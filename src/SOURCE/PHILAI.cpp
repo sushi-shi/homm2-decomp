@@ -36,21 +36,15 @@
 #define PHILAI_INIT_MAP_LINE_BASE 0x1b86
 #define PHILAI_CLOSE_MAP_LINE_BASE 0x1b96
 
-// Cell access for the heap-allocated MAP_WIDTH*MAP_HEIGHT i16 AI maps
-// (gaiHeroStrategicRVOfPos, gaiHeroEventStratRVOfPos, gaiLiveChanceOfPos; their
-// CodeView publics prove plain `short *` identity, so the pointer types are
-// modeled correctly). Retail lowers every access as byte-offset addressing —
-// each term scaled by 2 separately, combined with `add ecx,ecx` +
-// `lea eax,[ecx+2*eax]`, then a flat [eax+ecx] access. Natural i16 indexing
-// (`map[x + y * MAP_WIDTH]`) compiles to a scaled-index access with reversed
-// imul operands and structurally diverges, so the byte-offset spelling is
-// retail truth, not a modeling gap. The expansion is token-identical to the
-// previously inlined casts; call sites keep their byte-tuned offset spellings
-// (term order and `(MAP_WIDTH | 0)` steer per-site imul operand selection).
-// Note: introducing any new #define into this TU flips /Od commutative
-// parities elsewhere in the TU (accepted; realigns as the TU fills out).
-#define AI_MAP_AT(map, byteOffset) \
-    *reinterpret_cast<i16 *>(reinterpret_cast<char *>(map) + byteOffset)
+// The AI position maps (gaiHeroStrategicRVOfPos, gaiHeroEventStratRVOfPos,
+// gaiLiveChanceOfPos) are heap-allocated MAP_WIDTH*MAP_HEIGHT i16 grids
+// indexed [x + y * MAP_WIDTH]; the CodeView publics prove plain `short *`
+// identity. Retail lowered every access as flat byte-offset addressing
+// ((char *)map + x*2 + y*MAP_WIDTH*2: per-term *2 scaling via `add ecx,ecx` +
+// `lea eax,[ecx+2*eax]`, flat [eax+ecx] access, per-site imul operand order).
+// Natural indexing compiles to a scaled-index access instead, so these sites
+// diverge from retail bytes by policy: modeled indexing over byte-offset
+// casts. Known residual; re-solve at the matching layer, not in source.
 
 // @data-layout-note
 // Retail initialized storage is 0xf20e0..0xf2552 (0x472 bytes). The 18 public
@@ -85,8 +79,10 @@ DATA(0x004f2474) static i16 s_closeAIMapLineBase = PHILAI_CLOSE_MAP_LINE_BASE;
 DATA(0x005256f0) searchArray SVSearchArray;
 
 // @semantic
-// Bytes 0x000-0x1b5 are instruction-identical with relocations masked, and all 17
-// relocation targets agree. Retail's three NOPs begin after the CodeView function range.
+// All 17 relocation targets agree; retail's three NOPs begin after the CodeView
+// function range. Residual: the four gai* map stores use natural i16 indexing,
+// which lowers as scaled-index accesses where retail used flat byte-offset
+// addressing (see the AI position map note at the top of this file).
 VA(0x0043781b, 0x1b5)
 void ResetHeroRVs(i32 resetAll, i32 x, i32 y) {
     i32 idx;
@@ -99,18 +95,14 @@ void ResetHeroRVs(i32 resetAll, i32 x, i32 y) {
             for (idx = 0; idx < MAP_HEIGHT; idx++) {
                 if (resetAll != 0) {
                     if (abs(x - node) + abs(y - idx) < AI_NEARBY_RADIUS)
-                        AI_MAP_AT(gaiHeroStrategicRVOfPos,
-                                  node * 2 + idx * MAP_WIDTH * 2) = AI_RV_UNSET;
+                        gaiHeroStrategicRVOfPos[node + idx * MAP_WIDTH] = AI_RV_UNSET;
                 } else {
-                    AI_MAP_AT(gaiHeroStrategicRVOfPos,
-                              node * 2 + idx * MAP_WIDTH * 2) = AI_RV_UNSET;
-                    AI_MAP_AT(gaiHeroEventStratRVOfPos,
-                              node * 2 + idx * MAP_WIDTH * 2) = AI_RV_UNSET;
+                    gaiHeroStrategicRVOfPos[node + idx * MAP_WIDTH] = AI_RV_UNSET;
+                    gaiHeroEventStratRVOfPos[node + idx * MAP_WIDTH] = AI_RV_UNSET;
                 }
             }
         }
-        AI_MAP_AT(gaiHeroEventStratRVOfPos,
-                  x * 2 + (MAP_WIDTH | 0) * y * 2) = AI_RV_UNSET;
+        gaiHeroEventStratRVOfPos[x + y * MAP_WIDTH] = AI_RV_UNSET;
         for (node = 0; node < AI_HERO_COUNT; node++) {
             if (resetAll == 0 ||
                 abs(y - gpGame->m_heroRecs[node].m_x) +
@@ -2794,7 +2786,9 @@ i32 philAI::RVOfPosition(i32 x, i32 y, i32 hasEvent, i32 eventX, i32 eventY,
 // /Od /Ob1 probe proved all ordinary for-condition spellings canonicalize to the
 // current form; the one if/else spelling that flips the operands adds two non-retail
 // routing jumps. The other three diff rows are constant-pool/delinker identities,
-// and all 99 relocation sites align (`homm2 relocs`: only-base=0).
+// and all 99 relocation sites align (`homm2 relocs`: only-base=0). Additional
+// residual: the five gai* map accesses use natural i16 indexing where retail used
+// flat byte-offset addressing (see the AI position map note at the top of this file).
 VA(0x0043ef45, 0xaf9)
 i32 philAI::StrategicValueOfPosition(i32 targetX, i32 targetY, i32 immediate,
                                      i32 checkEnemies, i32 *liveChance,
@@ -2821,12 +2815,9 @@ i32 philAI::StrategicValueOfPosition(i32 targetX, i32 targetY, i32 immediate,
     i32 score4;
 
     if (!extraDistance && !immediate &&
-        AI_MAP_AT(gaiHeroStrategicRVOfPos,
-                  targetX * 2 + targetY * MAP_WIDTH * 2) != AI_RV_UNSET) {
-        *liveChance = AI_MAP_AT(gaiLiveChanceOfPos,
-                                targetX * 2 + targetY * MAP_WIDTH * 2);
-        return AI_MAP_AT(gaiHeroStrategicRVOfPos,
-                         targetX * 2 + targetY * MAP_WIDTH * 2);
+        gaiHeroStrategicRVOfPos[targetX + targetY * MAP_WIDTH] != AI_RV_UNSET) {
+        *liveChance = gaiLiveChanceOfPos[targetX + targetY * MAP_WIDTH];
+        return gaiHeroStrategicRVOfPos[targetX + targetY * MAP_WIDTH];
     }
 
     score4 = 0;
@@ -2969,10 +2960,10 @@ i32 philAI::StrategicValueOfPosition(i32 targetX, i32 targetY, i32 immediate,
     if (score4 > 32000)
         score4 = 32000;
     if (!immediate && !extraDistance) {
-        AI_MAP_AT(gaiHeroStrategicRVOfPos,
-                  targetX * 2 + targetY * MAP_WIDTH * 2) = static_cast<i16>(score4);
-        AI_MAP_AT(gaiLiveChanceOfPos,
-                  targetX * 2 + targetY * MAP_WIDTH * 2) = static_cast<i16>(*liveChance);
+        gaiHeroStrategicRVOfPos[targetX + targetY * MAP_WIDTH] =
+            static_cast<i16>(score4);
+        gaiLiveChanceOfPos[targetX + targetY * MAP_WIDTH] =
+            static_cast<i16>(*liveChance);
     }
     return score4;
 }
@@ -4771,7 +4762,9 @@ i32 philAI::ManaRefreshValue(hero *h, i32 level) {
 // delinked private code, so symbol-only disassembly truncates our body after the
 // first switch arm; explicit-range review is required. One canonical
 // gafAITurnCostResource reference remains delinked under a different identity.
-// Revisit when private-function boundaries are normalized.
+// Revisit when private-function boundaries are normalized. Additional residual:
+// the three gai* map accesses use natural i16 indexing where retail used flat
+// byte-offset addressing (see the AI position map note at the top of this file).
 VA(0x00443fc4, 0x1ac5)
 i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32 *liveChance) {
     mapCell *cell_k;
@@ -4806,11 +4799,8 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32 *liveChance)
     i32 resources_e[7];
 
     if (!immediate &&
-        AI_MAP_AT(gaiHeroEventStratRVOfPos,
-                  (MAP_WIDTH | 0) * y * sizeof(i16) + x * sizeof(i16)) !=
-            AI_RV_UNSET)
-        return AI_MAP_AT(gaiHeroEventStratRVOfPos,
-                         (MAP_WIDTH | 0) * y * sizeof(i16) + x * sizeof(i16));
+        gaiHeroEventStratRVOfPos[x + y * MAP_WIDTH] != AI_RV_UNSET)
+        return gaiHeroEventStratRVOfPos[x + y * MAP_WIDTH];
 
     gbReduceByReload = 1;
     gbReduceByBerserk = 1;
@@ -5351,8 +5341,7 @@ creature_purchase:
             value_h = 32000;
         else if (value_h < -32000)
             value_h = -32000;
-        AI_MAP_AT(gaiHeroEventStratRVOfPos,
-                  (MAP_WIDTH | 0) * y * sizeof(i16) + x * sizeof(i16)) =
+        gaiHeroEventStratRVOfPos[x + y * MAP_WIDTH] =
             static_cast<i16>(value_h);
     }
     return value_h;
