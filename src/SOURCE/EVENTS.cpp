@@ -522,7 +522,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     -1,
                     MAP_EVENT_REWARD_ARTIFACT,
                     eventValue1,
-                    RES_GOLD,
+                    IDX(RES_GOLD),
                     SEA_CHEST_ARTIFACT_GOLD,
                     -1,
                     0
@@ -589,7 +589,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         1,
                         -1,
                         -1,
-                        RES_WOOD,
+                        IDX(RES_WOOD),
                         10,
                         RES_GOLD,
                         500,
@@ -2384,7 +2384,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             -1,
                             -1,
                             MAP_EVENT_REWARD_ARTIFACT,
-                            artifact8,
+                            IDX(artifact8),
                             -1,
                             0,
                             -1,
@@ -2450,7 +2450,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             -1,
                             -1,
                             MAP_EVENT_REWARD_ARTIFACT,
-                            artifact8,
+                            IDX(artifact8),
                             -1,
                             0,
                             -1,
@@ -4217,7 +4217,7 @@ void advManager::EventWindow(
     else
         sprintf(eventText, "Event ID %d", eventId);
 
-    NormalDialog(eventText, buttons, -1, -1, type1, value1, type2, value2, type3, 0);
+    NormalDialog(eventText, buttons, -1, -1, IDX(type1), value1, type2, value2, type3, 0);
 }
 
 // @early-stop
@@ -5918,7 +5918,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                         (cell->m_objectMetadata - eventResults[2]) * 8 | (cell->m_objectData & 7)
                     );
                     if (creatureFlag_l == 0) {
-                        GetMonsterCost(creatureType_i, creatureCosts_a);
+                        GetMonsterCost(IDX(creatureType_i), creatureCosts_a);
                         for (index_h = 0; index_h < AI_EVENT_RESOURCE_COUNT; ++index_h)
                             gpCurPlayer->m_resources[index_h] -=
                                 creatureCosts_a[index_h] * eventResults[2];
@@ -6606,7 +6606,7 @@ void advManager::RecruitSiteAIEvent(mapCell* cell, hero* eventHero) {
             availableCount1 = static_cast<i16>(availableCount1 - purchaseCount17);
             packedSite17 = (availableCount1 << AI_EVENT_RECRUIT_COUNT_SHIFT) | siteType3;
             cell->m_objectMetadata = packedSite17;
-            GetMonsterCost(creatureType13, cost16);
+            GetMonsterCost(IDX(creatureType13), cost16);
             for (resourceIndex27 = 0; resourceIndex27 < AI_EVENT_RESOURCE_COUNT;
                  resourceIndex27++) {
                 gpCurPlayer->m_resources[resourceIndex27] -=
@@ -6913,7 +6913,7 @@ void advManager::PlayerMonsterInteract(
                 strcat(gText, offerText_g);
             }
 
-            NormalDialog(gText, 2, -1, -1, RES_GOLD, joiningCost_i, -1, 0, -1, 0);
+            NormalDialog(gText, 2, -1, -1, IDX(RES_GOLD), joiningCost_i, -1, 0, -1, 0);
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                 eventHero->m_army.Add(IDX(monster_n), joining, -1);
                 *handled = 1;

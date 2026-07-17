@@ -2347,7 +2347,7 @@ void philAI::ValueOfBuyingCreature(
     i32 visitingArmySlot;
 
     missileStacks = 0;
-    GetMonsterCost(creature, creatureCosts);
+    GetMonsterCost(IDX(creature), creatureCosts);
     purchaseCost = RVConversion(creatureCosts) * purchaseCount;
     creatureValue = static_cast<i32>(
         gMonsterDatabase[IDX(creature)].fightValue * purchaseCount * gpCurPlayer->m_upgradeValueWeight
@@ -2502,7 +2502,7 @@ void philAI::GetBestCreature(town* townPtr, BHC& best, float& bestValue) {
                             gText,
                             "Town:%2d  Creature: % 18s   Raw BC = %8.2f,  RandBC = %8.2f.",
                             townPtr->m_id,
-                            GetMonsterName(creature),
+                            GetMonsterName(IDX(creature)),
                             rawValue,
                             randomizedValue
                         );
@@ -2548,7 +2548,7 @@ i32 philAI::MaxBuyableCreatures(CreatureType level) {
     i32 cost7[7];
     i32 res;
     i32 i;
-    GetMonsterCost(level, cost7);
+    GetMonsterCost(IDX(level), cost7);
     for (i = 0; i < 7; i++) {
         if (cost7[i] == 0)
             res = 9999;
@@ -3574,7 +3574,7 @@ void philAI::EvaluateOneTimeCreaturePurchase(
             purchaseFightValue15 * gpGame->m_players[gpCurAIHero->m_owner].m_upgradeValueWeight
         );
         if (useAvailableCount == 0) {
-            GetMonsterCost(creature, costTemp);
+            GetMonsterCost(IDX(creature), costTemp);
             purchaseValue -= RVConversion(costTemp) * purchaseCount;
         }
         if (purchaseValue < 0) {

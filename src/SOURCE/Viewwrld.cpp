@@ -291,7 +291,7 @@ void advManager::VWCompleteDraw(void) {
                         0,
                         VIEW_WORLD_SCREEN_WIDTH,
                         VIEW_WORLD_SCREEN_HEIGHT,
-                        giViewWorldScale
+                        IDX(giViewWorldScale)
                     );
                 }
                 if (cell0->m_extraIndex == 0
@@ -313,7 +313,7 @@ void advManager::VWCompleteDraw(void) {
                             0,
                             VIEW_WORLD_SCREEN_WIDTH,
                             VIEW_WORLD_SCREEN_HEIGHT,
-                            giViewWorldScale
+                            IDX(giViewWorldScale)
                         );
                     }
                     if (extra15->nextIndex == 0
@@ -337,7 +337,7 @@ void advManager::VWCompleteDraw(void) {
                         0,
                         VIEW_WORLD_SCREEN_WIDTH,
                         VIEW_WORLD_SCREEN_HEIGHT,
-                        giViewWorldScale
+                        IDX(giViewWorldScale)
                     );
                 }
                 if (cell0->m_extraIndex == 0
@@ -359,7 +359,7 @@ void advManager::VWCompleteDraw(void) {
                             0,
                             VIEW_WORLD_SCREEN_WIDTH,
                             VIEW_WORLD_SCREEN_HEIGHT,
-                            giViewWorldScale
+                            IDX(giViewWorldScale)
                         );
                     }
                     if (extra15->nextIndex == 0
@@ -383,7 +383,7 @@ void advManager::VWCompleteDraw(void) {
                         0,
                         VIEW_WORLD_SCREEN_WIDTH,
                         VIEW_WORLD_SCREEN_HEIGHT,
-                        giViewWorldScale
+                        IDX(giViewWorldScale)
                     );
                 }
                 if (cell0->m_extraIndex == 0
@@ -404,7 +404,7 @@ void advManager::VWCompleteDraw(void) {
                             0,
                             VIEW_WORLD_SCREEN_WIDTH,
                             VIEW_WORLD_SCREEN_HEIGHT,
-                            giViewWorldScale
+                            IDX(giViewWorldScale)
                         );
                     }
                     if (extra15->nextIndex == 0

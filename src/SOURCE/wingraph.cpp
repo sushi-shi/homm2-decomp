@@ -943,11 +943,11 @@ void SetFullScreenStatus(i32 fullScreen) {
         if (gbDDrawAttached == 0)
             return;
         gConfig.gfx[giCurExe].fullScreen = 1;
-        if (SetGraphicsType(WINGRAPH_GRAPHICS_DIRECT_DRAW) != 0)
+        if (IDX(SetGraphicsType(WINGRAPH_GRAPHICS_DIRECT_DRAW) != 0))
             DDSetFullScreenStatus(fullScreen);
     } else if (fullScreen == 0) {
         if (gbWinGAttached != 0)
-            SetGraphicsType(WINGRAPH_GRAPHICS_WING);
+            SetGraphicsType(IDX(WINGRAPH_GRAPHICS_WING));
     } else {
         DDSetFullScreenStatus(fullScreen);
     }
