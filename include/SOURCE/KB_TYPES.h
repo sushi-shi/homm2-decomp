@@ -401,10 +401,10 @@ H2_ENUM_BEGIN(MapObjectType)
     MAP_OBJECT_JAIL = 123
 H2_ENUM_END(MapObjectType)
 
-enum {
+H2_ENUM_BEGIN(KbTypeConstant)
     MAP_TRIGGER_ACTION_FLAG = 0x80,
     MAP_TRIGGER_TYPE_MASK = 0x7f
-};
+H2_ENUM_END(KbTypeConstant)
 
 H2_ENUM_CLASS_BEGIN(FactionType)
     FACTION_KNIGHT = 0,
@@ -506,9 +506,9 @@ typedef u32 UInt32;
 struct MemEntry;
 struct _SAMPLE; // SAMPLE2::pMem — opaque
 
-enum {
+H2_ENUM_BEGIN(KbLayoutConstant)
     MENU_ENABLE_STATUS_COUNT = 70
-};
+H2_ENUM_END(KbLayoutConstant)
 #pragma pack(push, 1)
 struct SMenuEnableStatus {
     u32 command;

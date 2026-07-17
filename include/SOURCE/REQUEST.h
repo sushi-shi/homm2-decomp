@@ -6,7 +6,7 @@
 
 #include <va.h>
 
-enum {
+H2_ENUM_BEGIN(RequestConstant)
     MAP_HEADER_SIZE = 0x1a4,
     MAP_HEADER_MAGIC_SIZE = 4,
     MAP_HEADER_PLAYER_DATA_SIZE = 0x12,
@@ -18,7 +18,7 @@ enum {
     MAP_HEADER_PLAYER_COUNT = 6,
     MAP_HEADER_MAGIC_BASE_GAME = 90,
     MAP_HEADER_MAGIC_EXPANSION_GAME = 92
-};
+H2_ENUM_END(RequestConstant)
 
 H2_ENUM_CLASS_BEGIN(MapDimension)
     MAP_DIMENSION_SMALL = 36,
