@@ -261,8 +261,8 @@ i32 inputManager::Open(i32 priority) {
     m_requestedPriority = priority;
     m_modifiers = 0;
     MakeScanCodeTable();
-    m_messageMask = 4;
-    m_priority = -1;
+    m_messageMask = BASE_MANAGER_ACCEPT_MOUSE_MOVE;
+    m_priority = INPUT_MANAGER_PRIORITY;
     m_active = true;
     strcpy(m_name, gInputManagerText.managerName);
     return 0;
