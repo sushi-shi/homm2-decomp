@@ -91,12 +91,12 @@ extern "C" void PollSound(void) {
         gpMouseManager->NewUpdate(0);
     }
     if (KBTickCount() > glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT]) {
-        if (giCycleType == 1 || IDX(giCycleType) == 3)
+        if (IDX(giCycleType) == 1 || IDX(giCycleType) == 3)
             glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT] = KBTickCount() + 110;
         else
             glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT] = KBTickCount() + 200;
         bDoColorCycle = 1;
-        if (giGraphicsType == 1 && IDX(giMainVideoModeColorDepth) != 8) {
+        if (IDX(giGraphicsType) == 1 && giMainVideoModeColorDepth != 8) {
             glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT] += 300;
             if (gbHeroMoving)
                 bDoColorCycle = 0;
@@ -391,7 +391,7 @@ i32 oldmain(void) {
             gbTCPFirstTime = false;
             giNumHumanPlayers = 1;
             iMPBaseType = MULTIPLAYER_BASE_NETWORK;
-            iMPNetProtocol = OLD_MAIN_NETWORK_PROTOCOL;
+            iMPNetProtocol = RemoteNetworkProtocol(OLD_MAIN_NETWORK_PROTOCOL);
             iMPExtendedType = giTCPHostStatus ? OLD_MAIN_REMOTE_HOST : OLD_MAIN_REMOTE_CLIENT;
             giSetupGameType = static_cast<u8>(giTCPType);
             RemoteMain(iMPExtendedType);
@@ -1279,7 +1279,7 @@ char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 mode) {
             gText,
             "The %s produces %s.",
             GetBuildingName(race, building),
-            gArmyNamesPlural[gDwellingType[IDX(race)][building - IDX(BUILDING_SLOT_DWELLING_FIRST)]]
+            gArmyNamesPlural[gDwellingType[IDX(race)][IDX(building) - IDX(BUILDING_SLOT_DWELLING_FIRST)]]
         );
         return gText;
     }
@@ -1302,7 +1302,7 @@ char* GetBuildingName(FactionType race, BuildingSlotType building) {
     else if (building < BUILDING_SLOT_DWELLING_FIRST)
         return gNeutralBuildingNames[IDX(building)];
     else
-        return gDwellingNames[IDX(race)][building - IDX(BUILDING_SLOT_DWELLING_FIRST)];
+        return gDwellingNames[IDX(race)][IDX(building) - IDX(BUILDING_SLOT_DWELLING_FIRST)];
 }
 
 VA(0x004997d4, 0x138)
@@ -1314,7 +1314,7 @@ void GetBuildingCost(FactionType race, BuildingSlotType building, i32* const des
                && building <= BUILDING_SLOT_DWELLING_LAST) {
         memcpy(
             dest,
-            gDwellingCosts[IDX(race)][building - IDX(BUILDING_SLOT_DWELLING_FIRST)],
+            gDwellingCosts[IDX(race)][IDX(building) - IDX(BUILDING_SLOT_DWELLING_FIRST)],
             KB_BUILDING_RESOURCE_COUNT * sizeof(i32)
         );
     } else if (building == BUILDING_SLOT_MAGE_GUILD) {
@@ -1417,7 +1417,7 @@ i32 CanBuild(town* t, BuildingSlotType building) {
         || (building == BUILDING_SLOT_UPGRADE_LAST
             && (t->m_buildings & IDX(KB_DWELLING_UPGRADE_SIXTH_FLAG))))
         return 0;
-    reqMask = gHierarchyMask[t->m_type][building - IDX(BUILDING_SLOT_DWELLING_FIRST)];
+    reqMask = gHierarchyMask[t->m_type][IDX(building) - IDX(BUILDING_SLOT_DWELLING_FIRST)];
     haveMask = t->m_buildings;
     if (haveMask & IDX(KB_DWELLING_UPGRADE_FIRST_FLAG))
         haveMask |= IDX(KB_DWELLING_FIRST_FLAG);
@@ -1467,7 +1467,7 @@ i32 GetBuildingBaseResourceValue(FactionType race, BuildingSlotType building, i3
         else
             return gNeutralBaseResourceValues[IDX(building)];
     } else {
-        return gDwellingBaseResourceValues[IDX(race)][building - IDX(BUILDING_SLOT_DWELLING_FIRST)];
+        return gDwellingBaseResourceValues[IDX(race)][IDX(building) - IDX(BUILDING_SLOT_DWELLING_FIRST)];
     }
 }
 
