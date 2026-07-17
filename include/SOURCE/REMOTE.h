@@ -5,6 +5,10 @@
 // Declarations of the free functions DEFINED in REMOTE.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
 
+typedef enum RemoteCrcConstant {
+    REMOTE_CRC_FEEDBACK_BIT = 0x08000000
+} RemoteCrcConstant;
+
 typedef enum RemoteConstant {
     REMOTE_PLAYER_COUNT = 6,
     REMOTE_QUEUE_CAPACITY = 128,

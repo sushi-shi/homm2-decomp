@@ -8,7 +8,17 @@ typedef enum MiscPaletteConstant {
     MISC_PALETTE_MAX_LEVEL = 0x3f
 } MiscPaletteConstant;
 
+typedef enum MiscCycleColorRange {
+    MISC_CYCLE_RANGE_ONE_FIRST = 0xd6,
+    MISC_CYCLE_RANGE_ONE_LAST = 0xdd,
+    MISC_CYCLE_RANGE_TWO_FIRST = 0xe7,
+    MISC_CYCLE_RANGE_TWO_LAST = 0xed
+} MiscCycleColorRange;
+
 typedef enum MiscFadeConstant {
+    MISC_FADE_LEVEL_COUNT = 0x40,
+    MISC_FADE_LEVEL_LAST = 0x3f,
+    MISC_WINDOW_POSITION_MARGIN = 0xc8,
     MISC_FADE_IN_FRAME_DELAY = 0x14,
     MISC_FADE_TO_INCREMENT_SHIFT = 2,
     MISC_FADE_TO_START_LEVEL = 0x30,

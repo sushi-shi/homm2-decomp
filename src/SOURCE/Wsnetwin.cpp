@@ -496,7 +496,7 @@ i32 wsWaitForHost(void) {
             if (iWSAttempts > WS_TRANSPORT_HOST_RETRY_LIMIT) {
                 sprintf(cWSTextBuffer, "The Host is not responding.  Keep waiting?");
                 NormalDialog(cWSTextBuffer, 2, -1, -1, -1, 0, -1, 0, -1, 0);
-                if (gpWindowManager->m_dialogResult != 0x7805)
+                if (gpWindowManager->m_dialogResult != NORMAL_DIALOG_BUTTON_FIVE)
                     ShutDown(0);
                 iWSAttempts = 0;
             }

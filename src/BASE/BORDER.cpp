@@ -111,7 +111,7 @@ hoverEvent: {
     mx -= static_cast<i16>(window->m_posX);
     i16 my = static_cast<i16>(msg.payload.mouse.y) - window->m_posY;
     if (m_x <= mx && m_y <= my && mx < m_width + m_x && my < m_height + m_y) {
-        if (type == 0x20) {
+        if (type == MESSAGE_RIGHT_BUTTON_DOWN) {
             msg.payload.widget.parameter = MESSAGE_MODIFIER_RIGHT_BUTTON;
             msg.payload.widget.command = WIDGET_COMMAND_ALTERNATE_SELECT;
         } else {
