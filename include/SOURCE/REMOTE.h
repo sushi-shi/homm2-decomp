@@ -49,11 +49,6 @@ typedef enum RemoteNetworkProtocol {
     REMOTE_PROTOCOL_WINSOCK = 2
 } RemoteNetworkProtocol;
 
-typedef enum RemoteBaseType {
-    REMOTE_BASE_MODEM = 0,
-    REMOTE_BASE_NETWORK = 1
-} RemoteBaseType;
-
 typedef enum RemoteMessageType {
     REMOTE_MESSAGE_CONFIRM = 1,
     REMOTE_MESSAGE_RELIABLE = 2,

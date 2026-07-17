@@ -5,7 +5,7 @@
 // The complete definition is required anywhere a message is passed or returned by value.
 
 // Values emitted by INPUTMGR and consumed by manager/widget Main loops.
-typedef enum MessageType {
+HOMM2_ENUM_BEGIN(MessageType)
     MESSAGE_NONE = 0,
     MESSAGE_KEY_DOWN = 1,
     MESSAGE_KEY_UP = 2,
@@ -16,7 +16,7 @@ typedef enum MessageType {
     MESSAGE_RIGHT_BUTTON_UP = 0x40,
     MESSAGE_WIDGET = 0x200,
     MESSAGE_EXECUTIVE = 0x4000
-} MessageType;
+HOMM2_ENUM_END(MessageType)
 
 typedef enum WidgetInputCommand {
     WIDGET_COMMAND_DIALOG_SELECT = 10,

@@ -6,6 +6,7 @@
 // symbols. Other TUs call them by including this header (no local externs).
 #include <windows.h>
 #include <dplay.h>
+#include <SOURCE/REMOTE_TYPES.h>
 // forward declarations (was <_all.h>):
 
 typedef enum DirectPlayTransportConstant {
@@ -40,14 +41,6 @@ typedef enum DirectPlayWaitType {
     DP_WAIT_EXTRA_GUESTS = 9,
     DP_WAIT_HOST = 10
 } DirectPlayWaitType;
-
-typedef enum DirectPlayMessageType {
-    DP_MESSAGE_DATA = 1,
-    DP_MESSAGE_GUEST_ARRIVED = 2,
-    DP_MESSAGE_STARTUP = 3,
-    DP_MESSAGE_GUEST_ACCEPTED = 4,
-    DP_MESSAGE_GUEST_REJECTED = 5
-} DirectPlayMessageType;
 
 typedef enum DirectPlayResult {
     DP_RESULT_OK = 0,

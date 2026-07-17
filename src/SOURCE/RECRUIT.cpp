@@ -39,7 +39,7 @@ void SetupRecruitWin(class heroWindow *window, i32 creatureType, i32 goldCost,
     creatureName[0] -= 'a' - 'A';
     sprintf(label, "%s %s", "Recruit", creatureName);
     message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = RECRUIT_SET_TEXT;
+    message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message.payload.widget.id = RECRUIT_TITLE_CONTROL;
     message.payload.widget.data.text = label;
     window->BroadcastMessage(message);
@@ -60,16 +60,16 @@ void SetupRecruitWin(class heroWindow *window, i32 creatureType, i32 goldCost,
 
     sprintf(gText, "monh%04d.icn", creatureType);
     message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = RECRUIT_SET_ICON;
+    message.payload.widget.command = WIDGET_COMMAND_SET_ICON;
     message.payload.widget.id = RECRUIT_CREATURE_CONTROL;
     message.payload.widget.data.text = gText;
     window->BroadcastMessage(message);
     if (resourceType != RECRUIT_NO_RESOURCE) {
-        message.payload.widget.command = RECRUIT_SET_IMAGE;
+        message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
         message.payload.widget.id = RECRUIT_RESOURCE_ICON_CONTROL;
         message.payload.widget.data.value = resourceType;
         window->BroadcastMessage(message);
-        message.payload.widget.command = RECRUIT_SET_IMAGE;
+        message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
         message.payload.widget.id = RECRUIT_RESOURCE_IMAGE_CONTROL;
         window->BroadcastMessage(message);
     }
@@ -98,7 +98,7 @@ i32 recruitUnit::Open(i32 priority)
                     m_resourceCost, *m_available);
     gpMouseManager->SetPointer("advmice.mse", 0, MOUSE_AUTO_CURSOR_TYPE);
     Update();
-    gpWindowManager->BroadcastMessage(MESSAGE_WIDGET, RECRUIT_SET_FLAGS,
+    gpWindowManager->BroadcastMessage(MESSAGE_WIDGET, WIDGET_COMMAND_SET_FLAGS,
                                       RECRUIT_CLOSE_CONTROL,
                                       RECRUIT_BROADCAST_FLAGS);
     gpWindowManager->AddWindow(m_window, -1, 1);
@@ -118,9 +118,9 @@ i32 recruitUnit::Open(i32 priority)
     m_recruited = 0;
     m_noRoom = 0;
     if (*m_available == 0) {
-        gpWindowManager->BroadcastMessage(MESSAGE_WIDGET, RECRUIT_CLEAR_FLAGS,
+        gpWindowManager->BroadcastMessage(MESSAGE_WIDGET, WIDGET_COMMAND_CLEAR_FLAGS,
                                           RECRUIT_CONFIRM_CONTROL, 2);
-        gpWindowManager->BroadcastMessage(MESSAGE_WIDGET, RECRUIT_SET_FLAGS,
+        gpWindowManager->BroadcastMessage(MESSAGE_WIDGET, WIDGET_COMMAND_SET_FLAGS,
                                           RECRUIT_CONFIRM_CONTROL,
                                           RECRUIT_BROADCAST_FLAGS);
     }
@@ -145,7 +145,7 @@ void recruitUnit::Close(void)
                      NORMAL_DIALOG_NO_RESOURCE, 0,
                      NORMAL_DIALOG_NO_RESOURCE, 0);
     }
-    gpWindowManager->BroadcastMessage(MESSAGE_WIDGET, RECRUIT_CLEAR_FLAGS,
+    gpWindowManager->BroadcastMessage(MESSAGE_WIDGET, WIDGET_COMMAND_CLEAR_FLAGS,
                                       RECRUIT_CLOSE_CONTROL,
                                       RECRUIT_BROADCAST_FLAGS);
     if (m_sourceType == RECRUIT_SOURCE_TOWN && m_recruited != 0 &&
@@ -166,7 +166,7 @@ void recruitUnit::Update(void)
 {
     tag_message message;
     message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = RECRUIT_SET_TEXT;
+    message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
 
     sprintf(gText, "%s%d", "Available: ", *m_available);
     message.payload.widget.id = RECRUIT_AVAILABLE_CONTROL;
@@ -207,7 +207,7 @@ i32 recruitUnit::Main(struct tag_message &message)
         case RECRUIT_QUANTITY_CONTROL:
             if (quickView != 0)
                 break;
-            message.payload.widget.command = RECRUIT_GET_TEXT;
+            message.payload.widget.command = WIDGET_COMMAND_GET_TEXT;
             m_window->BroadcastMessage(message);
             m_quantity = atoi(message.payload.widget.data.text);
             if (m_quantity < 0)

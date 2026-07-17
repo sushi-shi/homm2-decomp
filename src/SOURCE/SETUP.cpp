@@ -339,12 +339,12 @@ i32 game::SetupMultiPlayerGame(void)
     gbDirectConnect = 0;
     switch (gpWindowManager->m_dialogResult) {
     case 1:
-        iMPBaseType = SETUP_MULTIPLAYER_HOT_SEAT;
+        iMPBaseType = MULTIPLAYER_BASE_HOT_SEAT;
         if (!SetupHotSeatGame())
             return 0;
         break;
     case 2:
-        iMPBaseType = SETUP_MULTIPLAYER_NETWORK;
+        iMPBaseType = MULTIPLAYER_BASE_NETWORK;
         if (!SetupNetworkGame2())
             return 0;
         break;
@@ -354,7 +354,7 @@ i32 game::SetupMultiPlayerGame(void)
     case 3:
         gbDirectConnect = 0;
     setupModem:
-        iMPBaseType = SETUP_MULTIPLAYER_MODEM;
+        iMPBaseType = MULTIPLAYER_BASE_MODEM;
         continueFlag = 1;
         LogStr("Common Modem 1");
         while (continueFlag) {
@@ -394,7 +394,7 @@ i32 game::SetupGame(void)
     gbInCampaign = 0;
     gbCampaignSideChoice = 0;
     iMPExtendedType = 10;
-    iMPBaseType = 10;
+    iMPBaseType = MULTIPLAYER_BASE_UNINITIALIZED;
     giNumHumanPlayers = 1;
     gbWaitForRemoteReceive = 0;
     gbDirectConnect = 0;
@@ -409,48 +409,48 @@ i32 game::SetupGame(void)
         case APP_MENU_RESTART_5:
         case APP_MENU_LOAD_2:
             giNumHumanPlayers = 2;
-            iMPBaseType = SETUP_MULTIPLAYER_HOT_SEAT;
+            iMPBaseType = MULTIPLAYER_BASE_HOT_SEAT;
             break;
         case APP_MENU_RESTART_6:
         case APP_MENU_LOAD_3:
             giNumHumanPlayers = 3;
-            iMPBaseType = SETUP_MULTIPLAYER_HOT_SEAT;
+            iMPBaseType = MULTIPLAYER_BASE_HOT_SEAT;
             break;
         case APP_MENU_RESTART_7:
         case APP_MENU_LOAD_4:
             giNumHumanPlayers = 4;
-            iMPBaseType = SETUP_MULTIPLAYER_HOT_SEAT;
+            iMPBaseType = MULTIPLAYER_BASE_HOT_SEAT;
             break;
 
         case APP_MENU_RESTART_8:
         case APP_MENU_LOAD_5:
-            iMPBaseType = SETUP_MULTIPLAYER_NETWORK;
+            iMPBaseType = MULTIPLAYER_BASE_NETWORK;
             iMPExtendedType = SETUP_REMOTE_NETWORK_HOST;
             goto remoteSetup;
         case APP_MENU_RESTART_9:
         case APP_MENU_LOAD_6:
-            iMPBaseType = SETUP_MULTIPLAYER_NETWORK;
+            iMPBaseType = MULTIPLAYER_BASE_NETWORK;
             iMPExtendedType = SETUP_REMOTE_NETWORK_GUEST;
             goto remoteSetup;
         case APP_MENU_RESTART_10:
         case APP_MENU_LOAD_7:
-            iMPBaseType = SETUP_MULTIPLAYER_MODEM;
+            iMPBaseType = MULTIPLAYER_BASE_MODEM;
             iMPExtendedType = SETUP_REMOTE_MODEM_DIAL;
             goto remoteSetup;
         case APP_MENU_RESTART_11:
         case APP_MENU_LOAD_8:
-            iMPBaseType = SETUP_MULTIPLAYER_MODEM;
+            iMPBaseType = MULTIPLAYER_BASE_MODEM;
             iMPExtendedType = SETUP_REMOTE_MODEM_ANSWER;
             goto remoteSetup;
         case APP_MENU_RESTART_12:
         case APP_MENU_LOAD_9:
-            iMPBaseType = SETUP_MULTIPLAYER_MODEM;
+            iMPBaseType = MULTIPLAYER_BASE_MODEM;
             iMPExtendedType = SETUP_REMOTE_MODEM_DIAL;
             gbDirectConnect = 1;
             goto remoteSetup;
         case APP_MENU_RESTART_13:
         case APP_MENU_LOAD_10:
-            iMPBaseType = SETUP_MULTIPLAYER_MODEM;
+            iMPBaseType = MULTIPLAYER_BASE_MODEM;
             iMPExtendedType = SETUP_REMOTE_MODEM_ANSWER;
             gbDirectConnect = 1;
             goto remoteSetup;
@@ -554,8 +554,8 @@ i32 game::SetupGame(void)
     }
 
     LogStr(" Setup 1");
-    if (iMPBaseType == SETUP_MULTIPLAYER_NETWORK ||
-        iMPBaseType == SETUP_MULTIPLAYER_MODEM) {
+    if (iMPBaseType == MULTIPLAYER_BASE_NETWORK ||
+        iMPBaseType == MULTIPLAYER_BASE_MODEM) {
         LogStr(" Setup 2");
         RemoteMain(iMPExtendedType);
         LogStr(" Setup 3");

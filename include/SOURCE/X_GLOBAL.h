@@ -2,6 +2,7 @@
 #define HOMM2_X_GLOBAL_H
 // Globals owned by this data-only TU (from CodeView).
 #include <SOURCE/KB_TYPES.h>
+#include <SOURCE/REMOTE_TYPES.h>
 #include <va.h>
 #include <SOURCE/CURSOR.h>
 #include <SOURCE/dimPalette.h>
@@ -541,7 +542,7 @@ extern char *cOverrideMIDIDriver;
 extern char gMapName[16];
 extern i32 giMinExtentX;
 extern i32 giMinExtentY;
-extern i32 iMPBaseType;
+extern MultiplayerBaseType iMPBaseType;
 extern i32 gbTCPFirstTime;
 extern i32 giHeroScreenSrcIndex;
 extern i32 giWeekType;
