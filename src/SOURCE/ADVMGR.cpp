@@ -1771,7 +1771,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
                 GiveArtifact(searchingHeroState, ARTIFACT_SPHERE_NEGATION, 1, -1);
             } else {
                 artifactResultLocal =
-                    GiveArtifact(searchingHeroState, gpGame->m_ultimateArtifactId, 1, -1);
+                    GiveArtifact(searchingHeroState, ArtifactType(gpGame->m_ultimateArtifactId), 1, -1);
             }
             gpGame->m_ultimateArtifactId = IDX(ARTIFACT_NONE);
         }

@@ -880,7 +880,7 @@ movementDone:
                 }
                 if (mapEvent_e->artifact != -1
                     && movingHero_f->NumArtifacts() < CURSOR_ARTIFACT_CAPACITY)
-                    GiveArtifact(movingHero_f, mapEvent_e->artifact, 1, -1);
+                    GiveArtifact(movingHero_f, ArtifactType(mapEvent_e->artifact), 1, -1);
                 if (mapEvent_e->cancelAfterVisit)
                     mapEvent_e->active = 0;
             }
@@ -908,7 +908,7 @@ movementDone:
             }
             if (mapEvent_e->artifact != -1
                 && movingHero_f->NumArtifacts() < CURSOR_ARTIFACT_CAPACITY) {
-                GiveArtifact(movingHero_f, mapEvent_e->artifact, 1, -1);
+                GiveArtifact(movingHero_f, ArtifactType(mapEvent_e->artifact), 1, -1);
                 if (primaryType_k != -1) {
                     secondaryType_k = primaryType_k;
                     secondaryAmount_e = primaryAmount_a;

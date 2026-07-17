@@ -308,7 +308,7 @@ void philAI::CheckBuyStuff(void) {
             idx = 0;
         }
         if (giBuildShipyard[giCurPlayer] >= 0) {
-            if (CanBuy(idx, 3) && CanBuild(idx, 3)) {
+            if (CanBuy(idx, 3) && CanBuild(idx, BuildingSlotType(3))) {
                 BuildBuilding(idx, 3);
                 giBuildShipyard[giCurPlayer] = -1;
             } else {
@@ -2287,7 +2287,7 @@ void philAI::GetBestBuilding(town* t, BHC& bhc, float& fOut) {
     jb = -1;
     for (node = 0; node < 32; node++) {
         if (!(t->m_buildings & (1 << node)) || (node == 0 && t->m_buildState < 5)) {
-            if (CanBuild(t, node)) {
+            if (CanBuild(t, BuildingSlotType(node))) {
                 ValueOfBuyingBuilding(t, BuildingSlotType(node), cost, idx);
                 if (gpCurPlayer->m_aiDifficulty == 1)
                     cost = static_cast<i32>(cost * 1.3);
@@ -2302,7 +2302,7 @@ void philAI::GetBestBuilding(town* t, BHC& bhc, float& fOut) {
                         gText,
                         "Town:%2d  Building: % 18s   Raw BC = %8.2f,  RandBC = %8.2f.",
                         t->m_id,
-                        GetBuildingName(t->m_type, node),
+                        GetBuildingName(FactionType(t->m_type), BuildingSlotType(node)),
                         idx,
                         score
                     );
@@ -3467,7 +3467,7 @@ i32 philAI::FightValueOfStack(
                     else if (gsSpellInfo[armySlotRecord].attributes & 1)
                         spellScoreTotal = static_cast<i32>(spellScoreTotal * spellPowerModifier);
                     numSpellCastsValue =
-                        heroPtr->m_spellPoints / GetManaCost(armySlotRecord, heroPtr);
+                        heroPtr->m_spellPoints / GetManaCost(SpellType(armySlotRecord), heroPtr);
                     if (numSpellCastsValue > 10)
                         numSpellCastsValue = 10;
                     spellScoreTotal =
@@ -4405,7 +4405,7 @@ void philAI::BuildBuilding(town* t, i32 building) {
         gText,
         "Player %d built %s in town %d.\n",
         giCurPlayer,
-        GetBuildingName(t->m_type, building),
+        GetBuildingName(FactionType(t->m_type), BuildingSlotType(building)),
         t->m_id
     );
     LogStr(gText);
@@ -4413,7 +4413,7 @@ void philAI::BuildBuilding(town* t, i32 building) {
         AiPrint(gText);
         DelayMilli(1500);
     }
-    GetBuildingCost(t->m_type, building, cost, t->m_buildState);
+    GetBuildingCost(FactionType(t->m_type), BuildingSlotType(building), cost, t->m_buildState);
     for (i = 0; i < 7; i++)
         gpCurPlayer->m_resources[i] -= cost[i];
     t->BuildBuilding(building);
@@ -5723,7 +5723,7 @@ i32 philAI::EvaluateGenericSite(mapCell* cell) {
         case AI_GENERIC_SITE_CURSED_ARTIFACTS:
             for (artifactIndex1 = 0; artifactIndex1 < AI_BATTLE_ARTIFACT_SLOT_COUNT;
                  artifactIndex1++) {
-                if (IsCursedItem(gpCurAIHero->m_artifacts[artifactIndex1]))
+                if (IsCursedItem(ArtifactType(gpCurAIHero->m_artifacts[artifactIndex1])))
                     cursedArtifactCount2++;
             }
             if (gpCurPlayer->m_resources[IDX(RES_GOLD)] > AI_GENERIC_SITE_GOLD_THRESHOLD) {

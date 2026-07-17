@@ -1445,7 +1445,7 @@ i32 CanBuy(town* t, i32 type) {
     i32 buf[KB_BUILDING_RESOURCE_COUNT];
     playerData* ptr;
     i32 idx;
-    GetBuildingCost(t->m_type, type, buf, t->m_buildState);
+    GetBuildingCost(FactionType(t->m_type), BuildingSlotType(type), buf, t->m_buildState);
     ptr = &gpGame->m_players[giCurPlayer];
     for (idx = 0; idx < KB_BUILDING_RESOURCE_COUNT; idx++)
         if (ptr->m_resources[idx] < buf[idx])
