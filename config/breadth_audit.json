@@ -2445,6 +2445,17 @@
     },
     {
       "unit": "SOURCE/KB",
+      "function": "?ClearMapExtra@@YIXXZ",
+      "source_hash": "8280c382066d",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 2,
+      "before": 96.4,
+      "after": 100.0,
+      "note": "Retail-order loop spelling closed executable bytes; all 19 relocs audited."
+    },
+    {
+      "unit": "SOURCE/KB",
       "function": "?DropDownToOnePlayer@@YIXXZ",
       "source_hash": "e14732932bbe",
       "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
@@ -2469,34 +2480,78 @@
       "unit": "SOURCE/KB",
       "function": "?HandleAppSpecificMenuCommands@@YIHH@Z",
       "source_hash": "015acf27f6db",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "parked",
       "iterations": 0,
       "before": 99.43399,
       "after": 99.43399,
-      "note": "Current raw immediate-displacement artifact proof revalidated with complete external relocations."
+      "note": "Reproduced table-excluded instruction and relocation proof; residual is delinked table/local identity."
+    },
+    {
+      "unit": "SOURCE/KB",
+      "function": "?HandleRemoteDeadPlayerExit@@YIXH@Z",
+      "source_hash": "ab7636d5cbe1",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 2,
+      "before": 97.44681,
+      "after": 97.44681,
+      "note": "Complete 0xc frame/CFG/9 relocs; equality load-order residual remains at +0xc."
     },
     {
       "unit": "SOURCE/KB",
       "function": "?InitMenuHandler@@YIHAAUtag_message@@@Z",
       "source_hash": "26703199975a",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "parked",
       "iterations": 0,
       "before": 99.60789,
       "after": 99.60789,
-      "note": "Current marker revalidated: complete frame CFG and relocation evidence; compiler-shape residual remains."
+      "note": "Reproduced existing complete frame/CFG/89-reloc proof; continuation and lea lowering remain documented."
+    },
+    {
+      "unit": "SOURCE/KB",
+      "function": "?InterpretCommandLine@@YIHXZ",
+      "source_hash": "fd9b8a1c8113",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 2,
+      "before": 99.40529,
+      "after": 100.0,
+      "note": "TU-state change closed the prior compare residual; table ranges and all 139 relocs audited."
+    },
+    {
+      "unit": "SOURCE/KB",
+      "function": "?NormalDialog@@YIXPADHHHHHHHHH@Z",
+      "source_hash": "9c5baa99deae",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 9,
+      "before": 97.42526,
+      "after": 97.1524,
+      "note": "Corrected resource branch, 32-bit temporaries and height lifetimes; remaining arithmetic/table/equality lowering documented."
     },
     {
       "unit": "SOURCE/KB",
       "function": "?PopNetBox@@YIXPADH@Z",
-      "source_hash": "8268ad33fe01",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
-      "outcome": "parked",
+      "source_hash": "973d390cf2f7",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "improved",
       "iterations": 2,
       "before": 98.83069,
-      "after": 98.83069,
-      "note": "Complete body frame CFG and 131 relocations; unsigned low-byte keyboard guard still lowers differently."
+      "after": 98.853615,
+      "note": "Corrected three cyclic stack-slot assignments and modeled keyboard low-byte view; direct byte-compare lowering remains."
+    },
+    {
+      "unit": "SOURCE/KB",
+      "function": "?ReceiveRemotePlayerExit@@YIXUSPlayerExit@@@Z",
+      "source_hash": "3a31baa751cb",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "improved",
+      "iterations": 2,
+      "before": 99.21739,
+      "after": 99.478264,
+      "note": "Complete 0x10 frame/CFG/45 relocs; one compare load-order residual remains at +0x280."
     },
     {
       "unit": "SOURCE/KB",
@@ -2513,23 +2568,23 @@
       "unit": "SOURCE/KB",
       "function": "?ShowMoraleInfo@game@@QAEXPAVhero@@H@Z",
       "source_hash": "d07a61f6bd0b",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
-      "outcome": "improved",
-      "iterations": 1,
-      "before": 99.399,
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.47301,
       "after": 99.47301,
-      "note": "Hash-derived stack-slot names aligned the frame; only two proved five-byte continuation jumps remain."
+      "note": "Reproduced exact non-jump stream with retail-only continuations at +0xfc and +0x60f; corrected marker offset."
     },
     {
       "unit": "SOURCE/KB",
       "function": "?SmackFade@@YIXPAE0@Z",
       "source_hash": "1d78bb4e16c5",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "exact",
       "iterations": 2,
-      "before": 99.28824,
+      "before": 98.588234,
       "after": 100.0,
-      "note": "Symmetric subscript spelling restores retail source-palette channel load order; all 597 bytes and 21 relocation sites align."
+      "note": "TU-state change closed byte-load order; all executable instructions and 21 relocs audited."
     },
     {
       "unit": "SOURCE/KB",
@@ -2541,6 +2596,17 @@
       "before": 92.94118,
       "after": 92.94118,
       "note": "Complete body; menu/local equality load order remains after operand swap and local qualification."
+    },
+    {
+      "unit": "SOURCE/KB",
+      "function": "?oldmain@@YIHXZ",
+      "source_hash": "48855b22c33f",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "improved",
+      "iterations": 0,
+      "before": 97.65539,
+      "after": 97.73516,
+      "note": "Reproduced complete frame/CFG proof; shared TU state improved score while three continuation sites remain."
     },
     {
       "unit": "SOURCE/Modem",
