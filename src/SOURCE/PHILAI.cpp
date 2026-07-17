@@ -202,7 +202,7 @@ void philAI::CheckForCreatureUpgrades(void) {
                 canUpgrade = 0;
                 for (dwelling = 20; dwelling <= 24; dwelling++) {
                     if (gDwellingType[townPtr->m_type]
-                                      [dwelling - AI_BUILDING_FIRST_DWELLING] ==
+                                      [dwelling - BUILDING_SLOT_DWELLING_FIRST] ==
                             armyPtr->m_creatureTypes[creatureIndex] &&
                         (townPtr->m_buildings & (1 << (dwelling + 5)))) {
                         canUpgrade = 1;
@@ -1948,8 +1948,8 @@ void philAI::ValueOfBuyingBuilding(town *townPtr, i32 building, i32 &resourceVal
     currentTownRace = townPtr->m_type;
     dwellingTotal = 0;
     highestDwellingId = -1;
-    for (indexBuilding = AI_BUILDING_FIRST_DWELLING;
-         indexBuilding < AI_BUILDING_LAST_DWELLING;
+    for (indexBuilding = BUILDING_SLOT_DWELLING_FIRST;
+         indexBuilding < BUILDING_SLOT_DWELLING_LAST;
          indexBuilding++) {
         if (townPtr->m_buildings & (1 << indexBuilding)) {
             dwellingTotal++;
@@ -1961,22 +1961,22 @@ void philAI::ValueOfBuyingBuilding(town *townPtr, i32 building, i32 &resourceVal
         if (townPtr->m_army.m_quantities[indexBuilding] > 0)
             currentOccupiedSlots++;
     }
-    if (building == AI_BUILDING_MAGE_GUILD)
+    if (building == BUILDING_SLOT_MAGE_GUILD)
         mageGuildLevelLocal = townPtr->m_buildState + 1;
     else
         mageGuildLevelLocal = 1;
     adjustedValue = static_cast<float>(GetBuildingBaseResourceValue(
         currentTownRace, building, mageGuildLevelLocal));
-    if (building >= AI_BUILDING_FIRST_UPGRADE &&
-        building <= AI_BUILDING_LAST_UPGRADE) {
+    if (building >= BUILDING_SLOT_UPGRADE_FIRST &&
+        building <= BUILDING_SLOT_UPGRADE_LAST) {
         adjustedValue -= static_cast<float>(GetBuildingBaseResourceValue(
             currentTownRace, building - 5, 1));
     }
-    if (building == AI_BUILDING_LAST_DWELLING) {
+    if (building == BUILDING_SLOT_DWELLING_LAST) {
         adjustedValue -= static_cast<float>(GetBuildingBaseResourceValue(
-            currentTownRace, AI_BUILDING_LAST_DWELLING - 1, 1));
+            currentTownRace, BUILDING_SLOT_DWELLING_LAST - 1, 1));
     }
-    if (building == AI_BUILDING_MAGE_GUILD &&
+    if (building == BUILDING_SLOT_MAGE_GUILD &&
         townPtr->m_buildState > 1) {
         adjustedValue -= static_cast<float>(GetBuildingBaseResourceValue(
             currentTownRace, building,
@@ -1984,11 +1984,11 @@ void philAI::ValueOfBuyingBuilding(town *townPtr, i32 building, i32 &resourceVal
     }
 
     switch (building) {
-    case AI_BUILDING_SPECIAL_SIX:
+    case BUILDING_SLOT_CASTLE:
         if (townPtr->m_unknown37 != 0)
             adjustedValue = -99.0f;
         break;
-    case AI_BUILDING_MAGE_GUILD:
+    case BUILDING_SLOT_MAGE_GUILD:
         if (townPtr->m_type == 0 ||
             townPtr->m_type == 1) {
             if ((townPtr->m_buildState >= 4 && giCurTurn < 40) ||
@@ -2005,18 +2005,18 @@ void philAI::ValueOfBuyingBuilding(town *townPtr, i32 building, i32 &resourceVal
             adjustedValue = static_cast<float>(adjustedValue * 0.55);
         }
         break;
-    case AI_BUILDING_SPECIAL_ONE:
+    case BUILDING_SLOT_SPECIAL_ONE:
         if (townPtr->m_type == 5 &&
             (townPtr->m_buildings &
-             (1 << AI_BUILDING_THIRD_DWELLING)))
+             (1 << BUILDING_SLOT_DWELLING_THIRD)))
             adjustedValue = 1500.0f;
         else if (giCurTurn < 21)
             adjustedValue = 0.0f;
         break;
-    case AI_BUILDING_SPECIAL_SEVEN:
+    case BUILDING_SLOT_SPECIAL_SEVEN:
         if (giCurTurn < 3 &&
             !(townPtr->m_buildings &
-              (1 << AI_BUILDING_THIRD_DWELLING)))
+              (1 << BUILDING_SLOT_DWELLING_THIRD)))
             adjustedValue = 0.0f;
         break;
     case 10:
@@ -2045,10 +2045,10 @@ void philAI::ValueOfBuyingBuilding(town *townPtr, i32 building, i32 &resourceVal
         break;
     case 14:
         break;
-    case AI_BUILDING_SPECIAL_THREE:
+    case BUILDING_SLOT_DOCK:
         adjustedValue = 0.0f;
         break;
-    case AI_BUILDING_SPECIAL_FOUR:
+    case BUILDING_SLOT_SPECIAL_FOUR:
         adjustedValue = static_cast<float>(
             (gpCurPlayer->m_attentionWeights.buildingValue + 0.66) * adjustedValue);
         adjustedValue = static_cast<float>(
@@ -2056,19 +2056,19 @@ void philAI::ValueOfBuyingBuilding(town *townPtr, i32 building, i32 &resourceVal
         adjustedValue = static_cast<float>((dwellingTotal * 0.33 + 0.66) * adjustedValue);
         if ((townPtr->m_type != 0 ||
              !(townPtr->m_buildings &
-               (1 << AI_BUILDING_SECOND_DWELLING))) &&
+               (1 << BUILDING_SLOT_DWELLING_SECOND))) &&
             gpGame->m_day < 6)
             adjustedValue = 0.0f;
         break;
-    case AI_BUILDING_SPECIAL_TWO:
+    case BUILDING_SLOT_NECROMANCER_SHRINE:
         if (townPtr->m_type == 5)
             break;
         if ((townPtr->m_type == 0 &&
              (townPtr->m_buildings &
-              (1 << AI_BUILDING_THIRD_DWELLING))) ||
+              (1 << BUILDING_SLOT_DWELLING_THIRD))) ||
             (townPtr->m_type == 2 &&
              (townPtr->m_buildings &
-              (1 << AI_BUILDING_THIRD_DWELLING)))) {
+              (1 << BUILDING_SLOT_DWELLING_THIRD)))) {
             adjustedValue = 1000.0f;
         } else {
             goto deferEarlyBuilding;
@@ -2090,7 +2090,7 @@ void philAI::ValueOfBuyingBuilding(town *townPtr, i32 building, i32 &resourceVal
             creatureLocated = 0;
             for (indexBuilding = 0; indexBuilding < AI_TOWN_ARMY_SLOTS; indexBuilding++) {
                 if (gDwellingType[townPtr->m_type]
-                                 [building - AI_BUILDING_FIRST_DWELLING] ==
+                                 [building - BUILDING_SLOT_DWELLING_FIRST] ==
                     townPtr->m_army.m_creatureTypes[indexBuilding]) {
                     creatureLocated = 1;
                 }
@@ -2104,7 +2104,7 @@ void philAI::ValueOfBuyingBuilding(town *townPtr, i32 building, i32 &resourceVal
             (gpCurPlayer->m_attentionWeights.upgradeBase * 2.0f + 0.33) * adjustedValue);
         adjustedValue = static_cast<float>(
             (1.0 - gpCurPlayer->BuildingsOwned(currentTownRace, building, 0) * 0.05) * adjustedValue);
-        if (building - AI_BUILDING_FIRST_DWELLING < highestDwellingId)
+        if (building - BUILDING_SLOT_DWELLING_FIRST < highestDwellingId)
             adjustedValue = static_cast<float>((1.66 - dwellingTotal * 0.33) * adjustedValue);
         if (townPtr->m_buildings & 0x10)
             adjustedValue = static_cast<float>(adjustedValue * 1.1);
@@ -2112,10 +2112,10 @@ void philAI::ValueOfBuyingBuilding(town *townPtr, i32 building, i32 &resourceVal
             currentCreatureType =
                 gDwellingType[townPtr->m_type][buildingLevel];
             if ((townPtr->m_buildings &
-                 (1 << (buildingLevel + AI_BUILDING_FIRST_DWELLING))) &&
+                 (1 << (buildingLevel + BUILDING_SLOT_DWELLING_FIRST))) &&
                 townPtr->m_garrison[buildingLevel] > 0 &&
                 gMonsterDatabase[gDwellingType[townPtr->m_type]
-                                              [building - AI_BUILDING_FIRST_DWELLING]].iconIndex <
+                                              [building - BUILDING_SLOT_DWELLING_FIRST]].iconIndex <
                     gMonsterDatabase[currentCreatureType].iconIndex * 1.2) {
                 adjustedValue = 0.0f;
                 break;
@@ -2133,7 +2133,7 @@ void philAI::ValueOfBuyingBuilding(town *townPtr, i32 building, i32 &resourceVal
     if (adjustedValue < 0.0f)
         adjustedValue = 0.0f;
     GetBuildingCost(currentTownRace, building, costsByResource,
-                    building == AI_BUILDING_MAGE_GUILD ?
+                    building == BUILDING_SLOT_MAGE_GUILD ?
                         townPtr->m_buildState : 0);
     adjustedValue = FutureDeflator(costsByResource) * adjustedValue;
     resourceValue = static_cast<i32>(adjustedValue);
@@ -2298,7 +2298,7 @@ void philAI::GetBestCreature(town *townPtr, BHC &best, float &bestValue) {
     for (dwelling = 0; dwelling < AI_CREATURE_PURCHASE_DWELLING_COUNT; dwelling++) {
         creature = gDwellingType[townPtr->m_type][dwelling];
         leastArmyValue = AI_CREATURE_PURCHASE_VALUE_LIMIT;
-        if ((townPtr->m_buildings & (1 << (dwelling + AI_BUILDING_FIRST_DWELLING))) &&
+        if ((townPtr->m_buildings & (1 << (dwelling + BUILDING_SLOT_DWELLING_FIRST))) &&
             townPtr->m_garrison[dwelling] > 0) {
             canJoin = 0;
             for (armyIndex = 0; armyIndex < AI_CREATURE_PURCHASE_ARMY_SLOT_COUNT; armyIndex++) {

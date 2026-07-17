@@ -213,8 +213,8 @@ i32 playerData::BuildingsOwned(i32 townType, i32 buildingIndex, i32 buildState)
     i32 i;
     for (i = 0; i < m_townCount; i++) {
         town *ownedTown = &gpGame->m_castleRecs[m_townIds[i]];
-        if (buildingIndex < TOWN_BUILDING_INDEX_FIRST_DWELLING || ownedTown->m_type == townType) {
-            if (buildingIndex == TOWN_BUILDING_INDEX_MAGE_GUILD) {
+        if (buildingIndex < BUILDING_SLOT_DWELLING_FIRST || ownedTown->m_type == townType) {
+            if (buildingIndex == BUILDING_SLOT_MAGE_GUILD) {
                 if (ownedTown->m_buildings & TOWN_BUILDING_MAGE_GUILD) {
                     if (ownedTown->m_buildState == buildState)
                         count++;
