@@ -5,6 +5,13 @@
 link-layout diagnostic, not an objdiff data-matching score and not a mechanism for
 forcing retail addresses.
 
+The same report compares the complete raw `.rdata` and `.data` payloads at
+section-relative offsets under `static_storage.section_bytes`. Exactness, SHA-256
+identities, equal/mismatched byte counts, and the first contiguous mismatch ranges
+are recorded. This whole-section comparison is the final authority: a normalized
+object-level 100% score is not proof when either linked section differs. Per-symbol
+and contribution diagnostics exist to attribute the first whole-section mismatch.
+
 ## Evidence and classification
 
 The retail inventory is limited to `data,cv-public-data` rows from
