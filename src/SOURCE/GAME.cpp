@@ -1585,7 +1585,7 @@ void game::RandomizeEvents(void) {
                     cell2->m_objectMetadata = signId4++;
                     break;
                 case MAP_OBJECT_WHIRLPOOL:
-                    cell2->m_triggerType |= 0x80;
+                    cell2->m_triggerType |= MAP_TRIGGER_ACTION_FLAG;
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_OBELISK:
                     cell2->m_objectMetadata = shrineId8++;
@@ -1595,7 +1595,7 @@ void game::RandomizeEvents(void) {
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SKELETON:
                     if (!HasObjectTilesetIndex(xPos2, yPos19, 0x37, 0x54)) {
-                        cell2->m_triggerType &= 0x7f;
+                        cell2->m_triggerType &= MAP_TRIGGER_TYPE_MASK;
                     } else if (Random(0, 9) > 2) {
                         cell2->m_objectMetadata = 1;
                     } else {
@@ -1811,7 +1811,7 @@ void game::RandomizeEvents(void) {
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_WAGON_CAMP:
                     if (!HasObjectTilesetIndex(xPos2, yPos19, 0x29, 0x81))
-                        cell2->m_triggerType &= 0x7f;
+                        cell2->m_triggerType &= MAP_TRIGGER_TYPE_MASK;
                     else
                         cell2->m_objectMetadata = Random(30, 50);
                     break;
@@ -1897,8 +1897,8 @@ void game::RandomizeEvents(void) {
                             if (column1 == xPos2 - 2 && cell2->m_triggerType != 0x81)
                                 continue;
                             if (m_worldMap.GetCell(column1, row18)->m_objectMetadata == 0
-                                || ((m_worldMap.GetCell(column1, row18)->m_triggerType & 0x7f)
-                                    == (cell2->m_triggerType & 0x7f)))
+                                || ((m_worldMap.GetCell(column1, row18)->m_triggerType & MAP_TRIGGER_TYPE_MASK)
+                                    == (cell2->m_triggerType & MAP_TRIGGER_TYPE_MASK)))
                                 m_worldMap.GetCell(column1, row18)->m_objectMetadata = mineId2;
                         }
                     }
@@ -1943,19 +1943,19 @@ void game::RandomizeEvents(void) {
     for (yPos19 = 0; yPos19 < MAP_HEIGHT; yPos19++) {
         for (xPos2 = 0; (xPos2 | 0) < MAP_WIDTH; xPos2++) {
             cell2 = m_worldMap.Row(yPos19) + xPos2;
-            if ((cell2->m_triggerType & 0x7f) == 0x67 && cell2->m_objectTileset == 0x3e)
+            if ((cell2->m_triggerType & MAP_TRIGGER_TYPE_MASK) == 0x67 && cell2->m_objectTileset == 0x3e)
                 cell2->m_flags |= 8;
-            if (cell2->m_objectIndex != 0xff && !(cell2->m_triggerType & 0x80)
+            if (cell2->m_objectIndex != 0xff && !(cell2->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
                 && !(cell2->m_flags & MAP_CELL_OBJECT_SHADOW_ONLY) && cell2->m_overlayIndex != 0xff)
                 cell2->m_flags |= 8;
             upperCount = 0;
             lowerCount16 = 0;
             if (!(cell2->m_flags & 8) && yPos19 < MAP_HEIGHT - 1 && cell2->m_objectIndex != 0xff
-                && !(cell2->m_triggerType & 0x80)
+                && !(cell2->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
                 && !(cell2->m_flags & MAP_CELL_OBJECT_SHADOW_ONLY)) {
                 mapCell* below0;
                 if (m_worldMap.GetCell(xPos2, yPos19 + 1)->m_objectIndex != 0xff
-                    && !(m_worldMap.GetCell(xPos2, yPos19 + 1)->m_triggerType & 0x80)
+                    && !(m_worldMap.GetCell(xPos2, yPos19 + 1)->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
                     && !(
                         m_worldMap.GetCell(xPos2, yPos19 + 1)->m_flags & MAP_CELL_OBJECT_SHADOW_ONLY
                     )) {
@@ -2017,7 +2017,7 @@ void game::RandomizeEvents(void) {
                     || m_worldMap.GetCell(xPos2, yPos19 + 1)->m_triggerType == 0xb1)
                     cell2->m_flags |= 8;
             }
-            if (cell2->m_objectIndex != 0xff && !(cell2->m_triggerType & 0x80)
+            if (cell2->m_objectIndex != 0xff && !(cell2->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
                 && !(cell2->m_flags & MAP_CELL_OBJECT_SHADOW_ONLY)
                 && (yPos19 == MAP_HEIGHT - 1 || (m_worldMap.Row(yPos19 + 1)[xPos2].m_flags & 4)))
                 cell2->m_flags |= 8;
@@ -3899,9 +3899,9 @@ void game::ConvertObject(
                     cell->m_objectIndex =
                         static_cast<u8>(cell->m_objectIndex - oldFirstIndex + newFirstIndex);
                 }
-                if ((cell->m_triggerType & 0x7f) == oldTrigger)
+                if ((cell->m_triggerType & MAP_TRIGGER_TYPE_MASK) == oldTrigger)
                     cell->m_triggerType =
-                        static_cast<u8>((cell->m_triggerType & 0x80) | newTrigger);
+                        static_cast<u8>((cell->m_triggerType & MAP_TRIGGER_ACTION_FLAG) | newTrigger);
 
                 if (cell->m_extraIndex != 0
                     && WORLDMAP->Extra(cell->m_extraIndex)->objectIndex != static_cast<u8>(-1))
@@ -4144,15 +4144,15 @@ void game::RandomizeMine(i32 x, i32 y) {
     mineId = GetMineId(x, y);
     for (rowOffset0 = 0; rowOffset0 < 2; rowOffset0++) {
         for (columnOffset4 = 0; columnOffset4 < 2; columnOffset4++) {
-            if ((WORLDMAP->GetCell(columnOffset4 + x, y - rowOffset0)->m_triggerType & 0x7f) > 0)
-                if ((WORLDMAP->GetCell(columnOffset4 + x, y - rowOffset0)->m_triggerType & 0x7f)
+            if ((WORLDMAP->GetCell(columnOffset4 + x, y - rowOffset0)->m_triggerType & MAP_TRIGGER_TYPE_MASK) > 0)
+                if ((WORLDMAP->GetCell(columnOffset4 + x, y - rowOffset0)->m_triggerType & MAP_TRIGGER_TYPE_MASK)
                     <= 0x30)
                     continue;
             WORLDMAP->GetCell(columnOffset4 + x, y - rowOffset0)->m_objectMetadata = mineId;
             WORLDMAP->GetCell(columnOffset4 + x, y - rowOffset0)->m_triggerType = triggerType19;
         }
     }
-    WORLDMAP->GetCell(x, y)->m_triggerType |= 0x80;
+    WORLDMAP->GetCell(x, y)->m_triggerType |= MAP_TRIGGER_ACTION_FLAG;
     m_mines[mineId].resourceType = static_cast<i8>(mineType29);
 }
 

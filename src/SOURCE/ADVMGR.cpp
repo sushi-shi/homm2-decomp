@@ -1264,7 +1264,7 @@ i32 advManager::ProcessSelect(struct tag_message* message, class mapCell** event
                         objectTypeState = MAP_OBJECT_HERO_INTERACTION;
                         objectIdIndex = gpCurPlayer->CurrentHero();
                     } else {
-                        objectTypeState = currentCell->m_triggerType & 0x7f;
+                        objectTypeState = currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK;
                         objectIdIndex = currentCell->m_objectMetadata;
                     }
                     switch (objectTypeState) {
@@ -1338,7 +1338,7 @@ i32 advManager::ProcessSelect(struct tag_message* message, class mapCell** event
                         *eventCell = DoAdvCommand();
                     }
                 } else {
-                    objectTypeState = currentCell->m_triggerType & 0x7f;
+                    objectTypeState = currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK;
                     objectIdIndex = currentCell->m_objectMetadata;
                     if (objectTypeState == MAP_OBJECT_HERO_INTERACTION) {
                         if (gpCurPlayer->CurrentHero() == objectIdIndex) {
@@ -1845,13 +1845,13 @@ i32 advManager::ProcessHover(i32 mouseX, i32 mouseY) {
 
             hoverCellLocal = GetCell(m_commandTargetX, m_commandTargetY);
             if (gpCurPlayer->m_currentHero == ADVMGR_INVALID_HERO) {
-                if ((hoverCellLocal->m_triggerType & ADVMGR_TRIGGER_TYPE_MASK) == ADVMGR_HOVER_TOWN
+                if ((hoverCellLocal->m_triggerType & MAP_TRIGGER_TYPE_MASK) == ADVMGR_HOVER_TOWN
                     && gpGame->GetTown(hoverCellLocal->m_objectMetadata)->m_owner == giCurPlayer) {
                     gpMouseManager->SetPointer(ADVMGR_POINTER_TOWN);
                     m_selectedCell = ADVMGR_COMMAND_TOWN_VIEW;
                     return 1;
                 } else {
-                    if ((hoverCellLocal->m_triggerType & ADVMGR_TRIGGER_TYPE_MASK)
+                    if ((hoverCellLocal->m_triggerType & MAP_TRIGGER_TYPE_MASK)
                             == ADVMGR_HOVER_HERO
                         && gpGame->GetHero(hoverCellLocal->m_objectMetadata)->m_owner
                                == giCurPlayer) {
@@ -1874,7 +1874,7 @@ i32 advManager::ProcessHover(i32 mouseX, i32 mouseY) {
                 }
 
                 if (hoverCellLocal->m_flags & ADVMGR_HOVER_OBJECT_BLOCKED) {
-                    if ((hoverCellLocal->m_triggerType & ADVMGR_TRIGGER_TYPE_MASK)
+                    if ((hoverCellLocal->m_triggerType & MAP_TRIGGER_TYPE_MASK)
                         == ADVMGR_HOVER_TOWN) {
                         hoverTownCell = gpGame->GetTown(hoverCellLocal->m_objectMetadata);
                         if (hoverTownCell->m_owner == giCurPlayer) {
@@ -1890,8 +1890,8 @@ i32 advManager::ProcessHover(i32 mouseX, i32 mouseY) {
 
                 if (!((m_cursorType == ADVMGR_CURSOR_ROUTE
                        || giGroundToTerrain[hoverCellLocal->m_terrainImageIndex]
-                       || hoverCellLocal->m_triggerType == ADVMGR_HERO_TRIGGER
-                       || hoverCellLocal->m_triggerType == ADVMGR_BOAT_TRIGGER
+                       || hoverCellLocal->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION)
+                       || hoverCellLocal->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_BOAT)
                        || hoverCellLocal->m_triggerType == ADVMGR_HOVER_SHIPWRECK_TRIGGER)
                       && (m_cursorType != ADVMGR_CURSOR_ROUTE
                           || !giGroundToTerrain[hoverCellLocal->m_terrainImageIndex]
@@ -1917,7 +1917,7 @@ i32 advManager::ProcessHover(i32 mouseX, i32 mouseY) {
                     }
                     pointerBaseCursor = routeDaysCount * ADVMGR_HOVER_ROUTE_FRAMES_PER_DAY;
 
-                    switch (hoverCellLocal->m_triggerType & ADVMGR_TRIGGER_TYPE_MASK) {
+                    switch (hoverCellLocal->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
                         case ADVMGR_HOVER_BOAT:
                             if (m_cursorType != ADVMGR_CURSOR_ROUTE) {
                                 gpMouseManager->SetPointer(pointerBaseCursor + ADVMGR_POINTER_SAIL);
@@ -1961,7 +1961,7 @@ i32 advManager::ProcessHover(i32 mouseX, i32 mouseY) {
                             break;
                         case ADVMGR_HOVER_TOWN:
                             hoverTownCell = gpGame->GetTown(hoverCellLocal->m_objectMetadata);
-                            if ((hoverCellLocal->m_triggerType & ADVMGR_TRIGGER_ACTION_FLAG)
+                            if ((hoverCellLocal->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
                                 && hoverTownCell->m_owner != giCurPlayer
                                 && hoverTownCell->HasGarrison()) {
                                 gpMouseManager->SetPointer(
@@ -1976,13 +1976,13 @@ i32 advManager::ProcessHover(i32 mouseX, i32 mouseY) {
                             if (!((mapExtra[m_commandTargetY * MAP_WIDTH + m_commandTargetX]
                                    & ADVMGR_HOVER_UNREACHABLE)
                                   && m_cursorType != ADVMGR_CURSOR_ROUTE
-                                  && (!(hoverCellLocal->m_triggerType & ADVMGR_TRIGGER_ACTION_FLAG)
+                                  && (!(hoverCellLocal->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
                                       || !StopOnTrigger(hoverCellLocal))
                                   && (gpMouseManager->SetPointer(
                                           pointerBaseCursor + ADVMGR_POINTER_ATTACK
                                       ),
                                       1))) {
-                                if (hoverCellLocal->m_triggerType & ADVMGR_TRIGGER_ACTION_FLAG) {
+                                if (hoverCellLocal->m_triggerType & MAP_TRIGGER_ACTION_FLAG) {
                                     if (m_cursorType != ADVMGR_CURSOR_ROUTE) {
                                         if (giGroundToTerrain[hoverCellLocal
                                                                   ->m_terrainImageIndex]) {
@@ -2820,7 +2820,7 @@ void advManager::DrawCell(
                 if (drawMask & ADVMGR_DRAW_HERO) {
                     if (mapX > 0) {
                         s_drawAdjacentCell = GetCell(mapX - 1, mapY);
-                        if (s_drawAdjacentCell->m_triggerType == ADVMGR_MONSTER_TRIGGER) {
+                        if (s_drawAdjacentCell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MINE)) {
                             s_drawMine = &gpGame->m_mines[s_drawAdjacentCell->m_objectMetadata];
                             if (s_drawMine->guardianType == 59) {
                                 IconToBitmap(
@@ -2907,7 +2907,7 @@ void advManager::DrawCell(
                     }
                 }
 
-                if (s_drawCell->m_triggerType == ADVMGR_BOAT_TRIGGER) {
+                if (s_drawCell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_BOAT)) {
                     s_drawPlayerColor = -1;
                     s_drawHeroType = ADVMGR_HERO_TYPE_BOAT;
                     s_drawHeroFrame =
@@ -2916,17 +2916,17 @@ void advManager::DrawCell(
                     s_drawHeroYOffset = -10;
                 } else {
                     s_drawHeroYOffset = 0;
-                    if (s_drawCell->m_triggerType == ADVMGR_HERO_TRIGGER) {
+                    if (s_drawCell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION)) {
                         s_drawHero = gpGame->GetHero(s_drawCell->m_objectMetadata);
                         s_drawPlayerColor = gpGame->m_players[s_drawHero->m_owner].m_color;
-                        if (s_drawHero->m_eventFlags & 0x80) {
+                        if (s_drawHero->m_eventFlags & HERO_EVENT_EMBARKED) {
                             s_drawHeroType = ADVMGR_HERO_TYPE_BOAT;
                         } else {
                             s_drawHeroType = s_drawHero->m_cursorType;
                         }
                         s_drawHeroFrame = GetCursorBaseFrame(s_drawHero->m_direction);
                         s_drawHasHero = 1;
-                        if (s_drawHero->m_eventFlags & 0x80) {
+                        if (s_drawHero->m_eventFlags & HERO_EVENT_EMBARKED) {
                             s_drawHeroYOffset = -10;
                         }
                     }
@@ -3506,7 +3506,7 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                     && m_mapOriginY + ADVMGR_RADAR_CURRENT_CELL == mapRow) {
                     radarColorValue = gOwnerColors[gpGame->m_players[giCurPlayer].m_color];
                 } else {
-                    if ((cellValue->m_triggerType & ADVMGR_TRIGGER_TYPE_MASK)
+                    if ((cellValue->m_triggerType & MAP_TRIGGER_TYPE_MASK)
                         == ADVMGR_RADAR_TOWN_TRIGGER) {
                         ownerIndexValue = gpGame->m_availableHeroes[cellValue->m_objectMetadata];
                         if (!(giCurPlayer != ownerIndexValue)) {
@@ -3850,16 +3850,16 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
             sprintf(gText, "%s", "Uncharted Territory");
         } else {
 
-            switch (currentCell->m_triggerType & 0x7f) {
+            switch (currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
                 case ADVMGR_OBJECT_ARTIFACT:
                     sprintf(gText, "%s", "Artifact");
                     break;
                 case ADVMGR_OBJECT_OBELISK:
-                    if (currentCell->m_triggerType & 0x80) {
+                    if (currentCell->m_triggerType & MAP_TRIGGER_ACTION_FLAG) {
                         sprintf(
                             gText,
                             "%s\n\n%s",
-                            gQuickViewText[currentCell->m_triggerType & 0x7f],
+                            gQuickViewText[currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK],
                             (gpGame->m_obeliskVisitors
                                  [currentCell->m_objectMetadata - ADVMGR_OBELISK_INDEX_BASE]
                              & (1u << giCurPlayer))
@@ -3871,11 +3871,11 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     }
                     break;
                 case ADVMGR_OBJECT_GAZEBO_VISIT:
-                    if (heroLocal != 0 && (currentCell->m_triggerType & 0x80)) {
+                    if (heroLocal != 0 && (currentCell->m_triggerType & MAP_TRIGGER_ACTION_FLAG)) {
                         sprintf(
                             gText,
                             "%s\n\n%s",
-                            gQuickViewText[currentCell->m_triggerType & 0x7f],
+                            gQuickViewText[currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK],
                             (heroLocal->m_gazeboVisits
                              & (1u << (currentCell->m_objectMetadata & 0x1f)))
                                 ? "(already visited)"
@@ -3886,11 +3886,11 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     }
                     break;
                 case ADVMGR_OBJECT_FORT_VISIT:
-                    if (heroLocal != 0 && (currentCell->m_triggerType & 0x80)) {
+                    if (heroLocal != 0 && (currentCell->m_triggerType & MAP_TRIGGER_ACTION_FLAG)) {
                         sprintf(
                             gText,
                             "%s\n\n%s",
-                            gQuickViewText[currentCell->m_triggerType & 0x7f],
+                            gQuickViewText[currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK],
                             (heroLocal->m_fortVisits
                              & (1u << (currentCell->m_objectMetadata & 0x1f)))
                                 ? "(already visited)"
@@ -3901,11 +3901,11 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     }
                     break;
                 case ADVMGR_OBJECT_WITCH_DOCTOR_VISIT:
-                    if (heroLocal != 0 && (currentCell->m_triggerType & 0x80)) {
+                    if (heroLocal != 0 && (currentCell->m_triggerType & MAP_TRIGGER_ACTION_FLAG)) {
                         sprintf(
                             gText,
                             "%s\n\n%s",
-                            gQuickViewText[currentCell->m_triggerType & 0x7f],
+                            gQuickViewText[currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK],
                             (heroLocal->m_witchDoctorVisits
                              & (1u << (currentCell->m_objectMetadata & 0x1f)))
                                 ? "(already visited)"
@@ -3916,11 +3916,11 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     }
                     break;
                 case ADVMGR_OBJECT_MERCENARY_VISIT:
-                    if (heroLocal != 0 && (currentCell->m_triggerType & 0x80)) {
+                    if (heroLocal != 0 && (currentCell->m_triggerType & MAP_TRIGGER_ACTION_FLAG)) {
                         sprintf(
                             gText,
                             "%s\n\n%s",
-                            gQuickViewText[currentCell->m_triggerType & 0x7f],
+                            gQuickViewText[currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK],
                             (heroLocal->m_mercenaryCampVisits
                              & (1u << (currentCell->m_objectMetadata & 0x1f)))
                                 ? "(already visited)"
@@ -3931,11 +3931,11 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     }
                     break;
                 case ADVMGR_OBJECT_STANDING_STONE_ALT:
-                    if (heroLocal != 0 && (currentCell->m_triggerType & 0x80)) {
+                    if (heroLocal != 0 && (currentCell->m_triggerType & MAP_TRIGGER_ACTION_FLAG)) {
                         sprintf(
                             gText,
                             "%s\n\n%s",
-                            gQuickViewText[currentCell->m_triggerType & 0x7f],
+                            gQuickViewText[currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK],
                             (heroLocal->m_standingStoneVisits
                              & (1u << (currentCell->m_objectMetadata & 0x1f)))
                                 ? "(already visited)"
@@ -3946,11 +3946,11 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     }
                     break;
                 case ADVMGR_OBJECT_TREE_ALT:
-                    if (heroLocal != 0 && (currentCell->m_triggerType & 0x80)) {
+                    if (heroLocal != 0 && (currentCell->m_triggerType & MAP_TRIGGER_ACTION_FLAG)) {
                         sprintf(
                             gText,
                             "%s\n\n%s",
-                            gQuickViewText[currentCell->m_triggerType & 0x7f],
+                            gQuickViewText[currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK],
                             (heroLocal->m_treeKnowledgeVisits
                              & (1u << (currentCell->m_objectMetadata & 0x1f)))
                                 ? "(already visited)"
@@ -3961,11 +3961,11 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     }
                     break;
                 case ADVMGR_OBJECT_XANADU_ALT:
-                    if (heroLocal != 0 && (currentCell->m_triggerType & 0x80)) {
+                    if (heroLocal != 0 && (currentCell->m_triggerType & MAP_TRIGGER_ACTION_FLAG)) {
                         sprintf(
                             gText,
                             "%s\n\n%s",
-                            gQuickViewText[currentCell->m_triggerType & 0x7f],
+                            gQuickViewText[currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK],
                             (heroLocal->m_xanaduVisits
                              & (1u << (currentCell->m_objectMetadata & 0x1f)))
                                 ? "(already visited)"
@@ -4011,7 +4011,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     );
                     break;
                 case ADVMGR_OBJECT_GUARDED:
-                    sprintf(gText, "%s", gQuickViewText[currentCell->m_triggerType & 0x7f]);
+                    sprintf(gText, "%s", gQuickViewText[currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK]);
                     goto quick_info_guarded;
                 case ADVMGR_OBJECT_MINE:
                     if (gpGame->m_mines[currentCell->m_objectMetadata].guardianType != -1) {
@@ -4073,7 +4073,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                 case ADVMGR_OBJECT_TENT:
                     sprintf(
                         gText,
-                        gQuickViewText[currentCell->m_triggerType & 0x7f],
+                        gQuickViewText[currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK],
                         xBarrierColor[currentCell->m_objectMetadata & 7]
                     );
                     uppercaseResult =
@@ -4196,12 +4196,12 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         sprintf(
                             gText,
                             "%s\n\n%s",
-                            gQuickViewText[currentCell->m_triggerType & 0x7f],
+                            gQuickViewText[currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK],
                             (heroLocal->m_eventFlags & visitedMaskValue) ? "(already visited)"
                                                                          : "(not visited)"
                         );
                     } else {
-                        sprintf(gText, "%s", gQuickViewText[currentCell->m_triggerType & 0x7f]);
+                        sprintf(gText, "%s", gQuickViewText[currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK]);
                     }
                     break;
             }
@@ -6462,7 +6462,7 @@ i32 DimensionDoorHandler(tag_message& message) {
                         gpAdvManager->m_mapOriginX + mouseX,
                         gpAdvManager->m_mapOriginY + mouseY
                     );
-                    if ((cell->m_triggerType & ADVMGR_TRIGGER_ACTION_FLAG)
+                    if ((cell->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
                         || (cell->m_flags & ADVMGR_HOVER_OBJECT_BLOCKED)) {
                         gpWindowManager->m_dialogResult = 0;
                         gpMouseManager->SetPointer(ADVMGR_POINTER_DEFAULT);
@@ -6546,10 +6546,10 @@ i32 advManager::ComboDraw(i32 originX, i32 originY, i32 animate) {
                 if (cell->m_animatedObject || cell->m_animatedOverlay) {
                     ++bComboDraw[column][mapRow];
                 }
-                if ((cell->m_triggerType & ADVMGR_TRIGGER_TYPE_MASK) == 0x28) {
+                if ((cell->m_triggerType & MAP_TRIGGER_TYPE_MASK) == 0x28) {
                     ++bComboDraw[column][mapRow];
                 }
-                if ((cell->m_triggerType & ADVMGR_TRIGGER_TYPE_MASK) == 1) {
+                if ((cell->m_triggerType & MAP_TRIGGER_TYPE_MASK) == 1) {
                     ++bComboDraw[column][mapRow];
                 }
 
@@ -6571,8 +6571,8 @@ i32 advManager::ComboDraw(i32 originX, i32 originY, i32 animate) {
                     }
                 }
 
-                if (cell->m_triggerType == ADVMGR_HERO_TRIGGER
-                    || cell->m_triggerType == ADVMGR_BOAT_TRIGGER) {
+                if (cell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION)
+                    || cell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_BOAT)) {
                     ++bComboDraw[column][mapRow];
                     if (GetCloudLookup(column + originX, mapRow + originY) != 0) {
                         bComboDraw[column + 1][mapRow] += ADVMGR_COMBO_CLOUD_MARK;
@@ -6649,7 +6649,7 @@ i32 advManager::ComboDraw(i32 originX, i32 originY, i32 animate) {
     for (column = 0; column < ADVMGR_COMBO_VIEW_CELLS; ++column) {
         for (mapRow = 0; mapRow < ADVMGR_COMBO_VIEW_CELLS; ++mapRow) {
             cell = GetCell(column + originX, mapRow + originY);
-            if (cell->m_triggerType == ADVMGR_MONSTER_TRIGGER) {
+            if (cell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MINE)) {
                 if (gpGame->m_mines[cell->m_objectMetadata].guardianType == CREATURE_GHOST) {
                     ++bComboDraw[column][mapRow];
                     ++bComboDraw[column + 1][mapRow];
@@ -7029,8 +7029,8 @@ i32 advManager::GetSoundId(i32 x, i32 y) {
         return ADVMGR_SOUND_COASTLINE;
     }
 
-    if (currentCell->m_triggerType & ADVMGR_TRIGGER_ACTION_FLAG) {
-        switch (currentCell->m_triggerType & ADVMGR_TRIGGER_TYPE_MASK) {
+    if (currentCell->m_triggerType & MAP_TRIGGER_ACTION_FLAG) {
+        switch (currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
             case MAP_OBJECT_ARCHER_HOUSE:
                 return ADVMGR_SOUND_DWELLING;
             case MAP_OBJECT_DWARF_COTTAGE:
@@ -7076,27 +7076,27 @@ i32 advManager::GetSoundId(i32 x, i32 y) {
             case MAP_OBJECT_WATER_WHEEL:
                 return ADVMGR_SOUND_WATER_WHEEL;
             case MAP_OBJECT_ALCHEMIST_LAB:
-                if (currentCell->m_triggerType & ADVMGR_TRIGGER_ACTION_FLAG) {
+                if (currentCell->m_triggerType & MAP_TRIGGER_ACTION_FLAG) {
                     return ADVMGR_SOUND_ALCHEMIST_LAB_ACTION;
                 }
                 break;
             case MAP_OBJECT_MINE:
-                if (currentCell->m_triggerType & ADVMGR_TRIGGER_ACTION_FLAG) {
+                if (currentCell->m_triggerType & MAP_TRIGGER_ACTION_FLAG) {
                     return ADVMGR_SOUND_MINE;
                 }
                 break;
             case MAP_OBJECT_ABANDONED_MINE:
-                if (currentCell->m_triggerType & ADVMGR_TRIGGER_ACTION_FLAG) {
+                if (currentCell->m_triggerType & MAP_TRIGGER_ACTION_FLAG) {
                     return ADVMGR_SOUND_ABANDONED_MINE;
                 }
                 break;
             case MAP_OBJECT_SAWMILL:
-                if (currentCell->m_triggerType & ADVMGR_TRIGGER_ACTION_FLAG) {
+                if (currentCell->m_triggerType & MAP_TRIGGER_ACTION_FLAG) {
                     return ADVMGR_SOUND_SAWMILL;
                 }
                 break;
             case MAP_OBJECT_DAEMON_CAVE:
-                if (currentCell->m_triggerType & ADVMGR_TRIGGER_ACTION_FLAG) {
+                if (currentCell->m_triggerType & MAP_TRIGGER_ACTION_FLAG) {
                     return ADVMGR_SOUND_DAEMON_CAVE;
                 }
                 break;
@@ -7324,7 +7324,7 @@ void advManager::TeleportTo(
         if (oldCellFlag26 != 0) {
             destinationCell29->m_flags |= ADVMGR_TELEPORT_CELL_OBJECT_FLAG;
         } else {
-            destinationCell29->m_triggerType = ADVMGR_HERO_TRIGGER;
+            destinationCell29->m_triggerType = (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION);
             destinationCell29->m_objectMetadata = static_cast<u8>(mapHero->m_id);
         }
         if (m_cursorType == BOAT_CURSOR_TYPE) {
@@ -9701,7 +9701,7 @@ i32 advManager::IsCrystalBallInEffect(i32 x, i32 y, i32 radius) {
 
 VA(0x0046c318, 0x85)
 u8 StopOnTrigger(class mapCell* cell) {
-    i32 type = cell->m_triggerType & ADVMGR_TRIGGER_TYPE_MASK;
+    i32 type = cell->m_triggerType & MAP_TRIGGER_TYPE_MASK;
     if (type != ADVMGR_SPECIAL_TRIGGER) {
         return bStopOnTrigger[type];
     }

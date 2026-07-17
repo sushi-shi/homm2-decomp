@@ -403,17 +403,17 @@ i32 philAI::GoodAdjacent(i32* direction) {
     fReduceFactor = 1.0f;
     fBerserkFactor = 1.0f;
     bestValue = 100;
-    if ((gpAdvManager->GetCell(gpCurAIHero->m_x, gpCurAIHero->m_y)->m_triggerType & 0x7f)
+    if ((gpAdvManager->GetCell(gpCurAIHero->m_x, gpCurAIHero->m_y)->m_triggerType & MAP_TRIGGER_TYPE_MASK)
         == MAP_OBJECT_MONSTER)
         return 0;
     for (jb = 0; jb < 8; jb++) {
         if (gpAdvManager->ValidMoveWithEvent(gpCurAIHero, jb)) {
             kn = normalDirTable[jb].x + gpCurAIHero->m_x;
             nb = normalDirTable[jb].y + gpCurAIHero->m_y;
-            if ((gpAdvManager->GetCell(kn, nb)->m_triggerType & 0x80)
+            if ((gpAdvManager->GetCell(kn, nb)->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
                 && !(mapExtra[kn + (MAP_WIDTH | 0) * nb] & 0x80)
-                && ((gpAdvManager->GetCell(kn, nb)->m_triggerType & 0x7f) != MAP_OBJECT_MONSTER)
-                && ((gpAdvManager->GetCell(kn, nb)->m_triggerType & 0x7f) != MAP_OBJECT_ARTIFACT)) {
+                && ((gpAdvManager->GetCell(kn, nb)->m_triggerType & MAP_TRIGGER_TYPE_MASK) != MAP_OBJECT_MONSTER)
+                && ((gpAdvManager->GetCell(kn, nb)->m_triggerType & MAP_TRIGGER_TYPE_MASK) != MAP_OBJECT_ARTIFACT)) {
                 if (gpAdvManager->GetCell(kn, nb)->m_triggerType
                     == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)) {
                     ra = gpAdvManager->GetCell(kn, nb)->m_objectMetadata;
@@ -473,7 +473,7 @@ void philAI::CheckReload(void) {
         gpCurAIHero->m_y,
         gpCurAIHero->m_direction,
         gpCurAIHero->m_mobility << 2,
-        gpCurAIHero->m_eventFlags & 0x80,
+        gpCurAIHero->m_eventFlags & HERO_EVENT_EMBARKED,
         0,
         gpCurAIHero->m_remainingMobility,
         gpCurAIHero->m_secondarySkills[0],
@@ -641,7 +641,7 @@ i32 philAI::DoAnywhereDDoorTownGate(i32 targetValue) {
     i32 bestValue;
     mapCell* cell;
 
-    if (gpCurAIHero->m_eventFlags & 0x80)
+    if (gpCurAIHero->m_eventFlags & HERO_EVENT_EMBARKED)
         return 0;
     {
         bestX = -1;
@@ -663,7 +663,7 @@ i32 philAI::DoAnywhereDDoorTownGate(i32 targetValue) {
                             cell = gpAdvManager->GetCell(x, y);
                             if (giGroundToTerrain[cell->m_terrainImageIndex] == 0)
                                 continue;
-                            if (!((cell->m_triggerType & 0x80)
+                            if (!((cell->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
                                   || (targetValue < 25 && Random(0, 10) < 2))) {
                             } else {
                                 positionValue = RVOfPosition(
@@ -714,7 +714,7 @@ i32 philAI::DoAnywhereDDoorTownGate(i32 targetValue) {
                                             continue;
                                         if (cell->m_flags & 8)
                                             continue;
-                                        if (cell->m_triggerType & 0x80)
+                                        if (cell->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
                                             continue;
                                         if (cell->m_objectIndex != 0xff
                                             && !(cell->m_flags & MAP_CELL_OBJECT_SHADOW_ONLY))
@@ -761,7 +761,7 @@ i32 philAI::DoDimensionDoor(hero* pHero) {
         nb += normalDirTable[static_cast<u8>(gpSearchArray->m_storage.aiPath.directions[node])].y;
         if (abs(kn - pHero->m_x) <= 7 && abs(nb - pHero->m_y) <= 7) {
             jb = gpAdvManager->GetCell(kn, nb);
-            if (!(jb->m_triggerType & 0x80) && !(jb->m_flags & 0x8)) {
+            if (!(jb->m_triggerType & MAP_TRIGGER_ACTION_FLAG) && !(jb->m_flags & 0x8)) {
                 bestX = kn;
                 bestY = nb;
                 idx = gpSearchArray->m_pathLength - node;
@@ -912,7 +912,7 @@ void philAI::DoAI(i32 player) {
 
         heroDone5 = 0;
         ResetHeroRVs(0, 0, 0);
-        stepLimit36 = (gpCurAIHero->m_eventFlags & 0x80) ? 15 : 5;
+        stepLimit36 = (gpCurAIHero->m_eventFlags & HERO_EVENT_EMBARKED) ? 15 : 5;
         minimumValue9 = gpCurAIHero->m_mobility + 800;
         stepLimit36 = static_cast<i32>(stepLimit36 * (1.7 - gpGame->m_difficulty * 0.1));
         minimumValue9 = static_cast<i32>(minimumValue9 * ((gpGame->m_difficulty - 1) * 0.06 + 0.8));
@@ -1251,7 +1251,7 @@ firstWeekDone:
                 threatHeroPtr6->m_y,
                 threatHeroPtr6->m_direction,
                 threatHeroPtr6->m_remainingMobility + 100,
-                threatHeroPtr6->m_eventFlags & 0x80,
+                threatHeroPtr6->m_eventFlags & HERO_EVENT_EMBARKED,
                 1,
                 threatHeroPtr6->m_remainingMobility + 100,
                 threatHeroPtr6->m_secondarySkills[0],
@@ -1269,7 +1269,7 @@ firstWeekDone:
                             cell12 = gpAdvManager->GetCell(x8, y4 - 1);
                             if (cell12->m_triggerType
                                     == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)
-                                || (cell12->m_triggerType & 0x7f)
+                                || (cell12->m_triggerType & MAP_TRIGGER_TYPE_MASK)
                                        == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_BOAT)) {
                                 i32 threatTownId8 = gpGame->GetTownId(x8, y4 - 1);
                                 if (threatTownId8 == -1) {
@@ -1684,7 +1684,7 @@ i32 philAI::DetermineTargetPosition(i32& targetX, i32& targetY, i32 mobility, i3
                         } else {
                             candidate = 0;
                         }
-                    } else if ((candidateCell->m_triggerType & 0x80)
+                    } else if ((candidateCell->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
                                || (candidateCell->m_triggerType == MAP_OBJECT_COAST
                                    && (gpCurAIHero->m_eventFlags & HERO_EVENT_EMBARKED))
                                || (x % scanSpacingStep == 0 && y % scanSpacingStep == 0
@@ -1758,7 +1758,7 @@ i32 philAI::DetermineTargetPosition(i32& targetX, i32& targetY, i32 mobility, i3
                         targetBestYLocal = y;
                         bestValue = targetScoreLocal;
                     } else if ((bestValue | 0) == targetScoreLocal && targetScoreLocal == 0
-                               && !(gpAdvManager->GetCell(x, y)->m_triggerType & 0x80)) {
+                               && !(gpAdvManager->GetCell(x, y)->m_triggerType & MAP_TRIGGER_ACTION_FLAG)) {
                         if ((gpAdvManager->GetCell(targetBestXRange, targetBestYLocal)
                                  ->m_triggerType
                              & 0x80)
@@ -2821,7 +2821,7 @@ i32 philAI::RVOfPosition(
     targetLiveChance = AI_POSITION_FULL_CHANCE;
     adjacentEventChance = AI_POSITION_FULL_CHANCE;
     triggerType = gpAdvManager->GetCell(x, y)->m_triggerType;
-    objectType = triggerType & 0x7f;
+    objectType = triggerType & MAP_TRIGGER_TYPE_MASK;
     primaryEventChance = AI_POSITION_FULL_CHANCE;
     strategicLiveChance = AI_POSITION_FULL_CHANCE;
     targetLiveChance = AI_POSITION_FULL_CHANCE;
@@ -2869,7 +2869,7 @@ i32 philAI::RVOfPosition(
         }
     }
 
-    if ((triggerType & 0x80)
+    if ((triggerType & MAP_TRIGGER_ACTION_FLAG)
         || (gpCurPlayer->m_ultimateArtifactHintX == x
             && gpCurPlayer->m_ultimateArtifactHintY == y)) {
         eventValue = ValueOfEventAtPosition(x, y, eventMode, &primaryEventChance);
@@ -2935,7 +2935,7 @@ i32 philAI::RVOfPosition(
     }
 
     if (giDebugLevel > AI_POSITION_DEBUG_LEVEL - 1) {
-        i32 debugObjectType = triggerType & 0x7f;
+        i32 debugObjectType = triggerType & MAP_TRIGGER_TYPE_MASK;
         if (debugObjectType > 0 && debugObjectType < AI_POSITION_OBJECT_NAME_COUNT)
             objectName = gQuickViewText[debugObjectType];
         else
@@ -3029,7 +3029,7 @@ i32 philAI::StrategicValueOfPosition(
         search5 = &SVSearchArray;
     }
 
-    eventFlags8 = gpCurAIHero->m_eventFlags & 0x80;
+    eventFlags8 = gpCurAIHero->m_eventFlags & HERO_EVENT_EMBARKED;
     if (eventFlags8 && gpAdvManager->GetCell(targetX, targetY)->m_triggerType == 0x1c)
         eventFlags8 = 0;
     shortDistance13 = 700;
@@ -3057,7 +3057,7 @@ i32 philAI::StrategicValueOfPosition(
         for (yCounter = 0; MAP_HEIGHT > (yCounter | 0); yCounter++) {
             if (search5->GetNode(x13, yCounter).visited) {
                 cell9 = gpAdvManager->GetCell(x13, yCounter);
-                if ((!immediate && (cell9->m_triggerType & 0x80)
+                if ((!immediate && (cell9->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
                      && search5->GetNode(x13, yCounter).distance <= shortDistance13)
                     || (checkEnemies
                         && cell9->m_triggerType
@@ -4623,7 +4623,7 @@ i32 philAI::FightEvent(hero* h, mapCell* cell, i32 evaluateOnly) {
     i32 combatResult18;
     i32 unusedValue8;
 
-    eventType16 = cell->m_triggerType & 0x7f;
+    eventType16 = cell->m_triggerType & MAP_TRIGGER_TYPE_MASK;
     if (cell->m_objectMetadata == AI_FIGHT_EVENT_EMPTY)
         return 0;
 
@@ -5075,8 +5075,8 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
     if (gpCurPlayer->m_ultimateArtifactHintChance > 15 && gpCurPlayer->m_ultimateArtifactHintX == x
         && gpCurPlayer->m_ultimateArtifactHintY == y) {
         value_h = (gpCurPlayer->m_ultimateArtifactHintChance - 15) * gUltArtifactAvgValue / 100;
-    } else if (cell_k->m_triggerType & 0x80) {
-        switch (cell_k->m_triggerType & 0x7f) {
+    } else if (cell_k->m_triggerType & MAP_TRIGGER_ACTION_FLAG) {
+        switch (cell_k->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
             case MAP_OBJECT_MONSTER:
                 value_h = EvaluateMonsterEvent(
                     cell_k->m_objectIndex,
@@ -5648,7 +5648,7 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                     gText,
                     "AI encountered object type %d and doesn't know how to deal with it.   Tell "
                     "Phil",
-                    cell_k->m_triggerType & 0x7f
+                    cell_k->m_triggerType & MAP_TRIGGER_TYPE_MASK
                 );
                 NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
                 value_h = 0;
@@ -5664,9 +5664,9 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
         value_h = static_cast<i32>(value_h * fBerserkFactor);
     if (!immediate) {
         if (value_h > 0 && (mapExtra[(MAP_WIDTH | 0) * y + x] & 0x80)
-            && (cell_k->m_triggerType & 0x7f) != MAP_OBJECT_MONSTER)
+            && (cell_k->m_triggerType & MAP_TRIGGER_TYPE_MASK) != MAP_OBJECT_MONSTER)
             value_h = 0;
-        if (value_h < 0 && (cell_k->m_triggerType & 0x7f) != MAP_OBJECT_HERO_INTERACTION)
+        if (value_h < 0 && (cell_k->m_triggerType & MAP_TRIGGER_TYPE_MASK) != MAP_OBJECT_HERO_INTERACTION)
             value_h = 0;
         else if (value_h > 32000)
             value_h = 32000;
