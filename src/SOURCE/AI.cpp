@@ -584,7 +584,7 @@ void combatManager::DoLichShot(class army *lich)
             }
         }
         if (bestArmy12 == COMBAT_AI_NO_ARMY ||
-            0[&damageValue10] > bestDamage15) {
+            OD_STEER(damageValue10) > bestDamage15) {
             bestDamage15 = damageValue10;
             bestArmy12 = armyIndex37;
             giNextAction = COMBAT_AI_ACTION_MOVE;
@@ -828,8 +828,8 @@ i32 combatManager::GetClosestArmy(class army *currentArmy, i32 side, i32 mask)
     army *target26;
 
     for (armyIndex2 = 0; armyIndex2 < m_armyCount[side]; armyIndex2++) {
-        if ((0[&bit1] & mask) != 0) {
-            target26 = &0[&armyIndex2][m_armies[side]];
+        if ((OD_STEER(bit1) & mask) != 0) {
+            target26 = &OD_STEER(armyIndex2)[m_armies[side]];
             value19 = gpSearchArray->QuickDistance(
                 m_hexCells[currentArmy->m_hex].m_x,
                 m_hexCells[currentArmy->m_hex].m_y,
@@ -837,7 +837,7 @@ i32 combatManager::GetClosestArmy(class army *currentArmy, i32 side, i32 mask)
                 m_hexCells[target26->m_hex].m_y);
             value19 = value19 * COMBAT_AI_DISTANCE_WEIGHT -
                 target26->m_monster.hitPoints * target26->m_quantity;
-            if (0[&closestValue29] > value19) {
+            if (OD_STEER(closestValue29) > value19) {
                 closestArmy7 = armyIndex2;
                 closestValue29 = value19;
             }
@@ -887,16 +887,16 @@ i32 combatManager::AttemptAttack(class army *currentArmy, i32 side, i32 mask)
 
         currentArmy->m_targetSide = side;
         currentArmy->m_targetIndex = targetArmy;
-        targetHex = 0[&targetArmy][m_armies[side]].m_hex;
+        targetHex = OD_STEER(targetArmy)[m_armies[side]].m_hex;
         currentArmy->m_moveTargetHex = targetHex;
         if (currentArmy->ValidPath(targetHex, 0)) {
             giNextAction = COMBAT_AI_ACTION_MOVE;
             giNextActionGridIndex = targetHex;
             return 1;
         }
-        if ((0[&targetArmy][m_armies[side]].m_monster.flags.abilityFlags &
+        if ((OD_STEER(targetArmy)[m_armies[side]].m_monster.flags.abilityFlags &
              MONSTER_ABILITY_FLAG_WIDE) != 0) {
-            if (0[&targetArmy][m_armies[side]].m_facing == 0)
+            if (OD_STEER(targetArmy)[m_armies[side]].m_facing == 0)
                 targetHex--;
             else
                 targetHex++;
@@ -978,8 +978,8 @@ i32 combatManager::WalkTowardArmyFront(class army *currentArmy,
         return 0;
 
     frontOffset13 = 1;
-    targetHex7 = 0[&targetArmy6][m_armies[side]].m_hex;
-    if ((0[&targetArmy6][m_armies[side]].m_monster.flags.abilityFlags &
+    targetHex7 = OD_STEER(targetArmy6)[m_armies[side]].m_hex;
+    if ((OD_STEER(targetArmy6)[m_armies[side]].m_monster.flags.abilityFlags &
          MONSTER_ABILITY_FLAG_WIDE) != 0)
         frontOffset13 = 2;
     if (currentArmy->m_facing == 1)

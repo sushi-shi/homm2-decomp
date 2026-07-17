@@ -251,7 +251,7 @@ void hero::HeroScreenUpdate(void) {
     message.type = HERO_UI_MESSAGE;
     UpdateArmies();
     for (index = 0; index < HERO_UI_ARMY_SLOT_COUNT; index++) {
-        if (index == 0[&giHeroScreenSrcIndex])
+        if (index == OD_STEER(giHeroScreenSrcIndex))
             message.payload.widget.command = HERO_UI_WIDGET_ENABLE;
         else
             message.payload.widget.command = HERO_UI_WIDGET_DISABLE;
@@ -1806,7 +1806,7 @@ i8 hero::GetSSLevel(i32 skill) {
         shrineAndArtifactBonus += gpGame->CountShrines(m_owner);
     if (shrineAndArtifactBonus > HERO_NECROMANCY_BONUS_MAX)
         shrineAndArtifactBonus = HERO_NECROMANCY_BONUS_MAX;
-    level = 0[&shrineAndArtifactBonus] + level;
+    level = OD_STEER(shrineAndArtifactBonus) + level;
     if (level > HERO_NECROMANCY_EFFECTIVE_LEVEL_MAX)
         level = HERO_NECROMANCY_EFFECTIVE_LEVEL_MAX;
     return level;

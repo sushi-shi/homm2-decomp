@@ -2001,9 +2001,9 @@ void advManager::EraseObj(class mapCell *cell, i32 x, i32 y)
             continue;
 
         if (currentCell_k->m_extraIndex &&
-            0[&m_mapData]->Extra(currentCell_k->m_extraIndex)->objectIndex !=
+            OD_STEER(m_mapData)->Extra(currentCell_k->m_extraIndex)->objectIndex !=
                 ERASE_EMPTY_INDEX)
-            extra_i = 0[&m_mapData]->Extra(currentCell_k->m_extraIndex);
+            extra_i = OD_STEER(m_mapData)->Extra(currentCell_k->m_extraIndex);
         else
             continue;
 
@@ -2030,9 +2030,9 @@ void advManager::EraseObj(class mapCell *cell, i32 x, i32 y)
             goto cellDone;
 
         if (currentCell_k->m_extraIndex &&
-            0[&m_mapData]->Extra(currentCell_k->m_extraIndex)->objectIndex !=
+            OD_STEER(m_mapData)->Extra(currentCell_k->m_extraIndex)->objectIndex !=
                 ERASE_EMPTY_INDEX)
-            extra_i = 0[&m_mapData]->Extra(currentCell_k->m_extraIndex);
+            extra_i = OD_STEER(m_mapData)->Extra(currentCell_k->m_extraIndex);
         else
             extra_i = 0;
 
@@ -2042,9 +2042,9 @@ void advManager::EraseObj(class mapCell *cell, i32 x, i32 y)
                 goto cellDone;
 
             if (extra_i->nextIndex &&
-                0[&m_mapData]->Extra(extra_i->nextIndex)->objectIndex !=
+                OD_STEER(m_mapData)->Extra(extra_i->nextIndex)->objectIndex !=
                     ERASE_EMPTY_INDEX)
-                extra_i = 0[&m_mapData]->Extra(extra_i->nextIndex);
+                extra_i = OD_STEER(m_mapData)->Extra(extra_i->nextIndex);
             else
                 extra_i = 0;
         }
@@ -2119,7 +2119,7 @@ i8 StrEqNoCase(char *firstString, char *secondString)
             toupper(static_cast<i32>(*firstPosition)));
         secondUpper = static_cast<char>(
             toupper(static_cast<i32>(*secondPos)));
-        if (0[&firstUpper] == secondUpper) {
+        if (OD_STEER(firstUpper) == secondUpper) {
             if (firstUpper == 0)
                 return 1;
             firstPosition++;
@@ -2154,7 +2154,7 @@ void advManager::PasswordEvent(mapCell *cell, hero *)
 
 // @semantic
 // Complete 0x6fe body, 0x54 frame/slots, CFG, and all 75 ordered relocation
-// sites/effective targets align. 0[&mapY9] restores retail's inner height compare
+// sites/effective targets align. OD_STEER(mapY9) restores retail's inner height compare
 // and closes the former one-byte body/shifted-relocation residual. The only
 // unmasked bytes left are +0x250/+0x253: retail loads primaryStat15 before
 // eventHero for the arena stat increment, while ours loads eventHero first.
@@ -2287,7 +2287,7 @@ void advManager::GenericSiteEvent(mapCell *cell, hero *eventHero)
             "journeys.",
             1, -1, -1, -1, 0, -1, 0, -1, 0);
         for (mapX37 = 0; mapX37 < MAP_WIDTH; mapX37++) {
-            for (mapY9 = 0; 0[&mapY9] < MAP_HEIGHT; mapY9++) {
+            for (mapY9 = 0; OD_STEER(mapY9) < MAP_HEIGHT; mapY9++) {
                 currentCell5 = gpGame->m_worldMap.Row(mapY9) + mapX37;
                 currentSiteType = currentCell5->m_objectMetadata;
                 currentSiteType &= BARRIER_COLOR_MASK;
@@ -3552,7 +3552,7 @@ void advManager::DoWhirlpool(hero *eventHero)
                     armyValue =
                         gMonsterDatabase[eventHero->m_army.m_creatureTypes[slotIndex]].fightValue *
                         eventHero->m_army.m_creatureCounts[slotIndex];
-                    if (armyValue < 0[&weakestValue]) {
+                    if (armyValue < OD_STEER(weakestValue)) {
                         weakestValue = armyValue;
                         selectedSlot = slotIndex;
                     }
@@ -4604,7 +4604,7 @@ void advManager::PasswordAIEvent(mapCell *cell, hero *)
 // sites/effective targets align. After masking those relocations, the only raw
 // differences are +0x197/+0x19a: retail loads primaryStat16 before eventHero for
 // the primary-stat increment, while ours loads eventHero first. Prefix/postfix,
-// 0[&index], and commuted subscript spellings were byte-neutral; an explicit
+// OD_STEER(index), and commuted subscript spellings were byte-neutral; an explicit
 // read/add/write grew the body by 12 bytes. Revisit only if the hero primary-stat
 // representation/accessor changes, an earlier EVENTS source edit changes emitted
 // evaluation order, or comparison gains a proved commutative-load normalization.
@@ -4729,7 +4729,7 @@ void advManager::GenericSiteAIEvent(mapCell *cell, hero *eventHero)
 // Complete 0x18f body, 0x44 frame/slots, CFG, and all 12 ordered relocation
 // sites/effective targets align. The sole executable residual is +0x11f..+0x12e:
 // retail reads the cell word before shifting packedSite17 for the bitfield write,
-// while ours shifts first. Direct, `| 0`, and 0[&packedSite17] assignments were
+// while ours shifts first. Direct, `| 0`, and OD_STEER(packedSite17) assignments were
 // byte-neutral; an explicit m_objectData mask/write changed the body size/register
 // width. Ten bounded TU-state declaration families produced no canonical exact
 // closure; revisit after later EVENTS TU or mapCell accessor changes.

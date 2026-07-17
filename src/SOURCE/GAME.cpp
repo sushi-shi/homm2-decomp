@@ -3837,7 +3837,7 @@ void game::RandomizeMine(i32 x, i32 y)
 // @semantic: Complete semantics/frame/CFG and all three external relocation
 // identities agree. The only structural residual is the outer width guard:
 // retail loads x then compares MAP_WIDTH with jle; base loads MAP_WIDTH then
-// compares x with jge. Reversed relational and 0[&x] barrier forms were neutral,
+// compares x with jge. Reversed relational and OD_STEER(x) barrier forms were neutral,
 // and ten bounded TU-state probes did not close it. Revisit after a material
 // GAME predecessor/header or comparison-tool change.
 VA(0x0047fc0a, 0xc6)
@@ -5886,7 +5886,7 @@ void CreateDiffFile(char *oldName, char *joinName, char *diffName,
 // @semantic: Complete join-file semantics, frame/slots, CFG, and all 77 ordered
 // relocation sites/effective targets agree. The only unmasked bytes are
 // +0x1ea/+0x1ed/+0x1ef: the diffSize/position loop comparison uses reversed
-// operands and branch polarity. Reversed relational and 0[&position] forms were
+// operands and branch polarity. Reversed relational and OD_STEER(position) forms were
 // neutral; ten bounded TU-state probes did not produce an admissible closure.
 // Revisit after a material GAME predecessor/header or comparison-tool change.
 VA(0x00485107, 0x3ce)

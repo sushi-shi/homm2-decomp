@@ -440,7 +440,7 @@ void ExpCampaign::ShowInfo(i32 viewOnly, i32)
 // bytes versus 0x926 here. Tried direct multidimensional indexing, a stored
 // flattened offset, inline flattened terms in both orders, and a partially
 // indexed base; all retained the nonretail evaluation order. Qualifying either
-// m_viewMap or m_campaignId through 0[&...] was also byte-neutral. Seven bounded
+// m_viewMap or m_campaignId through OD_STEER(...) was also byte-neutral. Seven bounded
 // expression families are exhausted; revisit only after an earlier X_CAMPGN or
 // relevant layout/header change alters evaluation order.
 VA(0x004bc34d, 0x921)
@@ -1160,7 +1160,7 @@ VA(0x004bd9f8, 0x64)
 i16 ExpCampaign::Days(void)
 {
     return (m_mapDays[m_currentMap] +
-            (0[&gpGame->m_week] - 1) * EXPANSION_CAMPAIGN_DAYS_PER_WEEK) +
+            (OD_STEER(gpGame->m_week) - 1) * EXPANSION_CAMPAIGN_DAYS_PER_WEEK) +
            (gpGame->m_month - 1) * EXPANSION_CAMPAIGN_DAYS_PER_MONTH +
            gpGame->m_day;
 }

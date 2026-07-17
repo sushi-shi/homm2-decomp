@@ -91,7 +91,7 @@ i32 army::GetMoveMask(i32 sourceHex)
 // @semantic: Complete 0x18 frame, loop/CFG, and ordered relocations. At +0x68
 // retail loads directionResult and compares it against directionCountNext;
 // candidate loads the bound and uses the equivalent reversed relation. Both
-// relational orders, 0[&directionResult], and directionResult|0 were unchanged.
+// relational orders, OD_STEER(directionResult), and directionResult|0 were unchanged.
 VA(0x004bde41, 0xb5)
 i32 army::GetAttackMask(i32 sourceHex, i32 targetMode, i32 targetHex)
 {
@@ -317,7 +317,7 @@ i32 GetAdjacentCellIndexNoArmy(i32 sourceHex, i32 direction)
         direction = COMBAT_DIRECTION_WEST;
     else if (direction == COMBAT_DIRECTION_WIDE_EAST)
         direction = COMBAT_DIRECTION_SOUTHEAST;
-    return 0[&direction][gpCombatManager->m_adjacency[sourceHex]];
+    return OD_STEER(direction)[gpCombatManager->m_adjacency[sourceHex]];
 }
 
 VA(0x004be59d, 0x44a)

@@ -152,7 +152,7 @@ void ModemCommand(char *command)
     char modemText[MODEM_WORK_TEXT_SIZE];
     i32 commandLength = strlen(command);
     i32 commandPosition0;
-    for (commandPosition0 = 0; commandPosition0 < 0[&commandLength];
+    for (commandPosition0 = 0; commandPosition0 < OD_STEER(commandLength);
          ++commandPosition0) {
         write_buffer(command + commandPosition0, 1);
         DelayMilli(MODEM_COMMAND_DELAY);
@@ -265,7 +265,7 @@ void Connect(void)
 
         stime = KBTickCount();
         // Scalar-lvalue steering preserves oldsec but emits the retail relocation order.
-        if (0[&oldsec] / 1000 != stime / 1000) {
+        if (OD_STEER(oldsec) / 1000 != stime / 1000) {
             oldsec = stime;
             sprintf(idMessage, "ID%s_%i", idstr, localstage);
             WriteModemPacket(idMessage, strlen(idMessage));
@@ -311,7 +311,7 @@ i32 WaitForDirectConnect(void)
         }
         stime = KBTickCount();
         // Scalar-lvalue steering preserves oldsec but emits the retail relocation order.
-        if (0[&oldsec] / 1000 != stime / 1000) {
+        if (OD_STEER(oldsec) / 1000 != stime / 1000) {
             oldsec = stime;
             sprintf(idMessage, "ID%s_%i", idstr, localstage);
             WriteModemPacket(idMessage, strlen(idMessage));

@@ -812,7 +812,7 @@ i32 InterpretCommandLine(void)
     strcpy(gFullMapName, "Chaos");
 
     len = strlen(gcCommandLine);
-    for (i = 0; 0[&len] > i; i++) {
+    for (i = 0; OD_STEER(len) > i; i++) {
         if (gcCommandLine[i] == ' ' &&
             i + 1 < len &&
             (gcCommandLine[i + 1] == '?' ||
@@ -2426,7 +2426,7 @@ void ClearMapExtra(void)
     DATA(0x005164bc) static i16 clearMapExtraSourceLineBase =
         KB_SOURCE_LINE_CLEAR_MAP_EXTRA_BASE;
     i32 i;
-    for (i = 0; 0[&i] < iMaxMapExtra; i++) {
+    for (i = 0; OD_STEER(i) < iMaxMapExtra; i++) {
         if (ppMapExtra[i])
             BaseFree(ppMapExtra[i], KBFILE,
                      clearMapExtraSourceLineBase +
@@ -2508,7 +2508,7 @@ i32 AddScoreToHighScore(i32 score, i32 days, i32 scenario, i32 highScoreType, ch
 
     if (entry < HIGH_SCORE_ENTRY_COUNT) {
         for (destination = HIGH_SCORE_ENTRY_COUNT - 2;
-             destination >= 0[&entry]; destination--)
+             destination >= OD_STEER(entry); destination--)
             entries_a[destination + 1] = entries_a[destination];
 
         GetDataEntry("Please enter your name for the high score list.", playerName_c,
@@ -2987,14 +2987,14 @@ void SmackFade(u8 *src, u8 *dst)
     memset(a, 0, 0x300);
     memset(f, 0, 0x100);
     for (h = 0xa; h < 0xf6; h++) {
-        e = (0[&src[h * 3 + 2]] + 0[&src[h * 3]] +
+        e = (OD_STEER(src[h * 3 + 2]) + OD_STEER(src[h * 3]) +
              src[h * 3 + 1]) / 3;
         d = 0x3e7;
         for (i = 0xa; i < 0x24; i++) {
-            b = (0[&dst[i * 3 + 2]] + 0[&dst[i * 3]] +
+            b = (OD_STEER(dst[i * 3 + 2]) + OD_STEER(dst[i * 3]) +
                  dst[i * 3 + 1]) / 3;
             p = abs(e - b);
-            if (0[&d] > p) {
+            if (OD_STEER(d) > p) {
                 d = p;
                 k = i;
             }
@@ -3449,7 +3449,7 @@ void UpdateSystemOptionsMenu(void)
         return;
     if (hmnuApp == 0)
         return;
-    if (0[&hmnuAdv] != hmnuApp)
+    if (OD_STEER(hmnuAdv) != hmnuApp)
         return;
 
     for (menuCommand = APP_MENU_MUSIC_FIRST; menuCommand <= APP_MENU_MUSIC_LAST;
@@ -3517,7 +3517,7 @@ void CleanUpMenus(void)
 // @semantic
 // Complete 0x2a body, 0x4 frame/slots, CFG, and both ordered relocations agree.
 // At +0xe retail loads hMenu from -0x4 and compares hmnuAdv; base loads the
-// global first. Swapped operands and 0[&hMenu] were byte-neutral.
+// global first. Swapped operands and OD_STEER(hMenu) were byte-neutral.
 VA(0x0049f9c6, 0x2a)
 void UpdateAppSpecificMenus(void *hMenu)
 {
@@ -3541,7 +3541,7 @@ i32 InMapArea(i32 x, i32 y)
 // @early-stop
 // @early-stop-reloc-only: Current KB.cpp/header epoch: all 0x6bc bytes match
 // after masking 51 ordered relocation sites. Qualifying columnIndex through
-// 0[&columnIndex] and spelling the first edge loop as columnsSize > 0[&edge]
+// OD_STEER(columnIndex) and spelling the first edge loop as columnsSize > OD_STEER(edge)
 // close the two loop load/polarity residuals; all remaining disassembly rows are
 // equivalent delinked string identities. Nine bounded variants were compiled,
 // including five exact forms. Revisit only after the KB source/TU/header or
@@ -3615,8 +3615,8 @@ void SetupDynamicWindow(i32 x, i32 y, i32 centered, i32 boundsWidth, i32 boundsH
     rightOffset = *contentRight - x;
     bottomOffsetLocal = *contentBottom - y;
 
-    for (tileRowPos = 0; 0[&tileRowPos] < numRows; tileRowPos++) {
-        for (columnIndex = 0; 0[&columnIndex] < columnsSize; columnIndex++) {
+    for (tileRowPos = 0; OD_STEER(tileRowPos) < numRows; tileRowPos++) {
+        for (columnIndex = 0; OD_STEER(columnIndex) < columnsSize; columnIndex++) {
             newWidgetTemp = new iconWidget(
                 columnIndex * DYNAMIC_TILE_SIZE + leftOffset,
                 tileRowPos * DYNAMIC_TILE_SIZE + topOffsetNum,
@@ -3660,7 +3660,7 @@ void SetupDynamicWindow(i32 x, i32 y, i32 centered, i32 boundsWidth, i32 boundsH
         MemError();
     (*window)->AddWidget(newWidgetTemp, -1);
 
-    for (edge = 0; columnsSize > 0[&edge]; edge++) {
+    for (edge = 0; columnsSize > OD_STEER(edge); edge++) {
         newWidgetTemp = new iconWidget(
             edge * DYNAMIC_TILE_SIZE + leftOffset - DYNAMIC_EDGE_OFFSET,
             topOffsetNum - DYNAMIC_CORNER_LEFT,
@@ -3682,7 +3682,7 @@ void SetupDynamicWindow(i32 x, i32 y, i32 centered, i32 boundsWidth, i32 boundsH
         (*window)->AddWidget(newWidgetTemp, -1);
     }
 
-    for (edge = 0; 0[&edge] < numRows; edge++) {
+    for (edge = 0; OD_STEER(edge) < numRows; edge++) {
         newWidgetTemp = new iconWidget(
             leftOffset - DYNAMIC_CORNER_LEFT,
             edge * DYNAMIC_TILE_SIZE + topOffsetNum - DYNAMIC_EDGE_OFFSET,
@@ -3731,7 +3731,7 @@ void TestDynamicWindow(i32 p1, i32 p2)
 // @semantic
 // Complete body, 0xc frame/slots, CFG, and all 9 ordered relocations align. At
 // +0xc retail loads pos from -0xc and compares giThisGamePos; ours loads the
-// global and compares pos. Both equality operand orders and 0[&pos] were tried
+// global and compares pos. Both equality operand orders and OD_STEER(pos) were tried
 // without steering MSVC's TU-state load order. Revisit on compiler-state change.
 VA(0x004a0234, 0x91)
 void HandleRemoteDeadPlayerExit(i32 pos)
@@ -3779,7 +3779,7 @@ void HandleRemoteSuddenExit(void)
 // @semantic
 // Complete 0x62 body, 0x8 frame/slots, CFG, and all five ordered relocations
 // agree. At +0x2b retail loads i from -0x8 and compares giThisNetPos; base
-// loads the global and compares i. Swapped operands and 0[&i] were byte-neutral.
+// loads the global and compares i. Swapped operands and OD_STEER(i) were byte-neutral.
 VA(0x004a036f, 0x62)
 void DropDownToOnePlayer(void)
 {
@@ -4494,7 +4494,7 @@ void NormalDialog(char *text, i32 dialogType, i32 windowX, i32 windowY,
         }
 
         if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_SECONDARY_SKILL) {
-            labelY_o = 0[&sizingIconHeight_l] + resourceY_l - 72;
+            labelY_o = OD_STEER(sizingIconHeight_l) + resourceY_l - 72;
             textPanel_h = new textWidget(
                 resourceCenterX_a - 50, labelY_o, 100,
                 (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_SPELL) * 12 + 12,
@@ -4508,15 +4508,15 @@ void NormalDialog(char *text, i32 dialogType, i32 windowX, i32 windowY,
                 NORMAL_DIALOG_TEXT_LENGTH, KBFILE,
                 normalDialogSourceLineBase +
                     KB_SOURCE_LINE_NORMAL_DIALOG_SECONDARY_TEXT_ALLOC_OFFSET));
-            labelY_o = 0[&sizingIconHeight_l] + resourceY_l - 24;
+            labelY_o = OD_STEER(sizingIconHeight_l) + resourceY_l - 24;
             sprintf(resourceText_e[resourceSlot_n], "%s",
                     gSecondarySkillLevels[
                         resourceValue_l[resourceSlot_n] %
                         SECONDARY_SKILL_VALUE_LEVEL_COUNT]);
         } else if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_PRIMARY_SKILL) {
-            labelY_o = 0[&sizingIconHeight_l] + resourceY_l - 93;
+            labelY_o = OD_STEER(sizingIconHeight_l) + resourceY_l - 93;
         } else {
-            labelY_o = 0[&sizingIconHeight_l] + resourceY_l - 10;
+            labelY_o = OD_STEER(sizingIconHeight_l) + resourceY_l - 10;
         }
 
         textPanel_h = new textWidget(
@@ -4537,7 +4537,7 @@ void NormalDialog(char *text, i32 dialogType, i32 windowX, i32 windowY,
             strcpy(bonusText, "+1 ");
             textPanel_h = new textWidget(
                 resourceCenterX_a - 50,
-                0[&sizingIconHeight_l] + resourceY_l - 22, 100, 16,
+                OD_STEER(sizingIconHeight_l) + resourceY_l - 22, 100, 16,
                 bonusText, "bigfont.fnt", 1, textWidgetId_h++,
                 NORMAL_DIALOG_WIDGET_FLAGS, 1);
             if (!textPanel_h)
