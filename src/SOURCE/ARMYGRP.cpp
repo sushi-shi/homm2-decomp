@@ -133,15 +133,12 @@ int armyGroup::IsMember(int creatureType)
     return 0;
 }
 
-// @match-note
-// Pre-95 structural checkpoint: the 0x1c frame, all five local slots,
-// 86-instruction CFG, and both relocations agree. First raw
-// divergence at +0x60: ours loads `this` from [ebp-0x1c] into EAX then the
-// index from [ebp-0xc] into ECX; retail loads those operands in the opposite
-// registers. The database relocation names differ but resolve identically to
-// gMonsterDatabase+0x0a/const_000faeba. Tried the direct nested array access
-// with `slot` and `i` spellings after hash-correcting every local. Revisit at
-// 95% for source-evaluation-order steering; do not repeat those spellings.
+// @early-stop
+// Complete 0x14e body, 0x1c frame/all five slots, 86-instruction CFG, and both
+// ordered relocations align. The only executable residual at +0x60/+0x63 swaps
+// the independent `this`[-0x1c] and index[-0xc] loads before the same indexed
+// monster-race access. Direct indexing, i[array], and 0[&i] were byte-neutral.
+// Revisit only after relevant ARMYGRP/TU state changes.
 VA(0x0048c44b, 0x14e)
 int armyGroup::IsHomogeneous(int countRaces)
 {
@@ -203,15 +200,6 @@ int armyGroup::GetNumArmies(void)
     return numArmies;
 }
 
-// @match-note
-// Pre-95 structural checkpoint: complete two-pass slot search, exact 0x08
-// frame/search slot, 76-instruction CFG, and no relocations.
-// First raw divergence at +0xab: ours compares slot with 0 first and branches
-// on `< 0`; retail compares with 5 first, then compares with 0 and branches on
-// `>= 0` into the body. Tried the current highest-scoring OR guard, a positive
-// AND guard in both operand orders, separate high/low early returns, and nested
-// positive arms with explicit else returns. Revisit at 95% for condition-block
-// layout steering; do not repeat those spellings.
 VA(0x0048c641, 0x11c)
 int armyGroup::Add(int creatureType, int quantity, int slot)
 {
@@ -233,7 +221,7 @@ int armyGroup::Add(int creatureType, int quantity, int slot)
             }
         }
     }
-    if (slot < 0 || slot >= ARMY_GROUP_SLOT_COUNT)
+    if (slot >= ARMY_GROUP_SLOT_COUNT || slot < 0)
         return 0;
 
     m_creatureTypes[slot] = creatureType;
