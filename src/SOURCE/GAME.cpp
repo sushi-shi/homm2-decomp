@@ -950,7 +950,7 @@ void game::LoadGame(char* filename, i32 loadFromFile, i32) {
     read(file0, m_mines, sizeof(m_mines));
     read(file0, m_mineOwners, sizeof(m_mineOwners));
     if (expansionMarker0)
-        read(file0, m_randomArtifacts, ARTIFACT_COUNT);
+        read(file0, m_randomArtifacts, IDX(ARTIFACT_COUNT));
     else
         read(file0, m_randomArtifacts, RANDOM_ARTIFACT_BASE_TABLE_SIZE);
     read(file0, m_boats, sizeof(m_boats));
