@@ -245,25 +245,25 @@ i32 textEntryWidget::Main(struct tag_message &message)
                     event = gpInputManager->GetEvent();
                     if (event.type == MESSAGE_KEY_DOWN) {
                         switch (event.payload.keyboard.keyCode) {
-                        case 1:
+                        case INPUT_SCAN_ESCAPE:
                             if (gbAllowTextEntryEscape != 0) {
                                 strcpy(edit, original);
                                 done++;
                                 gbTextEntryEscaped = 1;
                             }
                             break;
-                        case 0x4b:
+                        case INPUT_SCAN_NUMPAD_4:
                             if (m_cursorPosition != 0) {
                                 m_cursorPosition--;
                                 if (m_cursorPosition < m_displayOffset)
                                     m_displayOffset = m_cursorPosition;
                             }
                             break;
-                        case 0x4d:
+                        case INPUT_SCAN_NUMPAD_6:
                             if (m_cursorPosition < strlen(edit))
                                 m_cursorPosition++;
                             break;
-                        case 0x53:
+                        case INPUT_SCAN_NUMPAD_DELETE:
                             if (m_cursorPosition < strlen(edit)) {
                                 strcpy(scratch, edit + m_cursorPosition + 1);
                                 strcpy(edit + m_cursorPosition, scratch);
@@ -287,16 +287,16 @@ i32 textEntryWidget::Main(struct tag_message &message)
                                 char typed = 0;
                                 if (event.payload.keyboard.keyCode >= 0x100) {
                                     switch ((event.payload.keyboard.keyCode >> 8) & 0xff) {
-                                    case 0x47: typed = '7'; break;
-                                    case 0x48: typed = '8'; break;
-                                    case 0x49: typed = '9'; break;
-                                    case 0x4b: typed = '4'; break;
-                                    case 0x4c: typed = '5'; break;
-                                    case 0x4d: typed = '6'; break;
-                                    case 0x4f: typed = '1'; break;
-                                    case 0x50: typed = '2'; break;
-                                    case 0x51: typed = '3'; break;
-                                    case 0x52: typed = '0'; break;
+                                    case INPUT_SCAN_NUMPAD_7: typed = '7'; break;
+                                    case INPUT_SCAN_NUMPAD_8: typed = '8'; break;
+                                    case INPUT_SCAN_NUMPAD_9: typed = '9'; break;
+                                    case INPUT_SCAN_NUMPAD_4: typed = '4'; break;
+                                    case INPUT_SCAN_NUMPAD_5: typed = '5'; break;
+                                    case INPUT_SCAN_NUMPAD_6: typed = '6'; break;
+                                    case INPUT_SCAN_NUMPAD_1: typed = '1'; break;
+                                    case INPUT_SCAN_NUMPAD_2: typed = '2'; break;
+                                    case INPUT_SCAN_NUMPAD_3: typed = '3'; break;
+                                    case INPUT_SCAN_NUMPAD_0: typed = '0'; break;
                                     }
                                 } else {
                                     typed = static_cast<char>(event.payload.keyboard.keyCode);
