@@ -301,13 +301,10 @@ void bsClose(BitStream *bs)
     ERROR_IF_EOF(retVal);
 }
 
-// @early-stop
-// All 21 instructions are identical and neither object has a relocation; the remaining
-// objdiff residual is local-label identity metadata.
 VA(0x004d4470, 0x35)
 unsigned int minUInt32(unsigned int a, unsigned int b)
 {
-    if (a > b) return b; else return a;
+    if (a < b) return a; else return b;
 }
 
 VA(0x004d44b0, 0x4e)
@@ -374,6 +371,9 @@ void arithCodeRenormalise_Encode(BitStream *bs)
     }
 }
 
+// @early-stop
+// Relocation-masked instructions are byte-identical and all eight effective targets agree;
+// the sole residual is the delinked panic-string symbol identity ($SG3428 vs $SG3417).
 VA(0x004d46c0, 0xd7)
 void arithCodeSymbol(BitStream *bs, Model *m, Int32 symbol)
 {
@@ -382,13 +382,13 @@ void arithCodeSymbol(BitStream *bs, Model *m, Int32 symbol)
 
     totalFrequency14 = m->totFreq;
     cumulativeLow8 = 0;
-    for (symbolIndex9 = 1; symbolIndex9 < symbol; symbolIndex9++)
+    for (symbolIndex9 = 1; symbolIndex9 < 0[&symbol]; symbolIndex9++)
         cumulativeLow8 += m->freq[symbolIndex9];
     cumulativeHigh2 = cumulativeLow8 + m->freq[symbol];
 
     rangeWidth29 = bigR / totalFrequency14;
 
-    rangeProduct8 = rangeWidth29 * cumulativeLow8;
+    rangeProduct8 = cumulativeLow8 * rangeWidth29;
     bigL = bigL + rangeProduct8;
 
     if (cumulativeHigh2 < totalFrequency14)
@@ -445,11 +445,11 @@ void initModel(Model *m, Char *initName, Int32 initNumSymbols, Int32 initIncValu
 
     if (initIncValue == 0) {
         m->totFreq = initNumSymbols;
-        for (i = 1; i <= initNumSymbols; i++)
+        for (i = 1; i <= 0[&initNumSymbols]; i++)
             m->freq[i] = 1;
     } else {
         m->totFreq = initNumSymbols * initIncValue;
-        for (i = 1; i <= initNumSymbols; i++)
+        for (i = 1; i <= 0[&initNumSymbols]; i++)
             m->freq[i] = initIncValue;
     }
 
@@ -719,7 +719,7 @@ void FreeDecompressStructures(void)
 VA(0x004d5480, 0xe4)
 void setDecompressStructureSizes(Int32 newSize100k)
 {
-    if (newSize100k == blockSize100k)
+    if (0[&newSize100k] == blockSize100k)
         return;
 
     blockSize100k = newSize100k;
@@ -797,21 +797,27 @@ Int32 NORMALISE(Int32 p)
                               (p)));
 }
 
+// @early-stop
+// All 22 instructions and both lastPP+0 relocations agree; the retained residual is
+// local-label/padding identity outside the executable instruction stream.
 VA(0x004d57d0, 0x36)
 Int32 NORMALISEHI(Int32 p)
 {
     return
-    IF_THEN_ELSE(((p) >= lastPP),
+    IF_THEN_ELSE(((p) >= 0[&lastPP]),
                  ((p) - lastPP),
                  (p));
 }
 
+// @early-stop
+// All 20 instructions and the lastPP+0 relocation agree; the retained residual is
+// local-label/padding identity outside the executable instruction stream.
 VA(0x004d5810, 0x31)
 Int32 NORMALISELO(Int32 p)
 {
     return
     IF_THEN_ELSE(((p) < 0),
-                 ((p) + lastPP),
+                 (((p) | 0) + lastPP),
                  (p));
 }
 
@@ -850,10 +856,9 @@ void sendZeroes(BitStream *outStream, Int32 zeroesPending)
     }
 }
 
-// @semantic
-// The recovered 0x120 frame, CFG, and all 13 effective relocations agree.  This is not a
-// byte-proven wall: the first structural residual is the local initialized at +0x18,
-// stored at [ebp-4] here versus retail [ebp-8], with later slot/branch encodings shifted.
+// @early-stop
+// All 106 instructions, the 0x120 frame, and all 13 effective relocation targets/addends
+// agree; the retained residual is delinked local-label identity metadata.
 VA(0x004d5930, 0x189)
 void moveToFrontCodeAndSend(BitStream *outStream, Bool thisIsTheLastBlock)
 {
@@ -900,27 +905,23 @@ void moveToFrontCodeAndSend(BitStream *outStream, Bool thisIsTheLastBlock)
     sendMTFVal(outStream, EOB);
 }
 
-// @semantic
-// The recovered 0x11c frame, CFG, and all 28 effective relocations agree, including both
-// diagnostics.  The first structural residual is +0x2a: candidate stores the initialized
-// local at [ebp-0x10c], while retail uses [ebp-4]; later slots and branch encodings differ.
 VA(0x004d5ac0, 0x2d9)
 Bool getAndMoveToFrontDecode(BitStream *inStream)
 {
-    UChar  yy[256];
-    Int32  i, j, tmpOrigPtr, nextSym, limit;
+    UChar  symbols[256];
+    Int32  i, j, encodedOrigin, nextSym, blockLimit;
 
-    limit = 100000 * blockSize100k;
+    blockLimit = 100000 * blockSize100k;
 
-    tmpOrigPtr = getInt32(inStream);
-    if (tmpOrigPtr < 0)
-        origPtr = (-tmpOrigPtr) - 1; else
-        origPtr =   tmpOrigPtr  - 1;
+    encodedOrigin = getInt32(inStream);
+    if (encodedOrigin < 0)
+        origPtr = (-encodedOrigin) - 1; else
+        origPtr =   encodedOrigin  - 1;
 
     initModels();
 
     for (i = 0; i <= 255; i++)
-        yy[i] = (UChar)i;
+        symbols[i] = (UChar)i;
 
     last = -1;
 
@@ -929,7 +930,7 @@ Bool getAndMoveToFrontDecode(BitStream *inStream)
     LOOPSTART:
 
     if (nextSym == EOB)
-        return (tmpOrigPtr < 0);
+        return (encodedOrigin < 0);
 
     if (nextSym == RUNA || nextSym == RUNB) {
         Int32 n = 0;
@@ -941,27 +942,27 @@ Bool getAndMoveToFrontDecode(BitStream *inStream)
         }
             while (nextSym == RUNA || nextSym == RUNB);
         while (n > 0) {
-            last++; if (last >= limit) blockOverrun();
-            ll[last] = yy[0];
+            last++; if (last >= 0[&blockLimit]) blockOverrun();
+            ll[last] = symbols[0];
             n--;
         }
         goto LOOPSTART;
     }
 
     if (nextSym >= 1 && nextSym <= 255) {
-        last++; if (last >= limit) blockOverrun();
-        ll[last] = yy[nextSym];
+        last++; if (last >= 0[&blockLimit]) blockOverrun();
+        ll[last] = symbols[nextSym];
 
         j = nextSym;
         for (; j > 3; j -= 4) {
-            yy[j]   = yy[j-1];
-            yy[j-1] = yy[j-2];
-            yy[j-2] = yy[j-3];
-            yy[j-3] = yy[j-4];
+            symbols[j]   = symbols[j-1];
+            symbols[j-1] = symbols[j-2];
+            symbols[j-2] = symbols[j-3];
+            symbols[j-3] = symbols[j-4];
         }
-        for (; j > 0; j--) yy[j] = yy[j-1];
+        for (; j > 0; j--) symbols[j] = symbols[j-1];
 
-        yy[0] = ll[last];
+        symbols[0] = ll[last];
         nextSym = getMTFVal(inStream);
         goto LOOPSTART;
     }
@@ -977,7 +978,7 @@ void stripe(void)
 {
     Int32 i;
 
-    for (i = 0; i < lastPP; i++) {
+    for (i = 0; 0[&i] < lastPP; i++) {
         UChar c = GETFIRST(i);
         SETSECOND(NORMALISELO(i-1), c);
         SETTHIRD (NORMALISELO(i-2), c);
@@ -994,6 +995,9 @@ void copyOffsetWords(void)
         words[lastPP+i] = words[i];
 }
 
+// @early-stop
+// All 113 instructions and all ten effective relocation targets/addends agree; the
+// retained residual is delinked local-label identity metadata.
 VA(0x004d5e80, 0x172)
 Bool fullGt(Int32 i1, Int32 i2)
 {
@@ -1048,7 +1052,8 @@ Bool fullGt(Int32 i1, Int32 i2)
 // @semantic
 // The recovered 0x1b0 frame, sorting CFG, and all 44 effective relocations agree.  The
 // first structural residual is +0x18: candidate initializes [ebp-8], retail [ebp-0xc0];
-// the resulting local-slot and branch encodings are not a proven delinker artifact.
+// the resulting local/macro-temporary slots remain a compiler-shape wall. No speculative
+// slot renaming was retained; revisit only with a complete retail role-to-slot map.
 VA(0x004d6000, 0x548)
 void qsortFull(Int32 left, Int32 right)
 {
@@ -1119,7 +1124,7 @@ Bool trivialGt(Int32 i1, Int32 i2)
 {
     Int32 k;
 
-    for (k = 0; k <= last; k++) {
+    for (k = 0; 0[&k] <= last; k++) {
         UChar c1 = GETFIRST(i1);
         UChar c2 = GETFIRST(i2);
         if (c1 == c2) {
@@ -1131,10 +1136,9 @@ Bool trivialGt(Int32 i1, Int32 i2)
     return False;
 }
 
-// @semantic
-// The recovered 0x1c frame, shell-sort CFG, and all seven effective relocations agree.
-// The first structural residual is +0x9: candidate initializes [ebp-0x1c], while retail
-// uses [ebp-4]; the later slot encodings therefore remain unresolved.
+// @early-stop
+// All 88 instructions, the 0x1c frame, and all seven effective relocation targets/addends
+// agree; the retained residual is delinked local-label identity metadata.
 VA(0x004d6610, 0x10f)
 void shellTrivial(void)
 {
@@ -1163,9 +1167,10 @@ void shellTrivial(void)
 }
 
 // @semantic
-// The bzip-0.21 trivial/graded BWT paths, 0x3c frame, five grade ranges, and NWC
-// LogStr redirection match retail; all 68 relocation occurrences agree. Residual code
-// begins with the initial zptr-loop comparison order and continues through switch lowering.
+// The trivial/graded BWT paths, 0x3c frame, five grade ranges, CFG, and all 68 effective
+// relocations agree. Three global/local loop comparisons were steered exactly with 0[&i].
+// The first remaining raw-code divergence is +0xdf: candidate i is [ebp-8], retail
+// [ebp-0xc]; nested-scope slots and the 0x14-byte grade jump table remain compiler shape.
 VA(0x004d6720, 0x434)
 void sortIt(void)
 {
@@ -1176,7 +1181,7 @@ void sortIt(void)
         Int32 i;
 
         if (veryVerbose) { sprintf(gText, "trivialSort ...\n"); LogStr(gText); }
-        for (i = 0; i <= last; i++) zptr[i] = i;
+        for (i = 0; 0[&i] <= last; i++) zptr[i] = i;
         shellTrivial();
         if (veryVerbose) { sprintf(gText, "trivialSort done.\n"); LogStr(gText); }
 
@@ -1191,12 +1196,12 @@ void sortIt(void)
 
         for (i = 0; i <= 65536; i++)
             ftab[i] = 0;
-        for (i = 0; i <= last; i++)
+        for (i = 0; 0[&i] <= last; i++)
             ftab[GETFIRST16(i)]++;
         for (i = 1; i <= 65536; i++)
             ftab[i] += ftab[i-1];
 
-        for (i = 0; i <= last; i++) {
+        for (i = 0; 0[&i] <= last; i++) {
             UInt32 j = GETFIRST16(i);
             ftab[j]--;
             zptr[ftab[j]] = i;
@@ -1275,95 +1280,83 @@ void doReversibleTransformation(void)
     if (origPtr == -1) panic(const_cast<char *>("doReversibleTransformation"));
 }
 
-// @semantic
-// The bzip-0.21 inverse-BWT count, prefix-sum, and backward traversal loops match retail,
-// with the same 0x418 frame and all 8 relocation occurrences. Residual code begins with
-// different local slots for the loop indices and 256-entry count array.
 VA(0x004d6c10, 0x158)
 void undoReversibleTransformation(void)
 {
-    Int32  cc[256];
-    Int32  i, j, ch, sum;
+    Int32  frequencyByChar[256];
+    Int32  i, j, currentChar, total;
 
-    for (i = 0; i <= 255; i++) cc[i] = 0;
+    for (i = 0; i <= 255; i++) frequencyByChar[i] = 0;
 
-    for (i = 0; i <= last; i++) {
+    for (i = 0; 0[&i] <= last; i++) {
         UChar ll_i = ll[i];
-        zptr[i] = cc[ll_i];
-        cc[ll_i]++;
+        zptr[i] = frequencyByChar[ll_i];
+        frequencyByChar[ll_i]++;
     }
 
-    sum = 0;
-    for (ch = 0; ch <= 255; ch++) {
-        sum = sum + cc[ch];
-        cc[ch] = sum - cc[ch];
+    total = 0;
+    for (currentChar = 0; currentChar <= 255; currentChar++) {
+        total = total + frequencyByChar[currentChar];
+        frequencyByChar[currentChar] = total - frequencyByChar[currentChar];
     }
 
     i = origPtr;
     for (j = last; j >= 0; j--) {
         UChar ll_i = ll[i];
         block[j] = ll_i;
-        i = zptr[i] + cc[ll_i];
+        i = zptr[i] + frequencyByChar[ll_i];
     }
 }
 
 #define SPOT_BASIS_STEP 8000
 
-// @semantic
-// Both spot/unspot byte paths and the complete nine-case delta cycle match retail, with
-// the same 0x18 frame and all 17 relocation occurrences. Residual code begins with the
-// local slot selected for pos and continues through equivalent switch lowering.
 VA(0x004d6d70, 0x1c1)
 void spotBlock(Bool weAreCompressing)
 {
-    Int32 pos, delta, newdelta;
+    Int32 spotPos, delta, updatedDelta;
 
-    pos   = SPOT_BASIS_STEP;
+    spotPos = SPOT_BASIS_STEP;
     delta = 1;
 
-    while (pos < last) {
+    while (0[&spotPos] < last) {
 
         Int32 n;
 
         if (weAreCompressing)
-            n = (Int32)GETFIRST(pos) + 1; else
-            n = (Int32)block[pos]    - 1;
+            n = (Int32)GETFIRST(spotPos) + 1; else
+            n = (Int32)block[spotPos]    - 1;
 
         if (n == 256) n = 0; else if (n == -1)  n = 255;
 
         if (!(n >= 0 && n <= 255)) panic(const_cast<char *>("spotBlock"));
 
         if (weAreCompressing)
-            SETFIRST(pos, (UChar)n); else
-            block[pos] = (UChar)n;
+            SETFIRST(spotPos, (UChar)n); else
+            block[spotPos] = (UChar)n;
 
         switch (delta) {
-            case 3:  newdelta = 1; break;
-            case 1:  newdelta = 4; break;
-            case 4:  newdelta = 5; break;
-            case 5:  newdelta = 9; break;
-            case 9:  newdelta = 2; break;
-            case 2:  newdelta = 6; break;
-            case 6:  newdelta = 7; break;
-            case 8:  newdelta = 8; break;
-            case 7:  newdelta = 3; break;
-            default: newdelta = 1; break;
+            case 3:  updatedDelta = 1; break;
+            case 1:  updatedDelta = 4; break;
+            case 4:  updatedDelta = 5; break;
+            case 5:  updatedDelta = 9; break;
+            case 9:  updatedDelta = 2; break;
+            case 2:  updatedDelta = 6; break;
+            case 6:  updatedDelta = 7; break;
+            case 8:  updatedDelta = 8; break;
+            case 7:  updatedDelta = 3; break;
+            default: updatedDelta = 1; break;
         }
-        delta = newdelta;
+        delta = updatedDelta;
 
-        pos = pos + SPOT_BASIS_STEP + 17 * (newdelta - 5);
+        spotPos = spotPos + SPOT_BASIS_STEP + 17 * (updatedDelta - 5);
     }
 }
 
-// @semantic
-// The recovered 0x14 frame, RLE CFG, and all 18 effective relocations agree; the panic
-// string differs only in local symbol identity.  The first code residual is +0x44:
-// candidate runLength is [ebp-0xc] while retail uses [ebp-4], so slots are not exact.
 VA(0x004d6f40, 0x15c)
 Int32 getRLEpair(FILE *src)
 {
-    Int32     runLength;
-    IntNative ch, chLatest;
+    Int32     runLen;
+    IntNative ch, latestCh;
 
     ch = getc(src);
 
@@ -1372,80 +1365,75 @@ Int32 getRLEpair(FILE *src)
         return (1 << 16) | MY_EOF;
     }
 
-    runLength = 0;
+    runLen = 0;
     do {
-        chLatest = getc(src);
-        runLength++;
+        latestCh = getc(src);
+        runLen++;
         bytesIn++;
     }
-        while (ch == chLatest && runLength < 255);
+        while (ch == latestCh && runLen < 255);
 
-    if (chLatest != EOF) {
-        if (ungetc(chLatest, src) == EOF)
+    if (latestCh != EOF) {
+        if (ungetc(latestCh, src) == EOF)
             panic(const_cast<char *>("getRLEpair: ungetc failed"));
     } else {
         ERROR_IF_NOT_ZERO(errno);
     }
 
-    if (runLength == 1) {
+    if (runLen == 1) {
         UPDATE_CRC(globalCrc, (UChar)ch);
         return (1 << 16) | ch;
     } else {
         Int32 i;
-        for (i = 1; i <= runLength; i++)
+        for (i = 1; 0[&i] <= runLen; i++)
             UPDATE_CRC(globalCrc, (UChar)ch);
-        return (runLength << 16) | ch;
+        return (runLen << 16) | ch;
     }
 }
 
-// @semantic
-// The bzip-0.21 block bound, RLE cases 1/2/3/default, EOF sentinel byte 42, and return
-// condition match retail, with the same 0x18 frame and all 40 relocation occurrences.
-// Residual code begins with the local slot for ch and equivalent loop-comparison order.
 VA(0x004d70a0, 0x1eb)
 Bool loadAndRLEsource(FILE *src)
 {
-    Int32 ch, allowableBlockSize;
+    Int32 currentChar, allowableBlockSize;
 
     last = -1;
-    ch   = 0;
+    currentChar = 0;
 
     allowableBlockSize = 100000 * blockSize100k - 20;
 
-    while (last < allowableBlockSize && ch != MY_EOF) {
-        Int32 rlePair, runLen;
+    while (last < 0[&allowableBlockSize] && currentChar != MY_EOF) {
+        Int32 rlePair, runLength;
         rlePair = getRLEpair(src);
-        ch      = rlePair & 0xFFFF;
-        runLen  = (UInt32)rlePair >> 16;
+        currentChar = rlePair & 0xFFFF;
+        runLength   = (UInt32)rlePair >> 16;
 
-        if (ch == MY_EOF)
+        if (currentChar == MY_EOF)
             { last++; SETFIRST(last, ((UChar)42)); }
             else
-            switch (runLen) {
+            switch (runLength) {
                 case 1:
-                    last++; SETFIRST(last, ((UChar)ch)); break;
+                    last++; SETFIRST(last, ((UChar)currentChar)); break;
                 case 2:
-                    last++; SETFIRST(last, ((UChar)ch));
-                    last++; SETFIRST(last, ((UChar)ch)); break;
+                    last++; SETFIRST(last, ((UChar)currentChar));
+                    last++; SETFIRST(last, ((UChar)currentChar)); break;
                 case 3:
-                    last++; SETFIRST(last, ((UChar)ch));
-                    last++; SETFIRST(last, ((UChar)ch));
-                    last++; SETFIRST(last, ((UChar)ch)); break;
+                    last++; SETFIRST(last, ((UChar)currentChar));
+                    last++; SETFIRST(last, ((UChar)currentChar));
+                    last++; SETFIRST(last, ((UChar)currentChar)); break;
                 default:
-                    last++; SETFIRST(last, ((UChar)ch));
-                    last++; SETFIRST(last, ((UChar)ch));
-                    last++; SETFIRST(last, ((UChar)ch));
-                    last++; SETFIRST(last, ((UChar)ch));
-                    last++; SETFIRST(last, ((UChar)(runLen-4))); break;
+                    last++; SETFIRST(last, ((UChar)currentChar));
+                    last++; SETFIRST(last, ((UChar)currentChar));
+                    last++; SETFIRST(last, ((UChar)currentChar));
+                    last++; SETFIRST(last, ((UChar)currentChar));
+                    last++; SETFIRST(last, ((UChar)(runLength-4))); break;
             }
     }
-    return (ch == MY_EOF);
+    return (currentChar == MY_EOF);
 }
 
-// @semantic
-// The recovered 0x28 frame, output CFG, and all 15 effective relocations agree.  The
-// first structural residual is +0x1f: candidate stores the first local at [ebp-4], while
-// retail uses [ebp-0x18]; later slot and branch encodings remain unresolved.
+// @early-stop
+// All 125 instructions, the 0x28 frame, and all 15 effective relocation targets/addends
+// agree; the retained residual is delinked local-label identity metadata.
 VA(0x004d7290, 0x18d)
 void unRLEandDump(FILE *dst, Bool thisIsTheLastBlock)
 {
@@ -1493,10 +1481,10 @@ void unRLEandDump(FILE *dst, Bool thisIsTheLastBlock)
     if (thisIsTheLastBlock && block[last] != 42) unblockError();
 }
 
-// @semantic
-// The recovered 0x34 frame, stream CFG, and all 79 effective relocations agree; local
-// string/float symbols differ only in delinker identity.  The first code residual is
-// +0x11: candidate's initialized local is [ebp-0xc], retail's is [ebp-8].
+// @early-stop
+// Relocation-masked instructions, the 0x34 frame, CFG, and all 79 effective targets agree.
+// Residuals are local string/constant identities and the __adjust_fdiv alias for retail's
+// ?iLeftRightSave+0x10; the resolved addresses and owner-relative values are identical.
 VA(0x004d7420, 0x2e6)
 void compressStream(FILE *stream, FILE *zStream)
 {
@@ -1563,10 +1551,9 @@ void compressStream(FILE *stream, FILE *zStream)
     if (veryVerbose) { sprintf(gText, "\n"); LogStr(gText); }
 }
 
-// @semantic
-// The recovered 0x30 frame, stream CFG, and all 56 effective relocations agree; seven
-// strings differ only in local symbol identity.  The first code residual is +0x19:
-// candidate stores a local at [ebp-0x24], while retail uses [ebp-0x28].
+// @early-stop
+// Relocation-masked instructions, the 0x30 frame, CFG, and all 56 effective targets/addends
+// agree; the retained residual is seven delinked local-string identities.
 VA(0x004d7710, 0x26e)
 Bool uncompressStream(FILE *zStream, FILE *stream)
 {
@@ -1796,10 +1783,9 @@ Bool endsInBz(Char *name)
          name[n-1] == 'w');
 }
 
-// @semantic
-// The recovered 0x14 frame, file-flow CFG, and all 16 effective relocations agree; the
-// .nw/rb/wb literals differ only in local symbol identity.  The first code residual is
-// +0x84: candidate stores inStr at [ebp-8], while retail uses [ebp-0xc].
+// @early-stop
+// Relocation-masked instructions, the 0x14 frame, file CFG, and all 16 effective targets
+// agree; the retained residual is the delinked .nw/rb/wb literal identities.
 VA(0x004d7d60, 0xe2)
 void compress(Char *name)
 {
@@ -1822,10 +1808,9 @@ void compress(Char *name)
     retVal = remove(inName);
 }
 
-// @semantic
-// The recovered 0x1c frame, file-flow CFG, and all 19 effective relocations agree.  The
-// outName-3 access is the same effective address under different delinker identities.
-// The first slot residual is +0xa0: candidate [ebp-0xc], retail [ebp-0x10].
+// @early-stop
+// Relocation-masked instructions, the 0x1c frame, file CFG, and all 19 effective targets
+// agree; only local literal identities and the equivalent outName-3 alias remain.
 VA(0x004d7e50, 0x110)
 void uncompress(Char *name)
 {
@@ -1851,10 +1836,10 @@ void uncompress(Char *name)
     ERROR_IF_NOT_ZERO(retVal);
 }
 
-// @semantic
-// The recovered 0x1f0 frame, encode/file CFG, and all 28 effective relocations agree;
-// literal differences are local identities.  The first slot residual is +0x1a7:
-// candidate fd is [ebp-0x1c8], while retail uses [ebp-0x1cc].
+// @early-stop
+// Relocation-masked instructions, the 0x1f0 frame, file CFG, and all 28 effective targets
+// agree. Residuals are local literals and _open/_write/_close import-name aliases that
+// resolve to the same retail addresses with zero addends.
 VA(0x004d7f60, 0x2d5)
 long EncodeData(char *dst, char *src, unsigned long srcLen)
 {
@@ -1897,10 +1882,10 @@ long EncodeData(char *dst, char *src, unsigned long srcLen)
     return flen;
 }
 
-// @semantic
-// The recovered 0x1f4 frame, decode/file CFG, and all 26 effective relocations agree;
-// literal differences are local identities.  The first slot residual is +0x1b4:
-// candidate fd is [ebp-0x1c8], while retail uses [ebp-0x1cc].
+// @early-stop
+// Relocation-masked instructions, the 0x1f4 frame, file CFG, and all 26 effective targets
+// agree. Residuals are local literals and _open/_write/_close import-name aliases that
+// resolve to the same retail addresses with zero addends.
 VA(0x004d8240, 0x2f3)
 long DecodeData(char *dst, char *src, unsigned long srcLen)
 {
