@@ -1,7 +1,8 @@
 """Advisory whole-tree Clang C++11 warning pass (no objects; diagnostics only).
 
 Every TU except BASE/TILE.cpp (a __declspec(naked) hand-asm blitter Clang cannot
-compile) is syntax-checked as C++11 with -Wall -Wextra. Accepted repo-wide
+compile) is syntax-checked as C++20 with -Wall -Wextra (register mapped away; C++20 adds the
+deprecated cross-enum/enum-float arithmetic diagnostics). Accepted repo-wide
 classes are suppressed: writable-strings (retail's CodeView-pinned char*
 signatures), nonportable-include-path (retail-era include casing),
 unused-parameter and missing-field-initializers (reconstruction style).
@@ -19,10 +20,10 @@ from pathlib import Path
 
 EXCLUDED = ("BASE/TILE.cpp",)
 FLAGS = [
-    "-fsyntax-only", "-std=c++11", "--target=i386-pc-windows-msvc",
+    "-fsyntax-only", "-std=c++20", "--target=i386-pc-windows-msvc",
     "-fms-extensions", "-fms-compatibility", "-fms-compatibility-version=10.20",
-    "-fdelayed-template-parsing", "-ferror-limit=5",
-    "-Wall", "-Wextra",
+    "-ferror-limit=5",
+    "-Wall", "-Wextra", "-Dregister=",
     "-Wno-writable-strings", "-Wno-nonportable-include-path",
     "-Wno-unused-parameter", "-Wno-missing-field-initializers",
 ]
