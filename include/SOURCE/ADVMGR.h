@@ -805,7 +805,7 @@ typedef enum AdventureAdjacentMonsterConstant {
     ADVMGR_ADJACENT_MONSTER_RADIUS = 1,
     ADVMGR_ADJACENT_MONSTER_END_OFFSET = 2,
     ADVMGR_ADJACENT_MONSTER_TRIGGER = 0x98,
-    ADVMGR_ADJACENT_OBJECT_INDEX_NONE = 0xff
+    ADVMGR_ADJACENT_OBJECT_INDEX_NONE = 0xFF
 } AdventureAdjacentMonsterConstant;
 
 typedef enum AdventurePuzzleViewConstant {

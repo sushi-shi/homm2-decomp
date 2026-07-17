@@ -72,7 +72,7 @@ void border::Read(void) {
         gpResourceManager->RestorePosition();
         return;
     }
-    m_fillColor = gpResourceManager->ReadWord() & 0xff;
+    m_fillColor = gpResourceManager->ReadWord() & 0xFF;
 }
 
 // @semantic

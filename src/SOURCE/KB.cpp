@@ -2667,17 +2667,17 @@ void game::ShowLuckInfo(hero* h, i32 dialogType) {
 
 VA(0x0049cc9e, 0xd7)
 void ClearMapExtra(void) {
-    DATA(0x005164bc) static i16 clearMapExtraSourceLineBase = KB_SOURCE_LINE_CLEAR_MAP_EXTRA_BASE;
+    DATA(0x005164bc) static i16 clearMapExtraSourceLineBase = 0x0cbe;
     i32 i;
     for (i = 0; OD_STEER(i) < iMaxMapExtra; i++) {
         if (ppMapExtra[i])
-            H2_FREE(ppMapExtra[i], clearMapExtraSourceLineBase + KB_SOURCE_LINE_CLEAR_MAP_EXTRA_ITEM_FREE_OFFSET);
+            H2_FREE(ppMapExtra[i], clearMapExtraSourceLineBase + 0x06);
     }
     if (ppMapExtra)
-        H2_FREE(ppMapExtra, clearMapExtraSourceLineBase + KB_SOURCE_LINE_CLEAR_MAP_EXTRA_POINTER_FREE_OFFSET);
+        H2_FREE(ppMapExtra, clearMapExtraSourceLineBase + 0x09);
     ppMapExtra = 0;
     if (pwSizeOfMapExtra)
-        H2_FREE(pwSizeOfMapExtra, clearMapExtraSourceLineBase + KB_SOURCE_LINE_CLEAR_MAP_EXTRA_SIZE_FREE_OFFSET);
+        H2_FREE(pwSizeOfMapExtra, clearMapExtraSourceLineBase + 0x0d);
     pwSizeOfMapExtra = 0;
     iMaxMapExtra = 0;
 }
@@ -2800,7 +2800,7 @@ i32 NetPosToGamePos(i32 netPos) {
     return -1;
 }
 
-VA(0x0049d3a7, 0xff)
+VA(0x0049d3a7, 0xFF)
 i32 WaitForOtherPlayer(void) {
     i32 result = 0;
     KbRemotePacket* data;
@@ -3147,7 +3147,7 @@ void AddNetBoxLine(char* str, char color) {
 
 VA(0x0049e0f2, 0x214)
 void ShutDown(char* msg) {
-    DATA(0x005165e0) static i16 shutdownSourceLineBase = KB_SOURCE_LINE_SHUTDOWN_BASE;
+    DATA(0x005165e0) static i16 shutdownSourceLineBase = 0x0ef4;
     char buf[768];
     if (bInShutDown)
         return;
@@ -3189,7 +3189,7 @@ void ShutDown(char* msg) {
         gEventHandle = 0;
     }
     if (mapExtra)
-        H2_FREE(mapExtra, shutdownSourceLineBase + KB_SOURCE_LINE_SHUTDOWN_MAP_FREE_OFFSET);
+        H2_FREE(mapExtra, shutdownSourceLineBase + 0x47);
     mapExtra = 0;
     CloseAIMapVars();
     DeleteMainClasses();
@@ -3215,7 +3215,7 @@ void FileError(char* filename) {
 
 VA(0x0049e3a8, 0x255)
 void SmackFade(u8* src, u8* dst) {
-    DATA(0x00516668) static i16 smackFadeSourceLineBase = KB_SOURCE_LINE_SMACK_FADE_BASE;
+    DATA(0x00516668) static i16 smackFadeSourceLineBase = 0x0f61;
     // /Od frame slots (od_oracle-verified): a=newPal(-8) b=avg2(-c) c=x(-10)
     // d=minDist(-14) e=avg1(-18) f=map(-1c) g=y(-20) h=outer(-24) i=inner(-28)
     // j=screen(-2c) k=best(-30) p=dist(-4)
@@ -3232,8 +3232,8 @@ void SmackFade(u8* src, u8* dst) {
     a = 0;
     f = 0;
     k = -1;
-    a = static_cast<u8*>(H2_ALLOC(0x300, smackFadeSourceLineBase + KB_SOURCE_LINE_SMACK_FADE_PALETTE_ALLOC_OFFSET));
-    f = static_cast<u8*>(H2_ALLOC(0x100, smackFadeSourceLineBase + KB_SOURCE_LINE_SMACK_FADE_MAP_ALLOC_OFFSET));
+    a = static_cast<u8*>(H2_ALLOC(0x300, smackFadeSourceLineBase + 0x0d));
+    f = static_cast<u8*>(H2_ALLOC(0x100, smackFadeSourceLineBase + 0x0e));
     memset(a, 0, MISC_PALETTE_BYTE_COUNT);
     memset(f, 0, 0x100);
     for (h = 0xa; h < 0xf6; h++) {
@@ -3260,13 +3260,13 @@ void SmackFade(u8* src, u8* dst) {
     }
     gpWindowManager->UpdateScreen();
     UpdatePalette(reinterpret_cast<i8*>(dst));
-    H2_FREE(a, smackFadeSourceLineBase + KB_SOURCE_LINE_SMACK_FADE_PALETTE_FREE_OFFSET);
-    H2_FREE(f, smackFadeSourceLineBase + KB_SOURCE_LINE_SMACK_FADE_MAP_FREE_OFFSET);
+    H2_FREE(a, smackFadeSourceLineBase + 0x31);
+    H2_FREE(f, smackFadeSourceLineBase + 0x32);
 }
 
 VA(0x0049e5fd, 0x303)
 void ShowCongrats(i32 highScoreType) {
-    DATA(0x0051670c) static i16 congratsSourceLineBase = KB_SOURCE_LINE_CONGRATS_BASE;
+    DATA(0x0051670c) static i16 congratsSourceLineBase = 0x0f97;
     u8 savedPalette[CONGRATS_PALETTE_BUFFER_SIZE];
     i32 baseScore;
     i32 score_e;
@@ -3275,7 +3275,7 @@ void ShowCongrats(i32 highScoreType) {
     gpMouseManager->HideColorPointer();
     memcpy(savedPalette, gpBufferPalette->m_data, CONGRATS_PALETTE_SIZE);
     gpWindowManager->m_updateFlags = 0;
-    congratsText = static_cast<char*>(H2_ALLOC(CONGRATS_TEXT_SIZE, congratsSourceLineBase + KB_SOURCE_LINE_CONGRATS_ALLOC_OFFSET));
+    congratsText = static_cast<char*>(H2_ALLOC(CONGRATS_TEXT_SIZE, congratsSourceLineBase + 0x09));
     baseScore = CalcBaseScore(giCurTurn);
     score_e = gpGame->m_difficultyRating * baseScore / CONGRATS_DIFFICULTY_SCALE;
     gpSoundManager->PlayAmbientMusic(CONGRATS_MUSIC_SILENT, 0, CONGRATS_MUSIC_SILENT);
@@ -3331,7 +3331,7 @@ void ShowCongrats(i32 highScoreType) {
         CONGRATS_STANDARD,
         gpGame->m_mapHeader.name
     );
-    H2_FREE(congratsText, congratsSourceLineBase + KB_SOURCE_LINE_CONGRATS_FREE_OFFSET);
+    H2_FREE(congratsText, congratsSourceLineBase + 0x4e);
     congratsText = 0;
     gpWindowManager->m_updateFlags = 1;
     memcpy(gpBufferPalette->m_data, gPalette->m_data, CONGRATS_PALETTE_SIZE);
@@ -4466,7 +4466,7 @@ void NormalDialog(
     i32 showOrText,
     i32 timeout
 ) {
-    DATA(0x00516d20) static i16 normalDialogSourceLineBase = KB_SOURCE_LINE_NORMAL_DIALOG_BASE;
+    DATA(0x00516d20) static i16 normalDialogSourceLineBase = 0x14a5;
     // Retail's 0x120 /Od frame retains this otherwise unreferenced local word.
     i32 panelHeight_p;
     i32 labelY_o;
@@ -4663,7 +4663,9 @@ void NormalDialog(
         if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_NO_RESOURCE)
             break;
 
-        resourceText_e[resourceSlot_n] = static_cast<char*>(H2_ALLOC(NORMAL_DIALOG_TEXT_LENGTH, normalDialogSourceLineBase + KB_SOURCE_LINE_NORMAL_DIALOG_FIRST_TEXT_ALLOC_OFFSET));
+        resourceText_e[resourceSlot_n] = static_cast<char*>(
+            H2_ALLOC(NORMAL_DIALOG_TEXT_LENGTH, normalDialogSourceLineBase + 0xbb)
+        );
         if (resourceType_l[resourceSlot_n] <= NORMAL_DIALOG_RESOURCE_LAST) {
             if (resourceValue_l[resourceSlot_n] > 0) {
                 sprintf(resourceText_e[resourceSlot_n], "%d", resourceValue_l[resourceSlot_n]);
@@ -4970,8 +4972,9 @@ void NormalDialog(
                 MemError();
             pNormalDialogWindow->AddWidget(textPanel_h, -1);
 
-            resourceText_e[resourceSlot_n] = static_cast<char*>(H2_ALLOC(NORMAL_DIALOG_TEXT_LENGTH, normalDialogSourceLineBase
-                    + KB_SOURCE_LINE_NORMAL_DIALOG_SECONDARY_TEXT_ALLOC_OFFSET));
+            resourceText_e[resourceSlot_n] = static_cast<char*>(
+                H2_ALLOC(NORMAL_DIALOG_TEXT_LENGTH, normalDialogSourceLineBase + 0x1af)
+            );
             labelY_o = OD_STEER(sizingIconHeight_l) + resourceY_l - 24;
             sprintf(
                 resourceText_e[resourceSlot_n],
@@ -5002,7 +5005,7 @@ void NormalDialog(
         pNormalDialogWindow->AddWidget(textPanel_h, -1);
 
         if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_PRIMARY_SKILL && showPrimaryBonus_e) {
-            char* bonusText = static_cast<char*>(H2_ALLOC(5, normalDialogSourceLineBase + KB_SOURCE_LINE_NORMAL_DIALOG_PRIMARY_BONUS_ALLOC_OFFSET));
+            char* bonusText = static_cast<char*>(H2_ALLOC(5, normalDialogSourceLineBase + 0x1c9));
             strcpy(bonusText, "+1 ");
             textPanel_h = new textWidget(
                 resourceCenterX_a - 50,
@@ -5041,7 +5044,7 @@ void NormalDialog(
     pNormalDialogWindow->BroadcastMessage(message_e);
 
     if (showOrText == NORMAL_DIALOG_SHOW_OR_TEXT) {
-        orText_f = static_cast<char*>(H2_ALLOC(3, normalDialogSourceLineBase + KB_SOURCE_LINE_NORMAL_DIALOG_OR_TEXT_ALLOC_OFFSET));
+        orText_f = static_cast<char*>(H2_ALLOC(3, normalDialogSourceLineBase + 0x1ed));
         strcpy(orText_f, "or");
         textPanel_h = new textWidget(
             windowWidth_a / 2 - 10,
@@ -5636,7 +5639,7 @@ DATA(0x004fa448) u8 gColorTableLighten[DIM_PALETTE_COLOR_COUNT] = {
     0xbc, 0xbd, 0xbe, 0xbf, 0xc0, 0xc1, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0xc7, 0xc8, 0xc9, 0xca, 0xcb,
     0xcc, 0xcd, 0xce, 0xcf, 0xd0, 0xd1, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde, 0xde,
     0xdf, 0xe0, 0xe1, 0xe2, 0xe3, 0xe4, 0xe5, 0xe7, 0xe8, 0xe9, 0xea, 0xeb, 0xec, 0xed, 0xee, 0xee,
-    0xef, 0xf0, 0xf2, 0xf2, 0xf3, 0xf4, 0xf6, 0xf7, 0xf8, 0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xff
+    0xef, 0xf0, 0xf2, 0xf2, 0xf3, 0xf4, 0xf6, 0xf7, 0xf8, 0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xFF
 };
 DATA(0x004fa548) u8 gColorTableNoCycle[DIM_PALETTE_COLOR_COUNT] = {
     0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
@@ -5654,7 +5657,7 @@ DATA(0x004fa548) u8 gColorTableNoCycle[DIM_PALETTE_COLOR_COUNT] = {
     0xc0, 0xc1, 0xc2, 0xc3, 0xc4, 0xc5, 0xc6, 0xc7, 0xc8, 0xc9, 0xca, 0xcb, 0xcc, 0xcd, 0xce, 0xcf,
     0xd0, 0xd1, 0xd2, 0xd3, 0xd4, 0xd5, 0xbc, 0xbc, 0xbc, 0xbc, 0x76, 0x76, 0x76, 0x76, 0xde, 0xdf,
     0xe0, 0xe1, 0xe2, 0xe3, 0xe4, 0xe5, 0xe6, 0x45, 0x45, 0x45, 0x45, 0x45, 0x45, 0x45, 0x45, 0x45,
-    0x45, 0x45, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6, 0xf7, 0xf8, 0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xff
+    0x45, 0x45, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6, 0xf7, 0xf8, 0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xFF
 };
 DATA(0x004fa648) font* smallFont = 0;
 DATA(0x004fa64c) font* bigFont = 0;
@@ -9095,86 +9098,84 @@ DATA(0x004ff958) char* gDwellingNames[FACTION_COUNT][KB_DWELLING_TYPE_COUNT] = {
      "",
      ""}
 };
-DATA(0x004ffa78) char*
-    cSecSkillDesc[HERO_SKILL_COUNT][SECONDARY_SKILL_VALUE_LEVEL_COUNT] =
-        {
-            {"{Basic Pathfinding}\n\nBasic Pathfinding reduces the movement penalty for rough "
-             "terrain by 25 percent.",
-             "{Advanced Pathfinding}\n\nAdvanced Pathfinding reduces the movement penalty for "
-             "rough terrain by 50 percent.",
-             "{Expert Pathfinding}\n\nExpert Pathfinding eliminates the movement penalty for rough "
-             "terrain."},
-            {"{Basic Archery}\n\nBasic Archery increases the damage done by range attacking "
-             "creatures by 10 percent.",
-             "{Advanced Archery}\n\nAdvanced Archery increases the damage done by range attacking "
-             "creatures by 25 percent.",
-             "{Expert Archery}\n\nExpert Archery increases the damage done by range attacking "
-             "creatures by 50 percent."},
-            {"{Basic Logistics}\n\nBasic Logistics increases your hero's movement points by 10 "
-             "percent.",
-             "{Advanced Logistics}\n\nAdvanced Logistics increases your hero's movement points by "
-             "20 percent.",
-             "{Expert Logistics}\n\nExpert Logistics increases your hero's movement points by 30 "
-             "percent."},
-            {"{Basic Scouting}\n\nBasic Scouting increases your hero's viewable area by 1 square.",
-             "{Advanced Scouting}\n\nAdvanced Scouting increases your hero's viewable area by 2 "
-             "squares.",
-             "{Expert Scouting}\n\nExpert Scouting increases your hero's viewable area by 3 "
-             "squares."},
-            {"{Basic Diplomacy}\n\nBasic Diplomacy allows you to negotiate with monsters who are "
-             "weaker than your group.  Approximately 1/4 of the creatures may offer to join you.",
-             "{Advanced Diplomacy}\n\nAdvanced Diplomacy allows you to negotiate with monsters who "
-             "are weaker than your group.  Approximately 1/2 of the creatures may offer to join "
-             "you.",
-             "{Expert Diplomacy}\n\nExpert Diplomacy allows you to negotiate with monsters who are "
-             "weaker than your group.  All of the creatures may offer to join you."},
-            {"{Basic Navigation}\n\nBasic Navigation increases your hero's movement points over "
-             "water by 1/3.",
-             "{Advanced Navigation}\n\nAdvanced Navigation increases your hero's movement points "
-             "over water by 2/3.",
-             "{Expert Navigation}\n\nExpert Navigation doubles your hero's movement points over "
-             "water."},
-            {"{Basic Leadership}\n\nBasic Leadership increases your hero's troops' morale by 1.",
-             "{Advanced Leadership}\n\nAdvanced Leadership increases your hero's troops' morale by "
-             "2.",
-             "{Expert Leadership}\n\nExpert Leadership increases your hero's troops' morale by 3."},
-            {"{Basic Wisdom}\n\nBasic Wisdom allows your hero to learn third level spells.",
-             "{Advanced Wisdom}\n\nAdvanced Wisdom allows your hero to learn fourth level spells.",
-             "{Expert Wisdom}\n\nExpert Wisdom allows your hero to learn fifth level spells."},
-            {"{Basic Mysticism}\n\nBasic Mysticism regenerates two of your hero's spell points per "
-             "day.",
-             "{Advanced Mysticism}\n\nAdvanced Mysticism regenerates three of your hero's spell "
-             "points per day.",
-             "{Expert Mysticism}\n\nExpert Mysticism regenerates four of your hero's spell points "
-             "per day."},
-            {"{Basic Luck}\n\nBasic Luck increases your hero's luck by 1.",
-             "{Advanced Luck}\n\nAdvanced Luck increases your hero's luck by 2.",
-             "{Expert Luck}\n\nExpert Luck increases your hero's luck by 3."},
-            {"{Basic Ballistics}\n\nBasic Ballistics gives your hero's catapult shots a greater "
-             "chance to hit and do damage to castle walls.",
-             "{Advanced Ballistics}\n\nAdvanced Ballistics gives your hero's catapult an extra "
-             "shot, and each shot has a greater chance to hit and do damage to castle walls.",
-             "{Expert Ballistics}\n\nExpert Ballistics gives your hero's catapult an extra shot, "
-             "and each shot automatically destroys any wall, except a fortified wall in a Knight "
-             "town."},
-            {"{Basic Eagle Eye}\n\nBasic Eagle Eye gives your hero a 20 percent chance to learn "
-             "any given 1st or 2nd level enemy spell used against him in a combat.",
-             "{Advanced Eagle Eye}\n\nAdvanced Eagle Eye gives your hero a 30 percent chance to "
-             "learn any given 3rd level spell (or below) used against him in combat.",
-             "{Expert Eagle Eye}\n\nExpert Eagle Eye gives your hero a 40 percent chance to learn "
-             "any given 4th level spell (or below) used against him in combat."},
-            {"{Basic Necromancy}\n\nBasic Necromancy allows 10 percent of the creatures killed in "
-             "combat to be brought back from the dead as Skeletons.",
-             "{Advanced Necromancy}\n\nAdvanced Necromancy allows 20 percent of the creatures "
-             "killed in combat to be brought back from the dead as Skeletons.",
-             "{Expert Necromancy}\n\nExpert Necromancy allows 30 percent of the creatures killed "
-             "in combat to be brought back from the dead as Skeletons."},
-            {"{Small Estates}\n\nYour hero produces 100 gold pieces per turn as tax revenue from "
-             "estates.",
-             "{Moderate Estates}\n\nYour hero produces 250 gold pieces per turn as tax revenue "
-             "from estates.",
-             "{Grand Estates}\n\nYour hero produces 500 gold pieces per turn as tax revenue from "
-             "estates."}
+DATA(0x004ffa78) char* cSecSkillDesc[HERO_SKILL_COUNT][SECONDARY_SKILL_VALUE_LEVEL_COUNT] = {
+    {"{Basic Pathfinding}\n\nBasic Pathfinding reduces the movement penalty for rough "
+     "terrain by 25 percent.",
+     "{Advanced Pathfinding}\n\nAdvanced Pathfinding reduces the movement penalty for "
+     "rough terrain by 50 percent.",
+     "{Expert Pathfinding}\n\nExpert Pathfinding eliminates the movement penalty for rough "
+     "terrain."},
+    {"{Basic Archery}\n\nBasic Archery increases the damage done by range attacking "
+     "creatures by 10 percent.",
+     "{Advanced Archery}\n\nAdvanced Archery increases the damage done by range attacking "
+     "creatures by 25 percent.",
+     "{Expert Archery}\n\nExpert Archery increases the damage done by range attacking "
+     "creatures by 50 percent."},
+    {"{Basic Logistics}\n\nBasic Logistics increases your hero's movement points by 10 "
+     "percent.",
+     "{Advanced Logistics}\n\nAdvanced Logistics increases your hero's movement points by "
+     "20 percent.",
+     "{Expert Logistics}\n\nExpert Logistics increases your hero's movement points by 30 "
+     "percent."},
+    {"{Basic Scouting}\n\nBasic Scouting increases your hero's viewable area by 1 square.",
+     "{Advanced Scouting}\n\nAdvanced Scouting increases your hero's viewable area by 2 "
+     "squares.",
+     "{Expert Scouting}\n\nExpert Scouting increases your hero's viewable area by 3 "
+     "squares."},
+    {"{Basic Diplomacy}\n\nBasic Diplomacy allows you to negotiate with monsters who are "
+     "weaker than your group.  Approximately 1/4 of the creatures may offer to join you.",
+     "{Advanced Diplomacy}\n\nAdvanced Diplomacy allows you to negotiate with monsters who "
+     "are weaker than your group.  Approximately 1/2 of the creatures may offer to join "
+     "you.",
+     "{Expert Diplomacy}\n\nExpert Diplomacy allows you to negotiate with monsters who are "
+     "weaker than your group.  All of the creatures may offer to join you."},
+    {"{Basic Navigation}\n\nBasic Navigation increases your hero's movement points over "
+     "water by 1/3.",
+     "{Advanced Navigation}\n\nAdvanced Navigation increases your hero's movement points "
+     "over water by 2/3.",
+     "{Expert Navigation}\n\nExpert Navigation doubles your hero's movement points over "
+     "water."},
+    {"{Basic Leadership}\n\nBasic Leadership increases your hero's troops' morale by 1.",
+     "{Advanced Leadership}\n\nAdvanced Leadership increases your hero's troops' morale by "
+     "2.",
+     "{Expert Leadership}\n\nExpert Leadership increases your hero's troops' morale by 3."},
+    {"{Basic Wisdom}\n\nBasic Wisdom allows your hero to learn third level spells.",
+     "{Advanced Wisdom}\n\nAdvanced Wisdom allows your hero to learn fourth level spells.",
+     "{Expert Wisdom}\n\nExpert Wisdom allows your hero to learn fifth level spells."},
+    {"{Basic Mysticism}\n\nBasic Mysticism regenerates two of your hero's spell points per "
+     "day.",
+     "{Advanced Mysticism}\n\nAdvanced Mysticism regenerates three of your hero's spell "
+     "points per day.",
+     "{Expert Mysticism}\n\nExpert Mysticism regenerates four of your hero's spell points "
+     "per day."},
+    {"{Basic Luck}\n\nBasic Luck increases your hero's luck by 1.",
+     "{Advanced Luck}\n\nAdvanced Luck increases your hero's luck by 2.",
+     "{Expert Luck}\n\nExpert Luck increases your hero's luck by 3."},
+    {"{Basic Ballistics}\n\nBasic Ballistics gives your hero's catapult shots a greater "
+     "chance to hit and do damage to castle walls.",
+     "{Advanced Ballistics}\n\nAdvanced Ballistics gives your hero's catapult an extra "
+     "shot, and each shot has a greater chance to hit and do damage to castle walls.",
+     "{Expert Ballistics}\n\nExpert Ballistics gives your hero's catapult an extra shot, "
+     "and each shot automatically destroys any wall, except a fortified wall in a Knight "
+     "town."},
+    {"{Basic Eagle Eye}\n\nBasic Eagle Eye gives your hero a 20 percent chance to learn "
+     "any given 1st or 2nd level enemy spell used against him in a combat.",
+     "{Advanced Eagle Eye}\n\nAdvanced Eagle Eye gives your hero a 30 percent chance to "
+     "learn any given 3rd level spell (or below) used against him in combat.",
+     "{Expert Eagle Eye}\n\nExpert Eagle Eye gives your hero a 40 percent chance to learn "
+     "any given 4th level spell (or below) used against him in combat."},
+    {"{Basic Necromancy}\n\nBasic Necromancy allows 10 percent of the creatures killed in "
+     "combat to be brought back from the dead as Skeletons.",
+     "{Advanced Necromancy}\n\nAdvanced Necromancy allows 20 percent of the creatures "
+     "killed in combat to be brought back from the dead as Skeletons.",
+     "{Expert Necromancy}\n\nExpert Necromancy allows 30 percent of the creatures killed "
+     "in combat to be brought back from the dead as Skeletons."},
+    {"{Small Estates}\n\nYour hero produces 100 gold pieces per turn as tax revenue from "
+     "estates.",
+     "{Moderate Estates}\n\nYour hero produces 250 gold pieces per turn as tax revenue "
+     "from estates.",
+     "{Grand Estates}\n\nYour hero produces 500 gold pieces per turn as tax revenue from "
+     "estates."}
 };
 DATA(0x004ffb20) char* cBuildingInfoNeutral[KB_NEUTRAL_BUILDING_INFO_COUNT] = {
     "The Mage Guild allows heroes to learn spells and replenish their spell points.",

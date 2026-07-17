@@ -82,14 +82,14 @@ DATA(0x004f7f84) static i16 gCompressTestSourceLine = 0x1f95;
 // These line operands CANNOT be hardcoded: retail materializes each base as a
 // static i16 global and emits a memory load plus add at every call site, so the
 // global reference is part of the byte proof.
-#define GSAVELINE gSaveSourceLine
-#define GLOADLINE gLoadSourceLine
-#define GMAPLINE gMapSourceLine
-#define GTRANSMITLINE gTransmitSourceLine
-#define GRECEIVELINE gReceiveSourceLine
-#define GDIFFLINE gDiffSourceLine
-#define GCOMPRESSTEST2LINE gCompressTest2SourceLine
-#define GCOMPRESSTESTLINE gCompressTestSourceLine
+#define gSaveSourceLine gSaveSourceLine
+#define gLoadSourceLine gLoadSourceLine
+#define gMapSourceLine gMapSourceLine
+#define gTransmitSourceLine gTransmitSourceLine
+#define gReceiveSourceLine gReceiveSourceLine
+#define gDiffSourceLine gDiffSourceLine
+#define gCompressTest2SourceLine gCompressTest2SourceLine
+#define gCompressTestSourceLine gCompressTestSourceLine
 // Retail folds the embedded member offset into Row/Extra accesses after inlining.
 #define WORLDMAP (&m_worldMap)
 
@@ -523,7 +523,7 @@ void GenerateStandardFileName(char* source, char* destination) {
 // reloc-masked: identical 0xbc4-byte code/frame; 135/135 targets agree, only compiler literal/constant symbol identities differ
 VA(0x00471eb7, 0xbc4)
 i32 game::SaveGame(char* filename, i32 generateName, i8 expansionFormat) {
-    void* emptyPayload = H2_ALLOC(GAME_SAVE_BUFFER_SIZE, GSAVELINE + 10);
+    void* emptyPayload = H2_ALLOC(GAME_SAVE_BUFFER_SIZE, gSaveSourceLine + 10);
     memset(emptyPayload, 0, GAME_SAVE_BUFFER_SIZE);
     if (!xIsExpansionMap)
         expansionFormat = 1;
@@ -673,7 +673,7 @@ i32 game::SaveGame(char* filename, i32 generateName, i8 expansionFormat) {
     m_worldMap.Write(fileInfo);
     write(fileInfo, markerBuffer, 4);
     close(fileInfo);
-    H2_FREE(emptyPayload, GSAVELINE + 0xed);
+    H2_FREE(emptyPayload, gSaveSourceLine + 0xed);
     return 1;
 }
 
@@ -950,16 +950,14 @@ void game::LoadGame(char* filename, i32 loadFromFile, i32) {
     read(file0, marker0, 4);
     read(file0, &iMaxMapExtra, 4);
     read(file0, marker0, 4);
-    ppMapExtra =
-        reinterpret_cast<void**>(H2_ALLOC(iMaxMapExtra * 4, GLOADLINE + 0xcb));
-    pwSizeOfMapExtra =
-        reinterpret_cast<i16*>(H2_ALLOC(iMaxMapExtra * 2, GLOADLINE + 0xcc));
+    ppMapExtra = reinterpret_cast<void**>(H2_ALLOC(iMaxMapExtra * 4, gLoadSourceLine + 0xcb));
+    pwSizeOfMapExtra = reinterpret_cast<i16*>(H2_ALLOC(iMaxMapExtra * 2, gLoadSourceLine + 0xcc));
     memset(ppMapExtra, 0, iMaxMapExtra * 4);
     memset(pwSizeOfMapExtra, 0, iMaxMapExtra * 2);
     for (i29 = 1; (&i29)[0] < iMaxMapExtra; i29++) {
         read(file0, marker0, 4);
         read(file0, pwSizeOfMapExtra + i29, 2);
-        ppMapExtra[i29] = H2_ALLOC(pwSizeOfMapExtra[i29], GLOADLINE + 0xd5);
+        ppMapExtra[i29] = H2_ALLOC(pwSizeOfMapExtra[i29], gLoadSourceLine + 0xd5);
         read(file0, ppMapExtra[i29], pwSizeOfMapExtra[i29]);
     }
     read(file0, marker0, 4);
@@ -1435,11 +1433,13 @@ void game::NewMap(char* filename) {
         ultimateDistance5 = m_mapHeader.lossConditionValue;
         ultimateTries4 = m_mapHeader.lossTownY;
         m_mapHeader.lossConditionValue = 0;
-        if (m_worldMap.GetCell(ultimateDistance5, ultimateTries4)->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MERMAID))
+        if (m_worldMap.GetCell(ultimateDistance5, ultimateTries4)->m_triggerType
+            == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MERMAID))
             m_mapHeader.lossConditionValue =
                 m_worldMap.GetCell(ultimateDistance5, ultimateTries4)->m_objectMetadata;
         else {
-            if (m_worldMap.GetCell(ultimateDistance5, ultimateTries4 - 1)->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MERMAID))
+            if (m_worldMap.GetCell(ultimateDistance5, ultimateTries4 - 1)->m_triggerType
+                == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MERMAID))
                 m_mapHeader.lossConditionValue =
                     m_worldMap.GetCell(ultimateDistance5, ultimateTries4 - 1)->m_objectMetadata;
             else
@@ -1450,11 +1450,13 @@ void game::NewMap(char* filename) {
         ultimateDistance5 = m_mapHeader.victoryConditionValue;
         ultimateTries4 = m_mapHeader.victoryTownY;
         m_mapHeader.victoryConditionValue = 0;
-        if (m_worldMap.GetCell(ultimateDistance5, ultimateTries4)->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MERMAID))
+        if (m_worldMap.GetCell(ultimateDistance5, ultimateTries4)->m_triggerType
+            == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MERMAID))
             m_mapHeader.victoryConditionValue =
                 m_worldMap.GetCell(ultimateDistance5, ultimateTries4)->m_objectMetadata;
         else {
-            if (m_worldMap.GetCell(ultimateDistance5, ultimateTries4 - 1)->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MERMAID))
+            if (m_worldMap.GetCell(ultimateDistance5, ultimateTries4 - 1)->m_triggerType
+                == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MERMAID))
                 m_mapHeader.victoryConditionValue =
                     m_worldMap.GetCell(ultimateDistance5, ultimateTries4 - 1)->m_objectMetadata;
             else
@@ -1541,7 +1543,7 @@ void game::RandomizeEvents(void) {
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_BOAT:
                     cell2->m_objectTileset = 0;
-                    cell2->m_objectIndex = 0xff;
+                    cell2->m_objectIndex = 0xFF;
                     cell2->m_objectMetadata = 0;
                     cell2->m_triggerType = 0;
                     CreateBoat(xPos2, yPos19, 1);
@@ -1562,7 +1564,7 @@ void game::RandomizeEvents(void) {
                     mapEvent1->active = 1;
                     cell2->m_objectMetadata = 0;
                     cell2->m_triggerType = 0;
-                    cell2->m_objectIndex = 0xff;
+                    cell2->m_objectIndex = 0xFF;
                     cell2->m_objectTileset = 0;
                     m_mapEventCount++;
                     break;
@@ -1580,7 +1582,9 @@ void game::RandomizeEvents(void) {
                     cell2->m_objectMetadata = tentId10++;
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_STANDING_STONES:
-                    if (xPos2 <= 0 || m_worldMap.GetCell(xPos2 - 1, yPos19)->m_triggerType != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_STANDING_STONES))
+                    if (xPos2 <= 0
+                        || m_worldMap.GetCell(xPos2 - 1, yPos19)->m_triggerType
+                               != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_STANDING_STONES))
                         cell2->m_objectMetadata = hutId11++;
                     else
                         cell2->m_objectMetadata =
@@ -1612,7 +1616,8 @@ void game::RandomizeEvents(void) {
                     if (randomValue7 < 40)
                         cell2->m_objectMetadata = 0;
                     else if (randomValue7 < 50)
-                        cell2->m_objectMetadata = GetRandomArtifactId(12, 1) | MAP_EVENT_ARTIFACT_CONDITION_FLAG;
+                        cell2->m_objectMetadata =
+                            GetRandomArtifactId(12, 1) | MAP_EVENT_ARTIFACT_CONDITION_FLAG;
                     else
                         cell2->m_objectMetadata = Random(0, 5) + (Random(2, 5) << 4) + 1;
                     break;
@@ -1650,7 +1655,8 @@ void game::RandomizeEvents(void) {
                         else if (randomValue7 < 90)
                             cell2->m_objectMetadata = 1;
                         else
-                            cell2->m_objectMetadata = GetRandomArtifactId(8, 1) | MAP_EVENT_ARTIFACT_GUARD_FLAG;
+                            cell2->m_objectMetadata =
+                                GetRandomArtifactId(8, 1) | MAP_EVENT_ARTIFACT_GUARD_FLAG;
                     } else {
                         randomValue7 = Random(0, 100);
                         if (randomValue7 < 32)
@@ -1660,7 +1666,8 @@ void game::RandomizeEvents(void) {
                         else if (randomValue7 < 95)
                             cell2->m_objectMetadata = 4;
                         else
-                            cell2->m_objectMetadata = GetRandomArtifactId(8, 1) | MAP_EVENT_ARTIFACT_GUARD_FLAG;
+                            cell2->m_objectMetadata =
+                                GetRandomArtifactId(8, 1) | MAP_EVENT_ARTIFACT_GUARD_FLAG;
                     }
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CAMPFIRE:
@@ -1899,10 +1906,13 @@ void game::RandomizeEvents(void) {
                     mineId2 = GetMineId(xPos2, yPos19);
                     for (row18 = yPos19 - 1; row18 <= yPos19; row18++) {
                         for (column1 = xPos2 - 2; column1 <= xPos2 + 1; column1++) {
-                            if (column1 == xPos2 - 2 && cell2->m_triggerType != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ALCHEMIST_LAB))
+                            if (column1 == xPos2 - 2
+                                && cell2->m_triggerType
+                                       != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ALCHEMIST_LAB))
                                 continue;
                             if (m_worldMap.GetCell(column1, row18)->m_objectMetadata == 0
-                                || ((m_worldMap.GetCell(column1, row18)->m_triggerType & MAP_TRIGGER_TYPE_MASK)
+                                || ((m_worldMap.GetCell(column1, row18)->m_triggerType
+                                     & MAP_TRIGGER_TYPE_MASK)
                                     == (cell2->m_triggerType & MAP_TRIGGER_TYPE_MASK)))
                                 m_worldMap.GetCell(column1, row18)->m_objectMetadata = mineId2;
                         }
@@ -1948,19 +1958,26 @@ void game::RandomizeEvents(void) {
     for (yPos19 = 0; yPos19 < MAP_HEIGHT; yPos19++) {
         for (xPos2 = 0; (xPos2 | 0) < MAP_WIDTH; xPos2++) {
             cell2 = m_worldMap.Row(yPos19) + xPos2;
-            if ((cell2->m_triggerType & MAP_TRIGGER_TYPE_MASK) == MAP_OBJECT_ROCK && cell2->m_objectTileset == TILESET_X_LOC2)
+            if ((cell2->m_triggerType & MAP_TRIGGER_TYPE_MASK) == MAP_OBJECT_ROCK
+                && cell2->m_objectTileset == TILESET_X_LOC2)
                 cell2->m_flags |= 8;
-            if (cell2->m_objectIndex != MAPCELL_SPRITE_NONE && !(cell2->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
-                && !(cell2->m_flags & MAP_CELL_OBJECT_SHADOW_ONLY) && cell2->m_overlayIndex != MAPCELL_SPRITE_NONE)
+            if (cell2->m_objectIndex != MAPCELL_SPRITE_NONE
+                && !(cell2->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
+                && !(cell2->m_flags & MAP_CELL_OBJECT_SHADOW_ONLY)
+                && cell2->m_overlayIndex != MAPCELL_SPRITE_NONE)
                 cell2->m_flags |= 8;
             upperCount = 0;
             lowerCount16 = 0;
-            if (!(cell2->m_flags & 8) && yPos19 < MAP_HEIGHT - 1 && cell2->m_objectIndex != MAPCELL_SPRITE_NONE
+            if (!(cell2->m_flags & 8) && yPos19 < MAP_HEIGHT - 1
+                && cell2->m_objectIndex != MAPCELL_SPRITE_NONE
                 && !(cell2->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
                 && !(cell2->m_flags & MAP_CELL_OBJECT_SHADOW_ONLY)) {
                 mapCell* below0;
                 if (m_worldMap.GetCell(xPos2, yPos19 + 1)->m_objectIndex != MAPCELL_SPRITE_NONE
-                    && !(m_worldMap.GetCell(xPos2, yPos19 + 1)->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
+                    && !(
+                        m_worldMap.GetCell(xPos2, yPos19 + 1)->m_triggerType
+                        & MAP_TRIGGER_ACTION_FLAG
+                    )
                     && !(
                         m_worldMap.GetCell(xPos2, yPos19 + 1)->m_flags & MAP_CELL_OBJECT_SHADOW_ONLY
                     )) {
@@ -1974,7 +1991,8 @@ void game::RandomizeEvents(void) {
                     else
                         extra15 = 0;
                     while (upperCount < 5 && extra15 != 0) {
-                        if (extra15->objectIndex != MAPCELL_SPRITE_NONE && !extra15->objectLayerBit1) {
+                        if (extra15->objectIndex != MAPCELL_SPRITE_NONE
+                            && !extra15->objectLayerBit1) {
                             upperTilesets29[upperCount] = extra15->objectTileset;
                             upperIndexes1[upperCount] = extra15->objectIndex;
                             upperCount++;
@@ -1995,7 +2013,8 @@ void game::RandomizeEvents(void) {
                     else
                         extra15 = 0;
                     while (lowerCount16 < 5 && extra15 != 0) {
-                        if (extra15->objectIndex != MAPCELL_SPRITE_NONE && !extra15->objectLayerBit1) {
+                        if (extra15->objectIndex != MAPCELL_SPRITE_NONE
+                            && !extra15->objectLayerBit1) {
                             lowerTilesets4[lowerCount16] = extra15->objectTileset;
                             lowerIndexes7[lowerCount16] = extra15->objectIndex;
                             lowerCount16++;
@@ -2017,12 +2036,16 @@ void game::RandomizeEvents(void) {
                 }
             }
             if (yPos19 < MAP_HEIGHT - 1) {
-                if (m_worldMap.GetCell(xPos2, yPos19 + 1)->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)
-                    || m_worldMap.GetCell(xPos2, yPos19 + 1)->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_TOWN)
-                    || m_worldMap.GetCell(xPos2, yPos19 + 1)->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_CASTLE))
+                if (m_worldMap.GetCell(xPos2, yPos19 + 1)->m_triggerType
+                        == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)
+                    || m_worldMap.GetCell(xPos2, yPos19 + 1)->m_triggerType
+                           == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_TOWN)
+                    || m_worldMap.GetCell(xPos2, yPos19 + 1)->m_triggerType
+                           == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_CASTLE))
                     cell2->m_flags |= 8;
             }
-            if (cell2->m_objectIndex != MAPCELL_SPRITE_NONE && !(cell2->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
+            if (cell2->m_objectIndex != MAPCELL_SPRITE_NONE
+                && !(cell2->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
                 && !(cell2->m_flags & MAP_CELL_OBJECT_SHADOW_ONLY)
                 && (yPos19 == MAP_HEIGHT - 1 || (m_worldMap.Row(yPos19 + 1)[xPos2].m_flags & 4)))
                 cell2->m_flags |= 8;
@@ -2120,15 +2143,13 @@ i32 game::LoadMap(char* filename) {
     read(file2, m_timeEventIndices, m_mapHeader.timeEventCount * 2);
     m_timeEventCount = m_mapHeader.timeEventCount;
     read(file2, &iMaxMapExtra, 4);
-    ppMapExtra =
-        reinterpret_cast<void**>(H2_ALLOC(iMaxMapExtra * 4, GMAPLINE + 0x59));
-    pwSizeOfMapExtra =
-        reinterpret_cast<i16*>(H2_ALLOC(iMaxMapExtra * 2, GMAPLINE + 0x5a));
+    ppMapExtra = reinterpret_cast<void**>(H2_ALLOC(iMaxMapExtra * 4, gMapSourceLine + 0x59));
+    pwSizeOfMapExtra = reinterpret_cast<i16*>(H2_ALLOC(iMaxMapExtra * 2, gMapSourceLine + 0x5a));
     memset(ppMapExtra, 0, iMaxMapExtra * 4);
     memset(pwSizeOfMapExtra, 0, iMaxMapExtra * 2);
     for (i37 = 1; (&i37)[0] < iMaxMapExtra; i37++) {
         read(file2, pwSizeOfMapExtra + i37, 2);
-        ppMapExtra[i37] = H2_ALLOC(pwSizeOfMapExtra[i37], GMAPLINE + 0x62);
+        ppMapExtra[i37] = H2_ALLOC(pwSizeOfMapExtra[i37], gMapSourceLine + 0x62);
         read(file2, ppMapExtra[i37], pwSizeOfMapExtra[i37]);
     }
     read(file2, trailer15, 2);
@@ -2631,7 +2652,7 @@ void game::ViewArmy(
     armyGroup* theGroup,
     i32 groupIndex
 ) {
-    DATA(0x004f7388) static i16 viewArmySourceLineBase = GAME_VIEW_ARMY_SOURCE_LINE_BASE;
+    DATA(0x004f7388) static i16 viewArmySourceLineBase = 0x0dd1;
     i16 baseX7 = 86;
     i16 quickBaseY3 = 164;
     i16 blankWidget3 = 1;
@@ -2656,7 +2677,8 @@ void game::ViewArmy(
                 iViewArmyUpgradeToType = monsterType + 1;
             }
         }
-        if ((monsterType == 35 || monsterType == 36) && (castle->m_buildings & KB_DWELLING_UPGRADE_SIXTH_FLAG)) {
+        if ((monsterType == 35 || monsterType == 36)
+            && (castle->m_buildings & KB_DWELLING_UPGRADE_SIXTH_FLAG)) {
             gbAllowUpgrade = 1;
             iViewArmyUpgradeToType = 37;
         }
@@ -2728,9 +2750,7 @@ void game::ViewArmy(
     message6.payload.widget.data.text = armyName8;
     m_viewArmyWindow->BroadcastMessage(message6);
 
-    char* details9 = static_cast<char*>(
-        H2_ALLOC(0x226, viewArmySourceLineBase + GAME_VIEW_ARMY_ALLOC_OFFSET)
-    );
+    char* details9 = static_cast<char*>(H2_ALLOC(0x226, viewArmySourceLineBase + 0x93));
     i32 morale2 = theGroup ? theGroup->GetMorale(theHero, castle, 0) : 0;
     if (monster8->flags.all & MONSTER_FLAGS_NO_MORALE)
         morale2 = 0;
@@ -2882,7 +2902,7 @@ void game::ViewArmy(
         if (gbUpgradeArmy && theGroup)
             theGroup->m_troopTypes[groupIndex] = static_cast<i8>(iViewArmyUpgradeToType);
     }
-    H2_FREE(details9, viewArmySourceLineBase + GAME_VIEW_ARMY_FREE_OFFSET);
+    H2_FREE(details9, viewArmySourceLineBase + 0x164);
     delete m_viewArmyWindow;
 }
 
@@ -3308,7 +3328,8 @@ i32 game::ComputeDailyGold(i32 player) {
                 gold += 1000;
             if (m_castleRecs[index].m_buildings & (1 << BUILDING_SLOT_SPECIAL_SEVEN))
                 gold += 250;
-            if (m_castleRecs[index].m_type == 3 && (m_castleRecs[index].m_buildings & (1 << BUILDING_SLOT_SPECIAL)))
+            if (m_castleRecs[index].m_type == 3
+                && (m_castleRecs[index].m_buildings & (1 << BUILDING_SLOT_SPECIAL)))
                 gold += 500;
         }
     }
@@ -3531,7 +3552,8 @@ void game::PerWeek(void) {
                                .growth;
                 if (castle37->m_buildings & (1 << BUILDING_SLOT_SPECIAL_FOUR))
                     growth13 += 2;
-                if (innerIndex3 == WEEKLY_FIRST_DWELLING && (castle37->m_buildings & (1 << BUILDING_SLOT_WELL_EXTRA)))
+                if (innerIndex3 == WEEKLY_FIRST_DWELLING
+                    && (castle37->m_buildings & (1 << BUILDING_SLOT_WELL_EXTRA)))
                     growth13 += 8;
                 if (castle37->m_owner == -1)
                     growth13 /= 2;
@@ -3625,7 +3647,8 @@ void game::PerWeek(void) {
                     WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata = 1;
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_WATER_WHEEL:
-                    if (WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata != WEEKLY_WATER_WHEEL_EMPTY)
+                    if (WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata
+                        != WEEKLY_WATER_WHEEL_EMPTY)
                         WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata = 2;
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MAGIC_GARDEN:
@@ -3679,7 +3702,8 @@ void game::PerWeek(void) {
                         WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata += Random(1, 3);
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_TREE_CITY:
-                    if (WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata < WEEKLY_MONSTER_POPULATION_LIMIT)
+                    if (WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata
+                        < WEEKLY_MONSTER_POPULATION_LIMIT)
                         WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata += Random(10, 20);
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CAVE:
@@ -3695,19 +3719,22 @@ void game::PerWeek(void) {
                         WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata += Random(5, 10);
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_TROLL_BRIDGE:
-                    if (!(WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata & WEEKLY_DWELLING_NO_GROWTH_FLAG)
+                    if (!(WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata
+                          & WEEKLY_DWELLING_NO_GROWTH_FLAG)
                         && WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata
                                < WEEKLY_DRAGON_CITY_LIMIT)
                         WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata += Random(1, 3);
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CITY_OF_DEAD:
-                    if (!(WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata & WEEKLY_DWELLING_NO_GROWTH_FLAG)
+                    if (!(WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata
+                          & WEEKLY_DWELLING_NO_GROWTH_FLAG)
                         && WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata
                                < WEEKLY_DRAGON_CITY_LIMIT)
                         WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata += Random(1, 3);
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_DRAGON_CITY:
-                    if (!(WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata & WEEKLY_DWELLING_NO_GROWTH_FLAG)
+                    if (!(WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata
+                          & WEEKLY_DWELLING_NO_GROWTH_FLAG)
                         && WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata
                                < WEEKLY_DRAGON_CITY_LIMIT)
                         WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata += 1;
@@ -3905,8 +3932,9 @@ void game::ConvertObject(
                         static_cast<u8>(cell->m_objectIndex - oldFirstIndex + newFirstIndex);
                 }
                 if ((cell->m_triggerType & MAP_TRIGGER_TYPE_MASK) == oldTrigger)
-                    cell->m_triggerType =
-                        static_cast<u8>((cell->m_triggerType & MAP_TRIGGER_ACTION_FLAG) | newTrigger);
+                    cell->m_triggerType = static_cast<u8>(
+                        (cell->m_triggerType & MAP_TRIGGER_ACTION_FLAG) | newTrigger
+                    );
 
                 if (cell->m_extraIndex != 0
                     && WORLDMAP->Extra(cell->m_extraIndex)->objectIndex != static_cast<u8>(-1))
@@ -4149,8 +4177,11 @@ void game::RandomizeMine(i32 x, i32 y) {
     mineId = GetMineId(x, y);
     for (rowOffset0 = 0; rowOffset0 < 2; rowOffset0++) {
         for (columnOffset4 = 0; columnOffset4 < 2; columnOffset4++) {
-            if ((WORLDMAP->GetCell(columnOffset4 + x, y - rowOffset0)->m_triggerType & MAP_TRIGGER_TYPE_MASK) > 0)
-                if ((WORLDMAP->GetCell(columnOffset4 + x, y - rowOffset0)->m_triggerType & MAP_TRIGGER_TYPE_MASK)
+            if ((WORLDMAP->GetCell(columnOffset4 + x, y - rowOffset0)->m_triggerType
+                 & MAP_TRIGGER_TYPE_MASK)
+                > 0)
+                if ((WORLDMAP->GetCell(columnOffset4 + x, y - rowOffset0)->m_triggerType
+                     & MAP_TRIGGER_TYPE_MASK)
                     <= 0x30)
                     continue;
             WORLDMAP->GetCell(columnOffset4 + x, y - rowOffset0)->m_objectMetadata = mineId;
@@ -4946,7 +4977,7 @@ void game::ProcessMapExtra(void) {
 // field/addend aliases; their effective addresses are identical.
 VA(0x00481c47, 0x900)
 void game::SetupTowns(void) {
-    DATA(0x004f756c) static i16 setupTownsSourceLineBase = GAME_SETUP_TOWNS_SOURCE_LINE_BASE;
+    DATA(0x004f756c) static i16 setupTownsSourceLineBase = 0x17f9;
     char defaultDwellingRoll[12];
     i8 usedSpells[SPELL_COUNT];
     i32 spellsPerLevel[5];
@@ -5130,7 +5161,7 @@ void game::SetupTowns(void) {
                 }
             }
         }
-        H2_FREE(ppMapExtra[extraIndex], setupTownsSourceLineBase + GAME_SETUP_TOWNS_FREE_OFFSET);
+        H2_FREE(ppMapExtra[extraIndex], setupTownsSourceLineBase + 0xee);
         ppMapExtra[extraIndex] = 0;
     }
 }
@@ -5142,8 +5173,7 @@ void game::SetupTowns(void) {
 // comparisons and |0 bounds did not steer them; the remaining $SG spelling is compiler-local.
 VA(0x00482547, 0x774)
 void game::ProcessOnMapHeroes(void) {
-    DATA(0x004f7598) static i16 processOnMapHeroesSourceLineBase =
-        GAME_PROCESS_ON_MAP_HEROES_SOURCE_LINE_BASE;
+    DATA(0x004f7598) static i16 processOnMapHeroesSourceLineBase = 0x18ef;
     u32 extraIndex0;
     i32 pass19;
     i8 usedHeroes4[GAME_HERO_COUNT];
@@ -5281,7 +5311,7 @@ void game::ProcessOnMapHeroes(void) {
                             cell5->m_objectMetadata = extra0->heroId;
                         } else {
                             cell5->m_objectTileset = 0;
-                            cell5->m_objectIndex = 0xff;
+                            cell5->m_objectIndex = 0xFF;
                             cell5->m_objectMetadata = 0;
                             cell5->m_triggerType = 0;
                         }
@@ -5309,8 +5339,7 @@ void game::ProcessOnMapHeroes(void) {
                                 giVisRange[mapHero0->m_secondarySkills[3]]
                             );
                         }
-                        H2_FREE(ppMapExtra[extraIndex0], processOnMapHeroesSourceLineBase
-                                + GAME_PROCESS_ON_MAP_HEROES_FREE_OFFSET);
+                        H2_FREE(ppMapExtra[extraIndex0], processOnMapHeroesSourceLineBase + 0xdd);
                         ppMapExtra[extraIndex0] = 0;
                     }
                 }
@@ -5371,7 +5400,8 @@ void game::CheckHeroConsistency(void) {
                         cell1->m_objectMetadata = 0;
                     }
                     if (mapHero3->m_owner < 0 || mapHero3->m_owner >= 6) {
-                        if (mapHero3->m_locationType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)) {
+                        if (mapHero3->m_locationType
+                            == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)) {
                             occupiedTown9 = GetCastle(mapHero3->m_occupiedTown);
                             occupiedTown9->m_occupyingHeroId = -1;
                         }
@@ -5490,7 +5520,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
         BVResMsg(const_cast<char*>("Sending Data"), -1, 0);
     AiPrint(const_cast<char*>("Transmit Start - Compressing"));
 
-    acknowledged = static_cast<char*>(H2_ALLOC(5000, GTRANSMITLINE + 0x2b));
+    acknowledged = static_cast<char*>(H2_ALLOC(5000, gTransmitSourceLine + 0x2b));
     memset(acknowledged, 0, 5000);
     SaveGame(gConfig.rmtSCName, 0, 0);
     if (!gbUseDiffCompression)
@@ -5506,11 +5536,10 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
     fileSize = FileSize(filename);
     LogInt(const_cast<char*>("PostDiffFileSize"), fileSize, -999, -999, -999, -999, -999, -999);
 
-    header = static_cast<i32*>(H2_ALLOC(0x100, GTRANSMITLINE + 0x3f));
+    header = static_cast<i32*>(H2_ALLOC(0x100, gTransmitSourceLine + 0x3f));
     if (gbUseRegularCompression)
-        transmitData =
-            static_cast<u8*>(H2_ALLOC(fileSize + 2000, GTRANSMITLINE + 0x41));
-    fileData = static_cast<u8*>(H2_ALLOC(fileSize + 2000, GTRANSMITLINE + 0x42));
+        transmitData = static_cast<u8*>(H2_ALLOC(fileSize + 2000, gTransmitSourceLine + 0x41));
+    fileData = static_cast<u8*>(H2_ALLOC(fileSize + 2000, gTransmitSourceLine + 0x42));
 
     file = open(filename, _O_BINARY);
     if (file == -1)
@@ -5609,13 +5638,13 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
 
 transmitCleanup:
     if (header)
-        H2_FREE(header, GTRANSMITLINE + 199);
+        H2_FREE(header, gTransmitSourceLine + 199);
     if (transmitData)
-        H2_FREE(transmitData, GTRANSMITLINE + 200);
+        H2_FREE(transmitData, gTransmitSourceLine + 200);
     if (fileData && fileData != transmitData)
-        H2_FREE(fileData, GTRANSMITLINE + 0xc9);
+        H2_FREE(fileData, gTransmitSourceLine + 0xc9);
     if (acknowledged)
-        H2_FREE(acknowledged, GTRANSMITLINE + 0xca);
+        H2_FREE(acknowledged, gTransmitSourceLine + 0xca);
 
     AiPrint(const_cast<char*>("Transmit End"));
     if (gpAdvManager->m_active == 1) {
@@ -5735,12 +5764,12 @@ i32 game::ReceiveSaveGame(
     if (!result)
         ShutDown(0);
 
-    received = static_cast<char*>(H2_ALLOC(5000, GRECEIVELINE + 0x33));
+    received = static_cast<char*>(H2_ALLOC(5000, gReceiveSourceLine + 0x33));
     memset(received, 0, 5000);
     if (gbUseRegularCompression)
-        decodedData = static_cast<u8*>(H2_ALLOC(700000, GRECEIVELINE + 0x37));
-    ackBuffer = static_cast<u8*>(H2_ALLOC(0x100, GRECEIVELINE + 0x39));
-    incomingData = static_cast<u8*>(H2_ALLOC(dataSize + 2000, GRECEIVELINE + 0x3a));
+        decodedData = static_cast<u8*>(H2_ALLOC(700000, gReceiveSourceLine + 0x37));
+    ackBuffer = static_cast<u8*>(H2_ALLOC(0x100, gReceiveSourceLine + 0x39));
+    incomingData = static_cast<u8*>(H2_ALLOC(dataSize + 2000, gReceiveSourceLine + 0x3a));
 
     lastPacketTime = KBTickCount();
     LogInt(const_cast<char*>("FW2"), remotePlayer, -999, -999, -999, -999, -999, -999);
@@ -5855,13 +5884,13 @@ i32 game::ReceiveSaveGame(
     success = 1;
 
     if (received)
-        H2_FREE(received, GRECEIVELINE + 0xa1);
+        H2_FREE(received, gReceiveSourceLine + 0xa1);
     if (ackBuffer)
-        H2_FREE(ackBuffer, GRECEIVELINE + 0xa2);
+        H2_FREE(ackBuffer, gReceiveSourceLine + 0xa2);
     if (incomingData)
-        H2_FREE(incomingData, GRECEIVELINE + 0xa3);
+        H2_FREE(incomingData, gReceiveSourceLine + 0xa3);
     if (decodedData && incomingData != decodedData)
-        H2_FREE(decodedData, GRECEIVELINE + 0xa4);
+        H2_FREE(decodedData, gReceiveSourceLine + 0xa4);
 
     CreateJoinFile(gConfig.rmtRLName, gConfig.rmtRDName, gConfig.rmtRCName);
     AiPrint(const_cast<char*>("Receive End"));
@@ -6102,7 +6131,7 @@ void game::RestoreCell(i32 x, i32 y, i32 obj, i32 barrier, mapCell* passedCell, 
 // source-line offsets were tried; revisit for inline/jump placement after 95%.
 VA(0x004848bf, 0xe3)
 void game::SetMapSize(i32 w, i32 h) {
-    DATA(0x004f7a0c) static i16 setMapSizeSourceLineBase = GAME_SET_MAP_SIZE_SOURCE_LINE_BASE;
+    DATA(0x004f7a0c) static i16 setMapSizeSourceLineBase = 0x1d0d;
     if (h == MAP_HEIGHT && w == MAP_WIDTH && bMapInitialized) {
     } else {
         bMapInitialized = 1;
@@ -6111,8 +6140,8 @@ void game::SetMapSize(i32 w, i32 h) {
         gpSearchArray->Init();
     }
     if (mapExtra)
-        H2_FREE(mapExtra, setMapSizeSourceLineBase + GAME_SET_MAP_SIZE_FREE_OFFSET);
-    mapExtra = static_cast<u8*>(H2_ALLOC(MAP_WIDTH * MAP_HEIGHT, setMapSizeSourceLineBase + GAME_SET_MAP_SIZE_ALLOC_OFFSET));
+        H2_FREE(mapExtra, setMapSizeSourceLineBase + 0xc);
+    mapExtra = static_cast<u8*>(H2_ALLOC(MAP_WIDTH * MAP_HEIGHT, setMapSizeSourceLineBase + 0xd));
     memset(mapExtra, 0, MAP_WIDTH * MAP_HEIGHT);
 }
 
@@ -6213,7 +6242,7 @@ void CreateDiffFile(
 
     sprintf(gText, "%s%s", ".\\DATA\\", joinName);
     joinSize36 = FileSize(gText);
-    joinData29 = static_cast<u8*>(H2_ALLOC(joinSize36, GDIFFLINE + 0x18));
+    joinData29 = static_cast<u8*>(H2_ALLOC(joinSize36, gDiffSourceLine + 0x18));
     sprintf(gText, "%s%s", ".\\DATA\\", joinName);
     joinFile1 = open(gText, _O_BINARY);
     if (joinFile1 == -1)
@@ -6234,7 +6263,7 @@ void CreateDiffFile(
     if (!forceWhole) {
         sprintf(gText, "%s%s", ".\\DATA\\", oldName);
         oldSize37 = FileSize(gText);
-        oldData13 = static_cast<u8*>(H2_ALLOC(oldSize37, GDIFFLINE + 0x2d));
+        oldData13 = static_cast<u8*>(H2_ALLOC(oldSize37, gDiffSourceLine + 0x2d));
         sprintf(gText, "%s%s", ".\\DATA\\", oldName);
         oldFile17 = open(gText, _O_BINARY);
         if (oldFile17 == -1)
@@ -6243,7 +6272,9 @@ void CreateDiffFile(
         close(oldFile17);
     }
 
-    diffData6 = static_cast<u8*>(H2_ALLOC((oldSize37 > joinSize36 ? oldSize37 : joinSize36) + 5000, GDIFFLINE + 0x37));
+    diffData6 = static_cast<u8*>(
+        H2_ALLOC((oldSize37 > joinSize36 ? oldSize37 : joinSize36) + 5000, gDiffSourceLine + 0x37)
+    );
     if (sendWhole4) {
         diffData6[0] = 0;
         diffData6[1] = 0;
@@ -6313,11 +6344,11 @@ void CreateDiffFile(
     close(joinFile1);
 
     if (oldData13 != 0)
-        H2_FREE(oldData13, GDIFFLINE + 0xa1);
+        H2_FREE(oldData13, gDiffSourceLine + 0xa1);
     if (joinData29 != 0)
-        H2_FREE(joinData29, GDIFFLINE + 0xa3);
+        H2_FREE(joinData29, gDiffSourceLine + 0xa3);
     if (diffData6 != 0)
-        H2_FREE(diffData6, GDIFFLINE + 0xa5);
+        H2_FREE(diffData6, gDiffSourceLine + 0xa5);
     return;
 }
 
@@ -6329,8 +6360,7 @@ void CreateDiffFile(
 // Revisit after a material GAME predecessor/header or comparison-tool change.
 VA(0x00485107, 0x3ce)
 void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
-    DATA(0x004f7bc4) static i16 createJoinFileSourceLineBase =
-        GAME_CREATE_JOIN_FILE_SOURCE_LINE_BASE;
+    DATA(0x004f7bc4) static i16 createJoinFileSourceLineBase = 0x1e0f;
     u8* oldData13 = 0;
     u8* diffData5 = 0;
     u8* joinData9 = 0;
@@ -6345,7 +6375,7 @@ void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
 
     sprintf(gText, "%s%s", ".\\DATA\\", diffName);
     diffSize1 = FileSize(gText);
-    diffData5 = static_cast<u8*>(H2_ALLOC(diffSize1, createJoinFileSourceLineBase + GAME_CREATE_JOIN_DIFF_ALLOC_OFFSET));
+    diffData5 = static_cast<u8*>(H2_ALLOC(diffSize1, createJoinFileSourceLineBase + 0xd));
     sprintf(gText, "%s%s", ".\\DATA\\", diffName);
     diffFile2 = open(gText, _O_BINARY);
     if (diffFile2 == -1)
@@ -6353,14 +6383,15 @@ void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
     read(diffFile2, diffData5, diffSize1);
     close(diffFile2);
 
-    joinData9 = static_cast<u8*>(H2_ALLOC(GAME_JOIN_BUFFER_SIZE, createJoinFileSourceLineBase + GAME_CREATE_JOIN_BUFFER_ALLOC_OFFSET));
+    joinData9 =
+        static_cast<u8*>(H2_ALLOC(GAME_JOIN_BUFFER_SIZE, createJoinFileSourceLineBase + 0x16));
     if (diffData5[0] == 0) {
         memcpy(joinData9, diffData5 + GAME_JOIN_HEADER_SIZE, diffSize1 - GAME_JOIN_HEADER_SIZE);
         joinSize37 = diffSize1 - GAME_JOIN_HEADER_SIZE;
     } else {
         sprintf(gText, "%s%s", ".\\DATA\\", oldName);
         oldSize10 = FileSize(gText);
-        oldData13 = static_cast<u8*>(H2_ALLOC(oldSize10, createJoinFileSourceLineBase + GAME_CREATE_JOIN_OLD_ALLOC_OFFSET));
+        oldData13 = static_cast<u8*>(H2_ALLOC(oldSize10, createJoinFileSourceLineBase + 0x21));
         sprintf(gText, "%s%s", ".\\DATA\\", oldName);
         diffFile2 = open(gText, _O_BINARY);
         if (diffFile2 == -1)
@@ -6408,11 +6439,11 @@ void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
     close(joinFile0);
 
     if (oldData13)
-        H2_FREE(oldData13, createJoinFileSourceLineBase + GAME_CREATE_JOIN_OLD_FREE_OFFSET);
+        H2_FREE(oldData13, createJoinFileSourceLineBase + 0x53);
     if (diffData5)
-        H2_FREE(diffData5, createJoinFileSourceLineBase + GAME_CREATE_JOIN_DIFF_FREE_OFFSET);
+        H2_FREE(diffData5, createJoinFileSourceLineBase + 0x55);
     if (joinData9)
-        H2_FREE(joinData9, createJoinFileSourceLineBase + GAME_CREATE_JOIN_BUFFER_FREE_OFFSET);
+        H2_FREE(joinData9, createJoinFileSourceLineBase + 0x57);
 }
 
 VA(0x004854d5, 0x5d)
@@ -6673,18 +6704,16 @@ void CheckValidAvailableHeroes(void) {
 
 VA(0x00486296, 0xab)
 i32 CalcFileCRC(char* filename) {
-    DATA(0x004f7e3c) static i16 calcFileCrcSourceLineBase = GAME_CALC_FILE_CRC_SOURCE_LINE_BASE;
+    DATA(0x004f7e3c) static i16 calcFileCrcSourceLineBase = 0x1f5e;
     i32l size = FileSize(filename);
-    char* block = static_cast<char*>(
-        H2_ALLOC(size, calcFileCrcSourceLineBase + GAME_CALC_CRC_ALLOC_OFFSET)
-    );
+    char* block = static_cast<char*>(H2_ALLOC(size, calcFileCrcSourceLineBase + 3));
     i32 hand = open(filename, _O_BINARY);
     if (hand == -1)
         FileError(filename);
     read(hand, block, size);
     i32 crc = calc_crc_long(reinterpret_cast<u8*>(block), size);
     close(hand);
-    H2_FREE(block, calcFileCrcSourceLineBase + GAME_CALC_CRC_FREE_OFFSET);
+    H2_FREE(block, calcFileCrcSourceLineBase + 0xe);
     return crc;
 }
 
@@ -6705,9 +6734,15 @@ void CompressTest2(void) {
     char* encodedData6;
 
     dataSize2 = Random(COMPRESSION_TEST_RANDOM_SIZE_MIN, COMPRESSION_TEST_RANDOM_SIZE_MAX);
-    sourceData6 = static_cast<char*>(H2_ALLOC(dataSize2 + COMPRESSION_TEST_RANDOM_BUFFER_EXTRA, GCOMPRESSTEST2LINE + 7));
-    encodedData6 = static_cast<char*>(H2_ALLOC(dataSize2 + COMPRESSION_TEST_RANDOM_BUFFER_EXTRA, GCOMPRESSTEST2LINE + 8));
-    decodedData6 = static_cast<char*>(H2_ALLOC(dataSize2 + COMPRESSION_TEST_RANDOM_BUFFER_EXTRA, GCOMPRESSTEST2LINE + 9));
+    sourceData6 = static_cast<char*>(
+        H2_ALLOC(dataSize2 + COMPRESSION_TEST_RANDOM_BUFFER_EXTRA, gCompressTest2SourceLine + 7)
+    );
+    encodedData6 = static_cast<char*>(
+        H2_ALLOC(dataSize2 + COMPRESSION_TEST_RANDOM_BUFFER_EXTRA, gCompressTest2SourceLine + 8)
+    );
+    decodedData6 = static_cast<char*>(
+        H2_ALLOC(dataSize2 + COMPRESSION_TEST_RANDOM_BUFFER_EXTRA, gCompressTest2SourceLine + 9)
+    );
     for (index7 = 0; index7 < dataSize2; index7++)
         sourceData6[index7] = static_cast<char>(Random(0, 255));
     sourceCrc0 = calc_crc_long(reinterpret_cast<u8*>(sourceData6), dataSize2);
@@ -6715,9 +6750,9 @@ void CompressTest2(void) {
     decodedSize17 = DecodeData(decodedData6, encodedData6, encodedSize14);
     decodedCrc5 = calc_crc_long(reinterpret_cast<u8*>(decodedData6), dataSize2);
     sourceCrcCheck7 = calc_crc_long(reinterpret_cast<u8*>(sourceData6), dataSize2);
-    H2_FREE(sourceData6, GCOMPRESSTEST2LINE + 0x1a);
-    H2_FREE(encodedData6, GCOMPRESSTEST2LINE + 0x1b);
-    H2_FREE(decodedData6, GCOMPRESSTEST2LINE + 0x1c);
+    H2_FREE(sourceData6, gCompressTest2SourceLine + 0x1a);
+    H2_FREE(encodedData6, gCompressTest2SourceLine + 0x1b);
+    H2_FREE(decodedData6, gCompressTest2SourceLine + 0x1c);
 }
 
 VA(0x00486494, 0x1be)
@@ -6737,9 +6772,15 @@ void CompressTest(void) {
     LogStr(const_cast<char*>("C1"));
     strcpy(filename3, "c:\\TEMP\\Z.DIF");
     fileSize7 = FileSize(filename3);
-    sourceData6 = static_cast<char*>(H2_ALLOC(fileSize7 + COMPRESSION_TEST_FILE_BUFFER_EXTRA, GCOMPRESSTESTLINE + 9));
-    encodedData6 = static_cast<char*>(H2_ALLOC(fileSize7 + COMPRESSION_TEST_FILE_BUFFER_EXTRA, GCOMPRESSTESTLINE + 10));
-    decodedData6 = static_cast<char*>(H2_ALLOC(fileSize7 + COMPRESSION_TEST_FILE_BUFFER_EXTRA, GCOMPRESSTESTLINE + 0xb));
+    sourceData6 = static_cast<char*>(
+        H2_ALLOC(fileSize7 + COMPRESSION_TEST_FILE_BUFFER_EXTRA, gCompressTestSourceLine + 9)
+    );
+    encodedData6 = static_cast<char*>(
+        H2_ALLOC(fileSize7 + COMPRESSION_TEST_FILE_BUFFER_EXTRA, gCompressTestSourceLine + 10)
+    );
+    decodedData6 = static_cast<char*>(
+        H2_ALLOC(fileSize7 + COMPRESSION_TEST_FILE_BUFFER_EXTRA, gCompressTestSourceLine + 0xb)
+    );
     LogStr(const_cast<char*>("C2"));
     fileHandle4 = open(filename3, 0x8000);
     if (fileHandle4 == -1)
@@ -6756,9 +6797,9 @@ void CompressTest(void) {
     LogStr(const_cast<char*>("C7"));
     decodedCrc5 = calc_crc_long(reinterpret_cast<u8*>(decodedData6), fileSize7);
     sourceCrcCheck7 = calc_crc_long(reinterpret_cast<u8*>(sourceData6), fileSize7);
-    H2_FREE(sourceData6, GCOMPRESSTESTLINE + 0x24);
-    H2_FREE(encodedData6, GCOMPRESSTESTLINE + 0x25);
-    H2_FREE(decodedData6, GCOMPRESSTESTLINE + 0x26);
+    H2_FREE(sourceData6, gCompressTestSourceLine + 0x24);
+    H2_FREE(encodedData6, gCompressTestSourceLine + 0x25);
+    H2_FREE(decodedData6, gCompressTestSourceLine + 0x26);
     LogStr(const_cast<char*>("C8"));
 }
 

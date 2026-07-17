@@ -137,7 +137,7 @@ void textEntryWidget::Read(i32 type) {
     gpResourceManager->SavePosition();
     m_font = gpResourceManager->GetFont(resourceName);
     gpResourceManager->RestorePosition();
-    m_color = gpResourceManager->ReadWord() & 0xff;
+    m_color = gpResourceManager->ReadWord() & 0xFF;
     m_alignment = static_cast<char>(gpResourceManager->ReadWord());
     gpResourceManager->Read13(reinterpret_cast<i8*>(resourceName));
     gpResourceManager->SavePosition();
@@ -277,7 +277,8 @@ i32 textEntryWidget::Main(struct tag_message& message) {
                                 if (event.payload.keyboard.keyCode == 10) {
                                     gbTextEntryEscaped = 0;
                                     done++;
-                                } else if (event.payload.keyboard.keyCode == TEXT_ENTRY_KEY_DELETE) {
+                                } else if (event.payload.keyboard.keyCode
+                                           == TEXT_ENTRY_KEY_DELETE) {
                                     if (m_cursorPosition != 0) {
                                         strcpy(scratch, edit + m_cursorPosition);
                                         strcpy(edit + m_cursorPosition - 1, scratch);
@@ -290,7 +291,7 @@ i32 textEntryWidget::Main(struct tag_message& message) {
                                     strcpy(backup, edit);
                                     char typed = 0;
                                     if (event.payload.keyboard.keyCode >= INPUT_EXTENDED_KEY_BASE) {
-                                        switch ((event.payload.keyboard.keyCode >> 8) & 0xff) {
+                                        switch ((event.payload.keyboard.keyCode >> 8) & 0xFF) {
                                             case INPUT_SCAN_NUMPAD_7:
                                                 typed = '7';
                                                 break;
@@ -332,8 +333,12 @@ i32 textEntryWidget::Main(struct tag_message& message) {
 #line 388
                                         H2_FREE_AT(m_text, TEXT_ENTRY_MAIN_SOURCE_FILES, 0x184);
 #line 389
-                                        m_text = static_cast<char*>(H2_ALLOC_AT(strlen(edit) + 6, TEXT_ENTRY_MAIN_SOURCE_FILES
-                                                + TEXT_ENTRY_SOURCE_FILE_SLOT_SIZE, 0x185));
+                                        m_text = static_cast<char*>(H2_ALLOC_AT(
+                                            strlen(edit) + 6,
+                                            TEXT_ENTRY_MAIN_SOURCE_FILES
+                                                + TEXT_ENTRY_SOURCE_FILE_SLOT_SIZE,
+                                            0x185
+                                        ));
                                         strcpy(scratch, edit);
                                         scratch[m_cursorPosition] = typed;
                                         scratch[m_cursorPosition + 1] = 0;

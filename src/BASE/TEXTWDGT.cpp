@@ -90,7 +90,7 @@ void textWidget::Read(void) {
     gpResourceManager->SavePosition();
     m_font = gpResourceManager->GetFont(resourceName);
     gpResourceManager->RestorePosition();
-    m_color = gpResourceManager->ReadWord() & 0xff;
+    m_color = gpResourceManager->ReadWord() & 0xFF;
     m_alignment = static_cast<char>(gpResourceManager->ReadWord());
     m_id = gpResourceManager->ReadWord();
     gpResourceManager->ReadWord();

@@ -26,7 +26,7 @@ DATA(0x00534970) static PCMWAVEFORMAT gWaveFormat; // digital-driver PCM format 
 
 VA(0x004cb630, 0x68)
 void HandleMCIError(i32 param_1, char* param_2) {
-    mciGetErrorStringA(param_1, lpszReturnString, 0xff);
+    mciGetErrorStringA(param_1, lpszReturnString, 0xFF);
     sprintf(
         gText,
         "CD MUSIC ERROR\n\n"
@@ -72,7 +72,7 @@ void soundManager::CDStop(void) {
     if (m_cdReady == 0)
         return;
     wsprintfA(CommandString, "stop CD wait");
-    nMCIError = mciSendStringA(CommandString, lpszReturnString, 0xff, 0);
+    nMCIError = mciSendStringA(CommandString, lpszReturnString, 0xFF, 0);
     if (nMCIError != 0)
         HandleMCIError(nMCIError, CommandString);
     if (stricmp(lpszReturnString, "stopped") != 0 && m_currentTrack >= 0) {
@@ -98,7 +98,7 @@ i32 soundManager::CDIsPlaying(void) {
     if (m_cdReady == 0)
         return 0;
     wsprintfA(CommandString, "status CD mode");
-    nMCIError = mciSendStringA(CommandString, lpszReturnString, 0xff, 0);
+    nMCIError = mciSendStringA(CommandString, lpszReturnString, 0xFF, 0);
     if (nMCIError != 0)
         HandleMCIError(nMCIError, CommandString);
     return stricmp(lpszReturnString, "playing") == 0;
@@ -117,7 +117,7 @@ void soundManager::CDStartup(void) {
     if (gbDontTryRedbook != 0)
         return;
     wsprintfA(CommandString, "open %c: type cdaudio alias CD shareable", gcAnimPath[0]);
-    nMCIError = mciSendStringA(CommandString, lpszReturnString, 0xff, 0);
+    nMCIError = mciSendStringA(CommandString, lpszReturnString, 0xFF, 0);
     if (nMCIError != 0) {
         m_cdReady = 0;
         gConfig.mciError = 1;
@@ -135,11 +135,11 @@ void soundManager::CDShutdown(void) {
     if (m_cdReady == 0)
         return;
     wsprintfA(CommandString, "stop CD");
-    nMCIError = mciSendStringA(CommandString, lpszReturnString, 0xff, 0);
+    nMCIError = mciSendStringA(CommandString, lpszReturnString, 0xFF, 0);
     if (nMCIError != 0)
         HandleMCIError(nMCIError, CommandString);
     wsprintfA(CommandString, "close CD");
-    nMCIError = mciSendStringA(CommandString, lpszReturnString, 0xff, 0);
+    nMCIError = mciSendStringA(CommandString, lpszReturnString, 0xFF, 0);
     if (nMCIError != 0)
         HandleMCIError(nMCIError, CommandString);
 }
@@ -204,11 +204,11 @@ void soundManager::CDPlay(i32 param_1, i32 param_2, i32 param_3, i32 param_4) {
     ServiceSound();
     t1 = KBTickCount();
     wsprintfA(CommandString, "set CD time format tmsf");
-    nMCIError = mciSendStringA(CommandString, lpszReturnString, 0xff, 0);
+    nMCIError = mciSendStringA(CommandString, lpszReturnString, 0xFF, 0);
     if (nMCIError != 0)
         HandleMCIError(nMCIError, CommandString);
     wsprintfA(CommandString, "status CD mode");
-    nMCIError = mciSendStringA(CommandString, lpszReturnString, 0xff, 0);
+    nMCIError = mciSendStringA(CommandString, lpszReturnString, 0xFF, 0);
     if (nMCIError != 0)
         HandleMCIError(nMCIError, CommandString);
     if (stricmp(lpszReturnString, "stopped") != 0) {
@@ -243,7 +243,7 @@ void soundManager::CDPlay(i32 param_1, i32 param_2, i32 param_3, i32 param_4) {
             wnd = static_cast<HWND>(hwndApp);
         else
             wnd = 0;
-        nMCIError = mciSendStringA(CommandString, lpszReturnString, 0xff, wnd);
+        nMCIError = mciSendStringA(CommandString, lpszReturnString, 0xFF, wnd);
         if (nMCIError != 0)
             HandleMCIError(nMCIError, CommandString);
     } else {
@@ -261,7 +261,7 @@ void soundManager::CDPlay(i32 param_1, i32 param_2, i32 param_3, i32 param_4) {
             wndn = static_cast<HWND>(hwndApp);
         else
             wndn = 0;
-        nMCIError = mciSendStringA(CommandString, lpszReturnString, 0xff, wndn);
+        nMCIError = mciSendStringA(CommandString, lpszReturnString, 0xFF, wndn);
         if (nMCIError != 0)
             HandleMCIError(nMCIError, CommandString);
     }

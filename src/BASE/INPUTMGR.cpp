@@ -356,7 +356,7 @@ void inputManager::AsciiConvert(tag_message& event) {
         || event.payload.keyboard.keyCode == INPUT_SCAN_F12)
         event.payload.keyboard.keyCode = m_keyState[event.payload.keyboard.keyCode];
     else
-        event.payload.keyboard.keyCode = m_keyState[event.payload.keyboard.keyCode] & 0xff;
+        event.payload.keyboard.keyCode = m_keyState[event.payload.keyboard.keyCode] & 0xFF;
 
     i32 modifiers = event.payload.keyboard.modifiers
                     & (MESSAGE_MODIFIER_RIGHT_SHIFT | MESSAGE_MODIFIER_LEFT_SHIFT);
