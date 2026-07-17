@@ -5063,7 +5063,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave)
     i32 packetsInBatch;
     u32 transmitCrc;
     char *reply;
-    void *acknowledged;
+    char *acknowledged;
     u32 fileCrc;
     i32 unused1c3;
     i32 result;
@@ -5094,7 +5094,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave)
         BVResMsg(const_cast<char *>("Sending Data"), -1, 0);
     AiPrint(const_cast<char *>("Transmit Start - Compressing"));
 
-    acknowledged = BaseAlloc(5000, GFILE, GTRANSMITLINE + 0x2b);
+    acknowledged = static_cast<char *>(BaseAlloc(5000, GFILE, GTRANSMITLINE + 0x2b));
     memset(acknowledged, 0, 5000);
     SaveGame(gConfig.rmtSCName, 0, 0);
     if (!gbUseDiffCompression)
@@ -5160,7 +5160,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave)
                      packet < batch * 100 + packetsInBatch; packet++) {
                     PollSound();
                     CheckDoMain(0, 1);
-                    if (!static_cast<char *>(acknowledged)[packet]) {
+                    if (!acknowledged[packet]) {
                         if (packet + 1 == packetCount)
                             chunkSize = fileSize - packet * 200;
                         else
@@ -5183,13 +5183,13 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave)
                 if (!result)
                     ShutDown(0);
                 for (packet = 0; packetsInBatch > packet; packet++) {
-                    if (reply[packet + 9] > 0)
-                        static_cast<char *>(acknowledged)[batch * 100 + packet] = 1;
+                    if (reinterpret_cast<RemoteMessage *>(reply)->payload[packet] > 0)
+                        acknowledged[batch * 100 + packet] = 1;
                 }
                 done = 1;
                 for (packet = batch * 100;
                      packet < batch * 100 + packetsInBatch; packet++) {
-                    if (!static_cast<char *>(acknowledged)[packet])
+                    if (!acknowledged[packet])
                         done = 0;
                 }
             }
@@ -5286,7 +5286,7 @@ i32 game::ReceiveSaveGame(i32 dataSize, i32 expectedCrc, i32 expectedTransmitCrc
     i32 finished;
     i32 receivedCrc;
     u8 *ackBuffer;
-    char *packet;
+    RemoteMessage *packet;
     i32 result;
     i32l lastPacketTime;
     char *received;
@@ -5351,18 +5351,18 @@ i32 game::ReceiveSaveGame(i32 dataSize, i32 expectedCrc, i32 expectedTransmitCrc
                 ShutDown(0);
         }
 
-        packet = GetRemoteData(1);
-        if (packet && (packet[5] == 2 || packet[5] == 3)) {
+        packet = reinterpret_cast<RemoteMessage *>(GetRemoteData(1));
+        if (packet && (packet->type == 2 || packet->type == 3)) {
             lastPacketTime = KBTickCount();
-            switch (packet[6]) {
+            switch (packet->command) {
             case 3:
-                packetStart = *reinterpret_cast<i16 *>(packet + 9);
+                packetStart = *reinterpret_cast<i16 *>(packet->payload);
                 received[packetStart] = 1;
-                memcpy(incomingData + packetStart * 200, packet + 11,
-                       *reinterpret_cast<i16 *>(packet + 7) - 2);
+                memcpy(incomingData + packetStart * 200, packet->payload + 2,
+                       packet->payloadSize - 2);
                 break;
             case 4:
-                packetStart = *reinterpret_cast<i16 *>(packet + 9);
+                packetStart = *reinterpret_cast<i16 *>(packet->payload);
                 for (index = packetStart; index < packetStart + 100; index++)
                     *(ackBuffer + index - packetStart) = received[index];
                 LogInt(const_cast<char *>("FW3"), remotePlayer,

@@ -676,10 +676,7 @@ i32 combatManager::GetAllMask(i32 side)
     army *currentArmy38;
 
     for (armyIndex11 = 0; armyIndex11 < m_armyCount[side]; armyIndex11++) {
-        currentArmy38 = reinterpret_cast<army *>(
-                            reinterpret_cast<u8 *>(m_armies) +
-                            side * sizeof(m_armies[0])) +
-            armyIndex11;
+        currentArmy38 = &m_armies[side][armyIndex11];
         if (currentArmy38 != 0 &&
             (currentArmy38->m_monster.flags.abilityFlags &
              MONSTER_ABILITY_FLAG_AI_EXCLUDED) == 0 &&
@@ -857,10 +854,7 @@ u32l combatManager::GetStrength(i32 side, i32 mask)
 
     for (armyIndex4 = 0; armyIndex4 < m_armyCount[side]; armyIndex4++) {
         if ((bit36 & mask) != 0) {
-            currentArmy8 = reinterpret_cast<army *>(
-                               reinterpret_cast<u8 *>(m_armies) +
-                               side * sizeof(m_armies[0])) +
-                armyIndex4;
+            currentArmy8 = &m_armies[side][armyIndex4];
             if (currentArmy8 != 0 &&
                 (currentArmy8->m_monster.flags.abilityFlags &
                  MONSTER_ABILITY_FLAG_AI_EXCLUDED) == 0)

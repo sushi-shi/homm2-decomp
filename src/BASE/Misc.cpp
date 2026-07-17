@@ -1150,7 +1150,7 @@ VA(0x004c5eb0, 0x25)
 void BlitBitmapToScreenNoMouseCheck(class bitmap *bmp, i32 sourceX, i32 sourceY, i32 width,
                                     i32 height, i32 destinationX, i32 destinationY)
 {
-    BlitBitmapToScreenVesa(reinterpret_cast<i32>(bmp), sourceX, sourceY, width, height,
+    BlitBitmapToScreenVesa(bmp, sourceX, sourceY, width, height,
                            destinationX, destinationY);
 }
 
@@ -1173,7 +1173,7 @@ void BlitBitmapToScreen(class bitmap *bmp, i32 sourceX, i32 sourceY, i32 width, 
 {
     i32 blitSourceX = sourceX;
     if (gbColorMice == 0) {
-        BlitBitmapToScreenVesa(reinterpret_cast<i32>(bmp), blitSourceX, sourceY, width, height,
+        BlitBitmapToScreenVesa(bmp, blitSourceX, sourceY, width, height,
                                destinationX, destinationY);
         return;
     }
@@ -1190,7 +1190,7 @@ void BlitBitmapToScreen(class bitmap *bmp, i32 sourceX, i32 sourceY, i32 width, 
         gBlitBottom >= gpMouseManager->m_savedTop &&
         gpMouseManager->m_cursorBottom >= destinationY) {
         gpMouseManager->SaveAndDraw();
-        BlitBitmapToScreenVesa(reinterpret_cast<i32>(bmp), blitSourceX, sourceY, width, height,
+        BlitBitmapToScreenVesa(bmp, blitSourceX, sourceY, width, height,
                                destinationX, destinationY);
         if (gpMouseManager->m_cursorRight > gBlitRight ||
             gpMouseManager->m_savedLeft < destinationX ||
@@ -1198,14 +1198,14 @@ void BlitBitmapToScreen(class bitmap *bmp, i32 sourceX, i32 sourceY, i32 width, 
             gpMouseManager->m_savedTop < destinationY) {
             i32 savedY = gpMouseManager->m_savedTop;
             i32 savedX = gpMouseManager->m_savedLeft;
-            BlitBitmapToScreenVesa(reinterpret_cast<i32>(bmp), savedX, savedY,
+            BlitBitmapToScreenVesa(bmp, savedX, savedY,
                                    gpMouseManager->m_cursorRight - savedX + 1,
                                    gpMouseManager->m_cursorBottom - savedY + 1, savedX, savedY);
         }
         gpMouseManager->RestoreUnderlying();
         return;
     }
-    BlitBitmapToScreenVesa(reinterpret_cast<i32>(bmp), blitSourceX, sourceY, width, height,
+    BlitBitmapToScreenVesa(bmp, blitSourceX, sourceY, width, height,
                            destinationX, destinationY);
 }
 

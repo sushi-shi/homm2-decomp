@@ -24,12 +24,10 @@
 // pointer, and explicit scaled-coordinate lifetimes were byte-neutral in three audited
 // variants. Revisit after a real predecessor/header/compiler-state change.
 VA(0x004d8540, 0x1e2)
-extern "C" void __fastcall BlitBitmapToScreenVesa(i32 bitmapAddress, i32 sourceX, i32 sourceY,
+extern "C" void __fastcall BlitBitmapToScreenVesa(bitmap *sourceBitmap, i32 sourceX, i32 sourceY,
                                                    i32 width, i32 height, i32 destinationX,
                                                    i32 destinationY)
 {
-    bitmap *sourceBitmap = reinterpret_cast<bitmap *>(bitmapAddress);
-
     if (gpWindowManager->m_screen != sourceBitmap) {
         i32 row = 0;
         if (height > row) {
