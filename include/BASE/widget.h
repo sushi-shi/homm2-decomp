@@ -43,9 +43,9 @@ HOMM2_ENUM_VALUES_BEGIN(BaseWidgetCommand)
     WIDGET_COMMAND_SET_WIDTH = 0x3d
 HOMM2_ENUM_VALUES_END(BaseWidgetCommand)
 
-HOMM2_ENUM_BEGIN(WidgetCommandArgument)
+HOMM2_ENUM_VALUES_BEGIN(WidgetCommandArgument)
     WIDGET_COMMAND_DIMMED = 0x1000
-HOMM2_ENUM_END(WidgetCommandArgument)
+HOMM2_ENUM_VALUES_END(WidgetCommandArgument)
 
 #pragma pack(push, 1) // recovered layout is byte-packed
 class widget /* abstract */ {
