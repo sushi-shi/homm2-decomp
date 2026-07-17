@@ -12,6 +12,12 @@ are recorded. This whole-section comparison is the final authority: a normalized
 object-level 100% score is not proof when either linked section differs. Per-symbol
 and contribution diagnostics exist to attribute the first whole-section mismatch.
 
+For every entry in `config/required_initialized_storage.tsv`, the link gate also
+requires the current source `DATA()` allocation size reported by Clang to equal
+the reviewed retail extent. Hashing only the reviewed prefix is insufficient: a
+short array followed by zero-valued storage can otherwise reproduce the expected
+prefix while remaining out of bounds at runtime.
+
 ## Evidence and classification
 
 The retail inventory is limited to `data,cv-public-data` rows from
