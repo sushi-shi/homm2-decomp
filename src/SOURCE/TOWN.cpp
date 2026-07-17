@@ -218,7 +218,7 @@ void town::CalcNumLevelArchers(i32* numArchers, i32* mageGuildLevel) {
         if (m_buildings & (1L << building))
             ++*numArchers;
     }
-    for (building = TOWN_OBJECT_MAGE_GUILD; building <= TOWN_COMMAND_LAST_NEUTRAL_BUILDING;
+    for (building = TOWN_OBJECT_MAGE_GUILD; building <= IDX(TOWN_COMMAND_LAST_NEUTRAL_BUILDING);
          ++building) {
         if (m_buildings & (1L << building))
             ++*numArchers;

@@ -2265,7 +2265,7 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
         && gpGame->m_campaignScenario + IDX(CHECK_END_GAME_SCENARIO_OFFSET)
                == IDX(CHECK_END_GAME_ROLAND_CAPTURE_SCENARIO)) {
         hasRoland_j = 0;
-        for (player = 0; player < CHECK_END_GAME_HERO_COUNT; player++) {
+        for (player = 0; player < IDX(CHECK_END_GAME_HERO_COUNT); player++) {
             if (gpGame->m_heroRecs[player].m_portrait == IDX(CHECK_END_GAME_ROLAND_HERO)
                 && gpGame->m_heroRecs[player].m_owner >= 0
                 && gpGame->m_heroRecs[player].m_owner <= CHECK_END_GAME_PLAYER_COUNT - 1) {
@@ -2371,7 +2371,7 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
         }
 
         if (carryoverHeroId != IDX(CHECK_END_GAME_NO_PLAYER)) {
-            for (player = 0; player < CHECK_END_GAME_ARMY_SLOTS; player++) {
+            for (player = 0; player < IDX(CHECK_END_GAME_ARMY_SLOTS); player++) {
                 gpGame->m_campaignCarryoverCreatureTypes[player] = IDX(CHECK_END_GAME_EMPTY_ARMY);
                 gpGame->m_campaignCarryoverCreatureCounts[player] = 0;
             }
@@ -2388,7 +2388,7 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
                 gpGame->m_campaignCarryoverCreatureTypes[0] = 0;
                 gpGame->m_campaignCarryoverCreatureCounts[0] = 1;
             } else {
-                for (player = 0; player < CHECK_END_GAME_ARMY_SLOTS; player++) {
+                for (player = 0; player < IDX(CHECK_END_GAME_ARMY_SLOTS); player++) {
                     gpGame->m_campaignCarryoverCreatureTypes[player] =
                         gpGame->m_heroRecs[gpGame->m_players[0].m_heroIds[campaignHeroIndex]]
                             .m_army.m_creatureTypes[player];

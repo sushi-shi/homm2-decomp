@@ -159,7 +159,7 @@ i32 game::HandleCampaignWin(void) {
         && (gpGame->m_campaignScenario + 1 != CAMPAIGN_ROLAND_FINAL_SCENARIO + 1
             || gpGame->m_campaignType != IDX(CAMPAIGN_ROLAND))) {
         m_campaignScenario = CAMPAIGN_NO_SCENARIO;
-        for (sideIndex = 0; sideIndex < CAMPAIGN_SIDE_COUNT; ++sideIndex) {
+        for (sideIndex = 0; sideIndex < IDX(CAMPAIGN_SIDE_COUNT); ++sideIndex) {
             for (mapIndex = 0; mapIndex < CAMPAIGN_REGULAR_MAP_COUNT; ++mapIndex) {
                 if (m_campaignMapEnabled[sideIndex][OD_STEER(mapIndex)]) {
                     gpGame->m_campaignScenarioBonus[sideIndex][OD_STEER(mapIndex)] =

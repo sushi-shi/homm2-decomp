@@ -89,7 +89,7 @@ i32 swapManager::Open(i32 id) {
     message.payload.widget.id = SWAP_TITLE_WIDGET;
     m_window->BroadcastMessage(message);
 
-    for (i32 side_6 = SWAP_SIDE_LEFT; side_6 < SWAP_SIDE_COUNT; ++side_6) {
+    for (i32 side_6 = IDX(SWAP_SIDE_LEFT); side_6 < IDX(SWAP_SIDE_COUNT); ++side_6) {
         for (i32 skillSlot = 0; skillSlot < SWAP_SECONDARY_SKILL_WIDGET_COUNT; ++skillSlot) {
             if (skillSlot < m_heroes[side_6]->m_secondarySkillCount) {
                 message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
@@ -716,7 +716,7 @@ void swapManager::SwapArtifacts(void) {
         || targetArtifact_2 == ARTIFACT_SPADE_NECROMANCY) {
         tag_message message_1;
         message_1.type = MESSAGE_WIDGET;
-        for (i32 side = SWAP_SIDE_LEFT; side < SWAP_SIDE_COUNT; ++side) {
+        for (i32 side = IDX(SWAP_SIDE_LEFT); side < IDX(SWAP_SIDE_COUNT); ++side) {
             for (i32 skillSlot = 0; skillSlot < SWAP_SECONDARY_SKILL_WIDGET_COUNT; ++skillSlot) {
                 if (skillSlot < m_heroes[side]->m_secondarySkillCount) {
                     message_1.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
