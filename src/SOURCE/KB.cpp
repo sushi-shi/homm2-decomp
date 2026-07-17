@@ -587,7 +587,7 @@ game_setup_complete:
                 netBuffer_b.setup.useDiffCompression = gbUseDiffCompression;
                 for (netPlayer_i = 1; netPlayer_i < giNumHumanPlayers; netPlayer_i++) {
                     transmissionResult_i = TransmitRemoteData(
-                        netBuffer_b.bytes, netPlayer_i, OLD_MAIN_NET_SETUP_SIZE,
+                        netBuffer_b.bytes, netPlayer_i, sizeof(OldMainNetSetup),
                         OLD_MAIN_NETWORK_PACKET, 1, 1, -1);
                     if (!transmissionResult_i)
                         ShutDown(0);
