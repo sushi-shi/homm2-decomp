@@ -186,7 +186,7 @@ void listBoxWidget::DeleteItem(i32 index) {
         H2_FREE_AT(
             m_items,
             LISTBOX_DELETE_SOURCE_FILES + LISTBOX_DELETE_LIST_SOURCE_FILE_OFFSET,
-            0x9d
+            157
         );
         m_items = 0;
     } else {
@@ -204,7 +204,7 @@ void listBoxWidget::DeleteItem(i32 index) {
             H2_FREE_AT(
                 m_items,
                 LISTBOX_DELETE_SOURCE_FILES + LISTBOX_DELETE_OLD_LIST_SOURCE_FILE_OFFSET,
-                0xa9
+                169
             );
         m_items = newItems;
     }
@@ -279,13 +279,13 @@ i32 listBoxWidget::Main(tag_message& message) {
                         H2_FREE_AT(
                             m_items[message.payload.widget.parameter],
                             LISTBOX_MAIN_SOURCE_FILES,
-                            0xde
+                            222
                         );
                         m_items[message.payload.widget.parameter] = static_cast<char*>(H2_ALLOC_AT(
                             strlen(text) + 1,
                             LISTBOX_MAIN_SOURCE_FILES
                                 + LISTBOX_REPLACE_ALLOCATION_SOURCE_FILE_OFFSET,
-                            0xdf
+                            223
                         ));
                         strcpy(m_items[message.payload.widget.parameter], text);
                     }
@@ -298,7 +298,7 @@ i32 listBoxWidget::Main(tag_message& message) {
                             (m_itemCount + 1) * 4,
                             LISTBOX_MAIN_SOURCE_FILES
                                 + LISTBOX_APPEND_LIST_ALLOCATION_SOURCE_FILE_OFFSET,
-                            0xe9
+                            233
                         ));
                         if (m_itemCount != 0)
                             memcpy(newItems, m_items, m_itemCount * 4);
@@ -307,7 +307,7 @@ i32 listBoxWidget::Main(tag_message& message) {
                             strlen(text) + 1,
                             LISTBOX_MAIN_SOURCE_FILES
                                 + LISTBOX_APPEND_ITEM_ALLOCATION_SOURCE_FILE_OFFSET,
-                            0xec
+                            236
                         ));
                         strcpy(newItems[m_itemCount], text);
                         m_itemCount++;
@@ -317,7 +317,7 @@ i32 listBoxWidget::Main(tag_message& message) {
                                 m_items,
                                 LISTBOX_MAIN_SOURCE_FILES
                                     + LISTBOX_APPEND_OLD_LIST_SOURCE_FILE_OFFSET,
-                                0xf0
+                                240
                             );
                         m_items = newItems;
                         if (m_maxVisibleItems < m_itemCount) {

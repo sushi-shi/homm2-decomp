@@ -1024,7 +1024,7 @@ void combatManager::DrawFrame(
             m_combatIcons[COMBAT_ICON_TOWER]->CombatClipDrawToBuffer(
                 0,
                 0,
-                m_drawbridgeState + 0x15,
+                m_drawbridgeState + 21,
                 &m_upperWallLimits,
                 0,
                 0,

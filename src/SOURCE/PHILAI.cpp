@@ -4412,7 +4412,7 @@ void philAI::BuildBuilding(town* t, i32 building) {
     LogStr(gText);
     if (giDebugLevel >= 3) {
         AiPrint(gText);
-        DelayMilli(0x5dc);
+        DelayMilli(1500);
     }
     GetBuildingCost(t->m_type, building, cost, t->m_buildState);
     for (i = 0; i < 7; i++)

@@ -978,7 +978,8 @@ i32 combatManager::GetCommand(i32 hexIndex) {
                             currentArmy->m_targetSide = targetSide;
                             currentArmy->m_targetIndex = targetIndex;
                             if (currentArmy->m_monster.shots > 0
-                                && currentArmy->GetAttackMask(currentArmy->m_hex, 1, -1) == 0xFF) {
+                                && currentArmy->GetAttackMask(currentArmy->m_hex, 1, -1)
+                                       == ARMY_ALL_ATTACK_DIRECTIONS) {
                                 if (ShotIsThroughWall(
                                         currentArmy->m_side,
                                         currentArmy->m_hex,

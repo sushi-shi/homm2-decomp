@@ -1565,7 +1565,7 @@ void game::RandomizeEvents(void) {
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_BOAT:
                     cell2->m_objectTileset = 0;
-                    cell2->m_objectIndex = 0xFF;
+                    cell2->m_objectIndex = MAPCELL_SPRITE_NONE;
                     cell2->m_objectMetadata = 0;
                     cell2->m_triggerType = 0;
                     CreateBoat(xPos2, yPos19, 1);
@@ -1586,7 +1586,7 @@ void game::RandomizeEvents(void) {
                     mapEvent1->active = 1;
                     cell2->m_objectMetadata = 0;
                     cell2->m_triggerType = 0;
-                    cell2->m_objectIndex = 0xFF;
+                    cell2->m_objectIndex = MAPCELL_SPRITE_NONE;
                     cell2->m_objectTileset = 0;
                     m_mapEventCount++;
                     break;
@@ -1625,7 +1625,7 @@ void game::RandomizeEvents(void) {
                     cell2->m_objectMetadata = Random(0, 3);
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SKELETON:
-                    if (!HasObjectTilesetIndex(xPos2, yPos19, TILESET_OBJNDSRT, 0x54)) {
+                    if (!HasObjectTilesetIndex(xPos2, yPos19, TILESET_OBJNDSRT, 84)) {
                         cell2->m_triggerType &= MAP_TRIGGER_TYPE_MASK;
                     } else if (Random(0, 9) > 2) {
                         cell2->m_objectMetadata = 1;
@@ -1844,7 +1844,7 @@ void game::RandomizeEvents(void) {
                     cell2->m_objectMetadata = Random(10, 20);
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_WAGON_CAMP:
-                    if (!HasObjectTilesetIndex(xPos2, yPos19, TILESET_OBJNMUL2, 0x81))
+                    if (!HasObjectTilesetIndex(xPos2, yPos19, TILESET_OBJNMUL2, 129))
                         cell2->m_triggerType &= MAP_TRIGGER_TYPE_MASK;
                     else
                         cell2->m_objectMetadata = Random(30, 50);
@@ -4463,10 +4463,10 @@ void game::ProcessRandomObjects(void) {
                         y8,
                         x10 - 1,
                         y8,
-                        0x2e,
-                        0x10,
-                        0x10,
-                        0x2e,
+                        TILESET_OBJNRSRC,
+                        16,
+                        16,
+                        TILESET_OBJNRSRC,
                         randomType0 * 2,
                         -1,
                         -1
@@ -4476,10 +4476,10 @@ void game::ProcessRandomObjects(void) {
                         y8,
                         x10,
                         y8,
-                        0x2e,
-                        0x11,
-                        0x11,
-                        0x2e,
+                        TILESET_OBJNRSRC,
+                        17,
+                        17,
+                        TILESET_OBJNRSRC,
                         randomType0 * 2 + 1,
                         -1,
                         -1
@@ -4506,26 +4506,14 @@ void game::ProcessRandomObjects(void) {
                         x10 - 1,
                         y8,
                         11,
-                        0xa2,
-                        0xa2,
+                        162,
+                        162,
                         11,
                         artifactId18 * 2,
                         -1,
                         -1
                     );
-                    ConvertObject(
-                        x10,
-                        y8,
-                        x10,
-                        y8,
-                        11,
-                        0xa3,
-                        0xa3,
-                        11,
-                        artifactId18 * 2 + 1,
-                        -1,
-                        -1
-                    );
+                    ConvertObject(x10, y8, x10, y8, 11, 163, 163, 11, artifactId18 * 2 + 1, -1, -1);
                     break;
                 case MAP_TRIGGER_RANDOM_ARTIFACT_LEVEL_1:
                     artifactId18 = GetRandomArtifactId(8, 0);
@@ -4536,26 +4524,14 @@ void game::ProcessRandomObjects(void) {
                         x10 - 1,
                         y8,
                         11,
-                        0xa6,
-                        0xa6,
+                        166,
+                        166,
                         11,
                         artifactId18 * 2,
                         -1,
                         -1
                     );
-                    ConvertObject(
-                        x10,
-                        y8,
-                        x10,
-                        y8,
-                        11,
-                        0xa7,
-                        0xa7,
-                        11,
-                        artifactId18 * 2 + 1,
-                        -1,
-                        -1
-                    );
+                    ConvertObject(x10, y8, x10, y8, 11, 167, 167, 11, artifactId18 * 2 + 1, -1, -1);
                     break;
                 case MAP_TRIGGER_RANDOM_ARTIFACT_LEVEL_2:
                     artifactId18 = GetRandomArtifactId(4, 0);
@@ -4566,26 +4542,14 @@ void game::ProcessRandomObjects(void) {
                         x10 - 1,
                         y8,
                         11,
-                        0xa8,
-                        0xa8,
+                        168,
+                        168,
                         11,
                         artifactId18 * 2,
                         -1,
                         -1
                     );
-                    ConvertObject(
-                        x10,
-                        y8,
-                        x10,
-                        y8,
-                        11,
-                        0xa9,
-                        0xa9,
-                        11,
-                        artifactId18 * 2 + 1,
-                        -1,
-                        -1
-                    );
+                    ConvertObject(x10, y8, x10, y8, 11, 169, 169, 11, artifactId18 * 2 + 1, -1, -1);
                     break;
                 case MAP_TRIGGER_RANDOM_ARTIFACT_LEVEL_3:
                     artifactId18 = GetRandomArtifactId(2, 0);
@@ -4596,26 +4560,14 @@ void game::ProcessRandomObjects(void) {
                         x10 - 1,
                         y8,
                         11,
-                        0xaa,
-                        0xaa,
+                        170,
+                        170,
                         11,
                         artifactId18 * 2,
                         -1,
                         -1
                     );
-                    ConvertObject(
-                        x10,
-                        y8,
-                        x10,
-                        y8,
-                        11,
-                        0xab,
-                        0xab,
-                        11,
-                        artifactId18 * 2 + 1,
-                        -1,
-                        -1
-                    );
+                    ConvertObject(x10, y8, x10, y8, 11, 171, 171, 11, artifactId18 * 2 + 1, -1, -1);
                     break;
                 case MAP_TRIGGER_RANDOM_MINE:
                     RandomizeMine(x10, y8);
@@ -5347,7 +5299,7 @@ void game::ProcessOnMapHeroes(void) {
                             cell5->m_objectMetadata = extra0->heroId;
                         } else {
                             cell5->m_objectTileset = 0;
-                            cell5->m_objectIndex = 0xFF;
+                            cell5->m_objectIndex = MAPCELL_SPRITE_NONE;
                             cell5->m_objectMetadata = 0;
                             cell5->m_triggerType = 0;
                         }

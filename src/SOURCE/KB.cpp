@@ -3240,7 +3240,7 @@ void SmackFade(u8* src, u8* dst) {
     a = static_cast<u8*>(H2_ALLOC(768, 3950));
     f = static_cast<u8*>(H2_ALLOC(256, 3951));
     memset(a, 0, MISC_PALETTE_BYTE_COUNT);
-    memset(f, 0, 0x100);
+    memset(f, 0, 256);
     for (h = 10; h < 246; h++) {
         e = (OD_STEER(src[h * 3 + 2]) + OD_STEER(src[h * 3]) + src[h * 3 + 1]) / 3;
         d = 999;
@@ -3392,7 +3392,7 @@ void MemError(void) {
         return;
     gbInMemError = 1;
     LogStr("Out of Memory");
-    sprintf(gText, cOutOfMemory, "Out of memory.", 0x1900);
+    sprintf(gText, cOutOfMemory, "Out of memory.", 6400);
     ShutDown(gText);
 }
 
@@ -4148,7 +4148,7 @@ void HandleRemoteSuddenExit(void) {
     else
         a = 0;
     LogStr("HRSE1");
-    TransmitRemoteData(buf, a, 7, 0x1f, 0, 0, 2);
+    TransmitRemoteData(buf, a, 7, 31, 0, 0, 2);
     LogStr("HRSE2");
     DelayMilli(500);
 }

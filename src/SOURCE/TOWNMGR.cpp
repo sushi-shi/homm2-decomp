@@ -6,6 +6,7 @@
 #include <va.h>
 #include <BASE/message.h>
 #include <BASE/Misc.h>
+#include <BASE/widgetKind.h>
 #include <BASE/border.h>
 #include <BASE/executive.h>
 #include <BASE/font.h>
@@ -1129,12 +1130,12 @@ i32 townManager::Main(tag_message& message) {
                                     sprintf(gText, "port%04d.icn", m_recruitHero->m_portrait);
                                     m_heroStrip = new strip(
                                         0,
-                                        0x163,
+                                        355,
                                         3,
                                         gpResourceManager->MakeId(gText, 1),
                                         0,
                                         &m_recruitHero->m_army,
-                                        0x7a,
+                                        122,
                                         0,
                                         -1
                                     );
@@ -1165,7 +1166,7 @@ i32 townManager::Main(tag_message& message) {
                                         );
                                         m_heroStrip = new strip(
                                             0,
-                                            0x163,
+                                            355,
                                             3,
                                             gpResourceManager->MakeId(gText, 1),
                                             0,
@@ -1412,8 +1413,8 @@ i32 townManager::Main(tag_message& message) {
                                     NormalDialog(
                                         "Cannot build another boat.",
                                         1,
-                                        0xd0,
-                                        0x28,
+                                        208,
+                                        40,
                                         -1,
                                         0,
                                         -1,
@@ -2062,9 +2063,9 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
     window_a->BroadcastMessage(message_m);
 
     descriptionWidget_g = new textWidget(
-        0x2b,
-        static_cast<i16>(windowY_m + 0x18),
-        0xf0,
+        43,
+        static_cast<i16>(windowY_m + 24),
+        240,
         static_cast<i16>(lineCount_j << 4),
         description_b,
         "bigfont.fnt",
@@ -2111,9 +2112,9 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
                 i32 widgetXOffset = 0;
                 amountWidgets_b[widgetIndex_f] = new textWidget(
                     static_cast<i16>(x_d + widgetXOffset),
-                    static_cast<i16>(rowY_o + 0x23),
+                    static_cast<i16>(rowY_o + 35),
                     static_cast<i16>(entryWidth_o),
-                    0xc,
+                    12,
                     amountText_n[widgetIndex_f],
                     "smalfont.fnt",
                     1,
@@ -2130,12 +2131,12 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
                     ),
                     static_cast<i16>(rowY_o),
                     static_cast<i16>(entryWidth_o),
-                    0xc,
+                    12,
                     "resource.icn",
                     resourceTypes_o[widgetIndex_f],
                     0,
                     -1,
-                    0x10,
+                    16,
                     1
                 );
                 if (resourceWidgets_m[widgetIndex_f] == 0)
@@ -2244,7 +2245,7 @@ void townManager::BuildObj(i32 building) {
         giMaxExtentY = 0;
         giMaxExtentX = giMaxExtentY;
         giMinExtentX = 639;
-        giMinExtentY = 0xFF;
+        giMinExtentY = 255;
         gbComputeExtent = 1;
         gbSaveBiggestExtent = 1;
         gbReturnAfterComputeExtent = 1;
@@ -2505,7 +2506,7 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
     m_heroWindow1 = new heroWindow(177, 16, "rcrthero.bin");
     if (m_heroWindow1 == 0)
         MemError();
-    SetWinText(m_heroWindow1, 0x14);
+    SetWinText(m_heroWindow1, 20);
     m_recruitHero = &gpGame->m_heroRecs[gpCurPlayer->AvailableHeroId(availableHeroIndex)];
     m_recruitHero->m_owner = static_cast<char>(giCurPlayer);
     messageLocal.type = MESSAGE_WIDGET;
@@ -2657,7 +2658,7 @@ void townManager::DoTavern(void) {
     m_heroWindow0 = new heroWindow(162, 10, "tavwin.bin");
     if (m_heroWindow0 == 0)
         MemError();
-    SetWinText(m_heroWindow0, 0x16);
+    SetWinText(m_heroWindow0, 22);
     sprintf(
         gText,
         "A generous tip for the barkeep yields the following rumor:\n\n%s",
@@ -2995,10 +2996,10 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
             for (position_current = firstAtRank_rank; !(lastAtRank_j < position_current);
                  ++position_current) {
                 iconControl_last = new iconWidget(
-                    static_cast<i16>((position_current - firstAtRank_rank) * 0x12 + rankX_m),
-                    static_cast<i16>(category_stat * 0x18 + 0x1b),
-                    0x12,
-                    0x16,
+                    static_cast<i16>((position_current - firstAtRank_rank) * 18 + rankX_m),
+                    static_cast<i16>(category_stat * 24 + 27),
+                    18,
+                    22,
                     "townwind.icn",
                     static_cast<i16>(
                         gpGame->m_players[categoryOrder_x[position_current]].m_color
@@ -3006,7 +3007,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                     ),
                     0,
                     -1,
-                    0x10,
+                    16,
                     1
                 );
                 if (iconControl_last == 0)
@@ -3049,22 +3050,22 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
 
             if (strongestHeroPosition_first != -1) {
                 iconControl_last = new iconWidget(
-                    static_cast<i16>(position_current * 0x44 + 0xf6),
-                    0x12d,
+                    static_cast<i16>(position_current * 68 + 246),
+                    301,
                     0,
                     0,
                     "locators.icn",
-                    0x16,
+                    22,
                     0,
                     -1,
-                    0x10,
+                    16,
                     1
                 );
                 if (iconControl_last == 0)
                     MemError();
                 window->AddWidget(iconControl_last, -1);
                 iconControl_last = new iconWidget(
-                    static_cast<i16>(position_current * 0x44 + 0xed),
+                    static_cast<i16>(position_current * 68 + 237),
                     300,
                     0,
                     0,
@@ -3072,7 +3073,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                     gpGame->GetPlayerHero(rank, strongestHeroPosition_first)->m_portrait,
                     0,
                     -1,
-                    0x10,
+                    16,
                     1
                 );
                 if (iconControl_last == 0)
@@ -3090,15 +3091,15 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                     );
                     strcpy(widgetText_control, gText);
                     textControl_icon = new textWidget(
-                        static_cast<i16>(position_current * 0x44 + 0xef),
-                        0x153,
-                        0x28,
-                        0x30,
+                        static_cast<i16>(position_current * 68 + 239),
+                        339,
+                        40,
+                        48,
                         widgetText_control,
                         "smalfont.fnt",
                         1,
                         -1,
-                        0x200,
+                        WIDGET_KIND_TEXT,
                         0
                     );
                     window->AddWidget(textControl_icon, -1);
@@ -3115,15 +3116,15 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                     );
                     strcpy(widgetText_control, gText);
                     textControl_icon = new textWidget(
-                        static_cast<i16>(position_current * 0x44 + 0x11c),
-                        0x153,
-                        0xf,
-                        0x30,
+                        static_cast<i16>(position_current * 68 + 284),
+                        339,
+                        15,
+                        48,
                         widgetText_control,
                         "smalfont.fnt",
                         1,
                         -1,
-                        0x200,
+                        WIDGET_KIND_TEXT,
                         0
                     );
                     window->AddWidget(textControl_icon, -1);
@@ -3137,10 +3138,10 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                     );
                     strcpy(widgetText_control, gText);
                     textControl_icon = new textWidget(
-                        static_cast<i16>(position_current * 0x44 + 0xe3),
-                        0x18d,
-                        0x4a,
-                        0x10,
+                        static_cast<i16>(position_current * 68 + 227),
+                        397,
+                        74,
+                        16,
                         widgetText_control,
                         "smalfont.fnt",
                         1,
@@ -3198,15 +3199,15 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                         }
                         if (strongestCreature_m != -1) {
                             iconControl_last = new iconWidget(
-                                static_cast<i16>(position_current * 0x44 + 0xf4),
-                                0x1a2,
-                                0x28,
-                                0x22,
+                                static_cast<i16>(position_current * 68 + 244),
+                                418,
+                                40,
+                                34,
                                 "mons32.icn",
                                 static_cast<i16>(strongestCreature_m),
                                 0,
                                 -1,
-                                0x11,
+                                17,
                                 1
                             );
                             if (iconControl_last == 0)

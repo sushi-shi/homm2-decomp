@@ -458,7 +458,7 @@ void PrintMemoryLeaks(void) {
 
 VA(0x004c4450, 0x91)
 void ShowMemoryStatus(void) {
-    sprintf(gText, gMiscText.memory.memoryStatusFormat.text, 0x3ea2);
+    sprintf(gText, gMiscText.memory.memoryStatusFormat.text, 16034);
     i32 savedDebugLevel = giDebugLevel;
     giDebugLevel = 9;
     FillBitmapArea(gpWindowManager->m_screen, 0, STATUS_BAR_Y, 640, STATUS_BAR_HEIGHT, 0);
@@ -2174,7 +2174,7 @@ void CreatePCXFile(char* filename, u8* pixels, i32 width, i32 height, u8* palett
         return;
     _write(fileHandle, &header, sizeof(header));
     u8* encodedRow =
-        static_cast<u8*>(H2_ALLOC_AT(width * 2, gMiscText.pcx.encodedRowAllocation.text, 0x5c8));
+        static_cast<u8*>(H2_ALLOC_AT(width * 2, gMiscText.pcx.encodedRowAllocation.text, 1480));
     for (i32 row = 0; row < height; ++row) {
         i32 sourceIndex = 0;
         u32 encodedSize = 0;
@@ -2201,7 +2201,7 @@ void CreatePCXFile(char* filename, u8* pixels, i32 width, i32 height, u8* palett
     u8 paletteMarker = PCX_VGA_PALETTE_MARKER;
     _write(fileHandle, &paletteMarker, 1);
     u8* outputPalette = static_cast<u8*>(
-        H2_ALLOC_AT(PCX_PALETTE_BYTE_COUNT, gMiscText.pcx.outputPaletteAllocation.text, 0x5f6)
+        H2_ALLOC_AT(PCX_PALETTE_BYTE_COUNT, gMiscText.pcx.outputPaletteAllocation.text, 1526)
     );
     for (i32 i = 0; i < PCX_PALETTE_BYTE_COUNT; ++i)
         outputPalette[i] = paletteData[i] << PCX_COMPONENT_SCALE_SHIFT;
@@ -2326,7 +2326,7 @@ i32 SGenRand(void) {
 
 VA(0x004c6ab0, 0x6)
 i32 MemSize(i32) {
-    return 0x3ea2;
+    return 16034;
 }
 
 #include <BASE/DataEntryConstants.h>
@@ -2409,10 +2409,10 @@ void GetDataEntry(
     }
 
     textEntryWidget* entry = new textEntryWidget(
-        0x23,
+        35,
         static_cast<i16>(entryY),
-        0xfb,
-        0x14,
+        251,
+        20,
         static_cast<i16>(maximumLength),
         destination,
         gMiscText.dataEntry.fontFilename.text,

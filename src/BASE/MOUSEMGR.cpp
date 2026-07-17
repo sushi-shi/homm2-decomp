@@ -190,14 +190,14 @@ void mouseManager::Close(void) {
                 H2_FREE_AT(
                     cAndBits[cursorIndex],
                     gMouseManagerStrings.andMaskDestruction.text,
-                    0x14a
+                    330
                 );
             cAndBits[cursorIndex] = 0;
             if (cColorBits[cursorIndex] != 0)
                 H2_FREE_AT(
                     cColorBits[cursorIndex],
                     gMouseManagerStrings.colorBitsDestruction.text,
-                    0x14e
+                    334
                 );
             cColorBits[cursorIndex] = 0;
             if (hbmpAndMask[cursorIndex] != 0)
@@ -244,7 +244,7 @@ void mouseManager::SetPointer(char* name, i32 param_2, i32 param_3) {
             H2_ASSERT(
                 param_2 != MOUSE_KEEP_CURRENT_FRAME,
                 gMouseManagerStrings.cursorFrameAssertion.text,
-                0x19a
+                410
             );
             m_cursorFrame = MOUSE_INVALID_CURSOR_FRAME;
             m_cursorReady = saved82;
@@ -285,7 +285,7 @@ void mouseManager::SetPointer(i32 frame) {
     H2_ASSERT(
         m_cursorSizeIndex >= 0 && m_cursorSizeIndex < MOUSE_CURSOR_COUNT,
         gMouseManagerStrings.cursorSizeAssertion.text,
-        0x1ca
+        458
     );
 
     if (gbColorMice != 0) {
@@ -362,7 +362,7 @@ void mouseManager::SetPointer(i32 frame) {
             H2_ASSERT(
                 reinterpret_cast<i32>(hbmpAndMask[m_cursorSizeIndex]),
                 gMouseManagerStrings.bitmapAssertion.text,
-                0x202
+                514
             );
 
             IconInfo[m_cursorSizeIndex].fIcon = 0;
@@ -379,7 +379,7 @@ void mouseManager::SetPointer(i32 frame) {
             H2_ASSERT(
                 reinterpret_cast<i32>(hMouseCursor[m_cursorSizeIndex]),
                 gMouseManagerStrings.cursorAssertion.text,
-                0x215
+                533
             );
         }
         SetCursor(hMouseCursor[m_cursorSizeIndex]);
