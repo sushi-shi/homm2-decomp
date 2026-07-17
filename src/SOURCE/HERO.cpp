@@ -166,9 +166,9 @@ i32 hero::GetNthSpell(i32 type, i32 spellNumber) {
         if (HasSpell(SpellType(spell))) {
             if (type == IDX(HERO_SPELL_TYPE_ALL)
                 || (type == IDX(HERO_SPELL_TYPE_COMBAT)
-                    && (gsSpellInfo[spell].attributes & IDX(SPELL_ATTRIBUTE_COMBAT)))
+                    && (gsSpellInfo[spell].attributes & IDX(SPELL_INFO_ATTRIBUTE_COMBAT)))
                 || (type == IDX(HERO_SPELL_TYPE_ADVENTURE)
-                    && !(gsSpellInfo[spell].attributes & IDX(SPELL_ATTRIBUTE_COMBAT)))) {
+                    && !(gsSpellInfo[spell].attributes & IDX(SPELL_INFO_ATTRIBUTE_COMBAT)))) {
                 spellOrdinalCount++;
             }
             if (spellOrdinalCount == spellNumber)
@@ -192,7 +192,7 @@ i32 hero::GetNumSpells(i32 type) {
     numAdventureSpells = 0;
     for (spellIndexCurrent = 0; spellIndexCurrent < IDX(SPELL_COUNT); spellIndexCurrent++) {
         if (HasSpell(SpellType(spellIndexCurrent))) {
-            if (gsSpellInfo[spellIndexCurrent].attributes & IDX(SPELL_ATTRIBUTE_COMBAT))
+            if (gsSpellInfo[spellIndexCurrent].attributes & IDX(SPELL_INFO_ATTRIBUTE_COMBAT))
                 numCombatSpells++;
             else
                 numAdventureSpells++;
