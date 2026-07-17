@@ -12,6 +12,7 @@ class sample;
 // per-element .rdata float symbols referenced in philAI::RVConversion; the rest follow the
 // canonical order.
 HOMM2_ENUM_BEGIN(ResourceType)
+    RES_NONE = -1,
     RES_WOOD = 0,
     RES_MERCURY = 1,
     RES_ORE = 2,

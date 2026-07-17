@@ -235,14 +235,14 @@ void philAI::CheckForCreatureUpgrades(void) {
                         resourceType = RES_GEMS;
                         resourceCost = armyPtr->m_quantities[creatureIndex] * 2;
                     } else {
-                        resourceType = -1;
+                        resourceType = RES_NONE;
                         resourceCost = 0;
                     }
                     if (goldCost <= gpCurPlayer->m_resources[IDX(RES_GOLD)]
-                        && (resourceType == -1
+                        && (resourceType == RES_NONE
                             || resourceCost <= gpCurPlayer->m_resources[IDX(resourceType)])) {
                         gpCurPlayer->m_resources[IDX(RES_GOLD)] -= goldCost;
-                        if (resourceType != -1)
+                        if (resourceType != RES_NONE)
                             gpCurPlayer->m_resources[IDX(resourceType)] -= resourceCost;
                         armyPtr->m_creatureTypes[creatureIndex] = static_cast<i8>(upgradeType);
                         for (mergeIndex = 0; mergeIndex < 5; mergeIndex++) {
@@ -748,7 +748,7 @@ i32 philAI::DoAnywhereDDoorTownGate(i32 targetValue) {
 VA(0x004393a9, 0x158)
 i32 philAI::DoDimensionDoor(hero* pHero) {
     i32 node;    // i
-    CreatureType nb;      // y
+    CreatureType nb;               // y
     i32 kn;      // x
     mapCell* jb; // cell
     i32 idx;     // dist
@@ -5806,7 +5806,7 @@ VA(0x00445dde, 0xf5)
 i32 philAI::EvaluateRecruitSite(mapCell* cell) {
     i32 val;  // value (returned)
     i32 node; // color
-    CreatureType nb;   // monster type
+    i32 nb;   // monster type
     i32 kn;   // out param
     i32 jb;   // unused
     i32 idx;  // out param
@@ -5834,7 +5834,7 @@ i32 philAI::EvaluateRecruitSite(mapCell* cell) {
             nb = CREATURE_WATER_ELEMENTAL;
             break;
     }
-    EvaluateOneTimeCreaturePurchase(IDX(nb), lvl, 0, idx, val, kn);
+    EvaluateOneTimeCreaturePurchase(nb, lvl, 0, idx, val, kn);
     gbReduceByReload = false;
     return val;
 }
