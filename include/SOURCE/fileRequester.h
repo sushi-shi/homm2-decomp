@@ -66,14 +66,6 @@ typedef enum FileRequesterKey {
     FILE_REQUESTER_KEY_DOWN = 0x50
 } FileRequesterKey;
 
-typedef enum FileRequesterWidgetCommand {
-    FILE_REQUESTER_WIDGET_HOVER = 12,
-    FILE_REQUESTER_WIDGET_CLICK = 13,
-    FILE_REQUESTER_WIDGET_HELP = 14,
-    FILE_REQUESTER_WIDGET_GET_TEXT = 7,
-    FILE_REQUESTER_WIDGET_SET_TEXT = 3
-} FileRequesterWidgetCommand;
-
 typedef enum FileRequesterHelpIndex {
     FILE_REQUESTER_HELP_NONE = -1,
     FILE_REQUESTER_HELP_FILTER_SMALL = 0,

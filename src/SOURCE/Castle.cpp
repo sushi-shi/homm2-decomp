@@ -49,23 +49,23 @@ void townManager::SetupCastle(heroWindow *window, i32 updateOnly)
     i16 cannotAffordFrame6 = CASTLE_FRAME_CANNOT_AFFORD;
     for (slot7 = 0; slot7 < CASTLE_SLOT_COUNT; ++slot7) {
         castleSlotsUse[slot7] = castleSlotsBase[slot7];
-        if (castleSlotsBase[slot7] >= CASTLE_FIRST_DWELLING + 1 &&
-            castleSlotsBase[slot7] <= CASTLE_LAST_DWELLING &&
+        if (castleSlotsBase[slot7] >= BUILDING_SLOT_DWELLING_FIRST + 1 &&
+            castleSlotsBase[slot7] <= BUILDING_SLOT_DWELLING_SIXTH &&
             ((m_town->m_buildings & (1L << castleSlotsBase[slot7])) ||
              (m_town->m_buildings &
               (1L << (castleSlotsBase[slot7] + CASTLE_UPGRADE_OFFSET))) ||
-             (castleSlotsBase[slot7] == CASTLE_WARLOCK_TOP_DWELLING &&
+             (castleSlotsBase[slot7] == BUILDING_SLOT_DWELLING_SIXTH &&
               m_town->m_type == FACTION_WARLOCK &&
               (m_town->m_buildings &
                TOWN_BUILDING_ALTERNATE_UPGRADED_DWELLING_6))) &&
             (gTownEligibleBuildMask[m_town->m_type] &
              (1L << (castleSlotsBase[slot7] + CASTLE_UPGRADE_OFFSET)))) {
-            if (castleSlotsBase[slot7] == CASTLE_WARLOCK_TOP_DWELLING &&
+            if (castleSlotsBase[slot7] == BUILDING_SLOT_DWELLING_SIXTH &&
                 m_town->m_type == FACTION_WARLOCK &&
                 ((m_town->m_buildings & TOWN_BUILDING_UPGRADED_DWELLING_6) ||
                  (m_town->m_buildings &
                   TOWN_BUILDING_ALTERNATE_UPGRADED_DWELLING_6))) {
-                castleSlotsUse[slot7] = CASTLE_WARLOCK_TOP_UPGRADE;
+                castleSlotsUse[slot7] = BUILDING_SLOT_DWELLING_LAST;
             } else {
                 castleSlotsUse[slot7] =
                     castleSlotsBase[slot7] + CASTLE_UPGRADE_OFFSET;

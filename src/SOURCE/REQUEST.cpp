@@ -499,7 +499,7 @@ i32 fileRequester::Main(struct tag_message &message)
         break;
     case FILE_REQUESTER_EVENT_WIDGET:
         switch (message.payload.widget.command) {
-        case FILE_REQUESTER_WIDGET_CLICK:
+        case WIDGET_COMMAND_DESELECT:
                 if (message.payload.widget.id < FILE_REQUESTER_OK) {
                     if (message.payload.widget.id == FILE_REQUESTER_CANCEL) {
                         message.payload.widget.data.value =
@@ -535,8 +535,8 @@ i32 fileRequester::Main(struct tag_message &message)
                     }
                 }
                 break;
-        case FILE_REQUESTER_WIDGET_HOVER:
-        case FILE_REQUESTER_WIDGET_HELP:
+        case WIDGET_COMMAND_SELECT:
+        case WIDGET_COMMAND_ALTERNATE_SELECT:
                 if ((message.payload.widget.parameter &
                      FILE_REQUESTER_HELP_MODIFIER) != 0) {
                     helpIndexMouse = FILE_REQUESTER_HELP_NONE;
@@ -676,7 +676,7 @@ i32 fileRequester::Main(struct tag_message &message)
                     case FILE_REQUESTER_FILENAME_ENTRY: {
                         broadcastMessage.type = FILE_REQUESTER_EVENT_WIDGET;
                         broadcastMessage.payload.widget.command =
-                            FILE_REQUESTER_WIDGET_GET_TEXT;
+                            WIDGET_COMMAND_GET_TEXT;
                         broadcastMessage.payload.widget.id =
                             FILE_REQUESTER_FILENAME_ENTRY;
                         m_window->BroadcastMessage(broadcastMessage);
@@ -714,7 +714,7 @@ i32 fileRequester::Main(struct tag_message &message)
                             SetOK(1);
                         }
                         broadcastMessage.payload.widget.command =
-                            FILE_REQUESTER_WIDGET_SET_TEXT;
+                            WIDGET_COMMAND_SET_TEXT;
                         broadcastMessage.payload.widget.id =
                             FILE_REQUESTER_FILENAME_ENTRY;
                         broadcastMessage.payload.widget.data.text = m_filename;

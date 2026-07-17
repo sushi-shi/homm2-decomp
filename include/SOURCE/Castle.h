@@ -8,14 +8,10 @@
 class heroWindow;
 struct tag_message;
 
-typedef enum CastleBuildingSlot {
+typedef enum CastleBuildingConstant {
     CASTLE_SLOT_COUNT = 18,
-    CASTLE_FIRST_DWELLING = 19,
-    CASTLE_LAST_DWELLING = 24,
-    CASTLE_UPGRADE_OFFSET = 5,
-    CASTLE_WARLOCK_TOP_DWELLING = 24,
-    CASTLE_WARLOCK_TOP_UPGRADE = 30
-} CastleBuildingSlot;
+    CASTLE_UPGRADE_OFFSET = 5
+} CastleBuildingConstant;
 
 typedef enum CastleControl {
     CASTLE_CONTROL_BUILDING_OVERLAY_FIRST = 400,
