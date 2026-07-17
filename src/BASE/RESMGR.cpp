@@ -306,7 +306,7 @@ void resourceManager::Close(void)
         if (m_aggregateDir[aggregateIndex] != 0)
             H2_FREE(m_aggregateDir[aggregateIndex], "I:\\Projects\\Heroes\\Prog\\BASE\\RESMGR.CPP", 0x1da);
         if (m_aggregateFd[aggregateIndex] != RESOURCE_MANAGER_INVALID_FILE) {
-            _close(m_aggregateFd[aggregateIndex]);
+            close(m_aggregateFd[aggregateIndex]);
             m_aggregateFd[aggregateIndex] = RESOURCE_MANAGER_INVALID_FILE;
         }
     }
@@ -330,7 +330,7 @@ int resourceManager::LoadAggregateHeader(char *aggregateName)
         ShutDown(gText);
         return RESOURCE_MANAGER_ERROR;
     }
-    aggregateFile = _open(aggregateName, RESOURCE_MANAGER_BINARY_OPEN_MODE);
+    aggregateFile = open(aggregateName, RESOURCE_MANAGER_BINARY_OPEN_MODE);
     if (aggregateFile == RESOURCE_MANAGER_INVALID_FILE) {
         sprintf(gText, "Can't open file: %s", aggregateName);
         ShutDown(gText);
@@ -339,11 +339,11 @@ int resourceManager::LoadAggregateHeader(char *aggregateName)
     m_curAggregate = m_numAggregates;
     m_numAggregates = m_numAggregates + 1;
     m_aggregateFd[m_curAggregate] = aggregateFile;
-    _read(m_aggregateFd[m_curAggregate], fileCountBuffer, sizeof(short));
+    read(m_aggregateFd[m_curAggregate], fileCountBuffer, sizeof(short));
     m_aggregateEntryCount[m_curAggregate] = fileCountBuffer[0];
     directoryBytes = m_aggregateEntryCount[m_curAggregate] * RESOURCE_MANAGER_ENTRY_BYTES;
     m_aggregateDir[m_curAggregate] = static_cast<aggEntry *>(H2_ALLOC(directoryBytes, "I:\\Projects\\Heroes\\Prog\\BASE\\RESMGR.CPP", 0x21e));
-    _read(m_aggregateFd[m_curAggregate], m_aggregateDir[m_curAggregate], directoryBytes);
+    read(m_aggregateFd[m_curAggregate], m_aggregateDir[m_curAggregate], directoryBytes);
     return RESOURCE_MANAGER_SUCCESS;
 }
 
@@ -374,8 +374,8 @@ void resourceManager::PointToFile(unsigned long fileId)
                 fileId, m_lastFileId, m_lastFileName);
         ShutDown(gText);
     }
-    long ignoredPosition = _lseek(m_aggregateFd[m_curAggregate],
-                                  m_aggregateDir[m_curAggregate][entryIndex].offset, 0);
+    long ignoredPosition = lseek(m_aggregateFd[m_curAggregate],
+                                 m_aggregateDir[m_curAggregate][entryIndex].offset, 0);
 }
 
 VA(0x004c8d20, 0xfa)
@@ -412,7 +412,7 @@ unsigned long resourceManager::GetFileSize(unsigned long fileId)
 VA(0x004c8e20, 0x52)
 void resourceManager::SavePosition(void)
 {
-    lastPositionZ[iSaveCtr] = _tell(m_aggregateFd[m_curAggregate]);
+    lastPositionZ[iSaveCtr] = tell(m_aggregateFd[m_curAggregate]);
     lastAggZ[iSaveCtr] = m_curAggregate;
     iSaveCtr = iSaveCtr + 1;
 }
@@ -422,7 +422,7 @@ void resourceManager::RestorePosition(void)
 {
     iSaveCtr = iSaveCtr - 1;
     m_curAggregate = lastAggZ[iSaveCtr];
-    _lseek(m_aggregateFd[m_curAggregate], lastPositionZ[iSaveCtr], 0);
+    lseek(m_aggregateFd[m_curAggregate], lastPositionZ[iSaveCtr], 0);
 }
 
 VA(0x004c8ee0, 0x81)
@@ -430,7 +430,7 @@ signed char resourceManager::ReadByte(void)
 {
     H2_ASSERT(m_aggregateFd[m_curAggregate] != RESOURCE_MANAGER_INVALID_FILE, "I:\\Projects\\Heroes\\Prog\\BASE\\RESMGR.CPP", 0x2bf);
     signed char value = 0;
-    int bytesRead = _read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
+    int bytesRead = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
     if (bytesRead == 0) {
         int errorCode = errno;
         int debugTrap = 0;
@@ -445,7 +445,7 @@ short resourceManager::ReadWord(void)
 {
     H2_ASSERT(m_aggregateFd[m_curAggregate] != RESOURCE_MANAGER_INVALID_FILE, "I:\\Projects\\Heroes\\Prog\\BASE\\RESMGR.CPP", 0x2dc);
     short value = 0;
-    int bytesRead = _read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
+    int bytesRead = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
     if (bytesRead == 0) {
         int errorCode = errno;
         int debugTrap = 0;
@@ -460,7 +460,7 @@ long resourceManager::ReadLong(void)
 {
     H2_ASSERT(m_aggregateFd[m_curAggregate] != RESOURCE_MANAGER_INVALID_FILE, "I:\\Projects\\Heroes\\Prog\\BASE\\RESMGR.CPP", 0x2f8);
     long value = 0;
-    int bytesRead = _read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
+    int bytesRead = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
     if (bytesRead == 0) {
         int errorCode = errno;
         int debugTrap = 0;
@@ -476,7 +476,7 @@ unsigned long resourceManager::MakeId(char *name, int translate)
     strcpy(m_lastFileName, name);
     if (gbUseEvilInterface != 0 && translate != 0) {
         for (int translatedIndex = 0; translatedIndex < RESOURCE_MANAGER_EVIL_TRANSLATION_COUNT; translatedIndex++) {
-            if (_stricmp(m_lastFileName, cEvilTranslate[translatedIndex][0]) == 0)
+            if (strcmpi(m_lastFileName, cEvilTranslate[translatedIndex][0]) == 0)
                 strcpy(m_lastFileName, cEvilTranslate[translatedIndex][1]);
         }
     }
@@ -501,7 +501,7 @@ void resourceManager::ReadBlock(signed char *destination, unsigned long size)
 {
     H2_ASSERT(m_aggregateFd[m_curAggregate] != RESOURCE_MANAGER_INVALID_FILE, "I:\\Projects\\Heroes\\Prog\\BASE\\RESMGR.CPP", 0x330);
     PollSound();
-    int bytesRead = _read(m_aggregateFd[m_curAggregate], destination, size);
+    int bytesRead = read(m_aggregateFd[m_curAggregate], destination, size);
     if (bytesRead != size) {
         int errorCode = errno;
         sprintf(gText,
