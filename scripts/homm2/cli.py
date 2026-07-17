@@ -61,6 +61,8 @@ def main(argv=None):
     if cmd == "link":
         if sh("python3", "configure.py"): return 1
         return sh("ninja", "link", *rest)
+    if cmd == "link-layout":
+        from homm2.build.link_layout_audit import main as m; return m(rest)
     if cmd == "relocs":
         # OPT-IN reloc-target audit (NOT a hard build gate): objdiff masks every relocation, so a
         # 100%-exact fn can silently read the wrong global/field or call a fabricated fn. This checks
@@ -75,6 +77,6 @@ def main(argv=None):
         from homm2.analysis.sema import main as m; return m(rest)
     if cmd == "ghidra":
         from homm2.ghidra.driver import cli_main as m; return m(rest)
-    print("usage: homm2 {init|configure|build|link|clangd|enum-types|strict-allocations|data-relocs|data-topology|status|breadth-audit|relocs|sema|ghidra}",
+    print("usage: homm2 {init|configure|build|link|link-layout|clangd|enum-types|strict-allocations|data-relocs|data-topology|status|breadth-audit|relocs|sema|ghidra}",
           file=sys.stderr)
     return 0 if cmd in ("help", "-h", "--help") else 1

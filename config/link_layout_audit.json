@@ -1,0 +1,21 @@
+{
+  "records": [
+    {
+      "alignment": "0x10",
+      "anchor": "?wsnet_init@@YIFXZ",
+      "candidate_object_sha256": "bad9b980fe88a0a20d61267013392e2fe19fe70d542a545b39e5fe2227454145",
+      "candidate_section_sha256": "076013f58ebf535348b7150c958800b263a559171df7dff160c231985540d9ae",
+      "link_config_sha256": "dbb9e40216756a38429c109561cb4758f5831b3ab75a61b7e30bf71fc96237db",
+      "linker_sha256": "81109c8cb534debc0c5645db7c3a1b99dd646d982b0fd545070ceb1c77f9cb6c",
+      "note": "Earliest actionable .text root; clean structured source is raw 0xfc4/aligned 0xfd0 versus retail 0xfc0, with exactness-only goto variants rejected.",
+      "outcome": "open",
+      "region_kind": "tu-contribution",
+      "retail_evidence_sha256": "114c54ba58aef602903e6e9d5f0443c54fd05fd8c88be7eee80d4360afb1f0d3",
+      "retail_size": "0xfc0",
+      "retail_start_rva": "0x68b0",
+      "section": ".text",
+      "unit": "SOURCE/Wsnetwin"
+    }
+  ],
+  "version": 1
+}
