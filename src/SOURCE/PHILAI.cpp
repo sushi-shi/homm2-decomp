@@ -2191,13 +2191,13 @@ void philAI::ValueOfBuyingBuilding(
         case BUILDING_SLOT_DWELLING_FIRST:
         case BUILDING_SLOT_DWELLING_SECOND:
         case BUILDING_SLOT_DWELLING_THIRD:
-        case 22:
-        case 23:
-        case 24:
-        case 25:
-        case 26:
-        case 27:
-        case 28:
+        case BUILDING_SLOT_DWELLING_FOURTH:
+        case BUILDING_SLOT_DWELLING_FIFTH:
+        case BUILDING_SLOT_DWELLING_SIXTH:
+        case BUILDING_SLOT_UPGRADE_FIRST:
+        case BUILDING_SLOT_UPGRADE_SECOND:
+        case BUILDING_SLOT_UPGRADE_THIRD:
+        case BUILDING_SLOT_NECROMANCER_MAGE_PREREQUISITE:
         case 29:
         case 30:
             if (currentOccupiedSlots == AI_TOWN_ARMY_SLOTS) {
