@@ -2,6 +2,28 @@
   "version": 1,
   "records": [
     {
+      "unit": "BASE/BITMAP",
+      "function": "?CopyToCareful@bitmap@@QAEXPAV1@HHHHHH@Z",
+      "source_hash": "e4f5184f80e8",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 10,
+      "before": 98.17073,
+      "after": 98.17073,
+      "note": "Complete 0x65 frame/CFG, signed guards, per-bitmap strides, inline memcpy, and zero-relocation set; sole residual is current-state this/destination/row register coloring after ten audited variants."
+    },
+    {
+      "unit": "BASE/BITMAP",
+      "function": "?GrabBitmapCareful@bitmap@@QAEXPAV1@FF@Z",
+      "source_hash": "4a90b8eb671a",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "exact",
+      "iterations": 1,
+      "before": 99.17583,
+      "after": 100.0,
+      "note": "Height-before-width declaration order restores retail register roles; all 0xf0 raw bytes and both ordered BlitBitmap REL32 owner/addend tuples are exact."
+    },
+    {
       "unit": "BASE/EXEC",
       "function": "?DoDialog@executive@@QAEHPAVbaseManager@@@Z",
       "source_hash": "a62bdf56e5ce",
@@ -440,6 +462,17 @@
       "before": 99.81481,
       "after": 100.0,
       "note": "Retail legacy CRT spelling restores exact external relocation identity; code, CFG, frame/slots, and owner-relative addends match"
+    },
+    {
+      "unit": "BASE/Ripple",
+      "function": "?DoRipple@@YIXPAVbitmap@@0HH@Z",
+      "source_hash": "4167e3b084cd",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "improved",
+      "iterations": 10,
+      "before": 99.03226,
+      "after": 99.09677,
+      "note": "Function-scope profileIndex fixes the column SIB; complete 0x23f/0x2c4 kernel and 13 effective relocation tuples remain, with four equivalent height-comparison bytes and one compiler-local 9.0f owner name residual at the bounded cap."
     },
     {
       "unit": "BASE/SAMPLE",
