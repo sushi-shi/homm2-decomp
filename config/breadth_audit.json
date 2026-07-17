@@ -794,6 +794,28 @@
       "note": "Complete body and 19 targets; call versus moat-table evaluation order remains after two neutral spellings."
     },
     {
+      "unit": "SOURCE/ARMYGRP",
+      "function": "?Add@armyGroup@@QAEHHHH@Z",
+      "source_hash": "56697ffb8e26",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 2,
+      "before": 98.39474,
+      "after": 100.0,
+      "note": "Swapping the invalid-range OR operands recovered retail high-bound-first CFG; all 76 instructions match and the function has no relocations."
+    },
+    {
+      "unit": "SOURCE/ARMYGRP",
+      "function": "?IsHomogeneous@armyGroup@@QAEHH@Z",
+      "source_hash": "f9a1d8cd81d8",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 2,
+      "before": 99.976746,
+      "after": 99.976746,
+      "note": "Complete 0x1c frame/all slots/CFG and 2/2 relocs; i[array] and qualified-index forms did not steer the two independent loads at +0x60."
+    },
+    {
       "unit": "SOURCE/CMBTMGR",
       "function": "?CatAttack@combatManager@@QAEXH@Z",
       "source_hash": "f892133d70a3",
@@ -2425,12 +2447,12 @@
       "unit": "SOURCE/KB",
       "function": "?CanBuild@@YIHPAVtown@@H@Z",
       "source_hash": "add3f9d13557",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "parked",
-      "iterations": 10,
+      "iterations": 0,
       "before": 99.98788,
       "after": 99.98788,
-      "note": "Exact frame CFG and five relocs; only two commutative mask-load bytes remain after ten bounded variants."
+      "note": "Reproduced complete 0x10 frame/CFG and 5/5 relocs; only commutative reqMask/haveMask load order remains after the existing ten-attempt cap."
     },
     {
       "unit": "SOURCE/KB",
