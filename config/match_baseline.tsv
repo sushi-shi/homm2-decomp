@@ -716,7 +716,7 @@ SOURCE/EVENTS	?CombatMonsterEvent@advManager@@QAEHPAVhero@@HHPAVmapCell@@HHHHHHH
 SOURCE/EVENTS	?ComputerMonsterInteract@advManager@@QAEXPAVmapCell@@PAVhero@@PAH@Z	98.1614	1a89ad0c7be6
 SOURCE/EVENTS	?DoAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@HH@Z	97.7867	7cbb53d27f6c
 SOURCE/EVENTS	?DoCombat@advManager@@QAEHHHPAVhero@@PAVarmyGroup@@PAVtown@@01HHHH@Z	100.0000	80a000cbd322
-SOURCE/EVENTS	?DoEvent@advManager@@QAEXPAVmapCell@@HH@Z	96.6419	5eef811a1afc
+SOURCE/EVENTS	?DoEvent@advManager@@QAEXPAVmapCell@@HH@Z	96.6468	5eef811a1afc
 SOURCE/EVENTS	?DoNetCombat@advManager@@QAEHPAD@Z	100.0000	a6e2ad39c980
 SOURCE/EVENTS	?DoWhirlpool@advManager@@QAEXPAVhero@@@Z	100.0000	3648d5383fd6
 SOURCE/EVENTS	?EraseObj@advManager@@QAEXPAVmapCell@@HH@Z	100.0000	dde746b206ff
@@ -1211,12 +1211,12 @@ SOURCE/SPELLAI	?EffectSpellResurrect@combatManager@@QAEXPAHHH@Z	100.0000	b3f49ff
 SOURCE/SPELLAI	?FirstArmy@combatManager@@QAEHHHPAH@Z	100.0000	2702525f7d96
 SOURCE/SPELLAI	?FirstResurrectable@combatManager@@QAEHHPAHH@Z	100.0000	2fe2117adfb3
 SOURCE/SPELLAI	?NextPos@combatManager@@QAEXPAH@Z	100.0000	c70cafebb9b6
-SOURCE/SPELLAI	?RawEffectSpellInfluence@combatManager@@QAEHPAVarmy@@H@Z	97.4750	415d95dc407e
+SOURCE/SPELLAI	?RawEffectSpellInfluence@combatManager@@QAEHPAVarmy@@H@Z	97.6750	415d95dc407e
 SOURCE/SPELLS	?AddBolt@combatManager@@QAEXPAUSBolt@@HHHHHHHHHHHH@Z	100.0000	28ffaf03b8bb
 SOURCE/SPELLS	?Armageddon@combatManager@@QAEXXZ	99.5822	da5400020c19
 SOURCE/SPELLS	?BloodLustEffect@combatManager@@QAEXPAVarmy@@H@Z	100.0000	cadc6faa9957
 SOURCE/SPELLS	?Blur@combatManager@@QAEXHHH@Z	100.0000	ddf2f7168fd6
-SOURCE/SPELLS	?CastMassSpell@combatManager@@QAEXHH@Z	96.4921	e4f77bdf7333
+SOURCE/SPELLS	?CastMassSpell@combatManager@@QAEXHH@Z	96.5200	e4f77bdf7333
 SOURCE/SPELLS	?CastSpell@combatManager@@QAEXHHHH@Z	97.4106	ea246d8393be
 SOURCE/SPELLS	?ChainLightning@combatManager@@QAEXHH@Z	99.5261	8e4d4711153e
 SOURCE/SPELLS	?CombatSpecialHandler@@YIHAAUtag_message@@@Z	91.4262	d270094fe831
@@ -1235,10 +1235,10 @@ SOURCE/SPELLS	?HasValidSpellTarget@combatManager@@QAEHH@Z	100.0000	cde4e29633d0
 SOURCE/SPELLS	?MeteorShower@combatManager@@QAEXH@Z	100.0000	0a040ea9d87a
 SOURCE/SPELLS	?MirrorImage@combatManager@@QAEXH@Z	93.6271	54b8a11e61e4
 SOURCE/SPELLS	?ModifyDamageForArtifacts@combatManager@@QAEXPAJHPAVhero@@1@Z	100.0000	fdd27d337900
-SOURCE/SPELLS	?ResetBoltAngle@combatManager@@QAEXPAUSBolt@@@Z	98.4170	5c60545ae1bb
+SOURCE/SPELLS	?ResetBoltAngle@combatManager@@QAEXPAUSBolt@@@Z	98.4213	5c60545ae1bb
 SOURCE/SPELLS	?Resurrect@combatManager@@QAEXHHH@Z	98.5585	11a73929e318
 SOURCE/SPELLS	?Ripple@combatManager@@QAEXH@Z	100.0000	00cb2ec88dbb
-SOURCE/SPELLS	?RippleCreature@combatManager@@QAEXHHH@Z	96.3629	c10812796b13
+SOURCE/SPELLS	?RippleCreature@combatManager@@QAEXHHH@Z	97.0028	c10812796b13
 SOURCE/SPELLS	?ShowMassSpell@combatManager@@QAEXQAY0BE@CHH@Z	95.1134	4dc4a37ff0c7
 SOURCE/SPELLS	?ShowSpellCastFailure@combatManager@@QAEXPAVarmy@@H@Z	99.8939	81694caddcfa
 SOURCE/SPELLS	?ShowSpellMessage@combatManager@@QAEXHHPAVarmy@@@Z	100.0000	bb6110119ab4
@@ -1322,7 +1322,7 @@ SOURCE/Viewwrld	?ViewWorld@advManager@@QAEXHHH@Z	99.9394	8d89d11c1bdd
 SOURCE/Viewwrld	?ViewWorldDialogHandler@@YIHAAUtag_message@@@Z	99.9677	c2c14bd487d0
 SOURCE/Wsnetwin	?wsEvaluateMessage@@YIXKH@Z	99.8684	26f960648197
 SOURCE/Wsnetwin	?wsProcessMessages@@YIXXZ	99.7778	2f5d24985962
-SOURCE/Wsnetwin	?wsSendMessage@@YIXHEGPAX@Z	98.4615	ac52bf025df7
+SOURCE/Wsnetwin	?wsSendMessage@@YIXHEGPAX@Z	98.4615	cfd5e25b50da
 SOURCE/Wsnetwin	?wsWaitForExtraGuests@@YIHXZ	100.0000	4f5ccbfa5b43
 SOURCE/Wsnetwin	?wsWaitForFirstGuest@@YIHXZ	99.7059	0c397dff2efb
 SOURCE/Wsnetwin	?wsWaitForHost@@YIHXZ	100.0000	1c735844bb6f
