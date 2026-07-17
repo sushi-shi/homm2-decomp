@@ -74,7 +74,6 @@ VA(0x004dbfe0, 0x21d)
 void dropListWidget::Read(void)
 {
     i8 name[16];
-    char **entries;
 
     m_x = gpResourceManager->ReadWord();
     m_y = gpResourceManager->ReadWord();
@@ -99,37 +98,37 @@ void dropListWidget::Read(void)
     m_textMode = gpResourceManager->ReadWord();
     i16 id = gpResourceManager->ReadWord();
 
-    m_closedContentFrame = 0;
-    m_dropButtonFrame = 1;
-    m_dropButtonPressedFrame = 2;
-    m_firstRowFrame = 3;
-    m_middleRowFrame = 4;
-    m_lastRowFrame = 5;
-    m_scrollUpFrame = 6;
-    m_scrollUpPressedFrame = 7;
-    m_scrollDownFrame = 8;
-    m_scrollDownPressedFrame = 9;
-    m_scrollTrackFirstFrame = 10;
-    m_scrollTrackMiddleFrame = 11;
-    m_scrollTrackLastFrame = 12;
-    m_scrollThumbFrame = 13;
+    m_closedContentFrame = DROPLIST_FRAME_CLOSED_CONTENT;
+    m_dropButtonFrame = DROPLIST_FRAME_DROP_BUTTON;
+    m_dropButtonPressedFrame = DROPLIST_FRAME_DROP_BUTTON_PRESSED;
+    m_firstRowFrame = DROPLIST_FRAME_FIRST_ROW;
+    m_middleRowFrame = DROPLIST_FRAME_MIDDLE_ROW;
+    m_lastRowFrame = DROPLIST_FRAME_LAST_ROW;
+    m_scrollUpFrame = DROPLIST_FRAME_SCROLL_UP;
+    m_scrollUpPressedFrame = DROPLIST_FRAME_SCROLL_UP_PRESSED;
+    m_scrollDownFrame = DROPLIST_FRAME_SCROLL_DOWN;
+    m_scrollDownPressedFrame = DROPLIST_FRAME_SCROLL_DOWN_PRESSED;
+    m_scrollTrackFirstFrame = DROPLIST_FRAME_SCROLL_TRACK_FIRST;
+    m_scrollTrackMiddleFrame = DROPLIST_FRAME_SCROLL_TRACK_MIDDLE;
+    m_scrollTrackLastFrame = DROPLIST_FRAME_SCROLL_TRACK_LAST;
+    m_scrollThumbFrame = DROPLIST_FRAME_SCROLL_THUMB;
     m_id = id;
-    entries = &m_icon->m_data;
+    IconEntry *iconEntries = reinterpret_cast<IconEntry *>(m_icon->m_data);
     i16 iconX = m_x;
     i16 iconY = m_y;
-    IconEntry *topEntry = reinterpret_cast<IconEntry *>(*entries);
+    IconEntry *closedContentEntry = iconEntries + DROPLIST_FRAME_CLOSED_CONTENT;
     m_iconX = iconX;
     m_iconY = iconY;
-    m_closedContentWidth = topEntry->w;
-    m_closedContentHeight = topEntry->h;
-    IconEntry *middleEntry = reinterpret_cast<IconEntry *>(*entries) + 1;
+    m_closedContentWidth = closedContentEntry->w;
+    m_closedContentHeight = closedContentEntry->h;
+    IconEntry *dropButtonEntry = iconEntries + DROPLIST_FRAME_DROP_BUTTON;
     m_dropButtonX = iconX + m_closedContentWidth;
     m_dropButtonY = iconY;
-    m_dropButtonWidth = middleEntry->w;
-    m_dropButtonHeight = middleEntry->h;
-    IconEntry *bottomEntry = reinterpret_cast<IconEntry *>(*entries) + 13;
-    m_scrollThumbWidth = bottomEntry->w;
-    m_scrollThumbHeight = bottomEntry->h;
+    m_dropButtonWidth = dropButtonEntry->w;
+    m_dropButtonHeight = dropButtonEntry->h;
+    IconEntry *scrollThumbEntry = iconEntries + DROPLIST_FRAME_SCROLL_THUMB;
+    m_scrollThumbWidth = scrollThumbEntry->w;
+    m_scrollThumbHeight = scrollThumbEntry->h;
 }
 
 VA(0x004dc200, 0xd5)

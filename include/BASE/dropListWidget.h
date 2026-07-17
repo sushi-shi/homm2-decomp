@@ -7,6 +7,25 @@
 // forward declarations:
 struct tag_message;
 
+// Frame layout of the drop-list ICN resource; the m_*Frame members are
+// initialized from these in Read and the entry table is indexed with them.
+typedef enum DropListFrame {
+    DROPLIST_FRAME_CLOSED_CONTENT = 0,
+    DROPLIST_FRAME_DROP_BUTTON = 1,
+    DROPLIST_FRAME_DROP_BUTTON_PRESSED = 2,
+    DROPLIST_FRAME_FIRST_ROW = 3,
+    DROPLIST_FRAME_MIDDLE_ROW = 4,
+    DROPLIST_FRAME_LAST_ROW = 5,
+    DROPLIST_FRAME_SCROLL_UP = 6,
+    DROPLIST_FRAME_SCROLL_UP_PRESSED = 7,
+    DROPLIST_FRAME_SCROLL_DOWN = 8,
+    DROPLIST_FRAME_SCROLL_DOWN_PRESSED = 9,
+    DROPLIST_FRAME_SCROLL_TRACK_FIRST = 10,
+    DROPLIST_FRAME_SCROLL_TRACK_MIDDLE = 11,
+    DROPLIST_FRAME_SCROLL_TRACK_LAST = 12,
+    DROPLIST_FRAME_SCROLL_THUMB = 13
+} DropListFrame;
+
 #pragma pack(push, 1)  // recovered layout is byte-packed
 class bitmap;
 class icon;
