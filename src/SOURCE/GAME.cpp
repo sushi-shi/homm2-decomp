@@ -79,17 +79,9 @@ DATA(0x004f7e90) static i16 gCompressTest2SourceLine = 0x1f72;
 DATA(0x004f7f84) static i16 gCompressTestSourceLine = 0x1f95;
 
 #define RETAIL_FILE const_cast<char*>("I:\\Projects\\Heroes\\Prog\\SOURCE\\GAME.CPP")
-// These line operands CANNOT be hardcoded: retail materializes each base as a
-// static i16 global and emits a memory load plus add at every call site, so the
-// global reference is part of the byte proof.
-#define gSaveSourceLine gSaveSourceLine
-#define gLoadSourceLine gLoadSourceLine
-#define gMapSourceLine gMapSourceLine
-#define gTransmitSourceLine gTransmitSourceLine
-#define gReceiveSourceLine gReceiveSourceLine
-#define gDiffSourceLine gDiffSourceLine
-#define gCompressTest2SourceLine gCompressTest2SourceLine
-#define gCompressTestSourceLine gCompressTestSourceLine
+// Call sites pass hardcoded retail line numbers by policy; the line-base DATA
+// words above still own their retail storage. (Retail itself loads the words
+// and adds an offset — a known, accepted divergence.)
 // Retail folds the embedded member offset into Row/Extra accesses after inlining.
 #define WORLDMAP (&m_worldMap)
 
@@ -523,7 +515,7 @@ void GenerateStandardFileName(char* source, char* destination) {
 // reloc-masked: identical 0xbc4-byte code/frame; 135/135 targets agree, only compiler literal/constant symbol identities differ
 VA(0x00471eb7, 0xbc4)
 i32 game::SaveGame(char* filename, i32 generateName, i8 expansionFormat) {
-    void* emptyPayload = H2_ALLOC(GAME_SAVE_BUFFER_SIZE, gSaveSourceLine + 10);
+    void* emptyPayload = H2_ALLOC(GAME_SAVE_BUFFER_SIZE, 670);
     memset(emptyPayload, 0, GAME_SAVE_BUFFER_SIZE);
     if (!xIsExpansionMap)
         expansionFormat = 1;
@@ -673,7 +665,7 @@ i32 game::SaveGame(char* filename, i32 generateName, i8 expansionFormat) {
     m_worldMap.Write(fileInfo);
     write(fileInfo, markerBuffer, 4);
     close(fileInfo);
-    H2_FREE(emptyPayload, gSaveSourceLine + 0xed);
+    H2_FREE(emptyPayload, 897);
     return 1;
 }
 
@@ -950,14 +942,14 @@ void game::LoadGame(char* filename, i32 loadFromFile, i32) {
     read(file0, marker0, 4);
     read(file0, &iMaxMapExtra, 4);
     read(file0, marker0, 4);
-    ppMapExtra = reinterpret_cast<void**>(H2_ALLOC(iMaxMapExtra * 4, gLoadSourceLine + 0xcb));
-    pwSizeOfMapExtra = reinterpret_cast<i16*>(H2_ALLOC(iMaxMapExtra * 2, gLoadSourceLine + 0xcc));
+    ppMapExtra = reinterpret_cast<void**>(H2_ALLOC(iMaxMapExtra * 4, 1306));
+    pwSizeOfMapExtra = reinterpret_cast<i16*>(H2_ALLOC(iMaxMapExtra * 2, 1307));
     memset(ppMapExtra, 0, iMaxMapExtra * 4);
     memset(pwSizeOfMapExtra, 0, iMaxMapExtra * 2);
     for (i29 = 1; (&i29)[0] < iMaxMapExtra; i29++) {
         read(file0, marker0, 4);
         read(file0, pwSizeOfMapExtra + i29, 2);
-        ppMapExtra[i29] = H2_ALLOC(pwSizeOfMapExtra[i29], gLoadSourceLine + 0xd5);
+        ppMapExtra[i29] = H2_ALLOC(pwSizeOfMapExtra[i29], 1316);
         read(file0, ppMapExtra[i29], pwSizeOfMapExtra[i29]);
     }
     read(file0, marker0, 4);
@@ -2143,13 +2135,13 @@ i32 game::LoadMap(char* filename) {
     read(file2, m_timeEventIndices, m_mapHeader.timeEventCount * 2);
     m_timeEventCount = m_mapHeader.timeEventCount;
     read(file2, &iMaxMapExtra, 4);
-    ppMapExtra = reinterpret_cast<void**>(H2_ALLOC(iMaxMapExtra * 4, gMapSourceLine + 0x59));
-    pwSizeOfMapExtra = reinterpret_cast<i16*>(H2_ALLOC(iMaxMapExtra * 2, gMapSourceLine + 0x5a));
+    ppMapExtra = reinterpret_cast<void**>(H2_ALLOC(iMaxMapExtra * 4, 2893));
+    pwSizeOfMapExtra = reinterpret_cast<i16*>(H2_ALLOC(iMaxMapExtra * 2, 2894));
     memset(ppMapExtra, 0, iMaxMapExtra * 4);
     memset(pwSizeOfMapExtra, 0, iMaxMapExtra * 2);
     for (i37 = 1; (&i37)[0] < iMaxMapExtra; i37++) {
         read(file2, pwSizeOfMapExtra + i37, 2);
-        ppMapExtra[i37] = H2_ALLOC(pwSizeOfMapExtra[i37], gMapSourceLine + 0x62);
+        ppMapExtra[i37] = H2_ALLOC(pwSizeOfMapExtra[i37], 2902);
         read(file2, ppMapExtra[i37], pwSizeOfMapExtra[i37]);
     }
     read(file2, trailer15, 2);
@@ -2750,7 +2742,7 @@ void game::ViewArmy(
     message6.payload.widget.data.text = armyName8;
     m_viewArmyWindow->BroadcastMessage(message6);
 
-    char* details9 = static_cast<char*>(H2_ALLOC(0x226, viewArmySourceLineBase + 0x93));
+    char* details9 = static_cast<char*>(H2_ALLOC(0x226, 3684));
     i32 morale2 = theGroup ? theGroup->GetMorale(theHero, castle, 0) : 0;
     if (monster8->flags.all & MONSTER_FLAGS_NO_MORALE)
         morale2 = 0;
@@ -2902,7 +2894,7 @@ void game::ViewArmy(
         if (gbUpgradeArmy && theGroup)
             theGroup->m_troopTypes[groupIndex] = static_cast<i8>(iViewArmyUpgradeToType);
     }
-    H2_FREE(details9, viewArmySourceLineBase + 0x164);
+    H2_FREE(details9, 3893);
     delete m_viewArmyWindow;
 }
 
@@ -5161,7 +5153,7 @@ void game::SetupTowns(void) {
                 }
             }
         }
-        H2_FREE(ppMapExtra[extraIndex], setupTownsSourceLineBase + 0xee);
+        H2_FREE(ppMapExtra[extraIndex], 6375);
         ppMapExtra[extraIndex] = 0;
     }
 }
@@ -5339,7 +5331,7 @@ void game::ProcessOnMapHeroes(void) {
                                 giVisRange[mapHero0->m_secondarySkills[3]]
                             );
                         }
-                        H2_FREE(ppMapExtra[extraIndex0], processOnMapHeroesSourceLineBase + 0xdd);
+                        H2_FREE(ppMapExtra[extraIndex0], 6604);
                         ppMapExtra[extraIndex0] = 0;
                     }
                 }
@@ -5520,7 +5512,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
         BVResMsg(const_cast<char*>("Sending Data"), -1, 0);
     AiPrint(const_cast<char*>("Transmit Start - Compressing"));
 
-    acknowledged = static_cast<char*>(H2_ALLOC(5000, gTransmitSourceLine + 0x2b));
+    acknowledged = static_cast<char*>(H2_ALLOC(5000, 6777));
     memset(acknowledged, 0, 5000);
     SaveGame(gConfig.rmtSCName, 0, 0);
     if (!gbUseDiffCompression)
@@ -5536,10 +5528,10 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
     fileSize = FileSize(filename);
     LogInt(const_cast<char*>("PostDiffFileSize"), fileSize, -999, -999, -999, -999, -999, -999);
 
-    header = static_cast<i32*>(H2_ALLOC(0x100, gTransmitSourceLine + 0x3f));
+    header = static_cast<i32*>(H2_ALLOC(0x100, 6797));
     if (gbUseRegularCompression)
-        transmitData = static_cast<u8*>(H2_ALLOC(fileSize + 2000, gTransmitSourceLine + 0x41));
-    fileData = static_cast<u8*>(H2_ALLOC(fileSize + 2000, gTransmitSourceLine + 0x42));
+        transmitData = static_cast<u8*>(H2_ALLOC(fileSize + 2000, 6799));
+    fileData = static_cast<u8*>(H2_ALLOC(fileSize + 2000, 6800));
 
     file = open(filename, _O_BINARY);
     if (file == -1)
@@ -5638,13 +5630,13 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
 
 transmitCleanup:
     if (header)
-        H2_FREE(header, gTransmitSourceLine + 199);
+        H2_FREE(header, 6933);
     if (transmitData)
-        H2_FREE(transmitData, gTransmitSourceLine + 200);
+        H2_FREE(transmitData, 6934);
     if (fileData && fileData != transmitData)
-        H2_FREE(fileData, gTransmitSourceLine + 0xc9);
+        H2_FREE(fileData, 6935);
     if (acknowledged)
-        H2_FREE(acknowledged, gTransmitSourceLine + 0xca);
+        H2_FREE(acknowledged, 6936);
 
     AiPrint(const_cast<char*>("Transmit End"));
     if (gpAdvManager->m_active == 1) {
@@ -5764,12 +5756,12 @@ i32 game::ReceiveSaveGame(
     if (!result)
         ShutDown(0);
 
-    received = static_cast<char*>(H2_ALLOC(5000, gReceiveSourceLine + 0x33));
+    received = static_cast<char*>(H2_ALLOC(5000, 7008));
     memset(received, 0, 5000);
     if (gbUseRegularCompression)
-        decodedData = static_cast<u8*>(H2_ALLOC(700000, gReceiveSourceLine + 0x37));
-    ackBuffer = static_cast<u8*>(H2_ALLOC(0x100, gReceiveSourceLine + 0x39));
-    incomingData = static_cast<u8*>(H2_ALLOC(dataSize + 2000, gReceiveSourceLine + 0x3a));
+        decodedData = static_cast<u8*>(H2_ALLOC(700000, 7012));
+    ackBuffer = static_cast<u8*>(H2_ALLOC(0x100, 7014));
+    incomingData = static_cast<u8*>(H2_ALLOC(dataSize + 2000, 7015));
 
     lastPacketTime = KBTickCount();
     LogInt(const_cast<char*>("FW2"), remotePlayer, -999, -999, -999, -999, -999, -999);
@@ -5884,13 +5876,13 @@ i32 game::ReceiveSaveGame(
     success = 1;
 
     if (received)
-        H2_FREE(received, gReceiveSourceLine + 0xa1);
+        H2_FREE(received, 7118);
     if (ackBuffer)
-        H2_FREE(ackBuffer, gReceiveSourceLine + 0xa2);
+        H2_FREE(ackBuffer, 7119);
     if (incomingData)
-        H2_FREE(incomingData, gReceiveSourceLine + 0xa3);
+        H2_FREE(incomingData, 7120);
     if (decodedData && incomingData != decodedData)
-        H2_FREE(decodedData, gReceiveSourceLine + 0xa4);
+        H2_FREE(decodedData, 7121);
 
     CreateJoinFile(gConfig.rmtRLName, gConfig.rmtRDName, gConfig.rmtRCName);
     AiPrint(const_cast<char*>("Receive End"));
@@ -6140,8 +6132,8 @@ void game::SetMapSize(i32 w, i32 h) {
         gpSearchArray->Init();
     }
     if (mapExtra)
-        H2_FREE(mapExtra, setMapSizeSourceLineBase + 0xc);
-    mapExtra = static_cast<u8*>(H2_ALLOC(MAP_WIDTH * MAP_HEIGHT, setMapSizeSourceLineBase + 0xd));
+        H2_FREE(mapExtra, 7449);
+    mapExtra = static_cast<u8*>(H2_ALLOC(MAP_WIDTH * MAP_HEIGHT, 7450));
     memset(mapExtra, 0, MAP_WIDTH * MAP_HEIGHT);
 }
 
@@ -6242,7 +6234,7 @@ void CreateDiffFile(
 
     sprintf(gText, "%s%s", ".\\DATA\\", joinName);
     joinSize36 = FileSize(gText);
-    joinData29 = static_cast<u8*>(H2_ALLOC(joinSize36, gDiffSourceLine + 0x18));
+    joinData29 = static_cast<u8*>(H2_ALLOC(joinSize36, 7550));
     sprintf(gText, "%s%s", ".\\DATA\\", joinName);
     joinFile1 = open(gText, _O_BINARY);
     if (joinFile1 == -1)
@@ -6263,7 +6255,7 @@ void CreateDiffFile(
     if (!forceWhole) {
         sprintf(gText, "%s%s", ".\\DATA\\", oldName);
         oldSize37 = FileSize(gText);
-        oldData13 = static_cast<u8*>(H2_ALLOC(oldSize37, gDiffSourceLine + 0x2d));
+        oldData13 = static_cast<u8*>(H2_ALLOC(oldSize37, 7571));
         sprintf(gText, "%s%s", ".\\DATA\\", oldName);
         oldFile17 = open(gText, _O_BINARY);
         if (oldFile17 == -1)
@@ -6273,7 +6265,7 @@ void CreateDiffFile(
     }
 
     diffData6 = static_cast<u8*>(
-        H2_ALLOC((oldSize37 > joinSize36 ? oldSize37 : joinSize36) + 5000, gDiffSourceLine + 0x37)
+        H2_ALLOC((oldSize37 > joinSize36 ? oldSize37 : joinSize36) + 5000, 7581)
     );
     if (sendWhole4) {
         diffData6[0] = 0;
@@ -6344,11 +6336,11 @@ void CreateDiffFile(
     close(joinFile1);
 
     if (oldData13 != 0)
-        H2_FREE(oldData13, gDiffSourceLine + 0xa1);
+        H2_FREE(oldData13, 7687);
     if (joinData29 != 0)
-        H2_FREE(joinData29, gDiffSourceLine + 0xa3);
+        H2_FREE(joinData29, 7689);
     if (diffData6 != 0)
-        H2_FREE(diffData6, gDiffSourceLine + 0xa5);
+        H2_FREE(diffData6, 7691);
     return;
 }
 
@@ -6375,7 +6367,7 @@ void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
 
     sprintf(gText, "%s%s", ".\\DATA\\", diffName);
     diffSize1 = FileSize(gText);
-    diffData5 = static_cast<u8*>(H2_ALLOC(diffSize1, createJoinFileSourceLineBase + 0xd));
+    diffData5 = static_cast<u8*>(H2_ALLOC(diffSize1, 7708));
     sprintf(gText, "%s%s", ".\\DATA\\", diffName);
     diffFile2 = open(gText, _O_BINARY);
     if (diffFile2 == -1)
@@ -6384,14 +6376,14 @@ void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
     close(diffFile2);
 
     joinData9 =
-        static_cast<u8*>(H2_ALLOC(GAME_JOIN_BUFFER_SIZE, createJoinFileSourceLineBase + 0x16));
+        static_cast<u8*>(H2_ALLOC(GAME_JOIN_BUFFER_SIZE, 7717));
     if (diffData5[0] == 0) {
         memcpy(joinData9, diffData5 + GAME_JOIN_HEADER_SIZE, diffSize1 - GAME_JOIN_HEADER_SIZE);
         joinSize37 = diffSize1 - GAME_JOIN_HEADER_SIZE;
     } else {
         sprintf(gText, "%s%s", ".\\DATA\\", oldName);
         oldSize10 = FileSize(gText);
-        oldData13 = static_cast<u8*>(H2_ALLOC(oldSize10, createJoinFileSourceLineBase + 0x21));
+        oldData13 = static_cast<u8*>(H2_ALLOC(oldSize10, 7728));
         sprintf(gText, "%s%s", ".\\DATA\\", oldName);
         diffFile2 = open(gText, _O_BINARY);
         if (diffFile2 == -1)
@@ -6439,11 +6431,11 @@ void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
     close(joinFile0);
 
     if (oldData13)
-        H2_FREE(oldData13, createJoinFileSourceLineBase + 0x53);
+        H2_FREE(oldData13, 7778);
     if (diffData5)
-        H2_FREE(diffData5, createJoinFileSourceLineBase + 0x55);
+        H2_FREE(diffData5, 7780);
     if (joinData9)
-        H2_FREE(joinData9, createJoinFileSourceLineBase + 0x57);
+        H2_FREE(joinData9, 7782);
 }
 
 VA(0x004854d5, 0x5d)
@@ -6706,14 +6698,14 @@ VA(0x00486296, 0xab)
 i32 CalcFileCRC(char* filename) {
     DATA(0x004f7e3c) static i16 calcFileCrcSourceLineBase = 0x1f5e;
     i32l size = FileSize(filename);
-    char* block = static_cast<char*>(H2_ALLOC(size, calcFileCrcSourceLineBase + 3));
+    char* block = static_cast<char*>(H2_ALLOC(size, 8033));
     i32 hand = open(filename, _O_BINARY);
     if (hand == -1)
         FileError(filename);
     read(hand, block, size);
     i32 crc = calc_crc_long(reinterpret_cast<u8*>(block), size);
     close(hand);
-    H2_FREE(block, calcFileCrcSourceLineBase + 0xe);
+    H2_FREE(block, 8044);
     return crc;
 }
 
@@ -6735,13 +6727,13 @@ void CompressTest2(void) {
 
     dataSize2 = Random(COMPRESSION_TEST_RANDOM_SIZE_MIN, COMPRESSION_TEST_RANDOM_SIZE_MAX);
     sourceData6 = static_cast<char*>(
-        H2_ALLOC(dataSize2 + COMPRESSION_TEST_RANDOM_BUFFER_EXTRA, gCompressTest2SourceLine + 7)
+        H2_ALLOC(dataSize2 + COMPRESSION_TEST_RANDOM_BUFFER_EXTRA, 8057)
     );
     encodedData6 = static_cast<char*>(
-        H2_ALLOC(dataSize2 + COMPRESSION_TEST_RANDOM_BUFFER_EXTRA, gCompressTest2SourceLine + 8)
+        H2_ALLOC(dataSize2 + COMPRESSION_TEST_RANDOM_BUFFER_EXTRA, 8058)
     );
     decodedData6 = static_cast<char*>(
-        H2_ALLOC(dataSize2 + COMPRESSION_TEST_RANDOM_BUFFER_EXTRA, gCompressTest2SourceLine + 9)
+        H2_ALLOC(dataSize2 + COMPRESSION_TEST_RANDOM_BUFFER_EXTRA, 8059)
     );
     for (index7 = 0; index7 < dataSize2; index7++)
         sourceData6[index7] = static_cast<char>(Random(0, 255));
@@ -6750,9 +6742,9 @@ void CompressTest2(void) {
     decodedSize17 = DecodeData(decodedData6, encodedData6, encodedSize14);
     decodedCrc5 = calc_crc_long(reinterpret_cast<u8*>(decodedData6), dataSize2);
     sourceCrcCheck7 = calc_crc_long(reinterpret_cast<u8*>(sourceData6), dataSize2);
-    H2_FREE(sourceData6, gCompressTest2SourceLine + 0x1a);
-    H2_FREE(encodedData6, gCompressTest2SourceLine + 0x1b);
-    H2_FREE(decodedData6, gCompressTest2SourceLine + 0x1c);
+    H2_FREE(sourceData6, 8076);
+    H2_FREE(encodedData6, 8077);
+    H2_FREE(decodedData6, 8078);
 }
 
 VA(0x00486494, 0x1be)
@@ -6773,13 +6765,13 @@ void CompressTest(void) {
     strcpy(filename3, "c:\\TEMP\\Z.DIF");
     fileSize7 = FileSize(filename3);
     sourceData6 = static_cast<char*>(
-        H2_ALLOC(fileSize7 + COMPRESSION_TEST_FILE_BUFFER_EXTRA, gCompressTestSourceLine + 9)
+        H2_ALLOC(fileSize7 + COMPRESSION_TEST_FILE_BUFFER_EXTRA, 8094)
     );
     encodedData6 = static_cast<char*>(
-        H2_ALLOC(fileSize7 + COMPRESSION_TEST_FILE_BUFFER_EXTRA, gCompressTestSourceLine + 10)
+        H2_ALLOC(fileSize7 + COMPRESSION_TEST_FILE_BUFFER_EXTRA, 8095)
     );
     decodedData6 = static_cast<char*>(
-        H2_ALLOC(fileSize7 + COMPRESSION_TEST_FILE_BUFFER_EXTRA, gCompressTestSourceLine + 0xb)
+        H2_ALLOC(fileSize7 + COMPRESSION_TEST_FILE_BUFFER_EXTRA, 8096)
     );
     LogStr(const_cast<char*>("C2"));
     fileHandle4 = open(filename3, 0x8000);
@@ -6797,9 +6789,9 @@ void CompressTest(void) {
     LogStr(const_cast<char*>("C7"));
     decodedCrc5 = calc_crc_long(reinterpret_cast<u8*>(decodedData6), fileSize7);
     sourceCrcCheck7 = calc_crc_long(reinterpret_cast<u8*>(sourceData6), fileSize7);
-    H2_FREE(sourceData6, gCompressTestSourceLine + 0x24);
-    H2_FREE(encodedData6, gCompressTestSourceLine + 0x25);
-    H2_FREE(decodedData6, gCompressTestSourceLine + 0x26);
+    H2_FREE(sourceData6, 8121);
+    H2_FREE(encodedData6, 8122);
+    H2_FREE(decodedData6, 8123);
     LogStr(const_cast<char*>("C8"));
 }
 

@@ -2671,13 +2671,13 @@ void ClearMapExtra(void) {
     i32 i;
     for (i = 0; OD_STEER(i) < iMaxMapExtra; i++) {
         if (ppMapExtra[i])
-            H2_FREE(ppMapExtra[i], clearMapExtraSourceLineBase + 0x06);
+            H2_FREE(ppMapExtra[i], 3268);
     }
     if (ppMapExtra)
-        H2_FREE(ppMapExtra, clearMapExtraSourceLineBase + 0x09);
+        H2_FREE(ppMapExtra, 3271);
     ppMapExtra = 0;
     if (pwSizeOfMapExtra)
-        H2_FREE(pwSizeOfMapExtra, clearMapExtraSourceLineBase + 0x0d);
+        H2_FREE(pwSizeOfMapExtra, 3275);
     pwSizeOfMapExtra = 0;
     iMaxMapExtra = 0;
 }
@@ -3189,7 +3189,7 @@ void ShutDown(char* msg) {
         gEventHandle = 0;
     }
     if (mapExtra)
-        H2_FREE(mapExtra, shutdownSourceLineBase + 0x47);
+        H2_FREE(mapExtra, 3899);
     mapExtra = 0;
     CloseAIMapVars();
     DeleteMainClasses();
@@ -3232,8 +3232,8 @@ void SmackFade(u8* src, u8* dst) {
     a = 0;
     f = 0;
     k = -1;
-    a = static_cast<u8*>(H2_ALLOC(0x300, smackFadeSourceLineBase + 0x0d));
-    f = static_cast<u8*>(H2_ALLOC(0x100, smackFadeSourceLineBase + 0x0e));
+    a = static_cast<u8*>(H2_ALLOC(0x300, 3950));
+    f = static_cast<u8*>(H2_ALLOC(0x100, 3951));
     memset(a, 0, MISC_PALETTE_BYTE_COUNT);
     memset(f, 0, 0x100);
     for (h = 0xa; h < 0xf6; h++) {
@@ -3260,8 +3260,8 @@ void SmackFade(u8* src, u8* dst) {
     }
     gpWindowManager->UpdateScreen();
     UpdatePalette(reinterpret_cast<i8*>(dst));
-    H2_FREE(a, smackFadeSourceLineBase + 0x31);
-    H2_FREE(f, smackFadeSourceLineBase + 0x32);
+    H2_FREE(a, 3986);
+    H2_FREE(f, 3987);
 }
 
 VA(0x0049e5fd, 0x303)
@@ -3275,7 +3275,7 @@ void ShowCongrats(i32 highScoreType) {
     gpMouseManager->HideColorPointer();
     memcpy(savedPalette, gpBufferPalette->m_data, CONGRATS_PALETTE_SIZE);
     gpWindowManager->m_updateFlags = 0;
-    congratsText = static_cast<char*>(H2_ALLOC(CONGRATS_TEXT_SIZE, congratsSourceLineBase + 0x09));
+    congratsText = static_cast<char*>(H2_ALLOC(CONGRATS_TEXT_SIZE, 4000));
     baseScore = CalcBaseScore(giCurTurn);
     score_e = gpGame->m_difficultyRating * baseScore / CONGRATS_DIFFICULTY_SCALE;
     gpSoundManager->PlayAmbientMusic(CONGRATS_MUSIC_SILENT, 0, CONGRATS_MUSIC_SILENT);
@@ -3331,7 +3331,7 @@ void ShowCongrats(i32 highScoreType) {
         CONGRATS_STANDARD,
         gpGame->m_mapHeader.name
     );
-    H2_FREE(congratsText, congratsSourceLineBase + 0x4e);
+    H2_FREE(congratsText, 4069);
     congratsText = 0;
     gpWindowManager->m_updateFlags = 1;
     memcpy(gpBufferPalette->m_data, gPalette->m_data, CONGRATS_PALETTE_SIZE);
@@ -4664,7 +4664,7 @@ void NormalDialog(
             break;
 
         resourceText_e[resourceSlot_n] = static_cast<char*>(
-            H2_ALLOC(NORMAL_DIALOG_TEXT_LENGTH, normalDialogSourceLineBase + 0xbb)
+            H2_ALLOC(NORMAL_DIALOG_TEXT_LENGTH, 5472)
         );
         if (resourceType_l[resourceSlot_n] <= NORMAL_DIALOG_RESOURCE_LAST) {
             if (resourceValue_l[resourceSlot_n] > 0) {
@@ -4973,7 +4973,7 @@ void NormalDialog(
             pNormalDialogWindow->AddWidget(textPanel_h, -1);
 
             resourceText_e[resourceSlot_n] = static_cast<char*>(
-                H2_ALLOC(NORMAL_DIALOG_TEXT_LENGTH, normalDialogSourceLineBase + 0x1af)
+                H2_ALLOC(NORMAL_DIALOG_TEXT_LENGTH, 5716)
             );
             labelY_o = OD_STEER(sizingIconHeight_l) + resourceY_l - 24;
             sprintf(
@@ -5005,7 +5005,7 @@ void NormalDialog(
         pNormalDialogWindow->AddWidget(textPanel_h, -1);
 
         if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_PRIMARY_SKILL && showPrimaryBonus_e) {
-            char* bonusText = static_cast<char*>(H2_ALLOC(5, normalDialogSourceLineBase + 0x1c9));
+            char* bonusText = static_cast<char*>(H2_ALLOC(5, 5742));
             strcpy(bonusText, "+1 ");
             textPanel_h = new textWidget(
                 resourceCenterX_a - 50,
@@ -5044,7 +5044,7 @@ void NormalDialog(
     pNormalDialogWindow->BroadcastMessage(message_e);
 
     if (showOrText == NORMAL_DIALOG_SHOW_OR_TEXT) {
-        orText_f = static_cast<char*>(H2_ALLOC(3, normalDialogSourceLineBase + 0x1ed));
+        orText_f = static_cast<char*>(H2_ALLOC(3, 5778));
         strcpy(orText_f, "or");
         textPanel_h = new textWidget(
             windowWidth_a / 2 - 10,

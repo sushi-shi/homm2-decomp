@@ -69,10 +69,10 @@ i16 wsnet_init(void) {
     }
     gbRemoteOn = 1;
     ppDPRcvBuffer = static_cast<u8**>(
-        H2_ALLOC(WS_TRANSPORT_BUFFER_COUNT * sizeof(u8*), s_wsInitSourceLineBase + 0xa)
+        H2_ALLOC(WS_TRANSPORT_BUFFER_COUNT * sizeof(u8*), 71)
     );
     piDPRcvBufferSize = static_cast<i32*>(
-        H2_ALLOC(WS_TRANSPORT_BUFFER_COUNT * sizeof(i32), s_wsInitSourceLineBase + 0xb)
+        H2_ALLOC(WS_TRANSPORT_BUFFER_COUNT * sizeof(i32), 72)
     );
     memset(ppDPRcvBuffer, 0, WS_TRANSPORT_BUFFER_COUNT * sizeof(u8*));
     memset(piDPRcvBufferSize, 0, WS_TRANSPORT_BUFFER_COUNT * sizeof(i32));
@@ -207,10 +207,10 @@ void wsnet_term(void) {
     if (sd_dg != INVALID_SOCKET)
         closesocket(sd_dg);
     if (ppDPRcvBuffer != 0)
-        H2_FREE(ppDPRcvBuffer, s_wsTermSourceLineBase + 7);
+        H2_FREE(ppDPRcvBuffer, 255);
     ppDPRcvBuffer = 0;
     if (piDPRcvBufferSize != 0)
-        H2_FREE(piDPRcvBufferSize, s_wsTermSourceLineBase + 0xb);
+        H2_FREE(piDPRcvBufferSize, 259);
     piDPRcvBufferSize = 0;
     WSACleanup();
     bHostFound = 0;
@@ -231,7 +231,7 @@ void wsnet_term(void) {
 // were tested; the exact label/pointer-index form was rejected as less source-faithful.
 VA(0x00406f37, 0x1f5)
 void wsSendMessage(i32 destination, u8 type, u16 size, void* data) {
-    u8* packetBuffer = static_cast<u8*>(H2_ALLOC(size + 1, s_wsSendSourceLineBase + 2));
+    u8* packetBuffer = static_cast<u8*>(H2_ALLOC(size + 1, 281));
     struct sockaddr_in peerAddress;
     i32 attemptCount;
     i32 error;
@@ -283,7 +283,7 @@ void wsSendMessage(i32 destination, u8 type, u16 size, void* data) {
             return;
         }
     }
-    H2_FREE(packetBuffer, s_wsSendSourceLineBase + 0x39);
+    H2_FREE(packetBuffer, 336);
 }
 
 VA(0x0040712c, 0x61)
@@ -312,7 +312,7 @@ i16 wsnet_rcv(i16, u16, void* data) {
         return 0;
     size = piDPRcvBufferSize[iDPRcvBufferTail];
     memcpy(data, ppDPRcvBuffer[iDPRcvBufferTail], size);
-    H2_FREE(ppDPRcvBuffer[iDPRcvBufferTail], s_wsReceiveSourceLineBase + 9);
+    H2_FREE(ppDPRcvBuffer[iDPRcvBufferTail], 368);
     iDPRcvBufferTail = (iDPRcvBufferTail + 1) % WS_TRANSPORT_BUFFER_COUNT;
     return static_cast<i16>(size);
 }
@@ -364,7 +364,7 @@ void wsEvaluateMessage(u32l size, i32 sender) {
     switch (rcvBufIn[0]) {
         case NETWORK_PACKET_DATA:
             ppDPRcvBuffer[iDPRcvBufferHead] =
-                static_cast<u8*>(H2_ALLOC(size - 1, s_wsEvaluateSourceLineBase + 10));
+                static_cast<u8*>(H2_ALLOC(size - 1, 423));
             memcpy(ppDPRcvBuffer[iDPRcvBufferHead], rcvBufIn + 1, size - 1);
             piDPRcvBufferSize[iDPRcvBufferHead] = size;
             iDPRcvBufferHead = (iDPRcvBufferHead + 1) % WS_TRANSPORT_BUFFER_COUNT;
