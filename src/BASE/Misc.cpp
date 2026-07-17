@@ -1516,7 +1516,7 @@ i32l FileSize(char *filename)
 VA(0x004c6920, 0xc)
 struct IconEntry * GetIconEntry(class icon *iconPtr, i32 index)
 {
-    return reinterpret_cast<IconEntry *>(iconPtr->m_data) + index;
+    return &iconPtr->Entries()[index];
 }
 
 #include <BASE/SeededRandomConstants.h>

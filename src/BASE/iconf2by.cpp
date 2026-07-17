@@ -55,7 +55,7 @@ void FlipIconToBitmapYModify(class icon *srcIcon, class bitmap *dest, i32 x, i32
                              i8 *shear)
 {
     i32 clipWidth = clipW;
-    IconEntry *entries = reinterpret_cast<IconEntry *>(srcIcon->m_data);
+    IconEntry *entries = srcIcon->Entries();
     gFYEntry = &entries[frame];
     gFYSrc = reinterpret_cast<u8 *>(srcIcon->m_data) + gFYEntry->srcOffset;
     gFYX0 = ((x - gFYEntry->w) - gFYEntry->x) + 1;

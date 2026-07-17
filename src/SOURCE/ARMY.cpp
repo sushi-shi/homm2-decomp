@@ -2119,8 +2119,7 @@ void army::PowEffect(i32 effect, i32 resetLimits, i32 effectX, i32 effectY)
     gpCombatManager->DrawFrame(0, 1, 0, 1, ARMY_COMBAT_FRAME_DELAY, 1, 1);
     if (effectX != ARMY_NO_EFFECT) {
         for (index_10 = 0; index_10 < gCurLoadedSpellIcon->m_frameCount; index_10++) {
-            entry_1 = reinterpret_cast<IconEntry *>(
-                index_10 * sizeof(IconEntry) + gCurLoadedSpellIcon->m_data);
+            entry_1 = &gCurLoadedSpellIcon->Entries()[index_10];
             giMinExtentX = entry_1->x + effectX < giMinExtentX
                 ? entry_1->x + effectX : giMinExtentX;
             giMinExtentY = entry_1->y + effectY < giMinExtentY

@@ -113,20 +113,20 @@ void dropListWidget::Read(void)
     m_scrollTrackLastFrame = DROPLIST_FRAME_SCROLL_TRACK_LAST;
     m_scrollThumbFrame = DROPLIST_FRAME_SCROLL_THUMB;
     m_id = id;
-    IconEntry *iconEntries = reinterpret_cast<IconEntry *>(m_icon->m_data);
+    IconEntry *iconEntries = m_icon->Entries();
     i16 iconX = m_x;
     i16 iconY = m_y;
-    IconEntry *closedContentEntry = iconEntries + DROPLIST_FRAME_CLOSED_CONTENT;
+    IconEntry *closedContentEntry = &iconEntries[DROPLIST_FRAME_CLOSED_CONTENT];
     m_iconX = iconX;
     m_iconY = iconY;
     m_closedContentWidth = closedContentEntry->w;
     m_closedContentHeight = closedContentEntry->h;
-    IconEntry *dropButtonEntry = iconEntries + DROPLIST_FRAME_DROP_BUTTON;
+    IconEntry *dropButtonEntry = &iconEntries[DROPLIST_FRAME_DROP_BUTTON];
     m_dropButtonX = iconX + m_closedContentWidth;
     m_dropButtonY = iconY;
     m_dropButtonWidth = dropButtonEntry->w;
     m_dropButtonHeight = dropButtonEntry->h;
-    IconEntry *scrollThumbEntry = iconEntries + DROPLIST_FRAME_SCROLL_THUMB;
+    IconEntry *scrollThumbEntry = &iconEntries[DROPLIST_FRAME_SCROLL_THUMB];
     m_scrollThumbWidth = scrollThumbEntry->w;
     m_scrollThumbHeight = scrollThumbEntry->h;
 }
@@ -394,22 +394,22 @@ void dropListWidget::ProcessSelectDialog(void)
         m_visibleItemCount = numItems;
     }
 
-    i16 topHeight = reinterpret_cast<IconEntry *>(m_icon->m_data)[m_firstRowFrame].h;
+    i16 topHeight = m_icon->Entries()[m_firstRowFrame].h;
     m_firstRowHeight = topHeight;
-    i16 middleHeight = reinterpret_cast<IconEntry *>(m_icon->m_data)[m_middleRowFrame].h;
+    i16 middleHeight = m_icon->Entries()[m_middleRowFrame].h;
     m_middleRowHeight = middleHeight;
-    i16 bottomHeight = reinterpret_cast<IconEntry *>(m_icon->m_data)[m_lastRowFrame].h;
+    i16 bottomHeight = m_icon->Entries()[m_lastRowFrame].h;
     m_lastRowHeight = bottomHeight;
     m_listX = m_iconX;
     m_listY = m_iconY + m_closedContentHeight;
-    m_listWidth = reinterpret_cast<IconEntry *>(m_icon->m_data)[m_firstRowFrame].w;
+    m_listWidth = m_icon->Entries()[m_firstRowFrame].w;
     m_listHeight = (m_visibleItemCount - 2) * m_middleRowHeight + m_firstRowHeight + m_lastRowHeight;
-    iconEntry = reinterpret_cast<IconEntry *>(m_icon->m_data) + m_scrollUpFrame;
+    iconEntry = &m_icon->Entries()[m_scrollUpFrame];
     scrollWidth[0] = iconEntry->w;
     m_scrollUpWidth = scrollWidth[0];
     scrollTopHeight[0] = iconEntry->h;
     m_scrollUpHeight = scrollTopHeight[0];
-    iconEntry = reinterpret_cast<IconEntry *>(m_icon->m_data) + m_scrollDownFrame;
+    iconEntry = &m_icon->Entries()[m_scrollDownFrame];
     scrollBottomWidth[0] = iconEntry->w;
     m_scrollDownWidth = scrollBottomWidth[0];
     scrollBottomHeight = iconEntry->h;
