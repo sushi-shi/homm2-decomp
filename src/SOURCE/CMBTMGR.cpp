@@ -156,13 +156,13 @@ void combatManager::SetupCombat(
 
         m_catapultAttacksRemaining[side] = 1;
         m_catapultAttackCount[side] = m_catapultAttacksRemaining[side];
-        if (m_heroes[side] != 0 && m_heroes[side]->HasArtifact(ARTIFACT_BALLISTA)) {
+        if (m_heroes[side] != 0 && m_heroes[side]->HasArtifact(IDX(ARTIFACT_BALLISTA))) {
             m_catapultAttacksRemaining[side] = 2;
             m_catapultAttackCount[side] = m_catapultAttacksRemaining[side];
         }
         if (m_heroes[side] != 0
             && m_heroes[side]->m_secondarySkills[IDX(HERO_SKILL_BALLISTICS)]
-                   >= HERO_SKILL_LEVEL_ADVANCED) {
+                   >= IDX(HERO_SKILL_LEVEL_ADVANCED)) {
             m_catapultAttackCount[side]++;
             m_catapultAttacksRemaining[side]++;
         }
@@ -181,13 +181,13 @@ void combatManager::SetupCombat(
             m_visitingHeroPresent[COMBAT_DEFENDER_SIDE] = 0;
         }
 
-        if (defenderTown->m_buildings & TOWN_BUILDING_CASTLE)
+        if (defenderTown->m_buildings & IDX(TOWN_BUILDING_CASTLE))
             m_inCastleCombat = true;
         else
             m_inCastleCombat = false;
 
         if (m_inCastleCombat != 0) {
-            if (defenderTown->m_buildings & TOWN_BUILDING_MOAT)
+            if (defenderTown->m_buildings & IDX(TOWN_BUILDING_MOAT))
                 m_drawbridgeBackgroundVisible = 1;
             else
                 m_drawbridgeBackgroundVisible = 0;
@@ -198,7 +198,7 @@ void combatManager::SetupCombat(
         m_originalCombatTown = m_combatTowns[COMBAT_DEFENDER_SIDE];
 
         if (m_heroes[COMBAT_DEFENDER_SIDE] == 0
-            && (defenderTown->m_buildings & TOWN_BUILDING_CAPTAIN_QUARTERS)) {
+            && (defenderTown->m_buildings & IDX(TOWN_BUILDING_CAPTAIN_QUARTERS))) {
             m_heroes[COMBAT_DEFENDER_SIDE] = &m_captain;
             memset(&m_captain, 0, sizeof(m_captain));
             for (side = 0; side < HERO_PRIMARY_STAT_COUNT; side++)
@@ -234,8 +234,8 @@ void combatManager::InitNonVisualVars(void) {
         m_spellPower[side] = 0;
         if (m_heroes[side] != 0)
             m_spellPower[side] = m_heroes[side]->Stats(HERO_PRIMARY_SPELL_POWER);
-        if (m_combatTowns[side] != 0 && m_combatTowns[side]->m_type == FACTION_NECROMANCER
-            && (m_combatTowns[side]->m_buildings & TOWN_BUILDING_SHRINE))
+        if (m_combatTowns[side] != 0 && m_combatTowns[side]->m_type == IDX(FACTION_NECROMANCER)
+            && (m_combatTowns[side]->m_buildings & IDX(TOWN_BUILDING_SHRINE)))
             m_spellPower[side] += 2;
     }
 
@@ -431,19 +431,19 @@ void combatManager::Close(void) {
             total += m_armyGroups[groupSide]->m_creatureCounts[index];
     }
 
-    if (m_battlefieldCell->m_triggerType == COMBAT_TRIGGER_MONSTER) {
+    if (m_battlefieldCell->m_triggerType == IDX(COMBAT_TRIGGER_MONSTER)) {
         if (total > 4000)
             total = 4000;
         m_battlefieldCell->m_objectMetadata = total & MAP_MONSTER_COUNT_MASK;
     }
 
-    if (m_battlefieldCell->m_triggerType == COMBAT_TRIGGER_MINE
+    if (m_battlefieldCell->m_triggerType == IDX(COMBAT_TRIGGER_MINE)
         && gpGame->m_mines[m_battlefieldCell->m_objectMetadata].guardianType != -1)
         gpGame->m_mines[m_battlefieldCell->m_objectMetadata].guardianCount = static_cast<u8>(total);
 
-    if (m_battlefieldCell->m_triggerType == COMBAT_TRIGGER_HERO) {
+    if (m_battlefieldCell->m_triggerType == IDX(COMBAT_TRIGGER_HERO)) {
         hero* combatHero = gpGame->GetHero(m_battlefieldCell->m_objectMetadata);
-        if (combatHero->m_locationType == COMBAT_TRIGGER_MINE
+        if (combatHero->m_locationType == IDX(COMBAT_TRIGGER_MINE)
             && gpGame->m_mines[combatHero->m_occupiedTown].guardianType != -1)
             gpGame->m_mines[combatHero->m_occupiedTown].guardianCount = static_cast<u8>(total);
     }
@@ -486,7 +486,7 @@ void combatManager::UpdateArmyGroup(i32 side) {
     }
 
     if (giSkeletonsCreated && m_combatResult == side)
-        m_armyGroups[side]->Add(CREATURE_SKELETON, giSkeletonsCreated, ARMY_GROUP_EMPTY_SLOT);
+        m_armyGroups[side]->Add(IDX(CREATURE_SKELETON), giSkeletonsCreated, ARMY_GROUP_EMPTY_SLOT);
 }
 
 VA(0x00491641, 0x365)
@@ -542,11 +542,11 @@ char* combatManager::GetBackgroundName(void) {
     m_colorCycleType = 1;
     m_battlefieldFringe = -1;
     switch (m_terrainType) {
-        case TERRAIN_WATER:
+        case IDX(TERRAIN_WATER):
             backgroundIndex = 0;
             m_battlefieldFringe = 13;
             break;
-        case TERRAIN_GRASS:
+        case IDX(TERRAIN_GRASS):
             if (MoreTreesNear()) {
                 backgroundIndex = 2;
                 m_battlefieldFringe = 12;
@@ -555,7 +555,7 @@ char* combatManager::GetBackgroundName(void) {
                 m_battlefieldFringe = 11;
             }
             break;
-        case TERRAIN_SNOW:
+        case IDX(TERRAIN_SNOW):
             m_colorCycleType = 3;
             if (MoreTreesNear()) {
                 backgroundIndex = 4;
@@ -565,20 +565,20 @@ char* combatManager::GetBackgroundName(void) {
                 m_battlefieldFringe = 7;
             }
             break;
-        case TERRAIN_SWAMP:
+        case IDX(TERRAIN_SWAMP):
             backgroundIndex = 6;
             m_battlefieldFringe = 8;
             break;
-        case TERRAIN_LAVA:
+        case IDX(TERRAIN_LAVA):
             backgroundIndex = 8;
             m_battlefieldFringe = 5;
             break;
-        case TERRAIN_DESERT:
+        case IDX(TERRAIN_DESERT):
             m_colorCycleType = 3;
             backgroundIndex = 10;
             m_battlefieldFringe = 4;
             break;
-        case TERRAIN_DIRT:
+        case IDX(TERRAIN_DIRT):
             if (MoreTreesNear()) {
                 backgroundIndex = 12;
                 m_battlefieldFringe = 10;
@@ -587,12 +587,12 @@ char* combatManager::GetBackgroundName(void) {
                 m_battlefieldFringe = 9;
             }
             break;
-        case TERRAIN_WASTELAND:
+        case IDX(TERRAIN_WASTELAND):
             m_colorCycleType = 3;
             backgroundIndex = 14;
             m_battlefieldFringe = 3;
             break;
-        case TERRAIN_BEACH:
+        case IDX(TERRAIN_BEACH):
             m_colorCycleType = 3;
             backgroundIndex = 16;
             m_battlefieldFringe = 2;
@@ -693,7 +693,7 @@ void combatManager::LoadIcons(void) {
     m_combatIcons[IDX(COMBAT_ICON_SMALL_VIEW_SPELL)] = gpResourceManager->GetIcon("spellinf.icn");
 
     if (m_inCastleCombat) {
-        if (m_combatTowns[COMBAT_DEFENDER_SIDE]->m_buildings & TOWN_BUILDING_MOAT) {
+        if (m_combatTowns[COMBAT_DEFENDER_SIDE]->m_buildings & IDX(TOWN_BUILDING_MOAT)) {
             m_combatIcons[IDX(COMBAT_ICON_MOAT)] = gpResourceManager->GetIcon("moatpart.icn");
             m_combatIcons[IDX(COMBAT_ICON_DRAWBRIDGE)] = gpResourceManager->GetIcon("moatwhol.icn");
         }
@@ -1131,23 +1131,23 @@ void combatManager::CatAttack(i32 side) {
     i32 advancedRoll5;
     i32 index28;
 
-    if (m_wallStates[IDX(COMBAT_WALL_SLOT_SECTION_FIRST)] != COMBAT_WALL_STATE_DESTROYED
-        && m_wallStates[IDX(COMBAT_WALL_SLOT_SECTION_FIRST)] != COMBAT_WALL_STATE_SECTION_DESTROYED)
+    if (m_wallStates[IDX(COMBAT_WALL_SLOT_SECTION_FIRST)] != IDX(COMBAT_WALL_STATE_DESTROYED)
+        && m_wallStates[IDX(COMBAT_WALL_SLOT_SECTION_FIRST)] != IDX(COMBAT_WALL_STATE_SECTION_DESTROYED))
         wallCount7++;
-    if (m_wallStates[IDX(COMBAT_WALL_SLOT_SECTION_SECOND)] != COMBAT_WALL_STATE_DESTROYED
+    if (m_wallStates[IDX(COMBAT_WALL_SLOT_SECTION_SECOND)] != IDX(COMBAT_WALL_STATE_DESTROYED)
         && m_wallStates[IDX(COMBAT_WALL_SLOT_SECTION_SECOND)]
-               != COMBAT_WALL_STATE_SECTION_DESTROYED)
+               != IDX(COMBAT_WALL_STATE_SECTION_DESTROYED))
         wallCount7++;
-    if (m_wallStates[IDX(COMBAT_WALL_SLOT_SECTION_THIRD)] != COMBAT_WALL_STATE_DESTROYED
-        && m_wallStates[IDX(COMBAT_WALL_SLOT_SECTION_THIRD)] != COMBAT_WALL_STATE_SECTION_DESTROYED)
+    if (m_wallStates[IDX(COMBAT_WALL_SLOT_SECTION_THIRD)] != IDX(COMBAT_WALL_STATE_DESTROYED)
+        && m_wallStates[IDX(COMBAT_WALL_SLOT_SECTION_THIRD)] != IDX(COMBAT_WALL_STATE_SECTION_DESTROYED))
         wallCount7++;
-    if (m_wallStates[IDX(COMBAT_WALL_SLOT_SECTION_FOURTH)] != COMBAT_WALL_STATE_DESTROYED
+    if (m_wallStates[IDX(COMBAT_WALL_SLOT_SECTION_FOURTH)] != IDX(COMBAT_WALL_STATE_DESTROYED)
         && m_wallStates[IDX(COMBAT_WALL_SLOT_SECTION_FOURTH)]
-               != COMBAT_WALL_STATE_SECTION_DESTROYED)
+               != IDX(COMBAT_WALL_STATE_SECTION_DESTROYED))
         wallCount7++;
-    if (m_wallStates[IDX(COMBAT_WALL_SLOT_TOP_TOWER)] == COMBAT_WALL_STATE_TOWER_STANDING)
+    if (m_wallStates[IDX(COMBAT_WALL_SLOT_TOP_TOWER)] == IDX(COMBAT_WALL_STATE_TOWER_STANDING))
         towerCount1++;
-    if (m_wallStates[IDX(COMBAT_WALL_SLOT_BOTTOM_TOWER)] == COMBAT_WALL_STATE_TOWER_STANDING)
+    if (m_wallStates[IDX(COMBAT_WALL_SLOT_BOTTOM_TOWER)] == IDX(COMBAT_WALL_STATE_TOWER_STANDING))
         towerCount1++;
 
     if (wallCount7 != 0) {
@@ -1164,14 +1164,14 @@ void combatManager::CatAttack(i32 side) {
     } else if (towerCount1 != 0) {
         random8 %= towerCount1;
         if (random8 == 1
-            || m_wallStates[IDX(COMBAT_WALL_SLOT_TOP_TOWER)] == COMBAT_WALL_STATE_DESTROYED)
+            || m_wallStates[IDX(COMBAT_WALL_SLOT_TOP_TOWER)] == IDX(COMBAT_WALL_STATE_DESTROYED))
             towerIndex27 = COMBAT_WALL_SLOT_BOTTOM_TOWER;
         else
             towerIndex27 = COMBAT_WALL_SLOT_TOP_TOWER;
     } else if (m_drawbridgeState != COMBAT_CASTLE_GATE_HIDDEN) {
         gateIndex2 = 1;
     } else {
-        if (m_wallStates[IDX(COMBAT_WALL_SLOT_KEEP)] == COMBAT_WALL_STATE_KEEP_STANDING)
+        if (m_wallStates[IDX(COMBAT_WALL_SLOT_KEEP)] == IDX(COMBAT_WALL_STATE_KEEP_STANDING))
             keepIndex6 = 0;
     }
 
@@ -1215,7 +1215,7 @@ void combatManager::CatAttack(i32 side) {
     i32 frame18;
 
     if (m_heroes[COMBAT_ATTACKER_SIDE]->m_secondarySkills[IDX(HERO_SKILL_BALLISTICS)]
-        == HERO_SKILL_LEVEL_NONE) {
+        == IDX(HERO_SKILL_LEVEL_NONE)) {
         firstRoll7 =
             SRandom(COMBAT_CATAPULT_BALLISTICS_ROLL_MIN, COMBAT_CATAPULT_BALLISTICS_ROLL_MAX);
         if (!gbHumanPlayer[m_heroes[COMBAT_ATTACKER_SIDE]->m_owner])
@@ -1227,7 +1227,7 @@ void combatManager::CatAttack(i32 side) {
             damageLevel13 = COMBAT_CATAPULT_DAMAGE_NONE;
         }
     } else if (m_heroes[COMBAT_ATTACKER_SIDE]->m_secondarySkills[IDX(HERO_SKILL_BALLISTICS)]
-               <= HERO_SKILL_LEVEL_ADVANCED) {
+               <= IDX(HERO_SKILL_LEVEL_ADVANCED)) {
         advancedRoll5 =
             SRandom(COMBAT_CATAPULT_BALLISTICS_ROLL_MIN, COMBAT_CATAPULT_BALLISTICS_ROLL_MAX);
         if (!gbHumanPlayer[m_heroes[COMBAT_ATTACKER_SIDE]->m_owner])
@@ -1235,7 +1235,7 @@ void combatManager::CatAttack(i32 side) {
         if (advancedRoll5 < COMBAT_CATAPULT_ADVANCED_DOUBLE_THRESHOLD)
             damageLevel13 = COMBAT_CATAPULT_DAMAGE_DOUBLE;
     } else if (m_heroes[COMBAT_ATTACKER_SIDE]->m_secondarySkills[IDX(HERO_SKILL_BALLISTICS)]
-               == HERO_SKILL_LEVEL_EXPERT) {
+               == IDX(HERO_SKILL_LEVEL_EXPERT)) {
         damageLevel13 = COMBAT_CATAPULT_DAMAGE_DOUBLE;
     }
 
@@ -1476,12 +1476,12 @@ void combatManager::KeepAttack(i32 tower) {
     if (!m_inCastleCombat)
         return;
     if ((tower == COMBAT_TOWER_SELECTOR_GARRISON
-         && m_wallStates[IDX(COMBAT_WALL_SLOT_KEEP)] != COMBAT_WALL_STATE_KEEP_STANDING)
+         && m_wallStates[IDX(COMBAT_WALL_SLOT_KEEP)] != IDX(COMBAT_WALL_STATE_KEEP_STANDING))
         || (tower == COMBAT_TOWER_SELECTOR_TOP
-            && m_wallStates[IDX(COMBAT_WALL_SLOT_TOP_TOWER)] != COMBAT_WALL_STATE_TOWER_STANDING)
+            && m_wallStates[IDX(COMBAT_WALL_SLOT_TOP_TOWER)] != IDX(COMBAT_WALL_STATE_TOWER_STANDING))
         || (tower == COMBAT_TOWER_SELECTOR_BOTTOM
             && m_wallStates[IDX(COMBAT_WALL_SLOT_BOTTOM_TOWER)]
-                   != COMBAT_WALL_STATE_TOWER_STANDING))
+                   != IDX(COMBAT_WALL_STATE_TOWER_STANDING)))
         return;
 
     LogStr("KA1");
@@ -1702,17 +1702,17 @@ void combatManager::SetupAndLoadObstacles(void) {
         for (cellIndex1 = 0; cellIndex1 < COMBAT_CASTLE_STRUCTURE_COUNT; cellIndex1++) {
             m_wallStates[cellIndex1 + COMBAT_WALL_SLOT_SECTION_FIRST] =
                 COMBAT_WALL_STATE_KEEP_STANDING;
-            if (m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type == FACTION_KNIGHT
+            if (m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type == IDX(FACTION_KNIGHT)
                 && (m_combatTowns[COMBAT_DEFENDER_SIDE]->m_buildings
-                    & TOWN_BUILDING_FORTIFICATIONS)) {
+                    & IDX(TOWN_BUILDING_FORTIFICATIONS))) {
                 m_wallStates[cellIndex1 + COMBAT_WALL_SLOT_SECTION_FIRST] =
                     COMBAT_WALL_STATE_SECTION_DAMAGE_FIRST;
             }
             m_wallStates[cellIndex1] = IDX(COMBAT_WALL_STATE_KEEP_STANDING);
         }
-        if (m_combatTowns[COMBAT_DEFENDER_SIDE]->m_buildings & TOWN_BUILDING_LEFT_TURRET)
+        if (m_combatTowns[COMBAT_DEFENDER_SIDE]->m_buildings & IDX(TOWN_BUILDING_LEFT_TURRET))
             m_wallStates[IDX(COMBAT_WALL_SLOT_TOP_TOWER)] = IDX(COMBAT_WALL_STATE_TOWER_STANDING);
-        if (m_combatTowns[COMBAT_DEFENDER_SIDE]->m_buildings & TOWN_BUILDING_RIGHT_TURRET)
+        if (m_combatTowns[COMBAT_DEFENDER_SIDE]->m_buildings & IDX(TOWN_BUILDING_RIGHT_TURRET))
             m_wallStates[IDX(COMBAT_WALL_SLOT_BOTTOM_TOWER)] = IDX(COMBAT_WALL_STATE_TOWER_STANDING);
 
         m_hexCells[IDX(COMBAT_CASTLE_HEX_TOP_TOWER)].m_blocked = 1;
@@ -1928,7 +1928,7 @@ i32 combatManager::ShotIsThroughWall(i32 side, i32 sourceHex, i32 targetHex) {
     if (!m_inCastleCombat)
         return 0;
     if (m_heroes[side]
-        && (m_heroes[side]->HasArtifact(ARTIFACT_GOLDEN_BOW)
+        && (m_heroes[side]->HasArtifact(IDX(ARTIFACT_GOLDEN_BOW))
             || m_heroes[side]->m_secondarySkills[IDX(HERO_SKILL_ARCHERY)])) {
         return 0;
     }
@@ -1976,7 +1976,7 @@ i32 combatManager::ShotIsThroughWall(i32 side, i32 sourceHex, i32 targetHex) {
                 return 1;
             }
             if (iTowerToHexCell[structureIndex0] == traceHex11
-                && m_wallStates[structureIndex0] != COMBAT_WALL_STATE_DESTROYED) {
+                && m_wallStates[structureIndex0] != IDX(COMBAT_WALL_STATE_DESTROYED)) {
                 return 1;
             }
             if (traceHex11 == COMBAT_CASTLE_HEX_GATE
@@ -2233,25 +2233,25 @@ i32 CombatSystemOptionsHandler(tag_message& message) {
                 || message.payload.widget.command == COMBAT_SYSTEM_OPTION_HOVER_EVENT) {
                 i32 helpIndex = -1;
                 switch (message.payload.widget.id) {
-                    case COMBAT_SYSTEM_OPTION_CLOSE_BUTTON:
+                    case IDX(COMBAT_SYSTEM_OPTION_CLOSE_BUTTON):
                         helpIndex = 0;
                         break;
-                    case COMBAT_SYSTEM_OPTION_SPEED_BUTTON:
+                    case IDX(COMBAT_SYSTEM_OPTION_SPEED_BUTTON):
                         helpIndex = 1;
                         break;
-                    case COMBAT_SYSTEM_OPTION_ARMY_INFO_BUTTON:
+                    case IDX(COMBAT_SYSTEM_OPTION_ARMY_INFO_BUTTON):
                         helpIndex = 2;
                         break;
-                    case COMBAT_SYSTEM_OPTION_AUTO_SPELL_BUTTON:
+                    case IDX(COMBAT_SYSTEM_OPTION_AUTO_SPELL_BUTTON):
                         helpIndex = 3;
                         break;
-                    case COMBAT_SYSTEM_OPTION_GRID_BUTTON:
+                    case IDX(COMBAT_SYSTEM_OPTION_GRID_BUTTON):
                         helpIndex = 4;
                         break;
-                    case COMBAT_SYSTEM_OPTION_SHADE_BUTTON:
+                    case IDX(COMBAT_SYSTEM_OPTION_SHADE_BUTTON):
                         helpIndex = 5;
                         break;
-                    case COMBAT_SYSTEM_OPTION_MOUSE_HEX_BUTTON:
+                    case IDX(COMBAT_SYSTEM_OPTION_MOUSE_HEX_BUTTON):
                         helpIndex = 6;
                         break;
                 }
@@ -2274,41 +2274,41 @@ i32 CombatSystemOptionsHandler(tag_message& message) {
             switch (message.payload.widget.command) {
                 case COMBAT_SYSTEM_OPTION_CLOSE_EVENT:
                     switch (message.payload.widget.id) {
-                        case COMBAT_SYSTEM_OPTION_CLOSE_BUTTON:
+                        case IDX(COMBAT_SYSTEM_OPTION_CLOSE_BUTTON):
                             bDone = 1;
                             break;
                     }
                     break;
                 case COMBAT_SYSTEM_OPTION_BUTTON_EVENT:
                     switch (message.payload.widget.id) {
-                        case COMBAT_SYSTEM_OPTION_SPEED_BUTTON:
+                        case IDX(COMBAT_SYSTEM_OPTION_SPEED_BUTTON):
                             gConfig.combatSpeed =
                                 (gConfig.combatSpeed + 1) % COMBAT_SYSTEM_OPTION_CYCLE_COUNT;
                             bRedraw = 1;
                             bCPrefsChanged = 1;
                             break;
-                        case COMBAT_SYSTEM_OPTION_ARMY_INFO_BUTTON:
+                        case IDX(COMBAT_SYSTEM_OPTION_ARMY_INFO_BUTTON):
                             gConfig.combatArmyInfoLevel = (gConfig.combatArmyInfoLevel + 1)
                                                           % COMBAT_SYSTEM_OPTION_CYCLE_COUNT;
                             bRedraw = 1;
                             bCPrefsChanged = 1;
                             break;
-                        case COMBAT_SYSTEM_OPTION_AUTO_SPELL_BUTTON:
+                        case IDX(COMBAT_SYSTEM_OPTION_AUTO_SPELL_BUTTON):
                             gConfig.autoCombatUseSpells = 1 - gConfig.autoCombatUseSpells;
                             bRedraw = 1;
                             bCPrefsChanged = 1;
                             break;
-                        case COMBAT_SYSTEM_OPTION_GRID_BUTTON:
+                        case IDX(COMBAT_SYSTEM_OPTION_GRID_BUTTON):
                             gConfig.showCombatGrid = 1 - gConfig.showCombatGrid;
                             bRedraw = 1;
                             bCPrefsChanged = 1;
                             break;
-                        case COMBAT_SYSTEM_OPTION_SHADE_BUTTON:
+                        case IDX(COMBAT_SYSTEM_OPTION_SHADE_BUTTON):
                             gConfig.combatShadeLevel = 1 - gConfig.combatShadeLevel;
                             bRedraw = 1;
                             bCPrefsChanged = 1;
                             break;
-                        case COMBAT_SYSTEM_OPTION_MOUSE_HEX_BUTTON:
+                        case IDX(COMBAT_SYSTEM_OPTION_MOUSE_HEX_BUTTON):
                             gConfig.showCombatMouseHex = 1 - gConfig.showCombatMouseHex;
                             bRedraw = 1;
                             bCPrefsChanged = 1;

@@ -1374,34 +1374,34 @@ i32 game::ProcessNGKeyPress(struct tag_message& message) {
                     scanCode =
                         static_cast<u8>(static_cast<u32>(message.payload.keyboard.keyCode) >> 8);
                     switch (scanCode) {
-                        case NEW_GAME_KEYPAD_INSERT:
+                        case IDX(NEW_GAME_KEYPAD_INSERT):
                             keyChar = '0';
                             break;
-                        case NEW_GAME_KEYPAD_END:
+                        case IDX(NEW_GAME_KEYPAD_END):
                             keyChar = '1';
                             break;
-                        case NEW_GAME_KEYPAD_DOWN:
+                        case IDX(NEW_GAME_KEYPAD_DOWN):
                             keyChar = '2';
                             break;
-                        case NEW_GAME_KEYPAD_PAGE_DOWN:
+                        case IDX(NEW_GAME_KEYPAD_PAGE_DOWN):
                             keyChar = '3';
                             break;
-                        case NEW_GAME_KEYPAD_LEFT:
+                        case IDX(NEW_GAME_KEYPAD_LEFT):
                             keyChar = '4';
                             break;
-                        case NEW_GAME_KEYPAD_CENTER:
+                        case IDX(NEW_GAME_KEYPAD_CENTER):
                             keyChar = '5';
                             break;
-                        case NEW_GAME_KEYPAD_RIGHT:
+                        case IDX(NEW_GAME_KEYPAD_RIGHT):
                             keyChar = '6';
                             break;
-                        case NEW_GAME_KEYPAD_HOME:
+                        case IDX(NEW_GAME_KEYPAD_HOME):
                             keyChar = '7';
                             break;
-                        case NEW_GAME_KEYPAD_UP:
+                        case IDX(NEW_GAME_KEYPAD_UP):
                             keyChar = '8';
                             break;
-                        case NEW_GAME_KEYPAD_PAGE_UP:
+                        case IDX(NEW_GAME_KEYPAD_PAGE_UP):
                             keyChar = '9';
                             break;
                     }
@@ -1535,11 +1535,11 @@ void game::ShowScenInfo(void) {
     scenarioWindowValue->BroadcastMessage(scenarioMessageTemp);
 
     mapSizeIndex = 0;
-    if (m_mapHeader.width == MAP_DIMENSION_MEDIUM)
+    if (m_mapHeader.width == IDX(MAP_DIMENSION_MEDIUM))
         mapSizeIndex = 1;
-    else if (m_mapHeader.width == MAP_DIMENSION_LARGE)
+    else if (m_mapHeader.width == IDX(MAP_DIMENSION_LARGE))
         mapSizeIndex = 2;
-    else if (m_mapHeader.width == MAP_DIMENSION_XLARGE)
+    else if (m_mapHeader.width == IDX(MAP_DIMENSION_XLARGE))
         mapSizeIndex = 3;
     scenarioMessageTemp.payload.widget.id = NEW_GAME_SCENARIO_MAP_SIZE;
     scenarioMessageTemp.payload.widget.data.text = cMapSize[mapSizeIndex];
@@ -1836,7 +1836,7 @@ void game::GetLossConditionText(char* text) {
     town* lossTown9;
     i32 townId12;
 
-    if (m_mapHeader.lossCondition != MAP_LOSS_STANDARD) {
+    if (m_mapHeader.lossCondition != IDX(MAP_LOSS_STANDARD)) {
         switch (m_mapHeader.lossCondition) {
             case IDX(MAP_LOSS_TOWN):
                 townId12 = GetTownId(m_mapHeader.lossConditionValue, m_mapHeader.lossTownY);
@@ -1844,7 +1844,7 @@ void game::GetLossConditionText(char* text) {
                 sprintf(
                     text,
                     "Lose the %s '%s'.",
-                    (lossTown9->m_buildings & TOWN_BUILDING_CASTLE) ? "castle" : "town",
+                    (lossTown9->m_buildings & IDX(TOWN_BUILDING_CASTLE)) ? "castle" : "town",
                     lossTown9->m_name
                 );
                 break;
@@ -1886,7 +1886,7 @@ void game::GetVictoryConditionText(char* text) {
     town* victoryTown;
     i32 townId;
 
-    if (m_mapHeader.victoryCondition != MAP_VICTORY_DEFEAT_ALL) {
+    if (m_mapHeader.victoryCondition != IDX(MAP_VICTORY_DEFEAT_ALL)) {
         switch (m_mapHeader.victoryCondition) {
             case IDX(MAP_VICTORY_CAPTURE_TOWN):
                 townId = GetTownId(m_mapHeader.victoryConditionValue, m_mapHeader.victoryTownY);
@@ -1894,7 +1894,7 @@ void game::GetVictoryConditionText(char* text) {
                 sprintf(
                     text,
                     "Capture the %s '%s'",
-                    (victoryTown->m_buildings & TOWN_BUILDING_CASTLE) ? "castle" : "town",
+                    (victoryTown->m_buildings & IDX(TOWN_BUILDING_CASTLE)) ? "castle" : "town",
                     victoryTown->m_name
                 );
                 break;
@@ -1937,7 +1937,7 @@ void game::GetVictoryConditionText(char* text) {
                     sprintf(text, "%s must defeat %s", secondSideValue, firstSide);
         }
 
-        if (m_mapHeader.victoryCondition != MAP_VICTORY_DEFEAT_SIDE
+        if (m_mapHeader.victoryCondition != IDX(MAP_VICTORY_DEFEAT_SIDE)
             && m_mapHeader.allowNormalVictory != 0)
             strcat(
                 text,

@@ -147,7 +147,7 @@ inline void soundManager::MIDISetVolume(void) {
                 volume = ((m_fadeSteps - MIDI_VOLUME_FADE_SPLIT) * MIDI_MAX_VOLUME)
                          / MIDI_VOLUME_HIGH_RANGE;
         }
-        AIL_set_XMIDI_master_volume(hMDI, ConvertVolume(volume, SOUND_VOLUME_MUSIC));
+        AIL_set_XMIDI_master_volume(hMDI, ConvertVolume(volume, IDX(SOUND_VOLUME_MUSIC)));
     }
 }
 

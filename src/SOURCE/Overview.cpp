@@ -152,7 +152,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
 
             {
                 i32 townFrame = record->m_type;
-                if ((record->m_buildings & TOWN_BUILDING_CASTLE) == 0) {
+                if ((record->m_buildings & IDX(TOWN_BUILDING_CASTLE)) == 0) {
                     townFrame += 6;
                 }
                 OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] = new iconWidget(
@@ -199,7 +199,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
             if (record->m_occupyingHeroId != -1) {
                 heroData0 = GetHero(record->m_occupyingHeroId);
             } else {
-                if ((record->m_buildings & TOWN_BUILDING_CAPTAIN_QUARTERS) != 0) {
+                if ((record->m_buildings & IDX(TOWN_BUILDING_CAPTAIN_QUARTERS)) != 0) {
                     hasCaptain = 1;
                 }
             }
@@ -262,7 +262,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                 iconCount++;
 
                 i32 captainMana =
-                    record->m_type == FACTION_BARBARIAN || record->m_type == FACTION_KNIGHT ? 10
+                    record->m_type == IDX(FACTION_BARBARIAN) || record->m_type == IDX(FACTION_KNIGHT) ? 10
                                                                                             : 20;
                 OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] = new iconWidget(
                     151,
@@ -648,7 +648,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
 
             i32 displayedArtifacts = 0;
             for (item = 0; item < OVERVIEW_ARTIFACT_SLOTS; item++) {
-                if (heroData0->m_artifacts[item] != ARTIFACT_NONE) {
+                if (heroData0->m_artifacts[item] != IDX(ARTIFACT_NONE)) {
                     detailRow = displayedArtifacts / OVERVIEW_ARTIFACT_COLUMNS;
                     detailColumn = displayedArtifacts % OVERVIEW_ARTIFACT_COLUMNS;
                     OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] = new iconWidget(
@@ -873,7 +873,7 @@ void game::Overview(void) {
     message8.payload.widget.data.text = gText;
     sprintf(gText, "%d", ComputeDailyGold(giCurPlayer));
     overWin->BroadcastMessage(message8);
-    SetupNewOverviewType(giOverviewType, 0);
+    SetupNewOverviewType(IDX(giOverviewType), 0);
     gpWindowManager->DoDialog(overWin, OverviewHandler, 1);
     gpWindowManager->FadeScreen(1, OVERVIEW_FADE_STEPS, 0);
     delete overWin;
@@ -1028,7 +1028,7 @@ i32 OverviewHandler(struct tag_message& message) {
                         }
                     selectHeroes:
                         if (giOverviewType != OVERVIEW_HEROES) {
-                            gpGame->SetupNewOverviewType(OVERVIEW_HEROES, 1);
+                            gpGame->SetupNewOverviewType(IDX(OVERVIEW_HEROES), 1);
                         }
                         break;
                     case OVERVIEW_TOWN_TAB_WIDGET:
@@ -1037,7 +1037,7 @@ i32 OverviewHandler(struct tag_message& message) {
                         }
                     selectTowns:
                         if (giOverviewType != OVERVIEW_TOWNS) {
-                            gpGame->SetupNewOverviewType(OVERVIEW_TOWNS, 1);
+                            gpGame->SetupNewOverviewType(IDX(OVERVIEW_TOWNS), 1);
                         }
                         break;
                     default:

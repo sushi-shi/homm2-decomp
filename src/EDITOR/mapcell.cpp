@@ -66,7 +66,7 @@ i32 fullMap::GetNewCellExtraIndex(void) {
     i32 j;           // loop2 counter  -> -0xc
 
     for (nb = 1; nb < extraCount; nb++) {
-        if (extras[nb].nextIndex == MAPCELL_EXTRA_FREE) {
+        if (extras[nb].nextIndex == IDX(MAPCELL_EXTRA_FREE)) {
             ClearCellExtra(nb);
             return nb;
         }
@@ -148,7 +148,7 @@ mapCellExtra* fullMap::GetNewCellExtraOverlay(i32 x, i32 y) {
         ix = Row(y)[x].m_extraIndex;
         node = Extra(Row(y)[x].m_extraIndex);
         for (;;) {
-            if (node->overlayIndex == MAPCELL_SPRITE_NONE)
+            if (node->overlayIndex == IDX(MAPCELL_SPRITE_NONE))
                 return node;
             if (node->nextIndex == 0) {
                 ni = GetNewCellExtraIndex();
@@ -178,7 +178,7 @@ mapCellExtra* fullMap::GetNewCellExtraObject(i32 x, i32 y) {
         ix = Row(y)[x].m_extraIndex;
         node = Extra(Row(y)[x].m_extraIndex);
         for (;;) {
-            if (node->objectIndex == MAPCELL_SPRITE_NONE)
+            if (node->objectIndex == IDX(MAPCELL_SPRITE_NONE))
                 return node;
             if (node->nextIndex == 0) {
                 ni = GetNewCellExtraIndex();
@@ -225,11 +225,11 @@ void fullMap::ChangeTilesetIndex(
         t = tileset;
 
     if (overlay == 0) {
-        if (cell->m_objectIndex != MAPCELL_SPRITE_NONE && cell->m_objectTileset != tileset) {
+        if (cell->m_objectIndex != IDX(MAPCELL_SPRITE_NONE) && cell->m_objectTileset != tileset) {
             idx = cell->m_extraIndex;
             while (idx != 0) {
                 ptr = Extra(idx);
-                if (ptr->objectIndex != MAPCELL_SPRITE_NONE && ptr->objectTileset != tileset) {
+                if (ptr->objectIndex != IDX(MAPCELL_SPRITE_NONE) && ptr->objectTileset != tileset) {
                     idx = ptr->nextIndex;
                 } else {
                     ptr->animatedObject = 0;
@@ -255,11 +255,11 @@ void fullMap::ChangeTilesetIndex(
             cell->m_objectIndex = index;
         }
     } else {
-        if (cell->m_overlayIndex != MAPCELL_SPRITE_NONE && cell->m_overlayTileset != tileset) {
+        if (cell->m_overlayIndex != IDX(MAPCELL_SPRITE_NONE) && cell->m_overlayTileset != tileset) {
             idx = cell->m_extraIndex;
             while (idx != 0) {
                 ptr = Extra(idx);
-                if (ptr->overlayIndex != MAPCELL_SPRITE_NONE && ptr->overlayTileset != tileset) {
+                if (ptr->overlayIndex != IDX(MAPCELL_SPRITE_NONE) && ptr->overlayTileset != tileset) {
                     idx = ptr->nextIndex;
                 } else {
                     ptr->animatedOverlay = 0;

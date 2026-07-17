@@ -305,7 +305,7 @@ i32 TradingPostHandler(struct tag_message& message) {
         switch (message.payload.widget.command) {
             case WIDGET_COMMAND_SELECT:
                 switch (message.payload.widget.id) {
-                    case TRADING_POST_TRACK:
+                    case IDX(TRADING_POST_TRACK):
                         if (iMaxUnitsToTrade == 0) {
                         } else {
                             knobPositionValue = message.payload.widget.screenX - tpX
@@ -358,7 +358,7 @@ i32 TradingPostHandler(struct tag_message& message) {
                     case NORMAL_DIALOG_BUTTON_TWO:
                         exitFlag = 1;
                         break;
-                    case TRADING_POST_EXECUTE:
+                    case IDX(TRADING_POST_EXECUTE):
                         if (qtyToTrade == 0)
                             break;
                         if (bLeftDenominated != 0) {
@@ -373,13 +373,13 @@ i32 TradingPostHandler(struct tag_message& message) {
                         leftResource = rightResource;
                         updateDisplay = 1;
                         break;
-                    case TRADING_POST_DECREMENT:
+                    case IDX(TRADING_POST_DECREMENT):
                         if (qtyToTrade > 0) {
                             --qtyToTrade;
                             updateDisplay = 1;
                         }
                         break;
-                    case TRADING_POST_INCREMENT:
+                    case IDX(TRADING_POST_INCREMENT):
                         if (iMaxUnitsToTrade > qtyToTrade) {
                             ++qtyToTrade;
                             updateDisplay = 1;

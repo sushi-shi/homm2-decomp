@@ -58,7 +58,7 @@ i32 armyGroup::GetMorale(hero* armyHero, town* occupiedTown, armyGroup* enemyGro
     enemyHasBoneDragon = 0;
     if (enemyGroup != 0) {
         for (index = 0; index < ARMY_GROUP_SLOT_COUNT; ++index) {
-            if (enemyGroup->m_creatureTypes[index] == CREATURE_BONE_DRAGON)
+            if (enemyGroup->m_creatureTypes[index] == IDX(CREATURE_BONE_DRAGON))
                 enemyHasBoneDragon = 1;
         }
     }
@@ -67,24 +67,24 @@ i32 armyGroup::GetMorale(hero* armyHero, town* occupiedTown, armyGroup* enemyGro
         --morale;
 
     if (armyHero != 0) {
-        if (armyHero->HasArtifact(ARTIFACT_BATTLE_GARB))
+        if (armyHero->HasArtifact(IDX(ARTIFACT_BATTLE_GARB)))
             return ARMY_GROUP_MORALE_MAX;
 
         morale += armyHero->m_secondarySkills[IDX(HERO_SKILL_LEADERSHIP)];
         morale += armyHero->m_morale;
-        if (armyHero->HasArtifact(ARTIFACT_MEDAL_OF_VALOR))
+        if (armyHero->HasArtifact(IDX(ARTIFACT_MEDAL_OF_VALOR)))
             ++morale;
-        if (armyHero->HasArtifact(ARTIFACT_MEDAL_OF_COURAGE))
+        if (armyHero->HasArtifact(IDX(ARTIFACT_MEDAL_OF_COURAGE)))
             ++morale;
-        if (armyHero->HasArtifact(ARTIFACT_MEDAL_OF_HONOR))
+        if (armyHero->HasArtifact(IDX(ARTIFACT_MEDAL_OF_HONOR)))
             ++morale;
-        if (armyHero->HasArtifact(ARTIFACT_MEDAL_OF_DISTINCTION))
+        if (armyHero->HasArtifact(IDX(ARTIFACT_MEDAL_OF_DISTINCTION)))
             ++morale;
-        if (armyHero->HasArtifact(ARTIFACT_FIZBIN_OF_MISFORTUNE))
+        if (armyHero->HasArtifact(IDX(ARTIFACT_FIZBIN_OF_MISFORTUNE)))
             morale -= 2;
-        if (armyHero->HasArtifact(ARTIFACT_ARM_OF_MARTYR))
+        if (armyHero->HasArtifact(IDX(ARTIFACT_ARM_OF_MARTYR)))
             hasSomeUndead = 1;
-        if (armyHero->HasArtifact(ARTIFACT_MASTHEAD)
+        if (armyHero->HasArtifact(IDX(ARTIFACT_MASTHEAD))
             && HAS(armyHero->m_eventFlags, HERO_EVENT_EMBARKED))
             ++morale;
     }
@@ -95,11 +95,11 @@ i32 armyGroup::GetMorale(hero* armyHero, town* occupiedTown, armyGroup* enemyGro
         alignmentValue = 0;
     morale += alignmentValue;
 
-    if (occupiedTown != 0 && occupiedTown->m_type != FACTION_NECROMANCER
-        && (occupiedTown->m_buildings & TOWN_BUILDING_TAVERN))
+    if (occupiedTown != 0 && occupiedTown->m_type != IDX(FACTION_NECROMANCER)
+        && (occupiedTown->m_buildings & IDX(TOWN_BUILDING_TAVERN)))
         ++morale;
-    if (occupiedTown != 0 && occupiedTown->m_type == FACTION_BARBARIAN
-        && (occupiedTown->m_buildings & TOWN_BUILDING_COLISEUM))
+    if (occupiedTown != 0 && occupiedTown->m_type == IDX(FACTION_BARBARIAN)
+        && (occupiedTown->m_buildings & IDX(TOWN_BUILDING_COLISEUM)))
         morale += 2;
 
     if (morale < ARMY_GROUP_MORALE_MIN)

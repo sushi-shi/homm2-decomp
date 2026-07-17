@@ -666,13 +666,13 @@ i32 ViewWorldDialogHandler(struct tag_message& message) {
                         && MAP_WIDTH <= VIEW_WORLD_FAR_MAX_MAP_SIZE)
                         break;
                     switch (MAP_HEIGHT) {
-                        case VIEW_WORLD_NEAR_MAX_MAP_SIZE:
+                        case IDX(VIEW_WORLD_NEAR_MAX_MAP_SIZE):
                             radarScale6 = 4.0f;
                             break;
-                        case VIEW_WORLD_MIDDLE_MAX_MAP_SIZE:
+                        case IDX(VIEW_WORLD_MIDDLE_MAX_MAP_SIZE):
                             radarScale6 = 2.0f;
                             break;
-                        case VIEW_WORLD_FAR_MAX_MAP_SIZE:
+                        case IDX(VIEW_WORLD_FAR_MAX_MAP_SIZE):
                             radarScale6 = 1.3333f;
                             break;
                         default:

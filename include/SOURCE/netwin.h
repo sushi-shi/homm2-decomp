@@ -40,6 +40,7 @@ HOMM2_ENUM_BEGIN(NetbiosCommand)
     NETBIOS_COMMAND_PROBE = 0x7f,
     NETBIOS_COMMAND_ASYNC = 0x80
 HOMM2_ENUM_END(NetbiosCommand)
+HOMM2_ENUM_FLAGS(NetbiosCommand)
 
 HOMM2_ENUM_BEGIN(NetbiosResult)
     NETBIOS_RESULT_SUCCESS = 0,
@@ -76,6 +77,7 @@ HOMM2_ENUM_BEGIN(NetbiosSessionStatus)
     NETBIOS_SESSION_CONNECTED = 8,
     NETBIOS_SESSION_ERROR = 0x80
 HOMM2_ENUM_END(NetbiosSessionStatus)
+HOMM2_ENUM_FLAGS(NetbiosSessionStatus)
 
 #pragma pack(push, 1)
 struct NetbiosControlBlock;

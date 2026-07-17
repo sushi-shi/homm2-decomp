@@ -465,7 +465,7 @@ i32 fileRequester::Main(struct tag_message& message) {
     switch (message.type) {
         case MESSAGE_KEY_DOWN:
             switch (message.payload.keyboard.keyCode) {
-                case FILE_REQUESTER_KEY_CYCLE_FILTER: {
+                case IDX(FILE_REQUESTER_KEY_CYCLE_FILTER): {
                     if (m_selectedIndex != FILE_REQUESTER_SELECTION_NONE) {
                         strcpy(cycleNameBuffer, m_fileNames[m_selectedIndex].text);
                     } else {
@@ -969,11 +969,11 @@ void fileRequester::Update(i32 drawWindow) {
 
         broadcastMessage.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
         broadcastMessage.payload.widget.id = FILE_REQUESTER_MAP_SIZE;
-        if (m_mapHeaders[m_selectedIndex].width == MAP_DIMENSION_SMALL) {
+        if (m_mapHeaders[m_selectedIndex].width == IDX(MAP_DIMENSION_SMALL)) {
             broadcastMessage.payload.widget.data.value = MAP_SIZE_FRAME_SMALL;
-        } else if (m_mapHeaders[m_selectedIndex].width == MAP_DIMENSION_MEDIUM) {
+        } else if (m_mapHeaders[m_selectedIndex].width == IDX(MAP_DIMENSION_MEDIUM)) {
             broadcastMessage.payload.widget.data.value = MAP_SIZE_FRAME_MEDIUM;
-        } else if (m_mapHeaders[m_selectedIndex].width == MAP_DIMENSION_LARGE) {
+        } else if (m_mapHeaders[m_selectedIndex].width == IDX(MAP_DIMENSION_LARGE)) {
             broadcastMessage.payload.widget.data.value = MAP_SIZE_FRAME_LARGE;
         } else {
             broadcastMessage.payload.widget.data.value = MAP_SIZE_FRAME_XLARGE;
@@ -1044,11 +1044,11 @@ void fileRequester::Update(i32 drawWindow) {
 
                 broadcastMessage.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
                 broadcastMessage.payload.widget.id = i + FILE_REQUESTER_MAP_SIZE_ICON_FIRST;
-                if (m_mapHeaders[m_topIndex + i].width == MAP_DIMENSION_SMALL) {
+                if (m_mapHeaders[m_topIndex + i].width == IDX(MAP_DIMENSION_SMALL)) {
                     broadcastMessage.payload.widget.data.value = MAP_SIZE_FRAME_SMALL;
-                } else if (m_mapHeaders[m_topIndex + i].width == MAP_DIMENSION_MEDIUM) {
+                } else if (m_mapHeaders[m_topIndex + i].width == IDX(MAP_DIMENSION_MEDIUM)) {
                     broadcastMessage.payload.widget.data.value = MAP_SIZE_FRAME_MEDIUM;
-                } else if (m_mapHeaders[m_topIndex + i].width == MAP_DIMENSION_LARGE) {
+                } else if (m_mapHeaders[m_topIndex + i].width == IDX(MAP_DIMENSION_LARGE)) {
                     broadcastMessage.payload.widget.data.value = MAP_SIZE_FRAME_LARGE;
                 } else {
                     broadcastMessage.payload.widget.data.value = MAP_SIZE_FRAME_XLARGE;
