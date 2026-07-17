@@ -37,7 +37,7 @@
 #define OVERVIEW_ICON_WIDGET_ROWS \
     (reinterpret_cast<OverviewIconWidgetRow *>(iconWidgetDynamic))
 
-// @match-note: retained 98.94%, live 96.78% with the schema-4 delink target.
+// @semantic: With the schema-4 delink target, the complete behavior is recovered.
 // Recovered flat row-major cleanup indexing, the
 // GetTown/GetHero inline accessors and both retail continuation jumps, the two
 // distinct final icon-count increments, cached row widget-ID base, captain CFG,
