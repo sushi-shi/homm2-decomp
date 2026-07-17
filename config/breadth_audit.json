@@ -2137,6 +2137,17 @@
     },
     {
       "unit": "SOURCE/AI",
+      "function": "?WalkTowardArmy@combatManager@@QAEHPAVarmy@@HH@Z",
+      "source_hash": "423874ae3de3",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 1,
+      "before": 96.04969,
+      "after": 96.04969,
+      "note": "Removed fake cast over the real moat array; complete frame/path CFG/relocs; residual is equivalent 2D army-index evaluation order; no behavior bug."
+    },
+    {
+      "unit": "SOURCE/AI",
       "function": "?WalkTowardArmyFront@combatManager@@QAEHPAVarmy@@HH@Z",
       "source_hash": "fc992b388363",
       "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
@@ -2150,12 +2161,12 @@
       "unit": "SOURCE/ARMY",
       "function": "?AttackTo@army@@QAEHH@Z",
       "source_hash": "478f87ba365c",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
-      "outcome": "exact",
-      "iterations": 1,
-      "before": 99.8855,
-      "after": 100.0,
-      "note": "Deterministic path-index local-name correction restores retail stack slots; all bytes and 18 relocs align."
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 2,
+      "before": 99.98473,
+      "after": 99.98473,
+      "note": "Complete frame/CFG/relocs; sole commutative member-compare load order resisted both operand orders and |0 steering; no behavior bug."
     },
     {
       "unit": "SOURCE/ARMY",
@@ -2172,12 +2183,12 @@
       "unit": "SOURCE/ARMY",
       "function": "?Damage@army@@QAEHJH@Z",
       "source_hash": "c5d767178626",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
-      "outcome": "exact",
-      "iterations": 1,
-      "before": 99.93056,
-      "after": 100.0,
-      "note": "Deterministic local-name bucket correction restores retail stack slots; all bytes and 15 relocs align."
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 95.65278,
+      "after": 95.65278,
+      "note": "Complete behavior/frame/CFG/relocs; first residual is equivalent current-side/current-index address evaluation order; no behavior bug."
     },
     {
       "unit": "SOURCE/ARMY",
@@ -2398,6 +2409,17 @@
       "before": 99.97605,
       "after": 99.97605,
       "note": "Reproduced the byte-proven TU-cumulative wall; size, frame, CFG, and 150 ordered relocations agree and previously exhausted commutations remain documented."
+    },
+    {
+      "unit": "SOURCE/CMBTMGR",
+      "function": "?CheckApplyBadMorale@combatManager@@QAEHHH@Z",
+      "source_hash": "6c3d4c250f53",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 94.86885,
+      "after": 94.86885,
+      "note": "Complete morale behavior/frame/CFG and effective external relocs; residual is equivalent 2D army-index evaluation plus local string aliases; no behavior bug."
     },
     {
       "unit": "SOURCE/CMBTMGR",
@@ -3456,6 +3478,39 @@
       "note": "Complete eight-direction object/terrain CFG and 66 relocations; residual begins with optimized occupied-array register ownership."
     },
     {
+      "unit": "SOURCE/FLY",
+      "function": "?CanFit@army@@QAEHHHPAH@Z",
+      "source_hash": "ca61f0c1f408",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "improved",
+      "iterations": 1,
+      "before": 95.85165,
+      "after": 95.98901,
+      "note": "Deterministic cell_9 naming restores retail cell/candidateHex stack slots; complete CFG and 14 relocs; wide-direction compiler shape remains."
+    },
+    {
+      "unit": "SOURCE/FLY",
+      "function": "?FlyTo@army@@QAEHH@Z",
+      "source_hash": "d6239cecd81e",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 96.81998,
+      "after": 96.81998,
+      "note": "Complete flight animation CFG and 119 ordered relocs; candidate frame remains three words short after previously exhausted local/aggregate forms; no behavior bug."
+    },
+    {
+      "unit": "SOURCE/FLY",
+      "function": "?ValidFlight@army@@QAEHHH@Z",
+      "source_hash": "0c841c30a294",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 98.36178,
+      "after": 98.36178,
+      "note": "Complete flight validation CFG and 18 ordered relocs; candidate frame remains two words short after previously exhausted local/aggregate forms; no behavior bug."
+    },
+    {
       "unit": "SOURCE/GAME",
       "function": "?CalcBaseScore@@YIHH@Z",
       "source_hash": "1f4082d38a49",
@@ -4160,6 +4215,17 @@
       "note": "Complete frame, slots, CFG, and 150 relocations; equality load order and third skill-row branch topology remain documented."
     },
     {
+      "unit": "SOURCE/HEXCELL",
+      "function": "?DrawUpperDeadOccupant@hexcell@@QAEXXZ",
+      "source_hash": "ad51fe2187b2",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 1,
+      "before": 90.51515,
+      "after": 90.51515,
+      "note": "Complete 0x10 frame/loop/relocs; equivalent 2D army-index operands load in reverse order and flattened indexing regressed; no behavior bug."
+    },
+    {
       "unit": "SOURCE/HISCORE",
       "function": "?Update@highScoreManager@@QAEXXZ",
       "source_hash": "5e862e03cbff",
@@ -4631,6 +4697,17 @@
       "before": 91.09677,
       "after": 100.0,
       "note": "Qualified direction operand in inverted adjacency subscript."
+    },
+    {
+      "unit": "SOURCE/PATH",
+      "function": "?GetAttackMask@army@@QAEHHHH@Z",
+      "source_hash": "47d936cf92f3",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 3,
+      "before": 98.78432,
+      "after": 98.78432,
+      "note": "Complete frame/loop/relocs; equivalent loop-bound operand order resisted reversed relation, 0[&local], and |0 steering; no behavior bug."
     },
     {
       "unit": "SOURCE/PATH",
@@ -5370,6 +5447,28 @@
       "note": "Retail initialization order and the unused-double bucket fixed all unmasked bytes; strict relocation-only proof now passes for 71 ordered effective targets."
     },
     {
+      "unit": "SOURCE/SEARCH",
+      "function": "?BuildPath@searchArray@@QAEHHHHHH@Z",
+      "source_hash": "11198ae50980",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 93.454544,
+      "after": 93.454544,
+      "note": "Complete /O2 path loop/CFG and effective relocs; retained entry register-allocation residual and one trailing alignment instruction; no behavior bug."
+    },
+    {
+      "unit": "SOURCE/SEARCH",
+      "function": "?SeedPosition@searchArray@@QAEXHHHHHHHHHHHH@Z",
+      "source_hash": "a9fe13065493",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 95.51873,
+      "after": 95.51873,
+      "note": "Complete /O2 queue/CFG and external relocs; retained register-allocation residual plus compiler-local static aliases; no behavior bug."
+    },
+    {
       "unit": "SOURCE/SETUP",
       "function": "?BaseSetupHandler@@YIHAAUtag_message@@@Z",
       "source_hash": "ecdba17223f9",
@@ -5478,6 +5577,17 @@
       "before": 99.89629,
       "after": 99.89629,
       "note": "Complete 0x510 frame/CFG and 334/334 relocs; only campaignChoice/global equality load order and its one-byte table shift remain."
+    },
+    {
+      "unit": "SOURCE/SPELLAI",
+      "function": "?ClearEffects@combatManager@@QAEXXZ",
+      "source_hash": "8fcae14db3c3",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "exact",
+      "iterations": 2,
+      "before": 90.63333,
+      "after": 100.0,
+      "note": "Contiguous-array spelling restores retail side-before-index lowering; all function bytes and relocation semantics are exact."
     },
     {
       "unit": "SOURCE/SPELLAI",
@@ -6050,6 +6160,39 @@
       "before": 98.83721,
       "after": 98.83721,
       "note": "Complete dialog CFG slots and 32 relocations; residual branch placement documented as semantic wall."
+    },
+    {
+      "unit": "SOURCE/VIEW",
+      "function": "?HandleViewGeneral@@YIHAAUtag_message@@@Z",
+      "source_hash": "38f2510e3a51",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "improved",
+      "iterations": 2,
+      "before": 95.489365,
+      "after": 97.026596,
+      "note": "Fixed runtime bug: retail opens contextual help on right mouse (0x200), not Left Shift (0x2); restored individual locals/init order; one frame word remains."
+    },
+    {
+      "unit": "SOURCE/VIEW",
+      "function": "?ViewArmy@combatManager@@QAEXPAVarmy@@H@Z",
+      "source_hash": "101f717cd611",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "improved",
+      "iterations": 4,
+      "before": 97.792076,
+      "after": 98.0198,
+      "note": "Recovered exact 0x24 frame and every local slot; geometry/call relocs agree; branchless facing-mask spelling remains; no behavior bug."
+    },
+    {
+      "unit": "SOURCE/VIEW",
+      "function": "?ViewGeneral@combatManager@@QAEHHHH@Z",
+      "source_hash": "1217f31d82b6",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "improved",
+      "iterations": 2,
+      "before": 98.85012,
+      "after": 99.459015,
+      "note": "Recovered individually allocated short locals and explicit null return; behavior/CFG and 71 ordered relocs agree; one unmodeled frame word remains."
     },
     {
       "unit": "SOURCE/Viewwrld",
