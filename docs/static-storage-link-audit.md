@@ -35,6 +35,13 @@ Retail storage classes come from the shipping PE:
 - The raw-backed prefix of `.data` is initialized writable storage.
 - The virtual portion of `.data` beyond its raw size is loader-zero storage.
 
+The final all-zero bytes physically present in raw `.data` can be linker file-alignment
+padding that overlaps the start of the original BSS contribution. The public-symbol audit
+classifies such a symbol as `data-loader-zero-padding` only when its retail RVA is wholly in
+that final zero tail and the candidate MAP independently places the allocation in `.bss` or
+`<common>`. This preserves the ambiguity in the PE alone while avoiding a false initialized-
+storage mismatch when the object-level evidence resolves it.
+
 Candidate symbols are joined by exact decorated name to the Microsoft LINK MAP.
 The containing MAP contribution classifies them as `.rdata`, initialized `.data`,
 or `.bss`/`<common>` loader-zero storage. Missing and multiply defined names remain

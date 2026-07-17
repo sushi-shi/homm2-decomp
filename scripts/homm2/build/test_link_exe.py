@@ -255,6 +255,29 @@ class LinkExeTest(unittest.TestCase):
         self.assertEqual(audit["symbols"][1]["candidate_storage"]["class"],
                          "data-loader-zero")
 
+    def test_static_symbol_audit_treats_corroborated_raw_zero_tail_as_bss(self):
+        retail = {"image_base": 0x400000, "sections": {
+            ".data": {"rva": 0x3000, "raw_size": 0x20, "virtual_size": 0x40},
+        }}
+        candidate = {"image_base": 0x400000, "sections": {
+            ".data": {"rva": 0x4000, "raw_size": 0x10, "virtual_size": 0x40},
+        }}
+        symbols = [{"name": "zeroed", "unit": "UNIT", "rva": 0x3018, "size": 0x10}]
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "test.map"
+            path.write_text(
+                " 0002:00000000 00000010H .data DATA\n"
+                " 0002:00000010 00000030H .bss DATA\n"
+                " 0002:00000010 zeroed 00404010 <common>\n")
+            audit = static_symbol_diagnostics(
+                retail, candidate, path, symbols,
+                retail_data_zero_tail_start=0x3014)
+        row = audit["symbols"][0]
+        self.assertEqual(row["retail_storage"]["class"],
+                         "data-loader-zero-padding")
+        self.assertTrue(row["storage_class_matches"])
+        self.assertEqual(audit["summary"]["storage_class_mismatches"], 0)
+
     def test_static_symbol_audit_reports_only_start_of_constant_displacement_run(self):
         retail = {"image_base": 0x400000, "sections": {
             ".rdata": {"rva": 0x2000, "raw_size": 0x40, "virtual_size": 0x40},

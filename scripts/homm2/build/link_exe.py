@@ -499,6 +499,26 @@ def compare_pe_section_bytes(retail_path, candidate_path, name, range_limit=32):
     }
 
 
+def pe_section_raw_zero_tail_start(path, name):
+    """Return the RVA where a PE section's final all-zero raw tail begins."""
+    data = Path(path).read_bytes()
+    pe_offset = struct.unpack_from("<I", data, 0x3C)[0]
+    coff = pe_offset + 4
+    section_count = struct.unpack_from("<H", data, coff + 2)[0]
+    optional_size = struct.unpack_from("<H", data, coff + 16)[0]
+    section_offset = coff + 20 + optional_size
+    for index in range(section_count):
+        offset = section_offset + index * COFF_SECTION_HEADER_SIZE
+        section_name = data[offset:offset + 8].split(b"\0", 1)[0].decode(
+            "ascii", "replace")
+        if section_name != name:
+            continue
+        rva, raw_size, raw_offset = struct.unpack_from("<III", data, offset + 12)
+        payload = data[raw_offset:raw_offset + raw_size]
+        return rva + len(payload.rstrip(b"\0"))
+    raise ValueError("missing PE section %s in %s" % (name, path))
+
+
 def read_pe_payload_evidence(path, rva, size, audit_kind="bytes"):
     """Read one PE span with relocation-normalized and optional pointer-target evidence."""
     data = Path(path).read_bytes()
@@ -1031,7 +1051,8 @@ def classify_missing_public_data(symbol, candidate_records):
     }
 
 
-def static_symbol_diagnostics(retail, candidate, map_path, retail_symbols=None):
+def static_symbol_diagnostics(retail, candidate, map_path, retail_symbols=None,
+                              retail_data_zero_tail_start=None):
     retail_symbols = (load_retail_data_symbols() if retail_symbols is None
                       else sorted(retail_symbols, key=lambda row: (row["rva"], row["name"])))
     contributions = parse_map_contributions(map_path)
@@ -1040,7 +1061,8 @@ def static_symbol_diagnostics(retail, candidate, map_path, retail_symbols=None):
         candidate_records[record["name"]].append(record)
 
     def normalized_storage(storage_class):
-        if storage_class in {"data-loader-zero", "data-loader-zero-tail"}:
+        if storage_class in {"data-loader-zero", "data-loader-zero-tail",
+                             "data-loader-zero-padding"}:
             return "data-loader-zero"
         return storage_class
 
@@ -1069,6 +1091,20 @@ def static_symbol_diagnostics(retail, candidate, map_path, retail_symbols=None):
             record = matches[0]
             candidate_rva = record["va"] - candidate["image_base"]
             candidate_storage = classify_candidate_storage(candidate, record, contributions)
+            if (retail_storage["class"] == "data-initialized" and
+                    candidate_storage["class"] == "data-loader-zero" and
+                    retail_data_zero_tail_start is not None and
+                    symbol["rva"] >= retail_data_zero_tail_start):
+                retail_storage = dict(retail_storage)
+                retail_storage.update({
+                    "class": "data-loader-zero-padding",
+                    "raw_zero_tail_start": retail_data_zero_tail_start,
+                    "evidence": (
+                        "Retail bytes from this symbol through the end of the raw .data "
+                        "payload are zero file-alignment padding; candidate MAP independently "
+                        "classifies the allocation as .bss."),
+                })
+                row["retail_storage"] = retail_storage
             candidate_section = candidate["sections"].get(candidate_storage["section"])
             candidate_storage["section_offset"] = (
                 candidate_rva - candidate_section["rva"] if candidate_section else None)
@@ -1328,7 +1364,8 @@ def resource_diagnostics(retail_path, candidate_path, retail, candidate):
     }
 
 
-def static_storage_diagnostics(retail, candidate, map_path, retail_symbols=None):
+def static_storage_diagnostics(retail, candidate, map_path, retail_symbols=None,
+                               retail_path=RETAIL_EXE):
     def section_pair(name):
         expected = retail["sections"].get(name, {"raw_size": 0, "virtual_size": 0, "rva": 0})
         actual = candidate["sections"].get(name, {"raw_size": 0, "virtual_size": 0, "rva": 0})
@@ -1368,7 +1405,9 @@ def static_storage_diagnostics(retail, candidate, map_path, retail_symbols=None)
         "retail_pe_size_of_uninitialized_data": retail["size_of_uninitialized_data"],
         "candidate_pe_size_of_uninitialized_data": candidate["size_of_uninitialized_data"],
         "public_symbols": static_symbol_diagnostics(
-            retail, candidate, map_path, retail_symbols=retail_symbols),
+            retail, candidate, map_path, retail_symbols=retail_symbols,
+            retail_data_zero_tail_start=pe_section_raw_zero_tail_start(
+                retail_path, ".data")),
         "retail_zero_fill_note": (
             "Retail has no map. PE evidence proves only a loader-zero writable .data tail; "
             "it does not prove that the entire tail was an independent .bss/common contribution."),

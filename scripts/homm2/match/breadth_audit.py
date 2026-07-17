@@ -15,17 +15,19 @@ import json
 import math
 import os
 import shutil
+import struct
 import sys
 import tempfile
 from pathlib import Path
 
+from homm2.build.canonicalize_data_symbols import CoffObject, SYMBOL_SIZE
 from homm2.match import status
 
 
 REPO = Path(os.environ.get("HOMM2_DIR", Path(__file__).resolve().parents[3]))
 STATE = REPO / "config/breadth_audit.json"
 STATE_VERSION = 1
-EPOCH_VERSION = 2
+EPOCH_VERSION = 3
 OUTCOMES = frozenset(("exact", "improved", "parked"))
 
 
@@ -43,6 +45,71 @@ def _sha256(path):
 
 def _json_bytes(value):
     return json.dumps(value, sort_keys=True, separators=(",", ":")).encode("utf-8")
+
+
+def _logical_target_sha256(path):
+    """Hash COFF comparison semantics, ignoring symbol/string-table record order."""
+    path = Path(path)
+    try:
+        coff = CoffObject(path.read_bytes())
+    except (OSError, ValueError, struct.error):
+        # Keep the epoch helper usable for explicit non-COFF test fixtures and
+        # fail closed on any byte change in an unrecognized target format.
+        return _sha256(path)
+
+    def symbol_base(symbol):
+        return (symbol.name, symbol.value, symbol.section, symbol.typ,
+                symbol.storage_class)
+
+    symbols = []
+    for symbol in coff.symbols.values():
+        aux_start = symbol.offset + SYMBOL_SIZE
+        aux_end = aux_start + symbol.aux_count * SYMBOL_SIZE
+        aux = coff.data[aux_start:aux_end]
+        if symbol.storage_class == 105 and symbol.aux_count and len(aux) >= 4:
+            target_index = struct.unpack_from("<I", aux)[0]
+            target = coff.symbols.get(target_index)
+            aux_identity = {
+                "weak_target": symbol_base(target) if target is not None else target_index,
+                "payload_after_target": aux[4:].hex(),
+            }
+        else:
+            aux_identity = {"payload": aux.hex()}
+        symbols.append({
+            "identity": symbol_base(symbol),
+            "aux_count": symbol.aux_count,
+            "aux": aux_identity,
+        })
+
+    relocations = []
+    for relocation in coff.relocations:
+        target = coff.symbols[relocation.symbol_index]
+        relocations.append({
+            "section": relocation.section,
+            "site": relocation.site,
+            "type": relocation.typ,
+            "target": symbol_base(target),
+        })
+
+    sections = []
+    for section in coff.sections:
+        sections.append({
+            "ordinal": section.index,
+            "name": section.name,
+            "raw_size": section.raw_size,
+            "characteristics": section.characteristics,
+            "payload_sha256": hashlib.sha256(
+                coff.section_bytes(section)).hexdigest(),
+            "relocations": sorted(
+                (row for row in relocations if row["section"] == section.index),
+                key=lambda row: (row["site"], row["type"], row["target"])),
+        })
+    identity = {
+        "schema": 1,
+        "sections": sections,
+        "symbols": sorted(symbols, key=lambda row: _json_bytes(row)),
+    }
+    return hashlib.sha256(_json_bytes(identity)).hexdigest()
 
 
 def comparison_epoch(repo=REPO, objdiff_cli=None):
@@ -84,7 +151,7 @@ def comparison_epoch(repo=REPO, objdiff_cli=None):
         if not target.is_file():
             raise AuditError("comparison target is missing: %s" % target)
         key = str(target)
-        digest_cache.setdefault(key, _sha256(target))
+        digest_cache.setdefault(key, _logical_target_sha256(target))
         targets.append({
             "unit": unit,
             "reference": reference,
