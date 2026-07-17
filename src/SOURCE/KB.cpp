@@ -713,7 +713,7 @@ i32 oldmain(void) {
         bShowIt = 1;
         gpMouseManager->SetPointer("advmice.mse", 0, OLD_MAIN_POINTER_TYPE);
         sprintf(
-            reinterpret_cast<char*>(&gcWinText),
+            gcWinText,
             "My heroes, our foes have been scattered, their castles broken and laid bare.  The "
             "great campaign is now complete, and I stand before you as the undisputed High "
             "King!\n\nOur victory was achieved in %d days!",
@@ -9650,7 +9650,7 @@ DATA(0x005285b0) i32 gbHitEvent;
 DATA(0x005285b4) i32 giMaxExtentX;
 DATA(0x005285b8) i32 giMaxExtentY;
 DATA(0x005285bc) i32 giRandomClouds;
-DATA(0x005285c0) char* cOverrideDigitalDriver;
+DATA(0x005285c0) char cOverrideDigitalDriver[0x10];
 DATA(0x005285d0) i32 giBottomViewOverrideEndTime;
 DATA(0x005285d8) i8 gArmyEffected[2][20];
 DATA(0x00528600) i32 giBottomViewResource;
@@ -9667,7 +9667,7 @@ DATA(0x00528630) SAMPLE2 NULL_SAMPLE2;
 DATA(0x00528638) i32 iMaxMapExtra;
 DATA(0x0052863c) palette* gPalette;
 DATA(0x00528640) resourceManager* gpResourceManager;
-DATA(0x00528648) char* gcBotViewText;
+DATA(0x00528648) char gcBotViewText[0x98];
 DATA(0x005286e0) i32 bSpecialHideCursor;
 DATA(0x005286e4) searchArray* gpSearchArray;
 DATA(0x005286e8) i32 giResType1;
@@ -9682,7 +9682,7 @@ DATA(0x00528938) i32 gCurLoadedSpellEffect;
 DATA(0x0052893c) class mouseManager* gpMouseManager;
 DATA(0x00528940) i32 giCurTempMobility;
 DATA(0x00528944) i32 giOverviewReturnAction;
-DATA(0x00528948) char* cOverrideMIDIDriver;
+DATA(0x00528948) char cOverrideMIDIDriver[0x10];
 DATA(0x00528958) icon* gSystemIcons;
 DATA(0x0052895c) i8 gbCombatSurrender;
 DATA(0x00528960) heroWindow* pNormalDialogWindow;
@@ -9759,7 +9759,7 @@ DATA(0x00529774) i32 gbTextEntryEscaped;
 DATA(0x00529778) i32 giTotalHighMem;
 DATA(0x0052977c) i32 gMapX;
 DATA(0x00529780) i32 gMapY;
-DATA(0x00529788) char* gcWinText;
+DATA(0x00529788) char gcWinText[0x12c];
 DATA(0x005298b4) i32 bFreshSave;
 DATA(0x005298b8) i32 bShowIt;
 DATA(0x005298bc) i32 gLowPageScreenSelector;

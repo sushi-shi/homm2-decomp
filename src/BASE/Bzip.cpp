@@ -2050,7 +2050,7 @@ DATA(0x00534ee4) i32 longestFileName;
 DATA(0x00534ee8) i32 opMode;
 DATA(0x00537028) char inName[1024];
 DATA(0x00537430) char outName[1024];
-DATA(0x00537c58) char* progNameReally;
+DATA(0x00537c58) char progNameReally[0x400];
 DATA(0x00538078) i32 keepInputFiles;
 
 #undef RETAIL_FILE
