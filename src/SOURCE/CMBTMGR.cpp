@@ -42,7 +42,7 @@ combatManager::combatManager(void) {
     m_limitCreatureHex = 0;
     m_limitCreature = 0;
     m_showArmyQuantities = 1;
-    m_currentCommand = 0;
+    m_currentCommand = CombatMessageCommand(0);
     m_unknownF35B = 0;
     m_unknownF353 = -1;
     m_unknownF34F = m_unknownF353;
