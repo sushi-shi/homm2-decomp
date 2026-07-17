@@ -195,7 +195,7 @@ public:
     i32 ComboDraw(i32);
     void SetEnvironmentOrigin(i32, i32, i32);
     void CheckLoadSample(i32);
-    i32 GetSoundId(i32, i32);
+    AdventureEnvironmentSoundId GetSoundId(i32, i32);
     void InsertSound(i32, i32, i32, i32);
     void TeleportTo(class hero*, i32, i32, i32, i32);
     void DimensionDoor(void);
