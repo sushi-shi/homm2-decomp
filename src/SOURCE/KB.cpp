@@ -13,6 +13,7 @@
 #include <SOURCE/game.h>
 #include <SOURCE/GAME.h>
 #include <BASE/Misc.h>
+#include <BASE/MiscGraphicsConstants.h>
 #include <BASE/WINMGR.h>
 #include <SOURCE/ADVMGR.h>
 #include <SOURCE/CURSOR.h>
@@ -187,7 +188,7 @@ void DeleteMainClasses(void) {
 
 VA(0x00496ca0, 0x39)
 void EarlyShutdown(char* caption, char* text) {
-    MessageBoxA(hwndApp, text, caption, 0x10);
+    MessageBoxA(hwndApp, text, caption, MB_ICONHAND);
     exit(0);
 }
 
@@ -195,7 +196,7 @@ VA(0x00496cd9, 0x148)
 void SetupCDRom(void) {
     i32 savedNoSound = gbNoSound;
     if (iCDRomErr == 1) {
-        SetPalette(*(i8**)((char*)gPalette + 0x10), 1);
+        SetPalette(gPalette->m_data, 1);
         gpMouseManager->ShowColorPointer();
         gbNoSound = 1;
         if (giTCPHostStatus)
@@ -214,7 +215,7 @@ void SetupCDRom(void) {
             );
         gbNoCDRom = 1;
     } else if (iCDRomErr == 2) {
-        SetPalette(*(i8**)((char*)gPalette + 0x10), 1);
+        SetPalette(gPalette->m_data, 1);
         gpMouseManager->ShowColorPointer();
         gbNoSound = 1;
         if (giTCPHostStatus)
@@ -3159,7 +3160,7 @@ void ShutDown(char* msg) {
         strcpy(buf, msg);
         SetFullScreenStatus(0);
         LogStr(buf);
-        MessageBoxA(hwndApp, buf, "Unexpected Program Termination", 0x10);
+        MessageBoxA(hwndApp, buf, "Unexpected Program Termination", MB_ICONHAND);
     } else {
         sprintf(buf, "Bye!");
     }
@@ -3233,7 +3234,7 @@ void SmackFade(u8* src, u8* dst) {
     k = -1;
     a = static_cast<u8*>(H2_ALLOC(0x300, smackFadeSourceLineBase + KB_SOURCE_LINE_SMACK_FADE_PALETTE_ALLOC_OFFSET));
     f = static_cast<u8*>(H2_ALLOC(0x100, smackFadeSourceLineBase + KB_SOURCE_LINE_SMACK_FADE_MAP_ALLOC_OFFSET));
-    memset(a, 0, 0x300);
+    memset(a, 0, MISC_PALETTE_BYTE_COUNT);
     memset(f, 0, 0x100);
     for (h = 0xa; h < 0xf6; h++) {
         e = (OD_STEER(src[h * 3 + 2]) + OD_STEER(src[h * 3]) + src[h * 3 + 1]) / 3;
