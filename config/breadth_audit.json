@@ -1609,6 +1609,17 @@
     },
     {
       "unit": "SOURCE/DRAWING",
+      "function": "?CombatMessage@combatManager@@QAEXPADHHH@Z",
+      "source_hash": "f4b0a622d0e9",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 2,
+      "before": 99.68282,
+      "after": 99.68282,
+      "note": "Semantics CFG and 0x1bc frame exact; 38/38 ordered relocations exact with no owner/addend residual. De Morgan polarity scored 99.418500 and explicit shared-branch CFG scored 95.872246; restored canonical source. Three local literal identities and equivalent compare operand order remain."
+    },
+    {
+      "unit": "SOURCE/DRAWING",
       "function": "?DrawBackground@combatManager@@QAEXXZ",
       "source_hash": "6f47d920d460",
       "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
@@ -1622,23 +1633,23 @@
       "unit": "SOURCE/DRAWING",
       "function": "?DrawFrame@combatManager@@QAEXHHHHHHH@Z",
       "source_hash": "23b145a34df4",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "parked",
-      "iterations": 10,
-      "before": 99.724525,
-      "after": 99.34714,
-      "note": "Complete frame slots CFG and 164 relocs; all ten hero-order moat and relational variants exhausted under current TU state."
+      "iterations": 0,
+      "before": 98.576035,
+      "after": 98.576035,
+      "note": "Semantics draw order castle/moat CFG 0xdc frame and all slots exact; 164/164 ordered external relocations exact including owner-relative addends. Prior ten documented source-shape attempts exhausted; residual is TU-state arithmetic order plus local switch/thunk layout, not a correctness bug."
     },
     {
       "unit": "SOURCE/DRAWING",
       "function": "?DrawSmallView@combatManager@@QAEXHH@Z",
       "source_hash": "e47995b968cb",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
-      "outcome": "improved",
-      "iterations": 5,
-      "before": 99.84635,
-      "after": 99.91805,
-      "note": "Recovered exact frame slots and names; bounded variants leave one equivalent spell-count compare polarity."
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.920616,
+      "after": 99.920616,
+      "note": "Semantics CFG 0x7c frame and live slots exact; 100/100 ordered relocations exact with no owner/addend residual. Five previously documented condition spellings compile to the same operand-polarity wall; five local string identities are compiler-only."
     },
     {
       "unit": "SOURCE/DRAWING",
