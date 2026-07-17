@@ -198,19 +198,19 @@ i32 dropListWidget::Main(tag_message& message) {
             break;
         case MESSAGE_WIDGET:
             switch (message.payload.widget.command) {
-                case 0x36:
+                case WIDGET_COMMAND_SET_SELECTION:
                     if (m_id == message.payload.widget.id) {
                         m_selectedIndex = static_cast<i16>(message.payload.widget.data.value);
                         return 1;
                     }
                     break;
-                case 0x37:
+                case WIDGET_COMMAND_GET_SELECTION:
                     if (m_id == message.payload.widget.id) {
                         message.payload.widget.data.value = m_selectedIndex;
                         return 1;
                     }
                     break;
-                case 0x38:
+                case WIDGET_COMMAND_APPEND_ITEM:
                     if (m_id == message.payload.widget.id) {
                         char* text = message.payload.widget.data.text;
                         char** newItems = static_cast<char**>(H2_ALLOC_AT(m_itemCount * 4 + 4, gDropListSourceFiles.appendedListAllocation.text, 184));
@@ -224,7 +224,7 @@ i32 dropListWidget::Main(tag_message& message) {
                         m_items = newItems;
                     }
                     break;
-                case 0x39:
+                case WIDGET_COMMAND_REPLACE_ITEM:
                     if (m_id == message.payload.widget.id) {
                         char* text = message.payload.widget.data.text;
                         if (message.payload.widget.parameter < m_itemCount) {
@@ -234,11 +234,11 @@ i32 dropListWidget::Main(tag_message& message) {
                         }
                     }
                     break;
-                case 0x3a:
+                case WIDGET_COMMAND_DELETE_ITEM:
                     if (m_id == message.payload.widget.id)
                         DeleteItem(message.payload.widget.data.value);
                     break;
-                case 0x3b:
+                case WIDGET_COMMAND_CLEAR_ITEMS:
                     if (m_id == message.payload.widget.id) {
                         while (m_itemCount != 0)
                             DeleteItem(0);
