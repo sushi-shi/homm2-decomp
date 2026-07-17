@@ -33,7 +33,7 @@ typedef enum ViewGeneralConstant {
     VIEW_ARMY_BOTTOM_CLAMP = 230
 } ViewGeneralConstant;
 
-i32 HandleViewGeneral(struct tag_message &);
+i32 HandleViewGeneral(struct tag_message&);
 extern i32 iViewGeneralWhichSide;
 
 #endif // HOMM2_VIEW_H

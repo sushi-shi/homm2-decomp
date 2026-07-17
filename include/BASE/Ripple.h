@@ -7,6 +7,6 @@
 // forward declarations (was <_all.h>):
 class bitmap;
 
-void DoRipple(class bitmap *, class bitmap *, i32, i32);
+void DoRipple(class bitmap*, class bitmap*, i32, i32);
 
 #endif // HOMM2_RIPPLE_H

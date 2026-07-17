@@ -5,16 +5,16 @@
 #include <va.h>
 #include <BASE/resource.h>
 
-#pragma pack(push, 1)  // recovered layout is byte-packed
+#pragma pack(push, 1) // recovered layout is byte-packed
 class tileset : public resource {
 public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (vptr auto-emitted at 0x00; own data starts at 0x04)
     u16 m_tileWidth;  // +0x10  tile width
-    u16 m_tileHeight;  // +0x12  tile height
+    u16 m_tileHeight; // +0x12  tile height
     u16 m_tileCount;  // +0x14  tile count
-    char   *m_data;  // +0x16  tile pixel data
+    char* m_data;     // +0x16  tile pixel data
     // --- constructors ---
     tileset(u32l);
     virtual ~tileset();

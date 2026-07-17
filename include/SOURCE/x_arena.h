@@ -45,12 +45,12 @@ typedef enum ArenaConstant {
 } ArenaConstant;
 
 i32 DoArenaDialog(void);
-i32 ArenaWindowHandler(struct tag_message &);
+i32 ArenaWindowHandler(struct tag_message&);
 void UpdateArenaIcons(void);
 
 // ---- globals (declarations, RVA order) ----
 extern i32 choice;
-extern class iconWidget *skillWidget[3];
-extern class heroWindow *arenaWinPtr;
+extern class iconWidget* skillWidget[3];
+extern class heroWindow* arenaWinPtr;
 
 #endif // HOMM2_X_ARENA_H

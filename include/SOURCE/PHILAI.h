@@ -10,10 +10,10 @@ class searchArray;
 class town;
 
 struct BHC {
-    town *pTown;     // 0x00
-    i32 type;        // 0x04  (0=building, 1=hero, 2=creature)
-    i32 what;        // 0x08
-    i32 num;         // 0x0c
+    town* pTown; // 0x00
+    i32 type;    // 0x04  (0=building, 1=hero, 2=creature)
+    i32 what;    // 0x08
+    i32 num;     // 0x0c
 };
 
 typedef enum AIResourceValue {
@@ -421,20 +421,19 @@ typedef enum AITownEvaluationConstant {
 void ResetHeroRVs(i32, i32, i32);
 void CheckDoMain(i32 a1, i32 doMain);
 void ShowStatus(void);
-void ValidateHero(hero *pHero);
+void ValidateHero(hero* pHero);
 void InitAIMapVars(void);
 void CloseAIMapVars(void);
 i32 OnMySide(i32);
 
-
 // --- globals owned by this TU (moved from _globals.h; CodeView-attributed) ---
 extern i32 bHeroBuiltThisTurn;
 extern float gafAITurnCostResource[7];
-extern i8 *gaiEnemyHeroReachable;
-extern i16 *gaiHeroEventStratRVOfPos;
-extern i16 *gaiHeroStrategicRVOfPos;
-extern i16 *gaiLiveChanceOfPos;
-extern i8 *gaiTurnValueOfMine;
+extern i8* gaiEnemyHeroReachable;
+extern i16* gaiHeroEventStratRVOfPos;
+extern i16* gaiHeroStrategicRVOfPos;
+extern i16* gaiLiveChanceOfPos;
+extern i8* gaiTurnValueOfMine;
 extern i32 gbReduceByReload;
 extern i8 giBuildBoat[6];
 extern i8 giBuildBoatStuffTurn[6];
@@ -442,8 +441,8 @@ extern i8 giBuildShipyard[6];
 extern i32 giCurPlayer;
 extern u8 giCurPlayerBit;
 extern i32 giCurTurn;
-extern hero *gpCurAIHero;
-extern playerData *gpCurPlayer;
+extern hero* gpCurAIHero;
+extern playerData* gpCurPlayer;
 extern u8 giCurWatchPlayerBit;
 extern i32 iAlphaMale;
 extern i32 iDummy;
@@ -454,25 +453,25 @@ extern searchArray SVSearchArray;
 extern i32 gbGameOver;
 extern i8 giMonType[];
 extern i32 iViewArmyNumTroops;
-extern i8 *gbNGHeroType;
+extern i8* gbNGHeroType;
 extern i16 giUABaseX;
 extern i16 giUABaseY;
 extern i32 giEndSequence;
 extern i32 gbDismissArmy;
-extern i8 *gbNGHuman;
+extern i8* gbNGHuman;
 extern i32 iViewArmyFrame;
 extern i32 gbAllowUpgrade;
 extern i32 iViewArmyType;
-extern class hero *viewSpellsHero;
+extern class hero* viewSpellsHero;
 extern i32 gbUpgradeArmy;
 extern i16 RandMineQty[8];
-extern i8 *gbNGDifficulty;
+extern i8* gbNGDifficulty;
 extern i32 iViewArmyUpgradeToType;
 extern i32 viewArmyBaseX;
 extern i32 viewArmyBaseY;
-extern i8 *gbNGColor;
+extern i8* gbNGColor;
 extern i16 giUARadius;
-extern i8 *gbNGPlayerPos;
+extern i8* gbNGPlayerPos;
 extern i32 viewArmyFacingWIPXMod;
 
 #endif // HOMM2_PHILAI_TU_H

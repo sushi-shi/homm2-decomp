@@ -21,25 +21,25 @@ typedef enum ExecutiveManagerConstant {
     EXECUTIVE_DIALOG_MANAGER_CAPACITY = 20
 } ExecutiveManagerConstant;
 
-#pragma pack(push, 1)  // recovered layout is byte-packed
+#pragma pack(push, 1) // recovered layout is byte-packed
 class executive {
 public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
-    baseManager *m_managerListHead;  // +0x00  manager-list head
-    baseManager *m_managerListTail;  // +0x04  manager-list tail
-    baseManager *m_activeManager;  // +0x08  the current/active manager
-    i32    m_result;  // +0x0c  result returned by an executive dialog/main loop
+    baseManager* m_managerListHead; // +0x00  manager-list head
+    baseManager* m_managerListTail; // +0x04  manager-list tail
+    baseManager* m_activeManager;   // +0x08  the current/active manager
+    i32 m_result;                   // +0x0c  result returned by an executive dialog/main loop
     // --- constructors ---
     executive(void);
     // --- methods ---
     i32 InitSystem(void);
     void ShutDownSystem(void);
-    i32 DoDialog(class baseManager *);
+    i32 DoDialog(class baseManager*);
     void PrintManagerList(void);
-    i32 AddManager(class baseManager *, i32);
-    void RemoveManager(class baseManager *);
-    void CallManager(class baseManager *);
+    i32 AddManager(class baseManager*, i32);
+    void RemoveManager(class baseManager*);
+    void CallManager(class baseManager*);
     void MainLoop(void);
     void Terminate(void);
 };

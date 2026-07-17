@@ -17,9 +17,8 @@
 #include <SOURCE/kbwin.h>
 #include <SOURCE/wingraph.h>
 VA(0x0041bce0, 0x146)
-extern "C" i32 __stdcall WinMain(HINSTANCE instance,
-    HINSTANCE previousInstance, char *commandLine, i32 showCommand)
-{
+extern "C" i32 __stdcall
+WinMain(HINSTANCE instance, HINSTANCE previousInstance, char* commandLine, i32 showCommand) {
     DWORD lastError;
     MSG message;
 
@@ -27,8 +26,7 @@ extern "C" i32 __stdcall WinMain(HINSTANCE instance,
     gEventHandle = CreateEventA(0, 0, 0, "Heroes II");
     lastError = GetLastError();
     if (gEventHandle == 0 || lastError == ERROR_ALREADY_EXISTS) {
-        sprintf(gText, "Only one copy of %s may run at a time",
-            "Heroes of Might and Magic II");
+        sprintf(gText, "Only one copy of %s may run at a time", "Heroes of Might and Magic II");
         MessageBoxA(0, gText, "Startup Error", MB_ICONHAND);
         return 0;
     }
@@ -56,15 +54,12 @@ extern "C" i32 __stdcall WinMain(HINSTANCE instance,
 }
 
 VA(0x0041be26, 0x339)
-i32 AppInit(HINSTANCE instance, HINSTANCE previousInstance, i32 showCommand,
-    char *commandLine)
-{
+i32 AppInit(HINSTANCE instance, HINSTANCE previousInstance, i32 showCommand, char* commandLine) {
     HMENU windowMenu;
     RECT windowRect;
     WNDCLASSA appClass;
 
-    LogInt("hInstApp", reinterpret_cast<i32>(hInstApp), -999, -999, -999,
-        -999, -999, -999);
+    LogInt("hInstApp", reinterpret_cast<i32>(hInstApp), -999, -999, -999, -999, -999, -999);
     memset(bProcessMessage, 0, sizeof(bProcessMessage));
     bProcessMessage[WM_CREATE] = 1;
     bProcessMessage[WM_KEYDOWN] = 1;
@@ -95,8 +90,7 @@ i32 AppInit(HINSTANCE instance, HINSTANCE previousInstance, i32 showCommand,
         appClass.hIcon = LoadIconA(instance, "Heroes II");
         appClass.lpszMenuName = 0;
         appClass.lpszClassName = szAppName;
-        appClass.hbrBackground =
-            reinterpret_cast<HBRUSH>(COLOR_WINDOW + 1);
+        appClass.hbrBackground = reinterpret_cast<HBRUSH>(COLOR_WINDOW + 1);
         appClass.hInstance = instance;
         appClass.style = KBWIN_CLASS_STYLE;
         appClass.lpfnWndProc = AppWndProc;
@@ -113,20 +107,32 @@ i32 AppInit(HINSTANCE instance, HINSTANCE previousInstance, i32 showCommand,
     windowRect.left = windowRect.top = 0;
     windowRect.right = gConfig.gfx[giCurExe].width - 1;
     windowRect.bottom = gConfig.gfx[giCurExe].height - 1;
-    AdjustWindowRect(&windowRect, giCurWindowsStyleFlags,
-        gConfig.gfx[giCurExe].showMenu);
+    AdjustWindowRect(&windowRect, giCurWindowsStyleFlags, gConfig.gfx[giCurExe].showMenu);
     if (gConfig.gfx[giCurExe].showMenu != 0)
         windowMenu = reinterpret_cast<HMENU>(hmnuDflt);
     else
         windowMenu = 0;
-    hwndApp = CreateWindowExA(0, szAppName, szTitle,
-        giCurWindowsStyleFlags, gConfig.gfx[giCurExe].x,
+    hwndApp = CreateWindowExA(
+        0,
+        szAppName,
+        szTitle,
+        giCurWindowsStyleFlags,
+        gConfig.gfx[giCurExe].x,
         gConfig.gfx[giCurExe].y,
         windowRect.right - windowRect.left + 1,
-        windowRect.bottom - windowRect.top + 1, 0, windowMenu, instance, 0);
+        windowRect.bottom - windowRect.top + 1,
+        0,
+        windowMenu,
+        instance,
+        0
+    );
     if (hwndApp != 0) {
-        PostMessageA(hwndApp, WM_SETICON, ICON_SMALL,
-            reinterpret_cast<LPARAM>(LoadIconA(instance, "Heroes")));
+        PostMessageA(
+            hwndApp,
+            WM_SETICON,
+            ICON_SMALL,
+            reinterpret_cast<LPARAM>(LoadIconA(instance, "Heroes"))
+        );
         ShowWindow(hwndApp, showCommand);
         SetWindowLongA(hwndApp, GWL_STYLE, giCurWindowsStyleFlags);
         if (gConfig.gfx[giCurExe].showMenu == 0)
@@ -145,8 +151,7 @@ i32 AppInit(HINSTANCE instance, HINSTANCE previousInstance, i32 showCommand,
 // false arm versus this compiler state's `xor eax, eax`; explicit if/else is the
 // best of the tested direct, comparison, and conditional-return forms.
 VA(0x0041c15f, 0x31)
-i32 AppIdle(void)
-{
+i32 AppIdle(void) {
     if (gbForegroundApp != 0)
         return 1;
     else
@@ -158,166 +163,161 @@ i32 AppIdle(void)
 // table at RVA 0x1c61b; the candidate's next public begins one byte earlier, so
 // the old full-span raw-identity claim was invalid.
 VA(0x0041c190, 0x57e)
-LRESULT CALLBACK AppWndProc(HWND window, UINT message,
-    WPARAM messageParam, LPARAM messageData)
-{
-    if (message > KBWIN_PROCESS_MESSAGE_MAX ||
-        bProcessMessage[message] == 0) {
+LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPARAM messageData) {
+    if (message > KBWIN_PROCESS_MESSAGE_MAX || bProcessMessage[message] == 0) {
         return DefWindowProcA(window, message, messageParam, messageData);
     }
 
     switch (message) {
-    case WM_CREATE:
-        srand(KBTickCount());
-        SetTimer(window, KBWIN_TIMER_ID, KBWIN_TIMER_INTERVAL, 0);
-        GdiSetBatchLimit(1);
-        return 0;
-    case WM_KEYDOWN:
-    case WM_KEYUP:
-        if (KeyboardMessageHandler(
-                window, message, messageParam, messageData) == 0)
+        case WM_CREATE:
+            srand(KBTickCount());
+            SetTimer(window, KBWIN_TIMER_ID, KBWIN_TIMER_INTERVAL, 0);
+            GdiSetBatchLimit(1);
             return 0;
-        break;
-    case WM_MOUSEMOVE:
-    case WM_LBUTTONDOWN:
-    case WM_LBUTTONUP:
-    case WM_LBUTTONDBLCLK:
-    case WM_RBUTTONDOWN:
-    case WM_RBUTTONUP:
-    case WM_RBUTTONDBLCLK:
-        if (MouseMessageHandler(
-                window, message, messageParam, messageData) == 0)
-            return 0;
-        break;
-    case WM_TIMER:
-        lTemp = KBTickCount();
-        if (lLastGTimerTickCount + 5 < lTemp) {
-            lLastGTimerTickCount = lTemp;
-            UpdateTimers(0);
-        }
-        return 0;
-    case KBWIN_CUSTOM_CD_MESSAGE:
-        if (messageParam == 1) {
-            gpSoundManager->CDPlay(gpSoundManager->m_cdTrack, 0,
-                gpSoundManager->m_cdPlayFrame, 1);
-        }
-        break;
-    case WM_ACTIVATEAPP:
-        gbForegroundApp = messageParam;
-        return 0;
-    case WM_ERASEBKGND:
-        return 1;
-    case WM_MOVE:
-        if (hwndApp == 0)
-            return 0;
-        lTemp = GetWindowLongA(hwndApp, GWL_STYLE);
-        if ((lTemp & (WS_MINIMIZE | WS_MAXIMIZE)) == 0 &&
-            gbClosingApp == 0 &&
-            gConfig.gfx[giCurExe].fullScreen == 0) {
-            GetWindowRect(window, &rcTemp);
-            gConfig.gfx[giCurExe].x = rcTemp.left;
-            gConfig.gfx[giCurExe].y = rcTemp.top;
-            WritePrefs();
-        }
-        return 0;
-    case WM_SIZE:
-        if (hwndApp != 0) {
-            lTemp = GetWindowLongA(hwndApp, GWL_STYLE);
-            gbMinimized = lTemp & WS_MINIMIZE;
-            if ((lTemp & WS_MINIMIZE) == 0)
-                EarlyResizeWindow(0, 0, 0, 0);
-            if ((lTemp & (WS_MINIMIZE | WS_MAXIMIZE)) == 0 &&
-                (LOWORD(messageData) < KBWIN_MIN_WIDTH ||
-                    HIWORD(messageData) < KBWIN_MIN_HEIGHT)) {
-                iTempX = LOWORD(messageData) > KBWIN_MIN_WIDTH
-                    ? LOWORD(messageData) : KBWIN_MIN_WIDTH;
-                iTempY = HIWORD(messageData) > KBWIN_MIN_HEIGHT
-                    ? HIWORD(messageData) : KBWIN_MIN_HEIGHT;
-                ResizeWindow(-1, -1, iTempX, iTempY);
+        case WM_KEYDOWN:
+        case WM_KEYUP:
+            if (KeyboardMessageHandler(window, message, messageParam, messageData) == 0)
                 return 0;
-            }
-        }
-        iMainWinScreenWidth = LOWORD(messageData);
-        iMainWinScreenHeight = HIWORD(messageData);
-        if (iMainWinScreenWidth < 1)
-            iMainWinScreenWidth = 1;
-        if (iMainWinScreenHeight < 1)
-            iMainWinScreenHeight = 1;
-        if (hwndApp != 0 &&
-            (lTemp & (WS_MINIMIZE | WS_MAXIMIZE)) == 0 &&
-            gbClosingApp == 0 &&
-            gConfig.gfx[giCurExe].fullScreen == 0) {
-            gConfig.gfx[giCurExe].width = iMainWinScreenWidth;
-            gConfig.gfx[giCurExe].height = iMainWinScreenHeight;
-            WritePrefs();
-        }
-        return 0;
-    case WM_COMMAND:
-        return AppCommand(window, message, messageParam, messageData);
-    case WM_PALETTECHANGED:
-        if (reinterpret_cast<u32>(window) == messageParam)
             break;
-    case WM_QUERYNEWPALETTE:
-        return QueryNewPalette();
-    case WM_PAINT:
-        AppPaint(window, 0);
-        return 0;
-    case WM_CLOSE:
-        if (hwndApp == window) {
-            if (GameUnsaved() != 0) {
-                NormalDialog("Are you sure you want to quit?",
-                    NORMAL_DIALOG_CONFIRM, NORMAL_DIALOG_NO_RESOURCE,
-                    NORMAL_DIALOG_NO_VALUE, NORMAL_DIALOG_NO_RESOURCE, 0,
-                    NORMAL_DIALOG_NO_RESOURCE, 0,
-                    NORMAL_DIALOG_NO_RESOURCE, 0);
-                if (gpWindowManager->m_dialogResult == APP_MENU_CONFIRM_OK)
-                    DestroyWindow(window);
+        case WM_MOUSEMOVE:
+        case WM_LBUTTONDOWN:
+        case WM_LBUTTONUP:
+        case WM_LBUTTONDBLCLK:
+        case WM_RBUTTONDOWN:
+        case WM_RBUTTONUP:
+        case WM_RBUTTONDBLCLK:
+            if (MouseMessageHandler(window, message, messageParam, messageData) == 0)
                 return 0;
+            break;
+        case WM_TIMER:
+            lTemp = KBTickCount();
+            if (lLastGTimerTickCount + 5 < lTemp) {
+                lLastGTimerTickCount = lTemp;
+                UpdateTimers(0);
             }
-        }
-    case WM_DESTROY:
-        gbClosingApp = 1;
-        PostQuitMessage(0);
-    case WM_QUIT:
-        ShutDown(0);
-        break;
+            return 0;
+        case KBWIN_CUSTOM_CD_MESSAGE:
+            if (messageParam == 1) {
+                gpSoundManager
+                    ->CDPlay(gpSoundManager->m_cdTrack, 0, gpSoundManager->m_cdPlayFrame, 1);
+            }
+            break;
+        case WM_ACTIVATEAPP:
+            gbForegroundApp = messageParam;
+            return 0;
+        case WM_ERASEBKGND:
+            return 1;
+        case WM_MOVE:
+            if (hwndApp == 0)
+                return 0;
+            lTemp = GetWindowLongA(hwndApp, GWL_STYLE);
+            if ((lTemp & (WS_MINIMIZE | WS_MAXIMIZE)) == 0 && gbClosingApp == 0
+                && gConfig.gfx[giCurExe].fullScreen == 0) {
+                GetWindowRect(window, &rcTemp);
+                gConfig.gfx[giCurExe].x = rcTemp.left;
+                gConfig.gfx[giCurExe].y = rcTemp.top;
+                WritePrefs();
+            }
+            return 0;
+        case WM_SIZE:
+            if (hwndApp != 0) {
+                lTemp = GetWindowLongA(hwndApp, GWL_STYLE);
+                gbMinimized = lTemp & WS_MINIMIZE;
+                if ((lTemp & WS_MINIMIZE) == 0)
+                    EarlyResizeWindow(0, 0, 0, 0);
+                if ((lTemp & (WS_MINIMIZE | WS_MAXIMIZE)) == 0
+                    && (LOWORD(messageData) < KBWIN_MIN_WIDTH
+                        || HIWORD(messageData) < KBWIN_MIN_HEIGHT)) {
+                    iTempX = LOWORD(messageData) > KBWIN_MIN_WIDTH ? LOWORD(messageData)
+                                                                   : KBWIN_MIN_WIDTH;
+                    iTempY = HIWORD(messageData) > KBWIN_MIN_HEIGHT ? HIWORD(messageData)
+                                                                    : KBWIN_MIN_HEIGHT;
+                    ResizeWindow(-1, -1, iTempX, iTempY);
+                    return 0;
+                }
+            }
+            iMainWinScreenWidth = LOWORD(messageData);
+            iMainWinScreenHeight = HIWORD(messageData);
+            if (iMainWinScreenWidth < 1)
+                iMainWinScreenWidth = 1;
+            if (iMainWinScreenHeight < 1)
+                iMainWinScreenHeight = 1;
+            if (hwndApp != 0 && (lTemp & (WS_MINIMIZE | WS_MAXIMIZE)) == 0 && gbClosingApp == 0
+                && gConfig.gfx[giCurExe].fullScreen == 0) {
+                gConfig.gfx[giCurExe].width = iMainWinScreenWidth;
+                gConfig.gfx[giCurExe].height = iMainWinScreenHeight;
+                WritePrefs();
+            }
+            return 0;
+        case WM_COMMAND:
+            return AppCommand(window, message, messageParam, messageData);
+        case WM_PALETTECHANGED:
+            if (reinterpret_cast<u32>(window) == messageParam)
+                break;
+        case WM_QUERYNEWPALETTE:
+            return QueryNewPalette();
+        case WM_PAINT:
+            AppPaint(window, 0);
+            return 0;
+        case WM_CLOSE:
+            if (hwndApp == window) {
+                if (GameUnsaved() != 0) {
+                    NormalDialog(
+                        "Are you sure you want to quit?",
+                        NORMAL_DIALOG_CONFIRM,
+                        NORMAL_DIALOG_NO_RESOURCE,
+                        NORMAL_DIALOG_NO_VALUE,
+                        NORMAL_DIALOG_NO_RESOURCE,
+                        0,
+                        NORMAL_DIALOG_NO_RESOURCE,
+                        0,
+                        NORMAL_DIALOG_NO_RESOURCE,
+                        0
+                    );
+                    if (gpWindowManager->m_dialogResult == APP_MENU_CONFIRM_OK)
+                        DestroyWindow(window);
+                    return 0;
+                }
+            }
+        case WM_DESTROY:
+            gbClosingApp = 1;
+            PostQuitMessage(0);
+        case WM_QUIT:
+            ShutDown(0);
+            break;
     }
     return DefWindowProcA(window, message, messageParam, messageData);
 }
 
 VA(0x0041c70e, 0x90)
-BOOL CALLBACK AppAbout(HWND dialog, UINT message,
-    WPARAM messageParam, LPARAM messageData)
-{
+BOOL CALLBACK AppAbout(HWND dialog, UINT message, WPARAM messageParam, LPARAM messageData) {
     i32 command;
     HWND commandWindow;
     u16 notificationType;
 
     switch (message) {
-    case WM_INITDIALOG:
-        return 1;
-    case WM_COMMAND:
-        command = LOWORD(messageParam);
-        commandWindow = reinterpret_cast<HWND>(messageData);
-        notificationType = HIWORD(messageParam);
-        if (command == IDOK)
-            EndDialog(dialog, 1);
-        break;
+        case WM_INITDIALOG:
+            return 1;
+        case WM_COMMAND:
+            command = LOWORD(messageParam);
+            commandWindow = reinterpret_cast<HWND>(messageData);
+            notificationType = HIWORD(messageParam);
+            if (command == IDOK)
+                EndDialog(dialog, 1);
+            break;
     }
     PollSound();
     return 0;
 }
 
 VA(0x0041c79e, 0x1a)
-void AppExit(void)
-{
+void AppExit(void) {
     CleanUpWinGraphics();
     CleanUpMenus();
 }
 
 VA(0x0041c7b8, 0xc8)
-void Process1WindowsMessage(void)
-{
+void Process1WindowsMessage(void) {
     MSG message;
     i32l currentTick;
 
@@ -341,8 +341,7 @@ void Process1WindowsMessage(void)
 }
 
 VA(0x0041c880, 0x147)
-void ResizeWindow(i32 x, i32 y, i32 width, i32 height)
-{
+void ResizeWindow(i32 x, i32 y, i32 width, i32 height) {
     i32 windowX;
     RECT windowRect;
     i32 targetY;
@@ -358,20 +357,24 @@ void ResizeWindow(i32 x, i32 y, i32 width, i32 height)
         targetY = windowRect.top;
     else
         targetY = y;
-        windowRect.left = 0;
-        windowRect.top = 0;
-        windowRect.right = width - 1;
-        windowRect.bottom = height - 1;
-        AdjustWindowRect(&windowRect, giCurWindowsStyleFlags,
-            gConfig.gfx[giCurExe].showMenu);
-        MoveWindow(hwndApp, windowX, targetY,
-            windowRect.right - windowRect.left + 1,
-            windowRect.bottom - windowRect.top + 1, 1);
-        gConfig.gfx[giCurExe].x = windowX;
-        gConfig.gfx[giCurExe].y = targetY;
-        gConfig.gfx[giCurExe].width = width;
-        gConfig.gfx[giCurExe].height = height;
-        WritePrefs();
+    windowRect.left = 0;
+    windowRect.top = 0;
+    windowRect.right = width - 1;
+    windowRect.bottom = height - 1;
+    AdjustWindowRect(&windowRect, giCurWindowsStyleFlags, gConfig.gfx[giCurExe].showMenu);
+    MoveWindow(
+        hwndApp,
+        windowX,
+        targetY,
+        windowRect.right - windowRect.left + 1,
+        windowRect.bottom - windowRect.top + 1,
+        1
+    );
+    gConfig.gfx[giCurExe].x = windowX;
+    gConfig.gfx[giCurExe].y = targetY;
+    gConfig.gfx[giCurExe].width = width;
+    gConfig.gfx[giCurExe].height = height;
+    WritePrefs();
 }
 
 // @early-stop
@@ -379,47 +382,42 @@ void ResizeWindow(i32 x, i32 y, i32 width, i32 height)
 // match after masking aligned COFF relocations. The 99.66% fuzzy result is
 // delinked local-label identity; all 6/6 external REL32 callees agree.
 VA(0x0041c9c7, 0x197)
-LRESULT AppCommand(HWND window, UINT message,
-    WPARAM messageParam, LPARAM messageData)
-{
+LRESULT AppCommand(HWND window, UINT message, WPARAM messageParam, LPARAM messageData) {
     i32 command;
     DLGPROC appDialogProc;
 
     command = LOWORD(messageParam);
     switch (command) {
-    case KBWIN_MENU_ABOUT:
-        appDialogProc = reinterpret_cast<DLGPROC>(AppAbout);
-        DialogBoxParamA(hInstApp, "HEROES", window,
-            appDialogProc, 0);
-        break;
-    case KBWIN_MENU_HELP:
-        WinHelpA(hwndApp, ".\\HELP\\HEROES2.HLP", HELP_FINDER, 0);
-        break;
-    case KBWIN_MENU_SIZE_640_480:
-        ResizeWindow(-1, -1, KBWIN_WIDTH_640, KBWIN_HEIGHT_480);
-        break;
-    case KBWIN_MENU_SIZE_800_600:
-        ResizeWindow(-1, -1, KBWIN_WIDTH_800, KBWIN_HEIGHT_600);
-        break;
-    case KBWIN_MENU_SIZE_1024_768:
-        ResizeWindow(-1, -1, KBWIN_WIDTH_1024, KBWIN_HEIGHT_768);
-        break;
-    case KBWIN_MENU_SIZE_1280_1024:
-        ResizeWindow(-1, -1, KBWIN_WIDTH_1280, KBWIN_HEIGHT_1024);
-        break;
-    case KBWIN_MENU_FULLSCREEN:
-        SetFullScreenStatus(
-            1 - gConfig.gfx[giCurExe].fullScreen);
-        break;
-    default:
-        return HandleAppSpecificMenuCommands(command);
+        case KBWIN_MENU_ABOUT:
+            appDialogProc = reinterpret_cast<DLGPROC>(AppAbout);
+            DialogBoxParamA(hInstApp, "HEROES", window, appDialogProc, 0);
+            break;
+        case KBWIN_MENU_HELP:
+            WinHelpA(hwndApp, ".\\HELP\\HEROES2.HLP", HELP_FINDER, 0);
+            break;
+        case KBWIN_MENU_SIZE_640_480:
+            ResizeWindow(-1, -1, KBWIN_WIDTH_640, KBWIN_HEIGHT_480);
+            break;
+        case KBWIN_MENU_SIZE_800_600:
+            ResizeWindow(-1, -1, KBWIN_WIDTH_800, KBWIN_HEIGHT_600);
+            break;
+        case KBWIN_MENU_SIZE_1024_768:
+            ResizeWindow(-1, -1, KBWIN_WIDTH_1024, KBWIN_HEIGHT_768);
+            break;
+        case KBWIN_MENU_SIZE_1280_1024:
+            ResizeWindow(-1, -1, KBWIN_WIDTH_1280, KBWIN_HEIGHT_1024);
+            break;
+        case KBWIN_MENU_FULLSCREEN:
+            SetFullScreenStatus(1 - gConfig.gfx[giCurExe].fullScreen);
+            break;
+        default:
+            return HandleAppSpecificMenuCommands(command);
     }
     return 0;
 }
 
 VA(0x0041cb5e, 0xd7)
-void UpdateDfltMenu(HMENU menu)
-{
+void UpdateDfltMenu(HMENU menu) {
     // Retail reserves these dwords but never reads or initializes them.
     i32 result;
     i32 value;
@@ -443,8 +441,7 @@ void UpdateDfltMenu(HMENU menu)
 // jump immediately after the null-menu fallback; an explicit empty positive arm
 // lowered the match to 94.70%.
 VA(0x0041cc35, 0xac)
-void KBChangeMenu(HMENU menu)
-{
+void KBChangeMenu(HMENU menu) {
     if (menu == 0)
         menu = hmnuCurrent;
     hmnuCurrent = menu;
@@ -461,8 +458,7 @@ void KBChangeMenu(HMENU menu)
 }
 
 VA(0x0041cce1, 0x15c)
-void SetMenuStatus(i32 showMenu)
-{
+void SetMenuStatus(i32 showMenu) {
     i32 width;
     i32 height;
     i32l windowStyle;
@@ -483,17 +479,14 @@ void SetMenuStatus(i32 showMenu)
             giCurWindowsStyleFlags = KBWIN_WINDOWED_STYLE;
         else
             giCurWindowsStyleFlags = KBWIN_FULLSCREEN_STYLE;
-        replacedStyle =
-            SetWindowLongA(hwndApp, GWL_STYLE, giCurWindowsStyleFlags);
+        replacedStyle = SetWindowLongA(hwndApp, GWL_STYLE, giCurWindowsStyleFlags);
         ShowWindow(hwndApp, SW_SHOWNA);
-        ResizeWindow(-1, -1, gConfig.gfx[giCurExe].width,
-            gConfig.gfx[giCurExe].height);
+        ResizeWindow(-1, -1, gConfig.gfx[giCurExe].width, gConfig.gfx[giCurExe].height);
     }
 }
 
 VA(0x0041ce3d, 0x7b)
-void SetNoDialogMenus(i32 menusEnabled)
-{
+void SetNoDialogMenus(i32 menusEnabled) {
     if (gbNoDialogMenusOn && !menusEnabled)
         return;
     if (!gbNoDialogMenusOn && menusEnabled)
@@ -513,8 +506,7 @@ void SetNoDialogMenus(i32 menusEnabled)
 // which retail's delinked object resolves internally. Revisit after a kbwin
 // TU/header change alters compiler state.
 VA(0x0041ceb8, 0x159)
-void SetMenus(HMENU menu, i32 enabled)
-{
+void SetMenus(HMENU menu, i32 enabled) {
     i32 count;
     u32 commandId;
     i32 scanPosition;
@@ -534,39 +526,32 @@ void SetMenus(HMENU menu, i32 enabled)
                 disableFlag = 1;
             } else {
                 scanPosition = 0;
-                for (commandPosition = 0;
-                     commandPosition < KBWIN_MENU_ENTRY_COUNT;
+                for (commandPosition = 0; commandPosition < KBWIN_MENU_ENTRY_COUNT;
                      commandPosition++) {
-                    if (gsMenuEnableStatus[commandPosition].command ==
-                        commandId) {
+                    if (gsMenuEnableStatus[commandPosition].command == commandId) {
                         scanPosition = commandPosition;
                     }
                 }
                 if (gbInSetupDialog)
-                    disableFlag = 1 -
-                        gsMenuEnableStatus[scanPosition].setupEnabled;
+                    disableFlag = 1 - gsMenuEnableStatus[scanPosition].setupEnabled;
                 else
-                    disableFlag = 1 -
-                        gsMenuEnableStatus[scanPosition].normalEnabled;
+                    disableFlag = 1 - gsMenuEnableStatus[scanPosition].normalEnabled;
             }
         }
         if (disableFlag != 0) {
-            EnableMenuItem(menu, commandId,
-                enabled == 0 ? MF_GRAYED : MF_ENABLED);
+            EnableMenuItem(menu, commandId, enabled == 0 ? MF_GRAYED : MF_ENABLED);
         }
     }
     UpdateDfltMenu(menu);
 }
 
 VA(0x0041d011, 0x16)
-i32l KBTickCount(void)
-{
+i32l KBTickCount(void) {
     return GetTickCount();
 }
 
 VA(0x0041d027, 0x10)
-void InitVideo(void)
-{
+void InitVideo(void) {
     return;
 }
 

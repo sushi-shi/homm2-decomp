@@ -22,7 +22,7 @@
 #include <BASE/widget.h>
 #include <SOURCE/Wsnetwin.h>
 
-#define WSFILE const_cast<char *>("I:\\Projects\\Heroes\\Prog\\SOURCE\\Wsnetwin.cpp")
+#define WSFILE const_cast<char*>("I:\\Projects\\Heroes\\Prog\\SOURCE\\Wsnetwin.cpp")
 #define WS_SOURCE_LINE_INIT_BASE 61
 #define WS_SOURCE_LINE_TERM_BASE 248
 #define WS_SOURCE_LINE_SEND_BASE 279
@@ -56,27 +56,31 @@ DATA(0x004ed860) static i16 s_wsEvaluateSourceLineBase = WS_SOURCE_LINE_EVALUATE
 VA(0x004068b0, 0x5b5)
 i16 wsnet_init(void) {
     WinsockStartupMessage startup;
-    struct hostent *pHost;
+    struct hostent* pHost;
     u_long socketMode;
     char localHostName[WS_TRANSPORT_BUFFER_SIZE];
     i32 player;
 
     if (gConfig.gfx[giCurExe].fullScreen != 0) {
-        sprintf(gText, "About to initiate TCP/IP connection.  Heroes II will now drop from full screen mode to windowed mode, so that any Windows 95 generated dialog boxes can be seen.\n\nWhen the connection is successfully made, you can return to full screen mode by pressing 'F4'.");
+        sprintf(
+            gText,
+            "About to initiate TCP/IP connection.  Heroes II will now drop from full screen mode "
+            "to windowed mode, so that any Windows 95 generated dialog boxes can be seen.\n\nWhen "
+            "the connection is successfully made, you can return to full screen mode by pressing "
+            "'F4'."
+        );
         NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
         SetFullScreenStatus(0);
     }
     gbRemoteOn = 1;
-    ppDPRcvBuffer = static_cast<u8 **>(
-        BaseAlloc(WS_TRANSPORT_BUFFER_COUNT * sizeof(u8 *), WSFILE,
-                  s_wsInitSourceLineBase + 0xa));
-    piDPRcvBufferSize = static_cast<i32 *>(
-        BaseAlloc(WS_TRANSPORT_BUFFER_COUNT * sizeof(i32), WSFILE,
-                  s_wsInitSourceLineBase + 0xb));
-    memset(ppDPRcvBuffer, 0,
-           WS_TRANSPORT_BUFFER_COUNT * sizeof(u8 *));
-    memset(piDPRcvBufferSize, 0,
-           WS_TRANSPORT_BUFFER_COUNT * sizeof(i32));
+    ppDPRcvBuffer = static_cast<u8**>(
+        BaseAlloc(WS_TRANSPORT_BUFFER_COUNT * sizeof(u8*), WSFILE, s_wsInitSourceLineBase + 0xa)
+    );
+    piDPRcvBufferSize = static_cast<i32*>(
+        BaseAlloc(WS_TRANSPORT_BUFFER_COUNT * sizeof(i32), WSFILE, s_wsInitSourceLineBase + 0xb)
+    );
+    memset(ppDPRcvBuffer, 0, WS_TRANSPORT_BUFFER_COUNT * sizeof(u8*));
+    memset(piDPRcvBufferSize, 0, WS_TRANSPORT_BUFFER_COUNT * sizeof(i32));
 
     wVer = MAKEWORD(1, 1);
     iRc = WSAStartup(wVer, &wsadata);
@@ -93,8 +97,7 @@ i16 wsnet_init(void) {
     saddr_loc.sin_family = AF_INET;
     saddr_loc.sin_port = htons(WS_TRANSPORT_PORT);
     saddr_loc.sin_addr.s_addr = htonl(INADDR_ANY);
-    iRc = bind(sd_dg, reinterpret_cast<struct sockaddr *>(&saddr_loc),
-               sizeof(saddr_loc));
+    iRc = bind(sd_dg, reinterpret_cast<struct sockaddr*>(&saddr_loc), sizeof(saddr_loc));
     if (iRc == SOCKET_ERROR) {
         sprintf(cWSTextBuffer, "Error During bind(): %d", WSAGetLastError());
         ShutDown(cWSTextBuffer);
@@ -111,21 +114,29 @@ i16 wsnet_init(void) {
         ShutDown(cWSTextBuffer);
     }
     pHost = gethostbyname(localHostName);
-    gIn_addrIP = *reinterpret_cast<struct in_addr *>(pHost->h_addr);
+    gIn_addrIP = *reinterpret_cast<struct in_addr*>(pHost->h_addr);
     sprintf(cWSTextBuffer, "%s", inet_ntoa(gIn_addrIP));
     giNetPosToDCOPos[giThisNetPos] = static_cast<i32>(inet_addr(cWSTextBuffer));
 
     if (GameMode == REMOTE_GAME_NETWORK_HOST) {
         giWaitType = WS_WAIT_FIRST_GUEST;
         if (giTCPHostStatus != -1) {
-            sprintf(cWSTextBuffer,
-                    "Hosting game at %s.\n\nYou have %d guest(s) out of an expected total of %d guest(s) now logged in.  Click 'CANCEL' to move on without waiting for additional guests.",
-                    inet_ntoa(gIn_addrIP), 0, giTCPNumPlayers - 1);
+            sprintf(
+                cWSTextBuffer,
+                "Hosting game at %s.\n\nYou have %d guest(s) out of an expected total of %d "
+                "guest(s) now logged in.  Click 'CANCEL' to move on without waiting for additional "
+                "guests.",
+                inet_ntoa(gIn_addrIP),
+                0,
+                giTCPNumPlayers - 1
+            );
             NormalDialog(cWSTextBuffer, 6, -1, -1, -1, 0, -1, 0, -1, 0);
         } else {
-            sprintf(cWSTextBuffer,
-                    "Hosting game at %s\n\nWaiting On Guest(s).\n\n  Press 'CANCEL' to abort.",
-                    inet_ntoa(gIn_addrIP));
+            sprintf(
+                cWSTextBuffer,
+                "Hosting game at %s\n\nWaiting On Guest(s).\n\n  Press 'CANCEL' to abort.",
+                inet_ntoa(gIn_addrIP)
+            );
             NormalDialog(cWSTextBuffer, 6, -1, -1, -1, 0, -1, 0, -1, 0);
         }
         if (gbFunctionComplete == 0)
@@ -134,26 +145,38 @@ i16 wsnet_init(void) {
         giWaitType = WS_WAIT_EXTRA_GUESTS;
         if (giTCPHostStatus != -1) {
             if (giTCPNumPlayers > 2) {
-                sprintf(cWSTextBuffer,
-                        "Hosting game at %s.\n\nYou have %d guest(s) out of an expected total of %d guest(s) now logged in.  Click 'CANCEL' to move on without waiting for additional guests.",
-                        inet_ntoa(gIn_addrIP), giNumHumanPlayers - 1,
-                        giTCPNumPlayers - 1);
+                sprintf(
+                    cWSTextBuffer,
+                    "Hosting game at %s.\n\nYou have %d guest(s) out of an expected total of %d "
+                    "guest(s) now logged in.  Click 'CANCEL' to move on without waiting for "
+                    "additional guests.",
+                    inet_ntoa(gIn_addrIP),
+                    giNumHumanPlayers - 1,
+                    giTCPNumPlayers - 1
+                );
                 NormalDialog(cWSTextBuffer, 6, -1, -1, -1, 0, -1, 0, -1, 0);
             }
         } else {
-            sprintf(cWSTextBuffer,
-                    "Hosting game at %s.\n\nYou have %d guest(s) now logged in.  Click 'OK' to move on, or wait for additional guests.",
-                    inet_ntoa(gIn_addrIP), giNumHumanPlayers - 1);
+            sprintf(
+                cWSTextBuffer,
+                "Hosting game at %s.\n\nYou have %d guest(s) now logged in.  Click 'OK' to move "
+                "on, or wait for additional guests.",
+                inet_ntoa(gIn_addrIP),
+                giNumHumanPlayers - 1
+            );
             NormalDialog(cWSTextBuffer, 5, -1, -1, -1, 0, -1, 0, -1, 0);
         }
         gbRemoteGameOpen = 0;
         startup.playerCount = static_cast<u8>(giNumHumanPlayers);
-        memcpy(startup.playerAddresses, giNetPosToDCOPos,
-               sizeof(giNetPosToDCOPos));
+        memcpy(startup.playerAddresses, giNetPosToDCOPos, sizeof(giNetPosToDCOPos));
         for (player = 1; player < giNumHumanPlayers; player++) {
             startup.netPosition = static_cast<u8>(player);
-            wsSendMessage(giNetPosToDCOPos[player], NETWORK_PACKET_STARTUP,
-                          sizeof(startup), &startup);
+            wsSendMessage(
+                giNetPosToDCOPos[player],
+                NETWORK_PACKET_STARTUP,
+                sizeof(startup),
+                &startup
+            );
         }
     } else {
         while (1) {
@@ -161,14 +184,19 @@ i16 wsnet_init(void) {
                 strcpy(cWSTextBuffer, gcTCPAddress);
                 strcpy(gcTCPAddress, "");
             } else {
-                GetDataEntry("Enter the host IP address.\n(i.e. 220.415.119.223)",
-                             cWSTextBuffer, 20, 0, 0, 1);
+                GetDataEntry(
+                    "Enter the host IP address.\n(i.e. 220.415.119.223)",
+                    cWSTextBuffer,
+                    20,
+                    0,
+                    0,
+                    1
+                );
             }
             giNetPosToDCOPos[0] = static_cast<i32>(inet_addr(cWSTextBuffer));
             if (giNetPosToDCOPos[0] != static_cast<i32>(INADDR_NONE))
                 break;
-            NormalDialog("Error in IP Address, please try again.",
-                         5, -1, -1, -1, 0, -1, 0, -1, 0);
+            NormalDialog("Error in IP Address, please try again.", 5, -1, -1, -1, 0, -1, 0, -1, 0);
         }
         giWaitType = WS_WAIT_HOST;
         sprintf(cWSTextBuffer, "Searching for host.");
@@ -207,10 +235,8 @@ void wsnet_term(void) {
 // peer-address assignment. Direct, commuted, nested, do/while, and assignment-condition forms
 // were tested; the exact label/pointer-index form was rejected as less source-faithful.
 VA(0x00406f37, 0x1f5)
-void wsSendMessage(i32 destination, u8 type, u16 size,
-                   void *data) {
-    u8 *packetBuffer = static_cast<u8 *>(
-        BaseAlloc(size + 1, WSFILE, s_wsSendSourceLineBase + 2));
+void wsSendMessage(i32 destination, u8 type, u16 size, void* data) {
+    u8* packetBuffer = static_cast<u8*>(BaseAlloc(size + 1, WSFILE, s_wsSendSourceLineBase + 2));
     struct sockaddr_in peerAddress;
     i32 attemptCount;
     i32 error;
@@ -227,16 +253,20 @@ void wsSendMessage(i32 destination, u8 type, u16 size,
                 continue;
             attemptCount = 0;
             peerAddress.sin_addr.s_addr = giNetPosToDCOPos[netPlayer];
-            while ((iRc = sendto(sd_dg, reinterpret_cast<char *>(packetBuffer),
-                                 size + 1, 0,
-                                 reinterpret_cast<struct sockaddr *>(&peerAddress),
-                                 sizeof(peerAddress))) == SOCKET_ERROR) {
+            while ((iRc = sendto(
+                        sd_dg,
+                        reinterpret_cast<char*>(packetBuffer),
+                        size + 1,
+                        0,
+                        reinterpret_cast<struct sockaddr*>(&peerAddress),
+                        sizeof(peerAddress)
+                    ))
+                   == SOCKET_ERROR) {
                 error = WSAGetLastError();
                 if (attemptCount < 20) {
                     DelayMilli(WS_TRANSPORT_SEND_RETRY_DELAY);
                 } else {
-                    sprintf(cWSTextBuffer,
-                            "TCP/IP Error During command 'sendto()' # %d", error);
+                    sprintf(cWSTextBuffer, "TCP/IP Error During command 'sendto()' # %d", error);
                     NormalDialog(cWSTextBuffer, 5, -1, -1, -1, 0, -1, 0, -1, 0);
                     return;
                 }
@@ -244,8 +274,14 @@ void wsSendMessage(i32 destination, u8 type, u16 size,
         }
     } else {
         peerAddress.sin_addr.s_addr = destination;
-        iRc = sendto(sd_dg, reinterpret_cast<char *>(packetBuffer), size + 1, 0,
-                     reinterpret_cast<struct sockaddr *>(&peerAddress), sizeof(peerAddress));
+        iRc = sendto(
+            sd_dg,
+            reinterpret_cast<char*>(packetBuffer),
+            size + 1,
+            0,
+            reinterpret_cast<struct sockaddr*>(&peerAddress),
+            sizeof(peerAddress)
+        );
         if (iRc == SOCKET_ERROR) {
             sprintf(cWSTextBuffer, "Error During sendto(): %d", WSAGetLastError());
             NormalDialog(cWSTextBuffer, 5, -1, -1, -1, 0, -1, 0, -1, 0);
@@ -256,20 +292,24 @@ void wsSendMessage(i32 destination, u8 type, u16 size,
 }
 
 VA(0x0040712c, 0x61)
-i32 wsnet_snd(i32 destination, i32 size, void *data) {
+i32 wsnet_snd(i32 destination, i32 size, void* data) {
     i32 result;
 
     wsProcessMessages();
     if (destination != WS_TRANSPORT_BROADCAST_POSITION)
-        wsSendMessage(giNetPosToDCOPos[destination], NETWORK_PACKET_DATA,
-                      static_cast<u16>(size), data);
+        wsSendMessage(
+            giNetPosToDCOPos[destination],
+            NETWORK_PACKET_DATA,
+            static_cast<u16>(size),
+            data
+        );
     else
         wsSendMessage(0, NETWORK_PACKET_DATA, static_cast<u16>(size), data);
     return 0;
 }
 
 VA(0x0040718d, 0xa7)
-i16 wsnet_rcv(i16, u16, void *data) {
+i16 wsnet_rcv(i16, u16, void* data) {
     u32 size;
 
     wsProcessMessages();
@@ -277,8 +317,7 @@ i16 wsnet_rcv(i16, u16, void *data) {
         return 0;
     size = piDPRcvBufferSize[iDPRcvBufferTail];
     memcpy(data, ppDPRcvBuffer[iDPRcvBufferTail], size);
-    BaseFree(ppDPRcvBuffer[iDPRcvBufferTail], WSFILE,
-             s_wsReceiveSourceLineBase + 9);
+    BaseFree(ppDPRcvBuffer[iDPRcvBufferTail], WSFILE, s_wsReceiveSourceLineBase + 9);
     iDPRcvBufferTail = (iDPRcvBufferTail + 1) % WS_TRANSPORT_BUFFER_COUNT;
     return static_cast<i16>(size);
 }
@@ -295,8 +334,14 @@ void wsProcessMessages(void) {
 
     while (1) {
         receiveSize = WS_TRANSPORT_BUFFER_SIZE;
-        iRc = recvfrom(sd_dg, rcvBufIn, receiveSize, 0,
-                       reinterpret_cast<struct sockaddr *>(&remote), &addressLength);
+        iRc = recvfrom(
+            sd_dg,
+            rcvBufIn,
+            receiveSize,
+            0,
+            reinterpret_cast<struct sockaddr*>(&remote),
+            &addressLength
+        );
         if (iRc == SOCKET_ERROR) {
             iRc = WSAGetLastError();
             if (iRc == WSAEWOULDBLOCK)
@@ -304,8 +349,7 @@ void wsProcessMessages(void) {
         }
         if (iRc == 0)
             break;
-        if (giNetPosToDCOPos[giThisNetPos] ==
-            static_cast<i32>(remote.sin_addr.s_addr)) {
+        if (giNetPosToDCOPos[giThisNetPos] == static_cast<i32>(remote.sin_addr.s_addr)) {
         } else {
             wsEvaluateMessage(iRc, static_cast<i32>(remote.sin_addr.s_addr));
         }
@@ -318,77 +362,85 @@ void wsProcessMessages(void) {
 // the old full-span raw-identity claim was invalid.
 VA(0x004072e3, 0x37d)
 void wsEvaluateMessage(u32l size, i32 sender) {
-    char *message = rcvBufIn + 1;
+    char* message = rcvBufIn + 1;
     tag_message windowMessage;
     i32 player;
 
     switch (rcvBufIn[0]) {
-    case NETWORK_PACKET_DATA:
-        ppDPRcvBuffer[iDPRcvBufferHead] = static_cast<u8 *>(
-            BaseAlloc(size - 1, WSFILE, s_wsEvaluateSourceLineBase + 10));
-        memcpy(ppDPRcvBuffer[iDPRcvBufferHead], rcvBufIn + 1, size - 1);
-        piDPRcvBufferSize[iDPRcvBufferHead] = size;
-        iDPRcvBufferHead = (iDPRcvBufferHead + 1) % WS_TRANSPORT_BUFFER_COUNT;
-        break;
-    case NETWORK_PACKET_GUEST_ARRIVED:
-        if (GameMode == REMOTE_GAME_NETWORK_HOST) {
-            if (gbRemoteGameOpen != 0) {
-                for (player = 1; player < giNumHumanPlayers; player++) {
-                    if (giNetPosToDCOPos[player] == sender ||
-                        &gsNetPlayerInfo[player] ==
-                            reinterpret_cast<SNetPlayerInfo *>(message)) {
-                        wsSendMessage(giNetPosToDCOPos[player],
-                                      NETWORK_PACKET_GUEST_ACCEPTED, 0, 0);
-                        return;
+        case NETWORK_PACKET_DATA:
+            ppDPRcvBuffer[iDPRcvBufferHead] =
+                static_cast<u8*>(BaseAlloc(size - 1, WSFILE, s_wsEvaluateSourceLineBase + 10));
+            memcpy(ppDPRcvBuffer[iDPRcvBufferHead], rcvBufIn + 1, size - 1);
+            piDPRcvBufferSize[iDPRcvBufferHead] = size;
+            iDPRcvBufferHead = (iDPRcvBufferHead + 1) % WS_TRANSPORT_BUFFER_COUNT;
+            break;
+        case NETWORK_PACKET_GUEST_ARRIVED:
+            if (GameMode == REMOTE_GAME_NETWORK_HOST) {
+                if (gbRemoteGameOpen != 0) {
+                    for (player = 1; player < giNumHumanPlayers; player++) {
+                        if (giNetPosToDCOPos[player] == sender
+                            || &gsNetPlayerInfo[player]
+                                   == reinterpret_cast<SNetPlayerInfo*>(message)) {
+                            wsSendMessage(
+                                giNetPosToDCOPos[player],
+                                NETWORK_PACKET_GUEST_ACCEPTED,
+                                0,
+                                0
+                            );
+                            return;
+                        }
                     }
+                    giNetPosToDCOPos[giNumHumanPlayers] = sender;
+                    LogInt("Got HereIAm from ", sender, -999, -999, -999, -999, -999, -999);
+                    gsNetPlayerInfo[giNumHumanPlayers] =
+                        *reinterpret_cast<SNetPlayerInfo*>(message);
+                    if (gsNetPlayerInfo[giNumHumanPlayers].reserved[0] == 0)
+                        xNetHasOldPlayers = 1;
+                    wsSendMessage(
+                        giNetPosToDCOPos[giNumHumanPlayers],
+                        NETWORK_PACKET_GUEST_ACCEPTED,
+                        0,
+                        0
+                    );
+                    giNumHumanPlayers++;
+                } else {
+                    wsSendMessage(sender, NETWORK_PACKET_GUEST_REJECTED, 0, 0);
                 }
-                giNetPosToDCOPos[giNumHumanPlayers] = sender;
-                LogInt("Got HereIAm from ", sender, -999, -999, -999, -999, -999, -999);
-                gsNetPlayerInfo[giNumHumanPlayers] =
-                    *reinterpret_cast<SNetPlayerInfo *>(message);
-                if (gsNetPlayerInfo[giNumHumanPlayers].reserved[0] == 0)
-                    xNetHasOldPlayers = 1;
-                wsSendMessage(giNetPosToDCOPos[giNumHumanPlayers],
-                              NETWORK_PACKET_GUEST_ACCEPTED, 0, 0);
-                giNumHumanPlayers++;
-            } else {
-                wsSendMessage(sender, NETWORK_PACKET_GUEST_REJECTED, 0, 0);
             }
-        }
-        break;
-    case NETWORK_PACKET_STARTUP:
-        giNumHumanPlayers = message[0];
-        giThisNetPos = message[1];
-        LogInt("WSMSGSTARTUP", giThisNetPos, sender,
-               -999, -999, -999, -999, -999);
-        memcpy(giNetPosToDCOPos, message + 2, sizeof(giNetPosToDCOPos));
-        bStartUpInfoReceived = 1;
-        break;
-    case NETWORK_PACKET_GUEST_REJECTED:
-        sprintf(cWSTextBuffer,
-                "The Host already has a game in progress and is not accepting new players.");
-        NormalDialog(cWSTextBuffer, 1, -1, -1, -1, 0, -1, 0, -1, 0);
-        ShutDown(0);
-        break;
-    case NETWORK_PACKET_GUEST_ACCEPTED:
-        sprintf(cWSTextBuffer, "Waiting for other remote player to set up game.");
-        windowMessage.type = MESSAGE_WIDGET;
-        windowMessage.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-        windowMessage.payload.widget.id = 1;
-        windowMessage.payload.widget.data.text = cWSTextBuffer;
-        pNormalDialogWindow->BroadcastMessage(windowMessage);
-        pNormalDialogWindow->DrawWindow();
-        bHostFound = 1;
-        break;
-    default:
-        sprintf(cWSTextBuffer, "Unknown message: %d\n",
-                static_cast<i32>(rcvBufIn[0]));
-        if (giDebugLevel > 0) {
-            sprintf(gText, cWSTextBuffer);
-            NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
-        }
-        LogStr(cWSTextBuffer);
-        break;
+            break;
+        case NETWORK_PACKET_STARTUP:
+            giNumHumanPlayers = message[0];
+            giThisNetPos = message[1];
+            LogInt("WSMSGSTARTUP", giThisNetPos, sender, -999, -999, -999, -999, -999);
+            memcpy(giNetPosToDCOPos, message + 2, sizeof(giNetPosToDCOPos));
+            bStartUpInfoReceived = 1;
+            break;
+        case NETWORK_PACKET_GUEST_REJECTED:
+            sprintf(
+                cWSTextBuffer,
+                "The Host already has a game in progress and is not accepting new players."
+            );
+            NormalDialog(cWSTextBuffer, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+            ShutDown(0);
+            break;
+        case NETWORK_PACKET_GUEST_ACCEPTED:
+            sprintf(cWSTextBuffer, "Waiting for other remote player to set up game.");
+            windowMessage.type = MESSAGE_WIDGET;
+            windowMessage.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
+            windowMessage.payload.widget.id = 1;
+            windowMessage.payload.widget.data.text = cWSTextBuffer;
+            pNormalDialogWindow->BroadcastMessage(windowMessage);
+            pNormalDialogWindow->DrawWindow();
+            bHostFound = 1;
+            break;
+        default:
+            sprintf(cWSTextBuffer, "Unknown message: %d\n", static_cast<i32>(rcvBufIn[0]));
+            if (giDebugLevel > 0) {
+                sprintf(gText, cWSTextBuffer);
+                NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+            }
+            LogStr(cWSTextBuffer);
+            break;
     }
 }
 
@@ -407,13 +459,16 @@ i32 wsWaitForExtraGuests(void) {
 
     wsProcessMessages();
     if (iWSLastMsgNumHumanPlayers != giNumHumanPlayers) {
-        if (giTCPHostStatus != -1 &&
-            giNumHumanPlayers >= giTCPNumPlayers)
+        if (giTCPHostStatus != -1 && giNumHumanPlayers >= giTCPNumPlayers)
             return 1;
         iWSLastMsgNumHumanPlayers = giNumHumanPlayers;
-        sprintf(cWSTextBuffer,
-                "Hosting game at %s.\n\nYou have %d guest(s) now logged in.  Click 'OK' to move on, or wait for additional guests.",
-                inet_ntoa(gIn_addrIP), giNumHumanPlayers - 1);
+        sprintf(
+            cWSTextBuffer,
+            "Hosting game at %s.\n\nYou have %d guest(s) now logged in.  Click 'OK' to move on, or "
+            "wait for additional guests.",
+            inet_ntoa(gIn_addrIP),
+            giNumHumanPlayers - 1
+        );
         message.type = MESSAGE_WIDGET;
         message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
         message.payload.widget.id = 1;
@@ -427,31 +482,35 @@ i32 wsWaitForExtraGuests(void) {
 VA(0x00407746, 0x126)
 i32 wsWaitForHost(void) {
     switch (iWSWaitForHostStatus) {
-    case 0:
-        if (KBTickCount() < iWSNextTickCount)
-            return 0;
-        wsProcessMessages();
-        if (bHostFound != 0) {
-            iWSWaitForHostStatus++;
-            return 0;
-        }
-        wsSendMessage(0, NETWORK_PACKET_GUEST_ARRIVED, sizeof(SNetPlayerInfo),
-                      &gsThisNetPlayerInfo);
-        iWSNextTickCount = KBTickCount() + WS_TRANSPORT_HOST_RETRY_DELAY;
-        iWSAttempts++;
-        if (iWSAttempts > WS_TRANSPORT_HOST_RETRY_LIMIT) {
-            sprintf(cWSTextBuffer, "The Host is not responding.  Keep waiting?");
-            NormalDialog(cWSTextBuffer, 2, -1, -1, -1, 0, -1, 0, -1, 0);
-            if (gpWindowManager->m_dialogResult != 0x7805)
-                ShutDown(0);
-            iWSAttempts = 0;
-        }
-        break;
-    case 1:
-        wsProcessMessages();
-        if (bStartUpInfoReceived != 0)
-            return 1;
-        break;
+        case 0:
+            if (KBTickCount() < iWSNextTickCount)
+                return 0;
+            wsProcessMessages();
+            if (bHostFound != 0) {
+                iWSWaitForHostStatus++;
+                return 0;
+            }
+            wsSendMessage(
+                0,
+                NETWORK_PACKET_GUEST_ARRIVED,
+                sizeof(SNetPlayerInfo),
+                &gsThisNetPlayerInfo
+            );
+            iWSNextTickCount = KBTickCount() + WS_TRANSPORT_HOST_RETRY_DELAY;
+            iWSAttempts++;
+            if (iWSAttempts > WS_TRANSPORT_HOST_RETRY_LIMIT) {
+                sprintf(cWSTextBuffer, "The Host is not responding.  Keep waiting?");
+                NormalDialog(cWSTextBuffer, 2, -1, -1, -1, 0, -1, 0, -1, 0);
+                if (gpWindowManager->m_dialogResult != 0x7805)
+                    ShutDown(0);
+                iWSAttempts = 0;
+            }
+            break;
+        case 1:
+            wsProcessMessages();
+            if (bStartUpInfoReceived != 0)
+                return 1;
+            break;
     }
     return 0;
 }

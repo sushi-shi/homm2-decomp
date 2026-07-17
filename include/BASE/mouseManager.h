@@ -11,43 +11,43 @@ class bitmap;
 class resource;
 class icon;
 
-#pragma pack(push, 1)  // recovered layout is byte-packed
+#pragma pack(push, 1) // recovered layout is byte-packed
 class mouseManager : public baseManager {
 public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (derived: base baseManager = 0x36 bytes at 0x00 via ': public baseManager'; own fields below)
-    bitmap *m_savedUnderlying;  // +0x36  saved-underlying bitmap
-    i32    m_cursorFrame;  // +0x3a
-    icon  *m_cursorIcon;  // +0x3e  the loaded cursor icon
-    i32    m_cursorType;  // +0x42
-    i32    m_cursorSizeIndex;  // +0x46
-    i32    m_drawnCursorSizeIndex;  // +0x4a  size-table entry currently drawn/saved
+    bitmap* m_savedUnderlying;  // +0x36  saved-underlying bitmap
+    i32 m_cursorFrame;          // +0x3a
+    icon* m_cursorIcon;         // +0x3e  the loaded cursor icon
+    i32 m_cursorType;           // +0x42
+    i32 m_cursorSizeIndex;      // +0x46
+    i32 m_drawnCursorSizeIndex; // +0x4a  size-table entry currently drawn/saved
     char _pad_0x4e[0x8];
-    i32    m_mouseX;  // +0x56
-    i32    m_mouseY;  // +0x5a
-    i32    m_savedLeft;  // +0x5e  clipped left edge of saved underlying pixels
-    i32    m_savedTop;  // +0x62  clipped top edge of saved underlying pixels
-    i32    m_cursorLeft;  // +0x66  unclipped cursor draw origin
-    i32    m_cursorTop;  // +0x6a  unclipped cursor draw origin
-    i32    m_cursorRight;  // +0x6e  clipped inclusive right edge
-    i32    m_cursorBottom;  // +0x72  clipped inclusive bottom edge
-    i32    m_savedWidth;  // +0x76  clipped saved-underlying width
-    i32    m_savedHeight;  // +0x7a  clipped saved-underlying height
-    i32    m_forcePointerUpdate;  // +0x7e
-    i32    m_cursorReady;  // +0x82
-    i32    m_hideCount;  // +0x86
+    i32 m_mouseX;             // +0x56
+    i32 m_mouseY;             // +0x5a
+    i32 m_savedLeft;          // +0x5e  clipped left edge of saved underlying pixels
+    i32 m_savedTop;           // +0x62  clipped top edge of saved underlying pixels
+    i32 m_cursorLeft;         // +0x66  unclipped cursor draw origin
+    i32 m_cursorTop;          // +0x6a  unclipped cursor draw origin
+    i32 m_cursorRight;        // +0x6e  clipped inclusive right edge
+    i32 m_cursorBottom;       // +0x72  clipped inclusive bottom edge
+    i32 m_savedWidth;         // +0x76  clipped saved-underlying width
+    i32 m_savedHeight;        // +0x7a  clipped saved-underlying height
+    i32 m_forcePointerUpdate; // +0x7e
+    i32 m_cursorReady;        // +0x82
+    i32 m_hideCount;          // +0x86
     // --- constructors ---
     mouseManager(void);
     // --- virtual methods (vtable order) ---
     virtual i32 Open(i32) OVERRIDE;
     virtual void Close(void) OVERRIDE;
-    virtual i32 Main(struct tag_message &) OVERRIDE;
+    virtual i32 Main(struct tag_message&) OVERRIDE;
     // --- methods ---
-    void SetPointer(char *, i32, i32);
+    void SetPointer(char*, i32, i32);
     void SetPointer(i32);
     void NewUpdate(i32);
-    void MouseCoords(i32 &, i32 &);
+    void MouseCoords(i32&, i32&);
     void SaveAndDraw(void);
     void RestoreUnderlying(void);
     void ReallyHidePointer(void);
@@ -99,8 +99,8 @@ extern i32 gbInSetPointer;
 extern i32 bInNewMouseUpdate;
 extern BITMAP bmpAndMask[MOUSE_CURSOR_COUNT];
 extern HICON hMouseCursor[MOUSE_CURSOR_COUNT];
-extern void *cAndBits[MOUSE_CURSOR_COUNT];
-extern void *cColorBits[MOUSE_CURSOR_COUNT];
+extern void* cAndBits[MOUSE_CURSOR_COUNT];
+extern void* cColorBits[MOUSE_CURSOR_COUNT];
 extern ICONINFO IconInfo[MOUSE_CURSOR_COUNT];
 extern HBITMAP hbmpAndMask[MOUSE_CURSOR_COUNT];
 

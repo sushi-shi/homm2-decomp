@@ -247,23 +247,22 @@ typedef enum GameCompressionTestConstant {
 
 i32 GetNumObelisks(i32 color);
 void ComputeUALoc(i32);
-void GenerateStandardFileName(char *, char *);
-i32 ViewSpellsHandler(struct tag_message &);
-i32 ViewSpecialHandler(struct tag_message &);
-i32 ViewArmyHandler(struct tag_message &);
+void GenerateStandardFileName(char*, char*);
+i32 ViewSpellsHandler(struct tag_message&);
+i32 ViewSpecialHandler(struct tag_message&);
+i32 ViewArmyHandler(struct tag_message&);
 i32 IsCursedItem(i32 item);
 i32 CalcBaseScore(i32);
-void WriteDiffHeaderInfo(u8 cmd, i32 len, u8 *buf, i32 *pos);
-i32 GetSkipCopyLen(u8 *buf, i32 *pos);
-void CreateDiffFile(char *, char *, char *, i32, i32);
-void CreateJoinFile(char *, char *, char *);
-EventExtra *GetMapEvent(i32 x, i32 y);
+void WriteDiffHeaderInfo(u8 cmd, i32 len, u8* buf, i32* pos);
+i32 GetSkipCopyLen(u8* buf, i32* pos);
+void CreateDiffFile(char*, char*, char*, i32, i32);
+void CreateJoinFile(char*, char*, char*);
+EventExtra* GetMapEvent(i32 x, i32 y);
 void CheckValidAvailableHeroes(void);
-i32 CalcFileCRC(char *filename);
+i32 CalcFileCRC(char* filename);
 void CompressTest2(void);
 void CompressTest(void);
 void CompressTest3(void);
-
 
 // --- globals owned by this TU (moved from _globals.h; CodeView-attributed) ---
 extern char bMapInitialized;

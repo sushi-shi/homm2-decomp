@@ -8,6 +8,6 @@
 class bitmap;
 class icon;
 
-void FlipIconToBitmap(class icon *, class bitmap *, i32, i32, i32, i32, i32, i32, i32, i32, i32);
+void FlipIconToBitmap(class icon*, class bitmap*, i32, i32, i32, i32, i32, i32, i32, i32, i32);
 
 #endif // HOMM2_ICONF2B_H

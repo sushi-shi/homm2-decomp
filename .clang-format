@@ -24,7 +24,9 @@ MaxEmptyLinesToKeep: 1
 
 # --- braces: attach everything, like Rust ----------------------------------
 BreakBeforeBraces: Attach
-InsertBraces: true
+# InsertBraces inserts TOKENS: it broke a statement-macro + else pairing in
+# Bzip.cpp and voids the whitespace-only matching-neutrality contract above.
+InsertBraces: false
 Cpp11BracedListStyle: true
 InsertTrailingCommas: Wrapped
 

@@ -11,13 +11,10 @@ class iconWidget;
 struct SMapHeader;
 
 HOMM2_ENUM_BEGIN(FileRequesterMode)
-    FILE_REQUESTER_MAP_GAME = 1,
-    FILE_REQUESTER_LOAD_GAME = 2,
-    FILE_REQUESTER_SAVE_GAME = 3,
-    FILE_REQUESTER_MAP = 4
-HOMM2_ENUM_END(FileRequesterMode)
+FILE_REQUESTER_MAP_GAME = 1, FILE_REQUESTER_LOAD_GAME = 2, FILE_REQUESTER_SAVE_GAME = 3,
+                             FILE_REQUESTER_MAP = 4 HOMM2_ENUM_END(FileRequesterMode)
 
-typedef enum FileRequesterControlId {
+                                 typedef enum FileRequesterControlId {
     FILE_REQUESTER_SCROLL_UP = 1,
     FILE_REQUESTER_SCROLL_DOWN = 2,
     FILE_REQUESTER_SCROLL_KNOB = 3,
@@ -46,15 +43,12 @@ typedef enum FileRequesterControlId {
 } FileRequesterControlId;
 
 HOMM2_ENUM_BEGIN(FileRequesterMapSizeFilter)
-    FILE_REQUESTER_MAP_SIZE_SMALL = 0,
-    FILE_REQUESTER_MAP_SIZE_MEDIUM = 1,
-    FILE_REQUESTER_MAP_SIZE_LARGE = 2,
-    FILE_REQUESTER_MAP_SIZE_XLARGE = 3,
-    FILE_REQUESTER_MAP_SIZE_ALL = 4,
-    FILE_REQUESTER_MAP_SIZE_COUNT = 5
-HOMM2_ENUM_END(FileRequesterMapSizeFilter)
+FILE_REQUESTER_MAP_SIZE_SMALL = 0,
+    FILE_REQUESTER_MAP_SIZE_MEDIUM = 1, FILE_REQUESTER_MAP_SIZE_LARGE = 2,
+    FILE_REQUESTER_MAP_SIZE_XLARGE = 3, FILE_REQUESTER_MAP_SIZE_ALL = 4,
+    FILE_REQUESTER_MAP_SIZE_COUNT = 5 HOMM2_ENUM_END(FileRequesterMapSizeFilter)
 
-typedef enum FileRequesterKey {
+        typedef enum FileRequesterKey {
     FILE_REQUESTER_KEY_CYCLE_FILTER = 0x40
 } FileRequesterKey;
 
@@ -105,48 +99,48 @@ struct FileRequesterExtension {
     char text[FILE_REQUESTER_EXTENSION_SIZE];
 };
 
-#pragma pack(push, 1)  // recovered layout is byte-packed
+#pragma pack(push, 1) // recovered layout is byte-packed
 class fileRequester : public baseManager {
 public:
-    heroWindow *m_window;                        // +0x036
-    i32 m_x;                                     // +0x03a
-    i32 m_y;                                     // +0x03e
-    FileRequesterMode m_mode;                    // +0x042
-    char m_filePattern[FILE_REQUESTER_PATH_SIZE]; // +0x046
-    char m_directory[FILE_REQUESTER_PATH_SIZE];   // +0x172
-    FileRequesterName *m_fileNames;              // +0x29e
-    FileRequesterExtension *m_extensions;        // +0x2a2
-    SMapHeader *m_mapHeaders;                     // +0x2a6
-    void *m_previousMenu;                         // +0x2aa
+    heroWindow* m_window;                                   // +0x036
+    i32 m_x;                                                // +0x03a
+    i32 m_y;                                                // +0x03e
+    FileRequesterMode m_mode;                               // +0x042
+    char m_filePattern[FILE_REQUESTER_PATH_SIZE];           // +0x046
+    char m_directory[FILE_REQUESTER_PATH_SIZE];             // +0x172
+    FileRequesterName* m_fileNames;                         // +0x29e
+    FileRequesterExtension* m_extensions;                   // +0x2a2
+    SMapHeader* m_mapHeaders;                               // +0x2a6
+    void* m_previousMenu;                                   // +0x2aa
     char m_defaultExtension[FILE_REQUESTER_EXTENSION_SIZE]; // +0x2ae
-    char m_filename[FILE_REQUESTER_NAME_SIZE];    // +0x2b3
-    i32 m_fileCount;                              // +0x412
-    i32 m_topIndex;                               // +0x416
-    i32 m_selectedIndex;                          // +0x41a
-    i32 m_result;                                 // +0x41e
-    char m_listState[9];                          // +0x422
-    iconWidget *m_scrollKnob;                     // +0x42b
+    char m_filename[FILE_REQUESTER_NAME_SIZE];              // +0x2b3
+    i32 m_fileCount;                                        // +0x412
+    i32 m_topIndex;                                         // +0x416
+    i32 m_selectedIndex;                                    // +0x41a
+    i32 m_result;                                           // +0x41e
+    char m_listState[9];                                    // +0x422
+    iconWidget* m_scrollKnob;                               // +0x42b
     // --- constructors ---
-    fileRequester(i32, i32, i32, char *, char *, char *);
+    fileRequester(i32, i32, i32, char*, char*, char*);
     // --- virtual methods (vtable order) ---
     virtual i32 Open(i32) OVERRIDE;
     virtual void Close(void) OVERRIDE;
-    virtual i32 Main(struct tag_message &) OVERRIDE;
+    virtual i32 Main(struct tag_message&) OVERRIDE;
     // --- methods ---
-    i32 InitializeFiles(char *, char *, i32);
+    i32 InitializeFiles(char*, char*, i32);
     i32 MapExistsForFilter(FileRequesterMapSizeFilter);
     void SetupFiles(void);
     void CleanUpData(void);
     void SetOK(i32);
     void DoKnob(void);
     void Update(i32);
-    char * GetFilename(void);
+    char* GetFilename(void);
 };
 #pragma pack(pop)
 SIZE(fileRequester, 0x42f);
 // ---- globals (declarations, RVA order) ----
 extern FileRequesterMapSizeFilter giMapSizeFilter;
-extern char *cFRDummy;
+extern char* cFRDummy;
 extern float fGutterMinY;
 extern float fGutterTravelLength;
 extern i32 iMaxListSize;

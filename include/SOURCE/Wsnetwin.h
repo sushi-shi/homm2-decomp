@@ -35,9 +35,9 @@ SIZE(WinsockStartupMessage, 0x1a);
 
 i16 wsnet_init(void);
 void wsnet_term(void);
-void wsSendMessage(i32, u8, u16, void *);
-i32 wsnet_snd(i32, i32, void *);
-i16 wsnet_rcv(i16, u16, void *);
+void wsSendMessage(i32, u8, u16, void*);
+i32 wsnet_snd(i32, i32, void*);
+i16 wsnet_rcv(i16, u16, void*);
 void wsProcessMessages(void);
 void wsEvaluateMessage(u32l, i32);
 i32 wsWaitForFirstGuest(void);

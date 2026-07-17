@@ -14,8 +14,7 @@
 
 #define BITMAP_COPY_STRIDE 640
 VA(0x004cffc0, 0x2a)
-bitmap::bitmap(void) : resource(0, 0, -1, 0)
-{
+bitmap::bitmap(void) : resource(0, 0, -1, 0) {
     m_bitmapType = BITMAP_TYPE_NONE;
     m_width = 0;
     m_height = 0;
@@ -24,21 +23,18 @@ bitmap::bitmap(void) : resource(0, 0, -1, 0)
 
 #line 15
 VA(0x004d0040, 0x53)
-bitmap::bitmap(i16 p1, i16 p2, i16 p3) : resource(0, 0, -1, 0)
-{
+bitmap::bitmap(i16 p1, i16 p2, i16 p3) : resource(0, 0, -1, 0) {
     DATA(0x0051f9f8) static char dimensionsAllocationSourceFile[] =
         "I:\\Projects\\Heroes\\Prog\\BASE\\BITMAP.CPP";
     m_bitmapType = p1;
     m_width = p2;
     m_height = p3;
-    m_pixels = static_cast<u8 *>(
-        H2_ALLOC(p3 * p2, dimensionsAllocationSourceFile, 21));
+    m_pixels = static_cast<u8*>(H2_ALLOC(p3 * p2, dimensionsAllocationSourceFile, 21));
 }
 
 #line 28
 VA(0x004d00a0, 0x8f)
-bitmap::bitmap(u32l id) : resource(0, id, 1, 0)
-{
+bitmap::bitmap(u32l id) : resource(0, id, 1, 0) {
     DATA(0x0051fa20) static char resourceAllocationSourceFile[] =
         "I:\\Projects\\Heroes\\Prog\\BASE\\BITMAP.CPP";
     i32 size;
@@ -47,10 +43,9 @@ bitmap::bitmap(u32l id) : resource(0, id, 1, 0)
     m_width = gpResourceManager->ReadWord();
     m_height = gpResourceManager->ReadWord();
     size = m_height * m_width;
-    m_pixels = static_cast<u8 *>(
-        H2_ALLOC(size, resourceAllocationSourceFile, 37));
+    m_pixels = static_cast<u8*>(H2_ALLOC(size, resourceAllocationSourceFile, 37));
     PollSound();
-    gpResourceManager->ReadBlock(reinterpret_cast<i8 *>(m_pixels), size);
+    gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_pixels), size);
     PollSound();
 }
 #line 48
@@ -71,16 +66,15 @@ inline bitmap::~bitmap() {
 // replacing the old volatile array with the scalar evidenced by the single retail stack slot.
 // Revisit during the TU-state/last-mile pass after earlier BITMAP source shapes settle.
 VA(0x004d0160, 0xff)
-void bitmap::DrawToBufferCareful(i16 x, i16 y)
-{
+void bitmap::DrawToBufferCareful(i16 x, i16 y) {
     i32 width;
     i32 destinationY;
     i32 height;
     i32 destinationX;
-    bitmap *screen;
+    bitmap* screen;
 
-    if (x >= 0 && x + m_width <= gpWindowManager->m_screen->m_width && y >= 0 &&
-        y + m_height <= gpWindowManager->m_screen->m_height) {
+    if (x >= 0 && x + m_width <= gpWindowManager->m_screen->m_width && y >= 0
+        && y + m_height <= gpWindowManager->m_screen->m_height) {
         DrawToBuffer(x, y);
     } else {
         width = m_width;
@@ -108,36 +102,31 @@ void bitmap::DrawToBufferCareful(i16 x, i16 y)
 }
 
 VA(0x004d0260, 0x3c)
-inline void bitmap::DrawToBuffer(i16 x, i16 y)
-{
+inline void bitmap::DrawToBuffer(i16 x, i16 y) {
     PollSound();
     BlitBitmap(this, 0, 0, m_width, m_height, gpWindowManager->m_screen, x, y);
     PollSound();
 }
 
 VA(0x004d02a0, 0x32)
-void bitmap::DrawToScreen(i16 x, i16 y)
-{
+void bitmap::DrawToScreen(i16 x, i16 y) {
     PollSound();
     BlitBitmapToScreen(this, 0, 0, m_width, m_height, x, y);
     PollSound();
 }
 
 VA(0x004d02e0, 0x2d)
-void bitmap::GrabScreen(i16 x, i16 y)
-{
+void bitmap::GrabScreen(i16 x, i16 y) {
     GrabBitmap(gpWindowManager->m_screen, x, y);
 }
 
 VA(0x004d0310, 0x26)
-inline void bitmap::GrabBitmap(class bitmap *src, i16 x, i16 y)
-{
+inline void bitmap::GrabBitmap(class bitmap* src, i16 x, i16 y) {
     BlitBitmap(src, x, y, m_width, m_height, this, 0, 0);
 }
 
 VA(0x004d0340, 0xf0)
-void bitmap::GrabBitmapCareful(class bitmap *source, i16 x, i16 y)
-{
+void bitmap::GrabBitmapCareful(class bitmap* source, i16 x, i16 y) {
     i32 sourceX;
     i32 sourceY;
     i32 height;
@@ -170,9 +159,15 @@ void bitmap::GrabBitmapCareful(class bitmap *source, i16 x, i16 y)
 }
 
 VA(0x004d0430, 0xcb)
-void bitmap::CopyTo(class bitmap *destination, i32 destinationX, i32 destinationY, i32 sourceX,
-                    i32 sourceY, i32 width, i32 height)
-{
+void bitmap::CopyTo(
+    class bitmap* destination,
+    i32 destinationX,
+    i32 destinationY,
+    i32 sourceX,
+    i32 sourceY,
+    i32 width,
+    i32 height
+) {
     PollSound();
     if (width != BITMAP_COPY_STRIDE) {
         if (height > 0) {
@@ -182,34 +177,37 @@ void bitmap::CopyTo(class bitmap *destination, i32 destinationX, i32 destination
             sourceRowOffset = sourceY * BITMAP_COPY_STRIDE;
             destinationRowOffset = destinationY * BITMAP_COPY_STRIDE;
             do {
-                memcpy(destination->m_pixels + destinationRowOffset + destinationX,
-                       m_pixels + sourceRowOffset + sourceX, width);
+                memcpy(
+                    destination->m_pixels + destinationRowOffset + destinationX,
+                    m_pixels + sourceRowOffset + sourceX,
+                    width
+                );
                 sourceRowOffset += BITMAP_COPY_STRIDE;
                 destinationRowOffset += BITMAP_COPY_STRIDE;
                 rowCount--;
             } while (rowCount != 0);
         }
     } else {
-        memcpy(destination->m_pixels + destinationY * BITMAP_COPY_STRIDE + destinationX,
-               m_pixels + sourceY * BITMAP_COPY_STRIDE + sourceX, width * height);
+        memcpy(
+            destination->m_pixels + destinationY * BITMAP_COPY_STRIDE + destinationX,
+            m_pixels + sourceY * BITMAP_COPY_STRIDE + sourceX,
+            width * height
+        );
     }
     PollSound();
 }
 
 // CodeView accounts for all 13 bitmap methods, so these inlined accessors are TU-local helpers,
 // not additional class members. All three forms are used below and emit no standalone symbols.
-static inline i16 BitmapWidth(bitmap *value)
-{
+static inline i16 BitmapWidth(bitmap* value) {
     return value->m_width;
 }
 
-static inline u8 *BitmapPixels(bitmap *value)
-{
+static inline u8* BitmapPixels(bitmap* value) {
     return value->m_pixels;
 }
 
-static inline u8 *BitmapPixels(bitmap *value, i32 offset)
-{
+static inline u8* BitmapPixels(bitmap* value, i32 offset) {
     return value->m_pixels + offset;
 }
 
@@ -221,26 +219,33 @@ static inline u8 *BitmapPixels(bitmap *value, i32 offset)
 // orders, two relational orders, and both pointer-declaration hoists were exhausted in
 // ten audited variants. Revisit after a material BITMAP predecessor/header-state change.
 VA(0x004d0500, 0x65)
-void bitmap::CopyToCareful(class bitmap *destination, i32 destinationX, i32 destinationY,
-                           i32 sourceX, i32 sourceY, i32 width, i32 height)
-{
+void bitmap::CopyToCareful(
+    class bitmap* destination,
+    i32 destinationX,
+    i32 destinationY,
+    i32 sourceX,
+    i32 sourceY,
+    i32 width,
+    i32 height
+) {
     const u32 copyWidth = width;
     i32 row;
-    bitmap *target = destination;
-    bitmap *source = this;
+    bitmap* target = destination;
+    bitmap* source = this;
     if (width >= 1) {
         row = 0;
         if (row < height) {
             do {
-                memcpy(BitmapPixels(target, (destinationY + row) * BitmapWidth(target)) + destinationX,
-                       BitmapPixels(source) + (sourceY + row) * BitmapWidth(source) + sourceX,
-                       copyWidth);
+                memcpy(
+                    BitmapPixels(target, (destinationY + row) * BitmapWidth(target)) + destinationX,
+                    BitmapPixels(source) + (sourceY + row) * BitmapWidth(source) + sourceX,
+                    copyWidth
+                );
                 ++row;
             } while (row < height);
         }
     }
 }
-
 
 // ===== vtable bitmap (root)  (1 slots) =====
 //  [ 0] VA(0x004cfff0, 0x41)  void * bitmap::scalar_dtor(unsigned int)   <- introduces virtual

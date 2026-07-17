@@ -11,8 +11,7 @@
 #include <SOURCE/hexcell.h>
 
 VA(0x0044a3c0, 0x46)
-hexcell::hexcell(void)
-{
+hexcell::hexcell(void) {
     m_obstacleIndex = -1;
     m_blocked = 0;
     m_occupantSide = -1;
@@ -22,17 +21,15 @@ hexcell::hexcell(void)
 }
 
 VA(0x0044a406, 0x16)
-void hexcell::DrawGround(void)
-{
+void hexcell::DrawGround(void) {
     return;
 }
 
 VA(0x0044a41c, 0xc6)
-void hexcell::DrawLowerDeadOccupants(void)
-{
+void hexcell::DrawLowerDeadOccupants(void) {
     i32 currentFrame;
     i32 i;
-    army *occupant;
+    army* occupant;
 
     if (m_deadOccupantCount > 0) {
         for (i = 0; i < m_deadOccupantCount - 1; ++i) {
@@ -50,11 +47,10 @@ void hexcell::DrawLowerDeadOccupants(void)
 // subscripts in reverse order. Flattening the two-dimensional index regressed the
 // live score; direct and commuted subscript spellings were otherwise unchanged.
 VA(0x0044a4e2, 0xc8)
-void hexcell::DrawUpperDeadOccupant(void)
-{
+void hexcell::DrawUpperDeadOccupant(void) {
     i32 currentFrame;
     i32 i;
-    army *occupant;
+    army* occupant;
 
     if (m_deadOccupantCount > 0) {
         for (i = m_deadOccupantCount - 1; i < m_deadOccupantCount; ++i) {
@@ -67,8 +63,7 @@ void hexcell::DrawUpperDeadOccupant(void)
 }
 
 VA(0x0044a5aa, 0x165)
-void hexcell::DrawOccupant(i32 creature, i32 frame)
-{
+void hexcell::DrawOccupant(i32 creature, i32 frame) {
     if (m_occupantSide != -1) {
         if (creature != 100) {
             if (gpCombatManager->m_armies[m_occupantSide][m_occupantIndex].m_drawState != creature)
@@ -78,14 +73,13 @@ void hexcell::DrawOccupant(i32 creature, i32 frame)
             && m_occupantIndex == gpCombatManager->m_currentArmyIndex)
             gbCurrArmyDrawn = 1;
         if (gpCombatManager->m_armies[m_occupantSide][m_occupantIndex].m_facing != m_occupantFrame)
-            gpCombatManager->m_armies[m_occupantSide][m_occupantIndex].DrawToBuffer(
-                m_x, m_y, frame);
+            gpCombatManager->m_armies[m_occupantSide][m_occupantIndex]
+                .DrawToBuffer(m_x, m_y, frame);
     }
 }
 
 VA(0x0044a70f, 0x149)
-void hexcell::DrawTower(i32 frame)
-{
+void hexcell::DrawTower(i32 frame) {
     i32 level = 0;
     i32 row;
     i32 drawX;
@@ -96,7 +90,8 @@ void hexcell::DrawTower(i32 frame)
         drawX = m_x;
     else
         drawX = m_x + 28;
-    gpCombatManager->m_combatIcons[COMBAT_ICON_TOWER]->CombatClipDrawToBuffer(drawX, m_y, frame, m_limits, 1, 0, 0, 0);
+    gpCombatManager->m_combatIcons[COMBAT_ICON_TOWER]
+        ->CombatClipDrawToBuffer(drawX, m_y, frame, m_limits, 1, 0, 0, 0);
 
     row = (m_y - 139) / 42;
     if (row == 4)
@@ -106,25 +101,25 @@ void hexcell::DrawTower(i32 frame)
             rightX = m_x;
         else
             rightX = m_x + 28;
-        gpCombatManager->m_combatIcons[COMBAT_ICON_TOWER]->CombatClipDrawToBuffer(rightX, m_y, 9, m_limits, 1, 0, 0, 0);
+        gpCombatManager->m_combatIcons[COMBAT_ICON_TOWER]
+            ->CombatClipDrawToBuffer(rightX, m_y, 9, m_limits, 1, 0, 0, 0);
     } else {
         if (level)
             temp = m_x - 28;
         else
             temp = m_x;
-        gpCombatManager->m_combatIcons[COMBAT_ICON_TOWER]->CombatClipDrawToBuffer(temp, m_y, 9, m_limits, 0, 0, 0, 0);
+        gpCombatManager->m_combatIcons[COMBAT_ICON_TOWER]
+            ->CombatClipDrawToBuffer(temp, m_y, 9, m_limits, 0, 0, 0, 0);
     }
 }
 
 VA(0x0044a858, 0x16)
-void hexcell::DrawClouds(void)
-{
+void hexcell::DrawClouds(void) {
     return;
 }
 
 VA(0x0044a86e, 0x4f)
-void hexcell::DrawObstacle(void)
-{
-    gpCombatManager->m_obstacleIcons[m_obstacleIndex]->CombatClipDrawToBuffer(
-        m_x, m_y, 0, m_limits, 0, 0, 0, 0);
+void hexcell::DrawObstacle(void) {
+    gpCombatManager->m_obstacleIcons[m_obstacleIndex]
+        ->CombatClipDrawToBuffer(m_x, m_y, 0, m_limits, 0, 0, 0, 0);
 }

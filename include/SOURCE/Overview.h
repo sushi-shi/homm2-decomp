@@ -27,8 +27,8 @@ typedef enum OverviewLayoutConstant {
     OVERVIEW_ARTIFACT_COLUMNS = 7
 } OverviewLayoutConstant;
 
-typedef iconWidget *OverviewIconWidgetRow[OVERVIEW_DYNAMIC_WIDGETS_PER_ROW];
-typedef textWidget *OverviewTextWidgetRow[OVERVIEW_DYNAMIC_WIDGETS_PER_ROW];
+typedef iconWidget* OverviewIconWidgetRow[OVERVIEW_DYNAMIC_WIDGETS_PER_ROW];
+typedef textWidget* OverviewTextWidgetRow[OVERVIEW_DYNAMIC_WIDGETS_PER_ROW];
 
 typedef enum OverviewUiConstant {
     OVERVIEW_DYNAMIC_SOURCE_LINE = 116,
@@ -94,6 +94,6 @@ typedef enum OverviewUiConstant {
     OVERVIEW_TOWN_HERO_LAST = 43,
 } OverviewUiConstant;
 
-i32 OverviewHandler(struct tag_message &);
+i32 OverviewHandler(struct tag_message&);
 
 #endif // HOMM2_OVERVIEW_H

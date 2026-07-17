@@ -46,7 +46,7 @@ typedef enum RecruitControl {
     RECRUIT_CONFIRM_CONTROL = 0x7802
 } RecruitControl;
 
-void SetupRecruitWin(class heroWindow *, i32, i32, i32, i32, i32);
-void QuickViewRecruit(class town *, i32);
+void SetupRecruitWin(class heroWindow*, i32, i32, i32, i32, i32);
+void QuickViewRecruit(class town*, i32);
 
 #endif // HOMM2_RECRUIT_H

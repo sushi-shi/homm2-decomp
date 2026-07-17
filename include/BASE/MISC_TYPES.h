@@ -6,8 +6,7 @@
 #define MISC_REGISTRY_KEY "SOFTWARE\\New World Computing\\Heroes of Might and Magic 2\\1.0"
 #define MISC_PCX_SOURCE_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\Misc.cpp"
 
-template <i32 TextSize>
-union SMiscTextSlot {
+template<i32 TextSize> union SMiscTextSlot {
     char text[TextSize];
     u32l alignmentValue;
 };
@@ -22,7 +21,9 @@ struct SMiscMemoryText {
     SMiscTextSlot<sizeof("Total Memory Leaks")> leakCountLabel;
     SMiscTextSlot<sizeof("Memory Leak,  File '%13s'  Line % 4d, ptr %12d   size %6d")> leakFormat;
     SMiscTextSlot<sizeof("Mem Left %dK")> memoryStatusFormat;
-    SMiscTextSlot<sizeof("Assert statement failed in module %s, line %d.  Do you wish to abort the program?")> assertMessage;
+    SMiscTextSlot<
+        sizeof("Assert statement failed in module %s, line %d.  Do you wish to abort the program?")>
+        assertMessage;
     SMiscTextSlot<sizeof("Assert Failure")> assertTitle;
 };
 SIZE(SMiscMemoryText, 0x180);

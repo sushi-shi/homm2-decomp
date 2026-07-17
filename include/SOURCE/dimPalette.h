@@ -10,8 +10,6 @@ typedef enum DimPaletteConstant {
 } DimPaletteConstant;
 
 // Shared dimming lookup table owned and defined by SOURCE/KB.
-extern u8 uDimPal[DIM_PALETTE_SET_COUNT]
-                             [DIM_PALETTE_LEVEL_COUNT]
-                             [DIM_PALETTE_COLOR_COUNT];
+extern u8 uDimPal[DIM_PALETTE_SET_COUNT][DIM_PALETTE_LEVEL_COUNT][DIM_PALETTE_COLOR_COUNT];
 
 #endif

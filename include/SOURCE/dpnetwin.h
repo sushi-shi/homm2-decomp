@@ -87,14 +87,14 @@ struct DirectPlayStartupMessage {
 #pragma pack(pop)
 SIZE(DirectPlayStartupMessage, 0x1a);
 
-BOOL WINAPI dpEnumServiceProvider(struct _GUID *, char *, DWORD, DWORD, void *);
-BOOL WINAPI dpEnumSession(DPSESSIONDESC *, void *, LPDWORD, DWORD);
+BOOL WINAPI dpEnumServiceProvider(struct _GUID*, char*, DWORD, DWORD, void*);
+BOOL WINAPI dpEnumSession(DPSESSIONDESC*, void*, LPDWORD, DWORD);
 i16 dpnet_init(void);
 void CleanupDPVars(void);
 void dpnet_term(void);
-void dpSendMessage(i32, u8, u16, void *);
-i32 dpnet_snd(i32, i32, void *);
-i16 dpnet_rcv(i16, u16, void *);
+void dpSendMessage(i32, u8, u16, void*);
+i32 dpnet_snd(i32, i32, void*);
+i16 dpnet_rcv(i16, u16, void*);
 u8 dpnet_stat(i16, u16);
 i16 __cdecl dpnet_sess(i32, i32, ...);
 void dpProcessMessages(void);
@@ -102,18 +102,18 @@ void dpEvaluateMessage(u32l, i32);
 i32 dpWaitForFirstGuest(void);
 i32 dpWaitForExtraGuests(void);
 i32 dpWaitForHost(void);
-void DPSD(i32, char *, i32);
+void DPSD(i32, char*, i32);
 
 // ---- globals (declarations, RVA order) ----
-extern struct IDirectPlay *lpIDC;
+extern struct IDirectPlay* lpIDC;
 extern DPID dcoID;
-extern struct _GUID *IPXGuid;
-extern struct _GUID *TCPGuid;
+extern struct _GUID* IPXGuid;
+extern struct _GUID* TCPGuid;
 extern HANDLE dphEvent;
 extern i32 iDPRcvBufferHead;
 extern i32 iDPRcvBufferTail;
-extern u8 **ppDPRcvBuffer;
-extern i32 *piDPRcvBufferSize;
+extern u8** ppDPRcvBuffer;
+extern i32* piDPRcvBufferSize;
 extern i32 bStartUpInfoReceived;
 extern HMODULE hinstDplayx;
 extern i32 iDPWaitForFirstGuestStatus;
@@ -126,7 +126,7 @@ extern i32 iGUIDCount;
 extern i32 iLastMsgNumHumanPlayers;
 extern i32 iMaxSession;
 extern i32 giHostAcceptStatus;
-extern struct _GUID *g_lpGuid;
+extern struct _GUID* g_lpGuid;
 extern i32 giNetPosToDCOPos[6];
 extern i32 iSessionToTry;
 extern i32l lSessions[10];

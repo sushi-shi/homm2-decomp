@@ -6,19 +6,13 @@
 
 // Values emitted by INPUTMGR and consumed by manager/widget Main loops.
 HOMM2_ENUM_BEGIN(MessageType)
-    MESSAGE_NONE = 0,
-    MESSAGE_KEY_DOWN = 1,
-    MESSAGE_KEY_UP = 2,
-    MESSAGE_MOUSE_MOVE = 4,
-    MESSAGE_LEFT_BUTTON_DOWN = 8,
-    MESSAGE_LEFT_BUTTON_UP = 0x10,
-    MESSAGE_RIGHT_BUTTON_DOWN = 0x20,
-    MESSAGE_RIGHT_BUTTON_UP = 0x40,
-    MESSAGE_WIDGET = 0x200,
-    MESSAGE_EXECUTIVE = 0x4000
-HOMM2_ENUM_END(MessageType)
+MESSAGE_NONE = 0, MESSAGE_KEY_DOWN = 1, MESSAGE_KEY_UP = 2, MESSAGE_MOUSE_MOVE = 4,
+                  MESSAGE_LEFT_BUTTON_DOWN = 8, MESSAGE_LEFT_BUTTON_UP = 0x10,
+                  MESSAGE_RIGHT_BUTTON_DOWN = 0x20, MESSAGE_RIGHT_BUTTON_UP = 0x40,
+                  MESSAGE_WIDGET = 0x200,
+                  MESSAGE_EXECUTIVE = 0x4000 HOMM2_ENUM_END(MessageType)
 
-typedef enum WidgetInputCommand {
+                      typedef enum WidgetInputCommand {
     WIDGET_COMMAND_DIALOG_SELECT = 10,
     WIDGET_COMMAND_SELECT = 12,
     WIDGET_COMMAND_DESELECT = 13,
@@ -70,7 +64,7 @@ SIZE(tag_messageHoverPayload, 0x18);
 
 union tag_messageWidgetData {
     i32 value;
-    char *text;
+    char* text;
 };
 SIZE(tag_messageWidgetData, 0x4);
 

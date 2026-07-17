@@ -7,6 +7,6 @@
 class bitmap;
 class tileset;
 
-extern "C" void __cdecl TileToBitmap(tileset *src, u32 flags, bitmap *dst, i32 x, i32 y);
+extern "C" void __cdecl TileToBitmap(tileset* src, u32 flags, bitmap* dst, i32 x, i32 y);
 
 #endif // HOMM2_TILE_H

@@ -8,7 +8,18 @@
 class bitmap;
 class icon;
 
-void MonoIconToBitmap(class icon *srcIcon, class bitmap *dest, i32 x, i32 y, i32 frame,
-                      i32 color, i32 clip, i32 clipX, i32 clipY, i32 clipW, i32 clipH);
+void MonoIconToBitmap(
+    class icon* srcIcon,
+    class bitmap* dest,
+    i32 x,
+    i32 y,
+    i32 frame,
+    i32 color,
+    i32 clip,
+    i32 clipX,
+    i32 clipY,
+    i32 clipW,
+    i32 clipH
+);
 
 #endif // HOMM2_ICONM2B_H

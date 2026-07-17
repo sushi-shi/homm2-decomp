@@ -22,15 +22,13 @@
 // run below structural alignment. Revisit after an exact-preserving shared-header
 // or predecessor/TU-state change; this is not a certified compiler wall.
 VA(0x004d2530, 0x47)
-baseManager::baseManager(void)
-{
+baseManager::baseManager(void) {
     m_prev = m_next = 0;
     m_priority = BASE_MANAGER_PRIORITY_UNASSIGNED;
     m_messageMask = BASE_MANAGER_MESSAGE_MASK_ALL;
     m_active = BASE_MANAGER_INACTIVE;
     strcpy(m_name, "Unknown");
 }
-
 
 // ===== vtable baseManager : public widget  (3 slots) =====
 //  [ 0] VA(0x004e1560, 0xb)  __purecall   <- = 0 (pure virtual)

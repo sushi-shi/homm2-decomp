@@ -13,12 +13,12 @@
 #include <string.h>
 // Per-call decoder scratch — its own contiguous file-static block (0x538190+).
 DATA(0x00538190) static u32 gFMRun;
-DATA(0x00538194) static u8 *gFMSrc;
-DATA(0x00538198) static IconEntry *gFMEntry;
+DATA(0x00538194) static u8* gFMSrc;
+DATA(0x00538198) static IconEntry* gFMEntry;
 DATA(0x0053819c) static i32 gFMX;
 DATA(0x005381a0) static i32 gFMX0;
 DATA(0x005381a4) static i32 gFMClipB;
-DATA(0x005381a8) static u8 *gFMRow;
+DATA(0x005381a8) static u8* gFMRow;
 DATA(0x005381ac) static i32 gFMY;
 DATA(0x005381b0) static i32 gFMClipR;
 DATA(0x005381b4) static i32 gFMXEnd;
@@ -54,11 +54,21 @@ DATA(0x005381b4) static i32 gFMXEnd;
 // The temporary `src = gFMSrc + 1; cmd = src[-1]` shape was an inline-helper trace. The recovered
 // reader raises live matching to 78.32934% and leaves the honest 26/27 multiset: only gFMY is short.
 VA(0x004da800, 0x212)
-void FlipMonoIconToBitmap(class icon *srcIcon, class bitmap *dest, i32 x, i32 y, i32 frame,
-                          i32 color, i32 clip, i32 clipX, i32 clipY, i32 clipW, i32 clipH)
-{
-    u8 *data = srcIcon->m_data;
-    IconEntry *entry = &srcIcon->Entries()[frame];
+void FlipMonoIconToBitmap(
+    class icon* srcIcon,
+    class bitmap* dest,
+    i32 x,
+    i32 y,
+    i32 frame,
+    i32 color,
+    i32 clip,
+    i32 clipX,
+    i32 clipY,
+    i32 clipW,
+    i32 clipH
+) {
+    u8* data = srcIcon->m_data;
+    IconEntry* entry = &srcIcon->Entries()[frame];
     i32 entryX = entry->x;
     i32 srcOffset = entry->srcOffset;
     gFMEntry = entry;
@@ -75,8 +85,8 @@ void FlipMonoIconToBitmap(class icon *srcIcon, class bitmap *dest, i32 x, i32 y,
     gFMXEnd = X;
     gFMY = y + entryY;
     if (clip != 0) {
-        if (x0 < clipX || clipX + clipW < right || gFMY < clipY ||
-            entry->h + gFMY > clipY + clipH) {
+        if (x0 < clipX || clipX + clipW < right || gFMY < clipY
+            || entry->h + gFMY > clipY + clipH) {
             clip = 1;
             gFMClipR = clipX + clipW - 1;
             gFMClipB = clipY + clipH - 1;
@@ -104,8 +114,8 @@ void FlipMonoIconToBitmap(class icon *srcIcon, class bitmap *dest, i32 x, i32 y,
             } else {
                 i32 left;
                 i32 currentY = gFMY;
-                if (clipY <= currentY && currentY <= gFMClipB &&
-                    (left = (X - cmd) + 1, clipX <= left) && gFMClipR >= X) {
+                if (clipY <= currentY && currentY <= gFMClipB
+                    && (left = (X - cmd) + 1, clipX <= left) && gFMClipR >= X) {
                     if (clipX <= left) {
                         memset((gFMRow - cmd) + 1 + X, color, cmd);
                     } else {

@@ -16,20 +16,18 @@ DATA(0x00520d9c) static STilesetSourceFiles gTilesetSourceFiles = {
 };
 
 VA(0x004dac60, 0x8f)
-tileset::tileset(u32l id) : resource(3, id, 1, 0)
-{
+tileset::tileset(u32l id) : resource(3, id, 1, 0) {
     gpResourceManager->PointToFile(id);
     m_tileWidth = gpResourceManager->ReadWord();
     m_tileHeight = gpResourceManager->ReadWord();
     m_tileCount = gpResourceManager->ReadWord();
     u32 size = m_tileCount * m_tileWidth * m_tileHeight;
-    m_data = static_cast<char *>(H2_ALLOC(size, gTilesetSourceFiles.allocation, 0x12));
-    gpResourceManager->ReadBlock(reinterpret_cast<i8 *>(m_data), size);
+    m_data = static_cast<char*>(H2_ALLOC(size, gTilesetSourceFiles.allocation, 0x12));
+    gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_data), size);
 }
 
 VA(0x004dad30, 0x21)
-tileset::~tileset()
-{
+tileset::~tileset() {
     H2_FREE(m_data, gTilesetSourceFiles.destruction, 0x1c);
 }
 
