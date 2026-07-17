@@ -2533,6 +2533,17 @@
     },
     {
       "unit": "SOURCE/CMBTMGR",
+      "function": "?ResetHitByCreature@combatManager@@QAEXXZ",
+      "source_hash": "9c52e2ebb50d",
+      "epoch": "cc7b2cff78090f65c374e818fede1f9ad8ce32ee0d5a55ec7d5ccd3ec4dc8628",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 85.09524,
+      "after": 85.09524,
+      "note": "Complete 0xc frame, 2-by-20 nested-loop CFG, zero-relocation set, and exact m_hitByCreature+0 store. Residual is only equivalent side/index scaling order in m_armies; behavioral bug=none."
+    },
+    {
+      "unit": "SOURCE/CMBTMGR",
       "function": "?SetupAndLoadObstacles@combatManager@@QAEXXZ",
       "source_hash": "bd309d6b3ad2",
       "epoch": "cc7b2cff78090f65c374e818fede1f9ad8ce32ee0d5a55ec7d5ccd3ec4dc8628",
@@ -3052,12 +3063,12 @@
       "unit": "SOURCE/DRAWING",
       "function": "?CombatMessage@combatManager@@QAEXH@Z",
       "source_hash": "b431be4bdee0",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "epoch": "cc7b2cff78090f65c374e818fede1f9ad8ce32ee0d5a55ec7d5ccd3ec4dc8628",
       "outcome": "parked",
-      "iterations": 2,
+      "iterations": 0,
       "before": 97.84138,
       "after": 97.84138,
-      "note": "Complete body frame CFG and 58 relocs; side-index evaluation order resisted direct row-base and decay spellings."
+      "note": "Complete 0x18 frame, switch CFG/case order, and 58/58 relocations; all 46 ordered nonlocal owner/addend tuples match, including every cCombatMessage table addend. Residual begins with equivalent m_currentArmySide/m_currentArmyIndex evaluation order and later compiler-local jump-table/string identities; the three documented source spellings remain exhausted; behavioral bug=none."
     },
     {
       "unit": "SOURCE/DRAWING",
@@ -4235,6 +4246,17 @@
       "before": 98.855835,
       "after": 98.855835,
       "note": "Complete frame, slots, CFG, and 150 relocations; equality load order and third skill-row branch topology remain documented."
+    },
+    {
+      "unit": "SOURCE/HEXCELL",
+      "function": "?DrawLowerDeadOccupants@hexcell@@QAEXXZ",
+      "source_hash": "0630054f904f",
+      "epoch": "cc7b2cff78090f65c374e818fede1f9ad8ce32ee0d5a55ec7d5ccd3ec4dc8628",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 90.21875,
+      "after": 90.21875,
+      "note": "Complete 0x10 frame and dead-occupant loop/DrawToBuffer CFG; both ordered relocation owner/addend tuples match exactly. Residual is only equivalent dead-occupant side/index scaling order in m_armies; behavioral bug=none."
     },
     {
       "unit": "SOURCE/HEXCELL",
@@ -5844,6 +5866,17 @@
     },
     {
       "unit": "SOURCE/SPELLS",
+      "function": "?MeteorShower@combatManager@@QAEXH@Z",
+      "source_hash": "0a040ea9d87a",
+      "epoch": "cc7b2cff78090f65c374e818fede1f9ad8ce32ee0d5a55ec7d5ccd3ec4dc8628",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 97.69004,
+      "after": 97.69004,
+      "note": "Complete 0x40 frame, validation/animation/damage CFG, and 30/30 relocations; all 27 ordered nonlocal owner/addend tuples match, including gConfig+302 and both gArmyEffected references. Residual is commutative occupant-side/index scaling order plus compiler-local string/floating-temporary renumbering; behavioral bug=none."
+    },
+    {
+      "unit": "SOURCE/SPELLS",
       "function": "?MirrorImage@combatManager@@QAEXH@Z",
       "source_hash": "54b8a11e61e4",
       "epoch": "cc7b2cff78090f65c374e818fede1f9ad8ce32ee0d5a55ec7d5ccd3ec4dc8628",
@@ -5973,6 +6006,17 @@
       "before": 99.982635,
       "after": 100.0,
       "note": "No-army guard return removes redundant continuation; all 979 bytes and 24 relocations agree."
+    },
+    {
+      "unit": "SOURCE/STRIP",
+      "function": "?Update@bankBox@@QAEXH@Z",
+      "source_hash": "7a0f7c06e833",
+      "epoch": "cc7b2cff78090f65c374e818fede1f9ad8ce32ee0d5a55ec7d5ccd3ec4dc8628",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 97.92063,
+      "after": 97.92063,
+      "note": "Complete 0x30 frame and resource-loop/gold-update CFG; 7/7 relocations and all 5 ordered nonlocal owner/addend tuples match. Residual is equivalent m_player-versus-resource-index evaluation order plus compiler-local string renumbering; behavioral bug=none."
     },
     {
       "unit": "SOURCE/SWAPMGR",
@@ -6418,12 +6462,12 @@
       "unit": "SOURCE/dpnetwin",
       "function": "?dpEvaluateMessage@@YIXKH@Z",
       "source_hash": "0b6f64c20e48",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "epoch": "cc7b2cff78090f65c374e818fede1f9ad8ce32ee0d5a55ec7d5ccd3ec4dc8628",
       "outcome": "parked",
       "iterations": 0,
       "before": 98.765434,
       "after": 98.765434,
-      "note": "Complete candidate range and 52 relocs; residual is local switch identities and one-byte provisional retail boundary."
+      "note": "Complete 0x14 frame, switch CFG/case order, and 52/52 relocations; all 43 ordered nonlocal owner/addend tuples match, including gsNetPlayerInfo+28. Residuals are compiler-local string/jump-table identities and the provisional retail span's one-byte tail (base 0x273 versus target 0x274); behavioral bug=none."
     },
     {
       "unit": "SOURCE/dpnetwin",
