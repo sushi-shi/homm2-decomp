@@ -69,6 +69,13 @@
 // also closed. Do not add padding, aliases, synthetic owners, or section pragmas
 // to force physical allocation order.
 DATA(0x004f70e0) i32 gbGameOver = 0;
+// PROVEN /Gi artifact: the retail TU was built with MSVC 4.2 incremental
+// compilation, under which __LINE__ is not an immediate - the compiler emits a
+// per-function static i16 __LINE__Var (movsx + add offset at each use) so
+// incremental rebuilds can patch line numbers in data. The original source was
+// plain __LINE__; these statics pin retail's anchor values because our file's
+// physical line numbers differ. Do not fold the base+offset sums into literals -
+// the memory reference is part of the byte proof. (Probe: CL /Od /Gi vs /Od.)
 DATA(0x004f70e4) static i16 gSaveSourceLine = 0x294;
 DATA(0x004f71a8) static i16 gLoadSourceLine = 0x44f;
 DATA(0x004f7274) static i16 gMapSourceLine = 0xaf4;
