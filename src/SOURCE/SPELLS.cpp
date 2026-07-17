@@ -64,7 +64,7 @@ i32 combatManager::HasValidSpellTarget(SpellType spell) {
 // kept the same two-byte residual, or reversed the branch. Revisit only after a
 // material TU-state change.
 VA(0x00420546, 0x44a)
-SpellType combatManager::ViewSpells(i32) {
+i32 combatManager::ViewSpells(i32) {
     CreatureType elementalType;
 
     m_selectedSpell = gpGame->ViewSpells(m_heroes[giCurGeneral], 0, CombatSpecialHandler, 0);
@@ -115,7 +115,7 @@ SpellType combatManager::ViewSpells(i32) {
                         NORMAL_DIALOG_NO_VALUE,
                         0
                     );
-                    return SpellType(0);
+                    return 0;
                 }
                 if (m_armyCount[m_currentSide] >= SPELL_ELEMENTAL_ARMY_LIMIT) {
                     sprintf(
@@ -135,7 +135,7 @@ SpellType combatManager::ViewSpells(i32) {
                         NORMAL_DIALOG_NO_VALUE,
                         0
                     );
-                    return SpellType(0);
+                    return 0;
                 }
                 if (!SpaceForElementalExists()) {
                     sprintf(
@@ -154,7 +154,7 @@ SpellType combatManager::ViewSpells(i32) {
                         NORMAL_DIALOG_NO_VALUE,
                         0
                     );
-                    return SpellType(0);
+                    return 0;
                 }
                 goto set_action;
 
@@ -184,11 +184,11 @@ SpellType combatManager::ViewSpells(i32) {
                         NORMAL_DIALOG_NO_VALUE,
                         0
                     );
-                    return SpellType(0);
+                    return 0;
                 }
             set_action:
                 giNextAction = SPELL_ACTION_CAST;
-                giNextActionExtra = m_selectedSpell;
+                giNextActionExtra = IDX(m_selectedSpell);
                 break;
 
             case SPELL_MIRROR_IMAGE:
@@ -210,7 +210,7 @@ SpellType combatManager::ViewSpells(i32) {
                         NORMAL_DIALOG_NO_VALUE,
                         0
                     );
-                    return SpellType(0);
+                    return 0;
                 }
                 // fall through
             default:
@@ -227,10 +227,10 @@ SpellType combatManager::ViewSpells(i32) {
                         NORMAL_DIALOG_NO_VALUE,
                         0
                     );
-                    return SpellType(0);
+                    return 0;
                 }
                 giNextAction = SPELL_ACTION_CAST;
-                giNextActionExtra = m_selectedSpell;
+                giNextActionExtra = IDX(m_selectedSpell);
                 gpMouseManager->SetPointer(
                     "spelmous.mse",
                     gsSpellInfo[IDX(m_selectedSpell)].iconIndex,
