@@ -970,6 +970,72 @@
       "note": "files=src/BASE/WIDGET.cpp; complete semantics and relocs=17/17; six register-allocation bytes in mouse hit test and +0x77 onward exact; behavioral bug=none"
     },
     {
+      "unit": "BASE/WINMGR",
+      "function": "?AddWindow@heroWindowManager@@QAEXPAVheroWindow@@HH@Z",
+      "source_hash": "18a6fd32e789",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 98.97298,
+      "after": 98.97298,
+      "note": "files=src/BASE/WINMGR.cpp; complete ordered insert/open/link behavior; relocs=1/1 only-base=0 with exact owner/addend; residual is xor-zero versus mov-zero plus EAX/ECX saved-head scheduling after prior bounded source/TU-state searches; behavioral bug=none"
+    },
+    {
+      "unit": "BASE/WINMGR",
+      "function": "?BroadcastMessage@heroWindowManager@@QAEHHHHH@Z",
+      "source_hash": "2ef5c7ed0142",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 81.17647,
+      "after": 81.17647,
+      "note": "files=src/BASE/WINMGR.cpp; complete 0x35 message initialization and slot-2 virtual dispatch with no relocations; seven raw bytes differ only because retail loads the vtable before the final payload store; prior comma/alias/TU-state variants were byte-neutral; behavioral bug=none"
+    },
+    {
+      "unit": "BASE/WINMGR",
+      "function": "?CycleColors@@YIXH@Z",
+      "source_hash": "6cd5ae84e6a8",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 97.89272,
+      "after": 97.89272,
+      "note": "files=src/BASE/WINMGR.cpp; complete 261-instruction color-cycle CFG through ret; relocs=71/71 only-base=0 with exact effective owner/addends; world-view loop and alternate-frame arithmetic differ only by equivalent register allocation after prior bounded variants; behavioral bug=none"
+    },
+    {
+      "unit": "BASE/WINMGR",
+      "function": "?FizzleForward@heroWindowManager@@QAEXHHHHHPAC0@Z",
+      "source_hash": "59a4454f8951",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 92.351974,
+      "after": 92.351974,
+      "note": "files=src/BASE/WINMGR.cpp; complete 0x404 candidate versus 0x402 retail with 0x2c frame and ordered CFG; relocs=33/33 only-base=0 with exact effective owner/addends; residual is current TU-state/register scheduling after prior cursor-order and bounded AST searches; behavioral bug=none"
+    },
+    {
+      "unit": "BASE/WINMGR",
+      "function": "?Main@heroWindowManager@@UAEHAAUtag_message@@@Z",
+      "source_hash": "5ef8d637ceb1",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 1,
+      "before": 97.5,
+      "after": 97.5,
+      "note": "files=src/BASE/WINMGR.cpp; complete 0x2d loop and return behavior; relocs=1/1 only-base=0 with exact owner/addend; retail swaps ESI/EDI ownership of window cursor and message reference; explicit message alias was byte-neutral; behavioral bug=none"
+    },
+    {
+      "unit": "BASE/WINMGR",
+      "function": "?SaveFizzleSource@heroWindowManager@@QAEXHHHH@Z",
+      "source_hash": "05b6bdacd522",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 1,
+      "before": 95.42254,
+      "after": 95.42254,
+      "note": "files=src/BASE/WINMGR.cpp; complete 0xc0 clipping/allocation/blit CFG; relocs=5/5 only-base=0 with exact effective owner/addends; width/y/height use equivalent ESI/EBX/EDI versus retail EDI/ESI/EBX allocation; clipped-local variant worsened prologue; behavioral bug=none"
+    },
+    {
       "unit": "BASE/bmap2",
       "function": "?BlitBitmap@@YIXPAVbitmap@@HHHH0HH@Z",
       "source_hash": "86201915eca7",
@@ -1001,6 +1067,61 @@
       "before": 98.44444,
       "after": 98.44444,
       "note": "Same 0x114 frame and CFG with 7/7 ordered relocs; only two equivalent compare operand reversals remain after bounded semantic and AST variants."
+    },
+    {
+      "unit": "BASE/droplist",
+      "function": "??1dropListWidget@@UAE@XZ",
+      "source_hash": "29e146487884",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 2,
+      "before": 98.95349,
+      "after": 98.95349,
+      "note": "files=src/BASE/droplist.cpp; complete 0x7c destructor; relocs=10/10 only-base=0 with exact effective owner/addends and only local source-symbol aliases; item index and byte offset use swapped EBX/EDI roles; commuted subscript and indirect condition were byte-neutral; behavioral bug=none"
+    },
+    {
+      "unit": "BASE/droplist",
+      "function": "?ProcessSelectDialog@dropListWidget@@QAEXXZ",
+      "source_hash": "3fd4ce773f8b",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 93.94631,
+      "after": 93.94631,
+      "note": "files=src/BASE/droplist.cpp; complete event/draw/selection CFG; candidate 0x827 frame 0x4c versus retail 0x81f frame 0x48 after shared tag-message TU-state change; relocs=36/36 only-base=0 with exact effective owner/addends; prior include/name/scope attempts exhausted; behavioral bug=none"
+    },
+    {
+      "unit": "BASE/droplist",
+      "function": "?Read@dropListWidget@@QAEXXZ",
+      "source_hash": "3e0df002aca4",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 3,
+      "before": 98.196724,
+      "after": 98.196724,
+      "note": "files=src/BASE/droplist.cpp; complete 0x21d resource/layout reader; relocs=44/44 only-base=0 with exact effective owner/addends; iconX and closed-width AX/BX roles are swapped; commute and named-width forms were byte-neutral while direct members worsened prologue; behavioral bug=none"
+    },
+    {
+      "unit": "BASE/listbox",
+      "function": "??1listBoxWidget@@UAE@XZ",
+      "source_hash": "310fd2d547ab",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 3,
+      "before": 98.97727,
+      "after": 98.97727,
+      "note": "files=src/BASE/listbox.cpp; complete 0x86 destructor; relocs=11/11 only-base=0 with exact effective owner/addends; item index and byte offset use swapped EBX/EDI roles; semantic name, item temporary, and explicit preincrement variants did not improve; behavioral bug=none"
+    },
+    {
+      "unit": "BASE/listbox",
+      "function": "?Main@listBoxWidget@@UAEHAAUtag_message@@@Z",
+      "source_hash": "4793bc215d6f",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.04878,
+      "after": 99.04878,
+      "note": "files=src/BASE/listbox.cpp; complete 0x368 frame/CFG and message behavior; relocs=23/23 only-base=0 with exact effective owner/addends; 23 raw bytes differ only by mouse-bound register allocation and delinked local jump-table labels; behavioral bug=none"
     },
     {
       "unit": "BASE/soundmgr",
