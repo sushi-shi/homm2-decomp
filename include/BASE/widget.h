@@ -20,7 +20,7 @@ typedef enum WidgetFlag {
     WIDGET_FLAG_UPDATE = 0x4000
 } WidgetFlag;
 
-typedef enum BaseWidgetCommand {
+HOMM2_ENUM_BEGIN(BaseWidgetCommand)
     WIDGET_COMMAND_DRAW = 2,
     WIDGET_COMMAND_SET_TEXT = 3,
     WIDGET_COMMAND_SET_FRAME = 4,
@@ -34,7 +34,7 @@ typedef enum BaseWidgetCommand {
     WIDGET_COMMAND_SET_Y = 0x35,
     WIDGET_COMMAND_REPLACE_ICON = 0x3c,
     WIDGET_COMMAND_SET_WIDTH = 0x3d
-} BaseWidgetCommand;
+HOMM2_ENUM_END(BaseWidgetCommand)
 
 typedef enum WidgetCommandArgument {
     WIDGET_COMMAND_DIMMED = 0x1000

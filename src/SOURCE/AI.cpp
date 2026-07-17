@@ -498,11 +498,10 @@ finish:
     }
 }
 
-// @early-stop
-// @early-stop-reloc-only
-// reloc-masked code bytes are identical; retail's delinked __adjust_fdiv
-// reference is misidentified as the interior alias iLeftRightSave+0x10, and
-// anonymous floating constants differ only in compiler counter names.
+// @semantic
+// Shared enum declaration state changed the x87 compare/store order at +0x37:
+// ours uses fst/fcomp where retail uses fcom/fstp. Frame, CFG, operands, and
+// external relocations remain aligned; revisit during the byte-last-mile pass.
 VA(0x004c2303, 0xc9)
 float combatManager::GetModLichDamage(class army *target, float damage)
 {

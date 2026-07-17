@@ -4,6 +4,7 @@
 // symbols. Other TUs call them by including this header (no local externs).
 #include <va.h>
 #include <winsock.h>
+#include <SOURCE/REMOTE_TYPES.h>
 
 typedef enum WinsockTransportConstant {
     WS_TRANSPORT_BUFFER_COUNT = 200,
@@ -16,14 +17,6 @@ typedef enum WinsockTransportConstant {
     WS_TRANSPORT_HOST_RETRY_LIMIT = 15,
     WS_TRANSPORT_ADDRESS_SIZE = 16
 } WinsockTransportConstant;
-
-typedef enum WinsockMessageType {
-    WS_MESSAGE_DATA = 1,
-    WS_MESSAGE_GUEST_ARRIVED = 2,
-    WS_MESSAGE_STARTUP = 3,
-    WS_MESSAGE_GUEST_ACCEPTED = 4,
-    WS_MESSAGE_GUEST_REJECTED = 5
-} WinsockMessageType;
 
 typedef enum WinsockWaitType {
     WS_WAIT_FIRST_GUEST = 11,

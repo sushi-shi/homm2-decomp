@@ -17,14 +17,6 @@ struct SBuildingInfo {
 #pragma pack(pop)
 SIZE(SBuildingInfo, 9);
 
-typedef enum TownManagerMessageType {
-    TOWN_MESSAGE_KEY_DOWN = 1,
-    TOWN_MESSAGE_KEY_UP = 2,
-    TOWN_MESSAGE_HOVER = 4,
-    TOWN_MESSAGE_SELECT = 0x200,
-    TOWN_MESSAGE_EXIT = 0x4000
-} TownManagerMessageType;
-
 typedef enum TownManagerInputCode {
     TOWN_WIDGET_SET_TEXT = 3,
     TOWN_WIDGET_DISABLE = 5,

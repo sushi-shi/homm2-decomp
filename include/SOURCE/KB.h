@@ -333,22 +333,6 @@ typedef enum NormalDialogConstant {
     NORMAL_DIALOG_POINTER_ID = -999
 } NormalDialogConstant;
 
-typedef enum CheckEndGameVictoryCondition {
-    CHECK_END_GAME_VICTORY_STANDARD = 0,
-    CHECK_END_GAME_VICTORY_CAPTURE_TOWN = 1,
-    CHECK_END_GAME_VICTORY_DEFEAT_HERO = 2,
-    CHECK_END_GAME_VICTORY_ARTIFACT = 3,
-    CHECK_END_GAME_VICTORY_SIDE = 4,
-    CHECK_END_GAME_VICTORY_GOLD = 5
-} CheckEndGameVictoryCondition;
-
-typedef enum CheckEndGameLossCondition {
-    CHECK_END_GAME_LOSS_NONE = 0,
-    CHECK_END_GAME_LOSS_TOWN = 1,
-    CHECK_END_GAME_LOSS_HERO = 2,
-    CHECK_END_GAME_LOSS_TIME = 3
-} CheckEndGameLossCondition;
-
 typedef enum CheckEndGameConstants {
     CHECK_END_GAME_NO_PLAYER = -1,
     CHECK_END_GAME_EMPTY_ARMY = -1,
@@ -627,8 +611,6 @@ typedef enum OldMainConstant {
     OLD_MAIN_EXIT = 0x69,
     OLD_MAIN_SETUP_NEW = 0,
     OLD_MAIN_SETUP_LOAD = 1,
-    OLD_MAIN_MULTIPLAYER_NETWORK = 1,
-    OLD_MAIN_MULTIPLAYER_LOCAL = 2,
     OLD_MAIN_NETWORK_PROTOCOL = 2,
     OLD_MAIN_REMOTE_HOST = 1,
     OLD_MAIN_REMOTE_CLIENT = 2,

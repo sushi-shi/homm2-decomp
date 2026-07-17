@@ -210,3 +210,166 @@ evidence = [
   "values 0 through 4 index giMapSizes and value 5 is the exclusive count",
 ]
 status = "reviewed"
+
+[[domain]]
+name = "MapVictoryCondition"
+declaration = "MapVictoryCondition"
+owner = "include/SOURCE/REQUEST.h"
+category = "serialized"
+production_carrier = "unsigned byte map-header storage boundary"
+strict = true
+sentinels = []
+enumerators = [
+  "MAP_VICTORY_DEFEAT_ALL",
+  "MAP_VICTORY_CAPTURE_TOWN",
+  "MAP_VICTORY_DEFEAT_HERO",
+  "MAP_VICTORY_FIND_ARTIFACT",
+  "MAP_VICTORY_DEFEAT_SIDE",
+  "MAP_VICTORY_ACCUMULATE_GOLD",
+]
+interfaces = ["map header serialization", "game::CheckEndGame condition dispatch"]
+members = []
+storage = ["SMapHeader::victoryCondition unsigned-byte storage"]
+conversions = ["implicit enum-to-byte assignment at map construction boundaries"]
+evidence = [
+  "the map header stores exactly one of values 0 through 5",
+  "Newgame and CheckEndGame dispatch the same six meanings",
+]
+status = "reviewed"
+
+[[domain]]
+name = "MapLossCondition"
+declaration = "MapLossCondition"
+owner = "include/SOURCE/REQUEST.h"
+category = "serialized"
+production_carrier = "unsigned byte map-header storage boundary"
+strict = true
+sentinels = []
+enumerators = [
+  "MAP_LOSS_STANDARD",
+  "MAP_LOSS_TOWN",
+  "MAP_LOSS_HERO",
+  "MAP_LOSS_TIME",
+]
+interfaces = ["map header serialization", "game::CheckEndGame condition dispatch"]
+members = []
+storage = ["SMapHeader::lossCondition unsigned-byte storage"]
+conversions = ["implicit enum-to-byte assignment at map construction boundaries"]
+evidence = [
+  "the map header stores exactly one of values 0 through 3",
+  "Newgame and CheckEndGame dispatch the same four meanings",
+]
+status = "reviewed"
+
+[[domain]]
+name = "NetworkPacketType"
+declaration = "NetworkPacketType"
+owner = "include/SOURCE/REMOTE_TYPES.h"
+category = "serialized"
+production_carrier = "unsigned byte transport boundary"
+strict = true
+sentinels = []
+enumerators = [
+  "NETWORK_PACKET_DATA",
+  "NETWORK_PACKET_GUEST_ARRIVED",
+  "NETWORK_PACKET_STARTUP",
+  "NETWORK_PACKET_GUEST_ACCEPTED",
+  "NETWORK_PACKET_GUEST_REJECTED",
+]
+interfaces = ["Winsock packet send/evaluate", "DirectPlay packet send/evaluate"]
+members = []
+storage = ["transport message type byte"]
+conversions = ["NetworkPacketType to unsigned byte at transport API boundaries"]
+evidence = [
+  "Winsock and DirectPlay used identical values 1 through 5",
+  "both transports dispatch the same payload and handshake meanings",
+]
+status = "reviewed"
+
+[[domain]]
+name = "MultiplayerBaseType"
+declaration = "MultiplayerBaseType"
+owner = "include/SOURCE/REMOTE_TYPES.h"
+category = "value"
+production_carrier = "int"
+strict = true
+sentinels = ["MULTIPLAYER_BASE_UNINITIALIZED"]
+enumerators = [
+  "MULTIPLAYER_BASE_MODEM",
+  "MULTIPLAYER_BASE_NETWORK",
+  "MULTIPLAYER_BASE_HOT_SEAT",
+  "MULTIPLAYER_BASE_UNINITIALIZED",
+]
+interfaces = ["multiplayer setup selection", "remote transport selection"]
+members = []
+storage = ["iMPBaseType four-byte global"]
+conversions = []
+evidence = [
+  "SETUP, REMOTE, Newgame, and OldMain used the same values for transport selection",
+  "value 10 is assigned before setup selection and is not a playable mode",
+]
+status = "reviewed"
+
+[[domain]]
+name = "MessageType"
+declaration = "MessageType"
+owner = "include/BASE/message.h"
+category = "message-id"
+production_carrier = "int"
+strict = true
+sentinels = ["MESSAGE_NONE"]
+enumerators = [
+  "MESSAGE_NONE",
+  "MESSAGE_KEY_DOWN",
+  "MESSAGE_KEY_UP",
+  "MESSAGE_MOUSE_MOVE",
+  "MESSAGE_LEFT_BUTTON_DOWN",
+  "MESSAGE_LEFT_BUTTON_UP",
+  "MESSAGE_RIGHT_BUTTON_DOWN",
+  "MESSAGE_RIGHT_BUTTON_UP",
+  "MESSAGE_WIDGET",
+  "MESSAGE_EXECUTIVE",
+]
+interfaces = ["inputManager event production", "manager and widget event dispatch"]
+members = []
+storage = ["tag_message four-byte type field"]
+conversions = ["MessageType to generic integer message transport"]
+evidence = [
+  "INPUTMGR emits these values and BASE/SOURCE managers dispatch the same values",
+  "TownManager's former local subset was numerically and semantically identical",
+  "the generic field also carries dialog-specific subprotocol values and remains integer storage",
+]
+status = "reviewed"
+
+[[domain]]
+name = "BaseWidgetCommand"
+declaration = "BaseWidgetCommand"
+owner = "include/BASE/widget.h"
+category = "message-id"
+production_carrier = "int message field"
+strict = true
+sentinels = []
+enumerators = [
+  "WIDGET_COMMAND_DRAW",
+  "WIDGET_COMMAND_SET_TEXT",
+  "WIDGET_COMMAND_SET_FRAME",
+  "WIDGET_COMMAND_SET_FLAGS",
+  "WIDGET_COMMAND_CLEAR_FLAGS",
+  "WIDGET_COMMAND_GET_TEXT",
+  "WIDGET_COMMAND_SET_FILL_COLOR",
+  "WIDGET_COMMAND_SET_ICON",
+  "WIDGET_COMMAND_SET_MAX_LENGTH",
+  "WIDGET_COMMAND_SET_X",
+  "WIDGET_COMMAND_SET_Y",
+  "WIDGET_COMMAND_REPLACE_ICON",
+  "WIDGET_COMMAND_SET_WIDTH",
+]
+interfaces = ["widget Main dispatch", "window-manager widget broadcasts"]
+members = []
+storage = ["tag_messageWidgetPayload::command four-byte transport"]
+conversions = []
+evidence = [
+  "BASE widgets consistently dispatch these command values",
+  "RECRUIT's former command enum was an exact semantic subset",
+]
+status = "reviewed"

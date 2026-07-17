@@ -46,15 +46,6 @@ typedef enum RecruitControl {
     RECRUIT_CONFIRM_CONTROL = 0x7802
 } RecruitControl;
 
-typedef enum RecruitWidgetCommand {
-    RECRUIT_SET_TEXT = 3,
-    RECRUIT_SET_IMAGE = 4,
-    RECRUIT_SET_FLAGS = 5,
-    RECRUIT_CLEAR_FLAGS = 6,
-    RECRUIT_GET_TEXT = 7,
-    RECRUIT_SET_ICON = 9
-} RecruitWidgetCommand;
-
 void SetupRecruitWin(class heroWindow *, i32, i32, i32, i32, i32);
 void QuickViewRecruit(class town *, i32);
 

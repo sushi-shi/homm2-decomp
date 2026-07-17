@@ -151,7 +151,7 @@ i16 wsnet_init(void) {
                sizeof(giNetPosToDCOPos));
         for (player = 1; player < giNumHumanPlayers; player++) {
             startup.netPosition = static_cast<u8>(player);
-            wsSendMessage(giNetPosToDCOPos[player], WS_MESSAGE_STARTUP,
+            wsSendMessage(giNetPosToDCOPos[player], NETWORK_PACKET_STARTUP,
                           sizeof(startup), &startup);
         }
     } else {
@@ -260,10 +260,10 @@ i32 wsnet_snd(i32 destination, i32 size, void *data) {
 
     wsProcessMessages();
     if (destination != WS_TRANSPORT_BROADCAST_POSITION)
-        wsSendMessage(giNetPosToDCOPos[destination], WS_MESSAGE_DATA,
+        wsSendMessage(giNetPosToDCOPos[destination], NETWORK_PACKET_DATA,
                       static_cast<u16>(size), data);
     else
-        wsSendMessage(0, WS_MESSAGE_DATA, static_cast<u16>(size), data);
+        wsSendMessage(0, NETWORK_PACKET_DATA, static_cast<u16>(size), data);
     return 0;
 }
 
@@ -322,14 +322,14 @@ void wsEvaluateMessage(u32l size, i32 sender) {
     i32 player;
 
     switch (rcvBufIn[0]) {
-    case WS_MESSAGE_DATA:
+    case NETWORK_PACKET_DATA:
         ppDPRcvBuffer[iDPRcvBufferHead] = static_cast<u8 *>(
             BaseAlloc(size - 1, WSFILE, s_wsEvaluateSourceLineBase + 10));
         memcpy(ppDPRcvBuffer[iDPRcvBufferHead], rcvBufIn + 1, size - 1);
         piDPRcvBufferSize[iDPRcvBufferHead] = size;
         iDPRcvBufferHead = (iDPRcvBufferHead + 1) % WS_TRANSPORT_BUFFER_COUNT;
         break;
-    case WS_MESSAGE_GUEST_ARRIVED:
+    case NETWORK_PACKET_GUEST_ARRIVED:
         if (GameMode == REMOTE_GAME_NETWORK_HOST) {
             if (gbRemoteGameOpen != 0) {
                 for (player = 1; player < giNumHumanPlayers; player++) {
@@ -337,7 +337,7 @@ void wsEvaluateMessage(u32l size, i32 sender) {
                         &gsNetPlayerInfo[player] ==
                             reinterpret_cast<SNetPlayerInfo *>(message)) {
                         wsSendMessage(giNetPosToDCOPos[player],
-                                      WS_MESSAGE_GUEST_ACCEPTED, 0, 0);
+                                      NETWORK_PACKET_GUEST_ACCEPTED, 0, 0);
                         return;
                     }
                 }
@@ -348,14 +348,14 @@ void wsEvaluateMessage(u32l size, i32 sender) {
                 if (gsNetPlayerInfo[giNumHumanPlayers].reserved[0] == 0)
                     xNetHasOldPlayers = 1;
                 wsSendMessage(giNetPosToDCOPos[giNumHumanPlayers],
-                              WS_MESSAGE_GUEST_ACCEPTED, 0, 0);
+                              NETWORK_PACKET_GUEST_ACCEPTED, 0, 0);
                 giNumHumanPlayers++;
             } else {
-                wsSendMessage(sender, WS_MESSAGE_GUEST_REJECTED, 0, 0);
+                wsSendMessage(sender, NETWORK_PACKET_GUEST_REJECTED, 0, 0);
             }
         }
         break;
-    case WS_MESSAGE_STARTUP:
+    case NETWORK_PACKET_STARTUP:
         giNumHumanPlayers = message[0];
         giThisNetPos = message[1];
         LogInt("WSMSGSTARTUP", giThisNetPos, sender,
@@ -363,13 +363,13 @@ void wsEvaluateMessage(u32l size, i32 sender) {
         memcpy(giNetPosToDCOPos, message + 2, sizeof(giNetPosToDCOPos));
         bStartUpInfoReceived = 1;
         break;
-    case WS_MESSAGE_GUEST_REJECTED:
+    case NETWORK_PACKET_GUEST_REJECTED:
         sprintf(cWSTextBuffer,
                 "The Host already has a game in progress and is not accepting new players.");
         NormalDialog(cWSTextBuffer, 1, -1, -1, -1, 0, -1, 0, -1, 0);
         ShutDown(0);
         break;
-    case WS_MESSAGE_GUEST_ACCEPTED:
+    case NETWORK_PACKET_GUEST_ACCEPTED:
         sprintf(cWSTextBuffer, "Waiting for other remote player to set up game.");
         windowMessage.type = 0x200;
         windowMessage.payload.widget.command = 3;
@@ -434,7 +434,7 @@ i32 wsWaitForHost(void) {
             iWSWaitForHostStatus++;
             return 0;
         }
-        wsSendMessage(0, WS_MESSAGE_GUEST_ARRIVED, sizeof(SNetPlayerInfo),
+        wsSendMessage(0, NETWORK_PACKET_GUEST_ARRIVED, sizeof(SNetPlayerInfo),
                       &gsThisNetPlayerInfo);
         iWSNextTickCount = KBTickCount() + WS_TRANSPORT_HOST_RETRY_DELAY;
         iWSAttempts++;

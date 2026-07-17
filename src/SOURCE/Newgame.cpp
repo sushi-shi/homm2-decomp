@@ -203,7 +203,7 @@ void game::SetupNetPlayerNames(void)
 
     if (giNumHumanPlayers > 1) {
         for (player = 0; 0[&giNumHumanPlayers] > player; ++player) {
-            if (iMPBaseType != NEW_GAME_MULTIPLAYER_HOTSEAT)
+            if (iMPBaseType != MULTIPLAYER_BASE_HOT_SEAT)
                 strcpy(cPlayerNames[player], gsNetPlayerInfo[player].name);
         }
     }
@@ -401,7 +401,7 @@ i32 game::NewGame(void)
 
         LoadGame("origdata.bin", 1, 0);
         if (giNumHumanPlayers > 1) {
-            if (iMPBaseType == NEW_GAME_MULTIPLAYER_HOTSEAT)
+            if (iMPBaseType == MULTIPLAYER_BASE_HOT_SEAT)
                 m_newGameWindow = new heroWindow(190, 4, "nghs.bin");
             else
                 m_newGameWindow = new heroWindow(190, 4, "ngmp.bin");
@@ -487,7 +487,7 @@ void game::InitNewGameWindow(void)
     multiplayerYOffsetValue = 0;
 
     if (giNumHumanPlayers > 1 &&
-        iMPBaseType != NEW_GAME_MULTIPLAYER_HOTSEAT)
+        iMPBaseType != MULTIPLAYER_BASE_HOT_SEAT)
         multiplayerYOffsetValue = -14;
 
     for (playerCounter = 0; playerCounter < m_mapHeader.playerCount;
@@ -897,7 +897,7 @@ i32 NewGameHandler(struct tag_message &message)
 
     if (message.type == NEW_GAME_MESSAGE_KEY &&
         giNumHumanPlayers > 1 &&
-        iMPBaseType != NEW_GAME_MULTIPLAYER_HOTSEAT &&
+        iMPBaseType != MULTIPLAYER_BASE_HOT_SEAT &&
         gpGame->ProcessNGKeyPress(message)) {
         redrawWindow = 1;
         for (currentPlayerLocal = 0;
@@ -1277,7 +1277,7 @@ i32 game::ProcessNGKeyPress(struct tag_message &message)
     i32 widthResult;
 
     if (giNumHumanPlayers == 1 ||
-        iMPBaseType == NEW_GAME_MULTIPLAYER_HOTSEAT)
+        iMPBaseType == MULTIPLAYER_BASE_HOT_SEAT)
         return 0;
 
     switch (message.payload.keyboard.keyCode) {
@@ -1390,7 +1390,7 @@ VA(0x004ba1d0, 0x11e)
 void game::NGKPSetupDisplayString(char *text, u16 cursor)
 {
     if (giNumHumanPlayers == 1 ||
-        iMPBaseType == NEW_GAME_MULTIPLAYER_HOTSEAT)
+        iMPBaseType == MULTIPLAYER_BASE_HOT_SEAT)
         return;
 
     if (glTimers[0] < static_cast<i32>(KBTickCount())) {
@@ -1419,7 +1419,7 @@ void game::DrawNGKPDisplayString(i32 updateScreen)
         return;
 
     if (giNumHumanPlayers == 1 ||
-        iMPBaseType == NEW_GAME_MULTIPLAYER_HOTSEAT)
+        iMPBaseType == MULTIPLAYER_BASE_HOT_SEAT)
         return;
 
     NGKPBkg->DrawToBuffer(NEW_GAME_CHAT_DRAW_X, NEW_GAME_CHAT_DRAW_Y,
