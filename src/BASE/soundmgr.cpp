@@ -24,9 +24,9 @@
 // ---- module-private synthetic globals (retail xref: single-module) ----
 DATA(0x00534970) static PCMWAVEFORMAT gWaveFormat; // digital-driver PCM format (WAVE_init_driver)
 
-typedef enum SoundStateSpan {
+HOMM2_ENUM_BEGIN(SoundStateSpan)
     SOUND_STATE_RESET_SPAN = 0xae
-} SoundStateSpan;
+HOMM2_ENUM_END(SoundStateSpan)
 
 VA(0x004cb630, 0x68)
 void HandleMCIError(i32 errorCode, char* commandString) {
@@ -531,7 +531,7 @@ void soundManager::AllocateSampleHandles(void) {
 
 VA(0x004cc9b0, 0x96)
 void soundManager::Close(void) {
-    if (m_active != 1)
+    if (!m_active)
         return;
     if (gbNoSound != 0)
         goto soundClosed;

@@ -7,12 +7,12 @@
 // forward declarations (was <_all.h>):
 struct tag_message;
 
-typedef enum CombatMainResult {
+HOMM2_ENUM_BEGIN(CombatMainResult)
     COMBAT_MAIN_CONTINUE = 1,
     COMBAT_MAIN_FINISHED = 2
-} CombatMainResult;
+HOMM2_ENUM_END(CombatMainResult)
 
-typedef enum CombatKeyCommand {
+HOMM2_ENUM_BEGIN(CombatKeyCommand)
     COMBAT_KEY_MOUSE_COORDS = 2,
     COMBAT_KEY_VIEW_ARMY = 0x14,
     COMBAT_KEY_VIEW_GENERAL = 0x23,
@@ -26,17 +26,17 @@ typedef enum CombatKeyCommand {
     COMBAT_KEY_CYCLE_SHADE = 0x42,
     COMBAT_KEY_CYCLE_SPELL_EFFECT = 0x43,
     COMBAT_KEY_DEBUG_CREATURE_EFFECT = 0x57
-} CombatKeyCommand;
+HOMM2_ENUM_END(CombatKeyCommand)
 
-typedef enum CombatWindowCommand {
+HOMM2_ENUM_BEGIN(CombatWindowCommand)
     COMBAT_WINDOW_HOVER = 12,
     COMBAT_WINDOW_CLICK = 13,
     COMBAT_WINDOW_HELP = 14,
     COMBAT_WINDOW_MAIN_BUTTON = 0x40,
     COMBAT_WINDOW_HELP_FLAG = 0x200
-} CombatWindowCommand;
+HOMM2_ENUM_END(CombatWindowCommand)
 
-typedef enum CombatWinLoseConstant {
+HOMM2_ENUM_VALUES_BEGIN(CombatWinLoseConstant)
     COMBAT_WIN_LOSE_WIDGET_COUNT = 25,
     COMBAT_WIN_LOSE_NEXT_CONTROL = 0x7800,
     COMBAT_WIN_LOSE_TEXT_COMMAND = 3,
@@ -75,9 +75,9 @@ typedef enum CombatWinLoseConstant {
     COMBAT_WIN_LOSE_ICON_FLAGS = 16,
     COMBAT_WIN_LOSE_SPELL_ICON_FLAGS = 17,
     COMBAT_WIN_LOSE_TEXT_FLAGS = 512
-} CombatWinLoseConstant;
+HOMM2_ENUM_VALUES_END(CombatWinLoseConstant)
 
-typedef enum CombatBattleResultText {
+HOMM2_ENUM_BEGIN(CombatBattleResultText)
     COMBAT_RESULT_TEXT_ENEMY_SURRENDERED = 0,
     COMBAT_RESULT_TEXT_ENEMY_FLED = 1,
     COMBAT_RESULT_TEXT_VICTORY = 2,
@@ -89,10 +89,9 @@ typedef enum CombatBattleResultText {
     COMBAT_RESULT_TEXT_FORCES_FLEE = 8,
     COMBAT_RESULT_TEXT_FORCES_DEFEAT = 9,
     COMBAT_RESULT_TEXT_NETWORK_EXPERIENCE = 10
-} CombatBattleResultText;
+HOMM2_ENUM_END(CombatBattleResultText)
 
-
-typedef enum CombatControlId {
+HOMM2_ENUM_BEGIN(CombatControlId)
     COMBAT_CONTROL_ATTACK = 1,
     COMBAT_CONTROL_WAIT = 2,
     COMBAT_CONTROL_DISABLE_SELECTION = 3,
@@ -101,16 +100,16 @@ typedef enum CombatControlId {
     COMBAT_CONTROL_HELP_SECOND = 11,
     COMBAT_CONTROL_HELP_THIRD = 12,
     COMBAT_CONTROL_HELP_FOURTH = 13
-} CombatControlId;
+HOMM2_ENUM_END(CombatControlId)
 
-typedef enum CombatRemoteConstant {
+HOMM2_ENUM_VALUES_BEGIN(CombatRemoteConstant)
     COMBAT_REMOTE_PACKET_TYPE = 1,
     COMBAT_REMOTE_CATEGORY_ACTION = 2,
     COMBAT_REMOTE_COMMAND_MESSAGE = 11,
     COMBAT_REMOTE_COMMAND_ACTION = 23
-} CombatRemoteConstant;
+HOMM2_ENUM_VALUES_END(CombatRemoteConstant)
 
-typedef enum CombatAction {
+HOMM2_ENUM_BEGIN(CombatAction)
     COMBAT_ACTION_NONE = 0,
     COMBAT_ACTION_CAST_SPELL = 1,
     COMBAT_ACTION_MOVE = 2,
@@ -119,17 +118,17 @@ typedef enum CombatAction {
     COMBAT_ACTION_SURRENDER = 5,
     COMBAT_ACTION_ATTACK = 6,
     COMBAT_ACTION_DEFEND = 7
-} CombatAction;
+HOMM2_ENUM_END(CombatAction)
 
-typedef enum CombatActionDataIndex {
+HOMM2_ENUM_BEGIN(CombatActionDataIndex)
     COMBAT_ACTION_DATA_ACTION = 0,
     COMBAT_ACTION_DATA_EXTRA = 1,
     COMBAT_ACTION_DATA_GRID = 2,
     COMBAT_ACTION_DATA_SECOND_GRID = 3,
     COMBAT_ACTION_DATA_COUNT = 4
-} CombatActionDataIndex;
+HOMM2_ENUM_END(CombatActionDataIndex)
 
-typedef enum CombatDirectionConstant {
+HOMM2_ENUM_VALUES_BEGIN(CombatDirectionConstant)
     COMBAT_DIRECTION_COUNT = 8,
     COMBAT_ADJACENT_DIRECTION_COUNT = 6,
     COMBAT_DIRECTION_SPECIAL_FIRST = 6,
@@ -146,9 +145,9 @@ typedef enum CombatDirectionConstant {
     COMBAT_DIRECTION_SPECIAL_SECOND_SECTOR_PREVIOUS = 23,
     COMBAT_DIRECTION_SPECIAL_SECOND_SECTOR_CENTER = 0,
     COMBAT_DIRECTION_SPECIAL_SECOND_SECTOR_NEXT = 1
-} CombatDirectionConstant;
+HOMM2_ENUM_VALUES_END(CombatDirectionConstant)
 
-typedef enum CombatCommandConstant {
+HOMM2_ENUM_VALUES_BEGIN(CombatCommandConstant)
     COMBAT_POINTER_DEFAULT = 6,
     COMBAT_POINTER_VIEW = 5,
     COMBAT_POINTER_ATTACK_OFFSET = 7,
@@ -160,16 +159,16 @@ typedef enum CombatCommandConstant {
     COMBAT_IGNORED_HEX = -2,
     COMBAT_INVALID_COMMAND = -99,
     COMBAT_CASTLE_GATE_HEX = 59
-} CombatCommandConstant;
+HOMM2_ENUM_VALUES_END(CombatCommandConstant)
 
-typedef enum CombatRoundConstant {
+HOMM2_ENUM_VALUES_BEGIN(CombatRoundConstant)
     COMBAT_ROUND_INITIAL_SPEED = 15,
     COMBAT_ROUND_ABILITY_FLAGS = 0xff1f,
     COMBAT_RESULT_DRAW = -1,
     COMBAT_WIN_MESSAGE = 0x4000
-} CombatRoundConstant;
+HOMM2_ENUM_VALUES_END(CombatRoundConstant)
 
-typedef enum CombatCommandGeometry {
+HOMM2_ENUM_VALUES_BEGIN(CombatCommandGeometry)
     COMBAT_CONTROL_RIGHT_MIN_X = 590,
     COMBAT_CONTROL_LEFT_MAX_X = 50,
     COMBAT_CONTROL_SYSTEM_OPTIONS_MIN_Y = 460,
@@ -181,17 +180,17 @@ typedef enum CombatCommandGeometry {
     COMBAT_COMMAND_FRAME_DELAY = 75,
     COMBAT_DEBUG_VAPORIZE_MASK = 0x3,
     COMBAT_DEBUG_DOUBLE_RIPPLE_MASK = 0xc
-} CombatCommandGeometry;
+HOMM2_ENUM_VALUES_END(CombatCommandGeometry)
 
-typedef enum CombatCasualtyConstant {
+HOMM2_ENUM_VALUES_BEGIN(CombatCasualtyConstant)
     COMBAT_CASUALTY_QUANTITY_STORAGE_COUNT = 42,
     COMBAT_CASUALTY_DISPLAY_LIMIT = 7,
     COMBAT_CASUALTY_WIDGETS_PER_SIDE = 7,
     COMBAT_CASUALTY_WINDOW_WIDTH = 320,
     COMBAT_CASUALTY_WINDOW_BOTTOM = 458
-} CombatCasualtyConstant;
+HOMM2_ENUM_VALUES_END(CombatCasualtyConstant)
 
-typedef enum CombatCycleConstant {
+HOMM2_ENUM_VALUES_BEGIN(CombatCycleConstant)
     COMBAT_CREATURE_CYCLE_SEQUENCE_FIRST = 8,
     COMBAT_CREATURE_CYCLE_SEQUENCE_LAST = 12,
     COMBAT_HERO_ANIMATION_STAND = 0,
@@ -206,9 +205,9 @@ typedef enum CombatCycleConstant {
     COMBAT_IDLE_ROLL_MIN = 1,
     COMBAT_IDLE_ROLL_MAX = 100,
     COMBAT_IDLE_REPEAT_CHANCE = 8
-} CombatCycleConstant;
+HOMM2_ENUM_VALUES_END(CombatCycleConstant)
 
-typedef enum CombatVictoryConstant {
+HOMM2_ENUM_VALUES_BEGIN(CombatVictoryConstant)
     COMBAT_VICTORY_NECROMANCY_STACK_LIMIT = 5,
     COMBAT_VICTORY_FADE_STEPS = 8,
     COMBAT_VICTORY_WATER_FADE_STEPS = 5,
@@ -216,9 +215,9 @@ typedef enum CombatVictoryConstant {
     COMBAT_VICTORY_FADE_DELAY = 60,
     COMBAT_VICTORY_MUSIC = 29,
     COMBAT_LOSS_MUSIC = 30
-} CombatVictoryConstant;
+HOMM2_ENUM_VALUES_END(CombatVictoryConstant)
 
-typedef enum CombatSurrenderDialogConstant {
+HOMM2_ENUM_VALUES_BEGIN(CombatSurrenderDialogConstant)
     COMBAT_SURRENDER_DIALOG_TYPE = 1,
     COMBAT_SURRENDER_DIALOG_ACCEPT_RESULT = 2,
     COMBAT_SURRENDER_TEXT_WIDTH = 30,
@@ -230,7 +229,7 @@ typedef enum CombatSurrenderDialogConstant {
     COMBAT_SURRENDER_CAPTAIN_OVERLAY_COMMAND = 4,
     COMBAT_SURRENDER_CAPTAIN_NEUTRAL_COLOR = 6,
     COMBAT_SURRENDER_TEXT_ID = 2
-} CombatSurrenderDialogConstant;
+HOMM2_ENUM_VALUES_END(CombatSurrenderDialogConstant)
 
 #define COMBAT_NECROMANCY_LEVEL_FACTOR 0.1
 #define COMBAT_SURRENDER_QUILL_FACTOR 0.1
@@ -241,12 +240,12 @@ typedef enum CombatSurrenderDialogConstant {
 #define COMBAT_STAND_DELAY_RANDOM_FACTOR 0.5
 #define COMBAT_CYCLE_TIMER_FACTOR 150.0f
 
-typedef enum CombatHelpTextIndex {
+HOMM2_ENUM_BEGIN(CombatHelpTextIndex)
     COMBAT_HELP_SKIP_UNIT = 1,
     COMBAT_HELP_AUTO_COMBAT = 2,
     COMBAT_HELP_SYSTEM_OPTIONS = 3,
     COMBAT_HELP_OTHER_CONTROL = 4
-} CombatHelpTextIndex;
+HOMM2_ENUM_END(CombatHelpTextIndex)
 
 #define COMBAT_SOUND_POLL_DELAY 75.0f
 #define COMBAT_DIRECTION_SLOPE_STEEPEST 3.73

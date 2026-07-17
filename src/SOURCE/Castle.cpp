@@ -235,7 +235,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
         casWin->BroadcastMessage(message3);
     }
 
-    if (gpCurPlayer->m_resources[RES_GOLD] < gHeroGoldCost)
+    if (gpCurPlayer->m_resources[IDX(RES_GOLD)] < gHeroGoldCost)
         widgetFrame12 = CASTLE_FRAME_CANNOT_AFFORD;
     else if (gpCurPlayer->m_heroCount == CASTLE_HERO_COUNT_LIMIT || m_town->m_occupyingHeroId != -1)
         widgetFrame12 = CASTLE_FRAME_CANNOT_BUILD;
@@ -391,23 +391,23 @@ i32 CastleHandler(tag_message& message) {
         gpTownManager->m_lastHoverId = message.payload.widget.id;
         switch (buildingIndex) {
             case CASTLE_CONTROL_CAPTAIN_FORMATION_GROUPED:
-                sprintf(gText, cCastleInfo[CASTLE_INFO_GROUPED_FORMATION]);
+                sprintf(gText, cCastleInfo[IDX(CASTLE_INFO_GROUPED_FORMATION)]);
                 break;
             case CASTLE_CONTROL_CAPTAIN_FORMATION_SPREAD:
-                sprintf(gText, cCastleInfo[CASTLE_INFO_SPREAD_FORMATION]);
+                sprintf(gText, cCastleInfo[IDX(CASTLE_INFO_SPREAD_FORMATION)]);
                 break;
 
             case CASTLE_MAGE_GUILD:
                 if (!(gpTownManager->m_buildableBuildings & (1L << buildingIndex))) {
                     sprintf(
                         gText,
-                        cCastleInfo[CASTLE_INFO_CANNOT_BUILD],
+                        cCastleInfo[IDX(CASTLE_INFO_CANNOT_BUILD)],
                         GetBuildingName(gpTownManager->m_town->m_type, buildingIndex)
                     );
                 } else if (!(gpTownManager->m_affordableBuildings & (1L << buildingIndex))) {
                     sprintf(
                         gText,
-                        cCastleInfo[CASTLE_INFO_CANNOT_AFFORD],
+                        cCastleInfo[IDX(CASTLE_INFO_CANNOT_AFFORD)],
                         GetBuildingName(gpTownManager->m_town->m_type, buildingIndex)
                     );
                 } else {
@@ -452,26 +452,26 @@ i32 CastleHandler(tag_message& message) {
                 } else if (gpTownManager->m_town->m_buildings & (1L << buildingIndex)) {
                     sprintf(
                         gText,
-                        cCastleInfo[CASTLE_INFO_ALREADY_BUILT],
+                        cCastleInfo[IDX(CASTLE_INFO_ALREADY_BUILT)],
                         GetBuildingName(gpTownManager->m_town->m_type, buildingIndex)
                     );
                 } else {
                     if (!(gpTownManager->m_buildableBuildings & (1L << buildingIndex)))
                         sprintf(
                             gText,
-                            cCastleInfo[CASTLE_INFO_CANNOT_BUILD],
+                            cCastleInfo[IDX(CASTLE_INFO_CANNOT_BUILD)],
                             GetBuildingName(gpTownManager->m_town->m_type, buildingIndex)
                         );
                     else if (!(gpTownManager->m_affordableBuildings & (1L << buildingIndex)))
                         sprintf(
                             gText,
-                            cCastleInfo[CASTLE_INFO_CANNOT_AFFORD],
+                            cCastleInfo[IDX(CASTLE_INFO_CANNOT_AFFORD)],
                             GetBuildingName(gpTownManager->m_town->m_type, buildingIndex)
                         );
                     else
                         sprintf(
                             gText,
-                            cCastleInfo[CASTLE_INFO_BUILD],
+                            cCastleInfo[IDX(CASTLE_INFO_BUILD)],
                             GetBuildingName(gpTownManager->m_town->m_type, buildingIndex)
                         );
                 }
@@ -487,20 +487,20 @@ i32 CastleHandler(tag_message& message) {
                     case CASTLE_CONTROL_RECRUIT_FIRST + 1:
                         heroChoiceIndex = message.payload.widget.id - CASTLE_CONTROL_RECRUIT_FIRST;
                     hero_hover_text:
-                        if (gpCurPlayer->m_resources[RES_GOLD] < gHeroGoldCost) {
-                            strcpy(gText, cCastleInfo[CASTLE_INFO_CANNOT_AFFORD_HERO]);
+                        if (gpCurPlayer->m_resources[IDX(RES_GOLD)] < gHeroGoldCost) {
+                            strcpy(gText, cCastleInfo[IDX(CASTLE_INFO_CANNOT_AFFORD_HERO)]);
                         } else if (gpCurPlayer->m_heroCount == CASTLE_HERO_COUNT_LIMIT) {
                             sprintf(
                                 gText,
-                                cCastleInfo[CASTLE_INFO_TOO_MANY_HEROES],
+                                cCastleInfo[IDX(CASTLE_INFO_TOO_MANY_HEROES)],
                                 CASTLE_HERO_COUNT_LIMIT
                             );
                         } else if (gpTownManager->m_town->m_occupyingHeroId != -1) {
-                            strcpy(gText, cCastleInfo[CASTLE_INFO_TOWN_OCCUPIED]);
+                            strcpy(gText, cCastleInfo[IDX(CASTLE_INFO_TOWN_OCCUPIED)]);
                         } else {
                             sprintf(
                                 gText,
-                                cCastleInfo[CASTLE_INFO_RECRUIT_HERO],
+                                cCastleInfo[IDX(CASTLE_INFO_RECRUIT_HERO)],
                                 gpGame->m_heroRecs[gpCurPlayer->AvailableHeroId(heroChoiceIndex)]
                                     .m_name,
                                 gAlignmentNames
@@ -512,9 +512,9 @@ i32 CastleHandler(tag_message& message) {
                         break;
                     default:
                         if (message.payload.widget.id == CASTLE_CONTROL_CLOSE)
-                            strcpy(gText, cCastleInfo[CASTLE_INFO_EXIT]);
+                            strcpy(gText, cCastleInfo[IDX(CASTLE_INFO_EXIT)]);
                         else
-                            strcpy(gText, cCastleInfo[CASTLE_INFO_OPTIONS]);
+                            strcpy(gText, cCastleInfo[IDX(CASTLE_INFO_OPTIONS)]);
                         break;
                 }
                 break;
@@ -660,7 +660,7 @@ i32 CastleHandler(tag_message& message) {
                                 } else {
                                     cannotRecruitHero =
                                         gpTownManager->m_recruitResult != 0
-                                        || gpCurPlayer->m_resources[RES_GOLD] < gHeroGoldCost
+                                        || gpCurPlayer->m_resources[IDX(RES_GOLD)] < gHeroGoldCost
                                         || gpCurPlayer->m_heroCount >= CASTLE_HERO_COUNT_LIMIT
                                         || gpTownManager->m_town->m_occupyingHeroId != -1;
                                     result = gpTownManager->RecruitHero(

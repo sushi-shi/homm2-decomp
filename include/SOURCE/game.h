@@ -46,18 +46,18 @@ class game {
 public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
-    i16 m_difficultyRating;                // +0x00
-    u8 m_campaignType;                     // +0x02
-    u8 m_campaignStartingSide;             // +0x03
-    i8 m_campaignScenario;                 // +0x04
-    u8 m_campaignScenarioCompleted[2][12]; // +0x05
-    i16 m_campaignScenarioBonus[2][12];    // +0x1d
-    i16 m_campaignScenarioDays[2][12];     // +0x4d
-    char m_unknown7d;               // +0x7d never referenced
-    u8 m_campaignAwards[12];        // +0x7e
-    u8 m_campaignChoice[2][12];     // +0x8a
-    u8 m_campaignMapEnabled[2][12]; // +0xa2
-    i16 m_campaignScore;            // +0xba
+    i16 m_difficultyRating;                   // +0x00
+    u8 m_campaignType;                        // +0x02
+    u8 m_campaignStartingSide;                // +0x03
+    i8 m_campaignScenario;                    // +0x04
+    u8 m_campaignScenarioCompleted[2][12];    // +0x05
+    i16 m_campaignScenarioBonus[2][12];       // +0x1d
+    i16 m_campaignScenarioDays[2][12];        // +0x4d
+    char m_unknown7d;                         // +0x7d never referenced
+    u8 m_campaignAwards[12];                  // +0x7e
+    u8 m_campaignChoice[2][12];               // +0x8a
+    u8 m_campaignMapEnabled[2][12];           // +0xa2
+    i16 m_campaignScore;                      // +0xba
     i16 m_campaignCarryoverCreatureTypes[5];  // +0xbc
     i16 m_campaignCarryoverCreatureCounts[5]; // +0xc6
     u8 m_campaignScenarioWon;                 // +0xd0
@@ -94,19 +94,19 @@ public:
         char m_dailyEventFlags[9]; // +0x27bb
         u8 m_knownTowns[9];
     };
-    hero m_heroRecs[54];                    // 0x27c4  hero record slots (GetHeroSlot)
-    i8 m_availableHeroes[54];               // +0x5c80
-    mineRecord m_mines[144];                // 0x5cb6
-    i8 m_mineOwners[144];                   // 0x60a6
-    char m_randomArtifacts[ARTIFACT_COUNT]; // 0x6136
-    boatRecord m_boats[48];                 // 0x619d
-    i8 m_boatSlots[48];                     // 0x631d, active boat record indices
-    i8 m_obeliskVisitors[48];               // 0x634d
-    char m_defaultPlayerNames[24];          // +0x637d
-    i8 m_ultimateArtifactX;                 // +0x6395
-    i8 m_ultimateArtifactY;                 // +0x6396
-    i8 m_ultimateArtifactId;                // +0x6397
-    class heroWindow* m_newGameWindow;      // +0x6398
+    hero m_heroRecs[54];                         // 0x27c4  hero record slots (GetHeroSlot)
+    i8 m_availableHeroes[54];                    // +0x5c80
+    mineRecord m_mines[144];                     // 0x5cb6
+    i8 m_mineOwners[144];                        // 0x60a6
+    char m_randomArtifacts[IDX(ARTIFACT_COUNT)]; // 0x6136
+    boatRecord m_boats[48];                      // 0x619d
+    i8 m_boatSlots[48];                          // 0x631d, active boat record indices
+    i8 m_obeliskVisitors[48];                    // 0x634d
+    char m_defaultPlayerNames[24];               // +0x637d
+    i8 m_ultimateArtifactX;                      // +0x6395
+    i8 m_ultimateArtifactY;                      // +0x6396
+    i8 m_ultimateArtifactId;                     // +0x6397
+    class heroWindow* m_newGameWindow;           // +0x6398
     char m_pad_0x639c;
     u8 m_cheated; // +0x639d
     char m_pad_0x639e[0xc];
@@ -189,7 +189,7 @@ public:
     i32 LoadMap(char*);
     void ClaimTown(i32, i32, i32);
     void ClaimMine(i32, i32);
-    i32 ViewSpells(class hero*, i32, i32 (*)(struct tag_message&), i32);
+    SpellType ViewSpells(class hero*, i32, i32 (*)(struct tag_message&), i32);
     void UpdateSpellWidgets(void);
     void ViewArmy(
         i32,

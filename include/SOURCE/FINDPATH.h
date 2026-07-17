@@ -5,10 +5,10 @@
 // Declarations of the free functions DEFINED in FINDPATH.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
 
-typedef enum FindPathConstant {
+HOMM2_ENUM_VALUES_BEGIN(FindPathConstant)
     PATH_ATTACK_MASK_SURROUNDED = 0xff,
     PATH_LENGTH_LIMIT = 0xff
-} FindPathConstant;
+HOMM2_ENUM_VALUES_END(FindPathConstant)
 
 i32 CalcTerrainCost(i32, i32, i32, i32, i32, i32);
 

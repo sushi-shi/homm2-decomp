@@ -8,7 +8,7 @@
 class heroWindow;
 class town;
 
-typedef enum RecruitConstant {
+HOMM2_ENUM_VALUES_BEGIN(RecruitConstant)
     RECRUIT_RESOURCE_COUNT = 6,
     RECRUIT_GOLD_RESOURCE = 6,
     RECRUIT_NO_RESOURCE = -1,
@@ -25,9 +25,9 @@ typedef enum RecruitConstant {
     RECRUIT_DRAW_DEPTH = 0x7fff,
     RECRUIT_VIEW_ARMY_X = 0x77,
     RECRUIT_VIEW_ARMY_Y = 0x20
-} RecruitConstant;
+HOMM2_ENUM_VALUES_END(RecruitConstant)
 
-typedef enum RecruitControl {
+HOMM2_ENUM_BEGIN(RecruitControl)
     RECRUIT_TITLE_CONTROL = 0x40,
     RECRUIT_CREATURE_CONTROL = 0x42,
     RECRUIT_AVAILABLE_CONTROL = 0x43,
@@ -44,7 +44,7 @@ typedef enum RecruitControl {
     RECRUIT_CLOSE_CONTROL = 0x7800,
     RECRUIT_CANCEL_CONTROL = 0x7801,
     RECRUIT_CONFIRM_CONTROL = 0x7802
-} RecruitControl;
+HOMM2_ENUM_END(RecruitControl)
 
 void SetupRecruitWin(class heroWindow*, i32, i32, i32, i32, i32);
 void QuickViewRecruit(class town*, i32);

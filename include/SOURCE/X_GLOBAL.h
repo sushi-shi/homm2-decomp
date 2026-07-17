@@ -10,16 +10,16 @@
 
 class ExpCampaign;
 
-typedef enum SecondarySkillValueTableConstant {
-    SECONDARY_SKILL_VALUE_LEVEL_COUNT = HERO_SKILL_LEVEL_COUNT - 1
-} SecondarySkillValueTableConstant;
+HOMM2_ENUM_VALUES_BEGIN(SecondarySkillValueTableConstant)
+    SECONDARY_SKILL_VALUE_LEVEL_COUNT = IDX(HERO_SKILL_LEVEL_COUNT) - 1
+HOMM2_ENUM_VALUES_END(SecondarySkillValueTableConstant)
 
-typedef enum ElevationOverlayConstant {
+HOMM2_ENUM_VALUES_BEGIN(ElevationOverlayConstant)
     ELEVATION_OVERLAY_COUNT = 25,
     ELEVATION_OVERLAY_CELL_COUNT = 15
-} ElevationOverlayConstant;
+HOMM2_ENUM_VALUES_END(ElevationOverlayConstant)
 
-typedef enum TownEligibleBuildMaskConstant {
+HOMM2_ENUM_VALUES_BEGIN(TownEligibleBuildMaskConstant)
     TOWN_ELIGIBLE_BUILD_MASK_COUNT = 6,
     TOWN_ELIGIBLE_BUILD_KNIGHT_MASK = 0x3ff8bf9f,
     TOWN_ELIGIBLE_BUILD_BARBARIAN_MASK = 0x1bf8bf9f,
@@ -27,11 +27,11 @@ typedef enum TownEligibleBuildMaskConstant {
     TOWN_ELIGIBLE_BUILD_WARLOCK_MASK = 0x69f8bf9f,
     TOWN_ELIGIBLE_BUILD_WIZARD_MASK = 0x35f8bf9f,
     TOWN_ELIGIBLE_BUILD_NECROMANCER_MASK = 0x1ff8bf9b
-} TownEligibleBuildMaskConstant;
+HOMM2_ENUM_VALUES_END(TownEligibleBuildMaskConstant)
 
-typedef enum CombatControlConstant {
+HOMM2_ENUM_VALUES_BEGIN(CombatControlConstant)
     COMBAT_CONTROL_SIDE_COUNT = 2
-} CombatControlConstant;
+HOMM2_ENUM_VALUES_END(CombatControlConstant)
 
 #pragma pack(push, 1)
 struct SCmbtObstacle {
@@ -99,18 +99,18 @@ extern i32 xPasswordStringsIndex[X_GLOBAL_PASSWORD_STRING_INDEX_COUNT];
 extern i32 xShrineBuildingCost[X_GLOBAL_BUILDING_RESOURCE_COUNT];
 
 // ---- globals (declarations, RVA order) ----
-typedef enum RadarColorTableCount {
+HOMM2_ENUM_VALUES_BEGIN(RadarColorTableCount)
     RADAR_MAP_COLOR_COUNT = 16,
     RADAR_OBJECT_COLOR_COUNT = 16,
     RADAR_OWNER_COLOR_COUNT = 8
-} RadarColorTableCount;
+HOMM2_ENUM_VALUES_END(RadarColorTableCount)
 
-typedef enum GroundTableConstant {
+HOMM2_ENUM_VALUES_BEGIN(GroundTableConstant)
     GROUND_TILE_IMAGE_COUNT = 432,
     GROUND_SHAPE_FLIPPED = 0x80
-} GroundTableConstant;
+HOMM2_ENUM_VALUES_END(GroundTableConstant)
 
-typedef enum KbControlTableConstant {
+HOMM2_ENUM_VALUES_BEGIN(KbControlTableConstant)
     MOVEMENT_FRAME_FLIP_COUNT = 16,
     CASTLE_RESOURCE_SLOT_COUNT = 8,
     CASTLE_AMOUNT_COUNT = 4,
@@ -122,20 +122,20 @@ typedef enum KbControlTableConstant {
     MINE_CHARACTERISTIC_COUNT = 8,
     VESA_SET_MODE_FUNCTION = 0x4f02,
     VESA_MODE_640_480_256 = 0x0101
-} KbControlTableConstant;
+HOMM2_ENUM_VALUES_END(KbControlTableConstant)
 
-typedef enum KbPaletteTableConstant {
+HOMM2_ENUM_VALUES_BEGIN(KbPaletteTableConstant)
     PUZZLE_DRAW_TABLE_COUNT = 64
-} KbPaletteTableConstant;
+HOMM2_ENUM_VALUES_END(KbPaletteTableConstant)
 
-typedef enum KbGameTableConstant {
+HOMM2_ENUM_VALUES_BEGIN(KbGameTableConstant)
     KB_MAP_SIZE_COUNT = 4,
     KB_INTERFACE_TYPE_COUNT = 37,
     KB_INTERFACE_VARIANT_COUNT = 2,
     KB_COMBAT_SPEED_COUNT = 3,
     KB_COMBAT_FX_COUNT = 32,
-    KB_ARTIFACT_LEVEL_COUNT = ARTIFACT_COUNT + 1,
-    KB_ARTIFACT_BASE_VALUE_COUNT = ARTIFACT_COUNT,
+    KB_ARTIFACT_LEVEL_COUNT = IDX(ARTIFACT_COUNT) + 1,
+    KB_ARTIFACT_BASE_VALUE_COUNT = IDX(ARTIFACT_COUNT),
     KB_STAT_POWER_COUNT = 42,
     KB_SPELL_LIMIT_COUNT = 5,
     KB_SPELL_MOD_COUNT = 12,
@@ -146,7 +146,7 @@ typedef enum KbGameTableConstant {
     KB_SPELL_EFFECT_COUNT = 32,
     KB_COMBAT_BACKGROUND_COUNT = 20,
     KB_COMBAT_OBSTACLE_COUNT = 32,
-    KB_TERRAIN_TYPE_COUNT = TERRAIN_COUNT + 1,
+    KB_TERRAIN_TYPE_COUNT = IDX(TERRAIN_COUNT) + 1,
     KB_TERRAIN_STEP_TYPE_COUNT = 2,
     KB_TRIGGER_TYPE_COUNT = 128,
     KB_TOWN_OBJECT_NAME_COUNT = 32,
@@ -156,7 +156,7 @@ typedef enum KbGameTableConstant {
     KB_COMBAT_COORDINATE_COUNT = 2,
     KB_TRADING_POST_EFFICIENCY_COUNT = 11,
     KB_MOAT_CELL_COUNT = 9,
-    KB_ALIGNMENT_NAME_COUNT = FACTION_COUNT + 2,
+    KB_ALIGNMENT_NAME_COUNT = IDX(FACTION_COUNT) + 2,
     KB_QUICK_VIEW_TEXT_COUNT = 124,
     KB_EVENT_TEXT_TABLE_COUNT = 96,
     KB_CONTROL_PANEL_HELP_COUNT = 6,
@@ -209,14 +209,14 @@ typedef enum KbGameTableConstant {
     KB_HUMAN_DIFFICULTY_TEXT_COUNT = 6,
     KB_HUMAN_INFO_DIFFICULTY_TEXT_COUNT = 6,
     KB_MUSIC_QUALITY_TEXT_COUNT = 4,
-    KB_SPELL_TEXT_COUNT = SPELL_COUNT + 1,
-    KB_SECONDARY_SKILL_LEVEL_TEXT_COUNT = HERO_SKILL_LEVEL_COUNT,
-    KB_SECONDARY_SKILL_TEXT_COUNT = HERO_SKILL_COUNT,
+    KB_SPELL_TEXT_COUNT = IDX(SPELL_COUNT) + 1,
+    KB_SECONDARY_SKILL_LEVEL_TEXT_COUNT = IDX(HERO_SKILL_LEVEL_COUNT),
+    KB_SECONDARY_SKILL_TEXT_COUNT = IDX(HERO_SKILL_COUNT),
     KB_NEUTRAL_BUILDING_TEXT_COUNT = 20,
     KB_WELL_EXTRA_NAME_COUNT = 8,
     KB_SPECIAL_BUILDING_NAME_COUNT = 8,
     KB_NEUTRAL_BUILDING_INFO_COUNT = 20,
-    KB_SPECIAL_BUILDING_INFO_COUNT = FACTION_COUNT,
+    KB_SPECIAL_BUILDING_INFO_COUNT = IDX(FACTION_COUNT),
     KB_DIRECTION_TEXT_COUNT = 10,
     KB_RUMOUR_TERRAIN_DESCRIPTION_COUNT = KB_TERRAIN_TYPE_COUNT,
     KB_INTERFACE_TYPE_TEXT_COUNT = 4,
@@ -241,15 +241,15 @@ typedef enum KbGameTableConstant {
     KB_RECRUITMENT_SITE_NAME_COUNT = 6,
     KB_WIN_SETUP_COUNT = 73,
     KB_INIT_MENU_HOTSPOT_COUNT = 5
-} KbGameTableConstant;
+HOMM2_ENUM_VALUES_END(KbGameTableConstant)
 
-typedef enum InitMenuHotSpotField {
+HOMM2_ENUM_BEGIN(InitMenuHotSpotField)
     INIT_MENU_HOTSPOT_X = 0,
     INIT_MENU_HOTSPOT_Y = 1,
     INIT_MENU_HOTSPOT_WIDTH = 2,
     INIT_MENU_HOTSPOT_HEIGHT = 3,
     INIT_MENU_HOTSPOT_FIELD_COUNT = 4
-} InitMenuHotSpotField;
+HOMM2_ENUM_END(InitMenuHotSpotField)
 
 extern u8 giGroundShape[GROUND_TILE_IMAGE_COUNT];
 extern u8 gColorTableTan[DIM_PALETTE_COLOR_COUNT];
@@ -263,7 +263,7 @@ extern u8 gMapColors[RADAR_MAP_COLOR_COUNT];
 extern u8 gObjectColors[RADAR_OBJECT_COLOR_COUNT];
 extern u8 gOwnerColors[RADAR_OWNER_COLOR_COUNT];
 // Indexes of gTilesetFiles: one id per adventure-object icn tileset.
-typedef enum TilesetId {
+HOMM2_ENUM_BEGIN(TilesetId)
     TILESET_OBJNHAUN = 10,
     TILESET_OBJNARTI = 11,
     TILESET_MONS32 = 12,
@@ -316,7 +316,7 @@ typedef enum TilesetId {
     TILESET_X_LOC1 = 61,
     TILESET_X_LOC2 = 62,
     TILESET_X_LOC3 = 63
-} TilesetId;
+HOMM2_ENUM_END(TilesetId)
 
 extern char* gTilesetFiles[64];
 extern u8 bPuzzleDraw[PUZZLE_DRAW_TABLE_COUNT];
@@ -353,7 +353,7 @@ extern i16 gVesaMode[VESA_MODE_VALUE_COUNT];
 extern i32 gInitResourcesHuman[STARTING_RESOURCE_DIFFICULTY_COUNT][STARTING_RESOURCE_TYPE_COUNT];
 extern i32 gInitResourcesComputer[STARTING_RESOURCE_DIFFICULTY_COUNT][STARTING_RESOURCE_TYPE_COUNT];
 extern i32 gMineCharacteristics[MINE_CHARACTERISTIC_COUNT];
-extern i32 gSSValues[HERO_SKILL_COUNT][SECONDARY_SKILL_VALUE_LEVEL_COUNT];
+extern i32 gSSValues[IDX(HERO_SKILL_COUNT)][SECONDARY_SKILL_VALUE_LEVEL_COUNT];
 extern u8 gArtifactLevel[KB_ARTIFACT_LEVEL_COUNT];
 extern i32 gUltArtifactAvgValue;
 extern i8 giVisRangeTown;
@@ -367,7 +367,7 @@ extern float gfPhilAIDurationMod[KB_SPELL_MOD_COUNT];
 extern float gfSpellTypeNumMod[KB_QUICK_COMBAT_SPELL_TYPE_COUNT];
 extern i8 gbArrow[NORMAL_DIRECTION_COUNT][NORMAL_DIRECTION_COUNT];
 extern u8 giCloudType[KB_CLOUD_MASK_COUNT];
-typedef enum TownMusicTrack {
+HOMM2_ENUM_BEGIN(TownMusicTrack)
     TOWN_MUSIC_NONE = 0,
     TOWN_MUSIC_WARLOCK = 5,
     TOWN_MUSIC_WIZARD = 6,
@@ -376,10 +376,10 @@ typedef enum TownMusicTrack {
     TOWN_MUSIC_BARBARIAN = 9,
     TOWN_MUSIC_SORCERESS = 10,
     TOWN_MUSIC_TABLE_SIZE = 8
-} TownMusicTrack;
+HOMM2_ENUM_END(TownMusicTrack)
 
-extern i8 townTheme[TOWN_MUSIC_TABLE_SIZE];
-extern i8 gHeroSkillBonus[FACTION_COUNT][KB_HERO_LEVEL_BAND_COUNT][HERO_PRIMARY_STAT_COUNT];
+extern i8 townTheme[IDX(TOWN_MUSIC_TABLE_SIZE)];
+extern i8 gHeroSkillBonus[IDX(FACTION_COUNT)][KB_HERO_LEVEL_BAND_COUNT][HERO_PRIMARY_STAT_COUNT];
 extern i32 giMonoIconSkip;
 extern i32 giScrollX;
 extern i32 giScrollY;
@@ -403,19 +403,20 @@ extern i32 giSpellEffectShowType;
 extern i8 gcColorToPlayerPos[RADAR_OWNER_COLOR_COUNT];
 extern char* cCombatBkgNames[KB_COMBAT_BACKGROUND_COUNT];
 extern struct SCmbtObstacle sCmbtObstacles[KB_COMBAT_OBSTACLE_COUNT];
-extern i32 gEstatesGoldLevel[HERO_SKILL_LEVEL_COUNT];
-extern float gfSSLogisticsMod[HERO_SKILL_LEVEL_COUNT];
-extern float gfSSNavigationMod[HERO_SKILL_LEVEL_COUNT];
-extern float gfSSArcheryMod[HERO_SKILL_LEVEL_COUNT];
-extern float gfSSAIArcheryMod[HERO_SKILL_LEVEL_COUNT];
-extern i8 giVisRange[HERO_SKILL_LEVEL_COUNT];
-extern u8 gStartingHeroStats[FACTION_COUNT][HERO_STARTING_STAT_COUNT];
-extern i32 giTerrainCost[KB_TERRAIN_TYPE_COUNT][HERO_SKILL_LEVEL_COUNT][KB_TERRAIN_STEP_TYPE_COUNT];
-extern char* gTownPrefixNames[FACTION_COUNT];
+extern i32 gEstatesGoldLevel[IDX(HERO_SKILL_LEVEL_COUNT)];
+extern float gfSSLogisticsMod[IDX(HERO_SKILL_LEVEL_COUNT)];
+extern float gfSSNavigationMod[IDX(HERO_SKILL_LEVEL_COUNT)];
+extern float gfSSArcheryMod[IDX(HERO_SKILL_LEVEL_COUNT)];
+extern float gfSSAIArcheryMod[IDX(HERO_SKILL_LEVEL_COUNT)];
+extern i8 giVisRange[IDX(HERO_SKILL_LEVEL_COUNT)];
+extern u8 gStartingHeroStats[IDX(FACTION_COUNT)][HERO_STARTING_STAT_COUNT];
+extern i32 giTerrainCost[KB_TERRAIN_TYPE_COUNT][IDX(HERO_SKILL_LEVEL_COUNT)]
+                        [KB_TERRAIN_STEP_TYPE_COUNT];
+extern char* gTownPrefixNames[IDX(FACTION_COUNT)];
 extern char* gTownObjNames[KB_TOWN_OBJECT_NAME_COUNT];
 extern i32 giDebugBuildingToBuild;
-extern u8 giTerrainToMusicTrack[TERRAIN_COUNT];
-extern char* cHeroTypeShortName[FACTION_COUNT];
+extern u8 giTerrainToMusicTrack[IDX(TERRAIN_COUNT)];
+extern char* cHeroTypeShortName[IDX(FACTION_COUNT)];
 extern char cHeroTypeInitial[HERO_TYPE_INITIAL_COUNT];
 extern i32 giDeferObjDrawX;
 extern i32 giDeferObjDrawY;
@@ -454,7 +455,7 @@ extern char* gLuckText[KB_LUCK_TEXT_COUNT];
 extern char* gMoraleText[KB_MORALE_TEXT_COUNT];
 extern char* onOffText[KB_ON_OFF_TEXT_COUNT];
 extern char* walkSpeedText[KB_WALK_SPEED_TEXT_COUNT];
-extern char* gColors[FACTION_COUNT];
+extern char* gColors[IDX(FACTION_COUNT)];
 extern char* gMonthNames[KB_MONTH_NAME_COUNT];
 extern char* gWeekNames[KB_WEEK_NAME_COUNT];
 extern char* cHeroScreen[KB_HERO_SCREEN_TEXT_COUNT];
@@ -502,7 +503,7 @@ extern char* gSpellDesc[KB_SPELL_TEXT_COUNT];
 extern char* gSpellNames[KB_SPELL_TEXT_COUNT];
 extern char* gSecondarySkillLevels[KB_SECONDARY_SKILL_LEVEL_TEXT_COUNT];
 extern char* gSecondarySkills[KB_SECONDARY_SKILL_TEXT_COUNT];
-extern char* cSecSkillDesc[HERO_SKILL_COUNT][SECONDARY_SKILL_VALUE_LEVEL_COUNT];
+extern char* cSecSkillDesc[IDX(HERO_SKILL_COUNT)][SECONDARY_SKILL_VALUE_LEVEL_COUNT];
 extern char* cDirections[KB_DIRECTION_TEXT_COUNT];
 extern char* cRumourTerrainDescriptions[KB_RUMOUR_TERRAIN_DESCRIPTION_COUNT];
 extern char* gInterfaceTypeText[KB_INTERFACE_TYPE_TEXT_COUNT];
@@ -550,7 +551,7 @@ extern i8 xSmackFromNetwork;
 extern i32 bKBDone;
 extern struct _REDBOOK* hRedbookz;
 extern i32 bForceCheckTimeEvent;
-extern u16 IMHotSpots[KB_INIT_MENU_HOTSPOT_COUNT][INIT_MENU_HOTSPOT_FIELD_COUNT];
+extern u16 IMHotSpots[KB_INIT_MENU_HOTSPOT_COUNT][IDX(INIT_MENU_HOTSPOT_FIELD_COUNT)];
 extern i32 lastIMHoverID;
 extern i32 bInCheckEndGame;
 extern i32 gbHitEvent;

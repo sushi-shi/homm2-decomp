@@ -12,7 +12,7 @@ struct CombatTowerOrigin {
     u16 y;
 };
 
-typedef enum CombatSystemOptionWidget {
+HOMM2_ENUM_BEGIN(CombatSystemOptionWidget)
     COMBAT_SYSTEM_OPTION_SPEED_BUTTON = 10,
     COMBAT_SYSTEM_OPTION_ARMY_INFO_BUTTON = 11,
     COMBAT_SYSTEM_OPTION_AUTO_SPELL_BUTTON = 12,
@@ -26,7 +26,7 @@ typedef enum CombatSystemOptionWidget {
     COMBAT_SYSTEM_OPTION_SHADE_TEXT = 24,
     COMBAT_SYSTEM_OPTION_MOUSE_HEX_TEXT = 25,
     COMBAT_SYSTEM_OPTION_CLOSE_BUTTON = 0x7800
-} CombatSystemOptionWidget;
+HOMM2_ENUM_END(CombatSystemOptionWidget)
 
 enum {
     COMBAT_SYSTEM_OPTION_EVENT = 0x200,

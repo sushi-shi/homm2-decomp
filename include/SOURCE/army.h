@@ -14,60 +14,60 @@ class army {
 public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
-    char m_animationState;              // +0x00
-    char m_animationCycle;              // +0x01
-    char m_pendingAnimationSequence;    // +0x02
-    i8 m_effectAnimationStart;          // +0x03
-    i8 m_effectAnimationEnd;            // +0x04
-    i8 m_effectAnimationLength;         // +0x05
-    i32 m_drawState;                    // +0x06
-    struct SLimitData m_creatureLimits; // +0x0a
-    struct SLimitData m_quantityLimits; // +0x1a
-    struct SLimitData m_spriteLimits;   // +0x2a
-    struct SLimitData m_spellLimits;    // +0x3a
-    i32 m_standingAnimation;            // +0x4a
-    i32 m_showQuantity;                 // +0x4e
-    i32 m_targetSide;                   // +0x52
-    i32 m_targetIndex;                  // +0x56
-    i32 m_attackDirection;              // +0x5a
-    i32 m_unknown5e; // +0x5e target-cluster int, only zeroed in the ctor
-    i32 m_moveTargetHex;                 // +0x62
-    i32 m_drawSpellEffect;               // +0x66
-    i32 m_mirrorSourceIndex;             // +0x6a
-    i32 m_mirrorImageIndex;              // +0x6e
-    i32 m_roundCounter;                  // +0x72
-    i32 m_monsterType;                   // +0x76
-    i32 m_hex;                           // +0x7a
-    i32 m_animationSequence;             // +0x7e
-    i32 m_animationFrame;                // +0x82
-    i32 m_facing;                        // +0x86
-    i32 m_walkDirection;                 // +0x8a
-    i32 m_facingChanged;                 // +0x8e
-    i32 m_initialQuantity;               // +0x92
-    i32 m_quantity;                      // +0x96
-    i32 m_lastTargetHex;                 // +0x9a
-    i32 m_temporaryResurrectionQuantity; // +0x9e
-    i32 m_hitPointsLost;                 // +0xa2
-    i32 m_armyGroupSlot;                 // +0xa6
-    i32 m_damagePenalty;                 // +0xaa
-    i32 m_speed;                         // +0xae
-    i32 m_walkDuration;                  // +0xb2
-    i32 m_luckOutcome;                   // +0xb6
-    struct tag_monsterInfo m_monster;    // +0xba
-    i16 m_unknownD4; // +0xd4 set to 6 in Init, never read
-    i32 m_damagePending;                             // +0xd6
-    i32 m_killPending;                               // +0xda
-    i32 m_deathPending;                              // +0xde
-    i32 m_spellEffect;                               // +0xe2
-    i32 m_side;                                      // +0xe6
-    i32 m_index;                                     // +0xea
-    i32 m_lastAnimationTime;                         // +0xee
-    i32 m_morale;                                    // +0xf2
-    i32 m_luck;                                      // +0xf6
-    i32 m_spellEffectYOffset;                        // +0xfa
-    i32 m_yOffset;                                   // +0xfe
-    i32 m_xOffset;                                   // +0x102
-    i32 m_spellCount;                                // +0x106
+    char m_animationState;                     // +0x00
+    char m_animationCycle;                     // +0x01
+    char m_pendingAnimationSequence;           // +0x02
+    i8 m_effectAnimationStart;                 // +0x03
+    i8 m_effectAnimationEnd;                   // +0x04
+    i8 m_effectAnimationLength;                // +0x05
+    i32 m_drawState;                           // +0x06
+    struct SLimitData m_creatureLimits;        // +0x0a
+    struct SLimitData m_quantityLimits;        // +0x1a
+    struct SLimitData m_spriteLimits;          // +0x2a
+    struct SLimitData m_spellLimits;           // +0x3a
+    i32 m_standingAnimation;                   // +0x4a
+    i32 m_showQuantity;                        // +0x4e
+    i32 m_targetSide;                          // +0x52
+    i32 m_targetIndex;                         // +0x56
+    i32 m_attackDirection;                     // +0x5a
+    i32 m_unknown5e;                           // +0x5e target-cluster int, only zeroed in the ctor
+    i32 m_moveTargetHex;                       // +0x62
+    i32 m_drawSpellEffect;                     // +0x66
+    i32 m_mirrorSourceIndex;                   // +0x6a
+    i32 m_mirrorImageIndex;                    // +0x6e
+    i32 m_roundCounter;                        // +0x72
+    CreatureType m_monsterType;                // +0x76
+    i32 m_hex;                                 // +0x7a
+    ArmyAnimationSequence m_animationSequence; // +0x7e
+    i32 m_animationFrame;                      // +0x82
+    i32 m_facing;                              // +0x86
+    i32 m_walkDirection;                       // +0x8a
+    i32 m_facingChanged;                       // +0x8e
+    i32 m_initialQuantity;                     // +0x92
+    i32 m_quantity;                            // +0x96
+    i32 m_lastTargetHex;                       // +0x9a
+    i32 m_temporaryResurrectionQuantity;       // +0x9e
+    i32 m_hitPointsLost;                       // +0xa2
+    i32 m_armyGroupSlot;                       // +0xa6
+    i32 m_damagePenalty;                       // +0xaa
+    i32 m_speed;                               // +0xae
+    i32 m_walkDuration;                        // +0xb2
+    i32 m_luckOutcome;                         // +0xb6
+    struct tag_monsterInfo m_monster;          // +0xba
+    i16 m_unknownD4;                           // +0xd4 set to 6 in Init, never read
+    i32 m_damagePending;                       // +0xd6
+    i32 m_killPending;                         // +0xda
+    i32 m_deathPending;                        // +0xde
+    i32 m_spellEffect;                         // +0xe2
+    i32 m_side;                                // +0xe6
+    i32 m_index;                               // +0xea
+    i32 m_lastAnimationTime;                   // +0xee
+    i32 m_morale;                              // +0xf2
+    i32 m_luck;                                // +0xf6
+    i32 m_spellEffectYOffset;                  // +0xfa
+    i32 m_yOffset;                             // +0xfe
+    i32 m_xOffset;                             // +0x102
+    i32 m_spellCount;                          // +0x106
     u8 m_spellInfluence[ARMY_SPELL_INFLUENCE_COUNT]; // +0x10a
     i32 m_effectAnimationStarted;                    // +0x119
     i32 m_drawEnabled;                               // +0x11d
@@ -80,9 +80,9 @@ public:
     // --- constructors ---
     army(void);
     // --- methods ---
-    void WaitSample(i32);
+    void WaitSample(ArmySampleType);
     void InitClean(void);
-    void Init(i32, i32, i32, i32, i32, i32);
+    void Init(CreatureType, i32, i32, i32, i32, i32);
     void LoadResources(void);
     void FreeResources(void);
     void DrawToBuffer(i32, i32, i32);
@@ -105,14 +105,14 @@ public:
     i32 LeaveNoBody(void);
     void ProcessDeath(i32);
     void SpellEffect(i32, i32, i32);
-    void CancelSpellType(i32);
-    void CancelIndividualSpell(i32);
-    i32 SetSpellInfluence(i32, i32);
+    void CancelSpellType(ArmySpellCancelType);
+    void CancelIndividualSpell(ArmySpellInfluence);
+    i32 SetSpellInfluence(ArmySpellInfluence, i32);
     void DecrementSpellRounds(void);
     void GoBerserk(void);
     void MoveAttack(i32, i32);
-    float SpellCastWorkChance(i32);
-    i32 SpellCastWorks(i32);
+    float SpellCastWorkChance(SpellType);
+    i32 SpellCastWorks(SpellType);
     void DispelGood(void);
     void Cure(i32);
     i32 MidX(void);
@@ -137,7 +137,7 @@ public:
     i32 ValidRange(i32);
     i32 GetBestDirection(i32, i32, i32);
     i32 IsAlive(void) {
-        return m_monsterType >= 0 && m_quantity > 0;
+        return m_monsterType >= CREATURE_PEASANT && m_quantity > 0;
     }
 };
 #pragma pack(pop)

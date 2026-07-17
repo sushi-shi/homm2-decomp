@@ -249,7 +249,7 @@ void combatManager::DoCompAI(i32) {
     enemyShooterStrength18 = GetStrength(enemySide12, shooterMasks6[enemySide12]);
 
     if (m_inCastleCombat != 0) {
-        if (m_heroes[COMBAT_ATTACKER_SIDE]->m_secondarySkills[HERO_SKILL_ARCHERY]
+        if (m_heroes[COMBAT_ATTACKER_SIDE]->m_secondarySkills[IDX(HERO_SKILL_ARCHERY)]
                 == HERO_SKILL_LEVEL_NONE
             && !m_heroes[COMBAT_ATTACKER_SIDE]->HasArtifact(ARTIFACT_GOLDEN_BOW)) {
             if (m_currentSide == COMBAT_ATTACKER_SIDE)
@@ -274,7 +274,7 @@ void combatManager::DoCompAI(i32) {
             );
             if (m_heroes[COMBAT_ATTACKER_SIDE] != 0
                 && (m_heroes[COMBAT_ATTACKER_SIDE]->HasArtifact(ARTIFACT_GOLDEN_BOW)
-                    || m_heroes[COMBAT_ATTACKER_SIDE]->m_secondarySkills[HERO_SKILL_ARCHERY]
+                    || m_heroes[COMBAT_ATTACKER_SIDE]->m_secondarySkills[IDX(HERO_SKILL_ARCHERY)]
                            != HERO_SKILL_LEVEL_NONE))
                 goldenBowBonus = 0;
             else
@@ -289,14 +289,14 @@ void combatManager::DoCompAI(i32) {
     if (m_heroes[m_currentSide] != 0) {
         currentShooterStrength5 = static_cast<i32>(
             static_cast<i32>(currentShooterStrength5)
-            * gfSSArcheryMod[m_heroes[m_currentSide]->m_secondarySkills[HERO_SKILL_ARCHERY]]
+            * gfSSArcheryMod[m_heroes[m_currentSide]->m_secondarySkills[IDX(HERO_SKILL_ARCHERY)]]
         );
     }
     if (m_heroes[COMBAT_DEFENDER_SIDE - m_currentSide] != 0) {
         enemyShooterStrength18 = static_cast<i32>(
             static_cast<i32>(enemyShooterStrength18)
             * gfSSArcheryMod[m_heroes[COMBAT_DEFENDER_SIDE - m_currentSide]
-                                 ->m_secondarySkills[HERO_SKILL_ARCHERY]]
+                                 ->m_secondarySkills[IDX(HERO_SKILL_ARCHERY)]]
         );
     }
     if (static_cast<i32>(currentShooterStrength5)
@@ -586,11 +586,11 @@ i32 combatManager::GetShooterMask(i32 side) {
             && (currentArmy10->m_monster.flags.abilityFlags & MONSTER_ABILITY_FLAG_AI_EXCLUDED) == 0
             && (currentArmy10->m_monster.flags.abilityFlags & MONSTER_ABILITY_FLAG_SHOOTER) != 0
             && currentArmy10->m_monster.shots > 0
-            && currentArmy10->m_spellInfluence[SPELL_INFLUENCE_BLIND] == 0
-            && currentArmy10->m_spellInfluence[SPELL_INFLUENCE_PARALYZE] == 0
-            && currentArmy10->m_spellInfluence[SPELL_INFLUENCE_MIRROR_IMAGE] == 0
-            && currentArmy10->m_spellInfluence[SPELL_INFLUENCE_BERSERKER] == 0
-            && currentArmy10->m_spellInfluence[SPELL_INFLUENCE_HYPNOTIZE] == 0)
+            && currentArmy10->m_spellInfluence[IDX(SPELL_INFLUENCE_BLIND)] == 0
+            && currentArmy10->m_spellInfluence[IDX(SPELL_INFLUENCE_PARALYZE)] == 0
+            && currentArmy10->m_spellInfluence[IDX(SPELL_INFLUENCE_MIRROR_IMAGE)] == 0
+            && currentArmy10->m_spellInfluence[IDX(SPELL_INFLUENCE_BERSERKER)] == 0
+            && currentArmy10->m_spellInfluence[IDX(SPELL_INFLUENCE_HYPNOTIZE)] == 0)
             mask5 |= bit1;
         bit1 <<= 1;
     }
@@ -608,7 +608,7 @@ i32 combatManager::GetMirrorImageMask(i32 side) {
         currentArmy10 = m_armies[side] + armyIndex2;
         if (currentArmy10 != 0
             && (currentArmy10->m_monster.flags.abilityFlags & MONSTER_ABILITY_FLAG_AI_EXCLUDED) == 0
-            && (currentArmy10->m_monster.flags.all & MONSTER_FLAGS_MIRROR_IMAGE) != 0)
+            && HAS(currentArmy10->m_monster.flags.all, MONSTER_FLAGS_MIRROR_IMAGE) != 0)
             mask5 |= bit1;
         bit1 <<= 1;
     }
@@ -627,11 +627,11 @@ i32 combatManager::GetFlyerMask(i32 side) {
         if (currentArmy10 != 0
             && (currentArmy10->m_monster.flags.abilityFlags & MONSTER_ABILITY_FLAG_AI_EXCLUDED) == 0
             && (currentArmy10->m_monster.flags.abilityFlags & MONSTER_ABILITY_FLAG_FLYING) != 0
-            && currentArmy10->m_spellInfluence[SPELL_INFLUENCE_BLIND] == 0
-            && currentArmy10->m_spellInfluence[SPELL_INFLUENCE_PARALYZE] == 0
-            && currentArmy10->m_spellInfluence[SPELL_INFLUENCE_MIRROR_IMAGE] == 0
-            && currentArmy10->m_spellInfluence[SPELL_INFLUENCE_BERSERKER] == 0
-            && currentArmy10->m_spellInfluence[SPELL_INFLUENCE_HYPNOTIZE] == 0)
+            && currentArmy10->m_spellInfluence[IDX(SPELL_INFLUENCE_BLIND)] == 0
+            && currentArmy10->m_spellInfluence[IDX(SPELL_INFLUENCE_PARALYZE)] == 0
+            && currentArmy10->m_spellInfluence[IDX(SPELL_INFLUENCE_MIRROR_IMAGE)] == 0
+            && currentArmy10->m_spellInfluence[IDX(SPELL_INFLUENCE_BERSERKER)] == 0
+            && currentArmy10->m_spellInfluence[IDX(SPELL_INFLUENCE_HYPNOTIZE)] == 0)
             mask5 |= bit1;
         bit1 <<= 1;
     }
@@ -670,11 +670,11 @@ i32 combatManager::GetWalkerMask(i32 side) {
             && (currentArmy10->m_monster.flags.abilityFlags & MONSTER_ABILITY_FLAG_FLYING) == 0
             && ((currentArmy10->m_monster.flags.abilityFlags & MONSTER_ABILITY_FLAG_SHOOTER) == 0
                 || currentArmy10->m_monster.shots <= 0)
-            && currentArmy10->m_spellInfluence[SPELL_INFLUENCE_BLIND] == 0
-            && currentArmy10->m_spellInfluence[SPELL_INFLUENCE_PARALYZE] == 0
-            && currentArmy10->m_spellInfluence[SPELL_INFLUENCE_MIRROR_IMAGE] == 0
-            && currentArmy10->m_spellInfluence[SPELL_INFLUENCE_BERSERKER] == 0
-            && currentArmy10->m_spellInfluence[SPELL_INFLUENCE_HYPNOTIZE] == 0)
+            && currentArmy10->m_spellInfluence[IDX(SPELL_INFLUENCE_BLIND)] == 0
+            && currentArmy10->m_spellInfluence[IDX(SPELL_INFLUENCE_PARALYZE)] == 0
+            && currentArmy10->m_spellInfluence[IDX(SPELL_INFLUENCE_MIRROR_IMAGE)] == 0
+            && currentArmy10->m_spellInfluence[IDX(SPELL_INFLUENCE_BERSERKER)] == 0
+            && currentArmy10->m_spellInfluence[IDX(SPELL_INFLUENCE_HYPNOTIZE)] == 0)
             mask5 |= bit1;
         bit1 <<= 1;
     }
@@ -692,9 +692,9 @@ i32 combatManager::GetOutOfItMask(i32 side) {
         currentArmy10 = m_armies[side] + armyIndex2;
         if (currentArmy10 != 0
             && (currentArmy10->m_monster.flags.abilityFlags & MONSTER_ABILITY_FLAG_AI_EXCLUDED) == 0
-            && (currentArmy10->m_spellInfluence[SPELL_INFLUENCE_BLIND] != 0
-                || currentArmy10->m_spellInfluence[SPELL_INFLUENCE_PARALYZE] != 0
-                || currentArmy10->m_spellInfluence[SPELL_INFLUENCE_MIRROR_IMAGE] != 0))
+            && (currentArmy10->m_spellInfluence[IDX(SPELL_INFLUENCE_BLIND)] != 0
+                || currentArmy10->m_spellInfluence[IDX(SPELL_INFLUENCE_PARALYZE)] != 0
+                || currentArmy10->m_spellInfluence[IDX(SPELL_INFLUENCE_MIRROR_IMAGE)] != 0))
             mask5 |= bit1;
         bit1 <<= 1;
     }
@@ -712,8 +712,8 @@ i32 combatManager::GetTraitorMask(i32 side) {
         currentArmy10 = armyIndex2 + m_armies[side];
         if (currentArmy10 != 0
             && (currentArmy10->m_monster.flags.abilityFlags & MONSTER_ABILITY_FLAG_AI_EXCLUDED) == 0
-            && (currentArmy10->m_spellInfluence[SPELL_INFLUENCE_BERSERKER] != 0
-                || currentArmy10->m_spellInfluence[SPELL_INFLUENCE_HYPNOTIZE] != 0))
+            && (currentArmy10->m_spellInfluence[IDX(SPELL_INFLUENCE_BERSERKER)] != 0
+                || currentArmy10->m_spellInfluence[IDX(SPELL_INFLUENCE_HYPNOTIZE)] != 0))
             mask5 |= bit1;
         bit1 <<= 1;
     }
@@ -731,12 +731,16 @@ i32 combatManager::GetBestArmy(i32 side, i32 mask) {
     for (armyIndex2 = 0; armyIndex2 < m_armyCount[side]; armyIndex2++) {
         if ((mask & bit1) != 0) {
             strength8 = (m_armies[side] + armyIndex2)->Strength();
-            if ((m_armies[side] + armyIndex2)->m_spellInfluence[SPELL_INFLUENCE_BLIND] != 0
-                || (m_armies[side] + armyIndex2)->m_spellInfluence[SPELL_INFLUENCE_PARALYZE] != 0
-                || (m_armies[side] + armyIndex2)->m_spellInfluence[SPELL_INFLUENCE_MIRROR_IMAGE]
+            if ((m_armies[side] + armyIndex2)->m_spellInfluence[IDX(SPELL_INFLUENCE_BLIND)] != 0
+                || (m_armies[side] + armyIndex2)->m_spellInfluence[IDX(SPELL_INFLUENCE_PARALYZE)]
                        != 0
-                || (m_armies[side] + armyIndex2)->m_spellInfluence[SPELL_INFLUENCE_BERSERKER] != 0
-                || (m_armies[side] + armyIndex2)->m_spellInfluence[SPELL_INFLUENCE_HYPNOTIZE] != 0)
+                || (m_armies[side] + armyIndex2)
+                           ->m_spellInfluence[IDX(SPELL_INFLUENCE_MIRROR_IMAGE)]
+                       != 0
+                || (m_armies[side] + armyIndex2)->m_spellInfluence[IDX(SPELL_INFLUENCE_BERSERKER)]
+                       != 0
+                || (m_armies[side] + armyIndex2)->m_spellInfluence[IDX(SPELL_INFLUENCE_HYPNOTIZE)]
+                       != 0)
                 strength8 >>= 1;
             if (bestStrength8 < strength8) {
                 bestArmy1 = armyIndex2;

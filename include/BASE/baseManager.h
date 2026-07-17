@@ -14,22 +14,17 @@
 // forward declarations:
 struct tag_message;
 
-typedef enum BaseManagerMessageMask {
+HOMM2_ENUM_VALUES_BEGIN(BaseManagerMessageMask)
     BASE_MANAGER_MESSAGE_MASK_ALL = -1
-} BaseManagerMessageMask;
+HOMM2_ENUM_VALUES_END(BaseManagerMessageMask)
 
-typedef enum BaseManagerPriority {
+HOMM2_ENUM_VALUES_BEGIN(BaseManagerPriority)
     BASE_MANAGER_PRIORITY_UNASSIGNED = -1
-} BaseManagerPriority;
+HOMM2_ENUM_VALUES_END(BaseManagerPriority)
 
-typedef enum BaseManagerActivationState {
-    BASE_MANAGER_INACTIVE = 0,
-    BASE_MANAGER_ACTIVE = 1
-} BaseManagerActivationState;
-
-typedef enum BaseManagerConstant {
+HOMM2_ENUM_VALUES_BEGIN(BaseManagerConstant)
     BASE_MANAGER_NAME_CAPACITY = 0x1e
-} BaseManagerConstant;
+HOMM2_ENUM_VALUES_END(BaseManagerConstant)
 
 #pragma pack(push, 1) // recovered layout is byte-packed
 class baseManager /* abstract */ {
@@ -42,11 +37,11 @@ public:
     i32 m_messageMask;                       // +0x0c  event/message classes accepted by Main
     i32 m_priority;                          // +0x10  executive manager-list ordering key
     char m_name[BASE_MANAGER_NAME_CAPACITY]; // +0x14  manager name
-    i32 m_active;                            // +0x32
+    b32 m_active;                            // +0x32
     // --- constructors ---
     baseManager(void);
     void Activate(void) {
-        m_active = BASE_MANAGER_ACTIVE;
+        m_active = 1;
     }
     // --- virtual methods (vtable order) ---
     virtual i32 Open(i32) = 0;

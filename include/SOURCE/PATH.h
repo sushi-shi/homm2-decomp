@@ -8,7 +8,7 @@
 i32 GetAdjacentCellIndexNoArmy(i32, i32);
 i32 OppositeDirection(i32);
 
-typedef enum CombatHexDirection {
+HOMM2_ENUM_BEGIN(CombatHexDirection)
     COMBAT_DIRECTION_NORTHWEST = 0,
     COMBAT_DIRECTION_NORTHEAST = 1,
     COMBAT_DIRECTION_EAST = 2,
@@ -17,14 +17,14 @@ typedef enum CombatHexDirection {
     COMBAT_DIRECTION_WEST = 5,
     COMBAT_DIRECTION_WIDE_WEST = 6,
     COMBAT_DIRECTION_WIDE_EAST = 7
-} CombatHexDirection;
+HOMM2_ENUM_END(CombatHexDirection)
 
-typedef enum CombatPathConstant {
+HOMM2_ENUM_VALUES_BEGIN(CombatPathConstant)
     COMBAT_PATH_DIRECTION_COUNT = 6,
     COMBAT_PATH_WIDE_DIRECTION_COUNT = 8,
     COMBAT_PATH_SPECIAL_DIRECTION_MASK = 0xc0,
     COMBAT_PATH_IGNORE_SPEED = 99,
     COMBAT_PATH_INVALID_HEX = -1
-} CombatPathConstant;
+HOMM2_ENUM_VALUES_END(CombatPathConstant)
 
 #endif // HOMM2_PATH_H

@@ -134,7 +134,7 @@ def _command(entry: dict, compiler: str) -> list[str]:
     filtered = [argument for argument in arguments
                 if argument not in ("/c", entry["file"], source)]
     return [compiler, "/nologo", "/Zs", source, *filtered,
-            "/DHOMM2_STRICT_ENUM_TYPES",
+            "/std:c++20", "/DHOMM2_STRICT_ENUM_TYPES",
             *_clang_flags([*COMPATIBILITY_FLAGS, *WARNING_FLAGS, *DIAGNOSTIC_FLAGS])]
 
 

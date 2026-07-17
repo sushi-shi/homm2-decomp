@@ -6,7 +6,7 @@
 // symbols. Other TUs call them by including this header (no local externs).
 // forward declarations (was <_all.h>):
 
-typedef enum ArmyAnimationSequence {
+HOMM2_ENUM_BEGIN(ArmyAnimationSequence)
     ARMY_ANIMATION_WALK = 6,
     ARMY_ANIMATION_STAND = 7,
     ARMY_ANIMATION_STANDING_FIRST = 8,
@@ -17,9 +17,9 @@ typedef enum ArmyAnimationSequence {
     ARMY_ANIMATION_SHOOT_UP = 28,
     ARMY_ANIMATION_SHOOT_FORWARD = 30,
     ARMY_ANIMATION_SHOOT_DOWN = 32
-} ArmyAnimationSequence;
+HOMM2_ENUM_END(ArmyAnimationSequence)
 
-typedef enum ArmySampleType {
+HOMM2_ENUM_BEGIN(ArmySampleType)
     ARMY_SAMPLE_MOVE,
     ARMY_SAMPLE_ATTACK,
     ARMY_SAMPLE_WINCE,
@@ -28,9 +28,9 @@ typedef enum ArmySampleType {
     ARMY_SAMPLE_EXTRA_ONE,
     ARMY_SAMPLE_EXTRA_TWO,
     ARMY_SAMPLE_COUNT
-} ArmySampleType;
+HOMM2_ENUM_END(ArmySampleType)
 
-typedef enum ArmyCombatConstant {
+HOMM2_ENUM_VALUES_BEGIN(ArmyCombatConstant)
     ARMY_SAMPLE_VOLUME = 64,
     ARMY_SAMPLE_CHANNEL = 3,
     ARMY_PRIMARY_SAMPLE_COUNT = ARMY_SAMPLE_KILL + 1,
@@ -49,9 +49,9 @@ typedef enum ArmyCombatConstant {
     ARMY_LICH_EXPLOSION_EFFECT = 20,
     ARMY_ARCHMAGE_DISPEL_CHANCE = 20,
     ARMY_PERCENT_MAX = 100
-} ArmyCombatConstant;
+HOMM2_ENUM_VALUES_END(ArmyCombatConstant)
 
-typedef enum ArmySpellInfluence {
+HOMM2_ENUM_BEGIN(ArmySpellInfluence)
     ARMY_SPELL_INFLUENCE_HASTE = 0,
     ARMY_SPELL_INFLUENCE_SLOW = 1,
     ARMY_SPELL_INFLUENCE_BLIND = 2,
@@ -67,16 +67,16 @@ typedef enum ArmySpellInfluence {
     ARMY_SPELL_INFLUENCE_ANTI_MAGIC = 12,
     ARMY_SPELL_INFLUENCE_STONESKIN = 13,
     ARMY_SPELL_INFLUENCE_STEELSKIN = 14
-} ArmySpellInfluence;
+HOMM2_ENUM_END(ArmySpellInfluence)
 
-typedef enum ArmySpellCancelType {
+HOMM2_ENUM_BEGIN(ArmySpellCancelType)
     ARMY_CANCEL_SPELLS_AFTER_MOVE = 0,
     ARMY_CANCEL_SPELLS_AFTER_ATTACK = 1,
     ARMY_CANCEL_SPELLS_AFTER_DAMAGE = 2,
     ARMY_CANCEL_SPELLS_UNUSED = 3
-} ArmySpellCancelType;
+HOMM2_ENUM_END(ArmySpellCancelType)
 
-typedef enum ArmyAttackConstant {
+HOMM2_ENUM_VALUES_BEGIN(ArmyAttackConstant)
     ARMY_COMBAT_TEXT_SIZE = 200,
     ARMY_COMBAT_SIDE_COUNT = 2,
     ARMY_COMBAT_DIRECTION_COUNT = 8,
@@ -104,27 +104,27 @@ typedef enum ArmyAttackConstant {
     ARMY_GENIE_HALF_ROLL_MAX = 5,
     ARMY_GENIE_HALF_ROLL = 2,
     ARMY_PATH_BLOCKED = 3
-} ArmyAttackConstant;
+HOMM2_ENUM_VALUES_END(ArmyAttackConstant)
 
-typedef enum ArmyCombatDirection {
+HOMM2_ENUM_BEGIN(ArmyCombatDirection)
     ARMY_DIRECTION_LEFT = 1,
     ARMY_DIRECTION_RIGHT = 4
-} ArmyCombatDirection;
+HOMM2_ENUM_END(ArmyCombatDirection)
 
-typedef enum ArmyFlightConstant {
+HOMM2_ENUM_VALUES_BEGIN(ArmyFlightConstant)
     ARMY_ALL_ADJACENT_DIRECTIONS = 0x3f,
     ARMY_FLIGHT_SOUND_FRAME = 1,
     ARMY_VAMPIRE_FLIGHT_SOUND_DELAY = 100
-} ArmyFlightConstant;
+HOMM2_ENUM_VALUES_END(ArmyFlightConstant)
 
 #define ARMY_VAMPIRE_FLIGHT_DURATION_SCALE 1.3
 
-typedef enum ArmySpellStatConstant {
+HOMM2_ENUM_VALUES_BEGIN(ArmySpellStatConstant)
     ARMY_HASTE_SPEED_BONUS = 2,
     ARMY_BLOODLUST_ATTACK_BONUS = 3,
     ARMY_STONESKIN_DEFENSE_BONUS = 3,
     ARMY_STEELSKIN_DEFENSE_BONUS = 5
-} ArmySpellStatConstant;
+HOMM2_ENUM_VALUES_END(ArmySpellStatConstant)
 
 #define ARMY_HASTE_WALK_DURATION_SCALE 0.65
 #define ARMY_SLOW_WALK_DURATION_SCALE 1.5
@@ -133,27 +133,27 @@ typedef enum ArmySpellStatConstant {
 #define ARMY_SHOOT_UP_MIN_ANGLE 25.0f
 #define ARMY_SHOOT_FORWARD_MIN_ANGLE -25.0f
 
-typedef enum ArmyDeathConstant {
+HOMM2_ENUM_VALUES_BEGIN(ArmyDeathConstant)
     ARMY_CORPSE_LIMIT = 14,
     ARMY_DEATH_RANDOM_MAX = 100,
     ARMY_DEATH_PRIMARY_CHANCE = 60,
     ARMY_DEATH_SECONDARY_CHANCE = 80
-} ArmyDeathConstant;
+HOMM2_ENUM_VALUES_END(ArmyDeathConstant)
 
-typedef enum ArmySpellEffectConstant {
+HOMM2_ENUM_VALUES_BEGIN(ArmySpellEffectConstant)
     ARMY_NO_EFFECT = -1,
     ARMY_EFFECT_MINIMUM_Y = 999,
     ARMY_DELAYED_MEDUSA_EFFECT = 101
-} ArmySpellEffectConstant;
+HOMM2_ENUM_VALUES_END(ArmySpellEffectConstant)
 
-typedef enum ArmyFrameConstant {
+HOMM2_ENUM_VALUES_BEGIN(ArmyFrameConstant)
     ARMY_MISSILE_OFFSET_COUNT = 3,
     ARMY_PROJECTILE_ANGLE_COUNT = 12,
     ARMY_ANIMATION_SEQUENCE_COUNT = 34,
     ARMY_ANIMATION_FRAME_COUNT = 16
-} ArmyFrameConstant;
+HOMM2_ENUM_VALUES_END(ArmyFrameConstant)
 
-typedef enum ArmyWalkSegment {
+HOMM2_ENUM_BEGIN(ArmyWalkSegment)
     ARMY_WALK_SEGMENT_BEGIN = 0,
     ARMY_WALK_SEGMENT_BEGIN_STANDING = 1,
     ARMY_WALK_SEGMENT_MIDDLE = 2,
@@ -161,9 +161,9 @@ typedef enum ArmyWalkSegment {
     ARMY_WALK_SEGMENT_END_STANDING = 4,
     ARMY_WALK_SEGMENT_STAND = 5,
     ARMY_WALK_SEGMENT_COUNT = 6
-} ArmyWalkSegment;
+HOMM2_ENUM_END(ArmyWalkSegment)
 
-typedef enum ArmySpellChanceConstant {
+HOMM2_ENUM_VALUES_BEGIN(ArmySpellChanceConstant)
     ARMY_RANDOM_SPELL_ROLL_MAX = 99,
     ARMY_RESURRECT_POWER_PER_SPELL_POWER = 50,
     ARMY_HYPNOTIZE_HIT_POINTS_PER_POWER = 25,
@@ -171,7 +171,7 @@ typedef enum ArmySpellChanceConstant {
     ARMY_CURE_HIT_POINTS_PER_POWER = 5,
     ARMY_WIDE_CREATURE_HALF_WIDTH = 22,
     ARMY_CONTROL_EFFECT_Y_OFFSET = 5
-} ArmySpellChanceConstant;
+HOMM2_ENUM_VALUES_END(ArmySpellChanceConstant)
 
 #define ARMY_SPELL_CHANCE_NONE 0.0f
 #define ARMY_SPELL_CHANCE_DWARF 0.75f
@@ -190,22 +190,22 @@ struct SMonFrameInfo {
         i16 y;
     };
     char unknown00;
-    i16 spellEffectX;                                                              // +0x01
-    i16 spellEffectY;                                                              // +0x03
-    i8 animationXOffsets[ARMY_WALK_SEGMENT_COUNT][ARMY_ANIMATION_FRAME_COUNT];     // +0x05
-    i8 walkXOffsets[ARMY_ANIMATION_FRAME_COUNT];                                   // +0x65
-    i8 standingAnimationCount;                                                     // +0x75
-    float standingAnimationChances[10];                                            // +0x76
-    i32 standStillDelay;                                                           // +0x9e
-    i32 walkDuration;                                                              // +0xa2
-    i32 attackDuration;                                                            // +0xa6
-    i32 flightSpeed;                                                               // +0xaa
-    struct MissileOffset missileOffsets[ARMY_MISSILE_OFFSET_COUNT];                // +0xae
-    u8 projectileDirectionCount;                                                   // +0xba
-    float projectileAngles[ARMY_PROJECTILE_ANGLE_COUNT];                           // +0xbb
-    i32 quantityX[2];                                                              // +0xeb
-    i8 animationFrameCount[ARMY_ANIMATION_SEQUENCE_COUNT];                         // +0xf3
-    i8 animationFrames[ARMY_ANIMATION_SEQUENCE_COUNT][ARMY_ANIMATION_FRAME_COUNT]; // +0x115
+    i16 spellEffectX;                                                               // +0x01
+    i16 spellEffectY;                                                               // +0x03
+    i8 animationXOffsets[IDX(ARMY_WALK_SEGMENT_COUNT)][ARMY_ANIMATION_FRAME_COUNT]; // +0x05
+    i8 walkXOffsets[ARMY_ANIMATION_FRAME_COUNT];                                    // +0x65
+    i8 standingAnimationCount;                                                      // +0x75
+    float standingAnimationChances[10];                                             // +0x76
+    i32 standStillDelay;                                                            // +0x9e
+    i32 walkDuration;                                                               // +0xa2
+    i32 attackDuration;                                                             // +0xa6
+    i32 flightSpeed;                                                                // +0xaa
+    struct MissileOffset missileOffsets[ARMY_MISSILE_OFFSET_COUNT];                 // +0xae
+    u8 projectileDirectionCount;                                                    // +0xba
+    float projectileAngles[ARMY_PROJECTILE_ANGLE_COUNT];                            // +0xbb
+    i32 quantityX[2];                                                               // +0xeb
+    i8 animationFrameCount[ARMY_ANIMATION_SEQUENCE_COUNT];                          // +0xf3
+    i8 animationFrames[ARMY_ANIMATION_SEQUENCE_COUNT][ARMY_ANIMATION_FRAME_COUNT];  // +0x115
 };
 SIZE(SMonFrameInfo, 0x335);
 #pragma pack(pop)

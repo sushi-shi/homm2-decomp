@@ -8,7 +8,7 @@
 class mapCell;
 struct tag_message;
 
-typedef enum AdventureSourceLineConstant {
+HOMM2_ENUM_VALUES_BEGIN(AdventureSourceLineConstant)
     ADVMGR_CLOSE_BORDER_FREE_LINE_BASE = 0x0124,
     ADVMGR_BORDER_INITIAL_FREE_LINE_OFFSET = 22,
     ADVMGR_BORDER_SECONDARY_FREE_LINE_OFFSET = 9,
@@ -28,9 +28,9 @@ typedef enum AdventureSourceLineConstant {
     ADVMGR_TOWN_VIEW_THIRD_ALLOC_LINE_OFFSET = 0x108,
     ADVMGR_REDRAW_BORDER_FREE_LINE_BASE = 0x1628,
     ADVMGR_SAVE_BORDER_ALLOC_LINE_BASE = 0x2025
-} AdventureSourceLineConstant;
+HOMM2_ENUM_VALUES_END(AdventureSourceLineConstant)
 
-typedef enum AdventureScreenConstant {
+HOMM2_ENUM_VALUES_BEGIN(AdventureScreenConstant)
     ADVMGR_SCREEN_WIDTH = 640,
     ADVMGR_SCREEN_HEIGHT = 480,
     ADVMGR_SCROLL_BORDER = 16,
@@ -41,9 +41,9 @@ typedef enum AdventureScreenConstant {
     ADVMGR_RADAR_BOTTOM = 160,
     ADVMGR_PUZZLE_TILE_SIZE = 32,
     ADVMGR_PUZZLE_X_TRIM = 12
-} AdventureScreenConstant;
+HOMM2_ENUM_VALUES_END(AdventureScreenConstant)
 
-typedef enum AdventureBorderConstant {
+HOMM2_ENUM_VALUES_BEGIN(AdventureBorderConstant)
     ADVMGR_BORDER_BUFFER_SIZE = 0x7400,
     ADVMGR_BORDER_EDGE_SIZE = 16,
     ADVMGR_BORDER_VIEW_SIZE = 480,
@@ -52,9 +52,9 @@ typedef enum AdventureBorderConstant {
     ADVMGR_BORDER_SCREEN_PITCH = ADVMGR_SCREEN_WIDTH,
     ADVMGR_BORDER_SIDE_BYTES = ADVMGR_BORDER_EDGE_SIZE,
     ADVMGR_BORDER_SAVED_SIDE_BYTES = ADVMGR_BORDER_SIDE_BYTES * 2
-} AdventureBorderConstant;
+HOMM2_ENUM_VALUES_END(AdventureBorderConstant)
 
-typedef enum AdventureScrollDirection {
+HOMM2_ENUM_BEGIN(AdventureScrollDirection)
     ADVMGR_SCROLL_NORTH = 0,
     ADVMGR_SCROLL_NORTH_EAST = 1,
     ADVMGR_SCROLL_EAST = 2,
@@ -63,15 +63,15 @@ typedef enum AdventureScrollDirection {
     ADVMGR_SCROLL_SOUTH_WEST = 5,
     ADVMGR_SCROLL_WEST = 6,
     ADVMGR_SCROLL_NORTH_WEST = 7
-} AdventureScrollDirection;
+HOMM2_ENUM_END(AdventureScrollDirection)
 
-typedef enum AdventureScrollConstant {
+HOMM2_ENUM_VALUES_BEGIN(AdventureScrollConstant)
     ADVMGR_SCROLL_MIN_ORIGIN = 1 - ADVMGR_VIEW_EDGE_MARGIN,
     ADVMGR_VIEW_CENTER_OFFSET = ADVMGR_VIEW_EDGE_MARGIN - 1,
     ADVMGR_SCROLL_TICK_INTERVAL = 70
-} AdventureScrollConstant;
+HOMM2_ENUM_VALUES_END(AdventureScrollConstant)
 
-typedef enum AdventureButtonConstant {
+HOMM2_ENUM_VALUES_BEGIN(AdventureButtonConstant)
     ADVMGR_BUTTON_MESSAGE = 0x200,
     ADVMGR_BUTTON_ENABLE = 5,
     ADVMGR_BUTTON_DISABLE = 6,
@@ -86,26 +86,26 @@ typedef enum AdventureButtonConstant {
     ADVMGR_BUTTON_SLOT_6 = 6,
     ADVMGR_BUTTON_BROADCAST_ARG = 1,
     ADVMGR_BUTTON_BROADCAST_FLAGS = 0x4008
-} AdventureButtonConstant;
+HOMM2_ENUM_VALUES_END(AdventureButtonConstant)
 
-typedef enum AdventureTriggerConstant {
+HOMM2_ENUM_VALUES_BEGIN(AdventureTriggerConstant)
     ADVMGR_SPECIAL_TRIGGER = 0x7a,
     ADVMGR_SPECIAL_TRIGGER_MASK = 0x3f,
     ADVMGR_TRIGGER_EVENT_5 = 5,
     ADVMGR_TRIGGER_EVENT_6 = 6
-} AdventureTriggerConstant;
+HOMM2_ENUM_VALUES_END(AdventureTriggerConstant)
 
-typedef enum AdventureHoverObject {
+HOMM2_ENUM_BEGIN(AdventureHoverObject)
     ADVMGR_HOVER_MONSTER = 0x18,
     ADVMGR_HOVER_COAST = 0x1c,
     ADVMGR_HOVER_SHIPWRECK = 0x20,
     ADVMGR_HOVER_TOWN = 0x23,
     ADVMGR_HOVER_HERO = 0x2a,
     ADVMGR_HOVER_BOAT = 0x2b,
-    ADVMGR_HOVER_SHIPWRECK_TRIGGER = ADVMGR_HOVER_SHIPWRECK | MAP_TRIGGER_ACTION_FLAG
-} AdventureHoverObject;
+    ADVMGR_HOVER_SHIPWRECK_TRIGGER = IDX(ADVMGR_HOVER_SHIPWRECK) | MAP_TRIGGER_ACTION_FLAG
+HOMM2_ENUM_END(AdventureHoverObject)
 
-typedef enum AdventureHoverConstant {
+HOMM2_ENUM_VALUES_BEGIN(AdventureHoverConstant)
     ADVMGR_HOVER_VIEW_CELLS = 15,
     ADVMGR_HOVER_MAX_CELL = ADVMGR_HOVER_VIEW_CELLS - 1,
     ADVMGR_HOVER_OBJECT_BLOCKED = 0x08,
@@ -114,9 +114,9 @@ typedef enum AdventureHoverConstant {
     ADVMGR_HOVER_ROUTE_FRAMES_PER_DAY = 6,
     ADVMGR_HOVER_SCROLL_FRAME_FIRST = 32,
     ADVMGR_HOVER_SCROLL_FRAME_END = 40
-} AdventureHoverConstant;
+HOMM2_ENUM_VALUES_END(AdventureHoverConstant)
 
-typedef enum AdventurePointerFrame {
+HOMM2_ENUM_BEGIN(AdventurePointerFrame)
     ADVMGR_POINTER_DEFAULT = 0,
     ADVMGR_POINTER_HERO = 2,
     ADVMGR_POINTER_TOWN = 3,
@@ -127,9 +127,9 @@ typedef enum AdventurePointerFrame {
     ADVMGR_POINTER_SELECT_HERO = 8,
     ADVMGR_POINTER_ACTION = 9,
     ADVMGR_POINTER_WATER_ACTION = 28
-} AdventurePointerFrame;
+HOMM2_ENUM_END(AdventurePointerFrame)
 
-typedef enum AdventureFrameConstant {
+HOMM2_ENUM_VALUES_BEGIN(AdventureFrameConstant)
     ADVMGR_MOBILITY_SCALE = 22,
     ADVMGR_MOBILITY_DIVISOR = 1500,
     ADVMGR_MANA_DIVISOR = 5,
@@ -143,9 +143,9 @@ typedef enum AdventureFrameConstant {
     ADVMGR_FRAME_TOP = 25,
     ADVMGR_FRAME_HIGH = 24,
     ADVMGR_FRAME_MID = 23
-} AdventureFrameConstant;
+HOMM2_ENUM_VALUES_END(AdventureFrameConstant)
 
-typedef enum AdventureStateConstant {
+HOMM2_ENUM_VALUES_BEGIN(AdventureStateConstant)
     ADVMGR_INVALID_CELL = -1,
     ADVMGR_INVALID_HERO = -1,
     ADVMGR_LOOPING_SOUND_LIMIT = 4,
@@ -163,9 +163,9 @@ typedef enum AdventureStateConstant {
     ADVMGR_DEFAULT_POINTER_FRAME = -999,
     ADVMGR_UNUSED_OBJECT_ICON_1 = 21,
     ADVMGR_UNUSED_OBJECT_ICON_2 = 38
-} AdventureStateConstant;
+HOMM2_ENUM_VALUES_END(AdventureStateConstant)
 
-typedef enum AdventureRemoteConstant {
+HOMM2_ENUM_VALUES_BEGIN(AdventureRemoteConstant)
     ADVMGR_REMOTE_DATA_REQUEST = 1,
     ADVMGR_REMOTE_PACKET_TYPE_GAME = 2,
     ADVMGR_REMOTE_PACKET_TYPE_ALT = 3,
@@ -177,9 +177,9 @@ typedef enum AdventureRemoteConstant {
     ADVMGR_REMOTE_COMMAND_GROUP_MAP_CHANGE = 41,
     ADVMGR_REMOTE_LOAD_MAP_CHANGE = 11,
     ADVMGR_REMOTE_PAYLOAD_VIEW_SIZE = 16
-} AdventureRemoteConstant;
+HOMM2_ENUM_VALUES_END(AdventureRemoteConstant)
 
-typedef enum AdventureRemoteWaitConstant {
+HOMM2_ENUM_VALUES_BEGIN(AdventureRemoteWaitConstant)
     ADVMGR_REMOTE_WAIT_COMMAND_MESSAGE = 1,
     ADVMGR_REMOTE_WAIT_MOUSE_MESSAGE = 4,
     ADVMGR_REMOTE_WAIT_EXIT_COMMAND = 16,
@@ -187,9 +187,9 @@ typedef enum AdventureRemoteWaitConstant {
     ADVMGR_REMOTE_WAIT_EXIT_MODIFIER_MASK = 0x0c,
     ADVMGR_REMOTE_WAIT_EXIT_MESSAGE = 0x4000,
     ADVMGR_REMOTE_WAIT_EXIT_RESULT = 2
-} AdventureRemoteWaitConstant;
+HOMM2_ENUM_VALUES_END(AdventureRemoteWaitConstant)
 
-typedef enum AdventureEnvironmentSoundConstant {
+HOMM2_ENUM_VALUES_BEGIN(AdventureEnvironmentSoundConstant)
     ADVMGR_ENVIRONMENT_SOUND_NONE = -1,
     ADVMGR_ENVIRONMENT_SOUND_LOG_UNUSED = -999,
     ADVMGR_ENVIRONMENT_SOUND_DEFAULT_VOLUME = 127,
@@ -198,9 +198,9 @@ typedef enum AdventureEnvironmentSoundConstant {
     ADVMGR_ENVIRONMENT_SOUND_FIRST_LAYER = 1,
     ADVMGR_ENVIRONMENT_SOUND_LAYER_COUNT = 2,
     ADVMGR_ENVIRONMENT_SOUND_CHANNEL_TYPE = 3
-} AdventureEnvironmentSoundConstant;
+HOMM2_ENUM_VALUES_END(AdventureEnvironmentSoundConstant)
 
-typedef enum AdventureEnvironmentSoundId {
+HOMM2_ENUM_BEGIN(AdventureEnvironmentSoundId)
     ADVMGR_SOUND_BUOY = 0,
     ADVMGR_SOUND_SHIPWRECK = 1,
     ADVMGR_SOUND_COAST = 2,
@@ -229,9 +229,9 @@ typedef enum AdventureEnvironmentSoundId {
     ADVMGR_SOUND_DWELLING = 25,
     ADVMGR_SOUND_ABANDONED_MINE = 26,
     ADVMGR_SOUND_LARGE_VOLCANO = 27
-} AdventureEnvironmentSoundId;
+HOMM2_ENUM_END(AdventureEnvironmentSoundId)
 
-typedef enum AdventureTeleportConstant {
+HOMM2_ENUM_VALUES_BEGIN(AdventureTeleportConstant)
     ADVMGR_TELEPORT_MAP_CHANGE = 9,
     ADVMGR_TELEPORT_MAP_CHANGE_VALUE = -999,
     ADVMGR_TELEPORT_CELL_OBJECT_FLAG = 0x40,
@@ -240,9 +240,9 @@ typedef enum AdventureTeleportConstant {
     ADVMGR_TELEPORT_DELAY = 90,
     ADVMGR_TELEPORT_FIZZLE_TIME = 128,
     ADVMGR_TELEPORT_REMOTE_FIZZLE_ADJUSTMENT = 64
-} AdventureTeleportConstant;
+HOMM2_ENUM_VALUES_END(AdventureTeleportConstant)
 
-typedef enum AdventureTravelSpellConstant {
+HOMM2_ENUM_VALUES_BEGIN(AdventureTravelSpellConstant)
     ADVMGR_TRAVEL_DIALOG_ACCEPT = 1,
     ADVMGR_TRAVEL_MUSIC = 1,
     ADVMGR_DIMENSION_DOOR_FIRST_BUTTON = 10,
@@ -253,9 +253,9 @@ typedef enum AdventureTravelSpellConstant {
     ADVMGR_TOWN_PORTAL_WINDOW_X = 159,
     ADVMGR_TOWN_PORTAL_WINDOW_Y = 65,
     ADVMGR_TOWN_PORTAL_DISTANCE_LIMIT = 1000
-} AdventureTravelSpellConstant;
+HOMM2_ENUM_VALUES_END(AdventureTravelSpellConstant)
 
-typedef enum AdventureTownPortalMessage {
+HOMM2_ENUM_BEGIN(AdventureTownPortalMessage)
     ADVMGR_TOWN_PORTAL_MESSAGE = 0x200,
     ADVMGR_TOWN_PORTAL_COMMAND_SELECT = 13,
     ADVMGR_TOWN_PORTAL_COMMAND_TEXT = 3,
@@ -269,9 +269,9 @@ typedef enum AdventureTownPortalMessage {
     ADVMGR_TOWN_PORTAL_LAST_CHOICE = 0x7802,
     ADVMGR_TOWN_PORTAL_UNHANDLED = 1,
     ADVMGR_TOWN_PORTAL_HANDLED = 2
-} AdventureTownPortalMessage;
+HOMM2_ENUM_END(AdventureTownPortalMessage)
 
-typedef enum AdventureSoundTilesetConstant {
+HOMM2_ENUM_VALUES_BEGIN(AdventureSoundTilesetConstant)
     ADVMGR_SOUND_GROUND_SHAPE_MASK = 0x0f,
     ADVMGR_SOUND_TILESET_WATER = 0x28,
     ADVMGR_SOUND_TILESET_STREAM = 0x2d,
@@ -282,9 +282,9 @@ typedef enum AdventureSoundTilesetConstant {
     ADVMGR_SOUND_SEAGULL_FRAME_LAST = 0xb7,
     ADVMGR_SOUND_ALCHEMIST_FRAME_FIRST = 0x27,
     ADVMGR_SOUND_ALCHEMIST_FRAME_LAST = 0x2c
-} AdventureSoundTilesetConstant;
+HOMM2_ENUM_VALUES_END(AdventureSoundTilesetConstant)
 
-typedef enum AdventureOpenConstant {
+HOMM2_ENUM_VALUES_BEGIN(AdventureOpenConstant)
     ADVMGR_SCROLL_Y = 195,
     ADVMGR_SCROLL_LEFT_X = 540,
     ADVMGR_SCROLL_RIGHT_X = 612,
@@ -295,18 +295,18 @@ typedef enum AdventureOpenConstant {
     ADVMGR_SCROLL_HOTKEY = 16,
     ADVMGR_TIMER_DELAY = 120,
     ADVMGR_MANAGER_MESSAGE = 0x400
-} AdventureOpenConstant;
+HOMM2_ENUM_VALUES_END(AdventureOpenConstant)
 
-typedef enum AdventureInterfaceConstant {
+HOMM2_ENUM_VALUES_BEGIN(AdventureInterfaceConstant)
     ADVMGR_INTERFACE_AUTO = 0,
     ADVMGR_INTERFACE_GOOD = 1,
     ADVMGR_INTERFACE_EVIL = 2,
     ADVMGR_INTERFACE_TRANSLATION_COUNT = 37,
     ADVMGR_INTERFACE_MESSAGE = 0x200,
     ADVMGR_INTERFACE_REPLACE_RESOURCE = 0x3c
-} AdventureInterfaceConstant;
+HOMM2_ENUM_VALUES_END(AdventureInterfaceConstant)
 
-typedef enum AdventureSystemOptionsMessage {
+HOMM2_ENUM_BEGIN(AdventureSystemOptionsMessage)
     ADVMGR_SYSTEM_OPTIONS_MESSAGE = 0x200,
     ADVMGR_SYSTEM_OPTIONS_ACTIVATE = 12,
     ADVMGR_SYSTEM_OPTIONS_ACCEPT = 13,
@@ -315,22 +315,26 @@ typedef enum AdventureSystemOptionsMessage {
     ADVMGR_SYSTEM_OPTIONS_DIALOG_ACCEPT = 0x7800,
     ADVMGR_SYSTEM_OPTIONS_UNHANDLED = 1,
     ADVMGR_SYSTEM_OPTIONS_HANDLED = 2
-} AdventureSystemOptionsMessage;
+HOMM2_ENUM_END(AdventureSystemOptionsMessage)
 
 HOMM2_ENUM_BEGIN(AdventureSystemOption)
-ADVMGR_SYSTEM_OPTION_MUSIC_VOLUME = 10,
-    ADVMGR_SYSTEM_OPTION_SOUND_VOLUME = 11, ADVMGR_SYSTEM_OPTION_HERO_SPEED = 12,
-    ADVMGR_SYSTEM_OPTION_MUSIC_SOURCE = 13, ADVMGR_SYSTEM_OPTION_SHOW_ROUTE = 14,
-    ADVMGR_SYSTEM_OPTION_COMPUTER_SPEED = 15, ADVMGR_SYSTEM_OPTION_INTERFACE = 16,
-    ADVMGR_SYSTEM_OPTION_VIDEO = 17, ADVMGR_SYSTEM_OPTION_COLOR_CURSOR = 18,
-    ADVMGR_SYSTEM_OPTION_FIRST = ADVMGR_SYSTEM_OPTION_MUSIC_VOLUME,
-    ADVMGR_SYSTEM_OPTION_LAST = ADVMGR_SYSTEM_OPTION_COLOR_CURSOR,
+    ADVMGR_SYSTEM_OPTION_MUSIC_VOLUME = 10,
+    ADVMGR_SYSTEM_OPTION_SOUND_VOLUME = 11,
+    ADVMGR_SYSTEM_OPTION_HERO_SPEED = 12,
+    ADVMGR_SYSTEM_OPTION_MUSIC_SOURCE = 13,
+    ADVMGR_SYSTEM_OPTION_SHOW_ROUTE = 14,
+    ADVMGR_SYSTEM_OPTION_COMPUTER_SPEED = 15,
+    ADVMGR_SYSTEM_OPTION_INTERFACE = 16,
+    ADVMGR_SYSTEM_OPTION_VIDEO = 17,
+    ADVMGR_SYSTEM_OPTION_COLOR_CURSOR = 18,
+    ADVMGR_SYSTEM_OPTION_FIRST = IDX(ADVMGR_SYSTEM_OPTION_MUSIC_VOLUME),
+    ADVMGR_SYSTEM_OPTION_LAST = IDX(ADVMGR_SYSTEM_OPTION_COLOR_CURSOR),
     ADVMGR_SYSTEM_OPTION_COUNT =
-        ADVMGR_SYSTEM_OPTION_LAST - ADVMGR_SYSTEM_OPTION_FIRST
-        + 1 HOMM2_ENUM_END(AdventureSystemOption)
+        IDX(ADVMGR_SYSTEM_OPTION_LAST) - IDX(ADVMGR_SYSTEM_OPTION_FIRST) + 1
+HOMM2_ENUM_END(AdventureSystemOption)
 
 #ifdef HOMM2_STRICT_ENUM_TYPES
-            inline i32 EncodeAdventureSystemOption(AdventureSystemOption option) {
+inline i32 EncodeAdventureSystemOption(AdventureSystemOption option) {
     return static_cast<i32>(option);
 }
 
@@ -342,7 +346,7 @@ inline AdventureSystemOption DecodeAdventureSystemOption(i32 value) {
 #define DecodeAdventureSystemOption(value) (value)
 #endif
 
-typedef enum AdventureSystemOptionConstant {
+HOMM2_ENUM_VALUES_BEGIN(AdventureSystemOptionConstant)
     ADVMGR_OPTION_VOLUME_LEVELS = 11,
     ADVMGR_OPTION_HERO_SPEED_LEVELS = 5,
     ADVMGR_OPTION_COMPUTER_SPEED_MAX = 4,
@@ -351,9 +355,9 @@ typedef enum AdventureSystemOptionConstant {
     ADVMGR_OPTION_DIALOG_MESSAGE = 1,
     ADVMGR_OPTION_DIALOG_HELP = 4,
     ADVMGR_OPTION_DIALOG_NONE = -1
-} AdventureSystemOptionConstant;
+HOMM2_ENUM_VALUES_END(AdventureSystemOptionConstant)
 
-typedef enum AdventureSummonBoatConstant {
+HOMM2_ENUM_VALUES_BEGIN(AdventureSummonBoatConstant)
     ADVMGR_SUMMON_CENTER_OFFSET = 7,
     ADVMGR_SUMMON_DIRECTION_COUNT = 8,
     ADVMGR_SUMMON_BOAT_COUNT = 48,
@@ -370,9 +374,9 @@ typedef enum AdventureSummonBoatConstant {
     ADVMGR_SUMMON_TARGET_WIDTH = 150,
     ADVMGR_SUMMON_TARGET_HEIGHT = 136,
     ADVMGR_SUMMON_BOAT_TRIGGER = 0xab
-} AdventureSummonBoatConstant;
+HOMM2_ENUM_VALUES_END(AdventureSummonBoatConstant)
 
-typedef enum AdventureRouteConstant {
+HOMM2_ENUM_VALUES_BEGIN(AdventureRouteConstant)
     ADVMGR_ROUTE_PATH_COST_LIMIT = 59999,
     ADVMGR_ROUTE_TERRAIN_COST_INFINITY = 999999999,
     ADVMGR_ROUTE_DAY_MASK = 0x100,
@@ -390,9 +394,9 @@ typedef enum AdventureRouteConstant {
     ADVMGR_ROUTE_DIAGONAL_COST_3 = 225,
     ADVMGR_ROUTE_DIAGONAL_COST_4 = 262,
     ADVMGR_ROUTE_DIAGONAL_COST_5 = 300
-} AdventureRouteConstant;
+HOMM2_ENUM_VALUES_END(AdventureRouteConstant)
 
-typedef enum AdventureCommand {
+HOMM2_ENUM_BEGIN(AdventureCommand)
     ADVMGR_COMMAND_NONE = -1,
     ADVMGR_COMMAND_MOVE_TO = 1,
     ADVMGR_COMMAND_HERO_VIEW = 2,
@@ -401,17 +405,17 @@ typedef enum AdventureCommand {
     ADVMGR_COMMAND_SELECT_TOWN = 5,
     ADVMGR_COMMAND_OCCUPIED_TOWN_VIEW = 6,
     ADVMGR_COMMAND_CONTINUE_ROUTE = 7
-} AdventureCommand;
+HOMM2_ENUM_END(AdventureCommand)
 
-typedef enum AdventureSearchConstant {
+HOMM2_ENUM_VALUES_BEGIN(AdventureSearchConstant)
     ADVMGR_ARTIFACT_CAPACITY = 14,
     ADVMGR_CLEAR_GROUND_TILESET = 47,
     ADVMGR_DIG_HOLE_TILESET = 56,
     ADVMGR_DIG_HOLE_FRAME = 140,
     ADVMGR_ULTIMATE_ARTIFACT_MUSIC = 41
-} AdventureSearchConstant;
+HOMM2_ENUM_VALUES_END(AdventureSearchConstant)
 
-typedef enum AdventureDrawMask {
+HOMM2_ENUM_BEGIN(AdventureDrawMask)
     ADVMGR_DRAW_GROUND = 0x01,
     ADVMGR_DRAW_OBJECT = 0x02,
     ADVMGR_DRAW_OVERLAY = 0x04,
@@ -419,9 +423,9 @@ typedef enum AdventureDrawMask {
     ADVMGR_DRAW_CLOUD = 0x20,
     ADVMGR_DRAW_OVERLAY_TOP = 0x40,
     ADVMGR_DRAW_HERO_SHADOW = 0x80
-} AdventureDrawMask;
+HOMM2_ENUM_END(AdventureDrawMask)
 
-typedef enum AdventureDrawConstant {
+HOMM2_ENUM_VALUES_BEGIN(AdventureDrawConstant)
     ADVMGR_CELL_PIXELS = 32,
     ADVMGR_DRAW_VIEW_CELLS = 15,
     ADVMGR_DRAW_LAST_CELL = ADVMGR_DRAW_VIEW_CELLS - 1,
@@ -436,9 +440,9 @@ typedef enum AdventureDrawConstant {
     ADVMGR_TILESET_MINE = 12,
     ADVMGR_TILESET_ROUTE = 17,
     ADVMGR_TILESET_BOAT = 39,
-} AdventureDrawConstant;
+HOMM2_ENUM_VALUES_END(AdventureDrawConstant)
 
-typedef enum AdventureComboDrawConstant {
+HOMM2_ENUM_VALUES_BEGIN(AdventureComboDrawConstant)
     ADVMGR_COMBO_VIEW_CELLS = 15,
     ADVMGR_COMBO_GRID_CELLS = 18,
     ADVMGR_COMBO_CLEAR_BYTES = 256,
@@ -451,17 +455,17 @@ typedef enum AdventureComboDrawConstant {
     ADVMGR_COMBO_UPDATE_MIN = 16,
     ADVMGR_COMBO_UPDATE_MAX = 463,
     ADVMGR_CURSOR_ROUTE = 6
-} AdventureComboDrawConstant;
+HOMM2_ENUM_VALUES_END(AdventureComboDrawConstant)
 
-typedef enum AdventureUpdateScreenConstant {
+HOMM2_ENUM_VALUES_BEGIN(AdventureUpdateScreenConstant)
     ADVMGR_UPDATE_NONE = -1,
     ADVMGR_UPDATE_VIEWPORT_ORIGIN = 16,
     ADVMGR_UPDATE_VIEWPORT_SIZE = 448,
     ADVMGR_UPDATE_ANIMATION_PHASES = 6,
     ADVMGR_UPDATE_FRAME_CYCLE = 18
-} AdventureUpdateScreenConstant;
+HOMM2_ENUM_VALUES_END(AdventureUpdateScreenConstant)
 
-typedef enum AdventureRadarConstant {
+HOMM2_ENUM_VALUES_BEGIN(AdventureRadarConstant)
     ADVMGR_RADAR_SIZE = 144,
     ADVMGR_RADAR_SCREEN_PITCH = 640,
     ADVMGR_RADAR_ROW_GROUPS = 5,
@@ -483,9 +487,9 @@ typedef enum AdventureRadarConstant {
     ADVMGR_RADAR_SPECIAL_TILESET = 0x3e,
     ADVMGR_RADAR_REEFS_TRIGGER = 0x67,
     ADVMGR_RADAR_NEIGHBOR_TRIGGER = 0xa3
-} AdventureRadarConstant;
+HOMM2_ENUM_VALUES_END(AdventureRadarConstant)
 
-typedef enum AdventureArmySizeThreshold {
+HOMM2_ENUM_BEGIN(AdventureArmySizeThreshold)
     ADVMGR_ARMY_FEW_LIMIT = 5,
     ADVMGR_ARMY_SEVERAL_LIMIT = 10,
     ADVMGR_ARMY_PACK_LIMIT = 20,
@@ -494,9 +498,9 @@ typedef enum AdventureArmySizeThreshold {
     ADVMGR_ARMY_THRONG_LIMIT = 250,
     ADVMGR_ARMY_SWARM_LIMIT = 500,
     ADVMGR_ARMY_ZOUNDS_LIMIT = 1000
-} AdventureArmySizeThreshold;
+HOMM2_ENUM_END(AdventureArmySizeThreshold)
 
-typedef enum AdventureBottomHeroViewConstant {
+HOMM2_ENUM_VALUES_BEGIN(AdventureBottomHeroViewConstant)
     ADVMGR_BOTTOM_HERO_VIEW_ID = 3,
     ADVMGR_BOTTOM_HERO_ARMY_SLOTS = 5,
     ADVMGR_BOTTOM_HERO_EMPTY_SLOT = -1,
@@ -520,9 +524,9 @@ typedef enum AdventureBottomHeroViewConstant {
     ADVMGR_BOTTOM_HERO_FIRST_TEXT_ID = 2101,
     ADVMGR_BOTTOM_HERO_WIDGET_FLAGS = 16,
     ADVMGR_BOTTOM_HERO_TEXT_ALIGNMENT = 0x200
-} AdventureBottomHeroViewConstant;
+HOMM2_ENUM_VALUES_END(AdventureBottomHeroViewConstant)
 
-typedef enum AdventureLocatorConstant {
+HOMM2_ENUM_VALUES_BEGIN(AdventureLocatorConstant)
     ADVMGR_LOCATOR_VISIBLE_COUNT = 4,
     ADVMGR_LOCATOR_PAGE_THRESHOLD = 5,
     ADVMGR_LOCATOR_PAGE_DENOMINATOR_OFFSET = 4,
@@ -563,17 +567,17 @@ typedef enum AdventureLocatorConstant {
     ADVMGR_LOCATOR_SCREEN_ROW_HEIGHT = 32,
     ADVMGR_LOCATOR_SCREEN_WIDTH = 54,
     ADVMGR_LOCATOR_SCREEN_HEIGHT = 30
-} AdventureLocatorConstant;
+HOMM2_ENUM_VALUES_END(AdventureLocatorConstant)
 
-typedef enum AdventureSpellConstant {
+HOMM2_ENUM_VALUES_BEGIN(AdventureSpellConstant)
     ADVMGR_TRAVEL_SPELL_MOBILITY_COST = 225,
     ADVMGR_MINE_GUARDIAN_MAX_POWER = 51,
     ADVMGR_MINE_GUARDIANS_PER_POWER = 4,
     ADVMGR_MINE_GUARDIAN_VALUE_COUNT = 2,
     ADVMGR_MINE_GUARDIAN_TYPE_INDEX = 0
-} AdventureSpellConstant;
+HOMM2_ENUM_VALUES_END(AdventureSpellConstant)
 
-typedef enum AdventureSaveConstant {
+HOMM2_ENUM_VALUES_BEGIN(AdventureSaveConstant)
     ADVMGR_SAVE_PLAYER_COUNT = 6,
     ADVMGR_SAVE_EXTENSION_SIZE = 8,
     ADVMGR_SAVE_PATTERN_SIZE = 16,
@@ -581,9 +585,9 @@ typedef enum AdventureSaveConstant {
     ADVMGR_SAVE_REQUESTER_Y = 58,
     ADVMGR_SAVE_POINTER_FRAME = 0,
     ADVMGR_SAVE_POINTER_DELAY = -999
-} AdventureSaveConstant;
+HOMM2_ENUM_VALUES_END(AdventureSaveConstant)
 
-typedef enum AdventureBottomViewConstant {
+HOMM2_ENUM_VALUES_BEGIN(AdventureBottomViewConstant)
     ADVMGR_BOTTOM_VIEW_NONE = 0,
     ADVMGR_BOTTOM_VIEW_NEW_TURN = 1,
     ADVMGR_BOTTOM_VIEW_KINGDOM = 2,
@@ -608,9 +612,9 @@ typedef enum AdventureBottomViewConstant {
     ADVMGR_BOTTOM_VIEW_WIDGET_CAPACITY = 12,
     ADVMGR_BOTTOM_VIEW_NO_ENEMY = -1,
     ADVMGR_BOTTOM_VIEW_NO_ANIMATION = -1
-} AdventureBottomViewConstant;
+HOMM2_ENUM_VALUES_END(AdventureBottomViewConstant)
 
-typedef enum AdventureNewTurnViewConstant {
+HOMM2_ENUM_VALUES_BEGIN(AdventureNewTurnViewConstant)
     ADVMGR_NEW_TURN_DATE_ICON_X = 480,
     ADVMGR_NEW_TURN_DATE_ICON_Y = 392,
     ADVMGR_NEW_TURN_DATE_ICON_WIDTH = 143,
@@ -624,9 +628,9 @@ typedef enum AdventureNewTurnViewConstant {
     ADVMGR_NEW_TURN_FIRST_DAY = 1,
     ADVMGR_NEW_TURN_WEEK_ALLOC_LINE_OFFSET = 0x29,
     ADVMGR_NEW_TURN_DAY_ALLOC_LINE_OFFSET = 0x43
-} AdventureNewTurnViewConstant;
+HOMM2_ENUM_VALUES_END(AdventureNewTurnViewConstant)
 
-typedef enum AdventureResourceViewConstant {
+HOMM2_ENUM_VALUES_BEGIN(AdventureResourceViewConstant)
     ADVMGR_RESOURCE_VIEW_TEXT_BASE_Y = 398,
     ADVMGR_RESOURCE_VIEW_MULTILINE_HEIGHT = 32,
     ADVMGR_RESOURCE_VIEW_LINE_HEIGHT = 6,
@@ -644,9 +648,9 @@ typedef enum AdventureResourceViewConstant {
     ADVMGR_RESOURCE_VIEW_COUNT_HEIGHT = 12,
     ADVMGR_RESOURCE_VIEW_MESSAGE_ALLOC_LINE_OFFSET = 0x26,
     ADVMGR_RESOURCE_VIEW_COUNT_ALLOC_LINE_OFFSET = 0x50
-} AdventureResourceViewConstant;
+HOMM2_ENUM_VALUES_END(AdventureResourceViewConstant)
 
-typedef enum AdventureKingdomViewConstant {
+HOMM2_ENUM_VALUES_BEGIN(AdventureKingdomViewConstant)
     ADVMGR_KINGDOM_VIEW_RESOURCE_COUNT = 7,
     ADVMGR_KINGDOM_VIEW_ENTRY_COUNT = 9,
     ADVMGR_KINGDOM_VIEW_CASTLE_ENTRY = 7,
@@ -669,16 +673,16 @@ typedef enum AdventureKingdomViewConstant {
     ADVMGR_KINGDOM_VIEW_CASTLE_TEXT_X = 27,
     ADVMGR_KINGDOM_VIEW_VILLAGE_TEXT_X = 80,
     ADVMGR_KINGDOM_VIEW_COUNT_ALLOC_LINE_OFFSET = 0x32
-} AdventureKingdomViewConstant;
+HOMM2_ENUM_VALUES_END(AdventureKingdomViewConstant)
 
-typedef enum AdventureVisionsConstant {
+HOMM2_ENUM_VALUES_BEGIN(AdventureVisionsConstant)
     ADVMGR_VISIONS_RADIUS = 3,
     ADVMGR_VISIONS_MONSTER_TRIGGER = 0x98,
     ADVMGR_VISIONS_NO_MONSTER_DISTANCE = 100,
     ADVMGR_VISIONS_MESSAGE_BUFFER_SIZE = 200
-} AdventureVisionsConstant;
+HOMM2_ENUM_VALUES_END(AdventureVisionsConstant)
 
-typedef enum AdventureEnemyTurnViewConstant {
+HOMM2_ENUM_VALUES_BEGIN(AdventureEnemyTurnViewConstant)
     ADVMGR_ENEMY_TURN_VIEW_ID = 4,
     ADVMGR_ENEMY_TURN_BACKGROUND_X = 480,
     ADVMGR_ENEMY_TURN_BACKGROUND_Y = 392,
@@ -712,9 +716,9 @@ typedef enum AdventureEnemyTurnViewConstant {
     ADVMGR_ENEMY_TURN_PHASE_DELAY = 700,
     ADVMGR_ENEMY_TURN_MESSAGE_TYPE = 0x200,
     ADVMGR_ENEMY_TURN_MESSAGE_SET_FRAME = 4
-} AdventureEnemyTurnViewConstant;
+HOMM2_ENUM_VALUES_END(AdventureEnemyTurnViewConstant)
 
-typedef enum AdventureCloudNeighbor {
+HOMM2_ENUM_BEGIN(AdventureCloudNeighbor)
     ADVMGR_CLOUD_NORTH = 0x01,
     ADVMGR_CLOUD_EAST = 0x02,
     ADVMGR_CLOUD_SOUTH = 0x04,
@@ -727,9 +731,9 @@ typedef enum AdventureCloudNeighbor {
     ADVMGR_CLOUD_RIGHT_EDGE = 0x32,
     ADVMGR_CLOUD_TOP_EDGE = 0x91,
     ADVMGR_CLOUD_BOTTOM_EDGE = 0x64
-} AdventureCloudNeighbor;
+HOMM2_ENUM_END(AdventureCloudNeighbor)
 
-typedef enum AdventureQuickInfoObject {
+HOMM2_ENUM_BEGIN(AdventureQuickInfoObject)
     ADVMGR_OBELISK_INDEX_BASE = 1,
     ADVMGR_RESOURCE_FRAME_PAIR_MASK = ~1,
     ADVMGR_ROUTE_BEYOND_MOBILITY_FLAG = 0x100,
@@ -741,9 +745,9 @@ typedef enum AdventureQuickInfoObject {
     ADVMGR_CHEAT_REVEAL_MAP = 8675309,
     ADVMGR_CHEAT_INFO = 411,
     ADVMGR_OBJECT_GENERIC_SITE = 0x7a
-} AdventureQuickInfoObject;
+HOMM2_ENUM_END(AdventureQuickInfoObject)
 
-typedef enum AdventureVisitMask {
+HOMM2_ENUM_BEGIN(AdventureVisitMask)
     ADVMGR_VISIT_FORT = 2,
     ADVMGR_VISIT_GAZEBO = 4,
     ADVMGR_VISIT_MERCENARY_CAMP = 8,
@@ -756,9 +760,9 @@ typedef enum AdventureVisitMask {
     ADVMGR_VISIT_GENERIC_SPRING = 0x200000,
     ADVMGR_VISIT_GENERIC_HUT = 0x400000,
     ADVMGR_VISIT_GENERIC_ALTAR = 0x800000
-} AdventureVisitMask;
+HOMM2_ENUM_END(AdventureVisitMask)
 
-typedef enum AdventureSiteConstant {
+HOMM2_ENUM_VALUES_BEGIN(AdventureSiteConstant)
     ADVMGR_SITE_TILESET_1 = 0x3d,
     ADVMGR_SITE_TILESET_2 = 0x3e,
     ADVMGR_SITE_TILESET_3 = 0x3f,
@@ -776,9 +780,9 @@ typedef enum AdventureSiteConstant {
     ADVMGR_RECRUITMENT_3_END = 0x78,
     ADVMGR_RECRUITMENT_4_END = 0x81,
     ADVMGR_RECRUITMENT_5_END = 0x89
-} AdventureSiteConstant;
+HOMM2_ENUM_VALUES_END(AdventureSiteConstant)
 
-typedef enum AdventurePanelCommand {
+HOMM2_ENUM_BEGIN(AdventurePanelCommand)
     ADVMGR_PANEL_NEXT_HERO = 1,
     ADVMGR_PANEL_CONTINUE_ROUTE = 2,
     ADVMGR_PANEL_OVERVIEW = 3,
@@ -799,16 +803,16 @@ typedef enum AdventurePanelCommand {
     ADVMGR_BOTTOM_VIEW_DURATION = 3000,
     ADVMGR_LOCATORS_PER_PAGE = 5,
     ADVMGR_LOCATOR_PAGE_STEP = 4
-} AdventurePanelCommand;
+HOMM2_ENUM_END(AdventurePanelCommand)
 
-typedef enum AdventureAdjacentMonsterConstant {
+HOMM2_ENUM_VALUES_BEGIN(AdventureAdjacentMonsterConstant)
     ADVMGR_ADJACENT_MONSTER_RADIUS = 1,
     ADVMGR_ADJACENT_MONSTER_END_OFFSET = 2,
     ADVMGR_ADJACENT_MONSTER_TRIGGER = 0x98,
     ADVMGR_ADJACENT_OBJECT_INDEX_NONE = 0xFF
-} AdventureAdjacentMonsterConstant;
+HOMM2_ENUM_VALUES_END(AdventureAdjacentMonsterConstant)
 
-typedef enum AdventurePuzzleViewConstant {
+HOMM2_ENUM_VALUES_BEGIN(AdventurePuzzleViewConstant)
     ADVMGR_PUZZLE_PIECE_COUNT = 48,
     ADVMGR_PUZZLE_MUSIC = 23,
     ADVMGR_PUZZLE_WINDOW_X = ADVMGR_DRAW_CLIP_WIDTH,
@@ -819,9 +823,9 @@ typedef enum AdventurePuzzleViewConstant {
     ADVMGR_PUZZLE_COORDINATE_OFFSET = 7,
     ADVMGR_PUZZLE_ALIGNMENT_DIVISOR = 3,
     ADVMGR_PUZZLE_FIZZLE_TIME = 220
-} AdventurePuzzleViewConstant;
+HOMM2_ENUM_VALUES_END(AdventurePuzzleViewConstant)
 
-typedef enum AdventurePanelDialogConstant {
+HOMM2_ENUM_VALUES_BEGIN(AdventurePanelDialogConstant)
     ADVMGR_PANEL_NO_HELP = -1,
     ADVMGR_PANEL_WINDOW_X = 144,
     ADVMGR_PANEL_WINDOW_Y = 40,
@@ -844,9 +848,9 @@ typedef enum AdventurePanelDialogConstant {
     ADVMGR_CONTROL_MAIN_MENU_HELP = 3,
     ADVMGR_CONTROL_CLOSE_HELP = 4,
     ADVMGR_CONTROL_CONFIRMATION_SIZE = 200
-} AdventurePanelDialogConstant;
+HOMM2_ENUM_VALUES_END(AdventurePanelDialogConstant)
 
-typedef enum AdventureSystemOptionsConstant {
+HOMM2_ENUM_VALUES_BEGIN(AdventureSystemOptionsConstant)
     ADVMGR_SYSTEM_OPTIONS_WINDOW_X = 160,
     ADVMGR_SYSTEM_OPTIONS_WINDOW_Y = 33,
     ADVMGR_SYSTEM_OPTIONS_TITLE = 2,
@@ -862,7 +866,7 @@ typedef enum AdventureSystemOptionsConstant {
     ADVMGR_SYSTEM_OPTIONS_CURSOR_FRAME_BASE = 20,
     ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET = 10,
     ADVMGR_SYSTEM_OPTIONS_DRAW_MASK = 0x7fff
-} AdventureSystemOptionsConstant;
+HOMM2_ENUM_VALUES_END(AdventureSystemOptionsConstant)
 
 #ifdef HOMM2_STRICT_ENUM_TYPES
 inline i32 EncodeAdventureSystemOptionTextControl(AdventureSystemOption option) {

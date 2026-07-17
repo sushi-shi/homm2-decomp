@@ -8,15 +8,15 @@ class widget;
 class bitmap;
 struct tag_message;
 
-typedef enum WindowFlag {
+HOMM2_ENUM_BEGIN(WindowFlag)
     WINDOW_FLAG_OWNS_WIDGETS = 0x4000,    // Close/RemoveWidgetById delete the widgets
     WINDOW_UPDATE_SUPPRESS_MASK = 0x7fff, // DrawWindow skips the screen update when == 1
     WINDOW_ALL_WIDGETS_LOW = -0xffff,     // DrawWindow id-range sentinel: no filter
     WINDOW_ALL_WIDGETS_HIGH = 0xffff,
     WINDOW_DRAW_ID_LIMIT = 0x7fff
-} WindowFlag;
+HOMM2_ENUM_END(WindowFlag)
 
-typedef enum WindowWidgetRecordType {
+HOMM2_ENUM_BEGIN(WindowWidgetRecordType)
     WINDOW_WIDGET_RECORD_END = 0,
     WINDOW_WIDGET_RECORD_BORDER = 1,
     WINDOW_WIDGET_RECORD_BUTTON = 2,
@@ -30,7 +30,7 @@ typedef enum WindowWidgetRecordType {
     WINDOW_WIDGET_RECORD_TEXT_ENTRY_INSET_FIVE = 0x204,
     WINDOW_WIDGET_RECORD_LIST_BOX = 0x205,
     WINDOW_WIDGET_RECORD_TEXT_ENTRY_INSET_FOUR = 0x206
-} WindowWidgetRecordType;
+HOMM2_ENUM_END(WindowWidgetRecordType)
 
 #pragma pack(push, 1) // recovered layout is byte-packed
 class heroWindow {

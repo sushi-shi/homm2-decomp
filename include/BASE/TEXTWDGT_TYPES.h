@@ -3,9 +3,9 @@
 
 #include <va.h>
 
-typedef enum TextWidgetSourceFileSize {
+HOMM2_ENUM_VALUES_BEGIN(TextWidgetSourceFileSize)
     TEXT_WIDGET_SOURCE_FILE_SLOT_SIZE = 0x2c
-} TextWidgetSourceFileSize;
+HOMM2_ENUM_VALUES_END(TextWidgetSourceFileSize)
 
 typedef struct STextWidgetSourceFiles {
     char read[TEXT_WIDGET_SOURCE_FILE_SLOT_SIZE];

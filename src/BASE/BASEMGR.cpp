@@ -26,7 +26,7 @@ baseManager::baseManager(void) {
     m_prev = m_next = 0;
     m_priority = BASE_MANAGER_PRIORITY_UNASSIGNED;
     m_messageMask = BASE_MANAGER_MESSAGE_MASK_ALL;
-    m_active = BASE_MANAGER_INACTIVE;
+    m_active = 0;
     strcpy(m_name, "Unknown");
 }
 

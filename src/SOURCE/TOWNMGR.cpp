@@ -51,7 +51,7 @@
 // __FILE__ for the NWC memory/assert tracking (reloc-masked path string).
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\TOWNMGR.CPP"
 
-DATA(0x004eb080) static const i8 gTownObjectOrder[FACTION_COUNT][TOWN_BUILDING_COUNT] = {
+DATA(0x004eb080) static const i8 gTownObjectOrder[IDX(FACTION_COUNT)][TOWN_BUILDING_COUNT] = {
     {TOWN_OBJECT_SECOND_WELL,
      TOWN_OBJECT_CASTLE_UPGRADE,
      TOWN_OBJECT_CASTLE,
@@ -259,7 +259,7 @@ DATA(0x004eb080) static const i8 gTownObjectOrder[FACTION_COUNT][TOWN_BUILDING_C
 // latter occupies a retail 0x10 contribution with four zero tail bytes. There
 // is no TOWNMGR BSS contribution. Do not add padding, fallback identities,
 // aliases, cursor adjustments, or section pragmas to force allocation order.
-DATA(0x004ee750) SBuildingInfo sBuildingInfo[FACTION_COUNT][TOWN_BUILDING_COUNT] = {
+DATA(0x004ee750) SBuildingInfo sBuildingInfo[IDX(FACTION_COUNT)][TOWN_BUILDING_COUNT] = {
     {// Knight
      {0, 397, 46, 84, 138},  {5, 0, 130, 53, 63},    {5, 345, 114, 83, 62},  {5, 531, 214, 113, 42},
      {0, 188, 214, 39, 42},  {0, 69, 108, 67, 55},   {5, 0, 49, 286, 116},   {0, 478, 193, 46, 63},
@@ -335,12 +335,12 @@ DATA(0x004ee750) SBuildingInfo sBuildingInfo[FACTION_COUNT][TOWN_BUILDING_COUNT]
 // post-95 TU-state sweep found several disposable 99.7685% candidates but no
 // audited exact closure; every candidate failed the strict size/identity guard.
 // Revisit only after a material TU-state change.
-typedef enum TownDialogResult {
+HOMM2_ENUM_BEGIN(TownDialogResult)
     DIALOG_CANCEL_ID = 0x7801
-} TownDialogResult;
-typedef enum TownPortraitIcon {
+HOMM2_ENUM_END(TownDialogResult)
+HOMM2_ENUM_BEGIN(TownPortraitIcon)
     TOWN_PORTRAIT_ICON_BASE = 90
-} TownPortraitIcon;
+HOMM2_ENUM_END(TownPortraitIcon)
 
 VA(0x00413900, 0x16a)
 townObject::townObject(i32 townType, i32 buildingId, char* iconBaseName) {
@@ -800,7 +800,7 @@ void townManager::SetArmyCommand(i32 qualifier) {
     if (m_pendingStrip == m_swapStrip && m_swapArmySlot == m_pendingArmySlot) {
         sprintf(
             m_statusText,
-            cTownCommand[TOWN_TEXT_VIEW_ARMY],
+            cTownCommand[IDX(TOWN_TEXT_VIEW_ARMY)],
             gArmyNames[m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot]]
         );
         m_command = TOWN_ARMY_COMMAND_VIEW;
@@ -813,17 +813,17 @@ void townManager::SetArmyCommand(i32 qualifier) {
             if (qualifier != 0) {
                 sprintf(
                     m_statusText,
-                    cTownCommand[TOWN_TEXT_REDISTRIBUTE_ARMY],
+                    cTownCommand[IDX(TOWN_TEXT_REDISTRIBUTE_ARMY)],
                     gArmyNames[m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot]]
                 );
                 m_command = TOWN_ARMY_COMMAND_SPLIT;
             } else if (cantMoveLastArmy) {
-                strcpy(m_statusText, cTownCommand[TOWN_TEXT_CANNOT_COMBINE_LAST_ARMY]);
+                strcpy(m_statusText, cTownCommand[IDX(TOWN_TEXT_CANNOT_COMBINE_LAST_ARMY)]);
                 return;
             } else {
                 sprintf(
                     m_statusText,
-                    cTownCommand[TOWN_TEXT_COMBINE_ARMIES],
+                    cTownCommand[IDX(TOWN_TEXT_COMBINE_ARMIES)],
                     gArmyNames[m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot]]
                 );
                 m_command = TOWN_ARMY_COMMAND_MERGE;
@@ -833,7 +833,7 @@ void townManager::SetArmyCommand(i32 qualifier) {
                           == ARMY_GROUP_EMPTY_SLOT) {
             sprintf(
                 m_statusText,
-                cTownCommand[TOWN_TEXT_REDISTRIBUTE_TO_EMPTY_SLOT],
+                cTownCommand[IDX(TOWN_TEXT_REDISTRIBUTE_TO_EMPTY_SLOT)],
                 gArmyNames[m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot]]
             );
             m_command = TOWN_ARMY_COMMAND_SPLIT;
@@ -844,12 +844,12 @@ void townManager::SetArmyCommand(i32 qualifier) {
         return;
     if (m_pendingStrip->m_army->m_creatureTypes[m_pendingArmySlot] == ARMY_GROUP_EMPTY_SLOT) {
         if (cantMoveLastArmy) {
-            strcpy(m_statusText, cTownCommand[TOWN_TEXT_CANNOT_MOVE_LAST_ARMY]);
+            strcpy(m_statusText, cTownCommand[IDX(TOWN_TEXT_CANNOT_MOVE_LAST_ARMY)]);
             return;
         } else {
             sprintf(
                 m_statusText,
-                cTownCommand[TOWN_TEXT_MOVE_ARMY],
+                cTownCommand[IDX(TOWN_TEXT_MOVE_ARMY)],
                 gArmyNames[m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot]]
             );
             m_command = TOWN_ARMY_COMMAND_SWAP;
@@ -857,7 +857,7 @@ void townManager::SetArmyCommand(i32 qualifier) {
     } else {
         sprintf(
             m_statusText,
-            cTownCommand[TOWN_TEXT_EXCHANGE_ARMIES],
+            cTownCommand[IDX(TOWN_TEXT_EXCHANGE_ARMIES)],
             gArmyNames[m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot]],
             gArmyNames[m_pendingStrip->m_army->m_creatureTypes[m_pendingArmySlot]]
         );
@@ -879,12 +879,12 @@ void townManager::SetCommandAndText(struct tag_message& message) {
     m_command = TOWN_WIDGET_ID_NONE;
     switch (objectId) {
         case TOWN_CONTROL_CLOSE:
-            strcpy(m_statusText, cTownCommand[TOWN_TEXT_EXIT]);
+            strcpy(m_statusText, cTownCommand[IDX(TOWN_TEXT_EXIT)]);
             break;
         case TOWN_WIDGET_ID_NONE:
         case TOWN_EMPTY_STATUS_CONTROL_FIRST:
         case TOWN_EMPTY_STATUS_CONTROL_LAST:
-            strcpy(m_statusText, cTownCommand[TOWN_TEXT_EMPTY_STATUS]);
+            strcpy(m_statusText, cTownCommand[IDX(TOWN_TEXT_EMPTY_STATUS)]);
             break;
         case TOWN_GARRISON_SLOT_FIRST:
         case TOWN_GARRISON_SLOT_FIRST + 1:
@@ -900,11 +900,11 @@ void townManager::SetCommandAndText(struct tag_message& message) {
                 m_selectedArmySlot = objectId - TOWN_GARRISON_SLOT_FIRST;
                 if (m_selectedStrip->m_army->m_creatureTypes[m_selectedArmySlot]
                     == ARMY_GROUP_EMPTY_SLOT) {
-                    strcpy(m_statusText, cTownCommand[TOWN_TEXT_EMPTY_SLOT]);
+                    strcpy(m_statusText, cTownCommand[IDX(TOWN_TEXT_EMPTY_SLOT)]);
                 } else {
                     sprintf(
                         m_statusText,
-                        cTownCommand[TOWN_TEXT_SELECT_ARMY],
+                        cTownCommand[IDX(TOWN_TEXT_SELECT_ARMY)],
                         gArmyNames[m_selectedStrip->m_army->m_creatureTypes[m_selectedArmySlot]]
                     );
                     m_command = TOWN_ARMY_COMMAND_SELECT;
@@ -912,7 +912,7 @@ void townManager::SetCommandAndText(struct tag_message& message) {
             }
             break;
         case TOWN_HERO_FIRST_CONTROL:
-            strcpy(m_statusText, cTownCommand[TOWN_TEXT_VIEW_HERO]);
+            strcpy(m_statusText, cTownCommand[IDX(TOWN_TEXT_VIEW_HERO)]);
             m_command = TOWN_ARMY_COMMAND_VIEW_HERO;
             break;
         case TOWN_HERO_SLOT_FIRST:
@@ -930,12 +930,12 @@ void townManager::SetCommandAndText(struct tag_message& message) {
                 if (m_selectedStrip->m_army == 0
                     || m_selectedStrip->m_army->m_creatureTypes[m_selectedArmySlot]
                            == ARMY_GROUP_EMPTY_SLOT) {
-                    strcpy(m_statusText, cTownCommand[TOWN_TEXT_EMPTY_SLOT]);
+                    strcpy(m_statusText, cTownCommand[IDX(TOWN_TEXT_EMPTY_SLOT)]);
                     m_command = TOWN_WIDGET_ID_NONE;
                 } else {
                     sprintf(
                         m_statusText,
-                        cTownCommand[TOWN_TEXT_SELECT_ARMY],
+                        cTownCommand[IDX(TOWN_TEXT_SELECT_ARMY)],
                         gArmyNames[m_selectedStrip->m_army->m_creatureTypes[m_selectedArmySlot]]
                     );
                     m_command = TOWN_ARMY_COMMAND_SELECT;
@@ -943,47 +943,47 @@ void townManager::SetCommandAndText(struct tag_message& message) {
             }
             break;
         case TOWN_OBJECT_MAGE_GUILD:
-            strcpy(m_statusText, cTownCommand[TOWN_TEXT_MAGE_GUILD]);
+            strcpy(m_statusText, cTownCommand[IDX(TOWN_TEXT_MAGE_GUILD)]);
             break;
         case TOWN_OBJECT_THIEVES_GUILD:
-            strcpy(m_statusText, cTownCommand[TOWN_TEXT_THIEVES_GUILD]);
+            strcpy(m_statusText, cTownCommand[IDX(TOWN_TEXT_THIEVES_GUILD)]);
             break;
         case TOWN_OBJECT_TAVERN:
             if (m_town->m_type == FACTION_NECROMANCER)
                 strcpy(m_statusText, xNecromancerShrine);
             else
-                strcpy(m_statusText, cTownCommand[TOWN_TEXT_TAVERN]);
+                strcpy(m_statusText, cTownCommand[IDX(TOWN_TEXT_TAVERN)]);
             break;
         case TOWN_OBJECT_DOCK:
         case TOWN_OBJECT_BOAT:
-            strcpy(m_statusText, cTownCommand[TOWN_TEXT_DOCK]);
+            strcpy(m_statusText, cTownCommand[IDX(TOWN_TEXT_DOCK)]);
             break;
         case TOWN_OBJECT_WELL:
-            strcpy(m_statusText, cTownCommand[TOWN_TEXT_WELL]);
+            strcpy(m_statusText, cTownCommand[IDX(TOWN_TEXT_WELL)]);
             break;
         case TOWN_OBJECT_TENT:
-            strcpy(m_statusText, cTownCommand[TOWN_TEXT_TENT]);
+            strcpy(m_statusText, cTownCommand[IDX(TOWN_TEXT_TENT)]);
             break;
         case TOWN_OBJECT_CASTLE:
-            strcpy(m_statusText, cTownCommand[TOWN_TEXT_CASTLE]);
+            strcpy(m_statusText, cTownCommand[IDX(TOWN_TEXT_CASTLE)]);
             break;
         case TOWN_OBJECT_STATUE:
-            strcpy(m_statusText, cTownCommand[TOWN_TEXT_STATUE]);
+            strcpy(m_statusText, cTownCommand[IDX(TOWN_TEXT_STATUE)]);
             break;
         case TOWN_OBJECT_LEFT_TURRET:
-            strcpy(m_statusText, cTownCommand[TOWN_TEXT_LEFT_TURRET]);
+            strcpy(m_statusText, cTownCommand[IDX(TOWN_TEXT_LEFT_TURRET)]);
             break;
         case TOWN_OBJECT_RIGHT_TURRET:
-            strcpy(m_statusText, cTownCommand[TOWN_TEXT_RIGHT_TURRET]);
+            strcpy(m_statusText, cTownCommand[IDX(TOWN_TEXT_RIGHT_TURRET)]);
             break;
         case TOWN_OBJECT_MOAT:
-            strcpy(m_statusText, cTownCommand[TOWN_TEXT_MOAT]);
+            strcpy(m_statusText, cTownCommand[IDX(TOWN_TEXT_MOAT)]);
             break;
         case TOWN_OBJECT_MARKETPLACE:
-            strcpy(m_statusText, cTownCommand[TOWN_TEXT_MARKETPLACE]);
+            strcpy(m_statusText, cTownCommand[IDX(TOWN_TEXT_MARKETPLACE)]);
             break;
         case TOWN_OBJECT_CAPTAIN_QUARTERS:
-            strcpy(m_statusText, cTownCommand[TOWN_TEXT_CAPTAIN_QUARTERS]);
+            strcpy(m_statusText, cTownCommand[IDX(TOWN_TEXT_CAPTAIN_QUARTERS)]);
             break;
         case TOWN_OBJECT_SPECIAL_BUILDING:
             strcpy(m_statusText, gSpecialBuildingNames[m_town->m_type]);
@@ -1005,7 +1005,7 @@ void townManager::SetCommandAndText(struct tag_message& message) {
         case TOWN_OBJECT_ALTERNATE_UPGRADED_DWELLING_6:
             sprintf(
                 m_statusText,
-                cTownCommand[TOWN_TEXT_RECRUIT],
+                cTownCommand[IDX(TOWN_TEXT_RECRUIT)],
                 gArmyNames[gDwellingType[m_town->m_type][objectId - TOWN_OBJECT_DWELLING_1]]
             );
             break;
@@ -1209,7 +1209,7 @@ i32 townManager::Main(tag_message& message) {
                                             -1,
                                             0
                                         );
-                                    } else if (gpCurPlayer->m_resources[RES_GOLD]
+                                    } else if (gpCurPlayer->m_resources[IDX(RES_GOLD)]
                                                < TOWN_SPELL_BOOK_COST) {
                                         NormalDialog(
                                             "To cast spells, you must first buy a spell book for "
@@ -1247,7 +1247,7 @@ i32 townManager::Main(tag_message& message) {
                                                 1,
                                                 -1
                                             );
-                                            gpCurPlayer->m_resources[RES_GOLD] -=
+                                            gpCurPlayer->m_resources[IDX(RES_GOLD)] -=
                                                 TOWN_SPELL_BOOK_COST;
                                             m_bankBox->Update(1);
                                             m_townWindow->DrawWindow();
@@ -1379,9 +1379,9 @@ i32 townManager::Main(tag_message& message) {
                                     if (m_heroWindow0 == 0)
                                         MemError();
                                     SetWinText(m_heroWindow0, 12);
-                                    if (gpGame->m_players[giCurPlayer].m_resources[RES_GOLD]
+                                    if (gpGame->m_players[giCurPlayer].m_resources[IDX(RES_GOLD)]
                                             < TOWN_BOAT_GOLD_COST
-                                        || gpGame->m_players[giCurPlayer].m_resources[RES_WOOD]
+                                        || gpGame->m_players[giCurPlayer].m_resources[IDX(RES_WOOD)]
                                                < TOWN_BOAT_WOOD_COST) {
                                         message.type = MESSAGE_WIDGET;
                                         message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
@@ -1399,10 +1399,10 @@ i32 townManager::Main(tag_message& message) {
                                         if (gpGame->CreateBoat(m_town->m_boatX, m_town->m_boatY, 0)
                                             != -1) {
                                             BuildObj(14);
-                                            gpGame->m_players[giCurPlayer].m_resources[RES_GOLD] -=
-                                                TOWN_BOAT_GOLD_COST;
-                                            gpGame->m_players[giCurPlayer].m_resources[RES_WOOD] -=
-                                                TOWN_BOAT_WOOD_COST;
+                                            gpGame->m_players[giCurPlayer]
+                                                .m_resources[IDX(RES_GOLD)] -= TOWN_BOAT_GOLD_COST;
+                                            gpGame->m_players[giCurPlayer]
+                                                .m_resources[IDX(RES_WOOD)] -= TOWN_BOAT_WOOD_COST;
                                             m_bankBox->Update(1);
                                         } else {
                                             unusedTownValue = 0;
@@ -2560,7 +2560,7 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
     delete m_heroWindow1;
     if (m_recruitState != -1) {
         m_recruitState = availableHeroIndex;
-        gpCurPlayer->m_resources[RES_GOLD] -= gHeroGoldCost;
+        gpCurPlayer->m_resources[IDX(RES_GOLD)] -= gHeroGoldCost;
         gpCurPlayer->m_heroIds[gpCurPlayer->m_heroCount] =
             gpCurPlayer->m_availableHeroIds[m_recruitState];
         ++gpCurPlayer->m_heroCount;
@@ -2569,7 +2569,7 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
         townYWork = m_town->m_y;
         m_recruitHero->m_x = townXh;
         m_recruitHero->m_y = townYWork;
-        m_recruitHero->m_eventFlags = 0;
+        m_recruitHero->m_eventFlags = HERO_EVENT_NONE;
         m_recruitHero->m_direction = 2;
         m_recruitHero->m_remainingMobility = m_recruitHero->CalcMobility();
         m_recruitHero->m_mobility = m_recruitHero->m_remainingMobility;
@@ -3275,17 +3275,17 @@ void GetCategoryStats(i32 category, i32l* const stats, i8* const order) {
                     stats[player] = gpGame->m_players[player].m_heroCount;
                     break;
                 case TOWN_THIEVES_CATEGORY_GOLD:
-                    stats[player] = gpGame->m_players[player].m_resources[RES_GOLD];
+                    stats[player] = gpGame->m_players[player].m_resources[IDX(RES_GOLD)];
                     break;
                 case TOWN_THIEVES_CATEGORY_WOOD_AND_ORE:
-                    stats[player] = gpGame->m_players[player].m_resources[RES_WOOD]
-                                    + gpGame->m_players[player].m_resources[RES_ORE];
+                    stats[player] = gpGame->m_players[player].m_resources[IDX(RES_WOOD)]
+                                    + gpGame->m_players[player].m_resources[IDX(RES_ORE)];
                     break;
                 case TOWN_THIEVES_CATEGORY_RARE_RESOURCES:
-                    stats[player] = gpGame->m_players[player].m_resources[RES_MERCURY]
-                                    + gpGame->m_players[player].m_resources[RES_SULFUR]
-                                    + gpGame->m_players[player].m_resources[RES_CRYSTAL]
-                                    + gpGame->m_players[player].m_resources[RES_GEMS];
+                    stats[player] = gpGame->m_players[player].m_resources[IDX(RES_MERCURY)]
+                                    + gpGame->m_players[player].m_resources[IDX(RES_SULFUR)]
+                                    + gpGame->m_players[player].m_resources[IDX(RES_CRYSTAL)]
+                                    + gpGame->m_players[player].m_resources[IDX(RES_GEMS)];
                     break;
                 case TOWN_THIEVES_CATEGORY_OBELISKS:
                     stats[player] = GetNumObelisks(player);

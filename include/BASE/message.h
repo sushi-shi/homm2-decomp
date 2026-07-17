@@ -5,30 +5,36 @@
 // The complete definition is required anywhere a message is passed or returned by value.
 
 // Values emitted by INPUTMGR and consumed by manager/widget Main loops.
-HOMM2_ENUM_BEGIN(MessageType)
-MESSAGE_NONE = 0, MESSAGE_KEY_DOWN = 1, MESSAGE_KEY_UP = 2, MESSAGE_MOUSE_MOVE = 4,
-                  MESSAGE_LEFT_BUTTON_DOWN = 8, MESSAGE_LEFT_BUTTON_UP = 0x10,
-                  MESSAGE_RIGHT_BUTTON_DOWN = 0x20, MESSAGE_RIGHT_BUTTON_UP = 0x40,
-                  MESSAGE_WIDGET = 0x200,
-                  MESSAGE_EXECUTIVE = 0x4000 HOMM2_ENUM_END(MessageType)
+HOMM2_ENUM_VALUES_BEGIN(MessageType)
+    MESSAGE_NONE = 0,
+    MESSAGE_KEY_DOWN = 1,
+    MESSAGE_KEY_UP = 2,
+    MESSAGE_MOUSE_MOVE = 4,
+    MESSAGE_LEFT_BUTTON_DOWN = 8,
+    MESSAGE_LEFT_BUTTON_UP = 0x10,
+    MESSAGE_RIGHT_BUTTON_DOWN = 0x20,
+    MESSAGE_RIGHT_BUTTON_UP = 0x40,
+    MESSAGE_WIDGET = 0x200,
+    MESSAGE_EXECUTIVE = 0x4000
+HOMM2_ENUM_VALUES_END(MessageType)
 
-                      typedef enum WidgetInputCommand {
+HOMM2_ENUM_VALUES_BEGIN(WidgetInputCommand)
     WIDGET_COMMAND_DIALOG_SELECT = 10,
     WIDGET_COMMAND_SELECT = 12,
     WIDGET_COMMAND_DESELECT = 13,
     WIDGET_COMMAND_ALTERNATE_SELECT = 14
-} WidgetInputCommand;
+HOMM2_ENUM_VALUES_END(WidgetInputCommand)
 
-typedef enum MessageModifier {
+HOMM2_ENUM_BEGIN(MessageModifier)
     MESSAGE_MODIFIER_RIGHT_SHIFT = 1,
     MESSAGE_MODIFIER_LEFT_SHIFT = 2,
     MESSAGE_MODIFIER_CONTROL = 4,
     MESSAGE_MODIFIER_ALT = 0x20,
-    MESSAGE_MODIFIER_CONTROL_KEYS = 0xc,  // either control-key modifier bit
+    MESSAGE_MODIFIER_CONTROL_KEYS = 0xc, // either control-key modifier bit
     MESSAGE_MODIFIER_LEFT_BUTTON = 0x100,
     MESSAGE_MODIFIER_RIGHT_BUTTON = 0x200,
     MESSAGE_MODIFIER_BUTTON_MASK = 0x300
-} MessageModifier;
+HOMM2_ENUM_END(MessageModifier)
 
 struct tag_messageKeyboardPayload {
     union {

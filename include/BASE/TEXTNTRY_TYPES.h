@@ -3,12 +3,12 @@
 
 #include <va.h>
 
-typedef enum TextEntryKeyConstant {
+HOMM2_ENUM_VALUES_BEGIN(TextEntryKeyConstant)
     TEXT_ENTRY_KEY_DELETE = 0x7f
-} TextEntryKeyConstant;
+HOMM2_ENUM_VALUES_END(TextEntryKeyConstant)
 
-typedef enum TextEntrySourceFileConstant {
+HOMM2_ENUM_VALUES_BEGIN(TextEntrySourceFileConstant)
     TEXT_ENTRY_SOURCE_FILE_SLOT_SIZE = 0x2c
-} TextEntrySourceFileConstant;
+HOMM2_ENUM_VALUES_END(TextEntrySourceFileConstant)
 
 #endif
