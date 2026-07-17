@@ -119,7 +119,7 @@ public:
     i32 EvaluatePassword(class mapCell*);
     i32 EvaluateRecruitSite(class mapCell*);
     i32 EvaluateJail(class mapCell*);
-    i32 EvaluateArtifactEvent(i32, i32);
+    i32 EvaluateArtifactEvent(ArtifactType, i32);
     i32 EvaluateMineEvent(i32, i32, i32, i32*);
     i32 EvaluateMonsterEvent(CreatureType, i32, i32*);
     i32 EvaluateHeroEvent(i32, i32, i32, i32, i32*);
