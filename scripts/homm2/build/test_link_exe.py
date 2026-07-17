@@ -340,6 +340,30 @@ class LinkExeTest(unittest.TestCase):
             "retail_sha256": "deadbeef", "highlow_count": 1, "audit": "bytes",
         }])
 
+    def test_required_initialized_storage_loader_parses_readable_span(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "required.tsv"
+            path.write_text(
+                "name\tunit\tsize\tretail_sha256\thighlow_count\taudit\t"
+                "readable_size\treadable_sha256\n"
+                "global\tUNIT\t0x10\tallocation\t0\tbytes\t0x12\treadable\n")
+            required = load_required_initialized_storage(path)
+        self.assertEqual(required, [{
+            "name": "global", "unit": "UNIT", "size": 0x10,
+            "retail_sha256": "allocation", "highlow_count": 0, "audit": "bytes",
+            "readable_size": 0x12, "readable_sha256": "readable",
+        }])
+
+    def test_required_initialized_storage_loader_rejects_partial_readable_span(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "required.tsv"
+            path.write_text(
+                "name\tunit\tsize\tretail_sha256\thighlow_count\taudit\t"
+                "readable_size\treadable_sha256\n"
+                "global\tUNIT\t0x10\tallocation\t0\tbytes\t0x12\t\n")
+            with self.assertRaisesRegex(RuntimeError, "must be provided together"):
+                load_required_initialized_storage(path)
+
     def test_required_initialized_storage_compares_candidate_payload_and_targets(self):
         retail_payload = {
             "size": 4, "sha256": "retail", "highlow_base_relocation_count": 1,
@@ -388,6 +412,39 @@ class LinkExeTest(unittest.TestCase):
         self.assertEqual(diagnostics["violations"][0]["status"],
                          "source-extent-mismatch")
         self.assertEqual(diagnostics["violations"][0]["source_definition_size"], 16)
+
+    def test_required_initialized_storage_checks_readable_span_separately(self):
+        allocation = {
+            "size": 16, "sha256": "allocation", "highlow_base_relocation_count": 0,
+            "highlow_relative_offsets": [], "normalized_sha256": "allocation-normalized",
+        }
+        readable = {
+            "size": 18, "sha256": "readable", "highlow_base_relocation_count": 0,
+            "highlow_relative_offsets": [], "normalized_sha256": "readable-normalized",
+        }
+        symbol = {
+            "name": "global", "unit": "UNIT", "retail_rva": "0x3000",
+            "candidate_count": 1, "status": "exact", "storage_class_matches": True,
+            "retail_storage": {"class": "data-initialized"},
+            "candidate_storage": {"class": "data-initialized"},
+            "retail_payload": allocation, "candidate_payload": dict(allocation),
+            "retail_readable_payload": readable,
+            "candidate_readable_payload": dict(readable),
+        }
+        required = [{
+            "name": "global", "unit": "UNIT", "size": 16,
+            "retail_sha256": "allocation", "highlow_count": 0, "audit": "bytes",
+            "readable_size": 18, "readable_sha256": "readable",
+        }]
+        diagnostics = required_initialized_storage_diagnostics(
+            {"symbols": [symbol]}, required, {("UNIT", 0x3000): 16})
+        self.assertEqual(diagnostics["verified"], 1)
+
+        symbol["candidate_readable_payload"]["normalized_sha256"] = "changed"
+        diagnostics = required_initialized_storage_diagnostics(
+            {"symbols": [symbol]}, required, {("UNIT", 0x3000): 16})
+        self.assertEqual(diagnostics["violations"][0]["status"],
+                         "readable-span-mismatch")
 
     def test_coff_section_parser_reports_raw_and_alignment_rounded_size(self):
         data = bytearray(0x100)
