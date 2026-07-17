@@ -43,7 +43,7 @@ typedef enum TownConstant {
     TOWN_OWNER_NONE = -1,
     TOWN_ID_NONE = -1,
     TOWN_OCCUPYING_HERO_NONE = -1,
-    TOWN_DOCK_COORDINATE_NONE = 0xff,
+    TOWN_DOCK_COORDINATE_NONE = 0xFF,
     TOWN_FORMATION_SPREAD = 0,
     TOWN_FORMATION_GROUPED = 1,
     TOWN_PLAYER_WINDOW_SIZE = 5,
@@ -52,7 +52,7 @@ typedef enum TownConstant {
     TOWN_MAGE_GUILD_WISDOM_LEVEL_BONUS = 2,
     TOWN_MAGE_GUILD_SPELLS_PER_LEVEL = 4,
     TOWN_CONVERT_SOURCE_FRAME = 0x10,
-    TOWN_CONVERT_ANY_FRAME = 0xff,
+    TOWN_CONVERT_ANY_FRAME = 0xFF,
     TOWN_CONVERT_OBJECT_NONE = 0,
     TOWN_VIEW_MEMORY_REQUIREMENT = 0x514,
     TOWN_VIEW_LOW_MEMORY_LIMIT = 0x320,
@@ -67,20 +67,19 @@ class town {
 public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
-    char m_id;              // +0x00
-    char m_owner;           // +0x01
-    i8 m_threat;            // +0x02
-    char m_type;            // +0x03
-    u8 m_x;                 // +0x04
-    u8 m_y;                 // +0x05
-    u8 m_boatX;             // +0x06
-    u8 m_boatY;             // +0x07
-    armyGroup m_army;       // +0x08
-    char m_occupyingHeroId; // +0x17
-    u32l m_buildings;       // +0x18
-    i8 m_buildState;        // +0x1c
-    char
-        m_unknown1d; // +0x1d zero-initialized only, never read
+    char m_id;                  // +0x00
+    char m_owner;               // +0x01
+    i8 m_threat;                // +0x02
+    char m_type;                // +0x03
+    u8 m_x;                     // +0x04
+    u8 m_y;                     // +0x05
+    u8 m_boatX;                 // +0x06
+    u8 m_boatY;                 // +0x07
+    armyGroup m_army;           // +0x08
+    char m_occupyingHeroId;     // +0x17
+    u32l m_buildings;           // +0x18
+    i8 m_buildState;            // +0x1c
+    char m_unknown1d;           // +0x1d zero-initialized only, never read
     i16 m_garrison[12];         // +0x1e
     u8 m_onMap;                 // +0x36
     i8 m_mayNotUpgradeToCastle; // +0x37

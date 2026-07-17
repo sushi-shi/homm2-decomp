@@ -100,7 +100,7 @@ void IconToBitmapYModify(
                 gYMX = gYMX + (gYMRun & ICON_RLE_COMMAND_RUN_MASK);
                 continue;
             }
-            // 0xc0 - 0xff
+            // 0xc0 - 0xFF
             if ((gYMRun & ICON_RLE_COMMAND_RUN_MASK) != 0) {
                 if (gYMRun == ICON_RLE_LONG_SOLID_COMMAND) {
                     gYMRun = *gYMSrc;

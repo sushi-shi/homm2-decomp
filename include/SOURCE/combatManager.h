@@ -497,7 +497,7 @@ typedef enum CombatAIConstant {
     COMBAT_AI_LICH_DAMAGE_PER_CREATURE = 9,
     COMBAT_AI_LICH_HIT_POINT_BONUS = 100,
     COMBAT_AI_ATTACK_DIRECTION_COUNT = 8,
-    COMBAT_AI_ALL_ATTACK_DIRECTIONS = 0xff,
+    COMBAT_AI_ALL_ATTACK_DIRECTIONS = 0xFF,
     COMBAT_AI_UNLIMITED_PATH_SPEED = 0x7f,
     COMBAT_AI_DISTANCE_WEIGHT = 1000,
     COMBAT_AI_WORST_STRENGTH_LIMIT = 999999999,
@@ -566,7 +566,7 @@ enum {
 #define COMBAT_SPELL_AI_MINIMUM_DISTANCE 2
 #define COMBAT_SPELL_AI_CASTLE_DISTANCE_BONUS 3
 #define COMBAT_SPELL_AI_RIGHT_DISTANCE_COLUMN 10
-#define COMBAT_SPELL_AI_ALL_ATTACK_DIRECTIONS 0xff
+#define COMBAT_SPELL_AI_ALL_ATTACK_DIRECTIONS 0xFF
 #define COMBAT_SPELL_AI_CURE_POINTS_PER_POWER 5
 #define COMBAT_SPELL_AI_RESURRECT_POINTS_PER_POWER 50
 #define COMBAT_SPELL_AI_FIRE_DAMAGE_PER_POWER 10
@@ -745,19 +745,18 @@ public:
     i32 m_catapultAttacksRemaining[2];    // +0xf323
     i32 m_keepAttacksRemaining[2];        // +0xf32b
     i32 m_inCastleCombat;                 // +0xf333
-    i32 m_unknownF337
-        [2]; // +0xf337 zeroed per side in the ctor, never read
-    i32 m_visitingHeroPresent[2]; // +0xf33f
+    i32 m_unknownF337[2];                 // +0xf337 zeroed per side in the ctor, never read
+    i32 m_visitingHeroPresent[2];         // +0xf33f
     char _pad_0xf347[0x4];
-    i32 m_unknownF34B; // +0xf34b zeroed at the end of CatAttack, never read
-    i32 m_unknownF34F; // +0xf34f seeds m_catapultFrame in the ctor, zeroed in CatAttack
-    i32 m_unknownF353; // +0xf353 -1 in the ctor feeding m_unknownF34F, never read
+    i32 m_unknownF34B;     // +0xf34b zeroed at the end of CatAttack, never read
+    i32 m_unknownF34F;     // +0xf34f seeds m_catapultFrame in the ctor, zeroed in CatAttack
+    i32 m_unknownF353;     // +0xf353 -1 in the ctor feeding m_unknownF34F, never read
     i32 m_nonVisualCombat; // +0xf357
-    i32 m_unknownF35B; // +0xf35b zeroed in the ctor, never read
-    i32 m_killBenefit[2];             // +0xf35f
+    i32 m_unknownF35B;     // +0xf35b zeroed in the ctor, never read
+    i32 m_killBenefit[2];  // +0xf35f
     class heroWindow* m_combatWindow; // +0xf367
     char _pad_0xf36b[0x8];
-    i32 m_unknownF373; // +0xf373 -1 in the ctor, never read
+    i32 m_unknownF373;                            // +0xf373 -1 in the ctor, never read
     i32 m_sideRetreated[2];                       // +0xf377
     i32 m_limitCreatureCount[2][20];              // +0xf37f
     i32 m_drawHero[2];                            // +0xf41f

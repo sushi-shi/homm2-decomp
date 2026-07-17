@@ -117,7 +117,7 @@ typedef enum InputManagerCapacity {
 } InputManagerCapacity;
 
 typedef enum InputManagerScanCodeEncoding {
-    INPUT_SCAN_CODE_MASK = 0xff
+    INPUT_SCAN_CODE_MASK = 0xFF
 } InputManagerScanCodeEncoding;
 
 typedef enum InputManagerCursorBounds {

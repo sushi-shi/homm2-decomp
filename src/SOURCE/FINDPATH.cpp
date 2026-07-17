@@ -51,11 +51,11 @@ DATA(0x0052ae64) static i32 gSearchHigh;
 // has no base-only owner. Preserve other nonexact call-site topology as function/link
 // packing work; do not add aliases, padding, or placement rules.
 DATA(0x0051733c) static SFindPathSourceLocation gSearchAllocationSource = {
-    {FINDPATH_ALLOCATION_SOURCE_LINE_BASE, 0},
+    {20, 0},
     FINDPATH_SOURCE_FILE
 };
 DATA(0x0051736c) static SFindPathSourceLocation gSearchDestructionSource = {
-    {FINDPATH_DESTRUCTION_SOURCE_LINE_BASE, 0},
+    {26, 0},
     FINDPATH_SOURCE_FILE
 };
 
@@ -73,7 +73,11 @@ searchArray::searchArray(void) {
 VA(0x004a4a60, 0x30)
 searchArray::~searchArray() {
     if (m_storage.cells != 0)
-        H2_FREE_AT(m_storage.cells, gSearchDestructionSource.sourceFile, gSearchDestructionSource.line.value + 1);
+        H2_FREE_AT(
+            m_storage.cells,
+            gSearchDestructionSource.sourceFile,
+            gSearchDestructionSource.line.value + 1
+        );
     m_storage.cells = 0;
 }
 
@@ -83,9 +87,17 @@ searchArray::~searchArray() {
 VA(0x004a4a90, 0x60)
 void searchArray::Init(void) {
     if (m_storage.cells != 0)
-        H2_FREE_AT(m_storage.cells, gSearchDestructionSource.sourceFile, gSearchDestructionSource.line.value + 1);
+        H2_FREE_AT(
+            m_storage.cells,
+            gSearchDestructionSource.sourceFile,
+            gSearchDestructionSource.line.value + 1
+        );
     m_storage.cells = 0;
-    m_storage.cells = static_cast<searchCell*>(H2_ALLOC_AT(MAP_WIDTH * MAP_HEIGHT * sizeof(searchCell), gSearchAllocationSource.sourceFile, gSearchAllocationSource.line.value + 2));
+    m_storage.cells = static_cast<searchCell*>(H2_ALLOC_AT(
+        MAP_WIDTH * MAP_HEIGHT * sizeof(searchCell),
+        gSearchAllocationSource.sourceFile,
+        gSearchAllocationSource.line.value + 2
+    ));
 }
 
 // @early-stop: relocation-masked instructions are identical; the 3/3 external
@@ -94,7 +106,11 @@ void searchArray::Init(void) {
 VA(0x004a4af0, 0x30)
 void searchArray::Close(void) {
     if (m_storage.cells != 0)
-        H2_FREE_AT(m_storage.cells, gSearchDestructionSource.sourceFile, gSearchDestructionSource.line.value + 1);
+        H2_FREE_AT(
+            m_storage.cells,
+            gSearchDestructionSource.sourceFile,
+            gSearchDestructionSource.line.value + 1
+        );
     m_storage.cells = 0;
 }
 
@@ -372,7 +388,8 @@ void searchArray::SeedCombatPosition(class army* unit) {
         unit->m_targetIndex = enemy->m_index;
         hex = enemy->m_hex;
 
-        if (unit->m_monster.speed <= 0 || unit->GetAttackMask(unit->m_hex, 1, -1) != PATH_ATTACK_MASK_SURROUNDED) {
+        if (unit->m_monster.speed <= 0
+            || unit->GetAttackMask(unit->m_hex, 1, -1) != PATH_ATTACK_MASK_SURROUNDED) {
             if (unit->ValidPath(hex, 1) == 1)
                 gpCombatManager->m_hexCells[hex].m_pathReachable = 1;
         } else {
@@ -384,7 +401,8 @@ void searchArray::SeedCombatPosition(class army* unit) {
                 hex,
                 enemy->m_facing == 1 ? COMBAT_DIRECTION_NORTHEAST : COMBAT_DIRECTION_SOUTHWEST
             );
-            if ((unit->m_monster.speed > 0 && unit->GetAttackMask(unit->m_hex, 1, -1) == PATH_ATTACK_MASK_SURROUNDED)
+            if ((unit->m_monster.speed > 0
+                 && unit->GetAttackMask(unit->m_hex, 1, -1) == PATH_ATTACK_MASK_SURROUNDED)
                 || unit->ValidPath(hex, 1) == 1) {
                 gpCombatManager->m_hexCells[hex].m_pathReachable = 1;
             }

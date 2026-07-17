@@ -63,12 +63,12 @@ inline bitmap::~bitmap() {
 
 // @semantic
 // /O2 residual begins at +0x0: retail starts `sub esp,8`; ours first loads x into DX. Both are
-// 0xff bytes with the same frame, destinationY stack slot, CFG, and relocation sites/identities
+// 0xFF bytes with the same frame, destinationY stack slot, CFG, and relocation sites/identities
 // (gpWindowManager +0x14/+0x4e/+0xad, PollSound +0x48/+0x6d, BlitBitmap +0x68/+0xf1).
 // Width/height/x/y declaration orders and an explicit screen-buffer local were tried after
 // replacing the old volatile array with the scalar evidenced by the single retail stack slot.
 // Revisit during the TU-state/last-mile pass after earlier BITMAP source shapes settle.
-VA(0x004d0160, 0xff)
+VA(0x004d0160, 0xFF)
 void bitmap::DrawToBufferCareful(i16 x, i16 y) {
     i32 width;
     i32 destinationY;

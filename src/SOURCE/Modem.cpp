@@ -354,7 +354,7 @@ readPacketStart:
     }
 }
 
-VA(0x0040d4df, 0xff)
+VA(0x0040d4df, 0xFF)
 void WriteModemPacket(char* buffer, i32 length) {
     i32 encodedPosition = 0;
     if (length > MODEM_PACKET_PAYLOAD_SIZE) {

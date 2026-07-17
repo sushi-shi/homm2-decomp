@@ -4,7 +4,7 @@
 // Constants for the deterministic seeded generator owned by BASE/Misc.
 typedef enum SeededRandomConstant {
     SEEDED_RANDOM_TERM_MULTIPLIER = 13,
-    SEEDED_RANDOM_TERM_MASK = 0xff,
+    SEEDED_RANDOM_TERM_MASK = 0xFF,
     SEEDED_RANDOM_HIGH_TERM_SHIFT = 5,
     SEEDED_RANDOM_LOW_TERM_MULTIPLIER = 13233,
     SEEDED_RANDOM_FEEDBACK_MASK = 0x3f,
