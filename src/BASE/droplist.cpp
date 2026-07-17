@@ -44,6 +44,13 @@ dropListWidget::dropListWidget(void) : widget(0, 0, 0, 0, 0, 0)
     m_selectedIndex = -1;
 }
 
+// @semantic
+// Complete 0x7c-byte destructor with all ten relocation sites and resolved
+// owner/addends aligned. The two source-path relocations differ only by compiler-local
+// symbol identity. In the item loop retail uses EBX for the four-byte item offset and
+// EDI for the item index, while candidate assigns those equivalent induction values to
+// EDI and EBX. Commuted subscript and indirect loop-condition spellings were byte-neutral.
+// Revisit only after a genuine declaration or combined-TU state change.
 VA(0x004dbf60, 0x7c)
 dropListWidget::~dropListWidget()
 {
@@ -56,6 +63,13 @@ dropListWidget::~dropListWidget()
     H2_FREE(m_items, gDropListSourceFiles.listDestruction.text, 27);
 }
 
+// @semantic
+// Complete 0x21d-byte resource/layout reader with all 44 relocation sites and resolved
+// owner/addends aligned. The sole raw residual begins after the frame-index stores:
+// candidate retains iconX in AX and the closed-content width in BX, while retail swaps
+// those register roles and schedules the same member stores accordingly. Commuting the
+// sum and naming the width were byte-neutral; removing the icon coordinate locals lost
+// the retail EBP save and worsened the stream. Revisit after a genuine TU-state change.
 VA(0x004dbfe0, 0x21d)
 void dropListWidget::Read(void)
 {
@@ -332,8 +346,8 @@ void dropListWidget::RestoreDropBackground(void)
     m_savedBackground = 0;
 }
 
-// @semantic: complete shared-header/TU-state checkpoint (live 95.256714%;
-// retained 99.3675%). Explicit ranges are base 0x827 versus retail 0x81f.
+// @semantic: complete shared-header/TU-state checkpoint (live 93.946310%).
+// Explicit ranges are base 0x827 versus retail 0x81f.
 // Retail has a 0x48 frame; base has 0x4c, with every real stack object shifted
 // uniformly by four bytes rather than an extra live variable. With the embedded
 // tables excluded, both have 76 branches and 17 calls. All 36 relocation targets
