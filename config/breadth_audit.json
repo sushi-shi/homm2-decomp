@@ -112,6 +112,61 @@
       "note": "Retail legacy CRT spelling restores exact external relocation identity; code, CFG, frame/slots, and owner-relative addends match"
     },
     {
+      "unit": "BASE/SAMPLE",
+      "function": "??0sample@@QAE@PADJJJ@Z",
+      "source_hash": "41d2763a7207",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.969696,
+      "after": 99.969696,
+      "note": "Nested playback member preserves the exact frame, CFG, executable bytes under relocation-union masking, and all 23 ordered relocation targets/table entries."
+    },
+    {
+      "unit": "BASE/soundmgr",
+      "function": "?CDIsPlaying@soundManager@@QAEHXZ",
+      "source_hash": "1b3352bc1920",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.891304,
+      "after": 99.891304,
+      "note": "All 0xb3 relocation-masked bytes, exact 0x04 this slot/CFG, and 13 ordered effective relocation targets agree; only local strings and the stricmp alias differ."
+    },
+    {
+      "unit": "BASE/soundmgr",
+      "function": "?CDPlay@soundManager@@QAEXHHHH@Z",
+      "source_hash": "10908b05109e",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.98208,
+      "after": 99.98208,
+      "note": "All 0x473 relocation-masked bytes, exact 0x30 frame/slots/CFG, and 86 ordered effective relocation targets agree; only local strings and the stricmp alias differ."
+    },
+    {
+      "unit": "BASE/soundmgr",
+      "function": "?CDStop@soundManager@@QAEXXZ",
+      "source_hash": "5d284bc70cd2",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.93507,
+      "after": 99.93507,
+      "note": "All 0x13c relocation-masked bytes, exact 0x18 frame/slots/CFG, and 25 ordered effective relocation targets agree; only local strings and the stricmp alias differ."
+    },
+    {
+      "unit": "BASE/soundmgr",
+      "function": "?MemorySample@soundManager@@QAEPAU_SAMPLE@@PAVsample@@@Z",
+      "source_hash": "a688f8117285",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 1,
+      "before": 97.36757,
+      "after": 100.0,
+      "note": "Genuine nested sample playback member restores retail's cached member pointer, exact 0x14 frame/five slots, all instructions, and all 13 relocations."
+    },
+    {
       "unit": "SOURCE/ADVMGR",
       "function": "?APanelHandler@@YIHAAUtag_message@@@Z",
       "source_hash": "98769448686e",
@@ -444,13 +499,13 @@
     {
       "unit": "SOURCE/ADVMGR",
       "function": "?SetEnvironmentOrigin@advManager@@QAEXHHH@Z",
-      "source_hash": "a5907b5c3623",
+      "source_hash": "304b3925732e",
       "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "parked",
-      "iterations": 1,
+      "iterations": 0,
       "before": 99.78846,
       "after": 99.78846,
-      "note": "Complete frame/CFG and 18 relocs; commuting all four origin-plus-radius expressions was byte-neutral, leaving four operand-order spans."
+      "note": "Nested sample member preserves complete behavior, frame/CFG, and 18 relocations; four previously documented commutative add-order spans remain."
     },
     {
       "unit": "SOURCE/ADVMGR",
