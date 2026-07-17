@@ -1,20 +1,20 @@
 #ifndef HOMM2_BASE_DATA_ENTRY_CONSTANTS_H
 #define HOMM2_BASE_DATA_ENTRY_CONSTANTS_H
 
-typedef enum DataEntryLayout {
+HOMM2_ENUM_VALUES_BEGIN(DataEntryLayout)
     DATA_ENTRY_WINDOW_X = 0xb1,
     DATA_ENTRY_WINDOW_Y = 0x14,
     DATA_ENTRY_INPUT_BOX_Y_OFFSET = 0x17
-} DataEntryLayout;
+HOMM2_ENUM_VALUES_END(DataEntryLayout)
 
-typedef enum DataEntryPhase {
+HOMM2_ENUM_BEGIN(DataEntryPhase)
     DATA_ENTRY_PHASE_IMMEDIATE = 0,
     DATA_ENTRY_PHASE_POINTER_SENT = 1,
     DATA_ENTRY_PHASE_READY = 2
-} DataEntryPhase;
+HOMM2_ENUM_END(DataEntryPhase)
 
 // Widget identifiers serialized in the evntwin*.bin data-entry windows.
-typedef enum DataEntryWidgetId {
+HOMM2_ENUM_BEGIN(DataEntryWidgetId)
     DATA_ENTRY_PROMPT_WIDGET = 1,
     DATA_ENTRY_TEXT_WIDGET = 10,
     DATA_ENTRY_BUTTON_ONE = 0x7801,
@@ -23,6 +23,6 @@ typedef enum DataEntryWidgetId {
     DATA_ENTRY_BUTTON_SIX = 0x7806,
     DATA_ENTRY_BUTTON_SEVEN = 0x7807,
     DATA_ENTRY_BUTTON_EIGHT = 0x7808
-} DataEntryWidgetId;
+HOMM2_ENUM_END(DataEntryWidgetId)
 
 #endif // HOMM2_BASE_DATA_ENTRY_CONSTANTS_H

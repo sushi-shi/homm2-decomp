@@ -8,7 +8,7 @@
 // forward declarations (was <_all.h>):
 struct tag_message;
 
-typedef enum CombatSpellInfluence {
+HOMM2_ENUM_BEGIN(CombatSpellInfluence)
     SPELL_INFLUENCE_HASTE = 0,
     SPELL_INFLUENCE_SLOW = 1,
     SPELL_INFLUENCE_BLIND = 2,
@@ -25,32 +25,32 @@ typedef enum CombatSpellInfluence {
     SPELL_INFLUENCE_STONE_SKIN = 13,
     SPELL_INFLUENCE_STEEL_SKIN = 14,
     SPELL_INFLUENCE_COUNT = 15
-} CombatSpellInfluence;
+HOMM2_ENUM_END(CombatSpellInfluence)
 
-typedef enum SpellRippleMode {
+HOMM2_ENUM_BEGIN(SpellRippleMode)
     SPELL_RIPPLE_MODE_WAVE = 0,
     SPELL_RIPPLE_MODE_DEATH_RIPPLE = 1,
     SPELL_RIPPLE_MODE_DEATH_WAVE = 2
-} SpellRippleMode;
+HOMM2_ENUM_END(SpellRippleMode)
 
-typedef enum SpellSourceLine {
+HOMM2_ENUM_VALUES_BEGIN(SpellSourceLine)
     SPELL_VAPORIZE_ALLOC_LINE_OFFSET = 0x09,
     SPELL_VAPORIZE_FREE_LINE_OFFSET = 0x38,
     SPELL_RIPPLE_MODIFIER_ALLOC_LINE_OFFSET = 0x2c,
     SPELL_RIPPLE_WAVE_ALLOC_LINE_OFFSET = 0x2d,
     SPELL_RIPPLE_MODIFIER_FREE_LINE_OFFSET = 0x8e,
     SPELL_RIPPLE_WAVE_FREE_LINE_OFFSET = 0x8f
-} SpellSourceLine;
+HOMM2_ENUM_VALUES_END(SpellSourceLine)
 
-typedef enum BoltColorMode {
+HOMM2_ENUM_BEGIN(BoltColorMode)
     BOLT_COLOR_RED_TABLE = 257,
     BOLT_COLOR_RAINBOW_FORWARD = 300,
     BOLT_COLOR_LIGHTNING = 301,
     BOLT_COLOR_RED_BEAM = 302,
     BOLT_COLOR_RAINBOW_REVERSE = 303
-} BoltColorMode;
+HOMM2_ENUM_END(BoltColorMode)
 
-typedef enum CombatSpellUiConstant {
+HOMM2_ENUM_VALUES_BEGIN(CombatSpellUiConstant)
     SPELL_MESSAGE_MOUSE_DOWN = 1,
     SPELL_MESSAGE_HOVER = 4,
     SPELL_MESSAGE_SELECT = 8,
@@ -76,7 +76,7 @@ typedef enum CombatSpellUiConstant {
     SPELL_HEX_RIGHT_BORDER = 12,
     SPELL_ELEMENTAL_ARMY_LIMIT = 20,
     SPELL_POINTER_DEFAULT_ID = -999
-} CombatSpellUiConstant;
+HOMM2_ENUM_VALUES_END(CombatSpellUiConstant)
 
 enum {
     SPELL_ATTRIBUTE_COMBAT = 2,

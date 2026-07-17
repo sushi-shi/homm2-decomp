@@ -16,29 +16,29 @@ struct exeGfxConfig {
     i32 colorMouseCursor;
 };
 
-typedef enum ConfigMusicSource {
+HOMM2_ENUM_BEGIN(ConfigMusicSource)
     CONFIG_MUSIC_SOURCE_MIDI = 0,
     CONFIG_MUSIC_SOURCE_CD = 1,
     CONFIG_MUSIC_SOURCE_DEFAULT = 3
-} ConfigMusicSource;
+HOMM2_ENUM_END(ConfigMusicSource)
 
-typedef enum ConfigOperaMode {
+HOMM2_ENUM_BEGIN(ConfigOperaMode)
     CONFIG_OPERA_DISABLED = 0,
     CONFIG_OPERA_ENABLED = 1
-} ConfigOperaMode;
+HOMM2_ENUM_END(ConfigOperaMode)
 
-typedef enum ConfigStorageConstant {
+HOMM2_ENUM_VALUES_BEGIN(ConfigStorageConstant)
     CONFIG_EXECUTABLE_COUNT = 2,
     CONFIG_GRAPHICS_SIZE = 0x1c,
     CONFIG_PERSISTED_SIZE = 0x19d,
     CONFIG_STRUCT_SIZE = 0x1a0
-} ConfigStorageConstant;
+HOMM2_ENUM_VALUES_END(ConfigStorageConstant)
 
-typedef enum ConfigConnectionType {
+HOMM2_ENUM_BEGIN(ConfigConnectionType)
     CONFIG_CONNECTION_MODEM = 0,
     CONFIG_CONNECTION_DIRECT = 1,
     CONFIG_CONNECTION_COUNT = 2
-} ConfigConnectionType;
+HOMM2_ENUM_END(ConfigConnectionType)
 
 struct configStruct {
     i32 computerWalkSpeed;
@@ -66,8 +66,8 @@ struct configStruct {
     char reservedAfterAutoSave[0x12];
     i32 musicSource;
     char modemInitString[0x64];
-    i32 comPort[CONFIG_CONNECTION_COUNT];
-    i32 baudRate[CONFIG_CONNECTION_COUNT];
+    i32 comPort[IDX(CONFIG_CONNECTION_COUNT)];
+    i32 baudRate[IDX(CONFIG_CONNECTION_COUNT)];
     char uniqueSystemID[4];
     i32 useOpera;
     i32 quickCombatLevel;

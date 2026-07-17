@@ -88,10 +88,10 @@ i32 hero::CalcMobility(void) {
     i32 slowestSpeedValue;
     i32 armySlotIndex;
 
-    if (m_eventFlags & HERO_EVENT_EMBARKED) {
+    if (HAS(m_eventFlags, HERO_EVENT_EMBARKED)) {
         mobilityResult = seaBaseMobilityCurrent;
         mobilityResult = static_cast<i32>(
-            mobilityResult * gfSSNavigationMod[m_secondarySkills[HERO_SKILL_NAVIGATION]]
+            mobilityResult * gfSSNavigationMod[m_secondarySkills[IDX(HERO_SKILL_NAVIGATION)]]
         );
         if (m_owner != -1)
             mobilityResult += gpGame->MineTypesOwned(m_owner, HERO_LIGHTHOUSE_MINE_TYPE)
@@ -109,13 +109,13 @@ i32 hero::CalcMobility(void) {
         }
         mobilityResult = landMobility[slowestSpeedValue];
         mobilityResult = static_cast<i32>(
-            mobilityResult * gfSSLogisticsMod[m_secondarySkills[HERO_SKILL_LOGISTICS]]
+            mobilityResult * gfSSLogisticsMod[m_secondarySkills[IDX(HERO_SKILL_LOGISTICS)]]
         );
         if (HasArtifact(ARTIFACT_NOMAD_BOOTS))
             mobilityResult += nomadBootsMobilityBonus;
         if (HasArtifact(ARTIFACT_TRAVELER_BOOTS))
             mobilityResult += travelerBonus;
-        if (m_eventFlags & HERO_EVENT_STABLES)
+        if (HAS(m_eventFlags, HERO_EVENT_STABLES))
             mobilityResult += HERO_STABLES_MOBILITY_BONUS;
     }
 
@@ -218,7 +218,7 @@ void hero::UseSpell(i32 spell) {
     m_spellPoints -= GetManaCost(spell, this);
     if (m_spellPoints < 0)
         m_spellPoints = 0;
-    if (gpAdvManager->m_active == 1 && gbThisNetHumanPlayer[giCurPlayer])
+    if (gpAdvManager->m_active && gbThisNetHumanPlayer[giCurPlayer])
         gpAdvManager->UpdateHeroLocator(-1, 1, 1);
 }
 
@@ -426,7 +426,7 @@ void hero::Deallocate(i32 updateMap) {
     if (updateMap)
         gpAdvManager->HideRoute(0, 0, 0);
 
-    if (m_eventFlags & HERO_EVENT_EMBARKED) {
+    if (HAS(m_eventFlags, HERO_EVENT_EMBARKED)) {
         for (index = 0; index < GAME_BOAT_COUNT; index++) {
             if (gpGame->m_boats[index].heroId == m_id) {
                 gpGame->m_boats[index].heroId = -1;
@@ -507,7 +507,7 @@ void hero::Deallocate(i32 updateMap) {
         && gpGame->m_campaignType == CAMPAIGN_ROLAND
         && gpGame->m_campaignScenario + 1 == CAMPAIGN_ROLAND_FINAL_SCENARIO && !gbRetreatWin
         && !gbCombatSurrender) {
-        gpGame->m_campaignAwards[CAMPAIGN_AWARD_CORLAGON_DEFEATED] = 1;
+        gpGame->m_campaignAwards[IDX(CAMPAIGN_AWARD_CORLAGON_DEFEATED)] = 1;
     }
 
     if (updateMap)
@@ -581,51 +581,51 @@ void hero::ApplyBattleWinTemps(void) {
     m_lastTownInteractionTurn = HERO_INTERACTION_TURN_NONE;
     m_lastHeroInteractionTurn = HERO_INTERACTION_TURN_NONE;
 
-    if (m_eventFlags & HERO_EVENT_GRAVEYARD) {
+    if (HAS(m_eventFlags, HERO_EVENT_GRAVEYARD)) {
         m_morale++;
         m_eventFlags = m_eventFlags - HERO_EVENT_GRAVEYARD;
     }
-    if (m_eventFlags & HERO_EVENT_SHIPWRECK) {
+    if (HAS(m_eventFlags, HERO_EVENT_SHIPWRECK)) {
         m_morale++;
         m_eventFlags = m_eventFlags - HERO_EVENT_SHIPWRECK;
     }
-    if (m_eventFlags & HERO_EVENT_BUOY) {
+    if (HAS(m_eventFlags, HERO_EVENT_BUOY)) {
         m_morale--;
         m_eventFlags = m_eventFlags - HERO_EVENT_BUOY;
     }
-    if (m_eventFlags & HERO_EVENT_OASIS) {
+    if (HAS(m_eventFlags, HERO_EVENT_OASIS)) {
         m_morale--;
         m_eventFlags = m_eventFlags - HERO_EVENT_OASIS;
     }
-    if (m_eventFlags & HERO_EVENT_TEMPLE) {
+    if (HAS(m_eventFlags, HERO_EVENT_TEMPLE)) {
         m_morale -= 2;
         m_eventFlags = m_eventFlags - HERO_EVENT_TEMPLE;
     }
-    if (m_eventFlags & HERO_EVENT_FAERIE_RING) {
+    if (HAS(m_eventFlags, HERO_EVENT_FAERIE_RING)) {
         m_luck--;
         m_eventFlags = m_eventFlags - HERO_EVENT_FAERIE_RING;
     }
-    if (m_eventFlags & HERO_EVENT_IDOL) {
+    if (HAS(m_eventFlags, HERO_EVENT_IDOL)) {
         m_luck--;
         m_eventFlags = m_eventFlags - HERO_EVENT_IDOL;
     }
-    if (m_eventFlags & HERO_EVENT_FOUNTAIN) {
+    if (HAS(m_eventFlags, HERO_EVENT_FOUNTAIN)) {
         m_luck--;
         m_eventFlags = m_eventFlags - HERO_EVENT_FOUNTAIN;
     }
-    if (m_eventFlags & HERO_EVENT_WATERING_HOLE) {
+    if (HAS(m_eventFlags, HERO_EVENT_WATERING_HOLE)) {
         m_morale--;
         m_eventFlags = m_eventFlags - HERO_EVENT_WATERING_HOLE;
     }
-    if (m_eventFlags & HERO_EVENT_DERELICT_SHIP) {
+    if (HAS(m_eventFlags, HERO_EVENT_DERELICT_SHIP)) {
         m_morale++;
         m_eventFlags = m_eventFlags - HERO_EVENT_DERELICT_SHIP;
     }
-    if (m_eventFlags & HERO_EVENT_PYRAMID) {
+    if (HAS(m_eventFlags, HERO_EVENT_PYRAMID)) {
         m_luck += 2;
         m_eventFlags = m_eventFlags - HERO_EVENT_PYRAMID;
     }
-    if (m_eventFlags & HERO_EVENT_MERMAID) {
+    if (HAS(m_eventFlags, HERO_EVENT_MERMAID)) {
         m_luck = m_luck - 1;
         m_eventFlags = m_eventFlags - HERO_EVENT_MERMAID;
     }
@@ -682,10 +682,10 @@ void hero::CheckLevel(void) {
             sprintf(line, cHeroLevel[1]);
             strcat(gText, line);
 
-            statBonuses[HERO_PRIMARY_ATTACK] = 0;
-            statBonuses[HERO_PRIMARY_DEFENSE] = 0;
-            statBonuses[HERO_PRIMARY_SPELL_POWER] = 0;
-            statBonuses[HERO_PRIMARY_KNOWLEDGE] = 0;
+            statBonuses[IDX(HERO_PRIMARY_ATTACK)] = 0;
+            statBonuses[IDX(HERO_PRIMARY_DEFENSE)] = 0;
+            statBonuses[IDX(HERO_PRIMARY_SPELL_POWER)] = 0;
+            statBonuses[IDX(HERO_PRIMARY_KNOWLEDGE)] = 0;
             if (currentLevelIndex <= HERO_LEVEL_HIGH_THRESHOLD)
                 highLevelIndex = 0;
             else
@@ -693,21 +693,23 @@ void hero::CheckLevel(void) {
 
             SRand(m_randomSeed + currentLevelIndex * HERO_LEVEL_RANDOM_SEED_FACTOR);
             randomValue = SRandom(1, HERO_LEVEL_RANDOM_MAX);
-            if (randomValue < gHeroSkillBonus[m_cursorType][highLevelIndex][HERO_PRIMARY_ATTACK]) {
-                statBonuses[HERO_PRIMARY_ATTACK]++;
+            if (randomValue
+                < gHeroSkillBonus[m_cursorType][highLevelIndex][IDX(HERO_PRIMARY_ATTACK)]) {
+                statBonuses[IDX(HERO_PRIMARY_ATTACK)]++;
             } else {
-                randomValue -= gHeroSkillBonus[m_cursorType][highLevelIndex][HERO_PRIMARY_ATTACK];
+                randomValue -=
+                    gHeroSkillBonus[m_cursorType][highLevelIndex][IDX(HERO_PRIMARY_ATTACK)];
                 if (randomValue
-                    < gHeroSkillBonus[m_cursorType][highLevelIndex][HERO_PRIMARY_DEFENSE]) {
-                    statBonuses[HERO_PRIMARY_DEFENSE]++;
+                    < gHeroSkillBonus[m_cursorType][highLevelIndex][IDX(HERO_PRIMARY_DEFENSE)]) {
+                    statBonuses[IDX(HERO_PRIMARY_DEFENSE)]++;
                 } else {
                     randomValue -=
-                        gHeroSkillBonus[m_cursorType][highLevelIndex][HERO_PRIMARY_DEFENSE];
-                    if (randomValue
-                        < gHeroSkillBonus[m_cursorType][highLevelIndex][HERO_PRIMARY_SPELL_POWER]) {
-                        statBonuses[HERO_PRIMARY_SPELL_POWER]++;
+                        gHeroSkillBonus[m_cursorType][highLevelIndex][IDX(HERO_PRIMARY_DEFENSE)];
+                    if (randomValue < gHeroSkillBonus[m_cursorType][highLevelIndex]
+                                                     [IDX(HERO_PRIMARY_SPELL_POWER)]) {
+                        statBonuses[IDX(HERO_PRIMARY_SPELL_POWER)]++;
                     } else {
-                        statBonuses[HERO_PRIMARY_KNOWLEDGE]++;
+                        statBonuses[IDX(HERO_PRIMARY_KNOWLEDGE)]++;
                     }
                 }
             }
@@ -725,7 +727,7 @@ void hero::CheckLevel(void) {
                 skillChoicesResult[indexValue] = HERO_SECONDARY_SKILL_NONE;
                 if (indexValue == 0 && m_cursorType != FACTION_BARBARIAN
                     && m_cursorType != FACTION_KNIGHT
-                    && m_secondarySkills[HERO_SKILL_WISDOM] < HERO_SKILL_LEVEL_EXPERT
+                    && m_secondarySkills[IDX(HERO_SKILL_WISDOM)] < HERO_SKILL_LEVEL_EXPERT
                     && currentLevelIndex - m_enabled >= HERO_SECONDARY_SKILL_OFFER_GAP) {
                     skillChoicesResult[indexValue] = HERO_SKILL_WISDOM;
                 } else {
@@ -866,53 +868,53 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
         case HERO_UI_PRIMARY_STAT_LAST:
             sprintf(
                 gText,
-                cHeroScreen[HERO_TEXT_PRIMARY_STAT],
+                cHeroScreen[IDX(HERO_TEXT_PRIMARY_STAT)],
                 gStatNames[message.payload.widget.id - HERO_UI_PRIMARY_STAT_FIRST]
             );
             break;
 
         case HERO_UI_ADDITIONAL_STATS:
-            sprintf(gText, cHeroScreen[HERO_TEXT_ADDITIONAL_STATS]);
+            sprintf(gText, cHeroScreen[IDX(HERO_TEXT_ADDITIONAL_STATS)]);
             break;
 
         case HERO_UI_MORALE_FIRST:
         case HERO_UI_MORALE_FIRST + 1:
         case HERO_UI_MORALE_LAST:
             if (gpHVHero->m_army.GetMorale(gpHVHero, gpHVHero->GetOccupiedTown(), 0) > 0)
-                sprintf(gText, cHeroScreen[HERO_TEXT_GOOD_MORALE]);
+                sprintf(gText, cHeroScreen[IDX(HERO_TEXT_GOOD_MORALE)]);
             else if (gpHVHero->m_army.GetMorale(gpHVHero, gpHVHero->GetOccupiedTown(), 0) == 0)
-                sprintf(gText, cHeroScreen[HERO_TEXT_NEUTRAL_MORALE]);
+                sprintf(gText, cHeroScreen[IDX(HERO_TEXT_NEUTRAL_MORALE)]);
             else
-                sprintf(gText, cHeroScreen[HERO_TEXT_BAD_MORALE]);
+                sprintf(gText, cHeroScreen[IDX(HERO_TEXT_BAD_MORALE)]);
             break;
 
         case HERO_UI_LUCK_FIRST:
         case HERO_UI_LUCK_FIRST + 1:
         case HERO_UI_LUCK_LAST:
             if (gpGame->GetLuck(gpHVHero, 0, gpHVHero->GetOccupiedTown()) > 0)
-                sprintf(gText, cHeroScreen[HERO_TEXT_GOOD_LUCK]);
+                sprintf(gText, cHeroScreen[IDX(HERO_TEXT_GOOD_LUCK)]);
             else if (gpGame->GetLuck(gpHVHero, 0, gpHVHero->GetOccupiedTown()) == 0)
-                sprintf(gText, cHeroScreen[HERO_TEXT_NEUTRAL_LUCK]);
+                sprintf(gText, cHeroScreen[IDX(HERO_TEXT_NEUTRAL_LUCK)]);
             else
-                sprintf(gText, cHeroScreen[HERO_TEXT_BAD_LUCK]);
+                sprintf(gText, cHeroScreen[IDX(HERO_TEXT_BAD_LUCK)]);
             break;
 
         case HERO_UI_EXPERIENCE_FIRST:
         case HERO_UI_EXPERIENCE_LAST:
-            sprintf(gText, cHeroScreen[HERO_TEXT_EXPERIENCE]);
+            sprintf(gText, cHeroScreen[IDX(HERO_TEXT_EXPERIENCE)]);
             break;
 
         case HERO_UI_SPELL_POINTS_FIRST:
         case HERO_UI_SPELL_POINTS_LAST:
-            sprintf(gText, cHeroScreen[HERO_TEXT_SPELL_POINTS]);
+            sprintf(gText, cHeroScreen[IDX(HERO_TEXT_SPELL_POINTS)]);
             break;
 
         case HERO_UI_FORMATION_SPREAD:
-            sprintf(gText, cHeroScreen[HERO_TEXT_SPREAD_FORMATION]);
+            sprintf(gText, cHeroScreen[IDX(HERO_TEXT_SPREAD_FORMATION)]);
             break;
 
         case HERO_UI_FORMATION_GROUPED:
-            sprintf(gText, cHeroScreen[HERO_TEXT_GROUPED_FORMATION]);
+            sprintf(gText, cHeroScreen[IDX(HERO_TEXT_GROUPED_FORMATION)]);
             break;
 
         case HERO_UI_ARMY_SELECTOR_FIRST:
@@ -925,50 +927,50 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
                 if (gpHVHero->m_army.m_creatureTypes[armySlot] != ARMY_GROUP_EMPTY_SLOT)
                     sprintf(
                         gText,
-                        cHeroScreen[HERO_TEXT_SELECT_ARMY],
+                        cHeroScreen[IDX(HERO_TEXT_SELECT_ARMY)],
                         gArmyNames[gpHVHero->m_army.m_creatureTypes[armySlot]]
                     );
                 else
-                    strcpy(gText, cHeroScreen[HERO_TEXT_EMPTY]);
+                    strcpy(gText, cHeroScreen[IDX(HERO_TEXT_EMPTY)]);
             } else if (giHeroScreenSrcIndex == armySlot) {
                 sprintf(
                     gText,
-                    cHeroScreen[HERO_TEXT_SELECT_ARMY],
+                    cHeroScreen[IDX(HERO_TEXT_SELECT_ARMY)],
                     gArmyNames[gpHVHero->m_army.m_creatureTypes[armySlot]]
                 );
             } else if (gpTownManager->m_castleDialogActive != 0) {
                 if (gpHVHero->m_army.m_creatureTypes[armySlot] != ARMY_GROUP_EMPTY_SLOT)
                     sprintf(
                         gText,
-                        cHeroScreen[HERO_TEXT_SELECT_ARMY],
+                        cHeroScreen[IDX(HERO_TEXT_SELECT_ARMY)],
                         gArmyNames[gpHVHero->m_army.m_creatureTypes[armySlot]]
                     );
                 else
-                    strcpy(gText, cHeroScreen[HERO_TEXT_EMPTY]);
+                    strcpy(gText, cHeroScreen[IDX(HERO_TEXT_EMPTY)]);
             } else if (gpHVHero->m_army.m_creatureTypes[armySlot] == ARMY_GROUP_EMPTY_SLOT) {
                 if (message.payload.widget.parameter & HERO_UI_SPLIT_MODIFIER_MASK)
                     sprintf(
                         gText,
-                        cHeroScreen[HERO_TEXT_SPLIT_ARMY],
+                        cHeroScreen[IDX(HERO_TEXT_SPLIT_ARMY)],
                         gArmyNamesPlural[gpHVHero->m_army.m_creatureTypes[giHeroScreenSrcIndex]]
                     );
                 else
                     sprintf(
                         gText,
-                        cHeroScreen[HERO_TEXT_MOVE_ARMY],
+                        cHeroScreen[IDX(HERO_TEXT_MOVE_ARMY)],
                         gArmyNames[gpHVHero->m_army.m_creatureTypes[giHeroScreenSrcIndex]]
                     );
             } else if (gpHVHero->m_army.m_creatureTypes[armySlot]
                        == gpHVHero->m_army.m_creatureTypes[giHeroScreenSrcIndex]) {
                 sprintf(
                     gText,
-                    cHeroScreen[HERO_TEXT_COMBINE_ARMIES],
+                    cHeroScreen[IDX(HERO_TEXT_COMBINE_ARMIES)],
                     gArmyNamesPlural[gpHVHero->m_army.m_creatureTypes[armySlot]]
                 );
             } else {
                 sprintf(
                     gText,
-                    cHeroScreen[HERO_TEXT_EXCHANGE_ARMIES],
+                    cHeroScreen[IDX(HERO_TEXT_EXCHANGE_ARMIES)],
                     gArmyNames[gpHVHero->m_army.m_creatureTypes[giHeroScreenSrcIndex]],
                     gArmyNames[gpHVHero->m_army.m_creatureTypes[armySlot]]
                 );
@@ -991,14 +993,14 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
         case HERO_UI_ARTIFACT_LAST:
             if (gpHVHero->m_artifacts[message.payload.widget.id - HERO_UI_ARTIFACT_FIRST]
                 == ARTIFACT_NONE)
-                sprintf(gText, cHeroScreen[HERO_TEXT_EMPTY]);
+                sprintf(gText, cHeroScreen[IDX(HERO_TEXT_EMPTY)]);
             else if (gpHVHero->m_artifacts[message.payload.widget.id - HERO_UI_ARTIFACT_FIRST]
                      == ARTIFACT_MAGIC_BOOK)
-                strcpy(gText, cHeroScreen[HERO_TEXT_VIEW_SPELLS]);
+                strcpy(gText, cHeroScreen[IDX(HERO_TEXT_VIEW_SPELLS)]);
             else
                 sprintf(
                     gText,
-                    cHeroScreen[HERO_TEXT_ARTIFACT],
+                    cHeroScreen[IDX(HERO_TEXT_ARTIFACT)],
                     gArtifactNames
                         [gpHVHero->m_artifacts[message.payload.widget.id - HERO_UI_ARTIFACT_FIRST]]
                 );
@@ -1007,14 +1009,14 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
         case HERO_UI_DISMISS:
             sprintf(
                 gText,
-                cHeroScreen[HERO_TEXT_DISMISS],
+                cHeroScreen[IDX(HERO_TEXT_DISMISS)],
                 gpHVHero->m_name,
                 gAlignmentNames[gpHVHero->m_cursorType]
             );
             break;
 
         case HERO_UI_CLOSE:
-            strcpy(gText, cHeroScreen[HERO_TEXT_EXIT]);
+            strcpy(gText, cHeroScreen[IDX(HERO_TEXT_EXIT)]);
             break;
 
         default:
@@ -1037,7 +1039,7 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
             if (secondarySkillSlot < gpHVHero->m_secondarySkillCount) {
                 sprintf(
                     gText,
-                    cHeroScreen[HERO_TEXT_SECONDARY_SKILL],
+                    cHeroScreen[IDX(HERO_TEXT_SECONDARY_SKILL)],
                     gSecondarySkillLevels
                         [gpHVHero->m_secondarySkills[gpHVHero->GetNthSS(secondarySkillSlot)] - 1],
                     gSecondarySkills[gpHVHero->GetNthSS(secondarySkillSlot)]
@@ -1045,7 +1047,7 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
                 break;
             }
         default_hero_text:
-            strcpy(gText, cHeroScreen[HERO_TEXT_SCREEN]);
+            strcpy(gText, cHeroScreen[IDX(HERO_TEXT_SCREEN)]);
             break;
     }
     HeroMessageUpdate(gText);
@@ -1662,14 +1664,14 @@ void SetupHeroView(void) {
     message.payload.widget.data.text = gText;
     heroWin->BroadcastMessage(message);
 
-    if (gpHVHero->m_eventFlags & HERO_EVENT_GROUPED_FORMATION)
+    if (HAS(gpHVHero->m_eventFlags, HERO_EVENT_GROUPED_FORMATION))
         message.payload.widget.command = HERO_UI_WIDGET_DISABLE;
     else
         message.payload.widget.command = HERO_UI_WIDGET_ENABLE;
     message.payload.widget.id = HERO_UI_FORMATION_SPREAD_ICON;
     message.payload.widget.data.value = HERO_UI_CONTROL_FRAME_DEFAULT;
     heroWin->BroadcastMessage(message);
-    if (gpHVHero->m_eventFlags & HERO_EVENT_GROUPED_FORMATION)
+    if (HAS(gpHVHero->m_eventFlags, HERO_EVENT_GROUPED_FORMATION))
         message.payload.widget.command = HERO_UI_WIDGET_ENABLE;
     else
         message.payload.widget.command = HERO_UI_WIDGET_DISABLE;
@@ -1930,11 +1932,11 @@ class town* hero::GetOccupiedTown(void) {
 }
 
 VA(0x0047057b, 0x47)
-i8 hero::Stats(i32 stat) {
-    if (stat == HERO_PRIMARY_SPELL_POWER && m_primaryStats[stat] < HERO_MINIMUM_SPELL_POWER) {
+i8 hero::Stats(HeroPrimaryStat stat) {
+    if (stat == HERO_PRIMARY_SPELL_POWER && m_primaryStats[IDX(stat)] < HERO_MINIMUM_SPELL_POWER) {
         return HERO_MINIMUM_SPELL_POWER;
     }
-    return m_primaryStats[stat];
+    return m_primaryStats[IDX(stat)];
 }
 
 VA(0x004705c2, 0xc3)

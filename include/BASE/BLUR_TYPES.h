@@ -3,10 +3,10 @@
 
 #include <va.h>
 
-typedef enum BlurTextSlotSize {
+HOMM2_ENUM_VALUES_BEGIN(BlurTextSlotSize)
     BLUR_SOURCE_FILE_SLOT_SIZE = 0x28,
     BLUR_LOOKUP_FILENAME_SLOT_SIZE = 0x10
-} BlurTextSlotSize;
+HOMM2_ENUM_VALUES_END(BlurTextSlotSize)
 
 typedef struct SBlurText {
     char lookupAllocationSource[BLUR_SOURCE_FILE_SLOT_SIZE];

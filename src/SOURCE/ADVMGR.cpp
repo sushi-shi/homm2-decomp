@@ -87,9 +87,9 @@ DATA(0x005280a8) static i32 s_drawPlayerColor;
 DATA(0x005280cc) static i32 s_adjacentMonsterEndX;
 DATA(0x005280d0) static i32 s_drawAnimationLength;
 DATA(0x005280d8) static i32 s_drawHeroYOffset;
-typedef enum AdvVisitMetadata {
+HOMM2_ENUM_BEGIN(AdvVisitMetadata)
     VISIT_BIT_INDEX_MASK = 0x1f
-} AdvVisitMetadata;
+HOMM2_ENUM_END(AdvVisitMetadata)
 
 VA(0x00456350, 0x30f)
 advManager::advManager(void) {
@@ -1748,7 +1748,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
                         "%s%s",
                         "Congratulations! After spending many hours digging here, you have "
                         "uncovered the ",
-                        gArtifactNames[ARTIFACT_SPHERE_NEGATION]
+                        gArtifactNames[IDX(ARTIFACT_SPHERE_NEGATION)]
                     );
                 } else {
                     sprintf(
@@ -2938,14 +2938,14 @@ void advManager::DrawCell(
                         == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION)) {
                         s_drawHero = gpGame->GetHero(s_drawCell->m_objectMetadata);
                         s_drawPlayerColor = gpGame->m_players[s_drawHero->m_owner].m_color;
-                        if (s_drawHero->m_eventFlags & HERO_EVENT_EMBARKED) {
+                        if (HAS(s_drawHero->m_eventFlags, HERO_EVENT_EMBARKED)) {
                             s_drawHeroType = ADVMGR_HERO_TYPE_BOAT;
                         } else {
                             s_drawHeroType = s_drawHero->m_cursorType;
                         }
                         s_drawHeroFrame = GetCursorBaseFrame(s_drawHero->m_direction);
                         s_drawHasHero = 1;
-                        if (s_drawHero->m_eventFlags & HERO_EVENT_EMBARKED) {
+                        if (HAS(s_drawHero->m_eventFlags, HERO_EVENT_EMBARKED)) {
                             s_drawHeroYOffset = -10;
                         }
                     }
@@ -6088,7 +6088,7 @@ void advManager::SetHeroContext(i32 heroId, i32 update) {
     m_cursorMapX = m_cursorMapY;
     m_previousCursorMapY = ADVMGR_INVALID_CELL;
     m_previousCursorMapX = m_previousCursorMapY;
-    if (currentHero->m_eventFlags & HERO_EVENT_EMBARKED) {
+    if (HAS(currentHero->m_eventFlags, HERO_EVENT_EMBARKED)) {
         m_cursorType = CURSOR_HERO_TYPE_BOAT;
     } else {
         m_cursorType = currentHero->m_cursorType;
@@ -6123,7 +6123,7 @@ void advManager::SetHeroContext(i32 heroId, i32 update) {
 
     UpdateHeroLocators(1, 1);
     UpdateTownLocators(1, 1);
-    if (!update && (m_active == 1 || gbThisNetHumanPlayer[giCurPlayer])) {
+    if (!update && (m_active || gbThisNetHumanPlayer[giCurPlayer])) {
         Reseed(0, 0);
         SeedTo(currentHero->m_destinationX, currentHero->m_destinationY);
         ShowRoute(0, 0, !update);
@@ -7362,7 +7362,7 @@ void advManager::TeleportTo(
         m_mapOriginX + ADVMGR_TELEPORT_VIEW_CENTER,
         m_mapOriginY + ADVMGR_TELEPORT_VIEW_CENTER,
         giCurPlayer,
-        giVisRange[mapHero->m_secondarySkills[HERO_SKILL_SCOUTING]]
+        giVisRange[mapHero->m_secondarySkills[IDX(HERO_SKILL_SCOUTING)]]
             + (static_cast<u32>(mapHero->HasArtifact(ARTIFACT_TELESCOPE)) >= 1)
     );
 
@@ -7446,9 +7446,9 @@ void advManager::DimensionDoor(void) {
         x = m_lastHoverCell + m_mapOriginX;
         y = m_hoverCellY + m_mapOriginY;
         targetCell = GetCell(x, y);
-        if (((targetHero->m_eventFlags & HERO_EVENT_EMBARKED)
+        if ((HAS(targetHero->m_eventFlags, HERO_EVENT_EMBARKED)
              && giGroundToTerrain[targetCell->m_terrainImageIndex])
-            || (!(targetHero->m_eventFlags & HERO_EVENT_EMBARKED)
+            || (!HAS(targetHero->m_eventFlags, HERO_EVENT_EMBARKED)
                 && !giGroundToTerrain[targetCell->m_terrainImageIndex])) {
             NormalDialog(
                 "Dimension Door failed!!!",
@@ -7478,7 +7478,7 @@ VA(0x00467734, 0x129)
 i32 TownPortalHandler(tag_message& message) {
     tag_message choiceMessage;
 
-    if (!gpSoundManager->MusicPlaying() && gpAdvManager->m_active == 1) {
+    if (!gpSoundManager->MusicPlaying() && gpAdvManager->m_active) {
         gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[gpAdvManager->m_currentTerrain]);
     }
 
@@ -7543,7 +7543,7 @@ void advManager::TownGate(i32 spellId) {
         );
         return;
     }
-    if (targetHero->m_eventFlags & HERO_EVENT_EMBARKED) {
+    if (HAS(targetHero->m_eventFlags, HERO_EVENT_EMBARKED)) {
         NormalDialog(
             "Spell Failed!!!  You must be on land for this spell to work.",
             ADVMGR_OPTION_DIALOG_MESSAGE,
@@ -7875,7 +7875,7 @@ void advManager::ShowRoute(i32 redraw, i32, i32 updateButton) {
                 giGroundToTerrain[nextCell7->m_terrainImageIndex],
                 direction & 1,
                 ADVMGR_ROUTE_TERRAIN_COST_INFINITY,
-                currentHero0->m_secondarySkills[HERO_SKILL_PATHFINDING],
+                currentHero0->m_secondarySkills[IDX(HERO_SKILL_PATHFINDING)],
                 currentCell2->m_isRoad,
                 nextCell7->m_isRoad
             );
@@ -7883,7 +7883,7 @@ void advManager::ShowRoute(i32 redraw, i32, i32 updateButton) {
                 currentTerrain0,
                 direction & 1,
                 remainingMobility2,
-                currentHero0->m_secondarySkills[HERO_SKILL_PATHFINDING],
+                currentHero0->m_secondarySkills[IDX(HERO_SKILL_PATHFINDING)],
                 currentCell2->m_isRoad,
                 nextCell7->m_isRoad
             );
@@ -8042,7 +8042,7 @@ void advManager::SeedTo(i32 targetX, i32 targetY) {
             m_cursorType == ADVMGR_POINTER_SAIL,
             0,
             currentHero->m_remainingMobility,
-            currentHero->m_secondarySkills[HERO_SKILL_PATHFINDING],
+            currentHero->m_secondarySkills[IDX(HERO_SKILL_PATHFINDING)],
             targetX,
             targetY,
             0,
@@ -8057,7 +8057,7 @@ void advManager::SeedTo(i32 targetX, i32 targetY) {
             m_cursorType == ADVMGR_POINTER_SAIL,
             0,
             currentHero->m_remainingMobility,
-            currentHero->m_secondarySkills[HERO_SKILL_PATHFINDING],
+            currentHero->m_secondarySkills[IDX(HERO_SKILL_PATHFINDING)],
             targetX,
             targetY,
             1,
@@ -8466,7 +8466,7 @@ void advManager::TrimLoopingSounds(i32 maxSamples) {
 
 VA(0x004697cc, 0xd5)
 void advManager::DisableButtons(void) {
-    if (gpAdvManager->m_active != 1) {
+    if (!gpAdvManager->m_active) {
         return;
     }
     tag_message msg;
@@ -8489,7 +8489,7 @@ void advManager::DisableButtons(void) {
 
 VA(0x004698a1, 0xd5)
 void advManager::EnableButtons(void) {
-    if (gpAdvManager->m_active != 1) {
+    if (!gpAdvManager->m_active) {
         return;
     }
     tag_message msg;
@@ -9690,10 +9690,12 @@ i32 advManager::DoVisions(hero* visionHero) {
             sprintf(visionMessageResult, "The creatures are willing to join us!");
             strcat(gText, visionMessageResult);
             goto showVision;
-        } else if (visionHero->m_secondarySkills[HERO_SKILL_DIPLOMACY] != MONSTER_DIPLOMACY_NONE) {
-            if (visionHero->m_secondarySkills[HERO_SKILL_DIPLOMACY] == MONSTER_DIPLOMACY_EXPERT) {
+        } else if (visionHero->m_secondarySkills[IDX(HERO_SKILL_DIPLOMACY)]
+                   != MONSTER_DIPLOMACY_NONE) {
+            if (visionHero->m_secondarySkills[IDX(HERO_SKILL_DIPLOMACY)]
+                == MONSTER_DIPLOMACY_EXPERT) {
                 joiningCount = monsterCountIndex;
-            } else if (visionHero->m_secondarySkills[HERO_SKILL_DIPLOMACY]
+            } else if (visionHero->m_secondarySkills[IDX(HERO_SKILL_DIPLOMACY)]
                        == MONSTER_DIPLOMACY_ADVANCED) {
                 joiningCount = monsterCountIndex / 2;
             } else {
@@ -9704,7 +9706,8 @@ i32 advManager::DoVisions(hero* visionHero) {
             }
 
             joiningCostIndex = gMonsterDatabase[creatureData].cost * monsterCountIndex * 2;
-            if (joiningCostIndex > gpGame->m_players[visionHero->m_owner].m_resources[RES_GOLD]) {
+            if (joiningCostIndex
+                > gpGame->m_players[visionHero->m_owner].m_resources[IDX(RES_GOLD)]) {
                 if (strengthRatioCurrent > MONSTER_STRENGTH_FLEE) {
                     goto creaturesFlee;
                 } else {

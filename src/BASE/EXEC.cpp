@@ -94,9 +94,9 @@ void executive::ShutDownSystem(void) {
         if (cur != gpWindowManager && cur != gpMouseManager)
             RemoveManager(cur);
     }
-    if (gpWindowManager->m_active == 1)
+    if (gpWindowManager->m_active)
         RemoveManager(gpWindowManager);
-    if (gpMouseManager->m_active == 1)
+    if (gpMouseManager->m_active)
         RemoveManager(gpMouseManager);
     gpInputManager->Close();
     gpResourceManager->Close();
@@ -181,7 +181,7 @@ i32 executive::AddManager(class baseManager* mgr, i32 priority) {
     if (priority == EXECUTIVE_MANAGER_DEFAULT_PRIORITY) {
         priority = m_managerListTail == 0 ? 0 : m_managerListTail->m_priority + 1;
     }
-    if (mgr->m_active == 0 && mgr->Open(priority) != 0)
+    if (!mgr->m_active && mgr->Open(priority) != 0)
         return EXECUTIVE_MANAGER_ERROR;
     baseManager* tail = m_managerListTail;
     baseManager* cur = m_managerListTail;
@@ -286,7 +286,7 @@ void executive::MainLoop(void) {
                 if (done)
                     return;
                 manager = m_activeManager;
-                if (manager->m_active == 1
+                if (manager->m_active
                     && (message.type != MESSAGE_MOUSE_MOVE || gpWindowManager != manager)) {
                     result = manager->Main(message);
                     switch (result) {

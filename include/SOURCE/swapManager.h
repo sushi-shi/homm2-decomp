@@ -10,29 +10,29 @@ class heroWindow;
 class icon;
 struct tag_message;
 
-typedef enum SwapManagerSide {
+HOMM2_ENUM_BEGIN(SwapManagerSide)
     SWAP_SIDE_NONE = -1,
     SWAP_SIDE_LEFT = 0,
     SWAP_SIDE_RIGHT = 1,
     SWAP_SIDE_COUNT = 2
-} SwapManagerSide;
+HOMM2_ENUM_END(SwapManagerSide)
 
-typedef enum SwapManagerItemType {
+HOMM2_ENUM_BEGIN(SwapManagerItemType)
     SWAP_ITEM_NONE = -1,
     SWAP_ITEM_ARMY = 0,
     SWAP_ITEM_ARTIFACT = 1
-} SwapManagerItemType;
+HOMM2_ENUM_END(SwapManagerItemType)
 
-typedef enum SwapManagerMessage {
+HOMM2_ENUM_BEGIN(SwapManagerMessage)
     SWAP_COMMAND_HOVER = 0xc,
     SWAP_COMMAND_SELECT = 0xd,
     SWAP_COMMAND_HELP = 0xe,
     SWAP_COMMAND_EXIT = 4,
     SWAP_CONTROL_CLOSE = 0x7800,
     SWAP_SPLIT_MODIFIER_MASK = 3
-} SwapManagerMessage;
+HOMM2_ENUM_END(SwapManagerMessage)
 
-typedef enum SwapManagerControl {
+HOMM2_ENUM_VALUES_BEGIN(SwapManagerControl)
     SWAP_CONTROL_LEFT_HERO = 0x41,
     SWAP_CONTROL_RIGHT_HERO = 0x42,
     SWAP_CONTROL_LEFT_ARMY_FIRST = 0x4e,
@@ -51,9 +51,9 @@ typedef enum SwapManagerControl {
     SWAP_CONTROL_LEFT_SKILL_LEVEL_LAST = 0xdf,
     SWAP_CONTROL_RIGHT_SKILL_LEVEL_FIRST = 0xe0,
     SWAP_CONTROL_RIGHT_SKILL_LEVEL_LAST = 0xe7
-} SwapManagerControl;
+HOMM2_ENUM_VALUES_END(SwapManagerControl)
 
-typedef enum SwapManagerConstant {
+HOMM2_ENUM_VALUES_BEGIN(SwapManagerConstant)
     SWAP_SECONDARY_SKILL_WIDGET_COUNT = 8,
     SWAP_WINDOW_TEXT_ID = 0x15,
     SWAP_LEFT_PORTRAIT_WIDGET = 0x41,
@@ -92,20 +92,20 @@ typedef enum SwapManagerConstant {
     SWAP_SPLIT_TEXT_CONTROL = 1,
     SWAP_SPLIT_AMOUNT_CONTROL = 0x44,
     SWAP_SPLIT_CONFIRM = 0x7802
-} SwapManagerConstant;
+HOMM2_ENUM_VALUES_END(SwapManagerConstant)
 
 #pragma pack(push, 1) // recovered layout is byte-packed
 class swapManager : public baseManager {
 public:
     // (derived: base baseManager = 0x36 bytes at 0x00 via ': public baseManager'; own fields below)
-    heroWindow* m_window;            // +0x36
-    icon* m_selectorIcon;            // +0x3a
-    hero* m_heroes[SWAP_SIDE_COUNT]; // +0x3e
-    i32 m_selectedSide;              // +0x46
-    i32 m_targetSide;                // +0x4a
-    i32 m_selectedSlot;              // +0x4e
-    i32 m_targetSlot;                // +0x52
-    i32 m_itemType;                  // +0x56
+    heroWindow* m_window;                 // +0x36
+    icon* m_selectorIcon;                 // +0x3a
+    hero* m_heroes[IDX(SWAP_SIDE_COUNT)]; // +0x3e
+    i32 m_selectedSide;                   // +0x46
+    i32 m_targetSide;                     // +0x4a
+    i32 m_selectedSlot;                   // +0x4e
+    i32 m_targetSlot;                     // +0x52
+    i32 m_itemType;                       // +0x56
     // --- constructors ---
     swapManager(void);
     swapManager(class hero*, class hero*);

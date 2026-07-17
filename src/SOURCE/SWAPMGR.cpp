@@ -35,14 +35,14 @@ swapManager::swapManager(void) {
     m_itemType = SWAP_ITEM_NONE;
     m_selectedSlot = SWAP_SLOT_NONE;
     m_targetSlot = SWAP_SLOT_NONE;
-    m_heroes[SWAP_SIDE_LEFT] = 0;
-    m_heroes[SWAP_SIDE_RIGHT] = 0;
+    m_heroes[IDX(SWAP_SIDE_LEFT)] = 0;
+    m_heroes[IDX(SWAP_SIDE_RIGHT)] = 0;
 }
 
 VA(0x00454444, 0x3e)
 swapManager::swapManager(hero* leftHero, hero* rightHero) {
-    m_heroes[SWAP_SIDE_LEFT] = leftHero;
-    m_heroes[SWAP_SIDE_RIGHT] = rightHero;
+    m_heroes[IDX(SWAP_SIDE_LEFT)] = leftHero;
+    m_heroes[IDX(SWAP_SIDE_RIGHT)] = rightHero;
 }
 
 VA(0x00454482, 0x50)
@@ -69,12 +69,12 @@ i32 swapManager::Open(i32 id) {
     tag_message message;
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_SET_ICON;
-    sprintf(gText, "port%04d.icn", m_heroes[SWAP_SIDE_LEFT]->m_portrait);
+    sprintf(gText, "port%04d.icn", m_heroes[IDX(SWAP_SIDE_LEFT)]->m_portrait);
     message.payload.widget.id = SWAP_LEFT_PORTRAIT_WIDGET;
     message.payload.widget.data.text = gText;
     m_window->BroadcastMessage(message);
 
-    sprintf(gText, "port%04d.icn", m_heroes[SWAP_SIDE_RIGHT]->m_portrait);
+    sprintf(gText, "port%04d.icn", m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_portrait);
     message.payload.widget.id = SWAP_RIGHT_PORTRAIT_WIDGET;
     m_window->BroadcastMessage(message);
 
@@ -82,8 +82,8 @@ i32 swapManager::Open(i32 id) {
     sprintf(
         gText,
         "%s meets %s",
-        m_heroes[SWAP_SIDE_LEFT]->m_name,
-        m_heroes[SWAP_SIDE_RIGHT]->m_name
+        m_heroes[IDX(SWAP_SIDE_LEFT)]->m_name,
+        m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_name
     );
     message.payload.widget.data.text = gText;
     message.payload.widget.id = SWAP_TITLE_WIDGET;
@@ -349,7 +349,7 @@ i32 swapManager::Main(tag_message& message) {
                         case SWAP_CONTROL_LEFT_HERO:
                             if (quickView)
                                 break;
-                            HeroView(m_heroes[SWAP_SIDE_LEFT]->m_id, 1, 0);
+                            HeroView(m_heroes[IDX(SWAP_SIDE_LEFT)]->m_id, 1, 0);
                             gpAdvManager->RedrawAdvScreen(1, 0);
                             Update();
                             DrawSwapWin();
@@ -360,7 +360,7 @@ i32 swapManager::Main(tag_message& message) {
                         case SWAP_CONTROL_RIGHT_HERO:
                             if (quickView)
                                 break;
-                            HeroView(m_heroes[SWAP_SIDE_RIGHT]->m_id, 1, 0);
+                            HeroView(m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_id, 1, 0);
                             gpAdvManager->RedrawAdvScreen(1, 0);
                             Update();
                             DrawSwapWin();
@@ -385,7 +385,7 @@ i32 swapManager::Main(tag_message& message) {
                             artifactSlot_2 =
                                 message.payload.widget.id - SWAP_CONTROL_LEFT_ARTIFACT_FIRST;
                             if (!quickView
-                                && m_heroes[SWAP_SIDE_LEFT]->m_artifacts[artifactSlot_2]
+                                && m_heroes[IDX(SWAP_SIDE_LEFT)]->m_artifacts[artifactSlot_2]
                                        == ARTIFACT_MAGIC_BOOK) {
                                 NormalDialog(
                                     "This item can't be traded.",
@@ -400,16 +400,16 @@ i32 swapManager::Main(tag_message& message) {
                                     0
                                 );
                             } else if (quickView) {
-                                if (m_heroes[SWAP_SIDE_LEFT]->m_artifacts[artifactSlot_2]
+                                if (m_heroes[IDX(SWAP_SIDE_LEFT)]->m_artifacts[artifactSlot_2]
                                     == ARTIFACT_NONE)
                                     break;
-                                m_heroes[SWAP_SIDE_LEFT]->ViewArtifact(
-                                    m_heroes[SWAP_SIDE_LEFT]->m_artifacts[artifactSlot_2],
+                                m_heroes[IDX(SWAP_SIDE_LEFT)]->ViewArtifact(
+                                    m_heroes[IDX(SWAP_SIDE_LEFT)]->m_artifacts[artifactSlot_2],
                                     SWAP_VIEW_QUICK,
-                                    m_heroes[SWAP_SIDE_LEFT]->m_artifactExtra[artifactSlot_2]
+                                    m_heroes[IDX(SWAP_SIDE_LEFT)]->m_artifactExtra[artifactSlot_2]
                                 );
                             } else if (m_itemType != SWAP_ITEM_ARTIFACT) {
-                                if (m_heroes[SWAP_SIDE_LEFT]->m_artifacts[artifactSlot_2]
+                                if (m_heroes[IDX(SWAP_SIDE_LEFT)]->m_artifacts[artifactSlot_2]
                                     != ARTIFACT_NONE) {
                                     m_selectedSide = SWAP_SIDE_LEFT;
                                     m_targetSide = SWAP_SIDE_NONE;
@@ -424,10 +424,11 @@ i32 swapManager::Main(tag_message& message) {
                                 m_targetSlot = artifactSlot_2;
                                 if (m_selectedSide == SWAP_SIDE_LEFT
                                     && m_selectedSlot == m_targetSlot) {
-                                    m_heroes[SWAP_SIDE_LEFT]->ViewArtifact(
-                                        m_heroes[SWAP_SIDE_LEFT]->m_artifacts[artifactSlot_2],
+                                    m_heroes[IDX(SWAP_SIDE_LEFT)]->ViewArtifact(
+                                        m_heroes[IDX(SWAP_SIDE_LEFT)]->m_artifacts[artifactSlot_2],
                                         SWAP_VIEW_FULL,
-                                        m_heroes[SWAP_SIDE_LEFT]->m_artifactExtra[artifactSlot_2]
+                                        m_heroes[IDX(SWAP_SIDE_LEFT)]
+                                            ->m_artifactExtra[artifactSlot_2]
                                     );
                                     Reset();
                                 } else {
@@ -454,7 +455,7 @@ i32 swapManager::Main(tag_message& message) {
                             artifactSlot_2 =
                                 message.payload.widget.id - SWAP_CONTROL_RIGHT_ARTIFACT_FIRST;
                             if (!quickView
-                                && m_heroes[SWAP_SIDE_RIGHT]->m_artifacts[artifactSlot_2]
+                                && m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_artifacts[artifactSlot_2]
                                        == ARTIFACT_MAGIC_BOOK) {
                                 NormalDialog(
                                     "This item can't be traded.",
@@ -469,16 +470,16 @@ i32 swapManager::Main(tag_message& message) {
                                     0
                                 );
                             } else if (quickView) {
-                                if (m_heroes[SWAP_SIDE_RIGHT]->m_artifacts[artifactSlot_2]
+                                if (m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_artifacts[artifactSlot_2]
                                     == ARTIFACT_NONE)
                                     break;
-                                m_heroes[SWAP_SIDE_RIGHT]->ViewArtifact(
-                                    m_heroes[SWAP_SIDE_RIGHT]->m_artifacts[artifactSlot_2],
+                                m_heroes[IDX(SWAP_SIDE_RIGHT)]->ViewArtifact(
+                                    m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_artifacts[artifactSlot_2],
                                     SWAP_VIEW_QUICK,
-                                    m_heroes[SWAP_SIDE_RIGHT]->m_artifactExtra[artifactSlot_2]
+                                    m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_artifactExtra[artifactSlot_2]
                                 );
                             } else if (m_itemType != SWAP_ITEM_ARTIFACT) {
-                                if (m_heroes[SWAP_SIDE_RIGHT]->m_artifacts[artifactSlot_2]
+                                if (m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_artifacts[artifactSlot_2]
                                     != ARTIFACT_NONE) {
                                     m_selectedSide = SWAP_SIDE_RIGHT;
                                     m_targetSide = SWAP_SIDE_NONE;
@@ -493,10 +494,11 @@ i32 swapManager::Main(tag_message& message) {
                                 m_targetSlot = artifactSlot_2;
                                 if (m_selectedSide == SWAP_SIDE_RIGHT
                                     && m_selectedSlot == m_targetSlot) {
-                                    m_heroes[SWAP_SIDE_RIGHT]->ViewArtifact(
-                                        m_heroes[SWAP_SIDE_RIGHT]->m_artifacts[artifactSlot_2],
+                                    m_heroes[IDX(SWAP_SIDE_RIGHT)]->ViewArtifact(
+                                        m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_artifacts[artifactSlot_2],
                                         SWAP_VIEW_FULL,
-                                        m_heroes[SWAP_SIDE_RIGHT]->m_artifactExtra[artifactSlot_2]
+                                        m_heroes[IDX(SWAP_SIDE_RIGHT)]
+                                            ->m_artifactExtra[artifactSlot_2]
                                     );
                                     Reset();
                                 } else {
@@ -512,30 +514,30 @@ i32 swapManager::Main(tag_message& message) {
                         case SWAP_CONTROL_LEFT_ARMY_FIRST + 3:
                         case SWAP_CONTROL_LEFT_ARMY_LAST:
                             if (quickView) {
-                                if (m_heroes[SWAP_SIDE_LEFT]->m_army.m_creatureTypes
+                                if (m_heroes[IDX(SWAP_SIDE_LEFT)]->m_army.m_creatureTypes
                                         [message.payload.widget.id - SWAP_CONTROL_LEFT_ARMY_FIRST]
                                     != CREATURE_NONE) {
                                     gpGame->ViewArmy(
                                         SWAP_ARMY_VIEW_X,
                                         SWAP_ARMY_VIEW_Y,
-                                        m_heroes[SWAP_SIDE_LEFT]->m_army.m_creatureTypes
+                                        m_heroes[IDX(SWAP_SIDE_LEFT)]->m_army.m_creatureTypes
                                             [message.payload.widget.id
                                              - SWAP_CONTROL_LEFT_ARMY_FIRST],
-                                        m_heroes[SWAP_SIDE_LEFT]->m_army.m_creatureCounts
+                                        m_heroes[IDX(SWAP_SIDE_LEFT)]->m_army.m_creatureCounts
                                             [message.payload.widget.id
                                              - SWAP_CONTROL_LEFT_ARMY_FIRST],
                                         0,
                                         0,
                                         1,
                                         1,
-                                        m_heroes[SWAP_SIDE_LEFT],
+                                        m_heroes[IDX(SWAP_SIDE_LEFT)],
                                         0,
-                                        &m_heroes[SWAP_SIDE_LEFT]->m_army,
+                                        &m_heroes[IDX(SWAP_SIDE_LEFT)]->m_army,
                                         message.payload.widget.id - SWAP_CONTROL_LEFT_ARMY_FIRST
                                     );
                                 }
                             } else if (m_itemType != SWAP_ITEM_ARMY) {
-                                if (m_heroes[SWAP_SIDE_LEFT]->m_army.m_creatureTypes
+                                if (m_heroes[IDX(SWAP_SIDE_LEFT)]->m_army.m_creatureTypes
                                         [message.payload.widget.id - SWAP_CONTROL_LEFT_ARMY_FIRST]
                                     != CREATURE_NONE) {
                                     m_selectedSide = SWAP_SIDE_LEFT;
@@ -581,30 +583,30 @@ i32 swapManager::Main(tag_message& message) {
                         case SWAP_CONTROL_RIGHT_ARMY_FIRST + 3:
                         case SWAP_CONTROL_RIGHT_ARMY_LAST:
                             if (quickView) {
-                                if (m_heroes[SWAP_SIDE_RIGHT]->m_army.m_creatureTypes
+                                if (m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_army.m_creatureTypes
                                         [message.payload.widget.id - SWAP_CONTROL_RIGHT_ARMY_FIRST]
                                     != CREATURE_NONE) {
                                     gpGame->ViewArmy(
                                         SWAP_ARMY_VIEW_X,
                                         SWAP_ARMY_VIEW_Y,
-                                        m_heroes[SWAP_SIDE_RIGHT]->m_army.m_creatureTypes
+                                        m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_army.m_creatureTypes
                                             [message.payload.widget.id
                                              - SWAP_CONTROL_RIGHT_ARMY_FIRST],
-                                        m_heroes[SWAP_SIDE_RIGHT]->m_army.m_creatureCounts
+                                        m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_army.m_creatureCounts
                                             [message.payload.widget.id
                                              - SWAP_CONTROL_RIGHT_ARMY_FIRST],
                                         0,
                                         0,
                                         1,
                                         1,
-                                        m_heroes[SWAP_SIDE_RIGHT],
+                                        m_heroes[IDX(SWAP_SIDE_RIGHT)],
                                         0,
-                                        &m_heroes[SWAP_SIDE_RIGHT]->m_army,
+                                        &m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_army,
                                         message.payload.widget.id - SWAP_CONTROL_RIGHT_ARMY_FIRST
                                     );
                                 }
                             } else if (m_itemType != SWAP_ITEM_ARMY) {
-                                if (m_heroes[SWAP_SIDE_RIGHT]->m_army.m_creatureTypes
+                                if (m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_army.m_creatureTypes
                                         [message.payload.widget.id - SWAP_CONTROL_RIGHT_ARMY_FIRST]
                                     != CREATURE_NONE) {
                                     m_selectedSide = SWAP_SIDE_RIGHT;
@@ -771,16 +773,16 @@ void swapManager::Update(void) {
 
     for (slot = 0; slot < SWAP_PRIMARY_SKILL_COUNT; ++slot) {
         message_1.payload.widget.id = slot + SWAP_LEFT_PRIMARY_SKILL_FIRST;
-        sprintf(gText, "%d", m_heroes[SWAP_SIDE_LEFT]->Stats(slot));
+        sprintf(gText, "%d", m_heroes[IDX(SWAP_SIDE_LEFT)]->Stats(slot));
         m_window->BroadcastMessage(message_1);
         message_1.payload.widget.id = slot + SWAP_RIGHT_PRIMARY_SKILL_FIRST;
-        sprintf(gText, "%d", m_heroes[SWAP_SIDE_RIGHT]->Stats(slot));
+        sprintf(gText, "%d", m_heroes[IDX(SWAP_SIDE_RIGHT)]->Stats(slot));
         m_window->BroadcastMessage(message_1);
     }
 
     for (slot = 0; slot < ARMY_GROUP_SLOT_COUNT; ++slot) {
         message_1.payload.widget.id = slot + SWAP_CONTROL_LEFT_ARMY_FIRST;
-        if (m_heroes[SWAP_SIDE_LEFT]->m_army.m_creatureTypes[slot] == CREATURE_NONE) {
+        if (m_heroes[IDX(SWAP_SIDE_LEFT)]->m_army.m_creatureTypes[slot] == CREATURE_NONE) {
             message_1.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
             message_1.payload.widget.data.value = SWAP_EMPTY_ITEM_VALUE;
         } else {
@@ -789,14 +791,14 @@ void swapManager::Update(void) {
             m_window->BroadcastMessage(message_1);
             message_1.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
             message_1.payload.widget.data.value =
-                m_heroes[SWAP_SIDE_LEFT]->m_army.m_creatureTypes[slot];
+                m_heroes[IDX(SWAP_SIDE_LEFT)]->m_army.m_creatureTypes[slot];
         }
         m_window->BroadcastMessage(message_1);
     }
 
     for (slot = 0; slot < ARMY_GROUP_SLOT_COUNT; ++slot) {
         message_1.payload.widget.id = slot + SWAP_LEFT_ARMY_COUNT_FIRST;
-        if (m_heroes[SWAP_SIDE_LEFT]->m_army.m_creatureTypes[slot] == CREATURE_NONE) {
+        if (m_heroes[IDX(SWAP_SIDE_LEFT)]->m_army.m_creatureTypes[slot] == CREATURE_NONE) {
             message_1.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
             message_1.payload.widget.data.value = SWAP_EMPTY_ITEM_VALUE;
         } else {
@@ -804,7 +806,7 @@ void swapManager::Update(void) {
             message_1.payload.widget.data.value = SWAP_EMPTY_ITEM_VALUE;
             m_window->BroadcastMessage(message_1);
             message_1.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-            sprintf(gText, "%d", m_heroes[SWAP_SIDE_LEFT]->m_army.m_creatureCounts[slot]);
+            sprintf(gText, "%d", m_heroes[IDX(SWAP_SIDE_LEFT)]->m_army.m_creatureCounts[slot]);
             message_1.payload.widget.data.text = gText;
         }
         m_window->BroadcastMessage(message_1);
@@ -812,7 +814,7 @@ void swapManager::Update(void) {
 
     for (slot = 0; slot < ARMY_GROUP_SLOT_COUNT; ++slot) {
         message_1.payload.widget.id = slot + SWAP_CONTROL_RIGHT_ARMY_FIRST;
-        if (m_heroes[SWAP_SIDE_RIGHT]->m_army.m_creatureTypes[slot] == CREATURE_NONE) {
+        if (m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_army.m_creatureTypes[slot] == CREATURE_NONE) {
             message_1.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
             message_1.payload.widget.data.value = SWAP_EMPTY_ITEM_VALUE;
         } else {
@@ -821,14 +823,14 @@ void swapManager::Update(void) {
             m_window->BroadcastMessage(message_1);
             message_1.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
             message_1.payload.widget.data.value =
-                m_heroes[SWAP_SIDE_RIGHT]->m_army.m_creatureTypes[slot];
+                m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_army.m_creatureTypes[slot];
         }
         m_window->BroadcastMessage(message_1);
     }
 
     for (slot = 0; slot < ARMY_GROUP_SLOT_COUNT; ++slot) {
         message_1.payload.widget.id = slot + SWAP_RIGHT_ARMY_COUNT_FIRST;
-        if (m_heroes[SWAP_SIDE_RIGHT]->m_army.m_creatureTypes[slot] == CREATURE_NONE) {
+        if (m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_army.m_creatureTypes[slot] == CREATURE_NONE) {
             message_1.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
             message_1.payload.widget.data.value = SWAP_EMPTY_ITEM_VALUE;
         } else {
@@ -836,7 +838,7 @@ void swapManager::Update(void) {
             message_1.payload.widget.data.value = SWAP_EMPTY_ITEM_VALUE;
             m_window->BroadcastMessage(message_1);
             message_1.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-            sprintf(gText, "%d", m_heroes[SWAP_SIDE_RIGHT]->m_army.m_creatureCounts[slot]);
+            sprintf(gText, "%d", m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_army.m_creatureCounts[slot]);
             message_1.payload.widget.data.text = gText;
         }
         m_window->BroadcastMessage(message_1);
@@ -844,7 +846,7 @@ void swapManager::Update(void) {
 
     for (slot = 0; slot < HERO_ARTIFACT_SLOT_COUNT; ++slot) {
         message_1.payload.widget.id = slot + SWAP_CONTROL_LEFT_ARTIFACT_FIRST;
-        if (m_heroes[SWAP_SIDE_LEFT]->m_artifacts[slot] == ARTIFACT_NONE) {
+        if (m_heroes[IDX(SWAP_SIDE_LEFT)]->m_artifacts[slot] == ARTIFACT_NONE) {
             message_1.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
             message_1.payload.widget.data.value = SWAP_EMPTY_ITEM_VALUE;
         } else {
@@ -852,14 +854,14 @@ void swapManager::Update(void) {
             message_1.payload.widget.data.value = SWAP_EMPTY_ITEM_VALUE;
             m_window->BroadcastMessage(message_1);
             message_1.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
-            message_1.payload.widget.data.value = m_heroes[SWAP_SIDE_LEFT]->m_artifacts[slot];
+            message_1.payload.widget.data.value = m_heroes[IDX(SWAP_SIDE_LEFT)]->m_artifacts[slot];
         }
         m_window->BroadcastMessage(message_1);
     }
 
     for (slot = 0; slot < HERO_ARTIFACT_SLOT_COUNT; ++slot) {
         message_1.payload.widget.id = slot + SWAP_CONTROL_RIGHT_ARTIFACT_FIRST;
-        if (m_heroes[SWAP_SIDE_RIGHT]->m_artifacts[slot] == ARTIFACT_NONE) {
+        if (m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_artifacts[slot] == ARTIFACT_NONE) {
             message_1.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
             message_1.payload.widget.data.value = SWAP_EMPTY_ITEM_VALUE;
         } else {
@@ -867,7 +869,7 @@ void swapManager::Update(void) {
             message_1.payload.widget.data.value = SWAP_EMPTY_ITEM_VALUE;
             m_window->BroadcastMessage(message_1);
             message_1.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
-            message_1.payload.widget.data.value = m_heroes[SWAP_SIDE_RIGHT]->m_artifacts[slot];
+            message_1.payload.widget.data.value = m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_artifacts[slot];
         }
         m_window->BroadcastMessage(message_1);
     }

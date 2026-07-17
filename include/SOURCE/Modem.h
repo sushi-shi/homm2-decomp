@@ -20,7 +20,7 @@ i32 WaitForDirectConnect(void);
 char ReadPacket(void);
 void WriteModemPacket(char*, i32);
 
-typedef enum ModemConstant {
+HOMM2_ENUM_VALUES_BEGIN(ModemConstant)
     MODEM_MODE_DIAL = 3,
     MODEM_MODE_WAIT = 4,
     MODEM_WAIT_COMMAND = 5,
@@ -49,7 +49,7 @@ typedef enum ModemConstant {
     MODEM_QUEUE_OUTPUT_SIZE = 0x800,
     MODEM_ESCAPE_BYTE = 0x70,
     MODEM_PACKET_END = 1
-} ModemConstant;
+HOMM2_ENUM_VALUES_END(ModemConstant)
 
 struct inque_t {
     i32 readPosition;

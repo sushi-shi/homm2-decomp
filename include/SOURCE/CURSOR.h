@@ -6,7 +6,7 @@
 
 // Hero sprite sheet: frames 45+ hold the vertical-walk steps; 0x37-0x3a are their
 // dedicated shadow sprites (fheroes2 corroborates the 45-frame boundary).
-typedef enum CursorHeroShadowFrame {
+HOMM2_ENUM_BEGIN(CursorHeroShadowFrame)
     HERO_SPRITE_UP_STEP_1 = 0x2e,
     HERO_SPRITE_UP_STEP_2 = 0x2f,
     HERO_SPRITE_UP_STEP_3 = 0x31,
@@ -16,9 +16,9 @@ typedef enum CursorHeroShadowFrame {
     HERO_SPRITE_UP_SHADOW_STEP_5 = 0x38,
     HERO_SPRITE_UP_SHADOW_STEP_4 = 0x39,
     HERO_SPRITE_UP_SHADOW_STEP_3 = 0x3a
-} CursorHeroShadowFrame;
+HOMM2_ENUM_END(CursorHeroShadowFrame)
 
-typedef enum CursorConstant {
+HOMM2_ENUM_VALUES_BEGIN(CursorConstant)
     CURSOR_HERO_TYPE_BOAT = 6,
     CURSOR_BOAT_WAKE_TYPE = 7,
     CURSOR_DIRECTION_COUNT = 8,
@@ -77,9 +77,9 @@ typedef enum CursorConstant {
     CURSOR_REMOTE_PACKET_TYPE = 0x29,
     CURSOR_REMOTE_RELIABLE = 1,
     CURSOR_REMOTE_NO_TIMEOUT = -1
-} CursorConstant;
+HOMM2_ENUM_VALUES_END(CursorConstant)
 
-typedef enum MapChangeType {
+HOMM2_ENUM_BEGIN(MapChangeType)
     MAP_CHANGE_MOVE_HERO = 1,
     MAP_CHANGE_UNUSED = 2,
     MAP_CHANGE_RECRUIT_HERO = 3,
@@ -91,7 +91,7 @@ typedef enum MapChangeType {
     MAP_CHANGE_TELEPORT_HERO = 9,
     MAP_CHANGE_DEAD_PLAYER = 10,
     MAP_CHANGE_MY_TURN = 11
-} MapChangeType;
+HOMM2_ENUM_END(MapChangeType)
 
 #pragma pack(push, 1)
 struct SMapChange {

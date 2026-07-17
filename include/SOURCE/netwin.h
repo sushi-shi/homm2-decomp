@@ -4,7 +4,7 @@
 // Declarations of the free functions DEFINED in netwin.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
 
-typedef enum NetbiosConstant {
+HOMM2_ENUM_VALUES_BEGIN(NetbiosConstant)
     NETBIOS_SESSION_COUNT = 7,
     NETBIOS_STATUS_COUNT = 10,
     NETBIOS_THREAD_EVENT_COUNT = 9,
@@ -22,9 +22,9 @@ typedef enum NetbiosConstant {
     NETBIOS_CALL_RETRY_LIMIT = 0x14,
     NETBIOS_CALL_RETRY_DELAY = 100,
     NETBIOS_RECEIVE_RETRY_DELAY = 0x32
-} NetbiosConstant;
+HOMM2_ENUM_VALUES_END(NetbiosConstant)
 
-typedef enum NetbiosCommand {
+HOMM2_ENUM_BEGIN(NetbiosCommand)
     NETBIOS_COMMAND_CALL = 0x10,
     NETBIOS_COMMAND_LISTEN = 0x11,
     NETBIOS_COMMAND_HANGUP = 0x12,
@@ -39,9 +39,9 @@ typedef enum NetbiosCommand {
     NETBIOS_COMMAND_CANCEL = 0x35,
     NETBIOS_COMMAND_PROBE = 0x7f,
     NETBIOS_COMMAND_ASYNC = 0x80
-} NetbiosCommand;
+HOMM2_ENUM_END(NetbiosCommand)
 
-typedef enum NetbiosResult {
+HOMM2_ENUM_BEGIN(NetbiosResult)
     NETBIOS_RESULT_SUCCESS = 0,
     NETBIOS_RESULT_ILLEGAL_COMMAND = 3,
     NETBIOS_RESULT_SESSION_OUT_OF_RANGE = 8,
@@ -56,9 +56,9 @@ typedef enum NetbiosResult {
     NETBIOS_RESULT_DUPLICATE_ENVIRONMENT = 0x30,
     NETBIOS_RESULT_ENVIRONMENT_UNDEFINED = 0x34,
     NETBIOS_RESULT_PENDING = 0xFF
-} NetbiosResult;
+HOMM2_ENUM_END(NetbiosResult)
 
-typedef enum NetbiosSessionOperation {
+HOMM2_ENUM_BEGIN(NetbiosSessionOperation)
     NETBIOS_SESSION_REGISTER = 0,
     NETBIOS_SESSION_RECEIVE_ANY = 1,
     NETBIOS_SESSION_CALL = 2,
@@ -68,14 +68,14 @@ typedef enum NetbiosSessionOperation {
     NETBIOS_SESSION_CLOSE = 6,
     NETBIOS_SESSION_CLEAR_CONNECTED = 7,
     NETBIOS_SESSION_GET_NAME = 9
-} NetbiosSessionOperation;
+HOMM2_ENUM_END(NetbiosSessionOperation)
 
-typedef enum NetbiosSessionStatus {
+HOMM2_ENUM_BEGIN(NetbiosSessionStatus)
     NETBIOS_SESSION_ACTIVE = 1,
     NETBIOS_SESSION_NAME_REGISTERED = 2,
     NETBIOS_SESSION_CONNECTED = 8,
     NETBIOS_SESSION_ERROR = 0x80
-} NetbiosSessionStatus;
+HOMM2_ENUM_END(NetbiosSessionStatus)
 
 #pragma pack(push, 1)
 struct NetbiosControlBlock;

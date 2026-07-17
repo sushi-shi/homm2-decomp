@@ -76,11 +76,11 @@ void DoBlur(
     do {
         componentOffset += sizeof(i32);
         paletteColor += BLUR_PALETTE_CHANNEL_COUNT;
-        BLUR_COMPONENT(components[BLUR_RED_CHANNEL], componentOffset - sizeof(i32)) =
+        BLUR_COMPONENT(components[IDX(BLUR_RED_CHANNEL)], componentOffset - sizeof(i32)) =
             static_cast<u8>(paletteColor[-3]);
-        BLUR_COMPONENT(components[BLUR_GREEN_CHANNEL], componentOffset - sizeof(i32)) =
+        BLUR_COMPONENT(components[IDX(BLUR_GREEN_CHANNEL)], componentOffset - sizeof(i32)) =
             static_cast<u8>(paletteColor[-2]);
-        BLUR_COMPONENT(components[BLUR_BLUE_CHANNEL], componentOffset - sizeof(i32)) =
+        BLUR_COMPONENT(components[IDX(BLUR_BLUE_CHANNEL)], componentOffset - sizeof(i32)) =
             static_cast<u8>(paletteColor[-1]);
     } while (componentOffset < BLUR_COMPONENT_TABLE_BYTE_COUNT);
 
@@ -134,56 +134,56 @@ void DoBlur(
                 sample15 = static_cast<u32>(input[BLUR_SCREEN_WIDTH * BLUR_BORDER_RADIUS])
                            << BLUR_COMPONENT_INDEX_SHIFT;
 
-                i32 redSum = BLUR_COMPONENT(components[BLUR_RED_CHANNEL], samples[1])
-                             + BLUR_COMPONENT(components[BLUR_RED_CHANNEL], samples[0]);
-                redSum += BLUR_COMPONENT(components[BLUR_RED_CHANNEL], samples[2]);
-                redSum += BLUR_COMPONENT(components[BLUR_RED_CHANNEL], samples[3]);
-                redSum += BLUR_COMPONENT(components[BLUR_RED_CHANNEL], samples[4]);
-                redSum += BLUR_COMPONENT(components[BLUR_RED_CHANNEL], samples[5]);
-                redSum += BLUR_COMPONENT(components[BLUR_RED_CHANNEL], samples[6]);
-                redSum += BLUR_COMPONENT(components[BLUR_RED_CHANNEL], samples[7]);
-                redSum += BLUR_COMPONENT(components[BLUR_RED_CHANNEL], samples[8]);
-                redSum += BLUR_COMPONENT(components[BLUR_RED_CHANNEL], samples[9]);
-                redSum += BLUR_COMPONENT(components[BLUR_RED_CHANNEL], samples[10]);
-                redSum += BLUR_COMPONENT(components[BLUR_RED_CHANNEL], samples[11]);
-                redSum += BLUR_COMPONENT(components[BLUR_RED_CHANNEL], samples[12]);
-                redSum += BLUR_COMPONENT(components[BLUR_RED_CHANNEL], sample13);
-                redSum += BLUR_COMPONENT(components[BLUR_RED_CHANNEL], sample14);
-                redSum += BLUR_COMPONENT(components[BLUR_RED_CHANNEL], sample15);
+                i32 redSum = BLUR_COMPONENT(components[IDX(BLUR_RED_CHANNEL)], samples[1])
+                             + BLUR_COMPONENT(components[IDX(BLUR_RED_CHANNEL)], samples[0]);
+                redSum += BLUR_COMPONENT(components[IDX(BLUR_RED_CHANNEL)], samples[2]);
+                redSum += BLUR_COMPONENT(components[IDX(BLUR_RED_CHANNEL)], samples[3]);
+                redSum += BLUR_COMPONENT(components[IDX(BLUR_RED_CHANNEL)], samples[4]);
+                redSum += BLUR_COMPONENT(components[IDX(BLUR_RED_CHANNEL)], samples[5]);
+                redSum += BLUR_COMPONENT(components[IDX(BLUR_RED_CHANNEL)], samples[6]);
+                redSum += BLUR_COMPONENT(components[IDX(BLUR_RED_CHANNEL)], samples[7]);
+                redSum += BLUR_COMPONENT(components[IDX(BLUR_RED_CHANNEL)], samples[8]);
+                redSum += BLUR_COMPONENT(components[IDX(BLUR_RED_CHANNEL)], samples[9]);
+                redSum += BLUR_COMPONENT(components[IDX(BLUR_RED_CHANNEL)], samples[10]);
+                redSum += BLUR_COMPONENT(components[IDX(BLUR_RED_CHANNEL)], samples[11]);
+                redSum += BLUR_COMPONENT(components[IDX(BLUR_RED_CHANNEL)], samples[12]);
+                redSum += BLUR_COMPONENT(components[IDX(BLUR_RED_CHANNEL)], sample13);
+                redSum += BLUR_COMPONENT(components[IDX(BLUR_RED_CHANNEL)], sample14);
+                redSum += BLUR_COMPONENT(components[IDX(BLUR_RED_CHANNEL)], sample15);
 
-                i32 greenSum = BLUR_COMPONENT(components[BLUR_GREEN_CHANNEL], samples[0])
-                               + BLUR_COMPONENT(components[BLUR_GREEN_CHANNEL], sample15);
-                greenSum += BLUR_COMPONENT(components[BLUR_GREEN_CHANNEL], sample14);
-                greenSum += BLUR_COMPONENT(components[BLUR_GREEN_CHANNEL], samples[2]);
-                greenSum += BLUR_COMPONENT(components[BLUR_GREEN_CHANNEL], samples[3]);
-                greenSum += BLUR_COMPONENT(components[BLUR_GREEN_CHANNEL], samples[4]);
-                greenSum += BLUR_COMPONENT(components[BLUR_GREEN_CHANNEL], samples[5]);
-                greenSum += BLUR_COMPONENT(components[BLUR_GREEN_CHANNEL], samples[6]);
-                greenSum += BLUR_COMPONENT(components[BLUR_GREEN_CHANNEL], samples[7]);
-                greenSum += BLUR_COMPONENT(components[BLUR_GREEN_CHANNEL], samples[8]);
-                greenSum += BLUR_COMPONENT(components[BLUR_GREEN_CHANNEL], samples[9]);
-                greenSum += BLUR_COMPONENT(components[BLUR_GREEN_CHANNEL], samples[10]);
-                greenSum += BLUR_COMPONENT(components[BLUR_GREEN_CHANNEL], samples[11]);
-                greenSum += BLUR_COMPONENT(components[BLUR_GREEN_CHANNEL], samples[12]);
-                greenSum += BLUR_COMPONENT(components[BLUR_GREEN_CHANNEL], sample13);
-                greenSum += BLUR_COMPONENT(components[BLUR_GREEN_CHANNEL], samples[1]);
+                i32 greenSum = BLUR_COMPONENT(components[IDX(BLUR_GREEN_CHANNEL)], samples[0])
+                               + BLUR_COMPONENT(components[IDX(BLUR_GREEN_CHANNEL)], sample15);
+                greenSum += BLUR_COMPONENT(components[IDX(BLUR_GREEN_CHANNEL)], sample14);
+                greenSum += BLUR_COMPONENT(components[IDX(BLUR_GREEN_CHANNEL)], samples[2]);
+                greenSum += BLUR_COMPONENT(components[IDX(BLUR_GREEN_CHANNEL)], samples[3]);
+                greenSum += BLUR_COMPONENT(components[IDX(BLUR_GREEN_CHANNEL)], samples[4]);
+                greenSum += BLUR_COMPONENT(components[IDX(BLUR_GREEN_CHANNEL)], samples[5]);
+                greenSum += BLUR_COMPONENT(components[IDX(BLUR_GREEN_CHANNEL)], samples[6]);
+                greenSum += BLUR_COMPONENT(components[IDX(BLUR_GREEN_CHANNEL)], samples[7]);
+                greenSum += BLUR_COMPONENT(components[IDX(BLUR_GREEN_CHANNEL)], samples[8]);
+                greenSum += BLUR_COMPONENT(components[IDX(BLUR_GREEN_CHANNEL)], samples[9]);
+                greenSum += BLUR_COMPONENT(components[IDX(BLUR_GREEN_CHANNEL)], samples[10]);
+                greenSum += BLUR_COMPONENT(components[IDX(BLUR_GREEN_CHANNEL)], samples[11]);
+                greenSum += BLUR_COMPONENT(components[IDX(BLUR_GREEN_CHANNEL)], samples[12]);
+                greenSum += BLUR_COMPONENT(components[IDX(BLUR_GREEN_CHANNEL)], sample13);
+                greenSum += BLUR_COMPONENT(components[IDX(BLUR_GREEN_CHANNEL)], samples[1]);
 
-                i32 blueSum = BLUR_COMPONENT(components[BLUR_BLUE_CHANNEL], samples[0])
-                              + BLUR_COMPONENT(components[BLUR_BLUE_CHANNEL], sample14);
-                blueSum += BLUR_COMPONENT(components[BLUR_BLUE_CHANNEL], sample15);
-                blueSum += BLUR_COMPONENT(components[BLUR_BLUE_CHANNEL], samples[1]);
-                blueSum += BLUR_COMPONENT(components[BLUR_BLUE_CHANNEL], samples[2]);
-                blueSum += BLUR_COMPONENT(components[BLUR_BLUE_CHANNEL], samples[3]);
-                blueSum += BLUR_COMPONENT(components[BLUR_BLUE_CHANNEL], samples[4]);
-                blueSum += BLUR_COMPONENT(components[BLUR_BLUE_CHANNEL], samples[5]);
-                blueSum += BLUR_COMPONENT(components[BLUR_BLUE_CHANNEL], samples[6]);
-                blueSum += BLUR_COMPONENT(components[BLUR_BLUE_CHANNEL], samples[7]);
-                blueSum += BLUR_COMPONENT(components[BLUR_BLUE_CHANNEL], samples[8]);
-                blueSum += BLUR_COMPONENT(components[BLUR_BLUE_CHANNEL], samples[9]);
-                blueSum += BLUR_COMPONENT(components[BLUR_BLUE_CHANNEL], samples[10]);
-                blueSum += BLUR_COMPONENT(components[BLUR_BLUE_CHANNEL], samples[11]);
-                blueSum += BLUR_COMPONENT(components[BLUR_BLUE_CHANNEL], samples[12]);
-                blueSum += BLUR_COMPONENT(components[BLUR_BLUE_CHANNEL], sample13);
+                i32 blueSum = BLUR_COMPONENT(components[IDX(BLUR_BLUE_CHANNEL)], samples[0])
+                              + BLUR_COMPONENT(components[IDX(BLUR_BLUE_CHANNEL)], sample14);
+                blueSum += BLUR_COMPONENT(components[IDX(BLUR_BLUE_CHANNEL)], sample15);
+                blueSum += BLUR_COMPONENT(components[IDX(BLUR_BLUE_CHANNEL)], samples[1]);
+                blueSum += BLUR_COMPONENT(components[IDX(BLUR_BLUE_CHANNEL)], samples[2]);
+                blueSum += BLUR_COMPONENT(components[IDX(BLUR_BLUE_CHANNEL)], samples[3]);
+                blueSum += BLUR_COMPONENT(components[IDX(BLUR_BLUE_CHANNEL)], samples[4]);
+                blueSum += BLUR_COMPONENT(components[IDX(BLUR_BLUE_CHANNEL)], samples[5]);
+                blueSum += BLUR_COMPONENT(components[IDX(BLUR_BLUE_CHANNEL)], samples[6]);
+                blueSum += BLUR_COMPONENT(components[IDX(BLUR_BLUE_CHANNEL)], samples[7]);
+                blueSum += BLUR_COMPONENT(components[IDX(BLUR_BLUE_CHANNEL)], samples[8]);
+                blueSum += BLUR_COMPONENT(components[IDX(BLUR_BLUE_CHANNEL)], samples[9]);
+                blueSum += BLUR_COMPONENT(components[IDX(BLUR_BLUE_CHANNEL)], samples[10]);
+                blueSum += BLUR_COMPONENT(components[IDX(BLUR_BLUE_CHANNEL)], samples[11]);
+                blueSum += BLUR_COMPONENT(components[IDX(BLUR_BLUE_CHANNEL)], samples[12]);
+                blueSum += BLUR_COMPONENT(components[IDX(BLUR_BLUE_CHANNEL)], sample13);
                 *output++ = lookup[redSum & ~BLUR_QUANTIZATION_MASK]
                                   [(greenSum & ~BLUR_QUANTIZATION_MASK)
                                    + (blueSum >> BLUR_QUANTIZATION_SHIFT)];
@@ -206,26 +206,29 @@ void DoBlur(
     i32 remainingColors = BLUR_PALETTE_COLOR_COUNT;
     i8* newColor = newPalette;
     do {
-        newColor[BLUR_RED_CHANNEL] = oldColor[BLUR_RED_CHANNEL] + static_cast<i8>(redAdjust);
-        newColor[BLUR_GREEN_CHANNEL] = oldColor[BLUR_GREEN_CHANNEL] + static_cast<i8>(greenAdjust);
-        newColor[BLUR_BLUE_CHANNEL] = oldColor[BLUR_BLUE_CHANNEL] + static_cast<i8>(blueAdjust);
-        if (newColor[BLUR_RED_CHANNEL] > BLUR_PALETTE_COMPONENT_MAXIMUM) {
-            newColor[BLUR_RED_CHANNEL] = BLUR_PALETTE_COMPONENT_MAXIMUM;
+        newColor[IDX(BLUR_RED_CHANNEL)] =
+            oldColor[IDX(BLUR_RED_CHANNEL)] + static_cast<i8>(redAdjust);
+        newColor[IDX(BLUR_GREEN_CHANNEL)] =
+            oldColor[IDX(BLUR_GREEN_CHANNEL)] + static_cast<i8>(greenAdjust);
+        newColor[IDX(BLUR_BLUE_CHANNEL)] =
+            oldColor[IDX(BLUR_BLUE_CHANNEL)] + static_cast<i8>(blueAdjust);
+        if (newColor[IDX(BLUR_RED_CHANNEL)] > BLUR_PALETTE_COMPONENT_MAXIMUM) {
+            newColor[IDX(BLUR_RED_CHANNEL)] = BLUR_PALETTE_COMPONENT_MAXIMUM;
         }
-        if (newColor[BLUR_RED_CHANNEL] < 0) {
-            newColor[BLUR_RED_CHANNEL] = 0;
+        if (newColor[IDX(BLUR_RED_CHANNEL)] < 0) {
+            newColor[IDX(BLUR_RED_CHANNEL)] = 0;
         }
-        if (newColor[BLUR_GREEN_CHANNEL] > BLUR_PALETTE_COMPONENT_MAXIMUM) {
-            newColor[BLUR_GREEN_CHANNEL] = BLUR_PALETTE_COMPONENT_MAXIMUM;
+        if (newColor[IDX(BLUR_GREEN_CHANNEL)] > BLUR_PALETTE_COMPONENT_MAXIMUM) {
+            newColor[IDX(BLUR_GREEN_CHANNEL)] = BLUR_PALETTE_COMPONENT_MAXIMUM;
         }
-        if (newColor[BLUR_GREEN_CHANNEL] < 0) {
-            newColor[BLUR_GREEN_CHANNEL] = 0;
+        if (newColor[IDX(BLUR_GREEN_CHANNEL)] < 0) {
+            newColor[IDX(BLUR_GREEN_CHANNEL)] = 0;
         }
-        if (newColor[BLUR_BLUE_CHANNEL] > BLUR_PALETTE_COMPONENT_MAXIMUM) {
-            newColor[BLUR_BLUE_CHANNEL] = BLUR_PALETTE_COMPONENT_MAXIMUM;
+        if (newColor[IDX(BLUR_BLUE_CHANNEL)] > BLUR_PALETTE_COMPONENT_MAXIMUM) {
+            newColor[IDX(BLUR_BLUE_CHANNEL)] = BLUR_PALETTE_COMPONENT_MAXIMUM;
         }
-        if (newColor[BLUR_BLUE_CHANNEL] < 0) {
-            newColor[BLUR_BLUE_CHANNEL] = 0;
+        if (newColor[IDX(BLUR_BLUE_CHANNEL)] < 0) {
+            newColor[IDX(BLUR_BLUE_CHANNEL)] = 0;
         }
         oldColor += BLUR_PALETTE_CHANNEL_COUNT;
         newColor += BLUR_PALETTE_CHANNEL_COUNT;

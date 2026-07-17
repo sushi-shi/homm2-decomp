@@ -2,7 +2,7 @@
 #define HOMM2_BASE_MISC_CONSTANTS_H
 
 // Serialized PCX values emitted by CreatePCXFile.
-typedef enum PCXConstant {
+HOMM2_ENUM_VALUES_BEGIN(PCXConstant)
     PCX_MANUFACTURER_ZSOFT = 10,
     PCX_VERSION_3_0 = 5,
     PCX_ENCODING_RLE = 1,
@@ -14,6 +14,6 @@ typedef enum PCXConstant {
     PCX_VGA_PALETTE_MARKER = 0x0c,
     PCX_PALETTE_BYTE_COUNT = 0x300,
     PCX_COMPONENT_SCALE_SHIFT = 2
-} PCXConstant;
+HOMM2_ENUM_VALUES_END(PCXConstant)
 
 #endif // HOMM2_BASE_MISC_CONSTANTS_H

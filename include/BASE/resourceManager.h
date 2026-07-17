@@ -23,7 +23,7 @@ struct aggEntry {     // one .agg directory record (0xc bytes)
     u32l size;
 };
 
-typedef enum ResourceManagerConstant {
+HOMM2_ENUM_VALUES_BEGIN(ResourceManagerConstant)
     RESOURCE_MANAGER_INVALID_FILE = -1,
     RESOURCE_MANAGER_SUCCESS = 0,
     RESOURCE_MANAGER_ERROR = 3,
@@ -34,7 +34,7 @@ typedef enum ResourceManagerConstant {
     RESOURCE_MANAGER_MESSAGE_MASK = 0x80,
     RESOURCE_MANAGER_BACKDROP_ROW_BYTES = 640,
     RESOURCE_MANAGER_BINARY_OPEN_MODE = 0x8000
-} ResourceManagerConstant;
+HOMM2_ENUM_VALUES_END(ResourceManagerConstant)
 
 class resourceManager : public baseManager {
 public:

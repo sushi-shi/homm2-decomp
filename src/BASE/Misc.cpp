@@ -218,12 +218,12 @@ DATA(0x0051dd10) static SMiscText gMiscText = {
 // includes four unowned tail bytes. Keep the DATA-proved owners and leave that as a
 // final-link packing residual rather than adding aliases, padding, or placement rules.
 
-typedef enum StatusBarLayout {
+HOMM2_ENUM_VALUES_BEGIN(StatusBarLayout)
     STATUS_BAR_Y = 460,
     STATUS_BAR_HEIGHT = 20,
     STATUS_TEXT_Y = 464,
     STATUS_TEXT_HEIGHT = 16
-} StatusBarLayout;
+HOMM2_ENUM_VALUES_END(StatusBarLayout)
 
 VA(0x004c3d10, 0x58)
 void InitMemEntry(void) {
@@ -726,17 +726,18 @@ void SetGameDefaults(void) {
     gConfig.autosave = 1;
     gConfig.showRoute = 1;
     do {
-        fullScreen[MISC_GRAPHICS_SHOW_MENU_FROM_FULLSCREEN] = 1;
-        fullScreen[MISC_GRAPHICS_X_FROM_FULLSCREEN] = MISC_DEFAULT_WINDOW_ORIGIN;
-        fullScreen[MISC_GRAPHICS_Y_FROM_FULLSCREEN] = MISC_DEFAULT_WINDOW_ORIGIN;
-        fullScreen[MISC_GRAPHICS_COLOR_MOUSE_FROM_FULLSCREEN] = 0;
-        fullScreen[MISC_GRAPHICS_FULLSCREEN] = 1;
+        fullScreen[IDX(MISC_GRAPHICS_SHOW_MENU_FROM_FULLSCREEN)] = 1;
+        fullScreen[IDX(MISC_GRAPHICS_X_FROM_FULLSCREEN)] = MISC_DEFAULT_WINDOW_ORIGIN;
+        fullScreen[IDX(MISC_GRAPHICS_Y_FROM_FULLSCREEN)] = MISC_DEFAULT_WINDOW_ORIGIN;
+        fullScreen[IDX(MISC_GRAPHICS_COLOR_MOUSE_FROM_FULLSCREEN)] = 0;
+        fullScreen[IDX(MISC_GRAPHICS_FULLSCREEN)] = 1;
         if (giMainVideoModeWidth <= MISC_DEFAULT_WINDOW_WIDTH) {
-            fullScreen[MISC_GRAPHICS_WIDTH_FROM_FULLSCREEN] = MISC_DEFAULT_SMALL_WINDOW_WIDTH;
-            fullScreen[MISC_GRAPHICS_HEIGHT_FROM_FULLSCREEN] = MISC_DEFAULT_SMALL_WINDOW_HEIGHT;
+            fullScreen[IDX(MISC_GRAPHICS_WIDTH_FROM_FULLSCREEN)] = MISC_DEFAULT_SMALL_WINDOW_WIDTH;
+            fullScreen[IDX(MISC_GRAPHICS_HEIGHT_FROM_FULLSCREEN)] =
+                MISC_DEFAULT_SMALL_WINDOW_HEIGHT;
         } else {
-            fullScreen[MISC_GRAPHICS_WIDTH_FROM_FULLSCREEN] = MISC_DEFAULT_WINDOW_WIDTH;
-            fullScreen[MISC_GRAPHICS_HEIGHT_FROM_FULLSCREEN] = MISC_DEFAULT_WINDOW_HEIGHT;
+            fullScreen[IDX(MISC_GRAPHICS_WIDTH_FROM_FULLSCREEN)] = MISC_DEFAULT_WINDOW_WIDTH;
+            fullScreen[IDX(MISC_GRAPHICS_HEIGHT_FROM_FULLSCREEN)] = MISC_DEFAULT_WINDOW_HEIGHT;
         }
         fullScreen += CONFIG_GRAPHICS_SIZE / sizeof(*fullScreen);
     } while (fullScreen < &gConfig.showCombatGrid);
@@ -811,11 +812,11 @@ skipDefaults:
 // retail literals, NOT sizeof the gConfig fields: modemInitString is char[0x64]
 // but retail moves 0x62 bytes, and networkDefaultName is char[0x18] but retail
 // moves 0x1e — six bytes past the field, faithfully reproduced.
-typedef enum RegistryValueSize {
+HOMM2_ENUM_VALUES_BEGIN(RegistryValueSize)
     MODEM_INIT_STRING_SIZE = 0x62,
     UNIQUE_SYSTEM_ID_SIZE = 4,
     NETWORK_DEFAULT_NAME_SIZE = 0x1e
-} RegistryValueSize;
+HOMM2_ENUM_VALUES_END(RegistryValueSize)
 
 VA(0x004c4ca0, 0x7ab)
 void ReadPrefsFromRegistry(void) {
@@ -920,7 +921,7 @@ void ReadPrefsFromRegistry(void) {
         gMiscText.readRegistry.directComPort.text,
         0,
         &dwType,
-        reinterpret_cast<u8*>(&gConfig.comPort[CONFIG_CONNECTION_DIRECT]),
+        reinterpret_cast<u8*>(&gConfig.comPort[IDX(CONFIG_CONNECTION_DIRECT)]),
         &dwSize
     );
     RegQueryValueExA(
@@ -928,7 +929,7 @@ void ReadPrefsFromRegistry(void) {
         gMiscText.readRegistry.directBaudRate.text,
         0,
         &dwType,
-        reinterpret_cast<u8*>(&gConfig.baudRate[CONFIG_CONNECTION_DIRECT]),
+        reinterpret_cast<u8*>(&gConfig.baudRate[IDX(CONFIG_CONNECTION_DIRECT)]),
         &dwSize
     );
     RegQueryValueExA(
@@ -936,7 +937,7 @@ void ReadPrefsFromRegistry(void) {
         gMiscText.readRegistry.modemComPort.text,
         0,
         &dwType,
-        reinterpret_cast<u8*>(&gConfig.comPort[CONFIG_CONNECTION_MODEM]),
+        reinterpret_cast<u8*>(&gConfig.comPort[IDX(CONFIG_CONNECTION_MODEM)]),
         &dwSize
     );
     RegQueryValueExA(
@@ -944,7 +945,7 @@ void ReadPrefsFromRegistry(void) {
         gMiscText.readRegistry.modemBaudRate.text,
         0,
         &dwType,
-        reinterpret_cast<u8*>(&gConfig.baudRate[CONFIG_CONNECTION_MODEM]),
+        reinterpret_cast<u8*>(&gConfig.baudRate[IDX(CONFIG_CONNECTION_MODEM)]),
         &dwSize
     );
     dwSize = MODEM_INIT_STRING_SIZE + 1;
@@ -1361,7 +1362,7 @@ void WritePrefsToRegistry(void) {
         gMiscText.writeRegistry.directComPort.text,
         0,
         REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.comPort[CONFIG_CONNECTION_DIRECT]),
+        reinterpret_cast<u8*>(&gConfig.comPort[IDX(CONFIG_CONNECTION_DIRECT)]),
         4
     );
     RegSetValueExA(
@@ -1369,7 +1370,7 @@ void WritePrefsToRegistry(void) {
         gMiscText.writeRegistry.directBaudRate.text,
         0,
         REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.baudRate[CONFIG_CONNECTION_DIRECT]),
+        reinterpret_cast<u8*>(&gConfig.baudRate[IDX(CONFIG_CONNECTION_DIRECT)]),
         4
     );
     RegSetValueExA(
@@ -1377,7 +1378,7 @@ void WritePrefsToRegistry(void) {
         gMiscText.writeRegistry.modemComPort.text,
         0,
         REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.comPort[CONFIG_CONNECTION_MODEM]),
+        reinterpret_cast<u8*>(&gConfig.comPort[IDX(CONFIG_CONNECTION_MODEM)]),
         4
     );
     RegSetValueExA(
@@ -1385,7 +1386,7 @@ void WritePrefsToRegistry(void) {
         gMiscText.writeRegistry.modemBaudRate.text,
         0,
         REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.baudRate[CONFIG_CONNECTION_MODEM]),
+        reinterpret_cast<u8*>(&gConfig.baudRate[IDX(CONFIG_CONNECTION_MODEM)]),
         4
     );
     RegSetValueExA(

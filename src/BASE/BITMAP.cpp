@@ -15,9 +15,9 @@
 // __FILE__ for the NWC memory/assert tracking (reloc-masked path string).
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\BITMAP.CPP"
 
-typedef enum BitmapConstant {
+HOMM2_ENUM_VALUES_BEGIN(BitmapConstant)
     COPY_STRIDE = 640 // full-screen row stride assumed by CopyTo's fast path
-} BitmapConstant;
+HOMM2_ENUM_VALUES_END(BitmapConstant)
 
 VA(0x004cffc0, 0x2a)
 bitmap::bitmap(void) : resource(0, 0, -1, 0) {

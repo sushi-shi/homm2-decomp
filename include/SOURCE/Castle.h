@@ -8,12 +8,12 @@
 class heroWindow;
 struct tag_message;
 
-typedef enum CastleBuildingConstant {
+HOMM2_ENUM_VALUES_BEGIN(CastleBuildingConstant)
     CASTLE_SLOT_COUNT = 18,
     CASTLE_UPGRADE_OFFSET = 5
-} CastleBuildingConstant;
+HOMM2_ENUM_VALUES_END(CastleBuildingConstant)
 
-typedef enum CastleControl {
+HOMM2_ENUM_BEGIN(CastleControl)
     CASTLE_CONTROL_BUILDING_OVERLAY_FIRST = 400,
     CASTLE_CONTROL_STATUS_FIRST = 500,
     CASTLE_CONTROL_BUILDING_NAME_FIRST = 600,
@@ -33,25 +33,25 @@ typedef enum CastleControl {
     CASTLE_CONTROL_CAPTAIN_FORMATION_GROUPED = 216,
     CASTLE_CONTROL_STATUS_TEXT = 502,
     CASTLE_CONTROL_CLOSE = 0x7800
-} CastleControl;
+HOMM2_ENUM_END(CastleControl)
 
-typedef enum CastleWidgetCommand {
+HOMM2_ENUM_BEGIN(CastleWidgetCommand)
     CASTLE_WIDGET_TEXT = 3,
     CASTLE_WIDGET_FRAME = 4,
     CASTLE_WIDGET_ENABLE = 5,
     CASTLE_WIDGET_DISABLE = 6,
     CASTLE_WIDGET_ICON_FILE = 9
-} CastleWidgetCommand;
+HOMM2_ENUM_END(CastleWidgetCommand)
 
-typedef enum CastleWidgetFrame {
+HOMM2_ENUM_BEGIN(CastleWidgetFrame)
     CASTLE_FRAME_AVAILABLE = 1,
     CASTLE_FRAME_UNAVAILABLE = 2,
     CASTLE_FRAME_BUILT = 11,
     CASTLE_FRAME_CANNOT_BUILD = 12,
     CASTLE_FRAME_CANNOT_AFFORD = 13
-} CastleWidgetFrame;
+HOMM2_ENUM_END(CastleWidgetFrame)
 
-typedef enum CastleInfoText {
+HOMM2_ENUM_BEGIN(CastleInfoText)
     CASTLE_INFO_ALREADY_BUILT = 4,
     CASTLE_INFO_CANNOT_BUILD = 5,
     CASTLE_INFO_CANNOT_AFFORD = 6,
@@ -64,9 +64,9 @@ typedef enum CastleInfoText {
     CASTLE_INFO_OPTIONS = 13,
     CASTLE_INFO_GROUPED_FORMATION = 14,
     CASTLE_INFO_SPREAD_FORMATION = 15
-} CastleInfoText;
+HOMM2_ENUM_END(CastleInfoText)
 
-typedef enum CastleConstant {
+HOMM2_ENUM_VALUES_BEGIN(CastleConstant)
     CASTLE_QUICK_VIEW_MODIFIER = 2,
     CASTLE_EXIT_COMMAND = 10,
     CASTLE_MAGE_GUILD = 0,
@@ -84,7 +84,7 @@ typedef enum CastleConstant {
     CASTLE_TERRAIN_ICON_COLUMNS = 5,
     CASTLE_TERRAIN_ICON_FRAMES = 2,
     CASTLE_RACE_ICON_FRAMES = 32
-} CastleConstant;
+HOMM2_ENUM_VALUES_END(CastleConstant)
 
 i32 CastleHandler(struct tag_message&);
 

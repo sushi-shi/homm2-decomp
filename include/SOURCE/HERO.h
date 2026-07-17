@@ -7,7 +7,7 @@
 // forward declarations (was <_all.h>):
 struct tag_message;
 
-typedef enum HeroUiConstant {
+HOMM2_ENUM_VALUES_BEGIN(HeroUiConstant)
     HERO_UI_HOVER = 4,
     HERO_UI_MESSAGE = 0x200,
     HERO_UI_INPUT_SELECT = 12,
@@ -104,9 +104,9 @@ typedef enum HeroUiConstant {
     HERO_UI_EMPTY_SKILL_FRAME = 0,
     HERO_UI_EMPTY_ARTIFACT_FRAME = 0,
     HERO_UI_ARTIFACT_CONTROL_VALUE = 2
-} HeroUiConstant;
+HOMM2_ENUM_VALUES_END(HeroUiConstant)
 
-typedef enum HeroScreenText {
+HOMM2_ENUM_BEGIN(HeroScreenText)
     HERO_TEXT_PRIMARY_STAT = 1,
     HERO_TEXT_ADDITIONAL_STATS = 2,
     HERO_TEXT_GOOD_MORALE = 3,
@@ -131,7 +131,7 @@ typedef enum HeroScreenText {
     HERO_TEXT_SPELL_POINTS = 22,
     HERO_TEXT_SPREAD_FORMATION = 23,
     HERO_TEXT_GROUPED_FORMATION = 24
-} HeroScreenText;
+HOMM2_ENUM_END(HeroScreenText)
 
 void HeroMessageUpdate(char*);
 void UpdateHeroScreenStatusBar(struct tag_message&);
