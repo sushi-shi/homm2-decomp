@@ -131,12 +131,12 @@ i32 hero::CalcMobility(void) {
 }
 
 VA(0x0046c79d, 0xcf)
-i32 hero::HasSpell(i32 spell) {
+i32 hero::HasSpell(SpellType spell) {
     i32 artifactIndex;
 
     if (!HasArtifact(ARTIFACT_MAGIC_BOOK))
         return 0;
-    if (m_spells[spell])
+    if (m_spells[IDX(spell)])
         return 1;
     for (artifactIndex = 0; artifactIndex < HERO_ARTIFACT_SLOT_COUNT; artifactIndex++) {
         if (m_artifacts[artifactIndex] == IDX(ARTIFACT_SPELL_SCROLL)
