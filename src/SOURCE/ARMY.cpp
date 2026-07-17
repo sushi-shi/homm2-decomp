@@ -1686,6 +1686,10 @@ int army::AttackTo(void)
     return AttackTo(m_moveTargetHex);
 }
 
+// @semantic: Complete 0x10 frame, CFG, and ordered relocations. The only raw
+// residual is +0x5e..+0x63: retail evaluates m_moveTargetHex then m_hex, while
+// MSVC evaluates the commutative equality in the opposite order. Both source
+// operand orders and the value-preserving |0 spelling emitted the same pair.
 VA(0x0044f756, 0x1e8)
 int army::AttackTo(int destination)
 {
@@ -1929,6 +1933,10 @@ void army::DamageEnemy(army *target, int *damageResult, int *killedResult,
     *killedResult = target->Damage(damageDone2, -1);
 }
 
+// @semantic: Complete behavior, 0x10 frame, CFG, and ordered relocations. The
+// first residual is +0x1ca: retail evaluates current side before army index in
+// the m_armies address, while the candidate evaluates the equivalent two
+// subscripts in reverse order. Direct and commuted subscript forms were checked.
 VA(0x0045012e, 0x23c)
 int army::Damage(long damage, int spell)
 {

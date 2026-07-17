@@ -88,6 +88,10 @@ int army::GetMoveMask(int sourceHex)
     return blockedMaskValue | COMBAT_PATH_SPECIAL_DIRECTION_MASK;
 }
 
+// @semantic: Complete 0x18 frame, loop/CFG, and ordered relocations. At +0x68
+// retail loads directionResult and compares it against directionCountNext;
+// candidate loads the bound and uses the equivalent reversed relation. Both
+// relational orders, 0[&directionResult], and directionResult|0 were unchanged.
 VA(0x004bde41, 0xb5)
 int army::GetAttackMask(int sourceHex, int targetMode, int targetHex)
 {

@@ -46,7 +46,7 @@ DATA(0x0052a254) static int s_hasTarget;
 DATA(0x0052a258) static signed char s_directionCosts[SEARCH_DIRECTION_COUNT];
 DATA(0x0052a260) static hero *s_currentHero;
 
-// @match-note
+// @semantic
 // /O2 structural checkpoint: complete loop/CFG and FPO saved-register set; base has
 // 0xbc meaningful bytes versus retail 0xbc plus a four-byte trailing alignment LEA.
 // First divergence is +0x0: base loads destination X into EAX before saving EBX,
@@ -86,7 +86,7 @@ int searchArray::BuildPath(int startX, int startY, int destinationX,
     return m_pathLength;
 }
 
-// @match-note
+// @semantic
 // /O2 structural checkpoint: complete semantics, 1024x9 queue layout, stack arguments,
 // call order, and bottom-tested queue CFG. The FPO prologue is exact: EBX/ESI/EDI/EBP
 // are saved, this is ESI, continueSeed is EBX, and target X is EDI. Base has 0x9ea

@@ -1010,8 +1010,7 @@ int combatManager::WalkTowardArmyFront(class army *currentArmy,
             pathIndex12--;
             movement3--;
             if (giNextActionGridIndex > 0 &&
-                reinterpret_cast<unsigned char *>(&bIsMoatSlowed)
-                    [giNextActionGridIndex] != 0)
+                bIsMoatSlowed[giNextActionGridIndex] != 0)
                 movement3 = 0;
         }
         return 1;
@@ -1019,6 +1018,10 @@ int combatManager::WalkTowardArmyFront(class army *currentArmy,
     return WalkTowardArmy(currentArmy, side, mask);
 }
 
+// @semantic: Complete 0x2c frame, slots, path/CFG behavior, and ordered external
+// relocations. The first residual at +0x34 is equivalent two-dimensional army
+// indexing: retail scales targetArmy before side, candidate scales side first.
+// Direct indexing, cached target pointer, and commuted address forms were tried.
 VA(0x004c382a, 0x244)
 int combatManager::WalkTowardArmy(class army *currentArmy, int side, int mask)
 {
@@ -1082,8 +1085,7 @@ int combatManager::WalkTowardArmy(class army *currentArmy, int side, int mask)
             pathIndex14--;
             movement27--;
             if (giNextActionGridIndex > 0 &&
-                reinterpret_cast<unsigned char *>(&bIsMoatSlowed)
-                    [giNextActionGridIndex] != 0)
+                bIsMoatSlowed[giNextActionGridIndex] != 0)
                 movement27 = 0;
         }
         return 1;

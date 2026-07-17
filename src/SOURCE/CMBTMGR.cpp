@@ -1024,6 +1024,10 @@ void combatManager::CheckApplyGoodMorale(int side, int index)
         WaitEndSample(moraleSample, -1);
 }
 
+// @semantic: Complete behavior, frame/slots, morale CFG, and ordered external
+// relocations. The first residual at +0x27 is equivalent m_armies indexing:
+// retail scales index before side while candidate scales side before index.
+// Direct indexing, cached army pointers, and commuted address forms were tried.
 VA(0x00492afa, 0x1cd)
 int combatManager::CheckApplyBadMorale(int side, int index)
 {

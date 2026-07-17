@@ -17,18 +17,18 @@
 #include <SOURCE/NOOPT.h>
 #include <SOURCE/PATH.h>
 #include <SOURCE/X_GLOBAL.h>
-// @match-note: Semantic CFG and the 0x0c frame are complete; all 14 relocations
-// agree. First residual is +0x0f..+0x11: retail stores candidateHex at [ebp-0x8],
-// ours at [ebp-0x4], with cell in the opposite slot. od_slots suffixes, declaration/
-// initialization order, cached/direct cell access, and wide-branch polarity were tried.
+// @semantic: Complete 0x0c frame, CFG, and all 14 ordered relocations. The
+// deterministic cell_9 suffix now gives retail's cell/candidateHex slots. The
+// first remaining branch span begins at +0x64 in the wide-creature path; direct
+// and cached cell access, wide-branch polarity, and both direction forms were tried.
 VA(0x004a5900, 0x295)
 int army::CanFit(int hex, int tryOtherSide, int *fittingHex)
 {
-    hexcell *cell;
+    hexcell *cell_9;
     int candidateHex;
 
     candidateHex = hex;
-    cell = 0;
+    cell_9 = 0;
     if (fittingHex) {
         *fittingHex = hex;
     }
@@ -45,13 +45,13 @@ int army::CanFit(int hex, int tryOtherSide, int *fittingHex)
             hex,
             (-(static_cast<unsigned int>(m_facing - 1) < 1) & -3) + 4);
         if (ValidHex(candidateHex)) {
-            cell = &gpCombatManager->m_hexCells[candidateHex];
+            cell_9 = &gpCombatManager->m_hexCells[candidateHex];
         }
         if (ValidHex(candidateHex) &&
-            (cell->m_occupantSide == -1 ||
-             (cell->m_occupantSide == gpCombatManager->m_currentArmySide &&
-              cell->m_occupantIndex == gpCombatManager->m_currentArmyIndex)) &&
-            !cell->m_blocked) {
+            (cell_9->m_occupantSide == -1 ||
+             (cell_9->m_occupantSide == gpCombatManager->m_currentArmySide &&
+              cell_9->m_occupantIndex == gpCombatManager->m_currentArmyIndex)) &&
+            !cell_9->m_blocked) {
             return 1;
         } else {
             if (!tryOtherSide) {
@@ -62,15 +62,15 @@ int army::CanFit(int hex, int tryOtherSide, int *fittingHex)
                 hex,
                 (-(static_cast<unsigned int>(m_facing - 1) < 1) & 3) + 1);
             if (ValidHex(candidateHex)) {
-                cell = &gpCombatManager->m_hexCells[candidateHex];
+                cell_9 = &gpCombatManager->m_hexCells[candidateHex];
             } else {
                 return 0;
             }
-            if ((cell->m_occupantSide == -1 ||
-                 (cell->m_occupantSide == gpCombatManager->m_currentArmySide &&
-                  cell->m_occupantIndex ==
+            if ((cell_9->m_occupantSide == -1 ||
+                 (cell_9->m_occupantSide == gpCombatManager->m_currentArmySide &&
+                  cell_9->m_occupantIndex ==
                       gpCombatManager->m_currentArmyIndex)) &&
-                !cell->m_blocked) {
+                !cell_9->m_blocked) {
                 if (fittingHex) {
                     *fittingHex = candidateHex;
                 }
@@ -83,7 +83,7 @@ int army::CanFit(int hex, int tryOtherSide, int *fittingHex)
     return 1;
 }
 
-// @match-note: Semantic CFG is complete and all 18 relocations agree. First
+// @semantic: Semantic CFG is complete and all 18 relocations agree. First
 // residual is +0x03..+0x05: retail frame 0x38, ours 0x30 (8 bytes short); NB09
 // has no local records for slot recovery. Local names/order/scope, attackHex forms,
 // cached/direct target access, if/ternary forms, and direction-loop polarity were tried.
@@ -201,7 +201,7 @@ int army::FlyTo(void)
     return FlyTo(m_moveTargetHex);
 }
 
-// @match-note: Semantic CFG is complete and all 119 relocations agree. First
+// @semantic: Semantic CFG is complete and all 119 relocations agree. First
 // residual is +0x03..+0x08: retail frame 0xc0, ours 0xb4 (12 bytes short); NB09
 // has no local records. Local names/order/scope, scalar/aggregate temporary forms,
 // initialization grouping, condition polarity, and for/while spellings were tried.
