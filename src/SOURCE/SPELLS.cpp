@@ -99,8 +99,8 @@ i32 combatManager::ViewSpells(i32) {
                 elementalType = CREATURE_WATER_ELEMENTAL;
                 goto check_elemental;
             check_elemental:
-                if (m_unknown351D[m_currentSide] != 0
-                    && m_unknown351D[m_currentSide] != elementalType) {
+                if (m_summonedCreatureType[m_currentSide] != 0
+                    && m_summonedCreatureType[m_currentSide] != elementalType) {
                     NormalDialog(
                         "You may only summon one type of elemental per combat.",
                         NORMAL_DIALOG_INFO,
@@ -3076,7 +3076,7 @@ void combatManager::SummonElemental(i32 monsterType, i32 spellPower) {
             == COMBAT_HEX_EMPTY)
             summonHex = summonHexes_l[m_currentSide * 3 + ((randomOffset_a | 0) + offset) % 3];
     }
-    m_unknown351D[m_currentSide] = static_cast<u8>(monsterType);
+    m_summonedCreatureType[m_currentSide] = static_cast<u8>(monsterType);
     AddArmy(
         m_currentSide,
         monsterType,

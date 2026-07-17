@@ -26,32 +26,32 @@ public:
     townObject* m_townObjects[32]; // +0x3e
     i32 m_townObjectCount;         // +0xbe
     i32 m_lastTownType;            // +0xc2
-    i32 m_unknownC6;               // +0xc6
-    heroWindow* m_townWindow;      // +0xca
-    strip* m_garrisonStrip;        // +0xce
-    strip* m_heroStrip;            // +0xd2
-    strip* m_selectedStrip;        // +0xd6
-    i32 m_selectedArmySlot;        // +0xda
-    strip* m_swapStrip;            // +0xde
-    i32 m_swapArmySlot;            // +0xe2
-    strip* m_pendingStrip;         // +0xe6
-    i32 m_pendingArmySlot;         // +0xea
-    bankBox* m_bankBox;            // +0xee
-    char m_statusText[0x50];       // +0xf2
-    i32 m_lastHoverId;             // +0x142
-    i32 m_lastHoverSubId;          // +0x146
-    i32 m_command;                 // +0x14a
-    i32 m_recruitResult;           // +0x14e
-    u32l m_affordableBuildings;    // +0x152
-    u32l m_buildableBuildings;     // +0x156
-    i32 m_castleDialogActive;      // +0x15a
-    i32 m_selectedBuilding;        // +0x15e
-    heroWindow* m_heroWindow0;     // +0x162  hero portrait window (redrawn on recruit)
-    heroWindow* m_heroWindow1;     // +0x166  hero portrait window (redrawn on recruit)
-    i32 m_splitAmount;             // +0x16a
-    i32 m_splitMaximum;            // +0x16e
-    i32 m_recruitState;            // +0x172  recruit slot / selection state
-    hero* m_recruitHero;           // +0x176
+    i32 m_unknownC6; // +0xc6 only zeroed (ctor/Open), never read; unnamed and unused in Ironfist (field_C6) too
+    heroWindow* m_townWindow;   // +0xca
+    strip* m_garrisonStrip;     // +0xce
+    strip* m_heroStrip;         // +0xd2
+    strip* m_selectedStrip;     // +0xd6
+    i32 m_selectedArmySlot;     // +0xda
+    strip* m_swapStrip;         // +0xde
+    i32 m_swapArmySlot;         // +0xe2
+    strip* m_pendingStrip;      // +0xe6
+    i32 m_pendingArmySlot;      // +0xea
+    bankBox* m_bankBox;         // +0xee
+    char m_statusText[0x50];    // +0xf2
+    i32 m_lastHoverId;          // +0x142
+    i32 m_lastHoverSubId;       // +0x146
+    i32 m_command;              // +0x14a
+    i32 m_recruitResult;        // +0x14e
+    u32l m_affordableBuildings; // +0x152
+    u32l m_buildableBuildings;  // +0x156
+    i32 m_castleDialogActive;   // +0x15a
+    i32 m_selectedBuilding;     // +0x15e
+    heroWindow* m_heroWindow0;  // +0x162  hero portrait window (redrawn on recruit)
+    heroWindow* m_heroWindow1;  // +0x166  hero portrait window (redrawn on recruit)
+    i32 m_splitAmount;          // +0x16a
+    i32 m_splitMaximum;         // +0x16e
+    i32 m_recruitState;         // +0x172  recruit slot / selection state
+    hero* m_recruitHero;        // +0x176
     // --- constructors ---
     townManager(void);
     // --- virtual methods (vtable order) ---

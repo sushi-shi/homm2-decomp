@@ -13,7 +13,7 @@
 #include <string.h>
 
 typedef enum BitmapConstant {
-    BITMAP_COPY_STRIDE = 640 // full-screen row stride assumed by CopyTo's fast path
+    COPY_STRIDE = 640 // full-screen row stride assumed by CopyTo's fast path
 } BitmapConstant;
 
 VA(0x004cffc0, 0x2a)
@@ -172,28 +172,28 @@ void bitmap::CopyTo(
     i32 height
 ) {
     PollSound();
-    if (width != BITMAP_COPY_STRIDE) {
+    if (width != COPY_STRIDE) {
         if (height > 0) {
             i32 rowCount = height;
             i32 destinationRowOffset;
             i32 sourceRowOffset;
-            sourceRowOffset = sourceY * BITMAP_COPY_STRIDE;
-            destinationRowOffset = destinationY * BITMAP_COPY_STRIDE;
+            sourceRowOffset = sourceY * COPY_STRIDE;
+            destinationRowOffset = destinationY * COPY_STRIDE;
             do {
                 memcpy(
                     destination->m_pixels + destinationRowOffset + destinationX,
                     m_pixels + sourceRowOffset + sourceX,
                     width
                 );
-                sourceRowOffset += BITMAP_COPY_STRIDE;
-                destinationRowOffset += BITMAP_COPY_STRIDE;
+                sourceRowOffset += COPY_STRIDE;
+                destinationRowOffset += COPY_STRIDE;
                 rowCount--;
             } while (rowCount != 0);
         }
     } else {
         memcpy(
-            destination->m_pixels + destinationY * BITMAP_COPY_STRIDE + destinationX,
-            m_pixels + sourceY * BITMAP_COPY_STRIDE + sourceX,
+            destination->m_pixels + destinationY * COPY_STRIDE + destinationX,
+            m_pixels + sourceY * COPY_STRIDE + sourceX,
             width * height
         );
     }

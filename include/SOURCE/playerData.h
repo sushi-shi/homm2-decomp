@@ -17,37 +17,39 @@ SIZE(playerAttentionWeights, 0x18);
 
 class playerData {
 public:
-    i8 m_color;                                // +0x00
-    i8 m_heroCount;                            // +0x01
-    i8 m_currentHero;                          // +0x02
-    i8 m_heroLocatorPage;                      // +0x03
-    i8 m_heroIds[8];                           // +0x04
-    i8 m_availableHeroIds[2];                  // +0x0c
-    i8 m_minimumHeroCount;                     // +0x0e
-    i32 m_aiDifficulty;                        // +0x0f
-    i8 m_cheatValue;                           // +0x13
-    char m_unusedSaveData[0x2c];               // +0x14
-    i8 m_ultimateArtifactHintChance;           // +0x40
-    i8 m_ultimateArtifactHintX;                // +0x41
-    i8 m_ultimateArtifactHintY;                // +0x42
-    i8 m_daysLeft;                             // +0x43
-    i8 m_townCount;                            // +0x44
-    i8 m_currentTown;                          // +0x45
-    i8 m_townLocatorPage;                      // +0x46
-    i8 m_townIds[72];                          // +0x47
-    i32 m_resources[7];                        // +0x8f
-    i8 m_evilInterface;                        // +0xab
-    i8 m_barrierTents;                         // +0xac
-    char m_unknownad[6];                       // +0xad
+    i8 m_color;                      // +0x00
+    i8 m_heroCount;                  // +0x01
+    i8 m_currentHero;                // +0x02
+    i8 m_heroLocatorPage;            // +0x03
+    i8 m_heroIds[8];                 // +0x04
+    i8 m_availableHeroIds[2];        // +0x0c
+    i8 m_minimumHeroCount;           // +0x0e
+    i32 m_aiDifficulty;              // +0x0f
+    i8 m_cheatValue;                 // +0x13
+    char m_unusedSaveData[0x2c];     // +0x14
+    i8 m_ultimateArtifactHintChance; // +0x40
+    i8 m_ultimateArtifactHintX;      // +0x41
+    i8 m_ultimateArtifactHintY;      // +0x42
+    i8 m_daysLeft;                   // +0x43
+    i8 m_townCount;                  // +0x44
+    i8 m_currentTown;                // +0x45
+    i8 m_townLocatorPage;            // +0x46
+    i8 m_townIds[72];                // +0x47
+    i32 m_resources[7];              // +0x8f
+    i8 m_evilInterface;              // +0xab
+    i8 m_barrierTents;               // +0xac
+    char m_unknownad
+        [6]; // +0xad save-serialized in playerData::Write/Read but never otherwise read; unknown in Ironfist (_4_2_1) too
     playerAttentionWeights m_attentionWeights; // +0xb3
-    char m_unknownCb[0x1c];                    // +0xcb
-    i32 m_income[7];                           // +0xe7
-    i32 m_obeliskValue;                        // +0x103
-    i32 m_totalObeliskValue;                   // +0x107
-    i32 m_unexploredValue;                     // +0x10b
-    float m_upgradeValueWeight;                // +0x10f
-    float m_artifactValue;                     // +0x113
-    float m_artifactPoolShare;                 // +0x117
+    char m_unknownCb
+        [0x1c]; // +0xcb never referenced; sits after the AI attention weights; unknown in Ironfist (_4_2_2) too
+    i32 m_income[7];            // +0xe7
+    i32 m_obeliskValue;         // +0x103
+    i32 m_totalObeliskValue;    // +0x107
+    i32 m_unexploredValue;      // +0x10b
+    float m_upgradeValueWeight; // +0x10f
+    float m_artifactValue;      // +0x113
+    float m_artifactPoolShare;  // +0x117
     // --- methods ---
     void Write(i32);
     void Read(i32);

@@ -796,9 +796,9 @@ skipDefaults:
 // but retail moves 0x62 bytes, and networkDefaultName is char[0x18] but retail
 // moves 0x1e — six bytes past the field, faithfully reproduced.
 typedef enum RegistryValueSize {
-    REG_MODEM_INIT_STRING_SIZE = 0x62,
-    REG_UNIQUE_SYSTEM_ID_SIZE = 4,
-    REG_NETWORK_DEFAULT_NAME_SIZE = 0x1e
+    MODEM_INIT_STRING_SIZE = 0x62,
+    UNIQUE_SYSTEM_ID_SIZE = 4,
+    NETWORK_DEFAULT_NAME_SIZE = 0x1e
 } RegistryValueSize;
 
 VA(0x004c4ca0, 0x7ab)
@@ -1378,7 +1378,7 @@ void WritePrefsToRegistry(void) {
         0,
         REG_SZ,
         reinterpret_cast<u8*>(gConfig.modemInitString),
-        REG_MODEM_INIT_STRING_SIZE
+        MODEM_INIT_STRING_SIZE
     );
     RegSetValueExA(
         hKey,
@@ -1386,7 +1386,7 @@ void WritePrefsToRegistry(void) {
         0,
         REG_SZ,
         reinterpret_cast<u8*>(gConfig.uniqueSystemID),
-        REG_UNIQUE_SYSTEM_ID_SIZE
+        UNIQUE_SYSTEM_ID_SIZE
     );
     RegSetValueExA(
         hKey,
@@ -1394,7 +1394,7 @@ void WritePrefsToRegistry(void) {
         0,
         REG_SZ,
         reinterpret_cast<u8*>(gConfig.networkDefaultName),
-        REG_NETWORK_DEFAULT_NAME_SIZE
+        NETWORK_DEFAULT_NAME_SIZE
     );
     RegSetValueExA(
         hKey,

@@ -1321,7 +1321,7 @@ i32 townManager::Main(tag_message& message) {
                                 goto showBuildingInformation;
                             }
                             {
-                                if (m_town->m_unknown37 != 0) {
+                                if (m_town->m_mayNotUpgradeToCastle != 0) {
                                     NormalDialog(
                                         "This town may not be upgraded to a castle.",
                                         1,
