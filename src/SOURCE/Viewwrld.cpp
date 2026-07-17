@@ -203,7 +203,7 @@ void advManager::VWCompleteDraw(void)
             if ((giCurPlayerBit & mapExtra[MAP_WIDTH * mapY3 + mapX7]) ||
                 iVWDrawAllTerrains ||
                 (iVWWhatToDraw == VIEW_WORLD_TOWNS &&
-                 (((cell0->m_triggerType & VIEW_WORLD_TRIGGER_TYPE_MASK) == MAP_EVENT_CASTLE) ||
+                 (((cell0->m_triggerType & VIEW_WORLD_TRIGGER_TYPE_MASK) == MAP_OBJECT_CASTLE) ||
                   (cell0->m_triggerType == VIEW_WORLD_TRIGGER_HERO &&
                    gpGame->m_heroRecs[cell0->m_objectMetadata].m_locationType ==
                        VIEW_WORLD_TRIGGER_TOWN)))) {
