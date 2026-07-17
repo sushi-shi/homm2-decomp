@@ -126,12 +126,12 @@ void IconToBitmap(
                 X = X + (cmd & ICON_RLE_COMMAND_RUN_MASK);
                 continue;
             }
-            // 0xc0 - 0xff
+            // 0xc0 - 0xFF
             gIcRun = cmd;
             u32 count = cmd & ICON_RLE_COMMAND_RUN_MASK;
             i32 flags;
             if (count != 0) {
-                // 0xc1 - 0xff : solid colour run
+                // 0xc1 - 0xFF : solid colour run
                 if (cmd == ICON_RLE_LONG_SOLID_COMMAND) {
                     count = ReadIconRleByte(gIcSrc);
                 }

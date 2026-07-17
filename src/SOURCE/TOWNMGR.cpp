@@ -2233,7 +2233,7 @@ void townManager::BuildObj(i32 building) {
         giMaxExtentY = 0;
         giMaxExtentX = giMaxExtentY;
         giMinExtentX = 0x27f;
-        giMinExtentY = 0xff;
+        giMinExtentY = 0xFF;
         gbComputeExtent = 1;
         gbSaveBiggestExtent = 1;
         gbReturnAfterComputeExtent = 1;

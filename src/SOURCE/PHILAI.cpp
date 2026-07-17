@@ -115,7 +115,8 @@ void ResetHeroRVs(i32 resetAll, i32 x, i32 y) {
 
 VA(0x004379d0, 0x180)
 void CheckDoMain(i32 a1, i32 doMain) {
-    if (KBTickCount() > iLastFrameRateTimer + AI_FRAME_THROTTLE_TICKS || KBTickCount() > glTimers[0]) {
+    if (KBTickCount() > iLastFrameRateTimer + AI_FRAME_THROTTLE_TICKS
+        || KBTickCount() > glTimers[0]) {
         Process1WindowsMessage();
         PollSound();
         if (KBTickCount() > glTimers[0]) {
@@ -403,7 +404,8 @@ i32 philAI::GoodAdjacent(i32* direction) {
     fReduceFactor = 1.0f;
     fBerserkFactor = 1.0f;
     bestValue = 100;
-    if ((gpAdvManager->GetCell(gpCurAIHero->m_x, gpCurAIHero->m_y)->m_triggerType & MAP_TRIGGER_TYPE_MASK)
+    if ((gpAdvManager->GetCell(gpCurAIHero->m_x, gpCurAIHero->m_y)->m_triggerType
+         & MAP_TRIGGER_TYPE_MASK)
         == MAP_OBJECT_MONSTER)
         return 0;
     for (jb = 0; jb < 8; jb++) {
@@ -412,8 +414,10 @@ i32 philAI::GoodAdjacent(i32* direction) {
             nb = normalDirTable[jb].y + gpCurAIHero->m_y;
             if ((gpAdvManager->GetCell(kn, nb)->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
                 && !(mapExtra[kn + (MAP_WIDTH | 0) * nb] & 0x80)
-                && ((gpAdvManager->GetCell(kn, nb)->m_triggerType & MAP_TRIGGER_TYPE_MASK) != MAP_OBJECT_MONSTER)
-                && ((gpAdvManager->GetCell(kn, nb)->m_triggerType & MAP_TRIGGER_TYPE_MASK) != MAP_OBJECT_ARTIFACT)) {
+                && ((gpAdvManager->GetCell(kn, nb)->m_triggerType & MAP_TRIGGER_TYPE_MASK)
+                    != MAP_OBJECT_MONSTER)
+                && ((gpAdvManager->GetCell(kn, nb)->m_triggerType & MAP_TRIGGER_TYPE_MASK)
+                    != MAP_OBJECT_ARTIFACT)) {
                 if (gpAdvManager->GetCell(kn, nb)->m_triggerType
                     == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)) {
                     ra = gpAdvManager->GetCell(kn, nb)->m_objectMetadata;
@@ -761,7 +765,8 @@ i32 philAI::DoDimensionDoor(hero* pHero) {
         nb += normalDirTable[static_cast<u8>(gpSearchArray->m_storage.aiPath.directions[node])].y;
         if (abs(kn - pHero->m_x) <= 7 && abs(nb - pHero->m_y) <= 7) {
             jb = gpAdvManager->GetCell(kn, nb);
-            if (!(jb->m_triggerType & MAP_TRIGGER_ACTION_FLAG) && !(jb->m_flags & MAP_CELL_OCCUPIED)) {
+            if (!(jb->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
+                && !(jb->m_flags & MAP_CELL_OCCUPIED)) {
                 bestX = kn;
                 bestY = nb;
                 idx = gpSearchArray->m_pathLength - node;
@@ -803,7 +808,8 @@ void ValidateHero(hero* pHero) {
     i32 i;
     for (i = 0; i < 5; i++) {
         if (pHero->m_army.m_creatureTypes[i] != -1) {
-            if (pHero->m_army.m_creatureTypes[i] < 0 || pHero->m_army.m_creatureTypes[i] >= CREATURE_COUNT) {
+            if (pHero->m_army.m_creatureTypes[i] < 0
+                || pHero->m_army.m_creatureTypes[i] >= CREATURE_COUNT) {
                 i32 j = 1;
                 j++;
             }
@@ -1276,7 +1282,8 @@ firstWeekDone:
                                 } else {
                                     town* threatTownPtr10 = GetCastleSlot(threatTownId8);
                                     if (threatTownPtr10->m_owner == giCurPlayer
-                                        && (threatTownPtr10->m_buildings & KB_DWELLING_UPGRADE_SIXTH_FLAG)) {
+                                        && (threatTownPtr10->m_buildings
+                                            & KB_DWELLING_UPGRADE_SIXTH_FLAG)) {
                                         ProbableOutcomeOfBattle(
                                             &threatHeroPtr6->m_army,
                                             threatHeroPtr6,
@@ -1344,7 +1351,8 @@ firstWeekDone:
 
     townCountValue5 = 0.1f;
     for (generalIndex4 = 0; generalIndex4 < gpCurPlayer->m_townCount; generalIndex4++) {
-        if (GetCastleSlot(gpCurPlayer->m_townIds[generalIndex4])->m_buildings & KB_DWELLING_UPGRADE_SIXTH_FLAG)
+        if (GetCastleSlot(gpCurPlayer->m_townIds[generalIndex4])->m_buildings
+            & KB_DWELLING_UPGRADE_SIXTH_FLAG)
             townCountValue5 += 1.0;
         else
             townCountValue5 += 0.5;
@@ -1421,7 +1429,9 @@ void philAI::GetBestBHC(i32 player, BHC& best) {
     averageStrength = totalStrength / totalWeight;
     for (i = 0; i < gpCurPlayer->m_townCount; i++) {
         townPtr = &gpGame->m_castleRecs[gpCurPlayer->m_townIds[i]];
-        desiredStrength[i] = ((townPtr->m_buildings & KB_DWELLING_UPGRADE_SIXTH_FLAG) ? 10 : 7) * averageStrength + 400;
+        desiredStrength[i] =
+            ((townPtr->m_buildings & KB_DWELLING_UPGRADE_SIXTH_FLAG) ? 10 : 7) * averageStrength
+            + 400;
     }
 
     for (i = 0; i < gpCurPlayer->m_townCount; i++) {
@@ -1758,7 +1768,10 @@ i32 philAI::DetermineTargetPosition(i32& targetX, i32& targetY, i32 mobility, i3
                         targetBestYLocal = y;
                         bestValue = targetScoreLocal;
                     } else if ((bestValue | 0) == targetScoreLocal && targetScoreLocal == 0
-                               && !(gpAdvManager->GetCell(x, y)->m_triggerType & MAP_TRIGGER_ACTION_FLAG)) {
+                               && !(
+                                   gpAdvManager->GetCell(x, y)->m_triggerType
+                                   & MAP_TRIGGER_ACTION_FLAG
+                               )) {
                         if ((gpAdvManager->GetCell(targetBestXRange, targetBestYLocal)
                                  ->m_triggerType
                              & 0x80)
@@ -4837,7 +4850,8 @@ i32 philAI::DamageGroup(armyGroup* ag, hero* loser, hero*, float dmg) {
 VA(0x004438b5, 0xcb)
 void philAI::IncrementHourGlass(void) {
     i32 nb = gpCurPlayer->m_heroCount;
-    if (nb < 4 && gpCurPlayer->m_resources[RES_GOLD] >= AI_HERO_PURCHASE_GOLD_FLOOR && bHeroBuiltThisTurn == 0)
+    if (nb < 4 && gpCurPlayer->m_resources[RES_GOLD] >= AI_HERO_PURCHASE_GOLD_FLOOR
+        && bHeroBuiltThisTurn == 0)
         nb++;
     iCurHourGlassPhase++;
     if (nb == 1) {
@@ -5287,7 +5301,8 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                 if (!cell_k->m_objectMetadata)
                     value_h = 0;
                 else if (cell_k->m_objectMetadata & MAP_EVENT_ARTIFACT_CONDITION_FLAG) {
-                    value_h = gArtifactBaseRV[cell_k->m_objectMetadata & MAP_EVENT_ARTIFACT_CONDITION_ID_MASK];
+                    value_h = gArtifactBaseRV
+                        [cell_k->m_objectMetadata & MAP_EVENT_ARTIFACT_CONDITION_ID_MASK];
                 } else {
                     resource = (cell_k->m_objectMetadata & 0xf) - 1;
                     amount_j = (cell_k->m_objectMetadata & 0xf0) >> 4;
@@ -5666,7 +5681,8 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
         if (value_h > 0 && (mapExtra[(MAP_WIDTH | 0) * y + x] & 0x80)
             && (cell_k->m_triggerType & MAP_TRIGGER_TYPE_MASK) != MAP_OBJECT_MONSTER)
             value_h = 0;
-        if (value_h < 0 && (cell_k->m_triggerType & MAP_TRIGGER_TYPE_MASK) != MAP_OBJECT_HERO_INTERACTION)
+        if (value_h < 0
+            && (cell_k->m_triggerType & MAP_TRIGGER_TYPE_MASK) != MAP_OBJECT_HERO_INTERACTION)
             value_h = 0;
         else if (value_h > 32000)
             value_h = 32000;
@@ -5832,21 +5848,16 @@ void InitAIMapVars(void) {
     // relocation order at all five commutative products.
     CloseAIMapVars();
     SVSearchArray.Init();
-    gaiLiveChanceOfPos = static_cast<i16*>(
-        H2_ALLOC(OD_STEER(MAP_WIDTH) * MAP_HEIGHT * 2, s_initAIMapLineBase + 8)
-    );
-    gaiHeroStrategicRVOfPos = static_cast<i16*>(
-        H2_ALLOC(OD_STEER(MAP_WIDTH) * MAP_HEIGHT * 2, s_initAIMapLineBase + 9)
-    );
-    gaiHeroEventStratRVOfPos = static_cast<i16*>(
-        H2_ALLOC(OD_STEER(MAP_WIDTH) * MAP_HEIGHT * 2, s_initAIMapLineBase + 10)
-    );
-    gaiTurnValueOfMine = static_cast<i8*>(
-        H2_ALLOC(OD_STEER(MAP_WIDTH) * MAP_HEIGHT, s_initAIMapLineBase + 11)
-    );
-    gaiEnemyHeroReachable = static_cast<i8*>(
-        H2_ALLOC(OD_STEER(MAP_WIDTH) * MAP_HEIGHT, s_initAIMapLineBase + 12)
-    );
+    gaiLiveChanceOfPos =
+        static_cast<i16*>(H2_ALLOC(OD_STEER(MAP_WIDTH) * MAP_HEIGHT * 2, s_initAIMapLineBase + 8));
+    gaiHeroStrategicRVOfPos =
+        static_cast<i16*>(H2_ALLOC(OD_STEER(MAP_WIDTH) * MAP_HEIGHT * 2, s_initAIMapLineBase + 9));
+    gaiHeroEventStratRVOfPos =
+        static_cast<i16*>(H2_ALLOC(OD_STEER(MAP_WIDTH) * MAP_HEIGHT * 2, s_initAIMapLineBase + 10));
+    gaiTurnValueOfMine =
+        static_cast<i8*>(H2_ALLOC(OD_STEER(MAP_WIDTH) * MAP_HEIGHT, s_initAIMapLineBase + 11));
+    gaiEnemyHeroReachable =
+        static_cast<i8*>(H2_ALLOC(OD_STEER(MAP_WIDTH) * MAP_HEIGHT, s_initAIMapLineBase + 12));
 }
 
 VA(0x00445fe6, 0x112)

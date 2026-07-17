@@ -5,9 +5,6 @@
 
 #define FINDPATH_SOURCE_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\FINDPATH.CPP"
 
-#define FINDPATH_ALLOCATION_SOURCE_LINE_BASE 20
-#define FINDPATH_DESTRUCTION_SOURCE_LINE_BASE 26
-
 struct SFindPathSourceLine {
     i16 value;
     i16 reserved;

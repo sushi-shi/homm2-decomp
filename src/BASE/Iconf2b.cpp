@@ -236,12 +236,12 @@ void FlipIconToBitmap(
                 X = X - n;
                 continue;
             }
-            // 0xc0 - 0xff
+            // 0xc0 - 0xFF
             gFlipRun = cmd;
             u32 count = cmd & ICON_RLE_COMMAND_RUN_MASK;
             i32 flags = 0;
             if (count != 0) {
-                // 0xc1 - 0xff : solid colour run
+                // 0xc1 - 0xFF : solid colour run
                 if (cmd == ICON_RLE_LONG_SOLID_COMMAND)
                     count = *src++;
                 gFlipColor = *src++;
@@ -292,7 +292,9 @@ void FlipIconToBitmap(
             gFlipRun = flags;
             gFlipDimLen = count;
             if (flags & ICON_RLE_DIM_APPLY_FLAG) {
-                u8* palette = reinterpret_cast<u8*>(uDimPal) + (flags & ICON_RLE_DIM_LEVEL_MASK) * ICON_RLE_DIM_PALETTE_LEVEL_STRIDE;
+                u8* palette =
+                    reinterpret_cast<u8*>(uDimPal)
+                    + (flags & ICON_RLE_DIM_LEVEL_MASK) * ICON_RLE_DIM_PALETTE_LEVEL_STRIDE;
                 gFlipDimPal = palette;
                 if (clip == 0) {
                     u8* dp = reinterpret_cast<u8*>((gFlipRow - count) + 1 + X);

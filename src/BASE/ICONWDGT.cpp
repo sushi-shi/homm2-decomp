@@ -89,7 +89,7 @@ void iconWidget::Read(void) {
     m_flip = static_cast<i8>(gpResourceManager->ReadWord());
     m_id = gpResourceManager->ReadWord();
     m_kind = gpResourceManager->ReadWord();
-    m_fillColor = gpResourceManager->ReadWord() & 0xff;
+    m_fillColor = gpResourceManager->ReadWord() & 0xFF;
 }
 
 VA(0x004d0ca0, 0x21)
@@ -166,7 +166,7 @@ i32 iconWidget::Main(tag_message& msg) {
                 case WIDGET_COMMAND_SET_FILL_COLOR:
                     if (m_id != msg.payload.widget.id)
                         goto normalEvent;
-                    m_fillColor = msg.payload.widget.data.value & 0xff;
+                    m_fillColor = msg.payload.widget.data.value & 0xFF;
                     return 1;
 
                 case WIDGET_COMMAND_SET_ICON:
