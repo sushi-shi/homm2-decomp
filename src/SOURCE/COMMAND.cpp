@@ -973,7 +973,7 @@ CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
                             if (m_currentSide == targetSide
                                 || (m_currentArmySide == targetSide
                                     && m_currentArmyIndex == targetIndex)) {
-                                return IDX(COMBAT_MESSAGE_COMMAND_VIEW_INFO);
+                                return COMBAT_MESSAGE_COMMAND_VIEW_INFO;
                             }
                             currentArmy->m_targetSide = targetSide;
                             currentArmy->m_targetIndex = targetIndex;
@@ -986,11 +986,11 @@ CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
                                         hexIndex
                                     )
                                     != 0)
-                                    return IDX(COMBAT_MESSAGE_COMMAND_SHOOT_THROUGH_WALL);
-                                return IDX(COMBAT_MESSAGE_COMMAND_SHOOT);
+                                    return COMBAT_MESSAGE_COMMAND_SHOOT_THROUGH_WALL;
+                                return COMBAT_MESSAGE_COMMAND_SHOOT;
                             }
                             if (currentArmy->ValidPath(hexIndex, 0) == 1)
-                                return IDX(COMBAT_MESSAGE_COMMAND_ATTACK);
+                                return COMBAT_MESSAGE_COMMAND_ATTACK;
                             currentArmy->m_targetSide = -1;
                             currentArmy->m_targetIndex = -1;
                     }

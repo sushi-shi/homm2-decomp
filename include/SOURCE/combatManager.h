@@ -734,7 +734,7 @@ public:
     i32 m_showArmyQuantities;             // +0xf2bf
     i32 m_selectedHex;                    // +0xf2c3
     i32 m_directionTargetHex;             // +0xf2c7
-    i32 m_previousCommand;                // +0xf2cb
+    CombatMessageCommand m_previousCommand;                // +0xf2cb
     CombatMessageCommand m_currentCommand;                 // +0xf2cf
     struct SLimitData m_catapultLimits;   // +0xf2d3
     struct SLimitData m_gateLimits;       // +0xf2e3
