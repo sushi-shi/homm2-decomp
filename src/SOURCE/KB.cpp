@@ -1259,7 +1259,7 @@ i32 RecruitHeroHandler(tag_message& msg) {
 }
 
 VA(0x00499589, 0x1a7)
-char* GetBuildingInfo(i32 race, i32 building, i32 mode) {
+char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 mode) {
     char buf[400];
     if (race == FACTION_NECROMANCER && building == BUILDING_SLOT_NECROMANCER_SHRINE) {
         sprintf(buf, xNecromancerShrineDesc);
@@ -1268,18 +1268,18 @@ char* GetBuildingInfo(i32 race, i32 building, i32 mode) {
             buf,
             "The %s increases production of %s by 8 per week.",
             GetBuildingName(race, building),
-            gArmyNamesPlural[gDwellingType[race][0]]
+            gArmyNamesPlural[gDwellingType[IDX(race)][0]]
         );
     } else if (building == BUILDING_SLOT_SPECIAL) {
-        sprintf(buf, gBuildingInfoSpecial[race]);
+        sprintf(buf, gBuildingInfoSpecial[IDX(race)]);
     } else if (building < BUILDING_SLOT_DWELLING_FIRST) {
-        sprintf(buf, cBuildingInfoNeutral[building]);
+        sprintf(buf, cBuildingInfoNeutral[IDX(building)]);
     } else {
         sprintf(
             gText,
             "The %s produces %s.",
             GetBuildingName(race, building),
-            gArmyNamesPlural[gDwellingType[race][building - BUILDING_SLOT_DWELLING_FIRST]]
+            gArmyNamesPlural[gDwellingType[IDX(race)][building - BUILDING_SLOT_DWELLING_FIRST]]
         );
         return gText;
     }
