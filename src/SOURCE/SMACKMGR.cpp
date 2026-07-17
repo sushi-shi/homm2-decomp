@@ -74,6 +74,13 @@ void DoAdvance(Smack *smack, int drawFrame, int advanceFrame, int updatePalette,
         SmackNextFrame(smack);
 }
 
+// @early-stop
+// Complete 0x118c body, 0x510 frame/slots, CFG, and all 334 ordered relocations
+// align. Excluding the embedded switch table at +0xde7/0x14, the only executable
+// residual is +0xb0b: retail loads campaignChoice4[-0x4c4] then compares the
+// global, while ours loads the global then compares the local. The one-byte
+// instruction-size difference shifts the table/following offsets. Both equality
+// orders and 0[&campaignChoice4] were byte-neutral; revisit on relevant TU change.
 VA(0x0040126d, 0x118c)
 void SmackManagerMain(void) {
     int soundFlags4;
