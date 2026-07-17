@@ -1,6 +1,7 @@
 #ifndef HOMM2_PHILAI_TU_H
 #define HOMM2_PHILAI_TU_H
 #include <va.h>
+#include <SOURCE/KB_TYPES.h>
 // AI view/record structs + free functions DEFINED in PHILAI.cpp — single home.
 // forward declarations (was <_all.h>):
 class army;
