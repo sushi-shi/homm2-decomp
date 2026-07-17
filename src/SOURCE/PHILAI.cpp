@@ -844,11 +844,11 @@ void philAI::DoAI(i32 player) {
                     )) {
                     bShowIt = 1;
                     gpAdvManager->SetHeroContext(
-                        static_cast<u8>(gpCurAIHero->m_id), 0);
+                        gpCurAIHero->m_id, 0);
                 } else {
                     bShowIt = 0;
                     gpAdvManager->SetHeroContext(
-                        static_cast<u8>(gpCurAIHero->m_id), 0);
+                        gpCurAIHero->m_id, 0);
                 }
 
                 heroDone5 = 0;
@@ -939,7 +939,7 @@ void philAI::DoAI(i32 player) {
                             goto aiMovementExit;
                         eventCell9 = 0;
                         gpAdvManager->SetHeroContext(
-                            static_cast<u8>(gpCurAIHero->m_id), 0);
+                            gpCurAIHero->m_id, 0);
                         gpSearchArray->BuildPath(
                             gpCurAIHero->m_x,
                             gpCurAIHero->m_y,
@@ -1629,7 +1629,7 @@ i32 philAI::DetermineTargetPosition(i32 &targetX, i32 &targetY, i32 mobility,
                     if (candidate && gpCurAIHero->m_boatId != 0xff) {
                         boatTravelDistanceCounter =
                             abs(y - static_cast<u8>(gpCurAIHero->m_unknown2a)) +
-                            abs(x - static_cast<u8>(gpCurAIHero->m_boatId));
+                            abs(x - gpCurAIHero->m_boatId);
                         if (gpCurAIHero->m_unknown2b < boatTravelDistanceCounter)
                             candidate = 0;
                     }
@@ -1640,7 +1640,7 @@ i32 philAI::DetermineTargetPosition(i32 &targetX, i32 &targetY, i32 mobility,
                             if (candidateCell->m_triggerType != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE) &&
                                 candidateCell->m_triggerType != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION) &&
                                 gpCurPlayer->m_heroIds[heroIndexSearch] !=
-                                    static_cast<u8>(gpCurAIHero->m_id) &&
+                                    gpCurAIHero->m_id &&
                                 gpGame->m_heroRecs[
                                     gpCurPlayer->m_heroIds[heroIndexSearch]].m_x == x &&
                                 gpGame->m_heroRecs[
@@ -1719,7 +1719,7 @@ candidate_scored:
     targetX = targetBestXRange;
     targetY = targetBestYLocal;
     if (gpCurAIHero->m_boatId != 0xff && bestValue <= 0) {
-        targetX = static_cast<u8>(gpCurAIHero->m_boatId);
+        targetX = gpCurAIHero->m_boatId;
         targetY = static_cast<u8>(gpCurAIHero->m_unknown2a);
     }
     LogInt("Hero, Best RV target XY  current XY", gpCurAIHero->m_owner, bestValue,
@@ -2905,12 +2905,12 @@ i32 philAI::StrategicValueOfPosition(i32 targetX, i32 targetY, i32 immediate,
                 }
             }
 
-            if (static_cast<u8>(gpCurAIHero->m_id) != iAlphaMale &&
+            if (gpCurAIHero->m_id != iAlphaMale &&
                 (targetX != x13 || targetY != yCounter) &&
                 search5->GetNode(x13, yCounter).distance < 1024 &&
                 gpAdvManager->GetCell(x13, yCounter)->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION) &&
                 gpAdvManager->GetCell(x13, yCounter)->m_objectMetadata !=
-                    static_cast<u8>(gpCurAIHero->m_id) &&
+                    gpCurAIHero->m_id &&
                 gpGame->m_availableHeroes[gpAdvManager->GetCell(x13, yCounter)->m_objectMetadata] ==
                     gpCurAIHero->m_owner) {
                 penalty = (1024 - search5->GetNode(x13, yCounter).distance) * 600 >> 10;
@@ -2926,7 +2926,7 @@ i32 philAI::StrategicValueOfPosition(i32 targetX, i32 targetY, i32 immediate,
          heroIndex2 < gpCurPlayer->m_heroCount;
          heroIndex2++) {
         if (gpCurPlayer->m_heroIds[heroIndex2] !=
-            static_cast<u8>(gpCurAIHero->m_id)) {
+            gpCurAIHero->m_id) {
             distance15 = abs(gpGame->m_heroRecs[
                            gpCurPlayer->m_heroIds[heroIndex2]].m_x -
                            targetX) +

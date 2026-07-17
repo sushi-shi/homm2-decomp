@@ -496,9 +496,7 @@ void advManager::DoEvent(mapCell *cell, i32 x, i32 y)
             if (eventHero2->m_spellPoints < wellSpellPoints5) {
                 NormalDialog("{Magic Well}\n\nA drink from the well has restored your spell points to maximum.",
                              1, -1, -1, -1, 0, -1, 0, -1, 0);
-                eventHero2->m_eventFlags =
-                    static_cast<i32>(eventHero2->m_eventFlags) |
-                    HERO_EVENT_MAGIC_WELL;
+                eventHero2->m_eventFlags = eventHero2->m_eventFlags | HERO_EVENT_MAGIC_WELL;
                 eventHero2->m_spellPoints = wellSpellPoints5;
             }
             else {
@@ -514,9 +512,7 @@ void advManager::DoEvent(mapCell *cell, i32 x, i32 y)
 
     case MAP_OBJECT_COAST:
         if (eventHero2->m_eventFlags & HERO_EVENT_EMBARKED) {
-            eventHero2->m_eventFlags =
-                static_cast<i32>(eventHero2->m_eventFlags) &
-                ~HERO_EVENT_EMBARKED;
+            eventHero2->m_eventFlags = eventHero2->m_eventFlags & ~HERO_EVENT_EMBARKED;
             eventHero2->m_remainingMobility = 0;
             eventHero2->m_direction = static_cast<u8>(m_cursorDirection);
             m_cursorType = eventHero2->m_cursorType;
@@ -537,8 +533,7 @@ void advManager::DoEvent(mapCell *cell, i32 x, i32 y)
     case MAP_OBJECT_BOAT:
         boat_j = &gpGame->m_boats[cell->m_objectMetadata];
         gpGame->RestoreCell(-1, -1, boat_j->x, boat_j->y, cell, BOAT_RESTORE_MODE);
-        eventHero2->m_eventFlags =
-            static_cast<i32>(eventHero2->m_eventFlags) | HERO_EVENT_EMBARKED;
+        eventHero2->m_eventFlags = eventHero2->m_eventFlags | HERO_EVENT_EMBARKED;
         eventHero2->m_remainingMobility = 0;
         boat_j->heroId = eventHero2->m_id;
         boat_j->owner = eventHero2->m_owner;
@@ -637,8 +632,7 @@ chestGold:
     case MAP_OBJECT_BUOY:
         if (!(eventHero2->m_eventFlags & HERO_EVENT_BUOY)) {
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-            eventHero2->m_eventFlags =
-                static_cast<i32>(eventHero2->m_eventFlags) | HERO_EVENT_BUOY;
+            eventHero2->m_eventFlags = eventHero2->m_eventFlags | HERO_EVENT_BUOY;
             eventHero2->m_morale++;
             EventWindow(3, 1, "", 12, 0, -1, 0, -1);
         }
@@ -650,9 +644,7 @@ chestGold:
     case MAP_OBJECT_FAERIE_RING:
         if (!(eventHero2->m_eventFlags & HERO_EVENT_FAERIE_RING)) {
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-            eventHero2->m_eventFlags =
-                static_cast<i32>(eventHero2->m_eventFlags) |
-                HERO_EVENT_FAERIE_RING;
+            eventHero2->m_eventFlags = eventHero2->m_eventFlags | HERO_EVENT_FAERIE_RING;
             eventHero2->m_luck++;
             EventWindow(13, 1, "", 10, 0, -1, 0, -1);
         }
@@ -664,8 +656,7 @@ chestGold:
     case MAP_OBJECT_IDOL:
         if (!(eventHero2->m_eventFlags & HERO_EVENT_IDOL)) {
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-            eventHero2->m_eventFlags =
-                static_cast<i32>(eventHero2->m_eventFlags) | HERO_EVENT_IDOL;
+            eventHero2->m_eventFlags = eventHero2->m_eventFlags | HERO_EVENT_IDOL;
             eventHero2->m_luck++;
             EventWindow(-1, 1,
                         "{Idol}\n\nYou've found an ancient and weathered stone idol.  Kissing it is supposed to be lucky, so you do.  The stone is very cold to the touch.",
@@ -681,8 +672,7 @@ chestGold:
     case MAP_OBJECT_FOUNTAIN:
         if (!(eventHero2->m_eventFlags & HERO_EVENT_FOUNTAIN)) {
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-            eventHero2->m_eventFlags =
-                static_cast<i32>(eventHero2->m_eventFlags) | HERO_EVENT_FOUNTAIN;
+            eventHero2->m_eventFlags = eventHero2->m_eventFlags | HERO_EVENT_FOUNTAIN;
             eventHero2->m_luck++;
             EventWindow(16, 1, "", 10, 0, -1, 0, -1);
         }
@@ -694,9 +684,7 @@ chestGold:
     case MAP_OBJECT_WATERING_HOLE:
         if (!(eventHero2->m_eventFlags & HERO_EVENT_WATERING_HOLE)) {
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-            eventHero2->m_eventFlags =
-                static_cast<i32>(eventHero2->m_eventFlags) |
-                HERO_EVENT_WATERING_HOLE;
+            eventHero2->m_eventFlags = eventHero2->m_eventFlags | HERO_EVENT_WATERING_HOLE;
             eventHero2->m_morale++;
             eventHero2->m_mobility += WATERING_HOLE_MOBILITY_BONUS;
             eventHero2->m_remainingMobility += WATERING_HOLE_MOBILITY_BONUS;
@@ -714,8 +702,7 @@ chestGold:
     case MAP_OBJECT_OASIS:
         if (!(eventHero2->m_eventFlags & HERO_EVENT_OASIS)) {
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-            eventHero2->m_eventFlags =
-                static_cast<i32>(eventHero2->m_eventFlags) | HERO_EVENT_OASIS;
+            eventHero2->m_eventFlags = eventHero2->m_eventFlags | HERO_EVENT_OASIS;
             eventHero2->m_morale++;
             eventHero2->m_mobility += OASIS_MOBILITY_BONUS;
             eventHero2->m_remainingMobility += OASIS_MOBILITY_BONUS;
@@ -733,8 +720,7 @@ chestGold:
     case MAP_OBJECT_TEMPLE:
         if (!(eventHero2->m_eventFlags & HERO_EVENT_TEMPLE)) {
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-            eventHero2->m_eventFlags =
-                static_cast<i32>(eventHero2->m_eventFlags) | HERO_EVENT_TEMPLE;
+            eventHero2->m_eventFlags = eventHero2->m_eventFlags | HERO_EVENT_TEMPLE;
             eventHero2->m_morale += 2;
             NormalDialog("{Temple}\n\nA visit and a prayer at the temple raises the morale of your troops.",
                          1, -1, -1, 12, 0, 12, 0, -1, 0);
@@ -1670,9 +1656,7 @@ daemonExperienceGold:
                             "Upon defeating the Ghosts you spend several hours sifting through the debris and find nothing.  Such a despicable act reduces your army's morale.",
                             13, 0, -1, 0, -1);
                 if (!(eventHero2->m_eventFlags & HERO_EVENT_SHIPWRECK)) {
-                    eventHero2->m_eventFlags =
-                        static_cast<i32>(eventHero2->m_eventFlags) |
-                        HERO_EVENT_SHIPWRECK;
+                    eventHero2->m_eventFlags = eventHero2->m_eventFlags | HERO_EVENT_SHIPWRECK;
                     eventHero2->m_morale--;
                 }
                 break;
@@ -1697,9 +1681,7 @@ daemonExperienceGold:
                 EventWindow(EVENT_TEXT_GRAVEYARD_EMPTY, 1, "",
                             13, 0, -1, 0, -1);
                 if (!(eventHero2->m_eventFlags & HERO_EVENT_GRAVEYARD)) {
-                    eventHero2->m_eventFlags =
-                        static_cast<i32>(eventHero2->m_eventFlags) |
-                        HERO_EVENT_GRAVEYARD;
+                    eventHero2->m_eventFlags = eventHero2->m_eventFlags | HERO_EVENT_GRAVEYARD;
                     eventHero2->m_morale--;
                 }
                 break;
@@ -1728,9 +1710,7 @@ daemonExperienceGold:
                             "Upon defeating the Skeletons you spend several hours sifting through the debris and find nothing.  Such a despicable act reduces your army's morale.",
                             13, 0, -1, 0, -1);
                 if (!(eventHero2->m_eventFlags & HERO_EVENT_DERELICT_SHIP)) {
-                    eventHero2->m_eventFlags =
-                        static_cast<i32>(eventHero2->m_eventFlags) |
-                        HERO_EVENT_DERELICT_SHIP;
+                    eventHero2->m_eventFlags = eventHero2->m_eventFlags | HERO_EVENT_DERELICT_SHIP;
                     eventHero2->m_morale--;
                 }
                 break;
@@ -1757,9 +1737,7 @@ daemonExperienceGold:
                 NormalDialog("You come upon the pyramid of a great and ancient king.  Routine exploration reveals that the pyramid is completely empty.",
                              1, -1, -1, 11, 0, 11, 0, -1, 0);
                 if (!(eventHero2->m_eventFlags & HERO_EVENT_PYRAMID)) {
-                    eventHero2->m_eventFlags =
-                        static_cast<i32>(eventHero2->m_eventFlags) |
-                        HERO_EVENT_PYRAMID;
+                    eventHero2->m_eventFlags = eventHero2->m_eventFlags | HERO_EVENT_PYRAMID;
                     eventHero2->m_luck -= 2;
                 }
             }
@@ -2250,8 +2228,7 @@ void advManager::GenericSiteEvent(mapCell *cell, hero *eventHero)
         } else {
             EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, siteType2,
                        &eventSample5);
-            eventHero->m_eventFlags =
-                static_cast<i32>(eventHero->m_eventFlags) | HERO_EVENT_ARENA;
+            eventHero->m_eventFlags = eventHero->m_eventFlags | HERO_EVENT_ARENA;
             primaryStat15 = DoArenaDialog();
             eventHero->m_primaryStats[primaryStat15]++;
         }
@@ -2266,8 +2243,7 @@ void advManager::GenericSiteEvent(mapCell *cell, hero *eventHero)
         } else {
             EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, siteType2,
                        &eventSample5);
-            eventHero->m_eventFlags = static_cast<i32>(eventHero->m_eventFlags) |
-                                      HERO_EVENT_MERMAID;
+            eventHero->m_eventFlags = eventHero->m_eventFlags | HERO_EVENT_MERMAID;
             eventHero->m_luck = eventHero->m_luck + 1;
             EventWindow(
                 -1, 1,
@@ -2353,8 +2329,7 @@ void advManager::GenericSiteEvent(mapCell *cell, hero *eventHero)
                     "headlong into the sea.",
                     1, -1, -1, -1, 0, -1, 0, -1, 0);
             }
-            eventHero->m_eventFlags = static_cast<i32>(eventHero->m_eventFlags) |
-                                      HERO_EVENT_SIRENS;
+            eventHero->m_eventFlags = eventHero->m_eventFlags | HERO_EVENT_SIRENS;
         }
         break;
 
@@ -2363,8 +2338,7 @@ void advManager::GenericSiteEvent(mapCell *cell, hero *eventHero)
         unusedTwo6 = 2;
         stableResult26 = 0;
         if ((eventHero->m_eventFlags & HERO_EVENT_STABLES) == 0) {
-            eventHero->m_eventFlags =
-                static_cast<i32>(eventHero->m_eventFlags) | HERO_EVENT_STABLES;
+            eventHero->m_eventFlags = eventHero->m_eventFlags | HERO_EVENT_STABLES;
             eventHero->m_mobility += GENERIC_SITE_STABLE_MOBILITY;
             eventHero->m_remainingMobility += GENERIC_SITE_STABLE_MOBILITY;
             stableResult26 |= 1;
@@ -3690,8 +3664,7 @@ void advManager::DoAIEvent(mapCell *cell, hero *eventHero, i32 x, i32 y)
     switch (eventType_g) {
     case MAP_OBJECT_COAST:
         if (eventHero->m_eventFlags & HERO_EVENT_EMBARKED) {
-            eventHero->m_eventFlags =
-                static_cast<i32>(eventHero->m_eventFlags) & ~HERO_EVENT_EMBARKED;
+            eventHero->m_eventFlags = eventHero->m_eventFlags & ~HERO_EVENT_EMBARKED;
             eventHero->m_remainingMobility = 0;
             eventHero->m_direction = static_cast<u8>(m_cursorDirection);
             m_cursorType = eventHero->m_cursorType;
@@ -3706,8 +3679,7 @@ void advManager::DoAIEvent(mapCell *cell, hero *eventHero, i32 x, i32 y)
         gpGame->RestoreCell(-1, -1, boat_k->savedTriggerType,
                             boat_k->savedEventData, cell,
                             AI_EVENT_BOAT_RESTORE_MODE);
-        eventHero->m_eventFlags =
-            static_cast<i32>(eventHero->m_eventFlags) | HERO_EVENT_EMBARKED;
+        eventHero->m_eventFlags = eventHero->m_eventFlags | HERO_EVENT_EMBARKED;
         eventHero->m_remainingMobility = 0;
         boat_k->heroId = eventHero->m_id;
         boat_k->owner = eventHero->m_owner;
@@ -3793,50 +3765,42 @@ chestGoldOrExperience:
         if ((eventHero->m_eventFlags & HERO_EVENT_WATERING_HOLE) == 0) {
             eventHero->m_mobility += WATERING_HOLE_MOBILITY_BONUS;
             eventHero->m_remainingMobility += WATERING_HOLE_MOBILITY_BONUS;
-            eventHero->m_eventFlags =
-                static_cast<i32>(eventHero->m_eventFlags) |
-                HERO_EVENT_WATERING_HOLE;
+            eventHero->m_eventFlags = eventHero->m_eventFlags | HERO_EVENT_WATERING_HOLE;
             ++eventHero->m_morale;
         }
         break;
 
     case MAP_OBJECT_BUOY:
         if ((eventHero->m_eventFlags & HERO_EVENT_BUOY) == 0) {
-            eventHero->m_eventFlags =
-                static_cast<i32>(eventHero->m_eventFlags) | HERO_EVENT_BUOY;
+            eventHero->m_eventFlags = eventHero->m_eventFlags | HERO_EVENT_BUOY;
             ++eventHero->m_morale;
         }
         break;
 
     case MAP_OBJECT_FAERIE_RING:
         if ((eventHero->m_eventFlags & HERO_EVENT_FAERIE_RING) == 0) {
-            eventHero->m_eventFlags =
-                static_cast<i32>(eventHero->m_eventFlags) |
-                HERO_EVENT_FAERIE_RING;
+            eventHero->m_eventFlags = eventHero->m_eventFlags | HERO_EVENT_FAERIE_RING;
             ++eventHero->m_luck;
         }
         break;
 
     case MAP_OBJECT_IDOL:
         if ((eventHero->m_eventFlags & HERO_EVENT_IDOL) == 0) {
-            eventHero->m_eventFlags =
-                static_cast<i32>(eventHero->m_eventFlags) | HERO_EVENT_IDOL;
+            eventHero->m_eventFlags = eventHero->m_eventFlags | HERO_EVENT_IDOL;
             ++eventHero->m_luck;
         }
         break;
 
     case MAP_OBJECT_FOUNTAIN:
         if ((eventHero->m_eventFlags & HERO_EVENT_FOUNTAIN) == 0) {
-            eventHero->m_eventFlags =
-                static_cast<i32>(eventHero->m_eventFlags) | HERO_EVENT_FOUNTAIN;
+            eventHero->m_eventFlags = eventHero->m_eventFlags | HERO_EVENT_FOUNTAIN;
             ++eventHero->m_luck;
         }
         break;
 
     case MAP_OBJECT_OASIS:
         if ((eventHero->m_eventFlags & HERO_EVENT_OASIS) == 0) {
-            eventHero->m_eventFlags =
-                static_cast<i32>(eventHero->m_eventFlags) | HERO_EVENT_OASIS;
+            eventHero->m_eventFlags = eventHero->m_eventFlags | HERO_EVENT_OASIS;
             ++eventHero->m_morale;
             eventHero->m_mobility += OASIS_MOBILITY_BONUS;
             eventHero->m_remainingMobility += OASIS_MOBILITY_BONUS;
@@ -3845,8 +3809,7 @@ chestGoldOrExperience:
 
     case MAP_OBJECT_TEMPLE:
         if ((eventHero->m_eventFlags & HERO_EVENT_TEMPLE) == 0) {
-            eventHero->m_eventFlags =
-                static_cast<i32>(eventHero->m_eventFlags) | HERO_EVENT_TEMPLE;
+            eventHero->m_eventFlags = eventHero->m_eventFlags | HERO_EVENT_TEMPLE;
             eventHero->m_morale += 2;
         }
         break;
@@ -4508,9 +4471,7 @@ artifactPickup:
             cell->m_objectMetadata = MAP_EVENT_DATA_EMPTY;
             spellPower_j = eventHero->Stats(HERO_PRIMARY_KNOWLEDGE);
             if (eventHero->m_spellPoints < spellPower_j * 10) {
-                eventHero->m_eventFlags =
-                    static_cast<i32>(eventHero->m_eventFlags) |
-                    HERO_EVENT_MAGIC_WELL;
+                eventHero->m_eventFlags = eventHero->m_eventFlags | HERO_EVENT_MAGIC_WELL;
                 eventHero->m_spellPoints = static_cast<i16>(spellPower_j * 10);
             }
         }
@@ -4650,9 +4611,7 @@ void advManager::GenericSiteAIEvent(mapCell *cell, hero *eventHero)
         break;
     case AI_GENERIC_SITE_SHIPWRECK:
         if (!(eventHero->m_eventFlags & AI_GENERIC_SITE_SHIPWRECK_FLAG)) {
-            eventHero->m_eventFlags =
-                static_cast<i32>(eventHero->m_eventFlags) |
-                AI_GENERIC_SITE_SHIPWRECK_FLAG;
+            eventHero->m_eventFlags = eventHero->m_eventFlags | AI_GENERIC_SITE_SHIPWRECK_FLAG;
             switch (eventHero->m_cursorType) {
             case FACTION_SORCERESS:
             case FACTION_WARLOCK:
@@ -4674,9 +4633,7 @@ void advManager::GenericSiteAIEvent(mapCell *cell, hero *eventHero)
         break;
     case AI_GENERIC_SITE_FAERIE_RING:
         if (!(eventHero->m_eventFlags & AI_GENERIC_SITE_FAERIE_RING_FLAG)) {
-            eventHero->m_eventFlags =
-                static_cast<i32>(eventHero->m_eventFlags) |
-                AI_GENERIC_SITE_FAERIE_RING_FLAG;
+            eventHero->m_eventFlags = eventHero->m_eventFlags | AI_GENERIC_SITE_FAERIE_RING_FLAG;
             eventHero->m_luck = eventHero->m_luck + 1;
         }
         break;
@@ -4706,16 +4663,12 @@ void advManager::GenericSiteAIEvent(mapCell *cell, hero *eventHero)
             }
             if (armyValue7 != 0)
                 GiveExperience(eventHero, armyValue7, 1);
-            eventHero->m_eventFlags =
-                static_cast<i32>(eventHero->m_eventFlags) |
-                AI_GENERIC_SITE_GRAVEYARD_FLAG;
+            eventHero->m_eventFlags = eventHero->m_eventFlags | AI_GENERIC_SITE_GRAVEYARD_FLAG;
         }
         break;
     case AI_GENERIC_SITE_CREATURE_UPGRADE:
         if (!(eventHero->m_eventFlags & AI_GENERIC_SITE_CREATURE_UPGRADE_FLAG)) {
-            eventHero->m_eventFlags =
-                static_cast<i32>(eventHero->m_eventFlags) |
-                AI_GENERIC_SITE_CREATURE_UPGRADE_FLAG;
+            eventHero->m_eventFlags = eventHero->m_eventFlags | AI_GENERIC_SITE_CREATURE_UPGRADE_FLAG;
             eventHero->m_mobility += AI_EVENT_CREATURE_UPGRADE_MOBILITY;
             eventHero->m_remainingMobility += AI_EVENT_CREATURE_UPGRADE_MOBILITY;
         }
