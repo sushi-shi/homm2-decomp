@@ -2358,7 +2358,7 @@ void philAI::ValueOfBuyingCreature(
         creatureValue = static_cast<i32>(creatureValue * AI_CREATURE_VISITING_HERO_FACTOR);
         if (gMonsterDatabase[IDX(creature)].race == visitingHeroCandidate->m_cursorType)
             creatureValue = static_cast<i32>(creatureValue * AI_CREATURE_SAME_RACE_FACTOR);
-        if (gMonsterDatabase[IDX(creature)].attributes & IDX(AI_CREATURE_PURCHASE_RANGED_ATTRIBUTE)) {
+        if HAS(gMonsterDatabase[IDX(creature)].attributes, MONSTER_ATTRIBUTE_RANGED) {
             for (visitingArmySlot = 0; visitingArmySlot < AI_CREATURE_PURCHASE_ARMY_SLOT_COUNT;
                  visitingArmySlot++) {
                 if (visitingHeroCandidate->m_army.m_creatureTypes[visitingArmySlot]
@@ -2382,7 +2382,7 @@ void philAI::ValueOfBuyingCreature(
         );
     }
 
-    if (gMonsterDatabase[IDX(creature)].attributes & IDX(AI_CREATURE_PURCHASE_RANGED_ATTRIBUTE)) {
+    if HAS(gMonsterDatabase[IDX(creature)].attributes, MONSTER_ATTRIBUTE_RANGED) {
         for (garrisonSlot = 0; garrisonSlot < AI_CREATURE_PURCHASE_ARMY_SLOT_COUNT;
              garrisonSlot++) {
             if (townPtr->m_army.m_creatureTypes[garrisonSlot] != AI_TROOP_EMPTY_SLOT
