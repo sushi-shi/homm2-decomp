@@ -31,6 +31,7 @@
 #include <SOURCE/wingraph.h>
 #include <BASE/BITS.h>
 #include <BASE/bmap2.h>
+#include <BASE/sample.h>
 #include <SOURCE/KB.h>
 #include <windows.h>
 #include <stdlib.h>
@@ -1195,7 +1196,7 @@ i32 RecruitHeroHandler(tag_message &msg)
                 break;
             case 0x7802:
                 gpTownManager->m_recruitState = 0;
-                *(i32 *)((char *)gpWindowManager + 0x5a) = msg.payload.widget.id;
+                gpWindowManager->m_dialogResult = msg.payload.widget.id;
                 a = 1;
                 break;
             }
@@ -3102,7 +3103,7 @@ SAMPLE2 LoadPlaySample(char *name)
     SAMPLE2 ss;
     ss.pSample = gpResourceManager->GetSample(name);
     if (ss.pSample) {
-        *(i32 *)((char *)ss.pSample + 0x1c) = 2;
+        ss.pSample->m_playbackData.channelType = 2;
         ss.pMem = gpSoundManager->MemorySample(ss.pSample);
     }
     return ss;
@@ -3165,9 +3166,9 @@ void EarlyShutDownSystem(void)
 VA(0x0049eb90, 0x75)
 i32 GameUnsaved(void)
 {
-    if ((gpAdvManager && *(i32 *)((char *)gpAdvManager + 0x32) == 1) ||
-        (gpCombatManager && *(i32 *)((char *)gpCombatManager + 0x32) == 1) ||
-        (gpTownManager && *(i32 *)((char *)gpTownManager + 0x32) == 1))
+    if ((gpAdvManager && gpAdvManager->m_active == 1) ||
+        (gpCombatManager && gpCombatManager->m_active == 1) ||
+        (gpTownManager && gpTownManager->m_active == 1))
         return 1;
     else
         return 0;
