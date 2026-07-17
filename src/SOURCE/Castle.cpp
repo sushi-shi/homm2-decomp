@@ -73,7 +73,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
     for (slot7 = 0; slot7 < CASTLE_SLOT_COUNT; ++slot7) {
         if (CanBuy(m_town, castleSlotsUse[slot7]))
             m_affordableBuildings |= 1L << castleSlotsUse[slot7];
-        if (CanBuild(m_town, castleSlotsUse[slot7]))
+        if (CanBuild(m_town, BuildingSlotType(castleSlotsUse[slot7])))
             m_buildableBuildings |= 1L << castleSlotsUse[slot7];
     }
 
@@ -106,7 +106,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
             message3.payload.widget.data.text = gText;
         } else {
             message3.payload.widget.data.text =
-                GetBuildingName(m_town->m_type, castleSlotsUse[slot7]);
+                GetBuildingName(FactionType(m_town->m_type), BuildingSlotType(castleSlotsUse[slot7]));
         }
         casWin->BroadcastMessage(message3);
     }
@@ -402,13 +402,13 @@ i32 CastleHandler(tag_message& message) {
                     sprintf(
                         gText,
                         cCastleInfo[IDX(CASTLE_INFO_CANNOT_BUILD)],
-                        GetBuildingName(gpTownManager->m_town->m_type, buildingIndex)
+                        GetBuildingName(FactionType(gpTownManager->m_town->m_type), BuildingSlotType(buildingIndex))
                     );
                 } else if (!(gpTownManager->m_affordableBuildings & (1L << buildingIndex))) {
                     sprintf(
                         gText,
                         cCastleInfo[IDX(CASTLE_INFO_CANNOT_AFFORD)],
-                        GetBuildingName(gpTownManager->m_town->m_type, buildingIndex)
+                        GetBuildingName(FactionType(gpTownManager->m_town->m_type), BuildingSlotType(buildingIndex))
                     );
                 } else {
                     if (!(gpTownManager->m_town->m_buildings & 1L))
@@ -453,26 +453,26 @@ i32 CastleHandler(tag_message& message) {
                     sprintf(
                         gText,
                         cCastleInfo[IDX(CASTLE_INFO_ALREADY_BUILT)],
-                        GetBuildingName(gpTownManager->m_town->m_type, buildingIndex)
+                        GetBuildingName(FactionType(gpTownManager->m_town->m_type), BuildingSlotType(buildingIndex))
                     );
                 } else {
                     if (!(gpTownManager->m_buildableBuildings & (1L << buildingIndex)))
                         sprintf(
                             gText,
                             cCastleInfo[IDX(CASTLE_INFO_CANNOT_BUILD)],
-                            GetBuildingName(gpTownManager->m_town->m_type, buildingIndex)
+                            GetBuildingName(FactionType(gpTownManager->m_town->m_type), BuildingSlotType(buildingIndex))
                         );
                     else if (!(gpTownManager->m_affordableBuildings & (1L << buildingIndex)))
                         sprintf(
                             gText,
                             cCastleInfo[IDX(CASTLE_INFO_CANNOT_AFFORD)],
-                            GetBuildingName(gpTownManager->m_town->m_type, buildingIndex)
+                            GetBuildingName(FactionType(gpTownManager->m_town->m_type), BuildingSlotType(buildingIndex))
                         );
                     else
                         sprintf(
                             gText,
                             cCastleInfo[IDX(CASTLE_INFO_BUILD)],
-                            GetBuildingName(gpTownManager->m_town->m_type, buildingIndex)
+                            GetBuildingName(FactionType(gpTownManager->m_town->m_type), BuildingSlotType(buildingIndex))
                         );
                 }
                 break;

@@ -697,8 +697,8 @@ void swapManager::SwapArtifacts(void) {
     i32 selectedArtifact = m_heroes[IDX(m_selectedSide)]->m_artifacts[m_selectedSlot];
     i32 targetArtifact_2 = m_heroes[m_targetSide]->m_artifacts[m_targetSlot];
 
-    GiveTakeArtifactStat(m_heroes[IDX(m_selectedSide)], selectedArtifact, 1);
-    GiveTakeArtifactStat(m_heroes[m_targetSide], targetArtifact_2, 1);
+    GiveTakeArtifactStat(m_heroes[IDX(m_selectedSide)], ArtifactType(selectedArtifact), 1);
+    GiveTakeArtifactStat(m_heroes[m_targetSide], ArtifactType(targetArtifact_2), 1);
     m_heroes[IDX(m_selectedSide)]->m_artifacts[m_selectedSlot] = targetArtifact_2;
     m_heroes[m_targetSide]->m_artifacts[m_targetSlot] = selectedArtifact;
 
@@ -707,8 +707,8 @@ void swapManager::SwapArtifacts(void) {
         m_heroes[m_targetSide]->m_artifactExtra[m_targetSlot];
     m_heroes[m_targetSide]->m_artifactExtra[m_targetSlot] = extra;
 
-    GiveTakeArtifactStat(m_heroes[IDX(m_selectedSide)], targetArtifact_2, 0);
-    GiveTakeArtifactStat(m_heroes[m_targetSide], selectedArtifact, 0);
+    GiveTakeArtifactStat(m_heroes[IDX(m_selectedSide)], ArtifactType(targetArtifact_2), 0);
+    GiveTakeArtifactStat(m_heroes[m_targetSide], ArtifactType(selectedArtifact), 0);
     m_heroes[IDX(m_selectedSide)]->CheckAnduranPieces(1);
     m_heroes[m_targetSide]->CheckAnduranPieces(1);
 

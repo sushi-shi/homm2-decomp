@@ -237,7 +237,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
 
                         if (eventExtra1->artifact != MAP_EVENT_REWARD_NONE
                             && eventHero2->NumArtifacts() < 14) {
-                            GiveArtifact(eventHero2, eventExtra1->artifact, 1, -1);
+                            GiveArtifact(eventHero2, ArtifactType(eventExtra1->artifact), 1, -1);
                             if (primaryReward3 != MAP_EVENT_REWARD_NONE) {
                                 secondaryReward_f = primaryReward3;
                                 secondaryAmount = primaryAmount1;
@@ -626,7 +626,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     -1,
                     0
                 );
-                GiveArtifact(eventHero2, cell->m_objectMetadata, 1, -1);
+                GiveArtifact(eventHero2, ArtifactType(cell->m_objectMetadata), 1, -1);
             } else {
                 NormalDialog(
                     "{Shipwreck Survivor}\n\nYou've pulled a shipwreck survivor from certain death "
@@ -3540,7 +3540,7 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
     switch (siteType2) {
         case IDX(GENERIC_SITE_ALCHEMIST_TOWER):
             for (index3 = 0; index3 < GENERIC_SITE_ARTIFACT_SLOT_COUNT; index3++) {
-                if (IsCursedItem(eventHero->m_artifacts[index3]))
+                if (IsCursedItem(ArtifactType(eventHero->m_artifacts[index3])))
                     cursedArtifactCount9++;
             }
             if (cursedArtifactCount9 != 0) {
@@ -3567,7 +3567,7 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
                 if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                     if (gpCurPlayer->m_resources[IDX(RES_GOLD)] >= GENERIC_SITE_ALCHEMIST_COST) {
                         for (index3 = 0; index3 < GENERIC_SITE_ARTIFACT_SLOT_COUNT; index3++) {
-                            if (IsCursedItem(eventHero->m_artifacts[index3]))
+                            if (IsCursedItem(ArtifactType(eventHero->m_artifacts[index3])))
                                 eventHero->m_artifacts[index3] = IDX(ARTIFACT_NONE);
                         }
                         gpCurPlayer->m_resources[IDX(RES_GOLD)] -= GENERIC_SITE_ALCHEMIST_COST;
@@ -4255,7 +4255,7 @@ ArtifactType advManager::GiveRandomArtifact(hero* eventHero) {
     if (artifactId == ARTIFACT_NONE)
         GiveResource(eventHero, IDX(RES_GOLD), EVENT_RANDOM_ARTIFACT_GOLD);
     else
-        GiveArtifact(eventHero, artifactId, 1, ARTIFACT_NONE);
+        GiveArtifact(eventHero, ArtifactType(artifactId), 1, ARTIFACT_NONE);
     return artifactId;
 }
 
@@ -5525,9 +5525,9 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 for (index_h = IDX(SPELL_SET_EARTH_GUARDIAN); index_h < IDX(SPELL_SET_WATER_GUARDIAN);
                      ++index_h) {
                     if (eventHero->HasSpell(SpellType(index_h))
-                        && GetManaCost(index_h, eventHero) < eventHero->m_spellPoints) {
+                        && GetManaCost(SpellType(index_h), eventHero) < eventHero->m_spellPoints) {
                         eventHero->m_spellPoints = static_cast<i16>(
-                            eventHero->m_spellPoints - GetManaCost(index_h, eventHero)
+                            eventHero->m_spellPoints - GetManaCost(SpellType(index_h), eventHero)
                         );
                         gpGame->m_mines[cell->m_objectMetadata].guardianType =
                             static_cast<i8>(index_h + 1);
@@ -5555,7 +5555,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                     cell->m_objectMetadata = CHEST_GOLD_ONLY;
                     goto chestGoldOrExperience;
                 }
-                GiveArtifact(eventHero, cell->m_objectMetadata & CHEST_ARTIFACT_MASK, 1, -1);
+                GiveArtifact(eventHero, ArtifactType(cell->m_objectMetadata & CHEST_ARTIFACT_MASK), 1, -1);
             } else {
             chestGoldOrExperience:
                 if (gpPhilAI->ChooseGoldOrExperience(
@@ -5699,7 +5699,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
         case MAP_OBJECT_SEA_CHEST:
             if ((cell->m_objectMetadata & CHEST_ARTIFACT_FLAG) != 0
                 && eventHero->NumArtifacts() < AI_EVENT_ARTIFACT_LIMIT) {
-                GiveArtifact(eventHero, cell->m_objectMetadata & CHEST_ARTIFACT_MASK, 1, -1);
+                GiveArtifact(eventHero, ArtifactType(cell->m_objectMetadata & CHEST_ARTIFACT_MASK), 1, -1);
                 GiveResource(eventHero, IDX(RES_GOLD), AI_EVENT_SEA_CHEST_ARTIFACT_GOLD);
             } else if (cell->m_objectMetadata != 0) {
                 GiveResource(eventHero, IDX(RES_GOLD), AI_EVENT_SEA_CHEST_GOLD);
@@ -6330,7 +6330,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
 
         case MAP_OBJECT_SHIPWRECK_SURVIVOR:
             if (eventHero->NumArtifacts() < AI_EVENT_ARTIFACT_LIMIT)
-                GiveArtifact(eventHero, cell->m_objectMetadata, 1, -1);
+                GiveArtifact(eventHero, ArtifactType(cell->m_objectMetadata), 1, -1);
             eventResults[0] = 1;
             break;
 
@@ -6374,7 +6374,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                     }
                     if (eventExtra_o->artifact != -1
                         && eventHero->NumArtifacts() < AI_EVENT_ARTIFACT_LIMIT) {
-                        GiveArtifact(eventHero, eventExtra_o->artifact, 1, -1);
+                        GiveArtifact(eventHero, ArtifactType(eventExtra_o->artifact), 1, -1);
                     }
                     eventExtra_o->active = 0;
                 } else {
@@ -6467,7 +6467,7 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
     switch (siteType3) {
         case AI_GENERIC_SITE_CURSED_ARTIFACTS:
             for (artifactIndex1 = 0; artifactIndex1 < AI_EVENT_ARTIFACT_LIMIT; artifactIndex1++) {
-                if (IsCursedItem(eventHero->m_artifacts[artifactIndex1]))
+                if (IsCursedItem(ArtifactType(eventHero->m_artifacts[artifactIndex1])))
                     cursedArtifactCount5++;
             }
             if (cursedArtifactCount5 != 0
@@ -6475,7 +6475,7 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
                        >= AI_EVENT_CURSED_ARTIFACT_GOLD_THRESHOLD) {
                 for (artifactIndex1 = 0; artifactIndex1 < AI_EVENT_ARTIFACT_LIMIT;
                      artifactIndex1++) {
-                    if (IsCursedItem(eventHero->m_artifacts[artifactIndex1]))
+                    if (IsCursedItem(ArtifactType(eventHero->m_artifacts[artifactIndex1])))
                         eventHero->m_artifacts[artifactIndex1] = IDX(ARTIFACT_NONE);
                 }
                 gpCurPlayer->m_resources[IDX(RES_GOLD)] -= AI_EVENT_CURSED_ARTIFACT_COST;

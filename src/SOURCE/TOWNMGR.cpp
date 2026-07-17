@@ -2006,7 +2006,7 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
                     strcat(description_b, "\n\nRequires:");
                 ++prerequisiteCount_p;
                 strcat(description_b, "\n");
-                strcat(description_b, GetBuildingName(m_town->m_type, index_h));
+                strcat(description_b, GetBuildingName(FactionType(m_town->m_type), BuildingSlotType(index_h)));
             }
         }
         if (m_town->m_type == IDX(FACTION_NECROMANCER)
@@ -2056,7 +2056,7 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
                                                         : TOWN_MAGE_GUILD_MAX_LEVEL
         );
     } else {
-        strcpy(gText, GetBuildingName(m_town->m_type, building));
+        strcpy(gText, GetBuildingName(FactionType(m_town->m_type), BuildingSlotType(building)));
     }
     message_m.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message_m.payload.widget.id = 3;
@@ -2393,14 +2393,14 @@ void townManager::SetupMage(heroWindow* window) {
                         gText,
                         "%s\n[%d]",
                         gSpellNames[m_town->m_spells[level][slot_m]],
-                        GetManaCost(m_town->m_spells[level][slot_m], 0)
+                        GetManaCost(SpellType(m_town->m_spells[level][slot_m]), 0)
                     );
                 else
                     sprintf(
                         gText,
                         "%s  [%d]",
                         gSpellNames[m_town->m_spells[level][slot_m]],
-                        GetManaCost(m_town->m_spells[level][slot_m], 0)
+                        GetManaCost(SpellType(m_town->m_spells[level][slot_m]), 0)
                     );
                 message_b.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
                 message_b.payload.widget.id = level * TOWN_MAGE_SPELLS_PER_LEVEL + slot_m

@@ -2411,7 +2411,7 @@ void game::UpdateSpellWidgets(void) {
             );
             message9.payload.widget.command = WIDGET_COMMAND_SET_FILL_COLOR;
             message9.payload.widget.id = spellSlot6 + 30;
-            if (GetManaCost(spell2, m_viewSpellsHero) > m_viewSpellsHero->m_spellPoints)
+            if (GetManaCost(SpellType(spell2), m_viewSpellsHero) > m_viewSpellsHero->m_spellPoints)
                 message9.payload.widget.data.value = 3;
             else
                 message9.payload.widget.command = 1;
@@ -2435,14 +2435,14 @@ void game::UpdateSpellWidgets(void) {
                     gText,
                     "%s\n[%d]",
                     gSpellNames[spell2],
-                    GetManaCost(spell2, m_viewSpellsHero)
+                    GetManaCost(SpellType(spell2), m_viewSpellsHero)
                 );
             } else {
                 sprintf(
                     gText,
                     "%s [%d]",
                     gSpellNames[spell2],
-                    GetManaCost(spell2, m_viewSpellsHero)
+                    GetManaCost(SpellType(spell2), m_viewSpellsHero)
                 );
             }
             message9.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
@@ -2726,7 +2726,7 @@ void game::ViewArmy(
         reinterpret_cast<i8*>(&sViewArmyMonFrameInfo),
         sizeof(sViewArmyMonFrameInfo)
     );
-    ModifyFrameInfo(&sViewArmyMonFrameInfo, monsterType);
+    ModifyFrameInfo(&sViewArmyMonFrameInfo, CreatureType(monsterType));
     BuildTempWalkSeq(&sViewArmyMonFrameInfo, 0, 1);
 
     viewArmyBaseX = 167;
@@ -4258,7 +4258,7 @@ i32 game::GetRandomArtifactId(i32 levelMask, i32 allowCursed) {
             continue;
         if (attempts++ < RANDOM_ARTIFACT_UNIQUE_RETRIES && m_randomArtifacts[artifact])
             continue;
-        if (IsCursedItem(artifact)) {
+        if (IsCursedItem(ArtifactType(artifact))) {
             if (!allowCursed)
                 continue;
             if (Random(RANDOM_ARTIFACT_FIRST, RANDOM_ARTIFACT_CURSED_ROLL_MAX)
@@ -5262,7 +5262,7 @@ void game::ProcessOnMapHeroes(void) {
                         }
                         for (artifactSlot10 = 0; artifactSlot10 < 3; artifactSlot10++) {
                             if (extra0->artifacts[artifactSlot10] >= 0)
-                                GiveArtifact(mapHero0, extra0->artifacts[artifactSlot10], 1, -1);
+                                GiveArtifact(mapHero0, ArtifactType(extra0->artifacts[artifactSlot10]), 1, -1);
                         }
                         if (extra0->hasCustomName)
                             strcpy(mapHero0->m_name, extra0->name);

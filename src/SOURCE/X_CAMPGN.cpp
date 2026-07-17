@@ -281,7 +281,7 @@ void ExpCampaign::InitMap(void) {
             break;
         case CAMPAIGN_CHOICE_ARTIFACT:
             if (player->m_heroCount > 0)
-                GiveArtifact(gpGame->GetHero(player->m_heroIds[0]), campaignChoice->value, 0, -1);
+                GiveArtifact(gpGame->GetHero(player->m_heroIds[0]), ArtifactType(campaignChoice->value), 0, -1);
             break;
         case CAMPAIGN_CHOICE_SPELL:
             if (player->m_heroCount > 0)
