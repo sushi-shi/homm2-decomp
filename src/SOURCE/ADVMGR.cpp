@@ -360,7 +360,7 @@ i32 advManager::Open(i32 id) {
     giBottomViewOverride = 0;
     gConfig.soundVolume = oldSampleVolumeState;
     gpSoundManager->AdjustSoundVolumes();
-    m_messageMask = ADVMGR_MANAGER_MESSAGE;
+    m_messageMask = BASE_MANAGER_ACCEPT_ADVENTURE;
     m_priority = id;
     m_active = true;
     strcpy(m_name, "advManager");
@@ -491,8 +491,8 @@ class mapCell* advManager::DoAdvCommand(void) {
             if (currentHeroState == 0) {
                 break;
             }
-            if (currentHeroState->m_destinationX == ADVMGR_INVALID_CELL
-                || currentHeroState->m_destinationY == ADVMGR_INVALID_CELL) {
+            if (currentHeroState->m_destinationX == IDX(ADVMGR_INVALID_CELL)
+                || currentHeroState->m_destinationY == IDX(ADVMGR_INVALID_CELL)) {
                 break;
             }
             gpSearchArray->BuildPath(
@@ -630,7 +630,7 @@ class mapCell* advManager::DoAdvCommand(void) {
     }
 
     m_selectedCell = ADVMGR_COMMAND_NONE;
-    m_hoverCellY = ADVMGR_INVALID_CELL;
+    m_hoverCellY = IDX(ADVMGR_INVALID_CELL);
     m_lastHoverCell = m_hoverCellY;
     if (refreshHover) {
         ForceNewHover();
@@ -1003,7 +1003,7 @@ i32 advManager::Main(struct tag_message& message) {
                         ViewPuzzle();
                         break;
                     case 47:
-                        ViewWorld(SPELL_VIEW_ALL, 0, 0);
+                        ViewWorld(VIEW_WORLD_ALL, false, false);
                         break;
                     case 49:
                         cheatDigitLocal = 'e';
@@ -1059,7 +1059,7 @@ i32 advManager::Main(struct tag_message& message) {
                         break;
                     case 20:
                         if (gpCurPlayer->m_townCount >= 0) {
-                            if (gpCurPlayer->CurrentTown() == ADVMGR_INVALID_CELL) {
+                            if (gpCurPlayer->CurrentTown() == IDX(ADVMGR_INVALID_CELL)) {
                                 nextTownId = gpCurPlayer->m_townIds[0];
                             } else {
                                 nextTownId = 0;
@@ -1084,7 +1084,7 @@ i32 advManager::Main(struct tag_message& message) {
                         SetHeroContext(gpCurPlayer->NextHero(0), 0);
                         break;
                     case 28:
-                        if (gpCurPlayer->CurrentTown() != ADVMGR_INVALID_CELL) {
+                        if (gpCurPlayer->CurrentTown() != IDX(ADVMGR_INVALID_CELL)) {
                             m_selectedCell = ADVMGR_COMMAND_TOWN_VIEW;
                             DoAdvCommand();
                         } else {
@@ -1629,7 +1629,7 @@ i32 advManager::ProcessDeSelect(
 // byte /Ob1 continuation: ours is at +0x0c and retail's is at +0x1d. Declaration
 // initialization and post-declaration assignment compile to the same placement.
 VA(0x0045a07c, 0x5c8)
-i32 advManager::ProcessSearch(i32 x, i32 y) {
+i32 advManager::ProcessSearch(i32 x, AdventureCommand y) {
     mapCell* currentCell;
     i32 playerState;
     tag_message messageValue;
@@ -1686,7 +1686,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
         x = m_mapOriginX + 7;
         y = m_mapOriginY + 7;
     }
-    currentCell = GetCell(x, y);
+    currentCell = GetCell(x, IDX(y));
     if (!((currentCell->m_objectIndex == IDX(MAPCELL_SPRITE_NONE)
            || currentCell->m_objectTileset == ADVMGR_CLEAR_GROUND_TILESET)
           && currentCell->m_overlayIndex == IDX(MAPCELL_SPRITE_NONE))) {
@@ -1718,7 +1718,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
     CompleteDraw(0);
     UpdateScreen(0, 0);
 
-    if (gpGame->m_ultimateArtifactX == x && gpGame->m_ultimateArtifactY == y
+    if (gpGame->m_ultimateArtifactX == x && gpGame->m_ultimateArtifactY == IDX(y)
         && gpGame->m_ultimateArtifactId != IDX(ARTIFACT_NONE)) {
         if (searchingHeroState->NumArtifacts() >= ADVMGR_ARTIFACT_CAPACITY) {
             if (gbHumanPlayer[giCurPlayer]) {
@@ -4437,7 +4437,7 @@ void advManager::UpdateTownLocators(i32 drawWindow, i32 updateScreen) {
         townId37 = gpCurPlayer->m_townIds[gpCurPlayer->m_townLocatorPage + locatorSlot];
         locatorMessage14.payload.widget.command = ADVMGR_LOCATOR_COMMAND_SET_COLOR;
         locatorMessage14.payload.widget.id = locatorSlot + ADVMGR_LOCATOR_TOWN_BORDER_BASE;
-        if (gpCurPlayer->m_currentTown != ADVMGR_INVALID_CELL
+        if (gpCurPlayer->m_currentTown != IDX(ADVMGR_INVALID_CELL)
             && gpCurPlayer->m_currentTown == townId37 && !gbAllBlack) {
             locatorMessage14.payload.widget.data.value = ADVMGR_LOCATOR_SELECTED_COLOR;
         } else {
@@ -4446,7 +4446,7 @@ void advManager::UpdateTownLocators(i32 drawWindow, i32 updateScreen) {
         m_adventureWindow->BroadcastMessage(locatorMessage14);
 
         locatorMessage14.payload.widget.id = locatorSlot + ADVMGR_LOCATOR_TOWN_IMAGE_BASE;
-        if (townId37 == ADVMGR_INVALID_CELL || gbAllBlack) {
+        if (townId37 == IDX(ADVMGR_INVALID_CELL) || gbAllBlack) {
             locatorMessage14.payload.widget.command = ADVMGR_LOCATOR_COMMAND_SET_FRAME;
             locatorMessage14.payload.widget.data.value =
                 locatorSlot + ADVMGR_LOCATOR_TOWN_EMPTY_FRAME_BASE;
@@ -6086,7 +6086,7 @@ void advManager::SetHeroContext(i32 heroId, i32 update) {
     m_mapOriginY = currentHero->m_y - ADVMGR_VIEW_CENTER_OFFSET;
     m_cursorMapY = 7;
     m_cursorMapX = m_cursorMapY;
-    m_previousCursorMapY = ADVMGR_INVALID_CELL;
+    m_previousCursorMapY = IDX(ADVMGR_INVALID_CELL);
     m_previousCursorMapX = m_previousCursorMapY;
     if (HAS(currentHero->m_eventFlags, HERO_EVENT_EMBARKED)) {
         m_cursorType = CURSOR_HERO_TYPE_BOAT;
@@ -7845,7 +7845,7 @@ void advManager::ShowRoute(i32 redraw, i32, i32 updateButton) {
     }
 
     currentHero0 = gpGame->GetHero(gpCurPlayer->m_currentHero);
-    if (currentHero0->m_destinationX == ADVMGR_INVALID_CELL) {
+    if (currentHero0->m_destinationX == IDX(ADVMGR_INVALID_CELL)) {
         HideRoute(redraw, 1, 1);
         return;
     }
@@ -7978,8 +7978,8 @@ void advManager::HideRoute(i32 redraw, i32 clearDestination, i32 updateButton) {
 
     if (clearDestination && gpCurPlayer->m_currentHero != ADVMGR_INVALID_HERO) {
         currentHero = &gpGame->m_heroRecs[gpCurPlayer->CurrentHero()];
-        currentHero->m_destinationX = ADVMGR_INVALID_CELL;
-        currentHero->m_destinationY = ADVMGR_INVALID_CELL;
+        currentHero->m_destinationX = IDX(ADVMGR_INVALID_CELL);
+        currentHero->m_destinationY = IDX(ADVMGR_INVALID_CELL);
     }
 
     if (!m_visibilityMapValid) {
@@ -8075,7 +8075,7 @@ void advManager::ForceNewHover(void) {
         return;
     }
     gpMouseManager->MouseCoords(x, y);
-    m_lastHoverCell = ADVMGR_INVALID_CELL;
+    m_lastHoverCell = IDX(ADVMGR_INVALID_CELL);
     ProcessHover(x, y);
 }
 
@@ -8229,7 +8229,7 @@ void advManager::SetInitialMapOrigin(void) {
     m_cursorActive = 0;
     gbHeroMoving = false;
 
-    if (gbThisNetHumanPlayer[giCurPlayer] && gpCurPlayer->CurrentTown() != ADVMGR_INVALID_CELL) {
+    if (gbThisNetHumanPlayer[giCurPlayer] && gpCurPlayer->CurrentTown() != IDX(ADVMGR_INVALID_CELL)) {
         currentTown9 = &gpGame->m_castleRecs[gpCurPlayer->CurrentTown()];
         m_mapOriginX = currentTown9->m_x - ADVMGR_VIEW_CENTER_OFFSET;
         m_mapOriginY = currentTown9->m_y - ADVMGR_VIEW_CENTER_OFFSET;
@@ -8947,10 +8947,10 @@ void advManager::AdvPanel(void) {
                 }
                 break;
             case ADVMGR_PANEL_SEARCH:
-                ProcessSearch(ADVMGR_INVALID_CELL, ADVMGR_INVALID_CELL);
+                ProcessSearch(IDX(ADVMGR_INVALID_CELL), IDX(ADVMGR_INVALID_CELL));
                 break;
             case ADVMGR_PANEL_VIEW_WORLD:
-                ViewWorld(SPELL_VIEW_ALL, 0, 0);
+                ViewWorld(VIEW_WORLD_ALL, false, false);
                 break;
             case ADVMGR_PANEL_VIEW_PUZZLE:
                 ViewPuzzle();
