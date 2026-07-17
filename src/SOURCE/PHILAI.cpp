@@ -2358,7 +2358,7 @@ void philAI::ValueOfBuyingCreature(
         creatureValue = static_cast<i32>(creatureValue * AI_CREATURE_VISITING_HERO_FACTOR);
         if (gMonsterDatabase[IDX(creature)].race == visitingHeroCandidate->m_cursorType)
             creatureValue = static_cast<i32>(creatureValue * AI_CREATURE_SAME_RACE_FACTOR);
-        if HAS(gMonsterDatabase[IDX(creature)].attributes, MONSTER_ATTRIBUTE_RANGED) {
+        if (HAS(gMonsterDatabase[IDX(creature)].attributes, MONSTER_ATTRIBUTE_RANGED)) {
             for (visitingArmySlot = 0; visitingArmySlot < AI_CREATURE_PURCHASE_ARMY_SLOT_COUNT;
                  visitingArmySlot++) {
                 if (visitingHeroCandidate->m_army.m_creatureTypes[visitingArmySlot]
@@ -2382,7 +2382,7 @@ void philAI::ValueOfBuyingCreature(
         );
     }
 
-    if HAS(gMonsterDatabase[IDX(creature)].attributes, MONSTER_ATTRIBUTE_RANGED) {
+    if (HAS(gMonsterDatabase[IDX(creature)].attributes, MONSTER_ATTRIBUTE_RANGED)) {
         for (garrisonSlot = 0; garrisonSlot < AI_CREATURE_PURCHASE_ARMY_SLOT_COUNT;
              garrisonSlot++) {
             if (townPtr->m_army.m_creatureTypes[garrisonSlot] != AI_TROOP_EMPTY_SLOT
@@ -2441,7 +2441,7 @@ void philAI::GetBestCreature(town* townPtr, BHC& best, float& bestValue) {
     bestRaw = AI_PURCHASE_INITIAL_VALUE;
     bestRandomized = AI_PURCHASE_INITIAL_VALUE;
     for (dwelling = 0; dwelling < AI_CREATURE_PURCHASE_DWELLING_COUNT; dwelling++) {
-        creature = gDwellingType[townPtr->m_type][dwelling];
+        creature = static_cast<CreatureType>(gDwellingType[townPtr->m_type][dwelling]);
         leastArmyValue = AI_CREATURE_PURCHASE_VALUE_LIMIT;
         if ((townPtr->m_buildings & BIT(dwelling + IDX(BUILDING_SLOT_DWELLING_FIRST)))
             && townPtr->m_garrison[dwelling] > 0) {
