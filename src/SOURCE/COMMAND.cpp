@@ -34,7 +34,7 @@
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\COMMAND.CPP"
 VA(0x0042a6d0, 0x36d)
 i32 combatManager::Main(tag_message& message) {
-    i32 IDX(result) = COMBAT_MAIN_CONTINUE;
+    i32 result = IDX(COMBAT_MAIN_CONTINUE);
 
     if (gbNoShowCombat == 0) {
         if (KBTickCount() > glTimers[0]) {

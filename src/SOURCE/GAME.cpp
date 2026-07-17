@@ -4738,7 +4738,7 @@ VA(0x0048111f, 0xf1)
 void game::SetupAdjacentMons(void) {
     i32 col;
     i32 row;
-    u8 IDX(mask) = MAP_EXTRA_ADJACENT_CLEAR_MASK;
+    u8 mask = IDX(MAP_EXTRA_ADJACENT_CLEAR_MASK);
     {
         i32 x;
         i32 y;
