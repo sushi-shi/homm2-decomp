@@ -657,7 +657,7 @@ i32 game::SaveGame(char* filename, i32 generateName, i8 expansionFormat) {
     write(fileInfo, m_mines, sizeof(m_mines));
     write(fileInfo, m_mineOwners, sizeof(m_mineOwners));
     if (!expansionFormat)
-        write(fileInfo, m_randomArtifacts, ARTIFACT_COUNT);
+        write(fileInfo, m_randomArtifacts, IDX(ARTIFACT_COUNT));
     else
         write(fileInfo, m_randomArtifacts, RANDOM_ARTIFACT_BASE_TABLE_SIZE);
     write(fileInfo, m_boats, sizeof(m_boats));
@@ -757,7 +757,7 @@ void game::SetupOrigData(void) {
     for (i = 0; i < GAME_HERO_COUNT; i++) {
         memset(&m_heroRecs[i], 0, sizeof(m_heroRecs[i]));
         memset(m_heroRecs[i].m_spells, 0, sizeof(m_heroRecs[i].m_spells));
-        memset(m_heroRecs[i].m_artifacts, ARTIFACT_NONE, sizeof(m_heroRecs[i].m_artifacts));
+        memset(m_heroRecs[i].m_artifacts, IDX(ARTIFACT_NONE), sizeof(m_heroRecs[i].m_artifacts));
         m_heroRecs[i].m_patrolY = -1;
         m_heroRecs[i].m_patrolX = m_heroRecs[i].m_patrolY;
         m_heroRecs[i].m_id = static_cast<i8>(i);
@@ -3357,11 +3357,11 @@ i32 game::ComputeDailyGold(i32 player) {
         }
     }
 
-    gold += m_players[player].NumOfGivenArtifact(30) * 1000;
-    gold += m_players[player].NumOfGivenArtifact(31) * 750;
-    gold += m_players[player].NumOfGivenArtifact(32) * 500;
-    gold += m_players[player].NumOfGivenArtifact(7) * 10000;
-    gold += m_players[player].NumOfGivenArtifact(69) * -250;
+    gold += m_players[player].NumOfGivenArtifact(ArtifactType(30)) * 1000;
+    gold += m_players[player].NumOfGivenArtifact(ArtifactType(31)) * 750;
+    gold += m_players[player].NumOfGivenArtifact(ArtifactType(32)) * 500;
+    gold += m_players[player].NumOfGivenArtifact(ArtifactType(7)) * 10000;
+    gold += m_players[player].NumOfGivenArtifact(ArtifactType(69)) * -250;
 
     for (heroIndex = 0; heroIndex < m_players[player].m_heroCount; heroIndex++) {
         gold += gEstatesGoldLevel[gpGame->m_heroRecs[m_players[player].m_heroIds[heroIndex]]
@@ -3436,17 +3436,17 @@ void game::PerDay(void) {
 
     for (player = 0; player < m_playerCount; player++) {
         m_players[player].m_resources[IDX(RES_SULFUR)] +=
-            m_players[player].NumOfGivenArtifact(IDX(ARTIFACT_ENDLESS_POUCH_SULFUR));
+            m_players[player].NumOfGivenArtifact(ARTIFACT_ENDLESS_POUCH_SULFUR);
         m_players[player].m_resources[IDX(RES_MERCURY)] +=
-            m_players[player].NumOfGivenArtifact(IDX(ARTIFACT_ENDLESS_VIAL_MERCURY));
+            m_players[player].NumOfGivenArtifact(ARTIFACT_ENDLESS_VIAL_MERCURY);
         m_players[player].m_resources[IDX(RES_GEMS)] +=
-            m_players[player].NumOfGivenArtifact(IDX(ARTIFACT_ENDLESS_POUCH_GEMS));
+            m_players[player].NumOfGivenArtifact(ARTIFACT_ENDLESS_POUCH_GEMS);
         m_players[player].m_resources[IDX(RES_WOOD)] +=
-            m_players[player].NumOfGivenArtifact(IDX(ARTIFACT_ENDLESS_CORD_WOOD));
+            m_players[player].NumOfGivenArtifact(ARTIFACT_ENDLESS_CORD_WOOD);
         m_players[player].m_resources[IDX(RES_ORE)] +=
-            m_players[player].NumOfGivenArtifact(IDX(ARTIFACT_ENDLESS_CART_ORE));
+            m_players[player].NumOfGivenArtifact(ARTIFACT_ENDLESS_CART_ORE);
         m_players[player].m_resources[IDX(RES_CRYSTAL)] +=
-            m_players[player].NumOfGivenArtifact(IDX(ARTIFACT_ENDLESS_POUCH_CRYSTAL));
+            m_players[player].NumOfGivenArtifact(ARTIFACT_ENDLESS_POUCH_CRYSTAL);
         m_players[player].m_resources[IDX(RES_GOLD)] += ComputeDailyGold(player);
     }
 
