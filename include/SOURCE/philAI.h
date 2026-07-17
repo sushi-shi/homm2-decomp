@@ -54,7 +54,7 @@ public:
     void GetBestCreature(class town*, struct BHC&, float&);
     i32 CreaturesToBuy(class town*, i32);
     i32 CreaturesToBuy(i32, i32);
-    i32 MaxBuyableCreatures(i32);
+    i32 MaxBuyableCreatures(CreatureType);
     void ValueOfBuyingHero(class town*, class hero*, i32&, float&);
     void GetBestHero(class town*, struct BHC&, float&);
     void
