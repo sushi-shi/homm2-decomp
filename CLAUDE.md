@@ -86,6 +86,11 @@ when ordinary disassembly is unclear. `homm2 ghidra` creates the optional projec
   directives.
 - Definitions and declarations follow the owner-header model. Do not add local
   `class`, `struct`, `enum`, `extern`, or forward declarations in `.cpp` files.
+- Reconstructed game integers use `Ints.h` aliases from `i8`/`u8` through
+  `i64`/`u64`; plain `char` remains textual. Use `i32l`/`u32l` only where retail
+  `long` type identity is proven to affect C++ ABI behavior, and keep native SDK
+  aliases at external API boundaries. The build assertion rejects raw integer
+  spellings in game-owned source and headers.
 - Comparison-only anonymous-data normalization happens under
   `build/objdiff/normalized/`. Raw compiler and delinker objects remain authoritative
   for linking, disassembly, and hard gates.

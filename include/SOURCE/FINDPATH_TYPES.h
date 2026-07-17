@@ -9,8 +9,8 @@
 #define FINDPATH_DESTRUCTION_SOURCE_LINE_BASE 26
 
 struct SFindPathSourceLine {
-    short value;
-    short reserved;
+    i16 value;
+    i16 reserved;
 };
 SIZE(SFindPathSourceLine, 0x4);
 

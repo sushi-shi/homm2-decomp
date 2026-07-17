@@ -11,12 +11,12 @@
 struct tag_Node {
     struct tag_Node *prev;      // +0x00
     struct tag_Node *next;      // +0x04
-    unsigned short   len;       // +0x08  payload length
+    u16   len;       // +0x08  payload length
     union {
-        unsigned char comData[1]; // +0x0a COM payload (variable length)
+        u8 comData[1]; // +0x0a COM payload (variable length)
         struct {
-            unsigned char sessionIndex; // NetBIOS session table index
-            unsigned char data[1];   // NetBIOS payload (variable length)
+            u8 sessionIndex; // NetBIOS session table index
+            u8 data[1];   // NetBIOS payload (variable length)
         };
     };
 };
@@ -46,10 +46,10 @@ typedef enum ComBaudRate {
 
 struct ComPortState {
     HANDLE handle;                 // +0x00
-    unsigned char reserved04[4];   // +0x04
+    u8 reserved04[4];   // +0x04
     DCB savedState;                // +0x08
     COMMTIMEOUTS savedTimeouts;    // +0x24
-    unsigned char reserved38[0x18];// +0x38
+    u8 reserved38[0x18];// +0x38
     tag_Anchor normalQueue;         // +0x50
     tag_Anchor priorityQueue;       // +0x58
 };
@@ -57,14 +57,14 @@ SIZE(ComPortState, 0x60);
 
 void add_node(struct tag_Anchor *, struct tag_Node *);
 struct tag_Node * pop_node(struct tag_Anchor *);
-void init_anchor(struct tag_Anchor *, int, int);
+void init_anchor(struct tag_Anchor *, i32, i32);
 void ShutdownComError(char *);
-short int com_init(unsigned char, int, int);
-void com_term(short int);
-short int com_rcv(short int, unsigned short int, void *);
-short int com_snd(short int, unsigned short int, unsigned short int, void *, int);
-short int __cdecl com_sess(int, int, ...);
-unsigned char com_stat(short int, unsigned short int);
+i16 com_init(u8, i32, i32);
+void com_term(i16);
+i16 com_rcv(i16, u16, void *);
+i16 com_snd(i16, u16, u16, void *, i32);
+i16 __cdecl com_sess(i32, i32, ...);
+u8 com_stat(i16, u16);
 void comm_wrt_task(void);
 
 #endif // HOMM2_COMWIN_H

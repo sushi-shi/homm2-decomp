@@ -1,6 +1,8 @@
 #ifndef HOMM2_BASE_BLURCONSTANTS_H
 #define HOMM2_BASE_BLURCONSTANTS_H
 
+#include <Ints.h>
+
 // Fixed geometry of the 640-pixel framebuffer region processed by DoBlur.
 typedef enum BlurBoundsConstant {
     BLUR_SCREEN_WIDTH = 640,
@@ -29,7 +31,7 @@ typedef enum BlurPaletteConstant {
     BLUR_PALETTE_COLOR_COUNT = 256,
     BLUR_PALETTE_BYTE_COUNT = BLUR_PALETTE_CHANNEL_COUNT * BLUR_PALETTE_COLOR_COUNT,
     BLUR_PALETTE_COMPONENT_MAXIMUM = 0x3f,
-    BLUR_COMPONENT_TABLE_BYTE_COUNT = sizeof(int) * BLUR_PALETTE_COLOR_COUNT
+    BLUR_COMPONENT_TABLE_BYTE_COUNT = sizeof(i32) * BLUR_PALETTE_COLOR_COUNT
 } BlurPaletteConstant;
 
 // RGBLOOKP.BIN is addressed as 1024 rows of 32 quantized blue entries.
@@ -45,7 +47,7 @@ typedef enum BlurTransitionConstant {
     BLUR_FIZZLE_DELAY = 150
 } BlurTransitionConstant;
 
-typedef int BlurComponentTable[BLUR_PALETTE_COLOR_COUNT];
-typedef unsigned char BlurLookupRow[BLUR_LOOKUP_ROW_BYTE_COUNT];
+typedef i32 BlurComponentTable[BLUR_PALETTE_COLOR_COUNT];
+typedef u8 BlurLookupRow[BLUR_LOOKUP_ROW_BYTE_COUNT];
 
 #endif // HOMM2_BASE_BLURCONSTANTS_H

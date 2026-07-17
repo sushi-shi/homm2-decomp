@@ -21,7 +21,7 @@
 // C frontend, Windows preamble, G3/G4/G5/GB and Oa/Ow profiles were tried. No AST pass: the
 // residual is not structurally aligned. Revisit only on a genuine predecessor/header state.
 VA(0x004d1594, 0x2e)
-extern "C" int __cdecl BitTest(const void *bits, BitIndex bitIndex)
+extern "C" i32 __cdecl BitTest(const void *bits, BitIndex bitIndex)
 {
     const BitByte *bytes = static_cast<const BitByte *>(bits);
     bytes += bitIndex >> BIT_INDEX_BYTE_SHIFT;

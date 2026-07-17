@@ -11,9 +11,9 @@ class town;
 
 struct BHC {
     town *pTown;     // 0x00
-    int type;        // 0x04  (0=building, 1=hero, 2=creature)
-    int what;        // 0x08
-    int num;         // 0x0c
+    i32 type;        // 0x04  (0=building, 1=hero, 2=creature)
+    i32 what;        // 0x08
+    i32 num;         // 0x0c
 };
 
 typedef enum AIResourceValue {
@@ -569,61 +569,61 @@ typedef enum AITownEvaluationConstant {
 
 // Declarations of the free functions DEFINED in PHILAI.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
-void ResetHeroRVs(int, int, int);
-void CheckDoMain(int a1, int doMain);
+void ResetHeroRVs(i32, i32, i32);
+void CheckDoMain(i32 a1, i32 doMain);
 void ShowStatus(void);
 void ValidateHero(hero *pHero);
 void InitAIMapVars(void);
 void CloseAIMapVars(void);
-int OnMySide(int);
+i32 OnMySide(i32);
 
 
 // --- globals owned by this TU (moved from _globals.h; CodeView-attributed) ---
-extern int bHeroBuiltThisTurn;
+extern i32 bHeroBuiltThisTurn;
 extern float gafAITurnCostResource[7];
-extern signed char *gaiEnemyHeroReachable;
-extern short *gaiHeroEventStratRVOfPos;
-extern short *gaiHeroStrategicRVOfPos;
-extern short *gaiLiveChanceOfPos;
-extern signed char *gaiTurnValueOfMine;
-extern int gbReduceByReload;
-extern signed char giBuildBoat[6];
-extern signed char giBuildBoatStuffTurn[6];
-extern signed char giBuildShipyard[6];
-extern int giCurPlayer;
-extern unsigned char giCurPlayerBit;
-extern int giCurTurn;
+extern i8 *gaiEnemyHeroReachable;
+extern i16 *gaiHeroEventStratRVOfPos;
+extern i16 *gaiHeroStrategicRVOfPos;
+extern i16 *gaiLiveChanceOfPos;
+extern i8 *gaiTurnValueOfMine;
+extern i32 gbReduceByReload;
+extern i8 giBuildBoat[6];
+extern i8 giBuildBoatStuffTurn[6];
+extern i8 giBuildShipyard[6];
+extern i32 giCurPlayer;
+extern u8 giCurPlayerBit;
+extern i32 giCurTurn;
 extern hero *gpCurAIHero;
 extern playerData *gpCurPlayer;
-extern unsigned char giCurWatchPlayerBit;
-extern int iAlphaMale;
-extern int iDummy;
-extern int iLastFrameRateTimer;
+extern u8 giCurWatchPlayerBit;
+extern i32 iAlphaMale;
+extern i32 iDummy;
+extern i32 iLastFrameRateTimer;
 extern searchArray SVSearchArray;
 
 // ---- globals (declarations, RVA order) ----
-extern int gbGameOver;
-extern signed char giMonType[];
-extern int iViewArmyNumTroops;
-extern signed char *gbNGHeroType;
-extern short giUABaseX;
-extern short giUABaseY;
-extern int giEndSequence;
-extern int gbDismissArmy;
-extern signed char *gbNGHuman;
-extern int iViewArmyFrame;
-extern int gbAllowUpgrade;
-extern int iViewArmyType;
+extern i32 gbGameOver;
+extern i8 giMonType[];
+extern i32 iViewArmyNumTroops;
+extern i8 *gbNGHeroType;
+extern i16 giUABaseX;
+extern i16 giUABaseY;
+extern i32 giEndSequence;
+extern i32 gbDismissArmy;
+extern i8 *gbNGHuman;
+extern i32 iViewArmyFrame;
+extern i32 gbAllowUpgrade;
+extern i32 iViewArmyType;
 extern class hero *viewSpellsHero;
-extern int gbUpgradeArmy;
-extern short RandMineQty[8];
-extern signed char *gbNGDifficulty;
-extern int iViewArmyUpgradeToType;
-extern int viewArmyBaseX;
-extern int viewArmyBaseY;
-extern signed char *gbNGColor;
-extern short giUARadius;
-extern signed char *gbNGPlayerPos;
-extern int viewArmyFacingWIPXMod;
+extern i32 gbUpgradeArmy;
+extern i16 RandMineQty[8];
+extern i8 *gbNGDifficulty;
+extern i32 iViewArmyUpgradeToType;
+extern i32 viewArmyBaseX;
+extern i32 viewArmyBaseY;
+extern i8 *gbNGColor;
+extern i16 giUARadius;
+extern i8 *gbNGPlayerPos;
+extern i32 viewArmyFacingWIPXMod;
 
 #endif // HOMM2_PHILAI_TU_H

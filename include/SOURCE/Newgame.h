@@ -1,5 +1,7 @@
 #ifndef HOMM2_NEWGAME_H
 #define HOMM2_NEWGAME_H
+
+#include <Ints.h>
 // Declarations of the free functions DEFINED in Newgame.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
 #include <EnumTypes.h>
@@ -149,24 +151,24 @@ HOMM2_ENUM_BEGIN(NewGameControl)
 HOMM2_ENUM_END(NewGameControl)
 
 #ifdef HOMM2_STRICT_ENUM_TYPES
-inline int EncodeNewGameControl(NewGameControl control)
+inline i32 EncodeNewGameControl(NewGameControl control)
 {
-    return static_cast<int>(control);
+    return static_cast<i32>(control);
 }
 
-inline NewGameControl DecodeNewGameControl(int value)
+inline NewGameControl DecodeNewGameControl(i32 value)
 {
     return static_cast<NewGameControl>(value);
 }
 
-inline int EncodeNewGameControlIndex(NewGameControl first, int index)
+inline i32 EncodeNewGameControlIndex(NewGameControl first, i32 index)
 {
-    return index + static_cast<int>(first);
+    return index + static_cast<i32>(first);
 }
 
-inline int LastNewGameControl(NewGameControl first, int count)
+inline i32 LastNewGameControl(NewGameControl first, i32 count)
 {
-    return static_cast<int>(first) + count - 1;
+    return static_cast<i32>(first) + count - 1;
 }
 #else
 #define EncodeNewGameControl(control) (control)
@@ -177,16 +179,16 @@ inline int LastNewGameControl(NewGameControl first, int count)
 
 #pragma pack(push, 1)
 struct NewGameRemotePacket {
-    signed char sender;
-    unsigned char reserved[4];
-    signed char type;
-    signed char command;
-    unsigned char sequence[2];
+    i8 sender;
+    u8 reserved[4];
+    i8 type;
+    i8 command;
+    u8 sequence[2];
     char payload[1];
 };
 
 #pragma pack(pop)
 
-int NewGameHandler(struct tag_message &);
+i32 NewGameHandler(struct tag_message &);
 
 #endif // HOMM2_NEWGAME_H

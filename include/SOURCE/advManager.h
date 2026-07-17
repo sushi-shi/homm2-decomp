@@ -24,8 +24,8 @@ struct tag_message;
 #define ADVMGR_MONSTER_ANIMATION_TABLE_SIZE 16
 
 struct adventureSoundCell {
-    int soundId;
-    int volume;
+    i32 soundId;
+    i32 volume;
 };
 
 #pragma pack(push, 1)  // recovered layout is byte-packed
@@ -34,9 +34,9 @@ public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (derived: base baseManager = 0x36 bytes at 0x00 via ': public baseManager'; own fields below)
-    int    m_selectedCell;  // +0x36
+    i32    m_selectedCell;  // +0x36
     union {
-        int m_heroLocatorState[12];  // +0x3a
+        i32 m_heroLocatorState[12];  // +0x3a
         class widget *m_bottomViewPrimaryWidgets[12];
         struct {
             class iconWidget *m_bottomViewBackground;  // +0x3a
@@ -46,24 +46,24 @@ public:
         };
     };
     union {
-        int m_townLocatorState[12];  // +0x6a
+        i32 m_townLocatorState[12];  // +0x6a
         class widget *m_bottomViewSecondaryWidgets[12];
         class textWidget *m_bottomViewAllTexts[12];
         struct {
-            int m_bottomViewTextReserved;  // +0x6a
+            i32 m_bottomViewTextReserved;  // +0x6a
             class textWidget *m_bottomViewTexts[5];  // +0x6e
             char m_bottomViewTextPadding[0x18];  // +0x82
         };
     };
     class heroWindow *m_adventureWindow;  // +0x9a
-    unsigned short *m_visibilityMap;  // +0x9e, packed route display cells
-    int    m_visibilityMapValid;  // +0xa2
-    int m_currentTerrain;  // +0xa6, index into giTerrainToMusicTrack
+    u16 *m_visibilityMap;  // +0x9e, packed route display cells
+    i32    m_visibilityMapValid;  // +0xa2
+    i32 m_currentTerrain;  // +0xa6, index into giTerrainToMusicTrack
     char _pad_0xaa[0x4];
     class fullMap *m_mapData;  // +0xae
     class iconWidget *m_scrollLeftButton;  // +0xb2
     class iconWidget *m_scrollRightButton;  // +0xb6
-    unsigned char *m_adventureBorder;  // +0xba
+    u8 *m_adventureBorder;  // +0xba
     char _pad_0xbe[0x4];
     class tileset *m_groundTiles;  // +0xc2
     class tileset *m_cloudTiles;  // +0xc6
@@ -71,259 +71,259 @@ public:
     class icon *m_objectIcons[64];  // +0xce
     class icon *m_puzzleIcon;  // +0x1ce
     class icon *m_cloudOverlayIcon;  // +0x1d2
-    int    m_mapOriginX;  // +0x1d6
-    int    m_mapOriginY;  // +0x1da
-    int    m_previousOriginX;  // +0x1de
-    int    m_previousOriginY;  // +0x1e2
-    int    m_lastHoverCell;  // +0x1e6
-    int    m_hoverCellY;  // +0x1ea
-    int    m_commandTargetX;  // +0x1ee
-    int    m_commandTargetY;  // +0x1f2
-    int    m_updateMinX;  // +0x1f6
-    int    m_updateMinY;  // +0x1fa
-    int    m_updateMaxX;  // +0x1fe
-    int    m_updateMaxY;  // +0x202
-    int    m_updatePending;  // +0x206
-    int    m_viewBounds[4];  // +0x20a
+    i32    m_mapOriginX;  // +0x1d6
+    i32    m_mapOriginY;  // +0x1da
+    i32    m_previousOriginX;  // +0x1de
+    i32    m_previousOriginY;  // +0x1e2
+    i32    m_lastHoverCell;  // +0x1e6
+    i32    m_hoverCellY;  // +0x1ea
+    i32    m_commandTargetX;  // +0x1ee
+    i32    m_commandTargetY;  // +0x1f2
+    i32    m_updateMinX;  // +0x1f6
+    i32    m_updateMinY;  // +0x1fa
+    i32    m_updateMaxX;  // +0x1fe
+    i32    m_updateMaxY;  // +0x202
+    i32    m_updatePending;  // +0x206
+    i32    m_viewBounds[4];  // +0x20a
     class icon *m_heroIcons[8];  // +0x21a
     class icon *m_shadowIcon;  // +0x23a
     class icon *m_boatShadowIcon;  // +0x23e
     class icon *m_flagIcons[6];  // +0x242
     class icon *m_boatFlagIcons[6];  // +0x25a
-    int    m_cursorActive;  // +0x272
-    int    m_drawHeroShadows;  // +0x276
-    int    m_cursorType;  // +0x27a
-    int    m_cursorDirection;  // +0x27e  !union: conflicting widths
-    int    m_cursorFrame;  // +0x282
-    int    m_cursorFrameCount;  // +0x286
-    int    m_cursorCycle;  // +0x28a
-    int    m_cursorTurning;  // +0x28e
-    int    m_cursorMapX;  // +0x292
-    int    m_previousCursorMapX;  // +0x296
-    int    m_cursorMapY;  // +0x29a
-    int    m_previousCursorMapY;  // +0x29e
-    int    m_comboHeroDrawn;  // +0x2a2
-    int    m_heroContextLocked;  // +0x2a6
-    int    m_townContextLocked;  // +0x2aa
-    int    m_forceCompleteDraw;  // +0x2ae
-    int    m_lastQuickViewX;  // +0x2b2
-    int    m_lastQuickViewY;  // +0x2b6
-    int    m_field_0x2ba;  // +0x2ba
-    int    m_activeSoundMask;  // +0x2be
+    i32    m_cursorActive;  // +0x272
+    i32    m_drawHeroShadows;  // +0x276
+    i32    m_cursorType;  // +0x27a
+    i32    m_cursorDirection;  // +0x27e  !union: conflicting widths
+    i32    m_cursorFrame;  // +0x282
+    i32    m_cursorFrameCount;  // +0x286
+    i32    m_cursorCycle;  // +0x28a
+    i32    m_cursorTurning;  // +0x28e
+    i32    m_cursorMapX;  // +0x292
+    i32    m_previousCursorMapX;  // +0x296
+    i32    m_cursorMapY;  // +0x29a
+    i32    m_previousCursorMapY;  // +0x29e
+    i32    m_comboHeroDrawn;  // +0x2a2
+    i32    m_heroContextLocked;  // +0x2a6
+    i32    m_townContextLocked;  // +0x2aa
+    i32    m_forceCompleteDraw;  // +0x2ae
+    i32    m_lastQuickViewX;  // +0x2b2
+    i32    m_lastQuickViewY;  // +0x2b6
+    i32    m_field_0x2ba;  // +0x2ba
+    i32    m_activeSoundMask;  // +0x2be
     adventureSoundCell m_activeSounds[4];  // +0x2c2
     class sample *m_loopingSamples[28];  // +0x2e2
     class sample *m_cursorSamples[9];  // +0x352
-    int m_identifyHeroActive;  // +0x376
-    int    m_openState;  // +0x37a
+    i32 m_identifyHeroActive;  // +0x376
+    i32    m_openState;  // +0x37a
     // --- constructors ---
     advManager(void);
     // --- virtual methods (vtable order) ---
-    virtual int Open(int) OVERRIDE;
+    virtual i32 Open(i32) OVERRIDE;
     virtual void Close(void) OVERRIDE;
-    virtual int Main(struct tag_message &) OVERRIDE;
+    virtual i32 Main(struct tag_message &) OVERRIDE;
     // --- methods ---
-    void StartCursor(int);
-    void StopCursor(int);
+    void StartCursor(i32);
+    void StopCursor(i32);
     void DrawCursor(void);
     void DrawCursorShadow(void);
-    int GetCursorBaseFrame(int);
-    void TurnTo(int);
-    int GetMoveShowIt(class hero *, int);
-    class mapCell * MoveHero(int, int, int *, int *, int *, int, int *, int);
-    void CheckAdjacentMon(int *);
-    int ValidMoveWithEvent(class hero *, int);
-    int ValidMove(int, int);
-    void MoveOrigin(int, int);
+    i32 GetCursorBaseFrame(i32);
+    void TurnTo(i32);
+    i32 GetMoveShowIt(class hero *, i32);
+    class mapCell * MoveHero(i32, i32, i32 *, i32 *, i32 *, i32, i32 *, i32);
+    void CheckAdjacentMon(i32 *);
+    i32 ValidMoveWithEvent(class hero *, i32);
+    i32 ValidMove(i32, i32);
+    void MoveOrigin(i32, i32);
     void ProcessMapChange(struct SMapChange);
     void ProcessIncomingSingleMapChange(struct SMapChange *);
     void ProcessIncomingGroupMapChange(char *);
     void PurgeMapChangeQueue(void);
-    void UnwindMapChangeQueue(int, int);
-    void ViewWorld(int, int, int);
+    void UnwindMapChangeQueue(i32, i32);
+    void ViewWorld(i32, i32, i32);
     void VWCleanup(void);
-    void VWInit(int, int);
+    void VWInit(i32, i32);
     void VWCompleteDraw(void);
-    void GetCursorSampleSet(int);
+    void GetCursorSampleSet(i32);
     class mapCell * DoAdvCommand(void);
-    int GetCommandTargetX(void) { return m_commandTargetX; }
-    int GetCommandTargetY(void) { return m_commandTargetY; }
-    void CheckSetEvilInterface(int, int);
-    void Reseed(int, int);
-    int ProcessSelect(struct tag_message *, class mapCell * *);
-    int ProcessDeSelect(struct tag_message *, int *, class mapCell * *);
-    int ProcessSearch(int, int);
-    int ProcessHover(int, int);
-    void UpdateScreen(int, int);
-    void CompleteDraw(int, int, int, int);
-    void CompleteDraw(int);
-    int GetCloudLookup(int, int);
-    void DrawCell(int, int, int, int, int, int);
-    class mapCell * GetCell(int, int);
-    void UpdateRadar(int, int);
-    void QuickInfo(int, int);
-    void UpdateHeroLocator(int, int, int);
-    void UpdateHeroLocators(int, int);
-    void UpdateTownLocators(int, int);
-    void UpdBottomView(int, int, int);
+    i32 GetCommandTargetX(void) { return m_commandTargetX; }
+    i32 GetCommandTargetY(void) { return m_commandTargetY; }
+    void CheckSetEvilInterface(i32, i32);
+    void Reseed(i32, i32);
+    i32 ProcessSelect(struct tag_message *, class mapCell * *);
+    i32 ProcessDeSelect(struct tag_message *, i32 *, class mapCell * *);
+    i32 ProcessSearch(i32, i32);
+    i32 ProcessHover(i32, i32);
+    void UpdateScreen(i32, i32);
+    void CompleteDraw(i32, i32, i32, i32);
+    void CompleteDraw(i32);
+    i32 GetCloudLookup(i32, i32);
+    void DrawCell(i32, i32, i32, i32, i32, i32);
+    class mapCell * GetCell(i32, i32);
+    void UpdateRadar(i32, i32);
+    void QuickInfo(i32, i32);
+    void UpdateHeroLocator(i32, i32, i32);
+    void UpdateHeroLocators(i32, i32);
+    void UpdateTownLocators(i32, i32);
+    void UpdBottomView(i32, i32, i32);
     void ClearBottomView(void);
-    int UpdBottomViewEnemyTurn(void);
-    int UpdBottomViewNewTurn(void);
-    int UpdBottomViewResMsg(void);
-    int UpdBottomViewKingdom(void);
-    int UpdBottomViewHero(void);
-    void HeroQuickView(int, int, int, int);
-    char * GetArmySizeName(int, int);
-    void TownQuickView(int, int, int, int);
-    void RedrawAdvScreen(int, int);
+    i32 UpdBottomViewEnemyTurn(void);
+    i32 UpdBottomViewNewTurn(void);
+    i32 UpdBottomViewResMsg(void);
+    i32 UpdBottomViewKingdom(void);
+    i32 UpdBottomViewHero(void);
+    void HeroQuickView(i32, i32, i32, i32);
+    char * GetArmySizeName(i32, i32);
+    void TownQuickView(i32, i32, i32, i32);
+    void RedrawAdvScreen(i32, i32);
     void DeactivateCurrTown(void);
     void DeactivateCurrHero(void);
-    void MobilizeCurrHero(int);
+    void MobilizeCurrHero(i32);
     void DemobilizeCurrHero(void);
-    void SetTownContext(int);
-    void SetHeroContext(int, int);
+    void SetTownContext(i32);
+    void SetHeroContext(i32, i32);
     void DoHeroKnob(void);
     void DoTownKnob(void);
-    void CastSpell(int);
+    void CastSpell(i32);
     void CheckCastSpell(void);
-    int ComboDraw(int, int, int);
-    int ComboDraw(int);
-    void SetEnvironmentOrigin(int, int, int);
-    void CheckLoadSample(int);
-    int GetSoundId(int, int);
-    void InsertSound(int, int, int, int);
-    void TeleportTo(class hero *, int, int, int, int);
+    i32 ComboDraw(i32, i32, i32);
+    i32 ComboDraw(i32);
+    void SetEnvironmentOrigin(i32, i32, i32);
+    void CheckLoadSample(i32);
+    i32 GetSoundId(i32, i32);
+    void InsertSound(i32, i32, i32, i32);
+    void TeleportTo(class hero *, i32, i32, i32, i32);
     void DimensionDoor(void);
-    void TownGate(int);
+    void TownGate(i32);
     void SummonBoat(void);
-    void ShowRoute(int, int, int);
-    void HideRoute(int, int, int);
+    void ShowRoute(i32, i32, i32);
+    void HideRoute(i32, i32, i32);
     void CheckDimHero(void);
     void CheckDimNextHeroBut(void);
-    void SeedTo(int, int);
+    void SeedTo(i32, i32);
     void ForceNewHover(void);
-    void ScreenScroll(int, int);
+    void ScreenScroll(i32, i32);
     void CheckScreenScroll(void);
-    int MouseInScrollZone(void);
+    i32 MouseInScrollZone(void);
     void SetInitialMapOrigin(void);
     void LoadRemote(void);
     char * CheckHandleNet(void);
-    int CheckHandleNetPlayerWait(struct tag_message &, int);
-    void TrimLoopingSounds(int);
+    i32 CheckHandleNetPlayerWait(struct tag_message &, i32);
+    void TrimLoopingSounds(i32);
     void DisableButtons(void);
     void EnableButtons(void);
     void SaveAdventureBorder(void);
     void DrawAdventureBorder(void);
-    int FindAdjacentMonster(int, int, int *, int *, int, int);
+    i32 FindAdjacentMonster(i32, i32, i32 *, i32 *, i32, i32);
     void ViewPuzzle(void);
-    void PuzzleDraw(int, int, int, int);
+    void PuzzleDraw(i32, i32, i32, i32);
     void AdvPanel(void);
-    int ControlPanel(void);
+    i32 ControlPanel(void);
     void SystemOptions(void);
-    int DoVisions(class hero *);
-    int IsCrystalBallInEffect(int, int, int);
-    void DoEvent(class mapCell *, int, int);
-    void EraseObj(class mapCell *, int, int);
+    i32 DoVisions(class hero *);
+    i32 IsCrystalBallInEffect(i32, i32, i32);
+    void DoEvent(class mapCell *, i32, i32);
+    void EraseObj(class mapCell *, i32, i32);
     void HeroSwap(class hero *, class hero *);
-    int BarrierEvent(class mapCell *, class hero *);
+    i32 BarrierEvent(class mapCell *, class hero *);
     void PasswordEvent(class mapCell *, class hero *);
     void GenericSiteEvent(class mapCell *, class hero *);
     void RecruitSiteEvent(class mapCell *, class hero *);
-    void ExpansionRecruitEvent(class hero *, int, short int *);
-    void JailEvent(class mapCell *, class hero *, int, int);
-    void TownEvent(class mapCell *, int, int);
-    void EventSound(int, int, struct SAMPLE2 *);
-    void EventWindow(int, int, char *, int, int, int, int, int);
-    int GiveRandomArtifact(class hero *);
-    int GiveExperience(class hero *, int, int);
-    void GiveResource(class hero *, int, int);
-    void RecruitEvent(class hero *, int, class mapCell *);
-    int SkeletonEvent(class hero *, class mapCell *, char *, int, int);
-    int ZombieEvent(class hero *, class mapCell *, char *, int, int);
-    int GhostEvent(class hero *, class mapCell *, char *, int, int);
+    void ExpansionRecruitEvent(class hero *, i32, i16 *);
+    void JailEvent(class mapCell *, class hero *, i32, i32);
+    void TownEvent(class mapCell *, i32, i32);
+    void EventSound(i32, i32, struct SAMPLE2 *);
+    void EventWindow(i32, i32, char *, i32, i32, i32, i32, i32);
+    i32 GiveRandomArtifact(class hero *);
+    i32 GiveExperience(class hero *, i32, i32);
+    void GiveResource(class hero *, i32, i32);
+    void RecruitEvent(class hero *, i32, class mapCell *);
+    i32 SkeletonEvent(class hero *, class mapCell *, char *, i32, i32);
+    i32 ZombieEvent(class hero *, class mapCell *, char *, i32, i32);
+    i32 GhostEvent(class hero *, class mapCell *, char *, i32, i32);
     void HouseEvent(class hero *, class mapCell *);
-    int CombatMonsterEvent(class hero *, int, int, class mapCell *, int, int, int, int, int, int, int, int, int, int, int);
+    i32 CombatMonsterEvent(class hero *, i32, i32, class mapCell *, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32);
     void TransferArtifacts(class hero *, class hero *);
     void HeroLoses(class hero *);
     void DoWhirlpool(class hero *);
-    void FizzleCenter(int);
-    void DoAIEvent(class mapCell *, class hero *, int, int);
-    int BarrierAIEvent(class mapCell *, class hero *);
+    void FizzleCenter(i32);
+    void DoAIEvent(class mapCell *, class hero *, i32, i32);
+    i32 BarrierAIEvent(class mapCell *, class hero *);
     void PasswordAIEvent(class mapCell *, class hero *);
     void GenericSiteAIEvent(class mapCell *, class hero *);
     void RecruitSiteAIEvent(class mapCell *, class hero *);
-    void JailAIEvent(class mapCell *, class hero *, int, int);
-    void PlayerMonsterInteract(class mapCell *, class mapCell *, class hero *, int *, int, int, int, int, int);
-    void ComputerMonsterInteract(class mapCell *, class hero *, int *);
-    int DoNetCombat(char *);
-    int DoCombat(int, int, class hero *, class armyGroup *, class town *, class hero *, class armyGroup *, int, int, int, int);
-    void SendHeroTownData(int, int, class hero *, class armyGroup *, class town *, class hero *, class armyGroup *, int, int, int, int, int, int, int);
-    void ReceiveHeroTownData(char *, int *, int *, int *, class hero * *, class armyGroup * *, class town * *, class hero * *, class armyGroup * *, int *, int *, int *, signed char *, signed char *, signed char *);
-    int AutoResolveCombat(int, int, class hero *, class armyGroup *, class town *, class hero *, class armyGroup *, int, int, int, int);
+    void JailAIEvent(class mapCell *, class hero *, i32, i32);
+    void PlayerMonsterInteract(class mapCell *, class mapCell *, class hero *, i32 *, i32, i32, i32, i32, i32);
+    void ComputerMonsterInteract(class mapCell *, class hero *, i32 *);
+    i32 DoNetCombat(char *);
+    i32 DoCombat(i32, i32, class hero *, class armyGroup *, class town *, class hero *, class armyGroup *, i32, i32, i32, i32);
+    void SendHeroTownData(i32, i32, class hero *, class armyGroup *, class town *, class hero *, class armyGroup *, i32, i32, i32, i32, i32, i32, i32);
+    void ReceiveHeroTownData(char *, i32 *, i32 *, i32 *, class hero * *, class armyGroup * *, class town * *, class hero * *, class armyGroup * *, i32 *, i32 *, i32 *, i8 *, i8 *, i8 *);
+    i32 AutoResolveCombat(i32, i32, class hero *, class armyGroup *, class town *, class hero *, class armyGroup *, i32, i32, i32, i32);
 };
 #pragma pack(pop)
 SIZE(advManager, 0x37e);
 // ---- globals (declarations, RVA order) ----
-extern int bMoveSoundMade;
-extern int giPixelsPerStep[6];
-extern int giStepDelay[5];
+extern i32 bMoveSoundMade;
+extern i32 giPixelsPerStep[6];
+extern i32 giStepDelay[5];
 extern struct _SAMPLE *hOldWalkSample;
 extern struct _SAMPLE *hNewWalkSample;
-extern int EveryOther;
-extern int startVals[3];
-extern signed char iVWHalf[3][6][2];
-extern int giViewWorldScale;
-extern int giViewWorldScaleLookup;
-extern int gbInViewWorld;
-extern int giLimitUpdMinX;
-extern int iLastScrollTime;
-extern int iSandAnim;
-extern int giLastHourGlassUpdateTime;
-extern int TrigX;
-extern int TrigY;
-extern int iCurBottomView;
-extern int iCurBottomViewEnemy;
-extern int iCurHourGlassPhase;
-extern int iLastHourGlassPhase;
-extern int gbForceUpdate;
-extern int giCheatSeq;
-extern int iQWE;
-extern unsigned char monAnimDrawFrame[ADVMGR_MONSTER_ANIMATION_TABLE_SIZE];
-extern int iLastSandAnimTime;
-extern int iLastNewSandAnimTime;
-extern int giFrameCount;
-extern int gbNoShowCombat;
-extern int S1cursorCycle;
-extern int S1cursorFrameCount;
-extern int S1cursorTurning;
-extern int S1cursorBaseFrame;
-extern int S1cursorDirection;
+extern i32 EveryOther;
+extern i32 startVals[3];
+extern i8 iVWHalf[3][6][2];
+extern i32 giViewWorldScale;
+extern i32 giViewWorldScaleLookup;
+extern i32 gbInViewWorld;
+extern i32 giLimitUpdMinX;
+extern i32 iLastScrollTime;
+extern i32 iSandAnim;
+extern i32 giLastHourGlassUpdateTime;
+extern i32 TrigX;
+extern i32 TrigY;
+extern i32 iCurBottomView;
+extern i32 iCurBottomViewEnemy;
+extern i32 iCurHourGlassPhase;
+extern i32 iLastHourGlassPhase;
+extern i32 gbForceUpdate;
+extern i32 giCheatSeq;
+extern i32 iQWE;
+extern u8 monAnimDrawFrame[ADVMGR_MONSTER_ANIMATION_TABLE_SIZE];
+extern i32 iLastSandAnimTime;
+extern i32 iLastNewSandAnimTime;
+extern i32 giFrameCount;
+extern i32 gbNoShowCombat;
+extern i32 S1cursorCycle;
+extern i32 S1cursorFrameCount;
+extern i32 S1cursorTurning;
+extern i32 S1cursorBaseFrame;
+extern i32 S1cursorDirection;
 extern class icon *pVWMisc;
 extern class icon *pVWLetters;
-extern int iVWYPixelOffset;
+extern i32 iVWYPixelOffset;
 extern class icon *pVWGround;
-extern int iVWViewableCells;
+extern i32 iVWViewableCells;
 extern class icon *pVWFlags;
-extern int iVWDrawAllTerrains;
-extern int iVWWhatToDraw;
-extern int iVWDrawAllObjs;
-extern int iVWMapOriginX;
-extern int iVWMapOriginY;
-extern int iVWCenterOffset;
-extern int iVWXPixelOffset;
+extern i32 iVWDrawAllTerrains;
+extern i32 iVWWhatToDraw;
+extern i32 iVWDrawAllObjs;
+extern i32 iVWMapOriginX;
+extern i32 iVWMapOriginY;
+extern i32 iVWCenterOffset;
+extern i32 iVWXPixelOffset;
 extern class heroWindow *cPanel;
 extern struct tag_message USMsg;
-extern int iThisMaxY;
-extern int giTownPortalChoice;
-extern int iThisMinY;
+extern i32 iThisMaxY;
+extern i32 giTownPortalChoice;
+extern i32 iThisMinY;
 extern class heroWindow *townPortalWin;
-extern int giFrameStep;
+extern i32 giFrameStep;
 extern char cArmySizeName[12];
-extern int giLimitUpdMaxX;
-extern int giLimitUpdMaxY;
-extern int bPrefsChanged;
-extern int giLimitUpdMinY;
+extern i32 giLimitUpdMaxX;
+extern i32 giLimitUpdMaxY;
+extern i32 bPrefsChanged;
+extern i32 giLimitUpdMinY;
 extern struct tag_message CDMsg;
-extern signed char bComboDraw[18][18];
-extern int iLastAnimFrame;
+extern i8 bComboDraw[18][18];
+extern i32 iLastAnimFrame;
 
 #endif // HOMM2_SOURCE_ADVMANAGER_H

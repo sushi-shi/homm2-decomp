@@ -43,9 +43,9 @@
 // declaring the window pointer at its initializer did not recover retail ordering.
 // Revisit only after TU-state changes expose different hidden-temporary ordering.
 VA(0x004333c0, 0x267)
-void advManager::ViewWorld(int whatToDraw, int drawAllObjects, int drawAllTerrains)
+void advManager::ViewWorld(i32 whatToDraw, i32 drawAllObjects, i32 drawAllTerrains)
 {
-    signed char paletteData[VIEW_WORLD_PALETTE_SIZE];
+    i8 paletteData[VIEW_WORLD_PALETTE_SIZE];
     char *viewIconNames[7];
     tag_message dialogMessage;
     heroWindow *viewWorldWindow;
@@ -66,7 +66,7 @@ void advManager::ViewWorld(int whatToDraw, int drawAllObjects, int drawAllTerrai
     if (viewWorldWindow == 0)
         MemError();
 
-    int legendMode;
+    i32 legendMode;
     viewIconNames[0] = "MINE";
     viewIconNames[1] = "RSRC";
     viewIconNames[2] = "RTFX";
@@ -107,7 +107,7 @@ void advManager::VWCleanup(void)
 }
 
 VA(0x00433681, 0x253)
-void advManager::VWInit(int centerX, int centerY)
+void advManager::VWInit(i32 centerX, i32 centerY)
 {
     if (giViewWorldScale == VIEW_WORLD_SCALE_FAR)
         giViewWorldScaleLookup = 0;
@@ -162,30 +162,30 @@ void advManager::VWInit(int centerX, int centerY)
 VA(0x004338d4, 0x1346)
 void advManager::VWCompleteDraw(void)
 {
-    int mineHighlight18;
-    int heroHighlight8;
-    int artifactHighlight2;
-    int townFlagHighlight3;
-    int townIconHighlight1;
-    signed char mineLetterY0[4];
-    signed char townIconX2[4];
-    signed char townFlagX15[4];
-    int currentHeroHere;
-    int pixelY2;
-    int pixelX6;
-    unsigned char *pixel4;
-    signed char drawTilesets0[VIEW_WORLD_TILESET_COUNT];
-    unsigned char *rowEnd37;
-    int unusedRowState14;
-    int mapY3;
+    i32 mineHighlight18;
+    i32 heroHighlight8;
+    i32 artifactHighlight2;
+    i32 townFlagHighlight3;
+    i32 townIconHighlight1;
+    i8 mineLetterY0[4];
+    i8 townIconX2[4];
+    i8 townFlagX15[4];
+    i32 currentHeroHere;
+    i32 pixelY2;
+    i32 pixelX6;
+    u8 *pixel4;
+    i8 drawTilesets0[VIEW_WORLD_TILESET_COUNT];
+    u8 *rowEnd37;
+    i32 unusedRowState14;
+    i32 mapY3;
     mapCell *cell0;
-    int mapX7;
-    int playerColor26;
-    unsigned int groundShape1;
-    unsigned int groundFrame29;
-    int resourceType9;
-    unsigned int flipped5;
-    int unusedExtraState29;
+    i32 mapX7;
+    i32 playerColor26;
+    u32 groundShape1;
+    u32 groundFrame29;
+    i32 resourceType9;
+    u32 flipped5;
+    i32 unusedExtraState29;
     mapCellExtra *extra15;
 
     groundFrame29 = 0;
@@ -532,11 +532,11 @@ void advManager::VWCompleteDraw(void)
 // operands compiled byte-identically. Ten reviewed depth-one commutative/relational AST
 // variants produced the same bytes; revisit only after TU-state changes.
 VA(0x00434c1a, 0x5e2)
-int ViewWorldDialogHandler(struct tag_message &message)
+i32 ViewWorldDialogHandler(struct tag_message &message)
 {
     float radarScale6;
-    int radarY1;
-    int radarX0;
+    i32 radarY1;
+    i32 radarX0;
     tag_message savedMessage;
     tag_message currentMessage7;
 
@@ -572,8 +572,8 @@ int ViewWorldDialogHandler(struct tag_message &message)
 
                 radarX0 = message.payload.mouse.screenX;
                 radarY1 = message.payload.mouse.screenY;
-                radarX0 = static_cast<int>((radarX0 - VIEW_WORLD_RADAR_LEFT) / radarScale6);
-                radarY1 = static_cast<int>((radarY1 - VIEW_WORLD_RADAR_TOP) / radarScale6);
+                radarX0 = static_cast<i32>((radarX0 - VIEW_WORLD_RADAR_LEFT) / radarScale6);
+                radarY1 = static_cast<i32>((radarY1 - VIEW_WORLD_RADAR_TOP) / radarScale6);
                 iVWMapOriginX = radarX0 - iVWCenterOffset;
                 iVWMapOriginY = radarY1 - iVWCenterOffset;
                 if (iVWMapOriginX < 0)
@@ -609,9 +609,9 @@ int ViewWorldDialogHandler(struct tag_message &message)
                         if (savedMessage.payload.mouse.y >= VIEW_WORLD_RADAR_BOTTOM)
                             savedMessage.payload.mouse.y = MAP_HEIGHT * 2 + VIEW_WORLD_RADAR_TOP - 1;
                         gpMouseManager->Main(savedMessage);
-                        radarX0 = static_cast<int>(
+                        radarX0 = static_cast<i32>(
                             (savedMessage.payload.mouse.x - VIEW_WORLD_RADAR_LEFT) / radarScale6);
-                        radarY1 = static_cast<int>(
+                        radarY1 = static_cast<i32>(
                             (savedMessage.payload.mouse.y - VIEW_WORLD_RADAR_TOP) / radarScale6);
                         iVWMapOriginX = radarX0 - iVWCenterOffset;
                         iVWMapOriginY = radarY1 - iVWCenterOffset;
@@ -666,24 +666,24 @@ int ViewWorldDialogHandler(struct tag_message &message)
 }
 
 // ---- globals (definitions, RVA order) ----
-DATA(0x004f11b8) signed char iVWHalf[3][6][2] = {
+DATA(0x004f11b8) i8 iVWHalf[3][6][2] = {
     3, 3, 5, 5, 6, 6, 8, 5, 2, 3, 2, 2,
     4, 5, 6, 6, 8, 8, 11, 7, 3, 4, 3, 3,
     7, 7, 8, 8, 10, 10, 14, 8, 3, 6, 4, 4
 };
-DATA(0x004f11dc) int giViewWorldScale = 6;
-DATA(0x004f11e0) int giViewWorldScaleLookup = 1;
-DATA(0x004f11e4) int gbInViewWorld = 0;
+DATA(0x004f11dc) i32 giViewWorldScale = 6;
+DATA(0x004f11e0) i32 giViewWorldScaleLookup = 1;
+DATA(0x004f11e4) i32 gbInViewWorld = 0;
 DATA(0x00525110) class icon *pVWMisc;
 DATA(0x00525114) class icon *pVWLetters;
-DATA(0x00525118) int iVWYPixelOffset;
+DATA(0x00525118) i32 iVWYPixelOffset;
 DATA(0x0052511c) class icon *pVWGround;
-DATA(0x00525120) int iVWViewableCells;
+DATA(0x00525120) i32 iVWViewableCells;
 DATA(0x00525124) class icon *pVWFlags;
-DATA(0x00525128) int iVWDrawAllTerrains;
-DATA(0x0052512c) int iVWWhatToDraw;
-DATA(0x00525130) int iVWDrawAllObjs;
-DATA(0x00525134) int iVWMapOriginX;
-DATA(0x00525138) int iVWMapOriginY;
-DATA(0x0052513c) int iVWCenterOffset;
-DATA(0x00525140) int iVWXPixelOffset;
+DATA(0x00525128) i32 iVWDrawAllTerrains;
+DATA(0x0052512c) i32 iVWWhatToDraw;
+DATA(0x00525130) i32 iVWDrawAllObjs;
+DATA(0x00525134) i32 iVWMapOriginX;
+DATA(0x00525138) i32 iVWMapOriginY;
+DATA(0x0052513c) i32 iVWCenterOffset;
+DATA(0x00525140) i32 iVWXPixelOffset;

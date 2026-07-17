@@ -28,8 +28,8 @@
 // all 25/25 relocation occurrences and targets; the reported 99.71% residual
 // is delinked pooled-string identity (the helper also mislabels two gText uses).
 VA(0x0048b310, 0x18c)
-void SetupRecruitWin(class heroWindow *window, int creatureType, int goldCost,
-                     int resourceType, int resourceCost, int available)
+void SetupRecruitWin(class heroWindow *window, i32 creatureType, i32 goldCost,
+                     i32 resourceType, i32 resourceCost, i32 available)
 {
     char creatureName[RECRUIT_NAME_SIZE];
     char label[RECRUIT_LABEL_SIZE];
@@ -80,10 +80,10 @@ void SetupRecruitWin(class heroWindow *window, int creatureType, int goldCost,
 // all non-relocation instructions are exact. All 26/26 relocation occurrences
 // resolve to the same owners/addends; only delinked pooled-string identities differ.
 VA(0x0048b49c, 0x24b)
-int recruitUnit::Open(int priority)
+i32 recruitUnit::Open(i32 priority)
 {
-    int goldMaximum;
-    int resourceMaximum;
+    i32 goldMaximum;
+    i32 resourceMaximum;
 
     m_window = new heroWindow(RECRUIT_WINDOW_X, RECRUIT_WINDOW_Y,
                               m_resourceType == RECRUIT_NO_RESOURCE
@@ -194,10 +194,10 @@ void recruitUnit::Update(void)
 // function has no embedded jump table. Guard-clause cases, confirmation shared
 // tails, right-button quick view, frame/slots, and final close==1 CFG are recovered.
 VA(0x0048b8f0, 0x41b)
-int recruitUnit::Main(struct tag_message &message)
+i32 recruitUnit::Main(struct tag_message &message)
 {
-    int close = 0;
-    int quickView =
+    i32 close = 0;
+    i32 quickView =
         (message.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) != 0;
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
@@ -296,11 +296,11 @@ int recruitUnit::Main(struct tag_message &message)
 }
 
 VA(0x0048bd0b, 0xdf)
-recruitUnit::recruitUnit(class armyGroup *army, int creatureType,
-                         short int *available)
+recruitUnit::recruitUnit(class armyGroup *army, i32 creatureType,
+                         i16 *available)
 {
-    int costs[RECRUIT_RESOURCE_COUNT + 1];
-    int resource;
+    i32 costs[RECRUIT_RESOURCE_COUNT + 1];
+    i32 resource;
 
     m_sourceType = RECRUIT_SOURCE_EVENT;
     m_refreshTown = 0;
@@ -323,10 +323,10 @@ recruitUnit::recruitUnit(class armyGroup *army, int creatureType,
 }
 
 VA(0x0048bdea, 0xfb)
-recruitUnit::recruitUnit(class town *townData, int dwelling, int refreshTown)
+recruitUnit::recruitUnit(class town *townData, i32 dwelling, i32 refreshTown)
 {
-    int costs[RECRUIT_RESOURCE_COUNT + 1];
-    int resource;
+    i32 costs[RECRUIT_RESOURCE_COUNT + 1];
+    i32 resource;
 
     m_refreshTown = refreshTown;
     m_sourceType = RECRUIT_SOURCE_TOWN;
@@ -353,16 +353,16 @@ recruitUnit::recruitUnit(class town *townData, int dwelling, int refreshTown)
 // instruction stream agree. All 13/13 relocation occurrences resolve to the
 // same targets; the 99.68% residual is the two pooled window-name symbols.
 VA(0x0048bee5, 0x14f)
-void QuickViewRecruit(class town *townData, int dwelling)
+void QuickViewRecruit(class town *townData, i32 dwelling)
 {
-    int costs[RECRUIT_RESOURCE_COUNT + 1];
-    int goldCost;
-    int resourceType;
-    int creatureType;
-    int resourceCost;
+    i32 costs[RECRUIT_RESOURCE_COUNT + 1];
+    i32 goldCost;
+    i32 resourceType;
+    i32 creatureType;
+    i32 resourceCost;
     heroWindow *window;
-    int available;
-    int resource;
+    i32 available;
+    i32 resource;
 
     creatureType = gDwellingType[townData->m_type][dwelling];
     available = townData->m_garrison[dwelling];

@@ -1,6 +1,8 @@
 #ifndef HOMM2_SOURCE_DIMPALETTE_H
 #define HOMM2_SOURCE_DIMPALETTE_H
 
+#include <Ints.h>
+
 typedef enum DimPaletteConstant {
     DIM_PALETTE_SET_COUNT = 3,
     DIM_PALETTE_LEVEL_COUNT = 4,
@@ -8,7 +10,7 @@ typedef enum DimPaletteConstant {
 } DimPaletteConstant;
 
 // Shared dimming lookup table owned and defined by SOURCE/KB.
-extern unsigned char uDimPal[DIM_PALETTE_SET_COUNT]
+extern u8 uDimPal[DIM_PALETTE_SET_COUNT]
                              [DIM_PALETTE_LEVEL_COUNT]
                              [DIM_PALETTE_COLOR_COUNT];
 

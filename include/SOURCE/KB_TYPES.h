@@ -46,27 +46,27 @@ typedef enum MonsterAbilityFlags {
 
 // Retained in the historical declaration sequence because MSVC 4.2's cumulative TU state
 // changes code generation when these otherwise redundant declarations are removed.
-typedef unsigned int UInt32;
+typedef u32 UInt32;
 struct MemEntry;
 struct _SAMPLE;                // SAMPLE2::pMem — opaque
 
 enum { MENU_ENABLE_STATUS_COUNT = 70 };
 #pragma pack(push, 1)
 struct SMenuEnableStatus {
-    unsigned int command;
-    unsigned char normalEnabled;
-    unsigned char setupEnabled;
+    u32 command;
+    u8 normalEnabled;
+    u8 setupEnabled;
     // All 70 retail values are zero, and the executable has no xref to this byte.
-    unsigned char reserved;
+    u8 reserved;
 };
 #pragma pack(pop)
 SIZE(SMenuEnableStatus, 7);
 
 #include <SOURCE/CONFIG_TYPES.h>
 struct tag_tilePoint {
-    signed char x;
-    signed char y;
-    short frameOffset;
+    i8 x;
+    i8 y;
+    i16 frameOffset;
 };
 SIZE(tag_tilePoint, 4);
 typedef enum MonsterDatabaseConstant {
@@ -77,32 +77,32 @@ typedef enum MonsterDatabaseConstant {
 struct tag_monsterInfo {
     union {
         struct {
-            short cost;
+            i16 cost;
             union {
-                int fightValue;
-                int randomValue;
+                i32 fightValue;
+                i32 randomValue;
             };
         };
     };
-    signed char iconIndex;
-    signed char growth;
-    unsigned short hitPoints;
-    signed char race;
-    signed char speed;
-    signed char attack;
-    signed char defense;
-    signed char damageMin;
-    signed char damageMax;
-    signed char shots;
+    i8 iconIndex;
+    i8 growth;
+    u16 hitPoints;
+    i8 race;
+    i8 speed;
+    i8 attack;
+    i8 defense;
+    i8 damageMin;
+    i8 damageMax;
+    i8 shots;
     char spriteName[MONSTER_SPRITE_NAME_SIZE];
     union {
-        int attributes;
+        i32 attributes;
         union {
-            int all;
-            int abilityFlags;
+            i32 all;
+            i32 abilityFlags;
             struct {
-                signed char abilities;
-                signed char attributes;
+                i8 abilities;
+                i8 attributeFlags;
             } bytes;
         } flags;
     };
@@ -116,11 +116,11 @@ typedef enum CombatHeroAnimationConstant {
 
 #pragma pack(push, 1)
 struct SCmbtHero {
-    short x[2];
-    short y[2];
-    unsigned char idleAnimationCount;
-    signed char animationFrameCount[COMBAT_HERO_ANIMATION_COUNT];
-    signed char animationFrames[COMBAT_HERO_ANIMATION_COUNT]
+    i16 x[2];
+    i16 y[2];
+    u8 idleAnimationCount;
+    i8 animationFrameCount[COMBAT_HERO_ANIMATION_COUNT];
+    i8 animationFrames[COMBAT_HERO_ANIMATION_COUNT]
                                [COMBAT_HERO_ANIMATION_FRAME_COUNT];
 };
 SIZE(SCmbtHero, 0x81);
@@ -134,13 +134,13 @@ typedef enum SpellInfoAttribute {
 
 struct SSpellInfo {
     char soundName[9];
-    unsigned char level;
-    unsigned char iconIndex;
-    unsigned char combatEffect;
-    short aiValue;
-    unsigned char cost;
-    unsigned char raceChance[6];
-    unsigned char attributes;
+    u8 level;
+    u8 iconIndex;
+    u8 combatEffect;
+    i16 aiValue;
+    u8 cost;
+    u8 raceChance[6];
+    u8 attributes;
 };  // gsSpellInfo[] (sizeof 22)
 SIZE(SSpellInfo, 0x16);
 struct SAMPLE2 { class sample *pSample; struct _SAMPLE *pMem; };            // NULL_SAMPLE2
@@ -157,8 +157,8 @@ typedef enum MonsterAttribute {
 } MonsterAttribute;
 #pragma pack(push, 1)
 struct SWinSetup {
-    unsigned char windowId;
-    unsigned short widgetId;
+    u8 windowId;
+    u16 widgetId;
     char *text;
 };
 SIZE(SWinSetup, 7);

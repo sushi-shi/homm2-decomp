@@ -47,7 +47,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-DATA(0x004eb080) static const signed char
+DATA(0x004eb080) static const i8
     gTownObjectOrder[TOWN_TYPE_COUNT][TOWN_BUILDING_COUNT] = {
         {
             TOWN_OBJECT_SECOND_WELL,
@@ -490,15 +490,15 @@ DATA(0x004ee750) SBuildingInfo
 // audited exact closure; every candidate failed the strict size/identity guard.
 // Revisit only after a material TU-state change.
 VA(0x00413900, 0x16a)
-townObject::townObject(int townType, int buildingId, char *iconBaseName)
+townObject::townObject(i32 townType, i32 buildingId, char *iconBaseName)
 {
     char fileName[TOWN_OBJECT_FILENAME_SIZE];
-    int x;
-    int y;
-    int tempY;
-    int w;
-    int h;
-    int buildingId_h;
+    i32 x;
+    i32 y;
+    i32 tempY;
+    i32 w;
+    i32 h;
+    i32 buildingId_h;
 
     m_animationFrame = 0;
     m_icon = 0;
@@ -515,7 +515,7 @@ townObject::townObject(int townType, int buildingId, char *iconBaseName)
     sprintf(fileName, "%s.icn", iconBaseName);
     m_icon = gpResourceManager->GetIcon(fileName);
     if (buildingId_h != TOWN_OBJECT_NONE) {
-        m_border = new border(x, y, w, h, static_cast<short>(buildingId_h),
+        m_border = new border(x, y, w, h, static_cast<i16>(buildingId_h),
                               TOWN_OBJECT_BORDER_Z_ORDER, 0, 0);
         if (m_border == 0)
             MemError();
@@ -531,9 +531,9 @@ townObject::~townObject()
 }
 
 VA(0x00413aca, 0x437)
-void townObject::Draw(int advanceAnimation)
+void townObject::Draw(i32 advanceAnimation)
 {
-    int baseFrame;
+    i32 baseFrame;
 
     if (m_visible == 0)
         return;
@@ -680,7 +680,7 @@ void townManager::SetupExtraStuff(void)
 }
 
 VA(0x00414109, 0x1ef)
-int townManager::Open(int id)
+i32 townManager::Open(i32 id)
 {
     gpGame->CheckHeroConsistency();
     if (gConfig.useOpera != CONFIG_OPERA_DISABLED || gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI)
@@ -741,9 +741,9 @@ VA(0x0041436f, 0x95a)
 void townManager::SetupTown(void)
 {
     tag_message message;
-    int objectOrder;
-    int objectId;
-    int crestFrame;
+    i32 objectOrder;
+    i32 objectId;
+    i32 crestFrame;
 
     sprintf(gText, GetTownName(m_town->m_id));
     message.type = TOWN_MESSAGE_SELECT;
@@ -812,7 +812,7 @@ void townManager::SetupTown(void)
         m_townObjectCount = 0;
         for (objectOrder = 0; objectOrder < TOWN_BUILDING_COUNT;
              ++objectOrder) {
-            int existingObjectId =
+            i32 existingObjectId =
                 gTownObjectOrder[m_town->m_type][objectOrder];
             if (existingObjectId != TOWN_OBJECT_NONE) {
                 if (m_townObjects[m_townObjectCount]->m_border != 0) {
@@ -847,7 +847,7 @@ void townManager::SetupTown(void)
     }
     m_garrisonStrip = new strip(
         0, TOWN_GARRISON_STRIP_Y,
-        static_cast<signed char>(
+        static_cast<i8>(
             m_town->m_occupyingHeroId == TOWN_OCCUPYING_HERO_NONE
                 ? TOWN_CREST_FRAME_WITHOUT_HERO
                 : TOWN_CREST_FRAME_WITH_HERO),
@@ -903,7 +903,7 @@ void townManager::SetupTown(void)
 VA(0x00414cc9, 0x1cf)
 void townManager::UnloadTown(void)
 {
-    int index_i;
+    i32 index_i;
 
     if (m_bankBox != 0)
         delete m_bankBox;
@@ -943,10 +943,10 @@ void townManager::Close(void)
 }
 
 VA(0x00414f62, 0x3b9)
-void townManager::SetArmyCommand(int qualifier)
+void townManager::SetArmyCommand(i32 qualifier)
 {
-    int cantMoveLastArmy;
-    int sameType;
+    i32 cantMoveLastArmy;
+    i32 sameType;
 
     m_command = TOWN_WIDGET_ID_NONE;
     cantMoveLastArmy = 0;
@@ -1029,7 +1029,7 @@ void townManager::SetArmyCommand(int qualifier)
 VA(0x0041531b, 0x5c5)
 void townManager::SetCommandAndText(struct tag_message &message)
 {
-    int objectId = message.payload.widget.id;
+    i32 objectId = message.payload.widget.id;
 
     m_command = TOWN_WIDGET_ID_NONE;
     switch (objectId) {
@@ -1191,18 +1191,18 @@ void townManager::ShowText(char *)
 // 512-candidate AST pass and integral-global-read pass retained no canonical
 // mutation. Revisit only with a shared inline-accessor/TU-state discovery.
 VA(0x0041595d, 0x1830)
-int townManager::Main(tag_message &message)
+i32 townManager::Main(tag_message &message)
 {
     char description_b[400];
-    int exitTown_i = 0;
-    int quickView_k = (message.payload.widget.parameter & TOWN_QUICK_VIEW_MODIFIER) != 0;
-    int debugBuilding_e;
-    int index_i;
-    int marketplaceCount_m;
+    i32 exitTown_i = 0;
+    i32 quickView_k = (message.payload.widget.parameter & TOWN_QUICK_VIEW_MODIFIER) != 0;
+    i32 debugBuilding_e;
+    i32 index_i;
+    i32 marketplaceCount_m;
     baseManager *dialogManager_d;
     SAMPLE2 buildSample_m;
-    int total;
-    int unusedTownValue;
+    i32 total;
+    i32 unusedTownValue;
 
     if (giDebugBuildingToBuild != -1) {
         debugBuilding_e = giDebugBuildingToBuild;
@@ -1214,7 +1214,7 @@ int townManager::Main(tag_message &message)
                     BuildObj(index_i);
             }
         } else if ((gTownEligibleBuildMask[m_town->m_type] &
-                    (1L << static_cast<unsigned char>(debugBuilding_e))) ||
+                    (1L << static_cast<u8>(debugBuilding_e))) ||
                    debugBuilding_e == TOWN_COMMAND_CASTLE) {
             BuildObj(debugBuilding_e);
         }
@@ -1291,7 +1291,7 @@ int townManager::Main(tag_message &message)
                     buildSample_m = LoadPlaySample("buildtwn.82M");
                     hero *townHero = gpGame->GetHero(
                         m_town->m_occupyingHeroId);
-                    int fizzleWidth = 0x228;
+                    i32 fizzleWidth = 0x228;
                     m_townWindow->DrawWindow(0);
                     m_garrisonStrip->DrawIcons(0);
                     m_heroStrip->DrawIcons(0);
@@ -1548,7 +1548,7 @@ int townManager::Main(tag_message &message)
 
         default:
             if (quickView_k) {
-                int armySelected = 0;
+                i32 armySelected = 0;
                 hero *viewedHero;
                 if (message.payload.widget.id >= TOWN_GARRISON_SLOT_FIRST &&
                     message.payload.widget.id <= TOWN_GARRISON_SLOT_LAST) {
@@ -1605,7 +1605,7 @@ int townManager::Main(tag_message &message)
                 if (gpCurPlayer->m_townCount <= 1)
                     break;
                 {
-                    int townPosition =
+                    i32 townPosition =
                         gpGame->TownIDToTownPos(gpCurPlayer, m_town->m_id);
                     townPosition = (townPosition +
                                     (message.payload.widget.id == TOWN_CONTROL_PREVIOUS_TOWN
@@ -1676,12 +1676,12 @@ int townManager::Main(tag_message &message)
 // A 295-candidate value-neutral AST run found no exact-size improvement; its
 // 98.9088% best adds a spurious five-byte m_dialogResult inline continuation.
 VA(0x0041718d, 0x4e3)
-void townManager::DoCommand(int command)
+void townManager::DoCommand(i32 command)
 {
     hero *viewedHero;
-    int dismissAllowed;
-    int slot;
-    int oldValue;
+    i32 dismissAllowed;
+    i32 slot;
+    i32 oldValue;
 
     switch (command) {
     case TOWN_ARMY_COMMAND_SELECT:
@@ -1792,9 +1792,9 @@ void townManager::RedrawTownScreen(void)
 VA(0x0041771d, 0x374)
 void townManager::SplitArmy(void)
 {
-    short unusedValue = 1;
-    short unusedDialogValue = 4;
-    int sameCreature;
+    i16 unusedValue = 1;
+    i16 unusedDialogValue = 4;
+    i32 sameCreature;
     tag_message message;
 
     m_heroWindow1 = new heroWindow(0xb1, 0x14, "splitwin.bin");
@@ -1865,9 +1865,9 @@ void townManager::ResetStrips(void)
 }
 
 VA(0x00417b62, 0x7b)
-void townManager::Toggle(int building)
+void townManager::Toggle(i32 building)
 {
-    int index;
+    i32 index;
 
     if (m_town->m_buildings & (1L << building)) {
         for (index = 0; index < m_townObjectCount; ++index) {
@@ -1878,9 +1878,9 @@ void townManager::Toggle(int building)
 }
 
 VA(0x00417bdd, 0xc0)
-void townManager::DrawTown(int updateScreen, int drawFlags)
+void townManager::DrawTown(i32 updateScreen, i32 drawFlags)
 {
-    int index;
+    i32 index;
 
     PollSound();
     m_backgroundIcon->DrawToBuffer(0, 0, 0, 0);
@@ -1906,49 +1906,49 @@ void townManager::DrawTown(int updateScreen, int drawFlags)
 // was byte-neutral, flattening shortened both neutral accesses, and bounded
 // 31-name index plus 32-name offset AST searches retained no gain.
 VA(0x00417c9d, 0xf35)
-int townManager::BuyBuild(int building, int cannotBuy, int quickView)
+i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView)
 {
-    static short sourceLineBase = 0x0948;
-    unsigned long prerequisiteMask_c;
-    int prerequisiteCount_p;
-    short dialogLeft_a;
-    int mageLevel_k;
+    static i16 sourceLineBase = 0x0948;
+    u32l prerequisiteMask_c;
+    i32 prerequisiteCount_p;
+    i16 dialogLeft_a;
+    i32 mageLevel_k;
     char *amountText_n[TOWN_RESOURCE_COUNT];
-    int windowY_m;
-    int bottomRowCount_o;
-    int resourcesInRow_l;
-    int resourceCount_a;
-    short dialogWidth_e;
-    int entryWidth_o;
-    int costCount_o;
-    short dialogButtonCount_m;
+    i32 windowY_m;
+    i32 bottomRowCount_o;
+    i32 resourcesInRow_l;
+    i32 resourceCount_a;
+    i16 dialogWidth_e;
+    i32 entryWidth_o;
+    i32 costCount_o;
+    i16 dialogButtonCount_m;
     iconWidget *resourceWidgets_m[TOWN_RESOURCE_COUNT];
-    int xStart_b;
-    int index_h;
+    i32 xStart_b;
+    i32 index_h;
     widget *descriptionWidget_g;
-    int windowHeight_a;
-    short costs_e[8];
-    int dwelling_k;
-    int topRowCount_c;
+    i32 windowHeight_a;
+    i16 costs_e[8];
+    i32 dwelling_k;
+    i32 topRowCount_c;
     tag_message message_m;
-    signed char resourceTypes_o[8];
-    int windowRows_b;
-    int row_l;
+    i8 resourceTypes_o[8];
+    i32 windowRows_b;
+    i32 row_l;
     icon *resourceIcon_c;
-    short dialogControl_g;
-    short dialogResult_b;
-    int rowWidth_h;
-    int lineCount_j;
+    i16 dialogControl_g;
+    i16 dialogResult_b;
+    i32 rowWidth_h;
+    i32 lineCount_j;
     heroWindow *window_a;
-    short dialogHeight_f;
-    short dialogButtonWidth_l;
+    i16 dialogHeight_f;
+    i16 dialogButtonWidth_l;
     textWidget *amountWidgets_b[TOWN_RESOURCE_COUNT];
-    int rowResourceTypes_a[4];
-    int x_d;
-    int spacing_h;
-    int rowY_o;
+    i32 rowResourceTypes_a[4];
+    i32 x_d;
+    i32 spacing_h;
+    i32 rowY_o;
     char iconName_o[16];
-    int widgetIndex_f;
+    i32 widgetIndex_f;
     char *description_b;
 
     mageLevel_k = 0;
@@ -1960,7 +1960,7 @@ int townManager::BuyBuild(int building, int cannotBuy, int quickView)
 
     for (index_h = 0; index_h < TOWN_RESOURCE_COUNT; ++index_h) {
         costs_e[index_h] = -1;
-        resourceTypes_o[index_h] = static_cast<signed char>(costs_e[index_h]);
+        resourceTypes_o[index_h] = static_cast<i8>(costs_e[index_h]);
     }
 
     dwelling_k = -1;
@@ -1971,8 +1971,8 @@ int townManager::BuyBuild(int building, int cannotBuy, int quickView)
         m_town->m_type == TOWN_TYPE_NECROMANCER) {
         for (index_h = 0; index_h < TOWN_RESOURCE_COUNT; ++index_h) {
             if (xShrineBuildingCost[index_h] > 0) {
-                resourceTypes_o[costCount_o] = static_cast<signed char>(index_h);
-                costs_e[costCount_o] = static_cast<short>(xShrineBuildingCost[index_h]);
+                resourceTypes_o[costCount_o] = static_cast<i8>(index_h);
+                costs_e[costCount_o] = static_cast<i16>(xShrineBuildingCost[index_h]);
                 ++costCount_o;
             }
         }
@@ -1983,8 +1983,8 @@ int townManager::BuyBuild(int building, int cannotBuy, int quickView)
                     mageLevel_k + 1 < TOWN_MAGE_GUILD_MAX_LEVEL
                         ? mageLevel_k + 1
                         : TOWN_MAGE_GUILD_MAX_LEVEL][index_h] > 0) {
-                resourceTypes_o[costCount_o] = static_cast<signed char>(index_h);
-                costs_e[costCount_o] = static_cast<short>(
+                resourceTypes_o[costCount_o] = static_cast<i8>(index_h);
+                costs_e[costCount_o] = static_cast<i16>(
                     gMageBuildingCosts[
                         mageLevel_k + 1 < TOWN_MAGE_GUILD_MAX_LEVEL
                             ? mageLevel_k + 1
@@ -1995,8 +1995,8 @@ int townManager::BuyBuild(int building, int cannotBuy, int quickView)
     } else if (building == TOWN_COMMAND_SPECIAL_BUILDING) {
         for (index_h = 0; index_h < TOWN_RESOURCE_COUNT; ++index_h) {
             if (gSpecialBuildingCosts[gpTownManager->m_town->m_type][index_h] > 0) {
-                resourceTypes_o[costCount_o] = static_cast<signed char>(index_h);
-                costs_e[costCount_o] = static_cast<short>(
+                resourceTypes_o[costCount_o] = static_cast<i8>(index_h);
+                costs_e[costCount_o] = static_cast<i16>(
                     gSpecialBuildingCosts[gpTownManager->m_town->m_type][index_h]);
                 ++costCount_o;
             }
@@ -2004,8 +2004,8 @@ int townManager::BuyBuild(int building, int cannotBuy, int quickView)
     } else if (building <= TOWN_COMMAND_LAST_NEUTRAL_BUILDING) {
         for (index_h = 0; index_h < TOWN_RESOURCE_COUNT; ++index_h) {
             if (gNeutralBuildingCosts[building][index_h] > 0) {
-                resourceTypes_o[costCount_o] = static_cast<signed char>(index_h);
-                costs_e[costCount_o] = static_cast<short>(
+                resourceTypes_o[costCount_o] = static_cast<i8>(index_h);
+                costs_e[costCount_o] = static_cast<i16>(
                     gNeutralBuildingCosts[building][index_h]);
                 ++costCount_o;
             }
@@ -2014,8 +2014,8 @@ int townManager::BuyBuild(int building, int cannotBuy, int quickView)
         for (index_h = 0; index_h < TOWN_RESOURCE_COUNT; ++index_h) {
             if (gDwellingCosts[gpTownManager->m_town->m_type]
                               [dwelling_k][index_h] > 0) {
-                resourceTypes_o[costCount_o] = static_cast<signed char>(index_h);
-                costs_e[costCount_o] = static_cast<short>(
+                resourceTypes_o[costCount_o] = static_cast<i8>(index_h);
+                costs_e[costCount_o] = static_cast<i16>(
                     gDwellingCosts[gpTownManager->m_town->m_type]
                                   [dwelling_k][index_h]);
                 ++costCount_o;
@@ -2118,8 +2118,8 @@ int townManager::BuyBuild(int building, int cannotBuy, int quickView)
     window_a->BroadcastMessage(message_m);
 
     descriptionWidget_g = new textWidget(
-        0x2b, static_cast<short>(windowY_m + 0x18), 0xf0,
-        static_cast<short>(lineCount_j << 4), description_b, "bigfont.fnt",
+        0x2b, static_cast<i16>(windowY_m + 0x18), 0xf0,
+        static_cast<i16>(lineCount_j << 4), description_b, "bigfont.fnt",
         1, -1, 8, 1);
     if (descriptionWidget_g == 0)
         MemError();
@@ -2160,21 +2160,21 @@ int townManager::BuyBuild(int building, int cannotBuy, int quickView)
                     10, "I:\\Projects\\Heroes\\Prog\\SOURCE\\TOWNMGR.CPP",
                     sourceLineBase + 0x128));
                 sprintf(amountText_n[widgetIndex_f], "%d", costs_e[widgetIndex_f]);
-                int widgetXOffset = 0;
+                i32 widgetXOffset = 0;
                 amountWidgets_b[widgetIndex_f] = new textWidget(
-                    static_cast<short>(x_d + widgetXOffset),
-                    static_cast<short>(rowY_o + 0x23),
-                    static_cast<short>(entryWidth_o), 0xc,
+                    static_cast<i16>(x_d + widgetXOffset),
+                    static_cast<i16>(rowY_o + 0x23),
+                    static_cast<i16>(entryWidth_o), 0xc,
                     amountText_n[widgetIndex_f], "smalfont.fnt", 1, -1, 8, 1);
                 if (amountWidgets_b[widgetIndex_f] == 0)
                     MemError();
                 resourceWidgets_m[widgetIndex_f] = new iconWidget(
-                    static_cast<short>(
+                    static_cast<i16>(
                         x_d + widgetXOffset -
                         GetIconEntry(resourceIcon_c,
                                      rowResourceTypes_a[index_h])->x),
-                    static_cast<short>(rowY_o),
-                    static_cast<short>(entryWidth_o), 0xc, "resource.icn",
+                    static_cast<i16>(rowY_o),
+                    static_cast<i16>(entryWidth_o), 0xc, "resource.icn",
                     resourceTypes_o[widgetIndex_f], 0, -1, 0x10, 1);
                 if (resourceWidgets_m[widgetIndex_f] == 0)
                     MemError();
@@ -2239,13 +2239,13 @@ int townManager::BuyBuild(int building, int cannotBuy, int quickView)
 }
 
 VA(0x00418bd2, 0x3e9)
-void townManager::BuildObj(int building)
+void townManager::BuildObj(i32 building)
 {
-    int objectIndex_k;
+    i32 objectIndex_k;
     SLimitData limits_h;
-    int index_j;
+    i32 index_j;
     SAMPLE2 buildSample_b;
-    int frame_g;
+    i32 frame_g;
 
     if ((m_town->m_buildings & (1L << building)) &&
         (building != TOWN_COMMAND_MAGE_GUILD ||
@@ -2336,22 +2336,22 @@ void townManager::BuildObj(int building)
 VA(0x00418fbb, 0x3d8)
 void townManager::SetupMage(heroWindow *window)
 {
-    short unusedZero_f = 0;
-    short unusedAvailable_j = 1;
-    short unusedInvalid_c = TOWN_MAGE_SPELL_UNAVAILABLE;
-    short unusedIconState_h = 2;
-    short unusedFirstSpell_p = TOWN_MAGE_FIRST_SPELL_CONTROL;
-    short unusedFirstIcon_m = TOWN_MAGE_FIRST_ICON_CONTROL;
-    short unusedFirstDescription_o = TOWN_MAGE_FIRST_DESCRIPTION_CONTROL;
-    short unusedGuildIcon_i = TOWN_MAGE_GUILD_ICON_CONTROL;
-    short unusedDescription_g = TOWN_MAGE_DESCRIPTION_CONTROL;
+    i16 unusedZero_f = 0;
+    i16 unusedAvailable_j = 1;
+    i16 unusedInvalid_c = TOWN_MAGE_SPELL_UNAVAILABLE;
+    i16 unusedIconState_h = 2;
+    i16 unusedFirstSpell_p = TOWN_MAGE_FIRST_SPELL_CONTROL;
+    i16 unusedFirstIcon_m = TOWN_MAGE_FIRST_ICON_CONTROL;
+    i16 unusedFirstDescription_o = TOWN_MAGE_FIRST_DESCRIPTION_CONTROL;
+    i16 unusedGuildIcon_i = TOWN_MAGE_GUILD_ICON_CONTROL;
+    i16 unusedDescription_g = TOWN_MAGE_DESCRIPTION_CONTROL;
     tag_message message_b;
-    int level;
-    int slot_m;
-    int spellState_m;
-    int hasLibrary_k;
-    int lineCount_m;
-    int unusedGuildFrame_n;
+    i32 level;
+    i32 slot_m;
+    i32 spellState_m;
+    i32 hasLibrary_k;
+    i32 lineCount_m;
+    i32 unusedGuildFrame_n;
 
     message_b.type = TOWN_MESSAGE_SELECT;
     if (m_town->m_occupyingHeroId == -1) {
@@ -2450,16 +2450,16 @@ void townManager::SetupMage(heroWindow *window)
 // produced the same worse level-before-base order. Revisit after a relevant
 // accessor, layout, or TOWNMGR TU-state change.
 VA(0x00419393, 0x190)
-int MageGuildHandler(tag_message &message)
+i32 MageGuildHandler(tag_message &message)
 {
-    short unusedFirstSpell = TOWN_MAGE_FIRST_SPELL_CONTROL;
-    short unusedFirstIcon = TOWN_MAGE_FIRST_ICON_CONTROL;
-    short unusedFirstDescription_l = TOWN_MAGE_FIRST_DESCRIPTION_CONTROL;
-    unsigned int quickView_f;
-    int spellSlot;
-    int level;
-    int slot_p;
-    int spell;
+    i16 unusedFirstSpell = TOWN_MAGE_FIRST_SPELL_CONTROL;
+    i16 unusedFirstIcon = TOWN_MAGE_FIRST_ICON_CONTROL;
+    i16 unusedFirstDescription_l = TOWN_MAGE_FIRST_DESCRIPTION_CONTROL;
+    u32 quickView_f;
+    i32 spellSlot;
+    i32 level;
+    i32 slot_p;
+    i32 spell;
 
     if (message.type == TOWN_MESSAGE_SELECT) {
         switch (message.payload.widget.command) {
@@ -2500,22 +2500,22 @@ int MageGuildHandler(tag_message &message)
 }
 
 VA(0x00419523, 0x706)
-int townManager::RecruitHero(int availableHeroIndex, int cannotRecruit)
+i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit)
 {
-    short unusedTextStateTemp = 1;
-    short unusedPortraitStateSlot = 2;
-    short unusedTextControlValue = 3;
-    short unusedIconStatek = 4;
-    short unusedDimStatem = 6;
-    short unusedPortraitControlIndex = 7;
-    short unusedButtonTextk = 8;
-    short unusedButtonIconl = 9;
+    i16 unusedTextStateTemp = 1;
+    i16 unusedPortraitStateSlot = 2;
+    i16 unusedTextControlValue = 3;
+    i16 unusedIconStatek = 4;
+    i16 unusedDimStatem = 6;
+    i16 unusedPortraitControlIndex = 7;
+    i16 unusedButtonTextk = 8;
+    i16 unusedButtonIconl = 9;
     tag_message messageLocal;
-    int artifactCountb;
-    int indexValue;
-    int townXh;
-    int townYWork;
-    int newHeroClassCount;
+    i32 artifactCountb;
+    i32 indexValue;
+    i32 townXh;
+    i32 townYWork;
+    i32 newHeroClassCount;
 
     m_heroWindow1 = new heroWindow(0xb1, 0x10, "rcrthero.bin");
     if (m_heroWindow1 == 0)
@@ -2596,7 +2596,7 @@ int townManager::RecruitHero(int availableHeroIndex, int cannotRecruit)
         m_town->m_occupyingHeroId = m_recruitHero->m_id;
         gpGame->m_availableHeroes[
             gpCurPlayer->m_availableHeroIds[m_recruitState]] =
-            static_cast<signed char>(giCurPlayer);
+            static_cast<i8>(giCurPlayer);
         CheckValidAvailableHeroes();
         if (m_town->m_buildings & 1)
             m_town->GiveSpells(0);
@@ -2606,7 +2606,7 @@ int townManager::RecruitHero(int availableHeroIndex, int cannotRecruit)
         newHeroClassCount =
             (Random(1, 5) + newHeroClassCount) % TOWN_HERO_CLASS_COUNT;
         gpCurPlayer->m_availableHeroIds[m_recruitState] =
-            static_cast<signed char>(
+            static_cast<i8>(
                 gpGame->GetNewHeroId(giCurPlayer, newHeroClassCount, 0));
         gpGame->m_availableHeroes[
             gpCurPlayer->m_availableHeroIds[m_recruitState]] =
@@ -2629,10 +2629,10 @@ int townManager::RecruitHero(int availableHeroIndex, int cannotRecruit)
 }
 
 VA(0x00419c29, 0x153)
-int TavernHandler(tag_message &message)
+i32 TavernHandler(tag_message &message)
 {
-    int unusedDelay = TOWN_TAVERN_ANIMATION_DELAY;
-    short unusedFirstFrame = TOWN_TAVERN_FIRST_ANIMATION_FRAME;
+    i32 unusedDelay = TOWN_TAVERN_ANIMATION_DELAY;
+    i16 unusedFirstFrame = TOWN_TAVERN_FIRST_ANIMATION_FRAME;
 
     if (message.type == TOWN_MESSAGE_SELECT) {
         switch (message.payload.widget.command) {
@@ -2653,7 +2653,7 @@ int TavernHandler(tag_message &message)
             break;
         }
     }
-    if (static_cast<long>(KBTickCount()) > glTimers[0]) {
+    if (static_cast<i32l>(KBTickCount()) > glTimers[0]) {
         message.type = TOWN_MESSAGE_SELECT;
         message.payload.widget.command = 4;
         message.payload.widget.id = 2;
@@ -2663,7 +2663,7 @@ int TavernHandler(tag_message &message)
             TOWN_TAVERN_FIRST_ANIMATION_FRAME;
         gpTownManager->m_heroWindow0->BroadcastMessage(message);
         gpTownManager->m_heroWindow0->MoveWindow(0, 0);
-        glTimers[0] = static_cast<int>(KBTickCount() +
+        glTimers[0] = static_cast<i32>(KBTickCount() +
                                        TOWN_TAVERN_ANIMATION_DELAY);
     }
     return 1;
@@ -2672,7 +2672,7 @@ int TavernHandler(tag_message &message)
 VA(0x00419d7c, 0x110)
 void townManager::DoTavern(void)
 {
-    int unusedValue = 0;
+    i32 unusedValue = 0;
     tag_message message;
 
     m_heroWindow0 = new heroWindow(0xa2, 10, "tavwin.bin");
@@ -2702,13 +2702,13 @@ void townManager::DoTavern(void)
 // before cancel regressed to 91.74%. All 106 safe atomic AST variants found no
 // gain. Revisit only with a new dispatch/body placement discovery.
 VA(0x00419e8c, 0x328)
-int SplitArmyHandler(tag_message &message)
+i32 SplitArmyHandler(tag_message &message)
 {
-    short plusButton = TOWN_SPLIT_INCREASE_CONTROL;
-    short minusButton = TOWN_SPLIT_DECREASE_CONTROL;
-    short amountControl = TOWN_SPLIT_AMOUNT_CONTROL;
-    int handled = 0;
-    int unusedAction;
+    i16 plusButton = TOWN_SPLIT_INCREASE_CONTROL;
+    i16 minusButton = TOWN_SPLIT_DECREASE_CONTROL;
+    i16 amountControl = TOWN_SPLIT_AMOUNT_CONTROL;
+    i32 handled = 0;
+    i32 unusedAction;
 
     if (message.type == TOWN_MESSAGE_SELECT) {
         switch (message.payload.widget.command) {
@@ -2783,21 +2783,21 @@ update_amount:
 VA(0x0041a1b4, 0x5cf)
 void townManager::SetupWell(heroWindow *window)
 {
-    short unusedFirstIconj = 1;
-    short unusedFirstNameh = TOWN_WELL_FIRST_NAME_CONTROL;
-    short unusedFirstMonsterIconSlot = TOWN_WELL_FIRST_MONSTER_ICON_CONTROL;
-    short unusedFirstCreaturep = TOWN_WELL_FIRST_CREATURE_CONTROL;
-    short unusedFirstDetailState = TOWN_WELL_FIRST_DETAIL_CONTROL;
-    short unusedFirstAvailablek = TOWN_WELL_FIRST_AVAILABLE_CONTROL;
-    short unusedFirstAvailableCountm = TOWN_WELL_FIRST_AVAILABLE_COUNT_CONTROL;
-    unsigned char dwellingTypesValue[8];
-    int availablen;
-    int dwellingResult;
+    i16 unusedFirstIconj = 1;
+    i16 unusedFirstNameh = TOWN_WELL_FIRST_NAME_CONTROL;
+    i16 unusedFirstMonsterIconSlot = TOWN_WELL_FIRST_MONSTER_ICON_CONTROL;
+    i16 unusedFirstCreaturep = TOWN_WELL_FIRST_CREATURE_CONTROL;
+    i16 unusedFirstDetailState = TOWN_WELL_FIRST_DETAIL_CONTROL;
+    i16 unusedFirstAvailablek = TOWN_WELL_FIRST_AVAILABLE_CONTROL;
+    i16 unusedFirstAvailableCountm = TOWN_WELL_FIRST_AVAILABLE_COUNT_CONTROL;
+    u8 dwellingTypesValue[8];
+    i32 availablen;
+    i32 dwellingResult;
     tag_message messaged;
     char iconNameCount[16];
     char detailTextf[40];
     tag_monsterInfo monsterInfoi;
-    int growthd;
+    i32 growthd;
 
     for (dwellingResult = 0; dwellingResult < TOWN_WELL_DWELLING_COUNT; ++dwellingResult) {
         if (dwellingResult == TOWN_WELL_DWELLING_COUNT - 1 &&
@@ -2807,10 +2807,10 @@ void townManager::SetupWell(heroWindow *window)
         } else if (dwellingResult >= 1 &&
                    (m_town->m_buildings &
                     (1L << (dwellingResult + TOWN_WELL_FIRST_UPGRADE_BUILDING)))) {
-            dwellingTypesValue[dwellingResult] = static_cast<unsigned char>(
+            dwellingTypesValue[dwellingResult] = static_cast<u8>(
                 dwellingResult + TOWN_WELL_FIRST_UPGRADE_OFFSET);
         } else {
-            dwellingTypesValue[dwellingResult] = static_cast<unsigned char>(dwellingResult);
+            dwellingTypesValue[dwellingResult] = static_cast<u8>(dwellingResult);
         }
     }
 
@@ -2919,48 +2919,48 @@ void townManager::SetupWell(heroWindow *window)
 // progression; a prior bounded AST pass found no exact closure. Revisit after
 // a rank-loop source-shape or relevant TOWNMGR TU-state discovery.
 VA(0x0041a783, 0xf0f)
-void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
+void townManager::SetupThievesGuild(heroWindow *window, i32 informationLevel)
 {
-    static short sourceLineBase = 0x0e0e;
-    short unusedRankX_last = 0x102;
-    short unusedRankWidth_category = 0x44;
-    short unusedRankY_j = 0x1b;
-    short unusedRankHeight_player = 0x18;
-    short unusedRankIconHeight_k = 0x16;
-    short unusedIconWidth_index = 0x12;
-    short unusedIconHeight = 0x16;
-    short unusedPlayerWidth_value = 0x48;
-    int category_stat;
-    signed char categoryOrder_x[TOWN_THIEVES_ORDER_BUFFER_SIZE];
-    int rank;
-    int tiedCount_value;
-    int rankX_m;
-    int lastAtRank_j;
-    int firstAtRank_rank;
+    static i16 sourceLineBase = 0x0e0e;
+    i16 unusedRankX_last = 0x102;
+    i16 unusedRankWidth_category = 0x44;
+    i16 unusedRankY_j = 0x1b;
+    i16 unusedRankHeight_player = 0x18;
+    i16 unusedRankIconHeight_k = 0x16;
+    i16 unusedIconWidth_index = 0x12;
+    i16 unusedIconHeight = 0x16;
+    i16 unusedPlayerWidth_value = 0x48;
+    i32 category_stat;
+    i8 categoryOrder_x[TOWN_THIEVES_ORDER_BUFFER_SIZE];
+    i32 rank;
+    i32 tiedCount_value;
+    i32 rankX_m;
+    i32 lastAtRank_j;
+    i32 firstAtRank_rank;
     widget *iconControl_last;
     char *widgetText_control;
-    int maxCategories_hero;
-    int strongestHeroValue_current;
+    i32 maxCategories_hero;
+    i32 strongestHeroValue_current;
     char statText_k[200];
-    int armySlot_index;
-    long categoryStats_m[TOWN_THIEVES_PLAYER_COUNT];
-    int heroPosition_index;
-    int heroValue_j;
-    int strongestCreatureValue;
-    int strongestHeroPosition_first;
+    i32 armySlot_index;
+    i32l categoryStats_m[TOWN_THIEVES_PLAYER_COUNT];
+    i32 heroPosition_index;
+    i32 heroValue_j;
+    i32 strongestCreatureValue;
+    i32 strongestHeroPosition_first;
     hero *strongestHero_x;
-    int unusedThievesValue_s;
+    i32 unusedThievesValue_s;
     town *playerTown_k;
-    short unusedFirstRankControl_slot = TOWN_THIEVES_FIRST_RANK_CONTROL;
-    short unusedFirstPlayerControl_hero = TOWN_THIEVES_FIRST_PLAYER_CONTROL;
-    short unusedHeroY_p = 0x12c;
-    short unusedPrimaryStatsY = 0x153;
-    short unusedPersonalityY_player = 0x18d;
-    short unusedCreatureY_j = 0x1a2;
-    int position_current;
+    i16 unusedFirstRankControl_slot = TOWN_THIEVES_FIRST_RANK_CONTROL;
+    i16 unusedFirstPlayerControl_hero = TOWN_THIEVES_FIRST_PLAYER_CONTROL;
+    i16 unusedHeroY_p = 0x12c;
+    i16 unusedPrimaryStatsY = 0x153;
+    i16 unusedPersonalityY_player = 0x18d;
+    i16 unusedCreatureY_j = 0x1a2;
+    i32 position_current;
     tag_message message_n;
     widget *textControl_icon;
-    int strongestCreature_m;
+    i32 strongestCreature_m;
 
     if (informationLevel == -1)
         informationLevel = gpGame->GetNumThievesGuilds(giCurPlayer);
@@ -3019,11 +3019,11 @@ void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
             for (position_current = firstAtRank_rank;
                  !(lastAtRank_j < position_current); ++position_current) {
                 iconControl_last = new iconWidget(
-                    static_cast<short>(
+                    static_cast<i16>(
                         (position_current - firstAtRank_rank) * 0x12 + rankX_m),
-                    static_cast<short>(category_stat * 0x18 + 0x1b),
+                    static_cast<i16>(category_stat * 0x18 + 0x1b),
                     0x12, 0x16, "townwind.icn",
-                    static_cast<short>(
+                    static_cast<i16>(
                         gpGame->m_players[categoryOrder_x[position_current]].m_color +
                         TOWN_THIEVES_RANK_ICON_FRAME_BASE),
                     0, -1, 0x10, 1);
@@ -3070,13 +3070,13 @@ void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
 
             if (strongestHeroPosition_first != -1) {
                 iconControl_last = new iconWidget(
-                    static_cast<short>(position_current * 0x44 + 0xf6),
+                    static_cast<i16>(position_current * 0x44 + 0xf6),
                     0x12d, 0, 0, "locators.icn", 0x16, 0, -1, 0x10, 1);
                 if (iconControl_last == 0)
                     MemError();
                 window->AddWidget(iconControl_last, -1);
                 iconControl_last = new iconWidget(
-                    static_cast<short>(position_current * 0x44 + 0xed),
+                    static_cast<i16>(position_current * 0x44 + 0xed),
                     300, 0, 0, "miniport.icn",
                     gpGame->GetPlayerHero(rank, strongestHeroPosition_first)
                         ->m_portrait,
@@ -3098,7 +3098,7 @@ void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
                         sourceLineBase + TOWN_THIEVES_SOURCE_LINE_HERO_LABELS));
                     strcpy(widgetText_control, gText);
                     textControl_icon = new textWidget(
-                        static_cast<short>(position_current * 0x44 + 0xef),
+                        static_cast<i16>(position_current * 0x44 + 0xef),
                         0x153, 0x28, 0x30, widgetText_control, "smalfont.fnt",
                         1, -1, 0x200, 0);
                     window->AddWidget(textControl_icon, -1);
@@ -3117,7 +3117,7 @@ void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
                         sourceLineBase + TOWN_THIEVES_SOURCE_LINE_HERO_STATS));
                     strcpy(widgetText_control, gText);
                     textControl_icon = new textWidget(
-                        static_cast<short>(position_current * 0x44 + 0x11c),
+                        static_cast<i16>(position_current * 0x44 + 0x11c),
                         0x153, 0xf, 0x30, widgetText_control, "smalfont.fnt",
                         1, -1, 0x200, 0);
                     window->AddWidget(textControl_icon, -1);
@@ -3133,7 +3133,7 @@ void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
                         sourceLineBase + TOWN_THIEVES_SOURCE_LINE_PERSONALITY));
                     strcpy(widgetText_control, gText);
                     textControl_icon = new textWidget(
-                        static_cast<short>(position_current * 0x44 + 0xe3),
+                        static_cast<i16>(position_current * 0x44 + 0xe3),
                         0x18d, 0x4a, 0x10, widgetText_control, "smalfont.fnt",
                         1, -1, 8, 1);
                     window->AddWidget(textControl_icon, -1);
@@ -3199,10 +3199,10 @@ void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
                         }
                         if (strongestCreature_m != -1) {
                             iconControl_last = new iconWidget(
-                                static_cast<short>(
+                                static_cast<i16>(
                                     position_current * 0x44 + 0xf4),
                                 0x1a2, 0x28, 0x22, "mons32.icn",
-                                static_cast<short>(strongestCreature_m),
+                                static_cast<i16>(strongestCreature_m),
                                 0, -1, 0x11, 1);
                             if (iconControl_last == 0)
                                 MemError();
@@ -3225,22 +3225,22 @@ void townManager::SetupThievesGuild(heroWindow *window, int informationLevel)
 // worse. The consolidated runner tried all 122 safe atomic AST mutations with
 // no gain. Revisit only after a playerData/accessor or TU-state change.
 VA(0x0041b692, 0x56a)
-void GetCategoryStats(int category, long int * const stats,
-                      signed char * const order)
+void GetCategoryStats(i32 category, i32l * const stats,
+                      i8 * const order)
 {
-    int player;
-    int townIndex_c;
+    i32 player;
+    i32 townIndex_c;
     hero *playerHero_h;
-    int heroIndex_n;
-    int townCount_k;
-    int castleCount_p;
-    int armyStrength;
+    i32 heroIndex_n;
+    i32 townCount_k;
+    i32 castleCount_p;
+    i32 armyStrength;
     town *playerTown;
 
     for (player = 0; player < gpGame->m_playerCount; ++player) {
         townCount_k = 0;
         castleCount_p = 0;
-        order[player] = static_cast<signed char>(player);
+        order[player] = static_cast<i8>(player);
         if (gpGame->m_playerDead[player]) {
             stats[player] = TOWN_THIEVES_DEAD_PLAYER_STAT;
         } else {
@@ -3336,12 +3336,12 @@ void GetCategoryStats(int category, long int * const stats,
 }
 
 VA(0x0041bbfc, 0xd9)
-void SortStats(long int * const stats, signed char * const order)
+void SortStats(i32l * const stats, i8 * const order)
 {
-    int temporaryOrder;
-    int secondPlayer;
-    int firstPlayer;
-    long tempStat;
+    i32 temporaryOrder;
+    i32 secondPlayer;
+    i32 firstPlayer;
+    i32l tempStat;
 
     for (firstPlayer = 0; firstPlayer < gpGame->m_playerCount - 1;
          ++firstPlayer) {
@@ -3353,7 +3353,7 @@ void SortStats(long int * const stats, signed char * const order)
                 stats[secondPlayer] = tempStat;
                 temporaryOrder = order[firstPlayer];
                 order[firstPlayer] = order[secondPlayer];
-                order[secondPlayer] = static_cast<signed char>(temporaryOrder);
+                order[secondPlayer] = static_cast<i8>(temporaryOrder);
             }
         }
     }

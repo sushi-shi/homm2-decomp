@@ -22,23 +22,23 @@
 #include <stdio.h>
 #include <string.h>
 
-DATA(0x00522f7c) static signed char bExpansionSmackNum;
+DATA(0x00522f7c) static i8 bExpansionSmackNum;
 
 VA(0x00401000, 0x4e)
-void ConvertSmackerPalette(unsigned char *paletteData) {
-    int i;
+void ConvertSmackerPalette(u8 *paletteData) {
+    i32 i;
 
     for (i = 0; i < SMACK_PALETTE_SIZE; ++i)
-        paletteData[i] = static_cast<unsigned char>(
-            static_cast<int>(paletteData[i]) >> 2);
+        paletteData[i] = static_cast<u8>(
+            static_cast<i32>(paletteData[i]) >> 2);
 }
 
 VA(0x0040104e, 0x21f)
-void DoAdvance(Smack *smack, int drawFrame, int advanceFrame, int updatePalette,
-               int skipPalette) {
+void DoAdvance(Smack *smack, i32 drawFrame, i32 advanceFrame, i32 updatePalette,
+               i32 skipPalette) {
     if (drawFrame && smack->NewPalette && !skipPalette) {
         memcpy(gPalette->m_data, smack->Palette, SMACK_PALETTE_SIZE);
-        ConvertSmackerPalette(reinterpret_cast<unsigned char *>(gPalette->m_data));
+        ConvertSmackerPalette(reinterpret_cast<u8 *>(gPalette->m_data));
         if (updatePalette)
             UpdatePalette(gPalette->m_data);
     }
@@ -82,24 +82,24 @@ void DoAdvance(Smack *smack, int drawFrame, int advanceFrame, int updatePalette,
 // orders and 0[&campaignChoice4] were byte-neutral; revisit on relevant TU change.
 VA(0x0040126d, 0x118c)
 void SmackManagerMain(void) {
-    int soundFlags4;
-    int preloadFlags26;
-    int playing16;
-    int unusedPlaybackState4;
-    int musicStarted36;
-    int companionStarted1;
-    int primaryStarted9;
-    int unusedOne1 = 1;
+    i32 soundFlags4;
+    i32 preloadFlags26;
+    i32 playing16;
+    i32 unusedPlaybackState4;
+    i32 musicStarted36;
+    i32 companionStarted1;
+    i32 primaryStarted9;
+    i32 unusedOne1 = 1;
     char path7[352];
-    signed char savedPalette9[SMACK_PALETTE_SIZE];
-    int unusedFrameHead36;
+    i8 savedPalette9[SMACK_PALETTE_SIZE];
+    i32 unusedFrameHead36;
 
     gbLastFramePlayed = 0;
     musicStarted36 = 0;
     if (bSmackNum == SMACK_CHOOSE_CAMPAIGN) {
-        int initialMouseY29;
-        int initialMouseX3;
-        int unusedInitialMouseState11;
+        i32 initialMouseY29;
+        i32 initialMouseX3;
+        i32 unusedInitialMouseState11;
 
         brotherIcon = gpResourceManager->GetIcon("brothers.icn");
         gpMouseManager->MouseCoords(initialMouseX3, initialMouseY29);
@@ -189,7 +189,7 @@ void SmackManagerMain(void) {
     companionStarted1 = 0;
 
     if (bSmackNum == SMACK_CHOOSE_CAMPAIGN) {
-        int eventSink;
+        i32 eventSink;
 
         Process1WindowsMessage();
         while (gpInputManager->GetEvent().type != 0) {
@@ -214,7 +214,7 @@ void SmackManagerMain(void) {
                 memcpy(gPalette->m_data, smk2->Palette, SMACK_PALETTE_SIZE);
                 SmackClose(smk2);
                 smk2 = 0;
-                ConvertSmackerPalette(reinterpret_cast<unsigned char *>(gPalette->m_data));
+                ConvertSmackerPalette(reinterpret_cast<u8 *>(gPalette->m_data));
                 UpdatePalette(gPalette->m_data);
                 memcpy(gpBufferPalette->m_data, gPalette->m_data, SMACK_PALETTE_SIZE);
                 gpWindowManager->FadeScreen(0, SMACK_FAST_FADE, 0);
@@ -253,8 +253,8 @@ void SmackManagerMain(void) {
 
         if (smk2 && primaryStarted9 && !SmackWait(smk2)) {
             if (companionStarted1 && smk2->Frames - 1 == smk2->FrameNum) {
-                int drawLastFrame;
-                int advanceLastFrame;
+                i32 drawLastFrame;
+                i32 advanceLastFrame;
 
                 advanceLastFrame = 0;
                 if (SmackOptions[bSmackNum].drawCompanion && !gConfig.slowVideo) {
@@ -286,9 +286,9 @@ void SmackManagerMain(void) {
         switch (message.type) {
         case SMACK_EVENT_MOUSE_MOVE:
             if (bSmackNum == SMACK_CHOOSE_CAMPAIGN) {
-                int campaignMouseX5;
-                int campaignMouseY3;
-                int campaignChoice4;
+                i32 campaignMouseX5;
+                i32 campaignMouseY3;
+                i32 campaignChoice4;
 
                 gpMouseManager->MouseCoords(campaignMouseX5, campaignMouseY3);
                 campaignChoice4 = campaignMouseX5 < SMACK_SCREEN_WIDTH / 2;
@@ -305,9 +305,9 @@ void SmackManagerMain(void) {
                 BlitBitmapToScreen(gpWindowManager->m_screen, 49, 78, 538, 258,
                                    49, 78);
             } else if (bSmackNum == SMACK_EXPANSION_CAMPAIGN) {
-                int expansionMouseX6;
-                int expansionMouseY4;
-                int expansionChoice1;
+                i32 expansionMouseX6;
+                i32 expansionMouseY4;
+                i32 expansionChoice1;
 
                 gpMouseManager->MouseCoords(expansionMouseX6, expansionMouseY4);
                 expansionChoice1 = ExpansionCampaignRect(expansionMouseX6,
@@ -322,7 +322,7 @@ void SmackManagerMain(void) {
                         smk2 = 0;
                     }
                     if (expansionChoice1 != -1) {
-                        bExpansionSmackNum = static_cast<signed char>(
+                        bExpansionSmackNum = static_cast<i8>(
                             expansionChoice1 + SMACK_EXPANSION_FIRST_MOVIE);
                         sprintf(gText, "%s%s.SMK", path7,
                                 SmackOptions[bExpansionSmackNum].fileName);
@@ -431,9 +431,9 @@ void ShutDownSmacker(void) {
 }
 
 VA(0x0040244f, 0x17f)
-int PlaySmacker(int smackNumber) {
-    signed char savedPalette[SMACK_PALETTE_SIZE];
-    int oldUpdateFlags;
+i32 PlaySmacker(i32 smackNumber) {
+    i8 savedPalette[SMACK_PALETTE_SIZE];
+    i32 oldUpdateFlags;
 
     xLastChoice = -1;
     if (gbNoCDRom)
@@ -462,7 +462,7 @@ int PlaySmacker(int smackNumber) {
         }
         PrintSummaryInfo(&smksum);
     }
-    bSmackNum = static_cast<signed char>(smackNumber);
+    bSmackNum = static_cast<i8>(smackNumber);
     SmackManagerMain();
     memcpy(gpBufferPalette->m_data, savedPalette, SMACK_PALETTE_SIZE);
     gpWindowManager->m_updateFlags = oldUpdateFlags;
@@ -470,7 +470,7 @@ int PlaySmacker(int smackNumber) {
     return gbPlayedThrough;
 }
 
-DATA(0x004ec040) int bSmackSound = 0;
+DATA(0x004ec040) i32 bSmackSound = 0;
 DATA(0x004ec044) icon *brotherIcon = 0;
 DATA(0x004ec048) static tag_rect expansionCampaignRects[SMACK_EXPANSION_RECT_COUNT] = {
     {215, 49, 230, 150}, {217, 275, 230, 150},
@@ -478,8 +478,8 @@ DATA(0x004ec048) static tag_rect expansionCampaignRects[SMACK_EXPANSION_RECT_COU
 };
 
 VA(0x004025ce, 0x65)
-int ExpansionCampaignRect(int x, int y) {
-    int i;
+i32 ExpansionCampaignRect(i32 x, i32 y) {
+    i32 i;
     for (i = 0; i < SMACK_EXPANSION_RECT_COUNT; ++i) {
         if (PointInRect(x, y, &expansionCampaignRects[i]))
             return i;
@@ -488,7 +488,7 @@ int ExpansionCampaignRect(int x, int y) {
 }
 
 VA(0x00402633, 0x89)
-signed char PointInRect(int x, int y, tag_rect *rect) {
+i8 PointInRect(i32 x, i32 y, tag_rect *rect) {
     if (x < rect->x)
         return 0;
     if (x >= rect->x + rect->width)
@@ -617,7 +617,7 @@ DATA(0x004ec070) SSmackOptions SmackOptions[73] = {
     {"IVYVOY", "", "IVYVOY", "", 0, 0, 1, 1, 1, 41, 132},
     {"CYBCREDS", "", "SCYBCRED", "", 1, 0, 1, 1, 0, 0, 0}
 };
-DATA(0x004ecd48) int bTesting = 0;
+DATA(0x004ecd48) i32 bTesting = 0;
 DATA(0x004ecd4c) Smack *smk1 = 0;
 DATA(0x004ecd50) Smack *smk2 = 0;
 // @data-layout-note
@@ -647,8 +647,8 @@ DATA(0x004ecd50) Smack *smk2 = 0;
 // a custom bss_seg retain the candidate order. All 65 BSS references match the
 // same 9 retail RVAs, including smksum addends +0x8, +0x1c, and +0x20. Do not
 // add padding, aliases, or section pragmas to hide this allocation-order wall.
-DATA(0x00522f20) signed char bSmackNum;
-DATA(0x00522f24) int gbLastFramePlayed;
+DATA(0x00522f20) i8 bSmackNum;
+DATA(0x00522f24) i32 gbLastFramePlayed;
 DATA(0x00522f28) SmackSum smksum;
-DATA(0x00522f80) int gbPlayedThrough;
-DATA(0x00522f84) signed char bMainDone;
+DATA(0x00522f80) i32 gbPlayedThrough;
+DATA(0x00522f84) i8 bMainDone;

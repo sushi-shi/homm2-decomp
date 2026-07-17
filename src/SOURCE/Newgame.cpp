@@ -37,7 +37,7 @@ VA(0x004b6f40, 0x1d5)
 void game::GetMap(void)
 {
     fileRequester *requesterResult;
-    int resultCode;
+    i32 resultCode;
     char fileMask[16];
     char savedName[44];
 
@@ -81,7 +81,7 @@ VA(0x004b7115, 0x77)
 void game::ProcessNewMap(struct SMapHeader *header)
 {
     m_newGameInitialized = 0;
-    m_newGameHumanCount = static_cast<signed char>(giNumHumanPlayers);
+    m_newGameHumanCount = static_cast<i8>(giNumHumanPlayers);
     if (m_newGameWindow == 0) {
     } else {
         CleanUpNewGameWindow();
@@ -100,12 +100,12 @@ void game::ProcessNewMap(struct SMapHeader *header)
 VA(0x004b718c, 0x491)
 void game::InitNewGame(struct SMapHeader *header)
 {
-    int activePlayerCount;
-    int unusedPlayerCount;
-    int player;
-    int computerPlayers;
-    int humanPlayers;
-    int flexiblePlayerType;
+    i32 activePlayerCount;
+    i32 unusedPlayerCount;
+    i32 player;
+    i32 computerPlayers;
+    i32 humanPlayers;
+    i32 flexiblePlayerType;
 
     activePlayerCount = 0;
     unusedPlayerCount = 0;
@@ -122,7 +122,7 @@ void game::InitNewGame(struct SMapHeader *header)
             }
         }
     } else {
-        m_newGameHumanCount = static_cast<signed char>(giNumHumanPlayers);
+        m_newGameHumanCount = static_cast<i8>(giNumHumanPlayers);
         if (header != 0)
             m_mapHeader = *header;
         else
@@ -131,7 +131,7 @@ void game::InitNewGame(struct SMapHeader *header)
         for (player = 0; player < MAP_HEADER_PLAYER_COUNT; ++player) {
             if (m_mapHeader.playerEnabled[player]) {
                 m_setupPlayerColor[activePlayerCount] =
-                    static_cast<signed char>(player);
+                    static_cast<i8>(player);
                 ++activePlayerCount;
             }
         }
@@ -156,7 +156,7 @@ void game::InitNewGame(struct SMapHeader *header)
                 !m_mapHeader.playerCanComputer[m_setupPlayerColor[player]]) {
                 m_setupPlayerType[player] = NEW_GAME_PLAYER_DEFAULT;
                 m_setupPlayerNetworkId[player] =
-                    static_cast<signed char>(humanPlayers);
+                    static_cast<i8>(humanPlayers);
                 ++humanPlayers;
             } else if (!m_mapHeader.playerCanHuman[m_setupPlayerColor[player]] &&
                        m_mapHeader.playerCanComputer[m_setupPlayerColor[player]]) {
@@ -175,7 +175,7 @@ void game::InitNewGame(struct SMapHeader *header)
         for (player = 0; player < m_mapHeader.playerCount; ++player) {
             if (m_setupPlayerType[player] == NEW_GAME_NETWORK_PLAYER_NONE)
                 m_setupPlayerType[player] =
-                    static_cast<signed char>(flexiblePlayerType);
+                    static_cast<i8>(flexiblePlayerType);
         }
 
         for (player = 0; player < m_mapHeader.playerCount; ++player) {
@@ -184,7 +184,7 @@ void game::InitNewGame(struct SMapHeader *header)
             if (humanPlayers < giNumHumanPlayers &&
                 m_mapHeader.playerCanHuman[m_setupPlayerColor[player]]) {
                 m_setupPlayerNetworkId[player] =
-                    static_cast<signed char>(humanPlayers);
+                    static_cast<i8>(humanPlayers);
                 ++humanPlayers;
             } else {
                 m_setupPlayerNetworkId[player] = NEW_GAME_COMPUTER_PLAYER;
@@ -199,7 +199,7 @@ void game::InitNewGame(struct SMapHeader *header)
 VA(0x004b761d, 0x81)
 void game::SetupNetPlayerNames(void)
 {
-    int player;
+    i32 player;
 
     if (giNumHumanPlayers > 1) {
         for (player = 0; 0[&giNumHumanPlayers] > player; ++player) {
@@ -217,23 +217,23 @@ void game::SetupNetPlayerNames(void)
 // has 35 unconditional jumps versus 30 here, exactly accounting for the
 // 25-byte size delta.
 VA(0x004b769e, 0xaca)
-int game::NewGame(void)
+i32 game::NewGame(void)
 {
-    DATA(0x0051cdd0) static short newGameSourceLineBase =
+    DATA(0x0051cdd0) static i16 newGameSourceLineBase =
         NEW_GAME_SOURCE_LINE_BASE;
     char netPlayerPacket[NEW_GAME_PLAYER_INFO_BUFFER_SIZE];
     char mapInfoPacket[NEW_GAME_MAP_PACKET_SIZE];
     tag_message windowMessage;
-    int mapHeaderLoaded;
-    int playerDataReceived;
+    i32 mapHeaderLoaded;
+    i32 playerDataReceived;
     NewGameRemotePacket *remoteBuffer;
     heroWindow *choiceWindow;
     char *extension;
-    int textBufferIndex;
-    int mapHeaderResult;
-    int result;
-    signed char wrongExpansionType;
-    int transmitResult;
+    i32 textBufferIndex;
+    i32 mapHeaderResult;
+    i32 result;
+    i8 wrongExpansionType;
+    i32 transmitResult;
 
     result = 1;
     m_newGameWindow = 0;
@@ -245,7 +245,7 @@ int game::NewGame(void)
             MemError();
         gpWindowManager->DoDialog(choiceWindow, ExpStdGameHandler, 0);
         delete choiceWindow;
-        switch (static_cast<short>(gpWindowManager->m_dialogResult)) {
+        switch (static_cast<i16>(gpWindowManager->m_dialogResult)) {
         case 1:
             xIsExpansionMap = 0;
             break;
@@ -360,7 +360,7 @@ int game::NewGame(void)
                     strcpy(gpGame->m_mapFilename, "brokena.mp2");
                 m_newGameInitialized = 0;
                 m_newGameHumanCount =
-                    static_cast<signed char>(giNumHumanPlayers);
+                    static_cast<i8>(giNumHumanPlayers);
             }
             if (giNumHumanPlayers > 3 &&
                 _strcmpi(gpGame->m_mapFilename, "brokena.mp2") == 0)
@@ -445,7 +445,7 @@ int game::NewGame(void)
 VA(0x004b8168, 0xf1)
 void game::CleanUpNewGameWindow(void)
 {
-    int player;
+    i32 player;
 
     for (player = 0; player < MAP_HEADER_PLAYER_COUNT; ++player) {
         m_newGameWindow->RemoveAndDeleteWidget(player + NEW_GAME_RACE_FIRST);
@@ -463,19 +463,19 @@ void game::CleanUpNewGameWindow(void)
 VA(0x004b8259, 0x67d)
 void game::InitNewGameWindow(void)
 {
-    DATA(0x0051cfa0) static short newGameWindowSourceLineBase =
+    DATA(0x0051cfa0) static i16 newGameWindowSourceLineBase =
         NEW_GAME_WINDOW_SOURCE_LINE_BASE;
-    int availableWidthResult;
+    i32 availableWidthResult;
     widget *textControlLocal;
-    int firstPlayerXLocal;
-    int multiplayerYOffsetValue;
-    int playerCounter;
-    int playerSpacingTemp;
+    i32 firstPlayerXLocal;
+    i32 multiplayerYOffsetValue;
+    i32 playerCounter;
+    i32 playerSpacingTemp;
     widget *iconControlLocal;
-    int playerGapValue;
+    i32 playerGapValue;
     char *label;
-    int raceTextWidth;
-    int singlePlayerYOffsetValue;
+    i32 raceTextWidth;
+    i32 singlePlayerYOffsetValue;
 
     iconControlLocal = 0;
     textControlLocal = 0;
@@ -494,22 +494,22 @@ void game::InitNewGameWindow(void)
          ++playerCounter) {
         if (giNumHumanPlayers > 1) {
             iconControlLocal = new iconWidget(
-                static_cast<short>(playerSpacingTemp * playerCounter +
+                static_cast<i16>(playerSpacingTemp * playerCounter +
                                    firstPlayerXLocal + 13),
-                static_cast<short>(multiplayerYOffsetValue + 343), 64, 28,
+                static_cast<i16>(multiplayerYOffsetValue + 343), 64, 28,
                 "ngextra.icn", 59, 0,
-                static_cast<short>(playerCounter + NEW_GAME_PLAYER_HUMAN_FIRST),
+                static_cast<i16>(playerCounter + NEW_GAME_PLAYER_HUMAN_FIRST),
                 16, 1);
             if (iconControlLocal == 0)
                 MemError();
             m_newGameWindow->AddWidget(iconControlLocal, -1);
 
             iconControlLocal = new iconWidget(
-                static_cast<short>(playerSpacingTemp * playerCounter +
+                static_cast<i16>(playerSpacingTemp * playerCounter +
                                    firstPlayerXLocal + 16),
-                static_cast<short>(multiplayerYOffsetValue + 340), 62, 26,
+                static_cast<i16>(multiplayerYOffsetValue + 340), 62, 26,
                 "ngextra.icn", 0, 0,
-                static_cast<short>(playerCounter + NEW_GAME_HANDICAP_FIRST),
+                static_cast<i16>(playerCounter + NEW_GAME_HANDICAP_FIRST),
                 16, 1);
             if (iconControlLocal == 0)
                 MemError();
@@ -517,56 +517,56 @@ void game::InitNewGameWindow(void)
         }
 
         iconControlLocal = new iconWidget(
-            static_cast<short>(playerSpacingTemp * playerCounter +
+            static_cast<i16>(playerSpacingTemp * playerCounter +
                                firstPlayerXLocal + 11),
             197, 68,
-            static_cast<short>(
+            static_cast<i16>(
                 ((giNumHumanPlayers <= 1) - 1 &
                  (NEW_GAME_RACE_WIDGET_MULTIPLAYER_HEIGHT -
                   NEW_GAME_RACE_WIDGET_SINGLE_HEIGHT)) +
                 NEW_GAME_RACE_WIDGET_SINGLE_HEIGHT),
             "ngextra.icn",
-            static_cast<short>(
+            static_cast<i16>(
                 ((giNumHumanPlayers <= 1) - 1 &
                  (NEW_GAME_RACE_WIDGET_MULTIPLAYER_FRAME -
                   NEW_GAME_RACE_WIDGET_SINGLE_FRAME)) +
                 NEW_GAME_RACE_WIDGET_SINGLE_FRAME),
-            0, static_cast<short>(playerCounter + NEW_GAME_RACE_FIRST), 16, 1);
+            0, static_cast<i16>(playerCounter + NEW_GAME_RACE_FIRST), 16, 1);
         if (iconControlLocal == 0)
             MemError();
         m_newGameWindow->AddWidget(iconControlLocal, -1);
 
         iconControlLocal = new iconWidget(
-            static_cast<short>(playerSpacingTemp * playerCounter +
+            static_cast<i16>(playerSpacingTemp * playerCounter +
                                firstPlayerXLocal + 13),
             191, 68,
-            static_cast<short>(
+            static_cast<i16>(
                 ((giNumHumanPlayers <= 1) - 1 &
                  (NEW_GAME_PLAYER_WIDGET_MULTIPLAYER_HEIGHT -
                   NEW_GAME_PLAYER_WIDGET_SINGLE_HEIGHT)) +
                 NEW_GAME_PLAYER_WIDGET_SINGLE_HEIGHT),
             "ngextra.icn",
-            static_cast<short>(
+            static_cast<i16>(
                 ((giNumHumanPlayers <= 1) - 1 &
                  (NEW_GAME_PLAYER_WIDGET_MULTIPLAYER_FRAME -
                   NEW_GAME_PLAYER_WIDGET_SINGLE_FRAME)) +
                 NEW_GAME_PLAYER_WIDGET_SINGLE_FRAME),
-            0, static_cast<short>(playerCounter + NEW_GAME_PLAYER_SELECT_FIRST),
+            0, static_cast<i16>(playerCounter + NEW_GAME_PLAYER_SELECT_FIRST),
             16, 1);
         if (iconControlLocal == 0)
             MemError();
         m_newGameWindow->AddWidget(iconControlLocal, -1);
 
         iconControlLocal = new iconWidget(
-            static_cast<short>(playerSpacingTemp * playerCounter +
+            static_cast<i16>(playerSpacingTemp * playerCounter +
                                firstPlayerXLocal + 16),
             194, 62, 58, "ngextra.icn",
-            static_cast<short>(
+            static_cast<i16>(
                 ((giNumHumanPlayers <= 1) - 1 &
                  (NEW_GAME_COLOR_WIDGET_MULTIPLAYER_FRAME -
                   NEW_GAME_COLOR_WIDGET_SINGLE_FRAME)) +
                 NEW_GAME_COLOR_WIDGET_SINGLE_FRAME), 0,
-            static_cast<short>(playerCounter + NEW_GAME_COLOR_FIRST), 16, 1);
+            static_cast<i16>(playerCounter + NEW_GAME_COLOR_FIRST), 16, 1);
         if (iconControlLocal == 0)
             MemError();
         m_newGameWindow->AddWidget(iconControlLocal, -1);
@@ -577,10 +577,10 @@ void game::InitNewGameWindow(void)
                 newGameWindowSourceLineBase + 0x50));
             sprintf(label, " ");
             textControlLocal = new textWidget(
-                static_cast<short>(playerSpacingTemp * playerCounter +
+                static_cast<i16>(playerSpacingTemp * playerCounter +
                                    firstPlayerXLocal + 19),
                 240, 56, 9, label, "smalfont.fnt", 1,
-                static_cast<short>(playerCounter + NEW_GAME_PLAYER_NAME_FIRST),
+                static_cast<i16>(playerCounter + NEW_GAME_PLAYER_NAME_FIRST),
                 NEW_GAME_MESSAGE_WIDGET, 1);
             if (textControlLocal == 0)
                 MemError();
@@ -591,12 +591,12 @@ void game::InitNewGameWindow(void)
         if (giNumHumanPlayers == 1)
             singlePlayerYOffsetValue = -14;
         iconControlLocal = new iconWidget(
-            static_cast<short>(playerSpacingTemp * playerCounter +
+            static_cast<i16>(playerSpacingTemp * playerCounter +
                                firstPlayerXLocal + 11),
-            static_cast<short>(0[&multiplayerYOffsetValue] +
+            static_cast<i16>(0[&multiplayerYOffsetValue] +
                                singlePlayerYOffsetValue + 277),
             64, 47, "ngextra.icn", 61, 0,
-            static_cast<short>(playerCounter + NEW_GAME_RACE_ICON_FIRST), 16,
+            static_cast<i16>(playerCounter + NEW_GAME_RACE_ICON_FIRST), 16,
             1);
         if (iconControlLocal == 0)
             MemError();
@@ -615,26 +615,26 @@ void game::InitNewGameWindow(void)
             raceTextWidth = 26;
         }
         textControlLocal = new textWidget(
-            static_cast<short>(playerSpacingTemp * playerCounter +
+            static_cast<i16>(playerSpacingTemp * playerCounter +
                                firstPlayerXLocal + 15 -
                                raceTextWidth / 2),
-            static_cast<short>(0[&multiplayerYOffsetValue] +
+            static_cast<i16>(0[&multiplayerYOffsetValue] +
                                singlePlayerYOffsetValue + 322),
-            static_cast<short>(raceTextWidth + 64), 12, label,
+            static_cast<i16>(raceTextWidth + 64), 12, label,
             "smalfont.fnt", 1,
-            static_cast<short>(playerCounter + NEW_GAME_RACE_NAME_FIRST),
+            static_cast<i16>(playerCounter + NEW_GAME_RACE_NAME_FIRST),
             NEW_GAME_MESSAGE_WIDGET, 1);
         if (textControlLocal == 0)
             MemError();
         m_newGameWindow->AddWidget(textControlLocal, -1);
 
         iconControlLocal = new iconWidget(
-            static_cast<short>(playerSpacingTemp * playerCounter +
+            static_cast<i16>(playerSpacingTemp * playerCounter +
                                firstPlayerXLocal + 16),
-            static_cast<short>(0[&multiplayerYOffsetValue] +
+            static_cast<i16>(0[&multiplayerYOffsetValue] +
                                singlePlayerYOffsetValue + 274),
             62, 45, "ngextra.icn", 51, 0,
-            static_cast<short>(playerCounter + NEW_GAME_RACE_CYCLE_FIRST), 16,
+            static_cast<i16>(playerCounter + NEW_GAME_RACE_CYCLE_FIRST), 16,
             1);
         if (iconControlLocal == 0)
             MemError();
@@ -649,10 +649,10 @@ void game::InitNewGameWindow(void)
 VA(0x004b88d6, 0x59c)
 void game::UpdateNewGameWindow(void)
 {
-    int playerLockedValue;
+    i32 playerLockedValue;
     tag_message messageTemp;
-    int playerIndex3;
-    int unusedPlayer17;
+    i32 playerIndex3;
+    i32 unusedPlayer17;
 
     strcpy(gText, m_mapHeader.name);
     messageTemp.type = NEW_GAME_MESSAGE_WIDGET;
@@ -781,7 +781,7 @@ void game::UpdateNewGameWindow(void)
     }
 
     gpGame->m_difficultyRating =
-        static_cast<short>(CalcDifficultyRating());
+        static_cast<i16>(CalcDifficultyRating());
     messageTemp.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
     messageTemp.payload.widget.id = EncodeNewGameControl(NEW_GAME_RATING);
     sprintf(gText, "%s %d%%", "Rating", gpGame->m_difficultyRating);
@@ -800,23 +800,23 @@ void game::UpdateNewGameWindow(void)
 // ranges; residual identities are equivalent adjacent-global addends and
 // delinked local labels.
 VA(0x004b8e72, 0xf46)
-int NewGameHandler(struct tag_message &message)
+i32 NewGameHandler(struct tag_message &message)
 {
-    int transmitResultTemp;
-    int redrawWindow = 0;
-    int oldNetworkId;
-    int swapPlayerTemp;
-    int currentPlayerLocal;
-    int synchronizeSetupResult = 0;
+    i32 transmitResultTemp;
+    i32 redrawWindow = 0;
+    i32 oldNetworkId;
+    i32 swapPlayerTemp;
+    i32 currentPlayerLocal;
+    i32 synchronizeSetupResult = 0;
     tag_message windowMessage;
     SMapHeader remoteMapHeaderValue;
     NewGameRemotePacket *remotePacketResult;
-    int sender;
+    i32 sender;
     char setupData[NEW_GAME_SETUP_BUFFER_SIZE];
     char mapPacketLocal[NEW_GAME_MAP_PACKET_SIZE];
     tag_message mapWindowMessageTemp;
-    int helpDialogIndexLocal;
-    int unusedSender;
+    i32 helpDialogIndexLocal;
+    i32 unusedSender;
     char mapNamePacket[MAP_HEADER_NAME_SIZE];
 
     if (!gbNewGameShadowHidden) {
@@ -888,9 +888,9 @@ int NewGameHandler(struct tag_message &message)
                 break;
             }
         }
-        if (glTimers[0] < static_cast<int>(KBTickCount())) {
+        if (glTimers[0] < static_cast<i32>(KBTickCount())) {
             gpGame->NGKPSetupDisplayString(
-                cNGKPCore, static_cast<unsigned short>(NGKPcursorIndex));
+                cNGKPCore, static_cast<u16>(NGKPcursorIndex));
             gpGame->DrawNGKPDisplayString(1);
         }
     }
@@ -1033,7 +1033,7 @@ int NewGameHandler(struct tag_message &message)
     case NEW_GAME_DIFFICULTY_FIRST + 4:
         currentPlayerLocal = message.payload.widget.id - NEW_GAME_DIFFICULTY_FIRST;
 setDifficulty:
-        gpGame->m_difficulty = static_cast<signed char>(currentPlayerLocal);
+        gpGame->m_difficulty = static_cast<i8>(currentPlayerLocal);
         synchronizeSetupResult = 1;
         redrawWindow = 1;
         break;
@@ -1060,7 +1060,7 @@ cycleHandicap:
         if (gpGame->m_setupPlayerNetworkId[currentPlayerLocal] !=
             NEW_GAME_COMPUTER_PLAYER) {
             gpGame->m_playerHandicap[currentPlayerLocal] =
-                static_cast<signed char>(
+                static_cast<i8>(
                     (gpGame->m_playerHandicap[currentPlayerLocal] + 1) %
                     NEW_GAME_HANDICAP_COUNT);
         }
@@ -1130,7 +1130,7 @@ selectPlayer:
             } else if (gpGame->m_selectedSetupPlayer ==
                        NEW_GAME_NETWORK_PLAYER_NONE) {
                 gpGame->m_selectedSetupPlayer =
-                    static_cast<signed char>(currentPlayerLocal);
+                    static_cast<i8>(currentPlayerLocal);
             } else if (gpGame->m_selectedSetupPlayer == currentPlayerLocal ||
                        (gpGame->m_setupPlayerNetworkId[currentPlayerLocal] ==
                             NEW_GAME_COMPUTER_PLAYER &&
@@ -1156,7 +1156,7 @@ selectPlayer:
                             gpGame->m_selectedSetupPlayer];
                     gpGame->m_setupPlayerNetworkId[
                         gpGame->m_selectedSetupPlayer] =
-                        static_cast<signed char>(swapPlayerTemp);
+                        static_cast<i8>(swapPlayerTemp);
                 } else {
                     NormalDialog(
                         "The two positions selected can not be swapped.",
@@ -1269,12 +1269,12 @@ finish:
 // best alternatives regressed to 99.39341%. Revisit only after a relevant
 // Newgame source/TU/header or comparison-state change affects local routing.
 VA(0x004b9db8, 0x418)
-int game::ProcessNGKeyPress(struct tag_message &message)
+i32 game::ProcessNGKeyPress(struct tag_message &message)
 {
     char workText[NEW_GAME_KEY_BUFFER_SIZE];
     char keyChar;
-    int scanCode;
-    int widthResult;
+    i32 scanCode;
+    i32 widthResult;
 
     if (giNumHumanPlayers == 1 ||
         iMPBaseType == NEW_GAME_MULTIPLAYER_HOTSEAT)
@@ -1320,8 +1320,8 @@ int game::ProcessNGKeyPress(struct tag_message &message)
             strcpy(workText, cNGKPCore);
             keyChar = 0;
             if (message.payload.keyboard.keyCode >= NEW_GAME_KEY_FIRST_EXTENDED) {
-                scanCode = static_cast<unsigned char>(
-                    static_cast<unsigned int>(message.payload.keyboard.keyCode) >>
+                scanCode = static_cast<u8>(
+                    static_cast<u32>(message.payload.keyboard.keyCode) >>
                     8);
                 switch (scanCode) {
                 case NEW_GAME_KEYPAD_INSERT:
@@ -1370,7 +1370,7 @@ int game::ProcessNGKeyPress(struct tag_message &message)
                 strcpy(cNGKPCore, gText);
                 ++NGKPcursorIndex;
                 NGKPSetupDisplayString(cNGKPCore,
-                                       static_cast<unsigned short>(NGKPcursorIndex));
+                                       static_cast<u16>(NGKPcursorIndex));
                 widthResult = smallFont->LineLength(
                     cNGKPDisplay, NEW_GAME_CHAT_DRAW_WIDTH);
                 if (widthResult > NEW_GAME_CHAT_MAX_LINES) {
@@ -1387,13 +1387,13 @@ int game::ProcessNGKeyPress(struct tag_message &message)
 }
 
 VA(0x004ba1d0, 0x11e)
-void game::NGKPSetupDisplayString(char *text, unsigned short cursor)
+void game::NGKPSetupDisplayString(char *text, u16 cursor)
 {
     if (giNumHumanPlayers == 1 ||
         iMPBaseType == NEW_GAME_MULTIPLAYER_HOTSEAT)
         return;
 
-    if (glTimers[0] < static_cast<int>(KBTickCount())) {
+    if (glTimers[0] < static_cast<i32>(KBTickCount())) {
         NGKPcursorFlashOn = 1 - NGKPcursorFlashOn;
         glTimers[0] = KBTickCount() + NEW_GAME_CURSOR_FLASH_TICKS;
     }
@@ -1413,7 +1413,7 @@ void game::NGKPSetupDisplayString(char *text, unsigned short cursor)
 }
 
 VA(0x004ba2ee, 0xae)
-void game::DrawNGKPDisplayString(int updateScreen)
+void game::DrawNGKPDisplayString(i32 updateScreen)
 {
     if (gbNewGameDialogOver != 0)
         return;
@@ -1436,23 +1436,23 @@ void game::DrawNGKPDisplayString(int updateScreen)
 VA(0x004ba39c, 0xb71)
 void game::ShowScenInfo(void)
 {
-    DATA(0x0051d0fc) static short scenarioInfoSourceLineBase =
+    DATA(0x0051d0fc) static i16 scenarioInfoSourceLineBase =
         NEW_GAME_SCENARIO_SOURCE_LINE_BASE;
-    int availableWidthResult;
-    int mapSizeIndex;
+    i32 availableWidthResult;
+    i32 mapSizeIndex;
     widget *textControlLocal;
-    int firstPlayerXLocal;
-    int multiplayerYOffsetValue;
-    int playerCounter;
-    int playerLockedLocal;
-    int playerSpacingTemp;
+    i32 firstPlayerXLocal;
+    i32 multiplayerYOffsetValue;
+    i32 playerCounter;
+    i32 playerLockedLocal;
+    i32 playerSpacingTemp;
     tag_message scenarioMessageTemp;
     widget *iconControlLocal;
     heroWindow *scenarioWindowValue;
-    int playerGapValue;
+    i32 playerGapValue;
     char *label;
-    int raceTextWidth;
-    int singlePlayerYOffsetValue;
+    i32 raceTextWidth;
+    i32 singlePlayerYOffsetValue;
 
     gpMouseManager->SetPointer("advmice.mse", 0,
                                NEW_GAME_POINTER_DEFAULT_FRAME);
@@ -1515,57 +1515,57 @@ void game::ShowScenInfo(void)
     for (playerCounter = 0; playerCounter < m_mapHeader.playerCount; ++playerCounter) {
         if (giNumHumanPlayers > 1) {
             iconControlLocal = new iconWidget(
-                static_cast<short>(0[&playerSpacingTemp] * playerCounter +
+                static_cast<i16>(0[&playerSpacingTemp] * playerCounter +
                                    firstPlayerXLocal + 13),
-                static_cast<short>(multiplayerYOffsetValue + 309), 64, 28,
+                static_cast<i16>(multiplayerYOffsetValue + 309), 64, 28,
                 "ngextra.icn", 59, 0,
-                static_cast<short>(playerCounter + NEW_GAME_PLAYER_HUMAN_FIRST), 16,
+                static_cast<i16>(playerCounter + NEW_GAME_PLAYER_HUMAN_FIRST), 16,
                 1);
             if (iconControlLocal == 0)
                 MemError();
             scenarioWindowValue->AddWidget(iconControlLocal, -1);
 
             iconControlLocal = new iconWidget(
-                static_cast<short>(0[&playerSpacingTemp] * playerCounter +
+                static_cast<i16>(0[&playerSpacingTemp] * playerCounter +
                                    firstPlayerXLocal + 16),
-                static_cast<short>(multiplayerYOffsetValue + 306), 62, 26,
+                static_cast<i16>(multiplayerYOffsetValue + 306), 62, 26,
                 "ngextra.icn", 0, 0,
-                static_cast<short>(playerCounter + NEW_GAME_HANDICAP_FIRST), 16, 1);
+                static_cast<i16>(playerCounter + NEW_GAME_HANDICAP_FIRST), 16, 1);
             if (iconControlLocal == 0)
                 MemError();
             scenarioWindowValue->AddWidget(iconControlLocal, -1);
         }
 
         iconControlLocal = new iconWidget(
-            static_cast<short>(0[&playerSpacingTemp] * playerCounter + firstPlayerXLocal +
+            static_cast<i16>(0[&playerSpacingTemp] * playerCounter + firstPlayerXLocal +
                                11),
             163, 68,
-            static_cast<short>(
+            static_cast<i16>(
                 ((giNumHumanPlayers <= 1) - 1 &
                  (NEW_GAME_RACE_WIDGET_MULTIPLAYER_HEIGHT -
                   NEW_GAME_RACE_WIDGET_SINGLE_HEIGHT)) +
                 NEW_GAME_RACE_WIDGET_SINGLE_HEIGHT),
             "ngextra.icn",
-            static_cast<short>(
+            static_cast<i16>(
                 ((giNumHumanPlayers <= 1) - 1 &
                  (NEW_GAME_RACE_WIDGET_MULTIPLAYER_FRAME -
                   NEW_GAME_RACE_WIDGET_SINGLE_FRAME)) +
                 NEW_GAME_RACE_WIDGET_SINGLE_FRAME),
-            0, static_cast<short>(playerCounter + NEW_GAME_RACE_FIRST), 16, 1);
+            0, static_cast<i16>(playerCounter + NEW_GAME_RACE_FIRST), 16, 1);
         if (iconControlLocal == 0)
             MemError();
         scenarioWindowValue->AddWidget(iconControlLocal, -1);
 
         iconControlLocal = new iconWidget(
-            static_cast<short>(0[&playerSpacingTemp] * playerCounter + firstPlayerXLocal +
+            static_cast<i16>(0[&playerSpacingTemp] * playerCounter + firstPlayerXLocal +
                                16),
             160, 62, 58, "ngextra.icn",
-            static_cast<short>(
+            static_cast<i16>(
                 ((giNumHumanPlayers <= 1) - 1 &
                  (NEW_GAME_COLOR_WIDGET_MULTIPLAYER_FRAME -
                   NEW_GAME_COLOR_WIDGET_SINGLE_FRAME)) +
                 NEW_GAME_COLOR_WIDGET_SINGLE_FRAME), 0,
-            static_cast<short>(playerCounter + NEW_GAME_COLOR_FIRST), 16, 1);
+            static_cast<i16>(playerCounter + NEW_GAME_COLOR_FIRST), 16, 1);
         if (iconControlLocal == 0)
             MemError();
         scenarioWindowValue->AddWidget(iconControlLocal, -1);
@@ -1576,10 +1576,10 @@ void game::ShowScenInfo(void)
                 scenarioInfoSourceLineBase + 0x72));
             sprintf(label, " ");
             textControlLocal = new textWidget(
-                static_cast<short>(0[&playerSpacingTemp] * playerCounter +
+                static_cast<i16>(0[&playerSpacingTemp] * playerCounter +
                                    firstPlayerXLocal + 19),
                 206, 56, 9, label, "smalfont.fnt", 1,
-                static_cast<short>(playerCounter + NEW_GAME_PLAYER_NAME_FIRST),
+                static_cast<i16>(playerCounter + NEW_GAME_PLAYER_NAME_FIRST),
                 NEW_GAME_MESSAGE_WIDGET, 1);
             if (textControlLocal == 0)
                 MemError();
@@ -1588,13 +1588,13 @@ void game::ShowScenInfo(void)
 
         singlePlayerYOffsetValue = 0;
         iconControlLocal = new iconWidget(
-            static_cast<short>(0[&playerSpacingTemp] * playerCounter + firstPlayerXLocal +
+            static_cast<i16>(0[&playerSpacingTemp] * playerCounter + firstPlayerXLocal +
                                11),
-            static_cast<short>(0[&multiplayerYOffsetValue] +
+            static_cast<i16>(0[&multiplayerYOffsetValue] +
                                singlePlayerYOffsetValue + 243),
             64, 47,
             "ngextra.icn", 61, 0,
-            static_cast<short>(playerCounter + NEW_GAME_RACE_ICON_FIRST), 16, 1);
+            static_cast<i16>(playerCounter + NEW_GAME_RACE_ICON_FIRST), 16, 1);
         if (iconControlLocal == 0)
             MemError();
         scenarioWindowValue->AddWidget(iconControlLocal, -1);
@@ -1612,26 +1612,26 @@ void game::ShowScenInfo(void)
             raceTextWidth = 26;
         }
         textControlLocal = new textWidget(
-            static_cast<short>(0[&playerSpacingTemp] * playerCounter + firstPlayerXLocal +
+            static_cast<i16>(0[&playerSpacingTemp] * playerCounter + firstPlayerXLocal +
                                15 - raceTextWidth / 2),
-            static_cast<short>(0[&multiplayerYOffsetValue] +
+            static_cast<i16>(0[&multiplayerYOffsetValue] +
                                singlePlayerYOffsetValue + 288),
-            static_cast<short>(raceTextWidth + 64), 12, label,
+            static_cast<i16>(raceTextWidth + 64), 12, label,
             "smalfont.fnt", 1,
-            static_cast<short>(playerCounter + NEW_GAME_RACE_NAME_FIRST),
+            static_cast<i16>(playerCounter + NEW_GAME_RACE_NAME_FIRST),
             NEW_GAME_MESSAGE_WIDGET, 1);
         if (textControlLocal == 0)
             MemError();
         scenarioWindowValue->AddWidget(textControlLocal, -1);
 
         iconControlLocal = new iconWidget(
-            static_cast<short>(0[&playerSpacingTemp] * playerCounter + firstPlayerXLocal +
+            static_cast<i16>(0[&playerSpacingTemp] * playerCounter + firstPlayerXLocal +
                                16),
-            static_cast<short>(0[&multiplayerYOffsetValue] +
+            static_cast<i16>(0[&multiplayerYOffsetValue] +
                                singlePlayerYOffsetValue + 240),
             62, 45,
             "ngextra.icn", 51, 0,
-            static_cast<short>(playerCounter + NEW_GAME_RACE_CYCLE_FIRST), 16, 1);
+            static_cast<i16>(playerCounter + NEW_GAME_RACE_CYCLE_FIRST), 16, 1);
         if (iconControlLocal == 0)
             MemError();
         scenarioWindowValue->AddWidget(iconControlLocal, -1);
@@ -1731,12 +1731,12 @@ void game::ShowScenInfo(void)
 VA(0x004baf0d, 0x1c7)
 void game::GetLossConditionText(char *text)
 {
-    int week2;
+    i32 week2;
     hero *lossHero11;
-    int day26;
-    int month19;
+    i32 day26;
+    i32 month19;
     town *lossTown9;
-    int townId12;
+    i32 townId12;
 
     if (m_mapHeader.lossCondition != MAP_LOSS_STANDARD) {
         switch (m_mapHeader.lossCondition) {
@@ -1780,13 +1780,13 @@ void game::GetLossConditionText(char *text)
 VA(0x004bb0d4, 0x2fb)
 void game::GetVictoryConditionText(char *text)
 {
-    int unusedVictoryWord;
+    i32 unusedVictoryWord;
     hero *victoryHeroData;
-    int firstSideIsLocalResult;
+    i32 firstSideIsLocalResult;
     char firstSide[NEW_GAME_SIDE_TEXT_SIZE];
     char secondSideValue[NEW_GAME_SIDE_TEXT_SIZE];
     town *victoryTown;
-    int townId;
+    i32 townId;
 
     if (m_mapHeader.victoryCondition != MAP_VICTORY_DEFEAT_ALL) {
         switch (m_mapHeader.victoryCondition) {
@@ -1844,16 +1844,16 @@ void game::GetVictoryConditionText(char *text)
 }
 
 VA(0x004bb3cf, 0x2a7)
-int game::GetSideDesc(char *text, int firstPlayer, int lastPlayer)
+i32 game::GetSideDesc(char *text, i32 firstPlayer, i32 lastPlayer)
 {
     char colorName3[NEW_GAME_SIDE_TEXT_SIZE];
-    int sideSize;
-    int localPlayerOnSide;
-    int unusedSideWord1;
-    int localPlayerIndex;
-    int player5;
-    int listedPlayerCount5;
-    int otherPlayerCount2;
+    i32 sideSize;
+    i32 localPlayerOnSide;
+    i32 unusedSideWord1;
+    i32 localPlayerIndex;
+    i32 player5;
+    i32 listedPlayerCount5;
+    i32 otherPlayerCount2;
 
     localPlayerIndex = -1;
     for (player5 = 0; player5 < m_mapHeader.playerCount; ++player5) {
@@ -1944,11 +1944,11 @@ int game::GetSideDesc(char *text, int firstPlayer, int lastPlayer)
 // cTextReceivedBuffer[3], NGKPBkg; candidate order differs but every owner and
 // extent is present. Do not introduce aliases, padding, or fake storage.
 // ---- globals (definitions, RVA order) ----
-DATA(0x0051cd20) int gbNewGameDialogOver = 1;
-DATA(0x0051cd24) int NGKPcursorFlashOn = 1;
+DATA(0x0051cd20) i32 gbNewGameDialogOver = 1;
+DATA(0x0051cd24) i32 NGKPcursorFlashOn = 1;
 DATA(0x00533150) char *cNGKPDisplay;
-DATA(0x00533154) int gbNewGameShadowHidden;
+DATA(0x00533154) i32 gbNewGameShadowHidden;
 DATA(0x00533158) char *cNGKPCore;
-DATA(0x0053315c) int NGKPcursorIndex;
+DATA(0x0053315c) i32 NGKPcursorIndex;
 DATA(0x00533160) char *cTextReceivedBuffer[3];
 DATA(0x0053316c) class icon *NGKPBkg;

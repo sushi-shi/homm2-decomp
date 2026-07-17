@@ -3,20 +3,22 @@
 // functions: 21   data: 9
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
-// Keep the DATA labels available before va.h: its tooling-only typedefs perturb
-// VC42's BSS allocation order even when included later in this translation unit.
+// These globals precede va.h to preserve the established VC4.2 BSS declaration order.
+// Their fixed-width types still need the lightweight alias header here.
+#include <Ints.h>
+
 #ifdef __clang__
 #define DATA(addr) __attribute__((annotate("data:" #addr)))
 #else
 #define DATA(addr)
 #endif
 
-DATA(0x00534908) signed char gCyclePal[0x60];
-DATA(0x00534968) short memSelector;
+DATA(0x00534908) i8 gCyclePal[0x60];
+DATA(0x00534968) i16 memSelector;
 
-static inline unsigned int &FadeSavedUpdate(void)
+static inline u32 &FadeSavedUpdate(void)
 {
-    DATA(0x0053496c) static unsigned int savedUpdate;
+    DATA(0x0053496c) static u32 savedUpdate;
     return savedUpdate;
 }
 
@@ -25,12 +27,12 @@ static inline unsigned int &FadeSavedUpdate(void)
 #include <BASE/WINMGR.h>
 #include <BASE/WINMGR_TYPES.h>
 
-DATA(0x0051ef28) int iCombatCycleFrame = 0;
-DATA(0x0051ef2c) int gbEveryOtherCycle = 1;
-DATA(0x0051ef30) int iCycle1Count = 0;
-DATA(0x0051ef34) int iCycle2Count = 0;
-DATA(0x0051ef38) int iCycle3Count = 0;
-DATA(0x0051ef3c) int iDialogNestCount = 0;
+DATA(0x0051ef28) i32 iCombatCycleFrame = 0;
+DATA(0x0051ef2c) i32 gbEveryOtherCycle = 1;
+DATA(0x0051ef30) i32 iCycle1Count = 0;
+DATA(0x0051ef34) i32 iCycle2Count = 0;
+DATA(0x0051ef38) i32 iCycle3Count = 0;
+DATA(0x0051ef3c) i32 iDialogNestCount = 0;
 DATA(0x0051ef40) static SWindowManagerText gWindowManagerText = {
     "heroWindowManager",
     "SHOT%04d.PCX",
@@ -74,9 +76,9 @@ DATA(0x0051ef40) static SWindowManagerText gWindowManagerText = {
 // pass retained no mutation. This is not a permitted artifact wall; revisit on a real
 // declaration/TU-state change.
 VA(0x004ca6d0, 0x3a3)
-void CycleColors(int forceUpdate)
+void CycleColors(i32 forceUpdate)
 {
-    signed char savedColor[WINDOW_PALETTE_COLOR_BYTES];
+    i8 savedColor[WINDOW_PALETTE_COLOR_BYTES];
     iCycle1Count++;
     if (gpWindowManager == 0 || gpBufferPalette == 0 || gpWindowManager->m_active != 1)
         return;
@@ -91,15 +93,15 @@ void CycleColors(int forceUpdate)
     if (gbEveryOtherCycle != 0) {
         if (giCycleType == WINDOW_COLOR_CYCLE_WORLD_VIEW) {
             iCombatCycleFrame = (iCombatCycleFrame + 1) % WINDOW_CYCLE_FRAME_COUNT;
-            int frame = iCombatCycleFrame;
+            i32 frame = iCombatCycleFrame;
             if (frame >= WINDOW_CYCLE_REFLECTION_THRESHOLD)
                 frame = WINDOW_CYCLE_FRAME_COUNT - frame;
             else
                 frame = iCombatCycleFrame;
-            unsigned char cycleIndices[WINDOW_WORLD_CYCLE_COLOR_COUNT] =
+            u8 cycleIndices[WINDOW_WORLD_CYCLE_COLOR_COUNT] =
                 { 0x98, 0x43, 0x59, 0xb5, 0x70, 0xdb, 0x87, 0x10 };
-            for (int colorIndex = 0; colorIndex < WINDOW_WORLD_CYCLE_COLOR_COUNT; ++colorIndex) {
-                signed char *src = gpBufferPalette->m_data +
+            for (i32 colorIndex = 0; colorIndex < WINDOW_WORLD_CYCLE_COLOR_COUNT; ++colorIndex) {
+                i8 *src = gpBufferPalette->m_data +
                     (cycleIndices[colorIndex] + frame * 3) * 3;
                 memcpy(gCyclePal + colorIndex * WINDOW_PALETTE_COLOR_BYTES, src,
                        WINDOW_PALETTE_COLOR_BYTES);
@@ -159,7 +161,7 @@ void CycleColors(int forceUpdate)
 
     if (giCycleType == WINDOW_COLOR_CYCLE_COMBAT) {
         iCombatCycleFrame = (iCombatCycleFrame + 1) % WINDOW_CYCLE_FRAME_COUNT;
-        int frame = iCombatCycleFrame;
+        i32 frame = iCombatCycleFrame;
         if (frame >= WINDOW_CYCLE_REFLECTION_THRESHOLD)
             frame = WINDOW_CYCLE_FRAME_COUNT - frame;
         else
@@ -170,7 +172,7 @@ void CycleColors(int forceUpdate)
     } else {
         if (giCycleType != WINDOW_COLOR_CYCLE_COMBAT_ALTERNATE)
             goto updatePalette;
-        int frame =
+        i32 frame =
             (iCombatCycleFrame + 1) % WINDOW_ALTERNATE_CYCLE_FRAME_COUNT;
         iCombatCycleFrame = frame;
         if (frame >= WINDOW_ALTERNATE_CYCLE_REFLECTION_THRESHOLD)
@@ -221,11 +223,11 @@ heroWindowManager::heroWindowManager(void) : baseManager()
 }
 
 VA(0x004caad0, 0xd6)
-int heroWindowManager::Open(int managerOrder)
+i32 heroWindowManager::Open(i32 managerOrder)
 {
-    int i;
+    i32 i;
     InitVideo();
-    int *pal = reinterpret_cast<int *>(gpBufferPalette->m_data);
+    i32 *pal = reinterpret_cast<i32 *>(gpBufferPalette->m_data);
     for (i = WINDOW_PALETTE_DWORD_COUNT; i != 0; i--) {
         *pal = 0;
         pal++;
@@ -237,7 +239,7 @@ int heroWindowManager::Open(int managerOrder)
     m_screen->m_bitmapType = BITMAP_TYPE_MEMORY;
     m_screen->m_width = WINDOW_SCREEN_WIDTH;
     m_screen->m_height = WINDOW_SCREEN_HEIGHT;
-    m_screen->m_pixels = reinterpret_cast<unsigned char *>(lpInitWin);
+    m_screen->m_pixels = reinterpret_cast<u8 *>(lpInitWin);
     memset(m_screen->m_pixels, WINDOW_FRAMEBUFFER_FILL_COLOR,
            WINDOW_SCREEN_WIDTH * WINDOW_SCREEN_HEIGHT);
     m_priority = managerOrder;
@@ -271,9 +273,9 @@ void heroWindowManager::Close(void)
 // A source-level message-reference alias was byte-neutral. Revisit after a genuine
 // declaration or combined-TU state change.
 VA(0x004cac00, 0x2d)
-int heroWindowManager::Main(struct tag_message &msg)
+i32 heroWindowManager::Main(struct tag_message &msg)
 {
-    int result = 0;
+    i32 result = 0;
     heroWindow *w = m_windowListTail;
     while (w != 0) {
         result = w->BroadcastMessage(msg);
@@ -285,7 +287,7 @@ int heroWindowManager::Main(struct tag_message &msg)
 }
 
 VA(0x004cac30, 0xf)
-int heroWindowManager::ConvertToHover(struct tag_message &msg)
+i32 heroWindowManager::ConvertToHover(struct tag_message &msg)
 {
     return Main(msg);
 }
@@ -301,7 +303,7 @@ int heroWindowManager::ConvertToHover(struct tag_message &msg)
 // baseManager alias were byte-identical. Revisit after a genuine combined-TU
 // change; this is not a proven wall.
 VA(0x004cac40, 0x35)
-int heroWindowManager::BroadcastMessage(int type, int p2, int p3, int p4)
+i32 heroWindowManager::BroadcastMessage(i32 type, i32 p2, i32 p3, i32 p4)
 {
     tag_message msg;
     msg.type = type;
@@ -322,10 +324,10 @@ int heroWindowManager::BroadcastMessage(int type, int p2, int p3, int p4)
 // TU-state trials and 80 clang-AST iterations found no gain. Revisit after a
 // genuine combined-TU change; this is not a proven wall.
 VA(0x004cac80, 0xbc)
-void heroWindowManager::AddWindow(class heroWindow *w, int zOrder, int openFlags)
+void heroWindowManager::AddWindow(class heroWindow *w, i32 zOrder, i32 openFlags)
 {
     heroWindow *cur = m_windowListTail;
-    int z;
+    i32 z;
     if ((w->m_winFlags & 1) != 0)
         z = 0;
     else
@@ -413,12 +415,12 @@ void heroWindowManager::RemoveWindow(class heroWindow *w)
 // reached disposable 99.78% candidates but rejected all that changed protected
 // siblings. Revisit after a genuine TU-state change; this is not a proven wall.
 VA(0x004cadd0, 0x1cf)
-int heroWindowManager::DoDialog(class heroWindow *window, int (*handler)(struct tag_message &),
-                                int fade)
+i32 heroWindowManager::DoDialog(class heroWindow *window, i32 (*handler)(struct tag_message &),
+                                i32 fade)
 {
     tag_message message;
-    int done;
-    int result;
+    i32 done;
+    i32 result;
 
     gbInDialog = 1;
     if (iDialogNestCount == 0)
@@ -432,10 +434,10 @@ int heroWindowManager::DoDialog(class heroWindow *window, int (*handler)(struct 
         heroWindowManager *manager = gpWindowManager;
         if (dialogPalette != 0)
             SetPalette(dialogPalette->m_data, 0);
-        int fadeType = WINDOW_FADE_IN;
+        i32 fadeType = WINDOW_FADE_IN;
         switch (fadeType) {
         case WINDOW_FADE_IN: {
-            unsigned int savedUpdate = manager->m_updateFlags;
+            u32 savedUpdate = manager->m_updateFlags;
             manager->m_updateFlags = 0;
             PollSound();
             FadeIn(8);
@@ -493,7 +495,7 @@ void heroWindowManager::UpdateScreen(void)
 }
 
 VA(0x004cafc0, 0x4f)
-void heroWindowManager::UpdateScreenRegion(int x, int y, int w, int h)
+void heroWindowManager::UpdateScreenRegion(i32 x, i32 y, i32 w, i32 h)
 {
     gpMouseManager->m_cursorReady = 0;
     PollSound();
@@ -510,13 +512,13 @@ void heroWindowManager::RedrawScreen(void)
 }
 
 VA(0x004cb030, 0x80)
-void heroWindowManager::FadeScreen(int param_1, int param_2, class palette *pal)
+void heroWindowManager::FadeScreen(i32 param_1, i32 param_2, class palette *pal)
 {
     if (pal != 0)
         SetPalette(pal->m_data, 0);
     switch (param_1) {
     case 0: {
-        unsigned int saved = m_updateFlags;
+        u32 saved = m_updateFlags;
         m_updateFlags = 0;
         PollSound();
         FadeIn(param_2);
@@ -544,7 +546,7 @@ void heroWindowManager::ScreenShot(void)
     sprintf(local_10, gWindowManagerText.screenshotFormat, m_screenshotIndex);
     CreatePCXFile(local_10, m_screen->m_pixels, WINDOW_SCREEN_WIDTH,
                   WINDOW_SCREEN_HEIGHT,
-                  reinterpret_cast<unsigned char *>(gPalette->m_data));
+                  reinterpret_cast<u8 *>(gPalette->m_data));
     m_screenshotIndex++;
     gpInputManager->Flush();
 }
@@ -557,7 +559,7 @@ void heroWindowManager::ScreenShot(void)
 // the score unchanged and worsened the prologue, so the direct-parameter form remains.
 // Revisit after a genuine declaration or combined-TU state change.
 VA(0x004cb110, 0xc0)
-void heroWindowManager::SaveFizzleSource(int x, int y, int width, int height)
+void heroWindowManager::SaveFizzleSource(i32 x, i32 y, i32 width, i32 height)
 {
     if (bShowIt != 0) {
         if (x < 0) {
@@ -575,7 +577,7 @@ void heroWindowManager::SaveFizzleSource(int x, int y, int width, int height)
         if (width > 0 && height > 0) {
             if (m_fizzleSource != 0)
                 delete m_fizzleSource;
-            m_fizzleSource = new bitmap(0, static_cast<short>(width), static_cast<short>(height));
+            m_fizzleSource = new bitmap(0, static_cast<i16>(width), static_cast<i16>(height));
             BlitBitmap(gpWindowManager->m_screen, x, y, width, height, m_fizzleSource, 0, 0);
         }
     }
@@ -611,12 +613,12 @@ void CreateFizzleTables(void) {}
 // TU-cumulative dip. Revisit after a genuine predecessor/header TU-state change;
 // this is not a proven wall.
 VA(0x004cb1e0, 0x402)
-void heroWindowManager::FizzleForward(int x, int y, int width, int height, int delay,
-                                      signed char *startPalette, signed char *endPalette)
+void heroWindowManager::FizzleForward(i32 x, i32 y, i32 width, i32 height, i32 delay,
+                                      i8 *startPalette, i8 *endPalette)
 {
     if (bShowIt != 0) {
         gbEnlargeScreenBlit = 0;
-        int tick = 0;
+        i32 tick = 0;
         if (x < 0) {
             width += x;
             x = 0;
@@ -630,36 +632,36 @@ void heroWindowManager::FizzleForward(int x, int y, int width, int height, int d
         if (y + height > WINDOW_SCREEN_HEIGHT)
             height = WINDOW_SCREEN_HEIGHT - y;
         if (width > 0 && height > 0) {
-            unsigned int savedUpdate = m_updateFlags;
+            u32 savedUpdate = m_updateFlags;
             m_updateFlags = 0;
             if (delay == -1)
                 delay = WINDOW_FIZZLE_DEFAULT_DELAY;
-            signed char *fadePalette = static_cast<signed char *>(H2_ALLOC(
+            i8 *fadePalette = static_cast<i8 *>(H2_ALLOC(
                 WINDOW_PALETTE_BYTE_COUNT, gWindowManagerText.fadePaletteAllocSource, 808));
-            m_fizzleWork = new bitmap(0, static_cast<short>(width), static_cast<short>(height));
-            signed char *cycleTable = static_cast<signed char *>(H2_ALLOC(
+            m_fizzleWork = new bitmap(0, static_cast<i16>(width), static_cast<i16>(height));
+            i8 *cycleTable = static_cast<i8 *>(H2_ALLOC(
                 WINDOW_FIZZLE_CYCLE_TABLE_BYTES, gWindowManagerText.cycleTableAllocSource, 810));
             BlitBitmap(m_screen, x, y, width, height, m_fizzleWork, 0, 0);
 
-            for (int frame = 0; frame < WINDOW_CYCLE_FRAME_COUNT; frame++) {
+            for (i32 frame = 0; frame < WINDOW_CYCLE_FRAME_COUNT; frame++) {
                 sprintf(gText, gWindowManagerText.cycleFilenameFormat, frame);
-                unsigned long id = gpResourceManager->MakeId(gText, 1);
+                u32l id = gpResourceManager->MakeId(gText, 1);
                 gpResourceManager->PointToFile(id);
                 gpResourceManager->ReadBlock(cycleTable, WINDOW_FIZZLE_CYCLE_TABLE_BYTES);
-                int sourceY = y;
+                i32 sourceY = y;
                 if (sourceY < y + height) {
-                    int screenOffset = y * WINDOW_SCREEN_WIDTH;
-                    int workOffset = 0;
+                    i32 screenOffset = y * WINDOW_SCREEN_WIDTH;
+                    i32 workOffset = 0;
                     do {
-                        unsigned char *savedPixel = m_fizzleSource->m_pixels +
+                        u8 *savedPixel = m_fizzleSource->m_pixels +
                             m_fizzleSource->m_width * (sourceY - y);
-                        unsigned char *workPixel = m_fizzleWork->m_pixels + workOffset;
-                        unsigned char *screenPixel = m_screen->m_pixels +
+                        u8 *workPixel = m_fizzleWork->m_pixels + workOffset;
+                        u8 *screenPixel = m_screen->m_pixels +
                             x + screenOffset;
                         if (x < x + width) {
-                            int remaining = width;
+                            i32 remaining = width;
                             do {
-                                unsigned short lookup =
+                                u16 lookup =
                                     *workPixel++ | (*savedPixel++ << 8);
                                 *screenPixel++ = cycleTable[lookup];
                                 remaining--;
@@ -676,7 +678,7 @@ void heroWindowManager::FizzleForward(int x, int y, int width, int height, int d
                 BlitBitmapToScreen(m_screen, x, y, width, height, x, y);
                 if (startPalette != 0) {
                     memcpy(fadePalette, startPalette, WINDOW_PALETTE_BYTE_COUNT);
-                    for (int i = 0; i < WINDOW_PALETTE_BYTE_COUNT; i++)
+                    for (i32 i = 0; i < WINDOW_PALETTE_BYTE_COUNT; i++)
                         fadePalette[i] +=
                             (endPalette[i] - startPalette[i]) * (frame + 1) /
                             WINDOW_CYCLE_FRAME_COUNT;

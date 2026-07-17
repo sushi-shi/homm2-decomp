@@ -12,10 +12,10 @@
 #include <SOURCE/searchArray.h>
 
 VA(0x004bdbf0, 0x14a)
-int army::FindPath(int sourceHex, int targetHex, int, int ignoreSpeed, int pathMode)
+i32 army::FindPath(i32 sourceHex, i32 targetHex, i32, i32 ignoreSpeed, i32 pathMode)
 {
-    int pathResult;
-    int savedSpeed;
+    i32 pathResult;
+    i32 savedSpeed;
 
     if (!ValidHex(sourceHex) || !ValidHex(targetHex))
         return 0;
@@ -46,15 +46,15 @@ int army::FindPath(int sourceHex, int targetHex, int, int ignoreSpeed, int pathM
                 sourceHex, targetHex, this, pathMode, 1);
     }
 
-    m_monster.speed = static_cast<signed char>(savedSpeed);
+    m_monster.speed = static_cast<i8>(savedSpeed);
     return pathResult;
 }
 
 VA(0x004bdd3a, 0x9a)
-int army::ValidPath(int targetHex, int pathMode)
+i32 army::ValidPath(i32 targetHex, i32 pathMode)
 {
-    int pathResult;
-    int reserved;
+    i32 pathResult;
+    i32 reserved;
 
     if (!ValidHex(targetHex))
         return 0;
@@ -72,11 +72,11 @@ int army::ValidPath(int targetHex, int pathMode)
 }
 
 VA(0x004bddd4, 0x6d)
-int army::GetMoveMask(int sourceHex)
+i32 army::GetMoveMask(i32 sourceHex)
 {
-    int directionResult;
-    int blockedMaskValue = 0;
-    int directionBitFlag = 1;
+    i32 directionResult;
+    i32 blockedMaskValue = 0;
+    i32 directionBitFlag = 1;
 
     for (directionResult = 0;
          directionResult <= COMBAT_DIRECTION_WEST;
@@ -93,13 +93,13 @@ int army::GetMoveMask(int sourceHex)
 // candidate loads the bound and uses the equivalent reversed relation. Both
 // relational orders, 0[&directionResult], and directionResult|0 were unchanged.
 VA(0x004bde41, 0xb5)
-int army::GetAttackMask(int sourceHex, int targetMode, int targetHex)
+i32 army::GetAttackMask(i32 sourceHex, i32 targetMode, i32 targetHex)
 {
-    int directionResult;
-    int directionCountNext;
-    int blockedMaskValue;
-    int directionBitFlag;
-    int attackHexNext;
+    i32 directionResult;
+    i32 directionCountNext;
+    i32 blockedMaskValue;
+    i32 directionBitFlag;
+    i32 attackHexNext;
 
     if (m_monster.attributes & MONSTER_ATTRIBUTE_WIDE)
         blockedMaskValue = 0;
@@ -125,18 +125,18 @@ int army::GetAttackMask(int sourceHex, int targetMode, int targetHex)
 }
 
 VA(0x004bdef6, 0x2b)
-int army::ValidMove(int direction)
+i32 army::ValidMove(i32 direction)
 {
     return ValidMove(m_hex, direction);
 }
 
 VA(0x004bdf21, 0x2f6)
-int army::ValidMove(int sourceHex, int direction)
+i32 army::ValidMove(i32 sourceHex, i32 direction)
 {
-    int destinationHexNext;
-    int rearHex;
-    int frontValid;
-    int rearValidResult;
+    i32 destinationHexNext;
+    i32 rearHex;
+    i32 frontValid;
+    i32 rearValidResult;
 
     if (!ValidHex(sourceHex))
         return 0;
@@ -209,11 +209,11 @@ int army::ValidMove(int sourceHex, int direction)
 }
 
 VA(0x004be217, 0x273)
-int army::ValidAttack(int sourceHex, int direction, int targetMode,
-                      int requiredTargetHex, int *attackHex)
+i32 army::ValidAttack(i32 sourceHex, i32 direction, i32 targetMode,
+                      i32 requiredTargetHex, i32 *attackHex)
 {
-    int adjacentSourceHex;
-    int occupantSide;
+    i32 adjacentSourceHex;
+    i32 occupantSide;
 
     if (!ValidHex(sourceHex))
         return 0;
@@ -223,13 +223,13 @@ int army::ValidAttack(int sourceHex, int direction, int targetMode,
         if (direction == COMBAT_DIRECTION_WIDE_WEST) {
             *attackHex = GetAdjacentCellIndex(
                 sourceHex,
-                static_cast<unsigned int>(m_facing) < 1
+                static_cast<u32>(m_facing) < 1
                     ? COMBAT_DIRECTION_WEST
                     : COMBAT_DIRECTION_NORTHWEST);
         } else if (direction == COMBAT_DIRECTION_WIDE_EAST) {
             *attackHex = GetAdjacentCellIndex(
                 sourceHex,
-                static_cast<unsigned int>(m_facing) < 1
+                static_cast<u32>(m_facing) < 1
                     ? COMBAT_DIRECTION_SOUTHEAST
                     : COMBAT_DIRECTION_EAST);
         } else {
@@ -286,7 +286,7 @@ int army::ValidAttack(int sourceHex, int direction, int targetMode,
 // first. Frame/CFG and the gpCombatManager relocation agree; direct, flat,
 // pointer, reordered, and SIB-index spellings were exhausted.
 VA(0x004be48a, 0xa5)
-int army::GetAdjacentCellIndex(int sourceHex, int direction)
+i32 army::GetAdjacentCellIndex(i32 sourceHex, i32 direction)
 {
     if (sourceHex == COMBAT_PATH_INVALID_HEX)
         return COMBAT_PATH_INVALID_HEX;
@@ -308,7 +308,7 @@ int army::GetAdjacentCellIndex(int sourceHex, int direction)
 }
 
 VA(0x004be52f, 0x6e)
-int GetAdjacentCellIndexNoArmy(int sourceHex, int direction)
+i32 GetAdjacentCellIndexNoArmy(i32 sourceHex, i32 direction)
 {
     if (sourceHex == COMBAT_PATH_INVALID_HEX)
         return COMBAT_PATH_INVALID_HEX;
@@ -321,10 +321,10 @@ int GetAdjacentCellIndexNoArmy(int sourceHex, int direction)
 }
 
 VA(0x004be59d, 0x44a)
-int army::ValidRange(int targetHex)
+i32 army::ValidRange(i32 targetHex)
 {
-    int adjacentHex;
-    int directionResult;
+    i32 adjacentHex;
+    i32 directionResult;
 
     if (!ValidHex(targetHex))
         return 0;
@@ -436,7 +436,7 @@ int army::ValidRange(int targetHex)
 }
 
 VA(0x004be9e7, 0x58)
-int OppositeDirection(int direction)
+i32 OppositeDirection(i32 direction)
 {
     if (direction < COMBAT_PATH_DIRECTION_COUNT) {
         return (direction + 3) % COMBAT_PATH_DIRECTION_COUNT;
@@ -449,16 +449,16 @@ int OppositeDirection(int direction)
 }
 
 VA(0x004bea3f, 0x8ff)
-int army::GetBestDirection(int sourceHex, int targetHex, int blockedMask)
+i32 army::GetBestDirection(i32 sourceHex, i32 targetHex, i32 blockedMask)
 {
-    int sourceRow;
-    int sourceColumnCheck;
-    int targetRowValue;
-    int targetColumn;
-    int isMovingUp;
-    int isMovingDown;
-    int leftFlag;
-    int isMovingRight;
+    i32 sourceRow;
+    i32 sourceColumnCheck;
+    i32 targetRowValue;
+    i32 targetColumn;
+    i32 isMovingUp;
+    i32 isMovingDown;
+    i32 leftFlag;
+    i32 isMovingRight;
 
     if (!ValidHex(sourceHex) || !ValidHex(targetHex))
         return COMBAT_PATH_INVALID_HEX;

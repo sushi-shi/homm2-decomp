@@ -1,5 +1,7 @@
 #ifndef HOMM2_EVENTS_H
 #define HOMM2_EVENTS_H
+
+#include <Ints.h>
 // Declarations of the free functions DEFINED in EVENTS.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
 // forward declarations (was <_all.h>):
@@ -30,10 +32,10 @@ typedef enum CombatRemoteFragment {
 
 #pragma pack(push, 1)
 struct mapEventExtra {
-    unsigned char active;
-    int resources[7];
-    short artifact;
-    unsigned char answerCount;
+    u8 active;
+    i32 resources[7];
+    i16 artifact;
+    u8 answerCount;
     char answers[8][13];
     char riddle[1];
 };
@@ -47,52 +49,52 @@ struct rumourEventExtra {
 };
 struct timeEventExtra {
     char unknown00;
-    int resources[7];
+    i32 resources[7];
     char unknown1d[2];
-    unsigned char appliesToComputer;
+    u8 appliesToComputer;
     char unknown20;
-    unsigned short firstDay;
-    unsigned short repeatInterval;
+    u16 firstDay;
+    u16 repeatInterval;
     char unknown25[5];
-    unsigned char appliesToHuman;
-    unsigned char players[6];
+    u8 appliesToHuman;
+    u8 players[6];
     char message[1];
 };
 struct mapHeroExtra {
-    signed char owner;
-    unsigned char hasCustomArmy;
-    signed char troopTypes[5];
-    unsigned short troopCounts[5];
-    unsigned char hasCustomHero;
-    signed char heroId;
-    signed char artifacts[3];
+    i8 owner;
+    u8 hasCustomArmy;
+    i8 troopTypes[5];
+    u16 troopCounts[5];
+    u8 hasCustomHero;
+    i8 heroId;
+    i8 artifacts[3];
     char unknown16;
-    int experience;
-    unsigned char hasCustomSkills;
-    signed char skillTypes[8];
-    signed char skillLevels[8];
+    i32 experience;
+    u8 hasCustomSkills;
+    i8 skillTypes[8];
+    i8 skillLevels[8];
     char unknown2c;
-    unsigned char hasCustomName;
+    u8 hasCustomName;
     char name[13];
-    unsigned char hasPatrol;
+    u8 hasPatrol;
     union {
-        signed char patrolRadius;
-        signed char heroClass;
+        i8 patrolRadius;
+        i8 heroClass;
     };
-    signed char hasAssignedHero;
+    i8 hasAssignedHero;
 };
 struct mapTownExtra {
-    signed char color;
-    unsigned char hasCustomBuildings;
-    unsigned int buildings;
-    signed char mageGuildLevel;
-    signed char hasCustomArmy;
-    signed char troopTypes[5];
-    unsigned short troopCounts[5];
-    unsigned char hasShrine;
+    i8 color;
+    u8 hasCustomBuildings;
+    u32 buildings;
+    i8 mageGuildLevel;
+    i8 hasCustomArmy;
+    i8 troopTypes[5];
+    u16 troopCounts[5];
+    u8 hasShrine;
     char unused18;
     char name[15];
-    signed char unknown28;
+    i8 unknown28;
 };
 #pragma pack(pop)
 
@@ -769,9 +771,9 @@ typedef enum EventEffectConstant {
     EVENT_FIZZLE_STEPS = 65
 } EventEffectConstant;
 
-signed char StrEqNoCase(char *, char *);
-int GiveArtifact(class hero *, int, int, signed char);
-void GiveTakeArtifactStat(class hero *, int, int);
-int RiddleStringsEqual(char *, char *);
+i8 StrEqNoCase(char *, char *);
+i32 GiveArtifact(class hero *, i32, i32, i8);
+void GiveTakeArtifactStat(class hero *, i32, i32);
+i32 RiddleStringsEqual(char *, char *);
 
 #endif // HOMM2_EVENTS_H

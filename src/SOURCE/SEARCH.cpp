@@ -16,34 +16,34 @@
 #include <SOURCE/playerData.h>
 #include <SOURCE/searchArray.h>
 
-DATA(0x0052a1d8) static int s_directionBlocked;
-DATA(0x0052a1dc) static int s_triggerType;
-DATA(0x0052a1e4) static int s_processedPointCount;
-DATA(0x0052a1e8) static int s_remainingMobility;
-DATA(0x0052a1ec) static int s_adjacentX;
-DATA(0x0052a1f0) static signed char s_possibleDirections[SEARCH_DIRECTION_COUNT];
-DATA(0x0052a1f8) static int s_targetWater;
-DATA(0x0052a1fc) static int s_neighborX;
-DATA(0x0052a200) static int s_mapY;
-DATA(0x0052a204) static int s_currentCost;
+DATA(0x0052a1d8) static i32 s_directionBlocked;
+DATA(0x0052a1dc) static i32 s_triggerType;
+DATA(0x0052a1e4) static i32 s_processedPointCount;
+DATA(0x0052a1e8) static i32 s_remainingMobility;
+DATA(0x0052a1ec) static i32 s_adjacentX;
+DATA(0x0052a1f0) static i8 s_possibleDirections[SEARCH_DIRECTION_COUNT];
+DATA(0x0052a1f8) static i32 s_targetWater;
+DATA(0x0052a1fc) static i32 s_neighborX;
+DATA(0x0052a200) static i32 s_mapY;
+DATA(0x0052a204) static i32 s_currentCost;
 DATA(0x0052a208) static mapCell *s_neighborCell;
-DATA(0x0052a20c) static int s_adjacentY;
+DATA(0x0052a20c) static i32 s_adjacentY;
 DATA(0x0052a210) static mapCell *s_targetCell;
-DATA(0x0052a214) static int s_currentWater;
-DATA(0x0052a218) static int s_bestTargetCost;
-DATA(0x0052a21c) static int s_adjacentMonsterX;
-DATA(0x0052a220) static int s_adjacentCost;
-DATA(0x0052a224) static int s_mapX;
-DATA(0x0052a228) static int s_neighborY;
-DATA(0x0052a22c) static int s_hasAdjacentMonster;
-DATA(0x0052a230) static int s_direction;
-DATA(0x0052a234) static int s_targetStepCost;
-DATA(0x0052a238) static int s_candidateY;
+DATA(0x0052a214) static i32 s_currentWater;
+DATA(0x0052a218) static i32 s_bestTargetCost;
+DATA(0x0052a21c) static i32 s_adjacentMonsterX;
+DATA(0x0052a220) static i32 s_adjacentCost;
+DATA(0x0052a224) static i32 s_mapX;
+DATA(0x0052a228) static i32 s_neighborY;
+DATA(0x0052a22c) static i32 s_hasAdjacentMonster;
+DATA(0x0052a230) static i32 s_direction;
+DATA(0x0052a234) static i32 s_targetStepCost;
+DATA(0x0052a238) static i32 s_candidateY;
 DATA(0x0052a23c) static searchNode *s_neighborNode;
-DATA(0x0052a240) static int s_terrain;
+DATA(0x0052a240) static i32 s_terrain;
 DATA(0x0052a248) static searchNode s_currentNode;
-DATA(0x0052a254) static int s_hasTarget;
-DATA(0x0052a258) static signed char s_directionCosts[SEARCH_DIRECTION_COUNT];
+DATA(0x0052a254) static i32 s_hasTarget;
+DATA(0x0052a258) static i8 s_directionCosts[SEARCH_DIRECTION_COUNT];
 DATA(0x0052a260) static hero *s_currentHero;
 
 // @semantic
@@ -56,12 +56,12 @@ DATA(0x0052a260) static hero *s_currentHero;
 // indexing, comma sequencing, coordinate aliases, both union views, condition
 // polarity, multiplication order, and shared-return CFG. Revisit in the 95% /O2 pass.
 VA(0x004a25e0, 0xc0)
-int searchArray::BuildPath(int startX, int startY, int destinationX,
-                           int destinationY, int maximumCost)
+i32 searchArray::BuildPath(i32 startX, i32 startY, i32 destinationX,
+                           i32 destinationY, i32 maximumCost)
 {
-    register int currentDestinationX = destinationX;
-    register int currentDestinationY = destinationY;
-    signed char *pathDirection = &m_storage.path.directions[1];
+    register i32 currentDestinationX = destinationX;
+    register i32 currentDestinationY = destinationY;
+    i8 *pathDirection = &m_storage.path.directions[1];
     m_pathLength = 0;
     while (startX != currentDestinationX || startY != currentDestinationY) {
         searchNode *node =
@@ -78,7 +78,7 @@ int searchArray::BuildPath(int startX, int startY, int destinationX,
                 break;
             }
         }
-        int reverseDirection =
+        i32 reverseDirection =
             (node->direction + SEARCH_DIRECTION_REVERSE) & SEARCH_DIRECTION_MASK;
         currentDestinationX += normalDirTable[reverseDirection].x;
         currentDestinationY += normalDirTable[reverseDirection].y;
@@ -98,14 +98,14 @@ int searchArray::BuildPath(int startX, int startY, int destinationX,
 // indexing, branch polarities, nested cost arguments, queue aliases, register/const alias
 // orders, and both top- and bottom-tested queue loops. Revisit in the 95% /O2 pass.
 VA(0x004a26a0, 0x9df)
-void searchArray::SeedPosition(int seedX, int seedY, int seedDirection,
-                               int maximumCost, int waterMode,
-                               int findAdjacentMonster, int mobility,
-                               int pathfindingSkill, int targetX, int targetY,
-                               int continueSeed, int scanMap)
+void searchArray::SeedPosition(i32 seedX, i32 seedY, i32 seedDirection,
+                               i32 maximumCost, i32 waterMode,
+                               i32 findAdjacentMonster, i32 mobility,
+                               i32 pathfindingSkill, i32 targetX, i32 targetY,
+                               i32 continueSeed, i32 scanMap)
 {
-    register int continuing = continueSeed;
-    register int targetColumn = targetX;
+    register i32 continuing = continueSeed;
+    register i32 targetColumn = targetX;
     searchArray * const search = this;
 
     if (!continuing) {
@@ -119,7 +119,7 @@ void searchArray::SeedPosition(int seedX, int seedY, int seedDirection,
 
     giSeedingValid = 1;
     if (targetColumn >= 0) {
-        int targetIndex = MAP_WIDTH * targetY + targetColumn;
+        i32 targetIndex = MAP_WIDTH * targetY + targetColumn;
         if (!(mapExtra[targetIndex] & giCurPlayerBit)) {
             return;
         }
@@ -133,7 +133,7 @@ void searchArray::SeedPosition(int seedX, int seedY, int seedDirection,
                 if (s_targetCell->m_triggerType == SEARCH_WATER_ENTRY_SECOND)
                     return;
             } else {
-                unsigned char targetTrigger = s_targetCell->m_triggerType;
+                u8 targetTrigger = s_targetCell->m_triggerType;
                 if (targetTrigger != SEARCH_WATER_ENTRY_FIRST &&
                     targetTrigger != SEARCH_WATER_ENTRY_SECOND &&
                     targetTrigger != SEARCH_WATER_ENTRY_THIRD)
@@ -256,7 +256,7 @@ expand_directions:
                 if (s_possibleDirections[s_direction] != -1) {
                     s_neighborX = normalDirTable[s_direction].x + s_currentNode.x;
                     s_neighborY = normalDirTable[s_direction].y + s_currentNode.y;
-                    int neighborIndex = MAP_WIDTH * s_neighborY + s_neighborX;
+                    i32 neighborIndex = MAP_WIDTH * s_neighborY + s_neighborX;
                     s_neighborNode = &search->m_storage.nodes[neighborIndex];
                     if (!findAdjacentMonster || s_currentNode.rvFlag1 ||
                         !(mapExtra[neighborIndex] & SEARCH_MAP_BLOCKED) ||
@@ -278,7 +278,7 @@ expand_directions:
                                 (gpAdvManager->GetCell(
                                     s_neighborX, s_neighborY)->m_objTypeBits & 2) >> 1),
                             maximumCost,
-                            static_cast<signed char>(s_directionCosts[s_direction]),
+                            static_cast<i8>(s_directionCosts[s_direction]),
                             s_hasAdjacentMonster, s_adjacentMonsterX, s_adjacentY,
                             s_currentNode.rvFlag2, s_currentNode.previousFlags,
                             s_currentNode.terrain);
@@ -288,14 +288,14 @@ expand_directions:
                             mapCell *neighborCell = gpAdvManager->GetCell(
                                 s_neighborX, s_neighborY);
                             s_targetStepCost = CalcTerrainCost(
-                                static_cast<signed char>(
+                                static_cast<i8>(
                                     s_possibleDirections[s_direction]),
                                 s_direction,
                                 giCurTempMobility - s_currentNode.distance,
                                 pathfindingSkill,
                                 (neighborCell->m_objTypeBits & 2) >> 1,
                                 s_targetWater);
-                            int targetCost =
+                            i32 targetCost =
                                 s_currentNode.distance + s_targetStepCost;
                             if (targetCost < s_bestTargetCost)
                                 s_bestTargetCost = targetCost;
@@ -345,7 +345,7 @@ point_complete:
                                         s_directionBlocked = 0;
                                     }
 
-                                    int adjacentIndex =
+                                    i32 adjacentIndex =
                                         MAP_WIDTH * s_candidateY + s_adjacentX;
                                     if (s_directionBlocked &&
                                         search->m_storage.nodes[adjacentIndex].visited &&

@@ -15,11 +15,11 @@
 #include <SOURCE/KB.h>
 
 VA(0x004c6fd0, 0xc8)
-font::font(unsigned long id) : resource(5, id, 1, 0)
+font::font(u32l id) : resource(5, id, 1, 0)
 {
     gpResourceManager->PointToFile(id);
     m_height = gpResourceManager->ReadWord();
-    int h = gpResourceManager->ReadWord();
+    i32 h = gpResourceManager->ReadWord();
     if (m_height >= 14)
         m_isLarge = 1;
     else
@@ -27,7 +27,7 @@ font::font(unsigned long id) : resource(5, id, 1, 0)
     char fname[13];
     // Read13 takes signed char*, GetIcon char* — one filename buffer feeds both, so bridge the
     // API signedness once (codegen-identical: both are byte pointers).
-    gpResourceManager->Read13(reinterpret_cast<signed char *>(fname));
+    gpResourceManager->Read13(reinterpret_cast<i8 *>(fname));
     gbLoadingMonoIcon = 1;
     m_glyphIcon = gpResourceManager->GetIcon(fname);
     gbLoadingMonoIcon = 0;
@@ -43,16 +43,16 @@ font::~font()
 // and the vtable relocation resolves through that alias, so the duplicate report rows are unscored.
 
 VA(0x004c7120, 0x24a)
-void font::DrawStringExecute(char *str, int x, int y, int mode,
-                            int clipL, int clipT, int clipR, int clipB)
+void font::DrawStringExecute(char *str, i32 x, i32 y, i32 mode,
+                            i32 clipL, i32 clipT, i32 clipR, i32 clipB)
 {
     char c = 0;
-    int pos = x;
-    int i = 0;
+    i32 pos = x;
+    i32 i = 0;
     while (str[i] != 0) {
         c = str[i];
         if (c == 0x1f) {
-            pos += GetCharacterWidth(static_cast<unsigned char>(str[i]));
+            pos += GetCharacterWidth(static_cast<u8>(str[i]));
             goto next;
         }
         if (c == '{') {
@@ -80,14 +80,14 @@ void font::DrawStringExecute(char *str, int x, int y, int mode,
                 IconToBitmapColorTable(m_glyphIcon, gpWindowManager->m_screen, pos, y, c, 1,
                                        clipL, clipT, clipR, clipB, 0, gColorTableDarkGray, 1);
         }
-        pos += GetCharacterWidth(static_cast<unsigned char>(str[i]));
+        pos += GetCharacterWidth(static_cast<u8>(str[i]));
     next:
         i++;
     }
 }
 
 VA(0x004c7370, 0x48)
-void font::DrawString(char *s, int x, int y, int mode)
+void font::DrawString(char *s, i32 x, i32 y, i32 mode)
 {
     m_suppressDraw = 0;
     DrawStringExecute(s, x, y, mode, 0, 0, 0x280, 0x1e0);
@@ -102,7 +102,7 @@ void font::DrawString(char *s, int x, int y, int mode)
 // cast cleanups and the DrawString mode rename did not move it. Revisit after material FONT/icon
 // header state changes; current 86.93% is below the audited AST-permuter threshold.
 VA(0x004c73c0, 0xaf)
-int font::GetCharacterWidth(unsigned char c)
+i32 font::GetCharacterWidth(u8 c)
 {
     if (c == '{' || c == '}') {
         return 0;
@@ -119,28 +119,28 @@ int font::GetCharacterWidth(unsigned char c)
 }
 
 VA(0x004c7470, 0x313)
-void font::DrawBoundedString(char *str, int x, int y, int w, int h, int mode, int align)
+void font::DrawBoundedString(char *str, i32 x, i32 y, i32 w, i32 h, i32 mode, i32 align)
 {
     // Semantic suffixes preserve the retail /Od slot buckets. glyphPos, space9, and v1 are
     // vestigial locals present in the retail frame.
-    int size = strlen(str);
+    i32 size = strlen(str);
     char *glyphPos = m_glyphIcon->m_data;
     char space9 = ' ';
-    int xPosition = 0;
-    int yOffC = 0;
+    i32 xPosition = 0;
+    i32 yOffC = 0;
     char savedChar;
-    int lineStartD = 0;
-    int lineEnd1 = 0;
-    int v1;
-    int idx = 0;
-    int lineWidth3 = 0;
-    int wordBreak0 = 0;
+    i32 lineStartD = 0;
+    i32 lineEnd1 = 0;
+    i32 v1;
+    i32 idx = 0;
+    i32 lineWidth3 = 0;
+    i32 wordBreak0 = 0;
     char *text2 = str;
-    int drawMode2 = mode;
+    i32 drawMode2 = mode;
     if (align & 4) {
         align -= 4;
-        int lineCount = LineLength(str, w);
-        int totalH = m_height * lineCount;
+        i32 lineCount = LineLength(str, w);
+        i32 totalH = m_height * lineCount;
         if (totalH < h)
             yOffC = (h - totalH) / 2;
     }
@@ -151,7 +151,7 @@ void font::DrawBoundedString(char *str, int x, int y, int w, int h, int mode, in
             lineWidth3 += GetCharacterWidth(text2[idx]);
             idx++;
         }
-        int savedWidth = lineWidth3;
+        i32 savedWidth = lineWidth3;
         if (w < lineWidth3) {
             idx--;
             wordBreak0 = 0;
@@ -196,18 +196,18 @@ void font::DrawBoundedString(char *str, int x, int y, int w, int h, int mode, in
 }
 
 VA(0x004c7790, 0x1b3)
-int font::LineLength(char *str, int maxW)
+i32 font::LineLength(char *str, i32 maxW)
 {
     // Word-wrap: count how many lines `str` needs at width maxW, breaking at spaces.
     // 13 locals (frame 0x38); names carry the /Od slot hashes (od_slots). q/v declared-unused;
     // aa/t/u are set-or-zeroed-but-unused (vestigial). Init order matches the retail.
-    int s = strlen(str);                 // len   @ -0x10
+    i32 s = strlen(str);                 // len   @ -0x10
     char aa = ' ';                       //       @ -0x30 (vestigial)
-    int z = 0, t = 0, r = 0, y = 0, p = 0, u = 0, x = 0, gap = 0;
+    i32 z = 0, t = 0, r = 0, y = 0, p = 0, u = 0, x = 0, gap = 0;
     // z=lineCount(-0x2c) t=vestigial(-0x14) r=wordStart(-0xc) y=(-0x28) p=i(-0x4)
     // u=vestigial(-0x18) x=width(-0x24) gap=breakPt(-0x34)
     char *w = str;                       // ptr   @ -0x20
-    int q, v;                            // unused @ -0x8, -0x1c
+    i32 q, v;                            // unused @ -0x8, -0x1c
     while (p < s && w[p] != 0) {
         while (w[p] != 0 && w[p] != '\n' && 0[&x] <= maxW) {
             x += GetCharacterWidth(w[p]);
@@ -237,13 +237,13 @@ int font::LineLength(char *str, int maxW)
 }
 
 VA(0x004c7950, 0xc4)
-int font::LineWidth(char *str)
+i32 font::LineWidth(char *str)
 {
     // 10 locals (frame 0x2c): local names carry the /Od slot hashes (od_slots); `q`/`u` are
     // declared-but-unused (reserved, not zeroed) — vestigial, as in the sibling string routines.
-    int s = strlen(str);                        // len @ -0x10
-    int q, u;                                   // unused @ -0x8, -0x18
-    int y = 0, t = 0, r = 0, x = 0, p = 0, w = 0;  // zeroed in this order: -0x28,-0x14,-0xc,-0x24,-0x4(i),-0x20(width)
+    i32 s = strlen(str);                        // len @ -0x10
+    i32 q, u;                                   // unused @ -0x8, -0x18
+    i32 y = 0, t = 0, r = 0, x = 0, p = 0, w = 0;  // zeroed in this order: -0x28,-0x14,-0xc,-0x24,-0x4(i),-0x20(width)
     char *v = str;                              // @ -0x1c
     while (0[&p] < s && v[p] != 0) {
         while (v[p] != 0 && v[p] != '\n') {

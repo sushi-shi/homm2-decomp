@@ -11,13 +11,13 @@ public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (vptr auto-emitted at 0x00; own data starts at 0x04)
-    signed char *m_data;  // +0x10  palette data (256*3 RGB)
+    i8 *m_data;  // +0x10  palette data (256*3 RGB)
     // --- constructors ---
     palette(void);
-    palette(unsigned long int);
+    palette(u32l);
     virtual ~palette();
     // --- methods ---
-    signed char * Data(void);
+    i8 * Data(void);
 };
 #pragma pack(pop)
 SIZE(palette, 0x14);

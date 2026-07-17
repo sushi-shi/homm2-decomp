@@ -33,10 +33,10 @@ DATA(0x00520df4) static SSampleSourceFiles gSampleSourceFiles = {
 // build/gen/jump_tables.csv): MSVC emits $L symbols, while the delinker rewrites them
 // as this constructor plus the same local offsets.
 VA(0x004dad60, 0x181)
-sample::sample(char *name, long channelType, long volume, long loopCount)
+sample::sample(char *name, i32l channelType, i32l volume, i32l loopCount)
     : resource(6, gpResourceManager->MakeId(name, 1), 1, 0)
 {
-    int formatFlags;
+    i32 formatFlags;
     m_playbackData.channelType = channelType;
     m_playbackData.volume = volume;
     m_playbackData.loopCount = loopCount;
@@ -46,7 +46,7 @@ sample::sample(char *name, long channelType, long volume, long loopCount)
     strcpy(filename, name);
     _strrev(filename);
 
-    for (int i = 0; i < 3; i++) {
+    for (i32 i = 0; i < 3; i++) {
         switch (filename[i]) {
         case '1':
             m_playbackData.sampleRate = SAMPLE_RATE_11025;
@@ -71,14 +71,14 @@ sample::sample(char *name, long channelType, long volume, long loopCount)
     }
     m_playbackData.format += formatFlags;
 
-    unsigned long size = gpResourceManager->GetFileSize(m_id);
+    u32l size = gpResourceManager->GetFileSize(m_id);
 #line 57
     m_playbackData.data = static_cast<char *>(
         H2_ALLOC(size, gSampleSourceFiles.sampleAllocation, 0x39));
     m_playbackData.size = size;
     gpResourceManager->PointToFile(m_id);
     gpResourceManager->ReadBlock(
-        reinterpret_cast<signed char *>(m_playbackData.data), size);
+        reinterpret_cast<i8 *>(m_playbackData.data), size);
 }
 
 // @early-stop
@@ -100,12 +100,12 @@ inline sample::~sample()
 VA(0x004daf70, 0x72)
 MIDIWrap::MIDIWrap(char *name) : resource(6, gpResourceManager->MakeId(name, 1), 1, 0)
 {
-    unsigned long size = gpResourceManager->GetFileSize(m_id);
+    u32l size = gpResourceManager->GetFileSize(m_id);
 #line 110
     m_data = static_cast<char *>(
         H2_ALLOC(size, gSampleSourceFiles.midiAllocation, 0x6e));
     gpResourceManager->PointToFile(m_id);
-    gpResourceManager->ReadBlock(reinterpret_cast<signed char *>(m_data), size);
+    gpResourceManager->ReadBlock(reinterpret_cast<i8 *>(m_data), size);
 }
 
 // @early-stop

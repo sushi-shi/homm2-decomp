@@ -24,10 +24,10 @@
 #include <SOURCE/kbwin.h>
 #include <SOURCE/Campaign.h>
 VA(0x00447710, 0x563)
-int game::HandleCampaignWin(void)
+i32 game::HandleCampaignWin(void)
 {
-    int sideIndex;
-    int mapIndex;
+    i32 sideIndex;
+    i32 mapIndex;
 
     memset(m_campaignMapEnabled, 0, sizeof(m_campaignMapEnabled));
     if (m_campaignType == CAMPAIGN_ROLAND) {
@@ -167,8 +167,8 @@ int game::HandleCampaignWin(void)
                     gpGame->m_campaignScenarioBonus[sideIndex][0[&mapIndex]] =
                         m_campaignScore;
                     if (m_campaignScenario == CAMPAIGN_NO_SCENARIO) {
-                        m_campaignType = static_cast<unsigned char>(sideIndex);
-                        m_campaignScenario = static_cast<signed char>(mapIndex);
+                        m_campaignType = static_cast<u8>(sideIndex);
+                        m_campaignScenario = static_cast<i8>(mapIndex);
                     }
                 }
             }
@@ -185,7 +185,7 @@ int game::HandleCampaignWin(void)
 }
 
 VA(0x00447c73, 0x343)
-void game::PlayPreScenarioSmacker(int side, int map)
+void game::PlayPreScenarioSmacker(i32 side, i32 map)
 {
     if (side == CAMPAIGN_ROLAND) {
         switch (map + 1) {
@@ -261,11 +261,11 @@ void game::PlayPreScenarioSmacker(int side, int map)
 // residual is the savedInterface slot at +0x33..+0x35. Declaration order and
 // od_slots-guided local names were tried.
 VA(0x00447fb6, 0x48d)
-void game::ShowCampaignInfo(int viewOnly, int)
+void game::ShowCampaignInfo(i32 viewOnly, i32)
 {
-    int savedInterface;
-    int map;
-    int trackMapIndex;
+    i32 savedInterface;
+    i32 map;
+    i32 trackMapIndex;
     widget *trackWidget;
     tag_message message;
 
@@ -368,9 +368,9 @@ void game::ShowCampaignInfo(int viewOnly, int)
 // and the exact pointer-add axis. Revisit only after a relevant Campaign source,
 // TU/header, or comparison epoch changes index evaluation/compiler state.
 VA(0x00448443, 0xa0f)
-void game::CampaignInfoUpdate(int redraw)
+void game::CampaignInfoUpdate(i32 redraw)
 {
-    int map;
+    i32 map;
     tag_message message;
     SCampaignChoice *choice;
     char armyName[CAMPAIGN_ARMY_NAME_BUFFER_SIZE];
@@ -387,7 +387,7 @@ void game::CampaignInfoUpdate(int redraw)
         } else {
             message.payload.widget.data.value = CAMPAIGN_TRACK_FRAME_LOCKED;
         }
-        if (iCurViewMap == static_cast<int>(map)) {
+        if (iCurViewMap == static_cast<i32>(map)) {
             if (map + 1 == 5 && iCampaignTrackType == 1)
                 message.payload.widget.data.value += 12;
             else if (map + 1 == 5 && iCampaignTrackType == 2)
@@ -563,9 +563,9 @@ void game::CampaignInfoUpdate(int redraw)
 // axis; switch arm order was also stagnant. Revisit only after a relevant
 // Campaign source, TU/header, or comparison epoch changes compiler state.
 VA(0x00448e52, 0x521)
-int CampaignHandler(struct tag_message &message)
+i32 CampaignHandler(struct tag_message &message)
 {
-    int map;
+    i32 map;
 
     if (!gpSoundManager->MusicPlaying() && gpAdvManager->m_active == 1)
         gpSoundManager->SwitchAmbientMusic(
@@ -615,7 +615,7 @@ int CampaignHandler(struct tag_message &message)
             if (!bCampaignViewOnly &&
                 gpGame->m_campaignMapEnabled[iCurViewSide][iCurViewMap]) {
                 gpGame->m_campaignChoice[iCurViewSide][iCurViewMap] =
-                    static_cast<unsigned char>(message.payload.widget.id -
+                    static_cast<u8>(message.payload.widget.id -
                                                CAMPAIGN_BONUS_WIDGET_FIRST);
                 gpGame->CampaignInfoUpdate(1);
             }
@@ -634,7 +634,7 @@ int CampaignHandler(struct tag_message &message)
                 if (gpGame->m_campaignMapEnabled[iCurViewSide][iCurViewMap]) {
                     if (iCurViewMap == CAMPAIGN_SWITCHING_MAP) {
                         gpGame->m_campaignScenario = CAMPAIGN_SWITCHING_SCENARIO;
-                        gpGame->m_campaignType = static_cast<unsigned char>(
+                        gpGame->m_campaignType = static_cast<u8>(
                             1 - gpGame->m_campaignType);
                         gpGame->m_campaignMapEnabled[gpGame->m_campaignType]
                                                     [gpGame->m_campaignScenario] = 1;
@@ -649,9 +649,9 @@ int CampaignHandler(struct tag_message &message)
                             gpGame->m_campaignAwards[map] = 0;
                     } else {
                         gpGame->m_campaignScenario =
-                            static_cast<signed char>(iCurViewMap);
+                            static_cast<i8>(iCurViewMap);
                         gpGame->m_campaignType =
-                            static_cast<unsigned char>(iCurViewSide);
+                            static_cast<u8>(iCurViewSide);
                     }
                 } else {
                     NormalDialog(
@@ -678,11 +678,11 @@ int CampaignHandler(struct tag_message &message)
 }
 
 VA(0x00449373, 0x47)
-void game::InitEntireCampaign(int side)
+void game::InitEntireCampaign(i32 side)
 {
     memset(&m_campaignType, 0, CAMPAIGN_STATE_RESET_SIZE);
-    m_campaignType = static_cast<unsigned char>(side);
-    m_campaignStartingSide = static_cast<unsigned char>(side);
+    m_campaignType = static_cast<u8>(side);
+    m_campaignStartingSide = static_cast<u8>(side);
     m_campaignScenario = CAMPAIGN_NO_SCENARIO;
 }
 
@@ -697,18 +697,18 @@ void game::InitEntireCampaign(int side)
 VA(0x004493ba, 0xbb7)
 void game::InitCampaignMap(void)
 {
-    int selectedChoicePosition;
+    i32 selectedChoicePosition;
     SCampaignChoice *choiceBest;
-    int mapHeaderResultCampaign;
-    int playerSlotSlot;
-    int bestHeroPositionCandidate;
+    i32 mapHeaderResultCampaign;
+    i32 playerSlotSlot;
+    i32 bestHeroPositionCandidate;
     playerData *campaignPlayerCurrent;
-    int heroPositionValue;
-    int scanPositionId;
-    int heroPriorityBest;
-    int bestHeroPriorityLocal;
-    int swappedHero;
-    int bonusHeroIndexPosition;
+    i32 heroPositionValue;
+    i32 scanPositionId;
+    i32 heroPriorityBest;
+    i32 bestHeroPriorityLocal;
+    i32 swappedHero;
+    i32 bonusHeroIndexPosition;
 
     selectedChoicePosition = m_campaignChoice[iCurViewSide][iCurViewMap];
     if (m_campaignType != m_campaignStartingSide &&
@@ -749,7 +749,7 @@ void game::InitCampaignMap(void)
                 ++playerSlotSlot;
         }
         m_setupPlayerRace[playerSlotSlot] =
-            static_cast<signed char>(choiceBest->value);
+            static_cast<i8>(choiceBest->value);
     }
 
     if (m_campaignScenario + 1 <= CAMPAIGN_EASY_SCENARIO_LIMIT)
@@ -798,7 +798,7 @@ void game::InitCampaignMap(void)
             campaignPlayerCurrent->m_heroIds[heroPositionValue] =
                 campaignPlayerCurrent->m_heroIds[bestHeroPositionCandidate];
             campaignPlayerCurrent->m_heroIds[bestHeroPositionCandidate] =
-                static_cast<signed char>(swappedHero);
+                static_cast<i8>(swappedHero);
         }
     }
     if (campaignPlayerCurrent->m_heroCount)
@@ -837,10 +837,10 @@ void game::InitCampaignMap(void)
         break;
     case CAMPAIGN_CHOICE_PUZZLE_PIECES:
         m_players[0].m_cheatValue =
-            static_cast<signed char>(choiceBest->value);
+            static_cast<i8>(choiceBest->value);
         break;
     case CAMPAIGN_CHOICE_EXPERIENCE: {
-        int savedNewGameSetup = gbInNewGameSetup;
+        i32 savedNewGameSetup = gbInNewGameSetup;
         gbInNewGameSetup = 1;
         if (m_players[0].m_heroCount > 0) {
             gpGame->GetHero(m_players[0].m_heroIds[0])->m_experience +=
@@ -886,7 +886,7 @@ void game::InitCampaignMap(void)
 
     if (m_campaignScenario + 1 == 7 &&
         m_campaignType == CAMPAIGN_ARCHIBALD) {
-        int savedNewGameSetup = gbInNewGameSetup;
+        i32 savedNewGameSetup = gbInNewGameSetup;
         hero *armyHero;
         gbInNewGameSetup = 1;
         armyHero = gpGame->GetHero(m_players[0].m_heroIds[0]);
@@ -937,7 +937,7 @@ void game::InitCampaignMap(void)
              heroPositionValue < CAMPAIGN_ARMY_SLOT_COUNT;
              ++heroPositionValue) {
             armyHero->m_army.m_creatureTypes[heroPositionValue] =
-                static_cast<signed char>(
+                static_cast<i8>(
                     m_campaignCarryoverCreatureTypes[heroPositionValue]);
             armyHero->m_army.m_creatureCounts[heroPositionValue] =
                 (m_campaignAwards[CAMPAIGN_AWARD_ROLAND_STRENGTHENED]
@@ -972,7 +972,7 @@ void game::InitCampaignMap(void)
 // alignment bytes at +0x25d. All 65 retail HIGHLOW targets are owned: trackXY
 // uses addends 0/2, the final literal uses 0/8/0xc (two suffix references from
 // other code), and every other initialized-data reference uses addend zero.
-DATA(0x004f4f28) short trackXY[2][13][2] = {
+DATA(0x004f4f28) i16 trackXY[2][13][2] = {
     39, 336, 113, 336, 150, 294, 187, 336, 261, 336, 335, 336,
     409, 378, 409, 294, 483, 336, 557, 336, -1, -1, 261, 378, -1, -1,
     39, 336, 113, 336, 187, 294, 187, 378, 261, 336, 335, 336,
@@ -988,7 +988,7 @@ DATA(0x004f4f90) class heroWindow *campWin = 0;
 // all with addend zero. iCurViewMap has 27 candidate versus 29 retail references;
 // that two-site code residual belongs to incomplete function reconstruction,
 // not to BSS ownership.
-DATA(0x00527ea4) int iCurViewSide;
-DATA(0x00527ea8) int iCampaignTrackType;
-DATA(0x00527eac) int bCampaignViewOnly;
-DATA(0x00527eb0) int iCurViewMap;
+DATA(0x00527ea4) i32 iCurViewSide;
+DATA(0x00527ea8) i32 iCampaignTrackType;
+DATA(0x00527eac) i32 bCampaignViewOnly;
+DATA(0x00527eb0) i32 iCurViewMap;

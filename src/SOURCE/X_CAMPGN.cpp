@@ -25,7 +25,7 @@
 #include <SOURCE/hero.h>
 #include <SOURCE/kbwin.h>
 
-DATA(0x0051d450) static int
+DATA(0x0051d450) static i32
 expansionCampaignTrackXY[EXPANSION_CAMPAIGN_COUNT]
                         [EXPANSION_CAMPAIGN_MAX_MAP_COUNT][2] = {
     {{113, 310}, {187, 310}, {261, 352}, {261, 310},
@@ -38,7 +38,7 @@ expansionCampaignTrackXY[EXPANSION_CAMPAIGN_COUNT]
      {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}}
 };
 
-DATA(0x0051d550) static int
+DATA(0x0051d550) static i32
 expansionCampaignMapCounts[EXPANSION_CAMPAIGN_COUNT] = {
     8, 8, 4, 4
 };
@@ -89,7 +89,7 @@ xCampaignChoices[EXPANSION_CAMPAIGN_COUNT]
     }
 };
 
-DATA(0x0051d740) static signed char
+DATA(0x0051d740) static i8
 expansionCampaignDifficulty[EXPANSION_CAMPAIGN_COUNT]
                            [EXPANSION_CAMPAIGN_MAX_MAP_COUNT] = {
     {0, 1, 1, 1, 1, 2, 2, 3},
@@ -144,19 +144,19 @@ void ExpCampaign::ResetBonusChoices(void)
 }
 
 VA(0x004bb75d, 0x23)
-void ExpCampaign::GrantAward(int award)
+void ExpCampaign::GrantAward(i32 award)
 {
     m_awards[award] = 1;
 }
 
 VA(0x004bb780, 0x23)
-void ExpCampaign::RemoveAward(int award)
+void ExpCampaign::RemoveAward(i32 award)
 {
     m_awards[award] = 0;
 }
 
 VA(0x004bb7a3, 0x22)
-signed char ExpCampaign::HasAward(int award)
+i8 ExpCampaign::HasAward(i32 award)
 {
     return m_awards[award];
 }
@@ -168,7 +168,7 @@ void ExpCampaign::SetMapWasPlayed(void)
 }
 
 VA(0x004bb7e9, 0x5a)
-void ExpCampaign::InitNewCampaign(int campaignId)
+void ExpCampaign::InitNewCampaign(i32 campaignId)
 {
     m_campaignId = campaignId;
     m_currentMap = -1;
@@ -200,7 +200,7 @@ void ExpCampaign::InitMap(void)
     if (m_currentMap == 0)
         m_mapDays[0] = 0;
     strcpy(gMapName, gpGame->m_mapFilename);
-    int mapHeaderResult =
+    i32 mapHeaderResult =
         GetMapHeader(gpGame->m_mapFilename, &gpGame->m_mapHeader);
     gpGame->LoadGame("origdata.bin", 1, 0);
     gpGame->InitNewGame(0);
@@ -210,7 +210,7 @@ void ExpCampaign::InitMap(void)
     gpGame->NewMap(gMapName);
 
     playerData *player = &gpGame->m_players[0];
-    int heroPosition;
+    i32 heroPosition;
     hero *choiceHero;
     switch (campaignChoice->type) {
     case CAMPAIGN_CHOICE_RESOURCE:
@@ -255,10 +255,10 @@ void ExpCampaign::InitMap(void)
         break;
     case CAMPAIGN_CHOICE_PUZZLE_PIECES:
         player->m_cheatValue =
-            static_cast<signed char>(campaignChoice->value);
+            static_cast<i8>(campaignChoice->value);
         break;
     case CAMPAIGN_CHOICE_EXPERIENCE: {
-        int savedNewGameSetup = gbInNewGameSetup;
+        i32 savedNewGameSetup = gbInNewGameSetup;
         gbInNewGameSetup = 1;
         if (player->m_heroCount > 0) {
             gpGame->GetHero(player->m_heroIds[0])->m_experience +=
@@ -291,11 +291,11 @@ void ExpCampaign::InitMap(void)
         if (player->m_heroCount > 0)
             GiveArtifact(gpGame->GetHero(player->m_heroIds[0]),
                          EVENT_ARTIFACT_SPELL_SCROLL, 0,
-                         static_cast<signed char>(campaignChoice->value));
+                         static_cast<i8>(campaignChoice->value));
         break;
     }
 
-    int award;
+    i32 award;
     for (award = 0; award < EXPANSION_CAMPAIGN_AWARD_COUNT; ++award) {
         if (m_awards[award] != 0) {
             switch (award) {
@@ -352,13 +352,13 @@ void ExpCampaign::InitMap(void)
 }
 
 VA(0x004bc00e, 0x33f)
-void ExpCampaign::ShowInfo(int viewOnly, int)
+void ExpCampaign::ShowInfo(i32 viewOnly, i32)
 {
     m_viewOnly = viewOnly;
     gpMouseManager->SetPointer("advmice.mse", 0,
                                CAMPAIGN_POINTER_HIDDEN_HOTSPOT);
     gpMouseManager->ReallyShowPointer();
-    int savedTheme = gbUseEvilInterface;
+    i32 savedTheme = gbUseEvilInterface;
     gbUseEvilInterface = 1;
     m_viewMap = m_currentMap;
     m_window = new heroWindow(0, 0, "x_camp.bin");
@@ -366,7 +366,7 @@ void ExpCampaign::ShowInfo(int viewOnly, int)
         MemError();
 
     widget *trackWidget = 0;
-    int map;
+    i32 map;
     for (map = 0; map < m_mapCount; ++map) {
         trackWidget = new iconWidget(
             expansionCampaignTrackXY[m_campaignId][map][0],
@@ -444,14 +444,14 @@ void ExpCampaign::ShowInfo(int viewOnly, int)
 // expression families are exhausted; revisit only after an earlier X_CAMPGN or
 // relevant layout/header change alters evaluation order.
 VA(0x004bc34d, 0x921)
-void ExpCampaign::UpdateInfo(int redraw)
+void ExpCampaign::UpdateInfo(i32 redraw)
 {
     tag_message message;
-    signed char hasVisibleAward;
-    int unusedCampaignData[5];
-    int map;
+    i8 hasVisibleAward;
+    i32 unusedCampaignData[5];
+    i32 map;
     SCampaignChoice *choice;
-    signed char showScroll;
+    i8 showScroll;
     char armyName8[EXPANSION_CAMPAIGN_ARMY_NAME_BUFFER_SIZE];
 
     message.type = CAMPAIGN_MESSAGE_WIDGET;
@@ -661,10 +661,10 @@ void ExpCampaign::UpdateInfo(int redraw)
 // local jump-table DIR32 fields at +0xaa..+0xbd. Retail delinks them as this
 // function while our object uses $L labels; all external relocations match.
 VA(0x004bcc6e, 0x172)
-int ExpCampaign::HandleVictory(void)
+i32 ExpCampaign::HandleVictory(void)
 {
-    int days = 0;
-    int mapIndex;
+    i32 days = 0;
+    i32 mapIndex;
 
     if (m_currentMap > EXPANSION_MAP_NONE) {
         days = Days();
@@ -1019,7 +1019,7 @@ void ExpCampaign::ReplaySmacker4(void)
 }
 
 VA(0x004bd5aa, 0x59)
-unsigned char ExpCampaign::IsCompleted(void)
+u8 ExpCampaign::IsCompleted(void)
 {
     if (m_mapsPlayed[m_mapCount - 1])
         return 1;
@@ -1030,7 +1030,7 @@ unsigned char ExpCampaign::IsCompleted(void)
 }
 
 VA(0x004bd603, 0x36)
-signed char ExpCampaign::IsThisMapCompleted(void)
+i8 ExpCampaign::IsThisMapCompleted(void)
 {
     if (m_mapsPlayed[m_currentMap])
         return 1;
@@ -1044,9 +1044,9 @@ signed char ExpCampaign::IsThisMapCompleted(void)
 // +0x21f,+0x227,+0x234,+0x239. Retail names interior addresses; base uses
 // xCampaign plus the same addends. All external globals and callees resolve identically.
 VA(0x004bd639, 0x32e)
-int ExpCampaign::MessageHandler(struct tag_message &message)
+i32 ExpCampaign::MessageHandler(struct tag_message &message)
 {
-    int map;
+    i32 map;
 
     if (!gpSoundManager->MusicPlaying() && gpAdvManager->m_active == 1)
         gpSoundManager->SwitchAmbientMusic(
@@ -1150,14 +1150,14 @@ void ExpCampaign::Autosave(void)
 }
 
 VA(0x004bd9d3, 0x25)
-int ExpCampaign::Choose(void)
+i32 ExpCampaign::Choose(void)
 {
     PlaySmacker(EXPANSION_SMACKER_CAMPAIGN_CHOICE);
     return xLastChoice;
 }
 
 VA(0x004bd9f8, 0x64)
-short int ExpCampaign::Days(void)
+i16 ExpCampaign::Days(void)
 {
     return (m_mapDays[m_currentMap] +
             (0[&gpGame->m_week] - 1) * EXPANSION_CAMPAIGN_DAYS_PER_WEEK) +
@@ -1166,7 +1166,7 @@ short int ExpCampaign::Days(void)
 }
 
 VA(0x004bda5c, 0x1b)
-int ExpCampaign::CampaignID(void)
+i32 ExpCampaign::CampaignID(void)
 {
     return m_campaignId;
 }
@@ -1194,7 +1194,7 @@ char *ExpCampaign::IvanName(void)
 }
 
 VA(0x004bdaeb, 0x4e)
-signed char ExpCampaign::IsSpecialGoldenBow(int x, int y)
+i8 ExpCampaign::IsSpecialGoldenBow(i32 x, i32 y)
 {
     if (m_campaignId == EXPANSION_CAMPAIGN_DESCENDANTS &&
         m_currentMap == EXPANSION_MAP_DES_ELVEN_LANDS &&
@@ -1205,7 +1205,7 @@ signed char ExpCampaign::IsSpecialGoldenBow(int x, int y)
 }
 
 VA(0x004bdb39, 0x38)
-signed char ExpCampaign::IsSpecialUA(void)
+i8 ExpCampaign::IsSpecialUA(void)
 {
     if (m_campaignId == EXPANSION_CAMPAIGN_WIZARDS_ISLE &&
         m_currentMap == EXPANSION_MAP_WIZ_POWERS_END)
@@ -1214,7 +1214,7 @@ signed char ExpCampaign::IsSpecialUA(void)
 }
 
 VA(0x004bdb71, 0x73)
-signed char ExpCampaign::IsSpecialLossCondition(int playerIndex)
+i8 ExpCampaign::IsSpecialLossCondition(i32 playerIndex)
 {
     playerData *player = &gpGame->m_players[playerIndex];
 

@@ -1,5 +1,7 @@
 #ifndef HOMM2_SETUP_H
 #define HOMM2_SETUP_H
+
+#include <Ints.h>
 // Declarations of the free functions DEFINED in SETUP.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
 // forward declarations (was <_all.h>):
@@ -53,21 +55,21 @@ typedef enum SetupComPort {
     SETUP_COM_PORT_4 = 4
 } SetupComPort;
 
-int SetupCampaignGameHandler(struct tag_message &);
-int SetupComPortHandler(struct tag_message &);
-int SetupBaudHandler(struct tag_message &);
-int SetupHotSeatGameHandler(struct tag_message &);
-int SetupModemGameHandler(struct tag_message &);
-int SetupMultiPlayerGameHandler(struct tag_message &);
-int SetupNetworkGameHandler(struct tag_message &);
-int SetupNetworkGame2Handler(struct tag_message &);
-int SetupGameHandler(struct tag_message &);
-int ExpNewCampaignHandler(struct tag_message &);
-int ExpLoadCampaignHandler(struct tag_message &);
-int ExpStdGameHandler(struct tag_message &);
-int BaseSetupHandler(struct tag_message &);
+i32 SetupCampaignGameHandler(struct tag_message &);
+i32 SetupComPortHandler(struct tag_message &);
+i32 SetupBaudHandler(struct tag_message &);
+i32 SetupHotSeatGameHandler(struct tag_message &);
+i32 SetupModemGameHandler(struct tag_message &);
+i32 SetupMultiPlayerGameHandler(struct tag_message &);
+i32 SetupNetworkGameHandler(struct tag_message &);
+i32 SetupNetworkGame2Handler(struct tag_message &);
+i32 SetupGameHandler(struct tag_message &);
+i32 ExpNewCampaignHandler(struct tag_message &);
+i32 ExpLoadCampaignHandler(struct tag_message &);
+i32 ExpStdGameHandler(struct tag_message &);
+i32 BaseSetupHandler(struct tag_message &);
 
 // ---- globals (declarations, RVA order) ----
-extern int gbDoModemConfig;
+extern i32 gbDoModemConfig;
 
 #endif // HOMM2_SETUP_H

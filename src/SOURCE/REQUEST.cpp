@@ -26,10 +26,10 @@
 // All 0x80 relocation-masked bytes and eight ordered relocation sites/effective
 // targets agree; residuals are CRT/compiler-local symbol spellings only.
 VA(0x0048c920, 0x80)
-int GetMapHeader(char *filename, struct SMapHeader *header)
+i32 GetMapHeader(char *filename, struct SMapHeader *header)
 {
     sprintf(gText, "%s%s", gcMapPath, filename);
-    int file = _open(gText, _O_BINARY);
+    i32 file = _open(gText, _O_BINARY);
     if (file == -1) {
         return 0;
     }
@@ -39,7 +39,7 @@ int GetMapHeader(char *filename, struct SMapHeader *header)
 }
 
 VA(0x0048c9a0, 0x1b)
-int CheckSumIsDemoOK(char *)
+i32 CheckSumIsDemoOK(char *)
 {
     return 1;
 }
@@ -50,12 +50,12 @@ int CheckSumIsDemoOK(char *)
 // CFG, and four ordered effective targets agree. Only the pooled "BROKENA"
 // and _strcmpi compiler/import aliases differ.
 VA(0x0048c9bb, 0xbb)
-int ShowThisMapGame(char *filename)
+i32 ShowThisMapGame(char *filename)
 {
     return 1;
 
     char mapName[300];
-    int ix;
+    i32 ix;
     strcpy(mapName, filename);
     mapName[8] = 0;
     for (ix = 0; ix < 8; ++ix) {
@@ -70,7 +70,7 @@ int ShowThisMapGame(char *filename)
 }
 
 VA(0x0048ca76, 0x1b)
-int ShowThisMap(char *)
+i32 ShowThisMap(char *)
 {
     return 1;
 }
@@ -85,7 +85,7 @@ int ShowThisMap(char *)
 // lowered the match materially. Revisit if REQUEST TU state or inline
 // continuation normalization changes.
 VA(0x0048ca91, 0x7c1)
-int fileRequester::InitializeFiles(char *directory, char *pattern, int countOnly)
+i32 fileRequester::InitializeFiles(char *directory, char *pattern, i32 countOnly)
 {
     char fullPath[FILE_REQUESTER_PATH_SIZE];
     SMapHeader mapHeader;
@@ -93,11 +93,11 @@ int fileRequester::InitializeFiles(char *directory, char *pattern, int countOnly
     char extensionEntry[FILE_REQUESTER_LOCAL_EXTENSION_SIZE];
     char fileName[FILE_REQUESTER_LOCAL_NAME_SIZE];
     HANDLE findHandleWork;
-    int moreFilesHandle;
-    int insertedCountResult;
+    i32 moreFilesHandle;
+    i32 insertedCountResult;
     char *dotSource;
-    int moveValue;
-    int indexData;
+    i32 moveValue;
+    i32 indexData;
 
     sprintf(gText, "%s%s", directory, pattern);
     m_fileCount = 0;
@@ -220,7 +220,7 @@ InsertNextFile:
 }
 
 VA(0x0048d252, 0x16e)
-fileRequester::fileRequester(int x, int y, int mode, char *pattern, char *directory,
+fileRequester::fileRequester(i32 x, i32 y, i32 mode, char *pattern, char *directory,
                              char *defaultExtension)
 {
     strcpy(m_filePattern, pattern);
@@ -252,11 +252,11 @@ fileRequester::fileRequester(int x, int y, int mode, char *pattern, char *direct
 }
 
 VA(0x0048d3c0, 0x63)
-int fileRequester::MapExistsForFilter(FileRequesterMapSizeFilter filter)
+i32 fileRequester::MapExistsForFilter(FileRequesterMapSizeFilter filter)
 {
     FileRequesterMapSizeFilter oldFilter = giMapSizeFilter;
     giMapSizeFilter = filter;
-    int result = InitializeFiles(m_directory, m_filePattern, 1);
+    i32 result = InitializeFiles(m_directory, m_filePattern, 1);
     giMapSizeFilter = oldFilter;
     return result > 0;
 }
@@ -309,7 +309,7 @@ void fileRequester::Close(void)
 // effective targets agree. Only pooled-string and _strcmpi import aliases
 // differ.
 VA(0x0048d5e1, 0x466)
-int fileRequester::Open(int id)
+i32 fileRequester::Open(i32 id)
 {
     strcpy(gLastFilename, "");
     m_previousMenu = hmnuCurrent;
@@ -322,7 +322,7 @@ int fileRequester::Open(int id)
         MemError();
     }
 
-    m_scrollKnob = new iconWidget(346, static_cast<short>(fGutterMinY), 8, 17,
+    m_scrollKnob = new iconWidget(346, static_cast<i16>(fGutterMinY), 8, 17,
                                   "scrollcn.icn", 4, 0, 14, 16, 1);
     if (m_scrollKnob == 0) {
         MemError();
@@ -332,8 +332,8 @@ int fileRequester::Open(int id)
     tag_message message;
     message.type = 0x200;
     message.payload.widget.command = 3;
-    unsigned char okEnabled3;
-    int fileIndex;
+    u8 okEnabled3;
+    i32 fileIndex;
     if (m_mode == FILE_REQUESTER_SAVE_GAME) {
         okEnabled3 = 1;
         strcpy(m_filename, gpGame->m_saveName);
@@ -403,7 +403,7 @@ int fileRequester::Open(int id)
 }
 
 VA(0x0048da47, 0xa5)
-void fileRequester::SetOK(int enabled)
+void fileRequester::SetOK(i32 enabled)
 {
     tag_message message;
     message.type = 0x200;
@@ -438,17 +438,17 @@ void fileRequester::SetOK(int enabled)
 // arms and moving click behind hover/help were rejected by lower scores.
 // Revisit if switch/FP lowering or REQUEST TU state changes.
 VA(0x0048daec, 0x11ae)
-int fileRequester::Main(struct tag_message &message)
+i32 fileRequester::Main(struct tag_message &message)
 {
-    int acceptStep = 0;
-    int iResult;
-    int helpIndexMouse;
-    int lengthIndex;
-    int positions;
-    int gutterStepScreen;
-    int mouseXIndex;
-    int screenY;
-    int newTopIndexBuffer;
+    i32 acceptStep = 0;
+    i32 iResult;
+    i32 helpIndexMouse;
+    i32 lengthIndex;
+    i32 positions;
+    i32 gutterStepScreen;
+    i32 mouseXIndex;
+    i32 screenY;
+    i32 newTopIndexBuffer;
     char newNameData[FILE_REQUESTER_LOCAL_NAME_SIZE];
     char cycleNameBuffer[FILE_REQUESTER_PATH_SIZE];
     char filteredNameMap[FILE_REQUESTER_PATH_SIZE];
@@ -726,13 +726,13 @@ int fileRequester::Main(struct tag_message &message)
                         positions = m_fileCount - (iMaxListSize - 1);
                         if (positions < 1)
                             positions = 1;
-                        gutterStepScreen = static_cast<int>(
+                        gutterStepScreen = static_cast<i32>(
                             (fGutterTravelLength *
                              FILE_REQUESTER_GUTTER_SCALE) /
                             positions);
                         mouseXIndex = message.payload.widget.screenX;
                         screenY = message.payload.widget.screenY;
-                        screenY = static_cast<int>(
+                        screenY = static_cast<i32>(
                                       screenY - (m_y + fGutterMinY)) -
                                  FILE_REQUESTER_SCROLL_KNOB_HALF_HEIGHT;
                         newTopIndexBuffer =
@@ -861,14 +861,14 @@ int fileRequester::Main(struct tag_message &message)
 VA(0x0048ec9a, 0x2e8)
 void fileRequester::DoKnob(void)
 {
-    int oldTopIndex = m_topIndex;
+    i32 oldTopIndex = m_topIndex;
     double gutterStep9 =
         fGutterTravelLength / (m_fileCount - (iMaxListSize - 1));
-    int mouseX7;
-    int mouseY5;
-    int newTopIndex;
+    i32 mouseX7;
+    i32 mouseY5;
+    i32 newTopIndex;
     gpMouseManager->MouseCoords(mouseX7, mouseY5);
-    int mouseOffset2 = mouseY5 - m_scrollKnob->m_y;
+    i32 mouseOffset2 = mouseY5 - m_scrollKnob->m_y;
 
     gpInputManager->Flush();
     tag_message dragMessage = gpInputManager->GetEvent();
@@ -877,18 +877,18 @@ void fileRequester::DoKnob(void)
             if (static_cast<float>(dragMessage.payload.mouse.y) <
                 mouseOffset2 + fGutterMinY) {
                 dragMessage.payload.mouse.y =
-                    static_cast<int>(mouseOffset2 + fGutterMinY);
+                    static_cast<i32>(mouseOffset2 + fGutterMinY);
             }
             if (mouseOffset2 + fGutterTravelLength + fGutterMinY <
                 static_cast<float>(dragMessage.payload.mouse.y)) {
-                dragMessage.payload.mouse.y = static_cast<int>(
+                dragMessage.payload.mouse.y = static_cast<i32>(
                     mouseOffset2 + fGutterTravelLength + fGutterMinY);
             }
             gpMouseManager->Main(dragMessage);
             m_scrollKnob->m_y =
                 dragMessage.payload.mouse.y - mouseOffset2;
             if (m_fileCount > iMaxListSize) {
-                newTopIndex = static_cast<int>(
+                newTopIndex = static_cast<i32>(
                     (m_scrollKnob->m_y - fGutterMinY) / gutterStep9);
                 if (newTopIndex != oldTopIndex) {
                     if (newTopIndex > m_fileCount - iMaxListSize) {
@@ -923,12 +923,12 @@ void fileRequester::DoKnob(void)
 // loop index against EAX, while candidate loads the loop index then compares the
 // global against EAX. The equivalent operand order shifts later relocation sites.
 VA(0x0048ef82, 0xc42)
-void fileRequester::Update(int drawWindow)
+void fileRequester::Update(i32 drawWindow)
 {
     tag_message broadcastMessage;
     char localStorage[FILE_REQUESTER_UPDATE_STORAGE_SIZE];
-    int localState;
-    int i;
+    i32 localState;
+    i32 i;
     double gutterStepCount;
     double gutterState0;
     broadcastMessage.type = 0x200;
@@ -1096,11 +1096,11 @@ void fileRequester::Update(int drawWindow)
     }
 
     if (m_fileCount <= iMaxListSize) {
-        m_scrollKnob->m_y = static_cast<short>(fGutterTravelLength / 2.0f + fGutterMinY);
+        m_scrollKnob->m_y = static_cast<i16>(fGutterTravelLength / 2.0f + fGutterMinY);
     } else {
         gutterStepCount =
             fGutterTravelLength / (m_fileCount - iMaxListSize);
-        m_scrollKnob->m_y = static_cast<short>(
+        m_scrollKnob->m_y = static_cast<i16>(
             m_topIndex * gutterStepCount + fGutterMinY);
     }
     if (drawWindow) {
@@ -1160,4 +1160,4 @@ DATA(0x004f8674) FileRequesterMapSizeFilter giMapSizeFilter =
 DATA(0x004f88c4) char *cFRDummy = "";
 DATA(0x0052857c) float fGutterMinY;
 DATA(0x00528580) float fGutterTravelLength;
-DATA(0x00528584) int iMaxListSize;
+DATA(0x00528584) i32 iMaxListSize;

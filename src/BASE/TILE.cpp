@@ -32,11 +32,11 @@
 
 
 // ---- module-private synthetic globals (retail xref: single-module) ----
-DATA(0x0051fec0) static unsigned int gTileMode;
-DATA(0x0051fec4) static int gTileRowCtr;
+DATA(0x0051fec0) static u32 gTileMode;
+DATA(0x0051fec4) static i32 gTileRowCtr;
 
 VA(0x004d310c, 0x18f)
-extern "C" __declspec(naked) void __cdecl TileToBitmap(tileset *src, unsigned int flags, bitmap *dst, int x, int y)
+extern "C" __declspec(naked) void __cdecl TileToBitmap(tileset *src, u32 flags, bitmap *dst, i32 x, i32 y)
 {
     __asm {
         push    ebp

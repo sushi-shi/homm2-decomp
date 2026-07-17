@@ -5,14 +5,14 @@
 // DEFINED in Bzip.cpp — their single declaration home. Callers include this header.
 #include <stdio.h>   // FILE (BitStream::handle)
 
-typedef int            Int32;
-typedef unsigned int   UInt32;
-typedef short          Int16;
-typedef unsigned short UInt16;
+typedef i32            Int32;
+typedef u32   UInt32;
+typedef i16          Int16;
+typedef u16 UInt16;
 typedef char           Char;
-typedef unsigned char  UChar;
-typedef int            Bool;
-typedef int            IntNative;
+typedef u8  UChar;
+typedef i32            Bool;
+typedef i32            IntNative;
 #define MAX_SYMBOLS 256
 
 struct BitStream {
@@ -33,17 +33,17 @@ struct Model {
 };
 
 void initialiseCRC(void);
-unsigned int getFinalCRC(void);
-unsigned int getGlobalCRC(void);
-void setGlobalCRC(unsigned int newCrc);
+u32 getFinalCRC(void);
+u32 getGlobalCRC(void);
+void setGlobalCRC(u32 newCrc);
 BitStream * bsOpenReadStream(FILE *f);
 BitStream * bsOpenWriteStream(FILE *f);
-void bsPutBit(BitStream *bs, int bit);
-int bsGetBit(BitStream *bs);
-unsigned char bsGetUChar(BitStream *bs);
-void bsPutUChar(BitStream *bs, unsigned char c);
+void bsPutBit(BitStream *bs, i32 bit);
+i32 bsGetBit(BitStream *bs);
+u8 bsGetUChar(BitStream *bs);
+void bsPutUChar(BitStream *bs, u8 c);
 void bsClose(BitStream *bs);
-unsigned int minUInt32(unsigned int a, unsigned int b);
+u32 minUInt32(u32 a, u32 b);
 void arithCodeBitPlusFollow(BitStream *bs, UInt32 bit);
 void arithCodeStartEncoding(BitStream *bs);
 void arithCodeDoneEncoding(BitStream *bs);
@@ -118,8 +118,8 @@ void compressOutOfMemory(Int32 draw, Int32 blockSize);
 Bool endsInBz(Char *name);
 void compress(Char *name);
 void uncompress(Char *name);
-long EncodeData(char *dst, char *src, unsigned long srcLen);
-long DecodeData(char *dst, char *src, unsigned long srcLen);
+i32l EncodeData(char *dst, char *src, u32l srcLen);
+i32l DecodeData(char *dst, char *src, u32l srcLen);
 
 
 // --- globals owned by this TU (moved from _globals.h; CodeView-attributed) ---
@@ -128,9 +128,9 @@ extern char inName[];
 extern char outName[];
 
 // ---- globals (declarations, RVA order) ----
-extern int longestFileName;
-extern int opMode;
+extern i32 longestFileName;
+extern i32 opMode;
 extern char *progNameReally;
-extern int keepInputFiles;
+extern i32 keepInputFiles;
 
 #endif // HOMM2_BASE_BZIP_H

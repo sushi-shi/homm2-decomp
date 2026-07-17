@@ -1,6 +1,8 @@
 #ifndef HOMM2_BASE_ICONRLE_H
 #define HOMM2_BASE_ICONRLE_H
 
+#include <Ints.h>
+
 // Serialized icon command-stream values shared by the BASE icon decoders. Keep the unrelated
 // monochrome and shear domains in their consumer-only headers: their typedef declarations alter
 // MSVC 4.2 /O2 allocation even in translation units that never use their enumerators.
@@ -17,7 +19,7 @@ typedef enum IconRleCommandConstant {
 
 // Preserve the original advance-before-read source order. MSVC inlines this as a cursor publication
 // followed by a load from the previous byte; reversing the two statements changes its scheduling.
-inline unsigned char ReadIconRleByte(unsigned char *&cursor)
+inline u8 ReadIconRleByte(u8 *&cursor)
 {
     cursor++;
     return cursor[-1];

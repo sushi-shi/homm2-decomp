@@ -61,35 +61,35 @@
 #define ADVMGR_REMOTE_PAYLOAD(packet) \
     (reinterpret_cast<AdventureRemotePayload *>((packet)->payload))
 
-static const int environmentVolumes[ADVMGR_ENVIRONMENT_VOLUME_COUNT] = {
+static const i32 environmentVolumes[ADVMGR_ENVIRONMENT_VOLUME_COUNT] = {
     64, 57, 40, 21, 7, 5, 3, 0
 };
 
-DATA(0x00527eb8) static unsigned short s_drawGroundTile;
-DATA(0x00527ebc) static int s_adjacentMonsterX;
-DATA(0x00527ec0) static int s_drawPixelY;
+DATA(0x00527eb8) static u16 s_drawGroundTile;
+DATA(0x00527ebc) static i32 s_adjacentMonsterX;
+DATA(0x00527ec0) static i32 s_drawPixelY;
 DATA(0x00527ec4) static mapCellExtra *s_drawExtra;
-DATA(0x00527ecc) static int s_adjacentMonsterY;
-DATA(0x00527ed4) static int s_adjacentMonsterMinX;
-DATA(0x00527ed8) static int s_adjacentMonsterMinY;
-DATA(0x00527ee4) static int s_drawMonsterFrame;
-DATA(0x00527f0c) static int s_drawCloudFrame;
-DATA(0x00527f10) static int s_drawStoneTile;
+DATA(0x00527ecc) static i32 s_adjacentMonsterY;
+DATA(0x00527ed4) static i32 s_adjacentMonsterMinX;
+DATA(0x00527ed8) static i32 s_adjacentMonsterMinY;
+DATA(0x00527ee4) static i32 s_drawMonsterFrame;
+DATA(0x00527f0c) static i32 s_drawCloudFrame;
+DATA(0x00527f10) static i32 s_drawStoneTile;
 DATA(0x00527f18) static mapCell *s_drawCell;
 DATA(0x00527f1c) static mineRecord *s_drawMine;
 DATA(0x00527f20) static hero *s_drawHero;
-DATA(0x00527f3c) static int s_drawHeroType;
-DATA(0x00527f44) static int s_drawCovered;
+DATA(0x00527f3c) static i32 s_drawHeroType;
+DATA(0x00527f44) static i32 s_drawCovered;
 DATA(0x00527f48) static mapCell *s_drawAdjacentCell;
-DATA(0x00528094) static int s_drawHasHero;
-DATA(0x00528098) static int s_adjacentMonsterEndY;
-DATA(0x0052809c) static int s_drawFlipCloud;
-DATA(0x005280a0) static int s_drawHeroFrame;
-DATA(0x005280a4) static int s_drawPixelX;
-DATA(0x005280a8) static int s_drawPlayerColor;
-DATA(0x005280cc) static int s_adjacentMonsterEndX;
-DATA(0x005280d0) static int s_drawAnimationLength;
-DATA(0x005280d8) static int s_drawHeroYOffset;
+DATA(0x00528094) static i32 s_drawHasHero;
+DATA(0x00528098) static i32 s_adjacentMonsterEndY;
+DATA(0x0052809c) static i32 s_drawFlipCloud;
+DATA(0x005280a0) static i32 s_drawHeroFrame;
+DATA(0x005280a4) static i32 s_drawPixelX;
+DATA(0x005280a8) static i32 s_drawPlayerColor;
+DATA(0x005280cc) static i32 s_adjacentMonsterEndX;
+DATA(0x005280d0) static i32 s_drawAnimationLength;
+DATA(0x005280d8) static i32 s_drawHeroYOffset;
 VA(0x00456350, 0x30f)
 advManager::advManager(void)
 {
@@ -108,7 +108,7 @@ advManager::advManager(void)
     m_drawHeroShadows = 1;
     m_adventureBorder = 0;
 
-    int index;
+    i32 index;
     for (index = 0; index < ADVMGR_OBJECT_ICON_COUNT; ++index)
         m_objectIcons[index] = 0;
     for (index = 0; index < ADVMGR_HERO_ICON_COUNT; ++index)
@@ -149,14 +149,14 @@ advManager::advManager(void)
 }
 
 VA(0x0045665f, 0x9c9)
-int advManager::Open(int id)
+i32 advManager::Open(i32 id)
 {
     iCurBottomView = 0;
     m_openState = 0;
     bShowIt = 0;
     m_adventureBorder = 0;
 
-    int resourceIndex;
+    i32 resourceIndex;
     for (resourceIndex = 0; resourceIndex < 12; ++resourceIndex) {
         m_heroLocatorState[resourceIndex] = 0;
         m_townLocatorState[resourceIndex] = 0;
@@ -188,7 +188,7 @@ int advManager::Open(int id)
         gpMouseManager->SetPointer("advmice.mse", 1, ADVMGR_DEFAULT_POINTER_FRAME);
 
     if (m_visibilityMap == 0) {
-        m_visibilityMap = new unsigned short[MAP_WIDTH * MAP_HEIGHT];
+        m_visibilityMap = new u16[MAP_WIDTH * MAP_HEIGHT];
         if (m_visibilityMap == 0)
             MemError();
     }
@@ -287,14 +287,14 @@ int advManager::Open(int id)
     }
 
     glTimers[0] = KBTickCount() + ADVMGR_TIMER_DELAY;
-    int oldSampleVolumeState = gConfig.soundVolume;
+    i32 oldSampleVolumeState = gConfig.soundVolume;
     if (gConfig.soundVolume != 0)
         gConfig.soundVolume = 10;
     SetInitialMapOrigin();
 
     bShowIt = gbThisNetHumanPlayer[giCurPlayer];
-    int oldPlayer = giCurPlayer;
-    int oldShowItValue = bShowIt;
+    i32 oldPlayer = giCurPlayer;
+    i32 oldShowItValue = bShowIt;
     giCurPlayer = giCurWatchPlayer;
     gpCurPlayer = &gpGame->m_players[giCurPlayer];
     bShowIt = 1;
@@ -320,7 +320,7 @@ int advManager::Open(int id)
 VA(0x00457028, 0x40a)
 void advManager::Close(void)
 {
-    DATA(0x004f59a8) static short s_closeBorderFreeLineBase =
+    DATA(0x004f59a8) static i16 s_closeBorderFreeLineBase =
         ADVMGR_CLOSE_BORDER_FREE_LINE_BASE;
 
     ClearBottomView();
@@ -338,7 +338,7 @@ void advManager::Close(void)
         m_adventureBorder = 0;
     }
 
-    int index;
+    i32 index;
     if (gAdvDisposeLevel <= 1) {
         for (index = 0; index < ADVMGR_OBJECT_ICON_COUNT; ++index) {
             if (m_objectIcons[index] != 0)
@@ -392,12 +392,12 @@ void advManager::Close(void)
 }
 
 VA(0x00457432, 0xe9)
-void advManager::GetCursorSampleSet(int sampleSet)
+void advManager::GetCursorSampleSet(i32 sampleSet)
 {
     if (sampleSet >= 1)
         sampleSet = 2;
-    int sampleSuffix[ADVMGR_CURSOR_SAMPLE_COUNT] = { 0, 3, 5, 3, 4, 5, 6, 3, 3 };
-    for (int index = 0; index < ADVMGR_CURSOR_SAMPLE_COUNT; ++index) {
+    i32 sampleSuffix[ADVMGR_CURSOR_SAMPLE_COUNT] = { 0, 3, 5, 3, 4, 5, 6, 3, 3 };
+    for (i32 index = 0; index < ADVMGR_CURSOR_SAMPLE_COUNT; ++index) {
         sprintf(gText, "wsnd%1d%1d.82M", sampleSet, sampleSuffix[index]);
         m_cursorSamples[index] = gpResourceManager->GetSample(gText);
         m_cursorSamples[index]->m_playbackData.volume =
@@ -421,10 +421,10 @@ class mapCell * advManager::DoAdvCommand(void)
     char movementStopped = 0;
     char refreshHover = 0;
     hero *currentHeroState;
-    int oldVisibilityStateLocal;
-    int pathIndexLocal;
-    int movementChangedResult;
-    int movementEndedLocal;
+    i32 oldVisibilityStateLocal;
+    i32 pathIndexLocal;
+    i32 movementChangedResult;
+    i32 movementEndedLocal;
     tag_message messageValue;
     if (gpCurPlayer->m_currentHero == ADVMGR_INVALID_HERO)
         currentHeroState = 0;
@@ -462,7 +462,7 @@ continue_route:
 
             pathIndexLocal = gpSearchArray->m_pathLength - 1;
             for (; pathIndexLocal >= 0; --pathIndexLocal) {
-                eventCellState = MoveHero(static_cast<unsigned char>(
+                eventCellState = MoveHero(static_cast<u8>(
                                               gpSearchArray->m_storage.path.directions[
                                                   pathIndexLocal + 1]),
                                           pathIndexLocal == 0,
@@ -573,12 +573,12 @@ movement_done:
 // address in the opposite order. Symmetric subscript and both pointer-add
 // orders compiled identically in two bounded attempts.
 VA(0x00457bdb, 0x191)
-void advManager::CheckSetEvilInterface(int redraw, int player)
+void advManager::CheckSetEvilInterface(i32 redraw, i32 player)
 {
     if (player == -1)
         player = giCurWatchPlayer;
 
-    int shouldChange = 0;
+    i32 shouldChange = 0;
     if (gConfig.evilInterfaceUsage == ADVMGR_INTERFACE_EVIL && !gbUseEvilInterface)
         shouldChange = 1;
     else if (gConfig.evilInterfaceUsage == ADVMGR_INTERFACE_GOOD && gbUseEvilInterface)
@@ -593,7 +593,7 @@ void advManager::CheckSetEvilInterface(int redraw, int player)
             tag_message interfaceMessage;
             interfaceMessage.type = ADVMGR_INTERFACE_MESSAGE;
             interfaceMessage.payload.widget.command = ADVMGR_INTERFACE_REPLACE_RESOURCE;
-            int translationIndex;
+            i32 translationIndex;
             for (translationIndex = 0;
                  translationIndex < ADVMGR_INTERFACE_TRANSLATION_COUNT; ++translationIndex) {
                 interfaceMessage.payload.widget.id = gpResourceManager->MakeId(
@@ -602,7 +602,7 @@ void advManager::CheckSetEvilInterface(int redraw, int player)
                     cEvilTranslate[translationIndex][gbUseEvilInterface], 0);
                 m_adventureWindow->BroadcastMessage(interfaceMessage);
             }
-            int savedShowIt = bShowIt;
+            i32 savedShowIt = bShowIt;
             bShowIt = 1;
             RedrawAdvScreen(1, 1);
             bShowIt = savedShowIt;
@@ -622,7 +622,7 @@ void advManager::CheckSetEvilInterface(int redraw, int player)
 // source hash or an included declaration changes, or the canonicalizer learns
 // a proven same-destination branch normalization; this is not a permanent wall.
 VA(0x00457d6c, 0xfda)
-int advManager::Main(struct tag_message &message)
+i32 advManager::Main(struct tag_message &message)
 {
     if (KBTickCount() > glTimers[0] && ComboDraw(1))
         UpdateScreen(1, 0);
@@ -650,13 +650,13 @@ int advManager::Main(struct tag_message &message)
         SetEnvironmentOrigin(m_mapOriginX + 7, m_mapOriginY + 7, 1);
     }
 
-    int processResult = 1;
-    int exitRequestedFlag = 0;
+    i32 processResult = 1;
+    i32 exitRequestedFlag = 0;
     mapCell *eventCellsResult[3];
     eventCellsResult[0] = 0;
-    int moveDirectionState;
-    int cheatDigitLocal;
-    int nextTownId;
+    i32 moveDirectionState;
+    i32 cheatDigitLocal;
+    i32 nextTownId;
     hero *currentHero;
     if (message.type != 0) {
     switch (message.type) {
@@ -668,7 +668,7 @@ int advManager::Main(struct tag_message &message)
             break;
         case 12:
         case 14: {
-            int helpIndexState;
+            i32 helpIndexState;
             if (message.payload.widget.parameter & 0x200) {
                 helpIndexState = -1;
                 switch (message.payload.widget.id) {
@@ -907,8 +907,8 @@ confirm_game_command:
     if (gpCurPlayer->m_currentHero != ADVMGR_INVALID_HERO && moveDirectionState >= 0) {
         HideRoute(1, 1, 1);
         gpMouseManager->HideColorPointer();
-        int movementChanged;
-        int movementEnded;
+        i32 movementChanged;
+        i32 movementEnded;
         eventCellsResult[0] = MoveHero(moveDirectionState, 1, &TrigX, &TrigY,
                                  &movementChanged, 0, &movementEnded, 0);
         UpdateHeroLocator(-1, 1, 1);
@@ -941,7 +941,7 @@ finish_message:
 }
 
 VA(0x00458d46, 0x22)
-void advManager::Reseed(int, int)
+void advManager::Reseed(i32, i32)
 {
     giSeedingValid = 0;
 }
@@ -955,19 +955,19 @@ void advManager::Reseed(int, int)
 // members versus CurrentHero(), and both boundary-test polarities were checked.
 // Revisit after a material predecessor/TU-state change or in the last-mile phase.
 VA(0x00458d68, 0xeb1)
-int advManager::ProcessSelect(struct tag_message *message, class mapCell **eventCell)
+i32 advManager::ProcessSelect(struct tag_message *message, class mapCell **eventCell)
 {
-    int mouseX;
+    i32 mouseX;
     mapCell *currentCell;
-    int objectTypeState;
-    int objectIdIndex;
-    int mouseY;
-    int visible;
-    int pageState;
+    i32 objectTypeState;
+    i32 objectIdIndex;
+    i32 mouseY;
+    i32 visible;
+    i32 pageState;
     float radarScale;
     tag_message currentMessageLocal;
     tag_message radarMessage;
-    int mobileResult;
+    i32 mobileResult;
     hero *currentHero;
 
     visible = 1;
@@ -1105,7 +1105,7 @@ int advManager::ProcessSelect(struct tag_message *message, class mapCell **event
             mobileResult = 0;
             if (gpCurPlayer->m_currentHero != ADVMGR_INVALID_HERO) {
                 currentHero = gpGame->GetHero(gpCurPlayer->m_currentHero);
-                mobileResult = gpGame->IsMobile(static_cast<unsigned char>(currentHero->m_id));
+                mobileResult = gpGame->IsMobile(static_cast<u8>(currentHero->m_id));
             }
             if (currentHero != 0) {
                 if (m_lastHoverCell == 7 && m_hoverCellY == 7 &&
@@ -1170,8 +1170,8 @@ int advManager::ProcessSelect(struct tag_message *message, class mapCell **event
                 radarScale = 1.0f;
                 break;
             }
-            mouseX = static_cast<int>((mouseX - 480) / radarScale);
-            mouseY = static_cast<int>((mouseY - 16) / radarScale);
+            mouseX = static_cast<i32>((mouseX - 480) / radarScale);
+            mouseY = static_cast<i32>((mouseY - 16) / radarScale);
             m_mapOriginX = mouseX - 7;
             m_mapOriginY = mouseY - 7;
             if (m_mapOriginX < -7)
@@ -1207,8 +1207,8 @@ int advManager::ProcessSelect(struct tag_message *message, class mapCell **event
                     if (radarMessage.payload.mouse.y >= ADVMGR_RADAR_BOTTOM)
                         radarMessage.payload.mouse.y = ADVMGR_RADAR_BOTTOM - 1;
                     gpMouseManager->Main(radarMessage);
-                    mouseX = static_cast<int>((radarMessage.payload.mouse.x - 480) / radarScale);
-                    mouseY = static_cast<int>((radarMessage.payload.mouse.y - 16) / radarScale);
+                    mouseX = static_cast<i32>((radarMessage.payload.mouse.x - 480) / radarScale);
+                    mouseY = static_cast<i32>((radarMessage.payload.mouse.y - 16) / radarScale);
                     m_mapOriginX = mouseX - 7;
                     m_mapOriginY = mouseY - 7;
                     if (m_mapOriginX < -7)
@@ -1242,7 +1242,7 @@ int advManager::ProcessSelect(struct tag_message *message, class mapCell **event
 // @early-stop
 // All 0x463 bytes / 401 instructions match with relocation bytes masked; residual is one string symbol, 15 delinked switch-table local-label identities, and the same iCurBottomView target.
 VA(0x00459c19, 0x463)
-int advManager::ProcessDeSelect(struct tag_message *message, int *result,
+i32 advManager::ProcessDeSelect(struct tag_message *message, i32 *result,
                                 class mapCell **eventCell)
 {
     switch (message->payload.widget.id) {
@@ -1300,14 +1300,14 @@ int advManager::ProcessDeSelect(struct tag_message *message, int *result,
             SetEnvironmentOrigin(-1, -1, 1);
         TrimLoopingSounds(0);
         gpGame->Overview();
-        int fadeAfter = 1;
+        i32 fadeAfter = 1;
         if (giOverviewReturnAction == ADVMGR_OVERVIEW_HERO) {
             gpMouseManager->SetPointer(0);
             if (gbLowMemory)
                 SetEnvironmentOrigin(-1, -1, 1);
             TrimLoopingSounds(0);
             HeroView(giOverviewReturnActionExtra,
-                     reinterpret_cast<int>(
+                     reinterpret_cast<i32>(
                          gpGame->GetHero(giOverviewReturnAction)->GetOccupiedTown()), 1);
             if (gbLowMemory)
                 SetEnvironmentOrigin(m_mapOriginX + 7, m_mapOriginY + 7, 1);
@@ -1354,15 +1354,15 @@ int advManager::ProcessDeSelect(struct tag_message *message, int *result,
 // byte /Ob1 continuation: ours is at +0x0c and retail's is at +0x1d. Declaration
 // initialization and post-declaration assignment compile to the same placement.
 VA(0x0045a07c, 0x5c8)
-int advManager::ProcessSearch(int x, int y)
+i32 advManager::ProcessSearch(i32 x, i32 y)
 {
     mapCell *currentCell;
-    int playerState;
+    i32 playerState;
     tag_message messageValue;
     char specialArtifactValue;
     hero *searchingHeroState;
     SAMPLE2 digSampleState;
-    int artifactResultLocal;
+    i32 artifactResultLocal;
 
     digSampleState = GetNullSample();
     searchingHeroState = &gpGame->m_heroRecs[gpCurPlayer->m_currentHero];
@@ -1483,16 +1483,16 @@ search_end:
 // eight-entry switch table has the same case mapping after its uniform 6-byte
 // code shift. Revisit with a proven shared GetCell accessor shape.
 VA(0x0045a644, 0xa50)
-int advManager::ProcessHover(int mouseX, int mouseY) {
-    int heroXHero;
-    int heroYCoordinate;
-    int cellXPosition;
-    int cellYCurrent;
+i32 advManager::ProcessHover(i32 mouseX, i32 mouseY) {
+    i32 heroXHero;
+    i32 heroYCoordinate;
+    i32 cellXPosition;
+    i32 cellYCurrent;
     town* hoverTownCell;
     mapCell* hoverCellLocal;
-    int routeDaysCount;
+    i32 routeDaysCount;
     hero* hoverHeroLocal;
-    int pointerBaseCursor;
+    i32 pointerBaseCursor;
 
     if (InMapArea(mouseX, mouseY)) {
         if (mouseX > ADVMGR_DRAW_CLIP_WIDTH) {
@@ -1728,7 +1728,7 @@ int advManager::ProcessHover(int mouseX, int mouseY) {
 }
 
 VA(0x0045b094, 0x21a)
-void advManager::UpdateScreen(int, int forceUpdate)
+void advManager::UpdateScreen(i32, i32 forceUpdate)
 {
     if (forceUpdate == 0 && bShowIt == 0) {
         if (KBTickCount() > glTimers[0])
@@ -1786,9 +1786,9 @@ void advManager::UpdateScreen(int, int forceUpdate)
 // +0x2e1/+0x2e4, +0x323/+0x326, +0x368/+0x36b, +0x3a8/+0x3ab,
 // +0x403/+0x406, and +0x463/+0x466.
 VA(0x0045b2ae, 0x4eb)
-void advManager::CompleteDraw(int originX, int originY, int forceDraw, int updateBottomView) {
-    int drawY;
-    int drawX;
+void advManager::CompleteDraw(i32 originX, i32 originY, i32 forceDraw, i32 updateBottomView) {
+    i32 drawY;
+    i32 drawX;
 
     PollSound();
     if (forceDraw == 0 && bShowIt == 0) {
@@ -1934,7 +1934,7 @@ void advManager::CompleteDraw(int originX, int originY, int forceDraw, int updat
 }
 
 VA(0x0045b799, 0x3a)
-void advManager::CompleteDraw(int update)
+void advManager::CompleteDraw(i32 update)
 {
     CompleteDraw(m_mapOriginX, m_mapOriginY, update, 1);
 }
@@ -1947,9 +1947,9 @@ void advManager::CompleteDraw(int update)
 // both multiplication orders and all 99 legal single-step AST variants were
 // checked without steering the remaining /Od evaluation order.
 VA(0x0045b7d3, 0x3a9)
-int advManager::GetCloudLookup(int x, int y)
+i32 advManager::GetCloudLookup(i32 x, i32 y)
 {
-    unsigned int cloudMask = 0;
+    u32 cloudMask = 0;
 
     if (x < 1)
         cloudMask |= ADVMGR_CLOUD_LEFT_EDGE;
@@ -2017,15 +2017,15 @@ int advManager::GetCloudLookup(int x, int y)
 // polarities, direct versus temporary booleans, both +31 associations, and the
 // accessor/direct forms were checked. Revisit after a material TU-state change.
 VA(0x0045bb7c, 0x24cb)
-void advManager::DrawCell(int mapX, int mapY, int screenX, int screenY,
-                          int drawMask, int forceDraw)
+void advManager::DrawCell(i32 mapX, i32 mapY, i32 screenX, i32 screenY,
+                          i32 drawMask, i32 forceDraw)
 {
-    int animFrame;
-    int heroShadowOffset;
-    int cursorFrame;
-    int boatFrameIndex;
-    int boatShadowFrameOffset;
-    int cursorSuppressed;
+    i32 animFrame;
+    i32 heroShadowOffset;
+    i32 cursorFrame;
+    i32 boatFrameIndex;
+    i32 boatShadowFrameOffset;
+    i32 cursorSuppressed;
 
     if (forceDraw == 0 && bShowIt == 0)
         return;
@@ -2641,7 +2641,7 @@ void advManager::DrawCell(int mapX, int mapY, int screenX, int screenY,
 // MAP_WIDTH<=0[&x] spellings compiled identically. Revisit after a material
 // ADVMGR predecessor/header or comparison-tool change.
 VA(0x0045e047, 0x93)
-class mapCell * advManager::GetCell(int x, int y)
+class mapCell * advManager::GetCell(i32 x, i32 y)
 {
     if (x < 0 || y < 0 || x >= MAP_WIDTH || MAP_HEIGHT <= y)
         return m_mapData->Cells();
@@ -2657,32 +2657,32 @@ class mapCell * advManager::GetCell(int x, int y)
 // and pointer-add forms compile to the same order. Revisit after a material
 // predecessor/TU-state change.
 VA(0x0045e0da, 0x104d)
-void advManager::UpdateRadar(int updateScreen, int partial)
+void advManager::UpdateRadar(i32 updateScreen, i32 partial)
 {
-    int maxXLocal;
-    int unusedRadarRowLocal;
-    int radarFrameLocal;
-    unsigned char radarColorValue = ADVMGR_RADAR_UNSEEN_COLOR;
+    i32 maxXLocal;
+    i32 unusedRadarRowLocal;
+    i32 radarFrameLocal;
+    u8 radarColorValue = ADVMGR_RADAR_UNSEEN_COLOR;
     float radarScaleState;
-    int townXValue;
-    int maxYLocal;
-    int unusedRadarCoordinateLocal;
-    int townYValue;
-    int rowRemainderState;
-    int unusedRadarDimensionValue;
-    int unusedRadarColumnState;
-    int mapRow;
-    int mapColumnLimit;
-    int ownerIndexValue;
-    unsigned char *radarPixel;
+    i32 townXValue;
+    i32 maxYLocal;
+    i32 unusedRadarCoordinateLocal;
+    i32 townYValue;
+    i32 rowRemainderState;
+    i32 unusedRadarDimensionValue;
+    i32 unusedRadarColumnState;
+    i32 mapRow;
+    i32 mapColumnLimit;
+    i32 ownerIndexValue;
+    u8 *radarPixel;
     mapCell *cellValue;
-    int screenColumnIndex;
-    unsigned char *screenRowOffset;
-    int columnRemainderValue;
-    int minYOffset;
-    int minXSlot;
-    int skipFrameIndex;
-    unsigned int objectTilesetLocal;
+    i32 screenColumnIndex;
+    u8 *screenRowOffset;
+    i32 columnRemainderValue;
+    i32 minYOffset;
+    i32 minXSlot;
+    i32 skipFrameIndex;
+    u32 objectTilesetLocal;
 
     // Retail reserves these four unreferenced named-local words above `this`.
 
@@ -2781,7 +2781,7 @@ void advManager::UpdateRadar(int updateScreen, int partial)
                         ADVMGR_RADAR_TOWN_TRIGGER) {
                         ownerIndexValue = gpGame->m_availableHeroes[cellValue->m_objectMetadata];
                         if (!(giCurPlayer != ownerIndexValue)) {
-                            int ownerColorIndex;
+                            i32 ownerColorIndex;
                             if (ownerIndexValue >= 0)
                                 ownerColorIndex = gpGame->m_players[ownerIndexValue].m_color;
                             else
@@ -2789,7 +2789,7 @@ void advManager::UpdateRadar(int updateScreen, int partial)
                             radarColorValue = gOwnerColors[ownerColorIndex];
                         }
                     } else {
-                        objectTilesetLocal = static_cast<unsigned int>(-1);
+                        objectTilesetLocal = static_cast<u32>(-1);
                         if (cellValue->m_objectIndex != 0xff) {
                             objectTilesetLocal = cellValue->m_objectTileset;
                         } else if (cellValue->m_overlayIndex != 0xff) {
@@ -2814,7 +2814,7 @@ void advManager::UpdateRadar(int updateScreen, int partial)
                             switch (objectTilesetLocal) {
                             case ADVMGR_RADAR_TOWN_TILESET_1:
                             case ADVMGR_RADAR_TOWN_TILESET_2: {
-                                int ownerColorIndex;
+                                i32 ownerColorIndex;
                                 ownerIndexValue = gpGame->m_townOwners[cellValue->m_objectMetadata];
                                 townXValue = gpGame->GetTown(cellValue->m_objectMetadata)->m_x;
                                 townYValue = gpGame->GetTown(cellValue->m_objectMetadata)->m_y;
@@ -2837,7 +2837,7 @@ void advManager::UpdateRadar(int updateScreen, int partial)
                                 switch (cellValue->m_triggerType) {
                                 case 1: case 0x17: case 0x1d:
                                 case 0x81: case 0x97: case 0x9d: {
-                                    int ownerColorIndex;
+                                    i32 ownerColorIndex;
                                     ownerIndexValue = gpGame->m_mineOwners[cellValue->m_objectMetadata];
                                     if (ownerIndexValue >= 0)
                                         ownerColorIndex = gpGame->m_players[ownerIndexValue].m_color;
@@ -2857,7 +2857,7 @@ radar_default_object:
                                 switch (cellValue->m_triggerType) {
                                 case 1: case 0x17: case 0x1d:
                                 case 0x81: case 0x97: case 0x9d: {
-                                    int ownerColorIndex;
+                                    i32 ownerColorIndex;
                                     ownerIndexValue = gpGame->m_mineOwners[cellValue->m_objectMetadata];
                                     if (ownerIndexValue >= 0)
                                         ownerColorIndex = gpGame->m_players[ownerIndexValue].m_color;
@@ -2980,14 +2980,14 @@ radar_default_object:
     if (skipFrameIndex == 0) {
         if (gbInViewWorld != 0) {
             m_puzzleIcon->ClipFillToBuffer(
-                static_cast<int>(iVWMapOriginX * radarScaleState + 480.0f),
-                static_cast<int>(iVWMapOriginY * radarScaleState + 16.0f),
+                static_cast<i32>(iVWMapOriginX * radarScaleState + 480.0f),
+                static_cast<i32>(iVWMapOriginY * radarScaleState + 16.0f),
                 radarFrameLocal, 181, 0, ADVMGR_RADAR_LEFT, ADVMGR_RADAR_TOP,
                 ADVMGR_RADAR_SIZE, ADVMGR_RADAR_SIZE);
         } else {
             m_puzzleIcon->ClipFillToBuffer(
-                static_cast<int>(m_mapOriginX * radarScaleState + 480.0f),
-                static_cast<int>(m_mapOriginY * radarScaleState + 16.0f),
+                static_cast<i32>(m_mapOriginX * radarScaleState + 480.0f),
+                static_cast<i32>(m_mapOriginY * radarScaleState + 16.0f),
                 radarFrameLocal, 181, 0, ADVMGR_RADAR_LEFT, ADVMGR_RADAR_TOP,
                 ADVMGR_RADAR_SIZE, ADVMGR_RADAR_SIZE);
         }
@@ -2996,10 +2996,10 @@ radar_default_object:
     if (updateScreen != 0) {
         if (partial != 0) {
             gpWindowManager->UpdateScreenRegion(
-                static_cast<int>(minXSlot * radarScaleState + 480.0f),
-                static_cast<int>(minYOffset * radarScaleState + 16.0f),
-                static_cast<int>((maxXLocal - minXSlot + 1) * radarScaleState),
-                static_cast<int>((maxYLocal - minYOffset + 1) * radarScaleState));
+                static_cast<i32>(minXSlot * radarScaleState + 480.0f),
+                static_cast<i32>(minYOffset * radarScaleState + 16.0f),
+                static_cast<i32>((maxXLocal - minXSlot + 1) * radarScaleState),
+                static_cast<i32>((maxYLocal - minYOffset + 1) * radarScaleState));
         } else {
             gpWindowManager->UpdateScreenRegion(ADVMGR_RADAR_LEFT, ADVMGR_RADAR_TOP,
                                                 ADVMGR_RADAR_SIZE, ADVMGR_RADAR_SIZE);
@@ -3012,20 +3012,20 @@ radar_default_object:
 // the 0x7c pointer table and adjacent byte lookup. All resolved relocation targets,
 // the 0x1fc frame, slots, and CFG agree; ours only has two trailing alignment NOPs.
 VA(0x0045f127, 0x133e)
-void advManager::QuickInfo(int cellX, int cellY)
+void advManager::QuickInfo(i32 cellX, i32 cellY)
 {
-    int quickInfoShowFlag = 1;
+    i32 quickInfoShowFlag = 1;
     mapCell *currentCell = 0;
     hero *heroLocal = 0;
-    int quickInfoScreenX;
-    int dialogTopPosition;
+    i32 quickInfoScreenX;
+    i32 dialogTopPosition;
     heroWindow *windowLocal;
-    unsigned int visitedMaskValue;
+    u32 visitedMaskValue;
     char savedTextLocal[200];
     char guardCaption[200];
-    int siteIndexName;
-    int siteFrameLocal[2];
-    int objectTilesetLocal;
+    i32 siteIndexName;
+    i32 siteFrameLocal[2];
+    i32 objectTilesetLocal;
     char uppercaseResult;
     char mapObjectKindValue;
     tag_message message;
@@ -3215,7 +3215,7 @@ quick_info_guarded:
         sprintf(gText, gQuickViewText[currentCell->m_triggerType & 0x7f],
                 xBarrierColor[currentCell->m_objectMetadata & 7]);
         uppercaseResult = static_cast<char>(
-            toupper(static_cast<int>(static_cast<signed char>(gText[0]))));
+            toupper(static_cast<i32>(static_cast<i8>(gText[0]))));
         gText[0] = uppercaseResult;
         break;
     case ADVMGR_OBJECT_GENERIC_SITE: {
@@ -3363,17 +3363,17 @@ quick_info_ready:
 // inline accessor/expression context is recovered, or after the SOURCE
 // placeholder census reaches zero; do not repeat these spellings beforehand.
 VA(0x00460465, 0x348)
-void advManager::UpdateHeroLocator(int locatorSlot, int drawWindow,
-                                   int updateScreen)
+void advManager::UpdateHeroLocator(i32 locatorSlot, i32 drawWindow,
+                                   i32 updateScreen)
 {
     hero *locatorHero8;
-    int mobilityFrame18;
-    int manaFrame36;
-    int selectedHero9;
-    int widgetBase7;
-    int index3;
+    i32 mobilityFrame18;
+    i32 manaFrame36;
+    i32 selectedHero9;
+    i32 widgetBase7;
+    i32 index3;
     tag_message locatorMessage15;
-    int heroId9;
+    i32 heroId9;
 
     if (!gbThisNetHumanPlayer[giCurPlayer])
         return;
@@ -3476,9 +3476,9 @@ void advManager::UpdateHeroLocator(int locatorSlot, int drawWindow,
 // ordered relocation fields; every effective target agrees. The sole raw byte
 // residual is inside the delinked __adjust_fdiv/iLeftRightSave relocation.
 VA(0x004607ad, 0x102)
-void advManager::UpdateHeroLocators(int drawWindow, int updateScreen)
+void advManager::UpdateHeroLocators(i32 drawWindow, i32 updateScreen)
 {
-    int locatorSlot;
+    i32 locatorSlot;
     double scrollStep;
 
     if (!gbThisNetHumanPlayer[giCurPlayer])
@@ -3494,7 +3494,7 @@ void advManager::UpdateHeroLocators(int drawWindow, int updateScreen)
         scrollStep = static_cast<double>(ADVMGR_LOCATOR_HERO_SCROLL_SPAN) /
                      (gpCurPlayer->m_heroCount -
                       ADVMGR_LOCATOR_PAGE_DENOMINATOR_OFFSET);
-        m_scrollLeftButton->m_y = static_cast<short>(
+        m_scrollLeftButton->m_y = static_cast<i16>(
             gpCurPlayer->m_heroLocatorPage * scrollStep +
             ADVMGR_LOCATOR_SCROLL_BASE_Y);
     }
@@ -3507,11 +3507,11 @@ void advManager::UpdateHeroLocators(int drawWindow, int updateScreen)
 // ordered relocation fields; every effective target agrees. The sole raw byte
 // residual is inside the delinked __adjust_fdiv/iLeftRightSave relocation.
 VA(0x004608af, 0x2e8)
-void advManager::UpdateTownLocators(int drawWindow, int updateScreen)
+void advManager::UpdateTownLocators(i32 drawWindow, i32 updateScreen)
 {
-    int locatorSlot;
+    i32 locatorSlot;
     tag_message locatorMessage14;
-    int townId37;
+    i32 townId37;
     double scrollStep;
 
     if (!gbThisNetHumanPlayer[giCurPlayer])
@@ -3586,7 +3586,7 @@ void advManager::UpdateTownLocators(int drawWindow, int updateScreen)
         scrollStep = static_cast<double>(ADVMGR_LOCATOR_TOWN_SCROLL_SPAN) /
                      (gpCurPlayer->m_townCount -
                       ADVMGR_LOCATOR_PAGE_DENOMINATOR_OFFSET);
-        m_scrollRightButton->m_y = static_cast<short>(
+        m_scrollRightButton->m_y = static_cast<i16>(
             gpCurPlayer->m_townLocatorPage * scrollStep +
             ADVMGR_LOCATOR_SCROLL_BASE_Y);
     }
@@ -3601,10 +3601,10 @@ void advManager::UpdateTownLocators(int drawWindow, int updateScreen)
 // enemy-path goto emits two extra continuations; both expiry-test polarities
 // were checked. Revisit only after the SOURCE placeholder census reaches zero.
 VA(0x00460b97, 0x1cc)
-void advManager::UpdBottomView(int forceUpdate, int drawWindow,
-                               int updateScreen)
+void advManager::UpdBottomView(i32 forceUpdate, i32 drawWindow,
+                               i32 updateScreen)
 {
-    int updated;
+    i32 updated;
 
     updated = 0;
     gbForceUpdate = forceUpdate;
@@ -3657,7 +3657,7 @@ update_bottom_view:
 VA(0x00460d63, 0x132)
 void advManager::ClearBottomView(void)
 {
-    int widgetIndex;
+    i32 widgetIndex;
 
     if (iCurBottomView == ADVMGR_BOTTOM_VIEW_NONE)
         return;
@@ -3690,9 +3690,9 @@ void advManager::ClearBottomView(void)
 // orders compile identically, while direct member access only moves the inline
 // continuation. Revisit after a material TU-state change or in the last-mile phase.
 VA(0x00460e95, 0x51b)
-int advManager::UpdBottomViewEnemyTurn(void)
+i32 advManager::UpdBottomViewEnemyTurn(void)
 {
-    int updated;
+    i32 updated;
     tag_message message;
 
     updated = 0;
@@ -3822,12 +3822,12 @@ int advManager::UpdBottomViewEnemyTurn(void)
 // source-supported fourth role. Revisit only if later type/predecessor recovery
 // explains the word or a relevant ADVMGR TU/header change alters the frame.
 VA(0x004613b0, 0x366)
-int advManager::UpdBottomViewNewTurn(void)
+i32 advManager::UpdBottomViewNewTurn(void)
 {
-    DATA(0x004f6134) static short s_newTurnLineBase =
+    DATA(0x004f6134) static i16 s_newTurnLineBase =
         ADVMGR_NEW_TURN_LINE_BASE;
 
-    int dateIconFrame;
+    i32 dateIconFrame;
     char *weekText;
     char *dayText;
 
@@ -3891,15 +3891,15 @@ int advManager::UpdBottomViewNewTurn(void)
 }
 
 VA(0x00461716, 0x35f)
-int advManager::UpdBottomViewResMsg(void)
+i32 advManager::UpdBottomViewResMsg(void)
 {
-    DATA(0x004f61f4) static short s_resourceViewLineBase =
+    DATA(0x004f61f4) static i16 s_resourceViewLineBase =
         ADVMGR_RESOURCE_VIEW_LINE_BASE;
 
-    int iconWidth6;
-    int iconHeight11;
-    int textY19;
-    int lineCount10;
+    i32 iconWidth6;
+    i32 iconHeight11;
+    i32 textY19;
+    i32 lineCount10;
     char *messageText2;
     char *resourceCountText6;
 
@@ -3978,16 +3978,16 @@ int advManager::UpdBottomViewResMsg(void)
 }
 
 VA(0x00461a75, 0x363)
-int advManager::UpdBottomViewKingdom(void)
+i32 advManager::UpdBottomViewKingdom(void)
 {
-    DATA(0x004f6294) static short s_kingdomViewLineBase =
+    DATA(0x004f6294) static i16 s_kingdomViewLineBase =
         ADVMGR_KINGDOM_VIEW_LINE_BASE;
 
-    int villageCount37;
-    int index11;
-    int castleCount12;
-    signed char textY5[ADVMGR_KINGDOM_VIEW_ENTRY_COUNT];
-    unsigned char textX[ADVMGR_KINGDOM_VIEW_ENTRY_COUNT];
+    i32 villageCount37;
+    i32 index11;
+    i32 castleCount12;
+    i8 textY5[ADVMGR_KINGDOM_VIEW_ENTRY_COUNT];
+    u8 textX[ADVMGR_KINGDOM_VIEW_ENTRY_COUNT];
     char *countText14[ADVMGR_KINGDOM_VIEW_ENTRY_COUNT];
 
     if (!gbForceUpdate && iCurBottomView == ADVMGR_BOTTOM_VIEW_KINGDOM)
@@ -4071,27 +4071,27 @@ int advManager::UpdBottomViewKingdom(void)
 // @early-stop
 // Exact bytes and all 36 relocation targets.
 VA(0x00461dd8, 0x583)
-int advManager::UpdBottomViewHero(void)
+i32 advManager::UpdBottomViewHero(void)
 {
-    DATA(0x004f6300) static short s_bottomHeroLineBase =
+    DATA(0x004f6300) static i16 s_bottomHeroLineBase =
         ADVMGR_BOTTOM_HERO_LINE_BASE;
 
     char *armyCountLabelsResult[ADVMGR_BOTTOM_HERO_ARMY_SLOTS];
     icon *monsterIconsLocal;
-    int occupiedSlotsLocal;
+    i32 occupiedSlotsLocal;
     hero *targetHero;
-    int armySlot;
-    int displayIndexData;
-    int creature;
+    i32 armySlot;
+    i32 displayIndexData;
+    i32 creature;
     IconEntry *iconEntryValue;
-    int groupWidthRef;
-    int layoutIndexIndex;
-    int iconX;
-    int iconY;
-    int labelY;
-    int labelWidthCount;
-    int labelX;
-    int creatureBoundsLocal[2];
+    i32 groupWidthRef;
+    i32 layoutIndexIndex;
+    i32 iconX;
+    i32 iconY;
+    i32 labelY;
+    i32 labelWidthCount;
+    i32 labelX;
+    i32 creatureBoundsLocal[2];
 
     if (!gbForceUpdate && iCurBottomView == ADVMGR_BOTTOM_HERO_VIEW_ID)
         return 0;
@@ -4121,11 +4121,11 @@ int advManager::UpdBottomViewHero(void)
         for (armySlot = 0; armySlot < ADVMGR_BOTTOM_HERO_ARMY_SLOTS; ++armySlot) {
             creature = targetHero->m_army.m_creatureTypes[armySlot];
             if (creature != ADVMGR_BOTTOM_HERO_EMPTY_SLOT) {
-                unsigned char iconPositions[16] = {
+                u8 iconPositions[16] = {
                     50, 3, 96, 3, 50, 17, 73, 17,
                     96, 17, 27, 32, 73, 32, 119, 32
                 };
-                signed char armyLayouts[ADVMGR_BOTTOM_HERO_ARMY_SLOTS]
+                i8 armyLayouts[ADVMGR_BOTTOM_HERO_ARMY_SLOTS]
                                              [ADVMGR_BOTTOM_HERO_ARMY_SLOTS] = {
                     {3, -1, -1, -1, -1},
                     {2, 4, -1, -1, -1},
@@ -4211,20 +4211,20 @@ int advManager::UpdBottomViewHero(void)
 // barrier were checked; the current loop reversal and OR-zero forms were byte-neutral.
 // Revisit after a material ADVMGR predecessor/header or comparison-tool change.
 VA(0x0046235b, 0xd32)
-void advManager::HeroQuickView(int heroId, int locatorSlot, int windowX, int windowY)
+void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 windowY)
 {
-    DATA(0x004f6370) static short s_quickViewLineBase =
+    DATA(0x004f6370) static i16 s_quickViewLineBase =
         ADVMGR_QUICK_VIEW_LINE_BASE;
 
-    short armyAreaWidthLocal = 160;
-    short armyAreaLeftLocal = 22;
-    short detailedCreatureY = 124;
-    short stackIconWidthData = 32;
-    short creatureIconHeight = 32;
-    short widgetEnableFlagLocal = 1;
-    short portraitWidgetLocal = 2;
-    short primaryStatsWidgetValue = 3;
-    short playerColorWidgetId = 8;
+    i16 armyAreaWidthLocal = 160;
+    i16 armyAreaLeftLocal = 22;
+    i16 detailedCreatureY = 124;
+    i16 stackIconWidthData = 32;
+    i16 creatureIconHeight = 32;
+    i16 widgetEnableFlagLocal = 1;
+    i16 portraitWidgetLocal = 2;
+    i16 primaryStatsWidgetValue = 3;
+    i16 playerColorWidgetId = 8;
     iconWidget *stackIconsWidgets[5];
     textWidget *creatureTextWidgetsLocal[5];
     char *armyLabelsStrings[5];
@@ -4232,10 +4232,10 @@ void advManager::HeroQuickView(int heroId, int locatorSlot, int windowX, int win
     icon *monsterIconRef;
     hero *targetHero;
     heroWindow *quickWindowSlot;
-    int visibleArmyCountState;
-    int armyIndex;
-    int previousOriginXState;
-    int savedOriginY;
+    i32 visibleArmyCountState;
+    i32 armyIndex;
+    i32 previousOriginXState;
+    i32 savedOriginY;
 
     quickViewMessageState.type = 0x200;
     if (heroId == ADVMGR_INVALID_HERO)
@@ -4296,23 +4296,23 @@ void advManager::HeroQuickView(int heroId, int locatorSlot, int windowX, int win
         quickWindowSlot->BroadcastMessage(quickViewMessageState);
 
         if (visibleArmyCountState != 0) {
-            int armyStartPosition = (160 - visibleArmyCountState * 32) / 2 + 22;
-            int displayIndexStateOffset = 0;
-            int creature;
+            i32 armyStartPosition = (160 - visibleArmyCountState * 32) / 2 + 22;
+            i32 displayIndexStateOffset = 0;
+            i32 creature;
             for (armyIndex = 0; armyIndex < visibleArmyCountState; ++armyIndex) {
                 while (targetHero->m_army.m_creatureTypes[displayIndexStateOffset] == -1)
                     ++displayIndexStateOffset;
                 creature = targetHero->m_army.m_creatureTypes[displayIndexStateOffset];
                 if (creature != -1) {
                 stackIconsWidgets[armyIndex] = new iconWidget(
-                    static_cast<short>(armyIndex * 32 + armyStartPosition -
+                    static_cast<i16>(armyIndex * 32 + armyStartPosition -
                         GetIconEntry(monsterIconRef, creature)->x +
                         (32 - GetIconEntry(monsterIconRef, creature)->w) / 2 + 1),
-                    static_cast<short>(124 -
+                    static_cast<i16>(124 -
                         GetIconEntry(monsterIconRef, creature)->y -
                         GetIconEntry(monsterIconRef, creature)->h + 30),
                     32, 32, "mons32.icn",
-                    static_cast<short>(creature), 0, -1, 16, 1);
+                    static_cast<i16>(creature), 0, -1, 16, 1);
                 if (stackIconsWidgets[armyIndex] == 0)
                     MemError();
                 armyLabelsStrings[armyIndex] = static_cast<char *>(BaseAlloc(
@@ -4322,8 +4322,8 @@ void advManager::HeroQuickView(int heroId, int locatorSlot, int windowX, int win
                 sprintf(armyLabelsStrings[armyIndex], "%d",
                         targetHero->m_army.m_creatureCounts[displayIndexStateOffset]);
                 creatureTextWidgetsLocal[armyIndex] = new textWidget(
-                    static_cast<short>(armyIndex * 32 + armyStartPosition),
-                    static_cast<short>(124 + 32), 32, 12,
+                    static_cast<i16>(armyIndex * 32 + armyStartPosition),
+                    static_cast<i16>(124 + 32), 32, 12,
                     armyLabelsStrings[armyIndex], "smalfont.fnt", 1, -1,
                     0x200, 1);
                 if (creatureTextWidgetsLocal[armyIndex] == 0)
@@ -4335,10 +4335,10 @@ void advManager::HeroQuickView(int heroId, int locatorSlot, int windowX, int win
             }
         }
     } else if (visibleArmyCountState != 0) {
-        int rowYCurrent = 73;
-        int topRowCount;
-        int secondRowCountTotal;
-        int creatureTypeId;
+        i32 rowYCurrent = 73;
+        i32 topRowCount;
+        i32 secondRowCountTotal;
+        i32 creatureTypeId;
         switch (visibleArmyCountState) {
         case 1:
         case 2:
@@ -4357,22 +4357,22 @@ void advManager::HeroQuickView(int heroId, int locatorSlot, int windowX, int win
             break;
         }
 
-        int displayIndexValue = 0;
-        int armySpacing = 160 / topRowCount;
-        int slotStartPosition = (armySpacing - 32) / 2 + 22;
+        i32 displayIndexValue = 0;
+        i32 armySpacing = 160 / topRowCount;
+        i32 slotStartPosition = (armySpacing - 32) / 2 + 22;
         for (armyIndex = 0; armyIndex < topRowCount; ++armyIndex) {
             while (targetHero->m_army.m_creatureTypes[displayIndexValue] == -1)
                 ++displayIndexValue;
             creatureTypeId = targetHero->m_army.m_creatureTypes[displayIndexValue];
             stackIconsWidgets[armyIndex] = new iconWidget(
-                static_cast<short>(armyIndex * armySpacing +
+                static_cast<i16>(armyIndex * armySpacing +
                     slotStartPosition - GetIconEntry(monsterIconRef, creatureTypeId)->x +
                     (32 - GetIconEntry(monsterIconRef, creatureTypeId)->w) / 2 + 1),
-                static_cast<short>(rowYCurrent -
+                static_cast<i16>(rowYCurrent -
                     GetIconEntry(monsterIconRef, creatureTypeId)->y -
                     GetIconEntry(monsterIconRef, creatureTypeId)->h + 30),
                 32, 32, "mons32.icn",
-                static_cast<short>(creatureTypeId), 0, -1, 16, 1);
+                static_cast<i16>(creatureTypeId), 0, -1, 16, 1);
             if (stackIconsWidgets[armyIndex] == 0)
                 MemError();
             armyLabelsStrings[armyIndex] = static_cast<char *>(BaseAlloc(
@@ -4382,8 +4382,8 @@ void advManager::HeroQuickView(int heroId, int locatorSlot, int windowX, int win
             strcpy(armyLabelsStrings[armyIndex],
                    GetArmySizeName(targetHero->m_army.m_creatureCounts[displayIndexValue], 0));
             creatureTextWidgetsLocal[armyIndex] = new textWidget(
-                static_cast<short>(armyIndex * armySpacing + 22),
-                static_cast<short>(rowYCurrent + 32), armySpacing, 12,
+                static_cast<i16>(armyIndex * armySpacing + 22),
+                static_cast<i16>(rowYCurrent + 32), armySpacing, 12,
                 armyLabelsStrings[armyIndex], "smalfont.fnt", 1, -1,
                 0x200, 1);
             if (creatureTextWidgetsLocal[armyIndex] == 0)
@@ -4403,15 +4403,15 @@ void advManager::HeroQuickView(int heroId, int locatorSlot, int windowX, int win
                     ++displayIndexValue;
                 creatureTypeId = targetHero->m_army.m_creatureTypes[displayIndexValue];
                 stackIconsWidgets[armyIndex] = new iconWidget(
-                    static_cast<short>((armyIndex - 2) * armySpacing +
+                    static_cast<i16>((armyIndex - 2) * armySpacing +
                         slotStartPosition -
                         GetIconEntry(monsterIconRef, creatureTypeId)->x +
                         (32 - GetIconEntry(monsterIconRef, creatureTypeId)->w) / 2 + 1),
-                    static_cast<short>(rowYCurrent -
+                    static_cast<i16>(rowYCurrent -
                         GetIconEntry(monsterIconRef, creatureTypeId)->y -
                         GetIconEntry(monsterIconRef, creatureTypeId)->h + 30 + 6),
                     32, 32, "mons32.icn",
-                    static_cast<short>(creatureTypeId), 0, -1, 16, 1);
+                    static_cast<i16>(creatureTypeId), 0, -1, 16, 1);
                 if (stackIconsWidgets[armyIndex] == 0)
                     MemError();
                 armyLabelsStrings[armyIndex] = static_cast<char *>(BaseAlloc(
@@ -4421,8 +4421,8 @@ void advManager::HeroQuickView(int heroId, int locatorSlot, int windowX, int win
                 strcpy(armyLabelsStrings[armyIndex],
                        GetArmySizeName(targetHero->m_army.m_creatureCounts[displayIndexValue], 0));
                 creatureTextWidgetsLocal[armyIndex] = new textWidget(
-                    static_cast<short>((armyIndex - 2) * armySpacing + 22),
-                    static_cast<short>(rowYCurrent + 38), armySpacing, 12,
+                    static_cast<i16>((armyIndex - 2) * armySpacing + 22),
+                    static_cast<i16>(rowYCurrent + 38), armySpacing, 12,
                     armyLabelsStrings[armyIndex], "smalfont.fnt", 1, -1,
                     0x200, 1);
                 if (creatureTextWidgetsLocal[armyIndex] == 0)
@@ -4449,12 +4449,12 @@ void advManager::HeroQuickView(int heroId, int locatorSlot, int windowX, int win
     CompleteDraw(0);
     UpdateScreen(0, 0);
     if (quickViewMessageState.type == 8 && targetHero->m_owner == giCurPlayer)
-        SetHeroContext(static_cast<unsigned char>(targetHero->m_id), 0);
+        SetHeroContext(static_cast<u8>(targetHero->m_id), 0);
     gpResourceManager->Dispose(monsterIconRef);
 }
 
 VA(0x0046308d, 0x120)
-char * advManager::GetArmySizeName(int armySize, int grammar)
+char * advManager::GetArmySizeName(i32 armySize, i32 grammar)
 {
     if (giDebugLevel > 0) {
         sprintf(cArmySizeName, "%d", armySize);
@@ -4488,28 +4488,28 @@ char * advManager::GetArmySizeName(int armySize, int grammar)
 // commuting this loop bound was also byte-neutral. Revisit after a material
 // ADVMGR predecessor/header or comparison-tool change.
 VA(0x004631ad, 0xc29)
-void advManager::TownQuickView(int townId, int locatorSlot, int windowX, int windowY)
+void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 windowY)
 {
-    DATA(0x004f6488) static short s_townViewLineBase =
+    DATA(0x004f6488) static i16 s_townViewLineBase =
         ADVMGR_TOWN_VIEW_LINE_BASE;
 
     icon *monsterIconLocal;
-    short portraitWidgetLocal;
-    short armyIconHeightState;
+    i16 portraitWidgetLocal;
+    i16 armyIconHeightState;
     tag_message messageLocal;
-    int armyCountLocal;
-    int armyIndex;
-    short armyIconWidthState;
-    short widgetEnabledData;
-    short colorWidgetValue;
-    int previousOriginXValue;
+    i32 armyCountLocal;
+    i32 armyIndex;
+    i16 armyIconWidthState;
+    i16 widgetEnabledData;
+    i16 colorWidgetValue;
+    i32 previousOriginXValue;
     heroWindow *townQuickWindow;
     town *quickTownLocal;
-    int previousOriginYSlot;
-    int informationLevel;
+    i32 previousOriginYSlot;
+    i32 informationLevel;
     char *emptyArmyLabel;
-    short armyAreaWidth;
-    short armyAreaLeftValue;
+    i16 armyAreaWidth;
+    i16 armyAreaLeftValue;
     widget *emptyArmyTextState;
 
     armyAreaWidth = 192;
@@ -4554,7 +4554,7 @@ void advManager::TownQuickView(int townId, int locatorSlot, int windowX, int win
     townQuickWindow->BroadcastMessage(messageLocal);
 
     if (informationLevel != 3 ||
-        BitTest(gpGame->m_knownTowns, static_cast<signed char>(quickTownLocal->m_id)) == 0) {
+        BitTest(gpGame->m_knownTowns, static_cast<i8>(quickTownLocal->m_id)) == 0) {
         messageLocal.payload.widget.command = 6;
         messageLocal.payload.widget.id = 300;
         messageLocal.payload.widget.data.value = 4;
@@ -4578,7 +4578,7 @@ void advManager::TownQuickView(int townId, int locatorSlot, int windowX, int win
         townQuickWindow->BroadcastMessage(messageLocal);
     }
 
-    sprintf(gText, GetTownName(static_cast<signed char>(quickTownLocal->m_id)));
+    sprintf(gText, GetTownName(static_cast<i8>(quickTownLocal->m_id)));
     messageLocal.payload.widget.command = 3;
     messageLocal.payload.widget.id = 1;
     messageLocal.payload.widget.data.text = gText;
@@ -4603,19 +4603,19 @@ void advManager::TownQuickView(int townId, int locatorSlot, int windowX, int win
             MemError();
         townQuickWindow->AddWidget(emptyArmyTextState, -1);
     } else {
-        int secondRowCountState;
-        int creatureSlotLocal;
+        i32 secondRowCountState;
+        i32 creatureSlotLocal;
         char *armyLabelsResult[5];
-        int creatureLocal;
+        i32 creatureLocal;
         iconWidget *armyIcons[5];
         textWidget *armyTexts[5];
-        int displayIndexLocal;
-        int widgetIndexWidget;
-        int slotWidthSlot;
-        int fiveArmyShiftValue;
-        int slotStartState;
-        int rowY;
-        int firstRowCountState;
+        i32 displayIndexLocal;
+        i32 widgetIndexWidget;
+        i32 slotWidthSlot;
+        i32 fiveArmyShiftValue;
+        i32 slotStartState;
+        i32 rowY;
+        i32 firstRowCountState;
 
         rowY = 76;
         switch (armyCountLocal) {
@@ -4649,14 +4649,14 @@ void advManager::TownQuickView(int townId, int locatorSlot, int windowX, int win
                 ++creatureSlotLocal;
             creatureLocal = quickTownLocal->m_army.m_creatureTypes[creatureSlotLocal];
             armyIcons[widgetIndexWidget] = new iconWidget(
-                static_cast<short>(slotWidthSlot * (widgetIndexWidget | 0) +
+                static_cast<i16>(slotWidthSlot * (widgetIndexWidget | 0) +
                     slotStartState +
                     fiveArmyShiftValue - GetIconEntry(monsterIconLocal, creatureLocal)->x +
                     (32 - GetIconEntry(monsterIconLocal, creatureLocal)->w) / 2 + 1),
-                static_cast<short>(rowY - GetIconEntry(monsterIconLocal, creatureLocal)->y -
+                static_cast<i16>(rowY - GetIconEntry(monsterIconLocal, creatureLocal)->y -
                     GetIconEntry(monsterIconLocal, creatureLocal)->h + 30),
                 32, 32, "mons32.icn",
-                static_cast<short>(creatureLocal), 0, -1, 16, 1);
+                static_cast<i16>(creatureLocal), 0, -1, 16, 1);
             if (armyIcons[widgetIndexWidget] == 0)
                 MemError();
             armyLabelsResult[widgetIndexWidget] = static_cast<char *>(BaseAlloc(
@@ -4672,9 +4672,9 @@ void advManager::TownQuickView(int townId, int locatorSlot, int windowX, int win
             else
                 strcpy(armyLabelsResult[widgetIndexWidget], "???");
             armyTexts[widgetIndexWidget] = new textWidget(
-                static_cast<short>(slotWidthSlot * (widgetIndexWidget | 0) +
+                static_cast<i16>(slotWidthSlot * (widgetIndexWidget | 0) +
                     slotStartState +
-                    fiveArmyShiftValue - 14), static_cast<short>(rowY + 32), 60, 12,
+                    fiveArmyShiftValue - 14), static_cast<i16>(rowY + 32), 60, 12,
                 armyLabelsResult[widgetIndexWidget], "smalfont.fnt", 1, -1,
                 0x200, 1);
             if (armyTexts[widgetIndexWidget] == 0)
@@ -4695,14 +4695,14 @@ void advManager::TownQuickView(int townId, int locatorSlot, int windowX, int win
                     ++creatureSlotLocal;
                 creatureLocal = quickTownLocal->m_army.m_creatureTypes[creatureSlotLocal];
                 armyIcons[widgetIndexWidget] = new iconWidget(
-                    static_cast<short>((widgetIndexWidget - firstRowCountState) *
+                    static_cast<i16>((widgetIndexWidget - firstRowCountState) *
                         slotWidthSlot + slotStartState -
                         GetIconEntry(monsterIconLocal, creatureLocal)->x +
                         (32 - GetIconEntry(monsterIconLocal, creatureLocal)->w) / 2 + 1),
-                    static_cast<short>(rowY - GetIconEntry(monsterIconLocal, creatureLocal)->y -
+                    static_cast<i16>(rowY - GetIconEntry(monsterIconLocal, creatureLocal)->y -
                         GetIconEntry(monsterIconLocal, creatureLocal)->h + 30),
                     32, 32, "mons32.icn",
-                    static_cast<short>(creatureLocal), 0, -1, 16, 1);
+                    static_cast<i16>(creatureLocal), 0, -1, 16, 1);
                 if (armyIcons[widgetIndexWidget] == 0)
                     MemError();
                 armyLabelsResult[widgetIndexWidget] = static_cast<char *>(BaseAlloc(
@@ -4718,9 +4718,9 @@ void advManager::TownQuickView(int townId, int locatorSlot, int windowX, int win
                 else
                     strcpy(armyLabelsResult[widgetIndexWidget], "???");
                 armyTexts[widgetIndexWidget] = new textWidget(
-                    static_cast<short>((widgetIndexWidget - firstRowCountState) *
+                    static_cast<i16>((widgetIndexWidget - firstRowCountState) *
                         slotWidthSlot + slotStartState - 14),
-                    static_cast<short>(rowY + 32), 60, 12,
+                    static_cast<i16>(rowY + 32), 60, 12,
                     armyLabelsResult[widgetIndexWidget], "smalfont.fnt", 1, -1,
                     0x200, 1);
                 if (armyTexts[widgetIndexWidget] == 0)
@@ -4748,14 +4748,14 @@ void advManager::TownQuickView(int townId, int locatorSlot, int windowX, int win
     CompleteDraw(0);
     UpdateScreen(0, 0);
     if (messageLocal.type == 8 && quickTownLocal->m_owner == giCurPlayer)
-        SetTownContext(static_cast<signed char>(quickTownLocal->m_id));
+        SetTownContext(static_cast<i8>(quickTownLocal->m_id));
     gpResourceManager->Dispose(monsterIconLocal);
 }
 
 VA(0x00463dd6, 0x11f)
-void advManager::RedrawAdvScreen(int update, int freeBorder)
+void advManager::RedrawAdvScreen(i32 update, i32 freeBorder)
 {
-    DATA(0x004f6590) static short s_redrawBorderFreeLineBase =
+    DATA(0x004f6590) static i16 s_redrawBorderFreeLineBase =
         ADVMGR_REDRAW_BORDER_FREE_LINE_BASE;
 
     if (!bShowIt)
@@ -4795,7 +4795,7 @@ void advManager::DeactivateCurrHero(void)
 }
 
 VA(0x00463f3b, 0x5a)
-void advManager::MobilizeCurrHero(int update)
+void advManager::MobilizeCurrHero(i32 update)
 {
     if (gpCurPlayer->m_currentHero == ADVMGR_INVALID_HERO)
         return;
@@ -4826,7 +4826,7 @@ void advManager::DemobilizeCurrHero(void)
     mapCell *currentCell = GetCell(currentHero->m_x, currentHero->m_y);
     currentHero->m_locationType = currentCell->m_triggerType;
     currentHero->m_occupiedTown = currentCell->m_objectMetadata;
-    currentHero->m_direction = static_cast<unsigned char>(m_cursorDirection);
+    currentHero->m_direction = static_cast<u8>(m_cursorDirection);
     if (m_cursorType == CURSOR_HERO_TYPE_BOAT)
         currentHero->m_eventFlags = HERO_EVENT_EMBARKED | currentHero->m_eventFlags;
     currentCell->m_triggerType = MAP_EVENT_ACTION_FLAG | MAP_EVENT_HERO_INTERACTION;
@@ -4838,25 +4838,25 @@ void advManager::DemobilizeCurrHero(void)
 }
 
 VA(0x00464101, 0x217)
-void advManager::SetTownContext(int townId)
+void advManager::SetTownContext(i32 townId)
 {
     DeactivateCurrHero();
-    gpCurPlayer->m_currentTown = static_cast<signed char>(townId);
+    gpCurPlayer->m_currentTown = static_cast<i8>(townId);
     town *currentTownValue = gpGame->GetTown(gpCurPlayer->m_currentTown);
     m_mapOriginX = currentTownValue->m_x - ADVMGR_VIEW_CENTER_OFFSET;
     m_mapOriginY = currentTownValue->m_y - ADVMGR_VIEW_CENTER_OFFSET;
 
-    int selectedIndex7 = 0;
-    int index;
+    i32 selectedIndex7 = 0;
+    i32 index;
     for (index = 0; index < gpCurPlayer->m_townCount; ++index) {
         if (gpCurPlayer->m_townIds[index] == townId)
             selectedIndex7 = index;
     }
     if (selectedIndex7 < gpCurPlayer->m_townLocatorPage)
-        gpCurPlayer->m_townLocatorPage = static_cast<signed char>(selectedIndex7);
+        gpCurPlayer->m_townLocatorPage = static_cast<i8>(selectedIndex7);
     else if (gpCurPlayer->m_townLocatorPage + ADVMGR_LOCATOR_VISIBLE_COUNT - 1 <
              selectedIndex7)
-        gpCurPlayer->m_townLocatorPage = static_cast<signed char>(
+        gpCurPlayer->m_townLocatorPage = static_cast<i8>(
             selectedIndex7 - (ADVMGR_LOCATOR_VISIBLE_COUNT - 1));
 
     UpdateHeroLocators(1, 1);
@@ -4880,7 +4880,7 @@ void advManager::SetTownContext(int townId)
 }
 
 VA(0x00464318, 0x392)
-void advManager::SetHeroContext(int heroId, int update)
+void advManager::SetHeroContext(i32 heroId, i32 update)
 {
     if (heroId == ADVMGR_INVALID_HERO)
         return;
@@ -4889,7 +4889,7 @@ void advManager::SetHeroContext(int heroId, int update)
     HideRoute(0, 0, 1);
     DeactivateCurrHero();
     m_heroContextLocked = 1;
-    gpCurPlayer->m_currentHero = static_cast<signed char>(heroId);
+    gpCurPlayer->m_currentHero = static_cast<i8>(heroId);
     hero *currentHero = gpGame->GetHero(gpCurPlayer->m_currentHero);
     m_mapOriginX = currentHero->m_x - ADVMGR_VIEW_CENTER_OFFSET;
     m_mapOriginY = currentHero->m_y - ADVMGR_VIEW_CENTER_OFFSET;
@@ -4910,17 +4910,17 @@ void advManager::SetHeroContext(int heroId, int update)
                         currentHero->m_locationType, currentHero->m_occupiedTown,
                         0, 4);
 
-    int selectedIndex7 = 0;
-    int index;
+    i32 selectedIndex7 = 0;
+    i32 index;
     for (index = 0; index < gpCurPlayer->m_heroCount; ++index) {
         if (gpCurPlayer->m_heroIds[index] == heroId)
             selectedIndex7 = index;
     }
     if (selectedIndex7 < gpCurPlayer->m_heroLocatorPage)
-        gpCurPlayer->m_heroLocatorPage = static_cast<signed char>(selectedIndex7);
+        gpCurPlayer->m_heroLocatorPage = static_cast<i8>(selectedIndex7);
     else if (gpCurPlayer->m_heroLocatorPage + ADVMGR_LOCATOR_VISIBLE_COUNT - 1 <
              selectedIndex7)
-        gpCurPlayer->m_heroLocatorPage = static_cast<signed char>(
+        gpCurPlayer->m_heroLocatorPage = static_cast<i8>(
             selectedIndex7 - (ADVMGR_LOCATOR_VISIBLE_COUNT - 1));
 
     UpdateHeroLocators(1, 1);
@@ -4960,15 +4960,15 @@ void advManager::SetHeroContext(int heroId, int update)
 VA(0x004646aa, 0x22f)
 void advManager::DoHeroKnob(void)
 {
-    int previousPageSlot = gpCurPlayer->m_heroLocatorPage;
-    int locatorCount29 = gpCurPlayer->m_heroCount;
-    int newPageState;
+    i32 previousPageSlot = gpCurPlayer->m_heroLocatorPage;
+    i32 locatorCount29 = gpCurPlayer->m_heroCount;
+    i32 newPageState;
     double pageHeight7 = static_cast<double>(ADVMGR_LOCATOR_HERO_SCROLL_SPAN) /
                          (locatorCount29 - ADVMGR_LOCATOR_VISIBLE_COUNT);
-    int mouseX4;
-    int mouseYState;
+    i32 mouseX4;
+    i32 mouseYState;
     gpMouseManager->MouseCoords(mouseX4, mouseYState);
-    int dragOffset5 = mouseYState - m_scrollLeftButton->m_y;
+    i32 dragOffset5 = mouseYState - m_scrollLeftButton->m_y;
     gpInputManager->Flush();
     tag_message message = gpInputManager->GetEvent();
 
@@ -4983,11 +4983,11 @@ void advManager::DoHeroKnob(void)
             m_scrollLeftButton->m_y = message.payload.mouse.y - dragOffset5;
             m_adventureWindow->DrawWindow();
             if (locatorCount29 > ADVMGR_LOCATOR_VISIBLE_COUNT) {
-                newPageState = static_cast<int>(
+                newPageState = static_cast<i32>(
                     (m_scrollLeftButton->m_y - ADVMGR_LOCATOR_SCROLL_BASE_Y) /
                     pageHeight7);
                 if (newPageState != previousPageSlot) {
-                    gpCurPlayer->m_heroLocatorPage = static_cast<signed char>(newPageState);
+                    gpCurPlayer->m_heroLocatorPage = static_cast<i8>(newPageState);
                     if (newPageState >
                         locatorCount29 - (ADVMGR_LOCATOR_VISIBLE_COUNT - 1))
                         newPageState =
@@ -5017,15 +5017,15 @@ void advManager::DoHeroKnob(void)
 VA(0x004648d9, 0x22f)
 void advManager::DoTownKnob(void)
 {
-    int previousPageSlot = gpCurPlayer->m_townLocatorPage;
-    int locatorCount29 = gpCurPlayer->m_townCount;
-    int newPageState;
+    i32 previousPageSlot = gpCurPlayer->m_townLocatorPage;
+    i32 locatorCount29 = gpCurPlayer->m_townCount;
+    i32 newPageState;
     double pageHeight7 = static_cast<double>(ADVMGR_LOCATOR_HERO_SCROLL_SPAN) /
                          (locatorCount29 - ADVMGR_LOCATOR_VISIBLE_COUNT);
-    int mouseX4;
-    int mouseYState;
+    i32 mouseX4;
+    i32 mouseYState;
     gpMouseManager->MouseCoords(mouseX4, mouseYState);
-    int dragOffset5 = mouseYState - m_scrollRightButton->m_y;
+    i32 dragOffset5 = mouseYState - m_scrollRightButton->m_y;
     gpInputManager->Flush();
     tag_message message = gpInputManager->GetEvent();
 
@@ -5040,11 +5040,11 @@ void advManager::DoTownKnob(void)
             m_scrollRightButton->m_y = message.payload.mouse.y - dragOffset5;
             m_adventureWindow->DrawWindow();
             if (locatorCount29 > ADVMGR_LOCATOR_VISIBLE_COUNT) {
-                newPageState = static_cast<int>(
+                newPageState = static_cast<i32>(
                     (m_scrollRightButton->m_y - ADVMGR_LOCATOR_SCROLL_BASE_Y) /
                     pageHeight7);
                 if (newPageState != previousPageSlot) {
-                    gpCurPlayer->m_townLocatorPage = static_cast<signed char>(newPageState);
+                    gpCurPlayer->m_townLocatorPage = static_cast<i8>(newPageState);
                     if (newPageState >
                         locatorCount29 - (ADVMGR_LOCATOR_VISIBLE_COUNT - 1))
                         newPageState =
@@ -5068,7 +5068,7 @@ void advManager::DoTownKnob(void)
 // agree; ours only has one trailing alignment NOP. Objdiff's residual is delinked
 // switch/jump-table local-label identity.
 VA(0x00464b08, 0x397)
-void advManager::CastSpell(int spell)
+void advManager::CastSpell(i32 spell)
 {
     hero *currentHeroSlot;
     if (gpCurPlayer->CurrentHero() != ADVMGR_INVALID_HERO)
@@ -5076,9 +5076,9 @@ void advManager::CastSpell(int spell)
     else
         currentHeroSlot = 0;
 
-    int guardianTypes1[ADVMGR_MINE_GUARDIAN_VALUE_COUNT];
+    i32 guardianTypes1[ADVMGR_MINE_GUARDIAN_VALUE_COUNT];
     mapCell *currentCell;
-    int spellPowerValue;
+    i32 spellPowerValue;
     switch (spell) {
     case ADVENTURE_SPELL_SET_EARTH_GUARDIAN:
         guardianTypes1[ADVMGR_MINE_GUARDIAN_TYPE_INDEX] =
@@ -5108,13 +5108,13 @@ setMineGuardian:
             return;
         }
         gpGame->m_mines[currentCell->m_objectMetadata].guardianType =
-            static_cast<signed char>(
+            static_cast<i8>(
                 guardianTypes1[ADVMGR_MINE_GUARDIAN_TYPE_INDEX]);
         spellPowerValue = currentHeroSlot->Stats(HERO_PRIMARY_SPELL_POWER);
         if (spellPowerValue > ADVMGR_MINE_GUARDIAN_MAX_POWER)
             spellPowerValue = ADVMGR_MINE_GUARDIAN_MAX_POWER;
         gpGame->m_mines[currentCell->m_objectMetadata].guardianCount =
-            static_cast<unsigned char>(
+            static_cast<u8>(
                 spellPowerValue * ADVMGR_MINE_GUARDIANS_PER_POWER);
         if (spell == ADVENTURE_SPELL_HAUNT)
             gpGame->ClaimMine(currentCell->m_objectMetadata, -1);
@@ -5169,14 +5169,14 @@ setMineGuardian:
 }
 
 VA(0x00464e9f, 0x24c)
-int SaveGame(void)
+i32 SaveGame(void)
 {
-    int result11 = 0;
-    int humanPlayerCount1 = 0;
+    i32 result11 = 0;
+    i32 humanPlayerCount1 = 0;
     gpAdvManager->DisableButtons();
     gpMouseManager->SetPointer("advmice.mse", ADVMGR_SAVE_POINTER_FRAME,
                                ADVMGR_SAVE_POINTER_DELAY);
-    int playerLocal;
+    i32 playerLocal;
     for (playerLocal = 0; playerLocal < ADVMGR_SAVE_PLAYER_COUNT; ++playerLocal) {
         if (!gpGame->m_playerDead[playerLocal] && gbHumanPlayer[playerLocal])
             ++humanPlayerCount1;
@@ -5203,7 +5203,7 @@ int SaveGame(void)
         FILE_REQUESTER_SAVE_GAME, patternState, gcGamePath, extension7);
     if (requester2 == 0)
         MemError();
-    int dialogResult7 = gpExec->DoDialog(requester2);
+    i32 dialogResult7 = gpExec->DoDialog(requester2);
     if (dialogResult7 == FILE_REQUESTER_OK) {
         result11 = 1;
         bFreshSave = 1;
@@ -5240,7 +5240,7 @@ void advManager::CheckCastSpell(void)
 // branch polarities, and both SetPointer arm orders. Revisit only with new TU
 // compiler-state evidence or after the SOURCE placeholder census is zero.
 VA(0x00465191, 0x31c)
-int DimensionDoorHandler(tag_message &message)
+i32 DimensionDoorHandler(tag_message &message)
 {
     if (glTimers[0] < KBTickCount()) {
         gpAdvManager->CompleteDraw(gpAdvManager->m_mapOriginX,
@@ -5248,9 +5248,9 @@ int DimensionDoorHandler(tag_message &message)
         gpAdvManager->UpdateScreen(0, 0);
     }
 
-    int mouseX = message.payload.mouse.x;
-    int mouseY = message.payload.mouse.y;
-    int handled = 0;
+    i32 mouseX = message.payload.mouse.x;
+    i32 mouseY = message.payload.mouse.y;
+    i32 handled = 0;
 
     switch (message.type) {
     case MESSAGE_WIDGET:
@@ -5338,14 +5338,14 @@ int DimensionDoorHandler(tag_message &message)
 // identically or regress; explicit temporaries and pointer/subscript variants were also
 // worse. Revisit after a material TU-state change or in the post-coverage last-mile phase.
 VA(0x004654ad, 0x11a9)
-int advManager::ComboDraw(int originX, int originY, int animate)
+i32 advManager::ComboDraw(i32 originX, i32 originY, i32 animate)
 {
-    int updateCount;
-    int mapCellX;
-    int column;
-    int mapRow;
+    i32 updateCount;
+    i32 mapCellX;
+    i32 column;
+    i32 mapRow;
     mapCell *cell;
-    int mapYValue;
+    i32 mapYValue;
 
     PollSound();
     if (bShowIt == 0)
@@ -5636,7 +5636,7 @@ int advManager::ComboDraw(int originX, int originY, int animate)
 }
 
 VA(0x00466656, 0x38)
-int advManager::ComboDraw(int update)
+i32 advManager::ComboDraw(i32 update)
 {
     return ComboDraw(m_mapOriginX, m_mapOriginY, update);
 }
@@ -5650,12 +5650,12 @@ int advManager::ComboDraw(int update)
 // origin-plus-radius expressions was byte-neutral. Revisit after a material
 // ADVMGR predecessor/header or comparison-tool change.
 VA(0x0046668e, 0x338)
-void advManager::SetEnvironmentOrigin(int originX, int originY, int stopSounds)
+void advManager::SetEnvironmentOrigin(i32 originX, i32 originY, i32 stopSounds)
 {
-    int soundLayer;
-    int maxSounds = ADVMGR_SOUND_CELL_COUNT;
-    int soundRadius;
-    int edgeOffset;
+    i32 soundLayer;
+    i32 maxSounds = ADVMGR_SOUND_CELL_COUNT;
+    i32 soundRadius;
+    i32 edgeOffset;
 
     if (gpSoundManager->m_samplesReady == 0)
         return;
@@ -5736,7 +5736,7 @@ void advManager::SetEnvironmentOrigin(int originX, int originY, int stopSounds)
 }
 
 VA(0x004669c6, 0x69)
-void advManager::CheckLoadSample(int index)
+void advManager::CheckLoadSample(i32 index)
 {
     if (m_loopingSamples[index] == 0) {
         TrimLoopingSounds(ADVMGR_LOOPING_SOUND_LIMIT);
@@ -5749,10 +5749,10 @@ void advManager::CheckLoadSample(int index)
 // All 0x4c1 bytes are identical after masking 39 relocations. Retail delinks
 // 37 switch-table local-label relocations as the containing function.
 VA(0x00466a2f, 0x4c1)
-int advManager::GetSoundId(int x, int y)
+i32 advManager::GetSoundId(i32 x, i32 y)
 {
     mapCell *currentCell = &m_mapData->Row(y)[x];
-    int soundId = ADVMGR_ENVIRONMENT_SOUND_NONE;
+    i32 soundId = ADVMGR_ENVIRONMENT_SOUND_NONE;
 
     if (!giGroundToTerrain[currentCell->m_terrainImageIndex] &&
         (giGroundShape[currentCell->m_terrainImageIndex] & ADVMGR_SOUND_GROUND_SHAPE_MASK))
@@ -5868,12 +5868,12 @@ int advManager::GetSoundId(int x, int y)
 // meaningful body 0x239 bytes versus retail's 0x23a and places the next candidate
 // symbol at +0x239. Direct bounds and MAP_WIDTH <= 0[&x] were already tried.
 VA(0x00466ef0, 0x23a)
-void advManager::InsertSound(int x, int mapY, int distance, int soundLayer)
+void advManager::InsertSound(i32 x, i32 mapY, i32 distance, i32 soundLayer)
 {
-    int soundSlot;
-    int distanceLimit;
-    int activeIndex;
-    int soundId;
+    i32 soundSlot;
+    i32 distanceLimit;
+    i32 activeIndex;
+    i32 soundId;
 
     if (x < 0 || mapY < 0 || MAP_WIDTH <= 0[&x] || mapY >= MAP_HEIGHT)
         return;
@@ -5935,23 +5935,23 @@ void advManager::InsertSound(int x, int mapY, int distance, int soundLayer)
 // temporaries, and both operand orders all fold to the memory OR. Revisit only
 // after a material TU-state change or in the last-mile phase.
 VA(0x0046712a, 0x40f)
-void advManager::TeleportTo(hero *mapHero, int destinationX, int destinationY,
-                            int, int skipMapChange)
+void advManager::TeleportTo(hero *mapHero, i32 destinationX, i32 destinationY,
+                            i32, i32 skipMapChange)
 {
-    int savedShow11;
-    int terrain5;
+    i32 savedShow11;
+    i32 terrain5;
     mapCell *oldCell2;
-    int oldCellFlag26;
-    int unused47;
+    i32 oldCellFlag26;
+    i32 unused47;
     mapCell *destinationCell29;
-    int fizzleTime36;
+    i32 fizzleTime36;
     town *occupiedTown47;
 
     savedShow11 = bShowIt;
     if (skipMapChange == 0) {
         SendMapChange(ADVMGR_TELEPORT_MAP_CHANGE, mapHero->m_id,
-                      static_cast<unsigned char>(destinationX),
-                      static_cast<unsigned char>(destinationY),
+                      static_cast<u8>(destinationX),
+                      static_cast<u8>(destinationY),
                       ADVMGR_TELEPORT_MAP_CHANGE_VALUE, 0, 0);
     }
 
@@ -6000,7 +6000,7 @@ void advManager::TeleportTo(hero *mapHero, int destinationX, int destinationY,
         m_mapOriginX + ADVMGR_TELEPORT_VIEW_CENTER,
         m_mapOriginY + ADVMGR_TELEPORT_VIEW_CENTER, giCurPlayer,
         giVisRange[mapHero->m_secondarySkills[HERO_SKILL_SCOUTING]] +
-            (static_cast<unsigned int>(mapHero->HasArtifact(
+            (static_cast<u32>(mapHero->HasArtifact(
                  ADVMGR_TELEPORT_TELESCOPE_ARTIFACT)) >= 1));
 
     if (bShowIt != 0) {
@@ -6026,7 +6026,7 @@ void advManager::TeleportTo(hero *mapHero, int destinationX, int destinationY,
         } else {
             destinationCell29->m_triggerType = ADVMGR_HERO_TRIGGER;
             destinationCell29->m_objectMetadata =
-                static_cast<unsigned char>(mapHero->m_id);
+                static_cast<u8>(mapHero->m_id);
         }
         if (m_cursorType == BOAT_CURSOR_TYPE) {
             mapHero->m_eventFlags =
@@ -6058,8 +6058,8 @@ void advManager::DimensionDoor(void)
 {
     hero *targetHero;
     heroWindow *dimensionDoorWindow;
-    int x;
-    int y;
+    i32 x;
+    i32 y;
     mapCell *targetCell;
 
     dimensionDoorWindow = new heroWindow(0, 0, "dimdoor.bin");
@@ -6099,7 +6099,7 @@ void advManager::DimensionDoor(void)
 }
 
 VA(0x00467734, 0x129)
-int TownPortalHandler(tag_message &message)
+i32 TownPortalHandler(tag_message &message)
 {
     tag_message choiceMessage;
 
@@ -6142,14 +6142,14 @@ int TownPortalHandler(tag_message &message)
 // negated, empty-arm, `| 0`, semantic-name, and AST permutations do not steer
 // this TU-cumulative /Od operand order (tu-cumulative-eval-order.md).
 VA(0x0046785d, 0x43e)
-void advManager::TownGate(int spellId)
+void advManager::TownGate(i32 spellId)
 {
-    int distance0;
+    i32 distance0;
     hero *targetHero;
     tag_message message;
-    int selectedTownIndex;
-    int nearestDistance;
-    int townListIndex;
+    i32 selectedTownIndex;
+    i32 nearestDistance;
+    i32 townListIndex;
 
     nearestDistance = ADVMGR_TOWN_PORTAL_DISTANCE_LIMIT;
     selectedTownIndex = ADVMGR_INVALID_HERO;
@@ -6272,21 +6272,21 @@ void advManager::TownGate(int spellId)
 // the interior string symbol at RVA 0xfaa79. Revisit after material TU-state change.
 VA(0x00467c9b, 0x5ac)
 void advManager::SummonBoat(void) {
-    int boatIndex9;
+    i32 boatIndex9;
     mapCell* destinationCell;
-    int foundBoat;
+    i32 foundBoat;
     hero* currentHero11;
-    int destinationX10;
-    int direction5;
-    int destinationY15;
-    int foundDestination9;
-    int currentHeroId3;
+    i32 destinationX10;
+    i32 direction5;
+    i32 destinationY15;
+    i32 foundDestination9;
+    i32 currentHeroId3;
     boatRecord* boat1;
     mapCell* oldBoatCell26;
-    int screenX4;
-    int screenY3;
-    int fizzleHeight;
-    int fizzleWidth;
+    i32 screenX4;
+    i32 screenY3;
+    i32 fizzleHeight;
+    i32 fizzleWidth;
 
     currentHero11 = gpGame->GetHero(gpCurPlayer->m_currentHero);
     foundDestination9 = 0;
@@ -6383,14 +6383,14 @@ void advManager::SummonBoat(void) {
                         ->FizzleForward(screenX4, screenY3, fizzleWidth, fizzleHeight, -1, 0, 0);
                 }
 
-                boat1->x = static_cast<signed char>(
+                boat1->x = static_cast<i8>(
                     normalDirTable[direction5].x + m_mapOriginX + ADVMGR_SUMMON_CENTER_OFFSET
                 );
-                boat1->y = static_cast<signed char>(
+                boat1->y = static_cast<i8>(
                     normalDirTable[direction5].y + m_mapOriginY + ADVMGR_SUMMON_CENTER_OFFSET
                 );
                 boat1->savedTriggerType = destinationCell->m_triggerType;
-                boat1->savedEventData = static_cast<unsigned char>(destinationCell->m_objectMetadata);
+                boat1->savedEventData = static_cast<u8>(destinationCell->m_objectMetadata);
                 destinationCell->m_triggerType = ADVMGR_SUMMON_BOAT_TRIGGER;
                 destinationCell->m_objectMetadata = boatIndex9;
 
@@ -6439,23 +6439,23 @@ void advManager::SummonBoat(void) {
 // direction loads corrected the two former MOVSX/MOVZX semantic mismatches;
 // only delinked relocation identities keep the raw objdiff score below 100%.
 VA(0x00468247, 0x4d9)
-void advManager::ShowRoute(int redraw, int, int updateButton)
+void advManager::ShowRoute(i32 redraw, i32, i32 updateButton)
 {
-    int routeReachable8;
-    int pathFound5;
-    int routeX1;
+    i32 routeReachable8;
+    i32 pathFound5;
+    i32 routeX1;
     mapCell *nextCell7;
-    int previousDirection0;
+    i32 previousDirection0;
     hero *currentHero0;
-    int routeY1;
-    int direction;
-    int terrainCost;
-    int remainingMobility2;
-    int pathIndex;
-    int currentTerrain0;
+    i32 routeY1;
+    i32 direction;
+    i32 terrainCost;
+    i32 remainingMobility2;
+    i32 pathIndex;
+    i32 currentTerrain0;
     mapCell *currentCell2;
-    int routeFrame;
-    int buttonFrame;
+    i32 routeFrame;
+    i32 buttonFrame;
 
     routeReachable8 = 0;
     if (!gbThisNetHumanPlayer[giCurPlayer])
@@ -6485,7 +6485,7 @@ void advManager::ShowRoute(int redraw, int, int updateButton)
 
         for (pathIndex = gpSearchArray->m_pathLength - 1;
              pathIndex >= 0; --pathIndex) {
-            direction = static_cast<unsigned char>(
+            direction = static_cast<u8>(
                 gpSearchArray->m_storage.path.directions[pathIndex + 1]);
             currentCell2 = GetCell(routeX1, routeY1);
             routeX1 += normalDirTable[direction].x;
@@ -6537,10 +6537,10 @@ void advManager::ShowRoute(int redraw, int, int updateButton)
             if (pathIndex == 0) {
                 m_visibilityMap[routeY1 * (MAP_WIDTH | 0) + routeX1] = 1;
             } else {
-                previousDirection0 = static_cast<unsigned char>(
+                previousDirection0 = static_cast<u8>(
                     gpSearchArray->m_storage.path.directions[pathIndex]);
                 m_visibilityMap[routeY1 * (MAP_WIDTH | 0) + routeX1] =
-                    static_cast<unsigned short>(
+                    static_cast<u16>(
                         gbArrow[previousDirection0][direction | 0] +
                         routeFrame * ADVMGR_ROUTE_ARROW_FRAME_STRIDE +
                         ADVMGR_ROUTE_ARROW_FRAME_OFFSET);
@@ -6572,7 +6572,7 @@ void advManager::ShowRoute(int redraw, int, int updateButton)
 }
 
 VA(0x00468720, 0x107)
-void advManager::HideRoute(int redraw, int clearDestination, int updateButton)
+void advManager::HideRoute(i32 redraw, i32 clearDestination, i32 updateButton)
 {
     hero *currentHero;
 
@@ -6617,7 +6617,7 @@ void advManager::CheckDimHero(void) {
 
 VA(0x004688b4, 0x6b)
 void advManager::CheckDimNextHeroBut(void) {
-    int frame;
+    i32 frame;
     if (!gbThisNetHumanPlayer[giCurPlayer] || !gpCurPlayer->HasMobileHero())
         frame = ADVMGR_BUTTON_ENABLE;
     else
@@ -6628,7 +6628,7 @@ void advManager::CheckDimNextHeroBut(void) {
 }
 
 VA(0x0046891f, 0x138)
-void advManager::SeedTo(int targetX, int targetY)
+void advManager::SeedTo(i32 targetX, i32 targetY)
 {
     hero *currentHero;
 
@@ -6660,8 +6660,8 @@ void advManager::SeedTo(int targetX, int targetY)
 VA(0x00468a57, 0x5f)
 void advManager::ForceNewHover(void)
 {
-    int x;
-    int y;
+    i32 x;
+    i32 y;
 
     if (!gbThisNetHumanPlayer[giCurPlayer])
         return;
@@ -6674,10 +6674,10 @@ void advManager::ForceNewHover(void)
 // All non-table bytes match. The 32-byte jump table has the same eight case
 // offsets; retail delinks its entries as ScreenScroll while base retains local labels.
 VA(0x00468ab6, 0x1a6)
-void advManager::ScreenScroll(int direction, int updatePointer)
+void advManager::ScreenScroll(i32 direction, i32 updatePointer)
 {
-    int originX;
-    int originY;
+    i32 originX;
+    i32 originY;
 
     originX = m_mapOriginX;
     originY = m_mapOriginY;
@@ -6740,10 +6740,10 @@ void advManager::ScreenScroll(int direction, int updatePointer)
 VA(0x00468c5c, 0x1bb)
 void advManager::CheckScreenScroll(void)
 {
-    int mouseX6;
-    int mouseY1;
-    int oldOriginX9;
-    int oldOriginY3;
+    i32 mouseX6;
+    i32 mouseY1;
+    i32 oldOriginX9;
+    i32 oldOriginY3;
 
     if (KBTickCount() - iLastScrollTime > ADVMGR_SCROLL_TICK_INTERVAL) {
         iLastScrollTime = KBTickCount();
@@ -6788,10 +6788,10 @@ void advManager::CheckScreenScroll(void)
 }
 
 VA(0x00468e17, 0x91)
-int advManager::MouseInScrollZone(void)
+i32 advManager::MouseInScrollZone(void)
 {
-    int x;
-    int y;
+    i32 x;
+    i32 y;
 
     gpMouseManager->MouseCoords(x, y);
     if (x >= 0 && x < ADVMGR_SCREEN_WIDTH && y >= 0 && y < ADVMGR_SCREEN_HEIGHT) {
@@ -6907,7 +6907,7 @@ VA(0x0046931e, 0x20c)
 char * advManager::CheckHandleNet(void)
 {
     RemoteMessage *packet9;
-    int playerExited5;
+    i32 playerExited5;
     SPlayerExit exitInfo4;
 
     packet9 = reinterpret_cast<RemoteMessage *>(
@@ -6927,7 +6927,7 @@ char * advManager::CheckHandleNet(void)
             }
             if (playerExited5) {
                 exitInfo4.netPosition = packet9->sender;
-                exitInfo4.gamePosition = static_cast<signed char>(
+                exitInfo4.gamePosition = static_cast<i8>(
                     NetPosToGamePos(packet9->sender));
                 exitInfo4.updateNetworkControl = 0;
                 exitInfo4.eliminated = 1;
@@ -6974,8 +6974,8 @@ char * advManager::CheckHandleNet(void)
 }
 
 VA(0x0046952a, 0xcd)
-int advManager::CheckHandleNetPlayerWait(
-    struct tag_message &message, int doMain)
+i32 advManager::CheckHandleNetPlayerWait(
+    struct tag_message &message, i32 doMain)
 {
     if (message.type == ADVMGR_REMOTE_WAIT_MOUSE_MESSAGE)
         gpMouseManager->Main(message);
@@ -7008,7 +7008,7 @@ int advManager::CheckHandleNetPlayerWait(
 // five-byte jumps, every opcode/operand, the 0x28 frame/slots and CFG, and all
 // six relocation targets match.
 VA(0x004695f7, 0x1d5)
-void advManager::TrimLoopingSounds(int maxSamples)
+void advManager::TrimLoopingSounds(i32 maxSamples)
 {
     if (giHighMemBuffer > 0)
         maxSamples += giHighMemBuffer / ADVMGR_HIGH_MEMORY_BUFFER_DIVISOR;
@@ -7019,11 +7019,11 @@ void advManager::TrimLoopingSounds(int maxSamples)
     if (maxSamples >= ADVMGR_LOOPING_SAMPLE_COUNT)
         return;
 
-    int loadedSampleCount = 0;
+    i32 loadedSampleCount = 0;
     char retainedSamples[ADVMGR_LOOPING_SAMPLE_COUNT];
     memset(retainedSamples, 0, sizeof(retainedSamples));
 
-    int soundIndex;
+    i32 soundIndex;
     for (soundIndex = 0; soundIndex < ADVMGR_SOUND_CELL_COUNT; ++soundIndex) {
         if (m_activeSounds[soundIndex].soundId >= 0 &&
             m_activeSounds[soundIndex].soundId < ADVMGR_LOOPING_SAMPLE_COUNT) {
@@ -7095,19 +7095,19 @@ void advManager::EnableButtons(void)
 VA(0x00469976, 0x145)
 void advManager::SaveAdventureBorder(void)
 {
-    DATA(0x004f688c) static short s_saveBorderAllocLineBase =
+    DATA(0x004f688c) static i16 s_saveBorderAllocLineBase =
         ADVMGR_SAVE_BORDER_ALLOC_LINE_BASE;
 
     if (m_adventureBorder != 0)
         return;
 
-    m_adventureBorder = static_cast<unsigned char *>(
+    m_adventureBorder = static_cast<u8 *>(
         BaseAlloc(ADVMGR_BORDER_BUFFER_SIZE, ADVMGR_SOURCE_FILE,
                   s_saveBorderAllocLineBase +
                       ADVMGR_BORDER_ALLOC_LINE_OFFSET));
-    unsigned char *savedPixels = m_adventureBorder;
-    unsigned char *screenPixel = gpWindowManager->m_screen->m_pixels;
-    int row;
+    u8 *savedPixels = m_adventureBorder;
+    u8 *screenPixel = gpWindowManager->m_screen->m_pixels;
+    i32 row;
     for (row = 0; row < ADVMGR_BORDER_EDGE_SIZE; ++row) {
         memcpy(savedPixels, screenPixel, ADVMGR_BORDER_ROW_BYTES);
         screenPixel += ADVMGR_BORDER_SCREEN_PITCH;
@@ -7137,9 +7137,9 @@ void advManager::DrawAdventureBorder(void)
     if (gbNoBorder != 0)
         return;
 
-    unsigned char *screenPixel = gpWindowManager->m_screen->m_pixels;
-    unsigned char *savedPixels = m_adventureBorder;
-    int row;
+    u8 *screenPixel = gpWindowManager->m_screen->m_pixels;
+    u8 *savedPixels = m_adventureBorder;
+    i32 row;
     for (row = 0; row < ADVMGR_BORDER_EDGE_SIZE; ++row) {
         memcpy(screenPixel, savedPixels, ADVMGR_BORDER_ROW_BYTES);
         screenPixel += ADVMGR_BORDER_SCREEN_PITCH;
@@ -7169,8 +7169,8 @@ void advManager::DrawAdventureBorder(void)
 // compound duplicated predicates, and both excluded-Y inequality orientations.
 // Revisit only with new static-symbol/TU evidence or in the last-mile phase.
 VA(0x00469bef, 0x3d3)
-int advManager::FindAdjacentMonster(int originX, int originY, int *monsterX,
-                                    int *monsterY, int excludedX, int excludedY)
+i32 advManager::FindAdjacentMonster(i32 originX, i32 originY, i32 *monsterX,
+                                    i32 *monsterY, i32 excludedX, i32 excludedY)
 {
     s_adjacentMonsterEndX = originX + ADVMGR_ADJACENT_MONSTER_END_OFFSET;
     s_adjacentMonsterEndY = originY + ADVMGR_ADJACENT_MONSTER_END_OFFSET;
@@ -7262,9 +7262,9 @@ void ComputeAdvNetControl(void)
     if (!gbRemoteOn) {
         gbThisNetGotAdventureControl = 1;
     } else {
-        int selectedPlayer = -1;
-        int player;
-        int currentPlayer;
+        i32 selectedPlayer = -1;
+        i32 player;
+        i32 currentPlayer;
         if (gpGame->m_playerDead[giCurPlayer]) {
             player = (giCurPlayer + 1) % GAME_PLAYER_COUNT;
             while (giCurPlayer != player) {
@@ -7292,14 +7292,14 @@ void ComputeAdvNetControl(void)
 // corresponding local branch displacements; do not claim relocation-only
 // identity until those destinations are normalized or made byte-exact.
 VA(0x0046a0e7, 0xf6)
-int MapExtraPosAndAdjacentsSet(int x, int y, unsigned char mask)
+i32 MapExtraPosAndAdjacentsSet(i32 x, i32 y, u8 mask)
 {
     if (mapExtra[MAP_WIDTH * y + x] & mask)
         return 1;
-    for (int checkX = x - 1; checkX <= x + 1; ++checkX) {
+    for (i32 checkX = x - 1; checkX <= x + 1; ++checkX) {
         if (checkX < 0 || checkX >= MAP_WIDTH)
             continue;
-        for (int checkY = y - 1; checkY <= y + 1; ++checkY) {
+        for (i32 checkY = y - 1; checkY <= y + 1; ++checkY) {
             if (checkY >= 0) {
                 if (MAP_HEIGHT <= 0[&checkY]) {
                 } else {
@@ -7323,19 +7323,19 @@ VA(0x0046a1dd, 0x4c6)
 void advManager::ViewPuzzle(void)
 {
     gpGame->SetupPuzzlePieces(giCurPlayer, 0);
-    unsigned char puzzleOrderLocal[ADVMGR_PUZZLE_PIECE_COUNT] = {
+    u8 puzzleOrderLocal[ADVMGR_PUZZLE_PIECE_COUNT] = {
         23, 7, 44, 5, 24, 47, 1, 39, 16, 36, 11, 45,
         31, 2, 30, 38, 43, 4, 3, 14, 40, 37, 34, 0,
         12, 17, 35, 42, 15, 8, 26, 41, 28, 46, 10, 22,
         21, 6, 32, 18, 19, 29, 13, 27, 9, 20, 33, 25
     };
-    int puzzlePiecesVisible = 0;
+    i32 puzzlePiecesVisible = 0;
 
     gpSoundManager->SwitchAmbientMusic(ADVMGR_PUZZLE_MUSIC);
     gpMouseManager->SetPointer("advmice.mse", ADVMGR_POINTER_DEFAULT,
                                ADVMGR_DEFAULT_POINTER_FRAME);
     icon *puzzleIconObjectPointer = gpResourceManager->GetIcon("puzzle.icn");
-    int pieceIndexPosition;
+    i32 pieceIndexPosition;
     for (pieceIndexPosition = 0;
          pieceIndexPosition < ADVMGR_PUZZLE_PIECE_COUNT;
          ++pieceIndexPosition)
@@ -7353,12 +7353,12 @@ void advManager::ViewPuzzle(void)
         MemError();
     gpWindowManager->AddWindow(puzzleWindowObject, -1, 1);
 
-    int puzzleXViewCurrent = gpGame->m_ultimateArtifactX -
+    i32 puzzleXViewCurrent = gpGame->m_ultimateArtifactX -
                              ADVMGR_PUZZLE_COORDINATE_OFFSET;
-    int puzzleYTop = gpGame->m_ultimateArtifactY -
+    i32 puzzleYTop = gpGame->m_ultimateArtifactY -
                      ADVMGR_PUZZLE_COORDINATE_OFFSET;
-    int xAdjustmentOffset = 0;
-    int yAdjustmentOffsetLocal = 0;
+    i32 xAdjustmentOffset = 0;
+    i32 yAdjustmentOffsetLocal = 0;
     xAdjustmentOffset = (gpGame->m_ultimateArtifactX +
                          gpGame->m_ultimateArtifactY) %
                             ADVMGR_PUZZLE_ALIGNMENT_DIVISOR -
@@ -7387,9 +7387,9 @@ void advManager::ViewPuzzle(void)
     PuzzleDraw(puzzleXViewCurrent, puzzleYTop, gpGame->m_ultimateArtifactX,
                gpGame->m_ultimateArtifactY);
 
-    int rowCounterNumber;
-    unsigned char *pixelIterator;
-    unsigned char *rowLimitAddress;
+    i32 rowCounterNumber;
+    u8 *pixelIterator;
+    u8 *rowLimitAddress;
     for (rowCounterNumber = ADVMGR_PUZZLE_VIEW_ORIGIN;
          rowCounterNumber < ADVMGR_PUZZLE_VIEW_END;
          ++rowCounterNumber) {
@@ -7433,7 +7433,7 @@ void advManager::ViewPuzzle(void)
 // reconstructed body needs 0x04/-0x04. Do not invent six unused locals; revisit
 // when adjacent source or recovered local evidence explains the retail frame.
 VA(0x0046a6a3, 0x81)
-void advManager::PuzzleDraw(int left, int top, int right, int bottom)
+void advManager::PuzzleDraw(i32 left, i32 top, i32 right, i32 bottom)
 {
     gbDrawingPuzzle = 1;
     CompleteDraw(left, top, 0, 0);
@@ -7458,7 +7458,7 @@ void advManager::AdvPanel(void)
         TrimLoopingSounds(ADVMGR_LOOPING_SOUND_LIMIT);
         gpMouseManager->SetPointer("advmice.mse", ADVMGR_POINTER_DEFAULT,
                                    ADVMGR_DEFAULT_POINTER_FRAME);
-        int heroWasMobilized = m_heroContextLocked;
+        i32 heroWasMobilized = m_heroContextLocked;
         tag_message message;
         DemobilizeCurrHero();
 
@@ -7527,15 +7527,15 @@ void advManager::AdvPanel(void)
 // switch-based command dispatch in both arms; the retained mixed form is closest.
 // Revisit only after shared message/layout evidence changes or in the last-mile phase.
 VA(0x0046a9d0, 0x1ca)
-int APanelHandler(tag_message &message)
+i32 APanelHandler(tag_message &message)
 {
-    int handled = 0;
+    i32 handled = 0;
     if (message.type == MESSAGE_WIDGET) {
         if (message.payload.widget.parameter & MESSAGE_MODIFIER_LEFT_SHIFT) {
             if (message.payload.widget.command == WIDGET_COMMAND_SELECT ||
                 message.payload.widget.command ==
                     WIDGET_COMMAND_ALTERNATE_SELECT) {
-                int helpIndex = ADVMGR_PANEL_NO_HELP;
+                i32 helpIndex = ADVMGR_PANEL_NO_HELP;
                 switch (message.payload.widget.id) {
                 case ADVMGR_PANEL_VIEW_WORLD:
                     helpIndex = 0;
@@ -7590,13 +7590,13 @@ int APanelHandler(tag_message &message)
 // switch after testing equivalent compound and nested spellings.
 // Revisit only after shared dialog/message evidence changes or in the last-mile phase.
 VA(0x0046ab9a, 0x1e4)
-int advManager::ControlPanel(void)
+i32 advManager::ControlPanel(void)
 {
     TrimLoopingSounds(ADVMGR_LOOPING_SOUND_LIMIT);
-    int selectedCommand = ADVMGR_PANEL_NO_HELP;
+    i32 selectedCommand = ADVMGR_PANEL_NO_HELP;
     gpMouseManager->SetPointer("advmice.mse", ADVMGR_POINTER_DEFAULT,
                                ADVMGR_DEFAULT_POINTER_FRAME);
-    int heroWasMobilized = m_heroContextLocked;
+    i32 heroWasMobilized = m_heroContextLocked;
     DemobilizeCurrHero();
 
     heroWindow *controlPanel = new heroWindow(
@@ -7648,15 +7648,15 @@ int advManager::ControlPanel(void)
 // Reordering those case bodies aligned source order in one attempt without a
 // fuzzy gain. Prior compound-command and alternate-nesting attempts were worse.
 VA(0x0046ad7e, 0x304)
-int CPanelHandler(tag_message &message)
+i32 CPanelHandler(tag_message &message)
 {
-    int handled = 0;
+    i32 handled = 0;
     if (message.type == MESSAGE_WIDGET) {
         if (message.payload.widget.parameter & MESSAGE_MODIFIER_LEFT_SHIFT) {
             if (message.payload.widget.command == WIDGET_COMMAND_SELECT ||
                 message.payload.widget.command ==
                     WIDGET_COMMAND_ALTERNATE_SELECT) {
-                int helpIndex = ADVMGR_PANEL_NO_HELP;
+                i32 helpIndex = ADVMGR_PANEL_NO_HELP;
                 switch (message.payload.widget.id) {
                 case ADVMGR_CONTROL_RESTART:
                     helpIndex = ADVMGR_CONTROL_RESTART_HELP;
@@ -7739,9 +7739,9 @@ void advManager::SystemOptions(void)
     TrimLoopingSounds(ADVMGR_LOOPING_SOUND_LIMIT);
     gpMouseManager->SetPointer("advmice.mse", ADVMGR_POINTER_DEFAULT,
                                ADVMGR_DEFAULT_POINTER_FRAME);
-    int oldInterfaceMode = gConfig.evilInterfaceUsage;
-    int oldWalkSpeed = gConfig.walkSpeed;
-    int heroWasMobilized = m_heroContextLocked;
+    i32 oldInterfaceMode = gConfig.evilInterfaceUsage;
+    i32 oldWalkSpeed = gConfig.walkSpeed;
+    i32 heroWasMobilized = m_heroContextLocked;
     bPrefsChanged = 0;
     DemobilizeCurrHero();
 
@@ -7756,7 +7756,7 @@ void advManager::SystemOptions(void)
     delete cPanel;
 
     if (gConfig.walkSpeed != oldWalkSpeed) {
-        int sampleIndex;
+        i32 sampleIndex;
         for (sampleIndex = 0; sampleIndex < ADVMGR_CURSOR_SAMPLE_COUNT;
              ++sampleIndex)
             gpResourceManager->Dispose(m_cursorSamples[sampleIndex]);
@@ -7777,10 +7777,10 @@ void advManager::SystemOptions(void)
 // and explicit branch forms; retained forms follow retail broadcast order.
 // Revisit only after shared config layout evidence changes or in the last-mile phase.
 VA(0x0046b219, 0x35f)
-void UpdateSystemOptions(int initialDraw)
+void UpdateSystemOptions(i32 initialDraw)
 {
     tag_message message;
-    int musicQuality;
+    i32 musicQuality;
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = ADVMGR_SYSTEM_OPTIONS_SET_FRAME;
 
@@ -7895,16 +7895,16 @@ void UpdateSystemOptions(int initialDraw)
 // Exact size, all non-relocation bytes, and all 94 relocation sites match. Residuals are
 // delinked jump-table labels, gConfig field overlays, and string-pool symbol names.
 VA(0x0046b578, 0x672)
-int SystemOptionsHandler(struct tag_message& message) {
-    int preferencesChanged = 0;
+i32 SystemOptionsHandler(struct tag_message& message) {
+    i32 preferencesChanged = 0;
     char textData[120];
-    int accepted = 0;
+    i32 accepted = 0;
 
     if (message.type == ADVMGR_SYSTEM_OPTIONS_MESSAGE) {
         if (message.payload.widget.parameter & ADVMGR_SYSTEM_OPTIONS_CONTEXT_FLAG) {
             if (message.payload.widget.command == ADVMGR_SYSTEM_OPTIONS_ACTIVATE
                 || message.payload.widget.command == ADVMGR_SYSTEM_OPTIONS_HOVER) {
-                int helpIndex = ADVMGR_OPTION_DIALOG_NONE;
+                i32 helpIndex = ADVMGR_OPTION_DIALOG_NONE;
 
                 switch (message.payload.widget.id) {
                     case ADVMGR_SYSTEM_OPTIONS_DIALOG_ACCEPT:
@@ -8144,8 +8144,8 @@ int SystemOptionsHandler(struct tag_message& message) {
 }
 
 VA(0x0046bbea, 0x7f)
-int GetMobilityFrame(int mobility) {
-    int frame = mobility * ADVMGR_MOBILITY_SCALE / ADVMGR_MOBILITY_DIVISOR;
+i32 GetMobilityFrame(i32 mobility) {
+    i32 frame = mobility * ADVMGR_MOBILITY_SCALE / ADVMGR_MOBILITY_DIVISOR;
     if (frame < 0) {
         frame = 0;
     }
@@ -8160,8 +8160,8 @@ int GetMobilityFrame(int mobility) {
 }
 
 VA(0x0046bc69, 0x7f)
-int GetManaFrame(int mana) {
-    int frame = mana / ADVMGR_MANA_DIVISOR;
+i32 GetManaFrame(i32 mana) {
+    i32 frame = mana / ADVMGR_MANA_DIVISOR;
     if (frame == 0 && mana >= ADVMGR_MANA_MIN_VISIBLE)
         frame = 1;
     if (frame > ADVMGR_MANA_TOP_THRESHOLD)
@@ -8181,22 +8181,22 @@ int GetManaFrame(int mana) {
 // TU-state perturbations also failed to close it. Revisit after a material ADVMGR
 // predecessor/header or comparison-tool change.
 VA(0x0046bce8, 0x559)
-int advManager::DoVisions(hero *visionHero)
+i32 advManager::DoVisions(hero *visionHero)
 {
     char visionMessageResult[ADVMGR_VISIONS_MESSAGE_BUFFER_SIZE];
-    int creatureData;
-    int nearestDistanceState;
-    int nearestXId;
-    int nearestYData;
-    int scanXType;
-    int scanYLocal;
+    i32 creatureData;
+    i32 nearestDistanceState;
+    i32 nearestXId;
+    i32 nearestYData;
+    i32 scanXType;
+    i32 scanYLocal;
     mapCell *cellData;
-    int joiningCount;
-    int monsterCountIndex;
-    int currentDistanceId;
-    int forcedJoinState;
+    i32 joiningCount;
+    i32 monsterCountIndex;
+    i32 currentDistanceId;
+    i32 forcedJoinState;
     float strengthRatioCurrent;
-    int joiningCostIndex;
+    i32 joiningCostIndex;
 
     nearestDistanceState = ADVMGR_VISIONS_NO_MONSTER_DISTANCE;
     nearestYData = -1;
@@ -8307,15 +8307,15 @@ showVision:
 // inline hero expressions and retained named locals, which is the closest source shape.
 // Revisit after inline GetHero evidence changes or in the last-mile phase.
 VA(0x0046c241, 0xd7)
-int advManager::IsCrystalBallInEffect(int x, int y, int radius)
+i32 advManager::IsCrystalBallInEffect(i32 x, i32 y, i32 radius)
 {
-    int heroIndex;
+    i32 heroIndex;
     hero *crystalHero;
-    int distance;
+    i32 distance;
     for (heroIndex = 0; heroIndex < gpCurPlayer->m_heroCount; ++heroIndex) {
         crystalHero = gpGame->GetHero(gpCurPlayer->m_heroIds[heroIndex]);
         if (crystalHero->HasArtifact(ADVMGR_CRYSTAL_BALL_ARTIFACT)) {
-            distance = static_cast<int>(sqrt(static_cast<double>(
+            distance = static_cast<i32>(sqrt(static_cast<double>(
                 (crystalHero->m_y - y) * (crystalHero->m_y - y) +
                 (crystalHero->m_x - x) * (crystalHero->m_x - x))));
             if (distance <= radius)
@@ -8326,13 +8326,13 @@ int advManager::IsCrystalBallInEffect(int x, int y, int radius)
 }
 
 VA(0x0046c318, 0x85)
-unsigned char StopOnTrigger(class mapCell *cell)
+u8 StopOnTrigger(class mapCell *cell)
 {
-    int type = cell->m_triggerType & ADVMGR_TRIGGER_TYPE_MASK;
+    i32 type = cell->m_triggerType & ADVMGR_TRIGGER_TYPE_MASK;
     if (type != ADVMGR_SPECIAL_TRIGGER)
         return bStopOnTrigger[type];
 
-    int trigger = cell->m_objectMetadata;
+    i32 trigger = cell->m_objectMetadata;
     trigger &= ADVMGR_SPECIAL_TRIGGER_MASK;
     switch (trigger) {
     case ADVMGR_TRIGGER_EVENT_5:
@@ -8359,38 +8359,38 @@ VTBL(advManager, 0x004eb6c8);
 // zero-valued iLastSandAnimTime immediately at 0x68. Retail callers can produce
 // indices 16 and 17, so preserve this evidenced adjacency rather than inflating
 // the allocation from bytes read past the public symbol.
-DATA(0x004f57b0) int giLimitUpdMinX = -1;
-DATA(0x004f57b4) int iLastScrollTime = 0;
-DATA(0x004f57b8) int iSandAnim = 0;
-DATA(0x004f57bc) int giLastHourGlassUpdateTime = 0;
-DATA(0x004f57c0) int TrigX = 0;
-DATA(0x004f57c4) int TrigY = 0;
-DATA(0x004f57c8) int iCurBottomView = 0;
-DATA(0x004f57cc) int iCurBottomViewEnemy = -1;
-DATA(0x004f57d0) int iCurHourGlassPhase = 0;
-DATA(0x004f57d4) int iLastHourGlassPhase = 1;
-DATA(0x004f57d8) int gbForceUpdate = 0;
-DATA(0x004f59e8) int giCheatSeq = 0;
-DATA(0x004f59ec) int iQWE = 0;
+DATA(0x004f57b0) i32 giLimitUpdMinX = -1;
+DATA(0x004f57b4) i32 iLastScrollTime = 0;
+DATA(0x004f57b8) i32 iSandAnim = 0;
+DATA(0x004f57bc) i32 giLastHourGlassUpdateTime = 0;
+DATA(0x004f57c0) i32 TrigX = 0;
+DATA(0x004f57c4) i32 TrigY = 0;
+DATA(0x004f57c8) i32 iCurBottomView = 0;
+DATA(0x004f57cc) i32 iCurBottomViewEnemy = -1;
+DATA(0x004f57d0) i32 iCurHourGlassPhase = 0;
+DATA(0x004f57d4) i32 iLastHourGlassPhase = 1;
+DATA(0x004f57d8) i32 gbForceUpdate = 0;
+DATA(0x004f59e8) i32 giCheatSeq = 0;
+DATA(0x004f59ec) i32 iQWE = 0;
 DATA(0x004f5e38)
-unsigned char monAnimDrawFrame[ADVMGR_MONSTER_ANIMATION_TABLE_SIZE] = {
+u8 monAnimDrawFrame[ADVMGR_MONSTER_ANIMATION_TABLE_SIZE] = {
     0, 0, 0, 1, 2, 2, 1, 0, 0, 0, 3, 4, 5, 5, 4, 3
 };
-DATA(0x004f60e0) int iLastSandAnimTime = 0;
-DATA(0x004f60e4) int iLastNewSandAnimTime = 0;
-DATA(0x004f6720) int giFrameCount = 0;
+DATA(0x004f60e0) i32 iLastSandAnimTime = 0;
+DATA(0x004f60e4) i32 iLastNewSandAnimTime = 0;
+DATA(0x004f6720) i32 giFrameCount = 0;
 DATA(0x00527ec8) class heroWindow *cPanel;
-DATA(0x00527ed0) int iThisMaxY;
-DATA(0x00527edc) int giTownPortalChoice;
-DATA(0x00527ee0) int iThisMinY;
+DATA(0x00527ed0) i32 iThisMaxY;
+DATA(0x00527edc) i32 giTownPortalChoice;
+DATA(0x00527ee0) i32 iThisMinY;
 DATA(0x00527ee8) class heroWindow *townPortalWin;
 DATA(0x00527ef0) struct tag_message USMsg;
-DATA(0x00527f14) int giFrameStep;
+DATA(0x00527f14) i32 giFrameStep;
 DATA(0x00527f28) char cArmySizeName[12];
-DATA(0x00527f34) int giLimitUpdMaxX;
-DATA(0x00527f38) int giLimitUpdMaxY;
-DATA(0x00527f40) int bPrefsChanged;
-DATA(0x00527f4c) int giLimitUpdMinY;
-DATA(0x00527f50) signed char bComboDraw[18][18];
+DATA(0x00527f34) i32 giLimitUpdMaxX;
+DATA(0x00527f38) i32 giLimitUpdMaxY;
+DATA(0x00527f40) i32 bPrefsChanged;
+DATA(0x00527f4c) i32 giLimitUpdMinY;
+DATA(0x00527f50) i8 bComboDraw[18][18];
 DATA(0x005280b0) struct tag_message CDMsg;
-DATA(0x005280d4) int iLastAnimFrame;
+DATA(0x005280d4) i32 iLastAnimFrame;

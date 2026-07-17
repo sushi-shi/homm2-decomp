@@ -17,36 +17,36 @@ class palette;
 class town;
 class widget;
 struct SBolt {
-    int startX;
-    int startY;
-    int endX;
-    int endY;
-    int branchDistance;
-    int width;
-    int colorMode;
-    int unused1C;
-    int angleDistance;
+    i32 startX;
+    i32 startY;
+    i32 endX;
+    i32 endY;
+    i32 branchDistance;
+    i32 width;
+    i32 colorMode;
+    i32 unused1C;
+    i32 angleDistance;
     float currentX;
     float currentY;
-    int pixelX;
-    int pixelY;
-    int drawVertically;
+    i32 pixelX;
+    i32 pixelY;
+    i32 drawVertically;
     float baseAngle;
     float angle;
-    int finished;
-    int nearTarget;
-    int nearestDistance;
-    int widthFirst;
-    int widthLast;
-    int lastBranchX;
-    int lastBranchY;
-    int startWidth;
-    int endWidth;
-    int totalDistance;
-    int minAngle;
-    int maxAngle;
+    i32 finished;
+    i32 nearTarget;
+    i32 nearestDistance;
+    i32 widthFirst;
+    i32 widthLast;
+    i32 lastBranchX;
+    i32 lastBranchY;
+    i32 startWidth;
+    i32 endWidth;
+    i32 totalDistance;
+    i32 minAngle;
+    i32 maxAngle;
     float distanceRatio;
-    int forceAngle;
+    i32 forceAngle;
 };
 SIZE(SBolt, 0x78);
 struct tag_message;
@@ -682,244 +682,244 @@ public:
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (derived: base baseManager = 0x36 bytes at 0x00 via ': public baseManager'; own fields below)
     class palette *m_combatPalette;  // +0x36
-    signed char m_savedPalette[COMBAT_PALETTE_DATA_SIZE];  // +0x3a
+    i8 m_savedPalette[COMBAT_PALETTE_DATA_SIZE];  // +0x3a
     char m_previousCombatMessage[COMBAT_MESSAGE_LINE_SIZE];  // +0x33a
     char m_currentCombatMessage[COMBAT_MESSAGE_LINE_SIZE];  // +0x3b2
-    unsigned char m_previousGridState[COMBAT_HEX_COUNT];  // +0x42a
-    unsigned char m_gridState[COMBAT_HEX_COUNT];  // +0x49f
+    u8 m_previousGridState[COMBAT_HEX_COUNT];  // +0x42a
+    u8 m_gridState[COMBAT_HEX_COUNT];  // +0x49f
     hexcell m_hexCells[COMBAT_HEX_COUNT];  // +0x514
-    int m_terrainType;  // +0x31de
-    int m_battlefieldFringe;  // +0x31e2
+    i32 m_terrainType;  // +0x31de
+    i32 m_battlefieldFringe;  // +0x31e2
     class town *m_originalCombatTown;  // +0x31e6
-    int m_colorCycleType;  // +0x31ea
+    i32 m_colorCycleType;  // +0x31ea
     char _pad_0x31ee[0x4];
-    int m_debugFormation;  // +0x31f2
+    i32 m_debugFormation;  // +0x31f2
     class icon *m_combatIcons[COMBAT_FIXED_ICON_COUNT];  // +0x31f6
     class icon *m_obstacleIcons[8];  // +0x3232
-    int m_obstacleCount;  // +0x3252
-    short m_eagleEyeSpell[2];  // +0x3256
-    int m_drawbridgeState;  // +0x325a
-    int m_drawbridgeBackgroundVisible;  // +0x325e
-    unsigned char m_wallStates[9];  // +0x3262
+    i32 m_obstacleCount;  // +0x3252
+    i16 m_eagleEyeSpell[2];  // +0x3256
+    i32 m_drawbridgeState;  // +0x325a
+    i32 m_drawbridgeBackgroundVisible;  // +0x325e
+    u8 m_wallStates[9];  // +0x3262
     class bitmap *m_combatBuffer;  // +0x326b
     class bitmap *m_backgroundBuffer;  // +0x326f
     class bitmap *m_mouseGridBuffer;  // +0x3273
-    int m_backgroundDrawn;  // +0x3277
+    i32 m_backgroundDrawn;  // +0x3277
     class mapCell *m_battlefieldCell;  // +0x327b
     class town *m_combatTowns[2];  // +0x327f
     class hero *m_heroes[2];  // +0x3287
     class hero m_captain;  // +0x328f
-    int m_spellPower[2];  // +0x3389
+    i32 m_spellPower[2];  // +0x3389
     class armyGroup *m_armyGroups[2];  // +0x3391
-    int m_mouseGridHex;  // +0x3399
-    unsigned char m_heroDeathPending[2];  // +0x339d
-    unsigned char m_heroAlternateDeathPending[2];  // +0x339f
-    unsigned char m_heroDeathAnimationPlayed[2];  // +0x33a1
-    unsigned char m_heroAlternateDeathAnimationPlayed[2];  // +0x33a3
-    int m_heroAnimationState[2];  // +0x33a5
-    int m_heroAnimationFrame[2];  // +0x33ad
-    int m_heroSpriteIndex[2];  // +0x33b5
-    long m_heroCycleTimer[2];  // +0x33bd
+    i32 m_mouseGridHex;  // +0x3399
+    u8 m_heroDeathPending[2];  // +0x339d
+    u8 m_heroAlternateDeathPending[2];  // +0x339f
+    u8 m_heroDeathAnimationPlayed[2];  // +0x33a1
+    u8 m_heroAlternateDeathAnimationPlayed[2];  // +0x33a3
+    i32 m_heroAnimationState[2];  // +0x33a5
+    i32 m_heroAnimationFrame[2];  // +0x33ad
+    i32 m_heroSpriteIndex[2];  // +0x33b5
+    i32l m_heroCycleTimer[2];  // +0x33bd
     class icon *m_heroIcons[2];  // +0x33c5
     class icon *m_heroOverlayIcons[2];  // +0x33cd
-    int m_heroOverlayFrame[2];  // +0x33d5
+    i32 m_heroOverlayFrame[2];  // +0x33d5
     struct SLimitData m_heroLimits[2];  // +0x33dd
     struct SLimitData m_heroOverlayLimits[2];  // +0x33fd
     struct SLimitData m_moatLimits[9];  // +0x341d
-    long m_previousCombatMessageExpiration;  // +0x34ad
-    long m_combatMessageExpiration;  // +0x34b1
-    int m_combatMessagePending;  // +0x34b5
+    i32l m_previousCombatMessageExpiration;  // +0x34ad
+    i32l m_combatMessageExpiration;  // +0x34b1
+    i32 m_combatMessagePending;  // +0x34b5
     char _pad_0x34b9[0x64];
-    unsigned char m_unknown351D[2];  // +0x351d
-    int m_sideDefeated[2];  // +0x351f
-    int m_networkArmyPresent[2];  // +0x3527
-    int m_playerId[2];  // +0x352f
-    int m_experienceValue[2];  // +0x3537
-    int m_heroCastSpell[2];  // +0x353f
-    int m_armyCount[2];  // +0x3547
+    u8 m_unknown351D[2];  // +0x351d
+    i32 m_sideDefeated[2];  // +0x351f
+    i32 m_networkArmyPresent[2];  // +0x3527
+    i32 m_playerId[2];  // +0x352f
+    i32 m_experienceValue[2];  // +0x3537
+    i32 m_heroCastSpell[2];  // +0x353f
+    i32 m_armyCount[2];  // +0x3547
     class army m_armies[2][21];  // +0x354f
-    int m_currentArmySide;  // +0xf2a3
-    int m_currentArmyIndex;  // +0xf2a7
-    int m_currentSpeed;  // +0xf2ab
-    int m_currentSide;  // +0xf2af
-    int m_gridSelectionDisabled;  // +0xf2b3
-    int m_limitCreature;  // +0xf2b7
-    int m_limitCreatureHex;  // +0xf2bb
-    int m_showArmyQuantities;  // +0xf2bf
-    int m_selectedHex;  // +0xf2c3
-    int m_directionTargetHex;  // +0xf2c7
-    int m_previousCommand;  // +0xf2cb
-    int m_currentCommand;  // +0xf2cf
+    i32 m_currentArmySide;  // +0xf2a3
+    i32 m_currentArmyIndex;  // +0xf2a7
+    i32 m_currentSpeed;  // +0xf2ab
+    i32 m_currentSide;  // +0xf2af
+    i32 m_gridSelectionDisabled;  // +0xf2b3
+    i32 m_limitCreature;  // +0xf2b7
+    i32 m_limitCreatureHex;  // +0xf2bb
+    i32 m_showArmyQuantities;  // +0xf2bf
+    i32 m_selectedHex;  // +0xf2c3
+    i32 m_directionTargetHex;  // +0xf2c7
+    i32 m_previousCommand;  // +0xf2cb
+    i32 m_currentCommand;  // +0xf2cf
     struct SLimitData m_catapultLimits;  // +0xf2d3
     struct SLimitData m_gateLimits;  // +0xf2e3
     struct SLimitData m_upperWallLimits;  // +0xf2f3
     struct SLimitData m_middleWallLimits;  // +0xf303
-    int m_catapultFrame[2];  // +0xf313
-    int m_catapultAttackCount[2];  // +0xf31b
-    int m_catapultAttacksRemaining[2];  // +0xf323
-    int m_keepAttacksRemaining[2];  // +0xf32b
-    int m_inCastleCombat;  // +0xf333
-    int m_unknownF337[2];  // +0xf337
-    int m_visitingHeroPresent[2];  // +0xf33f
+    i32 m_catapultFrame[2];  // +0xf313
+    i32 m_catapultAttackCount[2];  // +0xf31b
+    i32 m_catapultAttacksRemaining[2];  // +0xf323
+    i32 m_keepAttacksRemaining[2];  // +0xf32b
+    i32 m_inCastleCombat;  // +0xf333
+    i32 m_unknownF337[2];  // +0xf337
+    i32 m_visitingHeroPresent[2];  // +0xf33f
     char _pad_0xf347[0x4];
-    int m_unknownF34B;  // +0xf34b
-    int m_unknownF34F;  // +0xf34f
-    int m_unknownF353;  // +0xf353
-    int m_nonVisualCombat;  // +0xf357
-    int m_unknownF35B;  // +0xf35b
-    int m_killBenefit[2];  // +0xf35f
+    i32 m_unknownF34B;  // +0xf34b
+    i32 m_unknownF34F;  // +0xf34f
+    i32 m_unknownF353;  // +0xf353
+    i32 m_nonVisualCombat;  // +0xf357
+    i32 m_unknownF35B;  // +0xf35b
+    i32 m_killBenefit[2];  // +0xf35f
     class heroWindow *m_combatWindow;  // +0xf367
     char _pad_0xf36b[0x8];
-    int m_unknownF373;  // +0xf373
-    int m_sideRetreated[2];  // +0xf377
-    int m_limitCreatureCount[2][20];  // +0xf37f
-    int m_drawHero[2];  // +0xf41f
-    int m_drawHeroOverlay[2];  // +0xf427
-    int m_combatWindowOpen;  // +0xf42f
+    i32 m_unknownF373;  // +0xf373
+    i32 m_sideRetreated[2];  // +0xf377
+    i32 m_limitCreatureCount[2][20];  // +0xf37f
+    i32 m_drawHero[2];  // +0xf41f
+    i32 m_drawHeroOverlay[2];  // +0xf427
+    i32 m_combatWindowOpen;  // +0xf42f
     class widget *m_winLoseBottomWidgets[25];  // +0xf433
     class widget *m_winLoseBottomTextWidgets[25];  // +0xf497
-    int m_combatX;  // +0xf4fb
-    int m_combatY;  // +0xf4ff
-    signed char m_directionMap[24];  // +0xf503
-    int m_mouseDirection;  // +0xf51b
-    int m_validDirectionCount;  // +0xf51f
+    i32 m_combatX;  // +0xf4fb
+    i32 m_combatY;  // +0xf4ff
+    i8 m_directionMap[24];  // +0xf503
+    i32 m_mouseDirection;  // +0xf51b
+    i32 m_validDirectionCount;  // +0xf51f
     struct SLimitData m_smallViewLimits;  // +0xf523
     char _pad_0xf533[0x10];
-    int m_smallViewSide[2];  // +0xf543
-    int m_smallViewArmyIndex[2];  // +0xf54b
-    int m_smallViewLastX[2];  // +0xf553
-    int m_smallViewLastY[2];  // +0xf55b
-    int m_smallViewWidth[2];  // +0xf563
-    int m_smallViewHeight[2];  // +0xf56b
+    i32 m_smallViewSide[2];  // +0xf543
+    i32 m_smallViewArmyIndex[2];  // +0xf54b
+    i32 m_smallViewLastX[2];  // +0xf553
+    i32 m_smallViewLastY[2];  // +0xf55b
+    i32 m_smallViewWidth[2];  // +0xf563
+    i32 m_smallViewHeight[2];  // +0xf56b
     char _pad_0xf573[0x4];
-    unsigned char m_removedArmies[2][20];  // +0xf577
-    unsigned char m_removedArmyPresent;  // +0xf59f
+    u8 m_removedArmies[2][20];  // +0xf577
+    u8 m_removedArmyPresent;  // +0xf59f
     char m_battlefieldBackgroundName[13];  // +0xf5a0
-    signed char m_adjacency[COMBAT_HEX_COUNT][COMBAT_AI_ADJACENT_DIRECTION_COUNT];  // +0xf5ad
+    i8 m_adjacency[COMBAT_HEX_COUNT][COMBAT_AI_ADJACENT_DIRECTION_COUNT];  // +0xf5ad
     class heroWindow *m_winLoseWindow;  // +0xf86b
-    int m_selectedSpell;  // +0xf86f
-    int m_combatResult;  // +0xf873
+    i32 m_selectedSpell;  // +0xf86f
+    i32 m_combatResult;  // +0xf873
     // --- constructors ---
     combatManager(void);
     // --- virtual methods (vtable order) ---
-    virtual int Open(int) OVERRIDE;
+    virtual i32 Open(i32) OVERRIDE;
     virtual void Close(void) OVERRIDE;
-    virtual int Main(struct tag_message &) OVERRIDE;
+    virtual i32 Main(struct tag_message &) OVERRIDE;
     // --- methods ---
     void NoShowCombatLog(char *);
-    void ClearCombatMessages(int);
+    void ClearCombatMessages(i32);
     void CheckUpdateCombatMessages(void);
-    void CombatMessage(char *, int, int, int);
-    void CombatMessage(int);
+    void CombatMessage(char *, i32, i32, i32);
+    void CombatMessage(i32);
     void ResetLimitCreature(void);
     void UpdateCombatArea(void);
     void SetupGridForArmy(class army *);
-    int UpdateGrid(int, int);
+    i32 UpdateGrid(i32, i32);
     void DrawBackground(void);
-    void UpdateMouseGrid(int, int);
-    void DrawFrame(int, int, int, int, int, int, int);
-    void DrawSmallView(int, int);
-    int ViewGeneral(int, int, int);
-    void ViewArmy(class army *, int);
-    int HasValidSpellTarget(int);
-    int ViewSpells(int);
-    int FindResurrectArmyIndex(int, int, int);
-    int ValidSpellTarget(int, int);
-    void SpellMessage(int, int);
-    void CastSpell(int, int, int, int);
-    void DefaultSpell(int);
-    void Fireball(int, int);
-    void MeteorShower(int);
+    void UpdateMouseGrid(i32, i32);
+    void DrawFrame(i32, i32, i32, i32, i32, i32, i32);
+    void DrawSmallView(i32, i32);
+    i32 ViewGeneral(i32, i32, i32);
+    void ViewArmy(class army *, i32);
+    i32 HasValidSpellTarget(i32);
+    i32 ViewSpells(i32);
+    i32 FindResurrectArmyIndex(i32, i32, i32);
+    i32 ValidSpellTarget(i32, i32);
+    void SpellMessage(i32, i32);
+    void CastSpell(i32, i32, i32, i32);
+    void DefaultSpell(i32);
+    void Fireball(i32, i32);
+    void MeteorShower(i32);
     void ElementalStorm(void);
     void Armageddon(void);
     void TurnToStone(class army *);
-    void BloodLustEffect(class army *, int);
-    void Ripple(int);
-    void Blur(int, int, int);
+    void BloodLustEffect(class army *, i32);
+    void Ripple(i32);
+    void Blur(i32, i32, i32);
     void ResetBoltAngle(struct SBolt *);
-    void DrawBolt(struct SBolt *, int);
-    void AddBolt(struct SBolt *, int, int, int, int, int, int, int, int, int, int, int, int);
-    void DoBolt(int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int);
-    int GetNextChainLightningTarget(class army *, int);
-    void ChainLightning(int, int);
-    void VaporizeCreature(int, int);
-    void RippleCreature(int, int, int);
-    void ShowMassSpell(signed char (* const)[20], int, int);
-    void CastMassSpell(int, int);
-    void MirrorImage(int);
-    void SummonElemental(int, int);
-    void DoLuck(int, int);
-    void DoBlast(int, int);
-    void Resurrect(int, int, int);
-    int SpaceForElementalExists(void);
-    void ShowSpellCastFailure(class army *, int);
-    void ModifyDamageForArtifacts(long int *, int, class hero *, class hero *);
+    void DrawBolt(struct SBolt *, i32);
+    void AddBolt(struct SBolt *, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32);
+    void DoBolt(i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32);
+    i32 GetNextChainLightningTarget(class army *, i32);
+    void ChainLightning(i32, i32);
+    void VaporizeCreature(i32, i32);
+    void RippleCreature(i32, i32, i32);
+    void ShowMassSpell(i8 (* const)[20], i32, i32);
+    void CastMassSpell(i32, i32);
+    void MirrorImage(i32);
+    void SummonElemental(i32, i32);
+    void DoLuck(i32, i32);
+    void DoBlast(i32, i32);
+    void Resurrect(i32, i32, i32);
+    i32 SpaceForElementalExists(void);
+    void ShowSpellCastFailure(class army *, i32);
+    void ModifyDamageForArtifacts(i32l *, i32, class hero *, class hero *);
     void Earthquake(void);
-    void ShowSpellMessage(int, int, class army *);
-    int ValidHexToStandOn(int);
-    void SetCombatDirections(int);
-    void CheckSetMouseDirection(int, int, int);
-    int GetPointer(int, int);
-    int ProcessCombatMsg(struct tag_message &);
-    int IsNegationSphereInEffect(void);
+    void ShowSpellMessage(i32, i32, class army *);
+    i32 ValidHexToStandOn(i32);
+    void SetCombatDirections(i32);
+    void CheckSetMouseDirection(i32, i32, i32);
+    i32 GetPointer(i32, i32);
+    i32 ProcessCombatMsg(struct tag_message &);
+    i32 IsNegationSphereInEffect(void);
     void ResetRound(void);
-    int CheckWin(struct tag_message *);
-    int GetCommand(int);
-    int RightClick(int);
-    void DoCommand(int);
+    i32 CheckWin(struct tag_message *);
+    i32 GetCommand(i32);
+    i32 RightClick(i32);
+    void DoCommand(i32);
     void ClearWinLoseBottom(class heroWindow *);
-    void ShowWinLoseArtifact(class heroWindow *, int);
+    void ShowWinLoseArtifact(class heroWindow *, i32);
     void ShowSkeletons(class heroWindow *);
     void ShowEagleEyeSpell(class heroWindow *);
     void ShowDeadArmies(class heroWindow *);
-    void DoVictory(int);
+    void DoVictory(i32);
     void DoLoseWindow(void);
-    int DoSurrender(void);
+    i32 DoSurrender(void);
     void CheckChangeSelector(void);
     void CheckCastleAttack(void);
     void CheckGetAIMove(void);
     void GetControl(void);
     void ResetMouse(void);
-    int ProcessNextAction(struct tag_message &);
+    i32 ProcessNextAction(struct tag_message &);
     void ResetCyclingCreatures(void);
     void ResetCycleTimers(void);
     void CycleCombatScreen(void);
-    void SetCombatViewArmySmallLevel(int);
-    void SetCombatGrid(int, int, int);
-    void AddArmy(int, int, int, int, int, int);
+    void SetCombatViewArmySmallLevel(i32);
+    void SetCombatGrid(i32, i32, i32);
+    void AddArmy(i32, i32, i32, i32, i32, i32);
     void SetupSmallView(void);
-    void ViewBallista(int);
-    int DoSpellAI(int, int);
-    void DetermineEffectOfSpell(int, int *, int *);
-    int EffectSpellCreateCreature(int, int);
-    int RawEffectSpellInfluence(class army *, int);
+    void ViewBallista(i32);
+    i32 DoSpellAI(i32, i32);
+    void DetermineEffectOfSpell(i32, i32 *, i32 *);
+    i32 EffectSpellCreateCreature(i32, i32);
+    i32 RawEffectSpellInfluence(class army *, i32);
     void ClearEffects(void);
-    void NextPos(int *);
-    int FirstArmy(int, int, int *);
-    int FirstResurrectable(int, int *, int);
-    void EffectSpellCure(int *, int, int, int);
-    void EffectSpellResurrect(int *, int, int);
-    void EffectSpellDamage(int *, int, int);
+    void NextPos(i32 *);
+    i32 FirstArmy(i32, i32, i32 *);
+    i32 FirstResurrectable(i32, i32 *, i32);
+    void EffectSpellCure(i32 *, i32, i32, i32);
+    void EffectSpellResurrect(i32 *, i32, i32);
+    void EffectSpellDamage(i32 *, i32, i32);
     void CombineGroups(class armyGroup *, class armyGroup *);
-    void SetupCombat(int, int, class hero *, class armyGroup *, class town *, class hero *, class armyGroup *, int, int, int);
+    void SetupCombat(i32, i32, class hero *, class armyGroup *, class town *, class hero *, class armyGroup *, i32, i32, i32);
     void InitNonVisualVars(void);
     void SetupAdjacencyArray(void);
-    void UpdateArmyGroup(int);
+    void UpdateArmyGroup(i32);
     void GenerateMap(void);
     char * GetBackgroundName(void);
-    int MoreTreesNear(void);
+    i32 MoreTreesNear(void);
     void LoadIcons(void);
     void FreeIcons(void);
     void LoadArmies(void);
     void FreeArmies(void);
-    int GetGridIndex(int, int);
-    void CheckApplyGoodMorale(int, int);
-    int CheckApplyBadMorale(int, int);
-    int GetNextArmy(int);
-    int IsWinner(int);
-    void CatAttack(int);
-    void KeepAttack(int);
-    int ExperienceValueOfStack(int);
+    i32 GetGridIndex(i32, i32);
+    void CheckApplyGoodMorale(i32, i32);
+    i32 CheckApplyBadMorale(i32, i32);
+    i32 GetNextArmy(i32);
+    i32 IsWinner(i32);
+    void CatAttack(i32);
+    void KeepAttack(i32);
+    i32 ExperienceValueOfStack(i32);
     void ResetHitByCreature(void);
     void SaveCombatBorder(void);
     void DrawCombatBorder(void);
@@ -928,66 +928,66 @@ public:
     void LowerDoor(void);
     void RaiseDoor(void);
     void TestRaiseDoor(void);
-    int InCastle(int);
-    int ShotIsThroughWall(int, int, int);
-    void ShootMissile(int, int, int, int, float *, class icon *);
+    i32 InCastle(i32);
+    i32 ShotIsThroughWall(i32, i32, i32);
+    void ShootMissile(i32, i32, i32, i32, float *, class icon *);
     void CombatSystemOptions(void);
-    int AICheckRetreat(void);
-    void DoCompAI(int);
+    i32 AICheckRetreat(void);
+    void DoCompAI(i32);
     float GetModLichDamage(class army *, float);
     void DoLichShot(class army *);
-    int GetShooterMask(int);
-    int GetMirrorImageMask(int);
-    int GetFlyerMask(int);
-    int GetAllMask(int);
-    int GetWalkerMask(int);
-    int GetOutOfItMask(int);
-    int GetTraitorMask(int);
-    int GetBestArmy(int, int);
-    int GetWorstArmy(int, int);
-    int GetClosestArmy(class army *, int, int);
-    unsigned long int GetStrength(int, int);
-    int AttemptAttack(class army *, int, int);
-    int AttemptAdjacentAttack(class army *);
-    int WalkTowardArmyFront(class army *, int, int);
-    int WalkTowardArmy(class army *, int, int);
+    i32 GetShooterMask(i32);
+    i32 GetMirrorImageMask(i32);
+    i32 GetFlyerMask(i32);
+    i32 GetAllMask(i32);
+    i32 GetWalkerMask(i32);
+    i32 GetOutOfItMask(i32);
+    i32 GetTraitorMask(i32);
+    i32 GetBestArmy(i32, i32);
+    i32 GetWorstArmy(i32, i32);
+    i32 GetClosestArmy(class army *, i32, i32);
+    u32l GetStrength(i32, i32);
+    i32 AttemptAttack(class army *, i32, i32);
+    i32 AttemptAdjacentAttack(class army *);
+    i32 WalkTowardArmyFront(class army *, i32, i32);
+    i32 WalkTowardArmy(class army *, i32, i32);
 };
 #pragma pack(pop)
 SIZE(combatManager, 0xf877);
 // ---- globals (declarations, RVA order) ----
-extern int bGridWasShowing;
-extern int gbInDrawSmallView;
-extern int iViewGeneralWhichSide;
-extern int castX;
-extern int castY;
-extern int bInTeleportGetDest;
-extern int indexToCastOn;
-extern unsigned char uRedBeam[];
-extern unsigned char uRainbow[];
-extern signed char *gyModify;
+extern i32 bGridWasShowing;
+extern i32 gbInDrawSmallView;
+extern i32 iViewGeneralWhichSide;
+extern i32 castX;
+extern i32 castY;
+extern i32 bInTeleportGetDest;
+extern i32 indexToCastOn;
+extern u8 uRedBeam[];
+extern u8 uRainbow[];
+extern i8 *gyModify;
 extern float gfDurationMods[12];
 extern float gfCancelDurationMods[11];
-extern int bInHighMoraleBonus;
-extern int giSeed;
-extern unsigned char wallHex[4];
-extern int gbThisNetHasControl;
-extern int iCurTransferArtifact;
-extern signed char iTransferArtifactsInfo[16];
-extern int gbWhichAnimationPlaying;
-extern int iMaxTransferArtifacts;
-extern int giNextActionExtra;
-extern int bSkeletonsShown;
-extern int gbShowingLoseWindow;
-extern int giWinCmbtFrame;
-extern int giNextActionGridIndex;
-extern int giSurrenderCost;
-extern int giSkeletonsCreated;
-extern signed char iTransferArtifacts[16];
-extern int giNextAction;
-extern int giNextActionGridIndex2;
-extern int giCurrSpellGroup;
-extern int bMouseWasVis;
+extern i32 bInHighMoraleBonus;
+extern i32 giSeed;
+extern u8 wallHex[4];
+extern i32 gbThisNetHasControl;
+extern i32 iCurTransferArtifact;
+extern i8 iTransferArtifactsInfo[16];
+extern i32 gbWhichAnimationPlaying;
+extern i32 iMaxTransferArtifacts;
+extern i32 giNextActionExtra;
+extern i32 bSkeletonsShown;
+extern i32 gbShowingLoseWindow;
+extern i32 giWinCmbtFrame;
+extern i32 giNextActionGridIndex;
+extern i32 giSurrenderCost;
+extern i32 giSkeletonsCreated;
+extern i8 iTransferArtifacts[16];
+extern i32 giNextAction;
+extern i32 giNextActionGridIndex2;
+extern i32 giCurrSpellGroup;
+extern i32 bMouseWasVis;
 extern class heroWindow *CSPanel;
-extern int bCPrefsChanged;
+extern i32 bCPrefsChanged;
 
 #endif // HOMM2_SOURCE_COMBATMANAGER_H

@@ -7,13 +7,13 @@
 // retail registry value names recovered from ReadPrefsFromRegistry/WritePrefsToRegistry.
 #pragma pack(push, 1)
 struct exeGfxConfig {
-    int showMenu;
-    int x;
-    int y;
-    int width;
-    int height;
-    int fullScreen;
-    int colorMouseCursor;
+    i32 showMenu;
+    i32 x;
+    i32 y;
+    i32 width;
+    i32 height;
+    i32 fullScreen;
+    i32 colorMouseCursor;
 };
 
 typedef enum ConfigMusicSource {
@@ -41,39 +41,39 @@ typedef enum ConfigConnectionType {
 } ConfigConnectionType;
 
 struct configStruct {
-    int computerWalkSpeed;
-    int walkSpeed;
-    int musicVolume;
-    int soundVolume;
-    int autosave;
-    int showRoute;
-    int blackoutComputer;
+    i32 computerWalkSpeed;
+    i32 walkSpeed;
+    i32 musicVolume;
+    i32 soundVolume;
+    i32 autosave;
+    i32 showRoute;
+    i32 blackoutComputer;
     exeGfxConfig gfx[CONFIG_EXECUTABLE_COUNT];
-    int firstMapOffset;
-    int currentMapOffset;
-    int showObjectBoxes;
-    int editorScreenAnimation;
-    int editorPaletteCycling;
-    int showCombatGrid;
-    int showCombatMouseHex;
-    int combatShadeLevel;
-    int combatArmyInfoLevel;
-    int evilInterfaceUsage;
+    i32 firstMapOffset;
+    i32 currentMapOffset;
+    i32 showObjectBoxes;
+    i32 editorScreenAnimation;
+    i32 editorPaletteCycling;
+    i32 showCombatGrid;
+    i32 showCombatMouseHex;
+    i32 combatShadeLevel;
+    i32 combatArmyInfoLevel;
+    i32 evilInterfaceUsage;
     char autoLoadName[0xd];
     char autoSaveName[0xd];
     char mciError;
     char needsDefaultInitialization;
     char reservedAfterAutoSave[0x12];
-    int musicSource;
+    i32 musicSource;
     char modemInitString[0x64];
-    int comPort[CONFIG_CONNECTION_COUNT];
-    int baudRate[CONFIG_CONNECTION_COUNT];
+    i32 comPort[CONFIG_CONNECTION_COUNT];
+    i32 baudRate[CONFIG_CONNECTION_COUNT];
     char uniqueSystemID[4];
-    int useOpera;
-    int quickCombatLevel;
-    int combatSpeed;
-    int autoCombatUseSpells;
-    int slowVideo;
+    i32 useOpera;
+    i32 quickCombatLevel;
+    i32 combatSpeed;
+    i32 autoCombatUseSpells;
+    i32 slowVideo;
     char rmtRLName[0xd];
     char rmtRCName[0xd];
     char rmtRDName[0xd];

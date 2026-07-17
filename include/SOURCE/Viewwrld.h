@@ -1,5 +1,7 @@
 #ifndef HOMM2_VIEWWRLD_H
 #define HOMM2_VIEWWRLD_H
+
+#include <Ints.h>
 // Declarations of the free functions DEFINED in Viewwrld.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
 // forward declarations (was <_all.h>):
@@ -72,6 +74,6 @@ typedef enum ViewWorldConstant {
     VIEW_WORLD_RADAR_BOTTOM = 0xa0
 } ViewWorldConstant;
 
-int ViewWorldDialogHandler(struct tag_message &);
+i32 ViewWorldDialogHandler(struct tag_message &);
 
 #endif // HOMM2_VIEWWRLD_H

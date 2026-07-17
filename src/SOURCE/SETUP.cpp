@@ -23,7 +23,7 @@
 #include <windows.h>
 
 VA(0x00410e90, 0x2f)
-int game::SetupCampaignGame(void)
+i32 game::SetupCampaignGame(void)
 {
     PlaySmacker(SETUP_CAMPAIGN_INTRO);
     PlaySmacker(SETUP_CAMPAIGN_SELECTION);
@@ -33,7 +33,7 @@ int game::SetupCampaignGame(void)
 // @early-stop All 0x141 code bytes match after relocation masking; external
 // relocations match 22/22. Residual is delinked local/interior symbol identity.
 VA(0x00410ebf, 0x141)
-int game::SetupBaud(void)
+i32 game::SetupBaud(void)
 {
     heroWindow *window = new heroWindow(SETUP_WINDOW_X, SETUP_WINDOW_Y, "stpbaud.bin");
     if (window == 0)
@@ -63,7 +63,7 @@ int game::SetupBaud(void)
 // @early-stop All 0x200 code bytes match after relocation masking; external
 // relocations match 47/47. Target-only entries are local jump-table relocs.
 VA(0x00411000, 0x200)
-int game::SetupComPort(void)
+i32 game::SetupComPort(void)
 {
     char initString[SETUP_MODEM_INIT_ENTRY_LENGTH];
 
@@ -110,10 +110,10 @@ int game::SetupComPort(void)
 }
 
 VA(0x00411200, 0x238)
-int game::SetupHotSeatGame(void)
+i32 game::SetupHotSeatGame(void)
 {
     char defaultName[24];
-    int ix;
+    i32 ix;
 
     heroWindow *window = new heroWindow(SETUP_WINDOW_X, SETUP_WINDOW_Y, "stphotst.bin");
     if (window == 0)
@@ -161,7 +161,7 @@ int game::SetupHotSeatGame(void)
 }
 
 VA(0x00411438, 0x127)
-int game::SetupNetworkGame(void)
+i32 game::SetupNetworkGame(void)
 {
     tag_message message;
     heroWindow *window = new heroWindow(SETUP_WINDOW_X, SETUP_WINDOW_Y, "stpnet.bin");
@@ -195,11 +195,11 @@ int game::SetupNetworkGame(void)
 // @early-stop All 0x236 code bytes match after relocation masking; external
 // relocations match 24/24. Residual is fixed IAT/local jump-table identity.
 VA(0x0041155f, 0x236)
-int game::SetupNetworkGame2(void)
+i32 game::SetupNetworkGame2(void)
 {
     tag_message message;
     OSVERSIONINFO osInfo;
-    int result;
+    i32 result;
 
     heroWindow *window = new heroWindow(SETUP_WINDOW_X, SETUP_WINDOW_Y, "stpnet2.bin");
     if (window == 0)
@@ -247,7 +247,7 @@ int game::SetupNetworkGame2(void)
 }
 
 VA(0x00411795, 0x317)
-int game::SetupModemGame(void)
+i32 game::SetupModemGame(void)
 {
     tag_message message;
     heroWindow *window;
@@ -317,10 +317,10 @@ int game::SetupModemGame(void)
 // @early-stop All 0x257 code bytes match after relocation masking; external
 // relocations match 42/42. Residual is delinked local jump-table identity.
 VA(0x00411aac, 0x257)
-int game::SetupMultiPlayerGame(void)
+i32 game::SetupMultiPlayerGame(void)
 {
     tag_message message;
-    int continueFlag;
+    i32 continueFlag;
 
     heroWindow *window = new heroWindow(SETUP_WINDOW_X, SETUP_WINDOW_Y, "stpmp.bin");
     if (window == 0)
@@ -382,10 +382,10 @@ int game::SetupMultiPlayerGame(void)
 }
 
 VA(0x00411d03, 0x6c9)
-int game::SetupGame(void)
+i32 game::SetupGame(void)
 {
     heroWindow *window;
-    int result;
+    i32 result;
 
     LogStr("Setup 0");
     result = 1;
@@ -490,7 +490,7 @@ int game::SetupGame(void)
     gpWindowManager->DoDialog(window, SetupGameHandler, 0);
     delete window;
 
-    switch (static_cast<short>(gpWindowManager->m_dialogResult)) {
+    switch (static_cast<i16>(gpWindowManager->m_dialogResult)) {
     case 1:
         break;
 
@@ -502,7 +502,7 @@ int game::SetupGame(void)
             gpWindowManager->DoDialog(window, ExpLoadCampaignHandler, 0);
             delete window;
 
-            switch (static_cast<short>(gpWindowManager->m_dialogResult)) {
+            switch (static_cast<i16>(gpWindowManager->m_dialogResult)) {
             case 1:
                 gbInCampaign = 1;
                 break;
@@ -521,7 +521,7 @@ int game::SetupGame(void)
             gpWindowManager->DoDialog(window, ExpLoadCampaignHandler, 0);
             delete window;
 
-            switch (static_cast<short>(gpWindowManager->m_dialogResult)) {
+            switch (static_cast<i16>(gpWindowManager->m_dialogResult)) {
             case 1:
                 gbInCampaign = 1;
                 if (!SetupCampaignGame()) {
@@ -570,10 +570,10 @@ done:
 }
 
 VA(0x004123cc, 0x2aa)
-int game::PickLoadGame(void)
+i32 game::PickLoadGame(void)
 {
     char filePattern_4[12];
-    int dialogResult_18;
+    i32 dialogResult_18;
     heroWindow *window_27;
     fileRequester *requester_11;
 
@@ -596,7 +596,7 @@ int game::PickLoadGame(void)
         gpWindowManager->DoDialog(window_27, ExpStdGameHandler, 0);
         delete window_27;
 
-        switch (static_cast<short>(gpWindowManager->m_dialogResult)) {
+        switch (static_cast<i16>(gpWindowManager->m_dialogResult)) {
         case 1:
             xIsExpansionMap = 0;
             break;
@@ -630,15 +630,15 @@ int game::PickLoadGame(void)
 }
 
 VA(0x00412676, 0x1e)
-int SetupCampaignGameHandler(struct tag_message &message)
+i32 SetupCampaignGameHandler(struct tag_message &message)
 {
     return BaseSetupHandler(message);
 }
 
 VA(0x00412694, 0x13e)
-int SetupComPortHandler(struct tag_message &message)
+i32 SetupComPortHandler(struct tag_message &message)
 {
-    int helpIndex;
+    i32 helpIndex;
 
     if ((message.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) != 0 &&
         (message.payload.widget.command == WIDGET_COMMAND_SELECT ||
@@ -664,9 +664,9 @@ int SetupComPortHandler(struct tag_message &message)
 }
 
 VA(0x004127d2, 0x13e)
-int SetupBaudHandler(struct tag_message &message)
+i32 SetupBaudHandler(struct tag_message &message)
 {
-    int helpIndex;
+    i32 helpIndex;
 
     if ((message.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) != 0 &&
         (message.payload.widget.command == WIDGET_COMMAND_SELECT ||
@@ -692,9 +692,9 @@ int SetupBaudHandler(struct tag_message &message)
 }
 
 VA(0x00412910, 0x118)
-int SetupHotSeatGameHandler(struct tag_message &message)
+i32 SetupHotSeatGameHandler(struct tag_message &message)
 {
-    int helpIndex;
+    i32 helpIndex;
 
     if ((message.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) != 0 &&
         (message.payload.widget.command == WIDGET_COMMAND_SELECT ||
@@ -716,9 +716,9 @@ int SetupHotSeatGameHandler(struct tag_message &message)
 }
 
 VA(0x00412a28, 0x12e)
-int SetupModemGameHandler(struct tag_message &message)
+i32 SetupModemGameHandler(struct tag_message &message)
 {
-    int helpIndex;
+    i32 helpIndex;
 
     if ((message.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) != 0 &&
         (message.payload.widget.command == WIDGET_COMMAND_SELECT ||
@@ -743,9 +743,9 @@ int SetupModemGameHandler(struct tag_message &message)
 }
 
 VA(0x00412b56, 0x108)
-int SetupMultiPlayerGameHandler(struct tag_message &message)
+i32 SetupMultiPlayerGameHandler(struct tag_message &message)
 {
-    int helpIndex;
+    i32 helpIndex;
 
     if ((message.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) != 0 &&
         (message.payload.widget.command == WIDGET_COMMAND_SELECT ||
@@ -766,9 +766,9 @@ int SetupMultiPlayerGameHandler(struct tag_message &message)
 }
 
 VA(0x00412c5e, 0xd7)
-int SetupNetworkGameHandler(struct tag_message &message)
+i32 SetupNetworkGameHandler(struct tag_message &message)
 {
-    int helpIndex;
+    i32 helpIndex;
 
     if ((message.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) != 0 &&
         (message.payload.widget.command == WIDGET_COMMAND_SELECT ||
@@ -787,9 +787,9 @@ int SetupNetworkGameHandler(struct tag_message &message)
 }
 
 VA(0x00412d35, 0xf8)
-int SetupNetworkGame2Handler(struct tag_message &message)
+i32 SetupNetworkGame2Handler(struct tag_message &message)
 {
-    int helpIndex;
+    i32 helpIndex;
 
     if ((message.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) != 0 &&
         (message.payload.widget.command == WIDGET_COMMAND_SELECT ||
@@ -809,9 +809,9 @@ int SetupNetworkGame2Handler(struct tag_message &message)
 }
 
 VA(0x00412e2d, 0x14b)
-int SetupGameHandler(struct tag_message &message)
+i32 SetupGameHandler(struct tag_message &message)
 {
-    int helpIndex;
+    i32 helpIndex;
 
     if ((message.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) != 0) {
         if (message.payload.widget.command == WIDGET_COMMAND_SELECT ||
@@ -842,9 +842,9 @@ int SetupGameHandler(struct tag_message &message)
 }
 
 VA(0x00412f78, 0xd7)
-int ExpNewCampaignHandler(struct tag_message &message)
+i32 ExpNewCampaignHandler(struct tag_message &message)
 {
-    int helpIndex;
+    i32 helpIndex;
 
     if ((message.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) != 0 &&
         (message.payload.widget.command == WIDGET_COMMAND_SELECT ||
@@ -863,9 +863,9 @@ int ExpNewCampaignHandler(struct tag_message &message)
 }
 
 VA(0x0041304f, 0xd7)
-int ExpLoadCampaignHandler(struct tag_message &message)
+i32 ExpLoadCampaignHandler(struct tag_message &message)
 {
-    int helpIndex;
+    i32 helpIndex;
 
     if ((message.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) != 0 &&
         (message.payload.widget.command == WIDGET_COMMAND_SELECT ||
@@ -884,9 +884,9 @@ int ExpLoadCampaignHandler(struct tag_message &message)
 }
 
 VA(0x00413126, 0xd7)
-int ExpStdGameHandler(struct tag_message &message)
+i32 ExpStdGameHandler(struct tag_message &message)
 {
-    int helpIndex;
+    i32 helpIndex;
 
     if ((message.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) != 0 &&
         (message.payload.widget.command == WIDGET_COMMAND_SELECT ||
@@ -905,9 +905,9 @@ int ExpStdGameHandler(struct tag_message &message)
 }
 
 VA(0x004131fd, 0xf0)
-int BaseSetupHandler(struct tag_message &message)
+i32 BaseSetupHandler(struct tag_message &message)
 {
-    int handled = 0;
+    i32 handled = 0;
 
     PollSound();
     if (message.type == MESSAGE_WIDGET) {
@@ -934,4 +934,4 @@ int BaseSetupHandler(struct tag_message &message)
 }
 
 // ---- globals (definitions, RVA order) ----
-DATA(0x004ee248) int gbDoModemConfig = 0;
+DATA(0x004ee248) i32 gbDoModemConfig = 0;

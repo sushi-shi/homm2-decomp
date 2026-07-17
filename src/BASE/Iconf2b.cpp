@@ -12,23 +12,23 @@
 #include <string.h>
 // Per-call decoder scratch — its own file-static block (0x534c60+).
 DATA(0x00534c78) static IconEntry *gFlipEntry;
-DATA(0x00534c68) static int gFlipX0;
-DATA(0x00534ca4) static int gFlipXEnd;
-DATA(0x00534c74) static int gFlipY;
-DATA(0x00534c7c) static int gFlipX;
-DATA(0x00534c80) static unsigned char *gFlipSrc;
-DATA(0x00534c9c) static int gFlipClipR;
-DATA(0x00534c8c) static int gFlipClipB;
-DATA(0x00534c90) static int gFlipRow;
-DATA(0x00534c64) static unsigned int gFlipRun;
-DATA(0x00534c98) static unsigned char gFlipColor;
-DATA(0x00534c94) static unsigned int gFlipCnt2;
-DATA(0x00534c70) static unsigned int gFlipDimLen;
-DATA(0x00534c84) static unsigned char *gFlipDimPal;
-DATA(0x00534c6c) static unsigned int gFlipCnt;
-DATA(0x00534c88) static unsigned char *gFlipDimDst;
-DATA(0x00534ca0) static unsigned char *gFlipDst;
-DATA(0x00534c60) static int gFlipSkip;
+DATA(0x00534c68) static i32 gFlipX0;
+DATA(0x00534ca4) static i32 gFlipXEnd;
+DATA(0x00534c74) static i32 gFlipY;
+DATA(0x00534c7c) static i32 gFlipX;
+DATA(0x00534c80) static u8 *gFlipSrc;
+DATA(0x00534c9c) static i32 gFlipClipR;
+DATA(0x00534c8c) static i32 gFlipClipB;
+DATA(0x00534c90) static i32 gFlipRow;
+DATA(0x00534c64) static u32 gFlipRun;
+DATA(0x00534c98) static u8 gFlipColor;
+DATA(0x00534c94) static u32 gFlipCnt2;
+DATA(0x00534c70) static u32 gFlipDimLen;
+DATA(0x00534c84) static u8 *gFlipDimPal;
+DATA(0x00534c6c) static u32 gFlipCnt;
+DATA(0x00534c88) static u8 *gFlipDimDst;
+DATA(0x00534ca0) static u8 *gFlipDst;
+DATA(0x00534c60) static i32 gFlipSkip;
 
 // @semantic
 // 214bd52 fresh structural pass: complete CFG, sub esp,8 frame, and all external relocation
@@ -179,13 +179,13 @@ DATA(0x00534c60) static int gFlipSkip;
 // typedefs or tune fuzzy here; revisit after a real header/TU-state change. See the macro-head rows
 // in iconf2b-cfg-f24566c.tsv. This remains a coverage checkpoint, not a byte-proven wall.
 VA(0x004d1ba0, 0x4f1)
-void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
-                      int clip, int clipX, int clipY, int clipW, int clipH, int color)
+void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, i32 x, i32 y, i32 frame,
+                      i32 clip, i32 clipX, i32 clipY, i32 clipW, i32 clipH, i32 color)
 {
     IconEntry *entries = reinterpret_cast<IconEntry *>(srcIcon->m_data);
-    unsigned char *src = reinterpret_cast<unsigned char *>(entries);
-    int x0 = x;
-    int w;
+    u8 *src = reinterpret_cast<u8 *>(entries);
+    i32 x0 = x;
+    i32 w;
     IconEntry *entry = &entries[frame];
     w = entry->w;
     x0 = x0 - entry->x;
@@ -195,7 +195,7 @@ void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int
     gFlipEntry = entry;
     x0++;
     gFlipX0 = x0;
-    int X = w + x0 - 1;
+    i32 X = w + x0 - 1;
     gFlipXEnd = X;
     gFlipY = y;
     if (clip != 0) {
@@ -209,15 +209,15 @@ void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int
             clip = 0;
         }
     }
-    short pitch = dest->m_width;
-    gFlipRow = gFlipY * pitch + reinterpret_cast<int>(dest->m_pixels);
+    i16 pitch = dest->m_width;
+    gFlipRow = gFlipY * pitch + reinterpret_cast<i32>(dest->m_pixels);
     for (;;) {
-        int cmd = *src++;
-        if (static_cast<signed char>(cmd) < 0) {
+        i32 cmd = *src++;
+        if (static_cast<i8>(cmd) < 0) {
             if ((cmd & 0x40) == 0) {
                 // skip run / end-of-sprite
                 gFlipRun = cmd;
-                int n = cmd & 0x3f;
+                i32 n = cmd & 0x3f;
                 gFlipX = X;
                 gFlipSrc = src;
                 if (n == 0)
@@ -227,8 +227,8 @@ void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int
             }
             // 0xc0 - 0xff
             gFlipRun = cmd;
-            unsigned int count = cmd & 0x3f;
-            int flags = 0;
+            u32 count = cmd & 0x3f;
+            i32 flags = 0;
             if (count != 0) {
                 // 0xc1 - 0xff : solid colour run
                 if (cmd == 0xc1)
@@ -246,25 +246,25 @@ void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int
                 gFlipRun = flags;
                 if (flags & 0x80) {
                     gFlipDimLen = count;
-                    gFlipColor = static_cast<unsigned char>(color);
+                    gFlipColor = static_cast<u8>(color);
                     goto do_fill;
                 }
             }
             goto do_dim;
         do_fill:
             if (clip == 0) {
-                memset(reinterpret_cast<unsigned char *>((gFlipRow - count) + 1 + X), gFlipColor,
+                memset(reinterpret_cast<u8 *>((gFlipRow - count) + 1 + X), gFlipColor,
                        count);
             } else {
-                int currentY = gFlipY;
-                int left;
+                i32 currentY = gFlipY;
+                i32 left;
                 if (currentY >= clipY && currentY <= gFlipClipB &&
                     (left = (X - count) + 1, clipX <= left) && X <= gFlipClipR) {
                     if (clipX <= left) {
-                        memset(reinterpret_cast<unsigned char *>((gFlipRow - count) + 1 + X),
+                        memset(reinterpret_cast<u8 *>((gFlipRow - count) + 1 + X),
                                gFlipColor, count);
                     } else {
-                        memset(reinterpret_cast<unsigned char *>(gFlipRow + clipX), gFlipColor,
+                        memset(reinterpret_cast<u8 *>(gFlipRow + clipX), gFlipColor,
                                (X - clipX) + 1);
                     }
                 }
@@ -276,47 +276,47 @@ void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int
             gFlipRun = flags;
             gFlipDimLen = count;
             if (flags & 0x40) {
-                unsigned char *palette =
-                    reinterpret_cast<unsigned char *>(uDimPal) + (flags & 0x3c) * 0x40;
+                u8 *palette =
+                    reinterpret_cast<u8 *>(uDimPal) + (flags & 0x3c) * 0x40;
                 gFlipDimPal = palette;
                 if (clip == 0) {
-                    unsigned char *dp =
-                        reinterpret_cast<unsigned char *>((gFlipRow - count) + 1 + X);
+                    u8 *dp =
+                        reinterpret_cast<u8 *>((gFlipRow - count) + 1 + X);
                     gFlipCnt = 0;
-                    int dimCount = count;
+                    i32 dimCount = count;
                     gFlipDimDst = dp;
                     if (dimCount > 0) {
                         gFlipCnt = dimCount;
                         do {
-                            unsigned char *dimPalette = gFlipDimPal;
-                            int px = *dp++;
+                            u8 *dimPalette = gFlipDimPal;
+                            i32 px = *dp++;
                             count--;
                             gFlipDimDst = dp;
                             dp[-1] = dimPalette[px];
                         } while (count != 0);
                     }
                 } else {
-                    const int currentY = gFlipY;
+                    const i32 currentY = gFlipY;
                     gFlipDimLen = count;
                     if (clipY <= currentY && currentY <= gFlipClipB &&
-                        clipX <= static_cast<int>((X - count) + 1) && X <= gFlipClipR) {
-                        int left = (X - count) + 1;
-                        unsigned char *dp;
+                        clipX <= static_cast<i32>((X - count) + 1) && X <= gFlipClipR) {
+                        i32 left = (X - count) + 1;
+                        u8 *dp;
                         if (clipX <= left) {
-                            dp = reinterpret_cast<unsigned char *>((gFlipRow - count) + 1 + X);
+                            dp = reinterpret_cast<u8 *>((gFlipRow - count) + 1 + X);
                         } else {
                             count = (X - clipX) + 1;
-                            dp = reinterpret_cast<unsigned char *>(gFlipRow + clipX);
+                            dp = reinterpret_cast<u8 *>(gFlipRow + clipX);
                         }
-                        int dimCount = count;
+                        i32 dimCount = count;
                         gFlipDimLen = count;
                         gFlipDimDst = dp;
                         gFlipCnt = 0;
                         if (dimCount > 0) {
                             gFlipCnt = dimCount;
                             do {
-                                unsigned char *dimPalette = gFlipDimPal;
-                                int px = *dp++;
+                                u8 *dimPalette = gFlipDimPal;
+                                i32 px = *dp++;
                                 count--;
                                 gFlipDimDst = dp;
                                 dp[-1] = dimPalette[px];
@@ -334,27 +334,27 @@ void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int
         if (cmd != 0) {
             if (clip == 0) {
                 gFlipCnt = 0;
-                unsigned char *dst = reinterpret_cast<unsigned char *>(gFlipRow + X);
+                u8 *dst = reinterpret_cast<u8 *>(gFlipRow + X);
                 gFlipDst = dst;
                 if (cmd > 0) {
                     gFlipCnt = cmd;
-                    int k = cmd;
+                    i32 k = cmd;
                     do {
-                        unsigned char c = *src++;
+                        u8 c = *src++;
                         *dst-- = c;
                         gFlipDst = dst;
                         k--;
                     } while (k != 0);
                 }
             } else {
-                int currentY = gFlipY;
+                i32 currentY = gFlipY;
                 if (currentY >= clipY && currentY <= gFlipClipB) {
-                    int left = (X - cmd) + 1;
+                    i32 left = (X - cmd) + 1;
                     if (left <= gFlipClipR && clipX <= X) {
-                        unsigned int cn;
-                        int skip;
+                        u32 cn;
+                        i32 skip;
                         if (X <= gFlipClipR) {
-                            gFlipDst = reinterpret_cast<unsigned char *>(gFlipRow + X);
+                            gFlipDst = reinterpret_cast<u8 *>(gFlipRow + X);
                             if (clipX <= left) {
                                 gFlipSkip = 0;
                                 cn = cmd;
@@ -367,7 +367,7 @@ void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int
                             cn = gFlipClipR;
                             src = src + (X - cn);
                             gFlipDst =
-                                reinterpret_cast<unsigned char *>(gFlipRow + cn);
+                                reinterpret_cast<u8 *>(gFlipRow + cn);
                             if (clipX <= (X - cmd)) {
                                 gFlipSkip = 0;
                                 cn = (cmd - X) + cn;
@@ -384,13 +384,13 @@ void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int
                     set_skip:
                         gFlipSkip = skip;
                     skip_set:
-                        int copyCount = cn;
+                        i32 copyCount = cn;
                         gFlipDimLen = cn;
                         gFlipCnt = 0;
                         if (copyCount > 0) {
                             gFlipCnt = copyCount;
                             do {
-                                unsigned char c = *src++;
+                                u8 c = *src++;
                                 (gFlipDst = gFlipDst - 1)[1] = c;
                                 cn--;
                             } while (cn != 0);

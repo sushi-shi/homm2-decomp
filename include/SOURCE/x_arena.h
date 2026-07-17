@@ -1,5 +1,7 @@
 #ifndef HOMM2_X_ARENA_H
 #define HOMM2_X_ARENA_H
+
+#include <Ints.h>
 // Declarations of the free functions DEFINED in x_arena.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
 // forward declarations (was <_all.h>):
@@ -42,12 +44,12 @@ typedef enum ArenaConstant {
     ARENA_DRAW_MODE = 1
 } ArenaConstant;
 
-int DoArenaDialog(void);
-int ArenaWindowHandler(struct tag_message &);
+i32 DoArenaDialog(void);
+i32 ArenaWindowHandler(struct tag_message &);
 void UpdateArenaIcons(void);
 
 // ---- globals (declarations, RVA order) ----
-extern int choice;
+extern i32 choice;
 extern class iconWidget *skillWidget[3];
 extern class heroWindow *arenaWinPtr;
 

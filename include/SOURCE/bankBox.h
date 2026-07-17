@@ -21,14 +21,14 @@ typedef enum BankBoxConstant {
 class bankBox {
 public:
     playerData *m_player;  // +0x00
-    short m_x;  // +0x04
-    short m_y;  // +0x06
+    i16 m_x;  // +0x04
+    i16 m_y;  // +0x06
     heroWindow *m_window;  // +0x08
     // --- constructors ---
-    bankBox(int x, int y, class playerData *player);
+    bankBox(i32 x, i32 y, class playerData *player);
     ~bankBox();
     // --- methods ---
-    void Update(int);
+    void Update(i32);
 };
 #pragma pack(pop)
 SIZE(bankBox, 0xc);

@@ -82,31 +82,31 @@ struct NetbiosControlBlock;
 typedef void (__stdcall *NetbiosPostRoutine)(NetbiosControlBlock *controlBlock);
 
 struct NetbiosControlBlock {
-    unsigned char command;
-    unsigned char returnCode;
-    unsigned char sessionNumber;
-    unsigned char nameNumber;
+    u8 command;
+    u8 returnCode;
+    u8 sessionNumber;
+    u8 nameNumber;
     void *buffer;
-    unsigned short length;
-    unsigned char callName[NETBIOS_NAME_SIZE];
-    unsigned char name[NETBIOS_NAME_SIZE];
-    unsigned char receiveTimeout;
-    unsigned char sendTimeout;
+    u16 length;
+    u8 callName[NETBIOS_NAME_SIZE];
+    u8 name[NETBIOS_NAME_SIZE];
+    u8 receiveTimeout;
+    u8 sendTimeout;
     NetbiosPostRoutine postRoutine;
-    unsigned char adapterNumber;
-    unsigned char commandComplete;
-    unsigned char reserved[10];
+    u8 adapterNumber;
+    u8 commandComplete;
+    u8 reserved[10];
     void *event;
 };
 #pragma pack(pop)
 
 struct NetbiosName {
-    unsigned char bytes[NETBIOS_NAME_SIZE];
+    u8 bytes[NETBIOS_NAME_SIZE];
 };
 
 union NetbiosPayload {
-    unsigned char bytes[NETBIOS_PAYLOAD_SIZE];
-    unsigned long words[NETBIOS_PAYLOAD_SIZE / sizeof(unsigned long)];
+    u8 bytes[NETBIOS_PAYLOAD_SIZE];
+    u32l words[NETBIOS_PAYLOAD_SIZE / sizeof(u32l)];
 };
 
 struct NetbiosSessionBuffer {
@@ -122,13 +122,13 @@ SIZE(NetbiosPayload, NETBIOS_PAYLOAD_SIZE);
 SIZE(NetbiosSessionBuffer, NETBIOS_PAYLOAD_SIZE);
 SIZE(NetbiosThreadEvents, NETBIOS_THREAD_EVENT_STORAGE_COUNT * sizeof(void *));
 
-int is_netbios_avail(void);
-extern "C" unsigned short __fastcall nb_init(unsigned short, unsigned short);
+i32 is_netbios_avail(void);
+extern "C" u16 __fastcall nb_init(u16, u16);
 extern "C" void __fastcall nb_term(void);
-extern "C" unsigned short __fastcall nb_rcv(short, void *);
-extern "C" unsigned short __fastcall nb_snd(short, short, void *);
-extern "C" unsigned short __cdecl nb_sess(short, ...);
-extern "C" char __fastcall nb_stat(short);
+extern "C" u16 __fastcall nb_rcv(i16, void *);
+extern "C" u16 __fastcall nb_snd(i16, i16, void *);
+extern "C" u16 __cdecl nb_sess(i16, ...);
+extern "C" char __fastcall nb_stat(i16);
 void nb_thr_ctl(void);
 
 #endif // HOMM2_NETWIN_H

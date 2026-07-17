@@ -66,7 +66,7 @@ void combatManager::CombineGroups(armyGroup *sourceGroup,
     if (sourceGroup == 0 || targetGroup == 0)
         return;
 
-    int sourceIndex;
+    i32 sourceIndex;
     for (sourceIndex = 0; sourceIndex < ARMY_GROUP_SLOT_COUNT; sourceIndex++) {
         if (targetGroup->IsMember(sourceGroup->m_creatureTypes[sourceIndex])) {
             targetGroup->Add(sourceGroup->m_creatureTypes[sourceIndex],
@@ -79,7 +79,7 @@ void combatManager::CombineGroups(armyGroup *sourceGroup,
     for (sourceIndex = 0; sourceIndex < ARMY_GROUP_SLOT_COUNT; sourceIndex++) {
         if (sourceGroup->m_creatureTypes[sourceIndex] !=
             ARMY_GROUP_EMPTY_SLOT) {
-            int targetIndex;
+            i32 targetIndex;
             for (targetIndex = 0; targetIndex < ARMY_GROUP_SLOT_COUNT;
                  targetIndex++) {
                 if (targetGroup->m_creatureTypes[targetIndex] ==
@@ -95,11 +95,11 @@ void combatManager::CombineGroups(armyGroup *sourceGroup,
 }
 
 VA(0x00490032, 0x5f2)
-void combatManager::SetupCombat(int mapX, int mapY, hero *attackerHero,
+void combatManager::SetupCombat(i32 mapX, i32 mapY, hero *attackerHero,
                                 armyGroup *attackerGroup, town *defenderTown,
                                 hero *defenderHero,
-                                armyGroup *defenderGroup, int combatX,
-                                int combatY, int randomSeed)
+                                armyGroup *defenderGroup, i32 combatX,
+                                i32 combatY, i32 randomSeed)
 {
     giSeed = randomSeed;
     SRand(combatX * COMBAT_RANDOM_X_MULTIPLIER + combatY);
@@ -131,7 +131,7 @@ void combatManager::SetupCombat(int mapX, int mapY, hero *attackerHero,
         m_playerId[COMBAT_DEFENDER_SIDE] = -1;
     }
 
-    int side;
+    i32 side;
     for (side = COMBAT_ATTACKER_SIDE; side < COMBAT_SIDE_COUNT_DRAWING; side++) {
         if (m_playerId[side] >= 0)
             m_networkArmyPresent[side] = gbHumanPlayer[m_playerId[side]];
@@ -235,7 +235,7 @@ void combatManager::InitNonVisualVars(void)
 {
     m_gridSelectionDisabled = 0;
     m_nonVisualCombat = 0;
-    int side;
+    i32 side;
     for (side = COMBAT_ATTACKER_SIDE; side < COMBAT_SIDE_COUNT_DRAWING; side++) {
         m_spellPower[side] = 0;
         if (m_heroes[side] != 0)
@@ -283,11 +283,11 @@ void combatManager::InitNonVisualVars(void)
 VA(0x0049089d, 0x203)
 void combatManager::SetupAdjacencyArray(void)
 {
-    int destinationHex = 0;
-    int sourceHex;
+    i32 destinationHex = 0;
+    i32 sourceHex;
     for (sourceHex = 0; sourceHex < COMBAT_HEX_COUNT; sourceHex++) {
-        int rowIndex = sourceHex / COMBAT_GRID_ROW_LENGTH;
-        int direction;
+        i32 rowIndex = sourceHex / COMBAT_GRID_ROW_LENGTH;
+        i32 direction;
         for (direction = 0; direction < COMBAT_AI_ADJACENT_DIRECTION_COUNT;
              direction++) {
             if (sourceHex % COMBAT_GRID_ROW_LENGTH == 0 ||
@@ -339,19 +339,19 @@ void combatManager::SetupAdjacencyArray(void)
                     m_adjacency[sourceHex][direction] = -1;
                 else
                     m_adjacency[sourceHex][direction] =
-                        static_cast<signed char>(destinationHex);
+                        static_cast<i8>(destinationHex);
             }
         }
     }
 }
 
 VA(0x00490aa0, 0x43f)
-int combatManager::Open(int openFlags)
+i32 combatManager::Open(i32 openFlags)
 {
     LogStr("Op1");
     memcpy(m_savedPalette, gPalette->m_data, COMBAT_PALETTE_DATA_SIZE);
     gpMouseManager->m_forcePointerUpdate = 1;
-    int savedShowMouseHex = gConfig.showCombatMouseHex;
+    i32 savedShowMouseHex = gConfig.showCombatMouseHex;
     gConfig.showCombatMouseHex = 0;
     m_previousCombatMessageExpiration = 0;
     m_combatMessageExpiration = 0;
@@ -437,9 +437,9 @@ void combatManager::Close(void)
     if (m_mouseGridBuffer != 0)
         delete m_mouseGridBuffer;
 
-    int total;
-    int groupSide;
-    int index;
+    i32 total;
+    i32 groupSide;
+    i32 index;
     for (index = 0; index < 2; index++)
         UpdateArmyGroup(index);
 
@@ -464,14 +464,14 @@ void combatManager::Close(void)
     if (m_battlefieldCell->m_triggerType == COMBAT_TRIGGER_MINE &&
         gpGame->m_mines[m_battlefieldCell->m_objectMetadata].guardianType != -1)
         gpGame->m_mines[m_battlefieldCell->m_objectMetadata].guardianCount =
-            static_cast<unsigned char>(total);
+            static_cast<u8>(total);
 
     if (m_battlefieldCell->m_triggerType == COMBAT_TRIGGER_HERO) {
         hero *combatHero = gpGame->GetHero(m_battlefieldCell->m_objectMetadata);
         if (combatHero->m_locationType == COMBAT_TRIGGER_MINE &&
             gpGame->m_mines[combatHero->m_occupiedTown].guardianType != -1)
             gpGame->m_mines[combatHero->m_occupiedTown].guardianCount =
-                static_cast<unsigned char>(total);
+                static_cast<u8>(total);
     }
 
     gpWindowManager->RemoveWindow(m_combatWindow);
@@ -486,10 +486,10 @@ void combatManager::Close(void)
 }
 
 VA(0x004912b5, 0x38c)
-void combatManager::UpdateArmyGroup(int side)
+void combatManager::UpdateArmyGroup(i32 side)
 {
-    int index;
-    int pos;
+    i32 index;
+    i32 pos;
     for (index = 0; index < ARMY_GROUP_SLOT_COUNT; index++) {
         m_armyGroups[side]->m_creatureTypes[index] = ARMY_GROUP_EMPTY_SLOT;
         m_armyGroups[side]->m_creatureCounts[index] = 0;
@@ -514,10 +514,10 @@ void combatManager::UpdateArmyGroup(int side)
               MONSTER_FLAGS_MIRROR_IMAGE)) {
             m_armyGroups[side]
                 ->m_creatureTypes[m_armies[side][index].m_armyGroupSlot] =
-                static_cast<signed char>(m_armies[side][index].m_monsterType);
+                static_cast<i8>(m_armies[side][index].m_monsterType);
             m_armyGroups[side]
                 ->m_creatureCounts[m_armies[side][index].m_armyGroupSlot] =
-                static_cast<short>(m_armies[side][index].m_quantity);
+                static_cast<i16>(m_armies[side][index].m_quantity);
         }
     }
 
@@ -529,35 +529,35 @@ void combatManager::UpdateArmyGroup(int side)
 VA(0x00491641, 0x365)
 void combatManager::GenerateMap(void)
 {
-    int gridX;
-    int randomOffset;
-    int x;
-    unsigned int y;
-    int coordinateY;
+    i32 gridX;
+    i32 randomOffset;
+    i32 x;
+    u32 y;
+    i32 coordinateY;
 
     if (m_inCastleCombat == 1)
         m_catapultFrame[COMBAT_ATTACKER_SIDE] = 0;
     else
         m_catapultFrame[COMBAT_ATTACKER_SIDE] = -1;
 
-    for (y = 0; static_cast<int>(y) < COMBAT_GRID_ROW_COUNT; y++) {
+    for (y = 0; static_cast<i32>(y) < COMBAT_GRID_ROW_COUNT; y++) {
         for (x = 0; x < COMBAT_GRID_ROW_LENGTH; x++) {
             m_hexCells[y * COMBAT_GRID_ROW_LENGTH + x].m_y =
-                static_cast<short>((y + 1) * COMBAT_HEX_VERTICAL_STEP +
+                static_cast<i16>((y + 1) * COMBAT_HEX_VERTICAL_STEP +
                                    COMBAT_HEX_CENTER_Y_ORIGIN);
             m_hexCells[y * COMBAT_GRID_ROW_LENGTH + x].m_x =
-                static_cast<short>(
+                static_cast<i16>(
                 ((y & 1) ? COMBAT_HEX_ROW_STAGGER :
                            COMBAT_HEX_HORIZONTAL_STEP) +
                 (x - 1) * COMBAT_HEX_HORIZONTAL_STEP +
                 COMBAT_HEX_GRID_LEFT_ORIGIN);
             m_hexCells[y * COMBAT_GRID_ROW_LENGTH + x].m_gridLeft =
-                static_cast<short>(
+                static_cast<i16>(
                 ((y & 1) ? 0 : COMBAT_HEX_ROW_STAGGER) +
                 (x - 1) * COMBAT_HEX_HORIZONTAL_STEP +
                 COMBAT_HEX_GRID_LEFT_ORIGIN);
             m_hexCells[y * COMBAT_GRID_ROW_LENGTH + x].m_gridTop =
-                static_cast<short>(
+                static_cast<i16>(
                 y * COMBAT_HEX_VERTICAL_STEP + COMBAT_HEX_GRID_TOP_ORIGIN);
             m_hexCells[y * COMBAT_GRID_ROW_LENGTH + x].m_gridRight =
                 m_hexCells[y * COMBAT_GRID_ROW_LENGTH + x].m_gridLeft +
@@ -587,7 +587,7 @@ void combatManager::GenerateMap(void)
 VA(0x004919a6, 0x224)
 char * combatManager::GetBackgroundName(void)
 {
-    int backgroundIndex;
+    i32 backgroundIndex;
     m_colorCycleType = 1;
     m_battlefieldFringe = -1;
     switch (m_terrainType) {
@@ -659,19 +659,19 @@ char * combatManager::GetBackgroundName(void)
 // normalDirTable+1 as a string, and moves the 0x14-byte local jump table from
 // target +0x13c to base +0x13d after the one-byte bound-test delta.
 VA(0x00491bca, 0x210)
-int combatManager::MoreTreesNear(void)
+i32 combatManager::MoreTreesNear(void)
 {
-    int treeCount;
-    int x;
-    int y;
-    int mountainCounter;
+    i32 treeCount;
+    i32 x;
+    i32 y;
+    i32 mountainCounter;
     mapCell *combatCell;
-    int radius;
-    int combatOriginX;
-    signed char nearbyTypeTable[3][8];
-    unsigned char nearbyTileset;
-    int nearbyDirection;
-    int centerY;
+    i32 radius;
+    i32 combatOriginX;
+    i8 nearbyTypeTable[3][8];
+    u8 nearbyTileset;
+    i32 nearbyDirection;
+    i32 centerY;
 
     memset(nearbyTypeTable, -1, sizeof(nearbyTypeTable));
     combatOriginX = m_combatX;
@@ -726,8 +726,8 @@ int combatManager::MoreTreesNear(void)
 VA(0x00491dda, 0x3e7)
 void combatManager::LoadIcons(void)
 {
-    int index;
-    int heroColor;
+    i32 index;
+    i32 heroColor;
     for (index = 0; index < COMBAT_FIXED_ICON_COUNT; index++)
         m_combatIcons[index] = 0;
 
@@ -786,7 +786,7 @@ void combatManager::LoadIcons(void)
                 heroColor = 6;
             else
                 heroColor = gpGame->GetPlayerColor(
-                    static_cast<signed char>(m_playerId[index]));
+                    static_cast<i8>(m_playerId[index]));
             sprintf(gText, "herofl%02d.icn", heroColor);
             m_heroOverlayIcons[index] = gpResourceManager->GetIcon(gText);
         }
@@ -796,7 +796,7 @@ void combatManager::LoadIcons(void)
 VA(0x004921c1, 0x124)
 void combatManager::FreeIcons(void)
 {
-    int index;
+    i32 index;
     for (index = 0; index < COMBAT_FIXED_ICON_COUNT; index++) {
         if (m_combatIcons[index])
             gpResourceManager->Dispose(m_combatIcons[index]);
@@ -818,9 +818,9 @@ void combatManager::FreeIcons(void)
 VA(0x004922e5, 0x36d)
 void combatManager::LoadArmies(void)
 {
-    int groupSlot;
-    int side;
-    int combatHex;
+    i32 groupSlot;
+    i32 side;
+    i32 combatHex;
 
     m_armyCount[COMBAT_ATTACKER_SIDE] =
         m_armyCount[COMBAT_DEFENDER_SIDE] = 0;
@@ -897,7 +897,7 @@ void combatManager::LoadArmies(void)
 VA(0x00492652, 0xdb)
 void combatManager::FreeArmies(void)
 {
-    int index;
+    i32 index;
     gpSoundManager->StopAllSamples(1);
 
     for (index = 0; index < m_armyCount[COMBAT_ATTACKER_SIDE]; index++)
@@ -912,15 +912,15 @@ void combatManager::FreeArmies(void)
 }
 
 VA(0x0049272d, 0x1e2)
-int combatManager::GetGridIndex(int x, int y)
+i32 combatManager::GetGridIndex(i32 x, i32 y)
 {
-    int gridX;
-    int gridY;
-    int rowIndex;
-    int gridColumn;
-    int diagonalDistance;
-    int yOffset;
-    int xResidual;
+    i32 gridX;
+    i32 gridY;
+    i32 rowIndex;
+    i32 gridColumn;
+    i32 diagonalDistance;
+    i32 yOffset;
+    i32 xResidual;
 
     gridX = x;
     gridY = y;
@@ -977,7 +977,7 @@ specialRegion:
 }
 
 VA(0x0049290f, 0x1eb)
-void combatManager::CheckApplyGoodMorale(int side, int index)
+void combatManager::CheckApplyGoodMorale(i32 side, i32 index)
 {
     if (side < 0 || index < 0)
         return;
@@ -1029,7 +1029,7 @@ void combatManager::CheckApplyGoodMorale(int side, int index)
 // retail scales index before side while candidate scales side before index.
 // Direct indexing, cached army pointers, and commuted address forms were tried.
 VA(0x00492afa, 0x1cd)
-int combatManager::CheckApplyBadMorale(int side, int index)
+i32 combatManager::CheckApplyBadMorale(i32 side, i32 index)
 {
     if (side < 0 || index < 0)
         return 0;
@@ -1070,16 +1070,16 @@ int combatManager::CheckApplyBadMorale(int side, int index)
 }
 
 VA(0x00492cc7, 0x382)
-int combatManager::GetNextArmy(int checkMorale)
+i32 combatManager::GetNextArmy(i32 checkMorale)
 {
     army *activeArmy;
-    int speedLoop;
-    int stackSide;
-    int armyCounter;
-    int sideLoop;
-    int hasDeferred;
-    int skipEntry;
-    int armyOffset;
+    i32 speedLoop;
+    i32 stackSide;
+    i32 armyCounter;
+    i32 sideLoop;
+    i32 hasDeferred;
+    i32 skipEntry;
+    i32 armyOffset;
 
 restart:
     hasDeferred = 0;
@@ -1164,10 +1164,10 @@ restart:
 }
 
 VA(0x00493049, 0xd6)
-int combatManager::IsWinner(int side)
+i32 combatManager::IsWinner(i32 side)
 {
-    int winner;
-    int index;
+    i32 winner;
+    i32 index;
 
     if (m_sideDefeated[1 - side])
         return 1;
@@ -1192,7 +1192,7 @@ int combatManager::IsWinner(int side)
 // Float guards spell __adjust_fdiv as proven iLeftRightSave+0x10. Revisit only
 // after the source/TU/header or comparison epoch changes.
 VA(0x0049311f, 0x100e)
-void combatManager::CatAttack(int side)
+void combatManager::CatAttack(i32 side)
 {
     if (!m_inCastleCombat)
         return;
@@ -1206,20 +1206,20 @@ void combatManager::CatAttack(int side)
         DrawSmallView(COMBAT_DEFENDER_SIDE, 1);
     }
 
-    int random8 = SRandom(COMBAT_CATAPULT_TARGET_ROLL_MIN,
+    i32 random8 = SRandom(COMBAT_CATAPULT_TARGET_ROLL_MIN,
                           COMBAT_CATAPULT_TARGET_ROLL_MAX);
-    int wallCount7 = 0;
-    int towerCount1 = 0;
-    int wallIndex17 = -1;
-    int towerIndex27 = -1;
-    int gateIndex2 = -1;
-    int keepIndex6 = -1;
-    int targetHex4 = -1;
-    int missShot19 = 0;
-    int damageLevel13 = COMBAT_CATAPULT_DAMAGE_NORMAL;
-    int firstRoll7;
-    int advancedRoll5;
-    int index28;
+    i32 wallCount7 = 0;
+    i32 towerCount1 = 0;
+    i32 wallIndex17 = -1;
+    i32 towerIndex27 = -1;
+    i32 gateIndex2 = -1;
+    i32 keepIndex6 = -1;
+    i32 targetHex4 = -1;
+    i32 missShot19 = 0;
+    i32 damageLevel13 = COMBAT_CATAPULT_DAMAGE_NORMAL;
+    i32 firstRoll7;
+    i32 advancedRoll5;
+    i32 index28;
 
     if (m_wallStates[COMBAT_WALL_SLOT_SECTION_FIRST] !=
             COMBAT_WALL_STATE_DESTROYED &&
@@ -1281,15 +1281,15 @@ void combatManager::CatAttack(int side)
 
     sprintf(gText, "catsnd%02d.82M", COMBAT_CATAPULT_IMPACT_SOUND);
     sample *loadedSample26 = gpResourceManager->GetSample(gText);
-    int unknown15;
+    i32 unknown15;
     SAMPLE2 catapultSound37 = NULL_SAMPLE2;
     SAMPLE2 impactSound1 = NULL_SAMPLE2;
     icon *boulder37 = gpResourceManager->GetIcon("boulder.icn");
     sprintf(gText, "catsnd%02d.82M", COMBAT_CATAPULT_LAUNCH_SOUND);
     catapultSound37 = LoadPlaySample(gText);
 
-    int impactX5 = -1;
-    int impactY0 = -1;
+    i32 impactX5 = -1;
+    i32 impactY0 = -1;
     if (wallIndex17 != -1) {
         impactX5 = wallPos[wallIndex17][COMBAT_COORDINATE_X];
         impactY0 = wallPos[wallIndex17][COMBAT_COORDINATE_Y];
@@ -1311,9 +1311,9 @@ void combatManager::CatAttack(int side)
         targetHex4 = COMBAT_CASTLE_HEX_KEEP;
     }
 
-    int startX7;
+    i32 startX7;
     float bounceY0;
-    int frame18;
+    i32 frame18;
 
     if (m_heroes[COMBAT_ATTACKER_SIDE]
             ->m_secondarySkills[HERO_SKILL_BALLISTICS] ==
@@ -1344,14 +1344,14 @@ void combatManager::CatAttack(int side)
     }
 
     if (missShot19) {
-        unsigned char validMissHexes[COMBAT_CATAPULT_MISS_HEX_COUNT] = {
+        u8 validMissHexes[COMBAT_CATAPULT_MISS_HEX_COUNT] = {
             32, 46, 10, 23, 35, 48, 60, 74, 87, 101, 114
         };
-        int startDirection = SRandom(COMBAT_CATAPULT_DIRECTION_ROLL_MIN,
+        i32 startDirection = SRandom(COMBAT_CATAPULT_DIRECTION_ROLL_MIN,
                                      COMBAT_CATAPULT_DIRECTION_ROLL_MAX);
         for (frame18 = 0; frame18 < COMBAT_CATAPULT_DIRECTION_COUNT;
              frame18++) {
-            int adjacentHex = GetAdjacentCellIndexNoArmy(
+            i32 adjacentHex = GetAdjacentCellIndexNoArmy(
                 targetHex4,
                 (frame18 + startDirection) % COMBAT_CATAPULT_DIRECTION_COUNT);
             if (adjacentHex != -1 &&
@@ -1384,8 +1384,8 @@ foundMissHex:
     }
 
     startX7 = COMBAT_CATAPULT_START_X;
-    int startY9 = COMBAT_CATAPULT_START_Y;
-    int spriteFrame27 = 0;
+    i32 startY9 = COMBAT_CATAPULT_START_Y;
+    i32 spriteFrame27 = 0;
     float projectileX11 = static_cast<float>(startX7);
     float projectileY4 = static_cast<float>(startY9);
     float midpointX19 = static_cast<float>(
@@ -1398,8 +1398,8 @@ foundMissHex:
         (midpointX19 - startX7) / COMBAT_CATAPULT_HORIZONTAL_STEP_DIVISOR);
     float yStep15 = (bounceY0 - startY9) /
                     COMBAT_CATAPULT_VERTICAL_STEP_DIVISOR;
-    int previousX5 = -1;
-    int previousY2 = -1;
+    i32 previousX5 = -1;
+    i32 previousY2 = -1;
     SLimitData limits1;
     for (frame18 = 0; frame18 < COMBAT_CATAPULT_PROJECTILE_FRAME_COUNT;
          frame18++) {
@@ -1409,11 +1409,11 @@ foundMissHex:
         if (frame18 != 0) {
             giMinExtentX = previousX5 -
                            COMBAT_CATAPULT_PROJECTILE_EXTENT_RADIUS;
-            giMaxExtentX = static_cast<long>(
+            giMaxExtentX = static_cast<i32l>(
                 projectileX11 + COMBAT_CATAPULT_PROJECTILE_EXTENT_RADIUS);
-            giMinExtentY = static_cast<long>(
+            giMinExtentY = static_cast<i32l>(
                 projectileY4 - COMBAT_CATAPULT_PROJECTILE_EXTENT_RADIUS);
-            giMaxExtentY = static_cast<long>(
+            giMaxExtentY = static_cast<i32l>(
                 projectileY4 + COMBAT_CATAPULT_PROJECTILE_EXTENT_RADIUS);
             if (previousY2 < projectileY4)
                 giMinExtentY = previousY2 -
@@ -1438,14 +1438,14 @@ foundMissHex:
         }
         DrawFrame(0, 0, 1, 0, COMBAT_CATAPULT_PROJECTILE_DELAY, 1, 1);
         boulder37->CombatClipDrawToBuffer(
-            static_cast<long>(projectileX11), static_cast<long>(projectileY4),
+            static_cast<i32l>(projectileX11), static_cast<i32l>(projectileY4),
             spriteFrame27, &limits1, 0, 0, 0, 0);
         gpWindowManager->UpdateScreenRegion(
             giMinExtentX, giMinExtentY,
             giMaxExtentX - giMinExtentX + 1,
             giMaxExtentY - giMinExtentY + 1);
-        previousX5 = static_cast<long>(projectileX11);
-        previousY2 = static_cast<long>(projectileY4);
+        previousX5 = static_cast<i32l>(projectileX11);
+        previousY2 = static_cast<i32l>(projectileY4);
         projectileX11 = projectileX11 + xStep0;
         projectileY4 = (COMBAT_CATAPULT_DESCENT_FRAME - frame18) * yStep15 +
                        projectileY4;
@@ -1483,7 +1483,7 @@ foundMissHex:
         if (frame18 >= COMBAT_CATAPULT_CLOUD_VISIBLE_FRAME_COUNT &&
             (gateIndex2 != -1 || missShot19 != 0))
             continue;
-        glTimers[COMBAT_CATAPULT_TIMER_SLOT] = static_cast<long>(
+        glTimers[COMBAT_CATAPULT_TIMER_SLOT] = static_cast<i32l>(
             KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] *
                                 COMBAT_CATAPULT_ANIMATION_DELAY);
         DrawFrame(0, 0, 1, 0, 0, 1, 0);
@@ -1580,7 +1580,7 @@ foundMissHex:
 // placements regressed and a nested bucket rename was stagnant. Revisit only
 // after compiler allocation or the source/TU/header epoch changes.
 VA(0x0049412d, 0x74f)
-void combatManager::KeepAttack(int tower)
+void combatManager::KeepAttack(i32 tower)
 {
     if (!m_inCastleCombat)
         return;
@@ -1597,16 +1597,16 @@ void combatManager::KeepAttack(int tower)
 
     LogStr("KA1");
 
-    int bestPriority0 = -1;
-    int bestValue10 = 0;
-    int bestArmyIndex5 = -1;
-    int armyIndex3;
+    i32 bestPriority0 = -1;
+    i32 bestValue10 = 0;
+    i32 bestArmyIndex5 = -1;
+    i32 armyIndex3;
     army *target0;
-    int value26;
+    i32 value26;
     for (armyIndex3 = 0; armyIndex3 < COMBAT_ARMY_CAPACITY; armyIndex3++) {
         if (m_armies[COMBAT_ATTACKER_SIDE][armyIndex3].IsAlive()) {
             target0 = &m_armies[COMBAT_ATTACKER_SIDE][armyIndex3];
-            int priority;
+            i32 priority;
             if (target0->m_spellInfluence[ARMY_SPELL_INFLUENCE_BLIND] ||
                 target0->m_spellInfluence[ARMY_SPELL_INFLUENCE_PARALYZE] ||
                 target0->m_spellInfluence[ARMY_SPELL_INFLUENCE_PETRIFIED] ||
@@ -1654,15 +1654,15 @@ void combatManager::KeepAttack(int tower)
         {{586, 177}, {428, 60}, {428, 314}},
         {{586, 177}, {428, 60}, {428, 314}}
     };
-    int unknownTowerData6[4];
-    int sourceX9 = towerOrigins4[m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type]
+    i32 unknownTowerData6[4];
+    i32 sourceX9 = towerOrigins4[m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type]
                               [tower]
                                   .x;
-    int sourceY6 = towerOrigins4[m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type]
+    i32 sourceY6 = towerOrigins4[m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type]
                               [tower]
                                   .y;
-    int targetX9 = target0->MidX();
-    int targetY8 = target0->MidY();
+    i32 targetX9 = target0->MidX();
+    i32 targetY8 = target0->MidY();
     float missileAngles0[COMBAT_KEEP_MISSILE_ANGLE_COUNT] = {
         90.0f, 68.5f, 45.0f, 20.8f, 0.0f,
         -20.8f, -45.0f, -68.5f, -90.0f
@@ -1670,8 +1670,8 @@ void combatManager::KeepAttack(int tower)
     ShootMissile(sourceX9, sourceY6, targetX9, targetY8, missileAngles0,
                  m_combatIcons[COMBAT_ICON_KEEP]);
 
-    int shotCount28;
-    int attackBonus4;
+    i32 shotCount28;
+    i32 attackBonus4;
     m_combatTowns[COMBAT_DEFENDER_SIDE]->CalcNumLevelArchers(&shotCount28,
                                                               &attackBonus4);
     attackBonus4 += COMBAT_KEEP_TOWER_DAMAGE_BONUS;
@@ -1686,17 +1686,17 @@ void combatManager::KeepAttack(int tower)
     if (tower != COMBAT_TOWER_SELECTOR_GARRISON)
         shotCount28 /= COMBAT_KEEP_SIDE_TOWER_SHOT_DIVISOR;
 
-    int damage8 = 0;
+    i32 damage8 = 0;
     for (armyIndex3 = 0; (shotCount28 | 0) > armyIndex3; armyIndex3++)
         damage8 += SRandom(COMBAT_KEEP_RANDOM_DAMAGE_MIN,
                            COMBAT_KEEP_RANDOM_DAMAGE_MAX);
-    damage8 = static_cast<long>(
+    damage8 = static_cast<i32l>(
         damage8 * gfBattleStat[attackBonus4 +
                               COMBAT_KEEP_ATTACK_STAT_INDEX_OFFSET]);
     if (damage8 <= 0)
         damage8 = COMBAT_KEEP_MIN_DAMAGE;
 
-    int killed29 = target0->Damage(damage8, -1);
+    i32 killed29 = target0->Damage(damage8, -1);
     if (killed29 > 0) {
         char *armyNameValue;
         if (killed29 > 1)
@@ -1736,10 +1736,10 @@ void combatManager::KeepAttack(int tower)
 // rejected by the sibling/exact guards; the other nine were stagnant. Revisit only
 // after a real TU/header or comparison-epoch change.
 VA(0x0049487c, 0x17b)
-int combatManager::ExperienceValueOfStack(int side)
+i32 combatManager::ExperienceValueOfStack(i32 side)
 {
-    int experienceValue6 = 0;
-    int index;
+    i32 experienceValue6 = 0;
+    i32 index;
 
     for (index = 0; index < COMBAT_ARMY_CAPACITY; index++) {
         if (m_armies[side][index].m_monsterType != -1 &&
@@ -1760,8 +1760,8 @@ int combatManager::ExperienceValueOfStack(int side)
 VA(0x004949f7, 0x88)
 void combatManager::ResetHitByCreature(void)
 {
-    int side;
-    int index;
+    i32 side;
+    i32 index;
 
     for (side = 0; side < COMBAT_MANAGER_SIDE_COUNT; side++) {
         for (index = 0; index < COMBAT_ARMY_CAPACITY; index++)
@@ -1770,7 +1770,7 @@ void combatManager::ResetHitByCreature(void)
 }
 
 VA(0x00494a7f, 0x36)
-int ValidHex(int hex)
+i32 ValidHex(i32 hex)
 {
     return hex >= 0 && hex <= COMBAT_VALID_HEX_MAX ? 1 : 0;
 }
@@ -1802,19 +1802,19 @@ void combatManager::DrawCombatBorder(void)
 VA(0x00494ae1, 0x4d8)
 void combatManager::SetupAndLoadObstacles(void)
 {
-    unsigned char obstacleUsed[COMBAT_OBSTACLE_TYPE_COUNT];
-    int overlayIndex14;
-    int obstacleType4;
-    int blocked6;
-    int anchorHex9;
-    int tryCount28;
-    int anchorRow2;
-    int obstacleCells18;
-    int cellIndex1;
-    unsigned int terrainMask9;
-    int obstacleHex2;
-    int elevationCells4;
-    int obstacleGoal7;
+    u8 obstacleUsed[COMBAT_OBSTACLE_TYPE_COUNT];
+    i32 overlayIndex14;
+    i32 obstacleType4;
+    i32 blocked6;
+    i32 anchorHex9;
+    i32 tryCount28;
+    i32 anchorRow2;
+    i32 obstacleCells18;
+    i32 cellIndex1;
+    u32 terrainMask9;
+    i32 obstacleHex2;
+    i32 elevationCells4;
+    i32 obstacleGoal7;
 
     m_debugFormation = 0;
     if (m_inCastleCombat) {
@@ -1929,7 +1929,7 @@ void combatManager::SetupAndLoadObstacles(void)
                             m_obstacleIcons[m_obstacleCount] =
                                 gpResourceManager->GetIcon(gText);
                             m_hexCells[anchorHex9].m_obstacleIndex =
-                                static_cast<signed char>(m_obstacleCount);
+                                static_cast<i8>(m_obstacleCount);
                             m_obstacleCount++;
                         }
                     }
@@ -1950,8 +1950,8 @@ VA(0x00494fb9, 0x2a1)
 void combatManager::MakeCreaturesVanish(void)
 {
     ResetLimitCreature();
-    int side3;
-    int armyIndex0;
+    i32 side3;
+    i32 armyIndex0;
     army *removedArmy27;
     for (side3 = 0; side3 < COMBAT_MANAGER_SIDE_COUNT; side3++) {
         for (armyIndex0 = 0;
@@ -1961,10 +1961,10 @@ void combatManager::MakeCreaturesVanish(void)
         }
     }
     DrawFrame(0, 1, 0, 1, COMBAT_DOOR_ANIMATION_DELAY, 1, 1);
-    int extentX2 = giMinExtentX;
-    int extentY37 = giMinExtentY;
-    int extentWidth8 = giMaxExtentX - giMinExtentX + 1;
-    int extentHeight9 = giMaxExtentY - giMinExtentY + 1;
+    i32 extentX2 = giMinExtentX;
+    i32 extentY37 = giMinExtentY;
+    i32 extentWidth8 = giMaxExtentX - giMinExtentX + 1;
+    i32 extentHeight9 = giMaxExtentY - giMinExtentY + 1;
     for (side3 = 0; side3 < COMBAT_MANAGER_SIDE_COUNT; side3++) {
         for (armyIndex0 = 0;
              armyIndex0 < gpCombatManager->m_armyCount[side3]; armyIndex0++) {
@@ -1973,13 +1973,13 @@ void combatManager::MakeCreaturesVanish(void)
                 m_hexCells[removedArmy27->m_hex].m_occupantSide = -1;
                 m_hexCells[removedArmy27->m_hex].m_occupantIndex = -1;
                 if (removedArmy27->m_monster.flags.all & MONSTER_FLAGS_WIDE) {
-                    m_hexCells[(((static_cast<unsigned int>(
+                    m_hexCells[(((static_cast<u32>(
                                            removedArmy27->m_facing - 1) < 1 ? -1 : 0) &
                                   2) -
                                  1) +
                                removedArmy27->m_hex]
                         .m_occupantSide = -1;
-                    m_hexCells[(((static_cast<unsigned int>(
+                    m_hexCells[(((static_cast<u32>(
                                            removedArmy27->m_facing - 1) < 1 ? -1 : 0) &
                                   2) -
                                  1) +
@@ -1994,7 +1994,7 @@ void combatManager::MakeCreaturesVanish(void)
     gpCombatManager->DrawFrame(0, 0, 1, 0, COMBAT_DOOR_ANIMATION_DELAY, 1, 1);
     gpWindowManager->FizzleForward(
         extentX2, extentY37, extentWidth8, extentHeight9,
-        static_cast<int>(gfCombatSpeedMod[gConfig.combatSpeed] *
+        static_cast<i32>(gfCombatSpeedMod[gConfig.combatSpeed] *
                          COMBAT_CREATURE_VANISH_DURATION),
         0, 0);
 }
@@ -2008,7 +2008,7 @@ void combatManager::LowerDoor(void)
     giMinExtentY = COMBAT_DOOR_EXTENT_MIN_Y;
     giMaxExtentX = COMBAT_DOOR_EXTENT_MAX_X;
     giMaxExtentY = COMBAT_DOOR_EXTENT_MAX_Y;
-    int bridgeFrame;
+    i32 bridgeFrame;
     for (bridgeFrame = COMBAT_DRAWBRIDGE_RAISE_FRAME_SECOND;
          bridgeFrame >= COMBAT_DRAWBRIDGE_LOWERED; bridgeFrame--) {
         m_drawbridgeState = bridgeFrame;
@@ -2049,7 +2049,7 @@ void combatManager::TestRaiseDoor(void)
 }
 
 VA(0x00495481, 0xd8)
-int combatManager::InCastle(int hex)
+i32 combatManager::InCastle(i32 hex)
 {
     return ((hex < COMBAT_CASTLE_INTERIOR_ROW_0_FIRST ||
          hex > COMBAT_CASTLE_INTERIOR_ROW_0_LAST) &&
@@ -2077,7 +2077,7 @@ int combatManager::InCastle(int hex)
 // differ: retail loads traceColumn/traceRow before the commutative step, while this
 // TU loads the step first. += and both explicit addition orders compile identically.
 VA(0x00495559, 0x346)
-int combatManager::ShotIsThroughWall(int side, int sourceHex, int targetHex)
+i32 combatManager::ShotIsThroughWall(i32 side, i32 sourceHex, i32 targetHex)
 {
     if (!m_inCastleCombat)
         return 0;
@@ -2089,13 +2089,13 @@ int combatManager::ShotIsThroughWall(int side, int sourceHex, int targetHex)
     if (InCastle(sourceHex) || !InCastle(targetHex))
         return 0;
 
-    int sourceColumn1 = sourceHex % COMBAT_GRID_ROW_LENGTH;
-    int sourceRow9 = sourceHex / COMBAT_GRID_ROW_LENGTH;
-    int targetColumn8 = targetHex % COMBAT_GRID_ROW_LENGTH;
-    int targetRow26 = targetHex / COMBAT_GRID_ROW_LENGTH;
-    int columnDistance4 = targetColumn8 - sourceColumn1;
-    int rowDistance17 = targetRow26 - sourceRow9;
-    int traceLength1;
+    i32 sourceColumn1 = sourceHex % COMBAT_GRID_ROW_LENGTH;
+    i32 sourceRow9 = sourceHex / COMBAT_GRID_ROW_LENGTH;
+    i32 targetColumn8 = targetHex % COMBAT_GRID_ROW_LENGTH;
+    i32 targetRow26 = targetHex / COMBAT_GRID_ROW_LENGTH;
+    i32 columnDistance4 = targetColumn8 - sourceColumn1;
+    i32 rowDistance17 = targetRow26 - sourceRow9;
+    i32 traceLength1;
     float columnStep5;
     float rowStep2;
     if (abs(columnDistance4) > abs(rowDistance17)) {
@@ -2113,16 +2113,16 @@ int combatManager::ShotIsThroughWall(int side, int sourceHex, int targetHex)
     rowStep2 /= static_cast<float>(COMBAT_WALL_TRACE_SUBDIVISIONS);
     float traceColumn6 = static_cast<float>(sourceColumn1);
     float traceRow1 = static_cast<float>(sourceRow9);
-    int traceIndex13;
-    int traceHex11;
-    int structureIndex0;
+    i32 traceIndex13;
+    i32 traceHex11;
+    i32 structureIndex0;
     for (traceIndex13 = 0;
          traceIndex13 < traceLength1 * COMBAT_WALL_TRACE_SUBDIVISIONS;
          traceIndex13++) {
         traceColumn6 += columnStep5;
         traceRow1 += rowStep2;
-        traceHex11 = static_cast<int>(traceRow1) * COMBAT_GRID_ROW_LENGTH +
-                     static_cast<int>(traceColumn6);
+        traceHex11 = static_cast<i32>(traceRow1) * COMBAT_GRID_ROW_LENGTH +
+                     static_cast<i32>(traceColumn6);
         for (structureIndex0 = 0;
              structureIndex0 < COMBAT_CASTLE_STRUCTURE_COUNT;
              structureIndex0++) {
@@ -2154,21 +2154,21 @@ int combatManager::ShotIsThroughWall(int side, int sourceHex, int targetHex)
 // identically. Remaining identities are QIfdiv/floating constants and gConfig.
 // Revisit only after the source/TU/header or comparison epoch changes.
 VA(0x0049589f, 0x52e)
-void combatManager::ShootMissile(int sourceX, int sourceY, int targetX,
-                                 int targetY, float *directionAngles,
+void combatManager::ShootMissile(i32 sourceX, i32 sourceY, i32 targetX,
+                                 i32 targetY, float *directionAngles,
                                  icon *missileIcon)
 {
-    int xDistance1 = targetX - sourceX;
-    int yDistance19 = targetY - sourceY;
-    int absoluteXDistance15 = targetX - sourceX;
-    signed char reverseMissile7 = 0;
+    i32 xDistance1 = targetX - sourceX;
+    i32 yDistance19 = targetY - sourceY;
+    i32 absoluteXDistance15 = targetX - sourceX;
+    i8 reverseMissile7 = 0;
     if (absoluteXDistance15 < 0) {
         reverseMissile7 = 1;
         absoluteXDistance15 = -absoluteXDistance15;
     }
-    int directionYDistance1 = targetY - sourceY;
-    int directionFrame27;
-    int frame16;
+    i32 directionYDistance1 = targetY - sourceY;
+    i32 directionFrame27;
+    i32 frame16;
     if (absoluteXDistance15 == 0) {
         if (directionYDistance1 > 0)
             directionFrame27 = COMBAT_MISSILE_LAST_DIRECTION;
@@ -2195,12 +2195,12 @@ void combatManager::ShootMissile(int sourceX, int sourceY, int targetX,
             directionFrame27 = COMBAT_MISSILE_LAST_DIRECTION;
     }
 
-    int distance4 = static_cast<int>(sqrt(static_cast<double>(
+    i32 distance4 = static_cast<i32>(sqrt(static_cast<double>(
         xDistance1 * xDistance1 + yDistance19 * yDistance19)));
-    int missileSteps8 =
+    i32 missileSteps8 =
         (distance4 + COMBAT_MISSILE_SPACING_ROUND) / COMBAT_MISSILE_SPACING;
-    int xStep29;
-    int yStep17;
+    i32 xStep29;
+    i32 yStep17;
     if (missileSteps8 > 1) {
         xStep29 = xDistance1 / (missileSteps8 - 1);
         yStep17 = yDistance19 / (missileSteps8 - 1);
@@ -2208,24 +2208,24 @@ void combatManager::ShootMissile(int sourceX, int sourceY, int targetX,
         xStep29 = xDistance1;
         yStep17 = yDistance19;
     }
-    int missileX16 = sourceX;
-    int missileY7 = sourceY;
-    int missileHalfWidth5 = COMBAT_MISSILE_HALF_WIDTH;
-    int missileHalfHeight28 = COMBAT_MISSILE_HALF_HEIGHT;
+    i32 missileX16 = sourceX;
+    i32 missileY7 = sourceY;
+    i32 missileHalfWidth5 = COMBAT_MISSILE_HALF_WIDTH;
+    i32 missileHalfHeight28 = COMBAT_MISSILE_HALF_HEIGHT;
     bitmap *missileBackground9 =
         new bitmap(COMBAT_MISSILE_BITMAP_TYPE, missileHalfWidth5 * 2,
                    missileHalfHeight28 * 2);
     missileBackground9->GrabBitmapCareful(
         gpWindowManager->m_screen,
-        static_cast<short>(missileX16 - missileHalfWidth5),
-        static_cast<short>(missileY7 - missileHalfHeight28));
+        static_cast<i16>(missileX16 - missileHalfWidth5),
+        static_cast<i16>(missileY7 - missileHalfHeight28));
 
-    int oldX8 = missileX16;
-    int oldY5 = missileY7;
-    int minX8 = COMBAT_MAX_EXTENT_X;
-    int maxX9 = 0;
-    int minY5 = 480;
-    int maxY6 = 0;
+    i32 oldX8 = missileX16;
+    i32 oldY5 = missileY7;
+    i32 minX8 = COMBAT_MAX_EXTENT_X;
+    i32 maxX9 = 0;
+    i32 minY5 = 480;
+    i32 maxY6 = 0;
     for (frame16 = 0; missileSteps8 > frame16; frame16++) {
         if (oldX8 - missileHalfWidth5 < minX8)
             minX8 = oldX8 - missileHalfWidth5;
@@ -2246,12 +2246,12 @@ void combatManager::ShootMissile(int sourceX, int sourceY, int targetX,
 
         if (frame16 != 0) {
             missileBackground9->DrawToBufferCareful(
-                static_cast<short>(oldX8 - missileHalfWidth5),
-                static_cast<short>(oldY5 - missileHalfHeight28));
+                static_cast<i16>(oldX8 - missileHalfWidth5),
+                static_cast<i16>(oldY5 - missileHalfHeight28));
             missileBackground9->GrabBitmapCareful(
                 gpWindowManager->m_screen,
-                static_cast<short>(missileX16 - missileHalfWidth5),
-                static_cast<short>(missileY7 - missileHalfHeight28));
+                static_cast<i16>(missileX16 - missileHalfWidth5),
+                static_cast<i16>(missileY7 - missileHalfHeight28));
         } else {
             if (giMinExtentX > minX8)
                 giMinExtentX = minX8;
@@ -2274,7 +2274,7 @@ void combatManager::ShootMissile(int sourceX, int sourceY, int targetX,
             gpWindowManager->UpdateScreenRegion(
                 minX8, minY5, maxX9 - minX8 + 1, maxY6 - minY5 + 1);
         }
-        glTimers[0] = static_cast<int>(
+        glTimers[0] = static_cast<i32>(
             KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] *
                                 COMBAT_MISSILE_TIMER_DELAY);
         oldX8 = missileX16;
@@ -2287,8 +2287,8 @@ void combatManager::ShootMissile(int sourceX, int sourceY, int targetX,
         maxY6 = missileY7 + missileHalfHeight28;
     }
     missileBackground9->DrawToBuffer(
-        static_cast<short>(oldX8 - missileHalfWidth5),
-        static_cast<short>(oldY5 - missileHalfHeight28));
+        static_cast<i16>(oldX8 - missileHalfWidth5),
+        static_cast<i16>(oldY5 - missileHalfHeight28));
     gpWindowManager->UpdateScreenRegion(
         oldX8 - missileHalfWidth5, oldY5 - missileHalfHeight28,
         missileHalfWidth5 * 2, missileHalfHeight28 * 2);
@@ -2314,7 +2314,7 @@ void combatManager::CombatSystemOptions(void)
 }
 
 VA(0x00495ebf, 0x1ea)
-void UpdateCombatSystemOptions(int initialDraw)
+void UpdateCombatSystemOptions(i32 initialDraw)
 {
     tag_message message;
     message.type = COMBAT_SYSTEM_OPTION_EVENT;
@@ -2375,16 +2375,16 @@ void UpdateCombatSystemOptions(int initialDraw)
 // close handling was 95.17%; the nested switch supplies retail's hidden temp.
 // Redraw/done declaration order and right-button flag forms are exhausted.
 VA(0x004960a9, 0x39a)
-int CombatSystemOptionsHandler(tag_message &message)
+i32 CombatSystemOptionsHandler(tag_message &message)
 {
-    int bRedraw = 0;
-    int bDone = 0;
+    i32 bRedraw = 0;
+    i32 bDone = 0;
     char optionText[COMBAT_MESSAGE_LINE_SIZE];
     if (message.type == COMBAT_SYSTEM_OPTION_EVENT) {
         if (message.payload.widget.parameter & COMBAT_SYSTEM_OPTION_RIGHT_BUTTON) {
             if (message.payload.widget.command == COMBAT_SYSTEM_OPTION_BUTTON_EVENT ||
                 message.payload.widget.command == COMBAT_SYSTEM_OPTION_HOVER_EVENT) {
-                int helpIndex = -1;
+                i32 helpIndex = -1;
                 switch (message.payload.widget.id) {
                 case COMBAT_SYSTEM_OPTION_CLOSE_BUTTON:
                     helpIndex = 0;
@@ -2507,9 +2507,9 @@ VTBL(combatManager, 0x004eb898);
 // allocations have the proven types, storage classes, and payloads. Revisit
 // allocation order only with natural compiler evidence; do not add padding,
 // aliases, synthetic identities, or unattached literals.
-DATA(0x004f8900) int bInHighMoraleBonus = 0;
-DATA(0x004f8904) int giSeed = 1;
-DATA(0x004f8c1c) unsigned char wallHex[4] = { 9, 34, 86, 113 };
-DATA(0x00528588) int bMouseWasVis;
+DATA(0x004f8900) i32 bInHighMoraleBonus = 0;
+DATA(0x004f8904) i32 giSeed = 1;
+DATA(0x004f8c1c) u8 wallHex[4] = { 9, 34, 86, 113 };
+DATA(0x00528588) i32 bMouseWasVis;
 DATA(0x0052858c) class heroWindow *CSPanel;
-DATA(0x00528590) int bCPrefsChanged;
+DATA(0x00528590) i32 bCPrefsChanged;

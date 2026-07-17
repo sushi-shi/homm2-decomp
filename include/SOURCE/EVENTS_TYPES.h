@@ -8,30 +8,30 @@
 
 #pragma pack(push, 1)
 struct combatRemoteData {
-    signed char fragment;
-    signed char x;
-    signed char y;
-    signed char hasFirstHero;
-    signed char hasTown;
-    signed char hasSecondHero;
-    signed char firstSide;
-    signed char secondSide;
-    int randomSeed;
-    signed char combatResult;
-    signed char retreatWin;
-    signed char combatSurrender;
-    signed char firstOwner;
-    int firstGold;
-    signed char secondOwner;
-    int secondGold;
+    i8 fragment;
+    i8 x;
+    i8 y;
+    i8 hasFirstHero;
+    i8 hasTown;
+    i8 hasSecondHero;
+    i8 firstSide;
+    i8 secondSide;
+    i32 randomSeed;
+    i8 combatResult;
+    i8 retreatWin;
+    i8 combatSurrender;
+    i8 firstOwner;
+    i32 firstGold;
+    i8 secondOwner;
+    i32 secondGold;
     armyGroup firstArmy;
     armyGroup secondArmy;
     town combatTown;
 };
 
 struct combatRemoteHeroFragment {
-    signed char fragment;
-    unsigned char data[COMBAT_REMOTE_HERO_FIRST_SIZE];
+    i8 fragment;
+    u8 data[COMBAT_REMOTE_HERO_FIRST_SIZE];
 };
 
 #pragma pack(pop)

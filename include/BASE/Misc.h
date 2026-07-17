@@ -11,8 +11,8 @@ struct tag_message;
 
 // Misc-private record structs (params of the functions above).
 struct indexArray {
-    unsigned short key;
-    unsigned short value;
+    u16 key;
+    u16 value;
 };
 
 // Leak-tracking allocation record (BaseAlloc/BaseFree). Packed: ptr sits at +1 (unaligned).
@@ -20,21 +20,21 @@ struct indexArray {
 struct MemEntry {
     char used;          // +0x00  in-use flag
     void *ptr;          // +0x01  allocated block
-    unsigned int size;  // +0x05  block size
+    u32 size;  // +0x05  block size
     char file[0x3d];    // +0x09  original source path supplied by the call site
-    int line;           // +0x46  original source line supplied by the call site
+    i32 line;           // +0x46  original source line supplied by the call site
 };
 #pragma pack(pop)
 SIZE(MemEntry, 0x4a);
 #ifdef HOMM2_MISC_INLINE_ICONENTRY
 #pragma pack(push, 1)
 struct IconEntry {
-    short x;
-    short y;
-    short w;
-    short h;
-    unsigned char flags;
-    int srcOffset;
+    i16 x;
+    i16 y;
+    i16 w;
+    i16 h;
+    u8 flags;
+    i32 srcOffset;
 };
 #pragma pack(pop)
 #else
@@ -44,28 +44,28 @@ struct IconEntry {
 #endif
 #pragma pack(push, 1)
 struct PCXHeader {
-    unsigned char manufacturer, version, encoding, bitsPerPixel;
-    unsigned short xMin, yMin, xMax, yMax;
-    unsigned short horizontalDpi, verticalDpi;
-    unsigned char palette16[48];
-    unsigned char reserved, planes;
-    unsigned short bytesPerLine, paletteType, horizontalScreenSize, verticalScreenSize;
-    unsigned char filler[54];
+    u8 manufacturer, version, encoding, bitsPerPixel;
+    u16 xMin, yMin, xMax, yMax;
+    u16 horizontalDpi, verticalDpi;
+    u8 palette16[48];
+    u8 reserved, planes;
+    u16 bytesPerLine, paletteType, horizontalScreenSize, verticalScreenSize;
+    u8 filler[54];
 };
 #pragma pack(pop)
 SIZE(PCXHeader, 0x80);
 
 void InitMemEntry(void);
-void * BaseAlloc(unsigned int, char *, int);
-void BaseFree(void *, char *, int);
+void * BaseAlloc(u32, char *, i32);
+void BaseFree(void *, char *, i32);
 void PrintMemoryLeaks(void);
 void ShowMemoryStatus(void);
-unsigned long int MAKEFILEID(char *text);
-int FindIndex(struct indexArray *entries, int low, int high, int key);
-void FadeIn(int);
-void FadeOut(int);
-int Random(int low, int high);
-void ProcessAssert(int condition, char *file, int line);
+u32l MAKEFILEID(char *text);
+i32 FindIndex(struct indexArray *entries, i32 low, i32 high, i32 key);
+void FadeIn(i32);
+void FadeOut(i32);
+i32 Random(i32 low, i32 high);
+void ProcessAssert(i32 condition, char *file, i32 line);
 // Retail source locations are explicit operands. Never substitute this build's __FILE__/__LINE__.
 #define H2_ALLOC(size, originalFile, originalLine) BaseAlloc(size, originalFile, originalLine)
 #define H2_FREE(ptr, originalFile, originalLine) BaseFree(ptr, originalFile, originalLine)
@@ -81,41 +81,41 @@ void ReadPrefs(void);
 void WritePrefsToFile(void);
 void WritePrefsToRegistry(void);
 void WritePrefs(void);
-int IsCDDrive(int);
-int SetupCDDrive(void);
+i32 IsCDDrive(i32);
+i32 SetupCDDrive(void);
 void BitmapToScreen(class bitmap *);
-void SetPalette(signed char *, int);
-void BlitBitmapToScreenNoMouseCheck(class bitmap *, int, int, int, int, int, int);
-void BlitBitmapToScreen(class bitmap *, int, int, int, int, int, int);
+void SetPalette(i8 *, i32);
+void BlitBitmapToScreenNoMouseCheck(class bitmap *, i32, i32, i32, i32, i32, i32);
+void BlitBitmapToScreen(class bitmap *, i32, i32, i32, i32, i32, i32);
 void LogTruncate(void);
 void LogStr(char *);
-void LogInt(char *, int, int, int, int, int, int, int);
+void LogInt(char *, i32, i32, i32, i32, i32, i32, i32);
 void AiPrint(char *);
 void AbsAiPrint(char *);
-void FadeTo(unsigned char *, unsigned char *, int);
-void FadeToColorTable(unsigned char *, int);
-int IsCycleColor(int color);
-void CreatePCXFile(char *, unsigned char *, int, int, unsigned char *);
-long int FileSize(char *filename);
-struct IconEntry * GetIconEntry(class icon *iconPtr, int index);
-int SRandom(int low, int high);
-void SIncRandomize(int x, int y);
-void SRand(int seed);
-int SGenRand(void);
-int MemSize(int);
-void GetDataEntry(char *, char *, int, char *, int, int);
-int DataEntryWindowHandler(struct tag_message &message);
+void FadeTo(u8 *, u8 *, i32);
+void FadeToColorTable(u8 *, i32);
+i32 IsCycleColor(i32 color);
+void CreatePCXFile(char *, u8 *, i32, i32, u8 *);
+i32l FileSize(char *filename);
+struct IconEntry * GetIconEntry(class icon *iconPtr, i32 index);
+i32 SRandom(i32 low, i32 high);
+void SIncRandomize(i32 x, i32 y);
+void SRand(i32 seed);
+i32 SGenRand(void);
+i32 MemSize(i32);
+void GetDataEntry(char *, char *, i32, char *, i32, i32);
+i32 DataEntryWindowHandler(struct tag_message &message);
 
 
 // --- globals owned by this TU (moved from _globals.h; CodeView-attributed) ---
-extern int bDataEntryTime;
+extern i32 bDataEntryTime;
 extern char *cDEDest;
 extern class heroWindow *DataEntryWin;
 extern MemEntry *gpMemEntry;
-extern int iDEMaxLen;
-extern int iLastSeed;
-extern int iMemEntries;
-extern int inBoxX;
-extern int inBoxY;
+extern i32 iDEMaxLen;
+extern i32 iLastSeed;
+extern i32 iMemEntries;
+extern i32 inBoxX;
+extern i32 inBoxY;
 
 #endif // HOMM2_MISC_H

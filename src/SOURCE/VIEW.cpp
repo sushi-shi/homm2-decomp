@@ -20,30 +20,30 @@
 // match to 99.46%; candidate frame 0x74 remains one word below retail 0x78.
 // Cached/repeated hero loads, packed locals, and both quick-view arm orders were tried.
 VA(0x0040bd60, 0x6d3)
-int combatManager::ViewGeneral(int side, int allowActions, int quickView)
+i32 combatManager::ViewGeneral(i32 side, i32 allowActions, i32 quickView)
 {
     if (m_heroes[side] == 0)
         return 0;
     {
-        short messageConstant1;
-        short messageConstant2;
-        short messageConstant3;
-        short messageConstant4;
-        short messageConstant30;
-        short messageConstant0;
-        short messageConstant1B;
-        short messageConstant7;
-        short messageConstant8;
-        short messageConstant9;
-        short messageConstant10;
-        short messageConstant11;
-        short messageConstant12;
-        short messageConstant13;
-        short messageConstant14;
+        i16 messageConstant1;
+        i16 messageConstant2;
+        i16 messageConstant3;
+        i16 messageConstant4;
+        i16 messageConstant30;
+        i16 messageConstant0;
+        i16 messageConstant1B;
+        i16 messageConstant7;
+        i16 messageConstant8;
+        i16 messageConstant9;
+        i16 messageConstant10;
+        i16 messageConstant11;
+        i16 messageConstant12;
+        i16 messageConstant13;
+        i16 messageConstant14;
         tag_message message;
         heroWindow *generalWindow;
-        int morale;
-        int luck;
+        i32 morale;
+        i32 luck;
 
         iViewGeneralWhichSide = side;
         messageConstant1 = 1;
@@ -182,24 +182,24 @@ int combatManager::ViewGeneral(int side, int allowActions, int quickView)
 // runtime bug. Individual compiler locals restored the frame to 0x58 versus retail
 // 0x5c. Mouse-first conditions and the retained retail-order switches were tried.
 VA(0x0040c433, 0x351)
-int HandleViewGeneral(tag_message &message)
+i32 HandleViewGeneral(tag_message &message)
 {
-    short messageConstant1;
-    short messageConstant2;
-    short messageConstant3;
-    short messageConstant4;
-    short messageConstant0;
-    short messageConstant1B;
-    short messageConstant7;
-    short messageConstant8;
-    short messageConstant9;
-    short messageConstant10;
-    short messageConstant11;
-    short messageConstant12;
-    short messageConstant13;
-    short messageConstant14;
-    int handled;
-    int helpIndex;
+    i16 messageConstant1;
+    i16 messageConstant2;
+    i16 messageConstant3;
+    i16 messageConstant4;
+    i16 messageConstant0;
+    i16 messageConstant1B;
+    i16 messageConstant7;
+    i16 messageConstant8;
+    i16 messageConstant9;
+    i16 messageConstant10;
+    i16 messageConstant11;
+    i16 messageConstant12;
+    i16 messageConstant13;
+    i16 messageConstant14;
+    i32 handled;
+    i32 helpIndex;
     messageConstant1 = 1;
     messageConstant2 = 2;
     messageConstant3 = 3;
@@ -298,19 +298,19 @@ int HandleViewGeneral(tag_message &message)
 // residual is the branchless facing mask near +0x81. Signed/unsigned equality and
 // less-than mask spellings plus direct ternary geometry were tried.
 VA(0x0040c784, 0x165)
-void combatManager::ViewArmy(army *viewedArmy, int quickView)
+void combatManager::ViewArmy(army *viewedArmy, i32 quickView)
 {
     if (viewedArmy == 0)
         return;
     {
-        int side;
-        int windowX;
-        int windowY_5;
-        short viewWidthConstant;
-        short viewYOffsetConstant_1;
-        short viewXOffsetConstant_9;
-        int xOffset_9;
-        short viewHeightConstant_10;
+        i32 side;
+        i32 windowX;
+        i32 windowY_5;
+        i16 viewWidthConstant;
+        i16 viewYOffsetConstant_1;
+        i16 viewXOffsetConstant_9;
+        i32 xOffset_9;
+        i16 viewHeightConstant_10;
 
         viewWidthConstant = 402;
         viewHeightConstant_10 = 229;
@@ -340,4 +340,4 @@ void combatManager::ViewArmy(army *viewedArmy, int quickView)
 }
 
 // ---- globals (definitions, RVA order) ----
-DATA(0x004eddf4) int iViewGeneralWhichSide = 0;
+DATA(0x004eddf4) i32 iViewGeneralWhichSide = 0;

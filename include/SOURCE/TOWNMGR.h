@@ -8,11 +8,11 @@ struct tag_message;
 
 #pragma pack(push, 1)
 struct SBuildingInfo {
-    signed char animationFrameCount;
-    short x;
-    short y;
-    short width;
-    short height;
+    i8 animationFrameCount;
+    i16 x;
+    i16 y;
+    i16 width;
+    i16 height;
 };
 #pragma pack(pop)
 SIZE(SBuildingInfo, 9);
@@ -301,10 +301,10 @@ typedef enum TownManagerConstant {
 
 extern SBuildingInfo sBuildingInfo[][TOWN_BUILDING_COUNT];
 
-int MageGuildHandler(struct tag_message &);
-int TavernHandler(struct tag_message &);
-int SplitArmyHandler(struct tag_message &);
-void GetCategoryStats(int, long int * const, signed char * const);
-void SortStats(long int * const, signed char * const);
+i32 MageGuildHandler(struct tag_message &);
+i32 TavernHandler(struct tag_message &);
+i32 SplitArmyHandler(struct tag_message &);
+void GetCategoryStats(i32, i32l * const, i8 * const);
+void SortStats(i32l * const, i8 * const);
 
 #endif // HOMM2_TOWNMGR_H

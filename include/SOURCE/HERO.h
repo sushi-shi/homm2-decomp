@@ -1,5 +1,7 @@
 #ifndef HOMM2_HERO_H
 #define HOMM2_HERO_H
+
+#include <Ints.h>
 // Declarations of the free functions DEFINED in HERO.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
 // forward declarations (was <_all.h>):
@@ -137,10 +139,10 @@ typedef enum HeroScreenText {
 
 void HeroMessageUpdate(char *);
 void UpdateHeroScreenStatusBar(struct tag_message &);
-int HeroHandler(struct tag_message &);
+i32 HeroHandler(struct tag_message &);
 void RedrawHeroScreen(void);
-int HeroView(int, int, int);
+i32 HeroView(i32, i32, i32);
 void SetupHeroView(void);
-void DoHeroSplit(int, int);
+void DoHeroSplit(i32, i32);
 
 #endif // HOMM2_HERO_H

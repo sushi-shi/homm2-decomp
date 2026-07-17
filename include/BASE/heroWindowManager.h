@@ -27,41 +27,41 @@ public:
     bitmap *m_screen;  // +0x46  (target screen bitmap)
     bitmap *m_fizzleSource;  // +0x4a  fizzle-source saved bitmap
     bitmap *m_fizzleWork;  // +0x4e  temporary destination used while composing a fizzle
-    int    m_screenshotIndex;  // +0x52
-    int    m_updateFlags;  // +0x56
-    int    m_dialogResult;  // +0x5a
-    int    m_lastHoverId;  // +0x5e  last hover widget/message id; -1 means none
+    i32    m_screenshotIndex;  // +0x52
+    i32    m_updateFlags;  // +0x56
+    i32    m_dialogResult;  // +0x5a
+    i32    m_lastHoverId;  // +0x5e  last hover widget/message id; -1 means none
     // --- constructors ---
     heroWindowManager(void);
     // --- virtual methods (vtable order) ---
-    virtual int Open(int) OVERRIDE;
+    virtual i32 Open(i32) OVERRIDE;
     virtual void Close(void) OVERRIDE;
-    virtual int Main(struct tag_message &) OVERRIDE;
+    virtual i32 Main(struct tag_message &) OVERRIDE;
     // --- methods ---
-    int ConvertToHover(struct tag_message &);
-    int BroadcastMessage(int, int, int, int);
-    void AddWindow(class heroWindow *, int, int);
+    i32 ConvertToHover(struct tag_message &);
+    i32 BroadcastMessage(i32, i32, i32, i32);
+    void AddWindow(class heroWindow *, i32, i32);
     void RemoveWindow(class heroWindow *);
-    int DoDialog(class heroWindow *, int (*)(struct tag_message &), int);
+    i32 DoDialog(class heroWindow *, i32 (*)(struct tag_message &), i32);
     void UpdateScreen(void);
-    void UpdateScreenRegion(int, int, int, int);
+    void UpdateScreenRegion(i32, i32, i32, i32);
     void RedrawScreen(void);
-    void FadeScreen(int, int, class palette *);
+    void FadeScreen(i32, i32, class palette *);
     void ScreenShot(void);
-    void SaveFizzleSource(int, int, int, int);
-    void FizzleForward(int, int, int, int, int, signed char *, signed char *);
+    void SaveFizzleSource(i32, i32, i32, i32);
+    void FizzleForward(i32, i32, i32, i32, i32, i8 *, i8 *);
     void ReleaseFizzleSource(void);
 };
 #pragma pack(pop)
 SIZE(heroWindowManager, 0x62);
 // ---- globals (declarations, RVA order) ----
-extern int iCombatCycleFrame;
-extern int gbEveryOtherCycle;
-extern int iCycle1Count;
-extern int iCycle2Count;
-extern int iCycle3Count;
-extern int iDialogNestCount;
-extern signed char gCyclePal[0x60];  // CodeView size 0x60; typed signed char* (array-decayed)
-extern short memSelector;
+extern i32 iCombatCycleFrame;
+extern i32 gbEveryOtherCycle;
+extern i32 iCycle1Count;
+extern i32 iCycle2Count;
+extern i32 iCycle3Count;
+extern i32 iDialogNestCount;
+extern i8 gCyclePal[0x60];  // CodeView size 0x60; typed signed char* (array-decayed)
+extern i16 memSelector;
 
 #endif // HOMM2_BASE_HEROWINDOWMANAGER_H

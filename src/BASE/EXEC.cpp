@@ -62,7 +62,7 @@ executive::executive(void)
 }
 
 VA(0x004d1620, 0x9e)
-int executive::InitSystem(void)
+i32 executive::InitSystem(void)
 {
     if (gpResourceManager->Open(EXECUTIVE_MANAGER_DEFAULT_PRIORITY) != 0)
         ShutDown(gExecutiveText.resourceInitError);
@@ -114,16 +114,16 @@ void executive::ShutDownSystem(void)
 // (78 trials total) reached only a disposable 99.4375%. Revisit after earlier EXEC
 // TU-state changes.
 VA(0x004d1750, 0xfb)
-int executive::DoDialog(class baseManager *manager)
+i32 executive::DoDialog(class baseManager *manager)
 {
     baseManager *managerList[EXECUTIVE_DIALOG_MANAGER_CAPACITY];
     baseManager *previousList[EXECUTIVE_DIALOG_MANAGER_CAPACITY];
     baseManager *nextList[EXECUTIVE_DIALOG_MANAGER_CAPACITY];
-    int dialogStorage[4];
+    i32 dialogStorage[4];
     executive *dialog = reinterpret_cast<executive *>(dialogStorage);
     baseManager *listManager;
-    int managerIndex;
-    int managerCount;
+    i32 managerIndex;
+    i32 managerCount;
     managerCount = 0;
     dialog->m_managerListHead = 0;
     dialog->m_managerListTail = 0;
@@ -182,7 +182,7 @@ void executive::PrintManagerList(void)
 }
 
 VA(0x004d18e0, 0xce)
-int executive::AddManager(class baseManager *mgr, int param_2)
+i32 executive::AddManager(class baseManager *mgr, i32 param_2)
 {
     if (mgr == 0)
         return EXECUTIVE_MANAGER_ERROR;
@@ -278,9 +278,9 @@ VA(0x004d1a90, 0xfa)
 void executive::MainLoop(void)
 {
     tag_message message;
-    int keepDispatching;
-    int done = 0;
-    int result;
+    i32 keepDispatching;
+    i32 done = 0;
+    i32 result;
     baseManager *manager;
     if (m_managerListHead != 0) {
         gpInputManager->Flush();

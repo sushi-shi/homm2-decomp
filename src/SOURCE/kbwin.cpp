@@ -17,8 +17,8 @@
 #include <SOURCE/kbwin.h>
 #include <SOURCE/wingraph.h>
 VA(0x0041bce0, 0x146)
-extern "C" int __stdcall WinMain(HINSTANCE instance,
-    HINSTANCE previousInstance, char *commandLine, int showCommand)
+extern "C" i32 __stdcall WinMain(HINSTANCE instance,
+    HINSTANCE previousInstance, char *commandLine, i32 showCommand)
 {
     DWORD lastError;
     MSG message;
@@ -56,14 +56,14 @@ extern "C" int __stdcall WinMain(HINSTANCE instance,
 }
 
 VA(0x0041be26, 0x339)
-int AppInit(HINSTANCE instance, HINSTANCE previousInstance, int showCommand,
+i32 AppInit(HINSTANCE instance, HINSTANCE previousInstance, i32 showCommand,
     char *commandLine)
 {
     HMENU windowMenu;
     RECT windowRect;
     WNDCLASSA appClass;
 
-    LogInt("hInstApp", reinterpret_cast<int>(hInstApp), -999, -999, -999,
+    LogInt("hInstApp", reinterpret_cast<i32>(hInstApp), -999, -999, -999,
         -999, -999, -999);
     memset(bProcessMessage, 0, sizeof(bProcessMessage));
     bProcessMessage[WM_CREATE] = 1;
@@ -145,7 +145,7 @@ int AppInit(HINSTANCE instance, HINSTANCE previousInstance, int showCommand,
 // false arm versus this compiler state's `xor eax, eax`; explicit if/else is the
 // best of the tested direct, comparison, and conditional-return forms.
 VA(0x0041c15f, 0x31)
-int AppIdle(void)
+i32 AppIdle(void)
 {
     if (gbForegroundApp != 0)
         return 1;
@@ -158,8 +158,8 @@ int AppIdle(void)
 // table at RVA 0x1c61b; the candidate's next public begins one byte earlier, so
 // the old full-span raw-identity claim was invalid.
 VA(0x0041c190, 0x57e)
-long int __stdcall AppWndProc(HWND window, unsigned int message,
-    unsigned int messageParam, long int messageData)
+LRESULT CALLBACK AppWndProc(HWND window, UINT message,
+    WPARAM messageParam, LPARAM messageData)
 {
     if (message > KBWIN_PROCESS_MESSAGE_MAX ||
         bProcessMessage[message] == 0) {
@@ -255,7 +255,7 @@ long int __stdcall AppWndProc(HWND window, unsigned int message,
     case WM_COMMAND:
         return AppCommand(window, message, messageParam, messageData);
     case WM_PALETTECHANGED:
-        if (reinterpret_cast<unsigned int>(window) == messageParam)
+        if (reinterpret_cast<u32>(window) == messageParam)
             break;
     case WM_QUERYNEWPALETTE:
         return QueryNewPalette();
@@ -286,12 +286,12 @@ long int __stdcall AppWndProc(HWND window, unsigned int message,
 }
 
 VA(0x0041c70e, 0x90)
-int __stdcall AppAbout(HWND dialog, unsigned int message,
-    unsigned int messageParam, long int messageData)
+BOOL CALLBACK AppAbout(HWND dialog, UINT message,
+    WPARAM messageParam, LPARAM messageData)
 {
-    int command;
+    i32 command;
     HWND commandWindow;
-    unsigned short notificationType;
+    u16 notificationType;
 
     switch (message) {
     case WM_INITDIALOG:
@@ -319,7 +319,7 @@ VA(0x0041c7b8, 0xc8)
 void Process1WindowsMessage(void)
 {
     MSG message;
-    long currentTick;
+    i32l currentTick;
 
     while (PeekMessageA(&message, 0, 0, 0, PM_REMOVE) != 0) {
         TranslateMessage(&message);
@@ -341,11 +341,11 @@ void Process1WindowsMessage(void)
 }
 
 VA(0x0041c880, 0x147)
-void ResizeWindow(int x, int y, int width, int height)
+void ResizeWindow(i32 x, i32 y, i32 width, i32 height)
 {
-    int windowX;
+    i32 windowX;
     RECT windowRect;
-    int targetY;
+    i32 targetY;
 
     if (gConfig.gfx[giCurExe].fullScreen != 0)
         return;
@@ -379,10 +379,10 @@ void ResizeWindow(int x, int y, int width, int height)
 // match after masking aligned COFF relocations. The 99.66% fuzzy result is
 // delinked local-label identity; all 6/6 external REL32 callees agree.
 VA(0x0041c9c7, 0x197)
-long int AppCommand(HWND window, unsigned int message,
-    unsigned int messageParam, long int messageData)
+LRESULT AppCommand(HWND window, UINT message,
+    WPARAM messageParam, LPARAM messageData)
 {
-    int command;
+    i32 command;
     DLGPROC appDialogProc;
 
     command = LOWORD(messageParam);
@@ -421,8 +421,8 @@ VA(0x0041cb5e, 0xd7)
 void UpdateDfltMenu(HMENU menu)
 {
     // Retail reserves these dwords but never reads or initializes them.
-    int result;
-    int value;
+    i32 result;
+    i32 value;
 
     if (gConfig.gfx[giCurExe].showMenu == 0)
         return;
@@ -461,12 +461,12 @@ void KBChangeMenu(HMENU menu)
 }
 
 VA(0x0041cce1, 0x15c)
-void SetMenuStatus(int showMenu)
+void SetMenuStatus(i32 showMenu)
 {
-    int width;
-    int height;
-    long windowStyle;
-    long replacedStyle;
+    i32 width;
+    i32 height;
+    i32l windowStyle;
+    i32l replacedStyle;
 
     if (gConfig.gfx[giCurExe].fullScreen && showMenu)
         return;
@@ -492,7 +492,7 @@ void SetMenuStatus(int showMenu)
 }
 
 VA(0x0041ce3d, 0x7b)
-void SetNoDialogMenus(int menusEnabled)
+void SetNoDialogMenus(i32 menusEnabled)
 {
     if (gbNoDialogMenusOn && !menusEnabled)
         return;
@@ -513,19 +513,19 @@ void SetNoDialogMenus(int menusEnabled)
 // which retail's delinked object resolves internally. Revisit after a kbwin
 // TU/header change alters compiler state.
 VA(0x0041ceb8, 0x159)
-void SetMenus(HMENU menu, int enabled)
+void SetMenus(HMENU menu, i32 enabled)
 {
-    int count;
-    unsigned int commandId;
-    int scanPosition;
-    int commandPosition;
-    int disableFlag;
-    int index;
+    i32 count;
+    u32 commandId;
+    i32 scanPosition;
+    i32 commandPosition;
+    i32 disableFlag;
+    i32 index;
 
     count = GetMenuItemCount(menu);
     for (index = 0; index < count; index++) {
         commandId = GetMenuItemID(menu, index);
-        if (commandId == static_cast<unsigned int>(-1)) {
+        if (commandId == static_cast<u32>(-1)) {
             SetMenus(GetSubMenu(menu, index), enabled);
             disableFlag = 0;
         } else {
@@ -559,7 +559,7 @@ void SetMenus(HMENU menu, int enabled)
 }
 
 VA(0x0041d011, 0x16)
-long int KBTickCount(void)
+i32l KBTickCount(void)
 {
     return GetTickCount();
 }
@@ -576,19 +576,19 @@ DATA(0x004ef4d8) char szTitle[32] = "Heroes of Might and Magic II";
 DATA(0x004ef4f8) HWND hwndApp = 0;
 DATA(0x004ef4fc) HMENU hmnuApp = 0;
 DATA(0x004ef500) HANDLE gEventHandle = 0;
-DATA(0x004ef588) long lLastGTimerTickCount = 0;
-DATA(0x004ef58c) long lLastCycleColorsTickCount = 0;
-DATA(0x004ef590) int bRestartMusic = 0;
-DATA(0x004ef594) int iLastMusic = -1;
-DATA(0x004ef5b8) long lLastGetMessage = 0;
-DATA(0x004ef5bc) long lLastAilServe = 0;
-DATA(0x004ef5dc) int gbNoDialogMenusOn = 0;
+DATA(0x004ef588) i32l lLastGTimerTickCount = 0;
+DATA(0x004ef58c) i32l lLastCycleColorsTickCount = 0;
+DATA(0x004ef590) i32 bRestartMusic = 0;
+DATA(0x004ef594) i32 iLastMusic = -1;
+DATA(0x004ef5b8) i32l lLastGetMessage = 0;
+DATA(0x004ef5bc) i32l lLastAilServe = 0;
+DATA(0x004ef5dc) i32 gbNoDialogMenusOn = 0;
 DATA(0x00524c08) HINSTANCE hInstApp;
 DATA(0x00524c10) RECT rcTemp;
-DATA(0x00524c20) int iMainWinScreenHeight;
+DATA(0x00524c20) i32 iMainWinScreenHeight;
 DATA(0x00524c24) HMENU hmnuCurrent;
-DATA(0x00524c28) int iTempX;
-DATA(0x00524c2c) int iTempY;
-DATA(0x00524c30) long lTemp;
-DATA(0x00524c38) unsigned char bProcessMessage[KBWIN_PROCESS_MESSAGE_COUNT];
-DATA(0x00525038) int iMainWinScreenWidth;
+DATA(0x00524c28) i32 iTempX;
+DATA(0x00524c2c) i32 iTempY;
+DATA(0x00524c30) i32l lTemp;
+DATA(0x00524c38) u8 bProcessMessage[KBWIN_PROCESS_MESSAGE_COUNT];
+DATA(0x00525038) i32 iMainWinScreenWidth;

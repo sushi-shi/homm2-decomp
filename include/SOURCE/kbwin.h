@@ -42,21 +42,21 @@ typedef enum KbWinMenuCommand {
     KBWIN_MENU_ABOUT = 0x9c75
 } KbWinMenuCommand;
 
-extern "C" int __stdcall WinMain(HINSTANCE, HINSTANCE, char *, int);
-int AppInit(HINSTANCE, HINSTANCE, int, char *);
-int AppIdle(void);
-long int __stdcall AppWndProc(HWND, unsigned int, unsigned int, long int);
-int __stdcall AppAbout(HWND, unsigned int, unsigned int, long int);
+extern "C" i32 __stdcall WinMain(HINSTANCE, HINSTANCE, char *, i32);
+i32 AppInit(HINSTANCE, HINSTANCE, i32, char *);
+i32 AppIdle(void);
+LRESULT CALLBACK AppWndProc(HWND, UINT, WPARAM, LPARAM);
+BOOL CALLBACK AppAbout(HWND, UINT, WPARAM, LPARAM);
 void AppExit(void);
 void Process1WindowsMessage(void);
-void ResizeWindow(int, int, int, int);
-long int AppCommand(HWND, unsigned int, unsigned int, long int);
+void ResizeWindow(i32, i32, i32, i32);
+LRESULT AppCommand(HWND, UINT, WPARAM, LPARAM);
 void UpdateDfltMenu(HMENU);
 void KBChangeMenu(HMENU);
-void SetMenuStatus(int);
-void SetNoDialogMenus(int);
-void SetMenus(HMENU, int);
-long int KBTickCount(void);
+void SetMenuStatus(i32);
+void SetNoDialogMenus(i32);
+void SetMenus(HMENU, i32);
+i32l KBTickCount(void);
 void InitVideo(void);
 
 
@@ -69,22 +69,22 @@ extern HWND hwndApp;
 // ---- globals (declarations, RVA order) ----
 extern char szAppName[16];
 extern char szTitle[32];
-extern long lLastGTimerTickCount;
-extern long lLastCycleColorsTickCount;
-extern int bRestartMusic;
-extern int iLastMusic;
-extern long lLastGetMessage;
-extern long lLastAilServe;
-extern int gbNoDialogMenusOn;
-extern int giTotalMemAllocated;
-extern unsigned char giChangeThreshold[16];
+extern i32l lLastGTimerTickCount;
+extern i32l lLastCycleColorsTickCount;
+extern i32 bRestartMusic;
+extern i32 iLastMusic;
+extern i32l lLastGetMessage;
+extern i32l lLastAilServe;
+extern i32 gbNoDialogMenusOn;
+extern i32 giTotalMemAllocated;
+extern u8 giChangeThreshold[16];
 extern RECT rcTemp;
-extern int iMainWinScreenHeight;
+extern i32 iMainWinScreenHeight;
 extern HMENU hmnuCurrent;
-extern int iTempX;
-extern int iTempY;
-extern long lTemp;
-extern unsigned char bProcessMessage[KBWIN_PROCESS_MESSAGE_COUNT];
-extern int iMainWinScreenWidth;
+extern i32 iTempX;
+extern i32 iTempY;
+extern i32l lTemp;
+extern u8 bProcessMessage[KBWIN_PROCESS_MESSAGE_COUNT];
+extern i32 iMainWinScreenWidth;
 
 #endif // HOMM2_KBWIN_H
