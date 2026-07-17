@@ -164,7 +164,8 @@ int game::HandleCampaignWin(void)
         for (sideIndex = 0; sideIndex < CAMPAIGN_SIDE_COUNT; ++sideIndex) {
             for (mapIndex = 0; mapIndex < CAMPAIGN_REGULAR_MAP_COUNT; ++mapIndex) {
                 if (m_campaignMapEnabled[sideIndex][0[&mapIndex]]) {
-                    gpGame->m_campaignScenarioBonus[sideIndex][mapIndex] = m_campaignScore;
+                    gpGame->m_campaignScenarioBonus[sideIndex][0[&mapIndex]] =
+                        m_campaignScore;
                     if (m_campaignScenario == CAMPAIGN_NO_SCENARIO) {
                         m_campaignType = static_cast<unsigned char>(sideIndex);
                         m_campaignScenario = static_cast<signed char>(mapIndex);
@@ -685,16 +686,14 @@ void game::InitEntireCampaign(int side)
     m_campaignScenario = CAMPAIGN_NO_SCENARIO;
 }
 
-// @semantic: Current Campaign.cpp/Campaign.h award-enum epoch: the full 0x5c
-// frame and CFG are reconstructed; all twelve named locals occupy the retail
-// role slots, and no wrong semantic external relocation target remains (gpGame
-// is 26/29 sites, with three target-only sites). First residual +0x0c: retail
-// loads iCurViewMap before iCurViewSide, while the equivalent array expression
-// lowers side-first. Final bounded pass exhausted eight non-improving variants
-// total: direct/symmetric indexing, match_variants commutative_order and
-// independent_statement_order, and the exact pointer-add axis. Revisit only
-// after a relevant Campaign source, TU/header, or comparison epoch changes
-// index evaluation/compiler state.
+// @semantic: The full 0x5c frame and CFG are reconstructed; all twelve named
+// locals occupy the retail role slots. All 80 ordered external relocation sites
+// now agree after separating direct `this->m_players` access from hero lookup
+// through gpGame. First residual +0x0c: retail loads iCurViewMap before
+// iCurViewSide, while the equivalent array expression lowers side-first. Eight
+// bounded index/evaluation-order variants were non-improving. Revisit only after
+// a relevant Campaign source, TU/header, or comparison epoch changes compiler
+// state.
 VA(0x004493ba, 0xbb7)
 void game::InitCampaignMap(void)
 {
@@ -807,42 +806,46 @@ void game::InitCampaignMap(void)
 
     switch (choiceBest->type) {
     case CAMPAIGN_CHOICE_RESOURCE:
-        gpGame->m_players[0].m_resources[choiceBest->value] += choiceBest->amount;
+        m_players[0].m_resources[choiceBest->value] += choiceBest->amount;
         break;
     case CAMPAIGN_CHOICE_ARTIFACT:
-        if (gpGame->m_players[0].m_heroCount > 0)
-            GiveArtifact(GetPlayerHero(0, 0), choiceBest->value, 0, -1);
+        if (m_players[0].m_heroCount > 0)
+            GiveArtifact(gpGame->GetHero(m_players[0].m_heroIds[0]),
+                         choiceBest->value, 0, -1);
         break;
     case CAMPAIGN_CHOICE_SPELL:
-        if (gpGame->m_players[0].m_heroCount > 0) {
+        if (m_players[0].m_heroCount > 0) {
             bonusHeroIndexPosition = 0;
             if (m_campaignType == CAMPAIGN_ROLAND &&
                 m_campaignScenario + 1 == 6 &&
-                gpGame->m_players[0].m_heroCount > 1)
+                m_players[0].m_heroCount > 1)
                 bonusHeroIndexPosition = 1;
-            GetPlayerHero(0, bonusHeroIndexPosition)
+            gpGame->GetHero(
+                m_players[0].m_heroIds[bonusHeroIndexPosition])
                 ->m_spells[choiceBest->value] = 1;
         }
         break;
     case CAMPAIGN_CHOICE_SECONDARY_SKILL:
-        if (gpGame->m_players[0].m_heroCount > 0)
-            GetPlayerHero(0, 0)->SetSS(choiceBest->value, choiceBest->amount);
+        if (m_players[0].m_heroCount > 0)
+            gpGame->GetHero(m_players[0].m_heroIds[0])
+                ->SetSS(choiceBest->value, choiceBest->amount);
         break;
     case CAMPAIGN_CHOICE_CREATURES:
-        if (gpGame->m_players[0].m_heroCount > 0)
-            GetPlayerHero(0, 0)->m_army.Add(
+        if (m_players[0].m_heroCount > 0)
+            gpGame->GetHero(m_players[0].m_heroIds[0])->m_army.Add(
                 choiceBest->value, choiceBest->amount, -1);
         break;
     case CAMPAIGN_CHOICE_PUZZLE_PIECES:
-        gpGame->m_players[0].m_cheatValue =
+        m_players[0].m_cheatValue =
             static_cast<signed char>(choiceBest->value);
         break;
     case CAMPAIGN_CHOICE_EXPERIENCE: {
         int savedNewGameSetup = gbInNewGameSetup;
         gbInNewGameSetup = 1;
-        if (gpGame->m_players[0].m_heroCount > 0) {
-            GetPlayerHero(0, 0)->m_experience += choiceBest->value;
-            GetPlayerHero(0, 0)->CheckLevel();
+        if (m_players[0].m_heroCount > 0) {
+            gpGame->GetHero(m_players[0].m_heroIds[0])->m_experience +=
+                choiceBest->value;
+            gpGame->GetHero(m_players[0].m_heroIds[0])->CheckLevel();
         }
         gbInNewGameSetup = savedNewGameSetup;
         break;
@@ -854,8 +857,9 @@ void game::InitCampaignMap(void)
     if ((m_campaignAwards[CAMPAIGN_AWARD_ARCHIBALD_ULTIMATE_CROWN] ||
          (m_campaignAwards[CAMPAIGN_AWARD_ROLAND_ULTIMATE_CROWN] &&
           m_campaignScenario + 1 == CAMPAIGN_ROLAND_FINAL_SCENARIO + 1)) &&
-        gpGame->m_players[0].m_heroCount > 0) {
-        GiveArtifact(GetPlayerHero(0, 0), EVENT_ARTIFACT_ULTIMATE_CROWN, 0, -1);
+        m_players[0].m_heroCount > 0) {
+        GiveArtifact(gpGame->GetHero(m_players[0].m_heroIds[0]),
+                     EVENT_ARTIFACT_ULTIMATE_CROWN, 0, -1);
     }
     gbRetreatWin = 1;
 
@@ -869,7 +873,8 @@ void game::InitCampaignMap(void)
     }
 
     if (m_campaignAwards[CAMPAIGN_AWARD_ROLAND_STRENGTHENED]) {
-        hero *armyHero = GetPlayerHero(CAMPAIGN_CARRYOVER_PLAYER, 0);
+        hero *armyHero = gpGame->GetHero(
+            m_players[CAMPAIGN_CARRYOVER_PLAYER].m_heroIds[0]);
         for (heroPositionValue = 0;
              heroPositionValue < CAMPAIGN_ARMY_SLOT_COUNT;
              ++heroPositionValue) {
@@ -884,7 +889,7 @@ void game::InitCampaignMap(void)
         int savedNewGameSetup = gbInNewGameSetup;
         hero *armyHero;
         gbInNewGameSetup = 1;
-        armyHero = GetPlayerHero(0, 0);
+        armyHero = gpGame->GetHero(m_players[0].m_heroIds[0]);
         for (heroPositionValue = 0;
              heroPositionValue < CAMPAIGN_ARMY_SLOT_COUNT;
              ++heroPositionValue) {
@@ -918,15 +923,16 @@ void game::InitCampaignMap(void)
                                  CAMPAIGN_NECROMANCER_VAMPIRE_COUNT, -1);
             break;
         }
-        GetPlayerHero(0, 0)->m_experience += CAMPAIGN_EXPERIENCE_BONUS;
-        GetPlayerHero(0, 0)->CheckLevel();
+        gpGame->GetHero(m_players[0].m_heroIds[0])->m_experience +=
+            CAMPAIGN_EXPERIENCE_BONUS;
+        gpGame->GetHero(m_players[0].m_heroIds[0])->CheckLevel();
         gbInNewGameSetup = savedNewGameSetup;
     }
 
     if ((m_campaignAwards[CAMPAIGN_AWARD_ROLAND_CARRYOVER_FORCES] &&
          m_campaignScenario + 1 == CAMPAIGN_ROLAND_FINAL_SCENARIO + 1) ||
         m_campaignAwards[CAMPAIGN_AWARD_ARCHIBALD_CARRYOVER_FORCES]) {
-        hero *armyHero = GetPlayerHero(0, 0);
+        hero *armyHero = gpGame->GetHero(m_players[0].m_heroIds[0]);
         for (heroPositionValue = 0;
              heroPositionValue < CAMPAIGN_ARMY_SLOT_COUNT;
              ++heroPositionValue) {
