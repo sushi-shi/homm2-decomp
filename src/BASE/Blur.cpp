@@ -20,18 +20,14 @@
 #include <SOURCE/X_GLOBAL.h>
 #include <string.h>
 
+// __FILE__ for the NWC memory/assert tracking (reloc-masked path string).
+#define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\Blur.cpp"
+
 #define BLUR_COMPONENT(table, offset)                                                              \
     (*reinterpret_cast<i32*>(reinterpret_cast<u8*>(table) + (offset)))
 
-DATA(0x0051fdc0) static SBlurText gBlurText = {
-    "I:\\Projects\\Heroes\\Prog\\BASE\\Blur.cpp",
-    "RGBLOOKP.BIN",
-    "I:\\Projects\\Heroes\\Prog\\BASE\\Blur.cpp",
-    "I:\\Projects\\Heroes\\Prog\\BASE\\Blur.cpp",
-    "I:\\Projects\\Heroes\\Prog\\BASE\\Blur.cpp",
-    "I:\\Projects\\Heroes\\Prog\\BASE\\Blur.cpp",
-    "I:\\Projects\\Heroes\\Prog\\BASE\\Blur.cpp"
-};
+DATA(0x0051fdc0) static SBlurText gBlurText =
+    {RETAIL_FILE, "RGBLOOKP.BIN", RETAIL_FILE, RETAIL_FILE, RETAIL_FILE, RETAIL_FILE, RETAIL_FILE};
 
 // @semantic
 // Coverage-phase structural checkpoint, not a proven wall. The complete CFG saves the source,
@@ -265,3 +261,5 @@ void DoBlur(
 // corresponding owner-relative field offset.
 
 #undef BLUR_COMPONENT
+
+#undef RETAIL_FILE

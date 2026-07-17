@@ -26,6 +26,9 @@ static inline u32& FadeSavedUpdate(void) {
 #include <BASE/WINMGR.h>
 #include <BASE/WINMGR_TYPES.h>
 
+// __FILE__ for the NWC memory/assert tracking (reloc-masked path string).
+#define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\WINMGR.CPP"
+
 DATA(0x0051ef28) i32 iCombatCycleFrame = 0;
 DATA(0x0051ef2c) i32 gbEveryOtherCycle = 1;
 DATA(0x0051ef30) i32 iCycle1Count = 0;
@@ -35,11 +38,11 @@ DATA(0x0051ef3c) i32 iDialogNestCount = 0;
 DATA(0x0051ef40) static SWindowManagerText gWindowManagerText = {
     "heroWindowManager",
     "SHOT%04d.PCX",
-    "I:\\Projects\\Heroes\\Prog\\BASE\\WINMGR.CPP",
-    "I:\\Projects\\Heroes\\Prog\\BASE\\WINMGR.CPP",
+    RETAIL_FILE,
+    RETAIL_FILE,
     "CCYCLE%02d.BIN",
-    "I:\\Projects\\Heroes\\Prog\\BASE\\WINMGR.CPP",
-    "I:\\Projects\\Heroes\\Prog\\BASE\\WINMGR.CPP"
+    RETAIL_FILE,
+    RETAIL_FILE
 };
 
 #include <BASE/heroWindowManager.h>
@@ -256,6 +259,7 @@ updatePalette:
 #include <stdio.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/NOOPT.h>
+
 
 VA(0x004caa80, 0x41)
 heroWindowManager::heroWindowManager(void) : baseManager() {
@@ -781,3 +785,5 @@ void CreateColorLookupTables(void) {}
 
 // ---- vtables (compiler-emitted; census) ----
 VTBL(heroWindowManager, 0x004eba10);
+
+#undef RETAIL_FILE

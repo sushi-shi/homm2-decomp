@@ -29,6 +29,9 @@
 #include <SOURCE/kbwin.h>
 #include <SOURCE/Newgame.h>
 
+// __FILE__ for the NWC memory/assert tracking (reloc-masked path string).
+#define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\Newgame.cpp"
+
 // @early-stop
 // @early-stop-reloc-only: Current Newgame.cpp/header epoch: all 0x1d5 bytes
 // match after masking 37 ordered relocation sites. Effective targets agree;
@@ -256,23 +259,17 @@ i32 game::NewGame(void) {
     SetupNetPlayerNames();
     glTimers[0] = 0;
     for (textBufferIndex = 0; textBufferIndex < NEW_GAME_TEXT_BUFFER_COUNT; ++textBufferIndex) {
-        cTextReceivedBuffer[textBufferIndex] = static_cast<char*>(BaseAlloc(
-            NEW_GAME_TEXT_BUFFER_SIZE,
-            "I:\\Projects\\Heroes\\Prog\\SOURCE\\Newgame.cpp",
-            newGameSourceLineBase + 0x2d
-        ));
+        cTextReceivedBuffer[textBufferIndex] = static_cast<char*>(
+            BaseAlloc(NEW_GAME_TEXT_BUFFER_SIZE, RETAIL_FILE, newGameSourceLineBase + 0x2d)
+        );
         strcpy(cTextReceivedBuffer[textBufferIndex], "");
     }
-    cNGKPCore = static_cast<char*>(BaseAlloc(
-        NEW_GAME_KEY_BUFFER_SIZE,
-        "I:\\Projects\\Heroes\\Prog\\SOURCE\\Newgame.cpp",
-        newGameSourceLineBase + 0x30
-    ));
-    cNGKPDisplay = static_cast<char*>(BaseAlloc(
-        NEW_GAME_KEY_BUFFER_SIZE,
-        "I:\\Projects\\Heroes\\Prog\\SOURCE\\Newgame.cpp",
-        newGameSourceLineBase + 0x31
-    ));
+    cNGKPCore = static_cast<char*>(
+        BaseAlloc(NEW_GAME_KEY_BUFFER_SIZE, RETAIL_FILE, newGameSourceLineBase + 0x30)
+    );
+    cNGKPDisplay = static_cast<char*>(
+        BaseAlloc(NEW_GAME_KEY_BUFFER_SIZE, RETAIL_FILE, newGameSourceLineBase + 0x31)
+    );
     strcpy(cNGKPCore, "");
     strcpy(cNGKPDisplay, "");
     NGKPcursorIndex = 0;
@@ -429,22 +426,10 @@ i32 game::NewGame(void) {
     }
 
     for (textBufferIndex = 0; textBufferIndex < NEW_GAME_TEXT_BUFFER_COUNT; ++textBufferIndex) {
-        BaseFree(
-            cTextReceivedBuffer[textBufferIndex],
-            "I:\\Projects\\Heroes\\Prog\\SOURCE\\Newgame.cpp",
-            newGameSourceLineBase + 0x11e
-        );
+        BaseFree(cTextReceivedBuffer[textBufferIndex], RETAIL_FILE, newGameSourceLineBase + 0x11e);
     }
-    BaseFree(
-        cNGKPCore,
-        "I:\\Projects\\Heroes\\Prog\\SOURCE\\Newgame.cpp",
-        newGameSourceLineBase + 0x120
-    );
-    BaseFree(
-        cNGKPDisplay,
-        "I:\\Projects\\Heroes\\Prog\\SOURCE\\Newgame.cpp",
-        newGameSourceLineBase + 0x121
-    );
+    BaseFree(cNGKPCore, RETAIL_FILE, newGameSourceLineBase + 0x120);
+    BaseFree(cNGKPDisplay, RETAIL_FILE, newGameSourceLineBase + 0x121);
     gpResourceManager->Dispose(NGKPBkg);
     return result;
 }
@@ -597,11 +582,8 @@ void game::InitNewGameWindow(void) {
         m_newGameWindow->AddWidget(iconControlLocal, -1);
 
         if (giNumHumanPlayers > 1) {
-            label = static_cast<char*>(BaseAlloc(
-                2,
-                "I:\\Projects\\Heroes\\Prog\\SOURCE\\Newgame.cpp",
-                newGameWindowSourceLineBase + 0x50
-            ));
+            label =
+                static_cast<char*>(BaseAlloc(2, RETAIL_FILE, newGameWindowSourceLineBase + 0x50));
             sprintf(label, " ");
             textControlLocal = new textWidget(
                 static_cast<i16>(playerSpacingTemp * playerCounter + firstPlayerXLocal + 19),
@@ -639,11 +621,7 @@ void game::InitNewGameWindow(void) {
             MemError();
         m_newGameWindow->AddWidget(iconControlLocal, -1);
 
-        label = static_cast<char*>(BaseAlloc(
-            2,
-            "I:\\Projects\\Heroes\\Prog\\SOURCE\\Newgame.cpp",
-            newGameWindowSourceLineBase + 0x70
-        ));
+        label = static_cast<char*>(BaseAlloc(2, RETAIL_FILE, newGameWindowSourceLineBase + 0x70));
         sprintf(label, "A");
         if (m_mapHeader.playerCount >= 5) {
             if (m_mapHeader.playerCount >= 6)
@@ -1677,11 +1655,8 @@ void game::ShowScenInfo(void) {
         scenarioWindowValue->AddWidget(iconControlLocal, -1);
 
         if (giNumHumanPlayers > 1) {
-            label = static_cast<char*>(BaseAlloc(
-                2,
-                "I:\\Projects\\Heroes\\Prog\\SOURCE\\Newgame.cpp",
-                scenarioInfoSourceLineBase + 0x72
-            ));
+            label =
+                static_cast<char*>(BaseAlloc(2, RETAIL_FILE, scenarioInfoSourceLineBase + 0x72));
             sprintf(label, " ");
             textControlLocal = new textWidget(
                 static_cast<i16>(
@@ -1719,11 +1694,7 @@ void game::ShowScenInfo(void) {
             MemError();
         scenarioWindowValue->AddWidget(iconControlLocal, -1);
 
-        label = static_cast<char*>(BaseAlloc(
-            2,
-            "I:\\Projects\\Heroes\\Prog\\SOURCE\\Newgame.cpp",
-            scenarioInfoSourceLineBase + 0x92
-        ));
+        label = static_cast<char*>(BaseAlloc(2, RETAIL_FILE, scenarioInfoSourceLineBase + 0x92));
         sprintf(label, "A");
         if (m_mapHeader.playerCount >= 5) {
             if (m_mapHeader.playerCount >= MAP_HEADER_PLAYER_COUNT)
@@ -2094,3 +2065,5 @@ DATA(0x00533158) char* cNGKPCore;
 DATA(0x0053315c) i32 NGKPcursorIndex;
 DATA(0x00533160) char* cTextReceivedBuffer[3];
 DATA(0x0053316c) class icon* NGKPBkg;
+
+#undef RETAIL_FILE

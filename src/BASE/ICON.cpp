@@ -22,10 +22,12 @@
 #include <BASE/heroWindowManager.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
+
+// __FILE__ for the NWC memory/assert tracking (reloc-masked path string).
+#define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\ICON.CPP"
 VA(0x004c7a20, 0x67)
 icon::icon(u32l id) : resource(1, id, 1, 0) {
-    DATA(0x0051e94c) static char allocationSourceFile[] =
-        "I:\\Projects\\Heroes\\Prog\\BASE\\ICON.CPP";
+    DATA(0x0051e94c) static char allocationSourceFile[] = RETAIL_FILE;
     gpResourceManager->PointToFile(id);
     m_frameCount = gpResourceManager->ReadWord();
     u32 len = gpResourceManager->ReadLong();
@@ -44,8 +46,7 @@ icon::icon(u32l id) : resource(1, id, 1, 0) {
 
 VA(0x004c7ad0, 0x21)
 icon::~icon() {
-    DATA(0x0051e974) static char destructionSourceFile[] =
-        "I:\\Projects\\Heroes\\Prog\\BASE\\ICON.CPP";
+    DATA(0x0051e974) static char destructionSourceFile[] = RETAIL_FILE;
     H2_FREE(m_data, destructionSourceFile, 0x1a);
 }
 
@@ -380,3 +381,5 @@ void icon::DimToBuffer(i32 x, i32 y, i32 frame, i32 flip) {
 
 // ---- vtables (compiler-emitted; census) ----
 VTBL(icon, 0x004eb9e8);
+
+#undef RETAIL_FILE
