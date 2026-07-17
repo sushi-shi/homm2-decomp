@@ -629,7 +629,7 @@ void philAI::DimensionDoorTo(i32 x, i32 y) {
 // delta is the equivalent MAP_WIDTH loop comparison operand/polarity.
 VA(0x00438fb0, 0x3f9)
 i32 philAI::DoAnywhereDDoorTownGate(i32 targetValue) {
-    CreatureType bestY;
+    i32 bestY;
     i32 candidateY;
     i32 bestX;
     i32 y;
@@ -731,7 +731,7 @@ i32 philAI::DoAnywhereDDoorTownGate(i32 targetValue) {
                     }
                 }
                 if (bestX != -1) {
-                    DimensionDoorTo(bestX, IDX(bestY));
+                    DimensionDoorTo(bestX, bestY);
                     return 1;
                 }
             }
@@ -2057,7 +2057,7 @@ void philAI::ValueOfBuyingBuilding(
     i32 mageGuildLevelLocal;
     float adjustedValue;
     i32 creatureLocated;
-    BuildingSlotType indexBuilding;
+    i32 indexBuilding;
     i32 buildingLevel;
     i32 currentCreatureType;
     i32 costsByResource[7];
@@ -2070,16 +2070,16 @@ void philAI::ValueOfBuyingBuilding(
     currentTownRace = townPtr->m_type;
     dwellingTotal = 0;
     highestDwellingId = -1;
-    for (indexBuilding = BUILDING_SLOT_DWELLING_FIRST; indexBuilding < BUILDING_SLOT_DWELLING_LAST;
+    for (indexBuilding = IDX(BUILDING_SLOT_DWELLING_FIRST); indexBuilding < IDX(BUILDING_SLOT_DWELLING_LAST);
          indexBuilding++) {
-        if (townPtr->m_buildings & (1 << IDX(indexBuilding))) {
+        if (townPtr->m_buildings & (1 << indexBuilding)) {
             dwellingTotal++;
             highestDwellingId = indexBuilding;
         }
     }
     currentOccupiedSlots = 0;
     for (indexBuilding = 0; indexBuilding < IDX(AI_TOWN_ARMY_SLOTS); indexBuilding++) {
-        if (townPtr->m_army.m_quantities[IDX(indexBuilding)] > 0)
+        if (townPtr->m_army.m_quantities[indexBuilding] > 0)
             currentOccupiedSlots++;
     }
     if (building == BUILDING_SLOT_MAGE_GUILD)
@@ -2204,7 +2204,7 @@ void philAI::ValueOfBuyingBuilding(
                 creatureLocated = 0;
                 for (indexBuilding = 0; indexBuilding < IDX(AI_TOWN_ARMY_SLOTS); indexBuilding++) {
                     if (gDwellingType[townPtr->m_type][building - IDX(BUILDING_SLOT_DWELLING_FIRST)]
-                        == townPtr->m_army.m_creatureTypes[IDX(indexBuilding)]) {
+                        == townPtr->m_army.m_creatureTypes[indexBuilding]) {
                         creatureLocated = 1;
                     }
                 }
