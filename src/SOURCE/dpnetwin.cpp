@@ -16,6 +16,7 @@
 #include <SOURCE/NOOPT.h>
 #include <BASE/heroWindow.h>
 #include <BASE/message.h>
+#include <BASE/widget.h>
 #include <SOURCE/dpnetwin.h>
 
 #define DPFILE const_cast<char *>("I:\\Projects\\Heroes\\Prog\\SOURCE\\dpnetwin.cpp")
@@ -396,8 +397,8 @@ i32 dpWaitForExtraGuests(void) {
         iLastMsgNumHumanPlayers = giNumHumanPlayers;
         sprintf(gText, "You have %d guest(s) now logged in.  Click 'OK' to move on, or wait for additional guests.",
                 giNumHumanPlayers - 1);
-        message.type = 0x200;
-        message.payload.widget.command = 3;
+        message.type = MESSAGE_WIDGET;
+        message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
         message.payload.widget.id = 1;
         message.payload.widget.data.text = gText;
         pNormalDialogWindow->BroadcastMessage(message);

@@ -330,8 +330,8 @@ i32 fileRequester::Open(i32 id)
     m_window->AddWidget(m_scrollKnob, -1);
 
     tag_message message;
-    message.type = 0x200;
-    message.payload.widget.command = 3;
+    message.type = MESSAGE_WIDGET;
+    message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     u8 okEnabled3;
     i32 fileIndex;
     if (m_mode == FILE_REQUESTER_SAVE_GAME) {
@@ -377,8 +377,8 @@ i32 fileRequester::Open(i32 id)
         m_window->BroadcastMessage(message);
     }
 
-    message.type = 0x200;
-    message.payload.widget.command = 0x33;
+    message.type = MESSAGE_WIDGET;
+    message.payload.widget.command = WIDGET_COMMAND_SET_MAX_LENGTH;
     message.payload.widget.id = 15;
     message.payload.widget.data.value = 201;
     m_window->BroadcastMessage(message);
@@ -406,11 +406,11 @@ VA(0x0048da47, 0xa5)
 void fileRequester::SetOK(i32 enabled)
 {
     tag_message message;
-    message.type = 0x200;
+    message.type = MESSAGE_WIDGET;
     if (enabled) {
-        message.payload.widget.command = 6;
+        message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
     } else {
-        message.payload.widget.command = 5;
+        message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
     }
     message.payload.widget.id = 0x7802;
     if (m_active == 1) {
@@ -420,9 +420,9 @@ void fileRequester::SetOK(i32 enabled)
     }
     m_window->BroadcastMessage(message);
     if (enabled) {
-        message.payload.widget.command = 5;
+        message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
     } else {
-        message.payload.widget.command = 6;
+        message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
     }
     message.payload.widget.data.value = 2;
     m_window->BroadcastMessage(message);
@@ -872,8 +872,8 @@ void fileRequester::DoKnob(void)
 
     gpInputManager->Flush();
     tag_message dragMessage = gpInputManager->GetEvent();
-    while (dragMessage.type != 0x10 && dragMessage.type != 0x40) {
-        if (dragMessage.type == 4) {
+    while (dragMessage.type != MESSAGE_LEFT_BUTTON_UP && dragMessage.type != MESSAGE_RIGHT_BUTTON_UP) {
+        if (dragMessage.type == MESSAGE_MOUSE_MOVE) {
             if (static_cast<float>(dragMessage.payload.mouse.y) <
                 mouseOffset2 + fGutterMinY) {
                 dragMessage.payload.mouse.y =
@@ -931,13 +931,13 @@ void fileRequester::Update(i32 drawWindow)
     i32 i;
     double gutterStepCount;
     double gutterState0;
-    broadcastMessage.type = 0x200;
+    broadcastMessage.type = MESSAGE_WIDGET;
     localState = 0;
 
     if (m_mode == FILE_REQUESTER_MAP_GAME || m_mode == FILE_REQUESTER_MAP) {
         for (i = 0; i < FILE_REQUESTER_MAP_SIZE_COUNT;
              ++i) {
-            broadcastMessage.payload.widget.command = 4;
+            broadcastMessage.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
             broadcastMessage.payload.widget.id =
                 FILE_REQUESTER_FILTER_SMALL + i;
             broadcastMessage.payload.widget.data.value =
@@ -949,7 +949,7 @@ void fileRequester::Update(i32 drawWindow)
         }
         SetOK(1);
 
-        broadcastMessage.payload.widget.command = 4;
+        broadcastMessage.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
         broadcastMessage.payload.widget.id = 0x52;
         if (m_mapHeaders[m_selectedIndex].width == MAP_DIMENSION_SMALL) {
             broadcastMessage.payload.widget.data.value = 0x1a;
@@ -974,7 +974,7 @@ void fileRequester::Update(i32 drawWindow)
         broadcastMessage.payload.widget.data.value = m_mapHeaders[m_selectedIndex].lossCondition + 0x24;
         m_window->BroadcastMessage(broadcastMessage);
 
-        broadcastMessage.payload.widget.command = 3;
+        broadcastMessage.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
         broadcastMessage.payload.widget.data.text = gText;
         sprintf(gText, "%s", m_mapHeaders[m_selectedIndex].name);
         broadcastMessage.payload.widget.id = 0x50;
@@ -991,7 +991,7 @@ void fileRequester::Update(i32 drawWindow)
 
     for (i = 0; iMaxListSize > i; ++i) {
         if (m_topIndex + i >= m_fileCount) {
-            broadcastMessage.payload.widget.command = 6;
+            broadcastMessage.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
             broadcastMessage.payload.widget.data.value = 4;
             broadcastMessage.payload.widget.id = i + 0x14;
             m_window->BroadcastMessage(broadcastMessage);
@@ -1007,7 +1007,7 @@ void fileRequester::Update(i32 drawWindow)
             }
         } else {
             broadcastMessage.payload.widget.id = i + 0x14;
-            broadcastMessage.payload.widget.command = 5;
+            broadcastMessage.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
             broadcastMessage.payload.widget.data.value = 4;
             m_window->BroadcastMessage(broadcastMessage);
 
@@ -1021,7 +1021,7 @@ void fileRequester::Update(i32 drawWindow)
                 broadcastMessage.payload.widget.id = i + 260;
                 m_window->BroadcastMessage(broadcastMessage);
 
-                broadcastMessage.payload.widget.command = 4;
+                broadcastMessage.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
                 broadcastMessage.payload.widget.id = i + 200;
                 if (m_mapHeaders[m_topIndex + i].width == MAP_DIMENSION_SMALL) {
                     broadcastMessage.payload.widget.data.value = 0x1a;
@@ -1051,7 +1051,7 @@ void fileRequester::Update(i32 drawWindow)
                 m_window->BroadcastMessage(broadcastMessage);
             }
 
-            broadcastMessage.payload.widget.command = 3;
+            broadcastMessage.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
             if (m_mode == FILE_REQUESTER_MAP || m_mode == FILE_REQUESTER_MAP_GAME) {
                 sprintf(gText, "%s",
                         m_mapHeaders[m_topIndex + i].name);
@@ -1065,7 +1065,7 @@ void fileRequester::Update(i32 drawWindow)
         }
 
         broadcastMessage.payload.widget.id = i + 0x14;
-        broadcastMessage.payload.widget.command = 8;
+        broadcastMessage.payload.widget.command = WIDGET_COMMAND_SET_FILL_COLOR;
         if (m_topIndex + i == m_selectedIndex) {
             broadcastMessage.payload.widget.data.value = 2;
         } else {
@@ -1075,11 +1075,11 @@ void fileRequester::Update(i32 drawWindow)
     }
 
     broadcastMessage.payload.widget.id = FILE_REQUESTER_FILENAME_ENTRY;
-    broadcastMessage.payload.widget.command = 5;
+    broadcastMessage.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
     broadcastMessage.payload.widget.data.value = 2;
     m_window->BroadcastMessage(broadcastMessage);
     if (m_selectedIndex != FILE_REQUESTER_SELECTION_NONE) {
-        broadcastMessage.payload.widget.command = 3;
+        broadcastMessage.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
         if (m_mode == FILE_REQUESTER_MAP_GAME || m_mode == FILE_REQUESTER_MAP) {
             sprintf(gText, "%s", m_mapHeaders[m_selectedIndex].name);
         } else {
@@ -1090,7 +1090,7 @@ void fileRequester::Update(i32 drawWindow)
     }
     if (m_mode == FILE_REQUESTER_MAP_GAME || m_mode == FILE_REQUESTER_LOAD_GAME ||
         m_mode == FILE_REQUESTER_MAP) {
-        broadcastMessage.payload.widget.command = 6;
+        broadcastMessage.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         broadcastMessage.payload.widget.data.value = 2;
         m_window->BroadcastMessage(broadcastMessage);
     }
