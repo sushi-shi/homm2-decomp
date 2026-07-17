@@ -14,6 +14,15 @@
 #include <windows.h>
 #include <string.h>
 
+// @semantic
+// Complete /O2 blit and invalidation checkpoint. Base and retail are both 0x1e2 bytes
+// with the same CFG and all 18 resolved relocation targets/occurrences. First divergence
+// is the destination-address association in the row copy: base adds the row offset before
+// destinationX, while retail adds destinationX first and then uses LEA for the row offset.
+// The remaining residuals are an equivalent loop comparison and operand order in the
+// left/top scaling multiplies. Commuted loop/product operands, an explicit row destination
+// pointer, and explicit scaled-coordinate lifetimes were byte-neutral in three audited
+// variants. Revisit after a real predecessor/header/compiler-state change.
 VA(0x004d8540, 0x1e2)
 extern "C" void __fastcall BlitBitmapToScreenVesa(int bitmapAddress, int sourceX, int sourceY,
                                                    int width, int height, int destinationX,
