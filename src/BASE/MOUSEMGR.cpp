@@ -45,6 +45,7 @@ DATA(0x00534760) HBITMAP hbmpAndMask[MOUSE_CURSOR_COUNT];
 
 // ---- initialized storage (retail RVA order) ----
 DATA(0x0051ebc8) i32 iMouseOffset[4] = { 0, 41, 57, 0 };
+// Per-cursor bitmap {width, height} pairs.
 DATA(0x0051ebd8) i8 iMouseSize[MOUSE_CURSOR_COUNT][2] = {
     { 15, 21 },
     { 22, 21 },
@@ -143,6 +144,9 @@ DATA(0x0051ebd8) i8 iMouseSize[MOUSE_CURSOR_COUNT][2] = {
     { 47, 37 },
     { 51, 13 }
 };
+// Per-cursor {x, y} click-point offsets inside the bitmap; fed to ICONINFO
+// xHotspot/yHotspot and the software draw position. -1 = default to center
+// (patched to iMouseSize/2 in Open).
 DATA(0x0051ec98) i8 iHotSpot[MOUSE_CURSOR_COUNT][2] = {
     { 2, 3 },
     { 2, 3 },
