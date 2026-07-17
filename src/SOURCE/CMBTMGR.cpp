@@ -390,7 +390,7 @@ i32 combatManager::Open(i32 openFlags) {
     LogStr("Op4");
     gpInputManager->Flush();
     ResetMouse();
-    m_messageMask = MESSAGE_WIDGET;
+    m_messageMask = BASE_MANAGER_ACCEPT_WIDGET;
     m_priority = openFlags;
     m_active = true;
     strcpy(m_name, "combatManager");

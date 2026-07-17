@@ -157,7 +157,7 @@ i32 mouseManager::Open(i32 priority) {
     m_mouseY = MOUSE_SCREEN_CENTER_Y;
     if (gbColorMice != 0)
         ShowCursor(0);
-    m_messageMask = MOUSE_MANAGER_MESSAGE_MASK;
+    m_messageMask = BASE_MANAGER_ACCEPT_RIGHT_BUTTON_UP;
     m_active = true;
     m_priority = priority;
     return 0;

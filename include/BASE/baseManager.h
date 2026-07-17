@@ -14,12 +14,26 @@
 // forward declarations:
 struct tag_message;
 
-H2_ENUM_BEGIN(BaseManagerMessageMask)
-    BASE_MANAGER_MESSAGE_MASK_ALL = -1
-H2_ENUM_END(BaseManagerMessageMask)
+// Message classes a manager accepts: the bits are the tag_message type ids.
+H2_ENUM_CLASS_BEGIN_T(BaseManagerMessageMask, i32)
+    BASE_MANAGER_MESSAGE_MASK_ALL = -1,
+    BASE_MANAGER_ACCEPT_MOUSE_MOVE = 4,
+    BASE_MANAGER_ACCEPT_LEFT_BUTTON_UP = 0x10,
+    BASE_MANAGER_ACCEPT_RIGHT_BUTTON_DOWN = 0x20,
+    BASE_MANAGER_ACCEPT_RIGHT_BUTTON_UP = 0x40,
+    BASE_MANAGER_ACCEPT_RESOURCE = 0x80,
+    BASE_MANAGER_ACCEPT_SWAP = 0x100,
+    BASE_MANAGER_ACCEPT_WIDGET = 0x200,
+    BASE_MANAGER_ACCEPT_TOWN_EVENT = 0x800,
+    BASE_MANAGER_ACCEPT_EXECUTIVE = 0x4000
+H2_ENUM_CLASS_END_T(BaseManagerMessageMask, i32)
+H2_ENUM_FLAGS(BaseManagerMessageMask)
 
+// Executive ordering keys stay arithmetic; the catalog names each manager.
 H2_ENUM_BEGIN(BaseManagerPriority)
-    BASE_MANAGER_PRIORITY_UNASSIGNED = -1
+    BASE_MANAGER_PRIORITY_UNASSIGNED = -1,
+    INPUT_MANAGER_PRIORITY = -1,
+    SOUND_MANAGER_PRIORITY = -1
 H2_ENUM_END(BaseManagerPriority)
 
 H2_ENUM_BEGIN(BaseManagerConstant)
@@ -34,7 +48,7 @@ public:
     // (vptr auto-emitted at 0x00; own data starts at 0x04)
     baseManager* m_next;                     // +0x04  next in the executive manager list
     baseManager* m_prev;                     // +0x08  prev in the executive manager list
-    i32 m_messageMask;                       // +0x0c  event/message classes accepted by Main
+    BaseManagerMessageMask m_messageMask;                       // +0x0c  event/message classes accepted by Main
     i32 m_priority;                          // +0x10  executive manager-list ordering key
     char m_name[BASE_MANAGER_NAME_CAPACITY]; // +0x14  manager name
     b32 m_active;                            // +0x32
