@@ -1643,13 +1643,13 @@
     {
       "unit": "SOURCE/ADVMGR",
       "function": "?InsertSound@advManager@@QAEXHHHH@Z",
-      "source_hash": "a905a981c4cb",
-      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "source_hash": "b5dc41761d83",
+      "epoch": "cc7b2cff78090f65c374e818fede1f9ad8ce32ee0d5a55ec7d5ccd3ec4dc8628",
       "outcome": "parked",
-      "iterations": 2,
+      "iterations": 0,
       "before": 98.70503,
       "after": 98.70503,
-      "note": "Recovered exact map bounds; all 0x23a bytes match after masking 9 identical reloc sites."
+      "note": "Complete 0x23a semantics, 0x14 frame and CFG; 9/9 canonical ordered relocation owner/addends agree; only the documented equivalent MAP_HEIGHT comparison spelling and one-byte continuation wall remain."
     },
     {
       "unit": "SOURCE/ADVMGR",
@@ -2167,6 +2167,17 @@
       "before": 99.98473,
       "after": 99.98473,
       "note": "Complete frame/CFG/relocs; sole commutative member-compare load order resisted both operand orders and |0 steering; no behavior bug."
+    },
+    {
+      "unit": "SOURCE/ARMY",
+      "function": "?BuildTempWalkSeq@@YIXPAUSMonFrameInfo@@HH@Z",
+      "source_hash": "48c1e4ddedcd",
+      "epoch": "cc7b2cff78090f65c374e818fede1f9ad8ce32ee0d5a55ec7d5ccd3ec4dc8628",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.96787,
+      "after": 99.96787,
+      "note": "Complete 0x39e semantics/CFG; all 261 masked instructions and 12/12 canonical ordered relocation owner/addends agree; residual is comparison/compiler-local metadata only."
     },
     {
       "unit": "SOURCE/ARMY",
@@ -3809,6 +3820,17 @@
     },
     {
       "unit": "SOURCE/GAME",
+      "function": "?PerMonth@game@@QAEXXZ",
+      "source_hash": "74e76c183b38",
+      "epoch": "cc7b2cff78090f65c374e818fede1f9ad8ce32ee0d5a55ec7d5ccd3ec4dc8628",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 98.37838,
+      "after": 98.37838,
+      "note": "Complete 0x375 semantics/CFG; 30/30 canonical ordered relocation owner/addends agree; only equivalent MAP_WIDTH/MAP_HEIGHT loop-bound load and comparison polarity changed with compiler state."
+    },
+    {
+      "unit": "SOURCE/GAME",
       "function": "?PerWeek@game@@QAEXXZ",
       "source_hash": "19470f488e54",
       "epoch": "cc7b2cff78090f65c374e818fede1f9ad8ce32ee0d5a55ec7d5ccd3ec4dc8628",
@@ -4811,13 +4833,13 @@
     {
       "unit": "SOURCE/PHILAI",
       "function": "?DetermineTargetPosition@philAI@@QAEHAAH0H0@Z",
-      "source_hash": "2462c3f4d256",
+      "source_hash": "83bbac0bc173",
       "epoch": "cc7b2cff78090f65c374e818fede1f9ad8ce32ee0d5a55ec7d5ccd3ec4dc8628",
       "outcome": "parked",
       "iterations": 0,
-      "before": 99.67066,
-      "after": 99.67066,
-      "note": "complete 0x90 frame and 179 relocs; inline continuation placement comparison load order and delinked table field remain"
+      "before": 99.65758,
+      "after": 99.65758,
+      "note": "Complete 0xe7d semantics, 0x90 frame and CFG; 179/179 canonical ordered relocation owner/addends agree; retail and candidate factor relocations resolve to 00 00 c0 3f (1.5f); only documented inline-continuation placement remains."
     },
     {
       "unit": "SOURCE/PHILAI",
@@ -6121,12 +6143,12 @@
       "unit": "SOURCE/TOWNMGR",
       "function": "?SetupWell@townManager@@QAEXPAVheroWindow@@@Z",
       "source_hash": "698002a0c968",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
-      "outcome": "exact",
-      "iterations": 1,
-      "before": 99.7057,
-      "after": 100.0,
-      "note": "Deterministic local-name reconstruction restores the complete retail stack-slot layout; function is exact."
+      "epoch": "cc7b2cff78090f65c374e818fede1f9ad8ce32ee0d5a55ec7d5ccd3ec4dc8628",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.99479,
+      "after": 99.99479,
+      "note": "Complete 0x5cf semantics/CFG and exact masked instructions; 76/76 canonical ordered relocation owner/addends agree; only volatile $SG spellings differ."
     },
     {
       "unit": "SOURCE/TOWNMGR",
