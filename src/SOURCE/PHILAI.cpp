@@ -46,16 +46,16 @@
 // either line base.
 //
 // Retail .rdata is 0xeb280..0xeb5e0 (0x360 bytes). Candidate .rdata is 0x368
-// bytes and contains the complete retail four-byte payload multiset plus two
-// candidate-only zero words, so whole-section translation is not valid. All
-// 139 private allocations are now closed: 86 by direct relocation/payload
-// evidence, 51 by exact remaining-slot elimination, and the two identical
-// 1.0f header statics as equivalence class PHILAI-rdata-identity-1f in their
-// declaration/candidate order. Their logical payload is 0x330 bytes. Fourteen
-// physical eight-byte candidate spans contain four-byte float allocations plus
-// alignment tails; retail retains twelve zero padding words (0x30 bytes) after
-// reordered allocation. The corrected pool distinguishes campfire 500.0f,
-// buoy 400.0f, watering-hole 300.0f, and the shared 200.0f land-site factor.
+// bytes, so whole-section translation is not valid. DetermineTargetPosition's
+// recovered 1.5f owner removed a candidate-only 1.1f allocation and its
+// alignment tail, shrinking the post-type-ownership object from 0x370. The
+// remaining pool has 140 allocations and 0x334 logical bytes: the canonical
+// CONFIG_TYPES include boundary materializes the 2.0f hero-purchase divisor
+// and gives the attention identity its eight-byte declared representation.
+// Retail has 139 allocations, 0x330 logical bytes, and twelve zero padding
+// words; the candidate has thirteen. The corrected pool distinguishes campfire
+// 500.0f, buoy 400.0f, watering-hole 300.0f, and the shared 200.0f land-site
+// factor.
 //
 // All 33 zero-fill owners are source DATA definitions. Their retail public
 // span is 0x125620..0x127e20 (0x2800 bytes); candidate COMMON ordering differs
@@ -1660,7 +1660,8 @@ int philAI::DetermineTargetPosition(int &targetX, int &targetY, int mobility,
                         targetScoreLocal = -100;
                     }
                     if (targetX == x && targetY == y) {
-                        targetScoreLocal = static_cast<int>(targetScoreLocal * 1.1f);
+                        targetScoreLocal = static_cast<int>(
+                            targetScoreLocal * AI_EVENT_HUMAN_VALUE_FACTOR);
                         targetScoreLocal += 20;
                     }
 
