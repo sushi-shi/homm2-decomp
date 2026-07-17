@@ -56,7 +56,7 @@
 // steering; do not repeat these forms.
 VA(0x00407870, 0x223e)
 void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
-    DATA(0x004eda04) static i16 overviewDynamicSourceLine = OVERVIEW_DYNAMIC_SOURCE_LINE;
+    DATA(0x004eda04) static i16 overviewDynamicSourceLine = 116;
     i32 row;
     i32 item;
     i32 textItemCount;
@@ -130,7 +130,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
             hero* heroData0;
             town* record = GetTown(gpCurPlayer->m_townIds[giOverviewTop[giOverviewType] + row]);
             {
-                valueText0 = static_cast<char*>(H2_ALLOC(strlen(record->m_name) + 1, overviewDynamicSourceLine + 0x4f));
+                valueText0 = static_cast<char*>(H2_ALLOC(strlen(record->m_name) + 1, 195));
                 strcpy(valueText0, record->m_name);
 
                 OVERVIEW_TEXT_WIDGET_ROWS[row][textItemCount] = new textWidget(
@@ -308,7 +308,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                         iconCount++;
 
                         valueText0 = static_cast<char*>(
-                            H2_ALLOC(6, overviewDynamicSourceLine + 0xee)
+                            H2_ALLOC(6, 354)
                         );
                         sprintf(
                             valueText0,
@@ -399,7 +399,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                         iconCount++;
 
                         valueText0 = static_cast<char*>(
-                            H2_ALLOC(6, overviewDynamicSourceLine + 0x12a)
+                            H2_ALLOC(6, 414)
                         );
                         sprintf(
                             valueText0,
@@ -505,7 +505,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
 
             for (item = 0; item < 4; item++) {
                 valueText0 = static_cast<char*>(
-                    H2_ALLOC(4, overviewDynamicSourceLine + 0x182)
+                    H2_ALLOC(4, 502)
                 );
                 sprintf(valueText0, "%d", static_cast<i32>(heroData0->Stats(item)));
                 OVERVIEW_TEXT_WIDGET_ROWS[row][textItemCount] = new textWidget(
@@ -568,7 +568,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                         iconCount++;
 
                         valueText0 = static_cast<char*>(
-                            H2_ALLOC(6, overviewDynamicSourceLine + 0x1bd)
+                            H2_ALLOC(6, 561)
                         );
                         sprintf(
                             valueText0,
@@ -635,7 +635,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                     iconCount += 2;
 
                     valueText0 = static_cast<char*>(
-                        H2_ALLOC(2, overviewDynamicSourceLine + 0x1fb)
+                        H2_ALLOC(2, 623)
                     );
                     sprintf(valueText0, "%d", static_cast<i32>(heroData0->GetSSLevel(detailIndex)));
                     OVERVIEW_TEXT_WIDGET_ROWS[row][textItemCount] = new textWidget(
@@ -709,7 +709,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
 
 VA(0x00409aae, 0x357)
 void game::SetupNewOverviewType(i32 overviewType, i32 redrawFrom) {
-    DATA(0x004edca8) static i16 overviewSetupSourceLine = OVERVIEW_SETUP_SOURCE_LINE;
+    DATA(0x004edca8) static i16 overviewSetupSourceLine = 698;
     i32 title;
     tag_message message;
     char* titleCopy;
@@ -754,7 +754,7 @@ void game::SetupNewOverviewType(i32 overviewType, i32 redrawFrom) {
         }
     }
     for (title = 0; title < OVERVIEW_TITLE_COUNT; title++) {
-        titleCopy = static_cast<char*>(H2_ALLOC(strlen(cOverviewText[giOverviewType * OVERVIEW_TITLE_COUNT + title]) + 1, overviewSetupSourceLine + 0x2a));
+        titleCopy = static_cast<char*>(H2_ALLOC(strlen(cOverviewText[giOverviewType * OVERVIEW_TITLE_COUNT + title]) + 1, 740));
         strcpy(titleCopy, cOverviewText[giOverviewType * OVERVIEW_TITLE_COUNT + title]);
         textWidgetTitle[title] = new textWidget(
             titleLefts[giOverviewType][OD_STEER(title)],
@@ -793,7 +793,7 @@ void game::SetupResources(void) {
 
 VA(0x00409e89, 0x4c7)
 void game::Overview(void) {
-    DATA(0x004edcec) static i16 overviewDialogSourceLine = OVERVIEW_DIALOG_SOURCE_LINE;
+    DATA(0x004edcec) static i16 overviewDialogSourceLine = 778;
     char mineCounts4[8];
     i32 sawmills4;
     i32 mine4;
@@ -809,8 +809,8 @@ void game::Overview(void) {
         textWidgetTitle[mine4] = 0;
     }
 
-    textWidgetDynamic = static_cast<textWidget**>(H2_ALLOC(OVERVIEW_DYNAMIC_ARRAY_BYTES, overviewDialogSourceLine + 0x11));
-    iconWidgetDynamic = static_cast<iconWidget**>(H2_ALLOC(OVERVIEW_DYNAMIC_ARRAY_BYTES, overviewDialogSourceLine + 0x12));
+    textWidgetDynamic = static_cast<textWidget**>(H2_ALLOC(OVERVIEW_DYNAMIC_ARRAY_BYTES, 795));
+    iconWidgetDynamic = static_cast<iconWidget**>(H2_ALLOC(OVERVIEW_DYNAMIC_ARRAY_BYTES, 796));
     for (row0 = 0; row0 < OVERVIEW_VISIBLE_ROWS; row0++) {
         for (mine4 = 0; mine4 < OVERVIEW_DYNAMIC_WIDGETS_PER_ROW; mine4++) {
             OVERVIEW_TEXT_WIDGET_ROWS[row0][mine4] = 0;
@@ -885,8 +885,8 @@ void game::Overview(void) {
     gpWindowManager->FadeScreen(1, OVERVIEW_FADE_STEPS, 0);
     delete overWin;
     overWin = 0;
-    H2_FREE(textWidgetDynamic, overviewDialogSourceLine + 0x68);
-    H2_FREE(iconWidgetDynamic, overviewDialogSourceLine + 0x69);
+    H2_FREE(textWidgetDynamic, 882);
+    H2_FREE(iconWidgetDynamic, 883);
     textWidgetDynamic = 0;
     iconWidgetDynamic = 0;
 }

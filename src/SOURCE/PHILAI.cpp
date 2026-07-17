@@ -5849,29 +5849,29 @@ void InitAIMapVars(void) {
     CloseAIMapVars();
     SVSearchArray.Init();
     gaiLiveChanceOfPos =
-        static_cast<i16*>(H2_ALLOC(OD_STEER(MAP_WIDTH) * MAP_HEIGHT * 2, s_initAIMapLineBase + 8));
+        static_cast<i16*>(H2_ALLOC(OD_STEER(MAP_WIDTH) * MAP_HEIGHT * 2, 7054));
     gaiHeroStrategicRVOfPos =
-        static_cast<i16*>(H2_ALLOC(OD_STEER(MAP_WIDTH) * MAP_HEIGHT * 2, s_initAIMapLineBase + 9));
+        static_cast<i16*>(H2_ALLOC(OD_STEER(MAP_WIDTH) * MAP_HEIGHT * 2, 7055));
     gaiHeroEventStratRVOfPos =
-        static_cast<i16*>(H2_ALLOC(OD_STEER(MAP_WIDTH) * MAP_HEIGHT * 2, s_initAIMapLineBase + 10));
+        static_cast<i16*>(H2_ALLOC(OD_STEER(MAP_WIDTH) * MAP_HEIGHT * 2, 7056));
     gaiTurnValueOfMine =
-        static_cast<i8*>(H2_ALLOC(OD_STEER(MAP_WIDTH) * MAP_HEIGHT, s_initAIMapLineBase + 11));
+        static_cast<i8*>(H2_ALLOC(OD_STEER(MAP_WIDTH) * MAP_HEIGHT, 7057));
     gaiEnemyHeroReachable =
-        static_cast<i8*>(H2_ALLOC(OD_STEER(MAP_WIDTH) * MAP_HEIGHT, s_initAIMapLineBase + 12));
+        static_cast<i8*>(H2_ALLOC(OD_STEER(MAP_WIDTH) * MAP_HEIGHT, 7058));
 }
 
 VA(0x00445fe6, 0x112)
 void CloseAIMapVars(void) {
     if (gaiLiveChanceOfPos != 0)
-        H2_FREE(gaiLiveChanceOfPos, s_closeAIMapLineBase + 1);
+        H2_FREE(gaiLiveChanceOfPos, 7063);
     if (gaiHeroStrategicRVOfPos != 0)
-        H2_FREE(gaiHeroStrategicRVOfPos, s_closeAIMapLineBase + 2);
+        H2_FREE(gaiHeroStrategicRVOfPos, 7064);
     if (gaiHeroEventStratRVOfPos != 0)
-        H2_FREE(gaiHeroEventStratRVOfPos, s_closeAIMapLineBase + 3);
+        H2_FREE(gaiHeroEventStratRVOfPos, 7065);
     if (gaiTurnValueOfMine != 0)
-        H2_FREE(gaiTurnValueOfMine, s_closeAIMapLineBase + 4);
+        H2_FREE(gaiTurnValueOfMine, 7066);
     if (gaiEnemyHeroReachable != 0)
-        H2_FREE(gaiEnemyHeroReachable, s_closeAIMapLineBase + 5);
+        H2_FREE(gaiEnemyHeroReachable, 7067);
     gaiLiveChanceOfPos = 0;
     gaiHeroStrategicRVOfPos = 0;
     gaiHeroEventStratRVOfPos = 0;

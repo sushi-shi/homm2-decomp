@@ -31,9 +31,6 @@ typedef iconWidget* OverviewIconWidgetRow[OVERVIEW_DYNAMIC_WIDGETS_PER_ROW];
 typedef textWidget* OverviewTextWidgetRow[OVERVIEW_DYNAMIC_WIDGETS_PER_ROW];
 
 typedef enum OverviewUiConstant {
-    OVERVIEW_DYNAMIC_SOURCE_LINE = 116,
-    OVERVIEW_SETUP_SOURCE_LINE = 0x2ba,
-    OVERVIEW_DIALOG_SOURCE_LINE = 0x30a,
     OVERVIEW_DYNAMIC_ARRAY_BYTES = 0x2bc0,
     OVERVIEW_WIDGET_SET_TEXT = 3,
     OVERVIEW_WIDGET_SET_FRAME = 4,
@@ -91,7 +88,7 @@ typedef enum OverviewUiConstant {
     OVERVIEW_TOWN_RECRUIT_ALT_FIRST = 27,
     OVERVIEW_TOWN_RECRUIT_ALT_LAST = 38,
     OVERVIEW_TOWN_HERO_FIRST = 39,
-    OVERVIEW_TOWN_HERO_LAST = 43,
+    OVERVIEW_TOWN_HERO_LAST = 43
 } OverviewUiConstant;
 
 i32 OverviewHandler(struct tag_message&);
