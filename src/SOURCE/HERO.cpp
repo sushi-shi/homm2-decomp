@@ -96,7 +96,7 @@ i32 hero::CalcMobility(void) {
         if (m_owner != -1)
             mobilityResult += gpGame->MineTypesOwned(m_owner, HERO_LIGHTHOUSE_MINE_TYPE)
                               * lighthouseBonusIncrement;
-        if (HasArtifact(IDX(ARTIFACT_SAILORS_ASTROLABE)))
+        if (HasArtifact(ARTIFACT_SAILORS_ASTROLABE))
             mobilityResult += astrolabeBonus;
     } else {
         slowestSpeedValue = 7;
@@ -111,15 +111,15 @@ i32 hero::CalcMobility(void) {
         mobilityResult = static_cast<i32>(
             mobilityResult * gfSSLogisticsMod[m_secondarySkills[IDX(HERO_SKILL_LOGISTICS)]]
         );
-        if (HasArtifact(IDX(ARTIFACT_NOMAD_BOOTS)))
+        if (HasArtifact(ARTIFACT_NOMAD_BOOTS))
             mobilityResult += nomadBootsMobilityBonus;
-        if (HasArtifact(IDX(ARTIFACT_TRAVELER_BOOTS)))
+        if (HasArtifact(ARTIFACT_TRAVELER_BOOTS))
             mobilityResult += travelerBonus;
         if (HAS(m_eventFlags, HERO_EVENT_STABLES))
             mobilityResult += HERO_STABLES_MOBILITY_BONUS;
     }
 
-    if (HasArtifact(IDX(ARTIFACT_TRUE_COMPASS)))
+    if (HasArtifact(ARTIFACT_TRUE_COMPASS))
         mobilityResult += compassMobility;
 
     if (m_owner >= 0 && m_owner < 6 && !gbHumanPlayer[m_owner] && gpGame->m_difficulty >= 2) {
@@ -134,7 +134,7 @@ VA(0x0046c79d, 0xcf)
 i32 hero::HasSpell(i32 spell) {
     i32 artifactIndex;
 
-    if (!HasArtifact(IDX(ARTIFACT_MAGIC_BOOK)))
+    if (!HasArtifact(ARTIFACT_MAGIC_BOOK))
         return 0;
     if (m_spells[spell])
         return 1;
@@ -144,7 +144,7 @@ i32 hero::HasSpell(i32 spell) {
             return 1;
         }
     }
-    if (HasArtifact(IDX(ARTIFACT_BATTLE_GARB)) && spell == SPELL_TOWN_PORTAL)
+    if (HasArtifact(ARTIFACT_BATTLE_GARB) && spell == SPELL_TOWN_PORTAL)
         return 1;
     return 0;
 }
@@ -1949,7 +1949,7 @@ i8 hero::GetSSLevel(i32 skill) {
         return level;
     if (level == IDX(HERO_SKILL_LEVEL_NONE))
         return level;
-    if (HasArtifact(IDX(ARTIFACT_SPADE_NECROMANCY)))
+    if (HasArtifact(ARTIFACT_SPADE_NECROMANCY))
         shrineAndArtifactBonus++;
     if (m_cursorType == IDX(FACTION_NECROMANCER))
         shrineAndArtifactBonus += gpGame->CountShrines(m_owner);
@@ -2005,8 +2005,8 @@ VA(0x00470779, 0x12f)
 void hero::CheckAnduranPieces(i32 showDialog) {
     i32 artifactSlot;
 
-    if (HasArtifact(IDX(ARTIFACT_BREASTPLATE_ANDURAN)) && HasArtifact(IDX(ARTIFACT_HELMET_ANDURAN))
-        && HasArtifact(IDX(ARTIFACT_SWORD_ANDURAN))) {
+    if (HasArtifact(ARTIFACT_BREASTPLATE_ANDURAN) && HasArtifact(ARTIFACT_HELMET_ANDURAN)
+        && HasArtifact(ARTIFACT_SWORD_ANDURAN)) {
         for (artifactSlot = 0; artifactSlot < HERO_ARTIFACT_SLOT_COUNT; artifactSlot++) {
             if (m_artifacts[artifactSlot] == IDX(ARTIFACT_BREASTPLATE_ANDURAN)
                 || m_artifacts[artifactSlot] == IDX(ARTIFACT_HELMET_ANDURAN)

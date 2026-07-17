@@ -156,7 +156,7 @@ void combatManager::SetupCombat(
 
         m_catapultAttacksRemaining[side] = 1;
         m_catapultAttackCount[side] = m_catapultAttacksRemaining[side];
-        if (m_heroes[side] != 0 && m_heroes[side]->HasArtifact(IDX(ARTIFACT_BALLISTA))) {
+        if (m_heroes[side] != 0 && m_heroes[side]->HasArtifact(ARTIFACT_BALLISTA)) {
             m_catapultAttacksRemaining[side] = 2;
             m_catapultAttackCount[side] = m_catapultAttacksRemaining[side];
         }
@@ -1928,7 +1928,7 @@ i32 combatManager::ShotIsThroughWall(i32 side, i32 sourceHex, i32 targetHex) {
     if (!m_inCastleCombat)
         return 0;
     if (m_heroes[side]
-        && (m_heroes[side]->HasArtifact(IDX(ARTIFACT_GOLDEN_BOW))
+        && (m_heroes[side]->HasArtifact(ARTIFACT_GOLDEN_BOW)
             || m_heroes[side]->m_secondarySkills[IDX(HERO_SKILL_ARCHERY)])) {
         return 0;
     }

@@ -812,7 +812,7 @@ public:
     i32 FindResurrectArmyIndex(i32, i32, i32);
     i32 ValidSpellTarget(SpellType, i32);
     void SpellMessage(i32, i32);
-    void CastSpell(i32, i32, i32, i32);
+    void CastSpell(SpellType, i32, i32, i32);
     void DefaultSpell(i32);
     void Fireball(i32, i32);
     void MeteorShower(i32);

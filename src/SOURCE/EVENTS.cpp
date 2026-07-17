@@ -2154,7 +2154,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 gSpellNames[eventValue1]
             );
         shrineSpell:
-            if (!eventHero2->HasArtifact(IDX(ARTIFACT_MAGIC_BOOK))) {
+            if (!eventHero2->HasArtifact(ARTIFACT_MAGIC_BOOK)) {
                 strcat(gText, "Unfortunately, you have no Magic Book to record the spell with.");
                 EventWindow(-1, 1, gText, -1, 0, -1, 0, -1);
             } else if (eventHero2->m_secondarySkills[IDX(HERO_SKILL_WISDOM)] + SHRINE_WISDOM_BONUS
@@ -3019,7 +3019,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             "wall, telling the secret of the spell - ",
                             gSpellNames[eventValue1]
                         );
-                        if (!eventHero2->HasArtifact(IDX(ARTIFACT_MAGIC_BOOK))) {
+                        if (!eventHero2->HasArtifact(ARTIFACT_MAGIC_BOOK)) {
                             strcat(
                                 eventText,
                                 "  Unfortunately, you have no Magic Book to record the spell with."
@@ -5977,7 +5977,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
         case MAP_OBJECT_SHRINE_FIRST_CIRCLE:
         case MAP_OBJECT_SHRINE_SECOND_CIRCLE:
         case MAP_OBJECT_SHRINE_THIRD_CIRCLE:
-            if (eventHero->HasArtifact(IDX(ARTIFACT_MAGIC_BOOK))
+            if (eventHero->HasArtifact(ARTIFACT_MAGIC_BOOK)
                 && gsSpellInfo[cell->m_objectMetadata - 1].level
                        <= eventHero->m_secondarySkills[IDX(HERO_SKILL_WISDOM)] + 2) {
                 eventHero->AddSpell(
@@ -6844,7 +6844,7 @@ void advManager::PlayerMonsterInteract(
     }
 
     if (eventHero->m_army.CanJoin(monster_n) && strengthRatio_p > MONSTER_STRENGTH_JOIN
-        && !eventHero->HasArtifact(IDX(ARTIFACT_HIDEOUS_MASK)) && monster_n != CREATURE_GHOST
+        && !eventHero->HasArtifact(ARTIFACT_HIDEOUS_MASK) && monster_n != CREATURE_GHOST
         && monster_n != CREATURE_EARTH_ELEMENTAL && monster_n != CREATURE_AIR_ELEMENTAL
         && monster_n != CREATURE_FIRE_ELEMENTAL && monster_n != CREATURE_WATER_ELEMENTAL) {
         if (forcedJoin_f) {
@@ -6989,7 +6989,7 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
         static_cast<float>(gpPhilAI->FightValueOfStack(&eventHero->m_army, eventHero, 0, 0, 0, 0))
         / static_cast<float>(gMonsterDatabase[monsterType].fightValue * monsterCount[0]);
 
-    if (eventHero->m_army.CanJoin(monsterType) && !eventHero->HasArtifact(IDX(ARTIFACT_HIDEOUS_MASK))
+    if (eventHero->m_army.CanJoin(monsterType) && !eventHero->HasArtifact(ARTIFACT_HIDEOUS_MASK)
         && strengthRatio > MONSTER_STRENGTH_JOIN && monsterType != CREATURE_GHOST
         && monsterType != CREATURE_EARTH_ELEMENTAL && monsterType != CREATURE_AIR_ELEMENTAL
         && monsterType != CREATURE_FIRE_ELEMENTAL && monsterType != CREATURE_WATER_ELEMENTAL) {
