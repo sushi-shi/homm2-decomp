@@ -201,7 +201,7 @@ public:
     void GetArmyStrengths(u32l* const);
     i32 HasArtifact(ArtifactType);
     i32 CalcMobility(void);
-    i32 HasSpell(i32);
+    i32 HasSpell(SpellType);
     i32 GetNthSpell(i32, i32);
     i32 GetNumSpells(i32);
     void UseSpell(i32);
