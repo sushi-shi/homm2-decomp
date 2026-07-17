@@ -1175,7 +1175,7 @@ i32 RecruitHeroHandler(tag_message &msg)
     i32 b;
     if (msg.type == MESSAGE_WIDGET) {
         switch (msg.payload.widget.command) {
-        case 0xc:
+        case WIDGET_COMMAND_SELECT:
             switch (msg.payload.widget.id) {
             case 2:
                 HeroView(static_cast<u8>(gpTownManager->m_recruitHero->m_id), 1, 0);
@@ -1188,7 +1188,7 @@ i32 RecruitHeroHandler(tag_message &msg)
                 break;
             }
             break;
-        case 0xd:
+        case WIDGET_COMMAND_DESELECT:
             switch (msg.payload.widget.id) {
             case 0x7801:
                 gpTownManager->m_recruitState = -1;

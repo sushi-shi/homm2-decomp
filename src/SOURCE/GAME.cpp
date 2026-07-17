@@ -2245,7 +2245,7 @@ i32 ViewSpellsHandler(tag_message &msg)
     }
     if (msg.type == MESSAGE_WIDGET) {
       switch (msg.payload.widget.command) {
-    case 13:
+    case WIDGET_COMMAND_DESELECT:
         if (msg.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT || (msg.payload.widget.parameter & 0x200) != 0)
             break;
         {
@@ -2289,8 +2289,8 @@ i32 ViewSpellsHandler(tag_message &msg)
             }
         }
         break;
-    case 12:
-    case 14:
+    case WIDGET_COMMAND_SELECT:
+    case WIDGET_COMMAND_ALTERNATE_SELECT:
         if (msg.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT || (msg.payload.widget.parameter & 0x200) != 0) {
             switch (msg.payload.widget.id) {
             case 100:
@@ -2476,7 +2476,8 @@ void game::ViewArmy(i32 x, i32 y, i32 monsterType, i32 numTroops, town *castle,
     viewArmyFacingWIPXMod = facing == 1 ? -1 : 1;
     gpResourceManager->PointToFile(
         gpResourceManager->MakeId(cArmyFrameFileNames[monsterType], 1));
-    gpResourceManager->ReadBlock(reinterpret_cast<i8 *>(&sViewArmyMonFrameInfo), 0x335);
+    gpResourceManager->ReadBlock(reinterpret_cast<i8 *>(&sViewArmyMonFrameInfo),
+                                 sizeof(sViewArmyMonFrameInfo));
     ModifyFrameInfo(&sViewArmyMonFrameInfo, monsterType);
     BuildTempWalkSeq(&sViewArmyMonFrameInfo, 0, 1);
 
@@ -2681,7 +2682,7 @@ i32 ViewArmyHandler(tag_message &msg)
 
     if (msg.type == MESSAGE_WIDGET) {
         switch (msg.payload.widget.command) {
-        case 13:
+        case WIDGET_COMMAND_DESELECT:
             switch (msg.payload.widget.id) {
             case 0x7800:
             case 0x7801:

@@ -227,20 +227,20 @@ void listBoxWidget::DeleteItem(i32 index)
 VA(0x004db520, 0x368)
 i32 listBoxWidget::Main(tag_message &message)
 {
-    if (!(m_flags & 2)) {
+    if (!(m_flags & WIDGET_FLAG_ENABLED)) {
         if (message.type == MESSAGE_WIDGET)
             return widget::Main(message);
         return 0;
     }
     switch (message.type) {
-    case 4:
-    case 0x10:
-        if (m_flags & 4)
+    case MESSAGE_MOUSE_MOVE:
+    case MESSAGE_LEFT_BUTTON_UP:
+        if (m_flags & WIDGET_FLAG_DRAW)
             return ProcessMouseMessage(message);
         break;
-    case 8:
+    case MESSAGE_LEFT_BUTTON_DOWN:
     case 0x20: {
-        if (!(m_flags & 4))
+        if (!(m_flags & WIDGET_FLAG_DRAW))
             break;
         i16 mx = message.payload.mouse.x - m_owner->m_posX;
         i16 my = message.payload.mouse.y - m_owner->m_posY;
@@ -256,7 +256,7 @@ i32 listBoxWidget::Main(tag_message &message)
         }
         return ProcessMouseMessage(message);
     }
-    case 0x200:
+    case MESSAGE_WIDGET:
         switch (message.payload.widget.command) {
         case 0x36:
             if (m_id == message.payload.widget.id) {
@@ -414,7 +414,7 @@ i32 listBoxWidget::ProcessMouseMessage(tag_message &message)
     i32 mouseY = message.payload.mouse.screenY - m_owner->m_posY;
     i32 adjY = mouseY - m_listY;
     switch (message.type) {
-    case 4:
+    case MESSAGE_MOUSE_MOVE:
         if (m_itemSelectionTracking) {
             i32 row;
             i16 firstRowHeight = m_firstRowHeight;
@@ -442,7 +442,7 @@ i32 listBoxWidget::ProcessMouseMessage(tag_message &message)
             return 0;
         }
         goto redraw;
-    case 8:
+    case MESSAGE_LEFT_BUTTON_DOWN:
         if (m_itemCount == 0)
             goto done;
         if (m_listX <= mouseX && m_listY <= mouseY && mouseX < m_listX + m_listWidth
@@ -479,7 +479,7 @@ i32 listBoxWidget::ProcessMouseMessage(tag_message &message)
                 m_topIndex = m_scrollRange;
         }
         goto redraw;
-    case 0x10:
+    case MESSAGE_LEFT_BUTTON_UP:
         gbSendMouseMoveMessages = 0;
         if (m_scrollUpPressed || m_scrollDownPressed || m_scrollThumbDragging) {
             m_scrollThumbDragging = 0;

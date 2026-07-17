@@ -660,13 +660,13 @@ i32 advManager::Main(struct tag_message &message)
     hero *currentHero;
     if (message.type != MESSAGE_NONE) {
     switch (message.type) {
-    case 0x200:
+    case MESSAGE_WIDGET:
         switch (message.payload.widget.command) {
-        case 13:
+        case WIDGET_COMMAND_DESELECT:
             if (!(message.payload.widget.parameter & 0x200))
                 processResult = ProcessDeSelect(&message, &exitRequestedFlag, eventCellsResult);
             break;
-        case 12:
+        case WIDGET_COMMAND_SELECT:
         case 14: {
             i32 helpIndexState;
             if (message.payload.widget.parameter & 0x200) {
@@ -692,11 +692,11 @@ i32 advManager::Main(struct tag_message &message)
         }
         }
         break;
-    case 4:
+    case MESSAGE_MOUSE_MOVE:
         processResult = ProcessHover(message.payload.mouse.screenX, message.payload.mouse.screenY);
     default:
         break;
-    case 1:
+    case MESSAGE_KEY_DOWN:
         moveDirectionState = -1;
         if (gpCurPlayer->CurrentHero() != ADVMGR_INVALID_HERO)
             currentHero = gpGame->GetHero(gpCurPlayer->m_currentHero);
