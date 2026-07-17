@@ -280,6 +280,7 @@ normalEvent:
     return widget::Main(msg);
 }
 
+// @semantic
 // After removing BUTTON's unused synthetic _globals_model include, candidate is 0x95
 // versus retail 0x96 and live match returns to 94.72%. The first non-relocation
 // divergence is +0x0a: candidate loads both owner coordinates first; retail starts
@@ -317,8 +318,9 @@ short button::Select(struct tag_message &msg)
 // ordered relocations are correct. The only residual is scheduling at +0x19/+0x1f:
 // retail loads the vptr, stores m_flags, then sets ECX; candidate stores m_flags, sets
 // ECX, then loads the vptr. Exact-preserving ctor/dtor inline, dllexport, definition,
-// and declaration-placement variants did not change it; variants that changed COMDAT
-// emission broke the destructor/alias shape.
+// and declaration-placement variants did not change it; a direct compound flag clear
+// also emitted the same current-epoch schedule. Variants that changed COMDAT emission
+// broke the destructor/alias shape.
 VA(0x004ddd10, 0x83)
 short button::Deselect(struct tag_message &msg)
 {

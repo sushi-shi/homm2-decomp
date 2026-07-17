@@ -99,6 +99,15 @@ textWidget::~textWidget()
     H2_FREE(m_text, gTextWidgetSourceFiles.destruction, 0x55);
 }
 
+// @semantic
+// Both sides are 0x210 bytes with the same frame, CFG, selection transitions, text
+// ownership, and 6/6 ordered relocations. The first executable-code divergence is
+// +0x88: candidate emits `cmp m_y, relativeY; jg`, while retail emits the signed-
+// equivalent `cmp relativeY, m_y; jl`. Spelling the test as `m_y > relativeY` or
+// `(m_y <= relativeY) == 0` did not change the candidate. The two later raw symbol-
+// name differences are the same typed source-file owner, with resize-free at +0x58
+// and resize-allocation at +0x84. Revisit after a real predecessor/header TU-state
+// change.
 VA(0x004d1280, 0x210)
 int textWidget::Main(tag_message &msg)
 {
