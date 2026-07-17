@@ -139,8 +139,8 @@ void bitmap::GrabBitmapCareful(class bitmap *source, short int x, short int y)
 {
     int sourceX;
     int sourceY;
-    int width;
     int height;
+    int width;
 
     if (x >= 0 && x + m_width <= source->m_width && y >= 0 && y + m_height <= source->m_height) {
         GrabBitmap(source, x, y);
@@ -212,6 +212,13 @@ static inline unsigned char *BitmapPixels(bitmap *value, int offset)
     return value->m_pixels + offset;
 }
 
+// @semantic
+// The 0x65-byte extent, frame, CFG, signed width/height guards, per-bitmap row strides,
+// inline memcpy, and zero-relocation set are complete. The first residual is +0x1:
+// retail keeps this/destination/row in EAX/EBX/EDX, while this TU state colors them
+// EDX/EAX/EBX. Alias/declaration order, direct owners, a combined guard, two addition
+// orders, two relational orders, and both pointer-declaration hoists were exhausted in
+// ten audited variants. Revisit after a material BITMAP predecessor/header-state change.
 VA(0x004d0500, 0x65)
 void bitmap::CopyToCareful(class bitmap *destination, int destinationX, int destinationY,
                            int sourceX, int sourceY, int width, int height)
