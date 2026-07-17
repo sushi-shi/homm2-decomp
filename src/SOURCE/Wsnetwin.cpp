@@ -47,10 +47,11 @@ DATA(0x004ed860) static short s_wsEvaluateSourceLineBase = WS_SOURCE_LINE_EVALUA
 // ownership. The 18 uncovered BSS bytes are alignment only; no .rdata is owned.
 
 // @semantic
-// Complete 0x128 frame/slots and 164/164 relocation targets. First raw residual is the
-// +0x4b3 local branch byte; the first CFG divergence is the final invalid-address test
-// (ours JE+JMP, retail JNE). Tried direct/commuted/SIB loop tests and if/else/continue/break arms;
-// revisit after later Wsnetwin source/header changes alter TU-cumulative block selection.
+// Complete 0x128 frame/slots and 164/164 relocation targets. First raw residual is +0x478:
+// retail loads player then compares giNumHumanPlayers (9 bytes), while the conventional
+// source loads the global then compares player (8 bytes). The later invalid-address test is
+// ours JE+JMP versus retail JNE. Structured while/do-while and both condition polarities were
+// tested; exact pointer-index and retry-label steering was rejected as less source-faithful.
 VA(0x004068b0, 0x5b5)
 short int wsnet_init(void) {
     WinsockStartupMessage startup;
@@ -148,7 +149,7 @@ short int wsnet_init(void) {
         startup.playerCount = static_cast<unsigned char>(giNumHumanPlayers);
         memcpy(startup.playerAddresses, giNetPosToDCOPos,
                sizeof(giNetPosToDCOPos));
-        for (player = 1; 0[&giNumHumanPlayers] > player; player++) {
+        for (player = 1; player < giNumHumanPlayers; player++) {
             startup.netPosition = static_cast<unsigned char>(player);
             wsSendMessage(giNetPosToDCOPos[player], WS_MESSAGE_STARTUP,
                           sizeof(startup), &startup);
@@ -198,10 +199,12 @@ void wsnet_term(void) {
 }
 
 // @semantic
-// Complete 0x28 frame/slots and 32/32 relocation targets. First raw residual is the +0x7b
-// local branch byte; the first opcode-count divergence is two extra five-byte return
-// trampolines after the broadcast send-error dialog. Tried both SOCKET_ERROR polarities,
-// direct/commuted/SIB player tests, and nested/direct return arms; revisit after TU-state changes.
+// Complete 0x28 frame/slots and 32/32 relocation targets. First raw residual is +0x8e:
+// retail loads netPlayer then compares giNumHumanPlayers (9 bytes), while the conventional
+// source loads the global then compares netPlayer (8 bytes). After DelayMilli, ours has two
+// five-byte loop continuations and retries at sendto; retail has one and repeats the idempotent
+// peer-address assignment. Direct, commuted, nested, do/while, and assignment-condition forms
+// were tested; the exact label/pointer-index form was rejected as less source-faithful.
 VA(0x00406f37, 0x1f5)
 void wsSendMessage(int destination, unsigned char type, unsigned short int size,
                    void *data) {
@@ -219,26 +222,23 @@ void wsSendMessage(int destination, unsigned char type, unsigned short int size,
     peerAddress.sin_port = htons(WS_TRANSPORT_PORT);
     if (destination == 0) {
         for (netPlayer = 0; netPlayer < giNumHumanPlayers; netPlayer++) {
-            if (giThisNetPos == 0[&netPlayer])
+            if (giThisNetPos == netPlayer)
                 continue;
             attemptCount = 0;
             peerAddress.sin_addr.s_addr = giNetPosToDCOPos[netPlayer];
-            while (1) {
-                iRc = sendto(sd_dg, reinterpret_cast<char *>(packetBuffer), size + 1, 0,
-                             reinterpret_cast<struct sockaddr *>(&peerAddress),
-                             sizeof(peerAddress));
-                if (iRc == SOCKET_ERROR) {
-                    error = WSAGetLastError();
-                    if (attemptCount < 20) {
-                        DelayMilli(WS_TRANSPORT_SEND_RETRY_DELAY);
-                        continue;
-                    }
+            while ((iRc = sendto(sd_dg, reinterpret_cast<char *>(packetBuffer),
+                                 size + 1, 0,
+                                 reinterpret_cast<struct sockaddr *>(&peerAddress),
+                                 sizeof(peerAddress))) == SOCKET_ERROR) {
+                error = WSAGetLastError();
+                if (attemptCount < 20) {
+                    DelayMilli(WS_TRANSPORT_SEND_RETRY_DELAY);
+                } else {
                     sprintf(cWSTextBuffer,
                             "TCP/IP Error During command 'sendto()' # %d", error);
                     NormalDialog(cWSTextBuffer, 5, -1, -1, -1, 0, -1, 0, -1, 0);
                     return;
                 }
-                break;
             }
         }
     } else {
