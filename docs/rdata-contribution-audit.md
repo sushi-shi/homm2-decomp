@@ -21,14 +21,16 @@ ordinary readonly contribution is `0x368`, while the retail owner span is
 to `+0x10` after later alignment. It remains source/compiler constant-pool
 recovery work, not a linker or BASE/FONT placement issue.
 
-`philAI::DetermineTargetPosition` now multiplies the selected human target by
-the retained `AI_EVENT_HUMAN_VALUE_FACTOR` owner (`1.5f`), matching retail's
-DIR32 relocation and payload. This removed the erroneous anonymous `1.1f`
-allocation and its alignment tail, shrinking the integrated post-ownership
-PHILAI object from `0x370` to `0x368` and improving every downstream anchor by
-eight bytes. The remaining `0x8` PHILAI difference is independent: the canonical
-CONFIG_TYPES include boundary causes MSVC 4.2 to materialize the typed
-hero-purchase divisor and the declared-width attention identity differently.
+`philAI::DetermineTargetPosition` multiplies the selected human target by the
+anonymous `1.1f` temporary. The retail pool orders that temporary between the
+function's own `1.05` double and the battle `1.11` double, a position only a
+literal at this site can produce; an earlier revision substituted the
+`AI_EVENT_HUMAN_VALUE_FACTOR` owner (`1.5f`) on masked-relocation evidence and
+has been reverted. The other former `0x8` excess came from a typed
+hero-purchase divisor and an eight-byte attention identity; the divisor is a
+double macro and the identity a float again, so the contribution matches the
+reviewed 0x368 candidate layout (retail payload multiset plus two alignment
+zero words).
 
 ## Historical SOURCE recovery
 
