@@ -2096,7 +2096,7 @@ void army::PowEffect(i32 effect, i32 resetLimits, i32 effectX, i32 effectY) {
         && IDX(gCurLoadedSpellEffect) != OD_STEER(effect)) {
         gpResourceManager->Dispose(gCurLoadedSpellIcon);
         gCurLoadedSpellIcon = gpResourceManager->GetIcon(gCombatFxNames[effect]);
-        gCurLoadedSpellEffect = effect;
+        gCurLoadedSpellEffect = SpellType(effect);
     }
     if (drawEffect_1) {
         effectFrames_1 = giNumPowFrames[IDX(gCurLoadedSpellEffect)];
@@ -2203,7 +2203,7 @@ void army::PowEffect(i32 effect, i32 resetLimits, i32 effectX, i32 effectY) {
                         + current->m_frameInfo
                               .animationFrameCount[current->m_effectAnimationStart + 1];
                 }
-                if (current->m_animationSequence == IDX(current->m_effectAnimationStart)) {
+                if (IDX(current->m_animationSequence) == current->m_effectAnimationStart) {
                     current->m_effectAnimationLength--;
                 }
                 if (m_drawState < 2) {
@@ -2517,7 +2517,7 @@ void army::SpellEffect(i32 effect, i32 effectFrameDelay, i32 animateCreature) {
         if (gCurLoadedSpellEffect != IDX(effect)) {
             gpResourceManager->Dispose(gCurLoadedSpellIcon);
             gCurLoadedSpellIcon = gpResourceManager->GetIcon(effectFileId_3);
-            gCurLoadedSpellEffect = effect;
+            gCurLoadedSpellEffect = SpellType(effect);
         }
     }
     frame_4 = 0;
