@@ -106,8 +106,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
     i32 artifactResourceType;
     i32 secondaryAmount;
     i32 primaryAmount1;
-    ArtifactType secondaryReward_f;
-    ArtifactType primaryReward3;
+    i32 secondaryReward_f;
+    i32 primaryReward3;
     i32 correctAnswer1;
     char eventText[EVENT_TEXT_BUFFER_SIZE];
     mapCell* skeletonCell1;
@@ -226,7 +226,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             if (gpGame->m_players[giCurPlayer].m_resources[eventValue1] < 0)
                                 gpGame->m_players[giCurPlayer].m_resources[eventValue1] = 0;
                             if (eventExtra1->resources[eventValue1] != 0) {
-                                if (primaryReward3 != IDX(MAP_EVENT_REWARD_NONE)) {
+                                if (primaryReward3 != MAP_EVENT_REWARD_NONE) {
                                     secondaryReward_f = primaryReward3;
                                     secondaryAmount = primaryAmount1;
                                 }
@@ -238,7 +238,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         if (eventExtra1->artifact != MAP_EVENT_REWARD_NONE
                             && eventHero2->NumArtifacts() < 14) {
                             GiveArtifact(eventHero2, ArtifactType(eventExtra1->artifact), 1, -1);
-                            if (primaryReward3 != IDX(MAP_EVENT_REWARD_NONE)) {
+                            if (primaryReward3 != MAP_EVENT_REWARD_NONE) {
                                 secondaryReward_f = primaryReward3;
                                 secondaryAmount = primaryAmount1;
                             }
