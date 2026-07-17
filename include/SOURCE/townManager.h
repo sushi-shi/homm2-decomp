@@ -26,7 +26,7 @@ public:
     townObject* m_townObjects[32]; // +0x3e
     i32 m_townObjectCount;         // +0xbe
     i32 m_lastTownType;            // +0xc2
-    i32 m_unknownC6; // +0xc6 only zeroed (ctor/Open), never read; unnamed and unused in Ironfist (field_C6) too
+    i32 m_unknownC6; // +0xc6 only zeroed (ctor/Open), never read
     heroWindow* m_townWindow;   // +0xca
     strip* m_garrisonStrip;     // +0xce
     strip* m_heroStrip;         // +0xd2

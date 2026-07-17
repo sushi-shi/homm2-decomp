@@ -53,7 +53,7 @@ public:
     u8 m_campaignScenarioCompleted[2][12]; // +0x05
     i16 m_campaignScenarioBonus[2][12];    // +0x1d
     i16 m_campaignScenarioDays[2][12];     // +0x4d
-    char m_unknown7d;               // +0x7d never referenced; unknown in Ironfist (campUnknown) too
+    char m_unknown7d;               // +0x7d never referenced
     u8 m_campaignAwards[12];        // +0x7e
     u8 m_campaignChoice[2][12];     // +0x8a
     u8 m_campaignMapEnabled[2][12]; // +0xa2

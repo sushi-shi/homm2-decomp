@@ -21,6 +21,19 @@
 #include <SOURCE/game.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/REQUEST.h>
+
+// Frames of the requester's map-info icons: the map-size frames are selected
+// directly; player-count, victory, and loss frames are base + header value.
+typedef enum RequesterIconFrame {
+    PLAYER_COUNT_FRAME_BASE = 0x13,
+    MAP_SIZE_FRAME_SMALL = 0x1a,
+    MAP_SIZE_FRAME_MEDIUM = 0x1b,
+    MAP_SIZE_FRAME_LARGE = 0x1c,
+    MAP_SIZE_FRAME_XLARGE = 0x1d,
+    VICTORY_FRAME_BASE = 0x1e,
+    LOSS_FRAME_BASE = 0x24
+} RequesterIconFrame;
+
 // @early-stop
 // @early-stop-reloc-only
 // All 0x80 relocation-masked bytes and eight ordered relocation sites/effective
@@ -337,10 +350,10 @@ i32 fileRequester::Open(i32 id) {
         if (dot != 0) {
             *dot = 0;
         }
-        message.payload.widget.id = 15;
+        message.payload.widget.id = FILE_REQUESTER_FILENAME_ENTRY;
         message.payload.widget.data.text = m_filename;
         m_window->BroadcastMessage(message);
-        message.payload.widget.id = 16;
+        message.payload.widget.id = FILE_REQUESTER_FILENAME_LABEL;
         sprintf(gText, "File to Save:");
         message.payload.widget.data.text = gText;
         m_window->BroadcastMessage(message);
@@ -366,7 +379,7 @@ i32 fileRequester::Open(i32 id) {
                 }
             }
         }
-        message.payload.widget.id = 16;
+        message.payload.widget.id = FILE_REQUESTER_FILENAME_LABEL;
         sprintf(gText, "File to Load:");
         message.payload.widget.data.text = gText;
         m_window->BroadcastMessage(message);
@@ -374,7 +387,7 @@ i32 fileRequester::Open(i32 id) {
 
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_SET_MAX_LENGTH;
-    message.payload.widget.id = 15;
+    message.payload.widget.id = FILE_REQUESTER_FILENAME_ENTRY;
     message.payload.widget.data.value = 201;
     m_window->BroadcastMessage(message);
     Update(0);
@@ -406,7 +419,7 @@ void fileRequester::SetOK(i32 enabled) {
     } else {
         message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
     }
-    message.payload.widget.id = 0x7802;
+    message.payload.widget.id = FILE_REQUESTER_OK;
     if (m_active == 1) {
         message.payload.widget.data.value = 8;
     } else {
@@ -953,45 +966,45 @@ void fileRequester::Update(i32 drawWindow) {
         SetOK(1);
 
         broadcastMessage.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
-        broadcastMessage.payload.widget.id = 0x52;
+        broadcastMessage.payload.widget.id = FILE_REQUESTER_MAP_SIZE;
         if (m_mapHeaders[m_selectedIndex].width == MAP_DIMENSION_SMALL) {
-            broadcastMessage.payload.widget.data.value = 0x1a;
+            broadcastMessage.payload.widget.data.value = MAP_SIZE_FRAME_SMALL;
         } else if (m_mapHeaders[m_selectedIndex].width == MAP_DIMENSION_MEDIUM) {
-            broadcastMessage.payload.widget.data.value = 0x1b;
+            broadcastMessage.payload.widget.data.value = MAP_SIZE_FRAME_MEDIUM;
         } else if (m_mapHeaders[m_selectedIndex].width == MAP_DIMENSION_LARGE) {
-            broadcastMessage.payload.widget.data.value = 0x1c;
+            broadcastMessage.payload.widget.data.value = MAP_SIZE_FRAME_LARGE;
         } else {
-            broadcastMessage.payload.widget.data.value = 0x1d;
+            broadcastMessage.payload.widget.data.value = MAP_SIZE_FRAME_XLARGE;
         }
         m_window->BroadcastMessage(broadcastMessage);
 
-        broadcastMessage.payload.widget.id = 0x51;
+        broadcastMessage.payload.widget.id = FILE_REQUESTER_MAP_PLAYER_COUNT;
         broadcastMessage.payload.widget.data.value =
-            m_mapHeaders[m_selectedIndex].playerCount + 0x13;
+            m_mapHeaders[m_selectedIndex].playerCount + PLAYER_COUNT_FRAME_BASE;
         m_window->BroadcastMessage(broadcastMessage);
 
-        broadcastMessage.payload.widget.id = 0x56;
+        broadcastMessage.payload.widget.id = FILE_REQUESTER_MAP_VICTORY;
         broadcastMessage.payload.widget.data.value =
-            m_mapHeaders[m_selectedIndex].victoryCondition + 0x1e;
+            m_mapHeaders[m_selectedIndex].victoryCondition + VICTORY_FRAME_BASE;
         m_window->BroadcastMessage(broadcastMessage);
 
-        broadcastMessage.payload.widget.id = 0x57;
+        broadcastMessage.payload.widget.id = FILE_REQUESTER_MAP_LOSS;
         broadcastMessage.payload.widget.data.value =
-            m_mapHeaders[m_selectedIndex].lossCondition + 0x24;
+            m_mapHeaders[m_selectedIndex].lossCondition + LOSS_FRAME_BASE;
         m_window->BroadcastMessage(broadcastMessage);
 
         broadcastMessage.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
         broadcastMessage.payload.widget.data.text = gText;
         sprintf(gText, "%s", m_mapHeaders[m_selectedIndex].name);
-        broadcastMessage.payload.widget.id = 0x50;
+        broadcastMessage.payload.widget.id = FILE_REQUESTER_MAP_NAME;
         m_window->BroadcastMessage(broadcastMessage);
 
         sprintf(gText, "%s", cDifficulty[m_mapHeaders[m_selectedIndex].difficulty]);
-        broadcastMessage.payload.widget.id = 0x54;
+        broadcastMessage.payload.widget.id = FILE_REQUESTER_MAP_DIFFICULTY_TEXT;
         m_window->BroadcastMessage(broadcastMessage);
 
         sprintf(gText, "%s", m_mapHeaders[m_selectedIndex].description);
-        broadcastMessage.payload.widget.id = 0x55;
+        broadcastMessage.payload.widget.id = FILE_REQUESTER_MAP_DESCRIPTION;
         m_window->BroadcastMessage(broadcastMessage);
     }
 
@@ -999,60 +1012,60 @@ void fileRequester::Update(i32 drawWindow) {
         if (m_topIndex + i >= m_fileCount) {
             broadcastMessage.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
             broadcastMessage.payload.widget.data.value = 4;
-            broadcastMessage.payload.widget.id = i + 0x14;
+            broadcastMessage.payload.widget.id = i + FILE_REQUESTER_LIST_TEXT_FIRST;
             m_window->BroadcastMessage(broadcastMessage);
             if (m_mode == FILE_REQUESTER_MAP || m_mode == FILE_REQUESTER_MAP_GAME) {
-                broadcastMessage.payload.widget.id = i + 200;
+                broadcastMessage.payload.widget.id = i + FILE_REQUESTER_MAP_SIZE_ICON_FIRST;
                 m_window->BroadcastMessage(broadcastMessage);
-                broadcastMessage.payload.widget.id = i + 220;
+                broadcastMessage.payload.widget.id = i + FILE_REQUESTER_MAP_PLAYER_ICON_FIRST;
                 m_window->BroadcastMessage(broadcastMessage);
-                broadcastMessage.payload.widget.id = i + 240;
+                broadcastMessage.payload.widget.id = i + FILE_REQUESTER_MAP_VICTORY_ICON_FIRST;
                 m_window->BroadcastMessage(broadcastMessage);
-                broadcastMessage.payload.widget.id = i + 260;
+                broadcastMessage.payload.widget.id = i + FILE_REQUESTER_MAP_LOSS_ICON_FIRST;
                 m_window->BroadcastMessage(broadcastMessage);
             }
         } else {
-            broadcastMessage.payload.widget.id = i + 0x14;
+            broadcastMessage.payload.widget.id = i + FILE_REQUESTER_LIST_TEXT_FIRST;
             broadcastMessage.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
             broadcastMessage.payload.widget.data.value = 4;
             m_window->BroadcastMessage(broadcastMessage);
 
             if (m_mode == FILE_REQUESTER_MAP || m_mode == FILE_REQUESTER_MAP_GAME) {
-                broadcastMessage.payload.widget.id = i + 200;
+                broadcastMessage.payload.widget.id = i + FILE_REQUESTER_MAP_SIZE_ICON_FIRST;
                 m_window->BroadcastMessage(broadcastMessage);
-                broadcastMessage.payload.widget.id = i + 220;
+                broadcastMessage.payload.widget.id = i + FILE_REQUESTER_MAP_PLAYER_ICON_FIRST;
                 m_window->BroadcastMessage(broadcastMessage);
-                broadcastMessage.payload.widget.id = i + 240;
+                broadcastMessage.payload.widget.id = i + FILE_REQUESTER_MAP_VICTORY_ICON_FIRST;
                 m_window->BroadcastMessage(broadcastMessage);
-                broadcastMessage.payload.widget.id = i + 260;
+                broadcastMessage.payload.widget.id = i + FILE_REQUESTER_MAP_LOSS_ICON_FIRST;
                 m_window->BroadcastMessage(broadcastMessage);
 
                 broadcastMessage.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
-                broadcastMessage.payload.widget.id = i + 200;
+                broadcastMessage.payload.widget.id = i + FILE_REQUESTER_MAP_SIZE_ICON_FIRST;
                 if (m_mapHeaders[m_topIndex + i].width == MAP_DIMENSION_SMALL) {
-                    broadcastMessage.payload.widget.data.value = 0x1a;
+                    broadcastMessage.payload.widget.data.value = MAP_SIZE_FRAME_SMALL;
                 } else if (m_mapHeaders[m_topIndex + i].width == MAP_DIMENSION_MEDIUM) {
-                    broadcastMessage.payload.widget.data.value = 0x1b;
+                    broadcastMessage.payload.widget.data.value = MAP_SIZE_FRAME_MEDIUM;
                 } else if (m_mapHeaders[m_topIndex + i].width == MAP_DIMENSION_LARGE) {
-                    broadcastMessage.payload.widget.data.value = 0x1c;
+                    broadcastMessage.payload.widget.data.value = MAP_SIZE_FRAME_LARGE;
                 } else {
-                    broadcastMessage.payload.widget.data.value = 0x1d;
+                    broadcastMessage.payload.widget.data.value = MAP_SIZE_FRAME_XLARGE;
                 }
                 m_window->BroadcastMessage(broadcastMessage);
 
-                broadcastMessage.payload.widget.id = i + 220;
+                broadcastMessage.payload.widget.id = i + FILE_REQUESTER_MAP_PLAYER_ICON_FIRST;
                 broadcastMessage.payload.widget.data.value =
-                    m_mapHeaders[m_topIndex + i].playerCount + 0x13;
+                    m_mapHeaders[m_topIndex + i].playerCount + PLAYER_COUNT_FRAME_BASE;
                 m_window->BroadcastMessage(broadcastMessage);
 
-                broadcastMessage.payload.widget.id = i + 240;
+                broadcastMessage.payload.widget.id = i + FILE_REQUESTER_MAP_VICTORY_ICON_FIRST;
                 broadcastMessage.payload.widget.data.value =
-                    m_mapHeaders[m_topIndex + i].victoryCondition + 0x1e;
+                    m_mapHeaders[m_topIndex + i].victoryCondition + VICTORY_FRAME_BASE;
                 m_window->BroadcastMessage(broadcastMessage);
 
-                broadcastMessage.payload.widget.id = i + 260;
+                broadcastMessage.payload.widget.id = i + FILE_REQUESTER_MAP_LOSS_ICON_FIRST;
                 broadcastMessage.payload.widget.data.value =
-                    m_mapHeaders[m_topIndex + i].lossCondition + 0x24;
+                    m_mapHeaders[m_topIndex + i].lossCondition + LOSS_FRAME_BASE;
                 m_window->BroadcastMessage(broadcastMessage);
             }
 
@@ -1063,11 +1076,11 @@ void fileRequester::Update(i32 drawWindow) {
                 sprintf(gText, "%s", m_fileNames[m_topIndex + i].text);
             }
             broadcastMessage.payload.widget.data.text = gText;
-            broadcastMessage.payload.widget.id = i + 0x14;
+            broadcastMessage.payload.widget.id = i + FILE_REQUESTER_LIST_TEXT_FIRST;
             m_window->BroadcastMessage(broadcastMessage);
         }
 
-        broadcastMessage.payload.widget.id = i + 0x14;
+        broadcastMessage.payload.widget.id = i + FILE_REQUESTER_LIST_TEXT_FIRST;
         broadcastMessage.payload.widget.command = WIDGET_COMMAND_SET_FILL_COLOR;
         if (m_topIndex + i == m_selectedIndex) {
             broadcastMessage.payload.widget.data.value = 2;

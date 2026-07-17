@@ -50,8 +50,7 @@
 // produced a new 0x14-frame family at 85.602840% (0x16d), while six later initialization points
 // ranged through 0x171-0x176 without the retail allocation. Hoisting tmpPixels/pitch/dstRow/srcRow,
 // singly and in combinations, was code-neutral within that family. Equivalent do/while/for clear
-// loops were also neutral; a pointer-advance clear regressed. Project-ironfist contains the same
-// retail assembly/stack map but no source reconstruction. No generated state or sub-100 shape is
+// loops were also neutral; a pointer-advance clear regressed. No generated state or sub-100 shape is
 // retained; the missing scale=EBX, step=EBP, tmpPixels/dstRow spills remain unresolved.
 VA(0x004d2f90, 0x179)
 void IconToBitmapScale(

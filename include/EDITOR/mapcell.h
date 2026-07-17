@@ -53,7 +53,7 @@ public:
             u16 m_objectLayerBit0 : 1; // +4 bit0; bits0-1 encode the object render layer
             u16 m_objectLayerBit1 : 1; // +4 bit1; 0=object, 1=background, 2=shadow, 3=terrain
             u16 m_objectDrawnAsOverlay
-                : 1; // +4 bit2: draw the object sprite in the OVERLAY pass, above the hero (still a TODO in fheroes2, unnamed in Ironfist; decoded from the ADVMGR draw gates)
+                : 1; // +4 bit2: draw the object sprite in the OVERLAY pass, above the hero(decoded from the ADVMGR draw gates)
             u16 m_objectMetadata : 13; // +4 bits3-15
         };
         struct {

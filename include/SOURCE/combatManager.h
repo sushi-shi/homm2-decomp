@@ -716,7 +716,7 @@ public:
     i32 m_combatMessagePending;                         // +0x34b5
     char _pad_0x34b9[0x64];
     u8 m_summonedCreatureType
-        [2]; // +0x351d per-side elemental type summoned this battle; gates Summon Elemental (Ironfist: summonedCreatureType)
+        [2]; // +0x351d per-side elemental type summoned this battle; gates Summon Elemental
     i32 m_sideDefeated[2];                // +0x351f
     i32 m_networkArmyPresent[2];          // +0x3527
     i32 m_playerId[2];                    // +0x352f
@@ -746,18 +746,18 @@ public:
     i32 m_keepAttacksRemaining[2];        // +0xf32b
     i32 m_inCastleCombat;                 // +0xf333
     i32 m_unknownF337
-        [2]; // +0xf337 zeroed per side in the ctor, never read; inside Ironfist unnamed _12 blob
+        [2]; // +0xf337 zeroed per side in the ctor, never read
     i32 m_visitingHeroPresent[2]; // +0xf33f
     char _pad_0xf347[0x4];
-    i32 m_unknownF34B; // +0xf34b zeroed at the end of CatAttack, never read (Ironfist: zeroedInHandleCatapult1)
-    i32 m_unknownF34F; // +0xf34f seeds m_catapultFrame in the ctor, zeroed in CatAttack (Ironfist: zeroedInHandleCatapult2)
-    i32 m_unknownF353; // +0xf353 -1 in the ctor feeding m_unknownF34F, never read; Ironfist types it float (field_F353)
+    i32 m_unknownF34B; // +0xf34b zeroed at the end of CatAttack, never read
+    i32 m_unknownF34F; // +0xf34f seeds m_catapultFrame in the ctor, zeroed in CatAttack
+    i32 m_unknownF353; // +0xf353 -1 in the ctor feeding m_unknownF34F, never read
     i32 m_nonVisualCombat; // +0xf357
-    i32 m_unknownF35B; // +0xf35b zeroed in the ctor, never read; unnamed in Ironfist (field_F35B) too
+    i32 m_unknownF35B; // +0xf35b zeroed in the ctor, never read
     i32 m_killBenefit[2];             // +0xf35f
     class heroWindow* m_combatWindow; // +0xf367
     char _pad_0xf36b[0x8];
-    i32 m_unknownF373; // +0xf373 -1 in the ctor, never read; unnamed in Ironfist (field_F373) too
+    i32 m_unknownF373; // +0xf373 -1 in the ctor, never read
     i32 m_sideRetreated[2];                       // +0xf377
     i32 m_limitCreatureCount[2][20];              // +0xf37f
     i32 m_drawHero[2];                            // +0xf41f
