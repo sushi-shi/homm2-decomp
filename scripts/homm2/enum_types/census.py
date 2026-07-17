@@ -168,7 +168,7 @@ def _parse_body(tokens: list[Token]) -> list[Enumerator]:
 
 
 def parse_declarations(path: Path, text: str | None = None) -> list[EnumDeclaration]:
-    if path.resolve() == (ROOT / "include" / "EnumTypes.h").resolve():
+    if path.resolve() == (ROOT / "include" / "Ints.h").resolve():
         return []
     text = path.read_text(errors="replace") if text is None else text
     tokens = _lex(text)
