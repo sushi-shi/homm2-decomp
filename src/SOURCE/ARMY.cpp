@@ -1567,7 +1567,7 @@ void army::DoAttack(i32 retaliation) {
             && m_monsterType != CREATURE_VAMPIRE && m_monsterType != CREATURE_VAMPIRE_LORD
             && !effectStopsRetaliation_4 && !retaliation) {
             DelayMilli(
-                static_cast<i32l>(gfCombatSpeedMod[gConfig.combatSpeed] * ARMY_RETALIATION_DELAY)
+                static_cast<i32l>(gfCombatSpeedMod[gConfig.combatSpeed] * IDX(ARMY_RETALIATION_DELAY))
             );
             target_1->m_attackDirection = OppositeDirection(m_attackDirection);
             if (HAS(target_1->m_monster.flags.all, MONSTER_FLAGS_WIDE)) {
@@ -1603,7 +1603,7 @@ void army::DoAttack(i32 retaliation) {
             && !m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PETRIFIED)]
             && !m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BLIND)] && m_quantity > 0) {
             DelayMilli(
-                static_cast<i32l>(gfCombatSpeedMod[gConfig.combatSpeed] * ARMY_SECOND_ATTACK_DELAY)
+                static_cast<i32l>(gfCombatSpeedMod[gConfig.combatSpeed] * IDX(ARMY_SECOND_ATTACK_DELAY))
             );
             secondAttackDirection_6 = m_attackDirection;
             m_attackDirection = originalDirection;
@@ -1685,7 +1685,7 @@ i32 army::WalkTo(i32 destination) {
         if (moatDestination) {
             canEnterMoat_1 = 0;
             if (moatIndex_1 == ARMY_MOAT_GATE_INDEX
-                && gpCombatManager->m_drawbridgeState != IDX(COMBAT_CASTLE_GATE_OPEN)) {
+                && gpCombatManager->m_drawbridgeState != COMBAT_CASTLE_GATE_OPEN) {
                 canEnterMoat_1 = 1;
             }
             if ((moatIndex_1 > 0 && moatCell[moatIndex_1 - 1] == m_hex)
