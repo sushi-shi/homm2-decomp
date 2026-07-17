@@ -885,7 +885,7 @@ public:
     i32 FirstArmy(i32, i32, i32*);
     i32 FirstResurrectable(i32, i32*, i32);
     void EffectSpellCure(i32*, i32, i32, i32);
-    void EffectSpellResurrect(i32*, i32, i32);
+    void EffectSpellResurrect(i32*, i32, SpellType);
     void EffectSpellDamage(i32*, i32, i32);
     void CombineGroups(class armyGroup*, class armyGroup*);
     void SetupCombat(

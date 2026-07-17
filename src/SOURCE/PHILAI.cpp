@@ -2227,7 +2227,7 @@ void philAI::ValueOfBuyingBuilding(
                 adjustedValue = static_cast<float>(adjustedValue * 1.1);
             for (buildingLevel = 0; buildingLevel < AI_DWELLING_LEVELS; buildingLevel++) {
                 currentCreatureType = gDwellingType[townPtr->m_type][buildingLevel];
-                if ((townPtr->m_buildings & (1 << (buildingLevel + BUILDING_SLOT_DWELLING_FIRST)))
+                if ((townPtr->m_buildings & BIT(buildingLevel + IDX(BUILDING_SLOT_DWELLING_FIRST)))
                     && townPtr->m_garrison[buildingLevel] > 0
                     && gMonsterDatabase[gDwellingType[townPtr->m_type]
                                                      [building - BUILDING_SLOT_DWELLING_FIRST]]
