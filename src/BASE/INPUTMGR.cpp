@@ -254,11 +254,11 @@ inputManager::inputManager(void) : baseManager() {
 }
 
 VA(0x004ce230, 0x78)
-i32 inputManager::Open(i32 param_1) {
+i32 inputManager::Open(i32 priority) {
     memset(m_eventRing, 0, sizeof(m_eventRing));
     m_writeIndex = 0;
     m_readIndex = 0;
-    m_requestedPriority = param_1;
+    m_requestedPriority = priority;
     m_modifiers = 0;
     MakeScanCodeTable();
     m_messageMask = 4;

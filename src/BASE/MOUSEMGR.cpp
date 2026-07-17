@@ -216,19 +216,19 @@ i32 mouseManager::Main(struct tag_message&) {
 }
 
 VA(0x004c94f0, 0x135)
-void mouseManager::SetPointer(char* name, i32 param_2, i32 param_3) {
+void mouseManager::SetPointer(char* name, i32 frame, i32 cursorType) {
     if (m_forcePointerUpdate == 0) {
         gbPutzingWithMouseCtr++;
         gpResourceManager->SavePosition();
-        if (param_3 == MOUSE_AUTO_CURSOR_TYPE) {
+        if (cursorType == MOUSE_AUTO_CURSOR_TYPE) {
             if (giCurExe == 1 || *name == 'a' || *name == 'A')
-                param_3 = MOUSE_CURSOR_ADVENTURE;
+                cursorType = MOUSE_CURSOR_ADVENTURE;
             else if (*name == 's' || *name == 'S')
-                param_3 = MOUSE_CURSOR_SPELL;
+                cursorType = MOUSE_CURSOR_SPELL;
             else
-                param_3 = MOUSE_CURSOR_COMBAT;
+                cursorType = MOUSE_CURSOR_COMBAT;
         }
-        if (m_cursorType != param_3 && (m_cursorType = param_3, gbColorMice != 0)) {
+        if (m_cursorType != cursorType && (m_cursorType = cursorType, gbColorMice != 0)) {
             i32 saved82 = m_cursorReady;
             m_cursorReady = 0;
             if (m_cursorIcon != 0)
@@ -242,14 +242,14 @@ void mouseManager::SetPointer(char* name, i32 param_2, i32 param_3) {
                 sprintf(local_10, gMouseManagerStrings.combatIcon.text);
             m_cursorIcon = gpResourceManager->GetIcon(local_10);
             H2_ASSERT(
-                param_2 != MOUSE_KEEP_CURRENT_FRAME,
+                frame != MOUSE_KEEP_CURRENT_FRAME,
                 gMouseManagerStrings.cursorFrameAssertion.text,
                 410
             );
             m_cursorFrame = MOUSE_INVALID_CURSOR_FRAME;
             m_cursorReady = saved82;
         }
-        SetPointer(param_2);
+        SetPointer(frame);
         gpResourceManager->RestorePosition();
         gbPutzingWithMouseCtr--;
     }
@@ -682,8 +682,8 @@ void mouseManager::CheckUpdateMousePos(void) {
 }
 
 VA(0x004ca230, 0x191)
-void mouseManager::SetColorMice(i32 param_1) {
-    if (param_1 != gbColorMice) {
+void mouseManager::SetColorMice(i32 enabled) {
+    if (enabled != gbColorMice) {
         i32 savedWM56 = gpWindowManager->m_updateFlags;
         gpWindowManager->m_updateFlags = 0;
         gbPutzingWithMouseCtr++;
@@ -700,7 +700,7 @@ void mouseManager::SetColorMice(i32 param_1) {
         i32 savedY = m_cursorType;
         i32 saved7e = m_forcePointerUpdate;
         m_cursorReady = 0;
-        gbColorMice = param_1;
+        gbColorMice = enabled;
         m_cursorFrame = MOUSE_RELOAD_CURSOR_FRAME;
         m_cursorType = MOUSE_INVALID_CURSOR_TYPE;
         m_forcePointerUpdate = 0;

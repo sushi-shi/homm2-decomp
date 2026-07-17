@@ -58,7 +58,7 @@ heroWindow::heroWindow(i32 x, i32 y, i32 w, i32 h, i32 flags) {
 }
 
 VA(0x004cecd0, 0x521)
-heroWindow::heroWindow(i32 param_1, i32 param_2, char* param_3) {
+heroWindow::heroWindow(i32 x, i32 y, char* resourceName) {
     u32l jb;
     i32 idx;
     textEntryWidget* pte;
@@ -71,16 +71,16 @@ heroWindow::heroWindow(i32 param_1, i32 param_2, char* param_3) {
     iconWidget* picn;
     listBoxWidget* plist;
     dimmerWidget* pdim;
-    strcpy(name, param_3);
-    jb = gpResourceManager->MakeId(param_3, 1);
+    strcpy(name, resourceName);
+    jb = gpResourceManager->MakeId(resourceName, 1);
     gpResourceManager->PointToFile(jb);
     m_savedBackground = 0;
     m_prevWindow = 0;
     m_nextWindow = m_prevWindow;
     m_winState = 0;
     m_zOrder = -1;
-    m_posX = param_1;
-    m_posY = param_2;
+    m_posX = x;
+    m_posY = y;
     m_winWidth = gpResourceManager->ReadWord();
     m_winHeight = gpResourceManager->ReadWord();
     m_winFlags = gpResourceManager->ReadWord();
@@ -207,35 +207,35 @@ void heroWindow::Close(void) {
 }
 
 VA(0x004cf3c0, 0x13c)
-void heroWindow::AddWidget(class widget* param_1, i32 param_2) {
+void heroWindow::AddWidget(class widget* newWidget, i32 zOrder) {
     widget* local_8 = m_widgetListHead;
-    if (param_2 == -1) {
+    if (zOrder == -1) {
         if (local_8 == 0)
-            param_2 = 0;
+            zOrder = 0;
         else
-            param_2 = local_8->m_zOrder + 1;
+            zOrder = local_8->m_zOrder + 1;
     }
-    if (param_1->Open(param_2, this) != 0)
+    if (newWidget->Open(zOrder, this) != 0)
         return;
-    while (local_8 != 0 && param_2 < local_8->m_zOrder) {
+    while (local_8 != 0 && zOrder < local_8->m_zOrder) {
         local_8 = local_8->m_next;
     }
     if (local_8 == 0) {
-        param_1->m_prev = m_widgetListTail;
-        param_1->m_next = 0;
-        m_widgetListTail = param_1;
+        newWidget->m_prev = m_widgetListTail;
+        newWidget->m_next = 0;
+        m_widgetListTail = newWidget;
         if (m_widgetListHead == 0)
-            m_widgetListHead = param_1;
+            m_widgetListHead = newWidget;
     } else if (local_8->m_prev == 0) {
-        param_1->m_next = m_widgetListHead;
-        param_1->m_prev = 0;
-        m_widgetListHead->m_prev = param_1;
-        m_widgetListHead = param_1;
+        newWidget->m_next = m_widgetListHead;
+        newWidget->m_prev = 0;
+        m_widgetListHead->m_prev = newWidget;
+        m_widgetListHead = newWidget;
     } else {
-        param_1->m_next = local_8;
-        param_1->m_prev = local_8->m_prev;
-        local_8->m_prev->m_next = param_1;
-        local_8->m_prev = param_1;
+        newWidget->m_next = local_8;
+        newWidget->m_prev = local_8->m_prev;
+        local_8->m_prev->m_next = newWidget;
+        local_8->m_prev = newWidget;
     }
 }
 
@@ -271,11 +271,11 @@ void heroWindow::RemoveWidget(class widget* w) {
 }
 
 VA(0x004cf620, 0x95)
-i32 heroWindow::BroadcastMessage(struct tag_message& param_1) {
+i32 heroWindow::BroadcastMessage(struct tag_message& message) {
     i32 local_8 = 0;
     widget* local_c = m_widgetListHead;
     while (local_c != 0) {
-        switch (local_8 = local_c->Main(param_1)) {
+        switch (local_8 = local_c->Main(message)) {
             case 0:
                 break;
             case 1:
@@ -298,7 +298,7 @@ void heroWindow::DrawWindow(i32 flags) {
 }
 
 VA(0x004cf710, 0x116)
-void heroWindow::DrawWindow(i32 param_1, i32 param_2, i32 param_3) {
+void heroWindow::DrawWindow(i32 update, i32 firstId, i32 lastId) {
     tag_message local_24;
     widget* local_8;
     gpMouseManager->m_cursorReady = 0;
@@ -307,15 +307,15 @@ void heroWindow::DrawWindow(i32 param_1, i32 param_2, i32 param_3) {
     local_24.payload.widget.command = WIDGET_COMMAND_DRAW;
     while (local_8 != 0) {
         PollSound();
-        if (param_2 != WINDOW_ALL_WIDGETS_LOW || param_3 != WINDOW_ALL_WIDGETS_HIGH) {
-            if (param_2 <= local_8->m_id && local_8->m_id <= param_3)
+        if (firstId != WINDOW_ALL_WIDGETS_LOW || lastId != WINDOW_ALL_WIDGETS_HIGH) {
+            if (firstId <= local_8->m_id && local_8->m_id <= lastId)
                 local_8->Main(local_24);
         } else
             local_8->Main(local_24);
         local_8 = local_8->m_prev;
     }
     PollSound();
-    if (param_1 != 0 && (m_winFlags & WINDOW_UPDATE_SUPPRESS_MASK) != 1) {
+    if (update != 0 && (m_winFlags & WINDOW_UPDATE_SUPPRESS_MASK) != 1) {
         gpWindowManager->UpdateScreenRegion(m_posX, m_posY, m_winWidth, m_winHeight);
         PollSound();
     }
