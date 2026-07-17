@@ -60,25 +60,25 @@ typedef i8 b8;
     ;                                                                                              \
     using enum name;
 #define HOMM2_ENUM_FLAGS(name)                                                                     \
-    inline name operator|(name a, name b) {                                                        \
+    inline constexpr name operator|(name a, name b) {                                                        \
         return static_cast<name>(static_cast<i64>(a) | static_cast<i64>(b));                       \
     }                                                                                              \
-    inline name operator&(name a, name b) {                                                        \
+    inline constexpr name operator&(name a, name b) {                                                        \
         return static_cast<name>(static_cast<i64>(a) & static_cast<i64>(b));                       \
     }                                                                                              \
-    inline name operator^(name a, name b) {                                                        \
+    inline constexpr name operator^(name a, name b) {                                                        \
         return static_cast<name>(static_cast<i64>(a) ^ static_cast<i64>(b));                       \
     }                                                                                              \
-    inline name operator~(name a) {                                                                \
+    inline constexpr name operator~(name a) {                                                                \
         return static_cast<name>(~static_cast<i64>(a));                                            \
     }                                                                                              \
-    inline name& operator|=(name& a, name b) {                                                     \
+    inline constexpr name& operator|=(name& a, name b) {                                                     \
         return a = a | b;                                                                          \
     }                                                                                              \
-    inline name& operator&=(name& a, name b) {                                                     \
+    inline constexpr name& operator&=(name& a, name b) {                                                     \
         return a = a & b;                                                                          \
     }                                                                                              \
-    inline name& operator^=(name& a, name b) {                                                     \
+    inline constexpr name& operator^=(name& a, name b) {                                                     \
         return a = a ^ b;                                                                          \
     }
 #else

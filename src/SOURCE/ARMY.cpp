@@ -2099,7 +2099,7 @@ void army::PowEffect(i32 effect, i32 resetLimits, i32 effectX, i32 effectY) {
         gCurLoadedSpellEffect = effect;
     }
     if (drawEffect_1) {
-        effectFrames_1 = giNumPowFrames[gCurLoadedSpellEffect];
+        effectFrames_1 = giNumPowFrames[IDX(gCurLoadedSpellEffect)];
     }
     for (side_4 = 0; side_4 < ARMY_COMBAT_SIDE_COUNT; side_4++) {
         for (index_10 = 0; index_10 < gpCombatManager->m_armyCount[side_4]; index_10++) {
@@ -2282,11 +2282,11 @@ void army::PowEffect(i32 effect, i32 resetLimits, i32 effectX, i32 effectY) {
         }
         glTimers[0] =
             static_cast<i32>(KBTickCount() + frameDelay_6 * gfCombatSpeedMod[gConfig.combatSpeed]);
-        if (drawEffect_1 && frame < giNumPowFrames[gCurLoadedSpellEffect]) {
+        if (drawEffect_1 && frame < giNumPowFrames[IDX(gCurLoadedSpellEffect)]) {
             gCurSpellEffectFrame = frame;
         }
         gpCombatManager->DrawFrame(0, 1, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
-        if (effectX != ARMY_NO_EFFECT && frame < giNumPowFrames[gCurLoadedSpellEffect]) {
+        if (effectX != ARMY_NO_EFFECT && frame < giNumPowFrames[IDX(gCurLoadedSpellEffect)]) {
             gCurLoadedSpellIcon->CombatClipDrawToBuffer(
                 effectX,
                 m_spellEffectYOffset + effectY,

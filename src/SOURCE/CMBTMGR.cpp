@@ -361,7 +361,7 @@ i32 combatManager::Open(i32 openFlags) {
     CycleColors(1);
     CycleColors(1);
     gCurLoadedSpellIcon = 0;
-    gCurLoadedSpellEffect = -1;
+    gCurLoadedSpellEffect = SPELL_NONE;
     gpMouseManager->m_forcePointerUpdate = 0;
     gpMouseManager->SetPointer("cmbtmous.mse", 6, MOUSE_AUTO_CURSOR_TYPE);
     bMouseWasVis = gpMouseManager->IsVis();
@@ -836,7 +836,7 @@ void combatManager::FreeArmies(void) {
     if (gCurLoadedSpellIcon)
         gpResourceManager->Dispose(gCurLoadedSpellIcon);
     gCurLoadedSpellIcon = 0;
-    gCurLoadedSpellEffect = -1;
+    gCurLoadedSpellEffect = SPELL_NONE;
 }
 
 VA(0x0049272d, 0x1e2)
