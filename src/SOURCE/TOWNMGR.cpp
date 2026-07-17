@@ -2587,7 +2587,7 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit)
         m_recruitHero->m_occupiedTown =
             gpGame->m_worldMap.GetCell(townXh, townYWork)->m_objectMetadata;
         gpGame->m_worldMap.GetCell(townXh, townYWork)->m_triggerType =
-            AI_OBJECT_HERO;
+            (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION);
         gpGame->m_worldMap.GetCell(townXh, townYWork)->m_objectMetadata =
             gpCurPlayer->m_availableHeroIds[m_recruitState];
         SendMapChange(3, m_recruitHero->m_id, townXh, townYWork,

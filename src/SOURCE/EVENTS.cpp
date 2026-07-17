@@ -124,7 +124,7 @@ void advManager::DoEvent(mapCell *cell, i32 x, i32 y)
     i32 springSpellPoints;
 
     eventHero2 = &gpGame->m_heroRecs[gpCurPlayer->CurrentHero()];
-    eventType_g = cell->m_triggerType & MAP_EVENT_TYPE_MASK;
+    eventType_g = cell->m_triggerType & MAP_TRIGGER_TYPE_MASK;
     eraseObject = 0;
     fizzleType3 = 0;
     playedSample3 = NULL_SAMPLE2;
@@ -133,12 +133,12 @@ void advManager::DoEvent(mapCell *cell, i32 x, i32 y)
     eventSample_f = NULL_SAMPLE2;
 
     switch (eventType_g) {
-    case MAP_EVENT_TRADING_POST:
+    case MAP_OBJECT_TRADING_POST:
         EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
         DoTradingPost(0, 0.2f);
         break;
 
-    case MAP_EVENT_MAGIC_GARDEN:
+    case MAP_OBJECT_MAGIC_GARDEN:
         if (cell->m_objectMetadata == MAP_EVENT_DATA_EMPTY) {
             EventWindow(-1, 1,
                         "{Magic Garden}\n\nYou've found a magic garden, the kind of place that leprechauns and faeries like to cavort in, but there is no one here today.  Perhaps you should try again next week.",
@@ -161,7 +161,7 @@ void advManager::DoEvent(mapCell *cell, i32 x, i32 y)
         }
         break;
 
-    case MAP_EVENT_SPHINX:
+    case MAP_OBJECT_SPHINX:
         EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
         eventExtra1 = reinterpret_cast<mapEventExtra *>(ppMapExtra[cell->m_objectMetadata]);
         if (!eventExtra1->active) {
@@ -227,7 +227,7 @@ void advManager::DoEvent(mapCell *cell, i32 x, i32 y)
         }
         break;
 
-    case MAP_EVENT_OBSERVATION_TOWER:
+    case MAP_OBJECT_OBSERVATION_TOWER:
         EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
         NormalDialog("{Observation Tower}\n\nFrom the observation tower, you are able to see distant lands.",
                      1, -1, -1, -1, 0, -1, 0, -1, 0);
@@ -236,7 +236,7 @@ void advManager::DoEvent(mapCell *cell, i32 x, i32 y)
         UpdateScreen(0, 0);
         break;
 
-    case MAP_EVENT_HILL_FORT:
+    case MAP_OBJECT_HILL_FORT:
         thirdUpgrade = -1;
         secondUpgrade1 = -1;
         firstUpgrade_e = -1;
@@ -293,7 +293,7 @@ void advManager::DoEvent(mapCell *cell, i32 x, i32 y)
         }
         break;
 
-    case MAP_EVENT_FREEMANS_FOUNDRY:
+    case MAP_OBJECT_FREEMANS_FOUNDRY:
         thirdUpgrade = -1;
         secondUpgrade1 = -1;
         firstUpgrade_e = -1;
@@ -350,7 +350,7 @@ void advManager::DoEvent(mapCell *cell, i32 x, i32 y)
         }
         break;
 
-    case MAP_EVENT_SEA_CHEST:
+    case MAP_OBJECT_SEA_CHEST:
         if (!(cell->m_objectMetadata & CHEST_ARTIFACT_FLAG) ||
             eventHero2->NumArtifacts() >= EVENT_ARTIFACT_CAPACITY) {
             if (!cell->m_objectMetadata) {
@@ -377,7 +377,7 @@ void advManager::DoEvent(mapCell *cell, i32 x, i32 y)
         eraseObject = 1;
         break;
 
-    case MAP_EVENT_FLOTSAM: {
+    case MAP_OBJECT_FLOTSAM: {
         switch (cell->m_objectMetadata) {
         case 0:
             NormalDialog("{Flotsam}\n\nYou search through the flotsam, but find nothing.",
@@ -406,7 +406,7 @@ void advManager::DoEvent(mapCell *cell, i32 x, i32 y)
         break;
     }
 
-    case MAP_EVENT_SHIPWRECK_SURVIVOR:
+    case MAP_OBJECT_SHIPWRECK_SURVIVOR:
         if (eventHero2->NumArtifacts() < EVENT_ARTIFACT_CAPACITY) {
             sprintf(gText,
                     "{Shipwreck Survivor}\n\nYou've pulled a shipwreck survivor from certain death in an unforgiving ocean.  Grateful, he rewards you for your act of kindness by giving you the %s.",
@@ -423,7 +423,7 @@ void advManager::DoEvent(mapCell *cell, i32 x, i32 y)
         eraseObject = 1;
         break;
 
-    case MAP_EVENT_MAGELLAN_MAPS:
+    case MAP_OBJECT_MAGELLAN_MAPS:
         if (gpCurPlayer->m_resources[RES_GOLD] < MAGELLAN_MAP_COST) {
             NormalDialog("{Magellan's Maps}\n\nThe captain sighs.  \"You don't have enough money, eh?  You can't expect me to give my maps away for free!\"",
                          1, -1, -1, -1, 0, -1, 0, -1, 0);
@@ -441,7 +441,7 @@ void advManager::DoEvent(mapCell *cell, i32 x, i32 y)
         }
         break;
 
-    case MAP_EVENT_WITCH_HUT:
+    case MAP_OBJECT_WITCH_HUT:
         if (!eventHero2->m_secondarySkills[cell->m_objectMetadata]) {
             if (eventHero2->m_secondarySkillCount < HERO_SECONDARY_SKILL_LIMIT) {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
@@ -466,7 +466,7 @@ void advManager::DoEvent(mapCell *cell, i32 x, i32 y)
         }
         break;
 
-    case MAP_EVENT_ARTESIAN_SPRING:
+    case MAP_OBJECT_ARTESIAN_SPRING:
         if (!cell->m_objectMetadata) {
             NormalDialog("{Artesian Spring}\n\nThe spring only refills once a week, and someone's already been here this week.",
                          1, -1, -1, -1, 0, -1, 0, -1, 0);
@@ -487,7 +487,7 @@ void advManager::DoEvent(mapCell *cell, i32 x, i32 y)
         }
         break;
 
-    case MAP_EVENT_MAGIC_WELL:
+    case MAP_OBJECT_MAGIC_WELL:
         if (!(eventHero2->m_eventFlags & HERO_EVENT_MAGIC_WELL)) {
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
             cell->m_objectMetadata = 0;
@@ -511,7 +511,7 @@ void advManager::DoEvent(mapCell *cell, i32 x, i32 y)
         }
         break;
 
-    case MAP_EVENT_COAST:
+    case MAP_OBJECT_COAST:
         if (eventHero2->m_eventFlags & HERO_EVENT_EMBARKED) {
             eventHero2->m_eventFlags =
                 static_cast<i32>(eventHero2->m_eventFlags) &
@@ -533,7 +533,7 @@ void advManager::DoEvent(mapCell *cell, i32 x, i32 y)
         }
         break;
 
-    case MAP_EVENT_BOAT:
+    case MAP_OBJECT_BOAT:
         boat_j = &gpGame->m_boats[cell->m_objectMetadata];
         gpGame->RestoreCell(-1, -1, boat_j->x, boat_j->y, cell, BOAT_RESTORE_MODE);
         eventHero2->m_eventFlags =
@@ -549,7 +549,7 @@ void advManager::DoEvent(mapCell *cell, i32 x, i32 y)
         UpdateScreen(0, 0);
         break;
 
-    case MAP_EVENT_MINE:
+    case MAP_OBJECT_MINE:
         if (gpGame->m_mineOwners[cell->m_objectMetadata] != giCurPlayer) {
             if (gpGame->m_mines[cell->m_objectMetadata].guardianType != -1) {
                 mineCombatResult7 = CombatMonsterEvent(eventHero2,
@@ -578,7 +578,7 @@ claimMine:
         }
         break;
 
-    case MAP_EVENT_ALCHEMIST_LAB:
+    case MAP_OBJECT_ALCHEMIST_LAB:
         if (gpGame->m_mineOwners[cell->m_objectMetadata] != giCurPlayer) {
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
             EventWindow(0, 1, "", 1, -1, -1, 0, -1);
@@ -586,7 +586,7 @@ claimMine:
         }
         break;
 
-    case MAP_EVENT_SAWMILL:
+    case MAP_OBJECT_SAWMILL:
         if (gpGame->m_mineOwners[cell->m_objectMetadata] != giCurPlayer) {
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
             EventWindow(73, 1, "", 0, -2, -1, 0, -1);
@@ -594,7 +594,7 @@ claimMine:
         }
         break;
 
-    case MAP_EVENT_LIGHTHOUSE:
+    case MAP_OBJECT_LIGHTHOUSE:
         if (gpGame->m_mineOwners[cell->m_objectMetadata] != giCurPlayer) {
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
             gpGame->ClaimMine(cell->m_objectMetadata, giCurPlayer);
@@ -602,7 +602,7 @@ claimMine:
         }
         break;
 
-    case MAP_EVENT_TREASURE_CHEST:
+    case MAP_OBJECT_TREASURE_CHEST:
 chestGold:
         if (!(cell->m_objectMetadata & CHEST_ARTIFACT_FLAG)) {
             EventWindow(-1, 2,
@@ -633,7 +633,7 @@ chestGold:
         eventHero2->CheckLevel();
         break;
 
-    case MAP_EVENT_BUOY:
+    case MAP_OBJECT_BUOY:
         if (!(eventHero2->m_eventFlags & HERO_EVENT_BUOY)) {
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
             eventHero2->m_eventFlags =
@@ -646,7 +646,7 @@ chestGold:
         }
         break;
 
-    case MAP_EVENT_FAERIE_RING:
+    case MAP_OBJECT_FAERIE_RING:
         if (!(eventHero2->m_eventFlags & HERO_EVENT_FAERIE_RING)) {
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
             eventHero2->m_eventFlags =
@@ -660,7 +660,7 @@ chestGold:
         }
         break;
 
-    case MAP_EVENT_IDOL:
+    case MAP_OBJECT_IDOL:
         if (!(eventHero2->m_eventFlags & HERO_EVENT_IDOL)) {
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
             eventHero2->m_eventFlags =
@@ -677,7 +677,7 @@ chestGold:
         }
         break;
 
-    case MAP_EVENT_FOUNTAIN:
+    case MAP_OBJECT_FOUNTAIN:
         if (!(eventHero2->m_eventFlags & HERO_EVENT_FOUNTAIN)) {
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
             eventHero2->m_eventFlags =
@@ -690,7 +690,7 @@ chestGold:
         }
         break;
 
-    case MAP_EVENT_WATERING_HOLE:
+    case MAP_OBJECT_WATERING_HOLE:
         if (!(eventHero2->m_eventFlags & HERO_EVENT_WATERING_HOLE)) {
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
             eventHero2->m_eventFlags =
@@ -710,7 +710,7 @@ chestGold:
         }
         break;
 
-    case MAP_EVENT_OASIS:
+    case MAP_OBJECT_OASIS:
         if (!(eventHero2->m_eventFlags & HERO_EVENT_OASIS)) {
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
             eventHero2->m_eventFlags =
@@ -729,7 +729,7 @@ chestGold:
         }
         break;
 
-    case MAP_EVENT_TEMPLE:
+    case MAP_OBJECT_TEMPLE:
         if (!(eventHero2->m_eventFlags & HERO_EVENT_TEMPLE)) {
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
             eventHero2->m_eventFlags =
@@ -744,7 +744,7 @@ chestGold:
         }
         break;
 
-    case MAP_EVENT_LEAN_TO:
+    case MAP_OBJECT_LEAN_TO:
         if (!cell->m_objectMetadata) {
             NormalDialog("{Lean To}\n\nThe lean-to is long abandoned.  There is nothing of value here.",
                          1, -1, -1, -1, 0, -1, 0, -1, 0);
@@ -760,7 +760,7 @@ chestGold:
         }
         break;
 
-    case MAP_EVENT_WAGON:
+    case MAP_OBJECT_WAGON:
         if (cell->m_objectMetadata) {
             if (!(cell->m_objectMetadata & WAGON_ARTIFACT_FLAG)) {
                 resourceType = (cell->m_objectMetadata & CAMPFIRE_RESOURCE_MASK) - 1;
@@ -792,7 +792,7 @@ chestGold:
         cell->m_objectMetadata = 0;
         break;
 
-    case MAP_EVENT_SKELETON: {
+    case MAP_OBJECT_SKELETON: {
         switch (cell->m_objectMetadata) {
         case SKELETON_EMPTY:
             EventWindow(EVENT_TEXT_SKELETON_EMPTY, 1, "",
@@ -820,7 +820,7 @@ chestGold:
         break;
     }
 
-    case MAP_EVENT_CAMPFIRE:
+    case MAP_OBJECT_CAMPFIRE:
         EventWindow(14, 1, "", RES_GOLD,
                     (cell->m_objectMetadata >> CAMPFIRE_AMOUNT_SHIFT) * CAMPFIRE_GOLD_MULTIPLIER,
                     cell->m_objectMetadata & CAMPFIRE_RESOURCE_MASK,
@@ -835,7 +835,7 @@ chestGold:
                              m_mapOriginY + ERASE_ENVIRONMENT_BORDER, 1);
         break;
 
-    case MAP_EVENT_XANADU:
+    case MAP_OBJECT_XANADU:
         if (!(eventHero2->m_xanaduVisits & (1 << cell->m_objectMetadata))) {
             if (eventHero2->m_level +
                     eventHero2->m_secondarySkills[HERO_SKILL_DIPLOMACY] * 2 <
@@ -860,7 +860,7 @@ chestGold:
         }
         break;
 
-    case MAP_EVENT_FORT:
+    case MAP_OBJECT_FORT:
         if (!(eventHero2->m_fortVisits & (1 << cell->m_objectMetadata))) {
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
             NormalDialog("{Fort}\n\n The soldiers living in the fort teach you a few new defensive tricks.",
@@ -874,7 +874,7 @@ chestGold:
         }
         break;
 
-    case MAP_EVENT_STANDING_STONES:
+    case MAP_OBJECT_STANDING_STONES:
         if (!(eventHero2->m_standingStoneVisits & (1 << cell->m_objectMetadata))) {
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
             NormalDialog("{Standing Stones}\n\nYou've found a group of Druids worshipping at one of their strange stone edifices.  Silently, they teach you new ways to cast spells.",
@@ -888,7 +888,7 @@ chestGold:
         }
         break;
 
-    case MAP_EVENT_WITCH_DOCTOR_HUT:
+    case MAP_OBJECT_WITCH_DOCTOR_HUT:
         if (!(eventHero2->m_witchDoctorVisits & (1 << cell->m_objectMetadata))) {
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
             NormalDialog("{Witch Doctor's Hut}\n\nAn Orcish witch doctor living in the hut deepens your knowledge of magic by showing you how to cast stones, read portents, and decipher the intricacies of chicken entrails.",
@@ -902,7 +902,7 @@ chestGold:
         }
         break;
 
-    case MAP_EVENT_MERCENARY_CAMP:
+    case MAP_OBJECT_MERCENARY_CAMP:
         if (!(eventHero2->m_mercenaryCampVisits & (1 << cell->m_objectMetadata))) {
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
             NormalDialog("{Mercenary Camp}\n\nYou've come upon a mercenary camp practicing their tactics.  The mercenaries welcome you and your troops and invite you to train with them.",
@@ -916,7 +916,7 @@ chestGold:
         }
         break;
 
-    case MAP_EVENT_GAZEBO:
+    case MAP_OBJECT_GAZEBO:
         if (!(eventHero2->m_gazeboVisits & (1 << cell->m_objectMetadata))) {
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
             EventWindow(18, 1, "", 14, GAZEBO_EXPERIENCE, -1, 0, -1);
@@ -929,7 +929,7 @@ chestGold:
         }
         break;
 
-    case MAP_EVENT_WATER_WHEEL:
+    case MAP_OBJECT_WATER_WHEEL:
         if (!cell->m_objectMetadata) {
             EventWindow(59, 1, "", -1, 0, -1, 0, -1);
         }
@@ -942,7 +942,7 @@ chestGold:
         }
         break;
 
-    case MAP_EVENT_RESOURCE:
+    case MAP_OBJECT_RESOURCE:
         resourceType = cell->m_objectIndex >> 1;
         GiveResource(eventHero2, resourceType,
                      resourceType == RES_GOLD
@@ -959,7 +959,7 @@ chestGold:
         fizzleType3 = 1;
         break;
 
-    case MAP_EVENT_WINDMILL:
+    case MAP_OBJECT_WINDMILL:
         if (cell->m_objectMetadata < SPHINX_RESOURCE_COUNT) {
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
             EventWindow(87, 1, "", cell->m_objectMetadata, WINDMILL_RESOURCE_AMOUNT,
@@ -972,7 +972,7 @@ chestGold:
         }
         break;
 
-    case MAP_EVENT_ANCIENT_LAMP:
+    case MAP_OBJECT_ANCIENT_LAMP:
         EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
         EventWindow(19, 2, "", -1, 0, -1, 0, -1);
         if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
@@ -984,7 +984,7 @@ chestGold:
         }
         break;
 
-    case MAP_EVENT_TREE_CITY:
+    case MAP_OBJECT_TREE_CITY:
         if (!cell->m_objectMetadata) {
             EventWindow(-1, 1,
                         "{Tree City}\n\nYou've found a Sprite Tree City.  Unfortunately, none of the Sprites living there wish to join an army.  Maybe next week.",
@@ -1000,7 +1000,7 @@ chestGold:
         }
         break;
 
-    case MAP_EVENT_RUINS:
+    case MAP_OBJECT_RUINS:
         if (!cell->m_objectMetadata) {
             EventWindow(-1, 1,
                         "{Ruins}\n\nYou search the ruins, but the Medusas that used to live here are gone.  Perhaps there will be more next week.",
@@ -1016,7 +1016,7 @@ chestGold:
         }
         break;
 
-    case MAP_EVENT_TROLL_BRIDGE:
+    case MAP_OBJECT_TROLL_BRIDGE:
         if (!cell->m_objectMetadata) {
             EventWindow(-1, 1,
                         "{Troll Bridge}\n\nYou've found one of those bridges that Trolls are so fond of living under, but there are none here.  Perhaps there will be some next week.",
@@ -1054,7 +1054,7 @@ recruitTroll:
         }
         break;
 
-    case MAP_EVENT_CITY_OF_DEAD:
+    case MAP_OBJECT_CITY_OF_DEAD:
         if (!cell->m_objectMetadata) {
             EventWindow(-1, 1,
                         "{City of the Dead}\n\nThe City of the Dead is empty of life, and empty of unlife as well.  Perhaps some undead will move in next week.",
@@ -1092,7 +1092,7 @@ recruitLich:
         }
         break;
 
-    case MAP_EVENT_DRAGON_CITY:
+    case MAP_OBJECT_DRAGON_CITY:
         if (!cell->m_objectMetadata) {
             EventWindow(-1, 1,
                         "{Dragon City}\n\nThe Dragon city has no Dragons willing to join you this week.  Perhaps a Dragon will become available next week.",
@@ -1137,7 +1137,7 @@ recruitDragon:
         }
         break;
 
-    case MAP_EVENT_WAGON_CAMP:
+    case MAP_OBJECT_WAGON_CAMP:
         if (!cell->m_objectMetadata) {
             EventWindow(83, 1, "", -1, 0, -1, 0, -1);
         }
@@ -1149,7 +1149,7 @@ recruitDragon:
         }
         break;
 
-    case MAP_EVENT_DESERT_TENT:
+    case MAP_OBJECT_DESERT_TENT:
         if (!cell->m_objectMetadata) {
             EventWindow(81, 1, "", -1, 0, -1, 0, -1);
         }
@@ -1161,27 +1161,27 @@ recruitDragon:
         }
         break;
 
-    case MAP_EVENT_ARCHER_HOUSE:
-    case MAP_EVENT_GOBLIN_HUT:
-    case MAP_EVENT_DWARF_COTTAGE:
-    case MAP_EVENT_PEASANT_HUT:
-    case MAP_EVENT_LOG_CABIN:
-    case MAP_EVENT_WATCH_TOWER:
-    case MAP_EVENT_TREE_HOUSE:
-    case MAP_EVENT_SIRENS:
-    case MAP_EVENT_HALFLING_HOLE:
-    case MAP_EVENT_EXCAVATION:
-    case MAP_EVENT_CAVE:
+    case MAP_OBJECT_ARCHER_HOUSE:
+    case MAP_OBJECT_GOBLIN_HUT:
+    case MAP_OBJECT_DWARF_COTTAGE:
+    case MAP_OBJECT_PEASANT_HUT:
+    case MAP_OBJECT_LOG_CABIN:
+    case MAP_OBJECT_WATCH_TOWER:
+    case MAP_OBJECT_TREE_HOUSE:
+    case MAP_OBJECT_SIRENS:
+    case MAP_OBJECT_HALFLING_HOLE:
+    case MAP_OBJECT_EXCAVATION:
+    case MAP_OBJECT_CAVE:
         if (cell->m_objectMetadata)
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
         HouseEvent(eventHero2, cell);
         break;
 
-    case MAP_EVENT_MONSTER:
+    case MAP_OBJECT_MONSTER:
         PlayerMonsterInteract(cell, cell, eventHero2, &eraseObject, x, y, 0, x, y);
         break;
 
-    case MAP_EVENT_OBELISK:
+    case MAP_OBJECT_OBELISK:
         if (!(gpGame->m_obeliskVisitors[cell->m_objectMetadata] & (1 << eventHero2->m_owner))) {
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
             gpGame->m_obeliskVisitors[cell->m_objectMetadata] |= 1 << eventHero2->m_owner;
@@ -1193,7 +1193,7 @@ recruitDragon:
         }
         break;
 
-    case MAP_EVENT_TREE_OF_KNOWLEDGE: {
+    case MAP_OBJECT_TREE_OF_KNOWLEDGE: {
         if (!(eventHero2->m_treeKnowledgeVisits & (1 << cell->m_objectMetadata))) {
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
             heroLevel2 = eventHero2->GetLevel(eventHero2->m_experience);
@@ -1248,7 +1248,7 @@ recruitDragon:
         break;
     }
 
-    case MAP_EVENT_ORACLE:
+    case MAP_OBJECT_ORACLE:
         EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
         EventWindow(74, 1, "", -1, 0, -1, 0, -1);
         oracleWindow = new heroWindow(0, 0, "thiefwin.bin");
@@ -1267,21 +1267,21 @@ recruitDragon:
         RedrawAdvScreen(1, 0);
         break;
 
-    case MAP_EVENT_SHRINE_FIRST_CIRCLE:
+    case MAP_OBJECT_SHRINE_FIRST_CIRCLE:
         eventValue1 = cell->m_objectMetadata - 1;
         sprintf(gText, "%s'%s'.  ",
                 "{Shrine of the 1st Circle}\n\nYou come across a small shrine attended by a group of novice acolytes.  In exchange for your protection, they agree to teach you a simple spell - ",
                 gSpellNames[eventValue1]);
         goto shrineSpell;
 
-    case MAP_EVENT_SHRINE_SECOND_CIRCLE:
+    case MAP_OBJECT_SHRINE_SECOND_CIRCLE:
         eventValue1 = cell->m_objectMetadata - 1;
         sprintf(gText, "%s'%s'.  ",
                 "{Shrine of the 2nd Circle}\n\nYou come across an ornate shrine attended by a group of rotund friars.  In exchange for your protection, they agree to teach you a spell - ",
                 gSpellNames[eventValue1]);
         goto shrineSpell;
 
-    case MAP_EVENT_SHRINE_THIRD_CIRCLE:
+    case MAP_OBJECT_SHRINE_THIRD_CIRCLE:
         eventValue1 = cell->m_objectMetadata - 1;
         sprintf(gText, "%s'%s'.  ",
                 "{Shrine of the 3rd Circle}\n\nYou come across a lavish shrine attended by a group of high priests.  In exchange for your protection, they agree to teach you a sophisticated spell - ",
@@ -1304,11 +1304,11 @@ shrineSpell:
         }
         break;
 
-    case MAP_EVENT_CASTLE:
+    case MAP_OBJECT_CASTLE:
         TownEvent(cell, x, y);
         break;
 
-    case MAP_EVENT_WHIRLPOOL:
+    case MAP_OBJECT_WHIRLPOOL:
         EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
         DoWhirlpool(eventHero2);
 
@@ -1319,7 +1319,7 @@ findTeleportDestination:
                 if ((gpGame->m_worldMap.Row(teleportY) + teleportX3)->m_triggerType ==
                         (eventType_g | TELEPORT_TRIGGER_FLAG) &&
                     (gpGame->m_worldMap.Row(teleportY) + teleportX3)->m_objectIndex == cell->m_objectIndex &&
-                    (eventType_g == MAP_EVENT_STONE_LITHS
+                    (eventType_g == MAP_OBJECT_STONE_LITHS
                          ? STONE_LITHS_MIN_DISTANCE
                          : WHIRLPOOL_MIN_DISTANCE) <
                         abs(teleportY - y) + abs(teleportX3 - x)) {
@@ -1336,7 +1336,7 @@ findTeleportDestination:
                             (eventType_g | TELEPORT_TRIGGER_FLAG) &&
                         (gpGame->m_worldMap.Row(teleportY) + teleportX3)->m_objectIndex == cell->m_objectIndex &&
                         (teleportX3 != x || teleportY != y) &&
-                        (eventType_g == MAP_EVENT_STONE_LITHS
+                        (eventType_g == MAP_OBJECT_STONE_LITHS
                              ? STONE_LITHS_MIN_DISTANCE
                              : WHIRLPOOL_MIN_DISTANCE) <
                             abs(teleportY - y) + abs(teleportX3 - x) &&
@@ -1351,11 +1351,11 @@ teleportHero:
         }
         break;
 
-    case MAP_EVENT_STONE_LITHS:
+    case MAP_OBJECT_STONE_LITHS:
         EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
         goto findTeleportDestination;
 
-    case MAP_EVENT_ARTIFACT: {
+    case MAP_OBJECT_ARTIFACT: {
         artifactResourceType = (cell->m_objectMetadata & ARTIFACT_EVENT_RESOURCE_MASK) >> ARTIFACT_EVENT_RESOURCE_SHIFT;
         artifact8 = cell->m_objectIndex >> 1;
         guardedMonster5 = cell->m_objectMetadata & ARTIFACT_EVENT_MONSTER_MASK;
@@ -1522,7 +1522,7 @@ giveArtifact:
         break;
     }
 
-    case MAP_EVENT_HERO_INTERACTION:
+    case MAP_OBJECT_HERO_INTERACTION:
         DemobilizeCurrHero();
         otherHero6 = gpGame->GetHero(cell->m_objectMetadata);
         if (otherHero6->m_owner == giCurPlayer) {
@@ -1542,7 +1542,7 @@ giveArtifact:
         }
         break;
 
-    case MAP_EVENT_BOTTLE:
+    case MAP_OBJECT_BOTTLE:
         if (cell->m_objectMetadata) {
             signExtra_k = reinterpret_cast<signEventExtra *>(ppMapExtra[cell->m_objectMetadata]);
             if (strlen(signExtra_k->text) < 2)
@@ -1555,7 +1555,7 @@ giveArtifact:
         eraseObject = 1;
         break;
 
-    case MAP_EVENT_SIGN:
+    case MAP_OBJECT_SIGN:
         if (cell->m_objectMetadata) {
             signExtra_k = reinterpret_cast<signEventExtra *>(ppMapExtra[cell->m_objectMetadata]);
             if (strlen(signExtra_k->text) < 2)
@@ -1566,7 +1566,7 @@ giveArtifact:
         }
         break;
 
-    case MAP_EVENT_DAEMON_CAVE: {
+    case MAP_OBJECT_DAEMON_CAVE: {
         EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
         EventWindow(-1, 2,
                     "{Daemon Cave}\n\nThe entrance to the cave is dark, and a foul, sulfurous smell issues from the cave mouth.  Will you enter?",
@@ -1657,7 +1657,7 @@ daemonExperienceGold:
         break;
     }
 
-    case MAP_EVENT_SHIPWRECK: {
+    case MAP_OBJECT_SHIPWRECK: {
         EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
         EventWindow(-1, 2,
                     "{Shipwreck}\n\nThe rotting hulk of a great pirate ship creaks eerily as it is pushed against the rocks.  Do you wish to search the shipwreck?",
@@ -1686,7 +1686,7 @@ daemonExperienceGold:
         break;
     }
 
-    case MAP_EVENT_GRAVEYARD: {
+    case MAP_OBJECT_GRAVEYARD: {
         EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
         EventWindow(EVENT_TEXT_GRAVEYARD_PROMPT, 2, "",
                     -1, 0, -1, 0, -1);
@@ -1715,7 +1715,7 @@ daemonExperienceGold:
         break;
     }
 
-    case MAP_EVENT_DERELICT_SHIP: {
+    case MAP_OBJECT_DERELICT_SHIP: {
         EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
         EventWindow(-1, 2,
                     "{Derelict Ship}\n\nThe rotting hulk of a great pirate ship creaks eerily as it is pushed against the rocks.  Do you wish to search the ship?",
@@ -1746,7 +1746,7 @@ daemonExperienceGold:
         break;
     }
 
-    case MAP_EVENT_PYRAMID:
+    case MAP_OBJECT_PYRAMID:
         EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
         EventWindow(-1, 2,
                     "You come upon the pyramid of a great and ancient king.  You are tempted to search it for treasure, but all the old stories warn of fearful curses and undead guardians.  Will you search?",
@@ -1793,7 +1793,7 @@ daemonExperienceGold:
         }
         break;
 
-    case MAP_EVENT_ABANDONED_MINE:
+    case MAP_OBJECT_ABANDONED_MINE:
         EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
         EventWindow(-1, 2,
                     "You come upon an abandoned gold mine.  The mine appears to be haunted.  Do you wish to enter?",
@@ -1840,23 +1840,23 @@ daemonExperienceGold:
         }
         break;
 
-    case MAP_EVENT_BARRIER:
+    case MAP_OBJECT_BARRIER:
         eraseObject = BarrierEvent(cell, eventHero2);
         break;
 
-    case MAP_EVENT_TRAVELER_TENT:
+    case MAP_OBJECT_TRAVELER_TENT:
         PasswordEvent(cell, eventHero2);
         break;
 
-    case MAP_EVENT_EXPANSION_OBJECT:
+    case MAP_OBJECT_EXPANSION_OBJECT:
         GenericSiteEvent(cell, eventHero2);
         break;
 
-    case MAP_EVENT_EXPANSION_DWELLING:
+    case MAP_OBJECT_EXPANSION_DWELLING:
         RecruitSiteEvent(cell, eventHero2);
         break;
 
-    case MAP_EVENT_JAIL:
+    case MAP_OBJECT_JAIL:
         JailEvent(cell, eventHero2, x, y);
     }
 
@@ -2088,7 +2088,7 @@ i32 advManager::BarrierEvent(mapCell *cell, hero *)
     GetDataEntry(gText, response, BARRIER_INPUT_LENGTH, 0, 0, 1);
     if (StrEqNoCase(response, xPasswordStrings[passwordIndex]) &&
         (gpCurPlayer->m_barrierTents & (1 << color))) {
-        EventSound(cell->m_triggerType & MAP_EVENT_TYPE_MASK, color,
+        EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, color,
                    &eventSample);
         NormalDialog(
             "As you speak the magic word, the glowing barrier dissolves into "
@@ -2139,7 +2139,7 @@ void advManager::PasswordEvent(mapCell *cell, hero *)
     i32 passwordIndex = cell->m_objectMetadata;
     passwordIndex >>= BARRIER_PASSWORD_SHIFT;
 
-    EventSound(cell->m_triggerType & MAP_EVENT_TYPE_MASK, color,
+    EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, color,
                &eventSample);
     sprintf(
         gText,
@@ -2198,7 +2198,7 @@ void advManager::GenericSiteEvent(mapCell *cell, hero *eventHero)
                 cursedArtifactCount9++;
         }
         if (cursedArtifactCount9 != 0) {
-            EventSound(cell->m_triggerType & MAP_EVENT_TYPE_MASK, siteType2,
+            EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, siteType2,
                        &eventSample5);
             if (cursedArtifactCount9 == 1) {
                 sprintf(
@@ -2247,7 +2247,7 @@ void advManager::GenericSiteEvent(mapCell *cell, hero *eventHero)
             NormalDialog("The Arena guards turn you away.", 1, -1, -1, -1, 0,
                          -1, 0, -1, 0);
         } else {
-            EventSound(cell->m_triggerType & MAP_EVENT_TYPE_MASK, siteType2,
+            EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, siteType2,
                        &eventSample5);
             eventHero->m_eventFlags =
                 static_cast<i32>(eventHero->m_eventFlags) | HERO_EVENT_ARENA;
@@ -2263,7 +2263,7 @@ void advManager::GenericSiteEvent(mapCell *cell, hero *eventHero)
                 "blessed again.",
                 1, -1, -1, -1, 0, -1, 0, -1, 0);
         } else {
-            EventSound(cell->m_triggerType & MAP_EVENT_TYPE_MASK, siteType2,
+            EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, siteType2,
                        &eventSample5);
             eventHero->m_eventFlags = static_cast<i32>(eventHero->m_eventFlags) |
                                       HERO_EVENT_MERMAID;
@@ -2279,7 +2279,7 @@ void advManager::GenericSiteEvent(mapCell *cell, hero *eventHero)
         break;
 
     case GENERIC_SITE_HUT_OF_MAGI:
-        EventSound(cell->m_triggerType & MAP_EVENT_TYPE_MASK, siteType2,
+        EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, siteType2,
                    &eventSample5);
         NormalDialog(
             "You enter a rickety hut and talk to the magician who lives there.  "
@@ -2291,8 +2291,8 @@ void advManager::GenericSiteEvent(mapCell *cell, hero *eventHero)
                 currentCell5 = gpGame->m_worldMap.Row(mapY9) + mapX37;
                 currentSiteType = currentCell5->m_objectMetadata;
                 currentSiteType &= BARRIER_COLOR_MASK;
-                if ((currentCell5->m_triggerType & MAP_EVENT_TYPE_MASK) ==
-                        MAP_EVENT_EXPANSION_OBJECT &&
+                if ((currentCell5->m_triggerType & MAP_TRIGGER_TYPE_MASK) ==
+                        MAP_OBJECT_EXPANSION_OBJECT &&
                     currentSiteType == GENERIC_SITE_HUT_COLOR) {
                     gpGame->SetVisibility(mapX37, mapY9, giCurPlayer,
                                           GENERIC_SITE_VISIBILITY_RADIUS);
@@ -2334,7 +2334,7 @@ void advManager::GenericSiteEvent(mapCell *cell, hero *eventHero)
                 }
             }
             if (experience11 != 0) {
-                EventSound(cell->m_triggerType & MAP_EVENT_TYPE_MASK, siteType2,
+                EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, siteType2,
                            &eventSample5);
                 sprintf(
                     gText,
@@ -2374,7 +2374,7 @@ void advManager::GenericSiteEvent(mapCell *cell, hero *eventHero)
             stableResult26 |= 2;
         }
         if (stableResult26 != 0) {
-            EventSound(cell->m_triggerType & MAP_EVENT_TYPE_MASK, siteType2,
+            EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, siteType2,
                        &eventSample5);
         }
         sprintf(gText, xStableText[stableResult26]);
@@ -2428,7 +2428,7 @@ void advManager::RecruitSiteEvent(mapCell *cell, hero *eventHero)
     if (availableCount == 0) {
         EventWindow(-1, 1, xRecruitEmpty[siteIndex], -1, 0, -1, 0, -1);
     } else {
-        EventSound(cell->m_triggerType & MAP_EVENT_TYPE_MASK, availableCount,
+        EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, availableCount,
                    &eventSample);
         EventWindow(-1, 2, xRecruitBuy[siteIndex], -1, 0, -1, 0, -1);
         if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
@@ -2481,7 +2481,7 @@ void advManager::JailEvent(mapCell *cell, hero *eventHero, i32 x, i32 y)
             "You already have 8 heroes, and regretfully must leave the prisoner in this jail to languish in agony for untold days.",
             1, -1, -1, -1, 0, -1, 0, -1, 0);
     } else {
-        EventSound(cell->m_triggerType & MAP_EVENT_TYPE_MASK, 0, &eventSample1);
+        EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, 0, &eventSample1);
         NormalDialog(
             "In a dazzling display of daring, you break into the local jail and free the hero imprisoned there, who, in return, pledges loyalty to your cause.",
             1, -1, -1, -1, 0, -1, 0, -1, 0);
@@ -2500,7 +2500,7 @@ void advManager::JailEvent(mapCell *cell, hero *eventHero, i32 x, i32 y)
         releasedHero1->m_mobility = releasedHero1->m_remainingMobility;
         releasedHero1->m_locationType = cell->m_triggerType;
         releasedHero1->m_occupiedTown = cell->m_objectMetadata;
-        cell->m_triggerType = MAP_EVENT_ACTION_FLAG | MAP_EVENT_HERO_INTERACTION;
+        cell->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION;
         cell->m_objectMetadata = heroId9;
         SendMapChange(AI_EVENT_HERO_MAP_CHANGE,
                       static_cast<i8>(heroId9), x, y,
@@ -2564,110 +2564,110 @@ void advManager::EventSound(i32 eventType, i32 eventData, struct SAMPLE2 *outSam
     i32 musicTrack_e = EVENT_SOUND_NONE;
 
     switch (eventType) {
-    case MAP_EVENT_ARTESIAN_SPRING:
-    case MAP_EVENT_FLOTSAM:
+    case MAP_OBJECT_ARTESIAN_SPRING:
+    case MAP_OBJECT_FLOTSAM:
         musicTrack_e = pickupSound_o;
-    case MAP_EVENT_ARCHER_HOUSE:
-    case MAP_EVENT_GOBLIN_HUT:
-    case MAP_EVENT_DWARF_COTTAGE:
-    case MAP_EVENT_PEASANT_HUT:
-    case MAP_EVENT_LOG_CABIN:
-    case MAP_EVENT_TREE_CITY:
-    case MAP_EVENT_RUINS:
-    case MAP_EVENT_IDOL:
-    case MAP_EVENT_SHRINE_SECOND_CIRCLE:
-    case MAP_EVENT_WAGON:
-    case MAP_EVENT_MAGELLAN_MAPS:
+    case MAP_OBJECT_ARCHER_HOUSE:
+    case MAP_OBJECT_GOBLIN_HUT:
+    case MAP_OBJECT_DWARF_COTTAGE:
+    case MAP_OBJECT_PEASANT_HUT:
+    case MAP_OBJECT_LOG_CABIN:
+    case MAP_OBJECT_TREE_CITY:
+    case MAP_OBJECT_RUINS:
+    case MAP_OBJECT_IDOL:
+    case MAP_OBJECT_SHRINE_SECOND_CIRCLE:
+    case MAP_OBJECT_WAGON:
+    case MAP_OBJECT_MAGELLAN_MAPS:
         musicTrack_e = experienceSound_o;
         break;
-    case MAP_EVENT_WATER_WHEEL:
-    case MAP_EVENT_LEAN_TO:
+    case MAP_OBJECT_WATER_WHEEL:
+    case MAP_OBJECT_LEAN_TO:
         musicTrack_e = EVENT_SOUND_TRACK_40;
         break;
-    case MAP_EVENT_SEA_CHEST:
-    case MAP_EVENT_PYRAMID:
-    case MAP_EVENT_CITY_OF_DEAD:
+    case MAP_OBJECT_SEA_CHEST:
+    case MAP_OBJECT_PYRAMID:
+    case MAP_OBJECT_CITY_OF_DEAD:
         musicTrack_e = treasureSound_a;
         break;
-    case MAP_EVENT_BOAT:
+    case MAP_OBJECT_BOAT:
         if (eventData == EVENT_SOUND_VARIANT_1)
             musicTrack_e = treasureSound_a;
         break;
-    case MAP_EVENT_SKELETON:
-    case MAP_EVENT_MINE:
-    case MAP_EVENT_MERMAID:
+    case MAP_OBJECT_SKELETON:
+    case MAP_OBJECT_MINE:
+    case MAP_OBJECT_MERMAID:
         musicTrack_e = treasureSound_a;
         break;
-    case MAP_EVENT_DAEMON_CAVE:
+    case MAP_OBJECT_DAEMON_CAVE:
         musicTrack_e = EVENT_SOUND_TRACK_36;
         break;
-    case MAP_EVENT_SHIPWRECK:
-    case MAP_EVENT_WATERING_HOLE:
-    case MAP_EVENT_OBSERVATION_TOWER:
+    case MAP_OBJECT_SHIPWRECK:
+    case MAP_OBJECT_WATERING_HOLE:
+    case MAP_OBJECT_OBSERVATION_TOWER:
         musicTrack_e = EVENT_SOUND_TRACK_32;
         break;
-    case MAP_EVENT_FAERIE_RING:
-    case MAP_EVENT_FOUNTAIN:
-    case MAP_EVENT_WITCH_DOCTOR_HUT:
+    case MAP_OBJECT_FAERIE_RING:
+    case MAP_OBJECT_FOUNTAIN:
+    case MAP_OBJECT_WITCH_DOCTOR_HUT:
         musicTrack_e = luckSound_g;
         break;
-    case MAP_EVENT_BUOY:
-    case MAP_EVENT_RESOURCE:
-    case MAP_EVENT_HALFLING_HOLE:
-    case MAP_EVENT_XANADU:
+    case MAP_OBJECT_BUOY:
+    case MAP_OBJECT_RESOURCE:
+    case MAP_OBJECT_HALFLING_HOLE:
+    case MAP_OBJECT_XANADU:
         musicTrack_e = moraleSound_e;
         break;
-    case MAP_EVENT_GAZEBO:
-    case MAP_EVENT_TEMPLE:
-    case MAP_EVENT_CAVE:
+    case MAP_OBJECT_GAZEBO:
+    case MAP_OBJECT_TEMPLE:
+    case MAP_OBJECT_CAVE:
         musicTrack_e = EVENT_SOUND_TRACK_37;
         break;
-    case MAP_EVENT_ANCIENT_LAMP:
-    case MAP_EVENT_TAR_PIT:
+    case MAP_OBJECT_ANCIENT_LAMP:
+    case MAP_OBJECT_TAR_PIT:
         musicTrack_e = EVENT_SOUND_TRACK_33;
         break;
-    case MAP_EVENT_GRAVEYARD:
-    case MAP_EVENT_DESERT_TENT:
-    case MAP_EVENT_STANDING_STONES:
-    case MAP_EVENT_DERELICT_SHIP:
-    case MAP_EVENT_BOTTLE:
-    case MAP_EVENT_REEFS:
+    case MAP_OBJECT_GRAVEYARD:
+    case MAP_OBJECT_DESERT_TENT:
+    case MAP_OBJECT_STANDING_STONES:
+    case MAP_OBJECT_DERELICT_SHIP:
+    case MAP_OBJECT_BOTTLE:
+    case MAP_OBJECT_REEFS:
         musicTrack_e = EVENT_SOUND_TRACK_39;
         break;
-    case MAP_EVENT_LIGHTHOUSE:
-    case MAP_EVENT_EXCAVATION:
-    case MAP_EVENT_SPHINX:
-    case MAP_EVENT_WITCH_HUT:
+    case MAP_OBJECT_LIGHTHOUSE:
+    case MAP_OBJECT_EXCAVATION:
+    case MAP_OBJECT_SPHINX:
+    case MAP_OBJECT_WITCH_HUT:
         musicTrack_e = EVENT_SOUND_TRACK_31;
         break;
-    case MAP_EVENT_OASIS:
+    case MAP_OBJECT_OASIS:
         musicTrack_e = experienceSound_o;
         break;
-    case MAP_EVENT_ABANDONED_MINE:
-    case MAP_EVENT_TREE_OF_KNOWLEDGE:
-    case MAP_EVENT_HILL_FORT:
-    case MAP_EVENT_SHRINE_THIRD_CIRCLE:
+    case MAP_OBJECT_ABANDONED_MINE:
+    case MAP_OBJECT_TREE_OF_KNOWLEDGE:
+    case MAP_OBJECT_HILL_FORT:
+    case MAP_OBJECT_SHRINE_THIRD_CIRCLE:
         musicTrack_e = EVENT_SOUND_TRACK_38;
         break;
-    case MAP_EVENT_STONE_LITHS:
-    case MAP_EVENT_MERCENARY_CAMP:
+    case MAP_OBJECT_STONE_LITHS:
+    case MAP_OBJECT_MERCENARY_CAMP:
         musicTrack_e = EVENT_SOUND_TRACK_34;
         break;
-    case MAP_EVENT_HUT_OF_MAGI:
+    case MAP_OBJECT_HUT_OF_MAGI:
         musicTrack_e = EVENT_SOUND_TRACK_1;
         break;
-    case MAP_EVENT_WHIRLPOOL:
-    case MAP_EVENT_FORT:
-    case MAP_EVENT_FREEMANS_FOUNDRY:
+    case MAP_OBJECT_WHIRLPOOL:
+    case MAP_OBJECT_FORT:
+    case MAP_OBJECT_FREEMANS_FOUNDRY:
         musicTrack_e = EVENT_SOUND_TRACK_35;
         break;
-    case MAP_EVENT_BARRIER:
+    case MAP_OBJECT_BARRIER:
         musicTrack_e = experienceSound_o;
         break;
-    case MAP_EVENT_TRAVELER_TENT:
+    case MAP_OBJECT_TRAVELER_TENT:
         musicTrack_e = experienceSound_o;
         break;
-    case MAP_EVENT_EXPANSION_OBJECT:
+    case MAP_OBJECT_EXPANSION_OBJECT:
         switch (eventData) {
         case EVENT_SOUND_VARIANT_0:
             musicTrack_e = experienceSound_o;
@@ -2693,10 +2693,10 @@ void advManager::EventSound(i32 eventType, i32 eventData, struct SAMPLE2 *outSam
             ;
         }
         break;
-    case MAP_EVENT_EXPANSION_DWELLING:
+    case MAP_OBJECT_EXPANSION_DWELLING:
         musicTrack_e = experienceSound_o;
         break;
-    case MAP_EVENT_JAIL:
+    case MAP_OBJECT_JAIL:
         musicTrack_e = experienceSound_o;
         break;
     default:
@@ -3049,36 +3049,36 @@ void advManager::HouseEvent(hero *eventHero, mapCell *cell)
     i32 siteIndex = HOUSE_RECRUIT_ARCHER;
     i32 creatureTypes[HOUSE_RECRUIT_SITE_COUNT];
 
-    switch (cell->m_triggerType & MAP_EVENT_TYPE_MASK) {
-    case MAP_EVENT_ARCHER_HOUSE:
+    switch (cell->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
+    case MAP_OBJECT_ARCHER_HOUSE:
         siteIndex = HOUSE_RECRUIT_ARCHER;
         break;
-    case MAP_EVENT_GOBLIN_HUT:
+    case MAP_OBJECT_GOBLIN_HUT:
         siteIndex = HOUSE_RECRUIT_GOBLIN;
         break;
-    case MAP_EVENT_PEASANT_HUT:
+    case MAP_OBJECT_PEASANT_HUT:
         siteIndex = HOUSE_RECRUIT_PEASANT;
         break;
-    case MAP_EVENT_DWARF_COTTAGE:
-    case MAP_EVENT_SIRENS:
+    case MAP_OBJECT_DWARF_COTTAGE:
+    case MAP_OBJECT_SIRENS:
         siteIndex = HOUSE_RECRUIT_DWARF;
         break;
-    case MAP_EVENT_LOG_CABIN:
+    case MAP_OBJECT_LOG_CABIN:
         siteIndex = HOUSE_RECRUIT_LOG_CABIN;
         break;
-    case MAP_EVENT_TREE_HOUSE:
+    case MAP_OBJECT_TREE_HOUSE:
         siteIndex = HOUSE_RECRUIT_TREE_HOUSE;
         break;
-    case MAP_EVENT_HALFLING_HOLE:
+    case MAP_OBJECT_HALFLING_HOLE:
         siteIndex = HOUSE_RECRUIT_HALFLING;
         break;
-    case MAP_EVENT_WATCH_TOWER:
+    case MAP_OBJECT_WATCH_TOWER:
         siteIndex = HOUSE_RECRUIT_WATCH_TOWER;
         break;
-    case MAP_EVENT_CAVE:
+    case MAP_OBJECT_CAVE:
         siteIndex = HOUSE_RECRUIT_CAVE;
         break;
-    case MAP_EVENT_EXCAVATION:
+    case MAP_OBJECT_EXCAVATION:
         siteIndex = HOUSE_RECRUIT_EXCAVATION;
         break;
     }
@@ -3675,7 +3675,7 @@ void advManager::DoAIEvent(mapCell *cell, hero *eventHero, i32 x, i32 y)
     i32 creatureFlag_l;
 
     occupiedTown_b = 0;
-    eventType_g = cell->m_triggerType & MAP_EVENT_TYPE_MASK;
+    eventType_g = cell->m_triggerType & MAP_TRIGGER_TYPE_MASK;
     eventResults[0] = 0;
     eventResults[1] = 0;
     oldPlayer_o = giCurPlayer;
@@ -3687,7 +3687,7 @@ void advManager::DoAIEvent(mapCell *cell, hero *eventHero, i32 x, i32 y)
     }
     --eventHero->m_remainingMobility;
     switch (eventType_g) {
-    case MAP_EVENT_COAST:
+    case MAP_OBJECT_COAST:
         if (eventHero->m_eventFlags & HERO_EVENT_EMBARKED) {
             eventHero->m_eventFlags =
                 static_cast<i32>(eventHero->m_eventFlags) & ~HERO_EVENT_EMBARKED;
@@ -3700,7 +3700,7 @@ void advManager::DoAIEvent(mapCell *cell, hero *eventHero, i32 x, i32 y)
         }
         break;
 
-    case MAP_EVENT_BOAT:
+    case MAP_OBJECT_BOAT:
         boat_k = &gpGame->m_boats[cell->m_objectMetadata];
         gpGame->RestoreCell(-1, -1, boat_k->savedTriggerType,
                             boat_k->savedEventData, cell,
@@ -3716,9 +3716,9 @@ void advManager::DoAIEvent(mapCell *cell, hero *eventHero, i32 x, i32 y)
         m_cursorActive = 1;
         break;
 
-    case MAP_EVENT_ALCHEMIST_LAB:
-    case MAP_EVENT_MINE:
-    case MAP_EVENT_SAWMILL:
+    case MAP_OBJECT_ALCHEMIST_LAB:
+    case MAP_OBJECT_MINE:
+    case MAP_OBJECT_SAWMILL:
         if (gpGame->m_mineOwners[cell->m_objectMetadata] == giCurPlayer)
             break;
         if (gpGame->m_mines[cell->m_objectMetadata].guardianType != CREATURE_NONE) {
@@ -3734,7 +3734,7 @@ void advManager::DoAIEvent(mapCell *cell, hero *eventHero, i32 x, i32 y)
             eventHero->CheckLevel();
         }
         gpGame->ClaimMine(cell->m_objectMetadata, giCurPlayer);
-        if (eventType_g == MAP_EVENT_MINE) {
+        if (eventType_g == MAP_OBJECT_MINE) {
             for (index_h = SPELL_SET_EARTH_GUARDIAN;
                  index_h < SPELL_SET_WATER_GUARDIAN; ++index_h) {
                 if (eventHero->HasSpell(index_h) &&
@@ -3756,14 +3756,14 @@ void advManager::DoAIEvent(mapCell *cell, hero *eventHero, i32 x, i32 y)
         }
         break;
 
-    case MAP_EVENT_LIGHTHOUSE:
+    case MAP_OBJECT_LIGHTHOUSE:
         if (gpGame->m_mineOwners[cell->m_objectMetadata] == giCurPlayer) {
         } else {
             gpGame->ClaimMine(cell->m_objectMetadata, giCurPlayer);
         }
         break;
 
-    case MAP_EVENT_TREASURE_CHEST:
+    case MAP_OBJECT_TREASURE_CHEST:
         if (cell->m_objectMetadata & CHEST_ARTIFACT_FLAG) {
             if (eventHero->NumArtifacts() >= AI_EVENT_ARTIFACT_LIMIT) {
                 cell->m_objectMetadata = CHEST_GOLD_ONLY;
@@ -3788,7 +3788,7 @@ chestGoldOrExperience:
         eventResults[0] = 1;
         break;
 
-    case MAP_EVENT_WATERING_HOLE:
+    case MAP_OBJECT_WATERING_HOLE:
         if ((eventHero->m_eventFlags & HERO_EVENT_WATERING_HOLE) == 0) {
             eventHero->m_mobility += WATERING_HOLE_MOBILITY_BONUS;
             eventHero->m_remainingMobility += WATERING_HOLE_MOBILITY_BONUS;
@@ -3799,7 +3799,7 @@ chestGoldOrExperience:
         }
         break;
 
-    case MAP_EVENT_BUOY:
+    case MAP_OBJECT_BUOY:
         if ((eventHero->m_eventFlags & HERO_EVENT_BUOY) == 0) {
             eventHero->m_eventFlags =
                 static_cast<i32>(eventHero->m_eventFlags) | HERO_EVENT_BUOY;
@@ -3807,7 +3807,7 @@ chestGoldOrExperience:
         }
         break;
 
-    case MAP_EVENT_FAERIE_RING:
+    case MAP_OBJECT_FAERIE_RING:
         if ((eventHero->m_eventFlags & HERO_EVENT_FAERIE_RING) == 0) {
             eventHero->m_eventFlags =
                 static_cast<i32>(eventHero->m_eventFlags) |
@@ -3816,7 +3816,7 @@ chestGoldOrExperience:
         }
         break;
 
-    case MAP_EVENT_IDOL:
+    case MAP_OBJECT_IDOL:
         if ((eventHero->m_eventFlags & HERO_EVENT_IDOL) == 0) {
             eventHero->m_eventFlags =
                 static_cast<i32>(eventHero->m_eventFlags) | HERO_EVENT_IDOL;
@@ -3824,7 +3824,7 @@ chestGoldOrExperience:
         }
         break;
 
-    case MAP_EVENT_FOUNTAIN:
+    case MAP_OBJECT_FOUNTAIN:
         if ((eventHero->m_eventFlags & HERO_EVENT_FOUNTAIN) == 0) {
             eventHero->m_eventFlags =
                 static_cast<i32>(eventHero->m_eventFlags) | HERO_EVENT_FOUNTAIN;
@@ -3832,7 +3832,7 @@ chestGoldOrExperience:
         }
         break;
 
-    case MAP_EVENT_OASIS:
+    case MAP_OBJECT_OASIS:
         if ((eventHero->m_eventFlags & HERO_EVENT_OASIS) == 0) {
             eventHero->m_eventFlags =
                 static_cast<i32>(eventHero->m_eventFlags) | HERO_EVENT_OASIS;
@@ -3842,7 +3842,7 @@ chestGoldOrExperience:
         }
         break;
 
-    case MAP_EVENT_TEMPLE:
+    case MAP_OBJECT_TEMPLE:
         if ((eventHero->m_eventFlags & HERO_EVENT_TEMPLE) == 0) {
             eventHero->m_eventFlags =
                 static_cast<i32>(eventHero->m_eventFlags) | HERO_EVENT_TEMPLE;
@@ -3850,7 +3850,7 @@ chestGoldOrExperience:
         }
         break;
 
-    case MAP_EVENT_SKELETON:
+    case MAP_OBJECT_SKELETON:
         switch (cell->m_objectMetadata) {
         case SKELETON_EMPTY:
             break;
@@ -3862,7 +3862,7 @@ chestGoldOrExperience:
         }
         break;
 
-    case MAP_EVENT_MAGIC_GARDEN:
+    case MAP_OBJECT_MAGIC_GARDEN:
         if (cell->m_objectMetadata != MAP_EVENT_DATA_EMPTY) {
             GiveResource(eventHero, cell->m_objectMetadata - MAP_EVENT_RESOURCE_OFFSET,
                          cell->m_objectMetadata - MAP_EVENT_RESOURCE_OFFSET == RES_GOLD
@@ -3872,7 +3872,7 @@ chestGoldOrExperience:
         }
         break;
 
-    case MAP_EVENT_LEAN_TO:
+    case MAP_OBJECT_LEAN_TO:
         if (cell->m_objectMetadata != MAP_EVENT_DATA_EMPTY) {
             GiveResource(eventHero,
                          (cell->m_objectMetadata & ARTIFACT_EVENT_MODE_MASK) - 1,
@@ -3882,7 +3882,7 @@ chestGoldOrExperience:
         }
         break;
 
-    case MAP_EVENT_WAGON:
+    case MAP_OBJECT_WAGON:
         if (cell->m_objectMetadata != MAP_EVENT_DATA_EMPTY) {
             if (cell->m_objectMetadata & WAGON_ARTIFACT_FLAG) {
                 if (eventHero->NumArtifacts() != AI_EVENT_ARTIFACT_LIMIT)
@@ -3899,7 +3899,7 @@ chestGoldOrExperience:
         }
         break;
 
-    case MAP_EVENT_SEA_CHEST:
+    case MAP_OBJECT_SEA_CHEST:
         if ((cell->m_objectMetadata & CHEST_ARTIFACT_FLAG) != 0 &&
             eventHero->NumArtifacts() < AI_EVENT_ARTIFACT_LIMIT) {
             GiveArtifact(eventHero, cell->m_objectMetadata & CHEST_ARTIFACT_MASK, 1, -1);
@@ -3911,7 +3911,7 @@ chestGoldOrExperience:
         eventResults[0] = 1;
         break;
 
-    case MAP_EVENT_FLOTSAM:
+    case MAP_OBJECT_FLOTSAM:
         switch (cell->m_objectMetadata) {
         case 0:
             break;
@@ -3930,7 +3930,7 @@ chestGoldOrExperience:
         eventResults[0] = 1;
         break;
 
-    case MAP_EVENT_CAMPFIRE:
+    case MAP_OBJECT_CAMPFIRE:
         GiveResource(eventHero, RES_GOLD,
                      (cell->m_objectMetadata >> CAMPFIRE_AMOUNT_SHIFT) *
                          CAMPFIRE_GOLD_MULTIPLIER);
@@ -3939,14 +3939,14 @@ chestGoldOrExperience:
         eventResults[0] = 1;
         break;
 
-    case MAP_EVENT_FORT:
+    case MAP_OBJECT_FORT:
         if ((eventHero->m_fortVisits & (1U << cell->m_objectMetadata)) == 0) {
             ++eventHero->m_primaryStats[HERO_PRIMARY_DEFENSE];
             eventHero->m_fortVisits |= 1U << cell->m_objectMetadata;
         }
         break;
 
-    case MAP_EVENT_XANADU:
+    case MAP_OBJECT_XANADU:
         if ((eventHero->m_xanaduVisits & (1U << cell->m_objectMetadata)) == 0 &&
             eventHero->m_level +
                     eventHero->m_secondarySkills[HERO_SKILL_DIPLOMACY] * 2 >=
@@ -3959,28 +3959,28 @@ chestGoldOrExperience:
         }
         break;
 
-    case MAP_EVENT_STANDING_STONES:
+    case MAP_OBJECT_STANDING_STONES:
         if ((eventHero->m_standingStoneVisits & (1U << cell->m_objectMetadata)) == 0) {
             ++eventHero->m_primaryStats[HERO_PRIMARY_SPELL_POWER];
             eventHero->m_standingStoneVisits |= 1U << cell->m_objectMetadata;
         }
         break;
 
-    case MAP_EVENT_WITCH_DOCTOR_HUT:
+    case MAP_OBJECT_WITCH_DOCTOR_HUT:
         if ((eventHero->m_witchDoctorVisits & (1U << cell->m_objectMetadata)) == 0) {
             ++eventHero->m_primaryStats[HERO_PRIMARY_KNOWLEDGE];
             eventHero->m_witchDoctorVisits |= 1U << cell->m_objectMetadata;
         }
         break;
 
-    case MAP_EVENT_MERCENARY_CAMP:
+    case MAP_OBJECT_MERCENARY_CAMP:
         if ((eventHero->m_mercenaryCampVisits & (1U << cell->m_objectMetadata)) == 0) {
             ++eventHero->m_primaryStats[HERO_PRIMARY_ATTACK];
             eventHero->m_mercenaryCampVisits |= 1U << cell->m_objectMetadata;
         }
         break;
 
-    case MAP_EVENT_GAZEBO:
+    case MAP_OBJECT_GAZEBO:
         if ((eventHero->m_gazeboVisits & (1U << cell->m_objectMetadata)) == 0) {
             GiveExperience(eventHero, GAZEBO_EXPERIENCE, 1);
             eventHero->m_gazeboVisits |= 1U << cell->m_objectMetadata;
@@ -3988,7 +3988,7 @@ chestGoldOrExperience:
         }
         break;
 
-    case MAP_EVENT_WATER_WHEEL:
+    case MAP_OBJECT_WATER_WHEEL:
         if (cell->m_objectMetadata != 0) {
             GiveResource(eventHero, RES_GOLD,
                          cell->m_objectMetadata * CHEST_GOLD_MULTIPLIER);
@@ -3996,7 +3996,7 @@ chestGoldOrExperience:
         }
         break;
 
-    case MAP_EVENT_RESOURCE:
+    case MAP_OBJECT_RESOURCE:
         resourceType_a = cell->m_objectIndex >> 1;
         resourceAmount_o = resourceType_a == RES_GOLD
             ? cell->m_objectMetadata * CAMPFIRE_GOLD_MULTIPLIER
@@ -4005,21 +4005,21 @@ chestGoldOrExperience:
         eventResults[0] = 1;
         break;
 
-    case MAP_EVENT_WINDMILL:
+    case MAP_OBJECT_WINDMILL:
         if (cell->m_objectMetadata != AI_EVENT_WINDMILL_EMPTY) {
             GiveResource(eventHero, cell->m_objectMetadata, WINDMILL_RESOURCE_AMOUNT);
             cell->m_objectMetadata = AI_EVENT_WINDMILL_EMPTY;
         }
         break;
 
-    case MAP_EVENT_HILL_FORT:
+    case MAP_OBJECT_HILL_FORT:
         eventHero->UpgradeCreatures(CREATURE_OGRE, CREATURE_OGRE_LORD);
         eventHero->UpgradeCreatures(CREATURE_ORC, CREATURE_ORC_CHIEF);
         eventHero->UpgradeCreatures(CREATURE_DWARF,
                                     CREATURE_BATTLE_DWARF);
         break;
 
-    case MAP_EVENT_FREEMANS_FOUNDRY:
+    case MAP_OBJECT_FREEMANS_FOUNDRY:
         eventHero->UpgradeCreatures(CREATURE_IRON_GOLEM,
                                     CREATURE_STEEL_GOLEM);
         eventHero->UpgradeCreatures(CREATURE_PIKEMAN,
@@ -4028,78 +4028,78 @@ chestGoldOrExperience:
                                     CREATURE_MASTER_SWORDSMAN);
         break;
 
-    case MAP_EVENT_TREE_CITY:
+    case MAP_OBJECT_TREE_CITY:
         creatureType_i = CREATURE_SPRITE;
         creatureFlag_l = 0;
         goto creaturePurchase;
-    case MAP_EVENT_RUINS:
+    case MAP_OBJECT_RUINS:
         creatureType_i = CREATURE_MEDUSA;
         creatureFlag_l = 0;
         goto creaturePurchase;
-    case MAP_EVENT_TROLL_BRIDGE:
+    case MAP_OBJECT_TROLL_BRIDGE:
         if (cell->m_objectMetadata & DWELLING_GUARDED_FLAG)
             break;
         creatureType_i = CREATURE_TROLL;
         creatureFlag_l = 0;
         goto creaturePurchase;
-    case MAP_EVENT_CITY_OF_DEAD:
+    case MAP_OBJECT_CITY_OF_DEAD:
         if (cell->m_objectMetadata & DWELLING_GUARDED_FLAG)
             break;
         creatureType_i = CREATURE_POWER_LICH;
         creatureFlag_l = 0;
         goto creaturePurchase;
-    case MAP_EVENT_DRAGON_CITY:
+    case MAP_OBJECT_DRAGON_CITY:
         if (cell->m_objectMetadata & DWELLING_GUARDED_FLAG)
             break;
         creatureType_i = CREATURE_RED_DRAGON;
         creatureFlag_l = 0;
         goto creaturePurchase;
-    case MAP_EVENT_HALFLING_HOLE:
+    case MAP_OBJECT_HALFLING_HOLE:
         creatureType_i = CREATURE_HALFLING;
         creatureFlag_l = 1;
         goto creaturePurchase;
-    case MAP_EVENT_ANCIENT_LAMP:
+    case MAP_OBJECT_ANCIENT_LAMP:
         creatureType_i = CREATURE_GENIE;
         creatureFlag_l = 0;
         goto creaturePurchase;
-    case MAP_EVENT_WAGON_CAMP:
+    case MAP_OBJECT_WAGON_CAMP:
         creatureType_i = CREATURE_ROGUE;
         creatureFlag_l = 0;
         goto creaturePurchase;
-    case MAP_EVENT_DESERT_TENT:
+    case MAP_OBJECT_DESERT_TENT:
         creatureType_i = CREATURE_NOMAD;
         creatureFlag_l = 0;
         goto creaturePurchase;
-    case MAP_EVENT_WATCH_TOWER:
+    case MAP_OBJECT_WATCH_TOWER:
         creatureType_i = CREATURE_ORC;
         creatureFlag_l = 1;
         goto creaturePurchase;
-    case MAP_EVENT_TREE_HOUSE:
+    case MAP_OBJECT_TREE_HOUSE:
         creatureType_i = CREATURE_SPRITE;
         creatureFlag_l = 1;
         goto creaturePurchase;
-    case MAP_EVENT_ARCHER_HOUSE:
+    case MAP_OBJECT_ARCHER_HOUSE:
         creatureType_i = CREATURE_ARCHER;
         creatureFlag_l = 1;
         goto creaturePurchase;
-    case MAP_EVENT_GOBLIN_HUT:
+    case MAP_OBJECT_GOBLIN_HUT:
         creatureType_i = CREATURE_GOBLIN;
         creatureFlag_l = 1;
         goto creaturePurchase;
-    case MAP_EVENT_PEASANT_HUT:
+    case MAP_OBJECT_PEASANT_HUT:
         creatureType_i = CREATURE_PEASANT;
         creatureFlag_l = 1;
         goto creaturePurchase;
-    case MAP_EVENT_DWARF_COTTAGE:
-    case MAP_EVENT_SIRENS:
+    case MAP_OBJECT_DWARF_COTTAGE:
+    case MAP_OBJECT_SIRENS:
         creatureType_i = CREATURE_DWARF;
         creatureFlag_l = 1;
         goto creaturePurchase;
-    case MAP_EVENT_CAVE:
+    case MAP_OBJECT_CAVE:
         creatureType_i = CREATURE_CENTAUR;
         creatureFlag_l = 1;
         goto creaturePurchase;
-    case MAP_EVENT_EXCAVATION:
+    case MAP_OBJECT_EXCAVATION:
         creatureType_i = CREATURE_SKELETON;
         creatureFlag_l = 1;
 creaturePurchase:
@@ -4121,15 +4121,15 @@ creaturePurchase:
                 }
             }
         }
-        if (cell->m_objectMetadata == 0 && eventType_g == MAP_EVENT_ANCIENT_LAMP)
+        if (cell->m_objectMetadata == 0 && eventType_g == MAP_OBJECT_ANCIENT_LAMP)
             eventResults[0] = 1;
         break;
 
-    case MAP_EVENT_MONSTER:
+    case MAP_OBJECT_MONSTER:
         ComputerMonsterInteract(cell, eventHero, eventResults);
         break;
 
-    case MAP_EVENT_TREE_OF_KNOWLEDGE:
+    case MAP_OBJECT_TREE_OF_KNOWLEDGE:
         if ((eventHero->m_treeKnowledgeVisits &
              (1U << (cell->m_objectMetadata & 31))) == 0) {
             heroLevel_e = eventHero->GetLevel(eventHero->m_experience);
@@ -4166,7 +4166,7 @@ creaturePurchase:
         }
         break;
 
-    case MAP_EVENT_OBELISK:
+    case MAP_OBJECT_OBELISK:
         if ((giCurPlayerBit &
              gpGame->m_obeliskVisitors[cell->m_objectMetadata - 1]) == 0) {
             gpGame->m_obeliskVisitors[cell->m_objectMetadata - 1] |= giCurPlayerBit;
@@ -4174,12 +4174,12 @@ creaturePurchase:
         }
         break;
 
-    case MAP_EVENT_ORACLE:
+    case MAP_OBJECT_ORACLE:
         break;
 
-    case MAP_EVENT_SHRINE_FIRST_CIRCLE:
-    case MAP_EVENT_SHRINE_SECOND_CIRCLE:
-    case MAP_EVENT_SHRINE_THIRD_CIRCLE:
+    case MAP_OBJECT_SHRINE_FIRST_CIRCLE:
+    case MAP_OBJECT_SHRINE_SECOND_CIRCLE:
+    case MAP_OBJECT_SHRINE_THIRD_CIRCLE:
         if (eventHero->HasArtifact(ARTIFACT_MAGIC_BOOK) &&
             gsSpellInfo[cell->m_objectMetadata - 1].level <=
                 eventHero->m_secondarySkills[HERO_SKILL_WISDOM] + 2) {
@@ -4188,25 +4188,25 @@ creaturePurchase:
         }
         break;
 
-    case MAP_EVENT_CASTLE:
+    case MAP_OBJECT_CASTLE:
         gpPhilAI->TownEvent(cell, eventHero, x, y);
         break;
 
-    case MAP_EVENT_WHIRLPOOL:
+    case MAP_OBJECT_WHIRLPOOL:
         DoWhirlpool(eventHero);
         goto teleportEvent;
-    case MAP_EVENT_STONE_LITHS:
+    case MAP_OBJECT_STONE_LITHS:
 teleportEvent:
         exitCount = 0;
         for (exitY_d = 0; MAP_HEIGHT > exitY_d; ++exitY_d) {
             for (exitX = 0; MAP_WIDTH > exitX; ++exitX) {
                 if (gpGame->m_worldMap.Row(exitY_d)[exitX].m_triggerType ==
                         static_cast<u8>(eventType_g |
-                                                   MAP_EVENT_ACTION_FLAG) &&
+                                                   MAP_TRIGGER_ACTION_FLAG) &&
                     gpGame->m_worldMap.Row(exitY_d)[exitX].m_objectIndex ==
                         cell->m_objectIndex &&
                     abs(exitY_d - y) + abs(exitX - x) >
-                        (eventType_g == MAP_EVENT_STONE_LITHS
+                        (eventType_g == MAP_OBJECT_STONE_LITHS
                              ? AI_EVENT_TELEPORT_STONE_DISTANCE
                              : AI_EVENT_TELEPORT_WHIRLPOOL_DISTANCE)) {
                     ++exitCount;
@@ -4220,11 +4220,11 @@ teleportEvent:
                 for (exitX = 0; MAP_WIDTH > exitX; ++exitX) {
                     if (gpGame->m_worldMap.Row(exitY_d)[exitX].m_triggerType ==
                             static_cast<u8>(eventType_g |
-                                                       MAP_EVENT_ACTION_FLAG) &&
+                                                       MAP_TRIGGER_ACTION_FLAG) &&
                         gpGame->m_worldMap.Row(exitY_d)[exitX].m_objectIndex ==
                             cell->m_objectIndex &&
                         abs(exitY_d - y) + abs(exitX - x) >
-                            (eventType_g == MAP_EVENT_STONE_LITHS
+                            (eventType_g == MAP_OBJECT_STONE_LITHS
                                  ? AI_EVENT_TELEPORT_STONE_DISTANCE
                                  : AI_EVENT_TELEPORT_WHIRLPOOL_DISTANCE) &&
                         --exitCount < 1) {
@@ -4238,7 +4238,7 @@ teleportDestination:
         }
         break;
 
-    case MAP_EVENT_ARTIFACT:
+    case MAP_OBJECT_ARTIFACT:
         artifactResource_p = (cell->m_objectMetadata & ARTIFACT_EVENT_RESOURCE_MASK) >>
                            ARTIFACT_EVENT_RESOURCE_SHIFT;
         artifact_g = cell->m_objectIndex >> 1;
@@ -4319,7 +4319,7 @@ artifactPickup:
         }
         break;
 
-    case MAP_EVENT_HERO_INTERACTION:
+    case MAP_OBJECT_HERO_INTERACTION:
         otherHero_e = gpGame->GetHero(cell->m_objectMetadata);
         savedShowIt_e = bShowIt;
         if (otherHero_e->m_owner == giCurPlayer) {
@@ -4351,11 +4351,11 @@ artifactPickup:
         CompleteDraw(0);
         break;
 
-    case MAP_EVENT_SIGN:
-    case MAP_EVENT_BOTTLE:
+    case MAP_OBJECT_SIGN:
+    case MAP_OBJECT_BOTTLE:
         break;
 
-    case MAP_EVENT_DAEMON_CAVE:
+    case MAP_OBJECT_DAEMON_CAVE:
         switch (cell->m_objectMetadata) {
         case DAEMON_CAVE_EMPTY:
             break;
@@ -4387,7 +4387,7 @@ artifactPickup:
         cell->m_objectMetadata = DAEMON_CAVE_EMPTY;
         break;
 
-    case MAP_EVENT_PYRAMID:
+    case MAP_OBJECT_PYRAMID:
         if (cell->m_objectMetadata != 0 && eventHero->HasSpell(cell->m_objectMetadata - 1) == 0) {
             for (index_h = 0; index_h < AI_EVENT_ARMY_STACK_COUNT; ++index_h) {
                 gpMonGroup->m_creatureTypes[index_h] =
@@ -4428,13 +4428,13 @@ artifactPickup:
         }
         break;
 
-    case MAP_EVENT_GRAVEYARD:
-    case MAP_EVENT_SHIPWRECK:
-    case MAP_EVENT_DERELICT_SHIP:
+    case MAP_OBJECT_GRAVEYARD:
+    case MAP_OBJECT_SHIPWRECK:
+    case MAP_OBJECT_DERELICT_SHIP:
         gpPhilAI->FightEvent(eventHero, cell, 0);
         break;
 
-    case MAP_EVENT_ABANDONED_MINE:
+    case MAP_OBJECT_ABANDONED_MINE:
         for (index_h = 0; index_h < AI_EVENT_ARMY_STACK_COUNT; ++index_h) {
             gpMonGroup->m_creatureTypes[index_h] =
                 gpGame->m_mines[cell->m_objectMetadata].guardianType;
@@ -4479,21 +4479,21 @@ artifactPickup:
         }
         break;
 
-    case MAP_EVENT_TAR_PIT:
+    case MAP_OBJECT_TAR_PIT:
         break;
 
-    case MAP_EVENT_OBSERVATION_TOWER:
+    case MAP_OBJECT_OBSERVATION_TOWER:
         gpGame->SetVisibility(x, y, giCurPlayer,
                               AI_EVENT_OBSERVATION_RADIUS);
         break;
 
-    case MAP_EVENT_SHIPWRECK_SURVIVOR:
+    case MAP_OBJECT_SHIPWRECK_SURVIVOR:
         if (eventHero->NumArtifacts() < AI_EVENT_ARTIFACT_LIMIT)
             GiveArtifact(eventHero, cell->m_objectMetadata, 1, -1);
         eventResults[0] = 1;
         break;
 
-    case MAP_EVENT_ARTESIAN_SPRING:
+    case MAP_OBJECT_ARTESIAN_SPRING:
         if (cell->m_objectMetadata != 0) {
             cell->m_objectMetadata = MAP_EVENT_DATA_EMPTY;
             spellPower_j = eventHero->Stats(HERO_PRIMARY_KNOWLEDGE);
@@ -4502,7 +4502,7 @@ artifactPickup:
         }
         break;
 
-    case MAP_EVENT_MAGIC_WELL:
+    case MAP_OBJECT_MAGIC_WELL:
         if ((eventHero->m_eventFlags & HERO_EVENT_MAGIC_WELL) == 0) {
             cell->m_objectMetadata = MAP_EVENT_DATA_EMPTY;
             spellPower_j = eventHero->Stats(HERO_PRIMARY_KNOWLEDGE);
@@ -4515,15 +4515,15 @@ artifactPickup:
         }
         break;
 
-    case MAP_EVENT_WITCH_HUT:
+    case MAP_OBJECT_WITCH_HUT:
         if (eventHero->m_secondarySkills[cell->m_objectMetadata] == 0)
             eventHero->GiveSS(cell->m_objectMetadata, HERO_SKILL_LEVEL_BASIC);
         break;
 
-    case MAP_EVENT_MAGELLAN_MAPS:
+    case MAP_OBJECT_MAGELLAN_MAPS:
         break;
 
-    case MAP_EVENT_SPHINX:
+    case MAP_OBJECT_SPHINX:
         eventExtra_o = reinterpret_cast<mapEventExtra *>(ppMapExtra[cell->m_objectMetadata]);
         if (eventExtra_o->active != 0) {
             if (Random(0, AI_EVENT_RANDOM_PERCENT_MAX) <
@@ -4545,22 +4545,22 @@ artifactPickup:
         }
         break;
 
-    case MAP_EVENT_TRADING_POST:
+    case MAP_OBJECT_TRADING_POST:
         break;
 
-    case MAP_EVENT_BARRIER:
+    case MAP_OBJECT_BARRIER:
         eventResults[0] = BarrierAIEvent(cell, eventHero);
         break;
-    case MAP_EVENT_TRAVELER_TENT:
+    case MAP_OBJECT_TRAVELER_TENT:
         PasswordAIEvent(cell, eventHero);
         break;
-    case MAP_EVENT_EXPANSION_OBJECT:
+    case MAP_OBJECT_EXPANSION_OBJECT:
         GenericSiteAIEvent(cell, eventHero);
         break;
-    case MAP_EVENT_EXPANSION_DWELLING:
+    case MAP_OBJECT_EXPANSION_DWELLING:
         RecruitSiteAIEvent(cell, eventHero);
         break;
-    case MAP_EVENT_JAIL:
+    case MAP_OBJECT_JAIL:
         JailAIEvent(cell, eventHero, x, y);
         break;
 
@@ -4828,7 +4828,7 @@ void advManager::JailAIEvent(mapCell *cell, hero *eventHero, i32 x, i32 y)
             releasedHero13->m_mobility = releasedHero13->m_remainingMobility;
             releasedHero13->m_locationType = cell->m_triggerType;
             releasedHero13->m_occupiedTown = cell->m_objectMetadata;
-            cell->m_triggerType = MAP_EVENT_ACTION_FLAG | MAP_EVENT_HERO_INTERACTION;
+            cell->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION;
             cell->m_objectMetadata = heroId9;
             SendMapChange(AI_EVENT_HERO_MAP_CHANGE,
                           static_cast<i8>(heroId9), x, y,
