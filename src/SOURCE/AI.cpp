@@ -251,7 +251,7 @@ void combatManager::DoCompAI(i32) {
     if (m_inCastleCombat != 0) {
         if (m_heroes[COMBAT_ATTACKER_SIDE]->m_secondarySkills[IDX(HERO_SKILL_ARCHERY)]
                 == IDX(HERO_SKILL_LEVEL_NONE)
-            && !m_heroes[COMBAT_ATTACKER_SIDE]->HasArtifact(IDX(ARTIFACT_GOLDEN_BOW))) {
+            && !m_heroes[COMBAT_ATTACKER_SIDE]->HasArtifact(ARTIFACT_GOLDEN_BOW)) {
             if (m_currentSide == COMBAT_ATTACKER_SIDE)
                 currentShooterStrength5 =
                     static_cast<i32>(currentShooterStrength5) / COMBAT_AI_SIDE_COUNT;
@@ -273,7 +273,7 @@ void combatManager::DoCompAI(i32) {
                 * (numArchers6 * COMBAT_AI_TOWER_STRENGTH)
             );
             if (m_heroes[COMBAT_ATTACKER_SIDE] != 0
-                && (m_heroes[COMBAT_ATTACKER_SIDE]->HasArtifact(IDX(ARTIFACT_GOLDEN_BOW))
+                && (m_heroes[COMBAT_ATTACKER_SIDE]->HasArtifact(ARTIFACT_GOLDEN_BOW)
                     || m_heroes[COMBAT_ATTACKER_SIDE]->m_secondarySkills[IDX(HERO_SKILL_ARCHERY)]
                            != IDX(HERO_SKILL_LEVEL_NONE)))
                 goldenBowBonus = 0;

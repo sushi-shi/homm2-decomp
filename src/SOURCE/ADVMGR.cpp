@@ -7363,7 +7363,7 @@ void advManager::TeleportTo(
         m_mapOriginY + ADVMGR_TELEPORT_VIEW_CENTER,
         giCurPlayer,
         giVisRange[mapHero->m_secondarySkills[IDX(HERO_SKILL_SCOUTING)]]
-            + (static_cast<u32>(mapHero->HasArtifact(IDX(ARTIFACT_TELESCOPE))) >= 1)
+            + (static_cast<u32>(mapHero->HasArtifact(ARTIFACT_TELESCOPE)) >= 1)
     );
 
     if (bShowIt != 0) {
@@ -9621,7 +9621,7 @@ i32 GetManaFrame(i32 mana) {
 VA(0x0046bce8, 0x559)
 i32 advManager::DoVisions(hero* visionHero) {
     char visionMessageResult[ADVMGR_VISIONS_MESSAGE_BUFFER_SIZE];
-    i32 creatureData;
+    CreatureType creatureData;
     i32 nearestDistanceState;
     i32 nearestXId;
     i32 nearestYData;
@@ -9674,16 +9674,16 @@ i32 advManager::DoVisions(hero* visionHero) {
     }
 
     cellData = GetCell(nearestXId, nearestYData);
-    creatureData = cellData->m_objectIndex;
+    creatureData = static_cast<CreatureType>(cellData->m_objectIndex);
     forcedJoinState = cellData->m_objectMetadata & MONSTER_JOIN_FORCED;
     monsterCountIndex = cellData->m_objectMetadata & MONSTER_COUNT_MASK;
-    sprintf(gText, "{%d %s}\n\n", monsterCountIndex, gArmyNamesPlural[creatureData]);
+    sprintf(gText, "{%d %s}\n\n", monsterCountIndex, gArmyNamesPlural[IDX(creatureData)]);
     strengthRatioCurrent =
         static_cast<float>(gpPhilAI->FightValueOfStack(&visionHero->m_army, visionHero, 0, 0, 0, 0))
-        / static_cast<float>(gMonsterDatabase[creatureData].fightValue * monsterCountIndex);
+        / static_cast<float>(gMonsterDatabase[IDX(creatureData)].fightValue * monsterCountIndex);
 
-    if (visionHero->m_army.CanJoin(creatureData) && strengthRatioCurrent > MONSTER_STRENGTH_JOIN
-        && !visionHero->HasArtifact(IDX(ARTIFACT_HIDEOUS_MASK)) && creatureData != CREATURE_GHOST
+    if (visionHero->m_army.CanJoin(IDX(creatureData)) && strengthRatioCurrent > MONSTER_STRENGTH_JOIN
+        && !visionHero->HasArtifact(ARTIFACT_HIDEOUS_MASK) && creatureData != CREATURE_GHOST
         && creatureData != CREATURE_EARTH_ELEMENTAL && creatureData != CREATURE_AIR_ELEMENTAL
         && creatureData != CREATURE_FIRE_ELEMENTAL && creatureData != CREATURE_WATER_ELEMENTAL) {
         if (forcedJoinState) {
@@ -9705,7 +9705,7 @@ i32 advManager::DoVisions(hero* visionHero) {
                 joiningCount = 1;
             }
 
-            joiningCostIndex = gMonsterDatabase[creatureData].cost * monsterCountIndex * 2;
+            joiningCostIndex = gMonsterDatabase[IDX(creatureData)].cost * monsterCountIndex * 2;
             if (joiningCostIndex
                 > gpGame->m_players[visionHero->m_owner].m_resources[IDX(RES_GOLD)]) {
                 if (strengthRatioCurrent > MONSTER_STRENGTH_FLEE) {
@@ -9763,7 +9763,7 @@ i32 advManager::IsCrystalBallInEffect(i32 x, i32 y, i32 radius) {
     i32 distance;
     for (heroIndex = 0; heroIndex < gpCurPlayer->m_heroCount; ++heroIndex) {
         crystalHero = gpGame->GetHero(gpCurPlayer->m_heroIds[heroIndex]);
-        if (crystalHero->HasArtifact(IDX(ARTIFACT_CRYSTAL_BALL))) {
+        if (crystalHero->HasArtifact(ARTIFACT_CRYSTAL_BALL)) {
             distance = static_cast<i32>(sqrt(
                 static_cast<double>(
                     (crystalHero->m_y - y) * (crystalHero->m_y - y)

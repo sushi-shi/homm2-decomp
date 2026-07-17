@@ -199,7 +199,7 @@ public:
     void Read(i32, i8);
     void Write(i32, i8);
     void GetArmyStrengths(u32l* const);
-    i32 HasArtifact(i32);
+    i32 HasArtifact(ArtifactType);
     i32 CalcMobility(void);
     i32 HasSpell(i32);
     i32 GetNthSpell(i32, i32);

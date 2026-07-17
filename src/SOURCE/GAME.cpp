@@ -232,7 +232,7 @@ i32 GetNumObelisks(i32 color) {
 }
 
 VA(0x00470f10, 0xca)
-i32 playerData::BuildingsOwned(i32 townType, i32 buildingIndex, i32 buildState) {
+i32 playerData::BuildingsOwned(i32 townType, BuildingSlotType buildingIndex, i32 buildState) {
     i32 count = 0;
     i32 i;
     for (i = 0; i < m_townCount; i++) {
@@ -3513,7 +3513,7 @@ void game::PerDay(void) {
         restoredSpellPoints13 = currentHero6->m_spellPoints;
         maxSpellPoints9 = currentHero6->Stats(3) * 10;
         restoredSpellPoints13 += currentHero6->m_secondarySkills[8] + 1;
-        if (currentHero6->HasArtifact(IDX(ARTIFACT_POWER_RING)))
+        if (currentHero6->HasArtifact(ARTIFACT_POWER_RING))
             restoredSpellPoints13 += 2;
         if (restoredSpellPoints13 > maxSpellPoints9)
             restoredSpellPoints13 = maxSpellPoints9;
@@ -4703,15 +4703,15 @@ i32 game::GetLuck(hero* h, class army*, town* castle) {
     if (h == 0)
         return LUCK_NEUTRAL;
     luck = LUCK_NEUTRAL;
-    if (h->HasArtifact(IDX(ARTIFACT_RABBIT_FOOT)))
+    if (h->HasArtifact(ARTIFACT_RABBIT_FOOT))
         luck++;
-    if (h->HasArtifact(IDX(ARTIFACT_GOLDEN_HORSESHOE)))
+    if (h->HasArtifact(ARTIFACT_GOLDEN_HORSESHOE))
         luck++;
-    if (h->HasArtifact(IDX(ARTIFACT_GAMBLERS_COIN)))
+    if (h->HasArtifact(ARTIFACT_GAMBLERS_COIN))
         luck++;
-    if (h->HasArtifact(IDX(ARTIFACT_FOUR_LEAF_CLOVER)))
+    if (h->HasArtifact(ARTIFACT_FOUR_LEAF_CLOVER))
         luck++;
-    if (h->HasArtifact(IDX(ARTIFACT_MASTHEAD)) && HAS(h->m_eventFlags, HERO_EVENT_EMBARKED)) {
+    if (h->HasArtifact(ARTIFACT_MASTHEAD) && HAS(h->m_eventFlags, HERO_EVENT_EMBARKED)) {
         luck++;
     }
     luck += h->m_luck;
@@ -4720,7 +4720,7 @@ i32 game::GetLuck(hero* h, class army*, town* castle) {
         luck = LUCK_MINIMUM;
     if (luck > LUCK_MAXIMUM)
         luck = LUCK_MAXIMUM;
-    if (h->HasArtifact(IDX(ARTIFACT_BATTLE_GARB)))
+    if (h->HasArtifact(ARTIFACT_BATTLE_GARB))
         luck = LUCK_MAXIMUM;
     if (castle != 0 && castle->m_type == IDX(FACTION_SORCERESS)
         && (castle->m_buildings & IDX(TOWN_BUILDING_RAINBOW))) {

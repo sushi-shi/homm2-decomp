@@ -2181,14 +2181,14 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
                             artifactWinnerPerson = player;
                         }
                     } else {
-                        if (artifactHeroPtr->HasArtifact(IDX(ARTIFACT_ULTIMATE_BOOK))
-                            || artifactHeroPtr->HasArtifact(IDX(ARTIFACT_ULTIMATE_SWORD))
-                            || artifactHeroPtr->HasArtifact(IDX(ARTIFACT_ULTIMATE_CLOAK))
-                            || artifactHeroPtr->HasArtifact(IDX(ARTIFACT_ULTIMATE_WAND))
-                            || artifactHeroPtr->HasArtifact(IDX(ARTIFACT_ULTIMATE_SHIELD))
-                            || artifactHeroPtr->HasArtifact(IDX(ARTIFACT_ULTIMATE_STAFF))
-                            || artifactHeroPtr->HasArtifact(IDX(ARTIFACT_ULTIMATE_CROWN))
-                            || artifactHeroPtr->HasArtifact(IDX(ARTIFACT_GOLDEN_GOOSE))) {
+                        if (artifactHeroPtr->HasArtifact(ARTIFACT_ULTIMATE_BOOK)
+                            || artifactHeroPtr->HasArtifact(ARTIFACT_ULTIMATE_SWORD)
+                            || artifactHeroPtr->HasArtifact(ARTIFACT_ULTIMATE_CLOAK)
+                            || artifactHeroPtr->HasArtifact(ARTIFACT_ULTIMATE_WAND)
+                            || artifactHeroPtr->HasArtifact(ARTIFACT_ULTIMATE_SHIELD)
+                            || artifactHeroPtr->HasArtifact(ARTIFACT_ULTIMATE_STAFF)
+                            || artifactHeroPtr->HasArtifact(ARTIFACT_ULTIMATE_CROWN)
+                            || artifactHeroPtr->HasArtifact(ARTIFACT_GOLDEN_GOOSE)) {
                             artifactWinnerPerson = player;
                         }
                     }
@@ -2513,7 +2513,7 @@ void game::ShowMoraleInfo(hero* h, i32 dialogType) {
     if (h->m_army.HasAllUndead()) {
         strcat(gText, cMoraleInfo[IDX(MORALE_INFO_ALL_UNDEAD)]);
     } else {
-        if (h->m_army.HasSomeUndead() || h->HasArtifact(IDX(ARTIFACT_ARM_OF_MARTYR))) {
+        if (h->m_army.HasSomeUndead() || h->HasArtifact(ARTIFACT_ARM_OF_MARTYR)) {
             strcat(gText, cMoraleInfo[IDX(MORALE_INFO_SOME_UNDEAD)]);
             mixedUndead4 = 1;
         }
@@ -2558,19 +2558,19 @@ void game::ShowMoraleInfo(hero* h, i32 dialogType) {
             strcat(gText, cMoraleInfo[IDX(MORALE_INFO_TAVERN)]);
         }
 
-        if (h->HasArtifact(IDX(ARTIFACT_MEDAL_OF_VALOR))) {
+        if (h->HasArtifact(ARTIFACT_MEDAL_OF_VALOR)) {
             strcat(gText, cMoraleInfo[IDX(MORALE_INFO_MEDAL_OF_VALOR)]);
         }
-        if (h->HasArtifact(IDX(ARTIFACT_MEDAL_OF_COURAGE))) {
+        if (h->HasArtifact(ARTIFACT_MEDAL_OF_COURAGE)) {
             strcat(gText, cMoraleInfo[IDX(MORALE_INFO_MEDAL_OF_COURAGE)]);
         }
-        if (h->HasArtifact(IDX(ARTIFACT_MEDAL_OF_HONOR))) {
+        if (h->HasArtifact(ARTIFACT_MEDAL_OF_HONOR)) {
             strcat(gText, cMoraleInfo[IDX(MORALE_INFO_MEDAL_OF_HONOR)]);
         }
-        if (h->HasArtifact(IDX(ARTIFACT_MEDAL_OF_DISTINCTION))) {
+        if (h->HasArtifact(ARTIFACT_MEDAL_OF_DISTINCTION)) {
             strcat(gText, cMoraleInfo[IDX(MORALE_INFO_MEDAL_OF_DISTINCTION)]);
         }
-        if (h->HasArtifact(IDX(ARTIFACT_FIZBIN_OF_MISFORTUNE))) {
+        if (h->HasArtifact(ARTIFACT_FIZBIN_OF_MISFORTUNE)) {
             strcat(gText, cMoraleInfo[IDX(MORALE_INFO_FIZBIN)]);
         }
         if (HAS(h->m_eventFlags, HERO_EVENT_BUOY)) {
@@ -2603,10 +2603,10 @@ void game::ShowMoraleInfo(hero* h, i32 dialogType) {
         if (h->m_secondarySkills[IDX(HERO_SKILL_LEADERSHIP)] == IDX(HERO_SKILL_LEVEL_EXPERT)) {
             strcat(gText, cMoraleInfo[IDX(MORALE_INFO_EXPERT_LEADERSHIP)]);
         }
-        if (h->HasArtifact(IDX(ARTIFACT_MASTHEAD)) && HAS(h->m_eventFlags, HERO_EVENT_EMBARKED)) {
+        if (h->HasArtifact(ARTIFACT_MASTHEAD) && HAS(h->m_eventFlags, HERO_EVENT_EMBARKED)) {
             strcat(gText, cMoraleInfo[IDX(MORALE_INFO_MASTHEAD)]);
         }
-        if (h->HasArtifact(IDX(ARTIFACT_BATTLE_GARB))) {
+        if (h->HasArtifact(ARTIFACT_BATTLE_GARB)) {
             strcat(gText, cMoraleInfo[IDX(MORALE_INFO_BATTLE_GARB)]);
         }
         if (static_cast<i32>(strlen(gText)) == modifierStart) {
@@ -2637,13 +2637,13 @@ void game::ShowLuckInfo(hero* h, i32 dialogType) {
     if (h->GetOccupiedTown() != 0 && h->GetOccupiedTown()->m_type == IDX(FACTION_SORCERESS)
         && (h->GetOccupiedTown()->m_buildings & IDX(TOWN_BUILDING_RAINBOW)))
         strcat(gText, cLuckInfo[IDX(LUCK_INFO_RAINBOW)]);
-    if (h->HasArtifact(IDX(ARTIFACT_RABBIT_FOOT)))
+    if (h->HasArtifact(ARTIFACT_RABBIT_FOOT))
         strcat(gText, cLuckInfo[IDX(LUCK_INFO_RABBIT_FOOT)]);
-    if (h->HasArtifact(IDX(ARTIFACT_GOLDEN_HORSESHOE)))
+    if (h->HasArtifact(ARTIFACT_GOLDEN_HORSESHOE))
         strcat(gText, cLuckInfo[IDX(LUCK_INFO_HORSESHOE)]);
-    if (h->HasArtifact(IDX(ARTIFACT_GAMBLERS_COIN)))
+    if (h->HasArtifact(ARTIFACT_GAMBLERS_COIN))
         strcat(gText, cLuckInfo[IDX(LUCK_INFO_LUCKY_COIN)]);
-    if (h->HasArtifact(IDX(ARTIFACT_FOUR_LEAF_CLOVER)))
+    if (h->HasArtifact(ARTIFACT_FOUR_LEAF_CLOVER))
         strcat(gText, cLuckInfo[IDX(LUCK_INFO_CLOVER)]);
     if (HAS(h->m_eventFlags, HERO_EVENT_FAERIE_RING))
         strcat(gText, cLuckInfo[IDX(LUCK_INFO_FAERIE_RING)]);
@@ -2659,11 +2659,11 @@ void game::ShowLuckInfo(hero* h, i32 dialogType) {
         strcat(gText, cLuckInfo[IDX(LUCK_INFO_ADVANCED_SKILL)]);
     if (h->m_secondarySkills[IDX(HERO_SKILL_LUCK)] == IDX(HERO_SKILL_LEVEL_EXPERT))
         strcat(gText, cLuckInfo[IDX(LUCK_INFO_EXPERT_SKILL)]);
-    if (h->HasArtifact(IDX(ARTIFACT_MASTHEAD)) && HAS(h->m_eventFlags, HERO_EVENT_EMBARKED))
+    if (h->HasArtifact(ARTIFACT_MASTHEAD) && HAS(h->m_eventFlags, HERO_EVENT_EMBARKED))
         strcat(gText, cLuckInfo[IDX(LUCK_INFO_MASTHEAD)]);
     if (HAS(h->m_eventFlags, HERO_EVENT_MERMAID))
         strcat(gText, cLuckInfo[IDX(LUCK_INFO_MERMAID)]);
-    if (h->HasArtifact(IDX(ARTIFACT_BATTLE_GARB)))
+    if (h->HasArtifact(ARTIFACT_BATTLE_GARB))
         strcat(gText, cLuckInfo[IDX(LUCK_INFO_BATTLE_GARB)]);
     if (static_cast<i32>(strlen(gText)) == modifierStart)
         strcat(gText, cLuckInfo[IDX(LUCK_INFO_NONE)]);
@@ -4403,17 +4403,17 @@ VA(0x004a0b6d, 0x109)
 i32 GetManaCost(i32 spell, hero* h) {
     i32 c = gsSpellInfo[spell].cost;
     if (h != 0) {
-        if (h->HasArtifact(IDX(ARTIFACT_EVIL_EYE))
+        if (h->HasArtifact(ARTIFACT_EVIL_EYE)
             && (spell == SPELL_CURSE || spell == SPELL_MASS_CURSE))
             c >>= 1;
-        if (h->HasArtifact(IDX(ARTIFACT_SKULLCAP))
+        if (h->HasArtifact(ARTIFACT_SKULLCAP)
             && (spell == SPELL_BERSERKER || spell == SPELL_HYPNOTIZE || spell == SPELL_PARALYZE
                 || spell == SPELL_BLIND))
             c >>= 1;
-        if (h->HasArtifact(IDX(ARTIFACT_SNAKE_RING))
+        if (h->HasArtifact(ARTIFACT_SNAKE_RING)
             && (spell == SPELL_BLESS || spell == SPELL_MASS_BLESS))
             c >>= 1;
-        if (h->HasArtifact(IDX(ARTIFACT_ELEMENTAL_RING))
+        if (h->HasArtifact(ARTIFACT_ELEMENTAL_RING)
             && (spell == SPELL_SUMMON_EARTH_ELEMENTAL || spell == SPELL_SUMMON_AIR_ELEMENTAL
                 || spell == SPELL_SUMMON_FIRE_ELEMENTAL || spell == SPELL_SUMMON_WATER_ELEMENTAL))
             c >>= 1;

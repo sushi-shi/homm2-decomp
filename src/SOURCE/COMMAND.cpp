@@ -798,7 +798,7 @@ VA(0x0042c40a, 0x70)
 i32 combatManager::IsNegationSphereInEffect(void) {
     i32 side;
     for (side = 0; side < COMBAT_MANAGER_SIDE_COUNT; side++) {
-        if (m_heroes[side] != 0 && m_heroes[side]->HasArtifact(IDX(ARTIFACT_SPHERE_NEGATION)) != 0)
+        if (m_heroes[side] != 0 && m_heroes[side]->HasArtifact(ARTIFACT_SPHERE_NEGATION) != 0)
             return 1;
     }
     return 0;
@@ -2149,7 +2149,7 @@ i32 combatManager::DoSurrender(void) {
                 * m_armies[m_currentSide][armyIndex_n].m_quantity;
         }
     }
-    if (m_heroes[m_currentSide]->HasArtifact(IDX(ARTIFACT_STATESMANS_QUILL)) != 0)
+    if (m_heroes[m_currentSide]->HasArtifact(ARTIFACT_STATESMANS_QUILL) != 0)
         giSurrenderCost = static_cast<i32>(giSurrenderCost * COMBAT_SURRENDER_QUILL_FACTOR);
     else
         giSurrenderCost = static_cast<i32>(giSurrenderCost * COMBAT_SURRENDER_BASE_FACTOR);
