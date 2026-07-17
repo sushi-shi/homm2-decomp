@@ -641,6 +641,7 @@ void ProcessAssert(int condition, char *file, int line)
     }
 }
 
+// @semantic
 // Structurally complete /O2 checkpoint with equal 0x66-byte sections, the same frame/CFG,
 // and the sole strncmp relocation.  The explicit MAKEFILEID rotate temporary moved this
 // from the old wholesale register-allocation residual to 98.60%; all instructions now agree
@@ -783,6 +784,11 @@ void SetGameDefaults(void)
     gConfig.needsDefaultInitialization = 0;
 }
 
+// @early-stop
+// @early-stop-reloc-only
+// All 0x13f relocation-masked bytes and all 28 ordered relocation sites and
+// effective targets agree. Residual identities are the Misc text block and the
+// _access/__access CRT alias at the same retail address.
 VA(0x004c4b60, 0x13f)
 void ReadPrefsFromFile(void)
 {
@@ -928,6 +934,11 @@ void ReadPrefs(void)
     sprintf(gConfig.rmtSDName, gMiscText.remoteNames.serverRight.text, gConfig.uniqueSystemID);
 }
 
+// @early-stop
+// @early-stop-reloc-only
+// All 0x6a relocation-masked bytes, CFG, and nine ordered relocation sites and
+// effective targets agree. Residual identities are the Misc text block and the
+// _open/_write/_close CRT aliases at their retail addresses.
 VA(0x004c5500, 0x6a)
 void WritePrefsToFile(void)
 {
@@ -1020,6 +1031,7 @@ int IsCDDrive(int driveIndex)
     return GetDriveTypeA(gText) == DRIVE_CDROM;
 }
 
+// @semantic
 // Structurally complete /O2 checkpoint: both sections are 0x3ed with the same 0x2f0 frame,
 // CFG and 51 relocation occurrences. Manual raw review confirms the indirect Win32/MCI
 // targets; `homm2 relocs` reports only three delinker owner aliases (the archive literal and
@@ -1554,6 +1566,11 @@ int SRandom(int low, int high)
     return rangedResult;
 }
 
+// @semantic: Complete seeded-coordinate mixing semantics and both ordered
+// iLastSeed relocations agree. The 0x5c retail register allocation keeps x in
+// ESI, y in EDX, and the seed in ECX; base assigns EDI/ECX/EDX respectively.
+// A direct xTerm/yTerm/seed-local form regressed to 46.53%, so the compact
+// in-place expression is retained. Revisit after Misc TU-state changes.
 VA(0x004c69f0, 0x5c)
 void SIncRandomize(int x, int y)
 {
@@ -1705,7 +1722,7 @@ void GetDataEntry(char *prompt, char *destination, int maximumLength, char *init
     gbAllowTextEntryEscape = 1;
 }
 
-// @semantic
+// @early-stop
 // Structurally complete /O2 checkpoint: the command-domain switch preserves the
 // retail case-body order, including the physical cancel tail. Base and retail are
 // both 0x173 with an identical relocation-masked instruction stream and 23 relocation
