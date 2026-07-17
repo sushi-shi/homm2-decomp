@@ -1463,11 +1463,11 @@ i32 townManager::Main(tag_message &message)
                         gpGame->m_players[giCurPlayer].m_resources[RES_WOOD] <
                             TOWN_BOAT_WOOD_COST) {
                         message.type = MESSAGE_WIDGET;
-                        message.payload.widget.command = 5;
+                        message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
                         message.payload.widget.id = TOWN_DIALOG_BUILD_BOAT;
                         message.payload.widget.data.value = 0x1000;
                         m_heroWindow0->BroadcastMessage(message);
-                        message.payload.widget.command = 6;
+                        message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
                         message.payload.widget.data.value = 2;
                         m_heroWindow0->BroadcastMessage(message);
                     }
@@ -1774,7 +1774,7 @@ void townManager::RedrawTownScreen(void)
 
     DrawTown(0, 1);
     message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = 3;
+    message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message.payload.widget.id = TOWN_CONTROL_STATUS_TEXT;
     message.payload.widget.data.text = m_statusText;
     m_townWindow->BroadcastMessage(message);
@@ -1813,7 +1813,7 @@ void townManager::SplitArmy(void)
                 m_swapStrip == m_heroStrip ? "Hero's Army" : "Garrison",
                 m_pendingStrip == m_heroStrip ? "Hero's Army" : "Garrison");
     }
-    message.payload.widget.command = 3;
+    message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message.payload.widget.id = 1;
     message.payload.widget.data.text = gText;
     m_heroWindow1->BroadcastMessage(message);
@@ -2094,12 +2094,12 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView)
         MemError();
 
     message_m.type = MESSAGE_WIDGET;
-    message_m.payload.widget.command = 9;
+    message_m.payload.widget.command = WIDGET_COMMAND_SET_ICON;
     message_m.payload.widget.id = 2;
     sprintf(iconName_o, "cstl%s.icn", cHeroTypeShortName[m_town->m_type]);
     message_m.payload.widget.data.text = iconName_o;
     window_a->BroadcastMessage(message_m);
-    message_m.payload.widget.command = 4;
+    message_m.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
     message_m.payload.widget.id = 2;
     message_m.payload.widget.data.value = building;
     window_a->BroadcastMessage(message_m);
@@ -2112,7 +2112,7 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView)
     } else {
         strcpy(gText, GetBuildingName(m_town->m_type, building));
     }
-    message_m.payload.widget.command = 3;
+    message_m.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message_m.payload.widget.id = 3;
     message_m.payload.widget.data.text = gText;
     window_a->BroadcastMessage(message_m);
@@ -2193,15 +2193,15 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView)
             TOWN_INTERFACE_BROADCAST_FLAGS);
     m_selectedBuilding = -1;
     if (quickView != 0) {
-        message_m.payload.widget.command = 6;
+        message_m.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message_m.payload.widget.data.value = 6;
         message_m.payload.widget.id = TOWN_DIALOG_CONFIRM;
         window_a->BroadcastMessage(message_m);
-        message_m.payload.widget.command = 6;
+        message_m.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message_m.payload.widget.data.value = 6;
         message_m.payload.widget.id = 0x7801;
         window_a->BroadcastMessage(message_m);
-        message_m.payload.widget.command = 6;
+        message_m.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message_m.payload.widget.data.value = 6;
         message_m.payload.widget.id = 0;
         window_a->BroadcastMessage(message_m);
@@ -2210,11 +2210,11 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView)
         gpWindowManager->RemoveWindow(window_a);
     } else {
         if (cannotBuy != 0) {
-            message_m.payload.widget.command = 6;
+            message_m.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
             message_m.payload.widget.id = TOWN_DIALOG_CONFIRM;
             message_m.payload.widget.data.value = 2;
             window_a->BroadcastMessage(message_m);
-            message_m.payload.widget.command = 5;
+            message_m.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
             message_m.payload.widget.id = TOWN_DIALOG_CONFIRM;
             message_m.payload.widget.data.value = 0x1000;
             window_a->BroadcastMessage(message_m);
@@ -2356,7 +2356,7 @@ void townManager::SetupMage(heroWindow *window)
     message_b.type = MESSAGE_WIDGET;
     if (m_town->m_occupyingHeroId == -1) {
         strcpy(gText, "The above spells are available here.");
-        message_b.payload.widget.command = 3;
+        message_b.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
         message_b.payload.widget.id = TOWN_MAGE_DESCRIPTION_CONTROL;
         message_b.payload.widget.data.text = gText;
         window->BroadcastMessage(message_b);
@@ -2379,16 +2379,16 @@ void townManager::SetupMage(heroWindow *window)
             }
 
             if (spellState_m == TOWN_MAGE_SPELL_UNAVAILABLE)
-                message_b.payload.widget.command = 6;
+                message_b.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
             else
-                message_b.payload.widget.command = 5;
+                message_b.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
             message_b.payload.widget.id = level * TOWN_MAGE_SPELLS_PER_LEVEL + slot_m +
                              TOWN_MAGE_FIRST_SPELL_CONTROL;
             message_b.payload.widget.data.value = 4;
             window->BroadcastMessage(message_b);
 
             if (spellState_m != TOWN_MAGE_SPELL_UNAVAILABLE) {
-                message_b.payload.widget.command = 4;
+                message_b.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
                 message_b.payload.widget.id = level * TOWN_MAGE_SPELLS_PER_LEVEL + slot_m +
                                  TOWN_MAGE_FIRST_SPELL_CONTROL;
                 message_b.payload.widget.data.value = spellState_m;
@@ -2396,7 +2396,7 @@ void townManager::SetupMage(heroWindow *window)
             }
 
             if (spellState_m != 0) {
-                message_b.payload.widget.command = 6;
+                message_b.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
                 message_b.payload.widget.data.value = 4;
                 message_b.payload.widget.id = level * TOWN_MAGE_SPELLS_PER_LEVEL + slot_m +
                                  TOWN_MAGE_FIRST_ICON_CONTROL;
@@ -2405,7 +2405,7 @@ void townManager::SetupMage(heroWindow *window)
                                  TOWN_MAGE_FIRST_DESCRIPTION_CONTROL;
                 window->BroadcastMessage(message_b);
             } else {
-                message_b.payload.widget.command = 4;
+                message_b.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
                 message_b.payload.widget.id = level * TOWN_MAGE_SPELLS_PER_LEVEL + slot_m +
                                  TOWN_MAGE_FIRST_ICON_CONTROL;
                 message_b.payload.widget.data.value = gsSpellInfo[
@@ -2421,7 +2421,7 @@ void townManager::SetupMage(heroWindow *window)
                     sprintf(gText, "%s  [%d]",
                             gSpellNames[m_town->m_spells[level][slot_m]],
                             GetManaCost(m_town->m_spells[level][slot_m], 0));
-                message_b.payload.widget.command = 3;
+                message_b.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
                 message_b.payload.widget.id = level * TOWN_MAGE_SPELLS_PER_LEVEL + slot_m +
                                  TOWN_MAGE_FIRST_DESCRIPTION_CONTROL;
                 message_b.payload.widget.data.text = gText;
@@ -2431,12 +2431,12 @@ void townManager::SetupMage(heroWindow *window)
     }
 
     message_b.payload.widget.data.value = m_town->m_buildState - 1;
-    message_b.payload.widget.command = 4;
+    message_b.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
     message_b.payload.widget.id = TOWN_MAGE_GUILD_ICON_CONTROL;
     unusedGuildFrame_n = message_b.payload.widget.data.value;
     window->BroadcastMessage(message_b);
     sprintf(gText, "magegld%c.icn", cHeroTypeInitial[m_town->m_type]);
-    message_b.payload.widget.command = 9;
+    message_b.payload.widget.command = WIDGET_COMMAND_SET_ICON;
     message_b.payload.widget.id = TOWN_MAGE_GUILD_ICON_CONTROL;
     message_b.payload.widget.data.text = gText;
     window->BroadcastMessage(message_b);
@@ -2527,7 +2527,7 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit)
     messageLocal.type = MESSAGE_WIDGET;
 
     if (cannotRecruit != 0) {
-        messageLocal.payload.widget.command = 6;
+        messageLocal.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         messageLocal.payload.widget.data.value = 2;
         messageLocal.payload.widget.id = 8;
         m_heroWindow1->BroadcastMessage(messageLocal);
@@ -2535,7 +2535,7 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit)
         m_heroWindow1->BroadcastMessage(messageLocal);
         messageLocal.payload.widget.id = TOWN_DIALOG_CONFIRM;
         m_heroWindow1->BroadcastMessage(messageLocal);
-        messageLocal.payload.widget.command = 5;
+        messageLocal.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
         messageLocal.payload.widget.data.value = 0x1000;
         messageLocal.payload.widget.id = 8;
         m_heroWindow1->BroadcastMessage(messageLocal);
@@ -2554,12 +2554,12 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit)
     sprintf(gText, "%s is a level %d %s with %d artifacts.",
             m_recruitHero->m_name, m_recruitHero->m_level,
             gAlignmentNames[m_recruitHero->m_cursorType], artifactCountb);
-    messageLocal.payload.widget.command = 3;
+    messageLocal.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     messageLocal.payload.widget.id = 1;
     messageLocal.payload.widget.data.text = gText;
     m_heroWindow1->BroadcastMessage(messageLocal);
     sprintf(gText, "port%04d.icn", m_recruitHero->m_portrait);
-    messageLocal.payload.widget.command = 9;
+    messageLocal.payload.widget.command = WIDGET_COMMAND_SET_ICON;
     messageLocal.payload.widget.id = 2;
     messageLocal.payload.widget.data.text = gText;
     m_heroWindow1->BroadcastMessage(messageLocal);
@@ -2655,7 +2655,7 @@ i32 TavernHandler(tag_message &message)
     }
     if (static_cast<i32l>(KBTickCount()) > glTimers[0]) {
         message.type = MESSAGE_WIDGET;
-        message.payload.widget.command = 4;
+        message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
         message.payload.widget.id = 2;
         ++gpGame->m_viewArmyResult;
         message.payload.widget.data.value =
@@ -2683,7 +2683,7 @@ void townManager::DoTavern(void)
             "A generous tip for the barkeep yields the following rumor:\n\n%s",
             gpGame->m_rumour);
     message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = 3;
+    message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message.payload.widget.id = TOWN_TAVERN_RUMOUR_CONTROL;
     message.payload.widget.data.text = gText;
     m_heroWindow0->BroadcastMessage(message);
@@ -2715,7 +2715,7 @@ i32 SplitArmyHandler(tag_message &message)
         case TOWN_INPUT_SELECT:
             switch (message.payload.widget.id) {
             case TOWN_SPLIT_AMOUNT_CONTROL:
-                message.payload.widget.command = 7;
+                message.payload.widget.command = WIDGET_COMMAND_GET_TEXT;
                 gpTownManager->m_heroWindow1->BroadcastMessage(message);
                 gpTownManager->m_splitAmount = atoi(message.payload.widget.data.text);
                 if (gpTownManager->m_splitAmount < 0)
@@ -2771,7 +2771,7 @@ i32 SplitArmyHandler(tag_message &message)
 update_amount:
     sprintf(gText, "%d", gpTownManager->m_splitAmount);
     message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = 3;
+    message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message.payload.widget.id = TOWN_SPLIT_AMOUNT_CONTROL;
     message.payload.widget.data.text = gText;
     gpTownManager->m_heroWindow1->BroadcastMessage(message);
@@ -2815,7 +2815,7 @@ void townManager::SetupWell(heroWindow *window)
     }
 
     messaged.type = MESSAGE_WIDGET;
-    messaged.payload.widget.command = 9;
+    messaged.payload.widget.command = WIDGET_COMMAND_SET_ICON;
     sprintf(iconNameCount, "cstl%s.icn", cHeroTypeShortName[m_town->m_type]);
     messaged.payload.widget.data.text = iconNameCount;
     for (dwellingResult = 0; dwellingResult < TOWN_WELL_DWELLING_COUNT; ++dwellingResult) {
@@ -2824,21 +2824,21 @@ void townManager::SetupWell(heroWindow *window)
     }
 
     for (dwellingResult = 0; dwellingResult < TOWN_WELL_DWELLING_COUNT; ++dwellingResult) {
-        messaged.payload.widget.command = 4;
+        messaged.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
         messaged.payload.widget.id = dwellingResult + 1;
         messaged.payload.widget.data.value = dwellingTypesValue[dwellingResult] +
                           TOWN_COMMAND_FIRST_DWELLING;
         window->BroadcastMessage(messaged);
         sprintf(gText, "monh%04d.icn",
                 gDwellingType[m_town->m_type][dwellingTypesValue[dwellingResult]]);
-        messaged.payload.widget.command = 9;
+        messaged.payload.widget.command = WIDGET_COMMAND_SET_ICON;
         messaged.payload.widget.id = dwellingResult + TOWN_WELL_FIRST_MONSTER_ICON_CONTROL;
         messaged.payload.widget.data.text = gText;
         window->BroadcastMessage(messaged);
     }
 
     messaged.type = MESSAGE_WIDGET;
-    messaged.payload.widget.command = 3;
+    messaged.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     for (dwellingResult = 0; dwellingResult < TOWN_WELL_DWELLING_COUNT; ++dwellingResult) {
         sprintf(gText, GetBuildingName(
             m_town->m_type,
@@ -2901,7 +2901,7 @@ void townManager::SetupWell(heroWindow *window)
             sprintf(detailTextf, cWellDetail[8], growthd);
             strcat(gText, detailTextf);
         }
-        messaged.payload.widget.command = 3;
+        messaged.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
         messaged.payload.widget.id = dwellingResult + TOWN_WELL_FIRST_DETAIL_CONTROL;
         messaged.payload.widget.data.text = gText;
         window->BroadcastMessage(messaged);
@@ -2981,7 +2981,7 @@ void townManager::SetupThievesGuild(heroWindow *window, i32 informationLevel)
     for (position_current = gpGame->m_playerCount - gpGame->m_deadPlayerCount;
          position_current < TOWN_THIEVES_PLAYER_COUNT; ++position_current) {
         message_n.type = MESSAGE_WIDGET;
-        message_n.payload.widget.command = 6;
+        message_n.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message_n.payload.widget.id = position_current + TOWN_THIEVES_FIRST_RANK_CONTROL;
         message_n.payload.widget.data.value = 4;
         window->BroadcastMessage(message_n);
@@ -2991,7 +2991,7 @@ void townManager::SetupThievesGuild(heroWindow *window, i32 informationLevel)
     for (position_current = gpGame->m_playerCount - gpGame->m_deadPlayerCount;
          position_current < TOWN_THIEVES_PLAYER_COUNT; ++position_current) {
         message_n.type = MESSAGE_WIDGET;
-        message_n.payload.widget.command = 6;
+        message_n.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message_n.payload.widget.id = position_current + TOWN_THIEVES_FIRST_PLAYER_CONTROL;
         message_n.payload.widget.data.value = 4;
         window->BroadcastMessage(message_n);
@@ -3046,7 +3046,7 @@ void townManager::SetupThievesGuild(heroWindow *window, i32 informationLevel)
         sprintf(gText, gColors[gpGame->m_players[rank].m_color]);
         gText[0] -= ' ';
         message_n.type = MESSAGE_WIDGET;
-        message_n.payload.widget.command = 3;
+        message_n.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
         message_n.payload.widget.id = position_current + TOWN_THIEVES_FIRST_PLAYER_CONTROL;
         message_n.payload.widget.data.text = gText;
         window->BroadcastMessage(message_n);

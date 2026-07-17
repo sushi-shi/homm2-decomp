@@ -1172,7 +1172,7 @@ i32 RecruitHeroHandler(tag_message &msg)
     i16 e = 2, p = 3, c = 8, d = 9;
     i32 a = 0;
     i32 b;
-    if (msg.type == 0x200) {
+    if (msg.type == MESSAGE_WIDGET) {
         switch (msg.payload.widget.command) {
         case 0xc:
             switch (msg.payload.widget.id) {
@@ -2177,7 +2177,7 @@ void QuickViewWait(void)
         PollSound();
         Process1WindowsMessage();
         ev = gpInputManager->GetEvent();
-        if (ev.type == 0x40 || ev.type == 8 || ev.type == 0x10)
+        if (ev.type == MESSAGE_RIGHT_BUTTON_UP || ev.type == MESSAGE_LEFT_BUTTON_DOWN || ev.type == MESSAGE_LEFT_BUTTON_UP)
             done = 1;
         else
             done = 0;
@@ -3090,8 +3090,8 @@ void CongratsWait(void)
         PollSound();
         Process1WindowsMessage();
         msg = gpInputManager->GetEvent();
-        if (msg.type == 1 || msg.type == 8 || msg.type == 0x10 || msg.type == 0x20 ||
-            msg.type == 0x40)
+        if (msg.type == MESSAGE_KEY_DOWN || msg.type == MESSAGE_LEFT_BUTTON_DOWN || msg.type == MESSAGE_LEFT_BUTTON_UP || msg.type == MESSAGE_RIGHT_BUTTON_DOWN ||
+            msg.type == MESSAGE_RIGHT_BUTTON_UP)
             done = 1;
     }
 }
@@ -4019,8 +4019,8 @@ void SetWinText(heroWindow *j, i32 id)
     for (i = 0; i < KB_WIN_SETUP_COUNT; i++) {
         if (gWinSetup[i].windowId == id) {
             a++;
-            c.type = 0x200;
-            c.payload.widget.command = 3;
+            c.type = MESSAGE_WIDGET;
+            c.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
             c.payload.widget.id = gWinSetup[i].widgetId;
             c.payload.widget.data.text = gWinSetup[i].text;
             j->BroadcastMessage(c);
@@ -4605,8 +4605,8 @@ void UpdateNormalDialog(char *text)
 {
     i16 show = 1;
     tag_message evt;
-    evt.type = 0x200;
-    evt.payload.widget.command = 3;
+    evt.type = MESSAGE_WIDGET;
+    evt.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     evt.payload.widget.id = 1;
     evt.payload.widget.data.text = text;
     pNormalDialogWindow->BroadcastMessage(evt);

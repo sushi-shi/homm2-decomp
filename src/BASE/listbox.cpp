@@ -228,7 +228,7 @@ VA(0x004db520, 0x368)
 i32 listBoxWidget::Main(tag_message &message)
 {
     if (!(m_flags & 2)) {
-        if (message.type == 0x200)
+        if (message.type == MESSAGE_WIDGET)
             return widget::Main(message);
         return 0;
     }
@@ -247,11 +247,11 @@ i32 listBoxWidget::Main(tag_message &message)
         i16 left = m_x;
         if (left > mx || m_y > my || left + m_width <= mx || m_y + m_height <= my)
             return 0;
-        if (message.type == 0x20) {
-            message.payload.widget.command = 0xe;
-            message.type = 0x200;
+        if (message.type == MESSAGE_RIGHT_BUTTON_DOWN) {
+            message.payload.widget.command = WIDGET_COMMAND_ALTERNATE_SELECT;
+            message.type = MESSAGE_WIDGET;
             message.payload.widget.id = m_id;
-            message.payload.widget.parameter = 0x200;
+            message.payload.widget.parameter = MESSAGE_MODIFIER_RIGHT_BUTTON;
             return 2;
         }
         return ProcessMouseMessage(message);
@@ -489,8 +489,8 @@ i32 listBoxWidget::ProcessMouseMessage(tag_message &message)
         }
         if (m_itemSelectionTracking) {
             m_itemSelectionTracking = 0;
-            message.payload.widget.command = 0xc;
-            message.type = 0x200;
+            message.payload.widget.command = WIDGET_COMMAND_SELECT;
+            message.type = MESSAGE_WIDGET;
             message.payload.widget.id = m_id;
             i32 selectedIndex = m_selectedIndex;
             message.payload.widget.parameter = 1;

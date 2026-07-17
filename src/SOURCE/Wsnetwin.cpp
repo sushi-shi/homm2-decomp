@@ -19,6 +19,7 @@
 #include <SOURCE/kbwin.h>
 #include <SOURCE/wingraph.h>
 #include <BASE/message.h>
+#include <BASE/widget.h>
 #include <SOURCE/Wsnetwin.h>
 
 #define WSFILE const_cast<char *>("I:\\Projects\\Heroes\\Prog\\SOURCE\\Wsnetwin.cpp")
@@ -371,8 +372,8 @@ void wsEvaluateMessage(u32l size, i32 sender) {
         break;
     case NETWORK_PACKET_GUEST_ACCEPTED:
         sprintf(cWSTextBuffer, "Waiting for other remote player to set up game.");
-        windowMessage.type = 0x200;
-        windowMessage.payload.widget.command = 3;
+        windowMessage.type = MESSAGE_WIDGET;
+        windowMessage.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
         windowMessage.payload.widget.id = 1;
         windowMessage.payload.widget.data.text = cWSTextBuffer;
         pNormalDialogWindow->BroadcastMessage(windowMessage);
@@ -413,8 +414,8 @@ i32 wsWaitForExtraGuests(void) {
         sprintf(cWSTextBuffer,
                 "Hosting game at %s.\n\nYou have %d guest(s) now logged in.  Click 'OK' to move on, or wait for additional guests.",
                 inet_ntoa(gIn_addrIP), giNumHumanPlayers - 1);
-        message.type = 0x200;
-        message.payload.widget.command = 3;
+        message.type = MESSAGE_WIDGET;
+        message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
         message.payload.widget.id = 1;
         message.payload.widget.data.text = cWSTextBuffer;
         pNormalDialogWindow->BroadcastMessage(message);

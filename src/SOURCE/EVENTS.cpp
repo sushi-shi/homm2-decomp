@@ -5622,7 +5622,7 @@ i32 advManager::AutoResolveCombat(
     bShowIt = 0;
     gpMouseManager->SetPointer(0);
     gpMouseManager->m_forcePointerUpdate = 1;
-    message.type = 0;
+    message.type = MESSAGE_NONE;
     DemobilizeCurrHero();
     gpCombatManager->SetupCombat(x, y, firstHero, firstArmy, combatTown,
                                  secondHero, secondArmy, x, y, randomSeed);

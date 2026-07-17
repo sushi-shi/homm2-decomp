@@ -192,7 +192,7 @@ void SmackManagerMain(void) {
         i32 eventSink;
 
         Process1WindowsMessage();
-        while (gpInputManager->GetEvent().type != 0) {
+        while (gpInputManager->GetEvent().type != MESSAGE_NONE) {
             eventSink = 0;
         }
     }

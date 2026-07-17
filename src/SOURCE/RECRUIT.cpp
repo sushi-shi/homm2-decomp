@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <va.h>
+#include <BASE/executive.h>
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/mouseManager.h>
@@ -288,7 +289,7 @@ i32 recruitUnit::Main(struct tag_message &message)
 
         if (close == 1) {
             message.type = MESSAGE_EXECUTIVE;
-            message.payload.executive.command = 4;
+            message.payload.executive.command = EXECUTIVE_COMMAND_RETURN_RESULT;
             return 2;
         }
     }

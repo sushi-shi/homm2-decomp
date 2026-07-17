@@ -2110,8 +2110,8 @@ i32 game::ViewSpells(hero *spellHero, i32 spellType,
         if (m_viewSpellsWindow == 0)
             MemError();
         if (spellType != 2) {
-            message.type = 0x200;
-            message.payload.widget.command = 6;
+            message.type = MESSAGE_WIDGET;
+            message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
             if (spellType == 0)
                 message.payload.widget.id = 4;
             else
@@ -2138,44 +2138,44 @@ void game::UpdateSpellWidgets(void)
     i32 spell2;
     i32 lineLength0;
 
-    message9.type = 0x200;
+    message9.type = MESSAGE_WIDGET;
     spellPoints0 = m_viewSpellsHero->m_spellPoints;
     if (spellPoints0 > 999)
         spellPoints0 = 999;
     message9.payload.widget.data.value = 6;
     if (spellPoints0 > 99)
-        message9.payload.widget.command = 5;
+        message9.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
     else
-        message9.payload.widget.command = 6;
+        message9.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
     message9.payload.widget.id = 7;
     m_viewSpellsWindow->BroadcastMessage(message9);
     if (spellPoints0 > 9)
-        message9.payload.widget.command = 5;
+        message9.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
     else
-        message9.payload.widget.command = 6;
+        message9.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
     message9.payload.widget.id = 8;
     m_viewSpellsWindow->BroadcastMessage(message9);
 
     sprintf(gText, "%d", (spellPoints0 / 100) % 10);
     message9.payload.widget.data.text = gText;
-    message9.payload.widget.command = 3;
+    message9.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message9.payload.widget.id = 7;
     m_viewSpellsWindow->BroadcastMessage(message9);
     sprintf(gText, "%d", (spellPoints0 / 10) % 10);
     message9.payload.widget.data.text = gText;
-    message9.payload.widget.command = 3;
+    message9.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message9.payload.widget.id = 8;
     m_viewSpellsWindow->BroadcastMessage(message9);
     sprintf(gText, "%d", spellPoints0 % 10);
     message9.payload.widget.data.text = gText;
-    message9.payload.widget.command = 3;
+    message9.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message9.payload.widget.id = 9;
     m_viewSpellsWindow->BroadcastMessage(message9);
 
     for (spellSlot6 = 0; spellSlot6 < 12; spellSlot6++) {
         if (m_viewSpellsTop[m_viewSpellsType] + spellSlot6 >=
             m_viewSpellsCount[m_viewSpellsType]) {
-            message9.payload.widget.command = 6;
+            message9.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
             message9.payload.widget.id = spellSlot6 + 100;
             message9.payload.widget.data.value = 6;
             m_viewSpellsWindow->BroadcastMessage(message9);
@@ -2185,7 +2185,7 @@ void game::UpdateSpellWidgets(void)
             spell2 = m_viewSpellsHero->GetNthSpell(
                 m_viewSpellsType,
                 m_viewSpellsTop[m_viewSpellsType] + spellSlot6 + 1);
-            message9.payload.widget.command = 8;
+            message9.payload.widget.command = WIDGET_COMMAND_SET_FILL_COLOR;
             message9.payload.widget.id = spellSlot6 + 30;
             if (GetManaCost(spell2, m_viewSpellsHero) >
                 m_viewSpellsHero->m_spellPoints)
@@ -2193,17 +2193,17 @@ void game::UpdateSpellWidgets(void)
             else
                 message9.payload.widget.command = 1;
             m_viewSpellsWindow->BroadcastMessage(message9);
-            message9.payload.widget.command = 5;
+            message9.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
             message9.payload.widget.data.value = 6;
             m_viewSpellsWindow->BroadcastMessage(message9);
             message9.payload.widget.id = spellSlot6 + 100;
             m_viewSpellsWindow->BroadcastMessage(message9);
             if (m_viewSpellsReadOnly) {
-                message9.payload.widget.command = 5;
+                message9.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
                 message9.payload.widget.data.value = 2;
                 m_viewSpellsWindow->BroadcastMessage(message9);
             }
-            message9.payload.widget.command = 4;
+            message9.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
             message9.payload.widget.data.value = gsSpellInfo[spell2].iconIndex;
             m_viewSpellsWindow->BroadcastMessage(message9);
             lineLength0 = smallFont->LineLength(gSpellNames[spell2], 78);
@@ -2214,7 +2214,7 @@ void game::UpdateSpellWidgets(void)
                 sprintf(gText, "%s [%d]", gSpellNames[spell2],
                         GetManaCost(spell2, m_viewSpellsHero));
             }
-            message9.payload.widget.command = 3;
+            message9.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
             message9.payload.widget.id = spellSlot6 + 30;
             message9.payload.widget.data.text = gText;
             m_viewSpellsWindow->BroadcastMessage(message9);
@@ -2235,7 +2235,7 @@ i32 ViewSpellsHandler(tag_message &msg)
 {
     i32 spell;
 
-    if (msg.type == 4) {
+    if (msg.type == MESSAGE_MOUSE_MOVE) {
         gpWindowManager->ConvertToHover(msg);
         if (msg.payload.hover.id == gpWindowManager->m_lastHoverId) {
             return 1;
@@ -2243,10 +2243,10 @@ i32 ViewSpellsHandler(tag_message &msg)
             return gpGame->m_viewSpellsCallback(msg);
         }
     }
-    if (msg.type == 0x200) {
+    if (msg.type == MESSAGE_WIDGET) {
       switch (msg.payload.widget.command) {
     case 13:
-        if (msg.payload.widget.command == 14 || (msg.payload.widget.parameter & 0x200) != 0)
+        if (msg.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT || (msg.payload.widget.parameter & 0x200) != 0)
             break;
         {
             switch (msg.payload.widget.id) {
@@ -2291,7 +2291,7 @@ i32 ViewSpellsHandler(tag_message &msg)
         break;
     case 12:
     case 14:
-        if (msg.payload.widget.command == 14 || (msg.payload.widget.parameter & 0x200) != 0) {
+        if (msg.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT || (msg.payload.widget.parameter & 0x200) != 0) {
             switch (msg.payload.widget.id) {
             case 100:
             case 101:
@@ -2361,7 +2361,7 @@ i32 ViewSpellsHandler(tag_message &msg)
                 return 0;
             }
             gpGame->m_viewSpell = spell;
-            msg.payload.widget.command = 10;
+            msg.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
             return 2;
           }
         }
@@ -2386,7 +2386,7 @@ i32 ViewSpellsHandler(tag_message &msg)
 VA(0x0047a4cd, 0x17c)
 i32 ViewSpecialHandler(tag_message &msg)
 {
-    if (msg.type == 4) {
+    if (msg.type == MESSAGE_MOUSE_MOVE) {
         if (gpWindowManager->m_lastHoverId == msg.payload.hover.id)
             return 1;
         gpWindowManager->m_lastHoverId = msg.payload.hover.id;
@@ -2438,7 +2438,7 @@ void game::ViewArmy(i32 x, i32 y, i32 monsterType, i32 numTroops, town *castle,
     i16 frame18 = 5;
     i32 loopIndex0;
     tag_message message6;
-    message6.type = 0x200;
+    message6.type = MESSAGE_WIDGET;
 
     iViewArmyFrame = 0;
     iViewArmyType = monsterType;
@@ -2511,7 +2511,7 @@ void game::ViewArmy(i32 x, i32 y, i32 monsterType, i32 numTroops, town *castle,
     char armyName8[32];
     strcpy(armyName8, gArmyNames[monsterType]);
     armyName8[0] -= 32;
-    message6.payload.widget.command = 3;
+    message6.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message6.payload.widget.id = 3;
     message6.payload.widget.data.text = armyName8;
     m_viewArmyWindow->BroadcastMessage(message6);
@@ -2583,25 +2583,25 @@ void game::ViewArmy(i32 x, i32 y, i32 monsterType, i32 numTroops, town *castle,
     message6.payload.widget.data.text = details9;
     m_viewArmyWindow->BroadcastMessage(message6);
     if (!gbAllowUpgrade) {
-        message6.payload.widget.command = 6;
+        message6.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message6.payload.widget.data.text = reinterpret_cast<char *>(6);
         message6.payload.widget.id = 500;
         m_viewArmyWindow->BroadcastMessage(message6);
     }
     if (disableUpgrade) {
-        message6.payload.widget.command = 6;
+        message6.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message6.payload.widget.data.text = reinterpret_cast<char *>(6);
         message6.payload.widget.id = 0x7803;
         m_viewArmyWindow->BroadcastMessage(message6);
     }
     if (quickView) {
-        message6.payload.widget.command = 6;
+        message6.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message6.payload.widget.data.text = reinterpret_cast<char *>(6);
         message6.payload.widget.id = 0x7800;
         m_viewArmyWindow->BroadcastMessage(message6);
     }
     if (numTroops < 1) {
-        message6.payload.widget.command = 6;
+        message6.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message6.payload.widget.data.text = reinterpret_cast<char *>(6);
         message6.payload.widget.id = 1;
         m_viewArmyWindow->BroadcastMessage(message6);
@@ -2610,7 +2610,7 @@ void game::ViewArmy(i32 x, i32 y, i32 monsterType, i32 numTroops, town *castle,
     } else {
         char countText[12];
         sprintf(countText, "%d", numTroops);
-        message6.payload.widget.command = 3;
+        message6.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
         message6.payload.widget.id = 2;
         message6.payload.widget.data.text = countText;
         m_viewArmyWindow->BroadcastMessage(message6);
@@ -2679,7 +2679,7 @@ i32 ViewArmyHandler(tag_message &msg)
     i16 frameDelay0 = 5;
     i16 frameOffset1;
 
-    if (msg.type == 0x200) {
+    if (msg.type == MESSAGE_WIDGET) {
         switch (msg.payload.widget.command) {
         case 13:
             switch (msg.payload.widget.id) {
@@ -2750,8 +2750,8 @@ i32 ViewArmyHandler(tag_message &msg)
     }
 
     if (!gbLowMemory && KBTickCount() > glTimers[0]) {
-        msg.type = 0x200;
-        msg.payload.widget.command = 4;
+        msg.type = MESSAGE_WIDGET;
+        msg.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
         msg.payload.widget.id = 5;
         iViewArmyFrame =
             (iViewArmyFrame + 1) %
