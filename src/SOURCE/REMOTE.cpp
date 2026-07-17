@@ -641,9 +641,9 @@ void PollRemote(void)
     } else {
     if (gbInRemoteCleanup != 0) {
     } else {
-    if (iMPBaseType == REMOTE_BASE_MODEM) {
+    if (iMPBaseType == MULTIPLAYER_BASE_MODEM) {
         comm_wrt_task();
-    } else if (iMPBaseType == REMOTE_BASE_NETWORK) {
+    } else if (iMPBaseType == MULTIPLAYER_BASE_NETWORK) {
         if (bUseDirectPlay != 0)
             dpProcessMessages();
         else if (bUseWinsock != 0)

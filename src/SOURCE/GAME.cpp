@@ -723,7 +723,7 @@ void game::SetupOrigData(void)
     for (i = 0; i < GAME_PLAYER_COUNT; i++) {
         strcpy(m_defaultPlayerNames + i * 4, "");
         if (i < (&giNumHumanPlayers)[0]) {
-            if (i == 0 || iMPBaseType == 2)
+            if (i == 0 || iMPBaseType == MULTIPLAYER_BASE_HOT_SEAT)
                 gbThisNetHumanPlayer[i] = 1;
             else
                 gbThisNetHumanPlayer[i] = 0;

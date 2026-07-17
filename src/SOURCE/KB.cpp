@@ -366,7 +366,7 @@ main_menu:
         if (giTCPHostStatus != -1 && gbTCPFirstTime) {
             gbTCPFirstTime = 0;
             giNumHumanPlayers = 1;
-            iMPBaseType = OLD_MAIN_MULTIPLAYER_NETWORK;
+            iMPBaseType = MULTIPLAYER_BASE_NETWORK;
             iMPNetProtocol = OLD_MAIN_NETWORK_PROTOCOL;
             iMPExtendedType = giTCPHostStatus ? OLD_MAIN_REMOTE_HOST
                                              : OLD_MAIN_REMOTE_CLIENT;
@@ -624,7 +624,7 @@ initialize_game:
 
         if (giNumHumanPlayers > 1) {
             for (player_h = 0; player_h < giNumHumanPlayers; player_h++) {
-                if (iMPBaseType != OLD_MAIN_MULTIPLAYER_LOCAL)
+                if (iMPBaseType != MULTIPLAYER_BASE_HOT_SEAT)
                     strcpy(cPlayerNames[NetPosToGamePos(player_h)],
                            gsNetPlayerInfo[player_h].name);
             }
@@ -1783,13 +1783,13 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured)
         winFlag = 0;
         defeated = 0;
         allowNormalVictory = 1;
-        if ((gpGame->m_mapHeader.victoryCondition != CHECK_END_GAME_VICTORY_STANDARD && !gpGame->m_mapHeader.allowNormalVictory) ||
+        if ((gpGame->m_mapHeader.victoryCondition != MAP_VICTORY_DEFEAT_ALL && !gpGame->m_mapHeader.allowNormalVictory) ||
             (gbInCampaign && gpGame->m_campaignType == CHECK_END_GAME_ARCHIBALD_CAMPAIGN &&
              gpGame->m_campaignScenario + CHECK_END_GAME_SCENARIO_OFFSET == CHECK_END_GAME_SIDE_SCENARIO)) {
             allowNormalVictory = 0;
         }
 
-        if (gpGame->m_mapHeader.victoryCondition == CHECK_END_GAME_VICTORY_SIDE &&
+        if (gpGame->m_mapHeader.victoryCondition == MAP_VICTORY_DEFEAT_SIDE &&
             gpGame->m_mapHeader.victoryConditionValue != CHECK_END_GAME_SIDE_SPECIAL_VALUE &&
             (!gbInCampaign || gpGame->m_campaignType != CHECK_END_GAME_ARCHIBALD_CAMPAIGN ||
              gpGame->m_campaignScenario + CHECK_END_GAME_SCENARIO_OFFSET != CHECK_END_GAME_SIDE_SCENARIO)) {
@@ -1831,7 +1831,7 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured)
             }
         }
 
-        if (gpGame->m_mapHeader.victoryCondition == CHECK_END_GAME_VICTORY_CAPTURE_TOWN) {
+        if (gpGame->m_mapHeader.victoryCondition == MAP_VICTORY_CAPTURE_TOWN) {
             victoryTownData = gpGame->GetTown(
                 gpGame->GetTownId(gpGame->m_mapHeader.victoryConditionValue, gpGame->m_mapHeader.victoryTownY));
             if (victoryTownData->m_owner != CHECK_END_GAME_NO_PLAYER &&
@@ -1853,7 +1853,7 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured)
             }
         }
 
-        if (gpGame->m_mapHeader.lossCondition == CHECK_END_GAME_LOSS_TOWN) {
+        if (gpGame->m_mapHeader.lossCondition == MAP_LOSS_TOWN) {
             lossTown =
                 gpGame->GetTown(gpGame->GetTownId(gpGame->m_mapHeader.lossConditionValue, gpGame->m_mapHeader.lossTownY));
             if (lossTown->m_owner == CHECK_END_GAME_NO_PLAYER || !gbHumanPlayer[lossTown->m_owner]) {
@@ -1866,7 +1866,7 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured)
             }
         }
 
-        if (gpGame->m_mapHeader.victoryCondition == CHECK_END_GAME_VICTORY_GOLD) {
+        if (gpGame->m_mapHeader.victoryCondition == MAP_VICTORY_ACCUMULATE_GOLD) {
             bestGold = 0;
             winnerPlayer = CHECK_END_GAME_NO_PLAYER;
             for (player = 0; player < gpGame->m_playerCount; player++) {
@@ -1902,7 +1902,7 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured)
             }
         }
 
-        if (gpGame->m_mapHeader.victoryCondition == CHECK_END_GAME_VICTORY_DEFEAT_HERO) {
+        if (gpGame->m_mapHeader.victoryCondition == MAP_VICTORY_DEFEAT_HERO) {
             winningHeroEntry = GetHeroSlot(gpGame->m_mapHeader.victoryConditionValue);
             if (winningHeroEntry->m_owner < 0 || winningHeroEntry->m_owner >= CHECK_END_GAME_PLAYER_COUNT ||
                 gbHumanPlayer[winningHeroEntry->m_owner]) {
@@ -1916,7 +1916,7 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured)
             }
         }
 
-        if (gpGame->m_mapHeader.lossCondition == CHECK_END_GAME_LOSS_HERO) {
+        if (gpGame->m_mapHeader.lossCondition == MAP_LOSS_HERO) {
             lossHero = GetHeroSlot(gpGame->m_mapHeader.lossConditionValue);
             if (lossHero->m_owner < 0 || lossHero->m_owner >= CHECK_END_GAME_PLAYER_COUNT ||
                 !gbHumanPlayer[lossHero->m_owner]) {
@@ -1929,7 +1929,7 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured)
             }
         }
 
-        if (gpGame->m_mapHeader.lossCondition == CHECK_END_GAME_LOSS_TIME) {
+        if (gpGame->m_mapHeader.lossCondition == MAP_LOSS_TIME) {
             if (gpGame->m_mapHeader.lossConditionValue <
                     (gpGame->m_week - 1) * CHECK_END_GAME_DAYS_PER_WEEK +
                     (gpGame->m_month - 1) * CHECK_END_GAME_DAYS_PER_MONTH +
@@ -1943,7 +1943,7 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured)
             }
         }
 
-        if (gpGame->m_mapHeader.victoryCondition == CHECK_END_GAME_VICTORY_ARTIFACT) {
+        if (gpGame->m_mapHeader.victoryCondition == MAP_VICTORY_FIND_ARTIFACT) {
             artifactWinnerPerson = CHECK_END_GAME_NO_PLAYER;
             for (player = 0; player < gpGame->m_playerCount; player++) {
                 if (!gpGame->m_playerDead[player]) {
@@ -8820,7 +8820,7 @@ DATA(0x00528964) i32 giTCPHostStatus;
 DATA(0x00528968) char gMapName[16];
 DATA(0x00528978) i32 giMinExtentX;
 DATA(0x0052897c) i32 giMinExtentY;
-DATA(0x00528980) i32 iMPBaseType;
+DATA(0x00528980) MultiplayerBaseType iMPBaseType;
 DATA(0x00528984) i32 gbTCPFirstTime;
 DATA(0x00528988) i16 *pwSizeOfMapExtra;
 DATA(0x0052898c) i32 giHeroScreenSrcIndex;

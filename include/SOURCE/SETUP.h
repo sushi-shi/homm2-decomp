@@ -2,6 +2,7 @@
 #define HOMM2_SETUP_H
 
 #include <Ints.h>
+#include <SOURCE/REMOTE_TYPES.h>
 // Declarations of the free functions DEFINED in SETUP.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
 // forward declarations (was <_all.h>):
@@ -26,12 +27,6 @@ typedef enum SetupConstant {
     SETUP_HANDLER_CONTINUE = 1,
     SETUP_HANDLER_CLOSE = 2
 } SetupConstant;
-
-typedef enum SetupMultiplayerType {
-    SETUP_MULTIPLAYER_MODEM = 0,
-    SETUP_MULTIPLAYER_NETWORK = 1,
-    SETUP_MULTIPLAYER_HOT_SEAT = 2
-} SetupMultiplayerType;
 
 typedef enum SetupRemoteType {
     SETUP_REMOTE_NETWORK_HOST = 1,

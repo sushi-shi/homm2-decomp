@@ -125,7 +125,7 @@ i16 dpnet_init(void) {
                    sizeof(giNetPosToDCOPos));
             for (guestIndex = 1; guestIndex < giNumHumanPlayers; guestIndex++) {
                 startup.netPosition = static_cast<u8>(guestIndex);
-                dpSendMessage(giNetPosToDCOPos[guestIndex], DP_MESSAGE_STARTUP,
+                dpSendMessage(giNetPosToDCOPos[guestIndex], NETWORK_PACKET_STARTUP,
                               sizeof(startup), &startup);
             }
         } else {
@@ -220,7 +220,7 @@ i32 dpnet_snd(i32 position, i32 size, void *data) {
         destination = 0;
     else
         destination = giNetPosToDCOPos[position];
-    dpSendMessage(destination, DP_MESSAGE_DATA, static_cast<u16>(size), data);
+    dpSendMessage(destination, NETWORK_PACKET_DATA, static_cast<u16>(size), data);
     return 0;
 }
 
@@ -290,7 +290,7 @@ void dpEvaluateMessage(u32l size, i32 sender) {
     i32 i;
 
     switch (rcvBufIn[0]) {
-    case DP_MESSAGE_DATA:
+    case NETWORK_PACKET_DATA:
         ppDPRcvBuffer[iDPRcvBufferHead] = static_cast<u8 *>(
             BaseAlloc(size - 1, DPFILE,
                       evaluateSourceLineBase + DP_SOURCE_LINE_EVALUATE_ALLOC_OFFSET));
@@ -298,11 +298,11 @@ void dpEvaluateMessage(u32l size, i32 sender) {
         piDPRcvBufferSize[iDPRcvBufferHead] = size;
         iDPRcvBufferHead = (iDPRcvBufferHead + 1) % DP_TRANSPORT_BUFFER_COUNT;
         break;
-    case DP_MESSAGE_GUEST_ARRIVED:
+    case NETWORK_PACKET_GUEST_ARRIVED:
         if (GameMode == REMOTE_GAME_NETWORK_HOST) {
             for (i = 1; i < giNumHumanPlayers; i++) {
                 if (giNetPosToDCOPos[i] == sender) {
-                    dpSendMessage(sender, DP_MESSAGE_GUEST_ACCEPTED, 0, 0);
+                    dpSendMessage(sender, NETWORK_PACKET_GUEST_ACCEPTED, 0, 0);
                     return;
                 }
             }
@@ -312,20 +312,20 @@ void dpEvaluateMessage(u32l size, i32 sender) {
                     *reinterpret_cast<SNetPlayerInfo *>(ptr);
                 if (gsNetPlayerInfo[giNumHumanPlayers].reserved[0] == 0)
                     xNetHasOldPlayers = 1;
-                dpSendMessage(sender, DP_MESSAGE_GUEST_ACCEPTED, 0, 0);
+                dpSendMessage(sender, NETWORK_PACKET_GUEST_ACCEPTED, 0, 0);
                 giNumHumanPlayers++;
             } else {
-                dpSendMessage(sender, DP_MESSAGE_GUEST_REJECTED, 0, 0);
+                dpSendMessage(sender, NETWORK_PACKET_GUEST_REJECTED, 0, 0);
             }
         }
         break;
-    case DP_MESSAGE_GUEST_ACCEPTED:
+    case NETWORK_PACKET_GUEST_ACCEPTED:
         giHostAcceptStatus = 1;
         break;
-    case DP_MESSAGE_GUEST_REJECTED:
+    case NETWORK_PACKET_GUEST_REJECTED:
         giHostAcceptStatus = 2;
         break;
-    case DP_MESSAGE_STARTUP:
+    case NETWORK_PACKET_STARTUP:
         giNumHumanPlayers = ptr[0];
         giThisNetPos = ptr[1];
         LogInt("DPMSGSTARTUP", giThisNetPos, sender, -999, -999, -999, -999, -999);
@@ -475,7 +475,7 @@ i32 dpWaitForHost(void) {
     case 3:
         iLastHereIAmTickCount = KBTickCount();
         giHostAcceptStatus = 0;
-        dpSendMessage(0, DP_MESSAGE_GUEST_ARRIVED, sizeof(SNetPlayerInfo),
+        dpSendMessage(0, NETWORK_PACKET_GUEST_ARRIVED, sizeof(SNetPlayerInfo),
                       &gsThisNetPlayerInfo);
         iDPWaitForHostStatus++;
         break;
