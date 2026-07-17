@@ -2358,16 +2358,16 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
             gpGame->m_campaignScenarioDays[gpGame->m_campaignType][gpGame->m_campaignScenario]
             + gpGame->m_campaignScenarioBonus[gpGame->m_campaignType][gpGame->m_campaignScenario];
 
-        carryoverHeroId = CHECK_END_GAME_NO_PLAYER;
+        carryoverHeroId = IDX(CHECK_END_GAME_NO_PLAYER);
         if (gpGame->m_campaignType == IDX(CHECK_END_GAME_ROLAND_CAMPAIGN)
             && gpGame->m_campaignScenario + IDX(CHECK_END_GAME_SCENARIO_OFFSET)
                    == CHECK_END_GAME_SIDE_SCENARIO) {
-            carryoverHeroId = CHECK_END_GAME_SIDE_SPECIAL_VALUE;
+            carryoverHeroId = IDX(CHECK_END_GAME_SIDE_SPECIAL_VALUE);
         }
         if (gpGame->m_campaignType == IDX(CHECK_END_GAME_ARCHIBALD_CAMPAIGN)
             && gpGame->m_campaignScenario + IDX(CHECK_END_GAME_SCENARIO_OFFSET)
                    == CHECK_END_GAME_FIRST_NO_SAVE_SCENARIO) {
-            carryoverHeroId = CHECK_END_GAME_SIDE_SPECIAL_VALUE;
+            carryoverHeroId = IDX(CHECK_END_GAME_SIDE_SPECIAL_VALUE);
         }
 
         if (carryoverHeroId != IDX(CHECK_END_GAME_NO_PLAYER)) {

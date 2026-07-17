@@ -563,7 +563,7 @@ i32 swapManager::Main(tag_message& message) {
                                            && (m_heroes[m_targetSide]
                                                        ->m_army.m_creatureTypes[m_targetSlot]
                                                    == IDX(CREATURE_NONE)
-                                               || m_heroes[m_selectedSide]
+                                               || m_heroes[IDX(m_selectedSide)]
                                                           ->m_army.m_creatureTypes[m_selectedSlot]
                                                       == m_heroes[m_targetSide]
                                                              ->m_army
@@ -632,7 +632,7 @@ i32 swapManager::Main(tag_message& message) {
                                            && (m_heroes[m_targetSide]
                                                        ->m_army.m_creatureTypes[m_targetSlot]
                                                    == IDX(CREATURE_NONE)
-                                               || m_heroes[m_selectedSide]
+                                               || m_heroes[IDX(m_selectedSide)]
                                                           ->m_army.m_creatureTypes[m_selectedSlot]
                                                       == m_heroes[m_targetSide]
                                                              ->m_army
@@ -679,37 +679,37 @@ void swapManager::ViewMon(void) {
     gpGame->ViewArmy(
         SWAP_ARMY_VIEW_X,
         SWAP_ARMY_VIEW_Y,
-        m_heroes[m_selectedSide]->m_army.m_creatureTypes[m_targetSlot],
-        m_heroes[m_selectedSide]->m_army.m_creatureCounts[m_targetSlot],
+        m_heroes[IDX(m_selectedSide)]->m_army.m_creatureTypes[m_targetSlot],
+        m_heroes[IDX(m_selectedSide)]->m_army.m_creatureCounts[m_targetSlot],
         0,
-        m_heroes[m_selectedSide]->m_army.GetNumArmies() == 1,
+        m_heroes[IDX(m_selectedSide)]->m_army.GetNumArmies() == 1,
         1,
         0,
-        m_heroes[m_selectedSide],
+        m_heroes[IDX(m_selectedSide)],
         0,
-        &m_heroes[m_selectedSide]->m_army,
+        &m_heroes[IDX(m_selectedSide)]->m_army,
         m_targetSlot
     );
 }
 
 VA(0x00455776, 0x255)
 void swapManager::SwapArtifacts(void) {
-    i32 selectedArtifact = m_heroes[m_selectedSide]->m_artifacts[m_selectedSlot];
+    i32 selectedArtifact = m_heroes[IDX(m_selectedSide)]->m_artifacts[m_selectedSlot];
     i32 targetArtifact_2 = m_heroes[m_targetSide]->m_artifacts[m_targetSlot];
 
-    GiveTakeArtifactStat(m_heroes[m_selectedSide], selectedArtifact, 1);
+    GiveTakeArtifactStat(m_heroes[IDX(m_selectedSide)], selectedArtifact, 1);
     GiveTakeArtifactStat(m_heroes[m_targetSide], targetArtifact_2, 1);
-    m_heroes[m_selectedSide]->m_artifacts[m_selectedSlot] = targetArtifact_2;
+    m_heroes[IDX(m_selectedSide)]->m_artifacts[m_selectedSlot] = targetArtifact_2;
     m_heroes[m_targetSide]->m_artifacts[m_targetSlot] = selectedArtifact;
 
-    i8 extra = m_heroes[m_selectedSide]->m_artifactExtra[m_selectedSlot];
-    m_heroes[m_selectedSide]->m_artifactExtra[m_selectedSlot] =
+    i8 extra = m_heroes[IDX(m_selectedSide)]->m_artifactExtra[m_selectedSlot];
+    m_heroes[IDX(m_selectedSide)]->m_artifactExtra[m_selectedSlot] =
         m_heroes[m_targetSide]->m_artifactExtra[m_targetSlot];
     m_heroes[m_targetSide]->m_artifactExtra[m_targetSlot] = extra;
 
-    GiveTakeArtifactStat(m_heroes[m_selectedSide], targetArtifact_2, 0);
+    GiveTakeArtifactStat(m_heroes[IDX(m_selectedSide)], targetArtifact_2, 0);
     GiveTakeArtifactStat(m_heroes[m_targetSide], selectedArtifact, 0);
-    m_heroes[m_selectedSide]->CheckAnduranPieces(1);
+    m_heroes[IDX(m_selectedSide)]->CheckAnduranPieces(1);
     m_heroes[m_targetSide]->CheckAnduranPieces(1);
 
     if (selectedArtifact == ARTIFACT_SPADE_NECROMANCY
@@ -739,12 +739,12 @@ VA(0x004559cb, 0x177)
 void swapManager::SwapMons(void) {
     i32 selectedArmyCount = 0;
     for (i32 slot_1 = 0; slot_1 < ARMY_GROUP_SLOT_COUNT; ++slot_1) {
-        if (m_heroes[m_selectedSide]->m_army.m_creatureTypes[slot_1] != CREATURE_NONE
-            && m_heroes[m_selectedSide]->m_army.m_creatureCounts[slot_1] > 0)
+        if (m_heroes[IDX(m_selectedSide)]->m_army.m_creatureTypes[slot_1] != IDX(CREATURE_NONE)
+            && m_heroes[IDX(m_selectedSide)]->m_army.m_creatureCounts[slot_1] > 0)
             ++selectedArmyCount;
     }
 
-    armyGroup* selectedArmy = &m_heroes[m_selectedSide]->m_army;
+    armyGroup* selectedArmy = &m_heroes[IDX(m_selectedSide)]->m_army;
     armyGroup* targetArmy = &m_heroes[m_targetSide]->m_army;
     if (OD_STEER(selectedArmy->m_creatureTypes[m_selectedSlot])
         == targetArmy->m_creatureTypes[m_targetSlot]) {
@@ -879,7 +879,7 @@ VA(0x00455fbd, 0x388)
 void swapManager::SplitMons(void) {
     i16 unusedAmountControl_29 = SWAP_SPLIT_AMOUNT_CONTROL;
     i32 unusedState = 0;
-    armyGroup* selectedArmy = &m_heroes[m_selectedSide]->m_army;
+    armyGroup* selectedArmy = &m_heroes[IDX(m_selectedSide)]->m_army;
     armyGroup* targetArmy = &m_heroes[m_targetSide]->m_army;
     i32 emptySlot;
     unusedState = 0;
@@ -901,7 +901,7 @@ void swapManager::SplitMons(void) {
             gText,
             "Move how many %s troops from %s to %s?",
             gArmyNames[selectedArmy->m_creatureTypes[m_selectedSlot]],
-            m_heroes[m_selectedSide]->m_name,
+            m_heroes[IDX(m_selectedSide)]->m_name,
             m_heroes[m_targetSide]->m_name
         );
     }
