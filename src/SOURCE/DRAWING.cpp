@@ -58,11 +58,14 @@ void combatManager::CheckUpdateCombatMessages(void)
 }
 
 // @match-note
-// Complete semantics and CFG; frame matches retail at 0x1bc and all 38 relocations
-// align.  After three literal identities, the first code difference is instruction
-// 121: ours loads message and emits cmp [newlinePtr],eax/jbe, while retail loads
-// newlinePtr and emits cmp [message],eax/jae.  Spelling the test as message <
-// newlinePtr produced the same code.  Revisit operand steering in the >=95% phase.
+// Complete semantics and CFG; frame matches retail at 0x1bc and all 38
+// relocations align. After three compiler-local literal identities, the first
+// code difference is instruction 121: ours loads message and emits
+// cmp [newlinePtr],eax/jbe, while retail loads newlinePtr and emits
+// cmp [message],eax/jae. Spelling the test as message < newlinePtr compiled
+// identically; the De Morgan polarity regressed to 99.418500%, and an explicit
+// shared-branch form regressed to 95.872246%. Revisit only after relevant
+// DRAWING source, TU/header, or comparison-state changes.
 VA(0x00402a88, 0x3f8)
 void combatManager::CombatMessage(char *message, int updateScreen, int retainPrevious,
                                   int clear)
