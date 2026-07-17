@@ -84,7 +84,8 @@ void border::Read(void)
 // sections remain 0x181 bytes with 9/9 relocations and matching external calls;
 // explicit-range comparison differs only at +0x78 and +0x7b, where the equivalent
 // signed comparison uses the opposite CMP/branch orientation. Enum tag, include
-// position, and semantic enumerator-name variants did not change these bytes.
+// position, semantic enumerator-name variants, and a retail-shaped negative hit-test
+// rejection did not change these bytes.
 VA(0x004d22f0, 0x181)
 int border::Main(struct tag_message &msg)
 {
