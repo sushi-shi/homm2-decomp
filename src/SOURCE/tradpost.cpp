@@ -17,7 +17,7 @@
 #include <SOURCE/kbwin.h>
 #include <SOURCE/playerData.h>
 #include <SOURCE/tradpost.h>
-#include <_carcass_types.h>
+#include <BASE/message.h>
 
 VA(0x004bf340, 0x165)
 void DoTradingPost(int isMarketplace, float efficiency) {

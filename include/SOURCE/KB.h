@@ -34,8 +34,8 @@ struct tag_tilePoint;
 struct mapEventExtra;
 class town;
 class townManager;
-#include <_types.h>
-#include <_carcass_types.h>
+#include <SOURCE/KB_TYPES.h>
+#include <BASE/message.h>
 
 typedef enum GlobalTimerConstant {
     GLOBAL_TIMER_COUNT = 10,

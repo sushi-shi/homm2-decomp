@@ -28,7 +28,7 @@
 #include <SOURCE/REMOTE.h>
 #include <SOURCE/town.h>
 #include <SOURCE/X_GLOBAL.h>
-#include <_carcass_types.h>
+#include <BASE/message.h>
 #include <stdio.h>
 #include <string.h>
 

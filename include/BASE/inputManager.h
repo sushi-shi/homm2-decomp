@@ -4,7 +4,7 @@
 // 12 methods, 3 own-virtual, 0 static data.
 #include <va.h>
 #include "baseManager.h"
-#include <_carcass_types.h>
+#include <BASE/message.h>
 // forward declarations:
 struct tag_message;
 

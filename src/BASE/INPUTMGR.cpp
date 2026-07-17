@@ -16,7 +16,7 @@
 #include <BASE/inputManager.h>
 #include <BASE/INPUTMGR.h>
 #include <BASE/INPUTMGR_TYPES.h>
-#include <_carcass_types.h>
+#include <BASE/message.h>
 
 DATA(0x0051f980) int iCurSwapPalette = 0;
 DATA(0x0051f984) int bLastMouseOffscreen = 0;
