@@ -87,9 +87,9 @@ DATA(0x005280a8) static i32 s_drawPlayerColor;
 DATA(0x005280cc) static i32 s_adjacentMonsterEndX;
 DATA(0x005280d0) static i32 s_drawAnimationLength;
 DATA(0x005280d8) static i32 s_drawHeroYOffset;
-HOMM2_ENUM_BEGIN(AdvVisitMetadata)
+HOMM2_ENUM_VALUES_BEGIN(AdvVisitMetadata)
     VISIT_BIT_INDEX_MASK = 0x1f
-HOMM2_ENUM_END(AdvVisitMetadata)
+HOMM2_ENUM_VALUES_END(AdvVisitMetadata)
 
 VA(0x00456350, 0x30f)
 advManager::advManager(void) {
@@ -2436,7 +2436,7 @@ void advManager::DrawCell(
                 s_drawCloudFrame = GetCloudLookup(mapX, mapY);
             }
             if (s_drawCloudFrame == 0) {
-                if (drawMask & ADVMGR_DRAW_CLOUD) {
+                if HAS(drawMask, ADVMGR_DRAW_CLOUD) {
                     TileToBitmap(
                         m_cloudTiles,
                         (mapY + mapX) & 3,
@@ -2529,7 +2529,7 @@ void advManager::DrawCell(
                 }
             }
         } else {
-            if (drawMask & ADVMGR_DRAW_GROUND) {
+            if HAS(drawMask, ADVMGR_DRAW_GROUND) {
                 s_drawGroundTile = s_drawCell->m_flags;
                 s_drawGroundTile <<= 14;
                 s_drawGroundTile |= s_drawCell->m_terrainImageIndex;
@@ -2724,7 +2724,7 @@ void advManager::DrawCell(
                 }
             }
 
-            if (drawMask & ADVMGR_DRAW_OBJECT) {
+            if HAS(drawMask, ADVMGR_DRAW_OBJECT) {
                 if (s_drawCell->m_objectIndex != IDX(MAPCELL_SPRITE_NONE)
                     && !s_drawCell->m_objectLayerBit0 && !s_drawCell->m_objectLayerBit1
                     && !s_drawCell->m_objectDrawnAsOverlay
@@ -2830,11 +2830,11 @@ void advManager::DrawCell(
                 }
             }
 
-            if (((drawMask & ADVMGR_DRAW_HERO) || (drawMask & ADVMGR_DRAW_HERO_SHADOW))
+            if ((HAS(drawMask, ADVMGR_DRAW_HERO) || HAS(drawMask, ADVMGR_DRAW_HERO_SHADOW))
                 && gbDrawingPuzzle == 0) {
                 s_drawHasHero = 0;
                 s_drawHero = 0;
-                if (drawMask & ADVMGR_DRAW_HERO) {
+                if HAS(drawMask, ADVMGR_DRAW_HERO) {
                     if (mapX > 0) {
                         s_drawAdjacentCell = GetCell(mapX - 1, mapY);
                         if (s_drawAdjacentCell->m_triggerType
@@ -2953,7 +2953,7 @@ void advManager::DrawCell(
 
                 if (s_drawHasHero) {
                     if (s_drawHeroFrame & ADVMGR_HERO_FRAME_MIRROR_FLAG) {
-                        if (drawMask & ADVMGR_DRAW_HERO_SHADOW) {
+                        if HAS(drawMask, ADVMGR_DRAW_HERO_SHADOW) {
                             if (m_drawHeroShadows != 0 && s_drawHeroType != ADVMGR_HERO_TYPE_BOAT) {
                                 cursorFrame = s_drawHeroFrame & ADVMGR_HERO_FRAME_INDEX_MASK;
                                 if (cursorFrame == 51) {
@@ -3077,9 +3077,9 @@ void advManager::DrawCell(
                             }
                         }
                     } else {
-                        if (drawMask & ADVMGR_DRAW_HERO_SHADOW) {
+                        if HAS(drawMask, ADVMGR_DRAW_HERO_SHADOW) {
                             if (m_drawHeroShadows != 0 && s_drawHeroType != ADVMGR_HERO_TYPE_BOAT
-                                && (drawMask & ADVMGR_DRAW_HERO_SHADOW)) {
+                                && HAS(drawMask, ADVMGR_DRAW_HERO_SHADOW)) {
                                 IconToBitmap(
                                     m_shadowIcon,
                                     gpWindowManager->m_screen,
@@ -3176,9 +3176,9 @@ void advManager::DrawCell(
                 }
 
                 if (m_cursorActive != 0 && (s_drawCell->m_flags & CURSOR_MAP_VISIBLE_FLAG) != 0
-                    && (m_comboHeroDrawn == 0 || (drawMask & ADVMGR_DRAW_HERO_SHADOW))
+                    && (m_comboHeroDrawn == 0 || HAS(drawMask, ADVMGR_DRAW_HERO_SHADOW))
                     && m_mapOriginX + 7 == mapX && m_mapOriginY + 7 == mapY) {
-                    if (drawMask & ADVMGR_DRAW_HERO_SHADOW) {
+                    if HAS(drawMask, ADVMGR_DRAW_HERO_SHADOW) {
                         cursorSuppressed = 1;
                     } else {
                         DrawCursorShadow();
@@ -3188,8 +3188,8 @@ void advManager::DrawCell(
                 }
             }
 
-            if ((drawMask & ADVMGR_DRAW_OVERLAY) || (drawMask & ADVMGR_DRAW_OVERLAY_TOP)) {
-                if ((drawMask & ADVMGR_DRAW_OVERLAY)
+            if (HAS(drawMask, ADVMGR_DRAW_OVERLAY) || HAS(drawMask, ADVMGR_DRAW_OVERLAY_TOP)) {
+                if (HAS(drawMask, ADVMGR_DRAW_OVERLAY)
                     && s_drawCell->m_objectIndex != IDX(MAPCELL_SPRITE_NONE)
                     && s_drawCell->m_objectDrawnAsOverlay
                     && (gbDrawingPuzzle == 0 || bPuzzleDraw[s_drawCell->m_objectTileset])) {
@@ -3282,8 +3282,8 @@ void advManager::DrawCell(
                 }
 
                 if (s_drawCell->m_overlayIndex != IDX(MAPCELL_SPRITE_NONE)
-                    && (((drawMask & ADVMGR_DRAW_OVERLAY) && !s_drawCell->m_drawOverlayOnTop)
-                        || ((drawMask & ADVMGR_DRAW_OVERLAY_TOP) && s_drawCell->m_drawOverlayOnTop))
+                    && ((HAS(drawMask, ADVMGR_DRAW_OVERLAY) && !s_drawCell->m_drawOverlayOnTop)
+                        || (HAS(drawMask, ADVMGR_DRAW_OVERLAY_TOP) && s_drawCell->m_drawOverlayOnTop))
                     && (gbDrawingPuzzle == 0 || bPuzzleDraw[s_drawCell->m_overlayTileset])) {
                     IconToBitmap(
                         m_objectIcons[s_drawCell->m_overlayTileset],
@@ -3328,8 +3328,8 @@ void advManager::DrawCell(
                     s_drawExtra = 0;
                 }
                 while (s_drawExtra != 0) {
-                    if (((drawMask & ADVMGR_DRAW_OVERLAY) && !s_drawExtra->drawOverlayOnTop)
-                        || ((drawMask & ADVMGR_DRAW_OVERLAY_TOP)
+                    if ((HAS(drawMask, ADVMGR_DRAW_OVERLAY) && !s_drawExtra->drawOverlayOnTop)
+                        || (HAS(drawMask, ADVMGR_DRAW_OVERLAY_TOP)
                             && s_drawExtra->drawOverlayOnTop)) {
                         if (gbDrawingPuzzle == 0 || bPuzzleDraw[s_drawExtra->overlayTileset]) {
                             IconToBitmap(
@@ -7092,7 +7092,7 @@ void advManager::CheckLoadSample(i32 index) {
 // All 0x4c1 bytes are identical after masking 39 relocations. Retail delinks
 // 37 switch-table local-label relocations as the containing function.
 VA(0x00466a2f, 0x4c1)
-i32 advManager::GetSoundId(i32 x, i32 y) {
+AdventureEnvironmentSoundId advManager::GetSoundId(i32 x, i32 y) {
     mapCell* currentCell = &m_mapData->Row(y)[x];
     i32 soundId = ADVMGR_ENVIRONMENT_SOUND_NONE;
 
@@ -7224,7 +7224,7 @@ void advManager::InsertSound(i32 x, i32 mapY, i32 distance, i32 soundLayer) {
     i32 soundSlot;
     i32 distanceLimit;
     i32 activeIndex;
-    i32 soundId;
+    AdventureEnvironmentSoundId soundId;
 
     if (x < 0 || mapY < 0 || MAP_WIDTH <= OD_STEER(x) || mapY >= MAP_HEIGHT) {
         return;
@@ -7266,12 +7266,12 @@ void advManager::InsertSound(i32 x, i32 mapY, i32 distance, i32 soundLayer) {
         }
         m_activeSounds[soundSlot].soundId = soundId;
         m_activeSounds[soundSlot].volume = distance;
-        CheckLoadSample(soundId);
-        m_loopingSamples[soundId]->m_playbackData.volume = ADVMGR_ENVIRONMENT_VOLUME(distance);
-        m_loopingSamples[soundId]->m_playbackData.loopCount = 0;
-        m_loopingSamples[soundId]->m_playbackData.channelType =
+        CheckLoadSample(IDX(soundId));
+        m_loopingSamples[IDX(soundId)]->m_playbackData.volume = ADVMGR_ENVIRONMENT_VOLUME(distance);
+        m_loopingSamples[IDX(soundId)]->m_playbackData.loopCount = 0;
+        m_loopingSamples[IDX(soundId)]->m_playbackData.channelType =
             ADVMGR_ENVIRONMENT_SOUND_CHANNEL_TYPE;
-        gpSoundManager->MemorySample(m_loopingSamples[soundId]);
+        gpSoundManager->MemorySample(m_loopingSamples[IDX(soundId)]);
         m_activeSoundMask ^= 1 << m_activeSounds[soundSlot].soundId;
     }
 }
