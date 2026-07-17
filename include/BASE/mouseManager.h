@@ -95,7 +95,7 @@ HOMM2_ENUM_END(MouseCursorType)
 extern i32 iMouseOffset[4];
 extern i8 iMouseSize[MOUSE_CURSOR_COUNT][2];
 extern i8 iHotSpot[MOUSE_CURSOR_COUNT][2];
-extern i32 gbInSetPointer;
+extern b32 gbInSetPointer;
 extern i32 bInNewMouseUpdate;
 extern BITMAP bmpAndMask[MOUSE_CURSOR_COUNT];
 extern HICON hMouseCursor[MOUSE_CURSOR_COUNT];

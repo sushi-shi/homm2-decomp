@@ -85,7 +85,7 @@ VA(0x00496450, 0x14e)
 extern "C" void PollSound(void) {
     if (gbInPollSound)
         return;
-    gbInPollSound = 1;
+    gbInPollSound = true;
     if (KBTickCount() > glTimers[GLOBAL_MOUSE_TIMER_SLOT] && !gbPutzingWithMouseCtr) {
         glTimers[GLOBAL_MOUSE_TIMER_SLOT] = KBTickCount() + 13;
         gpMouseManager->NewUpdate(0);
@@ -110,7 +110,7 @@ extern "C" void PollSound(void) {
             gpSoundManager->PollSound();
         PollRemote();
     }
-    gbInPollSound = 0;
+    gbInPollSound = false;
 }
 
 VA(0x0049659e, 0x20)
@@ -203,7 +203,7 @@ void SetupCDRom(void) {
     if (iCDRomErr == 1) {
         SetPalette(gPalette->m_data, 1);
         gpMouseManager->ShowColorPointer();
-        gbNoSound = 1;
+        gbNoSound = true;
         if (giTCPHostStatus)
             NormalDialog(
                 "Unable to access CD-ROM Drive.  Without a CD-ROM drive and a Heroes 2 Expansion "
@@ -218,11 +218,11 @@ void SetupCDRom(void) {
                 -1,
                 0
             );
-        gbNoCDRom = 1;
+        gbNoCDRom = true;
     } else if (iCDRomErr == 2) {
         SetPalette(gPalette->m_data, 1);
         gpMouseManager->ShowColorPointer();
-        gbNoSound = 1;
+        gbNoSound = true;
         if (giTCPHostStatus)
             NormalDialog(
                 "The Heroes 2 Expansion CD-ROM is not in the drive.  Without a Heroes 2 Expansion "
@@ -238,7 +238,7 @@ void SetupCDRom(void) {
                 -1,
                 0
             );
-        gbNoCDRom = 1;
+        gbNoCDRom = true;
     }
     if (iCDRomErr == 3) {
         EarlyShutdown(
@@ -388,7 +388,7 @@ i32 oldmain(void) {
             gpWindowManager->m_updateFlags = 1;
 
         if (giTCPHostStatus != -1 && gbTCPFirstTime) {
-            gbTCPFirstTime = 0;
+            gbTCPFirstTime = false;
             giNumHumanPlayers = 1;
             iMPBaseType = MULTIPLAYER_BASE_NETWORK;
             iMPNetProtocol = OLD_MAIN_NETWORK_PROTOCOL;
@@ -454,12 +454,12 @@ i32 oldmain(void) {
                 gpInitWin = new heroWindow(0, 0, "stpmain.bin");
                 if (!gpInitWin)
                     MemError();
-                gbInSetupDialog = 1;
+                gbInSetupDialog = true;
                 gpWindowManager->DoDialog(gpInitWin, InitMenuHandler, 0);
                 delete gpInitWin;
                 gpInitWin = 0;
                 command_a = gpWindowManager->m_dialogResult;
-                gbInSetupDialog = 0;
+                gbInSetupDialog = false;
             }
         }
         if (giMenuCommand != -1)
@@ -675,7 +675,7 @@ i32 oldmain(void) {
             }
         }
         ComputeAdvNetControl();
-        gbGameInitialized = 1;
+        gbGameInitialized = true;
         mainScreenLoaded_b = 0;
         gpSoundManager->StopAllSamples(1);
         gpWindowManager->FadeScreen(1, OLD_MAIN_FADE_SPEED, 0);
@@ -743,7 +743,7 @@ i32 oldmain(void) {
                     && gpGame->m_campaignType == OLD_MAIN_ROLAND_CAMPAIGN
                     && gpGame->m_campaignScenarioCompleted[OLD_MAIN_ROLAND_CAMPAIGN]
                                                           [OLD_MAIN_ROLAND_FINAL_SCENARIO])) {
-                gbShowHighScore = 1;
+                gbShowHighScore = true;
                 ShowCongrats(CONGRATS_CAMPAIGN);
                 AddScoreToHighScore(
                     gpGame->m_campaignScore,
@@ -757,14 +757,14 @@ i32 oldmain(void) {
                 for (player_h = 0; player_h < OLD_MAIN_PLAYER_COUNT; player_h++)
                     sprintf(cPlayerNames[player_h], "");
                 gpGame->InitCampaignMap();
-                gbGameOver = 0;
+                gbGameOver = false;
                 bForceCheckTimeEvent = 1;
                 goto initialize_game;
             }
         } else if (xIsPlayingExpansionCampaign) {
             result_i = xCampaign.HandleVictory();
             if (xCampaign.IsCompleted()) {
-                gbShowHighScore = 1;
+                gbShowHighScore = true;
                 ShowCongrats(CONGRATS_EXPANSION_CAMPAIGN);
                 AddScoreToHighScore(
                     xCampaign.Days(),
@@ -778,7 +778,7 @@ i32 oldmain(void) {
                 for (player_h = 0; player_h < OLD_MAIN_PLAYER_COUNT; player_h++)
                     sprintf(cPlayerNames[player_h], "");
                 xCampaign.InitMap();
-                gbGameOver = 0;
+                gbGameOver = false;
                 bForceCheckTimeEvent = 1;
                 goto initialize_game;
             }
@@ -798,9 +798,9 @@ i32 oldmain(void) {
             }
         }
 
-        gbGameOver = 0;
+        gbGameOver = false;
         if (gbShowHighScore) {
-            gbShowHighScore = 0;
+            gbShowHighScore = false;
             if (gpExec->AddManager(gpHighScoreManager, -1))
                 ShutDown("Can't add manager!");
             gpExec->MainLoop();
@@ -836,20 +836,20 @@ i32 InterpretCommandLine(void) {
     i32 len;
     i32 i;
     i32 helpRequested;
-    gbTCPFirstTime = 1;
+    gbTCPFirstTime = true;
     giTCPType = -1;
     giTCPHostStatus = -1;
     giTCPNumPlayers = -1;
     strcpy(gcTCPAddress, "");
     strcpy(gcTCPName, "");
-    gbUseWaveout = 0;
+    gbUseWaveout = false;
     giDebugLevel = 0;
     giShowIntro = 1;
-    gbNoSound = 0;
-    gbCheatMenus = 0;
+    gbNoSound = false;
+    gbCheatMenus = false;
     giScreenScroll = 1;
     giLimitPlayer = 0;
-    gbBlackoutPlayer = 1;
+    gbBlackoutPlayer = true;
     helpRequested = 0;
     strcpy(gMapName, "Chaos.mp2");
     strcpy(gFullMapName, "Chaos");
@@ -864,10 +864,10 @@ i32 InterpretCommandLine(void) {
         if (gcCommandLine[i] == '/' && i + 1 < len) {
             switch (toupper(gcCommandLine[i + 1])) {
                 case 'Z':
-                    gbDoMemCheck = 0;
+                    gbDoMemCheck = false;
                     break;
                 case 'W':
-                    gbUseWaveout = 1;
+                    gbUseWaveout = true;
                     if (i + 2 < len)
                         gbUseWaveout = gcCommandLine[i + 2] - '0';
                     break;
@@ -878,7 +878,7 @@ i32 InterpretCommandLine(void) {
                 case 'N':
                     if (i + 3 < len && toupper(gcCommandLine[i + 2]) == 'W'
                         && toupper(gcCommandLine[i + 3]) == 'C') {
-                        gbCheatMenus = 1;
+                        gbCheatMenus = true;
                     }
                     break;
                 case 'M':
@@ -990,7 +990,7 @@ i32 InterpretCommandLine(void) {
             gbHumanPlayer[i] = 0;
     }
     if (giNumHumanPlayers == COMMAND_LINE_SINGLE_PLAYER)
-        gbBlackoutPlayer = 0;
+        gbBlackoutPlayer = false;
 
     if (giTCPHostStatus != -1) {
         if (giTCPType == -1 || giTCPNumPlayers == -1
@@ -1474,7 +1474,7 @@ i32 GetBuildingBaseResourceValue(i32 race, i32 building, i32 level) {
 VA(0x00499e81, 0x21e)
 i32 WaitHandler(tag_message& msg) {
     i32 result = 0;
-    gbFunctionComplete = 1;
+    gbFunctionComplete = true;
     PollSound();
     if (msg.type == MESSAGE_WIDGET) {
         switch (msg.payload.widget.command) {
@@ -1483,7 +1483,7 @@ i32 WaitHandler(tag_message& msg) {
                     case EVENT_WINDOW_FIRST_BUTTON:
                     case EVENT_WINDOW_SECOND_BUTTON:
                     case EVENT_WINDOW_THIRD_BUTTON:
-                        gbFunctionComplete = 0;
+                        gbFunctionComplete = false;
                         result = 1;
                         break;
                 }
@@ -1786,7 +1786,7 @@ VA(0x0049a52f, 0x192)
 void PlayerDead(i32 player) {
     playerData* rec;
     i32 i;
-    gbRetreatWin = 0;
+    gbRetreatWin = false;
     rec = &gpGame->m_players[player];
     gpGame->m_playerDead[player] = 1;
     ++gpGame->m_deadPlayerCount;
@@ -2304,11 +2304,11 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
     }
 
     if (defeated) {
-        gbGameOver = 1;
+        gbGameOver = true;
         giEndSequence = 0;
     }
     if (winFlag) {
-        gbGameOver = 1;
+        gbGameOver = true;
         giEndSequence = 1;
     }
 
@@ -2316,27 +2316,27 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
         || (survivingHumans == 1 && !gbThisNetHumanPlayer[lastHuman_i])) {
         if (survivingHumans == 1 && gbThisNetHumanPlayer[lastHuman_i]) {
             if (allowNormalVictory) {
-                gbGameOver = 1;
+                gbGameOver = true;
                 giEndSequence = 1;
             }
         } else {
-            gbGameOver = 1;
+            gbGameOver = true;
             giEndSequence = 0;
         }
     }
 
     if (savedRemoteOn && netHumanCount == 0) {
-        gbGameOver = 1;
+        gbGameOver = true;
         giEndSequence = 0;
     }
     if (forcedResult == CHECK_END_GAME_FORCE_VICTORY) {
         winFlag = 1;
-        gbGameOver = 1;
+        gbGameOver = true;
         giEndSequence = 1;
     }
     if (forcedResult == CHECK_END_GAME_FORCE_DEFEAT) {
         defeated = 1;
-        gbGameOver = 1;
+        gbGameOver = true;
         giEndSequence = 0;
     }
 
@@ -2452,11 +2452,11 @@ void InitVars(void) {
     NULL_SAMPLE2.pMem = reinterpret_cast<struct _SAMPLE*>(NULL_SAMPLE2.pSample);
     gGameCommand = -1;
     gPalette = 0;
-    gbCombatSurrender = 0;
+    gbCombatSurrender = false;
     gpGame->m_viewArmyResult = 0;
     strcpy(gpGame->m_mapFilename, "brokena.mp2");
     gpGame->m_newGameInitialized = 0;
-    gbInNewGameSetup = 0;
+    gbInNewGameSetup = false;
     strcpy(cNetBoxLine[0], "");
     strcpy(cNetBoxLine[1], "");
     strcpy(cNetBoxLine[2], "");
@@ -2733,7 +2733,7 @@ i32 AddScoreToHighScore(i32 score, i32 days, i32 scenario, i32 highScoreType, ch
         close(file_a);
     }
 
-    gbShowHighScore = 1;
+    gbShowHighScore = true;
     giHighScoreType = highScoreType;
     giHighScoreRank = HIGH_SCORE_EMPTY;
     giScore = score;
@@ -2777,7 +2777,7 @@ i32 AddScoreToHighScore(i32 score, i32 days, i32 scenario, i32 highScoreType, ch
             write(file_a, &entries_a[entry], sizeof(HighScoreEntry));
         close(file_a);
     } else {
-        gbShowHighScore = 0;
+        gbShowHighScore = false;
     }
     return 0;
 }
@@ -2900,7 +2900,7 @@ void PopNetBox(char* text, i32 netPlayer) {
     inputLength_a = 0;
     savedShowIt_a = bShowIt;
     bShowIt = 1;
-    gbMoveShown = 0;
+    gbMoveShown = false;
     netWindow_j = new heroWindow(0, NET_BOX_WINDOW_Y, "netbox.bin");
     if (netWindow_j == 0)
         MemError();
@@ -2956,14 +2956,14 @@ void PopNetBox(char* text, i32 netPlayer) {
                 remoteData_g = reinterpret_cast<KbRemotePacket*>(GetRemoteData(1));
                 switch (remoteData_g->command) {
                     case NET_BOX_REMOTE_MAP_CHANGE:
-                        gbLeaveNetBoxAlone = 1;
+                        gbLeaveNetBoxAlone = true;
                         if (gpAdvManager->m_active) {
                             bShowIt = savedShowIt_a;
                             gpAdvManager->ProcessIncomingGroupMapChange(remoteData_g->payload.data);
                             bShowIt = 1;
                             redrawAdventure_i = 1;
                         }
-                        gbLeaveNetBoxAlone = 0;
+                        gbLeaveNetBoxAlone = false;
                         updateInput_a = 1;
                         break;
                 }
@@ -3124,9 +3124,9 @@ void PopNetBox(char* text, i32 netPlayer) {
 
     gpInputManager->SetKeyCodeType(1);
     if (redrawAdventure_i && gbMoveShown) {
-        gbDrawWindowBackground = 0;
+        gbDrawWindowBackground = false;
         gpWindowManager->RemoveWindow(netWindow_j);
-        gbDrawWindowBackground = 1;
+        gbDrawWindowBackground = true;
         redrawSavedShowIt_a = bShowIt;
         bShowIt = 1;
         gpAdvManager->RedrawAdvScreen(1, 0);
@@ -3159,7 +3159,7 @@ void ShutDown(char* msg) {
         return;
     LogStr("Shutdown");
     bInShutDown = 1;
-    gbClosingApp = 1;
+    gbClosingApp = true;
     buf[0] = 0;
     gpMouseManager->SetColorMice(0);
     if (msg) {
@@ -3391,7 +3391,7 @@ VA(0x0049ea7c, 0x5d)
 void MemError(void) {
     if (gbInMemError)
         return;
-    gbInMemError = 1;
+    gbInMemError = true;
     LogStr("Out of Memory");
     sprintf(gText, cOutOfMemory, "Out of memory.", 6400);
     ShutDown(gText);
@@ -4180,7 +4180,7 @@ void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, i32
                 RemoteCleanup();
                 sprintf(gText, "You have been eliminated from the game!!!");
                 NormalDialog(gText, PLAYER_EXIT_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
-                gbGameOver = 1;
+                gbGameOver = true;
                 giEndSequence = 0;
                 return;
             }
@@ -4383,7 +4383,7 @@ playerExitHandled:
         sprintf(gText, "You have been eliminated from the game!!!");
         RemoteCleanup();
         NormalDialog(gText, PLAYER_EXIT_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
-        gbGameOver = 1;
+        gbGameOver = true;
         giEndSequence = 0;
         return;
     }
@@ -5331,8 +5331,8 @@ DATA(0x004f95b8) u8 gColorTableDarkBrown[DIM_PALETTE_COLOR_COUNT] = {
 DATA(0x004f96b8) i32 MAP_WIDTH = 72;
 DATA(0x004f96bc) i32 MAP_HEIGHT = 72;
 DATA(0x004f96c0) u8* mapExtra = 0;
-DATA(0x004f96c4) i32 gbClosingApp = 0;
-DATA(0x004f96c8) i32 gbForegroundApp = 0;
+DATA(0x004f96c4) b32 gbClosingApp = false;
+DATA(0x004f96c8) b32 gbForegroundApp = false;
 DATA(0x004f96cc) i32 giMainVideoModeColorDepth = 8;
 DATA(0x004f96d0) i32 giMainVideoModeWidth = 640;
 DATA(0x004f96d4) i32 giMainVideoModeHeight = 480;
@@ -5671,13 +5671,13 @@ DATA(0x004fa548) u8 gColorTableNoCycle[DIM_PALETTE_COLOR_COUNT] = {
 };
 DATA(0x004fa648) font* smallFont = 0;
 DATA(0x004fa64c) font* bigFont = 0;
-DATA(0x004fa650) i32 gbReturnAfterComputeExtent = 0;
-DATA(0x004fa654) i32 gbAllowTextEntryEscape = 1;
+DATA(0x004fa650) b32 gbReturnAfterComputeExtent = false;
+DATA(0x004fa654) b32 gbAllowTextEntryEscape = true;
 DATA(0x004fa658) i32 giCycleType = 0;
 DATA(0x004fa65c) i32 giScreenScroll = 1;
 DATA(0x004fa660) i32 giMenuCommand = -1;
-DATA(0x004fa664) i32 gbSendMouseMoveMessages = 0;
-DATA(0x004fa668) i32 gbColorMice = 1;
+DATA(0x004fa664) b32 gbSendMouseMoveMessages = false;
+DATA(0x004fa668) b32 gbColorMice = true;
 DATA(0x004fa670) u32l gTownEligibleBuildMask[TOWN_ELIGIBLE_BUILD_MASK_COUNT] = {
     TOWN_ELIGIBLE_BUILD_KNIGHT_MASK,
     TOWN_ELIGIBLE_BUILD_BARBARIAN_MASK,
@@ -5688,7 +5688,7 @@ DATA(0x004fa670) u32l gTownEligibleBuildMask[TOWN_ELIGIBLE_BUILD_MASK_COUNT] = {
 };
 DATA(0x004fa688) u8 giMapSizes[KB_MAP_SIZE_COUNT] =
     {IDX(MAP_DIMENSION_SMALL), IDX(MAP_DIMENSION_MEDIUM), IDX(MAP_DIMENSION_LARGE), IDX(MAP_DIMENSION_XLARGE)};
-DATA(0x004fa68c) i32 gbUseEvilInterface = 0;
+DATA(0x004fa68c) b32 gbUseEvilInterface = false;
 DATA(0x004fa690) char* cEvilTranslate[KB_INTERFACE_TYPE_COUNT][KB_INTERFACE_VARIANT_COUNT] = {
     {"advbord.icn", "advborde.icn"},  {"heroextg.icn", "heroexte.icn"},
     {"buybuild.icn", "buybuile.icn"}, {"advbtns.icn", "advebtns.icn"},
@@ -5713,21 +5713,21 @@ DATA(0x004fa690) char* cEvilTranslate[KB_INTERFACE_TYPE_COUNT][KB_INTERFACE_VARI
 DATA(0x004fa7b8) char gcAnimPath[0x160] = "\\HEROES2\\ANIM\\";
 DATA(0x004fa918) char gcGamePath[0x18] = ".\\GAMES\\";
 DATA(0x004fa930) char gcMapPath[0x14] = ".\\MAPS\\";
-DATA(0x004fa944) i32 gbPutzingWithMouseCtr = 0;
-DATA(0x004fa948) i32 gbDontTryRedbook = 0;
-DATA(0x004fa94c) i32 gbDontTryMIDI = 0;
-DATA(0x004fa950) i32 gbDontTryDigital = 0;
+DATA(0x004fa944) b32 gbPutzingWithMouseCtr = false;
+DATA(0x004fa948) b32 gbDontTryRedbook = false;
+DATA(0x004fa94c) b32 gbDontTryMIDI = false;
+DATA(0x004fa950) b32 gbDontTryDigital = false;
 DATA(0x004fa958) float gfCombatSpeedMod[KB_COMBAT_SPEED_COUNT] = {1.0f, 0.7f, 0.35f};
 DATA(0x004fa964) icon* gShingleAnim = 0;
 DATA(0x004fa968) i32 iNextShingleAnim = 0;
 DATA(0x004fa96c) i32 giDialogTimeout = 0;
 DATA(0x004fa970) i32 giNewMonsterCycleFrame = 0;
-DATA(0x004fa974) i32 gbNoCDRom = 0;
-DATA(0x004fa978) i32 gbLeaveNetBoxAlone = 0;
-DATA(0x004fa97c) i32 gbDrawWindowBackground = 1;
-DATA(0x004fa980) i32 gbCheatMenus = 0;
-DATA(0x004fa984) i32 gbUseWaveout = 0;
-DATA(0x004fa988) i32 gbShowAllMaps = 0;
+DATA(0x004fa974) b32 gbNoCDRom = false;
+DATA(0x004fa978) b32 gbLeaveNetBoxAlone = false;
+DATA(0x004fa97c) b32 gbDrawWindowBackground = true;
+DATA(0x004fa980) b32 gbCheatMenus = false;
+DATA(0x004fa984) b32 gbUseWaveout = false;
+DATA(0x004fa988) b32 gbShowAllMaps = false;
 DATA(0x004fa990) char* gCombatFxNames[KB_COMBAT_FX_COUNT] = {
     "",
     "magic01.icn",
@@ -6085,8 +6085,8 @@ DATA(0x004fb750) float gfPhilAIDurationMod[KB_SPELL_MOD_COUNT] =
     {0.0f, 0.4f, 0.65f, 0.8f, 1.0f, 1.16f, 1.3f, 1.43f, 1.54f, 1.64f, 1.74f, 0.0f};
 DATA(0x004fb780) float gfSpellTypeNumMod[KB_QUICK_COMBAT_SPELL_TYPE_COUNT] =
     {1.0f, 0.75f, 0.55f, 0.4f, 0.28f, 0.2f, 0.15f};
-DATA(0x004fb79c) i32 gbDrawSavedCursor = 0;
-DATA(0x004fb7a0) i8 gbArrow[NORMAL_DIRECTION_COUNT][NORMAL_DIRECTION_COUNT] = {
+DATA(0x004fb79c) b32 gbDrawSavedCursor = false;
+DATA(0x004fb7a0) b8 gbArrow[NORMAL_DIRECTION_COUNT][NORMAL_DIRECTION_COUNT] = {
     {8, 0, 0, 0, 8, 16, 16, 16},
     {17, 9, 1, 1, 1, 9, 17, 17},
     {18, 18, 10, 2, 2, 2, 10, 18},
@@ -6155,14 +6155,14 @@ DATA(0x004fbaf8) i8
         {{10, 10, 40, 40}, {20, 20, 30, 30}},
         {{15, 15, 35, 35}, {25, 25, 25, 25}}
 };
-DATA(0x004fbb28) i32 gbLoadingMonoIcon = 0;
+DATA(0x004fbb28) b32 gbLoadingMonoIcon = false;
 DATA(0x004fbb2c) i32 giMonoIconSkip = -1;
 DATA(0x004fbb30) i32 giScrollX = 0;
 DATA(0x004fbb34) i32 giScrollY = 0;
-DATA(0x004fbb38) i32 gbNoBorder = 0;
-DATA(0x004fbb3c) i32 gbEnlargeScreenBlit = 1;
+DATA(0x004fbb38) b32 gbNoBorder = false;
+DATA(0x004fbb3c) b32 gbEnlargeScreenBlit = true;
 DATA(0x004fbb40) i32 giCurExe = 0;
-DATA(0x004fbb44) i32 gbInDialog = 0;
+DATA(0x004fbb44) b32 gbInDialog = false;
 // APP_MENU_UNKNOWN_9C6D and APP_MENU_UNKNOWN_9CAD occur only in this retail
 // table; executable and menu-resource evidence does not identify their actions.
 DATA(0x004fbb48) struct SMenuEnableStatus gsMenuEnableStatus[MENU_ENABLE_STATUS_COUNT] = {
@@ -6237,13 +6237,13 @@ DATA(0x004fbb48) struct SMenuEnableStatus gsMenuEnableStatus[MENU_ENABLE_STATUS_
     {APP_MENU_SAVE, 0, 0, 0},
     {APP_MENU_EXIT, 0, 0, 0}
 };
-DATA(0x004fbd34) i32 gbInSetupDialog = 0;
-DATA(0x004fbd38) i32 gbMinimized = 0;
-DATA(0x004fbd3c) i32 gbHeroMoving = 0;
-DATA(0x004fbd40) i32 gbInSmackMgr = 0;
+DATA(0x004fbd34) b32 gbInSetupDialog = false;
+DATA(0x004fbd38) b32 gbMinimized = false;
+DATA(0x004fbd3c) b32 gbHeroMoving = false;
+DATA(0x004fbd40) b32 gbInSmackMgr = false;
 DATA(0x004fbd44) i32 glBottomRefresh = 0;
-DATA(0x004fbd48) i32 gbBothMachinesWin95 = 0;
-DATA(0x004fbd4c) i32 gbGotFirstHeartbeat = 0;
+DATA(0x004fbd48) b32 gbBothMachinesWin95 = false;
+DATA(0x004fbd4c) b32 gbGotFirstHeartbeat = false;
 DATA(0x004fbd50) void* hmnuDflt = 0;
 DATA(0x004fbd54) void* hmnuCmbt = 0;
 DATA(0x004fbd58) void* hmnuAdv = 0;
@@ -6261,7 +6261,7 @@ DATA(0x004fbd60) char* cMonFilename[IDX(CREATURE_COUNT)] = {
     "lich.icn",     "lich2.icn",    "dragbone.icn", "rogue.icn",    "nomad.icn",    "ghost.icn",
     "genie.icn",    "medusa.icn",   "eelem.icn",    "aelem.icn",    "felem.icn",    "welem.icn"
 };
-DATA(0x004fbe68) i32 gbProcessingCombatAction = 0;
+DATA(0x004fbe68) b32 gbProcessingCombatAction = false;
 DATA(0x004fbe6c) i32 iMPNetProtocol = 0;
 DATA(0x004fbe70) i32 iLastDiffSendTo = -2;
 DATA(0x004fbe78) SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)] = {
@@ -7285,7 +7285,7 @@ DATA(0x004fdf50) struct SElevationOverlay sElevationOverlay[ELEVATION_OVERLAY_CO
 };
 DATA(0x004fe100) i8 captainStats[IDX(FACTION_COUNT)][HERO_PRIMARY_STAT_COUNT] =
     {{1, 1, 1, 1}, {1, 1, 1, 1}, {0, 0, 2, 2}, {0, 0, 2, 2}, {0, 0, 2, 2}, {0, 0, 2, 2}};
-DATA(0x004fe118) i32 gbDrawingPuzzle = 0;
+DATA(0x004fe118) b32 gbDrawingPuzzle = false;
 DATA(0x004fe11c) i32 giWalkingFrom = -1;
 DATA(0x004fe120) i32 giWalkingFrom2 = -1;
 DATA(0x004fe124) i32 giWalkingTo = -1;
@@ -9580,32 +9580,32 @@ DATA(0x004fff10) SWinSetup gWinSetup[KB_WIN_SETUP_COUNT] = {
     {23, 606, "Victory\nConditions"},
     {23, 607, "Loss\nConditions"}
 };
-DATA(0x00500110) i32 gbHeroWindShowing = 0;
-DATA(0x00500114) i32 gbFullCombatScreenDrawn = 1;
-DATA(0x00500118) i32 gbLimitedCombatUpdatePalette = 0;
-DATA(0x0050011c) i32 gbFirstTimeThrough = 0;
-DATA(0x00500120) i32 gbSkipIntro = 0;
-DATA(0x00500124) i32 gbDoMemCheck = 1;
-DATA(0x00500128) i32 gbAllBlack = 0;
-DATA(0x0050012c) i32 gbInCombat = 0;
-DATA(0x00500130) i32 gbDirectConnect = 0;
+DATA(0x00500110) b32 gbHeroWindShowing = false;
+DATA(0x00500114) b32 gbFullCombatScreenDrawn = true;
+DATA(0x00500118) b32 gbLimitedCombatUpdatePalette = false;
+DATA(0x0050011c) b32 gbFirstTimeThrough = false;
+DATA(0x00500120) b32 gbSkipIntro = false;
+DATA(0x00500124) b32 gbDoMemCheck = true;
+DATA(0x00500128) b32 gbAllBlack = false;
+DATA(0x0050012c) b32 gbInCombat = false;
+DATA(0x00500130) b32 gbDirectConnect = false;
 DATA(0x00500134) i32 giForceSwitchMusic = -1;
-DATA(0x00500138) i32 gbComputeExtent = 0;
-DATA(0x0050013c) i32 gbSaveBiggestExtent = 0;
-DATA(0x00500140) i32 gbLimitToExtent = 0;
-DATA(0x00500144) i32 gbCurrArmyDrawn = 1;
+DATA(0x00500138) b32 gbComputeExtent = false;
+DATA(0x0050013c) b32 gbSaveBiggestExtent = false;
+DATA(0x00500140) b32 gbLimitToExtent = false;
+DATA(0x00500144) b32 gbCurrArmyDrawn = true;
 DATA(0x00500148) i32 gAdvDisposeLevel = 0;
-DATA(0x0050014c) i32 gbRemoteOn = 0;
-DATA(0x00500150) i32 gbGameInitialized = 0;
+DATA(0x0050014c) b32 gbRemoteOn = false;
+DATA(0x00500150) b32 gbGameInitialized = false;
 DATA(0x00500154) i32 giHighScoreRank = -1;
 DATA(0x00500158) i32 giHighScoreType = 1;
-DATA(0x0050015c) i32 gbShowHighScore = 0;
-DATA(0x00500160) i32 gbLowMemory = 0;
+DATA(0x0050015c) b32 gbShowHighScore = false;
+DATA(0x00500160) b32 gbLowMemory = false;
 DATA(0x00500164) i32 giHighMemBuffer = 5;
 DATA(0x00500168) void* gLowPage = 0;
-DATA(0x0050016c) i32 gbLowPageGrabbed = 0;
+DATA(0x0050016c) b32 gbLowPageGrabbed = false;
 DATA(0x00500170) i8 xSmackFromNetwork = 0;
-DATA(0x00500174) i32 gbInPollSound = 0;
+DATA(0x00500174) b32 gbInPollSound = false;
 // @data-layout-note Retail's initialized KB contribution is
 // 0xf8c58..0x116f60 (0x1e308); candidate .data is 0x1e309. All 2,719 initialized
 // candidate definitions close: 315 typed source DATA owners plus 2,404 reviewed
@@ -9637,7 +9637,7 @@ DATA(0x00515ca0) u16 IMHotSpots[KB_INIT_MENU_HOTSPOT_COUNT][IDX(INIT_MENU_HOTSPO
 DATA(0x00515cc8) i32 lastIMHoverID = -1;
 DATA(0x00515f78) i32 bInCheckEndGame = 0;
 DATA(0x005165dc) i32 bInShutDown = 0;
-DATA(0x00516810) i32 gbInMemError = 0;
+DATA(0x00516810) b32 gbInMemError = false;
 DATA(0x00516d1c) i32 iShingleAnimFrame = 0;
 // @data-layout-note Retail's loader-zero KB contribution is
 // 0x128598..0x12a1d8 (0x1c40); candidate .bss is 0x1a7c. Its 131 public
@@ -9652,8 +9652,8 @@ DATA(0x00516d1c) i32 iShingleAnimFrame = 0;
 // and file/function-static probes do not recover retail's order. Revisit only
 // with evidence for original common/section topology or referenced private
 // storage; do not add padding definitions solely to close the 0x1c4 size delta.
-DATA(0x00528598) i32 gbHumanPlayer[6];
-DATA(0x005285b0) i32 gbHitEvent;
+DATA(0x00528598) b32 gbHumanPlayer[6];
+DATA(0x005285b0) b32 gbHitEvent;
 DATA(0x005285b4) i32 giMaxExtentX;
 DATA(0x005285b8) i32 giMaxExtentY;
 DATA(0x005285bc) i32 giRandomClouds;
@@ -9661,7 +9661,7 @@ DATA(0x005285c0) char cOverrideDigitalDriver[0x10];
 DATA(0x005285d0) i32 giBottomViewOverrideEndTime;
 DATA(0x005285d8) i8 gArmyEffected[2][20];
 DATA(0x00528600) i32 giBottomViewResource;
-DATA(0x00528604) i32 gbInCampaign;
+DATA(0x00528604) b32 gbInCampaign;
 DATA(0x00528608) i32 giResExtra1;
 DATA(0x0052860c) i32 giResExtra2;
 DATA(0x00528610) i8 puzzlePiecesRemoved[6];
@@ -9678,7 +9678,7 @@ DATA(0x00528648) char gcBotViewText[0x98];
 DATA(0x005286e0) i32 bSpecialHideCursor;
 DATA(0x005286e4) searchArray* gpSearchArray;
 DATA(0x005286e8) i32 giResType1;
-DATA(0x005286ec) i32 gbBlackoutPlayer;
+DATA(0x005286ec) b32 gbBlackoutPlayer;
 DATA(0x005286f0) i32 giResType2;
 DATA(0x005286f8) char cNetBoxLine[4][140];
 DATA(0x00528928) i32 gIndex;
@@ -9691,21 +9691,21 @@ DATA(0x00528940) i32 giCurTempMobility;
 DATA(0x00528944) i32 giOverviewReturnAction;
 DATA(0x00528948) char cOverrideMIDIDriver[0x10];
 DATA(0x00528958) icon* gSystemIcons;
-DATA(0x0052895c) i8 gbCombatSurrender;
+DATA(0x0052895c) b8 gbCombatSurrender;
 DATA(0x00528960) heroWindow* pNormalDialogWindow;
 DATA(0x00528964) i32 giTCPHostStatus;
 DATA(0x00528968) char gMapName[16];
 DATA(0x00528978) i32 giMinExtentX;
 DATA(0x0052897c) i32 giMinExtentY;
 DATA(0x00528980) MultiplayerBaseType iMPBaseType;
-DATA(0x00528984) i32 gbTCPFirstTime;
+DATA(0x00528984) b32 gbTCPFirstTime;
 DATA(0x00528988) i16* pwSizeOfMapExtra;
 DATA(0x0052898c) i32 giHeroScreenSrcIndex;
 DATA(0x00528990) i32 giWeekType;
 DATA(0x00528998) char gText[768];
-DATA(0x00528c98) i32 gbInNewGameSetup;
+DATA(0x00528c98) b32 gbInNewGameSetup;
 DATA(0x00528c9c) class palette* gpBufferPalette;
-DATA(0x00528ca0) i32 gbCampaignSideChoice;
+DATA(0x00528ca0) b32 gbCampaignSideChoice;
 DATA(0x00528ca4) char cNetBoxColor[4];
 DATA(0x00528ca8) i32 giMonthTypeExtra;
 DATA(0x00528cac) i32 iMPExtendedType;
@@ -9722,7 +9722,7 @@ DATA(0x00529020) u32l gTimeMark;
 DATA(0x00529024) char* EXPANSION_AGGREGATE_NAME;
 DATA(0x00529028) char cPlayerNames[6][21];
 DATA(0x005290a8) game* gpGame;
-DATA(0x005290ac) i8 gbRetreatWin;
+DATA(0x005290ac) b8 gbRetreatWin;
 DATA(0x005290b0) i32 giWaitType;
 DATA(0x005290b4) class icon* gCurLoadedSpellIcon;
 DATA(0x005290b8) u8 bSaveMusicPosition[0x3c];
@@ -9732,22 +9732,22 @@ DATA(0x00529110) u8 giSetupGameType;
 DATA(0x00529118) char gLastFilename[GLOBAL_AGGREGATE_PATH_SIZE];
 DATA(0x00529278) i32 giFullySeeded;
 DATA(0x0052927c) icon* gBuyBuildIcons;
-DATA(0x00529280) i32 gbNoSound;
+DATA(0x00529280) b32 gbNoSound;
 DATA(0x00529288) i32 iCombatControlNetPos[COMBAT_CONTROL_SIDE_COUNT];
 DATA(0x00529290) char cExpAggPathName[GLOBAL_AGGREGATE_PATH_SIZE];
-DATA(0x005293f0) i32 gbMoveShown;
+DATA(0x005293f0) b32 gbMoveShown;
 DATA(0x005293f4) void** ppMapExtra;
 DATA(0x005293f8) char gcBottomViewText[92];
 DATA(0x00529454) i32 giThisNetPos;
-DATA(0x00529458) i8 gbSetupGamePosToRealGamePos[8];
+DATA(0x00529458) b8 gbSetupGamePosToRealGamePos[8];
 DATA(0x00529460) char gcRegCDRomPath[0x160];
 DATA(0x005295c0) class heroWindow* heroWin;
 DATA(0x005295c4) i32 giOverviewReturnActionExtra;
 DATA(0x005295c8) i32 giCurGeneral;
 DATA(0x005295cc) i32 giThisGamePos;
 DATA(0x005295d0) i32 giNumHumanPlayers;
-DATA(0x005295d4) i32 gbIconClipOn;
-DATA(0x005295d8) i32 gbRemoteGameOpen;
+DATA(0x005295d4) b32 gbIconClipOn;
+DATA(0x005295d8) b32 gbRemoteGameOpen;
 DATA(0x005295dc) combatManager* gpCombatManager;
 DATA(0x005295e0) i32 giTCPNumPlayers;
 DATA(0x005295e4) executive* gpExec;
@@ -9757,12 +9757,12 @@ DATA(0x005295f0) i32 gGameCommand;
 DATA(0x005295f4) i32 giMonthType;
 DATA(0x005295f8) char* DEFAULT_AGGREGATE_NAME;
 DATA(0x005295fc) i32 gCurSpellEffectFrame;
-DATA(0x00529600) i8 gbThisNetHumanPlayer[8];
+DATA(0x00529600) b8 gbThisNetHumanPlayer[8];
 DATA(0x00529608) char cAggPathName[GLOBAL_AGGREGATE_PATH_SIZE];
 DATA(0x00529768) class highScoreManager* gpHighScoreManager;
-DATA(0x0052976c) i32 gbFunctionComplete;
-DATA(0x00529770) i32 gbIAmGreatest;
-DATA(0x00529774) i32 gbTextEntryEscaped;
+DATA(0x0052976c) b32 gbFunctionComplete;
+DATA(0x00529770) b32 gbIAmGreatest;
+DATA(0x00529774) b32 gbTextEntryEscaped;
 DATA(0x00529778) i32 giTotalHighMem;
 DATA(0x0052977c) i32 gMapX;
 DATA(0x00529780) i32 gMapY;
@@ -9775,13 +9775,13 @@ DATA(0x005298c4) i32 giCurWatchPlayer;
 DATA(0x005298c8) char gcCommandLine[GLOBAL_COMMAND_LINE_SIZE];
 DATA(0x00529908) i32 giBottomViewResourceQty;
 DATA(0x0052990c) soundManager* gpSoundManager;
-DATA(0x00529910) i32 gbThisNetGotAdventureControl;
+DATA(0x00529910) b32 gbThisNetGotAdventureControl;
 DATA(0x00529914) i32 giMapChangeCtr;
 DATA(0x00529918) SMapChange sMapChangeQueue[CURSOR_MAP_CHANGE_QUEUE_COUNT];
-DATA(0x0052a184) i32 gbWaitForRemoteReceive;
+DATA(0x0052a184) b32 gbWaitForRemoteReceive;
 DATA(0x0052a188) u8 bMusicIsLooping[0x3c];
 DATA(0x0052a1c4) townManager* gpTownManager;
 DATA(0x0052a1c8) advManager* gpAdvManager;
-DATA(0x0052a1d0) i8 gbGamePosToNetPos[OLD_MAIN_MATCH_BUFFER_SIZE];
+DATA(0x0052a1d0) b8 gbGamePosToNetPos[OLD_MAIN_MATCH_BUFFER_SIZE];
 
 #undef RETAIL_FILE

@@ -2486,7 +2486,7 @@ void combatManager::VaporizeCreature(i32 side, i32 armyIndex) {
         for (row = 0; row < rowCount; ++row) {
             gyModify[row * VAPORIZE_STRIPE_WIDTH + firstY + topOffset] = VAPORIZE_MASKED;
             gyModify[lastY + (row * -VAPORIZE_STRIPE_WIDTH - bottomOffset)] = VAPORIZE_MASKED;
-            gbLimitToExtent = 1;
+            gbLimitToExtent = true;
             gpCombatManager->DrawFrame(1, 0, 1, 0, 30, 1, 1);
         }
     }
@@ -2615,7 +2615,7 @@ void combatManager::RippleCreature(i32 side, i32 armyIndex, i32 mode) {
                     - (phase - RIPPLE_DEATH_WAVE_FADE_BASE) * extentHeight / RIPPLE_FADE_DIVISOR;
                 memset(gyModify + start, VAPORIZE_MASKED, end - start + 1);
             }
-            gbLimitToExtent = 1;
+            gbLimitToExtent = true;
             gpCombatManager->DrawFrame(1, 0, 1, 0, frameDelay, 1, 1);
         }
     }
@@ -3026,7 +3026,7 @@ mirror_found:
     for (frame = 0; frame < MIRROR_SLIDE_FRAME_COUNT; ++frame) {
         image->m_xOffset = (MIRROR_SLIDE_FRAME_COUNT - frame) * xOffset / MIRROR_SLIDE_FRAME_COUNT;
         image->m_yOffset = (MIRROR_SLIDE_FRAME_COUNT - frame) * yOffset / MIRROR_SLIDE_FRAME_COUNT;
-        gbLimitToExtent = 1;
+        gbLimitToExtent = true;
         gpCombatManager->DrawFrame(0, 0, 0, 0, 0, 1, 0);
         gpWindowManager->UpdateScreenRegion(
             giMinExtentX,
@@ -3034,7 +3034,7 @@ mirror_found:
             giMaxExtentX - giMinExtentX + 1,
             giMaxExtentY - giMinExtentY + 1
         );
-        gbLimitToExtent = 0;
+        gbLimitToExtent = false;
         DelayTil(&deadline);
         deadline = static_cast<i32>(
             KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * MIRROR_SLIDE_FRAME_DELAY
@@ -3199,8 +3199,8 @@ void combatManager::DoBlast(i32 targetHex, i32 spell) {
     deadline_j = 0;
     for (segment_h = 0; segmentCount_f > (segment_h | 0); ++segment_h) {
         ResetLimitCreature();
-        gbComputeExtent = 1;
-        gbSaveBiggestExtent = 1;
+        gbComputeExtent = true;
+        gbSaveBiggestExtent = true;
         currentX_i = OD_STEER(currentX_i) + stepX_a;
         currentY_d = OD_STEER(currentY_d) + stepY_e;
         frame_j = (segment_h * BLAST_FRAME_COUNT - 1) / segmentCount_f;
@@ -3233,8 +3233,8 @@ void combatManager::DoBlast(i32 targetHex, i32 spell) {
             giMaxExtentY - giMinExtentY + 1
         );
     }
-    gbComputeExtent = 0;
-    gbSaveBiggestExtent = 0;
+    gbComputeExtent = false;
+    gbSaveBiggestExtent = false;
     DrawFrame(1, 0, 0, 0, 0, 1, 0);
     gpResourceManager->Dispose(blastIcon_h);
 }

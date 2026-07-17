@@ -68,7 +68,7 @@
 // two referenced retail owners. The 0xb8 rdata group and all 23 BSS owners are
 // also closed. Do not add padding, aliases, synthetic owners, or section pragmas
 // to force physical allocation order.
-DATA(0x004f70e0) i32 gbGameOver = 0;
+DATA(0x004f70e0) b32 gbGameOver = false;
 // PROVEN /Gi artifact: the retail TU was built with MSVC 4.2 incremental
 // compilation, under which __LINE__ is not an immediate - the compiler emits a
 // per-function static i16 __LINE__Var (movsx + add offset at each use) so
@@ -708,7 +708,7 @@ i32 game::SaveGame(char* filename, i32 generateName, i8 expansionFormat) {
 VA(0x00472a7b, 0xb44)
 void game::SetupOrigData(void) {
     ClearMapExtra();
-    gbIAmGreatest = 0;
+    gbIAmGreatest = false;
     m_difficultyRating = 1;
     giMonthType = 0;
     giMonthTypeExtra = 0;
@@ -851,7 +851,7 @@ void game::LoadGame(char* filename, i32 loadFromFile, i32) {
     }
     LogStr("LG2");
     i32 humansLoaded3 = 0;
-    gbGameOver = 0;
+    gbGameOver = false;
     m_gameLoaded = 1;
 
     char path28[452];
@@ -892,7 +892,7 @@ void game::LoadGame(char* filename, i32 loadFromFile, i32) {
         read(file0, &m_campaignType, CAMPAIGN_STATE_RESET_SIZE);
     } else if (gbInCampaign == 2) {
         xIsPlayingExpansionCampaign = 1;
-        gbInCampaign = 0;
+        gbInCampaign = false;
         read(file0, &xCampaign, EXPANSION_CAMPAIGN_SAVE_PREFIX_SIZE);
     }
     if (expansionMarker0)
@@ -1180,7 +1180,7 @@ void game::NewMap(char* filename) {
     else
         gTownEligibleBuildMask[IDX(FACTION_NECROMANCER)] &= ~4;
 
-    gbInNewGameSetup = 1;
+    gbInNewGameSetup = true;
     giCurPlayer = 0;
     gpCurPlayer = &gpGame->m_players[giCurPlayer];
     giCurPlayerBit = static_cast<u8>(1 << giCurPlayer);
@@ -1505,7 +1505,7 @@ void game::NewMap(char* filename) {
         gpGame->m_players[player2].m_minimumHeroCount = gpGame->m_players[player2].m_heroCount;
     }
     gpPhilAI->GetGameAIVars();
-    gbInNewGameSetup = 0;
+    gbInNewGameSetup = false;
     SetupNewRumour();
     gpAdvManager->CheckSetEvilInterface(0, -1);
     return;
@@ -2690,19 +2690,19 @@ void game::ViewArmy(
     iViewArmyFrame = 0;
     iViewArmyType = monsterType;
     iViewArmyNumTroops = numTroops;
-    gbAllowUpgrade = 0;
+    gbAllowUpgrade = false;
 
     if (castle && (gpAdvManager->m_active || gpTownManager->m_active)) {
         for (loopIndex0 = 20; loopIndex0 <= 24; loopIndex0++) {
             if (gDwellingType[static_cast<i8>(castle->m_type)][loopIndex0 - 19] == monsterType
                 && (castle->m_buildings & (1 << (loopIndex0 + 5)))) {
-                gbAllowUpgrade = 1;
+                gbAllowUpgrade = true;
                 iViewArmyUpgradeToType = monsterType + 1;
             }
         }
         if ((monsterType == 35 || monsterType == 36)
             && (castle->m_buildings & IDX(KB_DWELLING_UPGRADE_SIXTH_FLAG))) {
-            gbAllowUpgrade = 1;
+            gbAllowUpgrade = true;
             iViewArmyUpgradeToType = 37;
         }
     }
@@ -2938,8 +2938,8 @@ i32 ViewArmyHandler(tag_message& msg) {
     ResourceType resourceType0;
     i32 resourceCost5;
 
-    gbDismissArmy = 0;
-    gbUpgradeArmy = 0;
+    gbDismissArmy = false;
+    gbUpgradeArmy = false;
     // Retail reserves a second short word before the aligned upgrade-cost locals.
     i16 frameDelay0 = 5;
     i16 frameOffset1;
@@ -2968,7 +2968,7 @@ i32 ViewArmyHandler(tag_message& msg) {
                             0
                         );
                         if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
-                            gbDismissArmy = 1;
+                            gbDismissArmy = true;
                             msg.payload.widget.id = 10;
                             msg.payload.widget.command = msg.payload.widget.id;
                             return 2;
@@ -3010,7 +3010,7 @@ i32 ViewArmyHandler(tag_message& msg) {
                                 gpCurPlayer->m_resources[IDX(RES_GOLD)] -= goldCost6;
                                 if (resourceType0 != -1)
                                     gpCurPlayer->m_resources[IDX(resourceType0)] -= resourceCost5;
-                                gbUpgradeArmy = 1;
+                                gbUpgradeArmy = true;
                                 msg.payload.widget.id = 10;
                                 msg.payload.widget.command = msg.payload.widget.id;
                                 return 2;
@@ -3276,7 +3276,7 @@ void game::NextPlayer(void) {
         ShowComputerScreen();
         bShowIt = 0;
         if (gbRemoteOn && gbHumanPlayer[giCurPlayer]) {
-            gbThisNetGotAdventureControl = 0;
+            gbThisNetGotAdventureControl = false;
             i32 remotePlayer = gbGamePosToNetPos[giCurPlayer];
             if (!gpGame->TransmitSaveGame(remotePlayer, 0, 0))
                 ShutDown(0);
@@ -3286,9 +3286,9 @@ void game::NextPlayer(void) {
     } else {
         SetNoDialogMenus(1);
         gpInputManager->Flush();
-        gbAllBlack = 1;
+        gbAllBlack = true;
         gpAdvManager->CheckSetEvilInterface(1, giCurPlayer);
-        gbAllBlack = 0;
+        gbAllBlack = false;
         if (gbBlackoutPlayer && giNumHumanPlayers > 1) {
             sprintf(gText, "%s's turn.", cPlayerNames[giCurPlayer]);
             WaitForPlayer(gText, giCurPlayer);
@@ -4781,13 +4781,13 @@ void game::ShowComputerScreen(void) {
                 i,
                 WIDGET_FLAG_UPDATE | WIDGET_FLAG_DIMMED
             );
-        gbAllBlack = 1;
+        gbAllBlack = true;
         gpAdvManager->CompleteDraw(1);
         gpAdvManager->UpdateHeroLocators(1, 1);
         gpAdvManager->UpdateTownLocators(1, 1);
         gpAdvManager->UpdBottomView(1, 1, 1);
         gpAdvManager->UpdateScreen(0, 1);
-        gbAllBlack = 0;
+        gbAllBlack = false;
         gbThisNetHumanPlayer[giCurPlayer] = static_cast<i8>(saved);
     }
     ShowHeroesLogo();
@@ -4808,7 +4808,7 @@ VA(0x004813fe, 0x143)
 void game::WaitForPlayer(char* text, i32 player) {
     if (gbBlackoutPlayer && giNumHumanPlayers > 1 && !gbRemoteOn) {
         gpMouseManager->SetPointer(0);
-        gbAllBlack = 1;
+        gbAllBlack = true;
         giBottomViewOverrideEndTime = KBTickCount() + WAIT_BOTTOM_VIEW_TIMEOUT;
         giBottomViewOverride = gbThisNetHumanPlayer[giCurPlayer] != 0;
         gpSoundManager->m_samplesReady = 1;
@@ -4818,7 +4818,7 @@ void game::WaitForPlayer(char* text, i32 player) {
         gpAdvManager->UpdateTownLocators(1, 1);
         gpAdvManager->UpdateScreen(0, 1);
         ShowHeroesLogo();
-        gbAllBlack = 0;
+        gbAllBlack = false;
         NormalDialog(
             text,
             1,
@@ -6859,13 +6859,13 @@ DATA(0x005280f8) SMonFrameInfo sViewArmyMonFrameInfo;
 DATA(0x00528430) i16 giUABaseX;
 DATA(0x00528434) i16 giUABaseY;
 DATA(0x00528438) i32 giEndSequence;
-DATA(0x0052843c) i32 gbDismissArmy;
+DATA(0x0052843c) b32 gbDismissArmy;
 DATA(0x00528440) i8* gbNGHuman;
 DATA(0x00528448) i32 iViewArmyFrame;
-DATA(0x0052844c) i32 gbAllowUpgrade;
+DATA(0x0052844c) b32 gbAllowUpgrade;
 DATA(0x00528450) i32 iViewArmyType;
 DATA(0x00528454) class hero* viewSpellsHero;
-DATA(0x00528458) i32 gbUpgradeArmy;
+DATA(0x00528458) b32 gbUpgradeArmy;
 DATA(0x00528460) i16 RandMineQty[8];
 DATA(0x00528470) char gcCurMapName[16];
 DATA(0x00528480) i8* gbNGDifficulty;

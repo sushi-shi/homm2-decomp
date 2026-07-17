@@ -100,7 +100,7 @@ i16 dpnet_init(void) {
             DPSD(result, RETAIL_FILE, 136);
 
         if (GameMode == IDX(REMOTE_GAME_NETWORK_HOST)) {
-            gbRemoteGameOpen = 1;
+            gbRemoteGameOpen = true;
             giWaitType = DP_WAIT_FIRST_GUEST;
             sprintf(gText, "Waiting On Guest.\n\n  Press 'CANCEL' to abort.");
             NormalDialog(gText, 6, -1, -1, -1, 0, -1, 0, -1, 0);
@@ -115,7 +115,7 @@ i16 dpnet_init(void) {
                 giNumHumanPlayers - 1
             );
             NormalDialog(gText, 5, -1, -1, -1, 0, -1, 0, -1, 0);
-            gbRemoteGameOpen = 0;
+            gbRemoteGameOpen = false;
             startup.playerCount = static_cast<u8>(giNumHumanPlayers);
             memcpy(startup.playerIds, giNetPosToDCOPos, sizeof(giNetPosToDCOPos));
             for (guestIndex = 1; guestIndex < giNumHumanPlayers; guestIndex++) {
@@ -166,7 +166,7 @@ void dpnet_term(void) {
     DATA(0x004efa00) static i16 termSourceLineBase = 219;
     char drainBuffer[DP_TRANSPORT_TERM_DRAIN_READ_SIZE + sizeof(i32)];
 
-    gbRemoteOn = 0;
+    gbRemoteOn = false;
     if (dcoID != 0)
         lpIDC->DestroyPlayer(dcoID);
     lpIDC->Close();

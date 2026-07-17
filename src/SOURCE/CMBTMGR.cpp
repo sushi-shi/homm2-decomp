@@ -259,8 +259,8 @@ void combatManager::InitNonVisualVars(void) {
     m_currentSide = COMBAT_DEFENDER_SIDE;
     m_currentArmySide = COMBAT_DEFENDER_SIDE;
     m_currentSpeed = COMBAT_INITIAL_COMMAND;
-    gbRetreatWin = 0;
-    gbCombatSurrender = 0;
+    gbRetreatWin = false;
+    gbCombatSurrender = false;
     m_sideDefeated[COMBAT_ATTACKER_SIDE] = 0;
     m_sideDefeated[COMBAT_DEFENDER_SIDE] = 0;
     m_limitCreature = 1;
@@ -380,7 +380,7 @@ i32 combatManager::Open(i32 openFlags) {
     if (m_combatPalette->m_data != gpBufferPalette->m_data)
         memmove(m_combatPalette->m_data, gpBufferPalette->m_data, COMBAT_PALETTE_DATA_SIZE);
     gpWindowManager->FadeScreen(0, 8, m_combatPalette);
-    gbLimitedCombatUpdatePalette = 1;
+    gbLimitedCombatUpdatePalette = true;
     WaitEndSample(preBattleSample, -1);
 
     LogStr("Op3");
@@ -401,7 +401,7 @@ i32 combatManager::Open(i32 openFlags) {
 VA(0x00490edf, 0x3d6)
 void combatManager::Close(void) {
     gpSoundManager->SwitchAmbientMusic(-1);
-    gbLimitedCombatUpdatePalette = 0;
+    gbLimitedCombatUpdatePalette = false;
     if (!gbClosingApp) {
         memcpy(gPalette->m_data, m_savedPalette, COMBAT_PALETTE_DATA_SIZE);
         memcpy(gpBufferPalette->m_data, m_savedPalette, COMBAT_PALETTE_DATA_SIZE);

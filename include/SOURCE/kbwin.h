@@ -74,7 +74,7 @@ extern i32 bRestartMusic;
 extern i32 iLastMusic;
 extern i32l lLastGetMessage;
 extern i32l lLastAilServe;
-extern i32 gbNoDialogMenusOn;
+extern b32 gbNoDialogMenusOn;
 extern i32 giTotalMemAllocated;
 extern u8 giChangeThreshold[16];
 extern RECT rcTemp;

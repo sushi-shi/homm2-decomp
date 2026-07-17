@@ -70,7 +70,7 @@ i32 highScoreManager::Main(struct tag_message& message) {
 
     result = 0;
     if (gbShowHighScore != 0)
-        gbShowHighScore = 0;
+        gbShowHighScore = false;
 
     if (glTimers[HIGH_SCORE_TIMER_SLOT] < KBTickCount()) {
         glTimers[HIGH_SCORE_TIMER_SLOT] = KBTickCount() + HIGH_SCORE_ANIMATION_DELAY;

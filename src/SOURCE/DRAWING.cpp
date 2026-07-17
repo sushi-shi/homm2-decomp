@@ -137,7 +137,7 @@ void combatManager::CombatMessage(char* message, i32 updateScreen, i32 retainPre
 
     savedComputeExtent = gbComputeExtent;
     savedLimitToExtent = gbLimitToExtent;
-    gbLimitToExtent = 0;
+    gbLimitToExtent = false;
     gbComputeExtent = gbLimitToExtent;
     m_combatWindow->DrawWindow(0, COMBAT_MESSAGE_DRAW_FIRST_WIDGET, COMBAT_MESSAGE_WIDGET_SECOND);
     SaveCombatBorder();
@@ -282,9 +282,9 @@ void combatManager::UpdateCombatArea(void) {
     if (m_combatWindowOpen == 0)
         return;
 
-    gbEnlargeScreenBlit = 0;
+    gbEnlargeScreenBlit = false;
     gpWindowManager->UpdateScreenRegion(0, 0, COMBAT_SCREEN_WIDTH, COMBAT_AREA_HEIGHT);
-    gbEnlargeScreenBlit = 1;
+    gbEnlargeScreenBlit = true;
 }
 
 VA(0x0040340e, 0x213)
@@ -748,8 +748,8 @@ void combatManager::UpdateMouseGrid(i32 hexIndex, i32 forceUpdate) {
     if (giMaxExtentY > COMBAT_MAX_EXTENT_Y)
         giMaxExtentY = COMBAT_MAX_EXTENT_Y;
 
-    gbLimitToExtent = 1;
-    gbComputeExtent = 1;
+    gbLimitToExtent = true;
+    gbComputeExtent = true;
     m_backgroundBuffer->CopyTo(
         gpWindowManager->m_screen,
         giMinExtentX,
@@ -835,17 +835,17 @@ void combatManager::DrawFrame(
             for (armyIndex2 = 0; armyIndex2 < COMBAT_ARMY_SLOT_COUNT_DRAWING; armyIndex2++) {
                 if (m_limitCreatureCount[side5][armyIndex2] > 0) {
                     extentChanged1 = 1;
-                    gbComputeExtent = 1;
-                    gbSaveBiggestExtent = 1;
-                    gbReturnAfterComputeExtent = 1;
+                    gbComputeExtent = true;
+                    gbSaveBiggestExtent = true;
+                    gbReturnAfterComputeExtent = true;
                     m_armies[side5][armyIndex2].DrawToBuffer(
                         m_hexCells[m_armies[side5][armyIndex2].m_hex].m_x,
                         m_hexCells[m_armies[side5][armyIndex2].m_hex].m_y,
                         0
                     );
-                    gbReturnAfterComputeExtent = 0;
-                    gbComputeExtent = 0;
-                    gbSaveBiggestExtent = 0;
+                    gbReturnAfterComputeExtent = false;
+                    gbComputeExtent = false;
+                    gbSaveBiggestExtent = false;
                 }
             }
         }
@@ -853,9 +853,9 @@ void combatManager::DrawFrame(
         for (side5 = 0; side5 < COMBAT_SIDE_COUNT_DRAWING; side5++) {
             if (m_drawHero[side5] != 0) {
                 extentChanged1 = 1;
-                gbComputeExtent = 1;
-                gbSaveBiggestExtent = 1;
-                gbReturnAfterComputeExtent = 1;
+                gbComputeExtent = true;
+                gbSaveBiggestExtent = true;
+                gbReturnAfterComputeExtent = true;
                 m_heroIcons[side5]->CombatClipDrawToBuffer(
                     side5 == 0 ? COMBAT_HERO_LEFT_X : COMBAT_HERO_RIGHT_X,
                     side5 == 0 ? COMBAT_HERO_LEFT_Y : COMBAT_HERO_RIGHT_Y,
@@ -867,16 +867,16 @@ void combatManager::DrawFrame(
                     0,
                     0
                 );
-                gbReturnAfterComputeExtent = 0;
-                gbComputeExtent = 0;
-                gbSaveBiggestExtent = 0;
+                gbReturnAfterComputeExtent = false;
+                gbComputeExtent = false;
+                gbSaveBiggestExtent = false;
             }
 
             if (m_drawHeroOverlay[side5] != 0) {
                 extentChanged1 = 1;
-                gbComputeExtent = 1;
-                gbSaveBiggestExtent = 1;
-                gbReturnAfterComputeExtent = 1;
+                gbComputeExtent = true;
+                gbSaveBiggestExtent = true;
+                gbReturnAfterComputeExtent = true;
                 m_heroOverlayIcons[side5]->CombatClipDrawToBuffer(
                     side5 == 0 ? COMBAT_HERO_LEFT_X
                                : ((m_heroes[side5]->m_isCaptain ? -1 : 0)
@@ -893,9 +893,9 @@ void combatManager::DrawFrame(
                     0,
                     0
                 );
-                gbReturnAfterComputeExtent = 0;
-                gbComputeExtent = 0;
-                gbSaveBiggestExtent = 0;
+                gbReturnAfterComputeExtent = false;
+                gbComputeExtent = false;
+                gbSaveBiggestExtent = false;
             }
         }
 
@@ -947,8 +947,8 @@ void combatManager::DrawFrame(
     }
 
     if (computeExtent != 0) {
-        gbLimitToExtent = 1;
-        gbComputeExtent = 1;
+        gbLimitToExtent = true;
+        gbComputeExtent = true;
     }
 
     for (row = 0; row < COMBAT_DRAW_LAYER_COUNT; row++) {
@@ -1259,29 +1259,29 @@ void combatManager::DrawFrame(
     PollSound();
     if (computeExtent != 0 || redrawExtent != 0) {
         redrawExtent = 0;
-        gbLimitToExtent = 0;
-        gbComputeExtent = 0;
+        gbLimitToExtent = false;
+        gbComputeExtent = false;
         if (waitForTimer != 0)
             DelayTil(glTimers);
         glTimers[0] =
             static_cast<i32>(KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * delay);
-        gbFullCombatScreenDrawn = 0;
+        gbFullCombatScreenDrawn = false;
         if (updateScreen == 1) {
             if (giMaxExtentY > COMBAT_MAX_EXTENT_Y)
                 giMaxExtentY = COMBAT_MAX_EXTENT_Y;
-            gbEnlargeScreenBlit = 0;
+            gbEnlargeScreenBlit = false;
             gpWindowManager->UpdateScreenRegion(
                 giMinExtentX,
                 giMinExtentY,
                 giMaxExtentX - giMinExtentX + 1,
                 giMaxExtentY - giMinExtentY + 1
             );
-            gbEnlargeScreenBlit = 1;
+            gbEnlargeScreenBlit = true;
         }
     } else if (updateScreen == 1) {
         if (waitForTimer != 0)
             DelayTil(glTimers);
-        gbFullCombatScreenDrawn = 1;
+        gbFullCombatScreenDrawn = true;
         glTimers[0] =
             static_cast<i32>(KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * delay);
         UpdateCombatArea();
@@ -1362,14 +1362,14 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
     if (gbInDrawSmallView != 0)
         return;
 
-    gbInDrawSmallView = 1;
+    gbInDrawSmallView = true;
     if (m_smallViewSide[viewIndex] == -1
         || (m_smallViewLastX[viewIndex] == COMBAT_SMALL_VIEW_LEFT_X
             && m_smallViewSide[viewIndex] == 1)
         || (m_smallViewLastX[viewIndex] == COMBAT_SMALL_VIEW_RIGHT_X
             && m_smallViewSide[viewIndex] == 0)) {
         if (m_smallViewLastX[viewIndex] >= 0) {
-            gbLimitToExtent = 1;
+            gbLimitToExtent = true;
             giMinExtentX = m_smallViewLastX[viewIndex];
             giMinExtentY = m_smallViewLastY[viewIndex];
             giMaxExtentX = m_smallViewWidth[viewIndex] + m_smallViewLastX[viewIndex] - 1;
@@ -1381,11 +1381,11 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                 giMaxExtentX - giMinExtentX + 1,
                 giMaxExtentY - giMinExtentY + 1
             );
-            gbLimitToExtent = 0;
+            gbLimitToExtent = false;
             m_smallViewLastX[viewIndex] = -1;
         }
         if (m_smallViewSide[viewIndex] == -1) {
-            gbInDrawSmallView = 0;
+            gbInDrawSmallView = false;
             return;
         }
     }
@@ -1422,7 +1422,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
     m_smallViewLastY[viewIndex] = viewY2;
     savedLimitToExtent9 = gbLimitToExtent;
     if (updateScreen != 0)
-        gbLimitToExtent = 0;
+        gbLimitToExtent = false;
 
     viewArmy1 = &m_armies[m_smallViewSide[viewIndex]][m_smallViewArmyIndex[viewIndex]];
     drawn6 = m_combatIcons[IDX(COMBAT_ICON_SMALL_VIEW_BACKGROUND)]->CombatClipDrawToBuffer(
@@ -1683,7 +1683,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
             m_smallViewWidth[viewIndex],
             m_smallViewHeight[viewIndex]
         );
-    gbInDrawSmallView = 0;
+    gbInDrawSmallView = false;
 }
 
 // @data-layout-note Retail initialized storage is 0xed22c+0x80. Candidate
@@ -1694,4 +1694,4 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
 // uses addend zero. The sole uncovered extent is one terminal zero alignment
 // byte at +0x7f; do not model it as invented storage.
 DATA(0x004ed25c) i32 bGridWasShowing = 0;
-DATA(0x004ed290) i32 gbInDrawSmallView = 0;
+DATA(0x004ed290) b32 gbInDrawSmallView = false;

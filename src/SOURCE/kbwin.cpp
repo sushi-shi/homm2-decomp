@@ -280,7 +280,7 @@ LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPAR
                 }
             }
         case WM_DESTROY:
-            gbClosingApp = 1;
+            gbClosingApp = true;
             PostQuitMessage(0);
         case WM_QUIT:
             ShutDown(0);
@@ -567,7 +567,7 @@ DATA(0x004ef590) i32 bRestartMusic = 0;
 DATA(0x004ef594) i32 iLastMusic = -1;
 DATA(0x004ef5b8) i32l lLastGetMessage = 0;
 DATA(0x004ef5bc) i32l lLastAilServe = 0;
-DATA(0x004ef5dc) i32 gbNoDialogMenusOn = 0;
+DATA(0x004ef5dc) b32 gbNoDialogMenusOn = false;
 DATA(0x00524c08) HINSTANCE hInstApp;
 DATA(0x00524c10) RECT rcTemp;
 DATA(0x00524c20) i32 iMainWinScreenHeight;

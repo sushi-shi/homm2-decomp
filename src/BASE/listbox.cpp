@@ -78,7 +78,7 @@ listBoxWidget::~listBoxWidget() {
         LISTBOX_DESTRUCTOR_SOURCE_FILES + LISTBOX_DESTRUCTOR_LIST_SOURCE_FILE_OFFSET,
         27
     );
-    gbSendMouseMoveMessages = 0;
+    gbSendMouseMoveMessages = false;
 }
 
 VA(0x004db160, 0x26e)
@@ -501,7 +501,7 @@ i32 listBoxWidget::ProcessMouseMessage(tag_message& message) {
                 if (m_itemCount <= clickedIndex)
                     goto done;
                 m_itemSelectionTracking = 1;
-                gbSendMouseMoveMessages = 1;
+                gbSendMouseMoveMessages = true;
                 if (m_selectedIndex == clickedIndex)
                     goto done;
                 m_selectedIndex = clickedIndex;
@@ -516,7 +516,7 @@ i32 listBoxWidget::ProcessMouseMessage(tag_message& message) {
             } else {
                 if (m_scrollThumbY <= mouseY && mouseY < m_scrollThumbY + m_scrollThumbHeight) {
                     m_scrollThumbDragging = 1;
-                    gbSendMouseMoveMessages = 1;
+                    gbSendMouseMoveMessages = true;
                 }
                 m_topIndex = (mouseY - m_scrollThumbHeight / 2 - m_scrollTrackY - 4)
                              * (m_scrollRange + 1) / m_scrollThumbTravel;
@@ -527,7 +527,7 @@ i32 listBoxWidget::ProcessMouseMessage(tag_message& message) {
             }
             goto redraw;
         case MESSAGE_LEFT_BUTTON_UP:
-            gbSendMouseMoveMessages = 0;
+            gbSendMouseMoveMessages = false;
             if (m_scrollUpPressed || m_scrollDownPressed || m_scrollThumbDragging) {
                 m_scrollThumbDragging = 0;
                 m_scrollDownPressed = 0;

@@ -954,7 +954,7 @@ public:
 SIZE(combatManager, 0xf877);
 // ---- globals (declarations, RVA order) ----
 extern i32 bGridWasShowing;
-extern i32 gbInDrawSmallView;
+extern b32 gbInDrawSmallView;
 extern i32 iViewGeneralWhichSide;
 extern i32 castX;
 extern i32 castY;
@@ -968,14 +968,14 @@ extern float gfCancelDurationMods[11];
 extern i32 bInHighMoraleBonus;
 extern i32 giSeed;
 extern u8 wallHex[4];
-extern i32 gbThisNetHasControl;
+extern b32 gbThisNetHasControl;
 extern i32 iCurTransferArtifact;
 extern i8 iTransferArtifactsInfo[16];
-extern i32 gbWhichAnimationPlaying;
+extern b32 gbWhichAnimationPlaying;
 extern i32 iMaxTransferArtifacts;
 extern i32 giNextActionExtra;
 extern i32 bSkeletonsShown;
-extern i32 gbShowingLoseWindow;
+extern b32 gbShowingLoseWindow;
 extern i32 giWinCmbtFrame;
 extern i32 giNextActionGridIndex;
 extern i32 giSurrenderCost;

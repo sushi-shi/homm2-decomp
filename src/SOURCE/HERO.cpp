@@ -1472,7 +1472,7 @@ i32 HeroView(i32 heroId, i32 noDismiss, i32 fadeAlreadyOut) {
     iOrigHeroViewID = heroId;
     gpAdvManager->TrimLoopingSounds(HERO_UI_LOOPING_SOUND_KEEP_COUNT);
     gpHVHero = gpGame->GetHero(heroId);
-    gbHeroWindShowing = 1;
+    gbHeroWindShowing = true;
     if (fadeAlreadyOut == 0)
         gpWindowManager->FadeScreen(HERO_UI_FADE_OUT, HERO_UI_FADE_STEPS, 0);
 
@@ -1502,7 +1502,7 @@ i32 HeroView(i32 heroId, i32 noDismiss, i32 fadeAlreadyOut) {
         return HERO_UI_VIEW_DISMISSED;
     } else {
         gpHVHero->m_mobility = gpHVHero->CalcMobility();
-        gbHeroWindShowing = 0;
+        gbHeroWindShowing = false;
         gpHVHero = 0;
         return HERO_UI_VIEW_CLOSED;
     }
@@ -2055,4 +2055,4 @@ DATA(0x004f6c8c) class heroWindow* gheroWin = 0;
 DATA(0x004f6cd0) i16 gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT] =
     {0, 1000, 2000, 3200, 4500, 6000, 7700, 9000, 11000, 13200, 15500, 18500};
 DATA(0x005280dc) i32 iOrigHeroViewID;
-DATA(0x005280e0) i32 gbNoDismiss;
+DATA(0x005280e0) b32 gbNoDismiss;

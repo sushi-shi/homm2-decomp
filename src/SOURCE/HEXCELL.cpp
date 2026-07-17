@@ -71,7 +71,7 @@ void hexcell::DrawOccupant(i32 creature, i32 frame) {
         }
         if (gbLimitToExtent && m_occupantSide == gpCombatManager->m_currentArmySide
             && m_occupantIndex == gpCombatManager->m_currentArmyIndex)
-            gbCurrArmyDrawn = 1;
+            gbCurrArmyDrawn = true;
         if (gpCombatManager->m_armies[m_occupantSide][m_occupantIndex].m_facing != m_occupantFrame)
             gpCombatManager->m_armies[m_occupantSide][m_occupantIndex]
                 .DrawToBuffer(m_x, m_y, frame);

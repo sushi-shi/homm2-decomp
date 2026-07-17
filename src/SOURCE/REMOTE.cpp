@@ -36,11 +36,11 @@ DATA(0x00516f64) i32 iCurLastID = 0;
 DATA(0x00516f68) i32 giLastConfirm = -1;
 DATA(0x00516f6c) u8 GameMode = 0;
 DATA(0x00516f70) i32l lLastHeartbeatSend = 0;
-DATA(0x00516f74) i32 gbInRemoteMain = 0;
-DATA(0x00516f78) i32 gbInRemoteCleanup = 0;
+DATA(0x00516f74) b32 gbInRemoteMain = false;
+DATA(0x00516f78) b32 gbInRemoteCleanup = false;
 DATA(0x00516f7c) i32 iIDCtr = 0;
 DATA(0x00516f80) i32 iTimesDropped = 0;
-DATA(0x00516f84) i8 gbInNetSetup = 0;
+DATA(0x00516f84) b8 gbInNetSetup = false;
 DATA(0x00516f88) i32 bUseDirectPlay = 0;
 DATA(0x00516f8c) i32 bUseWinsock = 0;
 DATA(0x00516f90) i8 bInTimeoutFail = 0;
@@ -85,7 +85,7 @@ void RemoteCleanup(void) {
         } else {
             if (gbInRemoteCleanup != 0) {
             } else {
-                gbInRemoteCleanup = 1;
+                gbInRemoteCleanup = true;
                 LogStr("RC3");
                 switch (GameMode) {
                     case IDX(REMOTE_GAME_NETWORK_HOST):
@@ -97,14 +97,14 @@ void RemoteCleanup(void) {
                         UnloadRemoteDriver(0);
                         break;
                 }
-                gbRemoteOn = 0;
+                gbRemoteOn = false;
                 xNetHasOldPlayers = 0;
                 iInOrderCtr = 0;
                 iCurLastID = 0;
                 giLastConfirm = -1;
                 GameMode = 0;
                 lLastHeartbeatSend = 0;
-                gbInRemoteMain = 0;
+                gbInRemoteMain = false;
                 iIDCtr = 0;
                 iTimesDropped = 0;
                 bUseDirectPlay = 0;
@@ -115,8 +115,8 @@ void RemoteCleanup(void) {
                 bInTimeoutFail = 0;
                 iMPNetProtocol = 0;
                 iLastDiffSendTo = -2;
-                gbGotFirstHeartbeat = 0;
-                gbInRemoteCleanup = 0;
+                gbGotFirstHeartbeat = false;
+                gbInRemoteCleanup = false;
             }
         }
     }
@@ -143,7 +143,7 @@ void RemoteMain(i32 gameMode) {
     char* remoteGameType;
     i32 setupCounter;
 
-    gbInRemoteMain = 1;
+    gbInRemoteMain = true;
     bGotGameType = 0;
     LogStr("In Remote Main");
     LogStr("RM 1");
@@ -152,14 +152,14 @@ void RemoteMain(i32 gameMode) {
         sprintf(gsNetPlayerInfo[player].name, "Player %d", player + 1);
     }
     LogStr("RM 2");
-    gbRemoteGameOpen = 1;
+    gbRemoteGameOpen = true;
     if (bLastMouseOffscreen != 0)
         savedColorMice = bLastOnscreenMouseColor;
     else
         savedColorMice = gbColorMice;
     gpMouseManager->SetColorMice(0);
     LogStr("RM 3");
-    gbInNetSetup = 1;
+    gbInNetSetup = true;
     if (iMPNetProtocol == REMOTE_PROTOCOL_DIRECT_PLAY)
         bUseDirectPlay = 1;
     else if (iMPNetProtocol == REMOTE_PROTOCOL_WINSOCK)
@@ -214,26 +214,26 @@ void RemoteMain(i32 gameMode) {
             if (bUseDirectPlay == 0) {
                 if (bUseWinsock == 0) {
                     nbnet_init();
-                    gbRemoteOn = 1;
+                    gbRemoteOn = true;
                 } else {
                     wsnet_init();
-                    gbRemoteOn = 1;
+                    gbRemoteOn = true;
                 }
             } else {
-                gbRemoteOn = 1;
+                gbRemoteOn = true;
                 dpnet_init();
             }
             break;
         case IDX(REMOTE_GAME_MODEM_HOST):
             LogStr("MH1");
-            gbRemoteOn = 1;
+            gbRemoteOn = true;
             gsNetPlayerInfo[0] = gsThisNetPlayerInfo;
             giThisNetPos = 0;
             ModemSetup(gameMode);
             LogStr("MH2");
             break;
         case IDX(REMOTE_GAME_MODEM_GUEST):
-            gbRemoteOn = 1;
+            gbRemoteOn = true;
             giThisNetPos = 1;
             ModemSetup(gameMode);
             break;
@@ -241,7 +241,7 @@ void RemoteMain(i32 gameMode) {
     if (bUseDirectPlay == 0 && bUseWinsock == 0)
         giNumHumanPlayers = 2;
     iIDCtr = (giThisNetPos + 1) * 100000000;
-    gbInNetSetup = 0;
+    gbInNetSetup = false;
     gpMouseManager->SetColorMice(savedColorMice);
 
     if (bUseDirectPlay == 0 && bUseWinsock == 0) {
@@ -326,7 +326,7 @@ void RemoteMain(i32 gameMode) {
         }
     }
     LogStr("Out Remote Main");
-    gbInRemoteMain = 0;
+    gbInRemoteMain = false;
 }
 
 VA(0x004a38e2, 0x85)
@@ -701,7 +701,7 @@ void PollRemote(void) {
                         && lLastHeartbeatReceive[queueIndex] + REMOTE_HOST_TIMEOUT < KBTickCount()
                         && bInTimeoutFail == 0) {
                         bInTimeoutFail = 1;
-                        gbInPollSound = 0;
+                        gbInPollSound = false;
                         sprintf(
                             gText,
                             "%s's computer is not responding.  Do you wish to keep waiting for a "
@@ -729,7 +729,7 @@ void PollRemote(void) {
                     timeout += REMOTE_CHAIN_GUEST_TIMEOUT_INCREMENT;
                 if (lLastHeartbeatReceive[0] + timeout < KBTickCount() && bInTimeoutFail == 0) {
                     bInTimeoutFail = 1;
-                    gbInPollSound = 0;
+                    gbInPollSound = false;
                     if (giThisNetPos == 1) {
                         sprintf(
                             gText,

@@ -544,7 +544,7 @@ void soundManager::Close(void) {
     LogStr("SD4");
 soundClosed:
     m_active = false;
-    gbNoSound = 1;
+    gbNoSound = true;
 }
 
 VA(0x004cca50, 0x1a)

@@ -94,7 +94,7 @@ extern i32l Orientation;
 extern void* lpInitWin;
 extern i32 bPaletteInitialized;
 extern i32 giTtlBlts;
-extern i32 gbWinGraphBusy;
+extern b32 gbWinGraphBusy;
 extern DirectDrawCreateProc lpDirectDrawCreate;
 extern struct _PALETTE LogicalPalette;
 extern struct _IMAGE screenImage;
