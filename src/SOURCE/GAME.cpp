@@ -1424,7 +1424,7 @@ void game::NewMap(char* filename) {
     }
     m_ultimateArtifactX = static_cast<i8>(player2);
     m_ultimateArtifactY = static_cast<i8>(townIndex9);
-    m_ultimateArtifactId = static_cast<i8>(Random(ARTIFACT_ULTIMATE_BOOK, ARTIFACT_GOLDEN_GOOSE));
+    m_ultimateArtifactId = static_cast<i8>(Random(IDX(ARTIFACT_ULTIMATE_BOOK), ARTIFACT_GOLDEN_GOOSE));
     if (gbInCampaign
         && ((m_campaignType == 0 && static_cast<i8>(m_campaignScenario) + 1 == 8)
             || (m_campaignType == 1 && static_cast<i8>(m_campaignScenario) + 1 == 9)))
@@ -2542,7 +2542,7 @@ i32 ViewSpellsHandler(tag_message& msg) {
                                 gpGame->m_viewSpellsTop[gpGame->m_viewSpellsType]
                                     + (msg.payload.widget.id - 100) + 1
                             );
-                            NormalDialog(gSpellDesc[IDX(spell)], 4, -1, -1, 8, spell, -1, 0, -1, 0);
+                            NormalDialog(gSpellDesc[IDX(spell)], 4, -1, -1, 8, IDX(spell), -1, 0, -1, 0);
                             break;
                         case 2:
                             NormalDialog(cSpellHelp[0], 4, -1, -1, -1, 0, -1, 0, -1, 0);
@@ -2584,7 +2584,7 @@ i32 ViewSpellsHandler(tag_message& msg) {
                                     + (msg.payload.widget.id - 100) + 1
                             );
                             if (gpGame->m_viewSpellsReadOnly) {
-                                NormalDialog(gSpellDesc[IDX(spell)], 1, -1, -1, 8, spell, -1, 0, -1, 0);
+                                NormalDialog(gSpellDesc[IDX(spell)], 1, -1, -1, 8, IDX(spell), -1, 0, -1, 0);
                                 return 1;
                             }
                             if (GetManaCost(spell, viewSpellsHero)
@@ -3001,7 +3001,7 @@ i32 ViewArmyHandler(tag_message& msg) {
                                 -1,
                                 6,
                                 goldCost6,
-                                resourceType0,
+                                IDX(resourceType0),
                                 resourceCost5,
                                 -1,
                                 0
@@ -3023,7 +3023,7 @@ i32 ViewArmyHandler(tag_message& msg) {
                                 -1,
                                 6,
                                 goldCost6,
-                                resourceType0,
+                                IDX(resourceType0),
                                 resourceCost5,
                                 -1,
                                 0
@@ -5126,9 +5126,9 @@ void game::SetupTowns(void) {
                 } else {
                     attempts = 0;
                     do {
-                        spell = Random(SPELL_FIREBALL, SPELL_SET_WATER_GUARDIAN);
+                        spell = Random(IDX(SPELL_FIREBALL), SPELL_SET_WATER_GUARDIAN);
                         while (gsSpellInfo[IDX(spell)].level - 1 != spellLevel)
-                            spell = Random(SPELL_FIREBALL, SPELL_SET_WATER_GUARDIAN);
+                            spell = Random(IDX(SPELL_FIREBALL), SPELL_SET_WATER_GUARDIAN);
                         if (castle->m_owner != -1 && !gbHumanPlayer[castle->m_owner])
                             spellValue = (gsSpellInfo[IDX(spell)].attributes & 1 ? 4 : 1)
                                              * gsSpellInfo[IDX(spell)].aiValue

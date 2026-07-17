@@ -1325,7 +1325,7 @@ void GetBuildingCost(FactionType race, BuildingSlotType building, i32* const des
     } else if (building == BUILDING_SLOT_SPECIAL) {
         memcpy(dest, gSpecialBuildingCosts[IDX(race)], KB_BUILDING_RESOURCE_COUNT * sizeof(i32));
     } else {
-        if (building >= IDX(KB_BUILDING_NEUTRAL_LIMIT))
+        if (IDX(building) >= KB_BUILDING_NEUTRAL_LIMIT)
             return;
         memcpy(dest, gNeutralBuildingCosts[IDX(building)], KB_BUILDING_RESOURCE_COUNT * sizeof(i32));
     }
@@ -1384,7 +1384,7 @@ i32 CanBuild(town* t, BuildingSlotType building) {
     i32 haveMask;
     if (BitTest(gpGame->m_knownTowns, t->m_id))
         return 0;
-    if (building != IDX(BUILDING_SLOT_CASTLE) && !(t->m_buildings & IDX(TOWN_BUILDING_CASTLE)))
+    if (building != BUILDING_SLOT_CASTLE && !(t->m_buildings & IDX(TOWN_BUILDING_CASTLE)))
         return 0;
     if (!xIsExpansionMap && building == BUILDING_SLOT_NECROMANCER_SHRINE
         && t->m_type == IDX(FACTION_NECROMANCER))
@@ -1890,7 +1890,7 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
                         1,
                         -1,
                         -1,
-                        CHECK_END_GAME_PLAYER_DIALOG_ICON,
+                        IDX(CHECK_END_GAME_PLAYER_DIALOG_ICON),
                         gpGame->GetPlayerColor(static_cast<i8>(player)),
                         -1,
                         -1,
@@ -1912,7 +1912,7 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
                             1,
                             -1,
                             -1,
-                            CHECK_END_GAME_PLAYER_DIALOG_ICON,
+                            IDX(CHECK_END_GAME_PLAYER_DIALOG_ICON),
                             gpGame->GetPlayerColor(static_cast<i8>(player)),
                             -1,
                             0,
@@ -1946,7 +1946,7 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
                         1,
                         -1,
                         -1,
-                        CHECK_END_GAME_PLAYER_DIALOG_ICON,
+                        IDX(CHECK_END_GAME_PLAYER_DIALOG_ICON),
                         gpGame->GetPlayerColor(static_cast<i8>(player)),
                         -1,
                         0,

@@ -1352,7 +1352,7 @@ i32 townManager::Main(tag_message& message) {
                                 } else {
                                     if (BuyBuild(
                                             IDX(TOWN_COMMAND_CASTLE),
-                                            CanBuy(m_town, TOWN_COMMAND_CASTLE) == 0,
+                                            CanBuy(m_town, IDX(TOWN_COMMAND_CASTLE)) == 0,
                                             quickView_k
                                         ))
                                         BuildObj(IDX(TOWN_COMMAND_CASTLE));
