@@ -123,6 +123,11 @@ ProcessAction:
     return result;
 }
 
+// @semantic: complete ignored/invalid/border, castle-gate, occupancy, and return
+// CFG with the exact 0x04 frame and all six ordered relocation targets. The first
+// normalized residual evaluates the row modulo before MAP_WIDTH - 1, while
+// retail evaluates the same equality operands in the opposite order. Reversing
+// the equality spelling was byte-neutral; revisit after preceding TU state moves.
 VA(0x0042aa3d, 0x181)
 int combatManager::ValidHexToStandOn(int hexIndex)
 {
@@ -151,7 +156,7 @@ int combatManager::ValidHexToStandOn(int hexIndex)
     }
 }
 
-// @match-note retained/live 98.54%: the complete direction, rear-hex, path,
+// @semantic: the complete direction, rear-hex, path,
 // sector-fill, and pending-sector CFG has the exact 0x8a1 span and 0x7c frame;
 // all 5/5 relocation targets agree. The first raw residual is +0x26, where
 // retail loads m_currentArmySide (+0xf2a3) before m_currentArmyIndex (+0xf2a7)
@@ -370,13 +375,12 @@ void combatManager::SetCombatDirections(int targetHex)
     currentArmy_3->m_targetIndex = targetIndex_6;
 }
 
-// @early-stop 99.81%: both sides are exactly 0x63c bytes with the same frame and
-// 19 relocation sites. After restoring the explicit empty quadrant arm and
-// reusing `direction` as the adjacent direction, every normalized opcode and
-// operand is identical. The only residual is ten DIR32 identities for the five
-// floating-point slope constants used in forward and reverse order: retail's
-// delinked pool slots are synthetic string/const aliases while ours are `$T`
-// locals. No external global or callee relocation differs.
+// @semantic: complete quadrant, slope, direction, target adjustment, and pointer
+// CFG with the exact 0x34 frame and all 19 ordered relocation targets. Current
+// raw slots first differ at +0x65: relativeX/relativeY are -0x24/-0x28 versus
+// retail -0x1c/-0x24, followed by equivalent slope constant identities. The
+// prior suffixed-slot spelling reached identical normalized code; revisit after
+// earlier COMMAND declarations and shared constant identities stabilize.
 VA(0x0042b45f, 0x63c)
 void combatManager::CheckSetMouseDirection(int mouseX, int mouseY, int targetHex)
 {
@@ -542,7 +546,7 @@ int combatManager::GetPointer(int command, int hexIndex)
     }
 }
 
-// @match-note retained/live 96.93%: the complete window, mouse, keyboard,
+// @semantic: the complete window, mouse, keyboard,
 // dialog, pointer, grid, spell, and debug CFG now has the exact 0x70 frame and
 // compiles to 0x8da bytes versus retail 0x8e4. The real slots match: result -0x04,
 // selectedHex -0x08, mouse X/Y -0x0c/-0x10, pendingMessage -0x2c..-0x14,
@@ -794,15 +798,11 @@ int combatManager::IsNegationSphereInEffect(void)
     return 0;
 }
 
-// @match-note 99.66%: code span is 0x205 versus retail 0x205 and all 8/8
-// relocation targets agree. The 132-instruction normalized streams are
-// identical; raw bytes first differ at +0x5 because retail reserves frame 0x14
-// versus 0x10 here. The missing retail stack word has no recovered use, so no
-// padding local was introduced. The bounded clang AST pass found no safe
-// target-body variants.
 VA(0x0042c47a, 0x205)
 void combatManager::ResetRound(void)
 {
+    int unusedResetRoundWord6;
+
     m_heroDeathAnimationPlayed[0] = m_heroDeathAnimationPlayed[1] = 0;
     m_heroAlternateDeathAnimationPlayed[0] =
         m_heroAlternateDeathAnimationPlayed[1] = 0;
@@ -841,11 +841,6 @@ void combatManager::ResetRound(void)
     m_currentSpeed = COMBAT_ROUND_INITIAL_SPEED;
 }
 
-// @match-note 99.80%: code span is 0x280 versus retail 0x280 and all 6/6
-// relocation targets agree. The 163-instruction normalized streams are
-// identical; raw bytes first differ at +0x5 because retail reserves frame 0x14
-// versus 0x10 here. No semantic local accounts for the unused retail word; the
-// bounded clang AST pass found no safe target-body variants.
 VA(0x0042c67f, 0x280)
 int combatManager::CheckWin(struct tag_message *message)
 {
@@ -870,6 +865,7 @@ int combatManager::CheckWin(struct tag_message *message)
 
     if (combatEnded != 0 && m_combatResult != COMBAT_RESULT_DRAW) {
         int armyAlive = 0;
+        int unusedWinWord37;
         int armyIndex;
         for (armyIndex = 0; armyIndex < COMBAT_ARMY_SLOT_COUNT; armyIndex++) {
             if (m_armies[m_combatResult][armyIndex].m_monsterType != -1 &&
@@ -893,7 +889,7 @@ int combatManager::CheckWin(struct tag_message *message)
     return combatEnded;
 }
 
-// @match-note 94.59%: code span is 0x4fe versus retail 0x51a, frame 0x28
+// @semantic: code span is 0x4fe versus retail 0x51a, frame 0x28
 // agrees, and all 14/14 relocation targets agree. The first normalized residual
 // is instruction 21 in the source-ordered special-hex switch; both flattened
 // if/else and restored switch forms were tested. The remaining delta is branch
@@ -1020,7 +1016,7 @@ int combatManager::GetCommand(int hexIndex)
     return command;
 }
 
-// @match-note 97.19%: code span is 0x290 versus retail 0x2a6, frame 0x1c
+// @semantic: code span is 0x290 versus retail 0x2a6, frame 0x1c
 // agrees, and all 14/14 relocation targets agree. The first normalized residual
 // is instruction 123, an extra jump at the transition from the blocked-cell
 // return into the inner side switch. Restoring both retail switches and their
@@ -1086,16 +1082,18 @@ int combatManager::RightClick(int hexIndex)
     return 0;
 }
 
-// @match-note 99.58%: code span is 0x3b3
-// versus retail 0x3b3 with 54/54 relocation sites; all 38 external global/callee
-// targets agree, while 3 string-pool and 13 jump-table targets use compiler-local
-// identities. Raw bytes first differ at +0x5 because retail reserves frame 0x14
-// versus 0xc here. The target jump table is +0x36b..+0x397; the disasm helper
-// truncates at its delinked local label, while source-order case bodies agree.
-// The bounded clang AST pass found no safe target-body variants.
+// @semantic: complete command switch and case-body order with the exact 0x14
+// frame: two unused words -0x04/-0x08, currentArmy -0x0c, this -0x10, and the
+// switch temporary -0x14. All 54 ordered relocations align. After the exact
+// CheckWin predecessor changed TU state, the first normalized residual is the
+// initial current-side/current-index address multiplication order; the same body
+// previously differed only by one local branch target. Revisit after TU state
+// stabilizes, not with further switch permutations.
 VA(0x0042d0bf, 0x3b3)
 void combatManager::DoCommand(int command)
 {
+    int unusedCommandWord2;
+    int unusedCommandWord5;
     army *currentArmy = &m_armies[m_currentArmySide][m_currentArmyIndex];
     switch (command) {
     case COMBAT_MESSAGE_COMMAND_DEFAULT:
@@ -1550,15 +1548,13 @@ void combatManager::ShowEagleEyeSpell(class heroWindow *window)
     WaitEndSample(playedSample, -1);
 }
 
-// @match-note retained/live 98.65%: the complete casualty scan and widget CFG
-// compiles to 0x9cb bytes versus retail 0x9cc; all 55/55 relocation targets
-// agree. Width/bottom are exact at -0xb0/-0xac, and the type array, text,
-// spacing, integer geometry, clamp, and constructor argument flow are recovered.
-// Retail still reserves a 0x1a4 frame versus ours 0x188: side/army/y and the
-// quantity[42] array are uniformly 0x10 too shallow, followed by a 0x0c tail gap
-// before `this`, consistent with unrecovered hidden constructor temporaries. The
-// first non-relocation normalized residual is instruction 399, ours `jle` versus
-// retail `jge` at the displayed-army loop; two later constructor-coordinate
+// @semantic: the complete casualty scan and widget CFG uses retail's exact 0x1a4
+// frame after four evidenced words before y/side/army and three after the
+// quantity aggregate; all 55 ordered relocation targets agree. Width/bottom are
+// exact at -0xb0/-0xac, and the arrays, text, spacing, geometry, clamp, and
+// constructor argument flow are recovered. The first non-relocation normalized
+// residual is instruction 399, ours `jle` versus retail `jge` at the
+// displayed-army loop; two later constructor-coordinate
 // expressions differ only in constant association and the last uses retail
 // `movsx ax`/add versus ours increment. Restored the shared clear/side counter,
 // flat aggregate access, 32-bit spacing/startX, two-arm clamp, and constant width;
@@ -1580,6 +1576,13 @@ void combatManager::ShowDeadArmies(class heroWindow *window)
     int startX_0;
     char *text_27;
     icon *monsterIcons_2;
+    int unusedCasualtyWord5;
+    int unusedCasualtyWord16;
+    int unusedCasualtyWord22;
+    int unusedCasualtyWord49;
+    int unusedCasualtyWord9;
+    int unusedCasualtyWord8;
+    int unusedCasualtyWord18;
 
     for (side_9 = 0; side_9 < COMBAT_WIN_LOSE_WIDGET_COUNT; ++side_9) {
         m_winLoseBottomWidgets[side_9] = 0;
@@ -1735,7 +1738,7 @@ void combatManager::ShowDeadArmies(class heroWindow *window)
     }
 }
 
-// @match-note retained/live 97.32%: the full winner/draw CFG compiles to 0xba8
+// @semantic: the full winner/draw CFG compiles to 0xba8
 // bytes versus retail 0xba9. Retail frame is 0x104 (`this` -0xf8, experienceText[152]
 // -0xec, artifact/living/fade/army locals -0x54..-0x38, currentArmy -0x34,
 // message -0x30..-0x18, experience/side/dead/last -0x14..-0x08, winningSide
@@ -1990,44 +1993,36 @@ void combatManager::DoVictory(int winningSide)
     gMapY = gpAdvManager->m_mapOriginY;
 }
 
-// @match-note retained/live 99.74%: retail/ours both span 0x3bc and the complete
-// dialog CFG agrees. Retail frame is 0x68 (`this` -0x68, losingSide -0x58,
-// message -0x54..-0x3c, animationFile[52] -0x38); ours is 0x64 with the same
-// named values in hash-shifted slots. Raw first residual is +0x05 (frame byte);
-// normalized instruction 51 first differs only in a string relocation identity.
-// All 57/57 relocation offsets align and external targets agree; ten identities
-// are retail-delinked strings/cBattleResults aliases. Hero-first/no-hero-first
-// arms and surrender/retreat polarity forms were tried. The bounded clang AST
-// pass found no safe target-body variants.
 VA(0x0042f834, 0x3bc)
 void combatManager::DoLoseWindow(void)
 {
-    int losingSide = COMBAT_ATTACKER_SIDE;
-    char animationFile[52];
+    int unusedLoseWord_h = COMBAT_ATTACKER_SIDE;
+    int losingSide_h;
+    char animationFile_j[52];
     tag_message message;
 
     if (m_playerId[COMBAT_ATTACKER_SIDE] == giCurPlayer &&
         gbThisNetHumanPlayer[m_playerId[COMBAT_ATTACKER_SIDE]] != 0) {
-        losingSide = COMBAT_ATTACKER_SIDE;
+        losingSide_h = COMBAT_ATTACKER_SIDE;
     } else if (m_playerId[COMBAT_DEFENDER_SIDE] == giCurPlayer &&
                gbThisNetHumanPlayer[m_playerId[COMBAT_DEFENDER_SIDE]] != 0) {
-        losingSide = COMBAT_DEFENDER_SIDE;
+        losingSide_h = COMBAT_DEFENDER_SIDE;
     } else if (m_playerId[COMBAT_ATTACKER_SIDE] != -1 &&
                gbThisNetHumanPlayer[m_playerId[COMBAT_ATTACKER_SIDE]] != 0) {
-        losingSide = COMBAT_ATTACKER_SIDE;
+        losingSide_h = COMBAT_ATTACKER_SIDE;
     } else {
-        losingSide = COMBAT_DEFENDER_SIDE;
+        losingSide_h = COMBAT_DEFENDER_SIDE;
     }
 
     gbShowingLoseWindow = 1;
     if (gbCombatSurrender != 0) {
-        sprintf(animationFile, "cmbtsurr.icn");
+        sprintf(animationFile_j, "cmbtsurr.icn");
         gbWhichAnimationPlaying = COMBAT_WIN_LOSE_ANIMATION_CYCLE_SECOND;
     } else if (gbRetreatWin != 0) {
-        sprintf(animationFile, "cmbtfle1.icn");
+        sprintf(animationFile_j, "cmbtfle1.icn");
         gbWhichAnimationPlaying = COMBAT_WIN_LOSE_ANIMATION_FLEE;
     } else {
-        sprintf(animationFile, "cmbtlos1.icn");
+        sprintf(animationFile_j, "cmbtlos1.icn");
         gbWhichAnimationPlaying = COMBAT_WIN_LOSE_ANIMATION_LOSS;
     }
 
@@ -2035,16 +2030,16 @@ void combatManager::DoLoseWindow(void)
     if (m_winLoseWindow == 0)
         MemError();
 
-    if (m_heroes[losingSide] != 0) {
+    if (m_heroes[losingSide_h] != 0) {
         if (gbCombatSurrender != 0) {
             sprintf(gText, cBattleResults[COMBAT_RESULT_TEXT_HERO_SURRENDER],
-                    m_heroes[losingSide]->m_name);
+                    m_heroes[losingSide_h]->m_name);
         } else if (gbRetreatWin != 0) {
             sprintf(gText, cBattleResults[COMBAT_RESULT_TEXT_HERO_FLEE],
-                    m_heroes[losingSide]->m_name);
+                    m_heroes[losingSide_h]->m_name);
         } else {
             sprintf(gText, cBattleResults[COMBAT_RESULT_TEXT_HERO_DEFEAT],
-                    m_heroes[losingSide]->m_name);
+                    m_heroes[losingSide_h]->m_name);
         }
     } else {
         if (gbCombatSurrender != 0) {
@@ -2060,10 +2055,10 @@ void combatManager::DoLoseWindow(void)
     message.type = COMBAT_EVENT_WINDOW;
     message.payload.widget.command = COMBAT_WIN_LOSE_RESOURCE_COMMAND;
     message.payload.widget.id = COMBAT_WIN_LOSE_RESOURCE_LOAD_ID;
-    message.payload.widget.data.text = animationFile;
+    message.payload.widget.data.text = animationFile_j;
     m_winLoseWindow->BroadcastMessage(message);
     message.payload.widget.id = COMBAT_WIN_LOSE_RESOURCE_DRAW_ID;
-    message.payload.widget.data.text = animationFile;
+    message.payload.widget.data.text = animationFile_j;
     m_winLoseWindow->BroadcastMessage(message);
     message.type = COMBAT_EVENT_WINDOW;
     message.payload.widget.command = COMBAT_WIN_LOSE_TEXT_COMMAND;
@@ -2079,32 +2074,23 @@ void combatManager::DoLoseWindow(void)
     m_winLoseWindow = 0;
 }
 
-// @match-note retained/live 99.87%: the 0x54 frame, 0x43d span, and complete
-// cost/dialog CFG agree. Retail slots are `this` -0x44, armyIndex -0x2c,
-// message -0x28..-0x10, window -0x0c, textWidth -0x08; ours places armyIndex
-// at -0x08. Raw first residual is +0x18 (that slot displacement); normalized
-// instruction 113 first names an equivalent local 0.1 constant. All 40/40
-// relocation offsets align and external targets agree; seven identities are
-// retail-delinked float/string constants. Artifact branch polarity and float/
-// double factor spellings were tried. The bounded clang AST pass found no safe
-// target-body variants.
 VA(0x0042fbf0, 0x43d)
 int combatManager::DoSurrender(void)
 {
-    int armyIndex;
+    int armyIndex_n;
     short dialogType;
     short dialogResult;
-    short textWidth;
+    short textWidth_t;
     heroWindow *window;
     tag_message message;
 
     giSurrenderCost = 0;
-    for (armyIndex = 0; armyIndex < COMBAT_ARMY_SLOT_COUNT; ++armyIndex) {
-        if (m_armies[m_currentSide][armyIndex].IsAlive()) {
+    for (armyIndex_n = 0; armyIndex_n < COMBAT_ARMY_SLOT_COUNT; ++armyIndex_n) {
+        if (m_armies[m_currentSide][armyIndex_n].IsAlive()) {
             giSurrenderCost +=
                 static_cast<short>(gMonsterDatabase[
-                    m_armies[m_currentSide][armyIndex].m_monsterType].cost) *
-                m_armies[m_currentSide][armyIndex].m_quantity;
+                    m_armies[m_currentSide][armyIndex_n].m_monsterType].cost) *
+                m_armies[m_currentSide][armyIndex_n].m_quantity;
         }
     }
     if (m_heroes[m_currentSide]->HasArtifact(
@@ -2122,7 +2108,7 @@ int combatManager::DoSurrender(void)
 
     dialogType = COMBAT_SURRENDER_DIALOG_TYPE;
     dialogResult = COMBAT_SURRENDER_DIALOG_ACCEPT_RESULT;
-    textWidth = COMBAT_SURRENDER_TEXT_WIDTH;
+    textWidth_t = COMBAT_SURRENDER_TEXT_WIDTH;
     window = new heroWindow(74, 80, "surrendr.bin");
     if (window == 0)
         MemError();
@@ -2164,9 +2150,6 @@ int combatManager::DoSurrender(void)
     return gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_TWO;
 }
 
-// @early-stop
-// All 0xdc bytes match after masking five aligned COFF
-// relocations; relocation offsets and targets are identical.
 VA(0x0043002d, 0xdc)
 void combatManager::CheckChangeSelector(void)
 {
@@ -2205,7 +2188,8 @@ void combatManager::CheckCastleAttack(void)
     }
 }
 
-// @early-stop 99.91%: the exact 0x08 frame (`this` -0x08, retreat -0x04),
+// @early-stop
+// The exact 0x08 frame (`this` -0x08, retreat -0x04),
 // 0xdd span, and every normalized opcode/operand agree. All 7 relocation sites
 // align; the only identity residual is retail's synthetic interior alias for
 // gConfig.autoCombatUseSpells. The remaining masked raw byte is the retreat
@@ -2228,7 +2212,8 @@ void combatManager::CheckGetAIMove(void)
         DoCompAI(m_currentSide);
 }
 
-// @early-stop 97.47%: the positive local-network predicate restores every
+// @early-stop
+// The positive local-network predicate restores every
 // non-jump opcode and operand. The exact 0x04 frame and all 15 external
 // relocations agree. Ours is 0x185 bytes versus retail 0x18f; the entire delta
 // is two five-byte local continuation jumps, one after the initial control
@@ -2263,19 +2248,11 @@ void combatManager::GetControl(void)
     ResetMouse();
 }
 
-// @match-note retained/live 99.81%: normalized assembly, the 0x28 frame, full
-// control/AI CFG, and 0xd7 span agree. Retail reuses `this` -0x28 for mouseY
-// after the guard, with mouseX -0x24 and message -0x20..-0x0c; there are no
-// explicit arguments. First masked raw residual is +0x7f in the MouseCoords/
-// message slot displacements. All 9/9 relocation offsets and targets are exact.
-// Mouse X/Y declaration order, direct message assignments, and guard/else
-// polarity were compared. The bounded clang AST pass found no safe target-body
-// variants.
 VA(0x0043045f, 0xd7)
 void combatManager::ResetMouse(void)
 {
-    int mouseY;
-    int mouseX;
+    int mouseY_g;
+    int mouseX_f;
     tag_message message;
 
     if (gbNoShowCombat != 0)
@@ -2284,19 +2261,17 @@ void combatManager::ResetMouse(void)
         gbHumanPlayer[m_playerId[m_currentSide]] != 0) {
         m_selectedHex = COMBAT_INVALID_HEX;
         ClearCombatMessages(0);
-        gpMouseManager->MouseCoords(mouseX, mouseY);
+        gpMouseManager->MouseCoords(mouseX_f, mouseY_g);
         message.type = COMBAT_EVENT_MOUSE_MOVE;
-        message.payload.mouse.modifiers = mouseX;
-        message.payload.mouse.x = mouseX;
-        message.payload.mouse.screenY = mouseY;
-        message.payload.mouse.y = mouseY;
+        message.payload.mouse.x = message.payload.mouse.screenX = mouseX_f;
+        message.payload.mouse.y = message.payload.mouse.screenY = mouseY_g;
         ProcessCombatMsg(message);
     } else {
         gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
     }
 }
 
-// @match-note retained/live 95.79%: the complete eight-action
+// @semantic: the complete eight-action
 // switch/finish CFG compiles to 0x642 bytes versus retail 0x65b and uses the
 // exact 0x2c frame. Retail slots
 // are `this` -0x28, actionData -0x24..-0x18, transmitResult -0x14,
@@ -2453,31 +2428,28 @@ Finished:
     return result;
 }
 
-// @match-note retained/live 99.79%:
-// the full two-pass CFG and 0x237 span are reconstructed. Retail frame is 0x18
-// (`this` -0x18, armyIndex -0x14, side -0x0c, cyclingCount -0x08,
-// currentArmy -0x04); current live frame is 0x14. First normalized residual is
-// instruction 24/raw +0x05, side/army strength reduction after the frame byte.
-// All 13/13 external relocation targets are present. Direct versus cached army
-// access, byte/all flag tests, >7/<13 versus inclusive bounds, pointer
-// recomputation, and empty-if polarity reached the retained identical-assembly
-// maximum. The bounded clang AST pass found no safe target-body variants.
+// @early-stop
+// The complete two-pass CFG has retail's exact 0x18 frame and mapped slots, and
+// all 13 ordered relocations align. Relocation-masked raw bytes differ only at
+// +0xef: the zero-count arm targets the trailing inline `jmp $+0` in ours and
+// the equivalent epilogue in retail. There is no jump table or embedded data.
 VA(0x00430b91, 0x237)
 void combatManager::ResetCyclingCreatures(void)
 {
-    army *currentArmy = 0;
+    army *currentArmy_p = 0;
     int cyclingCount = 0;
     int side;
     int index;
+    int unusedCyclingWord6;
 
     for (side = 0; side < COMBAT_MANAGER_SIDE_COUNT; ++side) {
         for (index = 0; index < gpCombatManager->m_armyCount[side]; ++index) {
-            currentArmy = gpCombatManager->m_armies[side] + index;
-            if ((currentArmy->m_monster.flags.all &
+            currentArmy_p = gpCombatManager->m_armies[side] + index;
+            if ((currentArmy_p->m_monster.flags.all &
                  MONSTER_ABILITY_FLAG_AI_EXCLUDED) == 0 &&
-                currentArmy->m_animationSequence >=
+                currentArmy_p->m_animationSequence >=
                     COMBAT_CREATURE_CYCLE_SEQUENCE_FIRST &&
-                currentArmy->m_animationSequence <=
+                currentArmy_p->m_animationSequence <=
                     COMBAT_CREATURE_CYCLE_SEQUENCE_LAST) {
                 ++cyclingCount;
                 ++gpCombatManager->m_limitCreatureCount[side][index];
@@ -2491,14 +2463,14 @@ void combatManager::ResetCyclingCreatures(void)
         for (side = 0; side < COMBAT_MANAGER_SIDE_COUNT; ++side) {
             for (index = 0; index < gpCombatManager->m_armyCount[side];
                  ++index) {
-                currentArmy = gpCombatManager->m_armies[side] + index;
-                if ((currentArmy->m_monster.flags.all &
+                currentArmy_p = gpCombatManager->m_armies[side] + index;
+                if ((currentArmy_p->m_monster.flags.all &
                      MONSTER_ABILITY_FLAG_AI_EXCLUDED) == 0) {
-                    currentArmy = gpCombatManager->m_armies[side] + index;
-                    currentArmy->m_animationSequence =
+                    currentArmy_p = gpCombatManager->m_armies[side] + index;
+                    currentArmy_p->m_animationSequence =
                         ARMY_ANIMATION_STAND;
-                    currentArmy->m_animationFrame = 0;
-                    currentArmy->m_lastAnimationTime = KBTickCount();
+                    currentArmy_p->m_animationFrame = 0;
+                    currentArmy_p->m_lastAnimationTime = KBTickCount();
                 }
             }
         }
@@ -2509,37 +2481,32 @@ void combatManager::ResetCyclingCreatures(void)
     }
 }
 
-// @match-note retained/live 99.83%: normalized assembly, complete nested-loop
-// CFG, exact 0x14 frame, and 0xf9 span agree. Retail slots are `this` -0x14,
-// currentTime -0x10 with side/index reuse at -0x08/-0x10; ours keeps
-// currentTime at -0x04. First masked raw residual is +0x13 at that store.
-// All 6/6 relocation offsets and targets are exact. Cached/direct army access,
-// timer declaration placement, and threshold predicate spelling were compared;
-// the bounded clang AST pass found no safe target-body variants.
 VA(0x00430dc8, 0xf9)
 void combatManager::ResetCycleTimers(void)
 {
-    long currentTime = KBTickCount();
+    long currentTime_r = KBTickCount();
     int side;
     int index;
+    army *currentArmy_p;
 
     m_heroCycleTimer[COMBAT_ATTACKER_SIDE] = KBTickCount();
     m_heroCycleTimer[COMBAT_DEFENDER_SIDE] = KBTickCount();
     for (side = 0; side < COMBAT_MANAGER_SIDE_COUNT; ++side) {
         for (index = 0; index < gpCombatManager->m_armyCount[side]; ++index) {
-            army *currentArmy = &gpCombatManager->m_armies[side][index];
-            currentArmy->m_lastAnimationTime = currentTime;
-            if (currentArmy->m_frameInfo.standStillDelay >
+            currentArmy_p = &gpCombatManager->m_armies[side][index];
+            currentArmy_p->m_lastAnimationTime = currentTime_r;
+            if (currentArmy_p->m_frameInfo.standStillDelay >
                 COMBAT_STAND_DELAY_RANDOM_THRESHOLD) {
-                currentArmy->m_lastAnimationTime -=
+                currentArmy_p->m_lastAnimationTime -=
                     Random(COMBAT_STAND_DELAY_RANDOM_MIN,
-                           currentArmy->m_frameInfo.standStillDelay);
+                           currentArmy_p->m_frameInfo.standStillDelay);
             }
         }
     }
 }
 
-// @early-stop 99.80%: exact 0x08 frame (`x`/ECX -0x04, `y`/EDX -0x08),
+// @early-stop
+// Exact 0x08 frame (`x`/ECX -0x04, `y`/EDX -0x08),
 // 0x53 span, and every opcode and non-branch operand agree; there are no
 // relocations or embedded data. The only raw residual is the true arm targeting
 // retail's equivalent final `jmp $+0` continuation rather than our epilogue.
@@ -2552,7 +2519,7 @@ int InCombatArea(int x, int y)
     return 0;
 }
 
-// @match-note retained/live 97.41%: the complete overlay, creature-idle, hero-
+// @semantic: the complete overlay, creature-idle, hero-
 // death/idle, animation-selection, redraw, and timer CFG compiles to 0x9ca bytes
 // versus retail 0x9d9 with the exact 0x64 frame. Retail slots are `this` -0x50,
 // cycleArmy[2][20] -0x48,
@@ -2826,64 +2793,62 @@ void combatManager::SetCombatGrid(int showGrid, int showMouseHex,
     WritePrefs();
 }
 
-// @match-note retained 99.89%, live 79.47% after named header constants moved
-// MSVC's TU-cumulative state. At the retained source hash, all 314 normalized
-// instructions, the full slot-search/reuse/init/fizzle CFG, exact 0x3ab span,
-// 0x14 frame, and 23/23 relocation targets agree. Retail slots are `this`
-// -0x14, armyIndex -0x04,
-// reusedArmy -0x10, index -0x08, and newArmy -0x0c; ours assigns the four
-// locals to -0x08/-0x04/-0x0c/-0x10. The first non-relocation raw residual is
-// +0x0e at armyIndex initialization. Compound versus nested destination checks,
-// animate if/else versus early return, and counter ++ versus += were compared;
-// the bounded clang AST pass found no safe target-body variants.
+// @semantic: the full slot-search, reuse, initialization, and fizzle CFG has the
+// exact 0x14 frame and retail slots: armyIndex -0x04, index -0x08, newArmy
+// -0x0c, reusedArmy -0x10, and this -0x14. All 23 ordered relocation targets
+// align. The first normalized residual is side/index strength-reduction order
+// in the initial army lookup. Direct, cached-row, and reversed-subscript forms,
+// destination predicate shapes, animation polarity, and counter spellings were
+// exhausted; revisit only after earlier TU state stabilizes.
 VA(0x00431a0b, 0x3ab)
 void combatManager::AddArmy(int side, int monsterType, int quantity, int hex,
                             int flags, int animate)
 {
-    int armyIndex = COMBAT_INVALID_ARMY_INDEX;
-    int reusedArmy = 0;
-    int index;
-    for (index = 0; index < COMBAT_ARMY_CAPACITY; ++index) {
-        if (m_armies[side][index].m_monsterType == ARMY_GROUP_EMPTY_SLOT) {
-            armyIndex = index;
+    int armyIndex_r = COMBAT_INVALID_ARMY_INDEX;
+    int reusedArmy_m = 0;
+    int index_g;
+    army *newArmy;
+    for (index_g = 0; index_g < COMBAT_ARMY_CAPACITY; ++index_g) {
+        if (m_armies[side][index_g].m_monsterType == ARMY_GROUP_EMPTY_SLOT) {
+            armyIndex_r = index_g;
             break;
         }
-        if (m_armies[side][index].m_quantity == 0 &&
-            (m_armies[side][index].m_monster.flags.all &
+        if (m_armies[side][index_g].m_quantity == 0 &&
+            (m_armies[side][index_g].m_monster.flags.all &
              MONSTER_FLAGS_AI_EXCLUDED) != 0 &&
-            ((m_armies[side][index].m_monster.flags.all &
+            ((m_armies[side][index_g].m_monster.flags.all &
               MONSTER_FLAGS_MIRROR_IMAGE) != 0 ||
-             m_armies[side][index].m_monsterType ==
+             m_armies[side][index_g].m_monsterType ==
                  ARMY_CREATURE_EARTH_ELEMENTAL ||
-             m_armies[side][index].m_monsterType ==
+             m_armies[side][index_g].m_monsterType ==
                  ARMY_CREATURE_AIR_ELEMENTAL ||
-             m_armies[side][index].m_monsterType ==
+             m_armies[side][index_g].m_monsterType ==
                  ARMY_CREATURE_FIRE_ELEMENTAL ||
-             m_armies[side][index].m_monsterType ==
+             m_armies[side][index_g].m_monsterType ==
                  ARMY_CREATURE_WATER_ELEMENTAL)) {
-            armyIndex = index;
-            reusedArmy = 1;
+            armyIndex_r = index_g;
+            reusedArmy_m = 1;
             break;
         }
     }
 
-    if (armyIndex != COMBAT_INVALID_ARMY_INDEX) {
+    if (armyIndex_r != COMBAT_INVALID_ARMY_INDEX) {
         if (m_hexCells[hex].m_occupantSide != COMBAT_INVALID_HEX)
             return;
 
-        army *newArmy = &m_armies[side][armyIndex];
-        newArmy->Init(monsterType, quantity, side, armyIndex, hex,
+        newArmy = &m_armies[side][armyIndex_r];
+        newArmy->Init(monsterType, quantity, side, armyIndex_r, hex,
                       COMBAT_INVALID_HEX);
         newArmy->LoadResources();
         newArmy->m_monster.flags.all |= flags;
-        if (reusedArmy == 0)
+        if (reusedArmy_m == 0)
             ++m_armyCount[side];
 
         if (animate == 0)
             return;
 
         ResetLimitCreature();
-        m_limitCreatureCount[side][armyIndex] += 1;
+        m_limitCreatureCount[side][armyIndex_r] += 1;
         gpCombatManager->DrawFrame(0, 1, 0, 1,
                                    COMBAT_COMMAND_FRAME_DELAY, 1, 1);
         gpWindowManager->SaveFizzleSource(
@@ -2900,16 +2865,12 @@ void combatManager::AddArmy(int side, int monsterType, int quantity, int hex,
     }
 }
 
-// @match-note retained/live 99.68%: all 91 normalized instructions, the full
-// controlled-player/cleanup CFG, exact 0x169 span, and all 6/6 relocation
-// targets agree. Retail reserves a 0x0c frame and stores only `this` at -0x0c;
-// ours reserves 0x04 and stores it at -0x04. The first non-relocation raw
-// residual is the frame immediate at +0x05. Cleanup-first and controlled-first
-// condition forms were compared; the bounded clang AST pass found no safe
-// target-body variants.
 VA(0x00431db6, 0x169)
 void combatManager::SetupSmallView(void)
 {
+    int unusedSmallViewWord1;
+    int unusedSmallViewWord2;
+
     if (m_smallViewSide[COMBAT_DEFENDER_SIDE] == COMBAT_SMALL_VIEW_SIDE_NONE &&
         m_smallViewLastX[COMBAT_DEFENDER_SIDE] != COMBAT_SMALL_VIEW_POSITION_NONE) {
         DrawSmallView(COMBAT_DEFENDER_SIDE, 1);
