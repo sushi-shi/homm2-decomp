@@ -18,6 +18,11 @@ typedef enum MapCellFlag {
     MAP_CELL_OBJECT_SHADOW_ONLY = 0x80
 } MapCellFlag;
 
+typedef enum MapCellSentinel {
+    MAPCELL_SPRITE_NONE = 0xff,  // object/overlay sprite index: no sprite
+    MAPCELL_EXTRA_FREE = 0xffff  // extras chain nextIndex: free-pool entry
+} MapCellSentinel;
+
 typedef enum MapTilesetConstant {
     MAP_TILESET_FLAG = 14
 } MapTilesetConstant;

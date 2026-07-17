@@ -7,6 +7,7 @@
 #include <BASE/Iconf2b.h>
 #include <BASE/icon.h>
 #include <BASE/bitmap.h>
+#include <BASE/IconRle.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <BASE/IconEntry.h>
 #include <string.h>
@@ -224,10 +225,10 @@ void FlipIconToBitmap(
     for (;;) {
         i32 cmd = *src++;
         if (static_cast<i8>(cmd) < 0) {
-            if ((cmd & 0x40) == 0) {
+            if ((cmd & ICON_RLE_COMMAND_SOLID_FLAG) == 0) {
                 // skip run / end-of-sprite
                 gFlipRun = cmd;
-                i32 n = cmd & 0x3f;
+                i32 n = cmd & ICON_RLE_COMMAND_RUN_MASK;
                 gFlipX = X;
                 gFlipSrc = src;
                 if (n == 0)
@@ -237,24 +238,24 @@ void FlipIconToBitmap(
             }
             // 0xc0 - 0xff
             gFlipRun = cmd;
-            u32 count = cmd & 0x3f;
+            u32 count = cmd & ICON_RLE_COMMAND_RUN_MASK;
             i32 flags = 0;
             if (count != 0) {
                 // 0xc1 - 0xff : solid colour run
-                if (cmd == 0xc1)
+                if (cmd == ICON_RLE_LONG_SOLID_COMMAND)
                     count = *src++;
                 gFlipColor = *src++;
                 goto do_fill;
             }
             // 0xc0 : shadow / dim run
             flags = *src++;
-            count = flags & 3;
+            count = flags & ICON_RLE_DIM_SHORT_COUNT_MASK;
             if (count == 0)
                 count = *src++;
             gFlipCnt2 = count;
             if (color != 0) {
                 gFlipRun = flags;
-                if (flags & 0x80) {
+                if (flags & ICON_RLE_DIM_RECOLOR_FLAG) {
                     gFlipDimLen = count;
                     gFlipColor = static_cast<u8>(color);
                     goto do_fill;
@@ -290,8 +291,8 @@ void FlipIconToBitmap(
         do_dim:
             gFlipRun = flags;
             gFlipDimLen = count;
-            if (flags & 0x40) {
-                u8* palette = reinterpret_cast<u8*>(uDimPal) + (flags & 0x3c) * 0x40;
+            if (flags & ICON_RLE_DIM_APPLY_FLAG) {
+                u8* palette = reinterpret_cast<u8*>(uDimPal) + (flags & ICON_RLE_DIM_LEVEL_MASK) * ICON_RLE_DIM_PALETTE_LEVEL_STRIDE;
                 gFlipDimPal = palette;
                 if (clip == 0) {
                     u8* dp = reinterpret_cast<u8*>((gFlipRow - count) + 1 + X);
