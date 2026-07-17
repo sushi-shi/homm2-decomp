@@ -344,6 +344,28 @@ class LinkExeTest(unittest.TestCase):
         self.assertEqual(diagnostics["violations"][0]["status"],
                          "normalized-payload-mismatch")
 
+    def test_required_initialized_storage_rejects_wrong_source_extent(self):
+        payload = {
+            "size": 18, "sha256": "retail", "highlow_base_relocation_count": 0,
+            "highlow_relative_offsets": [], "normalized_sha256": "same",
+        }
+        public_symbols = {"symbols": [{
+            "name": "global", "unit": "UNIT", "retail_rva": "0x3000",
+            "candidate_count": 1, "status": "exact", "storage_class_matches": True,
+            "retail_storage": {"class": "data-initialized"},
+            "candidate_storage": {"class": "data-initialized"},
+            "retail_payload": payload, "candidate_payload": dict(payload),
+        }]}
+        required = [{
+            "name": "global", "unit": "UNIT", "size": 18,
+            "retail_sha256": "retail", "highlow_count": 0, "audit": "bytes",
+        }]
+        diagnostics = required_initialized_storage_diagnostics(
+            public_symbols, required, {("UNIT", 0x3000): 16})
+        self.assertEqual(diagnostics["violations"][0]["status"],
+                         "source-extent-mismatch")
+        self.assertEqual(diagnostics["violations"][0]["source_definition_size"], 16)
+
     def test_coff_section_parser_reports_raw_and_alignment_rounded_size(self):
         data = bytearray(0x100)
         struct.pack_into("<HHIIIHH", data, 0, 0x14C, 1, 0, 0, 0, 0, 0)
