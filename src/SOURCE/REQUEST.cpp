@@ -956,7 +956,7 @@ void fileRequester::Update(i32 drawWindow) {
     localState = 0;
 
     if (m_mode == FILE_REQUESTER_MAP_GAME || m_mode == FILE_REQUESTER_MAP) {
-        for (i = 0; i < FILE_REQUESTER_MAP_SIZE_COUNT; ++i) {
+        for (i = 0; i < IDX(FILE_REQUESTER_MAP_SIZE_COUNT); ++i) {
             broadcastMessage.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
             broadcastMessage.payload.widget.id = FILE_REQUESTER_FILTER_SMALL + i;
             broadcastMessage.payload.widget.data.value = (giMapSizeFilter == i) + i * 2 + 9;

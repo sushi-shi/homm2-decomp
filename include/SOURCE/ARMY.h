@@ -212,6 +212,6 @@ SIZE(SMonFrameInfo, 0x335);
 extern SMonFrameInfo sViewArmyMonFrameInfo;
 
 void BuildTempWalkSeq(struct SMonFrameInfo*, i32, i32);
-void ModifyFrameInfo(struct SMonFrameInfo*, i32);
+void ModifyFrameInfo(struct SMonFrameInfo*, CreatureType);
 
 #endif // HOMM2_ARMY_H
