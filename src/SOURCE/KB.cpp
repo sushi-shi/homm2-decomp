@@ -66,9 +66,6 @@
 // SPlayerExit -> KB.h.
 
 #define KBFILE const_cast<char *>("I:\\Projects\\Heroes\\Prog\\SOURCE\\KB.CPP")
-#define GLOBAL_POLL_SOUND_TIMER_SLOT 5
-#define GLOBAL_MOUSE_TIMER_SLOT 6
-#define GLOBAL_COLOR_CYCLE_TIMER_SLOT 7
 
 
 
