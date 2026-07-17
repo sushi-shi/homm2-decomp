@@ -2289,7 +2289,7 @@ void combatManager::DoBolt(
         }
     }
 
-    delete bolts;
+    delete[] bolts;
     if (managePointer != 0) {
         DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
         gpMouseManager->ShowColorPointer();

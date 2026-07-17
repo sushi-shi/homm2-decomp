@@ -135,7 +135,7 @@ extern char outName[];
 // ---- globals (declarations, RVA order) ----
 extern i32 longestFileName;
 extern i32 opMode;
-extern char* progNameReally;
+extern char progNameReally[0x400];
 extern i32 keepInputFiles;
 
 #endif // HOMM2_BASE_BZIP_H
