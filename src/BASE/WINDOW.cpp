@@ -309,8 +309,8 @@ void heroWindow::DrawWindow(i32 param_1, i32 param_2, i32 param_3)
     widget *local_8;
     gpMouseManager->m_cursorReady = 0;
     local_8 = m_widgetListTail;
-    local_24.type = 0x200;
-    local_24.payload.widget.command = 2;
+    local_24.type = MESSAGE_WIDGET;
+    local_24.payload.widget.command = WIDGET_COMMAND_DRAW;
     while (local_8 != 0) {
         PollSound();
         if (param_2 != -0xffff || param_3 != 0xffff) {

@@ -474,7 +474,7 @@ continue_route:
                 if (movementChangedResult || movementEndedLocal || gbHitEvent)
                     goto movement_done;
                 messageValue = gpInputManager->GetEvent();
-                while (messageValue.type != 0) {
+                while (messageValue.type != MESSAGE_NONE) {
                     if (messageValue.type == ADVMGR_INPUT_MOUSE_DOWN ||
                         messageValue.type == ADVMGR_INPUT_MOUSE_UP ||
                         messageValue.type == ADVMGR_INPUT_KEY_DOWN ||
@@ -627,8 +627,8 @@ i32 advManager::Main(struct tag_message &message)
     if (KBTickCount() > glTimers[0] && ComboDraw(1))
         UpdateScreen(1, 0);
     if (gbGameOver) {
-        message.type = 0x4000;
-        message.payload.executive.command = 1;
+        message.type = MESSAGE_EXECUTIVE;
+        message.payload.executive.command = EXECUTIVE_COMMAND_TERMINATE_LOOP;
         return 2;
     }
 
@@ -658,7 +658,7 @@ i32 advManager::Main(struct tag_message &message)
     i32 cheatDigitLocal;
     i32 nextTownId;
     hero *currentHero;
-    if (message.type != 0) {
+    if (message.type != MESSAGE_NONE) {
     switch (message.type) {
     case 0x200:
         switch (message.payload.widget.command) {
@@ -933,8 +933,8 @@ finish_message:
     if (eventCellsResult[0] != 0)
         DoEvent(eventCellsResult[0], TrigX, TrigY);
     if (gbGameOver || exitRequestedFlag == 1 || giMenuCommand != -1) {
-        message.type = 0x4000;
-        message.payload.executive.command = 1;
+        message.type = MESSAGE_EXECUTIVE;
+        message.payload.executive.command = EXECUTIVE_COMMAND_TERMINATE_LOOP;
         return 2;
     }
     return processResult;
@@ -1186,18 +1186,18 @@ i32 advManager::ProcessSelect(struct tag_message *message, class mapCell **event
             CompleteDraw(0);
             UpdateScreen(0, 0);
 
-            currentMessageLocal.type = 0;
-            while (currentMessageLocal.type != 0x10) {
+            currentMessageLocal.type = MESSAGE_NONE;
+            while (currentMessageLocal.type != MESSAGE_LEFT_BUTTON_UP) {
                 Process1WindowsMessage();
                 currentMessageLocal = gpInputManager->GetEvent();
                 radarMessage = currentMessageLocal;
-                while (currentMessageLocal.type != 0x10 && currentMessageLocal.type != 0) {
-                    if (currentMessageLocal.type == 4)
+                while (currentMessageLocal.type != MESSAGE_LEFT_BUTTON_UP && currentMessageLocal.type != MESSAGE_NONE) {
+                    if (currentMessageLocal.type == MESSAGE_MOUSE_MOVE)
                         radarMessage = currentMessageLocal;
                     Process1WindowsMessage();
                     currentMessageLocal = gpInputManager->GetEvent();
                 }
-                if (radarMessage.type == 4) {
+                if (radarMessage.type == MESSAGE_MOUSE_MOVE) {
                     if (radarMessage.payload.mouse.x < ADVMGR_RADAR_LEFT)
                         radarMessage.payload.mouse.x = ADVMGR_RADAR_LEFT;
                     if (radarMessage.payload.mouse.x >= ADVMGR_RADAR_RIGHT)
@@ -1222,7 +1222,7 @@ i32 advManager::ProcessSelect(struct tag_message *message, class mapCell **event
                     UpdateRadar(1, 0);
                     CompleteDraw(0);
                     UpdateScreen(0, 0);
-                    radarMessage.type = 0;
+                    radarMessage.type = MESSAGE_NONE;
                 }
             }
         break;
@@ -3343,8 +3343,8 @@ quick_info_ready:
                 currentCell->m_objectMetadata, currentCell->m_flags & 8, savedTextLocal,
                 m_mapOriginX + cellX, m_mapOriginY + cellY);
     }
-    message.type = 0x200;
-    message.payload.widget.command = 3;
+    message.type = MESSAGE_WIDGET;
+    message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message.payload.widget.id = 1;
     message.payload.widget.data.text = gText;
     windowLocal->BroadcastMessage(message);
@@ -4237,7 +4237,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
     i32 previousOriginXState;
     i32 savedOriginY;
 
-    quickViewMessageState.type = 0x200;
+    quickViewMessageState.type = MESSAGE_WIDGET;
     if (heroId == ADVMGR_INVALID_HERO)
         return;
 
@@ -4259,11 +4259,11 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
             MemError();
     }
 
-    quickViewMessageState.payload.widget.command = 4;
+    quickViewMessageState.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
     quickViewMessageState.payload.widget.id = 2;
     quickViewMessageState.payload.widget.data.value = targetHero->m_portrait;
     quickWindowSlot->BroadcastMessage(quickViewMessageState);
-    quickViewMessageState.payload.widget.command = 4;
+    quickViewMessageState.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
     quickViewMessageState.payload.widget.id = 8;
     quickViewMessageState.payload.widget.data.value = gpGame->GetPlayerColor(targetHero->m_owner) * 2;
     quickWindowSlot->BroadcastMessage(quickViewMessageState);
@@ -4271,7 +4271,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
     ++quickViewMessageState.payload.widget.data.value;
     quickWindowSlot->BroadcastMessage(quickViewMessageState);
     sprintf(gText, "%s", targetHero->m_name);
-    quickViewMessageState.payload.widget.command = 3;
+    quickViewMessageState.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     quickViewMessageState.payload.widget.id = 1;
     quickViewMessageState.payload.widget.data.text = gText;
     quickWindowSlot->BroadcastMessage(quickViewMessageState);
@@ -4448,7 +4448,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
     UpdateRadar(1, 0);
     CompleteDraw(0);
     UpdateScreen(0, 0);
-    if (quickViewMessageState.type == 8 && targetHero->m_owner == giCurPlayer)
+    if (quickViewMessageState.type == MESSAGE_LEFT_BUTTON_DOWN && targetHero->m_owner == giCurPlayer)
         SetHeroContext(static_cast<u8>(targetHero->m_id), 0);
     gpResourceManager->Dispose(monsterIconRef);
 }
@@ -4545,8 +4545,8 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
 
     SetWinText(townQuickWindow, 19);
     armyCountLocal = 0;
-    messageLocal.type = 0x200;
-    messageLocal.payload.widget.command = 4;
+    messageLocal.type = MESSAGE_WIDGET;
+    messageLocal.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
     messageLocal.payload.widget.id = 2;
     messageLocal.payload.widget.data.value = quickTownLocal->m_type + 9;
     if ((gpGame->GetTown(townId)->m_buildings & 0x40) == 0)
@@ -4555,21 +4555,21 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
 
     if (informationLevel != 3 ||
         BitTest(gpGame->m_knownTowns, static_cast<i8>(quickTownLocal->m_id)) == 0) {
-        messageLocal.payload.widget.command = 6;
+        messageLocal.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         messageLocal.payload.widget.id = 300;
         messageLocal.payload.widget.data.value = 4;
         townQuickWindow->BroadcastMessage(messageLocal);
     }
 
     if (quickTownLocal->m_owner == -1) {
-        messageLocal.payload.widget.command = 6;
+        messageLocal.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         messageLocal.payload.widget.id = 8;
         messageLocal.payload.widget.data.value = 4;
         townQuickWindow->BroadcastMessage(messageLocal);
         ++messageLocal.payload.widget.id;
         townQuickWindow->BroadcastMessage(messageLocal);
     } else {
-        messageLocal.payload.widget.command = 4;
+        messageLocal.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
         messageLocal.payload.widget.id = 8;
         messageLocal.payload.widget.data.value = gpGame->GetPlayerColor(quickTownLocal->m_owner) * 2;
         townQuickWindow->BroadcastMessage(messageLocal);
@@ -4579,7 +4579,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
     }
 
     sprintf(gText, GetTownName(static_cast<i8>(quickTownLocal->m_id)));
-    messageLocal.payload.widget.command = 3;
+    messageLocal.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     messageLocal.payload.widget.id = 1;
     messageLocal.payload.widget.data.text = gText;
     townQuickWindow->BroadcastMessage(messageLocal);
@@ -4747,7 +4747,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
     UpdateRadar(1, 0);
     CompleteDraw(0);
     UpdateScreen(0, 0);
-    if (messageLocal.type == 8 && quickTownLocal->m_owner == giCurPlayer)
+    if (messageLocal.type == MESSAGE_LEFT_BUTTON_DOWN && quickTownLocal->m_owner == giCurPlayer)
         SetTownContext(static_cast<i8>(quickTownLocal->m_id));
     gpResourceManager->Dispose(monsterIconLocal);
 }

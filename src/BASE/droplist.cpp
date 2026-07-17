@@ -165,7 +165,7 @@ VA(0x004dc2e0, 0x350)
 i32 dropListWidget::Main(tag_message &message)
 {
     if ((m_flags & 2) == 0) {
-        if (message.type == 0x200)
+        if (message.type == MESSAGE_WIDGET)
             return widget::Main(message);
         return 0;
     }
@@ -176,12 +176,12 @@ i32 dropListWidget::Main(tag_message &message)
         if (m_flags & 4) {
             i16 x = static_cast<i16>(message.payload.mouse.x) - static_cast<i16>(m_owner->m_posX);
             i16 y = static_cast<i16>(message.payload.mouse.y) - static_cast<i16>(m_owner->m_posY);
-            if (message.type == 0x20) {
+            if (message.type == MESSAGE_RIGHT_BUTTON_DOWN) {
                 if (x >= m_x && y >= m_y && x < m_x + m_width && y < m_y + m_height) {
-                    message.payload.widget.command = 14;
-                    message.type = 0x200;
+                    message.payload.widget.command = WIDGET_COMMAND_ALTERNATE_SELECT;
+                    message.type = MESSAGE_WIDGET;
                     message.payload.widget.id = m_id;
-                    message.payload.widget.parameter = 0x200;
+                    message.payload.widget.parameter = MESSAGE_MODIFIER_RIGHT_BUTTON;
                     return 2;
                 }
                 return 0;
@@ -189,8 +189,8 @@ i32 dropListWidget::Main(tag_message &message)
                 if (x >= m_dropButtonX && y >= m_dropButtonY &&
                     x < m_dropButtonX + m_dropButtonWidth && y < m_dropButtonY + m_dropButtonHeight) {
                     ProcessSelectDialog();
-                    message.payload.widget.command = 12;
-                    message.type = 0x200;
+                    message.payload.widget.command = WIDGET_COMMAND_SELECT;
+                    message.type = MESSAGE_WIDGET;
                     message.payload.widget.id = m_id;
                     return 2;
                 }

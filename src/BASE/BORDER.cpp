@@ -91,7 +91,7 @@ i32 border::Main(struct tag_message &msg)
 {
     i16 flags = m_flags;
     if ((flags & 2) == 0) {
-        if (msg.type == 0x200)
+        if (msg.type == MESSAGE_WIDGET)
             return widget::Main(msg);
         return 0;
     }
@@ -117,13 +117,13 @@ hoverEvent: {
     i16 my = static_cast<i16>(msg.payload.mouse.y) - window->m_posY;
     if (m_x <= mx && m_y <= my && mx < m_width + m_x && my < m_height + m_y) {
         if (type == 0x20) {
-            msg.payload.widget.parameter = 0x200;
-            msg.payload.widget.command = 0xe;
+            msg.payload.widget.parameter = MESSAGE_MODIFIER_RIGHT_BUTTON;
+            msg.payload.widget.command = WIDGET_COMMAND_ALTERNATE_SELECT;
         } else {
             m_flags = flags | 1;
-            msg.payload.widget.command = 0xc;
+            msg.payload.widget.command = WIDGET_COMMAND_SELECT;
         }
-        msg.type = 0x200;
+        msg.type = MESSAGE_WIDGET;
         msg.payload.widget.id = m_id;
         return 2;
     }
@@ -133,8 +133,8 @@ hoverEvent: {
 leaveEvent:
     if ((flags & 1) != 0) {
         m_flags = flags & 0xfffe;
-        msg.type = 0x200;
-        msg.payload.widget.command = 0xd;
+        msg.type = MESSAGE_WIDGET;
+        msg.payload.widget.command = WIDGET_COMMAND_DESELECT;
         msg.payload.widget.id = m_id;
         return 2;
     }

@@ -463,7 +463,7 @@ i32 heroWindowManager::DoDialog(class heroWindow *window, i32 (*handler)(struct 
         Process1WindowsMessage();
         message = gpInputManager->GetEvent();
         gpMouseManager->Main(message);
-        if (window != 0 && (message.type != 4 || gbSendMouseMoveMessages != 0)) {
+        if (window != 0 && (message.type != MESSAGE_MOUSE_MOVE || gbSendMouseMoveMessages != 0)) {
             result = window->BroadcastMessage(message);
             if (result == 2 && message.type == MESSAGE_WIDGET &&
                 message.payload.widget.command == WIDGET_COMMAND_DIALOG_SELECT) {

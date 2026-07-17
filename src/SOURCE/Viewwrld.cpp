@@ -587,13 +587,13 @@ i32 ViewWorldDialogHandler(struct tag_message &message)
                 gpAdvManager->UpdateRadar(1, 0);
                 gpAdvManager->VWCompleteDraw();
 
-                currentMessage7.type = 0;
+                currentMessage7.type = MESSAGE_NONE;
                 while (currentMessage7.type != VIEW_WORLD_MOUSE_UP) {
                     Process1WindowsMessage();
                     currentMessage7 = gpInputManager->GetEvent();
                     savedMessage = currentMessage7;
                     while (currentMessage7.type != VIEW_WORLD_MOUSE_UP &&
-                           currentMessage7.type != 0) {
+                           currentMessage7.type != MESSAGE_NONE) {
                         if (currentMessage7.type == VIEW_WORLD_MOUSE_MOVE)
                             savedMessage = currentMessage7;
                         Process1WindowsMessage();
@@ -625,7 +625,7 @@ i32 ViewWorldDialogHandler(struct tag_message &message)
                             iVWMapOriginY = MAP_HEIGHT - iVWViewableCells;
                         gpAdvManager->UpdateRadar(1, 0);
                         gpAdvManager->VWCompleteDraw();
-                        savedMessage.type = 0;
+                        savedMessage.type = MESSAGE_NONE;
                     }
                 }
             }
