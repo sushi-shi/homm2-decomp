@@ -83,16 +83,16 @@ i32 combatManager::ViewSpells(i32)
             goto set_action;
 
     case SPELL_SUMMON_EARTH_ELEMENTAL:
-        elementalType = SPELL_MONSTER_EARTH_ELEMENTAL;
+        elementalType = CREATURE_EARTH_ELEMENTAL;
         goto check_elemental;
     case SPELL_SUMMON_AIR_ELEMENTAL:
-        elementalType = SPELL_MONSTER_AIR_ELEMENTAL;
+        elementalType = CREATURE_AIR_ELEMENTAL;
         goto check_elemental;
     case SPELL_SUMMON_FIRE_ELEMENTAL:
-        elementalType = SPELL_MONSTER_FIRE_ELEMENTAL;
+        elementalType = CREATURE_FIRE_ELEMENTAL;
         goto check_elemental;
     case SPELL_SUMMON_WATER_ELEMENTAL:
-        elementalType = SPELL_MONSTER_WATER_ELEMENTAL;
+        elementalType = CREATURE_WATER_ELEMENTAL;
         goto check_elemental;
 check_elemental:
         if (m_unknown351D[m_currentSide] != 0 &&
@@ -384,7 +384,7 @@ i32 combatManager::ValidSpellTarget(i32 spell, i32 hex)
         target_j = &m_armies[m_hexCells[hex].m_occupantSide]
                               [m_hexCells[hex].m_occupantIndex];
         if (target_j->m_spellInfluence[SPELL_INFLUENCE_ANTI_MAGIC] != 0 ||
-            target_j->m_monsterType == SPELL_MONSTER_GREEN_DRAGON)
+            target_j->m_monsterType == CREATURE_GREEN_DRAGON)
             return 0;
     }
 
@@ -784,10 +784,10 @@ void combatManager::CastSpell(i32 spell, i32 targetHex, i32 castByCreature, i32 
         case SPELL_COLD_RAY:
             DelayMilli(static_cast<i32l>(gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_COLD_RAY_DELAY));
             damage_m = spellPower_i * SPELL_COLD_RAY_DAMAGE_PER_POWER;
-            if (target_i->m_monsterType == SPELL_MONSTER_FIRE_ELEMENTAL)
+            if (target_i->m_monsterType == CREATURE_FIRE_ELEMENTAL)
                 damage_m = spellPower_i * SPELL_COLD_RAY_FIRE_ELEMENTAL_DAMAGE_PER_POWER;
-            if (target_i->m_monsterType == SPELL_MONSTER_IRON_GOLEM ||
-                target_i->m_monsterType == SPELL_MONSTER_STEEL_GOLEM)
+            if (target_i->m_monsterType == CREATURE_IRON_GOLEM ||
+                target_i->m_monsterType == CREATURE_STEEL_GOLEM)
                 damage_m = static_cast<i32l>(damage_m * SPELL_GOLEM_DAMAGE_MULTIPLIER);
             ModifyDamageForArtifacts(&damage_m, spell, m_heroes[m_currentSide],
                                      m_heroes[1 - m_currentSide]);
@@ -831,10 +831,10 @@ void combatManager::CastSpell(i32 spell, i32 targetHex, i32 castByCreature, i32 
             break;
         case SPELL_LIGHTNING_BOLT:
             damage_m = spellPower_i * SPELL_LIGHTNING_DAMAGE_PER_POWER;
-            if (target_i->m_monsterType == SPELL_MONSTER_AIR_ELEMENTAL)
+            if (target_i->m_monsterType == CREATURE_AIR_ELEMENTAL)
                 damage_m = spellPower_i * SPELL_LIGHTNING_AIR_ELEMENTAL_DAMAGE_PER_POWER;
-            if (target_i->m_monsterType == SPELL_MONSTER_IRON_GOLEM ||
-                target_i->m_monsterType == SPELL_MONSTER_STEEL_GOLEM)
+            if (target_i->m_monsterType == CREATURE_IRON_GOLEM ||
+                target_i->m_monsterType == CREATURE_STEEL_GOLEM)
                 damage_m = static_cast<i32l>(damage_m * SPELL_GOLEM_DAMAGE_MULTIPLIER);
             ModifyDamageForArtifacts(&damage_m, spell, m_heroes[m_currentSide],
                                      m_heroes[1 - m_currentSide]);
@@ -866,16 +866,16 @@ void combatManager::CastSpell(i32 spell, i32 targetHex, i32 castByCreature, i32 
             MirrorImage(targetHex);
             break;
         case SPELL_SUMMON_EARTH_ELEMENTAL:
-            SummonElemental(SPELL_MONSTER_EARTH_ELEMENTAL, spellPower_i);
+            SummonElemental(CREATURE_EARTH_ELEMENTAL, spellPower_i);
             break;
         case SPELL_SUMMON_AIR_ELEMENTAL:
-            SummonElemental(SPELL_MONSTER_AIR_ELEMENTAL, spellPower_i);
+            SummonElemental(CREATURE_AIR_ELEMENTAL, spellPower_i);
             break;
         case SPELL_SUMMON_FIRE_ELEMENTAL:
-            SummonElemental(SPELL_MONSTER_FIRE_ELEMENTAL, spellPower_i);
+            SummonElemental(CREATURE_FIRE_ELEMENTAL, spellPower_i);
             break;
         case SPELL_SUMMON_WATER_ELEMENTAL:
-            SummonElemental(SPELL_MONSTER_WATER_ELEMENTAL, spellPower_i);
+            SummonElemental(CREATURE_WATER_ELEMENTAL, spellPower_i);
             break;
         case SPELL_RESURRECT:
         case SPELL_TRUE_RESURRECT:
@@ -1167,14 +1167,14 @@ void combatManager::Fireball(i32 targetHex, i32 spell)
                 if (target_n->m_damagePending == 0) {
                     damage_f = baseDamage_w;
                     if (spell == SPELL_COLD_RING &&
-                        target_n->m_monsterType == SPELL_MONSTER_FIRE_ELEMENTAL)
+                        target_n->m_monsterType == CREATURE_FIRE_ELEMENTAL)
                         damage_f <<= 1;
                     if ((spell == SPELL_FIREBALL ||
                          spell == SPELL_FIREBLAST) &&
-                        target_n->m_monsterType == SPELL_MONSTER_WATER_ELEMENTAL)
+                        target_n->m_monsterType == CREATURE_WATER_ELEMENTAL)
                         damage_f *= 2;
-                    if (target_n->m_monsterType == SPELL_MONSTER_IRON_GOLEM ||
-                        target_n->m_monsterType == SPELL_MONSTER_STEEL_GOLEM) {
+                    if (target_n->m_monsterType == CREATURE_IRON_GOLEM ||
+                        target_n->m_monsterType == CREATURE_STEEL_GOLEM) {
                         damage_f = static_cast<i32l>(
                             damage_f * SPELL_GOLEM_DAMAGE_MULTIPLIER);
                     }
@@ -1258,7 +1258,7 @@ void combatManager::MeteorShower(i32 targetHex)
                 if (target_k->m_damagePending == 0) {
                     damage_c = baseDamage_w;
                     if (target_k->m_monsterType ==
-                        SPELL_MONSTER_EARTH_ELEMENTAL)
+                        CREATURE_EARTH_ELEMENTAL)
                         damage_c <<= 1;
                     target_k->Damage(damage_c, SPELL_METEOR_SHOWER);
                     anyAffected_h = 1;
@@ -1327,10 +1327,10 @@ void combatManager::ElementalStorm(void)
                        side_h * COMBAT_ARMY_STORAGE_SLOT_COUNT + armyIndex_e;
             if (target_m->SpellCastWorks(SPELL_ELEMENTAL_STORM)) {
                 damage_e = baseDamage_w;
-                if (target_m->m_monsterType == SPELL_MONSTER_AIR_ELEMENTAL)
+                if (target_m->m_monsterType == CREATURE_AIR_ELEMENTAL)
                     damage_e <<= 1;
-                if (target_m->m_monsterType == SPELL_MONSTER_IRON_GOLEM ||
-                    target_m->m_monsterType == SPELL_MONSTER_STEEL_GOLEM) {
+                if (target_m->m_monsterType == CREATURE_IRON_GOLEM ||
+                    target_m->m_monsterType == CREATURE_STEEL_GOLEM) {
                     damage_e = static_cast<i32l>(
                         damage_e * SPELL_GOLEM_DAMAGE_MULTIPLIER);
                 }
@@ -1383,8 +1383,8 @@ void combatManager::Armageddon(void)
             target18 = &m_armies[side11][armyIndex3];
             if (target18->SpellCastWorks(SPELL_ARMAGEDDON)) {
                 i32l damage9 = baseDamage2;
-                if (target18->m_monsterType == SPELL_MONSTER_IRON_GOLEM ||
-                    target18->m_monsterType == SPELL_MONSTER_STEEL_GOLEM) {
+                if (target18->m_monsterType == CREATURE_IRON_GOLEM ||
+                    target18->m_monsterType == CREATURE_STEEL_GOLEM) {
                     damage9 = static_cast<i32l>(
                         damage9 * SPELL_GOLEM_DAMAGE_MULTIPLIER);
                 }
@@ -2234,10 +2234,10 @@ void combatManager::ChainLightning(i32 targetHex, i32 spellPower)
             gpCombatManager->m_heroDeathPending[m_currentSide] = 1;
 
         i32 targetDamage = damage;
-        if (target->m_monsterType == SPELL_MONSTER_AIR_ELEMENTAL)
+        if (target->m_monsterType == CREATURE_AIR_ELEMENTAL)
             targetDamage *= CHAIN_LIGHTNING_AIR_ELEMENTAL_MULTIPLIER;
-        if (target->m_monsterType == SPELL_MONSTER_IRON_GOLEM ||
-            target->m_monsterType == SPELL_MONSTER_STEEL_GOLEM)
+        if (target->m_monsterType == CREATURE_IRON_GOLEM ||
+            target->m_monsterType == CREATURE_STEEL_GOLEM)
             targetDamage = static_cast<i32>(targetDamage *
                                             SPELL_GOLEM_DAMAGE_MULTIPLIER);
         target->Damage(targetDamage, COMBAT_HEX_EMPTY);

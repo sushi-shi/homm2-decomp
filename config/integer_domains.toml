@@ -53,6 +53,107 @@ evidence = [
 status = "reviewed"
 
 [[domain]]
+name = "CreatureType"
+declaration = "CreatureType"
+owner = "include/SOURCE/KB_TYPES.h"
+category = "serialized"
+production_carrier = "packed signed-byte storage and int combat/table boundaries"
+strict = true
+sentinels = ["CREATURE_NONE"]
+enumerators = [
+  "CREATURE_NONE",
+  "CREATURE_PEASANT",
+  "CREATURE_ARCHER",
+  "CREATURE_RANGER",
+  "CREATURE_PIKEMAN",
+  "CREATURE_VETERAN_PIKEMAN",
+  "CREATURE_SWORDSMAN",
+  "CREATURE_MASTER_SWORDSMAN",
+  "CREATURE_CAVALRY",
+  "CREATURE_CHAMPION",
+  "CREATURE_PALADIN",
+  "CREATURE_CRUSADER",
+  "CREATURE_GOBLIN",
+  "CREATURE_ORC",
+  "CREATURE_ORC_CHIEF",
+  "CREATURE_WOLF",
+  "CREATURE_OGRE",
+  "CREATURE_OGRE_LORD",
+  "CREATURE_TROLL",
+  "CREATURE_WAR_TROLL",
+  "CREATURE_CYCLOPS",
+  "CREATURE_SPRITE",
+  "CREATURE_DWARF",
+  "CREATURE_BATTLE_DWARF",
+  "CREATURE_ELF",
+  "CREATURE_GRAND_ELF",
+  "CREATURE_DRUID",
+  "CREATURE_GREATER_DRUID",
+  "CREATURE_UNICORN",
+  "CREATURE_PHOENIX",
+  "CREATURE_CENTAUR",
+  "CREATURE_GARGOYLE",
+  "CREATURE_GRIFFIN",
+  "CREATURE_MINOTAUR",
+  "CREATURE_MINOTAUR_KING",
+  "CREATURE_HYDRA",
+  "CREATURE_GREEN_DRAGON",
+  "CREATURE_RED_DRAGON",
+  "CREATURE_BLACK_DRAGON",
+  "CREATURE_HALFLING",
+  "CREATURE_BOAR",
+  "CREATURE_IRON_GOLEM",
+  "CREATURE_STEEL_GOLEM",
+  "CREATURE_ROC",
+  "CREATURE_MAGE",
+  "CREATURE_ARCHMAGE",
+  "CREATURE_GIANT",
+  "CREATURE_TITAN",
+  "CREATURE_SKELETON",
+  "CREATURE_ZOMBIE",
+  "CREATURE_MUTANT_ZOMBIE",
+  "CREATURE_MUMMY",
+  "CREATURE_ROYAL_MUMMY",
+  "CREATURE_VAMPIRE",
+  "CREATURE_VAMPIRE_LORD",
+  "CREATURE_LICH",
+  "CREATURE_POWER_LICH",
+  "CREATURE_BONE_DRAGON",
+  "CREATURE_ROGUE",
+  "CREATURE_NOMAD",
+  "CREATURE_GHOST",
+  "CREATURE_GENIE",
+  "CREATURE_MEDUSA",
+  "CREATURE_EARTH_ELEMENTAL",
+  "CREATURE_AIR_ELEMENTAL",
+  "CREATURE_FIRE_ELEMENTAL",
+  "CREATURE_WATER_ELEMENTAL",
+  "CREATURE_COUNT",
+]
+interfaces = [
+  "creature-indexed name, sprite, frame, and monster-stat tables",
+  "combat army construction and spell targeting",
+  "map event guards, recruitment, and mine guardians",
+]
+members = ["army::m_monsterType", "armyGroup::m_creatureTypes", "mineRecord::guardianType"]
+storage = [
+  "army::m_monsterType four-byte combat field",
+  "armyGroup::m_creatureTypes packed signed-byte array with -1 empty entries",
+  "mineRecord::guardianType packed signed byte",
+]
+conversions = [
+  "CreatureType to packed i8 army-group and mine storage boundaries",
+  "CreatureType to integer indices for 66-entry creature tables",
+]
+evidence = [
+  "retail gArmyNames, gArmyNamesPlural, sprite-name tables, and gMonsterDatabase share the same 66-entry order",
+  "AI, combat, random-hero, adventure-spell, and map-event subsets carry identical creature IDs",
+  "packed army-group and mine records use -1 as the absence sentinel without widening storage",
+  "expansion burial-site text and event dispatch identify site zero as Ghost recruitment rather than Genie",
+]
+status = "reviewed"
+
+[[domain]]
 name = "FactionType"
 declaration = "FactionType"
 owner = "include/SOURCE/KB_TYPES.h"

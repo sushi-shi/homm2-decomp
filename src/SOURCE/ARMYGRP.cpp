@@ -64,7 +64,7 @@ i32 armyGroup::GetMorale(hero *armyHero, town *occupiedTown, armyGroup *enemyGro
     enemyHasBoneDragon = 0;
     if (enemyGroup != 0) {
         for (index = 0; index < ARMY_GROUP_SLOT_COUNT; ++index) {
-            if (enemyGroup->m_creatureTypes[index] == ARMY_GROUP_CREATURE_BONE_DRAGON)
+            if (enemyGroup->m_creatureTypes[index] == CREATURE_BONE_DRAGON)
                 enemyHasBoneDragon = 1;
         }
     }

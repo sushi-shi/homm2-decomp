@@ -826,8 +826,8 @@ void combatManager::ResetRound(void)
             if (currentArmy->m_quantity > 0) {
                 currentArmy->m_monster.flags.abilityFlags &=
                     COMBAT_ROUND_ABILITY_FLAGS;
-                if (currentArmy->m_monsterType == ARMY_CREATURE_TROLL ||
-                    currentArmy->m_monsterType == ARMY_CREATURE_WAR_TROLL)
+                if (currentArmy->m_monsterType == CREATURE_TROLL ||
+                    currentArmy->m_monsterType == CREATURE_WAR_TROLL)
                     currentArmy->m_hitPointsLost = 0;
                 currentArmy->DecrementSpellRounds();
                 if (currentArmy->m_roundCounter == 0)
@@ -1800,11 +1800,11 @@ void combatManager::DoVictory(i32 winningSide)
             if (side == winningSide && currentArmy->m_quantity > 0 &&
                 (currentArmy->m_monster.flags.all &
                  MONSTER_FLAGS_LIGHT_PALETTE) == 0 &&
-                currentArmy->m_monsterType != ARMY_CREATURE_EARTH_ELEMENTAL &&
-                currentArmy->m_monsterType != ARMY_CREATURE_AIR_ELEMENTAL &&
-                currentArmy->m_monsterType != ARMY_CREATURE_FIRE_ELEMENTAL &&
-                currentArmy->m_monsterType != ARMY_CREATURE_WATER_ELEMENTAL &&
-                currentArmy->m_monsterType != ARMY_CREATURE_GHOST) {
+                currentArmy->m_monsterType != CREATURE_EARTH_ELEMENTAL &&
+                currentArmy->m_monsterType != CREATURE_AIR_ELEMENTAL &&
+                currentArmy->m_monsterType != CREATURE_FIRE_ELEMENTAL &&
+                currentArmy->m_monsterType != CREATURE_WATER_ELEMENTAL &&
+                currentArmy->m_monsterType != CREATURE_GHOST) {
                 ++eligibleWinnerStacks;
             }
             if (winningSide == COMBAT_DEFENDER_SIDE - side) {
@@ -2819,13 +2819,13 @@ void combatManager::AddArmy(i32 side, i32 monsterType, i32 quantity, i32 hex,
             ((m_armies[side][index_g].m_monster.flags.all &
               MONSTER_FLAGS_MIRROR_IMAGE) != 0 ||
              m_armies[side][index_g].m_monsterType ==
-                 ARMY_CREATURE_EARTH_ELEMENTAL ||
+                 CREATURE_EARTH_ELEMENTAL ||
              m_armies[side][index_g].m_monsterType ==
-                 ARMY_CREATURE_AIR_ELEMENTAL ||
+                 CREATURE_AIR_ELEMENTAL ||
              m_armies[side][index_g].m_monsterType ==
-                 ARMY_CREATURE_FIRE_ELEMENTAL ||
+                 CREATURE_FIRE_ELEMENTAL ||
              m_armies[side][index_g].m_monsterType ==
-                 ARMY_CREATURE_WATER_ELEMENTAL)) {
+                 CREATURE_WATER_ELEMENTAL)) {
             armyIndex_r = index_g;
             reusedArmy_m = 1;
             break;

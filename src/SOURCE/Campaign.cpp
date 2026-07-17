@@ -899,27 +899,27 @@ void game::InitCampaignMap(void)
         }
         switch (armyHero->m_cursorType) {
         case FACTION_BARBARIAN:
-            armyHero->m_army.Add(ARMY_CREATURE_ORC_CHIEF,
+            armyHero->m_army.Add(CREATURE_ORC_CHIEF,
                                  CAMPAIGN_BARBARIAN_ORC_CHIEF_COUNT, -1);
-            armyHero->m_army.Add(ARMY_CREATURE_OGRE,
+            armyHero->m_army.Add(CREATURE_OGRE,
                                  CAMPAIGN_BARBARIAN_OGRE_COUNT, -1);
-            armyHero->m_army.Add(ARMY_CREATURE_GOBLIN,
+            armyHero->m_army.Add(CREATURE_GOBLIN,
                                  CAMPAIGN_BARBARIAN_GOBLIN_COUNT, -1);
             break;
         case FACTION_WARLOCK:
-            armyHero->m_army.Add(ARMY_CREATURE_CENTAUR,
+            armyHero->m_army.Add(CREATURE_CENTAUR,
                                  CAMPAIGN_WARLOCK_CENTAUR_COUNT, -1);
-            armyHero->m_army.Add(ARMY_CREATURE_GARGOYLE,
+            armyHero->m_army.Add(CREATURE_GARGOYLE,
                                  CAMPAIGN_WARLOCK_GARGOYLE_COUNT, -1);
-            armyHero->m_army.Add(ARMY_CREATURE_GRIFFIN,
+            armyHero->m_army.Add(CREATURE_GRIFFIN,
                                  CAMPAIGN_WARLOCK_GRIFFIN_COUNT, -1);
             break;
         case FACTION_NECROMANCER:
-            armyHero->m_army.Add(ARMY_CREATURE_SKELETON,
+            armyHero->m_army.Add(CREATURE_SKELETON,
                                  CAMPAIGN_NECROMANCER_SKELETON_COUNT, -1);
-            armyHero->m_army.Add(ARMY_CREATURE_ROYAL_MUMMY,
+            armyHero->m_army.Add(CREATURE_ROYAL_MUMMY,
                                  CAMPAIGN_NECROMANCER_MUMMY_COUNT, -1);
-            armyHero->m_army.Add(ARMY_CREATURE_VAMPIRE_LORD,
+            armyHero->m_army.Add(CREATURE_VAMPIRE_LORD,
                                  CAMPAIGN_NECROMANCER_VAMPIRE_COUNT, -1);
             break;
         }
