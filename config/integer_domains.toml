@@ -1722,6 +1722,9 @@ declaration = "MiscFadeConstant"
 owner = "include/BASE/MiscGraphicsConstants.h"
 category = "value"
 enumerators = [
+  "MISC_FADE_LEVEL_COUNT",
+  "MISC_FADE_LEVEL_LAST",
+  "MISC_WINDOW_POSITION_MARGIN",
   "MISC_FADE_IN_FRAME_DELAY",
   "MISC_FADE_TO_INCREMENT_SHIFT",
   "MISC_FADE_TO_START_LEVEL",
@@ -2415,6 +2418,7 @@ declaration = "MessageModifier"
 owner = "include/BASE/message.h"
 category = "message-id"
 enumerators = [
+  "MESSAGE_MODIFIER_CONTROL_KEYS",
   "MESSAGE_MODIFIER_RIGHT_SHIFT",
   "MESSAGE_MODIFIER_LEFT_SHIFT",
   "MESSAGE_MODIFIER_CONTROL",
@@ -4519,34 +4523,16 @@ declaration = "AdventureQuickInfoObject"
 owner = "include/SOURCE/ADVMGR.h"
 category = "value"
 enumerators = [
+  "ADVMGR_ROUTE_BEYOND_MOBILITY_FLAG",
+  "ADVMGR_HERO_FRAME_MIRROR_FLAG",
+  "ADVMGR_HERO_FRAME_INDEX_MASK",
+  "ADVMGR_CHEAT_CREATURES",
+  "ADVMGR_CHEAT_WIN",
+  "ADVMGR_CHEAT_LOSE",
+  "ADVMGR_CHEAT_REVEAL_MAP",
+  "ADVMGR_CHEAT_INFO",
   "ADVMGR_OBELISK_INDEX_BASE",
   "ADVMGR_RESOURCE_FRAME_PAIR_MASK",
-  "ADVMGR_OBJECT_NONE",
-  "ADVMGR_OBJECT_FORT",
-  "ADVMGR_OBJECT_STANDING_STONES",
-  "ADVMGR_OBJECT_GAZEBO",
-  "ADVMGR_OBJECT_GAZEBO_VISIT",
-  "ADVMGR_OBJECT_MINE",
-  "ADVMGR_OBJECT_MONSTER",
-  "ADVMGR_OBJECT_OBELISK",
-  "ADVMGR_OBJECT_MERCENARY_CAMP",
-  "ADVMGR_OBJECT_RESOURCE",
-  "ADVMGR_OBJECT_ARTIFACT",
-  "ADVMGR_OBJECT_FORT_VISIT",
-  "ADVMGR_OBJECT_GUARDED",
-  "ADVMGR_OBJECT_STANDING_STONE_ALT",
-  "ADVMGR_OBJECT_XANADU",
-  "ADVMGR_OBJECT_TREE_ALT",
-  "ADVMGR_OBJECT_WITCH_DOCTOR_VISIT",
-  "ADVMGR_OBJECT_WITCH_DOCTOR_ALT",
-  "ADVMGR_OBJECT_MERCENARY_VISIT",
-  "ADVMGR_OBJECT_EVENT_SITE",
-  "ADVMGR_OBJECT_XANADU_ALT",
-  "ADVMGR_OBJECT_EVENT_SITE_ALT",
-  "ADVMGR_OBJECT_REEFS",
-  "ADVMGR_OBJECT_BARRIER",
-  "ADVMGR_OBJECT_TENT",
-  "ADVMGR_OBJECT_RECRUITMENT_SITE",
   "ADVMGR_OBJECT_GENERIC_SITE",
 ]
 evidence = [
@@ -4848,6 +4834,7 @@ declaration = "ArmyCombatConstant"
 owner = "include/SOURCE/ARMY.h"
 category = "value"
 enumerators = [
+  "ARMY_SPELL_EFFECT_ANIMATION_DURATION",
   "ARMY_SAMPLE_VOLUME",
   "ARMY_SAMPLE_CHANNEL",
   "ARMY_HEX_COLUMNS",
@@ -6423,6 +6410,10 @@ declaration = "MapEventConstant"
 owner = "include/SOURCE/EVENTS.h"
 category = "value"
 enumerators = [
+  "MAP_EVENT_ARTIFACT_GUARD_FLAG",
+  "MAP_EVENT_ARTIFACT_CONDITION_FLAG",
+  "MAP_EVENT_ARTIFACT_CONDITION_ID_MASK",
+  "MAP_EVENT_ARTIFACT_ID_MASK",
   "MAP_EVENT_DATA_EMPTY",
   "MAP_EVENT_DATA_SHIFT",
   "MAP_EVENT_RESOURCE_OFFSET",
@@ -7530,6 +7521,22 @@ declaration = "GameMapTrigger"
 owner = "include/SOURCE/GAME.h"
 category = "value"
 enumerators = [
+  "MAP_TRIGGER_MONSTER",
+  "MAP_TRIGGER_RESOURCE",
+  "MAP_TRIGGER_ARTIFACT",
+  "MAP_TRIGGER_RANDOM_ULTIMATE_ARTIFACT",
+  "MAP_TRIGGER_RANDOM_RESOURCE",
+  "MAP_TRIGGER_RANDOM_MONSTER",
+  "MAP_TRIGGER_RANDOM_TOWN",
+  "MAP_TRIGGER_RANDOM_CASTLE",
+  "MAP_TRIGGER_RANDOM_MINE",
+  "MAP_TRIGGER_RANDOM_MONSTER_LEVEL_1",
+  "MAP_TRIGGER_RANDOM_MONSTER_LEVEL_2",
+  "MAP_TRIGGER_RANDOM_MONSTER_LEVEL_3",
+  "MAP_TRIGGER_RANDOM_MONSTER_LEVEL_4",
+  "MAP_TRIGGER_RANDOM_ARTIFACT_LEVEL_1",
+  "MAP_TRIGGER_RANDOM_ARTIFACT_LEVEL_2",
+  "MAP_TRIGGER_RANDOM_ARTIFACT_LEVEL_3",
   "MAP_TRIGGER_TOWN_BASE",
   "MAP_TRIGGER_TOWN",
   "MAP_TRIGGER_RANDOM_ARTIFACT",
@@ -7600,6 +7607,9 @@ declaration = "GameWeeklyConstant"
 owner = "include/SOURCE/GAME.h"
 category = "value"
 enumerators = [
+  "WEEKLY_WATER_WHEEL_EMPTY",
+  "WEEKLY_MONSTER_POPULATION_LIMIT",
+  "WEEKLY_DWELLING_NO_GROWTH_FLAG",
   "WEEKLY_FIRST_DWELLING",
   "WEEKLY_LAST_DWELLING",
   "WEEKLY_RECRUIT_COUNT_SHIFT",
@@ -7714,6 +7724,8 @@ declaration = "GameRandomTownConstant"
 owner = "include/SOURCE/GAME.h"
 category = "value"
 enumerators = [
+  "NEUTRAL_TOWN_CASTLE_REINFORCE_CHANCE",
+  "NEUTRAL_TOWN_REINFORCE_CHANCE",
   "RANDOM_TOWN_UNOWNED_COLOR",
   "RANDOM_TOWN_RACE_MIN",
   "RANDOM_TOWN_RACE_MAX",
@@ -7746,6 +7758,8 @@ declaration = "GameRandomArtifactConstant"
 owner = "include/SOURCE/GAME.h"
 category = "value"
 enumerators = [
+  "RANDOM_ARTIFACT_BASE_TABLE_SIZE",
+  "GAME_SPECIAL_HERO_CLASS_NONE",
   "RANDOM_ARTIFACT_FIRST",
   "RANDOM_ARTIFACT_BASE_LAST",
   "RANDOM_ARTIFACT_EXPANSION_LAST",
@@ -8983,6 +8997,13 @@ declaration = "OldMainConstant"
 owner = "include/SOURCE/KB.h"
 category = "value"
 enumerators = [
+  "OLD_MAIN_WAIT_DIRECT_CONNECT",
+  "OLD_MAIN_WAIT_DP_FIRST_GUEST",
+  "OLD_MAIN_WAIT_DP_EXTRA_GUESTS",
+  "OLD_MAIN_WAIT_DP_HOST",
+  "OLD_MAIN_WAIT_WS_FIRST_GUEST",
+  "OLD_MAIN_WAIT_WS_EXTRA_GUESTS",
+  "OLD_MAIN_WAIT_WS_HOST",
   "OLD_MAIN_PLAYER_COUNT",
   "OLD_MAIN_MATCH_BUFFER_SIZE",
   "OLD_MAIN_PLAYER_NAME_LENGTH",
@@ -10080,20 +10101,6 @@ enumerators = [
 ]
 evidence = [
   "compared/assigned local integer namespace",
-  "first-pass constant taxonomy sweep; refinement queue in docs/constant-taxonomy.md",
-]
-status = "provisional"
-
-[[constant_group]]
-name = "AIArtifactEventFlag"
-declaration = "AIArtifactEventFlag"
-owner = "include/SOURCE/PHILAI.h"
-category = "flags"
-enumerators = [
-  "AI_ARTIFACT_EVENT_GUARD_FLAG",
-]
-evidence = [
-  "1/1 enumerator names carry flags suffixes",
   "first-pass constant taxonomy sweep; refinement queue in docs/constant-taxonomy.md",
 ]
 status = "provisional"
@@ -13373,6 +13380,7 @@ declaration = "FileRequesterControlId"
 owner = "include/SOURCE/fileRequester.h"
 category = "message-id"
 enumerators = [
+  "FILE_REQUESTER_FILENAME_LABEL",
   "FILE_REQUESTER_SCROLL_UP",
   "FILE_REQUESTER_SCROLL_DOWN",
   "FILE_REQUESTER_SCROLL_KNOB",
@@ -13547,6 +13555,7 @@ declaration = "HeroConstant"
 owner = "include/SOURCE/hero.h"
 category = "sentinel"
 enumerators = [
+  "HERO_BOAT_NONE",
   "HERO_OWNER_NONE",
   "HERO_DESTINATION_NONE",
   "HERO_MAP_CHANGE_UNUSED",
@@ -14862,5 +14871,293 @@ enumerators = [
 ]
 evidence = [
   "documented no-sprite and free-pool markers in the mapCell record comments",
+]
+status = "provisional"
+
+[[constant_group]]
+name = "ListBoxTiming"
+declaration = "ListBoxTiming"
+owner = "include/BASE/LISTBOX_TYPES.h"
+category = "value"
+enumerators = [
+  "LISTBOX_DOUBLE_CLICK_TICKS",
+]
+evidence = [
+  "named during the literal-coverage sweep; see docs/constant-taxonomy.md",
+]
+status = "provisional"
+
+[[constant_group]]
+name = "MiscCycleColorRange"
+declaration = "MiscCycleColorRange"
+owner = "include/BASE/MiscGraphicsConstants.h"
+category = "value"
+enumerators = [
+  "MISC_CYCLE_RANGE_ONE_FIRST",
+  "MISC_CYCLE_RANGE_ONE_LAST",
+  "MISC_CYCLE_RANGE_TWO_FIRST",
+  "MISC_CYCLE_RANGE_TWO_LAST",
+]
+evidence = [
+  "named during the literal-coverage sweep; see docs/constant-taxonomy.md",
+]
+status = "provisional"
+
+[[constant_group]]
+name = "TextEntryKeyConstant"
+declaration = "TextEntryKeyConstant"
+owner = "include/BASE/TEXTNTRY_TYPES.h"
+category = "value"
+enumerators = [
+  "TEXT_ENTRY_KEY_DELETE",
+]
+evidence = [
+  "named during the literal-coverage sweep; see docs/constant-taxonomy.md",
+]
+status = "provisional"
+
+[[constant_group]]
+name = "FontGlyphConstant"
+declaration = "FontGlyphConstant"
+owner = "include/BASE/font.h"
+category = "value"
+enumerators = [
+  "FONT_SPACER_CHAR",
+  "FONT_GLYPH_FALLBACK",
+]
+evidence = [
+  "named during the literal-coverage sweep; see docs/constant-taxonomy.md",
+]
+status = "provisional"
+
+[[constant_group]]
+name = "WindowFlag"
+declaration = "WindowFlag"
+owner = "include/BASE/heroWindow.h"
+category = "value"
+enumerators = [
+  "WINDOW_FLAG_OWNS_WIDGETS",
+  "WINDOW_UPDATE_SUPPRESS_MASK",
+  "WINDOW_ALL_WIDGETS_LOW",
+  "WINDOW_ALL_WIDGETS_HIGH",
+]
+evidence = [
+  "named during the literal-coverage sweep; see docs/constant-taxonomy.md",
+]
+status = "provisional"
+
+[[constant_group]]
+name = "InputManagerExtendedKey"
+declaration = "InputManagerExtendedKey"
+owner = "include/BASE/inputManager.h"
+category = "value"
+enumerators = [
+  "INPUT_EXTENDED_KEY_BASE",
+]
+evidence = [
+  "named during the literal-coverage sweep; see docs/constant-taxonomy.md",
+]
+status = "provisional"
+
+[[constant_group]]
+name = "SoundVolumeConstant"
+declaration = "SoundVolumeConstant"
+owner = "include/BASE/soundManager.h"
+category = "value"
+enumerators = [
+  "SOUND_VOLUME_STEPS",
+  "SOUND_SAMPLE_VOLUME_MAX",
+  "SOUND_MIDI_VOLUME_MAX",
+  "SOUND_CD_VOLUME_SCALE_DIVISOR",
+  "SOUND_CD_MUSIC_TRACK_FIRST",
+  "SOUND_CD_MUSIC_TRACK_LAST",
+  "SOUND_FADE_HOLD_STEPS",
+]
+evidence = [
+  "named during the literal-coverage sweep; see docs/constant-taxonomy.md",
+]
+status = "provisional"
+
+[[constant_group]]
+name = "MapCellFlag"
+declaration = "MapCellFlag"
+owner = "include/EDITOR/mapcell.h"
+category = "value"
+enumerators = [
+  "MAP_CELL_OBJECT_SHADOW_ONLY",
+  "MAP_CELL_OCCUPIED",
+]
+evidence = [
+  "named during the literal-coverage sweep; see docs/constant-taxonomy.md",
+]
+status = "provisional"
+
+[[constant_group]]
+name = "FindPathConstant"
+declaration = "FindPathConstant"
+owner = "include/SOURCE/FINDPATH.h"
+category = "value"
+enumerators = [
+  "PATH_ATTACK_MASK_SURROUNDED",
+  "PATH_LENGTH_LIMIT",
+]
+evidence = [
+  "named during the literal-coverage sweep; see docs/constant-taxonomy.md",
+]
+status = "provisional"
+
+[[constant_group]]
+name = "GameDiffEncoding"
+declaration = "GameDiffEncoding"
+owner = "include/SOURCE/GAME.h"
+category = "value"
+enumerators = [
+  "DIFF_COMMAND_SHIFT",
+  "DIFF_LEN_WORD_FLAG",
+  "DIFF_LEN_BYTE_FLAG",
+  "DIFF_LEN_WORD_HIGH_MASK",
+  "DIFF_LEN_SHORT_MASK",
+  "DIFF_LEN_BYTE_MAX",
+  "DIFF_LEN_WORD_MAX",
+]
+evidence = [
+  "named during the literal-coverage sweep; see docs/constant-taxonomy.md",
+]
+status = "provisional"
+
+[[constant_group]]
+name = "GameSaveSentinel"
+declaration = "GameSaveSentinel"
+owner = "include/SOURCE/GAME.h"
+category = "value"
+enumerators = [
+  "GAME_SAVED_TOWN_OFF_MAP",
+]
+evidence = [
+  "named during the literal-coverage sweep; see docs/constant-taxonomy.md",
+]
+status = "provisional"
+
+[[constant_group]]
+name = "RemoteCrcConstant"
+declaration = "RemoteCrcConstant"
+owner = "include/SOURCE/REMOTE.h"
+category = "value"
+enumerators = [
+  "REMOTE_CRC_FEEDBACK_BIT",
+]
+evidence = [
+  "named during the literal-coverage sweep; see docs/constant-taxonomy.md",
+]
+status = "provisional"
+
+[[constant_group]]
+name = "TilesetId"
+declaration = "TilesetId"
+owner = "include/SOURCE/X_GLOBAL.h"
+category = "value"
+enumerators = [
+  "TILESET_OBJNHAUN",
+  "TILESET_OBJNARTI",
+  "TILESET_MONS32",
+  "TILESET_ART32",
+  "TILESET_FLAG32",
+  "TILESET_RESSMALL",
+  "TILESET_HOURGLAS",
+  "TILESET_ROUTE",
+  "TILESET_STONBACK",
+  "TILESET_MINIMON",
+  "TILESET_MINIHERO",
+  "TILESET_MTNSNOW",
+  "TILESET_MTNSWMP",
+  "TILESET_MTNLAVA",
+  "TILESET_MTNDSRT",
+  "TILESET_MTNDIRT",
+  "TILESET_MTNMULT",
+  "TILESET_EXTRAOVR",
+  "TILESET_ROAD",
+  "TILESET_MTNCRCK",
+  "TILESET_MTNGRAS",
+  "TILESET_TREJNGL",
+  "TILESET_TREEVIL",
+  "TILESET_OBJNTOWN",
+  "TILESET_OBJNTWBA",
+  "TILESET_OBJNTWSH",
+  "TILESET_OBJNTWRD",
+  "TILESET_OBJNXTRA",
+  "TILESET_OBJNWAT2",
+  "TILESET_OBJNMUL2",
+  "TILESET_TRESNOW",
+  "TILESET_TREFIR",
+  "TILESET_TREFALL",
+  "TILESET_STREAM",
+  "TILESET_OBJNRSRC",
+  "TILESET_DUMMY",
+  "TILESET_OBJNGRA2",
+  "TILESET_TREDECI",
+  "TILESET_OBJNWATR",
+  "TILESET_OBJNGRAS",
+  "TILESET_OBJNSNOW",
+  "TILESET_OBJNSWMP",
+  "TILESET_OBJNLAVA",
+  "TILESET_OBJNDSRT",
+  "TILESET_OBJNDIRT",
+  "TILESET_OBJNCRCK",
+  "TILESET_OBJNLAV3",
+  "TILESET_OBJNMULT",
+  "TILESET_OBJNLAV2",
+  "TILESET_X_LOC1",
+  "TILESET_X_LOC2",
+  "TILESET_X_LOC3",
+]
+evidence = [
+  "named during the literal-coverage sweep; see docs/constant-taxonomy.md",
+]
+status = "provisional"
+
+[[constant_group]]
+name = "BitmapConstant"
+declaration = "BitmapConstant"
+owner = "src/BASE/BITMAP.cpp"
+category = "value"
+enumerators = [
+  "COPY_STRIDE",
+]
+evidence = [
+  "named during the literal-coverage sweep; see docs/constant-taxonomy.md",
+]
+status = "provisional"
+
+[[constant_group]]
+name = "RegistryValueSize"
+declaration = "RegistryValueSize"
+owner = "src/BASE/Misc.cpp"
+category = "value"
+enumerators = [
+  "MODEM_INIT_STRING_SIZE",
+  "UNIQUE_SYSTEM_ID_SIZE",
+  "NETWORK_DEFAULT_NAME_SIZE",
+]
+evidence = [
+  "named during the literal-coverage sweep; see docs/constant-taxonomy.md",
+]
+status = "provisional"
+
+[[constant_group]]
+name = "RequesterIconFrame"
+declaration = "RequesterIconFrame"
+owner = "src/SOURCE/REQUEST.cpp"
+category = "value"
+enumerators = [
+  "PLAYER_COUNT_FRAME_BASE",
+  "MAP_SIZE_FRAME_SMALL",
+  "MAP_SIZE_FRAME_MEDIUM",
+  "MAP_SIZE_FRAME_LARGE",
+  "MAP_SIZE_FRAME_XLARGE",
+  "VICTORY_FRAME_BASE",
+  "LOSS_FRAME_BASE",
+]
+evidence = [
+  "named during the literal-coverage sweep; see docs/constant-taxonomy.md",
 ]
 status = "provisional"

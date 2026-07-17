@@ -3,6 +3,10 @@
 
 #include <va.h>
 
+typedef enum ListBoxTiming {
+    LISTBOX_DOUBLE_CLICK_TICKS = 0x190
+} ListBoxTiming;
+
 typedef enum ListBoxSourceFileConstant {
     LISTBOX_SOURCE_FILE_SLOT_SIZE = 0x2c
 } ListBoxSourceFileConstant;

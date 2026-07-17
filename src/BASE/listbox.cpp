@@ -225,7 +225,7 @@ i32 listBoxWidget::Main(tag_message& message) {
                 return ProcessMouseMessage(message);
             break;
         case MESSAGE_LEFT_BUTTON_DOWN:
-        case 0x20: {
+        case MESSAGE_RIGHT_BUTTON_DOWN: {
             if (!(m_flags & WIDGET_FLAG_DRAW))
                 break;
             i16 mx = message.payload.mouse.x - m_owner->m_posX;
@@ -244,19 +244,19 @@ i32 listBoxWidget::Main(tag_message& message) {
         }
         case MESSAGE_WIDGET:
             switch (message.payload.widget.command) {
-                case 0x36:
+                case WIDGET_COMMAND_SET_SELECTION:
                     if (m_id == message.payload.widget.id) {
                         m_selectedIndex = message.payload.widget.data.value;
                         return 1;
                     }
                     break;
-                case 0x37:
+                case WIDGET_COMMAND_GET_SELECTION:
                     if (m_id == message.payload.widget.id) {
                         message.payload.widget.data.value = m_selectedIndex;
                         return 1;
                     }
                     break;
-                case 0x39:
+                case WIDGET_COMMAND_REPLACE_ITEM:
                     if (m_id == message.payload.widget.id) {
                         char* text = message.payload.widget.data.text;
                         if (m_itemCount <= message.payload.widget.parameter)
@@ -268,7 +268,7 @@ i32 listBoxWidget::Main(tag_message& message) {
                         strcpy(m_items[message.payload.widget.parameter], text);
                     }
                     break;
-                case 0x38:
+                case WIDGET_COMMAND_APPEND_ITEM:
                     if (m_id == message.payload.widget.id) {
                         char* text = message.payload.widget.data.text;
 #line 233
@@ -300,11 +300,11 @@ i32 listBoxWidget::Main(tag_message& message) {
                             m_visibleItemCount = m_itemCount;
                     }
                     break;
-                case 0x3a:
+                case WIDGET_COMMAND_DELETE_ITEM:
                     if (m_id == message.payload.widget.id)
                         DeleteItem(message.payload.widget.data.value);
                     break;
-                case 0x3b:
+                case WIDGET_COMMAND_CLEAR_ITEMS:
                     if (m_id == message.payload.widget.id)
                         while (m_itemCount != 0)
                             DeleteItem(0);
@@ -511,7 +511,7 @@ i32 listBoxWidget::ProcessMouseMessage(tag_message& message) {
                 if (m_lastSelectedIndex == m_selectedIndex) {
                     i32 lastTick = m_lastClickTime;
                     i32 currentTick = KBTickCount();
-                    if (lastTick + 0x190 > currentTick)
+                    if (lastTick + LISTBOX_DOUBLE_CLICK_TICKS > currentTick)
                         message.payload.widget.parameter = 2;
                 }
                 m_lastSelectedIndex = m_selectedIndex;

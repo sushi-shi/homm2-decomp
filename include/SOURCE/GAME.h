@@ -121,7 +121,24 @@ typedef enum GameJoinConstant {
     GAME_JOIN_LOG_UNUSED = -999
 } GameJoinConstant;
 
+typedef enum GameDiffEncoding {
+    DIFF_COMMAND_SHIFT = 7,
+    DIFF_LEN_WORD_FLAG = 0x40,
+    DIFF_LEN_BYTE_FLAG = 0x20,
+    DIFF_LEN_WORD_HIGH_MASK = 0x3f,
+    DIFF_LEN_SHORT_MASK = 0x1f,
+    DIFF_LEN_BYTE_MAX = 0x1f,
+    DIFF_LEN_WORD_MAX = 0x1fff
+} GameDiffEncoding;
+
+typedef enum GameSaveSentinel {
+    GAME_SAVED_TOWN_OFF_MAP = 0xff
+} GameSaveSentinel;
+
 typedef enum GameWeeklyConstant {
+    WEEKLY_WATER_WHEEL_EMPTY = 0xff,
+    WEEKLY_MONSTER_POPULATION_LIMIT = 0x1fe1,
+    WEEKLY_DWELLING_NO_GROWTH_FLAG = 0x80,
     WEEKLY_FIRST_DWELLING = 19,
     WEEKLY_LAST_DWELLING = 30,
     WEEKLY_GROWTH_LIMIT = 0x1feb,
@@ -164,6 +181,8 @@ typedef enum GameMonthlyConstant {
 } GameMonthlyConstant;
 
 typedef enum GameRandomTownConstant {
+    NEUTRAL_TOWN_CASTLE_REINFORCE_CHANCE = 80,
+    NEUTRAL_TOWN_REINFORCE_CHANCE = 40,
     RANDOM_TOWN_UNOWNED_COLOR = -1,
     RANDOM_TOWN_RACE_MIN = 0,
     RANDOM_TOWN_RACE_MAX = 5,
@@ -186,6 +205,8 @@ typedef enum GameRandomTownConstant {
 } GameRandomTownConstant;
 
 typedef enum GameRandomArtifactConstant {
+    RANDOM_ARTIFACT_BASE_TABLE_SIZE = ARTIFACT_MAGIC_BOOK + 1,
+    GAME_SPECIAL_HERO_CLASS_NONE = -1,
     RANDOM_ARTIFACT_FIRST = ARTIFACT_ULTIMATE_BOOK,
     RANDOM_ARTIFACT_BASE_LAST = ARTIFACT_MAGIC_BOOK,
     RANDOM_ARTIFACT_EXPANSION_LAST = ARTIFACT_SPADE_NECROMANCY,

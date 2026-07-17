@@ -277,7 +277,7 @@ i32 textEntryWidget::Main(struct tag_message& message) {
                                 if (event.payload.keyboard.keyCode == 10) {
                                     gbTextEntryEscaped = 0;
                                     done++;
-                                } else if (event.payload.keyboard.keyCode == 0x7f) {
+                                } else if (event.payload.keyboard.keyCode == TEXT_ENTRY_KEY_DELETE) {
                                     if (m_cursorPosition != 0) {
                                         strcpy(scratch, edit + m_cursorPosition);
                                         strcpy(edit + m_cursorPosition - 1, scratch);
@@ -289,7 +289,7 @@ i32 textEntryWidget::Main(struct tag_message& message) {
                                            && event.payload.keyboard.keyCode != 0) {
                                     strcpy(backup, edit);
                                     char typed = 0;
-                                    if (event.payload.keyboard.keyCode >= 0x100) {
+                                    if (event.payload.keyboard.keyCode >= INPUT_EXTENDED_KEY_BASE) {
                                         switch ((event.payload.keyboard.keyCode >> 8) & 0xff) {
                                             case INPUT_SCAN_NUMPAD_7:
                                                 typed = '7';

@@ -304,19 +304,19 @@ VA(0x004cc1c0, 0xdd)
 i32 soundManager::ConvertVolume(i32 param_1, i32 param_2) {
     i32 local_8 = 0;
     if (param_2 == SOUND_VOLUME_MUSIC) {
-        if (gConfig.musicVolume >= 1 && gConfig.musicVolume <= 0xa) {
+        if (gConfig.musicVolume >= 1 && gConfig.musicVolume <= SOUND_VOLUME_STEPS) {
             local_8 = ((0xb - gConfig.musicVolume) * param_1) / 10;
             if (local_8 < 1)
                 local_8 = 1;
         }
-    } else if (gConfig.soundVolume >= 1 && gConfig.soundVolume <= 0xa) {
+    } else if (gConfig.soundVolume >= 1 && gConfig.soundVolume <= SOUND_VOLUME_STEPS) {
         local_8 = ((0xb - gConfig.soundVolume) * param_1) / 10;
         if (local_8 < 1)
             local_8 = 1;
     }
     if (local_8 < 0)
         local_8 = 0;
-    if (0x7f < local_8)
+    if (SOUND_MIDI_VOLUME_MAX < local_8)
         local_8 = 0x7f;
     return local_8;
 }
@@ -364,7 +364,7 @@ struct _DIG_DRIVER* WAVE_init_driver(u32l param_1, u16 param_2, u16 param_3, u16
         drvr = 0;
         return 0;
     }
-    if (waveOutGetDevCapsA(0, &caps, 0x34) != 0) {
+    if (waveOutGetDevCapsA(0, &caps, sizeof(caps)) != 0) {
         MessageBoxA(
             static_cast<HWND>(hwndApp),
             "Sound initialization error!  No wave devices found.",
@@ -803,14 +803,14 @@ void soundManager::PollSound(void) {
     if (m_fadeSteps > 0) {
         LogStr("Poll Sound 1a");
         Process1WindowsMessage();
-        if (m_currentTrack < 8 || m_currentTrack > 0xf)
+        if (m_currentTrack < SOUND_CD_MUSIC_TRACK_FIRST || m_currentTrack > SOUND_CD_MUSIC_TRACK_LAST)
             glTimers[GLOBAL_MUSIC_FADE_TIMER_SLOT] = KBTickCount();
         delta = glTimers[GLOBAL_MUSIC_FADE_TIMER_SLOT] - KBTickCount();
         m_fadeSteps = delta / 0x3c;
         if (m_fadeSteps < 1)
             m_fadeSteps = 0;
         LogStr("Poll Sound 1b");
-        if (m_fadeSteps <= 0xa && m_currentTrack != m_fadeTargetTrack) {
+        if (m_fadeSteps <= SOUND_FADE_HOLD_STEPS && m_currentTrack != m_fadeTargetTrack) {
             if (m_midiFile != 0 && bSaveMusicPosition[m_currentTrack] != 0) {
                 if (gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI) {
                     H2_ASSERT(reinterpret_cast<i32>(m_midiFile), RETAIL_FILE, 0x61a);
@@ -831,20 +831,20 @@ void soundManager::PollSound(void) {
             m_currentTrack = static_cast<char>(m_fadeTargetTrack);
         }
         snap = m_fadeSteps;
-        if (m_fadeSteps <= 0xa)
+        if (m_fadeSteps <= SOUND_FADE_HOLD_STEPS)
             volume = (0xb - m_fadeSteps) * 0x40 / 0xb;
         else
-            volume = (m_fadeSteps - 0xa) * 0x40 / 6;
-        if (volume > 0x40)
-            volume = 0x40;
+            volume = (m_fadeSteps - SOUND_FADE_HOLD_STEPS) * SOUND_SAMPLE_VOLUME_MAX / 6;
+        if (volume > SOUND_SAMPLE_VOLUME_MAX)
+            volume = SOUND_SAMPLE_VOLUME_MAX;
         if (volume < 0)
             volume = 0;
         LogStr("Poll Sound 1c");
         smp = m_sampleHandles[0];
         if (gConfig.musicSource != CONFIG_MUSIC_SOURCE_MIDI) {
-            volume = (0xb - gConfig.musicVolume) * volume * 0x7f / 0x280;
-            if (volume > 0x7f)
-                volume = 0x7f;
+            volume = (SOUND_VOLUME_STEPS + 1 - gConfig.musicVolume) * volume * SOUND_MIDI_VOLUME_MAX / SOUND_CD_VOLUME_SCALE_DIVISOR;
+            if (volume > SOUND_MIDI_VOLUME_MAX)
+                volume = SOUND_MIDI_VOLUME_MAX;
             if (volume < 0)
                 volume = 0;
             CDSetVolume(volume, 1);
@@ -877,7 +877,7 @@ void soundManager::SwitchAmbientMusic(i32 param_1) {
     Process1WindowsMessage();
     if ((m_fadeSteps != 0 && m_fadeTargetTrack != param_1)
         || (m_fadeSteps == 0 && m_currentTrack != param_1)) {
-        if (m_fadeSteps <= 0xa) {
+        if (m_fadeSteps <= SOUND_FADE_HOLD_STEPS) {
             m_fadeSteps = 0xb;
             glTimers[GLOBAL_MUSIC_FADE_TIMER_SLOT] = KBTickCount() + 900;
         }

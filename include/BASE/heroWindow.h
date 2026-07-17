@@ -8,6 +8,13 @@ class widget;
 class bitmap;
 struct tag_message;
 
+typedef enum WindowFlag {
+    WINDOW_FLAG_OWNS_WIDGETS = 0x4000,   // Close/RemoveWidgetById delete the widgets
+    WINDOW_UPDATE_SUPPRESS_MASK = 0x7fff, // DrawWindow skips the screen update when == 1
+    WINDOW_ALL_WIDGETS_LOW = -0xffff,     // DrawWindow id-range sentinel: no filter
+    WINDOW_ALL_WIDGETS_HIGH = 0xffff
+} WindowFlag;
+
 typedef enum WindowWidgetRecordType {
     WINDOW_WIDGET_RECORD_END = 0,
     WINDOW_WIDGET_RECORD_BORDER = 1,

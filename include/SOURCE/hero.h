@@ -48,6 +48,7 @@ typedef enum HeroPrimaryStat {
 
 typedef enum HeroConstant {
     HERO_OWNER_NONE = -1,
+    HERO_BOAT_NONE = 0xff,
     HERO_DESTINATION_NONE = -1,
     HERO_INTERACTION_TURN_NONE = -99,
     HERO_LOCATION_TOWN = 0xa3,

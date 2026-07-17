@@ -357,7 +357,7 @@ i32 calc_crc_long(u8* data, i32 length) {
     sum = 0;
     unused = 0;
     while (length-- != 0) {
-        shifted = crc & 0x08000000;
+        shifted = crc & REMOTE_CRC_FEEDBACK_BIT;
         crc <<= 1;
         crc += *data;
         sum += *data;

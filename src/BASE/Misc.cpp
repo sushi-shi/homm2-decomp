@@ -575,16 +575,16 @@ void FadeOut(i32 increment) {
     memcpy(fadePalette->m_data, gpBufferPalette->m_data, 0x300);
     i32 level = 0;
     for (;;) {
-        if (level >= 0x40) {
+        if (level >= MISC_FADE_LEVEL_COUNT) {
             if (done) {
                 delete fadePalette;
                 return;
             }
-            level = 0x3f;
+            level = MISC_FADE_LEVEL_LAST;
         }
         i32 delayUntil = KBTickCount() + 0x14;
         PollSound();
-        if (level == 0x3f)
+        if (level == MISC_FADE_LEVEL_LAST)
             done = 1;
         for (i32 i = 0; i < 0x300; ++i) {
             if (fadePalette->m_data[i] > 0) {
@@ -617,7 +617,7 @@ void ProcessAssert(i32 condition, char* file, i32 line) {
         gpMouseManager->SetColorMice(0);
         SetFullScreenStatus(0);
         sprintf(gText, gMiscText.memory.assertMessage.text, file, line);
-        if (MessageBoxA(hwndApp, gText, gMiscText.memory.assertTitle.text, 0x14) != 7) {
+        if (MessageBoxA(hwndApp, gText, gMiscText.memory.assertTitle.text, MB_YESNO | MB_ICONHAND) != IDNO) {
             ShutDown(0);
         }
     }
@@ -1227,8 +1227,8 @@ void ReadPrefsFromRegistry(void) {
         gConfig.gfx[giCurExe].x = giMainVideoModeHeight - 0xc8;
     if (gConfig.gfx[giCurExe].y < 0)
         gConfig.gfx[giCurExe].y = 0;
-    if (gConfig.gfx[giCurExe].y > giMainVideoModeWidth - 0xc8)
-        gConfig.gfx[giCurExe].y = giMainVideoModeWidth - 0xc8;
+    if (gConfig.gfx[giCurExe].y > giMainVideoModeWidth - MISC_WINDOW_POSITION_MARGIN)
+        gConfig.gfx[giCurExe].y = giMainVideoModeWidth - MISC_WINDOW_POSITION_MARGIN;
 }
 
 VA(0x004c5450, 0xa1)
@@ -2108,7 +2108,7 @@ void FadeToColorTable(u8* colorTable, i32 increment) {
 
 VA(0x004c66a0, 0x29)
 i32 IsCycleColor(i32 color) {
-    if ((color >= 0xD6 && color <= 0xDD) || (color >= 0xE7 && color <= 0xED)) {
+    if ((color >= MISC_CYCLE_RANGE_ONE_FIRST && color <= MISC_CYCLE_RANGE_ONE_LAST) || (color >= MISC_CYCLE_RANGE_TWO_FIRST && color <= MISC_CYCLE_RANGE_TWO_LAST)) {
         return 1;
     }
     return 0;
