@@ -3345,14 +3345,14 @@ i32 game::ComputeDailyGold(i32 player) {
 
     for (index = 0; index < 72; index++) {
         if (m_castleRecs[index].m_owner == player) {
-            if (m_castleRecs[index].m_buildings & (1 << BUILDING_SLOT_UPGRADE_CASTLE))
+            if (m_castleRecs[index].m_buildings & BIT(BUILDING_SLOT_UPGRADE_CASTLE))
                 gold += 250;
             else
                 gold += 1000;
-            if (m_castleRecs[index].m_buildings & (1 << BUILDING_SLOT_SPECIAL_SEVEN))
+            if (m_castleRecs[index].m_buildings & BIT(BUILDING_SLOT_SPECIAL_SEVEN))
                 gold += 250;
             if (m_castleRecs[index].m_type == 3
-                && (m_castleRecs[index].m_buildings & (1 << BUILDING_SLOT_SPECIAL)))
+                && (m_castleRecs[index].m_buildings & BIT(BUILDING_SLOT_SPECIAL)))
                 gold += 500;
         }
     }
@@ -3574,10 +3574,10 @@ void game::PerWeek(void) {
                 growth13 = gMonsterDatabase[gDwellingType[castle37->m_type]
                                                          [innerIndex3 - WEEKLY_FIRST_DWELLING]]
                                .growth;
-                if (castle37->m_buildings & (1 << BUILDING_SLOT_SPECIAL_FOUR))
+                if (castle37->m_buildings & BIT(BUILDING_SLOT_SPECIAL_FOUR))
                     growth13 += 2;
                 if (innerIndex3 == WEEKLY_FIRST_DWELLING
-                    && (castle37->m_buildings & (1 << BUILDING_SLOT_WELL_EXTRA)))
+                    && (castle37->m_buildings & BIT(BUILDING_SLOT_WELL_EXTRA)))
                     growth13 += 8;
                 if (castle37->m_owner == -1)
                     growth13 /= 2;
@@ -5061,7 +5061,7 @@ void game::SetupTowns(void) {
         if (castle->m_buildings & 1) {
             for (slot = 1; slot <= castle->m_buildState; slot++) {
                 castle->m_spellCounts[slot] = gSpellLimits[slot - 1];
-                if (castle->m_type == 4 && (castle->m_buildings & (1 << BUILDING_SLOT_SPECIAL)))
+                if (castle->m_type == 4 && (castle->m_buildings & BIT(BUILDING_SLOT_SPECIAL)))
                     castle->m_spellCounts[slot]++;
             }
         }

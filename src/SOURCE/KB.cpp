@@ -1986,7 +1986,7 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
          && !gpGame->m_mapHeader.allowNormalVictory)
         || (gbInCampaign && gpGame->m_campaignType == IDX(CHECK_END_GAME_ARCHIBALD_CAMPAIGN)
             && gpGame->m_campaignScenario + IDX(CHECK_END_GAME_SCENARIO_OFFSET)
-                   == CHECK_END_GAME_SIDE_SCENARIO)) {
+                   == IDX(CHECK_END_GAME_SIDE_SCENARIO))) {
         allowNormalVictory = 0;
     }
 
@@ -1994,7 +1994,7 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
         && gpGame->m_mapHeader.victoryConditionValue != IDX(CHECK_END_GAME_SIDE_SPECIAL_VALUE)
         && (!gbInCampaign || gpGame->m_campaignType != IDX(CHECK_END_GAME_ARCHIBALD_CAMPAIGN)
             || gpGame->m_campaignScenario + IDX(CHECK_END_GAME_SCENARIO_OFFSET)
-                   != CHECK_END_GAME_SIDE_SCENARIO)) {
+                   != IDX(CHECK_END_GAME_SIDE_SCENARIO))) {
         sideBelow_i = 0;
         sideAbove = 0;
         for (player = 0; player < gpGame->m_playerCount; player++) {
@@ -2155,8 +2155,8 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
 
     if (gpGame->m_mapHeader.lossCondition == IDX(MAP_LOSS_TIME)) {
         if (gpGame->m_mapHeader.lossConditionValue
-            < (gpGame->m_week - 1) * CHECK_END_GAME_DAYS_PER_WEEK
-                  + (gpGame->m_month - 1) * CHECK_END_GAME_DAYS_PER_MONTH + gpGame->m_day) {
+            < (gpGame->m_week - 1) * IDX(CHECK_END_GAME_DAYS_PER_WEEK)
+                  + (gpGame->m_month - 1) * IDX(CHECK_END_GAME_DAYS_PER_MONTH) + gpGame->m_day) {
             defeated = 1;
             if (!showedDialog) {
                 showedDialog = 1;
@@ -2227,7 +2227,7 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
 
     if (gbInCampaign && gpGame->m_campaignType == IDX(CHECK_END_GAME_ROLAND_CAMPAIGN)
         && gpGame->m_campaignScenario + IDX(CHECK_END_GAME_SCENARIO_OFFSET)
-               == CHECK_END_GAME_DWARF_SCENARIO) {
+               == IDX(CHECK_END_GAME_DWARF_SCENARIO)) {
         hasDwarfTown = 0;
         for (player = 0; player < gpGame->m_players[0].m_townCount; player++) {
             if (gpGame->GetTown(gpGame->m_players[0].m_townIds[player])->m_type
@@ -2251,7 +2251,7 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
 
     if (gbInCampaign && gpGame->m_campaignType == IDX(CHECK_END_GAME_ARCHIBALD_CAMPAIGN)
         && gpGame->m_campaignScenario + IDX(CHECK_END_GAME_SCENARIO_OFFSET)
-               == CHECK_END_GAME_SIDE_SCENARIO
+               == IDX(CHECK_END_GAME_SIDE_SCENARIO)
         && dragonCityCaptured) {
         winFlag = 1;
         if (!showedDialog) {
@@ -2263,7 +2263,7 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
 
     if (gbInCampaign && gpGame->m_campaignType == IDX(CHECK_END_GAME_ROLAND_CAMPAIGN)
         && gpGame->m_campaignScenario + IDX(CHECK_END_GAME_SCENARIO_OFFSET)
-               == CHECK_END_GAME_ROLAND_CAPTURE_SCENARIO) {
+               == IDX(CHECK_END_GAME_ROLAND_CAPTURE_SCENARIO)) {
         hasRoland_j = 0;
         for (player = 0; player < CHECK_END_GAME_HERO_COUNT; player++) {
             if (gpGame->m_heroRecs[player].m_portrait == IDX(CHECK_END_GAME_ROLAND_HERO)
@@ -2284,7 +2284,7 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
 
     if (gbInCampaign && gpGame->m_campaignType == IDX(CHECK_END_GAME_ROLAND_CAMPAIGN)
         && gpGame->m_campaignScenario + IDX(CHECK_END_GAME_SCENARIO_OFFSET)
-               == CHECK_END_GAME_ROLAND_CAPTURE_SCENARIO) {
+               == IDX(CHECK_END_GAME_ROLAND_CAPTURE_SCENARIO)) {
         enemyRemaining = 0;
         for (player = 0; player < gpGame->m_playerCount; player++) {
             if (!gpGame->m_playerDead[player]
@@ -2348,8 +2348,8 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
     }
 
     if (gbInCampaign && winFlag) {
-        currentDayIndex = (gpGame->m_week - 1) * CHECK_END_GAME_DAYS_PER_WEEK
-                          + (gpGame->m_month - 1) * CHECK_END_GAME_DAYS_PER_MONTH + gpGame->m_day;
+        currentDayIndex = (gpGame->m_week - 1) * IDX(CHECK_END_GAME_DAYS_PER_WEEK)
+                          + (gpGame->m_month - 1) * IDX(CHECK_END_GAME_DAYS_PER_MONTH) + gpGame->m_day;
         gpGame->m_campaignScenarioWon = 1;
         gpGame->m_campaignScenarioCompleted[gpGame->m_campaignType][gpGame->m_campaignScenario] = 1;
         gpGame->m_campaignScenarioDays[gpGame->m_campaignType][gpGame->m_campaignScenario] =
@@ -2361,12 +2361,12 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
         carryoverHeroId = IDX(CHECK_END_GAME_NO_PLAYER);
         if (gpGame->m_campaignType == IDX(CHECK_END_GAME_ROLAND_CAMPAIGN)
             && gpGame->m_campaignScenario + IDX(CHECK_END_GAME_SCENARIO_OFFSET)
-                   == CHECK_END_GAME_SIDE_SCENARIO) {
+                   == IDX(CHECK_END_GAME_SIDE_SCENARIO)) {
             carryoverHeroId = IDX(CHECK_END_GAME_SIDE_SPECIAL_VALUE);
         }
         if (gpGame->m_campaignType == IDX(CHECK_END_GAME_ARCHIBALD_CAMPAIGN)
             && gpGame->m_campaignScenario + IDX(CHECK_END_GAME_SCENARIO_OFFSET)
-                   == CHECK_END_GAME_FIRST_NO_SAVE_SCENARIO) {
+                   == IDX(CHECK_END_GAME_FIRST_NO_SAVE_SCENARIO)) {
             carryoverHeroId = IDX(CHECK_END_GAME_SIDE_SPECIAL_VALUE);
         }
 
@@ -2400,9 +2400,9 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
         }
 
         if (gpGame->m_campaignScenario + IDX(CHECK_END_GAME_SCENARIO_OFFSET)
-                != CHECK_END_GAME_LAST_SCENARIO
+                != IDX(CHECK_END_GAME_LAST_SCENARIO)
             && (gpGame->m_campaignScenario + IDX(CHECK_END_GAME_SCENARIO_OFFSET)
-                    != CHECK_END_GAME_FIRST_NO_SAVE_SCENARIO
+                    != IDX(CHECK_END_GAME_FIRST_NO_SAVE_SCENARIO)
                 || gpGame->m_campaignType != IDX(CHECK_END_GAME_ROLAND_CAMPAIGN))) {
             sprintf(
                 campaignSaveName,

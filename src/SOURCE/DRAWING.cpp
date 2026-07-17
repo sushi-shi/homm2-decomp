@@ -1171,9 +1171,9 @@ void combatManager::DrawFrame(
                 }
 
                 if (skipSpecialOccupants6 == 0
-                    || (row * COMBAT_GRID_ROW_LENGTH + column1 != COMBAT_CASTLE_SPECIAL_HEX_FIRST
+                    || (row * COMBAT_GRID_ROW_LENGTH + column1 != IDX(COMBAT_CASTLE_SPECIAL_HEX_FIRST)
                         && row * COMBAT_GRID_ROW_LENGTH + column1
-                               != COMBAT_CASTLE_SPECIAL_HEX_SECOND)) {
+                               != IDX(COMBAT_CASTLE_SPECIAL_HEX_SECOND))) {
                     m_hexCells[row * COMBAT_GRID_ROW_LENGTH + column1].DrawOccupant(side5, 0);
                 }
             }

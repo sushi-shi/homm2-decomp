@@ -117,4 +117,13 @@ typedef i8 b8;
 #define HAS(flags, bit) ((flags) & (bit))
 #endif
 
+
+// Bit-index to mask: the domain value is a shift count. Production expands to
+// the plain shift.
+#ifdef HOMM2_STRICT_ENUM_TYPES
+#define BIT(x) (1 << IDX(x))
+#else
+#define BIT(x) (1 << (x))
+#endif
+
 #endif // HOMM2_INTS_H
