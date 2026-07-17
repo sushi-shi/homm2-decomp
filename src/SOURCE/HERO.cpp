@@ -2013,7 +2013,7 @@ void hero::CheckAnduranPieces(i32 showDialog) {
             if (m_artifacts[artifactSlot] == IDX(ARTIFACT_BREASTPLATE_ANDURAN)
                 || m_artifacts[artifactSlot] == IDX(ARTIFACT_HELMET_ANDURAN)
                 || m_artifacts[artifactSlot] == IDX(ARTIFACT_SWORD_ANDURAN)) {
-                GiveTakeArtifactStat(this, m_artifacts[artifactSlot], EVENT_ARTIFACT_TAKE);
+                GiveTakeArtifactStat(this, ArtifactType(m_artifacts[artifactSlot]), EVENT_ARTIFACT_TAKE);
                 m_artifacts[artifactSlot] = IDX(ARTIFACT_NONE);
             }
         }

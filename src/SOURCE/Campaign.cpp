@@ -860,7 +860,7 @@ void game::InitCampaignMap(void) {
             break;
         case CAMPAIGN_CHOICE_ARTIFACT:
             if (m_players[0].m_heroCount > 0)
-                GiveArtifact(gpGame->GetHero(m_players[0].m_heroIds[0]), choiceBest->value, 0, -1);
+                GiveArtifact(gpGame->GetHero(m_players[0].m_heroIds[0]), ArtifactType(choiceBest->value), 0, -1);
             break;
         case CAMPAIGN_CHOICE_SPELL:
             if (m_players[0].m_heroCount > 0) {
