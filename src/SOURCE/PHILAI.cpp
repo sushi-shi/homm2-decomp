@@ -2198,12 +2198,12 @@ void philAI::ValueOfBuyingBuilding(
         case BUILDING_SLOT_UPGRADE_SECOND:
         case BUILDING_SLOT_UPGRADE_THIRD:
         case BUILDING_SLOT_NECROMANCER_MAGE_PREREQUISITE:
-        case 29:
-        case 30:
+        case BUILDING_SLOT_SPECIAL_TWENTY_NINE:
+        case BUILDING_SLOT_SPECIAL_THIRTY:
             if (currentOccupiedSlots == AI_TOWN_ARMY_SLOTS) {
                 creatureLocated = 0;
                 for (indexBuilding = 0; indexBuilding < IDX(AI_TOWN_ARMY_SLOTS); indexBuilding++) {
-                    if (gDwellingType[townPtr->m_type][building - IDX(BUILDING_SLOT_DWELLING_FIRST)]
+                    if (gDwellingType[townPtr->m_type][IDX(building) - IDX(BUILDING_SLOT_DWELLING_FIRST)]
                         == townPtr->m_army.m_creatureTypes[indexBuilding]) {
                         creatureLocated = 1;
                     }
