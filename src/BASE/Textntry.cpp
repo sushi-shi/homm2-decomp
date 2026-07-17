@@ -337,7 +337,7 @@ i32 textEntryWidget::Main(struct tag_message& message) {
                                             strlen(edit) + 6,
                                             TEXT_ENTRY_MAIN_SOURCE_FILES
                                                 + TEXT_ENTRY_SOURCE_FILE_SLOT_SIZE,
-                                            0x185
+                                            389
                                         ));
                                         strcpy(scratch, edit);
                                         scratch[m_cursorPosition] = typed;

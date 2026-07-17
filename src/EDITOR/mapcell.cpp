@@ -44,13 +44,13 @@ void fullMap::Init(i32 w, i32 h) {
 VA(0x0040b198, 0xce)
 void fullMap::ClearCellExtra(i32 index) {
     extras[index].objectTileset = 0;
-    extras[index].objectIndex = 0xFF;
+    extras[index].objectIndex = MAPCELL_SPRITE_NONE;
     extras[index].animatedObject = 0;
     extras[index].objectLayerBit0 = 0;
     extras[index].objectLayerBit1 = 0;
     extras[index].objectDrawnAsOverlay = 0;
     extras[index].overlayTileset = 0;
-    extras[index].overlayIndex = 0xFF;
+    extras[index].overlayIndex = MAPCELL_SPRITE_NONE;
     extras[index].animatedOverlay = 0;
     extras[index].drawOverlayOnTop = 0;
     extras[index].nextIndex = 0;
@@ -76,7 +76,7 @@ i32 fullMap::GetNewCellExtraIndex(void) {
     delete extras;
     extras = i;
     for (j = extraCount; j < extraCount + 100; j++)
-        extras[j].nextIndex = 0xFFFF;
+        extras[j].nextIndex = MAPCELL_EXTRA_FREE;
     extraCount += 100;
     ClearCellExtra(extraCount - 100);
     return extraCount - 100;

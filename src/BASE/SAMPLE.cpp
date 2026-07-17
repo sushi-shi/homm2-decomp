@@ -69,7 +69,7 @@ sample::sample(char* name, i32l channelType, i32l volume, i32l loopCount)
     u32l size = gpResourceManager->GetFileSize(m_id);
 #line 57
     m_playbackData.data =
-        static_cast<char*>(H2_ALLOC_AT(size, gSampleSourceFiles.sampleAllocation, 0x39));
+        static_cast<char*>(H2_ALLOC_AT(size, gSampleSourceFiles.sampleAllocation, 57));
     m_playbackData.size = size;
     gpResourceManager->PointToFile(m_id);
     gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_playbackData.data), size);

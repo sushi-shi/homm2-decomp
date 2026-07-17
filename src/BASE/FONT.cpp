@@ -144,7 +144,7 @@ void font::DrawStringExecute(
 VA(0x004c7370, 0x48)
 void font::DrawString(char* s, i32 x, i32 y, i32 mode) {
     m_suppressDraw = 0;
-    DrawStringExecute(s, x, y, mode, 0, 0, 0x280, 0x1e0);
+    DrawStringExecute(s, x, y, mode, 0, 0, 640, 480);
 }
 
 // @semantic

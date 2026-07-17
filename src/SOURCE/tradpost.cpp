@@ -37,13 +37,13 @@ void DoTradingPost(i32 isMarketplace, float efficiency) {
     tradeKnob = new iconWidget(
         TRADING_POST_KNOB_X,
         TRADING_POST_KNOB_Y,
-        0x11,
+        17,
         8,
         "tradpost.icn",
         2,
         0,
         TRADING_POST_KNOB_ID,
-        0x10,
+        16,
         1
     );
     if (tradeKnob == 0)

@@ -24,6 +24,7 @@
 #include <SOURCE/game.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/Overview.h>
+#include <BASE/widgetKind.h>
 #include <SOURCE/playerData.h>
 #include <SOURCE/recruitUnit.h>
 #include <SOURCE/town.h>
@@ -142,7 +143,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                     const_cast<char*>("smalfont.fnt"),
                     1,
                     static_cast<i16>(rowWidgetId6 + 3),
-                    0x200,
+                    WIDGET_KIND_TEXT,
                     1
                 );
                 overWin->AddWidget(OVERVIEW_TEXT_WIDGET_ROWS[row][textItemCount], -1);
@@ -322,7 +323,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                             const_cast<char*>("smalfont.fnt"),
                             1,
                             static_cast<i16>(rowWidgetId6 + item + 10),
-                            0x200,
+                            WIDGET_KIND_TEXT,
                             1
                         );
                         overWin->AddWidget(OVERVIEW_TEXT_WIDGET_ROWS[row][textItemCount], -1);
@@ -411,7 +412,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                             const_cast<char*>("smalfont.fnt"),
                             1,
                             static_cast<i16>(rowWidgetId6 + detailIndex + 27),
-                            0x200,
+                            WIDGET_KIND_TEXT,
                             1
                         );
                         overWin->AddWidget(OVERVIEW_TEXT_WIDGET_ROWS[row][textItemCount], -1);
@@ -511,7 +512,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                     const_cast<char*>("smalfont.fnt"),
                     1,
                     static_cast<i16>(rowWidgetId6 + item + 142),
-                    0x200,
+                    WIDGET_KIND_TEXT,
                     2
                 );
                 overWin->AddWidget(OVERVIEW_TEXT_WIDGET_ROWS[row][textItemCount], -1);
@@ -576,7 +577,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                             const_cast<char*>("smalfont.fnt"),
                             1,
                             static_cast<i16>(rowWidgetId6 + item + 109),
-                            0x200,
+                            WIDGET_KIND_TEXT,
                             1
                         );
                         overWin->AddWidget(OVERVIEW_TEXT_WIDGET_ROWS[row][textItemCount], -1);
@@ -637,7 +638,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                         const_cast<char*>("smalfont.fnt"),
                         1,
                         static_cast<i16>(rowWidgetId6 + item + 162),
-                        0x200,
+                        WIDGET_KIND_TEXT,
                         2
                     );
                     overWin->AddWidget(OVERVIEW_TEXT_WIDGET_ROWS[row][textItemCount], -1);
@@ -757,7 +758,7 @@ void game::SetupNewOverviewType(i32 overviewType, i32 redrawFrom) {
             const_cast<char*>("smalfont.fnt"),
             1,
             static_cast<i16>(title + 110),
-            0x200,
+            WIDGET_KIND_TEXT,
             1
         );
         overWin->AddWidget(textWidgetTitle[title], -1);
