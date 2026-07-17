@@ -1852,7 +1852,7 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
     i32 hasDwarfTown;
     char artifactName[IDX(CHECK_END_GAME_TEXT_BUFFER_SIZE)];
     hero* artifactHeroPtr;
-    CheckEndGameConstants artifactWinnerPerson;
+    i32 artifactWinnerPerson;
     hero* lossHero;
     hero* winningHeroEntry;
     i32 winnerPlayer;
@@ -2196,7 +2196,7 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
             }
         }
         if (artifactWinnerPerson != CHECK_END_GAME_NO_PLAYER) {
-            if (gbThisNetHumanPlayer[IDX(artifactWinnerPerson)]) {
+            if (gbThisNetHumanPlayer[artifactWinnerPerson]) {
                 winFlag = 1;
             } else {
                 defeated = 1;
@@ -2691,7 +2691,7 @@ void ClearMapExtra(void) {
 VA(0x0049cd75, 0x9f)
 i32 GetMonType(i32 score, i32 campaign) {
     i32 idx;
-    for (idx = CREATURE_COUNT - 1; IDX(idx) >= 0; idx--) {
+    for (idx = IDX(CREATURE_COUNT) - 1; idx >= 0; idx--) {
         if (campaign == HIGH_SCORE_CAMPAIGN || campaign == HIGH_SCORE_EXPANSION_CAMPAIGN) {
             if (giScoreCampaignMon[idx][IDX(MONSTER_SCORE_THRESHOLD)] >= score)
                 return giScoreCampaignMon[idx][IDX(MONSTER_SCORE_TYPE)];
