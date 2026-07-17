@@ -420,6 +420,162 @@ evidence = [
 status = "reviewed"
 
 [[domain]]
+name = "MapObjectType"
+declaration = "MapObjectType"
+owner = "include/SOURCE/KB_TYPES.h"
+category = "serialized"
+production_carrier = "packed trigger byte and int dispatch boundaries"
+strict = true
+sentinels = ["MAP_OBJECT_NONE"]
+enumerators = [
+  "MAP_OBJECT_NONE",
+  "MAP_OBJECT_ALCHEMIST_LAB",
+  "MAP_OBJECT_SIGN",
+  "MAP_OBJECT_BUOY",
+  "MAP_OBJECT_SKELETON",
+  "MAP_OBJECT_DAEMON_CAVE",
+  "MAP_OBJECT_TREASURE_CHEST",
+  "MAP_OBJECT_FAERIE_RING",
+  "MAP_OBJECT_CAMPFIRE",
+  "MAP_OBJECT_FOUNTAIN",
+  "MAP_OBJECT_GAZEBO",
+  "MAP_OBJECT_ANCIENT_LAMP",
+  "MAP_OBJECT_GRAVEYARD",
+  "MAP_OBJECT_ARCHER_HOUSE",
+  "MAP_OBJECT_GOBLIN_HUT",
+  "MAP_OBJECT_DWARF_COTTAGE",
+  "MAP_OBJECT_PEASANT_HUT",
+  "MAP_OBJECT_LOG_CABIN",
+  "MAP_OBJECT_ALCHEMIST_TOWER",
+  "MAP_OBJECT_MAP_EVENT",
+  "MAP_OBJECT_DRAGON_CITY",
+  "MAP_OBJECT_LIGHTHOUSE",
+  "MAP_OBJECT_WATER_WHEEL",
+  "MAP_OBJECT_MINE",
+  "MAP_OBJECT_MONSTER",
+  "MAP_OBJECT_OBELISK",
+  "MAP_OBJECT_OASIS",
+  "MAP_OBJECT_RESOURCE",
+  "MAP_OBJECT_COAST",
+  "MAP_OBJECT_SAWMILL",
+  "MAP_OBJECT_ORACLE",
+  "MAP_OBJECT_SHRINE_FIRST_CIRCLE",
+  "MAP_OBJECT_SHIPWRECK",
+  "MAP_OBJECT_SEA_CHEST",
+  "MAP_OBJECT_DESERT_TENT",
+  "MAP_OBJECT_CASTLE",
+  "MAP_OBJECT_STONE_LITHS",
+  "MAP_OBJECT_WAGON_CAMP",
+  "MAP_OBJECT_HUT_OF_MAGI",
+  "MAP_OBJECT_WHIRLPOOL",
+  "MAP_OBJECT_WINDMILL",
+  "MAP_OBJECT_ARTIFACT",
+  "MAP_OBJECT_MERMAID",
+  "MAP_OBJECT_HERO_INTERACTION",
+  "MAP_OBJECT_BOAT",
+  "MAP_OBJECT_RANDOM_ULTIMATE_ARTIFACT",
+  "MAP_OBJECT_RANDOM_ARTIFACT",
+  "MAP_OBJECT_RANDOM_RESOURCE",
+  "MAP_OBJECT_RANDOM_MONSTER",
+  "MAP_OBJECT_RANDOM_TOWN",
+  "MAP_OBJECT_RANDOM_CASTLE",
+  "MAP_OBJECT_EYE_OF_MAGI",
+  "MAP_OBJECT_RANDOM_MONSTER_WEAK",
+  "MAP_OBJECT_RANDOM_MONSTER_MEDIUM",
+  "MAP_OBJECT_RANDOM_MONSTER_STRONG",
+  "MAP_OBJECT_RANDOM_MONSTER_VERY_STRONG",
+  "MAP_OBJECT_HERO",
+  "MAP_OBJECT_NOTHING_SPECIAL",
+  "MAP_OBJECT_MOSSY_ROCK",
+  "MAP_OBJECT_WATCH_TOWER",
+  "MAP_OBJECT_TREE_HOUSE",
+  "MAP_OBJECT_TREE_CITY",
+  "MAP_OBJECT_RUINS",
+  "MAP_OBJECT_FORT",
+  "MAP_OBJECT_TRADING_POST",
+  "MAP_OBJECT_ABANDONED_MINE",
+  "MAP_OBJECT_SIRENS",
+  "MAP_OBJECT_STANDING_STONES",
+  "MAP_OBJECT_IDOL",
+  "MAP_OBJECT_TREE_OF_KNOWLEDGE",
+  "MAP_OBJECT_WITCH_DOCTOR_HUT",
+  "MAP_OBJECT_TEMPLE",
+  "MAP_OBJECT_HILL_FORT",
+  "MAP_OBJECT_HALFLING_HOLE",
+  "MAP_OBJECT_MERCENARY_CAMP",
+  "MAP_OBJECT_SHRINE_SECOND_CIRCLE",
+  "MAP_OBJECT_SHRINE_THIRD_CIRCLE",
+  "MAP_OBJECT_PYRAMID",
+  "MAP_OBJECT_CITY_OF_DEAD",
+  "MAP_OBJECT_EXCAVATION",
+  "MAP_OBJECT_SPHINX",
+  "MAP_OBJECT_WAGON",
+  "MAP_OBJECT_TAR_PIT",
+  "MAP_OBJECT_ARTESIAN_SPRING",
+  "MAP_OBJECT_TROLL_BRIDGE",
+  "MAP_OBJECT_WATERING_HOLE",
+  "MAP_OBJECT_WITCH_HUT",
+  "MAP_OBJECT_XANADU",
+  "MAP_OBJECT_CAVE",
+  "MAP_OBJECT_LEAN_TO",
+  "MAP_OBJECT_MAGELLAN_MAPS",
+  "MAP_OBJECT_FLOTSAM",
+  "MAP_OBJECT_DERELICT_SHIP",
+  "MAP_OBJECT_SHIPWRECK_SURVIVOR",
+  "MAP_OBJECT_BOTTLE",
+  "MAP_OBJECT_MAGIC_WELL",
+  "MAP_OBJECT_MAGIC_GARDEN",
+  "MAP_OBJECT_OBSERVATION_TOWER",
+  "MAP_OBJECT_FREEMANS_FOUNDRY",
+  "MAP_OBJECT_REEFS",
+  "MAP_OBJECT_TREES",
+  "MAP_OBJECT_MOUNTAINS",
+  "MAP_OBJECT_VOLCANO",
+  "MAP_OBJECT_FLOWERS",
+  "MAP_OBJECT_ROCK",
+  "MAP_OBJECT_WATER_LAKE",
+  "MAP_OBJECT_MANDRAKE",
+  "MAP_OBJECT_DEAD_TREE",
+  "MAP_OBJECT_STUMP",
+  "MAP_OBJECT_CRATER",
+  "MAP_OBJECT_CACTUS",
+  "MAP_OBJECT_MOUND",
+  "MAP_OBJECT_DUNE",
+  "MAP_OBJECT_LAVA_POOL",
+  "MAP_OBJECT_SHRUB",
+  "MAP_OBJECT_ARENA",
+  "MAP_OBJECT_BARROW_MOUNDS",
+  "MAP_OBJECT_RANDOM_TREASURE_ARTIFACT",
+  "MAP_OBJECT_RANDOM_MINOR_ARTIFACT",
+  "MAP_OBJECT_RANDOM_MAJOR_ARTIFACT",
+  "MAP_OBJECT_BARRIER",
+  "MAP_OBJECT_TRAVELER_TENT",
+  "MAP_OBJECT_EXPANSION_DWELLING",
+  "MAP_OBJECT_EXPANSION_OBJECT",
+  "MAP_OBJECT_JAIL",
+]
+interfaces = [
+  "adventure trigger and select dispatch",
+  "map event processing and editor placement",
+  "AI object valuation",
+  "adventure object sound selection",
+]
+members = []
+storage = [
+  "mapCell::m_triggerType packed byte carrying the object ID under the 0x7f mask with the 0x80 action flag",
+  "serialized map event records addressed by the same object IDs",
+]
+conversions = [
+  "MapObjectType to packed trigger-byte transport under MAP_TRIGGER_ACTION_FLAG and MAP_TRIGGER_TYPE_MASK",
+]
+evidence = [
+  "event, AI, and adventure sound subsets used identical object IDs 1 through 123",
+  "cell trigger bytes mask the 0x80 action flag over the same object domain in every consumer",
+  "AI flagged variants equal the base ID with the 0x80 action bit folded in",
+]
+status = "reviewed"
+
+[[domain]]
 name = "FactionType"
 declaration = "FactionType"
 owner = "include/SOURCE/KB_TYPES.h"
@@ -473,6 +629,58 @@ conversions = ["TerrainType to serialized byte and integer table-index boundarie
 evidence = [
   "ground and combat terrain used identical values 0 through 8",
   "combat rendering and adventure music dispatch the same terrain meanings",
+]
+status = "reviewed"
+
+[[domain]]
+name = "BuildingSlotType"
+declaration = "BuildingSlotType"
+owner = "include/SOURCE/KB_TYPES.h"
+category = "value"
+production_carrier = "int bit-index and table boundaries"
+strict = true
+sentinels = []
+enumerators = [
+  "BUILDING_SLOT_MAGE_GUILD",
+  "BUILDING_SLOT_SPECIAL_ONE",
+  "BUILDING_SLOT_NECROMANCER_SHRINE",
+  "BUILDING_SLOT_DOCK",
+  "BUILDING_SLOT_SPECIAL_FOUR",
+  "BUILDING_SLOT_UPGRADE_CASTLE",
+  "BUILDING_SLOT_CASTLE",
+  "BUILDING_SLOT_SPECIAL_SEVEN",
+  "BUILDING_SLOT_WELL_EXTRA",
+  "BUILDING_SLOT_SPECIAL",
+  "BUILDING_SLOT_DISABLED_FIRST",
+  "BUILDING_SLOT_NEUTRAL_LAST",
+  "BUILDING_SLOT_DISABLED_SECOND",
+  "BUILDING_SLOT_DISABLED_THIRD",
+  "BUILDING_SLOT_DISABLED_FOURTH",
+  "BUILDING_SLOT_DWELLING_FIRST",
+  "BUILDING_SLOT_DWELLING_SECOND",
+  "BUILDING_SLOT_DWELLING_THIRD",
+  "BUILDING_SLOT_DWELLING_FOURTH",
+  "BUILDING_SLOT_DWELLING_FIFTH",
+  "BUILDING_SLOT_DWELLING_SIXTH",
+  "BUILDING_SLOT_UPGRADE_FIRST",
+  "BUILDING_SLOT_NECROMANCER_MAGE_PREREQUISITE",
+  "BUILDING_SLOT_UPGRADE_LAST",
+  "BUILDING_SLOT_DWELLING_LAST",
+  "BUILDING_SLOT_DISABLED_LAST",
+]
+interfaces = [
+  "town build dispatch and dialog state",
+  "AI build planning",
+  "building-slot-indexed game tables",
+]
+members = []
+storage = ["town::m_buildings 32-bit mask addressed by slot bit shifts"]
+conversions = [
+  "BuildingSlotType to bit shifts over town building masks and to integer table indices",
+]
+evidence = [
+  "KB, AI, and town subsets used identical slot values 0 through 31",
+  "AI building masks equal one shifted left by the matching slot",
 ]
 status = "reviewed"
 
