@@ -1192,7 +1192,7 @@ i32 townManager::Main(tag_message& message) {
                             {
                                 if (m_town->m_occupyingHeroId != -1
                                     && !gpGame->GetHero(m_town->m_occupyingHeroId)
-                                            ->HasArtifact(IDX(ARTIFACT_MAGIC_BOOK))) {
+                                            ->HasArtifact(ARTIFACT_MAGIC_BOOK)) {
                                     if (gpGame->GetHero(m_town->m_occupyingHeroId)->NumArtifacts()
                                         == TOWN_MAX_ARTIFACTS) {
                                         NormalDialog(
