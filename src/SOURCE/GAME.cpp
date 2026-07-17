@@ -3052,7 +3052,7 @@ i32 ViewArmyHandler(tag_message& msg) {
             sViewArmyMonFrameInfo.walkXOffsets[iViewArmyFrame] * viewArmyFacingWIPXMod
             + viewArmyBaseX;
         gpGame->m_viewArmyWindow->BroadcastMessage(msg);
-        gpGame->m_viewArmyWindow->DrawWindow(1, 0, 0x7fff);
+        gpGame->m_viewArmyWindow->DrawWindow(1, 0, WINDOW_DRAW_ID_LIMIT);
         glTimers[0] = static_cast<i32>(
             KBTickCount()
             + sViewArmyMonFrameInfo.walkDuration * GAME_VIEW_ARMY_FRAME_DELAY_SCALE
@@ -3208,7 +3208,7 @@ i32 game::GetRandomNumTroops(i32 monsterType) {
 VA(0x0047bd35, 0x3f)
 void game::TurnOnAIMusic(void) {
     gpSoundManager->StopAllSamples(1);
-    gpSoundManager->SwitchAmbientMusic(0x1c);
+    gpSoundManager->SwitchAmbientMusic(28);
     gpSoundManager->m_samplesReady = 0;
 }
 
@@ -4806,7 +4806,12 @@ void game::CancelComputerScreen(void) {
     bShowIt = 1;
     i32 i;
     for (i = 1; i <= 6; i++) {
-        gpWindowManager->BroadcastMessage(0x200, 6, i, 0x4008);
+        gpWindowManager->BroadcastMessage(
+            MESSAGE_WIDGET,
+            WIDGET_COMMAND_CLEAR_FLAGS,
+            i,
+            WIDGET_FLAG_UPDATE | WIDGET_FLAG_DIMMED
+        );
     }
 }
 
@@ -4817,7 +4822,12 @@ void game::ShowComputerScreen(void) {
         gbThisNetHumanPlayer[giCurPlayer] = 1;
         i32 i;
         for (i = 1; i <= 6; i++)
-            gpWindowManager->BroadcastMessage(0x200, 5, i, 0x4008);
+            gpWindowManager->BroadcastMessage(
+                MESSAGE_WIDGET,
+                WIDGET_COMMAND_SET_FLAGS,
+                i,
+                WIDGET_FLAG_UPDATE | WIDGET_FLAG_DIMMED
+            );
         gbAllBlack = 1;
         gpAdvManager->CompleteDraw(1);
         gpAdvManager->UpdateHeroLocators(1, 1);
@@ -4835,8 +4845,8 @@ void game::ShowHeroesLogo(void) {
     if (gpAdvManager->m_openState == 0) {
         gpAdvManager->m_openState = 1;
         icon* theIcon = gpResourceManager->GetIcon("herologo.icn");
-        IconToBitmap(theIcon, gpWindowManager->m_screen, 0x1e0, 0x10, 0, 0, 0, 0, 0x280, 0x1e0, 0);
-        gpWindowManager->UpdateScreenRegion(0x1e0, 0x10, 0x90, 0x90);
+        IconToBitmap(theIcon, gpWindowManager->m_screen, 480, 16, 0, 0, 0, 0, 640, 480, 0);
+        gpWindowManager->UpdateScreenRegion(480, 16, 144, 144);
         gpResourceManager->Dispose(static_cast<resource*>(theIcon));
     }
 }

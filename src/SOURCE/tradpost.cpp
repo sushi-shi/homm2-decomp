@@ -209,7 +209,7 @@ void UpdateTradingPost(i32 draw) {
         tradeKnob->m_x = TRADING_POST_KNOB_X;
     if (draw != 0) {
         tpWindow->DrawWindow(0);
-        gpWindowManager->UpdateScreenRegion(tpX + 0x20, tpY, 0x102, 0x1a2);
+        gpWindowManager->UpdateScreenRegion(tpX + 32, tpY, 258, 418);
     }
 }
 

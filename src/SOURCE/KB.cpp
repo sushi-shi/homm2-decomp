@@ -77,6 +77,10 @@ inline hero* GetHeroSlot(i32 i) {
     return &gpGame->m_heroRecs[i];
 }
 
+typedef enum NormalDialogDrawLimit {
+    NORMAL_DIALOG_DRAW_ID_LIMIT = 0x9000
+} NormalDialogDrawLimit;
+
 VA(0x00496450, 0x14e)
 extern "C" void PollSound(void) {
     if (gbInPollSound)
@@ -3579,7 +3583,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
             break;
 
         case APP_MENU_VIEW_WORLD:
-            gpAdvManager->ViewWorld(0x35, 0, 0);
+            gpAdvManager->ViewWorld(SPELL_VIEW_ALL, 0, 0);
             break;
         case APP_MENU_VIEW_PUZZLE:
             gpAdvManager->ViewPuzzle();
@@ -4442,7 +4446,7 @@ void CheckShingleUpdate(void) {
         iNextShingleAnim = KBTickCount() + 250;
         iShingleAnimFrame = (iShingleAnimFrame + 1) % 39;
         gShingleAnim->DrawToBuffer(0, 0, iShingleAnimFrame + 1, 0);
-        gpWindowManager->UpdateScreenRegion(0x2e, 0xb0, 0x8b, 0xbb);
+        gpWindowManager->UpdateScreenRegion(46, 176, 139, 187);
     }
 }
 
@@ -5096,7 +5100,7 @@ void UpdateNormalDialog(char* text) {
     evt.payload.widget.id = 1;
     evt.payload.widget.data.text = text;
     pNormalDialogWindow->BroadcastMessage(evt);
-    pNormalDialogWindow->DrawWindow(0, 0, 0x9000);
+    pNormalDialogWindow->DrawWindow(0, 0, NORMAL_DIALOG_DRAW_ID_LIMIT);
     pNormalDialogWindow->DrawWindow(1, -65535, -256);
 }
 
