@@ -356,7 +356,7 @@ VA(0x004d4620, 0x98)
 void arithCodeRenormalise_Encode(BitStream *bs)
 {
     while (bigR <= TWO_TO_THE(smallB - 2)) {
-        if ((0[&bigR] + bigL) <= TWO_TO_THE(smallB - 1)) {
+        if ((OD_STEER(bigR) + bigL) <= TWO_TO_THE(smallB - 1)) {
             arithCodeBitPlusFollow(bs, 0);
         } else
         if (TWO_TO_THE(smallB - 1) <= bigL) {
@@ -382,7 +382,7 @@ void arithCodeSymbol(BitStream *bs, Model *m, Int32 symbol)
 
     totalFrequency14 = m->totFreq;
     cumulativeLow8 = 0;
-    for (symbolIndex9 = 1; symbolIndex9 < 0[&symbol]; symbolIndex9++)
+    for (symbolIndex9 = 1; symbolIndex9 < OD_STEER(symbol); symbolIndex9++)
         cumulativeLow8 += m->freq[symbolIndex9];
     cumulativeHigh2 = cumulativeLow8 + m->freq[symbol];
 
@@ -445,11 +445,11 @@ void initModel(Model *m, Char *initName, Int32 initNumSymbols, Int32 initIncValu
 
     if (initIncValue == 0) {
         m->totFreq = initNumSymbols;
-        for (i = 1; i <= 0[&initNumSymbols]; i++)
+        for (i = 1; i <= OD_STEER(initNumSymbols); i++)
             m->freq[i] = 1;
     } else {
         m->totFreq = initNumSymbols * initIncValue;
-        for (i = 1; i <= 0[&initNumSymbols]; i++)
+        for (i = 1; i <= OD_STEER(initNumSymbols); i++)
             m->freq[i] = initIncValue;
     }
 
@@ -719,7 +719,7 @@ void FreeDecompressStructures(void)
 VA(0x004d5480, 0xe4)
 void setDecompressStructureSizes(Int32 newSize100k)
 {
-    if (0[&newSize100k] == blockSize100k)
+    if (OD_STEER(newSize100k) == blockSize100k)
         return;
 
     blockSize100k = newSize100k;
@@ -804,7 +804,7 @@ VA(0x004d57d0, 0x36)
 Int32 NORMALISEHI(Int32 p)
 {
     return
-    IF_THEN_ELSE(((p) >= 0[&lastPP]),
+    IF_THEN_ELSE(((p) >= OD_STEER(lastPP)),
                  ((p) - lastPP),
                  (p));
 }
@@ -942,7 +942,7 @@ Bool getAndMoveToFrontDecode(BitStream *inStream)
         }
             while (nextSym == RUNA || nextSym == RUNB);
         while (n > 0) {
-            last++; if (last >= 0[&blockLimit]) blockOverrun();
+            last++; if (last >= OD_STEER(blockLimit)) blockOverrun();
             ll[last] = symbols[0];
             n--;
         }
@@ -950,7 +950,7 @@ Bool getAndMoveToFrontDecode(BitStream *inStream)
     }
 
     if (nextSym >= 1 && nextSym <= 255) {
-        last++; if (last >= 0[&blockLimit]) blockOverrun();
+        last++; if (last >= OD_STEER(blockLimit)) blockOverrun();
         ll[last] = symbols[nextSym];
 
         j = nextSym;
@@ -978,7 +978,7 @@ void stripe(void)
 {
     Int32 i;
 
-    for (i = 0; 0[&i] < lastPP; i++) {
+    for (i = 0; OD_STEER(i) < lastPP; i++) {
         UChar c = GETFIRST(i);
         SETSECOND(NORMALISELO(i-1), c);
         SETTHIRD (NORMALISELO(i-2), c);
@@ -1124,7 +1124,7 @@ Bool trivialGt(Int32 i1, Int32 i2)
 {
     Int32 k;
 
-    for (k = 0; 0[&k] <= last; k++) {
+    for (k = 0; OD_STEER(k) <= last; k++) {
         UChar c1 = GETFIRST(i1);
         UChar c2 = GETFIRST(i2);
         if (c1 == c2) {
@@ -1168,7 +1168,7 @@ void shellTrivial(void)
 
 // @semantic
 // The trivial/graded BWT paths, 0x3c frame, five grade ranges, CFG, and all 68 effective
-// relocations agree. Three global/local loop comparisons were steered exactly with 0[&i].
+// relocations agree. Three global/local loop comparisons were steered exactly with OD_STEER(i).
 // The first remaining raw-code divergence is +0xdf: candidate i is [ebp-8], retail
 // [ebp-0xc]; nested-scope slots and the 0x14-byte grade jump table remain compiler shape.
 VA(0x004d6720, 0x434)
@@ -1181,7 +1181,7 @@ void sortIt(void)
         Int32 i;
 
         if (veryVerbose) { sprintf(gText, "trivialSort ...\n"); LogStr(gText); }
-        for (i = 0; 0[&i] <= last; i++) zptr[i] = i;
+        for (i = 0; OD_STEER(i) <= last; i++) zptr[i] = i;
         shellTrivial();
         if (veryVerbose) { sprintf(gText, "trivialSort done.\n"); LogStr(gText); }
 
@@ -1196,12 +1196,12 @@ void sortIt(void)
 
         for (i = 0; i <= 65536; i++)
             ftab[i] = 0;
-        for (i = 0; 0[&i] <= last; i++)
+        for (i = 0; OD_STEER(i) <= last; i++)
             ftab[GETFIRST16(i)]++;
         for (i = 1; i <= 65536; i++)
             ftab[i] += ftab[i-1];
 
-        for (i = 0; 0[&i] <= last; i++) {
+        for (i = 0; OD_STEER(i) <= last; i++) {
             UInt32 j = GETFIRST16(i);
             ftab[j]--;
             zptr[ftab[j]] = i;
@@ -1288,7 +1288,7 @@ void undoReversibleTransformation(void)
 
     for (i = 0; i <= 255; i++) frequencyByChar[i] = 0;
 
-    for (i = 0; 0[&i] <= last; i++) {
+    for (i = 0; OD_STEER(i) <= last; i++) {
         UChar ll_i = ll[i];
         zptr[i] = frequencyByChar[ll_i];
         frequencyByChar[ll_i]++;
@@ -1318,7 +1318,7 @@ void spotBlock(Bool weAreCompressing)
     spotPos = SPOT_BASIS_STEP;
     delta = 1;
 
-    while (0[&spotPos] < last) {
+    while (OD_STEER(spotPos) < last) {
 
         Int32 n;
 
@@ -1385,7 +1385,7 @@ Int32 getRLEpair(FILE *src)
         return (1 << 16) | ch;
     } else {
         Int32 i;
-        for (i = 1; 0[&i] <= runLen; i++)
+        for (i = 1; OD_STEER(i) <= runLen; i++)
             UPDATE_CRC(globalCrc, (UChar)ch);
         return (runLen << 16) | ch;
     }
@@ -1401,7 +1401,7 @@ Bool loadAndRLEsource(FILE *src)
 
     allowableBlockSize = 100000 * blockSize100k - 20;
 
-    while (last < 0[&allowableBlockSize] && currentChar != MY_EOF) {
+    while (last < OD_STEER(allowableBlockSize) && currentChar != MY_EOF) {
         Int32 rlePair, runLength;
         rlePair = getRLEpair(src);
         currentChar = rlePair & 0xFFFF;

@@ -79,7 +79,7 @@ void DoAdvance(Smack *smack, i32 drawFrame, i32 advanceFrame, i32 updatePalette,
 // residual is +0xb0b: retail loads campaignChoice4[-0x4c4] then compares the
 // global, while ours loads the global then compares the local. The one-byte
 // instruction-size difference shifts the table/following offsets. Both equality
-// orders and 0[&campaignChoice4] were byte-neutral; revisit on relevant TU change.
+// orders and OD_STEER(campaignChoice4) were byte-neutral; revisit on relevant TU change.
 VA(0x0040126d, 0x118c)
 void SmackManagerMain(void) {
     i32 soundFlags4;

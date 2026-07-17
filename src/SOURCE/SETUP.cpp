@@ -148,7 +148,7 @@ i32 game::SetupHotSeatGame(void)
         sprintf(gText, "Do you wish to enter each player's name?");
         NormalDialog(gText, 2, -1, -1, -1, 0, -1, 0, -1, 0);
         if (gpWindowManager->m_dialogResult == SETUP_DIALOG_YES) {
-            for (ix = 0; ix < 0[&giNumHumanPlayers]; ix++) {
+            for (ix = 0; ix < OD_STEER(giNumHumanPlayers); ix++) {
                 strcpy(defaultName, "");
                 sprintf(gText, "Enter player %d's name.", ix + 1);
                 GetDataEntry(

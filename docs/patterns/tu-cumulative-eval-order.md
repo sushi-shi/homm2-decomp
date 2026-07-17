@@ -76,8 +76,11 @@ a value-first bitfield write — see GAME `RandomizeBarrier`.) Loop tests, flag 
 schedules may also move when exact predecessors or header state changes; do not classify
 them as walls before a combined-root source-order audit.
 
-**Scalar-lvalue SIB escape — use `0[&local]`.** Array subscripting is symmetric by the
-language definition, so `0[&idx]` is the same lvalue as `idx`. In VC4.2 `/Od`, however, this
+**Scalar-lvalue SIB escape — use `OD_STEER(local)`.** The source spelling is the
+`OD_STEER(x)` macro in `va.h`, which expands to `0[&(x)]` under every compiler; the
+macro conversion was proven byte-identical across all 95 base objects (COFF timestamp
+masked). Array subscripting is symmetric by the language definition, so `0[&idx]` is
+the same lvalue as `idx`. In VC4.2 `/Od`, however, this
 source shape can make a comparison load its other operand first. It resolved every remaining
 FONT comparison without changing the frame, CFG, or relocations. For example,
 `DrawBoundedString`'s ordinary `idx >= lineStart` emitted:

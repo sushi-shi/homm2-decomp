@@ -2046,7 +2046,7 @@ void army::PowEffect(i32 effect, i32 resetLimits, i32 effectX, i32 effectY)
         }
     }
     if (!gbNoShowCombat && effect != ARMY_NO_EFFECT && drawEffect_1 &&
-        gCurLoadedSpellEffect != 0[&effect]) {
+        gCurLoadedSpellEffect != OD_STEER(effect)) {
         gpResourceManager->Dispose(gCurLoadedSpellIcon);
         gCurLoadedSpellIcon = gpResourceManager->GetIcon(gCombatFxNames[effect]);
         gCurLoadedSpellEffect = effect;
@@ -2113,7 +2113,7 @@ void army::PowEffect(i32 effect, i32 resetLimits, i32 effectX, i32 effectY)
                      gpCombatManager->m_armies[side_4][index_10].m_animationCycle)) &&
                 !*reinterpret_cast<i32 *>(
                     index_10 * sizeof(gpCombatManager->m_limitCreatureCount[0][0]) +
-                    0[&side_4] * sizeof(gpCombatManager->m_limitCreatureCount[0]) +
+                    OD_STEER(side_4) * sizeof(gpCombatManager->m_limitCreatureCount[0]) +
                     reinterpret_cast<char *>(
                         gpCombatManager->m_limitCreatureCount))) {
                 index_10[side_4[gpCombatManager->m_limitCreatureCount]]++;
@@ -2179,7 +2179,7 @@ void army::PowEffect(i32 effect, i32 resetLimits, i32 effectX, i32 effectY)
         }
     }
     frame = 0;
-    for (frame = 0; 0[&effectFrames_1] > frame; frame++) {
+    for (frame = 0; OD_STEER(effectFrames_1) > frame; frame++) {
         for (side_4 = 0; side_4 < ARMY_COMBAT_SIDE_COUNT; side_4++) {
             for (index_10 = 0; index_10 < gpCombatManager->m_armyCount[side_4]; index_10++) {
                 current = &gpCombatManager->m_armies[side_4][index_10];

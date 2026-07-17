@@ -156,7 +156,7 @@ void font::DrawBoundedString(char *str, i32 x, i32 y, i32 w, i32 h, i32 mode, i3
             idx--;
             wordBreak0 = 0;
             // The SIB-equivalent lvalue makes VC4.2 load the other comparison operand first.
-            while (text2[idx] != ' ' && 0[&idx] >= lineStartD) {
+            while (text2[idx] != ' ' && OD_STEER(idx) >= lineStartD) {
                 lineWidth3 -= GetCharacterWidth(text2[idx]);
                 if (m_height * 2 + yOffC > h && lineWidth3 < w)
                     break;
@@ -164,7 +164,7 @@ void font::DrawBoundedString(char *str, i32 x, i32 y, i32 w, i32 h, i32 mode, i3
                     wordBreak0 = idx;
                 idx--;
             }
-            if (0[&idx] <= lineStartD) {
+            if (OD_STEER(idx) <= lineStartD) {
                 idx = wordBreak0;
                 lineWidth3 = savedWidth;
             }
@@ -209,16 +209,16 @@ i32 font::LineLength(char *str, i32 maxW)
     char *w = str;                       // ptr   @ -0x20
     i32 q, v;                            // unused @ -0x8, -0x1c
     while (p < s && w[p] != 0) {
-        while (w[p] != 0 && w[p] != '\n' && 0[&x] <= maxW) {
+        while (w[p] != 0 && w[p] != '\n' && OD_STEER(x) <= maxW) {
             x += GetCharacterWidth(w[p]);
             p++;
         }
-        if (0[&x] > maxW) {
+        if (OD_STEER(x) > maxW) {
             p--;
             gap = 0;
             while (w[p] != ' ' && p >= r) {
                 x -= GetCharacterWidth(w[p]);
-                if (gap == 0 && 0[&x] < maxW)
+                if (gap == 0 && OD_STEER(x) < maxW)
                     gap = p;
                 p--;
             }
@@ -245,7 +245,7 @@ i32 font::LineWidth(char *str)
     i32 q, u;                                   // unused @ -0x8, -0x18
     i32 y = 0, t = 0, r = 0, x = 0, p = 0, w = 0;  // zeroed in this order: -0x28,-0x14,-0xc,-0x24,-0x4(i),-0x20(width)
     char *v = str;                              // @ -0x1c
-    while (0[&p] < s && v[p] != 0) {
+    while (OD_STEER(p) < s && v[p] != 0) {
         while (v[p] != 0 && v[p] != '\n') {
             w += GetCharacterWidth(v[p]);
             p++;

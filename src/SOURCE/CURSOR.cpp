@@ -40,7 +40,7 @@
 // relocation sites/effective targets align. The only unmasked bytes are
 // +0xd9/+0xda/+0xe2/+0xe3: the cellY sum loads cursor Y before origin Y, while
 // retail loads the commutative terms in reverse order. Five bounded candidates
-// across direct reversal, both 0[&term] escapes, and both OR-zero forms were
+// across direct reversal, both OD_STEER(term) escapes, and both OR-zero forms were
 // byte-neutral. Revisit after an earlier CURSOR source edit or relevant
 // advManager layout/header change perturbs TU-cumulative operand evaluation.
 VA(0x0040d5e0, 0x138)
@@ -74,7 +74,7 @@ void advManager::StartCursor(i32 direction)
 // relocation sites/effective targets align. The only unmasked bytes are
 // +0xaa/+0xab/+0xb2/+0xb3: the previous-cursor cell offset adds origin X before
 // cursor X, while retail loads the commutative terms in reverse order. Nine
-// bounded candidates across direct term reversal, both 0[&term] escapes, both
+// bounded candidates across direct term reversal, both OD_STEER(term) escapes, both
 // OR-zero forms, zero grouping, and three depth-one commutative_order AST edits
 // were byte-neutral. Revisit after an earlier CURSOR source edit or relevant
 // advManager layout/header change perturbs TU-cumulative operand evaluation.
@@ -148,7 +148,7 @@ void advManager::DrawCursor(void)
             } else {
                 if (m_cursorCycle == 0) {
                     drawFrame_f = m_updateMaxY % CURSOR_DIRECTION_COUNT +
-                                  ((0[&m_cursorFrame] & CURSOR_FRAME_MASK) +
+                                  ((OD_STEER(m_cursorFrame) & CURSOR_FRAME_MASK) +
                                    CURSOR_FLAG_FRAME_BASE);
                 }
                 FlipIconToBitmap(m_flagIcons[gpCurPlayer->m_color],
@@ -181,7 +181,7 @@ void advManager::DrawCursor(void)
             } else {
                 if (m_cursorCycle == 0) {
                     drawFrame_f = m_updateMaxY % CURSOR_DIRECTION_COUNT +
-                                  ((0[&m_cursorFrame] & CURSOR_FRAME_MASK) +
+                                  ((OD_STEER(m_cursorFrame) & CURSOR_FRAME_MASK) +
                                    CURSOR_FLAG_FRAME_BASE);
                 }
                 IconToBitmap(m_flagIcons[gpCurPlayer->m_color],
@@ -507,7 +507,7 @@ mapCell *advManager::MoveHero(i32 direction, i32 stopAfterMove,
             boat->heroId | MAP_TRIGGER_ACTION_FLAG);
         boatCell_a->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_BOAT;
         boatCell_a->m_objectMetadata =
-            static_cast<u16>(0[&step_a]);
+            static_cast<u16>(OD_STEER(step_a));
         boat->x = static_cast<i8>(movingHero_f->m_x);
         boat->y = static_cast<i8>(movingHero_f->m_y);
         StopCursor(1);
@@ -652,7 +652,7 @@ stoppingEvent:
                     m_updateMinY = startVals[directionY_b + 1];
                 }
                 i32l tick = KBTickCount();
-                if (0[&step_a] + 1 == halfSteps_o * 2) {
+                if (OD_STEER(step_a) + 1 == halfSteps_o * 2) {
                     m_updateMinX = 0;
                     m_updateMinY = 0;
                 } else {
@@ -895,7 +895,7 @@ i32 advManager::ValidMoveWithEvent(hero *movingHero, i32 direction)
 // relocation sites/effective targets align. Retained second-term OR-zero removed
 // the +0x211/+0x214 centerY/directionY span; only +0x442/+0x443/+0x44b/+0x44c
 // remains, where the cursor/origin Y addends load in reverse order. Nine bounded
-// candidates covered direct reversal, both 0[&term] escapes, both OR-zero forms,
+// candidates covered direct reversal, both OD_STEER(term) escapes, both OR-zero forms,
 // regroupings, and a targeted depth-one commutative_order AST edit. Revisit after
 // an earlier CURSOR source edit or relevant advManager layout/header change
 // perturbs TU-cumulative operand evaluation. Retail also delinks normalDirTable.y.
@@ -1301,7 +1301,7 @@ void advManager::PurgeMapChangeQueue(void)
 // sites/effective targets align. First executable divergence is +0xe: retail
 // loads maximumToUnwind before comparing unwoundChanges (`cmp local,eax; jge`),
 // while ours loads the local first and emits the reversed equivalent compare.
-// Four bounded condition families (commuted relation, 0[&parameter], explicit
+// Four bounded condition families (commuted relation, OD_STEER(parameter), explicit
 // break, and negated relation) were byte-neutral or added a jump. Revisit only
 // if the parameter/local representation or an earlier CURSOR edit changes operand
 // evaluation, or comparison gains proved relational-swap normalization. Retail

@@ -252,9 +252,9 @@ void combatManager::ResetLimitCreature(void)
              armySlotIndex++) {
             if ((m_armies[side][armySlotIndex].m_monster.flags.all &
                  COMBAT_ARMY_FLAG_MIRROR_IMAGE) != 0)
-                m_limitCreatureCount[side][0[&armySlotIndex]] = -1;
+                m_limitCreatureCount[side][OD_STEER(armySlotIndex)] = -1;
             else
-                m_limitCreatureCount[side][0[&armySlotIndex]] = 0;
+                m_limitCreatureCount[side][OD_STEER(armySlotIndex)] = 0;
         }
     }
     m_drawHero[0] = 0;
@@ -348,7 +348,7 @@ i32 combatManager::UpdateGrid(i32 resetGridDisplay, i32 rebuildGrid)
             m_gridSelectionDisabled != 0) {
             memset(m_gridState, COMBAT_GRID_SHADE_NONE, sizeof(m_gridState));
         } else {
-            SetupGridForArmy(&m_armies[0[&m_currentArmySide]][m_currentArmyIndex]);
+            SetupGridForArmy(&m_armies[OD_STEER(m_currentArmySide)][m_currentArmyIndex]);
         }
     }
     if (resetGridDisplay != 0)
