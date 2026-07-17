@@ -5742,13 +5742,10 @@ int philAI::EvaluateMineEvent(int mineIndex, int x, int y, int *liveChance) {
     return result1;
 }
 
-// @early-stop
-// @early-stop-reloc-only: Current PHILAI.cpp/header epoch: all 0x33e bytes match after
-// masking 40 ordered relocation sites. The sole raw difference is byte +0x191,
-// inside the proven __adjust_fdiv versus iLeftRightSave+0x10 delinker spelling;
-// remaining floating-constant rows are identity-only. Frame, slots, opcodes,
-// operands, and CFG are exact. Revisit only after the PHILAI source/TU/header or
-// comparison epoch.
+// @semantic: The 0x33e frame/CFG and all 40 ordered relocation semantics agree.
+// The unmasked ModRM bytes at +0x277 and +0x286 exchange equivalent register roles;
+// the remaining residuals are compiler float-constant and division-guard identities.
+// This is not a relocation-only early stop. Revisit after PHILAI compiler state changes.
 VA(0x00446928, 0x33e)
 int philAI::EvaluateMonsterEvent(int monsterType, int eventData, int *liveChance) {
     int result5;
