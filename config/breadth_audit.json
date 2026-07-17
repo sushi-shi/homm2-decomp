@@ -2,6 +2,116 @@
   "version": 1,
   "records": [
     {
+      "unit": "BASE/RESMGR",
+      "function": "?Close@resourceManager@@UAEXXZ",
+      "source_hash": "dbff39a4e1b4",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 1,
+      "before": 99.90741,
+      "after": 100.0,
+      "note": "Retail legacy CRT spelling restores exact external relocation identity; code, CFG, frame/slots, and owner-relative addends match; remaining $SG labels are byte-identical local literals"
+    },
+    {
+      "unit": "BASE/RESMGR",
+      "function": "?LoadAggregateHeader@resourceManager@@QAEHPAD@Z",
+      "source_hash": "8d621da06a02",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 1,
+      "before": 99.84849,
+      "after": 100.0,
+      "note": "Retail legacy CRT spelling restores exact external relocation identity; code, CFG, frame/slots, and owner-relative addends match; remaining $SG labels are byte-identical local literals"
+    },
+    {
+      "unit": "BASE/RESMGR",
+      "function": "?MakeId@resourceManager@@QAEKPADH@Z",
+      "source_hash": "367e50f17308",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 1,
+      "before": 99.932434,
+      "after": 100.0,
+      "note": "Retail legacy CRT spelling restores exact external relocation identity; code, CFG, frame/slots, and owner-relative addends match"
+    },
+    {
+      "unit": "BASE/RESMGR",
+      "function": "?PointToFile@resourceManager@@QAEXK@Z",
+      "source_hash": "995b280dd992",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 1,
+      "before": 99.93976,
+      "after": 100.0,
+      "note": "Retail legacy CRT spelling restores exact external relocation identity; code, CFG, frame/slots, and owner-relative addends match; remaining $SG labels are byte-identical local literals"
+    },
+    {
+      "unit": "BASE/RESMGR",
+      "function": "?ReadBlock@resourceManager@@QAEXPACK@Z",
+      "source_hash": "bb251f9ef06b",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 1,
+      "before": 99.91936,
+      "after": 100.0,
+      "note": "Retail legacy CRT spelling restores exact external relocation identity; code, CFG, frame/slots, and owner-relative addends match; remaining $SG labels are byte-identical local literals"
+    },
+    {
+      "unit": "BASE/RESMGR",
+      "function": "?ReadByte@resourceManager@@QAECXZ",
+      "source_hash": "367cf3537972",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 1,
+      "before": 99.88636,
+      "after": 100.0,
+      "note": "Retail legacy CRT spelling restores exact external relocation identity; code, CFG, frame/slots, and owner-relative addends match; remaining $SG labels are byte-identical local literals"
+    },
+    {
+      "unit": "BASE/RESMGR",
+      "function": "?ReadLong@resourceManager@@QAEJXZ",
+      "source_hash": "1b8ac2e11a6f",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 1,
+      "before": 99.88636,
+      "after": 100.0,
+      "note": "Retail legacy CRT spelling restores exact external relocation identity; code, CFG, frame/slots, and owner-relative addends match; remaining $SG labels are byte-identical local literals"
+    },
+    {
+      "unit": "BASE/RESMGR",
+      "function": "?ReadWord@resourceManager@@QAEFXZ",
+      "source_hash": "0baa95ea5095",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 1,
+      "before": 99.88636,
+      "after": 100.0,
+      "note": "Retail legacy CRT spelling restores exact external relocation identity; code, CFG, frame/slots, and owner-relative addends match; remaining $SG labels are byte-identical local literals"
+    },
+    {
+      "unit": "BASE/RESMGR",
+      "function": "?RestorePosition@resourceManager@@QAEXXZ",
+      "source_hash": "1d60e709eb26",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 1,
+      "before": 99.82758,
+      "after": 100.0,
+      "note": "Retail legacy CRT spelling restores exact external relocation identity; code, CFG, frame/slots, and owner-relative addends match"
+    },
+    {
+      "unit": "BASE/RESMGR",
+      "function": "?SavePosition@resourceManager@@QAEXXZ",
+      "source_hash": "bcdd65ecba15",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 1,
+      "before": 99.81481,
+      "after": 100.0,
+      "note": "Retail legacy CRT spelling restores exact external relocation identity; code, CFG, frame/slots, and owner-relative addends match"
+    },
+    {
       "unit": "SOURCE/ADVMGR",
       "function": "?APanelHandler@@YIHAAUtag_message@@@Z",
       "source_hash": "98769448686e",
