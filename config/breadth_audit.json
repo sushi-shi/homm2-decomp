@@ -740,6 +740,17 @@
     },
     {
       "unit": "SOURCE/ARMY",
+      "function": "?CheckLuck@army@@QAEXXZ",
+      "source_hash": "4b28e0e131f0",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "improved",
+      "iterations": 3,
+      "before": 99.751595,
+      "after": 99.9363,
+      "note": "Distinct bad/good name lifetimes restore the retail frame; return temporaries and name slots remain exchanged after three scope forms, with 37 relocs aligned."
+    },
+    {
+      "unit": "SOURCE/ARMY",
       "function": "?Damage@army@@QAEHJH@Z",
       "source_hash": "c5d767178626",
       "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
@@ -751,14 +762,80 @@
     },
     {
       "unit": "SOURCE/ARMY",
+      "function": "?DamageEnemy@army@@QAEXPAV1@PAH1HH@Z",
+      "source_hash": "384c6086d9f2",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "improved",
+      "iterations": 1,
+      "before": 99.71903,
+      "after": 99.72205,
+      "note": "Restoring retail's duplicate Bless test fixes shipped behavior; all 41 relocations align and only the genie clamp operand order remains."
+    },
+    {
+      "unit": "SOURCE/ARMY",
       "function": "?DecrementSpellRounds@army@@QAEXXZ",
       "source_hash": "b2d77b4339d9",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "parked",
       "iterations": 3,
       "before": 99.954544,
       "after": 99.954544,
-      "note": "Current TU state leaves one commutative load-order span after three bounded forms; retained source hash was exact previously."
+      "note": "Complete 0x08 frame, CFG, and sole relocation; the documented decrement SIB register order resisted three bounded spellings."
+    },
+    {
+      "unit": "SOURCE/ARMY",
+      "function": "?DoAttack@army@@QAEXH@Z",
+      "source_hash": "555225dd07b2",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 97.7963,
+      "after": 97.7963,
+      "note": "Complete switch/body order, 0x124 frame, and external targets; durable semantic evidence covers address order, branch polarity, continuations, and local calls."
+    },
+    {
+      "unit": "SOURCE/ARMY",
+      "function": "?DoHydraAttack@army@@QAEXH@Z",
+      "source_hash": "58b97aa823c2",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 96.03481,
+      "after": 96.03481,
+      "note": "Complete behavior, frame slots, CFG, and 48 relocs; three side/index address evaluations and local string identities remain documented."
+    },
+    {
+      "unit": "SOURCE/ARMY",
+      "function": "?DrawToBuffer@army@@QAEXHHH@Z",
+      "source_hash": "7e861f0a2b24",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 98.26403,
+      "after": 98.26403,
+      "note": "All executable bytes before the proved local compressed switch table and all 42 relocation sites align; dispatch and five cases were audited."
+    },
+    {
+      "unit": "SOURCE/ARMY",
+      "function": "?GoBerserk@army@@QAEXXZ",
+      "source_hash": "6e07af00e3dd",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 95.428215,
+      "after": 95.428215,
+      "note": "Complete behavior, 0x50 frame/slots, CFG, and 55 relocs; address/compare order and continuation branch shapes remain documented."
+    },
+    {
+      "unit": "SOURCE/ARMY",
+      "function": "?LoadResources@army@@QAEXXZ",
+      "source_hash": "04ea623f2998",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 1,
+      "before": 99.78388,
+      "after": 100.0,
+      "note": "Eight evidenced unused words restore the retail 0x28 frame and loop slot; all bytes and 87 relocations are exact."
     },
     {
       "unit": "SOURCE/ARMY",
@@ -773,14 +850,91 @@
     },
     {
       "unit": "SOURCE/ARMY",
+      "function": "?MoveAttack@army@@QAEXHH@Z",
+      "source_hash": "2410c03a5733",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 96.915054,
+      "after": 96.915054,
+      "note": "All non-jump operands and 24 relocations align; seven five-byte inline continuations plus one equivalent branch account for the extent delta."
+    },
+    {
+      "unit": "SOURCE/ARMY",
       "function": "?OtherArmyAdjacent@army@@QAEHHH@Z",
       "source_hash": "2dba1fca51c2",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "parked",
       "iterations": 4,
       "before": 99.92381,
       "after": 99.92381,
-      "note": "Complete frame slots CFG and three relocs; repeated equality load order resists four bounded forms."
+      "note": "Complete 0x1c frame, CFG, and three relocations; repeated equality operand register order resisted four bounded forms."
+    },
+    {
+      "unit": "SOURCE/ARMY",
+      "function": "?PowEffect@army@@QAEXHHHH@Z",
+      "source_hash": "bf3753b3a274",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "improved",
+      "iterations": 3,
+      "before": 99.807175,
+      "after": 99.99522,
+      "note": "Retail initialization order and typed increment recover the exact frame and 119 relocations; four commutative load orders and three padding NOPs remain documented."
+    },
+    {
+      "unit": "SOURCE/ARMY",
+      "function": "?ProcessDeath@army@@QAEXH@Z",
+      "source_hash": "a921c47fa66a",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 1,
+      "before": 97.67286,
+      "after": 97.67286,
+      "note": "Complete behavior, 0x18 frame, CFG, and external targets; typed flat indexing regressed, leaving commutative mirror lookup order and local call identity."
+    },
+    {
+      "unit": "SOURCE/ARMY",
+      "function": "?SpecialAttack@army@@QAEXXZ",
+      "source_hash": "9cc1dd8b1c44",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.036125,
+      "after": 99.036125,
+      "note": "Complete behavior, 0x1d8 frame/slots, CFG, and external relocs; durable semantic evidence covers address order, float polarity, and continuation residuals."
+    },
+    {
+      "unit": "SOURCE/ARMY",
+      "function": "?SpellCastWorkChance@army@@QAEMH@Z",
+      "source_hash": "8ab5325213c4",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "improved",
+      "iterations": 1,
+      "before": 99.799194,
+      "after": 99.819275,
+      "note": "Hash-ordered locals restore every retail frame slot; all 59 relocations align and only one equivalent branch polarity plus trailing NOPs remain."
+    },
+    {
+      "unit": "SOURCE/ARMY",
+      "function": "?SpellEffect@army@@QAEXHHH@Z",
+      "source_hash": "397317f3a721",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 3,
+      "before": 99.716736,
+      "after": 100.0,
+      "note": "Retail local slots, comparison order, and 275-tick creature animation duration close all bytes and 54 relocations exactly."
+    },
+    {
+      "unit": "SOURCE/ARMY",
+      "function": "?Walk@army@@QAEXHHH@Z",
+      "source_hash": "213d8725ae5b",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "improved",
+      "iterations": 2,
+      "before": 99.44395,
+      "after": 99.99252,
+      "note": "Correct oldHex/oldMinX slots and frame-info duration access leave all executable bytes aligned apart from one effective relocation alias; 151 relocs agree."
     },
     {
       "unit": "SOURCE/ARMY",
@@ -2357,36 +2511,80 @@
     },
     {
       "unit": "SOURCE/HERO",
-      "function": "?CheckLevel@hero@@QAEXXZ",
-      "source_hash": "066b19fb5144",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "function": "?ApplyBattleWinTemps@hero@@QAEXXZ",
+      "source_hash": "080d9a22a391",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "parked",
       "iterations": 0,
-      "before": 99.51685,
-      "after": 99.51685,
-      "note": "Every non-jump byte and 58 external relocs align; retail has two extra five-byte local trampoline jumps."
+      "before": 69.39726,
+      "after": 69.39726,
+      "note": "Complete twelve-flag cleanup semantics, exact frame, CFG, and zero-relocation set; MSVC selects memory SUB instead of retail load/sub/store lowering."
+    },
+    {
+      "unit": "SOURCE/HERO",
+      "function": "?CheckLevel@hero@@QAEXXZ",
+      "source_hash": "066b19fb5144",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.366295,
+      "after": 99.366295,
+      "note": "Complete body, frame slots, and 58 relocations; the byte-proven residual is exactly two inline continuation jumps."
+    },
+    {
+      "unit": "SOURCE/HERO",
+      "function": "?Deallocate@hero@@QAEXH@Z",
+      "source_hash": "8a0ecdaa0303",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 96.64561,
+      "after": 96.64561,
+      "note": "Complete deallocation and campaign behavior with documented frame/CFG/relocs; remaining cursor/map materialization and flag-mask lowering are compiler shape."
     },
     {
       "unit": "SOURCE/HERO",
       "function": "?DoHeroSplit@@YIXHH@Z",
       "source_hash": "67c038bb7d71",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
-      "outcome": "exact",
-      "iterations": 3,
-      "before": 99.97369,
-      "after": 100.0,
-      "note": "Corrected split-amount widget ID to 68 and reconstructed retail local slots; function is exact."
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.98684,
+      "after": 99.98684,
+      "note": "Complete 0x18 frame/CFG and 50 relocs; two exchanged local displacement bytes remain at +0x18c/+0x19a alongside local string identities."
     },
     {
       "unit": "SOURCE/HERO",
       "function": "?DoSSLevelDialog@hero@@QAEXHH@Z",
       "source_hash": "eb3e70e63135",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
-      "outcome": "improved",
-      "iterations": 2,
-      "before": 99.85542,
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.93976,
       "after": 99.93976,
-      "note": "Corrected skill label index to level minus one and restored local slots; all masked bytes and 11 effective targets align."
+      "note": "All 0xf4 relocation-masked bytes and 11 effective relocation targets agree; residual identities are the coalesced level table and local format string."
+    },
+    {
+      "unit": "SOURCE/HERO",
+      "function": "?GetLevel@hero@@QAEHH@Z",
+      "source_hash": "0860396dea90",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 1,
+      "before": 98.64151,
+      "after": 98.64151,
+      "note": "Complete extrapolation behavior, 0x10 frame, CFG, and eight relocs; direct and reversed loop inequalities produce the same compare operand order."
+    },
+    {
+      "unit": "SOURCE/HERO",
+      "function": "?GetNthSpell@hero@@QAEHHH@Z",
+      "source_hash": "bb05a9d91671",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 0,
+      "before": 99.781815,
+      "after": 100.0,
+      "note": "The unchanged complete body closes under the restored HERO TU state; raw bytes and all three relocations are exact."
     },
     {
       "unit": "SOURCE/HERO",
@@ -2401,6 +2599,17 @@
     },
     {
       "unit": "SOURCE/HERO",
+      "function": "?HeroHandler@@YIHAAUtag_message@@@Z",
+      "source_hash": "75511c620bc2",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 94.45385,
+      "after": 94.45385,
+      "note": "Complete hero UI behavior, frame, message CFG, and relocation order; hover loads, continuations, and formation update lowering remain documented."
+    },
+    {
+      "unit": "SOURCE/HERO",
       "function": "?HeroScreenUpdate@hero@@QAEXXZ",
       "source_hash": "53aee49d98a7",
       "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
@@ -2412,14 +2621,47 @@
     },
     {
       "unit": "SOURCE/HERO",
+      "function": "?HeroView@@YIHHHH@Z",
+      "source_hash": "2d004dfa07d3",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 95.30303,
+      "after": 95.30303,
+      "note": "Complete behavior, 0x08 frame, CFG, and 47 relocs; retail evaluates hero owner before current player ID while base evaluates them in reverse."
+    },
+    {
+      "unit": "SOURCE/HERO",
+      "function": "?SetupHeroView@@YIXXZ",
+      "source_hash": "726ebd966440",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 98.754036,
+      "after": 98.754036,
+      "note": "Complete UI construction and message order with documented exact frame/relocations; local slot placement and compiler-selected assignments remain."
+    },
+    {
+      "unit": "SOURCE/HERO",
+      "function": "?TakeSS@hero@@QAEHHH@Z",
+      "source_hash": "122a2e337637",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "exact",
+      "iterations": 0,
+      "before": 99.97183,
+      "after": 100.0,
+      "note": "The unchanged complete body closes under the restored HERO TU state; raw bytes and the zero-relocation set are exact."
+    },
+    {
+      "unit": "SOURCE/HERO",
       "function": "?UpdateHeroScreenStatusBar@@YIXAAUtag_message@@@Z",
       "source_hash": "34daeaffc9cb",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
       "outcome": "parked",
-      "iterations": 2,
+      "iterations": 0,
       "before": 98.855835,
       "after": 98.855835,
-      "note": "Complete frame slots and 150 relocs; equality load order and third skill-row branch topology resist bounded steering."
+      "note": "Complete frame, slots, CFG, and 150 relocations; equality load order and third skill-row branch topology remain documented."
     },
     {
       "unit": "SOURCE/HISCORE",
@@ -2827,6 +3069,28 @@
       "before": 99.899704,
       "after": 100.0,
       "note": "Semantic local suffixes restore the retail slots; function is exact."
+    },
+    {
+      "unit": "SOURCE/Overview",
+      "function": "?DoKnob@game@@QAEXXZ",
+      "source_hash": "dfb49dc3f57c",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.94924,
+      "after": 99.94924,
+      "note": "All 0x31f relocation-masked bytes, frame/CFG, and 49 effective relocation targets agree; only compiler-local pool and FDIV aliases differ."
+    },
+    {
+      "unit": "SOURCE/Overview",
+      "function": "?SetupDynamicStuff@game@@QAEXHHH@Z",
+      "source_hash": "93269887ff6c",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 96.79277,
+      "after": 96.79277,
+      "note": "Complete overview behavior and retail message order; the durable semantic marker records frame/slot and equality steering already exhausted."
     },
     {
       "unit": "SOURCE/Overview",
