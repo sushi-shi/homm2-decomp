@@ -951,7 +951,7 @@ void combatManager::DrawFrame(
         gbComputeExtent = true;
     }
 
-    for (row = 0; row < COMBAT_DRAW_LAYER_COUNT; row++) {
+    for (row = 0; row < IDX(COMBAT_DRAW_LAYER_COUNT); row++) {
         if (row == COMBAT_DRAW_RIGHT_HERO_LAYER && m_heroes[1] != 0) {
             m_heroIcons[1]->CombatClipDrawToBuffer(
                 ((m_heroes[1]->m_isCaptain ? -1 : 0)

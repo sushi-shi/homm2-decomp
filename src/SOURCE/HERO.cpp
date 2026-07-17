@@ -162,7 +162,7 @@ i32 hero::GetNthSpell(i32 type, i32 spellNumber) {
     i32 spell;
     i32 spellOrdinalCount = 0;
 
-    for (spell = 0; spell < SPELL_COUNT; spell++) {
+    for (spell = 0; spell < IDX(SPELL_COUNT); spell++) {
         if (HasSpell(spell)) {
             if (type == HERO_SPELL_TYPE_ALL
                 || (type == HERO_SPELL_TYPE_COMBAT
@@ -190,7 +190,7 @@ i32 hero::GetNumSpells(i32 type) {
 
     numCombatSpells = 0;
     numAdventureSpells = 0;
-    for (spellIndexCurrent = 0; spellIndexCurrent < SPELL_COUNT; spellIndexCurrent++) {
+    for (spellIndexCurrent = 0; spellIndexCurrent < IDX(SPELL_COUNT); spellIndexCurrent++) {
         if (HasSpell(spellIndexCurrent)) {
             if (gsSpellInfo[spellIndexCurrent].attributes & SPELL_ATTRIBUTE_COMBAT)
                 numCombatSpells++;
@@ -1856,7 +1856,7 @@ i32 hero::TakeSS(i32 skill, i32 levels) {
         if (m_secondarySkills[skill] < IDX(HERO_SKILL_LEVEL_NONE))
             m_secondarySkills[skill] = IDX(HERO_SKILL_LEVEL_NONE);
         if (m_secondarySkills[skill] == IDX(HERO_SKILL_LEVEL_NONE)) {
-            for (otherSkill = 0; otherSkill < HERO_SKILL_COUNT; otherSkill++) {
+            for (otherSkill = 0; otherSkill < IDX(HERO_SKILL_COUNT); otherSkill++) {
                 if (m_secondarySkillOrder[otherSkill] > m_secondarySkillOrder[skill]) {
                     m_secondarySkillOrder[otherSkill]--;
                 }
@@ -1917,7 +1917,7 @@ VA(0x004704cc, 0x5e)
 i32 hero::GetNthSS(i32 ordinal) {
     i32 skill;
 
-    for (skill = 0; skill < HERO_SKILL_COUNT; skill++) {
+    for (skill = 0; skill < IDX(HERO_SKILL_COUNT); skill++) {
         if (m_secondarySkillOrder[skill] == ordinal + HERO_SECONDARY_SKILL_ORDER_BASE)
             return skill;
     }

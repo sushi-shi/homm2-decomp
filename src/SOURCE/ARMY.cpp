@@ -3449,7 +3449,7 @@ i32 army::OtherArmyAdjacent(i32 side, i32 index) {
 }
 
 VA(0x00454117, 0x1e1)
-void ModifyFrameInfo(struct SMonFrameInfo* frameInfo, i32 monsterType) {
+void ModifyFrameInfo(struct SMonFrameInfo* frameInfo, CreatureType monsterType) {
     i32 speedDifference;
 
     speedDifference = 0;
@@ -3463,11 +3463,11 @@ void ModifyFrameInfo(struct SMonFrameInfo* frameInfo, i32 monsterType) {
         || monsterType == CREATURE_MUTANT_ZOMBIE || monsterType == CREATURE_ROYAL_MUMMY
         || monsterType == CREATURE_VAMPIRE_LORD || monsterType == CREATURE_POWER_LICH) {
         speedDifference =
-            gMonsterDatabase[monsterType].speed - gMonsterDatabase[monsterType - 1].speed;
+            gMonsterDatabase[IDX(monsterType)].speed - gMonsterDatabase[monsterType - 1].speed;
     }
     if (monsterType == CREATURE_EARTH_ELEMENTAL || monsterType == CREATURE_AIR_ELEMENTAL
         || monsterType == CREATURE_WATER_ELEMENTAL) {
-        speedDifference = gMonsterDatabase[monsterType].speed
+        speedDifference = gMonsterDatabase[IDX(monsterType)].speed
                           - gMonsterDatabase[IDX(CREATURE_FIRE_ELEMENTAL)].speed;
     }
     if (speedDifference) {

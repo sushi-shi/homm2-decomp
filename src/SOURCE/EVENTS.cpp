@@ -5522,7 +5522,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             }
             gpGame->ClaimMine(cell->m_objectMetadata, giCurPlayer);
             if (eventType_g == MAP_OBJECT_MINE) {
-                for (index_h = SPELL_SET_EARTH_GUARDIAN; index_h < SPELL_SET_WATER_GUARDIAN;
+                for (index_h = IDX(SPELL_SET_EARTH_GUARDIAN); index_h < IDX(SPELL_SET_WATER_GUARDIAN);
                      ++index_h) {
                     if (eventHero->HasSpell(index_h)
                         && GetManaCost(index_h, eventHero) < eventHero->m_spellPoints) {

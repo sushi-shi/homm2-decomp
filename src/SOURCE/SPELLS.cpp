@@ -1055,7 +1055,7 @@ void combatManager::CastSpell(
                 ShowSpellMessage(castByCreature, IDX(spell), target_i);
                 target_i->DispelGood();
                 target_i->SpellEffect(gsSpellInfo[IDX(SPELL_DISPEL)].combatEffect, 0, 0);
-                for (influence = 0; influence < SPELL_INFLUENCE_COUNT; influence++)
+                for (influence = 0; influence < IDX(SPELL_INFLUENCE_COUNT); influence++)
                     target_i->CancelIndividualSpell(influence);
                 break;
             case SPELL_BLIND:

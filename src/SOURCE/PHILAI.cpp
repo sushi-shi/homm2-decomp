@@ -3780,7 +3780,7 @@ i32 philAI::QuickCombat(
     }
     if (defeatedHero5 != 0 && defeatedHero5->m_secondarySkills[IDX(HERO_SKILL_EAGLE_EYE)] != 0
         && victoriousHero4 != 0) {
-        for (armyIndex0 = 0; armyIndex0 < SPELL_COUNT; armyIndex0++) {
+        for (armyIndex0 = 0; armyIndex0 < IDX(SPELL_COUNT); armyIndex0++) {
             if (defeatedHero5->HasSpell(armyIndex0) != 0
                 && victoriousHero4->HasSpell(armyIndex0) == 0
                 && gsSpellInfo[armyIndex0].level

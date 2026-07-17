@@ -39,7 +39,7 @@ i32 combatManager::DoSpellAI(i32 side, i32 restricted) {
             return 0;
     }
 
-    for (spellIndex = 0; spellIndex < SPELL_COUNT; spellIndex++) {
+    for (spellIndex = 0; spellIndex < IDX(SPELL_COUNT); spellIndex++) {
         if (m_heroes[side]->HasSpell(spellIndex)
             && (gsSpellInfo[spellIndex].attributes & SPELL_ATTRIBUTE_COMBAT)
             && GetManaCost(spellIndex, m_heroes[side]) <= m_heroes[side]->m_spellPoints) {
