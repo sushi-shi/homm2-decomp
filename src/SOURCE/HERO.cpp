@@ -1405,8 +1405,10 @@ i32 HeroHandler(struct tag_message& message) {
                                 );
                             } else {
                                 gpHVHero->ViewArtifact(
-                                    ArtifactType(gpHVHero->m_artifacts)
-                                        [message.payload.widget.id - HERO_UI_ARTIFACT_FIRST],
+                                    ArtifactType(
+                                        gpHVHero->m_artifacts
+                                            [message.payload.widget.id - HERO_UI_ARTIFACT_FIRST]
+                                    ),
                                     quickView0,
                                     gpHVHero->m_artifactExtra
                                         [message.payload.widget.id - HERO_UI_ARTIFACT_FIRST]
