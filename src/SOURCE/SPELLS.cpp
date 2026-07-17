@@ -998,52 +998,52 @@ void combatManager::CastSpell(
                 break;
             case SPELL_HASTE:
                 ShowSpellMessage(castByCreature, IDX(spell), target_i);
-                target_i->SetSpellInfluence(SPELL_INFLUENCE_HASTE, spellPower_i);
+                target_i->SetSpellInfluence(ArmySpellInfluence(IDX(SPELL_INFLUENCE_HASTE)), spellPower_i);
                 target_i->SpellEffect(gsSpellInfo[IDX(SPELL_HASTE)].combatEffect, 0, 0);
                 break;
             case SPELL_SHIELD:
                 ShowSpellMessage(castByCreature, IDX(spell), target_i);
-                target_i->SetSpellInfluence(SPELL_INFLUENCE_SHIELD, spellPower_i);
+                target_i->SetSpellInfluence(ArmySpellInfluence(IDX(SPELL_INFLUENCE_SHIELD)), spellPower_i);
                 target_i->SpellEffect(gsSpellInfo[IDX(SPELL_SHIELD)].combatEffect, 0, 0);
                 break;
             case SPELL_DRAGON_SLAYER:
                 ShowSpellMessage(castByCreature, IDX(spell), target_i);
-                target_i->SetSpellInfluence(SPELL_INFLUENCE_DRAGON_SLAYER, spellPower_i);
+                target_i->SetSpellInfluence(ArmySpellInfluence(IDX(SPELL_INFLUENCE_DRAGON_SLAYER)), spellPower_i);
                 target_i->SpellEffect(gsSpellInfo[IDX(SPELL_DRAGON_SLAYER)].combatEffect, 0, 0);
                 break;
             case SPELL_BLESS:
                 ShowSpellMessage(castByCreature, IDX(spell), target_i);
-                target_i->SetSpellInfluence(SPELL_INFLUENCE_BLESS, spellPower_i);
+                target_i->SetSpellInfluence(ArmySpellInfluence(IDX(SPELL_INFLUENCE_BLESS)), spellPower_i);
                 target_i->SpellEffect(gsSpellInfo[IDX(SPELL_BLESS)].combatEffect, 0, 0);
                 break;
             case SPELL_STONE_SKIN:
                 ShowSpellMessage(castByCreature, IDX(spell), target_i);
-                target_i->SetSpellInfluence(SPELL_INFLUENCE_STONE_SKIN, spellPower_i);
+                target_i->SetSpellInfluence(ArmySpellInfluence(IDX(SPELL_INFLUENCE_STONE_SKIN)), spellPower_i);
                 target_i->SpellEffect(gsSpellInfo[IDX(SPELL_STONE_SKIN)].combatEffect, 0, 0);
                 break;
             case SPELL_STEEL_SKIN:
                 ShowSpellMessage(castByCreature, IDX(spell), target_i);
-                target_i->SetSpellInfluence(SPELL_INFLUENCE_STEEL_SKIN, spellPower_i);
+                target_i->SetSpellInfluence(ArmySpellInfluence(IDX(SPELL_INFLUENCE_STEEL_SKIN)), spellPower_i);
                 target_i->SpellEffect(gsSpellInfo[IDX(SPELL_STEEL_SKIN)].combatEffect, 0, 0);
                 break;
             case SPELL_CURSE:
                 ShowSpellMessage(castByCreature, IDX(spell), target_i);
-                target_i->SetSpellInfluence(SPELL_INFLUENCE_CURSE, spellPower_i);
+                target_i->SetSpellInfluence(ArmySpellInfluence(IDX(SPELL_INFLUENCE_CURSE)), spellPower_i);
                 target_i->SpellEffect(gsSpellInfo[IDX(SPELL_CURSE)].combatEffect, 0, 0);
                 break;
             case SPELL_BERSERKER:
                 ShowSpellMessage(castByCreature, IDX(spell), target_i);
-                target_i->SetSpellInfluence(SPELL_INFLUENCE_BERSERKER, spellPower_i);
+                target_i->SetSpellInfluence(ArmySpellInfluence(IDX(SPELL_INFLUENCE_BERSERKER)), spellPower_i);
                 target_i->SpellEffect(gsSpellInfo[IDX(SPELL_BERSERKER)].combatEffect, 0, 0);
                 break;
             case SPELL_HYPNOTIZE:
                 ShowSpellMessage(castByCreature, IDX(spell), target_i);
-                target_i->SetSpellInfluence(SPELL_INFLUENCE_HYPNOTIZE, spellPower_i);
+                target_i->SetSpellInfluence(ArmySpellInfluence(IDX(SPELL_INFLUENCE_HYPNOTIZE)), spellPower_i);
                 target_i->SpellEffect(gsSpellInfo[IDX(SPELL_HYPNOTIZE)].combatEffect, 0, 0);
                 break;
             case SPELL_PARALYZE:
                 ShowSpellMessage(castByCreature, IDX(spell), target_i);
-                target_i->SetSpellInfluence(SPELL_INFLUENCE_PARALYZE, spellPower_i);
+                target_i->SetSpellInfluence(ArmySpellInfluence(IDX(SPELL_INFLUENCE_PARALYZE)), spellPower_i);
                 target_i->SpellEffect(gsSpellInfo[IDX(SPELL_PARALYZE)].combatEffect, 0, 0);
                 break;
             case CREATURE_SPELL_DISPEL:
@@ -1060,17 +1060,17 @@ void combatManager::CastSpell(
                 break;
             case SPELL_BLIND:
                 ShowSpellMessage(castByCreature, IDX(spell), target_i);
-                target_i->SetSpellInfluence(SPELL_INFLUENCE_BLIND, spellPower_i);
+                target_i->SetSpellInfluence(ArmySpellInfluence(IDX(SPELL_INFLUENCE_BLIND)), spellPower_i);
                 target_i->SpellEffect(gsSpellInfo[IDX(SPELL_BLIND)].combatEffect, 0, 0);
                 break;
             case SPELL_BLOOD_LUST:
                 ShowSpellMessage(castByCreature, IDX(spell), target_i);
                 BloodLustEffect(target_i, SPELL_BLOOD_LUST_EFFECT);
-                target_i->SetSpellInfluence(SPELL_INFLUENCE_BLOOD_LUST, SPELL_BLOOD_LUST_DURATION);
+                target_i->SetSpellInfluence(ArmySpellInfluence(IDX(SPELL_INFLUENCE_BLOOD_LUST)), SPELL_BLOOD_LUST_DURATION);
                 break;
             case SPELL_ANTI_MAGIC:
                 ShowSpellMessage(castByCreature, IDX(spell), target_i);
-                target_i->SetSpellInfluence(SPELL_INFLUENCE_ANTI_MAGIC, spellPower_i);
+                target_i->SetSpellInfluence(ArmySpellInfluence(IDX(SPELL_INFLUENCE_ANTI_MAGIC)), spellPower_i);
                 target_i->SpellEffect(gsSpellInfo[IDX(SPELL_ANTI_MAGIC)].combatEffect, 0, 0);
                 break;
             case CREATURE_SPELL_PETRIFY:
@@ -2891,19 +2891,19 @@ void combatManager::CastMassSpell(SpellType spell, i32 spellPower) {
                 target_i = &m_armies[side_i][armyIndex_k];
                 switch (spell) {
                     case SPELL_MASS_CURSE:
-                        target_i->SetSpellInfluence(SPELL_INFLUENCE_CURSE, spellPower);
+                        target_i->SetSpellInfluence(ArmySpellInfluence(IDX(SPELL_INFLUENCE_CURSE)), spellPower);
                         break;
                     case SPELL_MASS_SLOW:
-                        target_i->SetSpellInfluence(SPELL_INFLUENCE_SLOW, spellPower);
+                        target_i->SetSpellInfluence(ArmySpellInfluence(IDX(SPELL_INFLUENCE_SLOW)), spellPower);
                         break;
                     case SPELL_MASS_HASTE:
-                        target_i->SetSpellInfluence(SPELL_INFLUENCE_HASTE, spellPower);
+                        target_i->SetSpellInfluence(ArmySpellInfluence(IDX(SPELL_INFLUENCE_HASTE)), spellPower);
                         break;
                     case SPELL_MASS_BLESS:
-                        target_i->SetSpellInfluence(SPELL_INFLUENCE_BLESS, spellPower);
+                        target_i->SetSpellInfluence(ArmySpellInfluence(IDX(SPELL_INFLUENCE_BLESS)), spellPower);
                         break;
                     case SPELL_MASS_SHIELD:
-                        target_i->SetSpellInfluence(SPELL_INFLUENCE_SHIELD, spellPower);
+                        target_i->SetSpellInfluence(ArmySpellInfluence(IDX(SPELL_INFLUENCE_SHIELD)), spellPower);
                         break;
                     case SPELL_MASS_CURE:
                         target_i->Cure(spellPower);
