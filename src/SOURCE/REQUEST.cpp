@@ -324,8 +324,10 @@ i32 fileRequester::Open(i32 id) {
     m_window = new heroWindow(
         m_x,
         m_y,
-        m_mode == FILE_REQUESTER_MAP_GAME || m_mode == FILE_REQUESTER_MAP ? "requests.bin"
-                                                                          : "request.bin"
+        const_cast<char*>(
+            m_mode == FILE_REQUESTER_MAP_GAME || m_mode == FILE_REQUESTER_MAP ? "requests.bin"
+                                                                              : "request.bin"
+        )
     );
     if (m_window == 0) {
         MemError();
