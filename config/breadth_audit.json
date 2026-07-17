@@ -387,6 +387,28 @@
       "note": "Retained exact maximum; sole current residual is commutative current/mouse-manager compare; reversal neutral; exact frame/CFG and 11/11 relocations."
     },
     {
+      "unit": "BASE/ICONWDGT",
+      "function": "?Draw@iconWidget@@UAEXXZ",
+      "source_hash": "002628e2796d",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 97.87234,
+      "after": 97.87234,
+      "note": "Same 0xe5 frame and switch CFG with 4/4 ordered relocs; residual is register scheduling in the centered draw arm after bounded source, AST, and typed-TU probes."
+    },
+    {
+      "unit": "BASE/ICONWDGT",
+      "function": "?Main@iconWidget@@UAEHAAUtag_message@@@Z",
+      "source_hash": "32e2da32aed6",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 98.8764,
+      "after": 98.8764,
+      "note": "Same 0x291 frame and CFG; 17/17 ordered relocs agree, with only equivalent compare reversal plus containing-function/local jump-table identities after typed-TU probes."
+    },
+    {
       "unit": "BASE/INPUTMGR",
       "function": "?AsciiConvert@inputManager@@QAEXAAUtag_message@@@Z",
       "source_hash": "5675c84ee1db",
@@ -429,6 +451,61 @@
       "before": 99.95763,
       "after": 99.95763,
       "note": "Proven early-stop: complete 0x36c code/table range is raw-exact after relocation-union masking; 55/55 sites and all runtime targets/addends agree, residual is local switch and static-text owner naming"
+    },
+    {
+      "unit": "BASE/MOUSEMGR",
+      "function": "?Close@mouseManager@@UAEXXZ",
+      "source_hash": "4b0c5ac6f369",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 98.92308,
+      "after": 98.92308,
+      "note": "Semantic zero-frame loop and 14/14 ordered relocs agree; residual is only the EBX/EBP allocation exchange already covered by bounded source and AST attempts."
+    },
+    {
+      "unit": "BASE/MOUSEMGR",
+      "function": "?NewUpdate@mouseManager@@QAEXH@Z",
+      "source_hash": "5edbd19804c6",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 98.54489,
+      "after": 98.54489,
+      "note": "Complete zero-frame semantics, CFG, lifetimes, and 83/83 ordered relocs; residual is four retail near branches accounting for the exact 16-byte size delta; retained max is 99.257."
+    },
+    {
+      "unit": "BASE/MOUSEMGR",
+      "function": "?Open@mouseManager@@UAEHH@Z",
+      "source_hash": "7c77adcf914e",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 93.325584,
+      "after": 93.325584,
+      "note": "Complete layout and no-frame CFG with 3/3 ordered relocs; residual is retail duplicate immediate stores versus candidate shared ECX constant, with identical suffix."
+    },
+    {
+      "unit": "BASE/MOUSEMGR",
+      "function": "?SetColorMice@mouseManager@@QAEXH@Z",
+      "source_hash": "752aa279ab48",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "exact",
+      "iterations": 0,
+      "before": 91.86667,
+      "after": 100.0,
+      "note": "Retained exact maximum is 100 for the unchanged source hash; current TU drift preserves complete behavior and all 29 ordered relocs including private-owner addends."
+    },
+    {
+      "unit": "BASE/MOUSEMGR",
+      "function": "?SetPointer@mouseManager@@QAEXH@Z",
+      "source_hash": "5d13270d637e",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 75.11654,
+      "after": 75.11654,
+      "note": "Complete 0x14 local area, CFG, cursor table semantics, mask planes, and 70/70 ordered relocs; residual is prologue/frame register allocation and compiler scheduling, not behavior."
     },
     {
       "unit": "BASE/Misc",
@@ -891,6 +968,39 @@
       "before": 99.76667,
       "after": 99.76667,
       "note": "files=src/BASE/WIDGET.cpp; complete semantics and relocs=17/17; six register-allocation bytes in mouse hit test and +0x77 onward exact; behavioral bug=none"
+    },
+    {
+      "unit": "BASE/bmap2",
+      "function": "?BlitBitmap@@YIXPAVbitmap@@HHHH0HH@Z",
+      "source_hash": "86201915eca7",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "exact",
+      "iterations": 0,
+      "before": 98.6,
+      "after": 100.0,
+      "note": "Retained exact maximum is 100 for the unchanged source hash; current TU drift is one equivalent loop compare reversal and all 11 ordered relocs agree."
+    },
+    {
+      "unit": "BASE/bmap2",
+      "function": "?DimBitmapArea@@YIXPAVbitmap@@HHHHH@Z",
+      "source_hash": "87da983049bd",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "exact",
+      "iterations": 0,
+      "before": 97.2,
+      "after": 100.0,
+      "note": "Retained exact maximum is 100 for the unchanged source hash; current TU drift is equivalent inner and outer loop compare reversals and all 15 ordered relocs agree."
+    },
+    {
+      "unit": "BASE/bmap2",
+      "function": "?FillBitmapAreaClip@@YIXPAVbitmap@@HHHHHHHHH@Z",
+      "source_hash": "bbc24c228322",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 98.44444,
+      "after": 98.44444,
+      "note": "Same 0x114 frame and CFG with 7/7 ordered relocs; only two equivalent compare operand reversals remain after bounded semantic and AST variants."
     },
     {
       "unit": "BASE/soundmgr",
