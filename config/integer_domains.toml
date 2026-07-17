@@ -295,6 +295,131 @@ evidence = [
 status = "reviewed"
 
 [[domain]]
+name = "SpellType"
+declaration = "SpellType"
+owner = "include/SOURCE/KB_TYPES.h"
+category = "serialized"
+production_carrier = "packed signed-byte storage and int table/call boundaries"
+strict = true
+sentinels = ["SPELL_NONE"]
+enumerators = [
+  "SPELL_NONE",
+  "SPELL_FIREBALL",
+  "SPELL_FIREBLAST",
+  "SPELL_LIGHTNING_BOLT",
+  "SPELL_CHAIN_LIGHTNING",
+  "SPELL_TELEPORT",
+  "SPELL_CURE",
+  "SPELL_MASS_CURE",
+  "SPELL_RESURRECT",
+  "SPELL_TRUE_RESURRECT",
+  "SPELL_HASTE",
+  "SPELL_MASS_HASTE",
+  "SPELL_SLOW",
+  "SPELL_MASS_SLOW",
+  "SPELL_BLIND",
+  "SPELL_BLESS",
+  "SPELL_MASS_BLESS",
+  "SPELL_STONE_SKIN",
+  "SPELL_STEEL_SKIN",
+  "SPELL_CURSE",
+  "SPELL_MASS_CURSE",
+  "SPELL_HOLY_WORD",
+  "SPELL_HOLY_SHOUT",
+  "SPELL_ANTI_MAGIC",
+  "SPELL_DISPEL",
+  "SPELL_MASS_DISPEL",
+  "SPELL_MAGIC_ARROW",
+  "SPELL_BERSERKER",
+  "SPELL_ARMAGEDDON",
+  "SPELL_ELEMENTAL_STORM",
+  "SPELL_METEOR_SHOWER",
+  "SPELL_PARALYZE",
+  "SPELL_HYPNOTIZE",
+  "SPELL_COLD_RAY",
+  "SPELL_COLD_RING",
+  "SPELL_DISRUPTING_RAY",
+  "SPELL_DEATH_RIPPLE",
+  "SPELL_DEATH_WAVE",
+  "SPELL_DRAGON_SLAYER",
+  "SPELL_BLOOD_LUST",
+  "SPELL_ANIMATE_DEAD",
+  "SPELL_MIRROR_IMAGE",
+  "SPELL_SHIELD",
+  "SPELL_MASS_SHIELD",
+  "SPELL_SUMMON_EARTH_ELEMENTAL",
+  "SPELL_SUMMON_AIR_ELEMENTAL",
+  "SPELL_SUMMON_FIRE_ELEMENTAL",
+  "SPELL_SUMMON_WATER_ELEMENTAL",
+  "SPELL_EARTHQUAKE",
+  "SPELL_VIEW_MINES",
+  "SPELL_VIEW_RESOURCES",
+  "SPELL_VIEW_ARTIFACTS",
+  "SPELL_VIEW_TOWNS",
+  "SPELL_VIEW_HEROES",
+  "SPELL_VIEW_ALL",
+  "SPELL_IDENTIFY_HERO",
+  "SPELL_SUMMON_BOAT",
+  "SPELL_DIMENSION_DOOR",
+  "SPELL_TOWN_GATE",
+  "SPELL_TOWN_PORTAL",
+  "SPELL_VISIONS",
+  "SPELL_HAUNT",
+  "SPELL_SET_EARTH_GUARDIAN",
+  "SPELL_SET_AIR_GUARDIAN",
+  "SPELL_SET_FIRE_GUARDIAN",
+  "SPELL_SET_WATER_GUARDIAN",
+  "SPELL_COUNT",
+]
+interfaces = [
+  "spell-indexed names, descriptions, attributes, costs, and AI tables",
+  "hero spell possession and adventure/combat spell dispatch",
+  "town mage-guild generation and campaign spell bonuses",
+]
+members = ["hero::m_spells", "town::m_spells", "town::m_spellSlots"]
+storage = [
+  "hero::m_spells 65-byte known-spell bitmap indexed by SpellType",
+  "town::m_spells and town::m_spellSlots packed signed-byte spell IDs with -1 empty entries",
+  "artifact spell-scroll extra packed signed-byte spell ID",
+  "campaign choice value signed short",
+  "map object metadata carrying spell ID plus one where zero means no spell",
+]
+conversions = [
+  "SpellType to packed i8 town and artifact storage boundaries",
+  "SpellType to integer indices for the 65-entry retail spell tables",
+  "SpellType plus one to map-object metadata transport",
+]
+evidence = [
+  "retail gsSpellInfo has 65 entries and gSpellNames has those 65 names plus a trailing null",
+  "combat spells occupy 0 through 47 and adventure spells occupy 48 through 64 in that shared table",
+  "hero, town, campaign, AI, combat, and map-event spell constants use identical IDs",
+  "packed town records prove signed-byte spell storage and the -1 absence sentinel",
+]
+status = "reviewed"
+
+[[domain]]
+name = "CreatureSpellType"
+declaration = "CreatureSpellType"
+owner = "include/SOURCE/KB_TYPES.h"
+category = "value"
+production_carrier = "int combat command boundary"
+strict = true
+sentinels = []
+enumerators = [
+  "CREATURE_SPELL_PETRIFY",
+  "CREATURE_SPELL_DISPEL",
+]
+interfaces = ["creature-triggered combat spell dispatch and resistance checks"]
+members = []
+storage = []
+conversions = ["CreatureSpellType to shared integer combat spell-command transport"]
+evidence = [
+  "retail combat dispatch uses values 101 and 102 only for creature Petrify and creature Dispel",
+  "these values lie outside the 65-entry player spell table and therefore are not SpellType values",
+]
+status = "reviewed"
+
+[[domain]]
 name = "FactionType"
 declaration = "FactionType"
 owner = "include/SOURCE/KB_TYPES.h"

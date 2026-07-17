@@ -501,7 +501,7 @@ void game::CampaignInfoUpdate(i32 redraw)
             }
             break;
         case CAMPAIGN_CHOICE_SPELL:
-            if (choice->value == CAMPAIGN_SUMMON_EARTH_SPELL)
+            if (choice->value == SPELL_SUMMON_EARTH_ELEMENTAL)
                 sprintf(gText, "Summon Earth");
             else
                 sprintf(gText, "%s", gSpellNames[choice->value]);

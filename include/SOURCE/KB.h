@@ -97,7 +97,6 @@ typedef enum CampaignConstant {
     CAMPAIGN_HERO_PRIORITY_HIGH = 100,
     CAMPAIGN_HERO_PRIORITY_NORMAL = 90,
     CAMPAIGN_EXPERIENCE_BONUS = 5000,
-    CAMPAIGN_SUMMON_EARTH_SPELL = 43,
     CAMPAIGN_SWITCH_VICTORY_VALUE = 99,
     CAMPAIGN_ROLAND_TIME_LIMIT = 90
 } CampaignConstant;
@@ -108,10 +107,6 @@ typedef enum CampaignChoiceValue {
     CAMPAIGN_RESOURCE_CRYSTAL = 4,
     CAMPAIGN_RESOURCE_GEMS = 5,
     CAMPAIGN_RESOURCE_GOLD = 6,
-    CAMPAIGN_SPELL_RESURRECT = 7,
-    CAMPAIGN_SPELL_MASS_CURSE = 19,
-    CAMPAIGN_SPELL_MIRROR_IMAGE = 40,
-    CAMPAIGN_SPELL_SUMMON_EARTH_ELEMENTAL = 43,
     CAMPAIGN_SECONDARY_SKILL_LOGISTICS = 2,
     CAMPAIGN_ALIGNMENT_KNIGHT = 0,
     CAMPAIGN_ALIGNMENT_BARBARIAN = 1,
@@ -930,7 +925,7 @@ extern icon *gShingleAnim;
 extern i32 gSpecialBuildingBaseResourceValues[];
 extern i32 gSpecialBuildingCosts[][KB_BUILDING_RESOURCE_COUNT];
 extern char *gSpecialBuildingNames[];
-extern SSpellInfo gsSpellInfo[HERO_SPELL_COUNT];
+extern SSpellInfo gsSpellInfo[SPELL_COUNT];
 extern icon *gSystemIcons;
 extern char gText[];
 extern char *gWellExtraNames[];
