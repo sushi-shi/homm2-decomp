@@ -8,10 +8,10 @@
 // forward declarations:
 struct tag_message;
 
-typedef enum InputManagerKeyCodeType {
+HOMM2_ENUM_BEGIN(InputManagerKeyCodeType)
     INPUT_KEY_CODE_ASCII = 0,
     INPUT_KEY_CODE_SCAN = 1
-} InputManagerKeyCodeType;
+HOMM2_ENUM_END(InputManagerKeyCodeType)
 
 // IBM PC set-1 scan codes carried in bits 16..23 of the Win32 key-message data.
 // MakeScanCodeTable proves the complete 0x00..0x58 domain used by the retail input

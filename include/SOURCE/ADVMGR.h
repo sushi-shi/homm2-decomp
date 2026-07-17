@@ -1,7 +1,6 @@
 #ifndef HOMM2_ADVMGR_H
 #define HOMM2_ADVMGR_H
 #include <va.h>
-#include <EnumTypes.h>
 // Declarations of the free functions DEFINED in ADVMGR.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
 // forward declarations (was <_all.h>):

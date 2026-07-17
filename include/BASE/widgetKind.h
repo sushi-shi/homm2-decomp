@@ -3,8 +3,6 @@
 
 #include <Ints.h>
 
-#include <EnumTypes.h>
-
 // Known serialized values only. The domain remains open-ended, and widget stores
 // the value in its proven packed short field rather than as this enum type.
 HOMM2_ENUM_BEGIN(WidgetKind)

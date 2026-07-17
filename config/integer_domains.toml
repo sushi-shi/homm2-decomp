@@ -1,6 +1,31 @@
 version = 1
 
 [[domain]]
+name = "InputManagerKeyCodeType"
+declaration = "InputManagerKeyCodeType"
+owner = "include/BASE/inputManager.h"
+category = "value"
+production_carrier = "int"
+strict = true
+sentinels = []
+enumerators = [
+  "INPUT_KEY_CODE_ASCII",
+  "INPUT_KEY_CODE_SCAN",
+]
+interfaces = ["inputManager::SetKeyCodeType integer decode boundary"]
+members = ["inputManager::m_keyCodeType"]
+storage = ["packed four-byte member at inputManager +0x856"]
+conversions = [
+  "int to InputManagerKeyCodeType via static_cast in SetKeyCodeType",
+]
+evidence = [
+  "the member is compared only with ASCII and scan-code modes",
+  "retail SetKeyCodeType accepts an integer-mangled parameter",
+  "the packed inputManager layout proves four-byte storage",
+]
+status = "reviewed"
+
+[[domain]]
 name = "FileRequesterMode"
 declaration = "FileRequesterMode"
 owner = "include/SOURCE/fileRequester.h"

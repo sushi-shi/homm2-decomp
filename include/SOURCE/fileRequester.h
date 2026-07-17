@@ -3,7 +3,6 @@
 // Reconstructed class (SOURCE) from CodeView NB09 of HEROES2W.EXE — NOT original source.
 // 12 methods, 3 own-virtual, 0 static data.
 #include <va.h>
-#include <EnumTypes.h>
 #include "../BASE/baseManager.h"
 // forward declarations:
 struct tag_message;
