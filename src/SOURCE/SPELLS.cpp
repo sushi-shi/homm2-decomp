@@ -963,7 +963,7 @@ void combatManager::CastSpell(
             case SPELL_DEATH_RIPPLE:
             case SPELL_DEATH_WAVE:
             case SPELL_MASS_SHIELD:
-                CastMassSpell(IDX(spell), spellPower_i);
+                CastMassSpell(spell, spellPower_i);
                 break;
             case SPELL_MIRROR_IMAGE:
                 MirrorImage(targetHex);
@@ -2772,12 +2772,12 @@ void combatManager::ShowMassSpell(i8 (*const affected)[20], i32 effect, i32 anim
 // 92.14% but incorrectly expanded the frame to 0x88 and was rejected. Revisit
 // switch-label shaping after the pre-95 structural campaign.
 VA(0x00427a91, 0x8f8)
-void combatManager::CastMassSpell(i32 spell, i32 spellPower) {
+void combatManager::CastMassSpell(SpellType spell, i32 spellPower) {
     army* target_i = 0;
-    u32 effect = gsSpellInfo[spell].combatEffect;
+    u32 effect = gsSpellInfo[IDX(spell)].combatEffect;
     i32 animateCreatures_k = 0;
     gpWindowManager->m_updateFlags = 0;
-    ShowSpellMessage(0, spell, 0);
+    ShowSpellMessage(0, IDX(spell), 0);
     i8 affected[COMBAT_SIDE_COUNT][20];
     memset(affected, 0, sizeof(affected));
 
@@ -2787,8 +2787,8 @@ void combatManager::CastMassSpell(i32 spell, i32 spellPower) {
     i32 anyAffected_i;
     CombatSpellInfluence influence_e;
     switch (spell) {
-        case IDX(SPELL_MASS_SLOW):
-        case IDX(SPELL_MASS_CURSE):
+        case SPELL_MASS_SLOW:
+        case SPELL_MASS_CURSE:
             side_i = 1 - m_currentSide;
             for (armyIndex_k = 0; armyIndex_k < m_armyCount[side_i]; ++armyIndex_k) {
                 if (m_armies[side_i][armyIndex_k].SpellCastWorks(spell))
@@ -2796,10 +2796,10 @@ void combatManager::CastMassSpell(i32 spell, i32 spellPower) {
             }
             break;
 
-        case IDX(SPELL_MASS_CURE):
-        case IDX(SPELL_MASS_HASTE):
-        case IDX(SPELL_MASS_BLESS):
-        case IDX(SPELL_MASS_SHIELD):
+        case SPELL_MASS_CURE:
+        case SPELL_MASS_HASTE:
+        case SPELL_MASS_BLESS:
+        case SPELL_MASS_SHIELD:
             side_i = m_currentSide;
             for (armyIndex_k = 0; armyIndex_k < m_armyCount[side_i]; ++armyIndex_k) {
                 if (m_armies[side_i][armyIndex_k].SpellCastWorks(spell))
@@ -2807,7 +2807,7 @@ void combatManager::CastMassSpell(i32 spell, i32 spellPower) {
             }
             break;
 
-        case IDX(SPELL_MASS_DISPEL):
+        case SPELL_MASS_DISPEL:
             for (side_i = 0; side_i < COMBAT_SIDE_COUNT; ++side_i) {
                 for (armyIndex_k = 0; armyIndex_k < m_armyCount[side_i]; ++armyIndex_k) {
                     if (m_armies[side_i][armyIndex_k].SpellCastWorks(spell))
@@ -2816,8 +2816,8 @@ void combatManager::CastMassSpell(i32 spell, i32 spellPower) {
             }
             break;
 
-        case IDX(SPELL_HOLY_WORD):
-        case IDX(SPELL_HOLY_SHOUT): {
+        case SPELL_HOLY_WORD:
+        case SPELL_HOLY_SHOUT: {
             animateCreatures_k = 1;
             damage_c = (spell == SPELL_HOLY_WORD ? 10 : 20) * spellPower;
             for (side_i = 0; side_i < COMBAT_SIDE_COUNT; ++side_i) {
@@ -2841,15 +2841,15 @@ void combatManager::CastMassSpell(i32 spell, i32 spellPower) {
             sprintf(
                 gText,
                 "The %s spell does %d damage\nto all undead creatures.",
-                gSpellNames[spell],
+                gSpellNames[IDX(spell)],
                 damage_c
             );
             CombatMessage(gText, 1, 1, 0);
             break;
         }
 
-        case IDX(SPELL_DEATH_RIPPLE):
-        case IDX(SPELL_DEATH_WAVE): {
+        case SPELL_DEATH_RIPPLE:
+        case SPELL_DEATH_WAVE: {
             animateCreatures_k = 1;
             for (side_i = 0; side_i < COMBAT_SIDE_COUNT; ++side_i) {
                 for (armyIndex_k = 0; armyIndex_k < m_armyCount[side_i]; ++armyIndex_k) {
@@ -2890,33 +2890,33 @@ void combatManager::CastMassSpell(i32 spell, i32 spellPower) {
             if (affected[side_i][armyIndex_k] != 0) {
                 target_i = &m_armies[side_i][armyIndex_k];
                 switch (spell) {
-                    case IDX(SPELL_MASS_CURSE):
+                    case SPELL_MASS_CURSE:
                         target_i->SetSpellInfluence(SPELL_INFLUENCE_CURSE, spellPower);
                         break;
-                    case IDX(SPELL_MASS_SLOW):
+                    case SPELL_MASS_SLOW:
                         target_i->SetSpellInfluence(SPELL_INFLUENCE_SLOW, spellPower);
                         break;
-                    case IDX(SPELL_MASS_HASTE):
+                    case SPELL_MASS_HASTE:
                         target_i->SetSpellInfluence(SPELL_INFLUENCE_HASTE, spellPower);
                         break;
-                    case IDX(SPELL_MASS_BLESS):
+                    case SPELL_MASS_BLESS:
                         target_i->SetSpellInfluence(SPELL_INFLUENCE_BLESS, spellPower);
                         break;
-                    case IDX(SPELL_MASS_SHIELD):
+                    case SPELL_MASS_SHIELD:
                         target_i->SetSpellInfluence(SPELL_INFLUENCE_SHIELD, spellPower);
                         break;
-                    case IDX(SPELL_MASS_CURE):
+                    case SPELL_MASS_CURE:
                         target_i->Cure(spellPower);
                         break;
-                    case IDX(SPELL_MASS_DISPEL): {
+                    case SPELL_MASS_DISPEL: {
                         for (influence_e = 0; influence_e < SPELL_INFLUENCE_COUNT; ++influence_e)
                             target_i->CancelIndividualSpell(influence_e);
                         break;
                     }
-                    case IDX(SPELL_HOLY_WORD):
-                    case IDX(SPELL_HOLY_SHOUT):
-                    case IDX(SPELL_DEATH_RIPPLE):
-                    case IDX(SPELL_DEATH_WAVE):
+                    case SPELL_HOLY_WORD:
+                    case SPELL_HOLY_SHOUT:
+                    case SPELL_DEATH_RIPPLE:
+                    case SPELL_DEATH_WAVE:
                         break;
                 }
             }
