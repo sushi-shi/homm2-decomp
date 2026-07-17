@@ -129,4 +129,5 @@ step to try before any TU-state permutation or soft defer.
 `philAI::{DetermineHeroToMove, ValueOfTown, DoDimensionDoor}`.
 
 Related: [o2-tu-cumulative-register-steering.md](o2-tu-cumulative-register-steering.md),
-`od-hash-slots.md` (prove slots first), `od-debug-build.md`, `inline-accessors.md`.
+`od-hash-slots.md` (prove slots first), [compiler detection](../compiler-detection.md),
+and `inline-accessors.md`.

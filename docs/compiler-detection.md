@@ -28,6 +28,18 @@ existed internally and then been removed by the minimal shipping link. The execu
 not distinguish those histories. It does prove that no private procedure/type/line information
 survives in the shipped NB09 stream.
 
+## Matching consequences
+
+Most game units use `/Od /Ob1 /MT /Gr /G5 /QIfdiv`; the per-unit exceptions and optimized
+BASE units are authoritative in `config/units.toml`. `/Gr` makes undeclared free functions
+fastcall by default, so CRT declarations must come from the period headers and retain their
+`__cdecl` convention. The same applies to the global `operator new` and `operator delete`
+entry points; do not redeclare them under the `/Gr` default. `/Ob1` remains active under `/Od`
+and explains the characteristic inline continuation jumps. The retail image has no C++
+exception-handler or RTTI references, so the configured units do not enable `/GX` or RTTI.
+These flags are supported by disassembly and matching behavior, not by private compiler records
+in the minimal NB09 stream.
+
 ## Static evidence
 - `C:\MSDEV\LIB\{LIBCMT,kernel32,user32,...}.lib` — the VC4 Developer-Studio (MSDEV) layout
   (from CodeView `sstLibraries`).

@@ -1,4 +1,4 @@
-# patterns - VC4.2 /O2 codegen idioms for matching
+# patterns - VC4.2 /Od and /O2 codegen idioms for matching
 
 When a function's objdiff residual is a *steerable* codegen idiom (a source spelling that makes
 MSVC 4.2 emit the retail instructions), document it here so it isn't re-derived. One file per
