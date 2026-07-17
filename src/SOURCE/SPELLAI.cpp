@@ -248,7 +248,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
             case SPELL_ANIMATE_DEAD:
                 if (hasMindEffect) {
                 } else {
-                    EffectSpellResurrect(&effect, hexIndex, IDX(spell));
+                    EffectSpellResurrect(&effect, hexIndex, spell);
                 }
                 break;
             case SPELL_MIRROR_IMAGE:
@@ -777,7 +777,7 @@ i32 combatManager::EffectSpellCreateCreature(i32 hex, SpellType spell) {
             break;
     }
 
-    i32 creatureEffect = gMonsterDatabase[IDX(creatureType)].fightValue * creatureType;
+    i32 creatureEffect = gMonsterDatabase[IDX(creatureType)].fightValue * IDX(creatureType);
     if (spell == SPELL_MIRROR_IMAGE) {
         float mirrorMod;
         if (m_spellPower[m_currentSide] == COMBAT_SPELL_AI_MIRROR_POWER_ONE)
@@ -1116,7 +1116,7 @@ void combatManager::EffectSpellCure(i32* effect, i32 targetSide, i32 targetIndex
 }
 
 VA(0x00488be2, 0x176)
-void combatManager::EffectSpellResurrect(i32* effect, i32 hex, i32 spell) {
+void combatManager::EffectSpellResurrect(i32* effect, i32 hex, SpellType spell) {
     army* targetStack;
     i32 resurrectPowerWork;
     i32 quantityResult[COMBAT_SIDE_COUNT];
@@ -1126,7 +1126,7 @@ void combatManager::EffectSpellResurrect(i32* effect, i32 hex, i32 spell) {
     if (m_heroes[m_currentSide] != 0 && m_heroes[m_currentSide]->HasArtifact(ARTIFACT_ANKH))
         resurrectPowerWork <<= 1;
 
-    armyIndexWork = FindResurrectArmyIndex(m_currentSide, spell, hex);
+    armyIndexWork = FindResurrectArmyIndex(m_currentSide, IDX(spell), hex);
     targetStack = &m_armies[m_currentSide][armyIndexWork];
     quantityResult[0] = resurrectPowerWork / targetStack->m_monster.hitPoints;
     if (targetStack->m_quantity + quantityResult[0] > targetStack->m_initialQuantity)
