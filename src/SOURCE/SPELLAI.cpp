@@ -40,7 +40,7 @@ i32 combatManager::DoSpellAI(i32 side, i32 restricted) {
     }
 
     for (spellIndex = 0; spellIndex < IDX(SPELL_COUNT); spellIndex++) {
-        if (m_heroes[side]->HasSpell(spellIndex)
+        if (m_heroes[side]->HasSpell(SpellType(spellIndex))
             && (gsSpellInfo[spellIndex].attributes & SPELL_ATTRIBUTE_COMBAT)
             && GetManaCost(spellIndex, m_heroes[side]) <= m_heroes[side]->m_spellPoints) {
             if (restricted && spellIndex != SPELL_FIREBALL && spellIndex != SPELL_FIREBLAST
@@ -806,7 +806,7 @@ VA(0x00487eda, 0x72d)
 i32 combatManager::RawEffectSpellInfluence(army* target, i32 influence) {
     i32 effect = 0;
     army* otherArmy = 0;
-    float workChance = target->SpellCastWorkChance(giSpellInfluenceToSpell[influence]);
+    float workChance = target->SpellCastWorkChance(SpellType(giSpellInfluenceToSpell[influence]));
     if (workChance <= COMBAT_SPELL_AI_ZERO_EFFECT)
         return 0;
 
@@ -1132,7 +1132,7 @@ void combatManager::EffectSpellResurrect(i32* effect, i32 hex, i32 spell) {
     if (targetStack->m_quantity + quantityResult[0] > targetStack->m_initialQuantity)
         quantityResult[0] = targetStack->m_initialQuantity - targetStack->m_quantity;
     *effect = gMonsterDatabase[IDX(targetStack->m_monsterType)].fightValue * quantityResult[0];
-    *effect = static_cast<i32>(*effect * targetStack->SpellCastWorkChance(spell));
+    *effect = static_cast<i32>(*effect * targetStack->SpellCastWorkChance(SpellType(spell)));
     if (spell == SPELL_RESURRECT)
         *effect = static_cast<i32>(*effect * COMBAT_SPELL_AI_RESURRECT_VALUE_MODIFIER);
 }
@@ -1337,7 +1337,7 @@ void combatManager::EffectSpellDamage(i32* effect, i32 spell, i32 targetHex) {
                               [m_hexCells[currentHex].m_occupantIndex]) {
                 gArmyEffected[m_hexCells[currentHex].m_occupantSide]
                              [m_hexCells[currentHex].m_occupantIndex] = 1;
-                workChanceWork = targetCreature->SpellCastWorkChance(spell);
+                workChanceWork = targetCreature->SpellCastWorkChance(SpellType(spell));
                 if (workChanceWork > 0.0f) {
                     spellDamageWork = static_cast<i32l>(damage * workChanceWork);
                     monsterTotal = targetCreature->m_monsterType;

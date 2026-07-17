@@ -163,7 +163,7 @@ i32 hero::GetNthSpell(i32 type, i32 spellNumber) {
     i32 spellOrdinalCount = 0;
 
     for (spell = 0; spell < IDX(SPELL_COUNT); spell++) {
-        if (HasSpell(spell)) {
+        if (HasSpell(SpellType(spell))) {
             if (type == HERO_SPELL_TYPE_ALL
                 || (type == HERO_SPELL_TYPE_COMBAT
                     && (gsSpellInfo[spell].attributes & SPELL_ATTRIBUTE_COMBAT))
@@ -191,7 +191,7 @@ i32 hero::GetNumSpells(i32 type) {
     numCombatSpells = 0;
     numAdventureSpells = 0;
     for (spellIndexCurrent = 0; spellIndexCurrent < IDX(SPELL_COUNT); spellIndexCurrent++) {
-        if (HasSpell(spellIndexCurrent)) {
+        if (HasSpell(SpellType(spellIndexCurrent))) {
             if (gsSpellInfo[spellIndexCurrent].attributes & SPELL_ATTRIBUTE_COMBAT)
                 numCombatSpells++;
             else
@@ -1590,7 +1590,7 @@ void SetupHeroView(void) {
 
     message.payload.widget.command = HERO_UI_WIDGET_TEXT;
     for (index = 0; index < HERO_PRIMARY_STAT_COUNT; index++) {
-        sprintf(gText, "%d", gpHVHero->Stats(index));
+        sprintf(gText, "%d", gpHVHero->Stats(HeroPrimaryStat(index)));
         message.payload.widget.id = HERO_UI_PRIMARY_STAT_VALUE_FIRST + index;
         message.payload.widget.data.text = gText;
         heroWin->BroadcastMessage(message);

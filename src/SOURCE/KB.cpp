@@ -1379,7 +1379,7 @@ void GetMonsterCost(i32 monster, i32* const cost) {
 // ANDs reqMask. Ten variants exhausted operand/equality order, qualified lvalues,
 // and hash-compatible names. Revisit only after relevant KB/TU state changes.
 VA(0x00499a6c, 0x2b5)
-i32 CanBuild(town* t, i32 building) {
+i32 CanBuild(town* t, BuildingSlotType building) {
     i32 reqMask;
     i32 haveMask;
     if (BitTest(gpGame->m_knownTowns, t->m_id))
@@ -2176,7 +2176,7 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
                     if (gpGame->m_mapHeader.victoryConditionValue
                         > IDX(CHECK_END_GAME_ULTIMATE_ARTIFACT)) {
                         if (artifactHeroPtr->HasArtifact(
-                                gpGame->m_mapHeader.victoryConditionValue - 1
+                                ArtifactType(gpGame->m_mapHeader.victoryConditionValue) - 1
                             )) {
                             artifactWinnerPerson = player;
                         }
@@ -3583,7 +3583,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
             break;
 
         case APP_MENU_VIEW_WORLD:
-            gpAdvManager->ViewWorld(IDX(SPELL_VIEW_ALL), 0, 0);
+            gpAdvManager->ViewWorld(SPELL_VIEW_ALL, 0, 0);
             break;
         case APP_MENU_VIEW_PUZZLE:
             gpAdvManager->ViewPuzzle();

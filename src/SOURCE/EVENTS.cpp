@@ -92,7 +92,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
     i32 guardedCount;
     i32 heroCombatResult3;
     i32 teleportY;
-    i32 artifact8;
+    ArtifactType artifact8;
     mapEventExtra* eventExtra1;
     i32 resourceType;
     i32 teleportX3;
@@ -740,7 +740,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 cell->m_objectMetadata = 0;
-                springSpellPoints = eventHero2->Stats(3) * 10;
+                springSpellPoints = eventHero2->Stats(HeroPrimaryStat(3)) * 10;
                 if (eventHero2->m_spellPoints < springSpellPoints * 2) {
                     NormalDialog(
                         "{Artesian Spring}\n\nA drink from the spring fills your blood with magic! "
@@ -778,7 +778,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             if (!HAS(eventHero2->m_eventFlags, HERO_EVENT_MAGIC_WELL)) {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 cell->m_objectMetadata = 0;
-                wellSpellPoints5 = eventHero2->Stats(3) * 10;
+                wellSpellPoints5 = eventHero2->Stats(HeroPrimaryStat(3)) * 10;
                 if (eventHero2->m_spellPoints < wellSpellPoints5) {
                     NormalDialog(
                         "{Magic Well}\n\nA drink from the well has restored your spell points to "
@@ -876,7 +876,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 if (gpGame->m_mines[cell->m_objectMetadata].guardianType != -1) {
                     mineCombatResult7 = CombatMonsterEvent(
                         eventHero2,
-                        gpGame->m_mines[cell->m_objectMetadata].guardianType,
+                        CreatureType(gpGame->m_mines[cell->m_objectMetadata].guardianType),
                         gpGame->m_mines[cell->m_objectMetadata].guardianCount,
                         cell,
                         x,
@@ -1695,7 +1695,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     break;
                 if (CombatMonsterEvent(
                         eventHero2,
-                        IDX(CREATURE_TROLL),
+                        CREATURE_TROLL,
                         12,
                         cell,
                         x,
@@ -1778,7 +1778,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     break;
                 if (CombatMonsterEvent(
                         eventHero2,
-                        IDX(CREATURE_VAMPIRE_LORD),
+                        CREATURE_VAMPIRE_LORD,
                         10,
                         cell,
                         x,
@@ -1865,7 +1865,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     dragonFactor_d = 2;
                 if (CombatMonsterEvent(
                         eventHero2,
-                        IDX(CREATURE_GREEN_DRAGON),
+                        CREATURE_GREEN_DRAGON,
                         dragonFactor_d * 3,
                         cell,
                         x,
@@ -2167,7 +2167,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(-1, 1, gText, -1, 0, -1, 0, -1);
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-                eventHero2->AddSpell(eventValue1, eventHero2->Stats(3));
+                eventHero2->AddSpell(eventValue1, eventHero2->Stats(HeroPrimaryStat(3)));
                 EventWindow(-1, 1, gText, 8, eventValue1, -1, 0, -1);
             }
             break;
@@ -2226,7 +2226,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_ARTIFACT: {
             artifactResourceType = (cell->m_objectMetadata & ARTIFACT_EVENT_RESOURCE_MASK)
                                    >> ARTIFACT_EVENT_RESOURCE_SHIFT;
-            artifact8 = cell->m_objectIndex >> 1;
+            artifact8 = static_cast<ArtifactType>(cell->m_objectIndex >> 1);
             guardedMonster5 = cell->m_objectMetadata & ARTIFACT_EVENT_MONSTER_MASK;
             if (eventHero2->NumArtifacts() == EVENT_ARTIFACT_CAPACITY) {
                 NormalDialog(
@@ -2252,7 +2252,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     "journey back to the elven towns.  They shower you with their graciousness and "
                     "the king promises that his people will aid you whenever you seek help."
                 );
-                EventWindow(-1, 1, gText, MAP_EVENT_REWARD_ARTIFACT, artifact8, -1, 0, -1);
+                EventWindow(-1, 1, gText, MAP_EVENT_REWARD_ARTIFACT, IDX(artifact8), -1, 0, -1);
                 GiveArtifact(eventHero2, artifact8, 1, static_cast<i8>(cell->m_objectMetadata));
                 eraseObject = 1;
                 fizzleType3 = 1;
@@ -2265,9 +2265,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     1,
-                    gArtifactEvent[artifact8],
+                    gArtifactEvent[IDX(artifact8)],
                     MAP_EVENT_REWARD_ARTIFACT,
-                    artifact8,
+                    IDX(artifact8),
                     -1,
                     0,
                     -1
@@ -2286,9 +2286,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         EventWindow(
                             -1,
                             1,
-                            gArtifactEvent[artifact8],
+                            gArtifactEvent[IDX(artifact8)],
                             MAP_EVENT_REWARD_ARTIFACT,
-                            artifact8,
+                            IDX(artifact8),
                             -1,
                             0,
                             -1
@@ -2301,9 +2301,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             gText,
                             "{Artifact}\n\nA leprechaun offers you the %s for the small price of "
                             "2000 gold.  Do you wish to buy this artifact?",
-                            gArtifactNames[artifact8]
+                            gArtifactNames[IDX(artifact8)]
                         );
-                        EventWindow(-1, 2, gText, MAP_EVENT_REWARD_ARTIFACT, artifact8, -1, 0, -1);
+                        EventWindow(-1, 2, gText, MAP_EVENT_REWARD_ARTIFACT, IDX(artifact8), -1, 0, -1);
                         if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                             if (gpGame->m_players[eventHero2->m_owner].m_resources[IDX(RES_GOLD)]
                                 >= ARTIFACT_EVENT_GOLD_COST) {
@@ -2349,7 +2349,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             "{Artifact}\n\nYou've found the humble dwelling of a withered hermit.  "
                             "The hermit tells you that he is willing to give the %s to the first "
                             "wise person he meets.",
-                            gArtifactNames[artifact8]
+                            gArtifactNames[IDX(artifact8)]
                         );
                         NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
                         break;
@@ -2362,7 +2362,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             "{Artifact}\n\nYou've come across the spartan quarters of a retired "
                             "soldier.  The soldier tells you that he is willing to pass on the %s "
                             "to the first true leader he meets.",
-                            gArtifactNames[artifact8]
+                            gArtifactNames[IDX(artifact8)]
                         );
                         NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
                         break;
@@ -2375,7 +2375,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             gText,
                             "{Artifact}\n\nA leprechaun offers you the %s for the small price of "
                             "2500 gold and 3 %s.  Do you wish to buy this artifact?",
-                            gArtifactNames[artifact8],
+                            gArtifactNames[IDX(artifact8)],
                             sphinxAnswer_a
                         );
                         NormalDialog(
@@ -2441,7 +2441,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             gText,
                             "{Artifact}\n\nA leprechaun offers you the %s for the small price of "
                             "3000 gold and 5 %s.  Do you wish to buy this artifact?",
-                            gArtifactNames[artifact8],
+                            gArtifactNames[IDX(artifact8)],
                             sphinxAnswer_a
                         );
                         NormalDialog(
@@ -2546,7 +2546,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 }
                 if (CombatMonsterEvent(
                         eventHero2,
-                        IDX(guardedMonster5),
+                        guardedMonster5,
                         guardedCount,
                         cell,
                         x,
@@ -2567,7 +2567,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 sprintf(
                     gText,
                     "Victorious, you take your prize, the %s",
-                    gArtifactNames[artifact8]
+                    gArtifactNames[IDX(artifact8)]
                 );
                 NormalDialog(
                     gText,
@@ -2681,7 +2681,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                 if (CombatMonsterEvent(
                         eventHero2,
-                        monsterType6,
+                        CreatureType(monsterType6),
                         DAEMON_SERVANT_COUNT,
                         cell,
                         x,
@@ -2994,7 +2994,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 } else {
                     if (CombatMonsterEvent(
                             eventHero2,
-                            IDX(CREATURE_ROYAL_MUMMY),
+                            CREATURE_ROYAL_MUMMY,
                             30,
                             cell,
                             x,
@@ -3034,7 +3034,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             );
                             EventWindow(-1, 1, eventText, -1, 0, -1, 0, -1);
                         } else {
-                            eventHero2->AddSpell(eventValue1, eventHero2->Stats(3));
+                            eventHero2->AddSpell(eventValue1, eventHero2->Stats(HeroPrimaryStat(3)));
                             EventWindow(-1, 1, eventText, 8, eventValue1, -1, 0, -1);
                         }
                         cell->m_objectMetadata = 0;
@@ -3059,7 +3059,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                 if (CombatMonsterEvent(
                         eventHero2,
-                        gpGame->m_mines[cell->m_objectMetadata].guardianType,
+                        CreatureType(gpGame->m_mines[cell->m_objectMetadata].guardianType),
                         gpGame->m_mines[cell->m_objectMetadata].guardianCount,
                         cell,
                         x,
@@ -4308,7 +4308,7 @@ i32 advManager::SkeletonEvent(hero* eventHero, mapCell* cell, char* text, i32 x,
         case IDX(UNDEAD_EVENT_LEVEL_SMALL):
             if (CombatMonsterEvent(
                     eventHero,
-                    IDX(CREATURE_SKELETON),
+                    CREATURE_SKELETON,
                     SKELETON_EVENT_SMALL_COUNT,
                     cell,
                     x,
@@ -4333,7 +4333,7 @@ i32 advManager::SkeletonEvent(hero* eventHero, mapCell* cell, char* text, i32 x,
         case IDX(UNDEAD_EVENT_LEVEL_MEDIUM):
             if (CombatMonsterEvent(
                     eventHero,
-                    IDX(CREATURE_SKELETON),
+                    CREATURE_SKELETON,
                     SKELETON_EVENT_MEDIUM_COUNT,
                     cell,
                     x,
@@ -4358,7 +4358,7 @@ i32 advManager::SkeletonEvent(hero* eventHero, mapCell* cell, char* text, i32 x,
         case IDX(UNDEAD_EVENT_LEVEL_LARGE):
             if (CombatMonsterEvent(
                     eventHero,
-                    IDX(CREATURE_SKELETON),
+                    CREATURE_SKELETON,
                     SKELETON_EVENT_LARGE_COUNT,
                     cell,
                     x,
@@ -4383,7 +4383,7 @@ i32 advManager::SkeletonEvent(hero* eventHero, mapCell* cell, char* text, i32 x,
         default:
             if (CombatMonsterEvent(
                     eventHero,
-                    IDX(CREATURE_SKELETON),
+                    CREATURE_SKELETON,
                     SKELETON_EVENT_HUGE_COUNT,
                     cell,
                     x,
@@ -4416,7 +4416,7 @@ i32 advManager::ZombieEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i
         case IDX(UNDEAD_EVENT_LEVEL_SMALL):
             if (CombatMonsterEvent(
                     eventHero,
-                    IDX(CREATURE_ZOMBIE),
+                    CREATURE_ZOMBIE,
                     ZOMBIE_EVENT_SMALL_COUNT,
                     cell,
                     x,
@@ -4441,7 +4441,7 @@ i32 advManager::ZombieEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i
         case IDX(UNDEAD_EVENT_LEVEL_MEDIUM):
             if (CombatMonsterEvent(
                     eventHero,
-                    IDX(CREATURE_MUTANT_ZOMBIE),
+                    CREATURE_MUTANT_ZOMBIE,
                     ZOMBIE_EVENT_MEDIUM_COUNT,
                     cell,
                     x,
@@ -4466,7 +4466,7 @@ i32 advManager::ZombieEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i
         case IDX(UNDEAD_EVENT_LEVEL_LARGE):
             if (CombatMonsterEvent(
                     eventHero,
-                    IDX(CREATURE_MUTANT_ZOMBIE),
+                    CREATURE_MUTANT_ZOMBIE,
                     ZOMBIE_EVENT_LARGE_COUNT,
                     cell,
                     x,
@@ -4491,7 +4491,7 @@ i32 advManager::ZombieEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i
         default:
             if (CombatMonsterEvent(
                     eventHero,
-                    IDX(CREATURE_MUTANT_ZOMBIE),
+                    CREATURE_MUTANT_ZOMBIE,
                     ZOMBIE_EVENT_HUGE_COUNT,
                     cell,
                     x,
@@ -4537,7 +4537,7 @@ i32 advManager::GhostEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i3
         case IDX(UNDEAD_EVENT_LEVEL_SMALL):
             if (CombatMonsterEvent(
                     eventHero,
-                    IDX(CREATURE_GHOST),
+                    CREATURE_GHOST,
                     GHOST_EVENT_SMALL_COUNT,
                     cell,
                     x,
@@ -4563,7 +4563,7 @@ i32 advManager::GhostEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i3
         case IDX(UNDEAD_EVENT_LEVEL_MEDIUM):
             if (CombatMonsterEvent(
                     eventHero,
-                    IDX(CREATURE_GHOST),
+                    CREATURE_GHOST,
                     GHOST_EVENT_MEDIUM_COUNT,
                     cell,
                     x,
@@ -4589,7 +4589,7 @@ i32 advManager::GhostEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i3
         case IDX(UNDEAD_EVENT_LEVEL_LARGE):
             if (CombatMonsterEvent(
                     eventHero,
-                    IDX(CREATURE_GHOST),
+                    CREATURE_GHOST,
                     GHOST_EVENT_LARGE_COUNT,
                     cell,
                     x,
@@ -4615,7 +4615,7 @@ i32 advManager::GhostEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i3
         default:
             if (CombatMonsterEvent(
                     eventHero,
-                    IDX(CREATURE_GHOST),
+                    CREATURE_GHOST,
                     GHOST_EVENT_HUGE_COUNT,
                     cell,
                     x,
@@ -5524,7 +5524,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             if (eventType_g == MAP_OBJECT_MINE) {
                 for (index_h = IDX(SPELL_SET_EARTH_GUARDIAN); index_h < IDX(SPELL_SET_WATER_GUARDIAN);
                      ++index_h) {
-                    if (eventHero->HasSpell(index_h)
+                    if (eventHero->HasSpell(SpellType(index_h))
                         && GetManaCost(index_h, eventHero) < eventHero->m_spellPoints) {
                         eventHero->m_spellPoints = static_cast<i16>(
                             eventHero->m_spellPoints - GetManaCost(index_h, eventHero)
@@ -6215,7 +6215,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
 
         case MAP_OBJECT_PYRAMID:
             if (cell->m_objectMetadata != 0
-                && eventHero->HasSpell(cell->m_objectMetadata - 1) == 0) {
+                && eventHero->HasSpell(SpellType(cell->m_objectMetadata) - 1) == 0) {
                 for (index_h = 0; index_h < AI_EVENT_ARMY_STACK_COUNT; ++index_h) {
                     gpMonGroup->m_creatureTypes[index_h] = IDX(CREATURE_ROYAL_MUMMY);
                     gpMonGroup->m_creatureCounts[index_h] = 10;
@@ -6681,7 +6681,7 @@ void advManager::PlayerMonsterInteract(
     i32 combatX,
     i32 combatY
 ) {
-    i32 monster_n;
+    CreatureType monster_n;
     float strengthRatio_p;
     i32 combatResult_f;
     i32 forcedJoin_f;
@@ -6692,12 +6692,12 @@ void advManager::PlayerMonsterInteract(
 
     unused = 0;
     gpMouseManager->ShowColorPointer();
-    monster_n = cell->m_objectIndex;
+    monster_n = static_cast<CreatureType>(cell->m_objectIndex);
     forcedJoin_f = cell->m_objectMetadata & MONSTER_JOIN_FORCED;
     monsterCount_n = cell->m_objectMetadata & MONSTER_COUNT_MASK;
     strengthRatio_p =
         static_cast<float>(gpPhilAI->FightValueOfStack(&eventHero->m_army, eventHero, 0, 0, 0, 0))
-        / static_cast<float>(gMonsterDatabase[monster_n].fightValue * monsterCount_n);
+        / static_cast<float>(gMonsterDatabase[IDX(monster_n)].fightValue * monsterCount_n);
 
     if (gbInCampaign
         && ((gpGame->m_campaignAwards[IDX(CAMPAIGN_AWARD_DWARVEN_ALLIANCE)]
@@ -6707,7 +6707,7 @@ void advManager::PlayerMonsterInteract(
             || (gpGame->m_campaignAwards[IDX(CAMPAIGN_AWARD_DRAGON_ALLIANCE)]
                 && (monster_n == CREATURE_GREEN_DRAGON || monster_n == CREATURE_RED_DRAGON
                     || monster_n == CREATURE_BLACK_DRAGON)))) {
-        if (!eventHero->m_army.CanJoin(monster_n)) {
+        if (!eventHero->m_army.CanJoin(IDX(monster_n))) {
             if (monster_n == CREATURE_DWARF || monster_n == CREATURE_BATTLE_DWARF)
                 NormalDialog(
                     "The dwarves hail you, \"Any friend of Roland is a friend of ours.  You may "
@@ -6792,7 +6792,7 @@ void advManager::PlayerMonsterInteract(
                     -1,
                     0
                 );
-            eventHero->m_army.Add(monster_n, monsterCount_n, -1);
+            eventHero->m_army.Add(IDX(monster_n), monsterCount_n, -1);
             *handled = 1;
         }
         return;
@@ -6808,7 +6808,7 @@ void advManager::PlayerMonsterInteract(
     if (xIsPlayingExpansionCampaign && xCampaign.HasAward(0)
         && (monster_n == CREATURE_ELF || monster_n == CREATURE_GRAND_ELF)) {
         *handled = 1;
-        if (eventHero->m_army.CanJoin(monster_n)) {
+        if (eventHero->m_army.CanJoin(IDX(monster_n))) {
             NormalDialog(
                 "As you approach the group of elves, their leader calls them all to attention.  He "
                 "shouts to them, \"Who of you is brave enough to join this fearless ally of "
@@ -6823,7 +6823,7 @@ void advManager::PlayerMonsterInteract(
                 -1,
                 0
             );
-            eventHero->m_army.Add(monster_n, monsterCount_n, -1);
+            eventHero->m_army.Add(IDX(monster_n), monsterCount_n, -1);
         } else {
             NormalDialog(
                 "The elves stand at attention as you approach.  Their leader calls to you and "
@@ -6843,15 +6843,15 @@ void advManager::PlayerMonsterInteract(
         return;
     }
 
-    if (eventHero->m_army.CanJoin(monster_n) && strengthRatio_p > MONSTER_STRENGTH_JOIN
+    if (eventHero->m_army.CanJoin(IDX(monster_n)) && strengthRatio_p > MONSTER_STRENGTH_JOIN
         && !eventHero->HasArtifact(ARTIFACT_HIDEOUS_MASK) && monster_n != CREATURE_GHOST
         && monster_n != CREATURE_EARTH_ELEMENTAL && monster_n != CREATURE_AIR_ELEMENTAL
         && monster_n != CREATURE_FIRE_ELEMENTAL && monster_n != CREATURE_WATER_ELEMENTAL) {
         if (forcedJoin_f) {
-            sprintf(gText, gEventText[EVENT_TEXT_FOLLOWERS], gArmyNamesPlural[monster_n]);
+            sprintf(gText, gEventText[EVENT_TEXT_FOLLOWERS], gArmyNamesPlural[IDX(monster_n)]);
             EventWindow(-1, 2, gText, -1, 0, -1, 0, -1);
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
-                eventHero->m_army.Add(monster_n, monsterCount_n, -1);
+                eventHero->m_army.Add(IDX(monster_n), monsterCount_n, -1);
                 *handled = 1;
                 return;
             } else {
@@ -6870,7 +6870,7 @@ void advManager::PlayerMonsterInteract(
             if (!joining)
                 joining = 1;
 
-            joiningCost_i = gMonsterDatabase[monster_n].cost * monsterCount_n;
+            joiningCost_i = gMonsterDatabase[IDX(monster_n)].cost * monsterCount_n;
             if (joiningCost_i > gpGame->m_players[eventHero->m_owner].m_resources[IDX(RES_GOLD)]) {
                 if (strengthRatio_p > MONSTER_STRENGTH_FLEE)
                     goto monstersFlee;
@@ -6883,7 +6883,7 @@ void advManager::PlayerMonsterInteract(
                     gText,
                     "The %s is swayed by your diplomatic tongue, and offers to join your army for "
                     "the sum of %d gold.  Do you accept?",
-                    gArmyNames[monster_n],
+                    gArmyNames[IDX(monster_n)],
                     joiningCost_i
                 );
             } else {
@@ -6897,7 +6897,7 @@ void advManager::PlayerMonsterInteract(
                         "All %d of the %s will join your army for the sum of %d gold.  Do you "
                         "accept?",
                         monsterCount_n,
-                        gArmyNamesPlural[monster_n],
+                        gArmyNamesPlural[IDX(monster_n)],
                         joiningCost_i
                     );
                 else
@@ -6907,7 +6907,7 @@ void advManager::PlayerMonsterInteract(
                         "for the sum of %d gold.  Do you accept?",
                         joining,
                         monsterCount_n,
-                        gArmyNamesPlural[monster_n],
+                        gArmyNamesPlural[IDX(monster_n)],
                         joiningCost_i
                     );
                 strcat(gText, offerText_g);
@@ -6915,7 +6915,7 @@ void advManager::PlayerMonsterInteract(
 
             NormalDialog(gText, 2, -1, -1, RES_GOLD, joiningCost_i, -1, 0, -1, 0);
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
-                eventHero->m_army.Add(monster_n, joining, -1);
+                eventHero->m_army.Add(IDX(monster_n), joining, -1);
                 *handled = 1;
                 gpGame->m_players[eventHero->m_owner].m_resources[IDX(RES_GOLD)] -= joiningCost_i;
                 return;
@@ -6932,7 +6932,7 @@ void advManager::PlayerMonsterInteract(
             gText,
             "The %s, awed by the power of your forces, begin to scatter.  Do you wish to pursue "
             "and engage them?",
-            gArmyNamesPlural[monster_n]
+            gArmyNamesPlural[IDX(monster_n)]
         );
         EventWindow(-1, 2, gText, -1, 0, -1, 0, -1);
         if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)

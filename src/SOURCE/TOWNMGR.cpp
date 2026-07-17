@@ -3110,7 +3110,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                     for (heroPosition_index = 0;
                          heroPosition_index < TOWN_THIEVES_PRIMARY_STAT_COUNT;
                          ++heroPosition_index) {
-                        sprintf(statText_k, "%d\n", strongestHero_x->Stats(heroPosition_index));
+                        sprintf(statText_k, "%d\n", strongestHero_x->Stats(HeroPrimaryStat(heroPosition_index)));
                         strcat(gText, statText_k);
                     }
                     widgetText_control = static_cast<char*>(
