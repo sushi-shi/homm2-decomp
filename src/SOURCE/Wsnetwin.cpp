@@ -405,9 +405,9 @@ int wsWaitForExtraGuests(void) {
     tag_message message;
 
     wsProcessMessages();
-    if (iWSLastMsgNumHumanPlayers != 0[&giNumHumanPlayers]) {
+    if (iWSLastMsgNumHumanPlayers != giNumHumanPlayers) {
         if (giTCPHostStatus != -1 &&
-            !(giTCPNumPlayers > 0[&giNumHumanPlayers]))
+            giNumHumanPlayers >= giTCPNumPlayers)
             return 1;
         iWSLastMsgNumHumanPlayers = giNumHumanPlayers;
         sprintf(cWSTextBuffer,
