@@ -292,11 +292,11 @@ void ExpCampaign::InitMap(void) {
                 for (heroPosition = 0; heroPosition < player->m_heroCount; ++heroPosition) {
                     choiceHero = gpGame->GetHero(player->m_heroIds[heroPosition]);
                     if (m_campaignId == EXPANSION_CAMPAIGN_VOYAGE_HOME && m_currentMap == 3) {
-                        if (choiceHero->m_portrait == EXPANSION_HERO_GALLAVANT)
+                        if (choiceHero->m_portrait == IDX(EXPANSION_HERO_GALLAVANT))
                             break;
                     } else {
                         if (m_campaignId == EXPANSION_CAMPAIGN_VOYAGE_HOME && m_currentMap == 2) {
-                            if (choiceHero->m_portrait == EXPANSION_HERO_CEALLACH)
+                            if (choiceHero->m_portrait == IDX(EXPANSION_HERO_CEALLACH))
                                 break;
                         } else {
                             break;
@@ -331,7 +331,7 @@ void ExpCampaign::InitMap(void) {
                 for (heroPosition = 0; heroPosition < player->m_heroCount; ++heroPosition) {
                     choiceHero = gpGame->GetHero(player->m_heroIds[heroPosition]);
                     if (m_campaignId == EXPANSION_CAMPAIGN_VOYAGE_HOME && m_currentMap == 2) {
-                        if (choiceHero->m_portrait == EXPANSION_HERO_CEALLACH)
+                        if (choiceHero->m_portrait == IDX(EXPANSION_HERO_CEALLACH))
                             break;
                     } else {
                         break;
@@ -355,9 +355,9 @@ void ExpCampaign::InitMap(void) {
     for (award = 0; award < EXPANSION_CAMPAIGN_AWARD_COUNT; ++award) {
         if (m_awards[award] != 0) {
             switch (award) {
-                case EXPANSION_AWARD_ELVEN_ALLIANCE:
+                case IDX(EXPANSION_AWARD_ELVEN_ALLIANCE):
                     break;
-                case EXPANSION_AWARD_BREASTPLATE_ANDURAN:
+                case IDX(EXPANSION_AWARD_BREASTPLATE_ANDURAN):
                     if (player->m_heroCount > 0)
                         GiveArtifact(
                             gpGame->GetHero(player->m_heroIds[0]),
@@ -366,9 +366,9 @@ void ExpCampaign::InitMap(void) {
                             -1
                         );
                     break;
-                case EXPANSION_AWARD_WOOD_BONUS:
+                case IDX(EXPANSION_AWARD_WOOD_BONUS):
                     break;
-                case EXPANSION_AWARD_HELMET_ANDURAN:
+                case IDX(EXPANSION_AWARD_HELMET_ANDURAN):
                     if (player->m_heroCount > 0)
                         GiveArtifact(
                             gpGame->GetHero(player->m_heroIds[0]),
@@ -377,14 +377,14 @@ void ExpCampaign::InitMap(void) {
                             -1
                         );
                     break;
-                case EXPANSION_AWARD_DEFEAT_KRAEGER:
+                case IDX(EXPANSION_AWARD_DEFEAT_KRAEGER):
                     for (heroPosition = 0; heroPosition < EXPANSION_CAMPAIGN_HERO_COUNT;
                          ++heroPosition) {
-                        if (gpGame->m_heroRecs[heroPosition].m_portrait == EXPANSION_HERO_DAINWIN)
+                        if (gpGame->m_heroRecs[heroPosition].m_portrait == IDX(EXPANSION_HERO_DAINWIN))
                             gpGame->m_heroRecs[heroPosition].Deallocate(0);
                     }
                     break;
-                case EXPANSION_AWARD_BATTLE_GARB:
+                case IDX(EXPANSION_AWARD_BATTLE_GARB):
                     if (player->m_heroCount > 0)
                         GiveArtifact(
                             gpGame->GetHero(player->m_heroIds[0]),
@@ -393,10 +393,10 @@ void ExpCampaign::InitMap(void) {
                             -1
                         );
                     break;
-                case EXPANSION_AWARD_WAYWARD_SON:
-                case EXPANSION_AWARD_UNCLE_IVAN:
+                case IDX(EXPANSION_AWARD_WAYWARD_SON):
+                case IDX(EXPANSION_AWARD_UNCLE_IVAN):
                     break;
-                case EXPANSION_AWARD_LEGENDARY_SCEPTER:
+                case IDX(EXPANSION_AWARD_LEGENDARY_SCEPTER):
                     if (player->m_heroCount > 0)
                         GiveArtifact(
                             gpGame->GetHero(player->m_heroIds[0]),
@@ -405,12 +405,12 @@ void ExpCampaign::InitMap(void) {
                             -1
                         );
                     break;
-                case EXPANSION_AWARD_SET_GUARDIAN:
+                case IDX(EXPANSION_AWARD_SET_GUARDIAN):
                     if (player->m_heroCount > 0)
                         gpGame->GetHero(player->m_heroIds[0])
                             ->m_spells[IDX(SPELL_SET_EARTH_GUARDIAN)] = 1;
                     break;
-                case EXPANSION_AWARD_SPHERE_NEGATION:
+                case IDX(EXPANSION_AWARD_SPHERE_NEGATION):
                     if (player->m_heroCount > 0)
                         GiveArtifact(
                             gpGame->GetHero(player->m_heroIds[0]),
@@ -659,7 +659,7 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
                 }
                 break;
             case CAMPAIGN_CHOICE_SPELL:
-                if (choice->value == SPELL_SUMMON_EARTH_ELEMENTAL)
+                if (choice->value == IDX(SPELL_SUMMON_EARTH_ELEMENTAL))
                     sprintf(gText, "Summon Earth");
                 else
                     sprintf(gText, "%s", gSpellNames[choice->value]);
@@ -759,16 +759,16 @@ i32 ExpCampaign::HandleVictory(void) {
     }
     memset(m_mapChoices, 0, m_mapCount);
     switch (m_campaignId) {
-        case EXPANSION_CAMPAIGN_PRICE_OF_LOYALTY:
+        case IDX(EXPANSION_CAMPAIGN_PRICE_OF_LOYALTY):
             HandleVictory1();
             break;
-        case EXPANSION_CAMPAIGN_DESCENDANTS:
+        case IDX(EXPANSION_CAMPAIGN_DESCENDANTS):
             HandleVictory2();
             break;
-        case EXPANSION_CAMPAIGN_WIZARDS_ISLE:
+        case IDX(EXPANSION_CAMPAIGN_WIZARDS_ISLE):
             HandleVictory3();
             break;
-        case EXPANSION_CAMPAIGN_VOYAGE_HOME:
+        case IDX(EXPANSION_CAMPAIGN_VOYAGE_HOME):
             HandleVictory4();
             break;
     }
@@ -963,16 +963,16 @@ void ExpCampaign::HandleVictory4(void) {
 VA(0x004bd219, 0x8c)
 void ExpCampaign::ReplaySmacker(void) {
     switch (m_campaignId) {
-        case EXPANSION_CAMPAIGN_PRICE_OF_LOYALTY:
+        case IDX(EXPANSION_CAMPAIGN_PRICE_OF_LOYALTY):
             ReplaySmacker1();
             break;
-        case EXPANSION_CAMPAIGN_DESCENDANTS:
+        case IDX(EXPANSION_CAMPAIGN_DESCENDANTS):
             ReplaySmacker2();
             break;
-        case EXPANSION_CAMPAIGN_WIZARDS_ISLE:
+        case IDX(EXPANSION_CAMPAIGN_WIZARDS_ISLE):
             ReplaySmacker3();
             break;
-        case EXPANSION_CAMPAIGN_VOYAGE_HOME:
+        case IDX(EXPANSION_CAMPAIGN_VOYAGE_HOME):
             ReplaySmacker4();
             break;
     }

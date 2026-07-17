@@ -239,7 +239,7 @@ i32 playerData::BuildingsOwned(i32 townType, i32 buildingIndex, i32 buildState) 
         town* ownedTown = &gpGame->m_castleRecs[m_townIds[i]];
         if (buildingIndex < BUILDING_SLOT_DWELLING_FIRST || ownedTown->m_type == townType) {
             if (buildingIndex == BUILDING_SLOT_MAGE_GUILD) {
-                if (ownedTown->m_buildings & TOWN_BUILDING_MAGE_GUILD) {
+                if (ownedTown->m_buildings & IDX(TOWN_BUILDING_MAGE_GUILD)) {
                     if (ownedTown->m_buildState == buildState)
                         count++;
                 }
@@ -286,7 +286,7 @@ i32 game::MineTypesOwned(i32 owner, i32 resourceType) {
 VA(0x004710f3, 0x40d)
 void ComputeUALoc(i32 player) {
     i32 result = gpGame->SetupPuzzlePieces(player, 1);
-    if (result < 8 || gpGame->m_ultimateArtifactId == ARTIFACT_NONE) {
+    if (result < 8 || gpGame->m_ultimateArtifactId == IDX(ARTIFACT_NONE)) {
         gpGame->m_players[player].m_ultimateArtifactHintChance = 0;
         gpGame->m_players[player].m_ultimateArtifactHintX = -1;
         gpGame->m_players[player].m_ultimateArtifactHintY = -1;
@@ -313,8 +313,8 @@ void ComputeUALoc(i32 player) {
     while (
         !(x >= 0 && (&x)[0] < MAP_WIDTH && y >= 0 && (&y)[0] < MAP_HEIGHT
           && gpGame->m_worldMap.Row(y)[x].m_triggerType == 0
-          && gpGame->m_worldMap.Row(y)[x].m_objectIndex == MAPCELL_SPRITE_NONE
-          && gpGame->m_worldMap.Row(y)[x].m_overlayIndex == MAPCELL_SPRITE_NONE
+          && gpGame->m_worldMap.Row(y)[x].m_objectIndex == IDX(MAPCELL_SPRITE_NONE)
+          && gpGame->m_worldMap.Row(y)[x].m_overlayIndex == IDX(MAPCELL_SPRITE_NONE)
           && giGroundToTerrain[gpGame->m_worldMap.Row(y)[x].m_terrainImageIndex] != 0)
     ) {
         tries++;
@@ -480,10 +480,10 @@ i32 game::GetNewHeroId(i32, i32 heroClass, i32 requireExperienced) {
             && m_heroRecs[heroId].m_cursorType != heroClass)
             continue;
         if (requireExperienced && attempts < 40 && m_heroRecs[heroId].m_experience < 1000
-            && (m_heroRecs[heroId].m_artifacts[0] == ARTIFACT_NONE
-                || m_heroRecs[heroId].m_artifacts[0] == ARTIFACT_MAGIC_BOOK)
-            && (m_heroRecs[heroId].m_artifacts[1] == ARTIFACT_NONE
-                || m_heroRecs[heroId].m_artifacts[1] == ARTIFACT_MAGIC_BOOK))
+            && (m_heroRecs[heroId].m_artifacts[0] == IDX(ARTIFACT_NONE)
+                || m_heroRecs[heroId].m_artifacts[0] == IDX(ARTIFACT_MAGIC_BOOK))
+            && (m_heroRecs[heroId].m_artifacts[1] == IDX(ARTIFACT_NONE)
+                || m_heroRecs[heroId].m_artifacts[1] == IDX(ARTIFACT_MAGIC_BOOK)))
             continue;
         if (gbInCampaign && attempts < 500 && m_heroRecs[heroId].m_portrait >= 54
             && m_heroRecs[heroId].m_portrait <= 59)
@@ -780,29 +780,29 @@ void game::SetupOrigData(void) {
             m_heroRecs[i].m_secondarySkillOrder[j] = 0;
         }
         if (m_heroRecs[i].m_cursorType == 0) {
-            m_heroRecs[i].GiveSS(HERO_SKILL_LEADERSHIP, 1);
-            m_heroRecs[i].GiveSS(HERO_SKILL_BALLISTICS, 1);
+            m_heroRecs[i].GiveSS(IDX(HERO_SKILL_LEADERSHIP), 1);
+            m_heroRecs[i].GiveSS(IDX(HERO_SKILL_BALLISTICS), 1);
         }
         if (m_heroRecs[i].m_cursorType == 2) {
             m_heroRecs[i].m_artifacts[0] = IDX(ARTIFACT_MAGIC_BOOK);
-            m_heroRecs[i].GiveSS(HERO_SKILL_NAVIGATION, 2);
-            m_heroRecs[i].GiveSS(HERO_SKILL_WISDOM, 1);
+            m_heroRecs[i].GiveSS(IDX(HERO_SKILL_NAVIGATION), 2);
+            m_heroRecs[i].GiveSS(IDX(HERO_SKILL_WISDOM), 1);
         }
         if (m_heroRecs[i].m_cursorType == 1)
-            m_heroRecs[i].GiveSS(HERO_SKILL_PATHFINDING, 2);
+            m_heroRecs[i].GiveSS(IDX(HERO_SKILL_PATHFINDING), 2);
         if (m_heroRecs[i].m_cursorType == 3) {
             m_heroRecs[i].m_artifacts[0] = IDX(ARTIFACT_MAGIC_BOOK);
-            m_heroRecs[i].GiveSS(HERO_SKILL_SCOUTING, 2);
-            m_heroRecs[i].GiveSS(HERO_SKILL_WISDOM, 1);
+            m_heroRecs[i].GiveSS(IDX(HERO_SKILL_SCOUTING), 2);
+            m_heroRecs[i].GiveSS(IDX(HERO_SKILL_WISDOM), 1);
         }
         if (m_heroRecs[i].m_cursorType == 4) {
             m_heroRecs[i].m_artifacts[0] = IDX(ARTIFACT_MAGIC_BOOK);
-            m_heroRecs[i].GiveSS(HERO_SKILL_WISDOM, 2);
+            m_heroRecs[i].GiveSS(IDX(HERO_SKILL_WISDOM), 2);
         }
         if (m_heroRecs[i].m_cursorType == 5) {
             m_heroRecs[i].m_artifacts[0] = IDX(ARTIFACT_MAGIC_BOOK);
-            m_heroRecs[i].GiveSS(HERO_SKILL_WISDOM, 1);
-            m_heroRecs[i].GiveSS(HERO_SKILL_NECROMANCY, 1);
+            m_heroRecs[i].GiveSS(IDX(HERO_SKILL_WISDOM), 1);
+            m_heroRecs[i].GiveSS(IDX(HERO_SKILL_NECROMANCY), 1);
         }
     }
 
@@ -1138,7 +1138,7 @@ void game::GiveTroopsToNeutralTowns(void) {
     i32 i;
     for (i = 0; i < GAME_TOWN_COUNT; i++) {
         GiveTroopsToNeutralTown(i);
-        if (m_castleRecs[i].m_buildings & TOWN_BUILDING_CASTLE) {
+        if (m_castleRecs[i].m_buildings & IDX(TOWN_BUILDING_CASTLE)) {
             if (Random(0, 100) < NEUTRAL_TOWN_CASTLE_REINFORCE_CHANCE)
                 GiveTroopsToNeutralTown(i);
         } else {
@@ -1270,7 +1270,7 @@ void game::NewMap(char* filename) {
                                    .m_occupyingHeroId
                                == -1
                         && ((m_castleRecs[(m_players + player2)->m_townIds[townIndex9]].m_buildings
-                             & TOWN_BUILDING_CASTLE)
+                             & IDX(TOWN_BUILDING_CASTLE))
                                 != 0
                             || pass27 == 1))
                         selectedTown14 = townIndex9;
@@ -1405,8 +1405,8 @@ void game::NewMap(char* filename) {
     ultimateTries4 = 0;
     ultimateDistance5 = Random(1, 20) + Random(1, 20) + Random(1, 30);
     while (player2 < 9 || townIndex9 < 9 || player2 > MAP_WIDTH - 10 || townIndex9 > MAP_HEIGHT - 10
-           || m_worldMap.GetCell(player2, townIndex9)->m_objectIndex != MAPCELL_SPRITE_NONE
-           || m_worldMap.GetCell(player2, townIndex9)->m_overlayIndex != MAPCELL_SPRITE_NONE
+           || m_worldMap.GetCell(player2, townIndex9)->m_objectIndex != IDX(MAPCELL_SPRITE_NONE)
+           || m_worldMap.GetCell(player2, townIndex9)->m_overlayIndex != IDX(MAPCELL_SPRITE_NONE)
            || giGroundToTerrain[m_worldMap.GetCell(player2, townIndex9)->m_terrainImageIndex] == 0
            || (giNumHumanPlayers == 1 && ultimateTries4 < 200
                && ultimateDistance5
@@ -1625,7 +1625,7 @@ void game::RandomizeEvents(void) {
                     cell2->m_objectMetadata = Random(0, 3);
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SKELETON:
-                    if (!HasObjectTilesetIndex(xPos2, yPos19, TILESET_OBJNDSRT, 84)) {
+                    if (!HasObjectTilesetIndex(xPos2, yPos19, IDX(TILESET_OBJNDSRT), 84)) {
                         cell2->m_triggerType &= MAP_TRIGGER_TYPE_MASK;
                     } else if (Random(0, 9) > 2) {
                         cell2->m_objectMetadata = 1;
@@ -1765,7 +1765,7 @@ void game::RandomizeEvents(void) {
                         if (cell2->m_objectIndex != 59 && cell2->m_objectIndex != 62
                             && cell2->m_objectIndex != 63 && cell2->m_objectIndex != 64
                             && cell2->m_objectIndex != 65 && Random(0, 100) < 20)
-                            cell2->m_objectMetadata |= MAP_MONSTER_GUARD_FLAG;
+                            cell2->m_objectMetadata |= IDX(MAP_MONSTER_GUARD_FLAG);
                     }
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RESOURCE:
@@ -1844,7 +1844,7 @@ void game::RandomizeEvents(void) {
                     cell2->m_objectMetadata = Random(10, 20);
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_WAGON_CAMP:
-                    if (!HasObjectTilesetIndex(xPos2, yPos19, TILESET_OBJNMUL2, 129))
+                    if (!HasObjectTilesetIndex(xPos2, yPos19, IDX(TILESET_OBJNMUL2), 129))
                         cell2->m_triggerType &= MAP_TRIGGER_TYPE_MASK;
                     else
                         cell2->m_objectMetadata = Random(30, 50);
@@ -1880,7 +1880,7 @@ void game::RandomizeEvents(void) {
                             artifactChoices17[5] = CREATURE_TITAN;
                             cell2->m_objectMetadata = 1;
                             if (gArtifactLevel[value26] == 8)
-                                cell2->m_objectMetadata |= CREATURE_ROGUE;
+                                cell2->m_objectMetadata |= IDX(CREATURE_ROGUE);
                             else if (gArtifactLevel[value26] == 4)
                                 cell2->m_objectMetadata |= artifactChoices17[Random(0, 3) + 6];
                             else
@@ -1962,17 +1962,17 @@ void game::RandomizeEvents(void) {
     for (yPos19 = 0; yPos19 < MAP_HEIGHT; yPos19++) {
         for (xPos2 = 0; (xPos2 | 0) < MAP_WIDTH; xPos2++) {
             cell2 = m_worldMap.Row(yPos19) + xPos2;
-            if (cell2->m_objectIndex != MAPCELL_SPRITE_NONE && cell2->m_objectLayerBit1) {
+            if (cell2->m_objectIndex != IDX(MAPCELL_SPRITE_NONE) && cell2->m_objectLayerBit1) {
                 valid27 = 1;
                 extraIndex3 = cell2->m_extraIndex;
                 while (extraIndex3 != 0) {
                     extra15 = m_worldMap.Extra(extraIndex3);
-                    if (extra15->objectIndex != MAPCELL_SPRITE_NONE && !extra15->objectLayerBit1)
+                    if (extra15->objectIndex != IDX(MAPCELL_SPRITE_NONE) && !extra15->objectLayerBit1)
                         valid27 = 0;
                     extraIndex3 = extra15->nextIndex;
                 }
                 if (valid27)
-                    cell2->m_flags |= MAP_CELL_OBJECT_SHADOW_ONLY;
+                    cell2->m_flags |= IDX(MAP_CELL_OBJECT_SHADOW_ONLY);
             }
         }
     }
@@ -1981,27 +1981,27 @@ void game::RandomizeEvents(void) {
         for (xPos2 = 0; (xPos2 | 0) < MAP_WIDTH; xPos2++) {
             cell2 = m_worldMap.Row(yPos19) + xPos2;
             if ((cell2->m_triggerType & MAP_TRIGGER_TYPE_MASK) == MAP_OBJECT_ROCK
-                && cell2->m_objectTileset == TILESET_X_LOC2)
+                && cell2->m_objectTileset == IDX(TILESET_X_LOC2))
                 cell2->m_flags |= 8;
-            if (cell2->m_objectIndex != MAPCELL_SPRITE_NONE
+            if (cell2->m_objectIndex != IDX(MAPCELL_SPRITE_NONE)
                 && !(cell2->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
-                && !(cell2->m_flags & MAP_CELL_OBJECT_SHADOW_ONLY)
-                && cell2->m_overlayIndex != MAPCELL_SPRITE_NONE)
+                && !(cell2->m_flags & IDX(MAP_CELL_OBJECT_SHADOW_ONLY))
+                && cell2->m_overlayIndex != IDX(MAPCELL_SPRITE_NONE))
                 cell2->m_flags |= 8;
             upperCount = 0;
             lowerCount16 = 0;
             if (!(cell2->m_flags & 8) && yPos19 < MAP_HEIGHT - 1
-                && cell2->m_objectIndex != MAPCELL_SPRITE_NONE
+                && cell2->m_objectIndex != IDX(MAPCELL_SPRITE_NONE)
                 && !(cell2->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
-                && !(cell2->m_flags & MAP_CELL_OBJECT_SHADOW_ONLY)) {
+                && !(cell2->m_flags & IDX(MAP_CELL_OBJECT_SHADOW_ONLY))) {
                 mapCell* below0;
-                if (m_worldMap.GetCell(xPos2, yPos19 + 1)->m_objectIndex != MAPCELL_SPRITE_NONE
+                if (m_worldMap.GetCell(xPos2, yPos19 + 1)->m_objectIndex != IDX(MAPCELL_SPRITE_NONE)
                     && !(
                         m_worldMap.GetCell(xPos2, yPos19 + 1)->m_triggerType
                         & MAP_TRIGGER_ACTION_FLAG
                     )
                     && !(
-                        m_worldMap.GetCell(xPos2, yPos19 + 1)->m_flags & MAP_CELL_OBJECT_SHADOW_ONLY
+                        m_worldMap.GetCell(xPos2, yPos19 + 1)->m_flags & IDX(MAP_CELL_OBJECT_SHADOW_ONLY)
                     )) {
                     if (!cell2->m_objectLayerBit1) {
                         upperTilesets29[upperCount] = cell2->m_objectTileset;
@@ -2013,7 +2013,7 @@ void game::RandomizeEvents(void) {
                     else
                         extra15 = 0;
                     while (upperCount < 5 && extra15 != 0) {
-                        if (extra15->objectIndex != MAPCELL_SPRITE_NONE
+                        if (extra15->objectIndex != IDX(MAPCELL_SPRITE_NONE)
                             && !extra15->objectLayerBit1) {
                             upperTilesets29[upperCount] = extra15->objectTileset;
                             upperIndexes1[upperCount] = extra15->objectIndex;
@@ -2035,7 +2035,7 @@ void game::RandomizeEvents(void) {
                     else
                         extra15 = 0;
                     while (lowerCount16 < 5 && extra15 != 0) {
-                        if (extra15->objectIndex != MAPCELL_SPRITE_NONE
+                        if (extra15->objectIndex != IDX(MAPCELL_SPRITE_NONE)
                             && !extra15->objectLayerBit1) {
                             lowerTilesets4[lowerCount16] = extra15->objectTileset;
                             lowerIndexes7[lowerCount16] = extra15->objectIndex;
@@ -2066,9 +2066,9 @@ void game::RandomizeEvents(void) {
                            == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_CASTLE))
                     cell2->m_flags |= 8;
             }
-            if (cell2->m_objectIndex != MAPCELL_SPRITE_NONE
+            if (cell2->m_objectIndex != IDX(MAPCELL_SPRITE_NONE)
                 && !(cell2->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
-                && !(cell2->m_flags & MAP_CELL_OBJECT_SHADOW_ONLY)
+                && !(cell2->m_flags & IDX(MAP_CELL_OBJECT_SHADOW_ONLY))
                 && (yPos19 == MAP_HEIGHT - 1 || (m_worldMap.Row(yPos19 + 1)[xPos2].m_flags & 4)))
                 cell2->m_flags |= 8;
         }
@@ -2128,15 +2128,15 @@ i32 game::LoadMap(char* filename) {
         read(file2, column5, 1);
         read(file2, row9, 1);
         read(file2, type5, 1);
-        if (static_cast<u8>(column5[0]) != GAME_SAVED_TOWN_OFF_MAP) {
+        if (static_cast<u8>(column5[0]) != IDX(GAME_SAVED_TOWN_OFF_MAP)) {
             m_castleRecs[i37].m_onMap = 1;
             m_castleRecs[i37].m_x = static_cast<u8>(column5[0]);
             m_castleRecs[i37].m_y = static_cast<u8>(row9[0]);
             m_castleRecs[i37].m_type = static_cast<i8>(type5[0] & TOWN_RECORD_TYPE_MASK);
             if (type5[0] < 0)
-                m_castleRecs[i37].m_buildings |= TOWN_BUILDING_CASTLE;
+                m_castleRecs[i37].m_buildings |= IDX(TOWN_BUILDING_CASTLE);
             else
-                m_castleRecs[i37].m_buildings |= TOWN_BUILDING_TENT;
+                m_castleRecs[i37].m_buildings |= IDX(TOWN_BUILDING_TENT);
         }
     }
 
@@ -2150,7 +2150,7 @@ i32 game::LoadMap(char* filename) {
             read(file2, row9, 1);
             read(file2, type5, 1);
         }
-        if (static_cast<u8>(column5[0]) != GAME_SAVED_TOWN_OFF_MAP) {
+        if (static_cast<u8>(column5[0]) != IDX(GAME_SAVED_TOWN_OFF_MAP)) {
             m_mines[i37].guardianType = -1;
             m_mines[i37].x = static_cast<u8>(column5[0]);
             m_mines[i37].y = static_cast<u8>(row9[0]);
@@ -2701,7 +2701,7 @@ void game::ViewArmy(
             }
         }
         if ((monsterType == 35 || monsterType == 36)
-            && (castle->m_buildings & KB_DWELLING_UPGRADE_SIXTH_FLAG)) {
+            && (castle->m_buildings & IDX(KB_DWELLING_UPGRADE_SIXTH_FLAG))) {
             gbAllowUpgrade = 1;
             iViewArmyUpgradeToType = 37;
         }
@@ -3436,17 +3436,17 @@ void game::PerDay(void) {
 
     for (player = 0; player < m_playerCount; player++) {
         m_players[player].m_resources[IDX(RES_SULFUR)] +=
-            m_players[player].NumOfGivenArtifact(ARTIFACT_ENDLESS_POUCH_SULFUR);
+            m_players[player].NumOfGivenArtifact(IDX(ARTIFACT_ENDLESS_POUCH_SULFUR));
         m_players[player].m_resources[IDX(RES_MERCURY)] +=
-            m_players[player].NumOfGivenArtifact(ARTIFACT_ENDLESS_VIAL_MERCURY);
+            m_players[player].NumOfGivenArtifact(IDX(ARTIFACT_ENDLESS_VIAL_MERCURY));
         m_players[player].m_resources[IDX(RES_GEMS)] +=
-            m_players[player].NumOfGivenArtifact(ARTIFACT_ENDLESS_POUCH_GEMS);
+            m_players[player].NumOfGivenArtifact(IDX(ARTIFACT_ENDLESS_POUCH_GEMS));
         m_players[player].m_resources[IDX(RES_WOOD)] +=
-            m_players[player].NumOfGivenArtifact(ARTIFACT_ENDLESS_CORD_WOOD);
+            m_players[player].NumOfGivenArtifact(IDX(ARTIFACT_ENDLESS_CORD_WOOD));
         m_players[player].m_resources[IDX(RES_ORE)] +=
-            m_players[player].NumOfGivenArtifact(ARTIFACT_ENDLESS_CART_ORE);
+            m_players[player].NumOfGivenArtifact(IDX(ARTIFACT_ENDLESS_CART_ORE));
         m_players[player].m_resources[IDX(RES_CRYSTAL)] +=
-            m_players[player].NumOfGivenArtifact(ARTIFACT_ENDLESS_POUCH_CRYSTAL);
+            m_players[player].NumOfGivenArtifact(IDX(ARTIFACT_ENDLESS_POUCH_CRYSTAL));
         m_players[player].m_resources[IDX(RES_GOLD)] += ComputeDailyGold(player);
     }
 
@@ -3513,7 +3513,7 @@ void game::PerDay(void) {
         restoredSpellPoints13 = currentHero6->m_spellPoints;
         maxSpellPoints9 = currentHero6->Stats(3) * 10;
         restoredSpellPoints13 += currentHero6->m_secondarySkills[8] + 1;
-        if (currentHero6->HasArtifact(ARTIFACT_POWER_RING))
+        if (currentHero6->HasArtifact(IDX(ARTIFACT_POWER_RING)))
             restoredSpellPoints13 += 2;
         if (restoredSpellPoints13 > maxSpellPoints9)
             restoredSpellPoints13 = maxSpellPoints9;
@@ -3656,7 +3656,7 @@ void game::PerWeek(void) {
             switch (WORLDMAP->Row(mapY5)[mapX8].m_triggerType) {
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MONSTER: {
                     monsterCount36 =
-                        WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata & MAP_MONSTER_COUNT_MASK;
+                        WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata & IDX(MAP_MONSTER_COUNT_MASK);
                     monsterIncrease16 = monsterCount36 / 7;
                     if (Random(1, 7) <= static_cast<i32>(monsterCount36 % 7))
                         monsterIncrease16++;
@@ -3664,7 +3664,7 @@ void game::PerWeek(void) {
                     if (monsterCount36 > WEEKLY_MONSTER_LIMIT)
                         monsterCount36 = WEEKLY_MONSTER_LIMIT;
                     WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata =
-                        (WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata & MAP_MONSTER_GUARD_FLAG)
+                        (WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata & IDX(MAP_MONSTER_GUARD_FLAG))
                         | monsterCount36;
                     break;
                 }
@@ -3912,7 +3912,7 @@ void game::PerMonth(void) {
                         cell0->m_objectMetadata = ((firstCount5 | 0) + secondCount4) | 0;
                         if (Random(MONTH_MONSTER_SPAWN_MIN, MONTH_MONSTER_GUARD_ROLL_MAX)
                             < MONTH_MONSTER_GUARD_CHANCE)
-                            cell0->m_objectMetadata |= MAP_MONSTER_GUARD_FLAG;
+                            cell0->m_objectMetadata |= IDX(MAP_MONSTER_GUARD_FLAG);
                     }
                 }
             }
@@ -4231,7 +4231,7 @@ void game::InitRandomArtifacts(void) {
     for (x = 0; x < MAP_WIDTH; x++) {
         for (i32 y = 0; y < MAP_HEIGHT; y++) {
             mapCell* cell = WORLDMAP->Row(y) + x;
-            if (cell->m_triggerType == MAP_TRIGGER_ARTIFACT)
+            if (cell->m_triggerType == IDX(MAP_TRIGGER_ARTIFACT))
                 m_randomArtifacts[cell->m_objectIndex >> 1] = 1;
         }
     }
@@ -4265,7 +4265,7 @@ i32 game::GetRandomArtifactId(i32 levelMask, i32 allowCursed) {
                 < RANDOM_ARTIFACT_CURSED_REJECT_CHANCE)
                 continue;
         }
-        if (m_mapHeader.victoryCondition != MAP_VICTORY_FIND_ARTIFACT
+        if (m_mapHeader.victoryCondition != IDX(MAP_VICTORY_FIND_ARTIFACT)
             || m_mapHeader.victoryConditionValue - VICTORY_ARTIFACT_ID_OFFSET != artifact)
             break;
     }
@@ -4297,13 +4297,13 @@ void game::RandomizeHeroPool(void) {
             static_cast<u8>(Random(RANDOM_HERO_SEED_MIN, RANDOM_HERO_SEED_MAX));
         m_heroRecs[heroId].m_enabled = RANDOM_HERO_ENABLED;
 
-        if (m_heroRecs[heroId].m_cursorType == FACTION_SORCERESS)
+        if (m_heroRecs[heroId].m_cursorType == IDX(FACTION_SORCERESS))
             m_heroRecs[heroId].m_spells[IDX(SPELL_BLESS)] = RANDOM_HERO_STARTING_SPELL_KNOWN;
-        else if (m_heroRecs[heroId].m_cursorType == FACTION_WARLOCK)
+        else if (m_heroRecs[heroId].m_cursorType == IDX(FACTION_WARLOCK))
             m_heroRecs[heroId].m_spells[IDX(SPELL_CURSE)] = RANDOM_HERO_STARTING_SPELL_KNOWN;
-        else if (m_heroRecs[heroId].m_cursorType == FACTION_NECROMANCER)
+        else if (m_heroRecs[heroId].m_cursorType == IDX(FACTION_NECROMANCER))
             m_heroRecs[heroId].m_spells[IDX(SPELL_HASTE)] = RANDOM_HERO_STARTING_SPELL_KNOWN;
-        else if (m_heroRecs[heroId].m_cursorType == FACTION_WIZARD)
+        else if (m_heroRecs[heroId].m_cursorType == IDX(FACTION_WIZARD))
             m_heroRecs[heroId].m_spells[IDX(SPELL_STONE_SKIN)] = RANDOM_HERO_STARTING_SPELL_KNOWN;
     }
 }
@@ -4426,24 +4426,24 @@ void game::ProcessRandomObjects(void) {
                     maxValue17 = 100000;
                     goto randomMonster;
                 randomMonster:
-                    if (cell6->m_objectTileset == TILESET_MONS32
+                    if (cell6->m_objectTileset == IDX(TILESET_MONS32)
                         && cell6->m_objectIndex >= RANDOM_MONSTER_SPRITE_FIRST
                         && cell6->m_objectIndex <= RANDOM_MONSTER_SPRITE_LAST) {
                         randomObjectType3 = cell6->m_objectIndex + RANDOM_MONSTER_SPRITE_TO_TRIGGER;
                         switch (randomObjectType3) {
-                            case MAP_TRIGGER_RANDOM_MONSTER_LEVEL_1:
+                            case IDX(MAP_TRIGGER_RANDOM_MONSTER_LEVEL_1):
                                 minValue7 = 0;
                                 maxValue17 = 400;
                                 goto monsterBoundsReady;
-                            case MAP_TRIGGER_RANDOM_MONSTER_LEVEL_2:
+                            case IDX(MAP_TRIGGER_RANDOM_MONSTER_LEVEL_2):
                                 minValue7 = 400;
                                 maxValue17 = 1000;
                                 goto monsterBoundsReady;
-                            case MAP_TRIGGER_RANDOM_MONSTER_LEVEL_3:
+                            case IDX(MAP_TRIGGER_RANDOM_MONSTER_LEVEL_3):
                                 minValue7 = 1000;
                                 maxValue17 = 2500;
                                 goto monsterBoundsReady;
-                            case MAP_TRIGGER_RANDOM_MONSTER_LEVEL_4:
+                            case IDX(MAP_TRIGGER_RANDOM_MONSTER_LEVEL_4):
                                 minValue7 = 2500;
                                 maxValue17 = 100000;
                                 goto monsterBoundsReady;
@@ -4464,10 +4464,10 @@ void game::ProcessRandomObjects(void) {
                         y8,
                         x10 - 1,
                         y8,
-                        TILESET_OBJNRSRC,
+                        IDX(TILESET_OBJNRSRC),
                         16,
                         16,
-                        TILESET_OBJNRSRC,
+                        IDX(TILESET_OBJNRSRC),
                         randomType0 * 2,
                         -1,
                         -1
@@ -4477,10 +4477,10 @@ void game::ProcessRandomObjects(void) {
                         y8,
                         x10,
                         y8,
-                        TILESET_OBJNRSRC,
+                        IDX(TILESET_OBJNRSRC),
                         17,
                         17,
-                        TILESET_OBJNRSRC,
+                        IDX(TILESET_OBJNRSRC),
                         randomType0 * 2 + 1,
                         -1,
                         -1
@@ -4703,15 +4703,15 @@ i32 game::GetLuck(hero* h, class army*, town* castle) {
     if (h == 0)
         return LUCK_NEUTRAL;
     luck = LUCK_NEUTRAL;
-    if (h->HasArtifact(ARTIFACT_RABBIT_FOOT))
+    if (h->HasArtifact(IDX(ARTIFACT_RABBIT_FOOT)))
         luck++;
-    if (h->HasArtifact(ARTIFACT_GOLDEN_HORSESHOE))
+    if (h->HasArtifact(IDX(ARTIFACT_GOLDEN_HORSESHOE)))
         luck++;
-    if (h->HasArtifact(ARTIFACT_GAMBLERS_COIN))
+    if (h->HasArtifact(IDX(ARTIFACT_GAMBLERS_COIN)))
         luck++;
-    if (h->HasArtifact(ARTIFACT_FOUR_LEAF_CLOVER))
+    if (h->HasArtifact(IDX(ARTIFACT_FOUR_LEAF_CLOVER)))
         luck++;
-    if (h->HasArtifact(ARTIFACT_MASTHEAD) && HAS(h->m_eventFlags, HERO_EVENT_EMBARKED)) {
+    if (h->HasArtifact(IDX(ARTIFACT_MASTHEAD)) && HAS(h->m_eventFlags, HERO_EVENT_EMBARKED)) {
         luck++;
     }
     luck += h->m_luck;
@@ -4720,10 +4720,10 @@ i32 game::GetLuck(hero* h, class army*, town* castle) {
         luck = LUCK_MINIMUM;
     if (luck > LUCK_MAXIMUM)
         luck = LUCK_MAXIMUM;
-    if (h->HasArtifact(ARTIFACT_BATTLE_GARB))
+    if (h->HasArtifact(IDX(ARTIFACT_BATTLE_GARB)))
         luck = LUCK_MAXIMUM;
-    if (castle != 0 && castle->m_type == FACTION_SORCERESS
-        && (castle->m_buildings & TOWN_BUILDING_RAINBOW)) {
+    if (castle != 0 && castle->m_type == IDX(FACTION_SORCERESS)
+        && (castle->m_buildings & IDX(TOWN_BUILDING_RAINBOW))) {
         luck += LUCK_RAINBOW_BONUS;
     }
     return luck;
@@ -4745,7 +4745,7 @@ void game::SetupAdjacentMons(void) {
         for (x = 0; x < MAP_WIDTH; x++) {
             for (y = 0; y < MAP_HEIGHT; y++) {
                 if (gpAdvManager->FindAdjacentMonster(x, y, &col, &row, -1, -1))
-                    mapExtra[y * MAP_WIDTH + x] |= MAP_EXTRA_ADJACENT_MONSTER;
+                    mapExtra[y * MAP_WIDTH + x] |= IDX(MAP_EXTRA_ADJACENT_MONSTER);
                 else
                     mapExtra[y * MAP_WIDTH + x] &= mask;
             }
@@ -4896,11 +4896,11 @@ i32 game::HasObjectTilesetIndex(i32 col, i32 row, i32 tileset, i32 index) {
 VA(0x004818a0, 0x112)
 void game::ConvertAllToLateOverlay(i32 col, i32 row) {
     mapCell* cell = WORLDMAP->Row(row) + col;
-    if (cell->m_overlayIndex != MAPCELL_SPRITE_NONE)
+    if (cell->m_overlayIndex != IDX(MAPCELL_SPRITE_NONE))
         cell->m_drawOverlayOnTop = 1;
     mapCellExtra* extra = cell->m_extraIndex ? WORLDMAP->Extra(cell->m_extraIndex) : 0;
     while (extra) {
-        if (extra->overlayIndex != MAPCELL_SPRITE_NONE)
+        if (extra->overlayIndex != IDX(MAPCELL_SPRITE_NONE))
             extra->drawOverlayOnTop = 1;
         extra = extra->nextIndex ? WORLDMAP->Extra(extra->nextIndex) : 0;
     }
@@ -5021,7 +5021,7 @@ void game::SetupTowns(void) {
         if (extra->hasCustomBuildings) {
             castle->m_buildings =
                 (gTownEligibleBuildMask[castle->m_type] & extra->buildings)
-                | (castle->m_buildings & (TOWN_BUILDING_CASTLE | TOWN_BUILDING_TENT));
+                | (castle->m_buildings & (IDX(TOWN_BUILDING_CASTLE) | IDX(TOWN_BUILDING_TENT)));
             castle->m_buildState = extra->mageGuildLevel;
         } else {
             defaultDwellingRoll[0] = 1;
@@ -5035,11 +5035,11 @@ void game::SetupTowns(void) {
             defaultDwellingRoll[8] = 1;
             defaultDwellingRoll[9] = 2;
             dwellingCount = defaultDwellingRoll[Random(0, 99) / 10];
-            castle->m_buildings |= TOWN_BUILDING_DWELLING_1;
+            castle->m_buildings |= IDX(TOWN_BUILDING_DWELLING_1);
             if (!gbHumanPlayer[castle->m_owner] && dwellingCount == 1 && Random(1, 10) < 4)
                 dwellingCount++;
             if (--dwellingCount != 0)
-                castle->m_buildings |= TOWN_BUILDING_DWELLING_2;
+                castle->m_buildings |= IDX(TOWN_BUILDING_DWELLING_2);
             dwellingCount--;
             castle->m_buildState = 0;
         }
@@ -5066,7 +5066,7 @@ void game::SetupTowns(void) {
             }
         }
         if (extra->hasShrine)
-            castle->m_buildings |= TOWN_BUILDING_CAPTAIN_QUARTERS;
+            castle->m_buildings |= IDX(TOWN_BUILDING_CAPTAIN_QUARTERS);
         castle->m_mayNotUpgradeToCastle = extra->unknown28;
         strcpy(castle->m_name, extra->name);
 
@@ -5120,7 +5120,7 @@ void game::SetupTowns(void) {
             combatSpells = 0;
             for (spellSlot = 0; spellSlot < TOWN_MAGE_GUILD_SPELLS_PER_LEVEL; spellSlot++) {
                 if (castle->m_spellSlots[spellLevel * TOWN_MAGE_GUILD_SPELLS_PER_LEVEL + spellSlot]
-                    != SPELL_NONE) {
+                    != IDX(SPELL_NONE)) {
                     usedSpells[castle->m_spellSlots
                                    [spellLevel * TOWN_MAGE_GUILD_SPELLS_PER_LEVEL + spellSlot]] = 1;
                 } else {
@@ -6021,7 +6021,7 @@ i32 game::GetNumThievesGuilds(i32 color) {
     i32 num = 0;
     i32 i;
     for (i = 0; i < m_players[color].m_townCount; i++) {
-        if (gpGame->m_castleRecs[m_players[color].m_townIds[i]].m_buildings & TOWN_BUILDING_TAVERN)
+        if (gpGame->m_castleRecs[m_players[color].m_townIds[i]].m_buildings & IDX(TOWN_BUILDING_TAVERN))
             num++;
     }
     return num;
@@ -6103,7 +6103,7 @@ void game::RestoreCell(i32 x, i32 y, i32 obj, i32 barrier, mapCell* passedCell, 
     else
         cell = gpAdvManager->GetCell(x, y);
     if (y > 0 && obj == MAP_TRIGGER_TOWN
-        && gpAdvManager->GetCell(x, y - 1)->m_triggerType != MAP_TRIGGER_TOWN_BASE) {
+        && gpAdvManager->GetCell(x, y - 1)->m_triggerType != IDX(MAP_TRIGGER_TOWN_BASE)) {
         cell->m_triggerType = 0;
         cell->m_objectMetadata = 0;
     } else {
@@ -6143,16 +6143,16 @@ void game::SetMapSize(i32 w, i32 h) {
 VA(0x004849a2, 0x100)
 void WriteDiffHeaderInfo(u8 cmd, i32 len, u8* buf, i32* pos) {
     u8 flags = 0;
-    flags = (cmd << DIFF_COMMAND_SHIFT) | flags;
+    flags = (cmd << IDX(DIFF_COMMAND_SHIFT)) | flags;
     if (len > DIFF_LEN_WORD_MAX) {
-        flags |= DIFF_LEN_WORD_FLAG;
+        flags |= IDX(DIFF_LEN_WORD_FLAG);
         flags |= (len & DIFF_LEN_HIGH_MASK) >> 16;
         u16 word = static_cast<u16>(len & DIFF_LEN_LOW_MASK);
         buf[*pos] = flags;
         *reinterpret_cast<u16*>(buf + *pos + 1) = word;
         *pos += 3;
     } else if (len > DIFF_LEN_BYTE_MAX) {
-        flags |= DIFF_LEN_BYTE_FLAG;
+        flags |= IDX(DIFF_LEN_BYTE_FLAG);
         flags |= (len >> 8) & DIFF_LEN_SHORT_MASK;
         u8 lo = static_cast<u8>(len);
         buf[*pos] = flags;
@@ -6169,18 +6169,18 @@ VA(0x00484aa2, 0xab)
 i32 GetSkipCopyLen(u8* buf, i32* pos) {
     u8 b = buf[*pos];
     i32 len;
-    if (b & DIFF_LEN_WORD_FLAG) {
-        len = b & DIFF_LEN_WORD_HIGH_MASK;
+    if (b & IDX(DIFF_LEN_WORD_FLAG)) {
+        len = b & IDX(DIFF_LEN_WORD_HIGH_MASK);
         len <<= 16;
         len |= *reinterpret_cast<u16*>(buf + *pos + 1);
         *pos += 3;
-    } else if (b & DIFF_LEN_BYTE_FLAG) {
-        len = b & DIFF_LEN_SHORT_MASK;
+    } else if (b & IDX(DIFF_LEN_BYTE_FLAG)) {
+        len = b & IDX(DIFF_LEN_SHORT_MASK);
         len <<= 8;
         len |= buf[*pos + 1];
         *pos += 2;
     } else {
-        len = b & DIFF_LEN_SHORT_MASK;
+        len = b & IDX(DIFF_LEN_SHORT_MASK);
         (*pos)++;
     }
     return len;
@@ -6813,10 +6813,10 @@ i32 game::CountShrines(i32 player) {
         for (row = 0; row < MAP_HEIGHT; row++) {
             for (col = 0; col < MAP_WIDTH; col++) {
                 cell = WORLDMAP->Row(row) + col;
-                if (cell->m_triggerType == MAP_TRIGGER_TOWN) {
+                if (cell->m_triggerType == IDX(MAP_TRIGGER_TOWN)) {
                     castle = GetCastle(cell->m_objectMetadata);
-                    if (castle->m_owner == player && (castle->m_buildings & TOWN_BUILDING_TAVERN)
-                        && castle->m_type == FACTION_NECROMANCER)
+                    if (castle->m_owner == player && (castle->m_buildings & IDX(TOWN_BUILDING_TAVERN))
+                        && castle->m_type == IDX(FACTION_NECROMANCER))
                         count++;
                 }
             }

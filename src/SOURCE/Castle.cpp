@@ -49,18 +49,18 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
     for (slot7 = 0; slot7 < CASTLE_SLOT_COUNT; ++slot7) {
         castleSlotsUse[slot7] = castleSlotsBase[slot7];
         if (castleSlotsBase[slot7] >= BUILDING_SLOT_DWELLING_FIRST + 1
-            && castleSlotsBase[slot7] <= BUILDING_SLOT_DWELLING_SIXTH
+            && castleSlotsBase[slot7] <= IDX(BUILDING_SLOT_DWELLING_SIXTH)
             && ((m_town->m_buildings & (1L << castleSlotsBase[slot7]))
                 || (m_town->m_buildings & (1L << (castleSlotsBase[slot7] + CASTLE_UPGRADE_OFFSET)))
-                || (castleSlotsBase[slot7] == BUILDING_SLOT_DWELLING_SIXTH
-                    && m_town->m_type == FACTION_WARLOCK
-                    && (m_town->m_buildings & TOWN_BUILDING_ALTERNATE_UPGRADED_DWELLING_6)))
+                || (castleSlotsBase[slot7] == IDX(BUILDING_SLOT_DWELLING_SIXTH)
+                    && m_town->m_type == IDX(FACTION_WARLOCK)
+                    && (m_town->m_buildings & IDX(TOWN_BUILDING_ALTERNATE_UPGRADED_DWELLING_6))))
             && (gTownEligibleBuildMask[m_town->m_type]
                 & (1L << (castleSlotsBase[slot7] + CASTLE_UPGRADE_OFFSET)))) {
-            if (castleSlotsBase[slot7] == BUILDING_SLOT_DWELLING_SIXTH
-                && m_town->m_type == FACTION_WARLOCK
-                && ((m_town->m_buildings & TOWN_BUILDING_UPGRADED_DWELLING_6)
-                    || (m_town->m_buildings & TOWN_BUILDING_ALTERNATE_UPGRADED_DWELLING_6))) {
+            if (castleSlotsBase[slot7] == IDX(BUILDING_SLOT_DWELLING_SIXTH)
+                && m_town->m_type == IDX(FACTION_WARLOCK)
+                && ((m_town->m_buildings & IDX(TOWN_BUILDING_UPGRADED_DWELLING_6))
+                    || (m_town->m_buildings & IDX(TOWN_BUILDING_ALTERNATE_UPGRADED_DWELLING_6)))) {
                 castleSlotsUse[slot7] = IDX(BUILDING_SLOT_DWELLING_LAST);
             } else {
                 castleSlotsUse[slot7] = castleSlotsBase[slot7] + CASTLE_UPGRADE_OFFSET;
@@ -321,7 +321,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
                 ++backgroundFrame6;
             }
         }
-        if (xIsExpansionMap == 0 && m_town->m_type == FACTION_NECROMANCER) {
+        if (xIsExpansionMap == 0 && m_town->m_type == IDX(FACTION_NECROMANCER)) {
             backgroundWidget19 = new iconWidget(149, 157, 137, 72, "caslxtra.icn", 0, 0, -1, 16, 1);
             if (backgroundWidget19 == 0)
                 MemError();
@@ -479,11 +479,11 @@ i32 CastleHandler(tag_message& message) {
 
             case -1:
                 switch (message.payload.widget.id) {
-                    case CASTLE_CONTROL_HERO_FIRST:
+                    case IDX(CASTLE_CONTROL_HERO_FIRST):
                     case CASTLE_CONTROL_HERO_FIRST + 1:
                         heroChoiceIndex = message.payload.widget.id - CASTLE_CONTROL_HERO_FIRST;
                         goto hero_hover_text;
-                    case CASTLE_CONTROL_RECRUIT_FIRST:
+                    case IDX(CASTLE_CONTROL_RECRUIT_FIRST):
                     case CASTLE_CONTROL_RECRUIT_FIRST + 1:
                         heroChoiceIndex = message.payload.widget.id - CASTLE_CONTROL_RECRUIT_FIRST;
                     hero_hover_text:
@@ -642,12 +642,12 @@ i32 CastleHandler(tag_message& message) {
 
                     case -1:
                         switch (message.payload.widget.id) {
-                            case CASTLE_CONTROL_HERO_FIRST:
+                            case IDX(CASTLE_CONTROL_HERO_FIRST):
                             case CASTLE_CONTROL_HERO_FIRST + 1:
                                 heroChoiceIndex =
                                     message.payload.widget.id - CASTLE_CONTROL_HERO_FIRST;
                                 goto hero_selected;
-                            case CASTLE_CONTROL_RECRUIT_FIRST:
+                            case IDX(CASTLE_CONTROL_RECRUIT_FIRST):
                             case CASTLE_CONTROL_RECRUIT_FIRST + 1:
                                 heroChoiceIndex =
                                     message.payload.widget.id - CASTLE_CONTROL_RECRUIT_FIRST;

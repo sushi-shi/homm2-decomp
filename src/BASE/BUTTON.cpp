@@ -326,7 +326,7 @@ i16 button::Select(struct tag_message& msg) {
     m_flags |= WIDGET_FLAG_SELECTED;
     msg.type = MESSAGE_WIDGET;
     msg.payload.widget.id = m_id;
-    if (m_selectMode == BUTTON_SELECT_DIALOG_RESULT) {
+    if (m_selectMode == IDX(BUTTON_SELECT_DIALOG_RESULT)) {
         msg.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
     } else {
         msg.payload.widget.command = WIDGET_COMMAND_SELECT;

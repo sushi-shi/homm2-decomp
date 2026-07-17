@@ -113,7 +113,7 @@ i32 recruitUnit::Open(i32 priority) {
     gpWindowManager->BroadcastMessage(
         MESSAGE_WIDGET,
         WIDGET_COMMAND_SET_FLAGS,
-        RECRUIT_CLOSE_CONTROL,
+        IDX(RECRUIT_CLOSE_CONTROL),
         RECRUIT_BROADCAST_FLAGS
     );
     gpWindowManager->AddWindow(m_window, -1, 1);
@@ -132,13 +132,13 @@ i32 recruitUnit::Open(i32 priority) {
         gpWindowManager->BroadcastMessage(
             MESSAGE_WIDGET,
             WIDGET_COMMAND_CLEAR_FLAGS,
-            RECRUIT_CONFIRM_CONTROL,
+            IDX(RECRUIT_CONFIRM_CONTROL),
             2
         );
         gpWindowManager->BroadcastMessage(
             MESSAGE_WIDGET,
             WIDGET_COMMAND_SET_FLAGS,
-            RECRUIT_CONFIRM_CONTROL,
+            IDX(RECRUIT_CONFIRM_CONTROL),
             RECRUIT_BROADCAST_FLAGS
         );
     }
@@ -172,7 +172,7 @@ void recruitUnit::Close(void) {
     gpWindowManager->BroadcastMessage(
         MESSAGE_WIDGET,
         WIDGET_COMMAND_CLEAR_FLAGS,
-        RECRUIT_CLOSE_CONTROL,
+        IDX(RECRUIT_CLOSE_CONTROL),
         RECRUIT_BROADCAST_FLAGS
     );
     if (m_sourceType == RECRUIT_SOURCE_TOWN && m_recruited != 0 && m_refreshTown != 0) {
@@ -227,7 +227,7 @@ i32 recruitUnit::Main(struct tag_message& message) {
             case WIDGET_COMMAND_SELECT:
             case WIDGET_COMMAND_ALTERNATE_SELECT:
                 switch (message.payload.widget.id) {
-                    case RECRUIT_QUANTITY_CONTROL:
+                    case IDX(RECRUIT_QUANTITY_CONTROL):
                         if (quickView != 0)
                             break;
                         message.payload.widget.command = WIDGET_COMMAND_GET_TEXT;
@@ -238,7 +238,7 @@ i32 recruitUnit::Main(struct tag_message& message) {
                         if (m_quantity > m_maximum)
                             m_quantity = m_maximum;
                         break;
-                    case RECRUIT_CREATURE_CONTROL:
+                    case IDX(RECRUIT_CREATURE_CONTROL):
                         gpGame->ViewArmy(
                             RECRUIT_VIEW_ARMY_X,
                             RECRUIT_VIEW_ARMY_Y,
@@ -260,7 +260,7 @@ i32 recruitUnit::Main(struct tag_message& message) {
                 break;
             case WIDGET_COMMAND_DESELECT:
                 switch (message.payload.widget.id) {
-                    case RECRUIT_INCREASE_CONTROL:
+                    case IDX(RECRUIT_INCREASE_CONTROL):
                         if (quickView != 0)
                             break;
                         ++m_quantity;
@@ -269,7 +269,7 @@ i32 recruitUnit::Main(struct tag_message& message) {
                         Update();
                         m_window->DrawWindow(1, 0, RECRUIT_DRAW_DEPTH);
                         break;
-                    case RECRUIT_DECREASE_CONTROL:
+                    case IDX(RECRUIT_DECREASE_CONTROL):
                         if (quickView != 0)
                             break;
                         --m_quantity;
@@ -278,20 +278,20 @@ i32 recruitUnit::Main(struct tag_message& message) {
                         Update();
                         m_window->DrawWindow(1, 0, RECRUIT_DRAW_DEPTH);
                         break;
-                    case RECRUIT_MAXIMUM_CONTROL:
+                    case IDX(RECRUIT_MAXIMUM_CONTROL):
                         if (quickView != 0)
                             break;
                         m_quantity = m_maximum;
                         Update();
                         m_window->DrawWindow(1, 0, RECRUIT_DRAW_DEPTH);
                         break;
-                    case RECRUIT_CANCEL_CONTROL:
+                    case IDX(RECRUIT_CANCEL_CONTROL):
                         if (quickView != 0)
                             break;
                         m_quantity = 0;
                         close = 1;
                         break;
-                    case RECRUIT_CONFIRM_CONTROL:
+                    case IDX(RECRUIT_CONFIRM_CONTROL):
                         if (quickView != 0)
                             break;
                         if (m_quantity == 0) {

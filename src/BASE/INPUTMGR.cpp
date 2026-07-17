@@ -57,7 +57,7 @@ i32 KeyboardMessageHandler(void*, u32 message, u32, i32l messageData) {
         case WM_KEYDOWN:
             event->type = MESSAGE_KEY_DOWN;
             event->payload.keyboard.keyCode =
-                static_cast<u16>(static_cast<u32l>(messageData) >> 16) & INPUT_SCAN_CODE_MASK;
+                static_cast<u16>(static_cast<u32l>(messageData) >> 16) & IDX(INPUT_SCAN_CODE_MASK);
             event->payload.keyboard.unknown0x08 = 0;
             event->payload.keyboard.modifiers = 0;
             switch (event->payload.keyboard.keyCode) {
@@ -78,7 +78,7 @@ i32 KeyboardMessageHandler(void*, u32 message, u32, i32l messageData) {
         case WM_KEYUP:
             event->type = MESSAGE_KEY_UP;
             event->payload.keyboard.keyCode =
-                static_cast<u16>(static_cast<u32l>(messageData) >> 16) & INPUT_SCAN_CODE_MASK;
+                static_cast<u16>(static_cast<u32l>(messageData) >> 16) & IDX(INPUT_SCAN_CODE_MASK);
             event->payload.keyboard.unknown0x08 = 0;
             event->payload.keyboard.modifiers = 0;
             switch (event->payload.keyboard.keyCode) {
@@ -197,7 +197,7 @@ i32 MouseMessageHandler(void*, u32 message, u32, i32l messageData) {
         && event->payload.mouse.x < INPUT_CURSOR_INTERIOR_MAX_X_EXCLUSIVE
         && event->payload.mouse.y > INPUT_CURSOR_INTERIOR_MIN_EXCLUSIVE
         && event->payload.mouse.y < INPUT_CURSOR_INTERIOR_MAX_Y_EXCLUSIVE) {
-        iLastBWOnScreenCheck = KBTickCount() + INPUT_CURSOR_CHECK_DELAY;
+        iLastBWOnScreenCheck = KBTickCount() + IDX(INPUT_CURSOR_CHECK_DELAY);
         gpMouseManager->SetPointer(MOUSE_KEEP_CURRENT_FRAME);
     }
 
@@ -435,7 +435,7 @@ void inputManager::AsciiConvert(tag_message& event) {
 
 VA(0x004ce650, 0x33c)
 void inputManager::MakeScanCodeTable(void) {
-    for (u32 scanCode = 0; scanCode < INPUT_SCAN_CODE_CAPACITY; scanCode++)
+    for (u32 scanCode = 0; scanCode < IDX(INPUT_SCAN_CODE_CAPACITY); scanCode++)
         m_keyState[scanCode] = scanCode << 8;
 
     m_keyState[IDX(INPUT_SCAN_NONE)] = 0;

@@ -113,7 +113,7 @@ i16 wsnet_init(void) {
     sprintf(cWSTextBuffer, "%s", inet_ntoa(gIn_addrIP));
     giNetPosToDCOPos[giThisNetPos] = static_cast<i32>(inet_addr(cWSTextBuffer));
 
-    if (GameMode == REMOTE_GAME_NETWORK_HOST) {
+    if (GameMode == IDX(REMOTE_GAME_NETWORK_HOST)) {
         giWaitType = WS_WAIT_FIRST_GUEST;
         if (giTCPHostStatus != -1) {
             sprintf(
@@ -370,7 +370,7 @@ void wsEvaluateMessage(u32l size, i32 sender) {
             iDPRcvBufferHead = (iDPRcvBufferHead + 1) % WS_TRANSPORT_BUFFER_COUNT;
             break;
         case IDX(NETWORK_PACKET_GUEST_ARRIVED):
-            if (GameMode == REMOTE_GAME_NETWORK_HOST) {
+            if (GameMode == IDX(REMOTE_GAME_NETWORK_HOST)) {
                 if (gbRemoteGameOpen != 0) {
                     for (player = 1; player < giNumHumanPlayers; player++) {
                         if (giNetPosToDCOPos[player] == sender

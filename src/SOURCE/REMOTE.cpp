@@ -204,11 +204,11 @@ void RemoteMain(i32 gameMode) {
     xNetHasOldPlayers = 0;
 
     switch (gameMode) {
-        case REMOTE_GAME_NETWORK_HOST:
+        case IDX(REMOTE_GAME_NETWORK_HOST):
             gsNetPlayerInfo[0] = gsThisNetPlayerInfo;
             giThisNetPos = 0;
             goto initializeNetwork;
-        case REMOTE_GAME_NETWORK_GUEST:
+        case IDX(REMOTE_GAME_NETWORK_GUEST):
             giThisNetPos = 1;
         initializeNetwork:
             if (bUseDirectPlay == 0) {
@@ -224,7 +224,7 @@ void RemoteMain(i32 gameMode) {
                 dpnet_init();
             }
             break;
-        case REMOTE_GAME_MODEM_HOST:
+        case IDX(REMOTE_GAME_MODEM_HOST):
             LogStr("MH1");
             gbRemoteOn = 1;
             gsNetPlayerInfo[0] = gsThisNetPlayerInfo;
@@ -232,7 +232,7 @@ void RemoteMain(i32 gameMode) {
             ModemSetup(gameMode);
             LogStr("MH2");
             break;
-        case REMOTE_GAME_MODEM_GUEST:
+        case IDX(REMOTE_GAME_MODEM_GUEST):
             gbRemoteOn = 1;
             giThisNetPos = 1;
             ModemSetup(gameMode);
@@ -255,7 +255,7 @@ void RemoteMain(i32 gameMode) {
                 incomingData = GetRemoteData(1);
                 LogStr("RM 4");
                 if (incomingData != 0
-                    && REMOTE_MESSAGE(incomingData)->type == REMOTE_MESSAGE_RELIABLE) {
+                    && REMOTE_MESSAGE(incomingData)->type == IDX(REMOTE_MESSAGE_RELIABLE)) {
                     switch (REMOTE_MESSAGE(incomingData)->command) {
                         case IDX(REMOTE_SETUP_PLAYER_INFO):
                             netPlayer = REMOTE_MESSAGE(incomingData)->sender;
@@ -305,21 +305,21 @@ void RemoteMain(i32 gameMode) {
             PollSound();
             remoteGameType = GetRemoteData(1);
             if (remoteGameType != 0
-                && REMOTE_MESSAGE(remoteGameType)->type == REMOTE_MESSAGE_RELIABLE) {
+                && REMOTE_MESSAGE(remoteGameType)->type == IDX(REMOTE_MESSAGE_RELIABLE)) {
                 setupCounter = 0;
                 setupCounter++;
                 setupCounter++;
                 setupCounter++;
             }
             if (remoteGameType != 0
-                && REMOTE_MESSAGE(remoteGameType)->type == REMOTE_MESSAGE_RELIABLE
-                && REMOTE_MESSAGE(remoteGameType)->command == REMOTE_SETUP_CAMPAIGN_GAME) {
+                && REMOTE_MESSAGE(remoteGameType)->type == IDX(REMOTE_MESSAGE_RELIABLE)
+                && REMOTE_MESSAGE(remoteGameType)->command == IDX(REMOTE_SETUP_CAMPAIGN_GAME)) {
                 bGotGameType = 1;
                 giSetupGameType = 1;
             }
             if (remoteGameType != 0
-                && REMOTE_MESSAGE(remoteGameType)->type == REMOTE_MESSAGE_RELIABLE
-                && REMOTE_MESSAGE(remoteGameType)->command == REMOTE_SETUP_STANDARD_GAME) {
+                && REMOTE_MESSAGE(remoteGameType)->type == IDX(REMOTE_MESSAGE_RELIABLE)
+                && REMOTE_MESSAGE(remoteGameType)->command == IDX(REMOTE_SETUP_STANDARD_GAME)) {
                 bGotGameType = 1;
                 giSetupGameType = 0;
             }
@@ -784,11 +784,11 @@ void PollRemote(void) {
                     ReceiveRemoteData(0, reinterpret_cast<u8*>(rcvBufIn), REMOTE_BROADCAST_PLAYER);
                 if (receiveResult == 0 || REMOTE_MESSAGE(rcvBufIn)->sender == giThisNetPos)
                     continue;
-                if (REMOTE_MESSAGE(rcvBufIn)->type == REMOTE_MESSAGE_CONFIRM) {
+                if (REMOTE_MESSAGE(rcvBufIn)->type == IDX(REMOTE_MESSAGE_CONFIRM)) {
                     giLastConfirm = REMOTE_MESSAGE(rcvBufIn)->id;
                     return;
                 }
-                if (REMOTE_MESSAGE(rcvBufIn)->type == REMOTE_MESSAGE_HEARTBEAT) {
+                if (REMOTE_MESSAGE(rcvBufIn)->type == IDX(REMOTE_MESSAGE_HEARTBEAT)) {
                     lLastHeartbeatReceive[REMOTE_MESSAGE(rcvBufIn)->sender] = KBTickCount();
                     netCommand = REMOTE_MESSAGE(rcvBufIn)->command;
                     if ((netCommand & REMOTE_HEARTBEAT_CONTROL_FLAG) == 0)
@@ -800,7 +800,7 @@ void PollRemote(void) {
                 }
                 if (queueFull)
                     return;
-                if (REMOTE_MESSAGE(rcvBufIn)->type == REMOTE_MESSAGE_RELIABLE) {
+                if (REMOTE_MESSAGE(rcvBufIn)->type == IDX(REMOTE_MESSAGE_RELIABLE)) {
                     REMOTE_MESSAGE(sndBuf)->sender = static_cast<i8>(giThisNetPos);
                     REMOTE_MESSAGE(sndBuf)->id = REMOTE_MESSAGE(rcvBufIn)->id;
                     REMOTE_MESSAGE(sndBuf)->type = IDX(REMOTE_MESSAGE_CONFIRM);
@@ -892,7 +892,7 @@ i32 TransmitAndWait(
             receivedData = GetRemoteData(1);
             if (receivedData != 0)
                 unusedResponseState = 0;
-            if (receivedData != 0 && REMOTE_MESSAGE(receivedData)->type == REMOTE_MESSAGE_RELIABLE
+            if (receivedData != 0 && REMOTE_MESSAGE(receivedData)->type == IDX(REMOTE_MESSAGE_RELIABLE)
                 && REMOTE_MESSAGE(receivedData)->command == responseCommand) {
                 complete = 1;
             }
