@@ -38,7 +38,10 @@ typedef enum MessageModifier {
 } MessageModifier;
 
 struct tag_messageKeyboardPayload {
-    int keyCode;
+    union {
+        int keyCode;
+        unsigned char keyByte;
+    };
     int unknown0x08;
     int modifiers;
     int unknown0x10;
