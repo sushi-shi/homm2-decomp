@@ -8,7 +8,7 @@
 // forward declarations (was <_all.h>):
 class hero;
 
-enum {
+H2_ENUM_BEGIN(EventConstant)
     COMBAT_REMOTE_BUFFER_SIZE = 0xFF,
     COMBAT_REMOTE_HEADER_SIZE = 0x9b,
     COMBAT_REMOTE_HERO_FIRST_SIZE = 200,
@@ -17,7 +17,7 @@ enum {
     COMBAT_REMOTE_PACKET_HEADER_SIZE = 9,
     COMBAT_REMOTE_FRAGMENT_TYPE = 1,
     COMBAT_REMOTE_TIMEOUT = 90000
-};
+H2_ENUM_END(EventConstant)
 
 H2_ENUM_CLASS_BEGIN(CombatRemoteCommand)
     COMBAT_REMOTE_COMMAND = 0x15,

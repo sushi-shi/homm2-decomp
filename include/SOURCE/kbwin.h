@@ -6,7 +6,7 @@
 // Declarations of the free functions DEFINED in kbwin.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
 
-enum {
+H2_ENUM_BEGIN(KbWinConstant)
     KBWIN_PROCESS_MESSAGE_MAX = 0x3ff,
     KBWIN_PROCESS_MESSAGE_COUNT = KBWIN_PROCESS_MESSAGE_MAX + 1,
     KBWIN_COMMAND_LINE_LIMIT = 0x3c,
@@ -30,7 +30,7 @@ enum {
     KBWIN_HEIGHT_768 = 768,
     KBWIN_WIDTH_1280 = 1280,
     KBWIN_HEIGHT_1024 = 1024
-};
+H2_ENUM_END(KbWinConstant)
 
 H2_ENUM_CLASS_BEGIN(KbWinMenuCommand)
     KBWIN_MENU_SIZE_640_480 = 0x9c45,
