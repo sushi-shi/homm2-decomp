@@ -7,7 +7,9 @@
 #include <BASE/Bzip.h> // bzip types/records + this TU's free-function decls
 #include <BASE/Misc.h> // LogStr, BaseAlloc, BaseFree, Random
 #include <SOURCE/KB.h> // FileError
-#include <io.h>        // _open, _write, _close
+#include <io.h>
+#include <fcntl.h>
+#include <sys/stat.h>        // _open, _write, _close
 #include <stdio.h>
 #include <errno.h>
 #include <stdlib.h>
@@ -1957,7 +1959,7 @@ i32l EncodeData(char* dst, char* src, u32l srcLen) {
     fname[strlen(fname)] = (char)Random(0x41, 0x5a);
     fname[strlen(fname)] = (char)Random(0x41, 0x5a);
 
-    fd = _open(fname, 0x8301, 0x80);
+    fd = _open(fname, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
     if (fd == -1)
         FileError(fname);
     _write(fd, src, srcLen);
@@ -2003,7 +2005,7 @@ i32l DecodeData(char* dst, char* src, u32l srcLen) {
     fname[strlen(fname)] = (char)Random(0x41, 0x5a);
     strcat(fname, ".nw");
 
-    fd = _open(fname, 0x8301, 0x80);
+    fd = _open(fname, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
     if (fd == -1)
         FileError(fname);
     _write(fd, src, srcLen);

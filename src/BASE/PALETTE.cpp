@@ -7,6 +7,7 @@
 #include <BASE/palette.h>
 #include <BASE/resourceManager.h>
 #include <BASE/Misc.h>
+#include <BASE/MiscGraphicsConstants.h>
 #include <SOURCE/KB.h>
 
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\PALETTE.CPP"
@@ -35,7 +36,7 @@ VA(0x004d2600, 0x55)
 palette::palette(u32l id) : resource(2, id, 1, 0) {
     m_data = static_cast<i8*>(H2_ALLOC_AT(0x300, RETAIL_FILE "\0", 13));
     gpResourceManager->PointToFile(id);
-    gpResourceManager->ReadBlock(m_data, 0x300);
+    gpResourceManager->ReadBlock(m_data, MISC_PALETTE_BYTE_COUNT);
 }
 
 VA(0x004d2660, 0x2c)

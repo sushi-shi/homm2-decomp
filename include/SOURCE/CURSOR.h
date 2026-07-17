@@ -4,6 +4,20 @@
 // Declarations of the free functions DEFINED in CURSOR.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
 
+// Hero sprite sheet: frames 45+ hold the vertical-walk steps; 0x37-0x3a are their
+// dedicated shadow sprites (fheroes2 corroborates the 45-frame boundary).
+typedef enum CursorHeroShadowFrame {
+    HERO_SPRITE_UP_STEP_1 = 0x2e,
+    HERO_SPRITE_UP_STEP_2 = 0x2f,
+    HERO_SPRITE_UP_STEP_3 = 0x31,
+    HERO_SPRITE_UP_STEP_4 = 0x32,
+    HERO_SPRITE_UP_STEP_5 = 0x33,
+    HERO_SPRITE_UP_SHADOW_WIDE = 0x37,
+    HERO_SPRITE_UP_SHADOW_STEP_5 = 0x38,
+    HERO_SPRITE_UP_SHADOW_STEP_4 = 0x39,
+    HERO_SPRITE_UP_SHADOW_STEP_3 = 0x3a
+} CursorHeroShadowFrame;
+
 typedef enum CursorConstant {
     CURSOR_HERO_TYPE_BOAT = 6,
     CURSOR_BOAT_WAKE_TYPE = 7,
