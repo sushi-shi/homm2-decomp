@@ -515,7 +515,7 @@ void townManager::SetupExtraStuff(void) {
 VA(0x00414109, 0x1ef)
 i32 townManager::Open(i32 id) {
     gpGame->CheckHeroConsistency();
-    if (gConfig.useOpera != CONFIG_OPERA_DISABLED
+    if (gConfig.useOpera != IDX(CONFIG_OPERA_DISABLED)
         || gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI)
         gpSoundManager->SwitchAmbientMusic(townTheme[m_town->m_type]);
     PollSound();
@@ -553,7 +553,7 @@ VA(0x004142f8, 0x77)
 void townManager::ChangeTown(void) {
     tag_message message;
 
-    if (gConfig.useOpera != CONFIG_OPERA_DISABLED
+    if (gConfig.useOpera != IDX(CONFIG_OPERA_DISABLED)
         || gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI)
         gpSoundManager->SwitchAmbientMusic(townTheme[m_town->m_type]);
     SetupExtraStuff();
@@ -777,7 +777,7 @@ void townManager::Close(void) {
         delete m_townWindow;
     }
     m_townWindow = 0;
-    if (gConfig.useOpera != CONFIG_OPERA_DISABLED
+    if (gConfig.useOpera != IDX(CONFIG_OPERA_DISABLED)
         || gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI)
         gpSoundManager->SwitchAmbientMusic(TOWN_MUSIC_STOP);
     gpWindowManager->FadeScreen(TOWN_FADE_OUT, TOWN_FADE_STEPS, 0);
@@ -1056,12 +1056,12 @@ i32 townManager::Main(tag_message& message) {
         if (debugBuilding_e == TOWN_DEBUG_BUILD_ALL) {
             for (index_i = 0; index_i < TOWN_BUILDING_COUNT; ++index_i) {
                 if ((gTownEligibleBuildMask[m_town->m_type] & (1L << index_i))
-                    || index_i == TOWN_COMMAND_CASTLE)
+                    || index_i == IDX(TOWN_COMMAND_CASTLE))
                     BuildObj(index_i);
             }
         } else if ((gTownEligibleBuildMask[m_town->m_type]
                     & (1L << static_cast<u8>(debugBuilding_e)))
-                   || debugBuilding_e == TOWN_COMMAND_CASTLE) {
+                   || debugBuilding_e == IDX(TOWN_COMMAND_CASTLE)) {
             BuildObj(debugBuilding_e);
         }
     }
@@ -1092,13 +1092,13 @@ i32 townManager::Main(tag_message& message) {
                             if (quickView_k) {
                                 QuickViewRecruit(
                                     m_town,
-                                    message.payload.widget.id - TOWN_COMMAND_FIRST_DWELLING
+                                    message.payload.widget.id - IDX(TOWN_COMMAND_FIRST_DWELLING)
                                 );
                             } else {
                                 DrawTown(1, 1);
                                 dialogManager_d = new recruitUnit(
                                     m_town,
-                                    message.payload.widget.id - TOWN_COMMAND_FIRST_DWELLING,
+                                    message.payload.widget.id - IDX(TOWN_COMMAND_FIRST_DWELLING),
                                     1
                                 );
                                 if (dialogManager_d == 0)
@@ -1162,7 +1162,7 @@ i32 townManager::Main(tag_message& message) {
                                         sprintf(
                                             gText,
                                             "port%04d.icn",
-                                            m_town->m_type + TOWN_PORTRAIT_ICON_BASE
+                                            m_town->m_type + IDX(TOWN_PORTRAIT_ICON_BASE)
                                         );
                                         m_heroStrip = new strip(
                                             0,
@@ -1240,7 +1240,7 @@ i32 townManager::Main(tag_message& message) {
                                             0
                                         );
                                         if (gpWindowManager->m_dialogResult
-                                            == TOWN_DIALOG_BUY_SPELL_BOOK) {
+                                            == IDX(TOWN_DIALOG_BUY_SPELL_BOOK)) {
                                             GiveArtifact(
                                                 gpGame->GetHero(m_town->m_occupyingHeroId),
                                                 ARTIFACT_MAGIC_BOOK,
@@ -1395,7 +1395,7 @@ i32 townManager::Main(tag_message& message) {
                                     gpWindowManager
                                         ->DoDialog(m_heroWindow0, TrueFalseDialogHandler, 0);
                                     delete m_heroWindow0;
-                                    if (gpWindowManager->m_dialogResult == TOWN_DIALOG_BUILD_BOAT) {
+                                    if (gpWindowManager->m_dialogResult == IDX(TOWN_DIALOG_BUILD_BOAT)) {
                                         if (gpGame->CreateBoat(m_town->m_boatX, m_town->m_boatY, 0)
                                             != -1) {
                                             BuildObj(14);
@@ -1570,7 +1570,7 @@ i32 townManager::Main(tag_message& message) {
                                     gpGame->TownIDToTownPos(gpCurPlayer, m_town->m_id);
                                 townPosition =
                                     (townPosition
-                                     + (message.payload.widget.id == TOWN_CONTROL_PREVIOUS_TOWN ? -1
+                                     + (message.payload.widget.id == IDX(TOWN_CONTROL_PREVIOUS_TOWN) ? -1
                                                                                                 : 1)
                                      + gpCurPlayer->m_townCount)
                                     % gpCurPlayer->m_townCount;
@@ -1921,7 +1921,7 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
                 ++costCount_o;
             }
         }
-    } else if (building == TOWN_COMMAND_MAGE_GUILD) {
+    } else if (building == IDX(TOWN_COMMAND_MAGE_GUILD)) {
         mageLevel_k = gpTownManager->m_town->m_buildState;
         for (index_h = 0; index_h < TOWN_RESOURCE_COUNT; ++index_h) {
             if (gMageBuildingCosts
@@ -1938,7 +1938,7 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
                 ++costCount_o;
             }
         }
-    } else if (building == TOWN_COMMAND_SPECIAL_BUILDING) {
+    } else if (building == IDX(TOWN_COMMAND_SPECIAL_BUILDING)) {
         for (index_h = 0; index_h < TOWN_RESOURCE_COUNT; ++index_h) {
             if (gSpecialBuildingCosts[gpTownManager->m_town->m_type][index_h] > 0) {
                 resourceTypes_o[costCount_o] = static_cast<i8>(index_h);
@@ -1947,7 +1947,7 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
                 ++costCount_o;
             }
         }
-    } else if (building <= TOWN_COMMAND_LAST_NEUTRAL_BUILDING) {
+    } else if (building <= IDX(TOWN_COMMAND_LAST_NEUTRAL_BUILDING)) {
         for (index_h = 0; index_h < TOWN_RESOURCE_COUNT; ++index_h) {
             if (gNeutralBuildingCosts[building][index_h] > 0) {
                 resourceTypes_o[costCount_o] = static_cast<i8>(index_h);
@@ -2010,7 +2010,7 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
             }
         }
         if (m_town->m_type == IDX(FACTION_NECROMANCER)
-            && building == TOWN_COMMAND_NECROMANCER_MAGE_GUILD_PREREQUISITE
+            && building == IDX(TOWN_COMMAND_NECROMANCER_MAGE_GUILD_PREREQUISITE)
             && m_town->m_buildState <= 2)
             strcat(description_b, "\nLevel 2 Mage Guild");
     }
@@ -2048,7 +2048,7 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
     message_m.payload.widget.data.value = building;
     window_a->BroadcastMessage(message_m);
 
-    if (building == TOWN_COMMAND_MAGE_GUILD) {
+    if (building == IDX(TOWN_COMMAND_MAGE_GUILD)) {
         sprintf(
             gText,
             "Mage Guild, Level %d",
@@ -2217,11 +2217,11 @@ void townManager::BuildObj(i32 building) {
     i32 frame_g;
 
     if ((m_town->m_buildings & (1L << building))
-        && (building != TOWN_COMMAND_MAGE_GUILD
+        && (building != IDX(TOWN_COMMAND_MAGE_GUILD)
             || m_town->m_buildState == TOWN_MAGE_GUILD_MAX_LEVEL)) {
         return;
     }
-    if (building == TOWN_COMMAND_DOCK && !m_town->CanBuildDock()) {
+    if (building == IDX(TOWN_COMMAND_DOCK) && !m_town->CanBuildDock()) {
         return;
     }
     {
@@ -2250,7 +2250,7 @@ void townManager::BuildObj(i32 building) {
         gbComputeExtent = true;
         gbSaveBiggestExtent = true;
         gbReturnAfterComputeExtent = true;
-        if (building == TOWN_COMMAND_MAGE_GUILD) {
+        if (building == IDX(TOWN_COMMAND_MAGE_GUILD)) {
             if (gpTownManager->m_town->m_type == IDX(FACTION_NECROMANCER))
                 frame_g = (gpTownManager->m_town->m_buildState - 1) * 3 * 2;
             else

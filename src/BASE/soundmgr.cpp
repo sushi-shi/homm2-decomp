@@ -571,7 +571,7 @@ void soundManager::StopAllSamples(i32 stopMusic) {
     LogStr("SAS 1");
     for (sampleIdx = 0; sampleIdx < m_numSampleHandles; sampleIdx++) {
         sampleStatus = AIL_sample_status(m_sampleHandles[sampleIdx]);
-        if (sampleStatus == SOUND_SAMPLE_STATUS_PLAYING)
+        if (sampleStatus == IDX(SOUND_SAMPLE_STATUS_PLAYING))
             AIL_end_sample(m_sampleHandles[sampleIdx]);
     }
     m_fadeSteps = 0;
@@ -675,7 +675,7 @@ i32l soundManager::DigitalReport(struct _SAMPLE* sample, i16 reportType) {
             return AIL_sample_volume(sample);
         case IDX(SOUND_DIGITAL_REPORT_PLAYING):
             sampleStatus = AIL_sample_status(sample);
-            return sampleStatus == SOUND_SAMPLE_STATUS_PLAYING;
+            return sampleStatus == IDX(SOUND_SAMPLE_STATUS_PLAYING);
     }
     return 0;
 }
@@ -914,7 +914,7 @@ struct _SAMPLE* soundManager::MemorySample(class sample* sampleResource) {
     LogStr("Memory Sample 1");
     scs = &SCS[playbackData->channelType];
     for (ch = static_cast<i16>(scs->startChannel); scs->endChannel > ch; ch++) {
-        if (AIL_sample_status(m_sampleHandles[ch]) == SOUND_SAMPLE_STATUS_DONE)
+        if (AIL_sample_status(m_sampleHandles[ch]) == IDX(SOUND_SAMPLE_STATUS_DONE))
             break;
     }
     if (scs->endChannel == ch) {

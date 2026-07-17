@@ -76,7 +76,7 @@ void advManager::ViewWorld(ViewWorldMode whatToDraw, b32 drawAllObjects, b32 dra
     if (whatToDraw == VIEW_WORLD_ALL && drawAllObjects == 0 && drawAllTerrains == 0)
         legendMode = 6;
     else
-        legendMode = whatToDraw - VIEW_WORLD_MINES;
+        legendMode = whatToDraw - IDX(VIEW_WORLD_MINES);
     sprintf(gText, "view%s.icn", viewIconNames[legendMode]);
     dialogMessage.type = VIEW_WORLD_MESSAGE;
     dialogMessage.payload.widget.command = VIEW_WORLD_ICON_MESSAGE;
@@ -113,7 +113,7 @@ void advManager::VWInit(i32 centerX, i32 centerY) {
     else
         giViewWorldScaleLookup = 2;
 
-    iVWViewableCells = VIEW_WORLD_DRAW_SIZE / giViewWorldScale;
+    iVWViewableCells = VIEW_WORLD_DRAW_SIZE / IDX(giViewWorldScale);
     if (MAP_WIDTH < iVWViewableCells)
         iVWViewableCells = MAP_WIDTH;
     iVWCenterOffset = iVWViewableCells >> 1;
@@ -132,7 +132,7 @@ void advManager::VWInit(i32 centerX, i32 centerY) {
             iVWMapOriginY = MAP_HEIGHT - iVWViewableCells;
     }
 
-    iVWXPixelOffset = (VIEW_WORLD_WINDOW_X - giViewWorldScale * iVWViewableCells) >> 1;
+    iVWXPixelOffset = (VIEW_WORLD_WINDOW_X - giViewWorldScale * IDX(iVWViewableCells)) >> 1;
     iVWYPixelOffset = iVWXPixelOffset;
     gpMouseManager->SetPointer("advmice.mse", VIEW_WORLD_POINTER_FRAME, VIEW_WORLD_POINTER_COLOR);
     sprintf(gText, "ground%d.icn", giViewWorldScale);
@@ -207,8 +207,8 @@ void advManager::VWCompleteDraw(void) {
                             && gpGame->m_heroRecs[cell0->m_objectMetadata].m_locationType
                                    == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE))))) {
                 flipped5 = 0;
-                pixelX6 = (mapX7 - iVWMapOriginX) * giViewWorldScale + iVWXPixelOffset;
-                pixelY2 = (mapY3 - iVWMapOriginY) * giViewWorldScale + iVWYPixelOffset;
+                pixelX6 = (mapX7 - iVWMapOriginX) * IDX(giViewWorldScale) + iVWXPixelOffset;
+                pixelY2 = (mapY3 - iVWMapOriginY) * IDX(giViewWorldScale) + iVWYPixelOffset;
                 groundShape1 =
                     giGroundShape[cell0->m_terrainImageIndex] & VIEW_WORLD_GROUND_SHAPE_MASK;
                 switch (groundShape1) {
@@ -428,9 +428,9 @@ void advManager::VWCompleteDraw(void) {
     for (mapY3 = iVWMapOriginY; mapY3 < iVWMapOriginY + iVWViewableCells; mapY3++) {
         for (mapX7 = iVWMapOriginX; mapX7 < iVWMapOriginX + iVWViewableCells; mapX7++) {
             cell0 = GetCell(mapX7, mapY3);
-            pixelX6 = (mapX7 - iVWMapOriginX) * giViewWorldScale + (giViewWorldScale >> 1)
+            pixelX6 = (mapX7 - iVWMapOriginX) * IDX(giViewWorldScale) + (giViewWorldScale >> 1)
                       + iVWXPixelOffset;
-            pixelY2 = (mapY3 - iVWMapOriginY) * giViewWorldScale + (giViewWorldScale >> 1)
+            pixelY2 = (mapY3 - iVWMapOriginY) * IDX(giViewWorldScale) + (giViewWorldScale >> 1)
                       + iVWYPixelOffset;
 
             if (cell0->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ARTIFACT)
@@ -659,11 +659,11 @@ i32 ViewWorldDialogHandler(struct tag_message& message) {
             case VIEW_WORLD_SELECT:
                 if (message.payload.widget.id == VIEW_WORLD_RADAR_WIDGET
                     && (giViewWorldScale != VIEW_WORLD_SCALE_NEAR
-                        || MAP_WIDTH > VIEW_WORLD_NEAR_MAX_MAP_SIZE)
+                        || MAP_WIDTH > IDX(VIEW_WORLD_NEAR_MAX_MAP_SIZE))
                     && (giViewWorldScale != VIEW_WORLD_SCALE_MIDDLE
-                        || MAP_WIDTH > VIEW_WORLD_MIDDLE_MAX_MAP_SIZE)) {
+                        || MAP_WIDTH > IDX(VIEW_WORLD_MIDDLE_MAX_MAP_SIZE))) {
                     if (giViewWorldScale == VIEW_WORLD_SCALE_FAR
-                        && MAP_WIDTH <= VIEW_WORLD_FAR_MAX_MAP_SIZE)
+                        && MAP_WIDTH <= IDX(VIEW_WORLD_FAR_MAX_MAP_SIZE))
                         break;
                     switch (MAP_HEIGHT) {
                         case IDX(VIEW_WORLD_NEAR_MAX_MAP_SIZE):

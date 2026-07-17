@@ -972,11 +972,11 @@ i32 SetGraphicsType(i32 graphicsType) {
     i32 height7;
     void* screenBuffer;
 
-    if (OD_STEER(giGraphicsType) == graphicsType)
+    if (OD_STEER(giGraphicsType) == IDX(graphicsType))
         return 1;
-    if (graphicsType == WINGRAPH_GRAPHICS_WING && gbWinGAttached == 0)
+    if (graphicsType == IDX(WINGRAPH_GRAPHICS_WING) && gbWinGAttached == 0)
         return 0;
-    if (graphicsType == WINGRAPH_GRAPHICS_DIRECT_DRAW && gbDDrawAttached == 0)
+    if (graphicsType == IDX(WINGRAPH_GRAPHICS_DIRECT_DRAW) && gbDDrawAttached == 0)
         return 0;
 
     fullScreen = gConfig.gfx[giCurExe].fullScreen;
@@ -986,7 +986,7 @@ i32 SetGraphicsType(i32 graphicsType) {
     height7 = gConfig.gfx[giCurExe].height;
     screenBuffer = H2_ALLOC(WINGRAPH_WIDTH * WINGRAPH_HEIGHT, 1265);
     memcpy(screenBuffer, gpWindowManager->m_screen->m_pixels, WINGRAPH_WIDTH * WINGRAPH_HEIGHT);
-    if (graphicsType == WINGRAPH_GRAPHICS_WING) {
+    if (graphicsType == IDX(WINGRAPH_GRAPHICS_WING)) {
         gConfig.gfx[giCurExe].fullScreen = 0;
         DDCleanUpWinGraphics();
         giGraphicsType = WINGRAPH_GRAPHICS_WING;
@@ -1000,7 +1000,7 @@ i32 SetGraphicsType(i32 graphicsType) {
     }
     memcpy(gpWindowManager->m_screen->m_pixels, screenBuffer, WINGRAPH_WIDTH * WINGRAPH_HEIGHT);
     H2_FREE(screenBuffer, 1286);
-    if (fullScreen != 0 && graphicsType == WINGRAPH_GRAPHICS_WING) {
+    if (fullScreen != 0 && graphicsType == IDX(WINGRAPH_GRAPHICS_WING)) {
         SetMenuStatus(1);
         ResizeWindow(x, y, width, height7);
     }

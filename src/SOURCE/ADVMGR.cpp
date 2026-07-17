@@ -845,7 +845,7 @@ i32 advManager::Main(struct tag_message& message) {
                         break;
                     case 67:
                         for (cheatDigitLocal = 0; cheatDigitLocal < 7; ++cheatDigitLocal) {
-                            if (cheatDigitLocal == RES_GOLD) {
+                            if (cheatDigitLocal == IDX(RES_GOLD)) {
                                 gpCurPlayer->m_resources[cheatDigitLocal] += 1000;
                             } else {
                                 gpCurPlayer->m_resources[cheatDigitLocal] += 10;
@@ -2463,7 +2463,7 @@ void advManager::DrawCell(
             s_drawCovered = 0;
         }
 
-        if ((drawMask & ADVMGR_DRAW_CLOUD) != 0 && gbDrawingPuzzle == 0) {
+        if ((drawMask & ADVMGR_DRAW_CLOUD) != 0 && IDX(gbDrawingPuzzle) == 0) {
             if (s_drawCovered != 0) {
                 if (s_drawFlipCloud != 0) {
                     FlipIconToBitmap(
@@ -4175,7 +4175,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         strcat(gText, "\n\n");
                         strcat(
                             gText,
-                            (heroLocal->m_eventFlags & visitedMaskValue) ? "(already visited)"
+                            (heroLocal->m_eventFlags & IDX(visitedMaskValue)) ? "(already visited)"
                                                                          : "(not visited)"
                         );
                     }
@@ -4230,7 +4230,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                             gText,
                             "%s\n\n%s",
                             gQuickViewText[currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK],
-                            (heroLocal->m_eventFlags & visitedMaskValue) ? "(already visited)"
+                            (heroLocal->m_eventFlags & IDX(visitedMaskValue)) ? "(already visited)"
                                                                          : "(not visited)"
                         );
                     } else {
@@ -7231,12 +7231,12 @@ void advManager::InsertSound(i32 x, i32 mapY, i32 distance, i32 soundLayer) {
     }
 
     soundId = GetSoundId(x, mapY);
-    if (soundId == ADVMGR_ENVIRONMENT_SOUND_NONE) {
+    if (soundId == IDX(ADVMGR_ENVIRONMENT_SOUND_NONE)) {
         return;
     }
 
     for (activeIndex = 0; activeIndex < ADVMGR_SOUND_CELL_COUNT; ++activeIndex) {
-        if (m_activeSounds[activeIndex].soundId == soundId) {
+        if (m_activeSounds[activeIndex].soundId == IDX(soundId)) {
             if (m_activeSounds[activeIndex].volume > distance) {
                 m_activeSounds[activeIndex].volume = distance;
                 m_activeSoundMask |= 1 << m_activeSounds[activeIndex].soundId;
@@ -8123,7 +8123,7 @@ void advManager::ScreenScroll(AdventureScrollDirection direction, i32 updatePoin
     }
 
     if (updatePointer) {
-        gpMouseManager->SetPointer(direction + ADVMGR_HOVER_SCROLL_FRAME_FIRST);
+        gpMouseManager->SetPointer(direction + IDX(ADVMGR_HOVER_SCROLL_FRAME_FIRST));
     }
 
     if (originX < ADVMGR_SCROLL_MIN_ORIGIN) {
@@ -9249,7 +9249,7 @@ void UpdateSystemOptions(i32 initialDraw) {
     message.payload.widget.id = EncodeAdventureSystemOption(ADVMGR_SYSTEM_OPTION_MUSIC_SOURCE);
     if (gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI) {
         musicQuality = 0;
-    } else if (gConfig.useOpera == CONFIG_OPERA_DISABLED) {
+    } else if (gConfig.useOpera == IDX(CONFIG_OPERA_DISABLED)) {
         musicQuality = 1;
     } else {
         musicQuality = 2;
@@ -9496,14 +9496,14 @@ i32 SystemOptionsHandler(struct tag_message& message) {
                                 }
                                 gpSoundManager->SetMusicQuality(IDX(CONFIG_MUSIC_SOURCE_CD));
                                 gConfig.useOpera = CONFIG_OPERA_DISABLED;
-                            } else if (gConfig.useOpera == CONFIG_OPERA_DISABLED) {
+                            } else if (gConfig.useOpera == IDX(CONFIG_OPERA_DISABLED)) {
                                 gConfig.useOpera = CONFIG_OPERA_ENABLED;
                             } else {
                                 if (gpSoundManager->m_midiStarted == 0) {
                                     gpSoundManager->MIDIStartup();
                                 }
                                 if (gpSoundManager->m_midiReady == 0) {
-                                    gConfig.useOpera = CONFIG_OPERA_ENABLED - gConfig.useOpera;
+                                    gConfig.useOpera = CONFIG_OPERA_ENABLED - IDX(gConfig.useOpera);
                                 } else {
                                     gpSoundManager->SetMusicQuality(IDX(CONFIG_MUSIC_SOURCE_MIDI));
                                 }

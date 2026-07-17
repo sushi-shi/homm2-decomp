@@ -219,7 +219,7 @@ void fullMap::ChangeTilesetIndex(
     i32 dummy;         // reserved unused    -> -0x10
 
     ptr = 0;
-    if (index == MAPCELL_SPRITE_NONE)
+    if (index == IDX(MAPCELL_SPRITE_NONE))
         t = 0;
     else
         t = tileset;

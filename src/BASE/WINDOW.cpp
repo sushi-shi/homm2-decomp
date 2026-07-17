@@ -182,7 +182,7 @@ void heroWindow::RemoveAndDeleteWidget(i32 id) {
         next = w->m_next;
         if (w->m_id == id) {
             RemoveWidget(w);
-            if ((m_winFlags & WINDOW_FLAG_OWNS_WIDGETS) != 0)
+            if ((m_winFlags & IDX(WINDOW_FLAG_OWNS_WIDGETS)) != 0)
                 delete w;
         }
         w = next;
@@ -198,7 +198,7 @@ void heroWindow::Close(void) {
     while (w != 0) {
         next = w->m_next;
         RemoveWidget(w);
-        if ((m_winFlags & WINDOW_FLAG_OWNS_WIDGETS) != 0) {
+        if ((m_winFlags & IDX(WINDOW_FLAG_OWNS_WIDGETS)) != 0) {
             delete w;
         }
         w = next;
@@ -307,7 +307,7 @@ void heroWindow::DrawWindow(i32 update, i32 firstId, i32 lastId) {
     local_24.payload.widget.command = WIDGET_COMMAND_DRAW;
     while (local_8 != 0) {
         PollSound();
-        if (firstId != WINDOW_ALL_WIDGETS_LOW || lastId != WINDOW_ALL_WIDGETS_HIGH) {
+        if (firstId != IDX(WINDOW_ALL_WIDGETS_LOW) || lastId != IDX(WINDOW_ALL_WIDGETS_HIGH)) {
             if (firstId <= local_8->m_id && local_8->m_id <= lastId)
                 local_8->Main(local_24);
         } else
@@ -315,7 +315,7 @@ void heroWindow::DrawWindow(i32 update, i32 firstId, i32 lastId) {
         local_8 = local_8->m_prev;
     }
     PollSound();
-    if (update != 0 && (m_winFlags & WINDOW_UPDATE_SUPPRESS_MASK) != 1) {
+    if (update != 0 && (m_winFlags & IDX(WINDOW_UPDATE_SUPPRESS_MASK)) != 1) {
         gpWindowManager->UpdateScreenRegion(m_posX, m_posY, m_winWidth, m_winHeight);
         PollSound();
     }

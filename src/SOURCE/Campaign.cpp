@@ -184,7 +184,7 @@ i32 game::HandleCampaignWin(void) {
 
 VA(0x00447c73, 0x343)
 void game::PlayPreScenarioSmacker(i32 side, i32 map) {
-    if (side == CAMPAIGN_ROLAND) {
+    if (side == IDX(CAMPAIGN_ROLAND)) {
         switch (map + 1) {
             case 1:
                 PlaySmacker(CAMPAIGN_SMACKER_ROLAND_INTRO);

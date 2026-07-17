@@ -91,12 +91,12 @@ extern "C" void PollSound(void) {
         gpMouseManager->NewUpdate(0);
     }
     if (KBTickCount() > glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT]) {
-        if (giCycleType == 1 || giCycleType == 3)
+        if (giCycleType == 1 || IDX(giCycleType) == 3)
             glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT] = KBTickCount() + 110;
         else
             glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT] = KBTickCount() + 200;
         bDoColorCycle = 1;
-        if (giGraphicsType == 1 && giMainVideoModeColorDepth != 8) {
+        if (giGraphicsType == 1 && IDX(giMainVideoModeColorDepth) != 8) {
             glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT] += 300;
             if (gbHeroMoving)
                 bDoColorCycle = 0;
@@ -1279,7 +1279,7 @@ char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 mode) {
             gText,
             "The %s produces %s.",
             GetBuildingName(race, building),
-            gArmyNamesPlural[gDwellingType[IDX(race)][building - BUILDING_SLOT_DWELLING_FIRST]]
+            gArmyNamesPlural[gDwellingType[IDX(race)][building - IDX(BUILDING_SLOT_DWELLING_FIRST)]]
         );
         return gText;
     }
@@ -1302,7 +1302,7 @@ char* GetBuildingName(FactionType race, BuildingSlotType building) {
     else if (building < BUILDING_SLOT_DWELLING_FIRST)
         return gNeutralBuildingNames[IDX(building)];
     else
-        return gDwellingNames[IDX(race)][building - BUILDING_SLOT_DWELLING_FIRST];
+        return gDwellingNames[IDX(race)][building - IDX(BUILDING_SLOT_DWELLING_FIRST)];
 }
 
 VA(0x004997d4, 0x138)
@@ -1314,7 +1314,7 @@ void GetBuildingCost(FactionType race, BuildingSlotType building, i32* const des
                && building <= BUILDING_SLOT_DWELLING_LAST) {
         memcpy(
             dest,
-            gDwellingCosts[IDX(race)][building - BUILDING_SLOT_DWELLING_FIRST],
+            gDwellingCosts[IDX(race)][building - IDX(BUILDING_SLOT_DWELLING_FIRST)],
             KB_BUILDING_RESOURCE_COUNT * sizeof(i32)
         );
     } else if (building == BUILDING_SLOT_MAGE_GUILD) {
@@ -1325,7 +1325,7 @@ void GetBuildingCost(FactionType race, BuildingSlotType building, i32* const des
     } else if (building == BUILDING_SLOT_SPECIAL) {
         memcpy(dest, gSpecialBuildingCosts[IDX(race)], KB_BUILDING_RESOURCE_COUNT * sizeof(i32));
     } else {
-        if (building >= KB_BUILDING_NEUTRAL_LIMIT)
+        if (building >= IDX(KB_BUILDING_NEUTRAL_LIMIT))
             return;
         memcpy(dest, gNeutralBuildingCosts[IDX(building)], KB_BUILDING_RESOURCE_COUNT * sizeof(i32));
     }
@@ -1417,20 +1417,20 @@ i32 CanBuild(town* t, BuildingSlotType building) {
         || (building == BUILDING_SLOT_UPGRADE_LAST
             && (t->m_buildings & IDX(KB_DWELLING_UPGRADE_SIXTH_FLAG))))
         return 0;
-    reqMask = gHierarchyMask[t->m_type][building - BUILDING_SLOT_DWELLING_FIRST];
+    reqMask = gHierarchyMask[t->m_type][building - IDX(BUILDING_SLOT_DWELLING_FIRST)];
     haveMask = t->m_buildings;
-    if (haveMask & KB_DWELLING_UPGRADE_FIRST_FLAG)
-        haveMask |= KB_DWELLING_FIRST_FLAG;
-    if (haveMask & KB_DWELLING_UPGRADE_SECOND_FLAG)
-        haveMask |= KB_DWELLING_SECOND_FLAG;
-    if (haveMask & KB_DWELLING_UPGRADE_THIRD_FLAG)
-        haveMask |= KB_DWELLING_THIRD_FLAG;
-    if (haveMask & KB_DWELLING_UPGRADE_FOURTH_FLAG)
-        haveMask |= KB_DWELLING_FOURTH_FLAG;
-    if (haveMask & KB_DWELLING_UPGRADE_SIXTH_FLAG)
-        haveMask |= KB_DWELLING_UPGRADE_FIFTH_FLAG;
-    if (haveMask & KB_DWELLING_UPGRADE_FIFTH_FLAG)
-        haveMask |= KB_DWELLING_FIFTH_FLAG;
+    if (haveMask & IDX(KB_DWELLING_UPGRADE_FIRST_FLAG))
+        haveMask |= IDX(KB_DWELLING_FIRST_FLAG);
+    if (haveMask & IDX(KB_DWELLING_UPGRADE_SECOND_FLAG))
+        haveMask |= IDX(KB_DWELLING_SECOND_FLAG);
+    if (haveMask & IDX(KB_DWELLING_UPGRADE_THIRD_FLAG))
+        haveMask |= IDX(KB_DWELLING_THIRD_FLAG);
+    if (haveMask & IDX(KB_DWELLING_UPGRADE_FOURTH_FLAG))
+        haveMask |= IDX(KB_DWELLING_FOURTH_FLAG);
+    if (haveMask & IDX(KB_DWELLING_UPGRADE_SIXTH_FLAG))
+        haveMask |= IDX(KB_DWELLING_UPGRADE_FIFTH_FLAG);
+    if (haveMask & IDX(KB_DWELLING_UPGRADE_FIFTH_FLAG))
+        haveMask |= IDX(KB_DWELLING_FIFTH_FLAG);
     if ((reqMask & haveMask) == reqMask) {
         if (t->m_type == IDX(FACTION_NECROMANCER)
             && building == BUILDING_SLOT_NECROMANCER_MAGE_PREREQUISITE && t->m_buildState <= 1)
@@ -1467,7 +1467,7 @@ i32 GetBuildingBaseResourceValue(FactionType race, BuildingSlotType building, i3
         else
             return gNeutralBaseResourceValues[IDX(building)];
     } else {
-        return gDwellingBaseResourceValues[IDX(race)][building - BUILDING_SLOT_DWELLING_FIRST];
+        return gDwellingBaseResourceValues[IDX(race)][building - IDX(BUILDING_SLOT_DWELLING_FIRST)];
     }
 }
 
@@ -2329,12 +2329,12 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
         gbGameOver = true;
         giEndSequence = 0;
     }
-    if (forcedResult == CHECK_END_GAME_FORCE_VICTORY) {
+    if (forcedResult == IDX(CHECK_END_GAME_FORCE_VICTORY)) {
         winFlag = 1;
         gbGameOver = true;
         giEndSequence = 1;
     }
-    if (forcedResult == CHECK_END_GAME_FORCE_DEFEAT) {
+    if (forcedResult == IDX(CHECK_END_GAME_FORCE_DEFEAT)) {
         defeated = 1;
         gbGameOver = true;
         giEndSequence = 0;
@@ -2691,7 +2691,7 @@ void ClearMapExtra(void) {
 VA(0x0049cd75, 0x9f)
 i32 GetMonType(i32 score, i32 campaign) {
     i32 idx;
-    for (idx = CREATURE_COUNT - 1; idx >= 0; idx--) {
+    for (idx = CREATURE_COUNT - 1; IDX(idx) >= 0; idx--) {
         if (campaign == HIGH_SCORE_CAMPAIGN || campaign == HIGH_SCORE_EXPANSION_CAMPAIGN) {
             if (giScoreCampaignMon[idx][IDX(MONSTER_SCORE_THRESHOLD)] >= score)
                 return giScoreCampaignMon[idx][IDX(MONSTER_SCORE_TYPE)];
@@ -3636,7 +3636,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
             if (gbInCampaign)
                 gpGame->m_campaignCheated = 1;
             for (loopIndex = 0; loopIndex < APP_MENU_RESOURCE_COUNT; loopIndex++) {
-                if (loopIndex == RES_GOLD)
+                if (loopIndex == IDX(RES_GOLD))
                     gpCurPlayer->m_resources[loopIndex] += APP_MENU_GOLD_BONUS;
                 else
                     gpCurPlayer->m_resources[loopIndex] += APP_MENU_RESOURCE_BONUS;
@@ -5880,7 +5880,7 @@ DATA(0x004faeb0) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      40,
      0,
      "phoe",
-     IDX(MONSTER_ATTRIBUTE_WIDE) | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER},
+     IDX(MONSTER_ATTRIBUTE_WIDE) | IDX(MONSTER_ATTRIBUTE_FLYING) | IDX(MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER)},
     {{60, 154},
      26,
      8,
@@ -5893,7 +5893,7 @@ DATA(0x004faeb0) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      2,
      8,
      "cntr",
-     IDX(MONSTER_ATTRIBUTE_WIDE) | MONSTER_ATTRIBUTE_RANGED},
+     IDX(MONSTER_ATTRIBUTE_WIDE) | IDX(MONSTER_ATTRIBUTE_RANGED)},
     {{200, 579}, 29, 6, 15, 3, 6, 4, 7, 2, 3, 0, "garg", IDX(MONSTER_ATTRIBUTE_FLYING)},
     {{300, 1101},
      37,
@@ -5907,7 +5907,7 @@ DATA(0x004faeb0) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      5,
      0,
      "grif",
-     IDX(MONSTER_ATTRIBUTE_WIDE) | MONSTER_ATTRIBUTE_FLYING},
+     IDX(MONSTER_ATTRIBUTE_WIDE) | IDX(MONSTER_ATTRIBUTE_FLYING)},
     {{400, 1751}, 44, 3, 35, 3, 4, 9, 8, 5, 10, 0, "mino", 0},
     {{500, 2252}, 45, 3, 45, 3, 6, 9, 8, 5, 10, 0, "mino", 0},
     {{800, 2878}, 36, 2, 75, 3, 2, 8, 9, 6, 12, 0, "hydr", IDX(MONSTER_ATTRIBUTE_WIDE)},
@@ -5923,7 +5923,7 @@ DATA(0x004faeb0) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      50,
      0,
      "drgn",
-     IDX(MONSTER_ATTRIBUTE_WIDE) | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER},
+     IDX(MONSTER_ATTRIBUTE_WIDE) | IDX(MONSTER_ATTRIBUTE_FLYING) | IDX(MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER)},
     {{3500, 22962},
      68,
      1,
@@ -5936,7 +5936,7 @@ DATA(0x004faeb0) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      50,
      0,
      "drgn",
-     IDX(MONSTER_ATTRIBUTE_WIDE) | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER},
+     IDX(MONSTER_ATTRIBUTE_WIDE) | IDX(MONSTER_ATTRIBUTE_FLYING) | IDX(MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER)},
     {{4000, 28144},
      74,
      1,
@@ -5949,7 +5949,7 @@ DATA(0x004faeb0) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      50,
      0,
      "drgn",
-     IDX(MONSTER_ATTRIBUTE_WIDE) | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER},
+     IDX(MONSTER_ATTRIBUTE_WIDE) | IDX(MONSTER_ATTRIBUTE_FLYING) | IDX(MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER)},
     {{50, 134}, 27, 8, 3, 4, 3, 2, 1, 1, 3, 12, "half", IDX(MONSTER_ATTRIBUTE_RANGED)},
     {{150, 493}, 33, 6, 15, 4, 6, 5, 4, 2, 3, 0, "boar", IDX(MONSTER_ATTRIBUTE_WIDE)},
     {{300, 951}, 19, 4, 30, 4, 2, 5, 10, 4, 5, 0, "golm", 0},
@@ -5966,7 +5966,7 @@ DATA(0x004faeb0) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      8,
      0,
      "roc_",
-     IDX(MONSTER_ATTRIBUTE_WIDE) | MONSTER_ATTRIBUTE_FLYING},
+     IDX(MONSTER_ATTRIBUTE_WIDE) | IDX(MONSTER_ATTRIBUTE_FLYING)},
     {{600, 1935}, 32, 2, 30, 4, 5, 11, 7, 7, 9, 12, "mage", IDX(MONSTER_ATTRIBUTE_RANGED)},
     {{700, 2469}, 35, 2, 35, 4, 6, 12, 8, 7, 9, 24, "mage", IDX(MONSTER_ATTRIBUTE_RANGED)},
     {{2000, 9589}, 42, 1, 150, 4, 4, 13, 10, 20, 30, 0, "titn", 0},
@@ -5988,7 +5988,7 @@ DATA(0x004faeb0) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      7,
      0,
      "vamp",
-     IDX(MONSTER_ATTRIBUTE_FLYING) | MONSTER_ATTRIBUTE_UNDEAD},
+     IDX(MONSTER_ATTRIBUTE_FLYING) | IDX(MONSTER_ATTRIBUTE_UNDEAD)},
     {{650, 2461},
      45,
      3,
@@ -6001,7 +6001,7 @@ DATA(0x004faeb0) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      7,
      0,
      "vamp",
-     IDX(MONSTER_ATTRIBUTE_FLYING) | MONSTER_ATTRIBUTE_UNDEAD},
+     IDX(MONSTER_ATTRIBUTE_FLYING) | IDX(MONSTER_ATTRIBUTE_UNDEAD)},
     {{750, 2069},
      28,
      2,
@@ -6014,7 +6014,7 @@ DATA(0x004faeb0) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      10,
      12,
      "lich",
-     IDX(MONSTER_ATTRIBUTE_RANGED) | MONSTER_ATTRIBUTE_UNDEAD},
+     IDX(MONSTER_ATTRIBUTE_RANGED) | IDX(MONSTER_ATTRIBUTE_UNDEAD)},
     {{900, 2625},
      29,
      2,
@@ -6027,7 +6027,7 @@ DATA(0x004faeb0) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      10,
      24,
      "lich",
-     IDX(MONSTER_ATTRIBUTE_RANGED) | MONSTER_ATTRIBUTE_UNDEAD},
+     IDX(MONSTER_ATTRIBUTE_RANGED) | IDX(MONSTER_ATTRIBUTE_UNDEAD)},
     {{1500, 11744},
      78,
      1,
@@ -6040,7 +6040,7 @@ DATA(0x004faeb0) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      45,
      0,
      "drgn",
-     IDX(MONSTER_ATTRIBUTE_WIDE) | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_UNDEAD},
+     IDX(MONSTER_ATTRIBUTE_WIDE) | IDX(MONSTER_ATTRIBUTE_FLYING) | IDX(MONSTER_ATTRIBUTE_UNDEAD)},
     {{50, 177}, 35, 12, 4, 6, 5, 6, 1, 1, 2, 0, "rogu", 0},
     {{200, 805}, 40, 4, 20, 6, 6, 7, 6, 2, 5, 0, "nmad", IDX(MONSTER_ATTRIBUTE_WIDE)},
     {{1000, 1545},
@@ -6055,7 +6055,7 @@ DATA(0x004faeb0) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      6,
      0,
      "ghst",
-     IDX(MONSTER_ATTRIBUTE_FLYING) | MONSTER_ATTRIBUTE_UNDEAD},
+     IDX(MONSTER_ATTRIBUTE_FLYING) | IDX(MONSTER_ATTRIBUTE_UNDEAD)},
     {{650, 5692}, 60, 2, 50, 6, 6, 10, 9, 20, 30, 0, "geni", IDX(MONSTER_ATTRIBUTE_FLYING)},
     {{500, 1979}, 40, 5, 35, 6, 4, 8, 9, 6, 10, 0, "meds", IDX(MONSTER_ATTRIBUTE_WIDE)},
     {{500, 1732}, 35, 3, 50, 6, 3, 8, 8, 4, 5, 0, "eelm", 0},

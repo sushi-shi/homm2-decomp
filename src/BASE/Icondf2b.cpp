@@ -76,7 +76,7 @@ void FlipDimIconToBitmap(
     gFDY = y + entryY;
     i32 X = w + x0 - 1;
     gFDXEnd = X;
-    if (clip != ICON_DRAW_NO_CLIP) {
+    if (clip != IDX(ICON_DRAW_NO_CLIP)) {
         i32 currentY;
         if (x0 < clipX || clipW + clipX < w + x0 || (currentY = gFDY) < clipY
             || entry->h + currentY > clipY + clipH) {
@@ -102,7 +102,7 @@ void FlipDimIconToBitmap(
         }
         gFDRun = cmd;
         if (cmd != ICON_RLE_MONO_NEWLINE_COMMAND) {
-            if (clip == ICON_DRAW_NO_CLIP) {
+            if (clip == IDX(ICON_DRAW_NO_CLIP)) {
                 u32 cnt;
                 gFDCnt = 0;
                 u8* dst = (gFDRow - cmd) + X + 1;

@@ -76,7 +76,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
         }
     }
 
-    if (!forceUpdate && giOverviewType == iLastDynamicType
+    if (!forceUpdate && giOverviewType == IDX(iLastDynamicType)
         && giOverviewTop[iLastDynamicType] == iLastDynamicTop) {
         return;
     }
@@ -746,9 +746,9 @@ void game::SetupNewOverviewType(OverviewType overviewType, i32 redrawFrom) {
     }
     for (title = 0; title < OVERVIEW_TITLE_COUNT; title++) {
         titleCopy = static_cast<char*>(
-            H2_ALLOC(strlen(cOverviewText[giOverviewType * OVERVIEW_TITLE_COUNT + title]) + 1, 740)
+            H2_ALLOC(strlen(cOverviewText[giOverviewType * IDX(OVERVIEW_TITLE_COUNT) + title]) + 1, 740)
         );
-        strcpy(titleCopy, cOverviewText[giOverviewType * OVERVIEW_TITLE_COUNT + title]);
+        strcpy(titleCopy, cOverviewText[giOverviewType * IDX(OVERVIEW_TITLE_COUNT) + title]);
         textWidgetTitle[title] = new textWidget(
             titleLefts[IDX(giOverviewType)][OD_STEER(title)],
             3,

@@ -87,7 +87,7 @@ void MonoIconToBitmap(
     gMonoX0 = entry->x + x;
     gMonoX = gMonoX0;
     gMonoY = entry->y + y;
-    if (clip != ICON_DRAW_NO_CLIP) {
+    if (clip != IDX(ICON_DRAW_NO_CLIP)) {
         if (clipX > gMonoX0 || gMonoX0 + entry->w > clipX + clipW || clipY > gMonoY
             || gMonoY + entry->h > clipY + clipH) {
             clip = ICON_DRAW_CLIP;
@@ -114,7 +114,7 @@ void MonoIconToBitmap(
         gMonoRun = cmd;
         if (cmd != ICON_RLE_MONO_NEWLINE_COMMAND) {
             // solid mono fill of `cmd` pixels
-            if (clip == ICON_DRAW_NO_CLIP) {
+            if (clip == IDX(ICON_DRAW_NO_CLIP)) {
                 memset(row + gMonoX, color, cmd);
             } else {
                 i32 right;
