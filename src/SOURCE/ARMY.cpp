@@ -409,7 +409,7 @@ void army::DrawToBuffer(i32 x, i32 y, i32 effectsOnly) {
                 11,
                 &m_creatureLimits,
                 0,
-                0xed,
+                237,
                 0,
                 0
             );

@@ -16,6 +16,7 @@
 #include <BASE/icon2bc.h>
 #include <BASE/Iconf2b.h>
 #include <BASE/Misc.h>
+#include <BASE/widgetKind.h>
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/inputManager.h>
@@ -5385,7 +5386,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                         "smalfont.fnt",
                         1,
                         -1,
-                        0x200,
+                        WIDGET_KIND_TEXT,
                         1
                     );
                     if (creatureTextWidgetsLocal[armyIndex] == 0) {
@@ -5465,7 +5466,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                 "smalfont.fnt",
                 1,
                 -1,
-                0x200,
+                WIDGET_KIND_TEXT,
                 1
             );
             if (creatureTextWidgetsLocal[armyIndex] == 0) {
@@ -5524,7 +5525,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                     "smalfont.fnt",
                     1,
                     -1,
-                    0x200,
+                    WIDGET_KIND_TEXT,
                     1
                 );
                 if (creatureTextWidgetsLocal[armyIndex] == 0) {
@@ -5715,8 +5716,18 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
         } else {
             sprintf(emptyArmyLabel, "None");
         }
-        emptyArmyTextState =
-            new textWidget(13, 117, 211, 12, emptyArmyLabel, "smalfont.fnt", 1, -1, 0x200, 1);
+        emptyArmyTextState = new textWidget(
+            13,
+            117,
+            211,
+            12,
+            emptyArmyLabel,
+            "smalfont.fnt",
+            1,
+            -1,
+            WIDGET_KIND_TEXT,
+            1
+        );
         if (emptyArmyTextState == 0) {
             MemError();
         }
@@ -5819,7 +5830,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
                 "smalfont.fnt",
                 1,
                 -1,
-                0x200,
+                WIDGET_KIND_TEXT,
                 1
             );
             if (armyTexts[widgetIndexWidget] == 0) {
@@ -5896,7 +5907,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
                     "smalfont.fnt",
                     1,
                     -1,
-                    0x200,
+                    WIDGET_KIND_TEXT,
                     1
                 );
                 if (armyTexts[widgetIndexWidget] == 0) {

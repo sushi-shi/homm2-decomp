@@ -472,8 +472,8 @@ void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
     campaignIcon = new iconWidget(
         24,
         25,
-        0x178,
-        0x31,
+        376,
+        49,
         "x_cmpext.icn",
         m_campaignId + EXPANSION_CAMPAIGN_ICON_FRAME_BASE,
         0,

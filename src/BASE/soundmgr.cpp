@@ -276,7 +276,7 @@ void soundManager::CDPlay(i32 param_1, i32 param_2, i32 param_3, i32 param_4) {
     if (m_fadeSteps > 0) {
         m_fadeSteps = 11;
         glTimers[GLOBAL_MUSIC_FADE_TIMER_SLOT] = KBTickCount() + 480;
-        CDSetVolume(0xa, 0);
+        CDSetVolume(10, 0);
     } else {
         CDSetVolume(param_3, 0);
     }
@@ -379,7 +379,7 @@ struct _DIG_DRIVER* WAVE_init_driver(u32l param_1, u16 param_2, u16 param_3, u16
         return 0;
     }
     if (gbUseWaveout != 0)
-        AIL_set_preference(0xf, 1);
+        AIL_set_preference(15, 1);
     gWaveFormat.wf.wFormatTag = 1;
     gWaveFormat.wf.nChannels = param_3;
     gWaveFormat.wf.nSamplesPerSec = param_1;
@@ -761,7 +761,7 @@ void soundManager::SetMusicQuality(i32 param_1) {
         local_8 = m_currentTrack;
         MIDIStop();
     }
-    memset(m_savedTrackPositions, 0, 0xf0);
+    memset(m_savedTrackPositions, 0, 240);
     gConfig.musicSource = param_1;
     if (local_8 >= 0)
         PlayAmbientMusic(local_8, 0, -1);

@@ -80,7 +80,7 @@ void DoRipple(bitmap* source, bitmap* destination, i32 height, i32 strength) {
             DelayTil(&deadline);
         }
         position += 4;
-    } while (position < 0x299);
+    } while (position < 665);
 
     gpMouseManager->ShowColorPointer();
 }
