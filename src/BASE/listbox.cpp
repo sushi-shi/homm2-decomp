@@ -260,13 +260,13 @@ i32 listBoxWidget::Main(tag_message &message)
         switch (message.payload.widget.command) {
         case 0x36:
             if (m_id == message.payload.widget.id) {
-                m_selectedIndex = reinterpret_cast<i32>(message.payload.widget.data.text);
+                m_selectedIndex = message.payload.widget.data.value;
                 return 1;
             }
             break;
         case 0x37:
             if (m_id == message.payload.widget.id) {
-                message.payload.widget.data.text = reinterpret_cast<char *>(static_cast<i32>(m_selectedIndex));
+                message.payload.widget.data.value = m_selectedIndex;
                 return 1;
             }
             break;
@@ -324,7 +324,7 @@ i32 listBoxWidget::Main(tag_message &message)
             break;
         case 0x3a:
             if (m_id == message.payload.widget.id)
-                DeleteItem(reinterpret_cast<i32>(message.payload.widget.data.text));
+                DeleteItem(message.payload.widget.data.value);
             break;
         case 0x3b:
             if (m_id == message.payload.widget.id)
@@ -494,7 +494,7 @@ i32 listBoxWidget::ProcessMouseMessage(tag_message &message)
             message.payload.widget.id = m_id;
             i32 selectedIndex = m_selectedIndex;
             message.payload.widget.parameter = 1;
-            message.payload.widget.data.text = reinterpret_cast<char *>(selectedIndex);
+            message.payload.widget.data.value = selectedIndex;
             if (m_lastSelectedIndex == m_selectedIndex) {
                 i32 lastTick = m_lastClickTime;
                 i32 currentTick = KBTickCount();

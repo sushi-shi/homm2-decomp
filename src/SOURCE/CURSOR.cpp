@@ -1081,8 +1081,7 @@ void advManager::ProcessMapChange(SMapChange change)
     }
     if (change.player >= 0 && change.player < CURSOR_PLAYER_COUNT) {
         giCurPlayer = change.player;
-        gpCurPlayer = reinterpret_cast<playerData *>(
-            &gpGame->m_players[giCurPlayer]);
+        gpCurPlayer = &gpGame->m_players[giCurPlayer];
         giCurPlayerBit = 1 << giCurPlayer;
     }
 
