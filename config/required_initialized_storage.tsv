@@ -98,7 +98,7 @@ name	unit	size	retail_sha256	highlow_count	audit
 ?gfCombatSpeedMod@@3PAMA	SOURCE/KB	0xc	402fb14a9aa0c9209e8ab5b8fdbc06c7e0f3ecd122887dce2d6fe56754bae9c0	0	bytes
 ?gCombatFxNames@@3PAPADA	SOURCE/KB	0x80	5867184a5aea03349c0b7320ffa2c0ab05e64a9bdda5a66689195127a64f8644	32	cstring-pointer-table
 ?gArtifactLevel@@3PAEA	SOURCE/KB	0x68	502d569f42aca24614bec865426e496a6af711254e435bcfa8ba3ca8a2949fef	0	bytes
-?gArtifactBaseRV@@3PAHA	SOURCE/KB	0x190	f56e69f6a97ab13d50e9675cd9eaf1b6f4b00b35c0ff7d123504e1a8932144fe	0	bytes
+?gArtifactBaseRV@@3PAHA	SOURCE/KB	0x19c	6ef1819ee7d62240eee412d69550c71f6c0e0fe25b0d4376ba8aa16e7d477916	0	bytes
 ?gMonsterDatabase@@3PAUtag_monsterInfo@@A	SOURCE/KB	0x6b4	bb6793526c7d46eb3f3c5351b5386176b6421b4b0fca3deacd2014afda651a19	0	bytes
 ?gfStatPower@@3PAMA	SOURCE/KB	0xa8	502f9a8e466577a3eeffd3e63337f1552ea2db8db9c38903e23518b4693ef727	0	bytes
 ?gfBattleStat@@3PAMA	SOURCE/KB	0xa8	51ca4928d3f4b68add26123aac240322c71929b3dbf49e3021c99adc3ccc04a5	0	bytes
@@ -137,7 +137,7 @@ name	unit	size	retail_sha256	highlow_count	audit
 ?gSpecialBuildingCosts@@3PAY06HA	SOURCE/KB	0xa8	57cbd4af68a650da30b390b239760c9ef801bf232ec0c933ae0d36ade892ebfa	0	bytes
 ?gNeutralBuildingCosts@@3PAY06HA	SOURCE/KB	0x1c0	18a0f9ae8f2ac1caa4ddb8f3413c5cfdf4a7b64a7eb462e4a9a8e4abacb09d69	0	bytes
 ?gMageBaseResourceValues@@3PAHA	SOURCE/KB	0x18	caa65a4847df46d384f52e970c4c6e1a98a5b53471efc04e91223a3fbcb81099	0	bytes
-?gNeutralBaseResourceValues@@3PAHA	SOURCE/KB	0x40	861425936c09920466b053d227d3230c25c3cad28991a843d5fe143e4e0ad3d0	0	bytes
+?gNeutralBaseResourceValues@@3PAHA	SOURCE/KB	0x50	30497b827dd384d80c7cd3f1af9e2f692d00206a6ca68bd23d683e0040c36190	0	bytes
 ?gSpecialBuildingBaseResourceValues@@3PAHA	SOURCE/KB	0x18	9e0f1c6f92ddf2d808c2238d51b17111c7fff525ad5b5a8fe7520387657285af	0	bytes
 ?gDwellingBaseResourceValues@@3PAY0M@HA	SOURCE/KB	0x120	23e99f63007263c7b59a6c763ac6568d3d317594eeeeefe3d5ada73182e28bb0	0	bytes
 ?gDwellingCosts@@3PAY1M@6HA	SOURCE/KB	0x7e0	7127c6a4b93cdcfb6a4bf30bd6e5b3753180cf30ada820a0887620950ecf586a	0	bytes

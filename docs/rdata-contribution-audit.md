@@ -5,10 +5,21 @@ starts at RVA `0xeb000`; the pinned LINK 3.00 candidate starts at RVA `0xf0000`.
 Offsets below are relative to each image's own `.rdata`, so that `0x5000` section-RVA
 difference is intentionally removed.
 
-The current SOURCE result is structurally complete: every public readonly anchor
-from TOWNMGR through HISCORE is exact relative to `.rdata`. The first remaining
-relative drift is BASE/FONT (`0x9e4` retail, `0xb10` candidate, `+0x12c`), followed
-by BASE/RESMGR (`0x9f0` retail, `0xb18` candidate, `+0x128`).
+The current linked result is exact through the TOWNMGR vtable at relative offset
+`0x140`. The first later public anchor, the swapManager vtable, is at `0x650` in
+retail and `0x660` in the candidate (`+0x10`). The advManager vtable retains that
+`+0x10` delta. Alignment after it raises the inherited delta to `+0x18` at the
+highScoreManager vtable. FONT (`0x9e4` retail, `0x9fc` candidate) and RESMGR
+(`0x9f0` retail, `0xa08` candidate) retain the same `+0x18`; they do not prove a
+new BASE contribution defect.
+
+The underlying SOURCE payload difference is narrower than those anchor deltas.
+SPELLS (`0xb4`), COMMAND (`0x64`), Viewwrld (`0x10`), and ARMY (`0x70`) reach
+their next retail anchors with the expected sizes and alignment. PHILAI's
+ordinary readonly contribution is `0x368`, while the retail owner span is
+`0x360`. That `+0x8` payload causes the later `+0x10` and `+0x18` aligned anchor
+deltas. It remains source/compiler constant-pool recovery work, not a linker or
+BASE/FONT placement issue.
 
 ## Historical SOURCE recovery
 
@@ -20,7 +31,7 @@ candidate `TOWNMGR.obj` ordinary readonly contribution is `0xc0` bytes at offset
 its SHA-1 is `478e9567157c...`, and the complete bytes occur once at retail offset `0x80`.
 Neither contribution causes the first drift.
 
-The next candidate readonly sequence is:
+An older candidate readonly sequence was:
 
 | Candidate offset | Owner | Raw/aligned bytes | Retail evidence |
 | ---: | :--- | ---: | :--- |
