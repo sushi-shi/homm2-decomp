@@ -24,6 +24,50 @@
       "note": "Height-before-width declaration order restores retail register roles; all 0xf0 raw bytes and both ordered BlitBitmap REL32 owner/addend tuples are exact."
     },
     {
+      "unit": "BASE/BORDER",
+      "function": "?Main@border@@UAEHAAUtag_message@@@Z",
+      "source_hash": "e967a43e7f03",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 1,
+      "before": 99.56322,
+      "after": 99.56322,
+      "note": "files=src/BASE/BORDER.cpp; complete semantics and relocs=9/9; signed-equivalent CMP orientation at +0x78/+0x7b; behavioral bug=none"
+    },
+    {
+      "unit": "BASE/BUTTON",
+      "function": "?Deselect@button@@QAEFAAUtag_message@@@Z",
+      "source_hash": "be16510063ee",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 1,
+      "before": 99.77778,
+      "after": 99.77778,
+      "note": "files=src/BASE/BUTTON.cpp; complete semantics and relocs=4/4; /O2 virtual-call scheduling wall at +0x19; behavioral bug=none"
+    },
+    {
+      "unit": "BASE/BUTTON",
+      "function": "?Main@button@@UAEHAAUtag_message@@@Z",
+      "source_hash": "30f87cfaee1d",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 94.5803,
+      "after": 94.5803,
+      "note": "files=src/BASE/BUTTON.cpp; complete CFG and relocs=36/36; repeated virtual-call and hit-test register scheduling walls; behavioral bug=none"
+    },
+    {
+      "unit": "BASE/BUTTON",
+      "function": "?Select@button@@QAEFAAUtag_message@@@Z",
+      "source_hash": "86b0f5316ec0",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 1,
+      "before": 94.71739,
+      "after": 94.71739,
+      "note": "files=src/BASE/BUTTON.cpp; complete semantics and relocs=6/6; /O2 coordinate register-allocation wall with identical shifted setup; behavioral bug=none"
+    },
+    {
       "unit": "BASE/Bzip",
       "function": "?DecodeData@@YIJPAD0K@Z",
       "source_hash": "f24a34e13474",
@@ -772,6 +816,28 @@
       "note": "Nested playback member preserves the exact frame, CFG, executable bytes under relocation-union masking, and all 23 ordered relocation targets/table entries."
     },
     {
+      "unit": "BASE/TEXTWDGT",
+      "function": "??0textWidget@@QAE@XZ",
+      "source_hash": "c6a0ff0d6ce3",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 97.36842,
+      "after": 97.36842,
+      "note": "files=src/BASE/TEXTWDGT.cpp; complete semantics and relocs=2/2; retained-this ESI-versus-EDI allocation wall; behavioral bug=none"
+    },
+    {
+      "unit": "BASE/TEXTWDGT",
+      "function": "?Main@textWidget@@UAEHAAUtag_message@@@Z",
+      "source_hash": "67e84325fee9",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 2,
+      "before": 99.6,
+      "after": 99.6,
+      "note": "files=src/BASE/TEXTWDGT.cpp; complete semantics and relocs=6/6; signed-equivalent CMP orientation at +0x88 and owner addends +0x58/+0x84 exact; behavioral bug=none"
+    },
+    {
       "unit": "BASE/Textntry",
       "function": "??0textEntryWidget@@QAE@FFFFFPAD0F0FFFFHH@Z",
       "source_hash": "f29eef3d8ec7",
@@ -814,6 +880,17 @@
       "before": 99.932434,
       "after": 99.932434,
       "note": "Retained raw-exact maximum; current residual is one commutative SIB byte after two neutral source/TU-state spellings; exact 0x130 frame and 8/8 ordered relocations."
+    },
+    {
+      "unit": "BASE/WIDGET",
+      "function": "?Main@widget@@UAEHAAUtag_message@@@Z",
+      "source_hash": "ed4b9c712dd0",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 1,
+      "before": 99.76667,
+      "after": 99.76667,
+      "note": "files=src/BASE/WIDGET.cpp; complete semantics and relocs=17/17; six register-allocation bytes in mouse hit test and +0x77 onward exact; behavioral bug=none"
     },
     {
       "unit": "BASE/soundmgr",
