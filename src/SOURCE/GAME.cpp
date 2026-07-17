@@ -773,7 +773,7 @@ void game::SetupOrigData(void) {
         m_heroRecs[i].m_destinationY = -1;
         m_heroRecs[i].m_destinationX = m_heroRecs[i].m_destinationY;
         m_heroRecs[i].m_level = 1;
-        m_heroRecs[i].m_spellPoints = m_heroRecs[i].Stats(3) * 10;
+        m_heroRecs[i].m_spellPoints = m_heroRecs[i].Stats(HeroPrimaryStat(3)) * 10;
         m_heroRecs[i].m_secondarySkillCount = 0;
         for (j = 0; j < 14; j++) {
             m_heroRecs[i].m_secondarySkills[j] = 0;
@@ -2783,7 +2783,7 @@ void game::ViewArmy(
     sprintf(gText, "%s%d", cArmyDetail[0], static_cast<i32>(monster8->attack));
     strcat(details9, gText);
     if (theHero)
-        modifier15 += theHero->Stats(0);
+        modifier15 += theHero->Stats(HeroPrimaryStat(0));
     if (theArmy)
         modifier15 = theArmy->m_monster.attack - monster8->attack;
     if (modifier15) {
@@ -2795,7 +2795,7 @@ void game::ViewArmy(
     sprintf(gText, "\n%s%d", cArmyDetail[1], static_cast<i32>(monster8->defense));
     strcat(details9, gText);
     if (theHero)
-        modifier15 += theHero->Stats(1);
+        modifier15 += theHero->Stats(HeroPrimaryStat(1));
     if (theArmy)
         modifier15 = theArmy->m_monster.defense - monster8->defense;
     if (modifier15) {
@@ -3511,7 +3511,7 @@ void game::PerDay(void) {
     for (player = 0; player < GAME_HERO_COUNT; player++) {
         currentHero6 = &m_heroRecs[player];
         restoredSpellPoints13 = currentHero6->m_spellPoints;
-        maxSpellPoints9 = currentHero6->Stats(3) * 10;
+        maxSpellPoints9 = currentHero6->Stats(HeroPrimaryStat(3)) * 10;
         restoredSpellPoints13 += currentHero6->m_secondarySkills[8] + 1;
         if (currentHero6->HasArtifact(ARTIFACT_POWER_RING))
             restoredSpellPoints13 += 2;
@@ -3529,7 +3529,7 @@ void game::PerDay(void) {
             continue;
         if (currentTown4->m_occupyingHeroId != -1) {
             townHero12 = GetHero(currentTown4->m_occupyingHeroId);
-            maxSpellPoints9 = townHero12->Stats(3) * 10;
+            maxSpellPoints9 = townHero12->Stats(HeroPrimaryStat(3)) * 10;
             if (townHero12->m_spellPoints < maxSpellPoints9)
                 townHero12->m_spellPoints = static_cast<i16>(maxSpellPoints9);
         }

@@ -1169,7 +1169,7 @@ void army::SpecialAttack(void) {
     switch (m_monsterType) {
         case CREATURE_ARCHMAGE:
             if (SRandom(1, ARMY_PERCENT_MAX) < ARMY_ARCHMAGE_DISPEL_CHANCE && target_1
-                && target_1->SpellCastWorks(102)) {
+                && target_1->SpellCastWorks(SpellType(102))) {
                 target_1->m_spellEffect = 102;
             }
             break;
@@ -1198,7 +1198,7 @@ void army::SpecialAttack(void) {
     }
     if (m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BERSERK)]
         || m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_HYPNOTIZE)]) {
-        CancelSpellType(1);
+        CancelSpellType(ArmySpellCancelType(1));
         gpCombatManager->DrawFrame(1, 0, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
     }
 }
@@ -1637,7 +1637,7 @@ void army::DoAttack(i32 retaliation) {
     if (!retaliation
         && (m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BERSERK)]
             || m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_HYPNOTIZE)])) {
-        CancelSpellType(1);
+        CancelSpellType(ArmySpellCancelType(1));
         gpCombatManager->DrawFrame(1, 0, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
     }
     targetHex_3 = -1;
@@ -1728,7 +1728,7 @@ i32 army::WalkTo(i32 destination) {
             direction_3 = -1;
         }
     }
-    CancelSpellType(0);
+    CancelSpellType(ArmySpellCancelType(0));
     m_animationSequence = ARMY_ANIMATION_STAND;
     m_animationFrame = 0;
     gpCombatManager->DrawFrame(1, 0, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
@@ -1786,7 +1786,7 @@ i32 army::AttackTo(i32 destination) {
                     return ARMY_PATH_BLOCKED;
                 }
             }
-            CancelSpellType(0);
+            CancelSpellType(ArmySpellCancelType(0));
             m_attackDirection = static_cast<u8>(gpSearchArray->m_storage.path.directions[1]);
             gpCombatManager->TestRaiseDoor();
             DoAttack(0);
@@ -2314,7 +2314,7 @@ void army::PowEffect(i32 effect, i32 resetLimits, i32 effectX, i32 effectY) {
             if (current->m_damagePending && current->m_spellEffect != ARMY_NO_EFFECT
                 && current->m_spellEffect != ARMY_DELAYED_MEDUSA_EFFECT) {
                 gpCombatManager
-                    ->CastSpell(current->m_spellEffect, current->m_hex, 1, ARMY_NO_EFFECT);
+                    ->CastSpell(SpellType(current->m_spellEffect), current->m_hex, 1, ARMY_NO_EFFECT);
                 current->m_spellEffect = ARMY_NO_EFFECT;
             }
         }
@@ -2384,7 +2384,7 @@ void army::PowEffect(i32 effect, i32 resetLimits, i32 effectX, i32 effectY) {
             current = &gpCombatManager->m_armies[side_4][index_10];
             if (current->m_damagePending && current->m_spellEffect == ARMY_DELAYED_MEDUSA_EFFECT) {
                 gpCombatManager
-                    ->CastSpell(current->m_spellEffect, current->m_hex, 1, ARMY_NO_EFFECT);
+                    ->CastSpell(SpellType(current->m_spellEffect), current->m_hex, 1, ARMY_NO_EFFECT);
                 current->m_spellEffect = ARMY_NO_EFFECT;
             }
             current->m_drawSpellEffect = 0;
@@ -2732,7 +2732,7 @@ i32 army::SetSpellInfluence(ArmySpellInfluence influence, i32 rounds) {
             break;
         case ARMY_SPELL_INFLUENCE_ANTI_MAGIC:
             for (i = 0; i < ARMY_SPELL_INFLUENCE_COUNT; i++) {
-                CancelIndividualSpell(i);
+                CancelIndividualSpell(ArmySpellInfluence(i));
             }
             break;
         case ARMY_SPELL_INFLUENCE_STONESKIN:
@@ -2764,7 +2764,7 @@ void army::DecrementSpellRounds(void) {
     for (i = 0; i < ARMY_SPELL_INFLUENCE_COUNT; i++) {
         if (m_spellInfluence[i]) {
             if (m_spellInfluence[i] == 1) {
-                CancelIndividualSpell(i);
+                CancelIndividualSpell(ArmySpellInfluence(i));
             } else {
                 m_spellInfluence[i]--;
             }
@@ -3137,7 +3137,7 @@ float army::SpellCastWorkChance(SpellType spell) {
                            * ARMY_RESURRECT_POWER_PER_SPELL_POWER;
         if (gpCombatManager->m_heroes[gpCombatManager->m_currentSide]
             && gpCombatManager->m_heroes[gpCombatManager->m_currentSide]->HasArtifact(
-                IDX(ARTIFACT_ANKH)
+                ARTIFACT_ANKH
             )) {
             resurrectPower_5 *= ARMY_ARTIFACT_POWER_MULTIPLIER;
         }
@@ -3161,7 +3161,7 @@ float army::SpellCastWorkChance(SpellType spell) {
                                 )
                                 * ARMY_HYPNOTIZE_HIT_POINTS_PER_POWER;
         if (gpCombatManager->m_heroes[gpCombatManager->m_currentSide]->HasArtifact(
-                IDX(ARTIFACT_GOLD_WATCH)
+                ARTIFACT_GOLD_WATCH
             )) {
             hypnotizeHitPoints_37 *= ARMY_ARTIFACT_POWER_MULTIPLIER;
         }

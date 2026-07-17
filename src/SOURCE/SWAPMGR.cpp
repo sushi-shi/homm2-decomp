@@ -773,10 +773,10 @@ void swapManager::Update(void) {
 
     for (slot = 0; slot < SWAP_PRIMARY_SKILL_COUNT; ++slot) {
         message_1.payload.widget.id = slot + SWAP_LEFT_PRIMARY_SKILL_FIRST;
-        sprintf(gText, "%d", m_heroes[IDX(SWAP_SIDE_LEFT)]->Stats(slot));
+        sprintf(gText, "%d", m_heroes[IDX(SWAP_SIDE_LEFT)]->Stats(HeroPrimaryStat(slot)));
         m_window->BroadcastMessage(message_1);
         message_1.payload.widget.id = slot + SWAP_RIGHT_PRIMARY_SKILL_FIRST;
-        sprintf(gText, "%d", m_heroes[IDX(SWAP_SIDE_RIGHT)]->Stats(slot));
+        sprintf(gText, "%d", m_heroes[IDX(SWAP_SIDE_RIGHT)]->Stats(HeroPrimaryStat(slot)));
         m_window->BroadcastMessage(message_1);
     }
 
