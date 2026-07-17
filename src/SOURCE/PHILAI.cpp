@@ -2363,10 +2363,10 @@ void philAI::ValueOfBuyingCreature(
                  visitingArmySlot++) {
                 if (visitingHeroCandidate->m_army.m_creatureTypes[visitingArmySlot]
                         != AI_TROOP_EMPTY_SLOT
-                    && (gMonsterDatabase[visitingHeroCandidate->m_army
+                    && (IDX(gMonsterDatabase)[visitingHeroCandidate->m_army
                                              .m_creatureTypes[visitingArmySlot]]
                             .attributes
-                        & IDX(AI_CREATURE_PURCHASE_RANGED_ATTRIBUTE))) {
+                        & MONSTER_ATTRIBUTE_RANGED)) {
                     missileStacks++;
                 }
             }
@@ -2386,8 +2386,8 @@ void philAI::ValueOfBuyingCreature(
         for (garrisonSlot = 0; garrisonSlot < AI_CREATURE_PURCHASE_ARMY_SLOT_COUNT;
              garrisonSlot++) {
             if (townPtr->m_army.m_creatureTypes[garrisonSlot] != AI_TROOP_EMPTY_SLOT
-                && (gMonsterDatabase[townPtr->m_army.m_creatureTypes[garrisonSlot]].attributes
-                    & IDX(AI_CREATURE_PURCHASE_RANGED_ATTRIBUTE))) {
+                && (IDX(gMonsterDatabase)[townPtr->m_army.m_creatureTypes[garrisonSlot]].attributes
+                    & MONSTER_ATTRIBUTE_RANGED)) {
                 missileStacks++;
             }
         }
@@ -2532,7 +2532,7 @@ i32 philAI::CreaturesToBuy(town* t, i32 level) {
 // emitted the same choice. Revisit in the byte-last-mile phase.
 VA(0x0043defb, 0x5f)
 i32 philAI::CreaturesToBuy(i32 a, i32 b) {
-    i32 n = MaxBuyableCreatures(a);
+    i32 n = MaxBuyableCreatures(CreatureType(a));
     if (n > 1)
         n >>= 1;
     if (b < n)
@@ -3544,7 +3544,7 @@ void philAI::EvaluateOneTimeCreaturePurchase(
     if (useAvailableCount != 0)
         purchaseCount = availableCount;
     else
-        purchaseCount = MaxBuyableCreatures(IDX(creature));
+        purchaseCount = MaxBuyableCreatures(creature);
     if (purchaseCount > availableCount)
         purchaseCount = availableCount;
 
