@@ -2158,7 +2158,7 @@ void philAI::ValueOfBuyingBuilding(
                 goto deferEarlyBuilding;
             }
             break;
-        case 14:
+        case BUILDING_SLOT_DISABLED_FIRST:
             break;
         case BUILDING_SLOT_DOCK:
             adjustedValue = 0.0f;
@@ -2188,9 +2188,9 @@ void philAI::ValueOfBuyingBuilding(
                 goto deferEarlyBuilding;
             }
             break;
-        case 19:
-        case 20:
-        case 21:
+        case BUILDING_SLOT_DWELLING_FIRST:
+        case BUILDING_SLOT_DWELLING_SECOND:
+        case BUILDING_SLOT_DWELLING_THIRD:
         case 22:
         case 23:
         case 24:

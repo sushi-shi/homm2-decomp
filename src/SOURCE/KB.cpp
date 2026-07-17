@@ -3583,7 +3583,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
             break;
 
         case APP_MENU_VIEW_WORLD:
-            gpAdvManager->ViewWorld(SPELL_VIEW_ALL, 0, 0);
+            gpAdvManager->ViewWorld(VIEW_WORLD_ALL, false, false);
             break;
         case APP_MENU_VIEW_PUZZLE:
             gpAdvManager->ViewPuzzle();
@@ -5673,7 +5673,7 @@ DATA(0x004fa648) font* smallFont = 0;
 DATA(0x004fa64c) font* bigFont = 0;
 DATA(0x004fa650) b32 gbReturnAfterComputeExtent = false;
 DATA(0x004fa654) b32 gbAllowTextEntryEscape = true;
-DATA(0x004fa658) i32 giCycleType = 0;
+DATA(0x004fa658) WindowColorCycleMode giCycleType = WindowColorCycleMode(0);
 DATA(0x004fa65c) i32 giScreenScroll = 1;
 DATA(0x004fa660) i32 giMenuCommand = -1;
 DATA(0x004fa664) b32 gbSendMouseMoveMessages = false;
