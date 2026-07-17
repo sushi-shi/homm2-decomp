@@ -1050,6 +1050,12 @@ void combatManager::DefaultSpell(int targetHex)
     }
 }
 
+// @early-stop
+// Complete 0x623 body, 0x5c frame/slots, 422-instruction CFG, and all 51 ordered
+// relocations align. The only executable residual at +0x366..+0x371 is the
+// equivalent affectedCount[-0xc]/frame[-0x18] loop comparison: retail loads the
+// bound and uses `jge`, while ours loads the index and uses `jle`. Reversed
+// relational and 0[&affectedCount] forms were byte-neutral; revisit on TU change.
 VA(0x00423762, 0x623)
 void combatManager::Fireball(int targetHex, int spell)
 {
@@ -1579,6 +1585,12 @@ void combatManager::Armageddon(void)
     gpMouseManager->ShowColorPointer();
 }
 
+// @early-stop
+// Complete 0x101 body, 0x4 frame/slot, 86-instruction CFG, and all 23 ordered
+// relocations align. The only executable residual at +0x17..+0x2f computes the
+// same m_limitCreatureCount element: retail loads target index (+0xea) before
+// side (+0xe6), while ours loads side first. Reversed indexing and three flat/
+// pointer-addition spellings were byte-neutral or worse; revisit on TU change.
 VA(0x00424e48, 0x101)
 void combatManager::TurnToStone(army *target)
 {
