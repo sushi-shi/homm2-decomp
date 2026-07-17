@@ -186,7 +186,7 @@ i32 icon::CombatClipDrawToBuffer(
                 ICON_DRAW_COMBAT_HEIGHT,
                 offset,
                 colorTable,
-                ICON_COLOR_TABLE_APPLY_DIM
+                IDX(ICON_COLOR_TABLE_APPLY_DIM)
             );
         else
             FlipIconToBitmapColorTable(

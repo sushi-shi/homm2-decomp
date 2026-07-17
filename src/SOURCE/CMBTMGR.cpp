@@ -1246,7 +1246,7 @@ void combatManager::CatAttack(i32 side) {
             SRandom(COMBAT_CATAPULT_DIRECTION_ROLL_MIN, COMBAT_CATAPULT_DIRECTION_ROLL_MAX);
         for (frame18 = 0; frame18 < COMBAT_CATAPULT_DIRECTION_COUNT; frame18++) {
             i32 adjacentHex = GetAdjacentCellIndexNoArmy(
-                targetHex4,
+                IDX(targetHex4),
                 (frame18 + startDirection) % COMBAT_CATAPULT_DIRECTION_COUNT
             );
             if (adjacentHex != -1 && m_hexCells[adjacentHex].m_occupantSide == -1) {

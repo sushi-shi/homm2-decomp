@@ -409,7 +409,7 @@ void hero::Deallocate(i32 updateMap) {
 
     if (updateMap)
         SendMapChange(
-            MAP_CHANGE_DEAD_HERO,
+            IDX(MAP_CHANGE_DEAD_HERO),
             m_id,
             static_cast<u8>(m_x),
             static_cast<u8>(m_y),
@@ -2026,7 +2026,7 @@ void hero::CheckAnduranPieces(i32 showDialog) {
                 NORMAL_DIALOG_NO_RESOURCE,
                 NORMAL_DIALOG_NO_VALUE,
                 NORMAL_DIALOG_ARTIFACT,
-                ARTIFACT_BATTLE_GARB,
+                IDX(ARTIFACT_BATTLE_GARB),
                 NORMAL_DIALOG_NO_RESOURCE,
                 0,
                 NORMAL_DIALOG_NO_RESOURCE,
