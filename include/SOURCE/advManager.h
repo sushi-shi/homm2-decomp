@@ -141,7 +141,7 @@ public:
     void ProcessIncomingGroupMapChange(char*);
     void PurgeMapChangeQueue(void);
     void UnwindMapChangeQueue(i32, i32);
-    void ViewWorld(i32, i32, i32);
+    void ViewWorld(ViewWorldMode, b32, b32);
     void VWCleanup(void);
     void VWInit(i32, i32);
     void VWCompleteDraw(void);
@@ -391,7 +391,7 @@ extern class icon* pVWGround;
 extern i32 iVWViewableCells;
 extern class icon* pVWFlags;
 extern i32 iVWDrawAllTerrains;
-extern i32 iVWWhatToDraw;
+extern ViewWorldMode iVWWhatToDraw;
 extern i32 iVWDrawAllObjs;
 extern i32 iVWMapOriginX;
 extern i32 iVWMapOriginY;

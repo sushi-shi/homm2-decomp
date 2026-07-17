@@ -43,7 +43,7 @@
 // declaring the window pointer at its initializer did not recover retail ordering.
 // Revisit only after TU-state changes expose different hidden-temporary ordering.
 VA(0x004333c0, 0x267)
-void advManager::ViewWorld(i32 whatToDraw, i32 drawAllObjects, i32 drawAllTerrains) {
+void advManager::ViewWorld(ViewWorldMode whatToDraw, b32 drawAllObjects, b32 drawAllTerrains) {
     i8 paletteData[VIEW_WORLD_PALETTE_SIZE];
     char* viewIconNames[7];
     tag_message dialogMessage;
@@ -794,7 +794,7 @@ DATA(0x0052511c) class icon* pVWGround;
 DATA(0x00525120) i32 iVWViewableCells;
 DATA(0x00525124) class icon* pVWFlags;
 DATA(0x00525128) i32 iVWDrawAllTerrains;
-DATA(0x0052512c) i32 iVWWhatToDraw;
+DATA(0x0052512c) ViewWorldMode iVWWhatToDraw;
 DATA(0x00525130) i32 iVWDrawAllObjs;
 DATA(0x00525134) i32 iVWMapOriginX;
 DATA(0x00525138) i32 iVWMapOriginY;
