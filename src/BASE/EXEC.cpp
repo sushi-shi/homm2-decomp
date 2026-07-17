@@ -107,11 +107,12 @@ void executive::ShutDownSystem(void)
 
 // @semantic
 // Complete /O2 structure with the retail frame/CFG and all 16 ordered external
-// relocations. The first and only structural residual is +0x19..+0x40 in the
-// manager snapshot loop: ours assigns EAX=listManager/ECX=index while retail
-// assigns ECX=listManager/EAX=index. Declaration/init reordering and 25 AST
-// permutations did not steer it; two bounded TU-state probes (78 trials total)
-// reached only a disposable 99.4375%. Revisit after earlier EXEC TU-state changes.
+// relocations. The snapshot loop at +0x19..+0x40 is byte-exact. The only structural
+// residual is +0xce..+0xe9 in the manager restoration loop: ours assigns EDX=manager
+// and ECX=index while retail assigns ECX=manager and EDX=index. Declaration/init
+// reordering and 25 AST permutations did not steer it; two bounded TU-state probes
+// (78 trials total) reached only a disposable 99.4375%. Revisit after earlier EXEC
+// TU-state changes.
 VA(0x004d1750, 0xfb)
 int executive::DoDialog(class baseManager *manager)
 {
