@@ -127,12 +127,12 @@ int KeyboardMessageHandler(void *, unsigned int message, unsigned int, long int 
 }
 
 // @early-stop
-// The complete 0x36c-byte range is raw-exact after relocation-union masking, proving
-// frame/slots and CFG. Candidate has 59 relocations versus retail's 55. Its four extra
-// sites are SetCapture (+0xc1/+0xf9) and ReleaseCapture (+0xcf/+0x107); USER32's linked
-// IAT order proves the embedded retail VAs 0x0053a668/0x0053a66c are those exact calls.
-// Other identities are the eight local switch sites and gConfig+0x30/+0x34 interior
-// labels at the same retail VAs 0x00528d50/0x00528d54.
+// The complete 0x36c-byte code-and-switch-table range is raw-exact after relocation-
+// union masking, proving stack/CFG and payload accesses. Both objects now expose 55
+// ordered sites. The residual is limited to delinked local switch labels and the
+// compiler-local name of gInputManagerText; its two references retain owner addends
+// +0/+0x18. All nonlocal runtime addresses and owner-relative addends agree,
+// including gConfig +0x30/+0x34, SetCapture, and ReleaseCapture.
 VA(0x004cde60, 0x36c)
 int MouseMessageHandler(void *, unsigned int message, unsigned int, long int messageData)
 {
@@ -501,6 +501,15 @@ void inputManager::MakeScanCodeTable(void)
     m_keyState[INPUT_SCAN_F12] = INPUT_SCAN_F12 << 8;
 }
 
+// @semantic
+// Complete 0xe4 retail CFG and all 18 relocation occurrences align. Candidate is
+// two bytes shorter because +0x82 loads/stores/tests gbColorMice through EAX rather
+// than retail ECX; at +0xb7 candidate then loads gbColorMice before
+// bLastOnscreenMouseColor, while retail loads the commutative operands oppositely.
+// Reversing that inequality and splitting the assignment through a scoped local are
+// code-neutral. Payload-independent cursor state and owner-relative gConfig +0x30/
+// +0x34 addends are confirmed; revisit only after a genuine predecessor/TU-state
+// change, since the residual is register coloring rather than missing behavior.
 VA(0x004ce990, 0xe4)
 void CheckChangeCursor(int x, int y, int force)
 {
