@@ -91,11 +91,11 @@ int fullMap::GetNewCellExtraIndex(void)
 VA(0x0040b73c, 0x9e)
 void fullMap::Write(int handle)
 {
-    _write(handle, &width, sizeof(width));
-    _write(handle, &height, sizeof(height));
-    _write(handle, cells, width * height * sizeof(mapCell));
-    _write(handle, &extraCount, sizeof(extraCount));
-    _write(handle, extras, extraCount * sizeof(mapCellExtra));
+    write(handle, &width, sizeof(width));
+    write(handle, &height, sizeof(height));
+    write(handle, cells, width * height * sizeof(mapCell));
+    write(handle, &extraCount, sizeof(extraCount));
+    write(handle, extras, extraCount * sizeof(mapCellExtra));
 }
 
 // The legacy cell stride is 20 bytes, while the current record is 12 bytes. Keeping
@@ -111,12 +111,12 @@ void fullMap::Read(int handle, int convert)
     int x, y;               // cell convert loops          -> -0xc / -0x10
     oldMapCellExtra *tmp2;  // legacy extra scratch buffer -> -0x14
 
-    _read(handle, &width, sizeof(width));
-    _read(handle, &height, sizeof(height));
+    read(handle, &width, sizeof(width));
+    read(handle, &height, sizeof(height));
     Init(width, height);
     if (convert) {
         tmp = static_cast<oldMapCell *>(operator new(width * height * sizeof(oldMapCell)));
-        _read(handle, tmp, width * height * sizeof(oldMapCell));
+        read(handle, tmp, width * height * sizeof(oldMapCell));
         for (x = 0; x < width; x++)
             for (y = 0; y < height; y++)
                 memcpy(reinterpret_cast<unsigned char *>(cells) +
@@ -124,20 +124,20 @@ void fullMap::Read(int handle, int convert)
                        tmp + width * y + x, sizeof(mapCell));
         delete tmp;
     } else {
-        _read(handle, cells, width * height * sizeof(mapCell));
+        read(handle, cells, width * height * sizeof(mapCell));
     }
-    _read(handle, &extraCount, sizeof(extraCount));
+    read(handle, &extraCount, sizeof(extraCount));
     if (extras)
         delete extras;
     extras = static_cast<mapCellExtra *>(operator new(extraCount * sizeof(mapCellExtra)));
     if (convert) {
         tmp2 = static_cast<oldMapCellExtra *>(operator new(extraCount * sizeof(oldMapCellExtra)));
-        _read(handle, tmp2, extraCount * sizeof(oldMapCellExtra));
+        read(handle, tmp2, extraCount * sizeof(oldMapCellExtra));
         for (nb = 0; nb < extraCount; nb++)
             memcpy(extras + nb, tmp2 + nb, sizeof(mapCellExtra));
         delete tmp2;
     } else {
-        _read(handle, extras, extraCount * sizeof(mapCellExtra));
+        read(handle, extras, extraCount * sizeof(mapCellExtra));
     }
 }
 
