@@ -501,7 +501,7 @@ void combatManager::DrawBackground(void)
         if (m_drawbridgeBackgroundVisible != 0)
             IconToBitmap(m_combatIcons[COMBAT_ICON_DRAWBRIDGE], m_backgroundBuffer, 0, 0, 0, 0, 0, 0,
                          COMBAT_SCREEN_WIDTH, COMBAT_AREA_HEIGHT, 0);
-        if (m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type == TOWN_TYPE_KNIGHT &&
+        if (m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type == FACTION_KNIGHT &&
             (m_combatTowns[COMBAT_DEFENDER_SIDE]->m_buildings &
              TOWN_BUILDING_RAINBOW) != 0)
             IconToBitmap(backgroundIcon, m_backgroundBuffer, 0, 0,
