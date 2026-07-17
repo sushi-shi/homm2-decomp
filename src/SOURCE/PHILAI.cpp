@@ -5806,7 +5806,7 @@ VA(0x00445dde, 0xf5)
 i32 philAI::EvaluateRecruitSite(mapCell* cell) {
     i32 val;  // value (returned)
     i32 node; // color
-    i32 nb;   // monster type
+    CreatureType nb;   // monster type
     i32 kn;   // out param
     i32 jb;   // unused
     i32 idx;  // out param
@@ -5834,7 +5834,7 @@ i32 philAI::EvaluateRecruitSite(mapCell* cell) {
             nb = CREATURE_WATER_ELEMENTAL;
             break;
     }
-    EvaluateOneTimeCreaturePurchase(nb, lvl, 0, idx, val, kn);
+    EvaluateOneTimeCreaturePurchase(IDX(nb), lvl, 0, idx, val, kn);
     gbReduceByReload = false;
     return val;
 }
