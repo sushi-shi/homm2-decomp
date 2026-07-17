@@ -534,7 +534,8 @@ Neither permutation tool was used. Full source/header hashes and every ineffecti
 source shape are recorded so the direct relation, `maxW | 0`, and `0[&maxW]` forms are not
 repeated.
 
-The successful form is the scalar-lvalue SIB identity `0[&local]`. It makes VC4.2 `/Od` load the
+The successful form is the scalar-lvalue SIB identity, now spelled `OD_STEER(local)`
+(the `va.h` macro expanding to `0[&(local)]`). It makes VC4.2 `/Od` load the
 other comparison operand first without changing semantics, slots, instruction count, CFG, or
 relocations. Applying it to the two index/start comparisons in `DrawBoundedString`, the three
 width/argument comparisons in `LineLength`, and the length/index comparison in `LineWidth` makes
