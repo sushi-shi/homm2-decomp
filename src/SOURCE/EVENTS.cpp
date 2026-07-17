@@ -372,7 +372,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         gArmyNamesPlural[IDX(thirdUpgrade)],
                         gArmyNamesPlural[IDX(firstUpgrade_e) + 1],
                         gArmyNamesPlural[IDX(secondUpgrade1) + 1],
-                        gArmyNamesPlural[thirdUpgrade + 1]
+                        gArmyNamesPlural[IDX(thirdUpgrade) + 1]
                     );
                 }
                 EventWindow(
@@ -380,9 +380,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     1,
                     gText,
                     EVENT_WINDOW_REWARD_CREATURE,
-                    firstUpgrade_e + 1,
+                    IDX(firstUpgrade_e) + 1,
                     secondUpgrade1 == CREATURE_NONE ? -1 : EVENT_WINDOW_REWARD_CREATURE,
-                    secondUpgrade1 + 1,
+                    IDX(secondUpgrade1) + 1,
                     -1
                 );
             }
@@ -458,7 +458,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         gArmyNamesPlural[IDX(thirdUpgrade)],
                         gArmyNamesPlural[IDX(firstUpgrade_e) + 1],
                         gArmyNamesPlural[IDX(secondUpgrade1) + 1],
-                        gArmyNamesPlural[thirdUpgrade + 1]
+                        gArmyNamesPlural[IDX(thirdUpgrade) + 1]
                     );
                 }
                 EventWindow(
@@ -466,9 +466,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     1,
                     gText,
                     EVENT_WINDOW_REWARD_CREATURE,
-                    firstUpgrade_e + 1,
+                    IDX(firstUpgrade_e) + 1,
                     secondUpgrade1 == CREATURE_NONE ? -1 : EVENT_WINDOW_REWARD_CREATURE,
-                    secondUpgrade1 + 1,
+                    IDX(secondUpgrade1) + 1,
                     -1
                 );
             }
