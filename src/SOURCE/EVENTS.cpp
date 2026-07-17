@@ -4250,7 +4250,7 @@ i32 GiveArtifact(hero* eventHero, i32 artifact, i32 checkEndGame, i8 artifactExt
 
 VA(0x004b00e9, 0x5e)
 i32 advManager::GiveRandomArtifact(hero* eventHero) {
-    i32 artifactId = gpGame->GetRandomArtifactId(EVENT_RANDOM_ARTIFACT_ANY, 1);
+    ArtifactType artifactId = ArtifactType(gpGame->GetRandomArtifactId(EVENT_RANDOM_ARTIFACT_ANY, 1));
 
     if (artifactId == ARTIFACT_NONE)
         GiveResource(eventHero, IDX(RES_GOLD), EVENT_RANDOM_ARTIFACT_GOLD);
@@ -6980,22 +6980,22 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
     i32 purchaseValue;
     i32 replacementSlot;
     u32 forcedJoin;
-    i32 monsterType;
+    CreatureType monsterType;
 
-    monsterType = cell->m_objectIndex;
+    monsterType = static_cast<CreatureType>(cell->m_objectIndex);
     monsterCount[0] = cell->m_objectMetadata & MONSTER_COUNT_MASK;
     forcedJoin = cell->m_objectMetadata & MONSTER_JOIN_FORCED;
     strengthRatio =
         static_cast<float>(gpPhilAI->FightValueOfStack(&eventHero->m_army, eventHero, 0, 0, 0, 0))
-        / static_cast<float>(gMonsterDatabase[monsterType].fightValue * monsterCount[0]);
+        / static_cast<float>(gMonsterDatabase[IDX(monsterType)].fightValue * monsterCount[0]);
 
-    if (eventHero->m_army.CanJoin(monsterType) && !eventHero->HasArtifact(ARTIFACT_HIDEOUS_MASK)
+    if (eventHero->m_army.CanJoin(IDX(monsterType)) && !eventHero->HasArtifact(ARTIFACT_HIDEOUS_MASK)
         && strengthRatio > MONSTER_STRENGTH_JOIN && monsterType != CREATURE_GHOST
         && monsterType != CREATURE_EARTH_ELEMENTAL && monsterType != CREATURE_AIR_ELEMENTAL
         && monsterType != CREATURE_FIRE_ELEMENTAL && monsterType != CREATURE_WATER_ELEMENTAL) {
         if (forcedJoin) {
             gpPhilAI->EvaluateOneTimeCreaturePurchase(
-                monsterType,
+                IDX(monsterType),
                 monsterCount[0],
                 1,
                 purchaseCount,
@@ -7003,7 +7003,7 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
                 replacementSlot
             );
             if (purchaseCount > 0) {
-                gpGame->GiveArmy(&eventHero->m_army, monsterType, monsterCount[0], replacementSlot);
+                gpGame->GiveArmy(&eventHero->m_army, IDX(monsterType), monsterCount[0], replacementSlot);
                 *handled = 1;
             } else {
                 *handled = 1;
@@ -7022,7 +7022,7 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
                     joiningCount = 1;
 
                 i32 joiningCost = static_cast<i32>(
-                    gMonsterDatabase[monsterType].cost * joiningCount
+                    gMonsterDatabase[IDX(monsterType)].cost * joiningCount
                     * MONSTER_AI_JOIN_COST_FRACTION
                 );
                 if (gpGame->m_players[eventHero->m_owner].m_resources[IDX(RES_GOLD)]
@@ -7032,7 +7032,7 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
                     goto fightComputerMonsters;
                 }
                 gpPhilAI->EvaluateOneTimeCreaturePurchase(
-                    monsterType,
+                    IDX(monsterType),
                     monsterCount[0],
                     1,
                     purchaseCount,
@@ -7042,7 +7042,7 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
                 if (purchaseCount > 0) {
                     gpGame->m_players[eventHero->m_owner].m_resources[IDX(RES_GOLD)] -= joiningCost;
                     gpGame
-                        ->GiveArmy(&eventHero->m_army, monsterType, joiningCount, replacementSlot);
+                        ->GiveArmy(&eventHero->m_army, IDX(monsterType), joiningCount, replacementSlot);
                     *handled = 1;
                 }
             }
@@ -7053,7 +7053,7 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
     computerMonstersFlee:
         gpAdvManager->GiveExperience(
             eventHero,
-            gMonsterDatabase[monsterType].hitPoints * monsterCount[0],
+            gMonsterDatabase[IDX(monsterType)].hitPoints * monsterCount[0],
             1
         );
         eventHero->CheckLevel();
@@ -7072,7 +7072,7 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
         *handled = 1;
     } else {
     fightComputerMonsters:
-        monsterCount[1] = gpPhilAI->CombatMonsterEvent(eventHero, monsterType, monsterCount, cell);
+        monsterCount[1] = gpPhilAI->CombatMonsterEvent(eventHero, IDX(monsterType), monsterCount, cell);
         if (monsterCount[1] != 0) {
             *handled = 1;
             return;
