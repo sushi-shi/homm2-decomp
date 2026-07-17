@@ -15,6 +15,9 @@
 #include <BASE/Misc.h>
 #include <stdio.h>
 
+// __FILE__ for the NWC memory/assert tracking (reloc-masked path string).
+#define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\netwin.cpp"
+
 // ---- module-private globals (retail xref: single-module) ----
 DATA(0x0051739c) static u8 gNbCallRetries = 0; // nb_call_done retry counter
 DATA(0x005173a0) static u8 gNetbiosAvail = 0;
@@ -116,7 +119,7 @@ extern "C" u16 __fastcall nb_init(u16 param1, u16 param2) {
         memset(&localNcb, 0, sizeof(localNcb));
         statusBuffer = static_cast<u8*>(BaseAlloc(
             NETBIOS_ADAPTER_STATUS_SIZE,
-            "I:\\Projects\\Heroes\\Prog\\SOURCE\\netwin.cpp",
+            RETAIL_FILE,
             gNbInitSourceLineBase + (NETWIN_SOURCE_LINE_INIT_ALLOC - NETWIN_SOURCE_LINE_INIT_BASE)
         ));
         localNcb.command = NETBIOS_COMMAND_ADAPTER_STATUS;
@@ -133,7 +136,7 @@ extern "C" u16 __fastcall nb_init(u16 param1, u16 param2) {
         }
         BaseFree(
             statusBuffer,
-            "I:\\Projects\\Heroes\\Prog\\SOURCE\\netwin.cpp",
+            RETAIL_FILE,
             gNbInitSourceLineBase + (NETWIN_SOURCE_LINE_INIT_FREE - NETWIN_SOURCE_LINE_INIT_BASE)
         );
         gNbShutdown = 0;
@@ -169,14 +172,14 @@ extern "C" void __fastcall nb_term(void) {
     while ((node = pop_node(&gNbSndQueue)) != 0)
         BaseFree(
             node,
-            "I:\\Projects\\Heroes\\Prog\\SOURCE\\netwin.cpp",
+            RETAIL_FILE,
             gNbTermSourceLineBase
                 + (NETWIN_SOURCE_LINE_TERM_SEND_FREE - NETWIN_SOURCE_LINE_TERM_BASE)
         );
     while ((node = pop_node(&gNbFreeQueue)) != 0)
         BaseFree(
             node,
-            "I:\\Projects\\Heroes\\Prog\\SOURCE\\netwin.cpp",
+            RETAIL_FILE,
             gNbTermSourceLineBase
                 + (NETWIN_SOURCE_LINE_TERM_POOL_FREE - NETWIN_SOURCE_LINE_TERM_BASE)
         );
@@ -192,7 +195,7 @@ extern "C" void __fastcall nb_term(void) {
     while ((node = pop_node(&gNbRcvQueue)) != 0)
         BaseFree(
             node,
-            "I:\\Projects\\Heroes\\Prog\\SOURCE\\netwin.cpp",
+            RETAIL_FILE,
             gNbTermSourceLineBase
                 + (NETWIN_SOURCE_LINE_TERM_RECEIVE_FREE - NETWIN_SOURCE_LINE_TERM_BASE)
         );
@@ -217,7 +220,7 @@ extern "C" u16 __fastcall nb_rcv(i16 session, void* buf) {
         memcpy(buf, node->data, len);
         BaseFree(
             node,
-            "I:\\Projects\\Heroes\\Prog\\SOURCE\\netwin.cpp",
+            RETAIL_FILE,
             gNbReceiveSourceLineBase
                 + (NETWIN_SOURCE_LINE_RECEIVE_FREE - NETWIN_SOURCE_LINE_RECEIVE_BASE)
         );
@@ -239,7 +242,7 @@ extern "C" u16 __fastcall nb_snd(i16 session, i16 len, void* data) {
         return NETBIOS_RESULT_SESSION_OUT_OF_RANGE;
     node = static_cast<tag_Node*>(BaseAlloc(
         len + NETBIOS_PACKET_HEADER_SIZE,
-        "I:\\Projects\\Heroes\\Prog\\SOURCE\\netwin.cpp",
+        RETAIL_FILE,
         gNbSendSourceLineBase + (NETWIN_SOURCE_LINE_SEND_ALLOC - NETWIN_SOURCE_LINE_SEND_BASE)
     ));
     node->len = len;
@@ -442,7 +445,7 @@ void nb_thr_ctl(void) {
                             case NETBIOS_RESULT_PENDING:
                                 ProcessAssert(
                                     0,
-                                    "I:\\Projects\\Heroes\\Prog\\SOURCE\\netwin.cpp",
+                                    RETAIL_FILE,
                                     gNbThreadSourceLineBase
                                         + (NETWIN_SOURCE_LINE_THREAD_PENDING_ASSERT
                                            - NETWIN_SOURCE_LINE_THREAD_BASE)
@@ -460,7 +463,7 @@ void nb_thr_ctl(void) {
                 }
                 BaseFree(
                     node,
-                    "I:\\Projects\\Heroes\\Prog\\SOURCE\\netwin.cpp",
+                    RETAIL_FILE,
                     gNbThreadSourceLineBase
                         + (NETWIN_SOURCE_LINE_THREAD_FREE - NETWIN_SOURCE_LINE_THREAD_BASE)
                 );
@@ -503,7 +506,7 @@ static void __stdcall nb_add_name_done(NetbiosControlBlock* ncb) {
     i32 j;
     ProcessAssert(
         &gNbSessNcb[gNbMaxSess] == ncb,
-        "I:\\Projects\\Heroes\\Prog\\SOURCE\\netwin.cpp",
+        RETAIL_FILE,
         gNbAddNameSourceLineBase
             + (NETWIN_SOURCE_LINE_ADD_NAME_ASSERT - NETWIN_SOURCE_LINE_ADD_NAME_BASE)
     );
@@ -639,7 +642,7 @@ static void __fastcall nb_arm_recv(i32 session) {
     for (;;) {
         ProcessAssert(
             gNbSessNcb[session].returnCode != NETBIOS_RESULT_PENDING,
-            "I:\\Projects\\Heroes\\Prog\\SOURCE\\netwin.cpp",
+            RETAIL_FILE,
             gNbArmReceiveSourceLineBase
                 + (NETWIN_SOURCE_LINE_ARM_RECEIVE_ASSERT - NETWIN_SOURCE_LINE_ARM_RECEIVE_BASE)
         );
@@ -703,7 +706,7 @@ static void __fastcall nb_recv_complete(i32 session) {
                 case NETBIOS_RESULT_SUCCESS:
                     node = static_cast<tag_Node*>(BaseAlloc(
                         gNbSessNcb[session].length + NETBIOS_PACKET_HEADER_SIZE,
-                        "I:\\Projects\\Heroes\\Prog\\SOURCE\\netwin.cpp",
+                        RETAIL_FILE,
                         gNbReceiveCompleteSourceLineBase
                             + (NETWIN_SOURCE_LINE_RECEIVE_COMPLETE_ALLOC
                                - NETWIN_SOURCE_LINE_RECEIVE_COMPLETE_BASE)
@@ -739,3 +742,5 @@ static void __fastcall nb_format_name(char* src, u8* dst) {
     for (; i < NETBIOS_NAME_SIZE - 1; i++)
         dst[i] = ' ';
 }
+
+#undef RETAIL_FILE

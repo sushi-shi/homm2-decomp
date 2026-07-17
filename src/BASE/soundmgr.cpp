@@ -18,6 +18,9 @@
 #include <windows.h>
 #include <BASE/Misc.h>
 
+// __FILE__ for the NWC memory/assert tracking (reloc-masked path string).
+#define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\soundmgr.cpp"
+
 // ---- module-private synthetic globals (retail xref: single-module) ----
 DATA(0x00534970) static PCMWAVEFORMAT gWaveFormat; // digital-driver PCM format (WAVE_init_driver)
 
@@ -45,7 +48,7 @@ VA(0x004cb6a0, 0xc7)
 void soundManager::ValidatePreviousPosition(i32 param_1) {
     char buf[20];
     char* cur;
-    H2_ASSERT(param_1 >= 0 && param_1 < 0x3c, "I:\\Projects\\Heroes\\Prog\\BASE\\soundmgr.cpp", 66);
+    H2_ASSERT(param_1 >= 0 && param_1 < 0x3c, RETAIL_FILE, 66);
     if (CDPreviousPosition[param_1][0] == 0)
         return;
     strcpy(buf, CDPreviousPosition[param_1]);
@@ -640,11 +643,7 @@ void soundManager::ModifySample(struct _SAMPLE* sampleHandle, i16 operation, i32
                 iLastVolume[foundChannel] = static_cast<i16>(value);
             break;
         case SOUND_SAMPLE_OPERATION_MUSIC_VOLUME:
-            H2_ASSERT(
-                gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI,
-                "I:\\Projects\\Heroes\\Prog\\BASE\\soundmgr.cpp",
-                0x52f
-            );
+            H2_ASSERT(gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI, RETAIL_FILE, 0x52f);
             AIL_set_sample_volume(sampleHandle, ConvertVolume(value, SOUND_VOLUME_MUSIC));
             if (foundChannel >= 0)
                 iLastVolume[foundChannel] = static_cast<i16>(value);
@@ -814,11 +813,7 @@ void soundManager::PollSound(void) {
         if (m_fadeSteps <= 0xa && m_currentTrack != m_fadeTargetTrack) {
             if (m_midiFile != 0 && bSaveMusicPosition[m_currentTrack] != 0) {
                 if (gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI) {
-                    H2_ASSERT(
-                        reinterpret_cast<i32>(m_midiFile),
-                        "I:\\Projects\\Heroes\\Prog\\BASE\\soundmgr.cpp",
-                        0x61a
-                    );
+                    H2_ASSERT(reinterpret_cast<i32>(m_midiFile), RETAIL_FILE, 0x61a);
                     m_savedTrackPositions[m_currentTrack] = ftell(m_midiFile);
                 }
             } else {
@@ -1028,3 +1023,5 @@ DATA(0x00534980) char lpszReturnString[0x100];
 DATA(0x00534a80) u32l nMCIError;
 DATA(0x00534a88) i16 iLastVolume[0x20];
 DATA(0x00534ac8) char CommandString[0x100];
+
+#undef RETAIL_FILE

@@ -11,6 +11,13 @@
 #include <va.h>
 #include <Ints.h>
 
+// Bits of mapCell::m_flags (+8). Bit 0x80 marks a cell whose object stack holds
+// no solid piece — every piece is shadow-layer or erased — so the occupancy
+// pass (bit 0x08) skips it.
+typedef enum MapCellFlag {
+    MAP_CELL_OBJECT_SHADOW_ONLY = 0x80
+} MapCellFlag;
+
 typedef enum MapTilesetConstant {
     MAP_TILESET_FLAG = 14
 } MapTilesetConstant;

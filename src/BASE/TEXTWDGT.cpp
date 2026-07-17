@@ -14,12 +14,11 @@
 #include <SOURCE/KB.h>
 #include <string.h>
 
-DATA(0x0051fa70) static STextWidgetSourceFiles gTextWidgetSourceFiles = {
-    "I:\\Projects\\Heroes\\Prog\\BASE\\TEXTWDGT.CPP",
-    "I:\\Projects\\Heroes\\Prog\\BASE\\TEXTWDGT.CPP",
-    "I:\\Projects\\Heroes\\Prog\\BASE\\TEXTWDGT.CPP",
-    "I:\\Projects\\Heroes\\Prog\\BASE\\TEXTWDGT.CPP"
-};
+// __FILE__ for the NWC memory/assert tracking (reloc-masked path string).
+#define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\TEXTWDGT.CPP"
+
+DATA(0x0051fa70) static STextWidgetSourceFiles gTextWidgetSourceFiles =
+    {RETAIL_FILE, RETAIL_FILE, RETAIL_FILE, RETAIL_FILE};
 
 // @data-layout-note NB09 assigns TEXTWDGT one 0xb0 initialized-data
 // contribution at 0x11fa70. Retail stores four identical source paths in 0x2c
@@ -237,3 +236,5 @@ void textWidget::SetText(char* text) {
 
 // ---- vtables (compiler-emitted; census) ----
 VTBL(textWidget, 0x004eba50);
+
+#undef RETAIL_FILE

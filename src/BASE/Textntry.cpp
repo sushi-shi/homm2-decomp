@@ -98,9 +98,8 @@ textEntryWidget::textEntryWidget(
     m_preserveTextOnFocus = 0;
     m_color = 1;
     m_rectH = m_height;
-#line 61 "I:\\Projects\\Heroes\\Prog\\BASE\\Textntry.cpp"
-    m_text =
-        static_cast<char*>(H2_ALLOC(static_cast<u16>(maxLength) + 5, RETAIL_FILE, 0x3e));
+#line 61 RETAIL_FILE
+    m_text = static_cast<char*>(H2_ALLOC(static_cast<u16>(maxLength) + 5, RETAIL_FILE, 0x3e));
     strcpy(m_text, text);
     if (layout == 4) {
         m_innerX = horizontalInset + m_x;

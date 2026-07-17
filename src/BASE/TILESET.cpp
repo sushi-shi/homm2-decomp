@@ -10,10 +10,10 @@
 #include <BASE/Misc.h>
 #include <SOURCE/KB.h>
 
-DATA(0x00520d9c) static STilesetSourceFiles gTilesetSourceFiles = {
-    "I:\\Projects\\Heroes\\Prog\\BASE\\TILESET.CPP",
-    "I:\\Projects\\Heroes\\Prog\\BASE\\TILESET.CPP"
-};
+// __FILE__ for the NWC memory/assert tracking (reloc-masked path string).
+#define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\TILESET.CPP"
+
+DATA(0x00520d9c) static STilesetSourceFiles gTilesetSourceFiles = {RETAIL_FILE, RETAIL_FILE};
 
 VA(0x004dac60, 0x8f)
 tileset::tileset(u32l id) : resource(3, id, 1, 0) {
@@ -45,3 +45,5 @@ tileset::~tileset() {
 
 // ---- vtables (compiler-emitted; census) ----
 VTBL(tileset, 0x004ebab0);
+
+#undef RETAIL_FILE
