@@ -210,7 +210,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     );
                     GetDataEntry(gText, sphinxAnswer_a, SPHINX_INPUT_LENGTH, 0, 0, 1);
                     correctAnswer1 = 0;
-                    for (eventValue1 = 0; eventValue1 < eventExtra1->answerCount; eventValue1++) {
+                    for (eventValue1 = 0; eventValue1 < IDX(eventExtra1->answerCount); eventValue1++) {
                         if (RiddleStringsEqual(sphinxAnswer_a, eventExtra1->answers[IDX(eventValue1)]))
                             correctAnswer1 = 1;
                     }
@@ -220,13 +220,13 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         primaryAmount1 = 0;
                         secondaryReward_f = MAP_EVENT_REWARD_NONE;
                         secondaryAmount = 0;
-                        for (eventValue1 = 0; eventValue1 < SPHINX_RESOURCE_COUNT; eventValue1++) {
+                        for (eventValue1 = 0; eventValue1 < IDX(SPHINX_RESOURCE_COUNT); eventValue1++) {
                             gpGame->m_players[giCurPlayer].m_resources[IDX(eventValue1)] +=
                                 eventExtra1->resources[IDX(eventValue1)];
                             if (gpGame->m_players[giCurPlayer].m_resources[IDX(eventValue1)] < 0)
                                 gpGame->m_players[giCurPlayer].m_resources[IDX(eventValue1)] = 0;
                             if (eventExtra1->resources[IDX(eventValue1)] != 0) {
-                                if (primaryReward3 != MAP_EVENT_REWARD_NONE) {
+                                if (primaryReward3 != IDX(MAP_EVENT_REWARD_NONE)) {
                                     secondaryReward_f = primaryReward3;
                                     secondaryAmount = primaryAmount1;
                                 }
@@ -238,7 +238,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         if (eventExtra1->artifact != MAP_EVENT_REWARD_NONE
                             && eventHero2->NumArtifacts() < 14) {
                             GiveArtifact(eventHero2, ArtifactType(eventExtra1->artifact), 1, -1);
-                            if (primaryReward3 != MAP_EVENT_REWARD_NONE) {
+                            if (primaryReward3 != IDX(MAP_EVENT_REWARD_NONE)) {
                                 secondaryReward_f = primaryReward3;
                                 secondaryAmount = primaryAmount1;
                             }
@@ -1564,7 +1564,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             GiveResource(
                 eventHero2,
                 resourceType,
-                resourceType == RES_GOLD ? cell->m_objectMetadata * CAMPFIRE_GOLD_MULTIPLIER
+                resourceType == IDX(RES_GOLD) ? cell->m_objectMetadata * CAMPFIRE_GOLD_MULTIPLIER
                                          : cell->m_objectMetadata
             );
             strcpy(sphinxAnswer_a, gResourceNames[resourceType]);
@@ -1573,7 +1573,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             BVResMsg(
                 gText,
                 resourceType,
-                resourceType == RES_GOLD ? cell->m_objectMetadata * CAMPFIRE_GOLD_MULTIPLIER
+                resourceType == IDX(RES_GOLD) ? cell->m_objectMetadata * CAMPFIRE_GOLD_MULTIPLIER
                                          : cell->m_objectMetadata
             );
             eraseObject = 1;
@@ -4042,7 +4042,7 @@ void advManager::EventSound(i32 eventType, i32 eventData, struct SAMPLE2* outSam
             musicTrack_e = treasureSound_a;
             break;
         case MAP_OBJECT_BOAT:
-            if (eventData == EVENT_SOUND_VARIANT_1)
+            if (eventData == IDX(EVENT_SOUND_VARIANT_1))
                 musicTrack_e = treasureSound_a;
             break;
         case MAP_OBJECT_SKELETON:
@@ -4279,7 +4279,7 @@ i32 advManager::GiveExperience(hero* eventHero, i32 experience, i32 checkLevel) 
 
 VA(0x004b01ae, 0x80)
 void advManager::GiveResource(hero* eventHero, ResourceType resourceType, i32 amount) {
-    if (resourceType >= 0 && resourceType <= RES_GOLD)
+    if (resourceType >= 0 && IDX(resourceType) <= IDX(RES_GOLD))
         gpGame->m_players[eventHero->m_owner].m_resources[IDX(resourceType)] += amount;
     if (resourceType == RES_GOLD && gbHumanPlayer[eventHero->m_owner])
         CheckEndGame(0, 0);
@@ -4700,7 +4700,7 @@ void advManager::HouseEvent(hero* eventHero, mapCell* cell) {
     }
 
     if (cell->m_objectMetadata == 0) {
-        EventWindow(siteIndex * 3 + HOUSE_EVENT_EMPTY_DIALOG_BASE, 1, "", -1, 0, -1, 0, -1);
+        EventWindow(siteIndex * 3 + IDX(HOUSE_EVENT_EMPTY_DIALOG_BASE), 1, "", -1, 0, -1, 0, -1);
     } else {
         creatureTypes[IDX(HOUSE_RECRUIT_ARCHER)] = CREATURE_ARCHER;
         creatureTypes[IDX(HOUSE_RECRUIT_GOBLIN)] = CREATURE_GOBLIN;
@@ -4713,14 +4713,14 @@ void advManager::HouseEvent(hero* eventHero, mapCell* cell) {
         creatureTypes[IDX(HOUSE_RECRUIT_CAVE)] = CREATURE_CENTAUR;
         creatureTypes[IDX(HOUSE_RECRUIT_EXCAVATION)] = CREATURE_SKELETON;
 
-        EventWindow(siteIndex * 3 + HOUSE_EVENT_RECRUIT_DIALOG_BASE, 2, "", -1, 0, -1, 0, -1);
+        EventWindow(siteIndex * 3 + IDX(HOUSE_EVENT_RECRUIT_DIALOG_BASE), 2, "", -1, 0, -1, 0, -1);
         if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
             if (eventHero->m_army.CanJoin(creatureTypes[IDX(siteIndex)])) {
                 eventHero->m_army.Add(creatureTypes[IDX(siteIndex)], cell->m_objectMetadata, -1);
                 cell->m_objectMetadata = 0;
             } else {
                 EventWindow(
-                    siteIndex * 3 + HOUSE_EVENT_ARMY_FULL_DIALOG_BASE,
+                    siteIndex * 3 + IDX(HOUSE_EVENT_ARMY_FULL_DIALOG_BASE),
                     1,
                     "",
                     -1,
@@ -5197,7 +5197,7 @@ void GiveTakeArtifactStat(hero* targetHero, ArtifactType artifact, b32 take) {
         targetHero->m_primaryStats[statChanges[EVENT_ARTIFACT_PRIMARY_STAT_COUNT]] +=
             statChanges[statChanges[EVENT_ARTIFACT_PRIMARY_STAT_COUNT]]
             * (take == EVENT_ARTIFACT_TAKE ? -1 : 1);
-        if (statChanges[EVENT_ARTIFACT_PRIMARY_STAT_COUNT] == HERO_PRIMARY_KNOWLEDGE
+        if (statChanges[EVENT_ARTIFACT_PRIMARY_STAT_COUNT] == IDX(HERO_PRIMARY_KNOWLEDGE)
             && take == EVENT_ARTIFACT_TAKE) {
             maxSpellPoints =
                 targetHero->Stats(HERO_PRIMARY_KNOWLEDGE) * EVENT_ARTIFACT_SPELL_POINT_MULTIPLIER;
@@ -5797,7 +5797,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
 
         case MAP_OBJECT_RESOURCE:
             resourceType_a = cell->m_objectIndex >> 1;
-            resourceAmount_o = resourceType_a == RES_GOLD
+            resourceAmount_o = resourceType_a == IDX(RES_GOLD)
                                    ? cell->m_objectMetadata * CAMPFIRE_GOLD_MULTIPLIER
                                    : cell->m_objectMetadata;
             GiveResource(eventHero, resourceType_a, resourceAmount_o);
@@ -6482,8 +6482,8 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
             }
             break;
         case AI_GENERIC_SITE_SHIPWRECK:
-            if (!(eventHero->m_eventFlags & AI_GENERIC_SITE_SHIPWRECK_FLAG)) {
-                eventHero->m_eventFlags = eventHero->m_eventFlags | AI_GENERIC_SITE_SHIPWRECK_FLAG;
+            if (!(eventHero->m_eventFlags & IDX(AI_GENERIC_SITE_SHIPWRECK_FLAG))) {
+                eventHero->m_eventFlags = eventHero->m_eventFlags | IDX(AI_GENERIC_SITE_SHIPWRECK_FLAG);
                 switch (eventHero->m_cursorType) {
                     case IDX(FACTION_SORCERESS):
                     case IDX(FACTION_WARLOCK):
@@ -6504,9 +6504,9 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
             }
             break;
         case AI_GENERIC_SITE_FAERIE_RING:
-            if (!(eventHero->m_eventFlags & AI_GENERIC_SITE_FAERIE_RING_FLAG)) {
+            if (!(eventHero->m_eventFlags & IDX(AI_GENERIC_SITE_FAERIE_RING_FLAG))) {
                 eventHero->m_eventFlags =
-                    eventHero->m_eventFlags | AI_GENERIC_SITE_FAERIE_RING_FLAG;
+                    eventHero->m_eventFlags | IDX(AI_GENERIC_SITE_FAERIE_RING_FLAG);
                 eventHero->m_luck = eventHero->m_luck + 1;
             }
             break;
@@ -6514,7 +6514,7 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
         case AI_GENERIC_SITE_UNUSED_3:
             break;
         case AI_GENERIC_SITE_GRAVEYARD:
-            if (!(eventHero->m_eventFlags & AI_GENERIC_SITE_GRAVEYARD_FLAG)) {
+            if (!(eventHero->m_eventFlags & IDX(AI_GENERIC_SITE_GRAVEYARD_FLAG))) {
                 armyValue7 = 0;
                 for (artifactIndex1 = 0; artifactIndex1 < AI_EVENT_ARMY_STACK_COUNT;
                      artifactIndex1++) {
@@ -6532,13 +6532,13 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
                 }
                 if (armyValue7 != 0)
                     GiveExperience(eventHero, armyValue7, 1);
-                eventHero->m_eventFlags = eventHero->m_eventFlags | AI_GENERIC_SITE_GRAVEYARD_FLAG;
+                eventHero->m_eventFlags = eventHero->m_eventFlags | IDX(AI_GENERIC_SITE_GRAVEYARD_FLAG);
             }
             break;
         case AI_GENERIC_SITE_CREATURE_UPGRADE:
-            if (!(eventHero->m_eventFlags & AI_GENERIC_SITE_CREATURE_UPGRADE_FLAG)) {
+            if (!(eventHero->m_eventFlags & IDX(AI_GENERIC_SITE_CREATURE_UPGRADE_FLAG))) {
                 eventHero->m_eventFlags =
-                    eventHero->m_eventFlags | AI_GENERIC_SITE_CREATURE_UPGRADE_FLAG;
+                    eventHero->m_eventFlags | IDX(AI_GENERIC_SITE_CREATURE_UPGRADE_FLAG);
                 eventHero->m_mobility += AI_EVENT_CREATURE_UPGRADE_MOBILITY;
                 eventHero->m_remainingMobility += AI_EVENT_CREATURE_UPGRADE_MOBILITY;
             }

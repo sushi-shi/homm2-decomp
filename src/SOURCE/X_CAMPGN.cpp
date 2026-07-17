@@ -291,11 +291,11 @@ void ExpCampaign::InitMap(void) {
             if (player->m_heroCount > 0) {
                 for (heroPosition = 0; heroPosition < player->m_heroCount; ++heroPosition) {
                     choiceHero = gpGame->GetHero(player->m_heroIds[heroPosition]);
-                    if (m_campaignId == EXPANSION_CAMPAIGN_VOYAGE_HOME && m_currentMap == 3) {
+                    if (m_campaignId == IDX(EXPANSION_CAMPAIGN_VOYAGE_HOME) && m_currentMap == 3) {
                         if (choiceHero->m_portrait == IDX(EXPANSION_HERO_GALLAVANT))
                             break;
                     } else {
-                        if (m_campaignId == EXPANSION_CAMPAIGN_VOYAGE_HOME && m_currentMap == 2) {
+                        if (m_campaignId == IDX(EXPANSION_CAMPAIGN_VOYAGE_HOME) && m_currentMap == 2) {
                             if (choiceHero->m_portrait == IDX(EXPANSION_HERO_CEALLACH))
                                 break;
                         } else {
@@ -330,7 +330,7 @@ void ExpCampaign::InitMap(void) {
             if (player->m_heroCount > 0) {
                 for (heroPosition = 0; heroPosition < player->m_heroCount; ++heroPosition) {
                     choiceHero = gpGame->GetHero(player->m_heroIds[heroPosition]);
-                    if (m_campaignId == EXPANSION_CAMPAIGN_VOYAGE_HOME && m_currentMap == 2) {
+                    if (m_campaignId == IDX(EXPANSION_CAMPAIGN_VOYAGE_HOME) && m_currentMap == 2) {
                         if (choiceHero->m_portrait == IDX(EXPANSION_HERO_CEALLACH))
                             break;
                     } else {
@@ -1100,7 +1100,7 @@ VA(0x004bd5aa, 0x59)
 u8 ExpCampaign::IsCompleted(void) {
     if (m_mapsPlayed[m_mapCount - 1])
         return 1;
-    if (m_campaignId == EXPANSION_CAMPAIGN_VOYAGE_HOME
+    if (m_campaignId == IDX(EXPANSION_CAMPAIGN_VOYAGE_HOME)
         && m_mapsPlayed[IDX(EXPANSION_MAP_VOY_KING_AND_COUNTRY)])
         return 1;
     return 0;
@@ -1264,7 +1264,7 @@ char* ExpCampaign::IvanName(void) {
 
 VA(0x004bdaeb, 0x4e)
 i8 ExpCampaign::IsSpecialGoldenBow(i32 x, i32 y) {
-    if (m_campaignId == EXPANSION_CAMPAIGN_DESCENDANTS
+    if (m_campaignId == IDX(EXPANSION_CAMPAIGN_DESCENDANTS)
         && m_currentMap == EXPANSION_MAP_DES_ELVEN_LANDS
         && x == EXPANSION_CAMPAIGN_GOLDEN_BOW_EVENT_X && y == EXPANSION_CAMPAIGN_GOLDEN_BOW_EVENT_Y)
         return 1;
@@ -1273,7 +1273,7 @@ i8 ExpCampaign::IsSpecialGoldenBow(i32 x, i32 y) {
 
 VA(0x004bdb39, 0x38)
 i8 ExpCampaign::IsSpecialUA(void) {
-    if (m_campaignId == EXPANSION_CAMPAIGN_WIZARDS_ISLE
+    if (m_campaignId == IDX(EXPANSION_CAMPAIGN_WIZARDS_ISLE)
         && m_currentMap == EXPANSION_MAP_WIZ_POWERS_END)
         return 1;
     return 0;
@@ -1284,7 +1284,7 @@ i8 ExpCampaign::IsSpecialLossCondition(i32 playerIndex) {
     playerData* player = &gpGame->m_players[playerIndex];
 
     if (playerIndex == EXPANSION_CAMPAIGN_MAIN_PLAYER
-        && m_campaignId == EXPANSION_CAMPAIGN_PRICE_OF_LOYALTY
+        && m_campaignId == IDX(EXPANSION_CAMPAIGN_PRICE_OF_LOYALTY)
         && m_currentMap == EXPANSION_MAP_POL_ABYSS && player->m_heroCount == 0)
         return 1;
     return 0;

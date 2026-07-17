@@ -668,11 +668,11 @@ void combatManager::CastSpell(
     } else {
         spellPower_i = m_spellPower[m_currentSide];
         if (m_heroes[m_currentSide]->HasArtifact(ARTIFACT_ENCHANTED_HOURGLASS)
-            && (gsSpellInfo[IDX(spell)].attributes & SPELL_ATTRIBUTE_DURATION)) {
+            && (gsSpellInfo[IDX(spell)].attributes & IDX(SPELL_ATTRIBUTE_DURATION))) {
             spellPower_i += SPELL_HOURGLASS_POWER_BONUS;
         }
         if (m_heroes[m_currentSide]->HasArtifact(ARTIFACT_WIZARD_HAT)
-            && (gsSpellInfo[IDX(spell)].attributes & SPELL_ATTRIBUTE_DURATION)) {
+            && (gsSpellInfo[IDX(spell)].attributes & IDX(SPELL_ATTRIBUTE_DURATION))) {
             spellPower_i += SPELL_WIZARD_HAT_POWER_BONUS;
         }
     }
@@ -732,9 +732,9 @@ void combatManager::CastSpell(
     }
 
     soundSpell_q = spell;
-    if (spell == CREATURE_SPELL_PETRIFY)
+    if (spell == IDX(CREATURE_SPELL_PETRIFY))
         soundSpell_q = SPELL_PARALYZE;
-    if (spell == CREATURE_SPELL_DISPEL)
+    if (spell == IDX(CREATURE_SPELL_DISPEL))
         soundSpell_q = SPELL_DISPEL;
     if (strlen(gsSpellInfo[IDX(soundSpell_q)].soundName) != 0)
         sprintf(sampleName_i, "%s.82M", gsSpellInfo[IDX(soundSpell_q)].soundName);
@@ -763,7 +763,7 @@ void combatManager::CastSpell(
                     sprintf(gText, "telptin.82m");
                     spellSample = LoadPlaySample(gText);
                 }
-                if ((teleportArmy_i->m_monster.flags.all & ARMY_FLAG_WIDE) != 0) {
+                if ((teleportArmy_i->m_monster.flags.all & IDX(ARMY_FLAG_WIDE)) != 0) {
                     adjacentHex_q = teleportDestination;
                     if (teleportArmy_i->m_facing == ARMY_FACING_RIGHT) {
                         adjacentHex_q =
@@ -1717,7 +1717,7 @@ void combatManager::BloodLustEffect(army* target, i32 effect) {
         giMaxExtentY - giMinExtentY + 1
     );
     DrawFrame(0, 1, 0, 1, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
-    target->m_monster.flags.abilityFlags |= effect;
+    target->m_monster.flags.abilityFlags |= IDX(effect);
     gpCombatManager->DrawFrame(0, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
     gpWindowManager->FizzleForward(
         giMinExtentX,
@@ -1734,7 +1734,7 @@ void combatManager::BloodLustEffect(army* target, i32 effect) {
         giMaxExtentX - giMinExtentX + 1,
         giMaxExtentY - giMinExtentY + 1
     );
-    target->m_monster.flags.abilityFlags -= effect;
+    target->m_monster.flags.abilityFlags -= IDX(effect);
     gpCombatManager->DrawFrame(0, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
     gpWindowManager->FizzleForward(
         giMinExtentX,
@@ -2040,7 +2040,7 @@ void combatManager::AddBolt(
     bolt->distanceRatio = 0;
     bolt->forceAngle = forceAngle;
 
-    if (colorMode == BOLT_COLOR_RAINBOW_FORWARD || colorMode == BOLT_COLOR_RAINBOW_REVERSE) {
+    if (colorMode == IDX(BOLT_COLOR_RAINBOW_FORWARD) || colorMode == IDX(BOLT_COLOR_RAINBOW_REVERSE)) {
         if (startX <= 0 || startX >= COMBAT_SCREEN_WIDTH - 1)
             bolt->drawVertically = 1;
         else
@@ -2538,7 +2538,7 @@ void combatManager::RippleCreature(i32 side, i32 armyIndex, i32 mode) {
 
     ResetLimitCreature();
     ++m_limitCreatureCount[side][armyIndex];
-    if (mode == SPELL_RIPPLE_MODE_DEATH_WAVE)
+    if (mode == IDX(SPELL_RIPPLE_MODE_DEATH_WAVE))
         gpCombatManager->DrawFrame(0, 1, 1, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
     else
         gpCombatManager->DrawFrame(1, 1, 1, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
@@ -2576,9 +2576,9 @@ void combatManager::RippleCreature(i32 side, i32 armyIndex, i32 mode) {
         i32 skipDistance =
             abs(RIPPLE_PHASE_CENTER - phase % RIPPLE_PHASE_PERIOD) - RIPPLE_SKIP_CENTER_OFFSET;
         i32 amplitudeIndex = (phase - RIPPLE_PHASE_START) / RIPPLE_AMPLITUDE_INDEX_DIVISOR + 1;
-        if (mode == SPELL_RIPPLE_MODE_DEATH_WAVE)
+        if (mode == IDX(SPELL_RIPPLE_MODE_DEATH_WAVE))
             amplitudeIndex = RIPPLE_MODE_TWO_AMPLITUDE_START - amplitudeIndex;
-        else if (mode == SPELL_RIPPLE_MODE_WAVE) {
+        else if (mode == IDX(SPELL_RIPPLE_MODE_WAVE)) {
             if (amplitudeIndex == 0)
                 amplitudeIndex = RIPPLE_MODE_ZERO_CENTER_AMPLITUDE;
             else
@@ -2592,7 +2592,7 @@ void combatManager::RippleCreature(i32 side, i32 armyIndex, i32 mode) {
             memset(gyModify + giMinExtentY, 0, extentHeight);
             for (row = giMinExtentY; row < giMaxExtentY; ++row) {
                 i32 waveIndex;
-                if (mode == SPELL_RIPPLE_MODE_DEATH_WAVE)
+                if (mode == IDX(SPELL_RIPPLE_MODE_DEATH_WAVE))
                     waveIndex = -RIPPLE_PHASE_CENTER - giMaxExtentY + phase * 2 + row;
                 else
                     waveIndex = phase * 2 - RIPPLE_PHASE_CENTER - row + giMinExtentY;
@@ -2600,7 +2600,7 @@ void combatManager::RippleCreature(i32 side, i32 armyIndex, i32 mode) {
                 if (waveIndex >= 0 && waveIndex < SPELL_MODIFIER_ROW_COUNT)
                     gyModify[row] = static_cast<i8>(wave[waveIndex] * amplitude);
             }
-            if (mode == SPELL_RIPPLE_MODE_DEATH_RIPPLE && phase >= RIPPLE_DEATH_RIPPLE_FADE_START) {
+            if (mode == IDX(SPELL_RIPPLE_MODE_DEATH_RIPPLE) && phase >= RIPPLE_DEATH_RIPPLE_FADE_START) {
                 i32 start = giMinExtentY - 1;
                 i32 end = giMinExtentY
                           + (RIPPLE_DEATH_RIPPLE_FADE_BASE - (RIPPLE_PHASE_END - phase))
@@ -2608,7 +2608,7 @@ void combatManager::RippleCreature(i32 side, i32 armyIndex, i32 mode) {
                           + 1;
                 memset(gyModify + start, VAPORIZE_MASKED, end - start + 1);
             }
-            if (mode == SPELL_RIPPLE_MODE_DEATH_WAVE && phase < RIPPLE_DEATH_WAVE_FADE_END) {
+            if (mode == IDX(SPELL_RIPPLE_MODE_DEATH_WAVE) && phase < RIPPLE_DEATH_WAVE_FADE_END) {
                 i32 start = giMinExtentY - 1;
                 i32 end =
                     giMaxExtentY - 1
@@ -2625,7 +2625,7 @@ void combatManager::RippleCreature(i32 side, i32 armyIndex, i32 mode) {
     H2_FREE(gyModify, 2587 + SPELL_RIPPLE_MODIFIER_FREE_LINE_OFFSET);
     H2_FREE(wave, 2587 + SPELL_RIPPLE_WAVE_FREE_LINE_OFFSET);
     gyModify = 0;
-    if (mode != SPELL_RIPPLE_MODE_DEATH_RIPPLE)
+    if (mode != IDX(SPELL_RIPPLE_MODE_DEATH_RIPPLE))
         gpCombatManager->DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
 }
 
@@ -2641,7 +2641,7 @@ void combatManager::ShowMassSpell(i8 (*const affected)[20], i32 effect, i32 anim
     u32l effectFile = MAKEFILEID(gCombatFxNames[effect]);
     i32 effectFrames = giNumPowFrames[effect] - 1;
     i32 returnFrames = 0;
-    if (gCurLoadedSpellEffect != effect) {
+    if (gCurLoadedSpellEffect != IDX(effect)) {
         gpResourceManager->Dispose(gCurLoadedSpellIcon);
         gCurLoadedSpellIcon = gpResourceManager->GetIcon(effectFile);
         gCurLoadedSpellEffect = effect;
@@ -2948,7 +2948,7 @@ void combatManager::MirrorImage(i32 targetHex) {
             if (sourcePart == 0) {
                 searchHex = source->m_hex;
             } else {
-                if ((source->m_monster.flags.all & ARMY_FLAG_WIDE) == 0)
+                if ((source->m_monster.flags.all & IDX(ARMY_FLAG_WIDE)) == 0)
                     continue;
                 if (source->m_facing == ARMY_FACING_RIGHT)
                     searchHex = source->m_hex + 1;
@@ -3002,7 +3002,7 @@ mirror_found:
     );
     army* image =
         &m_armies[m_hexCells[mirrorHex].m_occupantSide][m_hexCells[mirrorHex].m_occupantIndex];
-    image->m_monster.flags.abilityFlags |= MIRROR_MONSTER_ABILITY;
+    image->m_monster.flags.abilityFlags |= IDX(MIRROR_MONSTER_ABILITY);
     i32 duration = m_spellPower[m_currentSide];
     if (m_heroes[m_currentSide]->HasArtifact(ARTIFACT_ENCHANTED_HOURGLASS))
         duration += SPELL_HOURGLASS_POWER_BONUS;
@@ -3078,7 +3078,7 @@ void combatManager::SummonElemental(i32 monsterType, i32 spellPower) {
     );
     army* elementals =
         &m_armies[m_hexCells[summonHex].m_occupantSide][m_hexCells[summonHex].m_occupantIndex];
-    elementals->m_monster.flags.abilityFlags |= MIRROR_MONSTER_ABILITY;
+    elementals->m_monster.flags.abilityFlags |= IDX(MIRROR_MONSTER_ABILITY);
     spellPower = m_spellPower[m_currentSide];
     if (m_heroes[m_currentSide]->HasArtifact(ARTIFACT_ENCHANTED_HOURGLASS))
         spellPower += SPELL_HOURGLASS_POWER_BONUS;
@@ -3132,7 +3132,7 @@ void combatManager::DoLuck(i32 side, i32 armyIndex) {
         LUCK_BOLT_WIDTH,
         BOLT_COLOR_RAINBOW_REVERSE
             + ((((targetX_k | 0) >= startX_b) - 1)
-               & (BOLT_COLOR_RAINBOW_FORWARD - BOLT_COLOR_RAINBOW_REVERSE)),
+               & (BOLT_COLOR_RAINBOW_FORWARD - IDX(BOLT_COLOR_RAINBOW_REVERSE))),
         LUCK_BOLT_ANGLE,
         LUCK_BOLT_ANGLE,
         LUCK_BOLT_DISTANCE,
@@ -3173,7 +3173,7 @@ void combatManager::DoBlast(i32 targetHex, i32 spell) {
     float stepX_a;
     i32 segmentCount_f;
 
-    if (spell == SPELL_COLD_RAY) {
+    if (spell == IDX(SPELL_COLD_RAY)) {
         blastIcon_h = gpResourceManager->GetIcon("coldray.icn");
         frameSpacing_c = BLAST_COLD_RAY_FRAME_SPACING;
     } else {
@@ -3272,7 +3272,7 @@ void combatManager::Resurrect(i32 spell, i32 targetHex, i32 spellPower) {
                             / static_cast<u16>(target_i->m_monster.hitPoints);
     if (target_i->m_initialQuantity < target_i->m_quantity)
         target_i->m_quantity = target_i->m_initialQuantity;
-    if (spell == SPELL_RESURRECT)
+    if (spell == IDX(SPELL_RESURRECT))
         target_i->m_temporaryResurrectionQuantity += target_i->m_quantity - oldQuantity_b;
 
     if (oldQuantity_b <= 0) {
@@ -3380,7 +3380,7 @@ void combatManager::Resurrect(i32 spell, i32 targetHex, i32 spellPower) {
         gpResourceManager->Dispose(resurrectIcon);
     }
     DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
-    target_i->m_monster.flags.abilityFlags &= ~RESURRECT_MONSTER_ABILITY;
+    target_i->m_monster.flags.abilityFlags &= ~IDX(RESURRECT_MONSTER_ABILITY);
 }
 
 VA(0x004296de, 0xb9)
@@ -3432,35 +3432,35 @@ void combatManager::ModifyDamageForArtifacts(
 ) {
     if (attacker != 0) {
         if (attacker->HasArtifact(ARTIFACT_EVERCOLD_ICICLE)
-            && (spell == SPELL_COLD_RAY || spell == SPELL_COLD_RING))
+            && (spell == IDX(SPELL_COLD_RAY) || spell == IDX(SPELL_COLD_RING)))
             *damage = static_cast<i32l>(*damage * SPELL_ARTIFACT_DAMAGE_BONUS);
         if (attacker->HasArtifact(ARTIFACT_EVERHOT_LAVA_ROCK)
-            && (spell == SPELL_FIREBALL || spell == SPELL_FIREBLAST))
+            && (spell == IDX(SPELL_FIREBALL) || spell == IDX(SPELL_FIREBLAST)))
             *damage = static_cast<i32l>(*damage * SPELL_ARTIFACT_DAMAGE_BONUS);
         if (attacker->HasArtifact(ARTIFACT_LIGHTNING_ROD)
-            && (spell == SPELL_LIGHTNING_BOLT || spell == SPELL_CHAIN_LIGHTNING))
+            && (spell == IDX(SPELL_LIGHTNING_BOLT) || spell == IDX(SPELL_CHAIN_LIGHTNING)))
             *damage = static_cast<i32l>(*damage * SPELL_ARTIFACT_DAMAGE_BONUS);
     }
     if (defender != 0) {
         if (defender->HasArtifact(ARTIFACT_ICE_CLOAK)
-            && (spell == SPELL_COLD_RAY || spell == SPELL_COLD_RING))
+            && (spell == IDX(SPELL_COLD_RAY) || spell == IDX(SPELL_COLD_RING)))
             *damage = static_cast<i32l>(*damage * SPELL_ARTIFACT_DAMAGE_REDUCTION);
         if (defender->HasArtifact(ARTIFACT_FIRE_CLOAK)
-            && (spell == SPELL_FIREBALL || spell == SPELL_FIREBLAST))
+            && (spell == IDX(SPELL_FIREBALL) || spell == IDX(SPELL_FIREBLAST)))
             *damage = static_cast<i32l>(*damage * SPELL_ARTIFACT_DAMAGE_REDUCTION);
         if (defender->HasArtifact(ARTIFACT_LIGHTNING_HELM)
-            && (spell == SPELL_LIGHTNING_BOLT || spell == SPELL_CHAIN_LIGHTNING))
+            && (spell == IDX(SPELL_LIGHTNING_BOLT) || spell == IDX(SPELL_CHAIN_LIGHTNING)))
             *damage = static_cast<i32l>(*damage * SPELL_ARTIFACT_DAMAGE_REDUCTION);
         if (defender->HasArtifact(ARTIFACT_HEART_FIRE)) {
-            if (spell == SPELL_COLD_RAY || spell == SPELL_COLD_RING)
+            if (spell == IDX(SPELL_COLD_RAY) || spell == IDX(SPELL_COLD_RING))
                 *damage <<= 1;
-            else if (spell == SPELL_FIREBALL || spell == SPELL_FIREBLAST)
+            else if (spell == IDX(SPELL_FIREBALL) || spell == IDX(SPELL_FIREBLAST))
                 *damage = static_cast<i32l>(*damage * SPELL_ARTIFACT_DAMAGE_REDUCTION);
         }
         if (defender->HasArtifact(ARTIFACT_HEART_ICE)) {
-            if (spell == SPELL_COLD_RAY || spell == SPELL_COLD_RING)
+            if (spell == IDX(SPELL_COLD_RAY) || spell == IDX(SPELL_COLD_RING))
                 *damage = static_cast<i32l>(*damage * SPELL_ARTIFACT_DAMAGE_REDUCTION);
-            else if (spell == SPELL_FIREBALL || spell == SPELL_FIREBLAST)
+            else if (spell == IDX(SPELL_FIREBALL) || spell == IDX(SPELL_FIREBLAST))
                 *damage <<= 1;
         }
     }
@@ -3601,8 +3601,8 @@ void combatManager::Earthquake(void) {
             impactPositions[impactCount][IDX(COMBAT_COORDINATE_Y)] =
                 wallPos[structure][IDX(COMBAT_COORDINATE_Y)] + EARTHQUAKE_CLOUD_Y_OFFSET;
             ++impactCount;
-            if (newWallStates[structure] == COMBAT_WALL_STATE_DESTROYED
-                || newWallStates[structure] == COMBAT_WALL_STATE_SECTION_DESTROYED)
+            if (newWallStates[structure] == IDX(COMBAT_WALL_STATE_DESTROYED)
+                || newWallStates[structure] == IDX(COMBAT_WALL_STATE_SECTION_DESTROYED))
                 m_hexCells[iWallToHexCell[structure]].m_blocked = 0;
         }
 
@@ -3619,7 +3619,7 @@ void combatManager::Earthquake(void) {
     }
 
     i32 newKeepState = m_drawbridgeState;
-    if (m_drawbridgeState != 3 && SRandom(0, 100) < EARTHQUAKE_KEEP_HIT_CHANCE) {
+    if (m_drawbridgeState != 3 && IDX(SRandom)(0, 100) < EARTHQUAKE_KEEP_HIT_CHANCE) {
         newKeepState = 3;
         impactPositions[impactCount][IDX(COMBAT_COORDINATE_X)] =
             towerPos[0][IDX(COMBAT_COORDINATE_X)];
@@ -3702,15 +3702,15 @@ void combatManager::ShowSpellMessage(i32 castByCreature, i32 spell, army* target
         sprintf(targetName_b, name_k);
     }
     if (castByCreature != 0) {
-        if (spell == SPELL_PARALYZE)
+        if (spell == IDX(SPELL_PARALYZE))
             sprintf(message_m, "The %s are paralyzed by the Cyclopes!", targetName_b);
-        else if (spell == SPELL_BLIND)
+        else if (spell == IDX(SPELL_BLIND))
             sprintf(message_m, "The Unicorns' attack blinds the %s!", targetName_b);
-        else if (spell == CREATURE_SPELL_PETRIFY)
+        else if (spell == IDX(CREATURE_SPELL_PETRIFY))
             sprintf(message_m, "The Medusas' gaze turns the %s to stone!", targetName_b);
-        else if (spell == SPELL_CURSE)
+        else if (spell == IDX(SPELL_CURSE))
             sprintf(message_m, "The Mummies' curse falls upon the %s!", targetName_b);
-        else if (spell == CREATURE_SPELL_DISPEL)
+        else if (spell == IDX(CREATURE_SPELL_DISPEL))
             sprintf(message_m, "The Archmages dispel all good spells\non your %s!", targetName_b);
         else {
             unhandledSpell_j = 0;

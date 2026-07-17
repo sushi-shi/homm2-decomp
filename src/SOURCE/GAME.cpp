@@ -244,7 +244,7 @@ i32 playerData::BuildingsOwned(i32 townType, BuildingSlotType buildingIndex, i32
                         count++;
                 }
             } else {
-                if (ownedTown->m_buildings & (1 << buildingIndex))
+                if (ownedTown->m_buildings & (1 << IDX(buildingIndex)))
                     count++;
             }
         }
@@ -259,7 +259,7 @@ i32 playerData::NumOfGivenArtifact(ArtifactType artifact) {
     for (i = 0; i < m_heroCount; i++) {
         i32 j;
         for (j = 0; j < HERO_ARTIFACT_SLOT_COUNT; j++) {
-            if (gpGame->m_heroRecs[m_heroIds[i]].m_artifacts[j] == artifact)
+            if (gpGame->m_heroRecs[m_heroIds[i]].m_artifacts[j] == IDX(artifact))
                 count++;
         }
     }
@@ -3419,14 +3419,14 @@ void game::PerDay(void) {
         if (m_mines[player].owner != -1) {
             resourceType1 = m_mines[player].resourceType;
             dailyIncome0 = 0;
-            if (resourceType1 == RES_ORE)
+            if (resourceType1 == IDX(RES_ORE))
                 dailyIncome0 = 2;
-            else if (resourceType1 == RES_WOOD)
+            else if (resourceType1 == IDX(RES_WOOD))
                 dailyIncome0 = 2;
-            else if (resourceType1 != RES_GOLD)
+            else if (resourceType1 != IDX(RES_GOLD))
                 dailyIncome0 = 1;
 
-            if (resourceType1 != RES_GOLD && resourceType1 <= RES_GOLD)
+            if (resourceType1 != IDX(RES_GOLD) && resourceType1 <= IDX(RES_GOLD))
                 m_players[m_mines[player].owner].m_resources[resourceType1] += dailyIncome0;
         }
     }
@@ -3483,7 +3483,7 @@ void game::PerDay(void) {
 
     for (player = 0; player < GAME_HERO_COUNT; player++)
         m_heroRecs[player].m_eventFlags =
-            m_heroRecs[player].m_eventFlags & ~WEEKLY_HERO_RESERVED_FLAG;
+            m_heroRecs[player].m_eventFlags & ~IDX(WEEKLY_HERO_RESERVED_FLAG);
 
     for (player = 0; player < gpGame->m_playerCount; player++) {
         for (resource8 = 0; resource8 < 6; resource8++) {
@@ -3520,7 +3520,7 @@ void game::PerDay(void) {
         if (currentHero6->m_spellPoints < restoredSpellPoints13)
             currentHero6->m_spellPoints = static_cast<i16>(restoredSpellPoints13);
         if (HAS(currentHero6->m_eventFlags, HERO_EVENT_MAGIC_WELL))
-            currentHero6->m_eventFlags = currentHero6->m_eventFlags - HERO_EVENT_MAGIC_WELL;
+            currentHero6->m_eventFlags = currentHero6->m_eventFlags - IDX(HERO_EVENT_MAGIC_WELL);
     }
 
     for (player = 0; player < GAME_TOWN_COUNT; player++) {
@@ -3624,7 +3624,7 @@ void game::PerWeek(void) {
                             innerIndex3 - outerIndex5 + outerIndex5 * (sizeof(playerData) + 1)
                         )[gpGame->m_players[0].m_availableHeroIds]]
                         .m_eventFlags
-                    & WEEKLY_HERO_RESERVED_FLAG)
+                    & IDX(WEEKLY_HERO_RESERVED_FLAG))
                     continue;
             }
             {
@@ -3778,7 +3778,7 @@ void game::PerWeek(void) {
 
     for (outerIndex5 = 0; outerIndex5 < GAME_HERO_COUNT; outerIndex5++) {
         weeklyHero4 = &m_heroRecs[outerIndex5];
-        if (weeklyHero4->m_eventFlags & WEEKLY_HERO_VISIT_FLAG)
+        if (weeklyHero4->m_eventFlags & IDX(WEEKLY_HERO_VISIT_FLAG))
             weeklyHero4->m_eventFlags =
                 static_cast<u32>(weeklyHero4->m_eventFlags) - WEEKLY_HERO_VISIT_FLAG;
     }
@@ -3950,7 +3950,7 @@ void game::ConvertObject(
             if (x >= 0 && x < MAP_WIDTH && y >= 0 && MAP_HEIGHT >= y + 1) {
                 cell = WORLDMAP->GetCell(x, y);
                 if (cell->m_objectIndex != static_cast<u8>(-1)
-                    && cell->m_objectTileset == oldTileset && cell->m_objectIndex >= oldFirstIndex
+                    && cell->m_objectTileset == IDX(oldTileset) && cell->m_objectIndex >= oldFirstIndex
                     && cell->m_objectIndex <= oldLastIndex) {
                     cell->m_objectTileset = static_cast<u8>(newTileset);
                     cell->m_objectIndex =
@@ -3967,7 +3967,7 @@ void game::ConvertObject(
                 else
                     extra = 0;
                 while (extra != 0) {
-                    if (extra->objectTileset == oldTileset && extra->objectIndex >= oldFirstIndex
+                    if (extra->objectTileset == IDX(oldTileset) && extra->objectIndex >= oldFirstIndex
                         && extra->objectIndex <= oldLastIndex) {
                         extra->objectTileset = static_cast<u8>(newTileset);
                         extra->objectIndex =
@@ -3981,7 +3981,7 @@ void game::ConvertObject(
                 }
 
                 if (cell->m_overlayIndex != static_cast<u8>(-1)
-                    && cell->m_overlayTileset == oldTileset && cell->m_overlayIndex >= oldFirstIndex
+                    && cell->m_overlayTileset == IDX(oldTileset) && cell->m_overlayIndex >= oldFirstIndex
                     && cell->m_overlayIndex <= oldLastIndex) {
                     cell->m_overlayTileset = static_cast<u8>(newTileset);
                     cell->m_overlayIndex =
@@ -3993,7 +3993,7 @@ void game::ConvertObject(
                 else
                     extra = 0;
                 while (extra != 0) {
-                    if (extra->overlayTileset == oldTileset && extra->overlayIndex >= oldFirstIndex
+                    if (extra->overlayTileset == IDX(oldTileset) && extra->overlayIndex >= oldFirstIndex
                         && extra->overlayIndex <= oldLastIndex) {
                         extra->overlayTileset = static_cast<u8>(newTileset);
                         extra->overlayIndex =
@@ -6102,7 +6102,7 @@ void game::RestoreCell(i32 x, i32 y, i32 obj, i32 barrier, mapCell* passedCell, 
         cell = passedCell;
     else
         cell = gpAdvManager->GetCell(x, y);
-    if (y > 0 && obj == MAP_TRIGGER_TOWN
+    if (y > 0 && obj == IDX(MAP_TRIGGER_TOWN)
         && gpAdvManager->GetCell(x, y - 1)->m_triggerType != IDX(MAP_TRIGGER_TOWN_BASE)) {
         cell->m_triggerType = 0;
         cell->m_objectMetadata = 0;
@@ -6144,16 +6144,16 @@ VA(0x004849a2, 0x100)
 void WriteDiffHeaderInfo(u8 cmd, i32 len, u8* buf, i32* pos) {
     u8 flags = 0;
     flags = (cmd << IDX(DIFF_COMMAND_SHIFT)) | flags;
-    if (len > DIFF_LEN_WORD_MAX) {
+    if (len > IDX(DIFF_LEN_WORD_MAX)) {
         flags |= IDX(DIFF_LEN_WORD_FLAG);
-        flags |= (len & DIFF_LEN_HIGH_MASK) >> 16;
-        u16 word = static_cast<u16>(len & DIFF_LEN_LOW_MASK);
+        flags |= (len & IDX(DIFF_LEN_HIGH_MASK)) >> 16;
+        u16 word = static_cast<u16>(len & IDX(DIFF_LEN_LOW_MASK));
         buf[*pos] = flags;
         *reinterpret_cast<u16*>(buf + *pos + 1) = word;
         *pos += 3;
-    } else if (len > DIFF_LEN_BYTE_MAX) {
+    } else if (len > IDX(DIFF_LEN_BYTE_MAX)) {
         flags |= IDX(DIFF_LEN_BYTE_FLAG);
-        flags |= (len >> 8) & DIFF_LEN_SHORT_MASK;
+        flags |= (len >> 8) & IDX(DIFF_LEN_SHORT_MASK);
         u8 lo = static_cast<u8>(len);
         buf[*pos] = flags;
         buf[*pos + 1] = lo;

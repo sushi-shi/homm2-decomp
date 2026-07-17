@@ -2141,8 +2141,8 @@ void FadeToColorTable(u8* colorTable, i32 increment) {
 
 VA(0x004c66a0, 0x29)
 i32 IsCycleColor(i32 color) {
-    if ((color >= MISC_CYCLE_RANGE_ONE_FIRST && color <= MISC_CYCLE_RANGE_ONE_LAST)
-        || (color >= MISC_CYCLE_RANGE_TWO_FIRST && color <= MISC_CYCLE_RANGE_TWO_LAST)) {
+    if ((color >= IDX(MISC_CYCLE_RANGE_ONE_FIRST) && color <= IDX(MISC_CYCLE_RANGE_ONE_LAST))
+        || (color >= IDX(MISC_CYCLE_RANGE_TWO_FIRST) && color <= IDX(MISC_CYCLE_RANGE_TWO_LAST))) {
         return 1;
     }
     return 0;
@@ -2459,7 +2459,7 @@ void GetDataEntry(
 // exact-preserving predecessor/TU-state change.
 VA(0x004c6e50, 0x173)
 i32 DataEntryWindowHandler(struct tag_message& message) {
-    if (bDataEntryTime == DATA_ENTRY_PHASE_IMMEDIATE) {
+    if (bDataEntryTime == IDX(DATA_ENTRY_PHASE_IMMEDIATE)) {
         ++bDataEntryTime;
         message.type = MESSAGE_LEFT_BUTTON_DOWN;
         message.payload.mouse.x = inBoxX;
@@ -2468,7 +2468,7 @@ i32 DataEntryWindowHandler(struct tag_message& message) {
         return EVENT_WINDOW_CONTINUE;
     }
 
-    if (bDataEntryTime == DATA_ENTRY_PHASE_POINTER_SENT)
+    if (bDataEntryTime == IDX(DATA_ENTRY_PHASE_POINTER_SENT))
         ++bDataEntryTime;
     else {
         if (message.type != MESSAGE_WIDGET)

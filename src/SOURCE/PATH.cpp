@@ -133,7 +133,7 @@ i32 army::ValidMove(i32 sourceHex, i32 direction) {
         && (!gpCombatManager->m_hexCells[destinationHexNext].m_blocked
             || (gpCombatManager->m_inCastleCombat
                 && (destinationHexNext == COMBAT_CASTLE_GATE_APPROACH_HEX
-                    || destinationHexNext == COMBAT_CASTLE_HEX_GATE)
+                    || destinationHexNext == IDX(COMBAT_CASTLE_HEX_GATE))
                 && (gpCombatManager->m_drawbridgeState != COMBAT_DRAWBRIDGE_RAISED
                     || (gpCombatManager->m_currentSide == COMBAT_DEFENDER_SIDE
                         && gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX]

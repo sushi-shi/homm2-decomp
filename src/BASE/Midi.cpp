@@ -130,7 +130,7 @@ VA(0x004d3f80, 0x46)
 inline i32 soundManager::MIDIIsPlaying(void) {
     if (gbNoSound == 0 && gConfig.musicVolume != 0 && m_midiReady != 0
         && CurrentMidiFile != MIDI_NO_TRACK && hSequence[CurrentMidiFile] != 0) {
-        return AIL_sequence_status(hSequence[CurrentMidiFile]) == MIDI_SEQUENCE_PLAYING;
+        return AIL_sequence_status(hSequence[CurrentMidiFile]) == IDX(MIDI_SEQUENCE_PLAYING);
     }
     return 0;
 }

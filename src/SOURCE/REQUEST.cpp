@@ -246,7 +246,7 @@ fileRequester::fileRequester(
     m_y = y;
     m_mode = static_cast<FileRequesterMode>(mode);
     strcpy(m_defaultExtension, defaultExtension);
-    if (mode == FILE_REQUESTER_MAP_GAME || mode == FILE_REQUESTER_MAP) {
+    if (mode == IDX(FILE_REQUESTER_MAP_GAME) || mode == IDX(FILE_REQUESTER_MAP)) {
         fGutterTravelLength = 123.0f;
         fGutterMinY = 73.0f;
         iMaxListSize = 9;
@@ -472,7 +472,7 @@ i32 fileRequester::Main(struct tag_message& message) {
                         strcpy(cycleNameBuffer, "");
                     }
                     giMapSizeFilter = static_cast<FileRequesterMapSizeFilter>(
-                        (giMapSizeFilter + 1) % FILE_REQUESTER_MAP_SIZE_COUNT
+                        (giMapSizeFilter + 1) % IDX(FILE_REQUESTER_MAP_SIZE_COUNT)
                     );
                     SetupFiles();
                     if (strlen(cycleNameBuffer) != 0) {
@@ -959,7 +959,7 @@ void fileRequester::Update(i32 drawWindow) {
         for (i = 0; i < IDX(FILE_REQUESTER_MAP_SIZE_COUNT); ++i) {
             broadcastMessage.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
             broadcastMessage.payload.widget.id = FILE_REQUESTER_FILTER_SMALL + i;
-            broadcastMessage.payload.widget.data.value = (giMapSizeFilter == i) + i * 2 + 9;
+            broadcastMessage.payload.widget.data.value = (giMapSizeFilter == IDX(i)) + i * 2 + 9;
             m_window->BroadcastMessage(broadcastMessage);
         }
         if (m_selectedIndex == FILE_REQUESTER_SELECTION_NONE && m_fileCount > 0) {
@@ -982,17 +982,17 @@ void fileRequester::Update(i32 drawWindow) {
 
         broadcastMessage.payload.widget.id = FILE_REQUESTER_MAP_PLAYER_COUNT;
         broadcastMessage.payload.widget.data.value =
-            m_mapHeaders[m_selectedIndex].playerCount + PLAYER_COUNT_FRAME_BASE;
+            m_mapHeaders[m_selectedIndex].playerCount + IDX(PLAYER_COUNT_FRAME_BASE);
         m_window->BroadcastMessage(broadcastMessage);
 
         broadcastMessage.payload.widget.id = FILE_REQUESTER_MAP_VICTORY;
         broadcastMessage.payload.widget.data.value =
-            m_mapHeaders[m_selectedIndex].victoryCondition + VICTORY_FRAME_BASE;
+            m_mapHeaders[m_selectedIndex].victoryCondition + IDX(VICTORY_FRAME_BASE);
         m_window->BroadcastMessage(broadcastMessage);
 
         broadcastMessage.payload.widget.id = FILE_REQUESTER_MAP_LOSS;
         broadcastMessage.payload.widget.data.value =
-            m_mapHeaders[m_selectedIndex].lossCondition + LOSS_FRAME_BASE;
+            m_mapHeaders[m_selectedIndex].lossCondition + IDX(LOSS_FRAME_BASE);
         m_window->BroadcastMessage(broadcastMessage);
 
         broadcastMessage.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
@@ -1057,17 +1057,17 @@ void fileRequester::Update(i32 drawWindow) {
 
                 broadcastMessage.payload.widget.id = i + FILE_REQUESTER_MAP_PLAYER_ICON_FIRST;
                 broadcastMessage.payload.widget.data.value =
-                    m_mapHeaders[m_topIndex + i].playerCount + PLAYER_COUNT_FRAME_BASE;
+                    m_mapHeaders[m_topIndex + i].playerCount + IDX(PLAYER_COUNT_FRAME_BASE);
                 m_window->BroadcastMessage(broadcastMessage);
 
                 broadcastMessage.payload.widget.id = i + FILE_REQUESTER_MAP_VICTORY_ICON_FIRST;
                 broadcastMessage.payload.widget.data.value =
-                    m_mapHeaders[m_topIndex + i].victoryCondition + VICTORY_FRAME_BASE;
+                    m_mapHeaders[m_topIndex + i].victoryCondition + IDX(VICTORY_FRAME_BASE);
                 m_window->BroadcastMessage(broadcastMessage);
 
                 broadcastMessage.payload.widget.id = i + FILE_REQUESTER_MAP_LOSS_ICON_FIRST;
                 broadcastMessage.payload.widget.data.value =
-                    m_mapHeaders[m_topIndex + i].lossCondition + LOSS_FRAME_BASE;
+                    m_mapHeaders[m_topIndex + i].lossCondition + IDX(LOSS_FRAME_BASE);
                 m_window->BroadcastMessage(broadcastMessage);
             }
 

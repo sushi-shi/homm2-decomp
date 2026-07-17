@@ -52,7 +52,7 @@ icon::~icon() {
 
 VA(0x004c7b00, 0x44)
 void icon::DrawToBuffer(i32 x, i32 y, i32 frame, i32 flip) {
-    if (flip == ICON_DRAW_NORMAL) {
+    if (flip == IDX(ICON_DRAW_NORMAL)) {
         IconToBitmap(
             this,
             gpWindowManager->m_screen,
@@ -141,7 +141,7 @@ i32 icon::CombatClipDrawToBuffer(
         return ICON_DRAW_SKIPPED;
 
     if (yModify != 0) {
-        if (flip == ICON_DRAW_NORMAL)
+        if (flip == IDX(ICON_DRAW_NORMAL))
             IconToBitmapYModify(
                 this,
                 gpWindowManager->m_screen,
@@ -172,7 +172,7 @@ i32 icon::CombatClipDrawToBuffer(
                 yModify
             );
     } else if (colorTable != 0) {
-        if (flip == ICON_DRAW_NORMAL)
+        if (flip == IDX(ICON_DRAW_NORMAL))
             IconToBitmapColorTable(
                 this,
                 gpWindowManager->m_screen,
@@ -204,7 +204,7 @@ i32 icon::CombatClipDrawToBuffer(
                 colorTable
             );
     } else if (gbLimitToExtent != 0) {
-        if (flip == ICON_DRAW_NORMAL)
+        if (flip == IDX(ICON_DRAW_NORMAL))
             IconToBitmap(
                 this,
                 gpWindowManager->m_screen,
@@ -232,7 +232,7 @@ i32 icon::CombatClipDrawToBuffer(
                 giMaxExtentY - giMinExtentY + 1,
                 offset
             );
-    } else if (flip == ICON_DRAW_NORMAL) {
+    } else if (flip == IDX(ICON_DRAW_NORMAL)) {
         IconToBitmap(
             this,
             gpWindowManager->m_screen,
@@ -303,7 +303,7 @@ void icon::ClipFillToBuffer(
 // state change.
 VA(0x004c7e50, 0x103)
 void icon::FillToBuffer(i32 x, i32 y, i32 frame, i32 color, i32 flip, struct SLimitData* limits) {
-    if (flip != ICON_DRAW_NORMAL) {
+    if (flip != IDX(ICON_DRAW_NORMAL)) {
         FlipMonoIconToBitmap(
             this,
             gpWindowManager->m_screen,
@@ -345,7 +345,7 @@ void icon::FillToBuffer(i32 x, i32 y, i32 frame, i32 color, i32 flip, struct SLi
 
 VA(0x004c7f60, 0x3e)
 void icon::DimToBuffer(i32 x, i32 y, i32 frame, i32 flip) {
-    if (flip == ICON_DRAW_NORMAL) {
+    if (flip == IDX(ICON_DRAW_NORMAL)) {
         DimIconToBitmap(
             this,
             gpWindowManager->m_screen,

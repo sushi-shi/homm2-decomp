@@ -151,7 +151,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
             casWin->BroadcastMessage(message3);
             message3.payload.widget.command = CASTLE_WIDGET_FRAME;
             message3.payload.widget.data.value =
-                widgetFrame12 == -1 ? CASTLE_FRAME_AVAILABLE : CASTLE_FRAME_UNAVAILABLE;
+                widgetFrame12 == -1 ? IDX(CASTLE_FRAME_AVAILABLE) : CASTLE_FRAME_UNAVAILABLE;
             casWin->BroadcastMessage(message3);
         }
     }
@@ -225,7 +225,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
     }
 
     message3.payload.widget.command =
-        widgetFrame12 == -1 ? CASTLE_WIDGET_DISABLE : CASTLE_WIDGET_ENABLE;
+        widgetFrame12 == -1 ? IDX(CASTLE_WIDGET_DISABLE) : CASTLE_WIDGET_ENABLE;
     message3.payload.widget.id = CASTLE_CONTROL_CAPTAIN_BUTTON;
     message3.payload.widget.data.value = 4;
     casWin->BroadcastMessage(message3);

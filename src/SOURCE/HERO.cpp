@@ -69,7 +69,7 @@ i32 hero::HasArtifact(ArtifactType artifact) {
     i32 artifactIndex;
 
     for (artifactIndex = 0; artifactIndex < HERO_ARTIFACT_SLOT_COUNT; artifactIndex++) {
-        if (m_artifacts[artifactIndex] == artifact)
+        if (m_artifacts[artifactIndex] == IDX(artifact))
             return 1;
     }
     return 0;
@@ -140,7 +140,7 @@ i32 hero::HasSpell(SpellType spell) {
         return 1;
     for (artifactIndex = 0; artifactIndex < HERO_ARTIFACT_SLOT_COUNT; artifactIndex++) {
         if (m_artifacts[artifactIndex] == IDX(ARTIFACT_SPELL_SCROLL)
-            && m_artifactExtra[artifactIndex] == spell) {
+            && m_artifactExtra[artifactIndex] == IDX(spell)) {
             return 1;
         }
     }
@@ -164,11 +164,11 @@ i32 hero::GetNthSpell(i32 type, i32 spellNumber) {
 
     for (spell = 0; spell < IDX(SPELL_COUNT); spell++) {
         if (HasSpell(SpellType(spell))) {
-            if (type == HERO_SPELL_TYPE_ALL
-                || (type == HERO_SPELL_TYPE_COMBAT
-                    && (gsSpellInfo[spell].attributes & SPELL_ATTRIBUTE_COMBAT))
-                || (type == HERO_SPELL_TYPE_ADVENTURE
-                    && !(gsSpellInfo[spell].attributes & SPELL_ATTRIBUTE_COMBAT))) {
+            if (type == IDX(HERO_SPELL_TYPE_ALL)
+                || (type == IDX(HERO_SPELL_TYPE_COMBAT)
+                    && (gsSpellInfo[spell].attributes & IDX(SPELL_ATTRIBUTE_COMBAT)))
+                || (type == IDX(HERO_SPELL_TYPE_ADVENTURE)
+                    && !(gsSpellInfo[spell].attributes & IDX(SPELL_ATTRIBUTE_COMBAT)))) {
                 spellOrdinalCount++;
             }
             if (spellOrdinalCount == spellNumber)
@@ -192,7 +192,7 @@ i32 hero::GetNumSpells(i32 type) {
     numAdventureSpells = 0;
     for (spellIndexCurrent = 0; spellIndexCurrent < IDX(SPELL_COUNT); spellIndexCurrent++) {
         if (HasSpell(SpellType(spellIndexCurrent))) {
-            if (gsSpellInfo[spellIndexCurrent].attributes & SPELL_ATTRIBUTE_COMBAT)
+            if (gsSpellInfo[spellIndexCurrent].attributes & IDX(SPELL_ATTRIBUTE_COMBAT))
                 numCombatSpells++;
             else
                 numAdventureSpells++;
@@ -583,51 +583,51 @@ void hero::ApplyBattleWinTemps(void) {
 
     if (HAS(m_eventFlags, HERO_EVENT_GRAVEYARD)) {
         m_morale++;
-        m_eventFlags = m_eventFlags - HERO_EVENT_GRAVEYARD;
+        m_eventFlags = m_eventFlags - IDX(HERO_EVENT_GRAVEYARD);
     }
     if (HAS(m_eventFlags, HERO_EVENT_SHIPWRECK)) {
         m_morale++;
-        m_eventFlags = m_eventFlags - HERO_EVENT_SHIPWRECK;
+        m_eventFlags = m_eventFlags - IDX(HERO_EVENT_SHIPWRECK);
     }
     if (HAS(m_eventFlags, HERO_EVENT_BUOY)) {
         m_morale--;
-        m_eventFlags = m_eventFlags - HERO_EVENT_BUOY;
+        m_eventFlags = m_eventFlags - IDX(HERO_EVENT_BUOY);
     }
     if (HAS(m_eventFlags, HERO_EVENT_OASIS)) {
         m_morale--;
-        m_eventFlags = m_eventFlags - HERO_EVENT_OASIS;
+        m_eventFlags = m_eventFlags - IDX(HERO_EVENT_OASIS);
     }
     if (HAS(m_eventFlags, HERO_EVENT_TEMPLE)) {
         m_morale -= 2;
-        m_eventFlags = m_eventFlags - HERO_EVENT_TEMPLE;
+        m_eventFlags = m_eventFlags - IDX(HERO_EVENT_TEMPLE);
     }
     if (HAS(m_eventFlags, HERO_EVENT_FAERIE_RING)) {
         m_luck--;
-        m_eventFlags = m_eventFlags - HERO_EVENT_FAERIE_RING;
+        m_eventFlags = m_eventFlags - IDX(HERO_EVENT_FAERIE_RING);
     }
     if (HAS(m_eventFlags, HERO_EVENT_IDOL)) {
         m_luck--;
-        m_eventFlags = m_eventFlags - HERO_EVENT_IDOL;
+        m_eventFlags = m_eventFlags - IDX(HERO_EVENT_IDOL);
     }
     if (HAS(m_eventFlags, HERO_EVENT_FOUNTAIN)) {
         m_luck--;
-        m_eventFlags = m_eventFlags - HERO_EVENT_FOUNTAIN;
+        m_eventFlags = m_eventFlags - IDX(HERO_EVENT_FOUNTAIN);
     }
     if (HAS(m_eventFlags, HERO_EVENT_WATERING_HOLE)) {
         m_morale--;
-        m_eventFlags = m_eventFlags - HERO_EVENT_WATERING_HOLE;
+        m_eventFlags = m_eventFlags - IDX(HERO_EVENT_WATERING_HOLE);
     }
     if (HAS(m_eventFlags, HERO_EVENT_DERELICT_SHIP)) {
         m_morale++;
-        m_eventFlags = m_eventFlags - HERO_EVENT_DERELICT_SHIP;
+        m_eventFlags = m_eventFlags - IDX(HERO_EVENT_DERELICT_SHIP);
     }
     if (HAS(m_eventFlags, HERO_EVENT_PYRAMID)) {
         m_luck += 2;
-        m_eventFlags = m_eventFlags - HERO_EVENT_PYRAMID;
+        m_eventFlags = m_eventFlags - IDX(HERO_EVENT_PYRAMID);
     }
     if (HAS(m_eventFlags, HERO_EVENT_MERMAID)) {
         m_luck = m_luck - 1;
-        m_eventFlags = m_eventFlags - HERO_EVENT_MERMAID;
+        m_eventFlags = m_eventFlags - IDX(HERO_EVENT_MERMAID);
     }
 }
 
@@ -753,8 +753,8 @@ void hero::CheckLevel(void) {
                 }
             }
 
-            if (skillChoicesResult[0] == HERO_SKILL_WISDOM
-                || skillChoicesResult[1] == HERO_SKILL_WISDOM) {
+            if (skillChoicesResult[0] == IDX(HERO_SKILL_WISDOM)
+                || skillChoicesResult[1] == IDX(HERO_SKILL_WISDOM)) {
                 m_enabled = static_cast<u8>(currentLevelIndex);
             }
 
@@ -1833,7 +1833,7 @@ void DoHeroSplit(i32 destinationSlot, i32 sourceSlot) {
 
 VA(0x004701e1, 0x6a)
 void hero::SetSS(i32 skill, i32 level) {
-    if (level == HERO_SKILL_LEVEL_NONE)
+    if (level == IDX(HERO_SKILL_LEVEL_NONE))
         TakeSS(skill, IDX(HERO_SKILL_LEVEL_EXPERT));
     else if (m_secondarySkills[skill] != IDX(HERO_SKILL_LEVEL_NONE))
         m_secondarySkills[skill] = static_cast<i8>(level);
@@ -1947,7 +1947,7 @@ i8 hero::GetSSLevel(i32 skill) {
     i8 level;
 
     level = m_secondarySkills[skill];
-    if (skill != HERO_SKILL_NECROMANCY)
+    if (skill != IDX(HERO_SKILL_NECROMANCY))
         return level;
     if (level == IDX(HERO_SKILL_LEVEL_NONE))
         return level;

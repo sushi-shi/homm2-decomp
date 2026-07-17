@@ -41,7 +41,7 @@ i32 combatManager::DoSpellAI(i32 side, i32 restricted) {
 
     for (spellIndex = 0; spellIndex < IDX(SPELL_COUNT); spellIndex++) {
         if (m_heroes[side]->HasSpell(SpellType(spellIndex))
-            && (gsSpellInfo[spellIndex].attributes & SPELL_ATTRIBUTE_COMBAT)
+            && (gsSpellInfo[spellIndex].attributes & IDX(SPELL_ATTRIBUTE_COMBAT))
             && GetManaCost(SpellType(spellIndex), m_heroes[side]) <= m_heroes[side]->m_spellPoints) {
             if (restricted && spellIndex != IDX(SPELL_FIREBALL) && spellIndex != IDX(SPELL_FIREBLAST)
                 && spellIndex != IDX(SPELL_LIGHTNING_BOLT) && spellIndex != IDX(SPELL_CHAIN_LIGHTNING)
@@ -187,13 +187,13 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
             return;
     }
 
-    if (targetModeBySide[0] == COMBAT_SPELL_AI_RESURRECT)
+    if (targetModeBySide[0] == IDX(COMBAT_SPELL_AI_RESURRECT))
         doneResult = FirstResurrectable(COMBAT_SPELL_AI_FIRST_HEX, &hexIndex, IDX(spell));
-    if (targetModeBySide[0] == COMBAT_SPELL_AI_FRIENDLY
-        || targetModeBySide[0] == COMBAT_SPELL_AI_ENEMY
-        || targetModeBySide[0] == COMBAT_SPELL_AI_SUM_ENEMY
-        || targetModeBySide[0] == COMBAT_SPELL_AI_SUM_FRIENDLY
-        || targetModeBySide[0] == COMBAT_SPELL_AI_ANY_ARMY)
+    if (targetModeBySide[0] == IDX(COMBAT_SPELL_AI_FRIENDLY)
+        || targetModeBySide[0] == IDX(COMBAT_SPELL_AI_ENEMY)
+        || targetModeBySide[0] == IDX(COMBAT_SPELL_AI_SUM_ENEMY)
+        || targetModeBySide[0] == IDX(COMBAT_SPELL_AI_SUM_FRIENDLY)
+        || targetModeBySide[0] == IDX(COMBAT_SPELL_AI_ANY_ARMY))
         doneResult = FirstArmy(COMBAT_SPELL_AI_FIRST_HEX, side, &hexIndex);
 
     while (!doneResult) {
@@ -700,8 +700,8 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
                 totalEffect += effect;
         }
 
-        if (targetModeBySide[0] == COMBAT_SPELL_AI_SUM_FRIENDLY
-            || targetModeBySide[0] == COMBAT_SPELL_AI_SUM_ENEMY || *bestEffect < totalEffect) {
+        if (targetModeBySide[0] == IDX(COMBAT_SPELL_AI_SUM_FRIENDLY)
+            || targetModeBySide[0] == IDX(COMBAT_SPELL_AI_SUM_ENEMY) || *bestEffect < totalEffect) {
             *bestEffect = totalEffect;
             *bestHex = hexIndex;
         }
@@ -815,7 +815,7 @@ i32 combatManager::RawEffectSpellInfluence(army* target, i32 influence) {
         case IDX(ARMY_SPELL_INFLUENCE_HASTE):
         case IDX(ARMY_SPELL_INFLUENCE_SLOW): {
             i32 newSpeed;
-            if (influence == ARMY_SPELL_INFLUENCE_SLOW) {
+            if (influence == IDX(ARMY_SPELL_INFLUENCE_SLOW)) {
                 newSpeed = (target->m_monster.speed + 1) >> 1;
             } else {
                 newSpeed = target->m_monster.speed + COMBAT_SPELL_AI_HASTE_SPEED_BONUS;
@@ -866,7 +866,7 @@ i32 combatManager::RawEffectSpellInfluence(army* target, i32 influence) {
                 * COMBAT_SPELL_AI_BLESS_CURSE_MODIFIER
             );
             effect = static_cast<i32>(
-                influence == ARMY_SPELL_INFLUENCE_BLESS ? damageEffect : -damageEffect
+                influence == IDX(ARMY_SPELL_INFLUENCE_BLESS) ? damageEffect : -damageEffect
             );
             break;
         }
@@ -945,7 +945,7 @@ i32 combatManager::RawEffectSpellInfluence(army* target, i32 influence) {
     effect = static_cast<i32>(effect * workChance);
     if ((target->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BERSERK)]
          || target->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_HYPNOTIZE)])
-        && influence != ARMY_SPELL_INFLUENCE_ANTI_MAGIC)
+        && influence != IDX(ARMY_SPELL_INFLUENCE_ANTI_MAGIC))
         effect = 0;
     return effect;
 }

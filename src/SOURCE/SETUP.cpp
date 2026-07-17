@@ -258,12 +258,12 @@ i32 game::SetupModemGame(void) {
 
     LogStr("SMC 1");
     if (gbDirectConnect != 0) {
-        if (gConfig.comPort[gbDirectConnect] == SETUP_COM_PORT_UNCONFIGURED)
+        if (gConfig.comPort[gbDirectConnect] == IDX(SETUP_COM_PORT_UNCONFIGURED))
             window = new heroWindow(SETUP_WINDOW_X, SETUP_WINDOW_Y, "stpdc.bin");
         else
             window = new heroWindow(SETUP_WINDOW_X, SETUP_WINDOW_Y, "stpdccfg.bin");
     } else {
-        if (gConfig.comPort[gbDirectConnect] == SETUP_COM_PORT_UNCONFIGURED)
+        if (gConfig.comPort[gbDirectConnect] == IDX(SETUP_COM_PORT_UNCONFIGURED))
             window = new heroWindow(SETUP_WINDOW_X, SETUP_WINDOW_Y, "stpmodem.bin");
         else
             window = new heroWindow(SETUP_WINDOW_X, SETUP_WINDOW_Y, "stpmcfg.bin");
@@ -289,7 +289,7 @@ i32 game::SetupModemGame(void) {
         case 1:
             LogStr("SMC 6");
             iMPExtendedType = SETUP_REMOTE_MODEM_DIAL;
-            if (gConfig.comPort[gbDirectConnect] == SETUP_COM_PORT_UNCONFIGURED) {
+            if (gConfig.comPort[gbDirectConnect] == IDX(SETUP_COM_PORT_UNCONFIGURED)) {
                 LogStr("SMC 7");
                 if (!SetupComPort())
                     return 0;
@@ -310,7 +310,7 @@ i32 game::SetupModemGame(void) {
             break;
         case 2:
             iMPExtendedType = SETUP_REMOTE_MODEM_ANSWER;
-            if (gConfig.comPort[gbDirectConnect] == SETUP_COM_PORT_UNCONFIGURED && !SetupComPort())
+            if (gConfig.comPort[gbDirectConnect] == IDX(SETUP_COM_PORT_UNCONFIGURED) && !SetupComPort())
                 return 0;
             break;
         case 3:
@@ -464,8 +464,8 @@ i32 game::SetupGame(void) {
             remoteSetup:
                 LogStr("Setup 0a");
                 RemoteMain(iMPExtendedType);
-                if (iMPExtendedType == SETUP_REMOTE_NETWORK_GUEST
-                    || iMPExtendedType == SETUP_REMOTE_MODEM_ANSWER)
+                if (iMPExtendedType == IDX(SETUP_REMOTE_NETWORK_GUEST)
+                    || iMPExtendedType == IDX(SETUP_REMOTE_MODEM_ANSWER))
                     gbWaitForRemoteReceive = true;
                 break;
             default:;
@@ -563,8 +563,8 @@ i32 game::SetupGame(void) {
         LogStr(" Setup 2");
         RemoteMain(iMPExtendedType);
         LogStr(" Setup 3");
-        if (iMPExtendedType == SETUP_REMOTE_NETWORK_GUEST
-            || iMPExtendedType == SETUP_REMOTE_MODEM_ANSWER)
+        if (iMPExtendedType == IDX(SETUP_REMOTE_NETWORK_GUEST)
+            || iMPExtendedType == IDX(SETUP_REMOTE_MODEM_ANSWER))
             gbWaitForRemoteReceive = true;
     }
 
