@@ -222,11 +222,11 @@ void mouseManager::SetPointer(char* name, i32 frame, i32 cursorType) {
         gpResourceManager->SavePosition();
         if (cursorType == MOUSE_AUTO_CURSOR_TYPE) {
             if (giCurExe == 1 || *name == 'a' || *name == 'A')
-                cursorType = MOUSE_CURSOR_ADVENTURE;
+                cursorType = IDX(MOUSE_CURSOR_ADVENTURE);
             else if (*name == 's' || *name == 'S')
-                cursorType = MOUSE_CURSOR_SPELL;
+                cursorType = IDX(MOUSE_CURSOR_SPELL);
             else
-                cursorType = MOUSE_CURSOR_COMBAT;
+                cursorType = IDX(MOUSE_CURSOR_COMBAT);
         }
         if (m_cursorType != cursorType && (m_cursorType = cursorType, gbColorMice != 0)) {
             i32 saved82 = m_cursorReady;
@@ -276,7 +276,7 @@ void mouseManager::SetPointer(i32 frame) {
     gbPutzingWithMouseCtr++;
     gpResourceManager->SavePosition();
     if (giCurExe == 1)
-        m_cursorType = MOUSE_CURSOR_ADVENTURE;
+        m_cursorType = IDX(MOUSE_CURSOR_ADVENTURE);
     if (frame == MOUSE_KEEP_CURRENT_FRAME)
         frame = m_cursorFrame;
     else

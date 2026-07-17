@@ -1475,13 +1475,13 @@ void army::DoAttack(i32 retaliation) {
                     if (!breathTarget_6 || breathTarget_6->m_quantity > 0) {
                         if (SRandom(1, ARMY_PERCENT_MAX) < ARMY_ATTACK_EFFECT_CHANCE) {
                             if (target_1 && target_1->SpellCastWorks(SPELL_PARALYZE)) {
-                                target_1->m_spellEffect = SPELL_PARALYZE;
+                                target_1->m_spellEffect = IDX(SPELL_PARALYZE);
                                 effectStopsRetaliation_4 = 1;
                             }
                         } else if (SRandom(1, ARMY_PERCENT_MAX) < ARMY_ATTACK_EFFECT_CHANCE
                                    && breathTarget_6
                                    && breathTarget_6->SpellCastWorks(SPELL_PARALYZE)) {
-                            breathTarget_6->m_spellEffect = SPELL_PARALYZE;
+                            breathTarget_6->m_spellEffect = IDX(SPELL_PARALYZE);
                         }
                     }
                 }
@@ -1489,14 +1489,14 @@ void army::DoAttack(i32 retaliation) {
             case CREATURE_UNICORN:
                 if (SRandom(1, ARMY_PERCENT_MAX) < ARMY_ATTACK_EFFECT_CHANCE && target_1
                     && target_1->SpellCastWorks(SPELL_BLIND)) {
-                    target_1->m_spellEffect = SPELL_BLIND;
+                    target_1->m_spellEffect = IDX(SPELL_BLIND);
                     effectStopsRetaliation_4 = 1;
                 }
                 break;
             case CREATURE_MEDUSA:
                 if (SRandom(1, ARMY_PERCENT_MAX) < ARMY_ATTACK_EFFECT_CHANCE && target_1
                     && target_1->SpellCastWorks(CREATURE_SPELL_PETRIFY)) {
-                    target_1->m_spellEffect = CREATURE_SPELL_PETRIFY;
+                    target_1->m_spellEffect = IDX(CREATURE_SPELL_PETRIFY);
                     effectStopsRetaliation_4 = 1;
                 }
                 break;
@@ -1509,14 +1509,14 @@ void army::DoAttack(i32 retaliation) {
                 if (SRandom(1, ARMY_PERCENT_MAX) < ARMY_ROYAL_MUMMY_EFFECT_CHANCE) {
                 applyMummySpell:
                     if (target_1 && target_1->SpellCastWorks(SPELL_CURSE)) {
-                        target_1->m_spellEffect = SPELL_CURSE;
+                        target_1->m_spellEffect = IDX(SPELL_CURSE);
                     }
                 }
                 break;
             case CREATURE_ARCHMAGE:
                 if (SRandom(1, ARMY_PERCENT_MAX) < ARMY_ATTACK_EFFECT_CHANCE && target_1
                     && target_1->SpellCastWorks(CREATURE_SPELL_DISPEL)) {
-                    target_1->m_spellEffect = CREATURE_SPELL_DISPEL;
+                    target_1->m_spellEffect = IDX(CREATURE_SPELL_DISPEL);
                 }
                 break;
             case CREATURE_GHOST:

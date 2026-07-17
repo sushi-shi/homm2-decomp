@@ -1868,16 +1868,16 @@ void game::RandomizeEvents(void) {
                             else if (gArtifactLevel[value26] == 2)
                                 cell2->m_objectMetadata = (Random(0, 5) << 4) | 7;
                         } else {
-                            artifactChoices17[6] = CREATURE_PALADIN;
-                            artifactChoices17[7] = CREATURE_CRUSADER;
-                            artifactChoices17[8] = CREATURE_CYCLOPS;
-                            artifactChoices17[9] = CREATURE_GENIE;
-                            artifactChoices17[0] = CREATURE_GREEN_DRAGON;
-                            artifactChoices17[1] = CREATURE_RED_DRAGON;
-                            artifactChoices17[2] = CREATURE_BLACK_DRAGON;
-                            artifactChoices17[3] = CREATURE_BONE_DRAGON;
-                            artifactChoices17[4] = CREATURE_GIANT;
-                            artifactChoices17[5] = CREATURE_TITAN;
+                            artifactChoices17[6] = IDX(CREATURE_PALADIN);
+                            artifactChoices17[7] = IDX(CREATURE_CRUSADER);
+                            artifactChoices17[8] = IDX(CREATURE_CYCLOPS);
+                            artifactChoices17[9] = IDX(CREATURE_GENIE);
+                            artifactChoices17[0] = IDX(CREATURE_GREEN_DRAGON);
+                            artifactChoices17[1] = IDX(CREATURE_RED_DRAGON);
+                            artifactChoices17[2] = IDX(CREATURE_BLACK_DRAGON);
+                            artifactChoices17[3] = IDX(CREATURE_BONE_DRAGON);
+                            artifactChoices17[4] = IDX(CREATURE_GIANT);
+                            artifactChoices17[5] = IDX(CREATURE_TITAN);
                             cell2->m_objectMetadata = 1;
                             if (gArtifactLevel[value26] == 8)
                                 cell2->m_objectMetadata |= IDX(CREATURE_ROGUE);

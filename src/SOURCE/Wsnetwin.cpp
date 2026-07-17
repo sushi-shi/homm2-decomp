@@ -114,7 +114,7 @@ i16 wsnet_init(void) {
     giNetPosToDCOPos[giThisNetPos] = static_cast<i32>(inet_addr(cWSTextBuffer));
 
     if (GameMode == IDX(REMOTE_GAME_NETWORK_HOST)) {
-        giWaitType = WS_WAIT_FIRST_GUEST;
+        giWaitType = IDX(WS_WAIT_FIRST_GUEST);
         if (giTCPHostStatus != -1) {
             sprintf(
                 cWSTextBuffer,
@@ -137,7 +137,7 @@ i16 wsnet_init(void) {
         if (gbFunctionComplete == 0)
             ShutDown(0);
         iWSLastMsgNumHumanPlayers = giNumHumanPlayers;
-        giWaitType = WS_WAIT_EXTRA_GUESTS;
+        giWaitType = IDX(WS_WAIT_EXTRA_GUESTS);
         if (giTCPHostStatus != -1) {
             if (giTCPNumPlayers > 2) {
                 sprintf(
@@ -193,7 +193,7 @@ i16 wsnet_init(void) {
                 break;
             NormalDialog("Error in IP Address, please try again.", 5, -1, -1, -1, 0, -1, 0, -1, 0);
         }
-        giWaitType = WS_WAIT_HOST;
+        giWaitType = IDX(WS_WAIT_HOST);
         sprintf(cWSTextBuffer, "Searching for host.");
         NormalDialog(cWSTextBuffer, 6, -1, -1, -1, 0, -1, 0, -1, 0);
         if (gbFunctionComplete == 0)
