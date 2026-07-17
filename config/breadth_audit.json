@@ -2931,45 +2931,45 @@
       "unit": "SOURCE/Campaign",
       "function": "?CampaignHandler@@YIHAAUtag_message@@@Z",
       "source_hash": "7d6f5ca4afd4",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
-      "outcome": "improved",
-      "iterations": 5,
-      "before": 96.8523,
-      "after": 97.13008,
-      "note": "Coalesced retail shared-break CFG; bounded variants leave one branch displacement from map-side evaluation order."
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 97.176155,
+      "after": 97.176155,
+      "note": "Reproduced complete 0x1c frame, switch CFG, and 74 ordered relocations; five prior bounded index-order families exhausted."
     },
     {
       "unit": "SOURCE/Campaign",
       "function": "?CampaignInfoUpdate@game@@QAEXH@Z",
       "source_hash": "e8759782fb79",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
-      "outcome": "improved",
-      "iterations": 5,
-      "before": 96.51126,
-      "after": 96.92458,
-      "note": "Restored dynamic switching-map indices; bounded AST/index variants leave map-side evaluation order."
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 97.02743,
+      "after": 97.02743,
+      "note": "Reproduced complete 0x68 frame, UI CFG, and external relocation identities; five prior bounded enabled-grid index-order families exhausted."
     },
     {
       "unit": "SOURCE/Campaign",
       "function": "?HandleCampaignWin@game@@QAEHXZ",
-      "source_hash": "70f5588e63fa",
-      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "source_hash": "bf9aaf9b56d3",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
       "outcome": "exact",
-      "iterations": 3,
-      "before": 99.845215,
+      "iterations": 1,
+      "before": 99.68374,
       "after": 100.0,
-      "note": "Corrected serialized award values and qualified map index to close final SIB residual."
+      "note": "Pointer-index spelling restores retail map-before-side evaluation for the campaign-score store; all bytes and 59 ordered relocations are exact."
     },
     {
       "unit": "SOURCE/Campaign",
       "function": "?InitCampaignMap@game@@QAEXXZ",
-      "source_hash": "ab5f4d4e5c44",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "source_hash": "e9b0c1e1f9fd",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
       "outcome": "improved",
-      "iterations": 8,
-      "before": 97.895195,
-      "after": 98.20337,
-      "note": "Recovered all role slots and gpGame player ownership; bounded AST/index variants left map-side evaluation order."
+      "iterations": 2,
+      "before": 97.97692,
+      "after": 98.75796,
+      "note": "Recovered direct this-player ownership and explicit gpGame hero lookup; all 80 ordered relocation sites now agree, leaving documented index evaluation-order compiler shape."
     },
     {
       "unit": "SOURCE/Campaign",
@@ -4378,6 +4378,17 @@
       "before": 99.88372,
       "after": 99.88372,
       "note": "Complete semantics and 19 relocations; one return-join branch byte remains, and explicit if/else regressed."
+    },
+    {
+      "unit": "SOURCE/Modem",
+      "function": "?GUIModemCommandExec@@YICXZ",
+      "source_hash": "dce9445c090b",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 5,
+      "before": 95.5,
+      "after": 95.5,
+      "note": "Complete 0x04 frame, byte-transmit CFG, and 13 ordered relocations; equivalent command-length compare order resisted five bounded forms."
     },
     {
       "unit": "SOURCE/Modem",
@@ -6176,12 +6187,12 @@
       "unit": "SOURCE/X_CAMPGN",
       "function": "?UpdateInfo@ExpCampaign@@QAEXH@Z",
       "source_hash": "4d75afc72c7c",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
       "outcome": "parked",
-      "iterations": 2,
+      "iterations": 0,
       "before": 98.93493,
       "after": 98.93493,
-      "note": "Complete UI CFG frame slots and 177 relocs; flattened selection evaluation order resists seven bounded families."
+      "note": "Reproduced complete 0x84 frame, two selector tables, UI CFG, and 177 ordered relocations; seven prior bounded flattened-index families exhausted."
     },
     {
       "unit": "SOURCE/comwin",
@@ -6349,6 +6360,17 @@
       "note": "Assigned the target-Y local its retail bucket; the complete frame, bytes, and 19 ordered relocations now match."
     },
     {
+      "unit": "SOURCE/kbwin",
+      "function": "?SetMenus@@YIXPAXH@Z",
+      "source_hash": "88ee794efb82",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 3,
+      "before": 99.36735,
+      "after": 99.36735,
+      "note": "Complete 0x20 frame, slots, recursive traversal, and CFG; equivalent outer-loop compare order remains after three bounded forms, with only the candidate recursive REL32 absent from retail."
+    },
+    {
       "unit": "SOURCE/netwin",
       "function": "?nb_add_name_done@@YGXPAUNetbiosControlBlock@@@Z",
       "source_hash": "6b001c3bf79a",
@@ -6413,6 +6435,17 @@
       "before": 99.64179,
       "after": 99.64179,
       "note": "Complete display/trade semantics, exact 0x3c frame/CFG, and 112 external relocations; five commuted owner-order pairs and one-byte extent residual persisted through ten reviewed AST variants."
+    },
+    {
+      "unit": "SOURCE/wingraph",
+      "function": "?WGAppPaint@@YIHPAX0@Z",
+      "source_hash": "3aba383fd09b",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "exact",
+      "iterations": 2,
+      "before": 99.166664,
+      "after": 100.0,
+      "note": "Scalar-lvalue spelling restores retail giScrollX-before-destination evaluation; all bytes and 19 ordered relocations are exact."
     },
     {
       "unit": "SOURCE/x_arena",
