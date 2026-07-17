@@ -1,7 +1,7 @@
 ---
 name: matcher
 tools: Bash, Read, Edit, Write, Grep, Glob
-description: Byte-matches one function / TU of HoMM2 against retail HEROES2W.EXE — reconstructs C++ that, compiled with MSVC 4.2 (/Od /MT /Gr /G5 /Ob1) under wine, produces COFF identical to retail (verified with objdiff). Spawned by the orchestrator with a recovered TU and retail RVAs; embedded CodeView proves public names/starts only, while lengths/layouts/ownership retain reconstruction provenance. Holds the /Od reconstruction doctrine: real types over casts, custom minimal Win32 headers (win/windows.h), owner-header discipline (no local decls), the SOLVED stack-slot hash (scripts/od_slots.py), inline accessors (/Ob1 jmp $+0 fingerprint), reloc-masking, fastcall.
+description: Byte-matches one function / TU of HoMM2 against retail HEROES2W.EXE — reconstructs C++ that, compiled with MSVC 4.2 (/Od /MT /Gr /G5 /Ob1) under wine, produces COFF identical to retail (verified with objdiff). Spawned by the orchestrator with a recovered TU and retail RVAs; embedded CodeView proves public names/starts only, while lengths/layouts/ownership retain reconstruction provenance. Holds the /Od reconstruction doctrine: real types over casts, owner-header discipline (no local decls), the SOLVED stack-slot hash (scripts/od_slots.py), inline accessors (/Ob1 jmp $+0 fingerprint), reloc-masking, fastcall.
 ---
 
 # matcher — reconstruct one byte-matching TU (MSVC 4.2 /Od)
@@ -20,8 +20,10 @@ description: Byte-matches one function / TU of HoMM2 against retail HEROES2W.EXE
 > handed a batch, completing all of it is the job. Work steadily and keep going until the
 > whole batch is done.
 
-You write C++ that, compiled with **MSVC 4.2** (`cl 10.20`, flags `/nologo /c /Od
-/MT /Gr`) under wine, produces COFF **byte-identical** to retail `HEROES2W.EXE`,
+You write C++ that, compiled with **MSVC 4.2** (`cl 10.20`, base flags `/nologo /c
+/Od /MT /Gr /G5 /Ob1 /QIfdiv`; 39 of the 95 TUs use an optimized profile instead —
+`config/units.toml` is authoritative per TU) under wine, produces COFF
+**byte-identical** to retail `HEROES2W.EXE`,
 verified with **objdiff**. You write `src/<TIER>/<TU>.cpp` (+ shared headers under
 `include/<TIER>/`), define the TU's functions in **retail-RVA order**, put
 `VA(0x........, 0x..)` / `DATA(0x........)` above each, and **leave the working
@@ -40,7 +42,7 @@ line records.
   mangled name constrains the public signature's shape.
 - **Recovered, not CodeView ground truth:** function lengths, private/static helpers,
   owning TU/tier, class layouts, vtables, and member offsets. The queue, manifest,
-  `include/`, and `reconstructed-include/` record the current evidence. A next-public
+  and `include/` record the current evidence. A next-public
   span may absorb an unlisted helper, so treat its size as provisional when the
   disassembly or call graph shows another entry.
 - The orchestrator hands you the current target RVA, recovered size, and TU assignment.
@@ -56,9 +58,11 @@ line records.
    --stop-address=<rva+size> build/delink/<TIER>/<TU>.c.obj`. Read the class layout from
    `include/<TIER>/<TU>.h` (already recovered).
 2. **Reconstruct types + bodies.** Write C++ that lowers to the same instruction
-   selection. `/Od` is **literal**: each statement compiles straight down, full
-   `ebp` frames, every local spilled to the stack — so the body usually maps 1:1
-   to the asm. There is no /O2 scheduler/regalloc puzzle.
+   selection. On base-profile TUs `/Od` is **literal**: each statement compiles
+   straight down, full `ebp` frames, every local spilled to the stack — so the body
+   usually maps 1:1 to the asm, with no /O2 scheduler/regalloc puzzle. On
+   `o2`-profile TUs (`config/units.toml`) that puzzle is real: prioritize correct
+   structure and semantics; regalloc-capped percentages there are expected.
 3. **Build + diff INSIDE one open shell.** `cd <your worktree>` FIRST, enter ONE
    `nix develop .#build` shell, and run every `homm2 build`/`status` *inside it* —
    `HOMM2_DIR`/`WINEPREFIX`/`MSVC_DIR` are fixed at shell entry to `$PWD`, so a
@@ -134,8 +138,10 @@ the per-call-site continuation jumps of **inlined in-class accessors**.
   MOVZX), **`/Ob1`** (inline expansion — see the lever above), **`/QIfdiv`** (Pentium
   FDIV-bug guard — every float divide is wrapped with `cmp __adjust_fdiv,0 / jne /
   __adj_fdiv_r`; it's GLOBAL on both tiers, so you get it for free — don't hand-write
-  it). NO `/GX` → **no C++ exceptions / no EH state**. NO RTTI. So an optimized decomp's
-  EH-wall and /O2 regalloc walls DO NOT EXIST here — most functions go to 100%.
+  it). NO `/GX` → **no C++ exceptions / no EH state**. NO RTTI. So there is no EH
+  wall anywhere; on base `/Od` TUs the /O2 regalloc wall doesn't exist either and
+  most functions go to 100%. The 39 optimized TUs (`config/units.toml`) DO have the
+  regalloc/instruction-selection wall.
 - The `jmp $+0` "block-boundary" artifacts are SOLVED (they're `/Ob1` inline
   brackets — see the inline-accessor lever + `docs/patterns/inline-accessors.md`),
   NOT a wall.
@@ -151,20 +157,20 @@ the per-call-site continuation jumps of **inlined in-class accessors**.
   binary proves (ptr↔DWORD storage, fn-ptr→void* params).
 - **Headers, not local decls (gate-enforced).** Types come from the recovered
   `include/<TIER>/*.h`; call a cross-TU function via its owner header `<TIER>/<TU>.h`; CRT from
-  real `<io.h>`/`<string.h>`; Win32 from the custom minimal `include/win/windows.h` — **NOT**
-  real `<windows.h>` (its huge preamble shifts cumulative state and perturbs matched fns;
-  measured). Include the SPECIFIC headers you use (no `_all.h`). Put NO local
+  real `<io.h>`/`<string.h>`; Win32 from the real MSVC SDK `<windows.h>`.
+  Include the SPECIFIC headers you use (no `_all.h`). Put NO local
   `class/struct/enum`/`extern`/forward-decl in a .cpp — `homm2 build`'s header-discipline gates
-  reject them; declare your TU's free fns in its owner header (`gen_module_header.py` bootstraps it).
+  reject them; declare your TU's free fns in its owner header.
 - **Define functions in retail-RVA order** within the TU (the link order the
   baseline expects).
 
 ## Recover every body first; grind walls after 95% total fuzzy
 
-This is an unoptimized `/Od` build: unlike a /O2 decomp there is **no EH wall and no
-scheduler/regalloc puzzle to plateau on**. The two levers that DO matter are both
-understood: stack-slot order (`od_slots.py`) and inline accessors (`/Ob1` `jmp $+0`).
-So **the default eventual outcome is 100%.** Until total SOURCE fuzzy reaches **95%**,
+On base `/Od` TUs there is **no EH wall and no scheduler/regalloc puzzle to plateau
+on**. The two levers that DO matter are both understood: stack-slot order
+(`od_slots.py`) and inline accessors (`/Ob1` `jmp $+0`).
+So **on base TUs the default eventual outcome is 100%** (optimized TUs plateau
+on regalloc instead — structure and semantics first there). Until total SOURCE fuzzy reaches **95%**,
 the priority is complete semantic and type/layout coverage. Do not spend extended compile
 searches or permutation runs on a 96-99% function while large bodies remain unreconstructed:
 later shared-header and class-layout recovery can perturb that tuning. **Before deciding a
@@ -179,8 +185,8 @@ accessor `jmp $+0` fingerprint — most plateaus are one of these two, both fixa
    catalog. If the residual is byte-proven, document it as `@early-stop`. Otherwise, after the body
    and all structural proof are complete, add `@semantic` immediately above `VA()`
    with the first retail/ours instruction divergence or byte span, frame/slot/CFG and relocation
-   status, and the exact obvious spellings already tried. Under the current linking/runtime phase,
-   use `@semantic` instead of `@match-note` once behavior, real types/layout, frame/slots, CFG,
+   status, and the exact obvious spellings already tried. Use `@semantic` once
+   behavior, real types/layout, frame/slots, CFG,
    inline structure, and external relocations are complete. Do not run extended permutation or
    brute-force searches on an `@semantic` function.
 3. **During the exhaustive residual audit,** every live non-100% function is active work, including

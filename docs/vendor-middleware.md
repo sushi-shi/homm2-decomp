@@ -17,8 +17,8 @@ CD image `img-pol/HEROES2W.EXE` (dated 1997-05-05). The GOG re-release EXE
 | Smacker Video | `smackw32.DLL` | **3.0g** | **by ordinal**, 10 fns | High |
 | WinG | `WING32.dll` | **1.0** (1.0.0.37) | by name, 6 fns | Certain |
 
-Period DLLs used as evidence come from HoMM2 disk images under
-`/path/to/homm2/investigation/extracted/` (`img-pol` = our exact EXE but the
+Period DLLs used as evidence come from a local, non-committed collection of extracted
+HoMM2 disk images (`img-pol` = our exact EXE but the
 CD only ships installer EXEs; `img-fargus` = a localization of the same NWC retail that
 keeps NWC's middleware DLLs; `demo`, `gog-win` = other lineages, cross-checks only).
 
