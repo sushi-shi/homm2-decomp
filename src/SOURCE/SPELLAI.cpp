@@ -41,7 +41,7 @@ i32 combatManager::DoSpellAI(i32 side, i32 restricted) {
 
     for (spellIndex = 0; spellIndex < IDX(SPELL_COUNT); spellIndex++) {
         if (m_heroes[side]->HasSpell(SpellType(spellIndex))
-            && (gsSpellInfo[spellIndex].attributes & IDX(SPELL_ATTRIBUTE_COMBAT))
+            && (gsSpellInfo[spellIndex].attributes & IDX(SPELL_INFO_ATTRIBUTE_COMBAT))
             && GetManaCost(SpellType(spellIndex), m_heroes[side]) <= m_heroes[side]->m_spellPoints) {
             if (restricted && spellIndex != IDX(SPELL_FIREBALL) && spellIndex != IDX(SPELL_FIREBLAST)
                 && spellIndex != IDX(SPELL_LIGHTNING_BOLT) && spellIndex != IDX(SPELL_CHAIN_LIGHTNING)
