@@ -30,7 +30,7 @@ i8 InitNetHost(void) {
                 ShutDown("NETBIOS is not loaded.");
             else {
                 iInitNetHostStatus++;
-                gbRemoteOn = 1;
+                gbRemoteOn = true;
             }
             break;
         case IDX(NETBIOS_SETUP_CHECK_LOCAL_NAME):
@@ -75,7 +75,7 @@ i8 InitNetGuest(void) {
                 == NETBIOS_INIT_UNAVAILABLE)
                 ShutDown("NETBIOS is not loaded.");
             else {
-                gbRemoteOn = 1;
+                gbRemoteOn = true;
                 iInitNetGuestStatus++;
             }
             break;

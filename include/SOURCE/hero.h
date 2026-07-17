@@ -237,6 +237,6 @@ extern class hero* gpHVHero;
 extern class heroWindow* gheroWin;
 extern i16 gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT];
 extern i32 iOrigHeroViewID;
-extern i32 gbNoDismiss;
+extern b32 gbNoDismiss;
 
 #endif // HOMM2_SOURCE_HERO_H

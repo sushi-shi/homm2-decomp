@@ -29,7 +29,7 @@ typedef unsigned __int64 u64;
 // the ABI, and boolean fields must not be forced into enum domains. b32/b8
 // state is written with true/false, defined here for the pre-bool compiler.
 typedef i32 b32;
-typedef u8 b8;
+typedef i8 b8;
 #ifndef __clang__
 #define true 1
 #define false 0

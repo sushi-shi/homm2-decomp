@@ -549,10 +549,10 @@ mapCell* advManager::MoveHero(
 
     if (gbThisNetHumanPlayer[giCurPlayer])
         SetNoDialogMenus(0);
-    gbHitEvent = 0;
+    gbHitEvent = false;
     *adjacentMonster = 0;
     *outOfMobility = 0;
-    gbHeroMoving = 1;
+    gbHeroMoving = true;
     eventCell_g = 0;
 
     movingHero_f = gpGame->GetHero(gpCurPlayer->m_currentHero);
@@ -562,7 +562,7 @@ mapCell* advManager::MoveHero(
     directionY_b = normalDirTable[direction].y;
     bShowIt = GetMoveShowIt(movingHero_f, direction);
     if (bShowIt)
-        gbMoveShown = 1;
+        gbMoveShown = true;
 
     currentCell_f = GetCell(movingHero_f->m_x, movingHero_f->m_y);
     i32 currentTerrain_b = giGroundToTerrain[currentCell_f->m_terrainImageIndex];
@@ -755,8 +755,8 @@ mapCell* advManager::MoveHero(
             giDeferObjDrawY = movingHero_f->m_y;
         }
 
-        gbEnlargeScreenBlit = 0;
-        gbNoBorder = 1;
+        gbEnlargeScreenBlit = false;
+        gbNoBorder = true;
         halfSteps_o = CURSOR_MOVE_HALF_TILE_PIXELS / pixelsPerStep_o;
         for (step_a = 0; step_a < halfSteps_o * 2; ++step_a) {
             if (step_a == halfSteps_o) {
@@ -782,9 +782,9 @@ mapCell* advManager::MoveHero(
                 DelayTilMilli(tick + stepDelay_d);
         }
         giDeferObjDrawX = giDeferObjDrawY = -1;
-        gbNoBorder = 0;
+        gbNoBorder = false;
         DrawAdventureBorder();
-        gbEnlargeScreenBlit = 1;
+        gbEnlargeScreenBlit = true;
     }
 
     movingHero_f->m_remainingMobility -= terrainCost_e;
@@ -846,7 +846,7 @@ mapCell* advManager::MoveHero(
 
 movementDone:
     UpdateRadar(1, 1);
-    gbHeroMoving = 0;
+    gbHeroMoving = false;
     if (!forceMove) {
         if (movingHero_f->m_x != oldHeroX_b || movingHero_f->m_y != oldHeroY_b) {
             if (mapExtra[movingHero_f->m_y * MAP_WIDTH + movingHero_f->m_x]
@@ -935,7 +935,7 @@ movementDone:
                 -1,
                 0
             );
-            gbHitEvent = 1;
+            gbHitEvent = true;
         }
     }
     return eventCell_g;

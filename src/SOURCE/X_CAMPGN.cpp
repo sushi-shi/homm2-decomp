@@ -316,7 +316,7 @@ void ExpCampaign::InitMap(void) {
             break;
         case CAMPAIGN_CHOICE_EXPERIENCE: {
             i32 savedNewGameSetup = gbInNewGameSetup;
-            gbInNewGameSetup = 1;
+            gbInNewGameSetup = true;
             if (player->m_heroCount > 0) {
                 gpGame->GetHero(player->m_heroIds[0])->m_experience += campaignChoice->value;
                 gpGame->GetHero(player->m_heroIds[0])->CheckLevel();
@@ -422,7 +422,7 @@ void ExpCampaign::InitMap(void) {
             }
         }
     }
-    gbRetreatWin = 1;
+    gbRetreatWin = true;
 }
 
 VA(0x004bc00e, 0x33f)
@@ -431,7 +431,7 @@ void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
     gpMouseManager->SetPointer("advmice.mse", 0, CAMPAIGN_POINTER_HIDDEN_HOTSPOT);
     gpMouseManager->ReallyShowPointer();
     i32 savedTheme = gbUseEvilInterface;
-    gbUseEvilInterface = 1;
+    gbUseEvilInterface = true;
     m_viewMap = m_currentMap;
     m_window = new heroWindow(0, 0, "x_camp.bin");
     if (m_window == 0)

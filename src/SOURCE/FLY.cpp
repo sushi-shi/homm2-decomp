@@ -372,11 +372,11 @@ i32 army::FlyTo(i32 destination) {
                 giMinExtentX = giMinExtentY;
                 giMaxExtentY = 0;
                 giMaxExtentX = giMaxExtentY;
-                gbComputeExtent = 1;
-                gbSaveBiggestExtent = 1;
+                gbComputeExtent = true;
+                gbSaveBiggestExtent = true;
                 DrawToBuffer(static_cast<i32>(x), static_cast<i32>(y), 0);
-                gbComputeExtent = 0;
-                gbSaveBiggestExtent = 0;
+                gbComputeExtent = false;
+                gbSaveBiggestExtent = false;
                 if (giMinExtentX < 0)
                     giMinExtentX = 0;
                 if (giMinExtentY < 0)

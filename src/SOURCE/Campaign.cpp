@@ -887,7 +887,7 @@ void game::InitCampaignMap(void) {
             break;
         case CAMPAIGN_CHOICE_EXPERIENCE: {
             i32 savedNewGameSetup = gbInNewGameSetup;
-            gbInNewGameSetup = 1;
+            gbInNewGameSetup = true;
             if (m_players[0].m_heroCount > 0) {
                 gpGame->GetHero(m_players[0].m_heroIds[0])->m_experience += choiceBest->value;
                 gpGame->GetHero(m_players[0].m_heroIds[0])->CheckLevel();
@@ -905,7 +905,7 @@ void game::InitCampaignMap(void) {
         && m_players[0].m_heroCount > 0) {
         GiveArtifact(gpGame->GetHero(m_players[0].m_heroIds[0]), ARTIFACT_ULTIMATE_CROWN, 0, -1);
     }
-    gbRetreatWin = 1;
+    gbRetreatWin = true;
 
     if (m_campaignAwards[IDX(CAMPAIGN_AWARD_CORLAGON_DEFEATED)]) {
         for (heroPositionValue = 0; heroPositionValue < CAMPAIGN_HERO_COUNT; ++heroPositionValue) {
@@ -927,7 +927,7 @@ void game::InitCampaignMap(void) {
     if (m_campaignScenario + 1 == 7 && m_campaignType == IDX(CAMPAIGN_ARCHIBALD)) {
         i32 savedNewGameSetup = gbInNewGameSetup;
         hero* armyHero;
-        gbInNewGameSetup = 1;
+        gbInNewGameSetup = true;
         armyHero = gpGame->GetHero(m_players[0].m_heroIds[0]);
         for (heroPositionValue = 0; heroPositionValue < CAMPAIGN_ARMY_SLOT_COUNT;
              ++heroPositionValue) {

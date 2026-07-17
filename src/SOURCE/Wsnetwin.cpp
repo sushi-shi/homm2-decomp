@@ -67,7 +67,7 @@ i16 wsnet_init(void) {
         NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
         SetFullScreenStatus(0);
     }
-    gbRemoteOn = 1;
+    gbRemoteOn = true;
     ppDPRcvBuffer = static_cast<u8**>(
         H2_ALLOC(WS_TRANSPORT_BUFFER_COUNT * sizeof(u8*), 71)
     );
@@ -88,7 +88,7 @@ i16 wsnet_init(void) {
         sprintf(cWSTextBuffer, "Error During socket(): %d", WSAGetLastError());
         ShutDown(cWSTextBuffer);
     }
-    gbRemoteOn = 1;
+    gbRemoteOn = true;
     saddr_loc.sin_family = AF_INET;
     saddr_loc.sin_port = htons(WS_TRANSPORT_PORT);
     saddr_loc.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -161,7 +161,7 @@ i16 wsnet_init(void) {
             );
             NormalDialog(cWSTextBuffer, 5, -1, -1, -1, 0, -1, 0, -1, 0);
         }
-        gbRemoteGameOpen = 0;
+        gbRemoteGameOpen = false;
         startup.playerCount = static_cast<u8>(giNumHumanPlayers);
         memcpy(startup.playerAddresses, giNetPosToDCOPos, sizeof(giNetPosToDCOPos));
         for (player = 1; player < giNumHumanPlayers; player++) {

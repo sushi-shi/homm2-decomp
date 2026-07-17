@@ -327,7 +327,7 @@ i32 game::NewGame(void) {
         windowMessage.payload.widget.data.value = NEW_GAME_WIDGET_INACTIVE_FRAME;
         m_newGameWindow->BroadcastMessage(windowMessage);
 
-        gbNewGameDialogOver = 0;
+        gbNewGameDialogOver = false;
         gpWindowManager->DoDialog(m_newGameWindow, NewGameHandler, 0);
         delete m_newGameWindow;
         if (gpWindowManager->m_dialogResult == NEW_GAME_DIALOG_CANCEL)
@@ -408,8 +408,8 @@ i32 game::NewGame(void) {
         InitNewGame(0);
         InitNewGameWindow();
         UpdateNewGameWindow();
-        gbNewGameShadowHidden = 0;
-        gbNewGameDialogOver = 0;
+        gbNewGameShadowHidden = false;
+        gbNewGameDialogOver = false;
         gpWindowManager->DoDialog(m_newGameWindow, NewGameHandler, 0);
         delete m_newGameWindow;
         if (gpWindowManager->m_dialogResult == NEW_GAME_DIALOG_CANCEL) {
@@ -838,7 +838,7 @@ i32 NewGameHandler(struct tag_message& message) {
     char mapNamePacket[MAP_HEADER_NAME_SIZE];
 
     if (!gbNewGameShadowHidden) {
-        gbNewGameShadowHidden = 1;
+        gbNewGameShadowHidden = true;
         windowMessage.type = MESSAGE_WIDGET;
         windowMessage.payload.widget.command = NEW_GAME_WIDGET_DISABLE;
         windowMessage.payload.widget.id = EncodeNewGameControl(NEW_GAME_SHADOW);
@@ -1034,7 +1034,7 @@ i32 NewGameHandler(struct tag_message& message) {
                     gpWindowManager->m_dialogResult = message.payload.widget.id;
                     message.payload.widget.id = NEW_GAME_DIALOG_CLOSE_MESSAGE;
                     message.payload.widget.command = message.payload.widget.id;
-                    gbNewGameDialogOver = 1;
+                    gbNewGameDialogOver = true;
                     return 2;
 
                 case NEW_GAME_DIALOG_CANCEL:
@@ -1053,7 +1053,7 @@ i32 NewGameHandler(struct tag_message& message) {
                     gpWindowManager->m_dialogResult = message.payload.widget.id;
                     message.payload.widget.id = NEW_GAME_DIALOG_CLOSE_MESSAGE;
                     message.payload.widget.command = message.payload.widget.id;
-                    gbNewGameDialogOver = 1;
+                    gbNewGameDialogOver = true;
                     return 2;
 
                 default:
@@ -2050,10 +2050,10 @@ i32 game::GetSideDesc(char* text, i32 firstPlayer, i32 lastPlayer) {
 // cTextReceivedBuffer[3], NGKPBkg; candidate order differs but every owner and
 // extent is present. Do not introduce aliases, padding, or fake storage.
 // ---- globals (definitions, RVA order) ----
-DATA(0x0051cd20) i32 gbNewGameDialogOver = 1;
+DATA(0x0051cd20) b32 gbNewGameDialogOver = true;
 DATA(0x0051cd24) i32 NGKPcursorFlashOn = 1;
 DATA(0x00533150) char* cNGKPDisplay;
-DATA(0x00533154) i32 gbNewGameShadowHidden;
+DATA(0x00533154) b32 gbNewGameShadowHidden;
 DATA(0x00533158) char* cNGKPCore;
 DATA(0x0053315c) i32 NGKPcursorIndex;
 DATA(0x00533160) char* cTextReceivedBuffer[3];

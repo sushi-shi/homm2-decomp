@@ -89,9 +89,9 @@ extern i32 bTesting;
 extern Smack* smk1;
 extern Smack* smk2;
 extern i8 bSmackNum;
-extern i32 gbLastFramePlayed;
+extern b32 gbLastFramePlayed;
 extern SmackSum smksum;
-extern i32 gbPlayedThrough;
+extern b32 gbPlayedThrough;
 extern i8 bMainDone;
 
 #endif // HOMM2_SMACKMGR_H

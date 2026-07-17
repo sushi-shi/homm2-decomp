@@ -56,7 +56,7 @@ public:
 SIZE(heroWindowManager, 0x62);
 // ---- globals (declarations, RVA order) ----
 extern i32 iCombatCycleFrame;
-extern i32 gbEveryOtherCycle;
+extern b32 gbEveryOtherCycle;
 extern i32 iCycle1Count;
 extern i32 iCycle2Count;
 extern i32 iCycle3Count;

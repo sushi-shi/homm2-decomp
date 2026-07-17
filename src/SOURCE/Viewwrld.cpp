@@ -50,7 +50,7 @@ void advManager::ViewWorld(i32 whatToDraw, i32 drawAllObjects, i32 drawAllTerrai
     heroWindow* viewWorldWindow;
 
     memcpy(paletteData, gpBufferPalette->m_data, VIEW_WORLD_PALETTE_SIZE);
-    gbInViewWorld = 1;
+    gbInViewWorld = true;
     iVWWhatToDraw = whatToDraw;
     iVWDrawAllObjs = drawAllObjects;
     iVWDrawAllTerrains = drawAllTerrains;
@@ -88,7 +88,7 @@ void advManager::ViewWorld(i32 whatToDraw, i32 drawAllObjects, i32 drawAllTerrai
 
     UpdateRadar(1, 0);
     VWCleanup();
-    gbInViewWorld = 0;
+    gbInViewWorld = false;
     gpWindowManager->m_updateFlags = 0;
     RedrawAdvScreen(1, 0);
     giCycleType = 0;
@@ -786,7 +786,7 @@ DATA(0x004f11b8) i8 iVWHalf[3][6][2] = {3,  3, 5, 5, 6, 6, 8, 5, 2, 3, 2,  2,  4
                                         11, 7, 3, 4, 3, 3, 7, 7, 8, 8, 10, 10, 14, 8, 3, 6, 4, 4};
 DATA(0x004f11dc) i32 giViewWorldScale = 6;
 DATA(0x004f11e0) i32 giViewWorldScaleLookup = 1;
-DATA(0x004f11e4) i32 gbInViewWorld = 0;
+DATA(0x004f11e4) b32 gbInViewWorld = false;
 DATA(0x00525110) class icon* pVWMisc;
 DATA(0x00525114) class icon* pVWLetters;
 DATA(0x00525118) i32 iVWYPixelOffset;

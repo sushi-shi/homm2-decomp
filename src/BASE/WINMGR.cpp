@@ -30,7 +30,7 @@ static inline u32& FadeSavedUpdate(void) {
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\WINMGR.CPP"
 
 DATA(0x0051ef28) i32 iCombatCycleFrame = 0;
-DATA(0x0051ef2c) i32 gbEveryOtherCycle = 1;
+DATA(0x0051ef2c) b32 gbEveryOtherCycle = true;
 DATA(0x0051ef30) i32 iCycle1Count = 0;
 DATA(0x0051ef34) i32 iCycle2Count = 0;
 DATA(0x0051ef38) i32 iCycle3Count = 0;
@@ -87,7 +87,7 @@ void CycleColors(i32 forceUpdate) {
         return;
 
     if (giCycleType == WINDOW_COLOR_CYCLE_DEFAULT)
-        gbEveryOtherCycle = 1;
+        gbEveryOtherCycle = true;
     else
         gbEveryOtherCycle = 1 - gbEveryOtherCycle;
 
@@ -474,7 +474,7 @@ i32 heroWindowManager::DoDialog(
     i32 done;
     i32 result;
 
-    gbInDialog = 1;
+    gbInDialog = true;
     if (iDialogNestCount == 0)
         SetNoDialogMenus(0);
     iDialogNestCount++;
@@ -531,7 +531,7 @@ i32 heroWindowManager::DoDialog(
     if (window != 0)
         RemoveWindow(window);
     gpInputManager->Flush();
-    gbInDialog = 0;
+    gbInDialog = false;
     iDialogNestCount--;
     if (iDialogNestCount == 0)
         SetNoDialogMenus(1);
@@ -673,7 +673,7 @@ void heroWindowManager::FizzleForward(
     i8* endPalette
 ) {
     if (bShowIt != 0) {
-        gbEnlargeScreenBlit = 0;
+        gbEnlargeScreenBlit = false;
         i32 tick = 0;
         if (x < 0) {
             width += x;
@@ -748,7 +748,7 @@ void heroWindowManager::FizzleForward(
             DelayTilMilli(delay + tick);
             BlitBitmap(m_fizzleWork, 0, 0, width, height, m_screen, x, y);
             BlitBitmapToScreen(m_screen, x, y, width, height, x, y);
-            gbEnlargeScreenBlit = 1;
+            gbEnlargeScreenBlit = true;
             m_updateFlags = savedUpdate;
             if (m_fizzleSource != 0)
                 delete m_fizzleSource;

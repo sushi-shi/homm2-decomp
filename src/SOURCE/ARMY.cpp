@@ -541,17 +541,17 @@ void army::Walk(i32 direction, i32 finishStanding, i32 skipDrawing) {
         giMinExtentX = giMinExtentY;
         giMaxExtentY = 0;
         giMaxExtentX = giMaxExtentY;
-        gbComputeExtent = 1;
-        gbSaveBiggestExtent = 1;
-        gbReturnAfterComputeExtent = 1;
+        gbComputeExtent = true;
+        gbSaveBiggestExtent = true;
+        gbReturnAfterComputeExtent = true;
         DrawToBuffer(
             gpCombatManager->m_hexCells[m_hex].m_x,
             gpCombatManager->m_hexCells[m_hex].m_y,
             0
         );
-        gbReturnAfterComputeExtent = 0;
-        gbSaveBiggestExtent = 0;
-        gbComputeExtent = 0;
+        gbReturnAfterComputeExtent = false;
+        gbSaveBiggestExtent = false;
+        gbComputeExtent = false;
     }
     if (giMinExtentX < 0)
         giMinExtentX = 0;
@@ -644,17 +644,17 @@ void army::Walk(i32 direction, i32 finishStanding, i32 skipDrawing) {
             giMinExtentX = giMinExtentY;
             giMaxExtentY = 0;
             giMaxExtentX = giMaxExtentY;
-            gbComputeExtent = 1;
-            gbSaveBiggestExtent = 1;
-            gbReturnAfterComputeExtent = 1;
+            gbComputeExtent = true;
+            gbSaveBiggestExtent = true;
+            gbReturnAfterComputeExtent = true;
             DrawToBuffer(
                 gpCombatManager->m_hexCells[m_hex].m_x,
                 gpCombatManager->m_hexCells[m_hex].m_y,
                 0
             );
-            gbReturnAfterComputeExtent = 0;
-            gbComputeExtent = 0;
-            gbSaveBiggestExtent = 0;
+            gbReturnAfterComputeExtent = false;
+            gbComputeExtent = false;
+            gbSaveBiggestExtent = false;
             if (giMinExtentX < 0)
                 giMinExtentX = 0;
             if (giMinExtentY < 0)
@@ -663,15 +663,15 @@ void army::Walk(i32 direction, i32 finishStanding, i32 skipDrawing) {
                 giMaxExtentX = ARMY_COMBAT_MAX_X;
             if (giMaxExtentY > ARMY_COMBAT_MAX_Y)
                 giMaxExtentY = ARMY_COMBAT_MAX_Y;
-            gbCurrArmyDrawn = 0;
-            gbComputeExtent = 1;
-            gbLimitToExtent = 1;
+            gbCurrArmyDrawn = false;
+            gbComputeExtent = true;
+            gbLimitToExtent = true;
             m_drawEnabled = 0;
             gpCombatManager->DrawFrame(0, 0, 0, 0, ARMY_COMBAT_FRAME_DELAY, 0, 1);
             m_drawEnabled = 1;
-            gbLimitToExtent = 0;
-            gbComputeExtent = 0;
-            gbCurrArmyDrawn = 1;
+            gbLimitToExtent = false;
+            gbComputeExtent = false;
+            gbCurrArmyDrawn = true;
             if (!(oldMinX <= giMinExtentX)) {
                 oldMinX = giMinExtentX;
             }
@@ -1879,7 +1879,7 @@ void army::DamageEnemy(
         return;
     }
     damage1 = 0;
-    gbGenieHalf = 0;
+    gbGenieHalf = false;
     for (index16 = 0; index16 < m_quantity; index16++) {
         if (m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BLESS)]) {
             damage1 += m_monster.damageMax;
@@ -1964,7 +1964,7 @@ void army::DamageEnemy(
         && SRandom(1, ARMY_GENIE_HALF_ROLL_MAX) == ARMY_GENIE_HALF_ROLL) {
         genieDamage26 = ((target->m_quantity + 1) / 2) * target->m_monster.hitPoints;
         if (damageDone2 < genieDamage26) {
-            gbGenieHalf = 1;
+            gbGenieHalf = true;
             damageDone2 = genieDamage26;
         }
     }
@@ -3513,4 +3513,4 @@ i32 army::GetPowBaseY(void) {
 // 0x127eb4..0x127eb8 is exactly gbGenieHalf (3 references, addend zero). Do not
 // model the .data order or terminal alignment with aliases or invented padding.
 DATA(0x004f54a8) i32 bSecondAttack = 0;
-DATA(0x00527eb4) i32 gbGenieHalf;
+DATA(0x00527eb4) b32 gbGenieHalf;

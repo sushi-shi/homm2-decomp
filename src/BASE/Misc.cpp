@@ -756,7 +756,7 @@ void SetGameDefaults(void) {
     gConfig.showObjectBoxes = 0;
     gConfig.editorScreenAnimation = 0;
     gConfig.editorPaletteCycling = 0;
-    gbFirstTimeThrough = 1;
+    gbFirstTimeThrough = true;
     gConfig.slowVideo = 3;
     gConfig.computerWalkSpeed = 3;
     gConfig.walkSpeed = 2;
@@ -2434,7 +2434,7 @@ void GetDataEntry(
 
     if (useImmediateHandler != 0) {
         bDataEntryTime = DATA_ENTRY_PHASE_IMMEDIATE;
-        gbAllowTextEntryEscape = 0;
+        gbAllowTextEntryEscape = false;
     } else
         bDataEntryTime = DATA_ENTRY_PHASE_READY;
     gpWindowManager->DoDialog(DataEntryWin, DataEntryWindowHandler, 0);
@@ -2444,7 +2444,7 @@ void GetDataEntry(
         savedCursorFrame,
         savedCursorType
     );
-    gbAllowTextEntryEscape = 1;
+    gbAllowTextEntryEscape = true;
 }
 
 // @early-stop
