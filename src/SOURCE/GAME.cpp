@@ -2975,7 +2975,7 @@ i32 ViewArmyHandler(tag_message& msg) {
                         }
                         break;
                     case 500:
-                        goldCost6 = (gMonsterDatabase[iViewArmyUpgradeToType].cost
+                        goldCost6 = (gMonsterDatabase[IDX(iViewArmyUpgradeToType)].cost
                                      - gMonsterDatabase[iViewArmyType].cost)
                                     * iViewArmyNumTroops * 2;
                         if (iViewArmyUpgradeToType == CREATURE_BLACK_DRAGON) {

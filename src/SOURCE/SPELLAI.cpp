@@ -256,7 +256,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
             case SPELL_SUMMON_AIR_ELEMENTAL:
             case SPELL_SUMMON_FIRE_ELEMENTAL:
             case SPELL_SUMMON_WATER_ELEMENTAL:
-                effect = EffectSpellCreateCreature(hexIndex, IDX(spell));
+                effect = EffectSpellCreateCreature(hexIndex, spell);
                 break;
             case SPELL_FIREBALL:
             case SPELL_FIREBLAST:
@@ -737,7 +737,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
 // fight-value/creature-type expressions were tried; revisit with
 // local-table-aware comparison in the byte-last-mile phase.
 VA(0x00487b8e, 0x34c)
-i32 combatManager::EffectSpellCreateCreature(i32 hex, i32 spell) {
+i32 combatManager::EffectSpellCreateCreature(i32 hex, SpellType spell) {
     float workChance = COMBAT_SPELL_AI_FULL_EFFECT_IMMEDIATE;
     i32 spellPowerValue = m_spellPower[m_currentSide];
 
@@ -754,16 +754,16 @@ i32 combatManager::EffectSpellCreateCreature(i32 hex, i32 spell) {
 
     CreatureType creatureType;
     switch (spell) {
-        case IDX(SPELL_SUMMON_EARTH_ELEMENTAL):
+        case SPELL_SUMMON_EARTH_ELEMENTAL:
             creatureType = CREATURE_EARTH_ELEMENTAL;
             break;
-        case IDX(SPELL_SUMMON_AIR_ELEMENTAL):
+        case SPELL_SUMMON_AIR_ELEMENTAL:
             creatureType = CREATURE_AIR_ELEMENTAL;
             break;
-        case IDX(SPELL_SUMMON_FIRE_ELEMENTAL):
+        case SPELL_SUMMON_FIRE_ELEMENTAL:
             creatureType = CREATURE_FIRE_ELEMENTAL;
             break;
-        case IDX(SPELL_SUMMON_WATER_ELEMENTAL):
+        case SPELL_SUMMON_WATER_ELEMENTAL:
             creatureType = CREATURE_WATER_ELEMENTAL;
             break;
         default:

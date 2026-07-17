@@ -4925,7 +4925,7 @@ i32 advManager::CombatMonsterEvent(
 }
 
 VA(0x004b1380, 0x5f3)
-void GiveTakeArtifactStat(hero* targetHero, i32 artifact, i32 take) {
+void GiveTakeArtifactStat(hero* targetHero, ArtifactType artifact, b32 take) {
     i32 statChanges[EVENT_ARTIFACT_PRIMARY_STAT_COUNT + 1];
     i32 maxSpellPoints;
 
@@ -4937,255 +4937,255 @@ void GiveTakeArtifactStat(hero* targetHero, i32 artifact, i32 take) {
     statChanges[IDX(HERO_PRIMARY_KNOWLEDGE)] = 0;
 
     switch (artifact) {
-        case IDX(ARTIFACT_ULTIMATE_BOOK):
+        case ARTIFACT_ULTIMATE_BOOK:
             statChanges[IDX(HERO_PRIMARY_KNOWLEDGE)] = 12;
             break;
-        case IDX(ARTIFACT_ULTIMATE_SWORD):
+        case ARTIFACT_ULTIMATE_SWORD:
             statChanges[IDX(HERO_PRIMARY_ATTACK)] = 12;
             break;
-        case IDX(ARTIFACT_ULTIMATE_CLOAK):
+        case ARTIFACT_ULTIMATE_CLOAK:
             statChanges[IDX(HERO_PRIMARY_DEFENSE)] = 12;
             break;
-        case IDX(ARTIFACT_ULTIMATE_WAND):
+        case ARTIFACT_ULTIMATE_WAND:
             statChanges[IDX(HERO_PRIMARY_SPELL_POWER)] = 12;
             break;
-        case IDX(ARTIFACT_ULTIMATE_SHIELD):
+        case ARTIFACT_ULTIMATE_SHIELD:
             statChanges[IDX(HERO_PRIMARY_ATTACK)] = 6;
             statChanges[IDX(HERO_PRIMARY_DEFENSE)] = 6;
             break;
-        case IDX(ARTIFACT_ULTIMATE_STAFF):
+        case ARTIFACT_ULTIMATE_STAFF:
             statChanges[IDX(HERO_PRIMARY_SPELL_POWER)] = 6;
             statChanges[IDX(HERO_PRIMARY_KNOWLEDGE)] = 6;
             break;
-        case IDX(ARTIFACT_ULTIMATE_CROWN):
+        case ARTIFACT_ULTIMATE_CROWN:
             statChanges[IDX(HERO_PRIMARY_ATTACK)] = 4;
             statChanges[IDX(HERO_PRIMARY_DEFENSE)] = 4;
             statChanges[IDX(HERO_PRIMARY_SPELL_POWER)] = 4;
             statChanges[IDX(HERO_PRIMARY_KNOWLEDGE)] = 4;
             break;
-        case IDX(ARTIFACT_GOLDEN_GOOSE):
+        case ARTIFACT_GOLDEN_GOOSE:
             break;
-        case IDX(ARTIFACT_ARCANE_NECKLACE):
+        case ARTIFACT_ARCANE_NECKLACE:
             statChanges[IDX(HERO_PRIMARY_SPELL_POWER)] = 4;
             break;
-        case IDX(ARTIFACT_CASTER_BRACELET):
+        case ARTIFACT_CASTER_BRACELET:
             statChanges[IDX(HERO_PRIMARY_SPELL_POWER)] = 2;
             break;
-        case IDX(ARTIFACT_MAGE_RING):
+        case ARTIFACT_MAGE_RING:
             statChanges[IDX(HERO_PRIMARY_SPELL_POWER)] = 2;
             break;
-        case IDX(ARTIFACT_WITCHES_BROACH):
+        case ARTIFACT_WITCHES_BROACH:
             statChanges[IDX(HERO_PRIMARY_SPELL_POWER)] = 3;
             break;
-        case IDX(ARTIFACT_MEDAL_OF_VALOR):
+        case ARTIFACT_MEDAL_OF_VALOR:
             break;
-        case IDX(ARTIFACT_MEDAL_OF_COURAGE):
+        case ARTIFACT_MEDAL_OF_COURAGE:
             break;
-        case IDX(ARTIFACT_MEDAL_OF_HONOR):
+        case ARTIFACT_MEDAL_OF_HONOR:
             break;
-        case IDX(ARTIFACT_MEDAL_OF_DISTINCTION):
+        case ARTIFACT_MEDAL_OF_DISTINCTION:
             break;
-        case IDX(ARTIFACT_FIZBIN_OF_MISFORTUNE):
+        case ARTIFACT_FIZBIN_OF_MISFORTUNE:
             break;
-        case IDX(ARTIFACT_THUNDER_MACE):
+        case ARTIFACT_THUNDER_MACE:
             statChanges[IDX(HERO_PRIMARY_ATTACK)] = 1;
             break;
-        case IDX(ARTIFACT_ARMORED_GAUNTLETS):
+        case ARTIFACT_ARMORED_GAUNTLETS:
             statChanges[IDX(HERO_PRIMARY_DEFENSE)] = 1;
             break;
-        case IDX(ARTIFACT_DEFENDER_HELM):
+        case ARTIFACT_DEFENDER_HELM:
             statChanges[IDX(HERO_PRIMARY_DEFENSE)] = 1;
             break;
-        case IDX(ARTIFACT_GIANT_FLAIL):
+        case ARTIFACT_GIANT_FLAIL:
             statChanges[IDX(HERO_PRIMARY_ATTACK)] = 1;
             break;
-        case IDX(ARTIFACT_BALLISTA):
+        case ARTIFACT_BALLISTA:
             break;
-        case IDX(ARTIFACT_STEALTH_SHIELD):
+        case ARTIFACT_STEALTH_SHIELD:
             statChanges[IDX(HERO_PRIMARY_DEFENSE)] = 2;
             break;
-        case IDX(ARTIFACT_DRAGON_SWORD):
+        case ARTIFACT_DRAGON_SWORD:
             statChanges[IDX(HERO_PRIMARY_ATTACK)] = 3;
             break;
-        case IDX(ARTIFACT_POWER_AXE):
+        case ARTIFACT_POWER_AXE:
             statChanges[IDX(HERO_PRIMARY_ATTACK)] = 2;
             break;
-        case IDX(ARTIFACT_DIVINE_BREASTPLATE):
+        case ARTIFACT_DIVINE_BREASTPLATE:
             statChanges[IDX(HERO_PRIMARY_DEFENSE)] = 3;
             break;
-        case IDX(ARTIFACT_MINOR_SCROLL):
+        case ARTIFACT_MINOR_SCROLL:
             statChanges[IDX(HERO_PRIMARY_KNOWLEDGE)] = 2;
             break;
-        case IDX(ARTIFACT_MAJOR_SCROLL):
+        case ARTIFACT_MAJOR_SCROLL:
             statChanges[IDX(HERO_PRIMARY_KNOWLEDGE)] = 3;
             break;
-        case IDX(ARTIFACT_SUPERIOR_SCROLL):
+        case ARTIFACT_SUPERIOR_SCROLL:
             statChanges[IDX(HERO_PRIMARY_KNOWLEDGE)] = 4;
             break;
-        case IDX(ARTIFACT_FOREMOST_SCROLL):
+        case ARTIFACT_FOREMOST_SCROLL:
             statChanges[IDX(HERO_PRIMARY_KNOWLEDGE)] = 5;
             break;
-        case IDX(ARTIFACT_ENDLESS_SACK_GOLD):
+        case ARTIFACT_ENDLESS_SACK_GOLD:
             break;
-        case IDX(ARTIFACT_ENDLESS_BAG_GOLD):
+        case ARTIFACT_ENDLESS_BAG_GOLD:
             break;
-        case IDX(ARTIFACT_ENDLESS_PURSE_GOLD):
+        case ARTIFACT_ENDLESS_PURSE_GOLD:
             break;
-        case IDX(ARTIFACT_NOMAD_BOOTS):
+        case ARTIFACT_NOMAD_BOOTS:
             break;
-        case IDX(ARTIFACT_TRAVELER_BOOTS):
+        case ARTIFACT_TRAVELER_BOOTS:
             break;
-        case IDX(ARTIFACT_RABBIT_FOOT):
+        case ARTIFACT_RABBIT_FOOT:
             break;
-        case IDX(ARTIFACT_GOLDEN_HORSESHOE):
+        case ARTIFACT_GOLDEN_HORSESHOE:
             break;
-        case IDX(ARTIFACT_GAMBLERS_COIN):
+        case ARTIFACT_GAMBLERS_COIN:
             break;
-        case IDX(ARTIFACT_FOUR_LEAF_CLOVER):
+        case ARTIFACT_FOUR_LEAF_CLOVER:
             break;
-        case IDX(ARTIFACT_TRUE_COMPASS):
+        case ARTIFACT_TRUE_COMPASS:
             break;
-        case IDX(ARTIFACT_SAILORS_ASTROLABE):
+        case ARTIFACT_SAILORS_ASTROLABE:
             break;
-        case IDX(ARTIFACT_EVIL_EYE):
+        case ARTIFACT_EVIL_EYE:
             break;
-        case IDX(ARTIFACT_ENCHANTED_HOURGLASS):
+        case ARTIFACT_ENCHANTED_HOURGLASS:
             break;
-        case IDX(ARTIFACT_GOLD_WATCH):
+        case ARTIFACT_GOLD_WATCH:
             break;
-        case IDX(ARTIFACT_SKULLCAP):
+        case ARTIFACT_SKULLCAP:
             break;
-        case IDX(ARTIFACT_ICE_CLOAK):
+        case ARTIFACT_ICE_CLOAK:
             break;
-        case IDX(ARTIFACT_FIRE_CLOAK):
+        case ARTIFACT_FIRE_CLOAK:
             break;
-        case IDX(ARTIFACT_LIGHTNING_HELM):
+        case ARTIFACT_LIGHTNING_HELM:
             break;
-        case IDX(ARTIFACT_EVERCOLD_ICICLE):
+        case ARTIFACT_EVERCOLD_ICICLE:
             break;
-        case IDX(ARTIFACT_EVERHOT_LAVA_ROCK):
+        case ARTIFACT_EVERHOT_LAVA_ROCK:
             break;
-        case IDX(ARTIFACT_LIGHTNING_ROD):
+        case ARTIFACT_LIGHTNING_ROD:
             break;
-        case IDX(ARTIFACT_SNAKE_RING):
+        case ARTIFACT_SNAKE_RING:
             break;
-        case IDX(ARTIFACT_ANKH):
+        case ARTIFACT_ANKH:
             break;
-        case IDX(ARTIFACT_BOOK_ELEMENTS):
+        case ARTIFACT_BOOK_ELEMENTS:
             break;
-        case IDX(ARTIFACT_ELEMENTAL_RING):
+        case ARTIFACT_ELEMENTAL_RING:
             break;
-        case IDX(ARTIFACT_HOLY_PENDANT):
+        case ARTIFACT_HOLY_PENDANT:
             break;
-        case IDX(ARTIFACT_PENDANT_FREE_WILL):
+        case ARTIFACT_PENDANT_FREE_WILL:
             break;
-        case IDX(ARTIFACT_PENDANT_LIFE):
+        case ARTIFACT_PENDANT_LIFE:
             break;
-        case IDX(ARTIFACT_SERENITY_PENDANT):
+        case ARTIFACT_SERENITY_PENDANT:
             break;
-        case IDX(ARTIFACT_SEEING_EYE_PENDANT):
+        case ARTIFACT_SEEING_EYE_PENDANT:
             break;
-        case IDX(ARTIFACT_KINETIC_PENDANT):
+        case ARTIFACT_KINETIC_PENDANT:
             break;
-        case IDX(ARTIFACT_PENDANT_DEATH):
+        case ARTIFACT_PENDANT_DEATH:
             break;
-        case IDX(ARTIFACT_WAND_NEGATION):
+        case ARTIFACT_WAND_NEGATION:
             break;
-        case IDX(ARTIFACT_GOLDEN_BOW):
+        case ARTIFACT_GOLDEN_BOW:
             break;
-        case IDX(ARTIFACT_TELESCOPE):
+        case ARTIFACT_TELESCOPE:
             break;
-        case IDX(ARTIFACT_STATESMANS_QUILL):
+        case ARTIFACT_STATESMANS_QUILL:
             break;
-        case IDX(ARTIFACT_WIZARD_HAT):
+        case ARTIFACT_WIZARD_HAT:
             break;
-        case IDX(ARTIFACT_POWER_RING):
+        case ARTIFACT_POWER_RING:
             break;
-        case IDX(ARTIFACT_AMMO_CART):
+        case ARTIFACT_AMMO_CART:
             break;
-        case IDX(ARTIFACT_TAX_LIEN):
+        case ARTIFACT_TAX_LIEN:
             break;
-        case IDX(ARTIFACT_HIDEOUS_MASK):
+        case ARTIFACT_HIDEOUS_MASK:
             break;
-        case IDX(ARTIFACT_ENDLESS_POUCH_SULFUR):
+        case ARTIFACT_ENDLESS_POUCH_SULFUR:
             break;
-        case IDX(ARTIFACT_ENDLESS_VIAL_MERCURY):
+        case ARTIFACT_ENDLESS_VIAL_MERCURY:
             break;
-        case IDX(ARTIFACT_ENDLESS_POUCH_GEMS):
+        case ARTIFACT_ENDLESS_POUCH_GEMS:
             break;
-        case IDX(ARTIFACT_ENDLESS_CORD_WOOD):
+        case ARTIFACT_ENDLESS_CORD_WOOD:
             break;
-        case IDX(ARTIFACT_ENDLESS_CART_ORE):
+        case ARTIFACT_ENDLESS_CART_ORE:
             break;
-        case IDX(ARTIFACT_ENDLESS_POUCH_CRYSTAL):
+        case ARTIFACT_ENDLESS_POUCH_CRYSTAL:
             break;
-        case IDX(ARTIFACT_SPIKED_HELM):
+        case ARTIFACT_SPIKED_HELM:
             statChanges[IDX(HERO_PRIMARY_ATTACK)] = 1;
             statChanges[IDX(HERO_PRIMARY_DEFENSE)] = 1;
             break;
-        case IDX(ARTIFACT_SPIKED_SHIELD):
+        case ARTIFACT_SPIKED_SHIELD:
             statChanges[IDX(HERO_PRIMARY_ATTACK)] = 2;
             statChanges[IDX(HERO_PRIMARY_DEFENSE)] = 2;
             break;
-        case IDX(ARTIFACT_WHITE_PEARL):
+        case ARTIFACT_WHITE_PEARL:
             statChanges[IDX(HERO_PRIMARY_SPELL_POWER)] = 1;
             statChanges[IDX(HERO_PRIMARY_KNOWLEDGE)] = 1;
             break;
-        case IDX(ARTIFACT_BLACK_PEARL):
+        case ARTIFACT_BLACK_PEARL:
             statChanges[IDX(HERO_PRIMARY_SPELL_POWER)] = 2;
             statChanges[IDX(HERO_PRIMARY_KNOWLEDGE)] = 2;
             break;
-        case IDX(ARTIFACT_MAGIC_BOOK):
+        case ARTIFACT_MAGIC_BOOK:
             break;
-        case IDX(ARTIFACT_SPELL_SCROLL):
+        case ARTIFACT_SPELL_SCROLL:
             break;
-        case IDX(ARTIFACT_ARM_OF_MARTYR):
+        case ARTIFACT_ARM_OF_MARTYR:
             statChanges[IDX(HERO_PRIMARY_SPELL_POWER)] = 3;
             break;
-        case IDX(ARTIFACT_BREASTPLATE_ANDURAN):
+        case ARTIFACT_BREASTPLATE_ANDURAN:
             statChanges[IDX(HERO_PRIMARY_DEFENSE)] = 5;
             break;
-        case IDX(ARTIFACT_BROACH_SHIELDING):
+        case ARTIFACT_BROACH_SHIELDING:
             statChanges[IDX(HERO_PRIMARY_SPELL_POWER)] = -2;
             break;
-        case IDX(ARTIFACT_BATTLE_GARB):
+        case ARTIFACT_BATTLE_GARB:
             statChanges[IDX(HERO_PRIMARY_SPELL_POWER)] = 5;
             statChanges[IDX(HERO_PRIMARY_DEFENSE)] = 5;
             statChanges[IDX(HERO_PRIMARY_ATTACK)] = 5;
             break;
-        case IDX(ARTIFACT_CRYSTAL_BALL):
+        case ARTIFACT_CRYSTAL_BALL:
             break;
-        case IDX(ARTIFACT_HEART_FIRE):
+        case ARTIFACT_HEART_FIRE:
             break;
-        case IDX(ARTIFACT_HEART_ICE):
+        case ARTIFACT_HEART_ICE:
             break;
-        case IDX(ARTIFACT_HELMET_ANDURAN):
+        case ARTIFACT_HELMET_ANDURAN:
             statChanges[IDX(HERO_PRIMARY_SPELL_POWER)] = 5;
             break;
-        case IDX(ARTIFACT_HOLY_HAMMER):
+        case ARTIFACT_HOLY_HAMMER:
             statChanges[IDX(HERO_PRIMARY_ATTACK)] = 5;
             break;
-        case IDX(ARTIFACT_LEGENDARY_SCEPTER):
+        case ARTIFACT_LEGENDARY_SCEPTER:
             statChanges[IDX(HERO_PRIMARY_SPELL_POWER)] = 2;
             statChanges[IDX(HERO_PRIMARY_ATTACK)] = 2;
             statChanges[IDX(HERO_PRIMARY_DEFENSE)] = 2;
             statChanges[IDX(HERO_PRIMARY_KNOWLEDGE)] = 2;
             break;
-        case IDX(ARTIFACT_MASTHEAD):
+        case ARTIFACT_MASTHEAD:
             break;
-        case IDX(ARTIFACT_SPHERE_NEGATION):
+        case ARTIFACT_SPHERE_NEGATION:
             break;
-        case IDX(ARTIFACT_STAFF_WIZARDRY):
+        case ARTIFACT_STAFF_WIZARDRY:
             statChanges[IDX(HERO_PRIMARY_SPELL_POWER)] = 5;
             break;
-        case IDX(ARTIFACT_SWORD_BREAKER):
+        case ARTIFACT_SWORD_BREAKER:
             statChanges[IDX(HERO_PRIMARY_DEFENSE)] = 4;
             statChanges[IDX(HERO_PRIMARY_ATTACK)] = 1;
             break;
-        case IDX(ARTIFACT_SWORD_ANDURAN):
+        case ARTIFACT_SWORD_ANDURAN:
             statChanges[IDX(HERO_PRIMARY_ATTACK)] = 5;
             break;
-        case IDX(ARTIFACT_SPADE_NECROMANCY):
+        case ARTIFACT_SPADE_NECROMANCY:
             break;
         default:
             break;
