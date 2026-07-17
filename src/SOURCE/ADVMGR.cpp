@@ -1058,14 +1058,14 @@ i32 advManager::ProcessSelect(struct tag_message *message, class mapCell **event
             } else {
                 if (m_lastHoverCell == 7 && m_hoverCellY == 7 &&
                     gpCurPlayer->CurrentHero() != ADVMGR_INVALID_HERO && m_heroContextLocked) {
-                    objectTypeState = MAP_EVENT_HERO_INTERACTION;
+                    objectTypeState = MAP_OBJECT_HERO_INTERACTION;
                     objectIdIndex = gpCurPlayer->CurrentHero();
                 } else {
                     objectTypeState = currentCell->m_triggerType & 0x7f;
                     objectIdIndex = currentCell->m_objectMetadata;
                 }
                 switch (objectTypeState) {
-                case MAP_EVENT_HERO_INTERACTION:
+                case MAP_OBJECT_HERO_INTERACTION:
                     mouseX = m_lastHoverCell * 32 - 73;
                     if (mouseX < 30)
                         mouseX = 30;
@@ -1078,7 +1078,7 @@ i32 advManager::ProcessSelect(struct tag_message *message, class mapCell **event
                         mouseY = 274;
                     HeroQuickView(objectIdIndex, -1, mouseX, mouseY);
                     break;
-                case MAP_EVENT_CASTLE:
+                case MAP_OBJECT_CASTLE:
                     mouseX = m_lastHoverCell * 32 - 89;
                     if (mouseX < 30)
                         mouseX = 30;
@@ -1128,7 +1128,7 @@ i32 advManager::ProcessSelect(struct tag_message *message, class mapCell **event
             } else {
                 objectTypeState = currentCell->m_triggerType & 0x7f;
                 objectIdIndex = currentCell->m_objectMetadata;
-                if (objectTypeState == MAP_EVENT_HERO_INTERACTION) {
+                if (objectTypeState == MAP_OBJECT_HERO_INTERACTION) {
                     if (gpCurPlayer->CurrentHero() == objectIdIndex) {
                         m_selectedCell = ADVMGR_COMMAND_HERO_VIEW;
                         DoAdvCommand();
@@ -1136,7 +1136,7 @@ i32 advManager::ProcessSelect(struct tag_message *message, class mapCell **event
                         SetHeroContext(objectIdIndex, 0);
                     }
                 }
-                if (objectTypeState == MAP_EVENT_CASTLE) {
+                if (objectTypeState == MAP_OBJECT_CASTLE) {
                     if (gpCurPlayer->CurrentTown() == objectIdIndex) {
                         m_selectedCell = ADVMGR_COMMAND_TOWN_VIEW;
                         *eventCell = DoAdvCommand();
@@ -4829,7 +4829,7 @@ void advManager::DemobilizeCurrHero(void)
     currentHero->m_direction = static_cast<u8>(m_cursorDirection);
     if (m_cursorType == CURSOR_HERO_TYPE_BOAT)
         currentHero->m_eventFlags = HERO_EVENT_EMBARKED | currentHero->m_eventFlags;
-    currentCell->m_triggerType = MAP_EVENT_ACTION_FLAG | MAP_EVENT_HERO_INTERACTION;
+    currentCell->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION;
     currentCell->m_objectMetadata = currentHero->m_id;
     currentCell->m_flags &= ~CURSOR_MAP_VISIBLE_FLAG;
     m_cursorActive = 0;
@@ -5102,7 +5102,7 @@ void advManager::CastSpell(i32 spell)
         goto setMineGuardian;
 setMineGuardian:
         currentCell = gpAdvManager->GetCell(currentHeroSlot->m_x, currentHeroSlot->m_y);
-        if (currentCell->m_triggerType != (MAP_EVENT_ACTION_FLAG | MAP_EVENT_MINE)) {
+        if (currentCell->m_triggerType != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MINE)) {
             NormalDialog("You must be standing on the entrance to a mine (sawmills and alchemists don't count) to cast this spell.",
                          1, -1, -1, -1, 0, -1, 0, -1, 0);
             return;
@@ -5760,88 +5760,88 @@ i32 advManager::GetSoundId(i32 x, i32 y)
 
     if (currentCell->m_triggerType & ADVMGR_TRIGGER_ACTION_FLAG) {
         switch (currentCell->m_triggerType & ADVMGR_TRIGGER_TYPE_MASK) {
-        case ADVMGR_SOUND_OBJECT_ARCHER_HOUSE:
+        case MAP_OBJECT_ARCHER_HOUSE:
             return ADVMGR_SOUND_DWELLING;
-        case ADVMGR_SOUND_OBJECT_DWARF_COTTAGE:
+        case MAP_OBJECT_DWARF_COTTAGE:
             return ADVMGR_SOUND_DWELLING;
-        case ADVMGR_SOUND_OBJECT_PEASANT_HUT:
+        case MAP_OBJECT_PEASANT_HUT:
             return ADVMGR_SOUND_DWELLING;
-        case ADVMGR_SOUND_OBJECT_LOG_CABIN:
+        case MAP_OBJECT_LOG_CABIN:
             return ADVMGR_SOUND_DWELLING;
-        case ADVMGR_SOUND_OBJECT_SIRENS:
+        case MAP_OBJECT_SIRENS:
             return ADVMGR_SOUND_DWELLING;
-        case ADVMGR_SOUND_OBJECT_RUINS:
+        case MAP_OBJECT_RUINS:
             return ADVMGR_SOUND_RUINS;
-        case ADVMGR_SOUND_OBJECT_DERELICT_SHIP:
+        case MAP_OBJECT_DERELICT_SHIP:
             return ADVMGR_SOUND_DERELICT_SHIP;
-        case ADVMGR_SOUND_OBJECT_TRADING_POST:
+        case MAP_OBJECT_TRADING_POST:
             return ADVMGR_SOUND_TRADING_POST;
-        case ADVMGR_SOUND_OBJECT_SHRINE_FIRST:
+        case MAP_OBJECT_SHRINE_FIRST_CIRCLE:
             return ADVMGR_SOUND_SHRINE;
-        case ADVMGR_SOUND_OBJECT_SHRINE_SECOND:
+        case MAP_OBJECT_SHRINE_SECOND_CIRCLE:
             return ADVMGR_SOUND_SHRINE;
-        case ADVMGR_SOUND_OBJECT_SHRINE_THIRD:
+        case MAP_OBJECT_SHRINE_THIRD_CIRCLE:
             return ADVMGR_SOUND_SHRINE;
-        case ADVMGR_SOUND_OBJECT_BUOY:
+        case MAP_OBJECT_BUOY:
             return ADVMGR_SOUND_BUOY;
-        case ADVMGR_SOUND_OBJECT_SHIPWRECK:
+        case MAP_OBJECT_SHIPWRECK:
             return ADVMGR_SOUND_SHIPWRECK;
-        case ADVMGR_SOUND_OBJECT_WHIRLPOOL:
+        case MAP_OBJECT_WHIRLPOOL:
             return ADVMGR_SOUND_COAST;
-        case ADVMGR_SOUND_OBJECT_CAMPFIRE:
+        case MAP_OBJECT_CAMPFIRE:
             return ADVMGR_SOUND_CAMPFIRE;
-        case ADVMGR_SOUND_OBJECT_WINDMILL:
+        case MAP_OBJECT_WINDMILL:
             return ADVMGR_SOUND_WINDMILL;
-        case ADVMGR_SOUND_OBJECT_FOUNTAIN:
+        case MAP_OBJECT_FOUNTAIN:
             return ADVMGR_SOUND_FOUNTAIN;
-        case ADVMGR_SOUND_OBJECT_ARTESIAN_SPRING:
+        case MAP_OBJECT_ARTESIAN_SPRING:
             return ADVMGR_SOUND_FOUNTAIN;
-        case ADVMGR_SOUND_OBJECT_WATERING_HOLE:
+        case MAP_OBJECT_WATERING_HOLE:
             return ADVMGR_SOUND_WATERING_HOLE;
-        case ADVMGR_SOUND_OBJECT_STONE_LITHS:
+        case MAP_OBJECT_STONE_LITHS:
             return ADVMGR_SOUND_STONE_LITHS;
-        case ADVMGR_SOUND_OBJECT_ORACLE:
+        case MAP_OBJECT_ORACLE:
             return ADVMGR_SOUND_ORACLE;
-        case ADVMGR_SOUND_OBJECT_WATER_WHEEL:
+        case MAP_OBJECT_WATER_WHEEL:
             return ADVMGR_SOUND_WATER_WHEEL;
-        case ADVMGR_SOUND_OBJECT_ALCHEMIST_LAB:
+        case MAP_OBJECT_ALCHEMIST_LAB:
             if (currentCell->m_triggerType & ADVMGR_TRIGGER_ACTION_FLAG)
                 return ADVMGR_SOUND_ALCHEMIST_LAB_ACTION;
             break;
-        case ADVMGR_SOUND_OBJECT_MINE:
+        case MAP_OBJECT_MINE:
             if (currentCell->m_triggerType & ADVMGR_TRIGGER_ACTION_FLAG)
                 return ADVMGR_SOUND_MINE;
             break;
-        case ADVMGR_SOUND_OBJECT_ABANDONED_MINE:
+        case MAP_OBJECT_ABANDONED_MINE:
             if (currentCell->m_triggerType & ADVMGR_TRIGGER_ACTION_FLAG)
                 return ADVMGR_SOUND_ABANDONED_MINE;
             break;
-        case ADVMGR_SOUND_OBJECT_SAWMILL:
+        case MAP_OBJECT_SAWMILL:
             if (currentCell->m_triggerType & ADVMGR_TRIGGER_ACTION_FLAG)
                 return ADVMGR_SOUND_SAWMILL;
             break;
-        case ADVMGR_SOUND_OBJECT_DAEMON_CAVE:
+        case MAP_OBJECT_DAEMON_CAVE:
             if (currentCell->m_triggerType & ADVMGR_TRIGGER_ACTION_FLAG)
                 return ADVMGR_SOUND_DAEMON_CAVE;
             break;
         }
     } else {
         switch (currentCell->m_triggerType) {
-        case ADVMGR_SOUND_OBJECT_TAR_PIT:
+        case MAP_OBJECT_TAR_PIT:
             return ADVMGR_SOUND_TAR_PIT;
-        case ADVMGR_SOUND_OBJECT_LAVA_POOL:
+        case MAP_OBJECT_LAVA_POOL:
             if (currentCell->m_objectIndex >= ADVMGR_SOUND_ALCHEMIST_FRAME_FIRST &&
                 currentCell->m_objectIndex <= ADVMGR_SOUND_ALCHEMIST_FRAME_LAST)
                 return ADVMGR_SOUND_ALCHEMIST_LAB;
             else
                 return ADVMGR_SOUND_LAVA_POOL;
-        case ADVMGR_SOUND_OBJECT_VOLCANO:
+        case MAP_OBJECT_VOLCANO:
             if (currentCell->m_objectTileset == ADVMGR_SOUND_TILESET_SMALL_VOLCANO ||
                 currentCell->m_objectTileset == ADVMGR_SOUND_TILESET_LARGE_VOLCANO)
                 return ADVMGR_SOUND_LARGE_VOLCANO;
             else
                 return ADVMGR_SOUND_SMALL_VOLCANO;
-        case ADVMGR_SOUND_OBJECT_WATER_LAKE:
+        case MAP_OBJECT_WATER_LAKE:
             if (currentCell->m_objectTileset == ADVMGR_SOUND_TILESET_WATER_LAKE_UNUSED)
                 break;
             return ADVMGR_SOUND_WATERING_HOLE;

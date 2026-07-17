@@ -3314,7 +3314,7 @@ void game::PerWeek(void)
     for (mapY5 = 0; MAP_HEIGHT > mapY5; mapY5++) {
         for (mapX8 = 0; mapX8 < MAP_WIDTH; mapX8++) {
             switch (WORLDMAP->Row(mapY5)[mapX8].m_triggerType) {
-            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_MONSTER: {
+            case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MONSTER: {
                 monsterCount36 = WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata & 0xfff;
                 monsterIncrease16 = monsterCount36 / 7;
                 if (Random(1, 7) <= static_cast<i32>(monsterCount36 % 7))
@@ -3326,99 +3326,99 @@ void game::PerWeek(void)
                     (WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata & 0x1000) | monsterCount36;
                 break;
             }
-            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_ARTESIAN_SPRING:
+            case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ARTESIAN_SPRING:
                 WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata = 1;
                 break;
-            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_WATER_WHEEL:
+            case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_WATER_WHEEL:
                 if (WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata != 0xff)
                     WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata = 2;
                 break;
-            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_MAGIC_GARDEN:
+            case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MAGIC_GARDEN:
                 WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata =
                     Random(0, 1) ? 7 : 6;
                 break;
-            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_WINDMILL:
+            case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_WINDMILL:
                 WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata = Random(1, 5);
                 break;
-            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_ARCHER_HOUSE:
+            case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ARCHER_HOUSE:
                 if (WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
                     WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata += Random(2, 4);
                 break;
-            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_GOBLIN_HUT:
+            case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_GOBLIN_HUT:
                 if (WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
                     WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata += Random(3, 6);
                 break;
-            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_DWARF_COTTAGE:
+            case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_DWARF_COTTAGE:
                 if (WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
                     WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata += Random(2, 4);
                 break;
-            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_PEASANT_HUT:
+            case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_PEASANT_HUT:
                 if (WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
                     WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata += Random(5, 10);
                 break;
-            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_LOG_CABIN:
+            case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_LOG_CABIN:
                 if (WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
                     WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata += Random(5, 10);
                 break;
-            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_DESERT_TENT:
+            case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_DESERT_TENT:
                 if (WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
                     WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata += Random(1, 3);
                 break;
-            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_WAGON_CAMP:
+            case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_WAGON_CAMP:
                 if (WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
                     WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata += Random(3, 6);
                 break;
-            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_TREE_HOUSE:
+            case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_TREE_HOUSE:
                 if (WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
                     WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata += Random(4, 8);
                 break;
-            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_SIRENS:
+            case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SIRENS:
                 if (WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
                     WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata += Random(3, 6);
                 break;
-            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_WATCH_TOWER:
+            case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_WATCH_TOWER:
                 if (WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
                     WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata += Random(1, 4);
                 break;
-            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_RUINS:
+            case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RUINS:
                 if (WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
                     WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata += Random(1, 3);
                 break;
-            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_TREE_CITY:
+            case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_TREE_CITY:
                 if (WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata < 0x1fe1)
                     WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata += Random(10, 20);
                 break;
-            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_CAVE:
+            case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CAVE:
                 if (WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
                     WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata += Random(3, 6);
                 break;
-            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_EXCAVATION:
+            case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_EXCAVATION:
                 if (WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
                     WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata += Random(4, 8);
                 break;
-            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_HALFLING_HOLE:
+            case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HALFLING_HOLE:
                 if (WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
                     WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata += Random(5, 10);
                 break;
-            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_TROLL_BRIDGE:
+            case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_TROLL_BRIDGE:
                 if (!(WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata & 0x80) &&
                     WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata < WEEKLY_DRAGON_CITY_LIMIT)
                     WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata += Random(1, 3);
                 break;
-            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_CITY_OF_DEAD:
+            case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CITY_OF_DEAD:
                 if (!(WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata & 0x80) &&
                     WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata < WEEKLY_DRAGON_CITY_LIMIT)
                     WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata += Random(1, 3);
                 break;
-            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_DRAGON_CITY:
+            case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_DRAGON_CITY:
                 if (!(WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata & 0x80) &&
                     WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata < WEEKLY_DRAGON_CITY_LIMIT)
                     WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata += 1;
                 break;
-            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_EXPANSION_DWELLING:
+            case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_EXPANSION_DWELLING:
                 WeeklyRecruitSite(WORLDMAP->GetCell(mapX8, mapY5));
                 break;
-            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_EXPANSION_OBJECT:
+            case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_EXPANSION_OBJECT:
                 WeeklyGenericSite(WORLDMAP->GetCell(mapX8, mapY5));
                 break;
             default:
@@ -4507,9 +4507,9 @@ void game::ProcessMapExtra(void)
         for (col = 0; MAP_WIDTH > col; col++) {
             cell = WORLDMAP->Row(row) + col;
             switch (cell->m_triggerType) {
-            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_CASTLE:
-            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_RANDOM_TOWN:
-            case MAP_EVENT_ACTION_FLAG | MAP_EVENT_RANDOM_CASTLE:
+            case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE:
+            case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_TOWN:
+            case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_CASTLE:
                 townId = GetTownId(col, row);
                 m_castleRecs[townId].m_extraIndex = cell->m_objectMetadata;
                 cell->m_objectMetadata = townId;
@@ -4521,11 +4521,11 @@ void game::ProcessMapExtra(void)
     for (row = 0; row < MAP_HEIGHT; row++) {
         for (col = 0; MAP_WIDTH > col; col++) {
             cell = WORLDMAP->Row(row) + col;
-            if (cell->m_triggerType == (MAP_EVENT_ACTION_FLAG | MAP_EVENT_MINE) &&
+            if (cell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MINE) &&
                 row > 0 && HasLateOverlay(col, row - 1)) {
                 ConvertFlagToLateOverlay(col, row);
             }
-            if (cell->m_triggerType == (MAP_EVENT_ACTION_FLAG | MAP_EVENT_ALCHEMIST_LAB)) {
+            if (cell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ALCHEMIST_LAB)) {
                 if (row > 0)
                     ConvertFlagToLateOverlay(col, row - 1);
                 if (row > 1)
@@ -4780,10 +4780,10 @@ void game::ProcessOnMapHeroes(void)
         for (mapY15 = 0; mapY15 < MAP_HEIGHT; mapY15++) {
             for (mapX0 = 0; mapX0 < MAP_WIDTH; mapX0++) {
                 cell5 = &WORLDMAP->Row(mapY15)[mapX0];
-                if ((cell5->m_triggerType & MAP_EVENT_TYPE_MASK) == MAP_EVENT_HERO ||
-                    cell5->m_triggerType == (MAP_EVENT_ACTION_FLAG | MAP_EVENT_JAIL)) {
+                if ((cell5->m_triggerType & MAP_TRIGGER_TYPE_MASK) == MAP_OBJECT_HERO ||
+                    cell5->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_JAIL)) {
 
-                if ((cell5->m_triggerType & MAP_EVENT_TYPE_MASK) == MAP_EVENT_JAIL)
+                if ((cell5->m_triggerType & MAP_TRIGGER_TYPE_MASK) == MAP_OBJECT_JAIL)
                     isJail6 = 1;
                 else
                     isJail6 = 0;
@@ -4880,7 +4880,7 @@ void game::ProcessOnMapHeroes(void)
                     if (!isJail6 && mapY15 > 0) {
                         townCell1 = &WORLDMAP->Row(mapY15 - 1)[mapX0];
                         if (townCell1->m_triggerType ==
-                            (MAP_EVENT_ACTION_FLAG | MAP_EVENT_CASTLE)) {
+                            (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)) {
                             mapHero0->m_patrolY--;
                             mapHero0->m_y--;
                             townId4 = GetTownId(mapX0, mapY15 - 1);
