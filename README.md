@@ -41,6 +41,8 @@ build/    (gitignored)           toolchain, synth PDB, delinked targets, base ob
 flake.nix two dev shells: default (analysis+diff+clang), build (+wine+MSVC 4.2)
 ```
 
+The documentation map and retention policy are in [`docs/README.md`](docs/README.md).
+
 ## Quickstart
 
 ```sh
@@ -75,7 +77,7 @@ the Wine MSVC 4.2 build is the sole verdict on a match.
 
 ninja **tracks header dependencies** (via `cc_wrap.py`, since MSVC 4.2 has no `/showIncludes`),
 so editing a shared header recompiles exactly its includers — no stale objects. `homm2 build`
-then runs six **hard gates** (a red gate fails the build): no TU declares types/enums/externs/
+then runs **hard gates** (a red gate fails the build): no TU declares types/enums/externs/
 forward-decls locally (all come from headers), no object emits a function symbol absent from
 CodeView, every global carries a unique `DATA(<its VA>)`, every free function is declared in its
 owner header, and every extern global has a definition in its owner TU (link-completeness), and every class

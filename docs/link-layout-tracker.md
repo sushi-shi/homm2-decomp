@@ -46,27 +46,11 @@ Generated queue TSVs belong under `build/link/`, not in version control.
 homm2 link-layout summary
 homm2 link-layout queue --limit 50
 homm2 link-layout queue --output build/link/link-layout-queue.tsv
-homm2 link-layout explain SOURCE/Wsnetwin
-homm2 link-layout record --unit SOURCE/Wsnetwin --outcome open \
-  --note 'first actionable .text root; raw 0xfc4/aligned 0xfd0 vs retail 0xfc0'
+homm2 link-layout explain SOURCE/UNIT
+homm2 link-layout record --unit SOURCE/UNIT --outcome open \
+  --note 'first actionable contribution; bounded source audit in progress'
 ```
 
-The current first root is `SOURCE/Wsnetwin`: both images begin its contribution at
-RVA `0x68b0`, but retail contributes `0xfc0` bytes while the candidate COFF contributes
-`0xfc4` raw bytes and LINK rounds it to `0xfd0`. Overview's following `+0x10` start
-delta is therefore a downstream consequence, not an independent patch target.
-
-The bounded source patch is three functions, derived from consecutive retail public
-RVAs and the current candidate COFF symbol offsets:
-
-| Function | Retail size | Candidate size | Delta |
-| :--- | ---: | ---: | ---: |
-| `wsnet_init` | `0x5b5` | `0x5ba` | `+5` |
-| `wsSendMessage` | `0x1f5` | `0x1f9` | `+4` |
-| `wsEvaluateMessage` | `0x37d` | `0x37c` | `-1` |
-
-The other seven public functions have the expected current size. Exactness-only goto
-and pointer-index spellings can close the first two bodies, but are deliberately not
-retained. The current structured reconstruction leaves a raw `+4`; section alignment
-turns that into the linked `+16`. Continue within Wsnetwin until its aligned contribution
-is `0xfc0`, then regenerate the queue before advancing to Overview.
+The queue and `config/link_layout_audit.json` hold the current root and its evidence.
+Do not copy live offsets, next targets, or queue snapshots into this document; regenerate
+them after every accepted contribution change.
