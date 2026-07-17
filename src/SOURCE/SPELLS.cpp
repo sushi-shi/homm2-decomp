@@ -732,9 +732,9 @@ void combatManager::CastSpell(
     }
 
     soundSpell_q = spell;
-    if (spell == IDX(CREATURE_SPELL_PETRIFY))
+    if (IDX(spell) == IDX(CREATURE_SPELL_PETRIFY))
         soundSpell_q = SPELL_PARALYZE;
-    if (spell == IDX(CREATURE_SPELL_DISPEL))
+    if (IDX(spell) == IDX(CREATURE_SPELL_DISPEL))
         soundSpell_q = SPELL_DISPEL;
     if (strlen(gsSpellInfo[IDX(soundSpell_q)].soundName) != 0)
         sprintf(sampleName_i, "%s.82M", gsSpellInfo[IDX(soundSpell_q)].soundName);
@@ -3706,11 +3706,11 @@ void combatManager::ShowSpellMessage(i32 castByCreature, i32 spell, army* target
             sprintf(message_m, "The %s are paralyzed by the Cyclopes!", targetName_b);
         else if (spell == IDX(SPELL_BLIND))
             sprintf(message_m, "The Unicorns' attack blinds the %s!", targetName_b);
-        else if (spell == IDX(CREATURE_SPELL_PETRIFY))
+        else if (IDX(spell) == IDX(CREATURE_SPELL_PETRIFY))
             sprintf(message_m, "The Medusas' gaze turns the %s to stone!", targetName_b);
         else if (spell == IDX(SPELL_CURSE))
             sprintf(message_m, "The Mummies' curse falls upon the %s!", targetName_b);
-        else if (spell == IDX(CREATURE_SPELL_DISPEL))
+        else if (IDX(spell) == IDX(CREATURE_SPELL_DISPEL))
             sprintf(message_m, "The Archmages dispel all good spells\non your %s!", targetName_b);
         else {
             unhandledSpell_j = 0;

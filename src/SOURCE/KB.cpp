@@ -1855,7 +1855,7 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
     CheckEndGameConstants artifactWinnerPerson;
     hero* lossHero;
     hero* winningHeroEntry;
-    CheckEndGameConstants winnerPlayer;
+    i32 winnerPlayer;
     char campaignSaveName[20];
     i32 campaignHeroIndex;
     u32 carryoverHeroId;
@@ -2176,7 +2176,7 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
                     if (gpGame->m_mapHeader.victoryConditionValue
                         > IDX(CHECK_END_GAME_ULTIMATE_ARTIFACT)) {
                         if (artifactHeroPtr->HasArtifact(
-                                ArtifactType(gpGame->m_mapHeader.victoryConditionValue) - 1
+                                ArtifactType(gpGame->m_mapHeader.victoryConditionValue - 1)
                             )) {
                             artifactWinnerPerson = player;
                         }
