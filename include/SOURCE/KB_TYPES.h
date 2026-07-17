@@ -1,8 +1,9 @@
 #ifndef HOMM2_SOURCE_KB_TYPES_H
 #define HOMM2_SOURCE_KB_TYPES_H
-// Shared records for data owned by KB.cpp. These layouts are used by multiple SOURCE
-// modules and are kept separate from KB.h's function and global declarations.
-#include <Ints.h>
+// Compatibility aggregate for shared records used by KB.cpp and its consumers. Domain
+// headers are canonical where split out; MSVC mirrors remain flattened when a nested include
+// boundary would perturb cumulative compiler state.
+#include <va.h>
 // Forward declarations for opaque pointer members.
 class sample;
 
@@ -61,6 +62,11 @@ struct SMenuEnableStatus {
 #pragma pack(pop)
 SIZE(SMenuEnableStatus, 7);
 
+#ifdef __clang__
+#include <SOURCE/CONFIG_TYPES.h>
+#else
+// MSVC 4.2 compatibility mirror. A nested include boundary here perturbs cumulative TU
+// state, so keep this declaration sequence flattened and byte-check it against the owner.
 // gConfig — game/editor preferences (persisted to the registry; field names are the
 // retail registry value names, recovered from ReadPrefsFromRegistry/WritePrefsToRegistry).
 #pragma pack(push, 1)
@@ -143,6 +149,7 @@ struct configStruct {                    // gConfig, 0x1a0 bytes
 #pragma pack(pop)
 SIZE(exeGfxConfig, CONFIG_GRAPHICS_SIZE);
 SIZE(configStruct, CONFIG_STRUCT_SIZE);
+#endif // __clang__
 struct tag_tilePoint {
     signed char x;
     signed char y;

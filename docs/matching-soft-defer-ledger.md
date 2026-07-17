@@ -229,7 +229,7 @@ Canonical source state:
 - `include/BASE/listBoxWidget.h`: `9c4035d2d94d3774180463006ade94348cd431251c88a599f73487cb285ea73b`
 - `include/BASE/widget.h`: `1a2343d9a53626c243d47b45d90b83968356a9abd5364a6e52cd153d71228fe5`
 - `include/BASE/heroWindow.h`: `14a00e5b0af8465d27af8a23f1c054c42e353109c1bd1ae24b9dee7a16f5fdd3`
-- `include/_carcass_types.h`: `27c231717cbc6d73835ec4b27c00568d3384d4aa780c8c87bdcbcaef3fa7a6c3`
+- `include/BASE/message.h`: `9f36a929a6fccd3a3e614fcbfc583ad1e043aca7cbb09640175e8d596b7ea26c`
 
 The candidate and retail functions are both `0x368` bytes with the same frame, CFG, and 23
 relocation sites. `Read` and `ProcessMouseMessage` are raw-exact. The only non-local-label code
