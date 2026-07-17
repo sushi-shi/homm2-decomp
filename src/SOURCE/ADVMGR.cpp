@@ -1002,7 +1002,7 @@ i32 advManager::Main(struct tag_message& message) {
                         ViewPuzzle();
                         break;
                     case 47:
-                        ViewWorld(0x35, 0, 0);
+                        ViewWorld(SPELL_VIEW_ALL, 0, 0);
                         break;
                     case 49:
                         cheatDigitLocal = 'e';

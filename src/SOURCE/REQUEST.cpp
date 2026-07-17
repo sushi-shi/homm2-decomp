@@ -921,13 +921,13 @@ void fileRequester::DoKnob(void) {
                     m_topIndex = newTopIndex;
                     Update(0);
                     m_scrollKnob->m_y = dragMessage.payload.mouse.y - mouseOffset2;
-                    m_window->DrawWindow(1, 0, 0x7fff);
+                    m_window->DrawWindow(1, 0, WINDOW_DRAW_ID_LIMIT);
                     oldTopIndex = newTopIndex;
                 } else {
-                    m_window->DrawWindow(1, 0, 0x7fff);
+                    m_window->DrawWindow(1, 0, WINDOW_DRAW_ID_LIMIT);
                 }
             } else {
-                m_window->DrawWindow(1, 0, 0x7fff);
+                m_window->DrawWindow(1, 0, WINDOW_DRAW_ID_LIMIT);
             }
         }
         Process1WindowsMessage();
@@ -1118,7 +1118,7 @@ void fileRequester::Update(i32 drawWindow) {
         m_scrollKnob->m_y = static_cast<i16>(m_topIndex * gutterStepCount + fGutterMinY);
     }
     if (drawWindow) {
-        m_window->DrawWindow(1, 0, 0x7fff);
+        m_window->DrawWindow(1, 0, WINDOW_DRAW_ID_LIMIT);
     }
 }
 
