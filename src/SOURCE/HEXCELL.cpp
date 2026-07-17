@@ -45,7 +45,10 @@ void hexcell::DrawLowerDeadOccupants(void)
 }
 
 // @early-stop
-// logic and frame slots byte-exact; only the two array-subscript operands load in reverse order
+// Complete 0x10 frame, loop/CFG, and ordered relocations. At +0x40 retail scales
+// dead-occupant side before index; candidate evaluates the equivalent m_armies
+// subscripts in reverse order. Flattening the two-dimensional index regressed the
+// live score; direct and commuted subscript spellings were otherwise unchanged.
 VA(0x0044a4e2, 0xc8)
 void hexcell::DrawUpperDeadOccupant(void)
 {
