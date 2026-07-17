@@ -36,6 +36,22 @@
 #define PHILAI_INIT_MAP_LINE_BASE 0x1b86
 #define PHILAI_CLOSE_MAP_LINE_BASE 0x1b96
 
+// Cell access for the heap-allocated MAP_WIDTH*MAP_HEIGHT i16 AI maps
+// (gaiHeroStrategicRVOfPos, gaiHeroEventStratRVOfPos, gaiLiveChanceOfPos; their
+// CodeView publics prove plain `short *` identity, so the pointer types are
+// modeled correctly). Retail lowers every access as byte-offset addressing —
+// each term scaled by 2 separately, combined with `add ecx,ecx` +
+// `lea eax,[ecx+2*eax]`, then a flat [eax+ecx] access. Natural i16 indexing
+// (`map[x + y * MAP_WIDTH]`) compiles to a scaled-index access with reversed
+// imul operands and structurally diverges, so the byte-offset spelling is
+// retail truth, not a modeling gap. The expansion is token-identical to the
+// previously inlined casts; call sites keep their byte-tuned offset spellings
+// (term order and `(MAP_WIDTH | 0)` steer per-site imul operand selection).
+// Note: introducing any new #define into this TU flips /Od commutative
+// parities elsewhere in the TU (accepted; realigns as the TU fills out).
+#define AI_MAP_AT(map, byteOffset) \
+    *reinterpret_cast<i16 *>(reinterpret_cast<char *>(map) + byteOffset)
+
 // @data-layout-note
 // Retail initialized storage is 0xf20e0..0xf2552 (0x472 bytes). The 18 public
 // definitions, 35 compiler-private literals, and two recovered short line-base
@@ -83,18 +99,18 @@ void ResetHeroRVs(i32 resetAll, i32 x, i32 y) {
             for (idx = 0; idx < MAP_HEIGHT; idx++) {
                 if (resetAll != 0) {
                     if (abs(x - node) + abs(y - idx) < AI_NEARBY_RADIUS)
-                        *reinterpret_cast<i16 *>(reinterpret_cast<char *>(gaiHeroStrategicRVOfPos) +
-                            node * 2 + idx * MAP_WIDTH * 2) = AI_RV_UNSET;
+                        AI_MAP_AT(gaiHeroStrategicRVOfPos,
+                                  node * 2 + idx * MAP_WIDTH * 2) = AI_RV_UNSET;
                 } else {
-                    *reinterpret_cast<i16 *>(reinterpret_cast<char *>(gaiHeroStrategicRVOfPos) +
-                        node * 2 + idx * MAP_WIDTH * 2) = AI_RV_UNSET;
-                    *reinterpret_cast<i16 *>(reinterpret_cast<char *>(gaiHeroEventStratRVOfPos) +
-                        node * 2 + idx * MAP_WIDTH * 2) = AI_RV_UNSET;
+                    AI_MAP_AT(gaiHeroStrategicRVOfPos,
+                              node * 2 + idx * MAP_WIDTH * 2) = AI_RV_UNSET;
+                    AI_MAP_AT(gaiHeroEventStratRVOfPos,
+                              node * 2 + idx * MAP_WIDTH * 2) = AI_RV_UNSET;
                 }
             }
         }
-        *reinterpret_cast<i16 *>(reinterpret_cast<char *>(gaiHeroEventStratRVOfPos) +
-            x * 2 + (MAP_WIDTH | 0) * y * 2) = AI_RV_UNSET;
+        AI_MAP_AT(gaiHeroEventStratRVOfPos,
+                  x * 2 + (MAP_WIDTH | 0) * y * 2) = AI_RV_UNSET;
         for (node = 0; node < AI_HERO_COUNT; node++) {
             if (resetAll == 0 ||
                 abs(y - gpGame->m_heroRecs[node].m_x) +
@@ -2805,14 +2821,12 @@ i32 philAI::StrategicValueOfPosition(i32 targetX, i32 targetY, i32 immediate,
     i32 score4;
 
     if (!extraDistance && !immediate &&
-        *reinterpret_cast<i16 *>(reinterpret_cast<char *>(gaiHeroStrategicRVOfPos) +
-            targetX * 2 + targetY * MAP_WIDTH * 2) != AI_RV_UNSET) {
-        *liveChance = *reinterpret_cast<i16 *>(
-            reinterpret_cast<char *>(gaiLiveChanceOfPos) +
-            targetX * 2 + targetY * MAP_WIDTH * 2);
-        return *reinterpret_cast<i16 *>(
-            reinterpret_cast<char *>(gaiHeroStrategicRVOfPos) +
-            targetX * 2 + targetY * MAP_WIDTH * 2);
+        AI_MAP_AT(gaiHeroStrategicRVOfPos,
+                  targetX * 2 + targetY * MAP_WIDTH * 2) != AI_RV_UNSET) {
+        *liveChance = AI_MAP_AT(gaiLiveChanceOfPos,
+                                targetX * 2 + targetY * MAP_WIDTH * 2);
+        return AI_MAP_AT(gaiHeroStrategicRVOfPos,
+                         targetX * 2 + targetY * MAP_WIDTH * 2);
     }
 
     score4 = 0;
@@ -2955,10 +2969,10 @@ i32 philAI::StrategicValueOfPosition(i32 targetX, i32 targetY, i32 immediate,
     if (score4 > 32000)
         score4 = 32000;
     if (!immediate && !extraDistance) {
-        *reinterpret_cast<i16 *>(reinterpret_cast<char *>(gaiHeroStrategicRVOfPos) +
-            targetX * 2 + targetY * MAP_WIDTH * 2) = static_cast<i16>(score4);
-        *reinterpret_cast<i16 *>(reinterpret_cast<char *>(gaiLiveChanceOfPos) +
-            targetX * 2 + targetY * MAP_WIDTH * 2) = static_cast<i16>(*liveChance);
+        AI_MAP_AT(gaiHeroStrategicRVOfPos,
+                  targetX * 2 + targetY * MAP_WIDTH * 2) = static_cast<i16>(score4);
+        AI_MAP_AT(gaiLiveChanceOfPos,
+                  targetX * 2 + targetY * MAP_WIDTH * 2) = static_cast<i16>(*liveChance);
     }
     return score4;
 }
@@ -4792,12 +4806,11 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32 *liveChance)
     i32 resources_e[7];
 
     if (!immediate &&
-        *reinterpret_cast<i16 *>(reinterpret_cast<char *>(gaiHeroEventStratRVOfPos) +
-                                   (MAP_WIDTH | 0) * y * sizeof(i16) + x * sizeof(i16)) !=
+        AI_MAP_AT(gaiHeroEventStratRVOfPos,
+                  (MAP_WIDTH | 0) * y * sizeof(i16) + x * sizeof(i16)) !=
             AI_RV_UNSET)
-        return *reinterpret_cast<i16 *>(
-            reinterpret_cast<char *>(gaiHeroEventStratRVOfPos) +
-            (MAP_WIDTH | 0) * y * sizeof(i16) + x * sizeof(i16));
+        return AI_MAP_AT(gaiHeroEventStratRVOfPos,
+                         (MAP_WIDTH | 0) * y * sizeof(i16) + x * sizeof(i16));
 
     gbReduceByReload = 1;
     gbReduceByBerserk = 1;
@@ -5338,8 +5351,8 @@ creature_purchase:
             value_h = 32000;
         else if (value_h < -32000)
             value_h = -32000;
-        *reinterpret_cast<i16 *>(reinterpret_cast<char *>(gaiHeroEventStratRVOfPos) +
-                                   (MAP_WIDTH | 0) * y * sizeof(i16) + x * sizeof(i16)) =
+        AI_MAP_AT(gaiHeroEventStratRVOfPos,
+                  (MAP_WIDTH | 0) * y * sizeof(i16) + x * sizeof(i16)) =
             static_cast<i16>(value_h);
     }
     return value_h;
