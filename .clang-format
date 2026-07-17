@@ -64,12 +64,18 @@ AlignTrailingComments:
   OverEmptyLines: 0
 SortIncludes: Never
 
-# --- project macros (include/rva.h) ----------------------------------------
+# --- project macros (include/va.h) -----------------------------------------
+# VA/VAU/SYMBOL annotate the FOLLOWING function definition and must sit on
+# their own line: the defs-declared gate reads the signature from the line
+# after VA(...). StatementMacros forces that break. DATA annotates a global
+# definition on the SAME line (the globals-data gate matches line-wise), so it
+# is attribute-like; BreakAfterAttributes: Leave preserves that placement.
 StatementMacros:
-  - RVA
-  - RVAU
+  - VA
+  - VAU
   - SYMBOL
-  - DATA
 AttributeMacros:
   - OVERRIDE
+  - DATA
+BreakAfterAttributes: Leave
 ...
