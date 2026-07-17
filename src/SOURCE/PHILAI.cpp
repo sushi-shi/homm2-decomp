@@ -211,7 +211,7 @@ void philAI::CheckForCreatureUpgrades(void) {
                     continue;
                 canUpgrade = 0;
                 for (dwelling = 20; dwelling <= 24; dwelling++) {
-                    if (gDwellingType[townPtr->m_type][dwelling - BUILDING_SLOT_DWELLING_FIRST]
+                    if (gDwellingType[townPtr->m_type][dwelling - IDX(BUILDING_SLOT_DWELLING_FIRST)]
                             == armyPtr->m_creatureTypes[creatureIndex]
                         && (townPtr->m_buildings & (1 << (dwelling + 5)))) {
                         canUpgrade = 1;

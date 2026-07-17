@@ -78,7 +78,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
     CreatureType secondUpgrade1;
     CreatureType firstUpgrade_e;
     SAMPLE2 eventSample_f;
-    i32 eventValue1;
+    ArtifactType eventValue1;
     signEventExtra* signExtra_k;
     SAMPLE2 playedSample3;
     tag_message unusedEventMessage;
@@ -106,8 +106,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
     i32 artifactResourceType;
     i32 secondaryAmount;
     i32 primaryAmount1;
-    i32 secondaryReward_f;
-    i32 primaryReward3;
+    ArtifactType secondaryReward_f;
+    ArtifactType primaryReward3;
     i32 correctAnswer1;
     char eventText[EVENT_TEXT_BUFFER_SIZE];
     mapCell* skeletonCell1;
@@ -211,7 +211,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     GetDataEntry(gText, sphinxAnswer_a, SPHINX_INPUT_LENGTH, 0, 0, 1);
                     correctAnswer1 = 0;
                     for (eventValue1 = 0; eventValue1 < eventExtra1->answerCount; eventValue1++) {
-                        if (RiddleStringsEqual(sphinxAnswer_a, eventExtra1->answers[eventValue1]))
+                        if (RiddleStringsEqual(sphinxAnswer_a, eventExtra1->answers[IDX(eventValue1)]))
                             correctAnswer1 = 1;
                     }
 
@@ -221,17 +221,17 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         secondaryReward_f = MAP_EVENT_REWARD_NONE;
                         secondaryAmount = 0;
                         for (eventValue1 = 0; eventValue1 < SPHINX_RESOURCE_COUNT; eventValue1++) {
-                            gpGame->m_players[giCurPlayer].m_resources[eventValue1] +=
-                                eventExtra1->resources[eventValue1];
-                            if (gpGame->m_players[giCurPlayer].m_resources[eventValue1] < 0)
-                                gpGame->m_players[giCurPlayer].m_resources[eventValue1] = 0;
-                            if (eventExtra1->resources[eventValue1] != 0) {
+                            gpGame->m_players[giCurPlayer].m_resources[IDX(eventValue1)] +=
+                                eventExtra1->resources[IDX(eventValue1)];
+                            if (gpGame->m_players[giCurPlayer].m_resources[IDX(eventValue1)] < 0)
+                                gpGame->m_players[giCurPlayer].m_resources[IDX(eventValue1)] = 0;
+                            if (eventExtra1->resources[IDX(eventValue1)] != 0) {
                                 if (primaryReward3 != MAP_EVENT_REWARD_NONE) {
                                     secondaryReward_f = primaryReward3;
                                     secondaryAmount = primaryAmount1;
                                 }
                                 primaryReward3 = eventValue1;
-                                primaryAmount1 = eventExtra1->resources[eventValue1];
+                                primaryAmount1 = eventExtra1->resources[IDX(eventValue1)];
                             }
                         }
 
@@ -513,7 +513,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     gText,
                     "{Chest}\n\nAfter spending hours trying to fish the chest out of the sea, you "
                     "open it and find 1000 gold and the %s",
-                    gArtifactNames[eventValue1]
+                    gArtifactNames[IDX(eventValue1)]
                 );
                 NormalDialog(
                     gText,
@@ -980,7 +980,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     gText,
                     "{Chest}\n\nAfter scouring the area, you fall upon a hidden chest, containing "
                     "the ancient artifact '%s'",
-                    gArtifactNames[eventValue1]
+                    gArtifactNames[IDX(eventValue1)]
                 );
                 NormalDialog(
                     gText,
@@ -1235,9 +1235,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         gText,
                         "{Wagon}\n\nYou come across an old wagon left by a trader who didn't quite "
                         "make it to safe terrain.  Searching inside, you find the '%s'.",
-                        gArtifactNames[eventValue1]
+                        gArtifactNames[IDX(eventValue1)]
                     );
-                    EventWindow(-1, 1, gText, MAP_EVENT_REWARD_ARTIFACT, eventValue1, -1, 0, -1);
+                    EventWindow(-1, 1, gText, MAP_EVENT_REWARD_ARTIFACT, IDX(eventValue1), -1, 0, -1);
                     GiveArtifact(eventHero2, eventValue1, 1, -1);
                     cell->m_objectMetadata = 0;
                     break;
@@ -1275,7 +1275,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             gText,
                             s_twoStringFormat,
                             gEventText[EVENT_TEXT_SKELETON_REWARD],
-                            gArtifactNames[eventValue1]
+                            gArtifactNames[IDX(eventValue1)]
                         );
                         GiveArtifact(eventHero2, eventValue1, 1, -1);
                         EventWindow(
@@ -1283,7 +1283,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             1,
                             gText,
                             MAP_EVENT_REWARD_ARTIFACT,
-                            eventValue1,
+                            IDX(eventValue1),
                             -1,
                             0,
                             -1
@@ -2127,7 +2127,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 "{Shrine of the 1st Circle}\n\nYou come across a small shrine attended by a group "
                 "of novice acolytes.  In exchange for your protection, they agree to teach you a "
                 "simple spell - ",
-                gSpellNames[eventValue1]
+                gSpellNames[IDX(eventValue1)]
             );
             goto shrineSpell;
 
@@ -2139,7 +2139,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 "{Shrine of the 2nd Circle}\n\nYou come across an ornate shrine attended by a "
                 "group of rotund friars.  In exchange for your protection, they agree to teach you "
                 "a spell - ",
-                gSpellNames[eventValue1]
+                gSpellNames[IDX(eventValue1)]
             );
             goto shrineSpell;
 
@@ -2151,14 +2151,14 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 "{Shrine of the 3rd Circle}\n\nYou come across a lavish shrine attended by a group "
                 "of high priests.  In exchange for your protection, they agree to teach you a "
                 "sophisticated spell - ",
-                gSpellNames[eventValue1]
+                gSpellNames[IDX(eventValue1)]
             );
         shrineSpell:
             if (!eventHero2->HasArtifact(ARTIFACT_MAGIC_BOOK)) {
                 strcat(gText, "Unfortunately, you have no Magic Book to record the spell with.");
                 EventWindow(-1, 1, gText, -1, 0, -1, 0, -1);
             } else if (eventHero2->m_secondarySkills[IDX(HERO_SKILL_WISDOM)] + SHRINE_WISDOM_BONUS
-                       < gsSpellInfo[eventValue1].level) {
+                       < gsSpellInfo[IDX(eventValue1)].level) {
                 strcat(
                     gText,
                     "Unfortunately, you do not have the wisdom to understand the spell, and you "
@@ -2167,8 +2167,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(-1, 1, gText, -1, 0, -1, 0, -1);
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-                eventHero2->AddSpell(eventValue1, eventHero2->Stats(HeroPrimaryStat(3)));
-                EventWindow(-1, 1, gText, 8, eventValue1, -1, 0, -1);
+                eventHero2->AddSpell(IDX(eventValue1), eventHero2->Stats(HeroPrimaryStat(3)));
+                EventWindow(-1, 1, gText, 8, IDX(eventValue1), -1, 0, -1);
             }
             break;
 
@@ -2745,14 +2745,14 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         gText,
                         "The Demon screams its challenge and attacks!  After a short, desperate "
                         "battle, you slay the monster and find the %s in the back of the cave.",
-                        gArtifactNames[eventValue1]
+                        gArtifactNames[IDX(eventValue1)]
                     );
                     EventWindow(
                         -1,
                         1,
                         gText,
                         MAP_EVENT_REWARD_ARTIFACT,
-                        eventValue1,
+                        IDX(eventValue1),
                         14,
                         DAEMON_EXPERIENCE,
                         -1
@@ -3017,7 +3017,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             "%s'%s'.  ",
                             "Upon defeating the monsters, you decipher an ancient glyph on the "
                             "wall, telling the secret of the spell - ",
-                            gSpellNames[eventValue1]
+                            gSpellNames[IDX(eventValue1)]
                         );
                         if (!eventHero2->HasArtifact(ARTIFACT_MAGIC_BOOK)) {
                             strcat(
@@ -3034,8 +3034,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             );
                             EventWindow(-1, 1, eventText, -1, 0, -1, 0, -1);
                         } else {
-                            eventHero2->AddSpell(eventValue1, eventHero2->Stats(HeroPrimaryStat(3)));
-                            EventWindow(-1, 1, eventText, 8, eventValue1, -1, 0, -1);
+                            eventHero2->AddSpell(IDX(eventValue1), eventHero2->Stats(HeroPrimaryStat(3)));
+                            EventWindow(-1, 1, eventText, 8, IDX(eventValue1), -1, 0, -1);
                         }
                         cell->m_objectMetadata = 0;
                     }
@@ -4249,7 +4249,7 @@ i32 GiveArtifact(hero* eventHero, i32 artifact, i32 checkEndGame, i8 artifactExt
 }
 
 VA(0x004b00e9, 0x5e)
-i32 advManager::GiveRandomArtifact(hero* eventHero) {
+ArtifactType advManager::GiveRandomArtifact(hero* eventHero) {
     ArtifactType artifactId = ArtifactType(gpGame->GetRandomArtifactId(EVENT_RANDOM_ARTIFACT_ANY, 1));
 
     if (artifactId == ARTIFACT_NONE)
@@ -4302,7 +4302,7 @@ void advManager::RecruitEvent(hero* eventHero, i32 creatureType, mapCell* cell) 
 
 VA(0x004b02e9, 0x261)
 i32 advManager::SkeletonEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i32 y) {
-    i32 artifactId;
+    ArtifactType artifactId;
 
     switch (cell->m_objectMetadata) {
         case IDX(UNDEAD_EVENT_LEVEL_SMALL):
@@ -4411,7 +4411,7 @@ i32 advManager::SkeletonEvent(hero* eventHero, mapCell* cell, char* text, i32 x,
 
 VA(0x004b054a, 0x29b)
 i32 advManager::ZombieEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i32 y) {
-    i32 artifactId;
+    ArtifactType artifactId;
     switch (cell->m_objectMetadata) {
         case IDX(UNDEAD_EVENT_LEVEL_SMALL):
             if (CombatMonsterEvent(
@@ -4516,7 +4516,7 @@ i32 advManager::ZombieEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i
                         IDX(RES_GOLD),
                         ZOMBIE_EVENT_HUGE_GOLD,
                         MAP_EVENT_REWARD_ARTIFACT,
-                        artifactId,
+                        IDX(artifactId),
                         -1
                     );
                 else
@@ -4532,7 +4532,7 @@ i32 advManager::ZombieEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i
 
 VA(0x004b07e5, 0x2f8)
 i32 advManager::GhostEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i32 y) {
-    i32 artifactId;
+    ArtifactType artifactId;
     switch (cell->m_objectMetadata) {
         case IDX(UNDEAD_EVENT_LEVEL_SMALL):
             if (CombatMonsterEvent(
@@ -4641,7 +4641,7 @@ i32 advManager::GhostEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i3
                         IDX(RES_GOLD),
                         GHOST_EVENT_HUGE_GOLD,
                         MAP_EVENT_REWARD_ARTIFACT,
-                        artifactId,
+                        IDX(artifactId),
                         -1
                     );
                 else
