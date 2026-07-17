@@ -1228,11 +1228,11 @@ i32 RecruitHeroHandler(tag_message& msg) {
                 break;
             case WIDGET_COMMAND_DESELECT:
                 switch (msg.payload.widget.id) {
-                    case 0x7801:
+                    case EVENT_WINDOW_SECOND_BUTTON:
                         gpTownManager->m_recruitState = -1;
                         a = 1;
                         break;
-                    case 0x7802:
+                    case EVENT_WINDOW_THIRD_BUTTON:
                         gpTownManager->m_recruitState = 0;
                         gpWindowManager->m_dialogResult = msg.payload.widget.id;
                         a = 1;
@@ -1505,25 +1505,25 @@ i32 WaitHandler(tag_message& msg) {
             case 6:
                 result = GUIModemResponseExec();
                 break;
-            case 7:
+            case OLD_MAIN_WAIT_DIRECT_CONNECT:
                 result = WaitForDirectConnect();
                 break;
-            case 8:
+            case OLD_MAIN_WAIT_DP_FIRST_GUEST:
                 result = dpWaitForFirstGuest();
                 break;
-            case 9:
+            case OLD_MAIN_WAIT_DP_EXTRA_GUESTS:
                 result = dpWaitForExtraGuests();
                 break;
-            case 0xa:
+            case OLD_MAIN_WAIT_DP_HOST:
                 result = dpWaitForHost();
                 break;
-            case 0xb:
+            case OLD_MAIN_WAIT_WS_FIRST_GUEST:
                 result = wsWaitForFirstGuest();
                 break;
-            case 0xc:
+            case OLD_MAIN_WAIT_WS_EXTRA_GUESTS:
                 result = wsWaitForExtraGuests();
                 break;
-            case 0xd:
+            case OLD_MAIN_WAIT_WS_HOST:
                 result = wsWaitForHost();
                 break;
         }
@@ -4093,7 +4093,7 @@ void TestDynamicWindow(i32 p1, i32 p2) {
         switch (gpInputManager->GetEvent().type) {
             case 1:
             case 8:
-            case 0x20:
+            case MESSAGE_RIGHT_BUTTON_DOWN:
                 t = 1;
         }
     }

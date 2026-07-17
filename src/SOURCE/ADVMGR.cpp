@@ -738,7 +738,7 @@ i32 advManager::Main(struct tag_message& message) {
             case MESSAGE_WIDGET:
                 switch (message.payload.widget.command) {
                     case WIDGET_COMMAND_DESELECT:
-                        if (!(message.payload.widget.parameter & 0x200)) {
+                        if (!(message.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON)) {
                             processResult =
                                 ProcessDeSelect(&message, &exitRequestedFlag, eventCellsResult);
                         }
@@ -746,7 +746,7 @@ i32 advManager::Main(struct tag_message& message) {
                     case WIDGET_COMMAND_SELECT:
                     case 14: {
                         i32 helpIndexState;
-                        if (message.payload.widget.parameter & 0x200) {
+                        if (message.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) {
                             helpIndexState = -1;
                             switch (message.payload.widget.id) {
                                 case 1:
@@ -884,7 +884,7 @@ i32 advManager::Main(struct tag_message& message) {
                         }
                         giCheatSeq = cheatDigitLocal + (giCheatSeq * 10) % 10000000;
                         if (!gbRemoteOn) {
-                            if (giCheatSeq % 100000 == 0x7da7 && cheatHero != 0) {
+                            if (giCheatSeq % 100000 == ADVMGR_CHEAT_CREATURES && cheatHero != 0) {
                                 gpGame->m_cheated = 1;
                                 if (gbInCampaign) {
                                     gpGame->m_campaignCheated = 1;
@@ -892,19 +892,19 @@ i32 advManager::Main(struct tag_message& message) {
                                 gpGame->GiveArmy(&cheatHero->m_army, 37, 5, -1);
                                 UpdBottomView(1, 1, 1);
                             }
-                            if (giCheatSeq % 1000 == 0x38f) {
+                            if (giCheatSeq % 1000 == ADVMGR_CHEAT_WIN) {
                                 gpGame->m_cheated = 1;
                                 if (gbInCampaign) {
                                     gpGame->m_campaignCheated = 1;
                                 }
                                 CheckEndGame(1, 0);
                             }
-                            if (giCheatSeq % 10000 == 0x521) {
+                            if (giCheatSeq % 10000 == ADVMGR_CHEAT_LOSE) {
                                 gpGame->m_cheated = 1;
                                 CheckEndGame(2, 0);
                             }
                         }
-                        if (giCheatSeq % 10000000 == 0x845fed) {
+                        if (giCheatSeq % 10000000 == ADVMGR_CHEAT_REVEAL_MAP) {
                             gpGame->m_cheated = 1;
                             if (gbInCampaign) {
                                 gpGame->m_campaignCheated = 1;
@@ -920,7 +920,7 @@ i32 advManager::Main(struct tag_message& message) {
                             CompleteDraw(0);
                             UpdateScreen(0, 0);
                         }
-                        if (giCheatSeq % 1000 == 0x19b) {
+                        if (giCheatSeq % 1000 == ADVMGR_CHEAT_INFO) {
                             sprintf(
                                 gText,
                                 "Coordinates at top left corner of view:\n\n  X: %d\n  Y: %d",
@@ -933,56 +933,56 @@ i32 advManager::Main(struct tag_message& message) {
                         break;
                     }
                     case 72:
-                        if (message.payload.keyboard.modifiers & 0xc) {
+                        if (message.payload.keyboard.modifiers & MESSAGE_MODIFIER_CONTROL_KEYS) {
                             ScreenScroll(0, 0);
                         } else {
                             moveDirectionState = 0;
                         }
                         break;
                     case 73:
-                        if (message.payload.keyboard.modifiers & 0xc) {
+                        if (message.payload.keyboard.modifiers & MESSAGE_MODIFIER_CONTROL_KEYS) {
                             ScreenScroll(1, 0);
                         } else {
                             moveDirectionState = 1;
                         }
                         break;
                     case 77:
-                        if (message.payload.keyboard.modifiers & 0xc) {
+                        if (message.payload.keyboard.modifiers & MESSAGE_MODIFIER_CONTROL_KEYS) {
                             ScreenScroll(2, 0);
                         } else {
                             moveDirectionState = 2;
                         }
                         break;
                     case 81:
-                        if (message.payload.keyboard.modifiers & 0xc) {
+                        if (message.payload.keyboard.modifiers & MESSAGE_MODIFIER_CONTROL_KEYS) {
                             ScreenScroll(3, 0);
                         } else {
                             moveDirectionState = 3;
                         }
                         break;
                     case 80:
-                        if (message.payload.keyboard.modifiers & 0xc) {
+                        if (message.payload.keyboard.modifiers & MESSAGE_MODIFIER_CONTROL_KEYS) {
                             ScreenScroll(4, 0);
                         } else {
                             moveDirectionState = 4;
                         }
                         break;
                     case 79:
-                        if (message.payload.keyboard.modifiers & 0xc) {
+                        if (message.payload.keyboard.modifiers & MESSAGE_MODIFIER_CONTROL_KEYS) {
                             ScreenScroll(5, 0);
                         } else {
                             moveDirectionState = 5;
                         }
                         break;
                     case 75:
-                        if (message.payload.keyboard.modifiers & 0xc) {
+                        if (message.payload.keyboard.modifiers & MESSAGE_MODIFIER_CONTROL_KEYS) {
                             ScreenScroll(6, 0);
                         } else {
                             moveDirectionState = 6;
                         }
                         break;
                     case 71:
-                        if (message.payload.keyboard.modifiers & 0xc) {
+                        if (message.payload.keyboard.modifiers & MESSAGE_MODIFIER_CONTROL_KEYS) {
                             ScreenScroll(7, 0);
                         } else {
                             moveDirectionState = 7;
@@ -1179,7 +1179,7 @@ i32 advManager::ProcessSelect(struct tag_message* message, class mapCell** event
                 break;
             }
             objectTypeState = gpCurPlayer->m_heroIds[gpCurPlayer->m_heroLocatorPage + pageState];
-            if (message->payload.widget.parameter & 0x200) {
+            if (message->payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) {
                 HeroQuickView(objectTypeState, pageState, -1, -1);
             } else {
                 if (gpCurPlayer->CurrentHero() == objectTypeState) {
@@ -1199,7 +1199,7 @@ i32 advManager::ProcessSelect(struct tag_message* message, class mapCell** event
             objectTypeState =
                 gpCurPlayer
                     ->m_townIds[gpCurPlayer->m_townLocatorPage + message->payload.widget.id - 16];
-            if (message->payload.widget.parameter & 0x200) {
+            if (message->payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) {
                 TownQuickView(objectTypeState, message->payload.widget.id - 16, -1, -1);
             } else {
                 HideRoute(1, 0, 1);
@@ -1254,7 +1254,7 @@ i32 advManager::ProcessSelect(struct tag_message* message, class mapCell** event
                 visible = 0;
             }
             currentCell = GetCell(m_lastHoverCell + m_mapOriginX, m_hoverCellY + m_mapOriginY);
-            if (message->payload.widget.parameter & 0x200) {
+            if (message->payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) {
                 if (!visible) {
                     QuickInfo(m_lastHoverCell, m_hoverCellY);
                 } else {
@@ -1325,7 +1325,7 @@ i32 advManager::ProcessSelect(struct tag_message* message, class mapCell** event
                         && m_heroContextLocked) {
                         m_selectedCell = ADVMGR_COMMAND_HERO_VIEW;
                         DoAdvCommand();
-                    } else if ((!mobileResult || (message->payload.widget.parameter & 0xc)
+                    } else if ((!mobileResult || (message->payload.widget.parameter & MESSAGE_MODIFIER_CONTROL_KEYS)
                                 || (gConfig.showRoute
                                     && (m_commandTargetX != currentHero->m_destinationX
                                         || m_commandTargetY != currentHero->m_destinationY)))
@@ -1361,7 +1361,7 @@ i32 advManager::ProcessSelect(struct tag_message* message, class mapCell** event
             break;
         }
         case 9:
-            if (message->payload.widget.parameter & 0x200) {
+            if (message->payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) {
                 NormalDialog(
                     "{World Map}\n\nA miniature view of the known world.  "
                     "Left click to move viewing area.",
@@ -1464,7 +1464,7 @@ i32 advManager::ProcessSelect(struct tag_message* message, class mapCell** event
             break;
     }
 
-    if ((message->payload.widget.parameter & 0x200)
+    if ((message->payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON)
         && message->payload.widget.id >= ADVMGR_BOTTOM_VIEW_FIRST_MESSAGE
         && message->payload.widget.id <= ADVMGR_BOTTOM_VIEW_LAST_MESSAGE) {
         NormalDialog(
@@ -1680,9 +1680,9 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
         y = m_mapOriginY + 7;
     }
     currentCell = GetCell(x, y);
-    if (!((currentCell->m_objectIndex == 0xff
+    if (!((currentCell->m_objectIndex == MAPCELL_SPRITE_NONE
            || currentCell->m_objectTileset == ADVMGR_CLEAR_GROUND_TILESET)
-          && currentCell->m_overlayIndex == 0xff)) {
+          && currentCell->m_overlayIndex == MAPCELL_SPRITE_NONE)) {
         if (!gbHumanPlayer[giCurPlayer]) {
             goto search_end;
         }
@@ -1700,7 +1700,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
     if (gbHumanPlayer[giCurPlayer]) {
         digSampleState = LoadPlaySample("DIGSOUND.82M");
     }
-    if (currentCell->m_objectIndex == 0xff
+    if (currentCell->m_objectIndex == MAPCELL_SPRITE_NONE
         || currentCell->m_objectTileset == ADVMGR_CLEAR_GROUND_TILESET) {
         currentCell->m_objectTileset = ADVMGR_DIG_HOLE_TILESET;
         currentCell->m_objectIndex = ADVMGR_DIG_HOLE_FRAME;
@@ -2487,7 +2487,7 @@ void advManager::DrawCell(
                     );
                 }
             } else if (m_visibilityMapValid && m_visibilityMap[mapY * MAP_WIDTH + mapX] != 0) {
-                if ((m_visibilityMap[mapY * MAP_WIDTH + mapX] & 0x100) != 0) {
+                if ((m_visibilityMap[mapY * MAP_WIDTH + mapX] & ADVMGR_ROUTE_BEYOND_MOBILITY_FLAG) != 0) {
                     IconToBitmapColorTable(
                         m_objectIcons[ADVMGR_TILESET_ROUTE],
                         gpWindowManager->m_screen,
@@ -2572,7 +2572,7 @@ void advManager::DrawCell(
                 }
 
                 if (s_drawCell->m_extraIndex != 0
-                    && m_mapData->Extra(s_drawCell->m_extraIndex)->objectIndex != 0xff) {
+                    && m_mapData->Extra(s_drawCell->m_extraIndex)->objectIndex != MAPCELL_SPRITE_NONE) {
                     s_drawExtra = m_mapData->Extra(s_drawCell->m_extraIndex);
                 } else {
                     s_drawExtra = 0;
@@ -2615,7 +2615,7 @@ void advManager::DrawCell(
                         }
                     }
                     if (s_drawExtra->nextIndex != 0
-                        && m_mapData->Extra(s_drawExtra->nextIndex)->objectIndex != 0xff) {
+                        && m_mapData->Extra(s_drawExtra->nextIndex)->objectIndex != MAPCELL_SPRITE_NONE) {
                         s_drawExtra = m_mapData->Extra(s_drawExtra->nextIndex);
                     } else {
                         s_drawExtra = 0;
@@ -2660,7 +2660,7 @@ void advManager::DrawCell(
                 }
 
                 if (s_drawCell->m_extraIndex != 0
-                    && m_mapData->Extra(s_drawCell->m_extraIndex)->objectIndex != 0xff) {
+                    && m_mapData->Extra(s_drawCell->m_extraIndex)->objectIndex != MAPCELL_SPRITE_NONE) {
                     s_drawExtra = m_mapData->Extra(s_drawCell->m_extraIndex);
                 } else {
                     s_drawExtra = 0;
@@ -2703,7 +2703,7 @@ void advManager::DrawCell(
                         }
                     }
                     if (s_drawExtra->nextIndex != 0
-                        && m_mapData->Extra(s_drawExtra->nextIndex)->objectIndex != 0xff) {
+                        && m_mapData->Extra(s_drawExtra->nextIndex)->objectIndex != MAPCELL_SPRITE_NONE) {
                         s_drawExtra = m_mapData->Extra(s_drawExtra->nextIndex);
                     } else {
                         s_drawExtra = 0;
@@ -2712,7 +2712,7 @@ void advManager::DrawCell(
             }
 
             if (drawMask & ADVMGR_DRAW_OBJECT) {
-                if (s_drawCell->m_objectIndex != 0xff && !s_drawCell->m_objectLayerBit0
+                if (s_drawCell->m_objectIndex != MAPCELL_SPRITE_NONE && !s_drawCell->m_objectLayerBit0
                     && !s_drawCell->m_objectLayerBit1 && !s_drawCell->m_objectDrawnAsOverlay
                     && s_drawCell->m_objectTileset != ADVMGR_TILESET_MINE
                     && (gbDrawingPuzzle == 0 || bPuzzleDraw[s_drawCell->m_objectTileset])) {
@@ -2736,7 +2736,7 @@ void advManager::DrawCell(
                         )
                                                     ->flags;
                         animFrame = m_updateMaxY % s_drawAnimationLength;
-                        if (s_drawCell->m_triggerType == 0xdf) {
+                        if (s_drawCell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MAGIC_GARDEN)) {
                             if (s_drawCell->m_objectMetadata != 0) {
                                 animFrame = m_updateMaxY % (s_drawAnimationLength - 1);
                             } else {
@@ -2760,7 +2760,7 @@ void advManager::DrawCell(
                 }
 
                 if (s_drawCell->m_extraIndex != 0
-                    && m_mapData->Extra(s_drawCell->m_extraIndex)->objectIndex != 0xff) {
+                    && m_mapData->Extra(s_drawCell->m_extraIndex)->objectIndex != MAPCELL_SPRITE_NONE) {
                     s_drawExtra = m_mapData->Extra(s_drawCell->m_extraIndex);
                 } else {
                     s_drawExtra = 0;
@@ -2805,7 +2805,7 @@ void advManager::DrawCell(
                         }
                     }
                     if (s_drawExtra->nextIndex != 0
-                        && m_mapData->Extra(s_drawExtra->nextIndex)->objectIndex != 0xff) {
+                        && m_mapData->Extra(s_drawExtra->nextIndex)->objectIndex != MAPCELL_SPRITE_NONE) {
                         s_drawExtra = m_mapData->Extra(s_drawExtra->nextIndex);
                     } else {
                         s_drawExtra = 0;
@@ -2933,10 +2933,10 @@ void advManager::DrawCell(
                 }
 
                 if (s_drawHasHero) {
-                    if (s_drawHeroFrame & 0x80) {
+                    if (s_drawHeroFrame & ADVMGR_HERO_FRAME_MIRROR_FLAG) {
                         if (drawMask & ADVMGR_DRAW_HERO_SHADOW) {
                             if (m_drawHeroShadows != 0 && s_drawHeroType != ADVMGR_HERO_TYPE_BOAT) {
-                                cursorFrame = s_drawHeroFrame & 0x7f;
+                                cursorFrame = s_drawHeroFrame & ADVMGR_HERO_FRAME_INDEX_MASK;
                                 if (cursorFrame == 51) {
                                     cursorFrame = 56;
                                 }
@@ -2973,7 +2973,7 @@ void advManager::DrawCell(
                                 );
                             }
                             if (m_drawHeroShadows != 0 && s_drawHeroType == ADVMGR_HERO_TYPE_BOAT) {
-                                boatFrameIndex = s_drawHeroFrame & 0x7f;
+                                boatFrameIndex = s_drawHeroFrame & ADVMGR_HERO_FRAME_INDEX_MASK;
                                 if (boatFrameIndex >= 9
                                     && boatFrameIndex < ADVMGR_HERO_SHADOW_FRAME_END) {
                                     boatShadowFrameOffset = 36;
@@ -3002,7 +3002,7 @@ void advManager::DrawCell(
                                     gpWindowManager->m_screen,
                                     s_drawPixelX + 32,
                                     s_drawPixelY + 31 + s_drawHeroYOffset,
-                                    s_drawHeroFrame & 0x7f,
+                                    s_drawHeroFrame & ADVMGR_HERO_FRAME_INDEX_MASK,
                                     1,
                                     0,
                                     0,
@@ -3016,7 +3016,7 @@ void advManager::DrawCell(
                                 gpWindowManager->m_screen,
                                 s_drawPixelX + 32,
                                 s_drawPixelY + 31 + s_drawHeroYOffset,
-                                s_drawHeroFrame & 0x7f,
+                                s_drawHeroFrame & ADVMGR_HERO_FRAME_INDEX_MASK,
                                 1,
                                 0,
                                 0,
@@ -3031,7 +3031,7 @@ void advManager::DrawCell(
                                         gpWindowManager->m_screen,
                                         s_drawPixelX + 32,
                                         s_drawPixelY + 31 + s_drawHeroYOffset,
-                                        s_drawHeroFrame & 0x7f,
+                                        s_drawHeroFrame & ADVMGR_HERO_FRAME_INDEX_MASK,
                                         1,
                                         0,
                                         0,
@@ -3045,7 +3045,7 @@ void advManager::DrawCell(
                                         gpWindowManager->m_screen,
                                         s_drawPixelX + 32,
                                         s_drawPixelY + 31,
-                                        m_updateMaxY % 8 + (s_drawHeroFrame & 0x7f) + 56,
+                                        m_updateMaxY % 8 + (s_drawHeroFrame & ADVMGR_HERO_FRAME_INDEX_MASK) + 56,
                                         1,
                                         0,
                                         0,
@@ -3126,7 +3126,7 @@ void advManager::DrawCell(
                                         gpWindowManager->m_screen,
                                         s_drawPixelX,
                                         s_drawPixelY + 31 + s_drawHeroYOffset,
-                                        s_drawHeroFrame & 0x7f,
+                                        s_drawHeroFrame & ADVMGR_HERO_FRAME_INDEX_MASK,
                                         1,
                                         0,
                                         0,
@@ -3140,7 +3140,7 @@ void advManager::DrawCell(
                                         gpWindowManager->m_screen,
                                         s_drawPixelX,
                                         s_drawPixelY + 31,
-                                        m_updateMaxY % 8 + (s_drawHeroFrame & 0x7f) + 56,
+                                        m_updateMaxY % 8 + (s_drawHeroFrame & ADVMGR_HERO_FRAME_INDEX_MASK) + 56,
                                         1,
                                         0,
                                         0,
@@ -3154,7 +3154,7 @@ void advManager::DrawCell(
                     }
                 }
 
-                if (m_cursorActive != 0 && (s_drawCell->m_flags & 0x40) != 0
+                if (m_cursorActive != 0 && (s_drawCell->m_flags & CURSOR_MAP_VISIBLE_FLAG) != 0
                     && (m_comboHeroDrawn == 0 || (drawMask & ADVMGR_DRAW_HERO_SHADOW))
                     && m_mapOriginX + 7 == mapX && m_mapOriginY + 7 == mapY) {
                     if (drawMask & ADVMGR_DRAW_HERO_SHADOW) {
@@ -3168,7 +3168,7 @@ void advManager::DrawCell(
             }
 
             if ((drawMask & ADVMGR_DRAW_OVERLAY) || (drawMask & ADVMGR_DRAW_OVERLAY_TOP)) {
-                if ((drawMask & ADVMGR_DRAW_OVERLAY) && s_drawCell->m_objectIndex != 0xff
+                if ((drawMask & ADVMGR_DRAW_OVERLAY) && s_drawCell->m_objectIndex != MAPCELL_SPRITE_NONE
                     && s_drawCell->m_objectDrawnAsOverlay
                     && (gbDrawingPuzzle == 0 || bPuzzleDraw[s_drawCell->m_objectTileset])) {
                     IconToBitmap(
@@ -3207,7 +3207,7 @@ void advManager::DrawCell(
                 }
 
                 if (s_drawCell->m_extraIndex != 0
-                    && m_mapData->Extra(s_drawCell->m_extraIndex)->objectIndex != 0xff) {
+                    && m_mapData->Extra(s_drawCell->m_extraIndex)->objectIndex != MAPCELL_SPRITE_NONE) {
                     s_drawExtra = m_mapData->Extra(s_drawCell->m_extraIndex);
                 } else {
                     s_drawExtra = 0;
@@ -3250,14 +3250,14 @@ void advManager::DrawCell(
                         }
                     }
                     if (s_drawExtra->nextIndex != 0
-                        && m_mapData->Extra(s_drawExtra->nextIndex)->objectIndex != 0xff) {
+                        && m_mapData->Extra(s_drawExtra->nextIndex)->objectIndex != MAPCELL_SPRITE_NONE) {
                         s_drawExtra = m_mapData->Extra(s_drawExtra->nextIndex);
                     } else {
                         s_drawExtra = 0;
                     }
                 }
 
-                if (s_drawCell->m_overlayIndex != 0xff
+                if (s_drawCell->m_overlayIndex != MAPCELL_SPRITE_NONE
                     && (((drawMask & ADVMGR_DRAW_OVERLAY) && !s_drawCell->m_drawOverlayOnTop)
                         || ((drawMask & ADVMGR_DRAW_OVERLAY_TOP) && s_drawCell->m_drawOverlayOnTop))
                     && (gbDrawingPuzzle == 0 || bPuzzleDraw[s_drawCell->m_overlayTileset])) {
@@ -3297,7 +3297,7 @@ void advManager::DrawCell(
                 }
 
                 if (s_drawCell->m_extraIndex != 0
-                    && m_mapData->Extra(s_drawCell->m_extraIndex)->overlayIndex != 0xff) {
+                    && m_mapData->Extra(s_drawCell->m_extraIndex)->overlayIndex != MAPCELL_SPRITE_NONE) {
                     s_drawExtra = m_mapData->Extra(s_drawCell->m_extraIndex);
                 } else {
                     s_drawExtra = 0;
@@ -3345,7 +3345,7 @@ void advManager::DrawCell(
                         }
                     }
                     if (s_drawExtra->nextIndex != 0
-                        && m_mapData->Extra(s_drawExtra->nextIndex)->overlayIndex != 0xff) {
+                        && m_mapData->Extra(s_drawExtra->nextIndex)->overlayIndex != MAPCELL_SPRITE_NONE) {
                         s_drawExtra = m_mapData->Extra(s_drawExtra->nextIndex);
                     } else {
                         s_drawExtra = 0;
@@ -3501,7 +3501,7 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                 radarColorValue = ADVMGR_RADAR_UNSEEN_COLOR;
             } else {
                 cellValue = &m_mapData->Row(mapRow)[mapColumnLimit];
-                if ((cellValue->m_flags & 0x40) != 0
+                if ((cellValue->m_flags & CURSOR_MAP_VISIBLE_FLAG) != 0
                     && m_mapOriginX + ADVMGR_RADAR_CURRENT_CELL == mapColumnLimit
                     && m_mapOriginY + ADVMGR_RADAR_CURRENT_CELL == mapRow) {
                     radarColorValue = gOwnerColors[gpGame->m_players[giCurPlayer].m_color];
@@ -3520,9 +3520,9 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                         }
                     } else {
                         objectTilesetLocal = static_cast<u32>(-1);
-                        if (cellValue->m_objectIndex != 0xff) {
+                        if (cellValue->m_objectIndex != MAPCELL_SPRITE_NONE) {
                             objectTilesetLocal = cellValue->m_objectTileset;
-                        } else if (cellValue->m_overlayIndex != 0xff) {
+                        } else if (cellValue->m_overlayIndex != MAPCELL_SPRITE_NONE) {
                             objectTilesetLocal = cellValue->m_overlayTileset;
                         }
 
@@ -3565,27 +3565,27 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                                     }
                                     break;
                                 }
-                                case 0x16:
-                                case 0x17:
-                                case 0x18:
-                                case 0x19:
-                                case 0x1a:
-                                case 0x1b:
-                                case 0x1f:
-                                case 0x20:
-                                case 0x21:
-                                case 0x22:
-                                case 0x2a:
-                                case 0x2b:
-                                case 0x2c:
-                                case 0x31:
+                                case TILESET_MTNSNOW:
+                                case TILESET_MTNSWMP:
+                                case TILESET_MTNLAVA:
+                                case TILESET_MTNDSRT:
+                                case TILESET_MTNDIRT:
+                                case TILESET_MTNMULT:
+                                case TILESET_MTNCRCK:
+                                case TILESET_MTNGRAS:
+                                case TILESET_TREJNGL:
+                                case TILESET_TREEVIL:
+                                case TILESET_TRESNOW:
+                                case TILESET_TREFIR:
+                                case TILESET_TREFALL:
+                                case MAP_OBJECT_RANDOM_CASTLE:
                                     switch (cellValue->m_triggerType) {
-                                        case 1:
-                                        case 0x17:
-                                        case 0x1d:
-                                        case 0x81:
-                                        case 0x97:
-                                        case 0x9d: {
+                                        case MAP_OBJECT_ALCHEMIST_LAB:
+                                        case MAP_OBJECT_MINE:
+                                        case MAP_OBJECT_SAWMILL:
+                                        case (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ALCHEMIST_LAB):
+                                        case (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MINE):
+                                        case (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SAWMILL): {
                                             i32 ownerColorIndex;
                                             ownerIndexValue =
                                                 gpGame->m_mineOwners[cellValue->m_objectMetadata];
@@ -3609,12 +3609,12 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                                 default:
                                 radar_default_object:
                                     switch (cellValue->m_triggerType) {
-                                        case 1:
-                                        case 0x17:
-                                        case 0x1d:
-                                        case 0x81:
-                                        case 0x97:
-                                        case 0x9d: {
+                                        case MAP_OBJECT_ALCHEMIST_LAB:
+                                        case MAP_OBJECT_MINE:
+                                        case MAP_OBJECT_SAWMILL:
+                                        case (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ALCHEMIST_LAB):
+                                        case (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MINE):
+                                        case (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SAWMILL): {
                                             i32 ownerColorIndex;
                                             ownerIndexValue =
                                                 gpGame->m_mineOwners[cellValue->m_objectMetadata];
@@ -3851,10 +3851,10 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
         } else {
 
             switch (currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
-                case ADVMGR_OBJECT_ARTIFACT:
+                case MAP_OBJECT_ARTIFACT:
                     sprintf(gText, "%s", "Artifact");
                     break;
-                case ADVMGR_OBJECT_OBELISK:
+                case MAP_OBJECT_OBELISK:
                     if (currentCell->m_triggerType & MAP_TRIGGER_ACTION_FLAG) {
                         sprintf(
                             gText,
@@ -3870,7 +3870,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         goto quick_info_default;
                     }
                     break;
-                case ADVMGR_OBJECT_GAZEBO_VISIT:
+                case MAP_OBJECT_GAZEBO:
                     if (heroLocal != 0 && (currentCell->m_triggerType & MAP_TRIGGER_ACTION_FLAG)) {
                         sprintf(
                             gText,
@@ -3885,7 +3885,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         goto quick_info_default;
                     }
                     break;
-                case ADVMGR_OBJECT_FORT_VISIT:
+                case MAP_OBJECT_FORT:
                     if (heroLocal != 0 && (currentCell->m_triggerType & MAP_TRIGGER_ACTION_FLAG)) {
                         sprintf(
                             gText,
@@ -3900,7 +3900,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         goto quick_info_default;
                     }
                     break;
-                case ADVMGR_OBJECT_WITCH_DOCTOR_VISIT:
+                case MAP_OBJECT_WITCH_DOCTOR_HUT:
                     if (heroLocal != 0 && (currentCell->m_triggerType & MAP_TRIGGER_ACTION_FLAG)) {
                         sprintf(
                             gText,
@@ -3915,7 +3915,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         goto quick_info_default;
                     }
                     break;
-                case ADVMGR_OBJECT_MERCENARY_VISIT:
+                case MAP_OBJECT_MERCENARY_CAMP:
                     if (heroLocal != 0 && (currentCell->m_triggerType & MAP_TRIGGER_ACTION_FLAG)) {
                         sprintf(
                             gText,
@@ -3930,7 +3930,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         goto quick_info_default;
                     }
                     break;
-                case ADVMGR_OBJECT_STANDING_STONE_ALT:
+                case MAP_OBJECT_STANDING_STONES:
                     if (heroLocal != 0 && (currentCell->m_triggerType & MAP_TRIGGER_ACTION_FLAG)) {
                         sprintf(
                             gText,
@@ -3945,7 +3945,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         goto quick_info_default;
                     }
                     break;
-                case ADVMGR_OBJECT_TREE_ALT:
+                case MAP_OBJECT_TREE_OF_KNOWLEDGE:
                     if (heroLocal != 0 && (currentCell->m_triggerType & MAP_TRIGGER_ACTION_FLAG)) {
                         sprintf(
                             gText,
@@ -3960,7 +3960,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         goto quick_info_default;
                     }
                     break;
-                case ADVMGR_OBJECT_XANADU_ALT:
+                case MAP_OBJECT_XANADU:
                     if (heroLocal != 0 && (currentCell->m_triggerType & MAP_TRIGGER_ACTION_FLAG)) {
                         sprintf(
                             gText,
@@ -3975,45 +3975,45 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         goto quick_info_default;
                     }
                     break;
-                case ADVMGR_OBJECT_FORT:
+                case MAP_OBJECT_BUOY:
                     visitedMaskValue = ADVMGR_VISIT_FORT;
                     goto quick_info_default;
-                case ADVMGR_OBJECT_GAZEBO:
+                case MAP_OBJECT_FOUNTAIN:
                     visitedMaskValue = ADVMGR_VISIT_GAZEBO;
                     goto quick_info_default;
-                case ADVMGR_OBJECT_MERCENARY_CAMP:
+                case MAP_OBJECT_OASIS:
                     visitedMaskValue = ADVMGR_VISIT_MERCENARY_CAMP;
                     goto quick_info_default;
-                case ADVMGR_OBJECT_STANDING_STONES:
+                case MAP_OBJECT_FAERIE_RING:
                     visitedMaskValue = ADVMGR_VISIT_STANDING_STONES;
                     goto quick_info_default;
-                case ADVMGR_OBJECT_WITCH_DOCTOR_ALT:
+                case MAP_OBJECT_TEMPLE:
                     visitedMaskValue = ADVMGR_VISIT_WITCH_DOCTOR;
                     goto quick_info_default;
-                case ADVMGR_OBJECT_EVENT_SITE:
+                case MAP_OBJECT_WATERING_HOLE:
                     visitedMaskValue = ADVMGR_VISIT_EVENT_SITE;
                     goto quick_info_default;
-                case ADVMGR_OBJECT_EVENT_SITE_ALT:
+                case MAP_OBJECT_MAGIC_WELL:
                     visitedMaskValue = ADVMGR_VISIT_XANADU;
                     goto quick_info_default;
-                case ADVMGR_OBJECT_XANADU:
+                case MAP_OBJECT_IDOL:
                     visitedMaskValue = ADVMGR_VISIT_TREE_OF_KNOWLEDGE;
                     goto quick_info_default;
-                case ADVMGR_OBJECT_NONE:
-                case 0x13:
-                case 0x1c:
-                case 0x2c:
-                case 0x39:
+                case MAP_OBJECT_NONE:
+                case MAP_OBJECT_MAP_EVENT:
+                case MAP_OBJECT_COAST:
+                case MAP_OBJECT_RANDOM_ULTIMATE_ARTIFACT:
+                case MAP_OBJECT_MOSSY_ROCK:
                     sprintf(
                         gText,
                         "%s",
                         gTerrainNames[giGroundToTerrain[currentCell->m_terrainImageIndex]]
                     );
                     break;
-                case ADVMGR_OBJECT_GUARDED:
+                case MAP_OBJECT_ABANDONED_MINE:
                     sprintf(gText, "%s", gQuickViewText[currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK]);
                     goto quick_info_guarded;
-                case ADVMGR_OBJECT_MINE:
+                case MAP_OBJECT_MINE:
                     if (gpGame->m_mines[currentCell->m_objectMetadata].guardianType != -1) {
                         sprintf(
                             gText,
@@ -4044,7 +4044,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         );
                     }
                     break;
-                case ADVMGR_OBJECT_RESOURCE:
+                case MAP_OBJECT_RESOURCE:
                     sprintf(
                         gText,
                         "%s",
@@ -4052,7 +4052,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                             [(currentCell->m_objectIndex & ADVMGR_RESOURCE_FRAME_PAIR_MASK) / 2]
                     );
                     break;
-                case ADVMGR_OBJECT_MONSTER:
+                case MAP_OBJECT_MONSTER:
                     if (IsCrystalBallInEffect(m_mapOriginX + cellX, m_mapOriginY + cellY, 8)) {
                         sprintf(
                             gText,
@@ -4069,8 +4069,8 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         );
                     }
                     break;
-                case ADVMGR_OBJECT_BARRIER:
-                case ADVMGR_OBJECT_TENT:
+                case MAP_OBJECT_BARRIER:
+                case MAP_OBJECT_TRAVELER_TENT:
                     sprintf(
                         gText,
                         gQuickViewText[currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK],
@@ -4082,7 +4082,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     break;
                 case ADVMGR_OBJECT_GENERIC_SITE: {
                     mapObjectKindValue = -1;
-                    if (currentCell->m_objectIndex != 0xff) {
+                    if (currentCell->m_objectIndex != MAPCELL_SPRITE_NONE) {
                         siteFrameLocal[0] = currentCell->m_objectIndex;
                         objectTilesetLocal = currentCell->m_objectTileset;
                     } else {
@@ -4148,8 +4148,8 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     }
                     break;
                 }
-                case ADVMGR_OBJECT_RECRUITMENT_SITE: {
-                    if (currentCell->m_overlayIndex == 0xff) {
+                case MAP_OBJECT_EXPANSION_DWELLING: {
+                    if (currentCell->m_overlayIndex == MAPCELL_SPRITE_NONE) {
                         siteFrameLocal[0] = currentCell->m_objectIndex;
                         objectTilesetLocal = currentCell->m_objectTileset;
                     } else {
@@ -4183,7 +4183,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     }
                     break;
                 }
-                case ADVMGR_OBJECT_REEFS:
+                case MAP_OBJECT_ROCK:
                     if (currentCell->m_objectTileset == ADVMGR_SITE_TILESET_2) {
                         sprintf(gText, "Reefs");
                     } else {
@@ -5606,7 +5606,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
     messageLocal.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
     messageLocal.payload.widget.id = 2;
     messageLocal.payload.widget.data.value = quickTownLocal->m_type + 9;
-    if ((gpGame->GetTown(townId)->m_buildings & 0x40) == 0) {
+    if ((gpGame->GetTown(townId)->m_buildings & (1 << BUILDING_SLOT_CASTLE)) == 0) {
         messageLocal.payload.widget.data.value += 6;
     }
     townQuickWindow->BroadcastMessage(messageLocal);
@@ -6546,14 +6546,14 @@ i32 advManager::ComboDraw(i32 originX, i32 originY, i32 animate) {
                 if (cell->m_animatedObject || cell->m_animatedOverlay) {
                     ++bComboDraw[column][mapRow];
                 }
-                if ((cell->m_triggerType & MAP_TRIGGER_TYPE_MASK) == 0x28) {
+                if ((cell->m_triggerType & MAP_TRIGGER_TYPE_MASK) == MAP_OBJECT_WINDMILL) {
                     ++bComboDraw[column][mapRow];
                 }
                 if ((cell->m_triggerType & MAP_TRIGGER_TYPE_MASK) == 1) {
                     ++bComboDraw[column][mapRow];
                 }
 
-                if (cell->m_triggerType == 0x98) {
+                if (cell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MONSTER)) {
                     ++bComboDraw[column][mapRow];
                     ++bComboDraw[column - 1][mapRow];
                     if (GetCloudLookup(column + originX, mapRow + originY) != 0) {
@@ -7614,7 +7614,7 @@ void advManager::SummonBoat(void) {
             }
 
             destinationCell = GetCell(destinationX10, destinationY15);
-            if (destinationCell->m_objectIndex == 0xff && destinationCell->m_triggerType == 0
+            if (destinationCell->m_objectIndex == MAPCELL_SPRITE_NONE && destinationCell->m_triggerType == 0
                 && !giGroundToTerrain[destinationCell->m_terrainImageIndex]) {
                 foundDestination9 = 1;
                 break;

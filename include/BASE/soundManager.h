@@ -6,6 +6,16 @@
 #include <stdio.h>
 #include "baseManager.h"
 
+typedef enum SoundVolumeConstant {
+    SOUND_VOLUME_STEPS = 10,
+    SOUND_SAMPLE_VOLUME_MAX = 0x40,
+    SOUND_MIDI_VOLUME_MAX = 0x7f,
+    SOUND_CD_VOLUME_SCALE_DIVISOR = 0x280,
+    SOUND_CD_MUSIC_TRACK_FIRST = 8,
+    SOUND_CD_MUSIC_TRACK_LAST = 15,
+    SOUND_FADE_HOLD_STEPS = 10
+} SoundVolumeConstant;
+
 typedef enum MidiTrackConstant {
     MIDI_NO_TRACK = -1,
     MIDI_TRACK_COUNT = 60

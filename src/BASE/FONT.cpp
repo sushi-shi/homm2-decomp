@@ -56,7 +56,7 @@ void font::DrawStringExecute(
     i32 i = 0;
     while (str[i] != 0) {
         c = str[i];
-        if (c == 0x1f) {
+        if (c == FONT_SPACER_CHAR) {
             pos += GetCharacterWidth(static_cast<u8>(str[i]));
             goto next;
         }
@@ -69,8 +69,8 @@ void font::DrawStringExecute(
             goto next;
         }
         c -= 0x20;
-        if (c < 0 || c > 0x5f)
-            c = 0x5f;
+        if (c < 0 || c > FONT_GLYPH_FALLBACK)
+            c = FONT_GLYPH_FALLBACK;
         if (c != 0) {
             if (mode == 1 && m_suppressDraw == 0)
                 IconToBitmap(
@@ -162,11 +162,11 @@ i32 font::GetCharacterWidth(u8 c) {
     } else {
         if (c == ' ')
             c = 'i';
-        if (c == 0x1f)
+        if (c == FONT_SPACER_CHAR)
             c = '_';
         c -= ' ';
-        if (c < 0 || c > 0x5f)
-            c = 0x5f;
+        if (c < 0 || c > FONT_GLYPH_FALLBACK)
+            c = FONT_GLYPH_FALLBACK;
         return m_glyphIcon->Entries()[c].w + m_isLarge;
     }
 }

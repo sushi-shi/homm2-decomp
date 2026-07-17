@@ -15,7 +15,8 @@
 // no solid piece — every piece is shadow-layer or erased — so the occupancy
 // pass (bit 0x08) skips it.
 typedef enum MapCellFlag {
-    MAP_CELL_OBJECT_SHADOW_ONLY = 0x80
+    MAP_CELL_OBJECT_SHADOW_ONLY = 0x80,
+    MAP_CELL_OCCUPIED = 0x08
 } MapCellFlag;
 
 typedef enum MapCellSentinel {

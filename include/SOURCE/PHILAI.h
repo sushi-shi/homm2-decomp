@@ -25,10 +25,6 @@ typedef enum AIResourceValue {
     AI_MAP_SIZE_XLARGE = 144
 } AIResourceValue;
 
-typedef enum AIArtifactEventFlag {
-    AI_ARTIFACT_EVENT_GUARD_FLAG = 0x100
-} AIArtifactEventFlag;
-
 typedef enum AIArtifactEventMode {
     AI_ARTIFACT_EVENT_MODE_MASK = 0xf,
     AI_ARTIFACT_EVENT_VALUE = 1,
@@ -208,6 +204,10 @@ typedef enum AIQuickCombatConstant {
 } AIQuickCombatConstant;
 
 #define AI_MINIMUM_FIGHT_VALUE 100
+#define AI_FRAME_THROTTLE_TICKS 15
+#define AI_MINIMUM_TURN_MOBILITY 225
+#define AI_MINIMUM_SITE_MOBILITY 75
+#define AI_HERO_PURCHASE_GOLD_FLOOR 2500
 #define AI_BERSERK_THRESHOLD 30000
 #define AI_RELOAD_BASE 2.0f
 #define AI_RELOAD_NUMERATOR 3.0f

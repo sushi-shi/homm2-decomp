@@ -107,6 +107,10 @@ INPUT_KEY_CODE_ASCII = 0,
     INPUT_SCAN_F12 = 0x58
 } InputManagerScanCode;
 
+typedef enum InputManagerExtendedKey {
+    INPUT_EXTENDED_KEY_BASE = 0x100  // extended keys arrive as scan code << 8
+} InputManagerExtendedKey;
+
 typedef enum InputManagerCapacity {
     INPUT_EVENT_RING_CAPACITY = 64,
     INPUT_SCAN_CODE_CAPACITY = 128
