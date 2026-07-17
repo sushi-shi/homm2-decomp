@@ -79,13 +79,14 @@ int combatManager::DoSpellAI(int side, int restricted)
 }
 
 // @semantic
-// Exact 0xd4 frame and live slots after recovering the two-side target-mode
-// aggregate; all 156/156 external relocation occurrences agree. The first
-// normalized report boundary is the local first switch label after 17
-// instructions, with retail-only continuation/table output thereafter.
-// The named full-effect constant restores the retail constant-pool order;
-// revisit the remaining code residual with local-table-aware explicit-range
-// comparison in the byte-last-mile phase.
+// Exact 0xd4 frame and all source roles are recovered; all 156/156 external
+// relocation occurrences agree. Named local allocation order still differs
+// (for example, ours -0x4/-0x24/-0x28 map to retail
+// -0x34/-0x4/-0x18). The immediate 1.0f spelling now matches the opening
+// initializer. The first normalized report boundary is the local first switch
+// label after 17 instructions, with retail-only continuation/table output
+// thereafter. Revisit slot naming and the local-table residual in the
+// byte-last-mile phase.
 VA(0x00486a39, 0x1155)
 void combatManager::DetermineEffectOfSpell(int spell, int *bestEffect, int *bestHex)
 {
@@ -108,7 +109,7 @@ void combatManager::DetermineEffectOfSpell(int spell, int *bestEffect, int *best
     doneResult = 0;
     side = 0;
     hexIndex = COMBAT_SPELL_AI_FIRST_HEX;
-    durationMod = COMBAT_SPELL_AI_FULL_EFFECT_MODIFIER;
+    durationMod = COMBAT_SPELL_AI_FULL_EFFECT_IMMEDIATE;
     fullQuantityFlag = 1;
     totalEffect = 0;
     targetCreature = 0;
@@ -662,17 +663,18 @@ void combatManager::DetermineEffectOfSpell(int spell, int *bestEffect, int *best
 }
 
 // @semantic
-// Exact 0x28 frame and 14/14 external relocations. The first 52 normalized
-// instructions agree, then objdump stops ours at a local switch label; the
-// explicit-range residual begins in local branch/table layout at +0xcb.
-// The named full-effect constant restores the retail constant-pool order. The
-// fight-value/power versus retail fight-value/monster expressions were tried;
-// revisit with local-table-aware comparison in the byte-last-mile phase.
+// Exact 0x28 frame, named local slots, and 14/14 external relocations after
+// restoring the immediate 1.0f initializer and semantic local names. The
+// first 52 normalized instructions agree, then objdump stops ours at a local
+// switch label; the explicit-range residual begins in local branch/table
+// layout at +0xcb. The fight-value/power versus retail
+// fight-value/creature-type expressions were tried; revisit with
+// local-table-aware comparison in the byte-last-mile phase.
 VA(0x00487b8e, 0x34c)
 int combatManager::EffectSpellCreateCreature(int hex, int spell)
 {
-    float workChance = COMBAT_SPELL_AI_FULL_EFFECT_MODIFIER;
-    int spellPower = m_spellPower[m_currentSide];
+    float workChance = COMBAT_SPELL_AI_FULL_EFFECT_IMMEDIATE;
+    int spellPowerValue = m_spellPower[m_currentSide];
 
     if ((spell == SPELL_SUMMON_EARTH_ELEMENTAL ||
          spell == SPELL_SUMMON_AIR_ELEMENTAL ||
@@ -680,7 +682,7 @@ int combatManager::EffectSpellCreateCreature(int hex, int spell)
          spell == SPELL_SUMMON_WATER_ELEMENTAL) &&
         m_heroes[m_currentSide] != 0 &&
         m_heroes[m_currentSide]->HasArtifact(SPELL_ARTIFACT_BOOK_ELEMENTS))
-        spellPower <<= 1;
+        spellPowerValue <<= 1;
 
     if ((spell == SPELL_SUMMON_EARTH_ELEMENTAL ||
          spell == SPELL_SUMMON_AIR_ELEMENTAL ||
@@ -689,36 +691,37 @@ int combatManager::EffectSpellCreateCreature(int hex, int spell)
         !SpaceForElementalExists())
         return 0;
 
-    int monster;
+    int creatureType;
     switch (spell) {
     case SPELL_SUMMON_EARTH_ELEMENTAL:
-        monster = SPELL_MONSTER_EARTH_ELEMENTAL;
+        creatureType = SPELL_MONSTER_EARTH_ELEMENTAL;
         break;
     case SPELL_SUMMON_AIR_ELEMENTAL:
-        monster = SPELL_MONSTER_AIR_ELEMENTAL;
+        creatureType = SPELL_MONSTER_AIR_ELEMENTAL;
         break;
     case SPELL_SUMMON_FIRE_ELEMENTAL:
-        monster = SPELL_MONSTER_FIRE_ELEMENTAL;
+        creatureType = SPELL_MONSTER_FIRE_ELEMENTAL;
         break;
     case SPELL_SUMMON_WATER_ELEMENTAL:
-        monster = SPELL_MONSTER_WATER_ELEMENTAL;
+        creatureType = SPELL_MONSTER_WATER_ELEMENTAL;
         break;
     default:
         workChance =
             m_armies[m_hexCells[hex].m_occupantSide]
                     [m_hexCells[hex].m_occupantIndex]
                         .SpellCastWorkChance(SPELL_MIRROR_IMAGE);
-        monster = m_armies[m_hexCells[hex].m_occupantSide]
-                            [m_hexCells[hex].m_occupantIndex]
-                                .m_monsterType;
-        spellPower = m_armies[m_hexCells[hex].m_occupantSide]
-                             [m_hexCells[hex].m_occupantIndex]
-                                 .m_quantity *
-                     SPELL_DEFAULT_CREATURE_POWER;
+        creatureType = m_armies[m_hexCells[hex].m_occupantSide]
+                                [m_hexCells[hex].m_occupantIndex]
+                                    .m_monsterType;
+        spellPowerValue = m_armies[m_hexCells[hex].m_occupantSide]
+                                  [m_hexCells[hex].m_occupantIndex]
+                                      .m_quantity *
+                          SPELL_DEFAULT_CREATURE_POWER;
         break;
     }
 
-    int effect = gMonsterDatabase[monster].fightValue * monster;
+    int creatureEffect =
+        gMonsterDatabase[creatureType].fightValue * creatureType;
     if (spell == SPELL_MIRROR_IMAGE) {
         float mirrorMod;
         if (m_spellPower[m_currentSide] == COMBAT_SPELL_AI_MIRROR_POWER_ONE)
@@ -727,21 +730,22 @@ int combatManager::EffectSpellCreateCreature(int hex, int spell)
             mirrorMod = COMBAT_SPELL_AI_MIRROR_POWER_TWO_MODIFIER;
         else
             mirrorMod = COMBAT_SPELL_AI_MIRROR_DEFAULT_MODIFIER;
-        effect = static_cast<int>(effect * mirrorMod);
-        if (gMonsterDatabase[monster].flags.bytes.abilities & 4)
-            effect = static_cast<int>(effect *
-                                      COMBAT_SPELL_AI_MIRROR_SHOOTER_MODIFIER);
+        creatureEffect = static_cast<int>(creatureEffect * mirrorMod);
+        if (gMonsterDatabase[creatureType].flags.bytes.abilities & 4)
+            creatureEffect = static_cast<int>(
+                creatureEffect * COMBAT_SPELL_AI_MIRROR_SHOOTER_MODIFIER);
     }
-    return static_cast<int>(effect * workChance);
+    return static_cast<int>(creatureEffect * workChance);
 }
 
 // @semantic
-// All live source roles and external targets are accounted; retail's 0xb0
-// frame has one compiler-only word beyond ours' 0xac frame. The first
-// normalized residual is pooled 0.0 identity ($T4772 versus const_000eb7f0),
-// followed by the first local switch boundary; 65/62 COFF sites have no
-// candidate-only external target. Float and double zero spellings were tried;
-// revisit after TU-state changes or with local-table-aware last-mile tooling.
+// All source roles and external targets are accounted; named local allocation
+// order differs, and retail's 0xb0 frame has one compiler-only word beyond
+// ours' 0xac frame. The first normalized residual is pooled 0.0 identity
+// ($T4772 versus const_000eb7f0), followed by the first local switch boundary;
+// 65/62 COFF sites have no candidate-only external target. Float and double
+// zero spellings were tried; revisit slot naming and the local-table residual
+// in the byte-last-mile phase.
 VA(0x00487eda, 0x72d)
 int combatManager::RawEffectSpellInfluence(army *target, int influence)
 {
