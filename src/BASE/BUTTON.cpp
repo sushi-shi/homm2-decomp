@@ -15,7 +15,6 @@
 #include <BASE/inputManager.h>
 #include <SOURCE/KB.h>
 
-#define BUTTON_REPEAT_TIMER_SLOT 2
 
 
 VA(0x004dd440, 0x34)
@@ -113,7 +112,7 @@ i32 button::Main(tag_message &msg)
 {
     if (DecodeWidgetKind(m_kind) == WIDGET_KIND_AUTO_REPEAT &&
         (m_flags & WIDGET_FLAG_SELECTED) != 0 &&
-        KBTickCount() > glTimers[BUTTON_REPEAT_TIMER_SLOT]) {
+        KBTickCount() > glTimers[GLOBAL_BUTTON_REPEAT_TIMER_SLOT]) {
         if ((m_flags & WIDGET_FLAG_SELECTED) == 0)
             return 0;
         m_flags &= ~WIDGET_FLAG_SELECTED;
@@ -308,7 +307,7 @@ i16 button::Select(struct tag_message &msg)
     } else {
         msg.payload.widget.command = WIDGET_COMMAND_SELECT;
     }
-    glTimers[BUTTON_REPEAT_TIMER_SLOT] = KBTickCount() + BUTTON_REPEAT_DELAY_TICKS;
+    glTimers[GLOBAL_BUTTON_REPEAT_TIMER_SLOT] = KBTickCount() + BUTTON_REPEAT_DELAY_TICKS;
     iLeftRightSave = msg.payload.widget.parameter & MESSAGE_MODIFIER_BUTTON_MASK;
     return 2;
 }

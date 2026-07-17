@@ -4922,7 +4922,7 @@ void advManager::PlayerMonsterInteract(mapCell *cell, mapCell *combatCell, hero 
             else {
                 sprintf(gText,
                         "The creatures are swayed by your diplomatic tongue, and make you an offer:\n\n");
-                if (monsterCount_n == joining)
+                if (OD_STEER(monsterCount_n) == joining)
                     sprintf(offerText_g,
                             "All %d of the %s will join your army for the sum of %d gold.  Do you accept?",
                             monsterCount_n, gArmyNamesPlural[monster_n], joiningCost_i);
