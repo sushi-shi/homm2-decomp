@@ -31,7 +31,6 @@
 #include <SOURCE/SPELLS.h>
 #include <SOURCE/X_GLOBAL.h>
 
-#define ARMY_SPELL_EFFECT_ANIMATION_DURATION 275
 
 VA(0x0044a8c0, 0xcf)
 army::army(void) {

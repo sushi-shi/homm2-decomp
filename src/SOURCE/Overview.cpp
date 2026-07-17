@@ -30,7 +30,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define OVERVIEW_SOURCE_FILE const_cast<char*>("I:\\Projects\\Heroes\\Prog\\SOURCE\\Overview.cpp")
+#define RETAIL_FILE const_cast<char*>("I:\\Projects\\Heroes\\Prog\\SOURCE\\Overview.cpp")
 
 #define OVERVIEW_TEXT_WIDGET_ROWS (reinterpret_cast<OverviewTextWidgetRow*>(textWidgetDynamic))
 #define OVERVIEW_ICON_WIDGET_ROWS (reinterpret_cast<OverviewIconWidgetRow*>(iconWidgetDynamic))
@@ -132,7 +132,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
             {
                 valueText0 = static_cast<char*>(BaseAlloc(
                     strlen(record->m_name) + 1,
-                    OVERVIEW_SOURCE_FILE,
+                    RETAIL_FILE,
                     overviewDynamicSourceLine + 0x4f
                 ));
                 strcpy(valueText0, record->m_name);
@@ -312,7 +312,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                         iconCount++;
 
                         valueText0 = static_cast<char*>(
-                            BaseAlloc(6, OVERVIEW_SOURCE_FILE, overviewDynamicSourceLine + 0xee)
+                            BaseAlloc(6, RETAIL_FILE, overviewDynamicSourceLine + 0xee)
                         );
                         sprintf(
                             valueText0,
@@ -403,7 +403,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                         iconCount++;
 
                         valueText0 = static_cast<char*>(
-                            BaseAlloc(6, OVERVIEW_SOURCE_FILE, overviewDynamicSourceLine + 0x12a)
+                            BaseAlloc(6, RETAIL_FILE, overviewDynamicSourceLine + 0x12a)
                         );
                         sprintf(
                             valueText0,
@@ -509,7 +509,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
 
             for (item = 0; item < 4; item++) {
                 valueText0 = static_cast<char*>(
-                    BaseAlloc(4, OVERVIEW_SOURCE_FILE, overviewDynamicSourceLine + 0x182)
+                    BaseAlloc(4, RETAIL_FILE, overviewDynamicSourceLine + 0x182)
                 );
                 sprintf(valueText0, "%d", static_cast<i32>(heroData0->Stats(item)));
                 OVERVIEW_TEXT_WIDGET_ROWS[row][textItemCount] = new textWidget(
@@ -572,7 +572,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                         iconCount++;
 
                         valueText0 = static_cast<char*>(
-                            BaseAlloc(6, OVERVIEW_SOURCE_FILE, overviewDynamicSourceLine + 0x1bd)
+                            BaseAlloc(6, RETAIL_FILE, overviewDynamicSourceLine + 0x1bd)
                         );
                         sprintf(
                             valueText0,
@@ -639,7 +639,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                     iconCount += 2;
 
                     valueText0 = static_cast<char*>(
-                        BaseAlloc(2, OVERVIEW_SOURCE_FILE, overviewDynamicSourceLine + 0x1fb)
+                        BaseAlloc(2, RETAIL_FILE, overviewDynamicSourceLine + 0x1fb)
                     );
                     sprintf(valueText0, "%d", static_cast<i32>(heroData0->GetSSLevel(detailIndex)));
                     OVERVIEW_TEXT_WIDGET_ROWS[row][textItemCount] = new textWidget(
@@ -760,7 +760,7 @@ void game::SetupNewOverviewType(i32 overviewType, i32 redrawFrom) {
     for (title = 0; title < OVERVIEW_TITLE_COUNT; title++) {
         titleCopy = static_cast<char*>(BaseAlloc(
             strlen(cOverviewText[giOverviewType * OVERVIEW_TITLE_COUNT + title]) + 1,
-            OVERVIEW_SOURCE_FILE,
+            RETAIL_FILE,
             overviewSetupSourceLine + 0x2a
         ));
         strcpy(titleCopy, cOverviewText[giOverviewType * OVERVIEW_TITLE_COUNT + title]);
@@ -819,12 +819,12 @@ void game::Overview(void) {
 
     textWidgetDynamic = static_cast<textWidget**>(BaseAlloc(
         OVERVIEW_DYNAMIC_ARRAY_BYTES,
-        OVERVIEW_SOURCE_FILE,
+        RETAIL_FILE,
         overviewDialogSourceLine + 0x11
     ));
     iconWidgetDynamic = static_cast<iconWidget**>(BaseAlloc(
         OVERVIEW_DYNAMIC_ARRAY_BYTES,
-        OVERVIEW_SOURCE_FILE,
+        RETAIL_FILE,
         overviewDialogSourceLine + 0x12
     ));
     for (row0 = 0; row0 < OVERVIEW_VISIBLE_ROWS; row0++) {
@@ -901,8 +901,8 @@ void game::Overview(void) {
     gpWindowManager->FadeScreen(1, OVERVIEW_FADE_STEPS, 0);
     delete overWin;
     overWin = 0;
-    BaseFree(textWidgetDynamic, OVERVIEW_SOURCE_FILE, overviewDialogSourceLine + 0x68);
-    BaseFree(iconWidgetDynamic, OVERVIEW_SOURCE_FILE, overviewDialogSourceLine + 0x69);
+    BaseFree(textWidgetDynamic, RETAIL_FILE, overviewDialogSourceLine + 0x68);
+    BaseFree(iconWidgetDynamic, RETAIL_FILE, overviewDialogSourceLine + 0x69);
     textWidgetDynamic = 0;
     iconWidgetDynamic = 0;
 }
@@ -1336,3 +1336,5 @@ DATA(0x0052325c) i32 iLastDynamicTop;
 DATA(0x00523260) i32 iOverviewItems;
 DATA(0x00523268) i32 giOverviewItems[2];
 DATA(0x00523270) class textWidget* textWidgetTitle[4];
+
+#undef RETAIL_FILE

@@ -9,7 +9,7 @@
 #include <BASE/Misc.h>
 #include <SOURCE/KB.h>
 
-#define PALETTE_SOURCE_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\PALETTE.CPP"
+#define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\PALETTE.CPP"
 
 // @data-layout-note Retail's initialized PALETTE contribution is
 // RVA 0x11fd3c..0x11fdc0 (0x84), with no loader-zero contribution. It contains
@@ -28,12 +28,12 @@
 
 VA(0x004d2580, 0x2e)
 palette::palette(void) : resource(2, 0, 1, 0) {
-    m_data = static_cast<i8*>(H2_ALLOC(0x300, PALETTE_SOURCE_FILE, 8));
+    m_data = static_cast<i8*>(H2_ALLOC(0x300, RETAIL_FILE, 8));
 }
 
 VA(0x004d2600, 0x55)
 palette::palette(u32l id) : resource(2, id, 1, 0) {
-    m_data = static_cast<i8*>(H2_ALLOC(0x300, PALETTE_SOURCE_FILE "\0", 13));
+    m_data = static_cast<i8*>(H2_ALLOC(0x300, RETAIL_FILE "\0", 13));
     gpResourceManager->PointToFile(id);
     gpResourceManager->ReadBlock(m_data, 0x300);
 }
@@ -41,7 +41,7 @@ palette::palette(u32l id) : resource(2, id, 1, 0) {
 VA(0x004d2660, 0x2c)
 palette::~palette() {
     if (m_data != 0)
-        H2_FREE(m_data, PALETTE_SOURCE_FILE "\0\0", 21);
+        H2_FREE(m_data, RETAIL_FILE "\0\0", 21);
     m_data = 0;
 }
 
@@ -55,3 +55,5 @@ i8* palette::Data(void) {
 
 // ---- vtables (compiler-emitted; census) ----
 VTBL(palette, 0x004eba7c);
+
+#undef RETAIL_FILE

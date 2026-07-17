@@ -65,7 +65,7 @@
 // SOURCE/KB_TYPES.h; SNetPlayerInfo -> SOURCE/REMOTE_TYPES.h;
 // SPlayerExit -> KB.h.
 
-#define KBFILE const_cast<char*>("I:\\Projects\\Heroes\\Prog\\SOURCE\\KB.CPP")
+#define RETAIL_FILE const_cast<char*>("I:\\Projects\\Heroes\\Prog\\SOURCE\\KB.CPP")
 
 inline town* GetCastleRec(i32 i) {
     return &gpGame->m_castleRecs[i];
@@ -2672,21 +2672,21 @@ void ClearMapExtra(void) {
         if (ppMapExtra[i])
             BaseFree(
                 ppMapExtra[i],
-                KBFILE,
+                RETAIL_FILE,
                 clearMapExtraSourceLineBase + KB_SOURCE_LINE_CLEAR_MAP_EXTRA_ITEM_FREE_OFFSET
             );
     }
     if (ppMapExtra)
         BaseFree(
             ppMapExtra,
-            KBFILE,
+            RETAIL_FILE,
             clearMapExtraSourceLineBase + KB_SOURCE_LINE_CLEAR_MAP_EXTRA_POINTER_FREE_OFFSET
         );
     ppMapExtra = 0;
     if (pwSizeOfMapExtra)
         BaseFree(
             pwSizeOfMapExtra,
-            KBFILE,
+            RETAIL_FILE,
             clearMapExtraSourceLineBase + KB_SOURCE_LINE_CLEAR_MAP_EXTRA_SIZE_FREE_OFFSET
         );
     pwSizeOfMapExtra = 0;
@@ -3202,7 +3202,7 @@ void ShutDown(char* msg) {
     if (mapExtra)
         BaseFree(
             mapExtra,
-            KBFILE,
+            RETAIL_FILE,
             shutdownSourceLineBase + KB_SOURCE_LINE_SHUTDOWN_MAP_FREE_OFFSET
         );
     mapExtra = 0;
@@ -3249,12 +3249,12 @@ void SmackFade(u8* src, u8* dst) {
     k = -1;
     a = static_cast<u8*>(BaseAlloc(
         0x300,
-        KBFILE,
+        RETAIL_FILE,
         smackFadeSourceLineBase + KB_SOURCE_LINE_SMACK_FADE_PALETTE_ALLOC_OFFSET
     ));
     f = static_cast<u8*>(BaseAlloc(
         0x100,
-        KBFILE,
+        RETAIL_FILE,
         smackFadeSourceLineBase + KB_SOURCE_LINE_SMACK_FADE_MAP_ALLOC_OFFSET
     ));
     memset(a, 0, 0x300);
@@ -3283,8 +3283,8 @@ void SmackFade(u8* src, u8* dst) {
     }
     gpWindowManager->UpdateScreen();
     UpdatePalette(reinterpret_cast<i8*>(dst));
-    BaseFree(a, KBFILE, smackFadeSourceLineBase + KB_SOURCE_LINE_SMACK_FADE_PALETTE_FREE_OFFSET);
-    BaseFree(f, KBFILE, smackFadeSourceLineBase + KB_SOURCE_LINE_SMACK_FADE_MAP_FREE_OFFSET);
+    BaseFree(a, RETAIL_FILE, smackFadeSourceLineBase + KB_SOURCE_LINE_SMACK_FADE_PALETTE_FREE_OFFSET);
+    BaseFree(f, RETAIL_FILE, smackFadeSourceLineBase + KB_SOURCE_LINE_SMACK_FADE_MAP_FREE_OFFSET);
 }
 
 VA(0x0049e5fd, 0x303)
@@ -3300,7 +3300,7 @@ void ShowCongrats(i32 highScoreType) {
     gpWindowManager->m_updateFlags = 0;
     congratsText = static_cast<char*>(BaseAlloc(
         CONGRATS_TEXT_SIZE,
-        KBFILE,
+        RETAIL_FILE,
         congratsSourceLineBase + KB_SOURCE_LINE_CONGRATS_ALLOC_OFFSET
     ));
     baseScore = CalcBaseScore(giCurTurn);
@@ -3358,7 +3358,7 @@ void ShowCongrats(i32 highScoreType) {
         CONGRATS_STANDARD,
         gpGame->m_mapHeader.name
     );
-    BaseFree(congratsText, KBFILE, congratsSourceLineBase + KB_SOURCE_LINE_CONGRATS_FREE_OFFSET);
+    BaseFree(congratsText, RETAIL_FILE, congratsSourceLineBase + KB_SOURCE_LINE_CONGRATS_FREE_OFFSET);
     congratsText = 0;
     gpWindowManager->m_updateFlags = 1;
     memcpy(gpBufferPalette->m_data, gPalette->m_data, CONGRATS_PALETTE_SIZE);
@@ -4692,7 +4692,7 @@ void NormalDialog(
 
         resourceText_e[resourceSlot_n] = static_cast<char*>(BaseAlloc(
             NORMAL_DIALOG_TEXT_LENGTH,
-            KBFILE,
+            RETAIL_FILE,
             normalDialogSourceLineBase + KB_SOURCE_LINE_NORMAL_DIALOG_FIRST_TEXT_ALLOC_OFFSET
         ));
         if (resourceType_l[resourceSlot_n] <= NORMAL_DIALOG_RESOURCE_LAST) {
@@ -5003,7 +5003,7 @@ void NormalDialog(
 
             resourceText_e[resourceSlot_n] = static_cast<char*>(BaseAlloc(
                 NORMAL_DIALOG_TEXT_LENGTH,
-                KBFILE,
+                RETAIL_FILE,
                 normalDialogSourceLineBase
                     + KB_SOURCE_LINE_NORMAL_DIALOG_SECONDARY_TEXT_ALLOC_OFFSET
             ));
@@ -5039,7 +5039,7 @@ void NormalDialog(
         if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_PRIMARY_SKILL && showPrimaryBonus_e) {
             char* bonusText = static_cast<char*>(BaseAlloc(
                 5,
-                KBFILE,
+                RETAIL_FILE,
                 normalDialogSourceLineBase + KB_SOURCE_LINE_NORMAL_DIALOG_PRIMARY_BONUS_ALLOC_OFFSET
             ));
             strcpy(bonusText, "+1 ");
@@ -5082,7 +5082,7 @@ void NormalDialog(
     if (showOrText == NORMAL_DIALOG_SHOW_OR_TEXT) {
         orText_f = static_cast<char*>(BaseAlloc(
             3,
-            KBFILE,
+            RETAIL_FILE,
             normalDialogSourceLineBase + KB_SOURCE_LINE_NORMAL_DIALOG_OR_TEXT_ALLOC_OFFSET
         ));
         strcpy(orText_f, "or");
@@ -9815,3 +9815,5 @@ DATA(0x0052a188) u8 bMusicIsLooping[0x3c];
 DATA(0x0052a1c4) townManager* gpTownManager;
 DATA(0x0052a1c8) advManager* gpAdvManager;
 DATA(0x0052a1d0) i8 gbGamePosToNetPos[OLD_MAIN_MATCH_BUFFER_SIZE];
+
+#undef RETAIL_FILE

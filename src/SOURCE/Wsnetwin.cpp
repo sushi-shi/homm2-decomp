@@ -22,18 +22,13 @@
 #include <BASE/widget.h>
 #include <SOURCE/Wsnetwin.h>
 
-#define WSFILE const_cast<char*>("I:\\Projects\\Heroes\\Prog\\SOURCE\\Wsnetwin.cpp")
-#define WS_SOURCE_LINE_INIT_BASE 61
-#define WS_SOURCE_LINE_TERM_BASE 248
-#define WS_SOURCE_LINE_SEND_BASE 279
-#define WS_SOURCE_LINE_RECEIVE_BASE 359
-#define WS_SOURCE_LINE_EVALUATE_BASE 413
+#define RETAIL_FILE const_cast<char*>("I:\\Projects\\Heroes\\Prog\\SOURCE\\Wsnetwin.cpp")
 
-DATA(0x004ed2c4) static i16 s_wsInitSourceLineBase = WS_SOURCE_LINE_INIT_BASE;
-DATA(0x004ed730) static i16 s_wsTermSourceLineBase = WS_SOURCE_LINE_TERM_BASE;
-DATA(0x004ed78c) static i16 s_wsSendSourceLineBase = WS_SOURCE_LINE_SEND_BASE;
-DATA(0x004ed830) static i16 s_wsReceiveSourceLineBase = WS_SOURCE_LINE_RECEIVE_BASE;
-DATA(0x004ed860) static i16 s_wsEvaluateSourceLineBase = WS_SOURCE_LINE_EVALUATE_BASE;
+DATA(0x004ed2c4) static i16 s_wsInitSourceLineBase = 61;
+DATA(0x004ed730) static i16 s_wsTermSourceLineBase = 248;
+DATA(0x004ed78c) static i16 s_wsSendSourceLineBase = 279;
+DATA(0x004ed830) static i16 s_wsReceiveSourceLineBase = 359;
+DATA(0x004ed860) static i16 s_wsEvaluateSourceLineBase = 413;
 
 // @data-layout-note Retail initialized storage is 0xed2ac+0x73c. Candidate
 // .data is 0x737 across 11 source DATA definitions and 32 private literals;
@@ -74,10 +69,10 @@ i16 wsnet_init(void) {
     }
     gbRemoteOn = 1;
     ppDPRcvBuffer = static_cast<u8**>(
-        BaseAlloc(WS_TRANSPORT_BUFFER_COUNT * sizeof(u8*), WSFILE, s_wsInitSourceLineBase + 0xa)
+        BaseAlloc(WS_TRANSPORT_BUFFER_COUNT * sizeof(u8*), RETAIL_FILE, s_wsInitSourceLineBase + 0xa)
     );
     piDPRcvBufferSize = static_cast<i32*>(
-        BaseAlloc(WS_TRANSPORT_BUFFER_COUNT * sizeof(i32), WSFILE, s_wsInitSourceLineBase + 0xb)
+        BaseAlloc(WS_TRANSPORT_BUFFER_COUNT * sizeof(i32), RETAIL_FILE, s_wsInitSourceLineBase + 0xb)
     );
     memset(ppDPRcvBuffer, 0, WS_TRANSPORT_BUFFER_COUNT * sizeof(u8*));
     memset(piDPRcvBufferSize, 0, WS_TRANSPORT_BUFFER_COUNT * sizeof(i32));
@@ -212,10 +207,10 @@ void wsnet_term(void) {
     if (sd_dg != INVALID_SOCKET)
         closesocket(sd_dg);
     if (ppDPRcvBuffer != 0)
-        BaseFree(ppDPRcvBuffer, WSFILE, s_wsTermSourceLineBase + 7);
+        BaseFree(ppDPRcvBuffer, RETAIL_FILE, s_wsTermSourceLineBase + 7);
     ppDPRcvBuffer = 0;
     if (piDPRcvBufferSize != 0)
-        BaseFree(piDPRcvBufferSize, WSFILE, s_wsTermSourceLineBase + 0xb);
+        BaseFree(piDPRcvBufferSize, RETAIL_FILE, s_wsTermSourceLineBase + 0xb);
     piDPRcvBufferSize = 0;
     WSACleanup();
     bHostFound = 0;
@@ -236,7 +231,7 @@ void wsnet_term(void) {
 // were tested; the exact label/pointer-index form was rejected as less source-faithful.
 VA(0x00406f37, 0x1f5)
 void wsSendMessage(i32 destination, u8 type, u16 size, void* data) {
-    u8* packetBuffer = static_cast<u8*>(BaseAlloc(size + 1, WSFILE, s_wsSendSourceLineBase + 2));
+    u8* packetBuffer = static_cast<u8*>(BaseAlloc(size + 1, RETAIL_FILE, s_wsSendSourceLineBase + 2));
     struct sockaddr_in peerAddress;
     i32 attemptCount;
     i32 error;
@@ -288,7 +283,7 @@ void wsSendMessage(i32 destination, u8 type, u16 size, void* data) {
             return;
         }
     }
-    BaseFree(packetBuffer, WSFILE, s_wsSendSourceLineBase + 0x39);
+    BaseFree(packetBuffer, RETAIL_FILE, s_wsSendSourceLineBase + 0x39);
 }
 
 VA(0x0040712c, 0x61)
@@ -317,7 +312,7 @@ i16 wsnet_rcv(i16, u16, void* data) {
         return 0;
     size = piDPRcvBufferSize[iDPRcvBufferTail];
     memcpy(data, ppDPRcvBuffer[iDPRcvBufferTail], size);
-    BaseFree(ppDPRcvBuffer[iDPRcvBufferTail], WSFILE, s_wsReceiveSourceLineBase + 9);
+    BaseFree(ppDPRcvBuffer[iDPRcvBufferTail], RETAIL_FILE, s_wsReceiveSourceLineBase + 9);
     iDPRcvBufferTail = (iDPRcvBufferTail + 1) % WS_TRANSPORT_BUFFER_COUNT;
     return static_cast<i16>(size);
 }
@@ -369,7 +364,7 @@ void wsEvaluateMessage(u32l size, i32 sender) {
     switch (rcvBufIn[0]) {
         case NETWORK_PACKET_DATA:
             ppDPRcvBuffer[iDPRcvBufferHead] =
-                static_cast<u8*>(BaseAlloc(size - 1, WSFILE, s_wsEvaluateSourceLineBase + 10));
+                static_cast<u8*>(BaseAlloc(size - 1, RETAIL_FILE, s_wsEvaluateSourceLineBase + 10));
             memcpy(ppDPRcvBuffer[iDPRcvBufferHead], rcvBufIn + 1, size - 1);
             piDPRcvBufferSize[iDPRcvBufferHead] = size;
             iDPRcvBufferHead = (iDPRcvBufferHead + 1) % WS_TRANSPORT_BUFFER_COUNT;
@@ -530,3 +525,5 @@ DATA(0x005230a8) struct WSAData wsadata;
 DATA(0x00523238) struct in_addr gIn_addrIP;
 DATA(0x00523240) struct sockaddr_in saddr_remote;
 DATA(0x00523250) i32 iAddrLen;
+
+#undef RETAIL_FILE

@@ -26,7 +26,7 @@
 #include <SOURCE/Wsnetwin.h>
 #include <SOURCE/X_GLOBAL.h>
 
-#define REMOTE_SOURCE_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\REMOTE.CPP"
+#define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\REMOTE.CPP"
 #define REMOTE_PACKET(buffer) (reinterpret_cast<RemotePacketHeader*>(buffer))
 #define REMOTE_MESSAGE(buffer) (reinterpret_cast<RemoteMessage*>(buffer))
 #define REMOTE_PLAYER_INFO(message) (reinterpret_cast<SNetPlayerInfo*>((message)->payload))
@@ -621,7 +621,7 @@ char* GetRemoteData(i8 remove) {
     if (selected >= 0) {
         memcpy(rcvBufOut, rcvBuf[selected], REMOTE_MESSAGE_SIZE);
         if (remove != 0) {
-            BaseFree(rcvBuf[selected], REMOTE_SOURCE_FILE, gGetRemoteDataLineBase + 25);
+            BaseFree(rcvBuf[selected], RETAIL_FILE, gGetRemoteDataLineBase + 25);
             rcvBuf[selected] = 0;
         }
         return rcvBufOut;
@@ -833,7 +833,7 @@ void PollRemote(void) {
                 if (queueIndex >= REMOTE_QUEUE_CAPACITY)
                     continue;
                 rcvBuf[queueIndex] = static_cast<char*>(
-                    BaseAlloc(REMOTE_MESSAGE_SIZE, REMOTE_SOURCE_FILE, gPollRemoteLineBase + 235)
+                    BaseAlloc(REMOTE_MESSAGE_SIZE, RETAIL_FILE, gPollRemoteLineBase + 235)
                 );
                 iInOrder[queueIndex] = iInOrderCtr++;
                 memcpy(rcvBuf[queueIndex], rcvBufIn, REMOTE_MESSAGE_SIZE);
@@ -919,3 +919,5 @@ DATA(0x0052aa58) char rcvBufIn[REMOTE_TRANSPORT_BUFFER_SIZE];
 DATA(0x0052ab68) char* rcvBuf[REMOTE_QUEUE_STORAGE_COUNT];
 DATA(0x0052ad90) i32 bGotGameType;
 DATA(0x0052ad98) SNetPlayerInfo gsThisNetPlayerInfo;
+
+#undef RETAIL_FILE

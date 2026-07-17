@@ -793,9 +793,6 @@ skipDefaults:
 
 // Byte counts the registry string values are written with (hard-coded in retail; not the
 // same as the in-struct buffer sizes).
-#define REG_MODEM_INIT_STRING_SIZE 0x62    // 98 bytes
-#define REG_UNIQUE_SYSTEM_ID_SIZE 4        // 4 bytes
-#define REG_NETWORK_DEFAULT_NAME_SIZE 0x1e // 30 bytes
 
 VA(0x004c4ca0, 0x7ab)
 void ReadPrefsFromRegistry(void) {
