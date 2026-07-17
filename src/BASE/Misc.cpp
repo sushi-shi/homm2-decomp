@@ -218,6 +218,13 @@ DATA(0x0051dd10) static SMiscText gMiscText = {
 // includes four unowned tail bytes. Keep the DATA-proved owners and leave that as a
 // final-link packing residual rather than adding aliases, padding, or placement rules.
 
+typedef enum StatusBarLayout {
+    STATUS_BAR_Y = 460,
+    STATUS_BAR_HEIGHT = 20,
+    STATUS_TEXT_Y = 464,
+    STATUS_TEXT_HEIGHT = 16
+} StatusBarLayout;
+
 VA(0x004c3d10, 0x58)
 void InitMemEntry(void) {
     LogInt(gMemEntryTag, iMemEntries, -999, -999, -999, -999, -999, -999);
@@ -454,9 +461,17 @@ void ShowMemoryStatus(void) {
     sprintf(gText, gMiscText.memory.memoryStatusFormat.text, 0x3ea2);
     i32 savedDebugLevel = giDebugLevel;
     giDebugLevel = 9;
-    FillBitmapArea(gpWindowManager->m_screen, 0, 0x1cc, 0x280, 0x14, 0);
-    smallFont->DrawBoundedString(gText, 0, 0x1d0, 0x280, 0x10, 1, 0);
-    BlitBitmapToScreen(gpWindowManager->m_screen, 0, 0x1cc, 0x280, 0x14, 0, 0x1cc);
+    FillBitmapArea(gpWindowManager->m_screen, 0, STATUS_BAR_Y, 640, STATUS_BAR_HEIGHT, 0);
+    smallFont->DrawBoundedString(gText, 0, STATUS_TEXT_Y, 640, STATUS_TEXT_HEIGHT, 1, 0);
+    BlitBitmapToScreen(
+        gpWindowManager->m_screen,
+        0,
+        STATUS_BAR_Y,
+        640,
+        STATUS_BAR_HEIGHT,
+        0,
+        STATUS_BAR_Y
+    );
     giDebugLevel = savedDebugLevel;
 }
 
@@ -1999,9 +2014,17 @@ void LogInt(
 VA(0x004c63f0, 0x6c)
 void AiPrint(char* text) {
     if (giDebugLevel >= 2) {
-        FillBitmapArea(gpWindowManager->m_screen, 0, 0x1cc, 0x280, 0x14, 0);
-        smallFont->DrawBoundedString(text, 0, 0x1d0, 0x280, 0x10, 1, 0);
-        BlitBitmapToScreen(gpWindowManager->m_screen, 0, 0x1cc, 0x280, 0x14, 0, 0x1cc);
+        FillBitmapArea(gpWindowManager->m_screen, 0, STATUS_BAR_Y, 640, STATUS_BAR_HEIGHT, 0);
+        smallFont->DrawBoundedString(text, 0, STATUS_TEXT_Y, 640, STATUS_TEXT_HEIGHT, 1, 0);
+        BlitBitmapToScreen(
+            gpWindowManager->m_screen,
+            0,
+            STATUS_BAR_Y,
+            640,
+            STATUS_BAR_HEIGHT,
+            0,
+            STATUS_BAR_Y
+        );
     }
 }
 
@@ -2009,9 +2032,17 @@ VA(0x004c6460, 0x7a)
 void AbsAiPrint(char* text) {
     i32 saved = giDebugLevel;
     giDebugLevel = 9;
-    FillBitmapArea(gpWindowManager->m_screen, 0, 0x1cc, 0x280, 0x14, 0);
-    smallFont->DrawBoundedString(text, 0, 0x1d0, 0x280, 0x10, 1, 0);
-    BlitBitmapToScreen(gpWindowManager->m_screen, 0, 0x1cc, 0x280, 0x14, 0, 0x1cc);
+    FillBitmapArea(gpWindowManager->m_screen, 0, STATUS_BAR_Y, 640, STATUS_BAR_HEIGHT, 0);
+    smallFont->DrawBoundedString(text, 0, STATUS_TEXT_Y, 640, STATUS_TEXT_HEIGHT, 1, 0);
+    BlitBitmapToScreen(
+        gpWindowManager->m_screen,
+        0,
+        STATUS_BAR_Y,
+        640,
+        STATUS_BAR_HEIGHT,
+        0,
+        STATUS_BAR_Y
+    );
     giDebugLevel = saved;
 }
 

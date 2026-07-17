@@ -337,6 +337,9 @@ DATA(0x004ee750) SBuildingInfo sBuildingInfo[FACTION_COUNT][TOWN_BUILDING_COUNT]
 typedef enum TownDialogResult {
     DIALOG_CANCEL_ID = 0x7801
 } TownDialogResult;
+typedef enum TownPortraitIcon {
+    TOWN_PORTRAIT_ICON_BASE = 90
+} TownPortraitIcon;
 
 VA(0x00413900, 0x16a)
 townObject::townObject(i32 townType, i32 buildingId, char* iconBaseName) {
@@ -1121,7 +1124,7 @@ i32 townManager::Main(tag_message& message) {
 
                                 if (m_recruitResult != 0) {
                                     RedrawTownScreen();
-                                    gpWindowManager->SaveFizzleSource(0, 0x100, 0x228, 0xcc);
+                                    gpWindowManager->SaveFizzleSource(0, 256, 552, 204);
                                     delete m_heroStrip;
                                     sprintf(gText, "port%04d.icn", m_recruitHero->m_portrait);
                                     m_heroStrip = new strip(
@@ -1145,7 +1148,7 @@ i32 townManager::Main(tag_message& message) {
                                     m_garrisonStrip->DrawIcons(0);
                                     m_heroStrip->DrawIcons(0);
                                     gpWindowManager
-                                        ->FizzleForward(0, 0x100, fizzleWidth, 0xcc, -1, 0, 0);
+                                        ->FizzleForward(0, 256, fizzleWidth, 204, -1, 0, 0);
                                     WaitEndSample(buildSample_m, -1);
                                     m_recruitResult = 0;
                                     gpWindowManager->ReleaseFizzleSource();
@@ -1155,7 +1158,11 @@ i32 townManager::Main(tag_message& message) {
                                         if (m_heroStrip != 0)
                                             delete m_heroStrip;
                                         m_heroStrip = 0;
-                                        sprintf(gText, "port%04d.icn", m_town->m_type + 0x5a);
+                                        sprintf(
+                                            gText,
+                                            "port%04d.icn",
+                                            m_town->m_type + TOWN_PORTRAIT_ICON_BASE
+                                        );
                                         m_heroStrip = new strip(
                                             0,
                                             0x163,
@@ -1734,7 +1741,7 @@ void townManager::RedrawTownScreen(void) {
     m_garrisonStrip->DrawIcons(0);
     m_heroStrip->DrawIcons(0);
     m_bankBox->Update(0);
-    gpWindowManager->UpdateScreenRegion(0, 0, 0x280, 0x1e0);
+    gpWindowManager->UpdateScreenRegion(0, 0, 640, 480);
 }
 
 // @early-stop
@@ -1831,10 +1838,10 @@ void townManager::DrawTown(i32 updateScreen, i32 drawFlags) {
         m_townObjects[index]->Draw(drawFlags);
         PollSound();
     }
-    m_townWindow->DrawWindow(0, 0x88, 0x89);
+    m_townWindow->DrawWindow(0, 136, 137);
     PollSound();
     if (updateScreen != 0)
-        BlitBitmapToScreen(gpWindowManager->m_screen, 0, 0, 0x280, 0x100, 0, 0);
+        BlitBitmapToScreen(gpWindowManager->m_screen, 0, 0, 640, 256, 0, 0);
     PollSound();
 }
 
@@ -2378,7 +2385,7 @@ void townManager::SetupMage(heroWindow* window) {
                     gsSpellInfo[m_town->m_spells[level][slot_m]].iconIndex;
                 window->BroadcastMessage(message_b);
                 lineCount_m =
-                    smallFont->LineLength(gSpellNames[m_town->m_spells[level][slot_m]], 0x4a);
+                    smallFont->LineLength(gSpellNames[m_town->m_spells[level][slot_m]], 74);
                 if (lineCount_m == 1)
                     sprintf(
                         gText,
