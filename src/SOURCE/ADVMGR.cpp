@@ -56,7 +56,6 @@
 #include <string.h>
 
 #define ADVMGR_SOURCE_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\ADVMGR.CPP"
-#define ADVMGR_PUZZLE_OBJECT_ICON 17
 #define ADVMGR_ENVIRONMENT_VOLUME(distance) environmentVolumes[distance]
 #define ADVMGR_REMOTE_PAYLOAD(packet) \
     (reinterpret_cast<AdventureRemotePayload *>((packet)->payload))
@@ -2108,13 +2107,13 @@ void advManager::DrawCell(i32 mapX, i32 mapY, i32 screenX, i32 screenY,
                    m_visibilityMap[mapY * MAP_WIDTH + mapX] != 0) {
             if ((m_visibilityMap[mapY * MAP_WIDTH + mapX] & 0x100) != 0) {
                 IconToBitmapColorTable(
-                    m_objectIcons[17], gpWindowManager->m_screen,
+                    m_objectIcons[ADVMGR_TILESET_ROUTE], gpWindowManager->m_screen,
                     s_drawPixelX - 12, s_drawPixelY + 2,
                     (m_visibilityMap[mapY * MAP_WIDTH + mapX] - 1) & 0xff,
                     1, 0, 0, ADVMGR_DRAW_CLIP_WIDTH, ADVMGR_DRAW_CLIP_HEIGHT,
                     0, gColorTableRed, 1);
             } else {
-                IconToBitmap(m_objectIcons[17], gpWindowManager->m_screen,
+                IconToBitmap(m_objectIcons[ADVMGR_TILESET_ROUTE], gpWindowManager->m_screen,
                              s_drawPixelX - 12, s_drawPixelY + 2,
                              (m_visibilityMap[mapY * MAP_WIDTH + mapX] - 1) & 0xff,
                              1, 0, 0, ADVMGR_DRAW_CLIP_WIDTH,
@@ -7437,7 +7436,7 @@ void advManager::PuzzleDraw(i32 left, i32 top, i32 right, i32 bottom)
     gbDrawingPuzzle = 1;
     CompleteDraw(left, top, 0, 0);
     gbDrawingPuzzle = 0;
-    IconToBitmap(m_objectIcons[ADVMGR_PUZZLE_OBJECT_ICON],
+    IconToBitmap(m_objectIcons[ADVMGR_TILESET_ROUTE],
                  gpWindowManager->m_screen,
                  (right - left) * ADVMGR_PUZZLE_TILE_SIZE - ADVMGR_PUZZLE_X_TRIM,
                  (bottom - top) * ADVMGR_PUZZLE_TILE_SIZE, 0, 1, 0, 0,
