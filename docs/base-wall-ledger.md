@@ -49,8 +49,8 @@ The counts and rows below are pinned to the following fully rebuilt state:
   `4efb3f3b249740f0e5631bf988cc2e8e108e49985e35203427e47f14eabb5f4d`
 - Accepted `include/BASE/widgetKind.h` SHA-256:
   `ff661f928541eefacac1429f0e25d3e065b4743ce8f5ac5670a7046bb8abf31f`
-- Accepted `include/_carcass_types.h` SHA-256:
-  `457c1114c0ee7e2f185a88124b015d56da97b2292c2ab09e8e67abb3b2d51995`
+- Accepted `include/BASE/message.h` SHA-256:
+  `9f36a929a6fccd3a3e614fcbfc583ad1e043aca7cbb09640175e8d596b7ea26c`
 - Accepted `src/SOURCE/GAME.cpp` SHA-256:
   `0ab36df97e9567ece70b52b505b105edf28e08748a6020e6c3d270886d4b64b2`
 - Accepted `src/SOURCE/SPELLS.cpp` SHA-256:

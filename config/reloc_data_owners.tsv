@@ -1,4 +1,4 @@
 # Public DATA extents proven independently of the provisional next-public size.
 # source name	RVA	size	evidence
-gConfig	0x128d20	0x1a0	include/_types.h SIZE(configStruct, CONFIG_STRUCT_SIZE)
-gMonsterDatabase	0xfaeb0	0x6b4	include/_types.h SIZE(tag_monsterInfo, 0x1a) * MONSTER_DATABASE_COUNT
+gConfig	0x128d20	0x1a0	include/SOURCE/CONFIG_TYPES.h SIZE(configStruct, CONFIG_STRUCT_SIZE)
+gMonsterDatabase	0xfaeb0	0x6b4	include/SOURCE/KB_TYPES.h SIZE(tag_monsterInfo, 0x1a) * MONSTER_DATABASE_COUNT
