@@ -1,6 +1,12 @@
 #ifndef HOMM2_BASE_DATA_ENTRY_CONSTANTS_H
 #define HOMM2_BASE_DATA_ENTRY_CONSTANTS_H
 
+typedef enum DataEntryLayout {
+    DATA_ENTRY_WINDOW_X = 0xb1,
+    DATA_ENTRY_WINDOW_Y = 0x14,
+    DATA_ENTRY_INPUT_BOX_Y_OFFSET = 0x17
+} DataEntryLayout;
+
 typedef enum DataEntryPhase {
     DATA_ENTRY_PHASE_IMMEDIATE = 0,
     DATA_ENTRY_PHASE_POINTER_SENT = 1,

@@ -4,6 +4,7 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
+#include <fcntl.h>
 #include <BASE/Misc.h>
 #include <SOURCE/x_cdtest.h>
 #include <io.h>
@@ -89,7 +90,7 @@ i32 CDTest_GenerateTable(char* file) {
     if (count == 0)
         return 0;
 
-    fileHandle = open(file, 0x4301);
+    fileHandle = open(file, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_TEXT);
     if (fileHandle == 0)
         return 0;
 

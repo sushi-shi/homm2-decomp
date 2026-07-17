@@ -572,7 +572,7 @@ void FadeOut(i32 increment) {
     i32 done = 0;
     if (gConfig.gfx[giCurExe].fullScreen == 0)
         increment *= 2;
-    memcpy(fadePalette->m_data, gpBufferPalette->m_data, 0x300);
+    memcpy(fadePalette->m_data, gpBufferPalette->m_data, MISC_PALETTE_BYTE_COUNT);
     i32 level = 0;
     for (;;) {
         if (level >= MISC_FADE_LEVEL_COUNT) {
@@ -1258,7 +1258,7 @@ void WritePrefsToFile(void) {
         p++;
     }
     sprintf(gText, gMiscText.writeFile.stringFormat.text, gMiscText.writeFile.configFilename.text);
-    i32 fd = _open(gText, 0x8301, 0x80);
+    i32 fd = _open(gText, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
     if (fd != -1) {
         _write(fd, &gConfig, CONFIG_PERSISTED_SIZE);
         _close(fd);
@@ -1763,8 +1763,8 @@ void BitmapToScreen(class bitmap* bmp) {
 
 VA(0x004c5e70, 0x3d)
 void SetPalette(i8* paletteData, i32 updateDisplay) {
-    memcpy(gpBufferPalette->m_data, paletteData, 0x300);
-    memcpy(gCyclePal, paletteData + 0x282, 0x60);
+    memcpy(gpBufferPalette->m_data, paletteData, MISC_PALETTE_BYTE_COUNT);
+    memcpy(gCyclePal, paletteData + MISC_CYCLE_RANGE_ONE_FIRST * 3, sizeof(gCyclePal));
     if (updateDisplay != 0)
         UpdatePalette(gpBufferPalette->m_data);
 }
@@ -2337,7 +2337,7 @@ void GetDataEntry(
 
     char windowName[16];
     sprintf(windowName, gMiscText.dataEntry.windowFilenameFormat.text, rows);
-    DataEntryWin = new heroWindow(0xb1, 0x14, windowName);
+    DataEntryWin = new heroWindow(DATA_ENTRY_WINDOW_X, DATA_ENTRY_WINDOW_Y, windowName);
     if (DataEntryWin == 0)
         MemError();
 
@@ -2394,7 +2394,7 @@ void GetDataEntry(
     );
     if (entry == 0)
         MemError();
-    inBoxY = entryY + 0x17;
+    inBoxY = entryY + DATA_ENTRY_INPUT_BOX_Y_OFFSET;
     inBoxX = 0xd5;
     DataEntryWin->AddWidget(entry, -1);
 
