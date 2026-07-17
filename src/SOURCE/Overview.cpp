@@ -791,7 +791,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate)
 
             i32 displayedArtifacts = 0;
             for (item = 0; item < OVERVIEW_ARTIFACT_SLOTS; item++) {
-                if (heroData0->m_artifacts[item] != -1) {
+                if (heroData0->m_artifacts[item] != ARTIFACT_NONE) {
                     detailRow = displayedArtifacts / OVERVIEW_ARTIFACT_COLUMNS;
                     detailColumn = displayedArtifacts % OVERVIEW_ARTIFACT_COLUMNS;
                     OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] =
@@ -1349,7 +1349,7 @@ i32 game::ProcessIconSelect(i32 widgetId, i32 quickView)
                 && widgetId <= OVERVIEW_HERO_ARTIFACT_LAST) {
                 selectionIndex2 =
                     selectedHero13->m_artifacts[widgetId - OVERVIEW_HERO_ARTIFACT_FIRST];
-                if (selectionIndex2 == OVERVIEW_MAGIC_BOOK_ARTIFACT) {
+                if (selectionIndex2 == ARTIFACT_MAGIC_BOOK) {
                     gpGame->ViewSpells(selectedHero13, 2, ViewSpecialHandler, 1);
                 } else {
                     NormalDialog(

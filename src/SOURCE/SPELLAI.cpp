@@ -36,7 +36,7 @@ i32 combatManager::DoSpellAI(i32 side, i32 restricted)
 
     for (spellIndex = 0; spellIndex < COMBAT_SIDE_COUNT; spellIndex++) {
         if (m_heroes[spellIndex] != 0 &&
-            m_heroes[spellIndex]->HasArtifact(SPELL_ARTIFACT_SPHERE_NEGATION))
+            m_heroes[spellIndex]->HasArtifact(ARTIFACT_SPHERE_NEGATION))
             return 0;
     }
 
@@ -216,9 +216,9 @@ void combatManager::DetermineEffectOfSpell(i32 spell, i32 *bestEffect, i32 *best
 
             spellPowerWork = m_spellPower[m_currentSide];
             if (m_heroes[m_currentSide]->HasArtifact(
-                    SPELL_ARTIFACT_ENCHANTED_HOURGLASS))
+                    ARTIFACT_ENCHANTED_HOURGLASS))
                 spellPowerWork += SPELL_HOURGLASS_POWER_BONUS;
-            if (m_heroes[m_currentSide]->HasArtifact(SPELL_ARTIFACT_WIZARD_HAT))
+            if (m_heroes[m_currentSide]->HasArtifact(ARTIFACT_WIZARD_HAT))
                 spellPowerWork += SPELL_WIZARD_HAT_POWER_BONUS;
 
             durationMod = gfDurationMods[
@@ -681,7 +681,7 @@ i32 combatManager::EffectSpellCreateCreature(i32 hex, i32 spell)
          spell == SPELL_SUMMON_FIRE_ELEMENTAL ||
          spell == SPELL_SUMMON_WATER_ELEMENTAL) &&
         m_heroes[m_currentSide] != 0 &&
-        m_heroes[m_currentSide]->HasArtifact(SPELL_ARTIFACT_BOOK_ELEMENTS))
+        m_heroes[m_currentSide]->HasArtifact(ARTIFACT_BOOK_ELEMENTS))
         spellPowerValue <<= 1;
 
     if ((spell == SPELL_SUMMON_EARTH_ELEMENTAL ||
@@ -1092,7 +1092,7 @@ void combatManager::EffectSpellResurrect(i32 *effect, i32 hex, i32 spell)
     resurrectPowerWork = m_spellPower[m_currentSide] *
                          COMBAT_SPELL_AI_RESURRECT_POINTS_PER_POWER;
     if (m_heroes[m_currentSide] != 0 &&
-        m_heroes[m_currentSide]->HasArtifact(SPELL_ARTIFACT_ANKH))
+        m_heroes[m_currentSide]->HasArtifact(ARTIFACT_ANKH))
         resurrectPowerWork <<= 1;
 
     armyIndexWork = FindResurrectArmyIndex(m_currentSide, spell, hex);

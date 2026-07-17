@@ -272,7 +272,7 @@ void combatManager::DoCompAI(i32)
                     ->m_secondarySkills[HERO_SKILL_ARCHERY] ==
                 HERO_SKILL_LEVEL_NONE &&
             !m_heroes[COMBAT_ATTACKER_SIDE]->HasArtifact(
-                COMBAT_ARTIFACT_GOLDEN_BOW)) {
+                ARTIFACT_GOLDEN_BOW)) {
             if (m_currentSide == COMBAT_ATTACKER_SIDE)
                 currentShooterStrength5 =
                     static_cast<i32>(currentShooterStrength5) /
@@ -300,7 +300,7 @@ void combatManager::DoCompAI(i32)
                 (numArchers6 * COMBAT_AI_TOWER_STRENGTH));
             if (m_heroes[COMBAT_ATTACKER_SIDE] != 0 &&
                 (m_heroes[COMBAT_ATTACKER_SIDE]->HasArtifact(
-                     COMBAT_ARTIFACT_GOLDEN_BOW) ||
+                     ARTIFACT_GOLDEN_BOW) ||
                  m_heroes[COMBAT_ATTACKER_SIDE]
                          ->m_secondarySkills[HERO_SKILL_ARCHERY] !=
                      HERO_SKILL_LEVEL_NONE))

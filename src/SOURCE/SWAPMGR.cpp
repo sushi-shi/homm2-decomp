@@ -375,7 +375,7 @@ i32 swapManager::Main(tag_message &message)
             case SWAP_CONTROL_LEFT_ARTIFACT_LAST:
                 artifactSlot_2 = message.payload.widget.id - SWAP_CONTROL_LEFT_ARTIFACT_FIRST;
                 if (!quickView && m_heroes[SWAP_SIDE_LEFT]->m_artifacts[artifactSlot_2] ==
-                                      SWAP_ARTIFACT_MAGIC_BOOK) {
+                                      ARTIFACT_MAGIC_BOOK) {
                     NormalDialog("This item can't be traded.", NORMAL_DIALOG_INFO,
                                  NORMAL_DIALOG_NO_VALUE, NORMAL_DIALOG_NO_VALUE,
                                  NORMAL_DIALOG_NO_RESOURCE, 0,
@@ -383,7 +383,7 @@ i32 swapManager::Main(tag_message &message)
                                  NORMAL_DIALOG_NO_VALUE, 0);
                 } else if (quickView) {
                     if (m_heroes[SWAP_SIDE_LEFT]->m_artifacts[artifactSlot_2] ==
-                        SWAP_ARTIFACT_NONE)
+                        ARTIFACT_NONE)
                         break;
                     m_heroes[SWAP_SIDE_LEFT]->ViewArtifact(
                         m_heroes[SWAP_SIDE_LEFT]->m_artifacts[artifactSlot_2],
@@ -391,7 +391,7 @@ i32 swapManager::Main(tag_message &message)
                         m_heroes[SWAP_SIDE_LEFT]->m_artifactExtra[artifactSlot_2]);
                 } else if (m_itemType != SWAP_ITEM_ARTIFACT) {
                     if (m_heroes[SWAP_SIDE_LEFT]->m_artifacts[artifactSlot_2] !=
-                        SWAP_ARTIFACT_NONE) {
+                        ARTIFACT_NONE) {
                         m_selectedSide = SWAP_SIDE_LEFT;
                         m_targetSide = SWAP_SIDE_NONE;
                         m_itemType = SWAP_ITEM_ARTIFACT;
@@ -433,7 +433,7 @@ i32 swapManager::Main(tag_message &message)
             case SWAP_CONTROL_RIGHT_ARTIFACT_LAST:
                 artifactSlot_2 = message.payload.widget.id - SWAP_CONTROL_RIGHT_ARTIFACT_FIRST;
                 if (!quickView && m_heroes[SWAP_SIDE_RIGHT]->m_artifacts[artifactSlot_2] ==
-                                      SWAP_ARTIFACT_MAGIC_BOOK) {
+                                      ARTIFACT_MAGIC_BOOK) {
                     NormalDialog("This item can't be traded.", NORMAL_DIALOG_INFO,
                                  NORMAL_DIALOG_NO_VALUE, NORMAL_DIALOG_NO_VALUE,
                                  NORMAL_DIALOG_NO_RESOURCE, 0,
@@ -441,7 +441,7 @@ i32 swapManager::Main(tag_message &message)
                                  NORMAL_DIALOG_NO_VALUE, 0);
                 } else if (quickView) {
                     if (m_heroes[SWAP_SIDE_RIGHT]->m_artifacts[artifactSlot_2] ==
-                        SWAP_ARTIFACT_NONE)
+                        ARTIFACT_NONE)
                         break;
                     m_heroes[SWAP_SIDE_RIGHT]->ViewArtifact(
                         m_heroes[SWAP_SIDE_RIGHT]->m_artifacts[artifactSlot_2],
@@ -449,7 +449,7 @@ i32 swapManager::Main(tag_message &message)
                         m_heroes[SWAP_SIDE_RIGHT]->m_artifactExtra[artifactSlot_2]);
                 } else if (m_itemType != SWAP_ITEM_ARTIFACT) {
                     if (m_heroes[SWAP_SIDE_RIGHT]->m_artifacts[artifactSlot_2] !=
-                        SWAP_ARTIFACT_NONE) {
+                        ARTIFACT_NONE) {
                         m_selectedSide = SWAP_SIDE_RIGHT;
                         m_targetSide = SWAP_SIDE_NONE;
                         m_itemType = SWAP_ITEM_ARTIFACT;
@@ -662,8 +662,8 @@ void swapManager::SwapArtifacts(void)
     m_heroes[m_selectedSide]->CheckAnduranPieces(1);
     m_heroes[m_targetSide]->CheckAnduranPieces(1);
 
-    if (selectedArtifact == SWAP_ARTIFACT_SKILL_BONUS ||
-        targetArtifact_2 == SWAP_ARTIFACT_SKILL_BONUS) {
+    if (selectedArtifact == ARTIFACT_SPADE_NECROMANCY ||
+        targetArtifact_2 == ARTIFACT_SPADE_NECROMANCY) {
         tag_message message_1;
         message_1.type = SWAP_MESSAGE_WIDGET;
         for (i32 side = SWAP_SIDE_LEFT; side < SWAP_SIDE_COUNT; ++side) {
@@ -805,7 +805,7 @@ void swapManager::Update(void)
     for (slot = 0; slot < HERO_ARTIFACT_SLOT_COUNT; ++slot) {
         message_1.payload.widget.id = slot + SWAP_CONTROL_LEFT_ARTIFACT_FIRST;
         if (m_heroes[SWAP_SIDE_LEFT]->m_artifacts[slot] ==
-            SWAP_ARTIFACT_NONE) {
+            ARTIFACT_NONE) {
             message_1.payload.widget.command = SWAP_MESSAGE_DISABLE;
             message_1.payload.widget.data.value = SWAP_EMPTY_ITEM_VALUE;
         } else {
@@ -821,7 +821,7 @@ void swapManager::Update(void)
     for (slot = 0; slot < HERO_ARTIFACT_SLOT_COUNT; ++slot) {
         message_1.payload.widget.id = slot + SWAP_CONTROL_RIGHT_ARTIFACT_FIRST;
         if (m_heroes[SWAP_SIDE_RIGHT]->m_artifacts[slot] ==
-            SWAP_ARTIFACT_NONE) {
+            ARTIFACT_NONE) {
             message_1.payload.widget.command = SWAP_MESSAGE_DISABLE;
             message_1.payload.widget.data.value = SWAP_EMPTY_ITEM_VALUE;
         } else {

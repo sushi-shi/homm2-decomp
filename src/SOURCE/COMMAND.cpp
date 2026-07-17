@@ -1883,7 +1883,7 @@ void combatManager::DoVictory(i32 winningSide)
                     for (fadeIndex = 0; fadeIndex < HERO_ARTIFACT_SLOT_COUNT;
                          ++fadeIndex) {
                         if (m_heroes[winningSide]->m_artifacts[fadeIndex] ==
-                            HERO_ARTIFACT_NONE) {
+                            ARTIFACT_NONE) {
                             ++emptyArtifactSlots;
                         }
                     }
@@ -1894,7 +1894,7 @@ void combatManager::DoVictory(i32 winningSide)
                                 HERO_ARTIFACT_TRANSFERABLE_FIRST &&
                             m_heroes[COMBAT_DEFENDER_SIDE - winningSide]
                                     ->m_artifacts[fadeIndex] !=
-                                HERO_ARTIFACT_MAGIC_BOOK &&
+                                ARTIFACT_MAGIC_BOOK &&
                             emptyArtifactSlots > iMaxTransferArtifacts) {
                             iTransferArtifacts[iMaxTransferArtifacts] =
                                 m_heroes[COMBAT_DEFENDER_SIDE - winningSide]
@@ -2094,7 +2094,7 @@ i32 combatManager::DoSurrender(void)
         }
     }
     if (m_heroes[m_currentSide]->HasArtifact(
-            HERO_ARTIFACT_STATESMANS_QUILL) != 0)
+            ARTIFACT_STATESMANS_QUILL) != 0)
         giSurrenderCost =
             static_cast<i32>(giSurrenderCost * COMBAT_SURRENDER_QUILL_FACTOR);
     else

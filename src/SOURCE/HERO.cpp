@@ -97,7 +97,7 @@ i32 hero::CalcMobility(void) {
         if (m_owner != -1)
             mobilityResult += gpGame->MineTypesOwned(m_owner, HERO_LIGHTHOUSE_MINE_TYPE) *
                 lighthouseBonusIncrement;
-        if (HasArtifact(HERO_ARTIFACT_SAILORS_ASTROLABE))
+        if (HasArtifact(ARTIFACT_SAILORS_ASTROLABE))
             mobilityResult += astrolabeBonus;
     } else {
         slowestSpeedValue = 7;
@@ -110,15 +110,15 @@ i32 hero::CalcMobility(void) {
         mobilityResult = landMobility[slowestSpeedValue];
         mobilityResult = static_cast<i32>(mobilityResult *
             gfSSLogisticsMod[m_secondarySkills[HERO_SKILL_LOGISTICS]]);
-        if (HasArtifact(HERO_ARTIFACT_NOMAD_BOOTS))
+        if (HasArtifact(ARTIFACT_NOMAD_BOOTS))
             mobilityResult += nomadBootsMobilityBonus;
-        if (HasArtifact(HERO_ARTIFACT_TRAVELER_BOOTS))
+        if (HasArtifact(ARTIFACT_TRAVELER_BOOTS))
             mobilityResult += travelerBonus;
         if (m_eventFlags & HERO_EVENT_STABLES)
             mobilityResult += HERO_STABLES_MOBILITY_BONUS;
     }
 
-    if (HasArtifact(HERO_ARTIFACT_TRUE_COMPASS))
+    if (HasArtifact(ARTIFACT_TRUE_COMPASS))
         mobilityResult += compassMobility;
 
     if (m_owner >= 0 && m_owner < 6 && !gbHumanPlayer[m_owner] &&
@@ -134,17 +134,17 @@ VA(0x0046c79d, 0xcf)
 i32 hero::HasSpell(i32 spell) {
     i32 artifactIndex;
 
-    if (!HasArtifact(HERO_ARTIFACT_MAGIC_BOOK))
+    if (!HasArtifact(ARTIFACT_MAGIC_BOOK))
         return 0;
     if (m_spells[spell])
         return 1;
     for (artifactIndex = 0; artifactIndex < HERO_ARTIFACT_SLOT_COUNT; artifactIndex++) {
-        if (m_artifacts[artifactIndex] == HERO_ARTIFACT_SPELL_SCROLL &&
+        if (m_artifacts[artifactIndex] == ARTIFACT_SPELL_SCROLL &&
             m_artifactExtra[artifactIndex] == spell) {
             return 1;
         }
     }
-    if (HasArtifact(HERO_ARTIFACT_BATTLE_GARB) && spell == HERO_SPELL_TOWN_PORTAL)
+    if (HasArtifact(ARTIFACT_BATTLE_GARB) && spell == HERO_SPELL_TOWN_PORTAL)
         return 1;
     return 0;
 }
@@ -321,7 +321,7 @@ void hero::ViewStat(i32 stat, i32 quickView) {
 
 VA(0x0046cdf0, 0x9b)
 void hero::ViewArtifact(i32 artifact, i32 quickView, i32 extra) {
-    if (artifact == HERO_ARTIFACT_SPELL_SCROLL) {
+    if (artifact == ARTIFACT_SPELL_SCROLL) {
         sprintf(gText, gArtifactDesc[artifact], gSpellNames[extra]);
         NormalDialog(gText, quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW,
             -1, HERO_UI_ARTIFACT_DIALOG_ICON, -1, 0, -1, 0, -1, 0);
@@ -904,10 +904,10 @@ void UpdateHeroScreenStatusBar(struct tag_message &message) {
     case HERO_UI_ARTIFACT_FIRST + 12:
     case HERO_UI_ARTIFACT_LAST:
         if (gpHVHero->m_artifacts[message.payload.widget.id - HERO_UI_ARTIFACT_FIRST] ==
-            HERO_ARTIFACT_NONE)
+            ARTIFACT_NONE)
             sprintf(gText, cHeroScreen[HERO_TEXT_EMPTY]);
         else if (gpHVHero->m_artifacts[message.payload.widget.id - HERO_UI_ARTIFACT_FIRST] ==
-                 HERO_ARTIFACT_MAGIC_BOOK)
+                 ARTIFACT_MAGIC_BOOK)
             strcpy(gText, cHeroScreen[HERO_TEXT_VIEW_SPELLS]);
         else
             sprintf(gText, cHeroScreen[HERO_TEXT_ARTIFACT],
@@ -1233,10 +1233,10 @@ i32 HeroHandler(struct tag_message &message) {
             case HERO_UI_ARTIFACT_FIRST + 12:
             case HERO_UI_ARTIFACT_LAST:
                 if (gpHVHero->m_artifacts[message.payload.widget.id - HERO_UI_ARTIFACT_FIRST] !=
-                    HERO_ARTIFACT_NONE) {
+                    ARTIFACT_NONE) {
                     if (quickView0 == 0 &&
                         gpHVHero->m_artifacts[message.payload.widget.id - HERO_UI_ARTIFACT_FIRST] ==
-                            HERO_ARTIFACT_MAGIC_BOOK) {
+                            ARTIFACT_MAGIC_BOOK) {
                         gpGame->ViewSpells(gpHVHero, HERO_UI_VIEW_SPELLS_ALL,
                             ViewSpecialHandler, HERO_UI_VIEW_SPELLS_SPECIAL);
                     } else {
@@ -1597,7 +1597,7 @@ void SetupHeroView(void) {
 
     for (index = 0; index < HERO_ARTIFACT_SLOT_COUNT; index++) {
         message.payload.widget.id = HERO_UI_ARTIFACT_FIRST + index;
-        if (gpHVHero->m_artifacts[index] != HERO_ARTIFACT_NONE) {
+        if (gpHVHero->m_artifacts[index] != ARTIFACT_NONE) {
             message.payload.widget.command = HERO_UI_WIDGET_ENABLE;
             message.payload.widget.data.value = HERO_UI_ARTIFACT_CONTROL_VALUE;
             heroWin->BroadcastMessage(message);
@@ -1800,7 +1800,7 @@ i8 hero::GetSSLevel(i32 skill) {
         return level;
     if (level == HERO_SKILL_LEVEL_NONE)
         return level;
-    if (HasArtifact(HERO_ARTIFACT_SPADE_NECROMANCY))
+    if (HasArtifact(ARTIFACT_SPADE_NECROMANCY))
         shrineAndArtifactBonus++;
     if (m_cursorType == FACTION_NECROMANCER)
         shrineAndArtifactBonus += gpGame->CountShrines(m_owner);
@@ -1847,29 +1847,29 @@ VA(0x00470779, 0x12f)
 void hero::CheckAnduranPieces(i32 showDialog) {
     i32 artifactSlot;
 
-    if (HasArtifact(HERO_ARTIFACT_BREASTPLATE_ANDURAN) &&
-        HasArtifact(HERO_ARTIFACT_HELMET_ANDURAN) &&
-        HasArtifact(HERO_ARTIFACT_SWORD_ANDURAN)) {
+    if (HasArtifact(ARTIFACT_BREASTPLATE_ANDURAN) &&
+        HasArtifact(ARTIFACT_HELMET_ANDURAN) &&
+        HasArtifact(ARTIFACT_SWORD_ANDURAN)) {
         for (artifactSlot = 0; artifactSlot < HERO_ARTIFACT_SLOT_COUNT;
              artifactSlot++) {
             if (m_artifacts[artifactSlot] ==
-                    HERO_ARTIFACT_BREASTPLATE_ANDURAN ||
-                m_artifacts[artifactSlot] == HERO_ARTIFACT_HELMET_ANDURAN ||
-                m_artifacts[artifactSlot] == HERO_ARTIFACT_SWORD_ANDURAN) {
+                    ARTIFACT_BREASTPLATE_ANDURAN ||
+                m_artifacts[artifactSlot] == ARTIFACT_HELMET_ANDURAN ||
+                m_artifacts[artifactSlot] == ARTIFACT_SWORD_ANDURAN) {
                 GiveTakeArtifactStat(
                     this, m_artifacts[artifactSlot], EVENT_ARTIFACT_TAKE);
-                m_artifacts[artifactSlot] = HERO_ARTIFACT_NONE;
+                m_artifacts[artifactSlot] = ARTIFACT_NONE;
             }
         }
-        GiveArtifact(this, HERO_ARTIFACT_BATTLE_GARB, showDialog,
-            HERO_ARTIFACT_NONE);
+        GiveArtifact(this, ARTIFACT_BATTLE_GARB, showDialog,
+            ARTIFACT_NONE);
         if (gbThisNetHumanPlayer[m_owner]) {
             LoadPlaySample("treasure.82m");
             NormalDialog(
                 "The three Anduran artifacts magically combine into one.",
                 NORMAL_DIALOG_INFO, NORMAL_DIALOG_NO_RESOURCE,
                 NORMAL_DIALOG_NO_VALUE, NORMAL_DIALOG_ARTIFACT,
-                HERO_ARTIFACT_BATTLE_GARB, NORMAL_DIALOG_NO_RESOURCE, 0,
+                ARTIFACT_BATTLE_GARB, NORMAL_DIALOG_NO_RESOURCE, 0,
                 NORMAL_DIALOG_NO_RESOURCE, 0);
         }
     }

@@ -128,7 +128,7 @@ i32 combatManager::ViewGeneral(i32 side, i32 allowActions, i32 quickView)
         generalWindow->BroadcastMessage(message);
 
         if (m_heroes[side] == 0 || allowActions == 0 ||
-            m_heroes[side]->HasArtifact(VIEW_GENERAL_MAGIC_BOOK) == 0 ||
+            m_heroes[side]->HasArtifact(ARTIFACT_MAGIC_BOOK) == 0 ||
             m_heroCastSpell[side] != 0 || m_currentSide != giCurGeneral) {
             message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
             message.payload.widget.id = VIEW_GENERAL_CLOSE;
