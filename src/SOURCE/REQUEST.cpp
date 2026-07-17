@@ -24,7 +24,7 @@
 
 // Frames of the requester's map-info icons: the map-size frames are selected
 // directly; player-count, victory, and loss frames are base + header value.
-HOMM2_ENUM_BEGIN(RequesterIconFrame)
+H2_ENUM_CLASS_BEGIN(RequesterIconFrame)
     PLAYER_COUNT_FRAME_BASE = 0x13,
     MAP_SIZE_FRAME_SMALL = 0x1a,
     MAP_SIZE_FRAME_MEDIUM = 0x1b,
@@ -32,7 +32,7 @@ HOMM2_ENUM_BEGIN(RequesterIconFrame)
     MAP_SIZE_FRAME_XLARGE = 0x1d,
     VICTORY_FRAME_BASE = 0x1e,
     LOSS_FRAME_BASE = 0x24
-HOMM2_ENUM_END(RequesterIconFrame)
+H2_ENUM_CLASS_END(RequesterIconFrame)
 
 // @early-stop
 // @early-stop-reloc-only

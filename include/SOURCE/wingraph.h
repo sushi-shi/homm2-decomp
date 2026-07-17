@@ -8,7 +8,7 @@
 // symbols. Other TUs call them by including this header (no local externs).
 // forward declarations (was <_all.h>):
 
-HOMM2_ENUM_VALUES_BEGIN(WingraphConstant)
+H2_ENUM_BEGIN(WingraphConstant)
     WINGRAPH_WIDTH = 640,
     WINGRAPH_HEIGHT = 480,
     WINGRAPH_COLOR_DEPTH = 8,
@@ -22,12 +22,12 @@ HOMM2_ENUM_VALUES_BEGIN(WingraphConstant)
     WINGRAPH_LOAD_LIBRARY_SUCCESS = 32,
     WINGRAPH_PAINT_TIMEOUT = 10000,
     WINGRAPH_ERROR_TEXT_SIZE = 200
-HOMM2_ENUM_VALUES_END(WingraphConstant)
+H2_ENUM_END(WingraphConstant)
 
-HOMM2_ENUM_BEGIN(WingraphGraphicsType)
+H2_ENUM_CLASS_BEGIN(WingraphGraphicsType)
     WINGRAPH_GRAPHICS_WING = 1,
     WINGRAPH_GRAPHICS_DIRECT_DRAW = 2
-HOMM2_ENUM_END(WingraphGraphicsType)
+H2_ENUM_CLASS_END(WingraphGraphicsType)
 
 #pragma pack(push, 1)
 struct _PALETTE {

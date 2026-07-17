@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include "baseManager.h"
 
-HOMM2_ENUM_VALUES_BEGIN(SoundVolumeConstant)
+H2_ENUM_BEGIN(SoundVolumeConstant)
     SOUND_VOLUME_STEPS = 10,
     SOUND_SAMPLE_VOLUME_MAX = 0x40,
     SOUND_MIDI_VOLUME_MAX = 0x7f,
@@ -14,45 +14,45 @@ HOMM2_ENUM_VALUES_BEGIN(SoundVolumeConstant)
     SOUND_CD_MUSIC_TRACK_FIRST = 8,
     SOUND_CD_MUSIC_TRACK_LAST = 15,
     SOUND_FADE_HOLD_STEPS = 10
-HOMM2_ENUM_VALUES_END(SoundVolumeConstant)
+H2_ENUM_END(SoundVolumeConstant)
 
-HOMM2_ENUM_VALUES_BEGIN(MidiTrackConstant)
+H2_ENUM_BEGIN(MidiTrackConstant)
     MIDI_NO_TRACK = -1,
     MIDI_TRACK_COUNT = 60
-HOMM2_ENUM_VALUES_END(MidiTrackConstant)
+H2_ENUM_END(MidiTrackConstant)
 
-HOMM2_ENUM_BEGIN(MidiSequenceStatus)
+H2_ENUM_CLASS_BEGIN(MidiSequenceStatus)
     MIDI_SEQUENCE_PLAYING = 4
-HOMM2_ENUM_END(MidiSequenceStatus)
+H2_ENUM_CLASS_END(MidiSequenceStatus)
 
-HOMM2_ENUM_VALUES_BEGIN(MidiVolumeConstant)
+H2_ENUM_BEGIN(MidiVolumeConstant)
     MIDI_VOLUME_HIGH_RANGE = 6,
     MIDI_VOLUME_FADE_SPLIT = 10,
     MIDI_VOLUME_LOW_RANGE = 11,
     MIDI_MAX_VOLUME = 127
-HOMM2_ENUM_VALUES_END(MidiVolumeConstant)
+H2_ENUM_END(MidiVolumeConstant)
 
-HOMM2_ENUM_BEGIN(SoundVolumeConversionMode)
+H2_ENUM_CLASS_BEGIN(SoundVolumeConversionMode)
     SOUND_VOLUME_EFFECT = 100,
     SOUND_VOLUME_MUSIC = 101
-HOMM2_ENUM_END(SoundVolumeConversionMode)
+H2_ENUM_CLASS_END(SoundVolumeConversionMode)
 
-HOMM2_ENUM_BEGIN(SoundSampleOperation)
+H2_ENUM_CLASS_BEGIN(SoundSampleOperation)
     SOUND_SAMPLE_OPERATION_VOLUME = 1,
     SOUND_SAMPLE_OPERATION_START = 5,
     SOUND_SAMPLE_OPERATION_EFFECT_VOLUME = 100,
     SOUND_SAMPLE_OPERATION_MUSIC_VOLUME = 101
-HOMM2_ENUM_END(SoundSampleOperation)
+H2_ENUM_CLASS_END(SoundSampleOperation)
 
-HOMM2_ENUM_BEGIN(SoundDigitalReportQuery)
+H2_ENUM_CLASS_BEGIN(SoundDigitalReportQuery)
     SOUND_DIGITAL_REPORT_VOLUME = 1,
     SOUND_DIGITAL_REPORT_PLAYING = 4
-HOMM2_ENUM_END(SoundDigitalReportQuery)
+H2_ENUM_CLASS_END(SoundDigitalReportQuery)
 
-HOMM2_ENUM_BEGIN(SoundSampleStatus)
+H2_ENUM_CLASS_BEGIN(SoundSampleStatus)
     SOUND_SAMPLE_STATUS_DONE = 2,
     SOUND_SAMPLE_STATUS_PLAYING = 4
-HOMM2_ENUM_END(SoundSampleStatus)
+H2_ENUM_CLASS_END(SoundSampleStatus)
 // forward declarations:
 class sample;
 struct _SAMPLE;

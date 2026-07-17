@@ -12,16 +12,16 @@
 class heroWindow;
 struct tag_message;
 
-HOMM2_ENUM_VALUES_BEGIN(WidgetFlag)
+H2_ENUM_BEGIN(WidgetFlag)
     WIDGET_FLAG_SELECTED = 1,
     WIDGET_FLAG_ENABLED = 2,
     WIDGET_FLAG_DRAW = 4,
     WIDGET_FLAG_DIMMED = 8,
     WIDGET_FLAG_GRAYED = 0x1000,
     WIDGET_FLAG_UPDATE = 0x4000
-HOMM2_ENUM_VALUES_END(WidgetFlag)
+H2_ENUM_END(WidgetFlag)
 
-HOMM2_ENUM_VALUES_BEGIN(BaseWidgetCommand)
+H2_ENUM_BEGIN(BaseWidgetCommand)
     WIDGET_COMMAND_DRAW = 2,
     WIDGET_COMMAND_SET_TEXT = 3,
     WIDGET_COMMAND_SET_FRAME = 4,
@@ -41,11 +41,11 @@ HOMM2_ENUM_VALUES_BEGIN(BaseWidgetCommand)
     WIDGET_COMMAND_CLEAR_ITEMS = 0x3b,
     WIDGET_COMMAND_REPLACE_ICON = 0x3c,
     WIDGET_COMMAND_SET_WIDTH = 0x3d
-HOMM2_ENUM_VALUES_END(BaseWidgetCommand)
+H2_ENUM_END(BaseWidgetCommand)
 
-HOMM2_ENUM_VALUES_BEGIN(WidgetCommandArgument)
+H2_ENUM_BEGIN(WidgetCommandArgument)
     WIDGET_COMMAND_DIMMED = 0x1000
-HOMM2_ENUM_VALUES_END(WidgetCommandArgument)
+H2_ENUM_END(WidgetCommandArgument)
 
 #pragma pack(push, 1) // recovered layout is byte-packed
 class widget /* abstract */ {

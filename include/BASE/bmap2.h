@@ -7,9 +7,9 @@
 // forward declarations (was <_all.h>):
 class bitmap;
 
-HOMM2_ENUM_VALUES_BEGIN(BitmapDimConstant)
+H2_ENUM_BEGIN(BitmapDimConstant)
     BITMAP_DIM_PALETTE_LEVEL_STRIDE = 256
-HOMM2_ENUM_VALUES_END(BitmapDimConstant)
+H2_ENUM_END(BitmapDimConstant)
 
 void FillBitmapArea(class bitmap*, i32, i32, i32, i32, i32);
 void FillBitmapAreaClip(class bitmap*, i32, i32, i32, i32, i32, i32, i32, i32, i32);

@@ -14,19 +14,19 @@
 // Bits of mapCell::m_flags (+8). Bit 0x80 marks a cell whose object stack holds
 // no solid piece — every piece is shadow-layer or erased — so the occupancy
 // pass (bit 0x08) skips it.
-HOMM2_ENUM_BEGIN(MapCellFlag)
+H2_ENUM_CLASS_BEGIN(MapCellFlag)
     MAP_CELL_OBJECT_SHADOW_ONLY = 0x80,
     MAP_CELL_OCCUPIED = 0x08
-HOMM2_ENUM_END(MapCellFlag)
+H2_ENUM_CLASS_END(MapCellFlag)
 
-HOMM2_ENUM_BEGIN(MapCellSentinel)
+H2_ENUM_CLASS_BEGIN(MapCellSentinel)
     MAPCELL_SPRITE_NONE = 0xff, // object/overlay sprite index: no sprite
     MAPCELL_EXTRA_FREE = 0xffff // extras chain nextIndex: free-pool entry
-HOMM2_ENUM_END(MapCellSentinel)
+H2_ENUM_CLASS_END(MapCellSentinel)
 
-HOMM2_ENUM_VALUES_BEGIN(MapTilesetConstant)
+H2_ENUM_BEGIN(MapTilesetConstant)
     MAP_TILESET_FLAG = 14
-HOMM2_ENUM_VALUES_END(MapTilesetConstant)
+H2_ENUM_END(MapTilesetConstant)
 
 #pragma pack(push, 1)
 struct mapCellExtra {       // 7 bytes (packed)

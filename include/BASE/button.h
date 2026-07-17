@@ -9,17 +9,17 @@ class icon;
 struct tag_message;
 
 // m_selectMode is open-ended; retail proves only this distinguished value.
-HOMM2_ENUM_BEGIN(ButtonSelectMode)
+H2_ENUM_CLASS_BEGIN(ButtonSelectMode)
     BUTTON_SELECT_DIALOG_RESULT = 1
-HOMM2_ENUM_END(ButtonSelectMode)
+H2_ENUM_CLASS_END(ButtonSelectMode)
 
-HOMM2_ENUM_VALUES_BEGIN(ButtonHotkeyConstant)
+H2_ENUM_BEGIN(ButtonHotkeyConstant)
     BUTTON_NO_HOTKEY = -1
-HOMM2_ENUM_VALUES_END(ButtonHotkeyConstant)
+H2_ENUM_END(ButtonHotkeyConstant)
 
-HOMM2_ENUM_VALUES_BEGIN(ButtonConstant)
+H2_ENUM_BEGIN(ButtonConstant)
     BUTTON_REPEAT_DELAY_TICKS = 60
-HOMM2_ENUM_VALUES_END(ButtonConstant)
+H2_ENUM_END(ButtonConstant)
 
 #pragma pack(push, 1) // recovered layout is byte-packed
 class button : public widget {

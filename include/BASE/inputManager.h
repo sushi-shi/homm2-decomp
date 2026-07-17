@@ -8,15 +8,15 @@
 // forward declarations:
 struct tag_message;
 
-HOMM2_ENUM_BEGIN(InputManagerKeyCodeType)
+H2_ENUM_CLASS_BEGIN(InputManagerKeyCodeType)
     INPUT_KEY_CODE_ASCII = 0,
     INPUT_KEY_CODE_SCAN = 1
-HOMM2_ENUM_END(InputManagerKeyCodeType)
+H2_ENUM_CLASS_END(InputManagerKeyCodeType)
 
 // IBM PC set-1 scan codes carried in bits 16..23 of the Win32 key-message data.
 // MakeScanCodeTable proves the complete 0x00..0x58 domain used by the retail input
 // manager, including the extended key values returned as scan-code << 8.
-HOMM2_ENUM_VALUES_BEGIN(InputManagerScanCode)
+H2_ENUM_BEGIN(InputManagerScanCode)
     INPUT_SCAN_NONE = 0x00,
     INPUT_SCAN_ESCAPE = 0x01,
     INPUT_SCAN_1 = 0x02,
@@ -106,37 +106,37 @@ HOMM2_ENUM_VALUES_BEGIN(InputManagerScanCode)
     INPUT_SCAN_ISO_BACKSLASH = 0x56,
     INPUT_SCAN_F11 = 0x57,
     INPUT_SCAN_F12 = 0x58
-HOMM2_ENUM_VALUES_END(InputManagerScanCode)
+H2_ENUM_END(InputManagerScanCode)
 
-HOMM2_ENUM_BEGIN(InputManagerExtendedKey)
+H2_ENUM_CLASS_BEGIN(InputManagerExtendedKey)
     INPUT_EXTENDED_KEY_BASE = 0x100 // extended keys arrive as scan code << 8
-HOMM2_ENUM_END(InputManagerExtendedKey)
+H2_ENUM_CLASS_END(InputManagerExtendedKey)
 
-HOMM2_ENUM_BEGIN(InputManagerCapacity)
+H2_ENUM_CLASS_BEGIN(InputManagerCapacity)
     INPUT_EVENT_RING_CAPACITY = 64,
     INPUT_SCAN_CODE_CAPACITY = 128
-HOMM2_ENUM_END(InputManagerCapacity)
+H2_ENUM_CLASS_END(InputManagerCapacity)
 
-HOMM2_ENUM_BEGIN(InputManagerScanCodeEncoding)
+H2_ENUM_CLASS_BEGIN(InputManagerScanCodeEncoding)
     INPUT_SCAN_CODE_MASK = 0xFF
-HOMM2_ENUM_END(InputManagerScanCodeEncoding)
+H2_ENUM_CLASS_END(InputManagerScanCodeEncoding)
 
-HOMM2_ENUM_BEGIN(InputManagerCursorBounds)
+H2_ENUM_CLASS_BEGIN(InputManagerCursorBounds)
     INPUT_CURSOR_INTERIOR_MIN_EXCLUSIVE = 3,
     INPUT_CURSOR_INTERIOR_MAX_X_EXCLUSIVE = 636,
     INPUT_CURSOR_INTERIOR_MAX_Y_EXCLUSIVE = 476
-HOMM2_ENUM_END(InputManagerCursorBounds)
+H2_ENUM_CLASS_END(InputManagerCursorBounds)
 
-HOMM2_ENUM_BEGIN(InputManagerTiming)
+H2_ENUM_CLASS_BEGIN(InputManagerTiming)
     INPUT_CURSOR_CHECK_DELAY = 500
-HOMM2_ENUM_END(InputManagerTiming)
+H2_ENUM_CLASS_END(InputManagerTiming)
 
-HOMM2_ENUM_BEGIN(InputManagerModifierClearMask)
+H2_ENUM_CLASS_BEGIN(InputManagerModifierClearMask)
     INPUT_CLEAR_CONTROL_MASK = 0xfffb,
     INPUT_CLEAR_LEFT_SHIFT_MASK = 0xfffd,
     INPUT_CLEAR_RIGHT_SHIFT_MASK = 0xfffe,
     INPUT_CLEAR_ALT_MASK = 0xffdf
-HOMM2_ENUM_END(InputManagerModifierClearMask)
+H2_ENUM_CLASS_END(InputManagerModifierClearMask)
 
 #pragma pack(push, 1) // recovered layout is byte-packed
 class inputManager : public baseManager {

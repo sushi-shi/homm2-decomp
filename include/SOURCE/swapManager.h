@@ -10,29 +10,29 @@ class heroWindow;
 class icon;
 struct tag_message;
 
-HOMM2_ENUM_VALUES_BEGIN(SwapManagerSide)
+H2_ENUM_BEGIN(SwapManagerSide)
     SWAP_SIDE_NONE = -1,
     SWAP_SIDE_LEFT = 0,
     SWAP_SIDE_RIGHT = 1,
     SWAP_SIDE_COUNT = 2
-HOMM2_ENUM_VALUES_END(SwapManagerSide)
+H2_ENUM_END(SwapManagerSide)
 
-HOMM2_ENUM_BEGIN(SwapManagerItemType)
+H2_ENUM_CLASS_BEGIN(SwapManagerItemType)
     SWAP_ITEM_NONE = -1,
     SWAP_ITEM_ARMY = 0,
     SWAP_ITEM_ARTIFACT = 1
-HOMM2_ENUM_END(SwapManagerItemType)
+H2_ENUM_CLASS_END(SwapManagerItemType)
 
-HOMM2_ENUM_BEGIN(SwapManagerMessage)
+H2_ENUM_CLASS_BEGIN(SwapManagerMessage)
     SWAP_COMMAND_HOVER = 0xc,
     SWAP_COMMAND_SELECT = 0xd,
     SWAP_COMMAND_HELP = 0xe,
     SWAP_COMMAND_EXIT = 4,
     SWAP_CONTROL_CLOSE = 0x7800,
     SWAP_SPLIT_MODIFIER_MASK = 3
-HOMM2_ENUM_END(SwapManagerMessage)
+H2_ENUM_CLASS_END(SwapManagerMessage)
 
-HOMM2_ENUM_VALUES_BEGIN(SwapManagerControl)
+H2_ENUM_BEGIN(SwapManagerControl)
     SWAP_CONTROL_LEFT_HERO = 0x41,
     SWAP_CONTROL_RIGHT_HERO = 0x42,
     SWAP_CONTROL_LEFT_ARMY_FIRST = 0x4e,
@@ -51,9 +51,9 @@ HOMM2_ENUM_VALUES_BEGIN(SwapManagerControl)
     SWAP_CONTROL_LEFT_SKILL_LEVEL_LAST = 0xdf,
     SWAP_CONTROL_RIGHT_SKILL_LEVEL_FIRST = 0xe0,
     SWAP_CONTROL_RIGHT_SKILL_LEVEL_LAST = 0xe7
-HOMM2_ENUM_VALUES_END(SwapManagerControl)
+H2_ENUM_END(SwapManagerControl)
 
-HOMM2_ENUM_VALUES_BEGIN(SwapManagerConstant)
+H2_ENUM_BEGIN(SwapManagerConstant)
     SWAP_SECONDARY_SKILL_WIDGET_COUNT = 8,
     SWAP_WINDOW_TEXT_ID = 0x15,
     SWAP_LEFT_PORTRAIT_WIDGET = 0x41,
@@ -92,7 +92,7 @@ HOMM2_ENUM_VALUES_BEGIN(SwapManagerConstant)
     SWAP_SPLIT_TEXT_CONTROL = 1,
     SWAP_SPLIT_AMOUNT_CONTROL = 0x44,
     SWAP_SPLIT_CONFIRM = 0x7802
-HOMM2_ENUM_VALUES_END(SwapManagerConstant)
+H2_ENUM_END(SwapManagerConstant)
 
 #pragma pack(push, 1) // recovered layout is byte-packed
 class swapManager : public baseManager {

@@ -9,7 +9,7 @@
 #include <SOURCE/REMOTE_TYPES.h>
 // forward declarations (was <_all.h>):
 
-HOMM2_ENUM_VALUES_BEGIN(DirectPlayTransportConstant)
+H2_ENUM_BEGIN(DirectPlayTransportConstant)
     DP_TRANSPORT_BUFFER_COUNT = 200,
     DP_TRANSPORT_RECEIVE_SIZE = 0x100,
     DP_TRANSPORT_BROADCAST_POSITION = 0x7f,
@@ -24,31 +24,31 @@ HOMM2_ENUM_VALUES_BEGIN(DirectPlayTransportConstant)
     DP_TRANSPORT_ENUM_LONG_PHASE = 4,
     DP_TRANSPORT_RETRY_WAIT_COUNT = 30,
     DP_TRANSPORT_RETRY_DELAY = 100
-HOMM2_ENUM_VALUES_END(DirectPlayTransportConstant)
+H2_ENUM_END(DirectPlayTransportConstant)
 
-HOMM2_ENUM_BEGIN(DirectPlayProtocol)
+H2_ENUM_CLASS_BEGIN(DirectPlayProtocol)
     DP_PROTOCOL_IPX = 1,
     DP_PROTOCOL_TCP = 2
-HOMM2_ENUM_END(DirectPlayProtocol)
+H2_ENUM_CLASS_END(DirectPlayProtocol)
 
-HOMM2_ENUM_BEGIN(DirectPlaySessionOpenFlag)
+H2_ENUM_CLASS_BEGIN(DirectPlaySessionOpenFlag)
     DP_SESSION_OPEN_JOIN = 1,
     DP_SESSION_OPEN_CREATE = 2
-HOMM2_ENUM_END(DirectPlaySessionOpenFlag)
+H2_ENUM_CLASS_END(DirectPlaySessionOpenFlag)
 
-HOMM2_ENUM_BEGIN(DirectPlayWaitType)
+H2_ENUM_CLASS_BEGIN(DirectPlayWaitType)
     DP_WAIT_FIRST_GUEST = 8,
     DP_WAIT_EXTRA_GUESTS = 9,
     DP_WAIT_HOST = 10
-HOMM2_ENUM_END(DirectPlayWaitType)
+H2_ENUM_CLASS_END(DirectPlayWaitType)
 
-HOMM2_ENUM_BEGIN(DirectPlayResult)
+H2_ENUM_CLASS_BEGIN(DirectPlayResult)
     DP_RESULT_OK = 0,
     DP_RESULT_INVALID_ARGUMENT = static_cast<i32>(0x80070057),
     DP_RESULT_INVALID_PLAYER = static_cast<i32>(0x88770096),
     DP_RESULT_NO_MESSAGES = static_cast<i32>(0x887700be),
     DP_RESULT_NO_SESSIONS = static_cast<i32>(0x887700dc)
-HOMM2_ENUM_END(DirectPlayResult)
+H2_ENUM_CLASS_END(DirectPlayResult)
 
 #pragma pack(push, 1)
 struct DirectPlayStartupMessage {

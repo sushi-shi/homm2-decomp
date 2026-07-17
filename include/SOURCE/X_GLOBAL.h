@@ -10,16 +10,16 @@
 
 class ExpCampaign;
 
-HOMM2_ENUM_VALUES_BEGIN(SecondarySkillValueTableConstant)
+H2_ENUM_BEGIN(SecondarySkillValueTableConstant)
     SECONDARY_SKILL_VALUE_LEVEL_COUNT = IDX(HERO_SKILL_LEVEL_COUNT) - 1
-HOMM2_ENUM_VALUES_END(SecondarySkillValueTableConstant)
+H2_ENUM_END(SecondarySkillValueTableConstant)
 
-HOMM2_ENUM_VALUES_BEGIN(ElevationOverlayConstant)
+H2_ENUM_BEGIN(ElevationOverlayConstant)
     ELEVATION_OVERLAY_COUNT = 25,
     ELEVATION_OVERLAY_CELL_COUNT = 15
-HOMM2_ENUM_VALUES_END(ElevationOverlayConstant)
+H2_ENUM_END(ElevationOverlayConstant)
 
-HOMM2_ENUM_VALUES_BEGIN(TownEligibleBuildMaskConstant)
+H2_ENUM_BEGIN(TownEligibleBuildMaskConstant)
     TOWN_ELIGIBLE_BUILD_MASK_COUNT = 6,
     TOWN_ELIGIBLE_BUILD_KNIGHT_MASK = 0x3ff8bf9f,
     TOWN_ELIGIBLE_BUILD_BARBARIAN_MASK = 0x1bf8bf9f,
@@ -27,11 +27,11 @@ HOMM2_ENUM_VALUES_BEGIN(TownEligibleBuildMaskConstant)
     TOWN_ELIGIBLE_BUILD_WARLOCK_MASK = 0x69f8bf9f,
     TOWN_ELIGIBLE_BUILD_WIZARD_MASK = 0x35f8bf9f,
     TOWN_ELIGIBLE_BUILD_NECROMANCER_MASK = 0x1ff8bf9b
-HOMM2_ENUM_VALUES_END(TownEligibleBuildMaskConstant)
+H2_ENUM_END(TownEligibleBuildMaskConstant)
 
-HOMM2_ENUM_VALUES_BEGIN(CombatControlConstant)
+H2_ENUM_BEGIN(CombatControlConstant)
     COMBAT_CONTROL_SIDE_COUNT = 2
-HOMM2_ENUM_VALUES_END(CombatControlConstant)
+H2_ENUM_END(CombatControlConstant)
 
 #pragma pack(push, 1)
 struct SCmbtObstacle {
@@ -99,18 +99,18 @@ extern i32 xPasswordStringsIndex[X_GLOBAL_PASSWORD_STRING_INDEX_COUNT];
 extern i32 xShrineBuildingCost[X_GLOBAL_BUILDING_RESOURCE_COUNT];
 
 // ---- globals (declarations, RVA order) ----
-HOMM2_ENUM_VALUES_BEGIN(RadarColorTableCount)
+H2_ENUM_BEGIN(RadarColorTableCount)
     RADAR_MAP_COLOR_COUNT = 16,
     RADAR_OBJECT_COLOR_COUNT = 16,
     RADAR_OWNER_COLOR_COUNT = 8
-HOMM2_ENUM_VALUES_END(RadarColorTableCount)
+H2_ENUM_END(RadarColorTableCount)
 
-HOMM2_ENUM_VALUES_BEGIN(GroundTableConstant)
+H2_ENUM_BEGIN(GroundTableConstant)
     GROUND_TILE_IMAGE_COUNT = 432,
     GROUND_SHAPE_FLIPPED = 0x80
-HOMM2_ENUM_VALUES_END(GroundTableConstant)
+H2_ENUM_END(GroundTableConstant)
 
-HOMM2_ENUM_VALUES_BEGIN(KbControlTableConstant)
+H2_ENUM_BEGIN(KbControlTableConstant)
     MOVEMENT_FRAME_FLIP_COUNT = 16,
     CASTLE_RESOURCE_SLOT_COUNT = 8,
     CASTLE_AMOUNT_COUNT = 4,
@@ -122,13 +122,13 @@ HOMM2_ENUM_VALUES_BEGIN(KbControlTableConstant)
     MINE_CHARACTERISTIC_COUNT = 8,
     VESA_SET_MODE_FUNCTION = 0x4f02,
     VESA_MODE_640_480_256 = 0x0101
-HOMM2_ENUM_VALUES_END(KbControlTableConstant)
+H2_ENUM_END(KbControlTableConstant)
 
-HOMM2_ENUM_VALUES_BEGIN(KbPaletteTableConstant)
+H2_ENUM_BEGIN(KbPaletteTableConstant)
     PUZZLE_DRAW_TABLE_COUNT = 64
-HOMM2_ENUM_VALUES_END(KbPaletteTableConstant)
+H2_ENUM_END(KbPaletteTableConstant)
 
-HOMM2_ENUM_VALUES_BEGIN(KbGameTableConstant)
+H2_ENUM_BEGIN(KbGameTableConstant)
     KB_MAP_SIZE_COUNT = 4,
     KB_INTERFACE_TYPE_COUNT = 37,
     KB_INTERFACE_VARIANT_COUNT = 2,
@@ -241,15 +241,15 @@ HOMM2_ENUM_VALUES_BEGIN(KbGameTableConstant)
     KB_RECRUITMENT_SITE_NAME_COUNT = 6,
     KB_WIN_SETUP_COUNT = 73,
     KB_INIT_MENU_HOTSPOT_COUNT = 5
-HOMM2_ENUM_VALUES_END(KbGameTableConstant)
+H2_ENUM_END(KbGameTableConstant)
 
-HOMM2_ENUM_BEGIN(InitMenuHotSpotField)
+H2_ENUM_CLASS_BEGIN(InitMenuHotSpotField)
     INIT_MENU_HOTSPOT_X = 0,
     INIT_MENU_HOTSPOT_Y = 1,
     INIT_MENU_HOTSPOT_WIDTH = 2,
     INIT_MENU_HOTSPOT_HEIGHT = 3,
     INIT_MENU_HOTSPOT_FIELD_COUNT = 4
-HOMM2_ENUM_END(InitMenuHotSpotField)
+H2_ENUM_CLASS_END(InitMenuHotSpotField)
 
 extern u8 giGroundShape[GROUND_TILE_IMAGE_COUNT];
 extern u8 gColorTableTan[DIM_PALETTE_COLOR_COUNT];
@@ -263,7 +263,7 @@ extern u8 gMapColors[RADAR_MAP_COLOR_COUNT];
 extern u8 gObjectColors[RADAR_OBJECT_COLOR_COUNT];
 extern u8 gOwnerColors[RADAR_OWNER_COLOR_COUNT];
 // Indexes of gTilesetFiles: one id per adventure-object icn tileset.
-HOMM2_ENUM_BEGIN(TilesetId)
+H2_ENUM_CLASS_BEGIN(TilesetId)
     TILESET_OBJNHAUN = 10,
     TILESET_OBJNARTI = 11,
     TILESET_MONS32 = 12,
@@ -316,7 +316,7 @@ HOMM2_ENUM_BEGIN(TilesetId)
     TILESET_X_LOC1 = 61,
     TILESET_X_LOC2 = 62,
     TILESET_X_LOC3 = 63
-HOMM2_ENUM_END(TilesetId)
+H2_ENUM_CLASS_END(TilesetId)
 
 extern char* gTilesetFiles[64];
 extern u8 bPuzzleDraw[PUZZLE_DRAW_TABLE_COUNT];
@@ -367,7 +367,7 @@ extern float gfPhilAIDurationMod[KB_SPELL_MOD_COUNT];
 extern float gfSpellTypeNumMod[KB_QUICK_COMBAT_SPELL_TYPE_COUNT];
 extern b8 gbArrow[NORMAL_DIRECTION_COUNT][NORMAL_DIRECTION_COUNT];
 extern u8 giCloudType[KB_CLOUD_MASK_COUNT];
-HOMM2_ENUM_BEGIN(TownMusicTrack)
+H2_ENUM_CLASS_BEGIN(TownMusicTrack)
     TOWN_MUSIC_NONE = 0,
     TOWN_MUSIC_WARLOCK = 5,
     TOWN_MUSIC_WIZARD = 6,
@@ -376,7 +376,7 @@ HOMM2_ENUM_BEGIN(TownMusicTrack)
     TOWN_MUSIC_BARBARIAN = 9,
     TOWN_MUSIC_SORCERESS = 10,
     TOWN_MUSIC_TABLE_SIZE = 8
-HOMM2_ENUM_END(TownMusicTrack)
+H2_ENUM_CLASS_END(TownMusicTrack)
 
 extern i8 townTheme[IDX(TOWN_MUSIC_TABLE_SIZE)];
 extern i8 gHeroSkillBonus[IDX(FACTION_COUNT)][KB_HERO_LEVEL_BAND_COUNT][HERO_PRIMARY_STAT_COUNT];

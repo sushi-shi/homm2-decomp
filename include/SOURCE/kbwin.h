@@ -32,7 +32,7 @@ enum {
     KBWIN_HEIGHT_1024 = 1024
 };
 
-HOMM2_ENUM_BEGIN(KbWinMenuCommand)
+H2_ENUM_CLASS_BEGIN(KbWinMenuCommand)
     KBWIN_MENU_SIZE_640_480 = 0x9c45,
     KBWIN_MENU_SIZE_800_600 = 0x9c46,
     KBWIN_MENU_SIZE_1024_768 = 0x9c47,
@@ -40,7 +40,7 @@ HOMM2_ENUM_BEGIN(KbWinMenuCommand)
     KBWIN_MENU_FULLSCREEN = 0x9c49,
     KBWIN_MENU_HELP = 0x9c74,
     KBWIN_MENU_ABOUT = 0x9c75
-HOMM2_ENUM_END(KbWinMenuCommand)
+H2_ENUM_CLASS_END(KbWinMenuCommand)
 
 extern "C" i32 __stdcall WinMain(HINSTANCE, HINSTANCE, char*, i32);
 i32 AppInit(HINSTANCE, HINSTANCE, i32, char*);

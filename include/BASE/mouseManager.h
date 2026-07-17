@@ -60,7 +60,7 @@ public:
 };
 #pragma pack(pop)
 SIZE(mouseManager, 0x8a);
-HOMM2_ENUM_VALUES_BEGIN(MouseManagerConstant)
+H2_ENUM_BEGIN(MouseManagerConstant)
     MOUSE_CURSOR_COUNT = 96,
     MOUSE_SCREEN_WIDTH = 640,
     MOUSE_SCREEN_HEIGHT = 480,
@@ -85,12 +85,12 @@ HOMM2_ENUM_VALUES_BEGIN(MouseManagerConstant)
     MOUSE_RELOAD_CURSOR_FRAME = -99,
     MOUSE_KEEP_CURRENT_FRAME = 1000,
     MOUSE_AUTO_CURSOR_TYPE = -999
-HOMM2_ENUM_VALUES_END(MouseManagerConstant)
-HOMM2_ENUM_BEGIN(MouseCursorType)
+H2_ENUM_END(MouseManagerConstant)
+H2_ENUM_CLASS_BEGIN(MouseCursorType)
     MOUSE_CURSOR_ADVENTURE = 0,
     MOUSE_CURSOR_COMBAT = 1,
     MOUSE_CURSOR_SPELL = 2
-HOMM2_ENUM_END(MouseCursorType)
+H2_ENUM_CLASS_END(MouseCursorType)
 // ---- globals (declarations, RVA order) ----
 extern i32 iMouseOffset[4];
 extern i8 iMouseSize[MOUSE_CURSOR_COUNT][2];

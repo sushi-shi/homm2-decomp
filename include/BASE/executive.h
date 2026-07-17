@@ -6,20 +6,20 @@
 // forward declarations:
 class baseManager;
 
-HOMM2_ENUM_BEGIN(ExecutiveCommand)
+H2_ENUM_CLASS_BEGIN(ExecutiveCommand)
     EXECUTIVE_COMMAND_TERMINATE_LOOP = 1,
     EXECUTIVE_COMMAND_REMOVE_MANAGER = 2,
     EXECUTIVE_COMMAND_RETURN_RESULT = 4
-HOMM2_ENUM_END(ExecutiveCommand)
+H2_ENUM_CLASS_END(ExecutiveCommand)
 
-HOMM2_ENUM_VALUES_BEGIN(ExecutiveManagerConstant)
+H2_ENUM_BEGIN(ExecutiveManagerConstant)
     EXECUTIVE_MANAGER_DEFAULT_PRIORITY = -1,
     EXECUTIVE_MANAGER_SUCCESS = 0,
     EXECUTIVE_MANAGER_STOP_DISPATCH = 1,
     EXECUTIVE_MANAGER_HANDLE_EXECUTIVE_MESSAGE = 2,
     EXECUTIVE_MANAGER_ERROR = 3,
     EXECUTIVE_DIALOG_MANAGER_CAPACITY = 20
-HOMM2_ENUM_VALUES_END(ExecutiveManagerConstant)
+H2_ENUM_END(ExecutiveManagerConstant)
 
 #pragma pack(push, 1) // recovered layout is byte-packed
 class executive {

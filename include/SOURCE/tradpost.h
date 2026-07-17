@@ -7,7 +7,7 @@
 // forward declarations (was <_all.h>):
 struct tag_message;
 
-HOMM2_ENUM_VALUES_BEGIN(TradingPostConstant)
+H2_ENUM_BEGIN(TradingPostConstant)
     TRADING_POST_RESOURCE_COUNT = 7,
     TRADING_POST_WINDOW_X = 0x9f,
     TRADING_POST_WINDOW_Y = 0x17,
@@ -25,9 +25,9 @@ HOMM2_ENUM_VALUES_BEGIN(TradingPostConstant)
     TRADING_POST_RIGHT_ICON_FIRST = 0x5a,
     TRADING_POST_RIGHT_TEXT_FIRST = 0x64,
     TRADING_POST_RIGHT_SELECT_FIRST = 0x6e
-HOMM2_ENUM_VALUES_END(TradingPostConstant)
+H2_ENUM_END(TradingPostConstant)
 
-HOMM2_ENUM_BEGIN(TradingPostWidgetId)
+H2_ENUM_CLASS_BEGIN(TradingPostWidgetId)
     TRADING_POST_LEFT_OFFER_ICON = 0x14,
     TRADING_POST_RIGHT_OFFER_ICON = 0x15,
     TRADING_POST_LEFT_OFFER_TEXT = 0x17,
@@ -36,17 +36,17 @@ HOMM2_ENUM_BEGIN(TradingPostWidgetId)
     TRADING_POST_INCREMENT = 0x1a,
     TRADING_POST_TRACK = 0x1b,
     TRADING_POST_EXECUTE = 0x1d
-HOMM2_ENUM_END(TradingPostWidgetId)
+H2_ENUM_CLASS_END(TradingPostWidgetId)
 
-HOMM2_ENUM_BEGIN(TradingPostWidgetCommand)
+H2_ENUM_CLASS_BEGIN(TradingPostWidgetCommand)
     TRADING_POST_SET_TEXT = 3,
     TRADING_POST_SET_ICON = 4
-HOMM2_ENUM_END(TradingPostWidgetCommand)
+H2_ENUM_CLASS_END(TradingPostWidgetCommand)
 
-HOMM2_ENUM_BEGIN(TradingPostHandlerResult)
+H2_ENUM_CLASS_BEGIN(TradingPostHandlerResult)
     TRADING_POST_HANDLER_CONTINUE = 1,
     TRADING_POST_HANDLER_EXIT = 2
-HOMM2_ENUM_END(TradingPostHandlerResult)
+H2_ENUM_CLASS_END(TradingPostHandlerResult)
 
 void DoTradingPost(i32, float);
 void UpdateTradingPost(i32);

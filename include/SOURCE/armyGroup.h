@@ -7,14 +7,14 @@
 class hero;
 class town;
 
-HOMM2_ENUM_VALUES_BEGIN(ArmyGroupConstant)
+H2_ENUM_BEGIN(ArmyGroupConstant)
     ARMY_GROUP_EMPTY_SLOT = -1,
     ARMY_GROUP_SLOT_COUNT = 5,
     ARMY_GROUP_RACE_COUNT = 7,
     ARMY_GROUP_RANDOM_PERCENT_MAX = 100,
     ARMY_GROUP_MORALE_MIN = -3,
     ARMY_GROUP_MORALE_MAX = 3
-HOMM2_ENUM_VALUES_END(ArmyGroupConstant)
+H2_ENUM_END(ArmyGroupConstant)
 
 #pragma pack(push, 1) // recovered layout is byte-packed
 class armyGroup {

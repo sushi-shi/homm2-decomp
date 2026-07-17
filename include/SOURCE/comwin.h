@@ -25,7 +25,7 @@ struct tag_Anchor {
     struct tag_Node* tail;
 };
 
-HOMM2_ENUM_VALUES_BEGIN(ComConstant)
+H2_ENUM_BEGIN(ComConstant)
     COM_PORT_COUNT = 2,
     COM_PORT_NAME_SIZE = 12,
     COM_ERROR_NAME_SIZE = 100,
@@ -34,15 +34,15 @@ HOMM2_ENUM_VALUES_BEGIN(ComConstant)
     COM_TRANSMIT_BUFFER_SIZE = 0x1000,
     COM_BREAK_DELAY = 500,
     COM_NODE_HEADER_SIZE = 10
-HOMM2_ENUM_VALUES_END(ComConstant)
+H2_ENUM_END(ComConstant)
 
-HOMM2_ENUM_BEGIN(ComBaudRate)
+H2_ENUM_CLASS_BEGIN(ComBaudRate)
     COM_BAUD_2400 = 1,
     COM_BAUD_4800 = 2,
     COM_BAUD_9600 = 3,
     COM_BAUD_19200 = 4,
     COM_BAUD_38400 = 5
-HOMM2_ENUM_END(ComBaudRate)
+H2_ENUM_CLASS_END(ComBaudRate)
 
 struct ComPortState {
     HANDLE handle;              // +0x00

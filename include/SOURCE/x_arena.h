@@ -7,7 +7,7 @@
 // forward declarations (was <_all.h>):
 struct tag_message;
 
-HOMM2_ENUM_VALUES_BEGIN(ArenaConstant)
+H2_ENUM_BEGIN(ArenaConstant)
     ARENA_CHOICE_COUNT = 3,
     ARENA_WINDOW_RESOURCE = 5,
     ARENA_WINDOW_WIDTH = 306,
@@ -42,7 +42,7 @@ HOMM2_ENUM_VALUES_BEGIN(ArenaConstant)
     ARENA_BROADCAST_TEXT_ID = 1,
     ARENA_BROADCAST_CONTROL_VALUE = 6,
     ARENA_DRAW_MODE = 1
-HOMM2_ENUM_VALUES_END(ArenaConstant)
+H2_ENUM_END(ArenaConstant)
 
 i32 DoArenaDialog(void);
 i32 ArenaWindowHandler(struct tag_message&);

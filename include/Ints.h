@@ -39,27 +39,27 @@ typedef i8 b8;
 // The opt-in Clang audit sees scoped enums and rejects cross-domain data flow;
 // `using enum` keeps the production unqualified-constant spelling compiling.
 // The _T variants carry the storage type so field widths agree in both modes.
-// HOMM2_ENUM_FLAGS declares the audit-only bitmask operators for a flag domain.
-// HOMM2_ENUM_VALUES_* declare a named-number catalog (counts, sizes, geometry,
+// H2_ENUM_FLAGS declares the audit-only bitmask operators for a flag domain.
+// H2_ENUM_* declare a named-number catalog (counts, sizes, geometry,
 // thresholds): the audit keeps it an unscoped typed enum, so values still
 // convert to integers but cross-domain comparisons diagnose. True semantic
-// domains use HOMM2_ENUM_BEGIN and become scoped enums under the audit.
+// domains use H2_ENUM_CLASS_BEGIN and become scoped enums under the audit.
 #ifdef HOMM2_STRICT_ENUM_TYPES
-#define HOMM2_ENUM_VALUES_BEGIN(name) typedef enum name {
-#define HOMM2_ENUM_VALUES_END(name)                                                                \
+#define H2_ENUM_BEGIN(name) typedef enum name {
+#define H2_ENUM_END(name)                                                                \
     }                                                                                              \
     name;
-#define HOMM2_ENUM_BEGIN(name) enum class name : i32 {
-#define HOMM2_ENUM_END(name)                                                                       \
+#define H2_ENUM_CLASS_BEGIN(name) enum class name : i32 {
+#define H2_ENUM_CLASS_END(name)                                                                       \
     }                                                                                              \
     ;                                                                                              \
     using enum name;
-#define HOMM2_ENUM_BEGIN_T(name, storage) enum class name : storage {
-#define HOMM2_ENUM_END_T(name, storage)                                                            \
+#define H2_ENUM_CLASS_BEGIN_T(name, storage) enum class name : storage {
+#define H2_ENUM_CLASS_END_T(name, storage)                                                            \
     }                                                                                              \
     ;                                                                                              \
     using enum name;
-#define HOMM2_ENUM_FLAGS(name)                                                                     \
+#define H2_ENUM_FLAGS(name)                                                                     \
     inline constexpr name operator|(name a, name b) {                                                        \
         return static_cast<name>(static_cast<i64>(a) | static_cast<i64>(b));                       \
     }                                                                                              \
@@ -82,22 +82,22 @@ typedef i8 b8;
         return a = a ^ b;                                                                          \
     }
 #else
-#define HOMM2_ENUM_VALUES_BEGIN(name) enum {
-#define HOMM2_ENUM_VALUES_END(name)                                                                \
+#define H2_ENUM_BEGIN(name) enum {
+#define H2_ENUM_END(name)                                                                \
     }                                                                                              \
     ;                                                                                              \
     typedef i32 name;
-#define HOMM2_ENUM_BEGIN(name) enum {
-#define HOMM2_ENUM_END(name)                                                                       \
+#define H2_ENUM_CLASS_BEGIN(name) enum {
+#define H2_ENUM_CLASS_END(name)                                                                       \
     }                                                                                              \
     ;                                                                                              \
     typedef i32 name;
-#define HOMM2_ENUM_BEGIN_T(name, storage) enum {
-#define HOMM2_ENUM_END_T(name, storage)                                                            \
+#define H2_ENUM_CLASS_BEGIN_T(name, storage) enum {
+#define H2_ENUM_CLASS_END_T(name, storage)                                                            \
     }                                                                                              \
     ;                                                                                              \
     typedef storage name;
-#define HOMM2_ENUM_FLAGS(name)
+#define H2_ENUM_FLAGS(name)
 #endif
 
 // Table lookup by semantic domain: IDX spells the value-as-index conversion at
@@ -109,7 +109,7 @@ typedef i8 b8;
 #endif
 
 // Flag-domain membership test usable in integer/boolean context. The flags
-// argument and bit share one HOMM2_ENUM_FLAGS domain; production expands to
+// argument and bit share one H2_ENUM_FLAGS domain; production expands to
 // the plain bitwise AND.
 #ifdef HOMM2_STRICT_ENUM_TYPES
 #define HAS(flags, bit) IDX((flags) & (bit))

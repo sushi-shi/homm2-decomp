@@ -9,7 +9,7 @@ class border;
 class heroWindow;
 class icon;
 
-HOMM2_ENUM_VALUES_BEGIN(StripConstant)
+H2_ENUM_BEGIN(StripConstant)
     STRIP_ARMY_SLOT_COUNT = 5,
     STRIP_BORDER_COUNT = 6,
     STRIP_WINDOW_WIDTH = 0x228,
@@ -32,7 +32,7 @@ HOMM2_ENUM_VALUES_BEGIN(StripConstant)
     STRIP_QUANTITY_HEIGHT = 0xd,
     STRIP_QUANTITY_COLOR = 1,
     STRIP_QUANTITY_BACKGROUND = 2
-HOMM2_ENUM_VALUES_END(StripConstant)
+H2_ENUM_END(StripConstant)
 
 #pragma pack(push, 1) // recovered layout is byte-packed
 class strip {
