@@ -5107,7 +5107,7 @@ void UpdateNormalDialog(char* text) {
     evt.payload.widget.id = 1;
     evt.payload.widget.data.text = text;
     pNormalDialogWindow->BroadcastMessage(evt);
-    pNormalDialogWindow->DrawWindow(0, 0, NORMAL_DIALOG_DRAW_ID_LIMIT);
+    pNormalDialogWindow->DrawWindow(0, 0, IDX(NORMAL_DIALOG_DRAW_ID_LIMIT));
     pNormalDialogWindow->DrawWindow(1, -65535, -256);
 }
 
@@ -6262,7 +6262,7 @@ DATA(0x004fbd60) char* cMonFilename[IDX(CREATURE_COUNT)] = {
     "genie.icn",    "medusa.icn",   "eelem.icn",    "aelem.icn",    "felem.icn",    "welem.icn"
 };
 DATA(0x004fbe68) b32 gbProcessingCombatAction = false;
-DATA(0x004fbe6c) i32 iMPNetProtocol = 0;
+DATA(0x004fbe6c) RemoteNetworkProtocol iMPNetProtocol = RemoteNetworkProtocol(0);
 DATA(0x004fbe70) i32 iLastDiffSendTo = -2;
 DATA(0x004fbe78) SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)] = {
     {"fireball",
@@ -6865,7 +6865,7 @@ DATA(0x004fcbe0) i32 gNeutralBuildingCosts[KB_BUILDING_NEUTRAL_LIMIT][KB_BUILDIN
      {0, 0, 0, 0, 0, 0, 500}};
 DATA(0x004fcda0) i32
     gMageBaseResourceValues[KB_MAGE_GUILD_LEVEL_COUNT] = {0, 4000, 6500, 8500, 10500, 15000};
-DATA(0x004fcdb8) i32 gNeutralBaseResourceValues[BUILDING_SLOT_DWELLING_FIRST + 1] = {
+DATA(0x004fcdb8) i32 gNeutralBaseResourceValues[IDX(BUILDING_SLOT_DWELLING_FIRST) + 1] = {
     5000, 300, 350, 2000, 3000, 0, 12000, 2500, 1500, 1500, 200, 1000, 500, 0, 0, 1100, 0, 0, 0, 0
 };
 DATA(0x004fce08) i32
