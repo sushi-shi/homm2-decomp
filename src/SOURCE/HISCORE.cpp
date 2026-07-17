@@ -46,7 +46,7 @@ i32 highScoreManager::Open(i32 id) {
     gpWindowManager->AddWindow(m_window, -1, 1);
     m_messageMask = MESSAGE_EXECUTIVE;
     m_priority = id;
-    m_active = 1;
+    m_active = true;
     strcpy(m_name, "highScoreManager");
     KBChangeMenu(hmnuDflt);
     gpWindowManager->FadeScreen(0, HIGH_SCORE_FADE_STEPS, 0);
@@ -59,7 +59,7 @@ void highScoreManager::Close(void) {
     gpWindowManager->FadeScreen(1, HIGH_SCORE_FADE_STEPS, 0);
     gpWindowManager->RemoveWindow(m_window);
     delete m_window;
-    m_active = 0;
+    m_active = false;
 }
 
 VA(0x00489c40, 0x22a)

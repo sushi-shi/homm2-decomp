@@ -34,7 +34,7 @@
 
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\SPELLS.CPP"
 VA(0x004204c0, 0x86)
-i32 combatManager::HasValidSpellTarget(i32 spell) {
+i32 combatManager::HasValidSpellTarget(SpellType spell) {
     i32 hex;
 
     for (hex = 0; hex < COMBAT_HEX_COUNT; ++hex) {
@@ -65,7 +65,7 @@ i32 combatManager::HasValidSpellTarget(i32 spell) {
 // material TU-state change.
 VA(0x00420546, 0x44a)
 SpellType combatManager::ViewSpells(i32) {
-    i32 elementalType;
+    CreatureType elementalType;
 
     m_selectedSpell = gpGame->ViewSpells(m_heroes[giCurGeneral], 0, CombatSpecialHandler, 0);
     if (m_selectedSpell != SPELL_NONE) {
@@ -591,7 +591,7 @@ void combatManager::CastSpell(
     i32 spellPower_i;
     army* target_i;
     i32 targetIndex_k;
-    i32 soundSpell_q;
+    SpellType soundSpell_q;
     i32 armyIndex;
     char sampleName_i[16];
     SAMPLE2 spellSample;
@@ -736,8 +736,8 @@ void combatManager::CastSpell(
         soundSpell_q = SPELL_PARALYZE;
     if (spell == CREATURE_SPELL_DISPEL)
         soundSpell_q = SPELL_DISPEL;
-    if (strlen(gsSpellInfo[soundSpell_q].soundName) != 0)
-        sprintf(sampleName_i, "%s.82M", gsSpellInfo[soundSpell_q].soundName);
+    if (strlen(gsSpellInfo[IDX(soundSpell_q)].soundName) != 0)
+        sprintf(sampleName_i, "%s.82M", gsSpellInfo[IDX(soundSpell_q)].soundName);
 
     if (castByCreature == 0 && target_i != 0 && !target_i->SpellCastWorks(spell)) {
         ShowSpellCastFailure(target_i, spell);
@@ -2785,7 +2785,7 @@ void combatManager::CastMassSpell(i32 spell, i32 spellPower) {
     i32 damage_c;
     i32 armyIndex_k;
     i32 anyAffected_i;
-    i32 influence_e;
+    CombatSpellInfluence influence_e;
     switch (spell) {
         case SPELL_MASS_SLOW:
         case SPELL_MASS_CURSE:

@@ -317,7 +317,7 @@ void advManager::DrawCursorShadow(void) {
     i32 boatShadowOffset;
     i32 drawFrame_f;
     i32 boatFrame_i;
-    i32 shadowFrame;
+    CursorHeroShadowFrame shadowFrame;
     i32 drawY;
 
     if (bShowIt == 0 || bSpecialHideCursor)
@@ -1207,7 +1207,7 @@ void advManager::ProcessMapChange(SMapChange change) {
     }
 
     switch (change.type) {
-        case MAP_CHANGE_MOVE_HERO:
+        case IDX(MAP_CHANGE_MOVE_HERO):
             LogInt(
                 "MC Move Hero",
                 change.id,
@@ -1254,7 +1254,7 @@ void advManager::ProcessMapChange(SMapChange change) {
             }
             break;
 
-        case MAP_CHANGE_MY_TURN:
+        case IDX(MAP_CHANGE_MY_TURN):
             LogInt(
                 "MC My Turn",
                 change.x,
@@ -1267,7 +1267,7 @@ void advManager::ProcessMapChange(SMapChange change) {
             );
             break;
 
-        case MAP_CHANGE_TELEPORT_HERO:
+        case IDX(MAP_CHANGE_TELEPORT_HERO):
             LogInt(
                 "MC Teleport Hero",
                 change.x,
@@ -1282,7 +1282,7 @@ void advManager::ProcessMapChange(SMapChange change) {
             TeleportTo(mapHero_n, change.x, change.y, 0, 1);
             break;
 
-        case MAP_CHANGE_CLAIM_MINE:
+        case IDX(MAP_CHANGE_CLAIM_MINE):
             LogInt(
                 "MC ClaimMine",
                 CURSOR_LOG_UNUSED,
@@ -1298,7 +1298,7 @@ void advManager::ProcessMapChange(SMapChange change) {
             UpdateScreen(0, 0);
             break;
 
-        case MAP_CHANGE_CLAIM_TOWN:
+        case IDX(MAP_CHANGE_CLAIM_TOWN):
             LogInt(
                 "MC ClaimTown",
                 CURSOR_LOG_UNUSED,
@@ -1314,7 +1314,7 @@ void advManager::ProcessMapChange(SMapChange change) {
             UpdateScreen(0, 0);
             break;
 
-        case MAP_CHANGE_BUILD_BOAT:
+        case IDX(MAP_CHANGE_BUILD_BOAT):
             LogInt(
                 "MC BuildBoat",
                 CURSOR_LOG_UNUSED,
@@ -1330,7 +1330,7 @@ void advManager::ProcessMapChange(SMapChange change) {
             UpdateScreen(0, 0);
             break;
 
-        case MAP_CHANGE_ERASE_OBJECT:
+        case IDX(MAP_CHANGE_ERASE_OBJECT):
             LogInt(
                 "MC Erase Object",
                 change.x,
@@ -1347,7 +1347,7 @@ void advManager::ProcessMapChange(SMapChange change) {
             UpdateScreen(0, 0);
             break;
 
-        case MAP_CHANGE_DEAD_HERO:
+        case IDX(MAP_CHANGE_DEAD_HERO):
             LogStr("MC DeadHero");
             mapHero_n = gpGame->GetHero(change.id);
             if (change.x != mapHero_n->m_x || change.y != mapHero_n->m_y)
@@ -1357,7 +1357,7 @@ void advManager::ProcessMapChange(SMapChange change) {
             UpdateScreen(0, 0);
             break;
 
-        case MAP_CHANGE_RECRUIT_HERO:
+        case IDX(MAP_CHANGE_RECRUIT_HERO):
             LogStr("MC RecruitHero");
             mapHero_n = gpGame->GetHero(change.id);
             mapHero_n->m_x = change.x;
@@ -1378,7 +1378,7 @@ void advManager::ProcessMapChange(SMapChange change) {
             UpdateScreen(0, 0);
             break;
 
-        case MAP_CHANGE_DEAD_PLAYER:
+        case IDX(MAP_CHANGE_DEAD_PLAYER):
             LogStr("Dead Player");
             sprintf(gText, "%s has been vanquished!", cPlayerNames[change.id]);
             NormalDialog(
@@ -1395,7 +1395,7 @@ void advManager::ProcessMapChange(SMapChange change) {
             );
             break;
 
-        case MAP_CHANGE_UNUSED:
+        case IDX(MAP_CHANGE_UNUSED):
         default:
             break;
     }

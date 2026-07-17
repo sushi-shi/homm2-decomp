@@ -88,12 +88,12 @@ void RemoteCleanup(void) {
                 gbInRemoteCleanup = 1;
                 LogStr("RC3");
                 switch (GameMode) {
-                    case REMOTE_GAME_NETWORK_HOST:
-                    case REMOTE_GAME_NETWORK_GUEST:
+                    case IDX(REMOTE_GAME_NETWORK_HOST):
+                    case IDX(REMOTE_GAME_NETWORK_GUEST):
                         UnloadRemoteDriver(1);
                         break;
-                    case REMOTE_GAME_MODEM_HOST:
-                    case REMOTE_GAME_MODEM_GUEST:
+                    case IDX(REMOTE_GAME_MODEM_HOST):
+                    case IDX(REMOTE_GAME_MODEM_GUEST):
                         UnloadRemoteDriver(0);
                         break;
                 }
@@ -257,7 +257,7 @@ void RemoteMain(i32 gameMode) {
                 if (incomingData != 0
                     && REMOTE_MESSAGE(incomingData)->type == REMOTE_MESSAGE_RELIABLE) {
                     switch (REMOTE_MESSAGE(incomingData)->command) {
-                        case REMOTE_SETUP_PLAYER_INFO:
+                        case IDX(REMOTE_SETUP_PLAYER_INFO):
                             netPlayer = REMOTE_MESSAGE(incomingData)->sender;
                             gsNetPlayerInfo[netPlayer] =
                                 *REMOTE_PLAYER_INFO(REMOTE_MESSAGE(incomingData));
@@ -449,8 +449,8 @@ i32 SendRemoteData(u8* dataToSend, u8*, i32 destination, i32 length) {
         length
     );
     switch (GameMode) {
-        case REMOTE_GAME_NETWORK_HOST:
-        case REMOTE_GAME_NETWORK_GUEST:
+        case IDX(REMOTE_GAME_NETWORK_HOST):
+        case IDX(REMOTE_GAME_NETWORK_GUEST):
             if (bUseDirectPlay != 0) {
                 sendStatus = dpnet_snd(destination, size, PacketSend);
             } else if (bUseWinsock != 0) {
@@ -474,8 +474,8 @@ i32 SendRemoteData(u8* dataToSend, u8*, i32 destination, i32 length) {
                 }
             }
             break;
-        case REMOTE_GAME_MODEM_HOST:
-        case REMOTE_GAME_MODEM_GUEST:
+        case IDX(REMOTE_GAME_MODEM_HOST):
+        case IDX(REMOTE_GAME_MODEM_GUEST):
             WriteModemPacket(PacketSend, size);
             out = 1;
             break;
@@ -497,8 +497,8 @@ i32 ReceiveRemoteData(u8*, u8* data, i32 decodeType) {
 
     result = 1;
     switch (GameMode) {
-        case REMOTE_GAME_NETWORK_HOST:
-        case REMOTE_GAME_NETWORK_GUEST:
+        case IDX(REMOTE_GAME_NETWORK_HOST):
+        case IDX(REMOTE_GAME_NETWORK_GUEST):
             if (bUseDirectPlay != 0) {
                 receiveResult = dpnet_rcv(0, REMOTE_RECEIVE_BUFFER_SIZE, packet);
                 if (receiveResult == 0)
@@ -516,8 +516,8 @@ i32 ReceiveRemoteData(u8*, u8* data, i32 decodeType) {
                 result = DecodePacket(data, decodeType);
             }
             break;
-        case REMOTE_GAME_MODEM_HOST:
-        case REMOTE_GAME_MODEM_GUEST:
+        case IDX(REMOTE_GAME_MODEM_HOST):
+        case IDX(REMOTE_GAME_MODEM_GUEST):
             receiveResult = ReadPacket();
             if (receiveResult == 0)
                 return 0;
@@ -562,9 +562,9 @@ i32 TransmitRemoteData(
         outgoing.type = messageType;
     } else {
         if (reliable != 0)
-            outgoing.type = REMOTE_MESSAGE_RELIABLE;
+            outgoing.type = IDX(REMOTE_MESSAGE_RELIABLE);
         else
-            outgoing.type = REMOTE_MESSAGE_UNRELIABLE;
+            outgoing.type = IDX(REMOTE_MESSAGE_UNRELIABLE);
     }
     outgoing.payloadSize = static_cast<u16>(length);
     outgoing.command = command;
@@ -672,7 +672,7 @@ void PollRemote(void) {
             queueFull = 0;
             if (KBTickCount() - lLastHeartbeatSend > REMOTE_HEARTBEAT_INTERVAL) {
                 REMOTE_MESSAGE(sndBuf)->sender = static_cast<i8>(giThisNetPos);
-                REMOTE_MESSAGE(sndBuf)->type = REMOTE_MESSAGE_HEARTBEAT;
+                REMOTE_MESSAGE(sndBuf)->type = IDX(REMOTE_MESSAGE_HEARTBEAT);
                 REMOTE_MESSAGE(sndBuf)->payloadSize = 0;
                 if (gbThisNetGotAdventureControl != 0) {
                     REMOTE_MESSAGE(sndBuf)->command = static_cast<i8>(
@@ -803,7 +803,7 @@ void PollRemote(void) {
                 if (REMOTE_MESSAGE(rcvBufIn)->type == REMOTE_MESSAGE_RELIABLE) {
                     REMOTE_MESSAGE(sndBuf)->sender = static_cast<i8>(giThisNetPos);
                     REMOTE_MESSAGE(sndBuf)->id = REMOTE_MESSAGE(rcvBufIn)->id;
-                    REMOTE_MESSAGE(sndBuf)->type = REMOTE_MESSAGE_CONFIRM;
+                    REMOTE_MESSAGE(sndBuf)->type = IDX(REMOTE_MESSAGE_CONFIRM);
                     REMOTE_MESSAGE(sndBuf)->payloadSize = 0;
                     SendRemoteData(
                         reinterpret_cast<u8*>(sndBuf),

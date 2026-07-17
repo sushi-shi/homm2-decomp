@@ -36,6 +36,7 @@ class town;
 class townManager;
 #include <SOURCE/KB_TYPES.h>
 #include <BASE/message.h>
+#include <BASE/WINMGR.h>
 
 HOMM2_ENUM_VALUES_BEGIN(GlobalTimerConstant)
     GLOBAL_TIMER_COUNT = 10,
@@ -64,7 +65,7 @@ HOMM2_ENUM_BEGIN(MonsterScoreField)
     MONSTER_SCORE_FIELD_COUNT = 2
 HOMM2_ENUM_END(MonsterScoreField)
 
-HOMM2_ENUM_BEGIN(CampaignChoiceType)
+HOMM2_ENUM_VALUES_BEGIN(CampaignChoiceType)
     CAMPAIGN_CHOICE_RESOURCE = 0,
     CAMPAIGN_CHOICE_ARTIFACT = 1,
     CAMPAIGN_CHOICE_SPELL = 2,
@@ -77,7 +78,7 @@ HOMM2_ENUM_BEGIN(CampaignChoiceType)
     CAMPAIGN_CHOICE_PRIMARY_SKILL = 9,
     CAMPAIGN_CHOICE_SPELL_SCROLL = 10,
     CAMPAIGN_CHOICE_INVALID = 255
-HOMM2_ENUM_END(CampaignChoiceType)
+HOMM2_ENUM_VALUES_END(CampaignChoiceType)
 
 HOMM2_ENUM_VALUES_BEGIN(CampaignConstant)
     CAMPAIGN_MAP_COUNT = 12,
@@ -106,16 +107,16 @@ HOMM2_ENUM_VALUES_BEGIN(CampaignConstant)
     CAMPAIGN_ROLAND_TIME_LIMIT = 90
 HOMM2_ENUM_VALUES_END(CampaignConstant)
 
-HOMM2_ENUM_BEGIN(CampaignChoiceValue)
+HOMM2_ENUM_VALUES_BEGIN(CampaignChoiceValue)
     CAMPAIGN_CHOICE_VALUE_NONE = -1
-HOMM2_ENUM_END(CampaignChoiceValue)
+HOMM2_ENUM_VALUES_END(CampaignChoiceValue)
 
-HOMM2_ENUM_BEGIN(CampaignChoiceAmount)
+HOMM2_ENUM_VALUES_BEGIN(CampaignChoiceAmount)
     CAMPAIGN_CHOICE_NO_AMOUNT = -1,
     CAMPAIGN_CHOICE_BASIC_SKILL = 1,
     CAMPAIGN_CHOICE_RESOURCE_BONUS = 20,
     CAMPAIGN_CHOICE_GOLD_BONUS = 2000
-HOMM2_ENUM_END(CampaignChoiceAmount)
+HOMM2_ENUM_VALUES_END(CampaignChoiceAmount)
 
 #pragma pack(push, 1)
 struct SCampaignChoice {
@@ -217,7 +218,7 @@ HOMM2_ENUM_BEGIN(KbMonsterResourceType)
     KB_MONSTER_NEEDS_GEMS_EXPANSION = 60
 HOMM2_ENUM_END(KbMonsterResourceType)
 
-HOMM2_ENUM_BEGIN(NormalDialogResourceType)
+HOMM2_ENUM_VALUES_BEGIN(NormalDialogResourceType)
     NORMAL_DIALOG_NO_RESOURCE = -1,
     NORMAL_DIALOG_RESOURCE_FIRST = 0,
     NORMAL_DIALOG_RESOURCE_LAST = 6,
@@ -230,7 +231,7 @@ HOMM2_ENUM_BEGIN(NormalDialogResourceType)
     NORMAL_DIALOG_SECONDARY_SKILL = 17,
     NORMAL_DIALOG_MONSTER = 18,
     NORMAL_DIALOG_PRIMARY_SKILL = 25
-HOMM2_ENUM_END(NormalDialogResourceType)
+HOMM2_ENUM_VALUES_END(NormalDialogResourceType)
 
 HOMM2_ENUM_VALUES_BEGIN(NormalDialogConstant)
     NORMAL_DIALOG_INFO = 1,
@@ -848,7 +849,7 @@ extern i32 giBottomViewOverride;
 extern i32 giBottomViewOverrideEndTime;
 extern i32 giBottomViewResource;
 extern i32 giBottomViewResourceQty;
-extern i32 giCycleType;
+extern WindowColorCycleMode giCycleType;
 extern i32 giDebugLevel;
 extern i32 giDialogTimeout;
 extern u8 giGroundToTerrain[];

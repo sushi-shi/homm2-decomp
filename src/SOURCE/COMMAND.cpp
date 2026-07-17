@@ -496,8 +496,8 @@ void combatManager::CheckSetMouseDirection(i32 mouseX, i32 mouseY, i32 targetHex
 }
 
 VA(0x0042ba9b, 0x8b)
-i32 combatManager::GetPointer(i32 command, i32 hexIndex) {
-    i32 result;
+i32 combatManager::GetPointer(CombatMessageCommand command, i32 hexIndex) {
+    CombatMainResult result;
     if (command == COMBAT_MESSAGE_COMMAND_OPPOSING_OPTIONS) {
         return COMBAT_POINTER_VIEW;
     } else {
@@ -900,7 +900,7 @@ VA(0x0042c8ff, 0x51a)
 i32 combatManager::GetCommand(i32 hexIndex) {
     i32 column = hexIndex % COMBAT_GRID_ROW_LENGTH;
     i32 row = hexIndex / COMBAT_GRID_ROW_LENGTH;
-    i32 command = COMBAT_MESSAGE_COMMAND_DEFAULT;
+    CombatMessageCommand command = COMBAT_MESSAGE_COMMAND_DEFAULT;
     i32 showSmallView = 0;
 
     if (hexIndex == COMBAT_INVALID_HEX) {
@@ -2340,7 +2340,7 @@ i32 combatManager::ProcessNextAction(struct tag_message& message) {
     army* currentArmy;
     i32 advanceArmy;
     i32 redraw;
-    i32 result;
+    CombatMainResult result;
 
     ClearCombatMessages(0);
     result = COMBAT_MAIN_CONTINUE;

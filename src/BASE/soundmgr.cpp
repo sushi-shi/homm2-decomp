@@ -305,7 +305,7 @@ void soundManager::CDPoll(void) {
 }
 
 VA(0x004cc1c0, 0xdd)
-i32 soundManager::ConvertVolume(i32 volume, i32 soundType) {
+i32 soundManager::ConvertVolume(i32 volume, SoundVolumeConversionMode soundType) {
     i32 local_8 = 0;
     if (soundType == SOUND_VOLUME_MUSIC) {
         if (gConfig.musicVolume >= 1 && gConfig.musicVolume <= SOUND_VOLUME_STEPS) {
@@ -344,7 +344,7 @@ void __stdcall UpdateTimers(u32l) {
 VA(0x004cc330, 0xd7)
 soundManager::soundManager(void) : baseManager(), field_0x574(1) {
     i32 local_8;
-    m_active = 0;
+    m_active = false;
     m_fadeSteps = 0;
     field_0x56c = 0;
     for (local_8 = 0; local_8 < 32; local_8++)
@@ -509,7 +509,7 @@ i32 soundManager::Open(i32) {
 managerReady:
     m_messageMask = MESSAGE_LEFT_BUTTON_UP;
     m_priority = -1;
-    m_active = 1;
+    m_active = true;
     strcpy(m_name, "soundManager");
     return 0;
 }
@@ -543,7 +543,7 @@ void soundManager::Close(void) {
     AIL_shutdown();
     LogStr("SD4");
 soundClosed:
-    m_active = 0;
+    m_active = false;
     gbNoSound = 1;
 }
 
@@ -641,19 +641,19 @@ void soundManager::ModifySample(struct _SAMPLE* sampleHandle, i16 operation, i32
     }
 
     switch (operation) {
-        case SOUND_SAMPLE_OPERATION_VOLUME:
-        case SOUND_SAMPLE_OPERATION_EFFECT_VOLUME:
+        case IDX(SOUND_SAMPLE_OPERATION_VOLUME):
+        case IDX(SOUND_SAMPLE_OPERATION_EFFECT_VOLUME):
             AIL_set_sample_volume(sampleHandle, ConvertVolume(value, SOUND_VOLUME_EFFECT));
             if (foundChannel >= 0)
                 iLastVolume[foundChannel] = static_cast<i16>(value);
             break;
-        case SOUND_SAMPLE_OPERATION_MUSIC_VOLUME:
+        case IDX(SOUND_SAMPLE_OPERATION_MUSIC_VOLUME):
             H2_ASSERT(gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI, RETAIL_FILE, 1327);
             AIL_set_sample_volume(sampleHandle, ConvertVolume(value, SOUND_VOLUME_MUSIC));
             if (foundChannel >= 0)
                 iLastVolume[foundChannel] = static_cast<i16>(value);
             break;
-        case SOUND_SAMPLE_OPERATION_START:
+        case IDX(SOUND_SAMPLE_OPERATION_START):
             AIL_start_sample(sampleHandle);
             break;
     }
@@ -671,9 +671,9 @@ i32l soundManager::DigitalReport(struct _SAMPLE* sample, i16 reportType) {
     if (m_digitalDriver == 0)
         return 0;
     switch (reportType) {
-        case SOUND_DIGITAL_REPORT_VOLUME:
+        case IDX(SOUND_DIGITAL_REPORT_VOLUME):
             return AIL_sample_volume(sample);
-        case SOUND_DIGITAL_REPORT_PLAYING:
+        case IDX(SOUND_DIGITAL_REPORT_PLAYING):
             sampleStatus = AIL_sample_status(sample);
             return sampleStatus == SOUND_SAMPLE_STATUS_PLAYING;
     }
@@ -696,14 +696,14 @@ void soundManager::AdjustSoundVolumes(void) {
     for (sampleIndex = 1; sampleIndex < m_numSampleHandles; sampleIndex++) {
         sampleHandle = m_sampleHandles[sampleIndex];
         if (gConfig.soundVolume != 0) {
-            if (DigitalReport(sampleHandle, SOUND_DIGITAL_REPORT_PLAYING) != 0)
+            if (DigitalReport(sampleHandle, IDX(SOUND_DIGITAL_REPORT_PLAYING)) != 0)
                 ModifySample(
                     sampleHandle,
-                    SOUND_SAMPLE_OPERATION_EFFECT_VOLUME,
+                    IDX(SOUND_SAMPLE_OPERATION_EFFECT_VOLUME),
                     iLastVolume[sampleIndex]
                 );
         } else {
-            ModifySample(sampleHandle, SOUND_SAMPLE_OPERATION_VOLUME, 0);
+            ModifySample(sampleHandle, IDX(SOUND_SAMPLE_OPERATION_VOLUME), 0);
         }
     }
     LogStr("Adjust Sound Volumes 2");

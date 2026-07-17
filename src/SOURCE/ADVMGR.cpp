@@ -362,7 +362,7 @@ i32 advManager::Open(i32 id) {
     gpSoundManager->AdjustSoundVolumes();
     m_messageMask = ADVMGR_MANAGER_MESSAGE;
     m_priority = id;
-    m_active = 1;
+    m_active = true;
     strcpy(m_name, "advManager");
     return 0;
 }
@@ -437,7 +437,7 @@ void advManager::Close(void) {
     }
     m_visibilityMap = 0;
     iCurBottomView = 0;
-    m_active = 0;
+    m_active = false;
 }
 
 VA(0x00457432, 0xe9)
@@ -479,14 +479,14 @@ class mapCell* advManager::DoAdvCommand(void) {
     }
 
     switch (m_selectedCell) {
-        case ADVMGR_COMMAND_MOVE_TO:
+        case IDX(ADVMGR_COMMAND_MOVE_TO):
             if (currentHeroState == 0) {
                 break;
             }
             currentHeroState->m_destinationX = m_commandTargetX,
             currentHeroState->m_destinationY = m_commandTargetY;
             goto continue_route;
-        case ADVMGR_COMMAND_CONTINUE_ROUTE:
+        case IDX(ADVMGR_COMMAND_CONTINUE_ROUTE):
         continue_route:
             if (currentHeroState == 0) {
                 break;
@@ -576,7 +576,7 @@ class mapCell* advManager::DoAdvCommand(void) {
             }
             break;
 
-        case ADVMGR_COMMAND_OCCUPIED_TOWN_VIEW:
+        case IDX(ADVMGR_COMMAND_OCCUPIED_TOWN_VIEW):
             DemobilizeCurrHero();
             gpMouseManager->SetPointer(0);
             viewTownValue = gpGame->GetTown(currentHeroState->m_occupiedTown);
@@ -584,7 +584,7 @@ class mapCell* advManager::DoAdvCommand(void) {
             eventCellState = 0;
             break;
 
-        case ADVMGR_COMMAND_TOWN_VIEW:
+        case IDX(ADVMGR_COMMAND_TOWN_VIEW):
             DemobilizeCurrHero();
             gpMouseManager->SetPointer(0);
             eventCellState = GetCell(
@@ -595,7 +595,7 @@ class mapCell* advManager::DoAdvCommand(void) {
             eventCellState = 0;
             break;
 
-        case ADVMGR_COMMAND_HERO_VIEW:
+        case IDX(ADVMGR_COMMAND_HERO_VIEW):
             if (currentHeroState == 0) {
                 break;
             }
@@ -612,7 +612,7 @@ class mapCell* advManager::DoAdvCommand(void) {
             gpWindowManager->FadeScreen(0, 8, 0);
             break;
 
-        case ADVMGR_COMMAND_SELECT_HERO:
+        case IDX(ADVMGR_COMMAND_SELECT_HERO):
             SetHeroContext(
                 GetCell(m_mapOriginX + m_lastHoverCell, m_hoverCellY + m_mapOriginY)
                     ->m_objectMetadata,
@@ -620,12 +620,12 @@ class mapCell* advManager::DoAdvCommand(void) {
             );
             break;
 
-        case ADVMGR_COMMAND_SELECT_TOWN:
+        case IDX(ADVMGR_COMMAND_SELECT_TOWN):
             SetTownContext(GetCell(m_mapOriginX + m_lastHoverCell, m_hoverCellY + m_mapOriginY)
                                ->m_objectMetadata);
             break;
 
-        case ADVMGR_COMMAND_NONE:
+        case IDX(ADVMGR_COMMAND_NONE):
             break;
     }
 
@@ -1773,7 +1773,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
                 artifactResultLocal =
                     GiveArtifact(searchingHeroState, gpGame->m_ultimateArtifactId, 1, -1);
             }
-            gpGame->m_ultimateArtifactId = ARTIFACT_NONE;
+            gpGame->m_ultimateArtifactId = IDX(ARTIFACT_NONE);
         }
     } else if (gbHumanPlayer[giCurPlayer]) {
         NormalDialog("Nothing here.\nWhere could it be?", 1, -1, -1, -1, 0, -1, 0, -1, 0);
@@ -2371,7 +2371,7 @@ void advManager::DrawCell(
     i32 mapY,
     i32 screenX,
     i32 screenY,
-    i32 drawMask,
+    AdventureDrawMask drawMask,
     i32 forceDraw
 ) {
     i32 animFrame;
@@ -6267,7 +6267,7 @@ void advManager::DoTownKnob(void) {
 // agree; ours only has one trailing alignment NOP. Objdiff's residual is delinked
 // switch/jump-table local-label identity.
 VA(0x00464b08, 0x397)
-void advManager::CastSpell(i32 spell) {
+void advManager::CastSpell(SpellType spell) {
     hero* currentHeroSlot;
     if (gpCurPlayer->CurrentHero() != ADVMGR_INVALID_HERO) {
         currentHeroSlot = gpGame->GetHero(gpCurPlayer->m_currentHero);
@@ -7071,7 +7071,7 @@ void advManager::SetEnvironmentOrigin(i32 originX, i32 originY, i32 stopSounds) 
                 gpSoundManager->ModifySample(
                     m_loopingSamples[m_activeSounds[edgeOffset].soundId]
                         ->m_playbackData.activeSample,
-                    SOUND_SAMPLE_OPERATION_EFFECT_VOLUME,
+                    IDX(SOUND_SAMPLE_OPERATION_EFFECT_VOLUME),
                     ADVMGR_ENVIRONMENT_VOLUME(m_activeSounds[edgeOffset].volume)
                 );
             }
@@ -8083,7 +8083,7 @@ void advManager::ForceNewHover(void) {
 // All non-table bytes match. The 32-byte jump table has the same eight case
 // offsets; retail delinks its entries as ScreenScroll while base retains local labels.
 VA(0x00468ab6, 0x1a6)
-void advManager::ScreenScroll(i32 direction, i32 updatePointer) {
+void advManager::ScreenScroll(AdventureScrollDirection direction, i32 updatePointer) {
     i32 originX;
     i32 originY;
 

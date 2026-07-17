@@ -50,7 +50,7 @@ SIZE(SCmbtObstacle, 0xe);
 SIZE(SElevationOverlay, 0x11);
 
 enum {
-    HERO_TYPE_INITIAL_COUNT = FACTION_COUNT,
+    HERO_TYPE_INITIAL_COUNT = IDX(FACTION_COUNT),
     EXPANSION_HIGH_SCORE_CAMPAIGN_COUNT = 4,
     X_GLOBAL_RECRUIT_EMPTY_COUNT = 6,
     X_GLOBAL_RECRUIT_BUY_COUNT = 5,
@@ -394,7 +394,7 @@ extern i32 glBottomRefresh;
 extern i32 gbBothMachinesWin95;
 extern i32 gbGotFirstHeartbeat;
 extern i32 gbProcessingCombatAction;
-extern i32 iMPNetProtocol;
+extern RemoteNetworkProtocol iMPNetProtocol;
 extern i32 iLastDiffSendTo;
 extern u8 gcSpellInfluenceIcons[KB_SPELL_INFLUENCE_MAP_COUNT];
 extern u8 giSpellInfluenceToSpell[KB_SPELL_INFLUENCE_MAP_COUNT];

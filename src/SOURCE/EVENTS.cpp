@@ -75,8 +75,8 @@ DATA(0x005190a4) static char s_twoStringFormat[] = "%s %s";
 // a new structural lead.
 VA(0x004a8530, 0x5adb)
 void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
-    i32 secondUpgrade1;
-    i32 firstUpgrade_e;
+    CreatureType secondUpgrade1;
+    CreatureType firstUpgrade_e;
     SAMPLE2 eventSample_f;
     i32 eventValue1;
     signEventExtra* signExtra_k;
@@ -87,7 +87,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
     char sphinxAnswer_a[SPHINX_ANSWER_BUFFER_SIZE];
     i32 eraseObject;
     i32 fizzleType3;
-    i32 thirdUpgrade;
+    CreatureType thirdUpgrade;
     i32 monsterType6;
     i32 guardedCount;
     i32 heroCombatResult3;
@@ -97,7 +97,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
     i32 resourceType;
     i32 teleportX3;
     i32 teleportCount;
-    i32 guardedMonster5;
+    CreatureType guardedMonster5;
     boatRecord* boat_j;
     heroWindow* oracleWindow;
     tag_message oracleMessage1;
@@ -346,7 +346,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             gText,
                             "{Hill Fort}\n\nAll of the %s you have in your army have been trained "
                             "by the battle masters of the fort.  Your army now contains %s.",
-                            gArmyNamesPlural[firstUpgrade_e],
+                            gArmyNamesPlural[IDX(firstUpgrade_e)],
                             gArmyNamesPlural[firstUpgrade_e + 1]
                         );
                     } else {
@@ -355,8 +355,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             "{Hill Fort}\n\nAll of the %s and %s you have in your army have been "
                             "trained by the battle masters of the fort.  Your army now contains %s "
                             "and %s.",
-                            gArmyNamesPlural[firstUpgrade_e],
-                            gArmyNamesPlural[secondUpgrade1],
+                            gArmyNamesPlural[IDX(firstUpgrade_e)],
+                            gArmyNamesPlural[IDX(secondUpgrade1)],
                             gArmyNamesPlural[firstUpgrade_e + 1],
                             gArmyNamesPlural[secondUpgrade1 + 1]
                         );
@@ -367,9 +367,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         "{Hill Fort}\n\n All of the %s, %s and %s you have in your army have been "
                         "trained by the battle masters of the fort.  Your army now contains %s, "
                         "%s, and %s.",
-                        gArmyNamesPlural[firstUpgrade_e],
-                        gArmyNamesPlural[secondUpgrade1],
-                        gArmyNamesPlural[thirdUpgrade],
+                        gArmyNamesPlural[IDX(firstUpgrade_e)],
+                        gArmyNamesPlural[IDX(secondUpgrade1)],
+                        gArmyNamesPlural[IDX(thirdUpgrade)],
                         gArmyNamesPlural[firstUpgrade_e + 1],
                         gArmyNamesPlural[secondUpgrade1 + 1],
                         gArmyNamesPlural[thirdUpgrade + 1]
@@ -434,7 +434,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         sprintf(
                             gText,
                             "{Freeman's Foundry}\n\nAll of your %s have been upgraded into %s.",
-                            gArmyNamesPlural[firstUpgrade_e],
+                            gArmyNamesPlural[IDX(firstUpgrade_e)],
                             gArmyNamesPlural[firstUpgrade_e + 1]
                         );
                     } else {
@@ -442,8 +442,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             gText,
                             "{Freeman's Foundry}\n\nAll of your %s and %s have been upgraded into "
                             "%s and %s.",
-                            gArmyNamesPlural[firstUpgrade_e],
-                            gArmyNamesPlural[secondUpgrade1],
+                            gArmyNamesPlural[IDX(firstUpgrade_e)],
+                            gArmyNamesPlural[IDX(secondUpgrade1)],
                             gArmyNamesPlural[firstUpgrade_e + 1],
                             gArmyNamesPlural[secondUpgrade1 + 1]
                         );
@@ -453,9 +453,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         gText,
                         "{Freeman's Foundry}\n\nAll of your  %s, %s and %s have been upgraded into "
                         "%s, %s, and %s.",
-                        gArmyNamesPlural[firstUpgrade_e],
-                        gArmyNamesPlural[secondUpgrade1],
-                        gArmyNamesPlural[thirdUpgrade],
+                        gArmyNamesPlural[IDX(firstUpgrade_e)],
+                        gArmyNamesPlural[IDX(secondUpgrade1)],
+                        gArmyNamesPlural[IDX(thirdUpgrade)],
                         gArmyNamesPlural[firstUpgrade_e + 1],
                         gArmyNamesPlural[secondUpgrade1 + 1],
                         gArmyNamesPlural[thirdUpgrade + 1]
@@ -3151,7 +3151,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         ABANDONED_MINE_OBJECT,
                         ABANDONED_MINE_EVENT
                     );
-                    gpGame->m_mines[cell->m_objectMetadata].resourceType = RES_GOLD;
+                    gpGame->m_mines[cell->m_objectMetadata].resourceType = IDX(RES_GOLD);
                     gpGame->m_mines[cell->m_objectMetadata].guardianType = -1;
                     gpGame->m_mines[cell->m_objectMetadata].guardianCount = 0;
                     gpGame->ClaimMine(cell->m_objectMetadata, giCurPlayer);
@@ -3568,7 +3568,7 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
                     if (gpCurPlayer->m_resources[IDX(RES_GOLD)] >= GENERIC_SITE_ALCHEMIST_COST) {
                         for (index3 = 0; index3 < GENERIC_SITE_ARTIFACT_SLOT_COUNT; index3++) {
                             if (IsCursedItem(eventHero->m_artifacts[index3]))
-                                eventHero->m_artifacts[index3] = ARTIFACT_NONE;
+                                eventHero->m_artifacts[index3] = IDX(ARTIFACT_NONE);
                         }
                         gpCurPlayer->m_resources[IDX(RES_GOLD)] -= GENERIC_SITE_ALCHEMIST_COST;
                     } else {
@@ -3812,7 +3812,7 @@ void advManager::RecruitSiteEvent(mapCell* cell, hero* eventHero) {
     SAMPLE2 eventSample = NULL_SAMPLE2;
     u32 siteType2;
     i16 availableCount;
-    i32 creatureType1;
+    CreatureType creatureType1;
     u32 siteIndex;
     u32 packedSite1;
 
@@ -4190,7 +4190,7 @@ void advManager::EventWindow(
     i32 eventId,
     i32 buttons,
     char* text,
-    i32 type1,
+    ResourceType type1,
     i32 value1,
     i32 type2,
     i32 value2,
@@ -4278,9 +4278,9 @@ i32 advManager::GiveExperience(hero* eventHero, i32 experience, i32 checkLevel) 
 }
 
 VA(0x004b01ae, 0x80)
-void advManager::GiveResource(hero* eventHero, i32 resourceType, i32 amount) {
+void advManager::GiveResource(hero* eventHero, ResourceType resourceType, i32 amount) {
     if (resourceType >= 0 && resourceType <= RES_GOLD)
-        gpGame->m_players[eventHero->m_owner].m_resources[resourceType] += amount;
+        gpGame->m_players[eventHero->m_owner].m_resources[IDX(resourceType)] += amount;
     if (resourceType == RES_GOLD && gbHumanPlayer[eventHero->m_owner])
         CheckEndGame(0, 0);
 }
@@ -4305,7 +4305,7 @@ i32 advManager::SkeletonEvent(hero* eventHero, mapCell* cell, char* text, i32 x,
     i32 artifactId;
 
     switch (cell->m_objectMetadata) {
-        case UNDEAD_EVENT_LEVEL_SMALL:
+        case IDX(UNDEAD_EVENT_LEVEL_SMALL):
             if (CombatMonsterEvent(
                     eventHero,
                     CREATURE_SKELETON,
@@ -4330,7 +4330,7 @@ i32 advManager::SkeletonEvent(hero* eventHero, mapCell* cell, char* text, i32 x,
                 return 1;
             }
             break;
-        case UNDEAD_EVENT_LEVEL_MEDIUM:
+        case IDX(UNDEAD_EVENT_LEVEL_MEDIUM):
             if (CombatMonsterEvent(
                     eventHero,
                     CREATURE_SKELETON,
@@ -4355,7 +4355,7 @@ i32 advManager::SkeletonEvent(hero* eventHero, mapCell* cell, char* text, i32 x,
                 return 1;
             }
             break;
-        case UNDEAD_EVENT_LEVEL_LARGE:
+        case IDX(UNDEAD_EVENT_LEVEL_LARGE):
             if (CombatMonsterEvent(
                     eventHero,
                     CREATURE_SKELETON,
@@ -4413,7 +4413,7 @@ VA(0x004b054a, 0x29b)
 i32 advManager::ZombieEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i32 y) {
     i32 artifactId;
     switch (cell->m_objectMetadata) {
-        case UNDEAD_EVENT_LEVEL_SMALL:
+        case IDX(UNDEAD_EVENT_LEVEL_SMALL):
             if (CombatMonsterEvent(
                     eventHero,
                     CREATURE_ZOMBIE,
@@ -4438,7 +4438,7 @@ i32 advManager::ZombieEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i
                 return 1;
             }
             break;
-        case UNDEAD_EVENT_LEVEL_MEDIUM:
+        case IDX(UNDEAD_EVENT_LEVEL_MEDIUM):
             if (CombatMonsterEvent(
                     eventHero,
                     CREATURE_MUTANT_ZOMBIE,
@@ -4463,7 +4463,7 @@ i32 advManager::ZombieEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i
                 return 1;
             }
             break;
-        case UNDEAD_EVENT_LEVEL_LARGE:
+        case IDX(UNDEAD_EVENT_LEVEL_LARGE):
             if (CombatMonsterEvent(
                     eventHero,
                     CREATURE_MUTANT_ZOMBIE,
@@ -4534,7 +4534,7 @@ VA(0x004b07e5, 0x2f8)
 i32 advManager::GhostEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i32 y) {
     i32 artifactId;
     switch (cell->m_objectMetadata) {
-        case UNDEAD_EVENT_LEVEL_SMALL:
+        case IDX(UNDEAD_EVENT_LEVEL_SMALL):
             if (CombatMonsterEvent(
                     eventHero,
                     CREATURE_GHOST,
@@ -4560,7 +4560,7 @@ i32 advManager::GhostEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i3
                 return 1;
             }
             break;
-        case UNDEAD_EVENT_LEVEL_MEDIUM:
+        case IDX(UNDEAD_EVENT_LEVEL_MEDIUM):
             if (CombatMonsterEvent(
                     eventHero,
                     CREATURE_GHOST,
@@ -4586,7 +4586,7 @@ i32 advManager::GhostEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i3
                 return 1;
             }
             break;
-        case UNDEAD_EVENT_LEVEL_LARGE:
+        case IDX(UNDEAD_EVENT_LEVEL_LARGE):
             if (CombatMonsterEvent(
                     eventHero,
                     CREATURE_GHOST,
@@ -4662,7 +4662,7 @@ i32 advManager::GhostEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i3
 // all six external relocation targets agree.
 VA(0x004b0add, 0x274)
 void advManager::HouseEvent(hero* eventHero, mapCell* cell) {
-    i32 siteIndex = HOUSE_RECRUIT_ARCHER;
+    HouseRecruitmentSite siteIndex = HOUSE_RECRUIT_ARCHER;
     i32 creatureTypes[IDX(HOUSE_RECRUIT_SITE_COUNT)];
 
     switch (cell->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
@@ -4715,8 +4715,8 @@ void advManager::HouseEvent(hero* eventHero, mapCell* cell) {
 
         EventWindow(siteIndex * 3 + HOUSE_EVENT_RECRUIT_DIALOG_BASE, 2, "", -1, 0, -1, 0, -1);
         if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
-            if (eventHero->m_army.CanJoin(creatureTypes[siteIndex])) {
-                eventHero->m_army.Add(creatureTypes[siteIndex], cell->m_objectMetadata, -1);
+            if (eventHero->m_army.CanJoin(creatureTypes[IDX(siteIndex)])) {
+                eventHero->m_army.Add(creatureTypes[IDX(siteIndex)], cell->m_objectMetadata, -1);
                 cell->m_objectMetadata = 0;
             } else {
                 EventWindow(
@@ -4851,7 +4851,7 @@ i32 advManager::CombatMonsterEvent(
 
     for (stackIndex9 = 0; stackIndex9 < COMBAT_MONSTER_ARMY_SLOTS; stackIndex9++) {
         if (gpMonGroup->m_creatureCounts[stackIndex9] <= 0)
-            gpMonGroup->m_creatureTypes[stackIndex9] = CREATURE_NONE;
+            gpMonGroup->m_creatureTypes[stackIndex9] = IDX(CREATURE_NONE);
     }
     for (stackIndex9 = 0; stackIndex9 < COMBAT_MONSTER_ARMY_SLOTS; stackIndex9++)
         placement4[stackIndex9] = stackIndex9;
@@ -5268,8 +5268,8 @@ void advManager::TransferArtifacts(hero* sourceHero, hero* destinationHero) {
                                 sourceHero->m_artifacts[sourceArtifactSlot],
                                 1
                             );
-                            sourceHero->m_artifacts[sourceArtifactSlot] = ARTIFACT_NONE;
-                            sourceHero->m_artifactExtra[sourceArtifactSlot] = ARTIFACT_NONE;
+                            sourceHero->m_artifacts[sourceArtifactSlot] = IDX(ARTIFACT_NONE);
+                            sourceHero->m_artifactExtra[sourceArtifactSlot] = IDX(ARTIFACT_NONE);
                             break;
                         }
                     }
@@ -5335,7 +5335,7 @@ void advManager::DoWhirlpool(hero* eventHero) {
         if (eventHero->m_army.GetNumArmies() > 1) {
             eventHero->m_army.m_creatureCounts[selectedSlot] >>= 1;
             if (eventHero->m_army.m_creatureCounts[selectedSlot] == 0)
-                eventHero->m_army.m_creatureTypes[selectedSlot] = CREATURE_NONE;
+                eventHero->m_army.m_creatureTypes[selectedSlot] = IDX(CREATURE_NONE);
         } else if (eventHero->m_army.m_creatureCounts[selectedSlot] > 1) {
             eventHero->m_army.m_creatureCounts[selectedSlot] >>= 1;
         }
@@ -5453,7 +5453,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     i32 battleResult_l;
     i32 purchaseCost_i;
     i32 purchaseValue_a;
-    i32 creatureType_i;
+    CreatureType creatureType_i;
     i32 creatureFlag_l;
 
     occupiedTown_b = 0;
@@ -5516,7 +5516,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 );
                 if (combatResult_d == 0)
                     break;
-                gpGame->m_mines[cell->m_objectMetadata].guardianType = CREATURE_NONE;
+                gpGame->m_mines[cell->m_objectMetadata].guardianType = IDX(CREATURE_NONE);
                 gpGame->m_mines[cell->m_objectMetadata].guardianCount = 0;
                 eventHero->CheckLevel();
             }
@@ -6217,7 +6217,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             if (cell->m_objectMetadata != 0
                 && eventHero->HasSpell(cell->m_objectMetadata - 1) == 0) {
                 for (index_h = 0; index_h < AI_EVENT_ARMY_STACK_COUNT; ++index_h) {
-                    gpMonGroup->m_creatureTypes[index_h] = CREATURE_ROYAL_MUMMY;
+                    gpMonGroup->m_creatureTypes[index_h] = IDX(CREATURE_ROYAL_MUMMY);
                     gpMonGroup->m_creatureCounts[index_h] = 10;
                 }
                 index_h = cell->m_objectMetadata - 1;
@@ -6313,8 +6313,8 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                     gpGame->ConvertObject(x - 2, y - 1, x + 1, y - 1, 51, 0, 3, 32, 75, 64, 23);
                     gpGame->ConvertObject(x - 2, y, x + 1, y, 51, 4, 7, 32, 80, 64, 23);
                     gpGame->ConvertObject(x, y, x, y, 29, 5, 5, 29, 4, 64, 23);
-                    gpGame->m_mines[cell->m_objectMetadata].resourceType = RES_GOLD;
-                    gpGame->m_mines[cell->m_objectMetadata].guardianType = CREATURE_NONE;
+                    gpGame->m_mines[cell->m_objectMetadata].resourceType = IDX(RES_GOLD);
+                    gpGame->m_mines[cell->m_objectMetadata].guardianType = IDX(CREATURE_NONE);
                     gpGame->m_mines[cell->m_objectMetadata].guardianCount = 0;
                     gpGame->ClaimMine(cell->m_objectMetadata, giCurPlayer);
                 }
@@ -6450,7 +6450,7 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
     i32 unusedPair27[2];
     i32 artifactIndex1;
     i32 siteLevel5;
-    i32 primaryStat16;
+    HeroPrimaryStat primaryStat16;
     i32 siteType3;
     i32 unusedTriple26[3];
     i32 cursedArtifactCount5;
@@ -6476,7 +6476,7 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
                 for (artifactIndex1 = 0; artifactIndex1 < AI_EVENT_ARTIFACT_LIMIT;
                      artifactIndex1++) {
                     if (IsCursedItem(eventHero->m_artifacts[artifactIndex1]))
-                        eventHero->m_artifacts[artifactIndex1] = ARTIFACT_NONE;
+                        eventHero->m_artifacts[artifactIndex1] = IDX(ARTIFACT_NONE);
                 }
                 gpCurPlayer->m_resources[IDX(RES_GOLD)] -= AI_EVENT_CURSED_ARTIFACT_COST;
             }
@@ -6485,22 +6485,22 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
             if (!(eventHero->m_eventFlags & AI_GENERIC_SITE_SHIPWRECK_FLAG)) {
                 eventHero->m_eventFlags = eventHero->m_eventFlags | AI_GENERIC_SITE_SHIPWRECK_FLAG;
                 switch (eventHero->m_cursorType) {
-                    case FACTION_SORCERESS:
-                    case FACTION_WARLOCK:
-                    case FACTION_WIZARD:
-                    case FACTION_NECROMANCER:
+                    case IDX(FACTION_SORCERESS):
+                    case IDX(FACTION_WARLOCK):
+                    case IDX(FACTION_WIZARD):
+                    case IDX(FACTION_NECROMANCER):
                         primaryStat16 = HERO_PRIMARY_SPELL_POWER;
                         break;
-                    case FACTION_BARBARIAN:
+                    case IDX(FACTION_BARBARIAN):
                         primaryStat16 = HERO_PRIMARY_ATTACK;
                         break;
-                    case FACTION_KNIGHT:
+                    case IDX(FACTION_KNIGHT):
                         primaryStat16 = HERO_PRIMARY_DEFENSE;
                         break;
                     default:
                         primaryStat16 = HERO_PRIMARY_ATTACK;
                 }
-                eventHero->m_primaryStats[primaryStat16]++;
+                eventHero->m_primaryStats[IDX(primaryStat16)]++;
             }
             break;
         case AI_GENERIC_SITE_FAERIE_RING:
@@ -6563,7 +6563,7 @@ void advManager::RecruitSiteAIEvent(mapCell* cell, hero* eventHero) {
     u32 packedSite17;
     i16 availableCount1;
     u32 siteType3;
-    i32 creatureType13;
+    CreatureType creatureType13;
     i32 resourceIndex27;
     i32 purchaseValue5;
     i32 replacementSlot26;
@@ -7255,7 +7255,7 @@ i32 advManager::DoCombat(
                     packet8 = CheckHandleNet();
                     if (packet8) {
                         switch (packet8[6]) {
-                            case COMBAT_REMOTE_COMMAND:
+                            case IDX(COMBAT_REMOTE_COMMAND):
                                 ReceiveHeroTownData(
                                     packet8,
                                     &remotePlayer,
@@ -7452,7 +7452,7 @@ void advManager::SendHeroTownData(
         ShutDown(0);
 
     if (firstHero) {
-        EVENTS_HERO_BUFFER(buffer)->fragment = COMBAT_REMOTE_FIRST_HERO_FIRST;
+        EVENTS_HERO_BUFFER(buffer)->fragment = IDX(COMBAT_REMOTE_FIRST_HERO_FIRST);
         memcpy(EVENTS_HERO_BUFFER(buffer)->data, firstHero, COMBAT_REMOTE_HERO_FIRST_SIZE);
         result = TransmitRemoteData(
             reinterpret_cast<char*>(buffer),
@@ -7465,7 +7465,7 @@ void advManager::SendHeroTownData(
         );
         if (!result)
             ShutDown(0);
-        EVENTS_HERO_BUFFER(buffer)->fragment = COMBAT_REMOTE_FIRST_HERO_SECOND;
+        EVENTS_HERO_BUFFER(buffer)->fragment = IDX(COMBAT_REMOTE_FIRST_HERO_SECOND);
         memcpy(
             EVENTS_HERO_BUFFER(buffer)->data,
             &firstHero->m_spells[COMBAT_REMOTE_HERO_SECOND_SPELL_INDEX],
@@ -7484,7 +7484,7 @@ void advManager::SendHeroTownData(
             ShutDown(0);
     }
     if (secondHero) {
-        EVENTS_HERO_BUFFER(buffer)->fragment = COMBAT_REMOTE_SECOND_HERO_FIRST;
+        EVENTS_HERO_BUFFER(buffer)->fragment = IDX(COMBAT_REMOTE_SECOND_HERO_FIRST);
         memcpy(EVENTS_HERO_BUFFER(buffer)->data, secondHero, COMBAT_REMOTE_HERO_FIRST_SIZE);
         result = TransmitRemoteData(
             reinterpret_cast<char*>(buffer),
@@ -7497,7 +7497,7 @@ void advManager::SendHeroTownData(
         );
         if (!result)
             ShutDown(0);
-        EVENTS_HERO_BUFFER(buffer)->fragment = COMBAT_REMOTE_SECOND_HERO_SECOND;
+        EVENTS_HERO_BUFFER(buffer)->fragment = IDX(COMBAT_REMOTE_SECOND_HERO_SECOND);
         memcpy(
             EVENTS_HERO_BUFFER(buffer)->data,
             &secondHero->m_spells[COMBAT_REMOTE_HERO_SECOND_SPELL_INDEX],

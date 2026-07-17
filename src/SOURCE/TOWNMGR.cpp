@@ -543,7 +543,7 @@ i32 townManager::Open(i32 id) {
     gpMouseManager->SetPointer("advmice.mse", 0, TOWN_MAP_CHANGE_UNUSED);
     m_messageMask = TOWN_MANAGER_EVENT_MASK;
     m_priority = id;
-    m_active = 1;
+    m_active = true;
     strcpy(m_name, "townManager");
     gpWindowManager->FadeScreen(0, TOWN_FADE_STEPS, 0);
     return 0;
@@ -782,7 +782,7 @@ void townManager::Close(void) {
         gpSoundManager->SwitchAmbientMusic(TOWN_MUSIC_STOP);
     gpWindowManager->FadeScreen(TOWN_FADE_OUT, TOWN_FADE_STEPS, 0);
     gpMouseManager->SetPointer(TOWN_POINTER_DEFAULT);
-    m_active = 0;
+    m_active = false;
     m_town->m_buildings &= TOWN_CLOSE_DYNAMIC_CLEAR_MASK;
 }
 

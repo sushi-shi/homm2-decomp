@@ -108,7 +108,7 @@ VA(0x004c9270, 0xd9)
 mouseManager::mouseManager(void) : baseManager() {
     i32 i;
     m_savedUnderlying = 0;
-    m_active = 0;
+    m_active = false;
     m_cursorType = MOUSE_INVALID_CURSOR_TYPE;
     strcpy(m_name, gMouseManagerStrings.managerName.text);
     m_cursorFrame = 0;
@@ -158,7 +158,7 @@ i32 mouseManager::Open(i32 priority) {
     if (gbColorMice != 0)
         ShowCursor(0);
     m_messageMask = MOUSE_MANAGER_MESSAGE_MASK;
-    m_active = 1;
+    m_active = true;
     m_priority = priority;
     return 0;
 }
@@ -177,7 +177,7 @@ VA(0x004c93f0, 0xed)
 void mouseManager::Close(void) {
     i32 cursorIndex;
     if (m_active) {
-        m_active = 0;
+        m_active = false;
         if (m_savedUnderlying != 0)
             delete m_savedUnderlying;
         m_savedUnderlying = 0;

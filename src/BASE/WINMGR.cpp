@@ -262,7 +262,7 @@ updatePalette:
 
 VA(0x004caa80, 0x41)
 heroWindowManager::heroWindowManager(void) : baseManager() {
-    m_active = 0;
+    m_active = false;
     m_activeWindow = 0;
     m_focusWindow = 0;
     m_windowListTail = 0;
@@ -289,7 +289,7 @@ i32 heroWindowManager::Open(i32 managerOrder) {
     m_screen = new bitmap();
     if (m_screen == 0)
         MemError();
-    m_screen->m_bitmapType = BITMAP_TYPE_MEMORY;
+    m_screen->m_bitmapType = IDX(BITMAP_TYPE_MEMORY);
     m_screen->m_width = WINDOW_SCREEN_WIDTH;
     m_screen->m_height = WINDOW_SCREEN_HEIGHT;
     m_screen->m_pixels = reinterpret_cast<u8*>(lpInitWin);
@@ -300,7 +300,7 @@ i32 heroWindowManager::Open(i32 managerOrder) {
     );
     m_priority = managerOrder;
     m_messageMask = MESSAGE_RIGHT_BUTTON_DOWN;
-    m_active = 1;
+    m_active = true;
     strcpy(m_name, gWindowManagerText.managerName);
     return 0;
 }
@@ -317,7 +317,7 @@ void heroWindowManager::Close(void) {
         m_screen->m_pixels = 0;
         if (m_screen != 0)
             delete m_screen;
-        m_active = 0;
+        m_active = false;
     }
 }
 

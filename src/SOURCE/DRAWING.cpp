@@ -164,8 +164,8 @@ VA(0x00402e80, 0x3fe)
 void combatManager::CombatMessage(i32 messageType) {
     army* currentArmyPtr;
     army* targetArmy;
-    i32 actingMonsterType;
-    i32 targetMonsterType;
+    CreatureType actingMonsterType;
+    CreatureType targetMonsterType;
 
     if (m_combatWindowOpen == 0)
         return;
@@ -193,28 +193,28 @@ void combatManager::CombatMessage(i32 messageType) {
             sprintf(
                 gText,
                 cCombatMessage[IDX(COMBAT_MESSAGE_TEXT_MOVE)],
-                gArmyNames[actingMonsterType]
+                gArmyNames[IDX(actingMonsterType)]
             );
             break;
         case COMBAT_MESSAGE_COMMAND_FLY:
             sprintf(
                 gText,
                 cCombatMessage[IDX(COMBAT_MESSAGE_TEXT_FLY)],
-                gArmyNames[actingMonsterType]
+                gArmyNames[IDX(actingMonsterType)]
             );
             break;
         case COMBAT_MESSAGE_COMMAND_ATTACK:
             sprintf(
                 gText,
                 cCombatMessage[IDX(COMBAT_MESSAGE_TEXT_ATTACK)],
-                gArmyNames[targetMonsterType]
+                gArmyNames[IDX(targetMonsterType)]
             );
             break;
         case COMBAT_MESSAGE_COMMAND_SHOOT:
             sprintf(
                 gText,
                 cCombatMessage[IDX(COMBAT_MESSAGE_TEXT_SHOOT)],
-                gArmyNames[targetMonsterType],
+                gArmyNames[IDX(targetMonsterType)],
                 static_cast<i32>(currentArmyPtr->m_monster.shots)
             );
             break;
@@ -241,7 +241,7 @@ void combatManager::CombatMessage(i32 messageType) {
                     sprintf(
                         gText,
                         cCombatMessage[IDX(COMBAT_MESSAGE_TEXT_VIEW_INFO)],
-                        gArmyNames[actingMonsterType]
+                        gArmyNames[IDX(actingMonsterType)]
                     );
                 else
                     sprintf(gText, "");
@@ -311,18 +311,18 @@ void combatManager::SetupGridForArmy(army* armyPtr) {
 
     for (hexIndex = 0; hexIndex < COMBAT_HEX_COUNT; hexIndex++) {
         if (armyPtr->m_hex == hexIndex) {
-            m_gridState[hexIndex] = COMBAT_GRID_SHADE_REACHABLE;
+            m_gridState[hexIndex] = IDX(COMBAT_GRID_SHADE_REACHABLE);
         } else if (m_hexCells[hexIndex].m_pathReachable != 0) {
             if (m_hexCells[hexIndex].m_occupantSide != -1) {
                 if (m_hexCells[hexIndex].m_occupantSide != armyPtr->m_side)
-                    m_gridState[hexIndex] = COMBAT_GRID_SHADE_REACHABLE;
+                    m_gridState[hexIndex] = IDX(COMBAT_GRID_SHADE_REACHABLE);
             } else {
-                m_gridState[hexIndex] = COMBAT_GRID_SHADE_EMPTY_BLOCKED;
+                m_gridState[hexIndex] = IDX(COMBAT_GRID_SHADE_EMPTY_BLOCKED);
             }
         } else if (m_hexCells[hexIndex].m_occupantSide != -1
                    && m_hexCells[hexIndex].m_occupantSide != 1 - m_currentSide
                    && (attackMask & (1 << m_hexCells[hexIndex].m_occupantIndex)) != 0) {
-            m_gridState[hexIndex] = COMBAT_GRID_SHADE_REACHABLE;
+            m_gridState[hexIndex] = IDX(COMBAT_GRID_SHADE_REACHABLE);
         }
     }
 }

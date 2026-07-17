@@ -143,7 +143,7 @@ i32 swapManager::Open(i32 id) {
     gpMouseManager->SetPointer(0);
     m_messageMask = SWAP_MANAGER_MESSAGE;
     m_priority = id;
-    m_active = 1;
+    m_active = true;
     strcpy(m_name, "swapManager");
     return 0;
 }
@@ -153,7 +153,7 @@ void swapManager::Close(void) {
     gpResourceManager->Dispose(m_selectorIcon);
     gpWindowManager->RemoveWindow(m_window);
     delete m_window;
-    m_active = 0;
+    m_active = false;
     gpAdvManager->Activate();
 
     tag_message message;
@@ -261,7 +261,7 @@ VA(0x00454be3, 0xaf0)
 i32 swapManager::Main(tag_message& message) {
     i32 closeRequested_5 = 0;
     i32 quickView = (message.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) != 0;
-    i32 side;
+    SwapManagerSide side;
     i32 slotIndex_8;
     i32 artifactSlot_2;
     i32 secondarySkill_1;
@@ -340,10 +340,10 @@ i32 swapManager::Main(tag_message& message) {
                             slotIndex_8 =
                                 message.payload.widget.id - SWAP_CONTROL_RIGHT_SKILL_LEVEL_FIRST;
                         showSecondarySkill:
-                            if (slotIndex_8 >= m_heroes[side]->m_secondarySkillCount)
+                            if (slotIndex_8 >= m_heroes[IDX(side)]->m_secondarySkillCount)
                                 break;
-                            secondarySkill_1 = m_heroes[side]->GetNthSS(slotIndex_8);
-                            m_heroes[side]->DoSSLevelDialog(secondarySkill_1, quickView);
+                            secondarySkill_1 = m_heroes[IDX(side)]->GetNthSS(slotIndex_8);
+                            m_heroes[IDX(side)]->DoSSLevelDialog(secondarySkill_1, quickView);
                             break;
 
                         case SWAP_CONTROL_LEFT_HERO:
@@ -753,7 +753,7 @@ void swapManager::SwapMons(void) {
         targetArmy->m_creatureCounts[m_targetSlot] =
             OD_STEER(selectedArmy->m_creatureCounts[m_selectedSlot])
             + targetArmy->m_creatureCounts[m_targetSlot];
-        selectedArmy->m_creatureTypes[m_selectedSlot] = CREATURE_NONE;
+        selectedArmy->m_creatureTypes[m_selectedSlot] = IDX(CREATURE_NONE);
         selectedArmy->m_creatureCounts[m_selectedSlot] = 0;
         return;
     }
@@ -922,7 +922,7 @@ void swapManager::SplitMons(void) {
             selectedArmy->m_creatureCounts[m_selectedSlot] -= gpTownManager->m_splitAmount;
             targetArmy->m_creatureCounts[m_targetSlot] += gpTownManager->m_splitAmount;
             if (selectedArmy->m_creatureCounts[m_selectedSlot] == 0)
-                selectedArmy->m_creatureTypes[m_selectedSlot] = CREATURE_NONE;
+                selectedArmy->m_creatureTypes[m_selectedSlot] = IDX(CREATURE_NONE);
             return;
         }
         if (targetArmy->m_creatureTypes[m_targetSlot] != CREATURE_NONE) {
@@ -937,7 +937,7 @@ void swapManager::SplitMons(void) {
         targetArmy->m_creatureCounts[m_targetSlot] = gpTownManager->m_splitAmount;
         selectedArmy->m_creatureCounts[m_selectedSlot] -= gpTownManager->m_splitAmount;
         if (selectedArmy->m_creatureCounts[m_selectedSlot] == 0)
-            selectedArmy->m_creatureTypes[m_selectedSlot] = CREATURE_NONE;
+            selectedArmy->m_creatureTypes[m_selectedSlot] = IDX(CREATURE_NONE);
     }
 }
 
