@@ -668,11 +668,11 @@ void combatManager::CastSpell(
     } else {
         spellPower_i = m_spellPower[m_currentSide];
         if (m_heroes[m_currentSide]->HasArtifact(ARTIFACT_ENCHANTED_HOURGLASS)
-            && (gsSpellInfo[IDX(spell)].attributes & IDX(SPELL_ATTRIBUTE_DURATION))) {
+            && HAS(gsSpellInfo[IDX(spell)].attributes, SPELL_ATTRIBUTE_DURATION)) {
             spellPower_i += SPELL_HOURGLASS_POWER_BONUS;
         }
         if (m_heroes[m_currentSide]->HasArtifact(ARTIFACT_WIZARD_HAT)
-            && (gsSpellInfo[IDX(spell)].attributes & IDX(SPELL_ATTRIBUTE_DURATION))) {
+            && HAS(gsSpellInfo[IDX(spell)].attributes, SPELL_ATTRIBUTE_DURATION)) {
             spellPower_i += SPELL_WIZARD_HAT_POWER_BONUS;
         }
     }
@@ -763,7 +763,7 @@ void combatManager::CastSpell(
                     sprintf(gText, "telptin.82m");
                     spellSample = LoadPlaySample(gText);
                 }
-                if ((teleportArmy_i->m_monster.flags.all & IDX(ARMY_FLAG_WIDE)) != 0) {
+                if (HAS(teleportArmy_i->m_monster.flags.all, MonsterFlags(IDX(ARMY_FLAG_WIDE))) != 0) {
                     adjacentHex_q = teleportDestination;
                     if (teleportArmy_i->m_facing == ARMY_FACING_RIGHT) {
                         adjacentHex_q =
@@ -2948,7 +2948,7 @@ void combatManager::MirrorImage(i32 targetHex) {
             if (sourcePart == 0) {
                 searchHex = source->m_hex;
             } else {
-                if ((source->m_monster.flags.all & IDX(ARMY_FLAG_WIDE)) == 0)
+                if (HAS(source->m_monster.flags.all, MonsterFlags(IDX(ARMY_FLAG_WIDE))) == 0)
                     continue;
                 if (source->m_facing == ARMY_FACING_RIGHT)
                     searchHex = source->m_hex + 1;

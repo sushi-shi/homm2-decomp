@@ -2095,7 +2095,7 @@ void philAI::ValueOfBuyingBuilding(
     }
     if (building == BUILDING_SLOT_DWELLING_LAST) {
         adjustedValue -= static_cast<float>(
-            GetBuildingBaseResourceValue(currentTownRace, BUILDING_SLOT_DWELLING_LAST - 1, 1)
+            GetBuildingBaseResourceValue(currentTownRace, BuildingSlotType(IDX(BUILDING_SLOT_DWELLING_LAST) - 1), 1)
         );
     }
     if (building == BUILDING_SLOT_MAGE_GUILD && townPtr->m_buildState > 1) {
@@ -2136,16 +2136,16 @@ void philAI::ValueOfBuyingBuilding(
             if (giCurTurn < 3 && !(townPtr->m_buildings & BIT(BUILDING_SLOT_DWELLING_THIRD)))
                 adjustedValue = 0.0f;
             break;
-        case 10:
+        case BUILDING_SLOT_SPECIAL_TEN:
             if (giCurTurn < 21)
                 adjustedValue = 0.0f;
             break;
-        case 11:
+        case BUILDING_SLOT_WELL_EXTRA:
             if (gpGame->m_day < 6)
                 adjustedValue = 0.0f;
             break;
-        case 8:
-        case 9:
+        case BUILDING_SLOT_SPECIAL_EIGHT:
+        case BUILDING_SLOT_SPECIAL_NINE:
         case 12:
         case 15:
         deferEarlyBuilding:
