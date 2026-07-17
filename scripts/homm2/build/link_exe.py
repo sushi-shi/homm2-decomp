@@ -648,11 +648,18 @@ def add_payload_evidence(public_symbols, retail_path, candidate_path, required):
         # Minimal NB09 public records do not carry type sizes. symbol_names.csv uses
         # the next-public gap, so the reviewed enrollment is authoritative here.
         size = expectation["size"]
+        readable_size = expectation.get("readable_size")
         row["retail_payload"] = read_pe_payload_evidence(
             retail_path, int(row["retail_rva"], 16), size, expectation["audit"])
+        if readable_size is not None:
+            row["retail_readable_payload"] = read_pe_payload_evidence(
+                retail_path, int(row["retail_rva"], 16), readable_size, "bytes")
         if row["candidate_count"] == 1:
             row["candidate_payload"] = read_pe_payload_evidence(
                 candidate_path, int(row["candidate_rva"], 16), size, expectation["audit"])
+            if readable_size is not None:
+                row["candidate_readable_payload"] = read_pe_payload_evidence(
+                    candidate_path, int(row["candidate_rva"], 16), readable_size, "bytes")
 
 
 def read_imports(path):
@@ -864,14 +871,27 @@ def load_required_initialized_storage(path=None):
     with path.open(newline="") as f:
         rows = csv.DictReader(
             (line for line in f if not line.lstrip().startswith("#")), delimiter="\t")
-        return [{
-            "name": row["name"],
-            "unit": row["unit"],
-            "size": int(row["size"], 0),
-            "retail_sha256": row["retail_sha256"],
-            "highlow_count": int(row["highlow_count"], 0),
-            "audit": row["audit"],
-        } for row in rows]
+        result = []
+        for row in rows:
+            expectation = {
+                "name": row["name"],
+                "unit": row["unit"],
+                "size": int(row["size"], 0),
+                "retail_sha256": row["retail_sha256"],
+                "highlow_count": int(row["highlow_count"], 0),
+                "audit": row["audit"],
+            }
+            readable_size = row.get("readable_size")
+            readable_sha256 = row.get("readable_sha256")
+            if bool(readable_size) != bool(readable_sha256):
+                raise RuntimeError(
+                    "readable_size and readable_sha256 must be provided together "
+                    "for %s" % row["name"])
+            if readable_size:
+                expectation["readable_size"] = int(readable_size, 0)
+                expectation["readable_sha256"] = readable_sha256
+            result.append(expectation)
+        return result
 
 
 def required_initialized_storage_diagnostics(public_symbols, required, source_sizes=None):
@@ -880,6 +900,7 @@ def required_initialized_storage_diagnostics(public_symbols, required, source_si
     rows = []
     for expectation in required:
         symbol = by_name.get(expectation["name"])
+        readable_size = expectation.get("readable_size")
         source_size = (source_sizes.get(
             (expectation["unit"], int(symbol["retail_rva"], 16)))
             if source_sizes and symbol is not None and symbol.get("retail_rva") else None)
@@ -900,6 +921,21 @@ def required_initialized_storage_diagnostics(public_symbols, required, source_si
             status = "reviewed-retail-evidence-mismatch"
         elif symbol.get("candidate_payload") is None:
             status = "candidate-payload-missing"
+        elif (readable_size is not None and
+              (symbol.get("retail_readable_payload") is None or
+               symbol["retail_readable_payload"]["size"] != readable_size or
+               symbol["retail_readable_payload"]["sha256"] !=
+               expectation["readable_sha256"])):
+            status = "reviewed-readable-evidence-mismatch"
+        elif (readable_size is not None and
+              symbol.get("candidate_readable_payload") is None):
+            status = "candidate-readable-payload-missing"
+        elif (readable_size is not None and
+              (symbol["candidate_readable_payload"]["normalized_sha256"] !=
+               symbol["retail_readable_payload"]["normalized_sha256"] or
+               symbol["candidate_readable_payload"]["highlow_relative_offsets"] !=
+               symbol["retail_readable_payload"]["highlow_relative_offsets"])):
+            status = "readable-span-mismatch"
         elif (symbol["candidate_payload"]["highlow_relative_offsets"] !=
               symbol["retail_payload"]["highlow_relative_offsets"]):
             status = "relocation-pattern-mismatch"
@@ -926,12 +962,18 @@ def required_initialized_storage_diagnostics(public_symbols, required, source_si
                 symbol["candidate_storage"]["class"]
                 if symbol is not None and symbol["candidate_storage"] else None),
             "audit": expectation["audit"],
+            "expected_readable_size": readable_size,
+            "expected_readable_sha256": expectation.get("readable_sha256"),
             "expected_size": expectation["size"],
             "source_definition_size": source_size,
             "expected_retail_sha256": expectation["retail_sha256"],
             "expected_highlow_count": expectation["highlow_count"],
             "retail_payload": symbol.get("retail_payload") if symbol is not None else None,
             "candidate_payload": symbol.get("candidate_payload") if symbol is not None else None,
+            "retail_readable_payload": (
+                symbol.get("retail_readable_payload") if symbol is not None else None),
+            "candidate_readable_payload": (
+                symbol.get("candidate_readable_payload") if symbol is not None else None),
         })
     violations = [row for row in rows if row["status"] != "verified"]
     return {

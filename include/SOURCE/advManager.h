@@ -21,7 +21,7 @@ struct SAMPLE2;
 struct SMapChange;
 struct tag_message;
 
-#define ADVMGR_MONSTER_ANIMATION_FRAME_COUNT 18
+#define ADVMGR_MONSTER_ANIMATION_TABLE_SIZE 16
 
 struct adventureSoundCell {
     int soundId;
@@ -287,7 +287,7 @@ extern int iLastHourGlassPhase;
 extern int gbForceUpdate;
 extern int giCheatSeq;
 extern int iQWE;
-extern unsigned char monAnimDrawFrame[ADVMGR_MONSTER_ANIMATION_FRAME_COUNT];
+extern unsigned char monAnimDrawFrame[ADVMGR_MONSTER_ANIMATION_TABLE_SIZE];
 extern int iLastSandAnimTime;
 extern int iLastNewSandAnimTime;
 extern int giFrameCount;

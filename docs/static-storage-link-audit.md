@@ -18,6 +18,12 @@ the reviewed retail extent. Hashing only the reviewed prefix is insufficient: a
 short array followed by zero-valued storage can otherwise reproduce the expected
 prefix while remaining out of bounds at runtime.
 
+An enrollment may also provide readable_size and readable_sha256 when retail code
+intentionally reads beyond the source allocation into evidenced adjacent storage.
+The allocation size remains checked against sizeof; the larger readable span is
+independently compared in both linked images so a later storage reorder cannot change
+the overread bytes silently.
+
 ## Evidence and classification
 
 The retail inventory is limited to `data,cv-public-data` rows from

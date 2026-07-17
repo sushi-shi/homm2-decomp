@@ -8353,18 +8353,12 @@ VTBL(advManager, 0x004eb6c8);
 
 // ---- globals (definitions, RVA order) ----
 // @data-layout-note
-// Retail ADVMGR owns initialized 0xf57b0+0x14d8 and zero-fill
-// 0x127eb8+0x224. After restoring every retail string payload, candidate
-// `.data` is 0x14ec: MSVC coalesces giCheatSeq/iQWE/monAnimDrawFrame,
-// iLastSandAnimTime/iLastNewSandAnimTime, and giFrameCount at offsets
-// 0x2c..0x50, while retail interleaves them at 0x238/0x23c/0x688,
-// 0x930/0x934, and 0xf70. Candidate `.bss` is 0x21c; all 40 proven
-// allocations and extents are present, but retail packing has alignment holes
-// at +0x2, +0x34, +0x6c, and +0x1f4. Restored payload relocation sites agree;
-// ProcessSelect is 118/118 and DoVisions is 42/42 with only-base=0. Main is
-// 232/232 but retains one unrelated pre-existing CreateColorTables identity.
-// Revisit only after a natural declaration/TU-state change; do not add padding,
-// aliases, or unattached literals.
+// Candidate and retail .data are byte-identical: 0x14d0 bytes with SHA-256
+// e49c0fee285991feeb3b0b394a8a82789560db423f4efbe40b991189e0f0c15d.
+// Retail stores 16 monAnimDrawFrame bytes at section offset 0x58 and places
+// zero-valued iLastSandAnimTime immediately at 0x68. Retail callers can produce
+// indices 16 and 17, so preserve this evidenced adjacency rather than inflating
+// the allocation from bytes read past the public symbol.
 DATA(0x004f57b0) int giLimitUpdMinX = -1;
 DATA(0x004f57b4) int iLastScrollTime = 0;
 DATA(0x004f57b8) int iSandAnim = 0;
@@ -8379,7 +8373,7 @@ DATA(0x004f57d8) int gbForceUpdate = 0;
 DATA(0x004f59e8) int giCheatSeq = 0;
 DATA(0x004f59ec) int iQWE = 0;
 DATA(0x004f5e38)
-unsigned char monAnimDrawFrame[ADVMGR_MONSTER_ANIMATION_FRAME_COUNT] = {
+unsigned char monAnimDrawFrame[ADVMGR_MONSTER_ANIMATION_TABLE_SIZE] = {
     0, 0, 0, 1, 2, 2, 1, 0, 0, 0, 3, 4, 5, 5, 4, 3
 };
 DATA(0x004f60e0) int iLastSandAnimTime = 0;
