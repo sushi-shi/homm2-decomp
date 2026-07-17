@@ -79,9 +79,10 @@ do not add current assignments, queue snapshots, percentages, or next actions.
   for proven retail `long` declarations whose distinct C++ type identity affects mangling or
   overload resolution, and retain SDK aliases such as `DWORD`, `WPARAM`, and `U32` at external
   ABI boundaries. The fixed-width build assertion enforces this scope.
-- Put type and enum declarations in headers. For known serialized numeric domains, prefer
-  a header-level `typedef enum` with explicit values while preserving storage width and
-  packed layout.
+- Put type declarations and shared enum domains in headers. A `typedef enum` used by
+  exactly one TU is private and lives in that `.cpp`. For known serialized numeric
+  domains, prefer a `typedef enum` with explicit values while preserving storage width
+  and packed layout.
 - Preserve proven layouts with packed records and `SIZE` evidence. The retail MSVC build
   keeps `SIZE` byte-neutral; do not turn it into emitted declarations.
 - Use inline accessors where retail `/Ob1` traces prove them. Do not replace modeled fields
