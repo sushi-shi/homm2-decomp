@@ -12,6 +12,7 @@
 #include <BASE/heroWindowManager.h>
 #include <BASE/bmap2.h>
 #include <BASE/executive.h>
+#include <BASE/widget.h>
 #include <BASE/inputManager.h>
 #include <BASE/Misc.h>
 #include <BASE/mouseManager.h>
@@ -1257,8 +1258,8 @@ recruitDragon:
         SetWinText(oracleWindow, ORACLE_WINDOW_TEXT_ID);
         gpTownManager->SetupThievesGuild(oracleWindow, ORACLE_THIEVES_GUILD_RANK);
         strcpy(gText, "Shrine - Player Rankings");
-        oracleMessage1.type = ORACLE_MESSAGE_TYPE;
-        oracleMessage1.payload.widget.command = ORACLE_MESSAGE_COMMAND;
+        oracleMessage1.type = MESSAGE_WIDGET;
+        oracleMessage1.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
         oracleMessage1.payload.widget.id = 0;
         oracleMessage1.payload.widget.data.text = gText;
         oracleWindow->BroadcastMessage(oracleMessage1);

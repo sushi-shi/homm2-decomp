@@ -313,7 +313,7 @@ i32 game::NewGame(void)
         InitNewGameWindow();
         UpdateNewGameWindow();
 
-        windowMessage.type = NEW_GAME_MESSAGE_WIDGET;
+        windowMessage.type = MESSAGE_WIDGET;
         windowMessage.payload.widget.id = NEW_GAME_MAP_OPTIONS_CONTROL;
         windowMessage.payload.widget.command = NEW_GAME_WIDGET_ENABLE;
         windowMessage.payload.widget.data.value = NEW_GAME_WIDGET_ACTIVE_FRAME;
@@ -581,7 +581,7 @@ void game::InitNewGameWindow(void)
                                    firstPlayerXLocal + 19),
                 240, 56, 9, label, "smalfont.fnt", 1,
                 static_cast<i16>(playerCounter + NEW_GAME_PLAYER_NAME_FIRST),
-                NEW_GAME_MESSAGE_WIDGET, 1);
+                MESSAGE_WIDGET, 1);
             if (textControlLocal == 0)
                 MemError();
             m_newGameWindow->AddWidget(textControlLocal, -1);
@@ -623,7 +623,7 @@ void game::InitNewGameWindow(void)
             static_cast<i16>(raceTextWidth + 64), 12, label,
             "smalfont.fnt", 1,
             static_cast<i16>(playerCounter + NEW_GAME_RACE_NAME_FIRST),
-            NEW_GAME_MESSAGE_WIDGET, 1);
+            MESSAGE_WIDGET, 1);
         if (textControlLocal == 0)
             MemError();
         m_newGameWindow->AddWidget(textControlLocal, -1);
@@ -655,7 +655,7 @@ void game::UpdateNewGameWindow(void)
     i32 unusedPlayer17;
 
     strcpy(gText, m_mapHeader.name);
-    messageTemp.type = NEW_GAME_MESSAGE_WIDGET;
+    messageTemp.type = MESSAGE_WIDGET;
     messageTemp.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
     messageTemp.payload.widget.id = EncodeNewGameControl(NEW_GAME_SCENARIO_NAME);
     messageTemp.payload.widget.data.text = gText;
@@ -821,14 +821,14 @@ i32 NewGameHandler(struct tag_message &message)
 
     if (!gbNewGameShadowHidden) {
         gbNewGameShadowHidden = 1;
-        windowMessage.type = NEW_GAME_MESSAGE_WIDGET;
+        windowMessage.type = MESSAGE_WIDGET;
         windowMessage.payload.widget.command = NEW_GAME_WIDGET_DISABLE;
         windowMessage.payload.widget.id = EncodeNewGameControl(NEW_GAME_SHADOW);
         windowMessage.payload.widget.data.value = NEW_GAME_SHADOW_FRAME;
         gpGame->m_newGameWindow->BroadcastMessage(windowMessage);
     }
 
-    if (message.type == NEW_GAME_MESSAGE_IDLE) {
+    if (message.type == MESSAGE_NONE) {
         remotePacketResult =
             reinterpret_cast<NewGameRemotePacket *>(GetRemoteData(1));
         if (remotePacketResult != 0 &&
@@ -839,7 +839,7 @@ i32 NewGameHandler(struct tag_message &message)
             case NEW_GAME_REMOTE_START:
                 gpWindowManager->m_dialogResult = message.payload.widget.id;
                 gpWindowManager->m_dialogResult = NEW_GAME_DIALOG_OK;
-                message.type = NEW_GAME_MESSAGE_WIDGET;
+                message.type = MESSAGE_WIDGET;
                 message.payload.widget.id = NEW_GAME_DIALOG_CLOSE_MESSAGE;
                 message.payload.widget.command = message.payload.widget.id;
                 return 2;
@@ -895,7 +895,7 @@ i32 NewGameHandler(struct tag_message &message)
         }
     }
 
-    if (message.type == NEW_GAME_MESSAGE_KEY &&
+    if (message.type == MESSAGE_KEY_DOWN &&
         giNumHumanPlayers > 1 &&
         iMPBaseType != MULTIPLAYER_BASE_HOT_SEAT &&
         gpGame->ProcessNGKeyPress(message)) {
@@ -919,7 +919,7 @@ i32 NewGameHandler(struct tag_message &message)
             ShutDown(0);
     }
 
-    if (message.type != NEW_GAME_MESSAGE_WIDGET)
+    if (message.type != MESSAGE_WIDGET)
         goto finish;
 
     if (message.payload.widget.parameter & NEW_GAME_MOUSE_RIGHT_FLAG) {
@@ -1210,13 +1210,13 @@ chooseMap:
         if (gbRemoteOn && giThisNetPos != 0)
             break;
         {
-            mapWindowMessageTemp.type = NEW_GAME_MESSAGE_WIDGET;
+            mapWindowMessageTemp.type = MESSAGE_WIDGET;
             mapWindowMessageTemp.payload.widget.command = NEW_GAME_WIDGET_DISABLE;
             mapWindowMessageTemp.payload.widget.id = NEW_GAME_DIALOG_CANCEL;
             mapWindowMessageTemp.payload.widget.data.value = NEW_GAME_WIDGET_INACTIVE_FRAME;
             gpGame->m_newGameWindow->BroadcastMessage(mapWindowMessageTemp);
             gpGame->GetMap();
-            mapWindowMessageTemp.type = NEW_GAME_MESSAGE_WIDGET;
+            mapWindowMessageTemp.type = MESSAGE_WIDGET;
             mapWindowMessageTemp.payload.widget.command = NEW_GAME_WIDGET_ENABLE;
             mapWindowMessageTemp.payload.widget.id = NEW_GAME_DIALOG_CANCEL;
             mapWindowMessageTemp.payload.widget.data.value = NEW_GAME_WIDGET_INACTIVE_FRAME;
@@ -1281,25 +1281,25 @@ i32 game::ProcessNGKeyPress(struct tag_message &message)
         return 0;
 
     switch (message.payload.keyboard.keyCode) {
-    case NEW_GAME_KEY_ESCAPE:
+    case INPUT_SCAN_ESCAPE:
         if (!gbAllowTextEntryEscape)
             break;
         strcpy(cNGKPCore, "");
         break;
 
-    case NEW_GAME_KEY_DELETE:
+    case INPUT_SCAN_NUMPAD_DELETE:
         if (strlen(cNGKPCore) > NGKPcursorIndex) {
             strcpy(gText, cNGKPCore + (NGKPcursorIndex + 1));
             strcpy(cNGKPCore + NGKPcursorIndex, gText);
         }
         break;
 
-    case NEW_GAME_KEY_LEFT:
+    case INPUT_SCAN_NUMPAD_4:
         if (NGKPcursorIndex > 0)
             --NGKPcursorIndex;
         break;
 
-    case NEW_GAME_KEY_RIGHT:
+    case INPUT_SCAN_NUMPAD_6:
         if (strlen(cNGKPCore) > NGKPcursorIndex)
             ++NGKPcursorIndex;
         break;
@@ -1461,7 +1461,7 @@ void game::ShowScenInfo(void)
         MemError();
     SetWinText(scenarioWindowValue, NEW_GAME_SCENARIO_WINDOW_TEXT_ID);
 
-    scenarioMessageTemp.type = NEW_GAME_MESSAGE_WIDGET;
+    scenarioMessageTemp.type = MESSAGE_WIDGET;
     scenarioMessageTemp.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
     scenarioMessageTemp.payload.widget.id =
         EncodeNewGameControl(NEW_GAME_SCENARIO_NAME);
@@ -1580,7 +1580,7 @@ void game::ShowScenInfo(void)
                                    firstPlayerXLocal + 19),
                 206, 56, 9, label, "smalfont.fnt", 1,
                 static_cast<i16>(playerCounter + NEW_GAME_PLAYER_NAME_FIRST),
-                NEW_GAME_MESSAGE_WIDGET, 1);
+                MESSAGE_WIDGET, 1);
             if (textControlLocal == 0)
                 MemError();
             scenarioWindowValue->AddWidget(textControlLocal, -1);
@@ -1619,7 +1619,7 @@ void game::ShowScenInfo(void)
             static_cast<i16>(raceTextWidth + 64), 12, label,
             "smalfont.fnt", 1,
             static_cast<i16>(playerCounter + NEW_GAME_RACE_NAME_FIRST),
-            NEW_GAME_MESSAGE_WIDGET, 1);
+            MESSAGE_WIDGET, 1);
         if (textControlLocal == 0)
             MemError();
         scenarioWindowValue->AddWidget(textControlLocal, -1);

@@ -1256,14 +1256,14 @@ i32 OverviewHandler(struct tag_message &message)
 
     if (message.type == MESSAGE_KEY_DOWN) {
         switch (message.payload.keyboard.keyCode) {
-            case OVERVIEW_KEY_PAGE_UP:
+            case INPUT_SCAN_NUMPAD_9:
                 giOverviewTop[giOverviewType] -= OVERVIEW_VISIBLE_ROWS;
                 if (giOverviewTop[giOverviewType] < 0) {
                     giOverviewTop[giOverviewType] = 0;
                 }
                 gpGame->SetupDynamicStuff(1, 1, 0);
                 break;
-            case OVERVIEW_KEY_PAGE_DOWN:
+            case INPUT_SCAN_NUMPAD_3:
                 giOverviewTop[giOverviewType] += OVERVIEW_VISIBLE_ROWS;
                 if (giOverviewTop[giOverviewType]
                     > giOverviewItems[giOverviewType] - OVERVIEW_VISIBLE_ROWS) {
@@ -1272,11 +1272,11 @@ i32 OverviewHandler(struct tag_message &message)
                 }
                 gpGame->SetupDynamicStuff(1, 1, 0);
                 break;
-            case OVERVIEW_KEY_HOME:
+            case INPUT_SCAN_NUMPAD_7:
                 giOverviewTop[giOverviewType] = 0;
                 gpGame->SetupDynamicStuff(1, 1, 0);
                 break;
-            case OVERVIEW_KEY_END:
+            case INPUT_SCAN_NUMPAD_1:
                 giOverviewTop[giOverviewType] =
                     giOverviewItems[giOverviewType] - OVERVIEW_VISIBLE_ROWS;
                 gpGame->SetupDynamicStuff(1, 1, 0);

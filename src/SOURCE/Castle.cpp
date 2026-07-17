@@ -82,7 +82,7 @@ void townManager::SetupCastle(heroWindow *window, i32 updateOnly)
             m_buildableBuildings |= 1L << castleSlotsUse[slot7];
     }
 
-    message3.type = CASTLE_MESSAGE_WIDGET;
+    message3.type = MESSAGE_WIDGET;
     message3.payload.widget.command = CASTLE_WIDGET_FRAME;
     for (slot7 = 0; slot7 < CASTLE_SLOT_COUNT; ++slot7) {
         message3.payload.widget.id = CASTLE_CONTROL_BUILDING_ICON_FIRST + slot7;
@@ -345,9 +345,9 @@ i32 CastleHandler(tag_message &message)
     result = 0;
     hoverMessage = 0;
 
-    if (message.type == CASTLE_MESSAGE_HOVER ||
-        message.type == CASTLE_MESSAGE_WIDGET) {
-        if (message.type == CASTLE_MESSAGE_HOVER) {
+    if (message.type == MESSAGE_MOUSE_MOVE ||
+        message.type == MESSAGE_WIDGET) {
+        if (message.type == MESSAGE_MOUSE_MOVE) {
             gpWindowManager->ConvertToHover(message);
             hoverMessage = 1;
         }
@@ -494,7 +494,7 @@ hero_hover_text:
         }
 
 hover_text_ready:
-        message.type = CASTLE_MESSAGE_WIDGET;
+        message.type = MESSAGE_WIDGET;
         message.payload.widget.command = CASTLE_WIDGET_TEXT;
         message.payload.widget.id = CASTLE_CONTROL_STATUS_TEXT;
         message.payload.widget.data.text = gText;
@@ -507,13 +507,13 @@ hover_text_ready:
         return 1;
     }
 
-    if (message.type == CASTLE_MESSAGE_WIDGET) {
+    if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
-        case CASTLE_INPUT_DESELECT:
+        case WIDGET_COMMAND_DESELECT:
             result = message.payload.widget.id == CASTLE_CONTROL_CLOSE;
             break;
-        case CASTLE_INPUT_SELECT:
-        case CASTLE_INPUT_ALTERNATE_SELECT:
+        case WIDGET_COMMAND_SELECT:
+        case WIDGET_COMMAND_ALTERNATE_SELECT:
             quickFlag = (message.payload.widget.parameter & CASTLE_QUICK_VIEW_MODIFIER) != 0;
             switch (buildingIndex) {
             case CASTLE_CONTROL_CAPTAIN_FORMATION_SPREAD:

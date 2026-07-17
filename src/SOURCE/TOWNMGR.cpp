@@ -1195,7 +1195,7 @@ i32 townManager::Main(tag_message &message)
 {
     char description_b[400];
     i32 exitTown_i = 0;
-    i32 quickView_k = (message.payload.widget.parameter & TOWN_QUICK_VIEW_MODIFIER) != 0;
+    i32 quickView_k = (message.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) != 0;
     i32 debugBuilding_e;
     i32 index_i;
     i32 marketplaceCount_m;
@@ -1635,8 +1635,8 @@ i32 townManager::Main(tag_message &message)
 
     case MESSAGE_KEY_UP:
         switch (message.payload.keyboard.keyCode) {
-        case TOWN_KEY_SHIFT_LEFT:
-        case TOWN_KEY_SHIFT_RIGHT:
+        case INPUT_SCAN_LEFT_SHIFT:
+        case INPUT_SCAN_RIGHT_SHIFT:
             ShiftQualChange();
             break;
         }
@@ -1644,8 +1644,8 @@ i32 townManager::Main(tag_message &message)
 
     case MESSAGE_KEY_DOWN:
         switch (message.payload.keyboard.keyCode) {
-        case TOWN_KEY_SHIFT_LEFT:
-        case TOWN_KEY_SHIFT_RIGHT:
+        case INPUT_SCAN_LEFT_SHIFT:
+        case INPUT_SCAN_RIGHT_SHIFT:
             ShiftQualChange();
             break;
 
@@ -2465,7 +2465,7 @@ i32 MageGuildHandler(tag_message &message)
         switch (message.payload.widget.command) {
         case TOWN_INPUT_SELECT:
         case TOWN_INPUT_ALTERNATE_SELECT:
-            quickView_f = message.payload.widget.parameter & TOWN_QUICK_VIEW_MODIFIER;
+            quickView_f = message.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON;
             spellSlot = -1;
             if (message.payload.widget.id >= TOWN_MAGE_FIRST_SPELL_CONTROL &&
                 message.payload.widget.id < TOWN_MAGE_FIRST_SPELL_CONTROL +

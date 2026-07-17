@@ -995,20 +995,20 @@ i32 HeroHandler(struct tag_message &message) {
         return HERO_UI_HANDLER_CONTINUE;
     }
 
-    if (message.type == HERO_UI_KEY_UP) {
+    if (message.type == MESSAGE_KEY_UP) {
         switch (message.payload.keyboard.keyCode) {
-        case HERO_UI_SHIFT_LEFT:
-        case HERO_UI_SHIFT_RIGHT:
+        case INPUT_SCAN_LEFT_SHIFT:
+        case INPUT_SCAN_RIGHT_SHIFT:
             gpWindowManager->m_lastHoverId = HERO_WINDOW_NO_HOVER_WIDGET;
             gpInputManager->ForceMouseMove();
             break;
         }
     }
 
-    if (message.type == HERO_UI_KEY_DOWN) {
+    if (message.type == MESSAGE_KEY_DOWN) {
         switch (message.payload.keyboard.keyCode) {
-        case HERO_UI_SHIFT_LEFT:
-        case HERO_UI_SHIFT_RIGHT:
+        case INPUT_SCAN_LEFT_SHIFT:
+        case INPUT_SCAN_RIGHT_SHIFT:
             gpWindowManager->m_lastHoverId = HERO_WINDOW_NO_HOVER_WIDGET;
             gpInputManager->ForceMouseMove();
             break;

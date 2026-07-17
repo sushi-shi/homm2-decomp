@@ -45,9 +45,6 @@ typedef enum NewGameConstant {
     NEW_GAME_SHADOW_FRAME = 6,
     NEW_GAME_WIDGET_SET_TEXT = 3,
     NEW_GAME_WIDGET_SET_FRAME = 4,
-    NEW_GAME_MESSAGE_WIDGET = 0x200,
-    NEW_GAME_MESSAGE_IDLE = 0,
-    NEW_GAME_MESSAGE_KEY = 1,
     NEW_GAME_EVENT_PRESS = 0x0c,
     NEW_GAME_EVENT_RELEASE = 0x0d,
     NEW_GAME_EVENT_ALTERNATE_PRESS = 0x0e,
@@ -110,10 +107,6 @@ typedef enum NewGameConstant {
 } NewGameConstant;
 
 typedef enum NewGameKeyCode {
-    NEW_GAME_KEY_ESCAPE = 1,
-    NEW_GAME_KEY_LEFT = 0x4b,
-    NEW_GAME_KEY_RIGHT = 0x4d,
-    NEW_GAME_KEY_DELETE = 0x53,
     NEW_GAME_KEY_ENTER = 10,
     NEW_GAME_KEY_BACKSPACE = 0x7f,
     NEW_GAME_KEY_FIRST_EXTENDED = 0x100,

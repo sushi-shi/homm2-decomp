@@ -475,10 +475,10 @@ continue_route:
                     goto movement_done;
                 messageValue = gpInputManager->GetEvent();
                 while (messageValue.type != MESSAGE_NONE) {
-                    if (messageValue.type == ADVMGR_INPUT_MOUSE_DOWN ||
-                        messageValue.type == ADVMGR_INPUT_MOUSE_UP ||
-                        messageValue.type == ADVMGR_INPUT_KEY_DOWN ||
-                        messageValue.type == ADVMGR_INPUT_COMMAND) {
+                    if (messageValue.type == MESSAGE_KEY_DOWN ||
+                        messageValue.type == MESSAGE_LEFT_BUTTON_DOWN ||
+                        messageValue.type == MESSAGE_RIGHT_BUTTON_DOWN ||
+                        messageValue.type == MESSAGE_WIDGET) {
                         movementStopped = 1;
                         StopCursor(1);
                         goto movement_done;

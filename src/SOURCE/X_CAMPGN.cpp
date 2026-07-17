@@ -390,7 +390,7 @@ void ExpCampaign::ShowInfo(i32 viewOnly, i32)
     m_window->AddWidget(campaignIcon, -1);
 
     tag_message message;
-    message.type = CAMPAIGN_MESSAGE_WIDGET;
+    message.type = MESSAGE_WIDGET;
     if (viewOnly == 0) {
         message.payload.widget.command = CAMPAIGN_MESSAGE_DESELECT;
         message.payload.widget.id = CAMPAIGN_DIALOG_RESTART;
@@ -454,7 +454,7 @@ void ExpCampaign::UpdateInfo(i32 redraw)
     i8 showScroll;
     char armyName8[EXPANSION_CAMPAIGN_ARMY_NAME_BUFFER_SIZE];
 
-    message.type = CAMPAIGN_MESSAGE_WIDGET;
+    message.type = MESSAGE_WIDGET;
     for (map = 0; map < m_mapCount; ++map) {
         if (m_mapChoices[map] != 0)
             message.payload.widget.data.value = 1;
@@ -464,7 +464,7 @@ void ExpCampaign::UpdateInfo(i32 redraw)
             message.payload.widget.data.value = 2;
         if (m_viewMap == map)
             message.payload.widget.data.value += (m_campaignId + 1) * 3;
-        message.payload.widget.command = CAMPAIGN_MESSAGE_SET_FRAME;
+        message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
         message.payload.widget.id = map + CAMPAIGN_TRACK_WIDGET_FIRST;
         m_window->BroadcastMessage(message);
     }
@@ -475,7 +475,7 @@ void ExpCampaign::UpdateInfo(i32 redraw)
     sprintf(gText, "x_track%d.icn", m_campaignId + 1);
     m_window->BroadcastMessage(message);
 
-    message.payload.widget.command = CAMPAIGN_MESSAGE_SET_TEXT;
+    message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message.payload.widget.data.text = gText;
     message.payload.widget.id = CAMPAIGN_SCENARIO_NUMBER_WIDGET;
     sprintf(gText, "%d", m_viewMap + 1);
@@ -638,7 +638,7 @@ void ExpCampaign::UpdateInfo(i32 redraw)
 
     for (map = 0; map < EXPANSION_CAMPAIGN_BONUS_CHOICE_COUNT; ++map) {
         message.payload.widget.id = map + CAMPAIGN_BONUS_WIDGET_FIRST;
-        message.payload.widget.command = CAMPAIGN_MESSAGE_SET_FRAME;
+        message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
         if (m_viewOnly == 0 && m_mapChoices[m_viewMap] != 0)
             message.payload.widget.data.value = CAMPAIGN_WIDGET_ENABLE_FRAME;
         else
@@ -1052,14 +1052,14 @@ i32 ExpCampaign::MessageHandler(struct tag_message &message)
         gpSoundManager->SwitchAmbientMusic(
             giTerrainToMusicTrack[gpAdvManager->m_currentTerrain]);
     if (giDialogTimeout != 0 && giDialogTimeout < KBTickCount()) {
-        message.type = CAMPAIGN_MESSAGE_WIDGET;
+        message.type = MESSAGE_WIDGET;
         gpWindowManager->m_dialogResult = message.payload.widget.id;
         message.payload.widget.id = CAMPAIGN_CLOSE_COMMAND;
         message.payload.widget.command = message.payload.widget.id;
         giDialogTimeout = 0;
         return CAMPAIGN_HANDLER_CLOSE;
     }
-    if (message.type == CAMPAIGN_MESSAGE_WIDGET) {
+    if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
         case CAMPAIGN_MESSAGE_HOVER:
         case CAMPAIGN_MESSAGE_HELP:

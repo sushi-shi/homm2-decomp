@@ -54,16 +54,8 @@ HOMM2_ENUM_BEGIN(FileRequesterMapSizeFilter)
     FILE_REQUESTER_MAP_SIZE_COUNT = 5
 HOMM2_ENUM_END(FileRequesterMapSizeFilter)
 
-typedef enum FileRequesterEventType {
-    FILE_REQUESTER_EVENT_KEY = 1,
-    FILE_REQUESTER_EVENT_WIDGET = 0x200,
-    FILE_REQUESTER_EVENT_EXIT = 0x4000
-} FileRequesterEventType;
-
 typedef enum FileRequesterKey {
-    FILE_REQUESTER_KEY_CYCLE_FILTER = 0x40,
-    FILE_REQUESTER_KEY_UP = 0x48,
-    FILE_REQUESTER_KEY_DOWN = 0x50
+    FILE_REQUESTER_KEY_CYCLE_FILTER = 0x40
 } FileRequesterKey;
 
 typedef enum FileRequesterHelpIndex {

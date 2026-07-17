@@ -36,9 +36,6 @@ typedef enum CampaignScenarioArmyCount {
 } CampaignScenarioArmyCount;
 
 typedef enum CampaignMessageConstant {
-    CAMPAIGN_MESSAGE_WIDGET = 0x200,
-    CAMPAIGN_MESSAGE_SET_TEXT = 3,
-    CAMPAIGN_MESSAGE_SET_FRAME = 4,
     CAMPAIGN_MESSAGE_SELECT = 5,
     CAMPAIGN_MESSAGE_DESELECT = 6,
     CAMPAIGN_MESSAGE_SET_ICON = 9,

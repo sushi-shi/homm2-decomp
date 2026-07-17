@@ -216,7 +216,7 @@ void bankBox::Update(i32 drawWindow)
     tag_message message;
     i32 resource_1;
 
-    message.type = EVENT_WINDOW_MESSAGE;
+    message.type = MESSAGE_WIDGET;
     message.payload.widget.command = BANK_BOX_SET_TEXT_COMMAND;
     for (resource_1 = 0; resource_1 < BANK_BOX_NON_GOLD_RESOURCE_COUNT;
          resource_1++) {
