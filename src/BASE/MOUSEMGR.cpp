@@ -234,9 +234,9 @@ void mouseManager::SetPointer(char* name, i32 frame, i32 cursorType) {
             if (m_cursorIcon != 0)
                 gpResourceManager->Dispose(m_cursorIcon);
             char local_10[16];
-            if (m_cursorType == MOUSE_CURSOR_ADVENTURE)
+            if (m_cursorType == IDX(MOUSE_CURSOR_ADVENTURE))
                 sprintf(local_10, gMouseManagerStrings.adventureIcon.text);
-            else if (m_cursorType == MOUSE_CURSOR_SPELL)
+            else if (m_cursorType == IDX(MOUSE_CURSOR_SPELL))
                 sprintf(local_10, gMouseManagerStrings.spellIcon.text);
             else
                 sprintf(local_10, gMouseManagerStrings.combatIcon.text);
@@ -304,9 +304,9 @@ void mouseManager::SetPointer(i32 frame) {
             );
 
             char filename[16];
-            if (m_cursorType == MOUSE_CURSOR_ADVENTURE)
+            if (m_cursorType == IDX(MOUSE_CURSOR_ADVENTURE))
                 sprintf(filename, gMouseManagerStrings.adventureBitmap.text, frame + 1);
-            else if (m_cursorType == MOUSE_CURSOR_SPELL)
+            else if (m_cursorType == IDX(MOUSE_CURSOR_SPELL))
                 sprintf(filename, gMouseManagerStrings.spellBitmap.text, frame);
             else
                 sprintf(filename, gMouseManagerStrings.combatBitmap.text, frame + 1);
@@ -366,7 +366,7 @@ void mouseManager::SetPointer(i32 frame) {
             );
 
             IconInfo[m_cursorSizeIndex].fIcon = 0;
-            if (m_cursorType == MOUSE_CURSOR_SPELL) {
+            if (m_cursorType == IDX(MOUSE_CURSOR_SPELL)) {
                 IconInfo[m_cursorSizeIndex].xHotspot = MOUSE_SPELL_CURSOR_HOTSPOT;
                 IconInfo[m_cursorSizeIndex].yHotspot = MOUSE_SPELL_CURSOR_HOTSPOT;
             } else {

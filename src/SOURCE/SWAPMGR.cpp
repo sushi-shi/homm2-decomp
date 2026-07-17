@@ -280,7 +280,7 @@ i32 swapManager::Main(tag_message& message) {
                 case IDX(SWAP_COMMAND_SELECT):
                     if (quickView)
                         break;
-                    if (message.payload.widget.id == SWAP_CONTROL_CLOSE)
+                    if (message.payload.widget.id == IDX(SWAP_CONTROL_CLOSE))
                         closeRequested_5 = 1;
                     break;
 
@@ -558,7 +558,7 @@ i32 swapManager::Main(tag_message& message) {
                                     ViewMon();
                                     Reset();
                                 } else if ((message.payload.widget.parameter
-                                            & SWAP_SPLIT_MODIFIER_MASK)
+                                            & IDX(SWAP_SPLIT_MODIFIER_MASK))
                                                != 0
                                            && (m_heroes[m_targetSide]
                                                        ->m_army.m_creatureTypes[m_targetSlot]
@@ -627,7 +627,7 @@ i32 swapManager::Main(tag_message& message) {
                                     ViewMon();
                                     Reset();
                                 } else if ((message.payload.widget.parameter
-                                            & SWAP_SPLIT_MODIFIER_MASK)
+                                            & IDX(SWAP_SPLIT_MODIFIER_MASK))
                                                != 0
                                            && (m_heroes[m_targetSide]
                                                        ->m_army.m_creatureTypes[m_targetSlot]
@@ -712,8 +712,8 @@ void swapManager::SwapArtifacts(void) {
     m_heroes[IDX(m_selectedSide)]->CheckAnduranPieces(1);
     m_heroes[m_targetSide]->CheckAnduranPieces(1);
 
-    if (selectedArtifact == ARTIFACT_SPADE_NECROMANCY
-        || targetArtifact_2 == ARTIFACT_SPADE_NECROMANCY) {
+    if (selectedArtifact == IDX(ARTIFACT_SPADE_NECROMANCY)
+        || targetArtifact_2 == IDX(ARTIFACT_SPADE_NECROMANCY)) {
         tag_message message_1;
         message_1.type = MESSAGE_WIDGET;
         for (i32 side = IDX(SWAP_SIDE_LEFT); side < IDX(SWAP_SIDE_COUNT); ++side) {
@@ -894,7 +894,7 @@ void swapManager::SplitMons(void) {
 
     tag_message message;
     message.type = MESSAGE_WIDGET;
-    if (m_selectedSide == m_targetSide) {
+    if (m_selectedSide == IDX(m_targetSide)) {
         sprintf(gText, "Move how many troops?");
     } else {
         sprintf(

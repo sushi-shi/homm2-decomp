@@ -51,9 +51,9 @@ i8 InitNetHost(void) {
             break;
         case IDX(NETBIOS_SETUP_WAIT_FOR_LOCAL_NAME):
             status = static_cast<u8>(nb_stat(NETBIOS_HOST_SESSION));
-            if (status & NETBIOS_SESSION_NAME_REGISTERED)
+            if (status & IDX(NETBIOS_SESSION_NAME_REGISTERED))
                 return 1;
-            else if (status & NETBIOS_SESSION_ERROR) {
+            else if (status & IDX(NETBIOS_SESSION_ERROR)) {
             }
             break;
     }
@@ -95,9 +95,9 @@ i8 InitNetGuest(void) {
             break;
         case IDX(NETBIOS_SETUP_WAIT_FOR_LOCAL_NAME): {
             i32 status = static_cast<u8>(nb_stat(NETBIOS_GUEST_SESSION));
-            i32 namePending = !(status & NETBIOS_SESSION_NAME_REGISTERED);
+            i32 namePending = !(status & IDX(NETBIOS_SESSION_NAME_REGISTERED));
             if (namePending) {
-                if (status & NETBIOS_SESSION_ERROR) {
+                if (status & IDX(NETBIOS_SESSION_ERROR)) {
                     iNameRetryCount++;
                     iInitNetGuestStatus--;
                 }
@@ -140,7 +140,7 @@ i8 WaitForGuest(void) {
     switch (iWaitForGuestStatus) {
         case IDX(NETBIOS_WAIT_START):
             status = static_cast<i16>(nb_sess(NETBIOS_SESSION_LISTEN_ANY, NETBIOS_GUEST_SESSION));
-            if (status == NETBIOS_RESULT_SUCCESS)
+            if (status == IDX(NETBIOS_RESULT_SUCCESS))
                 iWaitForGuestStatus++;
             return 0;
         case IDX(NETBIOS_WAIT_POLL):

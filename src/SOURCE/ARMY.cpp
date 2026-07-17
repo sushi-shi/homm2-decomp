@@ -37,7 +37,7 @@ army::army(void) {
 
     m_creatureIcon = 0;
     m_hex = 0;
-    for (i = 0; i < ARMY_SAMPLE_COUNT; i++) {
+    for (i = 0; i < IDX(ARMY_SAMPLE_COUNT); i++) {
         m_samples[i] = 0;
     }
     m_drawEnabled = 1;
@@ -61,7 +61,7 @@ VA(0x0044a9a7, 0xde)
 void army::InitClean(void) {
     i32 i;
 
-    for (i = 0; i < ARMY_SAMPLE_COUNT; i++) {
+    for (i = 0; i < IDX(ARMY_SAMPLE_COUNT); i++) {
         m_samples[i] = 0;
     }
     m_roundCounter = -1;
@@ -244,7 +244,7 @@ void army::FreeResources(void) {
         gpResourceManager->Dispose(m_creatureIcon);
         m_creatureIcon = 0;
     }
-    for (i = 0; i < ARMY_SAMPLE_COUNT; i++) {
+    for (i = 0; i < IDX(ARMY_SAMPLE_COUNT); i++) {
         if (m_samples[i]) {
             gpResourceManager->Dispose(m_samples[i]);
             m_samples[i] = 0;
@@ -1685,7 +1685,7 @@ i32 army::WalkTo(i32 destination) {
         if (moatDestination) {
             canEnterMoat_1 = 0;
             if (moatIndex_1 == ARMY_MOAT_GATE_INDEX
-                && gpCombatManager->m_drawbridgeState != COMBAT_CASTLE_GATE_OPEN) {
+                && gpCombatManager->m_drawbridgeState != IDX(COMBAT_CASTLE_GATE_OPEN)) {
                 canEnterMoat_1 = 1;
             }
             if ((moatIndex_1 > 0 && moatCell[moatIndex_1 - 1] == m_hex)
@@ -2093,7 +2093,7 @@ void army::PowEffect(i32 effect, i32 resetLimits, i32 effectX, i32 effectY) {
         }
     }
     if (!gbNoShowCombat && effect != ARMY_NO_EFFECT && drawEffect_1
-        && gCurLoadedSpellEffect != OD_STEER(effect)) {
+        && IDX(gCurLoadedSpellEffect) != OD_STEER(effect)) {
         gpResourceManager->Dispose(gCurLoadedSpellIcon);
         gCurLoadedSpellIcon = gpResourceManager->GetIcon(gCombatFxNames[effect]);
         gCurLoadedSpellEffect = effect;
@@ -2203,7 +2203,7 @@ void army::PowEffect(i32 effect, i32 resetLimits, i32 effectX, i32 effectY) {
                         + current->m_frameInfo
                               .animationFrameCount[current->m_effectAnimationStart + 1];
                 }
-                if (current->m_animationSequence == current->m_effectAnimationStart) {
+                if (current->m_animationSequence == IDX(current->m_effectAnimationStart)) {
                     current->m_effectAnimationLength--;
                 }
                 if (m_drawState < 2) {
@@ -2245,8 +2245,8 @@ void army::PowEffect(i32 effect, i32 resetLimits, i32 effectX, i32 effectY) {
                                 || current->m_animationFrame + 1
                                        < current->m_frameInfo.animationFrameCount
                                              [IDX(current->m_animationSequence)])))) {
-                    if (current->m_animationSequence != current->m_effectAnimationStart
-                        && current->m_animationSequence != current->m_effectAnimationEnd) {
+                    if (current->m_animationSequence != IDX(current->m_effectAnimationStart)
+                        && current->m_animationSequence != IDX(current->m_effectAnimationEnd)) {
                         if (!gbNoShowCombat
                             && current->m_effectAnimationStart == IDX(ARMY_ANIMATION_WINCE)) {
                             gpSoundManager->MemorySample(gpCombatManager->m_armies[side_4][index_10]
@@ -2264,7 +2264,7 @@ void army::PowEffect(i32 effect, i32 resetLimits, i32 effectX, i32 effectY) {
                             < current->m_frameInfo
                                   .animationFrameCount[IDX(current->m_animationSequence)]) {
                             current->m_animationFrame++;
-                        } else if (current->m_animationSequence != current->m_effectAnimationEnd
+                        } else if (current->m_animationSequence != IDX(current->m_effectAnimationEnd)
                                    && current->m_effectAnimationEnd != -1) {
                             current->m_animationSequence = current->m_effectAnimationEnd;
                             current->m_animationFrame = 0;
@@ -2325,15 +2325,15 @@ void army::PowEffect(i32 effect, i32 resetLimits, i32 effectX, i32 effectY) {
         for (side_4 = 0; side_4 < ARMY_COMBAT_SIDE_COUNT; side_4++) {
             for (index_10 = 0; index_10 < gpCombatManager->m_armyCount[side_4]; index_10++) {
                 current = &gpCombatManager->m_armies[side_4][index_10];
-                if (current->m_animationSequence == 14 || current->m_animationSequence == 16
-                    || current->m_animationSequence == 20 || current->m_animationSequence == 24
-                    || current->m_animationSequence == 18 || current->m_animationSequence == 22
-                    || current->m_animationSequence == 26 || current->m_animationSequence == 28
-                    || current->m_animationSequence == 30 || current->m_animationSequence == 32) {
+                if (current->m_animationSequence == 14 || IDX(current->m_animationSequence) == 16
+                    || current->m_animationSequence == 20 || IDX(current->m_animationSequence) == 24
+                    || current->m_animationSequence == 18 || IDX(current->m_animationSequence) == 22
+                    || current->m_animationSequence == 26 || IDX(current->m_animationSequence) == 28
+                    || current->m_animationSequence == 30 || IDX(current->m_animationSequence) == 32) {
                     current->m_animationSequence++;
                     current->m_animationFrame = 0;
                     keepAnimating_1 = 1;
-                } else if (current->m_animationSequence == 13 || current->m_animationSequence == 15
+                } else if (current->m_animationSequence == 13 || IDX(current->m_animationSequence) == 15
                            || current->m_animationSequence == 17
                            || current->m_animationSequence == 21
                            || current->m_animationSequence == 25
@@ -2514,7 +2514,7 @@ void army::SpellEffect(i32 effect, i32 effectFrameDelay, i32 animateCreature) {
         animateCreature = 0;
     }
     if (!gbNoShowCombat) {
-        if (gCurLoadedSpellEffect != effect) {
+        if (gCurLoadedSpellEffect != IDX(effect)) {
             gpResourceManager->Dispose(gCurLoadedSpellIcon);
             gCurLoadedSpellIcon = gpResourceManager->GetIcon(effectFileId_3);
             gCurLoadedSpellEffect = effect;
@@ -3126,7 +3126,7 @@ float army::SpellCastWorkChance(SpellType spell) {
         }
         if (gpCombatManager->m_heroes[m_side]->HasArtifact(ARTIFACT_WAND_NEGATION)
             && (spell == SPELL_DISPEL || spell == SPELL_MASS_DISPEL
-                || spell == CREATURE_SPELL_DISPEL)) {
+                || spell == IDX(CREATURE_SPELL_DISPEL))) {
             return ARMY_SPELL_CHANCE_NONE;
         }
     }
@@ -3145,7 +3145,7 @@ float army::SpellCastWorkChance(SpellType spell) {
             return ARMY_SPELL_CHANCE_NONE;
         }
     }
-    if (spell == CREATURE_SPELL_DISPEL && !m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_HASTE)]
+    if (spell == IDX(CREATURE_SPELL_DISPEL) && !m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_HASTE)]
         && !m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BLESS)]
         && !m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_DRAGON_SLAYER)]
         && !m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BLOODLUST)]
@@ -3463,7 +3463,7 @@ void ModifyFrameInfo(struct SMonFrameInfo* frameInfo, CreatureType monsterType) 
         || monsterType == CREATURE_MUTANT_ZOMBIE || monsterType == CREATURE_ROYAL_MUMMY
         || monsterType == CREATURE_VAMPIRE_LORD || monsterType == CREATURE_POWER_LICH) {
         speedDifference =
-            gMonsterDatabase[IDX(monsterType)].speed - gMonsterDatabase[monsterType - 1].speed;
+            gMonsterDatabase[IDX(monsterType)].speed - gMonsterDatabase[monsterType - 1].IDX(speed);
     }
     if (monsterType == CREATURE_EARTH_ELEMENTAL || monsterType == CREATURE_AIR_ELEMENTAL
         || monsterType == CREATURE_WATER_ELEMENTAL) {

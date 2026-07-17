@@ -183,7 +183,7 @@ void combatManager::CombatMessage(i32 messageType) {
 
     switch (messageType) {
         case IDX(COMBAT_MESSAGE_COMMAND_DEFAULT):
-            if ((currentArmyPtr->m_monster.flags.all & COMBAT_ARMY_FLAG_SHOOTER) != 0
+            if ((currentArmyPtr->m_monster.flags.all & IDX(COMBAT_ARMY_FLAG_SHOOTER)) != 0
                 && currentArmyPtr->m_monster.shots == 0 && targetArmy != 0)
                 strcpy(gText, cCombatMessage[IDX(COMBAT_MESSAGE_TEXT_NO_SHOTS)]);
             else
@@ -952,7 +952,7 @@ void combatManager::DrawFrame(
     }
 
     for (row = 0; row < IDX(COMBAT_DRAW_LAYER_COUNT); row++) {
-        if (row == COMBAT_DRAW_RIGHT_HERO_LAYER && m_heroes[1] != 0) {
+        if (row == IDX(COMBAT_DRAW_RIGHT_HERO_LAYER) && m_heroes[1] != 0) {
             m_heroIcons[1]->CombatClipDrawToBuffer(
                 ((m_heroes[1]->m_isCaptain ? -1 : 0)
                  & (COMBAT_HERO_RIGHT_ALT_X - COMBAT_HERO_RIGHT_X))
@@ -981,7 +981,7 @@ void combatManager::DrawFrame(
             );
         }
 
-        if (row == COMBAT_DRAW_LEFT_HERO_LAYER && m_heroes[0] != 0) {
+        if (row == IDX(COMBAT_DRAW_LEFT_HERO_LAYER) && m_heroes[0] != 0) {
             m_heroIcons[0]->CombatClipDrawToBuffer(
                 COMBAT_HERO_LEFT_X,
                 COMBAT_HERO_LEFT_Y,
@@ -1015,7 +1015,7 @@ void combatManager::DrawFrame(
             columnStep3 = -1;
         }
 
-        if (m_inCastleCombat != 0 && row == COMBAT_DRAW_CATAPULT_LAYER) {
+        if (m_inCastleCombat != 0 && row == IDX(COMBAT_DRAW_CATAPULT_LAYER)) {
             m_combatIcons[IDX(COMBAT_ICON_CATAPULT)]->CombatClipDrawToBuffer(
                 COMBAT_CATAPULT_X,
                 COMBAT_CATAPULT_Y,
@@ -1027,8 +1027,8 @@ void combatManager::DrawFrame(
                 0
             );
         }
-        if (m_inCastleCombat != 0 && row == COMBAT_DRAW_WALL_TOP_LAYER
-            && m_drawbridgeState != COMBAT_CASTLE_GATE_OPEN) {
+        if (m_inCastleCombat != 0 && row == IDX(COMBAT_DRAW_WALL_TOP_LAYER)
+            && m_drawbridgeState != IDX(COMBAT_CASTLE_GATE_OPEN)) {
             m_combatIcons[IDX(COMBAT_ICON_TOWER)]->CombatClipDrawToBuffer(
                 0,
                 0,
@@ -1040,7 +1040,7 @@ void combatManager::DrawFrame(
                 0
             );
         }
-        if (m_inCastleCombat != 0 && row == COMBAT_DRAW_WALL_MIDDLE_LAYER
+        if (m_inCastleCombat != 0 && row == IDX(COMBAT_DRAW_WALL_MIDDLE_LAYER)
             && m_drawbridgeState == 0) {
             m_combatIcons[IDX(COMBAT_ICON_TOWER)]->CombatClipDrawToBuffer(
                 0,
@@ -1053,7 +1053,7 @@ void combatManager::DrawFrame(
                 0
             );
         }
-        if (m_inCastleCombat != 0 && row == COMBAT_DRAW_GATE_LAYER) {
+        if (m_inCastleCombat != 0 && row == IDX(COMBAT_DRAW_GATE_LAYER)) {
             m_combatIcons[IDX(COMBAT_ICON_TOWER)]->CombatClipDrawToBuffer(
                 0,
                 0,
@@ -1152,7 +1152,7 @@ void combatManager::DrawFrame(
                                 wallCoordinates1[m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type][7];
                             break;
                         case IDX(COMBAT_CASTLE_HEX_GATE):
-                            if (m_drawbridgeState != COMBAT_CASTLE_GATE_HIDDEN)
+                            if (m_drawbridgeState != IDX(COMBAT_CASTLE_GATE_HIDDEN))
                                 wallFrame1 = 4;
                             break;
                     }
@@ -1182,7 +1182,7 @@ void combatManager::DrawFrame(
         if (m_inCastleCombat == 0
             || (m_combatTowns[COMBAT_DEFENDER_SIDE]->m_buildings & IDX(TOWN_BUILDING_MOAT)) == 0)
             goto endRow;
-        if (row == COMBAT_CASTLE_GATE_ROW && m_drawbridgeState != COMBAT_CASTLE_GATE_OPEN)
+        if (row == COMBAT_CASTLE_GATE_ROW && m_drawbridgeState != IDX(COMBAT_CASTLE_GATE_OPEN))
             goto endRow;
 
         if (moatCell[row] == giWalkingTo || moatCell[row] == giWalkingTo2
@@ -1195,7 +1195,7 @@ void combatManager::DrawFrame(
                 != row)
                 goto endRow;
 
-            if (gpCombatManager->m_drawbridgeState != COMBAT_CASTLE_GATE_OPEN
+            if (gpCombatManager->m_drawbridgeState != IDX(COMBAT_CASTLE_GATE_OPEN)
                 && (giWalkingTo / COMBAT_GRID_ROW_LENGTH == COMBAT_CASTLE_GATE_ROW
                     || giWalkingFrom / COMBAT_GRID_ROW_LENGTH == COMBAT_CASTLE_GATE_ROW)) {
                 if (giWalkingTo / COMBAT_GRID_ROW_LENGTH == COMBAT_CASTLE_GATE_ROW
@@ -1514,7 +1514,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                 1,
                 0
             );
-            if (viewArmy1->m_monster.flags.all & COMBAT_ARMY_FLAG_SHOOTER)
+            if (viewArmy1->m_monster.flags.all & IDX(COMBAT_ARMY_FLAG_SHOOTER))
                 smallFont->DrawBoundedString(
                     cMiniViewText[IDX(COMBAT_SMALL_VIEW_TEXT_SHOTS)],
                     viewX + COMBAT_SMALL_VIEW_TEXT_X,
@@ -1631,7 +1631,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                 );
             }
 
-            if (viewArmy1->m_monster.flags.all & COMBAT_ARMY_FLAG_SHOOTER) {
+            if (viewArmy1->m_monster.flags.all & IDX(COMBAT_ARMY_FLAG_SHOOTER)) {
                 sprintf(gText, "%d", static_cast<i32>(viewArmy1->m_monster.shots));
                 smallFont->DrawBoundedString(
                     gText,

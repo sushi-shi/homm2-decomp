@@ -83,16 +83,16 @@ i32 KeyboardMessageHandler(void*, u32 message, u32, i32l messageData) {
             event->payload.keyboard.modifiers = 0;
             switch (event->payload.keyboard.keyCode) {
                 case INPUT_SCAN_CONTROL:
-                    gpInputManager->m_modifiers &= INPUT_CLEAR_CONTROL_MASK;
+                    gpInputManager->m_modifiers &= IDX(INPUT_CLEAR_CONTROL_MASK);
                     break;
                 case INPUT_SCAN_LEFT_SHIFT:
-                    gpInputManager->m_modifiers &= INPUT_CLEAR_LEFT_SHIFT_MASK;
+                    gpInputManager->m_modifiers &= IDX(INPUT_CLEAR_LEFT_SHIFT_MASK);
                     break;
                 case INPUT_SCAN_RIGHT_SHIFT:
-                    gpInputManager->m_modifiers &= INPUT_CLEAR_RIGHT_SHIFT_MASK;
+                    gpInputManager->m_modifiers &= IDX(INPUT_CLEAR_RIGHT_SHIFT_MASK);
                     break;
                 case INPUT_SCAN_ALT:
-                    gpInputManager->m_modifiers &= INPUT_CLEAR_ALT_MASK;
+                    gpInputManager->m_modifiers &= IDX(INPUT_CLEAR_ALT_MASK);
                     break;
             }
             break;
@@ -101,10 +101,10 @@ i32 KeyboardMessageHandler(void*, u32 message, u32, i32l messageData) {
     if (event->type != MESSAGE_NONE) {
         event->payload.keyboard.modifiers = gpInputManager->m_modifiers;
         gpInputManager->m_writeIndex++;
-        gpInputManager->m_writeIndex %= INPUT_EVENT_RING_CAPACITY;
+        gpInputManager->m_writeIndex %= IDX(INPUT_EVENT_RING_CAPACITY);
         if (gpInputManager->m_writeIndex == gpInputManager->m_readIndex) {
             gpInputManager->m_readIndex++;
-            gpInputManager->m_readIndex %= INPUT_EVENT_RING_CAPACITY;
+            gpInputManager->m_readIndex %= IDX(INPUT_EVENT_RING_CAPACITY);
         }
         gpInputManager->m_field_0x85a = 0;
 
@@ -193,10 +193,10 @@ i32 MouseMessageHandler(void*, u32 message, u32, i32l messageData) {
 
     if (gConfig.gfx[giCurExe].fullScreen == 0 && gConfig.gfx[giCurExe].colorMouseCursor == 0
         && KBTickCount() > iLastBWOnScreenCheck
-        && event->payload.mouse.x > INPUT_CURSOR_INTERIOR_MIN_EXCLUSIVE
-        && event->payload.mouse.x < INPUT_CURSOR_INTERIOR_MAX_X_EXCLUSIVE
-        && event->payload.mouse.y > INPUT_CURSOR_INTERIOR_MIN_EXCLUSIVE
-        && event->payload.mouse.y < INPUT_CURSOR_INTERIOR_MAX_Y_EXCLUSIVE) {
+        && event->payload.mouse.x > IDX(INPUT_CURSOR_INTERIOR_MIN_EXCLUSIVE)
+        && event->payload.mouse.x < IDX(INPUT_CURSOR_INTERIOR_MAX_X_EXCLUSIVE)
+        && event->payload.mouse.y > IDX(INPUT_CURSOR_INTERIOR_MIN_EXCLUSIVE)
+        && event->payload.mouse.y < IDX(INPUT_CURSOR_INTERIOR_MAX_Y_EXCLUSIVE)) {
         iLastBWOnScreenCheck = KBTickCount() + IDX(INPUT_CURSOR_CHECK_DELAY);
         gpMouseManager->SetPointer(MOUSE_KEEP_CURRENT_FRAME);
     }
@@ -228,11 +228,11 @@ afterMouseCoordinates:
     if (event->type != MESSAGE_NONE) {
         event->payload.mouse.modifiers = gpInputManager->m_modifiers;
         gpInputManager->m_writeIndex++;
-        gpInputManager->m_writeIndex %= INPUT_EVENT_RING_CAPACITY;
+        gpInputManager->m_writeIndex %= IDX(INPUT_EVENT_RING_CAPACITY);
         i32 readIndex = gpInputManager->m_readIndex;
         if (gpInputManager->m_writeIndex == readIndex) {
             gpInputManager->m_readIndex = readIndex + 1;
-            gpInputManager->m_readIndex %= INPUT_EVENT_RING_CAPACITY;
+            gpInputManager->m_readIndex %= IDX(INPUT_EVENT_RING_CAPACITY);
         }
     }
     gpInputManager->m_mouseMessageActive = 0;
@@ -296,7 +296,7 @@ tag_message inputManager::GetEvent(void) {
     if (gpInputManager->m_active && m_readIndex != m_writeIndex) {
         event = m_eventRing[m_readIndex];
         m_readIndex++;
-        m_readIndex %= INPUT_EVENT_RING_CAPACITY;
+        m_readIndex %= IDX(INPUT_EVENT_RING_CAPACITY);
         if (event.type == MESSAGE_KEY_DOWN && m_keyCodeType == INPUT_KEY_CODE_ASCII)
             AsciiConvert(event);
     } else {
@@ -314,7 +314,7 @@ tag_message inputManager::PeekEvent(void) {
     PollSound();
     if (gpInputManager->m_active && m_readIndex != m_writeIndex) {
         event = m_eventRing[m_readIndex];
-        m_readIndex = m_readIndex % INPUT_EVENT_RING_CAPACITY;
+        m_readIndex = m_readIndex % IDX(INPUT_EVENT_RING_CAPACITY);
         if (event.type == MESSAGE_KEY_DOWN && m_keyCodeType == INPUT_KEY_CODE_ASCII)
             AsciiConvert(event);
     } else {
@@ -589,10 +589,10 @@ void inputManager::ForceMouseMove(void) {
     event->payload.mouse.screenY = event->payload.mouse.y;
     event->payload.mouse.modifiers = gpInputManager->m_modifiers;
     gpInputManager->m_writeIndex++;
-    gpInputManager->m_writeIndex %= INPUT_EVENT_RING_CAPACITY;
+    gpInputManager->m_writeIndex %= IDX(INPUT_EVENT_RING_CAPACITY);
     if (gpInputManager->m_writeIndex == gpInputManager->m_readIndex) {
         gpInputManager->m_readIndex++;
-        gpInputManager->m_readIndex %= INPUT_EVENT_RING_CAPACITY;
+        gpInputManager->m_readIndex %= IDX(INPUT_EVENT_RING_CAPACITY);
     }
     gpInputManager->m_mouseMessageActive = 0;
 }

@@ -1357,10 +1357,10 @@ i32 game::ProcessNGKeyPress(struct tag_message& message) {
 
         default:
             gpInputManager->AsciiConvert(message);
-            if (message.payload.keyboard.keyCode == NEW_GAME_KEY_ENTER)
+            if (message.payload.keyboard.keyCode == IDX(NEW_GAME_KEY_ENTER))
                 return 1;
 
-            if (message.payload.keyboard.keyCode == NEW_GAME_KEY_BACKSPACE) {
+            if (message.payload.keyboard.keyCode == IDX(NEW_GAME_KEY_BACKSPACE)) {
                 if (NGKPcursorIndex > 0) {
                     strcpy(gText, cNGKPCore + NGKPcursorIndex);
                     strcpy(cNGKPCore + (NGKPcursorIndex - 1), gText);
@@ -1370,7 +1370,7 @@ i32 game::ProcessNGKeyPress(struct tag_message& message) {
                        && message.payload.keyboard.keyCode != 0) {
                 strcpy(workText, cNGKPCore);
                 keyChar = 0;
-                if (message.payload.keyboard.keyCode >= NEW_GAME_KEY_FIRST_EXTENDED) {
+                if (message.payload.keyboard.keyCode >= IDX(NEW_GAME_KEY_FIRST_EXTENDED)) {
                     scanCode =
                         static_cast<u8>(static_cast<u32>(message.payload.keyboard.keyCode) >> 8);
                     switch (scanCode) {

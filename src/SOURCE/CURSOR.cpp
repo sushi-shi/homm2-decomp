@@ -369,7 +369,7 @@ void advManager::DrawCursorShadow(void) {
                 shadowFrame = HERO_SPRITE_UP_SHADOW_WIDE;
             if (shadowFrame == HERO_SPRITE_UP_STEP_1)
                 shadowFrame = HERO_SPRITE_UP_SHADOW_WIDE;
-            if (shadowFrame >= CURSOR_SHADOW_ANIM_FIRST && shadowFrame < CURSOR_SHADOW_ANIM_END)
+            if (shadowFrame >= IDX(CURSOR_SHADOW_ANIM_FIRST) && shadowFrame < IDX(CURSOR_SHADOW_ANIM_END))
                 shadowOffset = CURSOR_HORSE_SHADOW_OFFSET;
             else
                 shadowOffset = 0;
@@ -378,7 +378,7 @@ void advManager::DrawCursorShadow(void) {
                 gpWindowManager->m_screen,
                 drawX - CURSOR_SHADOW_FLIP_X_ADJUST,
                 drawY,
-                shadowFrame + shadowOffset,
+                shadowFrame + IDX(shadowOffset),
                 1,
                 0,
                 0,
