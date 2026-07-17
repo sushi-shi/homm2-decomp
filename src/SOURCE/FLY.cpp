@@ -22,10 +22,10 @@
 // first remaining branch span begins at +0x64 in the wide-creature path; direct
 // and cached cell access, wide-branch polarity, and both direction forms were tried.
 VA(0x004a5900, 0x295)
-int army::CanFit(int hex, int tryOtherSide, int *fittingHex)
+i32 army::CanFit(i32 hex, i32 tryOtherSide, i32 *fittingHex)
 {
     hexcell *cell_9;
-    int candidateHex;
+    i32 candidateHex;
 
     candidateHex = hex;
     cell_9 = 0;
@@ -43,7 +43,7 @@ int army::CanFit(int hex, int tryOtherSide, int *fittingHex)
     if (m_monster.flags.all & MONSTER_FLAGS_WIDE) {
         candidateHex = GetAdjacentCellIndex(
             hex,
-            (-(static_cast<unsigned int>(m_facing - 1) < 1) & -3) + 4);
+            (-(static_cast<u32>(m_facing - 1) < 1) & -3) + 4);
         if (ValidHex(candidateHex)) {
             cell_9 = &gpCombatManager->m_hexCells[candidateHex];
         }
@@ -60,7 +60,7 @@ int army::CanFit(int hex, int tryOtherSide, int *fittingHex)
 
             candidateHex = GetAdjacentCellIndex(
                 hex,
-                (-(static_cast<unsigned int>(m_facing - 1) < 1) & 3) + 1);
+                (-(static_cast<u32>(m_facing - 1) < 1) & 3) + 1);
             if (ValidHex(candidateHex)) {
                 cell_9 = &gpCombatManager->m_hexCells[candidateHex];
             } else {
@@ -88,18 +88,18 @@ int army::CanFit(int hex, int tryOtherSide, int *fittingHex)
 // has no local records for slot recovery. Local names/order/scope, attackHex forms,
 // cached/direct target access, if/ternary forms, and direction-loop polarity were tried.
 VA(0x004a5b95, 0x405)
-int army::ValidFlight(int destination, int fromTargetHex)
+i32 army::ValidFlight(i32 destination, i32 fromTargetHex)
 {
     army *target;
-    int targetHex;
-    int attackMask;
-    int initialDirection;
-    int direction;
-    int attackHex[2];
-    unsigned int directionMask;
-    int adjacentHex;
-    int fittingHex;
-    int i;
+    i32 targetHex;
+    i32 attackMask;
+    i32 initialDirection;
+    i32 direction;
+    i32 attackHex[2];
+    u32 directionMask;
+    i32 adjacentHex;
+    i32 fittingHex;
+    i32 i;
 
     if (!ValidHex(destination)) {
         return 0;
@@ -196,7 +196,7 @@ int army::ValidFlight(int destination, int fromTargetHex)
 }
 
 VA(0x004a5f9a, 0x25)
-int army::FlyTo(void)
+i32 army::FlyTo(void)
 {
     return FlyTo(m_moveTargetHex);
 }
@@ -208,33 +208,33 @@ int army::FlyTo(void)
 // The dead retail segment-count==0 fallback and the BEGIN_STANDING frame count
 // overwritten by the MIDDLE assignment were audited and intentionally retained.
 VA(0x004a5fbf, 0xc1f)
-int army::FlyTo(int destination)
+i32 army::FlyTo(i32 destination)
 {
-    int sourceColumn;
-    int destinationColumn;
-    int columnDifference;
-    int destinationX;
-    int destinationY;
-    int sourceX;
-    int sourceY;
+    i32 sourceColumn;
+    i32 destinationColumn;
+    i32 columnDifference;
+    i32 destinationX;
+    i32 destinationY;
+    i32 sourceX;
+    i32 sourceY;
     float x;
     float y;
-    int xDistance;
-    int yDistance;
-    int distance;
-    int flightSegmentCount;
+    i32 xDistance;
+    i32 yDistance;
+    i32 distance;
+    i32 flightSegmentCount;
     float xStep;
     float yStep;
-    int sourceRearHex;
-    int destinationRearHex;
-    int flightSegment;
-    int flightFrameCount;
-    int middleFrameCount;
-    int frameStart;
-    int oldMinX;
-    int oldMinY;
-    int oldMaxX;
-    int oldMaxY;
+    i32 sourceRearHex;
+    i32 destinationRearHex;
+    i32 flightSegment;
+    i32 flightFrameCount;
+    i32 middleFrameCount;
+    i32 frameStart;
+    i32 oldMinX;
+    i32 oldMinY;
+    i32 oldMaxX;
+    i32 oldMaxY;
 
     if (!ValidHex(destination)) {
         return 0;
@@ -272,7 +272,7 @@ int army::FlyTo(int destination)
     y = static_cast<float>(sourceY);
     xDistance = destinationX - sourceX;
     yDistance = destinationY - sourceY;
-    distance = static_cast<int>(sqrt(static_cast<double>(
+    distance = static_cast<i32>(sqrt(static_cast<double>(
         xDistance * xDistance + yDistance * yDistance)));
     flightSegmentCount = 0;
     if (m_frameInfo.flightSpeed > 0) {
@@ -290,7 +290,7 @@ int army::FlyTo(int destination)
     gpCombatManager->m_hexCells[m_hex].m_occupantFrame = -1;
     if (m_monster.flags.all & MONSTER_FLAGS_WIDE) {
         sourceRearHex =
-            ((-(static_cast<unsigned int>(m_facing - 1) < 1) & 2) - 1) +
+            ((-(static_cast<u32>(m_facing - 1) < 1) & 2) - 1) +
             m_hex;
         gpCombatManager->m_hexCells[sourceRearHex].m_occupantIndex = -1;
         gpCombatManager->m_hexCells[sourceRearHex].m_occupantSide = -1;
@@ -392,7 +392,7 @@ int army::FlyTo(int destination)
                 giMaxExtentX = giMaxExtentY;
                 gbComputeExtent = 1;
                 gbSaveBiggestExtent = 1;
-                DrawToBuffer(static_cast<int>(x), static_cast<int>(y), 0);
+                DrawToBuffer(static_cast<i32>(x), static_cast<i32>(y), 0);
                 gbComputeExtent = 0;
                 gbSaveBiggestExtent = 0;
                 if (giMinExtentX < 0) giMinExtentX = 0;
@@ -411,13 +411,13 @@ int army::FlyTo(int destination)
                     (m_animationFrame + 1 >= middleFrameCount &&
                      (m_monsterType == ARMY_CREATURE_VAMPIRE ||
                       m_monsterType == ARMY_CREATURE_VAMPIRE_LORD))) {
-                    glTimers[0] = static_cast<int>(
+                    glTimers[0] = static_cast<i32>(
                         KBTickCount() + m_frameInfo.walkDuration *
                         gfCombatSpeedMod[gConfig.combatSpeed] *
                         ARMY_VAMPIRE_FLIGHT_DURATION_SCALE /
                         flightFrameCount);
                 } else {
-                    glTimers[0] = static_cast<int>(
+                    glTimers[0] = static_cast<i32>(
                         KBTickCount() + m_frameInfo.walkDuration *
                         gfCombatSpeedMod[gConfig.combatSpeed] /
                         flightFrameCount);
@@ -437,18 +437,18 @@ int army::FlyTo(int destination)
 
     CancelSpellType(ARMY_CANCEL_SPELLS_AFTER_MOVE);
     gpCombatManager->m_hexCells[destination].m_occupantSide =
-        static_cast<signed char>(gpCombatManager->m_currentArmySide);
+        static_cast<i8>(gpCombatManager->m_currentArmySide);
     gpCombatManager->m_hexCells[destination].m_occupantIndex =
-        static_cast<signed char>(gpCombatManager->m_currentArmyIndex);
+        static_cast<i8>(gpCombatManager->m_currentArmyIndex);
     gpCombatManager->m_hexCells[destination].m_occupantFrame = -1;
     if (m_monster.flags.all & MONSTER_FLAGS_WIDE) {
         destinationRearHex =
-            ((-(static_cast<unsigned int>(m_facing - 1) < 1) & 2) - 1) +
+            ((-(static_cast<u32>(m_facing - 1) < 1) & 2) - 1) +
             destination;
         gpCombatManager->m_hexCells[destinationRearHex].m_occupantSide =
-            static_cast<signed char>(gpCombatManager->m_currentArmySide);
+            static_cast<i8>(gpCombatManager->m_currentArmySide);
         gpCombatManager->m_hexCells[destinationRearHex].m_occupantIndex =
-            static_cast<signed char>(gpCombatManager->m_currentArmyIndex);
+            static_cast<i8>(gpCombatManager->m_currentArmyIndex);
         if (destinationRearHex >= destination) {
             gpCombatManager->m_hexCells[destinationRearHex].m_occupantFrame = 1;
         } else {

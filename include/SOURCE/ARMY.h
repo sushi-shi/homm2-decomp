@@ -1,5 +1,7 @@
 #ifndef HOMM2_ARMY_H
 #define HOMM2_ARMY_H
+
+#include <Ints.h>
 // Declarations of the free functions DEFINED in ARMY.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
 // forward declarations (was <_all.h>):
@@ -260,34 +262,34 @@ typedef enum ArmySpellChanceConstant {
 #pragma pack(push, 1)
 struct SMonFrameInfo {
     struct MissileOffset {
-        short x;
-        short y;
+        i16 x;
+        i16 y;
     };
     char unknown00;
-    short spellEffectX;              // +0x01
-    short spellEffectY;              // +0x03
-    signed char animationXOffsets[ARMY_WALK_SEGMENT_COUNT]
+    i16 spellEffectX;              // +0x01
+    i16 spellEffectY;              // +0x03
+    i8 animationXOffsets[ARMY_WALK_SEGMENT_COUNT]
                                  [ARMY_ANIMATION_FRAME_COUNT]; // +0x05
-    signed char walkXOffsets[ARMY_ANIMATION_FRAME_COUNT]; // +0x65
-    signed char standingAnimationCount; // +0x75
+    i8 walkXOffsets[ARMY_ANIMATION_FRAME_COUNT]; // +0x65
+    i8 standingAnimationCount; // +0x75
     float standingAnimationChances[10]; // +0x76
-    int standStillDelay;              // +0x9e
-    int walkDuration;                 // +0xa2
-    int attackDuration;               // +0xa6
-    int flightSpeed;                  // +0xaa
+    i32 standStillDelay;              // +0x9e
+    i32 walkDuration;                 // +0xa2
+    i32 attackDuration;               // +0xa6
+    i32 flightSpeed;                  // +0xaa
     struct MissileOffset missileOffsets[ARMY_MISSILE_OFFSET_COUNT]; // +0xae
-    unsigned char projectileDirectionCount; // +0xba
+    u8 projectileDirectionCount; // +0xba
     float projectileAngles[ARMY_PROJECTILE_ANGLE_COUNT]; // +0xbb
-    int quantityX[2];                 // +0xeb
-    signed char animationFrameCount[ARMY_ANIMATION_SEQUENCE_COUNT]; // +0xf3
-    signed char animationFrames[ARMY_ANIMATION_SEQUENCE_COUNT]
+    i32 quantityX[2];                 // +0xeb
+    i8 animationFrameCount[ARMY_ANIMATION_SEQUENCE_COUNT]; // +0xf3
+    i8 animationFrames[ARMY_ANIMATION_SEQUENCE_COUNT]
                                [ARMY_ANIMATION_FRAME_COUNT]; // +0x115
 };
 SIZE(SMonFrameInfo, 0x335);
 #pragma pack(pop)
 extern SMonFrameInfo sViewArmyMonFrameInfo;
 
-void BuildTempWalkSeq(struct SMonFrameInfo *, int, int);
-void ModifyFrameInfo(struct SMonFrameInfo *, int);
+void BuildTempWalkSeq(struct SMonFrameInfo *, i32, i32);
+void ModifyFrameInfo(struct SMonFrameInfo *, i32);
 
 #endif // HOMM2_ARMY_H

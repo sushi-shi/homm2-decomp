@@ -79,12 +79,12 @@
 
 
 
-inline town *GetCastleRec(int i)
+inline town *GetCastleRec(i32 i)
 {
     return &gpGame->m_castleRecs[i];
 }
 
-inline hero *GetHeroSlot(int i)
+inline hero *GetHeroSlot(i32 i)
 {
     return &gpGame->m_heroRecs[i];
 }
@@ -213,9 +213,9 @@ void EarlyShutdown(char *caption, char *text)
 VA(0x00496cd9, 0x148)
 void SetupCDRom(void)
 {
-    int savedNoSound = gbNoSound;
+    i32 savedNoSound = gbNoSound;
     if (iCDRomErr == 1) {
-        SetPalette(*(signed char **)((char *)gPalette + 0x10), 1);
+        SetPalette(*(i8 **)((char *)gPalette + 0x10), 1);
         gpMouseManager->ShowColorPointer();
         gbNoSound = 1;
         if (giTCPHostStatus)
@@ -223,7 +223,7 @@ void SetupCDRom(void)
                          1, -1, -1, -1, 0, -1, 0, -1, 0);
         gbNoCDRom = 1;
     } else if (iCDRomErr == 2) {
-        SetPalette(*(signed char **)((char *)gPalette + 0x10), 1);
+        SetPalette(*(i8 **)((char *)gPalette + 0x10), 1);
         gpMouseManager->ShowColorPointer();
         gbNoSound = 1;
         if (giTCPHostStatus)
@@ -243,7 +243,7 @@ void SetupCDRom(void)
 }
 
 VA(0x00496e21, 0x77)
-int EarlySetup(void)
+i32 EarlySetup(void)
 {
     if (bEarlySetupDone)
         return 0;
@@ -270,22 +270,22 @@ int EarlySetup(void)
 // Tried raw assignments, a void setter (wrong local jmp $+0), and a reference
 // accessor (wrong pointer temporaries/frame). Revisit for inline-tail placement.
 VA(0x00496e98, 0x16c0)
-int oldmain(void)
+i32 oldmain(void)
 {
-    int command_a;
-    int quit_g;
-    int mainScreenLoaded_b;
-    int firstMainScreen_c;
-    int savedUpdateFlags_l;
-    int player_h;
+    i32 command_a;
+    i32 quit_g;
+    i32 mainScreenLoaded_b;
+    i32 firstMainScreen_c;
+    i32 savedUpdateFlags_l;
+    i32 player_h;
     // Retail reserves three unreferenced /Od locals around the live state slots.
-    int unusedMainState_o;
-    int unusedMenuState_d;
-    int unusedPlayerState_c;
-    int netPlayer_i;
-    int gamePlayer_m;
-    int result_i;
-    int transmissionResult_i;
+    i32 unusedMainState_o;
+    i32 unusedMenuState_d;
+    i32 unusedPlayerState_c;
+    i32 netPlayer_i;
+    i32 gamePlayer_m;
+    i32 result_i;
+    i32 transmissionResult_i;
     char matchedNetPlayers_d[OLD_MAIN_MATCH_BUFFER_SIZE];
     char matchedGamePlayers_e[OLD_MAIN_MATCH_BUFFER_SIZE];
     OldMainNetBuffer netBuffer_b;
@@ -370,7 +370,7 @@ main_menu:
             iMPNetProtocol = OLD_MAIN_NETWORK_PROTOCOL;
             iMPExtendedType = giTCPHostStatus ? OLD_MAIN_REMOTE_HOST
                                              : OLD_MAIN_REMOTE_CLIENT;
-            giSetupGameType = static_cast<unsigned char>(giTCPType);
+            giSetupGameType = static_cast<u8>(giTCPType);
             RemoteMain(iMPExtendedType);
             gbWaitForRemoteReceive =
                 iMPExtendedType == OLD_MAIN_REMOTE_CLIENT;
@@ -539,7 +539,7 @@ game_setup_complete:
                                 !matchedNetPlayers_d[netPlayer_i]) {
                                 matchedGamePlayers_e[gamePlayer_m] = 1;
                                 matchedNetPlayers_d[netPlayer_i] = 1;
-                                gbGamePosToNetPos[gamePlayer_m] = static_cast<signed char>(netPlayer_i);
+                                gbGamePosToNetPos[gamePlayer_m] = static_cast<i8>(netPlayer_i);
                             }
                         }
                     }
@@ -555,7 +555,7 @@ game_setup_complete:
                             gbGamePosToNetPos[netPlayer_i] = -1;
                         } else {
                             gbGamePosToNetPos[netPlayer_i] =
-                                static_cast<signed char>(gamePlayer_m);
+                                static_cast<i8>(gamePlayer_m);
                             strcpy(&gpGame->m_defaultPlayerNames[
                                        gamePlayer_m *
                                        OLD_MAIN_DEFAULT_NAME_STRIDE],
@@ -647,7 +647,7 @@ initialize_game:
              !gbThisNetHumanPlayer[giCurWatchPlayer];
              giCurWatchPlayer = (giCurWatchPlayer + 1) % gpGame->m_playerCount) {
         }
-        giCurWatchPlayerBit = static_cast<unsigned char>(1 << giCurWatchPlayer);
+        giCurWatchPlayerBit = static_cast<u8>(1 << giCurWatchPlayer);
 
         if (gbInCampaign && gpGame->m_campaignScenarioWon) {
             giEndSequence = 1;
@@ -788,11 +788,11 @@ char toupper(char c)
 }
 
 VA(0x0049859c, 0x791)
-int InterpretCommandLine(void)
+i32 InterpretCommandLine(void)
 {
-    int len;
-    int i;
-    int helpRequested;
+    i32 len;
+    i32 i;
+    i32 helpRequested;
     gbTCPFirstTime = 1;
     giTCPType = -1;
     giTCPHostStatus = -1;
@@ -896,7 +896,7 @@ int InterpretCommandLine(void)
                 break;
             case 'P':
             {
-                int count = 0;
+                i32 count = 0;
                 if (i + 3 < len)
                     count = gcCommandLine[i + 3] - '0';
                 if (count >= COMMAND_LINE_TCP_MIN_PLAYERS &&
@@ -908,8 +908,8 @@ int InterpretCommandLine(void)
             case 'A':
             {
                 if (i + 3 < len) {
-                    int dst = 0;
-                    int src = i + 3;
+                    i32 dst = 0;
+                    i32 src = i + 3;
                     while (dst < COMMAND_LINE_TCP_TEXT_LENGTH &&
                            gcCommandLine[src] && gcCommandLine[src] != ' ') {
                         gcTCPAddress[dst] = gcCommandLine[src];
@@ -923,8 +923,8 @@ int InterpretCommandLine(void)
             case 'N':
             {
                 if (i + 3 < len) {
-                    int dst = 0;
-                    int src = i + 3;
+                    i32 dst = 0;
+                    i32 src = i + 3;
                     while (dst < COMMAND_LINE_TCP_TEXT_LENGTH &&
                            gcCommandLine[src] && gcCommandLine[src] != ' ') {
                         gcTCPName[dst] = gcCommandLine[src];
@@ -985,13 +985,13 @@ int InterpretCommandLine(void)
 // swap were tried without changing the residual. Revisit with focused exact-span
 // variants after the TU's pre-target libclang diagnostics are resolved.
 VA(0x00498d2d, 0x698)
-int InitMenuHandler(struct tag_message &msg)
+i32 InitMenuHandler(struct tag_message &msg)
 {
-    int handled = 0;
-    int idx;
-    int menu;
-    int helpIndex;
-    int hoverIndex;
+    i32 handled = 0;
+    i32 idx;
+    i32 menu;
+    i32 helpIndex;
+    i32 hoverIndex;
 
     PollSound();
     if (msg.payload.widget.parameter & INIT_MENU_DISABLE_MASK) {
@@ -1160,24 +1160,24 @@ int InitMenuHandler(struct tag_message &msg)
 }
 
 VA(0x004993c5, 0x1b)
-int NullHandler(struct tag_message &msg)
+i32 NullHandler(struct tag_message &msg)
 {
     return 1;
 }
 
 VA(0x004993e0, 0x1a9)
-int RecruitHeroHandler(tag_message &msg)
+i32 RecruitHeroHandler(tag_message &msg)
 {
     // e/p/c/d are the (dead) event-id shorts; a = handled flag; b reserves a slot.
-    short e = 2, p = 3, c = 8, d = 9;
-    int a = 0;
-    int b;
+    i16 e = 2, p = 3, c = 8, d = 9;
+    i32 a = 0;
+    i32 b;
     if (msg.type == 0x200) {
         switch (msg.payload.widget.command) {
         case 0xc:
             switch (msg.payload.widget.id) {
             case 2:
-                HeroView(static_cast<unsigned char>(gpTownManager->m_recruitHero->m_id), 1, 0);
+                HeroView(static_cast<u8>(gpTownManager->m_recruitHero->m_id), 1, 0);
                 gpTownManager->RedrawTownScreen();
                 gpTownManager->m_heroWindow0->DrawWindow();
                 gpTownManager->m_heroWindow1->DrawWindow();
@@ -1195,7 +1195,7 @@ int RecruitHeroHandler(tag_message &msg)
                 break;
             case 0x7802:
                 gpTownManager->m_recruitState = 0;
-                *(int *)((char *)gpWindowManager + 0x5a) = msg.payload.widget.id;
+                *(i32 *)((char *)gpWindowManager + 0x5a) = msg.payload.widget.id;
                 a = 1;
                 break;
             }
@@ -1213,7 +1213,7 @@ int RecruitHeroHandler(tag_message &msg)
 }
 
 VA(0x00499589, 0x1a7)
-char *GetBuildingInfo(int race, int building, int mode)
+char *GetBuildingInfo(i32 race, i32 building, i32 mode)
 {
     char buf[400];
     if (race == TOWN_TYPE_NECROMANCER && building == KB_BUILDING_NECROMANCER_SHRINE) {
@@ -1242,7 +1242,7 @@ char *GetBuildingInfo(int race, int building, int mode)
 }
 
 VA(0x00499730, 0xa4)
-char *GetBuildingName(int race, int building)
+char *GetBuildingName(i32 race, i32 building)
 {
     if (race == TOWN_TYPE_NECROMANCER && building == KB_BUILDING_NECROMANCER_SHRINE)
         return xNecromancerShrine;
@@ -1257,30 +1257,30 @@ char *GetBuildingName(int race, int building)
 }
 
 VA(0x004997d4, 0x138)
-void GetBuildingCost(int race, int building, int *const dest, int mageLevel)
+void GetBuildingCost(i32 race, i32 building, i32 *const dest, i32 mageLevel)
 {
-    int level;
+    i32 level;
     if (building == KB_BUILDING_NECROMANCER_SHRINE && race == TOWN_TYPE_NECROMANCER) {
-        memcpy(dest, xShrineBuildingCost, KB_BUILDING_RESOURCE_COUNT * sizeof(int));
+        memcpy(dest, xShrineBuildingCost, KB_BUILDING_RESOURCE_COUNT * sizeof(i32));
     } else if (building >= KB_BUILDING_DWELLING_FIRST && building <= KB_BUILDING_DWELLING_LAST) {
         memcpy(dest, gDwellingCosts[race][building - KB_BUILDING_DWELLING_FIRST],
-               KB_BUILDING_RESOURCE_COUNT * sizeof(int));
+               KB_BUILDING_RESOURCE_COUNT * sizeof(i32));
     } else if (building == KB_BUILDING_MAGE_GUILD) {
         level = mageLevel + 1;
         if (level > KB_MAGE_GUILD_MAX_LEVEL)
             level = KB_MAGE_GUILD_MAX_LEVEL;
-        memcpy(dest, gMageBuildingCosts[mageLevel + 1], KB_BUILDING_RESOURCE_COUNT * sizeof(int));
+        memcpy(dest, gMageBuildingCosts[mageLevel + 1], KB_BUILDING_RESOURCE_COUNT * sizeof(i32));
     } else if (building == KB_BUILDING_SPECIAL) {
-        memcpy(dest, gSpecialBuildingCosts[race], KB_BUILDING_RESOURCE_COUNT * sizeof(int));
+        memcpy(dest, gSpecialBuildingCosts[race], KB_BUILDING_RESOURCE_COUNT * sizeof(i32));
     } else {
         if (building >= KB_BUILDING_NEUTRAL_LIMIT)
             return;
-        memcpy(dest, gNeutralBuildingCosts[building], KB_BUILDING_RESOURCE_COUNT * sizeof(int));
+        memcpy(dest, gNeutralBuildingCosts[building], KB_BUILDING_RESOURCE_COUNT * sizeof(i32));
     }
 }
 
 VA(0x0049990c, 0x20)
-char *GetMonsterName(int m)
+char *GetMonsterName(i32 m)
 {
     return gArmyNames[m];
 }
@@ -1290,9 +1290,9 @@ char *GetMonsterName(int m)
 // agree. Only delinked local-label DIR32 names differ at +0xe1, +0xe8 and the
 // +0xec..+0x108 switch table ($L... versus containing-function plus addend).
 VA(0x0049992c, 0x140)
-void GetMonsterCost(int monster, int *const cost)
+void GetMonsterCost(i32 monster, i32 *const cost)
 {
-    int idx;
+    i32 idx;
     for (idx = 0; idx < KB_BUILDING_RESOURCE_COUNT; idx++)
         cost[idx] = 0;
     cost[RES_GOLD] = gMonsterDatabase[monster].cost;
@@ -1329,10 +1329,10 @@ void GetMonsterCost(int monster, int *const cost)
 // ANDs reqMask. Ten variants exhausted operand/equality order, qualified lvalues,
 // and hash-compatible names. Revisit only after relevant KB/TU state changes.
 VA(0x00499a6c, 0x2b5)
-int CanBuild(town *t, int building)
+i32 CanBuild(town *t, i32 building)
 {
-    int reqMask;
-    int haveMask;
+    i32 reqMask;
+    i32 haveMask;
     if (BitTest(gpGame->m_knownTowns, t->m_id))
         return 0;
     if (building != KB_BUILDING_CASTLE && !(t->m_buildings & TOWN_BUILDING_CASTLE))
@@ -1392,11 +1392,11 @@ int CanBuild(town *t, int building)
 }
 
 VA(0x00499d21, 0x9a)
-int CanBuy(town *t, int type)
+i32 CanBuy(town *t, i32 type)
 {
-    int buf[KB_BUILDING_RESOURCE_COUNT];
+    i32 buf[KB_BUILDING_RESOURCE_COUNT];
     playerData *ptr;
-    int idx;
+    i32 idx;
     GetBuildingCost(t->m_type, type, buf, t->m_buildState);
     ptr = &gpGame->m_players[giCurPlayer];
     for (idx = 0; idx < KB_BUILDING_RESOURCE_COUNT; idx++)
@@ -1406,7 +1406,7 @@ int CanBuy(town *t, int type)
 }
 
 VA(0x00499dbb, 0xc6)
-int GetBuildingBaseResourceValue(int race, int building, int level)
+i32 GetBuildingBaseResourceValue(i32 race, i32 building, i32 level)
 {
     if (race == TOWN_TYPE_NECROMANCER && building == KB_BUILDING_UPGRADE_CASTLE)
         return 1000;
@@ -1425,9 +1425,9 @@ int GetBuildingBaseResourceValue(int race, int building, int level)
 }
 
 VA(0x00499e81, 0x21e)
-int WaitHandler(tag_message &msg)
+i32 WaitHandler(tag_message &msg)
 {
-    int result = 0;
+    i32 result = 0;
     gbFunctionComplete = 1;
     PollSound();
     if (msg.type == EVENT_WINDOW_MESSAGE) {
@@ -1501,10 +1501,10 @@ int WaitHandler(tag_message &msg)
 }
 
 VA(0x0049a09f, 0x472)
-int EventWindowHandler(struct tag_message &msg)
+i32 EventWindowHandler(struct tag_message &msg)
 {
-    int type;
-    int extra;
+    i32 type;
+    i32 extra;
 
     if (!gpSoundManager->MusicPlaying() && gpAdvManager->m_active == 1)
         gpSoundManager->SwitchAmbientMusic(
@@ -1618,16 +1618,16 @@ int EventWindowHandler(struct tag_message &msg)
 }
 
 VA(0x0049a511, 0x1e)
-int TrueFalseDialogHandler(struct tag_message &msg)
+i32 TrueFalseDialogHandler(struct tag_message &msg)
 {
     return EventWindowHandler(msg);
 }
 
 VA(0x0049a52f, 0x192)
-void PlayerDead(int player)
+void PlayerDead(i32 player)
 {
     playerData *rec;
-    int i;
+    i32 i;
     gbRetreatWin = 0;
     rec = &gpGame->m_players[player];
     gpGame->m_playerDead[player] = 1;
@@ -1647,7 +1647,7 @@ void PlayerDead(int player)
         if (gbHumanPlayer[player])
             HandleRemoteDeadPlayerExit(player);
         else
-            SendMapChange(PLAYER_DEAD_MAP_CHANGE, static_cast<signed char>(player), 0, 0,
+            SendMapChange(PLAYER_DEAD_MAP_CHANGE, static_cast<i8>(player), 0, 0,
                           PLAYER_DEAD_MAP_CHANGE_UNUSED, 0, 0);
     }
 }
@@ -1660,41 +1660,41 @@ void PlayerDead(int player)
 // subscripts and qualifying m_campaignType regressed or were byte-neutral.
 // Revisit after a later KB TU/header change.
 VA(0x0049a6c1, 0x19bb)
-void CheckEndGame(int forcedResult, int dragonCityCaptured)
+void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured)
 {
-    int showedDialog;
-    int defeated;
-    int allowNormalVictory;
-    int lastLivingPlayer;
-    int survivingHumans;
-    int lastHuman_i;
-    int netHumanCount;
-    int player;
-    int heroIndex;
-    int winFlag;
+    i32 showedDialog;
+    i32 defeated;
+    i32 allowNormalVictory;
+    i32 lastLivingPlayer;
+    i32 survivingHumans;
+    i32 lastHuman_i;
+    i32 netHumanCount;
+    i32 player;
+    i32 heroIndex;
+    i32 winFlag;
     playerData *rec;
-    int savedRemoteOn;
-    int numAlive;
+    i32 savedRemoteOn;
+    i32 numAlive;
     char unusedTextA_c[CHECK_END_GAME_TEXT_BUFFER_SIZE];
     char unusedTextB_c[CHECK_END_GAME_TEXT_BUFFER_SIZE];
-    int sideBelow_i;
-    int sideAbove;
-    int bestGold;
+    i32 sideBelow_i;
+    i32 sideAbove;
+    i32 bestGold;
     town *lossTown;
     town *victoryTownData;
-    int currentDayIndex;
-    int enemyRemaining;
-    int hasRoland_j;
-    int hasDwarfTown;
+    i32 currentDayIndex;
+    i32 enemyRemaining;
+    i32 hasRoland_j;
+    i32 hasDwarfTown;
     char artifactName[CHECK_END_GAME_TEXT_BUFFER_SIZE];
     hero *artifactHeroPtr;
-    int artifactWinnerPerson;
+    i32 artifactWinnerPerson;
     hero *lossHero;
     hero *winningHeroEntry;
-    int winnerPlayer;
+    i32 winnerPlayer;
     char campaignSaveName[20];
-    int campaignHeroIndex;
-    unsigned int carryoverHeroId;
+    i32 campaignHeroIndex;
+    u32 carryoverHeroId;
 
     if (!gbThisNetGotAdventureControl)
         return;
@@ -1722,7 +1722,7 @@ void CheckEndGame(int forcedResult, int dragonCityCaptured)
                     } else {
                         sprintf(gText, "%s has been vanquished!", cPlayerNames[player]);
                         NormalDialog(gText, 1, -1, -1, CHECK_END_GAME_PLAYER_DIALOG_ICON,
-                                     gpGame->GetPlayerColor(static_cast<signed char>(player)), -1, -1, -1,
+                                     gpGame->GetPlayerColor(static_cast<i8>(player)), -1, -1, -1,
                                      CHECK_END_GAME_REMOTE_DIALOG_TIME);
                     }
                 } else if (rec->m_townCount == 0) {
@@ -1733,7 +1733,7 @@ void CheckEndGame(int forcedResult, int dragonCityCaptured)
                                     "town in the next week, you will be eliminated.",
                                     cPlayerNames[player]);
                             NormalDialog(gText, 1, -1, -1, CHECK_END_GAME_PLAYER_DIALOG_ICON,
-                                         gpGame->GetPlayerColor(static_cast<signed char>(player)), -1, 0, -1, 0);
+                                         gpGame->GetPlayerColor(static_cast<i8>(player)), -1, 0, -1, 0);
                         }
                         rec->m_daysLeft = CHECK_END_GAME_GRACE_DAYS;
                     } else if (rec->m_daysLeft == 0) {
@@ -1753,7 +1753,7 @@ void CheckEndGame(int forcedResult, int dragonCityCaptured)
                                     cPlayerNames[player]);
                         }
                         NormalDialog(gText, 1, -1, -1, CHECK_END_GAME_PLAYER_DIALOG_ICON,
-                                     gpGame->GetPlayerColor(static_cast<signed char>(player)), -1, 0, -1, 0);
+                                     gpGame->GetPlayerColor(static_cast<i8>(player)), -1, 0, -1, 0);
                     }
                 } else {
                     rec->m_daysLeft = -1;
@@ -2166,7 +2166,7 @@ VA(0x0049c07c, 0x95)
 void QuickViewWait(void)
 {
     tag_message ev;
-    int done;
+    i32 done;
     gpMouseManager->ReallyHidePointer();
     done = 0;
     while (!done) {
@@ -2189,8 +2189,8 @@ void QuickViewWait(void)
 VA(0x0049c111, 0x201)
 void InitVars(void)
 {
-    int i;
-    int j;
+    i32 i;
+    i32 j;
     NULL_SAMPLE2.pSample = 0;
     NULL_SAMPLE2.pMem = reinterpret_cast<struct _SAMPLE *>(NULL_SAMPLE2.pSample);
     gGameCommand = -1;
@@ -2233,14 +2233,14 @@ void InitVars(void)
 // caused by the inserted jumps; every non-jump opcode/operand matches, the size
 // delta is exactly 10, and all 119 relocation tuples align after offset adjustment.
 VA(0x0049c312, 0x61b)
-void game::ShowMoraleInfo(hero *h, int dialogType)
+void game::ShowMoraleInfo(hero *h, i32 dialogType)
 {
-    int mixedUndead4;
-    int alignment_e;
-    int homogeneous3;
-    int modifierStart;
+    i32 mixedUndead4;
+    i32 alignment_e;
+    i32 homogeneous3;
+    i32 modifierStart;
     char description[200];
-    int slot8;
+    i32 slot8;
 
     mixedUndead4 = 0;
     if (h->m_army.GetMorale(h, h->GetOccupiedTown(), 0) > 0)
@@ -2353,7 +2353,7 @@ void game::ShowMoraleInfo(hero *h, int dialogType)
         if (h->HasArtifact(ARTIFACT_BATTLE_GARB)) {
             strcat(gText, cMoraleInfo[MORALE_INFO_BATTLE_GARB]);
         }
-        if (static_cast<int>(strlen(gText)) == modifierStart) {
+        if (static_cast<i32>(strlen(gText)) == modifierStart) {
             strcat(gText, cMoraleInfo[MORALE_INFO_NONE]);
         }
     }
@@ -2362,11 +2362,11 @@ void game::ShowMoraleInfo(hero *h, int dialogType)
 }
 
 VA(0x0049c92d, 0x371)
-void game::ShowLuckInfo(hero *h, int dialogType)
+void game::ShowLuckInfo(hero *h, i32 dialogType)
 {
     char description[200];
-    int luckValue;
-    int modifierStart;
+    i32 luckValue;
+    i32 modifierStart;
 
     if (gpGame->GetLuck(h, 0, h->GetOccupiedTown()) > 0)
         sprintf(description, cLuckInfo[LUCK_INFO_GOOD]);
@@ -2410,7 +2410,7 @@ void game::ShowLuckInfo(hero *h, int dialogType)
         strcat(gText, cLuckInfo[LUCK_INFO_MERMAID]);
     if (h->HasArtifact(ARTIFACT_BATTLE_GARB))
         strcat(gText, cLuckInfo[LUCK_INFO_BATTLE_GARB]);
-    if (static_cast<int>(strlen(gText)) == modifierStart)
+    if (static_cast<i32>(strlen(gText)) == modifierStart)
         strcat(gText, cLuckInfo[LUCK_INFO_NONE]);
 
     NormalDialog(gText, dialogType, -1, -1, -1, 0, -1, 0, -1, 0);
@@ -2419,9 +2419,9 @@ void game::ShowLuckInfo(hero *h, int dialogType)
 VA(0x0049cc9e, 0xd7)
 void ClearMapExtra(void)
 {
-    DATA(0x005164bc) static short clearMapExtraSourceLineBase =
+    DATA(0x005164bc) static i16 clearMapExtraSourceLineBase =
         KB_SOURCE_LINE_CLEAR_MAP_EXTRA_BASE;
-    int i;
+    i32 i;
     for (i = 0; 0[&i] < iMaxMapExtra; i++) {
         if (ppMapExtra[i])
             BaseFree(ppMapExtra[i], KBFILE,
@@ -2442,9 +2442,9 @@ void ClearMapExtra(void)
 }
 
 VA(0x0049cd75, 0x9f)
-int GetMonType(int score, int campaign)
+i32 GetMonType(i32 score, i32 campaign)
 {
-    int idx;
+    i32 idx;
     for (idx = MONSTER_DATABASE_COUNT - 1; idx >= 0; idx--) {
         if (campaign == HIGH_SCORE_CAMPAIGN || campaign == HIGH_SCORE_EXPANSION_CAMPAIGN) {
             if (giScoreCampaignMon[idx][MONSTER_SCORE_THRESHOLD] >= score)
@@ -2458,15 +2458,15 @@ int GetMonType(int score, int campaign)
 }
 
 VA(0x0049ce14, 0x4ac)
-int AddScoreToHighScore(int score, int days, int scenario, int highScoreType, char *scenarioName)
+i32 AddScoreToHighScore(i32 score, i32 days, i32 scenario, i32 highScoreType, char *scenarioName)
 {
-    int destination;
+    i32 destination;
     HighScoreEntry entries_a[HIGH_SCORE_ENTRY_COUNT];
-    int file_a;
-    int entry;
+    i32 file_a;
+    i32 entry;
     char filename_a[352];
     char playerName_c[20];
-    int missingFile;
+    i32 missingFile;
 
     missingFile = 0;
     if (highScoreType == HIGH_SCORE_STANDARD)
@@ -2532,7 +2532,7 @@ int AddScoreToHighScore(int score, int days, int scenario, int highScoreType, ch
 }
 
 VA(0x0049d2c0, 0x66)
-void BVResMsg(char *s, int res, int qty)
+void BVResMsg(char *s, i32 res, i32 qty)
 {
     giBottomViewOverride = 5;
     giBottomViewOverrideEndTime = KBTickCount() + 0x1388;
@@ -2550,18 +2550,18 @@ void GOut(char *str)
 }
 
 VA(0x0049d353, 0x54)
-int NetPosToGamePos(int netPos)
+i32 NetPosToGamePos(i32 netPos)
 {
-    for (int i = 0; i < 6; i++)
+    for (i32 i = 0; i < 6; i++)
         if (gbGamePosToNetPos[i] == netPos)
             return i;
     return -1;
 }
 
 VA(0x0049d3a7, 0xff)
-int WaitForOtherPlayer(void)
+i32 WaitForOtherPlayer(void)
 {
-    int result = 0;
+    i32 result = 0;
     KbRemotePacket *data;
     PollSound();
     data = reinterpret_cast<KbRemotePacket *>(GetRemoteData(1));
@@ -2596,31 +2596,31 @@ int WaitForOtherPlayer(void)
 // retail slots. Pointer lvalues, byte casts, and the byte-neutral keyboard payload
 // union were tried without steering this lowering; revisit on compiler-state change.
 VA(0x0049d4a6, 0xb85)
-void PopNetBox(char *text, int netPlayer)
+void PopNetBox(char *text, i32 netPlayer)
 {
-    int textY_d;
-    long messageTime_b;
+    i32 textY_d;
+    i32l messageTime_b;
     heroWindow *netWindow_j;
-    int result_a;
-    int textWidth_b;
-    int textX_d;
-    int savedShowIt_a;
-    int updateInput_a;
-    int inputLength_a;
+    i32 result_a;
+    i32 textWidth_b;
+    i32 textX_d;
+    i32 savedShowIt_a;
+    i32 updateInput_a;
+    i32 inputLength_a;
     char inputText_c[NET_BOX_TEXT_LENGTH];
-    int exitForIncomingData_i;
-    int sendText_e;
+    i32 exitForIncomingData_i;
+    i32 sendText_e;
     tag_message event_a;
     tag_message updateMessage_f;
-    int firstLineId_a;
-    int delay_h;
-    int lineTextLimit_p;
-    int done_i;
-    int redrawLines_f;
-    int redrawSavedShowIt_a;
+    i32 firstLineId_a;
+    i32 delay_h;
+    i32 lineTextLimit_p;
+    i32 done_i;
+    i32 redrawLines_f;
+    i32 redrawSavedShowIt_a;
     KbRemotePacket *remoteData_g;
-    int redrawAdventure_i;
-    int cursorState;
+    i32 redrawAdventure_i;
+    i32 cursorState;
 
     if (!gbRemoteOn)
         return;
@@ -2884,7 +2884,7 @@ void AddNetBoxLine(char *str, char color)
 VA(0x0049e0f2, 0x214)
 void ShutDown(char *msg)
 {
-    DATA(0x005165e0) static short shutdownSourceLineBase =
+    DATA(0x005165e0) static i16 shutdownSourceLineBase =
         KB_SOURCE_LINE_SHUTDOWN_BASE;
     char buf[768];
     if (bInShutDown)
@@ -2944,7 +2944,7 @@ VA(0x0049e306, 0xa2)
 void FileError(char *filename)
 {
     char buf1[500];
-    int err;
+    i32 err;
     char buf[500];
     err = errno;
     sprintf(buf1, "File Error %s", strerror(err));
@@ -2954,30 +2954,30 @@ void FileError(char *filename)
 }
 
 VA(0x0049e3a8, 0x255)
-void SmackFade(unsigned char *src, unsigned char *dst)
+void SmackFade(u8 *src, u8 *dst)
 {
-    DATA(0x00516668) static short smackFadeSourceLineBase =
+    DATA(0x00516668) static i16 smackFadeSourceLineBase =
         KB_SOURCE_LINE_SMACK_FADE_BASE;
     // /Od frame slots (od_oracle-verified): a=newPal(-8) b=avg2(-c) c=x(-10)
     // d=minDist(-14) e=avg1(-18) f=map(-1c) g=y(-20) h=outer(-24) i=inner(-28)
     // j=screen(-2c) k=best(-30) p=dist(-4)
-    unsigned char *a;   /* newPal */
-    unsigned char *f;   /* map    */
-    int k;              /* best   */
-    int h, i;           /* outer / inner loop */
-    int e, b;           /* avg1, avg2 */
-    int d;              /* minDist */
-    int p;              /* dist   */
-    unsigned char *j;   /* screen */
-    int c, g;           /* x, y   */
+    u8 *a;   /* newPal */
+    u8 *f;   /* map    */
+    i32 k;              /* best   */
+    i32 h, i;           /* outer / inner loop */
+    i32 e, b;           /* avg1, avg2 */
+    i32 d;              /* minDist */
+    i32 p;              /* dist   */
+    u8 *j;   /* screen */
+    i32 c, g;           /* x, y   */
 
     a = 0;
     f = 0;
     k = -1;
-    a = static_cast<unsigned char *>(BaseAlloc(
+    a = static_cast<u8 *>(BaseAlloc(
         0x300, KBFILE,
         smackFadeSourceLineBase + KB_SOURCE_LINE_SMACK_FADE_PALETTE_ALLOC_OFFSET));
-    f = static_cast<unsigned char *>(BaseAlloc(
+    f = static_cast<u8 *>(BaseAlloc(
         0x100, KBFILE,
         smackFadeSourceLineBase + KB_SOURCE_LINE_SMACK_FADE_MAP_ALLOC_OFFSET));
     memset(a, 0, 0x300);
@@ -2996,10 +2996,10 @@ void SmackFade(unsigned char *src, unsigned char *dst)
             }
         }
         memcpy(a + h * 3, dst + k * 3, 3);
-        f[h] = (unsigned char)k;
+        f[h] = (u8)k;
     }
     FadeTo(src, a, 8);
-    j = *(unsigned char **)(*(char **)((char *)gpWindowManager + 0x46) + 0x16);
+    j = *(u8 **)(*(char **)((char *)gpWindowManager + 0x46) + 0x16);
     for (c = 0; c < 0x280; c++) {
         for (g = 0; g < 0x1e0; g++) {
             *j = f[*j];
@@ -3007,7 +3007,7 @@ void SmackFade(unsigned char *src, unsigned char *dst)
         }
     }
     gpWindowManager->UpdateScreen();
-    UpdatePalette(reinterpret_cast<signed char *>(dst));
+    UpdatePalette(reinterpret_cast<i8 *>(dst));
     BaseFree(a, KBFILE,
              smackFadeSourceLineBase + KB_SOURCE_LINE_SMACK_FADE_PALETTE_FREE_OFFSET);
     BaseFree(f, KBFILE,
@@ -3015,13 +3015,13 @@ void SmackFade(unsigned char *src, unsigned char *dst)
 }
 
 VA(0x0049e5fd, 0x303)
-void ShowCongrats(int highScoreType)
+void ShowCongrats(i32 highScoreType)
 {
-    DATA(0x0051670c) static short congratsSourceLineBase =
+    DATA(0x0051670c) static i16 congratsSourceLineBase =
         KB_SOURCE_LINE_CONGRATS_BASE;
-    unsigned char savedPalette[CONGRATS_PALETTE_BUFFER_SIZE];
-    int baseScore;
-    int score_e;
+    u8 savedPalette[CONGRATS_PALETTE_BUFFER_SIZE];
+    i32 baseScore;
+    i32 score_e;
     char rating[CONGRATS_RATING_LENGTH];
 
     gpMouseManager->HideColorPointer();
@@ -3043,7 +3043,7 @@ void ShowCongrats(int highScoreType)
         sprintf(rating, gArmyNames[GetMonType(gpGame->m_campaignScore, highScoreType)]);
     }
     rating[0] -= 0x20;
-    if (static_cast<signed char>(gpGame->m_cheated))
+    if (static_cast<i8>(gpGame->m_cheated))
         sprintf(rating, "Cheater!!!");
 
     if (highScoreType == CONGRATS_STANDARD) {
@@ -3062,7 +3062,7 @@ void ShowCongrats(int highScoreType)
 
     PlaySmacker(CONGRATS_SMACKER);
     memcpy(gpBufferPalette->m_data, gPalette->m_data, CONGRATS_PALETTE_SIZE);
-    SmackFade(reinterpret_cast<unsigned char *>(gpBufferPalette->m_data), savedPalette);
+    SmackFade(reinterpret_cast<u8 *>(gpBufferPalette->m_data), savedPalette);
     memcpy(gPalette->m_data, savedPalette, CONGRATS_PALETTE_SIZE);
     memcpy(gpBufferPalette->m_data, gPalette->m_data, CONGRATS_PALETTE_SIZE);
     gpMouseManager->ShowColorPointer();
@@ -3078,8 +3078,8 @@ void ShowCongrats(int highScoreType)
 VA(0x0049e900, 0x99)
 void CongratsWait(void)
 {
-    int cmd = 0;
-    int done = 0;
+    i32 cmd = 0;
+    i32 done = 0;
     tag_message msg;
     gpInputManager->Flush();
     while (!done) {
@@ -3098,16 +3098,16 @@ SAMPLE2 LoadPlaySample(char *name)
     SAMPLE2 ss;
     ss.pSample = gpResourceManager->GetSample(name);
     if (ss.pSample) {
-        *(int *)((char *)ss.pSample + 0x1c) = 2;
+        *(i32 *)((char *)ss.pSample + 0x1c) = 2;
         ss.pMem = gpSoundManager->MemorySample(ss.pSample);
     }
     return ss;
 }
 
 VA(0x0049e9ed, 0x8f)
-void WaitEndSample(SAMPLE2 s, int waitTime)
+void WaitEndSample(SAMPLE2 s, i32 waitTime)
 {
-    long endTime;
+    i32l endTime;
     if (waitTime < 0)
         waitTime = 4000;
     endTime = KBTickCount() + waitTime;
@@ -3133,7 +3133,7 @@ void MemError(void)
 }
 
 VA(0x0049ead9, 0x3b)
-char *GetTownName(int i)
+char *GetTownName(i32 i)
 {
     town *t = GetCastleRec(i);
     return t->m_name;
@@ -3159,11 +3159,11 @@ void EarlyShutDownSystem(void)
 }
 
 VA(0x0049eb90, 0x75)
-int GameUnsaved(void)
+i32 GameUnsaved(void)
 {
-    if ((gpAdvManager && *(int *)((char *)gpAdvManager + 0x32) == 1) ||
-        (gpCombatManager && *(int *)((char *)gpCombatManager + 0x32) == 1) ||
-        (gpTownManager && *(int *)((char *)gpTownManager + 0x32) == 1))
+    if ((gpAdvManager && *(i32 *)((char *)gpAdvManager + 0x32) == 1) ||
+        (gpCombatManager && *(i32 *)((char *)gpCombatManager + 0x32) == 1) ||
+        (gpTownManager && *(i32 *)((char *)gpTownManager + 0x32) == 1))
         return 1;
     else
         return 0;
@@ -3177,14 +3177,14 @@ int GameUnsaved(void)
 // offset/type; the base-only PostMessageA and WritePrefs entries are resolved by
 // delinking, and the remaining aliases are literals or local switch labels.
 VA(0x0049ec05, 0xa18)
-int HandleAppSpecificMenuCommands(int command)
+i32 HandleAppSpecificMenuCommands(i32 command)
 {
-    int menuChanged;
+    i32 menuChanged;
     hero *currentHeroRec;
-    int loopIndex;
-    int secondarySkillIndex;
-    int secondaryLevel;
-    int formationHexIndex;
+    i32 loopIndex;
+    i32 secondarySkillIndex;
+    i32 secondaryLevel;
+    i32 formationHexIndex;
 
     menuChanged = 0;
     currentHeroRec = 0;
@@ -3438,8 +3438,8 @@ adjustSound:
 VA(0x0049f61d, 0x310)
 void UpdateSystemOptionsMenu(void)
 {
-    int menuCommand;
-    int checkedCommand;
+    i32 menuCommand;
+    i32 checkedCommand;
 
     if (gConfig.gfx[giCurExe].showMenu == 0)
         return;
@@ -3522,14 +3522,14 @@ void UpdateAppSpecificMenus(void *hMenu)
 }
 
 VA(0x0049f9f0, 0x2d)
-void EarlyResizeWindow(int x, int y, int w, int h)
+void EarlyResizeWindow(i32 x, i32 y, i32 w, i32 h)
 {
     if (gbClosingApp)
         return;
 }
 
 VA(0x0049fa1d, 0x53)
-int InMapArea(int x, int y)
+i32 InMapArea(i32 x, i32 y)
 {
     return (x >= 16 && x < 448 && y >= 16 && y < 448);
 }
@@ -3543,36 +3543,36 @@ int InMapArea(int x, int y)
 // including five exact forms. Revisit only after the KB source/TU/header or
 // comparison epoch.
 VA(0x0049fa70, 0x6bc)
-void SetupDynamicWindow(int x, int y, int centered, int boundsWidth, int boundsHeight,
-                        int contentWidth, int contentHeight, int *windowWidth,
-                        int *windowHeight, int *contentLeft, int *contentTop,
-                        int *contentRight, int *contentBottom, heroWindow **window,
-                        int windowType)
+void SetupDynamicWindow(i32 x, i32 y, i32 centered, i32 boundsWidth, i32 boundsHeight,
+                        i32 contentWidth, i32 contentHeight, i32 *windowWidth,
+                        i32 *windowHeight, i32 *contentLeft, i32 *contentTop,
+                        i32 *contentRight, i32 *contentBottom, heroWindow **window,
+                        i32 windowType)
 {
-    int leftOffset;
-    int bottomCornerPaddingNum;
-    int numRows;
+    i32 leftOffset;
+    i32 bottomCornerPaddingNum;
+    i32 numRows;
     widget *newWidgetTemp;
-    int columnsSize;
-    int topOffsetNum;
-    int contentXPaddingCount;
-    int centeredHeightCount;
-    int centeredPadding;
-    int topCornerPaddingCount;
-    int bottomOffsetLocal;
-    int rightOffset;
-    int contentYPadding;
-    int edge;
-    int tileRowPos;
-    int centeredWidthValue;
-    int leftCornerPaddingLocal;
-    int rightCornerPaddingValue;
-    int stoneWidgetColorSize;
-    int columnIndex;
-    int bottomEdgeOffset;
-    int tileWidth;
-    int tileHeight;
-    int topEdgeInset;
+    i32 columnsSize;
+    i32 topOffsetNum;
+    i32 contentXPaddingCount;
+    i32 centeredHeightCount;
+    i32 centeredPadding;
+    i32 topCornerPaddingCount;
+    i32 bottomOffsetLocal;
+    i32 rightOffset;
+    i32 contentYPadding;
+    i32 edge;
+    i32 tileRowPos;
+    i32 centeredWidthValue;
+    i32 leftCornerPaddingLocal;
+    i32 rightCornerPaddingValue;
+    i32 stoneWidgetColorSize;
+    i32 columnIndex;
+    i32 bottomEdgeOffset;
+    i32 tileWidth;
+    i32 tileHeight;
+    i32 topEdgeInset;
 
     tileWidth = DYNAMIC_TILE_SIZE;
     tileHeight = DYNAMIC_TILE_SIZE;
@@ -3702,11 +3702,11 @@ void SetupDynamicWindow(int x, int y, int centered, int boundsWidth, int boundsH
 }
 
 VA(0x004a012c, 0x108)
-void TestDynamicWindow(int p1, int p2)
+void TestDynamicWindow(i32 p1, i32 p2)
 {
     heroWindow *p;
-    int q, r, s, u, v, w;
-    int t;
+    i32 q, r, s, u, v, w;
+    i32 t;
     SetupDynamicWindow(0, 0, 1, 640, 480, p1 * 48, p2 * 48, &s, &u, &v, &w, &q, &r, &p, 0);
     gpWindowManager->AddWindow(p, -1, 1);
     t = 0;
@@ -3730,7 +3730,7 @@ void TestDynamicWindow(int p1, int p2)
 // global and compares pos. Both equality operand orders and 0[&pos] were tried
 // without steering MSVC's TU-state load order. Revisit on compiler-state change.
 VA(0x004a0234, 0x91)
-void HandleRemoteDeadPlayerExit(int pos)
+void HandleRemoteDeadPlayerExit(i32 pos)
 {
     SPlayerExit pe;
     if (giThisGamePos == pos) {
@@ -3751,7 +3751,7 @@ void HandleRemoteDeadPlayerExit(int pos)
 VA(0x004a02c5, 0xaa)
 void HandleRemoteSuddenExit(void)
 {
-    int a;
+    i32 a;
     char buf[5];
     if (!gbGameInitialized)
         return;
@@ -3781,19 +3781,19 @@ void DropDownToOnePlayer(void)
 {
     RemoteCleanup();
     giNumHumanPlayers = 1;
-    for (int i = 0; i < 6; i++)
+    for (i32 i = 0; i < 6; i++)
         if (giThisNetPos != i)
             gbHumanPlayer[i] = 0;
     ComputeAdvNetControl();
 }
 
 VA(0x004a03d1, 0x412)
-void ReceiveHostReportsPlayerExit(int hostNetPosition, SPlayerExit exitInfo,
-                                  int forwardedReport)
+void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo,
+                                  i32 forwardedReport)
 {
-    int showExitMessage;
+    i32 showExitMessage;
     char playerExitMessage[PLAYER_EXIT_MESSAGE_LENGTH];
-    int netPosition;
+    i32 netPosition;
 
     showExitMessage = 0;
     if (!forwardedReport) {
@@ -3886,10 +3886,10 @@ void ReceiveHostReportsPlayerExit(int hostNetPosition, SPlayerExit exitInfo,
 VA(0x004a07e3, 0x361)
 void ReceiveRemotePlayerExit(SPlayerExit exitInfo)
 {
-    int localPlayerLost;
-    int sendReturn;
-    int unusedPacketResult;
-    int recipient;
+    i32 localPlayerLost;
+    i32 sendReturn;
+    i32 unusedPacketResult;
+    i32 recipient;
 
     localPlayerLost = 0;
     lLastHeartbeatReceive[exitInfo.netPosition] = PLAYER_EXIT_HEARTBEAT_DISABLED;
@@ -3974,7 +3974,7 @@ playerExitHandled:
 }
 
 VA(0x004a0b44, 0x29)
-int CheckMem(void)
+i32 CheckMem(void)
 {
     giTotalHighMem = 16000;
     giHighMemBuffer = 8000;
@@ -3982,9 +3982,9 @@ int CheckMem(void)
 }
 
 VA(0x004a0b6d, 0x109)
-int GetManaCost(int spell, hero *h)
+i32 GetManaCost(i32 spell, hero *h)
 {
-    int c = gsSpellInfo[spell].cost;
+    i32 c = gsSpellInfo[spell].cost;
     if (h != 0) {
         if (h->HasArtifact(0x29) && (spell == 0x12 || spell == 0x13))
             c >>= 1;
@@ -3999,10 +3999,10 @@ int GetManaCost(int spell, hero *h)
 }
 
 VA(0x004a0c76, 0x9f)
-void SetWinText(heroWindow *j, int id)
+void SetWinText(heroWindow *j, i32 id)
 {
-    int a = 0;
-    int i;
+    i32 a = 0;
+    i32 i;
     tag_message c;
     for (i = 0; i < KB_WIN_SETUP_COUNT; i++) {
         if (gWinSetup[i].windowId == id) {
@@ -4038,49 +4038,49 @@ void CheckShingleUpdate(void)
 // lowering. Direct arithmetic, unsigned comparison, width, lifetime, case-order,
 // and condition-polarity variants were exhausted; revisit with bounded AST variants.
 VA(0x004a0d9f, 0x17c6)
-void NormalDialog(char *text, int dialogType, int windowX, int windowY,
-                  int firstResourceType, int firstResourceValue,
-                  int secondResourceType, int secondResourceValue,
-                  int showOrText, int timeout)
+void NormalDialog(char *text, i32 dialogType, i32 windowX, i32 windowY,
+                  i32 firstResourceType, i32 firstResourceValue,
+                  i32 secondResourceType, i32 secondResourceValue,
+                  i32 showOrText, i32 timeout)
 {
-    DATA(0x00516d20) static short normalDialogSourceLineBase =
+    DATA(0x00516d20) static i16 normalDialogSourceLineBase =
         KB_SOURCE_LINE_NORMAL_DIALOG_BASE;
     // Retail's 0x120 /Od frame retains this otherwise unreferenced local word.
-    int panelHeight_p;
-    int labelY_o;
+    i32 panelHeight_p;
+    i32 labelY_o;
     widget *borderWidget_o;
     char iconFile_h[NORMAL_DIALOG_FILENAME_LENGTH];
     char *resourceText_e[NORMAL_DIALOG_RESOURCE_COUNT];
-    int iconHeight_d;
-    int sizingIconHeight_l;
-    int showPrimaryBonus_e;
-    int resourceType_l[NORMAL_DIALOG_RESOURCE_COUNT];
-    int lineCount_d;
+    i32 iconHeight_d;
+    i32 sizingIconHeight_l;
+    i32 showPrimaryBonus_e;
+    i32 resourceType_l[NORMAL_DIALOG_RESOURCE_COUNT];
+    i32 lineCount_d;
     widget *iconPanel_j;
     heroWindow *savedNormalDialogWindow_o;
-    int windowWidth_a;
-    int savedFirstResourceType_p;
-    int resourceImageHeight_g;
-    short showMessage_h;
-    int windowHeight_k;
-    int resourceSlot_n;
-    int savedPointerType_e;
-    int dialogContentHeight_h;
-    int textWidgetId_h;
+    i32 windowWidth_a;
+    i32 savedFirstResourceType_p;
+    i32 resourceImageHeight_g;
+    i16 showMessage_h;
+    i32 windowHeight_k;
+    i32 resourceSlot_n;
+    i32 savedPointerType_e;
+    i32 dialogContentHeight_h;
+    i32 textWidgetId_h;
     tag_message message_e;
-    int savedSecondResourceType_f;
-    int windowRows_j;
-    int maxIconHeight_a;
-    int savedFirstResourceValue_i;
-    int resourceY_l;
-    int resourceFrame_g;
+    i32 savedSecondResourceType_f;
+    i32 windowRows_j;
+    i32 maxIconHeight_a;
+    i32 savedFirstResourceValue_i;
+    i32 resourceY_l;
+    i32 resourceFrame_g;
     widget *textPanel_h;
-    int resourceCenterX_a;
-    int resourceValue_l[NORMAL_DIALOG_RESOURCE_COUNT];
-    int savedSecondResourceValue_j;
+    i32 resourceCenterX_a;
+    i32 resourceValue_l[NORMAL_DIALOG_RESOURCE_COUNT];
+    i32 savedSecondResourceValue_j;
     char *orText_f;
-    int savedPointerFrame_j;
-    int imageHeight_b;
+    i32 savedPointerFrame_j;
+    i32 imageHeight_b;
 
     if (!gbRemoteOn)
         timeout = 0;
@@ -4591,7 +4591,7 @@ void NormalDialog(char *text, int dialogType, int windowX, int windowY,
 VA(0x004a2565, 0x71)
 void UpdateNormalDialog(char *text)
 {
-    short show = 1;
+    i16 show = 1;
     tag_message evt;
     evt.type = 0x200;
     evt.payload.widget.command = 3;
@@ -4614,7 +4614,7 @@ void UpdateNormalDialog(char *text)
         GROUND_REPEAT_4(7), GROUND_REPEAT_4(8), 10, 11, 12, 13, 14, 15,           \
         GROUND_REPEAT_8(0)
 
-DATA(0x004f8c58) unsigned char giGroundToTerrain[GROUND_TILE_IMAGE_COUNT] = {
+DATA(0x004f8c58) u8 giGroundToTerrain[GROUND_TILE_IMAGE_COUNT] = {
     GROUND_REPEAT_16(GROUND_TERRAIN_WATER), GROUND_REPEAT_8(GROUND_TERRAIN_WATER),
     GROUND_REPEAT_4(GROUND_TERRAIN_WATER), GROUND_REPEAT_2(GROUND_TERRAIN_WATER),
     GROUND_REPEAT_32(GROUND_TERRAIN_GRASS), GROUND_REPEAT_16(GROUND_TERRAIN_GRASS),
@@ -4634,7 +4634,7 @@ DATA(0x004f8c58) unsigned char giGroundToTerrain[GROUND_TILE_IMAGE_COUNT] = {
     GROUND_REPEAT_2(GROUND_TERRAIN_WASTELAND), GROUND_REPEAT_16(GROUND_TERRAIN_BEACH),
     GROUND_TERRAIN_BEACH
 };
-DATA(0x004f8e08) unsigned char giGroundShape[GROUND_TILE_IMAGE_COUNT] = {
+DATA(0x004f8e08) u8 giGroundShape[GROUND_TILE_IMAGE_COUNT] = {
     GROUND_REPEAT_2(16), GROUND_REPEAT_2(1), GROUND_REPEAT_4(2),
     GROUND_REPEAT_2(17), GROUND_REPEAT_2(3), GROUND_REPEAT_4(4),
     GROUND_REPEAT_4(0), GROUND_REPEAT_4(18), GROUND_REPEAT_2(20),
@@ -4659,7 +4659,7 @@ DATA(0x004f8e08) unsigned char giGroundShape[GROUND_TILE_IMAGE_COUNT] = {
 #undef GROUND_REPEAT_8
 #undef GROUND_REPEAT_4
 #undef GROUND_REPEAT_2
-DATA(0x004f8fb8) unsigned char gColorTableTan[DIM_PALETTE_COLOR_COUNT] = {
+DATA(0x004f8fb8) u8 gColorTableTan[DIM_PALETTE_COLOR_COUNT] = {
     0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6,
     0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0xc8, 0xc9, 0xcb, 0xcc, 0xce, 0xcf, 0xd0, 0xd1, 0xd2,
     0xd3, 0xd5, 0xd5, 0xd5, 0xd5, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6,
@@ -4677,7 +4677,7 @@ DATA(0x004f8fb8) unsigned char gColorTableTan[DIM_PALETTE_COLOR_COUNT] = {
     0xc6, 0xc8, 0xcb, 0xcc, 0xcf, 0xd0, 0xd1, 0xc9, 0xcb, 0xcf, 0xd1, 0xce, 0xd1, 0xd0, 0xc6, 0xc6,
     0xcf, 0xd5, 0xc6, 0xc9, 0xce, 0xd0, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5
 };
-DATA(0x004f90b8) unsigned char gColorTableGray[DIM_PALETTE_COLOR_COUNT] = {
+DATA(0x004f90b8) u8 gColorTableGray[DIM_PALETTE_COLOR_COUNT] = {
     0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
     0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
     0x20, 0x21, 0x22, 0x23, 0x24, 0x0a, 0x0b, 0x0c, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x12,
@@ -4695,7 +4695,7 @@ DATA(0x004f90b8) unsigned char gColorTableGray[DIM_PALETTE_COLOR_COUNT] = {
     0x14, 0x15, 0x16, 0x17, 0x19, 0x1a, 0x1b, 0x1b, 0x18, 0x15, 0x16, 0x1a, 0x1a, 0x1b, 0x24, 0x0c,
     0x12, 0x19, 0x13, 0x15, 0x18, 0x1a, 0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x24
 };
-DATA(0x004f91b8) unsigned char gColorTableYellow[DIM_PALETTE_COLOR_COUNT] = {
+DATA(0x004f91b8) u8 gColorTableYellow[DIM_PALETTE_COLOR_COUNT] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x72, 0x73, 0x73, 0x74, 0x75, 0x75,
     0x76, 0x77, 0x77, 0x78, 0x79, 0x79, 0x7a, 0x7b, 0x7b, 0x7c, 0x7d, 0x7d, 0x7e, 0x7f, 0x7f, 0x80,
     0x81, 0x81, 0x82, 0x82, 0x82, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -4713,7 +4713,7 @@ DATA(0x004f91b8) unsigned char gColorTableYellow[DIM_PALETTE_COLOR_COUNT] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
-DATA(0x004f92b8) unsigned char gColorTableScenWin[DIM_PALETTE_COLOR_COUNT] = {
+DATA(0x004f92b8) u8 gColorTableScenWin[DIM_PALETTE_COLOR_COUNT] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
     0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
     0x20, 0x21, 0x22, 0x23, 0x24, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -4731,7 +4731,7 @@ DATA(0x004f92b8) unsigned char gColorTableScenWin[DIM_PALETTE_COLOR_COUNT] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
-DATA(0x004f93b8) unsigned char gColorTableDarkGray[DIM_PALETTE_COLOR_COUNT] = {
+DATA(0x004f93b8) u8 gColorTableDarkGray[DIM_PALETTE_COLOR_COUNT] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14,
     0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20, 0x21, 0x22, 0x23, 0x24,
     0x24, 0x24, 0x24, 0x24, 0x24, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -4749,7 +4749,7 @@ DATA(0x004f93b8) unsigned char gColorTableDarkGray[DIM_PALETTE_COLOR_COUNT] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
-DATA(0x004f94b8) unsigned char gColorTableRed[DIM_PALETTE_COLOR_COUNT] = {
+DATA(0x004f94b8) u8 gColorTableRed[DIM_PALETTE_COLOR_COUNT] = {
     0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xb4, 0xb6, 0xb8, 0xba, 0xd0, 0xd1,
     0xd2, 0xd2, 0xd3, 0xd3, 0xd4, 0xd5, 0xd5, 0xc4, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5,
     0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xb4, 0xb4, 0xb6, 0xb6, 0xb8, 0xba, 0xd0, 0xd1, 0xd1, 0xd2, 0xd2,
@@ -4767,7 +4767,7 @@ DATA(0x004f94b8) unsigned char gColorTableRed[DIM_PALETTE_COLOR_COUNT] = {
     0xc0, 0xc1, 0xc2, 0xd5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5,
     0xd3, 0xc5, 0xd3, 0xd4, 0xc4, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5, 0xc5
 };
-DATA(0x004f95b8) unsigned char gColorTableDarkBrown[DIM_PALETTE_COLOR_COUNT] = {
+DATA(0x004f95b8) u8 gColorTableDarkBrown[DIM_PALETTE_COLOR_COUNT] = {
     0x32, 0x2a, 0x2a, 0x2a, 0x2a, 0x32, 0x32, 0x32, 0x32, 0x35, 0x2a, 0x2b, 0x2b, 0x2c, 0x2c, 0x2d,
     0x2e, 0x2e, 0x2f, 0x2f, 0x30, 0x31, 0x32, 0x33, 0x34, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a,
     0x3c, 0x3e, 0x3e, 0x3e, 0x3e, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f,
@@ -4785,22 +4785,22 @@ DATA(0x004f95b8) unsigned char gColorTableDarkBrown[DIM_PALETTE_COLOR_COUNT] = {
     0x32, 0x33, 0x34, 0x35, 0x37, 0x38, 0x3a, 0x33, 0x34, 0x37, 0x39, 0x36, 0x39, 0x38, 0x2c, 0x30,
     0x36, 0x3e, 0x31, 0x33, 0x36, 0x39, 0x32, 0x32, 0x32, 0x32, 0x32, 0x32, 0x32, 0x32, 0x32, 0x2a
 };
-DATA(0x004f96b8) int MAP_WIDTH = 72;
-DATA(0x004f96bc) int MAP_HEIGHT = 72;
-DATA(0x004f96c0) unsigned char *mapExtra = 0;
-DATA(0x004f96c4) int gbClosingApp = 0;
-DATA(0x004f96c8) int gbForegroundApp = 0;
-DATA(0x004f96cc) int giMainVideoModeColorDepth = 8;
-DATA(0x004f96d0) int giMainVideoModeWidth = 640;
-DATA(0x004f96d4) int giMainVideoModeHeight = 480;
-DATA(0x004f96d8) unsigned long glMilliCounter = 0;
-DATA(0x004f96e0) unsigned char gMapColors[RADAR_MAP_COLOR_COUNT] = {
+DATA(0x004f96b8) i32 MAP_WIDTH = 72;
+DATA(0x004f96bc) i32 MAP_HEIGHT = 72;
+DATA(0x004f96c0) u8 *mapExtra = 0;
+DATA(0x004f96c4) i32 gbClosingApp = 0;
+DATA(0x004f96c8) i32 gbForegroundApp = 0;
+DATA(0x004f96cc) i32 giMainVideoModeColorDepth = 8;
+DATA(0x004f96d0) i32 giMainVideoModeWidth = 640;
+DATA(0x004f96d4) i32 giMainVideoModeHeight = 480;
+DATA(0x004f96d8) u32l glMilliCounter = 0;
+DATA(0x004f96e0) u8 gMapColors[RADAR_MAP_COLOR_COUNT] = {
     77, 98, 13, 104, 32, 118, 54, 206, 41, 0, 0, 0, 0, 0, 0, 0
 };
-DATA(0x004f96f0) unsigned char gObjectColors[RADAR_OBJECT_COLOR_COUNT] = {
+DATA(0x004f96f0) u8 gObjectColors[RADAR_OBJECT_COLOR_COUNT] = {
     16, 48, 98, 160, 126, 74, 110, 179, 100, 218, 12, 12, 12, 12, 12, 12
 };
-DATA(0x004f9700) unsigned char gOwnerColors[RADAR_OWNER_COLOR_COUNT] = {
+DATA(0x004f9700) u8 gOwnerColors[RADAR_OWNER_COLOR_COUNT] = {
     73, 105, 190, 114, 205, 138, 10, 0
 };
 DATA(0x004f9708) char *gTilesetFiles[64] = {
@@ -4818,13 +4818,13 @@ DATA(0x004f9708) char *gTilesetFiles[64] = {
     "objndirt.icn", "objncrck.icn", "objnlav3.icn", "objnmult.icn",
     "objnlav2.icn", "x_loc1.icn", "x_loc2.icn", "x_loc3.icn"
 };
-DATA(0x004f9808) unsigned char bPuzzleDraw[PUZZLE_DRAW_TABLE_COUNT] = {
+DATA(0x004f9808) u8 bPuzzleDraw[PUZZLE_DRAW_TABLE_COUNT] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x00, 0x01, 0x01, 0x01,
     0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x00, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x00, 0x00,
     0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01
 };
-DATA(0x004f9848) unsigned char uDimPal[DIM_PALETTE_SET_COUNT]
+DATA(0x004f9848) u8 uDimPal[DIM_PALETTE_SET_COUNT]
                                                [DIM_PALETTE_LEVEL_COUNT]
                                                [DIM_PALETTE_COLOR_COUNT] = {
     {
@@ -5050,7 +5050,7 @@ DATA(0x004f9848) unsigned char uDimPal[DIM_PALETTE_SET_COUNT]
         }
     }
 };
-DATA(0x004fa448) unsigned char gColorTableLighten[DIM_PALETTE_COLOR_COUNT] = {
+DATA(0x004fa448) u8 gColorTableLighten[DIM_PALETTE_COLOR_COUNT] = {
     0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0b,
     0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b,
     0x1c, 0x1d, 0x1e, 0x1f, 0x20, 0x25, 0x25, 0x25, 0x25, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b,
@@ -5068,7 +5068,7 @@ DATA(0x004fa448) unsigned char gColorTableLighten[DIM_PALETTE_COLOR_COUNT] = {
     0xdf, 0xe0, 0xe1, 0xe2, 0xe3, 0xe4, 0xe5, 0xe7, 0xe8, 0xe9, 0xea, 0xeb, 0xec, 0xed, 0xee, 0xee,
     0xef, 0xf0, 0xf2, 0xf2, 0xf3, 0xf4, 0xf6, 0xf7, 0xf8, 0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xff
 };
-DATA(0x004fa548) unsigned char gColorTableNoCycle[DIM_PALETTE_COLOR_COUNT] = {
+DATA(0x004fa548) u8 gColorTableNoCycle[DIM_PALETTE_COLOR_COUNT] = {
     0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
     0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
     0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f,
@@ -5088,14 +5088,14 @@ DATA(0x004fa548) unsigned char gColorTableNoCycle[DIM_PALETTE_COLOR_COUNT] = {
 };
 DATA(0x004fa648) font *smallFont = 0;
 DATA(0x004fa64c) font *bigFont = 0;
-DATA(0x004fa650) int gbReturnAfterComputeExtent = 0;
-DATA(0x004fa654) int gbAllowTextEntryEscape = 1;
-DATA(0x004fa658) int giCycleType = 0;
-DATA(0x004fa65c) int giScreenScroll = 1;
-DATA(0x004fa660) int giMenuCommand = -1;
-DATA(0x004fa664) int gbSendMouseMoveMessages = 0;
-DATA(0x004fa668) int gbColorMice = 1;
-DATA(0x004fa670) unsigned long
+DATA(0x004fa650) i32 gbReturnAfterComputeExtent = 0;
+DATA(0x004fa654) i32 gbAllowTextEntryEscape = 1;
+DATA(0x004fa658) i32 giCycleType = 0;
+DATA(0x004fa65c) i32 giScreenScroll = 1;
+DATA(0x004fa660) i32 giMenuCommand = -1;
+DATA(0x004fa664) i32 gbSendMouseMoveMessages = 0;
+DATA(0x004fa668) i32 gbColorMice = 1;
+DATA(0x004fa670) u32l
     gTownEligibleBuildMask[TOWN_ELIGIBLE_BUILD_MASK_COUNT] = {
         TOWN_ELIGIBLE_BUILD_KNIGHT_MASK,
         TOWN_ELIGIBLE_BUILD_BARBARIAN_MASK,
@@ -5104,11 +5104,11 @@ DATA(0x004fa670) unsigned long
         TOWN_ELIGIBLE_BUILD_WIZARD_MASK,
         TOWN_ELIGIBLE_BUILD_NECROMANCER_MASK
     };
-DATA(0x004fa688) unsigned char giMapSizes[KB_MAP_SIZE_COUNT] = {
+DATA(0x004fa688) u8 giMapSizes[KB_MAP_SIZE_COUNT] = {
     MAP_DIMENSION_SMALL, MAP_DIMENSION_MEDIUM, MAP_DIMENSION_LARGE,
     MAP_DIMENSION_XLARGE
 };
-DATA(0x004fa68c) int gbUseEvilInterface = 0;
+DATA(0x004fa68c) i32 gbUseEvilInterface = 0;
 DATA(0x004fa690) char
     *cEvilTranslate[KB_INTERFACE_TYPE_COUNT][KB_INTERFACE_VARIANT_COUNT] = {
     { "advbord.icn", "advborde.icn" },
@@ -5152,23 +5152,23 @@ DATA(0x004fa690) char
 DATA(0x004fa7b8) char gcAnimPath[0x160] = "\\HEROES2\\ANIM\\";
 DATA(0x004fa918) char gcGamePath[0x18] = ".\\GAMES\\";
 DATA(0x004fa930) char gcMapPath[0x14] = ".\\MAPS\\";
-DATA(0x004fa944) int gbPutzingWithMouseCtr = 0;
-DATA(0x004fa948) int gbDontTryRedbook = 0;
-DATA(0x004fa94c) int gbDontTryMIDI = 0;
-DATA(0x004fa950) int gbDontTryDigital = 0;
+DATA(0x004fa944) i32 gbPutzingWithMouseCtr = 0;
+DATA(0x004fa948) i32 gbDontTryRedbook = 0;
+DATA(0x004fa94c) i32 gbDontTryMIDI = 0;
+DATA(0x004fa950) i32 gbDontTryDigital = 0;
 DATA(0x004fa958) float gfCombatSpeedMod[KB_COMBAT_SPEED_COUNT] = {
     1.0f, 0.7f, 0.35f
 };
 DATA(0x004fa964) icon *gShingleAnim = 0;
-DATA(0x004fa968) int iNextShingleAnim = 0;
-DATA(0x004fa96c) int giDialogTimeout = 0;
-DATA(0x004fa970) int giNewMonsterCycleFrame = 0;
-DATA(0x004fa974) int gbNoCDRom = 0;
-DATA(0x004fa978) int gbLeaveNetBoxAlone = 0;
-DATA(0x004fa97c) int gbDrawWindowBackground = 1;
-DATA(0x004fa980) int gbCheatMenus = 0;
-DATA(0x004fa984) int gbUseWaveout = 0;
-DATA(0x004fa988) int gbShowAllMaps = 0;
+DATA(0x004fa968) i32 iNextShingleAnim = 0;
+DATA(0x004fa96c) i32 giDialogTimeout = 0;
+DATA(0x004fa970) i32 giNewMonsterCycleFrame = 0;
+DATA(0x004fa974) i32 gbNoCDRom = 0;
+DATA(0x004fa978) i32 gbLeaveNetBoxAlone = 0;
+DATA(0x004fa97c) i32 gbDrawWindowBackground = 1;
+DATA(0x004fa980) i32 gbCheatMenus = 0;
+DATA(0x004fa984) i32 gbUseWaveout = 0;
+DATA(0x004fa988) i32 gbShowAllMaps = 0;
 DATA(0x004fa990) char *gCombatFxNames[KB_COMBAT_FX_COUNT] = {
     "", "magic01.icn", "magic02.icn", "magic03.icn",
     "magic04.icn", "magic05.icn", "magic06.icn", "magic07.icn",
@@ -5179,28 +5179,28 @@ DATA(0x004fa990) char *gCombatFxNames[KB_COMBAT_FX_COUNT] = {
     "haste.icn", "paralyze.icn", "hypnotiz.icn", "dragslay.icn",
     "blind.icn", "curse.icn", "stonskin.icn", "stelskin.icn"
 };
-DATA(0x004faa10) short horseFrameFlip[MOVEMENT_FRAME_FLIP_COUNT] = {
+DATA(0x004faa10) i16 horseFrameFlip[MOVEMENT_FRAME_FLIP_COUNT] = {
     45, 46, 47, 48, 49, 50, 51, 52, 53, 179, 178, 177, 54, 175, 174, 55
 };
-DATA(0x004faa30) short boatFrameFlip[MOVEMENT_FRAME_FLIP_COUNT] = {
+DATA(0x004faa30) i16 boatFrameFlip[MOVEMENT_FRAME_FLIP_COUNT] = {
     0, 0, 9, 9, 18, 18, 27, 27, 36, 36, 155, 155, 146, 146, 137, 137
 };
-DATA(0x004faa50) signed char gCastleResources[CASTLE_RESOURCE_SLOT_COUNT] = {
+DATA(0x004faa50) i8 gCastleResources[CASTLE_RESOURCE_SLOT_COUNT] = {
     RES_WOOD, RES_ORE, -1, -1, 0, 0, 0, 0
 };
-DATA(0x004faa58) short gCastleAmounts[CASTLE_AMOUNT_COUNT] = { 20, 20, 0, 0 };
-DATA(0x004faa60) int gHeroGoldCost = 2500;
-DATA(0x004faa68) short gVesaMode[VESA_MODE_VALUE_COUNT] = {
+DATA(0x004faa58) i16 gCastleAmounts[CASTLE_AMOUNT_COUNT] = { 20, 20, 0, 0 };
+DATA(0x004faa60) i32 gHeroGoldCost = 2500;
+DATA(0x004faa68) i16 gVesaMode[VESA_MODE_VALUE_COUNT] = {
     640, 480, 256, VESA_SET_MODE_FUNCTION, VESA_MODE_640_480_256, 0, 0, 0
 };
 DATA(0x004faa78) tag_tilePoint normalDirTable[NORMAL_DIRECTION_COUNT] = {
     { 0, -1, 16 }, { 1, -1, 16 }, { 1, 0, 16 },  { 1, 1, 16 },
     { 0, 1, 16 },  { -1, 1, 16 }, { -1, 0, 16 }, { -1, -1, 16 }
 };
-DATA(0x004faa98) int gResourceBaseValue[RESOURCE_VALUE_COUNT] = {
+DATA(0x004faa98) i32 gResourceBaseValue[RESOURCE_VALUE_COUNT] = {
     200, 300, 200, 300, 300, 300, 1, 0
 };
-DATA(0x004faab8) int
+DATA(0x004faab8) i32
     gInitResourcesHuman[STARTING_RESOURCE_DIFFICULTY_COUNT]
                        [STARTING_RESOURCE_TYPE_COUNT] = {
         { 30, 10, 30, 10, 10, 10, 10000 },
@@ -5209,7 +5209,7 @@ DATA(0x004faab8) int
         { 5, 0, 5, 0, 0, 0, 2500 },
         { 0, 0, 0, 0, 0, 0, 0 }
     };
-DATA(0x004fab48) int
+DATA(0x004fab48) i32
     gInitResourcesComputer[STARTING_RESOURCE_DIFFICULTY_COUNT]
                           [STARTING_RESOURCE_TYPE_COUNT] = {
         { 20, 5, 20, 5, 5, 5, 7500 },
@@ -5218,10 +5218,10 @@ DATA(0x004fab48) int
         { 30, 10, 30, 10, 10, 10, 10000 },
         { 30, 10, 30, 10, 10, 10, 10000 }
     };
-DATA(0x004fabd8) int gMineCharacteristics[MINE_CHARACTERISTIC_COUNT] = {
+DATA(0x004fabd8) i32 gMineCharacteristics[MINE_CHARACTERISTIC_COUNT] = {
     2, 1, 2, 1, 1, 1, 1000, 0
 };
-DATA(0x004fabf8) int gSSValues[HERO_SKILL_COUNT]
+DATA(0x004fabf8) i32 gSSValues[HERO_SKILL_COUNT]
                                  [SECONDARY_SKILL_VALUE_LEVEL_COUNT] = {
     { 400, 750, 1000 }, { 200, 450, 850 }, { 450, 1000, 1675 },
     { 1, 2, 3 },        { 50, 100, 150 },  { 150, 275, 375 },
@@ -5229,7 +5229,7 @@ DATA(0x004fabf8) int gSSValues[HERO_SKILL_COUNT]
     { 300, 550, 800 },  { 100, 200, 300 }, { 50, 100, 150 },
     { 100, 450, 950 },  { 445, 950, 1500 }
 };
-DATA(0x004faca0) unsigned char gArtifactLevel[KB_ARTIFACT_LEVEL_COUNT] = {
+DATA(0x004faca0) u8 gArtifactLevel[KB_ARTIFACT_LEVEL_COUNT] = {
     0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x02, 0x04, 0x04, 0x02, 0x08, 0x08, 0x08, 0x08,
     0x08, 0x08, 0x08, 0x08, 0x08, 0x02, 0x04, 0x02, 0x04, 0x02, 0x04, 0x02, 0x02, 0x02, 0x02, 0x02,
     0x04, 0x02, 0x02, 0x08, 0x08, 0x08, 0x08, 0x02, 0x04, 0x04, 0x08, 0x04, 0x04, 0x08, 0x08, 0x08,
@@ -5238,7 +5238,7 @@ DATA(0x004faca0) unsigned char gArtifactLevel[KB_ARTIFACT_LEVEL_COUNT] = {
     0x02, 0x10, 0x20, 0x20, 0x20, 0x20, 0x02, 0x08, 0x02, 0x08, 0x02, 0x02, 0x08, 0x08, 0x02, 0x02,
     0x02, 0x04, 0x02, 0x02, 0x02, 0x02, 0x04, 0x00
 };
-DATA(0x004fad08) int gArtifactBaseRV[KB_ARTIFACT_BASE_VALUE_COUNT] = {
+DATA(0x004fad08) i32 gArtifactBaseRV[KB_ARTIFACT_BASE_VALUE_COUNT] = {
     13600, 22000, 18000, 14000, 19000, 18500, 22200, 25000,
     6000, 4000, 4000, 5600, 1200, 1200, 1200, 1200,
     -1200, 2000, 1800, 1800, 2000, 1000, 3600, 5600,
@@ -5253,9 +5253,9 @@ DATA(0x004fad08) int gArtifactBaseRV[KB_ARTIFACT_BASE_VALUE_COUNT] = {
     9000, -3250, 36200, 2000, -1050, -1050, 10000, 10000,
     15000, 720, 7500, 10000, 9200, 10000, 1500
 };
-DATA(0x004faea4) int gUltArtifactAvgValue = 16500;
-DATA(0x004faea8) int giDebugLevel = 0;
-DATA(0x004faeac) signed char giVisRangeTown = 5;
+DATA(0x004faea4) i32 gUltArtifactAvgValue = 16500;
+DATA(0x004faea8) i32 giDebugLevel = 0;
+DATA(0x004faeac) i8 giVisRangeTown = 5;
 DATA(0x004faeb0) tag_monsterInfo gMonsterDatabase[MONSTER_DATABASE_COUNT] = {
     { { 20, 33 }, 17, 12, 1, 0, 2, 1, 1, 1, 1, 0, "psnt", 0 },
     { { 150, 312 }, 21, 8, 10, 0, 2, 5, 3, 2, 3, 12, "arch", MONSTER_ATTRIBUTE_RANGED },
@@ -5342,7 +5342,7 @@ DATA(0x004fb610) float gfBattleStat[KB_STAT_POWER_COUNT] = {
     2.0f, 2.1f, 2.2f, 2.3f, 2.4f, 2.5f,
     2.6f, 2.7f, 2.8f, 2.9f, 3.0f, 0.0f
 };
-DATA(0x004fb6b8) signed char gSpellLimits[KB_SPELL_LIMIT_COUNT] = {
+DATA(0x004fb6b8) i8 gSpellLimits[KB_SPELL_LIMIT_COUNT] = {
     3, 3, 2, 2, 1
 };
 DATA(0x004fb6c0) float gfSpellCastableCombatMod[KB_SPELL_MOD_COUNT] = {
@@ -5364,8 +5364,8 @@ DATA(0x004fb750) float gfPhilAIDurationMod[KB_SPELL_MOD_COUNT] = {
 DATA(0x004fb780) float gfSpellTypeNumMod[KB_QUICK_COMBAT_SPELL_TYPE_COUNT] = {
     1.0f, 0.75f, 0.55f, 0.4f, 0.28f, 0.2f, 0.15f
 };
-DATA(0x004fb79c) int gbDrawSavedCursor = 0;
-DATA(0x004fb7a0) signed char gbArrow[NORMAL_DIRECTION_COUNT][NORMAL_DIRECTION_COUNT] = {
+DATA(0x004fb79c) i32 gbDrawSavedCursor = 0;
+DATA(0x004fb7a0) i8 gbArrow[NORMAL_DIRECTION_COUNT][NORMAL_DIRECTION_COUNT] = {
     { 8, 0, 0, 0, 8, 16, 16, 16 },
     { 17, 9, 1, 1, 1, 9, 17, 17 },
     { 18, 18, 10, 2, 2, 2, 10, 18 },
@@ -5375,7 +5375,7 @@ DATA(0x004fb7a0) signed char gbArrow[NORMAL_DIRECTION_COUNT][NORMAL_DIRECTION_CO
     { 6, 6, 14, 22, 22, 22, 14, 6 },
     { 7, 7, 7, 15, 23, 23, 23, 15 }
 };
-DATA(0x004fb7e0) unsigned char giCloudType[KB_CLOUD_MASK_COUNT] = {
+DATA(0x004fb7e0) u8 giCloudType[KB_CLOUD_MASK_COUNT] = {
     0x0b, 0x07, 0x08, 0x81, 0x09, 0x0a, 0x80, 0x21, 0x6c, 0x1d, 0x1e, 0x20, 0x1c, 0x85, 0x22, 0x16,
     0x0b, 0x07, 0x08, 0x71, 0x09, 0x0a, 0x80, 0x7e, 0x6c, 0x1d, 0x1e, 0x83, 0x1c, 0x85, 0x22, 0x78,
     0x0b, 0x07, 0x08, 0x81, 0x09, 0x0a, 0x70, 0x7f, 0x6c, 0x1d, 0x1e, 0x20, 0x1c, 0x85, 0x7d, 0x79,
@@ -5393,7 +5393,7 @@ DATA(0x004fb7e0) unsigned char giCloudType[KB_CLOUD_MASK_COUNT] = {
     0x0b, 0x07, 0x08, 0x81, 0x09, 0x0a, 0x70, 0x7f, 0x6c, 0x0d, 0x1e, 0x1f, 0x0e, 0x03, 0x01, 0x10,
     0x0b, 0x07, 0x08, 0x73, 0x09, 0x0a, 0x72, 0x67, 0x6c, 0x0f, 0x1e, 0x05, 0x0e, 0x03, 0x01, 0x00
 };
-DATA(0x004fb8e0) short giScoreMon[MONSTER_DATABASE_COUNT][MONSTER_SCORE_FIELD_COUNT] = {
+DATA(0x004fb8e0) i16 giScoreMon[MONSTER_DATABASE_COUNT][MONSTER_SCORE_FIELD_COUNT] = {
     { 0, 0 }, { 4, 11 }, { 8, 20 }, { 12, 38 }, { 16, 29 }, { 20, 57 },
     { 24, 47 }, { 28, 12 }, { 32, 48 }, { 36, 1 }, { 40, 2 }, { 44, 39 },
     { 48, 21 }, { 52, 49 }, { 56, 13 }, { 60, 23 }, { 64, 30 }, { 68, 3 },
@@ -5406,7 +5406,7 @@ DATA(0x004fb8e0) short giScoreMon[MONSTER_DATABASE_COUNT][MONSTER_SCORE_FIELD_CO
     { 195, 34 }, { 198, 9 }, { 201, 60 }, { 204, 10 }, { 207, 19 }, { 210, 45 },
     { 213, 28 }, { 216, 56 }, { 219, 35 }, { 222, 36 }, { 225, 46 }, { 228, 37 }
 };
-DATA(0x004fb9e8) short giScoreCampaignMon[MONSTER_DATABASE_COUNT][MONSTER_SCORE_FIELD_COUNT] = {
+DATA(0x004fb9e8) i16 giScoreCampaignMon[MONSTER_DATABASE_COUNT][MONSTER_SCORE_FIELD_COUNT] = {
     { 9999, 0 }, { 5800, 11 }, { 5600, 20 }, { 5400, 38 }, { 5200, 29 }, { 5000, 57 },
     { 4800, 47 }, { 4600, 12 }, { 4400, 48 }, { 4200, 1 }, { 4000, 2 }, { 3800, 39 },
     { 3600, 21 }, { 3400, 49 }, { 3200, 13 }, { 3000, 23 }, { 2800, 30 }, { 2600, 3 },
@@ -5419,7 +5419,7 @@ DATA(0x004fb9e8) short giScoreCampaignMon[MONSTER_DATABASE_COUNT][MONSTER_SCORE_
     { 520, 34 }, { 500, 9 }, { 480, 60 }, { 460, 10 }, { 440, 19 }, { 420, 45 },
     { 400, 28 }, { 380, 56 }, { 360, 35 }, { 340, 36 }, { 320, 46 }, { 300, 37 }
 };
-DATA(0x004fbaf0) signed char townTheme[TOWN_MUSIC_TABLE_SIZE] = {
+DATA(0x004fbaf0) i8 townTheme[TOWN_MUSIC_TABLE_SIZE] = {
     TOWN_MUSIC_KNIGHT,
     TOWN_MUSIC_BARBARIAN,
     TOWN_MUSIC_WARLOCK,
@@ -5429,7 +5429,7 @@ DATA(0x004fbaf0) signed char townTheme[TOWN_MUSIC_TABLE_SIZE] = {
     TOWN_MUSIC_NONE,
     TOWN_MUSIC_NONE
 };
-DATA(0x004fbaf8) signed char
+DATA(0x004fbaf8) i8
     gHeroSkillBonus[HERO_CLASS_COUNT][KB_HERO_LEVEL_BAND_COUNT][HERO_PRIMARY_STAT_COUNT] = {
         { { 35, 45, 10, 10 }, { 25, 25, 25, 25 } },
         { { 55, 35, 5, 5 }, { 25, 25, 25, 25 } },
@@ -5438,14 +5438,14 @@ DATA(0x004fbaf8) signed char
         { { 10, 10, 40, 40 }, { 20, 20, 30, 30 } },
         { { 15, 15, 35, 35 }, { 25, 25, 25, 25 } }
     };
-DATA(0x004fbb28) int gbLoadingMonoIcon = 0;
-DATA(0x004fbb2c) int giMonoIconSkip = -1;
-DATA(0x004fbb30) int giScrollX = 0;
-DATA(0x004fbb34) int giScrollY = 0;
-DATA(0x004fbb38) int gbNoBorder = 0;
-DATA(0x004fbb3c) int gbEnlargeScreenBlit = 1;
-DATA(0x004fbb40) int giCurExe = 0;
-DATA(0x004fbb44) int gbInDialog = 0;
+DATA(0x004fbb28) i32 gbLoadingMonoIcon = 0;
+DATA(0x004fbb2c) i32 giMonoIconSkip = -1;
+DATA(0x004fbb30) i32 giScrollX = 0;
+DATA(0x004fbb34) i32 giScrollY = 0;
+DATA(0x004fbb38) i32 gbNoBorder = 0;
+DATA(0x004fbb3c) i32 gbEnlargeScreenBlit = 1;
+DATA(0x004fbb40) i32 giCurExe = 0;
+DATA(0x004fbb44) i32 gbInDialog = 0;
 // APP_MENU_UNKNOWN_9C6D and APP_MENU_UNKNOWN_9CAD occur only in this retail
 // table; executable and menu-resource evidence does not identify their actions.
 DATA(0x004fbb48) struct SMenuEnableStatus
@@ -5521,13 +5521,13 @@ DATA(0x004fbb48) struct SMenuEnableStatus
         { APP_MENU_SAVE, 0, 0, 0 },
         { APP_MENU_EXIT, 0, 0, 0 }
     };
-DATA(0x004fbd34) int gbInSetupDialog = 0;
-DATA(0x004fbd38) int gbMinimized = 0;
-DATA(0x004fbd3c) int gbHeroMoving = 0;
-DATA(0x004fbd40) int gbInSmackMgr = 0;
-DATA(0x004fbd44) int glBottomRefresh = 0;
-DATA(0x004fbd48) int gbBothMachinesWin95 = 0;
-DATA(0x004fbd4c) int gbGotFirstHeartbeat = 0;
+DATA(0x004fbd34) i32 gbInSetupDialog = 0;
+DATA(0x004fbd38) i32 gbMinimized = 0;
+DATA(0x004fbd3c) i32 gbHeroMoving = 0;
+DATA(0x004fbd40) i32 gbInSmackMgr = 0;
+DATA(0x004fbd44) i32 glBottomRefresh = 0;
+DATA(0x004fbd48) i32 gbBothMachinesWin95 = 0;
+DATA(0x004fbd4c) i32 gbGotFirstHeartbeat = 0;
 DATA(0x004fbd50) void *hmnuDflt = 0;
 DATA(0x004fbd54) void *hmnuCmbt = 0;
 DATA(0x004fbd58) void *hmnuAdv = 0;
@@ -5551,9 +5551,9 @@ DATA(0x004fbd60) char *cMonFilename[MONSTER_DATABASE_COUNT] = {
     "genie.icn", "medusa.icn", "eelem.icn", "aelem.icn",
     "felem.icn", "welem.icn"
 };
-DATA(0x004fbe68) int gbProcessingCombatAction = 0;
-DATA(0x004fbe6c) int iMPNetProtocol = 0;
-DATA(0x004fbe70) int iLastDiffSendTo = -2;
+DATA(0x004fbe68) i32 gbProcessingCombatAction = 0;
+DATA(0x004fbe6c) i32 iMPNetProtocol = 0;
+DATA(0x004fbe70) i32 iLastDiffSendTo = -2;
 DATA(0x004fbe78) SSpellInfo gsSpellInfo[HERO_SPELL_COUNT] = {
     { "fireball", 3, 8, 0, 500, 9, { 10, 10, 10, 10, 10, 10 }, SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT },
     { "fireball", 4, 9, 0, 750, 15, { 10, 10, 10, 10, 10, 10 }, SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT },
@@ -5640,22 +5640,22 @@ DATA(0x004fc410) char *cArmyFrameFileNames[MONSTER_DATABASE_COUNT] = {
     "geniefrm.bin", "medusfrm.bin", "felemfrm.bin", "felemfrm.bin",
     "felemfrm.bin", "felemfrm.bin"
 };
-DATA(0x004fc518) unsigned char gcSpellInfluenceIcons[KB_SPELL_INFLUENCE_MAP_COUNT] = {
+DATA(0x004fc518) u8 gcSpellInfluenceIcons[KB_SPELL_INFLUENCE_MAP_COUNT] = {
     0x06, 0x07, 0x08, 0x09, 0x0b, 0x0f, 0x13, 0x02,
     0x02, 0x02, 0x02, 0x02, 0x0d, 0x0a, 0x0a, 0x00
 };
-DATA(0x004fc528) unsigned char giSpellInfluenceToSpell[KB_SPELL_INFLUENCE_MAP_COUNT] = {
+DATA(0x004fc528) u8 giSpellInfluenceToSpell[KB_SPELL_INFLUENCE_MAP_COUNT] = {
     0x09, 0x0b, 0x0d, 0x0e, 0x12, 0x1a, 0x1e, 0x1f,
     0x25, 0x26, 0x29, 0x65, 0x16, 0x10, 0x11, 0x00
 };
-DATA(0x004fc538) unsigned char giNumPowFrames[KB_SPELL_EFFECT_COUNT] = {
+DATA(0x004fc538) u8 giNumPowFrames[KB_SPELL_EFFECT_COUNT] = {
     10, 10, 10, 10, 10, 10, 10, 10,
     10, 8, 8, 10, 10, 10, 10, 15,
     10, 10, 10, 10, 10, 16, 16, 14,
     19, 22, 10, 17, 10, 12, 11, 16
 };
-DATA(0x004fc558) int giSpellEffectShowType = 2;
-DATA(0x004fc560) signed char gcColorToPlayerPos[RADAR_OWNER_COLOR_COUNT] = {
+DATA(0x004fc558) i32 giSpellEffectShowType = 2;
+DATA(0x004fc560) i8 gcColorToPlayerPos[RADAR_OWNER_COLOR_COUNT] = {
     0, 1, 2, 3, 4, 5, 0, 0
 };
 DATA(0x004fc568) char *cCombatBkgNames[KB_COMBAT_BACKGROUND_COUNT] = {
@@ -5699,7 +5699,7 @@ DATA(0x004fc5b8) struct SCmbtObstacle sCmbtObstacles[KB_COMBAT_OBSTACLE_COUNT] =
     { 0x00000000, 1, 2, { 0, 1, 0, 0, 0, 0, 0, 0 } },
     { 0x00000010, 2, 2, { 0, 1, 0, 0, 0, 0, 0, 0 } }
 };
-DATA(0x004fc778) int gEstatesGoldLevel[HERO_SKILL_LEVEL_COUNT] = {
+DATA(0x004fc778) i32 gEstatesGoldLevel[HERO_SKILL_LEVEL_COUNT] = {
     0, 100, 250, 500
 };
 DATA(0x004fc788) float gfSSLogisticsMod[HERO_SKILL_LEVEL_COUNT] = {
@@ -5714,11 +5714,11 @@ DATA(0x004fc7a8) float gfSSArcheryMod[HERO_SKILL_LEVEL_COUNT] = {
 DATA(0x004fc7b8) float gfSSAIArcheryMod[HERO_SKILL_LEVEL_COUNT] = {
     1.0f, 1.04f, 1.1f, 1.2f
 };
-DATA(0x004fc7c8) signed char giVisRange[HERO_SKILL_LEVEL_COUNT] = {
+DATA(0x004fc7c8) i8 giVisRange[HERO_SKILL_LEVEL_COUNT] = {
     4, 5, 6, 7
 };
 DATA(0x004fc7d0)
-unsigned char gStartingHeroStats[HERO_CLASS_COUNT][HERO_STARTING_STAT_COUNT] = {
+u8 gStartingHeroStats[HERO_CLASS_COUNT][HERO_STARTING_STAT_COUNT] = {
     { 2, 2, 1, 1, 1 },
     { 3, 1, 1, 1, 1 },
     { 0, 0, 2, 3, 1 },
@@ -5727,7 +5727,7 @@ unsigned char gStartingHeroStats[HERO_CLASS_COUNT][HERO_STARTING_STAT_COUNT] = {
     { 1, 0, 2, 2, 1 }
 };
 DATA(0x004fc7f0)
-int giTerrainCost[KB_TERRAIN_TYPE_COUNT][HERO_SKILL_LEVEL_COUNT]
+i32 giTerrainCost[KB_TERRAIN_TYPE_COUNT][HERO_SKILL_LEVEL_COUNT]
                  [KB_TERRAIN_STEP_TYPE_COUNT] = {
     { { 100, 150 }, { 100, 150 }, { 100, 150 }, { 100, 150 } },
     { { 100, 150 }, { 100, 150 }, { 100, 150 }, { 100, 150 } },
@@ -5740,7 +5740,7 @@ int giTerrainCost[KB_TERRAIN_TYPE_COUNT][HERO_SKILL_LEVEL_COUNT]
     { { 125, 187 }, { 100, 150 }, { 100, 150 }, { 100, 150 } },
     { { 75, 112 }, { 75, 112 }, { 75, 112 }, { 75, 112 } }
 };
-DATA(0x004fc930) unsigned char bStopOnTrigger[KB_TRIGGER_TYPE_COUNT] = {
+DATA(0x004fc930) u8 bStopOnTrigger[KB_TRIGGER_TYPE_COUNT] = {
     0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0,
     0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0,
     1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1,
@@ -5763,7 +5763,7 @@ DATA(0x004fc9c8) char *gTownObjNames[KB_TOWN_OBJECT_NAME_COUNT] = {
     "dw_5", "up_1", "up_2", "up_3",
     "up_4", "up_5", "up5b", "ext3"
 };
-DATA(0x004fca48) signed char gDwellingType[TOWN_TYPE_COUNT][KB_DWELLING_TYPE_COUNT] = {
+DATA(0x004fca48) i8 gDwellingType[TOWN_TYPE_COUNT][KB_DWELLING_TYPE_COUNT] = {
     { ARMY_CREATURE_PEASANT, ARMY_CREATURE_ARCHER, ARMY_CREATURE_PIKEMAN,
       ARMY_CREATURE_SWORDSMAN, ARMY_CREATURE_CAVALRY,
       ARMY_CREATURE_PALADIN, ARMY_CREATURE_RANGER,
@@ -5796,7 +5796,7 @@ DATA(0x004fca48) signed char gDwellingType[TOWN_TYPE_COUNT][KB_DWELLING_TYPE_COU
       ARMY_GROUP_EMPTY_SLOT, ARMY_GROUP_EMPTY_SLOT }
 };
 DATA(0x004fca90)
-int gMageBuildingCosts[KB_MAGE_GUILD_LEVEL_COUNT][KB_BUILDING_RESOURCE_COUNT] = {
+i32 gMageBuildingCosts[KB_MAGE_GUILD_LEVEL_COUNT][KB_BUILDING_RESOURCE_COUNT] = {
     { 0, 0, 0, 0, 0, 0, 0 },
     { 5, 0, 5, 0, 0, 0, 2000 },
     { 5, 4, 5, 4, 4, 4, 1000 },
@@ -5805,7 +5805,7 @@ int gMageBuildingCosts[KB_MAGE_GUILD_LEVEL_COUNT][KB_BUILDING_RESOURCE_COUNT] = 
     { 5, 10, 5, 10, 10, 10, 1000 }
 };
 DATA(0x004fcb38)
-int gSpecialBuildingCosts[TOWN_TYPE_COUNT][KB_BUILDING_RESOURCE_COUNT] = {
+i32 gSpecialBuildingCosts[TOWN_TYPE_COUNT][KB_BUILDING_RESOURCE_COUNT] = {
     { 5, 0, 15, 0, 0, 0, 1500 },
     { 10, 0, 10, 0, 0, 0, 2000 },
     { 0, 0, 0, 0, 10, 0, 1500 },
@@ -5814,7 +5814,7 @@ int gSpecialBuildingCosts[TOWN_TYPE_COUNT][KB_BUILDING_RESOURCE_COUNT] = {
     { 0, 10, 0, 10, 0, 0, 1000 }
 };
 DATA(0x004fcbe0)
-int gNeutralBuildingCosts[KB_BUILDING_NEUTRAL_LIMIT][KB_BUILDING_RESOURCE_COUNT] = {
+i32 gNeutralBuildingCosts[KB_BUILDING_NEUTRAL_LIMIT][KB_BUILDING_RESOURCE_COUNT] = {
     { 5, 0, 5, 0, 0, 0, 2000 },
     { 5, 0, 0, 0, 0, 0, 750 },
     { 5, 0, 0, 0, 0, 0, 500 },
@@ -5832,20 +5832,20 @@ int gNeutralBuildingCosts[KB_BUILDING_NEUTRAL_LIMIT][KB_BUILDING_RESOURCE_COUNT]
     { 0, 0, 0, 0, 0, 0, 0 },
     { 0, 0, 0, 0, 0, 0, 500 }
 };
-DATA(0x004fcda0) int gMageBaseResourceValues[KB_MAGE_GUILD_LEVEL_COUNT] = {
+DATA(0x004fcda0) i32 gMageBaseResourceValues[KB_MAGE_GUILD_LEVEL_COUNT] = {
     0, 4000, 6500, 8500, 10500, 15000
 };
-DATA(0x004fcdb8) int
+DATA(0x004fcdb8) i32
     gNeutralBaseResourceValues[KB_BUILDING_DWELLING_FIRST + 1] = {
     5000, 300, 350, 2000, 3000, 0, 12000, 2500,
     1500, 1500, 200, 1000, 500, 0, 0, 1100,
     0, 0, 0, 0
 };
-DATA(0x004fce08) int gSpecialBuildingBaseResourceValues[TOWN_TYPE_COUNT] = {
+DATA(0x004fce08) i32 gSpecialBuildingBaseResourceValues[TOWN_TYPE_COUNT] = {
     1500, 1000, 1000, 4500, 3500, 1000
 };
 DATA(0x004fce20)
-int gDwellingBaseResourceValues[TOWN_TYPE_COUNT][KB_DWELLING_TYPE_COUNT] = {
+i32 gDwellingBaseResourceValues[TOWN_TYPE_COUNT][KB_DWELLING_TYPE_COUNT] = {
     { 858, 2225, 2816, 7385, 13754, 29785, 4000, 3200, 8000, 16000, 40000, 0 },
     { 1802, 2615, 3414, 6967, 13212, 38141, 3500, 0, 8000, 16000, 0, 0 },
     { 1684, 3000, 3500, 7213, 15181, 27684, 4000, 4000, 12000, 0, 0, 0 },
@@ -5854,7 +5854,7 @@ int gDwellingBaseResourceValues[TOWN_TYPE_COUNT][KB_DWELLING_TYPE_COUNT] = {
     { 2200, 2100, 3800, 6000, 9500, 90000, 3000, 4900, 15000, 12000, 0, 0 }
 };
 DATA(0x004fcf40)
-int gDwellingCosts[TOWN_TYPE_COUNT][KB_DWELLING_TYPE_COUNT][KB_BUILDING_RESOURCE_COUNT] = {
+i32 gDwellingCosts[TOWN_TYPE_COUNT][KB_DWELLING_TYPE_COUNT][KB_BUILDING_RESOURCE_COUNT] = {
     {
         { 0, 0, 0, 0, 0, 0, 200 }, { 0, 0, 0, 0, 0, 0, 1000 },
         { 0, 0, 5, 0, 0, 0, 1000 }, { 10, 0, 10, 0, 0, 0, 2000 },
@@ -5905,7 +5905,7 @@ int gDwellingCosts[TOWN_TYPE_COUNT][KB_DWELLING_TYPE_COUNT][KB_BUILDING_RESOURCE
     }
 };
 DATA(0x004fd720)
-unsigned long gHierarchyMask[TOWN_TYPE_COUNT][KB_DWELLING_TYPE_COUNT] = {
+u32l gHierarchyMask[TOWN_TYPE_COUNT][KB_DWELLING_TYPE_COUNT] = {
     { 0x00000000UL, 0x00080000UL, 0x00080010UL, 0x00080004UL,
       0x00700000UL, 0x00700000UL, 0x00700000UL, 0x00700000UL,
       0x00700000UL, 0x00800000UL, 0x01000000UL, 0xffffffffUL },
@@ -5925,8 +5925,8 @@ unsigned long gHierarchyMask[TOWN_TYPE_COUNT][KB_DWELLING_TYPE_COUNT] = {
       0x00100001UL, 0x00800000UL, 0x00100000UL, 0x00200000UL,
       0x00400000UL, 0x00800000UL, 0xffffffffUL, 0xffffffffUL }
 };
-DATA(0x004fd840) int giDebugBuildingToBuild = -1;
-DATA(0x004fd848) unsigned char giTerrainToMusicTrack[GROUND_TERRAIN_TYPE_COUNT] = {
+DATA(0x004fd840) i32 giDebugBuildingToBuild = -1;
+DATA(0x004fd848) u8 giTerrainToMusicTrack[GROUND_TERRAIN_TYPE_COUNT] = {
     16, 18, 14, 15, 11, 13, 17, 12, 16
 };
 DATA(0x004fd858) char *cHeroTypeShortName[HERO_CLASS_COUNT] = {
@@ -5935,10 +5935,10 @@ DATA(0x004fd858) char *cHeroTypeShortName[HERO_CLASS_COUNT] = {
 DATA(0x004fd870) char cHeroTypeInitial[HERO_TYPE_INITIAL_COUNT] = {
     'k', 'b', 's', 'w', 'z', 'n'
 };
-DATA(0x004fd878) int giDeferObjDrawX = -1;
-DATA(0x004fd87c) int giDeferObjDrawY = -1;
+DATA(0x004fd878) i32 giDeferObjDrawX = -1;
+DATA(0x004fd87c) i32 giDeferObjDrawY = -1;
 DATA(0x004fd880) class heroWindow *gpInitWin = 0;
-DATA(0x004fd888) unsigned char iGetSSByAlignment[HERO_SKILL_COUNT][HERO_CLASS_COUNT] = {
+DATA(0x004fd888) u8 iGetSSByAlignment[HERO_SKILL_COUNT][HERO_CLASS_COUNT] = {
     {3, 4, 2, 2, 2, 3},
     {2, 3, 3, 1, 1, 1},
     {3, 3, 2, 2, 2, 2},
@@ -6413,22 +6413,22 @@ struct SCmbtHero sCmbtHero[KB_COMBAT_HERO_SPRITE_COUNT] = {
         }
     } }
 };
-DATA(0x004fdeec) unsigned char iWallToHexCell[KB_CASTLE_WALL_SEGMENT_COUNT] = {
+DATA(0x004fdeec) u8 iWallToHexCell[KB_CASTLE_WALL_SEGMENT_COUNT] = {
     9, 34, 86, 113
 };
-DATA(0x004fdef0) unsigned char iTowerToHexCell[KB_CASTLE_TOWER_COUNT] = {
+DATA(0x004fdef0) u8 iTowerToHexCell[KB_CASTLE_TOWER_COUNT] = {
     22, 47, 73, 100
 };
 DATA(0x004fdef8)
-unsigned short wallPos[KB_CASTLE_WALL_SEGMENT_COUNT][KB_COMBAT_COORDINATE_COUNT] = {
+u16 wallPos[KB_CASTLE_WALL_SEGMENT_COUNT][KB_COMBAT_COORDINATE_COUNT] = {
     { 468, 58 }, { 421, 128 }, { 417, 291 }, { 498, 402 }
 };
 DATA(0x004fdf08)
-unsigned short towerPos[KB_CASTLE_TOWER_COUNT][KB_COMBAT_COORDINATE_COUNT] = {
+u16 towerPos[KB_CASTLE_TOWER_COUNT][KB_COMBAT_COORDINATE_COUNT] = {
     { 441, 61 }, { 398, 147 }, { 398, 233 }, { 441, 316 }
 };
 DATA(0x004fdf18)
-unsigned short doorPos[KB_CASTLE_DOOR_POSITION_COUNT][KB_COMBAT_COORDINATE_COUNT] = {
+u16 doorPos[KB_CASTLE_DOOR_POSITION_COUNT][KB_COMBAT_COORDINATE_COUNT] = {
     { 393, 192 }, { 348, 262 }
 };
 DATA(0x004fdf20)
@@ -6465,18 +6465,18 @@ DATA(0x004fdf50) struct SElevationOverlay
     { 0x0080, { 21, 34, 48, 70, 83, 97, 98, -1, -1, -1, -1, -1, -1, -1, -1 } }
 };
 DATA(0x004fe100)
-signed char captainStats[HERO_CLASS_COUNT][HERO_PRIMARY_STAT_COUNT] = {
+i8 captainStats[HERO_CLASS_COUNT][HERO_PRIMARY_STAT_COUNT] = {
     { 1, 1, 1, 1 }, { 1, 1, 1, 1 },
     { 0, 0, 2, 2 }, { 0, 0, 2, 2 },
     { 0, 0, 2, 2 }, { 0, 0, 2, 2 }
 };
-DATA(0x004fe118) int gbDrawingPuzzle = 0;
-DATA(0x004fe11c) int giWalkingFrom = -1;
-DATA(0x004fe120) int giWalkingFrom2 = -1;
-DATA(0x004fe124) int giWalkingTo = -1;
-DATA(0x004fe128) int giWalkingTo2 = -1;
-DATA(0x004fe12c) int giWalkingYMod = 0;
-DATA(0x004fe130) unsigned char moatCell[KB_MOAT_CELL_COUNT] = {
+DATA(0x004fe118) i32 gbDrawingPuzzle = 0;
+DATA(0x004fe11c) i32 giWalkingFrom = -1;
+DATA(0x004fe120) i32 giWalkingFrom2 = -1;
+DATA(0x004fe124) i32 giWalkingTo = -1;
+DATA(0x004fe128) i32 giWalkingTo2 = -1;
+DATA(0x004fe12c) i32 giWalkingYMod = 0;
+DATA(0x004fe130) u8 moatCell[KB_MOAT_CELL_COUNT] = {
     8, 21, 33, 46, 58, 72, 85, 99, 112
 };
 DATA(0x004fe140) SCampaignChoice campaignChoices[CAMPAIGN_SIDE_COUNT]
@@ -8702,32 +8702,32 @@ DATA(0x004fff10) SWinSetup gWinSetup[KB_WIN_SETUP_COUNT] = {
     {23, 606, "Victory\nConditions"},
     {23, 607, "Loss\nConditions"}
 };
-DATA(0x00500110) int gbHeroWindShowing = 0;
-DATA(0x00500114) int gbFullCombatScreenDrawn = 1;
-DATA(0x00500118) int gbLimitedCombatUpdatePalette = 0;
-DATA(0x0050011c) int gbFirstTimeThrough = 0;
-DATA(0x00500120) int gbSkipIntro = 0;
-DATA(0x00500124) int gbDoMemCheck = 1;
-DATA(0x00500128) int gbAllBlack = 0;
-DATA(0x0050012c) int gbInCombat = 0;
-DATA(0x00500130) int gbDirectConnect = 0;
-DATA(0x00500134) int giForceSwitchMusic = -1;
-DATA(0x00500138) int gbComputeExtent = 0;
-DATA(0x0050013c) int gbSaveBiggestExtent = 0;
-DATA(0x00500140) int gbLimitToExtent = 0;
-DATA(0x00500144) int gbCurrArmyDrawn = 1;
-DATA(0x00500148) int gAdvDisposeLevel = 0;
-DATA(0x0050014c) int gbRemoteOn = 0;
-DATA(0x00500150) int gbGameInitialized = 0;
-DATA(0x00500154) int giHighScoreRank = -1;
-DATA(0x00500158) int giHighScoreType = 1;
-DATA(0x0050015c) int gbShowHighScore = 0;
-DATA(0x00500160) int gbLowMemory = 0;
-DATA(0x00500164) int giHighMemBuffer = 5;
+DATA(0x00500110) i32 gbHeroWindShowing = 0;
+DATA(0x00500114) i32 gbFullCombatScreenDrawn = 1;
+DATA(0x00500118) i32 gbLimitedCombatUpdatePalette = 0;
+DATA(0x0050011c) i32 gbFirstTimeThrough = 0;
+DATA(0x00500120) i32 gbSkipIntro = 0;
+DATA(0x00500124) i32 gbDoMemCheck = 1;
+DATA(0x00500128) i32 gbAllBlack = 0;
+DATA(0x0050012c) i32 gbInCombat = 0;
+DATA(0x00500130) i32 gbDirectConnect = 0;
+DATA(0x00500134) i32 giForceSwitchMusic = -1;
+DATA(0x00500138) i32 gbComputeExtent = 0;
+DATA(0x0050013c) i32 gbSaveBiggestExtent = 0;
+DATA(0x00500140) i32 gbLimitToExtent = 0;
+DATA(0x00500144) i32 gbCurrArmyDrawn = 1;
+DATA(0x00500148) i32 gAdvDisposeLevel = 0;
+DATA(0x0050014c) i32 gbRemoteOn = 0;
+DATA(0x00500150) i32 gbGameInitialized = 0;
+DATA(0x00500154) i32 giHighScoreRank = -1;
+DATA(0x00500158) i32 giHighScoreType = 1;
+DATA(0x0050015c) i32 gbShowHighScore = 0;
+DATA(0x00500160) i32 gbLowMemory = 0;
+DATA(0x00500164) i32 giHighMemBuffer = 5;
 DATA(0x00500168) void *gLowPage = 0;
-DATA(0x0050016c) int gbLowPageGrabbed = 0;
-DATA(0x00500170) signed char xSmackFromNetwork = 0;
-DATA(0x00500174) int gbInPollSound = 0;
+DATA(0x0050016c) i32 gbLowPageGrabbed = 0;
+DATA(0x00500170) i8 xSmackFromNetwork = 0;
+DATA(0x00500174) i32 gbInPollSound = 0;
 // @data-layout-note Retail's initialized KB contribution is
 // 0xf8c58..0x116f60 (0x1e308); candidate .data is 0x1e309. All 2,719 initialized
 // candidate definitions close: 315 typed source DATA owners plus 2,404 reviewed
@@ -8744,12 +8744,12 @@ DATA(0x00500174) int gbInPollSound = 0;
 // and 75bba73ed144117efade24fa386a3dfb14f2717d48ef2246817e900e687499b7.
 // KB has no candidate or NB09 .rdata contribution. Do not invent padding,
 // aliases, synthetic owners, or section pragmas for the physical stream delta.
-DATA(0x005157a8) int iCDRomErr = 0;
-DATA(0x005157ac) int bEarlySetupDone = 0;
-DATA(0x005159f8) int bKBDone = 0;
+DATA(0x005157a8) i32 iCDRomErr = 0;
+DATA(0x005157ac) i32 bEarlySetupDone = 0;
+DATA(0x005159f8) i32 bKBDone = 0;
 DATA(0x005159fc) struct _REDBOOK *hRedbookz = 0;
-DATA(0x00515a00) int bForceCheckTimeEvent = 0;
-DATA(0x00515ca0) unsigned short
+DATA(0x00515a00) i32 bForceCheckTimeEvent = 0;
+DATA(0x00515ca0) u16
     IMHotSpots[KB_INIT_MENU_HOTSPOT_COUNT][INIT_MENU_HOTSPOT_FIELD_COUNT] = {
     {481, 185, 83, 96},
     {194, 179, 82, 79},
@@ -8757,11 +8757,11 @@ DATA(0x00515ca0) unsigned short
     {303, 137, 75, 44},
     {0, 389, 86, 90}
 };
-DATA(0x00515cc8) int lastIMHoverID = -1;
-DATA(0x00515f78) int bInCheckEndGame = 0;
-DATA(0x005165dc) int bInShutDown = 0;
-DATA(0x00516810) int gbInMemError = 0;
-DATA(0x00516d1c) int iShingleAnimFrame = 0;
+DATA(0x00515cc8) i32 lastIMHoverID = -1;
+DATA(0x00515f78) i32 bInCheckEndGame = 0;
+DATA(0x005165dc) i32 bInShutDown = 0;
+DATA(0x00516810) i32 gbInMemError = 0;
+DATA(0x00516d1c) i32 iShingleAnimFrame = 0;
 // @data-layout-note Retail's loader-zero KB contribution is
 // 0x128598..0x12a1d8 (0x1c40); candidate .bss is 0x1a7c. Its 131 public
 // definitions have 125 inconsistent section bases because VC4.2 emits the
@@ -8775,134 +8775,134 @@ DATA(0x00516d1c) int iShingleAnimFrame = 0;
 // and file/function-static probes do not recover retail's order. Revisit only
 // with evidence for original common/section topology or referenced private
 // storage; do not add padding definitions solely to close the 0x1c4 size delta.
-DATA(0x00528598) int gbHumanPlayer[6];
-DATA(0x005285b0) int gbHitEvent;
-DATA(0x005285b4) int giMaxExtentX;
-DATA(0x005285b8) int giMaxExtentY;
-DATA(0x005285bc) int giRandomClouds;
+DATA(0x00528598) i32 gbHumanPlayer[6];
+DATA(0x005285b0) i32 gbHitEvent;
+DATA(0x005285b4) i32 giMaxExtentX;
+DATA(0x005285b8) i32 giMaxExtentY;
+DATA(0x005285bc) i32 giRandomClouds;
 DATA(0x005285c0) char *cOverrideDigitalDriver;
-DATA(0x005285d0) int giBottomViewOverrideEndTime;
-DATA(0x005285d8) signed char gArmyEffected[2][20];
-DATA(0x00528600) int giBottomViewResource;
-DATA(0x00528604) int gbInCampaign;
-DATA(0x00528608) int giResExtra1;
-DATA(0x0052860c) int giResExtra2;
-DATA(0x00528610) signed char puzzlePiecesRemoved[6];
-DATA(0x00528618) int giSeedingValid;
-DATA(0x0052861c) int giLimitPlayer;
-DATA(0x00528620) int giShowClouds;
-DATA(0x00528624) int bDoColorCycle;
+DATA(0x005285d0) i32 giBottomViewOverrideEndTime;
+DATA(0x005285d8) i8 gArmyEffected[2][20];
+DATA(0x00528600) i32 giBottomViewResource;
+DATA(0x00528604) i32 gbInCampaign;
+DATA(0x00528608) i32 giResExtra1;
+DATA(0x0052860c) i32 giResExtra2;
+DATA(0x00528610) i8 puzzlePiecesRemoved[6];
+DATA(0x00528618) i32 giSeedingValid;
+DATA(0x0052861c) i32 giLimitPlayer;
+DATA(0x00528620) i32 giShowClouds;
+DATA(0x00528624) i32 bDoColorCycle;
 DATA(0x00528628) inputManager *gpInputManager;
 DATA(0x00528630) SAMPLE2 NULL_SAMPLE2;
-DATA(0x00528638) int iMaxMapExtra;
+DATA(0x00528638) i32 iMaxMapExtra;
 DATA(0x0052863c) palette *gPalette;
 DATA(0x00528640) resourceManager *gpResourceManager;
 DATA(0x00528648) char *gcBotViewText;
-DATA(0x005286e0) int bSpecialHideCursor;
+DATA(0x005286e0) i32 bSpecialHideCursor;
 DATA(0x005286e4) searchArray *gpSearchArray;
-DATA(0x005286e8) int giResType1;
-DATA(0x005286ec) int gbBlackoutPlayer;
-DATA(0x005286f0) int giResType2;
+DATA(0x005286e8) i32 giResType1;
+DATA(0x005286ec) i32 gbBlackoutPlayer;
+DATA(0x005286f0) i32 giResType2;
 DATA(0x005286f8) char cNetBoxLine[4][140];
-DATA(0x00528928) int gIndex;
-DATA(0x0052892c) int giWeekTypeExtra;
+DATA(0x00528928) i32 gIndex;
+DATA(0x0052892c) i32 giWeekTypeExtra;
 DATA(0x00528930) philAI *gpPhilAI;
-DATA(0x00528934) int giTCPType;
-DATA(0x00528938) int gCurLoadedSpellEffect;
+DATA(0x00528934) i32 giTCPType;
+DATA(0x00528938) i32 gCurLoadedSpellEffect;
 DATA(0x0052893c) class mouseManager *gpMouseManager;
-DATA(0x00528940) int giCurTempMobility;
-DATA(0x00528944) int giOverviewReturnAction;
+DATA(0x00528940) i32 giCurTempMobility;
+DATA(0x00528944) i32 giOverviewReturnAction;
 DATA(0x00528948) char *cOverrideMIDIDriver;
 DATA(0x00528958) icon *gSystemIcons;
-DATA(0x0052895c) signed char gbCombatSurrender;
+DATA(0x0052895c) i8 gbCombatSurrender;
 DATA(0x00528960) heroWindow *pNormalDialogWindow;
-DATA(0x00528964) int giTCPHostStatus;
+DATA(0x00528964) i32 giTCPHostStatus;
 DATA(0x00528968) char gMapName[16];
-DATA(0x00528978) int giMinExtentX;
-DATA(0x0052897c) int giMinExtentY;
-DATA(0x00528980) int iMPBaseType;
-DATA(0x00528984) int gbTCPFirstTime;
-DATA(0x00528988) short *pwSizeOfMapExtra;
-DATA(0x0052898c) int giHeroScreenSrcIndex;
-DATA(0x00528990) int giWeekType;
+DATA(0x00528978) i32 giMinExtentX;
+DATA(0x0052897c) i32 giMinExtentY;
+DATA(0x00528980) i32 iMPBaseType;
+DATA(0x00528984) i32 gbTCPFirstTime;
+DATA(0x00528988) i16 *pwSizeOfMapExtra;
+DATA(0x0052898c) i32 giHeroScreenSrcIndex;
+DATA(0x00528990) i32 giWeekType;
 DATA(0x00528998) char gText[768];
-DATA(0x00528c98) int gbInNewGameSetup;
+DATA(0x00528c98) i32 gbInNewGameSetup;
 DATA(0x00528c9c) class palette *gpBufferPalette;
-DATA(0x00528ca0) int gbCampaignSideChoice;
+DATA(0x00528ca0) i32 gbCampaignSideChoice;
 DATA(0x00528ca4) char cNetBoxColor[4];
-DATA(0x00528ca8) int giMonthTypeExtra;
-DATA(0x00528cac) int iMPExtendedType;
-DATA(0x00528cb0) signed char gcColorToSetupPos[8];
+DATA(0x00528ca8) i32 giMonthTypeExtra;
+DATA(0x00528cac) i32 iMPExtendedType;
+DATA(0x00528cb0) i8 gcColorToSetupPos[8];
 DATA(0x00528cb8) char gFullMapName[GLOBAL_MAP_NAME_SIZE];
 DATA(0x00528cd0) char gcTCPName[GLOBAL_TCP_TEXT_SIZE];
-DATA(0x00528ce8) int giShowIntro;
-DATA(0x00528cf0) int glTimers[GLOBAL_TIMER_COUNT];
-DATA(0x00528d18) int giScore;
+DATA(0x00528ce8) i32 giShowIntro;
+DATA(0x00528cf0) i32 glTimers[GLOBAL_TIMER_COUNT];
+DATA(0x00528d18) i32 giScore;
 DATA(0x00528d1c) armyGroup *gpMonGroup;
 DATA(0x00528d20) configStruct gConfig;
 DATA(0x00528ec0) char gcRegAppPath[0x160];
-DATA(0x00529020) unsigned long gTimeMark;
+DATA(0x00529020) u32l gTimeMark;
 DATA(0x00529024) char *EXPANSION_AGGREGATE_NAME;
 DATA(0x00529028) char cPlayerNames[6][21];
 DATA(0x005290a8) game *gpGame;
-DATA(0x005290ac) signed char gbRetreatWin;
-DATA(0x005290b0) int giWaitType;
+DATA(0x005290ac) i8 gbRetreatWin;
+DATA(0x005290b0) i32 giWaitType;
 DATA(0x005290b4) class icon *gCurLoadedSpellIcon;
-DATA(0x005290b8) unsigned char bSaveMusicPosition[0x3c];
-DATA(0x005290f4) int giBottomViewOverride;
+DATA(0x005290b8) u8 bSaveMusicPosition[0x3c];
+DATA(0x005290f4) i32 giBottomViewOverride;
 DATA(0x005290f8) char gcTCPAddress[GLOBAL_TCP_TEXT_SIZE];
-DATA(0x00529110) unsigned char giSetupGameType;
+DATA(0x00529110) u8 giSetupGameType;
 DATA(0x00529118) char gLastFilename[GLOBAL_AGGREGATE_PATH_SIZE];
-DATA(0x00529278) int giFullySeeded;
+DATA(0x00529278) i32 giFullySeeded;
 DATA(0x0052927c) icon *gBuyBuildIcons;
-DATA(0x00529280) int gbNoSound;
-DATA(0x00529288) int iCombatControlNetPos[COMBAT_CONTROL_SIDE_COUNT];
+DATA(0x00529280) i32 gbNoSound;
+DATA(0x00529288) i32 iCombatControlNetPos[COMBAT_CONTROL_SIDE_COUNT];
 DATA(0x00529290) char cExpAggPathName[GLOBAL_AGGREGATE_PATH_SIZE];
-DATA(0x005293f0) int gbMoveShown;
+DATA(0x005293f0) i32 gbMoveShown;
 DATA(0x005293f4) void **ppMapExtra;
 DATA(0x005293f8) char gcBottomViewText[92];
-DATA(0x00529454) int giThisNetPos;
-DATA(0x00529458) signed char gbSetupGamePosToRealGamePos[8];
+DATA(0x00529454) i32 giThisNetPos;
+DATA(0x00529458) i8 gbSetupGamePosToRealGamePos[8];
 DATA(0x00529460) char gcRegCDRomPath[0x160];
 DATA(0x005295c0) class heroWindow *heroWin;
-DATA(0x005295c4) int giOverviewReturnActionExtra;
-DATA(0x005295c8) int giCurGeneral;
-DATA(0x005295cc) int giThisGamePos;
-DATA(0x005295d0) int giNumHumanPlayers;
-DATA(0x005295d4) int gbIconClipOn;
-DATA(0x005295d8) int gbRemoteGameOpen;
+DATA(0x005295c4) i32 giOverviewReturnActionExtra;
+DATA(0x005295c8) i32 giCurGeneral;
+DATA(0x005295cc) i32 giThisGamePos;
+DATA(0x005295d0) i32 giNumHumanPlayers;
+DATA(0x005295d4) i32 gbIconClipOn;
+DATA(0x005295d8) i32 gbRemoteGameOpen;
 DATA(0x005295dc) combatManager *gpCombatManager;
-DATA(0x005295e0) int giTCPNumPlayers;
+DATA(0x005295e0) i32 giTCPNumPlayers;
 DATA(0x005295e4) executive *gpExec;
 DATA(0x005295e8) void *hMainWindow;
-DATA(0x005295ec) int giCurWindowsStyleFlags;
-DATA(0x005295f0) int gGameCommand;
-DATA(0x005295f4) int giMonthType;
+DATA(0x005295ec) i32 giCurWindowsStyleFlags;
+DATA(0x005295f0) i32 gGameCommand;
+DATA(0x005295f4) i32 giMonthType;
 DATA(0x005295f8) char *DEFAULT_AGGREGATE_NAME;
-DATA(0x005295fc) int gCurSpellEffectFrame;
-DATA(0x00529600) signed char gbThisNetHumanPlayer[8];
+DATA(0x005295fc) i32 gCurSpellEffectFrame;
+DATA(0x00529600) i8 gbThisNetHumanPlayer[8];
 DATA(0x00529608) char cAggPathName[GLOBAL_AGGREGATE_PATH_SIZE];
 DATA(0x00529768) class highScoreManager *gpHighScoreManager;
-DATA(0x0052976c) int gbFunctionComplete;
-DATA(0x00529770) int gbIAmGreatest;
-DATA(0x00529774) int gbTextEntryEscaped;
-DATA(0x00529778) int giTotalHighMem;
-DATA(0x0052977c) int gMapX;
-DATA(0x00529780) int gMapY;
+DATA(0x0052976c) i32 gbFunctionComplete;
+DATA(0x00529770) i32 gbIAmGreatest;
+DATA(0x00529774) i32 gbTextEntryEscaped;
+DATA(0x00529778) i32 giTotalHighMem;
+DATA(0x0052977c) i32 gMapX;
+DATA(0x00529780) i32 gMapY;
 DATA(0x00529788) char *gcWinText;
-DATA(0x005298b4) int bFreshSave;
-DATA(0x005298b8) int bShowIt;
-DATA(0x005298bc) int gLowPageScreenSelector;
+DATA(0x005298b4) i32 bFreshSave;
+DATA(0x005298b8) i32 bShowIt;
+DATA(0x005298bc) i32 gLowPageScreenSelector;
 DATA(0x005298c0) class heroWindowManager *gpWindowManager;
-DATA(0x005298c4) int giCurWatchPlayer;
+DATA(0x005298c4) i32 giCurWatchPlayer;
 DATA(0x005298c8) char gcCommandLine[GLOBAL_COMMAND_LINE_SIZE];
-DATA(0x00529908) int giBottomViewResourceQty;
+DATA(0x00529908) i32 giBottomViewResourceQty;
 DATA(0x0052990c) soundManager *gpSoundManager;
-DATA(0x00529910) int gbThisNetGotAdventureControl;
-DATA(0x00529914) int giMapChangeCtr;
+DATA(0x00529910) i32 gbThisNetGotAdventureControl;
+DATA(0x00529914) i32 giMapChangeCtr;
 DATA(0x00529918) SMapChange sMapChangeQueue[CURSOR_MAP_CHANGE_QUEUE_COUNT];
-DATA(0x0052a184) int gbWaitForRemoteReceive;
-DATA(0x0052a188) unsigned char bMusicIsLooping[0x3c];
+DATA(0x0052a184) i32 gbWaitForRemoteReceive;
+DATA(0x0052a188) u8 bMusicIsLooping[0x3c];
 DATA(0x0052a1c4) townManager *gpTownManager;
 DATA(0x0052a1c8) advManager *gpAdvManager;
-DATA(0x0052a1d0) signed char gbGamePosToNetPos[OLD_MAIN_MATCH_BUFFER_SIZE];
+DATA(0x0052a1d0) i8 gbGamePosToNetPos[OLD_MAIN_MATCH_BUFFER_SIZE];

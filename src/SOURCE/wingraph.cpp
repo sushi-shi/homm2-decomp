@@ -23,18 +23,18 @@ DATA(0x00525158) static RECT gDDClientRect;
 DATA(0x00525170) static RECT gDDDestinationRect;
 DATA(0x005255ac) static HRESULT gDDResult;
 DATA(0x005255b0) static DDSURFACEDESC gDDSurfaceDesc;
-DATA(0x004f16c4) static short gDDRestoreLineBase = 45;
-DATA(0x004f16f4) static short gCreatePrimaryLineBase = 67;
-DATA(0x004f1724) static short gSetupClipperLineBase = 87;
-DATA(0x004f17ac) static short gDDInitLineBase = 110;
-DATA(0x004f1864) static short gDDPaintLineBase = 157;
-DATA(0x004f19b0) static short gDDInitializePaletteLineBase = 296;
-DATA(0x004f19e0) static short gDDSetPaletteLineBase = 368;
-DATA(0x004f1a10) static short gDDCreateSurfaceLineBase = 393;
-DATA(0x004f1dbc) static short gDDUpdatePaletteLineBase = 500;
-DATA(0x004f1e18) static short gDDCleanUpLineBase = 526;
-DATA(0x004f1e74) static short gDDSetFullScreenLineBase = 572;
-DATA(0x004f2084) static short gSetGraphicsTypeLineBase = 1247;
+DATA(0x004f16c4) static i16 gDDRestoreLineBase = 45;
+DATA(0x004f16f4) static i16 gCreatePrimaryLineBase = 67;
+DATA(0x004f1724) static i16 gSetupClipperLineBase = 87;
+DATA(0x004f17ac) static i16 gDDInitLineBase = 110;
+DATA(0x004f1864) static i16 gDDPaintLineBase = 157;
+DATA(0x004f19b0) static i16 gDDInitializePaletteLineBase = 296;
+DATA(0x004f19e0) static i16 gDDSetPaletteLineBase = 368;
+DATA(0x004f1a10) static i16 gDDCreateSurfaceLineBase = 393;
+DATA(0x004f1dbc) static i16 gDDUpdatePaletteLineBase = 500;
+DATA(0x004f1e18) static i16 gDDCleanUpLineBase = 526;
+DATA(0x004f1e74) static i16 gDDSetFullScreenLineBase = 572;
+DATA(0x004f2084) static i16 gSetGraphicsTypeLineBase = 1247;
 
 VA(0x00435290, 0x55)
 void DDRestoreDisplayMode(void)
@@ -49,9 +49,9 @@ void DDRestoreDisplayMode(void)
 }
 
 VA(0x004352e5, 0x46)
-int DDQueryNewPalette(void)
+i32 DDQueryNewPalette(void)
 {
-    int unused;
+    i32 unused;
 
     if (gbWinGraphBusy != 0)
         return 1;
@@ -125,12 +125,12 @@ void DDInitGraphics(void)
 }
 
 VA(0x00435601, 0x530)
-int DDAppPaint(void *window, void *paintDC)
+i32 DDAppPaint(void *window, void *paintDC)
 {
-    int sourceTop4;
-    int sourceWidth5;
-    int sourceHeight3;
-    int sourceLeft3;
+    i32 sourceTop4;
+    i32 sourceWidth5;
+    i32 sourceHeight3;
+    i32 sourceLeft3;
     POINT point0;
     PAINTSTRUCT paint3;
 
@@ -228,7 +228,7 @@ int DDAppPaint(void *window, void *paintDC)
             DDSD(gDDResult, WINGRAPH_SOURCE_FILE, gDDPaintLineBase + 118);
         if (gpWindowManager->m_screen != 0) {
             gpWindowManager->m_screen->m_pixels =
-                static_cast<unsigned char *>(gDDSurfaceDesc.lpSurface);
+                static_cast<u8 *>(gDDSurfaceDesc.lpSurface);
             lpInitWin = gDDSurfaceDesc.lpSurface;
         } else {
             lpInitWin = gDDSurfaceDesc.lpSurface;
@@ -245,7 +245,7 @@ VA(0x00435b31, 0x13c)
 void DDInitializePalette(void)
 {
     HDC dc0;
-    int entry;
+    i32 entry;
     HRESULT result0;
 
     if (gbWinGraphBusy != 0)
@@ -283,7 +283,7 @@ void DDInitializePalette(void)
 }
 
 VA(0x00435c6d, 0xaf)
-int DDSetPalette(void)
+i32 DDSetPalette(void)
 {
     HRESULT result;
 
@@ -301,12 +301,12 @@ int DDSetPalette(void)
 
 VA(0x00435d1c, 0x133)
 struct IDirectDrawSurface * DDCreateSurface(
-    unsigned long width, unsigned long height, int primary)
+    u32l width, u32l height, i32 primary)
 {
     DDSURFACEDESC description;
     IDirectDrawSurface *surface;
-    int cnt;
-    int unused;
+    i32 cnt;
+    i32 unused;
     HRESULT rv;
 
     memset(&description, 0, sizeof(description));
@@ -331,7 +331,7 @@ struct IDirectDrawSurface * DDCreateSurface(
                 gDDCreateSurfaceLineBase + 36);
         if (gpWindowManager->m_screen != 0) {
             gpWindowManager->m_screen->m_pixels =
-                static_cast<unsigned char *>(description.lpSurface);
+                static_cast<u8 *>(description.lpSurface);
             lpInitWin = description.lpSurface;
         } else {
             lpInitWin = description.lpSurface;
@@ -345,10 +345,10 @@ struct IDirectDrawSurface * DDCreateSurface(
 // delinked local-label jump table. Only local/constant relocation names differ;
 // every external relocation target agrees.
 VA(0x00435e4f, 0x5d2)
-void DDSD(int error, char *file, int line)
+void DDSD(i32 error, char *file, i32 line)
 {
     HRESULT restoreResult;
-    int unused;
+    i32 unused;
     char errorMessage0[WINGRAPH_ERROR_TEXT_SIZE];
 
     if (bInDDSD != 0)
@@ -458,9 +458,9 @@ void DDSD(int error, char *file, int line)
 }
 
 VA(0x00436421, 0x118)
-void DDUpdatePalette(signed char *paletteData)
+void DDUpdatePalette(i8 *paletteData)
 {
-    int entry;
+    i32 entry;
     HRESULT result0;
 
     if (gbWinGraphBusy != 0)
@@ -475,7 +475,7 @@ void DDUpdatePalette(signed char *paletteData)
         LogicalPalette.entries[entry].peBlue = paletteData[entry * 3 + 2] << 2;
         LogicalPalette.entries[entry].peFlags = PC_NOCOLLAPSE;
     }
-    ProcessAssert(reinterpret_cast<int>(lpDDPal), WINGRAPH_SOURCE_FILE,
+    ProcessAssert(reinterpret_cast<i32>(lpDDPal), WINGRAPH_SOURCE_FILE,
         gDDUpdatePaletteLineBase + 18);
     result0 = lpDDPal->SetEntries(0, WINGRAPH_SYSTEM_PALETTE_SIZE,
         WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE * 2,
@@ -522,12 +522,12 @@ void DDCleanUpWinGraphics(void)
 }
 
 VA(0x004366b0, 0x305)
-void DDSetFullScreenStatus(int fullScreen)
+void DDSetFullScreenStatus(i32 fullScreen)
 {
-    int width;
-    int windowHeight0;
-    int x;
-    int y;
+    i32 width;
+    i32 windowHeight0;
+    i32 x;
+    i32 y;
     HRESULT result0;
 
     if (gbWinGraphBusy != 0)
@@ -590,9 +590,9 @@ void DDSetFullScreenStatus(int fullScreen)
 }
 
 VA(0x004369b5, 0x89)
-int WGQueryNewPalette(void)
+i32 WGQueryNewPalette(void)
 {
-    int paletteChanges;
+    i32 paletteChanges;
     HDC hdc;
 
     hdc = GetDC(hwndApp);
@@ -647,11 +647,11 @@ void WGInitGraphics(void)
 }
 
 VA(0x00436b8f, 0x1e7)
-void WGUpdatePalette(signed char *paletteData)
+void WGUpdatePalette(i8 *paletteData)
 {
     HDC dc0;
-    int entry;
-    int result0;
+    i32 entry;
+    i32 result0;
 
     for (entry = WINGRAPH_SYSTEM_PALETTE_SIZE;
          entry < WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE;
@@ -700,7 +700,7 @@ VA(0x00436d76, 0x1d5)
 void WGInitializePalette(void)
 {
     HDC dc0;
-    int entry;
+    i32 entry;
 
     if (hpalApp != 0)
         return;
@@ -759,18 +759,18 @@ void WGInitializePalette(void)
 }
 
 VA(0x00436f4b, 0x1c4)
-int WGAppPaint(void *window, void *paintDC)
+i32 WGAppPaint(void *window, void *paintDC)
 {
-    int padding8;
+    i32 padding8;
     RECT clientRect16;
     char unusedByte0;
-    int destY1;
-    int sourceX7;
+    i32 destY1;
+    i32 sourceX7;
     PAINTSTRUCT paint5;
-    int destHeight3;
-    int destWidth0;
-    int destX7;
-    int sourceY7;
+    i32 destHeight3;
+    i32 destWidth0;
+    i32 destX7;
+    i32 sourceY7;
 
     unusedByte0 = 0;
     if (screenImage.bits != 0) {
@@ -832,7 +832,7 @@ VA(0x00437187, 0x80)
 void ConnectToDLLs(void)
 {
     hDDrawLibrary = LoadLibraryA("DDRAW.DLL");
-    if (reinterpret_cast<unsigned long>(hDDrawLibrary) >=
+    if (reinterpret_cast<u32l>(hDDrawLibrary) >=
         WINGRAPH_LOAD_LIBRARY_SUCCESS) {
         lpDirectDrawCreate = reinterpret_cast<DirectDrawCreateProc>(
             GetProcAddress(hDDrawLibrary, "DirectDrawCreate"));
@@ -848,7 +848,7 @@ void ConnectToDLLs(void)
 VA(0x00437207, 0x29)
 void DisconnectDLLs(void)
 {
-    if (reinterpret_cast<unsigned long>(hDDrawLibrary) >=
+    if (reinterpret_cast<u32l>(hDDrawLibrary) >=
         WINGRAPH_LOAD_LIBRARY_SUCCESS) {
         FreeLibrary(hDDrawLibrary);
     }
@@ -865,7 +865,7 @@ void RestoreDisplayMode(void)
 }
 
 VA(0x0043725c, 0x2e)
-int SetPalette(void)
+i32 SetPalette(void)
 {
     if (giGraphicsType == WINGRAPH_GRAPHICS_WING)
         return 0;
@@ -914,7 +914,7 @@ void InitGraphics(void)
 }
 
 VA(0x004373a8, 0x46)
-int AppPaint(void *window, void *message)
+i32 AppPaint(void *window, void *message)
 {
     if (giGraphicsType == WINGRAPH_GRAPHICS_WING)
         return WGAppPaint(window, message);
@@ -932,7 +932,7 @@ void InitializePalette(void)
 }
 
 VA(0x0043741a, 0x38)
-void UpdatePalette(signed char *paletteData)
+void UpdatePalette(i8 *paletteData)
 {
     if (giGraphicsType == WINGRAPH_GRAPHICS_WING)
         WGUpdatePalette(paletteData);
@@ -951,7 +951,7 @@ void CleanUpWinGraphics(void)
 }
 
 VA(0x00437483, 0xe1)
-void SetFullScreenStatus(int fullScreen)
+void SetFullScreenStatus(i32 fullScreen)
 {
     if (gbInSmackMgr != 0)
         return;
@@ -974,7 +974,7 @@ void SetFullScreenStatus(int fullScreen)
 }
 
 VA(0x00437564, 0x31)
-int QueryNewPalette(void)
+i32 QueryNewPalette(void)
 {
     if (giGraphicsType == WINGRAPH_GRAPHICS_WING)
         return WGQueryNewPalette();
@@ -983,13 +983,13 @@ int QueryNewPalette(void)
 }
 
 VA(0x00437595, 0x286)
-int SetGraphicsType(int graphicsType)
+i32 SetGraphicsType(i32 graphicsType)
 {
-    int fullScreen;
-    int x;
-    int y;
-    int width;
-    int height7;
+    i32 fullScreen;
+    i32 x;
+    i32 y;
+    i32 width;
+    i32 height7;
     void *screenBuffer;
 
     if (0[&giGraphicsType] == graphicsType)
@@ -1014,13 +1014,13 @@ int SetGraphicsType(int graphicsType)
         giGraphicsType = WINGRAPH_GRAPHICS_WING;
         WGInitGraphics();
         gpWindowManager->m_screen->m_pixels =
-            static_cast<unsigned char *>(lpInitWin);
+            static_cast<u8 *>(lpInitWin);
     } else {
         WGCleanUpWinGraphics();
         giGraphicsType = WINGRAPH_GRAPHICS_DIRECT_DRAW;
         DDInitGraphics();
         gpWindowManager->m_screen->m_pixels =
-            static_cast<unsigned char *>(lpInitWin);
+            static_cast<u8 *>(lpInitWin);
     }
     memcpy(gpWindowManager->m_screen->m_pixels, screenBuffer,
         WINGRAPH_WIDTH * WINGRAPH_HEIGHT);
@@ -1064,30 +1064,30 @@ int SetGraphicsType(int graphicsType)
 // the aggregate retail hash differs only because of the proven owner order.
 // Do not add aliases, padding owners, or synthetic storage for these gaps.
 // ---- globals (definitions, RVA order) ----
-DATA(0x004f1288) int gbWinGAttached = 1;
-DATA(0x004f128c) int gbDDrawAttached = 0;
-DATA(0x004f1290) int giGraphicsType = 1;
-DATA(0x004f1294) long Orientation = 1;
+DATA(0x004f1288) i32 gbWinGAttached = 1;
+DATA(0x004f128c) i32 gbDDrawAttached = 0;
+DATA(0x004f1290) i32 giGraphicsType = 1;
+DATA(0x004f1294) i32l Orientation = 1;
 DATA(0x004f1298) struct _PALETTE LogicalPalette = {
     WINGRAPH_PALETTE_VERSION, WINGRAPH_PALETTE_SIZE
 };
 DATA(0x004f169c) void *lpInitWin = 0;
-DATA(0x004f16a0) int bPaletteInitialized = 0;
-DATA(0x004f16a4) int giTtlBlts = 0;
-DATA(0x004f16a8) int gbWinGraphBusy = 0;
+DATA(0x004f16a0) i32 bPaletteInitialized = 0;
+DATA(0x004f16a4) i32 giTtlBlts = 0;
+DATA(0x004f16a8) i32 gbWinGraphBusy = 0;
 DATA(0x004f16ac) DirectDrawCreateProc lpDirectDrawCreate = 0;
 DATA(0x004f16b0) struct IDirectDraw *lpDD = 0;
 DATA(0x004f16b4) struct IDirectDrawSurface *lpDDSPrimary = 0;
 DATA(0x004f16b8) struct IDirectDrawSurface *lpDDSOne = 0;
 DATA(0x004f16bc) struct IDirectDrawClipper *lpClipper = 0;
 DATA(0x004f16c0) struct IDirectDrawPalette *lpDDPal = 0;
-DATA(0x004f17b0) int iBusyRetry = 0;
-DATA(0x004f1a14) int bInDDSD = 0;
+DATA(0x004f17b0) i32 iBusyRetry = 0;
+DATA(0x004f1a14) i32 bInDDSD = 0;
 DATA(0x004f1e78) HDC hdcImage = 0;
 DATA(0x004f1e7c) HBITMAP gbmOldMonoBitmap = 0;
 DATA(0x004f1e80) HPALETTE hpalApp = 0;
 DATA(0x004f1f60) HINSTANCE hWinGLibrary = 0;
 DATA(0x004f1f64) HINSTANCE hDDrawLibrary = 0;
-DATA(0x004f2080) long lDelayRefresh = 0;
-DATA(0x00525168) long lPaintStart;
+DATA(0x004f2080) i32l lDelayRefresh = 0;
+DATA(0x00525168) i32l lPaintStart;
 DATA(0x00525180) struct _IMAGE screenImage;

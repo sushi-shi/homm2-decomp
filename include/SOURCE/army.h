@@ -17,62 +17,62 @@ public:
     char   m_animationState;  // +0x00
     char   m_animationCycle;  // +0x01
     char   m_pendingAnimationSequence;  // +0x02
-    signed char m_effectAnimationStart;  // +0x03
-    signed char m_effectAnimationEnd;  // +0x04
-    signed char m_effectAnimationLength;  // +0x05
-    int    m_drawState;  // +0x06
+    i8 m_effectAnimationStart;  // +0x03
+    i8 m_effectAnimationEnd;  // +0x04
+    i8 m_effectAnimationLength;  // +0x05
+    i32    m_drawState;  // +0x06
     struct SLimitData m_creatureLimits;  // +0x0a
     struct SLimitData m_quantityLimits;  // +0x1a
     struct SLimitData m_spriteLimits;  // +0x2a
     struct SLimitData m_spellLimits;  // +0x3a
-    int m_standingAnimation;  // +0x4a
-    int    m_showQuantity;  // +0x4e
-    int    m_targetSide;  // +0x52
-    int    m_targetIndex;  // +0x56
-    int    m_attackDirection;  // +0x5a
-    int    m_unknown5e;  // +0x5e (only observed initialization: 0)
-    int    m_moveTargetHex;  // +0x62
-    int    m_drawSpellEffect;  // +0x66
-    int    m_mirrorSourceIndex;  // +0x6a
-    int    m_mirrorImageIndex;  // +0x6e
-    int    m_roundCounter;  // +0x72
-    int    m_monsterType;  // +0x76
-    int    m_hex;  // +0x7a
-    int    m_animationSequence;  // +0x7e
-    int    m_animationFrame;  // +0x82
-    int    m_facing;  // +0x86
-    int    m_walkDirection;  // +0x8a
-    int    m_facingChanged;  // +0x8e
-    int    m_initialQuantity;  // +0x92
-    int    m_quantity;  // +0x96
-    int    m_lastTargetHex;  // +0x9a
-    int    m_temporaryResurrectionQuantity;  // +0x9e
-    int    m_hitPointsLost;  // +0xa2
-    int    m_armyGroupSlot;  // +0xa6
-    int    m_damagePenalty;  // +0xaa
-    int    m_speed;  // +0xae
-    int    m_walkDuration;  // +0xb2
-    int    m_luckOutcome;  // +0xb6
+    i32 m_standingAnimation;  // +0x4a
+    i32    m_showQuantity;  // +0x4e
+    i32    m_targetSide;  // +0x52
+    i32    m_targetIndex;  // +0x56
+    i32    m_attackDirection;  // +0x5a
+    i32    m_unknown5e;  // +0x5e (only observed initialization: 0)
+    i32    m_moveTargetHex;  // +0x62
+    i32    m_drawSpellEffect;  // +0x66
+    i32    m_mirrorSourceIndex;  // +0x6a
+    i32    m_mirrorImageIndex;  // +0x6e
+    i32    m_roundCounter;  // +0x72
+    i32    m_monsterType;  // +0x76
+    i32    m_hex;  // +0x7a
+    i32    m_animationSequence;  // +0x7e
+    i32    m_animationFrame;  // +0x82
+    i32    m_facing;  // +0x86
+    i32    m_walkDirection;  // +0x8a
+    i32    m_facingChanged;  // +0x8e
+    i32    m_initialQuantity;  // +0x92
+    i32    m_quantity;  // +0x96
+    i32    m_lastTargetHex;  // +0x9a
+    i32    m_temporaryResurrectionQuantity;  // +0x9e
+    i32    m_hitPointsLost;  // +0xa2
+    i32    m_armyGroupSlot;  // +0xa6
+    i32    m_damagePenalty;  // +0xaa
+    i32    m_speed;  // +0xae
+    i32    m_walkDuration;  // +0xb2
+    i32    m_luckOutcome;  // +0xb6
     struct tag_monsterInfo m_monster;  // +0xba
-    short  m_unknownD4;  // +0xd4 (only observed initialization: 6)
-    int    m_damagePending;  // +0xd6
-    int    m_killPending;  // +0xda
-    int    m_deathPending;  // +0xde
-    int    m_spellEffect;  // +0xe2
-    int    m_side;  // +0xe6
-    int    m_index;  // +0xea
-    int    m_lastAnimationTime;  // +0xee
-    int    m_morale;  // +0xf2
-    int    m_luck;  // +0xf6
-    int    m_spellEffectYOffset;  // +0xfa
-    int    m_yOffset;  // +0xfe
-    int    m_xOffset;  // +0x102
-    int    m_spellCount;  // +0x106
-    unsigned char m_spellInfluence[ARMY_SPELL_INFLUENCE_COUNT];  // +0x10a
-    int m_effectAnimationStarted;  // +0x119
-    int    m_drawEnabled;  // +0x11d
-    int    m_hitByCreature;  // +0x121
-    signed char *m_palette;  // +0x125
+    i16  m_unknownD4;  // +0xd4 (only observed initialization: 6)
+    i32    m_damagePending;  // +0xd6
+    i32    m_killPending;  // +0xda
+    i32    m_deathPending;  // +0xde
+    i32    m_spellEffect;  // +0xe2
+    i32    m_side;  // +0xe6
+    i32    m_index;  // +0xea
+    i32    m_lastAnimationTime;  // +0xee
+    i32    m_morale;  // +0xf2
+    i32    m_luck;  // +0xf6
+    i32    m_spellEffectYOffset;  // +0xfa
+    i32    m_yOffset;  // +0xfe
+    i32    m_xOffset;  // +0x102
+    i32    m_spellCount;  // +0x106
+    u8 m_spellInfluence[ARMY_SPELL_INFLUENCE_COUNT];  // +0x10a
+    i32 m_effectAnimationStarted;  // +0x119
+    i32    m_drawEnabled;  // +0x11d
+    i32    m_hitByCreature;  // +0x121
+    i8 *m_palette;  // +0x125
     struct SMonFrameInfo m_frameInfo;  // +0x129
     class icon *m_creatureIcon;  // +0x45e
     class icon *m_missileIcon;  // +0x462
@@ -80,68 +80,68 @@ public:
     // --- constructors ---
     army(void);
     // --- methods ---
-    void WaitSample(int);
+    void WaitSample(i32);
     void InitClean(void);
-    void Init(int, int, int, int, int, int);
+    void Init(i32, i32, i32, i32, i32, i32);
     void LoadResources(void);
     void FreeResources(void);
-    void DrawToBuffer(int, int, int);
+    void DrawToBuffer(i32, i32, i32);
     void Wince(void);
-    void Walk(int, int, int);
+    void Walk(i32, i32, i32);
     void SpecialAttack(void);
-    void DirDoAttack(int);
-    void DoHydraAttack(int);
-    void DoAttack(int);
+    void DirDoAttack(i32);
+    void DoHydraAttack(i32);
+    void DoAttack(i32);
     void ResetPath(void);
-    int WalkTo(void);
-    int WalkTo(int);
-    int AttackTo(void);
-    int AttackTo(int);
+    i32 WalkTo(void);
+    i32 WalkTo(i32);
+    i32 AttackTo(void);
+    i32 AttackTo(i32);
     void CheckLuck(void);
-    void DamageEnemy(class army *, int *, int *, int, int);
-    int Damage(long int, int);
-    void PowEffect(int, int, int, int);
-    unsigned long int Strength(void);
-    int LeaveNoBody(void);
-    void ProcessDeath(int);
-    void SpellEffect(int, int, int);
-    void CancelSpellType(int);
-    void CancelIndividualSpell(int);
-    int SetSpellInfluence(int, int);
+    void DamageEnemy(class army *, i32 *, i32 *, i32, i32);
+    i32 Damage(i32l, i32);
+    void PowEffect(i32, i32, i32, i32);
+    u32l Strength(void);
+    i32 LeaveNoBody(void);
+    void ProcessDeath(i32);
+    void SpellEffect(i32, i32, i32);
+    void CancelSpellType(i32);
+    void CancelIndividualSpell(i32);
+    i32 SetSpellInfluence(i32, i32);
     void DecrementSpellRounds(void);
     void GoBerserk(void);
-    void MoveAttack(int, int);
-    float SpellCastWorkChance(int);
-    int SpellCastWorks(int);
+    void MoveAttack(i32, i32);
+    float SpellCastWorkChance(i32);
+    i32 SpellCastWorks(i32);
     void DispelGood(void);
-    void Cure(int);
-    int MidX(void);
-    int MidY(void);
-    int TopY(void);
-    int RightX(void);
-    int LeftX(void);
-    int OtherArmyAdjacent(int, int);
-    int GetPowBaseY(void);
-    int CanFit(int, int, int *);
-    int ValidFlight(int, int);
-    int FlyTo(void);
-    int FlyTo(int);
-    int FindPath(int, int, int, int, int);
-    int ValidPath(int, int);
-    int GetMoveMask(int);
-    int GetAttackMask(int, int, int);
-    int ValidMove(int);
-    int ValidMove(int, int);
-    int ValidAttack(int, int, int, int, int *);
-    int GetAdjacentCellIndex(int, int);
-    int ValidRange(int);
-    int GetBestDirection(int, int, int);
-    int IsAlive(void) { return m_monsterType >= 0 && m_quantity > 0; }
+    void Cure(i32);
+    i32 MidX(void);
+    i32 MidY(void);
+    i32 TopY(void);
+    i32 RightX(void);
+    i32 LeftX(void);
+    i32 OtherArmyAdjacent(i32, i32);
+    i32 GetPowBaseY(void);
+    i32 CanFit(i32, i32, i32 *);
+    i32 ValidFlight(i32, i32);
+    i32 FlyTo(void);
+    i32 FlyTo(i32);
+    i32 FindPath(i32, i32, i32, i32, i32);
+    i32 ValidPath(i32, i32);
+    i32 GetMoveMask(i32);
+    i32 GetAttackMask(i32, i32, i32);
+    i32 ValidMove(i32);
+    i32 ValidMove(i32, i32);
+    i32 ValidAttack(i32, i32, i32, i32, i32 *);
+    i32 GetAdjacentCellIndex(i32, i32);
+    i32 ValidRange(i32);
+    i32 GetBestDirection(i32, i32, i32);
+    i32 IsAlive(void) { return m_monsterType >= 0 && m_quantity > 0; }
 };
 #pragma pack(pop)
 SIZE(army, 0x482);
 // ---- globals (declarations, RVA order) ----
-extern int bSecondAttack;
-extern int gbGenieHalf;
+extern i32 bSecondAttack;
+extern i32 gbGenieHalf;
 
 #endif // HOMM2_SOURCE_ARMY_H

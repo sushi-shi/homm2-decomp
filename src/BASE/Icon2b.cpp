@@ -12,22 +12,22 @@
 #include <SOURCE/dimPalette.h>
 #include <string.h>
 // Per-call decoder scratch — its own 0x534c20+ file-static block.
-DATA(0x00534c20) static unsigned char *gIcRow;
-DATA(0x00534c24) static int gIcPitch;
-DATA(0x00534c28) static unsigned char gIcColor;
-DATA(0x00534c2c) static unsigned char *gIcDimPal;
-DATA(0x00534c30) static unsigned int gIcRun;
-DATA(0x00534c34) static unsigned int gIcCnt;
-DATA(0x00534c38) static unsigned char *gIcSrc;
-DATA(0x00534c3c) static unsigned char *gIcDimDst;
-DATA(0x00534c40) static int gIcClipR;
-DATA(0x00534c44) static int gIcClipB;
-DATA(0x00534c48) static int gIcX0;
-DATA(0x00534c4c) static unsigned int gIcDimLen;
-DATA(0x00534c50) static int gIcY;
-DATA(0x00534c54) static int gIcX;
+DATA(0x00534c20) static u8 *gIcRow;
+DATA(0x00534c24) static i32 gIcPitch;
+DATA(0x00534c28) static u8 gIcColor;
+DATA(0x00534c2c) static u8 *gIcDimPal;
+DATA(0x00534c30) static u32 gIcRun;
+DATA(0x00534c34) static u32 gIcCnt;
+DATA(0x00534c38) static u8 *gIcSrc;
+DATA(0x00534c3c) static u8 *gIcDimDst;
+DATA(0x00534c40) static i32 gIcClipR;
+DATA(0x00534c44) static i32 gIcClipB;
+DATA(0x00534c48) static i32 gIcX0;
+DATA(0x00534c4c) static u32 gIcDimLen;
+DATA(0x00534c50) static i32 gIcY;
+DATA(0x00534c54) static i32 gIcX;
 DATA(0x00534c58) static IconEntry *gIcEntry;
-DATA(0x00534c5c) static unsigned int gIcCnt2;
+DATA(0x00534c5c) static u32 gIcCnt2;
 
 // @semantic
 // Macro-neutral structural checkpoint: complete no-frame CFG and correct relocation targets.
@@ -75,19 +75,19 @@ DATA(0x00534c5c) static unsigned int gIcCnt2;
 // the shared advance-and-read helper raises live matching to 75.60989% with 80/83 relocations; the
 // only occurrence deficits are gIcX0, gIcY, and gIcCnt2, with no excess cursor reference.
 VA(0x004d0570, 0x4ed)
-void IconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
-                  int clip, int clipX, int clipY, int clipW, int clipH, int color)
+void IconToBitmap(class icon *srcIcon, class bitmap *dest, i32 x, i32 y, i32 frame,
+                  i32 clip, i32 clipX, i32 clipY, i32 clipW, i32 clipH, i32 color)
 {
-    unsigned char *data = reinterpret_cast<unsigned char *>(srcIcon->m_data);
-    int entryOffset = frame * sizeof(IconEntry);
-    int entryX = reinterpret_cast<IconEntry *>(data + entryOffset)->x;
-    int srcOffset = reinterpret_cast<IconEntry *>(data + entryOffset)->srcOffset;
+    u8 *data = reinterpret_cast<u8 *>(srcIcon->m_data);
+    i32 entryOffset = frame * sizeof(IconEntry);
+    i32 entryX = reinterpret_cast<IconEntry *>(data + entryOffset)->x;
+    i32 srcOffset = reinterpret_cast<IconEntry *>(data + entryOffset)->srcOffset;
     IconEntry *entry = reinterpret_cast<IconEntry *>(data + entryOffset);
-    unsigned char *cursor = data + srcOffset;
+    u8 *cursor = data + srcOffset;
     gIcEntry = entry;
     gIcSrc = cursor;
-    int X = entryX + x;
-    int Y = entry->y + y;
+    i32 X = entryX + x;
+    i32 Y = entry->y + y;
     gIcX0 = X;
     gIcPitch = dest->m_width;
     gIcY = Y;
@@ -101,11 +101,11 @@ void IconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int fra
             clip = 0;
         }
     }
-    unsigned char *row = dest->m_pixels + gIcPitch * gIcY;
-    int cmd;
+    u8 *row = dest->m_pixels + gIcPitch * gIcY;
+    i32 cmd;
     for (;;) {
         cmd = ReadIconRleByte(gIcSrc);
-        if (static_cast<signed char>(cmd) < 0) {
+        if (static_cast<i8>(cmd) < 0) {
             // ---- negative command ----
             if ((cmd & ICON_RLE_COMMAND_SOLID_FLAG) == 0) {
                 // skip run / end-of-sprite
@@ -119,8 +119,8 @@ void IconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int fra
             }
             // 0xc0 - 0xff
             gIcRun = cmd;
-            unsigned int count = cmd & ICON_RLE_COMMAND_RUN_MASK;
-            int flags;
+            u32 count = cmd & ICON_RLE_COMMAND_RUN_MASK;
+            i32 flags;
             if (count != 0) {
                 // 0xc1 - 0xff : solid colour run
                 if (cmd == ICON_RLE_LONG_SOLID_COMMAND) {
@@ -140,7 +140,7 @@ void IconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int fra
                 gIcRun = flags;
                 if (flags & ICON_RLE_DIM_RECOLOR_FLAG) {
                     gIcCnt2 = count;
-                    gIcColor = static_cast<unsigned char>(color);
+                    gIcColor = static_cast<u8>(color);
                     goto do_fill;
                 }
             }
@@ -149,7 +149,7 @@ void IconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int fra
             if (clip == 0) {
                 memset(row + X, gIcColor, count);
             } else {
-                int right;
+                i32 right;
                 if (clipY <= gIcY && gIcClipB >= gIcY &&
                     (right = X + count, clipX < right) && gIcClipR >= X) {
                     if (clipX <= X) {
@@ -158,7 +158,7 @@ void IconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int fra
                         else
                             memset(row + X, gIcColor, (gIcClipR - X) + 1);
                     } else {
-                        unsigned int cn = clipW;
+                        u32 cn = clipW;
                         if (right <= gIcClipR)
                             cn = (count - clipX) + X;
                         memset(row + clipX, gIcColor, cn);
@@ -172,18 +172,18 @@ void IconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int fra
             gIcCnt2 = count;
             gIcRun = flags;
             if (flags & ICON_RLE_DIM_APPLY_FLAG) {
-                unsigned int lvl =
+                u32 lvl =
                     (flags & ICON_RLE_DIM_LEVEL_MASK) * ICON_RLE_DIM_PALETTE_LEVEL_STRIDE;
-                unsigned char *palette = &uDimPal[0][0][0] + lvl;
+                u8 *palette = &uDimPal[0][0][0] + lvl;
                 if (clip == 0) {
-                    unsigned char *dp = row + X;
+                    u8 *dp = row + X;
                     gIcDimPal = palette;
                     gIcDimDst = dp;
                     gIcCnt = 0;
-                    if (static_cast<int>(count) > 0) {
+                    if (static_cast<i32>(count) > 0) {
                         gIcCnt = count;
                         do {
-                            int px = *dp++;
+                            i32 px = *dp++;
                             gIcDimDst = dp;
                             count--;
                             gIcDimPal = palette;
@@ -193,11 +193,11 @@ void IconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int fra
                 } else {
                     gIcCnt2 = count;
                     gIcDimPal = palette;
-                    int right;
+                    i32 right;
                     if (clipY <= gIcY && gIcClipB >= gIcY &&
                         (right = X + count, clipX < right) && gIcClipR >= X) {
-                        unsigned int cn;
-                        unsigned char *dst;
+                        u32 cn;
+                        u8 *dst;
                         if (clipX <= X) {
                             cn = count;
                             if (gIcClipR < right)
@@ -215,10 +215,10 @@ void IconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int fra
                         gIcDimDst = dst;
                         gIcDimPal = palette;
                         gIcCnt = 0;
-                        if (static_cast<int>(cn) > 0) {
+                        if (static_cast<i32>(cn) > 0) {
                             gIcCnt = cn;
                             do {
-                                int px = *dst++;
+                                i32 px = *dst++;
                                 gIcDimDst = dst;
                                 cn--;
                                 gIcDimPal = palette;
@@ -235,10 +235,10 @@ void IconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int fra
         gIcX = X;
         gIcRun = cmd;
         if (cmd != 0) {
-            int right;
-            unsigned int copyCount;
-            unsigned char *copyDst;
-            unsigned char *copySrc;
+            i32 right;
+            u32 copyCount;
+            u8 *copyDst;
+            u8 *copySrc;
             do {
                 if (clip == 0) {
                     copyCount = cmd;

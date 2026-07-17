@@ -7,12 +7,12 @@
 struct SamplePlaybackData {
     struct _SAMPLE *activeSample;
     char *data;
-    int size;
-    int channelType;
-    int sampleRate;
-    int format;
-    int volume;
-    int loopCount;
+    i32 size;
+    i32 channelType;
+    i32 sampleRate;
+    i32 format;
+    i32 volume;
+    i32 loopCount;
 };
 #pragma pack(pop)
 SIZE(SamplePlaybackData, 0x20);

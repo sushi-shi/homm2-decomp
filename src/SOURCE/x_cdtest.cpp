@@ -32,7 +32,7 @@ DATA(0x004f5188) struct sCDTest_Track_Data cdTestTrackData[43] = {
 DATA(0x004f52e0) static HREDBOOK cdTestRedbook = 0;
 
 VA(0x00449f80, 0x3b)
-int CDTest_Init(void)
+i32 CDTest_Init(void)
 {
     cdTestRedbook = AIL_redbook_open(0);
     if (cdTestRedbook != 0)
@@ -50,15 +50,15 @@ void CDTest_Cleanup(void)
 }
 
 VA(0x00449fee, 0x26)
-int CDTest_VerifyCDQuick(void)
+i32 CDTest_VerifyCDQuick(void)
 {
     return CDTest_VerifyTrack(Random(1, 43));
 }
 
 VA(0x0044a014, 0x4d)
-int CDTest_VerifyCDThorough(void)
+i32 CDTest_VerifyCDThorough(void)
 {
-    for (int i = 1; i <= 43; ++i) {
+    for (i32 i = 1; i <= 43; ++i) {
         if (!CDTest_VerifyTrack(i))
             return 0;
     }
@@ -66,10 +66,10 @@ int CDTest_VerifyCDThorough(void)
 }
 
 VA(0x0044a061, 0x8f)
-int CDTest_VerifyTrack(int track)
+i32 CDTest_VerifyTrack(i32 track)
 {
-    unsigned long first;
-    unsigned long end;
+    U32 first;
+    U32 end;
 
     if (cdTestRedbook == 0)
         return 0;
@@ -83,14 +83,14 @@ int CDTest_VerifyTrack(int track)
 }
 
 VA(0x0044a0f0, 0x2ce)
-int CDTest_GenerateTable(char *file)
+i32 CDTest_GenerateTable(char *file)
 {
     char line[100];
-    unsigned long first;
-    int fileHandle;
-    int count;
-    int trackNumber;
-    unsigned long finish;
+    U32 first;
+    i32 fileHandle;
+    i32 count;
+    i32 trackNumber;
+    U32 finish;
 
     if (cdTestRedbook == 0)
         return 0;

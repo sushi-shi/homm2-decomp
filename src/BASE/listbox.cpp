@@ -68,7 +68,7 @@ listBoxWidget::listBoxWidget(void) : widget(0, 0, 0, 0, 0, 0)
 VA(0x004db0d0, 0x86)
 listBoxWidget::~listBoxWidget()
 {
-    int i;
+    i32 i;
     gpResourceManager->Dispose(m_font);
     gpResourceManager->Dispose(m_icon);
     if (m_scrollbar != 0)
@@ -86,17 +86,17 @@ listBoxWidget::~listBoxWidget()
 VA(0x004db160, 0x26e)
 void listBoxWidget::Read(void)
 {
-    short frameHeight[2];
-    signed char iconName[16];
+    i16 frameHeight[2];
+    i8 iconName[16];
     IconEntry *iconEntry;
-    short bottomY;
-    short topY;
-    short rightX;
-    short firstRowHeight;
-    short listX;
-    short rowHeight;
-    short listY;
-    short lastRowHeight;
+    i16 bottomY;
+    i16 topY;
+    i16 rightX;
+    i16 firstRowHeight;
+    i16 listX;
+    i16 rowHeight;
+    i16 listY;
+    i16 lastRowHeight;
     m_x = gpResourceManager->ReadWord();
     m_y = gpResourceManager->ReadWord();
     m_width = gpResourceManager->ReadWord();
@@ -170,7 +170,7 @@ void listBoxWidget::Read(void)
 }
 
 VA(0x004db3d0, 0x142)
-void listBoxWidget::DeleteItem(int index)
+void listBoxWidget::DeleteItem(i32 index)
 {
     if (index >= m_itemCount)
         return;
@@ -225,7 +225,7 @@ void listBoxWidget::DeleteItem(int index)
 // dispatch, ID gates, set/get/replace/append/delete/clear behavior, and fallback Main call agree.
 // A bounded 512-trial exact-only TU-state diagnostic found no closure; no probe was retained.
 VA(0x004db520, 0x368)
-int listBoxWidget::Main(tag_message &message)
+i32 listBoxWidget::Main(tag_message &message)
 {
     if (!(m_flags & 2)) {
         if (message.type == 0x200)
@@ -242,9 +242,9 @@ int listBoxWidget::Main(tag_message &message)
     case 0x20: {
         if (!(m_flags & 4))
             break;
-        short mx = message.payload.mouse.x - m_owner->m_posX;
-        short my = message.payload.mouse.y - m_owner->m_posY;
-        short left = m_x;
+        i16 mx = message.payload.mouse.x - m_owner->m_posX;
+        i16 my = message.payload.mouse.y - m_owner->m_posY;
+        i16 left = m_x;
         if (left > mx || m_y > my || left + m_width <= mx || m_y + m_height <= my)
             return 0;
         if (message.type == 0x20) {
@@ -260,13 +260,13 @@ int listBoxWidget::Main(tag_message &message)
         switch (message.payload.widget.command) {
         case 0x36:
             if (m_id == message.payload.widget.id) {
-                m_selectedIndex = reinterpret_cast<int>(message.payload.widget.data.text);
+                m_selectedIndex = reinterpret_cast<i32>(message.payload.widget.data.text);
                 return 1;
             }
             break;
         case 0x37:
             if (m_id == message.payload.widget.id) {
-                message.payload.widget.data.text = reinterpret_cast<char *>(static_cast<int>(m_selectedIndex));
+                message.payload.widget.data.text = reinterpret_cast<char *>(static_cast<i32>(m_selectedIndex));
                 return 1;
             }
             break;
@@ -324,7 +324,7 @@ int listBoxWidget::Main(tag_message &message)
             break;
         case 0x3a:
             if (m_id == message.payload.widget.id)
-                DeleteItem(reinterpret_cast<int>(message.payload.widget.data.text));
+                DeleteItem(reinterpret_cast<i32>(message.payload.widget.data.text));
             break;
         case 0x3b:
             if (m_id == message.payload.widget.id)
@@ -344,17 +344,17 @@ void listBoxWidget::Draw(void)
 }
 
 VA(0x004db8a0, 0x334)
-void listBoxWidget::DrawLBStuff(int doUpdate)
+void listBoxWidget::DrawLBStuff(i32 doUpdate)
 {
-    int y;
-    int x;
+    i32 y;
+    i32 x;
     x = m_listX + m_owner->m_posX;
     y = m_listY + m_owner->m_posY;
-    for (int i = 0; i < m_maxVisibleItems; i++) {
+    for (i32 i = 0; i < m_maxVisibleItems; i++) {
         if (i == 0) {
             m_icon->DrawToBuffer(x, y, m_firstRowFrame, 0);
             if (i < m_visibleItemCount) {
-                int color = m_selectedIndex == m_topIndex ? m_selectedColor : m_normalColor;
+                i32 color = m_selectedIndex == m_topIndex ? m_selectedColor : m_normalColor;
                 m_font->DrawBoundedString(m_items[m_topIndex], x + 5,
                                           y + 4, m_listWidth - 10, m_font->m_height + 1, color,
                                           m_textMode);
@@ -363,8 +363,8 @@ void listBoxWidget::DrawLBStuff(int doUpdate)
         } else if (1 == m_maxVisibleItems - i) {
             m_icon->DrawToBuffer(x, y, m_lastRowFrame, 0);
             if (m_visibleItemCount > i) {
-                int itemIndex = m_topIndex + i;
-                int color = m_selectedIndex == itemIndex ? m_selectedColor : m_normalColor;
+                i32 itemIndex = m_topIndex + i;
+                i32 color = m_selectedIndex == itemIndex ? m_selectedColor : m_normalColor;
                 m_font->DrawBoundedString(m_items[itemIndex], x + 5,
                                           y + 2, m_listWidth - 10, m_font->m_height + 1, color,
                                           m_textMode);
@@ -372,8 +372,8 @@ void listBoxWidget::DrawLBStuff(int doUpdate)
         } else {
             m_icon->DrawToBuffer(x, y, m_middleRowFrame, 0);
             if (i < m_visibleItemCount) {
-                int itemIndex = m_topIndex + i;
-                int color = m_selectedIndex == itemIndex ? m_selectedColor : m_normalColor;
+                i32 itemIndex = m_topIndex + i;
+                i32 color = m_selectedIndex == itemIndex ? m_selectedColor : m_normalColor;
                 m_font->DrawBoundedString(m_items[itemIndex], x + 5,
                                           y + 2, m_listWidth - 10, m_font->m_height + 1, color,
                                           m_textMode);
@@ -381,25 +381,25 @@ void listBoxWidget::DrawLBStuff(int doUpdate)
             y += m_rowHeight;
         }
     }
-    int upFrame = m_scrollUpPressed ? m_scrollUpPressedFrame : m_scrollUpFrame;
+    i32 upFrame = m_scrollUpPressed ? m_scrollUpPressedFrame : m_scrollUpFrame;
     m_icon->DrawToBuffer(m_scrollUpX + m_owner->m_posX, m_scrollUpY + m_owner->m_posY, upFrame, 0);
     m_icon->DrawToBuffer(m_scrollTrackX + m_owner->m_posX, m_scrollTrackY + m_owner->m_posY, m_scrollTrackFirstFrame, 0);
-    int j;
+    i32 j;
     for (j = 2; j < m_maxVisibleItems - 2; j++)
         m_icon->DrawToBuffer(m_scrollTrackX + m_owner->m_posX,
                              (j - 1) * m_rowHeight + m_scrollTrackY + m_owner->m_posY, m_scrollTrackMiddleFrame, 0);
     m_icon->DrawToBuffer(m_scrollTrackX + m_owner->m_posX,
                          (j - 1) * m_rowHeight + m_scrollTrackY + m_owner->m_posY, m_scrollTrackLastFrame, 0);
-    int downFrame = m_scrollDownPressed ? m_scrollDownPressedFrame : m_scrollDownFrame;
+    i32 downFrame = m_scrollDownPressed ? m_scrollDownPressedFrame : m_scrollDownFrame;
     m_icon->DrawToBuffer(m_scrollDownX + m_owner->m_posX, m_scrollDownY + m_owner->m_posY, downFrame, 0);
-    short thumbX = m_owner->m_posX + m_scrollTrackX + 5;
+    i16 thumbX = m_owner->m_posX + m_scrollTrackX + 5;
     m_scrollThumbX = thumbX;
-    int offset;
+    i32 offset;
     if (m_scrollRange > 0)
         offset = m_topIndex * m_scrollThumbTravel / m_scrollRange;
     else
         offset = m_scrollThumbTravel / 2;
-    short thumbY = offset + m_owner->m_posY + m_scrollTrackY + 3;
+    i16 thumbY = offset + m_owner->m_posY + m_scrollTrackY + 3;
     m_scrollThumbY = thumbY;
     m_icon->DrawToBuffer(thumbX, thumbY, m_scrollThumbFrame, 0);
     if (doUpdate)
@@ -408,16 +408,16 @@ void listBoxWidget::DrawLBStuff(int doUpdate)
 }
 
 VA(0x004dbbe0, 0x312)
-int listBoxWidget::ProcessMouseMessage(tag_message &message)
+i32 listBoxWidget::ProcessMouseMessage(tag_message &message)
 {
-    int mouseX = message.payload.mouse.screenX - m_owner->m_posX;
-    int mouseY = message.payload.mouse.screenY - m_owner->m_posY;
-    int adjY = mouseY - m_listY;
+    i32 mouseX = message.payload.mouse.screenX - m_owner->m_posX;
+    i32 mouseY = message.payload.mouse.screenY - m_owner->m_posY;
+    i32 adjY = mouseY - m_listY;
     switch (message.type) {
     case 4:
         if (m_itemSelectionTracking) {
-            int row;
-            short firstRowHeight = m_firstRowHeight;
+            i32 row;
+            i16 firstRowHeight = m_firstRowHeight;
             if (adjY > firstRowHeight)
                 row = (adjY - firstRowHeight) / m_rowHeight + 1;
             else
@@ -430,7 +430,7 @@ int listBoxWidget::ProcessMouseMessage(tag_message &message)
                 goto done;
             m_selectedIndex = row + m_topIndex;
         } else if (m_scrollThumbDragging) {
-            int newTop = (mouseY - m_scrollThumbHeight / 2 - m_scrollTrackY - 4) * (m_scrollRange + 1) / m_scrollThumbTravel;
+            i32 newTop = (mouseY - m_scrollThumbHeight / 2 - m_scrollTrackY - 4) * (m_scrollRange + 1) / m_scrollThumbTravel;
             if (newTop < 0)
                 newTop = 0;
             if (newTop > m_scrollRange)
@@ -447,7 +447,7 @@ int listBoxWidget::ProcessMouseMessage(tag_message &message)
             goto done;
         if (m_listX <= mouseX && m_listY <= mouseY && mouseX < m_listX + m_listWidth
             && mouseY < m_listY + m_listHeight) {
-            int clickedIndex;
+            i32 clickedIndex;
             if (adjY > m_firstRowHeight)
                 clickedIndex = m_topIndex + (adjY - m_firstRowHeight) / m_rowHeight + 1;
             else
@@ -492,12 +492,12 @@ int listBoxWidget::ProcessMouseMessage(tag_message &message)
             message.payload.widget.command = 0xc;
             message.type = 0x200;
             message.payload.widget.id = m_id;
-            int selectedIndex = m_selectedIndex;
+            i32 selectedIndex = m_selectedIndex;
             message.payload.widget.parameter = 1;
             message.payload.widget.data.text = reinterpret_cast<char *>(selectedIndex);
             if (m_lastSelectedIndex == m_selectedIndex) {
-                int lastTick = m_lastClickTime;
-                int currentTick = KBTickCount();
+                i32 lastTick = m_lastClickTime;
+                i32 currentTick = KBTickCount();
                 if (lastTick + 0x190 > currentTick)
                     message.payload.widget.parameter = 2;
             }

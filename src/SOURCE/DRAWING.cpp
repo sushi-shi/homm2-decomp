@@ -35,7 +35,7 @@ void combatManager::NoShowCombatLog(char *message)
 }
 
 VA(0x00402951, 0xda)
-void combatManager::ClearCombatMessages(int force)
+void combatManager::ClearCombatMessages(i32 force)
 {
     m_combatMessagePending = 0;
     if (strlen(m_currentCombatMessage) <= 1 && strlen(m_previousCombatMessage) <= 1)
@@ -67,14 +67,14 @@ void combatManager::CheckUpdateCombatMessages(void)
 // shared-branch form regressed to 95.872246%. Revisit only after relevant
 // DRAWING source, TU/header, or comparison-state changes.
 VA(0x00402a88, 0x3f8)
-void combatManager::CombatMessage(char *message, int updateScreen, int retainPrevious,
-                                  int clear)
+void combatManager::CombatMessage(char *message, i32 updateScreen, i32 retainPrevious,
+                                  i32 clear)
 {
     char *newlinePtr;
     char wrappedMessage[COMBAT_MESSAGE_WRAP_BUFFER_SIZE];
     tag_message windowMessage;
-    int savedLimitToExtent;
-    int savedComputeExtent;
+    i32 savedLimitToExtent;
+    i32 savedComputeExtent;
 
     if (gbNoShowCombat != 0) {
         if (retainPrevious != 0)
@@ -164,12 +164,12 @@ void combatManager::CombatMessage(char *message, int updateScreen, int retainPre
 // compile identically. This body was raw-byte exact before the corrected monster
 // flag view changed TU-cumulative state; do not restore that invalid alias.
 VA(0x00402e80, 0x3fe)
-void combatManager::CombatMessage(int messageType)
+void combatManager::CombatMessage(i32 messageType)
 {
     army *currentArmyPtr;
     army *targetArmy;
-    int actingMonsterType;
-    int targetMonsterType;
+    i32 actingMonsterType;
+    i32 targetMonsterType;
 
     if (m_combatWindowOpen == 0)
         return;
@@ -208,7 +208,7 @@ void combatManager::CombatMessage(int messageType)
         case COMBAT_MESSAGE_COMMAND_SHOOT:
             sprintf(gText, cCombatMessage[COMBAT_MESSAGE_TEXT_SHOOT],
                     gArmyNames[targetMonsterType],
-                    static_cast<int>(currentArmyPtr->m_monster.shots));
+                    static_cast<i32>(currentArmyPtr->m_monster.shots));
             break;
         case COMBAT_MESSAGE_COMMAND_OPTIONS:
             if (m_heroes[m_currentSide] != 0 && m_heroes[m_currentSide]->m_isCaptain != 0)
@@ -244,8 +244,8 @@ void combatManager::CombatMessage(int messageType)
 VA(0x0040327e, 0x126)
 void combatManager::ResetLimitCreature(void)
 {
-    int side;
-    int armySlotIndex;
+    i32 side;
+    i32 armySlotIndex;
 
     for (side = 0; side < COMBAT_SIDE_COUNT_DRAWING; side++) {
         for (armySlotIndex = 0; armySlotIndex < COMBAT_ARMY_SLOT_COUNT_DRAWING;
@@ -283,10 +283,10 @@ void combatManager::UpdateCombatArea(void)
 VA(0x0040340e, 0x213)
 void combatManager::SetupGridForArmy(army *armyPtr)
 {
-    int attackMask;
-    int savedTargetSide;
-    int targetIndexSave;
-    int hexIndex;
+    i32 attackMask;
+    i32 savedTargetSide;
+    i32 targetIndexSave;
+    i32 hexIndex;
 
     if (gbNoShowCombat != 0)
         return;
@@ -327,17 +327,17 @@ void combatManager::SetupGridForArmy(army *armyPtr)
 // +0x17d/+0x18c and +0x242/+0x251 bytes reverse m_gridState and
 // m_previousGridState loads; qualifying the current-state lvalues was neutral.
 VA(0x00403621, 0x5fb)
-int combatManager::UpdateGrid(int resetGridDisplay, int rebuildGrid)
+i32 combatManager::UpdateGrid(i32 resetGridDisplay, i32 rebuildGrid)
 {
-    int retval;
-    int minX;
-    int minY;
-    int maxX;
-    int maxY;
-    int cellIndex;
-    int gridChanged;
-    int drawShading;
-    int hadOldShade;
+    i32 retval;
+    i32 minX;
+    i32 minY;
+    i32 maxX;
+    i32 maxY;
+    i32 cellIndex;
+    i32 gridChanged;
+    i32 drawShading;
+    i32 hadOldShade;
 
     if (gbNoShowCombat != 0)
         return 0;
@@ -460,8 +460,8 @@ VA(0x00403c1c, 0x364)
 void combatManager::DrawBackground(void)
 {
     icon *backgroundIcon;
-    int unusedBackgroundHeight;
-    int unusedBackgroundSide;
+    i32 unusedBackgroundHeight;
+    i32 unusedBackgroundSide;
 
     if (gbNoShowCombat != 0)
         return;
@@ -525,15 +525,15 @@ void combatManager::DrawBackground(void)
 }
 
 VA(0x00403f80, 0x64c)
-void combatManager::UpdateMouseGrid(int hexIndex, int forceUpdate)
+void combatManager::UpdateMouseGrid(i32 hexIndex, i32 forceUpdate)
 {
-    int oldLimit;
-    int copyHeight;
-    int maxXSave;
-    int oldMinX;
-    int oldMaxYBackup;
-    int savedComputeExtents;
-    int savedExtentMinY;
+    i32 oldLimit;
+    i32 copyHeight;
+    i32 maxXSave;
+    i32 oldMinX;
+    i32 oldMaxYBackup;
+    i32 savedComputeExtents;
+    i32 savedExtentMinY;
 
     if (m_nonVisualCombat != 0)
         return;
@@ -648,25 +648,25 @@ void combatManager::UpdateMouseGrid(int hexIndex, int forceUpdate)
 // fields and jump-table locals resolve to the same retail addresses. Revisit only
 // after relevant DRAWING source, TU/header, or comparison-state changes.
 VA(0x004045cc, 0x173f)
-void combatManager::DrawFrame(int updateScreen, int computeExtent, int redrawExtent,
-                              int extentOnly, int delay, int drawBackground,
-                              int waitForTimer)
+void combatManager::DrawFrame(i32 updateScreen, i32 computeExtent, i32 redrawExtent,
+                              i32 extentOnly, i32 delay, i32 drawBackground,
+                              i32 waitForTimer)
 {
-    int column1;
-    int unusedDrawState11;
-    int unusedDrawState05;
-    int side5;
-    int row;
-    int unusedDrawState213;
-    int unusedDrawState3;
-    int armyIndex2;
-    int unusedDrawState4;
-    int extentChanged1;
-    int firstColumn;
-    int skipSpecialOccupants6;
-    int columnStep3;
-    int endColumn;
-    int gridWasShowing1;
+    i32 column1;
+    i32 unusedDrawState11;
+    i32 unusedDrawState05;
+    i32 side5;
+    i32 row;
+    i32 unusedDrawState213;
+    i32 unusedDrawState3;
+    i32 armyIndex2;
+    i32 unusedDrawState4;
+    i32 extentChanged1;
+    i32 firstColumn;
+    i32 skipSpecialOccupants6;
+    i32 columnStep3;
+    i32 endColumn;
+    i32 gridWasShowing1;
 
     if (m_nonVisualCombat != 0)
         return;
@@ -872,7 +872,7 @@ void combatManager::DrawFrame(int updateScreen, int computeExtent, int redrawExt
 
             for (column1 = firstColumn; endColumn != column1;
                  column1 += columnStep3) {
-                unsigned short wallCoordinates1[6][8] = {
+                u16 wallCoordinates1[6][8] = {
                     { 443, 153, 399, 237, 399, 321, 443, 405 },
                     { 443, 153, 399, 237, 399, 321, 443, 405 },
                     { 443, 153, 399, 237, 399, 321, 443, 405 },
@@ -880,11 +880,11 @@ void combatManager::DrawFrame(int updateScreen, int computeExtent, int redrawExt
                     { 443, 153, 399, 237, 399, 321, 443, 405 },
                     { 443, 153, 399, 237, 399, 321, 443, 405 }
                 };
-                unsigned char wallFrameOffsets1[7] = { 0, 4, 8, 23, 27, 35, 31 };
-                int wallX7;
-                int wallFrame1;
-                int wallY;
-                int hexIndex6;
+                u8 wallFrameOffsets1[7] = { 0, 4, 8, 23, 27, 35, 31 };
+                i32 wallX7;
+                i32 wallFrame1;
+                i32 wallY;
+                i32 hexIndex6;
 
                 if (m_inCastleCombat != 0 && side5 == 0) {
                     hexIndex6 = row * COMBAT_GRID_ROW_LENGTH + column1;
@@ -1002,8 +1002,8 @@ checkWalkingTo:
                     goto drawMoat;
                 goto endRow;
             } else {
-                int drawbridgeY;
-                int drawbridgeBottom;
+                i32 drawbridgeY;
+                i32 drawbridgeBottom;
 
                 drawbridgeY = m_hexCells[giWalkingFrom].m_y - 9 + giWalkingYMod;
                 drawbridgeBottom =
@@ -1046,7 +1046,7 @@ endRow:
         gbComputeExtent = 0;
         if (waitForTimer != 0)
             DelayTil(glTimers);
-        glTimers[0] = static_cast<int>(
+        glTimers[0] = static_cast<i32>(
             KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * delay);
         gbFullCombatScreenDrawn = 0;
         if (updateScreen == 1) {
@@ -1062,7 +1062,7 @@ endRow:
         if (waitForTimer != 0)
             DelayTil(glTimers);
         gbFullCombatScreenDrawn = 1;
-        glTimers[0] = static_cast<int>(
+        glTimers[0] = static_cast<i32>(
             KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * delay);
         UpdateCombatArea();
     }
@@ -1081,16 +1081,16 @@ finish:
 // commuted `>`, negated `>=`, explicit-break, and slot-neutral index/count names
 // were tried. Five earlier residual rows are compiler-local string identities.
 VA(0x00405d0b, 0xb99)
-void combatManager::DrawSmallView(int viewIndex, int updateScreen)
+void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen)
 {
-    int iconX;
-    int iconY2;
-    int savedLimitToExtent9;
+    i32 iconX;
+    i32 iconY2;
+    i32 savedLimitToExtent9;
     army *viewArmy1;
-    int viewX;
-    int spellSlot;
-    int drawn6;
-    unsigned char spellPositions[6][6][2] = {
+    i32 viewX;
+    i32 spellSlot;
+    i32 drawn6;
+    u8 spellPositions[6][6][2] = {
         {{COMBAT_SMALL_VIEW_SPELL_X_THIRD, COMBAT_SMALL_VIEW_SPELL_Y_SECOND},
          {COMBAT_SMALL_VIEW_UNUSED_POSITION, COMBAT_SMALL_VIEW_UNUSED_POSITION},
          {COMBAT_SMALL_VIEW_UNUSED_POSITION, COMBAT_SMALL_VIEW_UNUSED_POSITION},
@@ -1128,11 +1128,11 @@ void combatManager::DrawSmallView(int viewIndex, int updateScreen)
          {COMBAT_SMALL_VIEW_SPELL_X_THIRD, COMBAT_SMALL_VIEW_SPELL_Y_THIRD},
          {COMBAT_SMALL_VIEW_SPELL_X_FIFTH, COMBAT_SMALL_VIEW_SPELL_Y_THIRD}}
     };
-    int viewY2;
-    int visibleSpellCount5;
-    int unusedSpellSlot15;
-    int spellFrame1;
-    int unusedSpellSlot2;
+    i32 viewY2;
+    i32 visibleSpellCount5;
+    i32 unusedSpellSlot15;
+    i32 spellFrame1;
+    i32 unusedSpellSlot2;
 
     if (gbNoShowCombat != 0)
         return;
@@ -1264,26 +1264,26 @@ void combatManager::DrawSmallView(int viewIndex, int updateScreen)
                                              COMBAT_SMALL_VIEW_TEXT_WIDTH,
                                              COMBAT_SMALL_VIEW_TEXT_HEIGHT, 1, 0);
 
-            sprintf(gText, "%d", static_cast<int>(viewArmy1->m_monster.attack));
+            sprintf(gText, "%d", static_cast<i32>(viewArmy1->m_monster.attack));
             smallFont->DrawBoundedString(gText, viewX + COMBAT_SMALL_VIEW_TEXT_X,
                                          viewY2 + COMBAT_SMALL_VIEW_FIRST_STAT_Y,
                                          COMBAT_SMALL_VIEW_TEXT_WIDTH,
                                          COMBAT_SMALL_VIEW_TEXT_HEIGHT, 1, 2);
-            sprintf(gText, "%d", static_cast<int>(viewArmy1->m_monster.defense));
+            sprintf(gText, "%d", static_cast<i32>(viewArmy1->m_monster.defense));
             smallFont->DrawBoundedString(gText, viewX + COMBAT_SMALL_VIEW_TEXT_X,
                                          viewY2 + COMBAT_SMALL_VIEW_FIRST_STAT_Y +
                                              COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT,
                                          COMBAT_SMALL_VIEW_TEXT_WIDTH,
                                          COMBAT_SMALL_VIEW_TEXT_HEIGHT, 1, 2);
             sprintf(gText, "%d",
-                    static_cast<unsigned int>(viewArmy1->m_monster.hitPoints));
+                    static_cast<u32>(viewArmy1->m_monster.hitPoints));
             smallFont->DrawBoundedString(gText, viewX + COMBAT_SMALL_VIEW_TEXT_X,
                                          viewY2 + COMBAT_SMALL_VIEW_FIRST_STAT_Y +
                                              COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * 2,
                                          COMBAT_SMALL_VIEW_TEXT_WIDTH,
                                          COMBAT_SMALL_VIEW_TEXT_HEIGHT, 1, 2);
-            sprintf(gText, "%d-%d", static_cast<int>(viewArmy1->m_monster.damageMin),
-                    static_cast<int>(viewArmy1->m_monster.damageMax));
+            sprintf(gText, "%d-%d", static_cast<i32>(viewArmy1->m_monster.damageMin),
+                    static_cast<i32>(viewArmy1->m_monster.damageMax));
             smallFont->DrawBoundedString(gText, viewX + COMBAT_SMALL_VIEW_TEXT_X,
                                          viewY2 + COMBAT_SMALL_VIEW_FIRST_STAT_Y +
                                              COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * 3,
@@ -1341,7 +1341,7 @@ void combatManager::DrawSmallView(int viewIndex, int updateScreen)
             }
 
             if (viewArmy1->m_monster.flags.all & COMBAT_ARMY_FLAG_SHOOTER) {
-                sprintf(gText, "%d", static_cast<int>(viewArmy1->m_monster.shots));
+                sprintf(gText, "%d", static_cast<i32>(viewArmy1->m_monster.shots));
                 smallFont->DrawBoundedString(gText, viewX + COMBAT_SMALL_VIEW_TEXT_X,
                                              viewY2 + COMBAT_SMALL_VIEW_SHOTS_Y,
                                              COMBAT_SMALL_VIEW_TEXT_WIDTH,
@@ -1388,5 +1388,5 @@ void combatManager::DrawSmallView(int viewIndex, int updateScreen)
 // data reference pairs at the same function-relative site, and every reference
 // uses addend zero. The sole uncovered extent is one terminal zero alignment
 // byte at +0x7f; do not model it as invented storage.
-DATA(0x004ed25c) int bGridWasShowing = 0;
-DATA(0x004ed290) int gbInDrawSmallView = 0;
+DATA(0x004ed25c) i32 bGridWasShowing = 0;
+DATA(0x004ed290) i32 gbInDrawSmallView = 0;

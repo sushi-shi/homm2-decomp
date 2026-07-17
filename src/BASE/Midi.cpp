@@ -15,15 +15,15 @@
 #include <stdio.h>
 
 DATA(0x0051fec8) struct _MDI_DRIVER *hMDI = 0;
-DATA(0x0051fecc) int CurrentMidiFile = MIDI_NO_TRACK;
-DATA(0x0051fed0) unsigned char bGotMidi[MIDI_TRACK_COUNT] = {
+DATA(0x0051fecc) i32 CurrentMidiFile = MIDI_NO_TRACK;
+DATA(0x0051fed0) u8 bGotMidi[MIDI_TRACK_COUNT] = {
     0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
-DATA(0x0051ff0c) long lLastMIDIPollTickCount = 0;
+DATA(0x0051ff0c) i32l lLastMIDIPollTickCount = 0;
 DATA(0x0051ff10) static SMidiText gMidiText = {
     "MS1",
     "MS2",
@@ -39,7 +39,7 @@ DATA(0x0051ff10) static SMidiText gMidiText = {
 VA(0x004d3850, 0xb8)
 void soundManager::MIDIStartup(void)
 {
-    int i;
+    i32 i;
     LogStr(gMidiText.startupBegin);
     if (gbNoSound == 0 && (m_midiStarted = 1, gbDontTryMIDI == 0)) {
         LogStr(gMidiText.startupDriver);
@@ -59,7 +59,7 @@ void soundManager::MIDIStartup(void)
 VA(0x004d3910, 0x1a9)
 void soundManager::MIDIShutdown(void)
 {
-    int i;
+    i32 i;
     if (gbNoSound == 0 && m_midiReady != 0) {
         MIDIStop();
         LogStr(gMidiText.shutdownBegin);
@@ -86,7 +86,7 @@ void soundManager::MIDIShutdown(void)
 // commuting the operands of the CMP immediately consumed by JE. All 66 relocation targets agree.
 // Equality/inequality, nested/early-return, subtraction, cast, local-copy, and |0 forms all emit c3.
 VA(0x004d3ac0, 0x3ab)
-void soundManager::MIDIPlay(int midiTrack)
+void soundManager::MIDIPlay(i32 midiTrack)
 {
     if (gbNoSound == 0 && m_midiReady != 0 && gConfig.musicVolume != 0) {
         LogStr(gMidiText.playBegin);
@@ -143,7 +143,7 @@ inline void soundManager::MIDIStop(void)
 }
 
 VA(0x004d3f80, 0x46)
-inline int soundManager::MIDIIsPlaying(void)
+inline i32 soundManager::MIDIIsPlaying(void)
 {
     if (gbNoSound == 0 && gConfig.musicVolume != 0 && m_midiReady != 0 &&
         CurrentMidiFile != MIDI_NO_TRACK && hSequence[CurrentMidiFile] != 0) {
@@ -156,7 +156,7 @@ VA(0x004d3fd0, 0x68)
 inline void soundManager::MIDISetVolume(void)
 {
     if (gbNoSound == 0 && m_midiReady != 0) {
-        int volume = MIDI_MAX_VOLUME;
+        i32 volume = MIDI_MAX_VOLUME;
         if (m_fadeSteps > 0) {
             if (m_fadeSteps <= MIDI_VOLUME_FADE_SPLIT)
                 volume = ((MIDI_VOLUME_LOW_RANGE - m_fadeSteps) * MIDI_MAX_VOLUME) /

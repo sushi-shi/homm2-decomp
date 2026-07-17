@@ -24,64 +24,64 @@ public:
     town *m_town;  // +0x36
     icon *m_backgroundIcon;  // +0x3a
     townObject *m_townObjects[32];  // +0x3e
-    int m_townObjectCount;  // +0xbe
-    int m_lastTownType;  // +0xc2
-    int m_unknownC6;  // +0xc6
+    i32 m_townObjectCount;  // +0xbe
+    i32 m_lastTownType;  // +0xc2
+    i32 m_unknownC6;  // +0xc6
     heroWindow *m_townWindow;  // +0xca
     strip *m_garrisonStrip;  // +0xce
     strip *m_heroStrip;  // +0xd2
     strip *m_selectedStrip;  // +0xd6
-    int m_selectedArmySlot;  // +0xda
+    i32 m_selectedArmySlot;  // +0xda
     strip *m_swapStrip;  // +0xde
-    int m_swapArmySlot;  // +0xe2
+    i32 m_swapArmySlot;  // +0xe2
     strip *m_pendingStrip;  // +0xe6
-    int m_pendingArmySlot;  // +0xea
+    i32 m_pendingArmySlot;  // +0xea
     bankBox *m_bankBox;  // +0xee
     char m_statusText[0x50];  // +0xf2
-    int m_lastHoverId;  // +0x142
-    int m_lastHoverSubId;  // +0x146
-    int m_command;  // +0x14a
-    int m_recruitResult;  // +0x14e
-    unsigned long m_affordableBuildings;  // +0x152
-    unsigned long m_buildableBuildings;  // +0x156
-    int m_castleDialogActive;  // +0x15a
-    int m_selectedBuilding;  // +0x15e
+    i32 m_lastHoverId;  // +0x142
+    i32 m_lastHoverSubId;  // +0x146
+    i32 m_command;  // +0x14a
+    i32 m_recruitResult;  // +0x14e
+    u32l m_affordableBuildings;  // +0x152
+    u32l m_buildableBuildings;  // +0x156
+    i32 m_castleDialogActive;  // +0x15a
+    i32 m_selectedBuilding;  // +0x15e
     heroWindow *m_heroWindow0;  // +0x162  hero portrait window (redrawn on recruit)
     heroWindow *m_heroWindow1;  // +0x166  hero portrait window (redrawn on recruit)
-    int m_splitAmount;  // +0x16a
-    int m_splitMaximum;  // +0x16e
-    int    m_recruitState;  // +0x172  recruit slot / selection state
+    i32 m_splitAmount;  // +0x16a
+    i32 m_splitMaximum;  // +0x16e
+    i32    m_recruitState;  // +0x172  recruit slot / selection state
     hero *m_recruitHero;  // +0x176
     // --- constructors ---
     townManager(void);
     // --- virtual methods (vtable order) ---
-    virtual int Open(int) OVERRIDE;
+    virtual i32 Open(i32) OVERRIDE;
     virtual void Close(void) OVERRIDE;
-    virtual int Main(struct tag_message &) OVERRIDE;
+    virtual i32 Main(struct tag_message &) OVERRIDE;
     // --- methods ---
     void SetupExtraStuff(void);
     void SetTown(class town *townData) { m_town = townData; }
     void ChangeTown(void);
     void SetupTown(void);
     void UnloadTown(void);
-    void SetArmyCommand(int);
+    void SetArmyCommand(i32);
     void SetCommandAndText(struct tag_message &);
     void ShowText(char *);
-    void DoCommand(int);
+    void DoCommand(i32);
     void RedrawTownScreen(void);
     void SplitArmy(void);
     void ShiftQualChange(void);
     void ResetStrips(void);
-    void Toggle(int);
-    void DrawTown(int, int);
-    int BuyBuild(int, int, int);
-    void BuildObj(int);
+    void Toggle(i32);
+    void DrawTown(i32, i32);
+    i32 BuyBuild(i32, i32, i32);
+    void BuildObj(i32);
     void SetupMage(class heroWindow *);
-    int RecruitHero(int, int);
+    i32 RecruitHero(i32, i32);
     void DoTavern(void);
     void SetupWell(class heroWindow *);
-    void SetupThievesGuild(class heroWindow *, int);
-    void SetupCastle(class heroWindow *, int);
+    void SetupThievesGuild(class heroWindow *, i32);
+    void SetupCastle(class heroWindow *, i32);
 };
 #pragma pack(pop)
 SIZE(townManager, 0x17a);

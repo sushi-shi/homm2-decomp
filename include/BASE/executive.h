@@ -29,15 +29,15 @@ public:
     baseManager *m_managerListHead;  // +0x00  manager-list head
     baseManager *m_managerListTail;  // +0x04  manager-list tail
     baseManager *m_activeManager;  // +0x08  the current/active manager
-    int    m_result;  // +0x0c  result returned by an executive dialog/main loop
+    i32    m_result;  // +0x0c  result returned by an executive dialog/main loop
     // --- constructors ---
     executive(void);
     // --- methods ---
-    int InitSystem(void);
+    i32 InitSystem(void);
     void ShutDownSystem(void);
-    int DoDialog(class baseManager *);
+    i32 DoDialog(class baseManager *);
     void PrintManagerList(void);
-    int AddManager(class baseManager *, int);
+    i32 AddManager(class baseManager *, i32);
     void RemoveManager(class baseManager *);
     void CallManager(class baseManager *);
     void MainLoop(void);

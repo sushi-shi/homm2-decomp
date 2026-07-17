@@ -26,7 +26,7 @@ public:
     // (vptr auto-emitted at 0x00; own data starts at 0x04)
     SamplePlaybackData m_playbackData;  // +0x10..+0x2f
     // --- constructors ---
-    sample(char *, long int, long int, long int);
+    sample(char *, i32l, i32l, i32l);
     // Inline lets the compiler fold the body into ??_G; dllexport also retains the
     // standalone ??1 body required by retail.
     __declspec(dllexport) virtual inline ~sample() OVERRIDE;

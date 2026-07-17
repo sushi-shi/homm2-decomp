@@ -21,7 +21,7 @@
 VA(0x00489a30, 0x66)
 highScoreManager::highScoreManager(void)
 {
-    int entry;
+    i32 entry;
 
     for (entry = 0; entry < HIGH_SCORE_DISPLAY_ENTRY_COUNT; entry++)
         m_animationFrames[entry] = Random(0, HIGH_SCORE_ANIMATION_FRAME_COUNT - 1);
@@ -29,7 +29,7 @@ highScoreManager::highScoreManager(void)
 }
 
 VA(0x00489a96, 0x14c)
-int highScoreManager::Open(int id)
+i32 highScoreManager::Open(i32 id)
 {
     if (giHighScoreType == HIGH_SCORE_CAMPAIGN ||
         giHighScoreType == HIGH_SCORE_EXPANSION_CAMPAIGN)
@@ -66,10 +66,10 @@ void highScoreManager::Close(void)
 }
 
 VA(0x00489c40, 0x22a)
-int highScoreManager::Main(struct tag_message &message)
+i32 highScoreManager::Main(struct tag_message &message)
 {
-    int result;
-    int entry;
+    i32 result;
+    i32 entry;
     tag_message windowMessage;
 
     result = 0;
@@ -141,12 +141,12 @@ int highScoreManager::Main(struct tag_message &message)
 VA(0x00489e6a, 0x7d3)
 void highScoreManager::Update(void)
 {
-    int entry;
+    i32 entry;
     HighScoreEntry scoreEntry;
-    int inputFile;
+    i32 inputFile;
     tag_message messageValue;
     char filename[HIGH_SCORE_FILENAME_LENGTH];
-    int missingFile;
+    i32 missingFile;
 
     missingFile = 0;
     if (m_showCampaignScores)

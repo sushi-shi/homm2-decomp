@@ -1,5 +1,7 @@
 #ifndef HOMM2_NETBIOS_H
 #define HOMM2_NETBIOS_H
+
+#include <Ints.h>
 // Declarations of the free functions DEFINED in Netbios.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
 
@@ -43,18 +45,18 @@ typedef enum NetbiosGameMode {
     NETBIOS_GAME_MODE_GUEST = 2
 } NetbiosGameMode;
 
-signed char InitNetHost(void);
-signed char InitNetGuest(void);
-signed char WaitForHost(void);
-signed char WaitForGuest(void);
-int nbnet_init(void);
+i8 InitNetHost(void);
+i8 InitNetGuest(void);
+i8 WaitForHost(void);
+i8 WaitForGuest(void);
+i32 nbnet_init(void);
 
 // ---- globals (declarations, RVA order) ----
-extern signed char iInitNetHostStatus;
-extern signed char iInitNetGuestStatus;
-extern int iNameRetryCount;
-extern signed char iWaitForHostStatus;
-extern signed char iWaitForGuestStatus;
-extern int iLastBroadcastTime;
+extern i8 iInitNetHostStatus;
+extern i8 iInitNetGuestStatus;
+extern i32 iNameRetryCount;
+extern i8 iWaitForHostStatus;
+extern i8 iWaitForGuestStatus;
+extern i32 iLastBroadcastTime;
 
 #endif // HOMM2_NETBIOS_H

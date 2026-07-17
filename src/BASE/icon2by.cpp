@@ -13,22 +13,22 @@
 #include <SOURCE/dimPalette.h>
 #include <string.h>
 // Per-call decoder scratch.
-DATA(0x00538150) static int gYMClipB;
-DATA(0x00538154) static int gYMDimIdx;
-DATA(0x0053815c) static int gYMPitch;
-DATA(0x00538158) static int gYMY;
-DATA(0x00538160) static int gYMX;
-DATA(0x00538164) static unsigned char *gYMDimDst;
-DATA(0x0053816c) static int gYMX0;
-DATA(0x00538168) static unsigned int gYMRun;
-DATA(0x00538170) static unsigned char *gYMDimPal;
-DATA(0x00538174) static unsigned char *gYMRow;
-DATA(0x00538178) static unsigned char *gYMSrc;
+DATA(0x00538150) static i32 gYMClipB;
+DATA(0x00538154) static i32 gYMDimIdx;
+DATA(0x0053815c) static i32 gYMPitch;
+DATA(0x00538158) static i32 gYMY;
+DATA(0x00538160) static i32 gYMX;
+DATA(0x00538164) static u8 *gYMDimDst;
+DATA(0x0053816c) static i32 gYMX0;
+DATA(0x00538168) static u32 gYMRun;
+DATA(0x00538170) static u8 *gYMDimPal;
+DATA(0x00538174) static u8 *gYMRow;
+DATA(0x00538178) static u8 *gYMSrc;
 DATA(0x00538180) static IconEntry *gYMEntry;
-DATA(0x0053817c) static unsigned int gYMDimLen;
-DATA(0x00538184) static unsigned char gYMColor;
-DATA(0x00538188) static unsigned int gYMDimLen2;
-DATA(0x0053818c) static int gYMClipR;
+DATA(0x0053817c) static u32 gYMDimLen;
+DATA(0x00538184) static u8 gYMColor;
+DATA(0x00538188) static u32 gYMDimLen2;
+DATA(0x0053818c) static i32 gYMClipR;
 
 // @semantic
 // Complete /O2 decoder at 90.177666%: candidate 0x579 versus retail 0x588. Both are frame-free and
@@ -66,12 +66,12 @@ DATA(0x0053818c) static int gYMClipR;
 // was retained. History proves the older ~95.1% state came from moving the same IconShearConstant
 // typedef enum between headers, so do not merge the correctly separated domains merely for score.
 VA(0x004da270, 0x588)
-void IconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int y, int frame, int clip,
-                         int clipX, int clipY, int clipW, int clipH, int color, signed char *shear)
+void IconToBitmapYModify(class icon *srcIcon, class bitmap *dest, i32 x, i32 y, i32 frame, i32 clip,
+                         i32 clipX, i32 clipY, i32 clipW, i32 clipH, i32 color, i8 *shear)
 {
     IconEntry *entries = reinterpret_cast<IconEntry *>(srcIcon->m_data);
     gYMEntry = &entries[frame];
-    gYMSrc = reinterpret_cast<unsigned char *>(srcIcon->m_data) + gYMEntry->srcOffset;
+    gYMSrc = reinterpret_cast<u8 *>(srcIcon->m_data) + gYMEntry->srcOffset;
     gYMX0 = gYMEntry->x + x;
     gYMPitch = dest->m_width;
     gYMY = gYMEntry->y + y;
@@ -82,7 +82,7 @@ void IconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int y, 
     for (;;) {
         gYMRun = *gYMSrc;
         gYMSrc = gYMSrc + 1;
-        if (static_cast<signed char>(gYMRun) < 0) {
+        if (static_cast<i8>(gYMRun) < 0) {
             if ((gYMRun & ICON_RLE_COMMAND_SOLID_FLAG) == 0) {
                 if ((gYMRun & ICON_RLE_COMMAND_RUN_MASK) == 0)
                     return;
@@ -112,18 +112,18 @@ void IconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int y, 
             gYMDimLen2 = gYMDimLen;
             if (color != 0 && (gYMRun & ICON_RLE_DIM_RECOLOR_FLAG) != 0) {
                 gYMRun = gYMDimLen;
-                gYMColor = static_cast<unsigned char>(color);
+                gYMColor = static_cast<u8>(color);
                 goto do_fill;
             }
             if ((gYMRun & ICON_RLE_DIM_APPLY_FLAG) != 0) {
-                gYMDimPal = reinterpret_cast<unsigned char *>(uDimPal) +
+                gYMDimPal = reinterpret_cast<u8 *>(uDimPal) +
                             (gYMRun & ICON_RLE_DIM_LEVEL_MASK) *
                                 ICON_RLE_DIM_PALETTE_LEVEL_STRIDE;
-                int currentY;
+                i32 currentY;
                 if (shear[gYMY] != ICON_SHEAR_SKIP_ROW &&
                     clipY <= (currentY = gYMY) && currentY <= gYMClipB &&
-                    static_cast<int>(gYMDimLen + gYMX) > clipX && gYMClipR >= gYMX) {
-                    int dimRight = gYMDimLen + gYMX;
+                    static_cast<i32>(gYMDimLen + gYMX) > clipX && gYMClipR >= gYMX) {
+                    i32 dimRight = gYMDimLen + gYMX;
                     if (clipX <= gYMX) {
                         if (gYMClipR < dimRight)
                             gYMDimLen = (gYMClipR - gYMX) + 1;
@@ -136,23 +136,23 @@ void IconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int y, 
                         gYMDimDst = gYMRow + clipX;
                     }
                     gYMDimIdx = 0;
-                    if (0 < static_cast<int>(gYMDimLen)) {
+                    if (0 < static_cast<i32>(gYMDimLen)) {
                         do {
                             *gYMDimDst = gYMDimPal[*gYMDimDst];
                             gYMDimDst = 1 + gYMDimDst;
                             gYMDimIdx = gYMDimIdx + 1;
-                        } while (gYMDimIdx < static_cast<int>(gYMDimLen));
+                        } while (gYMDimIdx < static_cast<i32>(gYMDimLen));
                     }
                 }
             }
             gYMX = gYMX + gYMDimLen2;
             continue;
         do_fill:
-            int currentY;
+            i32 currentY;
             if (shear[gYMY] != ICON_SHEAR_SKIP_ROW &&
                 clipY <= (currentY = gYMY) && currentY <= gYMClipB &&
-                static_cast<int>(gYMX + gYMRun) > clipX && gYMClipR >= gYMX) {
-                int fillRight = gYMX + gYMRun;
+                static_cast<i32>(gYMX + gYMRun) > clipX && gYMClipR >= gYMX) {
+                i32 fillRight = gYMX + gYMRun;
                 if (clipX <= gYMX) {
                     if (gYMClipR >= fillRight) {
                         memset(gYMRow + gYMX, gYMColor, gYMRun);
@@ -172,11 +172,11 @@ void IconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int y, 
         }
         // ---- positive command : literal copy / newline ----
         if (gYMRun != 0) {
-            int currentY;
+            i32 currentY;
             if (shear[gYMY] != ICON_SHEAR_SKIP_ROW &&
                 clipY <= (currentY = gYMY) && currentY <= gYMClipB &&
-                static_cast<int>(gYMX + gYMRun) > clipX && gYMClipR >= gYMX) {
-                int copyRight = gYMX + gYMRun;
+                static_cast<i32>(gYMX + gYMRun) > clipX && gYMClipR >= gYMX) {
+                i32 copyRight = gYMX + gYMRun;
                 if (clipX <= gYMX) {
                     if (gYMClipR >= copyRight) {
                         memcpy(gYMRow + gYMX, gYMSrc, gYMRun);

@@ -31,9 +31,9 @@ town::town(void)
 }
 
 VA(0x00432c65, 0x54)
-int town::HasGarrison(void)
+i32 town::HasGarrison(void)
 {
-    for (int slot = 0; slot < ARMY_GROUP_SLOT_COUNT; ++slot) {
+    for (i32 slot = 0; slot < ARMY_GROUP_SLOT_COUNT; ++slot) {
         if (m_army.m_creatureTypes[slot] != ARMY_GROUP_EMPTY_SLOT)
             return 1;
     }
@@ -44,8 +44,8 @@ VA(0x00432cb9, 0x111)
 void town::GiveSpells(hero *targetHero)
 {
     hero *activeHero;
-    int level;
-    int slot;
+    i32 level;
+    i32 slot;
 
     if (targetHero == 0 && m_occupyingHeroId == TOWN_OCCUPYING_HERO_NONE)
         return;
@@ -74,7 +74,7 @@ void town::GiveSpells(hero *targetHero)
 VA(0x00432dca, 0xaa)
 void town::XformToCastle(void)
 {
-    int objectType;
+    i32 objectType;
     gpGame->ConvertObject(m_x + RANDOM_TOWN_LEFT, m_y + RANDOM_TOWN_TOP,
                           m_x + RANDOM_TOWN_RIGHT, m_y + RANDOM_TOWN_BOTTOM,
                           RANDOM_TOWN_OBJECT_TILESET, TOWN_CONVERT_SOURCE_FRAME,
@@ -90,7 +90,7 @@ void town::XformToCastle(void)
 }
 
 VA(0x00432e74, 0xe0)
-void town::View(int noFade)
+void town::View(i32 noFade)
 {
     bEnteringTown = 1;
     if (giHighMemBuffer + TOWN_VIEW_MEMORY_REQUIREMENT > TOWN_VIEW_HIGH_MEMORY_LIMIT)
@@ -113,8 +113,8 @@ VA(0x00432f54, 0x14d)
 void town::Deallocate(void)
 {
     playerData *playerRecord = &gpGame->m_players[m_owner];
-    int position = TOWN_ID_NONE;
-    int i;
+    i32 position = TOWN_ID_NONE;
+    i32 i;
 
     for (i = 0; i < playerRecord->m_townCount; ++i) {
         if (playerRecord->m_townIds[i] == m_id)
@@ -145,9 +145,9 @@ void town::Deallocate(void)
 // source-hash maximum is 100%; revisit only after a relevant TOWN source/TU/header
 // or comparison epoch alters MSVC register selection.
 VA(0x004330a1, 0x23e)
-void town::BuildBuilding(int building)
+void town::BuildBuilding(i32 building)
 {
-    int level;
+    i32 level;
     if (building == TOWN_OBJECT_MAGE_GUILD) {
         ++m_buildState;
         m_spellCounts[m_buildState] = gSpellLimits[m_buildState - TOWN_MAGE_GUILD_FIRST_LEVEL];
@@ -199,17 +199,17 @@ void town::BuildBuilding(int building)
 }
 
 VA(0x004332df, 0x36)
-int town::CanBuildDock(void)
+i32 town::CanBuildDock(void)
 {
     return m_boatX != TOWN_DOCK_COORDINATE_NONE;
 }
 
 VA(0x00433315, 0x9f)
-void town::CalcNumLevelArchers(int *numArchers, int *mageGuildLevel)
+void town::CalcNumLevelArchers(i32 *numArchers, i32 *mageGuildLevel)
 {
     *mageGuildLevel = m_buildState;
     *numArchers = 0;
-    int building;
+    i32 building;
     for (building = TOWN_OBJECT_DWELLING_1;
          building <= TOWN_OBJECT_ALTERNATE_UPGRADED_DWELLING_6; ++building) {
         if (m_buildings & (1L << building))
@@ -223,4 +223,4 @@ void town::CalcNumLevelArchers(int *numArchers, int *mageGuildLevel)
 }
 
 // ---- globals (definitions, RVA order) ----
-DATA(0x004f11b0) int bEnteringTown = 0;
+DATA(0x004f11b0) i32 bEnteringTown = 0;

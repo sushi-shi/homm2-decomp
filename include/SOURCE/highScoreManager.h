@@ -66,16 +66,16 @@ public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (derived: base baseManager = 0x36 bytes at 0x00 via ': public baseManager'; own fields below)
-    short m_animationFrames[HIGH_SCORE_DISPLAY_ENTRY_COUNT];  // +0x36
-    short m_monsterTypes[HIGH_SCORE_DISPLAY_ENTRY_COUNT];  // +0x4a
+    i16 m_animationFrames[HIGH_SCORE_DISPLAY_ENTRY_COUNT];  // +0x36
+    i16 m_monsterTypes[HIGH_SCORE_DISPLAY_ENTRY_COUNT];  // +0x4a
     char m_showCampaignScores;  // +0x5e
     heroWindow *m_window;  // +0x5f
     // --- constructors ---
     highScoreManager(void);
     // --- virtual methods (vtable order) ---
-    virtual int Open(int) OVERRIDE;
+    virtual i32 Open(i32) OVERRIDE;
     virtual void Close(void) OVERRIDE;
-    virtual int Main(struct tag_message &) OVERRIDE;
+    virtual i32 Main(struct tag_message &) OVERRIDE;
     // --- methods ---
     void Update(void);
 };

@@ -36,7 +36,7 @@
 VA(0x0044a8c0, 0xcf)
 army::army(void)
 {
-    int i;
+    i32 i;
 
     m_creatureIcon = 0;
     m_hex = 0;
@@ -56,7 +56,7 @@ army::army(void)
 }
 
 VA(0x0044a98f, 0x18)
-void army::WaitSample(int sampleIndex)
+void army::WaitSample(i32 sampleIndex)
 {
     return;
 }
@@ -64,7 +64,7 @@ void army::WaitSample(int sampleIndex)
 VA(0x0044a9a7, 0xde)
 void army::InitClean(void)
 {
-    int i;
+    i32 i;
 
     for (i = 0; i < ARMY_SAMPLE_COUNT; i++) {
         m_samples[i] = 0;
@@ -84,10 +84,10 @@ void army::InitClean(void)
 }
 
 VA(0x0044aa85, 0x443)
-void army::Init(int monsterType, int quantity, int side, int index, int hex, int unknown)
+void army::Init(i32 monsterType, i32 quantity, i32 side, i32 index, i32 hex, i32 unknown)
 {
     hero *commander;
-    int rearHex;
+    i32 rearHex;
 
     InitClean();
     m_monsterType = monsterType;
@@ -156,15 +156,15 @@ void army::Init(int monsterType, int quantity, int side, int index, int hex, int
 VA(0x0044aec8, 0x4a6)
 void army::LoadResources(void)
 {
-    int unusedLoadWord17;
-    int unusedLoadWord14;
-    int unusedLoadWord9;
-    int unusedLoadWord0;
-    int i;
-    int unusedLoadWord2;
-    int unusedLoadWord28;
-    int unusedLoadWord34;
-    int unusedLoadWord40;
+    i32 unusedLoadWord17;
+    i32 unusedLoadWord14;
+    i32 unusedLoadWord9;
+    i32 unusedLoadWord0;
+    i32 i;
+    i32 unusedLoadWord2;
+    i32 unusedLoadWord28;
+    i32 unusedLoadWord34;
+    i32 unusedLoadWord40;
 
     if (gbNoShowCombat) {
         return;
@@ -172,7 +172,7 @@ void army::LoadResources(void)
 
     gpResourceManager->PointToFile(
         gpResourceManager->MakeId(cArmyFrameFileNames[m_monsterType], 1));
-    gpResourceManager->ReadBlock(reinterpret_cast<signed char *>(&m_frameInfo),
+    gpResourceManager->ReadBlock(reinterpret_cast<i8 *>(&m_frameInfo),
                                  sizeof(m_frameInfo));
     ModifyFrameInfo(&m_frameInfo, m_monsterType);
     m_walkDuration = m_frameInfo.walkDuration;
@@ -246,7 +246,7 @@ void army::LoadResources(void)
 VA(0x0044b36e, 0xe8)
 void army::FreeResources(void)
 {
-    int i;
+    i32 i;
 
     if (gbNoShowCombat) {
         return;
@@ -272,28 +272,28 @@ void army::FreeResources(void)
 // 42 relocation sites align. The table/selector span at +0x4f0..+0x513 has only
 // local-label identities; its dispatch and five case bodies were audited raw.
 VA(0x0044b456, 0x7d2)
-void army::DrawToBuffer(int x, int y, int effectsOnly)
+void army::DrawToBuffer(i32 x, i32 y, i32 effectsOnly)
 {
-    int quantityY0;
-    int spellY;
-    unsigned char *palette8;
-    int spellX2;
-    int standing7;
-    int yDistance6;
-    int xDistance;
-    int unused;
-    int effect6;
-    int frameCount17;
-    int color;
-    int quantityX5;
-    int goodEffects0;
-    int drawn1;
-    int neighborOccupied14;
-    int badEffects0;
-    int quantityOffset0;
+    i32 quantityY0;
+    i32 spellY;
+    u8 *palette8;
+    i32 spellX2;
+    i32 standing7;
+    i32 yDistance6;
+    i32 xDistance;
+    i32 unused;
+    i32 effect6;
+    i32 frameCount17;
+    i32 color;
+    i32 quantityX5;
+    i32 goodEffects0;
+    i32 drawn1;
+    i32 neighborOccupied14;
+    i32 badEffects0;
+    i32 quantityOffset0;
     char quantityText3[ARMY_QUANTITY_TEXT_SIZE];
-    int statusFrame0;
-    int neighboringHex;
+    i32 statusFrame0;
+    i32 neighboringHex;
 
     if (gpCombatManager->m_nonVisualCombat) {
         return;
@@ -487,17 +487,17 @@ void army::Wince(void)
 // commuted, negated, and scalar-SIB forms were previously exhausted; revisit
 // after later ARMY TU-state changes.
 VA(0x0044bc55, 0xb90)
-void army::Walk(int direction, int finishStanding, int skipDrawing)
+void army::Walk(i32 direction, i32 finishStanding, i32 skipDrawing)
 {
-    int oldMaxX_1;
-    int oldMaxY_1;
-    int destination_3;
-    int otherHex_1;
-    int frame;
-    int oldHex_7;
-    int oldMinX;
-    int oldMinY_4;
-    int finalDestination;
+    i32 oldMaxX_1;
+    i32 oldMaxY_1;
+    i32 destination_3;
+    i32 otherHex_1;
+    i32 frame;
+    i32 oldHex_7;
+    i32 oldMinX;
+    i32 oldMinY_4;
+    i32 finalDestination;
 
     destination_3 = GetAdjacentCellIndex(m_hex, direction);
     if (m_side == 1 && gpCombatManager->m_inCastleCombat &&
@@ -515,14 +515,14 @@ void army::Walk(int direction, int finishStanding, int skipDrawing)
     giWalkingFrom = m_hex;
     if (m_monster.flags.all & MONSTER_FLAGS_WIDE) {
         giWalkingFrom2 =
-            (static_cast<unsigned int>(m_facing - 1) < 1 ? 1 : -1) + m_hex;
+            (static_cast<u32>(m_facing - 1) < 1 ? 1 : -1) + m_hex;
     } else {
         giWalkingFrom2 = -1;
     }
     giWalkingTo = destination_3;
     if (m_monster.flags.all & MONSTER_FLAGS_WIDE) {
         giWalkingTo2 =
-            (static_cast<unsigned int>(m_facing - 1) < 1 ? 1 : -1) +
+            (static_cast<u32>(m_facing - 1) < 1 ? 1 : -1) +
             destination_3;
     } else {
         giWalkingTo2 = -1;
@@ -666,7 +666,7 @@ void army::Walk(int direction, int finishStanding, int skipDrawing)
                 oldMaxY_1 = giMaxExtentY;
             }
             DelayTil(glTimers);
-            glTimers[0] = static_cast<int>(
+            glTimers[0] = static_cast<i32>(
                 KBTickCount() +
                 m_frameInfo.walkDuration * gfCombatSpeedMod[gConfig.combatSpeed] /
                     m_frameInfo.animationFrameCount[ARMY_ANIMATION_WALK]);
@@ -683,7 +683,7 @@ void army::Walk(int direction, int finishStanding, int skipDrawing)
     gpCombatManager->m_hexCells[m_hex].m_occupantFrame = -1;
     if (m_monster.flags.all & MONSTER_FLAGS_WIDE) {
         otherHex_1 =
-            (static_cast<unsigned int>(m_facing - 1) < 1 ? 1 : -1) + m_hex;
+            (static_cast<u32>(m_facing - 1) < 1 ? 1 : -1) + m_hex;
         gpCombatManager->m_hexCells[otherHex_1].m_occupantIndex = -1;
         gpCombatManager->m_hexCells[otherHex_1].m_occupantSide = -1;
         gpCombatManager->m_hexCells[otherHex_1].m_occupantFrame = -1;
@@ -693,7 +693,7 @@ void army::Walk(int direction, int finishStanding, int skipDrawing)
     gpCombatManager->m_hexCells[finalDestination].m_occupantFrame = -1;
     if (m_monster.flags.all & MONSTER_FLAGS_WIDE) {
         otherHex_1 =
-            (static_cast<unsigned int>(m_facing - 1) < 1 ? 1 : -1) +
+            (static_cast<u32>(m_facing - 1) < 1 ? 1 : -1) +
             finalDestination;
         gpCombatManager->m_hexCells[otherHex_1].m_occupantSide = m_side;
         gpCombatManager->m_hexCells[otherHex_1].m_occupantIndex = m_index;
@@ -742,54 +742,54 @@ VA(0x0044c7e5, 0x14aa)
 void army::SpecialAttack(void)
 {
     char combatText[ARMY_COMBAT_TEXT_SIZE];
-    int missileDelay_2;
-    int minY_1;
-    int oldX_16;
+    i32 missileDelay_2;
+    i32 minY_1;
+    i32 oldX_16;
     char targetColumn_2;
-    int minX_1;
+    i32 minX_1;
     float angle_2;
-    int missileHalfHeight_1;
+    i32 missileHalfHeight_1;
     char sourceColumn_8;
-    int attackDirection_3;
-    int effectType_1;
-    int initialXDistance_6;
-    int yStep_6;
-    int currentMissileY_7;
-    int xStep_29;
-    int currentMissileX_7;
-    int effectY_28;
+    i32 attackDirection_3;
+    i32 effectType_1;
+    i32 initialXDistance_6;
+    i32 yStep_6;
+    i32 currentMissileY_7;
+    i32 xStep_29;
+    i32 currentMissileX_7;
+    i32 effectY_28;
     char sourceRow;
-    int missileSteps_7;
-    int oldY_9;
-    int effectX_2;
+    i32 missileSteps_7;
+    i32 oldY_9;
+    i32 effectX_2;
     char targetRow_1;
     char reverseMissile;
-    int distance_6;
-    int originalFacing_6;
-    int initialYDistance_8;
-    int backgroundX_4;
-    int maxX_3;
-    int xDistance_7;
-    int maxY_3;
+    i32 distance_6;
+    i32 originalFacing_6;
+    i32 initialYDistance_8;
+    i32 backgroundX_4;
+    i32 maxX_3;
+    i32 xDistance_7;
+    i32 maxY_3;
     bitmap *missileBackground;
-    int backgroundY_6;
-    int originalAttack;
-    int direction;
-    int missileHalfWidth;
-    int sourceY_1;
-    int targetY_1;
-    int missileSpacing_1;
-    int missileY_7;
-    int endX_36;
-    int yDistance_16;
-    int sourceX_1;
-    int targetX_1;
-    int missileX_7;
-    int damage;
+    i32 backgroundY_6;
+    i32 originalAttack;
+    i32 direction;
+    i32 missileHalfWidth;
+    i32 sourceY_1;
+    i32 targetY_1;
+    i32 missileSpacing_1;
+    i32 missileY_7;
+    i32 endX_36;
+    i32 yDistance_16;
+    i32 sourceX_1;
+    i32 targetX_1;
+    i32 missileX_7;
+    i32 damage;
     float slope;
-    int directionFrame_2;
-    int endY_19;
-    int killed_13;
+    i32 directionFrame_2;
+    i32 endY_19;
+    i32 killed_13;
     army *target_1;
 
     damage = 0;
@@ -894,7 +894,7 @@ void army::SpecialAttack(void)
             gpCombatManager->DrawFrame(1, 1, 0, 0,
                                        ARMY_COMBAT_FRAME_DELAY, 1, 1);
         }
-        glTimers[0] = static_cast<int>(
+        glTimers[0] = static_cast<i32>(
             KBTickCount() + m_frameInfo.attackDuration *
             gfCombatSpeedMod[gConfig.combatSpeed] /
             m_frameInfo.animationFrameCount[m_animationSequence]);
@@ -929,7 +929,7 @@ void army::SpecialAttack(void)
     endY_19 = target_1->MidY();
     xDistance_7 = endX_36 - missileX_7;
     yDistance_16 = endY_19 - missileY_7;
-    distance_6 = static_cast<int>(sqrt(static_cast<double>(
+    distance_6 = static_cast<i32>(sqrt(static_cast<double>(
         xDistance_7 * xDistance_7 + yDistance_16 * yDistance_16)));
     missileSteps_7 = (distance_6 + (missileSpacing_1 >> 1)) / missileSpacing_1;
 
@@ -940,7 +940,7 @@ void army::SpecialAttack(void)
             giMinExtentY,
             giMaxExtentX - giMinExtentX + 1,
             giMaxExtentY - giMinExtentY + 1);
-        DelayMilli(static_cast<long>(gfCombatSpeedMod[gConfig.combatSpeed] *
+        DelayMilli(static_cast<i32l>(gfCombatSpeedMod[gConfig.combatSpeed] *
                                      ARMY_MAGE_BOLT_DELAY));
         gpCombatManager->DoBolt(
             1, missileX_7, missileY_7, endX_36, endY_19, 0, 0, 5, 4, 302, 0, 0,
@@ -957,12 +957,12 @@ void army::SpecialAttack(void)
         currentMissileY_7 = missileY_7;
         missileBackground = new bitmap(
             33,
-            static_cast<short>(missileHalfWidth * 2),
-            static_cast<short>(missileHalfHeight_1 * 2));
+            static_cast<i16>(missileHalfWidth * 2),
+            static_cast<i16>(missileHalfHeight_1 * 2));
         missileBackground->GrabBitmapCareful(
             gpWindowManager->m_screen,
-            static_cast<short>(currentMissileX_7 - missileHalfWidth),
-            static_cast<short>(currentMissileY_7 - missileHalfHeight_1));
+            static_cast<i16>(currentMissileX_7 - missileHalfWidth),
+            static_cast<i16>(currentMissileY_7 - missileHalfHeight_1));
         oldX_16 = currentMissileX_7;
         oldY_9 = currentMissileY_7;
         backgroundX_4 = 0;
@@ -986,8 +986,8 @@ void army::SpecialAttack(void)
             if (maxY_3 > ARMY_COMBAT_MAX_Y) maxY_3 = ARMY_COMBAT_MAX_Y;
             if (direction != 0) {
                 missileBackground->DrawToBufferCareful(
-                    static_cast<short>(backgroundX_4),
-                    static_cast<short>(backgroundY_6));
+                    static_cast<i16>(backgroundX_4),
+                    static_cast<i16>(backgroundY_6));
             } else {
                 if (minX_1 < giMinExtentX) giMinExtentX = minX_1;
                 if (giMaxExtentX < maxX_3) giMaxExtentX = maxX_3;
@@ -1006,8 +1006,8 @@ void army::SpecialAttack(void)
             }
             missileBackground->GrabBitmapCareful(
                 gpWindowManager->m_screen,
-                static_cast<short>(backgroundX_4),
-                static_cast<short>(backgroundY_6));
+                static_cast<i16>(backgroundX_4),
+                static_cast<i16>(backgroundY_6));
             m_missileIcon->DrawToBuffer(
                 currentMissileX_7, currentMissileY_7, directionFrame_2, reverseMissile);
             if (direction == 0) {
@@ -1021,7 +1021,7 @@ void army::SpecialAttack(void)
                 gpWindowManager->UpdateScreenRegion(
                     minX_1, minY_1, maxX_3 - minX_1 + 1, maxY_3 - minY_1 + 1);
             }
-            glTimers[0] = static_cast<int>(
+            glTimers[0] = static_cast<i32>(
                 KBTickCount() +
                 missileDelay_2 * gfCombatSpeedMod[gConfig.combatSpeed]);
             oldX_16 = currentMissileX_7;
@@ -1034,7 +1034,7 @@ void army::SpecialAttack(void)
             maxY_3 = currentMissileY_7 + missileHalfHeight_1;
         }
         missileBackground->DrawToBuffer(
-            static_cast<short>(backgroundX_4), static_cast<short>(backgroundY_6));
+            static_cast<i16>(backgroundX_4), static_cast<i16>(backgroundY_6));
         gpWindowManager->UpdateScreenRegion(
             oldX_16 - missileHalfWidth,
             oldY_9 - missileHalfHeight_1,
@@ -1054,7 +1054,7 @@ void army::SpecialAttack(void)
     effectY_28 = -1;
     if (m_monsterType == ARMY_CREATURE_LICH ||
         m_monsterType == ARMY_CREATURE_POWER_LICH) {
-        int adjacentHex;
+        i32 adjacentHex;
         army *splashTarget;
 
         gpCombatManager->ClearEffects();
@@ -1153,7 +1153,7 @@ void army::SpecialAttack(void)
 }
 
 VA(0x0044dc8f, 0x2b)
-void army::DirDoAttack(int direction)
+void army::DirDoAttack(i32 direction)
 {
     m_attackDirection = direction;
     DoAttack(0);
@@ -1165,27 +1165,27 @@ void army::DirDoAttack(int direction)
 // army-array sites; direct, commuted, flat-pointer, and scalar-SIB spellings
 // were audited. Other residual identities are delinked string literals.
 VA(0x0044dcba, 0x4e7)
-void army::DoHydraAttack(int)
+void army::DoHydraAttack(i32)
 {
-    int damage_8;
-    int killed_4;
-    int targetIndex_9;
-    int direction;
-    int targetSide_8;
-    int targetHex_2;
-    int totalKilled_7;
+    i32 damage_8;
+    i32 killed_4;
+    i32 targetIndex_9;
+    i32 direction;
+    i32 targetSide_8;
+    i32 targetHex_2;
+    i32 totalKilled_7;
     army *target_2;
-    short attackMask_7;
+    i16 attackMask_7;
     char combatText_8[200];
-    int totalDamage_1;
+    i32 totalDamage_1;
 
     totalKilled_7 = 0;
     totalDamage_1 = totalKilled_7;
     gpCombatManager->ResetHitByCreature();
     if (m_spellInfluence[ARMY_SPELL_INFLUENCE_BERSERK]) {
-        attackMask_7 = static_cast<short>(GetAttackMask(m_hex, 2, -1));
+        attackMask_7 = static_cast<i16>(GetAttackMask(m_hex, 2, -1));
     } else {
-        attackMask_7 = static_cast<short>(GetAttackMask(m_hex, 1, -1));
+        attackMask_7 = static_cast<i16>(GetAttackMask(m_hex, 1, -1));
     }
     CheckLuck();
     gpCombatManager->ResetLimitCreature();
@@ -1261,26 +1261,26 @@ void army::DoHydraAttack(int)
 // The two base-only self REL32 entries are the retail-resolved recursive calls;
 // remaining relocation identities are strings, gConfig, and constant-pool names.
 VA(0x0044e1a1, 0x1267)
-void army::DoAttack(int retaliation)
+void army::DoAttack(i32 retaliation)
 {
-    int targetOriginalFacing_5;
-    int originalDirection;
+    i32 targetOriginalFacing_5;
+    i32 originalDirection;
     army *breathTarget_6;
-    int secondAttackDirection_6;
-    int breathDamage;
-    int desiredFacing;
-    int effectStopsRetaliation_4;
-    int originalFacing_6;
-    int occupantSide_5;
+    i32 secondAttackDirection_6;
+    i32 breathDamage;
+    i32 desiredFacing;
+    i32 effectStopsRetaliation_4;
+    i32 originalFacing_6;
+    i32 occupantSide_5;
     char combatText[ARMY_COMBAT_TEXT_SIZE];
-    int damage;
-    int targetHex_3;
-    int killed_13;
+    i32 damage;
+    i32 targetHex_3;
+    i32 killed_13;
     army *target_1;
-    int breathKilled;
-    int adjacentHex_1;
-    int revivedQuantity_3;
-    int breathHex_1;
+    i32 breathKilled;
+    i32 adjacentHex_1;
+    i32 revivedQuantity_3;
+    i32 breathHex_1;
 
     m_drawState = 3;
     damage = 0;
@@ -1506,19 +1506,19 @@ applyMummySpell:
             m_monsterType != ARMY_CREATURE_VAMPIRE &&
             m_monsterType != ARMY_CREATURE_VAMPIRE_LORD &&
             !effectStopsRetaliation_4 && !retaliation) {
-            DelayMilli(static_cast<long>(
+            DelayMilli(static_cast<i32l>(
                 gfCombatSpeedMod[gConfig.combatSpeed] * ARMY_RETALIATION_DELAY));
             target_1->m_attackDirection = OppositeDirection(m_attackDirection);
             if (target_1->m_monster.flags.all & MONSTER_FLAGS_WIDE) {
                 adjacentHex_1 = GetAdjacentCellIndex(
                     target_1->m_hex,
-                    (static_cast<unsigned int>(target_1->m_facing - 1) < 1 ? 0 : -1) & 5);
+                    (static_cast<u32>(target_1->m_facing - 1) < 1 ? 0 : -1) & 5);
                 if (adjacentHex_1 == m_hex) {
                     target_1->m_attackDirection = 6;
                 }
                 adjacentHex_1 = GetAdjacentCellIndex(
                     target_1->m_hex,
-                    static_cast<unsigned int>(target_1->m_facing - 1) < 1 ? 2 : 3);
+                    static_cast<u32>(target_1->m_facing - 1) < 1 ? 2 : 3);
                 if (adjacentHex_1 == m_hex) {
                     target_1->m_attackDirection = 7;
                 }
@@ -1540,7 +1540,7 @@ applyMummySpell:
             !m_spellInfluence[ARMY_SPELL_INFLUENCE_PETRIFIED] &&
             !m_spellInfluence[ARMY_SPELL_INFLUENCE_BLIND] &&
             m_quantity > 0) {
-            DelayMilli(static_cast<long>(
+            DelayMilli(static_cast<i32l>(
                 gfCombatSpeedMod[gConfig.combatSpeed] * ARMY_SECOND_ATTACK_DELAY));
             secondAttackDirection_6 = m_attackDirection;
             m_attackDirection = originalDirection;
@@ -1591,7 +1591,7 @@ void army::ResetPath(void)
 }
 
 VA(0x0044f41e, 0x25)
-int army::WalkTo(void)
+i32 army::WalkTo(void)
 {
     return WalkTo(m_moveTargetHex);
 }
@@ -1602,13 +1602,13 @@ int army::WalkTo(void)
 // moatCell[moatIndex]; base loads the table byte before the call. Swapped
 // equality operands and qualifying the table lvalue were byte-neutral.
 VA(0x0044f443, 0x2ee)
-int army::WalkTo(int destination)
+i32 army::WalkTo(i32 destination)
 {
-    int direction_3;
-    int steps;
-    int moatDestination;
-    int moatIndex_1;
-    int canEnterMoat_1;
+    i32 direction_3;
+    i32 steps;
+    i32 moatDestination;
+    i32 moatIndex_1;
+    i32 canEnterMoat_1;
 
     m_targetIndex = -1;
     m_targetSide = m_targetIndex;
@@ -1663,7 +1663,7 @@ int army::WalkTo(int destination)
     for (direction_3 = gpSearchArray->m_pathLength - 1;
          direction_3 >= 0;
          direction_3--) {
-        Walk(static_cast<unsigned char>(
+        Walk(static_cast<u8>(
                  gpSearchArray->m_storage.path.directions[direction_3 + 1]),
              0,
              gpSearchArray->m_pathLength - 1 != direction_3);
@@ -1681,7 +1681,7 @@ int army::WalkTo(int destination)
 }
 
 VA(0x0044f731, 0x25)
-int army::AttackTo(void)
+i32 army::AttackTo(void)
 {
     return AttackTo(m_moveTargetHex);
 }
@@ -1691,11 +1691,11 @@ int army::AttackTo(void)
 // MSVC evaluates the commutative equality in the opposite order. Both source
 // operand orders and the value-preserving |0 spelling emitted the same pair.
 VA(0x0044f756, 0x1e8)
-int army::AttackTo(int destination)
+i32 army::AttackTo(i32 destination)
 {
-    int finishStanding;
-    int pathIndex_4;
-    int steps;
+    i32 finishStanding;
+    i32 pathIndex_4;
+    i32 steps;
 
     if (m_monster.flags.all & MONSTER_FLAGS_FLYING) {
         if (m_hex != destination) {
@@ -1711,7 +1711,7 @@ int army::AttackTo(int destination)
     }
     if (FindPath(m_hex, destination, m_monster.speed, 1, 0)) {
         if (gpSearchArray->m_pathLength == 1) {
-            m_attackDirection = static_cast<unsigned char>(
+            m_attackDirection = static_cast<u8>(
                 gpSearchArray->m_storage.path.directions[1]);
             gpCombatManager->TestRaiseDoor();
             DoAttack(0);
@@ -1727,7 +1727,7 @@ int army::AttackTo(int destination)
                 } else {
                     finishStanding = 0;
                 }
-                Walk(static_cast<unsigned char>(
+                Walk(static_cast<u8>(
                          gpSearchArray->m_storage.path.directions[pathIndex_4 + 1]),
                      finishStanding,
                      gpSearchArray->m_pathLength - 1 != pathIndex_4);
@@ -1736,7 +1736,7 @@ int army::AttackTo(int destination)
                 }
             }
             CancelSpellType(0);
-            m_attackDirection = static_cast<unsigned char>(
+            m_attackDirection = static_cast<u8>(
                 gpSearchArray->m_storage.path.directions[1]);
             gpCombatManager->TestRaiseDoor();
             DoAttack(0);
@@ -1810,17 +1810,17 @@ void army::CheckLuck(void)
 // value-equivalent genie clamp operand order at target 0x581f-0x5825; direct,
 // reversed, negated, and empty-arm comparison spellings were audited.
 VA(0x0044fbc0, 0x56e)
-void army::DamageEnemy(army *target, int *damageResult, int *killedResult,
-                       int rangedAttack, int defenseModifier)
+void army::DamageEnemy(army *target, i32 *damageResult, i32 *killedResult,
+                       i32 rangedAttack, i32 defenseModifier)
 {
     float damage1;
-    int attackBonus6;
-    int defenseBonus9;
-    int attackDifference7;
-    int rearHex19;
-    int index16;
-    int damageDone2;
-    int genieDamage26;
+    i32 attackBonus6;
+    i32 defenseBonus9;
+    i32 attackDifference7;
+    i32 rearHex19;
+    i32 index16;
+    i32 damageDone2;
+    i32 genieDamage26;
     hero *commander1;
 
     if (!target) {
@@ -1852,7 +1852,7 @@ void army::DamageEnemy(army *target, int *damageResult, int *killedResult,
         rearHex19 = -1;
         if (target->m_monster.flags.all & MONSTER_FLAGS_WIDE) {
             rearHex19 =
-                (static_cast<unsigned int>(target->m_facing - 1) < 1 ? 1 : -1) +
+                (static_cast<u32>(target->m_facing - 1) < 1 ? 1 : -1) +
                 target->m_hex;
         }
         for (index16 = 0; index16 < ARMY_MOAT_CELL_COUNT; index16++) {
@@ -1913,7 +1913,7 @@ void army::DamageEnemy(army *target, int *damageResult, int *killedResult,
     if (target->m_spellInfluence[ARMY_SPELL_INFLUENCE_PETRIFIED]) {
         damage1 /= 2.0f;
     }
-    damageDone2 = static_cast<int>(damage1 + 0.5);
+    damageDone2 = static_cast<i32>(damage1 + 0.5);
     if (m_monsterType == ARMY_CREATURE_GENIE &&
         SRandom(1, ARMY_GENIE_HALF_ROLL_MAX) == ARMY_GENIE_HALF_ROLL) {
         genieDamage26 =
@@ -1938,11 +1938,11 @@ void army::DamageEnemy(army *target, int *damageResult, int *killedResult,
 // the m_armies address, while the candidate evaluates the equivalent two
 // subscripts in reverse order. Direct and commuted subscript forms were checked.
 VA(0x0045012e, 0x23c)
-int army::Damage(long damage, int spell)
+i32 army::Damage(i32l damage, i32 spell)
 {
-    int killed_13;
-    int originalFacing;
-    int quantityFifth;
+    i32 killed_13;
+    i32 originalFacing;
+    i32 quantityFifth;
 
     damage += m_hitPointsLost;
     if (spell != -1) {
@@ -1996,24 +1996,24 @@ int army::Damage(long damage, int spell)
 // reversed comparison/addition spellings were byte-neutral, while typed direct
 // limit-count indexing regressed both address sites.
 VA(0x0045036a, 0x1361)
-void army::PowEffect(int effect, int resetLimits, int effectX, int effectY)
+void army::PowEffect(i32 effect, i32 resetLimits, i32 effectX, i32 effectY)
 {
-    int damageFrames;
-    int side_4;
-    int maximumDamageFrames_3;
+    i32 damageFrames;
+    i32 side_4;
+    i32 maximumDamageFrames_3;
     army *current;
-    int drawEffect_1;
-    int effectFrames_1;
-    int index_10;
-    int overlapAdjustment_7;
-    int frame;
-    int maximumEndFrames_1;
-    int keepAnimating_1;
-    int endFrames_1;
-    int maximumStartFrames;
-    int totalFrames_4;
-    int frameDelay_6;
-    int startFrames_5;
+    i32 drawEffect_1;
+    i32 effectFrames_1;
+    i32 index_10;
+    i32 overlapAdjustment_7;
+    i32 frame;
+    i32 maximumEndFrames_1;
+    i32 keepAnimating_1;
+    i32 endFrames_1;
+    i32 maximumStartFrames;
+    i32 totalFrames_4;
+    i32 frameDelay_6;
+    i32 startFrames_5;
     IconEntry *entry_1;
 
     maximumStartFrames = 0;
@@ -2057,7 +2057,7 @@ void army::PowEffect(int effect, int resetLimits, int effectX, int effectY)
         for (side_4 = 0; side_4 < ARMY_COMBAT_SIDE_COUNT; side_4++) {
         for (index_10 = 0; index_10 < gpCombatManager->m_armyCount[side_4]; index_10++) {
             current = &gpCombatManager->m_armies[side_4][index_10];
-            if (static_cast<unsigned char>(current->m_animationState)) {
+            if (static_cast<u8>(current->m_animationState)) {
                 startFrames_5 = current->m_frameInfo.animationFrameCount[
                     m_pendingAnimationSequence];
                 endFrames_1 = current->m_frameInfo.animationFrameCount[
@@ -2107,11 +2107,11 @@ void army::PowEffect(int effect, int resetLimits, int effectX, int effectY)
                 gpCombatManager->m_armies[side_4][index_10].m_animationCycle = 0;
             }
             if ((gpCombatManager->m_armies[side_4][index_10].m_damagePending ||
-                 static_cast<unsigned char>(
+                 static_cast<u8>(
                      gpCombatManager->m_armies[side_4][index_10].m_animationState) ||
-                 static_cast<unsigned char>(
+                 static_cast<u8>(
                      gpCombatManager->m_armies[side_4][index_10].m_animationCycle)) &&
-                !*reinterpret_cast<int *>(
+                !*reinterpret_cast<i32 *>(
                     index_10 * sizeof(gpCombatManager->m_limitCreatureCount[0][0]) +
                     0[&side_4] * sizeof(gpCombatManager->m_limitCreatureCount[0]) +
                     reinterpret_cast<char *>(
@@ -2148,8 +2148,8 @@ void army::PowEffect(int effect, int resetLimits, int effectX, int effectY)
             current->m_effectAnimationEnd = -1;
             current->m_effectAnimationStarted = 0;
             if (current->m_damagePending ||
-                static_cast<unsigned char>(current->m_animationState)) {
-                if (static_cast<unsigned char>(current->m_animationState)) {
+                static_cast<u8>(current->m_animationState)) {
+                if (static_cast<u8>(current->m_animationState)) {
                     current->m_effectAnimationStart = m_pendingAnimationSequence;
                     current->m_effectAnimationEnd =
                         m_pendingAnimationSequence + 1;
@@ -2183,7 +2183,7 @@ void army::PowEffect(int effect, int resetLimits, int effectX, int effectY)
         for (side_4 = 0; side_4 < ARMY_COMBAT_SIDE_COUNT; side_4++) {
             for (index_10 = 0; index_10 < gpCombatManager->m_armyCount[side_4]; index_10++) {
                 current = &gpCombatManager->m_armies[side_4][index_10];
-                if (static_cast<unsigned char>(current->m_animationCycle)) {
+                if (static_cast<u8>(current->m_animationCycle)) {
                     if (current->m_animationSequence == ARMY_ANIMATION_SHOOT_UP ||
                         current->m_animationSequence == ARMY_ANIMATION_SHOOT_FORWARD ||
                         current->m_animationSequence == ARMY_ANIMATION_SHOOT_DOWN) {
@@ -2202,8 +2202,8 @@ void army::PowEffect(int effect, int resetLimits, int effectX, int effectY)
                 }
                 if (current->m_effectAnimationStart != -1 &&
                     !current->m_effectAnimationStarted &&
-                    (static_cast<unsigned char>(current->m_animationState) ||
-                     static_cast<int>(effectFrames_1 - frame - 1) <=
+                    (static_cast<u8>(current->m_animationState) ||
+                     static_cast<i32>(effectFrames_1 - frame - 1) <=
                          current->m_effectAnimationLength ||
                      (maximumStartFrames && frame >= maximumStartFrames - 1) ||
                      (!maximumStartFrames &&
@@ -2250,7 +2250,7 @@ void army::PowEffect(int effect, int resetLimits, int effectX, int effectY)
                 }
             }
         }
-        glTimers[0] = static_cast<int>(KBTickCount() +
+        glTimers[0] = static_cast<i32>(KBTickCount() +
             frameDelay_6 * gfCombatSpeedMod[gConfig.combatSpeed]);
         if (drawEffect_1 && frame < giNumPowFrames[gCurLoadedSpellEffect]) {
             gCurSpellEffectFrame = frame;
@@ -2325,7 +2325,7 @@ void army::PowEffect(int effect, int resetLimits, int effectX, int effectY)
             }
         }
         if (keepAnimating_1) {
-            glTimers[0] = static_cast<int>(KBTickCount() +
+            glTimers[0] = static_cast<i32>(KBTickCount() +
                 frameDelay_6 * gfCombatSpeedMod[gConfig.combatSpeed]);
             gpCombatManager->DrawFrame(1, 1, 0, 0,
                                        ARMY_COMBAT_FRAME_DELAY, 1, 1);
@@ -2374,13 +2374,13 @@ void army::PowEffect(int effect, int resetLimits, int effectX, int effectY)
 }
 
 VA(0x004516cb, 0x35)
-unsigned long int army::Strength(void)
+u32l army::Strength(void)
 {
     return gMonsterDatabase[m_monsterType].fightValue * m_quantity;
 }
 
 VA(0x00451700, 0x66)
-int army::LeaveNoBody(void)
+i32 army::LeaveNoBody(void)
 {
     return m_monsterType == ARMY_CREATURE_EARTH_ELEMENTAL ||
         m_monsterType == ARMY_CREATURE_AIR_ELEMENTAL ||
@@ -2396,9 +2396,9 @@ int army::LeaveNoBody(void)
 // trailing retail NOPs. A typed flat-array spelling changed the multiplication
 // shape and regressed the match, so the real two-dimensional access is retained.
 VA(0x00451766, 0x3f5)
-void army::ProcessDeath(int immediate)
+void army::ProcessDeath(i32 immediate)
 {
-    int rearHex;
+    i32 rearHex;
     army *mirrorImage_4;
     army *mirrorSource;
     hexcell *frontCell_1;
@@ -2417,7 +2417,7 @@ void army::ProcessDeath(int immediate)
     frontCell_1 = &gpCombatManager->m_hexCells[m_hex];
     rearHex = 0;
     if (m_monster.flags.all & MONSTER_FLAGS_WIDE) {
-        rearHex = (static_cast<unsigned int>(m_facing - 1) < 1 ? 1 : -1) +
+        rearHex = (static_cast<u32>(m_facing - 1) < 1 ? 1 : -1) +
             m_hex;
         rearCell = &gpCombatManager->m_hexCells[rearHex];
     } else {
@@ -2475,16 +2475,16 @@ void army::ProcessDeath(int immediate)
 }
 
 VA(0x00451b5b, 0x39d)
-void army::SpellEffect(int effect, int effectFrameDelay, int animateCreature)
+void army::SpellEffect(i32 effect, i32 effectFrameDelay, i32 animateCreature)
 {
-    unsigned long effectFileId_3;
+    u32l effectFileId_3;
     IconEntry *entry_8;
-    int frame_4;
-    int minimumYOffset_16;
-    int powBaseY_14;
-    int frameDelay_2;
-    int i_16;
-    int unusedSpellEffectWord_12;
+    i32 frame_4;
+    i32 minimumYOffset_16;
+    i32 powBaseY_14;
+    i32 frameDelay_2;
+    i32 i_16;
+    i32 unusedSpellEffectWord_12;
 
     effectFileId_3 = MAKEFILEID(gCombatFxNames[effect]);
     if (m_animationSequence == ARMY_ANIMATION_WINCE ||
@@ -2516,10 +2516,10 @@ void army::SpellEffect(int effect, int effectFrameDelay, int animateCreature)
         }
         if (animateCreature) {
             frameDelay_2 = ARMY_SPELL_EFFECT_ANIMATION_DURATION /
-                static_cast<signed char>(
+                static_cast<i8>(
                     m_frameInfo.animationFrameCount[ARMY_ANIMATION_WINCE]);
             m_animationSequence = ARMY_ANIMATION_WINCE;
-            for (; frame_4 < static_cast<signed char>(
+            for (; frame_4 < static_cast<i8>(
                        m_frameInfo.animationFrameCount[ARMY_ANIMATION_WINCE]);
                  frame_4++) {
                 m_animationFrame = frame_4;
@@ -2528,7 +2528,7 @@ void army::SpellEffect(int effect, int effectFrameDelay, int animateCreature)
                 } else {
                     gCurSpellEffectFrame = giNumPowFrames[effect];
                 }
-                glTimers[1] = static_cast<int>(KBTickCount() +
+                glTimers[1] = static_cast<i32>(KBTickCount() +
                     gfCombatSpeedMod[gConfig.combatSpeed] * frameDelay_2);
                 gpCombatManager->DrawFrame(1, 0, 0, 0,
                                            ARMY_COMBAT_FRAME_DELAY, 1, 1);
@@ -2536,7 +2536,7 @@ void army::SpellEffect(int effect, int effectFrameDelay, int animateCreature)
             }
         }
         for (; frame_4 < giNumPowFrames[effect]; frame_4++) {
-            glTimers[1] = static_cast<int>(KBTickCount() +
+            glTimers[1] = static_cast<i32>(KBTickCount() +
                 gfCombatSpeedMod[gConfig.combatSpeed] * effectFrameDelay);
             gCurSpellEffectFrame = frame_4;
             gpCombatManager->DrawFrame(1, 0, 0, 0,
@@ -2548,16 +2548,16 @@ void army::SpellEffect(int effect, int effectFrameDelay, int animateCreature)
     if (!gbNoShowCombat) {
         if (animateCreature) {
             frameDelay_2 = ARMY_SPELL_EFFECT_ANIMATION_DURATION /
-                static_cast<signed char>(
+                static_cast<i8>(
                     m_frameInfo.animationFrameCount[
                         ARMY_ANIMATION_WINCE_RETURN]);
             m_animationSequence = ARMY_ANIMATION_WINCE_RETURN;
             for (frame_4 = 0;
-                 frame_4 < static_cast<signed char>(
+                 frame_4 < static_cast<i8>(
                      m_frameInfo.animationFrameCount[ARMY_ANIMATION_WINCE_RETURN]);
                  frame_4++) {
                 m_animationFrame = frame_4;
-                glTimers[1] = static_cast<int>(KBTickCount() +
+                glTimers[1] = static_cast<i32>(KBTickCount() +
                     gfCombatSpeedMod[gConfig.combatSpeed] * frameDelay_2);
                 gpCombatManager->DrawFrame(1, 0, 0, 0,
                                            ARMY_COMBAT_FRAME_DELAY, 1, 1);
@@ -2578,7 +2578,7 @@ void army::SpellEffect(int effect, int effectFrameDelay, int animateCreature)
 // All non-table bytes match. The table at +0xf3..+0x102 contains four
 // function-local label relocations; its dispatch and all five calls also align.
 VA(0x00451ef8, 0x10f)
-void army::CancelSpellType(int cancelType)
+void army::CancelSpellType(i32 cancelType)
 {
     switch (cancelType) {
     case ARMY_CANCEL_SPELLS_AFTER_MOVE:
@@ -2611,7 +2611,7 @@ void army::CancelSpellType(int cancelType)
 // All non-table bytes match. The table at +0x130..+0x16b contains only 15
 // function-local label relocations; its dispatch and database field also align.
 VA(0x00452007, 0x178)
-void army::CancelIndividualSpell(int influence)
+void army::CancelIndividualSpell(i32 influence)
 {
     if (!m_spellInfluence[influence]) {
         return;
@@ -2621,7 +2621,7 @@ void army::CancelIndividualSpell(int influence)
     switch (influence) {
     case ARMY_SPELL_INFLUENCE_HASTE:
     case ARMY_SPELL_INFLUENCE_SLOW:
-        m_monster.speed = static_cast<signed char>(m_speed);
+        m_monster.speed = static_cast<i8>(m_speed);
         m_frameInfo.walkDuration = m_walkDuration;
         m_monster.attributes |=
             gMonsterDatabase[m_monsterType].attributes & MONSTER_ATTRIBUTE_FLYING;
@@ -2662,13 +2662,13 @@ void army::CancelIndividualSpell(int influence)
 // All non-table bytes match. The table at +0x21c..+0x257 contains only 15
 // function-local label relocations; its dispatch and all 12 externals also align.
 VA(0x0045217f, 0x282)
-int army::SetSpellInfluence(int influence, int rounds)
+i32 army::SetSpellInfluence(i32 influence, i32 rounds)
 {
-    int i;
+    i32 i;
 
     if (m_spellInfluence[influence]) {
         if (m_spellInfluence[influence] < rounds) {
-            m_spellInfluence[influence] = static_cast<unsigned char>(rounds);
+            m_spellInfluence[influence] = static_cast<u8>(rounds);
         }
         return 0;
     }
@@ -2676,16 +2676,16 @@ int army::SetSpellInfluence(int influence, int rounds)
     case ARMY_SPELL_INFLUENCE_HASTE:
         CancelIndividualSpell(ARMY_SPELL_INFLUENCE_SLOW);
         m_monster.speed += ARMY_HASTE_SPEED_BONUS;
-        m_frameInfo.walkDuration = static_cast<int>(
+        m_frameInfo.walkDuration = static_cast<i32>(
             m_frameInfo.walkDuration * ARMY_HASTE_WALK_DURATION_SCALE);
         break;
     case ARMY_SPELL_INFLUENCE_SLOW:
         CancelIndividualSpell(ARMY_SPELL_INFLUENCE_HASTE);
-        m_monster.speed = static_cast<signed char>((m_monster.speed + 1) / 2);
+        m_monster.speed = static_cast<i8>((m_monster.speed + 1) / 2);
         if (m_monster.attributes & MONSTER_ATTRIBUTE_FLYING) {
             m_monster.attributes -= MONSTER_ATTRIBUTE_FLYING;
         }
-        m_frameInfo.walkDuration = static_cast<int>(
+        m_frameInfo.walkDuration = static_cast<i32>(
             m_frameInfo.walkDuration * ARMY_SLOW_WALK_DURATION_SCALE);
         break;
     case ARMY_SPELL_INFLUENCE_BLIND:
@@ -2730,7 +2730,7 @@ int army::SetSpellInfluence(int influence, int rounds)
         break;
     }
     m_spellCount++;
-    m_spellInfluence[influence] = static_cast<unsigned char>(rounds);
+    m_spellInfluence[influence] = static_cast<u8>(rounds);
     return 1;
 }
 
@@ -2743,7 +2743,7 @@ int army::SetSpellInfluence(int influence, int rounds)
 VA(0x00452401, 0x94)
 void army::DecrementSpellRounds(void)
 {
-    int i;
+    i32 i;
 
     for (i = 0; i < ARMY_SPELL_INFLUENCE_COUNT; i++) {
         if (m_spellInfluence[i]) {
@@ -2768,16 +2768,16 @@ void army::DecrementSpellRounds(void)
 VA(0x00452495, 0x644)
 void army::GoBerserk(void)
 {
-    int masks_28[5];
-    int savedQuantity_10;
-    int direction_4;
-    int targetHex_9;
-    int nearestSide_8;
-    int nearestIndex_19;
-    int nearestDistance_2;
-    int side_8;
-    int index_11;
-    int distance_6;
+    i32 masks_28[5];
+    i32 savedQuantity_10;
+    i32 direction_4;
+    i32 targetHex_9;
+    i32 nearestSide_8;
+    i32 nearestIndex_19;
+    i32 nearestDistance_2;
+    i32 side_8;
+    i32 index_11;
+    i32 distance_6;
 
     masks_28[4] = 0;
     direction_4 = 0;
@@ -2835,8 +2835,8 @@ void army::GoBerserk(void)
             giNextActionGridIndex =
                 gpCombatManager->m_armies[nearestSide_8][nearestIndex_19].m_hex;
         } else {
-            int sideZeroTarget_12 = -1;
-            int sideOneTarget_18 = -1;
+            i32 sideZeroTarget_12 = -1;
+            i32 sideOneTarget_18 = -1;
             if (gpCombatManager->AttemptAttack(this, 0, masks_28[0])) {
                 giNextAction = COMBAT_AI_ACTION_MOVE;
                 sideZeroTarget_12 = giNextActionGridIndex;
@@ -2848,12 +2848,12 @@ void army::GoBerserk(void)
             giNextActionGridIndex = -1;
             if (sideZeroTarget_12 != -1 || sideOneTarget_18 != -1) {
                 if (sideZeroTarget_12 != -1 && sideOneTarget_18 != -1) {
-                    int sideZeroDistance = gpSearchArray->QuickDistance(
+                    i32 sideZeroDistance = gpSearchArray->QuickDistance(
                         gpCombatManager->m_hexCells[m_hex].m_x,
                         gpCombatManager->m_hexCells[m_hex].m_y,
                         gpCombatManager->m_hexCells[sideZeroTarget_12].m_x,
                         gpCombatManager->m_hexCells[sideZeroTarget_12].m_y);
-                    int sideOneDistance = gpSearchArray->QuickDistance(
+                    i32 sideOneDistance = gpSearchArray->QuickDistance(
                         gpCombatManager->m_hexCells[m_hex].m_x,
                         gpCombatManager->m_hexCells[m_hex].m_y,
                         gpCombatManager->m_hexCells[sideOneTarget_18].m_x,
@@ -2894,13 +2894,13 @@ berserkFinish:
 // object extent delta is limited to seven five-byte inline-accessor continuation
 // jumps plus the equivalent first-condition branch encoding.
 VA(0x00452ad9, 0x3f1)
-void army::MoveAttack(int destination, int moveOnly)
+void army::MoveAttack(i32 destination, i32 moveOnly)
 {
-    int baseAttackMask;
-    int targetAttackMask;
-    int sourceHex;
-    int adjacentHex;
-    int direction;
+    i32 baseAttackMask;
+    i32 targetAttackMask;
+    i32 sourceHex;
+    i32 adjacentHex;
+    i32 direction;
     hexcell *adjacentCell;
 
     while (1) {
@@ -2996,12 +2996,12 @@ finish:
 // instruction 134; retail also has three trailing NOPs. Computed local-name
 // buckets fixed all prior slot differences; revisit after ARMY TU-state changes.
 VA(0x00452eca, 0x931)
-float army::SpellCastWorkChance(int spell)
+float army::SpellCastWorkChance(i32 spell)
 {
-    int foundSpell_8;
-    int i_15;
-    int resurrectPower_5;
-    int hypnotizeHitPoints_37;
+    i32 foundSpell_8;
+    i32 i_15;
+    i32 resurrectPower_5;
+    i32 hypnotizeHitPoints_37;
 
     if ((m_monster.flags.all & MONSTER_FLAGS_MIRROR_IMAGE) &&
         (spell == SPELL_MIRROR_IMAGE || spell == SPELL_ANTI_MAGIC)) {
@@ -3193,18 +3193,18 @@ float army::SpellCastWorkChance(int spell)
 }
 
 VA(0x004537fb, 0x56)
-int army::SpellCastWorks(int spell)
+i32 army::SpellCastWorks(i32 spell)
 {
-    int chance;
+    i32 chance;
 
-    chance = static_cast<int>(SpellCastWorkChance(spell) *
+    chance = static_cast<i32>(SpellCastWorkChance(spell) *
                               ARMY_SPELL_CHANCE_PERCENT);
     return SRandom(1, ARMY_RANDOM_SPELL_ROLL_MAX) <= chance;
 }
 
 VA(0x00453851, 0x39e)
-void BuildTempWalkSeq(struct SMonFrameInfo *frameInfo, int finishStanding,
-                      int skipDrawing)
+void BuildTempWalkSeq(struct SMonFrameInfo *frameInfo, i32 finishStanding,
+                      i32 skipDrawing)
 {
     frameInfo->animationFrameCount[ARMY_ANIMATION_WALK] = 0;
     if (!skipDrawing && finishStanding) {
@@ -3317,7 +3317,7 @@ void army::DispelGood(void)
 }
 
 VA(0x00453c55, 0x90)
-void army::Cure(int amount)
+void army::Cure(i32 amount)
 {
     CancelIndividualSpell(ARMY_SPELL_INFLUENCE_SLOW);
     CancelIndividualSpell(ARMY_SPELL_INFLUENCE_BLIND);
@@ -3333,9 +3333,9 @@ void army::Cure(int amount)
 }
 
 VA(0x00453ce5, 0x79)
-int army::MidX(void)
+i32 army::MidX(void)
 {
-    int wideOffset;
+    i32 wideOffset;
 
     if (m_monster.flags.all & MONSTER_FLAGS_WIDE) {
         if (m_facing == 1) {
@@ -3350,7 +3350,7 @@ int army::MidX(void)
 }
 
 VA(0x00453d5e, 0x59)
-int army::MidY(void)
+i32 army::MidY(void)
 {
     return gpCombatManager->m_hexCells[m_hex].m_y -
            (GetIconEntry(
@@ -3361,7 +3361,7 @@ int army::MidY(void)
 }
 
 VA(0x00453db7, 0x57)
-int army::TopY(void)
+i32 army::TopY(void)
 {
     return gpCombatManager->m_hexCells[m_hex].m_y -
            GetIconEntry(
@@ -3371,7 +3371,7 @@ int army::TopY(void)
 }
 
 VA(0x00453e0e, 0xcc)
-int army::RightX(void)
+i32 army::RightX(void)
 {
     if (m_facing == 1) {
         return gpCombatManager->m_hexCells[m_hex].m_x +
@@ -3393,7 +3393,7 @@ int army::RightX(void)
 }
 
 VA(0x00453eda, 0xcc)
-int army::LeftX(void)
+i32 army::LeftX(void)
 {
     if (m_facing == 1) {
         return gpCombatManager->m_hexCells[m_hex].m_x +
@@ -3422,14 +3422,14 @@ int army::LeftX(void)
 // inequality forms all canonicalized unchanged. Revisit in the byte-last-mile
 // phase or after ARMY TU/header state changes.
 VA(0x00453fa6, 0x171)
-int army::OtherArmyAdjacent(int side, int index)
+i32 army::OtherArmyAdjacent(i32 side, i32 index)
 {
     army *otherArmy1;
-    int otherHex1;
-    int otherRearHex;
-    int adjacentHex;
-    int rearHex;
-    int directionResult;
+    i32 otherHex1;
+    i32 otherRearHex;
+    i32 adjacentHex;
+    i32 rearHex;
+    i32 directionResult;
 
     otherArmy1 = &gpCombatManager->m_armies[side][index];
     otherHex1 = otherArmy1->m_hex;
@@ -3462,9 +3462,9 @@ int army::OtherArmyAdjacent(int side, int index)
 }
 
 VA(0x00454117, 0x1e1)
-void ModifyFrameInfo(struct SMonFrameInfo *frameInfo, int monsterType)
+void ModifyFrameInfo(struct SMonFrameInfo *frameInfo, i32 monsterType)
 {
-    int speedDifference;
+    i32 speedDifference;
 
     speedDifference = 0;
     if (monsterType == ARMY_CREATURE_RANGER ||
@@ -3496,15 +3496,15 @@ void ModifyFrameInfo(struct SMonFrameInfo *frameInfo, int monsterType)
     }
     if (speedDifference) {
         if (monsterType == ARMY_CREATURE_RANGER) {
-            frameInfo->attackDuration = static_cast<int>(
+            frameInfo->attackDuration = static_cast<i32>(
                 frameInfo->attackDuration * ARMY_RANGER_ATTACK_DURATION_SCALE);
         } else {
-            frameInfo->attackDuration = static_cast<int>(
+            frameInfo->attackDuration = static_cast<i32>(
                 (ARMY_DURATION_BASE_SCALE -
                  speedDifference * ARMY_ATTACK_DURATION_SPEED_SCALE) *
                 frameInfo->attackDuration);
         }
-        frameInfo->walkDuration = static_cast<int>(
+        frameInfo->walkDuration = static_cast<i32>(
             (ARMY_DURATION_BASE_SCALE -
              speedDifference * ARMY_WALK_DURATION_SPEED_SCALE) *
             frameInfo->walkDuration);
@@ -3512,9 +3512,9 @@ void ModifyFrameInfo(struct SMonFrameInfo *frameInfo, int monsterType)
 }
 
 VA(0x004542f8, 0xbe)
-int army::GetPowBaseY(void)
+i32 army::GetPowBaseY(void)
 {
-    int y;
+    i32 y;
 
     y = MidY();
     if (gCurLoadedSpellEffect == SPELL_BERSERKER ||
@@ -3542,5 +3542,5 @@ int army::GetPowBaseY(void)
 // the complete candidate section (18 constants, 63 references), and .bss
 // 0x127eb4..0x127eb8 is exactly gbGenieHalf (3 references, addend zero). Do not
 // model the .data order or terminal alignment with aliases or invented padding.
-DATA(0x004f54a8) int bSecondAttack = 0;
-DATA(0x00527eb4) int gbGenieHalf;
+DATA(0x004f54a8) i32 bSecondAttack = 0;
+DATA(0x00527eb4) i32 gbGenieHalf;

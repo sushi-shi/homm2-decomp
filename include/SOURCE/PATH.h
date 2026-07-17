@@ -1,10 +1,12 @@
 #ifndef HOMM2_PATH_H
 #define HOMM2_PATH_H
+
+#include <Ints.h>
 // Declarations of the free functions DEFINED in PATH.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
 
-int GetAdjacentCellIndexNoArmy(int, int);
-int OppositeDirection(int);
+i32 GetAdjacentCellIndexNoArmy(i32, i32);
+i32 OppositeDirection(i32);
 
 typedef enum CombatHexDirection {
     COMBAT_DIRECTION_NORTHWEST = 0,

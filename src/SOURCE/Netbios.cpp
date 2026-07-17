@@ -18,15 +18,15 @@
 // InitNetHost local labels. Every instruction byte and all 21 external
 // relocation targets agree; frame 0x34 and all referenced slots are exact.
 VA(0x004132f0, 0x155)
-signed char InitNetHost(void)
+i8 InitNetHost(void)
 {
     char localName[NETBIOS_NAME_BUFFER_SIZE];
-    int reserved;
-    int status;
+    i32 reserved;
+    i32 status;
 
     switch (iInitNetHostStatus) {
     case NETBIOS_SETUP_INITIALIZE:
-        if (static_cast<short>(
+        if (static_cast<i16>(
                 nb_init(NETBIOS_SETUP_SESSION_COUNT, NETBIOS_HOST_SESSION)) ==
             NETBIOS_INIT_UNAVAILABLE)
             ShutDown("NETBIOS is not loaded.");
@@ -37,7 +37,7 @@ signed char InitNetHost(void)
         break;
     case NETBIOS_SETUP_CHECK_LOCAL_NAME:
         status = !(
-            static_cast<unsigned char>(nb_stat(NETBIOS_HOST_SESSION)) &
+            static_cast<u8>(nb_stat(NETBIOS_HOST_SESSION)) &
             NETBIOS_SESSION_NAME_REGISTERED);
         if (status)
             iInitNetHostStatus++;
@@ -47,14 +47,14 @@ signed char InitNetHost(void)
     case NETBIOS_SETUP_REGISTER_LOCAL_NAME:
         sprintf(localName, "H2H%d",
                 Random(NETBIOS_RANDOM_NAME_MIN, NETBIOS_RANDOM_NAME_MAX));
-        if (static_cast<short>(nb_sess(NETBIOS_SESSION_REGISTER, localName)) ==
+        if (static_cast<i16>(nb_sess(NETBIOS_SESSION_REGISTER, localName)) ==
             NETBIOS_RESULT_SUCCESS)
             iInitNetHostStatus++;
         else
             ShutDown("Network initialization failed");
         break;
     case NETBIOS_SETUP_WAIT_FOR_LOCAL_NAME:
-        status = static_cast<unsigned char>(nb_stat(NETBIOS_HOST_SESSION));
+        status = static_cast<u8>(nb_stat(NETBIOS_HOST_SESSION));
         if (status & NETBIOS_SESSION_NAME_REGISTERED)
             return 1;
         else if (status & NETBIOS_SESSION_ERROR) {
@@ -70,13 +70,13 @@ signed char InitNetHost(void)
 // InitNetGuest local labels. Every instruction byte and all 32 external
 // relocation targets agree; frame 0x34 and all referenced slots are exact.
 VA(0x00413445, 0x1ab)
-signed char InitNetGuest(void)
+i8 InitNetGuest(void)
 {
     char localName[NETBIOS_NAME_BUFFER_SIZE];
 
     switch (iInitNetGuestStatus) {
     case NETBIOS_SETUP_INITIALIZE:
-        if (static_cast<short>(
+        if (static_cast<i16>(
                 nb_init(NETBIOS_SETUP_SESSION_COUNT, NETBIOS_GUEST_SESSION)) ==
             NETBIOS_INIT_UNAVAILABLE)
             ShutDown("NETBIOS is not loaded.");
@@ -86,7 +86,7 @@ signed char InitNetGuest(void)
         }
         break;
     case NETBIOS_SETUP_CHECK_LOCAL_NAME:
-        if (static_cast<unsigned char>(nb_stat(NETBIOS_GUEST_SESSION)) &
+        if (static_cast<u8>(nb_stat(NETBIOS_GUEST_SESSION)) &
             NETBIOS_SESSION_NAME_REGISTERED)
             iInitNetGuestStatus += NETBIOS_REGISTERED_STATE_ADVANCE;
         else
@@ -95,15 +95,15 @@ signed char InitNetGuest(void)
     case NETBIOS_SETUP_REGISTER_LOCAL_NAME:
         sprintf(localName, "H2G%d",
                 Random(NETBIOS_RANDOM_NAME_MIN, NETBIOS_RANDOM_NAME_MAX));
-        if (static_cast<short>(nb_sess(NETBIOS_SESSION_REGISTER, localName)) ==
+        if (static_cast<i16>(nb_sess(NETBIOS_SESSION_REGISTER, localName)) ==
             NETBIOS_RESULT_SUCCESS)
             iInitNetGuestStatus++;
         else
             iNameRetryCount++;
         break;
     case NETBIOS_SETUP_WAIT_FOR_LOCAL_NAME: {
-        int status = static_cast<unsigned char>(nb_stat(NETBIOS_GUEST_SESSION));
-        int namePending = !(status & NETBIOS_SESSION_NAME_REGISTERED);
+        i32 status = static_cast<u8>(nb_stat(NETBIOS_GUEST_SESSION));
+        i32 namePending = !(status & NETBIOS_SESSION_NAME_REGISTERED);
         if (namePending) {
             if (status & NETBIOS_SESSION_ERROR) {
                 iNameRetryCount++;
@@ -115,7 +115,7 @@ signed char InitNetGuest(void)
         break;
     }
     case NETBIOS_SETUP_START_RECEIVE:
-        if (static_cast<short>(
+        if (static_cast<i16>(
                 nb_sess(NETBIOS_SESSION_RECEIVE_ANY, NETBIOS_HOST_SESSION)) !=
             NETBIOS_RESULT_SUCCESS) {
             sprintf(gText, "Network initialization failed");
@@ -127,14 +127,14 @@ signed char InitNetGuest(void)
 }
 
 VA(0x004135f0, 0x5f)
-signed char WaitForHost(void)
+i8 WaitForHost(void)
 {
     char scratch[NETBIOS_SCRATCH_BUFFER_SIZE];
-    int status;
+    i32 status;
 
     switch (iWaitForHostStatus) {
     case NETBIOS_WAIT_START:
-        status = static_cast<unsigned char>(nb_stat(NETBIOS_HOST_SESSION)) &
+        status = static_cast<u8>(nb_stat(NETBIOS_HOST_SESSION)) &
                  NETBIOS_SESSION_ACTIVE;
         if (status != 0)
             return 1;
@@ -144,21 +144,21 @@ signed char WaitForHost(void)
 }
 
 VA(0x0041364f, 0xe9)
-signed char WaitForGuest(void)
+i8 WaitForGuest(void)
 {
     char scratch[NETBIOS_SCRATCH_BUFFER_SIZE];
-    int status;
+    i32 status;
 
     switch (iWaitForGuestStatus) {
     case NETBIOS_WAIT_START:
-        status = static_cast<short>(
+        status = static_cast<i16>(
             nb_sess(NETBIOS_SESSION_LISTEN_ANY, NETBIOS_GUEST_SESSION));
         if (status == NETBIOS_RESULT_SUCCESS)
             iWaitForGuestStatus++;
         return 0;
     case NETBIOS_WAIT_POLL:
         status = !(
-            static_cast<unsigned char>(nb_stat(NETBIOS_GUEST_SESSION)) &
+            static_cast<u8>(nb_stat(NETBIOS_GUEST_SESSION)) &
             NETBIOS_SESSION_ACTIVE);
         if (status) {
             if (KBTickCount() > iLastBroadcastTime + NETBIOS_BROADCAST_INTERVAL) {
@@ -175,10 +175,10 @@ signed char WaitForGuest(void)
 }
 
 VA(0x00413738, 0x1ba)
-int nbnet_init(void)
+i32 nbnet_init(void)
 {
     char scratch[NETBIOS_SCRATCH_BUFFER_SIZE];
-    int unused;
+    i32 unused;
 
     LogStr("GUON1");
     switch (GameMode) {
@@ -223,9 +223,9 @@ int nbnet_init(void)
 // is byte-exact against retail. All later private owners have singleton
 // relocation proof. The final two retail bytes are zero alignment; do not add
 // a fake owner for them.
-DATA(0x004ee5c8) signed char iInitNetHostStatus = 0;
-DATA(0x004ee5cc) signed char iInitNetGuestStatus = 0;
-DATA(0x004ee5d0) int iNameRetryCount = 0;
-DATA(0x004ee614) signed char iWaitForHostStatus = 0;
-DATA(0x004ee658) signed char iWaitForGuestStatus = 0;
-DATA(0x004ee65c) int iLastBroadcastTime = 0;
+DATA(0x004ee5c8) i8 iInitNetHostStatus = 0;
+DATA(0x004ee5cc) i8 iInitNetGuestStatus = 0;
+DATA(0x004ee5d0) i32 iNameRetryCount = 0;
+DATA(0x004ee614) i8 iWaitForHostStatus = 0;
+DATA(0x004ee658) i8 iWaitForGuestStatus = 0;
+DATA(0x004ee65c) i32 iLastBroadcastTime = 0;

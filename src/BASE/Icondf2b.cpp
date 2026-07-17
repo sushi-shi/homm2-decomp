@@ -13,19 +13,19 @@
 #include <BASE/bitmap.h>
 #include <SOURCE/dimPalette.h>
 // Per-call decoder scratch — its own contiguous file-static block (0x5381b8+).
-DATA(0x005381b8) static int gFDX0;
-DATA(0x005381bc) static int gFDXEnd;
-DATA(0x005381c0) static unsigned int gFDCnt;
-DATA(0x005381c4) static int gFDX;
-DATA(0x005381c8) static int gFDClipR;
-DATA(0x005381cc) static unsigned int gFDCnt2;
-DATA(0x005381d0) static unsigned char *gFDRow;
-DATA(0x005381d4) static int gFDClipB;
-DATA(0x005381d8) static unsigned char *gFDSrc;
-DATA(0x005381dc) static unsigned char *gFDDst;
-DATA(0x005381e0) static int gFDY;
+DATA(0x005381b8) static i32 gFDX0;
+DATA(0x005381bc) static i32 gFDXEnd;
+DATA(0x005381c0) static u32 gFDCnt;
+DATA(0x005381c4) static i32 gFDX;
+DATA(0x005381c8) static i32 gFDClipR;
+DATA(0x005381cc) static u32 gFDCnt2;
+DATA(0x005381d0) static u8 *gFDRow;
+DATA(0x005381d4) static i32 gFDClipB;
+DATA(0x005381d8) static u8 *gFDSrc;
+DATA(0x005381dc) static u8 *gFDDst;
+DATA(0x005381e0) static i32 gFDY;
 DATA(0x005381e4) static IconEntry *gFDEntry;
-DATA(0x005381e8) static unsigned int gFDRun;
+DATA(0x005381e8) static u32 gFDRun;
 
 // @semantic
 // Complete /O2 decoder: candidate/retail have 166/167 instructions, both have 25 branches, both
@@ -48,26 +48,26 @@ DATA(0x005381e8) static unsigned int gFDRun;
 // the complete 37/37 per-owner relocation multiset. The 79.06626% live score is TU-state-sensitive;
 // the semantic helper is retained rather than restoring compiler-shaped source for a higher score.
 VA(0x004daa20, 0x23b)
-void FlipDimIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
-                         int color, int clip, int clipX, int clipY, int clipW, int clipH)
+void FlipDimIconToBitmap(class icon *srcIcon, class bitmap *dest, i32 x, i32 y, i32 frame,
+                         i32 color, i32 clip, i32 clipX, i32 clipY, i32 clipW, i32 clipH)
 {
     IconEntry *entries = reinterpret_cast<IconEntry *>(srcIcon->m_data);
     IconEntry *entry = &entries[frame];
-    unsigned char *srcData = reinterpret_cast<unsigned char *>(entries) + entry->srcOffset;
-    int x0 = x;
+    u8 *srcData = reinterpret_cast<u8 *>(entries) + entry->srcOffset;
+    i32 x0 = x;
     gFDEntry = entry;
     gFDSrc = srcData;
-    int w = entry->w;
-    int entryY = entry->y;
+    i32 w = entry->w;
+    i32 entryY = entry->y;
     x0 = x0 - entry->x;
     x0 = x0 - w;
     x0++;
     gFDX0 = x0;
     gFDY = y + entryY;
-    int X = w + x0 - 1;
+    i32 X = w + x0 - 1;
     gFDXEnd = X;
     if (clip != ICON_DRAW_NO_CLIP) {
-        int currentY;
+        i32 currentY;
         if (x0 < clipX || clipW + clipX < w + x0 || (currentY = gFDY) < clipY ||
             entry->h + currentY > clipY + clipH) {
             clip = ICON_DRAW_CLIP;
@@ -77,14 +77,14 @@ void FlipDimIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, 
             clip = ICON_DRAW_NO_CLIP;
         }
     }
-    short pitch = dest->m_width;
+    i16 pitch = dest->m_width;
     gFDRow = dest->m_pixels + gFDY * pitch;
     for (;;) {
         gFDX = X;
-        int cmd = ReadIconRleByte(gFDSrc);
-        if (static_cast<signed char>(cmd) < 0) {
+        i32 cmd = ReadIconRleByte(gFDSrc);
+        if (static_cast<i8>(cmd) < 0) {
             gFDRun = cmd;
-            int n = cmd & ICON_RLE_MONO_RUN_MASK;
+            i32 n = cmd & ICON_RLE_MONO_RUN_MASK;
             if (n == ICON_RLE_MONO_END_COUNT)
                 return;
             X = X - n;
@@ -93,27 +93,27 @@ void FlipDimIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, 
         gFDRun = cmd;
         if (cmd != ICON_RLE_MONO_NEWLINE_COMMAND) {
             if (clip == ICON_DRAW_NO_CLIP) {
-                unsigned int cnt;
+                u32 cnt;
                 gFDCnt = 0;
-                unsigned char *dst = (gFDRow - cmd) + X + 1;
+                u8 *dst = (gFDRow - cmd) + X + 1;
                 gFDDst = dst;
-                if (static_cast<int>(cmd) > 0) {
+                if (static_cast<i32>(cmd) > 0) {
                     cnt = cmd;
                     gFDCnt = cmd;
                     do {
-                        int px = *dst++;
+                        i32 px = *dst++;
                         cnt--;
                         gFDDst = dst;
                         dst[-1] = uDimPal[0][color][px];
                     } while (cnt != 0);
                 }
             } else {
-                int left;
-                int currentY = gFDY;
+                i32 left;
+                i32 currentY = gFDY;
                 if (clipY <= currentY && currentY <= gFDClipB &&
                     (left = (X - cmd) + 1, clipX <= left) && X <= gFDClipR) {
-                    int cn;
-                    unsigned char *dst;
+                    i32 cn;
+                    u8 *dst;
                     if (clipX <= left) {
                         cn = cmd;
                         dst = (gFDRow - cmd) + X + 1;
@@ -124,11 +124,11 @@ void FlipDimIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, 
                     gFDCnt2 = cn;
                     gFDDst = dst;
                     gFDCnt = 0;
-                    if (static_cast<int>(cn) > 0) {
+                    if (static_cast<i32>(cn) > 0) {
                         gFDCnt = cn;
-                        unsigned int cnt = cn;
+                        u32 cnt = cn;
                         do {
-                            int px = *dst++;
+                            i32 px = *dst++;
                             cnt--;
                             gFDDst = dst;
                             dst[-1] = uDimPal[0][color][px];

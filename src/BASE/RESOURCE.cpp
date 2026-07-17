@@ -16,7 +16,7 @@ resource::resource(void)
 }
 
 VA(0x004d9750, 0x2d)
-resource::resource(short int a1, unsigned long int a2, short int a3, resource* a4)
+resource::resource(i16 a1, u32l a2, i16 a3, resource* a4)
 {
   m_resourceType = a1;
   m_id = a2;

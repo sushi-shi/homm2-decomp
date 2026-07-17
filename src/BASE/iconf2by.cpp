@@ -14,25 +14,25 @@
 #include <string.h>
 // Per-call decoder scratch — its own file-static block.
 static IconEntry *gFYEntry;
-static unsigned char *gFYSrc;
-static int gFYX0;
-static int gFYXEnd;
-static int gFYY;
-static int gFYX;
-static int gFYClipB;
-static unsigned char *gFYRow;
-static int gFYRun;
-static unsigned char gFYColor;
-static int gFYDimLen;
-static unsigned int gFYDimLen2;
-static unsigned char *gFYDimPal;
-static int gFYDimIdx;
-static unsigned char *gFYDimDst;
-static unsigned char *gFYDst;
-static int gFYSkip;
-static int gFYClipR;
+static u8 *gFYSrc;
+static i32 gFYX0;
+static i32 gFYXEnd;
+static i32 gFYY;
+static i32 gFYX;
+static i32 gFYClipB;
+static u8 *gFYRow;
+static i32 gFYRun;
+static u8 gFYColor;
+static i32 gFYDimLen;
+static u32 gFYDimLen2;
+static u8 *gFYDimPal;
+static i32 gFYDimIdx;
+static u8 *gFYDimDst;
+static u8 *gFYDst;
+static i32 gFYSkip;
+static i32 gFYClipR;
 
-static inline int IconRowVisible(signed char *shear, int clipTop)
+static inline i32 IconRowVisible(i8 *shear, i32 clipTop)
 {
     return shear[gFYY] != ICON_SHEAR_SKIP_ROW && clipTop <= gFYY && gFYY <= gFYClipB;
 }
@@ -50,14 +50,14 @@ static inline int IconRowVisible(signed char *shear, int clipTop)
 // setup lifetime at +0x5c: retail keeps shear in ESI and clipW in EBP, while candidate keeps shear
 // in EBP and later reloads width. Do not reintroduce labels merely to chase fuzzy scheduling.
 VA(0x004d9ce0, 0x58d)
-void FlipIconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
-                             int clip, int clipX, int clipY, int clipW, int clipH, int color,
-                             signed char *shear)
+void FlipIconToBitmapYModify(class icon *srcIcon, class bitmap *dest, i32 x, i32 y, i32 frame,
+                             i32 clip, i32 clipX, i32 clipY, i32 clipW, i32 clipH, i32 color,
+                             i8 *shear)
 {
-    int clipWidth = clipW;
+    i32 clipWidth = clipW;
     IconEntry *entries = reinterpret_cast<IconEntry *>(srcIcon->m_data);
     gFYEntry = &entries[frame];
-    gFYSrc = reinterpret_cast<unsigned char *>(srcIcon->m_data) + gFYEntry->srcOffset;
+    gFYSrc = reinterpret_cast<u8 *>(srcIcon->m_data) + gFYEntry->srcOffset;
     gFYX0 = ((x - gFYEntry->w) - gFYEntry->x) + 1;
     gFYXEnd = gFYEntry->w + gFYX0 - 1;
     gFYY = gFYEntry->y + y;
@@ -67,7 +67,7 @@ void FlipIconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int
     gFYRow = dest->m_pixels + dest->m_width * gFYY;
     for (;;) {
         gFYRun = *gFYSrc++;
-        if (static_cast<signed char>(gFYRun) < 0) {
+        if (static_cast<i8>(gFYRun) < 0) {
             if ((gFYRun & ICON_RLE_COMMAND_SOLID_FLAG) == 0) {
                 if ((gFYRun & ICON_RLE_COMMAND_RUN_MASK) == 0)
                     return;
@@ -91,16 +91,16 @@ void FlipIconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int
                 gFYDimLen2 = gFYDimLen;
                 if (color != 0 && (gFYRun & ICON_RLE_DIM_RECOLOR_FLAG) != 0) {
                     gFYRun = gFYDimLen;
-                    gFYColor = static_cast<unsigned char>(color);
+                    gFYColor = static_cast<u8>(color);
                 } else {
                     if ((gFYRun & ICON_RLE_DIM_APPLY_FLAG) != 0) {
                         gFYDimPal =
-                            reinterpret_cast<unsigned char *>(uDimPal) +
+                            reinterpret_cast<u8 *>(uDimPal) +
                             (gFYRun & ICON_RLE_DIM_LEVEL_MASK) *
                                 ICON_RLE_DIM_PALETTE_LEVEL_STRIDE;
                         if (IconRowVisible(shear, clipY)) {
                             if (clipX <= (gFYX - gFYDimLen) + 1 && gFYX <= gFYClipR) {
-                                unsigned char *dimDst;
+                                u8 *dimDst;
                                 if (clipX <= (gFYX - gFYDimLen) + 1) {
                                     dimDst = (gFYRow - gFYDimLen) + gFYX + 1;
                                 } else {
@@ -109,12 +109,12 @@ void FlipIconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int
                                 }
                                 gFYDimIdx = 0;
                                 gFYDimDst = dimDst;
-                                if (0 < static_cast<int>(gFYDimLen)) {
+                                if (0 < static_cast<i32>(gFYDimLen)) {
                                     do {
                                         *gFYDimDst = gFYDimPal[*gFYDimDst];
                                         gFYDimDst = gFYDimDst + 1;
                                         gFYDimIdx = gFYDimIdx + 1;
-                                    } while (gFYDimIdx < static_cast<int>(gFYDimLen));
+                                    } while (gFYDimIdx < static_cast<i32>(gFYDimLen));
                                 }
                             }
                         }
@@ -124,9 +124,9 @@ void FlipIconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int
                 }
             }
             if (IconRowVisible(shear, clipY)) {
-                unsigned int fillCount = gFYRun;
-                if (clipX <= static_cast<int>((gFYX - fillCount) + 1) && gFYX <= gFYClipR) {
-                    if (clipX <= static_cast<int>((gFYX - fillCount) + 1)) {
+                u32 fillCount = gFYRun;
+                if (clipX <= static_cast<i32>((gFYX - fillCount) + 1) && gFYX <= gFYClipR) {
+                    if (clipX <= static_cast<i32>((gFYX - fillCount) + 1)) {
                         memset((gFYRow - fillCount) + 1 + gFYX, gFYColor, fillCount);
                     } else {
                         memset(gFYRow + clipX, gFYColor, (gFYX - clipX) + 1);
@@ -139,7 +139,7 @@ void FlipIconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int
         // ---- positive command : backward literal copy / newline ----
         if (gFYRun != 0) {
             if (IconRowVisible(shear, clipY)) {
-                int left = (gFYX - gFYRun) + 1;
+                i32 left = (gFYX - gFYRun) + 1;
                 if (left <= gFYClipR && clipX <= gFYX) {
                     if (gFYX <= gFYClipR) {
                         gFYDst = gFYRow + gFYX;
@@ -157,7 +157,7 @@ void FlipIconToBitmapYModify(class icon *srcIcon, class bitmap *dest, int x, int
                             gFYSkip = 0;
                             gFYDimLen = gFYRun - gFYX + gFYClipR;
                         } else {
-                            int pendingSkip = ((gFYRun - gFYX) - clipWidth) + gFYClipR;
+                            i32 pendingSkip = ((gFYRun - gFYX) - clipWidth) + gFYClipR;
                             gFYDimLen = clipWidth;
                             gFYSkip = pendingSkip;
                         }

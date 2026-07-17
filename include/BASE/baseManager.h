@@ -39,17 +39,17 @@ public:
     // (vptr auto-emitted at 0x00; own data starts at 0x04)
     baseManager *m_next;  // +0x04  next in the executive manager list
     baseManager *m_prev;  // +0x08  prev in the executive manager list
-    int    m_messageMask;  // +0x0c  event/message classes accepted by Main
-    int    m_priority;  // +0x10  executive manager-list ordering key
+    i32    m_messageMask;  // +0x0c  event/message classes accepted by Main
+    i32    m_priority;  // +0x10  executive manager-list ordering key
     char   m_name[BASE_MANAGER_NAME_CAPACITY];  // +0x14  manager name
-    int    m_active;  // +0x32
+    i32    m_active;  // +0x32
     // --- constructors ---
     baseManager(void);
     void Activate(void) { m_active = BASE_MANAGER_ACTIVE; }
     // --- virtual methods (vtable order) ---
-    virtual int Open(int) = 0;
+    virtual i32 Open(i32) = 0;
     virtual void Close(void) = 0;
-    virtual int Main(struct tag_message &) = 0;
+    virtual i32 Main(struct tag_message &) = 0;
 };
 #pragma pack(pop)
 SIZE(baseManager, 0x36);

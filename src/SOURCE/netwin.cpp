@@ -18,13 +18,13 @@
 
 
 // ---- module-private globals (retail xref: single-module) ----
-DATA(0x0051739c) static unsigned char gNbCallRetries = 0;      // nb_call_done retry counter
-DATA(0x005173a0) static unsigned char gNetbiosAvail = 0;
-DATA(0x005173a4) static unsigned char gNetbiosLana = 0;
-DATA(0x005173a8) static unsigned char gNbShutdown = 0;         // shutdown flag, cleared by nb_init
-DATA(0x005173ac) static unsigned char gNbMaxSess = NETBIOS_INVALID_ID;
-DATA(0x005173b0) static unsigned char gNbLocalNum = 0;         // local netbios name number
-DATA(0x005173b4) static unsigned char gNetStatus[NETBIOS_STATUS_COUNT] = { 0 };
+DATA(0x0051739c) static u8 gNbCallRetries = 0;      // nb_call_done retry counter
+DATA(0x005173a0) static u8 gNetbiosAvail = 0;
+DATA(0x005173a4) static u8 gNetbiosLana = 0;
+DATA(0x005173a8) static u8 gNbShutdown = 0;         // shutdown flag, cleared by nb_init
+DATA(0x005173ac) static u8 gNbMaxSess = NETBIOS_INVALID_ID;
+DATA(0x005173b0) static u8 gNbLocalNum = 0;         // local netbios name number
+DATA(0x005173b4) static u8 gNetStatus[NETBIOS_STATUS_COUNT] = { 0 };
 DATA(0x005173c0) static char         *gNbGroupName = "Empire Too ";
 DATA(0x005173c4) static char         *gNbListenName = "*";
 
@@ -40,7 +40,7 @@ DATA(0x005173c4) static char         *gNbListenName = "*";
 
 // Semantic suffixes retain the retail MSVC BSS allocation order; audit with section replay.
 DATA(0x0052ae68) static tag_Anchor gNbFreeQueueRuntime;
-DATA(0x0052ae70) static unsigned char gNbSessionNumbersEntry[NETBIOS_SESSION_COUNT];
+DATA(0x0052ae70) static u8 gNbSessionNumbersEntry[NETBIOS_SESSION_COUNT];
 DATA(0x0052ae78) static NetbiosPayload gNbReceiveDataLocal[NETBIOS_SESSION_COUNT];
 DATA(0x00531e78) static NetbiosName gNbNameBufferBacking[NETBIOS_SESSION_COUNT];
 DATA(0x00531ee8) static NetbiosSessionBuffer gNbSessionBufferContext;
@@ -66,7 +66,7 @@ DATA(0x00533138) static CRITICAL_SECTION gNbSendLockBacking;
 #define gNbSndLock gNbSendLockBacking
 
 VA(0x004a6be0, 0xa8)
-int is_netbios_avail(void)
+i32 is_netbios_avail(void)
 {
     NetbiosControlBlock ncb;
     memset(&ncb, 0, sizeof(ncb));
@@ -85,14 +85,14 @@ int is_netbios_avail(void)
 }
 
 VA(0x004a6c88, 0x244)
-extern "C" unsigned short __fastcall nb_init(unsigned short param1, unsigned short param2)
+extern "C" u16 __fastcall nb_init(u16 param1, u16 param2)
 {
     // Retail interleaves each line base with this function's literals; this compiler groups them.
-    DATA(0x005173d8) static short gNbInitSourceLineBase = NETWIN_SOURCE_LINE_INIT_BASE;
+    DATA(0x005173d8) static i16 gNbInitSourceLineBase = NETWIN_SOURCE_LINE_INIT_BASE;
     NetbiosControlBlock localNcb;
-    int i;
-    unsigned char *statusBuffer;
-    int returnCode;
+    i32 i;
+    u8 *statusBuffer;
+    i32 returnCode;
 
     memset(gNbSessLsn, 0, sizeof(gNbSessLsn));
     memset(&gNbCtlNcb, 0, sizeof(gNbCtlNcb));
@@ -118,7 +118,7 @@ extern "C" unsigned short __fastcall nb_init(unsigned short param1, unsigned sho
         for (i = 0; i < NETBIOS_THREAD_EVENT_COUNT; i++)
             gNbEvents.handles[i] = CreateEventA(0, 1, 0, 0);
         memset(&localNcb, 0, sizeof(localNcb));
-        statusBuffer = static_cast<unsigned char *>(BaseAlloc(
+        statusBuffer = static_cast<u8 *>(BaseAlloc(
             NETBIOS_ADAPTER_STATUS_SIZE,
             "I:\\Projects\\Heroes\\Prog\\SOURCE\\netwin.cpp",
             gNbInitSourceLineBase +
@@ -147,10 +147,10 @@ extern "C" unsigned short __fastcall nb_init(unsigned short param1, unsigned sho
 VA(0x004a6ecc, 0x207)
 extern "C" void __fastcall nb_term(void)
 {
-    DATA(0x00517434) static short gNbTermSourceLineBase = NETWIN_SOURCE_LINE_TERM_BASE;
+    DATA(0x00517434) static i16 gNbTermSourceLineBase = NETWIN_SOURCE_LINE_TERM_BASE;
     tag_Node *node;
     NetbiosControlBlock localNcb;
-    int i;
+    i32 i;
 
     for (i = 0; i < NETBIOS_SESSION_COUNT; i++)
         nb_close_session(i);
@@ -195,18 +195,18 @@ extern "C" void __fastcall nb_term(void)
 }
 
 VA(0x004a70d3, 0xb3)
-extern "C" unsigned short __fastcall nb_rcv(short session, void *buf)
+extern "C" u16 __fastcall nb_rcv(i16 session, void *buf)
 {
-    DATA(0x005174bc) static short gNbReceiveSourceLineBase = NETWIN_SOURCE_LINE_RECEIVE_BASE;
+    DATA(0x005174bc) static i16 gNbReceiveSourceLineBase = NETWIN_SOURCE_LINE_RECEIVE_BASE;
     tag_Node *node;
-    int len;
+    i32 len;
 
     EnterCriticalSection(&gNbRcvLock);
     node = pop_node(&gNbRcvQueue);
     LeaveCriticalSection(&gNbRcvLock);
     if (node) {
         if (node->len >= session)
-            len = static_cast<unsigned short>(session);
+            len = static_cast<u16>(session);
         else
             len = node->len;
         memcpy(buf, node->data, len);
@@ -219,9 +219,9 @@ extern "C" unsigned short __fastcall nb_rcv(short session, void *buf)
 }
 
 VA(0x004a7186, 0xe4)
-extern "C" unsigned short __fastcall nb_snd(short session, short len, void *data)
+extern "C" u16 __fastcall nb_snd(i16 session, i16 len, void *data)
 {
-    DATA(0x005174ec) static short gNbSendSourceLineBase = NETWIN_SOURCE_LINE_SEND_BASE;
+    DATA(0x005174ec) static i16 gNbSendSourceLineBase = NETWIN_SOURCE_LINE_SEND_BASE;
     tag_Node *node;
 
     if (gNbMaxSess == session && len == 0) {
@@ -236,7 +236,7 @@ extern "C" unsigned short __fastcall nb_snd(short session, short len, void *data
         gNbSendSourceLineBase +
             (NETWIN_SOURCE_LINE_SEND_ALLOC - NETWIN_SOURCE_LINE_SEND_BASE)));
     node->len = len;
-    node->sessionIndex = static_cast<unsigned char>(session);
+    node->sessionIndex = static_cast<u8>(session);
     memcpy(node->data, data, len);
     EnterCriticalSection(&gNbSndLock);
     add_node(&gNbSndQueue, node);
@@ -249,14 +249,14 @@ extern "C" unsigned short __fastcall nb_snd(short session, short len, void *data
 // reloc-masked: all 0x4cd bytes match; 99.84% is delinked jump-table
 // local-label identity only; external relocations agree.
 VA(0x004a726a, 0x4cd)
-extern "C" unsigned short __cdecl nb_sess(short operation, ...)
+extern "C" u16 __cdecl nb_sess(i16 operation, ...)
 {
-    int oldSession;
-    int destinationSession;
-    int detachFlag;
+    i32 oldSession;
+    i32 destinationSession;
+    i32 detachFlag;
     NetbiosControlBlock controlBlock;
     char *callName;
-    short returnCode;
+    i16 returnCode;
     va_list argList;
 
     va_start(argList, operation);
@@ -277,7 +277,7 @@ extern "C" unsigned short __cdecl nb_sess(short operation, ...)
         break;
 
     case NETBIOS_SESSION_RECEIVE_ANY: {
-        destinationSession = va_arg(argList, int);
+        destinationSession = va_arg(argList, i32);
         if (gNbSessNcb[destinationSession].commandComplete == NETBIOS_RESULT_PENDING) {
             switch (gNbSessNcb[destinationSession].command & ~NETBIOS_COMMAND_ASYNC) {
             case NETBIOS_COMMAND_CALL:
@@ -297,31 +297,31 @@ extern "C" unsigned short __cdecl nb_sess(short operation, ...)
     }
 
     case NETBIOS_SESSION_CALL:
-        destinationSession = va_arg(argList, int);
+        destinationSession = va_arg(argList, i32);
         callName = va_arg(argList, char *);
         nb_format_name(callName, gNbNameBuf[destinationSession].bytes);
         returnCode = nb_call(destinationSession, gNbNameBuf[destinationSession].bytes);
         break;
 
     case NETBIOS_SESSION_LISTEN_ANY:
-        destinationSession = va_arg(argList, int);
+        destinationSession = va_arg(argList, i32);
         nb_snd(gNbMaxSess, 0, 0);
         returnCode = nb_listen(destinationSession, gNbListenName);
         break;
 
     case NETBIOS_SESSION_LISTEN:
-        destinationSession = va_arg(argList, int);
+        destinationSession = va_arg(argList, i32);
         callName = va_arg(argList, char *);
         nb_format_name(callName, gNbNameBuf[destinationSession].bytes);
         returnCode = nb_listen(destinationSession, gNbNameBuf[destinationSession].bytes);
         break;
 
     case NETBIOS_SESSION_MOVE:
-        oldSession = va_arg(argList, int);
-        destinationSession = va_arg(argList, int);
-        detachFlag = va_arg(argList, int);
+        oldSession = va_arg(argList, i32);
+        destinationSession = va_arg(argList, i32);
+        detachFlag = va_arg(argList, i32);
         if (gNbMaxSess == oldSession)
-            gNbMaxSess = static_cast<unsigned char>(destinationSession);
+            gNbMaxSess = static_cast<u8>(destinationSession);
         if (gNbSessLsn[oldSession] == NETBIOS_INVALID_ID)
             return 0;
         gNbSessLsn[destinationSession] = gNbSessLsn[oldSession];
@@ -338,7 +338,7 @@ extern "C" unsigned short __cdecl nb_sess(short operation, ...)
         break;
 
     case NETBIOS_SESSION_CLOSE:
-        destinationSession = va_arg(argList, int);
+        destinationSession = va_arg(argList, i32);
         if (gNbSessNcb[destinationSession].commandComplete == NETBIOS_RESULT_PENDING) {
             memset(&controlBlock, 0, sizeof(controlBlock));
             controlBlock.command = NETBIOS_COMMAND_CANCEL;
@@ -351,13 +351,13 @@ extern "C" unsigned short __cdecl nb_sess(short operation, ...)
         break;
 
     case NETBIOS_SESSION_CLEAR_CONNECTED:
-        destinationSession = va_arg(argList, int);
+        destinationSession = va_arg(argList, i32);
         gNetStatus[destinationSession] &= ~NETBIOS_SESSION_CONNECTED;
         returnCode = 0;
         break;
 
     case NETBIOS_SESSION_GET_NAME:
-        destinationSession = va_arg(argList, int);
+        destinationSession = va_arg(argList, i32);
         callName = va_arg(argList, char *);
         memcpy(callName, gNbNameBuf[destinationSession].bytes, NETBIOS_NAME_SIZE);
         returnCode = 0;
@@ -372,7 +372,7 @@ extern "C" unsigned short __cdecl nb_sess(short operation, ...)
 }
 
 VA(0x004a7737, 0x21)
-extern "C" char __fastcall nb_stat(short session) { return gNetStatus[session]; }
+extern "C" char __fastcall nb_stat(i16 session) { return gNetStatus[session]; }
 
 // nb_thr_ctl — the receiver-thread pump: drain completed per-session receives into the rcv queue,
 // then drain the send/free queues, issuing a synchronous NCBSEND for each queued packet.
@@ -386,13 +386,13 @@ extern "C" char __fastcall nb_stat(short session) { return gNetStatus[session]; 
 VA(0x004a7758, 0xdd2)
 void nb_thr_ctl(void)
 {
-    DATA(0x0051751c) static short gNbThreadSourceLineBase = NETWIN_SOURCE_LINE_THREAD_BASE;
-    int keepRunning;
-    int i;
+    DATA(0x0051751c) static i16 gNbThreadSourceLineBase = NETWIN_SOURCE_LINE_THREAD_BASE;
+    i32 keepRunning;
+    i32 i;
     tag_Node *node;
     NetbiosControlBlock localNcb;
-    unsigned char rc;
-    int sendComplete;
+    u8 rc;
+    i32 sendComplete;
 
     keepRunning = 1;
     if (WaitForMultipleObjects(NETBIOS_THREAD_EVENT_COUNT,
@@ -492,8 +492,8 @@ static void nb_add_name(void)
 VA(0x004a7a81, 0x1ca)
 static void __stdcall nb_add_name_done(NetbiosControlBlock *ncb)
 {
-    DATA(0x00517578) static short gNbAddNameSourceLineBase = NETWIN_SOURCE_LINE_ADD_NAME_BASE;
-    int j;
+    DATA(0x00517578) static i16 gNbAddNameSourceLineBase = NETWIN_SOURCE_LINE_ADD_NAME_BASE;
+    i32 j;
     ProcessAssert(&gNbSessNcb[gNbMaxSess] == ncb,
                   "I:\\Projects\\Heroes\\Prog\\SOURCE\\netwin.cpp",
                   gNbAddNameSourceLineBase +
@@ -529,7 +529,7 @@ static void __stdcall nb_add_name_done(NetbiosControlBlock *ncb)
 }
 
 VA(0x004a7c4b, 0xbe)
-static unsigned short __fastcall nb_recv_any(int session)
+static u16 __fastcall nb_recv_any(i32 session)
 {
     if (gNbSessNcb[session].commandComplete != NETBIOS_RESULT_PENDING) {
         memset(&gNbSessNcb[session], 0, sizeof(NetbiosControlBlock));
@@ -547,7 +547,7 @@ static unsigned short __fastcall nb_recv_any(int session)
 VA(0x004a7d09, 0x142)
 static void __stdcall nb_recv_any_done(NetbiosControlBlock *ncb)
 {
-    int i;
+    i32 i;
     for (i = 0; i < NETBIOS_SESSION_COUNT; i++) {
         if (&gNbSessNcb[i] == ncb)
             break;
@@ -573,7 +573,7 @@ static void __stdcall nb_recv_any_done(NetbiosControlBlock *ncb)
 }
 
 VA(0x004a7e4b, 0xcf)
-static unsigned short __fastcall nb_call(int session, void *name)
+static u16 __fastcall nb_call(i32 session, void *name)
 {
     memset(&gNbSessNcb[session], 0, sizeof(NetbiosControlBlock));
     memcpy(gNbSessNcb[session].callName, name, NETBIOS_NAME_SIZE);
@@ -588,7 +588,7 @@ static unsigned short __fastcall nb_call(int session, void *name)
 }
 
 VA(0x004a7f1a, 0xcf)
-static unsigned short __fastcall nb_listen(int session, void *name)
+static u16 __fastcall nb_listen(i32 session, void *name)
 {
     memset(&gNbSessNcb[session], 0, sizeof(NetbiosControlBlock));
     memcpy(gNbSessNcb[session].callName, name, NETBIOS_NAME_SIZE);
@@ -606,7 +606,7 @@ static unsigned short __fastcall nb_listen(int session, void *name)
 VA(0x004a7fe9, 0x126)
 static void __stdcall nb_call_done(NetbiosControlBlock *ncb)
 {
-    int i;
+    i32 i;
     for (i = 0; i < NETBIOS_SESSION_COUNT; i++) {
         if (&gNbSessNcb[i] == ncb)
             break;
@@ -636,10 +636,10 @@ static void __stdcall nb_call_done(NetbiosControlBlock *ncb)
 }
 
 VA(0x004a8119, 0x13b)
-static void __fastcall nb_arm_recv(int session)
+static void __fastcall nb_arm_recv(i32 session)
 {
-    DATA(0x005175c0) static short gNbArmReceiveSourceLineBase = NETWIN_SOURCE_LINE_ARM_RECEIVE_BASE;
-    unsigned char result;
+    DATA(0x005175c0) static i16 gNbArmReceiveSourceLineBase = NETWIN_SOURCE_LINE_ARM_RECEIVE_BASE;
+    u8 result;
     for (;;) {
         ProcessAssert(gNbSessNcb[session].returnCode != NETBIOS_RESULT_PENDING,
                       "I:\\Projects\\Heroes\\Prog\\SOURCE\\netwin.cpp",
@@ -671,7 +671,7 @@ static void __fastcall nb_arm_recv(int session)
 }
 
 VA(0x004a8268, 0xc2)
-static void __fastcall nb_close_session(int session)
+static void __fastcall nb_close_session(i32 session)
 {
     NetbiosControlBlock controlBlock;
     if (gNbSessNcb[session].commandComplete == NETBIOS_RESULT_PENDING) {
@@ -699,9 +699,9 @@ static void __fastcall nb_close_session(int session)
 // gNbSessNcb.returnCode/length and fixed IAT operands for Enter/LeaveCriticalSection;
 // base retains the owner-relative field addends and two corresponding COFF relocs.
 VA(0x004a832a, 0x179)
-static void __fastcall nb_recv_complete(int session)
+static void __fastcall nb_recv_complete(i32 session)
 {
-    DATA(0x005175f0) static short gNbReceiveCompleteSourceLineBase = NETWIN_SOURCE_LINE_RECEIVE_COMPLETE_BASE;
+    DATA(0x005175f0) static i16 gNbReceiveCompleteSourceLineBase = NETWIN_SOURCE_LINE_RECEIVE_COMPLETE_BASE;
     tag_Node *node;
     switch (gNbSessNcb[session].command & ~NETBIOS_COMMAND_ASYNC) {
     case NETBIOS_COMMAND_RECEIVE:
@@ -715,7 +715,7 @@ static void __fastcall nb_recv_complete(int session)
                      NETWIN_SOURCE_LINE_RECEIVE_COMPLETE_BASE)));
             if (node != 0) {
                 node->len = gNbSessNcb[session].length;
-                node->sessionIndex = static_cast<unsigned char>(session);
+                node->sessionIndex = static_cast<u8>(session);
                 memcpy(node->data, gNbRcvData[session].bytes, node->len);
                 EnterCriticalSection(&gNbRcvLock);
                 add_node(&gNbRcvQueue, node);
@@ -736,9 +736,9 @@ static void __fastcall nb_recv_complete(int session)
 }
 
 VA(0x004a84a3, 0x87)
-static void __fastcall nb_format_name(char *src, unsigned char *dst)
+static void __fastcall nb_format_name(char *src, u8 *dst)
 {
-    unsigned int i;
+    u32 i;
     memset(dst, 0, NETBIOS_NAME_SIZE);
     for (i = 0; i < NETBIOS_NAME_SIZE - 1 && *src != '\0'; i++, src++)
         dst[i] = *src;

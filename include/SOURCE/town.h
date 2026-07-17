@@ -83,49 +83,49 @@ public:
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     char   m_id;  // +0x00
     char   m_owner;  // +0x01
-    signed char m_threat;  // +0x02
+    i8 m_threat;  // +0x02
     char   m_type;  // +0x03
-    unsigned char m_x;  // +0x04
-    unsigned char m_y;  // +0x05
-    unsigned char m_boatX;  // +0x06
-    unsigned char m_boatY;  // +0x07
+    u8 m_x;  // +0x04
+    u8 m_y;  // +0x05
+    u8 m_boatX;  // +0x06
+    u8 m_boatY;  // +0x07
     armyGroup m_army;  // +0x08
     char   m_occupyingHeroId;  // +0x17
-    unsigned long m_buildings;  // +0x18
-    signed char m_buildState;  // +0x1c
+    u32l m_buildings;  // +0x18
+    i8 m_buildState;  // +0x1c
     char m_unknown1d;  // +0x1d
-    short m_garrison[12];  // +0x1e
-    unsigned char m_onMap;  // +0x36
-    signed char m_unknown37;  // +0x37
-    signed char m_formation;  // +0x38
-    signed char m_originalOwner;  // +0x39
-    unsigned short m_extraIndex;  // +0x3a
+    i16 m_garrison[12];  // +0x1e
+    u8 m_onMap;  // +0x36
+    i8 m_unknown37;  // +0x37
+    i8 m_formation;  // +0x38
+    i8 m_originalOwner;  // +0x39
+    u16 m_extraIndex;  // +0x3a
     union {
-        signed char m_spells[TOWN_MAGE_GUILD_LEVEL_COUNT][TOWN_MAGE_GUILD_SPELLS_PER_LEVEL];  // +0x3c
-        signed char m_spellSlots[TOWN_MAGE_GUILD_LEVEL_COUNT * TOWN_MAGE_GUILD_SPELLS_PER_LEVEL];
+        i8 m_spells[TOWN_MAGE_GUILD_LEVEL_COUNT][TOWN_MAGE_GUILD_SPELLS_PER_LEVEL];  // +0x3c
+        i8 m_spellSlots[TOWN_MAGE_GUILD_LEVEL_COUNT * TOWN_MAGE_GUILD_SPELLS_PER_LEVEL];
         struct {
             char m_spellPad[19];
-            signed char m_spellCounts[6];
+            i8 m_spellCounts[6];
         };
     };
-    unsigned short m_turnsOwned;  // +0x55
+    u16 m_turnsOwned;  // +0x55
     char m_name[13];  // +0x57
     // Packed retail stride is 0x64 bytes.
     // --- constructors ---
     town(void);
     // --- methods ---
-    int HasGarrison(void);
+    i32 HasGarrison(void);
     void GiveSpells(class hero *);
     void XformToCastle(void);
-    void View(int);
+    void View(i32);
     void Deallocate(void);
-    void BuildBuilding(int);
-    int CanBuildDock(void);
-    void CalcNumLevelArchers(int *, int *);
+    void BuildBuilding(i32);
+    i32 CanBuildDock(void);
+    void CalcNumLevelArchers(i32 *, i32 *);
 };
 #pragma pack(pop)
 SIZE(town, 100);
 // ---- globals (declarations, RVA order) ----
-extern int bEnteringTown;
+extern i32 bEnteringTown;
 
 #endif // HOMM2_SOURCE_TOWN_H

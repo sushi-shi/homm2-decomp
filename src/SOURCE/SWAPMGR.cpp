@@ -54,7 +54,7 @@ void swapManager::Reset(void)
 }
 
 VA(0x004544d2, 0x30)
-int swapManager::DrawSwapWin(void)
+i32 swapManager::DrawSwapWin(void)
 {
     m_window->DrawWindow(0);
     gpWindowManager->UpdateScreen();
@@ -62,7 +62,7 @@ int swapManager::DrawSwapWin(void)
 }
 
 VA(0x00454502, 0x3bc)
-int swapManager::Open(int id)
+i32 swapManager::Open(i32 id)
 {
     Reset();
     m_window = new heroWindow(0, 0, "swapwin.bin");
@@ -90,8 +90,8 @@ int swapManager::Open(int id)
     message.payload.widget.id = SWAP_TITLE_WIDGET;
     m_window->BroadcastMessage(message);
 
-    for (int side_6 = SWAP_SIDE_LEFT; side_6 < SWAP_SIDE_COUNT; ++side_6) {
-        for (int skillSlot = 0; skillSlot < SWAP_SECONDARY_SKILL_WIDGET_COUNT;
+    for (i32 side_6 = SWAP_SIDE_LEFT; side_6 < SWAP_SIDE_COUNT; ++side_6) {
+        for (i32 skillSlot = 0; skillSlot < SWAP_SECONDARY_SKILL_WIDGET_COUNT;
              ++skillSlot) {
             if (skillSlot < m_heroes[side_6]->m_secondarySkillCount) {
                 message.payload.widget.command = SWAP_MESSAGE_SET_ICON;
@@ -178,16 +178,16 @@ VA(0x004549eb, 0x1f8)
 void swapManager::DrawSelector(void)
 {
     const char selectorFrame_17 = 10;
-    const short leftArmyX_37 = 37;
-    const short rightArmyX_12 = 382;
-    const short armyY_19 = 268;
-    const short armySpacing_16 = 45;
-    const short leftArtifactX_1 = 24;
-    const short rightArtifactX_6 = 368;
-    const short artifactY_7 = 348;
-    const short artifactSpacing_11 = 36;
-    int selectorX_2 = 0;
-    int selectorY_11 = 0;
+    const i16 leftArmyX_37 = 37;
+    const i16 rightArmyX_12 = 382;
+    const i16 armyY_19 = 268;
+    const i16 armySpacing_16 = 45;
+    const i16 leftArtifactX_1 = 24;
+    const i16 rightArtifactX_6 = 368;
+    const i16 artifactY_7 = 348;
+    const i16 artifactSpacing_11 = 36;
+    i32 selectorX_2 = 0;
+    i32 selectorY_11 = 0;
 
     if (m_selectedSide != SWAP_SIDE_NONE && m_selectedSlot != SWAP_SLOT_NONE) {
         switch (m_selectedSide) {
@@ -251,14 +251,14 @@ void swapManager::DrawSelector(void)
 // bounded TU-state trials also failed to close the residual. Revisit after an
 // earlier SWAPMGR/header change or new evidence for case-exit lowering.
 VA(0x00454be3, 0xaf0)
-int swapManager::Main(tag_message &message)
+i32 swapManager::Main(tag_message &message)
 {
-    int closeRequested_5 = 0;
-    int quickView = (message.payload.widget.parameter & SWAP_QUICK_VIEW_MODIFIER) != 0;
-    int side;
-    int slotIndex_8;
-    int artifactSlot_2;
-    int secondarySkill_1;
+    i32 closeRequested_5 = 0;
+    i32 quickView = (message.payload.widget.parameter & SWAP_QUICK_VIEW_MODIFIER) != 0;
+    i32 side;
+    i32 slotIndex_8;
+    i32 artifactSlot_2;
+    i32 secondarySkill_1;
 
     switch (message.type) {
     case SWAP_MESSAGE_REDRAW:
@@ -642,16 +642,16 @@ void swapManager::ViewMon(void)
 VA(0x00455776, 0x255)
 void swapManager::SwapArtifacts(void)
 {
-    int selectedArtifact =
+    i32 selectedArtifact =
         m_heroes[m_selectedSide]->m_artifacts[m_selectedSlot];
-    int targetArtifact_2 = m_heroes[m_targetSide]->m_artifacts[m_targetSlot];
+    i32 targetArtifact_2 = m_heroes[m_targetSide]->m_artifacts[m_targetSlot];
 
     GiveTakeArtifactStat(m_heroes[m_selectedSide], selectedArtifact, 1);
     GiveTakeArtifactStat(m_heroes[m_targetSide], targetArtifact_2, 1);
     m_heroes[m_selectedSide]->m_artifacts[m_selectedSlot] = targetArtifact_2;
     m_heroes[m_targetSide]->m_artifacts[m_targetSlot] = selectedArtifact;
 
-    signed char extra =
+    i8 extra =
         m_heroes[m_selectedSide]->m_artifactExtra[m_selectedSlot];
     m_heroes[m_selectedSide]->m_artifactExtra[m_selectedSlot] =
         m_heroes[m_targetSide]->m_artifactExtra[m_targetSlot];
@@ -666,8 +666,8 @@ void swapManager::SwapArtifacts(void)
         targetArtifact_2 == SWAP_ARTIFACT_SKILL_BONUS) {
         tag_message message_1;
         message_1.type = SWAP_MESSAGE_WIDGET;
-        for (int side = SWAP_SIDE_LEFT; side < SWAP_SIDE_COUNT; ++side) {
-            for (int skillSlot = 0;
+        for (i32 side = SWAP_SIDE_LEFT; side < SWAP_SIDE_COUNT; ++side) {
+            for (i32 skillSlot = 0;
                  skillSlot < SWAP_SECONDARY_SKILL_WIDGET_COUNT; ++skillSlot) {
                 if (skillSlot < m_heroes[side]->m_secondarySkillCount) {
                     message_1.payload.widget.command = SWAP_MESSAGE_SET_TEXT;
@@ -687,8 +687,8 @@ void swapManager::SwapArtifacts(void)
 VA(0x004559cb, 0x177)
 void swapManager::SwapMons(void)
 {
-    int selectedArmyCount = 0;
-    for (int slot_1 = 0; slot_1 < ARMY_GROUP_SLOT_COUNT; ++slot_1) {
+    i32 selectedArmyCount = 0;
+    for (i32 slot_1 = 0; slot_1 < ARMY_GROUP_SLOT_COUNT; ++slot_1) {
         if (m_heroes[m_selectedSide]->m_army.m_creatureTypes[slot_1] !=
                 SWAP_CREATURE_NONE &&
             m_heroes[m_selectedSide]->m_army.m_creatureCounts[slot_1] > 0)
@@ -717,7 +717,7 @@ void swapManager::SwapMons(void)
 VA(0x00455b42, 0x47b)
 void swapManager::Update(void)
 {
-    int slot;
+    i32 slot;
     tag_message message_1;
     message_1.type = SWAP_MESSAGE_WIDGET;
     message_1.payload.widget.command = SWAP_MESSAGE_SET_TEXT;
@@ -838,13 +838,13 @@ void swapManager::Update(void)
 VA(0x00455fbd, 0x388)
 void swapManager::SplitMons(void)
 {
-    short unusedAmountControl_29 = SWAP_SPLIT_AMOUNT_CONTROL;
-    int unusedState = 0;
+    i16 unusedAmountControl_29 = SWAP_SPLIT_AMOUNT_CONTROL;
+    i32 unusedState = 0;
     armyGroup *selectedArmy = &m_heroes[m_selectedSide]->m_army;
     armyGroup *targetArmy = &m_heroes[m_targetSide]->m_army;
-    int emptySlot;
+    i32 emptySlot;
     unusedState = 0;
-    short unusedTextControl_2 = SWAP_SPLIT_TEXT_CONTROL;
+    i16 unusedTextControl_2 = SWAP_SPLIT_TEXT_CONTROL;
 
     gpTownManager->m_heroWindow1 =
         new heroWindow(SWAP_SPLIT_WINDOW_X, SWAP_SPLIT_WINDOW_Y,

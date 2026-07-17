@@ -20,7 +20,7 @@
 #include <BASE/message.h>
 
 VA(0x004bf340, 0x165)
-void DoTradingPost(int isMarketplace, float efficiency) {
+void DoTradingPost(i32 isMarketplace, float efficiency) {
     tag_message messageTemp;
 
     bIsMarketPlace = isMarketplace;
@@ -57,15 +57,15 @@ void DoTradingPost(int isMarketplace, float efficiency) {
 // commutative/relational AST variants did not improve the raw match. Revisit after TU-state
 // changes or a new structural discovery.
 VA(0x004bf4a5, 0x596)
-void UpdateTradingPost(int draw) {
+void UpdateTradingPost(i32 draw) {
     tag_message messageTemp;
-    int ratioLocal;
-    int maxTradeField;
-    int leftDenominatedLocal;
-    int offeredValue;
-    int requestedValue;
-    int sideCurrent;
-    int resource;
+    i32 ratioLocal;
+    i32 maxTradeField;
+    i32 leftDenominatedLocal;
+    i32 offeredValue;
+    i32 requestedValue;
+    i32 sideCurrent;
+    i32 resource;
 
     messageTemp.type = MESSAGE_WIDGET;
     if (leftResource != -1 && rightResource != -1 &&
@@ -187,7 +187,7 @@ void UpdateTradingPost(int draw) {
         }
     }
     if (iMaxUnitsToTrade != 0)
-        tradeKnob->m_x = static_cast<short>(
+        tradeKnob->m_x = static_cast<i16>(
             qtyToTrade * TRADING_POST_KNOB_TRAVEL / iMaxUnitsToTrade +
             TRADING_POST_KNOB_X);
     else
@@ -199,20 +199,20 @@ void UpdateTradingPost(int draw) {
 }
 
 VA(0x004bfa3b, 0xfe)
-void ComputeTradeRatios(int sourceResource, int destinationResource, int *ratio,
-                        int *leftDenominated, int *maxTrade) {
+void ComputeTradeRatios(i32 sourceResource, i32 destinationResource, i32 *ratio,
+                        i32 *leftDenominated, i32 *maxTrade) {
     float sourceValueLocal = coreRatio[sourceResource] * fTradingPostEfficiency;
     float destinationValueValue =
-        static_cast<unsigned int>(coreRatio[destinationResource]);
+        static_cast<u32>(coreRatio[destinationResource]);
     float tradeRatio = destinationValueValue / sourceValueLocal;
 
     if (tradeRatio >= 1.0f) {
         *leftDenominated = 0;
-        *ratio = static_cast<int>(tradeRatio + 0.999);
+        *ratio = static_cast<i32>(tradeRatio + 0.999);
         *maxTrade = gpCurPlayer->m_resources[sourceResource] / *ratio;
     } else {
         *leftDenominated = 1;
-        *ratio = static_cast<int>(1.0f / tradeRatio);
+        *ratio = static_cast<i32>(1.0f / tradeRatio);
         *maxTrade = gpCurPlayer->m_resources[sourceResource];
     }
 }
@@ -227,7 +227,7 @@ void ComputeTradeRatios(int sourceResource, int destinationResource, int *ratio,
 VA(0x004bfb39, 0x148)
 void DoTradeKnob(struct tag_message message) {
     tag_message nextMessage;
-    int knobPosition;
+    i32 knobPosition;
 
     while (message.type != MESSAGE_LEFT_BUTTON_UP &&
            message.type != MESSAGE_RIGHT_BUTTON_UP) {
@@ -274,11 +274,11 @@ void SetupNewTrade(void) {
 // delinker aliases. Direct commuted spellings and ten reviewed depth-one
 // commutative/relational AST variants compiled byte-identically. Revisit after TU-state changes.
 VA(0x004bfcbb, 0x3b6)
-int TradingPostHandler(struct tag_message &message) {
-    int exitFlag = 0;
-    int updateDisplay = 0;
-    int resourceData;
-    int knobPositionValue;
+i32 TradingPostHandler(struct tag_message &message) {
+    i32 exitFlag = 0;
+    i32 updateDisplay = 0;
+    i32 resourceData;
+    i32 knobPositionValue;
 
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
@@ -383,20 +383,20 @@ int TradingPostHandler(struct tag_message &message) {
 }
 
 // ---- globals (definitions, RVA order) ----
-DATA(0x0051d9d0) unsigned short coreRatio[TRADING_POST_RESOURCE_COUNT] = {
+DATA(0x0051d9d0) u16 coreRatio[TRADING_POST_RESOURCE_COUNT] = {
     250, 500, 250, 500, 500, 500, 1
 };
 DATA(0x00533170) class iconWidget *tradeKnob;
-DATA(0x00533174) int qtyToTrade;
-DATA(0x00533178) int leftResource;
-DATA(0x0053317c) int iTradeRatio;
-DATA(0x00533180) int bTradeMade;
+DATA(0x00533174) i32 qtyToTrade;
+DATA(0x00533178) i32 leftResource;
+DATA(0x0053317c) i32 iTradeRatio;
+DATA(0x00533180) i32 bTradeMade;
 DATA(0x00533184) float fTradingPostEfficiency;
-DATA(0x00533188) int tpX;
-DATA(0x0053318c) int tpY;
-DATA(0x00533190) int bIsMarketPlace;
-DATA(0x00533194) int bLeftDenominated;
+DATA(0x00533188) i32 tpX;
+DATA(0x0053318c) i32 tpY;
+DATA(0x00533190) i32 bIsMarketPlace;
+DATA(0x00533194) i32 bLeftDenominated;
 DATA(0x00533198) class heroWindow *tpWindow;
-DATA(0x0053319c) int rightResource;
-DATA(0x005331a0) int iMaxUnitsToTrade;
-DATA(0x005331a4) int maxUnitsToTrade;
+DATA(0x0053319c) i32 rightResource;
+DATA(0x005331a0) i32 iMaxUnitsToTrade;
+DATA(0x005331a4) i32 maxUnitsToTrade;

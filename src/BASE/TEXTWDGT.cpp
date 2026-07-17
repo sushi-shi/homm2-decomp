@@ -57,8 +57,8 @@ textWidget::textWidget(void) : widget(0, 0, 0, 0, 0, 0)
 // VA(0x004d10a0, 0x45) ??_E/??_G textWidget deleting-destructor aliases
 
 VA(0x004d10f0, 0x64)
-textWidget::textWidget(short x, short y, short width, short height, char *text, char *fontName,
-                       short color, short id, short kind, short alignment)
+textWidget::textWidget(i16 x, i16 y, i16 width, i16 height, char *text, char *fontName,
+                       i16 color, i16 id, i16 kind, i16 alignment)
     : widget(x, y, width, height, id, kind)
 {
     font *loadedFont = gpResourceManager->GetFont(fontName);
@@ -77,11 +77,11 @@ void textWidget::Read(void)
     m_y = gpResourceManager->ReadWord();
     m_width = gpResourceManager->ReadWord();
     m_height = gpResourceManager->ReadWord();
-    short len = gpResourceManager->ReadWord();
+    i16 len = gpResourceManager->ReadWord();
     m_text = static_cast<char *>(
         H2_ALLOC(len, gTextWidgetSourceFiles.read, 0x39));
-    gpResourceManager->ReadBlock(reinterpret_cast<signed char *>(m_text), len);
-    gpResourceManager->Read13(reinterpret_cast<signed char *>(resourceName));
+    gpResourceManager->ReadBlock(reinterpret_cast<i8 *>(m_text), len);
+    gpResourceManager->Read13(reinterpret_cast<i8 *>(resourceName));
     gpResourceManager->SavePosition();
     m_font = gpResourceManager->GetFont(resourceName);
     gpResourceManager->RestorePosition();
@@ -109,9 +109,9 @@ textWidget::~textWidget()
 // and resize-allocation at +0x84. Revisit after a real predecessor/header TU-state
 // change.
 VA(0x004d1280, 0x210)
-int textWidget::Main(tag_message &msg)
+i32 textWidget::Main(tag_message &msg)
 {
-    unsigned short flags = m_flags;
+    u16 flags = m_flags;
     if ((flags & WIDGET_FLAG_ENABLED) == 0) {
         if (msg.type == MESSAGE_WIDGET)
             return widget::Main(msg);
@@ -121,10 +121,10 @@ int textWidget::Main(tag_message &msg)
     switch (msg.type) {
     case MESSAGE_LEFT_BUTTON_DOWN:
     case MESSAGE_RIGHT_BUTTON_DOWN: {
-        short relativeX = static_cast<short>(msg.payload.mouse.x) -
-                          static_cast<short>(m_owner->m_posX);
-        short relativeY = static_cast<short>(msg.payload.mouse.y) -
-                          static_cast<short>(m_owner->m_posY);
+        i16 relativeX = static_cast<i16>(msg.payload.mouse.x) -
+                          static_cast<i16>(m_owner->m_posX);
+        i16 relativeY = static_cast<i16>(msg.payload.mouse.y) -
+                          static_cast<i16>(m_owner->m_posY);
         if (relativeX < m_x || relativeY < m_y ||
             relativeX >= m_x + m_width || relativeY >= m_y + m_height)
             return 0;
@@ -161,7 +161,7 @@ int textWidget::Main(tag_message &msg)
                 m_text = newText;
                 return 1;
             }
-            unsigned short newLen = strlen(newText);
+            u16 newLen = strlen(newText);
             if (strlen(m_text) < newLen) {
                 H2_FREE(m_text, gTextWidgetSourceFiles.resizeFree, 0xd3);
                 m_text = static_cast<char *>(H2_ALLOC(
@@ -192,7 +192,7 @@ normalEvent:
 VA(0x004d1490, 0x49)
 void textWidget::Draw(void)
 {
-    int color = 3;
+    i32 color = 3;
     if ((m_flags & WIDGET_FLAG_DIMMED) == 0)
         color = m_color;
     m_font->DrawBoundedString(m_text, m_x + m_owner->m_posX,
@@ -201,7 +201,7 @@ void textWidget::Draw(void)
 }
 
 VA(0x004d14e0, 0xc)
-void textWidget::SetColorIndex(short int color)
+void textWidget::SetColorIndex(i16 color)
 {
     m_color = color;
 }
@@ -214,7 +214,7 @@ void textWidget::SetText(char *text)
         m_text = text;
         return;
     }
-    unsigned short newLen = strlen(text);
+    u16 newLen = strlen(text);
     if (strlen(m_text) < newLen) {
         H2_FREE(m_text, gTextWidgetSourceFiles.resizeFree, 0xd3);
         m_text = static_cast<char *>(H2_ALLOC(

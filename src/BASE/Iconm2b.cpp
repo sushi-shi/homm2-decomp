@@ -13,15 +13,15 @@
 #include <BASE/IconMonoRle.h>
 #include <string.h>
 // Per-call decoder scratch — its own 0x534bcc+ file-static block.
-DATA(0x00534bcc) static int gMonoClipR;
-DATA(0x00534bd0) static unsigned char *gMonoRow;
+DATA(0x00534bcc) static i32 gMonoClipR;
+DATA(0x00534bd0) static u8 *gMonoRow;
 DATA(0x00534bd4) static IconEntry *gMonoEntry;
-DATA(0x00534bd8) static unsigned char *gMonoSrc;
-DATA(0x00534bdc) static int gMonoX0;
-DATA(0x00534be0) static unsigned int gMonoRun;
-DATA(0x00534be4) static int gMonoY;
-DATA(0x00534be8) static int gMonoClipB;
-DATA(0x00534bec) static int gMonoX;
+DATA(0x00534bd8) static u8 *gMonoSrc;
+DATA(0x00534bdc) static i32 gMonoX0;
+DATA(0x00534be0) static u32 gMonoRun;
+DATA(0x00534be4) static i32 gMonoY;
+DATA(0x00534be8) static i32 gMonoClipB;
+DATA(0x00534bec) static i32 gMonoX;
 
 // @semantic
 // Complete mono-RLE decoder with the selected IconEntry kept as one typed lifetime: entry/source
@@ -67,10 +67,10 @@ DATA(0x00534bec) static int gMonoX;
 // The split command-byte advance/read was an inline-helper trace. Restoring the shared reader raises
 // live matching to 80.09945% while preserving 36/38 relocations; only gMonoX0 and gMonoY are short.
 VA(0x004cfae0, 0x266)
-void MonoIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
-                      int color, int clip, int clipX, int clipY, int clipW, int clipH)
+void MonoIconToBitmap(class icon *srcIcon, class bitmap *dest, i32 x, i32 y, i32 frame,
+                      i32 color, i32 clip, i32 clipX, i32 clipY, i32 clipW, i32 clipH)
 {
-    unsigned char *data = reinterpret_cast<unsigned char *>(srcIcon->m_data);
+    u8 *data = reinterpret_cast<u8 *>(srcIcon->m_data);
     IconEntry *entry = reinterpret_cast<IconEntry *>(data + frame * sizeof(IconEntry));
     gMonoEntry = entry;
     gMonoSrc = data + entry->srcOffset;
@@ -87,15 +87,15 @@ void MonoIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int
             clip = ICON_DRAW_NO_CLIP;
         }
     }
-    short pitch = dest->m_width;
-    unsigned char *row = dest->m_pixels + gMonoY * pitch;
+    i16 pitch = dest->m_width;
+    u8 *row = dest->m_pixels + gMonoY * pitch;
     for (;;) {
-        int cmd = ReadIconRleByte(gMonoSrc);
-        if (static_cast<signed char>(cmd) < 0) {
+        i32 cmd = ReadIconRleByte(gMonoSrc);
+        if (static_cast<i8>(cmd) < 0) {
             // skip run / end-of-sprite (negative command masks 7 bits)
             gMonoRow = row;
             gMonoRun = cmd;
-            int n = cmd & ICON_RLE_MONO_RUN_MASK;
+            i32 n = cmd & ICON_RLE_MONO_RUN_MASK;
             if (n == ICON_RLE_MONO_END_COUNT)
                 return;
             gMonoX = gMonoX + n;
@@ -107,7 +107,7 @@ void MonoIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int
             if (clip == ICON_DRAW_NO_CLIP) {
                 memset(row + gMonoX, color, cmd);
             } else {
-                int right;
+                i32 right;
                 if (clipY <= gMonoY && gMonoClipB >= gMonoY &&
                     (right = gMonoX + cmd, clipX < right) && gMonoClipR >= gMonoX) {
                     if (clipX <= gMonoX) {

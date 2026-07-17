@@ -1,6 +1,8 @@
 #ifndef HOMM2_BASE_WIDGET_KIND_H
 #define HOMM2_BASE_WIDGET_KIND_H
 
+#include <Ints.h>
+
 #include <EnumTypes.h>
 
 // Known serialized values only. The domain remains open-ended, and widget stores
@@ -20,14 +22,14 @@ HOMM2_ENUM_BEGIN(WidgetKind)
 HOMM2_ENUM_END(WidgetKind)
 
 #ifdef HOMM2_STRICT_ENUM_TYPES
-inline WidgetKind DecodeWidgetKind(short value)
+inline WidgetKind DecodeWidgetKind(i16 value)
 {
     return static_cast<WidgetKind>(value);
 }
 
-inline short EncodeWidgetKind(WidgetKind value)
+inline i16 EncodeWidgetKind(WidgetKind value)
 {
-    return static_cast<short>(value);
+    return static_cast<i16>(value);
 }
 #else
 #define DecodeWidgetKind(value) (value)

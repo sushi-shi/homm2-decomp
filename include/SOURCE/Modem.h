@@ -4,21 +4,21 @@
 // Declarations of the free functions DEFINED in Modem.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
 
-void ModemSetup(int);
-long int Dial(void);
-long int Wait(void);
+void ModemSetup(i32);
+i32l Dial(void);
+i32l Wait(void);
 void GUIModemCommand(char *, char *);
-signed char GUIModemCommandExec(void);
+i8 GUIModemCommandExec(void);
 void ModemCommand(char *);
-signed char GUIModemResponse(char *, char *);
-signed char GUIModemResponseExec(void);
-int write_buffer(char *, int);
-int read_byte(void);
-void write_byte(int);
+i8 GUIModemResponse(char *, char *);
+i8 GUIModemResponseExec(void);
+i32 write_buffer(char *, i32);
+i32 read_byte(void);
+void write_byte(i32);
 void Connect(void);
-int WaitForDirectConnect(void);
+i32 WaitForDirectConnect(void);
 char ReadPacket(void);
-void WriteModemPacket(char *, int);
+void WriteModemPacket(char *, i32);
 
 typedef enum ModemConstant {
     MODEM_MODE_DIAL = 3,
@@ -52,40 +52,40 @@ typedef enum ModemConstant {
 } ModemConstant;
 
 struct inque_t {
-    int readPosition;
-    int writePosition;
+    i32 readPosition;
+    i32 writePosition;
     char data[MODEM_QUEUE_INPUT_SIZE];
 };
 
 struct outque_t {
-    int readPosition;
-    int writePosition;
+    i32 readPosition;
+    i32 writePosition;
     char data[MODEM_QUEUE_OUTPUT_SIZE];
 };
 SIZE(inque_t, 0x1008);
 SIZE(outque_t, 0x808);
 
 // ---- globals (declarations, RVA order) ----
-extern int iBaudBits;
-extern int inescape;
-extern int newpacket;
-extern int packetlen;
+extern i32 iBaudBits;
+extern i32 inescape;
+extern i32 newpacket;
+extern i32 packetlen;
 extern char idstr[MODEM_ID_SIZE];
-extern int GUIMRc;
-extern int iModemCommandPos;
-extern int GUIMRrespptr;
-extern int localstage;
+extern i32 GUIMRc;
+extern i32 iModemCommandPos;
+extern i32 GUIMRrespptr;
+extern i32 localstage;
 extern char numbuf[MODEM_NUMBER_BUFFER_SIZE];
-extern int WFDCStage;
+extern i32 WFDCStage;
 extern char remoteidstr[MODEM_ID_SIZE];
-extern int stime;
+extern i32 stime;
 extern char cModemCommand[MODEM_COMMAND_BUFFER_SIZE];
-extern int iLastDialPos;
-extern int remotestage;
+extern i32 iLastDialPos;
+extern i32 remotestage;
 extern char GUIMRresp[MODEM_RESPONSE_SIZE];
-extern int oldsec;
+extern i32 oldsec;
 extern inque_t inque;
-extern int iLastActionTime;
+extern i32 iLastActionTime;
 extern char GUIMRresponse[MODEM_RESPONSE_SIZE];
 extern outque_t outque;
 

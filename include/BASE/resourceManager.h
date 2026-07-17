@@ -18,9 +18,9 @@ struct tag_message;
 
 #pragma pack(push, 1)  // recovered layout is byte-packed
 struct aggEntry {  // one .agg directory record (0xc bytes)
-    unsigned long id;
-    long offset;
-    unsigned long size;
+    u32l id;
+    i32l offset;
+    u32l size;
 };
 
 typedef enum ResourceManagerConstant {
@@ -42,28 +42,28 @@ public:
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (derived: base baseManager = 0x36 bytes at 0x00 via ': public baseManager'; own fields below)
     resource *m_resourceListHead;  // +0x36  resource-list head
-    int    m_numAggregates;  // +0x3a
-    int    m_curAggregate;  // +0x3e
-    int    m_aggregateFd[RESOURCE_MANAGER_AGGREGATE_LIMIT];  // +0x42  per-aggregate file descriptors
+    i32    m_numAggregates;  // +0x3a
+    i32    m_curAggregate;  // +0x3e
+    i32    m_aggregateFd[RESOURCE_MANAGER_AGGREGATE_LIMIT];  // +0x42  per-aggregate file descriptors
     aggEntry *m_aggregateDir[RESOURCE_MANAGER_AGGREGATE_LIMIT];  // +0x4a  per-aggregate directory
-    int    m_aggregateEntryCount[RESOURCE_MANAGER_AGGREGATE_LIMIT];  // +0x52
-    int    m_expunging;  // +0x5a
-    int    m_reserved;  // +0x5e  unreferenced/reserved state
+    i32    m_aggregateEntryCount[RESOURCE_MANAGER_AGGREGATE_LIMIT];  // +0x52
+    i32    m_expunging;  // +0x5a
+    i32    m_reserved;  // +0x5e  unreferenced/reserved state
     char   m_lastFileName[0x3c];  // +0x62
-    int    m_lastFileId;  // +0x9e
+    i32    m_lastFileId;  // +0x9e
     // --- constructors ---
     resourceManager(void);
     // --- virtual methods (vtable order) ---
-    virtual int Open(int) OVERRIDE;
+    virtual i32 Open(i32) OVERRIDE;
     virtual void Close(void) OVERRIDE;
-    virtual int Main(struct tag_message &) OVERRIDE;
+    virtual i32 Main(struct tag_message &) OVERRIDE;
     // --- methods ---
-    void GetBackdrop(char *, class bitmap *, int);
-    void GetBackdropAtLoc(char *, class bitmap *, int, int, int);
+    void GetBackdrop(char *, class bitmap *, i32);
+    void GetBackdropAtLoc(char *, class bitmap *, i32, i32, i32);
     class palette * GetPalette(char *);
     class bitmap * GetBitmap(char *);
     class icon * GetIcon(char *);
-    class icon * GetIcon(unsigned long int);
+    class icon * GetIcon(u32l);
     class tileset * GetTileset(char *);
     class mouse * GetMouse(char *);
     class font * GetFont(char *);
@@ -72,25 +72,25 @@ public:
     void Dispose(class resource *);
     void AddResource(class resource *);
     void Expunge(void);
-    class resource * Query(unsigned long int);
+    class resource * Query(u32l);
     void RemoveResource(class resource *);
-    int LoadAggregateHeader(char *);
-    void PointToFile(unsigned long int);
-    unsigned long int GetFileSize(unsigned long int);
+    i32 LoadAggregateHeader(char *);
+    void PointToFile(u32l);
+    u32l GetFileSize(u32l);
     void SavePosition(void);
     void RestorePosition(void);
-    signed char ReadByte(void);
-    short int ReadWord(void);
-    long int ReadLong(void);
-    unsigned long int MakeId(char *, int);
-    void Read13(signed char *);
-    void ReadBlock(signed char *, unsigned long int);
+    i8 ReadByte(void);
+    i16 ReadWord(void);
+    i32l ReadLong(void);
+    u32l MakeId(char *, i32);
+    void Read13(i8 *);
+    void ReadBlock(i8 *, u32l);
 };
 #pragma pack(pop)
 SIZE(resourceManager, 0xa2);
 // ---- globals (declarations, RVA order) ----
-extern int iSaveCtr;
-extern int lastAggZ[10];
-extern long lastPositionZ[10];
+extern i32 iSaveCtr;
+extern i32 lastAggZ[10];
+extern i32l lastPositionZ[10];
 
 #endif // HOMM2_BASE_RESOURCEMANAGER_H

@@ -141,32 +141,32 @@ public:
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (derived: base baseManager = 0x36 bytes at 0x00 via ': public baseManager'; own fields below)
     tag_message m_eventRing[INPUT_EVENT_RING_CAPACITY];  // +0x36  event ring (64 x 0x1c)
-    int    m_readIndex;  // +0x736
-    int    m_writeIndex;  // +0x73a
-    int    m_mouseMessageActive;  // +0x73e  reentrancy guard shared by mouse event producers
-    int    field_0x742;  // +0x742
-    int    field_0x746;  // +0x746
-    int    field_0x74a;  // +0x74a
-    short  m_keyState[INPUT_SCAN_CODE_CAPACITY];  // +0x74e  scan-code to ASCII/extended-key table
-    int    field_0x84e;  // +0x84e
-    int    field_0x852;  // +0x852
+    i32    m_readIndex;  // +0x736
+    i32    m_writeIndex;  // +0x73a
+    i32    m_mouseMessageActive;  // +0x73e  reentrancy guard shared by mouse event producers
+    i32    field_0x742;  // +0x742
+    i32    field_0x746;  // +0x746
+    i32    field_0x74a;  // +0x74a
+    i16  m_keyState[INPUT_SCAN_CODE_CAPACITY];  // +0x74e  scan-code to ASCII/extended-key table
+    i32    field_0x84e;  // +0x84e
+    i32    field_0x852;  // +0x852
     InputManagerKeyCodeType m_keyCodeType;  // +0x856  zero converts scan codes to ASCII on dequeue
-    int    m_field_0x85a;  // +0x85a
-    int    m_modifiers;  // +0x85e  current keyboard modifier mask
-    int    field_0x862;  // +0x862
-    int    field_0x866;  // +0x866
+    i32    m_field_0x85a;  // +0x85a
+    i32    m_modifiers;  // +0x85e  current keyboard modifier mask
+    i32    field_0x862;  // +0x862
+    i32    field_0x866;  // +0x866
     // --- constructors ---
     inputManager(void);
     // --- virtual methods (vtable order) ---
-    virtual int Open(int) OVERRIDE;
+    virtual i32 Open(i32) OVERRIDE;
     virtual void Close(void) OVERRIDE;
-    virtual int Main(struct tag_message &) OVERRIDE;
+    virtual i32 Main(struct tag_message &) OVERRIDE;
     // --- methods ---
     void Flush(void);
     struct tag_message GetEvent(void);
     struct tag_message PeekEvent(void);
-    void SetMouseCoords(int, int);
-    void SetKeyCodeType(int);
+    void SetMouseCoords(i32, i32);
+    void SetKeyCodeType(i32);
     void AsciiConvert(struct tag_message &);
     void MakeScanCodeTable(void);
     void ForceMouseMove(void);
@@ -174,10 +174,10 @@ public:
 #pragma pack(pop)
 SIZE(inputManager, 0x86a);
 // ---- globals (declarations, RVA order) ----
-extern int iCurSwapPalette;
-extern int bLastMouseOffscreen;
-extern int bLastOnscreenMouseColor;
-extern int bInCheckChangeCursor;
-extern int iLastBWOnScreenCheck;
+extern i32 iCurSwapPalette;
+extern i32 bLastMouseOffscreen;
+extern i32 bLastOnscreenMouseColor;
+extern i32 bInCheckChangeCursor;
+extern i32 iLastBWOnScreenCheck;
 
 #endif // HOMM2_BASE_INPUTMANAGER_H

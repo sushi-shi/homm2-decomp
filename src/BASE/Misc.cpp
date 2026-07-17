@@ -34,23 +34,23 @@
 #include <BASE/palette.h>
 #include <SOURCE/X_GLOBAL.h>
 
-DATA(0x005331c0) static int giFindMid;
+DATA(0x005331c0) static i32 giFindMid;
 
 
 
 
 // ---- module-private synthetic globals (retail xref: single-module) ----
-DATA(0x005331cc) static int gBlitRight;   // BlitBitmapToScreen computed blit-rect right edge
-DATA(0x005331d0) static int gBlitBottom;  // BlitBitmapToScreen computed blit-rect bottom edge
+DATA(0x005331cc) static i32 gBlitRight;   // BlitBitmapToScreen computed blit-rect right edge
+DATA(0x005331d0) static i32 gBlitBottom;  // BlitBitmapToScreen computed blit-rect bottom edge
 
 // ---- initialized storage (retail RVA order) ----
-DATA(0x0051dce8) int iMemEntries = 0;
+DATA(0x0051dce8) i32 iMemEntries = 0;
 DATA(0x0051dcec) MemEntry *gpMemEntry = 0;
-DATA(0x0051dcf0) int giTotalMemAllocated = 0;
-DATA(0x0051dcf8) unsigned char giChangeThreshold[16] = {
+DATA(0x0051dcf0) i32 giTotalMemAllocated = 0;
+DATA(0x0051dcf8) u8 giChangeThreshold[16] = {
     0, 1, 2, 3, 4, 6, 8, 10, 13, 16, 19, 22, 26, 31, 37, 46
 };
-DATA(0x0051dd08) int iLastSeed = 0x08156a03;
+DATA(0x0051dd08) i32 iLastSeed = 0x08156a03;
 DATA(0x0051dd0c) static char gMemEntryTag[sizeof("IME")] = "IME";
 
 // Retail emits each text operand as an independent aligned allocation. Grouping
@@ -266,7 +266,7 @@ void InitMemEntry(void)
 {
     LogInt(gMemEntryTag, iMemEntries, -999, -999, -999, -999, -999, -999);
     gpMemEntry = static_cast<MemEntry *>(malloc(2000 * sizeof(MemEntry)));
-    for (int i = 0; i < 2000; ++i)
+    for (i32 i = 0; i < 2000; ++i)
         gpMemEntry[i].used = 0;
 }
 
@@ -280,7 +280,7 @@ void InitMemEntry(void)
 // `strcat`, strcpy/memcpy-at-strlen, direct word stores, volatile loads, and a manual scan
 // were already tried.  Revisit only after required shared-header/TU state changes.
 VA(0x004c3d70, 0x20f)
-void *BaseAlloc(unsigned int size, char *originalFile, int originalLine)
+void *BaseAlloc(u32 size, char *originalFile, i32 originalLine)
 {
     char text[200];
     char logText[500];
@@ -289,7 +289,7 @@ void *BaseAlloc(unsigned int size, char *originalFile, int originalLine)
     if (gpMemEntry == 0) {
         LogInt(gMemEntryTag, iMemEntries, -999, -999, -999, -999, -999, -999);
         gpMemEntry = static_cast<MemEntry *>(malloc(2000 * sizeof(MemEntry)));
-        for (int initIndex = 0; initIndex < 2000; ++initIndex)
+        for (i32 initIndex = 0; initIndex < 2000; ++initIndex)
             gpMemEntry[initIndex].used = 0;
     }
     giTotalMemAllocated += size;
@@ -299,7 +299,7 @@ void *BaseAlloc(unsigned int size, char *originalFile, int originalLine)
         return 0;
     }
     ++iMemEntries;
-    int entryIndex;
+    i32 entryIndex;
     for (entryIndex = 0; entryIndex < 2000; ++entryIndex) {
         if (!gpMemEntry[entryIndex].used) {
             gpMemEntry[entryIndex].used = 1;
@@ -317,8 +317,8 @@ void *BaseAlloc(unsigned int size, char *originalFile, int originalLine)
             FILE *logFile = fopen(gMiscText.log.appendFilename.text, gMiscText.log.appendMode.text);
             if (logFile != 0) {
                 strcpy(logText, text);
-                *reinterpret_cast<unsigned short *>(logText + strlen(logText)) =
-                    *reinterpret_cast<const unsigned short *>(gMiscText.log.appendNewline.text);
+                *reinterpret_cast<u16 *>(logText + strlen(logText)) =
+                    *reinterpret_cast<const u16 *>(gMiscText.log.appendNewline.text);
                 fputs(logText, logFile);
                 fclose(logFile);
                 if (giDebugLevel == 4)
@@ -338,26 +338,26 @@ void *BaseAlloc(unsigned int size, char *originalFile, int originalLine)
 // tested here; a cached MemEntry reference regressed the loop allocation. Revisit only
 // after exact-preserving predecessor/TU-state changes.
 VA(0x004c3f80, 0x386)
-void BaseFree(void *ptr, char *originalFile, int originalLine)
+void BaseFree(void *ptr, char *originalFile, i32 originalLine)
 {
     char logText[500];
     char text[200];
     if (gpMemEntry == 0) {
         LogInt(gMemEntryTag, iMemEntries, -999, -999, -999, -999, -999, -999);
         gpMemEntry = static_cast<MemEntry *>(malloc(2000 * sizeof(MemEntry)));
-        for (int initIndex = 0; initIndex < 2000; ++initIndex)
+        for (i32 initIndex = 0; initIndex < 2000; ++initIndex)
             gpMemEntry[initIndex].used = 0;
     }
     if (giDebugLevel == 4)
-        LogInt(gMiscText.memory.freeLabel.text, reinterpret_cast<int>(ptr), -999, -999, -999,
+        LogInt(gMiscText.memory.freeLabel.text, reinterpret_cast<i32>(ptr), -999, -999, -999,
                -999, -999, -999);
     if (ptr == 0) {
         if (giDebugLevel >= 2) {
             FILE *logFile = fopen(gMiscText.log.appendFilename.text, gMiscText.log.appendMode.text);
             if (logFile != 0) {
                 strcpy(logText, gMiscText.memory.nullPointer.text);
-                *reinterpret_cast<unsigned short *>(logText + strlen(logText)) =
-                    *reinterpret_cast<const unsigned short *>(gMiscText.log.appendNewline.text);
+                *reinterpret_cast<u16 *>(logText + strlen(logText)) =
+                    *reinterpret_cast<const u16 *>(gMiscText.log.appendNewline.text);
                 fputs(logText, logFile);
                 fclose(logFile);
                 if (giDebugLevel == 4)
@@ -370,7 +370,7 @@ void BaseFree(void *ptr, char *originalFile, int originalLine)
     if (iMemEntries < 0)
         LogInt(gMiscText.memory.entryUnderflow.text, iMemEntries, -999, -999, -999, -999,
                -999, -999);
-    int entryIndex;
+    i32 entryIndex;
     for (entryIndex = 0; entryIndex < 2000; ++entryIndex) {
         if (gpMemEntry[entryIndex].ptr == ptr) {
             if (giDebugLevel == 4) {
@@ -382,8 +382,8 @@ void BaseFree(void *ptr, char *originalFile, int originalLine)
                                           gMiscText.log.appendMode.text);
                     if (logFile != 0) {
                         strcpy(logText, text);
-                        *reinterpret_cast<unsigned short *>(logText + strlen(logText)) =
-                            *reinterpret_cast<const unsigned short *>(
+                        *reinterpret_cast<u16 *>(logText + strlen(logText)) =
+                            *reinterpret_cast<const u16 *>(
                                 gMiscText.log.appendNewline.text);
                         fputs(logText, logFile);
                         fclose(logFile);
@@ -404,8 +404,8 @@ void BaseFree(void *ptr, char *originalFile, int originalLine)
             FILE *logFile = fopen(gMiscText.log.appendFilename.text, gMiscText.log.appendMode.text);
             if (logFile != 0) {
                 strcpy(logText, gText);
-                *reinterpret_cast<unsigned short *>(logText + strlen(logText)) =
-                    *reinterpret_cast<const unsigned short *>(gMiscText.log.appendNewline.text);
+                *reinterpret_cast<u16 *>(logText + strlen(logText)) =
+                    *reinterpret_cast<const u16 *>(gMiscText.log.appendNewline.text);
                 fputs(logText, logFile);
                 fclose(logFile);
                 if (giDebugLevel == 4)
@@ -433,20 +433,20 @@ void PrintMemoryLeaks(void)
     if (giDebugLevel >= 1 && gpMemEntry != 0) {
         LogInt(gMiscText.memory.leakCountLabel.text, iMemEntries, -999, -999, -999, -999,
                -999, -999);
-        int entryIndex = 0;
+        i32 entryIndex = 0;
         do {
             if (gpMemEntry[entryIndex].used != 0) {
                 sprintf(gText, gMiscText.memory.leakFormat.text,
                         gpMemEntry[entryIndex].file, gpMemEntry[entryIndex].line,
-                        reinterpret_cast<int>(gpMemEntry[entryIndex].ptr),
+                        reinterpret_cast<i32>(gpMemEntry[entryIndex].ptr),
                         gpMemEntry[entryIndex].size);
                 if (giDebugLevel >= 2) {
                     FILE *logFile = fopen(gMiscText.log.appendFilename.text,
                                           gMiscText.log.appendMode.text);
                     if (logFile != 0) {
                         strcpy(logText, gText);
-                        *reinterpret_cast<unsigned short *>(logText + strlen(logText)) =
-                            *reinterpret_cast<const unsigned short *>(
+                        *reinterpret_cast<u16 *>(logText + strlen(logText)) =
+                            *reinterpret_cast<const u16 *>(
                                 gMiscText.log.appendNewline.text);
                         fputs(logText, logFile);
                         fclose(logFile);
@@ -464,7 +464,7 @@ VA(0x004c4450, 0x91)
 void ShowMemoryStatus(void)
 {
     sprintf(gText, gMiscText.memory.memoryStatusFormat.text, 0x3ea2);
-    int savedDebugLevel = giDebugLevel;
+    i32 savedDebugLevel = giDebugLevel;
     giDebugLevel = 9;
     FillBitmapArea(gpWindowManager->m_screen, 0, 0x1cc, 0x280, 0x14, 0);
     smallFont->DrawBoundedString(gText, 0, 0x1d0, 0x280, 0x10, 1, 0);
@@ -480,15 +480,15 @@ void ShowMemoryStatus(void)
 // rotate-expression orders were tried. A bounded 30-walk libclang AST pass exposed four
 // variants and retained none; revisit after an exact-preserving predecessor/TU-state change.
 VA(0x004c44f0, 0x48)
-unsigned long int MAKEFILEID(char *text)
+u32l MAKEFILEID(char *text)
 {
-    unsigned int hash = 0;
-    int sum = 0;
-    for (int i = strlen(text) - 1; i >= 0; --i) {
+    u32 hash = 0;
+    i32 sum = 0;
+    for (i32 i = strlen(text) - 1; i >= 0; --i) {
         if (text[i] >= 'a' && text[i] <= 'z') {
             text[i] &= ~0x20;
         }
-        unsigned int shiftedHash = hash << 5;
+        u32 shiftedHash = hash << 5;
         hash >>= 25;
         hash += shiftedHash;
         sum += text[i];
@@ -505,11 +505,11 @@ unsigned long int MAKEFILEID(char *text)
 // fields are typed and named.  Direct tests, saved values, reversed/negated predicates,
 // combined conditions, and three-way forms were tried; this is not a proven artifact.
 VA(0x004c4540, 0x95)
-int FindIndex(struct indexArray *entries, int low, int high, int key)
+i32 FindIndex(struct indexArray *entries, i32 low, i32 high, i32 key)
 {
     giFindMid = (low + high) >> 1;
     while (high - low > 1) {
-        int value = entries[giFindMid].key;
+        i32 value = entries[giFindMid].key;
         if (value > key) {
             high = giFindMid;
         } else {
@@ -540,16 +540,16 @@ int FindIndex(struct indexArray *entries, int low, int high, int key)
 // split declaration/assignment were tried. At head 34c93d1, the pre-domain bounded AST
 // pass found eight variants and retained none after 30 walks with all 144 siblings pinned.
 VA(0x004c45e0, 0xea)
-void FadeIn(int increment)
+void FadeIn(i32 increment)
 {
     palette *fadePalette = new palette;
     if (fadePalette == 0)
         MemError();
-    int done = 0;
+    i32 done = 0;
     if (gConfig.gfx[giCurExe].fullScreen == 0)
         increment *= 2;
     memset(fadePalette->m_data, 0, MISC_PALETTE_BYTE_COUNT);
-    int level = 0;
+    i32 level = 0;
     for (;;) {
         if (level >= MISC_PALETTE_LEVEL_COUNT) {
             if (done) {
@@ -558,16 +558,16 @@ void FadeIn(int increment)
             }
             level = MISC_PALETTE_MAX_LEVEL;
         }
-        int delayUntil = KBTickCount() + MISC_FADE_IN_FRAME_DELAY;
+        i32 delayUntil = KBTickCount() + MISC_FADE_IN_FRAME_DELAY;
         PollSound();
-        signed char *colors;
+        i8 *colors;
         if (level == MISC_PALETTE_MAX_LEVEL) {
             done = 1;
             colors = gpBufferPalette->m_data;
         } else {
-            int threshold = MISC_PALETTE_MAX_LEVEL - level;
-            for (int i = 0; i < MISC_PALETTE_BYTE_COUNT; ++i) {
-                signed char color = gpBufferPalette->m_data[i];
+            i32 threshold = MISC_PALETTE_MAX_LEVEL - level;
+            for (i32 i = 0; i < MISC_PALETTE_BYTE_COUNT; ++i) {
+                i8 color = gpBufferPalette->m_data[i];
                 if (color > threshold)
                     fadePalette->m_data[i] = color - threshold;
             }
@@ -580,16 +580,16 @@ void FadeIn(int increment)
 }
 
 VA(0x004c46d0, 0xe6)
-void FadeOut(int increment)
+void FadeOut(i32 increment)
 {
     palette *fadePalette = new palette;
     if (fadePalette == 0)
         MemError();
-    int done = 0;
+    i32 done = 0;
     if (gConfig.gfx[giCurExe].fullScreen == 0)
         increment *= 2;
     memcpy(fadePalette->m_data, gpBufferPalette->m_data, 0x300);
-    int level = 0;
+    i32 level = 0;
     for (;;) {
         if (level >= 0x40) {
             if (done) {
@@ -598,11 +598,11 @@ void FadeOut(int increment)
             }
             level = 0x3f;
         }
-        int delayUntil = KBTickCount() + 0x14;
+        i32 delayUntil = KBTickCount() + 0x14;
         PollSound();
         if (level == 0x3f)
             done = 1;
-        for (int i = 0; i < 0x300; ++i) {
+        for (i32 i = 0; i < 0x300; ++i) {
             if (fadePalette->m_data[i] > 0) {
                 if (fadePalette->m_data[i] > increment)
                     fadePalette->m_data[i] -= increment;
@@ -617,7 +617,7 @@ void FadeOut(int increment)
 }
 
 VA(0x004c47c0, 0x28)
-int Random(int low, int high)
+i32 Random(i32 low, i32 high)
 {
     if (low == high) {
         return high;
@@ -629,7 +629,7 @@ int Random(int low, int high)
 }
 
 VA(0x004c47f0, 0x5d)
-void ProcessAssert(int condition, char *file, int line)
+void ProcessAssert(i32 condition, char *file, i32 line)
 {
     if (condition == 0) {
         gpMouseManager->SetColorMice(0);
@@ -652,10 +652,10 @@ void ProcessAssert(int condition, char *file, int line)
 VA(0x004c4850, 0x66)
 char * FindStringInString(char *text, char *pattern)
 {
-    int text_len = strlen(text);
-    int pattern_len = strlen(pattern);
-    int count = text_len - pattern_len + 1;
-    int i = 0;
+    i32 text_len = strlen(text);
+    i32 pattern_len = strlen(pattern);
+    i32 count = text_len - pattern_len + 1;
+    i32 i = 0;
     if (count > 0) {
         do {
             if (strncmp(text + i, pattern, pattern_len) == 0)
@@ -677,8 +677,8 @@ char * FindStringInString(char *text, char *pattern)
 VA(0x004c48c0, 0x31)
 char * FindToken(char *text, char token)
 {
-    int len = strlen(text);
-    int i = 0;
+    i32 len = strlen(text);
+    i32 i = 0;
     if (len > 0) {
         do {
             if (text[i] == token)
@@ -692,7 +692,7 @@ char * FindToken(char *text, char token)
 VA(0x004c4900, 0x2b)
 char * FindLastToken(char *text, char token)
 {
-    for (int i = strlen(text) - 1; i >= 0; --i) {
+    for (i32 i = strlen(text) - 1; i >= 0; --i) {
         if (text[i] == token) {
             return text + i;
         }
@@ -727,7 +727,7 @@ void SetInstallDefaults(void)
 VA(0x004c49a0, 0x1b5)
 void SetGameDefaults(void)
 {
-    int *fullScreen = &gConfig.gfx[0].fullScreen;
+    i32 *fullScreen = &gConfig.gfx[0].fullScreen;
     gConfig.musicVolume = 1;
     gConfig.soundVolume = 1;
     gConfig.autosave = 1;
@@ -767,12 +767,12 @@ void SetGameDefaults(void)
     gConfig.computerWalkSpeed = 3;
     gConfig.walkSpeed = 2;
     strcpy(gConfig.networkDefaultName, gMiscText.gameDefaults.unknownHeroName.text);
-    *reinterpret_cast<int *>(gConfig.uniqueSystemID) = 0;
-    int idSeed = rand() % MISC_UNIQUE_ID_RANDOM_MODULUS + 1;
+    *reinterpret_cast<i32 *>(gConfig.uniqueSystemID) = 0;
+    i32 idSeed = rand() % MISC_UNIQUE_ID_RANDOM_MODULUS + 1;
     idSeed += KBTickCount();
     gConfig.uniqueSystemID[2] =
         gMiscText.gameDefaults.uniqueIdAlphabet.text[idSeed % MISC_UNIQUE_ID_ALPHANUMERIC_COUNT];
-    int idAdd = rand() % MISC_UNIQUE_ID_RANDOM_MODULUS + 1;
+    i32 idAdd = rand() % MISC_UNIQUE_ID_RANDOM_MODULUS + 1;
     idAdd += KBTickCount();
     idSeed += idAdd;
     gConfig.uniqueSystemID[1] =
@@ -825,8 +825,8 @@ VA(0x004c4ca0, 0x7ab)
 void ReadPrefsFromRegistry(void)
 {
     HKEY hKey;
-    unsigned long dwType;
-    unsigned long dwSize;
+    DWORD dwType;
+    DWORD dwSize;
     char szKey[100];
     char szScratch[100];
 
@@ -837,7 +837,7 @@ void ReadPrefsFromRegistry(void)
         return;
     dwSize = 4;
     if (RegQueryValueExA(hKey, gMiscText.readRegistry.musicVolumeProbe.text, 0, &dwType,
-                         reinterpret_cast<unsigned char *>(&gConfig.musicVolume), &dwSize) != 0) {
+                         reinterpret_cast<u8 *>(&gConfig.musicVolume), &dwSize) != 0) {
         memset(&gConfig, 0, CONFIG_PERSISTED_SIZE);
         memset(&gConfig, 0, CONFIG_PERSISTED_SIZE);
         strcpy(gConfig.autoLoadName, gMiscText.installDefaults.autoLoadName.text);
@@ -849,61 +849,61 @@ void ReadPrefsFromRegistry(void)
         WritePrefsToRegistry();
         return;
     }
-    RegQueryValueExA(hKey, gMiscText.readRegistry.musicVolume.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.musicVolume), &dwSize);
-    RegQueryValueExA(hKey, gMiscText.readRegistry.soundVolume.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.soundVolume), &dwSize);
-    RegQueryValueExA(hKey, gMiscText.readRegistry.walkSpeed.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.walkSpeed), &dwSize);
-    RegQueryValueExA(hKey, gMiscText.readRegistry.computerWalkSpeed.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.computerWalkSpeed), &dwSize);
-    RegQueryValueExA(hKey, gMiscText.readRegistry.showRoute.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.showRoute), &dwSize);
-    RegQueryValueExA(hKey, gMiscText.readRegistry.blackoutComputer.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.blackoutComputer), &dwSize);
-    RegQueryValueExA(hKey, gMiscText.readRegistry.soundQuality.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.musicSource), &dwSize);
-    RegQueryValueExA(hKey, gMiscText.readRegistry.useOpera.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.useOpera), &dwSize);
-    RegQueryValueExA(hKey, gMiscText.readRegistry.directComPort.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.comPort[CONFIG_CONNECTION_DIRECT]), &dwSize);
-    RegQueryValueExA(hKey, gMiscText.readRegistry.directBaudRate.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.baudRate[CONFIG_CONNECTION_DIRECT]), &dwSize);
-    RegQueryValueExA(hKey, gMiscText.readRegistry.modemComPort.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.comPort[CONFIG_CONNECTION_MODEM]), &dwSize);
-    RegQueryValueExA(hKey, gMiscText.readRegistry.modemBaudRate.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.baudRate[CONFIG_CONNECTION_MODEM]), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.musicVolume.text, 0, &dwType, reinterpret_cast<u8 *>(&gConfig.musicVolume), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.soundVolume.text, 0, &dwType, reinterpret_cast<u8 *>(&gConfig.soundVolume), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.walkSpeed.text, 0, &dwType, reinterpret_cast<u8 *>(&gConfig.walkSpeed), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.computerWalkSpeed.text, 0, &dwType, reinterpret_cast<u8 *>(&gConfig.computerWalkSpeed), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.showRoute.text, 0, &dwType, reinterpret_cast<u8 *>(&gConfig.showRoute), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.blackoutComputer.text, 0, &dwType, reinterpret_cast<u8 *>(&gConfig.blackoutComputer), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.soundQuality.text, 0, &dwType, reinterpret_cast<u8 *>(&gConfig.musicSource), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.useOpera.text, 0, &dwType, reinterpret_cast<u8 *>(&gConfig.useOpera), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.directComPort.text, 0, &dwType, reinterpret_cast<u8 *>(&gConfig.comPort[CONFIG_CONNECTION_DIRECT]), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.directBaudRate.text, 0, &dwType, reinterpret_cast<u8 *>(&gConfig.baudRate[CONFIG_CONNECTION_DIRECT]), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.modemComPort.text, 0, &dwType, reinterpret_cast<u8 *>(&gConfig.comPort[CONFIG_CONNECTION_MODEM]), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.modemBaudRate.text, 0, &dwType, reinterpret_cast<u8 *>(&gConfig.baudRate[CONFIG_CONNECTION_MODEM]), &dwSize);
     dwSize = 0x63;
-    RegQueryValueExA(hKey, gMiscText.readRegistry.modemInitString.text, 0, &dwType, reinterpret_cast<unsigned char *>(gConfig.modemInitString), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.modemInitString.text, 0, &dwType, reinterpret_cast<u8 *>(gConfig.modemInitString), &dwSize);
     dwSize = 4;
-    RegQueryValueExA(hKey, gMiscText.readRegistry.uniqueSystemId.text, 0, &dwType, reinterpret_cast<unsigned char *>(gConfig.uniqueSystemID), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.uniqueSystemId.text, 0, &dwType, reinterpret_cast<u8 *>(gConfig.uniqueSystemID), &dwSize);
     // Retail relocation at function +0x2f6 resolves to gConfig +0x125, the terminator byte after
     // this four-byte ID, rather than the unrelated modem string at gConfig +0x110.
     gConfig.uniqueSystemID[3] = 0;
     dwSize = 0x1f;
-    RegQueryValueExA(hKey, gMiscText.readRegistry.networkDefaultName.text, 0, &dwType, reinterpret_cast<unsigned char *>(gConfig.networkDefaultName), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.networkDefaultName.text, 0, &dwType, reinterpret_cast<u8 *>(gConfig.networkDefaultName), &dwSize);
     dwSize = 4;
-    RegQueryValueExA(hKey, gMiscText.readRegistry.autosave.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.autosave), &dwSize);
-    RegQueryValueExA(hKey, gMiscText.readRegistry.slowVideo.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.slowVideo), &dwSize);
-    RegQueryValueExA(hKey, gMiscText.readRegistry.showCombatGrid.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.showCombatGrid), &dwSize);
-    RegQueryValueExA(hKey, gMiscText.readRegistry.showCombatMouseHex.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.showCombatMouseHex), &dwSize);
-    RegQueryValueExA(hKey, gMiscText.readRegistry.combatShadeLevel.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.combatShadeLevel), &dwSize);
-    RegQueryValueExA(hKey, gMiscText.readRegistry.combatArmyInfoLevel.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.combatArmyInfoLevel), &dwSize);
-    RegQueryValueExA(hKey, gMiscText.readRegistry.evilInterfaceUsage.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.evilInterfaceUsage), &dwSize);
-    RegQueryValueExA(hKey, gMiscText.readRegistry.quickCombatLevel.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.quickCombatLevel), &dwSize);
-    RegQueryValueExA(hKey, gMiscText.readRegistry.combatSpeed.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.combatSpeed), &dwSize);
-    RegQueryValueExA(hKey, gMiscText.readRegistry.autoCombatUseSpells.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.autoCombatUseSpells), &dwSize);
-    RegQueryValueExA(hKey, gMiscText.readRegistry.firstMapOffset.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.firstMapOffset), &dwSize);
-    RegQueryValueExA(hKey, gMiscText.readRegistry.currentMapOffset.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.currentMapOffset), &dwSize);
-    RegQueryValueExA(hKey, gMiscText.readRegistry.showObjectBoxes.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.showObjectBoxes), &dwSize);
-    RegQueryValueExA(hKey, gMiscText.readRegistry.editorScreenAnimation.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.editorScreenAnimation), &dwSize);
-    RegQueryValueExA(hKey, gMiscText.readRegistry.editorPaletteCycling.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.editorPaletteCycling), &dwSize);
-    RegQueryValueExA(hKey, gMiscText.readRegistry.mainGameShowMenu.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].showMenu), &dwSize);
-    RegQueryValueExA(hKey, gMiscText.readRegistry.mainGameX.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].x), &dwSize);
-    RegQueryValueExA(hKey, gMiscText.readRegistry.mainGameY.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].y), &dwSize);
-    RegQueryValueExA(hKey, gMiscText.readRegistry.mainGameWidth.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].width), &dwSize);
-    RegQueryValueExA(hKey, gMiscText.readRegistry.mainGameHeight.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].height), &dwSize);
-    RegQueryValueExA(hKey, gMiscText.readRegistry.mainGameFullScreen.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].fullScreen), &dwSize);
-    RegQueryValueExA(hKey, gMiscText.readRegistry.mainGameColorMouseCursor.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].colorMouseCursor), &dwSize);
-    RegQueryValueExA(hKey, gMiscText.readRegistry.editorShowMenu.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].showMenu), &dwSize);
-    RegQueryValueExA(hKey, gMiscText.readRegistry.editorX.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].x), &dwSize);
-    RegQueryValueExA(hKey, gMiscText.readRegistry.editorY.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].y), &dwSize);
-    RegQueryValueExA(hKey, gMiscText.readRegistry.editorWidth.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].width), &dwSize);
-    RegQueryValueExA(hKey, gMiscText.readRegistry.editorHeight.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].height), &dwSize);
-    RegQueryValueExA(hKey, gMiscText.readRegistry.editorFullScreen.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].fullScreen), &dwSize);
-    RegQueryValueExA(hKey, gMiscText.readRegistry.editorColorMouseCursor.text, 0, &dwType, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].colorMouseCursor), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.autosave.text, 0, &dwType, reinterpret_cast<u8 *>(&gConfig.autosave), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.slowVideo.text, 0, &dwType, reinterpret_cast<u8 *>(&gConfig.slowVideo), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.showCombatGrid.text, 0, &dwType, reinterpret_cast<u8 *>(&gConfig.showCombatGrid), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.showCombatMouseHex.text, 0, &dwType, reinterpret_cast<u8 *>(&gConfig.showCombatMouseHex), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.combatShadeLevel.text, 0, &dwType, reinterpret_cast<u8 *>(&gConfig.combatShadeLevel), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.combatArmyInfoLevel.text, 0, &dwType, reinterpret_cast<u8 *>(&gConfig.combatArmyInfoLevel), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.evilInterfaceUsage.text, 0, &dwType, reinterpret_cast<u8 *>(&gConfig.evilInterfaceUsage), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.quickCombatLevel.text, 0, &dwType, reinterpret_cast<u8 *>(&gConfig.quickCombatLevel), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.combatSpeed.text, 0, &dwType, reinterpret_cast<u8 *>(&gConfig.combatSpeed), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.autoCombatUseSpells.text, 0, &dwType, reinterpret_cast<u8 *>(&gConfig.autoCombatUseSpells), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.firstMapOffset.text, 0, &dwType, reinterpret_cast<u8 *>(&gConfig.firstMapOffset), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.currentMapOffset.text, 0, &dwType, reinterpret_cast<u8 *>(&gConfig.currentMapOffset), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.showObjectBoxes.text, 0, &dwType, reinterpret_cast<u8 *>(&gConfig.showObjectBoxes), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.editorScreenAnimation.text, 0, &dwType, reinterpret_cast<u8 *>(&gConfig.editorScreenAnimation), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.editorPaletteCycling.text, 0, &dwType, reinterpret_cast<u8 *>(&gConfig.editorPaletteCycling), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.mainGameShowMenu.text, 0, &dwType, reinterpret_cast<u8 *>(&gConfig.gfx[0].showMenu), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.mainGameX.text, 0, &dwType, reinterpret_cast<u8 *>(&gConfig.gfx[0].x), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.mainGameY.text, 0, &dwType, reinterpret_cast<u8 *>(&gConfig.gfx[0].y), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.mainGameWidth.text, 0, &dwType, reinterpret_cast<u8 *>(&gConfig.gfx[0].width), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.mainGameHeight.text, 0, &dwType, reinterpret_cast<u8 *>(&gConfig.gfx[0].height), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.mainGameFullScreen.text, 0, &dwType, reinterpret_cast<u8 *>(&gConfig.gfx[0].fullScreen), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.mainGameColorMouseCursor.text, 0, &dwType, reinterpret_cast<u8 *>(&gConfig.gfx[0].colorMouseCursor), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.editorShowMenu.text, 0, &dwType, reinterpret_cast<u8 *>(&gConfig.gfx[1].showMenu), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.editorX.text, 0, &dwType, reinterpret_cast<u8 *>(&gConfig.gfx[1].x), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.editorY.text, 0, &dwType, reinterpret_cast<u8 *>(&gConfig.gfx[1].y), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.editorWidth.text, 0, &dwType, reinterpret_cast<u8 *>(&gConfig.gfx[1].width), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.editorHeight.text, 0, &dwType, reinterpret_cast<u8 *>(&gConfig.gfx[1].height), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.editorFullScreen.text, 0, &dwType, reinterpret_cast<u8 *>(&gConfig.gfx[1].fullScreen), &dwSize);
+    RegQueryValueExA(hKey, gMiscText.readRegistry.editorColorMouseCursor.text, 0, &dwType, reinterpret_cast<u8 *>(&gConfig.gfx[1].colorMouseCursor), &dwSize);
     dwSize = 0x63;
-    if (RegQueryValueExA(hKey, gMiscText.readRegistry.appPath.text, 0, &dwType, reinterpret_cast<unsigned char *>(gcRegAppPath), &dwSize) != 0)
+    if (RegQueryValueExA(hKey, gMiscText.readRegistry.appPath.text, 0, &dwType, reinterpret_cast<u8 *>(gcRegAppPath), &dwSize) != 0)
         strcpy(gcRegAppPath, gMiscText.readRegistry.appPathDefault.text);
-    if (RegQueryValueExA(hKey, gMiscText.readRegistry.cdDrive.text, 0, &dwType, reinterpret_cast<unsigned char *>(gcRegCDRomPath), &dwSize) != 0)
+    if (RegQueryValueExA(hKey, gMiscText.readRegistry.cdDrive.text, 0, &dwType, reinterpret_cast<u8 *>(gcRegCDRomPath), &dwSize) != 0)
         strcpy(gcRegCDRomPath, gMiscText.readRegistry.cdDriveDefault.text);
     RegCloseKey(hKey);
     // Clamp the saved window geometry to sane defaults / on-screen bounds.
@@ -942,15 +942,15 @@ void ReadPrefs(void)
 VA(0x004c5500, 0x6a)
 void WritePrefsToFile(void)
 {
-    int zeroBuffer[25];
-    int i;
-    int *p = zeroBuffer;
+    i32 zeroBuffer[25];
+    i32 i;
+    i32 *p = zeroBuffer;
     for (i = 0x19; i != 0; i--) {
         *p = 0;
         p++;
     }
     sprintf(gText, gMiscText.writeFile.stringFormat.text, gMiscText.writeFile.configFilename.text);
-    int fd = _open(gText, 0x8301, 0x80);
+    i32 fd = _open(gText, 0x8301, 0x80);
     if (fd != -1) {
         _write(fd, &gConfig, CONFIG_PERSISTED_SIZE);
         _close(fd);
@@ -969,50 +969,50 @@ void WritePrefsToRegistry(void)
     hKey = 0;
     if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, szKey, 0, KEY_ALL_ACCESS, &hKey) != 0)
         return;
-    RegSetValueExA(hKey, gMiscText.writeRegistry.musicVolume.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.musicVolume), 4);
-    RegSetValueExA(hKey, gMiscText.writeRegistry.soundVolume.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.soundVolume), 4);
-    RegSetValueExA(hKey, gMiscText.writeRegistry.walkSpeed.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.walkSpeed), 4);
-    RegSetValueExA(hKey, gMiscText.writeRegistry.computerWalkSpeed.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.computerWalkSpeed), 4);
-    RegSetValueExA(hKey, gMiscText.writeRegistry.showRoute.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.showRoute), 4);
-    RegSetValueExA(hKey, gMiscText.writeRegistry.blackoutComputer.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.blackoutComputer), 4);
-    RegSetValueExA(hKey, gMiscText.writeRegistry.soundQuality.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.musicSource), 4);
-    RegSetValueExA(hKey, gMiscText.writeRegistry.useOpera.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.useOpera), 4);
-    RegSetValueExA(hKey, gMiscText.writeRegistry.directComPort.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.comPort[CONFIG_CONNECTION_DIRECT]), 4);
-    RegSetValueExA(hKey, gMiscText.writeRegistry.directBaudRate.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.baudRate[CONFIG_CONNECTION_DIRECT]), 4);
-    RegSetValueExA(hKey, gMiscText.writeRegistry.modemComPort.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.comPort[CONFIG_CONNECTION_MODEM]), 4);
-    RegSetValueExA(hKey, gMiscText.writeRegistry.modemBaudRate.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.baudRate[CONFIG_CONNECTION_MODEM]), 4);
-    RegSetValueExA(hKey, gMiscText.writeRegistry.modemInitString.text, 0, REG_SZ, reinterpret_cast<unsigned char *>(gConfig.modemInitString), REG_MODEM_INIT_STRING_SIZE);
-    RegSetValueExA(hKey, gMiscText.writeRegistry.uniqueSystemId.text, 0, REG_SZ, reinterpret_cast<unsigned char *>(gConfig.uniqueSystemID), REG_UNIQUE_SYSTEM_ID_SIZE);
-    RegSetValueExA(hKey, gMiscText.writeRegistry.networkDefaultName.text, 0, REG_SZ, reinterpret_cast<unsigned char *>(gConfig.networkDefaultName), REG_NETWORK_DEFAULT_NAME_SIZE);
-    RegSetValueExA(hKey, gMiscText.writeRegistry.autosave.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.autosave), 4);
-    RegSetValueExA(hKey, gMiscText.writeRegistry.slowVideo.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.slowVideo), 4);
-    RegSetValueExA(hKey, gMiscText.writeRegistry.showCombatGrid.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.showCombatGrid), 4);
-    RegSetValueExA(hKey, gMiscText.writeRegistry.showCombatMouseHex.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.showCombatMouseHex), 4);
-    RegSetValueExA(hKey, gMiscText.writeRegistry.combatShadeLevel.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.combatShadeLevel), 4);
-    RegSetValueExA(hKey, gMiscText.writeRegistry.combatArmyInfoLevel.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.combatArmyInfoLevel), 4);
-    RegSetValueExA(hKey, gMiscText.writeRegistry.evilInterfaceUsage.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.evilInterfaceUsage), 4);
-    RegSetValueExA(hKey, gMiscText.writeRegistry.quickCombatLevel.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.quickCombatLevel), 4);
-    RegSetValueExA(hKey, gMiscText.writeRegistry.combatSpeed.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.combatSpeed), 4);
-    RegSetValueExA(hKey, gMiscText.writeRegistry.autoCombatUseSpells.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.autoCombatUseSpells), 4);
-    RegSetValueExA(hKey, gMiscText.writeRegistry.firstMapOffset.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.firstMapOffset), 4);
-    RegSetValueExA(hKey, gMiscText.writeRegistry.currentMapOffset.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.currentMapOffset), 4);
-    RegSetValueExA(hKey, gMiscText.writeRegistry.showObjectBoxes.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.showObjectBoxes), 4);
-    RegSetValueExA(hKey, gMiscText.writeRegistry.editorScreenAnimation.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.editorScreenAnimation), 4);
-    RegSetValueExA(hKey, gMiscText.writeRegistry.editorPaletteCycling.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.editorPaletteCycling), 4);
-    RegSetValueExA(hKey, gMiscText.writeRegistry.mainGameShowMenu.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].showMenu), 4);
-    RegSetValueExA(hKey, gMiscText.writeRegistry.mainGameX.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].x), 4);
-    RegSetValueExA(hKey, gMiscText.writeRegistry.mainGameY.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].y), 4);
-    RegSetValueExA(hKey, gMiscText.writeRegistry.mainGameWidth.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].width), 4);
-    RegSetValueExA(hKey, gMiscText.writeRegistry.mainGameHeight.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].height), 4);
-    RegSetValueExA(hKey, gMiscText.writeRegistry.mainGameFullScreen.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].fullScreen), 4);
-    RegSetValueExA(hKey, gMiscText.writeRegistry.mainGameColorMouseCursor.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[0].colorMouseCursor), 4);
-    RegSetValueExA(hKey, gMiscText.writeRegistry.editorShowMenu.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].showMenu), 4);
-    RegSetValueExA(hKey, gMiscText.writeRegistry.editorX.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].x), 4);
-    RegSetValueExA(hKey, gMiscText.writeRegistry.editorY.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].y), 4);
-    RegSetValueExA(hKey, gMiscText.writeRegistry.editorWidth.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].width), 4);
-    RegSetValueExA(hKey, gMiscText.writeRegistry.editorHeight.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].height), 4);
-    RegSetValueExA(hKey, gMiscText.writeRegistry.editorFullScreen.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].fullScreen), 4);
-    RegSetValueExA(hKey, gMiscText.writeRegistry.editorColorMouseCursor.text, 0, REG_DWORD, reinterpret_cast<unsigned char *>(&gConfig.gfx[1].colorMouseCursor), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.musicVolume.text, 0, REG_DWORD, reinterpret_cast<u8 *>(&gConfig.musicVolume), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.soundVolume.text, 0, REG_DWORD, reinterpret_cast<u8 *>(&gConfig.soundVolume), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.walkSpeed.text, 0, REG_DWORD, reinterpret_cast<u8 *>(&gConfig.walkSpeed), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.computerWalkSpeed.text, 0, REG_DWORD, reinterpret_cast<u8 *>(&gConfig.computerWalkSpeed), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.showRoute.text, 0, REG_DWORD, reinterpret_cast<u8 *>(&gConfig.showRoute), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.blackoutComputer.text, 0, REG_DWORD, reinterpret_cast<u8 *>(&gConfig.blackoutComputer), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.soundQuality.text, 0, REG_DWORD, reinterpret_cast<u8 *>(&gConfig.musicSource), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.useOpera.text, 0, REG_DWORD, reinterpret_cast<u8 *>(&gConfig.useOpera), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.directComPort.text, 0, REG_DWORD, reinterpret_cast<u8 *>(&gConfig.comPort[CONFIG_CONNECTION_DIRECT]), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.directBaudRate.text, 0, REG_DWORD, reinterpret_cast<u8 *>(&gConfig.baudRate[CONFIG_CONNECTION_DIRECT]), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.modemComPort.text, 0, REG_DWORD, reinterpret_cast<u8 *>(&gConfig.comPort[CONFIG_CONNECTION_MODEM]), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.modemBaudRate.text, 0, REG_DWORD, reinterpret_cast<u8 *>(&gConfig.baudRate[CONFIG_CONNECTION_MODEM]), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.modemInitString.text, 0, REG_SZ, reinterpret_cast<u8 *>(gConfig.modemInitString), REG_MODEM_INIT_STRING_SIZE);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.uniqueSystemId.text, 0, REG_SZ, reinterpret_cast<u8 *>(gConfig.uniqueSystemID), REG_UNIQUE_SYSTEM_ID_SIZE);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.networkDefaultName.text, 0, REG_SZ, reinterpret_cast<u8 *>(gConfig.networkDefaultName), REG_NETWORK_DEFAULT_NAME_SIZE);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.autosave.text, 0, REG_DWORD, reinterpret_cast<u8 *>(&gConfig.autosave), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.slowVideo.text, 0, REG_DWORD, reinterpret_cast<u8 *>(&gConfig.slowVideo), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.showCombatGrid.text, 0, REG_DWORD, reinterpret_cast<u8 *>(&gConfig.showCombatGrid), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.showCombatMouseHex.text, 0, REG_DWORD, reinterpret_cast<u8 *>(&gConfig.showCombatMouseHex), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.combatShadeLevel.text, 0, REG_DWORD, reinterpret_cast<u8 *>(&gConfig.combatShadeLevel), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.combatArmyInfoLevel.text, 0, REG_DWORD, reinterpret_cast<u8 *>(&gConfig.combatArmyInfoLevel), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.evilInterfaceUsage.text, 0, REG_DWORD, reinterpret_cast<u8 *>(&gConfig.evilInterfaceUsage), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.quickCombatLevel.text, 0, REG_DWORD, reinterpret_cast<u8 *>(&gConfig.quickCombatLevel), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.combatSpeed.text, 0, REG_DWORD, reinterpret_cast<u8 *>(&gConfig.combatSpeed), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.autoCombatUseSpells.text, 0, REG_DWORD, reinterpret_cast<u8 *>(&gConfig.autoCombatUseSpells), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.firstMapOffset.text, 0, REG_DWORD, reinterpret_cast<u8 *>(&gConfig.firstMapOffset), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.currentMapOffset.text, 0, REG_DWORD, reinterpret_cast<u8 *>(&gConfig.currentMapOffset), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.showObjectBoxes.text, 0, REG_DWORD, reinterpret_cast<u8 *>(&gConfig.showObjectBoxes), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.editorScreenAnimation.text, 0, REG_DWORD, reinterpret_cast<u8 *>(&gConfig.editorScreenAnimation), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.editorPaletteCycling.text, 0, REG_DWORD, reinterpret_cast<u8 *>(&gConfig.editorPaletteCycling), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.mainGameShowMenu.text, 0, REG_DWORD, reinterpret_cast<u8 *>(&gConfig.gfx[0].showMenu), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.mainGameX.text, 0, REG_DWORD, reinterpret_cast<u8 *>(&gConfig.gfx[0].x), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.mainGameY.text, 0, REG_DWORD, reinterpret_cast<u8 *>(&gConfig.gfx[0].y), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.mainGameWidth.text, 0, REG_DWORD, reinterpret_cast<u8 *>(&gConfig.gfx[0].width), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.mainGameHeight.text, 0, REG_DWORD, reinterpret_cast<u8 *>(&gConfig.gfx[0].height), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.mainGameFullScreen.text, 0, REG_DWORD, reinterpret_cast<u8 *>(&gConfig.gfx[0].fullScreen), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.mainGameColorMouseCursor.text, 0, REG_DWORD, reinterpret_cast<u8 *>(&gConfig.gfx[0].colorMouseCursor), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.editorShowMenu.text, 0, REG_DWORD, reinterpret_cast<u8 *>(&gConfig.gfx[1].showMenu), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.editorX.text, 0, REG_DWORD, reinterpret_cast<u8 *>(&gConfig.gfx[1].x), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.editorY.text, 0, REG_DWORD, reinterpret_cast<u8 *>(&gConfig.gfx[1].y), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.editorWidth.text, 0, REG_DWORD, reinterpret_cast<u8 *>(&gConfig.gfx[1].width), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.editorHeight.text, 0, REG_DWORD, reinterpret_cast<u8 *>(&gConfig.gfx[1].height), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.editorFullScreen.text, 0, REG_DWORD, reinterpret_cast<u8 *>(&gConfig.gfx[1].fullScreen), 4);
+    RegSetValueExA(hKey, gMiscText.writeRegistry.editorColorMouseCursor.text, 0, REG_DWORD, reinterpret_cast<u8 *>(&gConfig.gfx[1].colorMouseCursor), 4);
     RegCloseKey(hKey);
 }
 
@@ -1024,7 +1024,7 @@ void WritePrefs(void)
 }
 
 VA(0x004c5a20, 0x3c)
-int IsCDDrive(int driveIndex)
+i32 IsCDDrive(i32 driveIndex)
 {
     sprintf(gText, gMiscText.cd.rootDrive.text);
     gText[0] = gText[0] + driveIndex;
@@ -1041,17 +1041,17 @@ int IsCDDrive(int driveIndex)
 // 30-walk libclang AST pass preserve that residual. Revisit after an exact-preserving
 // predecessor/TU-state change; this is not a proven artifact.
 VA(0x004c5a60, 0x3ed)
-int SetupCDDrive(void)
+i32 SetupCDDrive(void)
 {
     char registryPath[MISC_CD_PATH_BUFFER_SIZE];
     char registryKey[MISC_CD_PATH_BUFFER_SIZE];
     char cdDrives[MISC_CD_DRIVE_SLOT_COUNT];
     char count;
-    int attempts;
+    i32 attempts;
     HKEY key;
 
     sprintf(gText, gMiscText.cd.dataArchive.text);
-    int file = _open(gText, _O_BINARY);
+    i32 file = _open(gText, _O_BINARY);
     if (file == -1) {
         if (_chdir(gcRegAppPath) == -1)
             return MISC_CD_APP_PATH_UNAVAILABLE;
@@ -1061,10 +1061,10 @@ int SetupCDDrive(void)
     }
     _close(file);
 
-    unsigned long logicalDrives = GetLogicalDrives();
-    int cdDriveCount = 0;
+    u32l logicalDrives = GetLogicalDrives();
+    i32 cdDriveCount = 0;
     memset(cdDrives, 0, sizeof(cdDrives));
-    for (int drive = MISC_CD_FIRST_DRIVE_INDEX; drive < MISC_CD_DRIVE_SLOT_COUNT; ++drive) {
+    for (i32 drive = MISC_CD_FIRST_DRIVE_INDEX; drive < MISC_CD_DRIVE_SLOT_COUNT; ++drive) {
         if (logicalDrives & (1 << drive)) {
             sprintf(gText, gMiscText.cd.rootDrive.text);
             gText[0] += static_cast<char>(drive);
@@ -1092,7 +1092,7 @@ int SetupCDDrive(void)
         char resultBuffer[MISC_CD_MCI_BUFFER_SIZE];
         char command[MISC_CD_MCI_BUFFER_SIZE];
         for (;;) {
-            for (int index = 0; index < count; ++index) {
+            for (i32 index = 0; index < count; ++index) {
                 wsprintfA(command, gMiscText.cd.openAudioCommand.text, cdDrives[index] + 'A');
                 if (mciSendStringA(command, resultBuffer, MISC_CD_MCI_RESULT_LENGTH, 0) == 0) {
                     wsprintfA(command, gMiscText.cd.audioInfoCommand.text);
@@ -1113,7 +1113,7 @@ int SetupCDDrive(void)
                     if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, registryKey, 0, KEY_WRITE, &key) == 0) {
                         wsprintfA(registryPath, gMiscText.cd.driveFormat.text, cdDrives[index] + 'A');
                         RegSetValueExA(key, gMiscText.cd.cdDrive.text, 0, REG_SZ,
-                                       reinterpret_cast<unsigned char *>(registryPath),
+                                       reinterpret_cast<u8 *>(registryPath),
                                        lstrlenA(registryPath) + 1);
                         RegCloseKey(key);
                     }
@@ -1138,7 +1138,7 @@ void BitmapToScreen(class bitmap *bmp)
 }
 
 VA(0x004c5e70, 0x3d)
-void SetPalette(signed char *paletteData, int updateDisplay)
+void SetPalette(i8 *paletteData, i32 updateDisplay)
 {
     memcpy(gpBufferPalette->m_data, paletteData, 0x300);
     memcpy(gCyclePal, paletteData + 0x282, 0x60);
@@ -1147,10 +1147,10 @@ void SetPalette(signed char *paletteData, int updateDisplay)
 }
 
 VA(0x004c5eb0, 0x25)
-void BlitBitmapToScreenNoMouseCheck(class bitmap *bmp, int sourceX, int sourceY, int width,
-                                    int height, int destinationX, int destinationY)
+void BlitBitmapToScreenNoMouseCheck(class bitmap *bmp, i32 sourceX, i32 sourceY, i32 width,
+                                    i32 height, i32 destinationX, i32 destinationY)
 {
-    BlitBitmapToScreenVesa(reinterpret_cast<int>(bmp), sourceX, sourceY, width, height,
+    BlitBitmapToScreenVesa(reinterpret_cast<i32>(bmp), sourceX, sourceY, width, height,
                            destinationX, destinationY);
 }
 
@@ -1168,12 +1168,12 @@ void BlitBitmapToScreenNoMouseCheck(class bitmap *bmp, int sourceX, int sourceY,
 // placement. Revisit only after a semantic predecessor/type change, never by restoring the
 // volatile alias or inventing reloads.
 VA(0x004c5ee0, 0x18b)
-void BlitBitmapToScreen(class bitmap *bmp, int sourceX, int sourceY, int width, int height,
-                        int destinationX, int destinationY)
+void BlitBitmapToScreen(class bitmap *bmp, i32 sourceX, i32 sourceY, i32 width, i32 height,
+                        i32 destinationX, i32 destinationY)
 {
-    int blitSourceX = sourceX;
+    i32 blitSourceX = sourceX;
     if (gbColorMice == 0) {
-        BlitBitmapToScreenVesa(reinterpret_cast<int>(bmp), blitSourceX, sourceY, width, height,
+        BlitBitmapToScreenVesa(reinterpret_cast<i32>(bmp), blitSourceX, sourceY, width, height,
                                destinationX, destinationY);
         return;
     }
@@ -1190,22 +1190,22 @@ void BlitBitmapToScreen(class bitmap *bmp, int sourceX, int sourceY, int width, 
         gBlitBottom >= gpMouseManager->m_savedTop &&
         gpMouseManager->m_cursorBottom >= destinationY) {
         gpMouseManager->SaveAndDraw();
-        BlitBitmapToScreenVesa(reinterpret_cast<int>(bmp), blitSourceX, sourceY, width, height,
+        BlitBitmapToScreenVesa(reinterpret_cast<i32>(bmp), blitSourceX, sourceY, width, height,
                                destinationX, destinationY);
         if (gpMouseManager->m_cursorRight > gBlitRight ||
             gpMouseManager->m_savedLeft < destinationX ||
             gpMouseManager->m_cursorBottom > gBlitBottom ||
             gpMouseManager->m_savedTop < destinationY) {
-            int savedY = gpMouseManager->m_savedTop;
-            int savedX = gpMouseManager->m_savedLeft;
-            BlitBitmapToScreenVesa(reinterpret_cast<int>(bmp), savedX, savedY,
+            i32 savedY = gpMouseManager->m_savedTop;
+            i32 savedX = gpMouseManager->m_savedLeft;
+            BlitBitmapToScreenVesa(reinterpret_cast<i32>(bmp), savedX, savedY,
                                    gpMouseManager->m_cursorRight - savedX + 1,
                                    gpMouseManager->m_cursorBottom - savedY + 1, savedX, savedY);
         }
         gpMouseManager->RestoreUnderlying();
         return;
     }
-    BlitBitmapToScreenVesa(reinterpret_cast<int>(bmp), blitSourceX, sourceY, width, height,
+    BlitBitmapToScreenVesa(reinterpret_cast<i32>(bmp), blitSourceX, sourceY, width, height,
                            destinationX, destinationY);
 }
 
@@ -1223,12 +1223,12 @@ void LogTruncate(void)
 {
     char logText[LOG_TEXT_BUFFER_SIZE];
     if (giDebugLevel >= LOG_FILE_DEBUG_LEVEL) {
-        int fileHandle = _open(gMiscText.log.truncateFilename.text,
+        i32 fileHandle = _open(gMiscText.log.truncateFilename.text,
                                _O_WRONLY | _O_CREAT | _O_TRUNC | _O_TEXT, _S_IWRITE);
         if (fileHandle != -1) {
             strcpy(logText, gMiscText.log.newLogLabel.text);
-            *reinterpret_cast<unsigned short *>(logText + strlen(logText)) =
-                *reinterpret_cast<const unsigned short *>(gMiscText.log.truncateNewline.text);
+            *reinterpret_cast<u16 *>(logText + strlen(logText)) =
+                *reinterpret_cast<const u16 *>(gMiscText.log.truncateNewline.text);
             _write(fileHandle, logText, strlen(logText));
             _close(fileHandle);
         }
@@ -1253,8 +1253,8 @@ void LogStr(char *text)
         FILE *logFile = fopen(gMiscText.log.appendFilename.text, gMiscText.log.appendMode.text);
         if (logFile != 0) {
             strcpy(logText, text);
-            *reinterpret_cast<unsigned short *>(logText + strlen(logText)) =
-                *reinterpret_cast<const unsigned short *>(gMiscText.log.appendNewline.text);
+            *reinterpret_cast<u16 *>(logText + strlen(logText)) =
+                *reinterpret_cast<const u16 *>(gMiscText.log.appendNewline.text);
             fputs(logText, logFile);
             fclose(logFile);
             if (giDebugLevel == LOG_DEBUGGER_OUTPUT_LEVEL)
@@ -1272,8 +1272,8 @@ void LogStr(char *text)
 // to 88.81%; a bounded libclang AST pass retained none after 30 walks, and 24 reversible
 // predecessor/TU-state probes produced no exact closure or eligible score change.
 VA(0x004c61c0, 0x224)
-void LogInt(char *label, int value1, int value2, int value3, int value4, int value5,
-            int value6, int value7)
+void LogInt(char *label, i32 value1, i32 value2, i32 value3, i32 value4, i32 value5,
+            i32 value6, i32 value7)
 {
     char text[LOG_FORMAT_BUFFER_SIZE];
     char logText[LOG_TEXT_BUFFER_SIZE];
@@ -1299,8 +1299,8 @@ void LogInt(char *label, int value1, int value2, int value3, int value4, int val
         FILE *file = fopen(gMiscText.log.appendFilename.text, gMiscText.log.appendMode.text);
         if (file != 0) {
             strcpy(logText, text);
-            *reinterpret_cast<unsigned short *>(logText + strlen(logText)) =
-                *reinterpret_cast<const unsigned short *>(gMiscText.log.appendNewline.text);
+            *reinterpret_cast<u16 *>(logText + strlen(logText)) =
+                *reinterpret_cast<const u16 *>(gMiscText.log.appendNewline.text);
             fputs(logText, file);
             fclose(file);
             if (giDebugLevel == LOG_DEBUGGER_OUTPUT_LEVEL)
@@ -1322,7 +1322,7 @@ void AiPrint(char *text)
 VA(0x004c6460, 0x7a)
 void AbsAiPrint(char *text)
 {
-    int saved = giDebugLevel;
+    i32 saved = giDebugLevel;
     giDebugLevel = 9;
     FillBitmapArea(gpWindowManager->m_screen, 0, 0x1cc, 0x280, 0x14, 0);
     smallFont->DrawBoundedString(text, 0, 0x1d0, 0x280, 0x10, 1, 0);
@@ -1339,44 +1339,44 @@ void AbsAiPrint(char *text)
 // were tried earlier; at head 34c93d1, cursor/threshold lifetime order regressed to 92.79%
 // and `distance > threshold` versus its commuted spelling was byte-neutral.
 VA(0x004c64e0, 0xf8)
-void FadeTo(unsigned char *source, unsigned char *destination, int increment)
+void FadeTo(u8 *source, u8 *destination, i32 increment)
 {
-    unsigned char colors[MISC_PALETTE_BYTE_COUNT];
+    u8 colors[MISC_PALETTE_BYTE_COUNT];
     memcpy(colors, source, sizeof(colors));
     increment >>= MISC_FADE_TO_INCREMENT_SHIFT;
     if (increment < 1)
         increment = 1;
-    int level = MISC_FADE_TO_START_LEVEL;
+    i32 level = MISC_FADE_TO_START_LEVEL;
     do {
-        int delayUntil = KBTickCount() + MISC_FADE_TO_FRAME_DELAY;
+        i32 delayUntil = KBTickCount() + MISC_FADE_TO_FRAME_DELAY;
         PollSound();
-        int thresholdIndex = MISC_PALETTE_LEVEL_COUNT - level - increment;
+        i32 thresholdIndex = MISC_PALETTE_LEVEL_COUNT - level - increment;
         if (thresholdIndex < 0)
             thresholdIndex = 0;
-        unsigned char threshold = giChangeThreshold[thresholdIndex];
-        unsigned char *current = colors;
-        unsigned char *target = destination;
-        int count = MISC_PALETTE_BYTE_COUNT;
+        u8 threshold = giChangeThreshold[thresholdIndex];
+        u8 *current = colors;
+        u8 *target = destination;
+        i32 count = MISC_PALETTE_BYTE_COUNT;
         do {
-            unsigned char value = *current;
-            int difference = static_cast<int>(*target) - static_cast<int>(value);
-            int distance = difference < 0 ? -difference : difference;
+            u8 value = *current;
+            i32 difference = static_cast<i32>(*target) - static_cast<i32>(value);
+            i32 distance = difference < 0 ? -difference : difference;
             if (distance > threshold) {
                 distance -= threshold;
                 if (difference > 0)
-                    *current = static_cast<unsigned char>(value + distance);
+                    *current = static_cast<u8>(value + distance);
                 else
-                    *current = static_cast<unsigned char>(value - distance);
+                    *current = static_cast<u8>(value - distance);
             }
             ++current;
             ++target;
             --count;
         } while (count != 0);
-        UpdatePalette(reinterpret_cast<signed char *>(colors));
+        UpdatePalette(reinterpret_cast<i8 *>(colors));
         DelayTil(&delayUntil);
         level += increment;
     } while (level < MISC_PALETTE_LEVEL_COUNT);
-    UpdatePalette(reinterpret_cast<signed char *>(destination));
+    UpdatePalette(reinterpret_cast<i8 *>(destination));
 }
 
 // @semantic
@@ -1388,31 +1388,31 @@ void FadeTo(unsigned char *source, unsigned char *destination, int increment)
 // explicit row pointers, linear pointer loop, inner/outer column scope and explicit pixel
 // value were tried; at head 34c93d1, commuted palette-pointer addition was byte-neutral.
 VA(0x004c65e0, 0xb8)
-void FadeToColorTable(unsigned char *colorTable, int increment)
+void FadeToColorTable(u8 *colorTable, i32 increment)
 {
-    unsigned char translatedPalette[MISC_PALETTE_BYTE_COUNT];
-    int savedUpdateFlags = gpWindowManager->m_updateFlags;
+    u8 translatedPalette[MISC_PALETTE_BYTE_COUNT];
+    i32 savedUpdateFlags = gpWindowManager->m_updateFlags;
     gpWindowManager->m_updateFlags = 0;
-    signed char *paletteData = gpBufferPalette->m_data;
-    unsigned char *output = translatedPalette;
-    int index = 0;
+    i8 *paletteData = gpBufferPalette->m_data;
+    u8 *output = translatedPalette;
+    i32 index = 0;
     do {
-        int paletteIndex = colorTable[index] * MISC_PALETTE_COMPONENT_BYTES;
+        i32 paletteIndex = colorTable[index] * MISC_PALETTE_COMPONENT_BYTES;
         output += MISC_PALETTE_COMPONENT_BYTES;
         ++index;
-        unsigned char *sourceColor = reinterpret_cast<unsigned char *>(paletteData) + paletteIndex;
+        u8 *sourceColor = reinterpret_cast<u8 *>(paletteData) + paletteIndex;
         output[-3] = sourceColor[0];
         output[-2] = sourceColor[1];
         output[-1] = sourceColor[2];
     } while (output < translatedPalette + sizeof(translatedPalette));
-    int rows = MISC_BLIT_SCREEN_HEIGHT;
-    FadeTo(reinterpret_cast<unsigned char *>(paletteData), translatedPalette, increment);
-    int columns;
-    unsigned char *pixel = gpWindowManager->m_screen->m_pixels;
+    i32 rows = MISC_BLIT_SCREEN_HEIGHT;
+    FadeTo(reinterpret_cast<u8 *>(paletteData), translatedPalette, increment);
+    i32 columns;
+    u8 *pixel = gpWindowManager->m_screen->m_pixels;
     do {
         columns = MISC_BLIT_SCREEN_WIDTH;
         do {
-            unsigned char pixelValue = *pixel;
+            u8 pixelValue = *pixel;
             *pixel = colorTable[pixelValue];
             ++pixel;
             --columns;
@@ -1425,7 +1425,7 @@ void FadeToColorTable(unsigned char *colorTable, int increment)
 }
 
 VA(0x004c66a0, 0x29)
-int IsCycleColor(int color)
+i32 IsCycleColor(i32 color)
 {
     if ((color >= 0xD6 && color <= 0xDD) || (color >= 0xE7 && color <= 0xED)) {
         return 1;
@@ -1443,8 +1443,8 @@ int IsCycleColor(int color)
 // a fresh bounded libclang AST pass found 23 single variants and retained none after
 // 30 walks with all 144 siblings pinned.
 VA(0x004c66d0, 0x1ee)
-void CreatePCXFile(char *filename, unsigned char *pixels, int width, int height,
-                   unsigned char *paletteData)
+void CreatePCXFile(char *filename, u8 *pixels, i32 width, i32 height,
+                   u8 *paletteData)
 {
     PCXHeader header;
     memset(&header, 0, sizeof(header));
@@ -1452,34 +1452,34 @@ void CreatePCXFile(char *filename, unsigned char *pixels, int width, int height,
     header.version = PCX_VERSION_3_0;
     header.encoding = PCX_ENCODING_RLE;
     header.bitsPerPixel = PCX_BITS_PER_PIXEL;
-    header.xMax = static_cast<unsigned short>(width - 1);
-    header.yMax = static_cast<unsigned short>(height - 1);
+    header.xMax = static_cast<u16>(width - 1);
+    header.yMax = static_cast<u16>(height - 1);
     header.planes = PCX_PLANE_COUNT;
-    header.bytesPerLine = static_cast<unsigned short>(width);
+    header.bytesPerLine = static_cast<u16>(width);
     header.paletteType = PCX_PALETTE_TYPE_COLOR;
-    int fileHandle =
+    i32 fileHandle =
         _open(filename, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
     if (fileHandle == -1)
         return;
     _write(fileHandle, &header, sizeof(header));
-    unsigned char *encodedRow = static_cast<unsigned char *>(
+    u8 *encodedRow = static_cast<u8 *>(
         H2_ALLOC(width * 2, gMiscText.pcx.encodedRowAllocation.text, 0x5c8));
-    for (int row = 0; row < height; ++row) {
-        int sourceIndex = 0;
-        unsigned int encodedSize = 0;
+    for (i32 row = 0; row < height; ++row) {
+        i32 sourceIndex = 0;
+        u32 encodedSize = 0;
         while (sourceIndex < width) {
-            unsigned char value = pixels[sourceIndex];
-            int runEnd = sourceIndex;
+            u8 value = pixels[sourceIndex];
+            i32 runEnd = sourceIndex;
             while (runEnd < width && pixels[runEnd] == value &&
                    runEnd - sourceIndex + 1 < PCX_RLE_RUN_LIMIT)
                 ++runEnd;
-            int runLength = runEnd - sourceIndex;
+            i32 runLength = runEnd - sourceIndex;
             if (runLength <= 1 && (value & PCX_RLE_RUN_MARKER) != PCX_RLE_RUN_MARKER) {
                 encodedRow[encodedSize++] = value;
                 ++sourceIndex;
             } else {
                 encodedRow[encodedSize++] =
-                    static_cast<unsigned char>(runLength | PCX_RLE_RUN_MARKER);
+                    static_cast<u8>(runLength | PCX_RLE_RUN_MARKER);
                 encodedRow[encodedSize++] = value;
                 sourceIndex += runLength;
             }
@@ -1488,11 +1488,11 @@ void CreatePCXFile(char *filename, unsigned char *pixels, int width, int height,
         pixels += width;
     }
     H2_FREE(encodedRow, gMiscText.pcx.encodedRowDestruction.text, 0x5f0);
-    unsigned char paletteMarker = PCX_VGA_PALETTE_MARKER;
+    u8 paletteMarker = PCX_VGA_PALETTE_MARKER;
     _write(fileHandle, &paletteMarker, 1);
-    unsigned char *outputPalette = static_cast<unsigned char *>(
+    u8 *outputPalette = static_cast<u8 *>(
         H2_ALLOC(PCX_PALETTE_BYTE_COUNT, gMiscText.pcx.outputPaletteAllocation.text, 0x5f6));
-    for (int i = 0; i < PCX_PALETTE_BYTE_COUNT; ++i)
+    for (i32 i = 0; i < PCX_PALETTE_BYTE_COUNT; ++i)
         outputPalette[i] = paletteData[i] << PCX_COMPONENT_SCALE_SHIFT;
     _write(fileHandle, outputPalette, PCX_PALETTE_BYTE_COUNT);
     H2_FREE(outputPalette, gMiscText.pcx.outputPaletteDestruction.text, 0x5fb);
@@ -1500,21 +1500,21 @@ void CreatePCXFile(char *filename, unsigned char *pixels, int width, int height,
 }
 
 VA(0x004c68c0, 0x52)
-long int FileSize(char *filename)
+i32l FileSize(char *filename)
 {
     FILE *file = fopen(filename, gMiscText.file.readWriteBinaryMode.text);
     if (file == 0) {
         FileError(filename);
     }
     fseek(file, 0, 2);
-    long size = ftell(file);
+    i32l size = ftell(file);
     fseek(file, 0, 0);
     fclose(file);
     return size;
 }
 
 VA(0x004c6920, 0xc)
-struct IconEntry * GetIconEntry(class icon *iconPtr, int index)
+struct IconEntry * GetIconEntry(class icon *iconPtr, i32 index)
 {
     return reinterpret_cast<IconEntry *>(iconPtr->m_data) + index;
 }
@@ -1533,7 +1533,7 @@ struct IconEntry * GetIconEntry(class icon *iconPtr, int index)
 // store were checked. In-place modulo regressed to 88.13%; 24 reversible TU-state
 // probes found no exact closure, so every generated variant was discarded.
 VA(0x004c6930, 0xb8)
-int SRandom(int low, int high)
+i32 SRandom(i32 low, i32 high)
 {
     if (high == low) {
         return high;
@@ -1542,26 +1542,26 @@ int SRandom(int low, int high)
         return low;
     }
 
-    int highTerm = (high * SEEDED_RANDOM_TERM_MULTIPLIER) & SEEDED_RANDOM_TERM_MASK;
-    int lowTerm = (low * SEEDED_RANDOM_TERM_MULTIPLIER) & SEEDED_RANDOM_TERM_MASK;
+    i32 highTerm = (high * SEEDED_RANDOM_TERM_MULTIPLIER) & SEEDED_RANDOM_TERM_MASK;
+    i32 lowTerm = (low * SEEDED_RANDOM_TERM_MULTIPLIER) & SEEDED_RANDOM_TERM_MASK;
     iLastSeed += highTerm << SEEDED_RANDOM_HIGH_TERM_SHIFT;
     iLastSeed += lowTerm * SEEDED_RANDOM_LOW_TERM_MULTIPLIER;
     iLastSeed += highTerm;
     iLastSeed += (iLastSeed & SEEDED_RANDOM_FEEDBACK_MASK) << SEEDED_RANDOM_FEEDBACK_SHIFT;
     iLastSeed &= SEEDED_RANDOM_SEED_MASK;
 
-    int result = 0;
-    int mix = iLastSeed * SEEDED_RANDOM_MIX_MULTIPLIER;
+    i32 result = 0;
+    i32 mix = iLastSeed * SEEDED_RANDOM_MIX_MULTIPLIER;
     mix += (mix & SEEDED_RANDOM_MIX_MASK) >> SEEDED_RANDOM_MIX_SHIFT;
-    for (int i = SEEDED_RANDOM_TOP_BIT; i >= 0; --i) {
+    for (i32 i = SEEDED_RANDOM_TOP_BIT; i >= 0; --i) {
         if (mix & (1 << i)) {
             result |= 1 << i;
         }
     }
     mix += low;
-    int range = high - low;
+    i32 range = high - low;
     mix += high * 8;
-    int rangedResult = low + result % (range + 1);
+    i32 rangedResult = low + result % (range + 1);
     iLastSeed = mix;
     return rangedResult;
 }
@@ -1572,7 +1572,7 @@ int SRandom(int low, int high)
 // A direct xTerm/yTerm/seed-local form regressed to 46.53%, so the compact
 // in-place expression is retained. Revisit after Misc TU-state changes.
 VA(0x004c69f0, 0x5c)
-void SIncRandomize(int x, int y)
+void SIncRandomize(i32 x, i32 y)
 {
     x *= SEEDED_RANDOM_TERM_MULTIPLIER;
     x &= SEEDED_RANDOM_TERM_MASK;
@@ -1585,7 +1585,7 @@ void SIncRandomize(int x, int y)
 }
 
 VA(0x004c6a50, 0x10)
-void SRand(int seed)
+void SRand(i32 seed)
 {
     iLastSeed = seed;
     srand(seed);
@@ -1602,13 +1602,13 @@ void SRand(int seed)
 // Twenty-four reversible predecessor/TU-state probes found no exact closure; their
 // sub-100 disposable improvement was discarded.
 VA(0x004c6a60, 0x48)
-int SGenRand(void)
+i32 SGenRand(void)
 {
-    int result = 0;
+    i32 result = 0;
     iLastSeed &= SEEDED_RANDOM_SEED_MASK;
-    int mix = iLastSeed * SEEDED_RANDOM_MIX_MULTIPLIER;
+    i32 mix = iLastSeed * SEEDED_RANDOM_MIX_MULTIPLIER;
     mix += (mix & SEEDED_RANDOM_MIX_MASK) >> SEEDED_RANDOM_MIX_SHIFT;
-    int i = SEEDED_RANDOM_TOP_BIT;
+    i32 i = SEEDED_RANDOM_TOP_BIT;
     do {
         if (mix & (1 << i)) {
             result |= 1 << i;
@@ -1620,7 +1620,7 @@ int SGenRand(void)
 }
 
 VA(0x004c6ab0, 0x6)
-int MemSize(int)
+i32 MemSize(i32)
 {
     return 0x3ea2;
 }
@@ -1638,11 +1638,11 @@ int MemSize(int)
 // reports are delinked gpMouseManager/empty-string owner identities. Revisit only after
 // exact-preserving predecessor/TU state changes.
 VA(0x004c6ac0, 0x386)
-void GetDataEntry(char *prompt, char *destination, int maximumLength, char *initialText,
-                  int showCancel, int useImmediateHandler)
+void GetDataEntry(char *prompt, char *destination, i32 maximumLength, char *initialText,
+                  i32 showCancel, i32 useImmediateHandler)
 {
-    int savedCursorType = gpMouseManager->m_cursorType;
-    int savedCursorFrame = gpMouseManager->m_cursorFrame;
+    i32 savedCursorType = gpMouseManager->m_cursorType;
+    i32 savedCursorFrame = gpMouseManager->m_cursorFrame;
     while (gpMouseManager->m_hideCount != 0)
         gpMouseManager->ShowColorPointer();
     gpMouseManager->SetPointer(gMiscText.dataEntry.mouseFilename.text, 0,
@@ -1652,13 +1652,13 @@ void GetDataEntry(char *prompt, char *destination, int maximumLength, char *init
     iDEMaxLen = maximumLength;
     strcpy(destination, gMiscText.dataEntry.destinationDefault.text);
 
-    int rows = bigFont->LineLength(prompt, 0xf0) * 0x10;
+    i32 rows = bigFont->LineLength(prompt, 0xf0) * 0x10;
     if (showCancel != 0)
         rows += 0x27;
     rows = (rows + 0xf) / 0x2d;
     if (rows > 6)
         rows = 6;
-    int entryY = rows * 0x2d - (showCancel != 0 ? 0x1e : 0) + 0x5f;
+    i32 entryY = rows * 0x2d - (showCancel != 0 ? 0x1e : 0) + 0x5f;
 
     char windowName[16];
     sprintf(windowName, gMiscText.dataEntry.windowFilenameFormat.text, rows);
@@ -1701,7 +1701,7 @@ void GetDataEntry(char *prompt, char *destination, int maximumLength, char *init
     }
 
     textEntryWidget *entry = new textEntryWidget(
-        0x23, static_cast<short>(entryY), 0xfb, 0x14, static_cast<short>(maximumLength),
+        0x23, static_cast<i16>(entryY), 0xfb, 0x14, static_cast<i16>(maximumLength),
         destination, gMiscText.dataEntry.fontFilename.text, 0,
         gMiscText.dataEntry.iconFilename.text, 3, 10, 0, 4, 10, 3);
     if (entry == 0)
@@ -1733,7 +1733,7 @@ void GetDataEntry(char *prompt, char *destination, int maximumLength, char *init
 // AST pass tested 16 variants in 30 walks and retained none. Revisit after an
 // exact-preserving predecessor/TU-state change.
 VA(0x004c6e50, 0x173)
-int DataEntryWindowHandler(struct tag_message &message)
+i32 DataEntryWindowHandler(struct tag_message &message)
 {
     if (bDataEntryTime == DATA_ENTRY_PHASE_IMMEDIATE) {
         ++bDataEntryTime;
@@ -1796,7 +1796,7 @@ normalEvent:
 // ---- zero-fill globals (definitions, RVA order) ----
 DATA(0x005331c4) class heroWindow *DataEntryWin;
 DATA(0x005331c8) char *cDEDest;
-DATA(0x005331d4) int iDEMaxLen;
-DATA(0x005331d8) int bDataEntryTime;
-DATA(0x005331dc) int inBoxX;
-DATA(0x005331e0) int inBoxY;
+DATA(0x005331d4) i32 iDEMaxLen;
+DATA(0x005331d8) i32 bDataEntryTime;
+DATA(0x005331dc) i32 inBoxX;
+DATA(0x005331e0) i32 inBoxY;

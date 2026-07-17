@@ -30,9 +30,9 @@ button::button(void) : widget(0, 0, 0, 0, 0, 0)
 }
 
 VA(0x004dd4c0, 0x6e)
-button::button(short int x, short int y, short int width, short int height,
-               unsigned long int iconId, short int normalFrame, short int pressedFrame,
-               short int selectMode, short int hotkey, short int id, short int kind)
+button::button(i16 x, i16 y, i16 width, i16 height,
+               u32l iconId, i16 normalFrame, i16 pressedFrame,
+               i16 selectMode, i16 hotkey, i16 id, i16 kind)
     : widget(x, y, width, height, id, kind)
 {
     m_iconId = iconId;
@@ -44,12 +44,12 @@ button::button(short int x, short int y, short int width, short int height,
 }
 
 VA(0x004dd530, 0x7c)
-button::button(short int x, short int y, short int width, short int height, char *iconName,
-               short int normalFrame, short int pressedFrame, short int selectMode,
-               short int hotkey, short int id, short int kind)
+button::button(i16 x, i16 y, i16 width, i16 height, char *iconName,
+               i16 normalFrame, i16 pressedFrame, i16 selectMode,
+               i16 hotkey, i16 id, i16 kind)
     : widget(x, y, width, height, id, kind)
 {
-    unsigned long iconId = gpResourceManager->MakeId(iconName, 1);
+    u32l iconId = gpResourceManager->MakeId(iconName, 1);
     m_iconId = iconId;
     m_icon = gpResourceManager->GetIcon(iconId);
     m_normalFrame = normalFrame;
@@ -66,7 +66,7 @@ void button::Read(void)
     m_y = gpResourceManager->ReadWord();
     m_width = gpResourceManager->ReadWord();
     m_height = gpResourceManager->ReadWord();
-    gpResourceManager->Read13(reinterpret_cast<signed char *>(iconName));
+    gpResourceManager->Read13(reinterpret_cast<i8 *>(iconName));
     gpResourceManager->SavePosition();
     m_iconId = gpResourceManager->MakeId(iconName, 1);
     m_icon = gpResourceManager->GetIcon(m_iconId);
@@ -109,7 +109,7 @@ inline button::~button()
 // exact predecessor. This residual remains unresolved; it is not a byte-proven early
 // stop.
 VA(0x004dd6d0, 0x595)
-int button::Main(tag_message &msg)
+i32 button::Main(tag_message &msg)
 {
     if (DecodeWidgetKind(m_kind) == WIDGET_KIND_AUTO_REPEAT &&
         (m_flags & WIDGET_FLAG_SELECTED) != 0 &&
@@ -134,7 +134,7 @@ int button::Main(tag_message &msg)
         return 0;
     }
 
-    int eventType = msg.type;
+    i32 eventType = msg.type;
     switch (eventType) {
     case MESSAGE_KEY_DOWN:
         if ((m_flags & WIDGET_FLAG_ENABLED) != 0 && (m_flags & WIDGET_FLAG_DRAW) != 0 &&
@@ -152,7 +152,7 @@ int button::Main(tag_message &msg)
             if (m_hotkey == BUTTON_NO_HOTKEY ||
                 m_hotkey != msg.payload.keyboard.keyCode)
                 return 0;
-            short keyFlags = m_flags;
+            i16 keyFlags = m_flags;
             if ((keyFlags & WIDGET_FLAG_SELECTED) == 0)
                 return 0;
             keyFlags &= ~WIDGET_FLAG_SELECTED;
@@ -174,10 +174,10 @@ int button::Main(tag_message &msg)
         if ((m_flags & WIDGET_FLAG_DRAW) == 0)
             goto normalEvent;
 
-        short relativeX = static_cast<short>(msg.payload.mouse.x) -
-                          static_cast<short>(m_owner->m_posX);
-        short relativeY = static_cast<short>(msg.payload.mouse.y) -
-                          static_cast<short>(m_owner->m_posY);
+        i16 relativeX = static_cast<i16>(msg.payload.mouse.x) -
+                          static_cast<i16>(m_owner->m_posX);
+        i16 relativeY = static_cast<i16>(msg.payload.mouse.y) -
+                          static_cast<i16>(m_owner->m_posY);
         if (eventType == MESSAGE_RIGHT_BUTTON_DOWN) {
             if (m_x <= relativeX && m_y <= relativeY &&
                 relativeX < m_x + m_width && relativeY < m_y + m_height) {
@@ -197,13 +197,13 @@ int button::Main(tag_message &msg)
                 PollSound();
                 gpMouseManager->Main(msg);
                 if (msg.type == MESSAGE_MOUSE_MOVE) {
-                    relativeX = static_cast<short>(msg.payload.mouse.x) -
-                                static_cast<short>(m_owner->m_posX);
-                    relativeY = static_cast<short>(msg.payload.mouse.y) -
-                                static_cast<short>(m_owner->m_posY);
+                    relativeX = static_cast<i16>(msg.payload.mouse.x) -
+                                static_cast<i16>(m_owner->m_posX);
+                    relativeY = static_cast<i16>(msg.payload.mouse.y) -
+                                static_cast<i16>(m_owner->m_posY);
                     if (m_x > relativeX || m_y > relativeY ||
                         relativeX >= m_x + m_width || relativeY >= m_y + m_height) {
-                        short moveFlags = m_flags;
+                        i16 moveFlags = m_flags;
                         if ((moveFlags & WIDGET_FLAG_SELECTED) != 0) {
                             moveFlags &= ~WIDGET_FLAG_SELECTED;
                             m_flags = moveFlags;
@@ -223,7 +223,7 @@ int button::Main(tag_message &msg)
                 Process1WindowsMessage();
                 msg = gpInputManager->GetEvent();
             }
-            short releaseFlags = m_flags;
+            i16 releaseFlags = m_flags;
             if ((releaseFlags & WIDGET_FLAG_SELECTED) != 0) {
                 releaseFlags &= ~WIDGET_FLAG_SELECTED;
                 m_flags = releaseFlags;
@@ -243,7 +243,7 @@ int button::Main(tag_message &msg)
     }
 
     case MESSAGE_LEFT_BUTTON_UP: {
-        short releaseFlags = m_flags;
+        i16 releaseFlags = m_flags;
         if ((releaseFlags & WIDGET_FLAG_DRAW) != 0 &&
             (releaseFlags & WIDGET_FLAG_SELECTED) != 0) {
             releaseFlags &= ~WIDGET_FLAG_SELECTED;
@@ -293,11 +293,11 @@ normalEvent:
 // real predecessor/header TU-state change. This residual remains unresolved; it is not
 // a byte-proven early stop.
 VA(0x004ddc70, 0x96)
-short button::Select(struct tag_message &msg)
+i16 button::Select(struct tag_message &msg)
 {
     heroWindow *window = m_owner;
-    short x = static_cast<short>(window->m_posX + m_x);
-    short y = static_cast<short>(window->m_posY + m_y);
+    i16 x = static_cast<i16>(window->m_posX + m_x);
+    i16 y = static_cast<i16>(window->m_posY + m_y);
     m_icon->DrawToBuffer(x, y, m_pressedFrame, 0);
     gpWindowManager->UpdateScreenRegion(x, y, m_width, m_height);
     m_flags |= WIDGET_FLAG_SELECTED;
@@ -322,9 +322,9 @@ short button::Select(struct tag_message &msg)
 // also emitted the same current-epoch schedule. Variants that changed COMDAT emission
 // broke the destructor/alias shape.
 VA(0x004ddd10, 0x83)
-short button::Deselect(struct tag_message &msg)
+i16 button::Deselect(struct tag_message &msg)
 {
-    short flags = m_flags;
+    i16 flags = m_flags;
     if ((flags & WIDGET_FLAG_SELECTED) == 0)
         return 0;
     flags &= ~WIDGET_FLAG_SELECTED;
@@ -363,4 +363,4 @@ void button::Draw(void)
 VTBL(button, 0x004ebaf0);
 
 // ---- globals (definitions, RVA order) ----
-DATA(0x0052125c) int iLeftRightSave = 0;
+DATA(0x0052125c) i32 iLeftRightSave = 0;

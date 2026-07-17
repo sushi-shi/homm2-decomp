@@ -19,22 +19,22 @@
 #include <SOURCE/x_arena.h>
 
 VA(0x004c0080, 0x35c)
-int DoArenaDialog(void)
+i32 DoArenaDialog(void)
 {
-    int statValues_2[ARENA_CHOICE_COUNT];
-    int statValue_28;
-    int windowLines_7 = ARENA_WINDOW_RESOURCE;
-    short widgetMode_3 = 1;
-    int windowWidth_9 = ARENA_WINDOW_WIDTH;
-    int windowHeight = windowLines_7 * ARENA_WINDOW_ROW_HEIGHT +
+    i32 statValues_2[ARENA_CHOICE_COUNT];
+    i32 statValue_28;
+    i32 windowLines_7 = ARENA_WINDOW_RESOURCE;
+    i16 widgetMode_3 = 1;
+    i32 windowWidth_9 = ARENA_WINDOW_WIDTH;
+    i32 windowHeight = windowLines_7 * ARENA_WINDOW_ROW_HEIGHT +
                        ARENA_WINDOW_BASE_HEIGHT;
-    int windowX_9 = ARENA_WINDOW_X;
-    int windowY_12 = (ARENA_WINDOW_SCREEN_HEIGHT - windowHeight) / 2;
+    i32 windowX_9 = ARENA_WINDOW_X;
+    i32 windowY_12 = (ARENA_WINDOW_SCREEN_HEIGHT - windowHeight) / 2;
     char windowName_3[ARENA_WINDOW_NAME_SIZE];
-    int lineCount_3;
-    int textHeight_11;
+    i32 lineCount_3;
+    i32 textHeight_11;
     tag_message message;
-    int widgetIndex_12;
+    i32 widgetIndex_12;
     textWidget *statWidgets[ARENA_CHOICE_COUNT];
 
     if (windowY_12 > ARENA_WINDOW_MAX_Y)
@@ -102,12 +102,12 @@ int DoArenaDialog(void)
 }
 
 VA(0x004c03dc, 0x25f)
-int ArenaWindowHandler(struct tag_message &message_1)
+i32 ArenaWindowHandler(struct tag_message &message_1)
 {
     tag_message dialogMessage_12;
-    int widgetIndex_5;
-    int type_13;
-    int extra_18;
+    i32 widgetIndex_5;
+    i32 type_13;
+    i32 extra_18;
 
     if (!gpSoundManager->MusicPlaying() && gpAdvManager->m_active == 1)
         gpSoundManager->SwitchAmbientMusic(
@@ -185,7 +185,7 @@ int ArenaWindowHandler(struct tag_message &message_1)
 VA(0x004c063b, 0x150)
 void UpdateArenaIcons(void)
 {
-    int widgetIndex;
+    i32 widgetIndex;
 
     for (widgetIndex = 0; widgetIndex < ARENA_CHOICE_COUNT; widgetIndex++) {
         arenaWinPtr->RemoveWidget(skillWidget[widgetIndex]);
@@ -207,6 +207,6 @@ void UpdateArenaIcons(void)
 }
 
 // ---- globals (definitions, RVA order) ----
-DATA(0x005331a8) int choice;
+DATA(0x005331a8) i32 choice;
 DATA(0x005331b0) class iconWidget *skillWidget[3];
 DATA(0x005331bc) class heroWindow *arenaWinPtr;

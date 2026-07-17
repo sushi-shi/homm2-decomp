@@ -1,5 +1,7 @@
 #ifndef HOMM2_CAMPAIGN_H
 #define HOMM2_CAMPAIGN_H
+
+#include <Ints.h>
 #include <SOURCE/KB.h>
 // Declarations of the free functions DEFINED in Campaign.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
@@ -127,6 +129,6 @@ typedef enum CampaignMapDifficulty {
     CAMPAIGN_DIFFICULTY_HARD = 2
 } CampaignMapDifficulty;
 
-int CampaignHandler(struct tag_message &);
+i32 CampaignHandler(struct tag_message &);
 
 #endif // HOMM2_CAMPAIGN_H

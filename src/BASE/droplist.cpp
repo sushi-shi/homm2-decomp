@@ -58,7 +58,7 @@ dropListWidget::~dropListWidget()
     gpResourceManager->Dispose(m_icon);
     if (m_savedBackground != 0)
         delete m_savedBackground;
-    for (int itemIndex = 0; itemIndex < m_itemCount; itemIndex++)
+    for (i32 itemIndex = 0; itemIndex < m_itemCount; itemIndex++)
         H2_FREE(m_items[itemIndex], gDropListSourceFiles.itemDestruction.text, 25);
     H2_FREE(m_items, gDropListSourceFiles.listDestruction.text, 27);
 }
@@ -73,7 +73,7 @@ dropListWidget::~dropListWidget()
 VA(0x004dbfe0, 0x21d)
 void dropListWidget::Read(void)
 {
-    signed char name[16];
+    i8 name[16];
     char **entries;
 
     m_x = gpResourceManager->ReadWord();
@@ -97,7 +97,7 @@ void dropListWidget::Read(void)
     m_selColor = gpResourceManager->ReadWord();
     m_unusedColor = gpResourceManager->ReadWord();
     m_textMode = gpResourceManager->ReadWord();
-    short id = gpResourceManager->ReadWord();
+    i16 id = gpResourceManager->ReadWord();
 
     m_closedContentFrame = 0;
     m_dropButtonFrame = 1;
@@ -115,8 +115,8 @@ void dropListWidget::Read(void)
     m_scrollThumbFrame = 13;
     m_id = id;
     entries = &m_icon->m_data;
-    short iconX = m_x;
-    short iconY = m_y;
+    i16 iconX = m_x;
+    i16 iconY = m_y;
     IconEntry *topEntry = reinterpret_cast<IconEntry *>(*entries);
     m_iconX = iconX;
     m_iconY = iconY;
@@ -133,7 +133,7 @@ void dropListWidget::Read(void)
 }
 
 VA(0x004dc200, 0xd5)
-void dropListWidget::DeleteItem(int index)
+void dropListWidget::DeleteItem(i32 index)
 {
     if (index < m_itemCount) {
         if (m_selectedIndex == index)
@@ -162,7 +162,7 @@ void dropListWidget::DeleteItem(int index)
 // of 22 ordered sites are the dispatch at +0x15b and six-word table at +0x338: MSVC
 // emits $L locals, while the delinker rewrites them as Main plus the same local offsets.
 VA(0x004dc2e0, 0x350)
-int dropListWidget::Main(tag_message &message)
+i32 dropListWidget::Main(tag_message &message)
 {
     if ((m_flags & 2) == 0) {
         if (message.type == 0x200)
@@ -174,8 +174,8 @@ int dropListWidget::Main(tag_message &message)
     case 8:
     case 0x20:
         if (m_flags & 4) {
-            short x = static_cast<short>(message.payload.mouse.x) - static_cast<short>(m_owner->m_posX);
-            short y = static_cast<short>(message.payload.mouse.y) - static_cast<short>(m_owner->m_posY);
+            i16 x = static_cast<i16>(message.payload.mouse.x) - static_cast<i16>(m_owner->m_posX);
+            i16 y = static_cast<i16>(message.payload.mouse.y) - static_cast<i16>(m_owner->m_posY);
             if (message.type == 0x20) {
                 if (x >= m_x && y >= m_y && x < m_x + m_width && y < m_y + m_height) {
                     message.payload.widget.command = 14;
@@ -202,7 +202,7 @@ int dropListWidget::Main(tag_message &message)
         switch (message.payload.widget.command) {
         case 0x36:
             if (m_id == message.payload.widget.id) {
-                m_selectedIndex = static_cast<short>(message.payload.widget.data.value);
+                m_selectedIndex = static_cast<i16>(message.payload.widget.data.value);
                 return 1;
             }
             break;
@@ -264,7 +264,7 @@ void dropListWidget::Draw(void)
     m_icon->DrawToBuffer(m_dropButtonX + m_owner->m_posX, m_dropButtonY + m_owner->m_posY,
                              m_dropButtonFrame, 0);
     if (m_itemCount > 0 && m_selectedIndex >= 0) {
-        int color = 3;
+        i32 color = 3;
         if ((m_flags & 8) == 0)
             color = m_normalColor;
         m_font->DrawBoundedString(m_items[m_selectedIndex],
@@ -277,16 +277,16 @@ void dropListWidget::Draw(void)
 VA(0x004dc6e0, 0x378)
 void dropListWidget::DrawDropStuff(void)
 {
-    int y = m_owner->m_posY + m_listY;
+    i32 y = m_owner->m_posY + m_listY;
     m_icon->DrawToBuffer(m_owner->m_posX + m_listX, y, m_firstRowFrame, 0);
-    int color = m_selectedIndex == m_topIndex ? m_selColor : m_normalColor;
+    i32 color = m_selectedIndex == m_topIndex ? m_selColor : m_normalColor;
     m_font->DrawBoundedString(m_items[m_topIndex], m_owner->m_posX + m_listX + 5,
         y + 4, m_listWidth - 10, m_font->m_height + 1, color, m_textMode);
-    int i = 1;
+    i32 i = 1;
     y += m_firstRowHeight;
     while (i < m_visibleItemCount - 1 && m_topIndex + i < m_itemCount) {
         m_icon->DrawToBuffer(m_owner->m_posX + m_listX, y, m_middleRowFrame, 0);
-        int item = m_topIndex + i;
+        i32 item = m_topIndex + i;
         color = m_selectedIndex == item ? m_selColor : m_normalColor;
         m_font->DrawBoundedString(m_items[item], m_owner->m_posX + m_listX + 5,
             y + 2, m_listWidth - 10, m_font->m_height + 1, color, m_textMode);
@@ -294,14 +294,14 @@ void dropListWidget::DrawDropStuff(void)
         y += m_middleRowHeight;
     }
     m_icon->DrawToBuffer(m_owner->m_posX + m_listX, y, m_lastRowFrame, 0);
-    int item = m_topIndex + i;
+    i32 item = m_topIndex + i;
     if (item < m_itemCount) {
         color = m_selectedIndex == item ? m_selColor : m_normalColor;
         m_font->DrawBoundedString(m_items[item], m_owner->m_posX + m_listX + 5,
             y + 2, m_listWidth - 10, m_font->m_height + 1, color, m_textMode);
     }
     if (m_scrollRange > 0) {
-        int frame;
+        i32 frame;
         if (m_scrollUpPressed != 0)
             frame = m_scrollUpPressedFrame;
         else
@@ -321,8 +321,8 @@ void dropListWidget::DrawDropStuff(void)
         else
             frame = m_scrollDownFrame;
         m_icon->DrawToBuffer(m_owner->m_posX + m_scrollDownX, m_owner->m_posY + m_scrollDownY, frame, 0);
-        m_scrollThumbX = static_cast<short>(m_owner->m_posX) + m_scrollTrackX + 5;
-        m_scrollThumbY = static_cast<short>(m_owner->m_posY) +
+        m_scrollThumbX = static_cast<i16>(m_owner->m_posX) + m_scrollTrackX + 5;
+        m_scrollThumbY = static_cast<i16>(m_owner->m_posY) +
             (m_scrollThumbTravel * m_topIndex) / m_scrollRange + m_scrollTrackY + 3;
         m_icon->DrawToBuffer(m_scrollThumbX, m_scrollThumbY, m_scrollThumbFrame, 0);
     }
@@ -363,14 +363,14 @@ void dropListWidget::ProcessSelectDialog(void)
 {
     IconEntry *iconEntry;
     // Retail reserves a four-byte stack object for each 16-bit dimension temporary.
-    short scrollWidth[2];
-    short scrollTopHeight[2];
-    short scrollBottomWidth[2];
-    short scrollBottomHeight;
+    i16 scrollWidth[2];
+    i16 scrollTopHeight[2];
+    i16 scrollBottomWidth[2];
+    i16 scrollBottomHeight;
     tag_message message;
-    int firstRelease = 1;
-    int ownerX;
-    int ownerY;
+    i32 firstRelease = 1;
+    i32 ownerX;
+    i32 ownerY;
     m_scrollUpPressed = 0;
     m_scrollDownPressed = 0;
     m_itemSelectionTracking = 0;
@@ -378,7 +378,7 @@ void dropListWidget::ProcessSelectDialog(void)
     m_topIndex = 0;
     m_scrollRange = 0;
 
-    short numItems = m_itemCount;
+    i16 numItems = m_itemCount;
     if (numItems > m_maxVisibleItems) {
         m_scrollRange = numItems - m_maxVisibleItems;
         m_topIndex = m_selectedIndex;
@@ -395,11 +395,11 @@ void dropListWidget::ProcessSelectDialog(void)
         m_visibleItemCount = numItems;
     }
 
-    short topHeight = reinterpret_cast<IconEntry *>(m_icon->m_data)[m_firstRowFrame].h;
+    i16 topHeight = reinterpret_cast<IconEntry *>(m_icon->m_data)[m_firstRowFrame].h;
     m_firstRowHeight = topHeight;
-    short middleHeight = reinterpret_cast<IconEntry *>(m_icon->m_data)[m_middleRowFrame].h;
+    i16 middleHeight = reinterpret_cast<IconEntry *>(m_icon->m_data)[m_middleRowFrame].h;
     m_middleRowHeight = middleHeight;
-    short bottomHeight = reinterpret_cast<IconEntry *>(m_icon->m_data)[m_lastRowFrame].h;
+    i16 bottomHeight = reinterpret_cast<IconEntry *>(m_icon->m_data)[m_lastRowFrame].h;
     m_lastRowHeight = bottomHeight;
     m_listX = m_iconX;
     m_listY = m_iconY + m_closedContentHeight;
@@ -421,14 +421,14 @@ void dropListWidget::ProcessSelectDialog(void)
     m_savedBackgroundHeight = m_listHeight;
 
     if (m_scrollRange > 0) {
-        short scrollX = m_x + m_width - scrollWidth[0];
+        i16 scrollX = m_x + m_width - scrollWidth[0];
         m_scrollUpX = scrollX;
         m_scrollUpY = m_listY;
         m_scrollDownX = scrollX;
-        short bottomY = m_listY - scrollBottomHeight + m_listHeight;
+        i16 bottomY = m_listY - scrollBottomHeight + m_listHeight;
         m_scrollDownY = bottomY;
         m_scrollTrackX = scrollX;
-        short topY = m_listY + scrollTopHeight[0];
+        i16 topY = m_listY + scrollTopHeight[0];
         m_scrollTrackY = topY;
         m_scrollTrackWidth = scrollBottomWidth[0];
         bottomY -= topY;
@@ -451,8 +451,8 @@ void dropListWidget::ProcessSelectDialog(void)
         gpMouseManager->Main(message);
         ownerX = m_owner->m_posX;
         ownerY = m_owner->m_posY;
-        int mouseX = message.payload.mouse.screenX - ownerX;
-        int mouseY = message.payload.mouse.screenY - ownerY;
+        i32 mouseX = message.payload.mouse.screenX - ownerX;
+        i32 mouseY = message.payload.mouse.screenY - ownerY;
 
         switch (message.type) {
         case 1:
@@ -505,7 +505,7 @@ void dropListWidget::ProcessSelectDialog(void)
 
         case 4:
             if (m_itemSelectionTracking != 0) {
-                int item;
+                i32 item;
                 if (m_firstRowHeight < mouseY - m_listY)
                     item = (mouseY - m_listY - m_firstRowHeight) / m_middleRowHeight + 1;
                 else
@@ -514,22 +514,22 @@ void dropListWidget::ProcessSelectDialog(void)
                     item = 0;
                 if (item >= m_visibleItemCount)
                     item = m_visibleItemCount - 1;
-                int selected = m_topIndex + item;
+                i32 selected = m_topIndex + item;
                 if (selected < m_itemCount && m_selectedIndex != selected) {
-                    m_selectedIndex = static_cast<short>(item) + m_topIndex;
+                    m_selectedIndex = static_cast<i16>(item) + m_topIndex;
                     DrawDropStuff();
                     continue;
                 }
             } else if (m_scrollThumbDragging != 0) {
-                int scrollRange = m_scrollRange;
-                int top = ((mouseY - m_scrollThumbHeight / 2 - m_scrollTrackY - 4) *
+                i32 scrollRange = m_scrollRange;
+                i32 top = ((mouseY - m_scrollThumbHeight / 2 - m_scrollTrackY - 4) *
                     (scrollRange + 1)) / m_scrollThumbTravel;
                 if (top < 0)
                     top = 0;
                 if (top > scrollRange)
                     top = scrollRange;
                 if (m_topIndex != top) {
-                    m_topIndex = static_cast<short>(top);
+                    m_topIndex = static_cast<i16>(top);
                     DrawDropStuff();
                     continue;
                 }
@@ -542,14 +542,14 @@ void dropListWidget::ProcessSelectDialog(void)
                 goto done;
             if (mouseX >= m_listX && mouseY >= m_listY &&
                 mouseX < m_listX + m_listWidth && mouseY < m_listY + m_listHeight) {
-                int item;
+                i32 item;
                 if (m_firstRowHeight < mouseY - m_listY)
                     item = m_topIndex + 1 + (mouseY - m_listY - m_firstRowHeight) / m_middleRowHeight;
                 else
                     item = m_topIndex;
                 m_itemSelectionTracking = 1;
                 if (item < m_itemCount && m_selectedIndex != item) {
-                    m_selectedIndex = static_cast<short>(item);
+                    m_selectedIndex = static_cast<i16>(item);
                     DrawDropStuff();
                     continue;
                 }
@@ -565,8 +565,8 @@ void dropListWidget::ProcessSelectDialog(void)
                 } else {
                     if (mouseY >= m_scrollThumbY && mouseY < m_scrollThumbY + m_scrollThumbHeight)
                         m_scrollThumbDragging = 1;
-                    short scrollRange = m_scrollRange;
-                    m_topIndex = static_cast<short>(((mouseY - m_scrollThumbHeight / 2 - m_scrollTrackY - 4) *
+                    i16 scrollRange = m_scrollRange;
+                    m_topIndex = static_cast<i16>(((mouseY - m_scrollThumbHeight / 2 - m_scrollTrackY - 4) *
                         (scrollRange + 1)) / m_scrollThumbTravel);
                     if (m_topIndex < 0)
                         m_topIndex = 0;

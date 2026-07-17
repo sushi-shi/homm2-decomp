@@ -1,5 +1,7 @@
 #ifndef HOMM2_COMMAND_H
 #define HOMM2_COMMAND_H
+
+#include <Ints.h>
 // Declarations of the free functions DEFINED in COMMAND.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
 // forward declarations (was <_all.h>):
@@ -273,20 +275,20 @@ typedef enum CombatHelpTextIndex {
 
 #pragma pack(push, 1)
 struct CombatRemotePacket {
-    signed char messageLength;
+    i8 messageLength;
     char reserved1[4];
-    signed char category;
-    signed char command;
+    i8 category;
+    i8 command;
     char reserved7[2];
-    int nextAction;
-    int nextActionExtra;
-    int nextActionGridIndex;
-    int nextActionGridIndex2;
+    i32 nextAction;
+    i32 nextActionExtra;
+    i32 nextActionGridIndex;
+    i32 nextActionGridIndex2;
 };
 #pragma pack(pop)
 SIZE(CombatRemotePacket, 0x19);
 
-int WinCombatHandler(struct tag_message &);
-int InCombatArea(int, int);
+i32 WinCombatHandler(struct tag_message &);
+i32 InCombatArea(i32, i32);
 
 #endif // HOMM2_COMMAND_H

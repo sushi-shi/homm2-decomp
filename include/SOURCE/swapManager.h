@@ -114,21 +114,21 @@ public:
     heroWindow *m_window;  // +0x36
     icon *m_selectorIcon;  // +0x3a
     hero *m_heroes[SWAP_SIDE_COUNT];  // +0x3e
-    int m_selectedSide;  // +0x46
-    int m_targetSide;  // +0x4a
-    int m_selectedSlot;  // +0x4e
-    int m_targetSlot;  // +0x52
-    int m_itemType;  // +0x56
+    i32 m_selectedSide;  // +0x46
+    i32 m_targetSide;  // +0x4a
+    i32 m_selectedSlot;  // +0x4e
+    i32 m_targetSlot;  // +0x52
+    i32 m_itemType;  // +0x56
     // --- constructors ---
     swapManager(void);
     swapManager(class hero *, class hero *);
     // --- virtual methods (vtable order) ---
-    virtual int Open(int) OVERRIDE;
+    virtual i32 Open(i32) OVERRIDE;
     virtual void Close(void) OVERRIDE;
-    virtual int Main(struct tag_message &) OVERRIDE;
+    virtual i32 Main(struct tag_message &) OVERRIDE;
     // --- methods ---
     void Reset(void);
-    int DrawSwapWin(void);
+    i32 DrawSwapWin(void);
     void DrawSelector(void);
     void ViewMon(void);
     void SwapArtifacts(void);

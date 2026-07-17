@@ -1,5 +1,7 @@
 #ifndef HOMM2_DPNETWIN_H
 #define HOMM2_DPNETWIN_H
+
+#include <Ints.h>
 // Declarations of the free functions DEFINED in dpnetwin.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
 #include <windows.h>
@@ -49,10 +51,10 @@ typedef enum DirectPlayMessageType {
 
 typedef enum DirectPlayResult {
     DP_RESULT_OK = 0,
-    DP_RESULT_INVALID_ARGUMENT = static_cast<int>(0x80070057),
-    DP_RESULT_INVALID_PLAYER = static_cast<int>(0x88770096),
-    DP_RESULT_NO_MESSAGES = static_cast<int>(0x887700be),
-    DP_RESULT_NO_SESSIONS = static_cast<int>(0x887700dc)
+    DP_RESULT_INVALID_ARGUMENT = static_cast<i32>(0x80070057),
+    DP_RESULT_INVALID_PLAYER = static_cast<i32>(0x88770096),
+    DP_RESULT_NO_MESSAGES = static_cast<i32>(0x887700be),
+    DP_RESULT_NO_SESSIONS = static_cast<i32>(0x887700dc)
 } DirectPlayResult;
 
 typedef enum DirectPlaySourceLine {
@@ -85,55 +87,55 @@ typedef enum DirectPlaySourceLine {
 
 #pragma pack(push, 1)
 struct DirectPlayStartupMessage {
-    unsigned char playerCount;
-    unsigned char netPosition;
-    int playerIds[DP_TRANSPORT_STARTUP_MAPPING_COUNT];
+    u8 playerCount;
+    u8 netPosition;
+    i32 playerIds[DP_TRANSPORT_STARTUP_MAPPING_COUNT];
 };
 #pragma pack(pop)
 SIZE(DirectPlayStartupMessage, 0x1a);
 
-int __stdcall dpEnumServiceProvider(struct _GUID *, char *, unsigned long int, unsigned long int, void *);
-int __stdcall dpEnumSession(DPSESSIONDESC *, void *, unsigned long int *, unsigned long int);
-short int dpnet_init(void);
+BOOL WINAPI dpEnumServiceProvider(struct _GUID *, char *, DWORD, DWORD, void *);
+BOOL WINAPI dpEnumSession(DPSESSIONDESC *, void *, LPDWORD, DWORD);
+i16 dpnet_init(void);
 void CleanupDPVars(void);
 void dpnet_term(void);
-void dpSendMessage(int, unsigned char, unsigned short int, void *);
-int dpnet_snd(int, int, void *);
-short int dpnet_rcv(short int, unsigned short int, void *);
-unsigned char dpnet_stat(short int, unsigned short int);
-short int __cdecl dpnet_sess(int, int, ...);
+void dpSendMessage(i32, u8, u16, void *);
+i32 dpnet_snd(i32, i32, void *);
+i16 dpnet_rcv(i16, u16, void *);
+u8 dpnet_stat(i16, u16);
+i16 __cdecl dpnet_sess(i32, i32, ...);
 void dpProcessMessages(void);
-void dpEvaluateMessage(unsigned long int, int);
-int dpWaitForFirstGuest(void);
-int dpWaitForExtraGuests(void);
-int dpWaitForHost(void);
-void DPSD(int, char *, int);
+void dpEvaluateMessage(u32l, i32);
+i32 dpWaitForFirstGuest(void);
+i32 dpWaitForExtraGuests(void);
+i32 dpWaitForHost(void);
+void DPSD(i32, char *, i32);
 
 // ---- globals (declarations, RVA order) ----
 extern struct IDirectPlay *lpIDC;
-extern unsigned long dcoID;
+extern DPID dcoID;
 extern struct _GUID *IPXGuid;
 extern struct _GUID *TCPGuid;
 extern HANDLE dphEvent;
-extern int iDPRcvBufferHead;
-extern int iDPRcvBufferTail;
-extern unsigned char **ppDPRcvBuffer;
-extern int *piDPRcvBufferSize;
-extern int bStartUpInfoReceived;
+extern i32 iDPRcvBufferHead;
+extern i32 iDPRcvBufferTail;
+extern u8 **ppDPRcvBuffer;
+extern i32 *piDPRcvBufferSize;
+extern i32 bStartUpInfoReceived;
 extern HMODULE hinstDplayx;
-extern int iDPWaitForFirstGuestStatus;
-extern int iDPWaitForHostStatus;
-extern int iWaitForHostWaitCount;
-extern int iEnumCount;
-extern int iLastHereIAmTickCount;
-extern int bInDPSD;
-extern int iGUIDCount;
-extern int iLastMsgNumHumanPlayers;
-extern int iMaxSession;
-extern int giHostAcceptStatus;
+extern i32 iDPWaitForFirstGuestStatus;
+extern i32 iDPWaitForHostStatus;
+extern i32 iWaitForHostWaitCount;
+extern i32 iEnumCount;
+extern i32 iLastHereIAmTickCount;
+extern i32 bInDPSD;
+extern i32 iGUIDCount;
+extern i32 iLastMsgNumHumanPlayers;
+extern i32 iMaxSession;
+extern i32 giHostAcceptStatus;
 extern struct _GUID *g_lpGuid;
-extern int giNetPosToDCOPos[6];
-extern int iSessionToTry;
-extern long lSessions[10];
+extern i32 giNetPosToDCOPos[6];
+extern i32 iSessionToTry;
+extern i32l lSessions[10];
 
 #endif // HOMM2_DPNETWIN_H

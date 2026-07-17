@@ -28,11 +28,11 @@
 #define WS_SOURCE_LINE_RECEIVE_BASE 359
 #define WS_SOURCE_LINE_EVALUATE_BASE 413
 
-DATA(0x004ed2c4) static short s_wsInitSourceLineBase = WS_SOURCE_LINE_INIT_BASE;
-DATA(0x004ed730) static short s_wsTermSourceLineBase = WS_SOURCE_LINE_TERM_BASE;
-DATA(0x004ed78c) static short s_wsSendSourceLineBase = WS_SOURCE_LINE_SEND_BASE;
-DATA(0x004ed830) static short s_wsReceiveSourceLineBase = WS_SOURCE_LINE_RECEIVE_BASE;
-DATA(0x004ed860) static short s_wsEvaluateSourceLineBase = WS_SOURCE_LINE_EVALUATE_BASE;
+DATA(0x004ed2c4) static i16 s_wsInitSourceLineBase = WS_SOURCE_LINE_INIT_BASE;
+DATA(0x004ed730) static i16 s_wsTermSourceLineBase = WS_SOURCE_LINE_TERM_BASE;
+DATA(0x004ed78c) static i16 s_wsSendSourceLineBase = WS_SOURCE_LINE_SEND_BASE;
+DATA(0x004ed830) static i16 s_wsReceiveSourceLineBase = WS_SOURCE_LINE_RECEIVE_BASE;
+DATA(0x004ed860) static i16 s_wsEvaluateSourceLineBase = WS_SOURCE_LINE_EVALUATE_BASE;
 
 // @data-layout-note Retail initialized storage is 0xed2ac+0x73c. Candidate
 // .data is 0x737 across 11 source DATA definitions and 32 private literals;
@@ -53,12 +53,12 @@ DATA(0x004ed860) static short s_wsEvaluateSourceLineBase = WS_SOURCE_LINE_EVALUA
 // ours JE+JMP versus retail JNE. Structured while/do-while and both condition polarities were
 // tested; exact pointer-index and retry-label steering was rejected as less source-faithful.
 VA(0x004068b0, 0x5b5)
-short int wsnet_init(void) {
+i16 wsnet_init(void) {
     WinsockStartupMessage startup;
     struct hostent *pHost;
-    unsigned long socketMode;
+    u_long socketMode;
     char localHostName[WS_TRANSPORT_BUFFER_SIZE];
-    int player;
+    i32 player;
 
     if (gConfig.gfx[giCurExe].fullScreen != 0) {
         sprintf(gText, "About to initiate TCP/IP connection.  Heroes II will now drop from full screen mode to windowed mode, so that any Windows 95 generated dialog boxes can be seen.\n\nWhen the connection is successfully made, you can return to full screen mode by pressing 'F4'.");
@@ -66,16 +66,16 @@ short int wsnet_init(void) {
         SetFullScreenStatus(0);
     }
     gbRemoteOn = 1;
-    ppDPRcvBuffer = static_cast<unsigned char **>(
-        BaseAlloc(WS_TRANSPORT_BUFFER_COUNT * sizeof(unsigned char *), WSFILE,
+    ppDPRcvBuffer = static_cast<u8 **>(
+        BaseAlloc(WS_TRANSPORT_BUFFER_COUNT * sizeof(u8 *), WSFILE,
                   s_wsInitSourceLineBase + 0xa));
-    piDPRcvBufferSize = static_cast<int *>(
-        BaseAlloc(WS_TRANSPORT_BUFFER_COUNT * sizeof(int), WSFILE,
+    piDPRcvBufferSize = static_cast<i32 *>(
+        BaseAlloc(WS_TRANSPORT_BUFFER_COUNT * sizeof(i32), WSFILE,
                   s_wsInitSourceLineBase + 0xb));
     memset(ppDPRcvBuffer, 0,
-           WS_TRANSPORT_BUFFER_COUNT * sizeof(unsigned char *));
+           WS_TRANSPORT_BUFFER_COUNT * sizeof(u8 *));
     memset(piDPRcvBufferSize, 0,
-           WS_TRANSPORT_BUFFER_COUNT * sizeof(int));
+           WS_TRANSPORT_BUFFER_COUNT * sizeof(i32));
 
     wVer = MAKEWORD(1, 1);
     iRc = WSAStartup(wVer, &wsadata);
@@ -112,7 +112,7 @@ short int wsnet_init(void) {
     pHost = gethostbyname(localHostName);
     gIn_addrIP = *reinterpret_cast<struct in_addr *>(pHost->h_addr);
     sprintf(cWSTextBuffer, "%s", inet_ntoa(gIn_addrIP));
-    giNetPosToDCOPos[giThisNetPos] = static_cast<int>(inet_addr(cWSTextBuffer));
+    giNetPosToDCOPos[giThisNetPos] = static_cast<i32>(inet_addr(cWSTextBuffer));
 
     if (GameMode == REMOTE_GAME_NETWORK_HOST) {
         giWaitType = WS_WAIT_FIRST_GUEST;
@@ -146,11 +146,11 @@ short int wsnet_init(void) {
             NormalDialog(cWSTextBuffer, 5, -1, -1, -1, 0, -1, 0, -1, 0);
         }
         gbRemoteGameOpen = 0;
-        startup.playerCount = static_cast<unsigned char>(giNumHumanPlayers);
+        startup.playerCount = static_cast<u8>(giNumHumanPlayers);
         memcpy(startup.playerAddresses, giNetPosToDCOPos,
                sizeof(giNetPosToDCOPos));
         for (player = 1; player < giNumHumanPlayers; player++) {
-            startup.netPosition = static_cast<unsigned char>(player);
+            startup.netPosition = static_cast<u8>(player);
             wsSendMessage(giNetPosToDCOPos[player], WS_MESSAGE_STARTUP,
                           sizeof(startup), &startup);
         }
@@ -163,8 +163,8 @@ short int wsnet_init(void) {
                 GetDataEntry("Enter the host IP address.\n(i.e. 220.415.119.223)",
                              cWSTextBuffer, 20, 0, 0, 1);
             }
-            giNetPosToDCOPos[0] = static_cast<int>(inet_addr(cWSTextBuffer));
-            if (giNetPosToDCOPos[0] != static_cast<int>(INADDR_NONE))
+            giNetPosToDCOPos[0] = static_cast<i32>(inet_addr(cWSTextBuffer));
+            if (giNetPosToDCOPos[0] != static_cast<i32>(INADDR_NONE))
                 break;
             NormalDialog("Error in IP Address, please try again.",
                          5, -1, -1, -1, 0, -1, 0, -1, 0);
@@ -206,14 +206,14 @@ void wsnet_term(void) {
 // peer-address assignment. Direct, commuted, nested, do/while, and assignment-condition forms
 // were tested; the exact label/pointer-index form was rejected as less source-faithful.
 VA(0x00406f37, 0x1f5)
-void wsSendMessage(int destination, unsigned char type, unsigned short int size,
+void wsSendMessage(i32 destination, u8 type, u16 size,
                    void *data) {
-    unsigned char *packetBuffer = static_cast<unsigned char *>(
+    u8 *packetBuffer = static_cast<u8 *>(
         BaseAlloc(size + 1, WSFILE, s_wsSendSourceLineBase + 2));
     struct sockaddr_in peerAddress;
-    int attemptCount;
-    int error;
-    int netPlayer;
+    i32 attemptCount;
+    i32 error;
+    i32 netPlayer;
 
     packetBuffer[0] = type;
     if (size != 0)
@@ -255,21 +255,21 @@ void wsSendMessage(int destination, unsigned char type, unsigned short int size,
 }
 
 VA(0x0040712c, 0x61)
-int wsnet_snd(int destination, int size, void *data) {
-    int result;
+i32 wsnet_snd(i32 destination, i32 size, void *data) {
+    i32 result;
 
     wsProcessMessages();
     if (destination != WS_TRANSPORT_BROADCAST_POSITION)
         wsSendMessage(giNetPosToDCOPos[destination], WS_MESSAGE_DATA,
-                      static_cast<unsigned short>(size), data);
+                      static_cast<u16>(size), data);
     else
-        wsSendMessage(0, WS_MESSAGE_DATA, static_cast<unsigned short>(size), data);
+        wsSendMessage(0, WS_MESSAGE_DATA, static_cast<u16>(size), data);
     return 0;
 }
 
 VA(0x0040718d, 0xa7)
-short int wsnet_rcv(short int, unsigned short int, void *data) {
-    unsigned int size;
+i16 wsnet_rcv(i16, u16, void *data) {
+    u32 size;
 
     wsProcessMessages();
     if (iDPRcvBufferTail == iDPRcvBufferHead)
@@ -279,7 +279,7 @@ short int wsnet_rcv(short int, unsigned short int, void *data) {
     BaseFree(ppDPRcvBuffer[iDPRcvBufferTail], WSFILE,
              s_wsReceiveSourceLineBase + 9);
     iDPRcvBufferTail = (iDPRcvBufferTail + 1) % WS_TRANSPORT_BUFFER_COUNT;
-    return static_cast<short>(size);
+    return static_cast<i16>(size);
 }
 
 // @semantic
@@ -289,8 +289,8 @@ short int wsnet_rcv(short int, unsigned short int, void *data) {
 VA(0x00407234, 0xaf)
 void wsProcessMessages(void) {
     struct sockaddr_in remote;
-    int addressLength = sizeof(remote);
-    int receiveSize;
+    i32 addressLength = sizeof(remote);
+    i32 receiveSize;
 
     while (1) {
         receiveSize = WS_TRANSPORT_BUFFER_SIZE;
@@ -304,9 +304,9 @@ void wsProcessMessages(void) {
         if (iRc == 0)
             break;
         if (giNetPosToDCOPos[giThisNetPos] ==
-            static_cast<int>(remote.sin_addr.s_addr)) {
+            static_cast<i32>(remote.sin_addr.s_addr)) {
         } else {
-            wsEvaluateMessage(iRc, static_cast<int>(remote.sin_addr.s_addr));
+            wsEvaluateMessage(iRc, static_cast<i32>(remote.sin_addr.s_addr));
         }
     }
 }
@@ -316,14 +316,14 @@ void wsProcessMessages(void) {
 // table at RVA 0x7642; the candidate's next public begins one byte earlier, so
 // the old full-span raw-identity claim was invalid.
 VA(0x004072e3, 0x37d)
-void wsEvaluateMessage(unsigned long int size, int sender) {
+void wsEvaluateMessage(u32l size, i32 sender) {
     char *message = rcvBufIn + 1;
     tag_message windowMessage;
-    int player;
+    i32 player;
 
     switch (rcvBufIn[0]) {
     case WS_MESSAGE_DATA:
-        ppDPRcvBuffer[iDPRcvBufferHead] = static_cast<unsigned char *>(
+        ppDPRcvBuffer[iDPRcvBufferHead] = static_cast<u8 *>(
             BaseAlloc(size - 1, WSFILE, s_wsEvaluateSourceLineBase + 10));
         memcpy(ppDPRcvBuffer[iDPRcvBufferHead], rcvBufIn + 1, size - 1);
         piDPRcvBufferSize[iDPRcvBufferHead] = size;
@@ -381,7 +381,7 @@ void wsEvaluateMessage(unsigned long int size, int sender) {
         break;
     default:
         sprintf(cWSTextBuffer, "Unknown message: %d\n",
-                static_cast<int>(rcvBufIn[0]));
+                static_cast<i32>(rcvBufIn[0]));
         if (giDebugLevel > 0) {
             sprintf(gText, cWSTextBuffer);
             NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
@@ -395,13 +395,13 @@ void wsEvaluateMessage(unsigned long int size, int sender) {
 // +0x1e local JMP displacement differs, with retail targeting the epilogue and
 // this form its equivalent trailing JMP. Explicit if/else scored 94.12%.
 VA(0x00407660, 0x2e)
-int wsWaitForFirstGuest(void) {
+i32 wsWaitForFirstGuest(void) {
     wsProcessMessages();
     return giNumHumanPlayers > 1;
 }
 
 VA(0x0040768e, 0xb8)
-int wsWaitForExtraGuests(void) {
+i32 wsWaitForExtraGuests(void) {
     tag_message message;
 
     wsProcessMessages();
@@ -424,7 +424,7 @@ int wsWaitForExtraGuests(void) {
 }
 
 VA(0x00407746, 0x126)
-int wsWaitForHost(void) {
+i32 wsWaitForHost(void) {
     switch (iWSWaitForHostStatus) {
     case 0:
         if (KBTickCount() < iWSNextTickCount)
@@ -456,17 +456,17 @@ int wsWaitForHost(void) {
 }
 
 // ---- globals (definitions, RVA order) ----
-DATA(0x004ed2ac) int bHostFound = 0;
-DATA(0x004ed2b0) unsigned int sd_dg = 0xffffffffU;
-DATA(0x004ed2b4) int iWSLastMsgNumHumanPlayers = 1;
-DATA(0x004ed2b8) int iWSAttempts = 0;
-DATA(0x004ed2bc) int iWSNextTickCount = 0;
-DATA(0x004ed2c0) int iWSWaitForHostStatus = 0;
-DATA(0x00522f88) int iRc;
+DATA(0x004ed2ac) i32 bHostFound = 0;
+DATA(0x004ed2b0) u32 sd_dg = 0xffffffffU;
+DATA(0x004ed2b4) i32 iWSLastMsgNumHumanPlayers = 1;
+DATA(0x004ed2b8) i32 iWSAttempts = 0;
+DATA(0x004ed2bc) i32 iWSNextTickCount = 0;
+DATA(0x004ed2c0) i32 iWSWaitForHostStatus = 0;
+DATA(0x00522f88) i32 iRc;
 DATA(0x00522f90) char cWSTextBuffer[WS_TRANSPORT_BUFFER_SIZE];
 DATA(0x00523090) struct sockaddr_in saddr_loc;
-DATA(0x005230a0) unsigned short wVer;
+DATA(0x005230a0) u16 wVer;
 DATA(0x005230a8) struct WSAData wsadata;
 DATA(0x00523238) struct in_addr gIn_addrIP;
 DATA(0x00523240) struct sockaddr_in saddr_remote;
-DATA(0x00523250) int iAddrLen;
+DATA(0x00523250) i32 iAddrLen;

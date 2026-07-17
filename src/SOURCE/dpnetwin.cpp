@@ -21,11 +21,11 @@
 #define DPFILE const_cast<char *>("I:\\Projects\\Heroes\\Prog\\SOURCE\\dpnetwin.cpp")
 
 VA(0x0041eda0, 0x95)
-int __stdcall dpEnumServiceProvider(struct _GUID *guid, char *name,
-                                    unsigned long int, unsigned long int, void *) {
+BOOL WINAPI dpEnumServiceProvider(struct _GUID *guid, char *name,
+                                  DWORD, DWORD, void *) {
     LogStr("ServiceProvider:");
     _strupr(name);
-    LogInt(name, reinterpret_cast<int>(guid), -999, -999, -999, -999, -999, -999);
+    LogInt(name, reinterpret_cast<i32>(guid), -999, -999, -999, -999, -999, -999);
     if (FindStringInString(name, "IPX") != 0)
         IPXGuid = guid;
     else if (FindStringInString(name, "TCP") != 0)
@@ -34,8 +34,8 @@ int __stdcall dpEnumServiceProvider(struct _GUID *guid, char *name,
 }
 
 VA(0x0041ee35, 0x7a)
-int __stdcall dpEnumSession(DPSESSIONDESC *session, void *,
-                            unsigned long int *, unsigned long int flags) {
+BOOL WINAPI dpEnumSession(DPSESSIONDESC *session, void *,
+                          LPDWORD, DWORD flags) {
     if (flags & 1)
         return 0;
     LogStr("Sessions:");
@@ -57,29 +57,29 @@ int __stdcall dpEnumSession(DPSESSIONDESC *session, void *,
 // GetProcAddress import-call shapes. Revisit only after relevant import-thunk,
 // declaration, source/TU/header, or comparison-epoch changes.
 VA(0x0041eeaf, 0x311)
-short int dpnet_init(void) {
-    DATA(0x004ef83c) static short initSourceLineBase = DP_SOURCE_LINE_INIT_BASE;
+i16 dpnet_init(void) {
+    DATA(0x004ef83c) static i16 initSourceLineBase = DP_SOURCE_LINE_INIT_BASE;
     DirectPlayStartupMessage startup;
     typedef HRESULT (WINAPI *DirectPlayCreateFunction)(GUID *, IDirectPlay **, IUnknown *);
     typedef HRESULT (WINAPI *DirectPlayEnumerateFunction)(LPDPENUMDPCALLBACK, void *);
     DirectPlayCreateFunction createFunction;
     DirectPlayEnumerateFunction enumerateFunction;
-    int guestIndex;
-    int result;
+    i32 guestIndex;
+    i32 result;
 
     if (lpIDC != 0)
         return 0;
     {
-        ppDPRcvBuffer = static_cast<unsigned char **>(
-            BaseAlloc(DP_TRANSPORT_BUFFER_COUNT * sizeof(unsigned char *), DPFILE,
+        ppDPRcvBuffer = static_cast<u8 **>(
+            BaseAlloc(DP_TRANSPORT_BUFFER_COUNT * sizeof(u8 *), DPFILE,
                       initSourceLineBase + DP_SOURCE_LINE_INIT_BUFFER_ALLOC_OFFSET));
-        piDPRcvBufferSize = static_cast<int *>(
-            BaseAlloc(DP_TRANSPORT_BUFFER_COUNT * sizeof(int), DPFILE,
+        piDPRcvBufferSize = static_cast<i32 *>(
+            BaseAlloc(DP_TRANSPORT_BUFFER_COUNT * sizeof(i32), DPFILE,
                       initSourceLineBase + DP_SOURCE_LINE_INIT_SIZE_ALLOC_OFFSET));
         memset(ppDPRcvBuffer, 0,
-               DP_TRANSPORT_BUFFER_COUNT * sizeof(unsigned char *));
+               DP_TRANSPORT_BUFFER_COUNT * sizeof(u8 *));
         memset(piDPRcvBufferSize, 0,
-               DP_TRANSPORT_BUFFER_COUNT * sizeof(int));
+               DP_TRANSPORT_BUFFER_COUNT * sizeof(i32));
         hinstDplayx = LoadLibraryA("DPLAYX.DLL");
         if (hinstDplayx == 0)
             ShutDown("Can't load 'DPLAYX.DLL'");
@@ -120,11 +120,11 @@ short int dpnet_init(void) {
                     giNumHumanPlayers - 1);
             NormalDialog(gText, 5, -1, -1, -1, 0, -1, 0, -1, 0);
             gbRemoteGameOpen = 0;
-            startup.playerCount = static_cast<unsigned char>(giNumHumanPlayers);
+            startup.playerCount = static_cast<u8>(giNumHumanPlayers);
             memcpy(startup.playerIds, giNetPosToDCOPos,
                    sizeof(giNetPosToDCOPos));
             for (guestIndex = 1; guestIndex < giNumHumanPlayers; guestIndex++) {
-                startup.netPosition = static_cast<unsigned char>(guestIndex);
+                startup.netPosition = static_cast<u8>(guestIndex);
                 dpSendMessage(giNetPosToDCOPos[guestIndex], DP_MESSAGE_STARTUP,
                               sizeof(startup), &startup);
             }
@@ -164,8 +164,8 @@ void CleanupDPVars(void) {
 
 VA(0x0041f28e, 0x116)
 void dpnet_term(void) {
-    DATA(0x004efa00) static short termSourceLineBase = DP_SOURCE_LINE_TERM_BASE;
-    char drainBuffer[DP_TRANSPORT_TERM_DRAIN_READ_SIZE + sizeof(int)];
+    DATA(0x004efa00) static i16 termSourceLineBase = DP_SOURCE_LINE_TERM_BASE;
+    char drainBuffer[DP_TRANSPORT_TERM_DRAIN_READ_SIZE + sizeof(i32)];
 
     gbRemoteOn = 0;
     if (dcoID != 0)
@@ -190,13 +190,13 @@ void dpnet_term(void) {
 }
 
 VA(0x0041f3a4, 0xee)
-void dpSendMessage(int destination, unsigned char type, unsigned short int size,
+void dpSendMessage(i32 destination, u8 type, u16 size,
                    void *data) {
-    DATA(0x004efa5c) static short sendSourceLineBase = DP_SOURCE_LINE_SEND_BASE;
-    unsigned char *message = static_cast<unsigned char *>(
+    DATA(0x004efa5c) static i16 sendSourceLineBase = DP_SOURCE_LINE_SEND_BASE;
+    u8 *message = static_cast<u8 *>(
         BaseAlloc(size + 1, DPFILE,
                   sendSourceLineBase + DP_SOURCE_LINE_SEND_ALLOC_OFFSET));
-    int result;
+    i32 result;
 
     message[0] = type;
     if (size != 0)
@@ -212,22 +212,22 @@ void dpSendMessage(int destination, unsigned char type, unsigned short int size,
 }
 
 VA(0x0041f492, 0x5a)
-int dpnet_snd(int position, int size, void *data) {
-    int destination;
+i32 dpnet_snd(i32 position, i32 size, void *data) {
+    i32 destination;
 
     dpProcessMessages();
     if (position == DP_TRANSPORT_BROADCAST_POSITION)
         destination = 0;
     else
         destination = giNetPosToDCOPos[position];
-    dpSendMessage(destination, DP_MESSAGE_DATA, static_cast<unsigned short>(size), data);
+    dpSendMessage(destination, DP_MESSAGE_DATA, static_cast<u16>(size), data);
     return 0;
 }
 
 VA(0x0041f4ec, 0xa7)
-short int dpnet_rcv(short int, unsigned short int, void *data) {
-    DATA(0x004efae4) static short receiveSourceLineBase = DP_SOURCE_LINE_RECEIVE_BASE;
-    unsigned int size;
+i16 dpnet_rcv(i16, u16, void *data) {
+    DATA(0x004efae4) static i16 receiveSourceLineBase = DP_SOURCE_LINE_RECEIVE_BASE;
+    u32 size;
 
     dpProcessMessages();
     if (iDPRcvBufferTail == iDPRcvBufferHead)
@@ -237,29 +237,29 @@ short int dpnet_rcv(short int, unsigned short int, void *data) {
     BaseFree(ppDPRcvBuffer[iDPRcvBufferTail], DPFILE,
              receiveSourceLineBase + DP_SOURCE_LINE_RECEIVE_FREE_OFFSET);
     iDPRcvBufferTail = (iDPRcvBufferTail + 1) % DP_TRANSPORT_BUFFER_COUNT;
-    return static_cast<short>(size);
+    return static_cast<i16>(size);
 }
 
 VA(0x0041f593, 0x1d)
-unsigned char dpnet_stat(short int, unsigned short int) { return 0; }
+u8 dpnet_stat(i16, u16) { return 0; }
 
 VA(0x0041f5b0, 0x13)
-short int __cdecl dpnet_sess(int, int, ...) { return 0; }
+i16 __cdecl dpnet_sess(i32, i32, ...) { return 0; }
 
 VA(0x0041f5c3, 0xbe)
 void dpProcessMessages(void) {
-    DATA(0x004efb14) static short processSourceLineBase = DP_SOURCE_LINE_PROCESS_BASE;
-    unsigned long packetSize[2];
-    int destinationIds[2];
-    int senderId;
-    int receiveResult;
+    DATA(0x004efb14) static i16 processSourceLineBase = DP_SOURCE_LINE_PROCESS_BASE;
+    DWORD packetSize[2];
+    i32 destinationIds[2];
+    i32 senderId;
+    i32 receiveResult;
 
     if (lpIDC == 0)
         return;
     while (1) {
         packetSize[0] = DP_TRANSPORT_RECEIVE_SIZE;
-        receiveResult = lpIDC->Receive(reinterpret_cast<unsigned long *>(&senderId),
-                                       reinterpret_cast<unsigned long *>(destinationIds),
+        receiveResult = lpIDC->Receive(reinterpret_cast<LPDPID>(&senderId),
+                                       reinterpret_cast<LPDPID>(destinationIds),
                                        1, rcvBufIn, packetSize);
         if (receiveResult == DP_RESULT_NO_MESSAGES)
             return;
@@ -284,14 +284,14 @@ void dpProcessMessages(void) {
 // one-byte boundary artifact. Revisit only after function-boundary, source/TU/
 // header, or comparison-epoch changes.
 VA(0x0041f681, 0x274)
-void dpEvaluateMessage(unsigned long int size, int sender) {
-    DATA(0x004efb44) static short evaluateSourceLineBase = DP_SOURCE_LINE_EVALUATE_BASE;
+void dpEvaluateMessage(u32l size, i32 sender) {
+    DATA(0x004efb44) static i16 evaluateSourceLineBase = DP_SOURCE_LINE_EVALUATE_BASE;
     char *ptr = rcvBufIn + 1;
-    int i;
+    i32 i;
 
     switch (rcvBufIn[0]) {
     case DP_MESSAGE_DATA:
-        ppDPRcvBuffer[iDPRcvBufferHead] = static_cast<unsigned char *>(
+        ppDPRcvBuffer[iDPRcvBufferHead] = static_cast<u8 *>(
             BaseAlloc(size - 1, DPFILE,
                       evaluateSourceLineBase + DP_SOURCE_LINE_EVALUATE_ALLOC_OFFSET));
         memcpy(ppDPRcvBuffer[iDPRcvBufferHead], rcvBufIn + 1, size - 1);
@@ -333,7 +333,7 @@ void dpEvaluateMessage(unsigned long int size, int sender) {
         bStartUpInfoReceived = 1;
         break;
     default:
-        sprintf(gText, "Unknown message: %d\n", static_cast<int>(rcvBufIn[0]));
+        sprintf(gText, "Unknown message: %d\n", static_cast<i32>(rcvBufIn[0]));
         LogStr(gText);
         break;
     }
@@ -346,10 +346,10 @@ void dpEvaluateMessage(unsigned long int size, int sender) {
 // target literal aliases are proven gsThisNetPlayerInfo +26/+27 fields. Revisit
 // only after the source/TU/header or comparison epoch changes.
 VA(0x0041f8f5, 0x182)
-int dpWaitForFirstGuest(void) {
-    DATA(0x004efb9c) static short firstGuestSourceLineBase = DP_SOURCE_LINE_FIRST_GUEST_BASE;
+i32 dpWaitForFirstGuest(void) {
+    DATA(0x004efb9c) static i16 firstGuestSourceLineBase = DP_SOURCE_LINE_FIRST_GUEST_BASE;
     DPSESSIONDESC session;
-    int result;
+    i32 result;
 
     switch (iDPWaitForFirstGuestStatus) {
     case 0:
@@ -388,7 +388,7 @@ int dpWaitForFirstGuest(void) {
 }
 
 VA(0x0041fa77, 0x84)
-int dpWaitForExtraGuests(void) {
+i32 dpWaitForExtraGuests(void) {
     tag_message message;
 
     dpProcessMessages();
@@ -410,11 +410,11 @@ int dpWaitForExtraGuests(void) {
 // status/result/session/timeout slots, and all 78 ordered relocations match.
 // The objdiff residual is only delinked switch-table/local-label identity.
 VA(0x0041fafb, 0x3d2)
-int dpWaitForHost(void) {
-    DATA(0x004efc78) static short hostSourceLineBase = DP_SOURCE_LINE_HOST_BASE;
-    unsigned long enumerationTimeout;
+i32 dpWaitForHost(void) {
+    DATA(0x004efc78) static i16 hostSourceLineBase = DP_SOURCE_LINE_HOST_BASE;
+    DWORD enumerationTimeout;
     DPSESSIONDESC sessionDescription;
-    int playResult;
+    i32 playResult;
     char statusString[32];
 
     sprintf(statusString, "WFHS %d", iDPWaitForHostStatus);
@@ -509,9 +509,9 @@ int dpWaitForHost(void) {
 }
 
 VA(0x0041fecd, 0x5eb)
-void DPSD(int result, char *file, int line) {
+void DPSD(i32 result, char *file, i32 line) {
     char errorText[200];
-    int errorFlag;
+    i32 errorFlag;
 
     if (bInDPSD != 0)
         return;
@@ -644,27 +644,27 @@ void DPSD(int result, char *file, int line) {
 // duplicate owners, aliases, padding, cursor replay, or synthetic identities.
 // ---- globals (definitions, RVA order) ----
 DATA(0x004ef7c8) struct IDirectPlay *lpIDC = 0;
-DATA(0x004ef7cc) unsigned long dcoID = 0;
+DATA(0x004ef7cc) DPID dcoID = 0;
 DATA(0x004ef7d0) struct _GUID *IPXGuid = 0;
 DATA(0x004ef7d4) struct _GUID *TCPGuid = 0;
 DATA(0x004ef7d8) HANDLE dphEvent = 0;
-DATA(0x004ef7dc) int iDPRcvBufferHead = 0;
-DATA(0x004ef7e0) int iDPRcvBufferTail = 0;
-DATA(0x004ef7e4) unsigned char **ppDPRcvBuffer = 0;
-DATA(0x004ef7e8) int *piDPRcvBufferSize = 0;
-DATA(0x004ef7ec) int bStartUpInfoReceived = 0;
+DATA(0x004ef7dc) i32 iDPRcvBufferHead = 0;
+DATA(0x004ef7e0) i32 iDPRcvBufferTail = 0;
+DATA(0x004ef7e4) u8 **ppDPRcvBuffer = 0;
+DATA(0x004ef7e8) i32 *piDPRcvBufferSize = 0;
+DATA(0x004ef7ec) i32 bStartUpInfoReceived = 0;
 DATA(0x004ef7f0) HMODULE hinstDplayx = 0;
-DATA(0x004ef7f4) int iDPWaitForFirstGuestStatus = 0;
-DATA(0x004ef7f8) int iDPWaitForHostStatus = 0;
-DATA(0x004ef7fc) int iWaitForHostWaitCount = 0;
-DATA(0x004ef800) int iEnumCount = 0;
-DATA(0x004ef804) int iLastHereIAmTickCount = 0;
-DATA(0x004ef808) int bInDPSD = 0;
-DATA(0x004ef80c) int iGUIDCount = 0;
-DATA(0x004ef810) int iLastMsgNumHumanPlayers = 1;
-DATA(0x00525060) int iMaxSession;
-DATA(0x00525064) int giHostAcceptStatus;
+DATA(0x004ef7f4) i32 iDPWaitForFirstGuestStatus = 0;
+DATA(0x004ef7f8) i32 iDPWaitForHostStatus = 0;
+DATA(0x004ef7fc) i32 iWaitForHostWaitCount = 0;
+DATA(0x004ef800) i32 iEnumCount = 0;
+DATA(0x004ef804) i32 iLastHereIAmTickCount = 0;
+DATA(0x004ef808) i32 bInDPSD = 0;
+DATA(0x004ef80c) i32 iGUIDCount = 0;
+DATA(0x004ef810) i32 iLastMsgNumHumanPlayers = 1;
+DATA(0x00525060) i32 iMaxSession;
+DATA(0x00525064) i32 giHostAcceptStatus;
 DATA(0x00525068) struct _GUID *g_lpGuid;
-DATA(0x00525070) int giNetPosToDCOPos[6];
-DATA(0x00525088) int iSessionToTry;
-DATA(0x00525090) long lSessions[10];
+DATA(0x00525070) i32 giNetPosToDCOPos[6];
+DATA(0x00525088) i32 iSessionToTry;
+DATA(0x00525090) i32l lSessions[10];

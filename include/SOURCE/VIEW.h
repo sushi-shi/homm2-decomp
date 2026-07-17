@@ -1,5 +1,7 @@
 #ifndef HOMM2_VIEW_H
 #define HOMM2_VIEW_H
+
+#include <Ints.h>
 // Declarations of the free functions DEFINED in VIEW.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
 // forward declarations (was <_all.h>):
@@ -32,7 +34,7 @@ typedef enum ViewGeneralConstant {
     VIEW_ARMY_BOTTOM_CLAMP = 230
 } ViewGeneralConstant;
 
-int HandleViewGeneral(struct tag_message &);
-extern int iViewGeneralWhichSide;
+i32 HandleViewGeneral(struct tag_message &);
+extern i32 iViewGeneralWhichSide;
 
 #endif // HOMM2_VIEW_H

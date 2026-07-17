@@ -1,11 +1,10 @@
 // Ints.h - fixed-width integer aliases.
 //
 // Widths are this target's: 32-bit Win32 / MSVC 4.2, where `long` == `int` == 4
-// bytes and `unsigned long` == `unsigned int` == 4 bytes. So `i32`/`u32` cover
-// BOTH `int`/`long` and `unsigned`/`unsigned long` here; this keeps codegen
-// byte-identical (widths preserved) while making shapes read clearly. `i32` IS
-// `int`, so `int`->`i32` is a no-op for codegen and name-mangling; `long`->`i32`
-// changes only the mangled name (the RVA-keyed pairing + reloc-masking absorb it).
+// bytes and `unsigned long` == `unsigned int` == 4 bytes. `i32`/`u32` preserve
+// int-backed retail declarations. `i32l`/`u32l` preserve the smaller set of
+// long-backed declarations whose distinct C++ type identity affects mangling and
+// overload resolution. A future port may map both families to native 32-bit types.
 //
 // NOTE: the SDK's own aliases (BOOL/DWORD/WORD/BYTE/UINT/INT/LONG/...) are left
 // as-is in our sources - they pin our externs to the real Win32 signatures.
@@ -20,6 +19,8 @@ typedef short i16;
 typedef unsigned short u16;
 typedef int i32;
 typedef unsigned int u32;
+typedef long i32l;
+typedef unsigned long u32l;
 typedef __int64 i64;
 typedef unsigned __int64 u64;
 

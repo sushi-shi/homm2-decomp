@@ -14,9 +14,9 @@
 
 #define COMWIN_SOURCE_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\comwin.cpp"
 
-DATA(0x004f843c) static short s_comTermSourceLineBase = 199;
-DATA(0x004f84d8) static short s_comSendSourceLineBase = 247;
-DATA(0x004f8540) static short s_comWriteSourceLineBase = 310;
+DATA(0x004f843c) static i16 s_comTermSourceLineBase = 199;
+DATA(0x004f84d8) static i16 s_comSendSourceLineBase = 247;
+DATA(0x004f8540) static i16 s_comWriteSourceLineBase = 310;
 DATA(0x005284b8) static ComPortState s_comPorts[COM_PORT_COUNT];
 
 // @data-layout-note Retail initialized storage is 0xf81ac..0xf858a. The
@@ -56,7 +56,7 @@ struct tag_Node * pop_node(struct tag_Anchor *anchor)
 }
 
 VA(0x0048a700, 0x2e)
-void init_anchor(struct tag_Anchor *anchor, int, int)
+void init_anchor(struct tag_Anchor *anchor, i32, i32)
 {
     anchor->head = 0;
     anchor->tail = 0;
@@ -149,12 +149,12 @@ void ShutdownComError(char *function)
 // 0x14-byte baud-rate jump table at RVA 0x8ace2. An initial BaudRate assignment
 // scored 95.64%; the explicit default arm is retained.
 VA(0x0048ab13, 0x34a)
-short int com_init(unsigned char portNumber, int baudRate, int useDtr)
+i16 com_init(u8 portNumber, i32 baudRate, i32 useDtr)
 {
     char portName[COM_PORT_NAME_SIZE];
     BOOL result;
     DCB state;
-    int portIndex;
+    i32 portIndex;
     COMMTIMEOUTS timeouts;
 
     for (portIndex = 0; portIndex < COM_PORT_COUNT; ++portIndex)
@@ -238,11 +238,11 @@ short int com_init(unsigned char portNumber, int baudRate, int useDtr)
 
     init_anchor(&s_comPorts[portIndex].normalQueue, 1, 0);
     init_anchor(&s_comPorts[portIndex].priorityQueue, 1, 0);
-    return static_cast<short>(portIndex);
+    return static_cast<i16>(portIndex);
 }
 
 VA(0x0048ae5d, 0x11d)
-void com_term(short int portIndex)
+void com_term(i16 portIndex)
 {
     tag_Node *node;
     if (s_comPorts[portIndex].handle != INVALID_HANDLE_VALUE) {
@@ -261,13 +261,13 @@ void com_term(short int portIndex)
 }
 
 VA(0x0048af7a, 0xdd)
-short int com_rcv(short int portIndex, unsigned short int requested,
+i16 com_rcv(i16 portIndex, u16 requested,
                   void *buffer)
 {
     COMSTAT status;
     DWORD commErrors;
-    unsigned int count;
-    short bytesRead[2];
+    u32 count;
+    i16 bytesRead[2];
     BOOL result;
 
     if (s_comPorts[portIndex].handle != INVALID_HANDLE_VALUE) {
@@ -290,8 +290,8 @@ short int com_rcv(short int portIndex, unsigned short int requested,
 }
 
 VA(0x0048b057, 0x145)
-short int com_snd(short int portIndex, unsigned short int,
-                  unsigned short int length, void *data, int priority)
+i16 com_snd(i16 portIndex, u16,
+                  u16 length, void *data, i32 priority)
 {
     BOOL result;
     tag_Node *sendNode;
@@ -324,10 +324,10 @@ short int com_snd(short int portIndex, unsigned short int,
 }
 
 VA(0x0048b19c, 0x13)
-short int __cdecl com_sess(int, int, ...) { return 0; }
+i16 __cdecl com_sess(i32, i32, ...) { return 0; }
 
 VA(0x0048b1af, 0x6e)
-unsigned char com_stat(short int portIndex, unsigned short int)
+u8 com_stat(i16 portIndex, u16)
 {
     DWORD modemStatus;
     if (s_comPorts[portIndex].handle != INVALID_HANDLE_VALUE &&
@@ -345,7 +345,7 @@ VA(0x0048b21d, 0xe8)
 void comm_wrt_task(void)
 {
     DWORD bytesWritten;
-    unsigned int writtenTotal;
+    u32 writtenTotal;
     tag_Node *packetNode;
     BOOL callResult;
     ComPortState *comPort;

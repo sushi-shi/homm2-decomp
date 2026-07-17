@@ -1,8 +1,10 @@
 #ifndef HOMM2_FINDPATH_H
 #define HOMM2_FINDPATH_H
+
+#include <Ints.h>
 // Declarations of the free functions DEFINED in FINDPATH.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
 
-int CalcTerrainCost(int, int, int, int, int, int);
+i32 CalcTerrainCost(i32, i32, i32, i32, i32, i32);
 
 #endif // HOMM2_FINDPATH_H

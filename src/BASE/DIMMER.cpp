@@ -13,7 +13,7 @@ dimmerWidget::dimmerWidget(void) : widget(0, 0, 0, 0, 0, 0)
 }
 
 VA(0x004dd350, 0x34)
-dimmerWidget::dimmerWidget(short int a, short int b, short int c, short int d, short int e, short int f)
+dimmerWidget::dimmerWidget(i16 a, i16 b, i16 c, i16 d, i16 e, i16 f)
     : widget(a, b, c, d, e, f)
 {
 }
@@ -30,7 +30,7 @@ void dimmerWidget::Read(void)
 }
 
 VA(0x004dd3f0, 0xd)
-int dimmerWidget::Main(struct tag_message &msg)
+i32 dimmerWidget::Main(struct tag_message &msg)
 {
     return widget::Main(msg);
 }

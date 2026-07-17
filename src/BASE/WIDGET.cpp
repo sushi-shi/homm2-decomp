@@ -13,7 +13,7 @@
 #include <SOURCE/KB.h>
 
 VA(0x004dde00, 0x5a)
-widget::widget(short int x, short int y, short int width, short int height, short int id, short int kind)
+widget::widget(i16 x, i16 y, i16 width, i16 height, i16 id, i16 kind)
 {
     m_owner = 0;
     m_next = 0;
@@ -48,7 +48,7 @@ VA(0x004ddea0, 0x7)
 widget::~widget() {}
 
 VA(0x004ddeb0, 0x14)
-int widget::Open(int zOrder, class heroWindow *owner)
+i32 widget::Open(i32 zOrder, class heroWindow *owner)
 {
     m_zOrder = zOrder;
     m_owner = owner;
@@ -69,16 +69,16 @@ void widget::Close(void) {}
 // rejection CFG spellings, 38 current-state AST variants, and 36 guarded TU-state
 // trials did not close it. Revisit after a real predecessor/header state change.
 VA(0x004ddee0, 0x2f4)
-int widget::Main(tag_message &message)
+i32 widget::Main(tag_message &message)
 {
     switch (message.type) {
     case MESSAGE_MOUSE_MOVE: {
-        short x = static_cast<short>(message.payload.mouse.x);
-        short y = static_cast<short>(message.payload.mouse.y);
-        short left = m_x;
+        i16 x = static_cast<i16>(message.payload.mouse.x);
+        i16 y = static_cast<i16>(message.payload.mouse.y);
+        i16 left = m_x;
         heroWindow *window = m_owner;
-        x -= static_cast<short>(window->m_posX);
-        y -= static_cast<short>(window->m_posY);
+        x -= static_cast<i16>(window->m_posX);
+        y -= static_cast<i16>(window->m_posY);
         if (left > x || m_y > y || left + m_width <= x || m_y + m_height <= y)
             break;
         message.payload.hover.id = m_id;
@@ -93,8 +93,8 @@ int widget::Main(tag_message &message)
             if ((m_flags & WIDGET_FLAG_DIMMED) != 0 &&
                 DecodeWidgetKind(m_kind) != WIDGET_KIND_UNDIMMED &&
                 DecodeWidgetKind(m_kind) != WIDGET_KIND_TEXT) {
-                short x = m_x + static_cast<short>(m_owner->m_posX);
-                short y = m_y + static_cast<short>(m_owner->m_posY);
+                i16 x = m_x + static_cast<i16>(m_owner->m_posX);
+                i16 y = m_y + static_cast<i16>(m_owner->m_posY);
                 DimBitmapArea(gpWindowManager->m_screen, x, y, m_width, m_height, 0);
                 return 0;
             }
@@ -106,14 +106,14 @@ int widget::Main(tag_message &message)
                     m_flags |= WIDGET_FLAG_DIMMED;
                     return 1;
                 }
-                unsigned short flags = m_flags | static_cast<unsigned short>(message.payload.widget.data.value);
+                u16 flags = m_flags | static_cast<u16>(message.payload.widget.data.value);
                 m_flags = flags;
                 if ((flags & WIDGET_FLAG_DIMMED) != 0) {
                     Draw();
                     if (DecodeWidgetKind(m_kind) != WIDGET_KIND_UNDIMMED &&
                         DecodeWidgetKind(m_kind) != WIDGET_KIND_TEXT) {
-                        short x = m_x + static_cast<short>(m_owner->m_posX);
-                        short y = m_y + static_cast<short>(m_owner->m_posY);
+                        i16 x = m_x + static_cast<i16>(m_owner->m_posX);
+                        i16 y = m_y + static_cast<i16>(m_owner->m_posY);
                         DimBitmapArea(gpWindowManager->m_screen, x, y, m_width, m_height, 0);
                     }
                 }
@@ -129,15 +129,15 @@ int widget::Main(tag_message &message)
 
         case WIDGET_COMMAND_CLEAR_FLAGS:
             if (m_id == message.payload.widget.id) {
-                unsigned int flags = message.payload.widget.data.value;
+                u32 flags = message.payload.widget.data.value;
                 if (flags == WIDGET_COMMAND_DIMMED) {
                     m_flags &= ~WIDGET_FLAG_DIMMED;
                     return 1;
                 }
-                m_flags &= ~static_cast<unsigned short>(flags);
-                if ((static_cast<unsigned short>(flags) & WIDGET_FLAG_DIMMED) != 0)
+                m_flags &= ~static_cast<u16>(flags);
+                if ((static_cast<u16>(flags) & WIDGET_FLAG_DIMMED) != 0)
                     Draw();
-                if ((static_cast<unsigned short>(flags) & WIDGET_FLAG_UPDATE) != 0)
+                if ((static_cast<u16>(flags) & WIDGET_FLAG_UPDATE) != 0)
                     gpWindowManager->UpdateScreenRegion(m_x + m_owner->m_posX,
                                                         m_y + m_owner->m_posY,
                                                         m_width, m_height);
@@ -147,21 +147,21 @@ int widget::Main(tag_message &message)
 
         case WIDGET_COMMAND_SET_X:
             if (m_id == message.payload.widget.id) {
-                m_x = static_cast<short>(message.payload.widget.data.value);
+                m_x = static_cast<i16>(message.payload.widget.data.value);
                 return 1;
             }
             break;
 
         case WIDGET_COMMAND_SET_Y:
             if (m_id == message.payload.widget.id) {
-                m_y = static_cast<short>(message.payload.widget.data.value);
+                m_y = static_cast<i16>(message.payload.widget.data.value);
                 return 1;
             }
             break;
 
         case WIDGET_COMMAND_SET_WIDTH:
             if (m_id == message.payload.widget.id) {
-                m_width = static_cast<short>(message.payload.widget.data.value);
+                m_width = static_cast<i16>(message.payload.widget.data.value);
                 return 1;
             }
             break;
@@ -183,8 +183,8 @@ void widget::Dim(void)
 {
     if (DecodeWidgetKind(m_kind) != WIDGET_KIND_UNDIMMED &&
         DecodeWidgetKind(m_kind) != WIDGET_KIND_TEXT) {
-        short x = m_owner->m_posX + m_x;
-        short y = m_y + m_owner->m_posY;
+        i16 x = m_owner->m_posX + m_x;
+        i16 y = m_y + m_owner->m_posY;
         DimBitmapArea(gpWindowManager->m_screen, x, y, m_width, m_height, 0);
     }
 }

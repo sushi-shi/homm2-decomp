@@ -15,10 +15,10 @@
 #include <SOURCE/comwin.h>
 #include <SOURCE/kbwin.h>
 VA(0x0040c8f0, 0x24e)
-void ModemSetup(int mode)
+void ModemSetup(i32 mode)
 {
     char directConnectMessage3[104];
-    int resetAttempt9;
+    i32 resetAttempt9;
     char command[104];
 
     LogStr("MS1");
@@ -28,7 +28,7 @@ void ModemSetup(int mode)
     outque.writePosition = 0;
     outque.readPosition = 0;
     iBaudBits = MODEM_BAUD_CLOCK / gConfig.baudRate[gbDirectConnect];
-    com_init(static_cast<unsigned char>(gConfig.comPort[gbDirectConnect]), 4, 0);
+    com_init(static_cast<u8>(gConfig.comPort[gbDirectConnect]), 4, 0);
     LogStr("MS2");
 
     if (gbDirectConnect == 0) {
@@ -85,7 +85,7 @@ void ModemSetup(int mode)
 // displacement at +0x8e: this form enters the trailing join jump while retail
 // reaches the epilogue directly. An explicit if/else return scored 97.67%.
 VA(0x0040cb3e, 0x9e)
-long int Dial(void)
+i32l Dial(void)
 {
     char dialCommand[40];
     iLastDialPos = 0;
@@ -101,7 +101,7 @@ long int Dial(void)
 // displacement at +0x44: this form enters the trailing join jump while retail
 // reaches the epilogue directly. An explicit if/else return scored 96.15%.
 VA(0x0040cbdc, 0x54)
-long int Wait(void)
+i32l Wait(void)
 {
     GUIModemResponse("Waiting for ring...", "RING");
     GUIModemCommand("Initializing modem...", "ATA");
@@ -128,9 +128,9 @@ void GUIModemCommand(char *message, char *command)
 // direct guard, and goto-guard forms were non-improving. Revisit only after a
 // Modem TU/header change alters compiler state.
 VA(0x0040cca9, 0x95)
-signed char GUIModemCommandExec(void)
+i8 GUIModemCommandExec(void)
 {
-    int commandLength;
+    i32 commandLength;
     if (KBTickCount() < iLastActionTime + MODEM_COMMAND_INTERVAL)
         return 0;
 
@@ -150,8 +150,8 @@ VA(0x0040cd3e, 0x8e)
 void ModemCommand(char *command)
 {
     char modemText[MODEM_WORK_TEXT_SIZE];
-    int commandLength = strlen(command);
-    int commandPosition0;
+    i32 commandLength = strlen(command);
+    i32 commandPosition0;
     for (commandPosition0 = 0; commandPosition0 < 0[&commandLength];
          ++commandPosition0) {
         write_buffer(command + commandPosition0, 1);
@@ -161,7 +161,7 @@ void ModemCommand(char *command)
 }
 
 VA(0x0040cdcc, 0x82)
-signed char GUIModemResponse(char *message, char *response)
+i8 GUIModemResponse(char *message, char *response)
 {
     memset(GUIMRresponse, 0, MODEM_RESPONSE_SIZE);
     GUIMRrespptr = 0;
@@ -178,7 +178,7 @@ signed char GUIModemResponse(char *message, char *response)
 // inlined TruncateModemResponse continuation at the trailing join jump. Adding
 // an inner else/return changed the CFG and scored 93.94%.
 VA(0x0040ce4e, 0xe2)
-signed char GUIModemResponseExec(void)
+i8 GUIModemResponseExec(void)
 {
     GUIMRc = read_byte();
     if (GUIMRc == -1)
@@ -206,20 +206,20 @@ signed char GUIModemResponseExec(void)
 }
 
 VA(0x0040cf30, 0x4e)
-int write_buffer(char *buffer, int length)
+i32 write_buffer(char *buffer, i32 length)
 {
     if (outque.writePosition + length + MODEM_QUEUE_GUARD >
         MODEM_OUT_QUEUE_SIZE)
         return 0;
-    com_snd(0, 0, static_cast<unsigned short>(length), buffer, 0);
+    com_snd(0, 0, static_cast<u16>(length), buffer, 0);
     return 1;
 }
 
 VA(0x0040cf7e, 0x47)
-int read_byte(void)
+i32 read_byte(void)
 {
-    unsigned char value[4];
-    int received = com_rcv(0, 1, value);
+    u8 value[4];
+    i32 received = com_rcv(0, 1, value);
     if (received == 1)
         return value[0];
     else
@@ -227,7 +227,7 @@ int read_byte(void)
 }
 
 VA(0x0040cfc5, 0x27)
-void write_byte(int value)
+void write_byte(i32 value)
 {
     com_snd(0, 0, 1, &value, 0);
 }
@@ -236,9 +236,9 @@ VA(0x0040cfec, 0x1bb)
 void Connect(void)
 {
     char idMessage[20];
-    unsigned int idSeed = KBTickCount();
+    u32 idSeed = KBTickCount();
     // The retail /Od frame retains this unused word between idMessage and idSeed.
-    int packetResult;
+    i32 packetResult;
     idSeed %= MODEM_ID_MODULUS;
     sprintf(idstr, "%06d", idSeed);
     oldsec = -1;
@@ -277,12 +277,12 @@ void Connect(void)
 }
 
 VA(0x0040d1a7, 0x211)
-int WaitForDirectConnect(void)
+i32 WaitForDirectConnect(void)
 {
     char idMessage[20];
     switch (WFDCStage) {
     case MODEM_CONNECTION_INIT_STAGE: {
-        unsigned int idSeed = KBTickCount();
+        u32 idSeed = KBTickCount();
         idSeed %= MODEM_ID_MODULUS;
         sprintf(idstr, "%06d", idSeed);
         oldsec = -1;
@@ -330,7 +330,7 @@ int WaitForDirectConnect(void)
 VA(0x0040d3b8, 0x127)
 char ReadPacket(void)
 {
-    int input;
+    i32 input;
     if (inque.writePosition > MODEM_QUEUE_INPUT_SIZE - 4) {
         LogStr("OverFlow1");
         inque.writePosition = 0;
@@ -371,15 +371,15 @@ readPacketStart:
 }
 
 VA(0x0040d4df, 0xff)
-void WriteModemPacket(char *buffer, int length)
+void WriteModemPacket(char *buffer, i32 length)
 {
-    int encodedPosition = 0;
+    i32 encodedPosition = 0;
     if (length > MODEM_PACKET_PAYLOAD_SIZE) {
         LogStr("TOO LONG");
         return;
     }
 
-    int remaining5;
+    i32 remaining5;
     char encoded[MODEM_ENCODED_PACKET_SIZE];
 
     encoded[encodedPosition] = MODEM_ESCAPE_BYTE;
@@ -404,25 +404,25 @@ void WriteModemPacket(char *buffer, int length)
 }
 
 // ---- globals (definitions, RVA order) ----
-DATA(0x004ede50) int iBaudBits = 8;
-DATA(0x004ede54) int inescape = 0;
-DATA(0x004ede58) int newpacket = 0;
-DATA(0x004ede5c) int packetlen = 0;
+DATA(0x004ede50) i32 iBaudBits = 8;
+DATA(0x004ede54) i32 inescape = 0;
+DATA(0x004ede58) i32 newpacket = 0;
+DATA(0x004ede5c) i32 packetlen = 0;
 DATA(0x00523280) char idstr[MODEM_ID_SIZE];
-DATA(0x00523288) int GUIMRc;
-DATA(0x0052328c) int iModemCommandPos;
-DATA(0x00523290) int GUIMRrespptr;
-DATA(0x00523294) int localstage;
+DATA(0x00523288) i32 GUIMRc;
+DATA(0x0052328c) i32 iModemCommandPos;
+DATA(0x00523290) i32 GUIMRrespptr;
+DATA(0x00523294) i32 localstage;
 DATA(0x00523298) char numbuf[MODEM_NUMBER_BUFFER_SIZE];
-DATA(0x005232bc) int WFDCStage;
+DATA(0x005232bc) i32 WFDCStage;
 DATA(0x005232c0) char remoteidstr[MODEM_ID_SIZE];
-DATA(0x005232c8) int stime;
+DATA(0x005232c8) i32 stime;
 DATA(0x005232d0) char cModemCommand[MODEM_COMMAND_BUFFER_SIZE];
-DATA(0x005232f8) int iLastDialPos;
-DATA(0x005232fc) int remotestage;
+DATA(0x005232f8) i32 iLastDialPos;
+DATA(0x005232fc) i32 remotestage;
 DATA(0x00523300) char GUIMRresp[MODEM_RESPONSE_SIZE];
-DATA(0x00523350) int oldsec;
+DATA(0x00523350) i32 oldsec;
 DATA(0x00523358) inque_t inque;
-DATA(0x00524360) int iLastActionTime;
+DATA(0x00524360) i32 iLastActionTime;
 DATA(0x00524368) char GUIMRresponse[MODEM_RESPONSE_SIZE];
 DATA(0x005243b8) outque_t outque;

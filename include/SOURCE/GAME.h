@@ -9,25 +9,25 @@ struct tag_message;
 // GAME-private types.
 #pragma pack(push, 1)
 struct EventExtra {
-    unsigned char unknown00;
-    int resources[7];
-    short artifact;
-    unsigned char applyToComputer;
-    unsigned char cancelAfterVisit;
+    u8 unknown00;
+    i32 resources[7];
+    i16 artifact;
+    u8 applyToComputer;
+    u8 cancelAfterVisit;
     char unknown21[4];
-    signed char active;
-    unsigned short x;
-    unsigned short y;
-    unsigned char unknown2a;
-    unsigned char players[6];
+    i8 active;
+    u16 x;
+    u16 y;
+    u8 unknown2a;
+    u8 players[6];
     char message[1];
 };
 #pragma pack(pop)
 SIZE(EventExtra, 0x32);
 struct RandomHeroArmyRange {
-    short creature;
-    short minimum;
-    short maximum;
+    i16 creature;
+    i16 minimum;
+    i16 maximum;
 };
 
 typedef enum GameSerializationConstant {
@@ -299,21 +299,21 @@ typedef enum GameCompressionTestConstant {
     COMPRESSION_TEST_FILENAME_SIZE = 32
 } GameCompressionTestConstant;
 
-int GetNumObelisks(int color);
-void ComputeUALoc(int);
+i32 GetNumObelisks(i32 color);
+void ComputeUALoc(i32);
 void GenerateStandardFileName(char *, char *);
-int ViewSpellsHandler(struct tag_message &);
-int ViewSpecialHandler(struct tag_message &);
-int ViewArmyHandler(struct tag_message &);
-int IsCursedItem(int item);
-int CalcBaseScore(int);
-void WriteDiffHeaderInfo(unsigned char cmd, int len, unsigned char *buf, int *pos);
-int GetSkipCopyLen(unsigned char *buf, int *pos);
-void CreateDiffFile(char *, char *, char *, int, int);
+i32 ViewSpellsHandler(struct tag_message &);
+i32 ViewSpecialHandler(struct tag_message &);
+i32 ViewArmyHandler(struct tag_message &);
+i32 IsCursedItem(i32 item);
+i32 CalcBaseScore(i32);
+void WriteDiffHeaderInfo(u8 cmd, i32 len, u8 *buf, i32 *pos);
+i32 GetSkipCopyLen(u8 *buf, i32 *pos);
+void CreateDiffFile(char *, char *, char *, i32, i32);
 void CreateJoinFile(char *, char *, char *);
-EventExtra *GetMapEvent(int x, int y);
+EventExtra *GetMapEvent(i32 x, i32 y);
 void CheckValidAvailableHeroes(void);
-int CalcFileCRC(char *filename);
+i32 CalcFileCRC(char *filename);
 void CompressTest2(void);
 void CompressTest(void);
 void CompressTest3(void);
