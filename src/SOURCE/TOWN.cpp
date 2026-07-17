@@ -18,13 +18,13 @@
 #include <SOURCE/townManager.h>
 VA(0x00432c00, 0x65)
 town::town(void) {
-    m_type = FACTION_KNIGHT;
+    m_type = IDX(FACTION_KNIGHT);
     m_id = 0;
     m_owner = 0;
     m_x = 0;
     m_y = 0;
     m_occupyingHeroId = TOWN_OCCUPYING_HERO_NONE;
-    m_buildings = TOWN_BUILDING_TENT;
+    m_buildings = IDX(TOWN_BUILDING_TENT);
     m_buildState = 0;
     m_unknown1d = 0;
 }

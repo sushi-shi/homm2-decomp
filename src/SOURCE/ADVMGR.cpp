@@ -4002,28 +4002,28 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     }
                     break;
                 case MAP_OBJECT_BUOY:
-                    visitedMaskValue = ADVMGR_VISIT_FORT;
+                    visitedMaskValue = IDX(ADVMGR_VISIT_FORT);
                     goto quick_info_default;
                 case MAP_OBJECT_FOUNTAIN:
-                    visitedMaskValue = ADVMGR_VISIT_GAZEBO;
+                    visitedMaskValue = IDX(ADVMGR_VISIT_GAZEBO);
                     goto quick_info_default;
                 case MAP_OBJECT_OASIS:
-                    visitedMaskValue = ADVMGR_VISIT_MERCENARY_CAMP;
+                    visitedMaskValue = IDX(ADVMGR_VISIT_MERCENARY_CAMP);
                     goto quick_info_default;
                 case MAP_OBJECT_FAERIE_RING:
-                    visitedMaskValue = ADVMGR_VISIT_STANDING_STONES;
+                    visitedMaskValue = IDX(ADVMGR_VISIT_STANDING_STONES);
                     goto quick_info_default;
                 case MAP_OBJECT_TEMPLE:
-                    visitedMaskValue = ADVMGR_VISIT_WITCH_DOCTOR;
+                    visitedMaskValue = IDX(ADVMGR_VISIT_WITCH_DOCTOR);
                     goto quick_info_default;
                 case MAP_OBJECT_WATERING_HOLE:
-                    visitedMaskValue = ADVMGR_VISIT_EVENT_SITE;
+                    visitedMaskValue = IDX(ADVMGR_VISIT_EVENT_SITE);
                     goto quick_info_default;
                 case MAP_OBJECT_MAGIC_WELL:
-                    visitedMaskValue = ADVMGR_VISIT_XANADU;
+                    visitedMaskValue = IDX(ADVMGR_VISIT_XANADU);
                     goto quick_info_default;
                 case MAP_OBJECT_IDOL:
-                    visitedMaskValue = ADVMGR_VISIT_TREE_OF_KNOWLEDGE;
+                    visitedMaskValue = IDX(ADVMGR_VISIT_TREE_OF_KNOWLEDGE);
                     goto quick_info_default;
                 case MAP_OBJECT_NONE:
                 case MAP_OBJECT_MAP_EVENT:
@@ -4132,7 +4132,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                                     siteIndexName = 0;
                                 } else if (siteFrameLocal[0] < ADVMGR_GENERIC_SITE_2_END) {
                                     siteIndexName = 1;
-                                    visitedMaskValue = ADVMGR_VISIT_GENERIC_HUT;
+                                    visitedMaskValue = IDX(ADVMGR_VISIT_GENERIC_HUT);
                                 }
                             }
                             break;
@@ -4142,15 +4142,15 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                             } else {
                                 if (siteFrameLocal[0] < ADVMGR_GENERIC_ALTAR_END) {
                                     siteIndexName = 4;
-                                    visitedMaskValue = ADVMGR_VISIT_GENERIC_ALTAR;
+                                    visitedMaskValue = IDX(ADVMGR_VISIT_GENERIC_ALTAR);
                                 } else if (siteFrameLocal[0] < ADVMGR_GENERIC_UNUSED_END) {
                                     siteIndexName = -1;
                                 } else if (siteFrameLocal[0] < ADVMGR_GENERIC_TOWER_END) {
                                     siteIndexName = 5;
-                                    visitedMaskValue = ADVMGR_VISIT_GENERIC_TOWER;
+                                    visitedMaskValue = IDX(ADVMGR_VISIT_GENERIC_TOWER);
                                 } else if (siteFrameLocal[0] < ADVMGR_GENERIC_SPRING_END) {
                                     siteIndexName = 6;
-                                    visitedMaskValue = ADVMGR_VISIT_GENERIC_SPRING;
+                                    visitedMaskValue = IDX(ADVMGR_VISIT_GENERIC_SPRING);
                                 }
                             }
                             break;

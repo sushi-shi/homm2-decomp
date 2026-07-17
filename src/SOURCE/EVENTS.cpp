@@ -2523,8 +2523,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         "{Artifact}\n\nThrough a clearing you observe an ancient artifact.  "
                         "Unfortunately, it's guarded by a nearby %s.  Do you want to fight the %s "
                         "for the artifact?",
-                        gArmyNames[guardedMonster5],
-                        gArmyNames[guardedMonster5]
+                        gArmyNames[IDX(guardedMonster5)],
+                        gArmyNames[IDX(guardedMonster5)]
                     );
                     NormalDialog(gText, 2, -1, -1, -1, 0, -1, 0, -1, 0);
                     if (gpWindowManager->m_dialogResult != MONSTER_DIALOG_YES) {
