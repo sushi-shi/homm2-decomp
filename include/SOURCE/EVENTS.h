@@ -468,7 +468,7 @@ HOMM2_ENUM_VALUES_BEGIN(EventEffectConstant)
 HOMM2_ENUM_VALUES_END(EventEffectConstant)
 
 i8 StrEqNoCase(char*, char*);
-i32 GiveArtifact(class hero*, i32, i32, i8);
+i32 GiveArtifact(class hero*, ArtifactType, b32, i8);
 void GiveTakeArtifactStat(class hero*, ArtifactType, b32);
 i32 RiddleStringsEqual(char*, char*);
 
