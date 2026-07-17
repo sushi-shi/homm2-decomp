@@ -824,15 +824,19 @@ def main(argv=None, data=None):
     base = load_baseline(); sh = source_hashes(); cur = _fn_fuzzy(data)
     started = sorted((u for u in data["units"] if unit_pct(u) > 0 and
                       _i((u.get("measures", {}) or {}).get("total_functions"))), key=unit_pct, reverse=True)
+    if started:
+        print("[status] highest objdiff matched-code byte percentages by unit:")
     for u in started[:25]:
         print(f"  {unit_pct(u):6.2f}%  {u.get('name')}")
     atmax = sum(1 for k, (mx, _) in base.items() if mx >= EXACT_MATCH_PERCENT)
-    overall = float((data.get("measures", {}) or {}).get("matched_code_percent", 0) or 0)
     measures = data.get("measures", {}) or {}
+    matched_code_percent = float(measures.get("matched_code_percent", 0) or 0)
+    fuzzy_match_percent = float(measures.get("fuzzy_match_percent", 0) or 0)
     matched_data = _i(measures.get("matched_data"))
     total_data = _i(measures.get("total_data"))
     data_percent = float(measures.get("matched_data_percent", 0) or 0)
     print(f"[status] units: {len(data['units'])}  with-progress: {len(started)}  "
-          f"overall: {overall:.2f}%  functions-at-max-100%: {atmax}  "
+          f"matched-code-bytes: {matched_code_percent:.2f}%  "
+          f"fuzzy: {fuzzy_match_percent:.2f}%  functions-at-max-100%: {atmax}  "
           f"data: {matched_data}/{total_data} ({data_percent:.3f}%)")
     return 0

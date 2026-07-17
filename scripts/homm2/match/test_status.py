@@ -131,6 +131,24 @@ class ReportCacheTest(unittest.TestCase):
             self.assertEqual(status.main(["--force-refresh"]), 0)
         loader.assert_called_once_with(force_refresh=True)
 
+    def test_status_distinguishes_matched_code_bytes_from_fuzzy(self):
+        data = {
+            "units": [],
+            "measures": {
+                "matched_code_percent": 36.9699,
+                "fuzzy_match_percent": 98.2670,
+            },
+        }
+        with mock.patch.object(status, "load_baseline", return_value={}), \
+                mock.patch.object(status, "source_hashes", return_value={}), \
+                mock.patch("builtins.print") as output:
+            self.assertEqual(status.main([], data=data), 0)
+        rendered = "\n".join(" ".join(str(arg) for arg in call.args)
+                             for call in output.call_args_list)
+        self.assertIn("matched-code-bytes: 36.97%", rendered)
+        self.assertIn("fuzzy: 98.27%", rendered)
+        self.assertNotIn("overall:", rendered)
+
     def test_partial_report_replaces_units_and_recomputes_measures(self):
         def unit(name, total, matched, fuzzy):
             return {
