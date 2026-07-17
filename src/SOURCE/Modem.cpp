@@ -120,6 +120,13 @@ void GUIModemCommand(char *message, char *command)
         ShutDown(0);
 }
 
+// @semantic: The command pacing and byte-at-a-time transmit semantics, 0x04
+// frame, CFG, and all 13 ordered external relocations match retail. First
+// residual +0x43: retail loads the local command length and compares the global
+// position with `jge`; this build loads the global first and compares the local
+// with the equivalent `jle`. Symmetric relational, pointer-index, value-or-zero,
+// direct guard, and goto-guard forms were non-improving. Revisit only after a
+// Modem TU/header change alters compiler state.
 VA(0x0040cca9, 0x95)
 signed char GUIModemCommandExec(void)
 {

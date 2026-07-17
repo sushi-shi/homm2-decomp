@@ -798,7 +798,7 @@ int WGAppPaint(void *window, void *paintDC)
             destY1 = paint5.rcPaint.top;
             destHeight3 = paint5.rcPaint.bottom - destY1 + 1;
             WinGBitBlt(static_cast<HDC>(paintDC), destX7, destY1,
-                destWidth0, destHeight3, hdcImage, giScrollX + destX7,
+                destWidth0, destHeight3, hdcImage, 0[&giScrollX] + destX7,
                 0[&giScrollY] + destY1);
         } else {
             WinGStretchBlt(static_cast<HDC>(paintDC), destX7, destY1,
