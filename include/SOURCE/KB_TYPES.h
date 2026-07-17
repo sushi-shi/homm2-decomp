@@ -524,6 +524,18 @@ SIZE(tag_tilePoint, 4);
 HOMM2_ENUM_VALUES_BEGIN(MonsterDatabaseConstant)
     MONSTER_SPRITE_NAME_SIZE = 5
 HOMM2_ENUM_VALUES_END(MonsterDatabaseConstant)
+HOMM2_ENUM_BEGIN(MonsterAttribute)
+    MONSTER_ATTRIBUTE_WIDE = 0x01,
+    MONSTER_ATTRIBUTE_FLYING = 0x02,
+    MONSTER_ATTRIBUTE_RANGED = 0x04,
+    MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER = 0x08,
+    MONSTER_ATTRIBUTE_UNDEAD = 0x0400,
+    MONSTER_ATTRIBUTE_DEAD = 0x10,
+    MONSTER_ATTRIBUTE_RETALIATED = 0x40,
+    MONSTER_ATTRIBUTE_WOKE_FROM_DAMAGE = 0x80
+HOMM2_ENUM_END(MonsterAttribute)
+HOMM2_ENUM_FLAGS(MonsterAttribute)
+
 #pragma pack(push, 1)
 struct tag_monsterInfo {
     union {
@@ -547,7 +559,7 @@ struct tag_monsterInfo {
     i8 shots;
     char spriteName[MONSTER_SPRITE_NAME_SIZE];
     union {
-        i32 attributes;
+        MonsterAttribute attributes;
         union {
             MonsterFlags all;
             i32 abilityFlags;
@@ -575,12 +587,12 @@ struct SCmbtHero {
 };
 SIZE(SCmbtHero, 0x81);
 #pragma pack(pop)
-HOMM2_ENUM_BEGIN(SpellInfoAttribute)
+HOMM2_ENUM_BEGIN_T(SpellInfoAttribute, u8)
     SPELL_INFO_ATTRIBUTE_POWER = 0x01,
     SPELL_INFO_ATTRIBUTE_COMBAT = 0x02,
     SPELL_INFO_ATTRIBUTE_ADVENTURE = 0x04,
     SPELL_INFO_ATTRIBUTE_DURATION = 0x08
-HOMM2_ENUM_END(SpellInfoAttribute)
+HOMM2_ENUM_END_T(SpellInfoAttribute, u8)
 HOMM2_ENUM_FLAGS(SpellInfoAttribute)
 
 struct SSpellInfo {
@@ -591,7 +603,7 @@ struct SSpellInfo {
     i16 aiValue;
     u8 cost;
     u8 raceChance[6];
-    u8 attributes;
+    SpellInfoAttribute attributes;
 }; // gsSpellInfo[] (sizeof 22)
 SIZE(SSpellInfo, 0x16);
 struct SAMPLE2 {
@@ -599,17 +611,6 @@ struct SAMPLE2 {
     struct _SAMPLE* pMem;
 }; // NULL_SAMPLE2
 
-HOMM2_ENUM_BEGIN(MonsterAttribute)
-    MONSTER_ATTRIBUTE_WIDE = 0x01,
-    MONSTER_ATTRIBUTE_FLYING = 0x02,
-    MONSTER_ATTRIBUTE_RANGED = 0x04,
-    MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER = 0x08,
-    MONSTER_ATTRIBUTE_UNDEAD = 0x0400,
-    MONSTER_ATTRIBUTE_DEAD = 0x10,
-    MONSTER_ATTRIBUTE_RETALIATED = 0x40,
-    MONSTER_ATTRIBUTE_WOKE_FROM_DAMAGE = 0x80
-HOMM2_ENUM_END(MonsterAttribute)
-HOMM2_ENUM_FLAGS(MonsterAttribute)
 #pragma pack(push, 1)
 struct SWinSetup {
     u8 windowId;
