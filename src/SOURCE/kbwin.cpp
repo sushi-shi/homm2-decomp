@@ -504,12 +504,14 @@ void SetNoDialogMenus(int menusEnabled)
     SetMenus(hmnuApp, menusEnabled);
 }
 
-// @match-note retained 100%, live 99.37%: this source was byte-exact before
-// preceding TU reconstruction changed cumulative compiler state. The recursive
-// traversal, 0x20 frame, eight parameter/local slots, menu-status layout, and CFG
-// remain unchanged. The first live residual is the equivalent outer loop test
-// `index >= count` versus `count <= index`. Base has one additional relocation
-// because retail resolves the recursive self-call; do not steer the retained exact hash.
+// @semantic: The recursive traversal, 0x20 frame, eight parameter/local slots,
+// menu-status layout, and CFG match retail. First residual +0x2b: retail loads
+// the loop index and compares count with `jle`; this build loads count and
+// compares index with the equivalent `jge`. Symmetric relational and
+// pointer-index forms were byte-neutral; an explicit break guard was worse. The
+// only relocation-count difference is the candidate REL32 recursive self-call,
+// which retail's delinked object resolves internally. Revisit after a kbwin
+// TU/header change alters compiler state.
 VA(0x0041ceb8, 0x159)
 void SetMenus(HMENU menu, int enabled)
 {
