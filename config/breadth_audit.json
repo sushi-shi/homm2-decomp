@@ -2,6 +2,50 @@
   "version": 1,
   "records": [
     {
+      "unit": "BASE/INPUTMGR",
+      "function": "?AsciiConvert@inputManager@@QAEXAAUtag_message@@@Z",
+      "source_hash": "5675c84ee1db",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.52318,
+      "after": 99.52318,
+      "note": "Complete semantics and CFG; only 12 bytes at +0x32..+0x51 differ by EAX/ECX scheduling; 23/23 relocations are delinked local jump-table identities with matching addends"
+    },
+    {
+      "unit": "BASE/INPUTMGR",
+      "function": "?CheckChangeCursor@@YIXHHH@Z",
+      "source_hash": "9647d57c6c37",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 2,
+      "before": 99.47369,
+      "after": 99.47369,
+      "note": "Complete 0xe4 retail CFG; only gbColorMice EAX/ECX coloring and commutative load order differ; inequality reversal and scoped-local split were code-neutral; all 18 relocation identities/addends agree"
+    },
+    {
+      "unit": "BASE/INPUTMGR",
+      "function": "?ForceMouseMove@inputManager@@QAEXXZ",
+      "source_hash": "1c7431790894",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 97.42647,
+      "after": 97.42647,
+      "note": "Complete semantics; first pointer/load/test is folded through EAX instead of retail ECX/EAX, remaining 0xc9 bytes match; all 11 relocation identities/addends agree; prior pointer/value/direct variants exhausted"
+    },
+    {
+      "unit": "BASE/INPUTMGR",
+      "function": "?MouseMessageHandler@@YIHPAXIIJ@Z",
+      "source_hash": "a3fde900086a",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.95763,
+      "after": 99.95763,
+      "note": "Proven early-stop: complete 0x36c code/table range is raw-exact after relocation-union masking; 55/55 sites and all runtime targets/addends agree, residual is local switch and static-text owner naming"
+    },
+    {
       "unit": "BASE/RESMGR",
       "function": "?Close@resourceManager@@UAEXXZ",
       "source_hash": "dbff39a4e1b4",
