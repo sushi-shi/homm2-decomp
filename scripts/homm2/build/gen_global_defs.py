@@ -19,7 +19,7 @@ for r in csv.DictReader(open("build/gen/symbol_names.csv")):
 
 BASE = {'char':1,'signed char':1,'unsigned char':1,'short':2,'unsigned short':2,'int':4,
         'unsigned int':4,'unsigned':4,'long':4,'unsigned long':4,'float':4,'double':8}
-# struct element sizes (from _types.h layouts)
+# Struct element sizes from their owner type headers.
 STRUCT = {'tag_monsterInfo':26,'SSpellInfo':22,'SWinSetup':7,'tag_tilePoint':4,
           'SNetPlayerInfo':0xcc,'monsterRV':26,'configStruct':0x1a0,'SCreatureInfo':26}
 
