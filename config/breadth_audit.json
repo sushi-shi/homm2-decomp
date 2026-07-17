@@ -3976,12 +3976,12 @@
       "unit": "SOURCE/SMACKMGR",
       "function": "?SmackManagerMain@@YIXXZ",
       "source_hash": "c3cf35cfac31",
-      "epoch": "93a208057b850a39cf5d71feb4938cac251d989dc0cd6bcf26c4c2f57042dcca",
-      "outcome": "exact",
-      "iterations": 1,
-      "before": 99.95742,
-      "after": 100.0,
-      "note": "Corrected the primary-start/fade condition and frame-zero comparisons; all bytes and 334 relocations align."
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 2,
+      "before": 99.89629,
+      "after": 99.89629,
+      "note": "Complete 0x510 frame/CFG and 334/334 relocs; only campaignChoice/global equality load order and its one-byte table shift remain."
     },
     {
       "unit": "SOURCE/SPELLAI",
@@ -4183,6 +4183,17 @@
     },
     {
       "unit": "SOURCE/SPELLS",
+      "function": "?Fireball@combatManager@@QAEXHH@Z",
+      "source_hash": "156e1eb01e2f",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 2,
+      "before": 99.85308,
+      "after": 99.85308,
+      "note": "Complete 0x5c frame/422-instruction CFG and 51/51 relocs; only equivalent affected-count loop comparison load/polarity remains."
+    },
+    {
+      "unit": "SOURCE/SPELLS",
       "function": "?GetNextChainLightningTarget@combatManager@@QAEHPAVarmy@@H@Z",
       "source_hash": "165c734b4183",
       "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
@@ -4279,6 +4290,17 @@
       "before": 99.893936,
       "after": 99.893936,
       "note": "Complete semantics and 15 relocations; semantic marker documents the seven remaining stack displacement bytes."
+    },
+    {
+      "unit": "SOURCE/SPELLS",
+      "function": "?TurnToStone@combatManager@@QAEXPAVarmy@@@Z",
+      "source_hash": "c11318c3b097",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 5,
+      "before": 94.98837,
+      "after": 94.98837,
+      "note": "Complete 0x4 frame/86-instruction CFG and 23/23 relocs; five indexing/pointer spellings did not steer independent side/index load order."
     },
     {
       "unit": "SOURCE/SPELLS",
