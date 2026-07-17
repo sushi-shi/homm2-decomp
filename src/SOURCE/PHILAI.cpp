@@ -4774,16 +4774,16 @@ i32 philAI::FightEvent(hero* h, mapCell* cell, i32 evaluateOnly) {
             case MAP_OBJECT_SHIPWRECK:
                 switch (cell->m_objectMetadata) {
                     case AI_FIGHT_EVENT_LEVEL_1:
-                        gpAdvManager->GiveResource(h, IDX(RES_GOLD), AI_FIGHT_EVENT_REWARD_1000);
+                        gpAdvManager->GiveResource(h, RES_GOLD, AI_FIGHT_EVENT_REWARD_1000);
                         break;
                     case AI_FIGHT_EVENT_LEVEL_2:
-                        gpAdvManager->GiveResource(h, IDX(RES_GOLD), AI_FIGHT_EVENT_REWARD_2000);
+                        gpAdvManager->GiveResource(h, RES_GOLD, AI_FIGHT_EVENT_REWARD_2000);
                         break;
                     case AI_FIGHT_EVENT_LEVEL_3:
-                        gpAdvManager->GiveResource(h, IDX(RES_GOLD), AI_FIGHT_EVENT_REWARD_5000);
+                        gpAdvManager->GiveResource(h, RES_GOLD, AI_FIGHT_EVENT_REWARD_5000);
                         break;
                     case AI_FIGHT_EVENT_LEVEL_4:
-                        gpAdvManager->GiveResource(h, IDX(RES_GOLD), AI_FIGHT_EVENT_REWARD_2000);
+                        gpAdvManager->GiveResource(h, RES_GOLD, AI_FIGHT_EVENT_REWARD_2000);
                         gpAdvManager->GiveRandomArtifact(h);
                         break;
                 }
@@ -4791,16 +4791,16 @@ i32 philAI::FightEvent(hero* h, mapCell* cell, i32 evaluateOnly) {
             case MAP_OBJECT_GRAVEYARD:
                 switch (cell->m_objectMetadata) {
                     case AI_FIGHT_EVENT_LEVEL_1:
-                        gpAdvManager->GiveResource(h, IDX(RES_GOLD), AI_FIGHT_EVENT_REWARD_500);
+                        gpAdvManager->GiveResource(h, RES_GOLD, AI_FIGHT_EVENT_REWARD_500);
                         break;
                     case AI_FIGHT_EVENT_LEVEL_2:
-                        gpAdvManager->GiveResource(h, IDX(RES_GOLD), AI_FIGHT_EVENT_REWARD_1000);
+                        gpAdvManager->GiveResource(h, RES_GOLD, AI_FIGHT_EVENT_REWARD_1000);
                         break;
                     case AI_FIGHT_EVENT_LEVEL_3:
-                        gpAdvManager->GiveResource(h, IDX(RES_GOLD), AI_FIGHT_EVENT_REWARD_3000);
+                        gpAdvManager->GiveResource(h, RES_GOLD, AI_FIGHT_EVENT_REWARD_3000);
                         break;
                     case AI_FIGHT_EVENT_LEVEL_4:
-                        gpAdvManager->GiveResource(h, IDX(RES_GOLD), AI_FIGHT_EVENT_REWARD_1000);
+                        gpAdvManager->GiveResource(h, RES_GOLD, AI_FIGHT_EVENT_REWARD_1000);
                         gpAdvManager->GiveRandomArtifact(h);
                         break;
                 }
@@ -4808,16 +4808,16 @@ i32 philAI::FightEvent(hero* h, mapCell* cell, i32 evaluateOnly) {
             case MAP_OBJECT_DERELICT_SHIP:
                 switch (cell->m_objectMetadata) {
                     case AI_FIGHT_EVENT_LEVEL_1:
-                        gpAdvManager->GiveResource(h, IDX(RES_GOLD), AI_FIGHT_EVENT_REWARD_500);
+                        gpAdvManager->GiveResource(h, RES_GOLD, AI_FIGHT_EVENT_REWARD_500);
                         break;
                     case AI_FIGHT_EVENT_LEVEL_2:
-                        gpAdvManager->GiveResource(h, IDX(RES_GOLD), AI_FIGHT_EVENT_REWARD_1000);
+                        gpAdvManager->GiveResource(h, RES_GOLD, AI_FIGHT_EVENT_REWARD_1000);
                         break;
                     case AI_FIGHT_EVENT_LEVEL_3:
-                        gpAdvManager->GiveResource(h, IDX(RES_GOLD), AI_FIGHT_EVENT_REWARD_2000);
+                        gpAdvManager->GiveResource(h, RES_GOLD, AI_FIGHT_EVENT_REWARD_2000);
                         break;
                     case AI_FIGHT_EVENT_LEVEL_4:
-                        gpAdvManager->GiveResource(h, IDX(RES_GOLD), AI_FIGHT_EVENT_REWARD_5000);
+                        gpAdvManager->GiveResource(h, RES_GOLD, AI_FIGHT_EVENT_REWARD_5000);
                         break;
                 }
                 break;

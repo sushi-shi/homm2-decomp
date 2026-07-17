@@ -168,7 +168,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 );
                 GiveResource(
                     eventHero2,
-                    cell->m_objectMetadata - MAP_EVENT_RESOURCE_OFFSET,
+                    ResourceType(cell->m_objectMetadata) - IDX(MAP_EVENT_RESOURCE_OFFSET),
                     cell->m_objectMetadata - MAP_EVENT_RESOURCE_OFFSET == IDX(RES_GOLD)
                         ? MAP_EVENT_GOLD_AMOUNT
                         : MAP_EVENT_RESOURCE_AMOUNT
@@ -505,7 +505,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         -1,
                         0
                     );
-                    GiveResource(eventHero2, IDX(RES_GOLD), SEA_CHEST_GOLD);
+                    GiveResource(eventHero2, RES_GOLD, SEA_CHEST_GOLD);
                 }
             } else {
                 eventValue1 = cell->m_objectMetadata & CHEST_ARTIFACT_MASK;
@@ -528,7 +528,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     0
                 );
                 GiveArtifact(eventHero2, ArtifactType(eventValue1), 1, -1);
-                GiveResource(eventHero2, IDX(RES_GOLD), SEA_CHEST_ARTIFACT_GOLD);
+                GiveResource(eventHero2, RES_GOLD, SEA_CHEST_ARTIFACT_GOLD);
             }
             fizzleType3 = 1;
             eraseObject = 1;
@@ -563,7 +563,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         -1,
                         0
                     );
-                    GiveResource(eventHero2, IDX(RES_WOOD), 5);
+                    GiveResource(eventHero2, RES_WOOD, 5);
                     break;
                 case 2:
                     NormalDialog(
@@ -579,8 +579,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         -1,
                         0
                     );
-                    GiveResource(eventHero2, IDX(RES_WOOD), 5);
-                    GiveResource(eventHero2, IDX(RES_GOLD), 200);
+                    GiveResource(eventHero2, RES_WOOD, 5);
+                    GiveResource(eventHero2, RES_GOLD, 200);
                     break;
                 case 3:
                     NormalDialog(
@@ -596,8 +596,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         -1,
                         0
                     );
-                    GiveResource(eventHero2, IDX(RES_WOOD), 10);
-                    GiveResource(eventHero2, IDX(RES_GOLD), 500);
+                    GiveResource(eventHero2, RES_WOOD, 10);
+                    GiveResource(eventHero2, RES_GOLD, 500);
                     break;
             }
             fizzleType3 = 1;
@@ -961,7 +961,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
                     GiveResource(
                         eventHero2,
-                        IDX(RES_GOLD),
+                        RES_GOLD,
                         cell->m_objectMetadata * CHEST_GOLD_MULTIPLIER
                     );
                 else
@@ -1200,7 +1200,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     -1,
                     0
                 );
-                GiveResource(eventHero2, resourceType, resourceAmount6);
+                GiveResource(eventHero2, ResourceType(resourceType), resourceAmount6);
                 cell->m_objectMetadata = 0;
             }
             break;
@@ -1224,7 +1224,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         0,
                         -1
                     );
-                    GiveResource(eventHero2, resourceType, resourceAmount6);
+                    GiveResource(eventHero2, ResourceType(resourceType), resourceAmount6);
                     cell->m_objectMetadata = 0;
                     break;
                 }
@@ -1268,7 +1268,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     if (eventHero2->NumArtifacts() == EVENT_ARTIFACT_CAPACITY) {
                         sprintf(gText, "%s.", "Treasure");
                         EventWindow(-1, 1, gText, IDX(RES_GOLD), SKELETON_GOLD, -1, 0, -1);
-                        GiveResource(eventHero2, IDX(RES_GOLD), SKELETON_GOLD);
+                        GiveResource(eventHero2, RES_GOLD, SKELETON_GOLD);
                     } else {
                         eventValue1 = cell->m_objectMetadata - SKELETON_ARTIFACT_OFFSET;
                         sprintf(
@@ -1308,12 +1308,12 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             );
             GiveResource(
                 eventHero2,
-                IDX(RES_GOLD),
+                RES_GOLD,
                 (cell->m_objectMetadata >> CAMPFIRE_AMOUNT_SHIFT) * CAMPFIRE_GOLD_MULTIPLIER
             );
             GiveResource(
                 eventHero2,
-                cell->m_objectMetadata & CAMPFIRE_RESOURCE_MASK,
+                ResourceType(cell->m_objectMetadata) & IDX(CAMPFIRE_RESOURCE_MASK),
                 cell->m_objectMetadata >> CAMPFIRE_AMOUNT_SHIFT
             );
             eraseObject = 1;
@@ -1554,7 +1554,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     0,
                     -1
                 );
-                GiveResource(eventHero2, IDX(RES_GOLD), cell->m_objectMetadata * MAP_EVENT_GOLD_AMOUNT);
+                GiveResource(eventHero2, RES_GOLD, cell->m_objectMetadata * MAP_EVENT_GOLD_AMOUNT);
                 cell->m_objectMetadata = 0;
             }
             break;
@@ -1563,7 +1563,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             resourceType = cell->m_objectIndex >> 1;
             GiveResource(
                 eventHero2,
-                resourceType,
+                ResourceType(resourceType),
                 resourceType == IDX(RES_GOLD) ? cell->m_objectMetadata * CAMPFIRE_GOLD_MULTIPLIER
                                          : cell->m_objectMetadata
             );
@@ -1584,7 +1584,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             if (cell->m_objectMetadata < SPHINX_RESOURCE_COUNT) {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 EventWindow(87, 1, "", cell->m_objectMetadata, WINDMILL_RESOURCE_AMOUNT, -1, 0, -1);
-                GiveResource(eventHero2, cell->m_objectMetadata, WINDMILL_RESOURCE_AMOUNT);
+                GiveResource(eventHero2, ResourceType(cell->m_objectMetadata), WINDMILL_RESOURCE_AMOUNT);
                 cell->m_objectMetadata = WINDMILL_EMPTY;
             } else {
                 EventWindow(86, 1, "", -1, 0, -1, 0, -1);
@@ -2711,7 +2711,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         -1,
                         0
                     );
-                    GiveResource(eventHero2, IDX(RES_GOLD), DAEMON_GOLD);
+                    GiveResource(eventHero2, RES_GOLD, DAEMON_GOLD);
                     cell->m_objectMetadata = DAEMON_CAVE_EMPTY;
                 }
                 break;
@@ -2776,7 +2776,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         -1
                     );
                     GiveExperience(eventHero2, DAEMON_EXPERIENCE, 0);
-                    GiveResource(eventHero2, IDX(RES_GOLD), DAEMON_GOLD);
+                    GiveResource(eventHero2, RES_GOLD, DAEMON_GOLD);
                     cell->m_objectMetadata = DAEMON_CAVE_EMPTY;
                     eventHero2->CheckLevel();
                     break;
@@ -4253,9 +4253,9 @@ ArtifactType advManager::GiveRandomArtifact(hero* eventHero) {
     ArtifactType artifactId = ArtifactType(gpGame->GetRandomArtifactId(EVENT_RANDOM_ARTIFACT_ANY, 1));
 
     if (artifactId == ARTIFACT_NONE)
-        GiveResource(eventHero, IDX(RES_GOLD), EVENT_RANDOM_ARTIFACT_GOLD);
+        GiveResource(eventHero, RES_GOLD, EVENT_RANDOM_ARTIFACT_GOLD);
     else
-        GiveArtifact(eventHero, ArtifactType(artifactId), 1, ARTIFACT_NONE);
+        GiveArtifact(eventHero, artifactId, true, -1);
     return artifactId;
 }
 
@@ -4279,7 +4279,7 @@ i32 advManager::GiveExperience(hero* eventHero, i32 experience, i32 checkLevel) 
 
 VA(0x004b01ae, 0x80)
 void advManager::GiveResource(hero* eventHero, ResourceType resourceType, i32 amount) {
-    if (resourceType >= 0 && IDX(resourceType) <= IDX(RES_GOLD))
+    if (resourceType >= RES_WOOD && resourceType <= RES_GOLD)
         gpGame->m_players[eventHero->m_owner].m_resources[IDX(resourceType)] += amount;
     if (resourceType == RES_GOLD && gbHumanPlayer[eventHero->m_owner])
         CheckEndGame(0, 0);
@@ -4325,7 +4325,7 @@ i32 advManager::SkeletonEvent(hero* eventHero, mapCell* cell, char* text, i32 x,
                 )
                 == 0) {
                 EventWindow(-1, 1, text, IDX(RES_GOLD), SKELETON_EVENT_SMALL_GOLD, -1, 0, -1);
-                GiveResource(eventHero, IDX(RES_GOLD), SKELETON_EVENT_SMALL_GOLD);
+                GiveResource(eventHero, RES_GOLD, SKELETON_EVENT_SMALL_GOLD);
                 eventHero->CheckLevel();
                 return 1;
             }
@@ -4350,7 +4350,7 @@ i32 advManager::SkeletonEvent(hero* eventHero, mapCell* cell, char* text, i32 x,
                 )
                 == 0) {
                 EventWindow(-1, 1, text, IDX(RES_GOLD), SKELETON_EVENT_MEDIUM_GOLD, -1, 0, -1);
-                GiveResource(eventHero, IDX(RES_GOLD), SKELETON_EVENT_MEDIUM_GOLD);
+                GiveResource(eventHero, RES_GOLD, SKELETON_EVENT_MEDIUM_GOLD);
                 eventHero->CheckLevel();
                 return 1;
             }
@@ -4375,7 +4375,7 @@ i32 advManager::SkeletonEvent(hero* eventHero, mapCell* cell, char* text, i32 x,
                 )
                 == 0) {
                 EventWindow(-1, 1, text, IDX(RES_GOLD), SKELETON_EVENT_LARGE_GOLD, -1, 0, -1);
-                GiveResource(eventHero, IDX(RES_GOLD), SKELETON_EVENT_LARGE_GOLD);
+                GiveResource(eventHero, RES_GOLD, SKELETON_EVENT_LARGE_GOLD);
                 eventHero->CheckLevel();
                 return 1;
             }
@@ -4400,7 +4400,7 @@ i32 advManager::SkeletonEvent(hero* eventHero, mapCell* cell, char* text, i32 x,
                 )
                 == 0) {
                 EventWindow(-1, 1, text, IDX(RES_GOLD), SKELETON_EVENT_HUGE_GOLD, -1, 0, -1);
-                GiveResource(eventHero, IDX(RES_GOLD), SKELETON_EVENT_HUGE_GOLD);
+                GiveResource(eventHero, RES_GOLD, SKELETON_EVENT_HUGE_GOLD);
                 eventHero->CheckLevel();
                 return 1;
             }
@@ -4433,7 +4433,7 @@ i32 advManager::ZombieEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i
                 )
                 == 0) {
                 EventWindow(-1, 1, text, IDX(RES_GOLD), ZOMBIE_EVENT_SMALL_GOLD, -1, 0, -1);
-                GiveResource(eventHero, IDX(RES_GOLD), ZOMBIE_EVENT_SMALL_GOLD);
+                GiveResource(eventHero, RES_GOLD, ZOMBIE_EVENT_SMALL_GOLD);
                 eventHero->CheckLevel();
                 return 1;
             }
@@ -4458,7 +4458,7 @@ i32 advManager::ZombieEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i
                 )
                 == 0) {
                 EventWindow(-1, 1, text, IDX(RES_GOLD), ZOMBIE_EVENT_MEDIUM_GOLD, -1, 0, -1);
-                GiveResource(eventHero, IDX(RES_GOLD), ZOMBIE_EVENT_MEDIUM_GOLD);
+                GiveResource(eventHero, RES_GOLD, ZOMBIE_EVENT_MEDIUM_GOLD);
                 eventHero->CheckLevel();
                 return 1;
             }
@@ -4483,7 +4483,7 @@ i32 advManager::ZombieEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i
                 )
                 == 0) {
                 EventWindow(-1, 1, text, IDX(RES_GOLD), ZOMBIE_EVENT_LARGE_GOLD, -1, 0, -1);
-                GiveResource(eventHero, IDX(RES_GOLD), ZOMBIE_EVENT_LARGE_GOLD);
+                GiveResource(eventHero, RES_GOLD, ZOMBIE_EVENT_LARGE_GOLD);
                 eventHero->CheckLevel();
                 return 1;
             }
@@ -4521,7 +4521,7 @@ i32 advManager::ZombieEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i
                     );
                 else
                     EventWindow(-1, 1, text, IDX(RES_GOLD), ZOMBIE_EVENT_HUGE_GOLD, -1, 0, -1);
-                GiveResource(eventHero, IDX(RES_GOLD), ZOMBIE_EVENT_HUGE_GOLD);
+                GiveResource(eventHero, RES_GOLD, ZOMBIE_EVENT_HUGE_GOLD);
                 eventHero->CheckLevel();
                 return 1;
             }
@@ -4555,7 +4555,7 @@ i32 advManager::GhostEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i3
                 == 0) {
                 sprintf(gText, "%s", text);
                 EventWindow(-1, 1, gText, IDX(RES_GOLD), GHOST_EVENT_SMALL_GOLD, -1, 0, -1);
-                GiveResource(eventHero, IDX(RES_GOLD), GHOST_EVENT_SMALL_GOLD);
+                GiveResource(eventHero, RES_GOLD, GHOST_EVENT_SMALL_GOLD);
                 eventHero->CheckLevel();
                 return 1;
             }
@@ -4581,7 +4581,7 @@ i32 advManager::GhostEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i3
                 == 0) {
                 sprintf(gText, "%s", text);
                 EventWindow(-1, 1, gText, IDX(RES_GOLD), GHOST_EVENT_MEDIUM_GOLD, -1, 0, -1);
-                GiveResource(eventHero, IDX(RES_GOLD), GHOST_EVENT_MEDIUM_GOLD);
+                GiveResource(eventHero, RES_GOLD, GHOST_EVENT_MEDIUM_GOLD);
                 eventHero->CheckLevel();
                 return 1;
             }
@@ -4607,7 +4607,7 @@ i32 advManager::GhostEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i3
                 == 0) {
                 sprintf(gText, "%s", text);
                 EventWindow(-1, 1, gText, IDX(RES_GOLD), GHOST_EVENT_LARGE_GOLD, -1, 0, -1);
-                GiveResource(eventHero, IDX(RES_GOLD), GHOST_EVENT_LARGE_GOLD);
+                GiveResource(eventHero, RES_GOLD, GHOST_EVENT_LARGE_GOLD);
                 eventHero->CheckLevel();
                 return 1;
             }
@@ -4646,7 +4646,7 @@ i32 advManager::GhostEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i3
                     );
                 else
                     EventWindow(-1, 1, gText, IDX(RES_GOLD), GHOST_EVENT_HUGE_GOLD, -1, 0, -1);
-                GiveResource(eventHero, IDX(RES_GOLD), GHOST_EVENT_HUGE_GOLD);
+                GiveResource(eventHero, RES_GOLD, GHOST_EVENT_HUGE_GOLD);
                 eventHero->CheckLevel();
                 return 1;
             }
@@ -5564,7 +5564,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                     )) {
                     GiveResource(
                         eventHero,
-                        IDX(RES_GOLD),
+                        RES_GOLD,
                         cell->m_objectMetadata * CHEST_GOLD_MULTIPLIER
                     );
                 } else {
@@ -5652,7 +5652,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             if (cell->m_objectMetadata != MAP_EVENT_DATA_EMPTY) {
                 GiveResource(
                     eventHero,
-                    cell->m_objectMetadata - MAP_EVENT_RESOURCE_OFFSET,
+                    ResourceType(cell->m_objectMetadata) - IDX(MAP_EVENT_RESOURCE_OFFSET),
                     cell->m_objectMetadata - MAP_EVENT_RESOURCE_OFFSET == IDX(RES_GOLD)
                         ? MAP_EVENT_GOLD_AMOUNT
                         : MAP_EVENT_RESOURCE_AMOUNT
@@ -5665,7 +5665,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             if (cell->m_objectMetadata != MAP_EVENT_DATA_EMPTY) {
                 GiveResource(
                     eventHero,
-                    (cell->m_objectMetadata & ARTIFACT_EVENT_MODE_MASK) - 1,
+                    (ResourceType(cell->m_objectMetadata) & IDX(ARTIFACT_EVENT_MODE_MASK)) - 1,
                     (cell->m_objectMetadata & ARTIFACT_EVENT_RESOURCE_MASK)
                         >> ARTIFACT_EVENT_RESOURCE_SHIFT
                 );
@@ -5687,7 +5687,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 } else {
                     GiveResource(
                         eventHero,
-                        (cell->m_objectMetadata & ARTIFACT_EVENT_MODE_MASK) - 1,
+                        (ResourceType(cell->m_objectMetadata) & IDX(ARTIFACT_EVENT_MODE_MASK)) - 1,
                         (cell->m_objectMetadata & ARTIFACT_EVENT_RESOURCE_MASK)
                             >> ARTIFACT_EVENT_RESOURCE_SHIFT
                     );
@@ -5700,9 +5700,9 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             if ((cell->m_objectMetadata & CHEST_ARTIFACT_FLAG) != 0
                 && eventHero->NumArtifacts() < AI_EVENT_ARTIFACT_LIMIT) {
                 GiveArtifact(eventHero, ArtifactType(cell->m_objectMetadata & CHEST_ARTIFACT_MASK), 1, -1);
-                GiveResource(eventHero, IDX(RES_GOLD), AI_EVENT_SEA_CHEST_ARTIFACT_GOLD);
+                GiveResource(eventHero, RES_GOLD, AI_EVENT_SEA_CHEST_ARTIFACT_GOLD);
             } else if (cell->m_objectMetadata != 0) {
-                GiveResource(eventHero, IDX(RES_GOLD), AI_EVENT_SEA_CHEST_GOLD);
+                GiveResource(eventHero, RES_GOLD, AI_EVENT_SEA_CHEST_GOLD);
             }
             eventResults[0] = 1;
             break;
@@ -5712,15 +5712,15 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 case 0:
                     break;
                 case 1:
-                    GiveResource(eventHero, IDX(RES_WOOD), 5);
+                    GiveResource(eventHero, RES_WOOD, 5);
                     break;
                 case 2:
-                    GiveResource(eventHero, IDX(RES_WOOD), 5);
-                    GiveResource(eventHero, IDX(RES_GOLD), 200);
+                    GiveResource(eventHero, RES_WOOD, 5);
+                    GiveResource(eventHero, RES_GOLD, 200);
                     break;
                 case 3:
-                    GiveResource(eventHero, IDX(RES_WOOD), 10);
-                    GiveResource(eventHero, IDX(RES_GOLD), 500);
+                    GiveResource(eventHero, RES_WOOD, 10);
+                    GiveResource(eventHero, RES_GOLD, 500);
                     break;
             }
             eventResults[0] = 1;
@@ -5729,12 +5729,12 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
         case MAP_OBJECT_CAMPFIRE:
             GiveResource(
                 eventHero,
-                IDX(RES_GOLD),
+                RES_GOLD,
                 (cell->m_objectMetadata >> CAMPFIRE_AMOUNT_SHIFT) * CAMPFIRE_GOLD_MULTIPLIER
             );
             GiveResource(
                 eventHero,
-                cell->m_objectMetadata & CAMPFIRE_RESOURCE_MASK,
+                ResourceType(cell->m_objectMetadata) & IDX(CAMPFIRE_RESOURCE_MASK),
                 cell->m_objectMetadata >> CAMPFIRE_AMOUNT_SHIFT
             );
             eventResults[0] = 1;
@@ -5790,7 +5790,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
 
         case MAP_OBJECT_WATER_WHEEL:
             if (cell->m_objectMetadata != 0) {
-                GiveResource(eventHero, IDX(RES_GOLD), cell->m_objectMetadata * CHEST_GOLD_MULTIPLIER);
+                GiveResource(eventHero, RES_GOLD, cell->m_objectMetadata * CHEST_GOLD_MULTIPLIER);
                 cell->m_objectMetadata = MAP_EVENT_DATA_EMPTY;
             }
             break;
@@ -5800,13 +5800,13 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             resourceAmount_o = resourceType_a == IDX(RES_GOLD)
                                    ? cell->m_objectMetadata * CAMPFIRE_GOLD_MULTIPLIER
                                    : cell->m_objectMetadata;
-            GiveResource(eventHero, resourceType_a, resourceAmount_o);
+            GiveResource(eventHero, ResourceType(resourceType_a), resourceAmount_o);
             eventResults[0] = 1;
             break;
 
         case MAP_OBJECT_WINDMILL:
             if (cell->m_objectMetadata != AI_EVENT_WINDMILL_EMPTY) {
-                GiveResource(eventHero, cell->m_objectMetadata, WINDMILL_RESOURCE_AMOUNT);
+                GiveResource(eventHero, ResourceType(cell->m_objectMetadata), WINDMILL_RESOURCE_AMOUNT);
                 cell->m_objectMetadata = AI_EVENT_WINDMILL_EMPTY;
             }
             break;
@@ -6194,7 +6194,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                     break;
                 case DAEMON_REWARD_EXPERIENCE_GOLD:
                     GiveExperience(eventHero, DAEMON_EXPERIENCE, 1);
-                    GiveResource(eventHero, IDX(RES_GOLD), AI_EVENT_DAEMON_GOLD);
+                    GiveResource(eventHero, RES_GOLD, AI_EVENT_DAEMON_GOLD);
                     break;
                 case DAEMON_REWARD_RANSOM:
                     if (gpGame->m_players[eventHero->m_owner].m_resources[IDX(RES_GOLD)]

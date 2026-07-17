@@ -241,7 +241,7 @@ public:
     void EventWindow(i32, i32, char*, i32, i32, i32, i32, i32);
     ArtifactType GiveRandomArtifact(class hero*);
     i32 GiveExperience(class hero*, i32, i32);
-    void GiveResource(class hero*, i32, i32);
+    void GiveResource(class hero*, ResourceType, i32);
     void RecruitEvent(class hero*, i32, class mapCell*);
     i32 SkeletonEvent(class hero*, class mapCell*, char*, i32, i32);
     i32 ZombieEvent(class hero*, class mapCell*, char*, i32, i32);
