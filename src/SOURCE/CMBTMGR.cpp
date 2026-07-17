@@ -1579,7 +1579,7 @@ void combatManager::KeepAttack(i32 tower) {
     if (damage8 <= 0)
         damage8 = COMBAT_KEEP_MIN_DAMAGE;
 
-    i32 killed29 = target0->Damage(damage8, -1);
+    i32 killed29 = target0->Damage(damage8, SPELL_NONE);
     if (killed29 > 0) {
         char* armyNameValue;
         if (killed29 > 1)
