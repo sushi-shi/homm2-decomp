@@ -3688,6 +3688,17 @@
     },
     {
       "unit": "SOURCE/SPELLAI",
+      "function": "?DetermineEffectOfSpell@combatManager@@QAEXHPAH0@Z",
+      "source_hash": "555b872405c7",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "improved",
+      "iterations": 1,
+      "before": 99.22416,
+      "after": 99.40011,
+      "note": "Immediate 1.0f initializer now matches retail; complete semantic body and 156/156 external relocations, with local-slot/table residuals parked."
+    },
+    {
+      "unit": "SOURCE/SPELLAI",
       "function": "?DoSpellAI@combatManager@@QAEHHH@Z",
       "source_hash": "36ba1f407be9",
       "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
@@ -3696,6 +3707,50 @@
       "before": 99.6,
       "after": 99.6,
       "note": "Complete body; best-effect comparison load order remains after both lvalue qualifications."
+    },
+    {
+      "unit": "SOURCE/SPELLAI",
+      "function": "?EffectSpellCreateCreature@combatManager@@QAEHHH@Z",
+      "source_hash": "32918f5a6c7f",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "improved",
+      "iterations": 3,
+      "before": 98.19618,
+      "after": 99.174385,
+      "note": "Immediate 1.0f and semantic local names recover all named slots; 14/14 external relocations align and only local-table layout remains."
+    },
+    {
+      "unit": "SOURCE/SPELLAI",
+      "function": "?EffectSpellCure@combatManager@@QAEXPAHHHH@Z",
+      "source_hash": "4a5142eba6b0",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 97.58707,
+      "after": 97.58707,
+      "note": "All ten live slots and 23/23 relocations align; retail retains one compiler-only word and the remaining residual is compiler layout."
+    },
+    {
+      "unit": "SOURCE/SPELLAI",
+      "function": "?EffectSpellDamage@combatManager@@QAEXPAHHH@Z",
+      "source_hash": "087068f74d4b",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 97.029564,
+      "after": 97.029564,
+      "note": "Complete frame and named slots; 86 retail versus 82 candidate relocations have no candidate-only external owner, leaving local-label/table residuals."
+    },
+    {
+      "unit": "SOURCE/SPELLAI",
+      "function": "?RawEffectSpellInfluence@combatManager@@QAEHPAVarmy@@H@Z",
+      "source_hash": "415d95dc407e",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 96.58654,
+      "after": 96.58654,
+      "note": "Complete semantics; named slot order differs and retail retains one compiler-only word, with 65/62 relocations and no candidate-only external owner."
     },
     {
       "unit": "SOURCE/SPELLS",
