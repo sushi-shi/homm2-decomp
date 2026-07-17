@@ -46,9 +46,10 @@ DATA(0x0052ae64) static int gSearchHigh;
 // and retail BSS are both 0xa8 and contain the same 13 DATA-proved logical owners.
 // The candidate's internal owner order differs from retail packing. Thirty-one
 // directly aligned owner references have exact RVAs/addends; all remaining BSS
-// references use zero addends, but current nonexact function shape leaves candidate
-// counts +1 for gSearchNextX/gSearchNextY and -1 for gSearchDirection. Preserve this
-// as function/link packing work; do not add aliases, padding, or placement rules.
+// references use zero addends. The breadth include audit removed the former extra
+// gSearchNextY site from TestPossibleDirections: its current 66/66 relocation set
+// has no base-only owner. Preserve other nonexact call-site topology as function/link
+// packing work; do not add aliases, padding, or placement rules.
 DATA(0x0051733c) static SFindPathSourceLocation gSearchAllocationSource = {
     { FINDPATH_ALLOCATION_SOURCE_LINE_BASE, 0 }, FINDPATH_SOURCE_FILE
 };

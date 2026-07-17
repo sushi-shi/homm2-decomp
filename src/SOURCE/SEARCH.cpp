@@ -92,9 +92,9 @@ int searchArray::BuildPath(int startX, int startY, int destinationX,
 // are saved, this is ESI, continueSeed is EBX, and target X is EDI. Base has 0x9ea
 // meaningful bytes versus retail 0x9df plus one pad byte. The first code divergence is
 // target visibility indexing: base adds mapExtra before target X and tests [EAX+EDI],
-// while retail adds target X first and tests [EAX+ECX]. Relocs are base 233/retail 232;
-// the two base-only entries are normalDirTable+1 references delinked in retail as local
-// ??_C aliases, and every external global/callee count agrees. Tried direct/local target
+// while retail adds target X first and tests [EAX+ECX]. Relocs are base 231/retail 232:
+// every candidate owner/addend occurs in retail, and candidate is short one zero-addend
+// s_adjacentX reference; every external global/callee count agrees. Tried direct/local target
 // indexing, branch polarities, nested cost arguments, queue aliases, register/const alias
 // orders, and both top- and bottom-tested queue loops. Revisit in the 95% /O2 pass.
 VA(0x004a26a0, 0x9df)

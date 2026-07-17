@@ -5861,12 +5861,12 @@ int advManager::GetSoundId(int x, int y)
     return ADVMGR_ENVIRONMENT_SOUND_NONE;
 }
 
-// @early-stop
-// @early-stop-reloc-only: all 0x23a bytes match after masking the same nine
-// relocation sites, with identical same-function destinations. Spelling the
-// bounds directly and then MAP_WIDTH <= 0[&x] closed the last code residual in
-// two attempts. The remaining score is the delinked environment-volume symbol
-// identity; its resolved retail address agrees.
+// @semantic
+// Complete semantics, 0x14 frame/slots and CFG; all 9/9 relocation owners/addends
+// agree. At the Y bound retail loads mapY then compares MAP_HEIGHT/EAX with JG;
+// candidate loads MAP_HEIGHT then compares mapY/EAX with JL. This makes candidate's
+// meaningful body 0x239 bytes versus retail's 0x23a and places the next candidate
+// symbol at +0x239. Direct bounds and MAP_WIDTH <= 0[&x] were already tried.
 VA(0x00466ef0, 0x23a)
 void advManager::InsertSound(int x, int mapY, int distance, int soundLayer)
 {

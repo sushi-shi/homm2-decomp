@@ -162,8 +162,6 @@ typedef enum KbGameTableConstant {
     KB_TERRAIN_STEP_TYPE_COUNT = 2,
     KB_TRIGGER_TYPE_COUNT = 128,
     KB_TOWN_OBJECT_NAME_COUNT = 32,
-    KB_COMBAT_HERO_VARIANT_COUNT = 2,
-    KB_COMBAT_HERO_SPRITE_COUNT = HERO_CLASS_COUNT * KB_COMBAT_HERO_VARIANT_COUNT,
     KB_CASTLE_WALL_SEGMENT_COUNT = 4,
     KB_CASTLE_TOWER_COUNT = 4,
     KB_CASTLE_DOOR_POSITION_COUNT = 2,
@@ -348,18 +346,15 @@ extern int gbNoBorder;
 extern int gbEnlargeScreenBlit;
 extern int giCurExe;
 extern int gbInDialog;
-extern struct SMenuEnableStatus gsMenuEnableStatus[MENU_ENABLE_STATUS_COUNT];
 extern int gbInSetupDialog;
 extern int gbMinimized;
 extern int gbInSmackMgr;
 extern int glBottomRefresh;
 extern int gbBothMachinesWin95;
 extern int gbGotFirstHeartbeat;
-extern char *cMonFilename[MONSTER_DATABASE_COUNT];
 extern int gbProcessingCombatAction;
 extern int iMPNetProtocol;
 extern int iLastDiffSendTo;
-extern char *cArmyFrameFileNames[MONSTER_DATABASE_COUNT];
 extern unsigned char gcSpellInfluenceIcons[KB_SPELL_INFLUENCE_MAP_COUNT];
 extern unsigned char giSpellInfluenceToSpell[KB_SPELL_INFLUENCE_MAP_COUNT];
 extern unsigned char giNumPowFrames[KB_SPELL_EFFECT_COUNT];
@@ -385,7 +380,6 @@ extern char cHeroTypeInitial[HERO_TYPE_INITIAL_COUNT];
 extern int giDeferObjDrawX;
 extern int giDeferObjDrawY;
 extern class heroWindow *gpInitWin;
-extern struct SCmbtHero sCmbtHero[KB_COMBAT_HERO_SPRITE_COUNT];
 extern unsigned char iWallToHexCell[KB_CASTLE_WALL_SEGMENT_COUNT];
 extern unsigned char iTowerToHexCell[KB_CASTLE_TOWER_COUNT];
 extern unsigned short wallPos[KB_CASTLE_WALL_SEGMENT_COUNT][KB_COMBAT_COORDINATE_COUNT];
@@ -407,7 +401,6 @@ extern char *gArtifactEvent[KB_ARTIFACT_LEVEL_COUNT];
 extern char *gStatNames[HERO_PRIMARY_STAT_COUNT];
 extern char *gStatDesc[HERO_PRIMARY_STAT_COUNT];
 extern char *gAlignmentNames[KB_ALIGNMENT_NAME_COUNT];
-extern char *gArmyShortNames[MONSTER_DATABASE_COUNT];
 extern char *gTerrainNames[KB_TERRAIN_TYPE_COUNT];
 extern char *gResourceNames[RESOURCE_VALUE_COUNT];
 extern char *gQuickViewText[KB_QUICK_VIEW_TEXT_COUNT];

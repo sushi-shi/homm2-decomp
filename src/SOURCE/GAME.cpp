@@ -8,7 +8,6 @@
 #include <SOURCE/philAI.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/GAME.h>
-#include <SOURCE/KB_TYPES.h>
 #include <BASE/Icon2b.h>
 #include <BASE/Misc.h>
 #include <SOURCE/CURSOR.h>
@@ -51,8 +50,7 @@
 #include <SOURCE/kbwin.h>
 
 
-// configStruct/tag_monsterInfo shared in SOURCE/KB_TYPES.h; EventExtra/SThievesData in
-// SOURCE/GAME.h.
+// EventExtra/SThievesData live in SOURCE/GAME.h.
 
 // GAME's BaseAlloc/BaseFree pass __FILE__ + a source line number. The retail
 // encodes the base line as a 2-byte string read via movswl, then adds a per-call

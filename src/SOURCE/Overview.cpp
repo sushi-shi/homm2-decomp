@@ -1062,11 +1062,11 @@ void game::Overview(void)
     iconWidgetDynamic = 0;
 }
 
-// @early-stop
-// @early-stop-reloc-only
-// All 0x31f relocation-masked bytes, frame/slots/CFG, and 49 ordered relocation
-// sites/effective targets agree; residuals are compiler-local float constants
-// and the __adjust_fdiv/iLeftRightSave owner alias.
+// @semantic
+// Complete 0xe0 frame/slots and CFG; all 49/49 relocation owners/addends agree.
+// The first non-relocation residual is at +0xfc and +0x124: retail loads the
+// -0x30 float before adding -0x3c, while candidate loads -0x3c before adding
+// -0x30. The two commutative x87 operand orders are behaviorally equivalent.
 VA(0x0040a350, 0x31f)
 void game::DoKnob(void)
 {
