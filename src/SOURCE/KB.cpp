@@ -1216,7 +1216,7 @@ VA(0x00499589, 0x1a7)
 char *GetBuildingInfo(i32 race, i32 building, i32 mode)
 {
     char buf[400];
-    if (race == TOWN_TYPE_NECROMANCER && building == KB_BUILDING_NECROMANCER_SHRINE) {
+    if (race == FACTION_NECROMANCER && building == KB_BUILDING_NECROMANCER_SHRINE) {
         sprintf(buf, xNecromancerShrineDesc);
     } else if (building == KB_BUILDING_WELL_EXTRA) {
         sprintf(buf, "The %s increases production of %s by 8 per week.",
@@ -1244,7 +1244,7 @@ char *GetBuildingInfo(i32 race, i32 building, i32 mode)
 VA(0x00499730, 0xa4)
 char *GetBuildingName(i32 race, i32 building)
 {
-    if (race == TOWN_TYPE_NECROMANCER && building == KB_BUILDING_NECROMANCER_SHRINE)
+    if (race == FACTION_NECROMANCER && building == KB_BUILDING_NECROMANCER_SHRINE)
         return xNecromancerShrine;
     if (building == KB_BUILDING_WELL_EXTRA)
         return gWellExtraNames[race];
@@ -1260,7 +1260,7 @@ VA(0x004997d4, 0x138)
 void GetBuildingCost(i32 race, i32 building, i32 *const dest, i32 mageLevel)
 {
     i32 level;
-    if (building == KB_BUILDING_NECROMANCER_SHRINE && race == TOWN_TYPE_NECROMANCER) {
+    if (building == KB_BUILDING_NECROMANCER_SHRINE && race == FACTION_NECROMANCER) {
         memcpy(dest, xShrineBuildingCost, KB_BUILDING_RESOURCE_COUNT * sizeof(i32));
     } else if (building >= KB_BUILDING_DWELLING_FIRST && building <= KB_BUILDING_DWELLING_LAST) {
         memcpy(dest, gDwellingCosts[race][building - KB_BUILDING_DWELLING_FIRST],
@@ -1338,7 +1338,7 @@ i32 CanBuild(town *t, i32 building)
     if (building != KB_BUILDING_CASTLE && !(t->m_buildings & TOWN_BUILDING_CASTLE))
         return 0;
     if (!xIsExpansionMap && building == KB_BUILDING_NECROMANCER_SHRINE &&
-        t->m_type == TOWN_TYPE_NECROMANCER)
+        t->m_type == FACTION_NECROMANCER)
         return 0;
     if (building == KB_BUILDING_DOCK) {
         if (t->CanBuildDock())
@@ -1383,7 +1383,7 @@ i32 CanBuild(town *t, i32 building)
     if (haveMask & KB_DWELLING_UPGRADE_FIFTH_FLAG)
         haveMask |= KB_DWELLING_FIFTH_FLAG;
     if ((reqMask & haveMask) == reqMask) {
-        if (t->m_type == TOWN_TYPE_NECROMANCER &&
+        if (t->m_type == FACTION_NECROMANCER &&
             building == KB_BUILDING_NECROMANCER_MAGE_PREREQUISITE && t->m_buildState <= 1)
             return 0;
         return 1;
@@ -1408,7 +1408,7 @@ i32 CanBuy(town *t, i32 type)
 VA(0x00499dbb, 0xc6)
 i32 GetBuildingBaseResourceValue(i32 race, i32 building, i32 level)
 {
-    if (race == TOWN_TYPE_NECROMANCER && building == KB_BUILDING_UPGRADE_CASTLE)
+    if (race == FACTION_NECROMANCER && building == KB_BUILDING_UPGRADE_CASTLE)
         return 1000;
     if (building < KB_BUILDING_DWELLING_FIRST || building > KB_BUILDING_DWELLING_LAST) {
         if (building > KB_BUILDING_NEUTRAL_LAST)
@@ -2293,7 +2293,7 @@ void game::ShowMoraleInfo(hero *h, i32 dialogType)
             strcat(gText, description);
         }
 
-        if (h->GetOccupiedTown() != 0 && h->GetOccupiedTown()->m_type == TOWN_TYPE_BARBARIAN
+        if (h->GetOccupiedTown() != 0 && h->GetOccupiedTown()->m_type == FACTION_BARBARIAN
             && (h->GetOccupiedTown()->m_buildings & TOWN_BUILDING_COLISEUM)) {
             strcat(gText, cMoraleInfo[MORALE_INFO_COLISEUM]);
         }
@@ -2379,7 +2379,7 @@ void game::ShowLuckInfo(hero *h, i32 dialogType)
 
     sprintf(gText, cLuckInfo[LUCK_INFO_HEADER], description);
     modifierStart = strlen(gText);
-    if (h->GetOccupiedTown() != 0 && h->GetOccupiedTown()->m_type == TOWN_TYPE_SORCERESS &&
+    if (h->GetOccupiedTown() != 0 && h->GetOccupiedTown()->m_type == FACTION_SORCERESS &&
         (h->GetOccupiedTown()->m_buildings & TOWN_BUILDING_RAINBOW))
         strcat(gText, cLuckInfo[LUCK_INFO_RAINBOW]);
     if (h->HasArtifact(ARTIFACT_RABBIT_FOOT))
@@ -4615,24 +4615,24 @@ void UpdateNormalDialog(char *text)
         GROUND_REPEAT_8(0)
 
 DATA(0x004f8c58) u8 giGroundToTerrain[GROUND_TILE_IMAGE_COUNT] = {
-    GROUND_REPEAT_16(GROUND_TERRAIN_WATER), GROUND_REPEAT_8(GROUND_TERRAIN_WATER),
-    GROUND_REPEAT_4(GROUND_TERRAIN_WATER), GROUND_REPEAT_2(GROUND_TERRAIN_WATER),
-    GROUND_REPEAT_32(GROUND_TERRAIN_GRASS), GROUND_REPEAT_16(GROUND_TERRAIN_GRASS),
-    GROUND_REPEAT_8(GROUND_TERRAIN_GRASS), GROUND_REPEAT_4(GROUND_TERRAIN_GRASS),
-    GROUND_REPEAT_2(GROUND_TERRAIN_GRASS), GROUND_REPEAT_32(GROUND_TERRAIN_SNOW),
-    GROUND_REPEAT_16(GROUND_TERRAIN_SNOW), GROUND_REPEAT_4(GROUND_TERRAIN_SNOW),
-    GROUND_REPEAT_2(GROUND_TERRAIN_SNOW), GROUND_REPEAT_32(GROUND_TERRAIN_SWAMP),
-    GROUND_REPEAT_16(GROUND_TERRAIN_SWAMP), GROUND_REPEAT_8(GROUND_TERRAIN_SWAMP),
-    GROUND_REPEAT_4(GROUND_TERRAIN_SWAMP), GROUND_REPEAT_2(GROUND_TERRAIN_SWAMP),
-    GROUND_REPEAT_32(GROUND_TERRAIN_LAVA), GROUND_REPEAT_16(GROUND_TERRAIN_LAVA),
-    GROUND_REPEAT_4(GROUND_TERRAIN_LAVA), GROUND_REPEAT_2(GROUND_TERRAIN_LAVA),
-    GROUND_REPEAT_32(GROUND_TERRAIN_DESERT), GROUND_REPEAT_16(GROUND_TERRAIN_DESERT),
-    GROUND_REPEAT_8(GROUND_TERRAIN_DESERT), GROUND_REPEAT_2(GROUND_TERRAIN_DESERT),
-    GROUND_TERRAIN_DESERT, GROUND_REPEAT_32(GROUND_TERRAIN_DIRT),
-    GROUND_REPEAT_8(GROUND_TERRAIN_DIRT), GROUND_REPEAT_32(GROUND_TERRAIN_WASTELAND),
-    GROUND_REPEAT_16(GROUND_TERRAIN_WASTELAND), GROUND_REPEAT_4(GROUND_TERRAIN_WASTELAND),
-    GROUND_REPEAT_2(GROUND_TERRAIN_WASTELAND), GROUND_REPEAT_16(GROUND_TERRAIN_BEACH),
-    GROUND_TERRAIN_BEACH
+    GROUND_REPEAT_16(TERRAIN_WATER), GROUND_REPEAT_8(TERRAIN_WATER),
+    GROUND_REPEAT_4(TERRAIN_WATER), GROUND_REPEAT_2(TERRAIN_WATER),
+    GROUND_REPEAT_32(TERRAIN_GRASS), GROUND_REPEAT_16(TERRAIN_GRASS),
+    GROUND_REPEAT_8(TERRAIN_GRASS), GROUND_REPEAT_4(TERRAIN_GRASS),
+    GROUND_REPEAT_2(TERRAIN_GRASS), GROUND_REPEAT_32(TERRAIN_SNOW),
+    GROUND_REPEAT_16(TERRAIN_SNOW), GROUND_REPEAT_4(TERRAIN_SNOW),
+    GROUND_REPEAT_2(TERRAIN_SNOW), GROUND_REPEAT_32(TERRAIN_SWAMP),
+    GROUND_REPEAT_16(TERRAIN_SWAMP), GROUND_REPEAT_8(TERRAIN_SWAMP),
+    GROUND_REPEAT_4(TERRAIN_SWAMP), GROUND_REPEAT_2(TERRAIN_SWAMP),
+    GROUND_REPEAT_32(TERRAIN_LAVA), GROUND_REPEAT_16(TERRAIN_LAVA),
+    GROUND_REPEAT_4(TERRAIN_LAVA), GROUND_REPEAT_2(TERRAIN_LAVA),
+    GROUND_REPEAT_32(TERRAIN_DESERT), GROUND_REPEAT_16(TERRAIN_DESERT),
+    GROUND_REPEAT_8(TERRAIN_DESERT), GROUND_REPEAT_2(TERRAIN_DESERT),
+    TERRAIN_DESERT, GROUND_REPEAT_32(TERRAIN_DIRT),
+    GROUND_REPEAT_8(TERRAIN_DIRT), GROUND_REPEAT_32(TERRAIN_WASTELAND),
+    GROUND_REPEAT_16(TERRAIN_WASTELAND), GROUND_REPEAT_4(TERRAIN_WASTELAND),
+    GROUND_REPEAT_2(TERRAIN_WASTELAND), GROUND_REPEAT_16(TERRAIN_BEACH),
+    TERRAIN_BEACH
 };
 DATA(0x004f8e08) u8 giGroundShape[GROUND_TILE_IMAGE_COUNT] = {
     GROUND_REPEAT_2(16), GROUND_REPEAT_2(1), GROUND_REPEAT_4(2),
@@ -5430,7 +5430,7 @@ DATA(0x004fbaf0) i8 townTheme[TOWN_MUSIC_TABLE_SIZE] = {
     TOWN_MUSIC_NONE
 };
 DATA(0x004fbaf8) i8
-    gHeroSkillBonus[HERO_CLASS_COUNT][KB_HERO_LEVEL_BAND_COUNT][HERO_PRIMARY_STAT_COUNT] = {
+    gHeroSkillBonus[FACTION_COUNT][KB_HERO_LEVEL_BAND_COUNT][HERO_PRIMARY_STAT_COUNT] = {
         { { 35, 45, 10, 10 }, { 25, 25, 25, 25 } },
         { { 55, 35, 5, 5 }, { 25, 25, 25, 25 } },
         { { 10, 10, 30, 50 }, { 20, 20, 30, 30 } },
@@ -5718,7 +5718,7 @@ DATA(0x004fc7c8) i8 giVisRange[HERO_SKILL_LEVEL_COUNT] = {
     4, 5, 6, 7
 };
 DATA(0x004fc7d0)
-u8 gStartingHeroStats[HERO_CLASS_COUNT][HERO_STARTING_STAT_COUNT] = {
+u8 gStartingHeroStats[FACTION_COUNT][HERO_STARTING_STAT_COUNT] = {
     { 2, 2, 1, 1, 1 },
     { 3, 1, 1, 1, 1 },
     { 0, 0, 2, 3, 1 },
@@ -5750,7 +5750,7 @@ DATA(0x004fc930) u8 bStopOnTrigger[KB_TRIGGER_TYPE_COUNT] = {
     0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0
 };
-DATA(0x004fc9b0) char *gTownPrefixNames[HERO_CLASS_COUNT] = {
+DATA(0x004fc9b0) char *gTownPrefixNames[FACTION_COUNT] = {
     "twnk", "twnb", "twns", "twnw", "twnz", "twnn"
 };
 DATA(0x004fc9c8) char *gTownObjNames[KB_TOWN_OBJECT_NAME_COUNT] = {
@@ -5763,7 +5763,7 @@ DATA(0x004fc9c8) char *gTownObjNames[KB_TOWN_OBJECT_NAME_COUNT] = {
     "dw_5", "up_1", "up_2", "up_3",
     "up_4", "up_5", "up5b", "ext3"
 };
-DATA(0x004fca48) i8 gDwellingType[TOWN_TYPE_COUNT][KB_DWELLING_TYPE_COUNT] = {
+DATA(0x004fca48) i8 gDwellingType[FACTION_COUNT][KB_DWELLING_TYPE_COUNT] = {
     { ARMY_CREATURE_PEASANT, ARMY_CREATURE_ARCHER, ARMY_CREATURE_PIKEMAN,
       ARMY_CREATURE_SWORDSMAN, ARMY_CREATURE_CAVALRY,
       ARMY_CREATURE_PALADIN, ARMY_CREATURE_RANGER,
@@ -5805,7 +5805,7 @@ i32 gMageBuildingCosts[KB_MAGE_GUILD_LEVEL_COUNT][KB_BUILDING_RESOURCE_COUNT] = 
     { 5, 10, 5, 10, 10, 10, 1000 }
 };
 DATA(0x004fcb38)
-i32 gSpecialBuildingCosts[TOWN_TYPE_COUNT][KB_BUILDING_RESOURCE_COUNT] = {
+i32 gSpecialBuildingCosts[FACTION_COUNT][KB_BUILDING_RESOURCE_COUNT] = {
     { 5, 0, 15, 0, 0, 0, 1500 },
     { 10, 0, 10, 0, 0, 0, 2000 },
     { 0, 0, 0, 0, 10, 0, 1500 },
@@ -5841,11 +5841,11 @@ DATA(0x004fcdb8) i32
     1500, 1500, 200, 1000, 500, 0, 0, 1100,
     0, 0, 0, 0
 };
-DATA(0x004fce08) i32 gSpecialBuildingBaseResourceValues[TOWN_TYPE_COUNT] = {
+DATA(0x004fce08) i32 gSpecialBuildingBaseResourceValues[FACTION_COUNT] = {
     1500, 1000, 1000, 4500, 3500, 1000
 };
 DATA(0x004fce20)
-i32 gDwellingBaseResourceValues[TOWN_TYPE_COUNT][KB_DWELLING_TYPE_COUNT] = {
+i32 gDwellingBaseResourceValues[FACTION_COUNT][KB_DWELLING_TYPE_COUNT] = {
     { 858, 2225, 2816, 7385, 13754, 29785, 4000, 3200, 8000, 16000, 40000, 0 },
     { 1802, 2615, 3414, 6967, 13212, 38141, 3500, 0, 8000, 16000, 0, 0 },
     { 1684, 3000, 3500, 7213, 15181, 27684, 4000, 4000, 12000, 0, 0, 0 },
@@ -5854,7 +5854,7 @@ i32 gDwellingBaseResourceValues[TOWN_TYPE_COUNT][KB_DWELLING_TYPE_COUNT] = {
     { 2200, 2100, 3800, 6000, 9500, 90000, 3000, 4900, 15000, 12000, 0, 0 }
 };
 DATA(0x004fcf40)
-i32 gDwellingCosts[TOWN_TYPE_COUNT][KB_DWELLING_TYPE_COUNT][KB_BUILDING_RESOURCE_COUNT] = {
+i32 gDwellingCosts[FACTION_COUNT][KB_DWELLING_TYPE_COUNT][KB_BUILDING_RESOURCE_COUNT] = {
     {
         { 0, 0, 0, 0, 0, 0, 200 }, { 0, 0, 0, 0, 0, 0, 1000 },
         { 0, 0, 5, 0, 0, 0, 1000 }, { 10, 0, 10, 0, 0, 0, 2000 },
@@ -5905,7 +5905,7 @@ i32 gDwellingCosts[TOWN_TYPE_COUNT][KB_DWELLING_TYPE_COUNT][KB_BUILDING_RESOURCE
     }
 };
 DATA(0x004fd720)
-u32l gHierarchyMask[TOWN_TYPE_COUNT][KB_DWELLING_TYPE_COUNT] = {
+u32l gHierarchyMask[FACTION_COUNT][KB_DWELLING_TYPE_COUNT] = {
     { 0x00000000UL, 0x00080000UL, 0x00080010UL, 0x00080004UL,
       0x00700000UL, 0x00700000UL, 0x00700000UL, 0x00700000UL,
       0x00700000UL, 0x00800000UL, 0x01000000UL, 0xffffffffUL },
@@ -5926,10 +5926,10 @@ u32l gHierarchyMask[TOWN_TYPE_COUNT][KB_DWELLING_TYPE_COUNT] = {
       0x00400000UL, 0x00800000UL, 0xffffffffUL, 0xffffffffUL }
 };
 DATA(0x004fd840) i32 giDebugBuildingToBuild = -1;
-DATA(0x004fd848) u8 giTerrainToMusicTrack[GROUND_TERRAIN_TYPE_COUNT] = {
+DATA(0x004fd848) u8 giTerrainToMusicTrack[TERRAIN_COUNT] = {
     16, 18, 14, 15, 11, 13, 17, 12, 16
 };
-DATA(0x004fd858) char *cHeroTypeShortName[HERO_CLASS_COUNT] = {
+DATA(0x004fd858) char *cHeroTypeShortName[FACTION_COUNT] = {
     "kngt", "barb", "sorc", "wrlk", "wzrd", "necr"
 };
 DATA(0x004fd870) char cHeroTypeInitial[HERO_TYPE_INITIAL_COUNT] = {
@@ -5938,7 +5938,7 @@ DATA(0x004fd870) char cHeroTypeInitial[HERO_TYPE_INITIAL_COUNT] = {
 DATA(0x004fd878) i32 giDeferObjDrawX = -1;
 DATA(0x004fd87c) i32 giDeferObjDrawY = -1;
 DATA(0x004fd880) class heroWindow *gpInitWin = 0;
-DATA(0x004fd888) u8 iGetSSByAlignment[HERO_SKILL_COUNT][HERO_CLASS_COUNT] = {
+DATA(0x004fd888) u8 iGetSSByAlignment[HERO_SKILL_COUNT][FACTION_COUNT] = {
     {3, 4, 2, 2, 2, 3},
     {2, 3, 3, 1, 1, 1},
     {3, 3, 2, 2, 2, 2},
@@ -6465,7 +6465,7 @@ DATA(0x004fdf50) struct SElevationOverlay
     { 0x0080, { 21, 34, 48, 70, 83, 97, 98, -1, -1, -1, -1, -1, -1, -1, -1 } }
 };
 DATA(0x004fe100)
-i8 captainStats[HERO_CLASS_COUNT][HERO_PRIMARY_STAT_COUNT] = {
+i8 captainStats[FACTION_COUNT][HERO_PRIMARY_STAT_COUNT] = {
     { 1, 1, 1, 1 }, { 1, 1, 1, 1 },
     { 0, 0, 2, 2 }, { 0, 0, 2, 2 },
     { 0, 0, 2, 2 }, { 0, 0, 2, 2 }
@@ -7436,7 +7436,7 @@ DATA(0x004fef98) char *walkSpeedText[KB_WALK_SPEED_TEXT_COUNT] = {
     "Jump",
     0
 };
-DATA(0x004fefb0) char *gColors[HERO_CLASS_COUNT] = {
+DATA(0x004fefb0) char *gColors[FACTION_COUNT] = {
     "blue",
     "green",
     "red",
@@ -8111,7 +8111,7 @@ DATA(0x004ff938) char *gSpecialBuildingNames[KB_SPECIAL_BUILDING_NAME_COUNT] = {
     "Special",
     0
 };
-DATA(0x004ff958) char *gDwellingNames[TOWN_TYPE_COUNT][KB_DWELLING_TYPE_COUNT] = {
+DATA(0x004ff958) char *gDwellingNames[FACTION_COUNT][KB_DWELLING_TYPE_COUNT] = {
     {
         "Thatched Hut",
         "Archery Range",

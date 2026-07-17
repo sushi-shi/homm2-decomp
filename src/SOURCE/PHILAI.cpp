@@ -2442,10 +2442,10 @@ void philAI::ValueOfBuyingHero(town *townPtr, hero *heroPtr, i32 &resourceValue,
     value27 = static_cast<i32>(
         (gpCurPlayer->m_attentionWeights.heroValue + 1.0 -
          gpCurPlayer->m_attentionWeights.upgradeBase) * value27);
-    magicHero6 = heroPtr->m_cursorType == HERO_CLASS_SORCERESS ||
-                 heroPtr->m_cursorType == HERO_CLASS_WARLOCK ||
-                 heroPtr->m_cursorType == HERO_CLASS_WIZARD ||
-                 heroPtr->m_cursorType == HERO_CLASS_NECROMANCER;
+    magicHero6 = heroPtr->m_cursorType == FACTION_SORCERESS ||
+                 heroPtr->m_cursorType == FACTION_WARLOCK ||
+                 heroPtr->m_cursorType == FACTION_WIZARD ||
+                 heroPtr->m_cursorType == FACTION_NECROMANCER;
     if (townPtr->m_type == heroPtr->m_cursorType) {
         value27 *= AI_HERO_PURCHASE_SAME_RACE_FACTOR + AI_ATTENTION_IDENTITY;
     } else if ((townPtr->m_buildState >= 2 && magicHero6) ||

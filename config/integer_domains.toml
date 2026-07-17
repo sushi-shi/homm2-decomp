@@ -26,6 +26,63 @@ evidence = [
 status = "reviewed"
 
 [[domain]]
+name = "FactionType"
+declaration = "FactionType"
+owner = "include/SOURCE/KB_TYPES.h"
+category = "serialized"
+production_carrier = "byte storage and int table-index boundaries"
+strict = true
+sentinels = []
+enumerators = [
+  "FACTION_KNIGHT",
+  "FACTION_BARBARIAN",
+  "FACTION_SORCERESS",
+  "FACTION_WARLOCK",
+  "FACTION_WIZARD",
+  "FACTION_NECROMANCER",
+  "FACTION_COUNT",
+]
+interfaces = ["hero alignment selection", "town type dispatch", "faction-indexed game tables"]
+members = []
+storage = ["town::m_type packed byte", "serialized map and campaign faction bytes"]
+conversions = ["FactionType to packed byte and integer table index boundaries"]
+evidence = [
+  "hero class and town type used the same six ordered factions",
+  "shared tables index both hero and town behavior in the same faction order",
+]
+status = "reviewed"
+
+[[domain]]
+name = "TerrainType"
+declaration = "TerrainType"
+owner = "include/SOURCE/KB_TYPES.h"
+category = "serialized"
+production_carrier = "int combat state and byte table boundaries"
+strict = true
+sentinels = []
+enumerators = [
+  "TERRAIN_WATER",
+  "TERRAIN_GRASS",
+  "TERRAIN_SNOW",
+  "TERRAIN_SWAMP",
+  "TERRAIN_LAVA",
+  "TERRAIN_DESERT",
+  "TERRAIN_DIRT",
+  "TERRAIN_WASTELAND",
+  "TERRAIN_BEACH",
+  "TERRAIN_COUNT",
+]
+interfaces = ["adventure ground lookup", "combat terrain dispatch", "terrain-indexed game tables"]
+members = []
+storage = ["combatManager::m_terrainType four-byte field", "terrain lookup table bytes"]
+conversions = ["TerrainType to serialized byte and integer table-index boundaries"]
+evidence = [
+  "ground and combat terrain used identical values 0 through 8",
+  "combat rendering and adventure music dispatch the same terrain meanings",
+]
+status = "reviewed"
+
+[[domain]]
 name = "FileRequesterMode"
 declaration = "FileRequesterMode"
 owner = "include/SOURCE/fileRequester.h"

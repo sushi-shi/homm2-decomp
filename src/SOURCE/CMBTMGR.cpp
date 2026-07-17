@@ -241,7 +241,7 @@ void combatManager::InitNonVisualVars(void)
         if (m_heroes[side] != 0)
             m_spellPower[side] = m_heroes[side]->Stats(HERO_PRIMARY_SPELL_POWER);
         if (m_combatTowns[side] != 0 &&
-            m_combatTowns[side]->m_type == TOWN_TYPE_NECROMANCER &&
+            m_combatTowns[side]->m_type == FACTION_NECROMANCER &&
             (m_combatTowns[side]->m_buildings & TOWN_BUILDING_SHRINE))
             m_spellPower[side] += 2;
     }
@@ -591,11 +591,11 @@ char * combatManager::GetBackgroundName(void)
     m_colorCycleType = 1;
     m_battlefieldFringe = -1;
     switch (m_terrainType) {
-    case COMBAT_TERRAIN_WATER:
+    case TERRAIN_WATER:
         backgroundIndex = 0;
         m_battlefieldFringe = 13;
         break;
-    case COMBAT_TERRAIN_GRASS:
+    case TERRAIN_GRASS:
         if (MoreTreesNear()) {
             backgroundIndex = 2;
             m_battlefieldFringe = 12;
@@ -604,7 +604,7 @@ char * combatManager::GetBackgroundName(void)
             m_battlefieldFringe = 11;
         }
         break;
-    case COMBAT_TERRAIN_SNOW:
+    case TERRAIN_SNOW:
         m_colorCycleType = 3;
         if (MoreTreesNear()) {
             backgroundIndex = 4;
@@ -614,20 +614,20 @@ char * combatManager::GetBackgroundName(void)
             m_battlefieldFringe = 7;
         }
         break;
-    case COMBAT_TERRAIN_SWAMP:
+    case TERRAIN_SWAMP:
         backgroundIndex = 6;
         m_battlefieldFringe = 8;
         break;
-    case COMBAT_TERRAIN_LAVA:
+    case TERRAIN_LAVA:
         backgroundIndex = 8;
         m_battlefieldFringe = 5;
         break;
-    case COMBAT_TERRAIN_DESERT:
+    case TERRAIN_DESERT:
         m_colorCycleType = 3;
         backgroundIndex = 10;
         m_battlefieldFringe = 4;
         break;
-    case COMBAT_TERRAIN_DIRT:
+    case TERRAIN_DIRT:
         if (MoreTreesNear()) {
             backgroundIndex = 12;
             m_battlefieldFringe = 10;
@@ -636,12 +636,12 @@ char * combatManager::GetBackgroundName(void)
             m_battlefieldFringe = 9;
         }
         break;
-    case COMBAT_TERRAIN_WASTELAND:
+    case TERRAIN_WASTELAND:
         m_colorCycleType = 3;
         backgroundIndex = 14;
         m_battlefieldFringe = 3;
         break;
-    case COMBAT_TERRAIN_BEACH:
+    case TERRAIN_BEACH:
         m_colorCycleType = 3;
         backgroundIndex = 16;
         m_battlefieldFringe = 2;
@@ -1646,7 +1646,7 @@ void combatManager::KeepAttack(i32 tower)
     keepSample19 = LoadPlaySample(gText);
 
     CombatTowerOrigin
-        towerOrigins4[COMBAT_KEEP_TOWN_TYPE_COUNT][COMBAT_KEEP_TOWER_COUNT] = {
+        towerOrigins4[COMBAT_KEEP_FACTION_COUNT][COMBAT_KEEP_TOWER_COUNT] = {
         {{586, 177}, {428, 60}, {428, 314}},
         {{586, 177}, {428, 60}, {428, 314}},
         {{586, 177}, {428, 60}, {428, 314}},
@@ -1824,7 +1824,7 @@ void combatManager::SetupAndLoadObstacles(void)
              cellIndex1++) {
             m_wallStates[cellIndex1 + COMBAT_WALL_SLOT_SECTION_FIRST] =
                 COMBAT_WALL_STATE_KEEP_STANDING;
-            if (m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type == TOWN_TYPE_KNIGHT &&
+            if (m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type == FACTION_KNIGHT &&
                 (m_combatTowns[COMBAT_DEFENDER_SIDE]->m_buildings &
                  TOWN_BUILDING_FORTIFICATIONS)) {
                 m_wallStates[cellIndex1 + COMBAT_WALL_SLOT_SECTION_FIRST] =
