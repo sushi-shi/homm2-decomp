@@ -86,7 +86,9 @@ when ordinary disassembly is unclear. `homm2 ghidra` creates the optional projec
   and owned vtables with `VTBL(...)`. These are audit metadata, not linker placement
   directives.
 - Definitions and declarations follow the owner-header model. Do not add local
-  `class`, `struct`, `enum`, `extern`, or forward declarations in `.cpp` files.
+  `class`, `struct`, `extern`, or forward declarations in `.cpp` files. A
+  `typedef enum` used by exactly one TU is private and lives in that `.cpp`;
+  shared enum domains live in the owner header.
 - Reconstructed game integers use `Ints.h` aliases from `i8`/`u8` through
   `i64`/`u64`; plain `char` remains textual. Use `i32l`/`u32l` only where retail
   `long` type identity is proven to affect C++ ABI behavior, and keep native SDK

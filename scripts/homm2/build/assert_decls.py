@@ -9,7 +9,8 @@ import re, sys, glob, os
 
 # a real type definition or forward decl living in a .cpp
 TYPE_RE = re.compile(r'^\s*(class|struct)\s+\w+\s*(\{|:|;)')
-# an enum definition (named or anonymous) living in a .cpp — also belongs in a header
+# a bare enum definition living in a .cpp — belongs in a header. TU-private
+# `typedef enum` definitions are allowed in .cpp files (deliberately unmatched here).
 ENUM_RE = re.compile(r'^\s*enum\b[^;{]*\{')
 # an extern DECLARATION (statement ending in ';' with no body) — not a linkage block/def
 EXTERN_DECL_RE = re.compile(r'^\s*extern\b')
