@@ -18,7 +18,7 @@ SOURCE_ROOTS = (
     Path("include/BASE"),
     Path("include/EDITOR"),
 )
-SHARED_FILES = (Path("include/EnumTypes.h"),)
+SHARED_FILES = ()
 
 
 def code_identifiers(text):
