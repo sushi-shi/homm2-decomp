@@ -3581,19 +3581,19 @@ void combatManager::Earthquake(void) {
     i32 structure;
     for (structure = 0; structure < EARTHQUAKE_STRUCTURE_COUNT; ++structure) {
         newWallStates[structure] = m_wallStates[structure + COMBAT_WALL_SLOT_SECTION_FIRST];
-        if (m_wallStates[structure + COMBAT_WALL_SLOT_SECTION_FIRST] != COMBAT_WALL_STATE_DESTROYED
+        if (m_wallStates[structure + COMBAT_WALL_SLOT_SECTION_FIRST] != IDX(COMBAT_WALL_STATE_DESTROYED)
             && m_wallStates[structure + COMBAT_WALL_SLOT_SECTION_FIRST]
-                   != COMBAT_WALL_STATE_SECTION_DESTROYED
+                   != IDX(COMBAT_WALL_STATE_SECTION_DESTROYED)
             && SRandom(0, 100) < EARTHQUAKE_WALL_HIT_CHANCE) {
             ++newWallStates[structure];
             if (m_wallStates[structure + COMBAT_WALL_SLOT_SECTION_FIRST]
-                    != COMBAT_WALL_STATE_DESTROYED
+                    != IDX(COMBAT_WALL_STATE_DESTROYED)
                 && m_wallStates[structure + COMBAT_WALL_SLOT_SECTION_FIRST]
-                       != COMBAT_WALL_STATE_TOWER_STANDING
+                       != IDX(COMBAT_WALL_STATE_TOWER_STANDING)
                 && m_wallStates[structure + COMBAT_WALL_SLOT_SECTION_FIRST]
-                       != COMBAT_WALL_STATE_SECTION_DESTROYED
+                       != IDX(COMBAT_WALL_STATE_SECTION_DESTROYED)
                 && m_wallStates[structure + COMBAT_WALL_SLOT_SECTION_FIRST]
-                       != COMBAT_WALL_STATE_SECTION_DAMAGE_LAST
+                       != IDX(COMBAT_WALL_STATE_SECTION_DAMAGE_LAST)
                 && SRandom(0, 100) < EARTHQUAKE_WALL_SECOND_HIT_CHANCE)
                 ++newWallStates[structure];
             impactPositions[impactCount][IDX(COMBAT_COORDINATE_X)] =
