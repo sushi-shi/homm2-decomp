@@ -115,20 +115,20 @@ i32 combatManager::ViewGeneral(i32 side, i32 allowActions, i32 quickView) {
             gText,
             "\n%s%d\n%s%d\n%s%d\n%s%d\n%s%s\n%s%s\n\n%s%d/%d",
             cViewGeneralLabels[0],
-            m_heroes[side]->Stats(0),
+            m_heroes[side]->Stats(HeroPrimaryStat(0)),
             cViewGeneralLabels[1],
-            m_heroes[side]->Stats(1),
+            m_heroes[side]->Stats(HeroPrimaryStat(1)),
             cViewGeneralLabels[2],
-            m_heroes[side]->Stats(2),
+            m_heroes[side]->Stats(HeroPrimaryStat(2)),
             cViewGeneralLabels[3],
-            m_heroes[side]->Stats(3),
+            m_heroes[side]->Stats(HeroPrimaryStat(3)),
             cViewGeneralLabels[4],
             gMoraleText[morale + VIEW_GENERAL_MORALE_TEXT_OFFSET],
             cViewGeneralLabels[5],
             gLuckText[luck + VIEW_GENERAL_LUCK_TEXT_OFFSET],
             cViewGeneralLabels[6],
             m_heroes[side]->m_spellPoints,
-            m_heroes[side]->Stats(3) * VIEW_GENERAL_MANA_PER_KNOWLEDGE
+            m_heroes[side]->Stats(HeroPrimaryStat(3)) * VIEW_GENERAL_MANA_PER_KNOWLEDGE
         );
         message.payload.widget.command = VIEW_GENERAL_SET_TEXT;
         message.payload.widget.id = 4;

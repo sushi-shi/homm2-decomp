@@ -621,7 +621,7 @@ void philAI::DimensionDoorTo(i32 x, CreatureType y) {
         gpCurAIHero->m_remainingMobility = 0;
     else
         gpCurAIHero->m_remainingMobility -= 225;
-    gpCurAIHero->UseSpell(IDX(SPELL_DIMENSION_DOOR));
+    gpCurAIHero->UseSpell(SPELL_DIMENSION_DOOR);
 }
 
 // @semantic
@@ -651,7 +651,7 @@ i32 philAI::DoAnywhereDDoorTownGate(i32 targetValue) {
             bestValue = targetValue + 1000;
         else
             bestValue = Random(0, 125) - 50;
-        if (gpCurAIHero->HasSpell(IDX(SPELL_DIMENSION_DOOR))) {
+        if (gpCurAIHero->HasSpell(SPELL_DIMENSION_DOOR)) {
             if (gpCurAIHero->m_spellPoints >= AI_DIMENSION_DOOR_SPELL_POINTS) {
                 for (x = 0; MAP_WIDTH > x; x++) {
                     for (y = 0; y < MAP_HEIGHT; y++) {
@@ -1009,7 +1009,7 @@ void philAI::DoAI(i32 player) {
                     if (gpSearchArray->m_pathLength <= 0)
                         goto aiMovementDone;
                     gpAdvManager->UpdateScreen(0, 0);
-                } while (targetValue11 > 1000 && gpCurAIHero->HasSpell(IDX(SPELL_DIMENSION_DOOR))
+                } while (targetValue11 > 1000 && gpCurAIHero->HasSpell(SPELL_DIMENSION_DOOR)
                          && gpCurAIHero->m_spellPoints >= AI_DIMENSION_DOOR_SPELL_POINTS
                          && DoDimensionDoor(gpCurAIHero));
 
@@ -2218,7 +2218,7 @@ void philAI::ValueOfBuyingBuilding(
                 (gpCurPlayer->m_attentionWeights.upgradeBase * 2.0f + 0.33) * adjustedValue
             );
             adjustedValue = static_cast<float>(
-                (1.0 - gpCurPlayer->BuildingsOwned(currentTownRace, building, 0) * 0.05)
+                (1.0 - gpCurPlayer->BuildingsOwned(currentTownRace, BuildingSlotType(building), 0) * 0.05)
                 * adjustedValue
             );
             if (building - BUILDING_SLOT_DWELLING_FIRST < highestDwellingId)
@@ -3318,7 +3318,7 @@ i32 philAI::FightValueOfStack(
     townRecord19 = 0;
 
     if (useEnemyMods) {
-        if (heroPtr->HasArtifact(ARTIFACT_BALLISTA) || heroPtr->HasSpell(IDX(SPELL_EARTHQUAKE))
+        if (heroPtr->HasArtifact(ARTIFACT_BALLISTA) || heroPtr->HasSpell(SPELL_EARTHQUAKE)
             || heroPtr->m_secondarySkills[10]) {
             enemyMeleeModifierIndex = 1.05f;
             enemyFlyingModifier36 = 0.95f;
@@ -3431,7 +3431,7 @@ i32 philAI::FightValueOfStack(
     }
 
     if (useHero && heroPtr) {
-        statPowerTarget = heroPtr->Stats(0) + heroPtr->Stats(1) + 20;
+        statPowerTarget = heroPtr->Stats(HeroPrimaryStat(0)) + heroPtr->Stats(HeroPrimaryStat(1)) + 20;
         if (statPowerTarget < 0)
             statPowerTarget = 0;
         if (statPowerTarget > 40)
@@ -3452,15 +3452,15 @@ i32 philAI::FightValueOfStack(
 
         if (heroPtr->m_spellPoints >= 3) {
             spellCount = 0;
-            if (heroPtr->Stats(2) <= 10) {
-                durationModifier7 = gfPhilAIDurationMod[heroPtr->Stats(2)];
-                spellPowerModifier = gfPhilAISpellPowerMod[heroPtr->Stats(2)];
+            if (heroPtr->Stats(HeroPrimaryStat(2)) <= 10) {
+                durationModifier7 = gfPhilAIDurationMod[heroPtr->Stats(HeroPrimaryStat(2))];
+                spellPowerModifier = gfPhilAISpellPowerMod[heroPtr->Stats(HeroPrimaryStat(2))];
             } else {
                 durationModifier7 = gfPhilAIDurationMod[10];
                 spellPowerModifier = gfPhilAISpellPowerMod[10];
             }
             for (armySlotRecord = 0; armySlotRecord < 46; armySlotRecord++) {
-                if (heroPtr->HasSpell(armySlotRecord)) {
+                if (heroPtr->HasSpell(SpellType(armySlotRecord))) {
                     spellScoreTotal = gsSpellInfo[armySlotRecord].aiValue;
                     if (gsSpellInfo[armySlotRecord].attributes & 8)
                         spellScoreTotal = static_cast<i32>(spellScoreTotal * durationModifier7);
@@ -3781,8 +3781,8 @@ i32 philAI::QuickCombat(
     if (defeatedHero5 != 0 && defeatedHero5->m_secondarySkills[IDX(HERO_SKILL_EAGLE_EYE)] != 0
         && victoriousHero4 != 0) {
         for (armyIndex0 = 0; armyIndex0 < IDX(SPELL_COUNT); armyIndex0++) {
-            if (defeatedHero5->HasSpell(armyIndex0) != 0
-                && victoriousHero4->HasSpell(armyIndex0) == 0
+            if (defeatedHero5->HasSpell(SpellType(armyIndex0)) != 0
+                && victoriousHero4->HasSpell(SpellType(armyIndex0)) == 0
                 && gsSpellInfo[armyIndex0].level
                        <= victoriousHero4->m_secondarySkills[IDX(HERO_SKILL_EAGLE_EYE)] + 1
                 && (gsSpellInfo[armyIndex0].attributes & AI_QUICK_COMBAT_LEARNABLE_SPELL)) {
@@ -3848,7 +3848,7 @@ void philAI::HeroInteractionAtHero(
                  statIndex8++) {
                 if (statIndex8 < 2 || currentHero9->HasArtifact(ARTIFACT_MAGIC_BOOK))
                     heroValues27[heroIndex9] +=
-                        currentHero9->Stats(statIndex8) * AI_HERO_INTERACTION_PRIMARY_STAT_VALUE;
+                        currentHero9->Stats(HeroPrimaryStat(statIndex8)) * AI_HERO_INTERACTION_PRIMARY_STAT_VALUE;
             }
             for (statIndex8 = 0; statIndex8 < AI_BATTLE_ARTIFACT_SLOT_COUNT; statIndex8++) {
                 if (statIndex8 == HERO_SKILL_ESTATES)
@@ -4019,7 +4019,7 @@ void philAI::HeroInteractionAtTown(hero* heroPtr, town* townPtr, i32 doInteracti
         }
         if ((townPtr->m_buildings & AI_BUILDING_MAGE_GUILD_MASK)
             && heroPtr->HasArtifact(ARTIFACT_MAGIC_BOOK)
-            && heroPtr->m_spellPoints < heroPtr->Stats(3) * AI_MANA_PER_KNOWLEDGE) {
+            && heroPtr->m_spellPoints < heroPtr->Stats(HeroPrimaryStat(3)) * AI_MANA_PER_KNOWLEDGE) {
             heroPtr->m_remainingMobility = 0;
         }
     }
@@ -4032,9 +4032,9 @@ void philAI::HeroInteractionAtTown(hero* heroPtr, town* townPtr, i32 doInteracti
              spellLevel14++) {
             for (spellIndex = 0; spellIndex < townPtr->m_spellCounts[spellLevel14 - 1];
                  spellIndex++) {
-                if (!heroPtr->HasSpell(townPtr->m_spells[spellLevel14 - 1][spellIndex])) {
+                if (!heroPtr->HasSpell(SpellType(townPtr->m_spells[spellLevel14 - 1][spellIndex]))) {
                     if (gsSpellInfo[townPtr->m_spells[spellLevel14 - 1][spellIndex]].attributes & 1)
-                        spellMultiplier1 = heroPtr->Stats(3);
+                        spellMultiplier1 = heroPtr->Stats(HeroPrimaryStat(3));
                     else
                         spellMultiplier1 = 1;
                     *value +=
@@ -4049,7 +4049,7 @@ void philAI::HeroInteractionAtTown(hero* heroPtr, town* townPtr, i32 doInteracti
     townStrength6 = FightValueOfStack(&townPtr->m_army, 0, 0, 0, 0, 0);
     townShare5 = static_cast<float>(townStrength6) / (townStrength6 + (heroStrength | 0));
     primarySkills3 = 0;
-    primarySkills3 = heroPtr->Stats(0) + heroPtr->Stats(1);
+    primarySkills3 = heroPtr->Stats(HeroPrimaryStat(0)) + heroPtr->Stats(HeroPrimaryStat(1));
     if (primarySkills3 > 10)
         primarySkills3 = 10;
     if (townPtr->m_buildings & AI_BUILDING_CASTLE_MASK)
@@ -5025,7 +5025,7 @@ i32 philAI::ComputeValueOfFreeSS(hero* h, i32 ss) {
 VA(0x00443f1e, 0xa6)
 i32 philAI::ManaRefreshValue(hero* h, i32 level) {
     i32 v = 0;
-    i32 sp = h->Stats(3) * level * 10;
+    i32 sp = h->Stats(HeroPrimaryStat(3)) * level * 10;
     i32 deficit = sp - h->m_spellPoints;
     if (deficit <= 0)
         return 0;
@@ -5191,16 +5191,16 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
             case MAP_OBJECT_SHRINE_FIRST_CIRCLE:
             case MAP_OBJECT_SHRINE_SECOND_CIRCLE:
             case MAP_OBJECT_SHRINE_THIRD_CIRCLE:
-                if (gpCurAIHero->Stats(3) > 0 && gpCurAIHero->HasArtifact(ARTIFACT_MAGIC_BOOK)
-                    && !gpCurAIHero->HasSpell(cell_k->m_objectMetadata - 1)) {
+                if (gpCurAIHero->Stats(HeroPrimaryStat(3)) > 0 && gpCurAIHero->HasArtifact(ARTIFACT_MAGIC_BOOK)
+                    && !gpCurAIHero->HasSpell(SpellType(cell_k->m_objectMetadata) - 1)) {
                     if (gsSpellInfo[cell_k->m_objectMetadata - 1].level
                         <= gpCurAIHero->m_secondarySkills[7] + 2) {
                         value_h = gsSpellInfo[cell_k->m_objectMetadata - 1].aiValue;
                         if (gsSpellInfo[cell_k->m_objectMetadata - 1].attributes & 1) {
-                            if (gpCurAIHero->Stats(3) > 40)
+                            if (gpCurAIHero->Stats(HeroPrimaryStat(3)) > 40)
                                 shrinePowerMod_p = gfStatPower[40];
                             else
-                                shrinePowerMod_p = gfStatPower[gpCurAIHero->Stats(3)];
+                                shrinePowerMod_p = gfStatPower[gpCurAIHero->Stats(HeroPrimaryStat(3))];
                             value_h = static_cast<i32>(value_h * shrinePowerMod_p);
                         }
                     }
@@ -5426,9 +5426,9 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                 } else {
                     index_k = cell_k->m_objectMetadata - 1;
                     if (gsSpellInfo[index_k].attributes & 1) {
-                        battleStatMod_n = gpCurAIHero->Stats(2) > AI_MAX_BATTLE_STAT
+                        battleStatMod_n = gpCurAIHero->Stats(HeroPrimaryStat(2)) > AI_MAX_BATTLE_STAT
                                               ? gfBattleStat[AI_MAX_BATTLE_STAT]
-                                              : gfBattleStat[gpCurAIHero->Stats(2)];
+                                              : gfBattleStat[gpCurAIHero->Stats(HeroPrimaryStat(2))];
                         spellPowerMod_m = battleStatMod_n;
                     } else {
                         spellPowerMod_m = 1.0f;
@@ -5946,7 +5946,7 @@ i32 philAI::EvaluateArtifactEvent(i32 artifact, i32 eventData) {
     artifactValue15 = gArtifactBaseRV[artifact];
 
     if (artifact == ARTIFACT_SPELL_SCROLL) {
-        if (gpCurAIHero->HasSpell(eventData))
+        if (gpCurAIHero->HasSpell(SpellType(eventData)))
             return artifactValue15;
         return artifactValue15 + gsSpellInfo[eventData].aiValue;
     }

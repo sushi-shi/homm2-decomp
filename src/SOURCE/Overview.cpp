@@ -502,7 +502,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
 
             for (item = 0; item < 4; item++) {
                 valueText0 = static_cast<char*>(H2_ALLOC(4, 502));
-                sprintf(valueText0, "%d", static_cast<i32>(heroData0->Stats(item)));
+                sprintf(valueText0, "%d", static_cast<i32>(heroData0->Stats(HeroPrimaryStat(item))));
                 OVERVIEW_TEXT_WIDGET_ROWS[row][textItemCount] = new textWidget(
                     static_cast<i16>(item * 35 + 105),
                     static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 39),

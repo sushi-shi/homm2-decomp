@@ -2412,7 +2412,7 @@ i32 combatManager::ProcessNextAction(struct tag_message& message) {
                 break;
             case IDX(COMBAT_ACTION_CAST_SPELL):
                 ResetCyclingCreatures();
-                CastSpell(giNextActionExtra, giNextActionGridIndex, 0, giNextActionGridIndex2);
+                CastSpell(SpellType(giNextActionExtra), giNextActionGridIndex, 0, giNextActionGridIndex2);
                 if (m_armies[m_currentArmySide][m_currentArmyIndex].m_quantity < 1)
                     advanceArmy = 1;
                 ResetCycleTimers();
@@ -2839,7 +2839,7 @@ void combatManager::AddArmy(
             return;
 
         newArmy = &m_armies[side][armyIndex_r];
-        newArmy->Init(monsterType, quantity, side, armyIndex_r, hex, COMBAT_INVALID_HEX);
+        newArmy->Init(CreatureType(monsterType), quantity, side, armyIndex_r, hex, COMBAT_INVALID_HEX);
         newArmy->LoadResources();
         newArmy->m_monster.flags.all |= flags;
         if (reusedArmy_m == 0)

@@ -719,7 +719,7 @@ char* GetBuildingName(FactionType race, BuildingSlotType building);
 void GetBuildingCost(FactionType race, BuildingSlotType building, i32* const dest, i32 mageLevel);
 char* GetMonsterName(i32 m);
 void GetMonsterCost(i32 monster, i32* const cost);
-i32 CanBuild(town* t, i32 building);
+i32 CanBuild(town* t, BuildingSlotType building);
 i32 CanBuy(town* t, i32 type);
 i32 GetBuildingBaseResourceValue(i32 race, i32 building, i32 level);
 i32 WaitHandler(tag_message& msg);

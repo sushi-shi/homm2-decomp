@@ -41,7 +41,7 @@ i32 combatManager::HasValidSpellTarget(SpellType spell) {
         if (hex % SPELL_HEX_COLUMN_COUNT == 0
             || hex % SPELL_HEX_COLUMN_COUNT == SPELL_HEX_RIGHT_BORDER)
             continue;
-        if (ValidSpellTarget(IDX(spell), hex))
+        if (ValidSpellTarget(spell, hex))
             return 1;
     }
     return 0;
@@ -304,7 +304,7 @@ i32 HandleCastSpell(tag_message& message) {
         case SPELL_MESSAGE_HOVER:
             hex = gpCombatManager->GetGridIndex(message.payload.mouse.x, message.payload.mouse.y);
             if (indexToCastOn != hex) {
-                if (!gpCombatManager->ValidSpellTarget(IDX(gpCombatManager->m_selectedSpell), hex)) {
+                if (!gpCombatManager->ValidSpellTarget(gpCombatManager->m_selectedSpell, hex)) {
                     indexToCastOn = SPELL_NO_SELECTION;
                     gpMouseManager->SetPointer(0);
                     if (gpCombatManager->m_selectedSpell == SPELL_TELEPORT && bInTeleportGetDest) {
@@ -379,7 +379,7 @@ i32 combatManager::FindResurrectArmyIndex(i32 side, i32 spell, i32 hex) {
     if (m_hexCells[hex].m_occupantSide != COMBAT_HEX_EMPTY) {
         if (m_hexCells[hex].m_occupantSide == side) {
             target_j = &m_armies[m_hexCells[hex].m_occupantSide][m_hexCells[hex].m_occupantIndex];
-            if (target_j->SpellCastWorkChance(spell) > 0.0f)
+            if (target_j->SpellCastWorkChance(SpellType(spell)) > 0.0f)
                 return m_hexCells[hex].m_occupantIndex;
         }
         return SPELL_NO_SELECTION;
@@ -394,7 +394,7 @@ i32 combatManager::FindResurrectArmyIndex(i32 side, i32 spell, i32 hex) {
             && m_hexCells[hex].m_deadOccupantSides[corpse] == side) {
             target_j = &m_armies[m_hexCells[hex].m_deadOccupantSides[corpse]]
                                 [m_hexCells[hex].m_deadOccupantIndices[corpse]];
-            if (target_j->SpellCastWorkChance(spell) > 0.0f)
+            if (target_j->SpellCastWorkChance(SpellType(spell)) > 0.0f)
                 return m_hexCells[hex].m_deadOccupantIndices[corpse];
         }
     }
@@ -610,7 +610,7 @@ void combatManager::CastSpell(
     float missileAngles[9];
 
     if (castByCreature == 0 && m_eagleEyeSpell[1 - m_currentSide] == -1
-        && m_heroes[1 - m_currentSide] != 0 && !m_heroes[1 - m_currentSide]->HasSpell(IDX(spell))
+        && m_heroes[1 - m_currentSide] != 0 && !m_heroes[1 - m_currentSide]->HasSpell(spell)
         && m_heroes[1 - m_currentSide]->m_secondarySkills[IDX(HERO_SKILL_EAGLE_EYE)]
                != IDX(HERO_SKILL_LEVEL_NONE)
         && m_heroes[1 - m_currentSide]->m_secondarySkills[IDX(HERO_SKILL_EAGLE_EYE)] + 1
@@ -638,7 +638,7 @@ void combatManager::CastSpell(
     }
 
     if (castByCreature == 0 && m_heroes[m_currentSide] != 0)
-        m_heroes[m_currentSide]->UseSpell(IDX(spell));
+        m_heroes[m_currentSide]->UseSpell(spell);
 
     target_i = 0;
     if (spell == SPELL_FIREBALL || spell == SPELL_FIREBLAST || spell == SPELL_COLD_RING
@@ -1056,7 +1056,7 @@ void combatManager::CastSpell(
                 target_i->DispelGood();
                 target_i->SpellEffect(gsSpellInfo[IDX(SPELL_DISPEL)].combatEffect, 0, 0);
                 for (influence = 0; influence < IDX(SPELL_INFLUENCE_COUNT); influence++)
-                    target_i->CancelIndividualSpell(influence);
+                    target_i->CancelIndividualSpell(ArmySpellInfluence(influence));
                 break;
             case SPELL_BLIND:
                 ShowSpellMessage(castByCreature, IDX(spell), target_i);
@@ -1270,7 +1270,7 @@ void combatManager::Fireball(i32 targetHex, i32 spell) {
             && m_hexCells[affectedHexes_e[frame_i]].m_occupantSide != COMBAT_HEX_EMPTY) {
             target_n = &m_armies[m_hexCells[affectedHexes_e[frame_i]].m_occupantSide]
                                 [m_hexCells[affectedHexes_e[frame_i]].m_occupantIndex];
-            if (target_n->SpellCastWorks(spell)
+            if (target_n->SpellCastWorks(SpellType(spell))
                 && !*(
                     gArmyEffected[0]
                     + m_hexCells[affectedHexes_e[frame_i]].m_occupantSide * COMBAT_ARMY_SLOT_COUNT
@@ -1291,7 +1291,7 @@ void combatManager::Fireball(i32 targetHex, i32 spell) {
                         || target_n->m_monsterType == CREATURE_STEEL_GOLEM) {
                         damage_f = static_cast<i32l>(damage_f * SPELL_GOLEM_DAMAGE_MULTIPLIER);
                     }
-                    target_n->Damage(damage_f, spell);
+                    target_n->Damage(damage_f, SpellType(spell));
                     anyAffected_g = 1;
                 }
             }
@@ -1375,7 +1375,7 @@ void combatManager::MeteorShower(i32 targetHex) {
                     damage_c = baseDamage_w;
                     if (target_k->m_monsterType == CREATURE_EARTH_ELEMENTAL)
                         damage_c <<= 1;
-                    target_k->Damage(damage_c, IDX(SPELL_METEOR_SHOWER));
+                    target_k->Damage(damage_c, SPELL_METEOR_SHOWER);
                     anyAffected_h = 1;
                 }
             }
@@ -1451,7 +1451,7 @@ void combatManager::ElementalStorm(void) {
                 if (m_heroes[side_h] && m_heroes[side_h]->HasArtifact(ARTIFACT_BROACH_SHIELDING)) {
                     damage_e = static_cast<i32l>(damage_e * SPELL_GOLEM_DAMAGE_MULTIPLIER);
                 }
-                target_m->Damage(damage_e, IDX(SPELL_ELEMENTAL_STORM));
+                target_m->Damage(damage_e, SPELL_ELEMENTAL_STORM);
                 anyAffected_f = 1;
             }
         }
@@ -1499,7 +1499,7 @@ void combatManager::Armageddon(void) {
                 if (m_heroes[side11] && m_heroes[side11]->HasArtifact(ARTIFACT_BROACH_SHIELDING)) {
                     damage9 = static_cast<i32l>(damage9 * SPELL_GOLEM_DAMAGE_MULTIPLIER);
                 }
-                target18->Damage(damage9, IDX(SPELL_ARMAGEDDON));
+                target18->Damage(damage9, SPELL_ARMAGEDDON);
                 anyAffected6 = 1;
             }
         }

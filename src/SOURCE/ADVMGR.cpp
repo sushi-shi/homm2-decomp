@@ -1003,7 +1003,7 @@ i32 advManager::Main(struct tag_message& message) {
                         ViewPuzzle();
                         break;
                     case 47:
-                        ViewWorld(IDX(SPELL_VIEW_ALL), 0, 0);
+                        ViewWorld(SPELL_VIEW_ALL, 0, 0);
                         break;
                     case 49:
                         cheatDigitLocal = 'e';
@@ -5327,12 +5327,12 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
     if (targetHero->m_owner == giCurPlayer || m_identifyHeroActive == 1
         || IsCrystalBallInEffect(targetHero->m_x, targetHero->m_y, 8)) {
         for (armyIndex = 0; armyIndex < 4; ++armyIndex) {
-            sprintf(gText, "%d", targetHero->Stats(armyIndex));
+            sprintf(gText, "%d", targetHero->Stats(HeroPrimaryStat(armyIndex)));
             quickViewMessageState.payload.widget.id = armyIndex + 3;
             quickViewMessageState.payload.widget.data.text = gText;
             quickWindowSlot->BroadcastMessage(quickViewMessageState);
         }
-        sprintf(gText, "%d/%d", targetHero->m_spellPoints, targetHero->Stats(3) * 10);
+        sprintf(gText, "%d/%d", targetHero->m_spellPoints, targetHero->Stats(HeroPrimaryStat(3)) * 10);
         quickViewMessageState.payload.widget.id = 7;
         quickViewMessageState.payload.widget.data.text = gText;
         quickWindowSlot->BroadcastMessage(quickViewMessageState);
@@ -6330,7 +6330,7 @@ void advManager::CastSpell(SpellType spell) {
         case SPELL_VIEW_TOWNS:
         case SPELL_VIEW_HEROES:
         case SPELL_VIEW_ALL:
-            ViewWorld(IDX(spell), spell == SPELL_VIEW_ALL, spell == SPELL_VIEW_ALL);
+            ViewWorld(spell, spell == SPELL_VIEW_ALL, spell == SPELL_VIEW_ALL);
             break;
         case SPELL_IDENTIFY_HERO:
             m_identifyHeroActive = 1;
@@ -6390,7 +6390,7 @@ void advManager::CastSpell(SpellType spell) {
     }
 
     if (spell != SPELL_DIMENSION_DOOR && spell != SPELL_TOWN_GATE && spell != SPELL_TOWN_PORTAL) {
-        gpGame->GetHero(gpCurPlayer->m_currentHero)->UseSpell(IDX(spell));
+        gpGame->GetHero(gpCurPlayer->m_currentHero)->UseSpell(spell);
     }
 }
 
@@ -7468,7 +7468,7 @@ void advManager::DimensionDoor(void) {
             TeleportTo(targetHero, x, y, 0, 0);
             gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[m_currentTerrain]);
         }
-        gpGame->GetHero(gpCurPlayer->m_currentHero)->UseSpell(IDX(SPELL_DIMENSION_DOOR));
+        gpGame->GetHero(gpCurPlayer->m_currentHero)->UseSpell(SPELL_DIMENSION_DOOR);
     } else {
         UpdateRadar(1, 0);
     }
@@ -7629,7 +7629,7 @@ void advManager::TownGate(SpellType spellId) {
         0,
         0
     );
-    targetHero->UseSpell(IDX(spellId));
+    targetHero->UseSpell(spellId);
     gpGame->m_castleRecs[gpCurPlayer->m_townIds[selectedTownIndex]].m_occupyingHeroId =
         targetHero->m_id;
     gpGame->m_castleRecs[gpCurPlayer->m_townIds[selectedTownIndex]].GiveSpells(0);
@@ -8950,7 +8950,7 @@ void advManager::AdvPanel(void) {
                 ProcessSearch(ADVMGR_INVALID_CELL, ADVMGR_INVALID_CELL);
                 break;
             case ADVMGR_PANEL_VIEW_WORLD:
-                ViewWorld(IDX(SPELL_VIEW_ALL), 0, 0);
+                ViewWorld(SPELL_VIEW_ALL, 0, 0);
                 break;
             case ADVMGR_PANEL_VIEW_PUZZLE:
                 ViewPuzzle();
