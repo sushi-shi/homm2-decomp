@@ -2433,8 +2433,8 @@ void philAI::ValueOfBuyingHero(town *townPtr, hero *heroPtr, i32 &resourceValue,
          artifactIndex10 < AI_BATTLE_ARTIFACT_SLOT_COUNT;
          artifactIndex10++) {
         if (heroPtr->m_artifacts[artifactIndex10] >= 0 &&
-            heroPtr->m_artifacts[artifactIndex10] < 82 &&
-            heroPtr->m_artifacts[artifactIndex10] != AI_ARTIFACT_MAGIC_BOOK) {
+            heroPtr->m_artifacts[artifactIndex10] < ARTIFACT_EDITOR_ANY_ULTIMATE &&
+            heroPtr->m_artifacts[artifactIndex10] != ARTIFACT_MAGIC_BOOK) {
             value27 += gArtifactBaseRV[heroPtr->m_artifacts[artifactIndex10]];
         }
     }
@@ -3031,7 +3031,7 @@ float philAI::TurnValueOfObelisk(i32 player) {
     if (gpGame->m_mapHeader.victoryCondition == 3)
         jb <<= 1;
     idx = jb / 0x6e;
-    if (gpGame->m_ultimateArtifactId == -1)
+    if (gpGame->m_ultimateArtifactId == ARTIFACT_NONE)
         return 0.0f;
     ta->m_obeliskValue = idx * 48 / gpGame->m_obeliskCount;
     if (gpCurPlayer->m_aiDifficulty == 2)
@@ -3095,12 +3095,12 @@ i32 philAI::FightValueOfStack(armyGroup *group, hero *heroPtr, i32 useHero,
     townRecord19 = 0;
 
     if (useEnemyMods) {
-        if (heroPtr->HasArtifact(0x15) || heroPtr->HasSpell(0x2f) ||
+        if (heroPtr->HasArtifact(ARTIFACT_BALLISTA) || heroPtr->HasSpell(0x2f) ||
             heroPtr->m_secondarySkills[10]) {
             enemyMeleeModifierIndex = 1.05f;
             enemyFlyingModifier36 = 0.95f;
         }
-        if (heroPtr->m_secondarySkills[1] || heroPtr->HasArtifact(0x3f))
+        if (heroPtr->m_secondarySkills[1] || heroPtr->HasArtifact(ARTIFACT_GOLDEN_BOW))
             enemyRangedModifier27 = 1.05f;
     }
     if (useTown) {
@@ -3629,7 +3629,7 @@ void philAI::HeroInteractionAtHero(hero *firstHero, hero *secondHero,
                  statIndex8 < AI_HERO_INTERACTION_PRIMARY_STAT_COUNT;
                  statIndex8++) {
                 if (statIndex8 < 2 ||
-                    currentHero9->HasArtifact(AI_ARTIFACT_MAGIC_BOOK))
+                    currentHero9->HasArtifact(ARTIFACT_MAGIC_BOOK))
                     heroValues27[heroIndex9] +=
                         currentHero9->Stats(statIndex8) *
                         AI_HERO_INTERACTION_PRIMARY_STAT_VALUE;
@@ -3694,7 +3694,7 @@ void philAI::HeroInteractionAtHero(hero *firstHero, hero *secondHero,
                      statIndex8++) {
                     artifactType15 = recipientHero36->m_artifacts[statIndex8];
                     if (artifactType15 != -1 &&
-                        artifactType15 != AI_ARTIFACT_MAGIC_BOOK)
+                        artifactType15 != ARTIFACT_MAGIC_BOOK)
                         interactionValue8 += gArtifactBaseRV[artifactType15];
                 }
             } else {
@@ -3800,11 +3800,11 @@ void philAI::HeroInteractionAtTown(hero *heroPtr, town *townPtr, i32 doInteracti
         heroPtr->m_lastTownInteractionTurn = static_cast<i16>(giCurTurn);
         heroPtr->m_visitedTownId = static_cast<u8>(
             townPtr->m_id);
-        if (!heroPtr->HasArtifact(AI_ARTIFACT_MAGIC_BOOK) &&
+        if (!heroPtr->HasArtifact(ARTIFACT_MAGIC_BOOK) &&
             (townPtr->m_buildings & AI_BUILDING_MAGE_GUILD_MASK)) {
             if (gpCurPlayer->m_resources[RES_GOLD] >=
                 AI_MAGIC_BOOK_COST) {
-                GiveArtifact(heroPtr, AI_ARTIFACT_MAGIC_BOOK, 1, -1);
+                GiveArtifact(heroPtr, ARTIFACT_MAGIC_BOOK, 1, -1);
                 gpCurPlayer->m_resources[RES_GOLD] -=
                     AI_MAGIC_BOOK_COST;
             } else {
@@ -3812,14 +3812,14 @@ void philAI::HeroInteractionAtTown(hero *heroPtr, town *townPtr, i32 doInteracti
             }
         }
         if ((townPtr->m_buildings & AI_BUILDING_MAGE_GUILD_MASK) &&
-            heroPtr->HasArtifact(AI_ARTIFACT_MAGIC_BOOK) &&
+            heroPtr->HasArtifact(ARTIFACT_MAGIC_BOOK) &&
             heroPtr->m_spellPoints < heroPtr->Stats(3) * AI_MANA_PER_KNOWLEDGE) {
             heroPtr->m_remainingMobility = 0;
         }
     }
 
     if ((townPtr->m_buildings & AI_BUILDING_MAGE_GUILD_MASK) &&
-        (doInteraction != 0 || heroPtr->HasArtifact(AI_ARTIFACT_MAGIC_BOOK))) {
+        (doInteraction != 0 || heroPtr->HasArtifact(ARTIFACT_MAGIC_BOOK))) {
         *value += ManaRefreshValue(heroPtr, 1);
         for (spellLevel14 = 1;
              spellLevel14 <= heroPtr->m_secondarySkills[HERO_SKILL_WISDOM] + 2;
@@ -4714,7 +4714,7 @@ i32 philAI::ComputeValueOfSS(hero *h, i32 skill, i32 level) {
         break;
     case HERO_SKILL_WISDOM:
     case HERO_SKILL_MYSTICISM:
-        if (!h->HasArtifact(AI_ARTIFACT_MAGIC_BOOK) ||
+        if (!h->HasArtifact(ARTIFACT_MAGIC_BOOK) ||
             h->Stats(HERO_PRIMARY_KNOWLEDGE) <
                 AI_SECONDARY_SKILL_MINIMUM_KNOWLEDGE) {
             value28 = static_cast<i32>(value28 * AI_SECONDARY_SKILL_BASE_FACTOR);
@@ -4898,7 +4898,7 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32 *liveChance)
     case AI_OBJECT_SHRINE_SECOND:
     case AI_OBJECT_SHRINE_THIRD:
         if (gpCurAIHero->Stats(3) > 0 &&
-            gpCurAIHero->HasArtifact(AI_ARTIFACT_MAGIC_BOOK) &&
+            gpCurAIHero->HasArtifact(ARTIFACT_MAGIC_BOOK) &&
             !gpCurAIHero->HasSpell(cell_k->m_objectMetadata - 1)) {
             if (gsSpellInfo[cell_k->m_objectMetadata - 1].level <=
                 gpCurAIHero->m_secondarySkills[7] + 2) {
@@ -5596,14 +5596,14 @@ i32 philAI::EvaluateArtifactEvent(i32 artifact, i32 eventData) {
     result5 = 0;
     artifactValue15 = gArtifactBaseRV[artifact];
 
-    if (artifact == AI_ARTIFACT_SPELL_SCROLL) {
+    if (artifact == ARTIFACT_SPELL_SCROLL) {
         if (gpCurAIHero->HasSpell(eventData))
             return artifactValue15;
         return artifactValue15 + gsSpellInfo[eventData].aiValue;
     }
 
     defaultValue37 = artifactValue15;
-    if (eventData & AI_ARTIFACT_GUARD_FLAG) {
+    if (eventData & AI_ARTIFACT_EVENT_GUARD_FLAG) {
         for (stackIndex29 = 0; stackIndex29 < ARMY_GROUP_SLOT_COUNT; stackIndex29++) {
             gpMonGroup->m_creatureTypes[stackIndex29] = static_cast<i8>(eventData);
             if (gpMonGroup->m_creatureTypes[stackIndex29] == CREATURE_ROGUE)
@@ -5791,7 +5791,7 @@ i32 philAI::EvaluateMonsterEvent(i32 monsterType, i32 eventData, i32 *liveChance
                       static_cast<float>(gMonsterDatabase[monsterType].fightValue * monsterCount4);
 
     if (willJoin15 && strengthRatio26 > AI_MONSTER_JOIN_RATIO &&
-        !gpCurAIHero->HasArtifact(AI_ARTIFACT_HIDEOUT_MASK) &&
+        !gpCurAIHero->HasArtifact(ARTIFACT_HIDEOUS_MASK) &&
         gpCurAIHero->m_army.CanJoin(monsterType) &&
         monsterType != CREATURE_GHOST &&
         monsterType != CREATURE_EARTH_ELEMENTAL &&

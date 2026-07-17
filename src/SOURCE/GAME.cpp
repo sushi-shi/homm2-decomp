@@ -266,7 +266,7 @@ VA(0x004710f3, 0x40d)
 void ComputeUALoc(i32 player)
 {
     i32 result = gpGame->SetupPuzzlePieces(player, 1);
-    if (result < 8 || gpGame->m_ultimateArtifactId == -1) {
+    if (result < 8 || gpGame->m_ultimateArtifactId == ARTIFACT_NONE) {
         gpGame->m_players[player].m_ultimateArtifactHintChance = 0;
         gpGame->m_players[player].m_ultimateArtifactHintX = -1;
         gpGame->m_players[player].m_ultimateArtifactHintY = -1;
@@ -463,10 +463,10 @@ i32 game::GetNewHeroId(i32, i32 heroClass, i32 requireExperienced)
             continue;
         if (requireExperienced && attempts < 40 &&
             m_heroRecs[heroId].m_experience < 1000 &&
-            (m_heroRecs[heroId].m_artifacts[0] == -1 ||
-             m_heroRecs[heroId].m_artifacts[0] == 81) &&
-            (m_heroRecs[heroId].m_artifacts[1] == -1 ||
-             m_heroRecs[heroId].m_artifacts[1] == 81))
+            (m_heroRecs[heroId].m_artifacts[0] == ARTIFACT_NONE ||
+             m_heroRecs[heroId].m_artifacts[0] == ARTIFACT_MAGIC_BOOK) &&
+            (m_heroRecs[heroId].m_artifacts[1] == ARTIFACT_NONE ||
+             m_heroRecs[heroId].m_artifacts[1] == ARTIFACT_MAGIC_BOOK))
             continue;
         if (gbInCampaign && attempts < 500 &&
             m_heroRecs[heroId].m_portrait >= 54 &&
@@ -749,7 +749,8 @@ void game::SetupOrigData(void)
     for (i = 0; i < GAME_HERO_COUNT; i++) {
         memset(&m_heroRecs[i], 0, sizeof(m_heroRecs[i]));
         memset(m_heroRecs[i].m_spells, 0, sizeof(m_heroRecs[i].m_spells));
-        memset(m_heroRecs[i].m_artifacts, -1, sizeof(m_heroRecs[i].m_artifacts));
+        memset(m_heroRecs[i].m_artifacts, ARTIFACT_NONE,
+               sizeof(m_heroRecs[i].m_artifacts));
         m_heroRecs[i].m_patrolY = -1;
         m_heroRecs[i].m_patrolX = m_heroRecs[i].m_patrolY;
         m_heroRecs[i].m_id = static_cast<i8>(i);
@@ -777,23 +778,23 @@ void game::SetupOrigData(void)
             m_heroRecs[i].GiveSS(HERO_SKILL_BALLISTICS, 1);
         }
         if (m_heroRecs[i].m_cursorType == 2) {
-            m_heroRecs[i].m_artifacts[0] = 81;
+            m_heroRecs[i].m_artifacts[0] = ARTIFACT_MAGIC_BOOK;
             m_heroRecs[i].GiveSS(HERO_SKILL_NAVIGATION, 2);
             m_heroRecs[i].GiveSS(HERO_SKILL_WISDOM, 1);
         }
         if (m_heroRecs[i].m_cursorType == 1)
             m_heroRecs[i].GiveSS(HERO_SKILL_PATHFINDING, 2);
         if (m_heroRecs[i].m_cursorType == 3) {
-            m_heroRecs[i].m_artifacts[0] = 81;
+            m_heroRecs[i].m_artifacts[0] = ARTIFACT_MAGIC_BOOK;
             m_heroRecs[i].GiveSS(HERO_SKILL_SCOUTING, 2);
             m_heroRecs[i].GiveSS(HERO_SKILL_WISDOM, 1);
         }
         if (m_heroRecs[i].m_cursorType == 4) {
-            m_heroRecs[i].m_artifacts[0] = 81;
+            m_heroRecs[i].m_artifacts[0] = ARTIFACT_MAGIC_BOOK;
             m_heroRecs[i].GiveSS(HERO_SKILL_WISDOM, 2);
         }
         if (m_heroRecs[i].m_cursorType == 5) {
-            m_heroRecs[i].m_artifacts[0] = 81;
+            m_heroRecs[i].m_artifacts[0] = ARTIFACT_MAGIC_BOOK;
             m_heroRecs[i].GiveSS(HERO_SKILL_WISDOM, 1);
             m_heroRecs[i].GiveSS(HERO_SKILL_NECROMANCY, 1);
         }
@@ -1360,11 +1361,12 @@ secondHero:
     }
                 m_ultimateArtifactX = static_cast<i8>(player2);
                 m_ultimateArtifactY = static_cast<i8>(townIndex9);
-                m_ultimateArtifactId = static_cast<i8>(Random(0, 7));
+                m_ultimateArtifactId = static_cast<i8>(
+                    Random(ARTIFACT_ULTIMATE_BOOK, ARTIFACT_GOLDEN_GOOSE));
                 if (gbInCampaign &&
                     ((m_campaignType == 0 && static_cast<i8>(m_campaignScenario) + 1 == 8) ||
                      (m_campaignType == 1 && static_cast<i8>(m_campaignScenario) + 1 == 9)))
-                    m_ultimateArtifactId = 6;
+                    m_ultimateArtifactId = ARTIFACT_ULTIMATE_CROWN;
                 for (player2 = 0; player2 < m_playerCount; player2++) {
                     if (gbHumanPlayer[player2]) {
                         m_players[player2].m_aiDifficulty = 3;
@@ -3871,7 +3873,7 @@ i32 game::GetRandomArtifactId(i32 levelMask, i32 allowCursed)
             artifact == ARTIFACT_EDITOR_UNUSED_84 ||
             artifact == ARTIFACT_EDITOR_UNUSED_85 ||
             artifact == ARTIFACT_EDITOR_UNUSED_86 ||
-            artifact == ARTIFACT_RANDOM_SPELL_SCROLL ||
+            artifact == ARTIFACT_SPELL_SCROLL ||
             artifact == ARTIFACT_BREASTPLATE_ANDURAN ||
             artifact == ARTIFACT_BATTLE_GARB ||
             artifact == ARTIFACT_HELMET_ANDURAN ||
@@ -3888,7 +3890,7 @@ i32 game::GetRandomArtifactId(i32 levelMask, i32 allowCursed)
                 RANDOM_ARTIFACT_CURSED_REJECT_CHANCE)
                 continue;
         }
-        if (m_mapHeader.victoryCondition != VICTORY_CONDITION_ARTIFACT ||
+        if (m_mapHeader.victoryCondition != MAP_VICTORY_FIND_ARTIFACT ||
             m_mapHeader.victoryConditionValue - VICTORY_ARTIFACT_ID_OFFSET != artifact)
             break;
     }
@@ -3900,8 +3902,13 @@ i32 game::GetRandomArtifactId(i32 levelMask, i32 allowCursed)
 VA(0x0047fe4f, 0x68)
 i32 IsCursedItem(i32 item)
 {
-    if (item == 0x10 || item == 0x46 || item == 0x45 || item == 0x57 ||
-        item == 0x59 || item == 0x5c || item == 0x5d)
+    if (item == ARTIFACT_FIZBIN_OF_MISFORTUNE ||
+        item == ARTIFACT_HIDEOUS_MASK ||
+        item == ARTIFACT_TAX_LIEN ||
+        item == ARTIFACT_ARM_OF_MARTYR ||
+        item == ARTIFACT_BROACH_SHIELDING ||
+        item == ARTIFACT_HEART_FIRE ||
+        item == ARTIFACT_HEART_ICE)
         return 1;
     return 0;
 }
@@ -4290,7 +4297,7 @@ i32 game::GetLuck(hero *h, class army *, town *castle)
         luck++;
     if (h->HasArtifact(ARTIFACT_GOLDEN_HORSESHOE))
         luck++;
-    if (h->HasArtifact(ARTIFACT_GAMBLERS_LUCKY_COIN))
+    if (h->HasArtifact(ARTIFACT_GAMBLERS_COIN))
         luck++;
     if (h->HasArtifact(ARTIFACT_FOUR_LEAF_CLOVER))
         luck++;

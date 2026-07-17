@@ -1329,7 +1329,7 @@ i32 townManager::Main(tag_message &message)
             {
                 if (m_town->m_occupyingHeroId != -1 &&
                     !gpGame->GetHero(m_town->m_occupyingHeroId)
-                         ->HasArtifact(TOWN_SPELL_BOOK_ARTIFACT)) {
+                         ->HasArtifact(ARTIFACT_MAGIC_BOOK)) {
                     if (gpGame->GetHero(m_town->m_occupyingHeroId)
                             ->NumArtifacts() == TOWN_MAX_ARTIFACTS) {
                         NormalDialog(
@@ -1339,18 +1339,18 @@ i32 townManager::Main(tag_message &message)
                                TOWN_SPELL_BOOK_COST) {
                         NormalDialog(
                             "To cast spells, you must first buy a spell book for 500 gold.  Unfortunately, you seem to be a little short of cash at the moment.",
-                            1, -1, -1, 7, TOWN_SPELL_BOOK_ARTIFACT,
+                            1, -1, -1, 7, ARTIFACT_MAGIC_BOOK,
                             -1, 0, -1, 0);
                     } else {
                         NormalDialog(
                             "To cast spells, you must first buy a spell book for 500 gold.  Do you wish to buy one?",
-                            2, -1, -1, 7, TOWN_SPELL_BOOK_ARTIFACT,
+                            2, -1, -1, 7, ARTIFACT_MAGIC_BOOK,
                             -1, 0, -1, 0);
                         if (gpWindowManager->m_dialogResult ==
                             TOWN_DIALOG_BUY_SPELL_BOOK) {
                             GiveArtifact(
                                 gpGame->GetHero(m_town->m_occupyingHeroId),
-                                TOWN_SPELL_BOOK_ARTIFACT, 1, -1);
+                                ARTIFACT_MAGIC_BOOK, 1, -1);
                             gpCurPlayer->m_resources[RES_GOLD] -=
                                 TOWN_SPELL_BOOK_COST;
                             m_bankBox->Update(1);
@@ -2547,8 +2547,8 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit)
 
     artifactCountb = 0;
     for (indexValue = 0; indexValue < TOWN_MAX_ARTIFACTS; ++indexValue) {
-        if (m_recruitHero->m_artifacts[indexValue] != -1 &&
-            m_recruitHero->m_artifacts[indexValue] != TOWN_SPELL_BOOK_ARTIFACT)
+        if (m_recruitHero->m_artifacts[indexValue] != ARTIFACT_NONE &&
+            m_recruitHero->m_artifacts[indexValue] != ARTIFACT_MAGIC_BOOK)
             ++artifactCountb;
     }
     sprintf(gText, "%s is a level %d %s with %d artifacts.",
@@ -3297,9 +3297,9 @@ void GetCategoryStats(i32 category, i32l * const stats,
                         gpGame->m_players[player].m_heroIds[townIndex_c]);
                     for (heroIndex_n = 0;
                          heroIndex_n < TOWN_MAX_ARTIFACTS; ++heroIndex_n) {
-                        if (playerHero_h->m_artifacts[heroIndex_n] != -1 &&
+                        if (playerHero_h->m_artifacts[heroIndex_n] != ARTIFACT_NONE &&
                             playerHero_h->m_artifacts[heroIndex_n] !=
-                                TOWN_SPELL_BOOK_ARTIFACT) {
+                                ARTIFACT_MAGIC_BOOK) {
                             ++stats[player];
                         }
                     }

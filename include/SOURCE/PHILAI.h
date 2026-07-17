@@ -121,12 +121,9 @@ typedef enum AISpellType {
     AI_SPELL_DIMENSION_DOOR = 0x38
 } AISpellType;
 
-typedef enum AIArtifactType {
-    AI_ARTIFACT_MAGIC_BOOK = 0x51,
-    AI_ARTIFACT_HIDEOUT_MASK = 0x46,
-    AI_ARTIFACT_SPELL_SCROLL = 0x56,
-    AI_ARTIFACT_GUARD_FLAG = 0x100
-} AIArtifactType;
+typedef enum AIArtifactEventFlag {
+    AI_ARTIFACT_EVENT_GUARD_FLAG = 0x100
+} AIArtifactEventFlag;
 
 typedef enum AIArtifactEventMode {
     AI_ARTIFACT_EVENT_MODE_MASK = 0xf,

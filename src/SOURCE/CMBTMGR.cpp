@@ -154,7 +154,7 @@ void combatManager::SetupCombat(i32 mapX, i32 mapY, hero *attackerHero,
         m_catapultAttacksRemaining[side] = 1;
         m_catapultAttackCount[side] = m_catapultAttacksRemaining[side];
         if (m_heroes[side] != 0 &&
-            m_heroes[side]->HasArtifact(COMBAT_ARTIFACT_BALLISTA)) {
+            m_heroes[side]->HasArtifact(ARTIFACT_BALLISTA)) {
             m_catapultAttacksRemaining[side] = 2;
             m_catapultAttackCount[side] = m_catapultAttacksRemaining[side];
         }
@@ -219,7 +219,7 @@ void combatManager::SetupCombat(i32 mapX, i32 mapY, hero *attackerHero,
                     ARMY_GROUP_EMPTY_SLOT;
             for (side = 0; side < HERO_ARTIFACT_SLOT_COUNT; side++)
                 m_captain.m_artifacts[side] = ARMY_GROUP_EMPTY_SLOT;
-            m_captain.m_artifacts[0] = COMBAT_CAPTAIN_MAGIC_BOOK;
+            m_captain.m_artifacts[0] = ARTIFACT_MAGIC_BOOK;
             m_combatTowns[COMBAT_DEFENDER_SIDE]->GiveSpells(&m_captain);
             m_captain.m_isCaptain = 1;
         }
@@ -2082,7 +2082,7 @@ i32 combatManager::ShotIsThroughWall(i32 side, i32 sourceHex, i32 targetHex)
     if (!m_inCastleCombat)
         return 0;
     if (m_heroes[side] &&
-        (m_heroes[side]->HasArtifact(COMBAT_ARTIFACT_GOLDEN_BOW) ||
+        (m_heroes[side]->HasArtifact(ARTIFACT_GOLDEN_BOW) ||
          m_heroes[side]->m_secondarySkills[HERO_SKILL_ARCHERY])) {
         return 0;
     }

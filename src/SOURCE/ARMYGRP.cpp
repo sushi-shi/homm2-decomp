@@ -73,24 +73,24 @@ i32 armyGroup::GetMorale(hero *armyHero, town *occupiedTown, armyGroup *enemyGro
         --morale;
 
     if (armyHero != 0) {
-        if (armyHero->HasArtifact(HERO_ARTIFACT_BATTLE_GARB))
+        if (armyHero->HasArtifact(ARTIFACT_BATTLE_GARB))
             return ARMY_GROUP_MORALE_MAX;
 
         morale += armyHero->m_secondarySkills[HERO_SKILL_LEADERSHIP];
         morale += armyHero->m_morale;
-        if (armyHero->HasArtifact(HERO_ARTIFACT_MEDAL_OF_VALOR))
+        if (armyHero->HasArtifact(ARTIFACT_MEDAL_OF_VALOR))
             ++morale;
-        if (armyHero->HasArtifact(HERO_ARTIFACT_MEDAL_OF_COURAGE))
+        if (armyHero->HasArtifact(ARTIFACT_MEDAL_OF_COURAGE))
             ++morale;
-        if (armyHero->HasArtifact(HERO_ARTIFACT_MEDAL_OF_HONOR))
+        if (armyHero->HasArtifact(ARTIFACT_MEDAL_OF_HONOR))
             ++morale;
-        if (armyHero->HasArtifact(HERO_ARTIFACT_MEDAL_OF_DISTINCTION))
+        if (armyHero->HasArtifact(ARTIFACT_MEDAL_OF_DISTINCTION))
             ++morale;
-        if (armyHero->HasArtifact(HERO_ARTIFACT_FIZBIN_OF_MISFORTUNE))
+        if (armyHero->HasArtifact(ARTIFACT_FIZBIN_OF_MISFORTUNE))
             morale -= 2;
-        if (armyHero->HasArtifact(HERO_ARTIFACT_UNDEAD_MORALE))
+        if (armyHero->HasArtifact(ARTIFACT_ARM_OF_MARTYR))
             hasSomeUndead = 1;
-        if (armyHero->HasArtifact(HERO_ARTIFACT_MASTHEAD)
+        if (armyHero->HasArtifact(ARTIFACT_MASTHEAD)
             && (armyHero->m_eventFlags & HERO_EVENT_EMBARKED))
             ++morale;
     }

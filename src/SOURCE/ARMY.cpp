@@ -1043,7 +1043,7 @@ void army::SpecialAttack(void)
         delete missileBackground;
         if (!gpCombatManager->m_heroes[m_side] ||
             !gpCombatManager->m_heroes[m_side]->HasArtifact(
-                ARMY_ENDLESS_AMMUNITION_ARTIFACT)) {
+                ARTIFACT_AMMO_CART)) {
             m_monster.shots--;
         }
     }
@@ -3096,42 +3096,42 @@ float army::SpellCastWorkChance(i32 spell)
     }
     if (gpCombatManager->m_heroes[m_side]) {
         if (gpCombatManager->m_heroes[m_side]->HasArtifact(
-                SPELL_ARTIFACT_HOLY_PENDANT) &&
+                ARTIFACT_HOLY_PENDANT) &&
             (spell == SPELL_CURSE || spell == SPELL_MASS_CURSE)) {
             return ARMY_SPELL_CHANCE_NONE;
         }
         if (gpCombatManager->m_heroes[m_side]->HasArtifact(
-                SPELL_ARTIFACT_PENDANT_FREE_WILL) &&
+                ARTIFACT_PENDANT_FREE_WILL) &&
             spell == SPELL_HYPNOTIZE) {
             return ARMY_SPELL_CHANCE_NONE;
         }
         if (gpCombatManager->m_heroes[m_side]->HasArtifact(
-                SPELL_ARTIFACT_PENDANT_LIFE) &&
+                ARTIFACT_PENDANT_LIFE) &&
             (spell == SPELL_DEATH_RIPPLE || spell == SPELL_DEATH_WAVE)) {
             return ARMY_SPELL_CHANCE_NONE;
         }
         if (gpCombatManager->m_heroes[m_side]->HasArtifact(
-                SPELL_ARTIFACT_SERENITY_PENDANT) &&
+                ARTIFACT_SERENITY_PENDANT) &&
             spell == SPELL_BERSERKER) {
             return ARMY_SPELL_CHANCE_NONE;
         }
         if (gpCombatManager->m_heroes[m_side]->HasArtifact(
-                SPELL_ARTIFACT_SEEING_EYE_PENDANT) &&
+                ARTIFACT_SEEING_EYE_PENDANT) &&
             spell == SPELL_BLIND) {
             return ARMY_SPELL_CHANCE_NONE;
         }
         if (gpCombatManager->m_heroes[m_side]->HasArtifact(
-                SPELL_ARTIFACT_KINETIC_PENDANT) &&
+                ARTIFACT_KINETIC_PENDANT) &&
             spell == SPELL_PARALYZE) {
             return ARMY_SPELL_CHANCE_NONE;
         }
         if (gpCombatManager->m_heroes[m_side]->HasArtifact(
-                SPELL_ARTIFACT_PENDANT_DEATH) &&
+                ARTIFACT_PENDANT_DEATH) &&
             (spell == SPELL_HOLY_WORD || spell == SPELL_HOLY_SHOUT)) {
             return ARMY_SPELL_CHANCE_NONE;
         }
         if (gpCombatManager->m_heroes[m_side]->HasArtifact(
-                SPELL_ARTIFACT_WAND_NEGATION) &&
+                ARTIFACT_WAND_NEGATION) &&
             (spell == SPELL_DISPEL || spell == SPELL_MASS_DISPEL ||
              spell == SPELL_CREATURE_DISPEL)) {
             return ARMY_SPELL_CHANCE_NONE;
@@ -3145,7 +3145,7 @@ float army::SpellCastWorkChance(i32 spell)
                          ARMY_RESURRECT_POWER_PER_SPELL_POWER;
         if (gpCombatManager->m_heroes[gpCombatManager->m_currentSide] &&
             gpCombatManager->m_heroes[gpCombatManager->m_currentSide]
-                ->HasArtifact(SPELL_ARTIFACT_ANKH)) {
+                ->HasArtifact(ARTIFACT_ANKH)) {
             resurrectPower_5 *= ARMY_ARTIFACT_POWER_MULTIPLIER;
         }
         if (resurrectPower_5 < m_monster.hitPoints) {
@@ -3169,7 +3169,7 @@ float army::SpellCastWorkChance(i32 spell)
                                   ->Stats(HERO_PRIMARY_SPELL_POWER) *
                               ARMY_HYPNOTIZE_HIT_POINTS_PER_POWER;
         if (gpCombatManager->m_heroes[gpCombatManager->m_currentSide]
-                ->HasArtifact(SPELL_ARTIFACT_GOLD_WATCH)) {
+                ->HasArtifact(ARTIFACT_GOLD_WATCH)) {
             hypnotizeHitPoints_37 *= ARMY_ARTIFACT_POWER_MULTIPLIER;
         }
         if (m_monster.hitPoints * m_quantity > hypnotizeHitPoints_37) {

@@ -486,17 +486,17 @@ void game::CampaignInfoUpdate(i32 redraw)
             break;
         case CAMPAIGN_CHOICE_ARTIFACT:
             switch (choice->value) {
-            case EVENT_ARTIFACT_MAGE_RING: strcpy(gText, "Mage's Ring"); break;
-            case EVENT_ARTIFACT_FIZBIN_MISFORTUNE: strcpy(gText, "Fizbin Medal"); break;
-            case EVENT_ARTIFACT_THUNDER_MACE: strcpy(gText, "Thunder Mace"); break;
-            case EVENT_ARTIFACT_ARMORED_GAUNTLETS: strcpy(gText, "Gauntlets"); break;
-            case EVENT_ARTIFACT_DEFENDER_HELM: strcpy(gText, "Defender Helm"); break;
-            case EVENT_ARTIFACT_DRAGON_SWORD: strcpy(gText, "Dragon Sword"); break;
-            case EVENT_ARTIFACT_POWER_AXE: strcpy(gText, "Power Axe"); break;
-            case EVENT_ARTIFACT_DIVINE_BREASTPLATE: strcpy(gText, "Breastplate"); break;
-            case EVENT_ARTIFACT_MINOR_SCROLL: strcpy(gText, "Minor Scroll"); break;
-            case EVENT_ARTIFACT_HIDEOUS_MASK:
-            case EVENT_ARTIFACT_BLACK_PEARL:
+            case ARTIFACT_MAGE_RING: strcpy(gText, "Mage's Ring"); break;
+            case ARTIFACT_FIZBIN_OF_MISFORTUNE: strcpy(gText, "Fizbin Medal"); break;
+            case ARTIFACT_THUNDER_MACE: strcpy(gText, "Thunder Mace"); break;
+            case ARTIFACT_ARMORED_GAUNTLETS: strcpy(gText, "Gauntlets"); break;
+            case ARTIFACT_DEFENDER_HELM: strcpy(gText, "Defender Helm"); break;
+            case ARTIFACT_DRAGON_SWORD: strcpy(gText, "Dragon Sword"); break;
+            case ARTIFACT_POWER_AXE: strcpy(gText, "Power Axe"); break;
+            case ARTIFACT_DIVINE_BREASTPLATE: strcpy(gText, "Breastplate"); break;
+            case ARTIFACT_MINOR_SCROLL: strcpy(gText, "Minor Scroll"); break;
+            case ARTIFACT_HIDEOUS_MASK:
+            case ARTIFACT_BLACK_PEARL:
             default: sprintf(gText, "%s", gArtifactNames[choice->value]); break;
             }
             break;
@@ -859,7 +859,7 @@ void game::InitCampaignMap(void)
           m_campaignScenario + 1 == CAMPAIGN_ROLAND_FINAL_SCENARIO + 1)) &&
         m_players[0].m_heroCount > 0) {
         GiveArtifact(gpGame->GetHero(m_players[0].m_heroIds[0]),
-                     EVENT_ARTIFACT_ULTIMATE_CROWN, 0, -1);
+                     ARTIFACT_ULTIMATE_CROWN, 0, -1);
     }
     gbRetreatWin = 1;
 

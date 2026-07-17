@@ -1422,7 +1422,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y)
 
             if (gpGame->m_ultimateArtifactX == x &&
                 gpGame->m_ultimateArtifactY == y &&
-                gpGame->m_ultimateArtifactId != ADVMGR_ULTIMATE_ARTIFACT_NONE) {
+                gpGame->m_ultimateArtifactId != ARTIFACT_NONE) {
                 if (searchingHeroState->NumArtifacts() >= ADVMGR_ARTIFACT_CAPACITY) {
                     if (gbHumanPlayer[giCurPlayer])
                         NormalDialog("You have no room to carry another artifact!",
@@ -1436,25 +1436,25 @@ i32 advManager::ProcessSearch(i32 x, i32 y)
                         if (specialArtifactValue)
                             sprintf(gText, "%s%s",
                                     "Congratulations! After spending many hours digging here, you have uncovered the ",
-                                    gArtifactNames[ADVMGR_SPHERE_OF_NEGATION]);
+                                    gArtifactNames[ARTIFACT_SPHERE_NEGATION]);
                         else
                             sprintf(gText, "%s%s",
                                     "Congratulations! After spending many hours digging here, you have uncovered the ",
                                     gArtifactNames[gpGame->m_ultimateArtifactId]);
                         NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
                         if (specialArtifactValue)
-                            searchingHeroState->ViewArtifact(ADVMGR_SPHERE_OF_NEGATION, 0, -1);
+                            searchingHeroState->ViewArtifact(ARTIFACT_SPHERE_NEGATION, 0, -1);
                         else
                             searchingHeroState->ViewArtifact(gpGame->m_ultimateArtifactId, 0, -1);
                         gpSoundManager->SwitchAmbientMusic(
                             giTerrainToMusicTrack[m_currentTerrain]);
                     }
                     if (specialArtifactValue)
-                        GiveArtifact(searchingHeroState, ADVMGR_SPHERE_OF_NEGATION, 1, -1);
+                        GiveArtifact(searchingHeroState, ARTIFACT_SPHERE_NEGATION, 1, -1);
                     else
                         artifactResultLocal = GiveArtifact(searchingHeroState,
                                                            gpGame->m_ultimateArtifactId, 1, -1);
-                    gpGame->m_ultimateArtifactId = ADVMGR_ULTIMATE_ARTIFACT_NONE;
+                    gpGame->m_ultimateArtifactId = ARTIFACT_NONE;
                 }
             } else if (gbHumanPlayer[giCurPlayer]) {
                 NormalDialog("Nothing here.\nWhere could it be?",
@@ -6001,7 +6001,7 @@ void advManager::TeleportTo(hero *mapHero, i32 destinationX, i32 destinationY,
         m_mapOriginY + ADVMGR_TELEPORT_VIEW_CENTER, giCurPlayer,
         giVisRange[mapHero->m_secondarySkills[HERO_SKILL_SCOUTING]] +
             (static_cast<u32>(mapHero->HasArtifact(
-                 ADVMGR_TELEPORT_TELESCOPE_ARTIFACT)) >= 1));
+                 ARTIFACT_TELESCOPE)) >= 1));
 
     if (bShowIt != 0) {
         destinationCell29->m_flags |= ADVMGR_TELEPORT_CELL_OBJECT_FLAG;
@@ -8236,7 +8236,7 @@ i32 advManager::DoVisions(hero *visionHero)
 
     if (visionHero->m_army.CanJoin(creatureData) &&
         strengthRatioCurrent > MONSTER_STRENGTH_JOIN &&
-        !visionHero->HasArtifact(MONSTER_NO_JOIN_ARTIFACT) &&
+        !visionHero->HasArtifact(ARTIFACT_HIDEOUS_MASK) &&
         creatureData != CREATURE_GHOST && creatureData != CREATURE_EARTH_ELEMENTAL &&
         creatureData != CREATURE_AIR_ELEMENTAL && creatureData != CREATURE_FIRE_ELEMENTAL &&
         creatureData != CREATURE_WATER_ELEMENTAL) {
@@ -8314,7 +8314,7 @@ i32 advManager::IsCrystalBallInEffect(i32 x, i32 y, i32 radius)
     i32 distance;
     for (heroIndex = 0; heroIndex < gpCurPlayer->m_heroCount; ++heroIndex) {
         crystalHero = gpGame->GetHero(gpCurPlayer->m_heroIds[heroIndex]);
-        if (crystalHero->HasArtifact(ADVMGR_CRYSTAL_BALL_ARTIFACT)) {
+        if (crystalHero->HasArtifact(ARTIFACT_CRYSTAL_BALL)) {
             distance = static_cast<i32>(sqrt(static_cast<double>(
                 (crystalHero->m_y - y) * (crystalHero->m_y - y) +
                 (crystalHero->m_x - x) * (crystalHero->m_x - x))));

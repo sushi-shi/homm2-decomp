@@ -55,7 +55,7 @@ void town::GiveSpells(hero *targetHero)
     else
         activeHero = gpGame->GetHero(m_occupyingHeroId);
 
-    if (!activeHero->HasArtifact(HERO_ARTIFACT_MAGIC_BOOK))
+    if (!activeHero->HasArtifact(ARTIFACT_MAGIC_BOOK))
         return;
     if (!(m_buildings & TOWN_BUILDING_MAGE_GUILD))
         return;
