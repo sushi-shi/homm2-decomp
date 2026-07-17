@@ -4670,19 +4670,27 @@ void NormalDialog(
 
         resourceText_e[resourceSlot_n] =
             static_cast<char*>(H2_ALLOC(NORMAL_DIALOG_TEXT_LENGTH, 5472));
-        if (resourceType_l[resourceSlot_n] <= NORMAL_DIALOG_RESOURCE_LAST) {
-            if (resourceValue_l[resourceSlot_n] > 0) {
-                sprintf(resourceText_e[resourceSlot_n], "%d", resourceValue_l[resourceSlot_n]);
-            } else if (resourceValue_l[resourceSlot_n] == 0) {
-                strcpy(resourceText_e[resourceSlot_n], "");
-            } else if (resourceValue_l[resourceSlot_n] < -NORMAL_DIALOG_DAILY_RESOURCE_OFFSET) {
-                sprintf(
-                    resourceText_e[resourceSlot_n],
-                    "%d",
-                    resourceValue_l[resourceSlot_n] + NORMAL_DIALOG_DAILY_RESOURCE_OFFSET
-                );
+        if (resourceType_l[resourceSlot_n] >= NORMAL_DIALOG_RESOURCE_FIRST
+            && resourceType_l[resourceSlot_n] <= NORMAL_DIALOG_RESOURCE_LAST) {
+            if (resourceValue_l[resourceSlot_n] < 1) {
+                if (resourceValue_l[resourceSlot_n] == 0) {
+                    strcpy(resourceText_e[resourceSlot_n], "");
+                } else if (resourceValue_l[resourceSlot_n]
+                           < -NORMAL_DIALOG_DAILY_RESOURCE_OFFSET) {
+                    sprintf(
+                        resourceText_e[resourceSlot_n],
+                        "%d",
+                        resourceValue_l[resourceSlot_n] + NORMAL_DIALOG_DAILY_RESOURCE_OFFSET
+                    );
+                } else {
+                    sprintf(
+                        resourceText_e[resourceSlot_n],
+                        "%d/day",
+                        -resourceValue_l[resourceSlot_n]
+                    );
+                }
             } else {
-                sprintf(resourceText_e[resourceSlot_n], "%d/day", -resourceValue_l[resourceSlot_n]);
+                sprintf(resourceText_e[resourceSlot_n], "%d", resourceValue_l[resourceSlot_n]);
             }
             strcpy(iconFile_h, "resource.icn");
             resourceFrame_g = resourceType_l[resourceSlot_n];

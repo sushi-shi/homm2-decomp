@@ -1461,9 +1461,8 @@ void combatManager::CatAttack(i32 side) {
 // uses base -0xcc/-0xc8 versus retail -0xc8/-0xc4; nested armyNameValue uses
 // base -0xc4 versus retail -0xcc. The 0xd8 frame size, other slots, CFG, and all
 // 44 ordered relocations agree. Three val|0 spellings recover both comparison
-// orders. The recovered defense field and the singular "perishes" / plural
-// "perish" selection replace incorrect source semantics without changing the
-// current score or resolved relocations. Bucket-12/-14 wider-scope pointer
+// orders. The recovered defense field replaces an incorrect source read
+// without changing the current score or resolved relocations. Bucket-12/-14 wider-scope pointer
 // placements regressed and a nested bucket rename was stagnant. Revisit only
 // after compiler allocation or the source/TU/header epoch changes.
 VA(0x0049412d, 0x74f)
@@ -1587,7 +1586,7 @@ void combatManager::KeepAttack(i32 tower) {
             "damage",
             killed29,
             armyNameValue,
-            killed29 > 1 ? "perish" : "perishes"
+            killed29 > 1 ? "perishes" : "perish"
         );
     } else {
         sprintf(

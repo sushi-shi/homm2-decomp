@@ -1856,6 +1856,7 @@ void townManager::DrawTown(i32 updateScreen, i32 drawFlags) {
 // 31-name index plus 32-name offset AST searches retained no gain.
 VA(0x00417c9d, 0xf35)
 i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
+    static i16 sourceLineBase = 0x0948; // retail /Gi __LINE__Var word
     u32l prerequisiteMask_c;
     i32 prerequisiteCount_p;
     i16 dialogLeft_a;
@@ -2901,6 +2902,7 @@ void townManager::SetupWell(heroWindow* window) {
 // a rank-loop source-shape or relevant TOWNMGR TU-state discovery.
 VA(0x0041a783, 0xf0f)
 void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
+    static i16 sourceLineBase = 0x0e0e; // retail /Gi __LINE__Var word
     i16 unusedRankX_last = 258;
     i16 unusedRankWidth_category = 68;
     i16 unusedRankY_j = 27;
