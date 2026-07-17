@@ -46,18 +46,18 @@ class game {
 public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
-    i16 m_difficultyRating;                   // +0x00
-    u8 m_campaignType;                        // +0x02
-    u8 m_campaignStartingSide;                // +0x03
-    i8 m_campaignScenario;                    // +0x04
-    u8 m_campaignScenarioCompleted[2][12];    // +0x05
-    i16 m_campaignScenarioBonus[2][12];       // +0x1d
-    i16 m_campaignScenarioDays[2][12];        // +0x4d
-    char m_unknown7d;                         // +0x7d
-    u8 m_campaignAwards[12];                  // +0x7e
-    u8 m_campaignChoice[2][12];               // +0x8a
-    u8 m_campaignMapEnabled[2][12];           // +0xa2
-    i16 m_campaignScore;                      // +0xba
+    i16 m_difficultyRating;                // +0x00
+    u8 m_campaignType;                     // +0x02
+    u8 m_campaignStartingSide;             // +0x03
+    i8 m_campaignScenario;                 // +0x04
+    u8 m_campaignScenarioCompleted[2][12]; // +0x05
+    i16 m_campaignScenarioBonus[2][12];    // +0x1d
+    i16 m_campaignScenarioDays[2][12];     // +0x4d
+    char m_unknown7d;               // +0x7d never referenced; unknown in Ironfist (campUnknown) too
+    u8 m_campaignAwards[12];        // +0x7e
+    u8 m_campaignChoice[2][12];     // +0x8a
+    u8 m_campaignMapEnabled[2][12]; // +0xa2
+    i16 m_campaignScore;            // +0xba
     i16 m_campaignCarryoverCreatureTypes[5];  // +0xbc
     i16 m_campaignCarryoverCreatureCounts[5]; // +0xc6
     u8 m_campaignScenarioWon;                 // +0xd0

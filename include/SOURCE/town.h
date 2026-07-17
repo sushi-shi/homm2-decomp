@@ -79,13 +79,14 @@ public:
     char m_occupyingHeroId; // +0x17
     u32l m_buildings;       // +0x18
     i8 m_buildState;        // +0x1c
-    char m_unknown1d;       // +0x1d
-    i16 m_garrison[12];     // +0x1e
-    u8 m_onMap;             // +0x36
-    i8 m_unknown37;         // +0x37
-    i8 m_formation;         // +0x38
-    i8 m_originalOwner;     // +0x39
-    u16 m_extraIndex;       // +0x3a
+    char
+        m_unknown1d; // +0x1d zero-initialized only, never read
+    i16 m_garrison[12];         // +0x1e
+    u8 m_onMap;                 // +0x36
+    i8 m_mayNotUpgradeToCastle; // +0x37
+    i8 m_formation;             // +0x38
+    i8 m_originalOwner;         // +0x39
+    u16 m_extraIndex;           // +0x3a
     union {
         i8 m_spells[TOWN_MAGE_GUILD_LEVEL_COUNT][TOWN_MAGE_GUILD_SPELLS_PER_LEVEL]; // +0x3c
         i8 m_spellSlots[TOWN_MAGE_GUILD_LEVEL_COUNT * TOWN_MAGE_GUILD_SPELLS_PER_LEVEL];

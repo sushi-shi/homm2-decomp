@@ -945,8 +945,10 @@ void game::LoadGame(char* filename, i32 loadFromFile, i32) {
     read(file0, marker0, 4);
     read(file0, &iMaxMapExtra, 4);
     read(file0, marker0, 4);
-    ppMapExtra = reinterpret_cast<void**>(BaseAlloc(iMaxMapExtra * 4, RETAIL_FILE, GLOADLINE + 0xcb));
-    pwSizeOfMapExtra = reinterpret_cast<i16*>(BaseAlloc(iMaxMapExtra * 2, RETAIL_FILE, GLOADLINE + 0xcc));
+    ppMapExtra =
+        reinterpret_cast<void**>(BaseAlloc(iMaxMapExtra * 4, RETAIL_FILE, GLOADLINE + 0xcb));
+    pwSizeOfMapExtra =
+        reinterpret_cast<i16*>(BaseAlloc(iMaxMapExtra * 2, RETAIL_FILE, GLOADLINE + 0xcc));
     memset(ppMapExtra, 0, iMaxMapExtra * 4);
     memset(pwSizeOfMapExtra, 0, iMaxMapExtra * 2);
     for (i29 = 1; (&i29)[0] < iMaxMapExtra; i29++) {
@@ -2110,8 +2112,10 @@ i32 game::LoadMap(char* filename) {
     read(file2, m_timeEventIndices, m_mapHeader.timeEventCount * 2);
     m_timeEventCount = m_mapHeader.timeEventCount;
     read(file2, &iMaxMapExtra, 4);
-    ppMapExtra = reinterpret_cast<void**>(BaseAlloc(iMaxMapExtra * 4, RETAIL_FILE, GMAPLINE + 0x59));
-    pwSizeOfMapExtra = reinterpret_cast<i16*>(BaseAlloc(iMaxMapExtra * 2, RETAIL_FILE, GMAPLINE + 0x5a));
+    ppMapExtra =
+        reinterpret_cast<void**>(BaseAlloc(iMaxMapExtra * 4, RETAIL_FILE, GMAPLINE + 0x59));
+    pwSizeOfMapExtra =
+        reinterpret_cast<i16*>(BaseAlloc(iMaxMapExtra * 2, RETAIL_FILE, GMAPLINE + 0x5a));
     memset(ppMapExtra, 0, iMaxMapExtra * 4);
     memset(pwSizeOfMapExtra, 0, iMaxMapExtra * 2);
     for (i37 = 1; (&i37)[0] < iMaxMapExtra; i37++) {
@@ -5035,7 +5039,7 @@ void game::SetupTowns(void) {
         }
         if (extra->hasShrine)
             castle->m_buildings |= 0x8000;
-        castle->m_unknown37 = extra->unknown28;
+        castle->m_mayNotUpgradeToCastle = extra->unknown28;
         strcpy(castle->m_name, extra->name);
 
         memset(usedSpells, 0, SPELL_COUNT);
@@ -5504,7 +5508,8 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
 
     header = static_cast<i32*>(BaseAlloc(0x100, RETAIL_FILE, GTRANSMITLINE + 0x3f));
     if (gbUseRegularCompression)
-        transmitData = static_cast<u8*>(BaseAlloc(fileSize + 2000, RETAIL_FILE, GTRANSMITLINE + 0x41));
+        transmitData =
+            static_cast<u8*>(BaseAlloc(fileSize + 2000, RETAIL_FILE, GTRANSMITLINE + 0x41));
     fileData = static_cast<u8*>(BaseAlloc(fileSize + 2000, RETAIL_FILE, GTRANSMITLINE + 0x42));
 
     file = open(filename, 0x8000);
@@ -6242,9 +6247,11 @@ void CreateDiffFile(
         close(oldFile17);
     }
 
-    diffData6 = static_cast<u8*>(
-        BaseAlloc((oldSize37 > joinSize36 ? oldSize37 : joinSize36) + 5000, RETAIL_FILE, GDIFFLINE + 0x37)
-    );
+    diffData6 = static_cast<u8*>(BaseAlloc(
+        (oldSize37 > joinSize36 ? oldSize37 : joinSize36) + 5000,
+        RETAIL_FILE,
+        GDIFFLINE + 0x37
+    ));
     if (sendWhole4) {
         diffData6[0] = 0;
         diffData6[1] = 0;
@@ -6421,7 +6428,11 @@ void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
     close(joinFile0);
 
     if (oldData13)
-        BaseFree(oldData13, RETAIL_FILE, createJoinFileSourceLineBase + GAME_CREATE_JOIN_OLD_FREE_OFFSET);
+        BaseFree(
+            oldData13,
+            RETAIL_FILE,
+            createJoinFileSourceLineBase + GAME_CREATE_JOIN_OLD_FREE_OFFSET
+        );
     if (diffData5)
         BaseFree(
             diffData5,
@@ -6726,15 +6737,21 @@ void CompressTest2(void) {
     char* encodedData6;
 
     dataSize2 = Random(COMPRESSION_TEST_RANDOM_SIZE_MIN, COMPRESSION_TEST_RANDOM_SIZE_MAX);
-    sourceData6 = static_cast<char*>(
-        BaseAlloc(dataSize2 + COMPRESSION_TEST_RANDOM_BUFFER_EXTRA, RETAIL_FILE, GCOMPRESSTEST2LINE + 7)
-    );
-    encodedData6 = static_cast<char*>(
-        BaseAlloc(dataSize2 + COMPRESSION_TEST_RANDOM_BUFFER_EXTRA, RETAIL_FILE, GCOMPRESSTEST2LINE + 8)
-    );
-    decodedData6 = static_cast<char*>(
-        BaseAlloc(dataSize2 + COMPRESSION_TEST_RANDOM_BUFFER_EXTRA, RETAIL_FILE, GCOMPRESSTEST2LINE + 9)
-    );
+    sourceData6 = static_cast<char*>(BaseAlloc(
+        dataSize2 + COMPRESSION_TEST_RANDOM_BUFFER_EXTRA,
+        RETAIL_FILE,
+        GCOMPRESSTEST2LINE + 7
+    ));
+    encodedData6 = static_cast<char*>(BaseAlloc(
+        dataSize2 + COMPRESSION_TEST_RANDOM_BUFFER_EXTRA,
+        RETAIL_FILE,
+        GCOMPRESSTEST2LINE + 8
+    ));
+    decodedData6 = static_cast<char*>(BaseAlloc(
+        dataSize2 + COMPRESSION_TEST_RANDOM_BUFFER_EXTRA,
+        RETAIL_FILE,
+        GCOMPRESSTEST2LINE + 9
+    ));
     for (index7 = 0; index7 < dataSize2; index7++)
         sourceData6[index7] = static_cast<char>(Random(0, 255));
     sourceCrc0 = calc_crc_long(reinterpret_cast<u8*>(sourceData6), dataSize2);
@@ -6764,15 +6781,21 @@ void CompressTest(void) {
     LogStr(const_cast<char*>("C1"));
     strcpy(filename3, "c:\\TEMP\\Z.DIF");
     fileSize7 = FileSize(filename3);
-    sourceData6 = static_cast<char*>(
-        BaseAlloc(fileSize7 + COMPRESSION_TEST_FILE_BUFFER_EXTRA, RETAIL_FILE, GCOMPRESSTESTLINE + 9)
-    );
-    encodedData6 = static_cast<char*>(
-        BaseAlloc(fileSize7 + COMPRESSION_TEST_FILE_BUFFER_EXTRA, RETAIL_FILE, GCOMPRESSTESTLINE + 10)
-    );
-    decodedData6 = static_cast<char*>(
-        BaseAlloc(fileSize7 + COMPRESSION_TEST_FILE_BUFFER_EXTRA, RETAIL_FILE, GCOMPRESSTESTLINE + 0xb)
-    );
+    sourceData6 = static_cast<char*>(BaseAlloc(
+        fileSize7 + COMPRESSION_TEST_FILE_BUFFER_EXTRA,
+        RETAIL_FILE,
+        GCOMPRESSTESTLINE + 9
+    ));
+    encodedData6 = static_cast<char*>(BaseAlloc(
+        fileSize7 + COMPRESSION_TEST_FILE_BUFFER_EXTRA,
+        RETAIL_FILE,
+        GCOMPRESSTESTLINE + 10
+    ));
+    decodedData6 = static_cast<char*>(BaseAlloc(
+        fileSize7 + COMPRESSION_TEST_FILE_BUFFER_EXTRA,
+        RETAIL_FILE,
+        GCOMPRESSTESTLINE + 0xb
+    ));
     LogStr(const_cast<char*>("C2"));
     fileHandle4 = open(filename3, 0x8000);
     if (fileHandle4 == -1)

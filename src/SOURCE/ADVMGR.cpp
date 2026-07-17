@@ -2717,7 +2717,7 @@ void advManager::DrawCell(
 
             if (drawMask & ADVMGR_DRAW_OBJECT) {
                 if (s_drawCell->m_objectIndex != 0xff && !s_drawCell->m_objectLayerBit0
-                    && !s_drawCell->m_objectLayerBit1 && !s_drawCell->m_unknownObjectFlag
+                    && !s_drawCell->m_objectLayerBit1 && !s_drawCell->m_objectDrawnAsOverlay
                     && s_drawCell->m_objectTileset != ADVMGR_TILESET_MINE
                     && (gbDrawingPuzzle == 0 || bPuzzleDraw[s_drawCell->m_objectTileset])) {
                     IconToBitmap(
@@ -2771,7 +2771,7 @@ void advManager::DrawCell(
                 }
                 while (s_drawExtra != 0) {
                     if (!s_drawExtra->objectLayerBit0 && !s_drawExtra->objectLayerBit1
-                        && !s_drawExtra->unknownObjectFlag
+                        && !s_drawExtra->objectDrawnAsOverlay
                         && s_drawExtra->objectTileset != ADVMGR_TILESET_MINE
                         && (gbDrawingPuzzle == 0 || bPuzzleDraw[s_drawExtra->objectTileset])) {
                         IconToBitmap(
@@ -3173,7 +3173,7 @@ void advManager::DrawCell(
 
             if ((drawMask & ADVMGR_DRAW_OVERLAY) || (drawMask & ADVMGR_DRAW_OVERLAY_TOP)) {
                 if ((drawMask & ADVMGR_DRAW_OVERLAY) && s_drawCell->m_objectIndex != 0xff
-                    && s_drawCell->m_unknownObjectFlag
+                    && s_drawCell->m_objectDrawnAsOverlay
                     && (gbDrawingPuzzle == 0 || bPuzzleDraw[s_drawCell->m_objectTileset])) {
                     IconToBitmap(
                         m_objectIcons[s_drawCell->m_objectTileset],
@@ -3217,7 +3217,7 @@ void advManager::DrawCell(
                     s_drawExtra = 0;
                 }
                 while (s_drawExtra != 0) {
-                    if (s_drawExtra->unknownObjectFlag
+                    if (s_drawExtra->objectDrawnAsOverlay
                         && (gbDrawingPuzzle == 0 || bPuzzleDraw[s_drawExtra->objectTileset])) {
                         IconToBitmap(
                             m_objectIcons[s_drawExtra->objectTileset],

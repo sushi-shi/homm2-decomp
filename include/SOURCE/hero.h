@@ -146,9 +146,9 @@ public:
     i32 m_destinationY;            // +0x25
     union {
         struct {
-            u8 m_boatId;      // +0x29
-            char m_unknown2a; // +0x2a
-            i8 m_unknown2b;   // +0x2b
+            u8 m_boatId;          // +0x29
+            char m_boatDestY;     // +0x2a
+            i8 m_boatTravelRange; // +0x2b
         };
         struct {
             i8 m_patrolX;      // +0x29
