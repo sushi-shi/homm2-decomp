@@ -14,37 +14,53 @@
 #include <SOURCE/combatManager.h>
 #include <SOURCE/game.h>
 #include <SOURCE/VIEW.h>
-// @match-note
-// Complete 0x78 frame, all dialog broadcasts/action-disable CFG, and all 71 relocation
-// addresses agree. Three gText sites are delinked under adjacent local data aliases;
-// residuals otherwise begin in local-slot order. Tried cached/repeated hero loads and
-// both quick-view arm orders. Revisit in the last-mile phase.
+// @semantic
+// Complete dialog behavior/CFG and all 71 ordered relocations. Recovering the
+// individually allocated compiler locals and explicit null return raised the live
+// match to 99.46%; candidate frame 0x74 remains one word below retail 0x78.
+// Cached/repeated hero loads, packed locals, and both quick-view arm orders were tried.
 VA(0x0040bd60, 0x6d3)
 int combatManager::ViewGeneral(int side, int allowActions, int quickView)
 {
-    if (m_heroes[side] != 0) {
-        short localConstants[15];
+    if (m_heroes[side] == 0)
+        return 0;
+    {
+        short messageConstant1;
+        short messageConstant2;
+        short messageConstant3;
+        short messageConstant4;
+        short messageConstant30;
+        short messageConstant0;
+        short messageConstant1B;
+        short messageConstant7;
+        short messageConstant8;
+        short messageConstant9;
+        short messageConstant10;
+        short messageConstant11;
+        short messageConstant12;
+        short messageConstant13;
+        short messageConstant14;
         tag_message message;
         heroWindow *generalWindow;
         int morale;
         int luck;
 
         iViewGeneralWhichSide = side;
-        localConstants[0] = 1;
-        localConstants[1] = 2;
-        localConstants[2] = 3;
-        localConstants[3] = 4;
-        localConstants[4] = 30;
-        localConstants[5] = 0;
-        localConstants[6] = 1;
-        localConstants[7] = 7;
-        localConstants[8] = 8;
-        localConstants[9] = 9;
-        localConstants[10] = 10;
-        localConstants[11] = 11;
-        localConstants[12] = 12;
-        localConstants[13] = 13;
-        localConstants[14] = 14;
+        messageConstant1 = 1;
+        messageConstant2 = 2;
+        messageConstant3 = 3;
+        messageConstant4 = 4;
+        messageConstant30 = 30;
+        messageConstant0 = 0;
+        messageConstant1B = 1;
+        messageConstant7 = 7;
+        messageConstant8 = 8;
+        messageConstant9 = 9;
+        messageConstant10 = 10;
+        messageConstant11 = 11;
+        messageConstant12 = 12;
+        messageConstant13 = 13;
+        messageConstant14 = 14;
         giCurGeneral = side;
 
         message.type = MESSAGE_WIDGET;
@@ -160,38 +176,53 @@ int combatManager::ViewGeneral(int side, int allowActions, int quickView)
     return 0;
 }
 
-// @match-note
-// Complete 0x5c frame, widget/help/hover switch CFG, and all 12 relocations agree.
-// Residuals are local-constant slot hashing and switch continuations after trying
-// mouse-first conditionals and the retained retail-order switch. Revisit last-mile.
+// @semantic
+// Complete widget/help/hover behavior and all 12 ordered relocations. Retail's
+// message+0x0d mask proves right-button help; the prior Left Shift spelling was a
+// runtime bug. Individual compiler locals restored the frame to 0x58 versus retail
+// 0x5c. Mouse-first conditions and the retained retail-order switches were tried.
 VA(0x0040c433, 0x351)
 int HandleViewGeneral(tag_message &message)
 {
-    short localConstants[14];
-    int handled = 0;
+    short messageConstant1;
+    short messageConstant2;
+    short messageConstant3;
+    short messageConstant4;
+    short messageConstant0;
+    short messageConstant1B;
+    short messageConstant7;
+    short messageConstant8;
+    short messageConstant9;
+    short messageConstant10;
+    short messageConstant11;
+    short messageConstant12;
+    short messageConstant13;
+    short messageConstant14;
+    int handled;
     int helpIndex;
-    localConstants[0] = 1;
-    localConstants[1] = 2;
-    localConstants[2] = 3;
-    localConstants[3] = 4;
-    localConstants[4] = 0;
-    localConstants[5] = 1;
-    localConstants[6] = 7;
-    localConstants[7] = 8;
-    localConstants[8] = 9;
-    localConstants[9] = 10;
-    localConstants[10] = 11;
-    localConstants[11] = 12;
-    localConstants[12] = 13;
-    localConstants[13] = 14;
+    messageConstant1 = 1;
+    messageConstant2 = 2;
+    messageConstant3 = 3;
+    messageConstant4 = 4;
+    messageConstant0 = 0;
+    messageConstant1B = 1;
+    messageConstant7 = 7;
+    messageConstant8 = 8;
+    messageConstant9 = 9;
+    messageConstant10 = 10;
+    messageConstant11 = 11;
+    messageConstant12 = 12;
+    messageConstant13 = 13;
+    messageConstant14 = 14;
+    handled = 0;
 
     switch (message.type) {
     case MESSAGE_WIDGET:
-        if (message.payload.widget.parameter & MESSAGE_MODIFIER_LEFT_SHIFT) {
+        if (message.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) {
+            helpIndex = -1;
             if (message.payload.widget.command != WIDGET_COMMAND_SELECT &&
                 message.payload.widget.command != WIDGET_COMMAND_ALTERNATE_SELECT)
                 break;
-            helpIndex = -1;
             switch (message.payload.widget.id) {
             case VIEW_GENERAL_CLOSE:
                 helpIndex = 0;
@@ -261,39 +292,47 @@ int HandleViewGeneral(tag_message &message)
     return 1;
 }
 
-// @match-note
-// Complete 0x24 frame, geometry clamps and ViewArmy arguments; both relocations agree.
-// Residuals are local-constant slots and arithmetic continuations after trying direct
-// ternary geometry and the retained branchless facing expression. Revisit last-mile.
+// @semantic
+// Exact 0x24 frame and all local slots after restoring the separate compiler locals;
+// geometry, clamps, call arguments, and both relocations agree. First non-branch
+// residual is the branchless facing mask near +0x81. Signed/unsigned equality and
+// less-than mask spellings plus direct ternary geometry were tried.
 VA(0x0040c784, 0x165)
 void combatManager::ViewArmy(army *viewedArmy, int quickView)
 {
     if (viewedArmy == 0)
         return;
     {
-        short localConstants[4];
-        localConstants[0] = 402;
-        localConstants[1] = 229;
-        localConstants[2] = 86;
-        localConstants[3] = 164;
-        int windowX = m_hexCells[viewedArmy->m_hex].m_x;
-        int windowY = m_hexCells[viewedArmy->m_hex].m_y;
-        int xOffset =
-            (-static_cast<unsigned int>(viewedArmy->m_facing == 0) &
-             VIEW_ARMY_FACING_OFFSET_DELTA) +
+        int side;
+        int windowX;
+        int windowY_5;
+        short viewWidthConstant;
+        short viewYOffsetConstant_1;
+        short viewXOffsetConstant_9;
+        int xOffset_9;
+        short viewHeightConstant_10;
+
+        viewWidthConstant = 402;
+        viewHeightConstant_10 = 229;
+        viewXOffsetConstant_9 = 86;
+        viewYOffsetConstant_1 = 164;
+        windowX = m_hexCells[viewedArmy->m_hex].m_x;
+        windowY_5 = m_hexCells[viewedArmy->m_hex].m_y;
+        xOffset_9 =
+            (-(viewedArmy->m_facing == 0) & VIEW_ARMY_FACING_OFFSET_DELTA) +
             VIEW_ARMY_RIGHT_FACING_X_OFFSET;
-        windowX -= -(-xOffset);
+        windowX -= xOffset_9;
         if (windowX < 0)
             windowX = 0;
         if (windowX + VIEW_ARMY_WIDTH > VIEW_ARMY_SCREEN_WIDTH)
             windowX = VIEW_ARMY_RIGHT_CLAMP;
-        windowY -= VIEW_ARMY_Y_OFFSET;
-        if (windowY < 0)
-            windowY = 0;
-        if (windowY + VIEW_ARMY_HEIGHT > VIEW_ARMY_SCREEN_HEIGHT)
-            windowY = VIEW_ARMY_BOTTOM_CLAMP;
-        int side = viewedArmy->m_side;
-        gpGame->ViewArmy(windowX, windowY, viewedArmy->m_monsterType,
+        windowY_5 -= VIEW_ARMY_Y_OFFSET;
+        if (windowY_5 < 0)
+            windowY_5 = 0;
+        if (windowY_5 + VIEW_ARMY_HEIGHT > VIEW_ARMY_SCREEN_HEIGHT)
+            windowY_5 = VIEW_ARMY_BOTTOM_CLAMP;
+        side = viewedArmy->m_side;
+        gpGame->ViewArmy(windowX, windowY_5, viewedArmy->m_monsterType,
                          viewedArmy->m_quantity, m_combatTowns[side], 1,
                          viewedArmy->m_facing, quickView, m_heroes[side],
                          viewedArmy, m_armyGroups[side], 0);
