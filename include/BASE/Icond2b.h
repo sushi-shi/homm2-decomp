@@ -8,6 +8,6 @@
 class bitmap;
 class icon;
 
-void DimIconToBitmap(class icon *, class bitmap *, i32, i32, i32, i32, i32, i32, i32, i32, i32);
+void DimIconToBitmap(class icon*, class bitmap*, i32, i32, i32, i32, i32, i32, i32, i32, i32);
 
 #endif // HOMM2_ICOND2B_H

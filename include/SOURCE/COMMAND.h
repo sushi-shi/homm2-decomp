@@ -279,7 +279,7 @@ struct CombatRemotePacket {
 #pragma pack(pop)
 SIZE(CombatRemotePacket, 0x19);
 
-i32 WinCombatHandler(struct tag_message &);
+i32 WinCombatHandler(struct tag_message&);
 i32 InCombatArea(i32, i32);
 
 #endif // HOMM2_COMMAND_H

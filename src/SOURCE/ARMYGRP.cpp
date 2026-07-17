@@ -11,8 +11,7 @@
 #include <SOURCE/KB.h>
 #include <SOURCE/town.h>
 VA(0x0048c040, 0x3c)
-armyGroup::armyGroup(void)
-{
+armyGroup::armyGroup(void) {
     memset(m_creatureTypes, ARMY_GROUP_EMPTY_SLOT, sizeof(m_creatureTypes));
     memset(m_creatureCounts, 0, sizeof(m_creatureCounts));
 }
@@ -21,32 +20,27 @@ VA(0x0048c07c, 0x18)
 void armyGroup::View(i32) {}
 
 VA(0x0048c094, 0x73)
-i32 armyGroup::HasAllUndead(void)
-{
+i32 armyGroup::HasAllUndead(void) {
     for (i32 slot = 0; slot < ARMY_GROUP_SLOT_COUNT; ++slot) {
-        if (m_creatureTypes[slot] != ARMY_GROUP_EMPTY_SLOT &&
-            !(gMonsterDatabase[m_creatureTypes[slot]].attributes &
-              MONSTER_ATTRIBUTE_UNDEAD))
+        if (m_creatureTypes[slot] != ARMY_GROUP_EMPTY_SLOT
+            && !(gMonsterDatabase[m_creatureTypes[slot]].attributes & MONSTER_ATTRIBUTE_UNDEAD))
             return 0;
     }
     return 1;
 }
 
 VA(0x0048c107, 0x73)
-i32 armyGroup::HasSomeUndead(void)
-{
+i32 armyGroup::HasSomeUndead(void) {
     for (i32 slot = 0; slot < ARMY_GROUP_SLOT_COUNT; ++slot) {
-        if (m_creatureTypes[slot] != ARMY_GROUP_EMPTY_SLOT &&
-            (gMonsterDatabase[m_creatureTypes[slot]].attributes &
-             MONSTER_ATTRIBUTE_UNDEAD))
+        if (m_creatureTypes[slot] != ARMY_GROUP_EMPTY_SLOT
+            && (gMonsterDatabase[m_creatureTypes[slot]].attributes & MONSTER_ATTRIBUTE_UNDEAD))
             return 1;
     }
     return 0;
 }
 
 VA(0x0048c17a, 0x24d)
-i32 armyGroup::GetMorale(hero *armyHero, town *occupiedTown, armyGroup *enemyGroup)
-{
+i32 armyGroup::GetMorale(hero* armyHero, town* occupiedTown, armyGroup* enemyGroup) {
     i32 morale = 0;
     i32 alignmentValue;
     i32 hasSomeUndead = 0;
@@ -117,15 +111,13 @@ i32 armyGroup::GetMorale(hero *armyHero, town *occupiedTown, armyGroup *enemyGro
 }
 
 VA(0x0048c3c7, 0x2f)
-void armyGroup::Dismiss(i32 slot)
-{
+void armyGroup::Dismiss(i32 slot) {
     m_creatureTypes[slot] = ARMY_GROUP_EMPTY_SLOT;
     m_creatureCounts[slot] = 0;
 }
 
 VA(0x0048c3f6, 0x55)
-i32 armyGroup::IsMember(i32 creatureType)
-{
+i32 armyGroup::IsMember(i32 creatureType) {
     for (i32 slot = 0; slot < ARMY_GROUP_SLOT_COUNT; ++slot) {
         if (m_creatureTypes[slot] == creatureType)
             return 1;
@@ -140,8 +132,7 @@ i32 armyGroup::IsMember(i32 creatureType)
 // monster-race access. Direct indexing, i[array], and OD_STEER(i) were byte-neutral.
 // Revisit only after relevant ARMYGRP/TU state changes.
 VA(0x0048c44b, 0x14e)
-i32 armyGroup::IsHomogeneous(i32 countRaces)
-{
+i32 armyGroup::IsHomogeneous(i32 countRaces) {
     i32 numCreatureTypes = 0;
     u8 raceUsed[ARMY_GROUP_RACE_COUNT];
     memset(raceUsed, 0, sizeof(raceUsed));
@@ -180,8 +171,7 @@ i32 armyGroup::IsHomogeneous(i32 countRaces)
 }
 
 VA(0x0048c599, 0x54)
-i32 armyGroup::CanJoin(i32 creatureType)
-{
+i32 armyGroup::CanJoin(i32 creatureType) {
     if (IsMember(creatureType))
         return 1;
     if (IsMember(ARMY_GROUP_EMPTY_SLOT))
@@ -190,8 +180,7 @@ i32 armyGroup::CanJoin(i32 creatureType)
 }
 
 VA(0x0048c5ed, 0x54)
-i32 armyGroup::GetNumArmies(void)
-{
+i32 armyGroup::GetNumArmies(void) {
     i32 numArmies = 0;
     for (i32 i = 0; i < ARMY_GROUP_SLOT_COUNT; ++i) {
         if (m_creatureTypes[i] != ARMY_GROUP_EMPTY_SLOT)
@@ -201,8 +190,7 @@ i32 armyGroup::GetNumArmies(void)
 }
 
 VA(0x0048c641, 0x11c)
-i32 armyGroup::Add(i32 creatureType, i32 quantity, i32 slot)
-{
+i32 armyGroup::Add(i32 creatureType, i32 quantity, i32 slot) {
     i32 searchSlot;
     if (slot == ARMY_GROUP_EMPTY_SLOT) {
         for (searchSlot = 0; searchSlot < ARMY_GROUP_SLOT_COUNT; ++searchSlot) {
@@ -232,8 +220,7 @@ i32 armyGroup::Add(i32 creatureType, i32 quantity, i32 slot)
 }
 
 VA(0x0048c75d, 0x75)
-void armyGroup::Swap(i32 slot, armyGroup *otherGroup, i32 otherSlot)
-{
+void armyGroup::Swap(i32 slot, armyGroup* otherGroup, i32 otherSlot) {
     i32 temporary = m_creatureTypes[slot];
     m_creatureTypes[slot] = otherGroup->m_creatureTypes[otherSlot];
     otherGroup->m_creatureTypes[otherSlot] = temporary;
@@ -244,8 +231,7 @@ void armyGroup::Swap(i32 slot, armyGroup *otherGroup, i32 otherSlot)
 }
 
 VA(0x0048c7d2, 0x14d)
-void armyGroup::DamageGroup(float damagePercent)
-{
+void armyGroup::DamageGroup(float damagePercent) {
     i32 numKilled;
     i32 percentChance = static_cast<i32>(damagePercent * ARMY_GROUP_RANDOM_PERCENT_MAX);
     i32 i;

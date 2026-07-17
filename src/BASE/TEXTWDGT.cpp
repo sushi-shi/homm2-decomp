@@ -39,8 +39,7 @@ DATA(0x0051fa70) static STextWidgetSourceFiles gTextWidgetSourceFiles = {
 // Four sibling-pinned AST variants and 60 guarded TU-state trials found no exact
 // closure. Revisit only after a real predecessor/header state change.
 VA(0x004d1060, 0x3e)
-textWidget::textWidget(void) : widget(0, 0, 0, 0, 0, 0)
-{
+textWidget::textWidget(void) : widget(0, 0, 0, 0, 0, 0) {
     m_color = 1;
     m_alignment = 1;
     m_font = 0;
@@ -57,11 +56,20 @@ textWidget::textWidget(void) : widget(0, 0, 0, 0, 0, 0)
 // VA(0x004d10a0, 0x45) ??_E/??_G textWidget deleting-destructor aliases
 
 VA(0x004d10f0, 0x64)
-textWidget::textWidget(i16 x, i16 y, i16 width, i16 height, char *text, char *fontName,
-                       i16 color, i16 id, i16 kind, i16 alignment)
-    : widget(x, y, width, height, id, kind)
-{
-    font *loadedFont = gpResourceManager->GetFont(fontName);
+textWidget::textWidget(
+    i16 x,
+    i16 y,
+    i16 width,
+    i16 height,
+    char* text,
+    char* fontName,
+    i16 color,
+    i16 id,
+    i16 kind,
+    i16 alignment
+)
+    : widget(x, y, width, height, id, kind) {
+    font* loadedFont = gpResourceManager->GetFont(fontName);
     m_color = color;
     m_font = loadedFont;
     m_text = text;
@@ -70,18 +78,16 @@ textWidget::textWidget(i16 x, i16 y, i16 width, i16 height, char *text, char *fo
 }
 
 VA(0x004d1160, 0xef)
-void textWidget::Read(void)
-{
+void textWidget::Read(void) {
     char resourceName[16];
     m_x = gpResourceManager->ReadWord();
     m_y = gpResourceManager->ReadWord();
     m_width = gpResourceManager->ReadWord();
     m_height = gpResourceManager->ReadWord();
     i16 len = gpResourceManager->ReadWord();
-    m_text = static_cast<char *>(
-        H2_ALLOC(len, gTextWidgetSourceFiles.read, 0x39));
-    gpResourceManager->ReadBlock(reinterpret_cast<i8 *>(m_text), len);
-    gpResourceManager->Read13(reinterpret_cast<i8 *>(resourceName));
+    m_text = static_cast<char*>(H2_ALLOC(len, gTextWidgetSourceFiles.read, 0x39));
+    gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_text), len);
+    gpResourceManager->Read13(reinterpret_cast<i8*>(resourceName));
     gpResourceManager->SavePosition();
     m_font = gpResourceManager->GetFont(resourceName);
     gpResourceManager->RestorePosition();
@@ -93,8 +99,7 @@ void textWidget::Read(void)
 }
 
 VA(0x004d1250, 0x30)
-textWidget::~textWidget()
-{
+textWidget::~textWidget() {
     gpResourceManager->Dispose(m_font);
     H2_FREE(m_text, gTextWidgetSourceFiles.destruction, 0x55);
 }
@@ -109,8 +114,7 @@ textWidget::~textWidget()
 // and resize-allocation at +0x84. Revisit after a real predecessor/header TU-state
 // change.
 VA(0x004d1280, 0x210)
-i32 textWidget::Main(tag_message &msg)
-{
+i32 textWidget::Main(tag_message& msg) {
     u16 flags = m_flags;
     if ((flags & WIDGET_FLAG_ENABLED) == 0) {
         if (msg.type == MESSAGE_WIDGET)
@@ -119,70 +123,71 @@ i32 textWidget::Main(tag_message &msg)
     }
 
     switch (msg.type) {
-    case MESSAGE_LEFT_BUTTON_DOWN:
-    case MESSAGE_RIGHT_BUTTON_DOWN: {
-        i16 relativeX = static_cast<i16>(msg.payload.mouse.x) -
-                          static_cast<i16>(m_owner->m_posX);
-        i16 relativeY = static_cast<i16>(msg.payload.mouse.y) -
-                          static_cast<i16>(m_owner->m_posY);
-        if (relativeX < m_x || relativeY < m_y ||
-            relativeX >= m_x + m_width || relativeY >= m_y + m_height)
-            return 0;
-        m_flags = flags | WIDGET_FLAG_SELECTED;
-        if (msg.type == MESSAGE_RIGHT_BUTTON_DOWN)
-            msg.payload.widget.parameter = MESSAGE_MODIFIER_RIGHT_BUTTON;
-        msg.type = MESSAGE_WIDGET;
-        msg.payload.widget.command = WIDGET_COMMAND_SELECT;
-        msg.payload.widget.id = m_id;
-        return 2;
-    }
-
-    case MESSAGE_LEFT_BUTTON_UP:
-    case MESSAGE_RIGHT_BUTTON_UP:
-        if ((flags & WIDGET_FLAG_SELECTED) != 0) {
-            m_flags = flags & ~WIDGET_FLAG_SELECTED;
-            if (msg.type == MESSAGE_RIGHT_BUTTON_UP)
+        case MESSAGE_LEFT_BUTTON_DOWN:
+        case MESSAGE_RIGHT_BUTTON_DOWN: {
+            i16 relativeX =
+                static_cast<i16>(msg.payload.mouse.x) - static_cast<i16>(m_owner->m_posX);
+            i16 relativeY =
+                static_cast<i16>(msg.payload.mouse.y) - static_cast<i16>(m_owner->m_posY);
+            if (relativeX < m_x || relativeY < m_y || relativeX >= m_x + m_width
+                || relativeY >= m_y + m_height)
+                return 0;
+            m_flags = flags | WIDGET_FLAG_SELECTED;
+            if (msg.type == MESSAGE_RIGHT_BUTTON_DOWN)
                 msg.payload.widget.parameter = MESSAGE_MODIFIER_RIGHT_BUTTON;
             msg.type = MESSAGE_WIDGET;
-            msg.payload.widget.command = WIDGET_COMMAND_DESELECT;
+            msg.payload.widget.command = WIDGET_COMMAND_SELECT;
             msg.payload.widget.id = m_id;
             return 2;
         }
-        return 0;
 
-    case MESSAGE_WIDGET:
-        switch (msg.payload.widget.command) {
-        case WIDGET_COMMAND_SET_TEXT: {
-            if (m_id != msg.payload.widget.id)
-                goto normalEvent;
-            char *newText = msg.payload.widget.data.text;
-            if (DecodeWidgetKind(m_kind) != WIDGET_KIND_TEXT &&
-                DecodeWidgetKind(m_kind) != WIDGET_KIND_TEXT_ENTRY) {
-                m_text = newText;
-                return 1;
+        case MESSAGE_LEFT_BUTTON_UP:
+        case MESSAGE_RIGHT_BUTTON_UP:
+            if ((flags & WIDGET_FLAG_SELECTED) != 0) {
+                m_flags = flags & ~WIDGET_FLAG_SELECTED;
+                if (msg.type == MESSAGE_RIGHT_BUTTON_UP)
+                    msg.payload.widget.parameter = MESSAGE_MODIFIER_RIGHT_BUTTON;
+                msg.type = MESSAGE_WIDGET;
+                msg.payload.widget.command = WIDGET_COMMAND_DESELECT;
+                msg.payload.widget.id = m_id;
+                return 2;
             }
-            u16 newLen = strlen(newText);
-            if (strlen(m_text) < newLen) {
-                H2_FREE(m_text, gTextWidgetSourceFiles.resizeFree, 0xd3);
-                m_text = static_cast<char *>(H2_ALLOC(
-                    newLen + 5, gTextWidgetSourceFiles.resizeAlloc, 0xd4));
-            }
-            strcpy(m_text, newText);
-            return 1;
-        }
+            return 0;
 
-        case WIDGET_COMMAND_SET_FILL_COLOR:
-            if (m_id != msg.payload.widget.id)
-                goto normalEvent;
-            m_color = msg.payload.widget.data.value;
-            return 1;
+        case MESSAGE_WIDGET:
+            switch (msg.payload.widget.command) {
+                case WIDGET_COMMAND_SET_TEXT: {
+                    if (m_id != msg.payload.widget.id)
+                        goto normalEvent;
+                    char* newText = msg.payload.widget.data.text;
+                    if (DecodeWidgetKind(m_kind) != WIDGET_KIND_TEXT
+                        && DecodeWidgetKind(m_kind) != WIDGET_KIND_TEXT_ENTRY) {
+                        m_text = newText;
+                        return 1;
+                    }
+                    u16 newLen = strlen(newText);
+                    if (strlen(m_text) < newLen) {
+                        H2_FREE(m_text, gTextWidgetSourceFiles.resizeFree, 0xd3);
+                        m_text = static_cast<char*>(
+                            H2_ALLOC(newLen + 5, gTextWidgetSourceFiles.resizeAlloc, 0xd4)
+                        );
+                    }
+                    strcpy(m_text, newText);
+                    return 1;
+                }
+
+                case WIDGET_COMMAND_SET_FILL_COLOR:
+                    if (m_id != msg.payload.widget.id)
+                        goto normalEvent;
+                    m_color = msg.payload.widget.data.value;
+                    return 1;
+
+                default:
+                    goto normalEvent;
+            }
 
         default:
             goto normalEvent;
-        }
-
-    default:
-        goto normalEvent;
     }
 
 normalEvent:
@@ -190,39 +195,40 @@ normalEvent:
 }
 
 VA(0x004d1490, 0x49)
-void textWidget::Draw(void)
-{
+void textWidget::Draw(void) {
     i32 color = 3;
     if ((m_flags & WIDGET_FLAG_DIMMED) == 0)
         color = m_color;
-    m_font->DrawBoundedString(m_text, m_x + m_owner->m_posX,
-                                  m_y + m_owner->m_posY, m_width, m_height,
-                                  color, m_alignment);
+    m_font->DrawBoundedString(
+        m_text,
+        m_x + m_owner->m_posX,
+        m_y + m_owner->m_posY,
+        m_width,
+        m_height,
+        color,
+        m_alignment
+    );
 }
 
 VA(0x004d14e0, 0xc)
-void textWidget::SetColorIndex(i16 color)
-{
+void textWidget::SetColorIndex(i16 color) {
     m_color = color;
 }
 
 VA(0x004d14f0, 0xa2)
-void textWidget::SetText(char *text)
-{
-    if (DecodeWidgetKind(m_kind) != WIDGET_KIND_TEXT &&
-        DecodeWidgetKind(m_kind) != WIDGET_KIND_TEXT_ENTRY) {
+void textWidget::SetText(char* text) {
+    if (DecodeWidgetKind(m_kind) != WIDGET_KIND_TEXT
+        && DecodeWidgetKind(m_kind) != WIDGET_KIND_TEXT_ENTRY) {
         m_text = text;
         return;
     }
     u16 newLen = strlen(text);
     if (strlen(m_text) < newLen) {
         H2_FREE(m_text, gTextWidgetSourceFiles.resizeFree, 0xd3);
-        m_text = static_cast<char *>(H2_ALLOC(
-            newLen + 5, gTextWidgetSourceFiles.resizeAlloc, 0xd4));
+        m_text = static_cast<char*>(H2_ALLOC(newLen + 5, gTextWidgetSourceFiles.resizeAlloc, 0xd4));
     }
     strcpy(m_text, text);
 }
-
 
 // ===== vtable textWidget : public widget  (3 slots) =====
 //  [ 0] VA(0x004d1490, 0x49)  void textWidget::Draw(void)   <- override (implements widget pure virtual)

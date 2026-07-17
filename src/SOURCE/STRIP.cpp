@@ -18,10 +18,17 @@
 #include <SOURCE/strip.h>
 
 VA(0x00432230, 0x27e)
-strip::strip(i32 x, i32 y, i32 stripType, u32l portraitIconId,
-             i32 portraitFrame, class armyGroup *army, i32 firstBorderId,
-             i32 drawWindow, i32 flagFrame)
-{
+strip::strip(
+    i32 x,
+    i32 y,
+    i32 stripType,
+    u32l portraitIconId,
+    i32 portraitFrame,
+    class armyGroup* army,
+    i32 firstBorderId,
+    i32 drawWindow,
+    i32 flagFrame
+) {
     m_selectedSlot = ARMY_GROUP_EMPTY_SLOT;
     m_x = x;
     m_y = y;
@@ -38,16 +45,22 @@ strip::strip(i32 x, i32 y, i32 stripType, u32l portraitIconId,
 
     m_flagIcon = gpResourceManager->GetIcon("portcflg.icn");
     m_flagFrame = flagFrame;
-    m_window = new heroWindow(m_x, m_y, STRIP_WINDOW_WIDTH,
-                              STRIP_WINDOW_HEIGHT, STRIP_WINDOW_FLAGS);
+    m_window =
+        new heroWindow(m_x, m_y, STRIP_WINDOW_WIDTH, STRIP_WINDOW_HEIGHT, STRIP_WINDOW_FLAGS);
     if (m_window == 0)
         MemError();
 
     if (m_army != 0) {
         m_borders[0] = new border(
-            STRIP_PORTRAIT_X, STRIP_CONTENT_Y, STRIP_PORTRAIT_BORDER_WIDTH,
-            STRIP_BORDER_HEIGHT, firstBorderId,
-            STRIP_BORDER_FILL_COLOR, 0, 0);
+            STRIP_PORTRAIT_X,
+            STRIP_CONTENT_Y,
+            STRIP_PORTRAIT_BORDER_WIDTH,
+            STRIP_BORDER_HEIGHT,
+            firstBorderId,
+            STRIP_BORDER_FILL_COLOR,
+            0,
+            0
+        );
         if (m_borders[0] == 0)
             MemError();
         m_window->AddWidget(m_borders[0], -1);
@@ -55,9 +68,14 @@ strip::strip(i32 x, i32 y, i32 stripType, u32l portraitIconId,
         for (i32 slot = 0; slot < STRIP_ARMY_SLOT_COUNT; slot++) {
             m_borders[slot + 1] = new border(
                 slot * STRIP_ARMY_X_STEP + STRIP_ARMY_FIRST_X,
-                STRIP_CONTENT_Y, STRIP_ARMY_BORDER_WIDTH,
-                STRIP_BORDER_HEIGHT, OD_STEER(slot) + firstBorderId + 1,
-                STRIP_BORDER_FILL_COLOR, 0, 0);
+                STRIP_CONTENT_Y,
+                STRIP_ARMY_BORDER_WIDTH,
+                STRIP_BORDER_HEIGHT,
+                OD_STEER(slot) + firstBorderId + 1,
+                STRIP_BORDER_FILL_COLOR,
+                0,
+                0
+            );
             if (m_borders[slot + 1] == 0)
                 MemError();
             m_window->AddWidget(m_borders[slot + 1], -1);
@@ -69,8 +87,7 @@ strip::strip(i32 x, i32 y, i32 stripType, u32l portraitIconId,
 }
 
 VA(0x004324ae, 0x144)
-strip::~strip()
-{
+strip::~strip() {
     i32 slot;
 
     gpWindowManager->RemoveWindow(m_window);
@@ -90,40 +107,33 @@ strip::~strip()
 }
 
 VA(0x004325f2, 0x40)
-void strip::Draw(void)
-{
+void strip::Draw(void) {
     DrawIcons(1);
-    gpWindowManager->UpdateScreenRegion(m_x, m_y, STRIP_WINDOW_WIDTH,
-                                        STRIP_WINDOW_HEIGHT);
+    gpWindowManager->UpdateScreenRegion(m_x, m_y, STRIP_WINDOW_WIDTH, STRIP_WINDOW_HEIGHT);
 }
 
 VA(0x00432632, 0x3d3)
-void strip::DrawIcons(i32 drawWindow)
-{
-    icon *oldIcons[STRIP_ARMY_SLOT_COUNT];
+void strip::DrawIcons(i32 drawWindow) {
+    icon* oldIcons[STRIP_ARMY_SLOT_COUNT];
     i32 oldCreatureTypes[STRIP_ARMY_SLOT_COUNT];
     i32 iconsCurrent_8;
     i32 slot;
     i32 creatureType;
 
-    m_portraitIcon->DrawToBuffer(m_x + STRIP_PORTRAIT_X,
-                                 m_y + STRIP_CONTENT_Y, m_portraitFrame, 0);
+    m_portraitIcon->DrawToBuffer(m_x + STRIP_PORTRAIT_X, m_y + STRIP_CONTENT_Y, m_portraitFrame, 0);
     if (m_flagFrame != ARMY_GROUP_EMPTY_SLOT)
-        m_flagIcon->DrawToBuffer(m_x + STRIP_PORTRAIT_X,
-                                 m_y + STRIP_CONTENT_Y, m_flagFrame, 0);
+        m_flagIcon->DrawToBuffer(m_x + STRIP_PORTRAIT_X, m_y + STRIP_CONTENT_Y, m_flagFrame, 0);
 
     if (m_army == 0) {
-        m_stripIcon->DrawToBuffer(m_x + STRIP_ARMY_FIRST_X,
-                                  m_y + STRIP_CONTENT_Y,
-                                  STRIP_NO_ARMY_FRAME, 0);
+        m_stripIcon
+            ->DrawToBuffer(m_x + STRIP_ARMY_FIRST_X, m_y + STRIP_CONTENT_Y, STRIP_NO_ARMY_FRAME, 0);
         m_window->DrawWindow(drawWindow);
         return;
     }
     iconsCurrent_8 = 1;
     for (slot = 0; slot < STRIP_ARMY_SLOT_COUNT; slot++) {
-        if (m_army->m_creatureTypes[slot] != ARMY_GROUP_EMPTY_SLOT &&
-            m_army->m_creatureTypes[slot] !=
-                m_cachedCreatureTypes[slot])
+        if (m_army->m_creatureTypes[slot] != ARMY_GROUP_EMPTY_SLOT
+            && m_army->m_creatureTypes[slot] != m_cachedCreatureTypes[slot])
             iconsCurrent_8 = 0;
     }
 
@@ -135,11 +145,9 @@ void strip::DrawIcons(i32 drawWindow)
                 m_creatureIcons[slot] = 0;
                 m_cachedCreatureTypes[slot] = ARMY_GROUP_EMPTY_SLOT;
             } else {
-                sprintf(gText, "monh%04d.icn",
-                        m_army->m_creatureTypes[slot]);
+                sprintf(gText, "monh%04d.icn", m_army->m_creatureTypes[slot]);
                 m_creatureIcons[slot] = gpResourceManager->GetIcon(gText);
-                m_cachedCreatureTypes[slot] =
-                    m_army->m_creatureTypes[slot];
+                m_cachedCreatureTypes[slot] = m_army->m_creatureTypes[slot];
             }
         }
         for (slot = 0; slot < STRIP_ARMY_SLOT_COUNT; slot++) {
@@ -154,75 +162,79 @@ void strip::DrawIcons(i32 drawWindow)
             m_stripIcon->DrawToBuffer(
                 m_x + slot * STRIP_ARMY_X_STEP + STRIP_ARMY_FIRST_X,
                 m_y + STRIP_CONTENT_Y,
-                gMonsterDatabase[creatureType].race +
-                    STRIP_RACE_FRAME_OFFSET,
-                0);
+                gMonsterDatabase[creatureType].race + STRIP_RACE_FRAME_OFFSET,
+                0
+            );
             m_creatureIcons[slot]->DrawToBuffer(
                 m_x + slot * STRIP_ARMY_X_STEP + STRIP_ARMY_FIRST_X,
-                m_y + STRIP_CONTENT_Y, 0, 0);
+                m_y + STRIP_CONTENT_Y,
+                0,
+                0
+            );
             sprintf(gText, "%d", m_army->m_creatureCounts[slot]);
             smallFont->DrawBoundedString(
                 gText,
                 m_x + slot * STRIP_ARMY_X_STEP + STRIP_ARMY_FIRST_X,
-                m_y + STRIP_QUANTITY_Y, STRIP_QUANTITY_WIDTH,
-                STRIP_QUANTITY_HEIGHT, STRIP_QUANTITY_COLOR,
-                STRIP_QUANTITY_BACKGROUND);
+                m_y + STRIP_QUANTITY_Y,
+                STRIP_QUANTITY_WIDTH,
+                STRIP_QUANTITY_HEIGHT,
+                STRIP_QUANTITY_COLOR,
+                STRIP_QUANTITY_BACKGROUND
+            );
         } else {
             m_stripIcon->DrawToBuffer(
                 m_x + slot * STRIP_ARMY_X_STEP + STRIP_ARMY_FIRST_X,
-                m_y + STRIP_CONTENT_Y, STRIP_EMPTY_FRAME, 0);
+                m_y + STRIP_CONTENT_Y,
+                STRIP_EMPTY_FRAME,
+                0
+            );
         }
     }
     m_window->DrawWindow(drawWindow);
     if (m_selectedSlot != ARMY_GROUP_EMPTY_SLOT) {
         m_stripIcon->DrawToBuffer(
-            m_x + m_selectedSlot * STRIP_ARMY_X_STEP +
-                STRIP_ARMY_FIRST_X,
-            m_y + STRIP_CONTENT_Y, STRIP_SELECTED_FRAME, 0);
+            m_x + m_selectedSlot * STRIP_ARMY_X_STEP + STRIP_ARMY_FIRST_X,
+            m_y + STRIP_CONTENT_Y,
+            STRIP_SELECTED_FRAME,
+            0
+        );
     }
 }
 
 VA(0x00432a05, 0x33)
-void strip::DrawFrame(void)
-{
+void strip::DrawFrame(void) {
     m_stripIcon->DrawToBuffer(m_x, m_y, 0, 0);
 }
 
 VA(0x00432a38, 0xb2)
-bankBox::bankBox(i32 x, i32 y, class playerData *player)
-{
+bankBox::bankBox(i32 x, i32 y, class playerData* player) {
     m_player = player;
     m_x = x;
     m_y = y;
     m_window = new heroWindow(m_x, m_y, "bankbox.bin");
     if (m_window == 0)
         MemError();
-    gpWindowManager->AddWindow(m_window, BANK_BOX_WINDOW_Z_ORDER,
-                               BANK_BOX_WINDOW_ACTIVE);
+    gpWindowManager->AddWindow(m_window, BANK_BOX_WINDOW_Z_ORDER, BANK_BOX_WINDOW_ACTIVE);
     Update(1);
 }
 
 VA(0x00432aea, 0x43)
-bankBox::~bankBox()
-{
+bankBox::~bankBox() {
     gpWindowManager->RemoveWindow(m_window);
     delete m_window;
 }
 
 VA(0x00432b2d, 0xcd)
-void bankBox::Update(i32 drawWindow)
-{
+void bankBox::Update(i32 drawWindow) {
     char text[BANK_BOX_TEXT_SIZE];
     tag_message message;
     i32 resource_1;
 
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = BANK_BOX_SET_TEXT_COMMAND;
-    for (resource_1 = 0; resource_1 < BANK_BOX_NON_GOLD_RESOURCE_COUNT;
-         resource_1++) {
+    for (resource_1 = 0; resource_1 < BANK_BOX_NON_GOLD_RESOURCE_COUNT; resource_1++) {
         sprintf(text, "%d", m_player->m_resources[resource_1]);
-        message.payload.widget.id =
-            BANK_BOX_FIRST_RESOURCE_WIDGET + resource_1;
+        message.payload.widget.id = BANK_BOX_FIRST_RESOURCE_WIDGET + resource_1;
         message.payload.widget.data.text = text;
         m_window->BroadcastMessage(message);
     }

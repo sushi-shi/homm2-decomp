@@ -65,6 +65,6 @@
 // Unlike the label macros above it expands to the SAME tokens under every compiler:
 // the spelling IS the mechanism, and clang must type-check exactly what MSVC compiles.
 // Use only where a byte proof demands it, and note it in the function's annotation.
-#define OD_STEER(x) 0[&(x)]
+#define OD_STEER(x) 0 [&(x)]
 
 #endif // HOMM2_VA_H

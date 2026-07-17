@@ -7,7 +7,7 @@
 // forward declarations:
 struct tag_message;
 
-#pragma pack(push, 1)  // recovered layout is byte-packed
+#pragma pack(push, 1) // recovered layout is byte-packed
 class dimmerWidget : public widget {
 public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
@@ -16,12 +16,12 @@ public:
     // --- constructors ---
     dimmerWidget(void);
     dimmerWidget(i16, i16, i16, i16, i16, i16);
-    virtual ~dimmerWidget() OVERRIDE {}   // EXPLICIT but inline: retail has ??_E/??_G (deleting
-                                          // dtors) at 0x4dd410 with the base dtor folded in and
-                                          // NO standalone ??1 — an out-of-line body would emit one.
+    virtual ~dimmerWidget() OVERRIDE {} // EXPLICIT but inline: retail has ??_E/??_G (deleting
+                                        // dtors) at 0x4dd410 with the base dtor folded in and
+                                        // NO standalone ??1 — an out-of-line body would emit one.
     // --- virtual methods (vtable order) ---
     virtual void Draw(void) OVERRIDE;
-    virtual i32 Main(struct tag_message &) OVERRIDE;
+    virtual i32 Main(struct tag_message&) OVERRIDE;
     // --- methods ---
     void Read(void);
 };

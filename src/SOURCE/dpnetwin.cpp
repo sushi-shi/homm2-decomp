@@ -19,11 +19,10 @@
 #include <BASE/widget.h>
 #include <SOURCE/dpnetwin.h>
 
-#define DPFILE const_cast<char *>("I:\\Projects\\Heroes\\Prog\\SOURCE\\dpnetwin.cpp")
+#define DPFILE const_cast<char*>("I:\\Projects\\Heroes\\Prog\\SOURCE\\dpnetwin.cpp")
 
 VA(0x0041eda0, 0x95)
-BOOL WINAPI dpEnumServiceProvider(struct _GUID *guid, char *name,
-                                  DWORD, DWORD, void *) {
+BOOL WINAPI dpEnumServiceProvider(struct _GUID* guid, char* name, DWORD, DWORD, void*) {
     LogStr("ServiceProvider:");
     _strupr(name);
     LogInt(name, reinterpret_cast<i32>(guid), -999, -999, -999, -999, -999, -999);
@@ -35,14 +34,11 @@ BOOL WINAPI dpEnumServiceProvider(struct _GUID *guid, char *name,
 }
 
 VA(0x0041ee35, 0x7a)
-BOOL WINAPI dpEnumSession(DPSESSIONDESC *session, void *,
-                          LPDWORD, DWORD flags) {
+BOOL WINAPI dpEnumSession(DPSESSIONDESC* session, void*, LPDWORD, DWORD flags) {
     if (flags & 1)
         return 0;
     LogStr("Sessions:");
-    LogInt(session->szSessionName,
-           session->dwSession,
-           -999, -999, -999, -999, -999, -999);
+    LogInt(session->szSessionName, session->dwSession, -999, -999, -999, -999, -999, -999);
     lSessions[iMaxSession] = session->dwSession;
     iMaxSession++;
     return 1;
@@ -61,8 +57,8 @@ VA(0x0041eeaf, 0x311)
 i16 dpnet_init(void) {
     DATA(0x004ef83c) static i16 initSourceLineBase = DP_SOURCE_LINE_INIT_BASE;
     DirectPlayStartupMessage startup;
-    typedef HRESULT (WINAPI *DirectPlayCreateFunction)(GUID *, IDirectPlay **, IUnknown *);
-    typedef HRESULT (WINAPI *DirectPlayEnumerateFunction)(LPDPENUMDPCALLBACK, void *);
+    typedef HRESULT(WINAPI * DirectPlayCreateFunction)(GUID*, IDirectPlay**, IUnknown*);
+    typedef HRESULT(WINAPI * DirectPlayEnumerateFunction)(LPDPENUMDPCALLBACK, void*);
     DirectPlayCreateFunction createFunction;
     DirectPlayEnumerateFunction enumerateFunction;
     i32 guestIndex;
@@ -71,42 +67,45 @@ i16 dpnet_init(void) {
     if (lpIDC != 0)
         return 0;
     {
-        ppDPRcvBuffer = static_cast<u8 **>(
-            BaseAlloc(DP_TRANSPORT_BUFFER_COUNT * sizeof(u8 *), DPFILE,
-                      initSourceLineBase + DP_SOURCE_LINE_INIT_BUFFER_ALLOC_OFFSET));
-        piDPRcvBufferSize = static_cast<i32 *>(
-            BaseAlloc(DP_TRANSPORT_BUFFER_COUNT * sizeof(i32), DPFILE,
-                      initSourceLineBase + DP_SOURCE_LINE_INIT_SIZE_ALLOC_OFFSET));
-        memset(ppDPRcvBuffer, 0,
-               DP_TRANSPORT_BUFFER_COUNT * sizeof(u8 *));
-        memset(piDPRcvBufferSize, 0,
-               DP_TRANSPORT_BUFFER_COUNT * sizeof(i32));
+        ppDPRcvBuffer = static_cast<u8**>(BaseAlloc(
+            DP_TRANSPORT_BUFFER_COUNT * sizeof(u8*),
+            DPFILE,
+            initSourceLineBase + DP_SOURCE_LINE_INIT_BUFFER_ALLOC_OFFSET
+        ));
+        piDPRcvBufferSize = static_cast<i32*>(BaseAlloc(
+            DP_TRANSPORT_BUFFER_COUNT * sizeof(i32),
+            DPFILE,
+            initSourceLineBase + DP_SOURCE_LINE_INIT_SIZE_ALLOC_OFFSET
+        ));
+        memset(ppDPRcvBuffer, 0, DP_TRANSPORT_BUFFER_COUNT * sizeof(u8*));
+        memset(piDPRcvBufferSize, 0, DP_TRANSPORT_BUFFER_COUNT * sizeof(i32));
         hinstDplayx = LoadLibraryA("DPLAYX.DLL");
         if (hinstDplayx == 0)
             ShutDown("Can't load 'DPLAYX.DLL'");
         enumerateFunction = 0;
         createFunction = 0;
         createFunction = reinterpret_cast<DirectPlayCreateFunction>(
-            GetProcAddress(hinstDplayx, "DirectPlayCreate"));
+            GetProcAddress(hinstDplayx, "DirectPlayCreate")
+        );
         if (createFunction == 0)
             ShutDown("Can't load 'DPLAYX.DLL'");
         enumerateFunction = reinterpret_cast<DirectPlayEnumerateFunction>(
-            GetProcAddress(hinstDplayx, "DirectPlayEnumerateA"));
+            GetProcAddress(hinstDplayx, "DirectPlayEnumerateA")
+        );
         if (enumerateFunction == 0)
             ShutDown("Can't load 'DPLAYX.DLL'");
         enumerateFunction(dpEnumServiceProvider, 0);
         switch (iMPNetProtocol) {
-        case DP_PROTOCOL_IPX:
-            g_lpGuid = IPXGuid;
-            break;
-        case DP_PROTOCOL_TCP:
-            g_lpGuid = TCPGuid;
-            break;
+            case DP_PROTOCOL_IPX:
+                g_lpGuid = IPXGuid;
+                break;
+            case DP_PROTOCOL_TCP:
+                g_lpGuid = TCPGuid;
+                break;
         }
         result = createFunction(g_lpGuid, &lpIDC, 0);
         if (result != DP_RESULT_OK)
-            DPSD(result, DPFILE,
-                 initSourceLineBase + DP_SOURCE_LINE_INIT_CREATE_OFFSET);
+            DPSD(result, DPFILE, initSourceLineBase + DP_SOURCE_LINE_INIT_CREATE_OFFSET);
 
         if (GameMode == REMOTE_GAME_NETWORK_HOST) {
             gbRemoteGameOpen = 1;
@@ -117,17 +116,24 @@ i16 dpnet_init(void) {
                 ShutDown(0);
             iLastMsgNumHumanPlayers = giNumHumanPlayers;
             giWaitType = DP_WAIT_EXTRA_GUESTS;
-            sprintf(gText, "You have %d guest(s) now logged in.  Click 'OK' to move on, or wait for additional guests.",
-                    giNumHumanPlayers - 1);
+            sprintf(
+                gText,
+                "You have %d guest(s) now logged in.  Click 'OK' to move on, or wait for "
+                "additional guests.",
+                giNumHumanPlayers - 1
+            );
             NormalDialog(gText, 5, -1, -1, -1, 0, -1, 0, -1, 0);
             gbRemoteGameOpen = 0;
             startup.playerCount = static_cast<u8>(giNumHumanPlayers);
-            memcpy(startup.playerIds, giNetPosToDCOPos,
-                   sizeof(giNetPosToDCOPos));
+            memcpy(startup.playerIds, giNetPosToDCOPos, sizeof(giNetPosToDCOPos));
             for (guestIndex = 1; guestIndex < giNumHumanPlayers; guestIndex++) {
                 startup.netPosition = static_cast<u8>(guestIndex);
-                dpSendMessage(giNetPosToDCOPos[guestIndex], NETWORK_PACKET_STARTUP,
-                              sizeof(startup), &startup);
+                dpSendMessage(
+                    giNetPosToDCOPos[guestIndex],
+                    NETWORK_PACKET_STARTUP,
+                    sizeof(startup),
+                    &startup
+                );
             }
         } else {
             giWaitType = DP_WAIT_HOST;
@@ -177,12 +183,18 @@ void dpnet_term(void) {
     while (dpnet_rcv(0, DP_TRANSPORT_TERM_DRAIN_READ_SIZE, drainBuffer) != 0) {
     }
     if (ppDPRcvBuffer != 0)
-        BaseFree(ppDPRcvBuffer, DPFILE,
-                 termSourceLineBase + DP_SOURCE_LINE_TERM_BUFFER_FREE_OFFSET);
+        BaseFree(
+            ppDPRcvBuffer,
+            DPFILE,
+            termSourceLineBase + DP_SOURCE_LINE_TERM_BUFFER_FREE_OFFSET
+        );
     ppDPRcvBuffer = 0;
     if (piDPRcvBufferSize != 0)
-        BaseFree(piDPRcvBufferSize, DPFILE,
-                 termSourceLineBase + DP_SOURCE_LINE_TERM_SIZE_FREE_OFFSET);
+        BaseFree(
+            piDPRcvBufferSize,
+            DPFILE,
+            termSourceLineBase + DP_SOURCE_LINE_TERM_SIZE_FREE_OFFSET
+        );
     piDPRcvBufferSize = 0;
     if (hinstDplayx != 0)
         FreeLibrary(hinstDplayx);
@@ -191,29 +203,26 @@ void dpnet_term(void) {
 }
 
 VA(0x0041f3a4, 0xee)
-void dpSendMessage(i32 destination, u8 type, u16 size,
-                   void *data) {
+void dpSendMessage(i32 destination, u8 type, u16 size, void* data) {
     DATA(0x004efa5c) static i16 sendSourceLineBase = DP_SOURCE_LINE_SEND_BASE;
-    u8 *message = static_cast<u8 *>(
-        BaseAlloc(size + 1, DPFILE,
-                  sendSourceLineBase + DP_SOURCE_LINE_SEND_ALLOC_OFFSET));
+    u8* message = static_cast<u8*>(
+        BaseAlloc(size + 1, DPFILE, sendSourceLineBase + DP_SOURCE_LINE_SEND_ALLOC_OFFSET)
+    );
     i32 result;
 
     message[0] = type;
     if (size != 0)
         memcpy(message + 1, data, size);
     result = lpIDC->Send(dcoID, destination, 0, message, size + 1);
-    if (result != DP_RESULT_OK && result != DP_RESULT_INVALID_PLAYER &&
-        result != DP_RESULT_INVALID_ARGUMENT) {
-        DPSD(result, DPFILE,
-             sendSourceLineBase + DP_SOURCE_LINE_SEND_ERROR_OFFSET);
+    if (result != DP_RESULT_OK && result != DP_RESULT_INVALID_PLAYER
+        && result != DP_RESULT_INVALID_ARGUMENT) {
+        DPSD(result, DPFILE, sendSourceLineBase + DP_SOURCE_LINE_SEND_ERROR_OFFSET);
     }
-    BaseFree(message, DPFILE,
-             sendSourceLineBase + DP_SOURCE_LINE_SEND_FREE_OFFSET);
+    BaseFree(message, DPFILE, sendSourceLineBase + DP_SOURCE_LINE_SEND_FREE_OFFSET);
 }
 
 VA(0x0041f492, 0x5a)
-i32 dpnet_snd(i32 position, i32 size, void *data) {
+i32 dpnet_snd(i32 position, i32 size, void* data) {
     i32 destination;
 
     dpProcessMessages();
@@ -226,7 +235,7 @@ i32 dpnet_snd(i32 position, i32 size, void *data) {
 }
 
 VA(0x0041f4ec, 0xa7)
-i16 dpnet_rcv(i16, u16, void *data) {
+i16 dpnet_rcv(i16, u16, void* data) {
     DATA(0x004efae4) static i16 receiveSourceLineBase = DP_SOURCE_LINE_RECEIVE_BASE;
     u32 size;
 
@@ -235,17 +244,24 @@ i16 dpnet_rcv(i16, u16, void *data) {
         return 0;
     size = piDPRcvBufferSize[iDPRcvBufferTail];
     memcpy(data, ppDPRcvBuffer[iDPRcvBufferTail], size);
-    BaseFree(ppDPRcvBuffer[iDPRcvBufferTail], DPFILE,
-             receiveSourceLineBase + DP_SOURCE_LINE_RECEIVE_FREE_OFFSET);
+    BaseFree(
+        ppDPRcvBuffer[iDPRcvBufferTail],
+        DPFILE,
+        receiveSourceLineBase + DP_SOURCE_LINE_RECEIVE_FREE_OFFSET
+    );
     iDPRcvBufferTail = (iDPRcvBufferTail + 1) % DP_TRANSPORT_BUFFER_COUNT;
     return static_cast<i16>(size);
 }
 
 VA(0x0041f593, 0x1d)
-u8 dpnet_stat(i16, u16) { return 0; }
+u8 dpnet_stat(i16, u16) {
+    return 0;
+}
 
 VA(0x0041f5b0, 0x13)
-i16 __cdecl dpnet_sess(i32, i32, ...) { return 0; }
+i16 __cdecl dpnet_sess(i32, i32, ...) {
+    return 0;
+}
 
 VA(0x0041f5c3, 0xbe)
 void dpProcessMessages(void) {
@@ -259,18 +275,24 @@ void dpProcessMessages(void) {
         return;
     while (1) {
         packetSize[0] = DP_TRANSPORT_RECEIVE_SIZE;
-        receiveResult = lpIDC->Receive(reinterpret_cast<LPDPID>(&senderId),
-                                       reinterpret_cast<LPDPID>(destinationIds),
-                                       1, rcvBufIn, packetSize);
+        receiveResult = lpIDC->Receive(
+            reinterpret_cast<LPDPID>(&senderId),
+            reinterpret_cast<LPDPID>(destinationIds),
+            1,
+            rcvBufIn,
+            packetSize
+        );
         if (receiveResult == DP_RESULT_NO_MESSAGES)
             return;
         if (receiveResult != DP_RESULT_OK)
-            DPSD(receiveResult, DPFILE,
-                 processSourceLineBase + DP_SOURCE_LINE_PROCESS_ERROR_OFFSET);
+            DPSD(
+                receiveResult,
+                DPFILE,
+                processSourceLineBase + DP_SOURCE_LINE_PROCESS_ERROR_OFFSET
+            );
         if (senderId == 0) {
         } else {
-            if (destinationIds[0] == 0 ||
-                destinationIds[0] == OD_STEER(dcoID))
+            if (destinationIds[0] == 0 || destinationIds[0] == OD_STEER(dcoID))
                 dpEvaluateMessage(packetSize[0], senderId);
         }
     }
@@ -287,56 +309,57 @@ void dpProcessMessages(void) {
 VA(0x0041f681, 0x274)
 void dpEvaluateMessage(u32l size, i32 sender) {
     DATA(0x004efb44) static i16 evaluateSourceLineBase = DP_SOURCE_LINE_EVALUATE_BASE;
-    char *ptr = rcvBufIn + 1;
+    char* ptr = rcvBufIn + 1;
     i32 i;
 
     switch (rcvBufIn[0]) {
-    case NETWORK_PACKET_DATA:
-        ppDPRcvBuffer[iDPRcvBufferHead] = static_cast<u8 *>(
-            BaseAlloc(size - 1, DPFILE,
-                      evaluateSourceLineBase + DP_SOURCE_LINE_EVALUATE_ALLOC_OFFSET));
-        memcpy(ppDPRcvBuffer[iDPRcvBufferHead], rcvBufIn + 1, size - 1);
-        piDPRcvBufferSize[iDPRcvBufferHead] = size;
-        iDPRcvBufferHead = (iDPRcvBufferHead + 1) % DP_TRANSPORT_BUFFER_COUNT;
-        break;
-    case NETWORK_PACKET_GUEST_ARRIVED:
-        if (GameMode == REMOTE_GAME_NETWORK_HOST) {
-            for (i = 1; i < giNumHumanPlayers; i++) {
-                if (giNetPosToDCOPos[i] == sender) {
+        case NETWORK_PACKET_DATA:
+            ppDPRcvBuffer[iDPRcvBufferHead] = static_cast<u8*>(BaseAlloc(
+                size - 1,
+                DPFILE,
+                evaluateSourceLineBase + DP_SOURCE_LINE_EVALUATE_ALLOC_OFFSET
+            ));
+            memcpy(ppDPRcvBuffer[iDPRcvBufferHead], rcvBufIn + 1, size - 1);
+            piDPRcvBufferSize[iDPRcvBufferHead] = size;
+            iDPRcvBufferHead = (iDPRcvBufferHead + 1) % DP_TRANSPORT_BUFFER_COUNT;
+            break;
+        case NETWORK_PACKET_GUEST_ARRIVED:
+            if (GameMode == REMOTE_GAME_NETWORK_HOST) {
+                for (i = 1; i < giNumHumanPlayers; i++) {
+                    if (giNetPosToDCOPos[i] == sender) {
+                        dpSendMessage(sender, NETWORK_PACKET_GUEST_ACCEPTED, 0, 0);
+                        return;
+                    }
+                }
+                if (gbRemoteGameOpen != 0) {
+                    giNetPosToDCOPos[giNumHumanPlayers] = sender;
+                    gsNetPlayerInfo[giNumHumanPlayers] = *reinterpret_cast<SNetPlayerInfo*>(ptr);
+                    if (gsNetPlayerInfo[giNumHumanPlayers].reserved[0] == 0)
+                        xNetHasOldPlayers = 1;
                     dpSendMessage(sender, NETWORK_PACKET_GUEST_ACCEPTED, 0, 0);
-                    return;
+                    giNumHumanPlayers++;
+                } else {
+                    dpSendMessage(sender, NETWORK_PACKET_GUEST_REJECTED, 0, 0);
                 }
             }
-            if (gbRemoteGameOpen != 0) {
-                giNetPosToDCOPos[giNumHumanPlayers] = sender;
-                gsNetPlayerInfo[giNumHumanPlayers] =
-                    *reinterpret_cast<SNetPlayerInfo *>(ptr);
-                if (gsNetPlayerInfo[giNumHumanPlayers].reserved[0] == 0)
-                    xNetHasOldPlayers = 1;
-                dpSendMessage(sender, NETWORK_PACKET_GUEST_ACCEPTED, 0, 0);
-                giNumHumanPlayers++;
-            } else {
-                dpSendMessage(sender, NETWORK_PACKET_GUEST_REJECTED, 0, 0);
-            }
-        }
-        break;
-    case NETWORK_PACKET_GUEST_ACCEPTED:
-        giHostAcceptStatus = 1;
-        break;
-    case NETWORK_PACKET_GUEST_REJECTED:
-        giHostAcceptStatus = 2;
-        break;
-    case NETWORK_PACKET_STARTUP:
-        giNumHumanPlayers = ptr[0];
-        giThisNetPos = ptr[1];
-        LogInt("DPMSGSTARTUP", giThisNetPos, sender, -999, -999, -999, -999, -999);
-        memcpy(giNetPosToDCOPos, ptr + 2, sizeof(giNetPosToDCOPos));
-        bStartUpInfoReceived = 1;
-        break;
-    default:
-        sprintf(gText, "Unknown message: %d\n", static_cast<i32>(rcvBufIn[0]));
-        LogStr(gText);
-        break;
+            break;
+        case NETWORK_PACKET_GUEST_ACCEPTED:
+            giHostAcceptStatus = 1;
+            break;
+        case NETWORK_PACKET_GUEST_REJECTED:
+            giHostAcceptStatus = 2;
+            break;
+        case NETWORK_PACKET_STARTUP:
+            giNumHumanPlayers = ptr[0];
+            giThisNetPos = ptr[1];
+            LogInt("DPMSGSTARTUP", giThisNetPos, sender, -999, -999, -999, -999, -999);
+            memcpy(giNetPosToDCOPos, ptr + 2, sizeof(giNetPosToDCOPos));
+            bStartUpInfoReceived = 1;
+            break;
+        default:
+            sprintf(gText, "Unknown message: %d\n", static_cast<i32>(rcvBufIn[0]));
+            LogStr(gText);
+            break;
     }
 }
 
@@ -353,37 +376,43 @@ i32 dpWaitForFirstGuest(void) {
     i32 result;
 
     switch (iDPWaitForFirstGuestStatus) {
-    case 0:
-        memset(&session, 0, sizeof(session));
-        session.dwSize = sizeof(session);
-        session.dwMaxPlayers = DP_TRANSPORT_MAX_PLAYERS;
-        session.guidSession = *g_lpGuid;
-        session.dwFlags = DP_SESSION_OPEN_CREATE;
-        strcpy(session.szSessionName, "Heroes 2");
-        result = lpIDC->Open(&session);
-        if (result != DP_RESULT_OK)
-            DPSD(result, DPFILE,
-                 firstGuestSourceLineBase + DP_SOURCE_LINE_FIRST_GUEST_OPEN_OFFSET);
-        iDPWaitForFirstGuestStatus++;
-        break;
-    case 1:
-        gsThisNetPlayerInfo.useRegularCompression = 0;
-        gsThisNetPlayerInfo.useDiffCompression = 0;
-        iDPWaitForFirstGuestStatus++;
-        break;
-    case 2:
-        result = lpIDC->CreatePlayer(&dcoID, "Dude", "Heroes Player", &dphEvent);
-        if (result != DP_RESULT_OK)
-            DPSD(result, DPFILE,
-                 firstGuestSourceLineBase + DP_SOURCE_LINE_FIRST_GUEST_CREATE_OFFSET);
-        giNetPosToDCOPos[0] = dcoID;
-        iDPWaitForFirstGuestStatus++;
-        break;
-    case 3:
-        dpProcessMessages();
-        if (giNumHumanPlayers > 1)
-            return 1;
-        break;
+        case 0:
+            memset(&session, 0, sizeof(session));
+            session.dwSize = sizeof(session);
+            session.dwMaxPlayers = DP_TRANSPORT_MAX_PLAYERS;
+            session.guidSession = *g_lpGuid;
+            session.dwFlags = DP_SESSION_OPEN_CREATE;
+            strcpy(session.szSessionName, "Heroes 2");
+            result = lpIDC->Open(&session);
+            if (result != DP_RESULT_OK)
+                DPSD(
+                    result,
+                    DPFILE,
+                    firstGuestSourceLineBase + DP_SOURCE_LINE_FIRST_GUEST_OPEN_OFFSET
+                );
+            iDPWaitForFirstGuestStatus++;
+            break;
+        case 1:
+            gsThisNetPlayerInfo.useRegularCompression = 0;
+            gsThisNetPlayerInfo.useDiffCompression = 0;
+            iDPWaitForFirstGuestStatus++;
+            break;
+        case 2:
+            result = lpIDC->CreatePlayer(&dcoID, "Dude", "Heroes Player", &dphEvent);
+            if (result != DP_RESULT_OK)
+                DPSD(
+                    result,
+                    DPFILE,
+                    firstGuestSourceLineBase + DP_SOURCE_LINE_FIRST_GUEST_CREATE_OFFSET
+                );
+            giNetPosToDCOPos[0] = dcoID;
+            iDPWaitForFirstGuestStatus++;
+            break;
+        case 3:
+            dpProcessMessages();
+            if (giNumHumanPlayers > 1)
+                return 1;
+            break;
     }
     return 0;
 }
@@ -395,8 +424,12 @@ i32 dpWaitForExtraGuests(void) {
     dpProcessMessages();
     if (iLastMsgNumHumanPlayers != OD_STEER(giNumHumanPlayers)) {
         iLastMsgNumHumanPlayers = giNumHumanPlayers;
-        sprintf(gText, "You have %d guest(s) now logged in.  Click 'OK' to move on, or wait for additional guests.",
-                giNumHumanPlayers - 1);
+        sprintf(
+            gText,
+            "You have %d guest(s) now logged in.  Click 'OK' to move on, or wait for additional "
+            "guests.",
+            giNumHumanPlayers - 1
+        );
         message.type = MESSAGE_WIDGET;
         message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
         message.payload.widget.id = 1;
@@ -421,96 +454,94 @@ i32 dpWaitForHost(void) {
     sprintf(statusString, "WFHS %d", iDPWaitForHostStatus);
     AiPrint(statusString);
     switch (iDPWaitForHostStatus) {
-    case 0:
-        if (iWaitForHostWaitCount != 0) {
-            iWaitForHostWaitCount--;
-            DelayMilli(DP_TRANSPORT_RETRY_DELAY);
-            return 0;
-        }
-        iSessionToTry = 0;
-        memset(&sessionDescription, 0, sizeof(sessionDescription));
-        sessionDescription.dwSize = sizeof(sessionDescription);
-        sessionDescription.guidSession = *g_lpGuid;
-        iMaxSession = 0;
-        if (iEnumCount % DP_TRANSPORT_ENUM_LONG_INTERVAL !=
-            DP_TRANSPORT_ENUM_LONG_PHASE)
-            enumerationTimeout = DP_TRANSPORT_ENUM_SHORT_TIMEOUT;
-        else
-            enumerationTimeout = DP_TRANSPORT_ENUM_LONG_TIMEOUT;
-        playResult = lpIDC->EnumSessions(&sessionDescription, enumerationTimeout,
-                                         dpEnumSession, 0, 0);
-        iEnumCount++;
-        if (playResult == DP_RESULT_NO_SESSIONS) {
-            iWaitForHostWaitCount = DP_TRANSPORT_RETRY_WAIT_COUNT;
-            return 0;
-        }
-        if (playResult != DP_RESULT_OK)
-            DPSD(playResult, DPFILE,
-                 hostSourceLineBase + DP_SOURCE_LINE_HOST_ENUM_OFFSET);
-        if (iMaxSession > 0) {
-            iWaitForHostWaitCount = DP_TRANSPORT_RETRY_WAIT_COUNT;
-            iDPWaitForHostStatus++;
-        }
-        break;
-    case 1:
-        memset(&sessionDescription, 0, sizeof(sessionDescription));
-        sessionDescription.dwSize = sizeof(sessionDescription);
-        sessionDescription.dwMaxPlayers = DP_TRANSPORT_MAX_PLAYERS;
-        sessionDescription.guidSession = *g_lpGuid;
-        sessionDescription.dwFlags = DP_SESSION_OPEN_JOIN;
-        sessionDescription.dwSession = lSessions[iSessionToTry];
-        strcpy(sessionDescription.szSessionName, "Heroes 2");
-        playResult = lpIDC->Open(&sessionDescription);
-        if (playResult != DP_RESULT_OK)
-            DPSD(playResult, DPFILE,
-                 hostSourceLineBase + DP_SOURCE_LINE_HOST_OPEN_OFFSET);
-        iDPWaitForHostStatus++;
-        break;
-    case 2:
-        playResult = lpIDC->CreatePlayer(&dcoID, "Dude", "Heroes Player", &dphEvent);
-        if (playResult != DP_RESULT_OK)
-            DPSD(playResult, DPFILE,
-                 hostSourceLineBase + DP_SOURCE_LINE_HOST_CREATE_OFFSET);
-        iDPWaitForHostStatus++;
-        break;
-    case 3:
-        iLastHereIAmTickCount = KBTickCount();
-        giHostAcceptStatus = 0;
-        dpSendMessage(0, NETWORK_PACKET_GUEST_ARRIVED, sizeof(SNetPlayerInfo),
-                      &gsThisNetPlayerInfo);
-        iDPWaitForHostStatus++;
-        break;
-    case 4:
-        dpProcessMessages();
-        if (giHostAcceptStatus == 1) {
-            iDPWaitForHostStatus++;
-        } else if (giHostAcceptStatus == 2) {
-            if (iSessionToTry + 1 >= iMaxSession) {
-                iDPWaitForHostStatus = 0;
-            } else {
-                iDPWaitForHostStatus = 1;
-                iSessionToTry++;
+        case 0:
+            if (iWaitForHostWaitCount != 0) {
+                iWaitForHostWaitCount--;
+                DelayMilli(DP_TRANSPORT_RETRY_DELAY);
+                return 0;
             }
-            playResult = lpIDC->Close();
+            iSessionToTry = 0;
+            memset(&sessionDescription, 0, sizeof(sessionDescription));
+            sessionDescription.dwSize = sizeof(sessionDescription);
+            sessionDescription.guidSession = *g_lpGuid;
+            iMaxSession = 0;
+            if (iEnumCount % DP_TRANSPORT_ENUM_LONG_INTERVAL != DP_TRANSPORT_ENUM_LONG_PHASE)
+                enumerationTimeout = DP_TRANSPORT_ENUM_SHORT_TIMEOUT;
+            else
+                enumerationTimeout = DP_TRANSPORT_ENUM_LONG_TIMEOUT;
+            playResult =
+                lpIDC->EnumSessions(&sessionDescription, enumerationTimeout, dpEnumSession, 0, 0);
+            iEnumCount++;
+            if (playResult == DP_RESULT_NO_SESSIONS) {
+                iWaitForHostWaitCount = DP_TRANSPORT_RETRY_WAIT_COUNT;
+                return 0;
+            }
             if (playResult != DP_RESULT_OK)
-                DPSD(playResult, DPFILE,
-                     hostSourceLineBase + DP_SOURCE_LINE_HOST_CLOSE_OFFSET);
-        } else if (iLastHereIAmTickCount + DP_TRANSPORT_ACCEPT_TIMEOUT <
-                   KBTickCount()) {
-            iDPWaitForHostStatus--;
-        }
-        break;
-    case 5:
-        dpProcessMessages();
-        if (bStartUpInfoReceived != 0)
-            return 1;
-        break;
+                DPSD(playResult, DPFILE, hostSourceLineBase + DP_SOURCE_LINE_HOST_ENUM_OFFSET);
+            if (iMaxSession > 0) {
+                iWaitForHostWaitCount = DP_TRANSPORT_RETRY_WAIT_COUNT;
+                iDPWaitForHostStatus++;
+            }
+            break;
+        case 1:
+            memset(&sessionDescription, 0, sizeof(sessionDescription));
+            sessionDescription.dwSize = sizeof(sessionDescription);
+            sessionDescription.dwMaxPlayers = DP_TRANSPORT_MAX_PLAYERS;
+            sessionDescription.guidSession = *g_lpGuid;
+            sessionDescription.dwFlags = DP_SESSION_OPEN_JOIN;
+            sessionDescription.dwSession = lSessions[iSessionToTry];
+            strcpy(sessionDescription.szSessionName, "Heroes 2");
+            playResult = lpIDC->Open(&sessionDescription);
+            if (playResult != DP_RESULT_OK)
+                DPSD(playResult, DPFILE, hostSourceLineBase + DP_SOURCE_LINE_HOST_OPEN_OFFSET);
+            iDPWaitForHostStatus++;
+            break;
+        case 2:
+            playResult = lpIDC->CreatePlayer(&dcoID, "Dude", "Heroes Player", &dphEvent);
+            if (playResult != DP_RESULT_OK)
+                DPSD(playResult, DPFILE, hostSourceLineBase + DP_SOURCE_LINE_HOST_CREATE_OFFSET);
+            iDPWaitForHostStatus++;
+            break;
+        case 3:
+            iLastHereIAmTickCount = KBTickCount();
+            giHostAcceptStatus = 0;
+            dpSendMessage(
+                0,
+                NETWORK_PACKET_GUEST_ARRIVED,
+                sizeof(SNetPlayerInfo),
+                &gsThisNetPlayerInfo
+            );
+            iDPWaitForHostStatus++;
+            break;
+        case 4:
+            dpProcessMessages();
+            if (giHostAcceptStatus == 1) {
+                iDPWaitForHostStatus++;
+            } else if (giHostAcceptStatus == 2) {
+                if (iSessionToTry + 1 >= iMaxSession) {
+                    iDPWaitForHostStatus = 0;
+                } else {
+                    iDPWaitForHostStatus = 1;
+                    iSessionToTry++;
+                }
+                playResult = lpIDC->Close();
+                if (playResult != DP_RESULT_OK)
+                    DPSD(playResult, DPFILE, hostSourceLineBase + DP_SOURCE_LINE_HOST_CLOSE_OFFSET);
+            } else if (iLastHereIAmTickCount + DP_TRANSPORT_ACCEPT_TIMEOUT < KBTickCount()) {
+                iDPWaitForHostStatus--;
+            }
+            break;
+        case 5:
+            dpProcessMessages();
+            if (bStartUpInfoReceived != 0)
+                return 1;
+            break;
     }
     return 0;
 }
 
 VA(0x0041fecd, 0x5eb)
-void DPSD(i32 result, char *file, i32 line) {
+void DPSD(i32 result, char* file, i32 line) {
     char errorText[200];
     i32 errorFlag;
 
@@ -519,101 +550,100 @@ void DPSD(i32 result, char *file, i32 line) {
     bInDPSD = 1;
     errorFlag = 0;
     switch (result) {
-    case DP_RESULT_OK:
-        return;
-    case DPERR_ALREADYINITIALIZED:
-        strcpy(errorText, "DPERR_ALREADYINITIALIZED ");
-        break;
-    case DPERR_ACCESSDENIED:
-        strcpy(errorText, "DPERR_ACCESSDENIED       ");
-        break;
-    case DPERR_ACTIVEPLAYERS:
-        strcpy(errorText, "DPERR_ACTIVEPLAYERS      ");
-        break;
-    case DPERR_BUFFERTOOSMALL:
-        strcpy(errorText, "DPERR_BUFFERTOOSMALL     ");
-        break;
-    case DPERR_CANTADDPLAYER:
-        strcpy(errorText, "DPERR_CANTADDPLAYER      ");
-        break;
-    case DPERR_CANTCREATEGROUP:
-        strcpy(errorText, "DPERR_CANTCREATEGROUP    ");
-        break;
-    case DPERR_CANTCREATEPLAYER:
-        strcpy(errorText, "DPERR_CANTCREATEPLAYER   ");
-        break;
-    case DPERR_CANTCREATESESSION:
-        strcpy(errorText, "DPERR_CANTCREATESESSION  ");
-        break;
-    case DPERR_CAPSNOTAVAILABLEYET:
-        strcpy(errorText, "DPERR_CAPSNOTAVAILABLEYET");
-        break;
-    case DPERR_EXCEPTION:
-        strcpy(errorText, "DPERR_EXCEPTION          ");
-        break;
-    case DPERR_GENERIC:
-        strcpy(errorText, "DPERR_GENERIC            ");
-        break;
-    case DPERR_INVALIDFLAGS:
-        strcpy(errorText, "DPERR_INVALIDFLAGS       ");
-        break;
-    case DPERR_INVALIDOBJECT:
-        strcpy(errorText, "DPERR_INVALIDOBJECT      ");
-        break;
-    case DPERR_INVALIDPARAMS:
-        strcpy(errorText, "DPERR_INVALIDPARAMS      ");
-        break;
-    case DPERR_INVALIDPLAYER:
-        strcpy(errorText, "DPERR_INVALIDPLAYER      ");
-        break;
-    case DPERR_NOCAPS:
-        strcpy(errorText, "DPERR_NOCAPS             ");
-        break;
-    case DPERR_NOCONNECTION:
-        strcpy(errorText, "DPERR_NOCONNECTION       ");
-        break;
-    case DPERR_OUTOFMEMORY:
-        strcpy(errorText, "DPERR_OUTOFMEMORY        ");
-        break;
-    case DPERR_NOMESSAGES:
-        strcpy(errorText, "DPERR_NOMESSAGES         ");
-        break;
-    case DPERR_NONAMESERVERFOUND:
-        strcpy(errorText, "DPERR_NONAMESERVERFOUND  ");
-        break;
-    case DPERR_NOPLAYERS:
-        strcpy(errorText, "DPERR_NOPLAYERS          ");
-        break;
-    case DPERR_NOSESSIONS:
-        strcpy(errorText, "DPERR_NOSESSIONS         ");
-        break;
-    case DPERR_SENDTOOBIG:
-        strcpy(errorText, "DPERR_SENDTOOBIG         ");
-        break;
-    case DPERR_TIMEOUT:
-        strcpy(errorText, "DPERR_TIMEOUT            ");
-        break;
-    case DPERR_UNAVAILABLE:
-        strcpy(errorText, "DPERR_UNAVAILABLE        ");
-        break;
-    case DPERR_UNSUPPORTED:
-        strcpy(errorText, "DPERR_UNSUPPORTED        ");
-        break;
-    case DPERR_BUSY:
-        strcpy(errorText, "DPERR_BUSY               ");
-        break;
-    case DPERR_USERCANCEL:
-        strcpy(errorText, "DPERR_USERCANCEL         ");
-        break;
-    default:
-        strcpy(errorText, "Error type unknown");
-        break;
+        case DP_RESULT_OK:
+            return;
+        case DPERR_ALREADYINITIALIZED:
+            strcpy(errorText, "DPERR_ALREADYINITIALIZED ");
+            break;
+        case DPERR_ACCESSDENIED:
+            strcpy(errorText, "DPERR_ACCESSDENIED       ");
+            break;
+        case DPERR_ACTIVEPLAYERS:
+            strcpy(errorText, "DPERR_ACTIVEPLAYERS      ");
+            break;
+        case DPERR_BUFFERTOOSMALL:
+            strcpy(errorText, "DPERR_BUFFERTOOSMALL     ");
+            break;
+        case DPERR_CANTADDPLAYER:
+            strcpy(errorText, "DPERR_CANTADDPLAYER      ");
+            break;
+        case DPERR_CANTCREATEGROUP:
+            strcpy(errorText, "DPERR_CANTCREATEGROUP    ");
+            break;
+        case DPERR_CANTCREATEPLAYER:
+            strcpy(errorText, "DPERR_CANTCREATEPLAYER   ");
+            break;
+        case DPERR_CANTCREATESESSION:
+            strcpy(errorText, "DPERR_CANTCREATESESSION  ");
+            break;
+        case DPERR_CAPSNOTAVAILABLEYET:
+            strcpy(errorText, "DPERR_CAPSNOTAVAILABLEYET");
+            break;
+        case DPERR_EXCEPTION:
+            strcpy(errorText, "DPERR_EXCEPTION          ");
+            break;
+        case DPERR_GENERIC:
+            strcpy(errorText, "DPERR_GENERIC            ");
+            break;
+        case DPERR_INVALIDFLAGS:
+            strcpy(errorText, "DPERR_INVALIDFLAGS       ");
+            break;
+        case DPERR_INVALIDOBJECT:
+            strcpy(errorText, "DPERR_INVALIDOBJECT      ");
+            break;
+        case DPERR_INVALIDPARAMS:
+            strcpy(errorText, "DPERR_INVALIDPARAMS      ");
+            break;
+        case DPERR_INVALIDPLAYER:
+            strcpy(errorText, "DPERR_INVALIDPLAYER      ");
+            break;
+        case DPERR_NOCAPS:
+            strcpy(errorText, "DPERR_NOCAPS             ");
+            break;
+        case DPERR_NOCONNECTION:
+            strcpy(errorText, "DPERR_NOCONNECTION       ");
+            break;
+        case DPERR_OUTOFMEMORY:
+            strcpy(errorText, "DPERR_OUTOFMEMORY        ");
+            break;
+        case DPERR_NOMESSAGES:
+            strcpy(errorText, "DPERR_NOMESSAGES         ");
+            break;
+        case DPERR_NONAMESERVERFOUND:
+            strcpy(errorText, "DPERR_NONAMESERVERFOUND  ");
+            break;
+        case DPERR_NOPLAYERS:
+            strcpy(errorText, "DPERR_NOPLAYERS          ");
+            break;
+        case DPERR_NOSESSIONS:
+            strcpy(errorText, "DPERR_NOSESSIONS         ");
+            break;
+        case DPERR_SENDTOOBIG:
+            strcpy(errorText, "DPERR_SENDTOOBIG         ");
+            break;
+        case DPERR_TIMEOUT:
+            strcpy(errorText, "DPERR_TIMEOUT            ");
+            break;
+        case DPERR_UNAVAILABLE:
+            strcpy(errorText, "DPERR_UNAVAILABLE        ");
+            break;
+        case DPERR_UNSUPPORTED:
+            strcpy(errorText, "DPERR_UNSUPPORTED        ");
+            break;
+        case DPERR_BUSY:
+            strcpy(errorText, "DPERR_BUSY               ");
+            break;
+        case DPERR_USERCANCEL:
+            strcpy(errorText, "DPERR_USERCANCEL         ");
+            break;
+        default:
+            strcpy(errorText, "Error type unknown");
+            break;
     }
     MessageBeep(0);
     MessageBeep(0);
     MessageBeep(0);
-    sprintf(gText, "DirectPlay Error:\n\n'%s'\n\n  File:'%s'\n Line# %d",
-            errorText, file, line);
+    sprintf(gText, "DirectPlay Error:\n\n'%s'\n\n  File:'%s'\n Line# %d", errorText, file, line);
     LogStr(gText);
     ShutDown(gText);
 }
@@ -644,15 +674,15 @@ void DPSD(i32 result, char *file, i32 line) {
 // multiline DPSD format. Do not restore raw string-dereference line constants,
 // duplicate owners, aliases, padding, cursor replay, or synthetic identities.
 // ---- globals (definitions, RVA order) ----
-DATA(0x004ef7c8) struct IDirectPlay *lpIDC = 0;
+DATA(0x004ef7c8) struct IDirectPlay* lpIDC = 0;
 DATA(0x004ef7cc) DPID dcoID = 0;
-DATA(0x004ef7d0) struct _GUID *IPXGuid = 0;
-DATA(0x004ef7d4) struct _GUID *TCPGuid = 0;
+DATA(0x004ef7d0) struct _GUID* IPXGuid = 0;
+DATA(0x004ef7d4) struct _GUID* TCPGuid = 0;
 DATA(0x004ef7d8) HANDLE dphEvent = 0;
 DATA(0x004ef7dc) i32 iDPRcvBufferHead = 0;
 DATA(0x004ef7e0) i32 iDPRcvBufferTail = 0;
-DATA(0x004ef7e4) u8 **ppDPRcvBuffer = 0;
-DATA(0x004ef7e8) i32 *piDPRcvBufferSize = 0;
+DATA(0x004ef7e4) u8** ppDPRcvBuffer = 0;
+DATA(0x004ef7e8) i32* piDPRcvBufferSize = 0;
 DATA(0x004ef7ec) i32 bStartUpInfoReceived = 0;
 DATA(0x004ef7f0) HMODULE hinstDplayx = 0;
 DATA(0x004ef7f4) i32 iDPWaitForFirstGuestStatus = 0;
@@ -665,7 +695,7 @@ DATA(0x004ef80c) i32 iGUIDCount = 0;
 DATA(0x004ef810) i32 iLastMsgNumHumanPlayers = 1;
 DATA(0x00525060) i32 iMaxSession;
 DATA(0x00525064) i32 giHostAcceptStatus;
-DATA(0x00525068) struct _GUID *g_lpGuid;
+DATA(0x00525068) struct _GUID* g_lpGuid;
 DATA(0x00525070) i32 giNetPosToDCOPos[6];
 DATA(0x00525088) i32 iSessionToTry;
 DATA(0x00525090) i32l lSessions[10];

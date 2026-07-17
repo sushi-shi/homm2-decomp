@@ -49,7 +49,7 @@ struct _SAMPLE;
 struct _DIG_DRIVER;
 struct tag_message;
 
-#pragma pack(push, 1)  // recovered layout is byte-packed
+#pragma pack(push, 1) // recovered layout is byte-packed
 struct SampleChannelStruct {
     i32 startChannel;
     i32 endChannel;
@@ -61,49 +61,49 @@ public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (derived: base baseManager = 0x36 bytes at 0x00 via ': public baseManager'; own fields below)
-    struct _DIG_DRIVER *m_digitalDriver;  // +0x36
-    i32    field_0x3a;  // +0x3a  constructor-initialized only; no retail reader
-    i32    m_ready;  // +0x3e
+    struct _DIG_DRIVER* m_digitalDriver; // +0x36
+    i32 field_0x3a;                      // +0x3a  constructor-initialized only; no retail reader
+    i32 m_ready;                         // +0x3e
     char _pad_0x42[0xe];
-    FILE *m_midiFile;  // +0x50
-    struct _SAMPLE *m_sampleHandles[14];  // +0x54  sample handles
+    FILE* m_midiFile;                    // +0x50
+    struct _SAMPLE* m_sampleHandles[14]; // +0x54  sample handles
     char _pad_0x8c[0x8];
-    i32    m_numSampleHandles;  // +0x94
-    char _pad_0x98[0x40];             // 0x98..0xd8
-    char   m_channelVolumes[0x14];          // 0xd8  per-channel volume byte
-    struct _SAMPLE *m_channelSamples[14];   // 0xec  active sample per channel
-    char _pad_0x124[0x8];             // 0x124..0x12c
-    void   *m_channelSampleData[14];       // 0x12c  sample data per channel
-    char _pad_0x164[0x8];             // 0x164..0x16c
-    u32l m_channelSampleSizes[14]; // 0x16c  sample byte length per channel
-    char _pad_0x1a4[0x3c8];           // 0x1a4..0x56c
-    i32    field_0x56c;  // +0x56c  constructor-initialized only; no retail reader
+    i32 m_numSampleHandles;               // +0x94
+    char _pad_0x98[0x40];                 // 0x98..0xd8
+    char m_channelVolumes[0x14];          // 0xd8  per-channel volume byte
+    struct _SAMPLE* m_channelSamples[14]; // 0xec  active sample per channel
+    char _pad_0x124[0x8];                 // 0x124..0x12c
+    void* m_channelSampleData[14];        // 0x12c  sample data per channel
+    char _pad_0x164[0x8];                 // 0x164..0x16c
+    u32l m_channelSampleSizes[14];        // 0x16c  sample byte length per channel
+    char _pad_0x1a4[0x3c8];               // 0x1a4..0x56c
+    i32 field_0x56c;                      // +0x56c  constructor-initialized only; no retail reader
     char _pad_0x570[0x4];
-    i32    field_0x574;  // +0x574  constructor-initialized only; no retail reader
-    char   m_currentTrack;  // +0x578
-    char   m_pollRequested;  // +0x579
-    char   m_pollDue;  // +0x57a
-    char   m_pollToggle;  // +0x57b
+    i32 field_0x574;      // +0x574  constructor-initialized only; no retail reader
+    char m_currentTrack;  // +0x578
+    char m_pollRequested; // +0x579
+    char m_pollDue;       // +0x57a
+    char m_pollToggle;    // +0x57b
     char _pad_0x57c[0x14];
-    i32l   m_savedTrackPositions[MIDI_TRACK_COUNT];  // +0x590  saved music file positions per track
-    i32    m_fading;  // +0x680
-    i32    m_samplesReady;  // +0x684
-    i32    m_fadeSteps;  // +0x688
-    i32    m_fadeTargetTrack;  // +0x68c
-    i32    m_cdTrack;  // +0x690
-    i32    m_cdPlayFrame;  // +0x694
-    i16  m_auxDevice;  // +0x698
-    i32    m_cdReady;  // +0x69a
-    i32    m_midiReady;  // +0x69e
-    i32    m_cdStarted;  // +0x6a2
-    i32    m_midiStarted;  // +0x6a6
-    i32    m_pollTimer;  // +0x6aa
+    i32l m_savedTrackPositions[MIDI_TRACK_COUNT]; // +0x590  saved music file positions per track
+    i32 m_fading;                                 // +0x680
+    i32 m_samplesReady;                           // +0x684
+    i32 m_fadeSteps;                              // +0x688
+    i32 m_fadeTargetTrack;                        // +0x68c
+    i32 m_cdTrack;                                // +0x690
+    i32 m_cdPlayFrame;                            // +0x694
+    i16 m_auxDevice;                              // +0x698
+    i32 m_cdReady;                                // +0x69a
+    i32 m_midiReady;                              // +0x69e
+    i32 m_cdStarted;                              // +0x6a2
+    i32 m_midiStarted;                            // +0x6a6
+    i32 m_pollTimer;                              // +0x6aa
     // --- constructors ---
     soundManager(void);
     // --- virtual methods (vtable order) ---
     virtual i32 Open(i32) OVERRIDE;
     virtual void Close(void) OVERRIDE;
-    virtual i32 Main(struct tag_message &) OVERRIDE;
+    virtual i32 Main(struct tag_message&) OVERRIDE;
     // --- methods ---
     void ValidatePreviousPosition(i32);
     void CDStop(void);
@@ -115,11 +115,11 @@ public:
     void CDPoll(void);
     i32 ConvertVolume(i32, i32);
     void AllocateSampleHandles(void);
-    struct _SAMPLE * StartSample(char *, char * *, i16, i16, i32, i32, i32l);
+    struct _SAMPLE* StartSample(char*, char**, i16, i16, i32, i32, i32l);
     void StopAllSamples(i32);
-    void StopSample(struct _SAMPLE *);
-    void ModifySample(struct _SAMPLE *, i16, i32l);
-    i32l DigitalReport(struct _SAMPLE *, i16);
+    void StopSample(struct _SAMPLE*);
+    void ModifySample(struct _SAMPLE*, i16, i32l);
+    i32l DigitalReport(struct _SAMPLE*, i16);
     void AdjustSoundVolumes(void);
     void AdjustMusicVolumes(void);
     void ForcePollSound(void);
@@ -127,7 +127,7 @@ public:
     void PlayAmbientMusic(i32, i32l, i32);
     void PollSound(void);
     void SwitchAmbientMusic(i32);
-    struct _SAMPLE * MemorySample(class sample *);
+    struct _SAMPLE* MemorySample(class sample*);
     void GetNumberCDDrives(void);
     void ServiceSound(void);
     i32 MusicPlaying(void);
@@ -142,13 +142,13 @@ public:
 #pragma pack(pop)
 SIZE(soundManager, 0x6ae);
 // ---- globals (declarations, RVA order) ----
-extern char *digitalDriverNames[14];
+extern char* digitalDriverNames[14];
 extern SampleChannelStruct SCS[4];
 extern char CDPreviousPosition[60][15];
 extern i32 CDWaiting;
 extern i32 CDPlaying;
 extern i32 iCalibrateLoop;
-extern struct _MDI_DRIVER *hMDI;
+extern struct _MDI_DRIVER* hMDI;
 extern i32 CurrentMidiFile;
 extern u8 bGotMidi[MIDI_TRACK_COUNT];
 extern i32l lLastMIDIPollTickCount;
@@ -156,7 +156,7 @@ extern char lpszReturnString[0x100];
 extern u32l nMCIError;
 extern i16 iLastVolume[0x20];
 extern char CommandString[0x100];
-extern class MIDIWrap *pMIDIWrap[MIDI_TRACK_COUNT];
-extern struct _SEQUENCE *hSequence[MIDI_TRACK_COUNT];
+extern class MIDIWrap* pMIDIWrap[MIDI_TRACK_COUNT];
+extern struct _SEQUENCE* hSequence[MIDI_TRACK_COUNT];
 
 #endif // HOMM2_BASE_SOUNDMANAGER_H

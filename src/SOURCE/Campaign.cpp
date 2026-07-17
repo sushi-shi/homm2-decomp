@@ -24,142 +24,140 @@
 #include <SOURCE/kbwin.h>
 #include <SOURCE/Campaign.h>
 VA(0x00447710, 0x563)
-i32 game::HandleCampaignWin(void)
-{
+i32 game::HandleCampaignWin(void) {
     i32 sideIndex;
     i32 mapIndex;
 
     memset(m_campaignMapEnabled, 0, sizeof(m_campaignMapEnabled));
     if (m_campaignType == CAMPAIGN_ROLAND) {
         switch (m_campaignScenario + 1) {
-        case 0:
-            PlaySmacker(CAMPAIGN_SMACKER_ROLAND_INTRO);
-            m_campaignMapEnabled[CAMPAIGN_ROLAND][0] = 1;
-            break;
-        case 1:
-            PlaySmacker(CAMPAIGN_SMACKER_ROLAND_1);
-            m_campaignMapEnabled[CAMPAIGN_ROLAND][1] = 1;
-            break;
-        case 2:
-            PlaySmacker(CAMPAIGN_SMACKER_ROLAND_2);
-            m_campaignMapEnabled[CAMPAIGN_ROLAND][2] = 1;
-            m_campaignMapEnabled[CAMPAIGN_ROLAND][3] = 1;
-            break;
-        case 3:
-            PlaySmacker(CAMPAIGN_SMACKER_ROLAND_3B);
-            m_campaignMapEnabled[CAMPAIGN_ROLAND][3] = 1;
-            m_campaignAwards[CAMPAIGN_AWARD_DWARVEN_ALLIANCE] = 1;
-            break;
-        case 4:
-            PlaySmacker(CAMPAIGN_SMACKER_ROLAND_4);
-            m_campaignMapEnabled[CAMPAIGN_ROLAND][4] = 1;
-            m_campaignMapEnabled[CAMPAIGN_ROLAND][11] = 1;
-            break;
-        case 5:
-            if (m_campaignStartingSide == CAMPAIGN_ROLAND)
-                PlaySmacker(CAMPAIGN_SMACKER_ROLAND_5A);
-            else
-                PlaySmacker(CAMPAIGN_SMACKER_ROLAND_5B);
-            m_campaignMapEnabled[CAMPAIGN_ROLAND][5] = 1;
-            break;
-        case 6:
-            PlaySmacker(CAMPAIGN_SMACKER_ROLAND_6);
-            m_campaignMapEnabled[CAMPAIGN_ROLAND][6] = 1;
-            m_campaignMapEnabled[CAMPAIGN_ROLAND][7] = 1;
-            m_campaignAwards[CAMPAIGN_AWARD_SORCERESS_GUILD] = 1;
-            break;
-        case 7:
-            PlaySmacker(CAMPAIGN_SMACKER_ROLAND_8);
-            m_campaignMapEnabled[CAMPAIGN_ROLAND][8] = 1;
-            m_campaignAwards[CAMPAIGN_AWARD_ROLAND_CARRYOVER_FORCES] = 1;
-            break;
-        case 8:
-            PlaySmacker(CAMPAIGN_SMACKER_ROLAND_8);
-            m_campaignMapEnabled[CAMPAIGN_ROLAND][8] = 1;
-            m_campaignAwards[CAMPAIGN_AWARD_ROLAND_ULTIMATE_CROWN] = 1;
-            break;
-        case 9:
-            PlaySmacker(CAMPAIGN_SMACKER_ROLAND_9);
-            m_campaignMapEnabled[CAMPAIGN_ROLAND][9] = 1;
-            break;
-        case 10:
-            PlaySmacker(CAMPAIGN_SMACKER_ROLAND_END);
-            break;
+            case 0:
+                PlaySmacker(CAMPAIGN_SMACKER_ROLAND_INTRO);
+                m_campaignMapEnabled[CAMPAIGN_ROLAND][0] = 1;
+                break;
+            case 1:
+                PlaySmacker(CAMPAIGN_SMACKER_ROLAND_1);
+                m_campaignMapEnabled[CAMPAIGN_ROLAND][1] = 1;
+                break;
+            case 2:
+                PlaySmacker(CAMPAIGN_SMACKER_ROLAND_2);
+                m_campaignMapEnabled[CAMPAIGN_ROLAND][2] = 1;
+                m_campaignMapEnabled[CAMPAIGN_ROLAND][3] = 1;
+                break;
+            case 3:
+                PlaySmacker(CAMPAIGN_SMACKER_ROLAND_3B);
+                m_campaignMapEnabled[CAMPAIGN_ROLAND][3] = 1;
+                m_campaignAwards[CAMPAIGN_AWARD_DWARVEN_ALLIANCE] = 1;
+                break;
+            case 4:
+                PlaySmacker(CAMPAIGN_SMACKER_ROLAND_4);
+                m_campaignMapEnabled[CAMPAIGN_ROLAND][4] = 1;
+                m_campaignMapEnabled[CAMPAIGN_ROLAND][11] = 1;
+                break;
+            case 5:
+                if (m_campaignStartingSide == CAMPAIGN_ROLAND)
+                    PlaySmacker(CAMPAIGN_SMACKER_ROLAND_5A);
+                else
+                    PlaySmacker(CAMPAIGN_SMACKER_ROLAND_5B);
+                m_campaignMapEnabled[CAMPAIGN_ROLAND][5] = 1;
+                break;
+            case 6:
+                PlaySmacker(CAMPAIGN_SMACKER_ROLAND_6);
+                m_campaignMapEnabled[CAMPAIGN_ROLAND][6] = 1;
+                m_campaignMapEnabled[CAMPAIGN_ROLAND][7] = 1;
+                m_campaignAwards[CAMPAIGN_AWARD_SORCERESS_GUILD] = 1;
+                break;
+            case 7:
+                PlaySmacker(CAMPAIGN_SMACKER_ROLAND_8);
+                m_campaignMapEnabled[CAMPAIGN_ROLAND][8] = 1;
+                m_campaignAwards[CAMPAIGN_AWARD_ROLAND_CARRYOVER_FORCES] = 1;
+                break;
+            case 8:
+                PlaySmacker(CAMPAIGN_SMACKER_ROLAND_8);
+                m_campaignMapEnabled[CAMPAIGN_ROLAND][8] = 1;
+                m_campaignAwards[CAMPAIGN_AWARD_ROLAND_ULTIMATE_CROWN] = 1;
+                break;
+            case 9:
+                PlaySmacker(CAMPAIGN_SMACKER_ROLAND_9);
+                m_campaignMapEnabled[CAMPAIGN_ROLAND][9] = 1;
+                break;
+            case 10:
+                PlaySmacker(CAMPAIGN_SMACKER_ROLAND_END);
+                break;
         }
     } else {
         switch (m_campaignScenario + 1) {
-        case 0:
-            PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_INTRO);
-            m_campaignMapEnabled[CAMPAIGN_ARCHIBALD][0] = 1;
-            break;
-        case 1:
-            PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_1);
-            m_campaignMapEnabled[CAMPAIGN_ARCHIBALD][1] = 1;
-            break;
-        case 2:
-            PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_2);
-            m_campaignMapEnabled[CAMPAIGN_ARCHIBALD][2] = 1;
-            m_campaignMapEnabled[CAMPAIGN_ARCHIBALD][3] = 1;
-            break;
-        case 3:
-            PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_4A);
-            PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_4_END);
-            m_campaignMapEnabled[CAMPAIGN_ARCHIBALD][4] = 1;
-            m_campaignMapEnabled[CAMPAIGN_ARCHIBALD][11] = 1;
-            m_campaignAwards[CAMPAIGN_AWARD_NECROMANCER_GUILD] = 1;
-            break;
-        case 4:
-            PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_4B);
-            PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_4_END);
-            m_campaignMapEnabled[CAMPAIGN_ARCHIBALD][4] = 1;
-            m_campaignMapEnabled[CAMPAIGN_ARCHIBALD][11] = 1;
-            m_campaignAwards[CAMPAIGN_AWARD_DWARFBANE] = 1;
-            m_campaignAwards[CAMPAIGN_AWARD_OGRE_ALLIANCE] = 1;
-            break;
-        case 5:
-            if (m_campaignStartingSide == CAMPAIGN_ARCHIBALD)
-                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_5A);
-            else
-                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_5B);
-            m_campaignMapEnabled[CAMPAIGN_ARCHIBALD][5] = 1;
-            break;
-        case 6:
-            PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_6);
-            m_campaignMapEnabled[CAMPAIGN_ARCHIBALD][6] = 1;
-            m_campaignMapEnabled[CAMPAIGN_ARCHIBALD][7] = 1;
-            break;
-        case 7:
-            PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_7B);
-            m_campaignMapEnabled[CAMPAIGN_ARCHIBALD][7] = 1;
-            m_campaignAwards[CAMPAIGN_AWARD_DRAGON_ALLIANCE] = 1;
-            break;
-        case 8:
-            PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_8);
-            m_campaignMapEnabled[CAMPAIGN_ARCHIBALD][8] = 1;
-            m_campaignMapEnabled[CAMPAIGN_ARCHIBALD][9] = 1;
-            break;
-        case 9:
-            PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_10);
-            m_campaignMapEnabled[CAMPAIGN_ARCHIBALD][10] = 1;
-            m_campaignAwards[CAMPAIGN_AWARD_ARCHIBALD_ULTIMATE_CROWN] = 1;
-            break;
-        case 10:
-            PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_10);
-            m_campaignMapEnabled[CAMPAIGN_ARCHIBALD][10] = 1;
-            m_campaignAwards[CAMPAIGN_AWARD_ARCHIBALD_CARRYOVER_FORCES] = 1;
-            break;
-        case 11:
-            PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_END);
-            m_campaignAwards[CAMPAIGN_AWARD_ARCHIBALD_ULTIMATE_CROWN] = 0;
-            m_campaignAwards[CAMPAIGN_AWARD_ARCHIBALD_CARRYOVER_FORCES] = 0;
-            break;
+            case 0:
+                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_INTRO);
+                m_campaignMapEnabled[CAMPAIGN_ARCHIBALD][0] = 1;
+                break;
+            case 1:
+                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_1);
+                m_campaignMapEnabled[CAMPAIGN_ARCHIBALD][1] = 1;
+                break;
+            case 2:
+                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_2);
+                m_campaignMapEnabled[CAMPAIGN_ARCHIBALD][2] = 1;
+                m_campaignMapEnabled[CAMPAIGN_ARCHIBALD][3] = 1;
+                break;
+            case 3:
+                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_4A);
+                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_4_END);
+                m_campaignMapEnabled[CAMPAIGN_ARCHIBALD][4] = 1;
+                m_campaignMapEnabled[CAMPAIGN_ARCHIBALD][11] = 1;
+                m_campaignAwards[CAMPAIGN_AWARD_NECROMANCER_GUILD] = 1;
+                break;
+            case 4:
+                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_4B);
+                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_4_END);
+                m_campaignMapEnabled[CAMPAIGN_ARCHIBALD][4] = 1;
+                m_campaignMapEnabled[CAMPAIGN_ARCHIBALD][11] = 1;
+                m_campaignAwards[CAMPAIGN_AWARD_DWARFBANE] = 1;
+                m_campaignAwards[CAMPAIGN_AWARD_OGRE_ALLIANCE] = 1;
+                break;
+            case 5:
+                if (m_campaignStartingSide == CAMPAIGN_ARCHIBALD)
+                    PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_5A);
+                else
+                    PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_5B);
+                m_campaignMapEnabled[CAMPAIGN_ARCHIBALD][5] = 1;
+                break;
+            case 6:
+                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_6);
+                m_campaignMapEnabled[CAMPAIGN_ARCHIBALD][6] = 1;
+                m_campaignMapEnabled[CAMPAIGN_ARCHIBALD][7] = 1;
+                break;
+            case 7:
+                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_7B);
+                m_campaignMapEnabled[CAMPAIGN_ARCHIBALD][7] = 1;
+                m_campaignAwards[CAMPAIGN_AWARD_DRAGON_ALLIANCE] = 1;
+                break;
+            case 8:
+                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_8);
+                m_campaignMapEnabled[CAMPAIGN_ARCHIBALD][8] = 1;
+                m_campaignMapEnabled[CAMPAIGN_ARCHIBALD][9] = 1;
+                break;
+            case 9:
+                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_10);
+                m_campaignMapEnabled[CAMPAIGN_ARCHIBALD][10] = 1;
+                m_campaignAwards[CAMPAIGN_AWARD_ARCHIBALD_ULTIMATE_CROWN] = 1;
+                break;
+            case 10:
+                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_10);
+                m_campaignMapEnabled[CAMPAIGN_ARCHIBALD][10] = 1;
+                m_campaignAwards[CAMPAIGN_AWARD_ARCHIBALD_CARRYOVER_FORCES] = 1;
+                break;
+            case 11:
+                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_END);
+                m_campaignAwards[CAMPAIGN_AWARD_ARCHIBALD_ULTIMATE_CROWN] = 0;
+                m_campaignAwards[CAMPAIGN_AWARD_ARCHIBALD_CARRYOVER_FORCES] = 0;
+                break;
         }
     }
 
-    if (m_campaignScenario + 1 != CAMPAIGN_ARCHIBALD_FINAL_SCENARIO + 1 &&
-        (gpGame->m_campaignScenario + 1 !=
-             CAMPAIGN_ROLAND_FINAL_SCENARIO + 1 ||
-         gpGame->m_campaignType != CAMPAIGN_ROLAND)) {
+    if (m_campaignScenario + 1 != CAMPAIGN_ARCHIBALD_FINAL_SCENARIO + 1
+        && (gpGame->m_campaignScenario + 1 != CAMPAIGN_ROLAND_FINAL_SCENARIO + 1
+            || gpGame->m_campaignType != CAMPAIGN_ROLAND)) {
         m_campaignScenario = CAMPAIGN_NO_SCENARIO;
         for (sideIndex = 0; sideIndex < CAMPAIGN_SIDE_COUNT; ++sideIndex) {
             for (mapIndex = 0; mapIndex < CAMPAIGN_REGULAR_MAP_COUNT; ++mapIndex) {
@@ -175,82 +173,113 @@ i32 game::HandleCampaignWin(void)
         }
         gpGame->ShowCampaignInfo(0, 0);
         switch (gpWindowManager->m_dialogResult) {
-        case CAMPAIGN_DIALOG_ACCEPT:
-            return 1;
-        case CAMPAIGN_DIALOG_CANCEL:
-            return 0;
+            case CAMPAIGN_DIALOG_ACCEPT:
+                return 1;
+            case CAMPAIGN_DIALOG_CANCEL:
+                return 0;
         }
     }
     return 0;
 }
 
 VA(0x00447c73, 0x343)
-void game::PlayPreScenarioSmacker(i32 side, i32 map)
-{
+void game::PlayPreScenarioSmacker(i32 side, i32 map) {
     if (side == CAMPAIGN_ROLAND) {
         switch (map + 1) {
-        case 1: PlaySmacker(CAMPAIGN_SMACKER_ROLAND_INTRO); break;
-        case 2: PlaySmacker(CAMPAIGN_SMACKER_ROLAND_1); break;
-        case 3: PlaySmacker(CAMPAIGN_SMACKER_ROLAND_2); break;
-        case 4:
-            if (m_campaignScenarioCompleted[m_campaignStartingSide][2])
-                PlaySmacker(CAMPAIGN_SMACKER_ROLAND_3B);
-            else
-                PlaySmacker(CAMPAIGN_SMACKER_ROLAND_3A);
-            break;
-        case 5: PlaySmacker(CAMPAIGN_SMACKER_ROLAND_4); break;
-        case 6:
-            if (m_campaignStartingSide == CAMPAIGN_ROLAND)
-                PlaySmacker(CAMPAIGN_SMACKER_ROLAND_5A);
-            else
-                PlaySmacker(CAMPAIGN_SMACKER_ROLAND_5B);
-            break;
-        case 7: PlaySmacker(CAMPAIGN_SMACKER_ROLAND_6); break;
-        case 8: PlaySmacker(CAMPAIGN_SMACKER_ROLAND_7); break;
-        case 9: PlaySmacker(CAMPAIGN_SMACKER_ROLAND_8); break;
-        case 10: PlaySmacker(CAMPAIGN_SMACKER_ROLAND_9); break;
-        case 12:
-        case 13:
-            PlaySmacker(CAMPAIGN_SMACKER_ROLAND_4);
-            break;
+            case 1:
+                PlaySmacker(CAMPAIGN_SMACKER_ROLAND_INTRO);
+                break;
+            case 2:
+                PlaySmacker(CAMPAIGN_SMACKER_ROLAND_1);
+                break;
+            case 3:
+                PlaySmacker(CAMPAIGN_SMACKER_ROLAND_2);
+                break;
+            case 4:
+                if (m_campaignScenarioCompleted[m_campaignStartingSide][2])
+                    PlaySmacker(CAMPAIGN_SMACKER_ROLAND_3B);
+                else
+                    PlaySmacker(CAMPAIGN_SMACKER_ROLAND_3A);
+                break;
+            case 5:
+                PlaySmacker(CAMPAIGN_SMACKER_ROLAND_4);
+                break;
+            case 6:
+                if (m_campaignStartingSide == CAMPAIGN_ROLAND)
+                    PlaySmacker(CAMPAIGN_SMACKER_ROLAND_5A);
+                else
+                    PlaySmacker(CAMPAIGN_SMACKER_ROLAND_5B);
+                break;
+            case 7:
+                PlaySmacker(CAMPAIGN_SMACKER_ROLAND_6);
+                break;
+            case 8:
+                PlaySmacker(CAMPAIGN_SMACKER_ROLAND_7);
+                break;
+            case 9:
+                PlaySmacker(CAMPAIGN_SMACKER_ROLAND_8);
+                break;
+            case 10:
+                PlaySmacker(CAMPAIGN_SMACKER_ROLAND_9);
+                break;
+            case 12:
+            case 13:
+                PlaySmacker(CAMPAIGN_SMACKER_ROLAND_4);
+                break;
         }
     } else {
         switch (map + 1) {
-        case 1: PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_INTRO); break;
-        case 2: PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_1); break;
-        case 3: PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_2); break;
-        case 4: PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_3); break;
-        case 5:
-            if (m_campaignScenarioCompleted[m_campaignStartingSide][3])
-                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_4B);
-            else
-                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_4A);
-            PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_4_END);
-            break;
-        case 6:
-            if (m_campaignStartingSide == CAMPAIGN_ARCHIBALD)
-                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_5A);
-            else
-                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_5B);
-            break;
-        case 7: PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_6); break;
-        case 8:
-            if (m_campaignScenarioCompleted[m_campaignType][6])
-                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_7B);
-            else
-                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_7A);
-            break;
-        case 9: PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_8); break;
-        case 10: PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_9); break;
-        case 11: PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_10); break;
-        case 12:
-        case 13:
-            if (m_campaignScenarioCompleted[m_campaignStartingSide][3])
-                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_4B);
-            else
-                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_4A);
-            PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_4_END);
-            break;
+            case 1:
+                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_INTRO);
+                break;
+            case 2:
+                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_1);
+                break;
+            case 3:
+                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_2);
+                break;
+            case 4:
+                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_3);
+                break;
+            case 5:
+                if (m_campaignScenarioCompleted[m_campaignStartingSide][3])
+                    PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_4B);
+                else
+                    PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_4A);
+                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_4_END);
+                break;
+            case 6:
+                if (m_campaignStartingSide == CAMPAIGN_ARCHIBALD)
+                    PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_5A);
+                else
+                    PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_5B);
+                break;
+            case 7:
+                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_6);
+                break;
+            case 8:
+                if (m_campaignScenarioCompleted[m_campaignType][6])
+                    PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_7B);
+                else
+                    PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_7A);
+                break;
+            case 9:
+                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_8);
+                break;
+            case 10:
+                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_9);
+                break;
+            case 11:
+                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_10);
+                break;
+            case 12:
+            case 13:
+                if (m_campaignScenarioCompleted[m_campaignStartingSide][3])
+                    PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_4B);
+                else
+                    PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_4A);
+                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_4_END);
+                break;
         }
     }
     gpWindowManager->m_updateFlags = 1;
@@ -261,16 +290,14 @@ void game::PlayPreScenarioSmacker(i32 side, i32 map)
 // residual is the savedInterface slot at +0x33..+0x35. Declaration order and
 // od_slots-guided local names were tried.
 VA(0x00447fb6, 0x48d)
-void game::ShowCampaignInfo(i32 viewOnly, i32)
-{
+void game::ShowCampaignInfo(i32 viewOnly, i32) {
     i32 savedInterface;
     i32 map;
     i32 trackMapIndex;
-    widget *trackWidget;
+    widget* trackWidget;
     tag_message message;
 
-    gpMouseManager->SetPointer("advmice.mse", 0,
-                               CAMPAIGN_POINTER_HIDDEN_HOTSPOT);
+    gpMouseManager->SetPointer("advmice.mse", 0, CAMPAIGN_POINTER_HIDDEN_HOTSPOT);
     gpMouseManager->ReallyShowPointer();
     savedInterface = gbUseEvilInterface;
     gbUseEvilInterface = m_campaignType == CAMPAIGN_ARCHIBALD;
@@ -306,14 +333,19 @@ void game::ShowCampaignInfo(i32 viewOnly, i32)
             if (trackMapIndex > CAMPAIGN_REGULAR_MAP_COUNT)
                 trackMapIndex = CAMPAIGN_REGULAR_MAP_COUNT;
             trackWidget = new iconWidget(
-                trackXY[map < 4 ? m_campaignStartingSide : m_campaignType][map][0] -
-                    CAMPAIGN_TRACK_ICON_OFFSET,
-                trackXY[map < 4 ? m_campaignStartingSide : m_campaignType][map][1] -
-                    CAMPAIGN_TRACK_ICON_OFFSET,
-                CAMPAIGN_TRACK_ICON_SIZE, CAMPAIGN_TRACK_ICON_SIZE,
-                "campxtrg.icn", CAMPAIGN_TRACK_ICON_FRAME, 0,
+                trackXY[map < 4 ? m_campaignStartingSide : m_campaignType][map][0]
+                    - CAMPAIGN_TRACK_ICON_OFFSET,
+                trackXY[map < 4 ? m_campaignStartingSide : m_campaignType][map][1]
+                    - CAMPAIGN_TRACK_ICON_OFFSET,
+                CAMPAIGN_TRACK_ICON_SIZE,
+                CAMPAIGN_TRACK_ICON_SIZE,
+                "campxtrg.icn",
+                CAMPAIGN_TRACK_ICON_FRAME,
+                0,
                 trackMapIndex + CAMPAIGN_TRACK_WIDGET_FIRST,
-                CAMPAIGN_TRACK_ICON_COLOR, 1);
+                CAMPAIGN_TRACK_ICON_COLOR,
+                1
+            );
             if (trackWidget == 0)
                 MemError();
             campWin->AddWidget(trackWidget, -1);
@@ -334,20 +366,26 @@ void game::ShowCampaignInfo(i32 viewOnly, i32)
         campWin->BroadcastMessage(message);
     }
     gpSoundManager->SwitchAmbientMusic(
-        m_campaignType == CAMPAIGN_ROLAND ? CAMPAIGN_GOOD_MUSIC
-                                          : CAMPAIGN_EVIL_MUSIC);
+        m_campaignType == CAMPAIGN_ROLAND ? CAMPAIGN_GOOD_MUSIC : CAMPAIGN_EVIL_MUSIC
+    );
     CampaignInfoUpdate(0);
     gpWindowManager->DoDialog(campWin, CampaignHandler, 0);
     delete campWin;
     gbUseEvilInterface = savedInterface;
 
     if (gpWindowManager->m_dialogResult == CAMPAIGN_DIALOG_RESTART) {
-        NormalDialog("Are you sure you want to restart this scenario?",
-                     CAMPAIGN_RESTART_CONFIRM,
-                     CAMPAIGN_DIALOG_NO_RESOURCE, CAMPAIGN_DIALOG_NO_RESOURCE,
-                     CAMPAIGN_DIALOG_NO_RESOURCE, 0,
-                     CAMPAIGN_DIALOG_NO_RESOURCE, 0,
-                     CAMPAIGN_DIALOG_NO_RESOURCE, 0);
+        NormalDialog(
+            "Are you sure you want to restart this scenario?",
+            CAMPAIGN_RESTART_CONFIRM,
+            CAMPAIGN_DIALOG_NO_RESOURCE,
+            CAMPAIGN_DIALOG_NO_RESOURCE,
+            CAMPAIGN_DIALOG_NO_RESOURCE,
+            0,
+            CAMPAIGN_DIALOG_NO_RESOURCE,
+            0,
+            CAMPAIGN_DIALOG_NO_RESOURCE,
+            0
+        );
         if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
             InitCampaignMap();
             gpAdvManager->m_visibilityMapValid = 0;
@@ -368,21 +406,19 @@ void game::ShowCampaignInfo(i32 viewOnly, i32)
 // and the exact pointer-add axis. Revisit only after a relevant Campaign source,
 // TU/header, or comparison epoch changes index evaluation/compiler state.
 VA(0x00448443, 0xa0f)
-void game::CampaignInfoUpdate(i32 redraw)
-{
+void game::CampaignInfoUpdate(i32 redraw) {
     i32 map;
     tag_message message;
-    SCampaignChoice *choice;
+    SCampaignChoice* choice;
     char armyName[CAMPAIGN_ARMY_NAME_BUFFER_SIZE];
 
     message.type = MESSAGE_WIDGET;
     for (map = 0; map < CAMPAIGN_TRACK_POINT_COUNT; ++map) {
         if (m_campaignMapEnabled[iCurViewSide][map]) {
             message.payload.widget.data.value = CAMPAIGN_TRACK_FRAME_COMPLETE;
-        } else if (map < CAMPAIGN_REGULAR_MAP_COUNT &&
-                   m_campaignScenarioCompleted[
-                       map < 4 ? m_campaignStartingSide
-                               : m_campaignType][map]) {
+        } else if (map < CAMPAIGN_REGULAR_MAP_COUNT
+                   && m_campaignScenarioCompleted[map < 4 ? m_campaignStartingSide : m_campaignType]
+                                                 [map]) {
             message.payload.widget.data.value = CAMPAIGN_TRACK_FRAME_AVAILABLE;
         } else {
             message.payload.widget.data.value = CAMPAIGN_TRACK_FRAME_LOCKED;
@@ -430,12 +466,10 @@ void game::CampaignInfoUpdate(i32 redraw)
 
     message.payload.widget.id = CAMPAIGN_SCENARIO_NAME_WIDGET;
     if (iCurViewMap == CAMPAIGN_SWITCHING_MAP) {
-        sprintf(gText, "%s", cCampaignName[1 - iCurViewSide]
-                                            [iCurViewMap]);
-    } else if (m_campaignType != m_campaignStartingSide &&
-               iCurViewMap == CAMPAIGN_SWITCHING_SCENARIO) {
-        sprintf(gText, "%s", cCampaignName[iCurViewSide]
-                                            [CAMPAIGN_SWITCHING_MAP]);
+        sprintf(gText, "%s", cCampaignName[1 - iCurViewSide][iCurViewMap]);
+    } else if (m_campaignType != m_campaignStartingSide
+               && iCurViewMap == CAMPAIGN_SWITCHING_SCENARIO) {
+        sprintf(gText, "%s", cCampaignName[iCurViewSide][CAMPAIGN_SWITCHING_MAP]);
     } else {
         sprintf(gText, "%s", cCampaignName[iCurViewSide][iCurViewMap]);
     }
@@ -443,12 +477,10 @@ void game::CampaignInfoUpdate(i32 redraw)
 
     message.payload.widget.id = CAMPAIGN_SCENARIO_DESCRIPTION_WIDGET;
     if (iCurViewMap == CAMPAIGN_SWITCHING_MAP) {
-        sprintf(gText, "%s", cCampaignDescription[1 - iCurViewSide]
-                                                   [iCurViewMap]);
-    } else if (m_campaignType != m_campaignStartingSide &&
-               iCurViewMap == CAMPAIGN_SWITCHING_SCENARIO) {
-        sprintf(gText, "%s", cCampaignDescription[iCurViewSide]
-                                                   [CAMPAIGN_SWITCHING_MAP]);
+        sprintf(gText, "%s", cCampaignDescription[1 - iCurViewSide][iCurViewMap]);
+    } else if (m_campaignType != m_campaignStartingSide
+               && iCurViewMap == CAMPAIGN_SWITCHING_SCENARIO) {
+        sprintf(gText, "%s", cCampaignDescription[iCurViewSide][CAMPAIGN_SWITCHING_MAP]);
     } else {
         sprintf(gText, "%s", cCampaignDescription[iCurViewSide][iCurViewMap]);
     }
@@ -471,63 +503,84 @@ void game::CampaignInfoUpdate(i32 redraw)
     for (map = 0; map < CAMPAIGN_BONUS_CHOICE_COUNT; ++map) {
         if (iCurViewMap == CAMPAIGN_SWITCHING_MAP) {
             choice = &campaignChoices[1 - iCurViewSide][iCurViewMap][map];
-        } else if (m_campaignType != m_campaignStartingSide &&
-                   iCurViewMap == CAMPAIGN_SWITCHING_SCENARIO) {
-            choice = &campaignChoices[iCurViewSide]
-                                     [CAMPAIGN_SWITCHING_MAP][map];
+        } else if (m_campaignType != m_campaignStartingSide
+                   && iCurViewMap == CAMPAIGN_SWITCHING_SCENARIO) {
+            choice = &campaignChoices[iCurViewSide][CAMPAIGN_SWITCHING_MAP][map];
         } else {
             choice = &campaignChoices[iCurViewSide][iCurViewMap][map];
         }
 
         switch (choice->type) {
-        case CAMPAIGN_CHOICE_RESOURCE:
-            sprintf(gText, "%d %s", choice->amount,
-                    gResourceNames[choice->value]);
-            break;
-        case CAMPAIGN_CHOICE_ARTIFACT:
-            switch (choice->value) {
-            case ARTIFACT_MAGE_RING: strcpy(gText, "Mage's Ring"); break;
-            case ARTIFACT_FIZBIN_OF_MISFORTUNE: strcpy(gText, "Fizbin Medal"); break;
-            case ARTIFACT_THUNDER_MACE: strcpy(gText, "Thunder Mace"); break;
-            case ARTIFACT_ARMORED_GAUNTLETS: strcpy(gText, "Gauntlets"); break;
-            case ARTIFACT_DEFENDER_HELM: strcpy(gText, "Defender Helm"); break;
-            case ARTIFACT_DRAGON_SWORD: strcpy(gText, "Dragon Sword"); break;
-            case ARTIFACT_POWER_AXE: strcpy(gText, "Power Axe"); break;
-            case ARTIFACT_DIVINE_BREASTPLATE: strcpy(gText, "Breastplate"); break;
-            case ARTIFACT_MINOR_SCROLL: strcpy(gText, "Minor Scroll"); break;
-            case ARTIFACT_HIDEOUS_MASK:
-            case ARTIFACT_BLACK_PEARL:
-            default: sprintf(gText, "%s", gArtifactNames[choice->value]); break;
-            }
-            break;
-        case CAMPAIGN_CHOICE_SPELL:
-            if (choice->value == SPELL_SUMMON_EARTH_ELEMENTAL)
-                sprintf(gText, "Summon Earth");
-            else
-                sprintf(gText, "%s", gSpellNames[choice->value]);
-            break;
-        case CAMPAIGN_CHOICE_SECONDARY_SKILL:
-            sprintf(gText, "%s %s",
+            case CAMPAIGN_CHOICE_RESOURCE:
+                sprintf(gText, "%d %s", choice->amount, gResourceNames[choice->value]);
+                break;
+            case CAMPAIGN_CHOICE_ARTIFACT:
+                switch (choice->value) {
+                    case ARTIFACT_MAGE_RING:
+                        strcpy(gText, "Mage's Ring");
+                        break;
+                    case ARTIFACT_FIZBIN_OF_MISFORTUNE:
+                        strcpy(gText, "Fizbin Medal");
+                        break;
+                    case ARTIFACT_THUNDER_MACE:
+                        strcpy(gText, "Thunder Mace");
+                        break;
+                    case ARTIFACT_ARMORED_GAUNTLETS:
+                        strcpy(gText, "Gauntlets");
+                        break;
+                    case ARTIFACT_DEFENDER_HELM:
+                        strcpy(gText, "Defender Helm");
+                        break;
+                    case ARTIFACT_DRAGON_SWORD:
+                        strcpy(gText, "Dragon Sword");
+                        break;
+                    case ARTIFACT_POWER_AXE:
+                        strcpy(gText, "Power Axe");
+                        break;
+                    case ARTIFACT_DIVINE_BREASTPLATE:
+                        strcpy(gText, "Breastplate");
+                        break;
+                    case ARTIFACT_MINOR_SCROLL:
+                        strcpy(gText, "Minor Scroll");
+                        break;
+                    case ARTIFACT_HIDEOUS_MASK:
+                    case ARTIFACT_BLACK_PEARL:
+                    default:
+                        sprintf(gText, "%s", gArtifactNames[choice->value]);
+                        break;
+                }
+                break;
+            case CAMPAIGN_CHOICE_SPELL:
+                if (choice->value == SPELL_SUMMON_EARTH_ELEMENTAL)
+                    sprintf(gText, "Summon Earth");
+                else
+                    sprintf(gText, "%s", gSpellNames[choice->value]);
+                break;
+            case CAMPAIGN_CHOICE_SECONDARY_SKILL:
+                sprintf(
+                    gText,
+                    "%s %s",
                     gSecondarySkillLevels[choice->amount - 1],
-                    gSecondarySkills[choice->value]);
-            break;
-        case CAMPAIGN_CHOICE_CREATURES:
-            strcpy(armyName, gArmyNamesPlural[choice->value]);
-            armyName[0] -= 'a' - 'A';
-            sprintf(gText, "%d %s", choice->amount, armyName);
-            break;
-        case CAMPAIGN_CHOICE_PUZZLE_PIECES:
-            sprintf(gText, "%d %s", choice->value, "Puzzle Pieces");
-            break;
-        case CAMPAIGN_CHOICE_EXPERIENCE:
-            sprintf(gText, "%d %s", choice->value, "Experience");
-            break;
-        case CAMPAIGN_CHOICE_NONE:
-            sprintf(gText, "n/a");
-            break;
-        case CAMPAIGN_CHOICE_ALIGNMENT:
-            sprintf(gText, gAlignmentNames[choice->value]);
-            break;
+                    gSecondarySkills[choice->value]
+                );
+                break;
+            case CAMPAIGN_CHOICE_CREATURES:
+                strcpy(armyName, gArmyNamesPlural[choice->value]);
+                armyName[0] -= 'a' - 'A';
+                sprintf(gText, "%d %s", choice->amount, armyName);
+                break;
+            case CAMPAIGN_CHOICE_PUZZLE_PIECES:
+                sprintf(gText, "%d %s", choice->value, "Puzzle Pieces");
+                break;
+            case CAMPAIGN_CHOICE_EXPERIENCE:
+                sprintf(gText, "%d %s", choice->value, "Experience");
+                break;
+            case CAMPAIGN_CHOICE_NONE:
+                sprintf(gText, "n/a");
+                break;
+            case CAMPAIGN_CHOICE_ALIGNMENT:
+                sprintf(gText, gAlignmentNames[choice->value]);
+                break;
         }
         message.payload.widget.id = map + CAMPAIGN_BONUS_TEXT_WIDGET_FIRST;
         campWin->BroadcastMessage(message);
@@ -536,8 +589,7 @@ void game::CampaignInfoUpdate(i32 redraw)
     for (map = 0; map < CAMPAIGN_BONUS_CHOICE_COUNT; ++map) {
         message.payload.widget.id = map + CAMPAIGN_BONUS_WIDGET_FIRST;
         message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
-        if (!bCampaignViewOnly &&
-            gpGame->m_campaignMapEnabled[iCurViewSide][iCurViewMap])
+        if (!bCampaignViewOnly && gpGame->m_campaignMapEnabled[iCurViewSide][iCurViewMap])
             message.payload.widget.data.value = CAMPAIGN_WIDGET_ENABLE_FRAME;
         else
             message.payload.widget.data.value = CAMPAIGN_WIDGET_DISABLE_FRAME;
@@ -563,13 +615,11 @@ void game::CampaignInfoUpdate(i32 redraw)
 // axis; switch arm order was also stagnant. Revisit only after a relevant
 // Campaign source, TU/header, or comparison epoch changes compiler state.
 VA(0x00448e52, 0x521)
-i32 CampaignHandler(struct tag_message &message)
-{
+i32 CampaignHandler(struct tag_message& message) {
     i32 map;
 
     if (!gpSoundManager->MusicPlaying() && gpAdvManager->m_active == 1)
-        gpSoundManager->SwitchAmbientMusic(
-            giTerrainToMusicTrack[gpAdvManager->m_currentTerrain]);
+        gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[gpAdvManager->m_currentTerrain]);
     if (giDialogTimeout != 0 && giDialogTimeout < KBTickCount()) {
         message.type = MESSAGE_WIDGET;
         gpWindowManager->m_dialogResult = message.payload.widget.id;
@@ -579,107 +629,110 @@ i32 CampaignHandler(struct tag_message &message)
         return CAMPAIGN_HANDLER_CLOSE;
     }
     if (message.type == MESSAGE_WIDGET) {
-      switch (message.payload.widget.command) {
-    case CAMPAIGN_MESSAGE_HOVER:
-    case CAMPAIGN_MESSAGE_HELP:
-        switch (message.payload.widget.id) {
-        case CAMPAIGN_TRACK_WIDGET_FIRST:
-        case CAMPAIGN_TRACK_WIDGET_FIRST + 1:
-        case CAMPAIGN_TRACK_WIDGET_FIRST + 2:
-        case CAMPAIGN_TRACK_WIDGET_FIRST + 3:
-        case CAMPAIGN_TRACK_WIDGET_FIRST + 4:
-        case CAMPAIGN_TRACK_WIDGET_FIRST + 5:
-        case CAMPAIGN_TRACK_WIDGET_FIRST + 6:
-        case CAMPAIGN_TRACK_WIDGET_FIRST + 7:
-        case CAMPAIGN_TRACK_WIDGET_FIRST + 8:
-        case CAMPAIGN_TRACK_WIDGET_FIRST + 9:
-        case CAMPAIGN_TRACK_WIDGET_FIRST + 10:
-        case CAMPAIGN_TRACK_WIDGET_LAST:
-            map = message.payload.widget.id - CAMPAIGN_TRACK_WIDGET_FIRST;
-            if (giDebugLevel < 1 &&
-                !gpGame->m_campaignMapEnabled[iCurViewSide][map]) {
-                if (map >= CAMPAIGN_REGULAR_MAP_COUNT ||
-                    !gpGame->m_campaignScenarioCompleted[
-                        map < 4 ? gpGame->m_campaignStartingSide
-                                : gpGame->m_campaignType][map])
-                    break;
-            }
-            iCurViewMap = map;
-            iCurViewSide = iCurViewMap < 4 ? gpGame->m_campaignStartingSide
-                                           : gpGame->m_campaignType;
-            gpGame->CampaignInfoUpdate(1);
-            break;
-        case CAMPAIGN_BONUS_WIDGET_FIRST:
-        case CAMPAIGN_BONUS_WIDGET_FIRST + 1:
-        case CAMPAIGN_BONUS_WIDGET_LAST:
-            if (!bCampaignViewOnly &&
-                gpGame->m_campaignMapEnabled[iCurViewSide][iCurViewMap]) {
-                gpGame->m_campaignChoice[iCurViewSide][iCurViewMap] =
-                    static_cast<u8>(message.payload.widget.id -
-                                               CAMPAIGN_BONUS_WIDGET_FIRST);
-                gpGame->CampaignInfoUpdate(1);
-            }
-            break;
-        }
-        break;
-
-    case CAMPAIGN_MESSAGE_ACTIVATE:
-        switch (message.payload.widget.id) {
-        case CAMPAIGN_DIALOG_REPLAY:
-            gpGame->PlayPreScenarioSmacker(iCurViewSide, iCurViewMap);
-            campWin->DrawWindow();
-            break;
-        case CAMPAIGN_DIALOG_ACCEPT:
-            if (!bCampaignViewOnly) {
-                if (gpGame->m_campaignMapEnabled[iCurViewSide][iCurViewMap]) {
-                    if (iCurViewMap == CAMPAIGN_SWITCHING_MAP) {
-                        gpGame->m_campaignScenario = CAMPAIGN_SWITCHING_SCENARIO;
-                        gpGame->m_campaignType = static_cast<u8>(
-                            1 - gpGame->m_campaignType);
-                        gpGame->m_campaignMapEnabled[gpGame->m_campaignType]
-                                                    [gpGame->m_campaignScenario] = 1;
-                        gpGame->m_campaignScenarioBonus[gpGame->m_campaignType]
-                                                     [gpGame->m_campaignScenario] =
-                            gpGame->m_campaignScore;
-                        gpGame->m_campaignChoice[gpGame->m_campaignType]
-                                                [gpGame->m_campaignScenario] =
-                            gpGame->m_campaignChoice[1 - gpGame->m_campaignType]
-                                                    [CAMPAIGN_SWITCHING_MAP];
-                        for (map = 0; map < CAMPAIGN_AWARD_COUNT; ++map)
-                            gpGame->m_campaignAwards[map] = 0;
-                    } else {
-                        gpGame->m_campaignScenario =
-                            static_cast<i8>(iCurViewMap);
-                        gpGame->m_campaignType =
-                            static_cast<u8>(iCurViewSide);
-                    }
-                } else {
-                    NormalDialog(
-                        "The currently selected map is not a valid choice for your next scenario.",
-                        NORMAL_DIALOG_INFO, NORMAL_DIALOG_NO_RESOURCE,
-                        NORMAL_DIALOG_NO_RESOURCE, NORMAL_DIALOG_NO_RESOURCE,
-                        0, NORMAL_DIALOG_NO_RESOURCE, 0,
-                        NORMAL_DIALOG_NO_RESOURCE, 0);
-                    break;
+        switch (message.payload.widget.command) {
+            case CAMPAIGN_MESSAGE_HOVER:
+            case CAMPAIGN_MESSAGE_HELP:
+                switch (message.payload.widget.id) {
+                    case CAMPAIGN_TRACK_WIDGET_FIRST:
+                    case CAMPAIGN_TRACK_WIDGET_FIRST + 1:
+                    case CAMPAIGN_TRACK_WIDGET_FIRST + 2:
+                    case CAMPAIGN_TRACK_WIDGET_FIRST + 3:
+                    case CAMPAIGN_TRACK_WIDGET_FIRST + 4:
+                    case CAMPAIGN_TRACK_WIDGET_FIRST + 5:
+                    case CAMPAIGN_TRACK_WIDGET_FIRST + 6:
+                    case CAMPAIGN_TRACK_WIDGET_FIRST + 7:
+                    case CAMPAIGN_TRACK_WIDGET_FIRST + 8:
+                    case CAMPAIGN_TRACK_WIDGET_FIRST + 9:
+                    case CAMPAIGN_TRACK_WIDGET_FIRST + 10:
+                    case CAMPAIGN_TRACK_WIDGET_LAST:
+                        map = message.payload.widget.id - CAMPAIGN_TRACK_WIDGET_FIRST;
+                        if (giDebugLevel < 1 && !gpGame->m_campaignMapEnabled[iCurViewSide][map]) {
+                            if (map >= CAMPAIGN_REGULAR_MAP_COUNT
+                                || !gpGame->m_campaignScenarioCompleted
+                                        [map < 4 ? gpGame->m_campaignStartingSide
+                                                 : gpGame->m_campaignType][map])
+                                break;
+                        }
+                        iCurViewMap = map;
+                        iCurViewSide = iCurViewMap < 4 ? gpGame->m_campaignStartingSide
+                                                       : gpGame->m_campaignType;
+                        gpGame->CampaignInfoUpdate(1);
+                        break;
+                    case CAMPAIGN_BONUS_WIDGET_FIRST:
+                    case CAMPAIGN_BONUS_WIDGET_FIRST + 1:
+                    case CAMPAIGN_BONUS_WIDGET_LAST:
+                        if (!bCampaignViewOnly
+                            && gpGame->m_campaignMapEnabled[iCurViewSide][iCurViewMap]) {
+                            gpGame->m_campaignChoice[iCurViewSide][iCurViewMap] = static_cast<u8>(
+                                message.payload.widget.id - CAMPAIGN_BONUS_WIDGET_FIRST
+                            );
+                            gpGame->CampaignInfoUpdate(1);
+                        }
+                        break;
                 }
-            }
-        case CAMPAIGN_DIALOG_CANCEL:
-        case CAMPAIGN_DIALOG_RESTART:
-            gpWindowManager->m_dialogResult = message.payload.widget.id;
-            message.payload.widget.id = CAMPAIGN_CLOSE_COMMAND;
-            message.payload.widget.command = message.payload.widget.id;
-            giDialogTimeout = 0;
-            return CAMPAIGN_HANDLER_CLOSE;
+                break;
+
+            case CAMPAIGN_MESSAGE_ACTIVATE:
+                switch (message.payload.widget.id) {
+                    case CAMPAIGN_DIALOG_REPLAY:
+                        gpGame->PlayPreScenarioSmacker(iCurViewSide, iCurViewMap);
+                        campWin->DrawWindow();
+                        break;
+                    case CAMPAIGN_DIALOG_ACCEPT:
+                        if (!bCampaignViewOnly) {
+                            if (gpGame->m_campaignMapEnabled[iCurViewSide][iCurViewMap]) {
+                                if (iCurViewMap == CAMPAIGN_SWITCHING_MAP) {
+                                    gpGame->m_campaignScenario = CAMPAIGN_SWITCHING_SCENARIO;
+                                    gpGame->m_campaignType =
+                                        static_cast<u8>(1 - gpGame->m_campaignType);
+                                    gpGame->m_campaignMapEnabled[gpGame->m_campaignType]
+                                                                [gpGame->m_campaignScenario] = 1;
+                                    gpGame->m_campaignScenarioBonus[gpGame->m_campaignType]
+                                                                   [gpGame->m_campaignScenario] =
+                                        gpGame->m_campaignScore;
+                                    gpGame->m_campaignChoice[gpGame->m_campaignType]
+                                                            [gpGame->m_campaignScenario] =
+                                        gpGame->m_campaignChoice[1 - gpGame->m_campaignType]
+                                                                [CAMPAIGN_SWITCHING_MAP];
+                                    for (map = 0; map < CAMPAIGN_AWARD_COUNT; ++map)
+                                        gpGame->m_campaignAwards[map] = 0;
+                                } else {
+                                    gpGame->m_campaignScenario = static_cast<i8>(iCurViewMap);
+                                    gpGame->m_campaignType = static_cast<u8>(iCurViewSide);
+                                }
+                            } else {
+                                NormalDialog(
+                                    "The currently selected map is not a valid choice for your "
+                                    "next scenario.",
+                                    NORMAL_DIALOG_INFO,
+                                    NORMAL_DIALOG_NO_RESOURCE,
+                                    NORMAL_DIALOG_NO_RESOURCE,
+                                    NORMAL_DIALOG_NO_RESOURCE,
+                                    0,
+                                    NORMAL_DIALOG_NO_RESOURCE,
+                                    0,
+                                    NORMAL_DIALOG_NO_RESOURCE,
+                                    0
+                                );
+                                break;
+                            }
+                        }
+                    case CAMPAIGN_DIALOG_CANCEL:
+                    case CAMPAIGN_DIALOG_RESTART:
+                        gpWindowManager->m_dialogResult = message.payload.widget.id;
+                        message.payload.widget.id = CAMPAIGN_CLOSE_COMMAND;
+                        message.payload.widget.command = message.payload.widget.id;
+                        giDialogTimeout = 0;
+                        return CAMPAIGN_HANDLER_CLOSE;
+                }
+                break;
         }
-        break;
-      }
     }
     return CAMPAIGN_HANDLER_CONTINUE;
 }
 
 VA(0x00449373, 0x47)
-void game::InitEntireCampaign(i32 side)
-{
+void game::InitEntireCampaign(i32 side) {
     memset(&m_campaignType, 0, CAMPAIGN_STATE_RESET_SIZE);
     m_campaignType = static_cast<u8>(side);
     m_campaignStartingSide = static_cast<u8>(side);
@@ -695,14 +748,13 @@ void game::InitEntireCampaign(i32 side)
 // a relevant Campaign source, TU/header, or comparison epoch changes compiler
 // state.
 VA(0x004493ba, 0xbb7)
-void game::InitCampaignMap(void)
-{
+void game::InitCampaignMap(void) {
     i32 selectedChoicePosition;
-    SCampaignChoice *choiceBest;
+    SCampaignChoice* choiceBest;
     i32 mapHeaderResultCampaign;
     i32 playerSlotSlot;
     i32 bestHeroPositionCandidate;
-    playerData *campaignPlayerCurrent;
+    playerData* campaignPlayerCurrent;
     i32 heroPositionValue;
     i32 scanPositionId;
     i32 heroPriorityBest;
@@ -711,26 +763,29 @@ void game::InitCampaignMap(void)
     i32 bonusHeroIndexPosition;
 
     selectedChoicePosition = m_campaignChoice[iCurViewSide][iCurViewMap];
-    if (m_campaignType != m_campaignStartingSide &&
-        iCurViewMap == CAMPAIGN_SWITCHING_SCENARIO) {
-        choiceBest = &campaignChoices[iCurViewSide][CAMPAIGN_SWITCHING_MAP]
-                                     [selectedChoicePosition];
+    if (m_campaignType != m_campaignStartingSide && iCurViewMap == CAMPAIGN_SWITCHING_SCENARIO) {
+        choiceBest = &campaignChoices[iCurViewSide][CAMPAIGN_SWITCHING_MAP][selectedChoicePosition];
     } else {
-        choiceBest = &campaignChoices[m_campaignType][m_campaignScenario]
-                                     [selectedChoicePosition];
+        choiceBest = &campaignChoices[m_campaignType][m_campaignScenario][selectedChoicePosition];
     }
 
     gpGame->m_campaignScenarioWon = 0;
     memset(m_setupPlayerColor, 0, CAMPAIGN_SETUP_RESET_SIZE);
-    if (m_campaignScenario + 1 == CAMPAIGN_SWITCHING_SCENARIO + 1 &&
-        m_campaignStartingSide != m_campaignType) {
-        sprintf(m_mapFilename, "CAMP%c%02dB.H2C",
-                m_campaignType == CAMPAIGN_ROLAND ? 'E' : 'G',
-                m_campaignScenario + 1);
+    if (m_campaignScenario + 1 == CAMPAIGN_SWITCHING_SCENARIO + 1
+        && m_campaignStartingSide != m_campaignType) {
+        sprintf(
+            m_mapFilename,
+            "CAMP%c%02dB.H2C",
+            m_campaignType == CAMPAIGN_ROLAND ? 'E' : 'G',
+            m_campaignScenario + 1
+        );
     } else {
-        sprintf(m_mapFilename, "CAMP%c%02d.H2C",
-                m_campaignType == CAMPAIGN_ROLAND ? 'G' : 'E',
-                m_campaignScenario + 1);
+        sprintf(
+            m_mapFilename,
+            "CAMP%c%02d.H2C",
+            m_campaignType == CAMPAIGN_ROLAND ? 'G' : 'E',
+            m_campaignScenario + 1
+        );
     }
     m_newGameInitialized = 0;
     if (m_campaignScenario == 0)
@@ -748,8 +803,7 @@ void game::InitCampaignMap(void)
             if (m_mapHeader.playerEnabled[1])
                 ++playerSlotSlot;
         }
-        m_setupPlayerRace[playerSlotSlot] =
-            static_cast<i8>(choiceBest->value);
+        m_setupPlayerRace[playerSlotSlot] = static_cast<i8>(choiceBest->value);
     }
 
     if (m_campaignScenario + 1 <= CAMPAIGN_EASY_SCENARIO_LIMIT)
@@ -763,27 +817,23 @@ void game::InitCampaignMap(void)
 
     bestHeroPositionCandidate = 0;
     campaignPlayerCurrent = &gpGame->m_players[0];
-    for (heroPositionValue = 0;
-         heroPositionValue < campaignPlayerCurrent->m_heroCount;
+    for (heroPositionValue = 0; heroPositionValue < campaignPlayerCurrent->m_heroCount;
          ++heroPositionValue) {
         bestHeroPriorityLocal = -1;
         for (scanPositionId = heroPositionValue;
              scanPositionId < campaignPlayerCurrent->m_heroCount;
              ++scanPositionId) {
-            if (gpGame->m_heroRecs[
-                    campaignPlayerCurrent->m_heroIds[scanPositionId]].m_portrait ==
-                    CAMPAIGN_HERO_ROLAND ||
-                gpGame->m_heroRecs[
-                    campaignPlayerCurrent->m_heroIds[scanPositionId]].m_portrait ==
-                    CAMPAIGN_HERO_ARCHIBALD) {
+            if (gpGame->m_heroRecs[campaignPlayerCurrent->m_heroIds[scanPositionId]].m_portrait
+                    == CAMPAIGN_HERO_ROLAND
+                || gpGame->m_heroRecs[campaignPlayerCurrent->m_heroIds[scanPositionId]].m_portrait
+                       == CAMPAIGN_HERO_ARCHIBALD) {
                 heroPriorityBest = CAMPAIGN_HERO_PRIORITY_HIGH;
-            } else if (
-                gpGame->m_heroRecs[
-                    campaignPlayerCurrent->m_heroIds[scanPositionId]].m_portrait ==
-                    CAMPAIGN_HERO_CORLAGON ||
-                gpGame->m_heroRecs[
-                    campaignPlayerCurrent->m_heroIds[scanPositionId]].m_portrait ==
-                    CAMPAIGN_HERO_HALTON) {
+            } else if (gpGame->m_heroRecs[campaignPlayerCurrent->m_heroIds[scanPositionId]]
+                               .m_portrait
+                           == CAMPAIGN_HERO_CORLAGON
+                       || gpGame->m_heroRecs[campaignPlayerCurrent->m_heroIds[scanPositionId]]
+                                  .m_portrait
+                              == CAMPAIGN_HERO_HALTON) {
                 heroPriorityBest = CAMPAIGN_HERO_PRIORITY_NORMAL;
             } else {
                 heroPriorityBest = 0;
@@ -805,78 +855,68 @@ void game::InitCampaignMap(void)
         campaignPlayerCurrent->m_currentHero = campaignPlayerCurrent->m_heroIds[0];
 
     switch (choiceBest->type) {
-    case CAMPAIGN_CHOICE_RESOURCE:
-        m_players[0].m_resources[choiceBest->value] += choiceBest->amount;
-        break;
-    case CAMPAIGN_CHOICE_ARTIFACT:
-        if (m_players[0].m_heroCount > 0)
-            GiveArtifact(gpGame->GetHero(m_players[0].m_heroIds[0]),
-                         choiceBest->value, 0, -1);
-        break;
-    case CAMPAIGN_CHOICE_SPELL:
-        if (m_players[0].m_heroCount > 0) {
-            bonusHeroIndexPosition = 0;
-            if (m_campaignType == CAMPAIGN_ROLAND &&
-                m_campaignScenario + 1 == 6 &&
-                m_players[0].m_heroCount > 1)
-                bonusHeroIndexPosition = 1;
-            gpGame->GetHero(
-                m_players[0].m_heroIds[bonusHeroIndexPosition])
-                ->m_spells[choiceBest->value] = 1;
+        case CAMPAIGN_CHOICE_RESOURCE:
+            m_players[0].m_resources[choiceBest->value] += choiceBest->amount;
+            break;
+        case CAMPAIGN_CHOICE_ARTIFACT:
+            if (m_players[0].m_heroCount > 0)
+                GiveArtifact(gpGame->GetHero(m_players[0].m_heroIds[0]), choiceBest->value, 0, -1);
+            break;
+        case CAMPAIGN_CHOICE_SPELL:
+            if (m_players[0].m_heroCount > 0) {
+                bonusHeroIndexPosition = 0;
+                if (m_campaignType == CAMPAIGN_ROLAND && m_campaignScenario + 1 == 6
+                    && m_players[0].m_heroCount > 1)
+                    bonusHeroIndexPosition = 1;
+                gpGame->GetHero(m_players[0].m_heroIds[bonusHeroIndexPosition])
+                    ->m_spells[choiceBest->value] = 1;
+            }
+            break;
+        case CAMPAIGN_CHOICE_SECONDARY_SKILL:
+            if (m_players[0].m_heroCount > 0)
+                gpGame->GetHero(m_players[0].m_heroIds[0])
+                    ->SetSS(choiceBest->value, choiceBest->amount);
+            break;
+        case CAMPAIGN_CHOICE_CREATURES:
+            if (m_players[0].m_heroCount > 0)
+                gpGame->GetHero(m_players[0].m_heroIds[0])
+                    ->m_army.Add(choiceBest->value, choiceBest->amount, -1);
+            break;
+        case CAMPAIGN_CHOICE_PUZZLE_PIECES:
+            m_players[0].m_cheatValue = static_cast<i8>(choiceBest->value);
+            break;
+        case CAMPAIGN_CHOICE_EXPERIENCE: {
+            i32 savedNewGameSetup = gbInNewGameSetup;
+            gbInNewGameSetup = 1;
+            if (m_players[0].m_heroCount > 0) {
+                gpGame->GetHero(m_players[0].m_heroIds[0])->m_experience += choiceBest->value;
+                gpGame->GetHero(m_players[0].m_heroIds[0])->CheckLevel();
+            }
+            gbInNewGameSetup = savedNewGameSetup;
+            break;
         }
-        break;
-    case CAMPAIGN_CHOICE_SECONDARY_SKILL:
-        if (m_players[0].m_heroCount > 0)
-            gpGame->GetHero(m_players[0].m_heroIds[0])
-                ->SetSS(choiceBest->value, choiceBest->amount);
-        break;
-    case CAMPAIGN_CHOICE_CREATURES:
-        if (m_players[0].m_heroCount > 0)
-            gpGame->GetHero(m_players[0].m_heroIds[0])->m_army.Add(
-                choiceBest->value, choiceBest->amount, -1);
-        break;
-    case CAMPAIGN_CHOICE_PUZZLE_PIECES:
-        m_players[0].m_cheatValue =
-            static_cast<i8>(choiceBest->value);
-        break;
-    case CAMPAIGN_CHOICE_EXPERIENCE: {
-        i32 savedNewGameSetup = gbInNewGameSetup;
-        gbInNewGameSetup = 1;
-        if (m_players[0].m_heroCount > 0) {
-            gpGame->GetHero(m_players[0].m_heroIds[0])->m_experience +=
-                choiceBest->value;
-            gpGame->GetHero(m_players[0].m_heroIds[0])->CheckLevel();
-        }
-        gbInNewGameSetup = savedNewGameSetup;
-        break;
-    }
-    case CAMPAIGN_CHOICE_NONE:
-        break;
+        case CAMPAIGN_CHOICE_NONE:
+            break;
     }
 
-    if ((m_campaignAwards[CAMPAIGN_AWARD_ARCHIBALD_ULTIMATE_CROWN] ||
-         (m_campaignAwards[CAMPAIGN_AWARD_ROLAND_ULTIMATE_CROWN] &&
-          m_campaignScenario + 1 == CAMPAIGN_ROLAND_FINAL_SCENARIO + 1)) &&
-        m_players[0].m_heroCount > 0) {
-        GiveArtifact(gpGame->GetHero(m_players[0].m_heroIds[0]),
-                     ARTIFACT_ULTIMATE_CROWN, 0, -1);
+    if ((m_campaignAwards[CAMPAIGN_AWARD_ARCHIBALD_ULTIMATE_CROWN]
+         || (m_campaignAwards[CAMPAIGN_AWARD_ROLAND_ULTIMATE_CROWN]
+             && m_campaignScenario + 1 == CAMPAIGN_ROLAND_FINAL_SCENARIO + 1))
+        && m_players[0].m_heroCount > 0) {
+        GiveArtifact(gpGame->GetHero(m_players[0].m_heroIds[0]), ARTIFACT_ULTIMATE_CROWN, 0, -1);
     }
     gbRetreatWin = 1;
 
     if (m_campaignAwards[CAMPAIGN_AWARD_CORLAGON_DEFEATED]) {
-        for (heroPositionValue = 0; heroPositionValue < CAMPAIGN_HERO_COUNT;
-             ++heroPositionValue) {
-            if (gpGame->m_heroRecs[heroPositionValue].m_portrait ==
-                CAMPAIGN_HERO_CORLAGON)
+        for (heroPositionValue = 0; heroPositionValue < CAMPAIGN_HERO_COUNT; ++heroPositionValue) {
+            if (gpGame->m_heroRecs[heroPositionValue].m_portrait == CAMPAIGN_HERO_CORLAGON)
                 gpGame->m_heroRecs[heroPositionValue].Deallocate(0);
         }
     }
 
     if (m_campaignAwards[CAMPAIGN_AWARD_ROLAND_STRENGTHENED]) {
-        hero *armyHero = gpGame->GetHero(
-            m_players[CAMPAIGN_CARRYOVER_PLAYER].m_heroIds[0]);
-        for (heroPositionValue = 0;
-             heroPositionValue < CAMPAIGN_ARMY_SLOT_COUNT;
+        hero* armyHero = gpGame->GetHero(m_players[CAMPAIGN_CARRYOVER_PLAYER].m_heroIds[0]);
+        for (heroPositionValue = 0; heroPositionValue < CAMPAIGN_ARMY_SLOT_COUNT;
              ++heroPositionValue) {
             if (armyHero->m_army.m_creatureCounts[heroPositionValue] > 0)
                 armyHero->m_army.m_creatureCounts[heroPositionValue] *=
@@ -884,83 +924,64 @@ void game::InitCampaignMap(void)
         }
     }
 
-    if (m_campaignScenario + 1 == 7 &&
-        m_campaignType == CAMPAIGN_ARCHIBALD) {
+    if (m_campaignScenario + 1 == 7 && m_campaignType == CAMPAIGN_ARCHIBALD) {
         i32 savedNewGameSetup = gbInNewGameSetup;
-        hero *armyHero;
+        hero* armyHero;
         gbInNewGameSetup = 1;
         armyHero = gpGame->GetHero(m_players[0].m_heroIds[0]);
-        for (heroPositionValue = 0;
-             heroPositionValue < CAMPAIGN_ARMY_SLOT_COUNT;
+        for (heroPositionValue = 0; heroPositionValue < CAMPAIGN_ARMY_SLOT_COUNT;
              ++heroPositionValue) {
-            armyHero->m_army.m_creatureTypes[heroPositionValue] =
-                ARMY_GROUP_EMPTY_SLOT;
+            armyHero->m_army.m_creatureTypes[heroPositionValue] = ARMY_GROUP_EMPTY_SLOT;
             armyHero->m_army.m_creatureCounts[heroPositionValue] = 0;
         }
         switch (armyHero->m_cursorType) {
-        case FACTION_BARBARIAN:
-            armyHero->m_army.Add(CREATURE_ORC_CHIEF,
-                                 CAMPAIGN_BARBARIAN_ORC_CHIEF_COUNT, -1);
-            armyHero->m_army.Add(CREATURE_OGRE,
-                                 CAMPAIGN_BARBARIAN_OGRE_COUNT, -1);
-            armyHero->m_army.Add(CREATURE_GOBLIN,
-                                 CAMPAIGN_BARBARIAN_GOBLIN_COUNT, -1);
-            break;
-        case FACTION_WARLOCK:
-            armyHero->m_army.Add(CREATURE_CENTAUR,
-                                 CAMPAIGN_WARLOCK_CENTAUR_COUNT, -1);
-            armyHero->m_army.Add(CREATURE_GARGOYLE,
-                                 CAMPAIGN_WARLOCK_GARGOYLE_COUNT, -1);
-            armyHero->m_army.Add(CREATURE_GRIFFIN,
-                                 CAMPAIGN_WARLOCK_GRIFFIN_COUNT, -1);
-            break;
-        case FACTION_NECROMANCER:
-            armyHero->m_army.Add(CREATURE_SKELETON,
-                                 CAMPAIGN_NECROMANCER_SKELETON_COUNT, -1);
-            armyHero->m_army.Add(CREATURE_ROYAL_MUMMY,
-                                 CAMPAIGN_NECROMANCER_MUMMY_COUNT, -1);
-            armyHero->m_army.Add(CREATURE_VAMPIRE_LORD,
-                                 CAMPAIGN_NECROMANCER_VAMPIRE_COUNT, -1);
-            break;
+            case FACTION_BARBARIAN:
+                armyHero->m_army.Add(CREATURE_ORC_CHIEF, CAMPAIGN_BARBARIAN_ORC_CHIEF_COUNT, -1);
+                armyHero->m_army.Add(CREATURE_OGRE, CAMPAIGN_BARBARIAN_OGRE_COUNT, -1);
+                armyHero->m_army.Add(CREATURE_GOBLIN, CAMPAIGN_BARBARIAN_GOBLIN_COUNT, -1);
+                break;
+            case FACTION_WARLOCK:
+                armyHero->m_army.Add(CREATURE_CENTAUR, CAMPAIGN_WARLOCK_CENTAUR_COUNT, -1);
+                armyHero->m_army.Add(CREATURE_GARGOYLE, CAMPAIGN_WARLOCK_GARGOYLE_COUNT, -1);
+                armyHero->m_army.Add(CREATURE_GRIFFIN, CAMPAIGN_WARLOCK_GRIFFIN_COUNT, -1);
+                break;
+            case FACTION_NECROMANCER:
+                armyHero->m_army.Add(CREATURE_SKELETON, CAMPAIGN_NECROMANCER_SKELETON_COUNT, -1);
+                armyHero->m_army.Add(CREATURE_ROYAL_MUMMY, CAMPAIGN_NECROMANCER_MUMMY_COUNT, -1);
+                armyHero->m_army.Add(CREATURE_VAMPIRE_LORD, CAMPAIGN_NECROMANCER_VAMPIRE_COUNT, -1);
+                break;
         }
-        gpGame->GetHero(m_players[0].m_heroIds[0])->m_experience +=
-            CAMPAIGN_EXPERIENCE_BONUS;
+        gpGame->GetHero(m_players[0].m_heroIds[0])->m_experience += CAMPAIGN_EXPERIENCE_BONUS;
         gpGame->GetHero(m_players[0].m_heroIds[0])->CheckLevel();
         gbInNewGameSetup = savedNewGameSetup;
     }
 
-    if ((m_campaignAwards[CAMPAIGN_AWARD_ROLAND_CARRYOVER_FORCES] &&
-         m_campaignScenario + 1 == CAMPAIGN_ROLAND_FINAL_SCENARIO + 1) ||
-        m_campaignAwards[CAMPAIGN_AWARD_ARCHIBALD_CARRYOVER_FORCES]) {
-        hero *armyHero = gpGame->GetHero(m_players[0].m_heroIds[0]);
-        for (heroPositionValue = 0;
-             heroPositionValue < CAMPAIGN_ARMY_SLOT_COUNT;
+    if ((m_campaignAwards[CAMPAIGN_AWARD_ROLAND_CARRYOVER_FORCES]
+         && m_campaignScenario + 1 == CAMPAIGN_ROLAND_FINAL_SCENARIO + 1)
+        || m_campaignAwards[CAMPAIGN_AWARD_ARCHIBALD_CARRYOVER_FORCES]) {
+        hero* armyHero = gpGame->GetHero(m_players[0].m_heroIds[0]);
+        for (heroPositionValue = 0; heroPositionValue < CAMPAIGN_ARMY_SLOT_COUNT;
              ++heroPositionValue) {
             armyHero->m_army.m_creatureTypes[heroPositionValue] =
-                static_cast<i8>(
-                    m_campaignCarryoverCreatureTypes[heroPositionValue]);
+                static_cast<i8>(m_campaignCarryoverCreatureTypes[heroPositionValue]);
             armyHero->m_army.m_creatureCounts[heroPositionValue] =
                 (m_campaignAwards[CAMPAIGN_AWARD_ROLAND_STRENGTHENED]
                      ? CAMPAIGN_TRIPLE_ARMY_MULTIPLIER
-                     : 1) *
-                m_campaignCarryoverCreatureCounts[heroPositionValue];
+                     : 1)
+                * m_campaignCarryoverCreatureCounts[heroPositionValue];
         }
     }
 
-    if (m_campaignType == CAMPAIGN_ARCHIBALD &&
-        m_campaignScenario + 1 == 6) {
+    if (m_campaignType == CAMPAIGN_ARCHIBALD && m_campaignScenario + 1 == 6) {
         gpGame->m_mapHeader.victoryCondition = MAP_VICTORY_DEFEAT_SIDE;
-        gpGame->m_mapHeader.victoryConditionValue =
-            CAMPAIGN_SWITCH_VICTORY_VALUE;
+        gpGame->m_mapHeader.victoryConditionValue = CAMPAIGN_SWITCH_VICTORY_VALUE;
         gpGame->m_mapHeader.allowNormalVictory = 1;
     }
-    if (m_campaignType == CAMPAIGN_ROLAND &&
-        m_campaignScenario + 1 == 9) {
+    if (m_campaignType == CAMPAIGN_ROLAND && m_campaignScenario + 1 == 9) {
         gpGame->m_mapHeader.lossCondition = MAP_LOSS_STANDARD;
         gpGame->m_mapHeader.lossConditionValue = 0;
     }
-    if (m_campaignType == CAMPAIGN_ROLAND &&
-        m_campaignScenario + 1 == 7)
+    if (m_campaignType == CAMPAIGN_ROLAND && m_campaignScenario + 1 == 7)
         gpGame->m_mapHeader.lossConditionValue = CAMPAIGN_ROLAND_TIME_LIMIT;
 }
 
@@ -972,13 +993,12 @@ void game::InitCampaignMap(void)
 // alignment bytes at +0x25d. All 65 retail HIGHLOW targets are owned: trackXY
 // uses addends 0/2, the final literal uses 0/8/0xc (two suffix references from
 // other code), and every other initialized-data reference uses addend zero.
-DATA(0x004f4f28) i16 trackXY[2][13][2] = {
-    39, 336, 113, 336, 150, 294, 187, 336, 261, 336, 335, 336,
-    409, 378, 409, 294, 483, 336, 557, 336, -1, -1, 261, 378, -1, -1,
-    39, 336, 113, 336, 187, 294, 187, 378, 261, 336, 335, 336,
-    372, 294, 409, 336, 483, 294, 483, 378, 557, 336, 261, 294, 261, 378
-};
-DATA(0x004f4f90) class heroWindow *campWin = 0;
+DATA(0x004f4f28) i16 trackXY[2][13][2] = {39,  336, 113, 336, 150, 294, 187, 336, 261, 336, 335,
+                                          336, 409, 378, 409, 294, 483, 336, 557, 336, -1,  -1,
+                                          261, 378, -1,  -1,  39,  336, 113, 336, 187, 294, 187,
+                                          378, 261, 336, 335, 336, 372, 294, 409, 336, 483, 294,
+                                          483, 378, 557, 336, 261, 294, 261, 378};
+DATA(0x004f4f90) class heroWindow* campWin = 0;
 // @data-layout-note Retail and candidate BSS both cover 0x127ea4+0x10 with
 // these four public identities. Retail COMMON order is side/track/viewOnly/map
 // at +0/+4/+8/+0xc; VC4.2 currently emits track/viewOnly/side/map. Declaration

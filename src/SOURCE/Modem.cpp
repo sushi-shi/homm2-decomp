@@ -15,8 +15,7 @@
 #include <SOURCE/comwin.h>
 #include <SOURCE/kbwin.h>
 VA(0x0040c8f0, 0x24e)
-void ModemSetup(i32 mode)
-{
+void ModemSetup(i32 mode) {
     char directConnectMessage3[104];
     i32 resetAttempt9;
     char command[104];
@@ -48,29 +47,31 @@ void ModemSetup(i32 mode)
 
     LogStr("MS3");
     switch (mode) {
-    case MODEM_MODE_DIAL:
-        if (gbDirectConnect == 0 && Dial() != 0) {
-            RemoteCleanup();
-            GameMode = 0;
-        }
-        break;
-    case MODEM_MODE_WAIT:
-        if (gbDirectConnect == 0 && Wait() != 0) {
-            RemoteCleanup();
-            GameMode = 0;
-        }
-        break;
-    default:
-        return;
+        case MODEM_MODE_DIAL:
+            if (gbDirectConnect == 0 && Dial() != 0) {
+                RemoteCleanup();
+                GameMode = 0;
+            }
+            break;
+        case MODEM_MODE_WAIT:
+            if (gbDirectConnect == 0 && Wait() != 0) {
+                RemoteCleanup();
+                GameMode = 0;
+            }
+            break;
+        default:
+            return;
     }
 
     if (gbDirectConnect != 0) {
         LogStr("MS4");
         WFDCStage = MODEM_CONNECTION_INIT_STAGE;
         giWaitType = MODEM_WAIT_DIRECT_CONNECT;
-        strcpy(directConnectMessage3,
-               "Waiting for other computer to log in to direct connection.\n\n"
-               "Press 'CANCEL' to abort.");
+        strcpy(
+            directConnectMessage3,
+            "Waiting for other computer to log in to direct connection.\n\n"
+            "Press 'CANCEL' to abort."
+        );
         NormalDialog(directConnectMessage3, 6, -1, -1, -1, 0, -1, 0, -1, 0);
         if (gbFunctionComplete == 0)
             ShutDown(0);
@@ -85,8 +86,7 @@ void ModemSetup(i32 mode)
 // displacement at +0x8e: this form enters the trailing join jump while retail
 // reaches the epilogue directly. An explicit if/else return scored 97.67%.
 VA(0x0040cb3e, 0x9e)
-i32l Dial(void)
-{
+i32l Dial(void) {
     char dialCommand[40];
     iLastDialPos = 0;
     sprintf(dialCommand, "ATDT%s", numbuf);
@@ -101,16 +101,14 @@ i32l Dial(void)
 // displacement at +0x44: this form enters the trailing join jump while retail
 // reaches the epilogue directly. An explicit if/else return scored 96.15%.
 VA(0x0040cbdc, 0x54)
-i32l Wait(void)
-{
+i32l Wait(void) {
     GUIModemResponse("Waiting for ring...", "RING");
     GUIModemCommand("Initializing modem...", "ATA");
     return GUIModemResponse("Establishing connection...", "CONNECT") != 0;
 }
 
 VA(0x0040cc30, 0x79)
-void GUIModemCommand(char *message, char *command)
-{
+void GUIModemCommand(char* message, char* command) {
     iLastActionTime = 0;
     iModemCommandPos = 0;
     giWaitType = MODEM_WAIT_COMMAND;
@@ -128,8 +126,7 @@ void GUIModemCommand(char *message, char *command)
 // direct guard, and goto-guard forms were non-improving. Revisit only after a
 // Modem TU/header change alters compiler state.
 VA(0x0040cca9, 0x95)
-i8 GUIModemCommandExec(void)
-{
+i8 GUIModemCommandExec(void) {
     i32 commandLength;
     if (KBTickCount() < iLastActionTime + MODEM_COMMAND_INTERVAL)
         return 0;
@@ -147,13 +144,11 @@ i8 GUIModemCommandExec(void)
 }
 
 VA(0x0040cd3e, 0x8e)
-void ModemCommand(char *command)
-{
+void ModemCommand(char* command) {
     char modemText[MODEM_WORK_TEXT_SIZE];
     i32 commandLength = strlen(command);
     i32 commandPosition0;
-    for (commandPosition0 = 0; commandPosition0 < OD_STEER(commandLength);
-         ++commandPosition0) {
+    for (commandPosition0 = 0; commandPosition0 < OD_STEER(commandLength); ++commandPosition0) {
         write_buffer(command + commandPosition0, 1);
         DelayMilli(MODEM_COMMAND_DELAY);
     }
@@ -161,8 +156,7 @@ void ModemCommand(char *command)
 }
 
 VA(0x0040cdcc, 0x82)
-i8 GUIModemResponse(char *message, char *response)
-{
+i8 GUIModemResponse(char* message, char* response) {
     memset(GUIMRresponse, 0, MODEM_RESPONSE_SIZE);
     GUIMRrespptr = 0;
     strcpy(GUIMRresp, response);
@@ -178,8 +172,7 @@ i8 GUIModemResponse(char *message, char *response)
 // inlined TruncateModemResponse continuation at the trailing join jump. Adding
 // an inner else/return changed the CFG and scored 93.94%.
 VA(0x0040ce4e, 0xe2)
-i8 GUIModemResponseExec(void)
-{
+i8 GUIModemResponseExec(void) {
     GUIMRc = read_byte();
     if (GUIMRc == -1)
         return 0;
@@ -206,18 +199,15 @@ i8 GUIModemResponseExec(void)
 }
 
 VA(0x0040cf30, 0x4e)
-i32 write_buffer(char *buffer, i32 length)
-{
-    if (outque.writePosition + length + MODEM_QUEUE_GUARD >
-        MODEM_OUT_QUEUE_SIZE)
+i32 write_buffer(char* buffer, i32 length) {
+    if (outque.writePosition + length + MODEM_QUEUE_GUARD > MODEM_OUT_QUEUE_SIZE)
         return 0;
     com_snd(0, 0, static_cast<u16>(length), buffer, 0);
     return 1;
 }
 
 VA(0x0040cf7e, 0x47)
-i32 read_byte(void)
-{
+i32 read_byte(void) {
     u8 value[4];
     i32 received = com_rcv(0, 1, value);
     if (received == 1)
@@ -227,14 +217,12 @@ i32 read_byte(void)
 }
 
 VA(0x0040cfc5, 0x27)
-void write_byte(i32 value)
-{
+void write_byte(i32 value) {
     com_snd(0, 0, 1, &value, 0);
 }
 
 VA(0x0040cfec, 0x1bb)
-void Connect(void)
-{
+void Connect(void) {
     char idMessage[20];
     u32 idSeed = KBTickCount();
     // The retail /Od frame retains this unused word between idMessage and idSeed.
@@ -252,8 +240,7 @@ void Connect(void)
             if (strncmp(packet, "ID", 2) != 0)
                 continue;
             if (strncmp(packet + 2, idstr, 6) == 0) {
-                sprintf(gText,
-                        "Duplicate ID Strings!\nSorry Please Try Again\n");
+                sprintf(gText, "Duplicate ID Strings!\nSorry Please Try Again\n");
                 GOut(gText);
                 RemoteCleanup();
             }
@@ -277,59 +264,56 @@ void Connect(void)
 }
 
 VA(0x0040d1a7, 0x211)
-i32 WaitForDirectConnect(void)
-{
+i32 WaitForDirectConnect(void) {
     char idMessage[20];
     switch (WFDCStage) {
-    case MODEM_CONNECTION_INIT_STAGE: {
-        u32 idSeed = KBTickCount();
-        idSeed %= MODEM_ID_MODULUS;
-        sprintf(idstr, "%06d", idSeed);
-        oldsec = -1;
-        remotestage = 0;
-        localstage = remotestage;
-        ++WFDCStage;
-        break;
-    }
-    case MODEM_CONNECTION_HANDSHAKE_STAGE:
-        if (ReadPacket()) {
-            packet[packetlen] = 0;
-            if (packetlen != 10)
-                return 0;
-            if (strncmp(packet, "ID", 2) != 0)
-                return 0;
-            if (strncmp(packet + 2, idstr, 6) == 0) {
-                sprintf(gText,
-                        "Duplicate ID Strings!\nSorry Please Try Again\n");
-                GOut(gText);
-                RemoteCleanup();
-            }
-            strncpy(remoteidstr, packet + 2, 6);
-            remotestage = packet[9] - '0';
-            localstage = remotestage + 1;
+        case MODEM_CONNECTION_INIT_STAGE: {
+            u32 idSeed = KBTickCount();
+            idSeed %= MODEM_ID_MODULUS;
+            sprintf(idstr, "%06d", idSeed);
             oldsec = -1;
-        }
-        stime = KBTickCount();
-        // Scalar-lvalue steering preserves oldsec but emits the retail relocation order.
-        if (OD_STEER(oldsec) / 1000 != stime / 1000) {
-            oldsec = stime;
-            sprintf(idMessage, "ID%s_%i", idstr, localstage);
-            WriteModemPacket(idMessage, strlen(idMessage));
-        }
-        if (localstage >= MODEM_CONNECTION_READY_STAGE)
+            remotestage = 0;
+            localstage = remotestage;
             ++WFDCStage;
-        break;
-    case MODEM_CONNECTION_READY_STAGE:
-        if (ReadPacket() == 0)
-            return 1;
-        break;
+            break;
+        }
+        case MODEM_CONNECTION_HANDSHAKE_STAGE:
+            if (ReadPacket()) {
+                packet[packetlen] = 0;
+                if (packetlen != 10)
+                    return 0;
+                if (strncmp(packet, "ID", 2) != 0)
+                    return 0;
+                if (strncmp(packet + 2, idstr, 6) == 0) {
+                    sprintf(gText, "Duplicate ID Strings!\nSorry Please Try Again\n");
+                    GOut(gText);
+                    RemoteCleanup();
+                }
+                strncpy(remoteidstr, packet + 2, 6);
+                remotestage = packet[9] - '0';
+                localstage = remotestage + 1;
+                oldsec = -1;
+            }
+            stime = KBTickCount();
+            // Scalar-lvalue steering preserves oldsec but emits the retail relocation order.
+            if (OD_STEER(oldsec) / 1000 != stime / 1000) {
+                oldsec = stime;
+                sprintf(idMessage, "ID%s_%i", idstr, localstage);
+                WriteModemPacket(idMessage, strlen(idMessage));
+            }
+            if (localstage >= MODEM_CONNECTION_READY_STAGE)
+                ++WFDCStage;
+            break;
+        case MODEM_CONNECTION_READY_STAGE:
+            if (ReadPacket() == 0)
+                return 1;
+            break;
     }
     return 0;
 }
 
 VA(0x0040d3b8, 0x127)
-char ReadPacket(void)
-{
+char ReadPacket(void) {
     i32 input;
     if (inque.writePosition > MODEM_QUEUE_INPUT_SIZE - 4) {
         LogStr("OverFlow1");
@@ -371,8 +355,7 @@ readPacketStart:
 }
 
 VA(0x0040d4df, 0xff)
-void WriteModemPacket(char *buffer, i32 length)
-{
+void WriteModemPacket(char* buffer, i32 length) {
     i32 encodedPosition = 0;
     if (length > MODEM_PACKET_PAYLOAD_SIZE) {
         LogStr("TOO LONG");

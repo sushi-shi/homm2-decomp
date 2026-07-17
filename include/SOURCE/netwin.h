@@ -79,14 +79,14 @@ typedef enum NetbiosSessionStatus {
 
 #pragma pack(push, 1)
 struct NetbiosControlBlock;
-typedef void (__stdcall *NetbiosPostRoutine)(NetbiosControlBlock *controlBlock);
+typedef void(__stdcall* NetbiosPostRoutine)(NetbiosControlBlock* controlBlock);
 
 struct NetbiosControlBlock {
     u8 command;
     u8 returnCode;
     u8 sessionNumber;
     u8 nameNumber;
-    void *buffer;
+    void* buffer;
     u16 length;
     u8 callName[NETBIOS_NAME_SIZE];
     u8 name[NETBIOS_NAME_SIZE];
@@ -96,7 +96,7 @@ struct NetbiosControlBlock {
     u8 adapterNumber;
     u8 commandComplete;
     u8 reserved[10];
-    void *event;
+    void* event;
 };
 #pragma pack(pop)
 
@@ -114,19 +114,19 @@ struct NetbiosSessionBuffer {
 };
 
 struct NetbiosThreadEvents {
-    void *handles[NETBIOS_THREAD_EVENT_STORAGE_COUNT];
+    void* handles[NETBIOS_THREAD_EVENT_STORAGE_COUNT];
 };
 SIZE(NetbiosControlBlock, NETBIOS_CONTROL_BLOCK_SIZE);
 SIZE(NetbiosName, NETBIOS_NAME_SIZE);
 SIZE(NetbiosPayload, NETBIOS_PAYLOAD_SIZE);
 SIZE(NetbiosSessionBuffer, NETBIOS_PAYLOAD_SIZE);
-SIZE(NetbiosThreadEvents, NETBIOS_THREAD_EVENT_STORAGE_COUNT * sizeof(void *));
+SIZE(NetbiosThreadEvents, NETBIOS_THREAD_EVENT_STORAGE_COUNT * sizeof(void*));
 
 i32 is_netbios_avail(void);
 extern "C" u16 __fastcall nb_init(u16, u16);
 extern "C" void __fastcall nb_term(void);
-extern "C" u16 __fastcall nb_rcv(i16, void *);
-extern "C" u16 __fastcall nb_snd(i16, i16, void *);
+extern "C" u16 __fastcall nb_rcv(i16, void*);
+extern "C" u16 __fastcall nb_snd(i16, i16, void*);
 extern "C" u16 __cdecl nb_sess(i16, ...);
 extern "C" char __fastcall nb_stat(i16);
 void nb_thr_ctl(void);

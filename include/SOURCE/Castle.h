@@ -86,10 +86,10 @@ typedef enum CastleConstant {
     CASTLE_RACE_ICON_FRAMES = 32
 } CastleConstant;
 
-i32 CastleHandler(struct tag_message &);
+i32 CastleHandler(struct tag_message&);
 
 extern u8 castleSlotsBase[CASTLE_SLOT_COUNT];
-extern class heroWindow *casWin;
+extern class heroWindow* casWin;
 extern u8 castleSlotsUse[CASTLE_SLOT_COUNT];
 
 #endif // HOMM2_CASTLE_H

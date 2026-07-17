@@ -18,17 +18,17 @@ DATA(0x005380e4) static i32 gFCXEnd;
 DATA(0x005380e8) static u32 gFCCnt;
 DATA(0x005380e0) static u32 gFCCnt2;
 DATA(0x005380d8) static i32 gFCY;
-DATA(0x005380ec) static IconEntry *gFCEntry;
+DATA(0x005380ec) static IconEntry* gFCEntry;
 DATA(0x005380d0) static i32 gFCX;
-DATA(0x005380f0) static u8 *gFCSrc;
-DATA(0x005380dc) static u8 *gFCDimPal;
-DATA(0x005380f4) static u8 *gFCDimDst;
+DATA(0x005380f0) static u8* gFCSrc;
+DATA(0x005380dc) static u8* gFCDimPal;
+DATA(0x005380f4) static u8* gFCDimDst;
 DATA(0x005380fc) static i32 gFCClipB;
-DATA(0x00538100) static u8 *gFCRow;
+DATA(0x00538100) static u8* gFCRow;
 DATA(0x005380c4) static u32 gFCDimLen;
 DATA(0x005380cc) static u8 gFCColor;
 DATA(0x005380c8) static i32 gFCClipR;
-DATA(0x005380c0) static u8 *gFCDst;
+DATA(0x005380c0) static u8* gFCDst;
 
 // @semantic
 // Complete typed decoder with the canonical IconEntry/layout, enum constants, dim-palette owner,
@@ -89,18 +89,28 @@ DATA(0x005380c0) static u8 *gFCDst;
 // A 2026-07-15 256-state exact-only sweep reached only a disposable 84.654915% (baseline
 // 84.554150%) and no exact closure; all generated declarations were removed and no MAX was recorded.
 VA(0x004d9790, 0x54d)
-void FlipIconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, i32 x, i32 y, i32 frame,
-                                i32 clip, i32 clipX, i32 clipY, i32 clipW, i32 clipH, i32 color,
-                                u8 *colorTable)
-{
-    IconEntry *entries = srcIcon->Entries();
-    u8 *src = reinterpret_cast<u8 *>(entries);
+void FlipIconToBitmapColorTable(
+    class icon* srcIcon,
+    class bitmap* dest,
+    i32 x,
+    i32 y,
+    i32 frame,
+    i32 clip,
+    i32 clipX,
+    i32 clipY,
+    i32 clipW,
+    i32 clipH,
+    i32 color,
+    u8* colorTable
+) {
+    IconEntry* entries = srcIcon->Entries();
+    u8* src = reinterpret_cast<u8*>(entries);
     i32 x0 = x;
     i32 w;
     i32 pitch;
     w = entries[frame].w;
     x0 = x0 - entries[frame].x;
-    IconEntry *entry = &entries[frame];
+    IconEntry* entry = &entries[frame];
     x0 = x0 - w;
     gFCEntry = entry;
     src += entry->srcOffset;
@@ -112,8 +122,8 @@ void FlipIconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, i32 x, 
     gFCY = Y;
     if (clip != 0) {
         i32 currentY = gFCY;
-        if (x0 < clipX || clipW + clipX < x0 + entry->w ||
-            currentY < clipY || clipY + clipH < entry->h + currentY) {
+        if (x0 < clipX || clipW + clipX < x0 + entry->w || currentY < clipY
+            || clipY + clipH < entry->h + currentY) {
             clip = 1;
             gFCClipR = clipX + clipW - 1;
             gFCClipB = clipY + clipH - 1;
@@ -170,8 +180,8 @@ void FlipIconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, i32 x, 
             } else {
                 i32 currentY = gFCY;
                 i32 left;
-                if (currentY >= clipY && currentY <= gFCClipB &&
-                    (left = (X - count) + 1, clipX <= left) && X <= gFCClipR) {
+                if (currentY >= clipY && currentY <= gFCClipB
+                    && (left = (X - count) + 1, clipX <= left) && X <= gFCClipR) {
                     if (clipX <= left) {
                         memset((gFCRow - count) + 1 + X, gFCColor, count);
                     } else {
@@ -186,19 +196,19 @@ void FlipIconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, i32 x, 
             gFCRun = flags;
             gFCCnt2 = count;
             if (flags & ICON_RLE_DIM_APPLY_FLAG) {
-                u8 *palette =
-                    &uDimPal[0][0][0] +
-                    (flags & ICON_RLE_DIM_LEVEL_MASK) * ICON_RLE_DIM_PALETTE_LEVEL_STRIDE;
+                u8* palette =
+                    &uDimPal[0][0][0]
+                    + (flags & ICON_RLE_DIM_LEVEL_MASK) * ICON_RLE_DIM_PALETTE_LEVEL_STRIDE;
                 gFCDimPal = palette;
                 if (clip == 0) {
-                    u8 *dp = (gFCRow - count) + 1 + X;
+                    u8* dp = (gFCRow - count) + 1 + X;
                     gFCCnt = 0;
                     i32 dimCount = count;
                     gFCDimDst = dp;
                     if (dimCount > 0) {
                         gFCCnt = dimCount;
                         do {
-                            u8 *dimPalette = gFCDimPal;
+                            u8* dimPalette = gFCDimPal;
                             i32 px = *dp;
                             dp++;
                             count--;
@@ -209,10 +219,10 @@ void FlipIconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, i32 x, 
                 } else {
                     i32 currentY = gFCY;
                     gFCCnt2 = count;
-                    if (currentY >= clipY && currentY <= gFCClipB &&
-                        clipX <= static_cast<i32>((X - count) + 1) && X <= gFCClipR) {
+                    if (currentY >= clipY && currentY <= gFCClipB
+                        && clipX <= static_cast<i32>((X - count) + 1) && X <= gFCClipR) {
                         i32 left = (X - count) + 1;
-                        u8 *dp;
+                        u8* dp;
                         if (clipX <= left) {
                             dp = (gFCRow - count) + 1 + X;
                         } else {
@@ -226,7 +236,7 @@ void FlipIconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, i32 x, 
                         if (dimCount > 0) {
                             gFCCnt = dimCount;
                             do {
-                                u8 *dimPalette = gFCDimPal;
+                                u8* dimPalette = gFCDimPal;
                                 i32 px = *dp;
                                 dp++;
                                 count--;
@@ -246,7 +256,7 @@ void FlipIconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, i32 x, 
         if (cmd != 0) {
             if (clip == 0) {
                 gFCCnt = 0;
-                u8 *dst = gFCRow + X;
+                u8* dst = gFCRow + X;
                 gFCDst = dst;
                 if (cmd > 0) {
                     gFCCnt = cmd;
@@ -265,7 +275,7 @@ void FlipIconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, i32 x, 
                     i32 left = (X - cmd) + 1;
                     if (left <= gFCClipR && clipX <= X) {
                         u32 cn;
-                        u8 *selectedDst;
+                        u8* selectedDst;
                         i32 skip;
                         if (X <= gFCClipR) {
                             selectedDst = gFCRow + X;
@@ -302,7 +312,7 @@ void FlipIconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, i32 x, 
                         if (copyCount > 0) {
                             gFCCnt = copyCount;
                             do {
-                                u8 *dst = gFCDst;
+                                u8* dst = gFCDst;
                                 i32 c = *src++;
                                 dst--;
                                 cn--;

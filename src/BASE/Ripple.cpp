@@ -23,8 +23,7 @@
 // Ten non-improving current-state variants exhausted operand orders and trivial local
 // hoists. Revisit only after a material Ripple header/declaration-state change.
 VA(0x004d26a0, 0x23f)
-void DoRipple(bitmap *source, bitmap *destination, i32 height, i32 strength)
-{
+void DoRipple(bitmap* source, bitmap* destination, i32 height, i32 strength) {
     i32 profileIndex;
     const i32 screenWidth = 0x280;
     const i32 profileRadius = 0x19;
@@ -33,26 +32,15 @@ void DoRipple(bitmap *source, bitmap *destination, i32 height, i32 strength)
 
     gpMouseManager->HideColorPointer();
 
-    u8 profile[51] = {
-        0, 0, 0, 0, 0, 0, 0,
-        1, 1, 1, 1, 1,
-        2, 2, 2, 2,
-        3, 3, 4, 5,
-        6, 6, 6,
-        7, 7, 7, 7, 7,
-        6, 6, 6, 5, 4, 3, 3,
-        2, 2, 2, 2,
-        1, 1, 1, 1, 1,
-        0, 0, 0, 0, 0, 0, 0
-    };
+    u8 profile[51] = {0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 4, 5, 6, 6, 6, 7, 7, 7,
+                      7, 7, 6, 6, 6, 5, 4, 3, 3, 2, 2, 2, 2, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0};
     u8 previous[screenWidth];
     memset(previous, 0, sizeof(previous));
     i32 position = -profileRadius;
 
     do {
         PollSound();
-        i32 deadline = KBTickCount() +
-            gfCombatSpeedMod[gConfig.combatSpeed] * 9.0f;
+        i32 deadline = KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * 9.0f;
 
         for (profileIndex = 0; profileIndex <= 50; ++profileIndex) {
             i32 column = profileIndex + position - profileRadius;
@@ -62,9 +50,9 @@ void DoRipple(bitmap *source, bitmap *destination, i32 height, i32 strength)
             if (previous[column] == profile[profileIndex])
                 continue;
 
-            u8 *destinationPixel = destination->m_pixels + column;
+            u8* destinationPixel = destination->m_pixels + column;
             i32 sourceRow = profile[profileIndex] * strength;
-            u8 *sourcePixel = source->m_pixels + sourceRow * screenWidth + column;
+            u8* sourcePixel = source->m_pixels + sourceRow * screenWidth + column;
 
             if (height > sourceRow) {
                 do {
@@ -88,8 +76,7 @@ void DoRipple(bitmap *source, bitmap *destination, i32 height, i32 strength)
         if (redrawX + width > screenWidth)
             width = screenWidth - redrawX;
         if (width >= 1) {
-            BlitBitmapToScreen(gpWindowManager->m_screen,
-                               redrawX, 0, width, height, redrawX, 0);
+            BlitBitmapToScreen(gpWindowManager->m_screen, redrawX, 0, width, height, redrawX, 0);
             DelayTil(&deadline);
         }
         position += 4;

@@ -24,8 +24,7 @@
 #include <stdlib.h>
 #include <string.h>
 VA(0x004ceb70, 0xaa)
-heroWindow::heroWindow(void)
-{
+heroWindow::heroWindow(void) {
     strcpy(name, "Default Construct");
     m_prevWindow = 0;
     m_nextWindow = m_prevWindow;
@@ -42,8 +41,7 @@ heroWindow::heroWindow(void)
 }
 
 VA(0x004cec20, 0xa5)
-heroWindow::heroWindow(i32 x, i32 y, i32 w, i32 h, i32 flags)
-{
+heroWindow::heroWindow(i32 x, i32 y, i32 w, i32 h, i32 flags) {
     strcpy(name, "Dynamic Construct");
     m_prevWindow = 0;
     m_nextWindow = m_prevWindow;
@@ -60,20 +58,19 @@ heroWindow::heroWindow(i32 x, i32 y, i32 w, i32 h, i32 flags)
 }
 
 VA(0x004cecd0, 0x521)
-heroWindow::heroWindow(i32 param_1, i32 param_2, char *param_3)
-{
+heroWindow::heroWindow(i32 param_1, i32 param_2, char* param_3) {
     u32l jb;
     i32 idx;
-    textEntryWidget *pte;
-    textWidget *ptw;
+    textEntryWidget* pte;
+    textWidget* ptw;
     i32 type;
-    button *pbtn;
-    dropListWidget *pdl;
-    border *pbd;
-    widget *pwdg;
-    iconWidget *picn;
-    listBoxWidget *plist;
-    dimmerWidget *pdim;
+    button* pbtn;
+    dropListWidget* pdl;
+    border* pbd;
+    widget* pwdg;
+    iconWidget* picn;
+    listBoxWidget* plist;
+    dimmerWidget* pdim;
     strcpy(name, param_3);
     jb = gpResourceManager->MakeId(param_3, 1);
     gpResourceManager->PointToFile(jb);
@@ -96,69 +93,69 @@ heroWindow::heroWindow(i32 param_1, i32 param_2, char *param_3)
         type = gpResourceManager->ReadWord();
         pwdg = 0;
         switch (type) {
-        case WINDOW_WIDGET_RECORD_END:
-            idx++;
-            break;
-        case WINDOW_WIDGET_RECORD_BORDER:
-            pbd = new border();
-            pbd->Read();
-            pwdg = pbd;
-            break;
-        case WINDOW_WIDGET_RECORD_BUTTON:
-            pbtn = new button();
-            pbtn->Read();
-            pwdg = pbtn;
-            break;
-        case WINDOW_WIDGET_RECORD_ICON:
-            picn = new iconWidget();
-            picn->Read();
-            pwdg = picn;
-            break;
-        case WINDOW_WIDGET_RECORD_DIMMER:
-            pdim = new dimmerWidget();
-            pdim->Read();
-            pwdg = pdim;
-            break;
-        case WINDOW_WIDGET_RECORD_TEXT:
-            ptw = new textWidget();
-            ptw->Read();
-            pwdg = ptw;
-            break;
-        case WINDOW_WIDGET_RECORD_TEXT_ENTRY:
-            pte = new textEntryWidget();
-            pte->Read(1);
-            pwdg = pte;
-            break;
-        case WINDOW_WIDGET_RECORD_TEXT_ENTRY_RECT:
-            pte = new textEntryWidget();
-            pte->Read(2);
-            pwdg = pte;
-            break;
-        case WINDOW_WIDGET_RECORD_TEXT_ENTRY_MULTILINE:
-            pte = new textEntryWidget();
-            pte->Read(3);
-            pwdg = pte;
-            break;
-        case WINDOW_WIDGET_RECORD_TEXT_ENTRY_INSET_FIVE:
-            pte = new textEntryWidget();
-            pte->Read(4);
-            pwdg = pte;
-            break;
-        case WINDOW_WIDGET_RECORD_TEXT_ENTRY_INSET_FOUR:
-            pte = new textEntryWidget();
-            pte->Read(5);
-            pwdg = pte;
-            break;
-        case WINDOW_WIDGET_RECORD_DROP_LIST:
-            pdl = new dropListWidget();
-            pdl->Read();
-            pwdg = pdl;
-            break;
-        case WINDOW_WIDGET_RECORD_LIST_BOX:
-            plist = new listBoxWidget();
-            plist->Read();
-            pwdg = plist;
-            break;
+            case WINDOW_WIDGET_RECORD_END:
+                idx++;
+                break;
+            case WINDOW_WIDGET_RECORD_BORDER:
+                pbd = new border();
+                pbd->Read();
+                pwdg = pbd;
+                break;
+            case WINDOW_WIDGET_RECORD_BUTTON:
+                pbtn = new button();
+                pbtn->Read();
+                pwdg = pbtn;
+                break;
+            case WINDOW_WIDGET_RECORD_ICON:
+                picn = new iconWidget();
+                picn->Read();
+                pwdg = picn;
+                break;
+            case WINDOW_WIDGET_RECORD_DIMMER:
+                pdim = new dimmerWidget();
+                pdim->Read();
+                pwdg = pdim;
+                break;
+            case WINDOW_WIDGET_RECORD_TEXT:
+                ptw = new textWidget();
+                ptw->Read();
+                pwdg = ptw;
+                break;
+            case WINDOW_WIDGET_RECORD_TEXT_ENTRY:
+                pte = new textEntryWidget();
+                pte->Read(1);
+                pwdg = pte;
+                break;
+            case WINDOW_WIDGET_RECORD_TEXT_ENTRY_RECT:
+                pte = new textEntryWidget();
+                pte->Read(2);
+                pwdg = pte;
+                break;
+            case WINDOW_WIDGET_RECORD_TEXT_ENTRY_MULTILINE:
+                pte = new textEntryWidget();
+                pte->Read(3);
+                pwdg = pte;
+                break;
+            case WINDOW_WIDGET_RECORD_TEXT_ENTRY_INSET_FIVE:
+                pte = new textEntryWidget();
+                pte->Read(4);
+                pwdg = pte;
+                break;
+            case WINDOW_WIDGET_RECORD_TEXT_ENTRY_INSET_FOUR:
+                pte = new textEntryWidget();
+                pte->Read(5);
+                pwdg = pte;
+                break;
+            case WINDOW_WIDGET_RECORD_DROP_LIST:
+                pdl = new dropListWidget();
+                pdl->Read();
+                pwdg = pdl;
+                break;
+            case WINDOW_WIDGET_RECORD_LIST_BOX:
+                plist = new listBoxWidget();
+                plist->Read();
+                pwdg = plist;
+                break;
         }
         if (idx == 0 && pwdg != 0)
             AddWidget(pwdg, -1);
@@ -166,8 +163,7 @@ heroWindow::heroWindow(i32 param_1, i32 param_2, char *param_3)
 }
 
 VA(0x004cf200, 0x73)
-i32 heroWindow::Open(i32 x, i32 flags)
-{
+i32 heroWindow::Open(i32 x, i32 flags) {
     if (m_winState & 1)
         return 3;
     if ((m_winFlags & 2) != 0 && SaveBackground() != 0)
@@ -179,8 +175,7 @@ i32 heroWindow::Open(i32 x, i32 flags)
 }
 
 VA(0x004cf280, 0x90)
-void heroWindow::RemoveAndDeleteWidget(i32 id)
-{
+void heroWindow::RemoveAndDeleteWidget(i32 id) {
     widget *w, *next;
     w = m_widgetListHead;
     while (w != 0) {
@@ -195,8 +190,7 @@ void heroWindow::RemoveAndDeleteWidget(i32 id)
 }
 
 VA(0x004cf310, 0xaa)
-void heroWindow::Close(void)
-{
+void heroWindow::Close(void) {
     widget *w, *next;
     if ((m_winFlags & 2) != 0 && (m_winState & 1) != 0)
         RestoreBackground();
@@ -213,9 +207,8 @@ void heroWindow::Close(void)
 }
 
 VA(0x004cf3c0, 0x13c)
-void heroWindow::AddWidget(class widget *param_1, i32 param_2)
-{
-    widget *local_8 = m_widgetListHead;
+void heroWindow::AddWidget(class widget* param_1, i32 param_2) {
+    widget* local_8 = m_widgetListHead;
     if (param_2 == -1) {
         if (local_8 == 0)
             param_2 = 0;
@@ -247,8 +240,7 @@ void heroWindow::AddWidget(class widget *param_1, i32 param_2)
 }
 
 VA(0x004cf500, 0x116)
-void heroWindow::RemoveWidget(class widget *w)
-{
+void heroWindow::RemoveWidget(class widget* w) {
     if (w == 0)
         return;
     // Retail call VA 0x004cf51e resolves to CodeView widget::Close at 0x004dded0;
@@ -267,7 +259,7 @@ void heroWindow::RemoveWidget(class widget *w)
         w->m_next->m_prev = w->m_prev;
         w->m_prev->m_next = w->m_next;
     }
-    widget *nextWidget = w->m_next;
+    widget* nextWidget = w->m_next;
     if (nextWidget == 0) {
         m_widgetListHead = 0;
         m_widgetListTail = m_widgetListHead;
@@ -279,17 +271,16 @@ void heroWindow::RemoveWidget(class widget *w)
 }
 
 VA(0x004cf620, 0x95)
-i32 heroWindow::BroadcastMessage(struct tag_message &param_1)
-{
+i32 heroWindow::BroadcastMessage(struct tag_message& param_1) {
     i32 local_8 = 0;
-    widget *local_c = m_widgetListHead;
+    widget* local_c = m_widgetListHead;
     while (local_c != 0) {
         switch (local_8 = local_c->Main(param_1)) {
-        case 0:
-            break;
-        case 1:
-        case 2:
-            return local_8;
+            case 0:
+                break;
+            case 1:
+            case 2:
+                return local_8;
         }
         local_c = local_c->m_next;
     }
@@ -297,16 +288,19 @@ i32 heroWindow::BroadcastMessage(struct tag_message &param_1)
 }
 
 VA(0x004cf6c0, 0x20)
-void heroWindow::DrawWindow(void) { DrawWindow(1); }
+void heroWindow::DrawWindow(void) {
+    DrawWindow(1);
+}
 
 VA(0x004cf6e0, 0x2e)
-void heroWindow::DrawWindow(i32 flags) { DrawWindow(flags, -0xffff, 0xffff); }
+void heroWindow::DrawWindow(i32 flags) {
+    DrawWindow(flags, -0xffff, 0xffff);
+}
 
 VA(0x004cf710, 0x116)
-void heroWindow::DrawWindow(i32 param_1, i32 param_2, i32 param_3)
-{
+void heroWindow::DrawWindow(i32 param_1, i32 param_2, i32 param_3) {
     tag_message local_24;
-    widget *local_8;
+    widget* local_8;
     gpMouseManager->m_cursorReady = 0;
     local_8 = m_widgetListTail;
     local_24.type = MESSAGE_WIDGET;
@@ -329,8 +323,7 @@ void heroWindow::DrawWindow(i32 param_1, i32 param_2, i32 param_3)
 }
 
 VA(0x004cf830, 0x7f)
-i32 heroWindow::SaveBackground(void)
-{
+i32 heroWindow::SaveBackground(void) {
     m_savedBackground = new bitmap(BITMAP_TYPE_MEMORY, m_winWidth, m_winHeight);
     PollSound();
     m_savedBackground->GrabScreen(m_posX, m_posY);
@@ -339,8 +332,7 @@ i32 heroWindow::SaveBackground(void)
 }
 
 VA(0x004cf8b0, 0x97)
-void heroWindow::RestoreBackground(void)
-{
+void heroWindow::RestoreBackground(void) {
     if (gbDrawWindowBackground) {
         m_savedBackground->DrawToBuffer(m_posX, m_posY);
         gpWindowManager->UpdateScreenRegion(m_posX, m_posY, m_winWidth, m_winHeight);
@@ -350,8 +342,7 @@ void heroWindow::RestoreBackground(void)
 }
 
 VA(0x004cf950, 0x186)
-void heroWindow::MoveWindow(i32 dx, i32 dy)
-{
+void heroWindow::MoveWindow(i32 dx, i32 dy) {
     i32 oldX = m_posX;
     i32 oldY = m_posY;
     i32 oldW = m_winWidth;

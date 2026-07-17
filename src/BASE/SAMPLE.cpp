@@ -18,12 +18,8 @@
 // Independent function-local arrays put both constructor copies before the inline-
 // destructor COMDATs, which conflicts with the retail order. This record emits one
 // section whose complete payload is byte-exact against the retail interval.
-DATA(0x00520df4) static SSampleSourceFiles gSampleSourceFiles = {
-    SAMPLE_SOURCE_FILE,
-    SAMPLE_SOURCE_FILE,
-    SAMPLE_SOURCE_FILE,
-    SAMPLE_SOURCE_FILE
-};
+DATA(0x00520df4) static SSampleSourceFiles gSampleSourceFiles =
+    {SAMPLE_SOURCE_FILE, SAMPLE_SOURCE_FILE, SAMPLE_SOURCE_FILE, SAMPLE_SOURCE_FILE};
 
 // @early-stop
 // The explicit 0x181-byte CodeView range is raw-exact after relocation-union masking;
@@ -33,9 +29,8 @@ DATA(0x00520df4) static SSampleSourceFiles gSampleSourceFiles = {
 // build/gen/jump_tables.csv): MSVC emits $L symbols, while the delinker rewrites them
 // as this constructor plus the same local offsets.
 VA(0x004dad60, 0x181)
-sample::sample(char *name, i32l channelType, i32l volume, i32l loopCount)
-    : resource(6, gpResourceManager->MakeId(name, 1), 1, 0)
-{
+sample::sample(char* name, i32l channelType, i32l volume, i32l loopCount)
+    : resource(6, gpResourceManager->MakeId(name, 1), 1, 0) {
     i32 formatFlags;
     m_playbackData.channelType = channelType;
     m_playbackData.volume = volume;
@@ -48,37 +43,36 @@ sample::sample(char *name, i32l channelType, i32l volume, i32l loopCount)
 
     for (i32 i = 0; i < 3; i++) {
         switch (filename[i]) {
-        case '1':
-            m_playbackData.sampleRate = SAMPLE_RATE_11025;
-            break;
-        case '2':
-            m_playbackData.sampleRate = SAMPLE_RATE_22050;
-            break;
-        case '4':
-            m_playbackData.sampleRate = SAMPLE_RATE_44100;
-            break;
-        case '6':
-            m_playbackData.format = SAMPLE_FORMAT_16_BIT;
-            break;
-        case '8':
-            m_playbackData.format = SAMPLE_FORMAT_8_BIT;
-            break;
-        case 'M':
-        case 'm':
-            formatFlags = 0;
-            break;
+            case '1':
+                m_playbackData.sampleRate = SAMPLE_RATE_11025;
+                break;
+            case '2':
+                m_playbackData.sampleRate = SAMPLE_RATE_22050;
+                break;
+            case '4':
+                m_playbackData.sampleRate = SAMPLE_RATE_44100;
+                break;
+            case '6':
+                m_playbackData.format = SAMPLE_FORMAT_16_BIT;
+                break;
+            case '8':
+                m_playbackData.format = SAMPLE_FORMAT_8_BIT;
+                break;
+            case 'M':
+            case 'm':
+                formatFlags = 0;
+                break;
         }
     }
     m_playbackData.format += formatFlags;
 
     u32l size = gpResourceManager->GetFileSize(m_id);
 #line 57
-    m_playbackData.data = static_cast<char *>(
-        H2_ALLOC(size, gSampleSourceFiles.sampleAllocation, 0x39));
+    m_playbackData.data =
+        static_cast<char*>(H2_ALLOC(size, gSampleSourceFiles.sampleAllocation, 0x39));
     m_playbackData.size = size;
     gpResourceManager->PointToFile(m_id);
-    gpResourceManager->ReadBlock(
-        reinterpret_cast<i8 *>(m_playbackData.data), size);
+    gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_playbackData.data), size);
 }
 
 // @early-stop
@@ -88,8 +82,7 @@ sample::sample(char *name, i32l channelType, i32l volume, i32l loopCount)
 // diffs=0, manual relocation targets 5/5. `homm2 relocs` reports 0/10 solely because
 // it looks for absent base ??_E and combines both duplicate retail ??_E bodies.
 VA(0x004daf40, 0x2c)
-inline sample::~sample()
-{
+inline sample::~sample() {
 #line 97
     H2_FREE(m_playbackData.data, gSampleSourceFiles.sampleDestruction, 0x61);
     m_playbackData.data = 0;
@@ -98,14 +91,12 @@ inline sample::~sample()
 }
 
 VA(0x004daf70, 0x72)
-MIDIWrap::MIDIWrap(char *name) : resource(6, gpResourceManager->MakeId(name, 1), 1, 0)
-{
+MIDIWrap::MIDIWrap(char* name) : resource(6, gpResourceManager->MakeId(name, 1), 1, 0) {
     u32l size = gpResourceManager->GetFileSize(m_id);
 #line 110
-    m_data = static_cast<char *>(
-        H2_ALLOC(size, gSampleSourceFiles.midiAllocation, 0x6e));
+    m_data = static_cast<char*>(H2_ALLOC(size, gSampleSourceFiles.midiAllocation, 0x6e));
     gpResourceManager->PointToFile(m_id);
-    gpResourceManager->ReadBlock(reinterpret_cast<i8 *>(m_data), size);
+    gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_data), size);
 }
 
 // @early-stop
@@ -115,13 +106,11 @@ MIDIWrap::MIDIWrap(char *name) : resource(6, gpResourceManager->MakeId(name, 1),
 // diffs=0, manual relocation targets 5/5. `homm2 relocs` reports 0/10 solely because
 // it looks for absent base ??_E and combines both duplicate retail ??_E bodies.
 VA(0x004db030, 0x28)
-inline MIDIWrap::~MIDIWrap()
-{
+inline MIDIWrap::~MIDIWrap() {
 #line 118
     H2_FREE(m_data, gSampleSourceFiles.midiDestruction, 0x76);
     m_data = 0;
 }
-
 
 // ===== vtable MIDIWrap (root)  (1 slots) =====
 //  [ 0] VA(0x004daff0, 0x3d)  void * MIDIWrap::scalar_dtor(unsigned int)   <- introduces virtual

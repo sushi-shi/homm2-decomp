@@ -52,6 +52,6 @@ enum {
 
 i32 ValidHex(i32);
 void UpdateCombatSystemOptions(i32);
-i32 CombatSystemOptionsHandler(struct tag_message &);
+i32 CombatSystemOptionsHandler(struct tag_message&);
 
 #endif // HOMM2_CMBTMGR_H

@@ -53,8 +53,8 @@ struct searchCell {
 SIZE(searchCell, 9);
 
 union searchStorage {
-    struct searchCell *cells;
-    struct searchNode *nodes;
+    struct searchCell* cells;
+    struct searchNode* nodes;
     struct {
         char pad[3];
         i8 directions[SEARCH_PATH_CAPACITY + 1];
@@ -93,34 +93,36 @@ struct searchNode {
 #pragma pack(pop)
 SIZE(searchNode, 9);
 
-#pragma pack(push, 1)  // recovered layout is byte-packed
+#pragma pack(push, 1) // recovered layout is byte-packed
 class searchArray {
 public:
     union {
         struct {
-            i32 m_queueSize;       // +0x00, overland queue count
-            i32 m_queueCursor;     // +0x04, overland queue high-water mark
+            i32 m_queueSize;   // +0x00, overland queue count
+            i32 m_queueCursor; // +0x04, overland queue high-water mark
         };
         struct {
-            u32 m_queueCount;     // +0x00, combat queue count
-            u32 m_maxQueueCount;  // +0x04, combat queue high-water mark
+            u32 m_queueCount;    // +0x00, combat queue count
+            u32 m_maxQueueCount; // +0x04, combat queue high-water mark
         };
     };
-    i32    m_pathLength;  // +0x08
+    i32 m_pathLength; // +0x08
     union {
         struct {
-            i32 m_lastY;  // +0x0c, overland destination
-            i32 m_lastX;  // +0x10
+            i32 m_lastY; // +0x0c, overland destination
+            i32 m_lastX; // +0x10
         };
         struct {
-            i32 m_specialTargetX;  // +0x0c, combat special target
-            i32 m_specialTargetY;  // +0x10
+            i32 m_specialTargetX; // +0x0c, combat special target
+            i32 m_specialTargetY; // +0x10
         };
     };
-    searchNode m_queue[SEARCH_QUEUE_CAPACITY];  // +0x14
-    searchStorage m_storage;  // +0x2414, path directions overlap the search-cell pointer
-    searchNode *GetRow(i32 y, i32 width) { return m_storage.nodes + y * (width | 0); }
-    searchNode &GetNode(i32 x, i32 y) {
+    searchNode m_queue[SEARCH_QUEUE_CAPACITY]; // +0x14
+    searchStorage m_storage; // +0x2414, path directions overlap the search-cell pointer
+    searchNode* GetRow(i32 y, i32 width) {
+        return m_storage.nodes + y * (width | 0);
+    }
+    searchNode& GetNode(i32 x, i32 y) {
         return *(m_storage.nodes + y * (MAP_WIDTH | 0) + x);
     }
     // --- constructors ---
@@ -134,11 +136,13 @@ public:
     void Clear(void);
     i32 QuickDistance(i32, i32, i32, i32);
     void PushPoint(i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32);
-    void TestPossibleDirections(i32, i32, i8 * const, i8 * const, i32, i32);
-    void SeedCombatPosition(class army *);
-    i32 FindCombatPath(i32, i32, class army *, i32, i32);
+    void TestPossibleDirections(i32, i32, i8* const, i8* const, i32, i32);
+    void SeedCombatPosition(class army*);
+    i32 FindCombatPath(i32, i32, class army*, i32, i32);
     void PushCombatPoint(i32, i32, i32, i32);
-    searchCell &GetCell(i32 x, i32 y) { return (m_storage.cells + y * MAP_WIDTH)[x]; }
+    searchCell& GetCell(i32 x, i32 y) {
+        return (m_storage.cells + y * MAP_WIDTH)[x];
+    }
 };
 #pragma pack(pop)
 SIZE(searchArray, 0x2518);

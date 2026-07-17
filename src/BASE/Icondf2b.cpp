@@ -19,12 +19,12 @@ DATA(0x005381c0) static u32 gFDCnt;
 DATA(0x005381c4) static i32 gFDX;
 DATA(0x005381c8) static i32 gFDClipR;
 DATA(0x005381cc) static u32 gFDCnt2;
-DATA(0x005381d0) static u8 *gFDRow;
+DATA(0x005381d0) static u8* gFDRow;
 DATA(0x005381d4) static i32 gFDClipB;
-DATA(0x005381d8) static u8 *gFDSrc;
-DATA(0x005381dc) static u8 *gFDDst;
+DATA(0x005381d8) static u8* gFDSrc;
+DATA(0x005381dc) static u8* gFDDst;
 DATA(0x005381e0) static i32 gFDY;
-DATA(0x005381e4) static IconEntry *gFDEntry;
+DATA(0x005381e4) static IconEntry* gFDEntry;
 DATA(0x005381e8) static u32 gFDRun;
 
 // @semantic
@@ -48,12 +48,22 @@ DATA(0x005381e8) static u32 gFDRun;
 // the complete 37/37 per-owner relocation multiset. The 79.06626% live score is TU-state-sensitive;
 // the semantic helper is retained rather than restoring compiler-shaped source for a higher score.
 VA(0x004daa20, 0x23b)
-void FlipDimIconToBitmap(class icon *srcIcon, class bitmap *dest, i32 x, i32 y, i32 frame,
-                         i32 color, i32 clip, i32 clipX, i32 clipY, i32 clipW, i32 clipH)
-{
-    IconEntry *entries = srcIcon->Entries();
-    IconEntry *entry = &entries[frame];
-    u8 *srcData = reinterpret_cast<u8 *>(entries) + entry->srcOffset;
+void FlipDimIconToBitmap(
+    class icon* srcIcon,
+    class bitmap* dest,
+    i32 x,
+    i32 y,
+    i32 frame,
+    i32 color,
+    i32 clip,
+    i32 clipX,
+    i32 clipY,
+    i32 clipW,
+    i32 clipH
+) {
+    IconEntry* entries = srcIcon->Entries();
+    IconEntry* entry = &entries[frame];
+    u8* srcData = reinterpret_cast<u8*>(entries) + entry->srcOffset;
     i32 x0 = x;
     gFDEntry = entry;
     gFDSrc = srcData;
@@ -68,8 +78,8 @@ void FlipDimIconToBitmap(class icon *srcIcon, class bitmap *dest, i32 x, i32 y, 
     gFDXEnd = X;
     if (clip != ICON_DRAW_NO_CLIP) {
         i32 currentY;
-        if (x0 < clipX || clipW + clipX < w + x0 || (currentY = gFDY) < clipY ||
-            entry->h + currentY > clipY + clipH) {
+        if (x0 < clipX || clipW + clipX < w + x0 || (currentY = gFDY) < clipY
+            || entry->h + currentY > clipY + clipH) {
             clip = ICON_DRAW_CLIP;
             gFDClipR = clipX + clipW - 1;
             gFDClipB = clipY + clipH - 1;
@@ -95,7 +105,7 @@ void FlipDimIconToBitmap(class icon *srcIcon, class bitmap *dest, i32 x, i32 y, 
             if (clip == ICON_DRAW_NO_CLIP) {
                 u32 cnt;
                 gFDCnt = 0;
-                u8 *dst = (gFDRow - cmd) + X + 1;
+                u8* dst = (gFDRow - cmd) + X + 1;
                 gFDDst = dst;
                 if (static_cast<i32>(cmd) > 0) {
                     cnt = cmd;
@@ -110,10 +120,10 @@ void FlipDimIconToBitmap(class icon *srcIcon, class bitmap *dest, i32 x, i32 y, 
             } else {
                 i32 left;
                 i32 currentY = gFDY;
-                if (clipY <= currentY && currentY <= gFDClipB &&
-                    (left = (X - cmd) + 1, clipX <= left) && X <= gFDClipR) {
+                if (clipY <= currentY && currentY <= gFDClipB
+                    && (left = (X - cmd) + 1, clipX <= left) && X <= gFDClipR) {
                     i32 cn;
-                    u8 *dst;
+                    u8* dst;
                     if (clipX <= left) {
                         cn = cmd;
                         dst = (gFDRow - cmd) + X + 1;

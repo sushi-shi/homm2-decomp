@@ -11,12 +11,12 @@
 #include <BASE/IconEntry.h>
 #include <string.h>
 // Per-call decoder scratch — its own file-static block (0x534c60+).
-DATA(0x00534c78) static IconEntry *gFlipEntry;
+DATA(0x00534c78) static IconEntry* gFlipEntry;
 DATA(0x00534c68) static i32 gFlipX0;
 DATA(0x00534ca4) static i32 gFlipXEnd;
 DATA(0x00534c74) static i32 gFlipY;
 DATA(0x00534c7c) static i32 gFlipX;
-DATA(0x00534c80) static u8 *gFlipSrc;
+DATA(0x00534c80) static u8* gFlipSrc;
 DATA(0x00534c9c) static i32 gFlipClipR;
 DATA(0x00534c8c) static i32 gFlipClipB;
 DATA(0x00534c90) static i32 gFlipRow;
@@ -24,10 +24,10 @@ DATA(0x00534c64) static u32 gFlipRun;
 DATA(0x00534c98) static u8 gFlipColor;
 DATA(0x00534c94) static u32 gFlipCnt2;
 DATA(0x00534c70) static u32 gFlipDimLen;
-DATA(0x00534c84) static u8 *gFlipDimPal;
+DATA(0x00534c84) static u8* gFlipDimPal;
 DATA(0x00534c6c) static u32 gFlipCnt;
-DATA(0x00534c88) static u8 *gFlipDimDst;
-DATA(0x00534ca0) static u8 *gFlipDst;
+DATA(0x00534c88) static u8* gFlipDimDst;
+DATA(0x00534ca0) static u8* gFlipDst;
 DATA(0x00534c60) static i32 gFlipSkip;
 
 // @semantic
@@ -179,14 +179,24 @@ DATA(0x00534c60) static i32 gFlipSkip;
 // typedefs or tune fuzzy here; revisit after a real header/TU-state change. See the macro-head rows
 // in iconf2b-cfg-f24566c.tsv. This remains a coverage checkpoint, not a byte-proven wall.
 VA(0x004d1ba0, 0x4f1)
-void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, i32 x, i32 y, i32 frame,
-                      i32 clip, i32 clipX, i32 clipY, i32 clipW, i32 clipH, i32 color)
-{
-    IconEntry *entries = srcIcon->Entries();
-    u8 *src = reinterpret_cast<u8 *>(entries);
+void FlipIconToBitmap(
+    class icon* srcIcon,
+    class bitmap* dest,
+    i32 x,
+    i32 y,
+    i32 frame,
+    i32 clip,
+    i32 clipX,
+    i32 clipY,
+    i32 clipW,
+    i32 clipH,
+    i32 color
+) {
+    IconEntry* entries = srcIcon->Entries();
+    u8* src = reinterpret_cast<u8*>(entries);
     i32 x0 = x;
     i32 w;
-    IconEntry *entry = &entries[frame];
+    IconEntry* entry = &entries[frame];
     w = entry->w;
     x0 = x0 - entry->x;
     src += entry->srcOffset;
@@ -199,9 +209,9 @@ void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, i32 x, i32 y, i32
     gFlipXEnd = X;
     gFlipY = y;
     if (clip != 0) {
-        if (gFlipX0 < clipX || clipW + clipX < gFlipX0 + w ||
-            (memcpy(&clip, &gFlipY, sizeof(clip)), clip < clipY) ||
-            clipY + clipH < entry->h + clip) {
+        if (gFlipX0 < clipX || clipW + clipX < gFlipX0 + w
+            || (memcpy(&clip, &gFlipY, sizeof(clip)), clip < clipY)
+            || clipY + clipH < entry->h + clip) {
             clip = 1;
             gFlipClipR = clipX + clipW - 1;
             gFlipClipB = clipY + clipH - 1;
@@ -253,19 +263,24 @@ void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, i32 x, i32 y, i32
             goto do_dim;
         do_fill:
             if (clip == 0) {
-                memset(reinterpret_cast<u8 *>((gFlipRow - count) + 1 + X), gFlipColor,
-                       count);
+                memset(reinterpret_cast<u8*>((gFlipRow - count) + 1 + X), gFlipColor, count);
             } else {
                 i32 currentY = gFlipY;
                 i32 left;
-                if (currentY >= clipY && currentY <= gFlipClipB &&
-                    (left = (X - count) + 1, clipX <= left) && X <= gFlipClipR) {
+                if (currentY >= clipY && currentY <= gFlipClipB
+                    && (left = (X - count) + 1, clipX <= left) && X <= gFlipClipR) {
                     if (clipX <= left) {
-                        memset(reinterpret_cast<u8 *>((gFlipRow - count) + 1 + X),
-                               gFlipColor, count);
+                        memset(
+                            reinterpret_cast<u8*>((gFlipRow - count) + 1 + X),
+                            gFlipColor,
+                            count
+                        );
                     } else {
-                        memset(reinterpret_cast<u8 *>(gFlipRow + clipX), gFlipColor,
-                               (X - clipX) + 1);
+                        memset(
+                            reinterpret_cast<u8*>(gFlipRow + clipX),
+                            gFlipColor,
+                            (X - clipX) + 1
+                        );
                     }
                 }
             }
@@ -276,19 +291,17 @@ void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, i32 x, i32 y, i32
             gFlipRun = flags;
             gFlipDimLen = count;
             if (flags & 0x40) {
-                u8 *palette =
-                    reinterpret_cast<u8 *>(uDimPal) + (flags & 0x3c) * 0x40;
+                u8* palette = reinterpret_cast<u8*>(uDimPal) + (flags & 0x3c) * 0x40;
                 gFlipDimPal = palette;
                 if (clip == 0) {
-                    u8 *dp =
-                        reinterpret_cast<u8 *>((gFlipRow - count) + 1 + X);
+                    u8* dp = reinterpret_cast<u8*>((gFlipRow - count) + 1 + X);
                     gFlipCnt = 0;
                     i32 dimCount = count;
                     gFlipDimDst = dp;
                     if (dimCount > 0) {
                         gFlipCnt = dimCount;
                         do {
-                            u8 *dimPalette = gFlipDimPal;
+                            u8* dimPalette = gFlipDimPal;
                             i32 px = *dp++;
                             count--;
                             gFlipDimDst = dp;
@@ -298,15 +311,15 @@ void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, i32 x, i32 y, i32
                 } else {
                     const i32 currentY = gFlipY;
                     gFlipDimLen = count;
-                    if (clipY <= currentY && currentY <= gFlipClipB &&
-                        clipX <= static_cast<i32>((X - count) + 1) && X <= gFlipClipR) {
+                    if (clipY <= currentY && currentY <= gFlipClipB
+                        && clipX <= static_cast<i32>((X - count) + 1) && X <= gFlipClipR) {
                         i32 left = (X - count) + 1;
-                        u8 *dp;
+                        u8* dp;
                         if (clipX <= left) {
-                            dp = reinterpret_cast<u8 *>((gFlipRow - count) + 1 + X);
+                            dp = reinterpret_cast<u8*>((gFlipRow - count) + 1 + X);
                         } else {
                             count = (X - clipX) + 1;
-                            dp = reinterpret_cast<u8 *>(gFlipRow + clipX);
+                            dp = reinterpret_cast<u8*>(gFlipRow + clipX);
                         }
                         i32 dimCount = count;
                         gFlipDimLen = count;
@@ -315,7 +328,7 @@ void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, i32 x, i32 y, i32
                         if (dimCount > 0) {
                             gFlipCnt = dimCount;
                             do {
-                                u8 *dimPalette = gFlipDimPal;
+                                u8* dimPalette = gFlipDimPal;
                                 i32 px = *dp++;
                                 count--;
                                 gFlipDimDst = dp;
@@ -334,7 +347,7 @@ void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, i32 x, i32 y, i32
         if (cmd != 0) {
             if (clip == 0) {
                 gFlipCnt = 0;
-                u8 *dst = reinterpret_cast<u8 *>(gFlipRow + X);
+                u8* dst = reinterpret_cast<u8*>(gFlipRow + X);
                 gFlipDst = dst;
                 if (cmd > 0) {
                     gFlipCnt = cmd;
@@ -354,7 +367,7 @@ void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, i32 x, i32 y, i32
                         u32 cn;
                         i32 skip;
                         if (X <= gFlipClipR) {
-                            gFlipDst = reinterpret_cast<u8 *>(gFlipRow + X);
+                            gFlipDst = reinterpret_cast<u8*>(gFlipRow + X);
                             if (clipX <= left) {
                                 gFlipSkip = 0;
                                 cn = cmd;
@@ -366,8 +379,7 @@ void FlipIconToBitmap(class icon *srcIcon, class bitmap *dest, i32 x, i32 y, i32
                         } else {
                             cn = gFlipClipR;
                             src = src + (X - cn);
-                            gFlipDst =
-                                reinterpret_cast<u8 *>(gFlipRow + cn);
+                            gFlipDst = reinterpret_cast<u8*>(gFlipRow + cn);
                             if (clipX <= (X - cmd)) {
                                 gFlipSkip = 0;
                                 cn = (cmd - X) + cn;

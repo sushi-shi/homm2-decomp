@@ -17,8 +17,7 @@
 #include <SOURCE/town.h>
 #include <SOURCE/townManager.h>
 VA(0x00432c00, 0x65)
-town::town(void)
-{
+town::town(void) {
     m_type = FACTION_KNIGHT;
     m_id = 0;
     m_owner = 0;
@@ -31,8 +30,7 @@ town::town(void)
 }
 
 VA(0x00432c65, 0x54)
-i32 town::HasGarrison(void)
-{
+i32 town::HasGarrison(void) {
     for (i32 slot = 0; slot < ARMY_GROUP_SLOT_COUNT; ++slot) {
         if (m_army.m_creatureTypes[slot] != ARMY_GROUP_EMPTY_SLOT)
             return 1;
@@ -41,9 +39,8 @@ i32 town::HasGarrison(void)
 }
 
 VA(0x00432cb9, 0x111)
-void town::GiveSpells(hero *targetHero)
-{
-    hero *activeHero;
+void town::GiveSpells(hero* targetHero) {
+    hero* activeHero;
     i32 level;
     i32 slot;
 
@@ -60,45 +57,55 @@ void town::GiveSpells(hero *targetHero)
     if (!(m_buildings & TOWN_BUILDING_MAGE_GUILD))
         return;
 
-    for (level = 0;
-         level < activeHero->m_secondarySkills[HERO_SKILL_WISDOM]
-                     + TOWN_MAGE_GUILD_WISDOM_LEVEL_BONUS;
+    for (level = 0; level < activeHero->m_secondarySkills[HERO_SKILL_WISDOM]
+                                + TOWN_MAGE_GUILD_WISDOM_LEVEL_BONUS;
          ++level) {
         for (slot = 0; slot < m_spellCounts[level + TOWN_MAGE_GUILD_FIRST_LEVEL]; ++slot) {
-            activeHero->AddSpell(m_spells[level][slot],
-                                 activeHero->Stats(HERO_PRIMARY_KNOWLEDGE));
+            activeHero->AddSpell(m_spells[level][slot], activeHero->Stats(HERO_PRIMARY_KNOWLEDGE));
         }
     }
 }
 
 VA(0x00432dca, 0xaa)
-void town::XformToCastle(void)
-{
+void town::XformToCastle(void) {
     i32 objectType;
-    gpGame->ConvertObject(m_x + RANDOM_TOWN_LEFT, m_y + RANDOM_TOWN_TOP,
-                          m_x + RANDOM_TOWN_RIGHT, m_y + RANDOM_TOWN_BOTTOM,
-                          RANDOM_TOWN_OBJECT_TILESET, TOWN_CONVERT_SOURCE_FRAME,
-                          TOWN_CONVERT_ANY_FRAME, RANDOM_TOWN_OBJECT_TILESET,
-                          TOWN_CONVERT_OBJECT_NONE,
-                          RANDOM_TOWN_OBJECT_TILESET, RANDOM_TOWN_OBJECT_TILESET);
-    gpGame->ConvertObject(m_x + RANDOM_TOWN_LEFT, m_y + RANDOM_TOWN_TOP,
-                          m_x + RANDOM_TOWN_RIGHT, m_y + RANDOM_TOWN_BOTTOM,
-                          RANDOM_TOWN_OVERLAY_TILESET, TOWN_CONVERT_SOURCE_FRAME,
-                          TOWN_CONVERT_ANY_FRAME, RANDOM_TOWN_OVERLAY_TILESET,
-                          TOWN_CONVERT_OBJECT_NONE,
-                          RANDOM_TOWN_OBJECT_TILESET, RANDOM_TOWN_OBJECT_TILESET);
+    gpGame->ConvertObject(
+        m_x + RANDOM_TOWN_LEFT,
+        m_y + RANDOM_TOWN_TOP,
+        m_x + RANDOM_TOWN_RIGHT,
+        m_y + RANDOM_TOWN_BOTTOM,
+        RANDOM_TOWN_OBJECT_TILESET,
+        TOWN_CONVERT_SOURCE_FRAME,
+        TOWN_CONVERT_ANY_FRAME,
+        RANDOM_TOWN_OBJECT_TILESET,
+        TOWN_CONVERT_OBJECT_NONE,
+        RANDOM_TOWN_OBJECT_TILESET,
+        RANDOM_TOWN_OBJECT_TILESET
+    );
+    gpGame->ConvertObject(
+        m_x + RANDOM_TOWN_LEFT,
+        m_y + RANDOM_TOWN_TOP,
+        m_x + RANDOM_TOWN_RIGHT,
+        m_y + RANDOM_TOWN_BOTTOM,
+        RANDOM_TOWN_OVERLAY_TILESET,
+        TOWN_CONVERT_SOURCE_FRAME,
+        TOWN_CONVERT_ANY_FRAME,
+        RANDOM_TOWN_OVERLAY_TILESET,
+        TOWN_CONVERT_OBJECT_NONE,
+        RANDOM_TOWN_OBJECT_TILESET,
+        RANDOM_TOWN_OBJECT_TILESET
+    );
 }
 
 VA(0x00432e74, 0xe0)
-void town::View(i32 noFade)
-{
+void town::View(i32 noFade) {
     bEnteringTown = 1;
     if (giHighMemBuffer + TOWN_VIEW_MEMORY_REQUIREMENT > TOWN_VIEW_HIGH_MEMORY_LIMIT)
         gAdvDisposeLevel = TOWN_DISPOSE_FULL;
     else if (giHighMemBuffer + TOWN_VIEW_MEMORY_REQUIREMENT > TOWN_VIEW_LOW_MEMORY_LIMIT)
         gAdvDisposeLevel = TOWN_DISPOSE_PARTIAL;
 
-    townManager *manager = gpTownManager;
+    townManager* manager = gpTownManager;
     manager->SetTown(this);
     if (!noFade)
         gpWindowManager->FadeScreen(1, TOWN_FADE_STEPS, 0);
@@ -110,9 +117,8 @@ void town::View(i32 noFade)
 }
 
 VA(0x00432f54, 0x14d)
-void town::Deallocate(void)
-{
-    playerData *playerRecord = &gpGame->m_players[m_owner];
+void town::Deallocate(void) {
+    playerData* playerRecord = &gpGame->m_players[m_owner];
     i32 position = TOWN_ID_NONE;
     i32 i;
 
@@ -145,8 +151,7 @@ void town::Deallocate(void)
 // source-hash maximum is 100%; revisit only after a relevant TOWN source/TU/header
 // or comparison epoch alters MSVC register selection.
 VA(0x004330a1, 0x23e)
-void town::BuildBuilding(i32 building)
-{
+void town::BuildBuilding(i32 building) {
     i32 level;
     if (building == TOWN_OBJECT_MAGE_GUILD) {
         ++m_buildState;
@@ -199,24 +204,22 @@ void town::BuildBuilding(i32 building)
 }
 
 VA(0x004332df, 0x36)
-i32 town::CanBuildDock(void)
-{
+i32 town::CanBuildDock(void) {
     return m_boatX != TOWN_DOCK_COORDINATE_NONE;
 }
 
 VA(0x00433315, 0x9f)
-void town::CalcNumLevelArchers(i32 *numArchers, i32 *mageGuildLevel)
-{
+void town::CalcNumLevelArchers(i32* numArchers, i32* mageGuildLevel) {
     *mageGuildLevel = m_buildState;
     *numArchers = 0;
     i32 building;
-    for (building = TOWN_OBJECT_DWELLING_1;
-         building <= TOWN_OBJECT_ALTERNATE_UPGRADED_DWELLING_6; ++building) {
+    for (building = TOWN_OBJECT_DWELLING_1; building <= TOWN_OBJECT_ALTERNATE_UPGRADED_DWELLING_6;
+         ++building) {
         if (m_buildings & (1L << building))
             ++*numArchers;
     }
-    for (building = TOWN_OBJECT_MAGE_GUILD;
-         building <= TOWN_COMMAND_LAST_NEUTRAL_BUILDING; ++building) {
+    for (building = TOWN_OBJECT_MAGE_GUILD; building <= TOWN_COMMAND_LAST_NEUTRAL_BUILDING;
+         ++building) {
         if (m_buildings & (1L << building))
             ++*numArchers;
     }

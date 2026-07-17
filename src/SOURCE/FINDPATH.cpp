@@ -25,15 +25,15 @@
 // Retail .data raw storage ends at VA 0x00523000. These VAs are in its loader-zero
 // virtual tail, so the definitions intentionally have no initializer.
 DATA(0x0052adc0) static i32 gSearchLow;
-DATA(0x0052adc4) static mapCell *gSearchNextCell;
-DATA(0x0052ae40) static searchNode *gSearchCell;
+DATA(0x0052adc4) static mapCell* gSearchNextCell;
+DATA(0x0052ae40) static searchNode* gSearchCell;
 DATA(0x0052ae44) static i32 gSearchNextY;
-DATA(0x0052ae48) static mapCell *gSearchCurrentCell;
+DATA(0x0052ae48) static mapCell* gSearchCurrentCell;
 DATA(0x0052ae4c) static i32 gSearchDirection;
 DATA(0x0052ae50) static i32 gSearchTriggerType;
 DATA(0x0052ae54) static i32 gSearchNextX;
 DATA(0x0052ae58) static i32 gSearchTerrain;
-DATA(0x0052ae5c) static searchNode *gSearchQueueNode;
+DATA(0x0052ae5c) static searchNode* gSearchQueueNode;
 DATA(0x0052ae60) static i32 gSearchMiddle;
 DATA(0x0052ae64) static i32 gSearchHigh;
 
@@ -51,17 +51,18 @@ DATA(0x0052ae64) static i32 gSearchHigh;
 // has no base-only owner. Preserve other nonexact call-site topology as function/link
 // packing work; do not add aliases, padding, or placement rules.
 DATA(0x0051733c) static SFindPathSourceLocation gSearchAllocationSource = {
-    { FINDPATH_ALLOCATION_SOURCE_LINE_BASE, 0 }, FINDPATH_SOURCE_FILE
+    {FINDPATH_ALLOCATION_SOURCE_LINE_BASE, 0},
+    FINDPATH_SOURCE_FILE
 };
 DATA(0x0051736c) static SFindPathSourceLocation gSearchDestructionSource = {
-    { FINDPATH_DESTRUCTION_SOURCE_LINE_BASE, 0 }, FINDPATH_SOURCE_FILE
+    {FINDPATH_DESTRUCTION_SOURCE_LINE_BASE, 0},
+    FINDPATH_SOURCE_FILE
 };
 
 // @early-stop: all 14 meaningful bytes are raw-identical and both sides have zero
 // relocations; retail's only residual is the trailing 8B FF two-byte alignment pad.
 VA(0x004a4a50, 0x10)
-searchArray::searchArray(void)
-{
+searchArray::searchArray(void) {
     m_storage.cells = 0;
     m_maxQueueCount = 0;
 }
@@ -70,11 +71,13 @@ searchArray::searchArray(void)
 // relocations agree and the residual is the delinked line-constant identity plus
 // one retail alignment LEA after RET.
 VA(0x004a4a60, 0x30)
-searchArray::~searchArray()
-{
+searchArray::~searchArray() {
     if (m_storage.cells != 0)
-        BaseFree(m_storage.cells, gSearchDestructionSource.sourceFile,
-                 gSearchDestructionSource.line.value + 1);
+        BaseFree(
+            m_storage.cells,
+            gSearchDestructionSource.sourceFile,
+            gSearchDestructionSource.line.value + 1
+        );
     m_storage.cells = 0;
 }
 
@@ -82,34 +85,39 @@ searchArray::~searchArray()
 // relocations agree and only two delinked line-constant identities and retail
 // post-RET alignment remain.
 VA(0x004a4a90, 0x60)
-void searchArray::Init(void)
-{
+void searchArray::Init(void) {
     if (m_storage.cells != 0)
-        BaseFree(m_storage.cells, gSearchDestructionSource.sourceFile,
-                 gSearchDestructionSource.line.value + 1);
+        BaseFree(
+            m_storage.cells,
+            gSearchDestructionSource.sourceFile,
+            gSearchDestructionSource.line.value + 1
+        );
     m_storage.cells = 0;
-    m_storage.cells = static_cast<searchCell *>(BaseAlloc(
-        MAP_WIDTH * MAP_HEIGHT * sizeof(searchCell), gSearchAllocationSource.sourceFile,
-        gSearchAllocationSource.line.value + 2));
+    m_storage.cells = static_cast<searchCell*>(BaseAlloc(
+        MAP_WIDTH * MAP_HEIGHT * sizeof(searchCell),
+        gSearchAllocationSource.sourceFile,
+        gSearchAllocationSource.line.value + 2
+    ));
 }
 
 // @early-stop: relocation-masked instructions are identical; the 3/3 external
 // relocations agree and the residual is one delinked line constant plus a retail
 // alignment LEA after RET.
 VA(0x004a4af0, 0x30)
-void searchArray::Close(void)
-{
+void searchArray::Close(void) {
     if (m_storage.cells != 0)
-        BaseFree(m_storage.cells, gSearchDestructionSource.sourceFile,
-                 gSearchDestructionSource.line.value + 1);
+        BaseFree(
+            m_storage.cells,
+            gSearchDestructionSource.sourceFile,
+            gSearchDestructionSource.line.value + 1
+        );
     m_storage.cells = 0;
 }
 
 // @early-stop: every meaningful instruction and both external relocations match;
 // retail has one trailing alignment LEA after RET.
 VA(0x004a4b20, 0x40)
-void searchArray::Clear(void)
-{
+void searchArray::Clear(void) {
     memset(m_queue, 0, sizeof(m_queue));
     memset(m_storage.cells, 0, MAP_WIDTH * MAP_HEIGHT * sizeof(searchCell));
     m_pathLength = 0;
@@ -122,8 +130,7 @@ void searchArray::Clear(void)
 // while candidate emits CMP EAX,ESI/JG; retail also has a trailing alignment LEA.
 // x>=y, y<=x, y<x, and x<y with reversed return-arm order were all compiled.
 VA(0x004a4b60, 0x40)
-i32 searchArray::QuickDistance(i32 x1, i32 y1, i32 x2, i32 y2)
-{
+i32 searchArray::QuickDistance(i32 x1, i32 y1, i32 x2, i32 y2) {
     i32 xDistance = abs(x1 - x2);
     i32 yDistance = abs(y1 - y2);
 
@@ -138,9 +145,14 @@ i32 searchArray::QuickDistance(i32 x1, i32 y1, i32 x2, i32 y2)
 // and top-level locals, operand reversal, row pointers, semantic aliases, register
 // hints, declaration order, and parameter names; revisit after 95%/TU-state changes.
 VA(0x004a4ba0, 0x80)
-i32 CalcTerrainCost(i32 terrain, i32 diagonal, i32 mobility,
-                    i32 direction, i32 useRoad, i32 usePathfinding)
-{
+i32 CalcTerrainCost(
+    i32 terrain,
+    i32 diagonal,
+    i32 mobility,
+    i32 direction,
+    i32 useRoad,
+    i32 usePathfinding
+) {
     i32 roadCost;
 
     if (mobility < giTerrainCost[terrain][direction][1]) {
@@ -169,22 +181,29 @@ terrainCost:
 // scratch globals. First divergence is scratch-register assignment at queue setup;
 // revisit after 95% or shared-layout/TU-state changes.
 VA(0x004a4c20, 0x270)
-void searchArray::PushPoint(i32 x, i32 y, i32 direction, i32 cost,
-                            i32 mobility, i32 unknownFlag, i32 rvFlag1,
-                            i32 valueX, i32 valueY, i32 rvFlag2,
-                            i32 previousX, i32 previousY)
-{
+void searchArray::PushPoint(
+    i32 x,
+    i32 y,
+    i32 direction,
+    i32 cost,
+    i32 mobility,
+    i32 unknownFlag,
+    i32 rvFlag1,
+    i32 valueX,
+    i32 valueY,
+    i32 rvFlag2,
+    i32 previousX,
+    i32 previousY
+) {
     if (cost > mobility && mobility > 0)
         return;
-    if (x >= 0 && x <= MAP_WIDTH - 1 && y >= 0 && y <= MAP_HEIGHT - 1 &&
-        m_queueCount < 1024) {
+    if (x >= 0 && x <= MAP_WIDTH - 1 && y >= 0 && y <= MAP_HEIGHT - 1 && m_queueCount < 1024) {
         gSearchLow = 0;
         gSearchHigh = m_queueCount;
         gSearchCell = &GetNode(x, y);
-        if (!gSearchCell->visited ||
-            ((gSearchCell->rvFlag1 || !rvFlag1) &&
-             (cost < gSearchCell->distance ||
-              (gSearchCell->rvFlag1 && !rvFlag1)))) {
+        if (!gSearchCell->visited
+            || ((gSearchCell->rvFlag1 || !rvFlag1)
+                && (cost < gSearchCell->distance || (gSearchCell->rvFlag1 && !rvFlag1)))) {
 
             for (;;) {
                 gSearchMiddle = (gSearchLow + gSearchHigh) / 2;
@@ -198,17 +217,18 @@ void searchArray::PushPoint(i32 x, i32 y, i32 direction, i32 cost,
             }
 
             if (static_cast<u32>(gSearchMiddle) < m_queueCount) {
-                memmove(gSearchQueueNode + 1, gSearchQueueNode,
-                        (m_queueCount - gSearchMiddle) * sizeof(searchNode));
+                memmove(
+                    gSearchQueueNode + 1,
+                    gSearchQueueNode,
+                    (m_queueCount - gSearchMiddle) * sizeof(searchNode)
+                );
             }
             m_queueCount++;
 
             if (giCurTempMobility < cost && rvFlag2 == 0) {
                 gSearchQueueNode->rvFlag2 = 1;
-                gSearchQueueNode->previousX =
-                    static_cast<i8>(x - normalDirTable[direction].x);
-                gSearchQueueNode->previousY =
-                    static_cast<i8>(y - normalDirTable[direction].y);
+                gSearchQueueNode->previousX = static_cast<i8>(x - normalDirTable[direction].x);
+                gSearchQueueNode->previousY = static_cast<i8>(y - normalDirTable[direction].y);
             } else {
                 gSearchQueueNode->rvFlag2 = static_cast<u8>(rvFlag2);
                 gSearchQueueNode->previousX = static_cast<i8>(previousX);
@@ -233,11 +253,14 @@ void searchArray::PushPoint(i32 x, i32 y, i32 direction, i32 cost,
 // First divergence is EBX/EDI ownership in occupied-array initialization; memset,
 // byte stores, sentinels and both terrain-arm orders were tried. Revisit after 95%.
 VA(0x004a4e90, 0x36f)
-void searchArray::TestPossibleDirections(i32 x, i32 y,
-                                         i8 * const terrain,
-                                         i8 * const occupied,
-                                         i32 allowOccupied, i32 waterMode)
-{
+void searchArray::TestPossibleDirections(
+    i32 x,
+    i32 y,
+    i8* const terrain,
+    i8* const occupied,
+    i32 allowOccupied,
+    i32 waterMode
+) {
     i32 invalidTerrain = SEARCH_INVALID_COORDINATE;
 
     memset(occupied, 0, SEARCH_DIRECTION_COUNT);
@@ -247,14 +270,14 @@ void searchArray::TestPossibleDirections(i32 x, i32 y,
     do {
         gSearchNextX = x + normalDirTable[gSearchDirection].x;
         gSearchNextY = y + normalDirTable[gSearchDirection].y;
-        if (gSearchNextX < 0 || MAP_WIDTH <= gSearchNextX || gSearchNextY < 0 ||
-            MAP_HEIGHT <= gSearchNextY)
+        if (gSearchNextX < 0 || MAP_WIDTH <= gSearchNextX || gSearchNextY < 0
+            || MAP_HEIGHT <= gSearchNextY)
             goto invalidDirection;
 
         gSearchNextCell = gpAdvManager->GetCell(gSearchNextX, gSearchNextY);
-        if ((gSearchNextCell->m_flags & SEARCH_CELL_UNREACHABLE) != 0 ||
-            (gbHumanPlayer[giCurPlayer] != 0 &&
-             (giCurPlayerBit & mapExtra[gSearchNextY * MAP_WIDTH + gSearchNextX]) == 0))
+        if ((gSearchNextCell->m_flags & SEARCH_CELL_UNREACHABLE) != 0
+            || (gbHumanPlayer[giCurPlayer] != 0
+                && (giCurPlayerBit & mapExtra[gSearchNextY * MAP_WIDTH + gSearchNextX]) == 0))
             goto invalidDirection;
 
         if ((gSearchNextCell->m_triggerType & SEARCH_TRIGGER_PRESENT) != 0) {
@@ -271,57 +294,58 @@ void searchArray::TestPossibleDirections(i32 x, i32 y,
             if (waterMode != 0) {
                 if (gSearchNextCell->m_triggerType == SEARCH_WATER_ENTRY_SECOND)
                     goto invalidDirection;
-                if (giGroundToTerrain[gSearchCurrentCell->m_terrainImageIndex] == SEARCH_TERRAIN_WATER &&
-                    normalDirTable[gSearchDirection].x != 0 &&
-                    normalDirTable[gSearchDirection].y != 0) {
-                    if (giGroundToTerrain[
-                            gpAdvManager->GetCell(gSearchNextX, y)->m_terrainImageIndex] != SEARCH_TERRAIN_WATER ||
-                        giGroundToTerrain[
-                            gpAdvManager->GetCell(x, gSearchNextY)->m_terrainImageIndex] != SEARCH_TERRAIN_WATER)
+                if (giGroundToTerrain[gSearchCurrentCell->m_terrainImageIndex]
+                        == SEARCH_TERRAIN_WATER
+                    && normalDirTable[gSearchDirection].x != 0
+                    && normalDirTable[gSearchDirection].y != 0) {
+                    if (giGroundToTerrain[gpAdvManager->GetCell(gSearchNextX, y)
+                                              ->m_terrainImageIndex]
+                            != SEARCH_TERRAIN_WATER
+                        || giGroundToTerrain[gpAdvManager->GetCell(x, gSearchNextY)
+                                                 ->m_terrainImageIndex]
+                               != SEARCH_TERRAIN_WATER)
                         goto invalidDirection;
                 }
             } else {
-                if (gSearchNextCell->m_triggerType != SEARCH_WATER_ENTRY_FIRST &&
-                    gSearchNextCell->m_triggerType != SEARCH_WATER_ENTRY_SECOND &&
-                    gSearchNextCell->m_triggerType != SEARCH_WATER_ENTRY_THIRD)
+                if (gSearchNextCell->m_triggerType != SEARCH_WATER_ENTRY_FIRST
+                    && gSearchNextCell->m_triggerType != SEARCH_WATER_ENTRY_SECOND
+                    && gSearchNextCell->m_triggerType != SEARCH_WATER_ENTRY_THIRD)
                     goto invalidDirection;
             }
-        } else if (waterMode != 0 &&
-                   gSearchNextCell->m_triggerType != SEARCH_TRIGGER_BOAT) {
+        } else if (waterMode != 0 && gSearchNextCell->m_triggerType != SEARCH_TRIGGER_BOAT) {
             goto invalidDirection;
         }
 
     testObjects:
         if (((1U << gSearchDirection) & SEARCH_DIRECTION_EDGE_OBJECT_MASK) != 0) {
-            if ((gSearchCurrentCell->m_objectIndex != SEARCH_NO_OBJECT &&
-                 (gSearchCurrentCell->m_objTypeBits & SEARCH_OBJECT_TYPE_MASK) !=
-                     SEARCH_BLOCKING_OBJECT_TYPE &&
-                 (gSearchCurrentCell->m_flags & SEARCH_CELL_BLOCKED) == 0))
+            if ((gSearchCurrentCell->m_objectIndex != SEARCH_NO_OBJECT
+                 && (gSearchCurrentCell->m_objTypeBits & SEARCH_OBJECT_TYPE_MASK)
+                        != SEARCH_BLOCKING_OBJECT_TYPE
+                 && (gSearchCurrentCell->m_flags & SEARCH_CELL_BLOCKED) == 0))
                 goto invalidDirection;
             if (gSearchNextCell->m_overlayIndex != SEARCH_NO_OBJECT) {
-                mapCell *belowNext =
-                    gpAdvManager->GetCell(gSearchNextX, gSearchNextY + 1);
-                if (belowNext->m_objectIndex != SEARCH_NO_OBJECT &&
-                    (belowNext->m_objTypeBits & SEARCH_OBJECT_TYPE_MASK) !=
-                        SEARCH_BLOCKING_OBJECT_TYPE &&
-                    (belowNext->m_flags & SEARCH_CELL_BLOCKED) == 0)
+                mapCell* belowNext = gpAdvManager->GetCell(gSearchNextX, gSearchNextY + 1);
+                if (belowNext->m_objectIndex != SEARCH_NO_OBJECT
+                    && (belowNext->m_objTypeBits & SEARCH_OBJECT_TYPE_MASK)
+                           != SEARCH_BLOCKING_OBJECT_TYPE
+                    && (belowNext->m_flags & SEARCH_CELL_BLOCKED) == 0)
                     goto invalidDirection;
             }
         } else if (((1U << gSearchDirection) & SEARCH_DIRECTION_OBJECT_MASK) != 0) {
-            if (gSearchNextCell->m_objectIndex == SEARCH_NO_OBJECT ||
-                (gSearchNextCell->m_objTypeBits & SEARCH_OBJECT_TYPE_MASK) ==
-                    SEARCH_BLOCKING_OBJECT_TYPE ||
-                (gSearchNextCell->m_flags & SEARCH_CELL_BLOCKED) != 0 ||
-                ((gSearchNextCell->m_triggerType & SEARCH_TRIGGER_PRESENT) != 0 &&
-                 (gSearchTriggerType = gSearchNextCell->m_triggerType & SEARCH_TRIGGER_MASK,
-                  StopOnTrigger(gSearchNextCell) != 0))) {
+            if (gSearchNextCell->m_objectIndex == SEARCH_NO_OBJECT
+                || (gSearchNextCell->m_objTypeBits & SEARCH_OBJECT_TYPE_MASK)
+                       == SEARCH_BLOCKING_OBJECT_TYPE
+                || (gSearchNextCell->m_flags & SEARCH_CELL_BLOCKED) != 0
+                || ((gSearchNextCell->m_triggerType & SEARCH_TRIGGER_PRESENT) != 0
+                    && (gSearchTriggerType = gSearchNextCell->m_triggerType & SEARCH_TRIGGER_MASK,
+                        StopOnTrigger(gSearchNextCell) != 0))) {
                 if (gSearchCurrentCell->m_overlayIndex == SEARCH_NO_OBJECT)
                     goto storeDirection;
-                mapCell *belowCurrent = gpAdvManager->GetCell(x, y + 1);
-                if (belowCurrent->m_objectIndex == SEARCH_NO_OBJECT ||
-                    (belowCurrent->m_objTypeBits & SEARCH_OBJECT_TYPE_MASK) ==
-                        SEARCH_BLOCKING_OBJECT_TYPE ||
-                    (belowCurrent->m_flags & SEARCH_CELL_BLOCKED) != 0)
+                mapCell* belowCurrent = gpAdvManager->GetCell(x, y + 1);
+                if (belowCurrent->m_objectIndex == SEARCH_NO_OBJECT
+                    || (belowCurrent->m_objTypeBits & SEARCH_OBJECT_TYPE_MASK)
+                           == SEARCH_BLOCKING_OBJECT_TYPE
+                    || (belowCurrent->m_flags & SEARCH_CELL_BLOCKED) != 0)
                     goto storeDirection;
             }
             goto invalidDirection;
@@ -340,8 +364,7 @@ void searchArray::TestPossibleDirections(i32 x, i32 y,
 // instruction and all 16/16 ordered external relocations match. Retail alone has
 // a trailing three-byte alignment LEA after RET.
 VA(0x004a5200, 0x1f0)
-void searchArray::SeedCombatPosition(class army *unit)
-{
+void searchArray::SeedCombatPosition(class army* unit) {
     i32 hex;
 
     for (hex = 0; hex < COMBAT_HEX_COUNT; hex++)
@@ -359,15 +382,13 @@ void searchArray::SeedCombatPosition(class army *unit)
         }
     }
 
-    for (i32 index = 0;
-         index < gpCombatManager->m_armyCount[1 - unit->m_side]; index++) {
-        army *enemy = &gpCombatManager->m_armies[1 - unit->m_side][index];
+    for (i32 index = 0; index < gpCombatManager->m_armyCount[1 - unit->m_side]; index++) {
+        army* enemy = &gpCombatManager->m_armies[1 - unit->m_side][index];
         unit->m_targetSide = enemy->m_side;
         unit->m_targetIndex = enemy->m_index;
         hex = enemy->m_hex;
 
-        if (unit->m_monster.speed <= 0 ||
-            unit->GetAttackMask(unit->m_hex, 1, -1) != 0xff) {
+        if (unit->m_monster.speed <= 0 || unit->GetAttackMask(unit->m_hex, 1, -1) != 0xff) {
             if (unit->ValidPath(hex, 1) == 1)
                 gpCombatManager->m_hexCells[hex].m_pathReachable = 1;
         } else {
@@ -376,11 +397,11 @@ void searchArray::SeedCombatPosition(class army *unit)
 
         if ((enemy->m_monster.attributes & MONSTER_ATTRIBUTE_WIDE) != 0) {
             hex = enemy->GetAdjacentCellIndex(
-                hex, enemy->m_facing == 1 ? COMBAT_DIRECTION_NORTHEAST
-                                          : COMBAT_DIRECTION_SOUTHWEST);
-            if ((unit->m_monster.speed > 0 &&
-                 unit->GetAttackMask(unit->m_hex, 1, -1) == 0xff) ||
-                unit->ValidPath(hex, 1) == 1) {
+                hex,
+                enemy->m_facing == 1 ? COMBAT_DIRECTION_NORTHEAST : COMBAT_DIRECTION_SOUTHWEST
+            );
+            if ((unit->m_monster.speed > 0 && unit->GetAttackMask(unit->m_hex, 1, -1) == 0xff)
+                || unit->ValidPath(hex, 1) == 1) {
                 gpCombatManager->m_hexCells[hex].m_pathReachable = 1;
             }
         }
@@ -394,9 +415,13 @@ void searchArray::SeedCombatPosition(class army *unit)
 // ECX for the moat-cell byte. Result/attack-target lifetime reuse and branch
 // polarities are recovered; revisit after 95% for register allocation only.
 VA(0x004a53f0, 0x410)
-i32 searchArray::FindCombatPath(i32 sourceHex, i32 targetHex, class army *unit,
-                                i32 attackPath, i32 ignoreTargetMoat)
-{
+i32 searchArray::FindCombatPath(
+    i32 sourceHex,
+    i32 targetHex,
+    class army* unit,
+    i32 attackPath,
+    i32 ignoreTargetMoat
+) {
     u8 savedMoatState[9];
     memset(bIsMoatSlowed, 0, sizeof(bIsMoatSlowed));
 
@@ -412,12 +437,10 @@ i32 searchArray::FindCombatPath(i32 sourceHex, i32 targetHex, class army *unit,
 
         for (moatIndex = 0; moatIndex < 9; moatIndex++) {
             i32 moatHex = moatCell[moatIndex];
-            savedMoatState[moatIndex] =
-                gpCombatManager->m_hexCells[moatHex].m_pathReachable;
-            if ((moatIndex != 4 || gpCombatManager->m_drawbridgeState == 4) &&
-                ((targetHex != moatHex && targetWideHex != moatHex) ||
-                 ignoreTargetMoat != 0) &&
-                (unit->m_hex != moatHex && sourceWideHex != moatHex)) {
+            savedMoatState[moatIndex] = gpCombatManager->m_hexCells[moatHex].m_pathReachable;
+            if ((moatIndex != 4 || gpCombatManager->m_drawbridgeState == 4)
+                && ((targetHex != moatHex && targetWideHex != moatHex) || ignoreTargetMoat != 0)
+                && (unit->m_hex != moatHex && sourceWideHex != moatHex)) {
                 bIsMoatSlowed[moatHex] = 1;
             }
         }
@@ -433,16 +456,18 @@ i32 searchArray::FindCombatPath(i32 sourceHex, i32 targetHex, class army *unit,
     m_queueCount = 0;
     m_pathLength = 0;
 
-    i8 *path;
+    i8* path;
     if (ValidHex(sourceHex) && ValidHex(targetHex) && unit != 0) {
         path = m_storage.aiPath.directions;
         u32 attackMask;
         i32 attackDirection;
         i32 currentHex;
-        PushCombatPoint(sourceHex,
-                        unit->m_facing == 0 ? COMBAT_DIRECTION_SOUTHWEST
-                                            : COMBAT_DIRECTION_NORTHEAST,
-                        0, unit->m_monster.speed);
+        PushCombatPoint(
+            sourceHex,
+            unit->m_facing == 0 ? COMBAT_DIRECTION_SOUTHWEST : COMBAT_DIRECTION_NORTHEAST,
+            0,
+            unit->m_monster.speed
+        );
 
         while (m_queueCount != 0) {
             searchNode node = m_queue[--m_queueCount];
@@ -450,10 +475,12 @@ i32 searchArray::FindCombatPath(i32 sourceHex, i32 targetHex, class army *unit,
                 continue;
 
             currentHex = node.x;
-            i32 xDistance = abs(gpCombatManager->m_hexCells[currentHex].m_x -
-                                gpCombatManager->m_hexCells[targetHex].m_x);
-            i32 yDistance = abs(gpCombatManager->m_hexCells[currentHex].m_y -
-                                gpCombatManager->m_hexCells[targetHex].m_y);
+            i32 xDistance =
+                abs(gpCombatManager->m_hexCells[currentHex].m_x
+                    - gpCombatManager->m_hexCells[targetHex].m_x);
+            i32 yDistance =
+                abs(gpCombatManager->m_hexCells[currentHex].m_y
+                    - gpCombatManager->m_hexCells[targetHex].m_y);
             i32 distance;
             if (xDistance >= yDistance)
                 distance = xDistance + yDistance / 2;
@@ -482,9 +509,12 @@ i32 searchArray::FindCombatPath(i32 sourceHex, i32 targetHex, class army *unit,
                     i32 moatCost = 0;
                     if (bIsMoatSlowed[nextHex])
                         moatCost = unit->m_speed + 2;
-                    PushCombatPoint(nextHex, direction,
-                                    node.distance + moatCost + 1,
-                                    unit->m_monster.speed);
+                    PushCombatPoint(
+                        nextHex,
+                        direction,
+                        node.distance + moatCost + 1,
+                        unit->m_monster.speed
+                    );
                 }
             }
         }
@@ -526,7 +556,7 @@ restoreMoat:
 reconstructPath:
     path = m_storage.aiPath.directions + m_pathLength;
     while (bestHex != sourceHex) {
-        searchNode &cell = m_storage.nodes[bestHex];
+        searchNode& cell = m_storage.nodes[bestHex];
         *path++ = static_cast<i8>(cell.direction);
         m_pathLength++;
         if (m_pathLength > 0xff)
@@ -543,18 +573,16 @@ reconstructPath:
 // divergence is ESI/EDI ownership in the prologue. Compound/nested gates, signed
 // and unsigned indices, and early/late cell formation were tried; revisit at 95%.
 VA(0x004a5800, 0x100)
-void searchArray::PushCombatPoint(i32 hex, i32 direction, i32 distance, i32 speed)
-{
+void searchArray::PushCombatPoint(i32 hex, i32 direction, i32 distance, i32 speed) {
     if (ValidHex(hex)) {
         i32 low = 0;
         i32 high = m_queueCount;
-        searchNode *cell;
+        searchNode* cell;
         if (speed <= 0 || distance <= speed) {
             cell = &m_storage.nodes[hex];
-            if ((!cell->visited || distance < cell->distance) &&
-                m_queueCount < 1024) {
+            if ((!cell->visited || distance < cell->distance) && m_queueCount < 1024) {
                 i32 middle;
-                searchNode *node;
+                searchNode* node;
 
                 for (;;) {
                     middle = (low + high) / 2;
@@ -567,8 +595,7 @@ void searchArray::PushCombatPoint(i32 hex, i32 direction, i32 distance, i32 spee
                         high = middle;
                 }
                 if (middle < m_queueCount) {
-                    memmove(node + 1, node,
-                            (m_queueCount - middle) * sizeof(searchNode));
+                    memmove(node + 1, node, (m_queueCount - middle) * sizeof(searchNode));
                 }
                 m_queueCount++;
                 if (m_maxQueueCount < m_queueCount)

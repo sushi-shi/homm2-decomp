@@ -12,15 +12,15 @@
 #include <BASE/bitmap.h>
 #include <SOURCE/dimPalette.h>
 // Per-call decoder scratch — its own file-static block (0x534bf0+).
-DATA(0x00534bf0) static u8 *gDimRow;
+DATA(0x00534bf0) static u8* gDimRow;
 DATA(0x00534bf4) static u32 gDimCnt;
 DATA(0x00534bf8) static u32 gDimRun;
 DATA(0x00534bfc) static i32 gDimY;
 DATA(0x00534c00) static u32 gDimCnt2;
-DATA(0x00534c04) static IconEntry *gDimEntry;
+DATA(0x00534c04) static IconEntry* gDimEntry;
 DATA(0x00534c08) static i32 gDimClipB;
-DATA(0x00534c0c) static u8 *gDimSrc;
-DATA(0x00534c10) static u8 *gDimDst;
+DATA(0x00534c0c) static u8* gDimSrc;
+DATA(0x00534c10) static u8* gDimDst;
 DATA(0x00534c14) static i32 gDimX;
 DATA(0x00534c18) static i32 gDimClipR;
 DATA(0x00534c1c) static i32 gDimX0;
@@ -48,14 +48,23 @@ DATA(0x00534c1c) static i32 gDimX0;
 // the honest 34/37 relocation shape and raises the live score to 79.24138%; two gDimX0 and one
 // gDimY reload remain absent, with the row symbol difference only a delinked owner alias.
 VA(0x004cfd50, 0x26e)
-void DimIconToBitmap(class icon *srcIcon, class bitmap *dest, i32 x, i32 y, i32 frame,
-                     i32 color, i32 clip, i32 clipX, i32 clipY, i32 clipW, i32 clipH)
-{
-    IconEntry *entries = srcIcon->Entries();
+void DimIconToBitmap(
+    class icon* srcIcon,
+    class bitmap* dest,
+    i32 x,
+    i32 y,
+    i32 frame,
+    i32 color,
+    i32 clip,
+    i32 clipX,
+    i32 clipY,
+    i32 clipW,
+    i32 clipH
+) {
+    IconEntry* entries = srcIcon->Entries();
     i32 entryX = entries[frame].x;
-    IconEntry * const entry = &entries[frame];
-    u8 * const srcData =
-        reinterpret_cast<u8 *>(entries) + entries[frame].srcOffset;
+    IconEntry* const entry = &entries[frame];
+    u8* const srcData = reinterpret_cast<u8*>(entries) + entries[frame].srcOffset;
     gDimEntry = entry;
     const i32 entryY = entry->y;
     gDimSrc = srcData;
@@ -65,8 +74,8 @@ void DimIconToBitmap(class icon *srcIcon, class bitmap *dest, i32 x, i32 y, i32 
     i32 right;
     u32 cnt;
     if (clip != 0) {
-        if (clipX > gDimX0 || gDimX0 + entry->w > clipX + clipW || gDimY < clipY ||
-            gDimY + entry->h > clipY + clipH) {
+        if (clipX > gDimX0 || gDimX0 + entry->w > clipX + clipW || gDimY < clipY
+            || gDimY + entry->h > clipY + clipH) {
             clip = 1;
             gDimClipR = clipX + clipW - 1;
             gDimClipB = clipY + clipH - 1;
@@ -77,7 +86,7 @@ void DimIconToBitmap(class icon *srcIcon, class bitmap *dest, i32 x, i32 y, i32 
     i32 rowOffset = gDimY;
     i16 pitch = dest->m_width;
     rowOffset = rowOffset * pitch;
-    u8 *row = dest->m_pixels + rowOffset;
+    u8* row = dest->m_pixels + rowOffset;
     for (;;) {
         gDimX = X;
         i32 cmd = ReadIconRleByte(gDimSrc);
@@ -94,7 +103,7 @@ void DimIconToBitmap(class icon *srcIcon, class bitmap *dest, i32 x, i32 y, i32 
         gDimRun = cmd;
         if (cmd != 0) {
             if (clip == 0) {
-                u8 *dst = row + X;
+                u8* dst = row + X;
                 u32 paletteOffset;
                 gDimCnt = 0;
                 gDimDst = dst;
@@ -110,10 +119,10 @@ void DimIconToBitmap(class icon *srcIcon, class bitmap *dest, i32 x, i32 y, i32 
                     } while (cnt != 0);
                 }
             } else {
-                if (gDimY >= clipY && gDimY <= gDimClipB &&
-                    (right = X + cmd, clipX < right) && X <= gDimClipR) {
+                if (gDimY >= clipY && gDimY <= gDimClipB && (right = X + cmd, clipX < right)
+                    && X <= gDimClipR) {
                     u32 palOffset;
-                    u8 *dst;
+                    u8* dst;
                     if (X >= clipX) {
                         right = gDimClipR < right ? (gDimClipR - X) + 1 : cmd;
                         dst = row + X;

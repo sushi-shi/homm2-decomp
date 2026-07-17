@@ -28,10 +28,15 @@ typedef unsigned __int64 u64;
 // The opt-in Clang audit sees genuine enums and diagnoses cross-domain data flow.
 #ifdef HOMM2_STRICT_ENUM_TYPES
 #define HOMM2_ENUM_BEGIN(name) typedef enum name {
-#define HOMM2_ENUM_END(name) } name;
+#define HOMM2_ENUM_END(name)                                                                       \
+    }                                                                                              \
+    name;
 #else
 #define HOMM2_ENUM_BEGIN(name) enum {
-#define HOMM2_ENUM_END(name) }; typedef i32 name;
+#define HOMM2_ENUM_END(name)                                                                       \
+    }                                                                                              \
+    ;                                                                                              \
+    typedef i32 name;
 #endif
 
 #endif // HOMM2_INTS_H

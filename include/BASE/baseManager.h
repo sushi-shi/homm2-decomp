@@ -31,25 +31,27 @@ typedef enum BaseManagerConstant {
     BASE_MANAGER_NAME_CAPACITY = 0x1e
 } BaseManagerConstant;
 
-#pragma pack(push, 1)  // recovered layout is byte-packed
+#pragma pack(push, 1) // recovered layout is byte-packed
 class baseManager /* abstract */ {
 public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (vptr auto-emitted at 0x00; own data starts at 0x04)
-    baseManager *m_next;  // +0x04  next in the executive manager list
-    baseManager *m_prev;  // +0x08  prev in the executive manager list
-    i32    m_messageMask;  // +0x0c  event/message classes accepted by Main
-    i32    m_priority;  // +0x10  executive manager-list ordering key
-    char   m_name[BASE_MANAGER_NAME_CAPACITY];  // +0x14  manager name
-    i32    m_active;  // +0x32
+    baseManager* m_next;                     // +0x04  next in the executive manager list
+    baseManager* m_prev;                     // +0x08  prev in the executive manager list
+    i32 m_messageMask;                       // +0x0c  event/message classes accepted by Main
+    i32 m_priority;                          // +0x10  executive manager-list ordering key
+    char m_name[BASE_MANAGER_NAME_CAPACITY]; // +0x14  manager name
+    i32 m_active;                            // +0x32
     // --- constructors ---
     baseManager(void);
-    void Activate(void) { m_active = BASE_MANAGER_ACTIVE; }
+    void Activate(void) {
+        m_active = BASE_MANAGER_ACTIVE;
+    }
     // --- virtual methods (vtable order) ---
     virtual i32 Open(i32) = 0;
     virtual void Close(void) = 0;
-    virtual i32 Main(struct tag_message &) = 0;
+    virtual i32 Main(struct tag_message&) = 0;
 };
 #pragma pack(pop)
 SIZE(baseManager, 0x36);

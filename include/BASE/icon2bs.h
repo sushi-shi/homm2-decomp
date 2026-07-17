@@ -13,6 +13,6 @@ typedef enum IconScaleConstant {
     ICON_SCALE_WORK_BITMAP_SIZE = 0x40
 } IconScaleConstant;
 
-void IconToBitmapScale(class icon *, class bitmap *, i32, i32, i32, i32, i32, i32, i32, i32, i32);
+void IconToBitmapScale(class icon*, class bitmap*, i32, i32, i32, i32, i32, i32, i32, i32, i32);
 
 #endif // HOMM2_ICON2BS_H

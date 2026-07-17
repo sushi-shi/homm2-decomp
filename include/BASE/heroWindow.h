@@ -24,36 +24,36 @@ typedef enum WindowWidgetRecordType {
     WINDOW_WIDGET_RECORD_TEXT_ENTRY_INSET_FOUR = 0x206
 } WindowWidgetRecordType;
 
-#pragma pack(push, 1)  // recovered layout is byte-packed
+#pragma pack(push, 1) // recovered layout is byte-packed
 class heroWindow {
 public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
-    i32    m_zOrder;  // +0x00
-    heroWindow *m_nextWindow;  // +0x04  next window in the manager list
-    heroWindow *m_prevWindow;  // +0x08  prev window in the manager list
-    char   name[0x14];  // +0x0c  window name (strcpy'd, e.g. "Default Construct")
-    i32    m_winFlags;  // +0x20  !union: conflicting widths
-    i32    m_winState;  // +0x24  !union: conflicting widths
-    i32    m_posX;  // +0x28
-    i32    m_posY;  // +0x2c
-    i32    m_winWidth;  // +0x30
-    i32    m_winHeight;  // +0x34
-    widget *m_widgetListTail;  // +0x38  widget-list tail
-    widget *m_widgetListHead;  // +0x3c  head of the widget list
-    bitmap *m_savedBackground;  // +0x40  saved-background bitmap
+    i32 m_zOrder;              // +0x00
+    heroWindow* m_nextWindow;  // +0x04  next window in the manager list
+    heroWindow* m_prevWindow;  // +0x08  prev window in the manager list
+    char name[0x14];           // +0x0c  window name (strcpy'd, e.g. "Default Construct")
+    i32 m_winFlags;            // +0x20  !union: conflicting widths
+    i32 m_winState;            // +0x24  !union: conflicting widths
+    i32 m_posX;                // +0x28
+    i32 m_posY;                // +0x2c
+    i32 m_winWidth;            // +0x30
+    i32 m_winHeight;           // +0x34
+    widget* m_widgetListTail;  // +0x38  widget-list tail
+    widget* m_widgetListHead;  // +0x3c  head of the widget list
+    bitmap* m_savedBackground; // +0x40  saved-background bitmap
     // size >= 0x44 (accessed lower bound; no ctor/stride oracle)
     // --- constructors ---
     heroWindow(void);
     heroWindow(i32, i32, i32, i32, i32);
-    heroWindow(i32, i32, char *);
+    heroWindow(i32, i32, char*);
     // --- methods ---
     i32 Open(i32, i32);
     void RemoveAndDeleteWidget(i32);
     void Close(void);
-    void AddWidget(class widget *, i32);
-    void RemoveWidget(class widget *);
-    i32 BroadcastMessage(struct tag_message &);
+    void AddWidget(class widget*, i32);
+    void RemoveWidget(class widget*);
+    i32 BroadcastMessage(struct tag_message&);
     void DrawWindow(void);
     void DrawWindow(i32);
     void DrawWindow(i32, i32, i32);

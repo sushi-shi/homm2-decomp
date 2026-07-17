@@ -8,6 +8,20 @@
 class bitmap;
 class icon;
 
-void IconToBitmapColorTable(class icon *, class bitmap *, i32, i32, i32, i32, i32, i32, i32, i32, i32, u8 *, i32);
+void IconToBitmapColorTable(
+    class icon*,
+    class bitmap*,
+    i32,
+    i32,
+    i32,
+    i32,
+    i32,
+    i32,
+    i32,
+    i32,
+    i32,
+    u8*,
+    i32
+);
 
 #endif // HOMM2_ICON2BC_H

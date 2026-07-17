@@ -12,16 +12,16 @@ typedef enum BitmapType {
     BITMAP_TYPE_MEMORY = 0x21
 } BitmapType;
 
-#pragma pack(push, 1)  // recovered layout is byte-packed
+#pragma pack(push, 1) // recovered layout is byte-packed
 class bitmap : public resource {
 public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (vptr auto-emitted at 0x00; own data starts at 0x04)
-    i16  m_bitmapType;  // +0x10  bitmap storage/drawing type
-    i16  m_width;  // +0x12
-    i16  m_height;  // +0x14
-    u8 *m_pixels;  // +0x16  pixel data
+    i16 m_bitmapType; // +0x10  bitmap storage/drawing type
+    i16 m_width;      // +0x12
+    i16 m_height;     // +0x14
+    u8* m_pixels;     // +0x16  pixel data
     // --- constructors ---
     bitmap(void);
     bitmap(i16, i16, i16);
@@ -32,10 +32,10 @@ public:
     __declspec(dllexport) inline void DrawToBuffer(i16, i16);
     void DrawToScreen(i16, i16);
     void GrabScreen(i16, i16);
-    __declspec(dllexport) inline void GrabBitmap(class bitmap *, i16, i16);
-    void GrabBitmapCareful(class bitmap *, i16, i16);
-    void CopyTo(class bitmap *, i32, i32, i32, i32, i32, i32);
-    void CopyToCareful(class bitmap *, i32, i32, i32, i32, i32, i32);
+    __declspec(dllexport) inline void GrabBitmap(class bitmap*, i16, i16);
+    void GrabBitmapCareful(class bitmap*, i16, i16);
+    void CopyTo(class bitmap*, i32, i32, i32, i32, i32, i32);
+    void CopyToCareful(class bitmap*, i32, i32, i32, i32, i32, i32);
 };
 #pragma pack(pop)
 SIZE(bitmap, 0x1a);

@@ -8,6 +8,19 @@
 class bitmap;
 class icon;
 
-void FlipIconToBitmapColorTable(class icon *, class bitmap *, i32, i32, i32, i32, i32, i32, i32, i32, i32, u8 *);
+void FlipIconToBitmapColorTable(
+    class icon*,
+    class bitmap*,
+    i32,
+    i32,
+    i32,
+    i32,
+    i32,
+    i32,
+    i32,
+    i32,
+    i32,
+    u8*
+);
 
 #endif // HOMM2_ICONF2BC_H
