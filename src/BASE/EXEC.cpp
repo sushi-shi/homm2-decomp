@@ -175,19 +175,19 @@ void executive::PrintManagerList(void) {
 }
 
 VA(0x004d18e0, 0xce)
-i32 executive::AddManager(class baseManager* mgr, i32 param_2) {
+i32 executive::AddManager(class baseManager* mgr, i32 priority) {
     if (mgr == 0)
         return EXECUTIVE_MANAGER_ERROR;
-    if (param_2 == EXECUTIVE_MANAGER_DEFAULT_PRIORITY) {
-        param_2 = m_managerListTail == 0 ? 0 : m_managerListTail->m_priority + 1;
+    if (priority == EXECUTIVE_MANAGER_DEFAULT_PRIORITY) {
+        priority = m_managerListTail == 0 ? 0 : m_managerListTail->m_priority + 1;
     }
-    if (mgr->m_active == 0 && mgr->Open(param_2) != 0)
+    if (mgr->m_active == 0 && mgr->Open(priority) != 0)
         return EXECUTIVE_MANAGER_ERROR;
     baseManager* tail = m_managerListTail;
     baseManager* cur = m_managerListTail;
     if (cur != 0) {
         do {
-            if (cur->m_priority <= param_2)
+            if (cur->m_priority <= priority)
                 break;
             cur = cur->m_prev;
         } while (cur != 0);
