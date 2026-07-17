@@ -5426,7 +5426,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     i32 artifactGuardResult_e;
     i32 heroCombatResult_h;
     i32 exitY_d;
-    i32 artifact_g;
+    ArtifactType artifact_g;
     i32 heroInteractionResult;
     i32 resourceType_a;
     i32 exitX;
@@ -6038,7 +6038,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
         case MAP_OBJECT_ARTIFACT:
             artifactResource_p = (cell->m_objectMetadata & ARTIFACT_EVENT_RESOURCE_MASK)
                                  >> ARTIFACT_EVENT_RESOURCE_SHIFT;
-            artifact_g = cell->m_objectIndex >> 1;
+            artifact_g = static_cast<ArtifactType>(cell->m_objectIndex >> 1);
             artifactGuardCount_b = cell->m_objectMetadata & ARTIFACT_EVENT_MONSTER_MASK;
             if (eventHero->NumArtifacts() == AI_EVENT_ARTIFACT_LIMIT)
                 break;
@@ -6052,7 +6052,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                     artifactGuardResult_e = AI_EVENT_ROGUE_COUNT;
                 } else {
                     artifactGuardResult_e = 1;
-                    if (gpPhilAI->ChooseToFightForArtifact(artifact_g, artifactGuardCount_b, 1)
+                    if (gpPhilAI->ChooseToFightForArtifact(IDX(artifact_g), artifactGuardCount_b, 1)
                         == 0)
                         break;
                 }
@@ -6077,7 +6077,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                     eventResults[0] = 1;
                     break;
                 case ARTIFACT_EVENT_MODE_GOLD:
-                    if (gpPhilAI->NetValueOfArtifact(artifact_g, AI_EVENT_ARTIFACT_GOLD, 0, 0)) {
+                    if (gpPhilAI->NetValueOfArtifact(IDX(artifact_g), AI_EVENT_ARTIFACT_GOLD, 0, 0)) {
                         gpGame->m_players[eventHero->m_owner].m_resources[IDX(RES_GOLD)] -=
                             AI_EVENT_ARTIFACT_GOLD;
                         goto artifactPickup;
@@ -6093,7 +6093,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                     break;
                 case ARTIFACT_EVENT_MODE_RESOURCE_3:
                     if (gpPhilAI->NetValueOfArtifact(
-                            artifact_g,
+                            IDX(artifact_g),
                             AI_EVENT_ARTIFACT_RESOURCE_3_GOLD,
                             artifactResource_p,
                             AI_EVENT_ARTIFACT_RESOURCE_3
@@ -6107,7 +6107,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                     break;
                 case ARTIFACT_EVENT_MODE_RESOURCE_5:
                     if (gpPhilAI->NetValueOfArtifact(
-                            artifact_g,
+                            IDX(artifact_g),
                             AI_EVENT_ARTIFACT_RESOURCE_5_GOLD,
                             artifactResource_p,
                             AI_EVENT_ARTIFACT_RESOURCE_5
