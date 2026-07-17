@@ -85,7 +85,7 @@ i32 is_netbios_avail(void) {
 }
 
 VA(0x004a6c88, 0x244)
-extern "C" u16 __fastcall nb_init(u16 param1, u16 param2) {
+extern "C" u16 __fastcall nb_init(u16 maxNames, u16 maxSessions) {
     // Retail interleaves each line base with this function's literals; this compiler groups them.
     DATA(0x005173d8) static i16 gNbInitSourceLineBase = 105;
     NetbiosControlBlock localNcb;
@@ -102,7 +102,7 @@ extern "C" u16 __fastcall nb_init(u16 param1, u16 param2) {
     if (is_netbios_avail() == 0)
         return 1;
     if (gNetbiosAvail != 0) {
-        gNbMaxSess = param2;
+        gNbMaxSess = maxSessions;
         for (i = 0; i < NETBIOS_SESSION_COUNT; i++) {
             gNetStatus[i] = 0;
             gNbSessLsn[i] = NETBIOS_INVALID_ID;
@@ -162,11 +162,9 @@ extern "C" void __fastcall nb_term(void) {
     }
     EnterCriticalSection(&gNbSndLock);
     while ((node = pop_node(&gNbSndQueue)) != 0)
-        H2_FREE(node, 169
-                + (200 - 169));
+        H2_FREE(node, 169 + (200 - 169));
     while ((node = pop_node(&gNbFreeQueue)) != 0)
-        H2_FREE(node, 169
-                + (204 - 169));
+        H2_FREE(node, 169 + (204 - 169));
     LeaveCriticalSection(&gNbSndLock);
     DeleteCriticalSection(&gNbSndLock);
     for (i = 0; i < NETBIOS_THREAD_EVENT_COUNT; i++) {
@@ -177,8 +175,7 @@ extern "C" void __fastcall nb_term(void) {
     SetEvent(gNbEvents.handles[0]);
     EnterCriticalSection(&gNbRcvLock);
     while ((node = pop_node(&gNbRcvQueue)) != 0)
-        H2_FREE(node, 169
-                + (219 - 169));
+        H2_FREE(node, 169 + (219 - 169));
     LeaveCriticalSection(&gNbRcvLock);
     DeleteCriticalSection(&gNbRcvLock);
 }
@@ -198,8 +195,7 @@ extern "C" u16 __fastcall nb_rcv(i16 session, void* buf) {
         else
             len = node->len;
         memcpy(buf, node->data, len);
-        H2_FREE(node, 226
-                + (237 - 226));
+        H2_FREE(node, 226 + (237 - 226));
         return len;
     }
     return 0;
@@ -415,13 +411,7 @@ void nb_thr_ctl(void) {
                                 sendComplete = 1;
                                 break;
                             case NETBIOS_RESULT_PENDING:
-                                ProcessAssert(
-                                    0,
-                                    RETAIL_FILE,
-                                    412
-                                        + (495
-                                           - 412)
-                                );
+                                ProcessAssert(0, RETAIL_FILE, 412 + (495 - 412));
                                 break;
                             case NETBIOS_RESULT_SESSION_OUT_OF_RANGE:
                             case NETBIOS_RESULT_SESSION_CLOSED:
@@ -433,8 +423,7 @@ void nb_thr_ctl(void) {
                         }
                     }
                 }
-                H2_FREE(node, 412
-                        + (508 - 412));
+                H2_FREE(node, 412 + (508 - 412));
             }
         }
     }
@@ -472,12 +461,7 @@ VA(0x004a7a81, 0x1ca)
 static void __stdcall nb_add_name_done(NetbiosControlBlock* ncb) {
     DATA(0x00517578) static i16 gNbAddNameSourceLineBase = 534;
     i32 j;
-    ProcessAssert(
-        &gNbSessNcb[gNbMaxSess] == ncb,
-        RETAIL_FILE,
-        534
-            + (537 - 534)
-    );
+    ProcessAssert(&gNbSessNcb[gNbMaxSess] == ncb, RETAIL_FILE, 534 + (537 - 534));
     switch (ncb->returnCode) {
         case NETBIOS_RESULT_SUCCESS:
         case NETBIOS_RESULT_CANCEL_COMPLETED:
@@ -611,8 +595,7 @@ static void __fastcall nb_arm_recv(i32 session) {
         ProcessAssert(
             gNbSessNcb[session].returnCode != NETBIOS_RESULT_PENDING,
             RETAIL_FILE,
-            710
-                + (715 - 710)
+            710 + (715 - 710)
         );
         memset(&gNbSessNcb[session], 0, sizeof(NetbiosControlBlock));
         gNbSessNcb[session].command = NETBIOS_COMMAND_RECEIVE | NETBIOS_COMMAND_ASYNC;
@@ -665,14 +648,15 @@ static void __fastcall nb_close_session(i32 session) {
 // base retains the owner-relative field addends and two corresponding COFF relocs.
 VA(0x004a832a, 0x179)
 static void __fastcall nb_recv_complete(i32 session) {
-    DATA(0x005175f0) static i16 gNbReceiveCompleteSourceLineBase =
-        780;
+    DATA(0x005175f0) static i16 gNbReceiveCompleteSourceLineBase = 780;
     tag_Node* node;
     switch (gNbSessNcb[session].command & ~NETBIOS_COMMAND_ASYNC) {
         case NETBIOS_COMMAND_RECEIVE:
             switch (gNbSessNcb[session].returnCode) {
                 case NETBIOS_RESULT_SUCCESS:
-                    node = static_cast<tag_Node*>(H2_ALLOC(gNbSessNcb[session].length + NETBIOS_PACKET_HEADER_SIZE, 796));
+                    node = static_cast<tag_Node*>(
+                        H2_ALLOC(gNbSessNcb[session].length + NETBIOS_PACKET_HEADER_SIZE, 796)
+                    );
                     if (node != 0) {
                         node->len = gNbSessNcb[session].length;
                         node->sessionIndex = static_cast<u8>(session);

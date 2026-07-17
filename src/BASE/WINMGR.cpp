@@ -561,15 +561,15 @@ void heroWindowManager::RedrawScreen(void) {
 }
 
 VA(0x004cb030, 0x80)
-void heroWindowManager::FadeScreen(i32 param_1, i32 param_2, class palette* pal) {
+void heroWindowManager::FadeScreen(i32 direction, i32 steps, class palette* pal) {
     if (pal != 0)
         SetPalette(pal->m_data, 0);
-    switch (param_1) {
+    switch (direction) {
         case 0: {
             u32 saved = m_updateFlags;
             m_updateFlags = 0;
             PollSound();
-            FadeIn(param_2);
+            FadeIn(steps);
             m_updateFlags = FadeSavedUpdate() | saved;
             PollSound();
             break;
@@ -578,7 +578,7 @@ void heroWindowManager::FadeScreen(i32 param_1, i32 param_2, class palette* pal)
             FadeSavedUpdate() = m_updateFlags;
             m_updateFlags = 0;
             PollSound();
-            FadeOut(param_2);
+            FadeOut(steps);
             PollSound();
             break;
         default:
