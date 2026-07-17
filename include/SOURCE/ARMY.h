@@ -2,6 +2,7 @@
 #define HOMM2_ARMY_H
 
 #include <Ints.h>
+#include <SOURCE/KB_TYPES.h>
 // Declarations of the free functions DEFINED in ARMY.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
 // forward declarations (was <_all.h>):
