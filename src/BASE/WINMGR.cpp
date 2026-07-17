@@ -56,17 +56,18 @@ DATA(0x0051ef40) static SWindowManagerText gWindowManagerText = {
 // of natural alignment, then FadeSavedUpdate's function-local static.
 // The inline accessor reproduces that 0x68-byte BSS topology without a padding
 // symbol or an unretained external data identity.
+// @semantic
 // Complete /O2 checkpoint: both code streams end at the ret at +0x3a2 and contain
 // 261 instructions (retail's +0x3a3 nop is alignment outside the CodeView span).
 // Relocations are exact at 71/71 with no wrong target. Keeping the combat and
 // alternate copies in their source branches is the retail-evidenced structure:
 // VC42 merges those two copies at +0x346, but preserves the saved-color restore at
 // +0x29d and its direct jump, recovering the former missing gCyclePal+66 occurrence.
-// The only remaining code residual is +0xda..+0x11c in the world-view loop: candidate
+// The first code residual is +0xda..+0x11c in the world-view loop: candidate
 // assigns ECX to colorIndex and ESI to the destination induction pointer, while
-// retail assigns ESI to colorIndex and ECX to the pointer. Renaming those two
-// registers makes every instruction in the range agree; all code outside that range
-// agrees after relocation masking. Earlier word/byte/RGB, signed-byte, pointer-loop,
+// retail assigns ESI to colorIndex and ECX to the pointer. The later alternate-cycle
+// frame calculation also uses equivalent ECX/EDX/EAX scheduling. Earlier word/byte/RGB,
+// signed-byte, pointer-loop,
 // predicate, scope, switch, accessor, header, enum, and source-pointer/register
 // variants did not recover the separate restore and need not be repeated. A semantic
 // local rename and preincrement were byte-neutral, and a 60-iteration libclang AST
@@ -263,6 +264,12 @@ void heroWindowManager::Close(void)
     }
 }
 
+// @semantic
+// Complete 0x2d-byte /O2 function with the same loop, return behavior, and sole
+// BroadcastMessage relocation target/addend. Candidate assigns the window cursor to
+// ESI and the message reference to EDI; retail swaps those register roles throughout.
+// A source-level message-reference alias was byte-neutral. Revisit after a genuine
+// declaration or combined-TU state change.
 VA(0x004cac00, 0x2d)
 int heroWindowManager::Main(struct tag_message &msg)
 {
@@ -542,6 +549,13 @@ void heroWindowManager::ScreenShot(void)
     gpInputManager->Flush();
 }
 
+// @semantic
+// Complete 0xc0-byte clipping/allocation/blit implementation with all five relocation
+// sites and owner/addends aligned. Retail assigns width/y/height to EDI/ESI/EBX;
+// candidate assigns the equivalent values to ESI/EBX/EDI, which changes only register
+// names and argument push scheduling. Explicit clipped-width/clipped-height locals kept
+// the score unchanged and worsened the prologue, so the direct-parameter form remains.
+// Revisit after a genuine declaration or combined-TU state change.
 VA(0x004cb110, 0xc0)
 void heroWindowManager::SaveFizzleSource(int x, int y, int width, int height)
 {
@@ -573,10 +587,12 @@ VA(0x004cb1d0, 0x1)
 void CreateFizzleTables(void) {}
 
 // @semantic
-// Structurally complete /O2 checkpoint (live 99.30%): declaring the three row
+// Structurally complete /O2 checkpoint (current live 92.35%): declaring the three row
 // cursors in saved/work/screen order makes the prefix through row-pointer setup
-// byte-exact and reduces base to 0x404 bytes versus retail's 0x402. The first raw
-// divergence is +0x206: base loads screenOffset from [esp+24h] before x from
+// byte-exact in the earlier TU state and reduces base to 0x404 bytes versus retail's
+// 0x402. In the current combined-TU state the first raw divergence occurs after clipping:
+// candidate keeps the manager in ECX while retail retains it in ESI. The pixel-loop
+// residual begins at +0x206: base loads screenOffset from [esp+24h] before x from
 // [esp+40h], while retail retains x in EDX and adds screenOffset afterward. At
 // +0x219 base reloads the row end into EDX and uses EDX for the 16-bit lookup;
 // retail loads the row end into EBX and uses EBX for that lookup. The row-backedge
