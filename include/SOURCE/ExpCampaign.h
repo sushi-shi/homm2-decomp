@@ -8,6 +8,10 @@
 class heroWindow;
 struct tag_message;
 
+typedef enum ExpansionCampaignSaveConstant {
+    EXPANSION_CAMPAIGN_SAVE_PREFIX_SIZE = 0x4f  // persisted prefix, up to m_pad_0x4f
+} ExpansionCampaignSaveConstant;
+
 typedef enum ExpansionCampaignId {
     EXPANSION_CAMPAIGN_PRICE_OF_LOYALTY = 0,
     EXPANSION_CAMPAIGN_DESCENDANTS = 1,

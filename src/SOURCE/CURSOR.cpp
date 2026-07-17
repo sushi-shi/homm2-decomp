@@ -359,16 +359,16 @@ void advManager::DrawCursorShadow(void) {
             );
         } else if (m_drawHeroShadows && m_cursorType != CURSOR_HERO_TYPE_BOAT) {
             shadowFrame = drawFrame_f;
-            if (shadowFrame == 0x33)
-                shadowFrame = 0x38;
-            if (shadowFrame == 0x32)
-                shadowFrame = 0x39;
-            if (shadowFrame == 0x31)
-                shadowFrame = 0x3a;
-            if (shadowFrame == 0x2f)
-                shadowFrame = 0x37;
-            if (shadowFrame == 0x2e)
-                shadowFrame = 0x37;
+            if (shadowFrame == HERO_SPRITE_UP_STEP_5)
+                shadowFrame = HERO_SPRITE_UP_SHADOW_STEP_5;
+            if (shadowFrame == HERO_SPRITE_UP_STEP_4)
+                shadowFrame = HERO_SPRITE_UP_SHADOW_STEP_4;
+            if (shadowFrame == HERO_SPRITE_UP_STEP_3)
+                shadowFrame = HERO_SPRITE_UP_SHADOW_STEP_3;
+            if (shadowFrame == HERO_SPRITE_UP_STEP_2)
+                shadowFrame = HERO_SPRITE_UP_SHADOW_WIDE;
+            if (shadowFrame == HERO_SPRITE_UP_STEP_1)
+                shadowFrame = HERO_SPRITE_UP_SHADOW_WIDE;
             if (shadowFrame >= CURSOR_SHADOW_ANIM_FIRST && shadowFrame < CURSOR_SHADOW_ANIM_END)
                 shadowOffset = CURSOR_HORSE_SHADOW_OFFSET;
             else

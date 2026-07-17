@@ -17,6 +17,7 @@
 #include <SOURCE/REMOTE.h>
 #include <io.h>
 #include <fcntl.h>
+#include <sys/stat.h>
 #include <math.h>
 #include <string.h>
 #include <stdio.h>
@@ -78,6 +79,9 @@ DATA(0x004f7e90) static i16 gCompressTest2SourceLine = 0x1f72;
 DATA(0x004f7f84) static i16 gCompressTestSourceLine = 0x1f95;
 
 #define RETAIL_FILE const_cast<char*>("I:\\Projects\\Heroes\\Prog\\SOURCE\\GAME.CPP")
+// These line operands CANNOT be hardcoded: retail materializes each base as a
+// static i16 global and emits a memory load plus add at every call site, so the
+// global reference is part of the byte proof.
 #define GSAVELINE gSaveSourceLine
 #define GLOADLINE gLoadSourceLine
 #define GMAPLINE gMapSourceLine
@@ -563,7 +567,7 @@ i32 game::SaveGame(char* filename, i32 generateName, i8 expansionFormat) {
             strcpy(gpGame->m_saveName, filename);
     }
 
-    i32 fileInfo = open(savePathValue, 0x8301, 0x80);
+    i32 fileInfo = open(savePathValue, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
     if (fileInfo == -1)
         FileError(savePathValue);
 
@@ -573,7 +577,7 @@ i32 game::SaveGame(char* filename, i32 generateName, i8 expansionFormat) {
     write(fileInfo, &m_worldMap.width, 4);
     write(fileInfo, &m_worldMap.height, 4);
     write(fileInfo, &m_mapHeader, sizeof(m_mapHeader));
-    write(fileInfo, m_setupPlayerColor, 0x41);
+    write(fileInfo, m_setupPlayerColor, CAMPAIGN_SETUP_RESET_SIZE);
     write(fileInfo, &gbIAmGreatest, 1);
     write(fileInfo, this, 2);
     write(fileInfo, &giMonthType, 1);
@@ -588,11 +592,11 @@ i32 game::SaveGame(char* filename, i32 generateName, i8 expansionFormat) {
     if (xIsPlayingExpansionCampaign) {
         i32 campaignTypeInfo = 2;
         write(fileInfo, &campaignTypeInfo, 4);
-        write(fileInfo, &xCampaign, 0x4f);
+        write(fileInfo, &xCampaign, EXPANSION_CAMPAIGN_SAVE_PREFIX_SIZE);
     } else {
         write(fileInfo, &gbInCampaign, 4);
         if (gbInCampaign)
-            write(fileInfo, &m_campaignType, 0x147);
+            write(fileInfo, &m_campaignType, CAMPAIGN_STATE_RESET_SIZE);
     }
     if (!expansionFormat)
         write(fileInfo, &xIsExpansionMap, 1);
@@ -625,16 +629,16 @@ i32 game::SaveGame(char* filename, i32 generateName, i8 expansionFormat) {
     for (indexFile = 0; indexFile < GAME_HERO_COUNT; indexFile++)
         m_heroRecs[indexFile].Write(fileInfo, !expansionFormat);
     write(fileInfo, m_availableHeroes, GAME_HERO_COUNT);
-    write(fileInfo, m_castleRecs, 0x1c20);
+    write(fileInfo, m_castleRecs, sizeof(m_castleRecs));
     write(fileInfo, m_castleOwners, sizeof(m_castleOwners));
     write(fileInfo, m_dailyEventFlags, sizeof(m_dailyEventFlags));
     write(fileInfo, m_mines, sizeof(m_mines));
-    write(fileInfo, m_mineOwners, 0x90);
+    write(fileInfo, m_mineOwners, sizeof(m_mineOwners));
     if (!expansionFormat)
         write(fileInfo, m_randomArtifacts, ARTIFACT_COUNT);
     else
         write(fileInfo, m_randomArtifacts, RANDOM_ARTIFACT_BASE_TABLE_SIZE);
-    write(fileInfo, m_boats, 0x180);
+    write(fileInfo, m_boats, sizeof(m_boats));
     write(fileInfo, m_boatSlots, sizeof(m_boatSlots));
     write(fileInfo, m_obeliskVisitors, sizeof(m_obeliskVisitors));
     write(fileInfo, &m_ultimateArtifactX, 1);
@@ -834,7 +838,7 @@ void game::LoadGame(char* filename, i32 loadFromFile, i32) {
     else
         sprintf(path28, "%s%s", gcGamePath, filename);
 
-    i32 file0 = open(path28, 0x8000);
+    i32 file0 = open(path28, _O_BINARY);
     if (file0 == -1)
         FileError(path28);
     ClearMapExtra();
@@ -850,7 +854,7 @@ void game::LoadGame(char* filename, i32 loadFromFile, i32) {
     read(file0, height9, 4);
     SetMapSize(width8, height9[0]);
     read(file0, &m_mapHeader, sizeof(m_mapHeader));
-    read(file0, m_setupPlayerColor, 0x41);
+    read(file0, m_setupPlayerColor, CAMPAIGN_SETUP_RESET_SIZE);
     read(file0, &gbIAmGreatest, 1);
     read(file0, this, 2);
     read(file0, &giMonthType, 1);
@@ -863,11 +867,11 @@ void game::LoadGame(char* filename, i32 loadFromFile, i32) {
     read(file0, oldData3, 36);
     read(file0, &gbInCampaign, 4);
     if (gbInCampaign == 1) {
-        read(file0, &m_campaignType, 0x147);
+        read(file0, &m_campaignType, CAMPAIGN_STATE_RESET_SIZE);
     } else if (gbInCampaign == 2) {
         xIsPlayingExpansionCampaign = 1;
         gbInCampaign = 0;
-        read(file0, &xCampaign, 0x4f);
+        read(file0, &xCampaign, EXPANSION_CAMPAIGN_SAVE_PREFIX_SIZE);
     }
     if (expansionMarker0)
         read(file0, &xIsExpansionMap, 1);
@@ -918,23 +922,23 @@ void game::LoadGame(char* filename, i32 loadFromFile, i32) {
     for (i29 = 0; i29 < GAME_HERO_COUNT; i29++)
         m_heroRecs[i29].Read(file0, expansionMarker0);
     read(file0, m_availableHeroes, GAME_HERO_COUNT);
-    read(file0, m_castleRecs, 0x1c20);
+    read(file0, m_castleRecs, sizeof(m_castleRecs));
     read(file0, m_castleOwners, sizeof(m_castleOwners));
     read(file0, m_dailyEventFlags, sizeof(m_dailyEventFlags));
-    read(file0, m_mines, 0x3f0);
-    read(file0, m_mineOwners, 0x90);
+    read(file0, m_mines, sizeof(m_mines));
+    read(file0, m_mineOwners, sizeof(m_mineOwners));
     if (expansionMarker0)
         read(file0, m_randomArtifacts, ARTIFACT_COUNT);
     else
         read(file0, m_randomArtifacts, RANDOM_ARTIFACT_BASE_TABLE_SIZE);
-    read(file0, m_boats, 0x180);
+    read(file0, m_boats, sizeof(m_boats));
     read(file0, m_boatSlots, sizeof(m_boatSlots));
-    read(file0, m_obeliskVisitors, 0x30);
+    read(file0, m_obeliskVisitors, sizeof(m_obeliskVisitors));
     read(file0, &m_ultimateArtifactX, 1);
     read(file0, &m_ultimateArtifactY, 1);
     read(file0, &m_ultimateArtifactId, 1);
     read(file0, m_rumour, sizeof(m_rumour));
-    read(file0, m_defaultPlayerNames, 0x18);
+    read(file0, m_defaultPlayerNames, sizeof(m_defaultPlayerNames));
     read(file0, &m_rumourEventCount, 4);
     read(file0, m_rumourEventIndices, m_rumourEventCount * 2);
     read(file0, &m_timeEventCount, 4);
@@ -5508,7 +5512,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
             static_cast<u8*>(H2_ALLOC(fileSize + 2000, GTRANSMITLINE + 0x41));
     fileData = static_cast<u8*>(H2_ALLOC(fileSize + 2000, GTRANSMITLINE + 0x42));
 
-    file = open(filename, 0x8000);
+    file = open(filename, _O_BINARY);
     if (file == -1)
         FileError(filename);
     if (file == -1) {
@@ -5843,7 +5847,7 @@ i32 game::ReceiveSaveGame(
     );
 
     sprintf(filename, "%s%s", ".\\DATA\\", gConfig.rmtRDName);
-    file = open(filename, 0x8301, 0x80);
+    file = open(filename, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
     if (file == -1)
         FileError(filename);
     write(file, decodedData, dataSize);
@@ -6295,14 +6299,14 @@ void CreateDiffFile(
     }
 
     sprintf(gText, "%s%s", ".\\DATA\\", diffName);
-    joinFile1 = open(gText, 0x8301, 0x80);
+    joinFile1 = open(gText, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
     if (joinFile1 == -1)
         FileError(gText);
     write(joinFile1, diffData6, diffSize29);
     close(joinFile1);
 
     sprintf(gText, "%s%s", ".\\DATA\\", oldName);
-    joinFile1 = open(gText, 0x8301, 0x80);
+    joinFile1 = open(gText, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
     if (joinFile1 == -1)
         FileError(gText);
     write(joinFile1, joinData29, joinSize36);
@@ -6380,7 +6384,7 @@ void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
     }
 
     sprintf(gText, "%s%s", ".\\DATA\\", joinName);
-    joinFile0 = open(gText, 0x8301, 0x80);
+    joinFile0 = open(gText, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
     if (joinFile0 == -1)
         FileError(gText);
     write(joinFile0, joinData9, joinSize37);
@@ -6397,7 +6401,7 @@ void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
     );
 
     sprintf(gText, "%s%s", ".\\DATA\\", oldName);
-    joinFile0 = open(gText, 0x8301, 0x80);
+    joinFile0 = open(gText, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
     if (joinFile0 == -1)
         FileError(gText);
     write(joinFile0, joinData9, joinSize37);
@@ -6674,7 +6678,7 @@ i32 CalcFileCRC(char* filename) {
     char* block = static_cast<char*>(
         H2_ALLOC(size, calcFileCrcSourceLineBase + GAME_CALC_CRC_ALLOC_OFFSET)
     );
-    i32 hand = open(filename, 0x8000);
+    i32 hand = open(filename, _O_BINARY);
     if (hand == -1)
         FileError(filename);
     read(hand, block, size);

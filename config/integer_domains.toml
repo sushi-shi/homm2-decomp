@@ -15161,3 +15161,52 @@ evidence = [
   "named during the literal-coverage sweep; see docs/constant-taxonomy.md",
 ]
 status = "provisional"
+
+[[constant_group]]
+name = "DataEntryLayout"
+declaration = "DataEntryLayout"
+owner = "include/BASE/DataEntryConstants.h"
+category = "value"
+enumerators = [
+  "DATA_ENTRY_WINDOW_X",
+  "DATA_ENTRY_WINDOW_Y",
+  "DATA_ENTRY_INPUT_BOX_Y_OFFSET",
+]
+evidence = [
+  "named during the literal-coverage sweep; see docs/constant-taxonomy.md",
+]
+status = "provisional"
+
+[[constant_group]]
+name = "CursorHeroShadowFrame"
+declaration = "CursorHeroShadowFrame"
+owner = "include/SOURCE/CURSOR.h"
+category = "value"
+enumerators = [
+  "HERO_SPRITE_UP_STEP_1",
+  "HERO_SPRITE_UP_STEP_2",
+  "HERO_SPRITE_UP_STEP_3",
+  "HERO_SPRITE_UP_STEP_4",
+  "HERO_SPRITE_UP_STEP_5",
+  "HERO_SPRITE_UP_SHADOW_WIDE",
+  "HERO_SPRITE_UP_SHADOW_STEP_5",
+  "HERO_SPRITE_UP_SHADOW_STEP_4",
+  "HERO_SPRITE_UP_SHADOW_STEP_3",
+]
+evidence = [
+  "named during the literal-coverage sweep; see docs/constant-taxonomy.md",
+]
+status = "provisional"
+
+[[constant_group]]
+name = "ExpansionCampaignSaveConstant"
+declaration = "ExpansionCampaignSaveConstant"
+owner = "include/SOURCE/ExpCampaign.h"
+category = "value"
+enumerators = [
+  "EXPANSION_CAMPAIGN_SAVE_PREFIX_SIZE",
+]
+evidence = [
+  "named during the literal-coverage sweep; see docs/constant-taxonomy.md",
+]
+status = "provisional"
