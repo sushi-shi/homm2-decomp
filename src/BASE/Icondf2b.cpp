@@ -80,11 +80,11 @@ void FlipDimIconToBitmap(
         i32 currentY;
         if (x0 < clipX || clipW + clipX < w + x0 || (currentY = gFDY) < clipY
             || entry->h + currentY > clipY + clipH) {
-            clip = ICON_DRAW_CLIP;
+            clip = IDX(ICON_DRAW_CLIP);
             gFDClipR = clipX + clipW - 1;
             gFDClipB = clipY + clipH - 1;
         } else {
-            clip = ICON_DRAW_NO_CLIP;
+            clip = IDX(ICON_DRAW_NO_CLIP);
         }
     }
     i16 pitch = dest->m_width;

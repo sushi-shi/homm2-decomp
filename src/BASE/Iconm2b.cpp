@@ -90,11 +90,11 @@ void MonoIconToBitmap(
     if (clip != IDX(ICON_DRAW_NO_CLIP)) {
         if (clipX > gMonoX0 || gMonoX0 + entry->w > clipX + clipW || clipY > gMonoY
             || gMonoY + entry->h > clipY + clipH) {
-            clip = ICON_DRAW_CLIP;
+            clip = IDX(ICON_DRAW_CLIP);
             gMonoClipR = clipX + clipW - 1;
             gMonoClipB = clipY + clipH - 1;
         } else {
-            clip = ICON_DRAW_NO_CLIP;
+            clip = IDX(ICON_DRAW_NO_CLIP);
         }
     }
     i16 pitch = dest->m_width;

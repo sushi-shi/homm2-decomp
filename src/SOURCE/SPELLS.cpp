@@ -3609,7 +3609,7 @@ void combatManager::Earthquake(void) {
         newTowerStates[structure] = m_wallStates[structure];
         if (m_wallStates[structure] != IDX(COMBAT_WALL_STATE_DESTROYED)
             && SRandom(0, 100) < EARTHQUAKE_TOWER_HIT_CHANCE) {
-            newTowerStates[structure] = COMBAT_WALL_STATE_DESTROYED;
+            newTowerStates[structure] = IDX(COMBAT_WALL_STATE_DESTROYED);
             impactPositions[impactCount][IDX(COMBAT_COORDINATE_X)] =
                 towerPos[structure][IDX(COMBAT_COORDINATE_X)];
             impactPositions[impactCount][IDX(COMBAT_COORDINATE_Y)] =

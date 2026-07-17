@@ -2513,7 +2513,7 @@ void philAI::GetBestCreature(town* townPtr, BHC& best, float& bestValue) {
         }
     }
     best.pTown = townPtr;
-    best.type = AI_PURCHASE_CREATURE;
+    best.type = IDX(AI_PURCHASE_CREATURE);
     best.what = bestDwelling;
     best.num = purchaseCount;
     bestValue = bestRaw;
@@ -2663,7 +2663,7 @@ void philAI::GetBestHero(town* townPtr, BHC& best, float& bestValue) {
         }
     }
     best.pTown = townPtr;
-    best.type = AI_PURCHASE_HERO;
+    best.type = IDX(AI_PURCHASE_HERO);
     best.what = bestHeroIndex;
     bestValue = bestRawLocal;
     if (gpGame->m_worldMap.cells[gpGame->m_worldMap.width * townPtr->m_y + townPtr->m_x]
@@ -5819,19 +5819,19 @@ i32 philAI::EvaluateRecruitSite(mapCell* cell) {
     val = 0;
     switch (node) {
         case 0:
-            nb = CREATURE_GHOST;
+            nb = IDX(CREATURE_GHOST);
             break;
         case 1:
-            nb = CREATURE_EARTH_ELEMENTAL;
+            nb = IDX(CREATURE_EARTH_ELEMENTAL);
             break;
         case 2:
-            nb = CREATURE_AIR_ELEMENTAL;
+            nb = IDX(CREATURE_AIR_ELEMENTAL);
             break;
         case 3:
-            nb = CREATURE_FIRE_ELEMENTAL;
+            nb = IDX(CREATURE_FIRE_ELEMENTAL);
             break;
         case 4:
-            nb = CREATURE_WATER_ELEMENTAL;
+            nb = IDX(CREATURE_WATER_ELEMENTAL);
             break;
     }
     EvaluateOneTimeCreaturePurchase(nb, lvl, 0, idx, val, kn);

@@ -592,7 +592,7 @@ i32 combatManager::ProcessCombatMsg(tag_message& message) {
                     case IDX(COMBAT_WINDOW_CLICK):
                         switch (message.payload.widget.id) {
                             case IDX(COMBAT_CONTROL_ATTACK):
-                                giNextAction = COMBAT_MESSAGE_COMMAND_ATTACK;
+                                giNextAction = IDX(COMBAT_MESSAGE_COMMAND_ATTACK);
                                 break;
                             case IDX(COMBAT_CONTROL_WAIT):
                                 giNextAction = COMBAT_AI_ACTION_WAIT;
@@ -2261,7 +2261,7 @@ void combatManager::CheckGetAIMove(void) {
     }
     retreat = AICheckRetreat();
     if (retreat != 0)
-        giNextAction = COMBAT_ACTION_RETREAT;
+        giNextAction = IDX(COMBAT_ACTION_RETREAT);
     else
         DoCompAI(m_currentSide);
 }
@@ -2468,7 +2468,7 @@ i32 combatManager::ProcessNextAction(struct tag_message& message) {
                 advanceArmy = 1;
                 break;
         }
-        giNextAction = COMBAT_ACTION_NONE;
+        giNextAction = IDX(COMBAT_ACTION_NONE);
         if (CheckWin(&message) == 0) {
             TestRaiseDoor();
             if (advanceArmy != 0 && GetNextArmy(1) == 0) {

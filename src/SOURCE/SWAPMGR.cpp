@@ -668,7 +668,7 @@ i32 swapManager::Main(tag_message& message) {
 
     if (closeRequested_5 == SWAP_CLOSE_REQUESTED) {
         message.type = MESSAGE_EXECUTIVE;
-        message.payload.widget.command = SWAP_COMMAND_EXIT;
+        message.payload.widget.command = IDX(SWAP_COMMAND_EXIT);
         return SWAP_RESULT_CLOSE;
     }
     return SWAP_RESULT_CONTINUE;
