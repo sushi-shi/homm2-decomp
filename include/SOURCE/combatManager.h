@@ -810,7 +810,7 @@ public:
     i32 HasValidSpellTarget(i32);
     SpellType ViewSpells(i32);
     i32 FindResurrectArmyIndex(i32, i32, i32);
-    i32 ValidSpellTarget(i32, i32);
+    i32 ValidSpellTarget(SpellType, i32);
     void SpellMessage(i32, i32);
     void CastSpell(i32, i32, i32, i32);
     void DefaultSpell(i32);
