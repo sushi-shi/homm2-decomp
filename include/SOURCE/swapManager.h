@@ -10,12 +10,12 @@ class heroWindow;
 class icon;
 struct tag_message;
 
-HOMM2_ENUM_BEGIN(SwapManagerSide)
+HOMM2_ENUM_VALUES_BEGIN(SwapManagerSide)
     SWAP_SIDE_NONE = -1,
     SWAP_SIDE_LEFT = 0,
     SWAP_SIDE_RIGHT = 1,
     SWAP_SIDE_COUNT = 2
-HOMM2_ENUM_END(SwapManagerSide)
+HOMM2_ENUM_VALUES_END(SwapManagerSide)
 
 HOMM2_ENUM_BEGIN(SwapManagerItemType)
     SWAP_ITEM_NONE = -1,
