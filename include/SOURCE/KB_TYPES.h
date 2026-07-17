@@ -11,7 +11,15 @@ class sample;
 // etc.), in the standard HoMM2 order. MERCURY/ORE/CRYSTAL are confirmed by the retail's
 // per-element .rdata float symbols referenced in philAI::RVConversion; the rest follow the
 // canonical order.
-enum { RES_WOOD, RES_MERCURY, RES_ORE, RES_SULFUR, RES_CRYSTAL, RES_GEMS, RES_GOLD };
+HOMM2_ENUM_BEGIN(ResourceType)
+    RES_WOOD = 0,
+    RES_MERCURY = 1,
+    RES_ORE = 2,
+    RES_SULFUR = 3,
+    RES_CRYSTAL = 4,
+    RES_GEMS = 5,
+    RES_GOLD = 6
+HOMM2_ENUM_END(ResourceType)
 
 HOMM2_ENUM_BEGIN(FactionType)
     FACTION_KNIGHT = 0,
