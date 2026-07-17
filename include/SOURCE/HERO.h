@@ -8,8 +8,6 @@
 struct tag_message;
 
 typedef enum HeroUiConstant {
-    HERO_UI_KEY_DOWN = 1,
-    HERO_UI_KEY_UP = 2,
     HERO_UI_HOVER = 4,
     HERO_UI_MESSAGE = 0x200,
     HERO_UI_INPUT_SELECT = 12,
@@ -63,8 +61,6 @@ typedef enum HeroUiConstant {
     HERO_UI_SECONDARY_SKILL_ROW3_LAST = 0x1a7,
     HERO_UI_CLOSE = 0x7800,
     HERO_UI_DISMISS = 0x7803,
-    HERO_UI_SHIFT_LEFT = 0x2a,
-    HERO_UI_SHIFT_RIGHT = 0x36,
     HERO_UI_QUICK_VIEW_MODIFIER = 0x200,
     HERO_UI_SPLIT_MODIFIER_MASK = 3,
     HERO_UI_DIALOG_CLOSE_COMMAND = 10,

@@ -10,6 +10,8 @@
 #include <SOURCE/kbwin.h>
 #include <SOURCE/highScoreManager.h>
 #include <BASE/Misc.h>
+#include <BASE/executive.h>
+#include <BASE/widget.h>
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/resourceManager.h>
@@ -45,7 +47,7 @@ i32 highScoreManager::Open(i32 id)
         MemError();
     Update();
     gpWindowManager->AddWindow(m_window, -1, 1);
-    m_messageMask = HIGH_SCORE_MESSAGE_EXECUTIVE;
+    m_messageMask = MESSAGE_EXECUTIVE;
     m_priority = id;
     m_active = 1;
     strcpy(m_name, "highScoreManager");
@@ -82,7 +84,7 @@ i32 highScoreManager::Main(struct tag_message &message)
         for (entry = 0; entry < HIGH_SCORE_DISPLAY_ENTRY_COUNT; entry++) {
             m_animationFrames[entry] =
                 (m_animationFrames[entry] + 1) % HIGH_SCORE_ANIMATION_FRAME_COUNT;
-            windowMessage.type = HIGH_SCORE_MESSAGE_WIDGET;
+            windowMessage.type = MESSAGE_WIDGET;
             windowMessage.payload.widget.id =
                 entry + HIGH_SCORE_FIRST_MONSTER_WIDGET;
             windowMessage.payload.widget.command = HIGH_SCORE_WIDGET_SET_FRAME;
@@ -103,7 +105,7 @@ i32 highScoreManager::Main(struct tag_message &message)
         return HIGH_SCORE_MANAGER_CONTINUE;
 
     switch (message.type) {
-    case HIGH_SCORE_MESSAGE_WIDGET:
+    case MESSAGE_WIDGET:
         switch (message.payload.widget.command) {
         case HIGH_SCORE_WIDGET_TOGGLE:
             switch (message.payload.widget.id) {
@@ -126,8 +128,8 @@ i32 highScoreManager::Main(struct tag_message &message)
     }
 
     if (result == 1) {
-        message.type = HIGH_SCORE_MESSAGE_EXECUTIVE;
-        message.payload.executive.command = HIGH_SCORE_EXECUTIVE_CLOSE;
+        message.type = MESSAGE_EXECUTIVE;
+        message.payload.executive.command = EXECUTIVE_COMMAND_RETURN_RESULT;
         return HIGH_SCORE_MANAGER_CLOSE;
     }
     return HIGH_SCORE_MANAGER_CONTINUE;
@@ -160,7 +162,7 @@ void highScoreManager::Update(void)
     sprintf(gText, "hsbkg.icn");
     gpResourceManager->GetBackdrop(gText, gpWindowManager->m_screen, 1);
 
-    messageValue.type = HIGH_SCORE_MESSAGE_WIDGET;
+    messageValue.type = MESSAGE_WIDGET;
     messageValue.payload.widget.id = HIGH_SCORE_TITLE_WIDGET;
     messageValue.payload.widget.command = HIGH_SCORE_WIDGET_SET_FRAME;
     if (m_showCampaignScores)
@@ -227,7 +229,7 @@ void highScoreManager::Update(void)
             m_window->BroadcastMessage(messageValue);
         }
 
-        messageValue.payload.widget.command = HIGH_SCORE_WIDGET_SET_TEXT;
+        messageValue.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
         messageValue.payload.widget.data.text = gText;
         sprintf(gText, "");
         messageValue.payload.widget.id =

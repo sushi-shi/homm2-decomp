@@ -24,15 +24,11 @@ typedef enum SwapManagerItemType {
 } SwapManagerItemType;
 
 typedef enum SwapManagerMessage {
-    SWAP_MESSAGE_REDRAW = 0x20,
-    SWAP_MESSAGE_WIDGET = 0x200,
-    SWAP_MESSAGE_EXIT = 0x4000,
     SWAP_COMMAND_HOVER = 0xc,
     SWAP_COMMAND_SELECT = 0xd,
     SWAP_COMMAND_HELP = 0xe,
     SWAP_COMMAND_EXIT = 4,
     SWAP_CONTROL_CLOSE = 0x7800,
-    SWAP_QUICK_VIEW_MODIFIER = 0x200,
     SWAP_SPLIT_MODIFIER_MASK = 3
 } SwapManagerMessage;
 
@@ -60,11 +56,6 @@ typedef enum SwapManagerControl {
 typedef enum SwapManagerConstant {
     SWAP_SECONDARY_SKILL_WIDGET_COUNT = 8,
     SWAP_WINDOW_TEXT_ID = 0x15,
-    SWAP_MESSAGE_SET_PORTRAIT = 9,
-    SWAP_MESSAGE_SET_TEXT = 3,
-    SWAP_MESSAGE_SET_ICON = 4,
-    SWAP_MESSAGE_ENABLE = 5,
-    SWAP_MESSAGE_DISABLE = 6,
     SWAP_LEFT_PORTRAIT_WIDGET = 0x41,
     SWAP_RIGHT_PORTRAIT_WIDGET = 0x42,
     SWAP_TITLE_WIDGET = 0x4d,

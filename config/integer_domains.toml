@@ -3185,23 +3185,6 @@ evidence = [
 status = "provisional"
 
 [[constant_group]]
-name = "AdventureInputEvent"
-declaration = "AdventureInputEvent"
-owner = "include/SOURCE/ADVMGR.h"
-category = "flags"
-enumerators = [
-  "ADVMGR_INPUT_MOUSE_DOWN",
-  "ADVMGR_INPUT_MOUSE_UP",
-  "ADVMGR_INPUT_KEY_DOWN",
-  "ADVMGR_INPUT_COMMAND",
-]
-evidence = [
-  "mostly power-of-two values with bitwise use",
-  "first-pass constant taxonomy sweep; refinement queue in docs/constant-taxonomy.md",
-]
-status = "provisional"
-
-[[constant_group]]
 name = "AdventureSearchConstant"
 declaration = "AdventureSearchConstant"
 owner = "include/SOURCE/ADVMGR.h"
@@ -4313,25 +4296,6 @@ evidence = [
 status = "provisional"
 
 [[constant_group]]
-name = "CombatInputEvent"
-declaration = "CombatInputEvent"
-owner = "include/SOURCE/COMMAND.h"
-category = "flags"
-enumerators = [
-  "COMBAT_EVENT_NONE",
-  "COMBAT_EVENT_KEY",
-  "COMBAT_EVENT_MOUSE_MOVE",
-  "COMBAT_EVENT_MOUSE_BUTTON",
-  "COMBAT_EVENT_MOUSE_OTHER",
-  "COMBAT_EVENT_WINDOW",
-]
-evidence = [
-  "mostly power-of-two values with bitwise use",
-  "first-pass constant taxonomy sweep; refinement queue in docs/constant-taxonomy.md",
-]
-status = "provisional"
-
-[[constant_group]]
 name = "CombatKeyCommand"
 declaration = "CombatKeyCommand"
 owner = "include/SOURCE/COMMAND.h"
@@ -4942,9 +4906,6 @@ declaration = "CampaignMessageConstant"
 owner = "include/SOURCE/Campaign.h"
 category = "message-id"
 enumerators = [
-  "CAMPAIGN_MESSAGE_WIDGET",
-  "CAMPAIGN_MESSAGE_SET_TEXT",
-  "CAMPAIGN_MESSAGE_SET_FRAME",
   "CAMPAIGN_MESSAGE_SELECT",
   "CAMPAIGN_MESSAGE_DESELECT",
   "CAMPAIGN_MESSAGE_SET_ICON",
@@ -5194,11 +5155,6 @@ declaration = "CastleConstant"
 owner = "include/SOURCE/Castle.h"
 category = "value"
 enumerators = [
-  "CASTLE_MESSAGE_HOVER",
-  "CASTLE_MESSAGE_WIDGET",
-  "CASTLE_INPUT_SELECT",
-  "CASTLE_INPUT_DESELECT",
-  "CASTLE_INPUT_ALTERNATE_SELECT",
   "CASTLE_QUICK_VIEW_MODIFIER",
   "CASTLE_EXIT_COMMAND",
   "CASTLE_MAGE_GUILD",
@@ -5383,8 +5339,6 @@ enumerators = [
   "OBSERVATION_TOWER_RADIUS",
   "ORACLE_WINDOW_TEXT_ID",
   "ORACLE_THIEVES_GUILD_RANK",
-  "ORACLE_MESSAGE_TYPE",
-  "ORACLE_MESSAGE_COMMAND",
   "TELEPORT_TRIGGER_FLAG",
   "STONE_LITHS_MIN_DISTANCE",
   "WHIRLPOOL_MIN_DISTANCE",
@@ -6415,8 +6369,6 @@ declaration = "HeroUiConstant"
 owner = "include/SOURCE/HERO.h"
 category = "resource-id"
 enumerators = [
-  "HERO_UI_KEY_DOWN",
-  "HERO_UI_KEY_UP",
   "HERO_UI_HOVER",
   "HERO_UI_MESSAGE",
   "HERO_UI_INPUT_SELECT",
@@ -6470,8 +6422,6 @@ enumerators = [
   "HERO_UI_SECONDARY_SKILL_ROW3_LAST",
   "HERO_UI_CLOSE",
   "HERO_UI_DISMISS",
-  "HERO_UI_SHIFT_LEFT",
-  "HERO_UI_SHIFT_RIGHT",
   "HERO_UI_QUICK_VIEW_MODIFIER",
   "HERO_UI_SPLIT_MODIFIER_MASK",
   "HERO_UI_DIALOG_CLOSE_COMMAND",
@@ -6743,11 +6693,7 @@ declaration = "EventWindowConstant"
 owner = "include/SOURCE/KB.h"
 category = "message-id"
 enumerators = [
-  "EVENT_WINDOW_MESSAGE",
   "EVENT_WINDOW_RESOURCE_FLAG",
-  "EVENT_WINDOW_HOVER_COMMAND",
-  "EVENT_WINDOW_CLICK_COMMAND",
-  "EVENT_WINDOW_HELP_COMMAND",
   "EVENT_WINDOW_CLOSE_COMMAND",
   "EVENT_WINDOW_FIRST_RESOURCE_WIDGET",
   "EVENT_WINDOW_SECOND_RESOURCE_WIDGET",
@@ -7134,7 +7080,6 @@ enumerators = [
   "NET_BOX_FOURTH_COLOR_ID",
   "NET_BOX_INPUT_ID",
   "NET_BOX_THIS_PLAYER_COLOR_ID",
-  "NET_BOX_KEY_MESSAGE",
   "NET_BOX_KEY_ESCAPE",
   "NET_BOX_KEY_ENTER",
   "NET_BOX_KEY_BACKSPACE",
@@ -7790,9 +7735,6 @@ enumerators = [
   "NEW_GAME_SHADOW_FRAME",
   "NEW_GAME_WIDGET_SET_TEXT",
   "NEW_GAME_WIDGET_SET_FRAME",
-  "NEW_GAME_MESSAGE_WIDGET",
-  "NEW_GAME_MESSAGE_IDLE",
-  "NEW_GAME_MESSAGE_KEY",
   "NEW_GAME_EVENT_PRESS",
   "NEW_GAME_EVENT_RELEASE",
   "NEW_GAME_EVENT_ALTERNATE_PRESS",
@@ -7865,10 +7807,6 @@ declaration = "NewGameKeyCode"
 owner = "include/SOURCE/Newgame.h"
 category = "value"
 enumerators = [
-  "NEW_GAME_KEY_ESCAPE",
-  "NEW_GAME_KEY_LEFT",
-  "NEW_GAME_KEY_RIGHT",
-  "NEW_GAME_KEY_DELETE",
   "NEW_GAME_KEY_ENTER",
   "NEW_GAME_KEY_BACKSPACE",
   "NEW_GAME_KEY_FIRST_EXTENDED",
@@ -7994,10 +7932,6 @@ enumerators = [
   "OVERVIEW_TOWN_RECRUIT_ALT_LAST",
   "OVERVIEW_TOWN_HERO_FIRST",
   "OVERVIEW_TOWN_HERO_LAST",
-  "OVERVIEW_KEY_HOME",
-  "OVERVIEW_KEY_PAGE_UP",
-  "OVERVIEW_KEY_END",
-  "OVERVIEW_KEY_PAGE_DOWN",
 ]
 evidence = [
   "declaration name marks an art/audio/video index namespace",
@@ -8751,11 +8685,6 @@ enumerators = [
   "SMACK_SHORT_FADE",
   "SMACK_FAST_FADE",
   "SMACK_DIALOG_RETRY",
-  "SMACK_EVENT_KEY",
-  "SMACK_EVENT_MOUSE_MOVE",
-  "SMACK_EVENT_MOUSE_CLICK",
-  "SMACK_EVENT_QUIT",
-  "SMACK_ALT_KEY",
   "SMACK_CHOOSE_CAMPAIGN",
   "SMACK_CREDITS",
   "SMACK_EARTH",
@@ -9089,8 +9018,6 @@ enumerators = [
   "TOWN_INPUT_SELECT",
   "TOWN_INPUT_DESELECT",
   "TOWN_INPUT_ALTERNATE_SELECT",
-  "TOWN_KEY_SHIFT_LEFT",
-  "TOWN_KEY_SHIFT_RIGHT",
   "TOWN_CONTROL_PREVIOUS_TOWN",
   "TOWN_CONTROL_NEXT_TOWN",
   "TOWN_CONTROL_CLOSE",
@@ -9374,7 +9301,6 @@ enumerators = [
   "TOWN_SPELL_BOOK_COST",
   "TOWN_BOAT_GOLD_COST",
   "TOWN_BOAT_WOOD_COST",
-  "TOWN_QUICK_VIEW_MODIFIER",
   "TOWN_INTERFACE_BROADCAST_FLAGS",
   "TOWN_CONTROL_STATUS_TEXT",
   "TOWN_DIALOG_CONFIRM",
@@ -10894,30 +10820,12 @@ evidence = [
 status = "provisional"
 
 [[constant_group]]
-name = "FileRequesterEventType"
-declaration = "FileRequesterEventType"
-owner = "include/SOURCE/fileRequester.h"
-category = "message-id"
-enumerators = [
-  "FILE_REQUESTER_EVENT_KEY",
-  "FILE_REQUESTER_EVENT_WIDGET",
-  "FILE_REQUESTER_EVENT_EXIT",
-]
-evidence = [
-  "2/3 enumerator names carry message-id suffixes",
-  "first-pass constant taxonomy sweep; refinement queue in docs/constant-taxonomy.md",
-]
-status = "provisional"
-
-[[constant_group]]
 name = "FileRequesterKey"
 declaration = "FileRequesterKey"
 owner = "include/SOURCE/fileRequester.h"
 category = "value"
 enumerators = [
   "FILE_REQUESTER_KEY_CYCLE_FILTER",
-  "FILE_REQUESTER_KEY_UP",
-  "FILE_REQUESTER_KEY_DOWN",
 ]
 evidence = [
   "compared/assigned local integer namespace",
@@ -11191,10 +11099,6 @@ enumerators = [
   "HIGH_SCORE_MONSTER_FRAME_STRIDE",
   "HIGH_SCORE_MONSTER_ACTIVE_FRAME_OFFSET",
   "HIGH_SCORE_TEXT_WIDGET_STRIDE",
-  "HIGH_SCORE_MESSAGE_WIDGET",
-  "HIGH_SCORE_MESSAGE_EXECUTIVE",
-  "HIGH_SCORE_EXECUTIVE_CLOSE",
-  "HIGH_SCORE_WIDGET_SET_TEXT",
   "HIGH_SCORE_WIDGET_SET_FRAME",
   "HIGH_SCORE_WIDGET_HIDE",
   "HIGH_SCORE_WIDGET_SHOW",
@@ -11569,15 +11473,11 @@ declaration = "SwapManagerMessage"
 owner = "include/SOURCE/swapManager.h"
 category = "message-id"
 enumerators = [
-  "SWAP_MESSAGE_REDRAW",
-  "SWAP_MESSAGE_WIDGET",
-  "SWAP_MESSAGE_EXIT",
   "SWAP_COMMAND_HOVER",
   "SWAP_COMMAND_SELECT",
   "SWAP_COMMAND_HELP",
   "SWAP_COMMAND_EXIT",
   "SWAP_CONTROL_CLOSE",
-  "SWAP_QUICK_VIEW_MODIFIER",
   "SWAP_SPLIT_MODIFIER_MASK",
 ]
 evidence = [
@@ -11625,11 +11525,6 @@ category = "value"
 enumerators = [
   "SWAP_SECONDARY_SKILL_WIDGET_COUNT",
   "SWAP_WINDOW_TEXT_ID",
-  "SWAP_MESSAGE_SET_PORTRAIT",
-  "SWAP_MESSAGE_SET_TEXT",
-  "SWAP_MESSAGE_SET_ICON",
-  "SWAP_MESSAGE_ENABLE",
-  "SWAP_MESSAGE_DISABLE",
   "SWAP_LEFT_PORTRAIT_WIDGET",
   "SWAP_RIGHT_PORTRAIT_WIDGET",
   "SWAP_TITLE_WIDGET",

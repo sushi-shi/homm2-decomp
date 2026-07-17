@@ -410,13 +410,6 @@ typedef enum AdventureCommand {
     ADVMGR_COMMAND_CONTINUE_ROUTE = 7
 } AdventureCommand;
 
-typedef enum AdventureInputEvent {
-    ADVMGR_INPUT_MOUSE_DOWN = 1,
-    ADVMGR_INPUT_MOUSE_UP = 8,
-    ADVMGR_INPUT_KEY_DOWN = 0x20,
-    ADVMGR_INPUT_COMMAND = 0x200
-} AdventureInputEvent;
-
 typedef enum AdventureSearchConstant {
     ADVMGR_ARTIFACT_CAPACITY = 14,
     ADVMGR_CLEAR_GROUND_TILESET = 47,

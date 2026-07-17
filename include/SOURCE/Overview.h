@@ -92,10 +92,6 @@ typedef enum OverviewUiConstant {
     OVERVIEW_TOWN_RECRUIT_ALT_LAST = 38,
     OVERVIEW_TOWN_HERO_FIRST = 39,
     OVERVIEW_TOWN_HERO_LAST = 43,
-    OVERVIEW_KEY_HOME = 0x47,
-    OVERVIEW_KEY_PAGE_UP = 0x49,
-    OVERVIEW_KEY_END = 0x4f,
-    OVERVIEW_KEY_PAGE_DOWN = 0x51
 } OverviewUiConstant;
 
 i32 OverviewHandler(struct tag_message &);
