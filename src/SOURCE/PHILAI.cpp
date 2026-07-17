@@ -2079,7 +2079,7 @@ void philAI::ValueOfBuyingBuilding(
     }
     currentOccupiedSlots = 0;
     for (indexBuilding = 0; indexBuilding < AI_TOWN_ARMY_SLOTS; indexBuilding++) {
-        if (townPtr->m_army.m_quantities[indexBuilding] > 0)
+        if (townPtr->m_army.m_quantities[IDX(indexBuilding)] > 0)
             currentOccupiedSlots++;
     }
     if (building == BUILDING_SLOT_MAGE_GUILD)
@@ -2204,7 +2204,7 @@ void philAI::ValueOfBuyingBuilding(
                 creatureLocated = 0;
                 for (indexBuilding = 0; indexBuilding < AI_TOWN_ARMY_SLOTS; indexBuilding++) {
                     if (gDwellingType[townPtr->m_type][building - BUILDING_SLOT_DWELLING_FIRST]
-                        == townPtr->m_army.m_creatureTypes[indexBuilding]) {
+                        == townPtr->m_army.m_creatureTypes[IDX(indexBuilding)]) {
                         creatureLocated = 1;
                     }
                 }
