@@ -364,7 +364,7 @@ i32 advManager::Open(i32 id) {
 
 VA(0x00457028, 0x40a)
 void advManager::Close(void) {
-    DATA(0x004f59a8) static i16 s_closeBorderFreeLineBase = ADVMGR_CLOSE_BORDER_FREE_LINE_BASE;
+    DATA(0x004f59a8) static i16 s_closeBorderFreeLineBase = 292;
 
     ClearBottomView();
     gpMouseManager->SetPointer(-1);
@@ -377,7 +377,7 @@ void advManager::Close(void) {
     if (m_adventureBorder != 0) {
         H2_FREE(
             m_adventureBorder,
-            s_closeBorderFreeLineBase + ADVMGR_BORDER_INITIAL_FREE_LINE_OFFSET
+            292 + ADVMGR_BORDER_INITIAL_FREE_LINE_OFFSET
         );
         m_adventureBorder = 0;
     }
@@ -4752,7 +4752,7 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
 // explains the word or a relevant ADVMGR TU/header change alters the frame.
 VA(0x004613b0, 0x366)
 i32 advManager::UpdBottomViewNewTurn(void) {
-    DATA(0x004f6134) static i16 s_newTurnLineBase = ADVMGR_NEW_TURN_LINE_BASE;
+    DATA(0x004f6134) static i16 s_newTurnLineBase = 4560;
 
     i32 dateIconFrame;
     char* weekText;
@@ -4808,7 +4808,7 @@ i32 advManager::UpdBottomViewNewTurn(void) {
 
     weekText = static_cast<char*>(H2_ALLOC(
         ADVMGR_BOTTOM_VIEW_TEXT_BUFFER_SIZE,
-        s_newTurnLineBase + ADVMGR_NEW_TURN_WEEK_ALLOC_LINE_OFFSET
+        4560 + ADVMGR_NEW_TURN_WEEK_ALLOC_LINE_OFFSET
     ));
     sprintf(weekText, "%s: %d  %s: %d", "Month", gpGame->m_month, "Week", gpGame->m_week);
     m_bottomViewAllTexts[0] = new textWidget(
@@ -4830,7 +4830,7 @@ i32 advManager::UpdBottomViewNewTurn(void) {
 
     dayText = static_cast<char*>(H2_ALLOC(
         ADVMGR_BOTTOM_VIEW_TEXT_BUFFER_SIZE,
-        s_newTurnLineBase + ADVMGR_NEW_TURN_DAY_ALLOC_LINE_OFFSET
+        4560 + ADVMGR_NEW_TURN_DAY_ALLOC_LINE_OFFSET
     ));
     sprintf(dayText, "%s: %d", "Day", gpGame->m_day);
     m_bottomViewAllTexts[0] = new textWidget(
@@ -4854,7 +4854,7 @@ i32 advManager::UpdBottomViewNewTurn(void) {
 
 VA(0x00461716, 0x35f)
 i32 advManager::UpdBottomViewResMsg(void) {
-    DATA(0x004f61f4) static i16 s_resourceViewLineBase = ADVMGR_RESOURCE_VIEW_LINE_BASE;
+    DATA(0x004f61f4) static i16 s_resourceViewLineBase = 4655;
 
     i32 iconWidth6;
     i32 iconHeight11;
@@ -4894,7 +4894,7 @@ i32 advManager::UpdBottomViewResMsg(void) {
     }
     messageText2 = static_cast<char*>(H2_ALLOC(
         strlen(gcBottomViewText) + 1,
-        s_resourceViewLineBase + ADVMGR_RESOURCE_VIEW_MESSAGE_ALLOC_LINE_OFFSET
+        4655 + ADVMGR_RESOURCE_VIEW_MESSAGE_ALLOC_LINE_OFFSET
     ));
     sprintf(messageText2, gcBottomViewText);
     m_bottomViewAllTexts[0] = new textWidget(
@@ -4942,7 +4942,7 @@ i32 advManager::UpdBottomViewResMsg(void) {
 
         resourceCountText6 = static_cast<char*>(H2_ALLOC(
             ADVMGR_BOTTOM_VIEW_COUNT_BUFFER_SIZE,
-            s_resourceViewLineBase + ADVMGR_RESOURCE_VIEW_COUNT_ALLOC_LINE_OFFSET
+            4655 + ADVMGR_RESOURCE_VIEW_COUNT_ALLOC_LINE_OFFSET
         ));
         sprintf(resourceCountText6, "%d", giBottomViewResourceQty);
         m_bottomViewAllTexts[1] = new textWidget(
@@ -4967,7 +4967,7 @@ i32 advManager::UpdBottomViewResMsg(void) {
 
 VA(0x00461a75, 0x363)
 i32 advManager::UpdBottomViewKingdom(void) {
-    DATA(0x004f6294) static i16 s_kingdomViewLineBase = ADVMGR_KINGDOM_VIEW_LINE_BASE;
+    DATA(0x004f6294) static i16 s_kingdomViewLineBase = 4758;
 
     i32 villageCount37;
     i32 index11;
@@ -5049,7 +5049,7 @@ i32 advManager::UpdBottomViewKingdom(void) {
     for (index11 = 0; index11 < ADVMGR_KINGDOM_VIEW_ENTRY_COUNT; ++index11) {
         countText14[index11] = static_cast<char*>(H2_ALLOC(
             ADVMGR_BOTTOM_VIEW_COUNT_BUFFER_SIZE,
-            s_kingdomViewLineBase + ADVMGR_KINGDOM_VIEW_COUNT_ALLOC_LINE_OFFSET
+            4758 + ADVMGR_KINGDOM_VIEW_COUNT_ALLOC_LINE_OFFSET
         ));
         if (index11 < ADVMGR_KINGDOM_VIEW_RESOURCE_COUNT) {
             sprintf(countText14[index11], "%d", gpCurPlayer->m_resources[index11]);
@@ -5083,7 +5083,7 @@ i32 advManager::UpdBottomViewKingdom(void) {
 // Exact bytes and all 36 relocation targets.
 VA(0x00461dd8, 0x583)
 i32 advManager::UpdBottomViewHero(void) {
-    DATA(0x004f6300) static i16 s_bottomHeroLineBase = ADVMGR_BOTTOM_HERO_LINE_BASE;
+    DATA(0x004f6300) static i16 s_bottomHeroLineBase = 4835;
 
     char* armyCountLabelsResult[ADVMGR_BOTTOM_HERO_ARMY_SLOTS];
     icon* monsterIconsLocal;
@@ -5152,7 +5152,7 @@ i32 advManager::UpdBottomViewHero(void) {
 
                 armyCountLabelsResult[displayIndexData] = static_cast<char*>(H2_ALLOC(
                     ADVMGR_BOTTOM_HERO_LABEL_BYTES,
-                    s_bottomHeroLineBase + ADVMGR_BOTTOM_HERO_ALLOC_LINE_OFFSET
+                    4835 + ADVMGR_BOTTOM_HERO_ALLOC_LINE_OFFSET
                 ));
                 if (targetHero->m_army.m_creatureCounts[armySlot]
                     > ADVMGR_BOTTOM_HERO_MAX_FULL_COUNT) {
@@ -5248,7 +5248,7 @@ i32 advManager::UpdBottomViewHero(void) {
 // Revisit after a material ADVMGR predecessor/header or comparison-tool change.
 VA(0x0046235b, 0xd32)
 void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 windowY) {
-    DATA(0x004f6370) static i16 s_quickViewLineBase = ADVMGR_QUICK_VIEW_LINE_BASE;
+    DATA(0x004f6370) static i16 s_quickViewLineBase = 4982;
 
     i16 armyAreaWidthLocal = 160;
     i16 armyAreaLeftLocal = 22;
@@ -5367,7 +5367,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                         MemError();
                     }
                     armyLabelsStrings[armyIndex] = static_cast<char*>(
-                        H2_ALLOC(5, s_quickViewLineBase + ADVMGR_QUICK_VIEW_FIRST_ALLOC_LINE_OFFSET)
+                        H2_ALLOC(5, 4982 + ADVMGR_QUICK_VIEW_FIRST_ALLOC_LINE_OFFSET)
                     );
                     sprintf(
                         armyLabelsStrings[armyIndex],
@@ -5449,7 +5449,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                 MemError();
             }
             armyLabelsStrings[armyIndex] = static_cast<char*>(
-                H2_ALLOC(15, s_quickViewLineBase + ADVMGR_QUICK_VIEW_SECOND_ALLOC_LINE_OFFSET)
+                H2_ALLOC(15, 4982 + ADVMGR_QUICK_VIEW_SECOND_ALLOC_LINE_OFFSET)
             );
             strcpy(
                 armyLabelsStrings[armyIndex],
@@ -5508,7 +5508,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                     MemError();
                 }
                 armyLabelsStrings[armyIndex] = static_cast<char*>(
-                    H2_ALLOC(15, s_quickViewLineBase + ADVMGR_QUICK_VIEW_THIRD_ALLOC_LINE_OFFSET)
+                    H2_ALLOC(15, 4982 + ADVMGR_QUICK_VIEW_THIRD_ALLOC_LINE_OFFSET)
                 );
                 strcpy(
                     armyLabelsStrings[armyIndex],
@@ -5600,7 +5600,7 @@ char* advManager::GetArmySizeName(i32 armySize, i32 grammar) {
 // ADVMGR predecessor/header or comparison-tool change.
 VA(0x004631ad, 0xc29)
 void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 windowY) {
-    DATA(0x004f6488) static i16 s_townViewLineBase = ADVMGR_TOWN_VIEW_LINE_BASE;
+    DATA(0x004f6488) static i16 s_townViewLineBase = 5346;
 
     icon* monsterIconLocal;
     i16 portraitWidgetLocal;
@@ -5708,7 +5708,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
 
     if (informationLevel == 0 || armyCountLocal == 0) {
         emptyArmyLabel = static_cast<char*>(
-            H2_ALLOC(20, s_townViewLineBase + ADVMGR_TOWN_VIEW_FIRST_ALLOC_LINE_OFFSET)
+            H2_ALLOC(20, 5346 + ADVMGR_TOWN_VIEW_FIRST_ALLOC_LINE_OFFSET)
         );
         if (informationLevel == 0) {
             sprintf(emptyArmyLabel, "Unknown");
@@ -5792,7 +5792,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
                 MemError();
             }
             armyLabelsResult[widgetIndexWidget] = static_cast<char*>(
-                H2_ALLOC(15, s_townViewLineBase + ADVMGR_TOWN_VIEW_SECOND_ALLOC_LINE_OFFSET)
+                H2_ALLOC(15, 5346 + ADVMGR_TOWN_VIEW_SECOND_ALLOC_LINE_OFFSET)
             );
             if (informationLevel == 3) {
                 sprintf(
@@ -5866,7 +5866,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
                     MemError();
                 }
                 armyLabelsResult[widgetIndexWidget] = static_cast<char*>(
-                    H2_ALLOC(15, s_townViewLineBase + ADVMGR_TOWN_VIEW_THIRD_ALLOC_LINE_OFFSET)
+                    H2_ALLOC(15, 5346 + ADVMGR_TOWN_VIEW_THIRD_ALLOC_LINE_OFFSET)
                 );
                 if (informationLevel == 3) {
                     sprintf(
@@ -5933,7 +5933,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
 
 VA(0x00463dd6, 0x11f)
 void advManager::RedrawAdvScreen(i32 update, i32 freeBorder) {
-    DATA(0x004f6590) static i16 s_redrawBorderFreeLineBase = ADVMGR_REDRAW_BORDER_FREE_LINE_BASE;
+    DATA(0x004f6590) static i16 s_redrawBorderFreeLineBase = 5672;
 
     if (!bShowIt) {
         return;
@@ -5942,7 +5942,7 @@ void advManager::RedrawAdvScreen(i32 update, i32 freeBorder) {
     if (freeBorder) {
         H2_FREE(
             m_adventureBorder,
-            s_redrawBorderFreeLineBase + ADVMGR_BORDER_SECONDARY_FREE_LINE_OFFSET
+            5672 + ADVMGR_BORDER_SECONDARY_FREE_LINE_OFFSET
         );
         m_adventureBorder = 0;
     }
@@ -8505,7 +8505,7 @@ void advManager::EnableButtons(void) {
 
 VA(0x00469976, 0x145)
 void advManager::SaveAdventureBorder(void) {
-    DATA(0x004f688c) static i16 s_saveBorderAllocLineBase = ADVMGR_SAVE_BORDER_ALLOC_LINE_BASE;
+    DATA(0x004f688c) static i16 s_saveBorderAllocLineBase = 8229;
 
     if (m_adventureBorder != 0) {
         return;
@@ -8513,7 +8513,7 @@ void advManager::SaveAdventureBorder(void) {
 
     m_adventureBorder = static_cast<u8*>(H2_ALLOC(
         ADVMGR_BORDER_BUFFER_SIZE,
-        s_saveBorderAllocLineBase + ADVMGR_BORDER_ALLOC_LINE_OFFSET
+        8229 + ADVMGR_BORDER_ALLOC_LINE_OFFSET
     ));
     u8* savedPixels = m_adventureBorder;
     u8* screenPixel = gpWindowManager->m_screen->m_pixels;

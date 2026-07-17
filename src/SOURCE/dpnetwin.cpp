@@ -55,7 +55,7 @@ BOOL WINAPI dpEnumSession(DPSESSIONDESC* session, void*, LPDWORD, DWORD flags) {
 // declaration, source/TU/header, or comparison-epoch changes.
 VA(0x0041eeaf, 0x311)
 i16 dpnet_init(void) {
-    DATA(0x004ef83c) static i16 initSourceLineBase = DP_SOURCE_LINE_INIT_BASE;
+    DATA(0x004ef83c) static i16 initSourceLineBase = 95;
     DirectPlayStartupMessage startup;
     typedef HRESULT(WINAPI * DirectPlayCreateFunction)(GUID*, IDirectPlay**, IUnknown*);
     typedef HRESULT(WINAPI * DirectPlayEnumerateFunction)(LPDPENUMDPCALLBACK, void*);
@@ -67,8 +67,8 @@ i16 dpnet_init(void) {
     if (lpIDC != 0)
         return 0;
     {
-        ppDPRcvBuffer = static_cast<u8**>(H2_ALLOC(DP_TRANSPORT_BUFFER_COUNT * sizeof(u8*), initSourceLineBase + DP_SOURCE_LINE_INIT_BUFFER_ALLOC_OFFSET));
-        piDPRcvBufferSize = static_cast<i32*>(H2_ALLOC(DP_TRANSPORT_BUFFER_COUNT * sizeof(i32), initSourceLineBase + DP_SOURCE_LINE_INIT_SIZE_ALLOC_OFFSET));
+        ppDPRcvBuffer = static_cast<u8**>(H2_ALLOC(DP_TRANSPORT_BUFFER_COUNT * sizeof(u8*), 102));
+        piDPRcvBufferSize = static_cast<i32*>(H2_ALLOC(DP_TRANSPORT_BUFFER_COUNT * sizeof(i32), 103));
         memset(ppDPRcvBuffer, 0, DP_TRANSPORT_BUFFER_COUNT * sizeof(u8*));
         memset(piDPRcvBufferSize, 0, DP_TRANSPORT_BUFFER_COUNT * sizeof(i32));
         hinstDplayx = LoadLibraryA("DPLAYX.DLL");
@@ -97,7 +97,7 @@ i16 dpnet_init(void) {
         }
         result = createFunction(g_lpGuid, &lpIDC, 0);
         if (result != DP_RESULT_OK)
-            DPSD(result, RETAIL_FILE, initSourceLineBase + DP_SOURCE_LINE_INIT_CREATE_OFFSET);
+            DPSD(result, RETAIL_FILE, 136);
 
         if (GameMode == REMOTE_GAME_NETWORK_HOST) {
             gbRemoteGameOpen = 1;
@@ -163,7 +163,7 @@ void CleanupDPVars(void) {
 
 VA(0x0041f28e, 0x116)
 void dpnet_term(void) {
-    DATA(0x004efa00) static i16 termSourceLineBase = DP_SOURCE_LINE_TERM_BASE;
+    DATA(0x004efa00) static i16 termSourceLineBase = 219;
     char drainBuffer[DP_TRANSPORT_TERM_DRAIN_READ_SIZE + sizeof(i32)];
 
     gbRemoteOn = 0;
@@ -175,10 +175,10 @@ void dpnet_term(void) {
     while (dpnet_rcv(0, DP_TRANSPORT_TERM_DRAIN_READ_SIZE, drainBuffer) != 0) {
     }
     if (ppDPRcvBuffer != 0)
-        H2_FREE(ppDPRcvBuffer, termSourceLineBase + DP_SOURCE_LINE_TERM_BUFFER_FREE_OFFSET);
+        H2_FREE(ppDPRcvBuffer, 233);
     ppDPRcvBuffer = 0;
     if (piDPRcvBufferSize != 0)
-        H2_FREE(piDPRcvBufferSize, termSourceLineBase + DP_SOURCE_LINE_TERM_SIZE_FREE_OFFSET);
+        H2_FREE(piDPRcvBufferSize, 237);
     piDPRcvBufferSize = 0;
     if (hinstDplayx != 0)
         FreeLibrary(hinstDplayx);
@@ -188,9 +188,9 @@ void dpnet_term(void) {
 
 VA(0x0041f3a4, 0xee)
 void dpSendMessage(i32 destination, u8 type, u16 size, void* data) {
-    DATA(0x004efa5c) static i16 sendSourceLineBase = DP_SOURCE_LINE_SEND_BASE;
+    DATA(0x004efa5c) static i16 sendSourceLineBase = 254;
     u8* message = static_cast<u8*>(
-        H2_ALLOC(size + 1, sendSourceLineBase + DP_SOURCE_LINE_SEND_ALLOC_OFFSET)
+        H2_ALLOC(size + 1, 256)
     );
     i32 result;
 
@@ -200,9 +200,9 @@ void dpSendMessage(i32 destination, u8 type, u16 size, void* data) {
     result = lpIDC->Send(dcoID, destination, 0, message, size + 1);
     if (result != DP_RESULT_OK && result != DP_RESULT_INVALID_PLAYER
         && result != DP_RESULT_INVALID_ARGUMENT) {
-        DPSD(result, RETAIL_FILE, sendSourceLineBase + DP_SOURCE_LINE_SEND_ERROR_OFFSET);
+        DPSD(result, RETAIL_FILE, 268);
     }
-    H2_FREE(message, sendSourceLineBase + DP_SOURCE_LINE_SEND_FREE_OFFSET);
+    H2_FREE(message, 270);
 }
 
 VA(0x0041f492, 0x5a)
@@ -220,7 +220,7 @@ i32 dpnet_snd(i32 position, i32 size, void* data) {
 
 VA(0x0041f4ec, 0xa7)
 i16 dpnet_rcv(i16, u16, void* data) {
-    DATA(0x004efae4) static i16 receiveSourceLineBase = DP_SOURCE_LINE_RECEIVE_BASE;
+    DATA(0x004efae4) static i16 receiveSourceLineBase = 284;
     u32 size;
 
     dpProcessMessages();
@@ -228,7 +228,7 @@ i16 dpnet_rcv(i16, u16, void* data) {
         return 0;
     size = piDPRcvBufferSize[iDPRcvBufferTail];
     memcpy(data, ppDPRcvBuffer[iDPRcvBufferTail], size);
-    H2_FREE(ppDPRcvBuffer[iDPRcvBufferTail], receiveSourceLineBase + DP_SOURCE_LINE_RECEIVE_FREE_OFFSET);
+    H2_FREE(ppDPRcvBuffer[iDPRcvBufferTail], 293);
     iDPRcvBufferTail = (iDPRcvBufferTail + 1) % DP_TRANSPORT_BUFFER_COUNT;
     return static_cast<i16>(size);
 }
@@ -245,7 +245,7 @@ i16 __cdecl dpnet_sess(i32, i32, ...) {
 
 VA(0x0041f5c3, 0xbe)
 void dpProcessMessages(void) {
-    DATA(0x004efb14) static i16 processSourceLineBase = DP_SOURCE_LINE_PROCESS_BASE;
+    DATA(0x004efb14) static i16 processSourceLineBase = 312;
     DWORD packetSize[2];
     i32 destinationIds[2];
     i32 senderId;
@@ -268,7 +268,7 @@ void dpProcessMessages(void) {
             DPSD(
                 receiveResult,
                 RETAIL_FILE,
-                processSourceLineBase + DP_SOURCE_LINE_PROCESS_ERROR_OFFSET
+                335
             );
         if (senderId == 0) {
         } else {
@@ -288,13 +288,13 @@ void dpProcessMessages(void) {
 // header, or comparison-epoch changes.
 VA(0x0041f681, 0x274)
 void dpEvaluateMessage(u32l size, i32 sender) {
-    DATA(0x004efb44) static i16 evaluateSourceLineBase = DP_SOURCE_LINE_EVALUATE_BASE;
+    DATA(0x004efb44) static i16 evaluateSourceLineBase = 355;
     char* ptr = rcvBufIn + 1;
     i32 i;
 
     switch (rcvBufIn[0]) {
         case NETWORK_PACKET_DATA:
-            ppDPRcvBuffer[iDPRcvBufferHead] = static_cast<u8*>(H2_ALLOC(size - 1, evaluateSourceLineBase + DP_SOURCE_LINE_EVALUATE_ALLOC_OFFSET));
+            ppDPRcvBuffer[iDPRcvBufferHead] = static_cast<u8*>(H2_ALLOC(size - 1, 363));
             memcpy(ppDPRcvBuffer[iDPRcvBufferHead], rcvBufIn + 1, size - 1);
             piDPRcvBufferSize[iDPRcvBufferHead] = size;
             iDPRcvBufferHead = (iDPRcvBufferHead + 1) % DP_TRANSPORT_BUFFER_COUNT;
@@ -347,7 +347,7 @@ void dpEvaluateMessage(u32l size, i32 sender) {
 // only after the source/TU/header or comparison epoch changes.
 VA(0x0041f8f5, 0x182)
 i32 dpWaitForFirstGuest(void) {
-    DATA(0x004efb9c) static i16 firstGuestSourceLineBase = DP_SOURCE_LINE_FIRST_GUEST_BASE;
+    DATA(0x004efb9c) static i16 firstGuestSourceLineBase = 426;
     DPSESSIONDESC session;
     i32 result;
 
@@ -364,7 +364,7 @@ i32 dpWaitForFirstGuest(void) {
                 DPSD(
                     result,
                     RETAIL_FILE,
-                    firstGuestSourceLineBase + DP_SOURCE_LINE_FIRST_GUEST_OPEN_OFFSET
+                    442
                 );
             iDPWaitForFirstGuestStatus++;
             break;
@@ -379,7 +379,7 @@ i32 dpWaitForFirstGuest(void) {
                 DPSD(
                     result,
                     RETAIL_FILE,
-                    firstGuestSourceLineBase + DP_SOURCE_LINE_FIRST_GUEST_CREATE_OFFSET
+                    472
                 );
             giNetPosToDCOPos[0] = dcoID;
             iDPWaitForFirstGuestStatus++;
@@ -421,7 +421,7 @@ i32 dpWaitForExtraGuests(void) {
 // The objdiff residual is only delinked switch-table/local-label identity.
 VA(0x0041fafb, 0x3d2)
 i32 dpWaitForHost(void) {
-    DATA(0x004efc78) static i16 hostSourceLineBase = DP_SOURCE_LINE_HOST_BASE;
+    DATA(0x004efc78) static i16 hostSourceLineBase = 510;
     DWORD enumerationTimeout;
     DPSESSIONDESC sessionDescription;
     i32 playResult;
@@ -453,7 +453,7 @@ i32 dpWaitForHost(void) {
                 return 0;
             }
             if (playResult != DP_RESULT_OK)
-                DPSD(playResult, RETAIL_FILE, hostSourceLineBase + DP_SOURCE_LINE_HOST_ENUM_OFFSET);
+                DPSD(playResult, RETAIL_FILE, 548);
             if (iMaxSession > 0) {
                 iWaitForHostWaitCount = DP_TRANSPORT_RETRY_WAIT_COUNT;
                 iDPWaitForHostStatus++;
@@ -469,13 +469,13 @@ i32 dpWaitForHost(void) {
             strcpy(sessionDescription.szSessionName, "Heroes 2");
             playResult = lpIDC->Open(&sessionDescription);
             if (playResult != DP_RESULT_OK)
-                DPSD(playResult, RETAIL_FILE, hostSourceLineBase + DP_SOURCE_LINE_HOST_OPEN_OFFSET);
+                DPSD(playResult, RETAIL_FILE, 567);
             iDPWaitForHostStatus++;
             break;
         case 2:
             playResult = lpIDC->CreatePlayer(&dcoID, "Dude", "Heroes Player", &dphEvent);
             if (playResult != DP_RESULT_OK)
-                DPSD(playResult, RETAIL_FILE, hostSourceLineBase + DP_SOURCE_LINE_HOST_CREATE_OFFSET);
+                DPSD(playResult, RETAIL_FILE, 577);
             iDPWaitForHostStatus++;
             break;
         case 3:
@@ -502,7 +502,7 @@ i32 dpWaitForHost(void) {
                 }
                 playResult = lpIDC->Close();
                 if (playResult != DP_RESULT_OK)
-                    DPSD(playResult, RETAIL_FILE, hostSourceLineBase + DP_SOURCE_LINE_HOST_CLOSE_OFFSET);
+                    DPSD(playResult, RETAIL_FILE, 603);
             } else if (iLastHereIAmTickCount + DP_TRANSPORT_ACCEPT_TIMEOUT < KBTickCount()) {
                 iDPWaitForHostStatus--;
             }

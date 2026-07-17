@@ -33,7 +33,7 @@ DATA(0x005173c4) static char* gNbListenName = "*";
 // Source DATA owners recover the nine module globals and eight function-local
 // line bases. Fifteen private literals cover the remaining payload. The two
 // otherwise unreferenced source-path strings are byte-exact immediately after
-// gNbAddNameSourceLineBase and gNbReceiveCompleteSourceLineBase, at 0x11757c
+// 534 and gNbReceiveCompleteSourceLineBase, at 0x11757c
 // and 0x1175f4. All other private owners have singleton relocation or unique
 // payload proof. The candidate payload ends at 0x11761e; retail's final two
 // bytes are zero alignment. Loader-zero storage is the exact 0x82e8-byte BSS
@@ -87,7 +87,7 @@ i32 is_netbios_avail(void) {
 VA(0x004a6c88, 0x244)
 extern "C" u16 __fastcall nb_init(u16 param1, u16 param2) {
     // Retail interleaves each line base with this function's literals; this compiler groups them.
-    DATA(0x005173d8) static i16 gNbInitSourceLineBase = NETWIN_SOURCE_LINE_INIT_BASE;
+    DATA(0x005173d8) static i16 gNbInitSourceLineBase = 105;
     NetbiosControlBlock localNcb;
     i32 i;
     u8* statusBuffer;
@@ -117,7 +117,7 @@ extern "C" u16 __fastcall nb_init(u16 param1, u16 param2) {
         for (i = 0; i < NETBIOS_THREAD_EVENT_COUNT; i++)
             gNbEvents.handles[i] = CreateEventA(0, 1, 0, 0);
         memset(&localNcb, 0, sizeof(localNcb));
-        statusBuffer = static_cast<u8*>(H2_ALLOC(NETBIOS_ADAPTER_STATUS_SIZE, gNbInitSourceLineBase + (NETWIN_SOURCE_LINE_INIT_ALLOC - NETWIN_SOURCE_LINE_INIT_BASE)));
+        statusBuffer = static_cast<u8*>(H2_ALLOC(NETBIOS_ADAPTER_STATUS_SIZE, 145));
         localNcb.command = NETBIOS_COMMAND_ADAPTER_STATUS;
         localNcb.length = NETBIOS_ADAPTER_STATUS_SIZE;
         localNcb.buffer = statusBuffer;
@@ -130,7 +130,7 @@ extern "C" u16 __fastcall nb_init(u16 param1, u16 param2) {
             localNcb.callName[2] = NETBIOS_RESULT_SESSION_CLOSED;
             Netbios(&localNcb);
         }
-        H2_FREE(statusBuffer, gNbInitSourceLineBase + (NETWIN_SOURCE_LINE_INIT_FREE - NETWIN_SOURCE_LINE_INIT_BASE));
+        H2_FREE(statusBuffer, 159);
         gNbShutdown = 0;
         return 0;
     }
@@ -139,7 +139,7 @@ extern "C" u16 __fastcall nb_init(u16 param1, u16 param2) {
 
 VA(0x004a6ecc, 0x207)
 extern "C" void __fastcall nb_term(void) {
-    DATA(0x00517434) static i16 gNbTermSourceLineBase = NETWIN_SOURCE_LINE_TERM_BASE;
+    DATA(0x00517434) static i16 gNbTermSourceLineBase = 169;
     tag_Node* node;
     NetbiosControlBlock localNcb;
     i32 i;
@@ -162,11 +162,11 @@ extern "C" void __fastcall nb_term(void) {
     }
     EnterCriticalSection(&gNbSndLock);
     while ((node = pop_node(&gNbSndQueue)) != 0)
-        H2_FREE(node, gNbTermSourceLineBase
-                + (NETWIN_SOURCE_LINE_TERM_SEND_FREE - NETWIN_SOURCE_LINE_TERM_BASE));
+        H2_FREE(node, 169
+                + (200 - 169));
     while ((node = pop_node(&gNbFreeQueue)) != 0)
-        H2_FREE(node, gNbTermSourceLineBase
-                + (NETWIN_SOURCE_LINE_TERM_POOL_FREE - NETWIN_SOURCE_LINE_TERM_BASE));
+        H2_FREE(node, 169
+                + (204 - 169));
     LeaveCriticalSection(&gNbSndLock);
     DeleteCriticalSection(&gNbSndLock);
     for (i = 0; i < NETBIOS_THREAD_EVENT_COUNT; i++) {
@@ -177,15 +177,15 @@ extern "C" void __fastcall nb_term(void) {
     SetEvent(gNbEvents.handles[0]);
     EnterCriticalSection(&gNbRcvLock);
     while ((node = pop_node(&gNbRcvQueue)) != 0)
-        H2_FREE(node, gNbTermSourceLineBase
-                + (NETWIN_SOURCE_LINE_TERM_RECEIVE_FREE - NETWIN_SOURCE_LINE_TERM_BASE));
+        H2_FREE(node, 169
+                + (219 - 169));
     LeaveCriticalSection(&gNbRcvLock);
     DeleteCriticalSection(&gNbRcvLock);
 }
 
 VA(0x004a70d3, 0xb3)
 extern "C" u16 __fastcall nb_rcv(i16 session, void* buf) {
-    DATA(0x005174bc) static i16 gNbReceiveSourceLineBase = NETWIN_SOURCE_LINE_RECEIVE_BASE;
+    DATA(0x005174bc) static i16 gNbReceiveSourceLineBase = 226;
     tag_Node* node;
     i32 len;
 
@@ -198,8 +198,8 @@ extern "C" u16 __fastcall nb_rcv(i16 session, void* buf) {
         else
             len = node->len;
         memcpy(buf, node->data, len);
-        H2_FREE(node, gNbReceiveSourceLineBase
-                + (NETWIN_SOURCE_LINE_RECEIVE_FREE - NETWIN_SOURCE_LINE_RECEIVE_BASE));
+        H2_FREE(node, 226
+                + (237 - 226));
         return len;
     }
     return 0;
@@ -207,7 +207,7 @@ extern "C" u16 __fastcall nb_rcv(i16 session, void* buf) {
 
 VA(0x004a7186, 0xe4)
 extern "C" u16 __fastcall nb_snd(i16 session, i16 len, void* data) {
-    DATA(0x005174ec) static i16 gNbSendSourceLineBase = NETWIN_SOURCE_LINE_SEND_BASE;
+    DATA(0x005174ec) static i16 gNbSendSourceLineBase = 245;
     tag_Node* node;
 
     if (gNbMaxSess == session && len == 0) {
@@ -216,7 +216,7 @@ extern "C" u16 __fastcall nb_snd(i16 session, i16 len, void* data) {
     }
     if ((gNetStatus[session] & NETBIOS_SESSION_ACTIVE) == 0)
         return NETBIOS_RESULT_SESSION_OUT_OF_RANGE;
-    node = static_cast<tag_Node*>(H2_ALLOC(len + NETBIOS_PACKET_HEADER_SIZE, gNbSendSourceLineBase + (NETWIN_SOURCE_LINE_SEND_ALLOC - NETWIN_SOURCE_LINE_SEND_BASE)));
+    node = static_cast<tag_Node*>(H2_ALLOC(len + NETBIOS_PACKET_HEADER_SIZE, 260));
     node->len = len;
     node->sessionIndex = static_cast<u8>(session);
     memcpy(node->data, data, len);
@@ -369,7 +369,7 @@ extern "C" char __fastcall nb_stat(i16 session) {
 // bytes resolve to the same entries. The 6.73% score is local identity only.
 VA(0x004a7758, 0xdd2)
 void nb_thr_ctl(void) {
-    DATA(0x0051751c) static i16 gNbThreadSourceLineBase = NETWIN_SOURCE_LINE_THREAD_BASE;
+    DATA(0x0051751c) static i16 gNbThreadSourceLineBase = 412;
     i32 keepRunning;
     i32 i;
     tag_Node* node;
@@ -418,9 +418,9 @@ void nb_thr_ctl(void) {
                                 ProcessAssert(
                                     0,
                                     RETAIL_FILE,
-                                    gNbThreadSourceLineBase
-                                        + (NETWIN_SOURCE_LINE_THREAD_PENDING_ASSERT
-                                           - NETWIN_SOURCE_LINE_THREAD_BASE)
+                                    412
+                                        + (495
+                                           - 412)
                                 );
                                 break;
                             case NETBIOS_RESULT_SESSION_OUT_OF_RANGE:
@@ -433,8 +433,8 @@ void nb_thr_ctl(void) {
                         }
                     }
                 }
-                H2_FREE(node, gNbThreadSourceLineBase
-                        + (NETWIN_SOURCE_LINE_THREAD_FREE - NETWIN_SOURCE_LINE_THREAD_BASE));
+                H2_FREE(node, 412
+                        + (508 - 412));
             }
         }
     }
@@ -470,13 +470,13 @@ static void nb_add_name(void) {
 // every resolved external relocation target agrees.
 VA(0x004a7a81, 0x1ca)
 static void __stdcall nb_add_name_done(NetbiosControlBlock* ncb) {
-    DATA(0x00517578) static i16 gNbAddNameSourceLineBase = NETWIN_SOURCE_LINE_ADD_NAME_BASE;
+    DATA(0x00517578) static i16 gNbAddNameSourceLineBase = 534;
     i32 j;
     ProcessAssert(
         &gNbSessNcb[gNbMaxSess] == ncb,
         RETAIL_FILE,
-        gNbAddNameSourceLineBase
-            + (NETWIN_SOURCE_LINE_ADD_NAME_ASSERT - NETWIN_SOURCE_LINE_ADD_NAME_BASE)
+        534
+            + (537 - 534)
     );
     switch (ncb->returnCode) {
         case NETBIOS_RESULT_SUCCESS:
@@ -605,14 +605,14 @@ static void __stdcall nb_call_done(NetbiosControlBlock* ncb) {
 
 VA(0x004a8119, 0x13b)
 static void __fastcall nb_arm_recv(i32 session) {
-    DATA(0x005175c0) static i16 gNbArmReceiveSourceLineBase = NETWIN_SOURCE_LINE_ARM_RECEIVE_BASE;
+    DATA(0x005175c0) static i16 gNbArmReceiveSourceLineBase = 710;
     u8 result;
     for (;;) {
         ProcessAssert(
             gNbSessNcb[session].returnCode != NETBIOS_RESULT_PENDING,
             RETAIL_FILE,
-            gNbArmReceiveSourceLineBase
-                + (NETWIN_SOURCE_LINE_ARM_RECEIVE_ASSERT - NETWIN_SOURCE_LINE_ARM_RECEIVE_BASE)
+            710
+                + (715 - 710)
         );
         memset(&gNbSessNcb[session], 0, sizeof(NetbiosControlBlock));
         gNbSessNcb[session].command = NETBIOS_COMMAND_RECEIVE | NETBIOS_COMMAND_ASYNC;
@@ -666,15 +666,13 @@ static void __fastcall nb_close_session(i32 session) {
 VA(0x004a832a, 0x179)
 static void __fastcall nb_recv_complete(i32 session) {
     DATA(0x005175f0) static i16 gNbReceiveCompleteSourceLineBase =
-        NETWIN_SOURCE_LINE_RECEIVE_COMPLETE_BASE;
+        780;
     tag_Node* node;
     switch (gNbSessNcb[session].command & ~NETBIOS_COMMAND_ASYNC) {
         case NETBIOS_COMMAND_RECEIVE:
             switch (gNbSessNcb[session].returnCode) {
                 case NETBIOS_RESULT_SUCCESS:
-                    node = static_cast<tag_Node*>(H2_ALLOC(gNbSessNcb[session].length + NETBIOS_PACKET_HEADER_SIZE, gNbReceiveCompleteSourceLineBase
-                            + (NETWIN_SOURCE_LINE_RECEIVE_COMPLETE_ALLOC
-                               - NETWIN_SOURCE_LINE_RECEIVE_COMPLETE_BASE)));
+                    node = static_cast<tag_Node*>(H2_ALLOC(gNbSessNcb[session].length + NETBIOS_PACKET_HEADER_SIZE, 796));
                     if (node != 0) {
                         node->len = gNbSessNcb[session].length;
                         node->sessionIndex = static_cast<u8>(session);
