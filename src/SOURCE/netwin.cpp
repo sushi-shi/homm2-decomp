@@ -72,7 +72,7 @@ i32 is_netbios_avail(void) {
     memset(&ncb, 0, sizeof(ncb));
     for (gNetbiosLana = 0; gNetbiosLana < NETBIOS_MAX_LANA; gNetbiosLana++) {
         memset(&ncb, 0, sizeof(ncb));
-        ncb.command = NETBIOS_COMMAND_PROBE;
+        ncb.command = IDX(NETBIOS_COMMAND_PROBE);
         ncb.adapterNumber = gNetbiosLana;
         if (Netbios(&ncb) == NETBIOS_RESULT_ILLEGAL_COMMAND)
             break;
@@ -118,16 +118,16 @@ extern "C" u16 __fastcall nb_init(u16 maxNames, u16 maxSessions) {
             gNbEvents.handles[i] = CreateEventA(0, 1, 0, 0);
         memset(&localNcb, 0, sizeof(localNcb));
         statusBuffer = static_cast<u8*>(H2_ALLOC(NETBIOS_ADAPTER_STATUS_SIZE, 145));
-        localNcb.command = NETBIOS_COMMAND_ADAPTER_STATUS;
+        localNcb.command = IDX(NETBIOS_COMMAND_ADAPTER_STATUS);
         localNcb.length = NETBIOS_ADAPTER_STATUS_SIZE;
         localNcb.buffer = statusBuffer;
         localNcb.adapterNumber = gNetbiosLana;
         if (Netbios(&localNcb) == NETBIOS_RESULT_ENVIRONMENT_UNDEFINED) {
             memset(&localNcb, 0, sizeof(localNcb));
-            localNcb.command = NETBIOS_COMMAND_RESET;
+            localNcb.command = IDX(NETBIOS_COMMAND_RESET);
             localNcb.adapterNumber = gNetbiosLana;
             localNcb.callName[0] = NETBIOS_CALL_RETRY_LIMIT;
-            localNcb.callName[2] = NETBIOS_RESULT_SESSION_CLOSED;
+            localNcb.callName[2] = IDX(NETBIOS_RESULT_SESSION_CLOSED);
             Netbios(&localNcb);
         }
         H2_FREE(statusBuffer, 159);
@@ -148,7 +148,7 @@ extern "C" void __fastcall nb_term(void) {
         nb_close_session(i);
     if (gNbCtlNcb.commandComplete == NETBIOS_RESULT_PENDING) {
         memset(&localNcb, 0, sizeof(localNcb));
-        localNcb.command = NETBIOS_COMMAND_CANCEL;
+        localNcb.command = IDX(NETBIOS_COMMAND_CANCEL);
         localNcb.adapterNumber = gNetbiosLana;
         localNcb.buffer = &gNbCtlNcb;
         Netbios(&localNcb);
@@ -156,7 +156,7 @@ extern "C" void __fastcall nb_term(void) {
     if ((gNetStatus[gNbMaxSess] & NETBIOS_SESSION_NAME_REGISTERED) != 0) {
         memset(&localNcb, 0, sizeof(localNcb));
         memcpy(localNcb.name, gNbNameBuf[gNbMaxSess].bytes, NETBIOS_NAME_SIZE);
-        localNcb.command = NETBIOS_COMMAND_DELETE_NAME;
+        localNcb.command = IDX(NETBIOS_COMMAND_DELETE_NAME);
         localNcb.adapterNumber = gNetbiosLana;
         Netbios(&localNcb);
     }
@@ -238,7 +238,7 @@ extern "C" u16 __cdecl nb_sess(i16 operation, ...) {
 
     va_start(argList, operation);
     switch (operation) {
-        case NETBIOS_SESSION_REGISTER:
+        case IDX(NETBIOS_SESSION_REGISTER):
             callName = va_arg(argList, char*);
             gNetStatus[gNbMaxSess] &= ~NETBIOS_SESSION_ERROR;
             nb_format_name(callName, gNbNameBuf[gNbMaxSess].bytes);
@@ -246,12 +246,12 @@ extern "C" u16 __cdecl nb_sess(i16 operation, ...) {
             memcpy(gNbSessNcb[gNbMaxSess].name, gNbNameBuf[gNbMaxSess].bytes, NETBIOS_NAME_SIZE);
             gNbSessNcb[gNbMaxSess].command = NETBIOS_COMMAND_ADD_NAME | NETBIOS_COMMAND_ASYNC;
             gNbSessNcb[gNbMaxSess].postRoutine = nb_add_name_done;
-            gNbSessNcb[gNbMaxSess].commandComplete = NETBIOS_RESULT_PENDING;
+            gNbSessNcb[gNbMaxSess].commandComplete = IDX(NETBIOS_RESULT_PENDING);
             gNbSessNcb[gNbMaxSess].adapterNumber = gNetbiosLana;
             returnCode = Netbios(&gNbSessNcb[gNbMaxSess]);
             break;
 
-        case NETBIOS_SESSION_RECEIVE_ANY: {
+        case IDX(NETBIOS_SESSION_RECEIVE_ANY): {
             destinationSession = va_arg(argList, i32);
             if (gNbSessNcb[destinationSession].commandComplete == NETBIOS_RESULT_PENDING) {
                 switch (gNbSessNcb[destinationSession].command & ~NETBIOS_COMMAND_ASYNC) {
@@ -262,7 +262,7 @@ extern "C" u16 __cdecl nb_sess(i16 operation, ...) {
                         break;
                 }
                 memset(&controlBlock, 0, sizeof(controlBlock));
-                controlBlock.command = NETBIOS_COMMAND_CANCEL;
+                controlBlock.command = IDX(NETBIOS_COMMAND_CANCEL);
                 controlBlock.adapterNumber = gNetbiosLana;
                 controlBlock.buffer = &gNbSessNcb[destinationSession];
                 Netbios(&controlBlock);
@@ -271,27 +271,27 @@ extern "C" u16 __cdecl nb_sess(i16 operation, ...) {
             break;
         }
 
-        case NETBIOS_SESSION_CALL:
+        case IDX(NETBIOS_SESSION_CALL):
             destinationSession = va_arg(argList, i32);
             callName = va_arg(argList, char*);
             nb_format_name(callName, gNbNameBuf[destinationSession].bytes);
             returnCode = nb_call(destinationSession, gNbNameBuf[destinationSession].bytes);
             break;
 
-        case NETBIOS_SESSION_LISTEN_ANY:
+        case IDX(NETBIOS_SESSION_LISTEN_ANY):
             destinationSession = va_arg(argList, i32);
             nb_snd(gNbMaxSess, 0, 0);
             returnCode = nb_listen(destinationSession, gNbListenName);
             break;
 
-        case NETBIOS_SESSION_LISTEN:
+        case IDX(NETBIOS_SESSION_LISTEN):
             destinationSession = va_arg(argList, i32);
             callName = va_arg(argList, char*);
             nb_format_name(callName, gNbNameBuf[destinationSession].bytes);
             returnCode = nb_listen(destinationSession, gNbNameBuf[destinationSession].bytes);
             break;
 
-        case NETBIOS_SESSION_MOVE:
+        case IDX(NETBIOS_SESSION_MOVE):
             oldSession = va_arg(argList, i32);
             destinationSession = va_arg(argList, i32);
             detachFlag = va_arg(argList, i32);
@@ -315,11 +315,11 @@ extern "C" u16 __cdecl nb_sess(i16 operation, ...) {
             returnCode = 0;
             break;
 
-        case NETBIOS_SESSION_CLOSE:
+        case IDX(NETBIOS_SESSION_CLOSE):
             destinationSession = va_arg(argList, i32);
             if (gNbSessNcb[destinationSession].commandComplete == NETBIOS_RESULT_PENDING) {
                 memset(&controlBlock, 0, sizeof(controlBlock));
-                controlBlock.command = NETBIOS_COMMAND_CANCEL;
+                controlBlock.command = IDX(NETBIOS_COMMAND_CANCEL);
                 controlBlock.adapterNumber = gNetbiosLana;
                 controlBlock.buffer = &gNbSessNcb[destinationSession];
                 Netbios(&controlBlock);
@@ -328,13 +328,13 @@ extern "C" u16 __cdecl nb_sess(i16 operation, ...) {
             returnCode = 0;
             break;
 
-        case NETBIOS_SESSION_CLEAR_CONNECTED:
+        case IDX(NETBIOS_SESSION_CLEAR_CONNECTED):
             destinationSession = va_arg(argList, i32);
             gNetStatus[destinationSession] &= ~NETBIOS_SESSION_CONNECTED;
             returnCode = 0;
             break;
 
-        case NETBIOS_SESSION_GET_NAME:
+        case IDX(NETBIOS_SESSION_GET_NAME):
             destinationSession = va_arg(argList, i32);
             callName = va_arg(argList, char*);
             memcpy(callName, gNbNameBuf[destinationSession].bytes, NETBIOS_NAME_SIZE);
@@ -401,21 +401,21 @@ void nb_thr_ctl(void) {
                     memcpy(gNbSessBuf.bytes, node->data, node->len);
                     gNbCtlNcb.buffer = gNbSessBuf.bytes;
                     gNbCtlNcb.length = node->len;
-                    gNbCtlNcb.command = NETBIOS_COMMAND_SEND;
+                    gNbCtlNcb.command = IDX(NETBIOS_COMMAND_SEND);
                     gNbCtlNcb.adapterNumber = gNetbiosLana;
                     sendComplete = 0;
                     while (!sendComplete) {
                         rc = Netbios(&gNbCtlNcb);
                         switch (rc) {
-                            case NETBIOS_RESULT_SUCCESS:
+                            case IDX(NETBIOS_RESULT_SUCCESS):
                                 sendComplete = 1;
                                 break;
-                            case NETBIOS_RESULT_PENDING:
+                            case IDX(NETBIOS_RESULT_PENDING):
                                 ProcessAssert(0, RETAIL_FILE, 412 + (495 - 412));
                                 break;
-                            case NETBIOS_RESULT_SESSION_OUT_OF_RANGE:
-                            case NETBIOS_RESULT_SESSION_CLOSED:
-                            case NETBIOS_RESULT_SESSION_ENDED:
+                            case IDX(NETBIOS_RESULT_SESSION_OUT_OF_RANGE):
+                            case IDX(NETBIOS_RESULT_SESSION_CLOSED):
+                            case IDX(NETBIOS_RESULT_SESSION_ENDED):
                                 gNetStatus[node->sessionIndex] &= ~NETBIOS_SESSION_ACTIVE;
                                 break;
                             default:
@@ -463,16 +463,16 @@ static void __stdcall nb_add_name_done(NetbiosControlBlock* ncb) {
     i32 j;
     ProcessAssert(&gNbSessNcb[gNbMaxSess] == ncb, RETAIL_FILE, 534 + (537 - 534));
     switch (ncb->returnCode) {
-        case NETBIOS_RESULT_SUCCESS:
-        case NETBIOS_RESULT_CANCEL_COMPLETED:
+        case IDX(NETBIOS_RESULT_SUCCESS):
+        case IDX(NETBIOS_RESULT_CANCEL_COMPLETED):
             gNbLocalNum = ncb->nameNumber;
             memcpy(gNbNameBuf[gNbMaxSess].bytes, ncb->name, NETBIOS_NAME_SIZE);
             gNetStatus[gNbMaxSess] |= NETBIOS_SESSION_NAME_REGISTERED;
             break;
-        case NETBIOS_RESULT_DUPLICATE_NAME:
-        case NETBIOS_RESULT_NAME_IN_USE:
-        case NETBIOS_RESULT_NAME_CONFLICT:
-        case NETBIOS_RESULT_DUPLICATE_ENVIRONMENT:
+        case IDX(NETBIOS_RESULT_DUPLICATE_NAME):
+        case IDX(NETBIOS_RESULT_NAME_IN_USE):
+        case IDX(NETBIOS_RESULT_NAME_CONFLICT):
+        case IDX(NETBIOS_RESULT_DUPLICATE_ENVIRONMENT):
             for (j = NETBIOS_NAME_SIZE - 1; j >= 0; j--) {
                 ncb->name[j]++;
                 if (gNbNameBuf[gNbMaxSess].bytes[j] != ncb->name[j])
@@ -480,7 +480,7 @@ static void __stdcall nb_add_name_done(NetbiosControlBlock* ncb) {
             }
             Netbios(ncb);
             break;
-        case NETBIOS_RESULT_CANCELLED:
+        case IDX(NETBIOS_RESULT_CANCELLED):
             break;
         default:
             sprintf(gText, "Add Name Error %02x\n", ncb->returnCode);
@@ -538,7 +538,7 @@ static u16 __fastcall nb_call(i32 session, void* name) {
     memcpy(gNbSessNcb[session].callName, name, NETBIOS_NAME_SIZE);
     memcpy(gNbSessNcb[session].name, gNbNameBuf[gNbMaxSess].bytes, NETBIOS_NAME_SIZE);
     gNbSessNcb[session].command = NETBIOS_COMMAND_CALL | NETBIOS_COMMAND_ASYNC;
-    gNbSessNcb[session].commandComplete = NETBIOS_RESULT_PENDING;
+    gNbSessNcb[session].commandComplete = IDX(NETBIOS_RESULT_PENDING);
     gNbSessNcb[session].postRoutine = nb_call_done;
     gNbSessNcb[session].adapterNumber = gNetbiosLana;
     gNbCallRetries = 0;
@@ -551,7 +551,7 @@ static u16 __fastcall nb_listen(i32 session, void* name) {
     memcpy(gNbSessNcb[session].callName, name, NETBIOS_NAME_SIZE);
     memcpy(gNbSessNcb[session].name, gNbNameBuf[gNbMaxSess].bytes, NETBIOS_NAME_SIZE);
     gNbSessNcb[session].command = NETBIOS_COMMAND_LISTEN | NETBIOS_COMMAND_ASYNC;
-    gNbSessNcb[session].commandComplete = NETBIOS_RESULT_PENDING;
+    gNbSessNcb[session].commandComplete = IDX(NETBIOS_RESULT_PENDING);
     gNbSessNcb[session].postRoutine = nb_call_done;
     gNbSessNcb[session].adapterNumber = gNetbiosLana;
     gNbCallRetries = 0;
@@ -568,14 +568,14 @@ static void __stdcall nb_call_done(NetbiosControlBlock* ncb) {
     if (i >= NETBIOS_SESSION_COUNT)
         return;
     switch (gNbSessNcb[i].returnCode) {
-        case NETBIOS_RESULT_SUCCESS:
+        case IDX(NETBIOS_RESULT_SUCCESS):
             gNbSessLsn[i] = gNbSessNcb[i].sessionNumber;
             memcpy(gNbNameBuf[i].bytes, gNbSessNcb[i].callName, NETBIOS_NAME_SIZE);
             gNetStatus[i] |= NETBIOS_SESSION_ACTIVE | NETBIOS_SESSION_CONNECTED;
             nb_arm_recv(i);
             break;
-        case NETBIOS_RESULT_CANCELLED:
-        case NETBIOS_RESULT_CANCEL_COMPLETED:
+        case IDX(NETBIOS_RESULT_CANCELLED):
+        case IDX(NETBIOS_RESULT_CANCEL_COMPLETED):
             break;
         default:
             gNbCallRetries++;
@@ -606,11 +606,11 @@ static void __fastcall nb_arm_recv(i32 session) {
         gNbSessNcb[session].event = gNbEvents.handles[session + NETBIOS_RECEIVE_EVENT_FIRST];
         result = Netbios(&gNbSessNcb[session]);
         switch (result) {
-            case NETBIOS_RESULT_SUCCESS:
-            case NETBIOS_RESULT_SESSION_OUT_OF_RANGE:
-            case NETBIOS_RESULT_SESSION_CLOSED:
-            case NETBIOS_RESULT_SESSION_ENDED:
-            case NETBIOS_RESULT_PENDING:
+            case IDX(NETBIOS_RESULT_SUCCESS):
+            case IDX(NETBIOS_RESULT_SESSION_OUT_OF_RANGE):
+            case IDX(NETBIOS_RESULT_SESSION_CLOSED):
+            case IDX(NETBIOS_RESULT_SESSION_ENDED):
+            case IDX(NETBIOS_RESULT_PENDING):
                 return;
             default:
                 Sleep(NETBIOS_RECEIVE_RETRY_DELAY);
@@ -624,7 +624,7 @@ static void __fastcall nb_close_session(i32 session) {
     NetbiosControlBlock controlBlock;
     if (gNbSessNcb[session].commandComplete == NETBIOS_RESULT_PENDING) {
         memset(&controlBlock, 0, sizeof(controlBlock));
-        controlBlock.command = NETBIOS_COMMAND_CANCEL;
+        controlBlock.command = IDX(NETBIOS_COMMAND_CANCEL);
         controlBlock.adapterNumber = gNetbiosLana;
         controlBlock.buffer = &gNbSessNcb[session];
         Netbios(&controlBlock);
@@ -632,7 +632,7 @@ static void __fastcall nb_close_session(i32 session) {
     if (gNbSessLsn[session] != NETBIOS_INVALID_ID) {
         memset(&controlBlock, 0, sizeof(controlBlock));
         controlBlock.sessionNumber = gNbSessLsn[session];
-        controlBlock.command = NETBIOS_COMMAND_HANGUP;
+        controlBlock.command = IDX(NETBIOS_COMMAND_HANGUP);
         controlBlock.adapterNumber = gNetbiosLana;
         Netbios(&controlBlock);
         gNetStatus[session] &= ~NETBIOS_SESSION_ACTIVE;
@@ -653,7 +653,7 @@ static void __fastcall nb_recv_complete(i32 session) {
     switch (gNbSessNcb[session].command & ~NETBIOS_COMMAND_ASYNC) {
         case NETBIOS_COMMAND_RECEIVE:
             switch (gNbSessNcb[session].returnCode) {
-                case NETBIOS_RESULT_SUCCESS:
+                case IDX(NETBIOS_RESULT_SUCCESS):
                     node = static_cast<tag_Node*>(
                         H2_ALLOC(gNbSessNcb[session].length + NETBIOS_PACKET_HEADER_SIZE, 796)
                     );
@@ -667,9 +667,9 @@ static void __fastcall nb_recv_complete(i32 session) {
                     }
                     nb_arm_recv(session);
                     break;
-                case NETBIOS_RESULT_SESSION_OUT_OF_RANGE:
-                case NETBIOS_RESULT_SESSION_CLOSED:
-                case NETBIOS_RESULT_SESSION_ENDED:
+                case IDX(NETBIOS_RESULT_SESSION_OUT_OF_RANGE):
+                case IDX(NETBIOS_RESULT_SESSION_CLOSED):
+                case IDX(NETBIOS_RESULT_SESSION_ENDED):
                     gNetStatus[session] &= ~NETBIOS_SESSION_ACTIVE;
                     break;
                 default:

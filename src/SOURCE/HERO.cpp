@@ -65,7 +65,7 @@ VA(0x0046c4b5, 0x18)
 void hero::GetArmyStrengths(u32l* const) {}
 
 VA(0x0046c4cd, 0x59)
-i32 hero::HasArtifact(i32 artifact) {
+i32 hero::HasArtifact(ArtifactType artifact) {
     i32 artifactIndex;
 
     for (artifactIndex = 0; artifactIndex < HERO_ARTIFACT_SLOT_COUNT; artifactIndex++) {
@@ -1854,7 +1854,7 @@ i32 hero::TakeSS(i32 skill, i32 levels) {
     if (m_secondarySkills[skill] != HERO_SKILL_LEVEL_NONE) {
         m_secondarySkills[skill] -= levels;
         if (m_secondarySkills[skill] < HERO_SKILL_LEVEL_NONE)
-            m_secondarySkills[skill] = HERO_SKILL_LEVEL_NONE;
+            m_secondarySkills[skill] = IDX(HERO_SKILL_LEVEL_NONE);
         if (m_secondarySkills[skill] == HERO_SKILL_LEVEL_NONE) {
             for (otherSkill = 0; otherSkill < HERO_SKILL_COUNT; otherSkill++) {
                 if (m_secondarySkillOrder[otherSkill] > m_secondarySkillOrder[skill]) {
@@ -1883,7 +1883,7 @@ i32 hero::GiveSS(i32 skill, i32 levels) {
         }
     }
     if (m_secondarySkills[skill] > HERO_SKILL_LEVEL_EXPERT)
-        m_secondarySkills[skill] = HERO_SKILL_LEVEL_EXPERT;
+        m_secondarySkills[skill] = IDX(HERO_SKILL_LEVEL_EXPERT);
     return m_secondarySkills[skill] - oldLevel;
 }
 
@@ -2012,7 +2012,7 @@ void hero::CheckAnduranPieces(i32 showDialog) {
                 || m_artifacts[artifactSlot] == ARTIFACT_HELMET_ANDURAN
                 || m_artifacts[artifactSlot] == ARTIFACT_SWORD_ANDURAN) {
                 GiveTakeArtifactStat(this, m_artifacts[artifactSlot], EVENT_ARTIFACT_TAKE);
-                m_artifacts[artifactSlot] = ARTIFACT_NONE;
+                m_artifacts[artifactSlot] = IDX(ARTIFACT_NONE);
             }
         }
         GiveArtifact(this, ARTIFACT_BATTLE_GARB, showDialog, ARTIFACT_NONE);

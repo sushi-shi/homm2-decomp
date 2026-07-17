@@ -85,11 +85,11 @@ i32 QueryNewPalette(void);
 i32 SetGraphicsType(i32);
 
 // --- globals owned by this TU (moved from _globals.h; CodeView-attributed) ---
-extern i32 giGraphicsType;
+extern WingraphGraphicsType giGraphicsType;
 
 // ---- globals (declarations, RVA order) ----
-extern i32 gbWinGAttached;
-extern i32 gbDDrawAttached;
+extern b32 gbWinGAttached;
+extern b32 gbDDrawAttached;
 extern i32l Orientation;
 extern void* lpInitWin;
 extern i32 bPaletteInitialized;

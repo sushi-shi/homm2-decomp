@@ -8,6 +8,7 @@
 #include <SOURCE/hero.h>
 #include <SOURCE/playerData.h>
 #include <SOURCE/town.h>
+#include <SOURCE/Overview.h>
 // forward declarations:
 class army;
 class armyGroup;
@@ -279,7 +280,7 @@ extern class heroWindow* overWin;
 extern char gcCurMapName[16];
 extern class textWidget** textWidgetDynamic;
 extern class iconWidget** iconWidgetDynamic;
-extern i32 giOverviewType;
+extern OverviewType giOverviewType;
 extern i32 giOverviewTop[2];
 extern class iconWidget* OVScrollKnob;
 extern i32 gbDoModemConfig;

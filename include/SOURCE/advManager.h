@@ -4,6 +4,8 @@
 // 139 methods, 3 own-virtual, 0 static data.
 #include <va.h>
 #include "../BASE/baseManager.h"
+#include <SOURCE/ADVMGR.h>
+#include <SOURCE/Viewwrld.h>
 // forward declarations:
 class armyGroup;
 class hero;
@@ -34,7 +36,7 @@ public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (derived: base baseManager = 0x36 bytes at 0x00 via ': public baseManager'; own fields below)
-    i32 m_selectedCell; // +0x36
+    AdventureCommand m_selectedCell; // +0x36
     union {
         i32 m_heroLocatorState[12]; // +0x3a
         class widget* m_bottomViewPrimaryWidgets[12];
@@ -356,7 +358,7 @@ extern struct _SAMPLE* hNewWalkSample;
 extern i32 EveryOther;
 extern i32 startVals[3];
 extern i8 iVWHalf[3][6][2];
-extern i32 giViewWorldScale;
+extern ViewWorldScale giViewWorldScale;
 extern i32 giViewWorldScaleLookup;
 extern i32 gbInViewWorld;
 extern i32 giLimitUpdMinX;

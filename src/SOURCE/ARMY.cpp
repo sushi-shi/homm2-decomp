@@ -2189,10 +2189,10 @@ void army::PowEffect(i32 effect, i32 resetLimits, i32 effectX, i32 effectY) {
                     current->m_effectAnimationStart = m_pendingAnimationSequence;
                     current->m_effectAnimationEnd = m_pendingAnimationSequence + 1;
                 } else if (current->m_deathPending) {
-                    current->m_effectAnimationStart = ARMY_ANIMATION_DEATH;
+                    current->m_effectAnimationStart = IDX(ARMY_ANIMATION_DEATH);
                 } else {
-                    current->m_effectAnimationStart = ARMY_ANIMATION_WINCE;
-                    current->m_effectAnimationEnd = ARMY_ANIMATION_WINCE_RETURN;
+                    current->m_effectAnimationStart = IDX(ARMY_ANIMATION_WINCE);
+                    current->m_effectAnimationEnd = IDX(ARMY_ANIMATION_WINCE_RETURN);
                 }
                 if (current->m_effectAnimationStart == ARMY_ANIMATION_DEATH) {
                     current->m_effectAnimationLength =

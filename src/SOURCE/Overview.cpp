@@ -699,7 +699,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
 }
 
 VA(0x00409aae, 0x357)
-void game::SetupNewOverviewType(i32 overviewType, i32 redrawFrom) {
+void game::SetupNewOverviewType(OverviewType overviewType, i32 redrawFrom) {
     DATA(0x004edca8) static i16 overviewSetupSourceLine = 698;
     i32 title;
     tag_message message;

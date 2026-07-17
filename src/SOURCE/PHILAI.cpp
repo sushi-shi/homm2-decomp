@@ -91,14 +91,14 @@ void ResetHeroRVs(i32 resetAll, i32 x, i32 y) {
             for (idx = 0; idx < MAP_HEIGHT; idx++) {
                 if (resetAll != 0) {
                     if (abs(x - node) + abs(y - idx) < AI_NEARBY_RADIUS)
-                        gaiHeroStrategicRVOfPos[node + idx * MAP_WIDTH] = AI_RV_UNSET;
+                        gaiHeroStrategicRVOfPos[node + idx * MAP_WIDTH] = IDX(AI_RV_UNSET);
                 } else {
-                    gaiHeroStrategicRVOfPos[node + idx * MAP_WIDTH] = AI_RV_UNSET;
-                    gaiHeroEventStratRVOfPos[node + idx * MAP_WIDTH] = AI_RV_UNSET;
+                    gaiHeroStrategicRVOfPos[node + idx * MAP_WIDTH] = IDX(AI_RV_UNSET);
+                    gaiHeroEventStratRVOfPos[node + idx * MAP_WIDTH] = IDX(AI_RV_UNSET);
                 }
             }
         }
-        gaiHeroEventStratRVOfPos[x + y * MAP_WIDTH] = AI_RV_UNSET;
+        gaiHeroEventStratRVOfPos[x + y * MAP_WIDTH] = IDX(AI_RV_UNSET);
         for (node = 0; node < AI_HERO_COUNT; node++) {
             // Retail bug, faithfully reproduced: both axes compare against the
             // hero's m_x — retail bytes read offset +0x27dd (m_x) twice, never
@@ -106,7 +106,7 @@ void ResetHeroRVs(i32 resetAll, i32 x, i32 y) {
             if (resetAll == 0
                 || abs(y - gpGame->m_heroRecs[node].m_x) + abs(x - gpGame->m_heroRecs[node].m_x)
                        < AI_NEARBY_RADIUS)
-                gaiHeroLiveChance[node] = AI_RV_UNSET;
+                gaiHeroLiveChance[node] = IDX(AI_RV_UNSET);
         }
     }
 }
@@ -191,7 +191,7 @@ void philAI::CheckForCreatureUpgrades(void) {
     town* townPtr;
     armyGroup* armyPtr;
     i32 goldCost;
-    i32 resourceType;
+    ResourceType resourceType;
     i32 resourceCost;
     i32 mergeIndex;
 
@@ -240,10 +240,10 @@ void philAI::CheckForCreatureUpgrades(void) {
                     }
                     if (goldCost <= gpCurPlayer->m_resources[IDX(RES_GOLD)]
                         && (resourceType == -1
-                            || resourceCost <= gpCurPlayer->m_resources[resourceType])) {
+                            || resourceCost <= gpCurPlayer->m_resources[IDX(resourceType)])) {
                         gpCurPlayer->m_resources[IDX(RES_GOLD)] -= goldCost;
                         if (resourceType != -1)
-                            gpCurPlayer->m_resources[resourceType] -= resourceCost;
+                            gpCurPlayer->m_resources[IDX(resourceType)] -= resourceCost;
                         armyPtr->m_creatureTypes[creatureIndex] = static_cast<i8>(upgradeType);
                         for (mergeIndex = 0; mergeIndex < 5; mergeIndex++) {
                             if (mergeIndex != creatureIndex
@@ -390,7 +390,7 @@ i32 philAI::GoodAdjacent(i32* direction) {
     i32 val;
     i32 bestValue;
     float node;
-    i32 nb;
+    CreatureType nb;
     i32 kn;
     i32 jb;
     i32 idx;
@@ -615,7 +615,7 @@ void philAI::CheckBerserk(void) {
 }
 
 VA(0x00438f3f, 0x71)
-void philAI::DimensionDoorTo(i32 x, i32 y) {
+void philAI::DimensionDoorTo(i32 x, CreatureType y) {
     gpAdvManager->TeleportTo(gpCurAIHero, x, y, 0, 0);
     if (gpCurAIHero->m_remainingMobility < AI_MINIMUM_TURN_MOBILITY)
         gpCurAIHero->m_remainingMobility = 0;
@@ -629,7 +629,7 @@ void philAI::DimensionDoorTo(i32 x, i32 y) {
 // delta is the equivalent MAP_WIDTH loop comparison operand/polarity.
 VA(0x00438fb0, 0x3f9)
 i32 philAI::DoAnywhereDDoorTownGate(i32 targetValue) {
-    i32 bestY;
+    CreatureType bestY;
     i32 candidateY;
     i32 bestX;
     i32 y;
@@ -748,7 +748,7 @@ i32 philAI::DoAnywhereDDoorTownGate(i32 targetValue) {
 VA(0x004393a9, 0x158)
 i32 philAI::DoDimensionDoor(hero* pHero) {
     i32 node;    // i
-    i32 nb;      // y
+    CreatureType nb;      // y
     i32 kn;      // x
     mapCell* jb; // cell
     i32 idx;     // dist
@@ -2052,12 +2052,12 @@ void philAI::ValueOfBuyingBuilding(
 ) {
     i32 currentTownRace;
     i32 dwellingTotal;
-    i32 highestDwellingId;
+    BuildingSlotType highestDwellingId;
     i32 currentOccupiedSlots;
     i32 mageGuildLevelLocal;
     float adjustedValue;
     i32 creatureLocated;
-    i32 indexBuilding;
+    BuildingSlotType indexBuilding;
     i32 buildingLevel;
     i32 currentCreatureType;
     i32 costsByResource[7];
@@ -2326,7 +2326,7 @@ void philAI::GetBestBuilding(town* t, BHC& bhc, float& fOut) {
 VA(0x0043d852, 0x306)
 void philAI::ValueOfBuyingCreature(
     town* townPtr,
-    i32 creature,
+    CreatureType creature,
     i32& resourceValue,
     i32 purchaseCount,
     float& benefitCost
@@ -2350,15 +2350,15 @@ void philAI::ValueOfBuyingCreature(
     GetMonsterCost(creature, creatureCosts);
     purchaseCost = RVConversion(creatureCosts) * purchaseCount;
     creatureValue = static_cast<i32>(
-        gMonsterDatabase[creature].fightValue * purchaseCount * gpCurPlayer->m_upgradeValueWeight
+        gMonsterDatabase[IDX(creature)].fightValue * purchaseCount * gpCurPlayer->m_upgradeValueWeight
     );
 
     if (townPtr->m_occupyingHeroId != AI_TROOP_EMPTY_SLOT) {
         visitingHeroCandidate = &gpGame->m_heroRecs[townPtr->m_occupyingHeroId];
         creatureValue = static_cast<i32>(creatureValue * AI_CREATURE_VISITING_HERO_FACTOR);
-        if (gMonsterDatabase[creature].race == visitingHeroCandidate->m_cursorType)
+        if (gMonsterDatabase[IDX(creature)].race == visitingHeroCandidate->m_cursorType)
             creatureValue = static_cast<i32>(creatureValue * AI_CREATURE_SAME_RACE_FACTOR);
-        if (gMonsterDatabase[creature].attributes & AI_CREATURE_PURCHASE_RANGED_ATTRIBUTE) {
+        if (gMonsterDatabase[IDX(creature)].attributes & AI_CREATURE_PURCHASE_RANGED_ATTRIBUTE) {
             for (visitingArmySlot = 0; visitingArmySlot < AI_CREATURE_PURCHASE_ARMY_SLOT_COUNT;
                  visitingArmySlot++) {
                 if (visitingHeroCandidate->m_army.m_creatureTypes[visitingArmySlot]
@@ -2382,7 +2382,7 @@ void philAI::ValueOfBuyingCreature(
         );
     }
 
-    if (gMonsterDatabase[creature].attributes & AI_CREATURE_PURCHASE_RANGED_ATTRIBUTE) {
+    if (gMonsterDatabase[IDX(creature)].attributes & AI_CREATURE_PURCHASE_RANGED_ATTRIBUTE) {
         for (garrisonSlot = 0; garrisonSlot < AI_CREATURE_PURCHASE_ARMY_SLOT_COUNT;
              garrisonSlot++) {
             if (townPtr->m_army.m_creatureTypes[garrisonSlot] != AI_TROOP_EMPTY_SLOT
@@ -2427,7 +2427,7 @@ void philAI::GetBestCreature(town* townPtr, BHC& best, float& bestValue) {
     float bestRaw;
     float bestRandomized;
     i32 dwelling;
-    i32 creature;
+    CreatureType creature;
     i32 leastArmyValue;
     i32 canJoin;
     i32 armyIndex;
@@ -2460,8 +2460,8 @@ void philAI::GetBestCreature(town* townPtr, BHC& best, float& bestValue) {
                         gMonsterDatabase[townPtr->m_army.m_creatureTypes[armyIndex]].randomValue;
                 }
             }
-            if (leastArmyValue < gMonsterDatabase[creature].randomValue
-                && gMonsterDatabase[creature].randomValue > AI_CREATURE_PURCHASE_EXPENSIVE_VALUE) {
+            if (leastArmyValue < gMonsterDatabase[IDX(creature)].randomValue
+                && gMonsterDatabase[IDX(creature)].randomValue > AI_CREATURE_PURCHASE_EXPENSIVE_VALUE) {
                 canJoin = 1;
             }
             if (dwelling == 0 && townPtr->m_occupyingHeroId != AI_TROOP_EMPTY_SLOT
@@ -2544,7 +2544,7 @@ i32 philAI::CreaturesToBuy(i32 a, i32 b) {
 }
 
 VA(0x0043df5a, 0x9c)
-i32 philAI::MaxBuyableCreatures(i32 level) {
+i32 philAI::MaxBuyableCreatures(CreatureType level) {
     i32 cost7[7];
     i32 res;
     i32 i;
@@ -2988,7 +2988,7 @@ i32 philAI::StrategicValueOfPosition(
     i32 distance15;
     searchArray* search5;
     i32 eventValue13;
-    i32 eventFlags8;
+    HeroEventFlag eventFlags8;
     i32 x13;
     i32 enemyMobility19;
     i32 seedMobility2;
@@ -3214,7 +3214,7 @@ i32 philAI::ValueOfTown(town* t) {
 // numerator first -> fdivp (al=0xf). Identical quotient; an /Od operand-eval-order pick.
 VA(0x0043fb8c, 0x180)
 void philAI::TurnCostResource(i32 player) {
-    i32 nb;         // i
+    CreatureType nb;         // i
     playerData* kn; // ptr
     float jb[7];    // per-resource ratio
     float idx;      // average turn cost
@@ -3223,14 +3223,14 @@ void philAI::TurnCostResource(i32 player) {
     kn = &gpGame->m_players[player];
     total = 0;
     for (nb = 0; nb < 7; nb++) {
-        cost[nb] = (i32)(((double)(kn->m_income[nb] * 5) * 0.7 + (double)kn->m_resources[nb])
-                         * (double)gResourceBaseValue[nb]);
-        total += cost[nb];
+        cost[IDX(nb)] = (i32)(((double)(kn->m_income[IDX(nb)] * 5) * 0.7 + (double)kn->m_resources[IDX(nb)])
+                         * (double)gResourceBaseValue[IDX(nb)]);
+        total += cost[IDX(nb)];
     }
     idx = (float)(total / 7);
     for (nb = 0; nb < 7; nb++) {
-        jb[nb] = (float)cost[nb] / idx;
-        gafAITurnCostResource[nb] = (float)((jb[nb] / 2.0f + 0.5) / gResourceBaseValue[nb]);
+        jb[IDX(nb)] = (float)cost[IDX(nb)] / idx;
+        gafAITurnCostResource[IDX(nb)] = (float)((jb[IDX(nb)] / 2.0f + 0.5) / gResourceBaseValue[IDX(nb)]);
     }
 }
 
@@ -3525,7 +3525,7 @@ i32 philAI::FightValueOfStack(
 // byte-last-mile phase or after PHILAI TU/header state changes.
 VA(0x00440aca, 0x1e7)
 void philAI::EvaluateOneTimeCreaturePurchase(
-    i32 creature,
+    CreatureType creature,
     i32 availableCount,
     i32 useAvailableCount,
     i32& purchaseCount,
@@ -3551,7 +3551,7 @@ void philAI::EvaluateOneTimeCreaturePurchase(
     if (purchaseCount == 0)
         return;
     {
-        purchaseFightValue15 = gMonsterDatabase[creature].fightValue * purchaseCount;
+        purchaseFightValue15 = gMonsterDatabase[IDX(creature)].fightValue * purchaseCount;
         if (gpCurAIHero->m_army.CanJoin(creature) == 0) {
             for (armyIndex3 = 0; armyIndex3 < AI_CREATURE_PURCHASE_ARMY_SLOT_COUNT; armyIndex3++) {
                 if (gpCurAIHero->m_army.m_creatureTypes[armyIndex3] == creature) {
@@ -4347,7 +4347,7 @@ i32 philAI::ChooseToFightForArtifact(i32 a, i32 b, i32 c) {
     i32 py;   // ProbableOutcomeOfBattle out o4 (-0x1c)
     i32 p;    // out o3 (-0x18)
     i32 node; // out o2 (-0x14)
-    i32 nb;   // out o1 (-0x10)
+    CreatureType nb;   // out o1 (-0x10)
     float kn; // fv (-0xc)
     i32 jb;   // artifact RV (-0x8)
     i32 idx;  // result (-0x4)
@@ -4384,7 +4384,7 @@ i32 philAI::ChooseToFightForArtifact(i32 a, i32 b, i32 c) {
 }
 
 VA(0x00442771, 0x53)
-i32 philAI::NetValueOfArtifact(i32 a1, i32 a2, i32 a3, i32 a4) {
+i32 philAI::NetValueOfArtifact(i32 a1, AIArtifactEventValue a2, i32 a3, i32 a4) {
     return static_cast<i32>(
         static_cast<float>(gArtifactBaseRV[a1])
         - (static_cast<float>(a4) * gafAITurnCostResource[a3]
@@ -4624,7 +4624,7 @@ i32 philAI::CombatMonsterEvent(hero* h, i32 monType, i32* pCount, mapCell* cell)
 VA(0x0044316b, 0x6d7)
 i32 philAI::FightEvent(hero* h, mapCell* cell, i32 evaluateOnly) {
     i32 eventType16;
-    i32 monsterType6;
+    CreatureType monsterType6;
     i32 monsterCount28;
     i32 stackIndex7;
     i32 rewardValue7;
@@ -4932,13 +4932,13 @@ void philAI::TownEvent(mapCell* cell, hero* h, i32 x, i32 y) {
 }
 
 VA(0x00443ba7, 0xad)
-i32 philAI::ComputeUpgradeValue(i32 a1, i32 a2) {
+i32 philAI::ComputeUpgradeValue(CreatureType a1, i32 a2) {
     i32 cnt = gpCurAIHero->CreatureTypeCount(a1);
     if (cnt == 0)
         return 0;
     i32 result = static_cast<i32>(
         static_cast<float>(
-            (gMonsterDatabase[a2].fightValue - gMonsterDatabase[a1].fightValue) * cnt
+            (gMonsterDatabase[a2].fightValue - gMonsterDatabase[IDX(a1)].fightValue) * cnt
         )
         * gpCurPlayer->m_upgradeValueWeight
     );
@@ -5061,7 +5061,7 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
     i32 value_h;
     i32 battleValue_b;
     i32 combatState_k[4];
-    i32 creature;
+    CreatureType creature;
     i32 exitY_p;
     i32 exitX_p;
     i32 routeLiveChance_e[4];
@@ -5438,7 +5438,7 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                         * spellPowerMod_m
                     );
                     for (index_k = 0; index_k < AI_TOWN_ARMY_SLOTS; index_k++) {
-                        gpMonGroup->m_creatureTypes[index_k] = CREATURE_ROYAL_MUMMY;
+                        gpMonGroup->m_creatureTypes[index_k] = IDX(CREATURE_ROYAL_MUMMY);
                         gpMonGroup->m_quantities[index_k] = 10;
                     }
                     ChooseEvaluateBattle(
@@ -5806,7 +5806,7 @@ VA(0x00445dde, 0xf5)
 i32 philAI::EvaluateRecruitSite(mapCell* cell) {
     i32 val;  // value (returned)
     i32 node; // color
-    i32 nb;   // monster type
+    CreatureType nb;   // monster type
     i32 kn;   // out param
     i32 jb;   // unused
     i32 idx;  // out param
@@ -5956,7 +5956,7 @@ i32 philAI::EvaluateArtifactEvent(i32 artifact, i32 eventData) {
         for (stackIndex29 = 0; stackIndex29 < ARMY_GROUP_SLOT_COUNT; stackIndex29++) {
             gpMonGroup->m_creatureTypes[stackIndex29] = static_cast<i8>(eventData);
             if (gpMonGroup->m_creatureTypes[stackIndex29] == CREATURE_ROGUE)
-                gpMonGroup->m_quantities[stackIndex29] = AI_ARTIFACT_EVENT_GUARD_ROGUE_COUNT;
+                gpMonGroup->m_quantities[stackIndex29] = IDX(AI_ARTIFACT_EVENT_GUARD_ROGUE_COUNT);
             else if (stackIndex29 == 0)
                 gpMonGroup->m_quantities[stackIndex29] = 1;
             else

@@ -41,7 +41,7 @@ public:
     // --- constructors ---
     baseManager(void);
     void Activate(void) {
-        m_active = 1;
+        m_active = true;
     }
     // --- virtual methods (vtable order) ---
     virtual i32 Open(i32) = 0;

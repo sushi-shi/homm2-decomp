@@ -16,7 +16,7 @@ HOMM2_ENUM_END(InputManagerKeyCodeType)
 // IBM PC set-1 scan codes carried in bits 16..23 of the Win32 key-message data.
 // MakeScanCodeTable proves the complete 0x00..0x58 domain used by the retail input
 // manager, including the extended key values returned as scan-code << 8.
-HOMM2_ENUM_BEGIN(InputManagerScanCode)
+HOMM2_ENUM_VALUES_BEGIN(InputManagerScanCode)
     INPUT_SCAN_NONE = 0x00,
     INPUT_SCAN_ESCAPE = 0x01,
     INPUT_SCAN_1 = 0x02,
@@ -106,7 +106,7 @@ HOMM2_ENUM_BEGIN(InputManagerScanCode)
     INPUT_SCAN_ISO_BACKSLASH = 0x56,
     INPUT_SCAN_F11 = 0x57,
     INPUT_SCAN_F12 = 0x58
-HOMM2_ENUM_END(InputManagerScanCode)
+HOMM2_ENUM_VALUES_END(InputManagerScanCode)
 
 HOMM2_ENUM_BEGIN(InputManagerExtendedKey)
     INPUT_EXTENDED_KEY_BASE = 0x100 // extended keys arrive as scan code << 8

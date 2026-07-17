@@ -253,7 +253,7 @@ i32 playerData::BuildingsOwned(i32 townType, i32 buildingIndex, i32 buildState) 
 }
 
 VA(0x00470fda, 0x97)
-i32 playerData::NumOfGivenArtifact(i32 artifact) {
+i32 playerData::NumOfGivenArtifact(ArtifactType artifact) {
     i32 count = 0;
     i32 i;
     for (i = 0; i < m_heroCount; i++) {
@@ -434,7 +434,7 @@ i32 game::CreateBoat(i32 x, i32 y, i32 notify) {
         mapCell* cell = WORLDMAP->Row(y) + x;
         boat->savedTriggerType = cell->m_triggerType;
         boat->savedEventData = static_cast<u8>(cell->m_objectMetadata);
-        cell->m_triggerType = MAP_TRIGGER_BOAT;
+        cell->m_triggerType = IDX(MAP_TRIGGER_BOAT);
         cell->m_objectMetadata = boatIdx;
     }
     return boatIdx;
@@ -784,23 +784,23 @@ void game::SetupOrigData(void) {
             m_heroRecs[i].GiveSS(HERO_SKILL_BALLISTICS, 1);
         }
         if (m_heroRecs[i].m_cursorType == 2) {
-            m_heroRecs[i].m_artifacts[0] = ARTIFACT_MAGIC_BOOK;
+            m_heroRecs[i].m_artifacts[0] = IDX(ARTIFACT_MAGIC_BOOK);
             m_heroRecs[i].GiveSS(HERO_SKILL_NAVIGATION, 2);
             m_heroRecs[i].GiveSS(HERO_SKILL_WISDOM, 1);
         }
         if (m_heroRecs[i].m_cursorType == 1)
             m_heroRecs[i].GiveSS(HERO_SKILL_PATHFINDING, 2);
         if (m_heroRecs[i].m_cursorType == 3) {
-            m_heroRecs[i].m_artifacts[0] = ARTIFACT_MAGIC_BOOK;
+            m_heroRecs[i].m_artifacts[0] = IDX(ARTIFACT_MAGIC_BOOK);
             m_heroRecs[i].GiveSS(HERO_SKILL_SCOUTING, 2);
             m_heroRecs[i].GiveSS(HERO_SKILL_WISDOM, 1);
         }
         if (m_heroRecs[i].m_cursorType == 4) {
-            m_heroRecs[i].m_artifacts[0] = ARTIFACT_MAGIC_BOOK;
+            m_heroRecs[i].m_artifacts[0] = IDX(ARTIFACT_MAGIC_BOOK);
             m_heroRecs[i].GiveSS(HERO_SKILL_WISDOM, 2);
         }
         if (m_heroRecs[i].m_cursorType == 5) {
-            m_heroRecs[i].m_artifacts[0] = ARTIFACT_MAGIC_BOOK;
+            m_heroRecs[i].m_artifacts[0] = IDX(ARTIFACT_MAGIC_BOOK);
             m_heroRecs[i].GiveSS(HERO_SKILL_WISDOM, 1);
             m_heroRecs[i].GiveSS(HERO_SKILL_NECROMANCY, 1);
         }
@@ -1390,7 +1390,7 @@ void game::NewMap(char* filename) {
                 m_worldMap.GetCell(heroX6, heroY16)->m_triggerType;
             m_heroRecs[m_players[player2].m_heroIds[campaignHero15]].m_occupiedTown =
                 m_worldMap.GetCell(heroX6, heroY16)->m_objectMetadata;
-            m_worldMap.GetCell(heroX6, heroY16)->m_triggerType = MAP_TRIGGER_HERO;
+            m_worldMap.GetCell(heroX6, heroY16)->m_triggerType = IDX(MAP_TRIGGER_HERO);
             m_worldMap.GetCell(heroX6, heroY16)->m_objectMetadata =
                 m_players[player2].m_heroIds[campaignHero15];
         }
@@ -1428,7 +1428,7 @@ void game::NewMap(char* filename) {
     if (gbInCampaign
         && ((m_campaignType == 0 && static_cast<i8>(m_campaignScenario) + 1 == 8)
             || (m_campaignType == 1 && static_cast<i8>(m_campaignScenario) + 1 == 9)))
-        m_ultimateArtifactId = ARTIFACT_ULTIMATE_CROWN;
+        m_ultimateArtifactId = IDX(ARTIFACT_ULTIMATE_CROWN);
     for (player2 = 0; player2 < m_playerCount; player2++) {
         if (gbHumanPlayer[player2]) {
             m_players[player2].m_aiDifficulty = 3;
@@ -1565,7 +1565,7 @@ void game::RandomizeEvents(void) {
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_BOAT:
                     cell2->m_objectTileset = 0;
-                    cell2->m_objectIndex = MAPCELL_SPRITE_NONE;
+                    cell2->m_objectIndex = IDX(MAPCELL_SPRITE_NONE);
                     cell2->m_objectMetadata = 0;
                     cell2->m_triggerType = 0;
                     CreateBoat(xPos2, yPos19, 1);
@@ -1586,7 +1586,7 @@ void game::RandomizeEvents(void) {
                     mapEvent1->active = 1;
                     cell2->m_objectMetadata = 0;
                     cell2->m_triggerType = 0;
-                    cell2->m_objectIndex = MAPCELL_SPRITE_NONE;
+                    cell2->m_objectIndex = IDX(MAPCELL_SPRITE_NONE);
                     cell2->m_objectTileset = 0;
                     m_mapEventCount++;
                     break;
@@ -1670,7 +1670,7 @@ void game::RandomizeEvents(void) {
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_TREASURE_CHEST:
                     if (giGroundToTerrain[cell2->m_terrainImageIndex] == 0) {
-                        cell2->m_triggerType = MAP_TRIGGER_SEA_CHEST;
+                        cell2->m_triggerType = IDX(MAP_TRIGGER_SEA_CHEST);
                         randomValue7 = Random(0, 100);
                         if (randomValue7 < 20)
                             cell2->m_objectMetadata = 0;
@@ -2463,7 +2463,7 @@ void game::UpdateSpellWidgets(void) {
 // predecessor/header change alters this TU-cumulative commutative load order.
 VA(0x00479e3b, 0x692)
 i32 ViewSpellsHandler(tag_message& msg) {
-    i32 spell;
+    SpellType spell;
 
     if (msg.type == MESSAGE_MOUSE_MOVE) {
         gpWindowManager->ConvertToHover(msg);
@@ -2542,7 +2542,7 @@ i32 ViewSpellsHandler(tag_message& msg) {
                                 gpGame->m_viewSpellsTop[gpGame->m_viewSpellsType]
                                     + (msg.payload.widget.id - 100) + 1
                             );
-                            NormalDialog(gSpellDesc[spell], 4, -1, -1, 8, spell, -1, 0, -1, 0);
+                            NormalDialog(gSpellDesc[IDX(spell)], 4, -1, -1, 8, spell, -1, 0, -1, 0);
                             break;
                         case 2:
                             NormalDialog(cSpellHelp[0], 4, -1, -1, -1, 0, -1, 0, -1, 0);
@@ -2584,7 +2584,7 @@ i32 ViewSpellsHandler(tag_message& msg) {
                                     + (msg.payload.widget.id - 100) + 1
                             );
                             if (gpGame->m_viewSpellsReadOnly) {
-                                NormalDialog(gSpellDesc[spell], 1, -1, -1, 8, spell, -1, 0, -1, 0);
+                                NormalDialog(gSpellDesc[IDX(spell)], 1, -1, -1, 8, spell, -1, 0, -1, 0);
                                 return 1;
                             }
                             if (GetManaCost(spell, viewSpellsHero)
@@ -2935,7 +2935,7 @@ void game::ViewArmy(
 VA(0x0047b2cf, 0x3f5)
 i32 ViewArmyHandler(tag_message& msg) {
     i32 goldCost6;
-    i32 resourceType0;
+    ResourceType resourceType0;
     i32 resourceCost5;
 
     gbDismissArmy = 0;
@@ -2990,7 +2990,7 @@ i32 ViewArmyHandler(tag_message& msg) {
                         }
                         if (gpCurPlayer->m_resources[IDX(RES_GOLD)] >= goldCost6
                             && (resourceType0 == -1
-                                || gpCurPlayer->m_resources[resourceType0] >= resourceCost5)) {
+                                || gpCurPlayer->m_resources[IDX(resourceType0)] >= resourceCost5)) {
                             NormalDialog(
                                 const_cast<char*>(
                                     "Your troops can be upgraded, but it will cost you dearly.  "
@@ -3009,7 +3009,7 @@ i32 ViewArmyHandler(tag_message& msg) {
                             if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
                                 gpCurPlayer->m_resources[IDX(RES_GOLD)] -= goldCost6;
                                 if (resourceType0 != -1)
-                                    gpCurPlayer->m_resources[resourceType0] -= resourceCost5;
+                                    gpCurPlayer->m_resources[IDX(resourceType0)] -= resourceCost5;
                                 gbUpgradeArmy = 1;
                                 msg.payload.widget.id = 10;
                                 msg.payload.widget.command = msg.payload.widget.id;
@@ -3932,7 +3932,7 @@ void game::ConvertObject(
     i32 top,
     i32 right,
     i32 bottom,
-    i32 oldTileset,
+    TilesetId oldTileset,
     i32 oldFirstIndex,
     i32 oldLastIndex,
     i32 newTileset,
@@ -4319,12 +4319,12 @@ void game::SetRandomHeroArmies(i32 heroId, i32 strongArmy) {
     armyGroup* army2 = &m_heroRecs[heroId].m_army;
     i32 armySlot7 = 0;
     RandomHeroArmyRange armyTable7[IDX(FACTION_COUNT)][RANDOM_HERO_ARMY_OPTION_COUNT] = {
-        {{CREATURE_PEASANT, 30, 50}, {CREATURE_ARCHER, 3, 5}, {CREATURE_PIKEMAN, 2, 4}},
-        {{CREATURE_GOBLIN, 15, 25}, {CREATURE_ORC, 3, 5}, {CREATURE_WOLF, 2, 3}},
-        {{CREATURE_SPRITE, 10, 20}, {CREATURE_DWARF, 2, 4}, {CREATURE_ELF, 1, 2}},
-        {{CREATURE_CENTAUR, 6, 10}, {CREATURE_GARGOYLE, 2, 4}, {CREATURE_GRIFFIN, 1, 2}},
-        {{CREATURE_HALFLING, 6, 10}, {CREATURE_BOAR, 2, 4}, {CREATURE_IRON_GOLEM, 1, 2}},
-        {{CREATURE_SKELETON, 6, 10}, {CREATURE_ZOMBIE, 2, 4}, {CREATURE_MUMMY, 1, 2}}
+        {{IDX(CREATURE_PEASANT), 30, 50}, {IDX(CREATURE_ARCHER), 3, 5}, {IDX(CREATURE_PIKEMAN), 2, 4}},
+        {{IDX(CREATURE_GOBLIN), 15, 25}, {IDX(CREATURE_ORC), 3, 5}, {IDX(CREATURE_WOLF), 2, 3}},
+        {{IDX(CREATURE_SPRITE), 10, 20}, {IDX(CREATURE_DWARF), 2, 4}, {IDX(CREATURE_ELF), 1, 2}},
+        {{IDX(CREATURE_CENTAUR), 6, 10}, {IDX(CREATURE_GARGOYLE), 2, 4}, {IDX(CREATURE_GRIFFIN), 1, 2}},
+        {{IDX(CREATURE_HALFLING), 6, 10}, {IDX(CREATURE_BOAR), 2, 4}, {IDX(CREATURE_IRON_GOLEM), 1, 2}},
+        {{IDX(CREATURE_SKELETON), 6, 10}, {IDX(CREATURE_ZOMBIE), 2, 4}, {IDX(CREATURE_MUMMY), 1, 2}}
     };
     i32 selected9[3];
     i32 index9;
@@ -4342,7 +4342,7 @@ void game::SetRandomHeroArmies(i32 heroId, i32 strongArmy) {
         selected9[1] = RANDOM_HERO_STACK_SELECTED;
 
     for (index9 = 0; index9 < RANDOM_HERO_ARMY_SLOT_COUNT; index9++) {
-        army2->m_creatureTypes[index9] = CREATURE_NONE;
+        army2->m_creatureTypes[index9] = IDX(CREATURE_NONE);
         army2->m_creatureCounts[index9] = RANDOM_HERO_EMPTY_COUNT;
     }
 
@@ -4391,7 +4391,7 @@ void game::ProcessRandomObjects(void) {
         for (x10 = 0; x10 < MAP_WIDTH; x10++) {
             cell6 = WORLDMAP->GetCell(x10, y8);
             switch (cell6->m_triggerType) {
-                case MAP_TRIGGER_RANDOM_ULTIMATE_ARTIFACT:
+                case IDX(MAP_TRIGGER_RANDOM_ULTIMATE_ARTIFACT):
                     giUABaseX = static_cast<i16>(x10);
                     giUABaseY = static_cast<i16>(y8);
                     giUARadius = static_cast<i16>(cell6->m_objectMetadata);
@@ -4399,29 +4399,29 @@ void game::ProcessRandomObjects(void) {
                     cell6->m_objectTileset = 0;
                     cell6->m_objectIndex = -1;
                     break;
-                case MAP_TRIGGER_RANDOM_TOWN:
+                case IDX(MAP_TRIGGER_RANDOM_TOWN):
                     RandomizeTown(x10, y8, 0);
                     break;
-                case MAP_TRIGGER_RANDOM_CASTLE:
+                case IDX(MAP_TRIGGER_RANDOM_CASTLE):
                     RandomizeTown(x10, y8, 1);
                     break;
-                case MAP_TRIGGER_RANDOM_MONSTER:
+                case IDX(MAP_TRIGGER_RANDOM_MONSTER):
                     minValue7 = 80;
                     maxValue17 = 2000;
                     goto randomMonster;
-                case MAP_TRIGGER_RANDOM_MONSTER_LEVEL_1:
+                case IDX(MAP_TRIGGER_RANDOM_MONSTER_LEVEL_1):
                     minValue7 = 0;
                     maxValue17 = 400;
                     goto randomMonster;
-                case MAP_TRIGGER_RANDOM_MONSTER_LEVEL_2:
+                case IDX(MAP_TRIGGER_RANDOM_MONSTER_LEVEL_2):
                     minValue7 = 400;
                     maxValue17 = 1000;
                     goto randomMonster;
-                case MAP_TRIGGER_RANDOM_MONSTER_LEVEL_3:
+                case IDX(MAP_TRIGGER_RANDOM_MONSTER_LEVEL_3):
                     minValue7 = 1000;
                     maxValue17 = 2500;
                     goto randomMonster;
-                case MAP_TRIGGER_RANDOM_MONSTER_LEVEL_4:
+                case IDX(MAP_TRIGGER_RANDOM_MONSTER_LEVEL_4):
                     minValue7 = 2500;
                     maxValue17 = 100000;
                     goto randomMonster;
@@ -4450,14 +4450,14 @@ void game::ProcessRandomObjects(void) {
                         }
                     }
                 monsterBoundsReady:
-                    cell6->m_triggerType = MAP_TRIGGER_MONSTER;
+                    cell6->m_triggerType = IDX(MAP_TRIGGER_MONSTER);
                     cell6->m_objectIndex = static_cast<u8>(Random(0, 65));
                     while (gMonsterDatabase[cell6->m_objectIndex].randomValue <= minValue7
                            || gMonsterDatabase[cell6->m_objectIndex].randomValue >= maxValue17)
                         cell6->m_objectIndex = static_cast<u8>(Random(0, 65));
                     break;
-                case MAP_TRIGGER_RANDOM_RESOURCE:
-                    cell6->m_triggerType = MAP_TRIGGER_RESOURCE;
+                case IDX(MAP_TRIGGER_RANDOM_RESOURCE):
+                    cell6->m_triggerType = IDX(MAP_TRIGGER_RESOURCE);
                     randomType0 = Random(0, 6);
                     ConvertObject(
                         x10 - 1,
@@ -4498,9 +4498,9 @@ void game::ProcessRandomObjects(void) {
                             break;
                     }
                     break;
-                case MAP_TRIGGER_RANDOM_ARTIFACT:
+                case IDX(MAP_TRIGGER_RANDOM_ARTIFACT):
                     artifactId18 = GetRandomArtifactId(14, 0);
-                    cell6->m_triggerType = MAP_TRIGGER_ARTIFACT;
+                    cell6->m_triggerType = IDX(MAP_TRIGGER_ARTIFACT);
                     ConvertObject(
                         x10 - 1,
                         y8,
@@ -4516,9 +4516,9 @@ void game::ProcessRandomObjects(void) {
                     );
                     ConvertObject(x10, y8, x10, y8, 11, 163, 163, 11, artifactId18 * 2 + 1, -1, -1);
                     break;
-                case MAP_TRIGGER_RANDOM_ARTIFACT_LEVEL_1:
+                case IDX(MAP_TRIGGER_RANDOM_ARTIFACT_LEVEL_1):
                     artifactId18 = GetRandomArtifactId(8, 0);
-                    cell6->m_triggerType = MAP_TRIGGER_ARTIFACT;
+                    cell6->m_triggerType = IDX(MAP_TRIGGER_ARTIFACT);
                     ConvertObject(
                         x10 - 1,
                         y8,
@@ -4534,9 +4534,9 @@ void game::ProcessRandomObjects(void) {
                     );
                     ConvertObject(x10, y8, x10, y8, 11, 167, 167, 11, artifactId18 * 2 + 1, -1, -1);
                     break;
-                case MAP_TRIGGER_RANDOM_ARTIFACT_LEVEL_2:
+                case IDX(MAP_TRIGGER_RANDOM_ARTIFACT_LEVEL_2):
                     artifactId18 = GetRandomArtifactId(4, 0);
-                    cell6->m_triggerType = MAP_TRIGGER_ARTIFACT;
+                    cell6->m_triggerType = IDX(MAP_TRIGGER_ARTIFACT);
                     ConvertObject(
                         x10 - 1,
                         y8,
@@ -4552,9 +4552,9 @@ void game::ProcessRandomObjects(void) {
                     );
                     ConvertObject(x10, y8, x10, y8, 11, 169, 169, 11, artifactId18 * 2 + 1, -1, -1);
                     break;
-                case MAP_TRIGGER_RANDOM_ARTIFACT_LEVEL_3:
+                case IDX(MAP_TRIGGER_RANDOM_ARTIFACT_LEVEL_3):
                     artifactId18 = GetRandomArtifactId(2, 0);
-                    cell6->m_triggerType = MAP_TRIGGER_ARTIFACT;
+                    cell6->m_triggerType = IDX(MAP_TRIGGER_ARTIFACT);
                     ConvertObject(
                         x10 - 1,
                         y8,
@@ -4570,7 +4570,7 @@ void game::ProcessRandomObjects(void) {
                     );
                     ConvertObject(x10, y8, x10, y8, 11, 171, 171, 11, artifactId18 * 2 + 1, -1, -1);
                     break;
-                case MAP_TRIGGER_RANDOM_MINE:
+                case IDX(MAP_TRIGGER_RANDOM_MINE):
                     RandomizeMine(x10, y8);
                     break;
             }
@@ -4975,7 +4975,7 @@ void game::SetupTowns(void) {
     i32 building;
     i32 spellLevel;
     i32 spellSlot;
-    i32 spell;
+    SpellType spell;
     i32 roll;
     i32 attempts;
     i32 spellValue;
@@ -5075,7 +5075,7 @@ void game::SetupTowns(void) {
             spellsPerLevel[spellLevel] = 0;
             for (spellSlot = 0; spellSlot < TOWN_MAGE_GUILD_SPELLS_PER_LEVEL; spellSlot++)
                 castle->m_spellSlots[spellLevel * TOWN_MAGE_GUILD_SPELLS_PER_LEVEL + spellSlot] =
-                    SPELL_NONE;
+                    IDX(SPELL_NONE);
         }
 
         if (castle->m_type == 5 && castle->m_owner != -1 && !gbHumanPlayer[castle->m_owner]) {
@@ -5083,7 +5083,7 @@ void game::SetupTowns(void) {
                 spell = SPELL_DEATH_RIPPLE;
             else
                 spell = SPELL_DEATH_WAVE;
-            spellLevel = gsSpellInfo[spell].level - 1;
+            spellLevel = gsSpellInfo[IDX(spell)].level - 1;
             castle->m_spells[spellLevel][spellsPerLevel[spellLevel]] = static_cast<i8>(spell);
             spellsPerLevel[spellLevel]++;
         }
@@ -5097,7 +5097,7 @@ void game::SetupTowns(void) {
             spell = SPELL_ANTI_MAGIC;
         else
             spell = SPELL_CURE;
-        spellLevel = gsSpellInfo[spell].level - 1;
+        spellLevel = gsSpellInfo[IDX(spell)].level - 1;
         castle->m_spells[spellLevel][spellsPerLevel[spellLevel]] = static_cast<i8>(spell);
         spellsPerLevel[spellLevel]++;
 
@@ -5112,7 +5112,7 @@ void game::SetupTowns(void) {
             spell = SPELL_COLD_RAY;
         else
             spell = SPELL_COLD_RING;
-        spellLevel = gsSpellInfo[spell].level - 1;
+        spellLevel = gsSpellInfo[IDX(spell)].level - 1;
         castle->m_spells[spellLevel][spellsPerLevel[spellLevel]] = static_cast<i8>(spell);
         spellsPerLevel[spellLevel]++;
 
@@ -5127,26 +5127,26 @@ void game::SetupTowns(void) {
                     attempts = 0;
                     do {
                         spell = Random(SPELL_FIREBALL, SPELL_SET_WATER_GUARDIAN);
-                        while (gsSpellInfo[spell].level - 1 != spellLevel)
+                        while (gsSpellInfo[IDX(spell)].level - 1 != spellLevel)
                             spell = Random(SPELL_FIREBALL, SPELL_SET_WATER_GUARDIAN);
                         if (castle->m_owner != -1 && !gbHumanPlayer[castle->m_owner])
-                            spellValue = (gsSpellInfo[spell].attributes & 1 ? 4 : 1)
-                                             * gsSpellInfo[spell].aiValue
+                            spellValue = (gsSpellInfo[IDX(spell)].attributes & 1 ? 4 : 1)
+                                             * gsSpellInfo[IDX(spell)].aiValue
                                          + 50;
                         else
                             spellValue = 1500;
                         if (spell == SPELL_DIMENSION_DOOR)
                             spellValue = 1500;
-                    } while ((combatSpells == 1 && (gsSpellInfo[spell].attributes & 4))
-                             || gsSpellInfo[spell].raceChance[castle->m_type] < Random(0, 10)
-                             || attempts++ > 500 || usedSpells[spell]
+                    } while ((combatSpells == 1 && (gsSpellInfo[IDX(spell)].attributes & 4))
+                             || gsSpellInfo[IDX(spell)].raceChance[castle->m_type] < Random(0, 10)
+                             || attempts++ > 500 || usedSpells[IDX(spell)]
                              || spellValue < Random(1, 1500));
-                    if (gsSpellInfo[spell].attributes & 4)
+                    if (gsSpellInfo[IDX(spell)].attributes & 4)
                         combatSpells++;
                     castle
                         ->m_spellSlots[spellLevel * TOWN_MAGE_GUILD_SPELLS_PER_LEVEL + spellSlot] =
                         static_cast<i8>(spell);
-                    usedSpells[spell] = 1;
+                    usedSpells[IDX(spell)] = 1;
                 }
             }
         }
@@ -5300,7 +5300,7 @@ void game::ProcessOnMapHeroes(void) {
                             cell5->m_objectMetadata = extra0->heroId;
                         } else {
                             cell5->m_objectTileset = 0;
-                            cell5->m_objectIndex = MAPCELL_SPRITE_NONE;
+                            cell5->m_objectIndex = IDX(MAPCELL_SPRITE_NONE);
                             cell5->m_objectMetadata = 0;
                             cell5->m_triggerType = 0;
                         }
@@ -6827,18 +6827,18 @@ i32 game::CountShrines(i32 player) {
 
 // ---- remaining globals (retail RVA order) ----
 DATA(0x004f7550) i8 giMonType[] = {
-    CREATURE_PEASANT,
-    CREATURE_TROLL,
-    CREATURE_DWARF,
-    CREATURE_ROC,
-    CREATURE_OGRE,
-    CREATURE_DRUID,
-    CREATURE_VAMPIRE,
-    CREATURE_WOLF,
-    CREATURE_CENTAUR,
-    CREATURE_GARGOYLE,
-    CREATURE_UNICORN,
-    CREATURE_LICH
+    IDX(CREATURE_PEASANT),
+    IDX(CREATURE_TROLL),
+    IDX(CREATURE_DWARF),
+    IDX(CREATURE_ROC),
+    IDX(CREATURE_OGRE),
+    IDX(CREATURE_DRUID),
+    IDX(CREATURE_VAMPIRE),
+    IDX(CREATURE_WOLF),
+    IDX(CREATURE_CENTAUR),
+    IDX(CREATURE_GARGOYLE),
+    IDX(CREATURE_UNICORN),
+    IDX(CREATURE_LICH)
 };
 DATA(0x004f7a08) char bMapInitialized = 0;
 // @data-layout-note Retail's loader-zero GAME contribution is

@@ -307,7 +307,7 @@ void fileRequester::Close(void) {
     CleanUpData();
     gpWindowManager->RemoveWindow(m_window);
     delete m_window;
-    m_active = 0;
+    m_active = false;
 }
 
 // @early-stop
@@ -407,7 +407,7 @@ i32 fileRequester::Open(i32 id) {
     SetOK(okEnabled3);
     m_messageMask = MESSAGE_EXECUTIVE;
     m_priority = id;
-    m_active = 1;
+    m_active = true;
     strcpy(m_name, "fileRequester");
     return 0;
 }
@@ -450,7 +450,7 @@ VA(0x0048daec, 0x11ae)
 i32 fileRequester::Main(struct tag_message& message) {
     i32 acceptStep = 0;
     i32 iResult;
-    i32 helpIndexMouse;
+    FileRequesterHelpIndex helpIndexMouse;
     i32 lengthIndex;
     i32 positions;
     i32 gutterStepScreen;
@@ -626,7 +626,7 @@ i32 fileRequester::Main(struct tag_message& message) {
                         }
                         if (helpIndexMouse >= 0) {
                             NormalDialog(
-                                gFileRequestHelp[helpIndexMouse],
+                                gFileRequestHelp[IDX(helpIndexMouse)],
                                 NORMAL_DIALOG_QUICK_VIEW,
                                 NORMAL_DIALOG_NO_RESOURCE,
                                 NORMAL_DIALOG_NO_VALUE,
