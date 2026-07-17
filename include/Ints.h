@@ -126,4 +126,21 @@ typedef i8 b8;
 #define BIT(x) (1 << (x))
 #endif
 
+
+// Sequence domains step to adjacent ids (animation followthroughs). The audit
+// defines the increment; production sees plain integer arithmetic.
+#ifdef HOMM2_STRICT_ENUM_TYPES
+#define H2_ENUM_STEPPED(name)                                                                      \
+    inline name& operator++(name& a) {                                                             \
+        return a = static_cast<name>(static_cast<i64>(a) + 1);                                     \
+    }                                                                                              \
+    inline name operator++(name& a, int) {                                                         \
+        name old = a;                                                                              \
+        ++a;                                                                                       \
+        return old;                                                                                \
+    }
+#else
+#define H2_ENUM_STEPPED(name)
+#endif
+
 #endif // HOMM2_INTS_H
