@@ -117,11 +117,7 @@ extern "C" u16 __fastcall nb_init(u16 param1, u16 param2) {
         for (i = 0; i < NETBIOS_THREAD_EVENT_COUNT; i++)
             gNbEvents.handles[i] = CreateEventA(0, 1, 0, 0);
         memset(&localNcb, 0, sizeof(localNcb));
-        statusBuffer = static_cast<u8*>(BaseAlloc(
-            NETBIOS_ADAPTER_STATUS_SIZE,
-            RETAIL_FILE,
-            gNbInitSourceLineBase + (NETWIN_SOURCE_LINE_INIT_ALLOC - NETWIN_SOURCE_LINE_INIT_BASE)
-        ));
+        statusBuffer = static_cast<u8*>(H2_ALLOC(NETBIOS_ADAPTER_STATUS_SIZE, gNbInitSourceLineBase + (NETWIN_SOURCE_LINE_INIT_ALLOC - NETWIN_SOURCE_LINE_INIT_BASE)));
         localNcb.command = NETBIOS_COMMAND_ADAPTER_STATUS;
         localNcb.length = NETBIOS_ADAPTER_STATUS_SIZE;
         localNcb.buffer = statusBuffer;
@@ -134,11 +130,7 @@ extern "C" u16 __fastcall nb_init(u16 param1, u16 param2) {
             localNcb.callName[2] = NETBIOS_RESULT_SESSION_CLOSED;
             Netbios(&localNcb);
         }
-        BaseFree(
-            statusBuffer,
-            RETAIL_FILE,
-            gNbInitSourceLineBase + (NETWIN_SOURCE_LINE_INIT_FREE - NETWIN_SOURCE_LINE_INIT_BASE)
-        );
+        H2_FREE(statusBuffer, gNbInitSourceLineBase + (NETWIN_SOURCE_LINE_INIT_FREE - NETWIN_SOURCE_LINE_INIT_BASE));
         gNbShutdown = 0;
         return 0;
     }
@@ -170,19 +162,11 @@ extern "C" void __fastcall nb_term(void) {
     }
     EnterCriticalSection(&gNbSndLock);
     while ((node = pop_node(&gNbSndQueue)) != 0)
-        BaseFree(
-            node,
-            RETAIL_FILE,
-            gNbTermSourceLineBase
-                + (NETWIN_SOURCE_LINE_TERM_SEND_FREE - NETWIN_SOURCE_LINE_TERM_BASE)
-        );
+        H2_FREE(node, gNbTermSourceLineBase
+                + (NETWIN_SOURCE_LINE_TERM_SEND_FREE - NETWIN_SOURCE_LINE_TERM_BASE));
     while ((node = pop_node(&gNbFreeQueue)) != 0)
-        BaseFree(
-            node,
-            RETAIL_FILE,
-            gNbTermSourceLineBase
-                + (NETWIN_SOURCE_LINE_TERM_POOL_FREE - NETWIN_SOURCE_LINE_TERM_BASE)
-        );
+        H2_FREE(node, gNbTermSourceLineBase
+                + (NETWIN_SOURCE_LINE_TERM_POOL_FREE - NETWIN_SOURCE_LINE_TERM_BASE));
     LeaveCriticalSection(&gNbSndLock);
     DeleteCriticalSection(&gNbSndLock);
     for (i = 0; i < NETBIOS_THREAD_EVENT_COUNT; i++) {
@@ -193,12 +177,8 @@ extern "C" void __fastcall nb_term(void) {
     SetEvent(gNbEvents.handles[0]);
     EnterCriticalSection(&gNbRcvLock);
     while ((node = pop_node(&gNbRcvQueue)) != 0)
-        BaseFree(
-            node,
-            RETAIL_FILE,
-            gNbTermSourceLineBase
-                + (NETWIN_SOURCE_LINE_TERM_RECEIVE_FREE - NETWIN_SOURCE_LINE_TERM_BASE)
-        );
+        H2_FREE(node, gNbTermSourceLineBase
+                + (NETWIN_SOURCE_LINE_TERM_RECEIVE_FREE - NETWIN_SOURCE_LINE_TERM_BASE));
     LeaveCriticalSection(&gNbRcvLock);
     DeleteCriticalSection(&gNbRcvLock);
 }
@@ -218,12 +198,8 @@ extern "C" u16 __fastcall nb_rcv(i16 session, void* buf) {
         else
             len = node->len;
         memcpy(buf, node->data, len);
-        BaseFree(
-            node,
-            RETAIL_FILE,
-            gNbReceiveSourceLineBase
-                + (NETWIN_SOURCE_LINE_RECEIVE_FREE - NETWIN_SOURCE_LINE_RECEIVE_BASE)
-        );
+        H2_FREE(node, gNbReceiveSourceLineBase
+                + (NETWIN_SOURCE_LINE_RECEIVE_FREE - NETWIN_SOURCE_LINE_RECEIVE_BASE));
         return len;
     }
     return 0;
@@ -240,11 +216,7 @@ extern "C" u16 __fastcall nb_snd(i16 session, i16 len, void* data) {
     }
     if ((gNetStatus[session] & NETBIOS_SESSION_ACTIVE) == 0)
         return NETBIOS_RESULT_SESSION_OUT_OF_RANGE;
-    node = static_cast<tag_Node*>(BaseAlloc(
-        len + NETBIOS_PACKET_HEADER_SIZE,
-        RETAIL_FILE,
-        gNbSendSourceLineBase + (NETWIN_SOURCE_LINE_SEND_ALLOC - NETWIN_SOURCE_LINE_SEND_BASE)
-    ));
+    node = static_cast<tag_Node*>(H2_ALLOC(len + NETBIOS_PACKET_HEADER_SIZE, gNbSendSourceLineBase + (NETWIN_SOURCE_LINE_SEND_ALLOC - NETWIN_SOURCE_LINE_SEND_BASE)));
     node->len = len;
     node->sessionIndex = static_cast<u8>(session);
     memcpy(node->data, data, len);
@@ -461,12 +433,8 @@ void nb_thr_ctl(void) {
                         }
                     }
                 }
-                BaseFree(
-                    node,
-                    RETAIL_FILE,
-                    gNbThreadSourceLineBase
-                        + (NETWIN_SOURCE_LINE_THREAD_FREE - NETWIN_SOURCE_LINE_THREAD_BASE)
-                );
+                H2_FREE(node, gNbThreadSourceLineBase
+                        + (NETWIN_SOURCE_LINE_THREAD_FREE - NETWIN_SOURCE_LINE_THREAD_BASE));
             }
         }
     }
@@ -704,13 +672,9 @@ static void __fastcall nb_recv_complete(i32 session) {
         case NETBIOS_COMMAND_RECEIVE:
             switch (gNbSessNcb[session].returnCode) {
                 case NETBIOS_RESULT_SUCCESS:
-                    node = static_cast<tag_Node*>(BaseAlloc(
-                        gNbSessNcb[session].length + NETBIOS_PACKET_HEADER_SIZE,
-                        RETAIL_FILE,
-                        gNbReceiveCompleteSourceLineBase
+                    node = static_cast<tag_Node*>(H2_ALLOC(gNbSessNcb[session].length + NETBIOS_PACKET_HEADER_SIZE, gNbReceiveCompleteSourceLineBase
                             + (NETWIN_SOURCE_LINE_RECEIVE_COMPLETE_ALLOC
-                               - NETWIN_SOURCE_LINE_RECEIVE_COMPLETE_BASE)
-                    ));
+                               - NETWIN_SOURCE_LINE_RECEIVE_COMPLETE_BASE)));
                     if (node != 0) {
                         node->len = gNbSessNcb[session].length;
                         node->sessionIndex = static_cast<u8>(session);

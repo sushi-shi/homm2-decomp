@@ -69,7 +69,7 @@ sample::sample(char* name, i32l channelType, i32l volume, i32l loopCount)
     u32l size = gpResourceManager->GetFileSize(m_id);
 #line 57
     m_playbackData.data =
-        static_cast<char*>(H2_ALLOC(size, gSampleSourceFiles.sampleAllocation, 0x39));
+        static_cast<char*>(H2_ALLOC_AT(size, gSampleSourceFiles.sampleAllocation, 0x39));
     m_playbackData.size = size;
     gpResourceManager->PointToFile(m_id);
     gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_playbackData.data), size);
@@ -84,7 +84,7 @@ sample::sample(char* name, i32l channelType, i32l volume, i32l loopCount)
 VA(0x004daf40, 0x2c)
 inline sample::~sample() {
 #line 97
-    H2_FREE(m_playbackData.data, gSampleSourceFiles.sampleDestruction, 0x61);
+    H2_FREE_AT(m_playbackData.data, gSampleSourceFiles.sampleDestruction, 0x61);
     m_playbackData.data = 0;
     m_playbackData.size = 0;
     m_playbackData.volume = 0;
@@ -94,7 +94,7 @@ VA(0x004daf70, 0x72)
 MIDIWrap::MIDIWrap(char* name) : resource(6, gpResourceManager->MakeId(name, 1), 1, 0) {
     u32l size = gpResourceManager->GetFileSize(m_id);
 #line 110
-    m_data = static_cast<char*>(H2_ALLOC(size, gSampleSourceFiles.midiAllocation, 0x6e));
+    m_data = static_cast<char*>(H2_ALLOC_AT(size, gSampleSourceFiles.midiAllocation, 0x6e));
     gpResourceManager->PointToFile(m_id);
     gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_data), size);
 }
@@ -108,7 +108,7 @@ MIDIWrap::MIDIWrap(char* name) : resource(6, gpResourceManager->MakeId(name, 1),
 VA(0x004db030, 0x28)
 inline MIDIWrap::~MIDIWrap() {
 #line 118
-    H2_FREE(m_data, gSampleSourceFiles.midiDestruction, 0x76);
+    H2_FREE_AT(m_data, gSampleSourceFiles.midiDestruction, 0x76);
     m_data = 0;
 }
 

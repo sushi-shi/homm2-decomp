@@ -694,14 +694,10 @@ void heroWindowManager::FizzleForward(
             if (delay == -1)
                 delay = WINDOW_FIZZLE_DEFAULT_DELAY;
             i8* fadePalette = static_cast<i8*>(
-                H2_ALLOC(WINDOW_PALETTE_BYTE_COUNT, gWindowManagerText.fadePaletteAllocSource, 808)
+                H2_ALLOC_AT(WINDOW_PALETTE_BYTE_COUNT, gWindowManagerText.fadePaletteAllocSource, 808)
             );
             m_fizzleWork = new bitmap(0, static_cast<i16>(width), static_cast<i16>(height));
-            i8* cycleTable = static_cast<i8*>(H2_ALLOC(
-                WINDOW_FIZZLE_CYCLE_TABLE_BYTES,
-                gWindowManagerText.cycleTableAllocSource,
-                810
-            ));
+            i8* cycleTable = static_cast<i8*>(H2_ALLOC_AT(WINDOW_FIZZLE_CYCLE_TABLE_BYTES, gWindowManagerText.cycleTableAllocSource, 810));
             BlitBitmap(m_screen, x, y, width, height, m_fizzleWork, 0, 0);
 
             for (i32 frame = 0; frame < WINDOW_CYCLE_FRAME_COUNT; frame++) {
@@ -755,8 +751,8 @@ void heroWindowManager::FizzleForward(
             if (m_fizzleWork != 0)
                 delete m_fizzleWork;
             m_fizzleWork = 0;
-            H2_FREE(cycleTable, gWindowManagerText.cycleTableFreeSource, 897);
-            H2_FREE(fadePalette, gWindowManagerText.fadePaletteFreeSource, 898);
+            H2_FREE_AT(cycleTable, gWindowManagerText.cycleTableFreeSource, 897);
+            H2_FREE_AT(fadePalette, gWindowManagerText.fadePaletteFreeSource, 898);
         }
     }
 }

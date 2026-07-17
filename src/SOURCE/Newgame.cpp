@@ -260,15 +260,15 @@ i32 game::NewGame(void) {
     glTimers[0] = 0;
     for (textBufferIndex = 0; textBufferIndex < NEW_GAME_TEXT_BUFFER_COUNT; ++textBufferIndex) {
         cTextReceivedBuffer[textBufferIndex] = static_cast<char*>(
-            BaseAlloc(NEW_GAME_TEXT_BUFFER_SIZE, RETAIL_FILE, newGameSourceLineBase + 0x2d)
+            H2_ALLOC(NEW_GAME_TEXT_BUFFER_SIZE, newGameSourceLineBase + 0x2d)
         );
         strcpy(cTextReceivedBuffer[textBufferIndex], "");
     }
     cNGKPCore = static_cast<char*>(
-        BaseAlloc(NEW_GAME_KEY_BUFFER_SIZE, RETAIL_FILE, newGameSourceLineBase + 0x30)
+        H2_ALLOC(NEW_GAME_KEY_BUFFER_SIZE, newGameSourceLineBase + 0x30)
     );
     cNGKPDisplay = static_cast<char*>(
-        BaseAlloc(NEW_GAME_KEY_BUFFER_SIZE, RETAIL_FILE, newGameSourceLineBase + 0x31)
+        H2_ALLOC(NEW_GAME_KEY_BUFFER_SIZE, newGameSourceLineBase + 0x31)
     );
     strcpy(cNGKPCore, "");
     strcpy(cNGKPDisplay, "");
@@ -426,10 +426,10 @@ i32 game::NewGame(void) {
     }
 
     for (textBufferIndex = 0; textBufferIndex < NEW_GAME_TEXT_BUFFER_COUNT; ++textBufferIndex) {
-        BaseFree(cTextReceivedBuffer[textBufferIndex], RETAIL_FILE, newGameSourceLineBase + 0x11e);
+        H2_FREE(cTextReceivedBuffer[textBufferIndex], newGameSourceLineBase + 0x11e);
     }
-    BaseFree(cNGKPCore, RETAIL_FILE, newGameSourceLineBase + 0x120);
-    BaseFree(cNGKPDisplay, RETAIL_FILE, newGameSourceLineBase + 0x121);
+    H2_FREE(cNGKPCore, newGameSourceLineBase + 0x120);
+    H2_FREE(cNGKPDisplay, newGameSourceLineBase + 0x121);
     gpResourceManager->Dispose(NGKPBkg);
     return result;
 }
@@ -583,7 +583,7 @@ void game::InitNewGameWindow(void) {
 
         if (giNumHumanPlayers > 1) {
             label =
-                static_cast<char*>(BaseAlloc(2, RETAIL_FILE, newGameWindowSourceLineBase + 0x50));
+                static_cast<char*>(H2_ALLOC(2, newGameWindowSourceLineBase + 0x50));
             sprintf(label, " ");
             textControlLocal = new textWidget(
                 static_cast<i16>(playerSpacingTemp * playerCounter + firstPlayerXLocal + 19),
@@ -621,7 +621,7 @@ void game::InitNewGameWindow(void) {
             MemError();
         m_newGameWindow->AddWidget(iconControlLocal, -1);
 
-        label = static_cast<char*>(BaseAlloc(2, RETAIL_FILE, newGameWindowSourceLineBase + 0x70));
+        label = static_cast<char*>(H2_ALLOC(2, newGameWindowSourceLineBase + 0x70));
         sprintf(label, "A");
         if (m_mapHeader.playerCount >= 5) {
             if (m_mapHeader.playerCount >= 6)
@@ -1656,7 +1656,7 @@ void game::ShowScenInfo(void) {
 
         if (giNumHumanPlayers > 1) {
             label =
-                static_cast<char*>(BaseAlloc(2, RETAIL_FILE, scenarioInfoSourceLineBase + 0x72));
+                static_cast<char*>(H2_ALLOC(2, scenarioInfoSourceLineBase + 0x72));
             sprintf(label, " ");
             textControlLocal = new textWidget(
                 static_cast<i16>(
@@ -1694,7 +1694,7 @@ void game::ShowScenInfo(void) {
             MemError();
         scenarioWindowValue->AddWidget(iconControlLocal, -1);
 
-        label = static_cast<char*>(BaseAlloc(2, RETAIL_FILE, scenarioInfoSourceLineBase + 0x92));
+        label = static_cast<char*>(H2_ALLOC(2, scenarioInfoSourceLineBase + 0x92));
         sprintf(label, "A");
         if (m_mapHeader.playerCount >= 5) {
             if (m_mapHeader.playerCount >= MAP_HEADER_PLAYER_COUNT)

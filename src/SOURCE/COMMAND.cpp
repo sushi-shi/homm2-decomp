@@ -30,6 +30,8 @@
 #include <SOURCE/REMOTE.h>
 #include <SOURCE/town.h>
 #include <SOURCE/X_GLOBAL.h>
+
+#define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\COMMAND.CPP"
 VA(0x0042a6d0, 0x36d)
 i32 combatManager::Main(tag_message& message) {
     i32 result = COMBAT_MAIN_CONTINUE;
@@ -1413,11 +1415,7 @@ void combatManager::ShowWinLoseArtifact(class heroWindow* window, i32 artifact) 
         MemError();
     window->AddWidget(m_winLoseBottomWidgets[1], -1);
 
-    capturedArtifactName = static_cast<char*>(BaseAlloc(
-        60,
-        COMMAND_SOURCE_FILE,
-        artifactSourceLineBase + COMMAND_ARTIFACT_ALLOC_LINE_OFFSET
-    ));
+    capturedArtifactName = static_cast<char*>(H2_ALLOC(60, artifactSourceLineBase + COMMAND_ARTIFACT_ALLOC_LINE_OFFSET));
     sprintf(capturedArtifactName, gArtifactNames[artifact]);
     m_winLoseBottomTextWidgets[0] = new textWidget(
         16,
@@ -1464,11 +1462,7 @@ void combatManager::ShowSkeletons(class heroWindow* window) {
     if (m_winLoseBottomWidgets[0] == 0)
         MemError();
 
-    skeletonCount = static_cast<char*>(BaseAlloc(
-        9,
-        COMMAND_SOURCE_FILE,
-        skeletonSourceLineBase + COMMAND_SKELETON_ALLOC_LINE_OFFSET
-    ));
+    skeletonCount = static_cast<char*>(H2_ALLOC(9, skeletonSourceLineBase + COMMAND_SKELETON_ALLOC_LINE_OFFSET));
     sprintf(skeletonCount, "%d", giSkeletonsCreated);
     m_winLoseBottomTextWidgets[0] = new textWidget(
         165,
@@ -1556,11 +1550,7 @@ void combatManager::ShowEagleEyeSpell(class heroWindow* window) {
     if (m_winLoseBottomWidgets[1] == 0)
         MemError();
 
-    spellName = static_cast<char*>(BaseAlloc(
-        200,
-        COMMAND_SOURCE_FILE,
-        eagleEyeSourceLineBase + COMMAND_EAGLE_EYE_ALLOC_LINE_OFFSET
-    ));
+    spellName = static_cast<char*>(H2_ALLOC(200, eagleEyeSourceLineBase + COMMAND_EAGLE_EYE_ALLOC_LINE_OFFSET));
     sprintf(spellName, "%s", gSpellNames[displayedSpell]);
     m_winLoseBottomTextWidgets[0] = new textWidget(
         x + 34,
@@ -1655,11 +1645,7 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
         }
     }
 
-    text_27 = static_cast<char*>(BaseAlloc(
-        30,
-        COMMAND_SOURCE_FILE,
-        casualtySourceLineBase + COMMAND_CASUALTY_TITLE_ALLOC_LINE_OFFSET
-    ));
+    text_27 = static_cast<char*>(H2_ALLOC(30, casualtySourceLineBase + COMMAND_CASUALTY_TITLE_ALLOC_LINE_OFFSET));
     sprintf(text_27, "Battlefield Casualties");
     m_winLoseBottomTextWidgets[17] = new textWidget(
         16,
@@ -1682,11 +1668,7 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
             y_29 = 279;
         else
             y_29 = 346;
-        text_27 = static_cast<char*>(BaseAlloc(
-            30,
-            COMMAND_SOURCE_FILE,
-            casualtySourceLineBase + COMMAND_CASUALTY_HEADER_ALLOC_LINE_OFFSET
-        ));
+        text_27 = static_cast<char*>(H2_ALLOC(30, casualtySourceLineBase + COMMAND_CASUALTY_HEADER_ALLOC_LINE_OFFSET));
         sprintf(text_27, side_9 == COMBAT_ATTACKER_SIDE ? "Attacker" : "Defender");
         m_winLoseBottomTextWidgets[15 + side_9] = new textWidget(
             16,
@@ -1705,11 +1687,7 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
         window->AddWidget(m_winLoseBottomTextWidgets[15 + side_9], -1);
 
         if (casualtyQuantity_0[side_9] <= 0) {
-            text_27 = static_cast<char*>(BaseAlloc(
-                10,
-                COMMAND_SOURCE_FILE,
-                casualtySourceLineBase + COMMAND_CASUALTY_NONE_ALLOC_LINE_OFFSET
-            ));
+            text_27 = static_cast<char*>(H2_ALLOC(10, casualtySourceLineBase + COMMAND_CASUALTY_NONE_ALLOC_LINE_OFFSET));
             sprintf(text_27, "None");
             m_winLoseBottomTextWidgets[side_9 * COMBAT_CASUALTY_WIDGETS_PER_SIDE] = new textWidget(
                 16,
@@ -1783,11 +1761,7 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
                 == 0)
                 MemError();
 
-            text_27 = static_cast<char*>(BaseAlloc(
-                9,
-                COMMAND_SOURCE_FILE,
-                casualtySourceLineBase + COMMAND_CASUALTY_QUANTITY_ALLOC_LINE_OFFSET
-            ));
+            text_27 = static_cast<char*>(H2_ALLOC(9, casualtySourceLineBase + COMMAND_CASUALTY_QUANTITY_ALLOC_LINE_OFFSET));
             sprintf(
                 text_27,
                 "%d",

@@ -84,7 +84,7 @@ void textWidget::Read(void) {
     m_width = gpResourceManager->ReadWord();
     m_height = gpResourceManager->ReadWord();
     i16 len = gpResourceManager->ReadWord();
-    m_text = static_cast<char*>(H2_ALLOC(len, gTextWidgetSourceFiles.read, 0x39));
+    m_text = static_cast<char*>(H2_ALLOC_AT(len, gTextWidgetSourceFiles.read, 0x39));
     gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_text), len);
     gpResourceManager->Read13(reinterpret_cast<i8*>(resourceName));
     gpResourceManager->SavePosition();
@@ -100,7 +100,7 @@ void textWidget::Read(void) {
 VA(0x004d1250, 0x30)
 textWidget::~textWidget() {
     gpResourceManager->Dispose(m_font);
-    H2_FREE(m_text, gTextWidgetSourceFiles.destruction, 0x55);
+    H2_FREE_AT(m_text, gTextWidgetSourceFiles.destruction, 0x55);
 }
 
 // @semantic
@@ -166,9 +166,9 @@ i32 textWidget::Main(tag_message& msg) {
                     }
                     u16 newLen = strlen(newText);
                     if (strlen(m_text) < newLen) {
-                        H2_FREE(m_text, gTextWidgetSourceFiles.resizeFree, 0xd3);
+                        H2_FREE_AT(m_text, gTextWidgetSourceFiles.resizeFree, 0xd3);
                         m_text = static_cast<char*>(
-                            H2_ALLOC(newLen + 5, gTextWidgetSourceFiles.resizeAlloc, 0xd4)
+                            H2_ALLOC_AT(newLen + 5, gTextWidgetSourceFiles.resizeAlloc, 0xd4)
                         );
                     }
                     strcpy(m_text, newText);
@@ -223,8 +223,8 @@ void textWidget::SetText(char* text) {
     }
     u16 newLen = strlen(text);
     if (strlen(m_text) < newLen) {
-        H2_FREE(m_text, gTextWidgetSourceFiles.resizeFree, 0xd3);
-        m_text = static_cast<char*>(H2_ALLOC(newLen + 5, gTextWidgetSourceFiles.resizeAlloc, 0xd4));
+        H2_FREE_AT(m_text, gTextWidgetSourceFiles.resizeFree, 0xd3);
+        m_text = static_cast<char*>(H2_ALLOC_AT(newLen + 5, gTextWidgetSourceFiles.resizeAlloc, 0xd4));
     }
     strcpy(m_text, text);
 }

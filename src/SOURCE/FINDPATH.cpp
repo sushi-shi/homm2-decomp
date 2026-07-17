@@ -73,11 +73,7 @@ searchArray::searchArray(void) {
 VA(0x004a4a60, 0x30)
 searchArray::~searchArray() {
     if (m_storage.cells != 0)
-        BaseFree(
-            m_storage.cells,
-            gSearchDestructionSource.sourceFile,
-            gSearchDestructionSource.line.value + 1
-        );
+        H2_FREE_AT(m_storage.cells, gSearchDestructionSource.sourceFile, gSearchDestructionSource.line.value + 1);
     m_storage.cells = 0;
 }
 
@@ -87,17 +83,9 @@ searchArray::~searchArray() {
 VA(0x004a4a90, 0x60)
 void searchArray::Init(void) {
     if (m_storage.cells != 0)
-        BaseFree(
-            m_storage.cells,
-            gSearchDestructionSource.sourceFile,
-            gSearchDestructionSource.line.value + 1
-        );
+        H2_FREE_AT(m_storage.cells, gSearchDestructionSource.sourceFile, gSearchDestructionSource.line.value + 1);
     m_storage.cells = 0;
-    m_storage.cells = static_cast<searchCell*>(BaseAlloc(
-        MAP_WIDTH * MAP_HEIGHT * sizeof(searchCell),
-        gSearchAllocationSource.sourceFile,
-        gSearchAllocationSource.line.value + 2
-    ));
+    m_storage.cells = static_cast<searchCell*>(H2_ALLOC_AT(MAP_WIDTH * MAP_HEIGHT * sizeof(searchCell), gSearchAllocationSource.sourceFile, gSearchAllocationSource.line.value + 2));
 }
 
 // @early-stop: relocation-masked instructions are identical; the 3/3 external
@@ -106,11 +94,7 @@ void searchArray::Init(void) {
 VA(0x004a4af0, 0x30)
 void searchArray::Close(void) {
     if (m_storage.cells != 0)
-        BaseFree(
-            m_storage.cells,
-            gSearchDestructionSource.sourceFile,
-            gSearchDestructionSource.line.value + 1
-        );
+        H2_FREE_AT(m_storage.cells, gSearchDestructionSource.sourceFile, gSearchDestructionSource.line.value + 1);
     m_storage.cells = 0;
 }
 

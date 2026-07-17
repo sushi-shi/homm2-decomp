@@ -68,7 +68,7 @@ void DoBlur(
     memcpy(saved->m_pixels, source->m_pixels, imageSize);
 
     BlurLookupRow* lookup = static_cast<BlurLookupRow*>(
-        H2_ALLOC(BLUR_LOOKUP_BYTE_COUNT, gBlurText.lookupAllocationSource, 0x19)
+        H2_ALLOC_AT(BLUR_LOOKUP_BYTE_COUNT, gBlurText.lookupAllocationSource, 0x19)
     );
     BlurComponentTable components[BLUR_PALETTE_CHANNEL_COUNT];
     i8* paletteColor = gpBufferPalette->m_data;
@@ -196,10 +196,10 @@ void DoBlur(
 
     PollSound();
     i8* oldPalette = static_cast<i8*>(
-        H2_ALLOC(BLUR_PALETTE_BYTE_COUNT, gBlurText.oldPaletteAllocationSource, 0x8b)
+        H2_ALLOC_AT(BLUR_PALETTE_BYTE_COUNT, gBlurText.oldPaletteAllocationSource, 0x8b)
     );
     i8* newPalette = static_cast<i8*>(
-        H2_ALLOC(BLUR_PALETTE_BYTE_COUNT, gBlurText.newPaletteAllocationSource, 0x8c)
+        H2_ALLOC_AT(BLUR_PALETTE_BYTE_COUNT, gBlurText.newPaletteAllocationSource, 0x8c)
     );
     memcpy(oldPalette, gPalette->m_data, BLUR_PALETTE_BYTE_COUNT);
     i8* oldColor = oldPalette;
@@ -238,13 +238,13 @@ void DoBlur(
     memcpy(source->m_pixels, saved->m_pixels, imageSize);
     gpWindowManager
         ->FizzleForward(0, 0, BLUR_SCREEN_WIDTH, height, BLUR_FIZZLE_DELAY, newPalette, oldPalette);
-    H2_FREE(lookup, gBlurText.lookupFreeSource, 0xa8);
+    H2_FREE_AT(lookup, gBlurText.lookupFreeSource, 0xa8);
     if (saved != 0) {
         delete saved;
     }
     gpMouseManager->ShowColorPointer();
-    H2_FREE(oldPalette, gBlurText.oldPaletteFreeSource, 0xad);
-    H2_FREE(newPalette, gBlurText.newPaletteFreeSource, 0xae);
+    H2_FREE_AT(oldPalette, gBlurText.oldPaletteFreeSource, 0xad);
+    H2_FREE_AT(newPalette, gBlurText.newPaletteFreeSource, 0xae);
 }
 
 // @data-layout-note

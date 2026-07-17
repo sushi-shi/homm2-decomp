@@ -67,16 +67,8 @@ i16 dpnet_init(void) {
     if (lpIDC != 0)
         return 0;
     {
-        ppDPRcvBuffer = static_cast<u8**>(BaseAlloc(
-            DP_TRANSPORT_BUFFER_COUNT * sizeof(u8*),
-            RETAIL_FILE,
-            initSourceLineBase + DP_SOURCE_LINE_INIT_BUFFER_ALLOC_OFFSET
-        ));
-        piDPRcvBufferSize = static_cast<i32*>(BaseAlloc(
-            DP_TRANSPORT_BUFFER_COUNT * sizeof(i32),
-            RETAIL_FILE,
-            initSourceLineBase + DP_SOURCE_LINE_INIT_SIZE_ALLOC_OFFSET
-        ));
+        ppDPRcvBuffer = static_cast<u8**>(H2_ALLOC(DP_TRANSPORT_BUFFER_COUNT * sizeof(u8*), initSourceLineBase + DP_SOURCE_LINE_INIT_BUFFER_ALLOC_OFFSET));
+        piDPRcvBufferSize = static_cast<i32*>(H2_ALLOC(DP_TRANSPORT_BUFFER_COUNT * sizeof(i32), initSourceLineBase + DP_SOURCE_LINE_INIT_SIZE_ALLOC_OFFSET));
         memset(ppDPRcvBuffer, 0, DP_TRANSPORT_BUFFER_COUNT * sizeof(u8*));
         memset(piDPRcvBufferSize, 0, DP_TRANSPORT_BUFFER_COUNT * sizeof(i32));
         hinstDplayx = LoadLibraryA("DPLAYX.DLL");
@@ -183,18 +175,10 @@ void dpnet_term(void) {
     while (dpnet_rcv(0, DP_TRANSPORT_TERM_DRAIN_READ_SIZE, drainBuffer) != 0) {
     }
     if (ppDPRcvBuffer != 0)
-        BaseFree(
-            ppDPRcvBuffer,
-            RETAIL_FILE,
-            termSourceLineBase + DP_SOURCE_LINE_TERM_BUFFER_FREE_OFFSET
-        );
+        H2_FREE(ppDPRcvBuffer, termSourceLineBase + DP_SOURCE_LINE_TERM_BUFFER_FREE_OFFSET);
     ppDPRcvBuffer = 0;
     if (piDPRcvBufferSize != 0)
-        BaseFree(
-            piDPRcvBufferSize,
-            RETAIL_FILE,
-            termSourceLineBase + DP_SOURCE_LINE_TERM_SIZE_FREE_OFFSET
-        );
+        H2_FREE(piDPRcvBufferSize, termSourceLineBase + DP_SOURCE_LINE_TERM_SIZE_FREE_OFFSET);
     piDPRcvBufferSize = 0;
     if (hinstDplayx != 0)
         FreeLibrary(hinstDplayx);
@@ -206,7 +190,7 @@ VA(0x0041f3a4, 0xee)
 void dpSendMessage(i32 destination, u8 type, u16 size, void* data) {
     DATA(0x004efa5c) static i16 sendSourceLineBase = DP_SOURCE_LINE_SEND_BASE;
     u8* message = static_cast<u8*>(
-        BaseAlloc(size + 1, RETAIL_FILE, sendSourceLineBase + DP_SOURCE_LINE_SEND_ALLOC_OFFSET)
+        H2_ALLOC(size + 1, sendSourceLineBase + DP_SOURCE_LINE_SEND_ALLOC_OFFSET)
     );
     i32 result;
 
@@ -218,7 +202,7 @@ void dpSendMessage(i32 destination, u8 type, u16 size, void* data) {
         && result != DP_RESULT_INVALID_ARGUMENT) {
         DPSD(result, RETAIL_FILE, sendSourceLineBase + DP_SOURCE_LINE_SEND_ERROR_OFFSET);
     }
-    BaseFree(message, RETAIL_FILE, sendSourceLineBase + DP_SOURCE_LINE_SEND_FREE_OFFSET);
+    H2_FREE(message, sendSourceLineBase + DP_SOURCE_LINE_SEND_FREE_OFFSET);
 }
 
 VA(0x0041f492, 0x5a)
@@ -244,11 +228,7 @@ i16 dpnet_rcv(i16, u16, void* data) {
         return 0;
     size = piDPRcvBufferSize[iDPRcvBufferTail];
     memcpy(data, ppDPRcvBuffer[iDPRcvBufferTail], size);
-    BaseFree(
-        ppDPRcvBuffer[iDPRcvBufferTail],
-        RETAIL_FILE,
-        receiveSourceLineBase + DP_SOURCE_LINE_RECEIVE_FREE_OFFSET
-    );
+    H2_FREE(ppDPRcvBuffer[iDPRcvBufferTail], receiveSourceLineBase + DP_SOURCE_LINE_RECEIVE_FREE_OFFSET);
     iDPRcvBufferTail = (iDPRcvBufferTail + 1) % DP_TRANSPORT_BUFFER_COUNT;
     return static_cast<i16>(size);
 }
@@ -314,11 +294,7 @@ void dpEvaluateMessage(u32l size, i32 sender) {
 
     switch (rcvBufIn[0]) {
         case NETWORK_PACKET_DATA:
-            ppDPRcvBuffer[iDPRcvBufferHead] = static_cast<u8*>(BaseAlloc(
-                size - 1,
-                RETAIL_FILE,
-                evaluateSourceLineBase + DP_SOURCE_LINE_EVALUATE_ALLOC_OFFSET
-            ));
+            ppDPRcvBuffer[iDPRcvBufferHead] = static_cast<u8*>(H2_ALLOC(size - 1, evaluateSourceLineBase + DP_SOURCE_LINE_EVALUATE_ALLOC_OFFSET));
             memcpy(ppDPRcvBuffer[iDPRcvBufferHead], rcvBufIn + 1, size - 1);
             piDPRcvBufferSize[iDPRcvBufferHead] = size;
             iDPRcvBufferHead = (iDPRcvBufferHead + 1) % DP_TRANSPORT_BUFFER_COUNT;

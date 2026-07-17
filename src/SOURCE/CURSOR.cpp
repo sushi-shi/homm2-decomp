@@ -1466,7 +1466,7 @@ void advManager::ProcessIncomingGroupMapChange(char* incomingData) {
 
     size = sizeof(sMapChangeLastFew);
     buf = static_cast<SMapChange*>(
-        BaseAlloc(size, RETAIL_FILE, s_groupLineBase + CURSOR_GROUP_ALLOC_LINE_OFFSET)
+        H2_ALLOC(size, s_groupLineBase + CURSOR_GROUP_ALLOC_LINE_OFFSET)
     );
     memcpy(buf, incomingData, size);
     for (i = CURSOR_MAP_CHANGE_RECENT_COUNT - 1; i >= 0; --i) {
@@ -1477,7 +1477,7 @@ void advManager::ProcessIncomingGroupMapChange(char* incomingData) {
             processed = 0;
         }
     }
-    BaseFree(buf, RETAIL_FILE, s_groupLineBase + CURSOR_GROUP_FREE_LINE_OFFSET);
+    H2_FREE(buf, s_groupLineBase + CURSOR_GROUP_FREE_LINE_OFFSET);
 }
 
 VA(0x00410b29, 0x75)

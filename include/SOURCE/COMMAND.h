@@ -91,7 +91,6 @@ typedef enum CombatBattleResultText {
     COMBAT_RESULT_TEXT_NETWORK_EXPERIENCE = 10
 } CombatBattleResultText;
 
-#define COMMAND_SOURCE_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\COMMAND.CPP"
 
 #define COMMAND_ARTIFACT_ALLOC_LINE_OFFSET 43
 #define COMMAND_SKELETON_ALLOC_LINE_OFFSET 19

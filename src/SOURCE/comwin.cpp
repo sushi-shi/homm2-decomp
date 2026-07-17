@@ -244,9 +244,9 @@ void com_term(i16 portIndex) {
         s_comPorts[portIndex].handle = INVALID_HANDLE_VALUE;
 
         while ((node = pop_node(&s_comPorts[portIndex].normalQueue)) != 0)
-            BaseFree(node, RETAIL_FILE, s_comTermSourceLineBase + 13);
+            H2_FREE(node, s_comTermSourceLineBase + 13);
         while ((node = pop_node(&s_comPorts[portIndex].priorityQueue)) != 0)
-            BaseFree(node, RETAIL_FILE, s_comTermSourceLineBase + 17);
+            H2_FREE(node, s_comTermSourceLineBase + 17);
     }
 }
 
@@ -298,11 +298,7 @@ i16 com_snd(i16 portIndex, u16, u16 length, void* data, i32 priority) {
                 ShutdownComError("Clear communications break");
             return 0;
         }
-        sendNode = static_cast<tag_Node*>(BaseAlloc(
-            length + COM_NODE_HEADER_SIZE,
-            RETAIL_FILE,
-            s_comSendSourceLineBase + 16
-        ));
+        sendNode = static_cast<tag_Node*>(H2_ALLOC(length + COM_NODE_HEADER_SIZE, s_comSendSourceLineBase + 16));
         if (sendNode != 0) {
             sendNode->len = length;
             memcpy(sendNode->comData, data, length);
@@ -364,7 +360,7 @@ void comm_wrt_task(void) {
                 ShutdownComError("Write communications data");
             writtenTotal += bytesWritten;
         }
-        BaseFree(packetNode, RETAIL_FILE, s_comWriteSourceLineBase + 28);
+        H2_FREE(packetNode, s_comWriteSourceLineBase + 28);
     }
 }
 

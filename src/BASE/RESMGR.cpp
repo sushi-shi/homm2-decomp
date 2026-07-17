@@ -305,7 +305,7 @@ void resourceManager::Close(void) {
     m_resourceListHead = 0;
     for (aggregateIndex = 0; aggregateIndex < RESOURCE_MANAGER_AGGREGATE_LIMIT; aggregateIndex++) {
         if (m_aggregateDir[aggregateIndex] != 0)
-            H2_FREE(m_aggregateDir[aggregateIndex], RETAIL_FILE, 0x1da);
+            H2_FREE(m_aggregateDir[aggregateIndex], 0x1da);
         if (m_aggregateFd[aggregateIndex] != RESOURCE_MANAGER_INVALID_FILE) {
             close(m_aggregateFd[aggregateIndex]);
             m_aggregateFd[aggregateIndex] = RESOURCE_MANAGER_INVALID_FILE;
@@ -343,7 +343,7 @@ i32 resourceManager::LoadAggregateHeader(char* aggregateName) {
     m_aggregateEntryCount[m_curAggregate] = fileCountBuffer[0];
     directoryBytes = m_aggregateEntryCount[m_curAggregate] * RESOURCE_MANAGER_ENTRY_BYTES;
     m_aggregateDir[m_curAggregate] =
-        static_cast<aggEntry*>(H2_ALLOC(directoryBytes, RETAIL_FILE, 0x21e));
+        static_cast<aggEntry*>(H2_ALLOC(directoryBytes, 0x21e));
     read(m_aggregateFd[m_curAggregate], m_aggregateDir[m_curAggregate], directoryBytes);
     return RESOURCE_MANAGER_SUCCESS;
 }
