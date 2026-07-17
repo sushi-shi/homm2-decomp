@@ -24,7 +24,7 @@ i32 army::FindPath(i32 sourceHex, i32 targetHex, i32, i32 ignoreSpeed, i32 pathM
         m_monster.speed = COMBAT_PATH_IGNORE_SPEED;
 
     pathResult = gpSearchArray->FindCombatPath(sourceHex, targetHex, this, pathMode, 0);
-    if (!pathResult && (m_monster.attributes & MONSTER_ATTRIBUTE_WIDE) && pathMode == 0) {
+    if (!pathResult && HAS(m_monster.attributes, MONSTER_ATTRIBUTE_WIDE) && pathMode == 0) {
         switch (m_facing) {
             case 0:
                 targetHex = GetAdjacentCellIndex(targetHex, COMBAT_DIRECTION_NORTHEAST);
@@ -52,7 +52,7 @@ i32 army::ValidPath(i32 targetHex, i32 pathMode) {
     if (!ValidHex(targetHex))
         return 0;
 
-    if (m_monster.attributes & MONSTER_ATTRIBUTE_FLYING)
+    if HAS(m_monster.attributes, MONSTER_ATTRIBUTE_FLYING)
         return ValidFlight(targetHex, pathMode);
 
     pathResult = FindPath(m_hex, targetHex, m_monster.speed, 0, pathMode);
@@ -89,14 +89,14 @@ i32 army::GetAttackMask(i32 sourceHex, i32 targetMode, i32 targetHex) {
     i32 directionBitFlag;
     i32 attackHexNext;
 
-    if (m_monster.attributes & MONSTER_ATTRIBUTE_WIDE)
+    if HAS(m_monster.attributes, MONSTER_ATTRIBUTE_WIDE)
         blockedMaskValue = 0;
     else
         blockedMaskValue = COMBAT_PATH_SPECIAL_DIRECTION_MASK;
 
     directionBitFlag = 1;
 
-    if (m_monster.attributes & MONSTER_ATTRIBUTE_WIDE)
+    if HAS(m_monster.attributes, MONSTER_ATTRIBUTE_WIDE)
         directionCountNext = COMBAT_PATH_WIDE_DIRECTION_COUNT;
     else
         directionCountNext = COMBAT_PATH_DIRECTION_COUNT;
@@ -145,7 +145,7 @@ i32 army::ValidMove(i32 sourceHex, i32 direction) {
         frontValid = 1;
     }
 
-    if (m_monster.attributes & MONSTER_ATTRIBUTE_WIDE) {
+    if HAS(m_monster.attributes, MONSTER_ATTRIBUTE_WIDE) {
         rearHex = COMBAT_PATH_INVALID_HEX;
         switch (m_facing) {
             case 0:
@@ -206,7 +206,7 @@ i32 army::ValidAttack(
         return 0;
 
     adjacentSourceHex = sourceHex;
-    if (m_monster.attributes & MONSTER_ATTRIBUTE_WIDE) {
+    if HAS(m_monster.attributes, MONSTER_ATTRIBUTE_WIDE) {
         if (direction == COMBAT_DIRECTION_WIDE_WEST) {
             *attackHex = GetAdjacentCellIndex(
                 sourceHex,
