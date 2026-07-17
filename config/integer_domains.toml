@@ -26,6 +26,33 @@ evidence = [
 status = "reviewed"
 
 [[domain]]
+name = "ResourceType"
+declaration = "ResourceType"
+owner = "include/SOURCE/KB_TYPES.h"
+category = "serialized"
+production_carrier = "int table index and packed campaign-choice boundary"
+strict = true
+sentinels = []
+enumerators = [
+  "RES_WOOD",
+  "RES_MERCURY",
+  "RES_ORE",
+  "RES_SULFUR",
+  "RES_CRYSTAL",
+  "RES_GEMS",
+  "RES_GOLD",
+]
+interfaces = ["resource-array indexing", "campaign resource bonus choices"]
+members = []
+storage = ["seven-element resource amount and cost arrays", "campaign choice value field"]
+conversions = ["ResourceType to integer table index and campaign-choice transport"]
+evidence = [
+  "all economy arrays use the same wood-through-gold order",
+  "expansion campaign resource choices used the identical seven values",
+]
+status = "reviewed"
+
+[[domain]]
 name = "FactionType"
 declaration = "FactionType"
 owner = "include/SOURCE/KB_TYPES.h"
