@@ -67,11 +67,6 @@ typedef enum CastleInfoText {
 } CastleInfoText;
 
 typedef enum CastleConstant {
-    CASTLE_MESSAGE_HOVER = 4,
-    CASTLE_MESSAGE_WIDGET = 0x200,
-    CASTLE_INPUT_SELECT = 12,
-    CASTLE_INPUT_DESELECT = 13,
-    CASTLE_INPUT_ALTERNATE_SELECT = 14,
     CASTLE_QUICK_VIEW_MODIFIER = 2,
     CASTLE_EXIT_COMMAND = 10,
     CASTLE_MAGE_GUILD = 0,

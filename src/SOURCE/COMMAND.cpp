@@ -73,7 +73,7 @@ i32 combatManager::Main(tag_message &message)
         }
 
         if (gbThisNetHasControl == 0) {
-            if (message.type == COMBAT_EVENT_KEY) {
+            if (message.type == MESSAGE_KEY_DOWN) {
                 switch (message.payload.keyboard.keyCode) {
                 case COMBAT_KEY_CLOSE_NETWORK_BOX:
                     PopNetBox(0, -1);
@@ -96,13 +96,13 @@ i32 combatManager::Main(tag_message &message)
 
     if (gbNoShowCombat == 0) {
         if (m_gridSelectionDisabled != 0) {
-            while (message.type != COMBAT_EVENT_KEY &&
-                   message.type != COMBAT_EVENT_MOUSE_BUTTON &&
-                   message.type != COMBAT_EVENT_MOUSE_OTHER &&
-                   message.type != COMBAT_EVENT_NONE) {
+            while (message.type != MESSAGE_KEY_DOWN &&
+                   message.type != MESSAGE_LEFT_BUTTON_DOWN &&
+                   message.type != MESSAGE_RIGHT_BUTTON_DOWN &&
+                   message.type != MESSAGE_NONE) {
                 message = gpInputManager->GetEvent();
             }
-            if (message.type != COMBAT_EVENT_NONE)
+            if (message.type != MESSAGE_NONE)
                 m_gridSelectionDisabled = 0;
         }
         CheckChangeSelector();
@@ -568,7 +568,7 @@ i32 combatManager::ProcessCombatMsg(tag_message &message)
     tag_message pendingMessage;
 
     switch (message.type) {
-    case COMBAT_EVENT_WINDOW:
+    case MESSAGE_WIDGET:
         if ((message.payload.widget.parameter & COMBAT_WINDOW_HELP_FLAG) != 0) {
             if (message.payload.widget.command == COMBAT_WINDOW_HOVER ||
                 message.payload.widget.command == COMBAT_WINDOW_HELP) {
@@ -635,10 +635,10 @@ i32 combatManager::ProcessCombatMsg(tag_message &message)
         }
         break;
 
-    case COMBAT_EVENT_MOUSE_MOVE:
+    case MESSAGE_MOUSE_MOVE:
         if (m_gridSelectionDisabled == 0) {
             pendingMessage = gpInputManager->PeekEvent();
-            if (pendingMessage.type != COMBAT_EVENT_MOUSE_MOVE) {
+            if (pendingMessage.type != MESSAGE_MOUSE_MOVE) {
                 if (InCombatArea(message.payload.mouse.screenX, message.payload.mouse.screenY) != 0)
                     selectedHex_36 = GetGridIndex(mouseX, mouseY);
                 else
@@ -689,7 +689,7 @@ i32 combatManager::ProcessCombatMsg(tag_message &message)
         }
         return COMBAT_MAIN_CONTINUE;
 
-    case COMBAT_EVENT_KEY:
+    case MESSAGE_KEY_DOWN:
         switch (message.payload.keyboard.keyCode) {
         case COMBAT_KEY_CLOSE_NETWORK_BOX:
             PopNetBox(0, -1);
@@ -1190,7 +1190,7 @@ i32 WinCombatHandler(struct tag_message &message)
     i32 iDelay;
 
     if (giDialogTimeout != 0 && KBTickCount() > giDialogTimeout) {
-        message.type = COMBAT_EVENT_WINDOW;
+        message.type = MESSAGE_WIDGET;
         gpWindowManager->m_dialogResult = message.payload.widget.id;
         message.payload.widget.id = COMBAT_WIN_LOSE_CLOSE_COMMAND;
         message.payload.widget.command = message.payload.widget.id;
@@ -1198,7 +1198,7 @@ i32 WinCombatHandler(struct tag_message &message)
         return COMBAT_MAIN_FINISHED;
     }
 
-    if (message.type == COMBAT_EVENT_WINDOW) {
+    if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
         case COMBAT_WINDOW_CLICK:
             switch (message.payload.widget.id) {
@@ -1248,7 +1248,7 @@ i32 WinCombatHandler(struct tag_message &message)
     }
 
     if (KBTickCount() > glTimers[0]) {
-        animationMessage.type = COMBAT_EVENT_WINDOW;
+        animationMessage.type = MESSAGE_WIDGET;
         animationMessage.payload.widget.command = COMBAT_WIN_LOSE_RESOURCE_COMMAND;
         animationMessage.payload.widget.data.text = iconFile;
         ++giWinCmbtFrame;
@@ -1349,7 +1349,7 @@ i32 WinCombatHandler(struct tag_message &message)
             break;
         }
 
-        message.type = COMBAT_EVENT_WINDOW;
+        message.type = MESSAGE_WIDGET;
         message.payload.widget.command = COMBAT_WIN_LOSE_ANIMATION_COMMAND;
         message.payload.widget.id = COMBAT_WIN_LOSE_RESOURCE_DRAW_ID;
         message.payload.widget.data.value = frame;
@@ -1392,7 +1392,7 @@ void combatManager::ShowWinLoseArtifact(class heroWindow *window, i32 artifact)
     char *capturedArtifactName;
 
     sprintf(gText, "You have captured an enemy artifact!");
-    message.type = COMBAT_EVENT_WINDOW;
+    message.type = MESSAGE_WIDGET;
     message.payload.widget.command = COMBAT_WIN_LOSE_TEXT_COMMAND;
     message.payload.widget.id = COMBAT_WIN_LOSE_TEXT_ID;
     message.payload.widget.data.text = gText;
@@ -1475,7 +1475,7 @@ void combatManager::ShowSkeletons(class heroWindow *window)
                 "raise one of the enemy's dead to return under your service "
                 "as a Skeleton.");
     }
-    message.type = COMBAT_EVENT_WINDOW;
+    message.type = MESSAGE_WIDGET;
     message.payload.widget.command = COMBAT_WIN_LOSE_TEXT_COMMAND;
     message.payload.widget.id = COMBAT_WIN_LOSE_TEXT_ID;
     message.payload.widget.data.text = gText;
@@ -1535,7 +1535,7 @@ void combatManager::ShowEagleEyeSpell(class heroWindow *window)
             "spell '%s'.",
             m_heroes[m_combatResult]->m_name,
             gSpellNames[displayedSpell]);
-    spellMessage.type = COMBAT_EVENT_WINDOW;
+    spellMessage.type = MESSAGE_WIDGET;
     spellMessage.payload.widget.command = COMBAT_WIN_LOSE_TEXT_COMMAND;
     spellMessage.payload.widget.id = COMBAT_WIN_LOSE_TEXT_ID;
     spellMessage.payload.widget.data.text = gText;
@@ -1964,7 +1964,7 @@ void combatManager::DoVictory(i32 winningSide)
                             cBattleResults[COMBAT_RESULT_TEXT_VICTORY]);
                 }
             }
-            message.type = COMBAT_EVENT_WINDOW;
+            message.type = MESSAGE_WIDGET;
             message.payload.widget.command = COMBAT_WIN_LOSE_TEXT_COMMAND;
             message.payload.widget.id = COMBAT_WIN_LOSE_TEXT_ID;
             message.payload.widget.data.text = gText;
@@ -2052,7 +2052,7 @@ void combatManager::DoLoseWindow(void)
         }
     }
 
-    message.type = COMBAT_EVENT_WINDOW;
+    message.type = MESSAGE_WIDGET;
     message.payload.widget.command = COMBAT_WIN_LOSE_RESOURCE_COMMAND;
     message.payload.widget.id = COMBAT_WIN_LOSE_RESOURCE_LOAD_ID;
     message.payload.widget.data.text = animationFile_j;
@@ -2060,7 +2060,7 @@ void combatManager::DoLoseWindow(void)
     message.payload.widget.id = COMBAT_WIN_LOSE_RESOURCE_DRAW_ID;
     message.payload.widget.data.text = animationFile_j;
     m_winLoseWindow->BroadcastMessage(message);
-    message.type = COMBAT_EVENT_WINDOW;
+    message.type = MESSAGE_WIDGET;
     message.payload.widget.command = COMBAT_WIN_LOSE_TEXT_COMMAND;
     message.payload.widget.id = COMBAT_WIN_LOSE_TEXT_ID;
     message.payload.widget.data.text = gText;
@@ -2112,7 +2112,7 @@ i32 combatManager::DoSurrender(void)
     window = new heroWindow(74, 80, "surrendr.bin");
     if (window == 0)
         MemError();
-    message.type = COMBAT_EVENT_WINDOW;
+    message.type = MESSAGE_WIDGET;
     message.payload.widget.command = COMBAT_WIN_LOSE_RESOURCE_COMMAND;
     message.payload.widget.id = COMBAT_SURRENDER_PORTRAIT_RESOURCE_ID;
     sprintf(gText, "port%04d.icn",
@@ -2262,7 +2262,7 @@ void combatManager::ResetMouse(void)
         m_selectedHex = COMBAT_INVALID_HEX;
         ClearCombatMessages(0);
         gpMouseManager->MouseCoords(mouseX_f, mouseY_g);
-        message.type = COMBAT_EVENT_MOUSE_MOVE;
+        message.type = MESSAGE_MOUSE_MOVE;
         message.payload.mouse.x = message.payload.mouse.screenX = mouseX_f;
         message.payload.mouse.y = message.payload.mouse.screenY = mouseY_g;
         ProcessCombatMsg(message);

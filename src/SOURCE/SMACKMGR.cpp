@@ -284,7 +284,7 @@ void SmackManagerMain(void) {
         tag_message message;
         message = gpInputManager->GetEvent();
         switch (message.type) {
-        case SMACK_EVENT_MOUSE_MOVE:
+        case MESSAGE_MOUSE_MOVE:
             if (bSmackNum == SMACK_CHOOSE_CAMPAIGN) {
                 i32 campaignMouseX5;
                 i32 campaignMouseY3;
@@ -340,15 +340,15 @@ void SmackManagerMain(void) {
                 }
             }
             break;
-        case SMACK_EVENT_KEY:
-            if (message.payload.keyboard.keyCode == SMACK_ALT_KEY)
+        case MESSAGE_KEY_DOWN:
+            if (message.payload.keyboard.keyCode == INPUT_SCAN_F4)
                 break;
-        case SMACK_EVENT_QUIT:
+        case MESSAGE_RIGHT_BUTTON_DOWN:
             if (bSmackNum == SMACK_CHOOSE_CAMPAIGN)
                 break;
             if (bSmackNum == SMACK_EXPANSION_CAMPAIGN)
                 break;
-        case SMACK_EVENT_MOUSE_CLICK:
+        case MESSAGE_LEFT_BUTTON_DOWN:
             if (bSmackNum == SMACK_EARTH)
                 break;
             if (bSmackNum == SMACK_EXPANSION_CAMPAIGN && xLastChoice == -1)

@@ -52,7 +52,7 @@ i32 DoArenaDialog(void)
            "skill of your choice.");
     lineCount_3 = bigFont->LineLength(gText, ARENA_TEXT_WIDTH);
     textHeight_11 = lineCount_3 << ARENA_TEXT_LINE_SHIFT;
-    message.type = EVENT_WINDOW_MESSAGE;
+    message.type = MESSAGE_WIDGET;
     message.payload.widget.command = ARENA_BROADCAST_TEXT;
     message.payload.widget.id = ARENA_BROADCAST_TEXT_ID;
     message.payload.widget.data.text = gText;
@@ -82,7 +82,7 @@ i32 DoArenaDialog(void)
         arenaWinPtr->AddWidget(statWidgets[widgetIndex_12], -1);
     }
 
-    message.type = EVENT_WINDOW_MESSAGE;
+    message.type = MESSAGE_WIDGET;
     message.payload.widget.command = ARENA_BROADCAST_CONTROL;
     message.payload.widget.data.value = ARENA_BROADCAST_CONTROL_VALUE;
     message.payload.widget.id = EVENT_WINDOW_SEVENTH_BUTTON;
@@ -113,7 +113,7 @@ i32 ArenaWindowHandler(struct tag_message &message_1)
         gpSoundManager->SwitchAmbientMusic(
             giTerrainToMusicTrack[gpAdvManager->m_currentTerrain]);
     if (giDialogTimeout != 0 && KBTickCount() > giDialogTimeout) {
-        message_1.type = EVENT_WINDOW_MESSAGE;
+        message_1.type = MESSAGE_WIDGET;
         gpWindowManager->m_dialogResult = message_1.payload.widget.id;
         message_1.payload.widget.id = EVENT_WINDOW_CLOSE_COMMAND;
         message_1.payload.widget.command = message_1.payload.widget.id;
@@ -128,10 +128,10 @@ i32 ArenaWindowHandler(struct tag_message &message_1)
                 choice = 0;
             UpdateArenaIcons();
         }
-    } else if (message_1.type == EVENT_WINDOW_MESSAGE) {
+    } else if (message_1.type == MESSAGE_WIDGET) {
         switch (message_1.payload.widget.command) {
-        case EVENT_WINDOW_HOVER_COMMAND:
-        case EVENT_WINDOW_HELP_COMMAND:
+        case WIDGET_COMMAND_SELECT:
+        case WIDGET_COMMAND_ALTERNATE_SELECT:
             type_13 = NORMAL_DIALOG_NO_RESOURCE;
             extra_18 = NORMAL_DIALOG_NO_VALUE;
             if (message_1.payload.widget.parameter & EVENT_WINDOW_RESOURCE_FLAG) {
@@ -151,7 +151,7 @@ i32 ArenaWindowHandler(struct tag_message &message_1)
             }
             break;
 
-        case EVENT_WINDOW_CLICK_COMMAND:
+        case WIDGET_COMMAND_DESELECT:
             switch (message_1.payload.widget.id) {
             case ARENA_WIDGET_FIRST_ID:
             case ARENA_WIDGET_FIRST_ID + 1:

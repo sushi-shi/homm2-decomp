@@ -455,7 +455,7 @@ i32 fileRequester::Main(struct tag_message &message)
     tag_message broadcastMessage;
 
     switch (message.type) {
-    case FILE_REQUESTER_EVENT_KEY:
+    case MESSAGE_KEY_DOWN:
         switch (message.payload.keyboard.keyCode) {
         case FILE_REQUESTER_KEY_CYCLE_FILTER: {
             if (m_selectedIndex != FILE_REQUESTER_SELECTION_NONE) {
@@ -477,7 +477,7 @@ i32 fileRequester::Main(struct tag_message &message)
             Update(1);
             break;
         }
-        case FILE_REQUESTER_KEY_UP:
+        case INPUT_SCAN_NUMPAD_8:
             if (m_selectedIndex > 0) {
                 --m_selectedIndex;
                 if (m_selectedIndex < m_topIndex) {
@@ -486,7 +486,7 @@ i32 fileRequester::Main(struct tag_message &message)
                 Update(1);
             }
             break;
-        case FILE_REQUESTER_KEY_DOWN:
+        case INPUT_SCAN_NUMPAD_2:
             if (m_fileCount - 1 > m_selectedIndex) {
                 ++m_selectedIndex;
                 if (m_selectedIndex >= m_topIndex + iMaxListSize) {
@@ -497,7 +497,7 @@ i32 fileRequester::Main(struct tag_message &message)
             break;
         }
         break;
-    case FILE_REQUESTER_EVENT_WIDGET:
+    case MESSAGE_WIDGET:
         switch (message.payload.widget.command) {
         case WIDGET_COMMAND_DESELECT:
                 if (message.payload.widget.id < FILE_REQUESTER_OK) {
@@ -674,7 +674,7 @@ i32 fileRequester::Main(struct tag_message &message)
                         break;
                     }
                     case FILE_REQUESTER_FILENAME_ENTRY: {
-                        broadcastMessage.type = FILE_REQUESTER_EVENT_WIDGET;
+                        broadcastMessage.type = MESSAGE_WIDGET;
                         broadcastMessage.payload.widget.command =
                             WIDGET_COMMAND_GET_TEXT;
                         broadcastMessage.payload.widget.id =
@@ -845,7 +845,7 @@ i32 fileRequester::Main(struct tag_message &message)
             }
         }
         if (acceptStep != 0) {
-            message.type = FILE_REQUESTER_EVENT_EXIT;
+            message.type = MESSAGE_EXECUTIVE;
             message.payload.executive.command =
                 FILE_REQUESTER_EXECUTIVE_CLOSE;
             return FILE_REQUESTER_MAIN_CLOSE;

@@ -320,7 +320,7 @@ void game::ShowCampaignInfo(i32 viewOnly, i32)
         }
     }
 
-    message.type = CAMPAIGN_MESSAGE_WIDGET;
+    message.type = MESSAGE_WIDGET;
     if (!viewOnly) {
         message.payload.widget.command = CAMPAIGN_MESSAGE_DESELECT;
         message.payload.widget.id = CAMPAIGN_DIALOG_RESTART;
@@ -375,7 +375,7 @@ void game::CampaignInfoUpdate(i32 redraw)
     SCampaignChoice *choice;
     char armyName[CAMPAIGN_ARMY_NAME_BUFFER_SIZE];
 
-    message.type = CAMPAIGN_MESSAGE_WIDGET;
+    message.type = MESSAGE_WIDGET;
     for (map = 0; map < CAMPAIGN_TRACK_POINT_COUNT; ++map) {
         if (m_campaignMapEnabled[iCurViewSide][map]) {
             message.payload.widget.data.value = CAMPAIGN_TRACK_FRAME_COMPLETE;
@@ -408,7 +408,7 @@ void game::CampaignInfoUpdate(i32 redraw)
                 message.payload.widget.data.value += 6;
             }
         }
-        message.payload.widget.command = CAMPAIGN_MESSAGE_SET_FRAME;
+        message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
         message.payload.widget.id = map + CAMPAIGN_TRACK_WIDGET_FIRST;
         campWin->BroadcastMessage(message);
     }
@@ -419,7 +419,7 @@ void game::CampaignInfoUpdate(i32 redraw)
     sprintf(gText, "ctrack%02d.icn", iCampaignTrackType);
     campWin->BroadcastMessage(message);
 
-    message.payload.widget.command = CAMPAIGN_MESSAGE_SET_TEXT;
+    message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message.payload.widget.data.text = gText;
     message.payload.widget.id = CAMPAIGN_SCENARIO_NUMBER_WIDGET;
     if (iCurViewMap == CAMPAIGN_SWITCHING_MAP)
@@ -535,7 +535,7 @@ void game::CampaignInfoUpdate(i32 redraw)
 
     for (map = 0; map < CAMPAIGN_BONUS_CHOICE_COUNT; ++map) {
         message.payload.widget.id = map + CAMPAIGN_BONUS_WIDGET_FIRST;
-        message.payload.widget.command = CAMPAIGN_MESSAGE_SET_FRAME;
+        message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
         if (!bCampaignViewOnly &&
             gpGame->m_campaignMapEnabled[iCurViewSide][iCurViewMap])
             message.payload.widget.data.value = CAMPAIGN_WIDGET_ENABLE_FRAME;
@@ -571,14 +571,14 @@ i32 CampaignHandler(struct tag_message &message)
         gpSoundManager->SwitchAmbientMusic(
             giTerrainToMusicTrack[gpAdvManager->m_currentTerrain]);
     if (giDialogTimeout != 0 && giDialogTimeout < KBTickCount()) {
-        message.type = CAMPAIGN_MESSAGE_WIDGET;
+        message.type = MESSAGE_WIDGET;
         gpWindowManager->m_dialogResult = message.payload.widget.id;
         message.payload.widget.id = CAMPAIGN_CLOSE_COMMAND;
         message.payload.widget.command = message.payload.widget.id;
         giDialogTimeout = 0;
         return CAMPAIGN_HANDLER_CLOSE;
     }
-    if (message.type == CAMPAIGN_MESSAGE_WIDGET) {
+    if (message.type == MESSAGE_WIDGET) {
       switch (message.payload.widget.command) {
     case CAMPAIGN_MESSAGE_HOVER:
     case CAMPAIGN_MESSAGE_HELP:

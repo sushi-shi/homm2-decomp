@@ -12,15 +12,6 @@ typedef enum CombatMainResult {
     COMBAT_MAIN_FINISHED = 2
 } CombatMainResult;
 
-typedef enum CombatInputEvent {
-    COMBAT_EVENT_NONE = 0,
-    COMBAT_EVENT_KEY = 1,
-    COMBAT_EVENT_MOUSE_MOVE = 4,
-    COMBAT_EVENT_MOUSE_BUTTON = 8,
-    COMBAT_EVENT_MOUSE_OTHER = 0x20,
-    COMBAT_EVENT_WINDOW = 0x200
-} CombatInputEvent;
-
 typedef enum CombatKeyCommand {
     COMBAT_KEY_MOUSE_COORDS = 2,
     COMBAT_KEY_VIEW_ARMY = 0x14,

@@ -1431,9 +1431,9 @@ i32 WaitHandler(tag_message &msg)
     i32 result = 0;
     gbFunctionComplete = 1;
     PollSound();
-    if (msg.type == EVENT_WINDOW_MESSAGE) {
+    if (msg.type == MESSAGE_WIDGET) {
         switch (msg.payload.widget.command) {
-        case EVENT_WINDOW_CLICK_COMMAND:
+        case WIDGET_COMMAND_DESELECT:
             switch (msg.payload.widget.id) {
             case EVENT_WINDOW_FIRST_BUTTON:
             case EVENT_WINDOW_SECOND_BUTTON:
@@ -1493,7 +1493,7 @@ i32 WaitHandler(tag_message &msg)
     CheckShingleUpdate();
     if (result != 0) {
         gpWindowManager->m_dialogResult = EVENT_WINDOW_SECOND_BUTTON;
-        msg.type = EVENT_WINDOW_MESSAGE;
+        msg.type = MESSAGE_WIDGET;
         msg.payload.widget.id = EVENT_WINDOW_CLOSE_COMMAND;
         msg.payload.widget.command = msg.payload.widget.id;
         return 2;
@@ -1511,17 +1511,17 @@ i32 EventWindowHandler(struct tag_message &msg)
         gpSoundManager->SwitchAmbientMusic(
             giTerrainToMusicTrack[gpAdvManager->m_currentTerrain]);
     if (giDialogTimeout != 0 && KBTickCount() > giDialogTimeout) {
-        msg.type = EVENT_WINDOW_MESSAGE;
+        msg.type = MESSAGE_WIDGET;
         gpWindowManager->m_dialogResult = msg.payload.widget.id;
         msg.payload.widget.id = EVENT_WINDOW_CLOSE_COMMAND;
         msg.payload.widget.command = msg.payload.widget.id;
         giDialogTimeout = 0;
         return EVENT_WINDOW_CLOSE;
     }
-    if (msg.type == EVENT_WINDOW_MESSAGE) {
+    if (msg.type == MESSAGE_WIDGET) {
         switch (msg.payload.widget.command) {
-        case EVENT_WINDOW_HOVER_COMMAND:
-        case EVENT_WINDOW_HELP_COMMAND:
+        case WIDGET_COMMAND_SELECT:
+        case WIDGET_COMMAND_ALTERNATE_SELECT:
             type = NORMAL_DIALOG_NO_RESOURCE;
             extra = NORMAL_DIALOG_NO_VALUE;
             if (msg.payload.widget.parameter & EVENT_WINDOW_RESOURCE_FLAG) {
@@ -1591,7 +1591,7 @@ i32 EventWindowHandler(struct tag_message &msg)
                 }
             }
             break;
-        case EVENT_WINDOW_CLICK_COMMAND:
+        case WIDGET_COMMAND_DESELECT:
             switch (msg.payload.widget.id) {
             case EVENT_WINDOW_FIRST_BUTTON:
             case EVENT_WINDOW_SECOND_BUTTON:
@@ -2743,7 +2743,7 @@ void PopNetBox(char *text, i32 netPlayer)
         Process1WindowsMessage();
         event_a = gpInputManager->GetEvent();
         switch (event_a.type) {
-        case NET_BOX_KEY_MESSAGE:
+        case MESSAGE_KEY_DOWN:
             messageTime_b = 0;
             switch (event_a.payload.keyboard.keyCode) {
             case NET_BOX_KEY_ESCAPE:
