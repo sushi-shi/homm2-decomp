@@ -2662,7 +2662,7 @@ void combatManager::ShowMassSpell(i8 (*const affected)[20], i32 effect, i32 anim
                         < target->m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_DEATH)])
                         effectFrames =
                             target->m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_DEATH)];
-                    gpSoundManager->MemorySample(target->m_samples[ARMY_SAMPLE_KILL]);
+                    gpSoundManager->MemorySample(target->m_samples[IDX(ARMY_SAMPLE_KILL)]);
                 } else {
                     if (effectFrames
                         < target->m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WINCE)])
@@ -2672,7 +2672,7 @@ void combatManager::ShowMassSpell(i8 (*const affected)[20], i32 effect, i32 anim
                         < target->m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WINCE_RETURN)])
                         returnFrames = target->m_frameInfo
                                            .animationFrameCount[IDX(ARMY_ANIMATION_WINCE_RETURN)];
-                    gpSoundManager->MemorySample(target->m_samples[ARMY_SAMPLE_WINCE]);
+                    gpSoundManager->MemorySample(target->m_samples[IDX(ARMY_SAMPLE_WINCE)]);
                 }
             }
         }

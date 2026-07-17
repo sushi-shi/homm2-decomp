@@ -337,14 +337,14 @@ i32 army::FlyTo(i32 destination) {
                     if ((m_monsterType == CREATURE_VAMPIRE
                          || m_monsterType == CREATURE_VAMPIRE_LORD)
                         && flightSegment == 0) {
-                        gpSoundManager->MemorySample(m_samples[ARMY_SAMPLE_EXTRA_ONE]);
+                        gpSoundManager->MemorySample(m_samples[IDX(ARMY_SAMPLE_EXTRA_ONE)]);
                         DelayMilli(ARMY_VAMPIRE_FLIGHT_SOUND_DELAY);
                     } else if ((m_monsterType == CREATURE_VAMPIRE
                                 || m_monsterType == CREATURE_VAMPIRE_LORD)
                                && flightSegmentCount - 1 == flightSegment) {
-                        gpSoundManager->MemorySample(m_samples[ARMY_SAMPLE_EXTRA_TWO]);
+                        gpSoundManager->MemorySample(m_samples[IDX(ARMY_SAMPLE_EXTRA_TWO)]);
                     } else {
-                        gpSoundManager->MemorySample(m_samples[ARMY_SAMPLE_MOVE]);
+                        gpSoundManager->MemorySample(m_samples[IDX(ARMY_SAMPLE_MOVE)]);
                     }
                 }
 

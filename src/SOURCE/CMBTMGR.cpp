@@ -769,7 +769,7 @@ void combatManager::LoadArmies(void) {
     for (groupSlot = 0; groupSlot < COMBAT_ARMY_CAPACITY; groupSlot++) {
         for (side = 0; side < COMBAT_MANAGER_SIDE_COUNT; side++) {
             m_armies[side][groupSlot].m_quantity = 0;
-            m_armies[side][groupSlot].m_monsterType = -1;
+            m_armies[side][groupSlot].m_monsterType = CREATURE_NONE;
         }
     }
 
@@ -788,7 +788,7 @@ void combatManager::LoadArmies(void) {
                 combatHex = COMBAT_SPREAD_HEX_STEP * groupSlot + COMBAT_ATTACKER_SPREAD_HEX;
 
             m_armies[COMBAT_ATTACKER_SIDE][m_armyCount[COMBAT_ATTACKER_SIDE]].Init(
-                m_armyGroups[COMBAT_ATTACKER_SIDE]->m_creatureTypes[groupSlot],
+                CreatureType(m_armyGroups[COMBAT_ATTACKER_SIDE]->m_creatureTypes[groupSlot]),
                 m_armyGroups[COMBAT_ATTACKER_SIDE]->m_creatureCounts[groupSlot],
                 COMBAT_ATTACKER_SIDE,
                 m_armyCount[COMBAT_ATTACKER_SIDE],
@@ -810,7 +810,7 @@ void combatManager::LoadArmies(void) {
                 combatHex = COMBAT_SPREAD_HEX_STEP * groupSlot + COMBAT_DEFENDER_SPREAD_HEX;
 
             m_armies[COMBAT_DEFENDER_SIDE][m_armyCount[COMBAT_DEFENDER_SIDE]].Init(
-                m_armyGroups[COMBAT_DEFENDER_SIDE]->m_creatureTypes[groupSlot],
+                CreatureType(m_armyGroups[COMBAT_DEFENDER_SIDE]->m_creatureTypes[groupSlot]),
                 m_armyGroups[COMBAT_DEFENDER_SIDE]->m_creatureCounts[groupSlot],
                 COMBAT_DEFENDER_SIDE,
                 m_armyCount[COMBAT_DEFENDER_SIDE],
@@ -1630,11 +1630,11 @@ i32 combatManager::ExperienceValueOfStack(i32 side) {
     i32 index;
 
     for (index = 0; index < COMBAT_ARMY_CAPACITY; index++) {
-        if (m_armies[side][index].m_monsterType != -1
+        if (m_armies[side][index].m_monsterType != CREATURE_NONE
             && !HAS(m_armies[side][index].m_monster.flags.all, MONSTER_FLAGS_SUMMONED)) {
             experienceValue6 +=
                 (m_armies[side][index].m_initialQuantity - m_armies[side][index].m_quantity)
-                * gMonsterDatabase[m_armies[side][index].m_monsterType].hitPoints;
+                * gMonsterDatabase[IDX(m_armies[side][index].m_monsterType)].hitPoints;
         }
     }
     if (m_heroes[side])
