@@ -2046,7 +2046,7 @@ float philAI::GetOddsOfWinning(i32) {
 VA(0x0043ce91, 0x826)
 void philAI::ValueOfBuyingBuilding(
     town* townPtr,
-    i32 building,
+    BuildingSlotType building,
     i32& resourceValue,
     float& benefitCost
 ) {
@@ -2105,11 +2105,11 @@ void philAI::ValueOfBuyingBuilding(
     }
 
     switch (building) {
-        case IDX(BUILDING_SLOT_CASTLE):
+        case BUILDING_SLOT_CASTLE:
             if (townPtr->m_mayNotUpgradeToCastle != 0)
                 adjustedValue = -99.0f;
             break;
-        case IDX(BUILDING_SLOT_MAGE_GUILD):
+        case BUILDING_SLOT_MAGE_GUILD:
             if (townPtr->m_type == 0 || townPtr->m_type == 1) {
                 if ((townPtr->m_buildState >= 4 && giCurTurn < 40)
                     || (townPtr->m_buildState >= 3 && giCurTurn < 30)
@@ -2125,14 +2125,14 @@ void philAI::ValueOfBuyingBuilding(
                 adjustedValue = static_cast<float>(adjustedValue * 0.55);
             }
             break;
-        case IDX(BUILDING_SLOT_SPECIAL_ONE):
+        case BUILDING_SLOT_SPECIAL_ONE:
             if (townPtr->m_type == 5
                 && (townPtr->m_buildings & BIT(BUILDING_SLOT_DWELLING_THIRD)))
                 adjustedValue = 1500.0f;
             else if (giCurTurn < 21)
                 adjustedValue = 0.0f;
             break;
-        case IDX(BUILDING_SLOT_SPECIAL_SEVEN):
+        case BUILDING_SLOT_SPECIAL_SEVEN:
             if (giCurTurn < 3 && !(townPtr->m_buildings & BIT(BUILDING_SLOT_DWELLING_THIRD)))
                 adjustedValue = 0.0f;
             break;
@@ -2160,10 +2160,10 @@ void philAI::ValueOfBuyingBuilding(
             break;
         case 14:
             break;
-        case IDX(BUILDING_SLOT_DOCK):
+        case BUILDING_SLOT_DOCK:
             adjustedValue = 0.0f;
             break;
-        case IDX(BUILDING_SLOT_SPECIAL_FOUR):
+        case BUILDING_SLOT_SPECIAL_FOUR:
             adjustedValue = static_cast<float>(
                 (gpCurPlayer->m_attentionWeights.buildingValue + 0.66) * adjustedValue
             );
@@ -2176,7 +2176,7 @@ void philAI::ValueOfBuyingBuilding(
                 && gpGame->m_day < 6)
                 adjustedValue = 0.0f;
             break;
-        case IDX(BUILDING_SLOT_NECROMANCER_SHRINE):
+        case BUILDING_SLOT_NECROMANCER_SHRINE:
             if (townPtr->m_type == 5)
                 break;
             if ((townPtr->m_type == 0
@@ -2288,7 +2288,7 @@ void philAI::GetBestBuilding(town* t, BHC& bhc, float& fOut) {
     for (node = 0; node < 32; node++) {
         if (!(t->m_buildings & (1 << node)) || (node == 0 && t->m_buildState < 5)) {
             if (CanBuild(t, node)) {
-                ValueOfBuyingBuilding(t, node, cost, idx);
+                ValueOfBuyingBuilding(t, BuildingSlotType(node), cost, idx);
                 if (gpCurPlayer->m_aiDifficulty == 1)
                     cost = static_cast<i32>(cost * 1.3);
                 score = (Random(1, 5) + 95) * idx / 100.0f;
@@ -5092,7 +5092,7 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
         switch (cell_k->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
             case MAP_OBJECT_MONSTER:
                 value_h = EvaluateMonsterEvent(
-                    cell_k->m_objectIndex,
+                    CreatureType(cell_k->m_objectIndex),
                     cell_k->m_objectMetadata,
                     liveChance
                 );
@@ -6119,7 +6119,7 @@ i32 philAI::EvaluateMineEvent(i32 mineIndex, i32 x, i32 y, i32* liveChance) {
 // the remaining residuals are compiler float-constant and division-guard identities.
 // This is not a relocation-only early stop. Revisit after PHILAI compiler state changes.
 VA(0x00446928, 0x33e)
-i32 philAI::EvaluateMonsterEvent(i32 monsterType, i32 eventData, i32* liveChance) {
+i32 philAI::EvaluateMonsterEvent(CreatureType monsterType, i32 eventData, i32* liveChance) {
     i32 result5;
     i32 outcomeValue0;
     i32 defenderRemaining6;
@@ -6173,7 +6173,7 @@ i32 philAI::EvaluateMonsterEvent(i32 monsterType, i32 eventData, i32* liveChance
         outcomeValue0
     );
     EvaluateOneTimeCreaturePurchase(
-        monsterType,
+        IDX(monsterType),
         monsterCount4,
         1,
         purchaseCost9,
@@ -6184,18 +6184,18 @@ i32 philAI::EvaluateMonsterEvent(i32 monsterType, i32 eventData, i32* liveChance
         static_cast<float>(
             gpPhilAI->FightValueOfStack(&gpCurAIHero->m_army, gpCurAIHero, 0, 0, 0, 0)
         )
-        / static_cast<float>(gMonsterDatabase[monsterType].fightValue * monsterCount4);
+        / static_cast<float>(gMonsterDatabase[IDX(monsterType)].fightValue * monsterCount4);
 
     if (willJoin15 && strengthRatio26 > AI_MONSTER_JOIN_RATIO
         && !gpCurAIHero->HasArtifact(ARTIFACT_HIDEOUS_MASK)
-        && gpCurAIHero->m_army.CanJoin(monsterType) && monsterType != CREATURE_GHOST
+        && gpCurAIHero->m_army.CanJoin(IDX(monsterType)) && monsterType != CREATURE_GHOST
         && monsterType != CREATURE_EARTH_ELEMENTAL && monsterType != CREATURE_AIR_ELEMENTAL
         && monsterType != CREATURE_FIRE_ELEMENTAL && monsterType != CREATURE_WATER_ELEMENTAL) {
         *liveChance = 100;
         *liveChance = static_cast<i32>(
             winChance9 * AI_MONSTER_JOIN_CHANCE_SCALE + AI_MONSTER_JOIN_CHANCE_BASE
         );
-        if (gpCurAIHero->m_army.CanJoin(monsterType))
+        if (gpCurAIHero->m_army.CanJoin(IDX(monsterType)))
             result5 = attackerLoss6;
         else
             result5 = 0;
@@ -6208,7 +6208,7 @@ i32 philAI::EvaluateMonsterEvent(i32 monsterType, i32 eventData, i32* liveChance
             result5 = 120;
         else
             result5 = 0;
-        result5 += gMonsterDatabase[monsterType].hitPoints * monsterCount4;
+        result5 += gMonsterDatabase[IDX(monsterType)].hitPoints * monsterCount4;
     } else {
         *liveChance = static_cast<i32>(winChance9 * AI_MONSTER_FIGHT_CHANCE_SCALE);
         result5 = outcomeValue0;
