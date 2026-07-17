@@ -5,6 +5,10 @@
 #include <va.h>
 #include <BASE/resource.h>
 
+typedef enum PaletteConstant {
+    PALETTE_DATA_SIZE = 0x300
+} PaletteConstant;
+
 #pragma pack(push, 1) // recovered layout is byte-packed
 class palette : public resource {
 public:

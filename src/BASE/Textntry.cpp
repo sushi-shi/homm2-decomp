@@ -99,7 +99,7 @@ textEntryWidget::textEntryWidget(
     m_color = 1;
     m_rectH = m_height;
 #line 61 RETAIL_FILE
-    m_text = static_cast<char*>(H2_ALLOC(static_cast<u16>(maxLength) + 5, 0x3e));
+    m_text = static_cast<char*>(H2_ALLOC(static_cast<u16>(maxLength) + 5, 62));
     strcpy(m_text, text);
     if (layout == 4) {
         m_innerX = horizontalInset + m_x;
@@ -131,7 +131,7 @@ void textEntryWidget::Read(i32 type) {
     m_height = gpResourceManager->ReadWord();
     m_maxLength = gpResourceManager->ReadWord();
 #line 99
-    m_text = static_cast<char*>(H2_ALLOC_AT(m_maxLength + 5, RETAIL_FILE "\0", 0x63));
+    m_text = static_cast<char*>(H2_ALLOC_AT(m_maxLength + 5, RETAIL_FILE "\0", 99));
     gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_text), m_maxLength);
     gpResourceManager->Read13(reinterpret_cast<i8*>(resourceName));
     gpResourceManager->SavePosition();
@@ -235,7 +235,7 @@ i32 textEntryWidget::Main(struct tag_message& message) {
                 Draw();
                 gpWindowManager->UpdateScreenRegion(mouseX, mouseY, m_width, m_height);
                 i16 done = 0;
-                glTimers[0] = KBTickCount() + 0x168;
+                glTimers[0] = KBTickCount() + 360;
                 gpMouseManager->ReallyHidePointer();
                 tag_message event;
                 do {
@@ -444,12 +444,12 @@ VA(0x004d9570, 0x1be)
 void textEntryWidget::SetupDisplayString(char* source, u16 cursor) {
     if (KBTickCount() > glTimers[0]) {
         m_cursorBlink = 1 - m_cursorBlink;
-        glTimers[0] = KBTickCount() + 0x168;
+        glTimers[0] = KBTickCount() + 360;
     }
     if (cursor != 0)
         strncpy(m_text, source, cursor);
     if (m_cursorBlink != 0)
-        m_text[cursor] = 0x1f;
+        m_text[cursor] = FONT_SPACER_CHAR;
     else
         m_text[cursor] = '_';
     if (cursor < strlen(source))

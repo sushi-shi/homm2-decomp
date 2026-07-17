@@ -334,6 +334,10 @@ DATA(0x004ee750) SBuildingInfo sBuildingInfo[FACTION_COUNT][TOWN_BUILDING_COUNT]
 // post-95 TU-state sweep found several disposable 99.7685% candidates but no
 // audited exact closure; every candidate failed the strict size/identity guard.
 // Revisit only after a material TU-state change.
+typedef enum TownDialogResult {
+    DIALOG_CANCEL_ID = 0x7801
+} TownDialogResult;
+
 VA(0x00413900, 0x16a)
 townObject::townObject(i32 townType, i32 buildingId, char* iconBaseName) {
     char fileName[TOWN_OBJECT_FILENAME_SIZE];
@@ -1136,7 +1140,7 @@ i32 townManager::Main(tag_message& message) {
                                     buildSample_m = NULL_SAMPLE2;
                                     buildSample_m = LoadPlaySample("buildtwn.82M");
                                     hero* townHero = gpGame->GetHero(m_town->m_occupyingHeroId);
-                                    i32 fizzleWidth = 0x228;
+                                    i32 fizzleWidth = 552;
                                     m_townWindow->DrawWindow(0);
                                     m_garrisonStrip->DrawIcons(0);
                                     m_heroStrip->DrawIcons(0);
@@ -1363,7 +1367,7 @@ i32 townManager::Main(tag_message& message) {
                                     && gpAdvManager->GetCell(m_town->m_boatX, m_town->m_boatY)
                                                ->m_triggerType
                                            == 0) {
-                                    m_heroWindow0 = new heroWindow(0xb1, 0x14, "shipwind.bin");
+                                    m_heroWindow0 = new heroWindow(177, 20, "shipwind.bin");
                                     if (m_heroWindow0 == 0)
                                         MemError();
                                     SetWinText(m_heroWindow0, 12);
@@ -1374,7 +1378,7 @@ i32 townManager::Main(tag_message& message) {
                                         message.type = MESSAGE_WIDGET;
                                         message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
                                         message.payload.widget.id = TOWN_DIALOG_BUILD_BOAT;
-                                        message.payload.widget.data.value = 0x1000;
+                                        message.payload.widget.data.value = WIDGET_FLAG_GRAYED;
                                         m_heroWindow0->BroadcastMessage(message);
                                         message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
                                         message.payload.widget.data.value = 2;
@@ -1744,7 +1748,7 @@ void townManager::SplitArmy(void) {
     i32 sameCreature;
     tag_message message;
 
-    m_heroWindow1 = new heroWindow(0xb1, 0x14, "splitwin.bin");
+    m_heroWindow1 = new heroWindow(177, 20, "splitwin.bin");
     if (m_heroWindow1 == 0)
         MemError();
     m_splitAmount = 0;
@@ -1954,10 +1958,10 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
         }
     }
 
-    dialogWidth_e = 0x50;
-    dialogHeight_f = 0x28;
-    dialogLeft_a = 0x20;
-    dialogControl_g = 0x121;
+    dialogWidth_e = 80;
+    dialogHeight_f = 40;
+    dialogLeft_a = 32;
+    dialogControl_g = 289;
     dialogResult_b = 0;
     dialogButtonWidth_l = 2;
     dialogButtonCount_m = 3;
@@ -2003,24 +2007,24 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
     }
     strcat(description_b, "\n ");
 
-    lineCount_j = bigFont->LineLength(description_b, 0xf0);
-    windowY_m = 0x97;
+    lineCount_j = bigFont->LineLength(description_b, 240);
+    windowY_m = 151;
     windowHeight_a = windowY_m;
     windowHeight_a += lineCount_j << 4;
     if (resourceCount_a <= 4)
-        windowHeight_a += 0x2c;
+        windowHeight_a += 44;
     else
-        windowHeight_a += 0x58;
+        windowHeight_a += 88;
     if (quickView == 0)
-        windowHeight_a += 0x27;
-    windowRows_b = (windowHeight_a - 0x45) / 0x2d;
+        windowHeight_a += 39;
+    windowRows_b = (windowHeight_a - 69) / 45;
     if (windowRows_b < 3)
         windowRows_b = 3;
     if (windowRows_b > 6)
         windowRows_b = 6;
 
     sprintf(gText, "buybuil%d.bin", windowRows_b);
-    window_a = new heroWindow(0x9e, 0x10, gText);
+    window_a = new heroWindow(158, 16, gText);
     if (window_a == 0)
         MemError();
 
@@ -2069,7 +2073,7 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
     widgetIndex_f = 0;
     resourceIcon_c = gpResourceManager->GetIcon("resource.icn");
     for (row_l = 0; row_l < 2; ++row_l) {
-        rowY_o = row_l * 0x2c + lineCount_j * 0x10 + windowY_m + 0xc;
+        rowY_o = row_l * 44 + lineCount_j * 16 + windowY_m + 12;
         if (row_l == 0)
             resourcesInRow_l = topRowCount_c;
         else
@@ -2090,8 +2094,8 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
             for (index_h = 0; index_h < resourcesInRow_l; ++index_h) {
                 rowWidth_h += GetIconEntry(resourceIcon_c, rowResourceTypes_a[index_h])->w;
             }
-            spacing_h = (0x100 - rowWidth_h) / (resourcesInRow_l + 1);
-            xStart_b = spacing_h + 0x20;
+            spacing_h = (256 - rowWidth_h) / (resourcesInRow_l + 1);
+            xStart_b = spacing_h + 32;
             x_d = xStart_b;
             for (index_h = 0; index_h < resourcesInRow_l; ++index_h) {
                 entryWidth_o = GetIconEntry(resourceIcon_c, rowResourceTypes_a[index_h])->w;
@@ -2153,7 +2157,7 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
         window_a->BroadcastMessage(message_m);
         message_m.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message_m.payload.widget.data.value = 6;
-        message_m.payload.widget.id = 0x7801;
+        message_m.payload.widget.id = DIALOG_CANCEL_ID;
         window_a->BroadcastMessage(message_m);
         message_m.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message_m.payload.widget.data.value = 6;
@@ -2170,7 +2174,7 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
             window_a->BroadcastMessage(message_m);
             message_m.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
             message_m.payload.widget.id = TOWN_DIALOG_CONFIRM;
-            message_m.payload.widget.data.value = 0x1000;
+            message_m.payload.widget.data.value = WIDGET_FLAG_GRAYED;
             window_a->BroadcastMessage(message_m);
         }
         gpWindowManager->DoDialog(window_a, TrueFalseDialogHandler, 0);
@@ -2232,7 +2236,7 @@ void townManager::BuildObj(i32 building) {
 
         giMaxExtentY = 0;
         giMaxExtentX = giMaxExtentY;
-        giMinExtentX = 0x27f;
+        giMinExtentX = 639;
         giMinExtentY = 0xFF;
         gbComputeExtent = 1;
         gbSaveBiggestExtent = 1;
@@ -2491,7 +2495,7 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
     i32 townYWork;
     i32 newHeroClassCount;
 
-    m_heroWindow1 = new heroWindow(0xb1, 0x10, "rcrthero.bin");
+    m_heroWindow1 = new heroWindow(177, 16, "rcrthero.bin");
     if (m_heroWindow1 == 0)
         MemError();
     SetWinText(m_heroWindow1, 0x14);
@@ -2509,7 +2513,7 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
         messageLocal.payload.widget.id = TOWN_DIALOG_CONFIRM;
         m_heroWindow1->BroadcastMessage(messageLocal);
         messageLocal.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-        messageLocal.payload.widget.data.value = 0x1000;
+        messageLocal.payload.widget.data.value = WIDGET_FLAG_GRAYED;
         messageLocal.payload.widget.id = 8;
         m_heroWindow1->BroadcastMessage(messageLocal);
         messageLocal.payload.widget.id = 9;
@@ -2643,7 +2647,7 @@ void townManager::DoTavern(void) {
     i32 unusedValue = 0;
     tag_message message;
 
-    m_heroWindow0 = new heroWindow(0xa2, 10, "tavwin.bin");
+    m_heroWindow0 = new heroWindow(162, 10, "tavwin.bin");
     if (m_heroWindow0 == 0)
         MemError();
     SetWinText(m_heroWindow0, 0x16);
@@ -2714,7 +2718,7 @@ i32 SplitArmyHandler(tag_message& message) {
                         break;
                     case TOWN_DIALOG_CONFIRM:
                         if (gpTownManager->m_splitAmount == 0)
-                            gpWindowManager->m_dialogResult = 0x7801;
+                            gpWindowManager->m_dialogResult = DIALOG_CANCEL_ID;
                         else
                             gpWindowManager->m_dialogResult = TOWN_DIALOG_CONFIRM;
                         handled = 1;
@@ -2889,14 +2893,14 @@ void townManager::SetupWell(heroWindow* window) {
 // a rank-loop source-shape or relevant TOWNMGR TU-state discovery.
 VA(0x0041a783, 0xf0f)
 void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
-    i16 unusedRankX_last = 0x102;
-    i16 unusedRankWidth_category = 0x44;
-    i16 unusedRankY_j = 0x1b;
-    i16 unusedRankHeight_player = 0x18;
-    i16 unusedRankIconHeight_k = 0x16;
-    i16 unusedIconWidth_index = 0x12;
-    i16 unusedIconHeight = 0x16;
-    i16 unusedPlayerWidth_value = 0x48;
+    i16 unusedRankX_last = 258;
+    i16 unusedRankWidth_category = 68;
+    i16 unusedRankY_j = 27;
+    i16 unusedRankHeight_player = 24;
+    i16 unusedRankIconHeight_k = 22;
+    i16 unusedIconWidth_index = 18;
+    i16 unusedIconHeight = 22;
+    i16 unusedPlayerWidth_value = 72;
     i32 category_stat;
     i8 categoryOrder_x[TOWN_THIEVES_ORDER_BUFFER_SIZE];
     i32 rank;
@@ -2920,10 +2924,10 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
     town* playerTown_k;
     i16 unusedFirstRankControl_slot = TOWN_THIEVES_FIRST_RANK_CONTROL;
     i16 unusedFirstPlayerControl_hero = TOWN_THIEVES_FIRST_PLAYER_CONTROL;
-    i16 unusedHeroY_p = 0x12c;
-    i16 unusedPrimaryStatsY = 0x153;
-    i16 unusedPersonalityY_player = 0x18d;
-    i16 unusedCreatureY_j = 0x1a2;
+    i16 unusedHeroY_p = 300;
+    i16 unusedPrimaryStatsY = 339;
+    i16 unusedPersonalityY_player = 397;
+    i16 unusedCreatureY_j = 418;
     i32 position_current;
     tag_message message_n;
     widget* textControl_icon;
@@ -2980,7 +2984,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                 ++tiedCount_value;
                 ++lastAtRank_j;
             }
-            rankX_m = 0x44 * rank + 0x102 - (tiedCount_value - 1) * 9;
+            rankX_m = 68 * rank + 258 - (tiedCount_value - 1) * 9;
             for (position_current = firstAtRank_rank; !(lastAtRank_j < position_current);
                  ++position_current) {
                 iconControl_last = new iconWidget(
@@ -3074,7 +3078,9 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                 if (strongestHeroPosition_first != -1) {
                     strongestHero_x = gpGame->GetPlayerHero(rank, strongestHeroPosition_first);
                     sprintf(gText, "Att.\nDef.\nPower\nKnowl.");
-                    widgetText_control = static_cast<char*>(H2_ALLOC(strlen(gText) + 1, 3598 + TOWN_THIEVES_SOURCE_LINE_HERO_LABELS));
+                    widgetText_control = static_cast<char*>(
+                        H2_ALLOC(strlen(gText) + 1, 3598 + TOWN_THIEVES_SOURCE_LINE_HERO_LABELS)
+                    );
                     strcpy(widgetText_control, gText);
                     textControl_icon = new textWidget(
                         static_cast<i16>(position_current * 0x44 + 0xef),
@@ -3097,7 +3103,9 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                         sprintf(statText_k, "%d\n", strongestHero_x->Stats(heroPosition_index));
                         strcat(gText, statText_k);
                     }
-                    widgetText_control = static_cast<char*>(H2_ALLOC(strlen(gText) + 1, 3598 + TOWN_THIEVES_SOURCE_LINE_HERO_STATS));
+                    widgetText_control = static_cast<char*>(
+                        H2_ALLOC(strlen(gText) + 1, 3598 + TOWN_THIEVES_SOURCE_LINE_HERO_STATS)
+                    );
                     strcpy(widgetText_control, gText);
                     textControl_icon = new textWidget(
                         static_cast<i16>(position_current * 0x44 + 0x11c),
@@ -3117,7 +3125,9 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                 if (informationLevel < TOWN_THIEVES_INFO_PERSONALITY) {
                 } else {
                     strcpy(gText, cPersonality[gpGame->m_players[rank].m_aiDifficulty]);
-                    widgetText_control = static_cast<char*>(H2_ALLOC(strlen(gText) + 1, 3598 + TOWN_THIEVES_SOURCE_LINE_PERSONALITY));
+                    widgetText_control = static_cast<char*>(
+                        H2_ALLOC(strlen(gText) + 1, 3598 + TOWN_THIEVES_SOURCE_LINE_PERSONALITY)
+                    );
                     strcpy(widgetText_control, gText);
                     textControl_icon = new textWidget(
                         static_cast<i16>(position_current * 0x44 + 0xe3),

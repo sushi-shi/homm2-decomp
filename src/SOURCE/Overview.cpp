@@ -307,9 +307,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                         overWin->AddWidget(OVERVIEW_ICON_WIDGET_ROWS[row][iconCount], -1);
                         iconCount++;
 
-                        valueText0 = static_cast<char*>(
-                            H2_ALLOC(6, 354)
-                        );
+                        valueText0 = static_cast<char*>(H2_ALLOC(6, 354));
                         sprintf(
                             valueText0,
                             "%d",
@@ -398,9 +396,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                         overWin->AddWidget(OVERVIEW_ICON_WIDGET_ROWS[row][iconCount], -1);
                         iconCount++;
 
-                        valueText0 = static_cast<char*>(
-                            H2_ALLOC(6, 414)
-                        );
+                        valueText0 = static_cast<char*>(H2_ALLOC(6, 414));
                         sprintf(
                             valueText0,
                             "%d",
@@ -504,9 +500,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
             iconCount++;
 
             for (item = 0; item < 4; item++) {
-                valueText0 = static_cast<char*>(
-                    H2_ALLOC(4, 502)
-                );
+                valueText0 = static_cast<char*>(H2_ALLOC(4, 502));
                 sprintf(valueText0, "%d", static_cast<i32>(heroData0->Stats(item)));
                 OVERVIEW_TEXT_WIDGET_ROWS[row][textItemCount] = new textWidget(
                     static_cast<i16>(item * 35 + 105),
@@ -567,9 +561,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                         overWin->AddWidget(OVERVIEW_ICON_WIDGET_ROWS[row][iconCount], -1);
                         iconCount++;
 
-                        valueText0 = static_cast<char*>(
-                            H2_ALLOC(6, 561)
-                        );
+                        valueText0 = static_cast<char*>(H2_ALLOC(6, 561));
                         sprintf(
                             valueText0,
                             "%d",
@@ -634,9 +626,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                     overWin->AddWidget(OVERVIEW_ICON_WIDGET_ROWS[row][iconCount + 1], -1);
                     iconCount += 2;
 
-                    valueText0 = static_cast<char*>(
-                        H2_ALLOC(2, 623)
-                    );
+                    valueText0 = static_cast<char*>(H2_ALLOC(2, 623));
                     sprintf(valueText0, "%d", static_cast<i32>(heroData0->GetSSLevel(detailIndex)));
                     OVERVIEW_TEXT_WIDGET_ROWS[row][textItemCount] = new textWidget(
                         static_cast<i16>(detailColumn * 35 + 255),
@@ -754,7 +744,9 @@ void game::SetupNewOverviewType(i32 overviewType, i32 redrawFrom) {
         }
     }
     for (title = 0; title < OVERVIEW_TITLE_COUNT; title++) {
-        titleCopy = static_cast<char*>(H2_ALLOC(strlen(cOverviewText[giOverviewType * OVERVIEW_TITLE_COUNT + title]) + 1, 740));
+        titleCopy = static_cast<char*>(
+            H2_ALLOC(strlen(cOverviewText[giOverviewType * OVERVIEW_TITLE_COUNT + title]) + 1, 740)
+        );
         strcpy(titleCopy, cOverviewText[giOverviewType * OVERVIEW_TITLE_COUNT + title]);
         textWidgetTitle[title] = new textWidget(
             titleLefts[giOverviewType][OD_STEER(title)],
@@ -1013,7 +1005,7 @@ i32 OverviewHandler(struct tag_message& message) {
                         }
                         scrollItemCount0 =
                             giOverviewItems[giOverviewType] - (OVERVIEW_VISIBLE_ROWS - 1);
-                        scrollDivisor3 = 0x7d64 / scrollItemCount0;
+                        scrollDivisor3 = 32100 / scrollItemCount0;
                         scrollY7 = message.payload.mouse.screenY;
                         scrollY7 -= OVERVIEW_SCROLL_MIN_Y;
                         scrollY7 -= OVERVIEW_SCROLL_KNOB_OFFSET;

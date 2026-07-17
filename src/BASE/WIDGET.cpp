@@ -38,8 +38,8 @@ widget::widget(void) {
     m_kind = EncodeWidgetKind(WIDGET_KIND_DEFAULT);
     m_y = 0;
     m_x = 0;
-    m_width = 0x10;
-    m_height = 0x10;
+    m_width = 16;
+    m_height = 16;
 }
 
 VA(0x004ddea0, 0x7)

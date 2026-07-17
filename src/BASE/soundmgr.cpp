@@ -24,6 +24,10 @@
 // ---- module-private synthetic globals (retail xref: single-module) ----
 DATA(0x00534970) static PCMWAVEFORMAT gWaveFormat; // digital-driver PCM format (WAVE_init_driver)
 
+typedef enum SoundStateSpan {
+    SOUND_STATE_RESET_SPAN = 0xae
+} SoundStateSpan;
+
 VA(0x004cb630, 0x68)
 void HandleMCIError(i32 param_1, char* param_2) {
     mciGetErrorStringA(param_1, lpszReturnString, 0xFF);
@@ -48,7 +52,7 @@ VA(0x004cb6a0, 0xc7)
 void soundManager::ValidatePreviousPosition(i32 param_1) {
     char buf[20];
     char* cur;
-    H2_ASSERT(param_1 >= 0 && param_1 < 0x3c, RETAIL_FILE, 66);
+    H2_ASSERT(param_1 >= 0 && param_1 < 60, RETAIL_FILE, 66);
     if (CDPreviousPosition[param_1][0] == 0)
         return;
     strcpy(buf, CDPreviousPosition[param_1]);
@@ -161,11 +165,11 @@ void soundManager::CDSetVolume(i32 param_1, i32 param_2) {
     if (local_c != 0) {
         i32 local_10;
         if (param_2 != 0)
-            local_10 = 0xc - (0xb - local_c / 0xc);
+            local_10 = 12 - (11 - local_c / 12);
         else
-            local_10 = 0xc - local_c;
-        local_10 <<= 0xc;
-        local_8 = local_10 << 0x10 | local_10;
+            local_10 = 12 - local_c;
+        local_10 <<= 12;
+        local_8 = local_10 << 16 | local_10;
     } else {
         local_8 = 0;
     }
@@ -213,7 +217,7 @@ void soundManager::CDPlay(i32 param_1, i32 param_2, i32 param_3, i32 param_4) {
         HandleMCIError(nMCIError, CommandString);
     if (stricmp(lpszReturnString, "stopped") != 0) {
         wsprintfA(CommandString, "status CD position");
-        nMCIError = mciSendStringA(CommandString, buffer, 0x14, 0);
+        nMCIError = mciSendStringA(CommandString, buffer, 20, 0);
         if (nMCIError != 0)
             HandleMCIError(nMCIError, CommandString);
         strcpy(CDPreviousPosition[m_currentTrack], buffer);
@@ -224,7 +228,7 @@ void soundManager::CDPlay(i32 param_1, i32 param_2, i32 param_3, i32 param_4) {
     Process1WindowsMessage();
     ServiceSound();
     if (param_4 == 0 && param_2 != 0 && CDPreviousPosition[param_1][0] != 0) {
-        if (param_1 == 0x2b)
+        if (param_1 == 43)
             wsprintfA(
                 CommandString,
                 "play CD from %s %s",
@@ -247,7 +251,7 @@ void soundManager::CDPlay(i32 param_1, i32 param_2, i32 param_3, i32 param_4) {
         if (nMCIError != 0)
             HandleMCIError(nMCIError, CommandString);
     } else {
-        if (param_1 == 0x2b)
+        if (param_1 == 43)
             wsprintfA(CommandString, "play CD from %d %s", param_1, notify ? " notify" : "");
         else
             wsprintfA(
@@ -270,8 +274,8 @@ void soundManager::CDPlay(i32 param_1, i32 param_2, i32 param_3, i32 param_4) {
     Process1WindowsMessage();
     ServiceSound();
     if (m_fadeSteps > 0) {
-        m_fadeSteps = 0xb;
-        glTimers[GLOBAL_MUSIC_FADE_TIMER_SLOT] = KBTickCount() + 0x1e0;
+        m_fadeSteps = 11;
+        glTimers[GLOBAL_MUSIC_FADE_TIMER_SLOT] = KBTickCount() + 480;
         CDSetVolume(0xa, 0);
     } else {
         CDSetVolume(param_3, 0);
@@ -305,19 +309,19 @@ i32 soundManager::ConvertVolume(i32 param_1, i32 param_2) {
     i32 local_8 = 0;
     if (param_2 == SOUND_VOLUME_MUSIC) {
         if (gConfig.musicVolume >= 1 && gConfig.musicVolume <= SOUND_VOLUME_STEPS) {
-            local_8 = ((0xb - gConfig.musicVolume) * param_1) / 10;
+            local_8 = ((11 - gConfig.musicVolume) * param_1) / 10;
             if (local_8 < 1)
                 local_8 = 1;
         }
     } else if (gConfig.soundVolume >= 1 && gConfig.soundVolume <= SOUND_VOLUME_STEPS) {
-        local_8 = ((0xb - gConfig.soundVolume) * param_1) / 10;
+        local_8 = ((11 - gConfig.soundVolume) * param_1) / 10;
         if (local_8 < 1)
             local_8 = 1;
     }
     if (local_8 < 0)
         local_8 = 0;
     if (SOUND_MIDI_VOLUME_MAX < local_8)
-        local_8 = 0x7f;
+        local_8 = 127;
     return local_8;
 }
 
@@ -333,7 +337,7 @@ void __stdcall SetReady2Poll(u32l) {
 VA(0x004cc300, 0x26)
 void __stdcall UpdateTimers(u32l) {
     iCalibrateLoop++;
-    glMilliCounter += 0x10;
+    glMilliCounter += 16;
     SetReady2Poll(0);
 }
 
@@ -343,9 +347,9 @@ soundManager::soundManager(void) : baseManager(), field_0x574(1) {
     m_active = 0;
     m_fadeSteps = 0;
     field_0x56c = 0;
-    for (local_8 = 0; local_8 < 0x20; local_8++)
+    for (local_8 = 0; local_8 < 32; local_8++)
         iLastVolume[local_8] = 0;
-    memset(&m_ready, 0, 0xae);
+    memset(&m_ready, 0, SOUND_STATE_RESET_SPAN);
     m_samplesReady = 0;
     m_digitalDriver = 0;
     field_0x3a = 0;
@@ -488,7 +492,7 @@ i32 soundManager::Open(i32) {
     }
 
     m_samplesReady = 1;
-    memset(&m_ready, 0, 0xae);
+    memset(&m_ready, 0, SOUND_STATE_RESET_SPAN);
     if (gbDontTryDigital == 0 && m_digitalDriver == 0)
         m_digitalDriver = WAVE_init_driver(22050, 8, 1, 0);
     if (m_digitalDriver == 0) {
@@ -502,7 +506,7 @@ i32 soundManager::Open(i32) {
     m_fading = 1;
 
 managerReady:
-    m_messageMask = 0x10;
+    m_messageMask = MESSAGE_LEFT_BUTTON_UP;
     m_priority = -1;
     m_active = 1;
     strcpy(m_name, "soundManager");
@@ -516,7 +520,7 @@ void soundManager::AllocateSampleHandles(void) {
         return;
     if (m_digitalDriver == 0)
         return;
-    for (local_8 = 0; local_8 < 0xe; local_8++) {
+    for (local_8 = 0; local_8 < 14; local_8++) {
         m_sampleHandles[local_8] = AIL_allocate_sample_handle(m_digitalDriver);
         if (m_sampleHandles[local_8] == 0)
             break;
@@ -643,7 +647,7 @@ void soundManager::ModifySample(struct _SAMPLE* sampleHandle, i16 operation, i32
                 iLastVolume[foundChannel] = static_cast<i16>(value);
             break;
         case SOUND_SAMPLE_OPERATION_MUSIC_VOLUME:
-            H2_ASSERT(gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI, RETAIL_FILE, 0x52f);
+            H2_ASSERT(gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI, RETAIL_FILE, 1327);
             AIL_set_sample_volume(sampleHandle, ConvertVolume(value, SOUND_VOLUME_MUSIC));
             if (foundChannel >= 0)
                 iLastVolume[foundChannel] = static_cast<i16>(value);
@@ -803,10 +807,11 @@ void soundManager::PollSound(void) {
     if (m_fadeSteps > 0) {
         LogStr("Poll Sound 1a");
         Process1WindowsMessage();
-        if (m_currentTrack < SOUND_CD_MUSIC_TRACK_FIRST || m_currentTrack > SOUND_CD_MUSIC_TRACK_LAST)
+        if (m_currentTrack < SOUND_CD_MUSIC_TRACK_FIRST
+            || m_currentTrack > SOUND_CD_MUSIC_TRACK_LAST)
             glTimers[GLOBAL_MUSIC_FADE_TIMER_SLOT] = KBTickCount();
         delta = glTimers[GLOBAL_MUSIC_FADE_TIMER_SLOT] - KBTickCount();
-        m_fadeSteps = delta / 0x3c;
+        m_fadeSteps = delta / 60;
         if (m_fadeSteps < 1)
             m_fadeSteps = 0;
         LogStr("Poll Sound 1b");
@@ -825,14 +830,14 @@ void soundManager::PollSound(void) {
             else
                 PlayAmbientMusic(m_fadeTargetTrack, 0, -1);
             now = glTimers[GLOBAL_MUSIC_FADE_TIMER_SLOT] - KBTickCount();
-            m_fadeSteps = now / 0x3c;
+            m_fadeSteps = now / 60;
             if (m_fadeSteps < 1)
                 m_fadeSteps = 0;
             m_currentTrack = static_cast<char>(m_fadeTargetTrack);
         }
         snap = m_fadeSteps;
         if (m_fadeSteps <= SOUND_FADE_HOLD_STEPS)
-            volume = (0xb - m_fadeSteps) * 0x40 / 0xb;
+            volume = (11 - m_fadeSteps) * 64 / 11;
         else
             volume = (m_fadeSteps - SOUND_FADE_HOLD_STEPS) * SOUND_SAMPLE_VOLUME_MAX / 6;
         if (volume > SOUND_SAMPLE_VOLUME_MAX)
@@ -842,7 +847,8 @@ void soundManager::PollSound(void) {
         LogStr("Poll Sound 1c");
         smp = m_sampleHandles[0];
         if (gConfig.musicSource != CONFIG_MUSIC_SOURCE_MIDI) {
-            volume = (SOUND_VOLUME_STEPS + 1 - gConfig.musicVolume) * volume * SOUND_MIDI_VOLUME_MAX / SOUND_CD_VOLUME_SCALE_DIVISOR;
+            volume = (SOUND_VOLUME_STEPS + 1 - gConfig.musicVolume) * volume * SOUND_MIDI_VOLUME_MAX
+                     / SOUND_CD_VOLUME_SCALE_DIVISOR;
             if (volume > SOUND_MIDI_VOLUME_MAX)
                 volume = SOUND_MIDI_VOLUME_MAX;
             if (volume < 0)
@@ -878,7 +884,7 @@ void soundManager::SwitchAmbientMusic(i32 param_1) {
     if ((m_fadeSteps != 0 && m_fadeTargetTrack != param_1)
         || (m_fadeSteps == 0 && m_currentTrack != param_1)) {
         if (m_fadeSteps <= SOUND_FADE_HOLD_STEPS) {
-            m_fadeSteps = 0xb;
+            m_fadeSteps = 11;
             glTimers[GLOBAL_MUSIC_FADE_TIMER_SLOT] = KBTickCount() + 900;
         }
         m_fadeTargetTrack = param_1;

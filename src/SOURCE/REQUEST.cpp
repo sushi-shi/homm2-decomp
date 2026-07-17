@@ -403,7 +403,7 @@ i32 fileRequester::Open(i32 id) {
         okEnabled3 = 1;
     }
     SetOK(okEnabled3);
-    m_messageMask = 0x4000;
+    m_messageMask = MESSAGE_EXECUTIVE;
     m_priority = id;
     m_active = 1;
     strcpy(m_name, "fileRequester");
@@ -423,7 +423,7 @@ void fileRequester::SetOK(i32 enabled) {
     if (m_active == 1) {
         message.payload.widget.data.value = 8;
     } else {
-        message.payload.widget.data.value = 0x1000;
+        message.payload.widget.data.value = WIDGET_FLAG_GRAYED;
     }
     m_window->BroadcastMessage(message);
     if (enabled) {

@@ -86,6 +86,10 @@ DATA(0x005280a8) static i32 s_drawPlayerColor;
 DATA(0x005280cc) static i32 s_adjacentMonsterEndX;
 DATA(0x005280d0) static i32 s_drawAnimationLength;
 DATA(0x005280d8) static i32 s_drawHeroYOffset;
+typedef enum AdvVisitMetadata {
+    VISIT_BIT_INDEX_MASK = 0x1f
+} AdvVisitMetadata;
+
 VA(0x00456350, 0x30f)
 advManager::advManager(void) {
     m_groundTiles = 0;
@@ -375,10 +379,7 @@ void advManager::Close(void) {
         gpSoundManager->StopAllSamples(0);
     }
     if (m_adventureBorder != 0) {
-        H2_FREE(
-            m_adventureBorder,
-            292 + ADVMGR_BORDER_INITIAL_FREE_LINE_OFFSET
-        );
+        H2_FREE(m_adventureBorder, 292 + ADVMGR_BORDER_INITIAL_FREE_LINE_OFFSET);
         m_adventureBorder = 0;
     }
 
@@ -1004,14 +1005,14 @@ i32 advManager::Main(struct tag_message& message) {
                         ViewWorld(0x35, 0, 0);
                         break;
                     case 49:
-                        cheatDigitLocal = 0x65;
+                        cheatDigitLocal = 'e';
                         strcpy(
                             gText,
                             "Are you sure you want to restart?  (Your current game will be lost)"
                         );
                         goto confirm_game_command;
                     case 38:
-                        cheatDigitLocal = 0x66;
+                        cheatDigitLocal = 'f';
                         strcpy(
                             gText,
                             "Are you sure you want to load a new game?  (Your current game will be "
@@ -1019,7 +1020,7 @@ i32 advManager::Main(struct tag_message& message) {
                         );
                         goto confirm_game_command;
                     case 16:
-                        cheatDigitLocal = 0x69;
+                        cheatDigitLocal = 'i';
                         strcpy(gText, "Are you sure you want to quit?");
                         goto confirm_game_command;
                     confirm_game_command:
@@ -3901,7 +3902,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                             "%s\n\n%s",
                             gQuickViewText[currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK],
                             (heroLocal->m_gazeboVisits
-                             & (1u << (currentCell->m_objectMetadata & 0x1f)))
+                             & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
                                 ? "(already visited)"
                                 : "(not visited)"
                         );
@@ -3916,7 +3917,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                             "%s\n\n%s",
                             gQuickViewText[currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK],
                             (heroLocal->m_fortVisits
-                             & (1u << (currentCell->m_objectMetadata & 0x1f)))
+                             & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
                                 ? "(already visited)"
                                 : "(not visited)"
                         );
@@ -3931,7 +3932,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                             "%s\n\n%s",
                             gQuickViewText[currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK],
                             (heroLocal->m_witchDoctorVisits
-                             & (1u << (currentCell->m_objectMetadata & 0x1f)))
+                             & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
                                 ? "(already visited)"
                                 : "(not visited)"
                         );
@@ -3946,7 +3947,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                             "%s\n\n%s",
                             gQuickViewText[currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK],
                             (heroLocal->m_mercenaryCampVisits
-                             & (1u << (currentCell->m_objectMetadata & 0x1f)))
+                             & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
                                 ? "(already visited)"
                                 : "(not visited)"
                         );
@@ -3961,7 +3962,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                             "%s\n\n%s",
                             gQuickViewText[currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK],
                             (heroLocal->m_standingStoneVisits
-                             & (1u << (currentCell->m_objectMetadata & 0x1f)))
+                             & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
                                 ? "(already visited)"
                                 : "(not visited)"
                         );
@@ -3976,7 +3977,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                             "%s\n\n%s",
                             gQuickViewText[currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK],
                             (heroLocal->m_treeKnowledgeVisits
-                             & (1u << (currentCell->m_objectMetadata & 0x1f)))
+                             & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
                                 ? "(already visited)"
                                 : "(not visited)"
                         );
@@ -3991,7 +3992,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                             "%s\n\n%s",
                             gQuickViewText[currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK],
                             (heroLocal->m_xanaduVisits
-                             & (1u << (currentCell->m_objectMetadata & 0x1f)))
+                             & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
                                 ? "(already visited)"
                                 : "(not visited)"
                         );
@@ -4085,14 +4086,17 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         sprintf(
                             gText,
                             "%d %s",
-                            currentCell->m_objectMetadata & 0xfff,
+                            currentCell->m_objectMetadata & MAP_MONSTER_COUNT_MASK,
                             gArmyNamesPlural[currentCell->m_objectIndex]
                         );
                     } else {
                         sprintf(
                             gText,
                             "%s %s",
-                            GetArmySizeName(currentCell->m_objectMetadata & 0xfff, 1),
+                            GetArmySizeName(
+                                currentCell->m_objectMetadata & MAP_MONSTER_COUNT_MASK,
+                                1
+                            ),
                             gArmyNamesPlural[currentCell->m_objectIndex]
                         );
                     }
@@ -4806,10 +4810,9 @@ i32 advManager::UpdBottomViewNewTurn(void) {
     }
     m_adventureWindow->AddWidget(m_bottomViewHourglassBackground, -1);
 
-    weekText = static_cast<char*>(H2_ALLOC(
-        ADVMGR_BOTTOM_VIEW_TEXT_BUFFER_SIZE,
-        4560 + ADVMGR_NEW_TURN_WEEK_ALLOC_LINE_OFFSET
-    ));
+    weekText = static_cast<char*>(
+        H2_ALLOC(ADVMGR_BOTTOM_VIEW_TEXT_BUFFER_SIZE, 4560 + ADVMGR_NEW_TURN_WEEK_ALLOC_LINE_OFFSET)
+    );
     sprintf(weekText, "%s: %d  %s: %d", "Month", gpGame->m_month, "Week", gpGame->m_week);
     m_bottomViewAllTexts[0] = new textWidget(
         ADVMGR_NEW_TURN_DATE_TEXT_X,
@@ -4828,10 +4831,9 @@ i32 advManager::UpdBottomViewNewTurn(void) {
     }
     m_adventureWindow->AddWidget(m_bottomViewAllTexts[0], -1);
 
-    dayText = static_cast<char*>(H2_ALLOC(
-        ADVMGR_BOTTOM_VIEW_TEXT_BUFFER_SIZE,
-        4560 + ADVMGR_NEW_TURN_DAY_ALLOC_LINE_OFFSET
-    ));
+    dayText = static_cast<char*>(
+        H2_ALLOC(ADVMGR_BOTTOM_VIEW_TEXT_BUFFER_SIZE, 4560 + ADVMGR_NEW_TURN_DAY_ALLOC_LINE_OFFSET)
+    );
     sprintf(dayText, "%s: %d", "Day", gpGame->m_day);
     m_bottomViewAllTexts[0] = new textWidget(
         ADVMGR_NEW_TURN_DATE_TEXT_X,
@@ -5448,9 +5450,8 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
             if (stackIconsWidgets[armyIndex] == 0) {
                 MemError();
             }
-            armyLabelsStrings[armyIndex] = static_cast<char*>(
-                H2_ALLOC(15, 4982 + ADVMGR_QUICK_VIEW_SECOND_ALLOC_LINE_OFFSET)
-            );
+            armyLabelsStrings[armyIndex] =
+                static_cast<char*>(H2_ALLOC(15, 4982 + ADVMGR_QUICK_VIEW_SECOND_ALLOC_LINE_OFFSET));
             strcpy(
                 armyLabelsStrings[armyIndex],
                 GetArmySizeName(targetHero->m_army.m_creatureCounts[displayIndexValue], 0)
@@ -5707,9 +5708,8 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
     }
 
     if (informationLevel == 0 || armyCountLocal == 0) {
-        emptyArmyLabel = static_cast<char*>(
-            H2_ALLOC(20, 5346 + ADVMGR_TOWN_VIEW_FIRST_ALLOC_LINE_OFFSET)
-        );
+        emptyArmyLabel =
+            static_cast<char*>(H2_ALLOC(20, 5346 + ADVMGR_TOWN_VIEW_FIRST_ALLOC_LINE_OFFSET));
         if (informationLevel == 0) {
             sprintf(emptyArmyLabel, "Unknown");
         } else {
@@ -5791,9 +5791,8 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
             if (armyIcons[widgetIndexWidget] == 0) {
                 MemError();
             }
-            armyLabelsResult[widgetIndexWidget] = static_cast<char*>(
-                H2_ALLOC(15, 5346 + ADVMGR_TOWN_VIEW_SECOND_ALLOC_LINE_OFFSET)
-            );
+            armyLabelsResult[widgetIndexWidget] =
+                static_cast<char*>(H2_ALLOC(15, 5346 + ADVMGR_TOWN_VIEW_SECOND_ALLOC_LINE_OFFSET));
             if (informationLevel == 3) {
                 sprintf(
                     armyLabelsResult[widgetIndexWidget],
@@ -5940,10 +5939,7 @@ void advManager::RedrawAdvScreen(i32 update, i32 freeBorder) {
     }
     gpResourceManager->GetBackdrop("advbord.icn", gpWindowManager->m_screen, 1);
     if (freeBorder) {
-        H2_FREE(
-            m_adventureBorder,
-            5672 + ADVMGR_BORDER_SECONDARY_FREE_LINE_OFFSET
-        );
+        H2_FREE(m_adventureBorder, 5672 + ADVMGR_BORDER_SECONDARY_FREE_LINE_OFFSET);
         m_adventureBorder = 0;
     }
     SaveAdventureBorder();
@@ -8511,10 +8507,9 @@ void advManager::SaveAdventureBorder(void) {
         return;
     }
 
-    m_adventureBorder = static_cast<u8*>(H2_ALLOC(
-        ADVMGR_BORDER_BUFFER_SIZE,
-        8229 + ADVMGR_BORDER_ALLOC_LINE_OFFSET
-    ));
+    m_adventureBorder = static_cast<u8*>(
+        H2_ALLOC(ADVMGR_BORDER_BUFFER_SIZE, 8229 + ADVMGR_BORDER_ALLOC_LINE_OFFSET)
+    );
     u8* savedPixels = m_adventureBorder;
     u8* screenPixel = gpWindowManager->m_screen->m_pixels;
     i32 row;

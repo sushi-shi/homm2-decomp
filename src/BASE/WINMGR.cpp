@@ -260,7 +260,6 @@ updatePalette:
 #include <SOURCE/kbwin.h>
 #include <SOURCE/NOOPT.h>
 
-
 VA(0x004caa80, 0x41)
 heroWindowManager::heroWindowManager(void) : baseManager() {
     m_active = 0;
@@ -300,7 +299,7 @@ i32 heroWindowManager::Open(i32 managerOrder) {
         WINDOW_SCREEN_WIDTH * WINDOW_SCREEN_HEIGHT
     );
     m_priority = managerOrder;
-    m_messageMask = 0x20;
+    m_messageMask = MESSAGE_RIGHT_BUTTON_DOWN;
     m_active = 1;
     strcpy(m_name, gWindowManagerText.managerName);
     return 0;
@@ -693,11 +692,17 @@ void heroWindowManager::FizzleForward(
             m_updateFlags = 0;
             if (delay == -1)
                 delay = WINDOW_FIZZLE_DEFAULT_DELAY;
-            i8* fadePalette = static_cast<i8*>(
-                H2_ALLOC_AT(WINDOW_PALETTE_BYTE_COUNT, gWindowManagerText.fadePaletteAllocSource, 808)
-            );
+            i8* fadePalette = static_cast<i8*>(H2_ALLOC_AT(
+                WINDOW_PALETTE_BYTE_COUNT,
+                gWindowManagerText.fadePaletteAllocSource,
+                808
+            ));
             m_fizzleWork = new bitmap(0, static_cast<i16>(width), static_cast<i16>(height));
-            i8* cycleTable = static_cast<i8*>(H2_ALLOC_AT(WINDOW_FIZZLE_CYCLE_TABLE_BYTES, gWindowManagerText.cycleTableAllocSource, 810));
+            i8* cycleTable = static_cast<i8*>(H2_ALLOC_AT(
+                WINDOW_FIZZLE_CYCLE_TABLE_BYTES,
+                gWindowManagerText.cycleTableAllocSource,
+                810
+            ));
             BlitBitmap(m_screen, x, y, width, height, m_fizzleWork, 0, 0);
 
             for (i32 frame = 0; frame < WINDOW_CYCLE_FRAME_COUNT; frame++) {

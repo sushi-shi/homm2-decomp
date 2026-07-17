@@ -51,8 +51,11 @@ typedef enum GameMapTrigger {
     MAP_TRIGGER_TOWN_BASE = 0x23,
     MAP_TRIGGER_MONSTER = 0x98,
     MAP_TRIGGER_RESOURCE = 0x9b,
+    MAP_TRIGGER_SEA_CHEST = 0xa1,
     MAP_TRIGGER_TOWN = 0xa3,
     MAP_TRIGGER_ARTIFACT = 0xa9,
+    MAP_TRIGGER_HERO = 0xaa,
+    MAP_TRIGGER_BOAT = 0xab,
     MAP_TRIGGER_RANDOM_ULTIMATE_ARTIFACT = 0xac,
     MAP_TRIGGER_RANDOM_ARTIFACT = 0xad,
     MAP_TRIGGER_RANDOM_RESOURCE = 0xae,
@@ -68,6 +71,13 @@ typedef enum GameMapTrigger {
     MAP_TRIGGER_RANDOM_ARTIFACT_LEVEL_2 = 0xf5,
     MAP_TRIGGER_RANDOM_ARTIFACT_LEVEL_3 = 0xf6
 } GameMapTrigger;
+
+// mapCell::m_objectMetadata layout for monster cells: low 12 bits carry the
+// troop count, bit 0x1000 marks a placed guardian.
+typedef enum GameMonsterMetadata {
+    MAP_MONSTER_COUNT_MASK = 0xfff,
+    MAP_MONSTER_GUARD_FLAG = 0x1000
+} GameMonsterMetadata;
 
 typedef enum GameDifficultyConstant {
     GAME_DIFFICULTY_HARD = 2,
@@ -103,6 +113,8 @@ typedef enum GameDiffEncoding {
     DIFF_LEN_WORD_FLAG = 0x40,
     DIFF_LEN_BYTE_FLAG = 0x20,
     DIFF_LEN_WORD_HIGH_MASK = 0x3f,
+    DIFF_LEN_HIGH_MASK = 0x2f0000,
+    DIFF_LEN_LOW_MASK = 0xffff,
     DIFF_LEN_SHORT_MASK = 0x1f,
     DIFF_LEN_BYTE_MAX = 0x1f,
     DIFF_LEN_WORD_MAX = 0x1fff
@@ -126,6 +138,7 @@ typedef enum GameWeeklyConstant {
     WEEKLY_RECRUIT_MIN_GROWTH = 2,
     WEEKLY_RECRUIT_MAX_GROWTH = 5,
     WEEKLY_RECRUIT_LIMIT = 1000,
+    WEEKLY_SITE_TYPE_MASK = 0x3f,
     WEEKLY_AVAILABLE_HERO = 64,
     WEEKLY_HERO_RESERVED_FLAG = 0x10000,
     WEEKLY_HERO_VISIT_FLAG = 0x800000
@@ -153,8 +166,7 @@ typedef enum GameMonthlyConstant {
     MONTH_MONSTER_SPAWN_MAX = 360,
     MONTH_MONSTER_SPAWN_ROLL = 10,
     MONTH_MONSTER_GUARD_ROLL_MAX = 100,
-    MONTH_MONSTER_GUARD_CHANCE = 20,
-    MONTH_MONSTER_GUARD_FLAG = 0x1000
+    MONTH_MONSTER_GUARD_CHANCE = 20
 } GameMonthlyConstant;
 
 typedef enum GameRandomTownConstant {

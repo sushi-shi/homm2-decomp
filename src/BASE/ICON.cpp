@@ -31,7 +31,7 @@ icon::icon(u32l id) : resource(1, id, 1, 0) {
     gpResourceManager->PointToFile(id);
     m_frameCount = gpResourceManager->ReadWord();
     u32 len = gpResourceManager->ReadLong();
-    m_data = static_cast<u8*>(H2_ALLOC_AT(len, allocationSourceFile, 0x12));
+    m_data = static_cast<u8*>(H2_ALLOC_AT(len, allocationSourceFile, 18));
     gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_data), len);
 }
 

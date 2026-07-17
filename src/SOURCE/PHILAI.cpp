@@ -145,7 +145,7 @@ void CheckDoMain(i32 a1, i32 doMain) {
                 gpAdvManager->m_previousOriginX = savedX;
                 gpAdvManager->m_previousOriginY = savedY;
             }
-            glTimers[0] = KBTickCount() + 0x78;
+            glTimers[0] = KBTickCount() + 120;
         }
         iLastFrameRateTimer = KBTickCount();
     }
@@ -413,7 +413,7 @@ i32 philAI::GoodAdjacent(i32* direction) {
             kn = normalDirTable[jb].x + gpCurAIHero->m_x;
             nb = normalDirTable[jb].y + gpCurAIHero->m_y;
             if ((gpAdvManager->GetCell(kn, nb)->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
-                && !(mapExtra[kn + (MAP_WIDTH | 0) * nb] & 0x80)
+                && !(mapExtra[kn + (MAP_WIDTH | 0) * nb] & MAP_EXTRA_ADJACENT_MONSTER)
                 && ((gpAdvManager->GetCell(kn, nb)->m_triggerType & MAP_TRIGGER_TYPE_MASK)
                     != MAP_OBJECT_MONSTER)
                 && ((gpAdvManager->GetCell(kn, nb)->m_triggerType & MAP_TRIGGER_TYPE_MASK)
@@ -622,7 +622,7 @@ void philAI::DimensionDoorTo(i32 x, i32 y) {
     if (gpCurAIHero->m_remainingMobility < AI_MINIMUM_TURN_MOBILITY)
         gpCurAIHero->m_remainingMobility = 0;
     else
-        gpCurAIHero->m_remainingMobility -= 0xe1;
+        gpCurAIHero->m_remainingMobility -= 225;
     gpCurAIHero->UseSpell(SPELL_DIMENSION_DOOR);
 }
 
@@ -952,17 +952,17 @@ void philAI::DoAI(i32 player) {
                                             gpCurAIHero->m_destinationY
                                         )
                                         ->m_triggerType
-                                    & 0x7f)
+                                    & MAP_TRIGGER_TYPE_MASK)
                                        != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_BOAT)) {
                                 gpCurAIHero->m_remainingMobility = 0;
                             }
                         }
-                        if (specialDirection6 != 0xffffffff) {
+                        if (specialDirection6 != -1) {
                             direction26 = specialDirection6;
                             steps14 = 99;
                             goto aiMoveDirection;
                         }
-                    } while (targetValue11 < 1000 && specialDirection6 == 0xffffffff
+                    } while (targetValue11 < 1000 && specialDirection6 == -1
                              && DoAnywhereDDoorTownGate(targetValue11));
 
                     if (targetValue11 < 75 && gpGame->m_day == 7
@@ -1774,7 +1774,7 @@ i32 philAI::DetermineTargetPosition(i32& targetX, i32& targetY, i32 mobility, i3
                                )) {
                         if ((gpAdvManager->GetCell(targetBestXRange, targetBestYLocal)
                                  ->m_triggerType
-                             & 0x80)
+                             & MAP_TRIGGER_ACTION_FLAG)
                             || ((abs(targetBestXRange - gpCurAIHero->m_x)
                                  + abs(targetBestYLocal - gpCurAIHero->m_y))
                                 | 0)
@@ -2287,13 +2287,13 @@ void philAI::GetBestBuilding(town* t, BHC& bhc, float& fOut) {
     nb = -99.0f;
     kn = -99.0f;
     jb = -1;
-    for (node = 0; node < 0x20; node++) {
+    for (node = 0; node < 32; node++) {
         if (!(t->m_buildings & (1 << node)) || (node == 0 && t->m_buildState < 5)) {
             if (CanBuild(t, node)) {
                 ValueOfBuyingBuilding(t, node, cost, idx);
                 if (gpCurPlayer->m_aiDifficulty == 1)
                     cost = static_cast<i32>(cost * 1.3);
-                score = (Random(1, 5) + 0x5f) * idx / 100.0f;
+                score = (Random(1, 5) + 95) * idx / 100.0f;
                 if (score > OD_STEER(kn)) {
                     jb = node;
                     nb = idx;
@@ -2553,7 +2553,7 @@ i32 philAI::MaxBuyableCreatures(i32 level) {
     GetMonsterCost(level, cost7);
     for (i = 0; i < 7; i++) {
         if (cost7[i] == 0)
-            res = 0x270f;
+            res = 9999;
         else if (gpCurPlayer->m_resources[i] > 0)
             res = gpCurPlayer->m_resources[i] / cost7[i];
         else
@@ -3193,20 +3193,20 @@ VA(0x0043fa3e, 0x14e)
 i32 philAI::ValueOfTown(town* t) {
     i32 sum = 0;
     i32 idx; // i
-    for (idx = 0; idx <= 0x18; idx++) {
+    for (idx = 0; idx <= 24; idx++) {
         if (t->m_buildings & (1 << idx))
             sum += GetBuildingBaseResourceValue(t->m_type, idx, t->m_buildState);
     }
     sum = (i32)(gafAITurnCostResource[RES_GOLD] * 1250.0f * 1.5 + sum);
-    sum += 0x2ee;
+    sum += 750;
     if (gpGame->m_mapHeader.lossCondition == MAP_LOSS_TOWN
         && t->m_x == gpGame->m_mapHeader.lossConditionValue
         && gpGame->m_mapHeader.lossTownY == t->m_y)
-        sum += 0xc350;
+        sum += 50000;
     if (gpGame->m_mapHeader.victoryCondition == MAP_VICTORY_CAPTURE_TOWN
         && t->m_x == gpGame->m_mapHeader.victoryConditionValue
         && gpGame->m_mapHeader.victoryTownY == t->m_y)
-        sum += 0xc350;
+        sum += 50000;
     return sum;
 }
 
@@ -3249,13 +3249,13 @@ float philAI::TurnValueOfObelisk(i32 player) {
     jb = gArtifactBaseRV[gpGame->m_ultimateArtifactId];
     if (gpGame->m_mapHeader.victoryCondition == 3)
         jb <<= 1;
-    idx = jb / 0x6e;
+    idx = jb / 110;
     if (gpGame->m_ultimateArtifactId == ARTIFACT_NONE)
         return 0.0f;
     ta->m_obeliskValue = idx * 48 / gpGame->m_obeliskCount;
     if (gpCurPlayer->m_aiDifficulty == 2)
         ta->m_obeliskValue = (i32)(ta->m_obeliskValue * 1.4);
-    ta->m_obeliskValue = (i32)((1.5 - abs(0x30 - gpGame->SetupPuzzlePieces(giCurPlayer, 1)) / 48.0f)
+    ta->m_obeliskValue = (i32)((1.5 - abs(48 - gpGame->SetupPuzzlePieces(giCurPlayer, 1)) / 48.0f)
                                * ta->m_obeliskValue);
     ta->m_obeliskValue =
         static_cast<i32>((ta->m_attentionWeights.heroValue + 0.66) * ta->m_obeliskValue);
@@ -3376,17 +3376,17 @@ i32 philAI::FightValueOfStack(
 
                 if ((gMonsterDatabase[group->m_creatureTypes[armySlotRecord]].attributes
                      & MONSTER_ATTRIBUTE_RANGED)
-                    || group->m_creatureTypes[armySlotRecord] == 0x34
-                    || group->m_creatureTypes[armySlotRecord] == 0x35
-                    || group->m_creatureTypes[armySlotRecord] == 0x14
-                    || group->m_creatureTypes[armySlotRecord] == 0x39
-                    || group->m_creatureTypes[armySlotRecord] == 0x22
-                    || group->m_creatureTypes[armySlotRecord] == 0x11) {
+                    || group->m_creatureTypes[armySlotRecord] == CREATURE_VAMPIRE
+                    || group->m_creatureTypes[armySlotRecord] == CREATURE_VAMPIRE_LORD
+                    || group->m_creatureTypes[armySlotRecord] == CREATURE_SPRITE
+                    || group->m_creatureTypes[armySlotRecord] == CREATURE_ROGUE
+                    || group->m_creatureTypes[armySlotRecord] == CREATURE_HYDRA
+                    || group->m_creatureTypes[armySlotRecord] == CREATURE_TROLL) {
                     quantityModifierTarget = static_cast<float>(quantityModifierTarget * 0.7);
                 } else if (group->m_creatureTypes[armySlotRecord] == CREATURE_WOLF) {
                     quantityModifierTarget = static_cast<float>(quantityModifierTarget * 0.85);
                 } else if (group->m_creatureTypes[armySlotRecord] == CREATURE_GRIFFIN
-                           || group->m_creatureTypes[armySlotRecord] == 0x3b) {
+                           || group->m_creatureTypes[armySlotRecord] == CREATURE_GHOST) {
                     quantityModifierTarget = static_cast<float>(quantityModifierTarget * 1.2);
                 }
                 stackValueMap = static_cast<i32>((quantityModifierTarget + 1.0f) * stackValueMap);
@@ -5304,8 +5304,8 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                     value_h = gArtifactBaseRV
                         [cell_k->m_objectMetadata & MAP_EVENT_ARTIFACT_CONDITION_ID_MASK];
                 } else {
-                    resource = (cell_k->m_objectMetadata & 0xf) - 1;
-                    amount_j = (cell_k->m_objectMetadata & 0xf0) >> 4;
+                    resource = (cell_k->m_objectMetadata & AI_EVENT_RESOURCE_TYPE_MASK) - 1;
+                    amount_j = (cell_k->m_objectMetadata & AI_ARTIFACT_EVENT_RESOURCE_MASK) >> 4;
                     value_h = static_cast<i32>(gafAITurnCostResource[resource] * amount_j);
                 }
                 break;
@@ -5436,7 +5436,7 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                         * spellPowerMod_m
                     );
                     for (index_k = 0; index_k < AI_TOWN_ARMY_SLOTS; index_k++) {
-                        gpMonGroup->m_creatureTypes[index_k] = 0x33;
+                        gpMonGroup->m_creatureTypes[index_k] = CREATURE_ROYAL_MUMMY;
                         gpMonGroup->m_quantities[index_k] = 10;
                     }
                     ChooseEvaluateBattle(
@@ -5678,7 +5678,7 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
     if (gbBerserk && gbReduceByBerserk)
         value_h = static_cast<i32>(value_h * fBerserkFactor);
     if (!immediate) {
-        if (value_h > 0 && (mapExtra[(MAP_WIDTH | 0) * y + x] & 0x80)
+        if (value_h > 0 && (mapExtra[(MAP_WIDTH | 0) * y + x] & MAP_EXTRA_ADJACENT_MONSTER)
             && (cell_k->m_triggerType & MAP_TRIGGER_TYPE_MASK) != MAP_OBJECT_MONSTER)
             value_h = 0;
         if (value_h < 0
@@ -5817,19 +5817,19 @@ i32 philAI::EvaluateRecruitSite(mapCell* cell) {
     val = 0;
     switch (node) {
         case 0:
-            nb = 0x3b;
+            nb = CREATURE_GHOST;
             break;
         case 1:
-            nb = 0x3e;
+            nb = CREATURE_EARTH_ELEMENTAL;
             break;
         case 2:
-            nb = 0x3f;
+            nb = CREATURE_AIR_ELEMENTAL;
             break;
         case 3:
-            nb = 0x40;
+            nb = CREATURE_FIRE_ELEMENTAL;
             break;
         case 4:
-            nb = 0x41;
+            nb = CREATURE_WATER_ELEMENTAL;
             break;
     }
     EvaluateOneTimeCreaturePurchase(nb, lvl, 0, idx, val, kn);
@@ -5848,16 +5848,13 @@ void InitAIMapVars(void) {
     // relocation order at all five commutative products.
     CloseAIMapVars();
     SVSearchArray.Init();
-    gaiLiveChanceOfPos =
-        static_cast<i16*>(H2_ALLOC(OD_STEER(MAP_WIDTH) * MAP_HEIGHT * 2, 7054));
+    gaiLiveChanceOfPos = static_cast<i16*>(H2_ALLOC(OD_STEER(MAP_WIDTH) * MAP_HEIGHT * 2, 7054));
     gaiHeroStrategicRVOfPos =
         static_cast<i16*>(H2_ALLOC(OD_STEER(MAP_WIDTH) * MAP_HEIGHT * 2, 7055));
     gaiHeroEventStratRVOfPos =
         static_cast<i16*>(H2_ALLOC(OD_STEER(MAP_WIDTH) * MAP_HEIGHT * 2, 7056));
-    gaiTurnValueOfMine =
-        static_cast<i8*>(H2_ALLOC(OD_STEER(MAP_WIDTH) * MAP_HEIGHT, 7057));
-    gaiEnemyHeroReachable =
-        static_cast<i8*>(H2_ALLOC(OD_STEER(MAP_WIDTH) * MAP_HEIGHT, 7058));
+    gaiTurnValueOfMine = static_cast<i8*>(H2_ALLOC(OD_STEER(MAP_WIDTH) * MAP_HEIGHT, 7057));
+    gaiEnemyHeroReachable = static_cast<i8*>(H2_ALLOC(OD_STEER(MAP_WIDTH) * MAP_HEIGHT, 7058));
 }
 
 VA(0x00445fe6, 0x112)
@@ -6135,8 +6132,8 @@ i32 philAI::EvaluateMonsterEvent(i32 monsterType, i32 eventData, i32* liveChance
     float strengthRatio26;
     i32 purchaseCost9;
 
-    monsterCount4 = eventData & 0xfff;
-    willJoin15 = eventData & 0x1000;
+    monsterCount4 = eventData & MAP_MONSTER_COUNT_MASK;
+    willJoin15 = eventData & MAP_MONSTER_GUARD_FLAG;
     result5 = 0;
     memset(gpMonGroup->m_creatureTypes, ARMY_GROUP_EMPTY_SLOT, ARMY_GROUP_SLOT_COUNT);
     memset(
