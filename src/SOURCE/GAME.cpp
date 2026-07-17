@@ -391,6 +391,11 @@ fullMap *game::GetWorldMapData(void)
     return &m_worldMap;
 }
 
+// @semantic
+// The 0x11e frame, CFG, and all three ordered relocations match. Only 12 bytes at
+// +0xf5..+0x104 differ: retail preserves the packed cell word before shifting boatIdx,
+// while MSVC emits the equivalent RHS-first order here. Whole-word, cast, and |0 variants
+// did not steer it; revisit only after GAME's cumulative declaration state changes.
 VA(0x0047187f, 0x11e)
 int game::CreateBoat(int x, int y, int notify)
 {
@@ -3471,6 +3476,10 @@ void game::WeeklyRecruitSite(mapCell *cell)
     cell->m_objectMetadata = packed | 0;
 }
 
+// @semantic
+// The complete 0x6f frame/CFG matches and neither side has relocations. The 12 bytes at
+// +0x30..+0x3f only reverse the equivalent packed-word/type evaluation order in case 4.
+// Whole-word, cast, and |0 variants did not steer it; revisit with new GAME TU state.
 VA(0x0047ebd5, 0x6f)
 void game::WeeklyGenericSite(mapCell *cell)
 {
@@ -3996,6 +4005,11 @@ void game::SetRandomHeroArmies(int heroId, int strongArmy)
     }
 }
 
+// @semantic
+// The recovered 0x40 frame, switch bodies, CFG, and all 56 relocation semantics match.
+// Retail's MAP_HEIGHT and MAP_WIDTH loop tests are each one byte shorter: mov global;
+// cmp local; jge at +0x61/+0x7e, versus mov local; cmp global; jle here, making this body
+// 0x748 bytes. Reversed comparisons and |0 bounds did not steer either test.
 VA(0x0048041e, 0x746)
 void game::ProcessRandomObjects(void)
 {
@@ -4246,6 +4260,10 @@ void game::GiveArmy(armyGroup *group, int type, int count, int slot)
     group->m_creatureCounts[i] += count;
 }
 
+// @semantic
+// The 0x91 frame/CFG and gMonsterDatabase relocation match. Only the two ModRM bytes at
+// +0x41/+0x44 differ because retail loads i before group for the creature-type subscript.
+// Direct, commuted i[array], and earlier-expression steering did not hold in canonical TU state.
 VA(0x00480f68, 0x91)
 int game::ExperienceValueOfStack(armyGroup *group, hero *h)
 {
@@ -4721,10 +4739,11 @@ void game::SetupTowns(void)
     }
 }
 
-// @early-stop
-// The recovered mapHeroExtra offsets, frame slots, CFG, and all 23 relocations match.
-// Retail loads MAP_WIDTH before mapX at the inner-loop test (0x774 bytes); this TU
-// loads mapX first (0x775 bytes). Both comparison polarities emit the latter form.
+// @semantic
+// The recovered mapHeroExtra offsets, 0x7c frame, CFG, and all 23 relocation semantics
+// match. Retail's MAP_HEIGHT/MAP_WIDTH tests load each global first at +0x44/+0x61;
+// this TU loads each local first, making the body 0x776 versus retail's 0x774. Reversed
+// comparisons and |0 bounds did not steer them; the remaining $SG spelling is compiler-local.
 VA(0x00482547, 0x774)
 void game::ProcessOnMapHeroes(void)
 {
@@ -6175,8 +6194,9 @@ void game::CheckForTimeEvent(void)
 }
 
 // @semantic
-// Frame/loops match; +0xc5..+0xe8 is only the equivalent packed expression
-// heroIndex + player * 283. Direct, commuted, accessor, and AST variants did not steer it.
+// The 0x143 frame/loops and all eight ordered relocations match; 17 raw bytes at
+// +0xc5..+0xe8 are only the equivalent packed expression heroIndex + player * 283.
+// Direct, commuted, accessor, and AST variants did not steer it.
 VA(0x00486153, 0x143)
 void CheckValidAvailableHeroes(void)
 {
