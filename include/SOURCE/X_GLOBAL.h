@@ -574,7 +574,7 @@ extern i32 giResType2;
 extern i32 gIndex;
 extern i32 giWeekTypeExtra;
 extern i32 giTCPType;
-extern i32 gCurLoadedSpellEffect;
+extern SpellType gCurLoadedSpellEffect;
 extern i32 giCurTempMobility;
 extern i32 giOverviewReturnAction;
 extern char cOverrideMIDIDriver[0x10];

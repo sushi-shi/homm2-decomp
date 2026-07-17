@@ -7516,7 +7516,7 @@ i32 TownPortalHandler(tag_message& message) {
 // negated, empty-arm, `| 0`, semantic-name, and AST permutations do not steer
 // this TU-cumulative /Od operand order (tu-cumulative-eval-order.md).
 VA(0x0046785d, 0x43e)
-void advManager::TownGate(i32 spellId) {
+void advManager::TownGate(SpellType spellId) {
     i32 distance0;
     hero* targetHero;
     tag_message message;
@@ -7629,7 +7629,7 @@ void advManager::TownGate(i32 spellId) {
         0,
         0
     );
-    targetHero->UseSpell(spellId);
+    targetHero->UseSpell(IDX(spellId));
     gpGame->m_castleRecs[gpCurPlayer->m_townIds[selectedTownIndex]].m_occupyingHeroId =
         targetHero->m_id;
     gpGame->m_castleRecs[gpCurPlayer->m_townIds[selectedTownIndex]].GiveSpells(0);
