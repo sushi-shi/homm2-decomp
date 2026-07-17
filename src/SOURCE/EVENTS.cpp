@@ -6454,7 +6454,7 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
     i32 siteType3;
     i32 unusedTriple26[3];
     i32 cursedArtifactCount5;
-    i32 creatureType3;
+    CreatureType creatureType3;
     i32 quantity6;
     i32 armyValue7;
 
@@ -6518,7 +6518,7 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
                 armyValue7 = 0;
                 for (artifactIndex1 = 0; artifactIndex1 < AI_EVENT_ARMY_STACK_COUNT;
                      artifactIndex1++) {
-                    creatureType3 = eventHero->m_army.m_creatureTypes[artifactIndex1];
+                    creatureType3 = static_cast<CreatureType>(eventHero->m_army.m_creatureTypes[artifactIndex1]);
                     if (creatureType3 != CREATURE_NONE) {
                         quantity6 = eventHero->m_army.m_quantities[artifactIndex1];
                         if (quantity6 > AI_EVENT_GRAVEYARD_ARMY_REMAINDER) {
@@ -6526,7 +6526,7 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
                                 static_cast<i16>(quantity6 * AI_GENERIC_SITE_GRAVEYARD_REMAINING);
                             armyValue7 +=
                                 (quantity6 - eventHero->m_army.m_quantities[artifactIndex1])
-                                * gMonsterDatabase[creatureType3].hitPoints;
+                                * gMonsterDatabase[IDX(creatureType3)].hitPoints;
                         }
                     }
                 }

@@ -1306,7 +1306,7 @@ char* GetBuildingName(FactionType race, BuildingSlotType building) {
 }
 
 VA(0x004997d4, 0x138)
-void GetBuildingCost(i32 race, i32 building, i32* const dest, i32 mageLevel) {
+void GetBuildingCost(FactionType race, BuildingSlotType building, i32* const dest, i32 mageLevel) {
     i32 level;
     if (building == BUILDING_SLOT_NECROMANCER_SHRINE && race == FACTION_NECROMANCER) {
         memcpy(dest, xShrineBuildingCost, KB_BUILDING_RESOURCE_COUNT * sizeof(i32));
@@ -1314,7 +1314,7 @@ void GetBuildingCost(i32 race, i32 building, i32* const dest, i32 mageLevel) {
                && building <= BUILDING_SLOT_DWELLING_LAST) {
         memcpy(
             dest,
-            gDwellingCosts[race][building - BUILDING_SLOT_DWELLING_FIRST],
+            gDwellingCosts[IDX(race)][building - BUILDING_SLOT_DWELLING_FIRST],
             KB_BUILDING_RESOURCE_COUNT * sizeof(i32)
         );
     } else if (building == BUILDING_SLOT_MAGE_GUILD) {
@@ -1323,11 +1323,11 @@ void GetBuildingCost(i32 race, i32 building, i32* const dest, i32 mageLevel) {
             level = KB_MAGE_GUILD_MAX_LEVEL;
         memcpy(dest, gMageBuildingCosts[mageLevel + 1], KB_BUILDING_RESOURCE_COUNT * sizeof(i32));
     } else if (building == BUILDING_SLOT_SPECIAL) {
-        memcpy(dest, gSpecialBuildingCosts[race], KB_BUILDING_RESOURCE_COUNT * sizeof(i32));
+        memcpy(dest, gSpecialBuildingCosts[IDX(race)], KB_BUILDING_RESOURCE_COUNT * sizeof(i32));
     } else {
         if (building >= KB_BUILDING_NEUTRAL_LIMIT)
             return;
-        memcpy(dest, gNeutralBuildingCosts[building], KB_BUILDING_RESOURCE_COUNT * sizeof(i32));
+        memcpy(dest, gNeutralBuildingCosts[IDX(building)], KB_BUILDING_RESOURCE_COUNT * sizeof(i32));
     }
 }
 
@@ -4400,8 +4400,8 @@ i32 CheckMem(void) {
 }
 
 VA(0x004a0b6d, 0x109)
-i32 GetManaCost(i32 spell, hero* h) {
-    i32 c = gsSpellInfo[spell].cost;
+i32 GetManaCost(SpellType spell, hero* h) {
+    i32 c = gsSpellInfo[IDX(spell)].cost;
     if (h != 0) {
         if (h->HasArtifact(ARTIFACT_EVIL_EYE)
             && (spell == SPELL_CURSE || spell == SPELL_MASS_CURSE))
