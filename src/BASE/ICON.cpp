@@ -88,20 +88,16 @@ i32 icon::CombatClipDrawToBuffer(i32 x, i32 y, i32 frame, struct SLimitData *lim
 {
     if (gbComputeExtent != 0) {
         i32 mirror = flip;
-        i32 entryOffset = frame * sizeof(IconEntry);
+        IconEntry *entry = &Entries()[frame];
         if (mirror != 0) {
-            limits->right = x -
-                            reinterpret_cast<IconEntry *>(m_data + entryOffset)->x;
-            limits->left = limits->right -
-                           reinterpret_cast<IconEntry *>(m_data + entryOffset)->w + 1;
+            limits->right = x - entry->x;
+            limits->left = limits->right - entry->w + 1;
         } else {
-            limits->left = reinterpret_cast<IconEntry *>(m_data + entryOffset)->x + x;
-            limits->right = reinterpret_cast<IconEntry *>(m_data + entryOffset)->w +
-                            limits->left - 1;
+            limits->left = entry->x + x;
+            limits->right = entry->w + limits->left - 1;
         }
-        limits->top = reinterpret_cast<IconEntry *>(m_data + entryOffset)->y + y;
-        limits->bottom = reinterpret_cast<IconEntry *>(m_data + entryOffset)->h +
-                         limits->top - 1;
+        limits->top = entry->y + y;
+        limits->bottom = entry->h + limits->top - 1;
         if (gbSaveBiggestExtent != 0) {
             if (limits->left < giMinExtentX)
                 giMinExtentX = limits->left;
@@ -198,11 +194,11 @@ void icon::FillToBuffer(i32 x, i32 y, i32 frame, i32 color, i32 flip,
         return;
     }
     if (gbLimitToExtent != 0 && limits != 0) {
-        limits->left = reinterpret_cast<IconEntry *>(m_data)[frame].x + x;
-        limits->right = reinterpret_cast<IconEntry *>(m_data)[frame].w +
+        limits->left = Entries()[frame].x + x;
+        limits->right = Entries()[frame].w +
                         limits->left - 1;
-        limits->top = reinterpret_cast<IconEntry *>(m_data)[frame].y + y;
-        limits->bottom = reinterpret_cast<IconEntry *>(m_data)[frame].h +
+        limits->top = Entries()[frame].y + y;
+        limits->bottom = Entries()[frame].h +
                          limits->top - 1;
         if (gbCurrArmyDrawn == 0 || limits->left > giMaxExtentX ||
             limits->right < giMinExtentX || limits->top > giMaxExtentY ||

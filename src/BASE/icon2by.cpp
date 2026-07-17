@@ -69,7 +69,7 @@ VA(0x004da270, 0x588)
 void IconToBitmapYModify(class icon *srcIcon, class bitmap *dest, i32 x, i32 y, i32 frame, i32 clip,
                          i32 clipX, i32 clipY, i32 clipW, i32 clipH, i32 color, i8 *shear)
 {
-    IconEntry *entries = reinterpret_cast<IconEntry *>(srcIcon->m_data);
+    IconEntry *entries = srcIcon->Entries();
     gYMEntry = &entries[frame];
     gYMSrc = reinterpret_cast<u8 *>(srcIcon->m_data) + gYMEntry->srcOffset;
     gYMX0 = gYMEntry->x + x;

@@ -19,6 +19,12 @@ public:
     // --- own members (base resource occupies 0x00..0x10; widths from access-analysis) ---
     i16  m_frameCount;  // +0x10
     char  *m_data;  // +0x12  (glyph/sprite data; indexed as a byte pointer)
+    // m_data heads with the serialized IconEntry frame table (m_frameCount rows);
+    // pixel runs follow at each entry's srcOffset. The typed view of the table
+    // lives here so call sites do not re-cast the blob.
+    struct IconEntry *Entries(void) {
+        return reinterpret_cast<struct IconEntry *>(m_data);
+    }
     // --- constructors ---
     icon(u32l);
     virtual ~icon();

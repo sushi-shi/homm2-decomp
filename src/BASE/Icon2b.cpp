@@ -79,10 +79,9 @@ void IconToBitmap(class icon *srcIcon, class bitmap *dest, i32 x, i32 y, i32 fra
                   i32 clip, i32 clipX, i32 clipY, i32 clipW, i32 clipH, i32 color)
 {
     u8 *data = reinterpret_cast<u8 *>(srcIcon->m_data);
-    i32 entryOffset = frame * sizeof(IconEntry);
-    i32 entryX = reinterpret_cast<IconEntry *>(data + entryOffset)->x;
-    i32 srcOffset = reinterpret_cast<IconEntry *>(data + entryOffset)->srcOffset;
-    IconEntry *entry = reinterpret_cast<IconEntry *>(data + entryOffset);
+    IconEntry *entry = &srcIcon->Entries()[frame];
+    i32 entryX = entry->x;
+    i32 srcOffset = entry->srcOffset;
     u8 *cursor = data + srcOffset;
     gIcEntry = entry;
     gIcSrc = cursor;

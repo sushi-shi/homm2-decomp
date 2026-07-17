@@ -114,7 +114,7 @@ i32 font::GetCharacterWidth(u8 c)
         c -= ' ';
         if (c < 0 || c > 0x5f)
             c = 0x5f;
-        return reinterpret_cast<IconEntry *>(m_glyphIcon->m_data)[c].w + m_isLarge;
+        return m_glyphIcon->Entries()[c].w + m_isLarge;
     }
 }
 

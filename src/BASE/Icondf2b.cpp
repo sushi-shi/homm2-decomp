@@ -51,7 +51,7 @@ VA(0x004daa20, 0x23b)
 void FlipDimIconToBitmap(class icon *srcIcon, class bitmap *dest, i32 x, i32 y, i32 frame,
                          i32 color, i32 clip, i32 clipX, i32 clipY, i32 clipW, i32 clipH)
 {
-    IconEntry *entries = reinterpret_cast<IconEntry *>(srcIcon->m_data);
+    IconEntry *entries = srcIcon->Entries();
     IconEntry *entry = &entries[frame];
     u8 *srcData = reinterpret_cast<u8 *>(entries) + entry->srcOffset;
     i32 x0 = x;

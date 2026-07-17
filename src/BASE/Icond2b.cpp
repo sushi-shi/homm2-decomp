@@ -51,7 +51,7 @@ VA(0x004cfd50, 0x26e)
 void DimIconToBitmap(class icon *srcIcon, class bitmap *dest, i32 x, i32 y, i32 frame,
                      i32 color, i32 clip, i32 clipX, i32 clipY, i32 clipW, i32 clipH)
 {
-    IconEntry *entries = reinterpret_cast<IconEntry *>(srcIcon->m_data);
+    IconEntry *entries = srcIcon->Entries();
     i32 entryX = entries[frame].x;
     IconEntry * const entry = &entries[frame];
     u8 * const srcData =
