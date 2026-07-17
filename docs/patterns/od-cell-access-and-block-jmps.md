@@ -1,4 +1,4 @@
-# /Od 2D cell access form + the block-jmp-to-next wall (SOLVED -> inline-accessors.md)
+# /Od 2D cell access and inline-continuation placement
 
 **tags:** `topic:od` `cpp:array` `toolchain:vc42` `cpp:inline`
 
@@ -20,14 +20,14 @@ mapCell *Row(int y) { return cells + width * y; }   // then Row(y)[x].extra
 ```
 gives `0xa(%eax,%ecx,4)` — the retail form. See `inline-accessors.md`.
 
-## the block-jmp wall — SOLVED
+## Inline-continuation cause recovered
 The `jmp $+0` filler was **inline expansion (`/Ob1`)**, not a mysterious /Od quirk:
 each inlined accessor call emits a per-site continuation `jmp $+0`. Reconstructing
 the `Row`/`Extra` inline accessors + `/Ob1` reproduces both the addressing and the
 jumps, taking GetNewCellExtra* from the ~86–91% plateau to ~97%. Full writeup:
 **`inline-accessors.md`**.
 
-## the block-jmp wall (topic:wall — not yet steered)
+## Residual continuation placement
 Retail GetNewCellExtraOverlay/Object carry /Od **jmp-to-next-instruction** filler
 that a literal translation does not emit: a *leading* `jmp` straight after the
 prologue (target+0x11), plus paired `jmp;jmp` at block ends and after returning

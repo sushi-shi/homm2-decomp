@@ -181,9 +181,9 @@ invalid HIGHLOW sites/targets, or any text evidence failure block promotion.
 Canonical coverage consumes the same generated, candidate-classified contribution manifest passed
 to Vostok; it never silently reverts to the raw PE-boundary split during promotion.
 
-## Current census
+## Checkpoint census
 
-The fresh candidate census contains 6,734 definitions: 1,232 resolve to source `DATA()` and 5,502
+The recorded candidate census contains 6,734 definitions: 1,232 resolve to source `DATA()` and 5,502
 are non-DATA candidate allocations. The reviewed supplemental manifest covers 634 of the latter,
 leaving 4,868 unreviewed definitions. This denominator includes public data, compiler-local statics,
 string literals, constant pools, vtables, and other compiler-emitted definitions.

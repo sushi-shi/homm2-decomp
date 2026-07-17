@@ -49,7 +49,7 @@ An older candidate readonly sequence was:
 | `0x264` | `Viewwrld.obj` | `0x10` | Complete bytes occur at retail `0x26c`. |
 | `0x278` | `PHILAI.obj` | `0x3c4` / `0x3c8` | Word alignment against retail places the next owner boundary at `0x5e0`, an inferred retail span of `0x360`. |
 | `0x640` | `ARMY.obj` | `0x68` | Word alignment begins the retail ARMY pool at `0x5e0`; its span to the swap vtable is `0x70`. |
-| `0x6a8` | `??_7swapManager@@6B@` | vtable | Retail offset `0x650`, current relative delta `+0x58`. |
+| `0x6a8` | `??_7swapManager@@6B@` | vtable | Retail offset `0x650`, then-current relative delta `+0x58`. |
 
 The combined source-contribution accounting is therefore `SPELLS -0x8`, `PHILAI
 +0x68`, and `ARMY -0x8`, producing the observed `+0x58`. This is an ownership and
@@ -77,8 +77,8 @@ storage.
 Recovering the real `static const int[8]` produces one `0x68` ADVMGR ordinary `.rdata`
 contribution: the `0x20` table followed by the existing `0x48` compiler constant pool.
 LINK places that ordinary contribution before `??_7advManager@@6B@`, as retail does.
-Consequently the advManager vtable changes from an independent `-0x10` relative delta to
-the same `+0x58` cumulative delta as swapManager. The swap-to-adv boundary is structurally
+Consequently the advManager vtable changed from an independent `-0x10` relative delta to
+the same then-current `+0x58` cumulative delta as swapManager. The swap-to-adv boundary was structurally
 resolved even though earlier SPELLS/PHILAI/ARMY contributions still displace both.
 
 ## Linker identity
