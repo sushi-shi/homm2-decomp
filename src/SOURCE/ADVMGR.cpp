@@ -705,7 +705,7 @@ i32 advManager::Main(struct tag_message& message) {
     }
     if (gbGameOver) {
         message.type = MESSAGE_EXECUTIVE;
-        message.payload.executive.command = EXECUTIVE_COMMAND_TERMINATE_LOOP;
+        message.payload.executive.command = IDX(EXECUTIVE_COMMAND_TERMINATE_LOOP);
         return 2;
     }
 
@@ -1136,7 +1136,7 @@ finish_message:
     }
     if (gbGameOver || exitRequestedFlag == 1 || giMenuCommand != -1) {
         message.type = MESSAGE_EXECUTIVE;
-        message.payload.executive.command = EXECUTIVE_COMMAND_TERMINATE_LOOP;
+        message.payload.executive.command = IDX(EXECUTIVE_COMMAND_TERMINATE_LOOP);
         return 2;
     }
     return processResult;
@@ -6280,19 +6280,19 @@ void advManager::CastSpell(SpellType spell) {
     i32 spellPowerValue;
     switch (spell) {
         case SPELL_SET_EARTH_GUARDIAN:
-            guardianTypes1[ADVMGR_MINE_GUARDIAN_TYPE_INDEX] = CREATURE_EARTH_ELEMENTAL;
+            guardianTypes1[ADVMGR_MINE_GUARDIAN_TYPE_INDEX] = IDX(CREATURE_EARTH_ELEMENTAL);
             goto setMineGuardian;
         case SPELL_SET_AIR_GUARDIAN:
-            guardianTypes1[ADVMGR_MINE_GUARDIAN_TYPE_INDEX] = CREATURE_AIR_ELEMENTAL;
+            guardianTypes1[ADVMGR_MINE_GUARDIAN_TYPE_INDEX] = IDX(CREATURE_AIR_ELEMENTAL);
             goto setMineGuardian;
         case SPELL_SET_FIRE_GUARDIAN:
-            guardianTypes1[ADVMGR_MINE_GUARDIAN_TYPE_INDEX] = CREATURE_FIRE_ELEMENTAL;
+            guardianTypes1[ADVMGR_MINE_GUARDIAN_TYPE_INDEX] = IDX(CREATURE_FIRE_ELEMENTAL);
             goto setMineGuardian;
         case SPELL_SET_WATER_GUARDIAN:
-            guardianTypes1[ADVMGR_MINE_GUARDIAN_TYPE_INDEX] = CREATURE_WATER_ELEMENTAL;
+            guardianTypes1[ADVMGR_MINE_GUARDIAN_TYPE_INDEX] = IDX(CREATURE_WATER_ELEMENTAL);
             goto setMineGuardian;
         case SPELL_HAUNT:
-            guardianTypes1[ADVMGR_MINE_GUARDIAN_TYPE_INDEX] = CREATURE_GHOST;
+            guardianTypes1[ADVMGR_MINE_GUARDIAN_TYPE_INDEX] = IDX(CREATURE_GHOST);
             goto setMineGuardian;
         setMineGuardian:
             currentCell = gpAdvManager->GetCell(currentHeroSlot->m_x, currentHeroSlot->m_y);
@@ -9495,9 +9495,9 @@ i32 SystemOptionsHandler(struct tag_message& message) {
                                     break;
                                 }
                                 gpSoundManager->SetMusicQuality(IDX(CONFIG_MUSIC_SOURCE_CD));
-                                gConfig.useOpera = CONFIG_OPERA_DISABLED;
+                                gConfig.useOpera = IDX(CONFIG_OPERA_DISABLED);
                             } else if (gConfig.useOpera == IDX(CONFIG_OPERA_DISABLED)) {
-                                gConfig.useOpera = CONFIG_OPERA_ENABLED;
+                                gConfig.useOpera = IDX(CONFIG_OPERA_ENABLED);
                             } else {
                                 if (gpSoundManager->m_midiStarted == 0) {
                                     gpSoundManager->MIDIStartup();

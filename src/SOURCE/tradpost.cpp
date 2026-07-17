@@ -112,7 +112,7 @@ void UpdateTradingPost(i32 draw) {
         );
     }
     messageTemp.type = MESSAGE_WIDGET;
-    messageTemp.payload.widget.command = TRADING_POST_SET_TEXT;
+    messageTemp.payload.widget.command = IDX(TRADING_POST_SET_TEXT);
     messageTemp.payload.widget.id = 1;
     messageTemp.payload.widget.data.text = gText;
     tpWindow->BroadcastMessage(messageTemp);
@@ -129,11 +129,11 @@ void UpdateTradingPost(i32 draw) {
 
     for (sideCurrent = 0; sideCurrent < 2; sideCurrent++) {
         if (leftResource != -1 && rightResource != -1 && leftResource != rightResource) {
-            messageTemp.payload.widget.command = TRADING_POST_SET_ICON;
+            messageTemp.payload.widget.command = IDX(TRADING_POST_SET_ICON);
             if (sideCurrent == 0) {
-                messageTemp.payload.widget.id = TRADING_POST_LEFT_OFFER_ICON;
+                messageTemp.payload.widget.id = IDX(TRADING_POST_LEFT_OFFER_ICON);
             } else {
-                messageTemp.payload.widget.id = TRADING_POST_RIGHT_OFFER_ICON;
+                messageTemp.payload.widget.id = IDX(TRADING_POST_RIGHT_OFFER_ICON);
             }
             if (sideCurrent == 0) {
                 messageTemp.payload.widget.data.value = leftResource;
@@ -141,16 +141,16 @@ void UpdateTradingPost(i32 draw) {
                 messageTemp.payload.widget.data.value = rightResource;
             }
             tpWindow->BroadcastMessage(messageTemp);
-            messageTemp.payload.widget.command = TRADING_POST_SET_TEXT;
+            messageTemp.payload.widget.command = IDX(TRADING_POST_SET_TEXT);
             messageTemp.payload.widget.data.text = gText;
             if (sideCurrent == 0) {
-                messageTemp.payload.widget.id = TRADING_POST_LEFT_OFFER_TEXT;
+                messageTemp.payload.widget.id = IDX(TRADING_POST_LEFT_OFFER_TEXT);
                 if (bLeftDenominated != 0)
                     sprintf(gText, "%d", qtyToTrade);
                 else
                     sprintf(gText, "%d", qtyToTrade * iTradeRatio);
             } else {
-                messageTemp.payload.widget.id = TRADING_POST_RIGHT_OFFER_TEXT;
+                messageTemp.payload.widget.id = IDX(TRADING_POST_RIGHT_OFFER_TEXT);
                 if (bLeftDenominated != 0)
                     sprintf(gText, "%d", qtyToTrade * iTradeRatio);
                 else
@@ -160,7 +160,7 @@ void UpdateTradingPost(i32 draw) {
         }
 
         for (resource = 0; resource < TRADING_POST_RESOURCE_COUNT; resource++) {
-            messageTemp.payload.widget.command = TRADING_POST_SET_TEXT;
+            messageTemp.payload.widget.command = IDX(TRADING_POST_SET_TEXT);
             messageTemp.payload.widget.data.text = gText;
             if (sideCurrent == 0) {
                 messageTemp.payload.widget.id = TRADING_POST_LEFT_TEXT_FIRST + resource;

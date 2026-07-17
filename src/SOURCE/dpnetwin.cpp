@@ -101,13 +101,13 @@ i16 dpnet_init(void) {
 
         if (GameMode == IDX(REMOTE_GAME_NETWORK_HOST)) {
             gbRemoteGameOpen = true;
-            giWaitType = DP_WAIT_FIRST_GUEST;
+            giWaitType = IDX(DP_WAIT_FIRST_GUEST);
             sprintf(gText, "Waiting On Guest.\n\n  Press 'CANCEL' to abort.");
             NormalDialog(gText, 6, -1, -1, -1, 0, -1, 0, -1, 0);
             if (gbFunctionComplete == 0)
                 ShutDown(0);
             iLastMsgNumHumanPlayers = giNumHumanPlayers;
-            giWaitType = DP_WAIT_EXTRA_GUESTS;
+            giWaitType = IDX(DP_WAIT_EXTRA_GUESTS);
             sprintf(
                 gText,
                 "You have %d guest(s) now logged in.  Click 'OK' to move on, or wait for "
@@ -128,7 +128,7 @@ i16 dpnet_init(void) {
                 );
             }
         } else {
-            giWaitType = DP_WAIT_HOST;
+            giWaitType = IDX(DP_WAIT_HOST);
             sprintf(gText, "Waiting for other remote player to set up game.");
             NormalDialog(gText, 6, -1, -1, -1, 0, -1, 0, -1, 0);
             if (gbFunctionComplete == 0)

@@ -171,12 +171,12 @@ i32 nbnet_init(void) {
     LogStr("GUON1");
     switch (GameMode) {
         case IDX(NETBIOS_GAME_MODE_HOST):
-            giWaitType = NETBIOS_INITIALIZE_HOST;
+            giWaitType = IDX(NETBIOS_INITIALIZE_HOST);
             sprintf(gText, "Initializing network.\n\n  Press 'CANCEL' to abort.");
             NormalDialog(gText, OLD_MAIN_DIALOG_WAIT, -1, -1, -1, 0, -1, 0, -1, 0);
             if (gbFunctionComplete == 0)
                 ShutDown(0);
-            giWaitType = NETBIOS_WAIT_FOR_GUEST;
+            giWaitType = IDX(NETBIOS_WAIT_FOR_GUEST);
             sprintf(gText, "Waiting On Guest.\n\n  Press 'CANCEL' to abort.");
             LogStr("GUON2");
             NormalDialog(gText, OLD_MAIN_DIALOG_WAIT, -1, -1, -1, 0, -1, 0, -1, 0);
@@ -186,12 +186,12 @@ i32 nbnet_init(void) {
             LogStr("GUON4");
             break;
         case IDX(NETBIOS_GAME_MODE_GUEST):
-            giWaitType = NETBIOS_INITIALIZE_GUEST;
+            giWaitType = IDX(NETBIOS_INITIALIZE_GUEST);
             sprintf(gText, "Initializing network.\n\n  Press 'CANCEL' to abort.");
             NormalDialog(gText, OLD_MAIN_DIALOG_WAIT, -1, -1, -1, 0, -1, 0, -1, 0);
             if (gbFunctionComplete == 0)
                 ShutDown(0);
-            giWaitType = NETBIOS_WAIT_FOR_HOST;
+            giWaitType = IDX(NETBIOS_WAIT_FOR_HOST);
             sprintf(gText, "Waiting On Host.\n\n  Press 'CANCEL' to abort.");
             NormalDialog(gText, OLD_MAIN_DIALOG_WAIT, -1, -1, -1, 0, -1, 0, -1, 0);
             if (gbFunctionComplete == 0)

@@ -729,7 +729,7 @@ void hero::CheckLevel(void) {
                     && m_cursorType != IDX(FACTION_KNIGHT)
                     && m_secondarySkills[IDX(HERO_SKILL_WISDOM)] < IDX(HERO_SKILL_LEVEL_EXPERT)
                     && currentLevelIndex - m_enabled >= HERO_SECONDARY_SKILL_OFFER_GAP) {
-                    skillChoicesResult[indexValue] = HERO_SKILL_WISDOM;
+                    skillChoicesResult[indexValue] = IDX(HERO_SKILL_WISDOM);
                 } else {
                     attempts = 0;
                     skillWeightIndex = Random(0, HERO_SECONDARY_SKILL_RANDOM_WEIGHT);

@@ -746,7 +746,7 @@ void SetGameDefaults(void) {
     gConfig.combatShadeLevel = 0;
     gConfig.combatArmyInfoLevel = 0;
     gConfig.evilInterfaceUsage = 0;
-    gConfig.useOpera = CONFIG_OPERA_ENABLED;
+    gConfig.useOpera = IDX(CONFIG_OPERA_ENABLED);
     gConfig.quickCombatLevel = 0;
     gConfig.combatSpeed = 0;
     gConfig.autoCombatUseSpells = 0;
@@ -2433,10 +2433,10 @@ void GetDataEntry(
     DataEntryWin->AddWidget(entry, -1);
 
     if (useImmediateHandler != 0) {
-        bDataEntryTime = DATA_ENTRY_PHASE_IMMEDIATE;
+        bDataEntryTime = IDX(DATA_ENTRY_PHASE_IMMEDIATE);
         gbAllowTextEntryEscape = false;
     } else
-        bDataEntryTime = DATA_ENTRY_PHASE_READY;
+        bDataEntryTime = IDX(DATA_ENTRY_PHASE_READY);
     gpWindowManager->DoDialog(DataEntryWin, DataEntryWindowHandler, 0);
     delete DataEntryWin;
     gpMouseManager->SetPointer(

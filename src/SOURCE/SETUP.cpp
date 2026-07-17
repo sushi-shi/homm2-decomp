@@ -41,16 +41,16 @@ i32 game::SetupBaud(void) {
 
     switch (gpWindowManager->m_dialogResult) {
         case 1:
-            gConfig.baudRate[gbDirectConnect] = SETUP_BAUD_2400;
+            gConfig.baudRate[gbDirectConnect] = IDX(SETUP_BAUD_2400);
             break;
         case 2:
-            gConfig.baudRate[gbDirectConnect] = SETUP_BAUD_9600;
+            gConfig.baudRate[gbDirectConnect] = IDX(SETUP_BAUD_9600);
             break;
         case 3:
-            gConfig.baudRate[gbDirectConnect] = SETUP_BAUD_19200;
+            gConfig.baudRate[gbDirectConnect] = IDX(SETUP_BAUD_19200);
             break;
         case 4:
-            gConfig.baudRate[gbDirectConnect] = SETUP_BAUD_38400;
+            gConfig.baudRate[gbDirectConnect] = IDX(SETUP_BAUD_38400);
             break;
         case SETUP_DIALOG_CANCEL:
             return 0;
@@ -75,16 +75,16 @@ i32 game::SetupComPort(void) {
 
     switch (gpWindowManager->m_dialogResult) {
         case 1:
-            gConfig.comPort[gbDirectConnect] = SETUP_COM_PORT_1;
+            gConfig.comPort[gbDirectConnect] = IDX(SETUP_COM_PORT_1);
             break;
         case 2:
-            gConfig.comPort[gbDirectConnect] = SETUP_COM_PORT_2;
+            gConfig.comPort[gbDirectConnect] = IDX(SETUP_COM_PORT_2);
             break;
         case 3:
-            gConfig.comPort[gbDirectConnect] = SETUP_COM_PORT_3;
+            gConfig.comPort[gbDirectConnect] = IDX(SETUP_COM_PORT_3);
             break;
         case 4:
-            gConfig.comPort[gbDirectConnect] = SETUP_COM_PORT_4;
+            gConfig.comPort[gbDirectConnect] = IDX(SETUP_COM_PORT_4);
             break;
         case SETUP_DIALOG_CANCEL:
             return 0;

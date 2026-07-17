@@ -126,27 +126,27 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
         case SPELL_SUMMON_FIRE_ELEMENTAL:
         case SPELL_SUMMON_WATER_ELEMENTAL:
         case SPELL_EARTHQUAKE:
-            targetModeBySide[0] = COMBAT_SPELL_AI_GLOBAL;
+            targetModeBySide[0] = IDX(COMBAT_SPELL_AI_GLOBAL);
             break;
         case SPELL_FIREBALL:
         case SPELL_FIREBLAST:
         case SPELL_METEOR_SHOWER:
         case SPELL_COLD_RING:
-            targetModeBySide[0] = COMBAT_SPELL_AI_AREA;
+            targetModeBySide[0] = IDX(COMBAT_SPELL_AI_AREA);
             break;
         case SPELL_MASS_HASTE:
         case SPELL_MASS_BLESS:
         case SPELL_MASS_SHIELD:
-            targetModeBySide[0] = COMBAT_SPELL_AI_SUM_FRIENDLY;
+            targetModeBySide[0] = IDX(COMBAT_SPELL_AI_SUM_FRIENDLY);
             side = m_currentSide;
             break;
         case SPELL_MASS_SLOW:
         case SPELL_MASS_CURSE:
-            targetModeBySide[0] = COMBAT_SPELL_AI_SUM_ENEMY;
+            targetModeBySide[0] = IDX(COMBAT_SPELL_AI_SUM_ENEMY);
             side = 1 - m_currentSide;
             break;
         case SPELL_DISPEL:
-            targetModeBySide[0] = COMBAT_SPELL_AI_ANY_ARMY;
+            targetModeBySide[0] = IDX(COMBAT_SPELL_AI_ANY_ARMY);
             side = COMBAT_SPELL_AI_ANY_SIDE;
             break;
         case SPELL_TELEPORT:
@@ -160,13 +160,13 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
         case SPELL_BLOOD_LUST:
         case SPELL_MIRROR_IMAGE:
         case SPELL_SHIELD:
-            targetModeBySide[0] = COMBAT_SPELL_AI_FRIENDLY;
+            targetModeBySide[0] = IDX(COMBAT_SPELL_AI_FRIENDLY);
             side = m_currentSide;
             break;
         case SPELL_RESURRECT:
         case SPELL_TRUE_RESURRECT:
         case SPELL_ANIMATE_DEAD:
-            targetModeBySide[0] = COMBAT_SPELL_AI_RESURRECT;
+            targetModeBySide[0] = IDX(COMBAT_SPELL_AI_RESURRECT);
             side = m_currentSide;
             break;
         case SPELL_LIGHTNING_BOLT:
@@ -179,7 +179,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
         case SPELL_PARALYZE:
         case SPELL_HYPNOTIZE:
         case SPELL_DISRUPTING_RAY:
-            targetModeBySide[0] = COMBAT_SPELL_AI_ENEMY;
+            targetModeBySide[0] = IDX(COMBAT_SPELL_AI_ENEMY);
             side = 1 - m_currentSide;
             break;
         default:

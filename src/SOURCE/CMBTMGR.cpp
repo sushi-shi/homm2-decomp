@@ -1865,7 +1865,7 @@ void combatManager::LowerDoor(void) {
     giMaxExtentX = COMBAT_DOOR_EXTENT_MAX_X;
     giMaxExtentY = COMBAT_DOOR_EXTENT_MAX_Y;
     i32 bridgeFrame;
-    for (bridgeFrame = COMBAT_DRAWBRIDGE_RAISE_FRAME_SECOND;
+    for (bridgeFrame = IDX(COMBAT_DRAWBRIDGE_RAISE_FRAME_SECOND);
          bridgeFrame >= IDX(COMBAT_DRAWBRIDGE_LOWERED);
          bridgeFrame--) {
         m_drawbridgeState = bridgeFrame;

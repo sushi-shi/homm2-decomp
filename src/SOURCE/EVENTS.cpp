@@ -4702,16 +4702,16 @@ void advManager::HouseEvent(hero* eventHero, mapCell* cell) {
     if (cell->m_objectMetadata == 0) {
         EventWindow(siteIndex * 3 + IDX(HOUSE_EVENT_EMPTY_DIALOG_BASE), 1, "", -1, 0, -1, 0, -1);
     } else {
-        creatureTypes[IDX(HOUSE_RECRUIT_ARCHER)] = CREATURE_ARCHER;
-        creatureTypes[IDX(HOUSE_RECRUIT_GOBLIN)] = CREATURE_GOBLIN;
-        creatureTypes[IDX(HOUSE_RECRUIT_PEASANT)] = CREATURE_PEASANT;
-        creatureTypes[IDX(HOUSE_RECRUIT_DWARF)] = CREATURE_DWARF;
-        creatureTypes[IDX(HOUSE_RECRUIT_LOG_CABIN)] = CREATURE_DWARF;
-        creatureTypes[IDX(HOUSE_RECRUIT_TREE_HOUSE)] = CREATURE_SPRITE;
-        creatureTypes[IDX(HOUSE_RECRUIT_HALFLING)] = CREATURE_HALFLING;
-        creatureTypes[IDX(HOUSE_RECRUIT_WATCH_TOWER)] = CREATURE_ORC;
-        creatureTypes[IDX(HOUSE_RECRUIT_CAVE)] = CREATURE_CENTAUR;
-        creatureTypes[IDX(HOUSE_RECRUIT_EXCAVATION)] = CREATURE_SKELETON;
+        creatureTypes[IDX(HOUSE_RECRUIT_ARCHER)] = IDX(CREATURE_ARCHER);
+        creatureTypes[IDX(HOUSE_RECRUIT_GOBLIN)] = IDX(CREATURE_GOBLIN);
+        creatureTypes[IDX(HOUSE_RECRUIT_PEASANT)] = IDX(CREATURE_PEASANT);
+        creatureTypes[IDX(HOUSE_RECRUIT_DWARF)] = IDX(CREATURE_DWARF);
+        creatureTypes[IDX(HOUSE_RECRUIT_LOG_CABIN)] = IDX(CREATURE_DWARF);
+        creatureTypes[IDX(HOUSE_RECRUIT_TREE_HOUSE)] = IDX(CREATURE_SPRITE);
+        creatureTypes[IDX(HOUSE_RECRUIT_HALFLING)] = IDX(CREATURE_HALFLING);
+        creatureTypes[IDX(HOUSE_RECRUIT_WATCH_TOWER)] = IDX(CREATURE_ORC);
+        creatureTypes[IDX(HOUSE_RECRUIT_CAVE)] = IDX(CREATURE_CENTAUR);
+        creatureTypes[IDX(HOUSE_RECRUIT_EXCAVATION)] = IDX(CREATURE_SKELETON);
 
         EventWindow(siteIndex * 3 + IDX(HOUSE_EVENT_RECRUIT_DIALOG_BASE), 2, "", -1, 0, -1, 0, -1);
         if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
