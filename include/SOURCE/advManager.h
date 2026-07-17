@@ -249,7 +249,7 @@ public:
     void HouseEvent(class hero*, class mapCell*);
     i32 CombatMonsterEvent(
         class hero*,
-        i32,
+        CreatureType,
         i32,
         class mapCell*,
         i32,

@@ -204,7 +204,7 @@ public:
     i32 HasSpell(SpellType);
     i32 GetNthSpell(i32, i32);
     i32 GetNumSpells(i32);
-    void UseSpell(i32);
+    void UseSpell(SpellType);
     void AddSpell(i32, i32);
     void HeroScreenUpdate(void);
     void UpdateArmies(void);

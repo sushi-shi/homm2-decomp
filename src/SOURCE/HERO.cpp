@@ -211,7 +211,7 @@ i32 hero::GetNumSpells(i32 type) {
 }
 
 VA(0x0046ca01, 0x8a)
-void hero::UseSpell(i32 spell) {
+void hero::UseSpell(SpellType spell) {
     if (spell == SPELL_NONE)
         return;
 
