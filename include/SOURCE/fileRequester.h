@@ -78,7 +78,7 @@ H2_ENUM_CLASS_BEGIN(FileRequesterHelpIndex)
     FILE_REQUESTER_HELP_DIFFICULTY = 14
 H2_ENUM_CLASS_END(FileRequesterHelpIndex)
 
-enum {
+H2_ENUM_BEGIN(FileRequesterConstant)
     FILE_REQUESTER_PATH_SIZE = 300,
     FILE_REQUESTER_NAME_SIZE = 0x15f,
     FILE_REQUESTER_EXTENSION_SIZE = 5,
@@ -96,7 +96,7 @@ enum {
     FILE_REQUESTER_MAIN_CONTINUE = 1,
     FILE_REQUESTER_MAIN_CLOSE = 2,
     FILE_REQUESTER_EXECUTIVE_CLOSE = 4
-};
+H2_ENUM_END(FileRequesterConstant)
 
 struct FileRequesterName {
     char text[FILE_REQUESTER_NAME_SIZE];
