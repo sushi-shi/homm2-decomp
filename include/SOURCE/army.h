@@ -30,7 +30,7 @@ public:
     i32 m_targetSide;                   // +0x52
     i32 m_targetIndex;                  // +0x56
     i32 m_attackDirection;              // +0x5a
-    i32 m_unknown5e; // +0x5e target-cluster int, only zeroed in the ctor; unnamed and unused in Ironfist (field_5E) too
+    i32 m_unknown5e; // +0x5e target-cluster int, only zeroed in the ctor
     i32 m_moveTargetHex;                 // +0x62
     i32 m_drawSpellEffect;               // +0x66
     i32 m_mirrorSourceIndex;             // +0x6a
@@ -54,7 +54,7 @@ public:
     i32 m_walkDuration;                  // +0xb2
     i32 m_luckOutcome;                   // +0xb6
     struct tag_monsterInfo m_monster;    // +0xba
-    i16 m_unknownD4; // +0xd4 set to 6 in Init, never read; unnamed in Ironfist (field_D4, same i16 width) too
+    i16 m_unknownD4; // +0xd4 set to 6 in Init, never read
     i32 m_damagePending;                             // +0xd6
     i32 m_killPending;                               // +0xda
     i32 m_deathPending;                              // +0xde

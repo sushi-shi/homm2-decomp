@@ -16,9 +16,7 @@ working executable.
 - `build/delink/` contains Vostok-delinked retail target objects.
   `build/objdiff/base/` contains objects compiled from this source tree. Do not call
   either side "original source"; all source structure remains a reconstruction.
-- Secondary references may help with names and semantics, but retail evidence wins:
-  A local checkout of [Project Ironfist](https://github.com/jkoppel/project-ironfist), if present, is a
-  read-only reference.
+- Secondary references may help with names and semantics, but retail evidence wins.
 
 See `docs/codeview-contents.md`, `docs/compiler-detection.md`, and
 `docs/candidate-data-topology.md` for the supporting evidence.
