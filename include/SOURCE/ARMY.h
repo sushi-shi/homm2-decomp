@@ -75,14 +75,6 @@ typedef enum ArmySpellCancelType {
     ARMY_CANCEL_SPELLS_UNUSED = 3
 } ArmySpellCancelType;
 
-typedef enum ArmyAttackSpell {
-    ARMY_ATTACK_SPELL_UNICORN = 13,
-    ARMY_ATTACK_SPELL_MUMMY = 18,
-    ARMY_ATTACK_SPELL_CYCLOPS = 30,
-    ARMY_ATTACK_SPELL_MEDUSA = 101,
-    ARMY_ATTACK_SPELL_ARCHMAGE = 102
-} ArmyAttackSpell;
-
 typedef enum ArmyAttackConstant {
     ARMY_COMBAT_TEXT_SIZE = 200,
     ARMY_COMBAT_SIDE_COUNT = 2,

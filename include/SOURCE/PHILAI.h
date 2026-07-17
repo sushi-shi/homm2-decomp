@@ -117,10 +117,6 @@ typedef enum AIObjectType {
     AI_EXPANSION_OBJECT_THRESHOLD = 108
 } AIObjectType;
 
-typedef enum AISpellType {
-    AI_SPELL_DIMENSION_DOOR = 0x38
-} AISpellType;
-
 typedef enum AIArtifactEventFlag {
     AI_ARTIFACT_EVENT_GUARD_FLAG = 0x100
 } AIArtifactEventFlag;
@@ -300,7 +296,6 @@ typedef enum AIQuickCombatConstant {
     AI_QUICK_COMBAT_TOWN_EXPERIENCE = 500,
     AI_QUICK_COMBAT_RANDOM_LIMIT = 100,
     AI_QUICK_COMBAT_RETREAT_CHANCE = 60,
-    AI_QUICK_COMBAT_SPELL_COUNT = 65,
     AI_QUICK_COMBAT_LEARNABLE_SPELL = 2
 } AIQuickCombatConstant;
 

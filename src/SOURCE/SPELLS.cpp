@@ -692,9 +692,9 @@ void combatManager::CastSpell(i32 spell, i32 targetHex, i32 castByCreature, i32 
     }
 
     soundSpell_q = spell;
-    if (spell == SPELL_PETRIFY)
+    if (spell == CREATURE_SPELL_PETRIFY)
         soundSpell_q = SPELL_PARALYZE;
-    if (spell == SPELL_CREATURE_DISPEL)
+    if (spell == CREATURE_SPELL_DISPEL)
         soundSpell_q = SPELL_DISPEL;
     if (strlen(gsSpellInfo[soundSpell_q].soundName) != 0)
         sprintf(sampleName_i, "%s.82M", gsSpellInfo[soundSpell_q].soundName);
@@ -943,7 +943,7 @@ void combatManager::CastSpell(i32 spell, i32 targetHex, i32 castByCreature, i32 
             target_i->SetSpellInfluence(SPELL_INFLUENCE_PARALYZE, spellPower_i);
             target_i->SpellEffect(gsSpellInfo[SPELL_PARALYZE].combatEffect, 0, 0);
             break;
-        case SPELL_CREATURE_DISPEL:
+        case CREATURE_SPELL_DISPEL:
             ShowSpellMessage(castByCreature, spell, target_i);
             target_i->DispelGood();
             target_i->SpellEffect(gsSpellInfo[SPELL_DISPEL].combatEffect, 0, 1);
@@ -970,7 +970,7 @@ void combatManager::CastSpell(i32 spell, i32 targetHex, i32 castByCreature, i32 
             target_i->SetSpellInfluence(SPELL_INFLUENCE_ANTI_MAGIC, spellPower_i);
             target_i->SpellEffect(gsSpellInfo[SPELL_ANTI_MAGIC].combatEffect, 0, 0);
             break;
-        case SPELL_PETRIFY:
+        case CREATURE_SPELL_PETRIFY:
             ShowSpellMessage(castByCreature, spell, target_i);
             TurnToStone(target_i);
             break;
@@ -3544,11 +3544,11 @@ void combatManager::ShowSpellMessage(i32 castByCreature, i32 spell,
             sprintf(message_m, "The %s are paralyzed by the Cyclopes!", targetName_b);
         else if (spell == SPELL_BLIND)
             sprintf(message_m, "The Unicorns' attack blinds the %s!", targetName_b);
-        else if (spell == SPELL_PETRIFY)
+        else if (spell == CREATURE_SPELL_PETRIFY)
             sprintf(message_m, "The Medusas' gaze turns the %s to stone!", targetName_b);
         else if (spell == SPELL_CURSE)
             sprintf(message_m, "The Mummies' curse falls upon the %s!", targetName_b);
-        else if (spell == SPELL_CREATURE_DISPEL)
+        else if (spell == CREATURE_SPELL_DISPEL)
             sprintf(message_m, "The Archmages dispel all good spells\non your %s!", targetName_b);
         else {
             unhandledSpell_j = 0;

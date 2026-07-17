@@ -1858,7 +1858,7 @@ void combatManager::DoVictory(i32 winningSide)
     case COMBAT_ATTACKER_SIDE:
     case COMBAT_DEFENDER_SIDE:
         if (m_heroes[winningSide] != 0) {
-            if (m_eagleEyeSpell[winningSide] != HERO_SPELL_NONE) {
+            if (m_eagleEyeSpell[winningSide] != SPELL_NONE) {
                 m_heroes[winningSide]
                     ->m_spells[m_eagleEyeSpell[winningSide]] = 1;
             }

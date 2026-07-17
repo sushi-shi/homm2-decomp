@@ -44,7 +44,6 @@ typedef enum HeroPrimaryStat {
 
 #define HERO_PRIMARY_STAT_COUNT 4
 #define HERO_ARTIFACT_SLOT_COUNT 14
-#define HERO_SPELL_COUNT 65
 #define HERO_EXPERIENCE_GROWTH_FACTOR 1.2
 
 typedef enum HeroConstant {
@@ -83,11 +82,6 @@ typedef enum HeroConstant {
 typedef enum HeroArtifactConstant {
     HERO_ARTIFACT_TRANSFERABLE_FIRST = ARTIFACT_ARCANE_NECKLACE
 } HeroArtifactConstant;
-
-typedef enum HeroSpell {
-    HERO_SPELL_NONE = -1,
-    HERO_SPELL_TOWN_PORTAL = 0x3a
-} HeroSpell;
 
 typedef enum HeroSpellType {
     HERO_SPELL_TYPE_COMBAT = 0,
@@ -186,7 +180,7 @@ public:
     i8 m_secondarySkills[14];  // +0x74
     u8 m_secondarySkillOrder[14];  // +0x82
     i32 m_secondarySkillCount;  // +0x90
-    i8 m_spells[HERO_SPELL_COUNT];  // +0x94
+    i8 m_spells[SPELL_COUNT];  // +0x94
     i8 m_artifacts[HERO_ARTIFACT_SLOT_COUNT];  // +0xd5
     u32 m_eventFlags;  // +0xe3
     u8 m_isCaptain;  // +0xe7

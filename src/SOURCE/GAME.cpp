@@ -3928,16 +3928,16 @@ void game::RandomizeHeroPool(void)
         m_heroRecs[heroId].m_enabled = RANDOM_HERO_ENABLED;
 
         if (m_heroRecs[heroId].m_cursorType == FACTION_SORCERESS)
-            m_heroRecs[heroId].m_spells[RANDOM_HERO_SORCERESS_STARTING_SPELL] =
+            m_heroRecs[heroId].m_spells[SPELL_BLESS] =
                 RANDOM_HERO_STARTING_SPELL_KNOWN;
         else if (m_heroRecs[heroId].m_cursorType == FACTION_WARLOCK)
-            m_heroRecs[heroId].m_spells[RANDOM_HERO_WARLOCK_STARTING_SPELL] =
+            m_heroRecs[heroId].m_spells[SPELL_CURSE] =
                 RANDOM_HERO_STARTING_SPELL_KNOWN;
         else if (m_heroRecs[heroId].m_cursorType == FACTION_NECROMANCER)
-            m_heroRecs[heroId].m_spells[RANDOM_HERO_NECROMANCER_STARTING_SPELL] =
+            m_heroRecs[heroId].m_spells[SPELL_HASTE] =
                 RANDOM_HERO_STARTING_SPELL_KNOWN;
         else if (m_heroRecs[heroId].m_cursorType == FACTION_WIZARD)
-            m_heroRecs[heroId].m_spells[RANDOM_HERO_WIZARD_STARTING_SPELL] =
+            m_heroRecs[heroId].m_spells[SPELL_STONE_SKIN] =
                 RANDOM_HERO_STARTING_SPELL_KNOWN;
     }
 }
@@ -4552,7 +4552,7 @@ void game::SetupTowns(void)
     DATA(0x004f756c) static i16 setupTownsSourceLineBase =
         GAME_SETUP_TOWNS_SOURCE_LINE_BASE;
     char defaultDwellingRoll[12];
-    i8 usedSpells[65];
+    i8 usedSpells[SPELL_COUNT];
     i32 spellsPerLevel[5];
     i32 townIndex;
     i32 slot;
@@ -4655,19 +4655,19 @@ void game::SetupTowns(void)
         castle->m_unknown37 = extra->unknown28;
         strcpy(castle->m_name, extra->name);
 
-        memset(usedSpells, 0, 65);
+        memset(usedSpells, 0, SPELL_COUNT);
         for (spellLevel = 0; spellLevel < TOWN_MAGE_GUILD_LEVEL_COUNT; spellLevel++) {
             spellsPerLevel[spellLevel] = 0;
             for (spellSlot = 0; spellSlot < TOWN_MAGE_GUILD_SPELLS_PER_LEVEL; spellSlot++)
                 castle->m_spellSlots[spellLevel * TOWN_MAGE_GUILD_SPELLS_PER_LEVEL + spellSlot] =
-                    HERO_SPELL_NONE;
+                    SPELL_NONE;
         }
 
         if (castle->m_type == 5 && castle->m_owner != -1 && !gbHumanPlayer[castle->m_owner]) {
             if (Random(0, 100) < 50)
-                spell = 35;
+                spell = SPELL_DEATH_RIPPLE;
             else
-                spell = 36;
+                spell = SPELL_DEATH_WAVE;
             spellLevel = gsSpellInfo[spell].level - 1;
             castle->m_spells[spellLevel][spellsPerLevel[spellLevel]] =
                 static_cast<i8>(spell);
@@ -4676,13 +4676,13 @@ void game::SetupTowns(void)
 
         roll = Random(0, 100);
         if (roll < 25)
-            spell = 23;
+            spell = SPELL_DISPEL;
         else if (roll < 50)
-            spell = 24;
+            spell = SPELL_MASS_DISPEL;
         else if (roll < 75)
-            spell = 22;
+            spell = SPELL_ANTI_MAGIC;
         else
-            spell = 5;
+            spell = SPELL_CURE;
         spellLevel = gsSpellInfo[spell].level - 1;
         castle->m_spells[spellLevel][spellsPerLevel[spellLevel]] =
             static_cast<i8>(spell);
@@ -4690,15 +4690,15 @@ void game::SetupTowns(void)
 
         roll = Random(0, 100);
         if (roll < 20)
-            spell = 25;
+            spell = SPELL_MAGIC_ARROW;
         else if (roll < 40)
-            spell = 2;
+            spell = SPELL_LIGHTNING_BOLT;
         else if (roll < 60)
-            spell = 0;
+            spell = SPELL_FIREBALL;
         else if (roll < 80)
-            spell = 32;
+            spell = SPELL_COLD_RAY;
         else
-            spell = 33;
+            spell = SPELL_COLD_RING;
         spellLevel = gsSpellInfo[spell].level - 1;
         castle->m_spells[spellLevel][spellsPerLevel[spellLevel]] =
             static_cast<i8>(spell);
@@ -4707,15 +4707,17 @@ void game::SetupTowns(void)
         for (spellLevel = 0; spellLevel < TOWN_MAGE_GUILD_LEVEL_COUNT; spellLevel++) {
             combatSpells = 0;
             for (spellSlot = 0; spellSlot < TOWN_MAGE_GUILD_SPELLS_PER_LEVEL; spellSlot++) {
-                if (castle->m_spellSlots[spellLevel * TOWN_MAGE_GUILD_SPELLS_PER_LEVEL + spellSlot] != HERO_SPELL_NONE) {
+                if (castle->m_spellSlots[spellLevel * TOWN_MAGE_GUILD_SPELLS_PER_LEVEL + spellSlot] != SPELL_NONE) {
                     usedSpells[castle->m_spellSlots[
                         spellLevel * TOWN_MAGE_GUILD_SPELLS_PER_LEVEL + spellSlot]] = 1;
                 } else {
                     attempts = 0;
                     do {
-                        spell = Random(0, 64);
+                        spell = Random(SPELL_FIREBALL,
+                                       SPELL_SET_WATER_GUARDIAN);
                         while (gsSpellInfo[spell].level - 1 != spellLevel)
-                            spell = Random(0, 64);
+                            spell = Random(SPELL_FIREBALL,
+                                           SPELL_SET_WATER_GUARDIAN);
                         if (castle->m_owner != -1 && !gbHumanPlayer[castle->m_owner])
                             spellValue =
                                 (gsSpellInfo[spell].attributes & 1 ? 4 : 1) *
@@ -4723,7 +4725,7 @@ void game::SetupTowns(void)
                                 50;
                         else
                             spellValue = 1500;
-                        if (spell == 56)
+                        if (spell == SPELL_DIMENSION_DOOR)
                             spellValue = 1500;
                     } while ((combatSpells == 1 &&
                               (gsSpellInfo[spell].attributes & 4)) ||

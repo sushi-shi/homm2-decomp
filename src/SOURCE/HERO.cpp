@@ -144,7 +144,7 @@ i32 hero::HasSpell(i32 spell) {
             return 1;
         }
     }
-    if (HasArtifact(ARTIFACT_BATTLE_GARB) && spell == HERO_SPELL_TOWN_PORTAL)
+    if (HasArtifact(ARTIFACT_BATTLE_GARB) && spell == SPELL_TOWN_PORTAL)
         return 1;
     return 0;
 }
@@ -162,7 +162,7 @@ i32 hero::GetNthSpell(i32 type, i32 spellNumber) {
     i32 spell;
     i32 spellOrdinalCount = 0;
 
-    for (spell = 0; spell < HERO_SPELL_COUNT; spell++) {
+    for (spell = 0; spell < SPELL_COUNT; spell++) {
         if (HasSpell(spell)) {
             if (type == HERO_SPELL_TYPE_ALL ||
                 (type == HERO_SPELL_TYPE_COMBAT &&
@@ -175,7 +175,7 @@ i32 hero::GetNthSpell(i32 type, i32 spellNumber) {
                 return spell;
         }
     }
-    return HERO_SPELL_NONE;
+    return SPELL_NONE;
 }
 
 // @early-stop
@@ -190,7 +190,7 @@ i32 hero::GetNumSpells(i32 type) {
 
     numCombatSpells = 0;
     numAdventureSpells = 0;
-    for (spellIndexCurrent = 0; spellIndexCurrent < HERO_SPELL_COUNT; spellIndexCurrent++) {
+    for (spellIndexCurrent = 0; spellIndexCurrent < SPELL_COUNT; spellIndexCurrent++) {
         if (HasSpell(spellIndexCurrent)) {
             if (gsSpellInfo[spellIndexCurrent].attributes & SPELL_ATTRIBUTE_COMBAT)
                 numCombatSpells++;
@@ -212,7 +212,7 @@ i32 hero::GetNumSpells(i32 type) {
 
 VA(0x0046ca01, 0x8a)
 void hero::UseSpell(i32 spell) {
-    if (spell == HERO_SPELL_NONE)
+    if (spell == SPELL_NONE)
         return;
 
     m_spellPoints -= GetManaCost(spell, this);

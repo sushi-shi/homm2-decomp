@@ -5080,23 +5080,23 @@ void advManager::CastSpell(i32 spell)
     mapCell *currentCell;
     i32 spellPowerValue;
     switch (spell) {
-    case ADVENTURE_SPELL_SET_EARTH_GUARDIAN:
+    case SPELL_SET_EARTH_GUARDIAN:
         guardianTypes1[ADVMGR_MINE_GUARDIAN_TYPE_INDEX] =
             CREATURE_EARTH_ELEMENTAL;
         goto setMineGuardian;
-    case ADVENTURE_SPELL_SET_AIR_GUARDIAN:
+    case SPELL_SET_AIR_GUARDIAN:
         guardianTypes1[ADVMGR_MINE_GUARDIAN_TYPE_INDEX] =
             CREATURE_AIR_ELEMENTAL;
         goto setMineGuardian;
-    case ADVENTURE_SPELL_SET_FIRE_GUARDIAN:
+    case SPELL_SET_FIRE_GUARDIAN:
         guardianTypes1[ADVMGR_MINE_GUARDIAN_TYPE_INDEX] =
             CREATURE_FIRE_ELEMENTAL;
         goto setMineGuardian;
-    case ADVENTURE_SPELL_SET_WATER_GUARDIAN:
+    case SPELL_SET_WATER_GUARDIAN:
         guardianTypes1[ADVMGR_MINE_GUARDIAN_TYPE_INDEX] =
             CREATURE_WATER_ELEMENTAL;
         goto setMineGuardian;
-    case ADVENTURE_SPELL_HAUNT:
+    case SPELL_HAUNT:
         guardianTypes1[ADVMGR_MINE_GUARDIAN_TYPE_INDEX] =
             CREATURE_GHOST;
         goto setMineGuardian;
@@ -5116,29 +5116,29 @@ setMineGuardian:
         gpGame->m_mines[currentCell->m_objectMetadata].guardianCount =
             static_cast<u8>(
                 spellPowerValue * ADVMGR_MINE_GUARDIANS_PER_POWER);
-        if (spell == ADVENTURE_SPELL_HAUNT)
+        if (spell == SPELL_HAUNT)
             gpGame->ClaimMine(currentCell->m_objectMetadata, -1);
         break;
-    case ADVENTURE_SPELL_VIEW_MINES:
-    case ADVENTURE_SPELL_VIEW_RESOURCES:
-    case ADVENTURE_SPELL_VIEW_ARTIFACTS:
-    case ADVENTURE_SPELL_VIEW_TOWNS:
-    case ADVENTURE_SPELL_VIEW_HEROES:
-    case ADVENTURE_SPELL_VIEW_ALL:
-        ViewWorld(spell, spell == ADVENTURE_SPELL_VIEW_ALL,
-                  spell == ADVENTURE_SPELL_VIEW_ALL);
+    case SPELL_VIEW_MINES:
+    case SPELL_VIEW_RESOURCES:
+    case SPELL_VIEW_ARTIFACTS:
+    case SPELL_VIEW_TOWNS:
+    case SPELL_VIEW_HEROES:
+    case SPELL_VIEW_ALL:
+        ViewWorld(spell, spell == SPELL_VIEW_ALL,
+                  spell == SPELL_VIEW_ALL);
         break;
-    case ADVENTURE_SPELL_IDENTIFY_HERO:
+    case SPELL_IDENTIFY_HERO:
         m_identifyHeroActive = 1;
         NormalDialog("Enemy heroes are now fully identifiable.",
                      1, -1, -1, -1, 0, -1, 0, -1, 0);
         break;
-    case ADVENTURE_SPELL_SUMMON_BOAT:
+    case SPELL_SUMMON_BOAT:
         SummonBoat();
         break;
-    case ADVENTURE_SPELL_DIMENSION_DOOR:
-    case ADVENTURE_SPELL_TOWN_GATE:
-    case ADVENTURE_SPELL_TOWN_PORTAL:
+    case SPELL_DIMENSION_DOOR:
+    case SPELL_TOWN_GATE:
+    case SPELL_TOWN_PORTAL:
         if (currentHeroSlot->m_remainingMobility == 0) {
             NormalDialog("Your hero is too tired to cast this spell today.  Try again tomorrow.",
                          1, -1, -1, -1, 0, -1, 0, -1, 0);
@@ -5149,12 +5149,12 @@ setMineGuardian:
         else
             currentHeroSlot->m_remainingMobility -= ADVMGR_TRAVEL_SPELL_MOBILITY_COST;
         UpdateHeroLocator(-1, 1, 1);
-        if (spell == ADVENTURE_SPELL_DIMENSION_DOOR)
+        if (spell == SPELL_DIMENSION_DOOR)
             DimensionDoor();
         else
             TownGate(spell);
         break;
-    case ADVENTURE_SPELL_VISIONS:
+    case SPELL_VISIONS:
         if (!DoVisions(currentHeroSlot))
             return;
         break;
@@ -5162,9 +5162,9 @@ setMineGuardian:
         break;
     }
 
-    if (spell != ADVENTURE_SPELL_DIMENSION_DOOR &&
-        spell != ADVENTURE_SPELL_TOWN_GATE &&
-        spell != ADVENTURE_SPELL_TOWN_PORTAL)
+    if (spell != SPELL_DIMENSION_DOOR &&
+        spell != SPELL_TOWN_GATE &&
+        spell != SPELL_TOWN_PORTAL)
         gpGame->GetHero(gpCurPlayer->m_currentHero)->UseSpell(spell);
 }
 
@@ -6092,7 +6092,7 @@ void advManager::DimensionDoor(void)
                 giTerrainToMusicTrack[m_currentTerrain]);
         }
         gpGame->GetHero(gpCurPlayer->m_currentHero)
-            ->UseSpell(ADVMGR_DIMENSION_DOOR_SPELL);
+            ->UseSpell(SPELL_DIMENSION_DOOR);
     } else {
         UpdateRadar(1, 0);
     }
@@ -6177,7 +6177,7 @@ void advManager::TownGate(i32 spellId)
         return;
     }
 
-    if (spellId == ADVMGR_TOWN_PORTAL_SPELL) {
+    if (spellId == SPELL_TOWN_PORTAL) {
         townPortalWin = new heroWindow(ADVMGR_TOWN_PORTAL_WINDOW_X,
                                        ADVMGR_TOWN_PORTAL_WINDOW_Y,
                                        "townport.bin");
@@ -7508,7 +7508,7 @@ void advManager::AdvPanel(void)
                 ProcessSearch(ADVMGR_INVALID_CELL, ADVMGR_INVALID_CELL);
                 break;
             case ADVMGR_PANEL_VIEW_WORLD:
-                ViewWorld(ADVENTURE_SPELL_VIEW_ALL, 0, 0);
+                ViewWorld(SPELL_VIEW_ALL, 0, 0);
                 break;
             case ADVMGR_PANEL_VIEW_PUZZLE:
                 ViewPuzzle();

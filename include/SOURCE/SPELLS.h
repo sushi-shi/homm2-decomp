@@ -2,63 +2,11 @@
 #define HOMM2_SPELLS_H
 
 #include <Ints.h>
+#include <SOURCE/KB_TYPES.h>
 // Declarations of the free functions DEFINED in SPELLS.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
 // forward declarations (was <_all.h>):
 struct tag_message;
-
-typedef enum CombatSpell {
-    SPELL_FIREBALL = 0,
-    SPELL_FIREBLAST = 1,
-    SPELL_LIGHTNING_BOLT = 2,
-    SPELL_CHAIN_LIGHTNING = 3,
-    SPELL_TELEPORT = 4,
-    SPELL_CURE = 5,
-    SPELL_MASS_CURE = 6,
-    SPELL_RESURRECT = 7,
-    SPELL_TRUE_RESURRECT = 8,
-    SPELL_HASTE = 9,
-    SPELL_MASS_HASTE = 10,
-    SPELL_SLOW = 11,
-    SPELL_MASS_SLOW = 12,
-    SPELL_BLIND = 13,
-    SPELL_BLESS = 14,
-    SPELL_MASS_BLESS = 15,
-    SPELL_STONE_SKIN = 16,
-    SPELL_STEEL_SKIN = 17,
-    SPELL_CURSE = 18,
-    SPELL_MASS_CURSE = 19,
-    SPELL_HOLY_WORD = 20,
-    SPELL_HOLY_SHOUT = 21,
-    SPELL_ANTI_MAGIC = 22,
-    SPELL_DISPEL = 23,
-    SPELL_MASS_DISPEL = 24,
-    SPELL_MAGIC_ARROW = 25,
-    SPELL_BERSERKER = 26,
-    SPELL_ARMAGEDDON = 27,
-    SPELL_ELEMENTAL_STORM = 28,
-    SPELL_METEOR_SHOWER = 29,
-    SPELL_PARALYZE = 30,
-    SPELL_HYPNOTIZE = 31,
-    SPELL_COLD_RAY = 32,
-    SPELL_COLD_RING = 33,
-    SPELL_DISRUPTING_RAY = 34,
-    SPELL_DEATH_RIPPLE = 35,
-    SPELL_DEATH_WAVE = 36,
-    SPELL_DRAGON_SLAYER = 37,
-    SPELL_BLOOD_LUST = 38,
-    SPELL_ANIMATE_DEAD = 39,
-    SPELL_MIRROR_IMAGE = 40,
-    SPELL_SHIELD = 41,
-    SPELL_MASS_SHIELD = 42,
-    SPELL_SUMMON_EARTH_ELEMENTAL = 43,
-    SPELL_SUMMON_AIR_ELEMENTAL = 44,
-    SPELL_SUMMON_FIRE_ELEMENTAL = 45,
-    SPELL_SUMMON_WATER_ELEMENTAL = 46,
-    SPELL_EARTHQUAKE = 47,
-    SPELL_PETRIFY = 101,
-    SPELL_CREATURE_DISPEL = 102
-} CombatSpell;
 
 typedef enum CombatSpellInfluence {
     SPELL_INFLUENCE_HASTE = 0,
@@ -133,7 +81,6 @@ typedef enum CombatSpellUiConstant {
 } CombatSpellUiConstant;
 
 enum {
-    COMBAT_SPELL_COUNT = 65,
     SPELL_ATTRIBUTE_COMBAT = 2,
     SPELL_ATTRIBUTE_DURATION = 8,
     SPELL_DEFAULT_CREATURE_POWER = 3,
