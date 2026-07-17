@@ -3527,7 +3527,7 @@ i32 philAI::QuickCombat(armyGroup *attacker, hero *attackerHero,
             AI_QUICK_COMBAT_NECROMANCY_FACTOR);
         if (necromancyCount6 <= 0)
             necromancyCount6 = 1;
-        attackerHero->m_army.Add(AI_CREATURE_SKELETON,
+        attackerHero->m_army.Add(CREATURE_SKELETON,
                                  necromancyCount6,
                                  AI_CREATURE_PURCHASE_NO_SLOT);
     } else if (defenderHero != 0 &&
@@ -3540,7 +3540,7 @@ i32 philAI::QuickCombat(armyGroup *attacker, hero *attackerHero,
             AI_QUICK_COMBAT_NECROMANCY_FACTOR);
         if (necromancyCount6 <= 0)
             necromancyCount6 = 1;
-        defenderHero->m_army.Add(AI_CREATURE_SKELETON,
+        defenderHero->m_army.Add(CREATURE_SKELETON,
                                  necromancyCount6,
                                  AI_CREATURE_PURCHASE_NO_SLOT);
     }
@@ -4414,15 +4414,15 @@ i32 philAI::FightEvent(hero *h, mapCell *cell, i32 evaluateOnly) {
 
     switch (eventType16) {
     case AI_OBJECT_SHIPWRECK:
-        monsterType6 = AI_CREATURE_GHOST;
+        monsterType6 = CREATURE_GHOST;
         monsterCount28 = shipwreckCounts15[cell->m_objectMetadata - AI_FIGHT_EVENT_LEVEL_OFFSET];
         break;
     case AI_OBJECT_GRAVEYARD:
-        monsterType6 = AI_CREATURE_ZOMBIE;
+        monsterType6 = CREATURE_ZOMBIE;
         monsterCount28 = graveyardCounts37[cell->m_objectMetadata - AI_FIGHT_EVENT_LEVEL_OFFSET];
         break;
     default:
-        monsterType6 = AI_CREATURE_SKELETON;
+        monsterType6 = CREATURE_SKELETON;
         monsterCount28 = derelictCounts28[cell->m_objectMetadata - AI_FIGHT_EVENT_LEVEL_OFFSET];
         break;
     }
@@ -5006,38 +5006,38 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32 *liveChance)
         }
         break;
     case AI_OBJECT_GENIE_LAMP:
-        creature = AI_CREATURE_GENIE;
+        creature = CREATURE_GENIE;
         creatureFlag_k = 0;
         goto creature_purchase;
     case AI_OBJECT_TREE_CITY:
-        creature = AI_CREATURE_SPRITE;
+        creature = CREATURE_SPRITE;
         creatureFlag_k = 0;
         goto creature_purchase;
     case AI_OBJECT_WATCH_TOWER:
-        creature = AI_CREATURE_ORC;
+        creature = CREATURE_ORC;
         creatureFlag_k = 1;
         goto creature_purchase;
     case AI_OBJECT_TREE_HOUSE:
-        creature = AI_CREATURE_SPRITE;
+        creature = CREATURE_SPRITE;
         creatureFlag_k = 1;
         goto creature_purchase;
     case AI_OBJECT_EXCAVATION:
-        creature = AI_CREATURE_SKELETON;
+        creature = CREATURE_SKELETON;
         creatureFlag_k = 1;
         goto creature_purchase;
     case AI_OBJECT_HALFLING_HOLE:
-        creature = AI_CREATURE_HALFLING;
+        creature = CREATURE_HALFLING;
         creatureFlag_k = 1;
         goto creature_purchase;
     case AI_OBJECT_RUINS:
-        creature = AI_CREATURE_MEDUSA;
+        creature = CREATURE_MEDUSA;
         creatureFlag_k = 0;
         goto creature_purchase;
     case AI_OBJECT_TROLL_BRIDGE:
         if (cell_k->m_objectMetadata & 0x100) {
             value_h = 0;
         } else {
-            creature = AI_CREATURE_TROLL;
+            creature = CREATURE_TROLL;
             creatureFlag_k = 0;
             goto creature_purchase;
         }
@@ -5046,7 +5046,7 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32 *liveChance)
         if (cell_k->m_objectMetadata & 0x100) {
             value_h = 0;
         } else {
-            creature = AI_CREATURE_RED_DRAGON;
+            creature = CREATURE_RED_DRAGON;
             creatureFlag_k = 0;
             goto creature_purchase;
         }
@@ -5055,38 +5055,38 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32 *liveChance)
         if (cell_k->m_objectMetadata & 0x100) {
             value_h = 0;
         } else {
-            creature = AI_CREATURE_POWER_LICH;
+            creature = CREATURE_POWER_LICH;
             creatureFlag_k = 0;
             goto creature_purchase;
         }
         break;
     case AI_OBJECT_CAVE:
-        creature = AI_CREATURE_CENTAUR;
+        creature = CREATURE_CENTAUR;
         creatureFlag_k = 1;
         goto creature_purchase;
     case AI_OBJECT_ARCHER_HOUSE:
-        creature = AI_CREATURE_ARCHER;
+        creature = CREATURE_ARCHER;
         creatureFlag_k = 1;
         goto creature_purchase;
     case AI_OBJECT_GOBLIN_HUT:
-        creature = AI_CREATURE_GOBLIN;
+        creature = CREATURE_GOBLIN;
         creatureFlag_k = 1;
         goto creature_purchase;
     case AI_OBJECT_PEASANT_HUT:
-        creature = AI_CREATURE_PEASANT;
+        creature = CREATURE_PEASANT;
         creatureFlag_k = 1;
         goto creature_purchase;
     case AI_OBJECT_DWARF_COTTAGE:
     case AI_OBJECT_SIRENS:
-        creature = AI_CREATURE_DWARF;
+        creature = CREATURE_DWARF;
         creatureFlag_k = 1;
         goto creature_purchase;
     case AI_OBJECT_DESERT_TENT:
-        creature = AI_CREATURE_NOMAD;
+        creature = CREATURE_NOMAD;
         creatureFlag_k = 0;
         goto creature_purchase;
     case AI_OBJECT_WAGON_CAMP:
-        creature = AI_CREATURE_ROGUE;
+        creature = CREATURE_ROGUE;
         creatureFlag_k = 0;
 creature_purchase:
         EvaluateOneTimeCreaturePurchase(creature, cell_k->m_objectMetadata, creatureFlag_k,
@@ -5263,17 +5263,17 @@ creature_purchase:
         value_h = 105;
         break;
     case AI_OBJECT_HILL_FORT:
-        value_h = (ComputeUpgradeValue(AI_CREATURE_DWARF, AI_CREATURE_BATTLE_DWARF) | 0) +
-                (((ComputeUpgradeValue(AI_CREATURE_ORC, AI_CREATURE_ORC_CHIEF) | 0) +
-                  (ComputeUpgradeValue(AI_CREATURE_OGRE, AI_CREATURE_OGRE_LORD) | 0)) | 0);
+        value_h = (ComputeUpgradeValue(CREATURE_DWARF, CREATURE_BATTLE_DWARF) | 0) +
+                (((ComputeUpgradeValue(CREATURE_ORC, CREATURE_ORC_CHIEF) | 0) +
+                  (ComputeUpgradeValue(CREATURE_OGRE, CREATURE_OGRE_LORD) | 0)) | 0);
         break;
     case AI_OBJECT_FREEMANS_FOUNDRY:
         value_h = (ComputeUpgradeValue(
-                       AI_CREATURE_SWORDSMAN, AI_CREATURE_MASTER_SWORDSMAN) | 0) +
-                (((ComputeUpgradeValue(AI_CREATURE_PIKEMAN,
-                                       AI_CREATURE_VETERAN_PIKEMAN)) +
-                  (ComputeUpgradeValue(AI_CREATURE_IRON_GOLEM,
-                                       AI_CREATURE_STEEL_GOLEM) | 0)) | 0);
+                       CREATURE_SWORDSMAN, CREATURE_MASTER_SWORDSMAN) | 0) +
+                (((ComputeUpgradeValue(CREATURE_PIKEMAN,
+                                       CREATURE_VETERAN_PIKEMAN)) +
+                  (ComputeUpgradeValue(CREATURE_IRON_GOLEM,
+                                       CREATURE_STEEL_GOLEM) | 0)) | 0);
         break;
     case AI_OBJECT_MAGIC_WELL:
         value_h = ManaRefreshValue(gpCurAIHero, 1);
@@ -5606,7 +5606,7 @@ i32 philAI::EvaluateArtifactEvent(i32 artifact, i32 eventData) {
     if (eventData & AI_ARTIFACT_GUARD_FLAG) {
         for (stackIndex29 = 0; stackIndex29 < ARMY_GROUP_SLOT_COUNT; stackIndex29++) {
             gpMonGroup->m_creatureTypes[stackIndex29] = static_cast<i8>(eventData);
-            if (gpMonGroup->m_creatureTypes[stackIndex29] == AI_CREATURE_ROGUE)
+            if (gpMonGroup->m_creatureTypes[stackIndex29] == CREATURE_ROGUE)
                 gpMonGroup->m_quantities[stackIndex29] =
                     AI_ARTIFACT_EVENT_GUARD_ROGUE_COUNT;
             else if (stackIndex29 == 0)
@@ -5793,11 +5793,11 @@ i32 philAI::EvaluateMonsterEvent(i32 monsterType, i32 eventData, i32 *liveChance
     if (willJoin15 && strengthRatio26 > AI_MONSTER_JOIN_RATIO &&
         !gpCurAIHero->HasArtifact(AI_ARTIFACT_HIDEOUT_MASK) &&
         gpCurAIHero->m_army.CanJoin(monsterType) &&
-        monsterType != AI_CREATURE_GHOST &&
-        monsterType != AI_CREATURE_EARTH_ELEMENTAL &&
-        monsterType != AI_CREATURE_AIR_ELEMENTAL &&
-        monsterType != AI_CREATURE_FIRE_ELEMENTAL &&
-        monsterType != AI_CREATURE_WATER_ELEMENTAL) {
+        monsterType != CREATURE_GHOST &&
+        monsterType != CREATURE_EARTH_ELEMENTAL &&
+        monsterType != CREATURE_AIR_ELEMENTAL &&
+        monsterType != CREATURE_FIRE_ELEMENTAL &&
+        monsterType != CREATURE_WATER_ELEMENTAL) {
         *liveChance = 100;
         *liveChance = static_cast<i32>(winChance9 * AI_MONSTER_JOIN_CHANCE_SCALE +
                                        AI_MONSTER_JOIN_CHANCE_BASE);

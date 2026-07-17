@@ -77,7 +77,6 @@ typedef enum SwapManagerConstant {
     SWAP_MANAGER_MESSAGE = 0x100,
     SWAP_SLOT_NONE = -1,
     SWAP_ARTIFACT_NONE = -1,
-    SWAP_CREATURE_NONE = -1,
     SWAP_ARTIFACT_COLUMN_COUNT = 7,
     SWAP_FADE_STEPS = 8,
     SWAP_VIEW_FULL = 0,

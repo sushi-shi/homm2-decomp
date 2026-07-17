@@ -351,15 +351,15 @@ i32 army::FlyTo(i32 destination)
                 if (m_animationFrame %
                         m_frameInfo.animationFrameCount[ARMY_ANIMATION_WALK] ==
                     ARMY_FLIGHT_SOUND_FRAME) {
-                    if ((m_monsterType == ARMY_CREATURE_VAMPIRE ||
-                         m_monsterType == ARMY_CREATURE_VAMPIRE_LORD) &&
+                    if ((m_monsterType == CREATURE_VAMPIRE ||
+                         m_monsterType == CREATURE_VAMPIRE_LORD) &&
                         flightSegment == 0) {
                         gpSoundManager->MemorySample(
                             m_samples[ARMY_SAMPLE_EXTRA_ONE]);
                         DelayMilli(ARMY_VAMPIRE_FLIGHT_SOUND_DELAY);
-                    } else if ((m_monsterType == ARMY_CREATURE_VAMPIRE ||
+                    } else if ((m_monsterType == CREATURE_VAMPIRE ||
                                 m_monsterType ==
-                                    ARMY_CREATURE_VAMPIRE_LORD) &&
+                                    CREATURE_VAMPIRE_LORD) &&
                                flightSegmentCount - 1 == flightSegment) {
                         gpSoundManager->MemorySample(
                             m_samples[ARMY_SAMPLE_EXTRA_TWO]);
@@ -409,8 +409,8 @@ i32 army::FlyTo(i32 destination)
                 DelayTil(glTimers);
                 if (m_animationFrame < frameStart ||
                     (m_animationFrame + 1 >= middleFrameCount &&
-                     (m_monsterType == ARMY_CREATURE_VAMPIRE ||
-                      m_monsterType == ARMY_CREATURE_VAMPIRE_LORD))) {
+                     (m_monsterType == CREATURE_VAMPIRE ||
+                      m_monsterType == CREATURE_VAMPIRE_LORD))) {
                     glTimers[0] = static_cast<i32>(
                         KBTickCount() + m_frameInfo.walkDuration *
                         gfCombatSpeedMod[gConfig.combatSpeed] *
