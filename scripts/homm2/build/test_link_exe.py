@@ -7,7 +7,7 @@ from homm2.build.link_exe import (
     LINK300_FORCED_VENDOR_IMPORTS, RETAIL_LINK_FLAGS, SYSTEM_LIBS_AFTER_VENDOR,
     SYSTEM_LIBS_BEFORE_VENDOR, build_link_command, classify_missing_public_data,
     classify_pe_storage, decode_map_symbol_name,
-    decode_s_compile_banner, load_required_initialized_storage,
+    compare_pe_section_bytes, decode_s_compile_banner, load_required_initialized_storage,
     load_retail_data_symbols, load_retail_order,
     link_environment, normalized_dll_import, normalized_vendor_imports,
     parse_map_contributions, parse_map_symbol_records,
@@ -415,6 +415,39 @@ class LinkExeTest(unittest.TestCase):
                           "characteristics": 0})
         self.assertEqual(pe["section_order"], [".data"])
         self.assertEqual(pe["resource_directory"], {"rva": 0, "size": 0})
+
+    def test_pe_section_byte_comparison_reports_ranges_and_tail(self):
+        def pe(section_bytes):
+            data = bytearray(0x200 + len(section_bytes))
+            data[:2] = b"MZ"
+            struct.pack_into("<I", data, 0x3C, 0x80)
+            data[0x80:0x84] = b"PE\0\0"
+            struct.pack_into("<H", data, 0x84 + 2, 1)
+            struct.pack_into("<H", data, 0x84 + 16, 0xE0)
+            optional = 0x84 + 20
+            struct.pack_into("<H", data, optional, 0x10B)
+            section = optional + 0xE0
+            data[section:section + 8] = b".data\0\0\0"
+            struct.pack_into("<IIII", data, section + 8,
+                             len(section_bytes), 0x2000, len(section_bytes), 0x200)
+            data[0x200:0x200 + len(section_bytes)] = section_bytes
+            return data
+
+        with tempfile.TemporaryDirectory() as temp:
+            retail = Path(temp) / "retail.exe"
+            candidate = Path(temp) / "candidate.exe"
+            retail.write_bytes(pe(b"abcDEF"))
+            candidate.write_bytes(pe(b"abcXYFz"))
+            result = compare_pe_section_bytes(retail, candidate, ".data")
+        self.assertFalse(result["exact"])
+        self.assertEqual(result["matched_bytes"], 4)
+        self.assertEqual(result["mismatched_bytes"], 3)
+        self.assertEqual(result["first_mismatch_ranges"], [
+            {"offset": 3, "size": 2, "retail_hex": "4445",
+             "candidate_hex": "5859"},
+            {"offset": 6, "size": 1, "kind": "candidate-tail",
+             "retail_hex": "", "candidate_hex": "7a"},
+        ])
 
     def test_import_parser_preserves_name_and_ordinal(self):
         data = bytearray(0x400)

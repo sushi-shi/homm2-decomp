@@ -436,6 +436,68 @@ def read_pe(path):
     }
 
 
+def compare_pe_section_bytes(retail_path, candidate_path, name, range_limit=32):
+    """Compare one PE section byte-for-byte at section-relative offsets."""
+    def payload(path):
+        data = Path(path).read_bytes()
+        pe_offset = struct.unpack_from("<I", data, 0x3C)[0]
+        coff = pe_offset + 4
+        section_count = struct.unpack_from("<H", data, coff + 2)[0]
+        optional_size = struct.unpack_from("<H", data, coff + 16)[0]
+        section_offset = coff + 20 + optional_size
+        for index in range(section_count):
+            offset = section_offset + index * COFF_SECTION_HEADER_SIZE
+            section_name = data[offset:offset + 8].split(b"\0", 1)[0].decode(
+                "ascii", "replace")
+            if section_name != name:
+                continue
+            raw_size, raw_offset = struct.unpack_from("<II", data, offset + 16)
+            return data[raw_offset:raw_offset + raw_size]
+        raise ValueError("missing PE section %s in %s" % (name, path))
+
+    retail = payload(retail_path)
+    candidate = payload(candidate_path)
+    common_size = min(len(retail), len(candidate))
+    matched = sum(retail[index] == candidate[index] for index in range(common_size))
+    total_size = max(len(retail), len(candidate))
+    ranges = []
+    index = 0
+    while index < common_size and len(ranges) < range_limit:
+        if retail[index] == candidate[index]:
+            index += 1
+            continue
+        start = index
+        while index < common_size and retail[index] != candidate[index]:
+            index += 1
+        ranges.append({
+            "offset": start,
+            "size": index - start,
+            "retail_hex": retail[start:min(index, start + 16)].hex(),
+            "candidate_hex": candidate[start:min(index, start + 16)].hex(),
+        })
+    if len(retail) != len(candidate) and len(ranges) < range_limit:
+        ranges.append({
+            "offset": common_size,
+            "size": abs(len(retail) - len(candidate)),
+            "kind": "candidate-tail" if len(candidate) > len(retail) else "retail-tail",
+            "retail_hex": retail[common_size:common_size + 16].hex(),
+            "candidate_hex": candidate[common_size:common_size + 16].hex(),
+        })
+    mismatch_count = total_size - matched
+    return {
+        "exact": retail == candidate,
+        "retail_size": len(retail),
+        "candidate_size": len(candidate),
+        "matched_bytes": matched,
+        "mismatched_bytes": mismatch_count,
+        "match_percent": round(matched * 100.0 / total_size, 6) if total_size else 100.0,
+        "retail_sha256": hashlib.sha256(retail).hexdigest(),
+        "candidate_sha256": hashlib.sha256(candidate).hexdigest(),
+        "first_mismatch_ranges": ranges,
+        "range_limit": range_limit,
+    }
+
+
 def read_pe_payload_evidence(path, rva, size, audit_kind="bytes"):
     """Read one PE span with relocation-normalized and optional pointer-target evidence."""
     data = Path(path).read_bytes()
@@ -1472,6 +1534,10 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
     }
     required_storage_ok = True
     if report["static_storage"]:
+        report["static_storage"]["section_bytes"] = {
+            name: compare_pe_section_bytes(RETAIL_EXE, output, name)
+            for name in (".rdata", ".data")
+        }
         required = load_required_initialized_storage(required_initialized_path)
         add_payload_evidence(
             report["static_storage"]["public_symbols"], RETAIL_EXE, output, required)
@@ -1539,6 +1605,13 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
                storage["writable"]["candidate"]["virtual_size"],
                storage["writable"]["retail"]["raw_size"],
                storage["writable"]["retail"]["virtual_size"]))
+        for name in (".rdata", ".data"):
+            byte_audit = storage["section_bytes"][name]
+            print("link audit: %s bytes %s; %d/%d equal (%.6f%%), %d mismatched" %
+                  (name, "EXACT" if byte_audit["exact"] else "DIFFER",
+                   byte_audit["matched_bytes"],
+                   max(byte_audit["retail_size"], byte_audit["candidate_size"]),
+                   byte_audit["match_percent"], byte_audit["mismatched_bytes"]))
         print("link audit: candidate map initialized/zero-fill contributions %d/%d bytes" %
               (storage["candidate_map_initialized_contribution_bytes"],
                storage["candidate_map_zero_fill_common_contribution_bytes"]))
