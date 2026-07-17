@@ -3145,9 +3145,9 @@ i32 advManager::CombatMonsterEvent(hero *eventHero, i32 monsterType,
         m_lastQuickViewX = combatX;
         m_lastQuickViewY = combatY;
         if (eventHero->m_x >= combatX)
-            m_field_0x2ba = 0;
+            m_mineGuardianFacingLeft = 0;
         else
-            m_field_0x2ba = 1;
+            m_mineGuardianFacingLeft = 1;
         if (ComboDraw(0))
             UpdateScreen(0, 0);
         m_lastQuickViewX = -1;

@@ -2321,7 +2321,7 @@ void advManager::DrawCell(i32 mapX, i32 mapY, i32 screenX, i32 screenY,
                         IconToBitmap(m_objectIcons[ADVMGR_TILESET_MONSTER],
                                      gpWindowManager->m_screen,
                                      s_drawPixelX + 16, s_drawPixelY + 30,
-                                     (8 - (m_field_0x2ba == 0)) +
+                                     (8 - (m_mineGuardianFacingLeft == 0)) +
                                          s_drawCell->m_objectIndex * 9,
                                      1, 0, 0, ADVMGR_DRAW_CLIP_WIDTH,
                                      ADVMGR_DRAW_CLIP_HEIGHT, 0);
