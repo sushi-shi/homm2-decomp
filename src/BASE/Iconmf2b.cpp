@@ -58,8 +58,7 @@ void FlipMonoIconToBitmap(class icon *srcIcon, class bitmap *dest, i32 x, i32 y,
                           i32 color, i32 clip, i32 clipX, i32 clipY, i32 clipW, i32 clipH)
 {
     u8 *data = reinterpret_cast<u8 *>(srcIcon->m_data);
-    i32 entryOffset = frame * sizeof(IconEntry);
-    IconEntry *entry = reinterpret_cast<IconEntry *>(data + entryOffset);
+    IconEntry *entry = &srcIcon->Entries()[frame];
     i32 entryX = entry->x;
     i32 srcOffset = entry->srcOffset;
     gFMEntry = entry;

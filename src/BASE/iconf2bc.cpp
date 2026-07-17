@@ -93,7 +93,7 @@ void FlipIconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, i32 x, 
                                 i32 clip, i32 clipX, i32 clipY, i32 clipW, i32 clipH, i32 color,
                                 u8 *colorTable)
 {
-    IconEntry *entries = reinterpret_cast<IconEntry *>(srcIcon->m_data);
+    IconEntry *entries = srcIcon->Entries();
     u8 *src = reinterpret_cast<u8 *>(entries);
     i32 x0 = x;
     i32 w;

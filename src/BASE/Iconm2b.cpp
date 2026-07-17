@@ -71,7 +71,7 @@ void MonoIconToBitmap(class icon *srcIcon, class bitmap *dest, i32 x, i32 y, i32
                       i32 color, i32 clip, i32 clipX, i32 clipY, i32 clipW, i32 clipH)
 {
     u8 *data = reinterpret_cast<u8 *>(srcIcon->m_data);
-    IconEntry *entry = reinterpret_cast<IconEntry *>(data + frame * sizeof(IconEntry));
+    IconEntry *entry = &srcIcon->Entries()[frame];
     gMonoEntry = entry;
     gMonoSrc = data + entry->srcOffset;
     gMonoX0 = entry->x + x;
