@@ -42,6 +42,11 @@ typedef enum GlobalTimerConstant {
     GLOBAL_COMBAT_CYCLE_TIMER_SLOT = 8
 } GlobalTimerConstant;
 
+typedef enum CombatHeroTableConstant {
+    KB_COMBAT_HERO_VARIANT_COUNT = 2,
+    KB_COMBAT_HERO_SPRITE_COUNT = HERO_CLASS_COUNT * KB_COMBAT_HERO_VARIANT_COUNT
+} CombatHeroTableConstant;
+
 typedef enum CampaignSide {
     CAMPAIGN_ROLAND = 0,
     CAMPAIGN_ARCHIBALD = 1,
@@ -868,6 +873,9 @@ extern char cNetBoxLine[][140];
 extern char *cOutOfMemory;
 extern char *gArmyNames[MONSTER_DATABASE_COUNT];
 extern char *gArmyNamesPlural[MONSTER_DATABASE_COUNT];
+extern char *cMonFilename[MONSTER_DATABASE_COUNT];
+extern char *cArmyFrameFileNames[MONSTER_DATABASE_COUNT];
+extern char *gArmyShortNames[MONSTER_DATABASE_COUNT];
 extern int gArtifactBaseRV[];
 extern int gbAllBlack;
 extern int gbCheatMenus;
@@ -901,6 +909,7 @@ extern char *gBuildingInfoSpecial[];
 extern icon *gBuyBuildIcons;
 extern char gcBottomViewText[];
 extern configStruct gConfig;
+extern SMenuEnableStatus gsMenuEnableStatus[MENU_ENABLE_STATUS_COUNT];
 extern int gDwellingBaseResourceValues[][KB_DWELLING_TYPE_COUNT];
 extern int gDwellingCosts[][KB_DWELLING_TYPE_COUNT][KB_BUILDING_RESOURCE_COUNT];
 extern char *gDwellingNames[][KB_DWELLING_TYPE_COUNT];
@@ -930,6 +939,7 @@ extern int glTimers[GLOBAL_TIMER_COUNT];
 extern int gMageBaseResourceValues[];
 extern int gMageBuildingCosts[][KB_BUILDING_RESOURCE_COUNT];
 extern tag_monsterInfo gMonsterDatabase[MONSTER_DATABASE_COUNT];
+extern SCmbtHero sCmbtHero[KB_COMBAT_HERO_SPRITE_COUNT];
 extern int gNeutralBaseResourceValues[];
 extern int gNeutralBuildingCosts[][KB_BUILDING_RESOURCE_COUNT];
 extern char *gNeutralBuildingNames[];

@@ -3,10 +3,6 @@
 
 #include <va.h>
 
-// KB_TYPES.h keeps a flattened MSVC mirror for compiler-state compatibility. Clang follows
-// this canonical declaration, while a later direct MSVC include after the aggregate is empty.
-#if !defined(HOMM2_SOURCE_KB_TYPES_H) || defined(__clang__)
-
 // gConfig - game/editor preferences persisted to the registry. Field names are the
 // retail registry value names recovered from ReadPrefsFromRegistry/WritePrefsToRegistry.
 #pragma pack(push, 1)
@@ -89,7 +85,5 @@ struct configStruct {
 #pragma pack(pop)
 SIZE(exeGfxConfig, CONFIG_GRAPHICS_SIZE);
 SIZE(configStruct, CONFIG_STRUCT_SIZE);
-
-#endif // standalone or Clang aggregate
 
 #endif // HOMM2_SOURCE_CONFIG_TYPES_H

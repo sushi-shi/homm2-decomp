@@ -8,7 +8,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <SOURCE/KB_TYPES.h>
 #include <BASE/message.h>
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>

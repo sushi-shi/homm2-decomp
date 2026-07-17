@@ -5,7 +5,6 @@
 
 #include <va.h>
 #include <BASE/message.h>
-#include <SOURCE/KB_TYPES.h>
 #include <BASE/Misc.h>
 #include <BASE/border.h>
 #include <BASE/executive.h>

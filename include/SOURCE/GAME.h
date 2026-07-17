@@ -1,13 +1,12 @@
 #ifndef HOMM2_GAME_H
 #define HOMM2_GAME_H
 #include <va.h>
-#include <SOURCE/KB_TYPES.h>
 // Declarations of the free functions DEFINED in GAME.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
 // forward declarations (was <_all.h>):
 struct tag_message;
 
-// GAME-private types (configStruct / tag_monsterInfo are shared, in KB_TYPES.h).
+// GAME-private types.
 #pragma pack(push, 1)
 struct EventExtra {
     unsigned char unknown00;
