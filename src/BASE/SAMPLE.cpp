@@ -37,9 +37,9 @@ sample::sample(char *name, long channelType, long volume, long loopCount)
     : resource(6, gpResourceManager->MakeId(name, 1), 1, 0)
 {
     int formatFlags;
-    m_channelType = channelType;
-    m_volume = volume;
-    m_loopCount = loopCount;
+    m_playbackData.channelType = channelType;
+    m_playbackData.volume = volume;
+    m_playbackData.loopCount = loopCount;
     formatFlags = SAMPLE_FORMAT_STEREO;
 
     char filename[32];
@@ -49,19 +49,19 @@ sample::sample(char *name, long channelType, long volume, long loopCount)
     for (int i = 0; i < 3; i++) {
         switch (filename[i]) {
         case '1':
-            m_sampleRate = SAMPLE_RATE_11025;
+            m_playbackData.sampleRate = SAMPLE_RATE_11025;
             break;
         case '2':
-            m_sampleRate = SAMPLE_RATE_22050;
+            m_playbackData.sampleRate = SAMPLE_RATE_22050;
             break;
         case '4':
-            m_sampleRate = SAMPLE_RATE_44100;
+            m_playbackData.sampleRate = SAMPLE_RATE_44100;
             break;
         case '6':
-            m_format = SAMPLE_FORMAT_16_BIT;
+            m_playbackData.format = SAMPLE_FORMAT_16_BIT;
             break;
         case '8':
-            m_format = SAMPLE_FORMAT_8_BIT;
+            m_playbackData.format = SAMPLE_FORMAT_8_BIT;
             break;
         case 'M':
         case 'm':
@@ -69,15 +69,16 @@ sample::sample(char *name, long channelType, long volume, long loopCount)
             break;
         }
     }
-    m_format += formatFlags;
+    m_playbackData.format += formatFlags;
 
     unsigned long size = gpResourceManager->GetFileSize(m_id);
 #line 57
-    m_data = static_cast<char *>(
+    m_playbackData.data = static_cast<char *>(
         H2_ALLOC(size, gSampleSourceFiles.sampleAllocation, 0x39));
-    m_size = size;
+    m_playbackData.size = size;
     gpResourceManager->PointToFile(m_id);
-    gpResourceManager->ReadBlock(reinterpret_cast<signed char *>(m_data), size);
+    gpResourceManager->ReadBlock(
+        reinterpret_cast<signed char *>(m_playbackData.data), size);
 }
 
 // @early-stop
@@ -90,10 +91,10 @@ VA(0x004daf40, 0x2c)
 inline sample::~sample()
 {
 #line 97
-    H2_FREE(m_data, gSampleSourceFiles.sampleDestruction, 0x61);
-    m_data = 0;
-    m_size = 0;
-    m_volume = 0;
+    H2_FREE(m_playbackData.data, gSampleSourceFiles.sampleDestruction, 0x61);
+    m_playbackData.data = 0;
+    m_playbackData.size = 0;
+    m_playbackData.volume = 0;
 }
 
 VA(0x004daf70, 0x72)
