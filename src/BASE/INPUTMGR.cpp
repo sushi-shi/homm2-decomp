@@ -246,7 +246,7 @@ inputManager::inputManager(void) : baseManager()
 {
     m_active = 0;
     m_mouseMessageActive = 0;
-    field_0x852 = 1;
+    m_requestedPriority = 1;
     field_0x84e = 0;
     field_0x742 = 0;
     field_0x746 = 0;
@@ -262,7 +262,7 @@ i32 inputManager::Open(i32 param_1)
     memset(m_eventRing, 0, sizeof(m_eventRing));
     m_writeIndex = 0;
     m_readIndex = 0;
-    field_0x852 = param_1;
+    m_requestedPriority = param_1;
     m_modifiers = 0;
     MakeScanCodeTable();
     m_messageMask = 4;
@@ -278,7 +278,7 @@ void inputManager::Close(void)
     if (m_active == 1) {
         m_writeIndex = 0;
         m_readIndex = 0;
-        field_0x852 = 0;
+        m_requestedPriority = 0;
         m_active = 0;
     }
 }

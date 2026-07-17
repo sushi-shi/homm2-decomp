@@ -144,17 +144,17 @@ public:
     i32    m_readIndex;  // +0x736
     i32    m_writeIndex;  // +0x73a
     i32    m_mouseMessageActive;  // +0x73e  reentrancy guard shared by mouse event producers
-    i32    field_0x742;  // +0x742
-    i32    field_0x746;  // +0x746
-    i32    field_0x74a;  // +0x74a
+    i32    field_0x742;  // +0x742  constructor-initialized only; no retail reader
+    i32    field_0x746;  // +0x746  constructor-initialized only; no retail reader
+    i32    field_0x74a;  // +0x74a  constructor-initialized only; no retail reader
     i16  m_keyState[INPUT_SCAN_CODE_CAPACITY];  // +0x74e  scan-code to ASCII/extended-key table
-    i32    field_0x84e;  // +0x84e
-    i32    field_0x852;  // +0x852
+    i32    field_0x84e;  // +0x84e  constructor-initialized only; no retail reader
+    i32    m_requestedPriority;  // +0x852  Open's priority argument; cleared on Close; never read
     InputManagerKeyCodeType m_keyCodeType;  // +0x856  zero converts scan codes to ASCII on dequeue
-    i32    m_field_0x85a;  // +0x85a
+    i32    m_field_0x85a;  // +0x85a  cleared on every event enqueue; no retail reader
     i32    m_modifiers;  // +0x85e  current keyboard modifier mask
-    i32    field_0x862;  // +0x862
-    i32    field_0x866;  // +0x866
+    i32    field_0x862;  // +0x862  constructor-initialized only; no retail reader
+    i32    field_0x866;  // +0x866  constructor-initialized only; no retail reader
     // --- constructors ---
     inputManager(void);
     // --- virtual methods (vtable order) ---
