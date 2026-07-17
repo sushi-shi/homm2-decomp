@@ -13,27 +13,26 @@
 #include <SOURCE/dimPalette.h>
 #include <string.h>
 // Per-call decoder scratch — its own file-static block.
-static IconEntry *gFYEntry;
-static u8 *gFYSrc;
+static IconEntry* gFYEntry;
+static u8* gFYSrc;
 static i32 gFYX0;
 static i32 gFYXEnd;
 static i32 gFYY;
 static i32 gFYX;
 static i32 gFYClipB;
-static u8 *gFYRow;
+static u8* gFYRow;
 static i32 gFYRun;
 static u8 gFYColor;
 static i32 gFYDimLen;
 static u32 gFYDimLen2;
-static u8 *gFYDimPal;
+static u8* gFYDimPal;
 static i32 gFYDimIdx;
-static u8 *gFYDimDst;
-static u8 *gFYDst;
+static u8* gFYDimDst;
+static u8* gFYDst;
 static i32 gFYSkip;
 static i32 gFYClipR;
 
-static inline i32 IconRowVisible(i8 *shear, i32 clipTop)
-{
+static inline i32 IconRowVisible(i8* shear, i32 clipTop) {
     return shear[gFYY] != ICON_SHEAR_SKIP_ROW && clipTop <= gFYY && gFYY <= gFYClipB;
 }
 
@@ -50,12 +49,22 @@ static inline i32 IconRowVisible(i8 *shear, i32 clipTop)
 // setup lifetime at +0x5c: retail keeps shear in ESI and clipW in EBP, while candidate keeps shear
 // in EBP and later reloads width. Do not reintroduce labels merely to chase fuzzy scheduling.
 VA(0x004d9ce0, 0x58d)
-void FlipIconToBitmapYModify(class icon *srcIcon, class bitmap *dest, i32 x, i32 y, i32 frame,
-                             i32 clip, i32 clipX, i32 clipY, i32 clipW, i32 clipH, i32 color,
-                             i8 *shear)
-{
+void FlipIconToBitmapYModify(
+    class icon* srcIcon,
+    class bitmap* dest,
+    i32 x,
+    i32 y,
+    i32 frame,
+    i32 clip,
+    i32 clipX,
+    i32 clipY,
+    i32 clipW,
+    i32 clipH,
+    i32 color,
+    i8* shear
+) {
     i32 clipWidth = clipW;
-    IconEntry *entries = srcIcon->Entries();
+    IconEntry* entries = srcIcon->Entries();
     gFYEntry = &entries[frame];
     gFYSrc = srcIcon->m_data + gFYEntry->srcOffset;
     gFYX0 = ((x - gFYEntry->w) - gFYEntry->x) + 1;
@@ -94,13 +103,12 @@ void FlipIconToBitmapYModify(class icon *srcIcon, class bitmap *dest, i32 x, i32
                     gFYColor = static_cast<u8>(color);
                 } else {
                     if ((gFYRun & ICON_RLE_DIM_APPLY_FLAG) != 0) {
-                        gFYDimPal =
-                            reinterpret_cast<u8 *>(uDimPal) +
-                            (gFYRun & ICON_RLE_DIM_LEVEL_MASK) *
-                                ICON_RLE_DIM_PALETTE_LEVEL_STRIDE;
+                        gFYDimPal = reinterpret_cast<u8*>(uDimPal)
+                                    + (gFYRun & ICON_RLE_DIM_LEVEL_MASK)
+                                          * ICON_RLE_DIM_PALETTE_LEVEL_STRIDE;
                         if (IconRowVisible(shear, clipY)) {
                             if (clipX <= (gFYX - gFYDimLen) + 1 && gFYX <= gFYClipR) {
-                                u8 *dimDst;
+                                u8* dimDst;
                                 if (clipX <= (gFYX - gFYDimLen) + 1) {
                                     dimDst = (gFYRow - gFYDimLen) + gFYX + 1;
                                 } else {

@@ -23,16 +23,14 @@
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
 VA(0x004c7a20, 0x67)
-icon::icon(u32l id) : resource(1, id, 1, 0)
-{
+icon::icon(u32l id) : resource(1, id, 1, 0) {
     DATA(0x0051e94c) static char allocationSourceFile[] =
         "I:\\Projects\\Heroes\\Prog\\BASE\\ICON.CPP";
     gpResourceManager->PointToFile(id);
     m_frameCount = gpResourceManager->ReadWord();
     u32 len = gpResourceManager->ReadLong();
-    m_data = static_cast<u8 *>(
-        H2_ALLOC(len, allocationSourceFile, 0x12));
-    gpResourceManager->ReadBlock(reinterpret_cast<i8 *>(m_data), len);
+    m_data = static_cast<u8*>(H2_ALLOC(len, allocationSourceFile, 0x12));
+    gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_data), len);
 }
 
 // @early-stop
@@ -45,25 +43,43 @@ icon::icon(u32l id) : resource(1, id, 1, 0)
 // VA(0x004c7a90, 0x36) ??_E/??_G icon deleting-destructor aliases
 
 VA(0x004c7ad0, 0x21)
-icon::~icon()
-{
+icon::~icon() {
     DATA(0x0051e974) static char destructionSourceFile[] =
         "I:\\Projects\\Heroes\\Prog\\BASE\\ICON.CPP";
     H2_FREE(m_data, destructionSourceFile, 0x1a);
 }
 
 VA(0x004c7b00, 0x44)
-void icon::DrawToBuffer(i32 x, i32 y, i32 frame, i32 flip)
-{
+void icon::DrawToBuffer(i32 x, i32 y, i32 frame, i32 flip) {
     if (flip == ICON_DRAW_NORMAL) {
-        IconToBitmap(this, gpWindowManager->m_screen, x, y, frame,
-                     ICON_DRAW_NO_CLIP, 0, 0, ICON_DRAW_SCREEN_WIDTH,
-                     ICON_DRAW_SCREEN_HEIGHT, 0);
+        IconToBitmap(
+            this,
+            gpWindowManager->m_screen,
+            x,
+            y,
+            frame,
+            ICON_DRAW_NO_CLIP,
+            0,
+            0,
+            ICON_DRAW_SCREEN_WIDTH,
+            ICON_DRAW_SCREEN_HEIGHT,
+            0
+        );
         return;
     }
-    FlipIconToBitmap(this, gpWindowManager->m_screen, x, y, frame,
-                     ICON_DRAW_NO_CLIP, 0, 0, ICON_DRAW_SCREEN_WIDTH,
-                     ICON_DRAW_SCREEN_HEIGHT, 0);
+    FlipIconToBitmap(
+        this,
+        gpWindowManager->m_screen,
+        x,
+        y,
+        frame,
+        ICON_DRAW_NO_CLIP,
+        0,
+        0,
+        ICON_DRAW_SCREEN_WIDTH,
+        ICON_DRAW_SCREEN_HEIGHT,
+        0
+    );
 }
 
 // @semantic
@@ -82,13 +98,19 @@ void icon::DrawToBuffer(i32 x, i32 y, i32 frame, i32 flip)
 // after a material exact predecessor/header-state change; this is not a
 // certified permanent wall.
 VA(0x004c7b50, 0x2bb)
-i32 icon::CombatClipDrawToBuffer(i32 x, i32 y, i32 frame, struct SLimitData *limits,
-                                 i32 flip, i32 offset, u8 *colorTable,
-                                 i8 *yModify)
-{
+i32 icon::CombatClipDrawToBuffer(
+    i32 x,
+    i32 y,
+    i32 frame,
+    struct SLimitData* limits,
+    i32 flip,
+    i32 offset,
+    u8* colorTable,
+    i8* yModify
+) {
     if (gbComputeExtent != 0) {
         i32 mirror = flip;
-        IconEntry *entry = &Entries()[frame];
+        IconEntry* entry = &Entries()[frame];
         if (mirror != 0) {
             limits->right = x - entry->x;
             limits->left = limits->right - entry->w + 1;
@@ -112,66 +134,160 @@ i32 icon::CombatClipDrawToBuffer(i32 x, i32 y, i32 frame, struct SLimitData *lim
             return ICON_DRAW_SKIPPED;
     }
 
-    if (gbLimitToExtent != 0 &&
-        (gbCurrArmyDrawn == 0 || limits->left > giMaxExtentX ||
-         limits->right < giMinExtentX || limits->top > giMaxExtentY ||
-         limits->bottom < giMinExtentY))
+    if (gbLimitToExtent != 0
+        && (gbCurrArmyDrawn == 0 || limits->left > giMaxExtentX || limits->right < giMinExtentX
+            || limits->top > giMaxExtentY || limits->bottom < giMinExtentY))
         return ICON_DRAW_SKIPPED;
 
     if (yModify != 0) {
         if (flip == ICON_DRAW_NORMAL)
-            IconToBitmapYModify(this, gpWindowManager->m_screen, x, y, frame,
-                                ICON_DRAW_CLIP, 0, 0, ICON_DRAW_SCREEN_WIDTH,
-                                ICON_DRAW_COMBAT_HEIGHT, offset, yModify);
+            IconToBitmapYModify(
+                this,
+                gpWindowManager->m_screen,
+                x,
+                y,
+                frame,
+                ICON_DRAW_CLIP,
+                0,
+                0,
+                ICON_DRAW_SCREEN_WIDTH,
+                ICON_DRAW_COMBAT_HEIGHT,
+                offset,
+                yModify
+            );
         else
-            FlipIconToBitmapYModify(this, gpWindowManager->m_screen, x, y,
-                                    frame, ICON_DRAW_CLIP, 0, 0,
-                                    ICON_DRAW_SCREEN_WIDTH,
-                                    ICON_DRAW_COMBAT_HEIGHT, offset, yModify);
+            FlipIconToBitmapYModify(
+                this,
+                gpWindowManager->m_screen,
+                x,
+                y,
+                frame,
+                ICON_DRAW_CLIP,
+                0,
+                0,
+                ICON_DRAW_SCREEN_WIDTH,
+                ICON_DRAW_COMBAT_HEIGHT,
+                offset,
+                yModify
+            );
     } else if (colorTable != 0) {
         if (flip == ICON_DRAW_NORMAL)
-            IconToBitmapColorTable(this, gpWindowManager->m_screen, x, y,
-                                   frame, ICON_DRAW_CLIP, 0, 0,
-                                   ICON_DRAW_SCREEN_WIDTH,
-                                   ICON_DRAW_COMBAT_HEIGHT, offset, colorTable,
-                                   ICON_COLOR_TABLE_APPLY_DIM);
+            IconToBitmapColorTable(
+                this,
+                gpWindowManager->m_screen,
+                x,
+                y,
+                frame,
+                ICON_DRAW_CLIP,
+                0,
+                0,
+                ICON_DRAW_SCREEN_WIDTH,
+                ICON_DRAW_COMBAT_HEIGHT,
+                offset,
+                colorTable,
+                ICON_COLOR_TABLE_APPLY_DIM
+            );
         else
-            FlipIconToBitmapColorTable(this, gpWindowManager->m_screen, x, y,
-                                       frame, ICON_DRAW_CLIP, 0, 0,
-                                       ICON_DRAW_SCREEN_WIDTH,
-                                       ICON_DRAW_COMBAT_HEIGHT, offset,
-                                       colorTable);
+            FlipIconToBitmapColorTable(
+                this,
+                gpWindowManager->m_screen,
+                x,
+                y,
+                frame,
+                ICON_DRAW_CLIP,
+                0,
+                0,
+                ICON_DRAW_SCREEN_WIDTH,
+                ICON_DRAW_COMBAT_HEIGHT,
+                offset,
+                colorTable
+            );
     } else if (gbLimitToExtent != 0) {
         if (flip == ICON_DRAW_NORMAL)
-            IconToBitmap(this, gpWindowManager->m_screen, x, y, frame,
-                         ICON_DRAW_CLIP,
-                         giMinExtentX, giMinExtentY,
-                         giMaxExtentX - giMinExtentX + 1,
-                         giMaxExtentY - giMinExtentY + 1, offset);
+            IconToBitmap(
+                this,
+                gpWindowManager->m_screen,
+                x,
+                y,
+                frame,
+                ICON_DRAW_CLIP,
+                giMinExtentX,
+                giMinExtentY,
+                giMaxExtentX - giMinExtentX + 1,
+                giMaxExtentY - giMinExtentY + 1,
+                offset
+            );
         else
-            FlipIconToBitmap(this, gpWindowManager->m_screen, x, y, frame,
-                             ICON_DRAW_CLIP,
-                             giMinExtentX, giMinExtentY,
-                             giMaxExtentX - giMinExtentX + 1,
-                             giMaxExtentY - giMinExtentY + 1, offset);
+            FlipIconToBitmap(
+                this,
+                gpWindowManager->m_screen,
+                x,
+                y,
+                frame,
+                ICON_DRAW_CLIP,
+                giMinExtentX,
+                giMinExtentY,
+                giMaxExtentX - giMinExtentX + 1,
+                giMaxExtentY - giMinExtentY + 1,
+                offset
+            );
     } else if (flip == ICON_DRAW_NORMAL) {
-        IconToBitmap(this, gpWindowManager->m_screen, x, y, frame,
-                     ICON_DRAW_CLIP, 0, 0, ICON_DRAW_SCREEN_WIDTH,
-                     ICON_DRAW_COMBAT_HEIGHT, offset);
+        IconToBitmap(
+            this,
+            gpWindowManager->m_screen,
+            x,
+            y,
+            frame,
+            ICON_DRAW_CLIP,
+            0,
+            0,
+            ICON_DRAW_SCREEN_WIDTH,
+            ICON_DRAW_COMBAT_HEIGHT,
+            offset
+        );
     } else {
-        FlipIconToBitmap(this, gpWindowManager->m_screen, x, y, frame,
-                         ICON_DRAW_CLIP, 0, 0, ICON_DRAW_SCREEN_WIDTH,
-                         ICON_DRAW_COMBAT_HEIGHT, offset);
+        FlipIconToBitmap(
+            this,
+            gpWindowManager->m_screen,
+            x,
+            y,
+            frame,
+            ICON_DRAW_CLIP,
+            0,
+            0,
+            ICON_DRAW_SCREEN_WIDTH,
+            ICON_DRAW_COMBAT_HEIGHT,
+            offset
+        );
     }
     return ICON_DRAW_COMPLETED;
 }
 
 VA(0x004c7e10, 0x3d)
-void icon::ClipFillToBuffer(i32 x, i32 y, i32 frame, i32 color, i32 flip,
-                            i32 clipX, i32 clipY, i32 clipW, i32 clipH)
-{
-    MonoIconToBitmap(this, gpWindowManager->m_screen, x, y, frame, color,
-                     ICON_DRAW_CLIP, clipX, clipY, clipW, clipH);
+void icon::ClipFillToBuffer(
+    i32 x,
+    i32 y,
+    i32 frame,
+    i32 color,
+    i32 flip,
+    i32 clipX,
+    i32 clipY,
+    i32 clipW,
+    i32 clipH
+) {
+    MonoIconToBitmap(
+        this,
+        gpWindowManager->m_screen,
+        x,
+        y,
+        frame,
+        color,
+        ICON_DRAW_CLIP,
+        clipX,
+        clipY,
+        clipW,
+        clipH
+    );
 }
 
 // Retained exact-max checkpoint: retail/base are both 0x103 bytes with the same 0x4-byte frame,
@@ -185,42 +301,79 @@ void icon::ClipFillToBuffer(i32 x, i32 y, i32 frame, i32 color, i32 flip,
 // AST pass found no gain. Revisit after an exact predecessor or shared-header
 // state change.
 VA(0x004c7e50, 0x103)
-void icon::FillToBuffer(i32 x, i32 y, i32 frame, i32 color, i32 flip,
-                        struct SLimitData *limits)
-{
+void icon::FillToBuffer(i32 x, i32 y, i32 frame, i32 color, i32 flip, struct SLimitData* limits) {
     if (flip != ICON_DRAW_NORMAL) {
-        FlipMonoIconToBitmap(this, gpWindowManager->m_screen, x, y, frame, color,
-                             ICON_DRAW_NO_CLIP, 0, 0, 0, 0);
+        FlipMonoIconToBitmap(
+            this,
+            gpWindowManager->m_screen,
+            x,
+            y,
+            frame,
+            color,
+            ICON_DRAW_NO_CLIP,
+            0,
+            0,
+            0,
+            0
+        );
         return;
     }
     if (gbLimitToExtent != 0 && limits != 0) {
         limits->left = Entries()[frame].x + x;
-        limits->right = Entries()[frame].w +
-                        limits->left - 1;
+        limits->right = Entries()[frame].w + limits->left - 1;
         limits->top = Entries()[frame].y + y;
-        limits->bottom = Entries()[frame].h +
-                         limits->top - 1;
-        if (gbCurrArmyDrawn == 0 || limits->left > giMaxExtentX ||
-            limits->right < giMinExtentX || limits->top > giMaxExtentY ||
-            limits->bottom < giMinExtentY)
+        limits->bottom = Entries()[frame].h + limits->top - 1;
+        if (gbCurrArmyDrawn == 0 || limits->left > giMaxExtentX || limits->right < giMinExtentX
+            || limits->top > giMaxExtentY || limits->bottom < giMinExtentY)
             return;
     }
-    MonoIconToBitmap(this, gpWindowManager->m_screen, x, y, frame, color,
-                     ICON_DRAW_NO_CLIP, 0, 0, 0, 0);
+    MonoIconToBitmap(
+        this,
+        gpWindowManager->m_screen,
+        x,
+        y,
+        frame,
+        color,
+        ICON_DRAW_NO_CLIP,
+        0,
+        0,
+        0,
+        0
+    );
 }
 
 VA(0x004c7f60, 0x3e)
-void icon::DimToBuffer(i32 x, i32 y, i32 frame, i32 flip)
-{
+void icon::DimToBuffer(i32 x, i32 y, i32 frame, i32 flip) {
     if (flip == ICON_DRAW_NORMAL) {
-        DimIconToBitmap(this, gpWindowManager->m_screen, x, y, frame,
-                        ICON_DRAW_NO_CLIP, 0, 0, 0, 0, 0);
+        DimIconToBitmap(
+            this,
+            gpWindowManager->m_screen,
+            x,
+            y,
+            frame,
+            ICON_DRAW_NO_CLIP,
+            0,
+            0,
+            0,
+            0,
+            0
+        );
         return;
     }
-    FlipDimIconToBitmap(this, gpWindowManager->m_screen, x, y, frame,
-                        ICON_DRAW_NO_CLIP, 0, 0, 0, 0, 0);
+    FlipDimIconToBitmap(
+        this,
+        gpWindowManager->m_screen,
+        x,
+        y,
+        frame,
+        ICON_DRAW_NO_CLIP,
+        0,
+        0,
+        0,
+        0,
+        0
+    );
 }
-
 
 // ===== vtable icon (root)  (1 slots) =====
 //  [ 0] VA(0x004c7a90, 0x36)  void * icon::scalar_dtor(unsigned int)   <- introduces virtual

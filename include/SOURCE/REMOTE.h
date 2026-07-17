@@ -86,17 +86,16 @@ SIZE(RemoteMessage, REMOTE_MESSAGE_SIZE);
 void RemoteCleanup(void);
 void RemoteMain(i32);
 void UnloadRemoteDriver(i16);
-i32 calc_crc_long(u8 *, i32);
-void calc_crc(u16 *, u8 *, i32);
-i32 EncodePacket(u8 *, char, char, i32);
-i32 DecodePacket(u8 *, i32);
-i32 SendRemoteData(u8 *, u8 *, i32, i32);
-i32 ReceiveRemoteData(u8 *, u8 *, i32);
-i32 TransmitRemoteData(char *, i32, i32, i8, i8, i8, i8);
-char * GetRemoteData(i8);
+i32 calc_crc_long(u8*, i32);
+void calc_crc(u16*, u8*, i32);
+i32 EncodePacket(u8*, char, char, i32);
+i32 DecodePacket(u8*, i32);
+i32 SendRemoteData(u8*, u8*, i32, i32);
+i32 ReceiveRemoteData(u8*, u8*, i32);
+i32 TransmitRemoteData(char*, i32, i32, i8, i8, i8, i8);
+char* GetRemoteData(i8);
 void PollRemote(void);
-i32 TransmitAndWait(char *, i32, i32, i8, i8, char * *);
-
+i32 TransmitAndWait(char*, i32, i32, i8, i8, char**);
 
 // --- globals owned by this TU (moved from _globals.h; CodeView-attributed) ---
 extern char gbUseDiffCompression;
@@ -128,7 +127,7 @@ extern char gcThisNetName[32];
 extern i32l lLastHeartbeatReceive[REMOTE_PLAYER_COUNT];
 extern char packet[REMOTE_TRANSPORT_BUFFER_SIZE];
 extern char rcvBufIn[REMOTE_TRANSPORT_BUFFER_SIZE];
-extern char *rcvBuf[REMOTE_QUEUE_STORAGE_COUNT];
+extern char* rcvBuf[REMOTE_QUEUE_STORAGE_COUNT];
 extern i32 bGotGameType;
 extern SNetPlayerInfo gsThisNetPlayerInfo;
 

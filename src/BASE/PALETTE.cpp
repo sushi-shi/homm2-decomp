@@ -27,30 +27,28 @@
 // owners, or section pragmas.
 
 VA(0x004d2580, 0x2e)
-palette::palette(void) : resource(2, 0, 1, 0)
-{
-    m_data = static_cast<i8 *>(H2_ALLOC(0x300, PALETTE_SOURCE_FILE, 8));
+palette::palette(void) : resource(2, 0, 1, 0) {
+    m_data = static_cast<i8*>(H2_ALLOC(0x300, PALETTE_SOURCE_FILE, 8));
 }
 
 VA(0x004d2600, 0x55)
-palette::palette(u32l id) : resource(2, id, 1, 0)
-{
-    m_data = static_cast<i8 *>(H2_ALLOC(0x300, PALETTE_SOURCE_FILE "\0", 13));
+palette::palette(u32l id) : resource(2, id, 1, 0) {
+    m_data = static_cast<i8*>(H2_ALLOC(0x300, PALETTE_SOURCE_FILE "\0", 13));
     gpResourceManager->PointToFile(id);
     gpResourceManager->ReadBlock(m_data, 0x300);
 }
 
 VA(0x004d2660, 0x2c)
-palette::~palette()
-{
+palette::~palette() {
     if (m_data != 0)
         H2_FREE(m_data, PALETTE_SOURCE_FILE "\0\0", 21);
     m_data = 0;
 }
 
 VA(0x004d2690, 0x4)
-i8 * palette::Data(void) { return m_data; }
-
+i8* palette::Data(void) {
+    return m_data;
+}
 
 // ===== vtable palette (root)  (1 slots) =====
 //  [ 0] VA(0x004d25b0, 0x41)  void * palette::scalar_dtor(unsigned int)   <- introduces virtual

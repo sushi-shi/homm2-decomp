@@ -74,6 +74,6 @@ typedef enum ViewWorldConstant {
     VIEW_WORLD_RADAR_BOTTOM = 0xa0
 } ViewWorldConstant;
 
-i32 ViewWorldDialogHandler(struct tag_message &);
+i32 ViewWorldDialogHandler(struct tag_message&);
 
 #endif // HOMM2_VIEWWRLD_H

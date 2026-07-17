@@ -30,12 +30,10 @@
 #include <stdio.h>
 #include <string.h>
 
-#define OVERVIEW_SOURCE_FILE const_cast<char *>("I:\\Projects\\Heroes\\Prog\\SOURCE\\Overview.cpp")
+#define OVERVIEW_SOURCE_FILE const_cast<char*>("I:\\Projects\\Heroes\\Prog\\SOURCE\\Overview.cpp")
 
-#define OVERVIEW_TEXT_WIDGET_ROWS \
-    (reinterpret_cast<OverviewTextWidgetRow *>(textWidgetDynamic))
-#define OVERVIEW_ICON_WIDGET_ROWS \
-    (reinterpret_cast<OverviewIconWidgetRow *>(iconWidgetDynamic))
+#define OVERVIEW_TEXT_WIDGET_ROWS (reinterpret_cast<OverviewTextWidgetRow*>(textWidgetDynamic))
+#define OVERVIEW_ICON_WIDGET_ROWS (reinterpret_cast<OverviewIconWidgetRow*>(iconWidgetDynamic))
 
 // @semantic: With the schema-4 delink target, the complete behavior is recovered.
 // Recovered flat row-major cleanup indexing, the
@@ -57,16 +55,14 @@
 // their public ABI and are not a valid reconstruction. Revisit for slot/equality
 // steering; do not repeat these forms.
 VA(0x00407870, 0x223e)
-void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate)
-{
-    DATA(0x004eda04) static i16 overviewDynamicSourceLine =
-        OVERVIEW_DYNAMIC_SOURCE_LINE;
+void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
+    DATA(0x004eda04) static i16 overviewDynamicSourceLine = OVERVIEW_DYNAMIC_SOURCE_LINE;
     i32 row;
     i32 item;
     i32 textItemCount;
     i32 iconCount;
     i32 rowWidgetId6;
-    char *valueText0;
+    char* valueText0;
 
     if (updateKnob) {
         if (giOverviewItems[giOverviewType] <= OVERVIEW_VISIBLE_ROWS) {
@@ -117,7 +113,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate)
             static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 17),
             594,
             82,
-            const_cast<char *>("overview.icn"),
+            const_cast<char*>("overview.icn"),
             static_cast<i16>(giOverviewType + 10),
             0,
             static_cast<i16>(rowWidgetId6 + 2),
@@ -127,42 +123,33 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate)
         if (OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] == 0) {
             MemError();
         }
-        overWin->AddWidget(
-            OVERVIEW_ICON_WIDGET_ROWS[row][iconCount],
-            -1
-        );
+        overWin->AddWidget(OVERVIEW_ICON_WIDGET_ROWS[row][iconCount], -1);
         iconCount++;
 
         if (giOverviewType == OVERVIEW_TOWNS) {
-            hero *heroData0;
-            town *record = GetTown(
-                gpCurPlayer->m_townIds[giOverviewTop[giOverviewType] + row]
-            );
+            hero* heroData0;
+            town* record = GetTown(gpCurPlayer->m_townIds[giOverviewTop[giOverviewType] + row]);
             {
-                valueText0 = static_cast<char *>(BaseAlloc(
+                valueText0 = static_cast<char*>(BaseAlloc(
                     strlen(record->m_name) + 1,
                     OVERVIEW_SOURCE_FILE,
                     overviewDynamicSourceLine + 0x4f
                 ));
                 strcpy(valueText0, record->m_name);
 
-                OVERVIEW_TEXT_WIDGET_ROWS[row][textItemCount] =
-                    new textWidget(
-                        35,
-                        static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 80),
-                        132,
-                        10,
-                        valueText0,
-                        const_cast<char *>("smalfont.fnt"),
-                        1,
-                        static_cast<i16>(rowWidgetId6 + 3),
-                        0x200,
-                        1
-                    );
-            overWin->AddWidget(
-                    OVERVIEW_TEXT_WIDGET_ROWS[row][textItemCount],
-                    -1
+                OVERVIEW_TEXT_WIDGET_ROWS[row][textItemCount] = new textWidget(
+                    35,
+                    static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 80),
+                    132,
+                    10,
+                    valueText0,
+                    const_cast<char*>("smalfont.fnt"),
+                    1,
+                    static_cast<i16>(rowWidgetId6 + 3),
+                    0x200,
+                    1
                 );
+                overWin->AddWidget(OVERVIEW_TEXT_WIDGET_ROWS[row][textItemCount], -1);
                 textItemCount++;
             }
 
@@ -171,50 +158,42 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate)
                 if ((record->m_buildings & TOWN_BUILDING_CASTLE) == 0) {
                     townFrame += 6;
                 }
-                OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] =
-                    new iconWidget(
-                        47,
-                        static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 36),
-                        46,
-                        22,
-                        const_cast<char *>("minitown.icn"),
-                        townFrame,
-                        0,
-                        static_cast<i16>(rowWidgetId6 + 4),
-                        16,
-                        1
-                    );
-                if (OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] == 0) {
-                MemError();
-                }
-            overWin->AddWidget(
-                    OVERVIEW_ICON_WIDGET_ROWS[row][iconCount],
-                    -1
+                OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] = new iconWidget(
+                    47,
+                    static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 36),
+                    46,
+                    22,
+                    const_cast<char*>("minitown.icn"),
+                    townFrame,
+                    0,
+                    static_cast<i16>(rowWidgetId6 + 4),
+                    16,
+                    1
                 );
-            iconCount++;
-            }
-
-            if (BitTest(gpGame->m_knownTowns, static_cast<u32>(record->m_id))) {
-                OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] =
-                    new iconWidget(
-                        42,
-                        static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 31),
-                        0,
-                        0,
-                        const_cast<char *>("locators.icn"),
-                        24,
-                        0,
-                        static_cast<i16>(rowWidgetId6 + 44),
-                        16,
-                        1
-                    );
                 if (OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] == 0) {
                     MemError();
                 }
-                overWin->AddWidget(
-                    OVERVIEW_ICON_WIDGET_ROWS[row][iconCount],
-                    -1
+                overWin->AddWidget(OVERVIEW_ICON_WIDGET_ROWS[row][iconCount], -1);
+                iconCount++;
+            }
+
+            if (BitTest(gpGame->m_knownTowns, static_cast<u32>(record->m_id))) {
+                OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] = new iconWidget(
+                    42,
+                    static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 31),
+                    0,
+                    0,
+                    const_cast<char*>("locators.icn"),
+                    24,
+                    0,
+                    static_cast<i16>(rowWidgetId6 + 44),
+                    16,
+                    1
                 );
+                if (OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] == 0) {
+                    MemError();
+                }
+                overWin->AddWidget(OVERVIEW_ICON_WIDGET_ROWS[row][iconCount], -1);
                 iconCount++;
             }
 
@@ -229,174 +208,141 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate)
             }
 
             if (heroData0 != 0 || hasCaptain) {
-                OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] =
-                    new iconWidget(
-                        112,
-                        static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 36),
-                        46,
-                        22,
-                        const_cast<char *>("portxtra.icn"),
-                        0,
-                        0,
-                        static_cast<i16>(rowWidgetId6 + 39),
-                        16,
-                        1
-                    );
+                OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] = new iconWidget(
+                    112,
+                    static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 36),
+                    46,
+                    22,
+                    const_cast<char*>("portxtra.icn"),
+                    0,
+                    0,
+                    static_cast<i16>(rowWidgetId6 + 39),
+                    16,
+                    1
+                );
                 if (OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] == 0) {
                     MemError();
                 }
-                overWin->AddWidget(
-                    OVERVIEW_ICON_WIDGET_ROWS[row][iconCount],
-                    -1
-                );
+                overWin->AddWidget(OVERVIEW_ICON_WIDGET_ROWS[row][iconCount], -1);
                 iconCount++;
 
-                OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] =
-                    new iconWidget(
-                        107,
-                        static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 31),
-                        51,
-                        27,
-                        hasCaptain ? "minicapt.icn" : "miniport.icn",
-                        hasCaptain ? static_cast<u8>(record->m_type)
-                                   : static_cast<u8>(heroData0->m_id),
-                        0,
-                        static_cast<i16>(rowWidgetId6 + 40),
-                        16,
-                        1
-                    );
-                if (OVERVIEW_ICON_WIDGET_ROWS[row][iconCount]
-                    == 0) {
+                OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] = new iconWidget(
+                    107,
+                    static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 31),
+                    51,
+                    27,
+                    hasCaptain ? "minicapt.icn" : "miniport.icn",
+                    hasCaptain ? static_cast<u8>(record->m_type) : static_cast<u8>(heroData0->m_id),
+                    0,
+                    static_cast<i16>(rowWidgetId6 + 40),
+                    16,
+                    1
+                );
+                if (OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] == 0) {
                     MemError();
                 }
-                overWin->AddWidget(
-                    OVERVIEW_ICON_WIDGET_ROWS[row][iconCount],
-                    -1
-                );
+                overWin->AddWidget(OVERVIEW_ICON_WIDGET_ROWS[row][iconCount], -1);
                 iconCount++;
 
-                OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] =
-                    new iconWidget(
-                        112,
-                        static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 36),
-                        0,
-                        0,
-                        const_cast<char *>("mobility.icn"),
-                        static_cast<i16>(
-                            GetMobilityFrame(hasCaptain ? 0 : heroData0->m_remainingMobility)
-                        ),
-                        0,
-                        static_cast<i16>(rowWidgetId6 + 43),
-                        16,
-                        1
-                    );
-                if (OVERVIEW_ICON_WIDGET_ROWS[row][iconCount]
-                    == 0) {
+                OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] = new iconWidget(
+                    112,
+                    static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 36),
+                    0,
+                    0,
+                    const_cast<char*>("mobility.icn"),
+                    static_cast<i16>(
+                        GetMobilityFrame(hasCaptain ? 0 : heroData0->m_remainingMobility)
+                    ),
+                    0,
+                    static_cast<i16>(rowWidgetId6 + 43),
+                    16,
+                    1
+                );
+                if (OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] == 0) {
                     MemError();
                 }
-                overWin->AddWidget(
-                    OVERVIEW_ICON_WIDGET_ROWS[row][iconCount],
-                    -1
-                );
+                overWin->AddWidget(OVERVIEW_ICON_WIDGET_ROWS[row][iconCount], -1);
                 iconCount++;
 
                 i32 captainMana =
-                    record->m_type == FACTION_BARBARIAN || record->m_type == FACTION_KNIGHT
-                        ? 10
-                        : 20;
-                OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] =
-                    new iconWidget(
-                        151,
-                        static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 36),
-                        0,
-                        0,
-                        const_cast<char *>("mana.icn"),
-                        static_cast<i16>(
-                            GetManaFrame(hasCaptain ? captainMana : heroData0->m_spellPoints)
-                        ),
-                        0,
-                        static_cast<i16>(rowWidgetId6 + 41),
-                        16,
-                        1
-                    );
-                if (OVERVIEW_ICON_WIDGET_ROWS[row][iconCount]
-                    == 0) {
+                    record->m_type == FACTION_BARBARIAN || record->m_type == FACTION_KNIGHT ? 10
+                                                                                            : 20;
+                OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] = new iconWidget(
+                    151,
+                    static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 36),
+                    0,
+                    0,
+                    const_cast<char*>("mana.icn"),
+                    static_cast<i16>(
+                        GetManaFrame(hasCaptain ? captainMana : heroData0->m_spellPoints)
+                    ),
+                    0,
+                    static_cast<i16>(rowWidgetId6 + 41),
+                    16,
+                    1
+                );
+                if (OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] == 0) {
                     MemError();
                 }
-                overWin->AddWidget(
-                    OVERVIEW_ICON_WIDGET_ROWS[row][iconCount],
-                    -1
-                );
+                overWin->AddWidget(OVERVIEW_ICON_WIDGET_ROWS[row][iconCount], -1);
                 iconCount++;
             }
 
             {
-            i32 displayedTroops = 0;
-            for (item = 0; item < OVERVIEW_TROOP_SLOTS; item++) {
+                i32 displayedTroops = 0;
+                for (item = 0; item < OVERVIEW_TROOP_SLOTS; item++) {
                     if (record->m_army.m_creatureTypes[item] != -1
                         && record->m_army.m_creatureCounts[item] > 0) {
-                    OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] =
-                        new iconWidget(
+                        OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] = new iconWidget(
                             static_cast<i16>(displayedTroops * 41 + 173),
-                                static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 35),
-                                42,
-                                40,
-                                const_cast<char *>("mons32.icn"),
-                                static_cast<i16>(record->m_army.m_creatureTypes[item]),
-                                0,
-                                static_cast<i16>(rowWidgetId6 + item + 5),
-                                17,
-                                1
-                            );
-                        if (OVERVIEW_ICON_WIDGET_ROWS[row][iconCount]
-                            == 0) {
-                        MemError();
-                        }
-                    overWin->AddWidget(
-                            OVERVIEW_ICON_WIDGET_ROWS[row][iconCount],
-                            -1
+                            static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 35),
+                            42,
+                            40,
+                            const_cast<char*>("mons32.icn"),
+                            static_cast<i16>(record->m_army.m_creatureTypes[item]),
+                            0,
+                            static_cast<i16>(rowWidgetId6 + item + 5),
+                            17,
+                            1
                         );
-                    iconCount++;
+                        if (OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] == 0) {
+                            MemError();
+                        }
+                        overWin->AddWidget(OVERVIEW_ICON_WIDGET_ROWS[row][iconCount], -1);
+                        iconCount++;
 
-                        valueText0 = static_cast<char *>(
-                            BaseAlloc(6, OVERVIEW_SOURCE_FILE,
-                                      overviewDynamicSourceLine + 0xee)
+                        valueText0 = static_cast<char*>(
+                            BaseAlloc(6, OVERVIEW_SOURCE_FILE, overviewDynamicSourceLine + 0xee)
                         );
                         sprintf(
                             valueText0,
                             "%d",
                             static_cast<i32>(record->m_army.m_creatureCounts[item])
                         );
-                        OVERVIEW_TEXT_WIDGET_ROWS[row][textItemCount] =
-                        new textWidget(
+                        OVERVIEW_TEXT_WIDGET_ROWS[row][textItemCount] = new textWidget(
                             static_cast<i16>(displayedTroops * 41 + 173),
-                                static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 81),
-                                40,
-                                12,
-                                valueText0,
-                                const_cast<char *>("smalfont.fnt"),
-                                1,
-                                static_cast<i16>(
-                                    rowWidgetId6 + item + 10
-                                ),
-                                0x200,
-                                1
-                            );
-                    overWin->AddWidget(
-                            OVERVIEW_TEXT_WIDGET_ROWS[row][textItemCount],
-                            -1
+                            static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 81),
+                            40,
+                            12,
+                            valueText0,
+                            const_cast<char*>("smalfont.fnt"),
+                            1,
+                            static_cast<i16>(rowWidgetId6 + item + 10),
+                            0x200,
+                            1
                         );
+                        overWin->AddWidget(OVERVIEW_TEXT_WIDGET_ROWS[row][textItemCount], -1);
                         textItemCount++;
-                    displayedTroops++;
+                        displayedTroops++;
+                    }
                 }
-            }
             }
 
             {
                 i32 displayedTroops = 0;
-            for (item = 0; item < OVERVIEW_DWELLING_SLOTS; item++) {
+                for (item = 0; item < OVERVIEW_DWELLING_SLOTS; item++) {
                     i32 detailIndex;
-                switch (item) {
+                    switch (item) {
                         case 0:
                             detailIndex = 0;
                             break;
@@ -436,65 +382,54 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate)
                     }
 
                     if ((record->m_buildings & (1 << (detailIndex + 19))) != 0) {
-                    OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] =
-                        new iconWidget(
-                                static_cast<i16>(displayedTroops * 41 + 378),
-                                static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 35),
-                                42,
-                                40,
-                                const_cast<char *>("mons32.icn"),
+                        OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] = new iconWidget(
+                            static_cast<i16>(displayedTroops * 41 + 378),
+                            static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 35),
+                            42,
+                            40,
+                            const_cast<char*>("mons32.icn"),
                             static_cast<i16>(
-                                    gDwellingType[static_cast<i8>(record->m_type)]
-                                                 [detailIndex]
-                                ),
-                                0,
-                                static_cast<i16>(
-                                    rowWidgetId6 + detailIndex + 15
-                                ),
-                                17,
-                                1
-                            );
-                        if (OVERVIEW_ICON_WIDGET_ROWS[row][iconCount]
-                            == 0) {
-                        MemError();
+                                gDwellingType[static_cast<i8>(record->m_type)][detailIndex]
+                            ),
+                            0,
+                            static_cast<i16>(rowWidgetId6 + detailIndex + 15),
+                            17,
+                            1
+                        );
+                        if (OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] == 0) {
+                            MemError();
                         }
-                    overWin->AddWidget(
-                            OVERVIEW_ICON_WIDGET_ROWS[row][iconCount],
-                            -1
-                        );
-                    iconCount++;
+                        overWin->AddWidget(OVERVIEW_ICON_WIDGET_ROWS[row][iconCount], -1);
+                        iconCount++;
 
-                        valueText0 = static_cast<char *>(
-                            BaseAlloc(6, OVERVIEW_SOURCE_FILE,
-                                      overviewDynamicSourceLine + 0x12a)
+                        valueText0 = static_cast<char*>(
+                            BaseAlloc(6, OVERVIEW_SOURCE_FILE, overviewDynamicSourceLine + 0x12a)
                         );
-                        sprintf(valueText0, "%d", static_cast<i32>(record->m_garrison[detailIndex]));
-                        OVERVIEW_TEXT_WIDGET_ROWS[row][textItemCount] =
-                        new textWidget(
-                                static_cast<i16>(displayedTroops * 41 + 378),
-                                static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 81),
-                                40,
-                                12,
-                                valueText0,
-                                const_cast<char *>("smalfont.fnt"),
-                                1,
-                                static_cast<i16>(
-                                    rowWidgetId6 + detailIndex + 27
-                                ),
-                                0x200,
-                                1
-                            );
-                    overWin->AddWidget(
-                            OVERVIEW_TEXT_WIDGET_ROWS[row][textItemCount],
-                            -1
+                        sprintf(
+                            valueText0,
+                            "%d",
+                            static_cast<i32>(record->m_garrison[detailIndex])
                         );
+                        OVERVIEW_TEXT_WIDGET_ROWS[row][textItemCount] = new textWidget(
+                            static_cast<i16>(displayedTroops * 41 + 378),
+                            static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 81),
+                            40,
+                            12,
+                            valueText0,
+                            const_cast<char*>("smalfont.fnt"),
+                            1,
+                            static_cast<i16>(rowWidgetId6 + detailIndex + 27),
+                            0x200,
+                            1
+                        );
+                        overWin->AddWidget(OVERVIEW_TEXT_WIDGET_ROWS[row][textItemCount], -1);
                         textItemCount++;
                         displayedTroops++;
                     }
                 }
             }
         } else {
-            hero *heroData0;
+            hero* heroData0;
             i32 detailRow;
             i32 detailColumn;
             i32 detailIndex;
@@ -505,7 +440,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate)
                 static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 21),
                 46,
                 22,
-                const_cast<char *>("portxtra.icn"),
+                const_cast<char*>("portxtra.icn"),
                 0,
                 0,
                 static_cast<i16>(rowWidgetId6 + 100),
@@ -515,10 +450,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate)
             if (OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] == 0) {
                 MemError();
             }
-            overWin->AddWidget(
-                OVERVIEW_ICON_WIDGET_ROWS[row][iconCount],
-                -1
-            );
+            overWin->AddWidget(OVERVIEW_ICON_WIDGET_ROWS[row][iconCount], -1);
             iconCount++;
 
             OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] = new iconWidget(
@@ -526,7 +458,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate)
                 static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 16),
                 51,
                 27,
-                const_cast<char *>("miniport.icn"),
+                const_cast<char*>("miniport.icn"),
                 static_cast<i16>(heroData0->m_id),
                 0,
                 static_cast<i16>(rowWidgetId6 + 101),
@@ -536,10 +468,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate)
             if (OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] == 0) {
                 MemError();
             }
-            overWin->AddWidget(
-                OVERVIEW_ICON_WIDGET_ROWS[row][iconCount],
-                -1
-            );
+            overWin->AddWidget(OVERVIEW_ICON_WIDGET_ROWS[row][iconCount], -1);
             iconCount++;
 
             OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] = new iconWidget(
@@ -547,7 +476,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate)
                 static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 21),
                 0,
                 0,
-                const_cast<char *>("mobility.icn"),
+                const_cast<char*>("mobility.icn"),
                 static_cast<i16>(GetMobilityFrame(heroData0->m_remainingMobility)),
                 0,
                 static_cast<i16>(rowWidgetId6 + 103),
@@ -557,10 +486,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate)
             if (OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] == 0) {
                 MemError();
             }
-            overWin->AddWidget(
-                OVERVIEW_ICON_WIDGET_ROWS[row][iconCount],
-                -1
-            );
+            overWin->AddWidget(OVERVIEW_ICON_WIDGET_ROWS[row][iconCount], -1);
             iconCount++;
 
             OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] = new iconWidget(
@@ -568,7 +494,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate)
                 static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 21),
                 0,
                 0,
-                const_cast<char *>("mana.icn"),
+                const_cast<char*>("mana.icn"),
                 static_cast<i16>(GetManaFrame(heroData0->m_spellPoints)),
                 0,
                 static_cast<i16>(rowWidgetId6 + 41),
@@ -578,124 +504,98 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate)
             if (OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] == 0) {
                 MemError();
             }
-            overWin->AddWidget(
-                OVERVIEW_ICON_WIDGET_ROWS[row][iconCount],
-                -1
-            );
+            overWin->AddWidget(OVERVIEW_ICON_WIDGET_ROWS[row][iconCount], -1);
             iconCount++;
 
             for (item = 0; item < 4; item++) {
-                valueText0 = static_cast<char *>(
-                    BaseAlloc(4, OVERVIEW_SOURCE_FILE,
-                              overviewDynamicSourceLine + 0x182)
+                valueText0 = static_cast<char*>(
+                    BaseAlloc(4, OVERVIEW_SOURCE_FILE, overviewDynamicSourceLine + 0x182)
                 );
                 sprintf(valueText0, "%d", static_cast<i32>(heroData0->Stats(item)));
-                OVERVIEW_TEXT_WIDGET_ROWS[row][textItemCount] =
-                    new textWidget(
-                        static_cast<i16>(item * 35 + 105),
-                        static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 39),
-                        14,
-                        8,
-                        valueText0,
-                        const_cast<char *>("smalfont.fnt"),
-                        1,
-                        static_cast<i16>(rowWidgetId6 + item + 142),
-                        0x200,
-                        2
-                    );
-                overWin->AddWidget(
-                    OVERVIEW_TEXT_WIDGET_ROWS[row][textItemCount],
-                    -1
+                OVERVIEW_TEXT_WIDGET_ROWS[row][textItemCount] = new textWidget(
+                    static_cast<i16>(item * 35 + 105),
+                    static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 39),
+                    14,
+                    8,
+                    valueText0,
+                    const_cast<char*>("smalfont.fnt"),
+                    1,
+                    static_cast<i16>(rowWidgetId6 + item + 142),
+                    0x200,
+                    2
                 );
+                overWin->AddWidget(OVERVIEW_TEXT_WIDGET_ROWS[row][textItemCount], -1);
                 textItemCount++;
             }
 
             for (item = 0; item < 4; item++) {
-                OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] =
-                    new iconWidget(
-                        static_cast<i16>(item * 35 + 87),
-                        static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 17),
-                        35,
-                        30,
-                        const_cast<char *>("overview.icn"),
-                        15,
-                        0,
-                        static_cast<i16>(rowWidgetId6 + item + 170),
-                        16,
-                        1
-                    );
+                OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] = new iconWidget(
+                    static_cast<i16>(item * 35 + 87),
+                    static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 17),
+                    35,
+                    30,
+                    const_cast<char*>("overview.icn"),
+                    15,
+                    0,
+                    static_cast<i16>(rowWidgetId6 + item + 170),
+                    16,
+                    1
+                );
                 if (OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] == 0) {
                     MemError();
                 }
-                overWin->AddWidget(
-                    OVERVIEW_ICON_WIDGET_ROWS[row][iconCount],
-                    -1
-                );
+                overWin->AddWidget(OVERVIEW_ICON_WIDGET_ROWS[row][iconCount], -1);
                 iconCount++;
             }
 
             {
-            i32 displayedTroops = 0;
-            for (item = 0; item < OVERVIEW_TROOP_SLOTS; item++) {
+                i32 displayedTroops = 0;
+                for (item = 0; item < OVERVIEW_TROOP_SLOTS; item++) {
                     if (heroData0->m_army.m_creatureTypes[item] != -1
                         && heroData0->m_army.m_creatureCounts[item] > 0) {
-                    OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] =
-                        new iconWidget(
+                        OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] = new iconWidget(
                             static_cast<i16>(displayedTroops * 40 + 30),
-                                static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 47),
-                                42,
-                                40,
-                                const_cast<char *>("mons32.icn"),
-                                static_cast<i16>(heroData0->m_army.m_creatureTypes[item]),
-                                0,
-                                static_cast<i16>(
-                                    rowWidgetId6 + item + 104
-                                ),
-                                17,
-                                1
-                            );
-                        if (OVERVIEW_ICON_WIDGET_ROWS[row][iconCount]
-                            == 0) {
-                        MemError();
-                        }
-                    overWin->AddWidget(
-                            OVERVIEW_ICON_WIDGET_ROWS[row][iconCount],
-                            -1
+                            static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 47),
+                            42,
+                            40,
+                            const_cast<char*>("mons32.icn"),
+                            static_cast<i16>(heroData0->m_army.m_creatureTypes[item]),
+                            0,
+                            static_cast<i16>(rowWidgetId6 + item + 104),
+                            17,
+                            1
                         );
-                    iconCount++;
+                        if (OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] == 0) {
+                            MemError();
+                        }
+                        overWin->AddWidget(OVERVIEW_ICON_WIDGET_ROWS[row][iconCount], -1);
+                        iconCount++;
 
-                        valueText0 = static_cast<char *>(
-                            BaseAlloc(6, OVERVIEW_SOURCE_FILE,
-                                      overviewDynamicSourceLine + 0x1bd)
+                        valueText0 = static_cast<char*>(
+                            BaseAlloc(6, OVERVIEW_SOURCE_FILE, overviewDynamicSourceLine + 0x1bd)
                         );
                         sprintf(
                             valueText0,
                             "%d",
                             static_cast<i32>(heroData0->m_army.m_creatureCounts[item])
                         );
-                        OVERVIEW_TEXT_WIDGET_ROWS[row][textItemCount] =
-                        new textWidget(
+                        OVERVIEW_TEXT_WIDGET_ROWS[row][textItemCount] = new textWidget(
                             static_cast<i16>(displayedTroops * 40 + 30),
-                                static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 87),
-                                40,
-                                12,
-                                valueText0,
-                                const_cast<char *>("smalfont.fnt"),
-                                1,
-                                static_cast<i16>(
-                                    rowWidgetId6 + item + 109
-                                ),
-                                0x200,
-                                1
-                            );
-                    overWin->AddWidget(
-                            OVERVIEW_TEXT_WIDGET_ROWS[row][textItemCount],
-                            -1
+                            static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 87),
+                            40,
+                            12,
+                            valueText0,
+                            const_cast<char*>("smalfont.fnt"),
+                            1,
+                            static_cast<i16>(rowWidgetId6 + item + 109),
+                            0x200,
+                            1
                         );
+                        overWin->AddWidget(OVERVIEW_TEXT_WIDGET_ROWS[row][textItemCount], -1);
                         textItemCount++;
-                    displayedTroops++;
+                        displayedTroops++;
+                    }
                 }
-            }
             }
 
             for (item = 0; item < OVERVIEW_SECONDARY_SKILL_SLOTS; item++) {
@@ -703,88 +603,58 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate)
                 if (detailIndex != -1) {
                     detailRow = item / OVERVIEW_SECONDARY_SKILL_COLUMNS;
                     detailColumn = item % OVERVIEW_SECONDARY_SKILL_COLUMNS;
-                    OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] =
-                        new iconWidget(
-                            static_cast<i16>(
-                                detailColumn * 35 + 233
-                            ),
-                            static_cast<i16>(
-                                row * OVERVIEW_ROW_HEIGHT
-                                + detailRow * 42 + 20
-                            ),
-                            34,
-                            34,
-                            const_cast<char *>("overview.icn"),
-                            12,
-                            0,
-                            static_cast<i16>(rowWidgetId6 + item + 154),
-                            16,
-                            1
-                        );
-                    if (OVERVIEW_ICON_WIDGET_ROWS[row][iconCount]
-                        == 0) {
+                    OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] = new iconWidget(
+                        static_cast<i16>(detailColumn * 35 + 233),
+                        static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + detailRow * 42 + 20),
+                        34,
+                        34,
+                        const_cast<char*>("overview.icn"),
+                        12,
+                        0,
+                        static_cast<i16>(rowWidgetId6 + item + 154),
+                        16,
+                        1
+                    );
+                    if (OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] == 0) {
                         MemError();
                     }
-                    overWin->AddWidget(
-                        OVERVIEW_ICON_WIDGET_ROWS[row][iconCount],
-                        -1
-                    );
+                    overWin->AddWidget(OVERVIEW_ICON_WIDGET_ROWS[row][iconCount], -1);
 
-                    OVERVIEW_ICON_WIDGET_ROWS[row][iconCount + 1] =
-                        new iconWidget(
-                            static_cast<i16>(
-                                detailColumn * 35 + 234
-                            ),
-                            static_cast<i16>(
-                                row * OVERVIEW_ROW_HEIGHT
-                                + detailRow * 42 + 21
-                            ),
-                            32,
-                            32,
-                            const_cast<char *>("miniss.icn"),
-                            static_cast<i16>(detailIndex),
-                            0,
-                            static_cast<i16>(rowWidgetId6 + item + 146),
-                            16,
-                            1
-                        );
-                    if (OVERVIEW_ICON_WIDGET_ROWS[row][iconCount + 1]
-                        == 0) {
+                    OVERVIEW_ICON_WIDGET_ROWS[row][iconCount + 1] = new iconWidget(
+                        static_cast<i16>(detailColumn * 35 + 234),
+                        static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + detailRow * 42 + 21),
+                        32,
+                        32,
+                        const_cast<char*>("miniss.icn"),
+                        static_cast<i16>(detailIndex),
+                        0,
+                        static_cast<i16>(rowWidgetId6 + item + 146),
+                        16,
+                        1
+                    );
+                    if (OVERVIEW_ICON_WIDGET_ROWS[row][iconCount + 1] == 0) {
                         MemError();
                     }
-                    overWin->AddWidget(
-                        OVERVIEW_ICON_WIDGET_ROWS[row][iconCount + 1],
-                        -1
-                    );
+                    overWin->AddWidget(OVERVIEW_ICON_WIDGET_ROWS[row][iconCount + 1], -1);
                     iconCount += 2;
 
-                    valueText0 = static_cast<char *>(
-                        BaseAlloc(2, OVERVIEW_SOURCE_FILE,
-                                  overviewDynamicSourceLine + 0x1fb)
+                    valueText0 = static_cast<char*>(
+                        BaseAlloc(2, OVERVIEW_SOURCE_FILE, overviewDynamicSourceLine + 0x1fb)
                     );
                     sprintf(valueText0, "%d", static_cast<i32>(heroData0->GetSSLevel(detailIndex)));
-                    OVERVIEW_TEXT_WIDGET_ROWS[row][textItemCount] =
-                        new textWidget(
-                            static_cast<i16>(
-                                detailColumn * 35 + 255
-                            ),
-                            static_cast<i16>(
-                                row * OVERVIEW_ROW_HEIGHT
-                                + detailRow * 42 + 45
-                            ),
-                            8,
-                            8,
-                            valueText0,
-                            const_cast<char *>("smalfont.fnt"),
-                            1,
-                            static_cast<i16>(rowWidgetId6 + item + 162),
-                            0x200,
-                            2
-                        );
-                    overWin->AddWidget(
-                        OVERVIEW_TEXT_WIDGET_ROWS[row][textItemCount],
-                        -1
+                    OVERVIEW_TEXT_WIDGET_ROWS[row][textItemCount] = new textWidget(
+                        static_cast<i16>(detailColumn * 35 + 255),
+                        static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + detailRow * 42 + 45),
+                        8,
+                        8,
+                        valueText0,
+                        const_cast<char*>("smalfont.fnt"),
+                        1,
+                        static_cast<i16>(rowWidgetId6 + item + 162),
+                        0x200,
+                        2
                     );
+                    overWin->AddWidget(OVERVIEW_TEXT_WIDGET_ROWS[row][textItemCount], -1);
                     textItemCount++;
                 }
             }
@@ -794,59 +664,39 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate)
                 if (heroData0->m_artifacts[item] != ARTIFACT_NONE) {
                     detailRow = displayedArtifacts / OVERVIEW_ARTIFACT_COLUMNS;
                     detailColumn = displayedArtifacts % OVERVIEW_ARTIFACT_COLUMNS;
-                    OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] =
-                        new iconWidget(
-                            static_cast<i16>(
-                                detailColumn * 35 + 378
-                            ),
-                            static_cast<i16>(
-                                row * OVERVIEW_ROW_HEIGHT
-                                + detailRow * 42 + 20
-                            ),
-                            34,
-                            34,
-                            const_cast<char *>("overview.icn"),
-                            12,
-                            0,
-                            static_cast<i16>(rowWidgetId6 + item + 128),
-                            16,
-                            1
-                        );
-                    if (OVERVIEW_ICON_WIDGET_ROWS[row][iconCount]
-                        == 0) {
+                    OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] = new iconWidget(
+                        static_cast<i16>(detailColumn * 35 + 378),
+                        static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + detailRow * 42 + 20),
+                        34,
+                        34,
+                        const_cast<char*>("overview.icn"),
+                        12,
+                        0,
+                        static_cast<i16>(rowWidgetId6 + item + 128),
+                        16,
+                        1
+                    );
+                    if (OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] == 0) {
                         MemError();
                     }
-                    overWin->AddWidget(
-                        OVERVIEW_ICON_WIDGET_ROWS[row][iconCount],
-                        -1
-                    );
+                    overWin->AddWidget(OVERVIEW_ICON_WIDGET_ROWS[row][iconCount], -1);
 
-                    OVERVIEW_ICON_WIDGET_ROWS[row][iconCount + 1] =
-                        new iconWidget(
-                            static_cast<i16>(
-                                detailColumn * 35 + 379
-                            ),
-                            static_cast<i16>(
-                                row * OVERVIEW_ROW_HEIGHT
-                                + detailRow * 42 + 21
-                            ),
-                            32,
-                            32,
-                            const_cast<char *>("artfx.icn"),
-                            static_cast<i16>(heroData0->m_artifacts[item]),
-                            0,
-                            static_cast<i16>(rowWidgetId6 + item + 114),
-                            16,
-                            1
-                        );
-                    if (OVERVIEW_ICON_WIDGET_ROWS[row][iconCount + 1]
-                        == 0) {
+                    OVERVIEW_ICON_WIDGET_ROWS[row][iconCount + 1] = new iconWidget(
+                        static_cast<i16>(detailColumn * 35 + 379),
+                        static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + detailRow * 42 + 21),
+                        32,
+                        32,
+                        const_cast<char*>("artfx.icn"),
+                        static_cast<i16>(heroData0->m_artifacts[item]),
+                        0,
+                        static_cast<i16>(rowWidgetId6 + item + 114),
+                        16,
+                        1
+                    );
+                    if (OVERVIEW_ICON_WIDGET_ROWS[row][iconCount + 1] == 0) {
                         MemError();
                     }
-                    overWin->AddWidget(
-                        OVERVIEW_ICON_WIDGET_ROWS[row][iconCount + 1],
-                        -1
-                    );
+                    overWin->AddWidget(OVERVIEW_ICON_WIDGET_ROWS[row][iconCount + 1], -1);
                     iconCount++;
                     iconCount++;
                     displayedArtifacts++;
@@ -862,13 +712,11 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate)
 }
 
 VA(0x00409aae, 0x357)
-void game::SetupNewOverviewType(i32 overviewType, i32 redrawFrom)
-{
-    DATA(0x004edca8) static i16 overviewSetupSourceLine =
-        OVERVIEW_SETUP_SOURCE_LINE;
+void game::SetupNewOverviewType(i32 overviewType, i32 redrawFrom) {
+    DATA(0x004edca8) static i16 overviewSetupSourceLine = OVERVIEW_SETUP_SOURCE_LINE;
     i32 title;
     tag_message message;
-    char *titleCopy;
+    char* titleCopy;
 
     giOverviewType = overviewType;
     iOverviewItems =
@@ -910,7 +758,7 @@ void game::SetupNewOverviewType(i32 overviewType, i32 redrawFrom)
         }
     }
     for (title = 0; title < OVERVIEW_TITLE_COUNT; title++) {
-        titleCopy = static_cast<char *>(BaseAlloc(
+        titleCopy = static_cast<char*>(BaseAlloc(
             strlen(cOverviewText[giOverviewType * OVERVIEW_TITLE_COUNT + title]) + 1,
             OVERVIEW_SOURCE_FILE,
             overviewSetupSourceLine + 0x2a
@@ -922,7 +770,7 @@ void game::SetupNewOverviewType(i32 overviewType, i32 redrawFrom)
             titleWidth[giOverviewType][OD_STEER(title)],
             12,
             titleCopy,
-            const_cast<char *>("smalfont.fnt"),
+            const_cast<char*>("smalfont.fnt"),
             1,
             static_cast<i16>(title + 110),
             0x200,
@@ -937,8 +785,7 @@ void game::SetupNewOverviewType(i32 overviewType, i32 redrawFrom)
 }
 
 VA(0x00409e05, 0x84)
-void game::SetupResources(void)
-{
+void game::SetupResources(void) {
     i32 resourceIdx;
     tag_message message;
 
@@ -953,10 +800,8 @@ void game::SetupResources(void)
 }
 
 VA(0x00409e89, 0x4c7)
-void game::Overview(void)
-{
-    DATA(0x004edcec) static i16 overviewDialogSourceLine =
-        OVERVIEW_DIALOG_SOURCE_LINE;
+void game::Overview(void) {
+    DATA(0x004edcec) static i16 overviewDialogSourceLine = OVERVIEW_DIALOG_SOURCE_LINE;
     char mineCounts4[8];
     i32 sawmills4;
     i32 mine4;
@@ -972,12 +817,12 @@ void game::Overview(void)
         textWidgetTitle[mine4] = 0;
     }
 
-    textWidgetDynamic = static_cast<textWidget **>(BaseAlloc(
+    textWidgetDynamic = static_cast<textWidget**>(BaseAlloc(
         OVERVIEW_DYNAMIC_ARRAY_BYTES,
         OVERVIEW_SOURCE_FILE,
         overviewDialogSourceLine + 0x11
     ));
-    iconWidgetDynamic = static_cast<iconWidget **>(BaseAlloc(
+    iconWidgetDynamic = static_cast<iconWidget**>(BaseAlloc(
         OVERVIEW_DYNAMIC_ARRAY_BYTES,
         OVERVIEW_SOURCE_FILE,
         overviewDialogSourceLine + 0x12
@@ -993,9 +838,9 @@ void game::Overview(void)
     iLastDynamicTop = -1;
     giOverviewItems[OVERVIEW_HEROES] = gpCurPlayer->m_heroCount;
     giOverviewItems[OVERVIEW_TOWNS] = gpCurPlayer->m_townCount;
-    gpMouseManager->SetPointer(const_cast<char *>("advmice.mse"), 0, -999);
-    gpResourceManager->GetBackdrop(const_cast<char *>("overback.icn"), gpWindowManager->m_screen, 1);
-    overWin = new heroWindow(0, 0, const_cast<char *>("overwind.bin"));
+    gpMouseManager->SetPointer(const_cast<char*>("advmice.mse"), 0, -999);
+    gpResourceManager->GetBackdrop(const_cast<char*>("overback.icn"), gpWindowManager->m_screen, 1);
+    overWin = new heroWindow(0, 0, const_cast<char*>("overwind.bin"));
     if (overWin == 0) {
         MemError();
     }
@@ -1005,7 +850,7 @@ void game::Overview(void)
         18,
         8,
         17,
-        const_cast<char *>("scrollcn.icn"),
+        const_cast<char*>("scrollcn.icn"),
         4,
         0,
         OVERVIEW_SCROLL_KNOB_WIDGET,
@@ -1068,8 +913,7 @@ void game::Overview(void)
 // -0x30 float before adding -0x3c, while candidate loads -0x3c before adding
 // -0x30. The two commutative x87 operand orders are behaviorally equivalent.
 VA(0x0040a350, 0x31f)
-void game::DoKnob(void)
-{
+void game::DoKnob(void) {
     tag_message pendingMessage4;
     float scrollRange13;
     i32 mouseY8;
@@ -1151,8 +995,7 @@ void game::DoKnob(void)
 // positions and external targets agree. Residual is only folded local
 // identities/addends for the three mid-function jump/selector tables.
 VA(0x0040a66f, 0x4fd)
-i32 OverviewHandler(struct tag_message &message)
-{
+i32 OverviewHandler(struct tag_message& message) {
     i32 closeDialog5;
     i32 quickView15;
     i32 scrollItemCount0;
@@ -1292,12 +1135,11 @@ i32 OverviewHandler(struct tag_message &message)
 }
 
 VA(0x0040ab6c, 0x4fa)
-i32 game::ProcessIconSelect(i32 widgetId, i32 quickView)
-{
+i32 game::ProcessIconSelect(i32 widgetId, i32 quickView) {
     i32 row0;
     i32 selectionIndex2;
-    hero *selectedHero13;
-    town *selectedTown3;
+    hero* selectedHero13;
+    town* selectedTown3;
 
     if (widgetId >= OVERVIEW_ICON_ROW_BASE && widgetId <= OVERVIEW_ICON_ROW_LIMIT - 1) {
         row0 = (widgetId - OVERVIEW_ICON_ROW_BASE) / OVERVIEW_ROW_ID_STRIDE;
@@ -1308,9 +1150,7 @@ i32 game::ProcessIconSelect(i32 widgetId, i32 quickView)
         widgetId %= OVERVIEW_ROW_ID_STRIDE;
 
         if (giOverviewType == OVERVIEW_HEROES) {
-            selectedHero13 = GetHero(
-                gpCurPlayer->m_heroIds[giOverviewTop[giOverviewType] + row0]
-            );
+            selectedHero13 = GetHero(gpCurPlayer->m_heroIds[giOverviewTop[giOverviewType] + row0]);
             if (widgetId >= OVERVIEW_HERO_SELECT_FIRST && widgetId <= OVERVIEW_HERO_SELECT_LAST) {
                 giOverviewReturnAction = OVERVIEW_RETURN_HERO;
                 giOverviewReturnActionExtra =
@@ -1383,9 +1223,7 @@ i32 game::ProcessIconSelect(i32 widgetId, i32 quickView)
             }
         }
         if (giOverviewType == OVERVIEW_TOWNS) {
-            selectedTown3 = GetTown(
-                gpCurPlayer->m_townIds[giOverviewTop[giOverviewType] + row0]
-            );
+            selectedTown3 = GetTown(gpCurPlayer->m_townIds[giOverviewTop[giOverviewType] + row0]);
             if (widgetId == OVERVIEW_TOWN_SELECT_WIDGET) {
                 giOverviewReturnAction = OVERVIEW_RETURN_TOWN;
                 giOverviewReturnActionExtra =
@@ -1431,14 +1269,14 @@ i32 game::ProcessIconSelect(i32 widgetId, i32 quickView)
                 if (quickView != 0) {
                     QuickViewRecruit(selectedTown3, selectionIndex2);
                 } else {
-                    recruitUnit *recruitDialog = new recruitUnit(selectedTown3, selectionIndex2, 0);
+                    recruitUnit* recruitDialog = new recruitUnit(selectedTown3, selectionIndex2, 0);
                     if (recruitDialog == 0) {
                         MemError();
                     }
                     gpExec->DoDialog(recruitDialog);
                     delete recruitDialog;
                     gpResourceManager->GetBackdrop(
-                        const_cast<char *>("overback.icn"),
+                        const_cast<char*>("overback.icn"),
                         gpWindowManager->m_screen,
                         1
                     );
@@ -1487,14 +1325,14 @@ i32 game::ProcessIconSelect(i32 widgetId, i32 quickView)
 // owner +0 except one proven giOverviewItems +4 reference. Preserve the natural
 // linker hole rather than inventing storage or placement controls.
 // ---- globals (definitions, RVA order) ----
-DATA(0x004ed9e8) class heroWindow *overWin = 0;
-DATA(0x004ed9ec) class textWidget **textWidgetDynamic = 0;
-DATA(0x004ed9f0) class iconWidget **iconWidgetDynamic = 0;
+DATA(0x004ed9e8) class heroWindow* overWin = 0;
+DATA(0x004ed9ec) class textWidget** textWidgetDynamic = 0;
+DATA(0x004ed9f0) class iconWidget** iconWidgetDynamic = 0;
 DATA(0x004ed9f4) i32 giOverviewType = 0;
 DATA(0x004ed9f8) i32 giOverviewTop[2] = {0};
-DATA(0x004eda00) class iconWidget *OVScrollKnob = 0;
+DATA(0x004eda00) class iconWidget* OVScrollKnob = 0;
 DATA(0x00523258) i32 iLastDynamicType;
 DATA(0x0052325c) i32 iLastDynamicTop;
 DATA(0x00523260) i32 iOverviewItems;
 DATA(0x00523268) i32 giOverviewItems[2];
-DATA(0x00523270) class textWidget *textWidgetTitle[4];
+DATA(0x00523270) class textWidget* textWidgetTitle[4];

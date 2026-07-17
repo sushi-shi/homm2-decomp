@@ -7,18 +7,18 @@
 void ModemSetup(i32);
 i32l Dial(void);
 i32l Wait(void);
-void GUIModemCommand(char *, char *);
+void GUIModemCommand(char*, char*);
 i8 GUIModemCommandExec(void);
-void ModemCommand(char *);
-i8 GUIModemResponse(char *, char *);
+void ModemCommand(char*);
+i8 GUIModemResponse(char*, char*);
 i8 GUIModemResponseExec(void);
-i32 write_buffer(char *, i32);
+i32 write_buffer(char*, i32);
 i32 read_byte(void);
 void write_byte(i32);
 void Connect(void);
 i32 WaitForDirectConnect(void);
 char ReadPacket(void);
-void WriteModemPacket(char *, i32);
+void WriteModemPacket(char*, i32);
 
 typedef enum ModemConstant {
     MODEM_MODE_DIAL = 3,
@@ -89,8 +89,7 @@ extern i32 iLastActionTime;
 extern char GUIMRresponse[MODEM_RESPONSE_SIZE];
 extern outque_t outque;
 
-inline void TruncateModemResponse(void)
-{
+inline void TruncateModemResponse(void) {
     GUIMRresponse[MODEM_RESPONSE_TRUNCATE_INDEX] = 0;
 }
 

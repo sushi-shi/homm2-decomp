@@ -29,15 +29,13 @@
 // entries (fwd, path_v, path_h, path_hv) are NWC's own loop-alignment pads — MSVC's inline assembler
 // won't synthesize them, so they must be emitted explicitly to reproduce retail's exact byte layout.
 
-
-
 // ---- module-private synthetic globals (retail xref: single-module) ----
 DATA(0x0051fec0) static u32 gTileMode;
 DATA(0x0051fec4) static i32 gTileRowCtr;
 
 VA(0x004d310c, 0x18f)
-extern "C" __declspec(naked) void __cdecl TileToBitmap(tileset *src, u32 flags, bitmap *dst, i32 x, i32 y)
-{
+extern "C" __declspec(naked) void __cdecl
+TileToBitmap(tileset* src, u32 flags, bitmap* dst, i32 x, i32 y) {
     __asm {
         push    ebp
         mov     ebp, esp

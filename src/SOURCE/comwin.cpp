@@ -30,8 +30,7 @@ DATA(0x005284b8) static ComPortState s_comPorts[COM_PORT_COUNT];
 // aliases or padding owners to reproduce the compiler's allocation order.
 
 VA(0x0048a640, 0x74)
-void add_node(struct tag_Anchor *anchor, struct tag_Node *node)
-{
+void add_node(struct tag_Anchor* anchor, struct tag_Node* node) {
     node->next = 0;
     node->prev = node->next;
     if (anchor->tail != 0) {
@@ -45,9 +44,8 @@ void add_node(struct tag_Anchor *anchor, struct tag_Node *node)
 }
 
 VA(0x0048a6b4, 0x4c)
-struct tag_Node * pop_node(struct tag_Anchor *anchor)
-{
-    tag_Node *node = anchor->head;
+struct tag_Node* pop_node(struct tag_Anchor* anchor) {
+    tag_Node* node = anchor->head;
     if (node != 0)
         anchor->head = node->next;
     if (anchor->head == 0)
@@ -56,8 +54,7 @@ struct tag_Node * pop_node(struct tag_Anchor *anchor)
 }
 
 VA(0x0048a700, 0x2e)
-void init_anchor(struct tag_Anchor *anchor, i32, i32)
-{
+void init_anchor(struct tag_Anchor* anchor, i32, i32) {
     anchor->head = 0;
     anchor->tail = 0;
 }
@@ -68,70 +65,69 @@ void init_anchor(struct tag_Anchor *anchor, i32, i32)
 // helper stops there and decodes table bytes as instructions. Literal and named
 // Win32 error case values compiled identically, so do not retry that spelling.
 VA(0x0048a72e, 0x3e5)
-void ShutdownComError(char *function)
-{
+void ShutdownComError(char* function) {
     char errorName[COM_ERROR_NAME_SIZE];
     char message[COM_ERROR_MESSAGE_SIZE];
     DWORD error = GetLastError();
 
     switch (error) {
-    case ERROR_INVALID_FUNCTION:
-        strcpy(errorName, "ERROR_INVALID_FUNCTION    ");
-        break;
-    case ERROR_FILE_NOT_FOUND:
-        strcpy(errorName, "ERROR_FILE_NOT_FOUND      ");
-        break;
-    case ERROR_PATH_NOT_FOUND:
-        strcpy(errorName, "ERROR_PATH_NOT_FOUND      ");
-        break;
-    case ERROR_TOO_MANY_OPEN_FILES:
-        strcpy(errorName, "ERROR_TOO_MANY_OPEN_FILES ");
-        break;
-    case ERROR_ACCESS_DENIED:
-        strcpy(errorName, "ERROR_ACCESS_DENIED       ");
-        break;
-    case ERROR_INVALID_HANDLE:
-        strcpy(errorName, "ERROR_INVALID_HANDLE      ");
-        break;
-    case ERROR_ARENA_TRASHED:
-        strcpy(errorName, "ERROR_ARENA_TRASHED       ");
-        break;
-    case ERROR_NOT_ENOUGH_MEMORY:
-        strcpy(errorName, "ERROR_NOT_ENOUGH_MEMORY   ");
-        break;
-    case ERROR_INVALID_BLOCK:
-        strcpy(errorName, "ERROR_INVALID_BLOCK       ");
-        break;
-    case ERROR_BAD_ENVIRONMENT:
-        strcpy(errorName, "ERROR_BAD_ENVIRONMENT     ");
-        break;
-    case ERROR_BAD_FORMAT:
-        strcpy(errorName, "ERROR_BAD_FORMAT          ");
-        break;
-    case ERROR_INVALID_ACCESS:
-        strcpy(errorName, "ERROR_INVALID_ACCESS      ");
-        break;
-    case ERROR_INVALID_DATA:
-        strcpy(errorName, "ERROR_INVALID_DATA        ");
-        break;
-    case ERROR_INVALID_DRIVE:
-        strcpy(errorName, "ERROR_INVALID_DRIVE       ");
-        break;
-    case ERROR_CURRENT_DIRECTORY:
-        strcpy(errorName, "ERROR_CURRENT_DIRECTORY   ");
-        break;
-    case ERROR_NOT_SAME_DEVICE:
-        strcpy(errorName, "ERROR_NOT_SAME_DEVICE     ");
-        break;
-    case ERROR_NO_MORE_FILES:
-        strcpy(errorName, "ERROR_NO_MORE_FILES       ");
-        break;
-    case ERROR_ALREADY_EXISTS:
-        strcpy(errorName, "ERROR_ALREADY_EXISTS      ");
-        break;
-    default:
-        strcpy(errorName, "UNKNOWN_ERROR             ");
-        break;
+        case ERROR_INVALID_FUNCTION:
+            strcpy(errorName, "ERROR_INVALID_FUNCTION    ");
+            break;
+        case ERROR_FILE_NOT_FOUND:
+            strcpy(errorName, "ERROR_FILE_NOT_FOUND      ");
+            break;
+        case ERROR_PATH_NOT_FOUND:
+            strcpy(errorName, "ERROR_PATH_NOT_FOUND      ");
+            break;
+        case ERROR_TOO_MANY_OPEN_FILES:
+            strcpy(errorName, "ERROR_TOO_MANY_OPEN_FILES ");
+            break;
+        case ERROR_ACCESS_DENIED:
+            strcpy(errorName, "ERROR_ACCESS_DENIED       ");
+            break;
+        case ERROR_INVALID_HANDLE:
+            strcpy(errorName, "ERROR_INVALID_HANDLE      ");
+            break;
+        case ERROR_ARENA_TRASHED:
+            strcpy(errorName, "ERROR_ARENA_TRASHED       ");
+            break;
+        case ERROR_NOT_ENOUGH_MEMORY:
+            strcpy(errorName, "ERROR_NOT_ENOUGH_MEMORY   ");
+            break;
+        case ERROR_INVALID_BLOCK:
+            strcpy(errorName, "ERROR_INVALID_BLOCK       ");
+            break;
+        case ERROR_BAD_ENVIRONMENT:
+            strcpy(errorName, "ERROR_BAD_ENVIRONMENT     ");
+            break;
+        case ERROR_BAD_FORMAT:
+            strcpy(errorName, "ERROR_BAD_FORMAT          ");
+            break;
+        case ERROR_INVALID_ACCESS:
+            strcpy(errorName, "ERROR_INVALID_ACCESS      ");
+            break;
+        case ERROR_INVALID_DATA:
+            strcpy(errorName, "ERROR_INVALID_DATA        ");
+            break;
+        case ERROR_INVALID_DRIVE:
+            strcpy(errorName, "ERROR_INVALID_DRIVE       ");
+            break;
+        case ERROR_CURRENT_DIRECTORY:
+            strcpy(errorName, "ERROR_CURRENT_DIRECTORY   ");
+            break;
+        case ERROR_NOT_SAME_DEVICE:
+            strcpy(errorName, "ERROR_NOT_SAME_DEVICE     ");
+            break;
+        case ERROR_NO_MORE_FILES:
+            strcpy(errorName, "ERROR_NO_MORE_FILES       ");
+            break;
+        case ERROR_ALREADY_EXISTS:
+            strcpy(errorName, "ERROR_ALREADY_EXISTS      ");
+            break;
+        default:
+            strcpy(errorName, "UNKNOWN_ERROR             ");
+            break;
     }
 
     sprintf(message, cWinComError[0], function, error, errorName);
@@ -149,8 +145,7 @@ void ShutdownComError(char *function)
 // 0x14-byte baud-rate jump table at RVA 0x8ace2. An initial BaudRate assignment
 // scored 95.64%; the explicit default arm is retained.
 VA(0x0048ab13, 0x34a)
-i16 com_init(u8 portNumber, i32 baudRate, i32 useDtr)
-{
+i16 com_init(u8 portNumber, i32 baudRate, i32 useDtr) {
     char portName[COM_PORT_NAME_SIZE];
     BOOL result;
     DCB state;
@@ -168,8 +163,7 @@ i16 com_init(u8 portNumber, i32 baudRate, i32 useDtr)
 
     wsprintfA(portName, "COM%d", portNumber);
     s_comPorts[portIndex].handle =
-        CreateFileA(portName, GENERIC_READ | GENERIC_WRITE, 0, 0,
-                    OPEN_EXISTING, 0, 0);
+        CreateFileA(portName, GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, 0, 0);
     if (s_comPorts[portIndex].handle == INVALID_HANDLE_VALUE) {
         sprintf(gText, "Opening COM%d", portNumber);
         ShutdownComError(gText);
@@ -179,28 +173,27 @@ i16 com_init(u8 portNumber, i32 baudRate, i32 useDtr)
     state.DCBlength = sizeof(DCB);
     GetCommState(s_comPorts[portIndex].handle, &state);
     s_comPorts[portIndex].savedState = state;
-    GetCommTimeouts(s_comPorts[portIndex].handle,
-                    &s_comPorts[portIndex].savedTimeouts);
+    GetCommTimeouts(s_comPorts[portIndex].handle, &s_comPorts[portIndex].savedTimeouts);
 
     switch (baudRate) {
-    case COM_BAUD_2400:
-        state.BaudRate = 2400;
-        break;
-    case COM_BAUD_4800:
-        state.BaudRate = 4800;
-        break;
-    case COM_BAUD_9600:
-        state.BaudRate = 9600;
-        break;
-    case COM_BAUD_19200:
-        state.BaudRate = 19200;
-        break;
-    case COM_BAUD_38400:
-        state.BaudRate = 38400;
-        break;
-    default:
-        state.BaudRate = baudRate;
-        break;
+        case COM_BAUD_2400:
+            state.BaudRate = 2400;
+            break;
+        case COM_BAUD_4800:
+            state.BaudRate = 4800;
+            break;
+        case COM_BAUD_9600:
+            state.BaudRate = 9600;
+            break;
+        case COM_BAUD_19200:
+            state.BaudRate = 19200;
+            break;
+        case COM_BAUD_38400:
+            state.BaudRate = 38400;
+            break;
+        default:
+            state.BaudRate = baudRate;
+            break;
     }
 
     state.fParity = 0;
@@ -219,8 +212,8 @@ i16 com_init(u8 portNumber, i32 baudRate, i32 useDtr)
     state.Parity = NOPARITY;
     state.StopBits = ONESTOPBIT;
 
-    result = SetupComm(s_comPorts[portIndex].handle,
-                       COM_RECEIVE_BUFFER_SIZE, COM_TRANSMIT_BUFFER_SIZE);
+    result =
+        SetupComm(s_comPorts[portIndex].handle, COM_RECEIVE_BUFFER_SIZE, COM_TRANSMIT_BUFFER_SIZE);
     if (result == 0)
         ShutdownComError("Initialize communications paramaters");
     result = SetCommState(s_comPorts[portIndex].handle, &state);
@@ -242,14 +235,11 @@ i16 com_init(u8 portNumber, i32 baudRate, i32 useDtr)
 }
 
 VA(0x0048ae5d, 0x11d)
-void com_term(i16 portIndex)
-{
-    tag_Node *node;
+void com_term(i16 portIndex) {
+    tag_Node* node;
     if (s_comPorts[portIndex].handle != INVALID_HANDLE_VALUE) {
-        SetCommState(s_comPorts[portIndex].handle,
-                     &s_comPorts[portIndex].savedState);
-        SetCommTimeouts(s_comPorts[portIndex].handle,
-                        &s_comPorts[portIndex].savedTimeouts);
+        SetCommState(s_comPorts[portIndex].handle, &s_comPorts[portIndex].savedState);
+        SetCommTimeouts(s_comPorts[portIndex].handle, &s_comPorts[portIndex].savedTimeouts);
         CloseHandle(s_comPorts[portIndex].handle);
         s_comPorts[portIndex].handle = INVALID_HANDLE_VALUE;
 
@@ -261,9 +251,7 @@ void com_term(i16 portIndex)
 }
 
 VA(0x0048af7a, 0xdd)
-i16 com_rcv(i16 portIndex, u16 requested,
-                  void *buffer)
-{
+i16 com_rcv(i16 portIndex, u16 requested, void* buffer) {
     COMSTAT status;
     DWORD commErrors;
     u32 count;
@@ -279,8 +267,13 @@ i16 com_rcv(i16 portIndex, u16 requested,
         else
             count = requested;
         if (count != 0) {
-            result = ReadFile(s_comPorts[portIndex].handle, buffer, count,
-                              reinterpret_cast<LPDWORD>(bytesRead), 0);
+            result = ReadFile(
+                s_comPorts[portIndex].handle,
+                buffer,
+                count,
+                reinterpret_cast<LPDWORD>(bytesRead),
+                0
+            );
             if (result == 0)
                 ShutdownComError("Read communications data");
             return bytesRead[0];
@@ -290,11 +283,9 @@ i16 com_rcv(i16 portIndex, u16 requested,
 }
 
 VA(0x0048b057, 0x145)
-i16 com_snd(i16 portIndex, u16,
-                  u16 length, void *data, i32 priority)
-{
+i16 com_snd(i16 portIndex, u16, u16 length, void* data, i32 priority) {
     BOOL result;
-    tag_Node *sendNode;
+    tag_Node* sendNode;
 
     if (s_comPorts[portIndex].handle != INVALID_HANDLE_VALUE) {
         if (length == 0) {
@@ -307,9 +298,11 @@ i16 com_snd(i16 portIndex, u16,
                 ShutdownComError("Clear communications break");
             return 0;
         }
-        sendNode = static_cast<tag_Node *>(
-            BaseAlloc(length + COM_NODE_HEADER_SIZE, COMWIN_SOURCE_FILE,
-                      s_comSendSourceLineBase + 16));
+        sendNode = static_cast<tag_Node*>(BaseAlloc(
+            length + COM_NODE_HEADER_SIZE,
+            COMWIN_SOURCE_FILE,
+            s_comSendSourceLineBase + 16
+        ));
         if (sendNode != 0) {
             sendNode->len = length;
             memcpy(sendNode->comData, data, length);
@@ -324,15 +317,16 @@ i16 com_snd(i16 portIndex, u16,
 }
 
 VA(0x0048b19c, 0x13)
-i16 __cdecl com_sess(i32, i32, ...) { return 0; }
+i16 __cdecl com_sess(i32, i32, ...) {
+    return 0;
+}
 
 VA(0x0048b1af, 0x6e)
-u8 com_stat(i16 portIndex, u16)
-{
+u8 com_stat(i16 portIndex, u16) {
     DWORD modemStatus;
-    if (s_comPorts[portIndex].handle != INVALID_HANDLE_VALUE &&
-        GetCommModemStatus(s_comPorts[portIndex].handle, &modemStatus) != 0 &&
-        (modemStatus & MS_CTS_ON) != 0 && (modemStatus & MS_RLSD_ON) != 0)
+    if (s_comPorts[portIndex].handle != INVALID_HANDLE_VALUE
+        && GetCommModemStatus(s_comPorts[portIndex].handle, &modemStatus) != 0
+        && (modemStatus & MS_CTS_ON) != 0 && (modemStatus & MS_RLSD_ON) != 0)
         return 1;
     return 0;
 }
@@ -342,13 +336,12 @@ u8 com_stat(i16 portIndex, u16)
 // local slot, the sole raw residual is the exit jump displacement at +0x4d:
 // retail reaches the epilogue directly while this form enters the trailing join.
 VA(0x0048b21d, 0xe8)
-void comm_wrt_task(void)
-{
+void comm_wrt_task(void) {
     DWORD bytesWritten;
     u32 writtenTotal;
-    tag_Node *packetNode;
+    tag_Node* packetNode;
     BOOL callResult;
-    ComPortState *comPort;
+    ComPortState* comPort;
 
     comPort = s_comPorts;
 
@@ -359,17 +352,18 @@ void comm_wrt_task(void)
         if (packetNode == 0)
             break;
         writtenTotal = 0;
-        while (comPort->handle != INVALID_HANDLE_VALUE &&
-               writtenTotal < packetNode->len) {
-            callResult = WriteFile(comPort->handle,
-                                   packetNode->comData + writtenTotal,
-                                   packetNode->len - writtenTotal,
-                                   &bytesWritten, 0);
+        while (comPort->handle != INVALID_HANDLE_VALUE && writtenTotal < packetNode->len) {
+            callResult = WriteFile(
+                comPort->handle,
+                packetNode->comData + writtenTotal,
+                packetNode->len - writtenTotal,
+                &bytesWritten,
+                0
+            );
             if (callResult == 0)
                 ShutdownComError("Write communications data");
             writtenTotal += bytesWritten;
         }
-        BaseFree(packetNode, COMWIN_SOURCE_FILE,
-                 s_comWriteSourceLineBase + 28);
+        BaseFree(packetNode, COMWIN_SOURCE_FILE, s_comWriteSourceLineBase + 28);
     }
 }

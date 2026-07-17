@@ -50,14 +50,14 @@ typedef enum TradingPostHandlerResult {
 
 void DoTradingPost(i32, float);
 void UpdateTradingPost(i32);
-void ComputeTradeRatios(i32, i32, i32 *, i32 *, i32 *);
+void ComputeTradeRatios(i32, i32, i32*, i32*, i32*);
 void DoTradeKnob(struct tag_message);
 void SetupNewTrade(void);
-i32 TradingPostHandler(struct tag_message &);
+i32 TradingPostHandler(struct tag_message&);
 
 // ---- globals (declarations, RVA order) ----
 extern u16 coreRatio[TRADING_POST_RESOURCE_COUNT];
-extern class iconWidget *tradeKnob;
+extern class iconWidget* tradeKnob;
 extern i32 qtyToTrade;
 extern i32 leftResource;
 extern i32 iTradeRatio;
@@ -67,7 +67,7 @@ extern i32 tpX;
 extern i32 tpY;
 extern i32 bIsMarketPlace;
 extern i32 bLeftDenominated;
-extern class heroWindow *tpWindow;
+extern class heroWindow* tpWindow;
 extern i32 rightResource;
 extern i32 iMaxUnitsToTrade;
 extern i32 maxUnitsToTrade;

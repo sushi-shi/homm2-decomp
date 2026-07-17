@@ -5,15 +5,15 @@
 #include <va.h>
 #include <BASE/resource.h>
 
-#pragma pack(push, 1)  // recovered layout is byte-packed
+#pragma pack(push, 1) // recovered layout is byte-packed
 class MIDIWrap : public resource {
 public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (vptr auto-emitted at 0x00; own data starts at 0x04)
-    char   *m_data;  // +0x10  MIDI data buffer
+    char* m_data; // +0x10  MIDI data buffer
     // --- constructors ---
-    MIDIWrap(char *);
+    MIDIWrap(char*);
     // Inline lets the compiler fold the body into ??_G; dllexport also retains the
     // standalone ??1 body required by retail.
     __declspec(dllexport) virtual inline ~MIDIWrap() OVERRIDE;

@@ -126,11 +126,10 @@ struct SCampaignChoice {
 #pragma pack(pop)
 SIZE(SCampaignChoice, 5);
 
-extern SCampaignChoice campaignChoices[CAMPAIGN_SIDE_COUNT]
-                                      [CAMPAIGN_MAP_COUNT]
+extern SCampaignChoice campaignChoices[CAMPAIGN_SIDE_COUNT][CAMPAIGN_MAP_COUNT]
                                       [CAMPAIGN_BONUS_CHOICE_COUNT];
-extern char *cCampaignName[CAMPAIGN_SIDE_COUNT][CAMPAIGN_MAP_COUNT];
-extern char *cCampaignDescription[CAMPAIGN_SIDE_COUNT][CAMPAIGN_MAP_COUNT];
+extern char* cCampaignName[CAMPAIGN_SIDE_COUNT][CAMPAIGN_MAP_COUNT];
+extern char* cCampaignDescription[CAMPAIGN_SIDE_COUNT][CAMPAIGN_MAP_COUNT];
 
 struct SPlayerExit {
     i8 netPosition;
@@ -189,8 +188,7 @@ typedef enum KbBuildingConstant {
     KB_BUILDING_RESOURCE_COUNT = 7,
     KB_MAGE_GUILD_MAX_LEVEL = 5,
     KB_MAGE_GUILD_LEVEL_COUNT = KB_MAGE_GUILD_MAX_LEVEL + 1,
-    KB_DWELLING_TYPE_COUNT =
-        BUILDING_SLOT_DWELLING_LAST - BUILDING_SLOT_DWELLING_FIRST + 1
+    KB_DWELLING_TYPE_COUNT = BUILDING_SLOT_DWELLING_LAST - BUILDING_SLOT_DWELLING_FIRST + 1
 } KbBuildingConstant;
 
 typedef enum KbDwellingFlag {
@@ -717,48 +715,48 @@ extern "C" void PollSound(void);
 void ForcePollSound(void);
 void InitMainClasses(void);
 void DeleteMainClasses(void);
-void EarlyShutdown(char *caption, char *text);
+void EarlyShutdown(char* caption, char* text);
 void SetupCDRom(void);
 i32 EarlySetup(void);
 i32 oldmain(void);
 char toupper(char c);
 i32 InterpretCommandLine(void);
-i32 InitMenuHandler(struct tag_message &);
-i32 NullHandler(struct tag_message &msg);
-i32 RecruitHeroHandler(tag_message &msg);
-char *GetBuildingInfo(i32 race, i32 building, i32 mode);
-char *GetBuildingName(i32 race, i32 building);
-void GetBuildingCost(i32 race, i32 building, i32 *const dest, i32 mageLevel);
-char *GetMonsterName(i32 m);
-void GetMonsterCost(i32 monster, i32 *const cost);
-i32 CanBuild(town *t, i32 building);
-i32 CanBuy(town *t, i32 type);
+i32 InitMenuHandler(struct tag_message&);
+i32 NullHandler(struct tag_message& msg);
+i32 RecruitHeroHandler(tag_message& msg);
+char* GetBuildingInfo(i32 race, i32 building, i32 mode);
+char* GetBuildingName(i32 race, i32 building);
+void GetBuildingCost(i32 race, i32 building, i32* const dest, i32 mageLevel);
+char* GetMonsterName(i32 m);
+void GetMonsterCost(i32 monster, i32* const cost);
+i32 CanBuild(town* t, i32 building);
+i32 CanBuy(town* t, i32 type);
 i32 GetBuildingBaseResourceValue(i32 race, i32 building, i32 level);
-i32 WaitHandler(tag_message &msg);
-i32 EventWindowHandler(struct tag_message &);
-i32 TrueFalseDialogHandler(struct tag_message &msg);
+i32 WaitHandler(tag_message& msg);
+i32 EventWindowHandler(struct tag_message&);
+i32 TrueFalseDialogHandler(struct tag_message& msg);
 void PlayerDead(i32 player);
 void CheckEndGame(i32, i32);
 void QuickViewWait(void);
 void InitVars(void);
 void ClearMapExtra(void);
 i32 GetMonType(i32 score, i32 campaign);
-i32 AddScoreToHighScore(i32, i32, i32, i32, char *);
-void BVResMsg(char *s, i32 res, i32 qty);
-void GOut(char *str);
+i32 AddScoreToHighScore(i32, i32, i32, i32, char*);
+void BVResMsg(char* s, i32 res, i32 qty);
+void GOut(char* str);
 i32 NetPosToGamePos(i32 netPos);
 i32 WaitForOtherPlayer(void);
-void PopNetBox(char *, i32);
-void AddNetBoxLine(char *str, char color);
-void ShutDown(char *msg);
-void FileError(char *filename);
-void SmackFade(u8 *src, u8 *dst);
+void PopNetBox(char*, i32);
+void AddNetBoxLine(char* str, char color);
+void ShutDown(char* msg);
+void FileError(char* filename);
+void SmackFade(u8* src, u8* dst);
 void ShowCongrats(i32);
 void CongratsWait(void);
-SAMPLE2 LoadPlaySample(char *name);
+SAMPLE2 LoadPlaySample(char* name);
 void WaitEndSample(SAMPLE2 s, i32 waitTime);
 void MemError(void);
-char *GetTownName(i32 i);
+char* GetTownName(i32 i);
 void LoadSystemwideIcons(void);
 void UnloadSystemwideIcons(void);
 void EarlyShutDownSystem(void);
@@ -766,10 +764,26 @@ i32 GameUnsaved(void);
 i32 HandleAppSpecificMenuCommands(i32);
 void UpdateSystemOptionsMenu(void);
 void CleanUpMenus(void);
-void UpdateAppSpecificMenus(void *hMenu);
+void UpdateAppSpecificMenus(void* hMenu);
 void EarlyResizeWindow(i32 x, i32 y, i32 w, i32 h);
 i32 InMapArea(i32 x, i32 y);
-void SetupDynamicWindow(i32, i32, i32, i32, i32, i32, i32, i32 *, i32 *, i32 *, i32 *, i32 *, i32 *, class heroWindow * *, i32);
+void SetupDynamicWindow(
+    i32,
+    i32,
+    i32,
+    i32,
+    i32,
+    i32,
+    i32,
+    i32*,
+    i32*,
+    i32*,
+    i32*,
+    i32*,
+    i32*,
+    class heroWindow**,
+    i32
+);
 void TestDynamicWindow(i32 p1, i32 p2);
 void HandleRemoteDeadPlayerExit(i32 pos);
 void HandleRemoteSuddenExit(void);
@@ -777,30 +791,29 @@ void DropDownToOnePlayer(void);
 void ReceiveHostReportsPlayerExit(i32, struct SPlayerExit, i32);
 void ReceiveRemotePlayerExit(struct SPlayerExit);
 i32 CheckMem(void);
-i32 GetManaCost(i32 spell, hero *h);
-void SetWinText(heroWindow *j, i32 id);
+i32 GetManaCost(i32 spell, hero* h);
+void SetWinText(heroWindow* j, i32 id);
 void CheckShingleUpdate(void);
-void NormalDialog(char *, i32, i32, i32, i32, i32, i32, i32, i32, i32);
-void UpdateNormalDialog(char *text);
-
+void NormalDialog(char*, i32, i32, i32, i32, i32, i32, i32, i32, i32);
+void UpdateNormalDialog(char* text);
 
 // --- globals owned by this TU (moved from _globals.h; CodeView-attributed) ---
 extern i32 bDoColorCycle;
 extern i32 gbDrawWindowBackground;
 extern i32 bEarlySetupDone;
-extern font *bigFont;
+extern font* bigFont;
 extern i32 bInShutDown;
 extern i32 bShowIt;
 extern i32 bSpecialHideCursor;
-extern char *cBuildingInfoNeutral[];
+extern char* cBuildingInfoNeutral[];
 extern char cNetBoxColor[];
 extern char cNetBoxLine[][140];
-extern char *cOutOfMemory;
-extern char *gArmyNames[CREATURE_COUNT];
-extern char *gArmyNamesPlural[CREATURE_COUNT];
-extern char *cMonFilename[CREATURE_COUNT];
-extern char *cArmyFrameFileNames[CREATURE_COUNT];
-extern char *gArmyShortNames[CREATURE_COUNT];
+extern char* cOutOfMemory;
+extern char* gArmyNames[CREATURE_COUNT];
+extern char* gArmyNamesPlural[CREATURE_COUNT];
+extern char* cMonFilename[CREATURE_COUNT];
+extern char* cArmyFrameFileNames[CREATURE_COUNT];
+extern char* gArmyShortNames[CREATURE_COUNT];
 extern i32 gArtifactBaseRV[];
 extern i32 gbAllBlack;
 extern i32 gbCheatMenus;
@@ -830,14 +843,14 @@ extern i32 gbTextEntryEscaped;
 extern i32 gbThisNetGotAdventureControl;
 extern i8 gbThisNetHumanPlayer[];
 extern u8 bStopOnTrigger[];
-extern char *gBuildingInfoSpecial[];
-extern icon *gBuyBuildIcons;
+extern char* gBuildingInfoSpecial[];
+extern icon* gBuyBuildIcons;
 extern char gcBottomViewText[];
 extern configStruct gConfig;
 extern SMenuEnableStatus gsMenuEnableStatus[MENU_ENABLE_STATUS_COUNT];
 extern i32 gDwellingBaseResourceValues[][KB_DWELLING_TYPE_COUNT];
 extern i32 gDwellingCosts[][KB_DWELLING_TYPE_COUNT][KB_BUILDING_RESOURCE_COUNT];
-extern char *gDwellingNames[][KB_DWELLING_TYPE_COUNT];
+extern char* gDwellingNames[][KB_DWELLING_TYPE_COUNT];
 extern i8 gDwellingType[][KB_DWELLING_TYPE_COUNT];
 extern i32 gGameCommand;
 extern i32 gHeroGoldCost;
@@ -867,49 +880,51 @@ extern tag_monsterInfo gMonsterDatabase[CREATURE_COUNT];
 extern SCmbtHero sCmbtHero[KB_COMBAT_HERO_SPRITE_COUNT];
 extern i32 gNeutralBaseResourceValues[];
 extern i32 gNeutralBuildingCosts[][KB_BUILDING_RESOURCE_COUNT];
-extern char *gNeutralBuildingNames[];
-extern advManager *gpAdvManager;
-extern palette *gPalette;
-extern combatManager *gpCombatManager;
-extern executive *gpExec;
-extern game *gpGame;
-extern inputManager *gpInputManager;
-extern armyGroup *gpMonGroup;
-extern class mouseManager *gpMouseManager;
-extern philAI *gpPhilAI;
-extern resourceManager *gpResourceManager;
-extern searchArray *gpSearchArray;
-extern soundManager *gpSoundManager;
-extern townManager *gpTownManager;
-extern class heroWindowManager *gpWindowManager;
+extern char* gNeutralBuildingNames[];
+extern advManager* gpAdvManager;
+extern palette* gPalette;
+extern combatManager* gpCombatManager;
+extern executive* gpExec;
+extern game* gpGame;
+extern inputManager* gpInputManager;
+extern armyGroup* gpMonGroup;
+extern class mouseManager* gpMouseManager;
+extern philAI* gpPhilAI;
+extern resourceManager* gpResourceManager;
+extern searchArray* gpSearchArray;
+extern soundManager* gpSoundManager;
+extern townManager* gpTownManager;
+extern class heroWindowManager* gpWindowManager;
 extern i32 gResourceBaseValue[];
-extern icon *gShingleAnim;
+extern icon* gShingleAnim;
 extern i32 gSpecialBuildingBaseResourceValues[];
 extern i32 gSpecialBuildingCosts[][KB_BUILDING_RESOURCE_COUNT];
-extern char *gSpecialBuildingNames[];
+extern char* gSpecialBuildingNames[];
 extern SSpellInfo gsSpellInfo[SPELL_COUNT];
-extern icon *gSystemIcons;
+extern icon* gSystemIcons;
 extern char gText[];
-extern char *gWellExtraNames[];
+extern char* gWellExtraNames[];
 extern SWinSetup gWinSetup[];
-extern void *hmnuAdv;
-extern void *hmnuCmbt;
-extern void *hmnuDflt;
-extern void *hmnuTown;
+extern void* hmnuAdv;
+extern void* hmnuCmbt;
+extern void* hmnuDflt;
+extern void* hmnuTown;
 extern i32 iCDRomErr;
 extern i32 iMaxMapExtra;
 extern i32 iNextShingleAnim;
 extern i32 iShingleAnimFrame;
 extern i32 MAP_HEIGHT;
 extern i32 MAP_WIDTH;
-extern u8 *mapExtra;
+extern u8* mapExtra;
 extern tag_tilePoint normalDirTable[];
 extern SAMPLE2 NULL_SAMPLE2;
-inline SAMPLE2 &GetNullSample(void) { return NULL_SAMPLE2; }
-extern heroWindow *pNormalDialogWindow;
-extern void **ppMapExtra;
-extern i16 *pwSizeOfMapExtra;
-extern font *smallFont;
+inline SAMPLE2& GetNullSample(void) {
+    return NULL_SAMPLE2;
+}
+extern heroWindow* pNormalDialogWindow;
+extern void** ppMapExtra;
+extern i16* pwSizeOfMapExtra;
+extern font* smallFont;
 extern u8 iGetSSByAlignment[HERO_SKILL_COUNT][FACTION_COUNT];
 
 #endif // HOMM2_KB_H

@@ -289,10 +289,10 @@ typedef enum TownManagerConstant {
 
 extern SBuildingInfo sBuildingInfo[][TOWN_BUILDING_COUNT];
 
-i32 MageGuildHandler(struct tag_message &);
-i32 TavernHandler(struct tag_message &);
-i32 SplitArmyHandler(struct tag_message &);
-void GetCategoryStats(i32, i32l * const, i8 * const);
-void SortStats(i32l * const, i8 * const);
+i32 MageGuildHandler(struct tag_message&);
+i32 TavernHandler(struct tag_message&);
+i32 SplitArmyHandler(struct tag_message&);
+void GetCategoryStats(i32, i32l* const, i8* const);
+void SortStats(i32l* const, i8* const);
 
 #endif // HOMM2_TOWNMGR_H

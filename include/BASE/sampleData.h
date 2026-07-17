@@ -5,8 +5,8 @@
 
 #pragma pack(push, 1)
 struct SamplePlaybackData {
-    struct _SAMPLE *activeSample;
-    char *data;
+    struct _SAMPLE* activeSample;
+    char* data;
     i32 size;
     i32 channelType;
     i32 sampleRate;

@@ -18,11 +18,11 @@ struct indexArray {
 // Leak-tracking allocation record (BaseAlloc/BaseFree). Packed: ptr sits at +1 (unaligned).
 #pragma pack(push, 1)
 struct MemEntry {
-    char used;          // +0x00  in-use flag
-    void *ptr;          // +0x01  allocated block
-    u32 size;  // +0x05  block size
-    char file[0x3d];    // +0x09  original source path supplied by the call site
-    i32 line;           // +0x46  original source line supplied by the call site
+    char used;       // +0x00  in-use flag
+    void* ptr;       // +0x01  allocated block
+    u32 size;        // +0x05  block size
+    char file[0x3d]; // +0x09  original source path supplied by the call site
+    i32 line;        // +0x46  original source line supplied by the call site
 };
 #pragma pack(pop)
 SIZE(MemEntry, 0x4a);
@@ -56,23 +56,24 @@ struct PCXHeader {
 SIZE(PCXHeader, 0x80);
 
 void InitMemEntry(void);
-void * BaseAlloc(u32, char *, i32);
-void BaseFree(void *, char *, i32);
+void* BaseAlloc(u32, char*, i32);
+void BaseFree(void*, char*, i32);
 void PrintMemoryLeaks(void);
 void ShowMemoryStatus(void);
-u32l MAKEFILEID(char *text);
-i32 FindIndex(struct indexArray *entries, i32 low, i32 high, i32 key);
+u32l MAKEFILEID(char* text);
+i32 FindIndex(struct indexArray* entries, i32 low, i32 high, i32 key);
 void FadeIn(i32);
 void FadeOut(i32);
 i32 Random(i32 low, i32 high);
-void ProcessAssert(i32 condition, char *file, i32 line);
+void ProcessAssert(i32 condition, char* file, i32 line);
 // Retail source locations are explicit operands. Never substitute this build's __FILE__/__LINE__.
 #define H2_ALLOC(size, originalFile, originalLine) BaseAlloc(size, originalFile, originalLine)
 #define H2_FREE(ptr, originalFile, originalLine) BaseFree(ptr, originalFile, originalLine)
-#define H2_ASSERT(condition, originalFile, originalLine) ProcessAssert(condition, originalFile, originalLine)
-char * FindStringInString(char *text, char *pattern);
-char * FindToken(char *text, char token);
-char * FindLastToken(char *text, char token);
+#define H2_ASSERT(condition, originalFile, originalLine)                                           \
+    ProcessAssert(condition, originalFile, originalLine)
+char* FindStringInString(char* text, char* pattern);
+char* FindToken(char* text, char token);
+char* FindLastToken(char* text, char token);
 void SetInstallDefaults(void);
 void SetGameDefaults(void);
 void ReadPrefsFromFile(void);
@@ -83,35 +84,34 @@ void WritePrefsToRegistry(void);
 void WritePrefs(void);
 i32 IsCDDrive(i32);
 i32 SetupCDDrive(void);
-void BitmapToScreen(class bitmap *);
-void SetPalette(i8 *, i32);
-void BlitBitmapToScreenNoMouseCheck(class bitmap *, i32, i32, i32, i32, i32, i32);
-void BlitBitmapToScreen(class bitmap *, i32, i32, i32, i32, i32, i32);
+void BitmapToScreen(class bitmap*);
+void SetPalette(i8*, i32);
+void BlitBitmapToScreenNoMouseCheck(class bitmap*, i32, i32, i32, i32, i32, i32);
+void BlitBitmapToScreen(class bitmap*, i32, i32, i32, i32, i32, i32);
 void LogTruncate(void);
-void LogStr(char *);
-void LogInt(char *, i32, i32, i32, i32, i32, i32, i32);
-void AiPrint(char *);
-void AbsAiPrint(char *);
-void FadeTo(u8 *, u8 *, i32);
-void FadeToColorTable(u8 *, i32);
+void LogStr(char*);
+void LogInt(char*, i32, i32, i32, i32, i32, i32, i32);
+void AiPrint(char*);
+void AbsAiPrint(char*);
+void FadeTo(u8*, u8*, i32);
+void FadeToColorTable(u8*, i32);
 i32 IsCycleColor(i32 color);
-void CreatePCXFile(char *, u8 *, i32, i32, u8 *);
-i32l FileSize(char *filename);
-struct IconEntry * GetIconEntry(class icon *iconPtr, i32 index);
+void CreatePCXFile(char*, u8*, i32, i32, u8*);
+i32l FileSize(char* filename);
+struct IconEntry* GetIconEntry(class icon* iconPtr, i32 index);
 i32 SRandom(i32 low, i32 high);
 void SIncRandomize(i32 x, i32 y);
 void SRand(i32 seed);
 i32 SGenRand(void);
 i32 MemSize(i32);
-void GetDataEntry(char *, char *, i32, char *, i32, i32);
-i32 DataEntryWindowHandler(struct tag_message &message);
-
+void GetDataEntry(char*, char*, i32, char*, i32, i32);
+i32 DataEntryWindowHandler(struct tag_message& message);
 
 // --- globals owned by this TU (moved from _globals.h; CodeView-attributed) ---
 extern i32 bDataEntryTime;
-extern char *cDEDest;
-extern class heroWindow *DataEntryWin;
-extern MemEntry *gpMemEntry;
+extern char* cDEDest;
+extern class heroWindow* DataEntryWin;
+extern MemEntry* gpMemEntry;
 extern i32 iDEMaxLen;
 extern i32 iLastSeed;
 extern i32 iMemEntries;

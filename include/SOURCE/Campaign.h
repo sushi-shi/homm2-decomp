@@ -126,6 +126,6 @@ typedef enum CampaignMapDifficulty {
     CAMPAIGN_DIFFICULTY_HARD = 2
 } CampaignMapDifficulty;
 
-i32 CampaignHandler(struct tag_message &);
+i32 CampaignHandler(struct tag_message&);
 
 #endif // HOMM2_CAMPAIGN_H

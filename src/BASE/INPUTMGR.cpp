@@ -22,11 +22,8 @@ DATA(0x0051f980) i32 iCurSwapPalette = 0;
 DATA(0x0051f984) i32 bLastMouseOffscreen = 0;
 DATA(0x0051f988) i32 bLastOnscreenMouseColor = 0;
 DATA(0x0051f98c) i32 bInCheckChangeCursor = 0;
-DATA(0x0051f990) static SInputManagerText gInputManagerText = {
-    "ReleaseCapture Failed",
-    "ReleaseCapture Failed",
-    "inputManager"
-};
+DATA(0x0051f990) static SInputManagerText gInputManagerText =
+    {"ReleaseCapture Failed", "ReleaseCapture Failed", "inputManager"};
 
 // @data-layout-note NB09 assigns INPUTMGR one 0x50 initialized-data
 // contribution at 0x11f980. Retail stores the four public integers first,
@@ -42,14 +39,13 @@ DATA(0x0051f990) static SInputManagerText gInputManagerText = {
 // by the delinker as this function plus local offsets, and gConfig+0x30, whose retail
 // interior label is the same VA 0x00528d50.
 VA(0x004cdb50, 0x308)
-i32 KeyboardMessageHandler(void *, u32 message, u32, i32l messageData)
-{
+i32 KeyboardMessageHandler(void*, u32 message, u32, i32l messageData) {
     if (gpInputManager == 0)
         return 1;
     if (gpInputManager->m_active != 1)
         return 1;
 
-    tag_message *event = &gpInputManager->m_eventRing[gpInputManager->m_writeIndex];
+    tag_message* event = &gpInputManager->m_eventRing[gpInputManager->m_writeIndex];
     event->payload.keyboard.modifiers = 0;
     event->payload.keyboard.unknown0x14 = 0;
     event->payload.keyboard.unknown0x10 = 0;
@@ -58,46 +54,48 @@ i32 KeyboardMessageHandler(void *, u32 message, u32, i32l messageData)
     event->type = MESSAGE_NONE;
 
     switch (message) {
-    case WM_KEYDOWN:
-        event->type = MESSAGE_KEY_DOWN;
-        event->payload.keyboard.keyCode = static_cast<u16>(static_cast<u32l>(messageData) >> 16) & INPUT_SCAN_CODE_MASK;
-        event->payload.keyboard.unknown0x08 = 0;
-        event->payload.keyboard.modifiers = 0;
-        switch (event->payload.keyboard.keyCode) {
-        case INPUT_SCAN_CONTROL:
-            gpInputManager->m_modifiers |= MESSAGE_MODIFIER_CONTROL;
+        case WM_KEYDOWN:
+            event->type = MESSAGE_KEY_DOWN;
+            event->payload.keyboard.keyCode =
+                static_cast<u16>(static_cast<u32l>(messageData) >> 16) & INPUT_SCAN_CODE_MASK;
+            event->payload.keyboard.unknown0x08 = 0;
+            event->payload.keyboard.modifiers = 0;
+            switch (event->payload.keyboard.keyCode) {
+                case INPUT_SCAN_CONTROL:
+                    gpInputManager->m_modifiers |= MESSAGE_MODIFIER_CONTROL;
+                    break;
+                case INPUT_SCAN_LEFT_SHIFT:
+                    gpInputManager->m_modifiers |= MESSAGE_MODIFIER_LEFT_SHIFT;
+                    break;
+                case INPUT_SCAN_RIGHT_SHIFT:
+                    gpInputManager->m_modifiers |= MESSAGE_MODIFIER_RIGHT_SHIFT;
+                    break;
+                case INPUT_SCAN_ALT:
+                    gpInputManager->m_modifiers |= MESSAGE_MODIFIER_ALT;
+                    break;
+            }
             break;
-        case INPUT_SCAN_LEFT_SHIFT:
-            gpInputManager->m_modifiers |= MESSAGE_MODIFIER_LEFT_SHIFT;
+        case WM_KEYUP:
+            event->type = MESSAGE_KEY_UP;
+            event->payload.keyboard.keyCode =
+                static_cast<u16>(static_cast<u32l>(messageData) >> 16) & INPUT_SCAN_CODE_MASK;
+            event->payload.keyboard.unknown0x08 = 0;
+            event->payload.keyboard.modifiers = 0;
+            switch (event->payload.keyboard.keyCode) {
+                case INPUT_SCAN_CONTROL:
+                    gpInputManager->m_modifiers &= INPUT_CLEAR_CONTROL_MASK;
+                    break;
+                case INPUT_SCAN_LEFT_SHIFT:
+                    gpInputManager->m_modifiers &= INPUT_CLEAR_LEFT_SHIFT_MASK;
+                    break;
+                case INPUT_SCAN_RIGHT_SHIFT:
+                    gpInputManager->m_modifiers &= INPUT_CLEAR_RIGHT_SHIFT_MASK;
+                    break;
+                case INPUT_SCAN_ALT:
+                    gpInputManager->m_modifiers &= INPUT_CLEAR_ALT_MASK;
+                    break;
+            }
             break;
-        case INPUT_SCAN_RIGHT_SHIFT:
-            gpInputManager->m_modifiers |= MESSAGE_MODIFIER_RIGHT_SHIFT;
-            break;
-        case INPUT_SCAN_ALT:
-            gpInputManager->m_modifiers |= MESSAGE_MODIFIER_ALT;
-            break;
-        }
-        break;
-    case WM_KEYUP:
-        event->type = MESSAGE_KEY_UP;
-        event->payload.keyboard.keyCode = static_cast<u16>(static_cast<u32l>(messageData) >> 16) & INPUT_SCAN_CODE_MASK;
-        event->payload.keyboard.unknown0x08 = 0;
-        event->payload.keyboard.modifiers = 0;
-        switch (event->payload.keyboard.keyCode) {
-        case INPUT_SCAN_CONTROL:
-            gpInputManager->m_modifiers &= INPUT_CLEAR_CONTROL_MASK;
-            break;
-        case INPUT_SCAN_LEFT_SHIFT:
-            gpInputManager->m_modifiers &= INPUT_CLEAR_LEFT_SHIFT_MASK;
-            break;
-        case INPUT_SCAN_RIGHT_SHIFT:
-            gpInputManager->m_modifiers &= INPUT_CLEAR_RIGHT_SHIFT_MASK;
-            break;
-        case INPUT_SCAN_ALT:
-            gpInputManager->m_modifiers &= INPUT_CLEAR_ALT_MASK;
-            break;
-        }
-        break;
     }
 
     if (event->type != MESSAGE_NONE) {
@@ -111,11 +109,13 @@ i32 KeyboardMessageHandler(void *, u32 message, u32, i32l messageData)
         gpInputManager->m_field_0x85a = 0;
 
         if (gpWindowManager->m_active == 1) {
-            if (event->type == MESSAGE_KEY_DOWN && event->payload.keyboard.keyCode == INPUT_SCAN_F12 &&
-                (event->payload.keyboard.modifiers &
-                 (MESSAGE_MODIFIER_RIGHT_SHIFT | MESSAGE_MODIFIER_LEFT_SHIFT)) != 0)
+            if (event->type == MESSAGE_KEY_DOWN && event->payload.keyboard.keyCode == INPUT_SCAN_F12
+                && (event->payload.keyboard.modifiers
+                    & (MESSAGE_MODIFIER_RIGHT_SHIFT | MESSAGE_MODIFIER_LEFT_SHIFT))
+                       != 0)
                 gpWindowManager->ScreenShot();
-            if (event->type == MESSAGE_KEY_DOWN && event->payload.keyboard.keyCode == INPUT_SCAN_F1) {
+            if (event->type == MESSAGE_KEY_DOWN
+                && event->payload.keyboard.keyCode == INPUT_SCAN_F1) {
                 SetFullScreenStatus(0);
                 AppCommand(hwndApp, 0, KBWIN_MENU_HELP, 0);
             }
@@ -134,8 +134,7 @@ i32 KeyboardMessageHandler(void *, u32 message, u32, i32l messageData)
 // +0/+0x18. All nonlocal runtime addresses and owner-relative addends agree,
 // including gConfig +0x30/+0x34, SetCapture, and ReleaseCapture.
 VA(0x004cde60, 0x36c)
-i32 MouseMessageHandler(void *, u32 message, u32, i32l messageData)
-{
+i32 MouseMessageHandler(void*, u32 message, u32, i32l messageData) {
     if (gpInputManager == 0)
         return 1;
     if (gpInputManager->m_active != 1)
@@ -144,7 +143,7 @@ i32 MouseMessageHandler(void *, u32 message, u32, i32l messageData)
         return 1;
     gpInputManager->m_mouseMessageActive = 1;
 
-    tag_message *event = &gpInputManager->m_eventRing[gpInputManager->m_writeIndex];
+    tag_message* event = &gpInputManager->m_eventRing[gpInputManager->m_writeIndex];
     event->payload.mouse.modifiers = 0;
     event->payload.mouse.screenY = 0;
     event->payload.mouse.screenX = 0;
@@ -153,52 +152,51 @@ i32 MouseMessageHandler(void *, u32 message, u32, i32l messageData)
     event->type = MESSAGE_NONE;
 
     switch (message - WM_MOUSEMOVE) {
-    case WM_MOUSEMOVE - WM_MOUSEMOVE:
-        event->type = MESSAGE_MOUSE_MOVE;
-        break;
-    case WM_LBUTTONDOWN - WM_MOUSEMOVE:
-        event->type = MESSAGE_LEFT_BUTTON_DOWN;
-        SetCapture(hwndApp);
-        break;
-    case WM_LBUTTONUP - WM_MOUSEMOVE:
-        event->type = MESSAGE_LEFT_BUTTON_UP;
-        if (ReleaseCapture() == 0)
-            LogStr(gInputManagerText.leftReleaseCaptureFailure);
-        break;
-    case WM_LBUTTONDBLCLK - WM_MOUSEMOVE:
-        event->type = MESSAGE_LEFT_BUTTON_DOWN;
-        break;
-    case WM_RBUTTONDOWN - WM_MOUSEMOVE:
-        event->type = MESSAGE_RIGHT_BUTTON_DOWN;
-        SetCapture(hwndApp);
-        break;
-    case WM_RBUTTONUP - WM_MOUSEMOVE:
-        event->type = MESSAGE_RIGHT_BUTTON_UP;
-        if (ReleaseCapture() == 0)
-            LogStr(gInputManagerText.rightReleaseCaptureFailure);
-        break;
-    case WM_RBUTTONDBLCLK - WM_MOUSEMOVE:
-        event->type = MESSAGE_RIGHT_BUTTON_DOWN;
-        break;
-    default:
-        goto afterMouseCoordinates;
+        case WM_MOUSEMOVE - WM_MOUSEMOVE:
+            event->type = MESSAGE_MOUSE_MOVE;
+            break;
+        case WM_LBUTTONDOWN - WM_MOUSEMOVE:
+            event->type = MESSAGE_LEFT_BUTTON_DOWN;
+            SetCapture(hwndApp);
+            break;
+        case WM_LBUTTONUP - WM_MOUSEMOVE:
+            event->type = MESSAGE_LEFT_BUTTON_UP;
+            if (ReleaseCapture() == 0)
+                LogStr(gInputManagerText.leftReleaseCaptureFailure);
+            break;
+        case WM_LBUTTONDBLCLK - WM_MOUSEMOVE:
+            event->type = MESSAGE_LEFT_BUTTON_DOWN;
+            break;
+        case WM_RBUTTONDOWN - WM_MOUSEMOVE:
+            event->type = MESSAGE_RIGHT_BUTTON_DOWN;
+            SetCapture(hwndApp);
+            break;
+        case WM_RBUTTONUP - WM_MOUSEMOVE:
+            event->type = MESSAGE_RIGHT_BUTTON_UP;
+            if (ReleaseCapture() == 0)
+                LogStr(gInputManagerText.rightReleaseCaptureFailure);
+            break;
+        case WM_RBUTTONDBLCLK - WM_MOUSEMOVE:
+            event->type = MESSAGE_RIGHT_BUTTON_DOWN;
+            break;
+        default:
+            goto afterMouseCoordinates;
     }
 
     event->payload.mouse.x =
         (static_cast<i16>(messageData) * MOUSE_SCREEN_WIDTH) / iMainWinScreenWidth;
     event->payload.mouse.y =
-        (static_cast<i16>(static_cast<u32l>(messageData) >> 16) * MOUSE_SCREEN_HEIGHT) /
-        iMainWinScreenHeight;
+        (static_cast<i16>(static_cast<u32l>(messageData) >> 16) * MOUSE_SCREEN_HEIGHT)
+        / iMainWinScreenHeight;
     event->payload.mouse.screenX = event->payload.mouse.x;
     event->payload.mouse.screenY = event->payload.mouse.y;
 
-    if (gConfig.gfx[giCurExe].fullScreen == 0 &&
-        gConfig.gfx[giCurExe].colorMouseCursor == 0 &&
-        KBTickCount() > iLastBWOnScreenCheck &&
-        event->payload.mouse.x > INPUT_CURSOR_INTERIOR_MIN_EXCLUSIVE &&
-        event->payload.mouse.x < INPUT_CURSOR_INTERIOR_MAX_X_EXCLUSIVE &&
-        event->payload.mouse.y > INPUT_CURSOR_INTERIOR_MIN_EXCLUSIVE &&
-        event->payload.mouse.y < INPUT_CURSOR_INTERIOR_MAX_Y_EXCLUSIVE) {
+    if (gConfig.gfx[giCurExe].fullScreen == 0 && gConfig.gfx[giCurExe].colorMouseCursor == 0
+        && KBTickCount() > iLastBWOnScreenCheck
+        && event->payload.mouse.x > INPUT_CURSOR_INTERIOR_MIN_EXCLUSIVE
+        && event->payload.mouse.x < INPUT_CURSOR_INTERIOR_MAX_X_EXCLUSIVE
+        && event->payload.mouse.y > INPUT_CURSOR_INTERIOR_MIN_EXCLUSIVE
+        && event->payload.mouse.y < INPUT_CURSOR_INTERIOR_MAX_Y_EXCLUSIVE) {
         iLastBWOnScreenCheck = KBTickCount() + INPUT_CURSOR_CHECK_DELAY;
         gpMouseManager->SetPointer(MOUSE_KEEP_CURRENT_FRAME);
     }
@@ -207,8 +205,8 @@ afterMouseCoordinates:
     if (message == WM_MOUSEMOVE && gpMouseManager != 0) {
         i32 y = event->payload.mouse.y;
         i32 x = event->payload.mouse.x;
-        if (bInCheckChangeCursor == 0 && gConfig.gfx[giCurExe].fullScreen == 0 &&
-            gConfig.gfx[giCurExe].colorMouseCursor != 0) {
+        if (bInCheckChangeCursor == 0 && gConfig.gfx[giCurExe].fullScreen == 0
+            && gConfig.gfx[giCurExe].colorMouseCursor != 0) {
             bInCheckChangeCursor = 1;
             if (x >= 0 && x < MOUSE_SCREEN_WIDTH && y >= 0 && y < MOUSE_SCREEN_HEIGHT) {
                 if (bLastMouseOffscreen != 0) {
@@ -242,8 +240,7 @@ afterMouseCoordinates:
 }
 
 VA(0x004ce1d0, 0x56)
-inputManager::inputManager(void) : baseManager()
-{
+inputManager::inputManager(void) : baseManager() {
     m_active = 0;
     m_mouseMessageActive = 0;
     m_requestedPriority = 1;
@@ -257,8 +254,7 @@ inputManager::inputManager(void) : baseManager()
 }
 
 VA(0x004ce230, 0x78)
-i32 inputManager::Open(i32 param_1)
-{
+i32 inputManager::Open(i32 param_1) {
     memset(m_eventRing, 0, sizeof(m_eventRing));
     m_writeIndex = 0;
     m_readIndex = 0;
@@ -273,8 +269,7 @@ i32 inputManager::Open(i32 param_1)
 }
 
 VA(0x004ce2b0, 0x20)
-void inputManager::Close(void)
-{
+void inputManager::Close(void) {
     if (m_active == 1) {
         m_writeIndex = 0;
         m_readIndex = 0;
@@ -284,18 +279,18 @@ void inputManager::Close(void)
 }
 
 VA(0x004ce2d0, 0x5)
-i32 inputManager::Main(struct tag_message &) { return 0; }
+i32 inputManager::Main(struct tag_message&) {
+    return 0;
+}
 
 VA(0x004ce2e0, 0xf)
-void inputManager::Flush(void)
-{
+void inputManager::Flush(void) {
     m_writeIndex = 0;
     m_readIndex = 0;
 }
 
 VA(0x004ce2f0, 0xa8)
-tag_message inputManager::GetEvent(void)
-{
+tag_message inputManager::GetEvent(void) {
     tag_message event;
     PollSound();
     if (gpInputManager->m_active == 1 && m_readIndex != m_writeIndex) {
@@ -314,8 +309,7 @@ tag_message inputManager::GetEvent(void)
 }
 
 VA(0x004ce3a0, 0xa1)
-tag_message inputManager::PeekEvent(void)
-{
+tag_message inputManager::PeekEvent(void) {
     tag_message event;
     PollSound();
     if (gpInputManager->m_active == 1 && m_readIndex != m_writeIndex) {
@@ -336,8 +330,7 @@ VA(0x004ce450, 0x3)
 void inputManager::SetMouseCoords(i32, i32) {}
 
 VA(0x004ce460, 0x1b)
-void inputManager::SetKeyCodeType(i32 keyCodeType)
-{
+void inputManager::SetKeyCodeType(i32 keyCodeType) {
     m_keyCodeType = static_cast<InputManagerKeyCodeType>(keyCodeType);
     m_writeIndex = 0;
     m_readIndex = 0;
@@ -356,20 +349,17 @@ void inputManager::SetKeyCodeType(i32 keyCodeType)
 // identities are delinked $L labels versus this function. Revisit on a genuine
 // predecessor/header/TU-state change; register scheduling is not a permitted artifact.
 VA(0x004ce480, 0x1cb)
-void inputManager::AsciiConvert(tag_message &event)
-{
-    if ((event.payload.keyboard.keyCode >= INPUT_SCAN_F1 &&
-         event.payload.keyboard.keyCode <= INPUT_SCAN_F10) ||
-        event.payload.keyboard.keyCode == INPUT_SCAN_F11 ||
-        event.payload.keyboard.keyCode == INPUT_SCAN_F12)
-        event.payload.keyboard.keyCode =
-            m_keyState[event.payload.keyboard.keyCode];
+void inputManager::AsciiConvert(tag_message& event) {
+    if ((event.payload.keyboard.keyCode >= INPUT_SCAN_F1
+         && event.payload.keyboard.keyCode <= INPUT_SCAN_F10)
+        || event.payload.keyboard.keyCode == INPUT_SCAN_F11
+        || event.payload.keyboard.keyCode == INPUT_SCAN_F12)
+        event.payload.keyboard.keyCode = m_keyState[event.payload.keyboard.keyCode];
     else
-        event.payload.keyboard.keyCode =
-            m_keyState[event.payload.keyboard.keyCode] & 0xff;
+        event.payload.keyboard.keyCode = m_keyState[event.payload.keyboard.keyCode] & 0xff;
 
-    i32 modifiers = event.payload.keyboard.modifiers &
-                    (MESSAGE_MODIFIER_RIGHT_SHIFT | MESSAGE_MODIFIER_LEFT_SHIFT);
+    i32 modifiers = event.payload.keyboard.modifiers
+                    & (MESSAGE_MODIFIER_RIGHT_SHIFT | MESSAGE_MODIFIER_LEFT_SHIFT);
     if (modifiers == 0) {
         i32 value = event.payload.keyboard.keyCode;
         if (value > 'A' - 1 && value < 'Z' + 1) {
@@ -379,33 +369,72 @@ void inputManager::AsciiConvert(tag_message &event)
     }
     if (modifiers != 0) {
         switch (event.payload.keyboard.keyCode) {
-        case '\'': event.payload.keyboard.keyCode = '"'; return;
-        case ',': event.payload.keyboard.keyCode = '<'; return;
-        case '-': event.payload.keyboard.keyCode = '_'; return;
-        case '.': event.payload.keyboard.keyCode = '>'; return;
-        case '/': event.payload.keyboard.keyCode = '?'; return;
-        case '0': event.payload.keyboard.keyCode = ')'; return;
-        case '1': event.payload.keyboard.keyCode = '!'; return;
-        case '2': event.payload.keyboard.keyCode = '@'; return;
-        case '3': event.payload.keyboard.keyCode = '#'; return;
-        case '4': event.payload.keyboard.keyCode = '$'; return;
-        case '5': event.payload.keyboard.keyCode = '%'; return;
-        case '6': event.payload.keyboard.keyCode = '^'; return;
-        case '7': event.payload.keyboard.keyCode = '&'; return;
-        case '8': event.payload.keyboard.keyCode = '*'; return;
-        case '9': event.payload.keyboard.keyCode = '('; return;
-        case ';': event.payload.keyboard.keyCode = ':'; return;
-        case '=': event.payload.keyboard.keyCode = '+'; return;
-        case '[': event.payload.keyboard.keyCode = '{'; return;
-        case '\\': event.payload.keyboard.keyCode = '|'; return;
-        case ']': event.payload.keyboard.keyCode = '}'; return;
+            case '\'':
+                event.payload.keyboard.keyCode = '"';
+                return;
+            case ',':
+                event.payload.keyboard.keyCode = '<';
+                return;
+            case '-':
+                event.payload.keyboard.keyCode = '_';
+                return;
+            case '.':
+                event.payload.keyboard.keyCode = '>';
+                return;
+            case '/':
+                event.payload.keyboard.keyCode = '?';
+                return;
+            case '0':
+                event.payload.keyboard.keyCode = ')';
+                return;
+            case '1':
+                event.payload.keyboard.keyCode = '!';
+                return;
+            case '2':
+                event.payload.keyboard.keyCode = '@';
+                return;
+            case '3':
+                event.payload.keyboard.keyCode = '#';
+                return;
+            case '4':
+                event.payload.keyboard.keyCode = '$';
+                return;
+            case '5':
+                event.payload.keyboard.keyCode = '%';
+                return;
+            case '6':
+                event.payload.keyboard.keyCode = '^';
+                return;
+            case '7':
+                event.payload.keyboard.keyCode = '&';
+                return;
+            case '8':
+                event.payload.keyboard.keyCode = '*';
+                return;
+            case '9':
+                event.payload.keyboard.keyCode = '(';
+                return;
+            case ';':
+                event.payload.keyboard.keyCode = ':';
+                return;
+            case '=':
+                event.payload.keyboard.keyCode = '+';
+                return;
+            case '[':
+                event.payload.keyboard.keyCode = '{';
+                return;
+            case '\\':
+                event.payload.keyboard.keyCode = '|';
+                return;
+            case ']':
+                event.payload.keyboard.keyCode = '}';
+                return;
         }
     }
 }
 
 VA(0x004ce650, 0x33c)
-void inputManager::MakeScanCodeTable(void)
-{
+void inputManager::MakeScanCodeTable(void) {
     for (u32 scanCode = 0; scanCode < INPUT_SCAN_CODE_CAPACITY; scanCode++)
         m_keyState[scanCode] = scanCode << 8;
 
@@ -511,8 +540,7 @@ void inputManager::MakeScanCodeTable(void)
 // +0x34 addends are confirmed; revisit only after a genuine predecessor/TU-state
 // change, since the residual is register coloring rather than missing behavior.
 VA(0x004ce990, 0xe4)
-void CheckChangeCursor(i32 x, i32 y, i32 force)
-{
+void CheckChangeCursor(i32 x, i32 y, i32 force) {
     if (bInCheckChangeCursor != 0)
         return;
     if (gConfig.gfx[giCurExe].fullScreen != 0 && force == 0)
@@ -521,8 +549,7 @@ void CheckChangeCursor(i32 x, i32 y, i32 force)
         return;
 
     bInCheckChangeCursor = 1;
-    if (force != 0 ||
-        (x >= 0 && x < MOUSE_SCREEN_WIDTH && y >= 0 && y < MOUSE_SCREEN_HEIGHT)) {
+    if (force != 0 || (x >= 0 && x < MOUSE_SCREEN_WIDTH && y >= 0 && y < MOUSE_SCREEN_HEIGHT)) {
         if (bLastMouseOffscreen != 0) {
             bLastMouseOffscreen = 0;
             gpMouseManager->SetPointer(MOUSE_KEEP_CURRENT_FRAME);
@@ -549,14 +576,13 @@ void CheckChangeCursor(i32 x, i32 y, i32 force)
 // integrated declaration states produced no exact closure. Revisit on a genuine
 // predecessor/header/TU-state change; load folding is not a permitted artifact.
 VA(0x004cea80, 0xe9)
-void inputManager::ForceMouseMove(void)
-{
+void inputManager::ForceMouseMove(void) {
     i32 mouseMessageActive = gpInputManager->m_mouseMessageActive;
     if (mouseMessageActive != 0)
         return;
     gpInputManager->m_mouseMessageActive = 1;
 
-    tag_message *event = &gpInputManager->m_eventRing[gpInputManager->m_writeIndex];
+    tag_message* event = &gpInputManager->m_eventRing[gpInputManager->m_writeIndex];
     event->type = MESSAGE_MOUSE_MOVE;
     gpMouseManager->MouseCoords(event->payload.mouse.x, event->payload.mouse.y);
     event->payload.mouse.screenX = event->payload.mouse.x;
@@ -570,7 +596,6 @@ void inputManager::ForceMouseMove(void)
     }
     gpInputManager->m_mouseMessageActive = 0;
 }
-
 
 // ===== vtable inputManager : public baseManager  (3 slots) =====
 //  [ 0] VA(0x004ce230, 0x78)  int inputManager::Open(int)   <- override (implements baseManager pure virtual)

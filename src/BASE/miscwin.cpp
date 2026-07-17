@@ -24,18 +24,25 @@
 // pointer, and explicit scaled-coordinate lifetimes were byte-neutral in three audited
 // variants. Revisit after a real predecessor/header/compiler-state change.
 VA(0x004d8540, 0x1e2)
-extern "C" void __fastcall BlitBitmapToScreenVesa(bitmap *sourceBitmap, i32 sourceX, i32 sourceY,
-                                                   i32 width, i32 height, i32 destinationX,
-                                                   i32 destinationY)
-{
+extern "C" void __fastcall BlitBitmapToScreenVesa(
+    bitmap* sourceBitmap,
+    i32 sourceX,
+    i32 sourceY,
+    i32 width,
+    i32 height,
+    i32 destinationX,
+    i32 destinationY
+) {
     if (gpWindowManager->m_screen != sourceBitmap) {
         i32 row = 0;
         if (height > row) {
             i32 destinationOffset = destinationY * 640;
             do {
-                memcpy(gpWindowManager->m_screen->m_pixels + destinationX + destinationOffset,
-                       sourceBitmap->m_pixels + sourceX + (sourceY + row) * sourceBitmap->m_width,
-                       width);
+                memcpy(
+                    gpWindowManager->m_screen->m_pixels + destinationX + destinationOffset,
+                    sourceBitmap->m_pixels + sourceX + (sourceY + row) * sourceBitmap->m_width,
+                    width
+                );
                 destinationOffset += 640;
                 ++row;
             } while (row < height);
@@ -80,7 +87,9 @@ extern "C" void __fastcall BlitBitmapToScreenVesa(bitmap *sourceBitmap, i32 sour
 }
 
 VA(0x004d8730, 0x4)
-i16 AutoInitSVGA(void) { return 0; }
+i16 AutoInitSVGA(void) {
+    return 0;
+}
 
 // ---- globals (definitions, RVA order) ----
 DATA(0x00538080) struct tagPAINTSTRUCT ps;

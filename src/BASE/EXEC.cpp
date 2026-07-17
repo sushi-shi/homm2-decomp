@@ -53,8 +53,7 @@ DATA(0x0051fb20) static SExecutiveText gExecutiveText = {
 };
 
 VA(0x004d1610, 0x10)
-executive::executive(void)
-{
+executive::executive(void) {
     m_managerListHead = 0;
     m_managerListTail = 0;
     m_activeManager = 0;
@@ -62,8 +61,7 @@ executive::executive(void)
 }
 
 VA(0x004d1620, 0x9e)
-i32 executive::InitSystem(void)
-{
+i32 executive::InitSystem(void) {
     if (gpResourceManager->Open(EXECUTIVE_MANAGER_DEFAULT_PRIORITY) != 0)
         ShutDown(gExecutiveText.resourceInitError);
     if (gpInputManager->Open(EXECUTIVE_MANAGER_DEFAULT_PRIORITY) != 0)
@@ -86,12 +84,11 @@ i32 executive::InitSystem(void)
 // tu_state_noise seed-45 enum probe produced an audited exact closure without
 // changing exact siblings; revisit only if earlier EXEC TU state changes.
 VA(0x004d16c0, 0x86)
-void executive::ShutDownSystem(void)
-{
+void executive::ShutDownSystem(void) {
     EarlyShutDownSystem();
     gpSoundManager->Close();
-    baseManager *next = m_managerListHead;
-    baseManager *cur;
+    baseManager* next = m_managerListHead;
+    baseManager* cur;
     while ((cur = next) != 0) {
         next = cur->m_next;
         if (cur != gpWindowManager && cur != gpMouseManager)
@@ -114,14 +111,13 @@ void executive::ShutDownSystem(void)
 // (78 trials total) reached only a disposable 99.4375%. Revisit after earlier EXEC
 // TU-state changes.
 VA(0x004d1750, 0xfb)
-i32 executive::DoDialog(class baseManager *manager)
-{
-    baseManager *managerList[EXECUTIVE_DIALOG_MANAGER_CAPACITY];
-    baseManager *previousList[EXECUTIVE_DIALOG_MANAGER_CAPACITY];
-    baseManager *nextList[EXECUTIVE_DIALOG_MANAGER_CAPACITY];
+i32 executive::DoDialog(class baseManager* manager) {
+    baseManager* managerList[EXECUTIVE_DIALOG_MANAGER_CAPACITY];
+    baseManager* previousList[EXECUTIVE_DIALOG_MANAGER_CAPACITY];
+    baseManager* nextList[EXECUTIVE_DIALOG_MANAGER_CAPACITY];
     i32 dialogStorage[4];
-    executive *dialog = reinterpret_cast<executive *>(dialogStorage);
-    baseManager *listManager;
+    executive* dialog = reinterpret_cast<executive*>(dialogStorage);
+    baseManager* listManager;
     i32 managerIndex;
     i32 managerCount;
     managerCount = 0;
@@ -165,25 +161,21 @@ i32 executive::DoDialog(class baseManager *manager)
 }
 
 VA(0x004d1850, 0x86)
-void executive::PrintManagerList(void)
-{
+void executive::PrintManagerList(void) {
     LogStr(gExecutiveText.managerListStart);
     LogStr(gExecutiveText.managerListDivider1);
-    sprintf(gText, gExecutiveText.managerListHeaderFormat,
-            m_managerListHead, m_managerListTail);
+    sprintf(gText, gExecutiveText.managerListHeaderFormat, m_managerListHead, m_managerListTail);
     LogStr(gText);
     LogStr(gExecutiveText.managerListDivider2);
-    for (baseManager *m = m_managerListHead; m != 0; m = m->m_next) {
-        sprintf(gText, gExecutiveText.managerListEntryFormat, m->m_name, m,
-                m->m_prev, m->m_next);
+    for (baseManager* m = m_managerListHead; m != 0; m = m->m_next) {
+        sprintf(gText, gExecutiveText.managerListEntryFormat, m->m_name, m, m->m_prev, m->m_next);
         LogStr(gText);
     }
     LogStr(gExecutiveText.managerListStop);
 }
 
 VA(0x004d18e0, 0xce)
-i32 executive::AddManager(class baseManager *mgr, i32 param_2)
-{
+i32 executive::AddManager(class baseManager* mgr, i32 param_2) {
     if (mgr == 0)
         return EXECUTIVE_MANAGER_ERROR;
     if (param_2 == EXECUTIVE_MANAGER_DEFAULT_PRIORITY) {
@@ -191,8 +183,8 @@ i32 executive::AddManager(class baseManager *mgr, i32 param_2)
     }
     if (mgr->m_active == 0 && mgr->Open(param_2) != 0)
         return EXECUTIVE_MANAGER_ERROR;
-    baseManager *tail = m_managerListTail;
-    baseManager *cur = m_managerListTail;
+    baseManager* tail = m_managerListTail;
+    baseManager* cur = m_managerListTail;
     if (cur != 0) {
         do {
             if (cur->m_priority <= param_2)
@@ -229,14 +221,13 @@ i32 executive::AddManager(class baseManager *mgr, i32 param_2)
 // tu_state_noise seed-45 enum probe produced an audited exact closure without
 // changing exact siblings; revisit only if earlier EXEC TU state changes.
 VA(0x004d19b0, 0x76)
-void executive::RemoveManager(class baseManager *mgr)
-{
+void executive::RemoveManager(class baseManager* mgr) {
     if (mgr != 0) {
         mgr->Close();
-        baseManager *next;
-        baseManager *prev = mgr->m_prev;
+        baseManager* next;
+        baseManager* prev = mgr->m_prev;
         if (prev == 0) {
-            baseManager *tail = m_managerListTail;
+            baseManager* tail = m_managerListTail;
             if (m_managerListHead == tail) {
                 m_managerListTail = 0;
                 m_managerListHead = 0;
@@ -261,9 +252,8 @@ void executive::RemoveManager(class baseManager *mgr)
 }
 
 VA(0x004d1a30, 0x5a)
-void executive::CallManager(class baseManager *mgr)
-{
-    baseManager *saved = m_activeManager;
+void executive::CallManager(class baseManager* mgr) {
+    baseManager* saved = m_activeManager;
     RemoveManager(saved);
     if (AddManager(mgr, EXECUTIVE_MANAGER_DEFAULT_PRIORITY) != 0)
         ShutDown(gExecutiveText.callManagerError1);
@@ -275,13 +265,12 @@ void executive::CallManager(class baseManager *mgr)
 }
 
 VA(0x004d1a90, 0xfa)
-void executive::MainLoop(void)
-{
+void executive::MainLoop(void) {
     tag_message message;
     i32 keepDispatching;
     i32 done = 0;
     i32 result;
-    baseManager *manager;
+    baseManager* manager;
     if (m_managerListHead != 0) {
         gpInputManager->Flush();
         do {
@@ -297,30 +286,30 @@ void executive::MainLoop(void)
                 if (done)
                     return;
                 manager = m_activeManager;
-                if (manager->m_active == 1 &&
-                    (message.type != MESSAGE_MOUSE_MOVE || gpWindowManager != manager)) {
+                if (manager->m_active == 1
+                    && (message.type != MESSAGE_MOUSE_MOVE || gpWindowManager != manager)) {
                     result = manager->Main(message);
                     switch (result) {
-                    case EXECUTIVE_MANAGER_STOP_DISPATCH:
-                        keepDispatching = 0;
-                        break;
-                    case EXECUTIVE_MANAGER_HANDLE_EXECUTIVE_MESSAGE:
-                        if ((message.type & MESSAGE_EXECUTIVE) == 0)
+                        case EXECUTIVE_MANAGER_STOP_DISPATCH:
+                            keepDispatching = 0;
                             break;
-                        switch (message.payload.executive.command) {
-                        case EXECUTIVE_COMMAND_TERMINATE_LOOP:
-                            done++;
+                        case EXECUTIVE_MANAGER_HANDLE_EXECUTIVE_MESSAGE:
+                            if ((message.type & MESSAGE_EXECUTIVE) == 0)
+                                break;
+                            switch (message.payload.executive.command) {
+                                case EXECUTIVE_COMMAND_TERMINATE_LOOP:
+                                    done++;
+                                    break;
+                                case EXECUTIVE_COMMAND_REMOVE_MANAGER:
+                                    RemoveManager(m_activeManager);
+                                    m_activeManager = 0;
+                                    break;
+                                case EXECUTIVE_COMMAND_RETURN_RESULT:
+                                    m_result = message.payload.executive.result;
+                                    done++;
+                                    break;
+                            }
                             break;
-                        case EXECUTIVE_COMMAND_REMOVE_MANAGER:
-                            RemoveManager(m_activeManager);
-                            m_activeManager = 0;
-                            break;
-                        case EXECUTIVE_COMMAND_RETURN_RESULT:
-                            m_result = message.payload.executive.result;
-                            done++;
-                            break;
-                        }
-                        break;
                     }
                 }
                 if (m_activeManager != 0)
@@ -331,7 +320,6 @@ void executive::MainLoop(void)
 }
 
 VA(0x004d1b90, 0xa)
-void executive::Terminate(void)
-{
+void executive::Terminate(void) {
     ShutDown(gExecutiveText.terminationMessage);
 }

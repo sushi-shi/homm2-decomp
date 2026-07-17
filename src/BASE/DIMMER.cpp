@@ -8,19 +8,13 @@
 #include <BASE/resourceManager.h>
 #include <SOURCE/KB.h>
 VA(0x004dd330, 0x1e)
-dimmerWidget::dimmerWidget(void) : widget(0, 0, 0, 0, 0, 0)
-{
-}
+dimmerWidget::dimmerWidget(void) : widget(0, 0, 0, 0, 0, 0) {}
 
 VA(0x004dd350, 0x34)
-dimmerWidget::dimmerWidget(i16 a, i16 b, i16 c, i16 d, i16 e, i16 f)
-    : widget(a, b, c, d, e, f)
-{
-}
+dimmerWidget::dimmerWidget(i16 a, i16 b, i16 c, i16 d, i16 e, i16 f) : widget(a, b, c, d, e, f) {}
 
 VA(0x004dd390, 0x5f)
-void dimmerWidget::Read(void)
-{
+void dimmerWidget::Read(void) {
     m_x = gpResourceManager->ReadWord();
     m_y = gpResourceManager->ReadWord();
     m_width = gpResourceManager->ReadWord();
@@ -30,17 +24,14 @@ void dimmerWidget::Read(void)
 }
 
 VA(0x004dd3f0, 0xd)
-i32 dimmerWidget::Main(struct tag_message &msg)
-{
+i32 dimmerWidget::Main(struct tag_message& msg) {
     return widget::Main(msg);
 }
 
 VA(0x004dd400, 0x5)
-void dimmerWidget::Draw(void)
-{
+void dimmerWidget::Draw(void) {
     Dim();
 }
-
 
 // ===== vtable dimmerWidget : public widget  (3 slots) =====
 //  [ 0] VA(0x004dd400, 0x5)  void dimmerWidget::Draw(void)   <- override (implements widget pure virtual)

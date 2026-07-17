@@ -16,8 +16,7 @@
 DATA(0x00534908) i8 gCyclePal[0x60];
 DATA(0x00534968) i16 memSelector;
 
-static inline u32 &FadeSavedUpdate(void)
-{
+static inline u32& FadeSavedUpdate(void) {
     DATA(0x0053496c) static u32 savedUpdate;
     return savedUpdate;
 }
@@ -76,8 +75,7 @@ DATA(0x0051ef40) static SWindowManagerText gWindowManagerText = {
 // pass retained no mutation. This is not a permitted artifact wall; revisit on a real
 // declaration/TU-state change.
 VA(0x004ca6d0, 0x3a3)
-void CycleColors(i32 forceUpdate)
-{
+void CycleColors(i32 forceUpdate) {
     i8 savedColor[WINDOW_PALETTE_COLOR_BYTES];
     iCycle1Count++;
     if (gpWindowManager == 0 || gpBufferPalette == 0 || gpWindowManager->m_active != 1)
@@ -99,63 +97,111 @@ void CycleColors(i32 forceUpdate)
             else
                 frame = iCombatCycleFrame;
             u8 cycleIndices[WINDOW_WORLD_CYCLE_COLOR_COUNT] =
-                { 0x98, 0x43, 0x59, 0xb5, 0x70, 0xdb, 0x87, 0x10 };
+                {0x98, 0x43, 0x59, 0xb5, 0x70, 0xdb, 0x87, 0x10};
             for (i32 colorIndex = 0; colorIndex < WINDOW_WORLD_CYCLE_COLOR_COUNT; ++colorIndex) {
-                i8 *src = gpBufferPalette->m_data +
-                    (cycleIndices[colorIndex] + frame * 3) * 3;
-                memcpy(gCyclePal + colorIndex * WINDOW_PALETTE_COLOR_BYTES, src,
-                       WINDOW_PALETTE_COLOR_BYTES);
+                i8* src = gpBufferPalette->m_data + (cycleIndices[colorIndex] + frame * 3) * 3;
+                memcpy(
+                    gCyclePal + colorIndex * WINDOW_PALETTE_COLOR_BYTES,
+                    src,
+                    WINDOW_PALETTE_COLOR_BYTES
+                );
             }
             goto updatePalette;
         }
 
-        memcpy(savedColor, gCyclePal + WINDOW_CYCLE_ROTATION_1_SAVE_OFFSET,
-               WINDOW_PALETTE_COLOR_BYTES);
-        memmove(gCyclePal + WINDOW_CYCLE_ROTATION_1_DESTINATION_OFFSET, gCyclePal,
-                WINDOW_CYCLE_ROTATION_1_BYTES);
+        memcpy(
+            savedColor,
+            gCyclePal + WINDOW_CYCLE_ROTATION_1_SAVE_OFFSET,
+            WINDOW_PALETTE_COLOR_BYTES
+        );
+        memmove(
+            gCyclePal + WINDOW_CYCLE_ROTATION_1_DESTINATION_OFFSET,
+            gCyclePal,
+            WINDOW_CYCLE_ROTATION_1_BYTES
+        );
         memcpy(gCyclePal, savedColor, WINDOW_PALETTE_COLOR_BYTES);
 
-        memcpy(savedColor, gCyclePal + WINDOW_CYCLE_ROTATION_2_SAVE_OFFSET,
-               WINDOW_PALETTE_COLOR_BYTES);
-        memmove(gCyclePal + WINDOW_CYCLE_ROTATION_2_DESTINATION_OFFSET,
-                gCyclePal + WINDOW_CYCLE_ROTATION_2_SOURCE_OFFSET,
-                WINDOW_CYCLE_ROTATION_2_BYTES);
-        memcpy(gCyclePal + WINDOW_CYCLE_ROTATION_2_SOURCE_OFFSET, savedColor,
-               WINDOW_PALETTE_COLOR_BYTES);
+        memcpy(
+            savedColor,
+            gCyclePal + WINDOW_CYCLE_ROTATION_2_SAVE_OFFSET,
+            WINDOW_PALETTE_COLOR_BYTES
+        );
+        memmove(
+            gCyclePal + WINDOW_CYCLE_ROTATION_2_DESTINATION_OFFSET,
+            gCyclePal + WINDOW_CYCLE_ROTATION_2_SOURCE_OFFSET,
+            WINDOW_CYCLE_ROTATION_2_BYTES
+        );
+        memcpy(
+            gCyclePal + WINDOW_CYCLE_ROTATION_2_SOURCE_OFFSET,
+            savedColor,
+            WINDOW_PALETTE_COLOR_BYTES
+        );
 
-        memcpy(savedColor, gCyclePal + WINDOW_CYCLE_ROTATION_3_SAVE_OFFSET,
-               WINDOW_PALETTE_COLOR_BYTES);
-        memmove(gCyclePal + WINDOW_CYCLE_ROTATION_3_SAVE_OFFSET,
-                gCyclePal + WINDOW_CYCLE_ROTATION_3_SOURCE_OFFSET,
-                WINDOW_CYCLE_ROTATION_3_BYTES);
-        memcpy(gCyclePal + WINDOW_CYCLE_ROTATION_3_RESTORE_OFFSET, savedColor,
-               WINDOW_PALETTE_COLOR_BYTES);
+        memcpy(
+            savedColor,
+            gCyclePal + WINDOW_CYCLE_ROTATION_3_SAVE_OFFSET,
+            WINDOW_PALETTE_COLOR_BYTES
+        );
+        memmove(
+            gCyclePal + WINDOW_CYCLE_ROTATION_3_SAVE_OFFSET,
+            gCyclePal + WINDOW_CYCLE_ROTATION_3_SOURCE_OFFSET,
+            WINDOW_CYCLE_ROTATION_3_BYTES
+        );
+        memcpy(
+            gCyclePal + WINDOW_CYCLE_ROTATION_3_RESTORE_OFFSET,
+            savedColor,
+            WINDOW_PALETTE_COLOR_BYTES
+        );
 
-        memcpy(savedColor, gCyclePal + WINDOW_CYCLE_ROTATION_4_SAVE_OFFSET,
-               WINDOW_PALETTE_COLOR_BYTES);
-        memmove(gCyclePal + WINDOW_CYCLE_ROTATION_4_DESTINATION_OFFSET,
-                gCyclePal + WINDOW_CYCLE_ROTATION_4_SOURCE_OFFSET,
-                WINDOW_CYCLE_ROTATION_4_BYTES);
-        memcpy(gCyclePal + WINDOW_CYCLE_ROTATION_4_SOURCE_OFFSET, savedColor,
-               WINDOW_PALETTE_COLOR_BYTES);
+        memcpy(
+            savedColor,
+            gCyclePal + WINDOW_CYCLE_ROTATION_4_SAVE_OFFSET,
+            WINDOW_PALETTE_COLOR_BYTES
+        );
+        memmove(
+            gCyclePal + WINDOW_CYCLE_ROTATION_4_DESTINATION_OFFSET,
+            gCyclePal + WINDOW_CYCLE_ROTATION_4_SOURCE_OFFSET,
+            WINDOW_CYCLE_ROTATION_4_BYTES
+        );
+        memcpy(
+            gCyclePal + WINDOW_CYCLE_ROTATION_4_SOURCE_OFFSET,
+            savedColor,
+            WINDOW_PALETTE_COLOR_BYTES
+        );
 
-        memcpy(savedColor, gCyclePal + WINDOW_CYCLE_ROTATION_5_SAVE_OFFSET,
-               WINDOW_PALETTE_COLOR_BYTES);
-        memmove(gCyclePal + WINDOW_CYCLE_ROTATION_5_DESTINATION_OFFSET,
-                gCyclePal + WINDOW_CYCLE_ROTATION_5_SOURCE_OFFSET,
-                WINDOW_CYCLE_ROTATION_5_BYTES);
-        memcpy(gCyclePal + WINDOW_CYCLE_ROTATION_5_SOURCE_OFFSET, savedColor,
-               WINDOW_PALETTE_COLOR_BYTES);
+        memcpy(
+            savedColor,
+            gCyclePal + WINDOW_CYCLE_ROTATION_5_SAVE_OFFSET,
+            WINDOW_PALETTE_COLOR_BYTES
+        );
+        memmove(
+            gCyclePal + WINDOW_CYCLE_ROTATION_5_DESTINATION_OFFSET,
+            gCyclePal + WINDOW_CYCLE_ROTATION_5_SOURCE_OFFSET,
+            WINDOW_CYCLE_ROTATION_5_BYTES
+        );
+        memcpy(
+            gCyclePal + WINDOW_CYCLE_ROTATION_5_SOURCE_OFFSET,
+            savedColor,
+            WINDOW_PALETTE_COLOR_BYTES
+        );
     }
 
     if (giCycleType == WINDOW_COLOR_CYCLE_DEFAULT) {
-        memcpy(savedColor, gCyclePal + WINDOW_DEFAULT_CYCLE_SAVE_OFFSET,
-               WINDOW_PALETTE_COLOR_BYTES);
-        memmove(gCyclePal + WINDOW_DEFAULT_CYCLE_SAVE_OFFSET,
-                gCyclePal + WINDOW_DEFAULT_CYCLE_SOURCE_OFFSET,
-                WINDOW_PALETTE_COLOR_BYTES);
-        memcpy(gCyclePal + WINDOW_DEFAULT_CYCLE_SOURCE_OFFSET, savedColor,
-               WINDOW_PALETTE_COLOR_BYTES);
+        memcpy(
+            savedColor,
+            gCyclePal + WINDOW_DEFAULT_CYCLE_SAVE_OFFSET,
+            WINDOW_PALETTE_COLOR_BYTES
+        );
+        memmove(
+            gCyclePal + WINDOW_DEFAULT_CYCLE_SAVE_OFFSET,
+            gCyclePal + WINDOW_DEFAULT_CYCLE_SOURCE_OFFSET,
+            WINDOW_PALETTE_COLOR_BYTES
+        );
+        memcpy(
+            gCyclePal + WINDOW_DEFAULT_CYCLE_SOURCE_OFFSET,
+            savedColor,
+            WINDOW_PALETTE_COLOR_BYTES
+        );
         goto updatePalette;
     }
 
@@ -166,27 +212,33 @@ void CycleColors(i32 forceUpdate)
             frame = WINDOW_CYCLE_FRAME_COUNT - frame;
         else
             frame = iCombatCycleFrame;
-        memcpy(gCyclePal + WINDOW_DEFAULT_CYCLE_SOURCE_OFFSET,
-               gpBufferPalette->m_data + WINDOW_COMBAT_CYCLE_SOURCE_OFFSET + frame * 12,
-               WINDOW_PALETTE_COLOR_BYTES);
+        memcpy(
+            gCyclePal + WINDOW_DEFAULT_CYCLE_SOURCE_OFFSET,
+            gpBufferPalette->m_data + WINDOW_COMBAT_CYCLE_SOURCE_OFFSET + frame * 12,
+            WINDOW_PALETTE_COLOR_BYTES
+        );
     } else {
         if (giCycleType != WINDOW_COLOR_CYCLE_COMBAT_ALTERNATE)
             goto updatePalette;
-        i32 frame =
-            (iCombatCycleFrame + 1) % WINDOW_ALTERNATE_CYCLE_FRAME_COUNT;
+        i32 frame = (iCombatCycleFrame + 1) % WINDOW_ALTERNATE_CYCLE_FRAME_COUNT;
         iCombatCycleFrame = frame;
         if (frame >= WINDOW_ALTERNATE_CYCLE_REFLECTION_THRESHOLD)
             frame = WINDOW_ALTERNATE_CYCLE_FRAME_COUNT - frame;
         else
             frame = iCombatCycleFrame;
-        memcpy(gCyclePal + WINDOW_DEFAULT_CYCLE_SOURCE_OFFSET,
-               gpBufferPalette->m_data + WINDOW_ALTERNATE_CYCLE_SOURCE_OFFSET + frame * 21,
-               WINDOW_PALETTE_COLOR_BYTES);
+        memcpy(
+            gCyclePal + WINDOW_DEFAULT_CYCLE_SOURCE_OFFSET,
+            gpBufferPalette->m_data + WINDOW_ALTERNATE_CYCLE_SOURCE_OFFSET + frame * 21,
+            WINDOW_PALETTE_COLOR_BYTES
+        );
     }
 
 updatePalette:
-    memcpy(gpBufferPalette->m_data + WINDOW_CYCLE_PALETTE_OFFSET, gCyclePal,
-           WINDOW_CYCLE_PALETTE_BYTES);
+    memcpy(
+        gpBufferPalette->m_data + WINDOW_CYCLE_PALETTE_OFFSET,
+        gCyclePal,
+        WINDOW_CYCLE_PALETTE_BYTES
+    );
     iCycle2Count++;
     if (forceUpdate == 0) {
         iCycle3Count++;
@@ -206,8 +258,7 @@ updatePalette:
 #include <SOURCE/NOOPT.h>
 
 VA(0x004caa80, 0x41)
-heroWindowManager::heroWindowManager(void) : baseManager()
-{
+heroWindowManager::heroWindowManager(void) : baseManager() {
     m_active = 0;
     m_activeWindow = 0;
     m_focusWindow = 0;
@@ -223,11 +274,10 @@ heroWindowManager::heroWindowManager(void) : baseManager()
 }
 
 VA(0x004caad0, 0xd6)
-i32 heroWindowManager::Open(i32 managerOrder)
-{
+i32 heroWindowManager::Open(i32 managerOrder) {
     i32 i;
     InitVideo();
-    i32 *pal = reinterpret_cast<i32 *>(gpBufferPalette->m_data);
+    i32* pal = reinterpret_cast<i32*>(gpBufferPalette->m_data);
     for (i = WINDOW_PALETTE_DWORD_COUNT; i != 0; i--) {
         *pal = 0;
         pal++;
@@ -239,9 +289,12 @@ i32 heroWindowManager::Open(i32 managerOrder)
     m_screen->m_bitmapType = BITMAP_TYPE_MEMORY;
     m_screen->m_width = WINDOW_SCREEN_WIDTH;
     m_screen->m_height = WINDOW_SCREEN_HEIGHT;
-    m_screen->m_pixels = reinterpret_cast<u8 *>(lpInitWin);
-    memset(m_screen->m_pixels, WINDOW_FRAMEBUFFER_FILL_COLOR,
-           WINDOW_SCREEN_WIDTH * WINDOW_SCREEN_HEIGHT);
+    m_screen->m_pixels = reinterpret_cast<u8*>(lpInitWin);
+    memset(
+        m_screen->m_pixels,
+        WINDOW_FRAMEBUFFER_FILL_COLOR,
+        WINDOW_SCREEN_WIDTH * WINDOW_SCREEN_HEIGHT
+    );
     m_priority = managerOrder;
     m_messageMask = 0x20;
     m_active = 1;
@@ -250,12 +303,11 @@ i32 heroWindowManager::Open(i32 managerOrder)
 }
 
 VA(0x004cabb0, 0x45)
-void heroWindowManager::Close(void)
-{
+void heroWindowManager::Close(void) {
     if (m_active == 1) {
-        heroWindow *w = m_windowListTail;
+        heroWindow* w = m_windowListTail;
         while (w != 0) {
-            heroWindow *prev = w->m_prevWindow;
+            heroWindow* prev = w->m_prevWindow;
             RemoveWindow(w);
             w = prev;
         }
@@ -273,10 +325,9 @@ void heroWindowManager::Close(void)
 // A source-level message-reference alias was byte-neutral. Revisit after a genuine
 // declaration or combined-TU state change.
 VA(0x004cac00, 0x2d)
-i32 heroWindowManager::Main(struct tag_message &msg)
-{
+i32 heroWindowManager::Main(struct tag_message& msg) {
     i32 result = 0;
-    heroWindow *w = m_windowListTail;
+    heroWindow* w = m_windowListTail;
     while (w != 0) {
         result = w->BroadcastMessage(msg);
         if (result >= 1 && result <= 2)
@@ -287,8 +338,7 @@ i32 heroWindowManager::Main(struct tag_message &msg)
 }
 
 VA(0x004cac30, 0xf)
-i32 heroWindowManager::ConvertToHover(struct tag_message &msg)
-{
+i32 heroWindowManager::ConvertToHover(struct tag_message& msg) {
     return Main(msg);
 }
 
@@ -303,8 +353,7 @@ i32 heroWindowManager::ConvertToHover(struct tag_message &msg)
 // baseManager alias were byte-identical. Revisit after a genuine combined-TU
 // change; this is not a proven wall.
 VA(0x004cac40, 0x35)
-i32 heroWindowManager::BroadcastMessage(i32 type, i32 p2, i32 p3, i32 p4)
-{
+i32 heroWindowManager::BroadcastMessage(i32 type, i32 p2, i32 p3, i32 p4) {
     tag_message msg;
     msg.type = type;
     msg.payload.widget.command = p2;
@@ -324,9 +373,8 @@ i32 heroWindowManager::BroadcastMessage(i32 type, i32 p2, i32 p3, i32 p4)
 // TU-state trials and 80 clang-AST iterations found no gain. Revisit after a
 // genuine combined-TU change; this is not a proven wall.
 VA(0x004cac80, 0xbc)
-void heroWindowManager::AddWindow(class heroWindow *w, i32 zOrder, i32 openFlags)
-{
-    heroWindow *cur = m_windowListTail;
+void heroWindowManager::AddWindow(class heroWindow* w, i32 zOrder, i32 openFlags) {
+    heroWindow* cur = m_windowListTail;
     i32 z;
     if ((w->m_winFlags & 1) != 0)
         z = 0;
@@ -351,7 +399,7 @@ void heroWindowManager::AddWindow(class heroWindow *w, i32 zOrder, i32 openFlags
     if (cur == 0) {
         w->m_nextWindow = m_windowListHead;
         w->m_prevWindow = 0;
-        heroWindow *oldHead = m_windowListHead;
+        heroWindow* oldHead = m_windowListHead;
         m_windowListHead = w;
         if (oldHead == 0)
             m_windowListTail = w;
@@ -371,12 +419,11 @@ void heroWindowManager::AddWindow(class heroWindow *w, i32 zOrder, i32 openFlags
 }
 
 VA(0x004cad40, 0x87)
-void heroWindowManager::RemoveWindow(class heroWindow *w)
-{
+void heroWindowManager::RemoveWindow(class heroWindow* w) {
     if (w != 0) {
         w->Close();
         if (m_windowListHead == w) {
-            heroWindow *next = w->m_nextWindow;
+            heroWindow* next = w->m_nextWindow;
             m_windowListHead = next;
             if (next == 0)
                 m_windowListTail = 0;
@@ -384,11 +431,11 @@ void heroWindowManager::RemoveWindow(class heroWindow *w)
                 next->m_prevWindow = 0;
         } else {
             if (m_windowListTail == w) {
-                heroWindow *prev = w->m_prevWindow;
+                heroWindow* prev = w->m_prevWindow;
                 m_windowListTail = prev;
                 prev->m_nextWindow = 0;
             } else {
-                heroWindow *prev = w->m_prevWindow;
+                heroWindow* prev = w->m_prevWindow;
                 if (prev != 0)
                     prev->m_nextWindow = w->m_nextWindow;
                 if (w->m_nextWindow != 0)
@@ -415,9 +462,11 @@ void heroWindowManager::RemoveWindow(class heroWindow *w)
 // reached disposable 99.78% candidates but rejected all that changed protected
 // siblings. Revisit after a genuine TU-state change; this is not a proven wall.
 VA(0x004cadd0, 0x1cf)
-i32 heroWindowManager::DoDialog(class heroWindow *window, i32 (*handler)(struct tag_message &),
-                                i32 fade)
-{
+i32 heroWindowManager::DoDialog(
+    class heroWindow* window,
+    i32 (*handler)(struct tag_message&),
+    i32 fade
+) {
     tag_message message;
     i32 done;
     i32 result;
@@ -430,28 +479,28 @@ i32 heroWindowManager::DoDialog(class heroWindow *window, i32 (*handler)(struct 
     if (window != 0)
         AddWindow(window, -1, 1);
     if (fade != 0) {
-        palette *dialogPalette = gPalette;
-        heroWindowManager *manager = gpWindowManager;
+        palette* dialogPalette = gPalette;
+        heroWindowManager* manager = gpWindowManager;
         if (dialogPalette != 0)
             SetPalette(dialogPalette->m_data, 0);
         i32 fadeType = WINDOW_FADE_IN;
         switch (fadeType) {
-        case WINDOW_FADE_IN: {
-            u32 savedUpdate = manager->m_updateFlags;
-            manager->m_updateFlags = 0;
-            PollSound();
-            FadeIn(8);
-            manager->m_updateFlags = FadeSavedUpdate() | savedUpdate;
-            break;
-        }
-        case WINDOW_FADE_OUT:
-            FadeSavedUpdate() = manager->m_updateFlags;
-            manager->m_updateFlags = 0;
-            PollSound();
-            FadeOut(8);
-            break;
-        default:
-            break;
+            case WINDOW_FADE_IN: {
+                u32 savedUpdate = manager->m_updateFlags;
+                manager->m_updateFlags = 0;
+                PollSound();
+                FadeIn(8);
+                manager->m_updateFlags = FadeSavedUpdate() | savedUpdate;
+                break;
+            }
+            case WINDOW_FADE_OUT:
+                FadeSavedUpdate() = manager->m_updateFlags;
+                manager->m_updateFlags = 0;
+                PollSound();
+                FadeOut(8);
+                break;
+            default:
+                break;
         }
         PollSound();
     }
@@ -465,15 +514,15 @@ i32 heroWindowManager::DoDialog(class heroWindow *window, i32 (*handler)(struct 
         gpMouseManager->Main(message);
         if (window != 0 && (message.type != MESSAGE_MOUSE_MOVE || gbSendMouseMoveMessages != 0)) {
             result = window->BroadcastMessage(message);
-            if (result == 2 && message.type == MESSAGE_WIDGET &&
-                message.payload.widget.command == WIDGET_COMMAND_DIALOG_SELECT) {
+            if (result == 2 && message.type == MESSAGE_WIDGET
+                && message.payload.widget.command == WIDGET_COMMAND_DIALOG_SELECT) {
                 m_dialogResult = message.payload.widget.id;
                 done = 1;
             }
         }
         result = handler(message);
-        if (result == 2 && message.type == MESSAGE_WIDGET &&
-            message.payload.widget.command == WIDGET_COMMAND_DIALOG_SELECT)
+        if (result == 2 && message.type == MESSAGE_WIDGET
+            && message.payload.widget.command == WIDGET_COMMAND_DIALOG_SELECT)
             done = 1;
     } while (done == 0);
     if (window != 0)
@@ -487,16 +536,14 @@ i32 heroWindowManager::DoDialog(class heroWindow *window, i32 (*handler)(struct 
 }
 
 VA(0x004cafa0, 0x17)
-void heroWindowManager::UpdateScreen(void)
-{
+void heroWindowManager::UpdateScreen(void) {
     PollSound();
     BitmapToScreen(m_screen);
     PollSound();
 }
 
 VA(0x004cafc0, 0x4f)
-void heroWindowManager::UpdateScreenRegion(i32 x, i32 y, i32 w, i32 h)
-{
+void heroWindowManager::UpdateScreenRegion(i32 x, i32 y, i32 w, i32 h) {
     gpMouseManager->m_cursorReady = 0;
     PollSound();
     BlitBitmapToScreen(m_screen, x, y, w, h, x, y);
@@ -505,48 +552,49 @@ void heroWindowManager::UpdateScreenRegion(i32 x, i32 y, i32 w, i32 h)
 }
 
 VA(0x004cb010, 0x18)
-void heroWindowManager::RedrawScreen(void)
-{
-    for (heroWindow *w = m_windowListHead; w != 0; w = w->m_nextWindow)
+void heroWindowManager::RedrawScreen(void) {
+    for (heroWindow* w = m_windowListHead; w != 0; w = w->m_nextWindow)
         w->DrawWindow();
 }
 
 VA(0x004cb030, 0x80)
-void heroWindowManager::FadeScreen(i32 param_1, i32 param_2, class palette *pal)
-{
+void heroWindowManager::FadeScreen(i32 param_1, i32 param_2, class palette* pal) {
     if (pal != 0)
         SetPalette(pal->m_data, 0);
     switch (param_1) {
-    case 0: {
-        u32 saved = m_updateFlags;
-        m_updateFlags = 0;
-        PollSound();
-        FadeIn(param_2);
-        m_updateFlags = FadeSavedUpdate() | saved;
-        PollSound();
-        break;
-    }
-    case 1:
-        FadeSavedUpdate() = m_updateFlags;
-        m_updateFlags = 0;
-        PollSound();
-        FadeOut(param_2);
-        PollSound();
-        break;
-    default:
-        PollSound();
-        break;
+        case 0: {
+            u32 saved = m_updateFlags;
+            m_updateFlags = 0;
+            PollSound();
+            FadeIn(param_2);
+            m_updateFlags = FadeSavedUpdate() | saved;
+            PollSound();
+            break;
+        }
+        case 1:
+            FadeSavedUpdate() = m_updateFlags;
+            m_updateFlags = 0;
+            PollSound();
+            FadeOut(param_2);
+            PollSound();
+            break;
+        default:
+            PollSound();
+            break;
     }
 }
 
 VA(0x004cb0b0, 0x53)
-void heroWindowManager::ScreenShot(void)
-{
+void heroWindowManager::ScreenShot(void) {
     char local_10[16];
     sprintf(local_10, gWindowManagerText.screenshotFormat, m_screenshotIndex);
-    CreatePCXFile(local_10, m_screen->m_pixels, WINDOW_SCREEN_WIDTH,
-                  WINDOW_SCREEN_HEIGHT,
-                  reinterpret_cast<u8 *>(gPalette->m_data));
+    CreatePCXFile(
+        local_10,
+        m_screen->m_pixels,
+        WINDOW_SCREEN_WIDTH,
+        WINDOW_SCREEN_HEIGHT,
+        reinterpret_cast<u8*>(gPalette->m_data)
+    );
     m_screenshotIndex++;
     gpInputManager->Flush();
 }
@@ -559,8 +607,7 @@ void heroWindowManager::ScreenShot(void)
 // the score unchanged and worsened the prologue, so the direct-parameter form remains.
 // Revisit after a genuine declaration or combined-TU state change.
 VA(0x004cb110, 0xc0)
-void heroWindowManager::SaveFizzleSource(i32 x, i32 y, i32 width, i32 height)
-{
+void heroWindowManager::SaveFizzleSource(i32 x, i32 y, i32 width, i32 height) {
     if (bShowIt != 0) {
         if (x < 0) {
             width += x;
@@ -613,9 +660,15 @@ void CreateFizzleTables(void) {}
 // TU-cumulative dip. Revisit after a genuine predecessor/header TU-state change;
 // this is not a proven wall.
 VA(0x004cb1e0, 0x402)
-void heroWindowManager::FizzleForward(i32 x, i32 y, i32 width, i32 height, i32 delay,
-                                      i8 *startPalette, i8 *endPalette)
-{
+void heroWindowManager::FizzleForward(
+    i32 x,
+    i32 y,
+    i32 width,
+    i32 height,
+    i32 delay,
+    i8* startPalette,
+    i8* endPalette
+) {
     if (bShowIt != 0) {
         gbEnlargeScreenBlit = 0;
         i32 tick = 0;
@@ -636,11 +689,15 @@ void heroWindowManager::FizzleForward(i32 x, i32 y, i32 width, i32 height, i32 d
             m_updateFlags = 0;
             if (delay == -1)
                 delay = WINDOW_FIZZLE_DEFAULT_DELAY;
-            i8 *fadePalette = static_cast<i8 *>(H2_ALLOC(
-                WINDOW_PALETTE_BYTE_COUNT, gWindowManagerText.fadePaletteAllocSource, 808));
+            i8* fadePalette = static_cast<i8*>(
+                H2_ALLOC(WINDOW_PALETTE_BYTE_COUNT, gWindowManagerText.fadePaletteAllocSource, 808)
+            );
             m_fizzleWork = new bitmap(0, static_cast<i16>(width), static_cast<i16>(height));
-            i8 *cycleTable = static_cast<i8 *>(H2_ALLOC(
-                WINDOW_FIZZLE_CYCLE_TABLE_BYTES, gWindowManagerText.cycleTableAllocSource, 810));
+            i8* cycleTable = static_cast<i8*>(H2_ALLOC(
+                WINDOW_FIZZLE_CYCLE_TABLE_BYTES,
+                gWindowManagerText.cycleTableAllocSource,
+                810
+            ));
             BlitBitmap(m_screen, x, y, width, height, m_fizzleWork, 0, 0);
 
             for (i32 frame = 0; frame < WINDOW_CYCLE_FRAME_COUNT; frame++) {
@@ -653,16 +710,14 @@ void heroWindowManager::FizzleForward(i32 x, i32 y, i32 width, i32 height, i32 d
                     i32 screenOffset = y * WINDOW_SCREEN_WIDTH;
                     i32 workOffset = 0;
                     do {
-                        u8 *savedPixel = m_fizzleSource->m_pixels +
-                            m_fizzleSource->m_width * (sourceY - y);
-                        u8 *workPixel = m_fizzleWork->m_pixels + workOffset;
-                        u8 *screenPixel = m_screen->m_pixels +
-                            x + screenOffset;
+                        u8* savedPixel =
+                            m_fizzleSource->m_pixels + m_fizzleSource->m_width * (sourceY - y);
+                        u8* workPixel = m_fizzleWork->m_pixels + workOffset;
+                        u8* screenPixel = m_screen->m_pixels + x + screenOffset;
                         if (x < x + width) {
                             i32 remaining = width;
                             do {
-                                u16 lookup =
-                                    *workPixel++ | (*savedPixel++ << 8);
+                                u16 lookup = *workPixel++ | (*savedPixel++ << 8);
                                 *screenPixel++ = cycleTable[lookup];
                                 remaining--;
                             } while (remaining != 0);
@@ -679,9 +734,8 @@ void heroWindowManager::FizzleForward(i32 x, i32 y, i32 width, i32 height, i32 d
                 if (startPalette != 0) {
                     memcpy(fadePalette, startPalette, WINDOW_PALETTE_BYTE_COUNT);
                     for (i32 i = 0; i < WINDOW_PALETTE_BYTE_COUNT; i++)
-                        fadePalette[i] +=
-                            (endPalette[i] - startPalette[i]) * (frame + 1) /
-                            WINDOW_CYCLE_FRAME_COUNT;
+                        fadePalette[i] += (endPalette[i] - startPalette[i]) * (frame + 1)
+                                          / WINDOW_CYCLE_FRAME_COUNT;
                     UpdatePalette(fadePalette);
                 }
                 PollSound();
@@ -704,8 +758,7 @@ void heroWindowManager::FizzleForward(i32 x, i32 y, i32 width, i32 height, i32 d
 }
 
 VA(0x004cb5f0, 0x19)
-void heroWindowManager::ReleaseFizzleSource(void)
-{
+void heroWindowManager::ReleaseFizzleSource(void) {
     if (m_fizzleSource != 0)
         delete m_fizzleSource;
     m_fizzleSource = 0;
@@ -720,7 +773,6 @@ void CreateColorTables(void) {}
 // followed only by alignment NOPs and carrying no relocations.
 VA(0x004cb620, 0x1)
 void CreateColorLookupTables(void) {}
-
 
 // ===== vtable heroWindowManager : public baseManager  (3 slots) =====
 //  [ 0] VA(0x004caad0, 0xd6)  int heroWindowManager::Open(int)   <- override (implements baseManager pure virtual)

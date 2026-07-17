@@ -8,6 +8,19 @@
 class bitmap;
 class icon;
 
-void IconToBitmapYModify(class icon *, class bitmap *, i32, i32, i32, i32, i32, i32, i32, i32, i32, i8 *);
+void IconToBitmapYModify(
+    class icon*,
+    class bitmap*,
+    i32,
+    i32,
+    i32,
+    i32,
+    i32,
+    i32,
+    i32,
+    i32,
+    i32,
+    i8*
+);
 
 #endif // HOMM2_ICON2BY_H

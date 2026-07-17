@@ -21,34 +21,54 @@ typedef enum ButtonConstant {
     BUTTON_REPEAT_DELAY_TICKS = 60
 } ButtonConstant;
 
-#pragma pack(push, 1)  // recovered layout is byte-packed
+#pragma pack(push, 1) // recovered layout is byte-packed
 class button : public widget {
 public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (derived: base widget = 0x20 bytes at 0x00 via ': public widget'; own fields below)
-    icon  *m_icon;  // +0x20  button icon
-    i16  m_normalFrame;  // +0x24  frame drawn while the button is idle
-    i16  m_pressedFrame;  // +0x26  frame drawn while selected/armed
-    i16  m_selectMode;  // +0x28  1 emits dialog-select command 10; other values emit command 12
-    i16  m_hotkey;  // +0x2a
-    u32l m_iconId;  // +0x2c  aggregate resource id
+    icon* m_icon;       // +0x20  button icon
+    i16 m_normalFrame;  // +0x24  frame drawn while the button is idle
+    i16 m_pressedFrame; // +0x26  frame drawn while selected/armed
+    i16 m_selectMode;   // +0x28  1 emits dialog-select command 10; other values emit command 12
+    i16 m_hotkey;       // +0x2a
+    u32l m_iconId;      // +0x2c  aggregate resource id
     // --- constructors ---
     button(void);
-    button(i16 x, i16 y, i16 width, i16 height,
-           u32l iconId, i16 normalFrame, i16 pressedFrame,
-           i16 selectMode, i16 hotkey, i16 id, i16 kind);
-    button(i16 x, i16 y, i16 width, i16 height,
-           char *iconName, i16 normalFrame, i16 pressedFrame,
-           i16 selectMode, i16 hotkey, i16 id, i16 kind);
+    button(
+        i16 x,
+        i16 y,
+        i16 width,
+        i16 height,
+        u32l iconId,
+        i16 normalFrame,
+        i16 pressedFrame,
+        i16 selectMode,
+        i16 hotkey,
+        i16 id,
+        i16 kind
+    );
+    button(
+        i16 x,
+        i16 y,
+        i16 width,
+        i16 height,
+        char* iconName,
+        i16 normalFrame,
+        i16 pressedFrame,
+        i16 selectMode,
+        i16 hotkey,
+        i16 id,
+        i16 kind
+    );
     __declspec(dllexport) virtual inline ~button() OVERRIDE;
     // --- virtual methods (vtable order) ---
     virtual void Draw(void) OVERRIDE;
-    virtual i32 Main(struct tag_message &message) OVERRIDE;
+    virtual i32 Main(struct tag_message& message) OVERRIDE;
     // --- methods ---
     void Read(void);
-    i16 Select(struct tag_message &message);
-    i16 Deselect(struct tag_message &message);
+    i16 Select(struct tag_message& message);
+    i16 Deselect(struct tag_message& message);
 };
 #pragma pack(pop)
 SIZE(button, 0x30);

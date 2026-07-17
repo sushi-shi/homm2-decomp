@@ -42,8 +42,8 @@ typedef enum KbWinMenuCommand {
     KBWIN_MENU_ABOUT = 0x9c75
 } KbWinMenuCommand;
 
-extern "C" i32 __stdcall WinMain(HINSTANCE, HINSTANCE, char *, i32);
-i32 AppInit(HINSTANCE, HINSTANCE, i32, char *);
+extern "C" i32 __stdcall WinMain(HINSTANCE, HINSTANCE, char*, i32);
+i32 AppInit(HINSTANCE, HINSTANCE, i32, char*);
 i32 AppIdle(void);
 LRESULT CALLBACK AppWndProc(HWND, UINT, WPARAM, LPARAM);
 BOOL CALLBACK AppAbout(HWND, UINT, WPARAM, LPARAM);
@@ -58,7 +58,6 @@ void SetNoDialogMenus(i32);
 void SetMenus(HMENU, i32);
 i32l KBTickCount(void);
 void InitVideo(void);
-
 
 // --- globals owned by this TU (moved from _globals.h; CodeView-attributed) ---
 extern HANDLE gEventHandle;

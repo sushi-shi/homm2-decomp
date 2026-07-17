@@ -14,31 +14,18 @@
 #include <BASE/Misc.h>
 #include <stdio.h>
 
-DATA(0x0051fec8) struct _MDI_DRIVER *hMDI = 0;
+DATA(0x0051fec8) struct _MDI_DRIVER* hMDI = 0;
 DATA(0x0051fecc) i32 CurrentMidiFile = MIDI_NO_TRACK;
-DATA(0x0051fed0) u8 bGotMidi[MIDI_TRACK_COUNT] = {
-    0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-};
+DATA(0x0051fed0) u8 bGotMidi[MIDI_TRACK_COUNT] = {0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1,
+                                                  1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0,
+                                                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 DATA(0x0051ff0c) i32l lLastMIDIPollTickCount = 0;
-DATA(0x0051ff10) static SMidiText gMidiText = {
-    "MS1",
-    "MS2",
-    "MS6b",
-    "MS6c",
-    "MS1",
-    "MS2",
-    "MS4",
-    "MP1a",
-    "MIDI%04d.XMI"
-};
+DATA(0x0051ff10) static SMidiText gMidiText =
+    {"MS1", "MS2", "MS6b", "MS6c", "MS1", "MS2", "MS4", "MP1a", "MIDI%04d.XMI"};
 
 VA(0x004d3850, 0xb8)
-void soundManager::MIDIStartup(void)
-{
+void soundManager::MIDIStartup(void) {
     i32 i;
     LogStr(gMidiText.startupBegin);
     if (gbNoSound == 0 && (m_midiStarted = 1, gbDontTryMIDI == 0)) {
@@ -57,8 +44,7 @@ void soundManager::MIDIStartup(void)
 }
 
 VA(0x004d3910, 0x1a9)
-void soundManager::MIDIShutdown(void)
-{
+void soundManager::MIDIShutdown(void) {
     i32 i;
     if (gbNoSound == 0 && m_midiReady != 0) {
         MIDIStop();
@@ -86,8 +72,7 @@ void soundManager::MIDIShutdown(void)
 // commuting the operands of the CMP immediately consumed by JE. All 66 relocation targets agree.
 // Equality/inequality, nested/early-return, subtraction, cast, local-copy, and |0 forms all emit c3.
 VA(0x004d3ac0, 0x3ab)
-void soundManager::MIDIPlay(i32 midiTrack)
-{
+void soundManager::MIDIPlay(i32 midiTrack) {
     if (gbNoSound == 0 && m_midiReady != 0 && gConfig.musicVolume != 0) {
         LogStr(gMidiText.playBegin);
         if (bGotMidi[midiTrack] == 0)
@@ -124,8 +109,7 @@ void soundManager::MIDIPlay(i32 midiTrack)
 }
 
 VA(0x004d3e70, 0x108)
-inline void soundManager::MIDIStop(void)
-{
+inline void soundManager::MIDIStop(void) {
     if (gbNoSound == 0 && m_midiReady != 0 && CurrentMidiFile != MIDI_NO_TRACK) {
         if (MIDIIsPlaying() && hSequence[CurrentMidiFile] != 0) {
             AIL_stop_sequence(hSequence[CurrentMidiFile]);
@@ -143,27 +127,25 @@ inline void soundManager::MIDIStop(void)
 }
 
 VA(0x004d3f80, 0x46)
-inline i32 soundManager::MIDIIsPlaying(void)
-{
-    if (gbNoSound == 0 && gConfig.musicVolume != 0 && m_midiReady != 0 &&
-        CurrentMidiFile != MIDI_NO_TRACK && hSequence[CurrentMidiFile] != 0) {
+inline i32 soundManager::MIDIIsPlaying(void) {
+    if (gbNoSound == 0 && gConfig.musicVolume != 0 && m_midiReady != 0
+        && CurrentMidiFile != MIDI_NO_TRACK && hSequence[CurrentMidiFile] != 0) {
         return AIL_sequence_status(hSequence[CurrentMidiFile]) == MIDI_SEQUENCE_PLAYING;
     }
     return 0;
 }
 
 VA(0x004d3fd0, 0x68)
-inline void soundManager::MIDISetVolume(void)
-{
+inline void soundManager::MIDISetVolume(void) {
     if (gbNoSound == 0 && m_midiReady != 0) {
         i32 volume = MIDI_MAX_VOLUME;
         if (m_fadeSteps > 0) {
             if (m_fadeSteps <= MIDI_VOLUME_FADE_SPLIT)
-                volume = ((MIDI_VOLUME_LOW_RANGE - m_fadeSteps) * MIDI_MAX_VOLUME) /
-                         MIDI_VOLUME_LOW_RANGE;
+                volume = ((MIDI_VOLUME_LOW_RANGE - m_fadeSteps) * MIDI_MAX_VOLUME)
+                         / MIDI_VOLUME_LOW_RANGE;
             else
-                volume = ((m_fadeSteps - MIDI_VOLUME_FADE_SPLIT) * MIDI_MAX_VOLUME) /
-                         MIDI_VOLUME_HIGH_RANGE;
+                volume = ((m_fadeSteps - MIDI_VOLUME_FADE_SPLIT) * MIDI_MAX_VOLUME)
+                         / MIDI_VOLUME_HIGH_RANGE;
         }
         AIL_set_XMIDI_master_volume(hMDI, ConvertVolume(volume, SOUND_VOLUME_MUSIC));
     }
@@ -187,5 +169,5 @@ void soundManager::MIDIPoll(void) {}
 // every source use attached to its retail owner without synthetic identities or
 // padding allocations.
 // ---- globals (definitions, RVA order) ----
-DATA(0x00534cf0) class MIDIWrap *pMIDIWrap[MIDI_TRACK_COUNT];
-DATA(0x00534de0) struct _SEQUENCE *hSequence[MIDI_TRACK_COUNT];
+DATA(0x00534cf0) class MIDIWrap* pMIDIWrap[MIDI_TRACK_COUNT];
+DATA(0x00534de0) struct _SEQUENCE* hSequence[MIDI_TRACK_COUNT];

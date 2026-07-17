@@ -34,28 +34,36 @@ typedef enum StripConstant {
     STRIP_QUANTITY_BACKGROUND = 2
 } StripConstant;
 
-#pragma pack(push, 1)  // recovered layout is byte-packed
+#pragma pack(push, 1) // recovered layout is byte-packed
 class strip {
 public:
-    heroWindow *m_window;  // +0x00
+    heroWindow* m_window; // +0x00
     char m_unused04[0x18];
-    i32 m_x;  // +0x1c
-    i32 m_y;  // +0x20
-    i32 m_stripType;  // +0x24
-    i32 m_selectedSlot;  // +0x28
-    border *m_borders[STRIP_BORDER_COUNT];  // +0x2c
-    icon *m_stripIcon;  // +0x44
-    icon *m_creatureIcons[STRIP_ARMY_SLOT_COUNT];  // +0x48
-    i32 m_cachedCreatureTypes[STRIP_ARMY_SLOT_COUNT];  // +0x5c
-    icon *m_portraitIcon;  // +0x70
-    icon *m_flagIcon;  // +0x74
-    i32 m_portraitFrame;  // +0x78
-    i32 m_flagFrame;  // +0x7c
-    armyGroup *m_army;  // +0x80
+    i32 m_x;                                          // +0x1c
+    i32 m_y;                                          // +0x20
+    i32 m_stripType;                                  // +0x24
+    i32 m_selectedSlot;                               // +0x28
+    border* m_borders[STRIP_BORDER_COUNT];            // +0x2c
+    icon* m_stripIcon;                                // +0x44
+    icon* m_creatureIcons[STRIP_ARMY_SLOT_COUNT];     // +0x48
+    i32 m_cachedCreatureTypes[STRIP_ARMY_SLOT_COUNT]; // +0x5c
+    icon* m_portraitIcon;                             // +0x70
+    icon* m_flagIcon;                                 // +0x74
+    i32 m_portraitFrame;                              // +0x78
+    i32 m_flagFrame;                                  // +0x7c
+    armyGroup* m_army;                                // +0x80
     // --- constructors ---
-    strip(i32 x, i32 y, i32 stripType, u32l portraitIconId,
-          i32 portraitFrame, class armyGroup *army, i32 firstBorderId,
-          i32 drawWindow, i32 flagFrame);
+    strip(
+        i32 x,
+        i32 y,
+        i32 stripType,
+        u32l portraitIconId,
+        i32 portraitFrame,
+        class armyGroup* army,
+        i32 firstBorderId,
+        i32 drawWindow,
+        i32 flagFrame
+    );
     ~strip();
     // --- methods ---
     void Draw(void);

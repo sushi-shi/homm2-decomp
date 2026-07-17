@@ -133,9 +133,9 @@ typedef enum HeroScreenText {
     HERO_TEXT_GROUPED_FORMATION = 24
 } HeroScreenText;
 
-void HeroMessageUpdate(char *);
-void UpdateHeroScreenStatusBar(struct tag_message &);
-i32 HeroHandler(struct tag_message &);
+void HeroMessageUpdate(char*);
+void UpdateHeroScreenStatusBar(struct tag_message&);
+i32 HeroHandler(struct tag_message&);
 void RedrawHeroScreen(void);
 i32 HeroView(i32, i32, i32);
 void SetupHeroView(void);

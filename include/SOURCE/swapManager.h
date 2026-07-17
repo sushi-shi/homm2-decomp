@@ -94,25 +94,25 @@ typedef enum SwapManagerConstant {
     SWAP_SPLIT_CONFIRM = 0x7802
 } SwapManagerConstant;
 
-#pragma pack(push, 1)  // recovered layout is byte-packed
+#pragma pack(push, 1) // recovered layout is byte-packed
 class swapManager : public baseManager {
 public:
     // (derived: base baseManager = 0x36 bytes at 0x00 via ': public baseManager'; own fields below)
-    heroWindow *m_window;  // +0x36
-    icon *m_selectorIcon;  // +0x3a
-    hero *m_heroes[SWAP_SIDE_COUNT];  // +0x3e
-    i32 m_selectedSide;  // +0x46
-    i32 m_targetSide;  // +0x4a
-    i32 m_selectedSlot;  // +0x4e
-    i32 m_targetSlot;  // +0x52
-    i32 m_itemType;  // +0x56
+    heroWindow* m_window;            // +0x36
+    icon* m_selectorIcon;            // +0x3a
+    hero* m_heroes[SWAP_SIDE_COUNT]; // +0x3e
+    i32 m_selectedSide;              // +0x46
+    i32 m_targetSide;                // +0x4a
+    i32 m_selectedSlot;              // +0x4e
+    i32 m_targetSlot;                // +0x52
+    i32 m_itemType;                  // +0x56
     // --- constructors ---
     swapManager(void);
-    swapManager(class hero *, class hero *);
+    swapManager(class hero*, class hero*);
     // --- virtual methods (vtable order) ---
     virtual i32 Open(i32) OVERRIDE;
     virtual void Close(void) OVERRIDE;
-    virtual i32 Main(struct tag_message &) OVERRIDE;
+    virtual i32 Main(struct tag_message&) OVERRIDE;
     // --- methods ---
     void Reset(void);
     i32 DrawSwapWin(void);

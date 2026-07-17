@@ -28,23 +28,16 @@ typedef enum MapDimension {
 } MapDimension;
 
 HOMM2_ENUM_BEGIN(MapVictoryCondition)
-    MAP_VICTORY_DEFEAT_ALL = 0,
-    MAP_VICTORY_CAPTURE_TOWN = 1,
-    MAP_VICTORY_DEFEAT_HERO = 2,
-    MAP_VICTORY_FIND_ARTIFACT = 3,
-    MAP_VICTORY_DEFEAT_SIDE = 4,
-    MAP_VICTORY_ACCUMULATE_GOLD = 5
-HOMM2_ENUM_END(MapVictoryCondition)
+MAP_VICTORY_DEFEAT_ALL = 0, MAP_VICTORY_CAPTURE_TOWN = 1, MAP_VICTORY_DEFEAT_HERO = 2,
+                            MAP_VICTORY_FIND_ARTIFACT = 3, MAP_VICTORY_DEFEAT_SIDE = 4,
+                            MAP_VICTORY_ACCUMULATE_GOLD = 5 HOMM2_ENUM_END(MapVictoryCondition)
 
-HOMM2_ENUM_BEGIN(MapLossCondition)
-    MAP_LOSS_STANDARD = 0,
-    MAP_LOSS_TOWN = 1,
-    MAP_LOSS_HERO = 2,
-    MAP_LOSS_TIME = 3
-HOMM2_ENUM_END(MapLossCondition)
+                                HOMM2_ENUM_BEGIN(MapLossCondition) MAP_LOSS_STANDARD = 0,
+                            MAP_LOSS_TOWN = 1, MAP_LOSS_HERO = 2,
+                            MAP_LOSS_TIME = 3 HOMM2_ENUM_END(MapLossCondition)
 
 #pragma pack(push, 1)
-struct SMapHeader {
+                                struct SMapHeader {
     u32 magic;
     u8 difficulty;
     u8 unknown5;
@@ -76,9 +69,9 @@ struct SMapHeader {
 #pragma pack(pop)
 SIZE(SMapHeader, MAP_HEADER_SIZE);
 
-i32 GetMapHeader(char *, struct SMapHeader *);
-i32 CheckSumIsDemoOK(char *);
-i32 ShowThisMapGame(char *);
-i32 ShowThisMap(char *);
+i32 GetMapHeader(char*, struct SMapHeader*);
+i32 CheckSumIsDemoOK(char*);
+i32 ShowThisMapGame(char*);
+i32 ShowThisMap(char*);
 
 #endif // HOMM2_REQUEST_H

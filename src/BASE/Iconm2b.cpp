@@ -14,9 +14,9 @@
 #include <string.h>
 // Per-call decoder scratch — its own 0x534bcc+ file-static block.
 DATA(0x00534bcc) static i32 gMonoClipR;
-DATA(0x00534bd0) static u8 *gMonoRow;
-DATA(0x00534bd4) static IconEntry *gMonoEntry;
-DATA(0x00534bd8) static u8 *gMonoSrc;
+DATA(0x00534bd0) static u8* gMonoRow;
+DATA(0x00534bd4) static IconEntry* gMonoEntry;
+DATA(0x00534bd8) static u8* gMonoSrc;
 DATA(0x00534bdc) static i32 gMonoX0;
 DATA(0x00534be0) static u32 gMonoRun;
 DATA(0x00534be4) static i32 gMonoY;
@@ -67,19 +67,29 @@ DATA(0x00534bec) static i32 gMonoX;
 // The split command-byte advance/read was an inline-helper trace. Restoring the shared reader raises
 // live matching to 80.09945% while preserving 36/38 relocations; only gMonoX0 and gMonoY are short.
 VA(0x004cfae0, 0x266)
-void MonoIconToBitmap(class icon *srcIcon, class bitmap *dest, i32 x, i32 y, i32 frame,
-                      i32 color, i32 clip, i32 clipX, i32 clipY, i32 clipW, i32 clipH)
-{
-    u8 *data = srcIcon->m_data;
-    IconEntry *entry = &srcIcon->Entries()[frame];
+void MonoIconToBitmap(
+    class icon* srcIcon,
+    class bitmap* dest,
+    i32 x,
+    i32 y,
+    i32 frame,
+    i32 color,
+    i32 clip,
+    i32 clipX,
+    i32 clipY,
+    i32 clipW,
+    i32 clipH
+) {
+    u8* data = srcIcon->m_data;
+    IconEntry* entry = &srcIcon->Entries()[frame];
     gMonoEntry = entry;
     gMonoSrc = data + entry->srcOffset;
     gMonoX0 = entry->x + x;
     gMonoX = gMonoX0;
     gMonoY = entry->y + y;
     if (clip != ICON_DRAW_NO_CLIP) {
-        if (clipX > gMonoX0 || gMonoX0 + entry->w > clipX + clipW ||
-            clipY > gMonoY || gMonoY + entry->h > clipY + clipH) {
+        if (clipX > gMonoX0 || gMonoX0 + entry->w > clipX + clipW || clipY > gMonoY
+            || gMonoY + entry->h > clipY + clipH) {
             clip = ICON_DRAW_CLIP;
             gMonoClipR = clipX + clipW - 1;
             gMonoClipB = clipY + clipH - 1;
@@ -88,7 +98,7 @@ void MonoIconToBitmap(class icon *srcIcon, class bitmap *dest, i32 x, i32 y, i32
         }
     }
     i16 pitch = dest->m_width;
-    u8 *row = dest->m_pixels + gMonoY * pitch;
+    u8* row = dest->m_pixels + gMonoY * pitch;
     for (;;) {
         i32 cmd = ReadIconRleByte(gMonoSrc);
         if (static_cast<i8>(cmd) < 0) {
@@ -108,8 +118,8 @@ void MonoIconToBitmap(class icon *srcIcon, class bitmap *dest, i32 x, i32 y, i32
                 memset(row + gMonoX, color, cmd);
             } else {
                 i32 right;
-                if (clipY <= gMonoY && gMonoClipB >= gMonoY &&
-                    (right = gMonoX + cmd, clipX < right) && gMonoClipR >= gMonoX) {
+                if (clipY <= gMonoY && gMonoClipB >= gMonoY && (right = gMonoX + cmd, clipX < right)
+                    && gMonoClipR >= gMonoX) {
                     if (clipX <= gMonoX) {
                         if (gMonoClipR >= right) {
                             memset(row + gMonoX, color, cmd);

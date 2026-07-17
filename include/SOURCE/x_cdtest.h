@@ -15,7 +15,7 @@ void CDTest_Cleanup(void);
 i32 CDTest_VerifyCDQuick(void);
 i32 CDTest_VerifyCDThorough(void);
 i32 CDTest_VerifyTrack(i32);
-i32 CDTest_GenerateTable(char *);
+i32 CDTest_GenerateTable(char*);
 
 // ---- globals (declarations, RVA order) ----
 extern struct sCDTest_Track_Data cdTestTrackData[43];

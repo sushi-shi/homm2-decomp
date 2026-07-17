@@ -7,6 +7,6 @@
 // forward declarations (was <_all.h>):
 class bitmap;
 
-void DoBlur(class bitmap *, class bitmap *, i32, i32, i32, i32);
+void DoBlur(class bitmap*, class bitmap*, i32, i32, i32, i32);
 
 #endif // HOMM2_BLUR_H

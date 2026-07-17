@@ -9,20 +9,17 @@
 #include <SOURCE/X_GLOBAL.h>
 #include <string.h>
 DATA(0x005348f0) static i32 gFillRow;
-DATA(0x005348f8) static u8 *gFillPtr;
+DATA(0x005348f8) static u8* gFillPtr;
 DATA(0x005348e8) static i32 gDimRow;
 DATA(0x005348e4) static i32 gDimCol;
-DATA(0x005348f4) static u8 *gDimPtr;
-DATA(0x00534900) static u8 *gDimNext;
-DATA(0x005348ec) static u8 *gBlitSrc;
-DATA(0x005348e0) static u8 *gBlitDst;
+DATA(0x005348f4) static u8* gDimPtr;
+DATA(0x00534900) static u8* gDimNext;
+DATA(0x005348ec) static u8* gBlitSrc;
+DATA(0x005348e0) static u8* gBlitDst;
 DATA(0x005348fc) static i32 gBlitRow;
 
-
-
 VA(0x004ca3d0, 0x80)
-void FillBitmapArea(class bitmap *bmp, i32 x, i32 y, i32 w, i32 h, i32 color)
-{
+void FillBitmapArea(class bitmap* bmp, i32 x, i32 y, i32 w, i32 h, i32 color) {
     gFillPtr = bmp->m_pixels + bmp->m_width * y + x;
     gFillRow = 0;
     if (h > 0) {
@@ -50,9 +47,18 @@ void FillBitmapArea(class bitmap *bmp, i32 x, i32 y, i32 w, i32 h, i32 color)
 // libclang AST pass found no gain. Revisit only after a genuine shared-header
 // or predecessor declaration-state change; this is not a certified wall.
 VA(0x004ca450, 0x114)
-void FillBitmapAreaClip(class bitmap *bmp, i32 x, i32 y, i32 w, i32 h, i32 color, i32 clipx,
-                        i32 clipy, i32 clipw, i32 cliph)
-{
+void FillBitmapAreaClip(
+    class bitmap* bmp,
+    i32 x,
+    i32 y,
+    i32 w,
+    i32 h,
+    i32 color,
+    i32 clipx,
+    i32 clipy,
+    i32 clipw,
+    i32 cliph
+) {
     i32 cx2 = clipx - 1 + clipw;
     i32 cy2;
     if (x < cx2 && clipx < x - 1 + w && (cy2 = clipy - 1 + cliph, y < cy2) && clipy < y - 1 + h) {
@@ -81,8 +87,16 @@ void FillBitmapAreaClip(class bitmap *bmp, i32 x, i32 y, i32 w, i32 h, i32 color
 }
 
 VA(0x004ca570, 0xa6)
-void BlitBitmap(class bitmap *src, i32 sx, i32 sy, i32 w, i32 h, class bitmap *dst, i32 dx, i32 dy)
-{
+void BlitBitmap(
+    class bitmap* src,
+    i32 sx,
+    i32 sy,
+    i32 w,
+    i32 h,
+    class bitmap* dst,
+    i32 dx,
+    i32 dy
+) {
     gBlitSrc = src->m_pixels + src->m_width * sy + sx;
     gBlitDst = dst->m_pixels + dst->m_width * dy + dx;
     gBlitRow = 0;
@@ -107,8 +121,7 @@ void BlitBitmap(class bitmap *src, i32 sx, i32 sy, i32 w, i32 h, class bitmap *d
 // pass also found no exact closure and retained nothing. Revisit only after a
 // predecessor or shared-header state change.
 VA(0x004ca620, 0xa8)
-void DimBitmapArea(class bitmap *bmp, i32 x, i32 y, i32 w, i32 h, i32 level)
-{
+void DimBitmapArea(class bitmap* bmp, i32 x, i32 y, i32 w, i32 h, i32 level) {
     gDimPtr = bmp->m_pixels + bmp->m_width * y + x;
     for (gDimRow = 0; gDimRow < h; gDimRow++) {
         gDimNext = gDimPtr + bmp->m_width;

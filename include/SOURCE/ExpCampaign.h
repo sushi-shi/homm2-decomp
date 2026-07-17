@@ -144,21 +144,21 @@ typedef enum ExpansionCampaignChoiceConstant {
     EXPANSION_CAMPAIGN_MERCURY_PENALTY_TWO = -2
 } ExpansionCampaignChoiceConstant;
 
-#pragma pack(push, 1)  // recovered layout is byte-packed
+#pragma pack(push, 1) // recovered layout is byte-packed
 class ExpCampaign {
 public:
-    i32 m_campaignId;  // +0x00
-    i32 m_currentMap;  // +0x04
-    i32 m_mapCount;  // +0x08
-    u8 m_mapChoices[EXPANSION_CAMPAIGN_MAX_MAP_COUNT];  // +0x0c
-    u8 m_mapsPlayed[EXPANSION_CAMPAIGN_MAX_MAP_COUNT];  // +0x14
-    i16 m_mapDays[EXPANSION_CAMPAIGN_MAX_MAP_COUNT];  // +0x1c
-    u8 m_awards[EXPANSION_CAMPAIGN_AWARD_COUNT];  // +0x2c
-    u8 m_bonusChoices[EXPANSION_CAMPAIGN_MAX_MAP_COUNT];  // +0x37
+    i32 m_campaignId;                                    // +0x00
+    i32 m_currentMap;                                    // +0x04
+    i32 m_mapCount;                                      // +0x08
+    u8 m_mapChoices[EXPANSION_CAMPAIGN_MAX_MAP_COUNT];   // +0x0c
+    u8 m_mapsPlayed[EXPANSION_CAMPAIGN_MAX_MAP_COUNT];   // +0x14
+    i16 m_mapDays[EXPANSION_CAMPAIGN_MAX_MAP_COUNT];     // +0x1c
+    u8 m_awards[EXPANSION_CAMPAIGN_AWARD_COUNT];         // +0x2c
+    u8 m_bonusChoices[EXPANSION_CAMPAIGN_MAX_MAP_COUNT]; // +0x37
     char m_pad_0x3f[4];
-    i32 m_viewMap;  // +0x43
-    class heroWindow *m_window;  // +0x47
-    i32 m_viewOnly;  // +0x4b
+    i32 m_viewMap;              // +0x43
+    class heroWindow* m_window; // +0x47
+    i32 m_viewOnly;             // +0x4b
     char m_pad_0x4f;
     // --- constructors ---
     ExpCampaign(void);
@@ -188,15 +188,16 @@ public:
     void ReplaySmacker4(void);
     u8 IsCompleted(void);
     i8 IsThisMapCompleted(void);
+
 private:
-    static i32 MessageHandler(struct tag_message &);   // ?...@ExpCampaign@@CIH... (private static)
+    static i32 MessageHandler(struct tag_message&); // ?...@ExpCampaign@@CIH... (private static)
 public:
     void Autosave(void);
     i32 Choose(void);
     i16 Days(void);
     i32 CampaignID(void);
-    char * JosephName(void);
-    char * IvanName(void);
+    char* JosephName(void);
+    char* IvanName(void);
     i8 IsSpecialGoldenBow(i32, i32);
     i8 IsSpecialUA(void);
     i8 IsSpecialLossCondition(i32);
@@ -204,8 +205,7 @@ public:
 #pragma pack(pop)
 SIZE(ExpCampaign, 0x50);
 
-extern struct SCampaignChoice
-    xCampaignChoices[EXPANSION_CAMPAIGN_COUNT]
-                    [EXPANSION_CAMPAIGN_MAX_MAP_COUNT]
-                    [EXPANSION_CAMPAIGN_BONUS_CHOICE_COUNT];
+extern struct SCampaignChoice xCampaignChoices[EXPANSION_CAMPAIGN_COUNT]
+                                              [EXPANSION_CAMPAIGN_MAX_MAP_COUNT]
+                                              [EXPANSION_CAMPAIGN_BONUS_CHOICE_COUNT];
 #endif // HOMM2_SOURCE_EXPCAMPAIGN_H

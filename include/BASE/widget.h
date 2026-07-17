@@ -21,52 +21,43 @@ typedef enum WidgetFlag {
 } WidgetFlag;
 
 HOMM2_ENUM_BEGIN(BaseWidgetCommand)
-    WIDGET_COMMAND_DRAW = 2,
-    WIDGET_COMMAND_SET_TEXT = 3,
-    WIDGET_COMMAND_SET_FRAME = 4,
-    WIDGET_COMMAND_SET_FLAGS = 5,
-    WIDGET_COMMAND_CLEAR_FLAGS = 6,
-    WIDGET_COMMAND_GET_TEXT = 7,
-    WIDGET_COMMAND_SET_FILL_COLOR = 8,
-    WIDGET_COMMAND_SET_ICON = 9,
-    WIDGET_COMMAND_SET_MAX_LENGTH = 0x33,
-    WIDGET_COMMAND_SET_X = 0x34,
-    WIDGET_COMMAND_SET_Y = 0x35,
-    WIDGET_COMMAND_REPLACE_ICON = 0x3c,
-    WIDGET_COMMAND_SET_WIDTH = 0x3d
-HOMM2_ENUM_END(BaseWidgetCommand)
+WIDGET_COMMAND_DRAW = 2,
+    WIDGET_COMMAND_SET_TEXT = 3, WIDGET_COMMAND_SET_FRAME = 4, WIDGET_COMMAND_SET_FLAGS = 5,
+    WIDGET_COMMAND_CLEAR_FLAGS = 6, WIDGET_COMMAND_GET_TEXT = 7, WIDGET_COMMAND_SET_FILL_COLOR = 8,
+    WIDGET_COMMAND_SET_ICON = 9, WIDGET_COMMAND_SET_MAX_LENGTH = 0x33, WIDGET_COMMAND_SET_X = 0x34,
+    WIDGET_COMMAND_SET_Y = 0x35, WIDGET_COMMAND_REPLACE_ICON = 0x3c,
+    WIDGET_COMMAND_SET_WIDTH = 0x3d HOMM2_ENUM_END(BaseWidgetCommand)
 
-typedef enum WidgetCommandArgument {
+        typedef enum WidgetCommandArgument {
     WIDGET_COMMAND_DIMMED = 0x1000
 } WidgetCommandArgument;
 
-#pragma pack(push, 1)  // recovered layout is byte-packed
+#pragma pack(push, 1) // recovered layout is byte-packed
 class widget /* abstract */ {
 public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (vptr auto-emitted at 0x00; own data starts at 0x04)
-    heroWindow *m_owner;  // +0x04  owning window
-    widget *m_next;  // +0x08  next widget in the owner window's list
-    widget *m_prev;  // +0x0c  prev widget in the owner window's list
-    i16  m_id;  // +0x10
-    i16  m_zOrder;  // +0x12
-    i16  m_kind;  // +0x14  serialized widget rendering/behavior kind
-    i16  m_flags;  // +0x16
-    i16  m_x;  // +0x18
-    i16  m_y;  // +0x1a
-    i16  m_width;  // +0x1c
-    i16  m_height;  // +0x1e
+    heroWindow* m_owner; // +0x04  owning window
+    widget* m_next;      // +0x08  next widget in the owner window's list
+    widget* m_prev;      // +0x0c  prev widget in the owner window's list
+    i16 m_id;            // +0x10
+    i16 m_zOrder;        // +0x12
+    i16 m_kind;          // +0x14  serialized widget rendering/behavior kind
+    i16 m_flags;         // +0x16
+    i16 m_x;             // +0x18
+    i16 m_y;             // +0x1a
+    i16 m_width;         // +0x1c
+    i16 m_height;        // +0x1e
     // --- constructors ---
-    widget(i16 x, i16 y, i16 width, i16 height,
-           i16 id, i16 kind);
+    widget(i16 x, i16 y, i16 width, i16 height, i16 id, i16 kind);
     widget(void);
     // --- virtual methods (vtable order) ---
     virtual void Draw(void) = 0;
     virtual ~widget(void) = 0;
-    virtual i32 Main(struct tag_message &message) = 0;
+    virtual i32 Main(struct tag_message& message) = 0;
     // --- methods ---
-    i32 Open(i32 zOrder, class heroWindow *owner);
+    i32 Open(i32 zOrder, class heroWindow* owner);
     void Close(void);
     void Dim(void);
 };

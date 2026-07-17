@@ -103,8 +103,7 @@ typedef enum AdventureHoverObject {
     ADVMGR_HOVER_TOWN = 0x23,
     ADVMGR_HOVER_HERO = 0x2a,
     ADVMGR_HOVER_BOAT = 0x2b,
-    ADVMGR_HOVER_SHIPWRECK_TRIGGER =
-        ADVMGR_HOVER_SHIPWRECK | ADVMGR_TRIGGER_ACTION_FLAG
+    ADVMGR_HOVER_SHIPWRECK_TRIGGER = ADVMGR_HOVER_SHIPWRECK | ADVMGR_TRIGGER_ACTION_FLAG
 } AdventureHoverObject;
 
 typedef enum AdventureHoverConstant {
@@ -320,28 +319,23 @@ typedef enum AdventureSystemOptionsMessage {
 } AdventureSystemOptionsMessage;
 
 HOMM2_ENUM_BEGIN(AdventureSystemOption)
-    ADVMGR_SYSTEM_OPTION_MUSIC_VOLUME = 10,
-    ADVMGR_SYSTEM_OPTION_SOUND_VOLUME = 11,
-    ADVMGR_SYSTEM_OPTION_HERO_SPEED = 12,
-    ADVMGR_SYSTEM_OPTION_MUSIC_SOURCE = 13,
-    ADVMGR_SYSTEM_OPTION_SHOW_ROUTE = 14,
-    ADVMGR_SYSTEM_OPTION_COMPUTER_SPEED = 15,
-    ADVMGR_SYSTEM_OPTION_INTERFACE = 16,
-    ADVMGR_SYSTEM_OPTION_VIDEO = 17,
-    ADVMGR_SYSTEM_OPTION_COLOR_CURSOR = 18,
+ADVMGR_SYSTEM_OPTION_MUSIC_VOLUME = 10,
+    ADVMGR_SYSTEM_OPTION_SOUND_VOLUME = 11, ADVMGR_SYSTEM_OPTION_HERO_SPEED = 12,
+    ADVMGR_SYSTEM_OPTION_MUSIC_SOURCE = 13, ADVMGR_SYSTEM_OPTION_SHOW_ROUTE = 14,
+    ADVMGR_SYSTEM_OPTION_COMPUTER_SPEED = 15, ADVMGR_SYSTEM_OPTION_INTERFACE = 16,
+    ADVMGR_SYSTEM_OPTION_VIDEO = 17, ADVMGR_SYSTEM_OPTION_COLOR_CURSOR = 18,
     ADVMGR_SYSTEM_OPTION_FIRST = ADVMGR_SYSTEM_OPTION_MUSIC_VOLUME,
     ADVMGR_SYSTEM_OPTION_LAST = ADVMGR_SYSTEM_OPTION_COLOR_CURSOR,
-    ADVMGR_SYSTEM_OPTION_COUNT = ADVMGR_SYSTEM_OPTION_LAST - ADVMGR_SYSTEM_OPTION_FIRST + 1
-HOMM2_ENUM_END(AdventureSystemOption)
+    ADVMGR_SYSTEM_OPTION_COUNT =
+        ADVMGR_SYSTEM_OPTION_LAST - ADVMGR_SYSTEM_OPTION_FIRST
+        + 1 HOMM2_ENUM_END(AdventureSystemOption)
 
 #ifdef HOMM2_STRICT_ENUM_TYPES
-inline i32 EncodeAdventureSystemOption(AdventureSystemOption option)
-{
+            inline i32 EncodeAdventureSystemOption(AdventureSystemOption option) {
     return static_cast<i32>(option);
 }
 
-inline AdventureSystemOption DecodeAdventureSystemOption(i32 value)
-{
+inline AdventureSystemOption DecodeAdventureSystemOption(i32 value) {
     return static_cast<AdventureSystemOption>(value);
 }
 #else
@@ -566,8 +560,7 @@ typedef enum AdventureLocatorConstant {
     ADVMGR_LOCATOR_SCROLL_BASE_Y = 195,
     ADVMGR_LOCATOR_HERO_SCROLL_SPAN = 73,
     ADVMGR_LOCATOR_TOWN_SCROLL_SPAN = 74,
-    ADVMGR_LOCATOR_KNOB_MAX_Y =
-        ADVMGR_LOCATOR_SCROLL_BASE_Y + ADVMGR_LOCATOR_HERO_SCROLL_SPAN,
+    ADVMGR_LOCATOR_KNOB_MAX_Y = ADVMGR_LOCATOR_SCROLL_BASE_Y + ADVMGR_LOCATOR_HERO_SCROLL_SPAN,
     ADVMGR_LOCATOR_HERO_DRAW_LEFT = 0,
     ADVMGR_LOCATOR_SCREEN_LEFT = 481,
     ADVMGR_LOCATOR_SCREEN_TOP = 177,
@@ -844,8 +837,7 @@ typedef enum AdventurePuzzleViewConstant {
     ADVMGR_PUZZLE_WINDOW_Y = ADVMGR_SCROLL_BORDER,
     ADVMGR_PUZZLE_VIEW_ORIGIN = ADVMGR_SCROLL_BORDER,
     ADVMGR_PUZZLE_VIEW_SIZE = ADVMGR_UPDATE_VIEWPORT_SIZE,
-    ADVMGR_PUZZLE_VIEW_END =
-        ADVMGR_PUZZLE_VIEW_ORIGIN + ADVMGR_PUZZLE_VIEW_SIZE,
+    ADVMGR_PUZZLE_VIEW_END = ADVMGR_PUZZLE_VIEW_ORIGIN + ADVMGR_PUZZLE_VIEW_SIZE,
     ADVMGR_PUZZLE_COORDINATE_OFFSET = 7,
     ADVMGR_PUZZLE_ALIGNMENT_DIVISOR = 3,
     ADVMGR_PUZZLE_FIZZLE_TIME = 220
@@ -895,28 +887,26 @@ typedef enum AdventureSystemOptionsConstant {
 } AdventureSystemOptionsConstant;
 
 #ifdef HOMM2_STRICT_ENUM_TYPES
-inline i32 EncodeAdventureSystemOptionTextControl(AdventureSystemOption option)
-{
+inline i32 EncodeAdventureSystemOptionTextControl(AdventureSystemOption option) {
     return EncodeAdventureSystemOption(option) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
 }
 #else
-#define EncodeAdventureSystemOptionTextControl(option) \
+#define EncodeAdventureSystemOptionTextControl(option)                                             \
     ((option) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET)
 #endif
 
 i32 SaveGame(void);
-i32 DimensionDoorHandler(struct tag_message &);
-i32 TownPortalHandler(struct tag_message &);
+i32 DimensionDoorHandler(struct tag_message&);
+i32 TownPortalHandler(struct tag_message&);
 void ComputeAdvNetControl(void);
 i32 MapExtraPosAndAdjacentsSet(i32, i32, u8);
-i32 APanelHandler(struct tag_message &);
-i32 CPanelHandler(struct tag_message &);
+i32 APanelHandler(struct tag_message&);
+i32 CPanelHandler(struct tag_message&);
 void UpdateSystemOptions(i32);
-i32 SystemOptionsHandler(struct tag_message &);
+i32 SystemOptionsHandler(struct tag_message&);
 i32 GetMobilityFrame(i32);
 i32 GetManaFrame(i32);
-u8 StopOnTrigger(class mapCell *);
-
+u8 StopOnTrigger(class mapCell*);
 
 // ---- globals (declarations, RVA order) ----
 extern float fFirstWeekTownFV;

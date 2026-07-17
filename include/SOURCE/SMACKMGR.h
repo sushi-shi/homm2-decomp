@@ -7,7 +7,7 @@
 // symbols. Other TUs call them by including this header (no local externs).
 // forward declarations (was <_all.h>):
 
-void ConvertSmackerPalette(u8 *);
+void ConvertSmackerPalette(u8*);
 class icon;
 
 typedef enum SmackManagerConstant {
@@ -64,7 +64,7 @@ struct SSmackOptions {
 
 struct SmackMilesDigitalDriver {
     char reserved[0x4c];
-    void *directSound;
+    void* directSound;
 };
 #pragma pack(pop)
 SIZE(tag_rect, 8);
@@ -72,22 +72,22 @@ SIZE(SSmackOptions, 45);
 SIZE(SmackMilesDigitalDriver, 0x50);
 SIZE(SmackSum, 0x54);
 
-void DoAdvance(Smack *, i32, i32, i32, i32);
+void DoAdvance(Smack*, i32, i32, i32, i32);
 void SmackManagerMain(void);
 void ShutDownSmacker(void);
 i32 PlaySmacker(i32);
 i32 ExpansionCampaignRect(i32, i32);
-i8 PointInRect(i32, i32, struct tag_rect *);
-void PrintSummaryInfo(SmackSum *);
+i8 PointInRect(i32, i32, struct tag_rect*);
+void PrintSummaryInfo(SmackSum*);
 
 // ---- globals (declarations, RVA order) ----
 extern i32 bSmackSound;
-extern class icon *brotherIcon;
-extern class icon *backImage;
+extern class icon* brotherIcon;
+extern class icon* backImage;
 extern struct SSmackOptions SmackOptions[];
 extern i32 bTesting;
-extern Smack *smk1;
-extern Smack *smk2;
+extern Smack* smk1;
+extern Smack* smk2;
 extern i8 bSmackNum;
 extern i32 gbLastFramePlayed;
 extern SmackSum smksum;

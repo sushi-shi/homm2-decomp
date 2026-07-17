@@ -19,8 +19,7 @@ typedef enum IconRleCommandConstant {
 
 // Preserve the original advance-before-read source order. MSVC inlines this as a cursor publication
 // followed by a load from the previous byte; reversing the two statements changes its scheduling.
-inline u8 ReadIconRleByte(u8 *&cursor)
-{
+inline u8 ReadIconRleByte(u8*& cursor) {
     cursor++;
     return cursor[-1];
 }
