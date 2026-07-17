@@ -5,9 +5,9 @@
 #include <va.h>
 #include <BASE/resource.h>
 
-HOMM2_ENUM_VALUES_BEGIN(PaletteConstant)
+H2_ENUM_BEGIN(PaletteConstant)
     PALETTE_DATA_SIZE = 0x300
-HOMM2_ENUM_VALUES_END(PaletteConstant)
+H2_ENUM_END(PaletteConstant)
 
 #pragma pack(push, 1) // recovered layout is byte-packed
 class palette : public resource {

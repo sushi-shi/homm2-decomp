@@ -88,7 +88,7 @@ DATA(0x004f7f84) static i16 gCompressTestSourceLine = 0x1f95;
 #define RETAIL_FILE const_cast<char*>("I:\\Projects\\Heroes\\Prog\\SOURCE\\GAME.CPP")
 
 // GAME-private tuning and encoding constants.
-HOMM2_ENUM_VALUES_BEGIN(GameTuningConstant)
+H2_ENUM_BEGIN(GameTuningConstant)
     RANDOM_SCAN_RETRY_LIMIT = 10000,
     EXPERIENCE_HERO_PRESENCE_BONUS = 500,
     MINE_FLAG_OVERWRITE_LIMIT = 0x30,   // highest passive object id a mine flag may cover
@@ -99,12 +99,12 @@ HOMM2_ENUM_VALUES_BEGIN(GameTuningConstant)
     BANK_GUARDIAN_FLAG = 0x100,   // creature-bank metadata: defenders present
     TOWN_RECORD_TYPE_MASK = 0x7f, // saved town record: low bits carry the race
     COMPRESS_TEST_ITERATIONS = 100
-HOMM2_ENUM_VALUES_END(GameTuningConstant)
+H2_ENUM_END(GameTuningConstant)
 
-HOMM2_ENUM_BEGIN(ViewArmyControlId)
+H2_ENUM_CLASS_BEGIN(ViewArmyControlId)
     VIEW_ARMY_QUICK_VIEW_ID = 0x7800,
     VIEW_ARMY_UPGRADE_ID = 0x7803
-HOMM2_ENUM_END(ViewArmyControlId)
+H2_ENUM_CLASS_END(ViewArmyControlId)
 
 // Retail's original source passed plain __FILE__/__LINE__ here: under /Od /Gi,
 // MSVC 4.2 lowers __LINE__ to a compiler-synthesized per-function static i16

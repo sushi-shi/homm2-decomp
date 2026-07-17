@@ -8,7 +8,7 @@
 // forward declarations (was <_all.h>):
 struct tag_message;
 
-HOMM2_ENUM_VALUES_BEGIN(SetupConstant)
+H2_ENUM_BEGIN(SetupConstant)
     SETUP_WINDOW_X = 405,
     SETUP_WINDOW_Y = 8,
     SETUP_DIALOG_CANCEL = 0x7801,
@@ -26,29 +26,29 @@ HOMM2_ENUM_VALUES_BEGIN(SetupConstant)
     SETUP_DIALOG_RESULT_MAX = 1000,
     SETUP_HANDLER_CONTINUE = 1,
     SETUP_HANDLER_CLOSE = 2
-HOMM2_ENUM_VALUES_END(SetupConstant)
+H2_ENUM_END(SetupConstant)
 
-HOMM2_ENUM_VALUES_BEGIN(SetupRemoteType)
+H2_ENUM_BEGIN(SetupRemoteType)
     SETUP_REMOTE_NETWORK_HOST = 1,
     SETUP_REMOTE_NETWORK_GUEST = 2,
     SETUP_REMOTE_MODEM_DIAL = 3,
     SETUP_REMOTE_MODEM_ANSWER = 4
-HOMM2_ENUM_VALUES_END(SetupRemoteType)
+H2_ENUM_END(SetupRemoteType)
 
-HOMM2_ENUM_BEGIN(SetupBaudRate)
+H2_ENUM_CLASS_BEGIN(SetupBaudRate)
     SETUP_BAUD_2400 = 2400,
     SETUP_BAUD_9600 = 9600,
     SETUP_BAUD_19200 = 19200,
     SETUP_BAUD_38400 = 38400
-HOMM2_ENUM_END(SetupBaudRate)
+H2_ENUM_CLASS_END(SetupBaudRate)
 
-HOMM2_ENUM_BEGIN(SetupComPort)
+H2_ENUM_CLASS_BEGIN(SetupComPort)
     SETUP_COM_PORT_UNCONFIGURED = 0,
     SETUP_COM_PORT_1 = 1,
     SETUP_COM_PORT_2 = 2,
     SETUP_COM_PORT_3 = 3,
     SETUP_COM_PORT_4 = 4
-HOMM2_ENUM_END(SetupComPort)
+H2_ENUM_CLASS_END(SetupComPort)
 
 i32 SetupCampaignGameHandler(struct tag_message&);
 i32 SetupComPortHandler(struct tag_message&);

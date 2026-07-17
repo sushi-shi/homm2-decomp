@@ -5,7 +5,7 @@
 
 // Known serialized values only. The domain remains open-ended, and widget stores
 // the value in its proven packed short field rather than as this enum type.
-HOMM2_ENUM_VALUES_BEGIN(WidgetKind)
+H2_ENUM_BEGIN(WidgetKind)
     WIDGET_KIND_DEFAULT = 2,
     WIDGET_KIND_UNDIMMED = 8,
     WIDGET_KIND_ICON_DIRECT = 0x10,
@@ -17,7 +17,7 @@ HOMM2_ENUM_VALUES_BEGIN(WidgetKind)
     WIDGET_KIND_ICON = 0x801,
     WIDGET_KIND_AUTO_REPEAT = 0x1000,
     WIDGET_KIND_TEXT_ENTRY = 0x4000
-HOMM2_ENUM_VALUES_END(WidgetKind)
+H2_ENUM_END(WidgetKind)
 
 #ifdef HOMM2_STRICT_ENUM_TYPES
 inline WidgetKind DecodeWidgetKind(i16 value) {

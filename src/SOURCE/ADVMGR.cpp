@@ -87,9 +87,9 @@ DATA(0x005280a8) static i32 s_drawPlayerColor;
 DATA(0x005280cc) static i32 s_adjacentMonsterEndX;
 DATA(0x005280d0) static i32 s_drawAnimationLength;
 DATA(0x005280d8) static i32 s_drawHeroYOffset;
-HOMM2_ENUM_VALUES_BEGIN(AdvVisitMetadata)
+H2_ENUM_BEGIN(AdvVisitMetadata)
     VISIT_BIT_INDEX_MASK = 0x1f
-HOMM2_ENUM_VALUES_END(AdvVisitMetadata)
+H2_ENUM_END(AdvVisitMetadata)
 
 VA(0x00456350, 0x30f)
 advManager::advManager(void) {

@@ -6,17 +6,17 @@
 #include <BASE/resource.h>
 #include <BASE/sampleData.h>
 
-HOMM2_ENUM_BEGIN(sampleAudioFormat)
+H2_ENUM_CLASS_BEGIN(sampleAudioFormat)
     SAMPLE_FORMAT_8_BIT = 0,
     SAMPLE_FORMAT_16_BIT = 1,
     SAMPLE_FORMAT_STEREO = 2
-HOMM2_ENUM_END(sampleAudioFormat)
+H2_ENUM_CLASS_END(sampleAudioFormat)
 
-HOMM2_ENUM_BEGIN(samplePlaybackRate)
+H2_ENUM_CLASS_BEGIN(samplePlaybackRate)
     SAMPLE_RATE_11025 = 11025,
     SAMPLE_RATE_22050 = 22050,
     SAMPLE_RATE_44100 = 44100
-HOMM2_ENUM_END(samplePlaybackRate)
+H2_ENUM_CLASS_END(samplePlaybackRate)
 
 #pragma pack(push, 1) // recovered layout is byte-packed
 class sample : public resource {

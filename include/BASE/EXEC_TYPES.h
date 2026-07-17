@@ -3,7 +3,7 @@
 
 #include <va.h>
 
-HOMM2_ENUM_VALUES_BEGIN(ExecutiveTextSlotSize)
+H2_ENUM_BEGIN(ExecutiveTextSlotSize)
     EXEC_TEXT_RESOURCE_INIT_SLOT_SIZE = 0x38,
     EXEC_TEXT_INPUT_INIT_SLOT_SIZE = 0x50,
     EXEC_TEXT_DEVICE_INIT_SLOT_SIZE = 0x1c,
@@ -15,7 +15,7 @@ HOMM2_ENUM_VALUES_BEGIN(ExecutiveTextSlotSize)
     EXEC_TEXT_LIST_ENTRY_SLOT_SIZE = 0x2c,
     EXEC_TEXT_LIST_STOP_SLOT_SIZE = 0x20,
     EXEC_TEXT_TERMINATION_SLOT_SIZE = 0xc
-HOMM2_ENUM_VALUES_END(ExecutiveTextSlotSize)
+H2_ENUM_END(ExecutiveTextSlotSize)
 
 typedef struct SExecutiveText {
     char resourceInitError[EXEC_TEXT_RESOURCE_INIT_SLOT_SIZE];

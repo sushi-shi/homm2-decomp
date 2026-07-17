@@ -7,7 +7,7 @@
 class heroWindow;
 class playerData;
 
-HOMM2_ENUM_VALUES_BEGIN(BankBoxConstant)
+H2_ENUM_BEGIN(BankBoxConstant)
     BANK_BOX_TEXT_SIZE = 12,
     BANK_BOX_NON_GOLD_RESOURCE_COUNT = 6,
     BANK_BOX_FIRST_RESOURCE_WIDGET = 0x7ee,
@@ -15,7 +15,7 @@ HOMM2_ENUM_VALUES_BEGIN(BankBoxConstant)
     BANK_BOX_SET_TEXT_COMMAND = 3,
     BANK_BOX_WINDOW_Z_ORDER = -1,
     BANK_BOX_WINDOW_ACTIVE = 1
-HOMM2_ENUM_VALUES_END(BankBoxConstant)
+H2_ENUM_END(BankBoxConstant)
 
 #pragma pack(push, 1) // recovered layout is byte-packed
 class bankBox {

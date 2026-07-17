@@ -24,9 +24,9 @@
 // ---- module-private synthetic globals (retail xref: single-module) ----
 DATA(0x00534970) static PCMWAVEFORMAT gWaveFormat; // digital-driver PCM format (WAVE_init_driver)
 
-HOMM2_ENUM_BEGIN(SoundStateSpan)
+H2_ENUM_CLASS_BEGIN(SoundStateSpan)
     SOUND_STATE_RESET_SPAN = 0xae
-HOMM2_ENUM_END(SoundStateSpan)
+H2_ENUM_CLASS_END(SoundStateSpan)
 
 VA(0x004cb630, 0x68)
 void HandleMCIError(i32 errorCode, char* commandString) {

@@ -2,7 +2,7 @@
 #define HOMM2_BASE_SEEDED_RANDOM_CONSTANTS_H
 
 // Constants for the deterministic seeded generator owned by BASE/Misc.
-HOMM2_ENUM_VALUES_BEGIN(SeededRandomConstant)
+H2_ENUM_BEGIN(SeededRandomConstant)
     SEEDED_RANDOM_TERM_MULTIPLIER = 13,
     SEEDED_RANDOM_TERM_MASK = 0xFF,
     SEEDED_RANDOM_HIGH_TERM_SHIFT = 5,
@@ -14,6 +14,6 @@ HOMM2_ENUM_VALUES_BEGIN(SeededRandomConstant)
     SEEDED_RANDOM_MIX_MASK = 0xff0,
     SEEDED_RANDOM_MIX_SHIFT = 4,
     SEEDED_RANDOM_TOP_BIT = 31
-HOMM2_ENUM_VALUES_END(SeededRandomConstant)
+H2_ENUM_END(SeededRandomConstant)
 
 #endif // HOMM2_BASE_SEEDED_RANDOM_CONSTANTS_H

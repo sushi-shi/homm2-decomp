@@ -8,7 +8,7 @@
 struct tag_message;
 class heroWindow;
 
-HOMM2_ENUM_VALUES_BEGIN(HighScoreManagerConstant)
+H2_ENUM_BEGIN(HighScoreManagerConstant)
     HIGH_SCORE_DISPLAY_ENTRY_COUNT = 10,
     HIGH_SCORE_ANIMATION_FRAME_COUNT = 18,
     HIGH_SCORE_ANIMATION_DELAY = 120,
@@ -54,7 +54,7 @@ HOMM2_ENUM_VALUES_BEGIN(HighScoreManagerConstant)
     HIGH_SCORE_MANAGER_OPEN_OK = 0,
     HIGH_SCORE_MANAGER_CONTINUE = 1,
     HIGH_SCORE_MANAGER_CLOSE = 2
-HOMM2_ENUM_VALUES_END(HighScoreManagerConstant)
+H2_ENUM_END(HighScoreManagerConstant)
 
 #pragma pack(push, 1) // recovered layout is byte-packed
 class highScoreManager : public baseManager {

@@ -16,29 +16,29 @@ struct exeGfxConfig {
     i32 colorMouseCursor;
 };
 
-HOMM2_ENUM_BEGIN(ConfigMusicSource)
+H2_ENUM_CLASS_BEGIN(ConfigMusicSource)
     CONFIG_MUSIC_SOURCE_MIDI = 0,
     CONFIG_MUSIC_SOURCE_CD = 1,
     CONFIG_MUSIC_SOURCE_DEFAULT = 3
-HOMM2_ENUM_END(ConfigMusicSource)
+H2_ENUM_CLASS_END(ConfigMusicSource)
 
-HOMM2_ENUM_BEGIN(ConfigOperaMode)
+H2_ENUM_CLASS_BEGIN(ConfigOperaMode)
     CONFIG_OPERA_DISABLED = 0,
     CONFIG_OPERA_ENABLED = 1
-HOMM2_ENUM_END(ConfigOperaMode)
+H2_ENUM_CLASS_END(ConfigOperaMode)
 
-HOMM2_ENUM_VALUES_BEGIN(ConfigStorageConstant)
+H2_ENUM_BEGIN(ConfigStorageConstant)
     CONFIG_EXECUTABLE_COUNT = 2,
     CONFIG_GRAPHICS_SIZE = 0x1c,
     CONFIG_PERSISTED_SIZE = 0x19d,
     CONFIG_STRUCT_SIZE = 0x1a0
-HOMM2_ENUM_VALUES_END(ConfigStorageConstant)
+H2_ENUM_END(ConfigStorageConstant)
 
-HOMM2_ENUM_BEGIN(ConfigConnectionType)
+H2_ENUM_CLASS_BEGIN(ConfigConnectionType)
     CONFIG_CONNECTION_MODEM = 0,
     CONFIG_CONNECTION_DIRECT = 1,
     CONFIG_CONNECTION_COUNT = 2
-HOMM2_ENUM_END(ConfigConnectionType)
+H2_ENUM_CLASS_END(ConfigConnectionType)
 
 struct configStruct {
     i32 computerWalkSpeed;

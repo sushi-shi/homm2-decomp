@@ -8,7 +8,7 @@
 // forward declarations:
 class hero;
 
-HOMM2_ENUM_BEGIN(TownBuilding)
+H2_ENUM_CLASS_BEGIN(TownBuilding)
     TOWN_BUILDING_MAGE_GUILD = 0x1,
     TOWN_BUILDING_TAVERN = 0x4,
     TOWN_BUILDING_DOCK = 0x8,
@@ -37,10 +37,10 @@ HOMM2_ENUM_BEGIN(TownBuilding)
     TOWN_BUILDING_UPGRADED_DWELLING_5 = 0x10000000,
     TOWN_BUILDING_UPGRADED_DWELLING_6 = 0x20000000,
     TOWN_BUILDING_ALTERNATE_UPGRADED_DWELLING_6 = 0x40000000
-HOMM2_ENUM_END(TownBuilding)
-HOMM2_ENUM_FLAGS(TownBuilding)
+H2_ENUM_CLASS_END(TownBuilding)
+H2_ENUM_FLAGS(TownBuilding)
 
-HOMM2_ENUM_VALUES_BEGIN(TownConstant)
+H2_ENUM_BEGIN(TownConstant)
     TOWN_OWNER_NONE = -1,
     TOWN_ID_NONE = -1,
     TOWN_OCCUPYING_HERO_NONE = -1,
@@ -61,7 +61,7 @@ HOMM2_ENUM_VALUES_BEGIN(TownConstant)
     TOWN_DISPOSE_NONE = 0,
     TOWN_DISPOSE_PARTIAL = 1,
     TOWN_DISPOSE_FULL = 2
-HOMM2_ENUM_VALUES_END(TownConstant)
+H2_ENUM_END(TownConstant)
 
 #pragma pack(push, 1) // recovered layout is byte-packed
 class town {

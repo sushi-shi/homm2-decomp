@@ -77,9 +77,9 @@ inline hero* GetHeroSlot(i32 i) {
     return &gpGame->m_heroRecs[i];
 }
 
-HOMM2_ENUM_BEGIN(NormalDialogDrawLimit)
+H2_ENUM_CLASS_BEGIN(NormalDialogDrawLimit)
     NORMAL_DIALOG_DRAW_ID_LIMIT = 0x9000
-HOMM2_ENUM_END(NormalDialogDrawLimit)
+H2_ENUM_CLASS_END(NormalDialogDrawLimit)
 
 VA(0x00496450, 0x14e)
 extern "C" void PollSound(void) {

@@ -6,7 +6,7 @@
 #include <winsock.h>
 #include <SOURCE/REMOTE_TYPES.h>
 
-HOMM2_ENUM_VALUES_BEGIN(WinsockTransportConstant)
+H2_ENUM_BEGIN(WinsockTransportConstant)
     WS_TRANSPORT_BUFFER_COUNT = 200,
     WS_TRANSPORT_BUFFER_SIZE = 0x100,
     WS_TRANSPORT_BROADCAST_POSITION = 0x7f,
@@ -16,13 +16,13 @@ HOMM2_ENUM_VALUES_BEGIN(WinsockTransportConstant)
     WS_TRANSPORT_HOST_RETRY_DELAY = 3000,
     WS_TRANSPORT_HOST_RETRY_LIMIT = 15,
     WS_TRANSPORT_ADDRESS_SIZE = 16
-HOMM2_ENUM_VALUES_END(WinsockTransportConstant)
+H2_ENUM_END(WinsockTransportConstant)
 
-HOMM2_ENUM_BEGIN(WinsockWaitType)
+H2_ENUM_CLASS_BEGIN(WinsockWaitType)
     WS_WAIT_FIRST_GUEST = 11,
     WS_WAIT_EXTRA_GUESTS = 12,
     WS_WAIT_HOST = 13
-HOMM2_ENUM_END(WinsockWaitType)
+H2_ENUM_CLASS_END(WinsockWaitType)
 
 #pragma pack(push, 1)
 struct WinsockStartupMessage {

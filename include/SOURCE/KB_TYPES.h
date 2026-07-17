@@ -11,7 +11,7 @@ class sample;
 // etc.), in the standard HoMM2 order. MERCURY/ORE/CRYSTAL are confirmed by the retail's
 // per-element .rdata float symbols referenced in philAI::RVConversion; the rest follow the
 // canonical order.
-HOMM2_ENUM_BEGIN(ResourceType)
+H2_ENUM_CLASS_BEGIN(ResourceType)
     RES_NONE = -1,
     RES_WOOD = 0,
     RES_MERCURY = 1,
@@ -20,9 +20,9 @@ HOMM2_ENUM_BEGIN(ResourceType)
     RES_CRYSTAL = 4,
     RES_GEMS = 5,
     RES_GOLD = 6
-HOMM2_ENUM_END(ResourceType)
+H2_ENUM_CLASS_END(ResourceType)
 
-HOMM2_ENUM_BEGIN(CreatureType)
+H2_ENUM_CLASS_BEGIN(CreatureType)
     CREATURE_NONE = -1,
     CREATURE_PEASANT = 0,
     CREATURE_ARCHER = 1,
@@ -91,9 +91,9 @@ HOMM2_ENUM_BEGIN(CreatureType)
     CREATURE_FIRE_ELEMENTAL = 64,
     CREATURE_WATER_ELEMENTAL = 65,
     CREATURE_COUNT = 66
-HOMM2_ENUM_END(CreatureType)
+H2_ENUM_CLASS_END(CreatureType)
 
-HOMM2_ENUM_BEGIN(ArtifactType)
+H2_ENUM_CLASS_BEGIN(ArtifactType)
     ARTIFACT_NONE = -1,
     ARTIFACT_ULTIMATE_BOOK = 0,
     ARTIFACT_ULTIMATE_SWORD = 1,
@@ -199,9 +199,9 @@ HOMM2_ENUM_BEGIN(ArtifactType)
     ARTIFACT_SWORD_ANDURAN = 101,
     ARTIFACT_SPADE_NECROMANCY = 102,
     ARTIFACT_COUNT = 103
-HOMM2_ENUM_END(ArtifactType)
+H2_ENUM_CLASS_END(ArtifactType)
 
-HOMM2_ENUM_BEGIN(SpellType)
+H2_ENUM_CLASS_BEGIN(SpellType)
     SPELL_NONE = -1,
     SPELL_FIREBALL = 0,
     SPELL_FIREBLAST = 1,
@@ -271,9 +271,9 @@ HOMM2_ENUM_BEGIN(SpellType)
     SPELL_COUNT = 65,
     CREATURE_SPELL_PETRIFY = 101,
     CREATURE_SPELL_DISPEL = 102
-HOMM2_ENUM_END(SpellType)
+H2_ENUM_CLASS_END(SpellType)
 
-HOMM2_ENUM_VALUES_BEGIN(MapObjectType)
+H2_ENUM_BEGIN(MapObjectType)
     MAP_OBJECT_NONE = 0,
     MAP_OBJECT_ALCHEMIST_LAB = 1,
     MAP_OBJECT_SIGN = 2,
@@ -399,14 +399,14 @@ HOMM2_ENUM_VALUES_BEGIN(MapObjectType)
     MAP_OBJECT_EXPANSION_DWELLING = 121,
     MAP_OBJECT_EXPANSION_OBJECT = 122,
     MAP_OBJECT_JAIL = 123
-HOMM2_ENUM_VALUES_END(MapObjectType)
+H2_ENUM_END(MapObjectType)
 
 enum {
     MAP_TRIGGER_ACTION_FLAG = 0x80,
     MAP_TRIGGER_TYPE_MASK = 0x7f
 };
 
-HOMM2_ENUM_BEGIN(FactionType)
+H2_ENUM_CLASS_BEGIN(FactionType)
     FACTION_KNIGHT = 0,
     FACTION_BARBARIAN = 1,
     FACTION_SORCERESS = 2,
@@ -414,9 +414,9 @@ HOMM2_ENUM_BEGIN(FactionType)
     FACTION_WIZARD = 4,
     FACTION_NECROMANCER = 5,
     FACTION_COUNT = 6
-HOMM2_ENUM_END(FactionType)
+H2_ENUM_CLASS_END(FactionType)
 
-HOMM2_ENUM_BEGIN(TerrainType)
+H2_ENUM_CLASS_BEGIN(TerrainType)
     TERRAIN_WATER = 0,
     TERRAIN_GRASS = 1,
     TERRAIN_SNOW = 2,
@@ -427,9 +427,9 @@ HOMM2_ENUM_BEGIN(TerrainType)
     TERRAIN_WASTELAND = 7,
     TERRAIN_BEACH = 8,
     TERRAIN_COUNT = 9
-HOMM2_ENUM_END(TerrainType)
+H2_ENUM_CLASS_END(TerrainType)
 
-HOMM2_ENUM_BEGIN(BuildingSlotType)
+H2_ENUM_CLASS_BEGIN(BuildingSlotType)
     BUILDING_SLOT_MAGE_GUILD = 0,
     BUILDING_SLOT_SPECIAL_ONE = 1,
     BUILDING_SLOT_NECROMANCER_SHRINE = 2,
@@ -459,12 +459,14 @@ HOMM2_ENUM_BEGIN(BuildingSlotType)
     BUILDING_SLOT_UPGRADE_SECOND = 26,
     BUILDING_SLOT_UPGRADE_THIRD = 27,
     BUILDING_SLOT_NECROMANCER_MAGE_PREREQUISITE = 28,
+    BUILDING_SLOT_SPECIAL_TWENTY_NINE = 29,
+    BUILDING_SLOT_SPECIAL_THIRTY = 30,
     BUILDING_SLOT_UPGRADE_LAST = 29,
     BUILDING_SLOT_DWELLING_LAST = 30,
     BUILDING_SLOT_DISABLED_LAST = 31
-HOMM2_ENUM_END(BuildingSlotType)
+H2_ENUM_CLASS_END(BuildingSlotType)
 
-HOMM2_ENUM_BEGIN(MonsterFlags)
+H2_ENUM_CLASS_BEGIN(MonsterFlags)
     MONSTER_FLAGS_WIDE = 0x00000001,
     MONSTER_FLAGS_FLYING = 0x00000002,
     MONSTER_FLAGS_LIGHT_PALETTE = 0x00000100,
@@ -482,10 +484,10 @@ HOMM2_ENUM_BEGIN(MonsterFlags)
     MONSTER_FLAGS_SUMMONED = 0x00000800,
     MONSTER_FLAGS_UNDEAD = 0x00000400,
     MONSTER_FLAGS_NO_MORALE = 0x00000400
-HOMM2_ENUM_END(MonsterFlags)
-HOMM2_ENUM_FLAGS(MonsterFlags)
+H2_ENUM_CLASS_END(MonsterFlags)
+H2_ENUM_FLAGS(MonsterFlags)
 
-HOMM2_ENUM_BEGIN(MonsterAbilityFlags)
+H2_ENUM_CLASS_BEGIN(MonsterAbilityFlags)
     MONSTER_ABILITY_FLAG_WIDE = 0x01,
     MONSTER_ABILITY_FLAG_FLYING = 0x02,
     MONSTER_ABILITY_FLAG_SHOOTER = 0x04,
@@ -495,8 +497,8 @@ HOMM2_ENUM_BEGIN(MonsterAbilityFlags)
     MONSTER_ABILITY_FLAG_BAD_MORALE = 0x80,
     MONSTER_ABILITY_FLAG_FULL_AI_QUANTITY = 0x80,
     MONSTER_ABILITY_FLAG_DEFERRED_TURN = 0x1000
-HOMM2_ENUM_END(MonsterAbilityFlags)
-HOMM2_ENUM_FLAGS(MonsterAbilityFlags)
+H2_ENUM_CLASS_END(MonsterAbilityFlags)
+H2_ENUM_FLAGS(MonsterAbilityFlags)
 
 // Retained in the historical declaration sequence because MSVC 4.2's cumulative TU state
 // changes code generation when these otherwise redundant declarations are removed.
@@ -525,10 +527,10 @@ struct tag_tilePoint {
     i16 frameOffset;
 };
 SIZE(tag_tilePoint, 4);
-HOMM2_ENUM_VALUES_BEGIN(MonsterDatabaseConstant)
+H2_ENUM_BEGIN(MonsterDatabaseConstant)
     MONSTER_SPRITE_NAME_SIZE = 5
-HOMM2_ENUM_VALUES_END(MonsterDatabaseConstant)
-HOMM2_ENUM_BEGIN(MonsterAttribute)
+H2_ENUM_END(MonsterDatabaseConstant)
+H2_ENUM_CLASS_BEGIN(MonsterAttribute)
     MONSTER_ATTRIBUTE_WIDE = 0x01,
     MONSTER_ATTRIBUTE_FLYING = 0x02,
     MONSTER_ATTRIBUTE_RANGED = 0x04,
@@ -537,8 +539,8 @@ HOMM2_ENUM_BEGIN(MonsterAttribute)
     MONSTER_ATTRIBUTE_DEAD = 0x10,
     MONSTER_ATTRIBUTE_RETALIATED = 0x40,
     MONSTER_ATTRIBUTE_WOKE_FROM_DAMAGE = 0x80
-HOMM2_ENUM_END(MonsterAttribute)
-HOMM2_ENUM_FLAGS(MonsterAttribute)
+H2_ENUM_CLASS_END(MonsterAttribute)
+H2_ENUM_FLAGS(MonsterAttribute)
 
 #pragma pack(push, 1)
 struct tag_monsterInfo {
@@ -576,10 +578,10 @@ struct tag_monsterInfo {
 };
 #pragma pack(pop)
 SIZE(tag_monsterInfo, 0x1a);
-HOMM2_ENUM_VALUES_BEGIN(CombatHeroAnimationConstant)
+H2_ENUM_BEGIN(CombatHeroAnimationConstant)
     COMBAT_HERO_ANIMATION_COUNT = 12,
     COMBAT_HERO_ANIMATION_FRAME_COUNT = 9
-HOMM2_ENUM_VALUES_END(CombatHeroAnimationConstant)
+H2_ENUM_END(CombatHeroAnimationConstant)
 
 #pragma pack(push, 1)
 struct SCmbtHero {
@@ -591,13 +593,13 @@ struct SCmbtHero {
 };
 SIZE(SCmbtHero, 0x81);
 #pragma pack(pop)
-HOMM2_ENUM_BEGIN_T(SpellInfoAttribute, u8)
+H2_ENUM_CLASS_BEGIN_T(SpellInfoAttribute, u8)
     SPELL_INFO_ATTRIBUTE_POWER = 0x01,
     SPELL_INFO_ATTRIBUTE_COMBAT = 0x02,
     SPELL_INFO_ATTRIBUTE_ADVENTURE = 0x04,
     SPELL_INFO_ATTRIBUTE_DURATION = 0x08
-HOMM2_ENUM_END_T(SpellInfoAttribute, u8)
-HOMM2_ENUM_FLAGS(SpellInfoAttribute)
+H2_ENUM_CLASS_END_T(SpellInfoAttribute, u8)
+H2_ENUM_FLAGS(SpellInfoAttribute)
 
 struct SSpellInfo {
     char soundName[9];

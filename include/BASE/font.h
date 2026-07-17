@@ -7,11 +7,11 @@
 // forward declarations:
 class icon;
 
-HOMM2_ENUM_VALUES_BEGIN(FontGlyphConstant)
+H2_ENUM_BEGIN(FontGlyphConstant)
     FONT_SPACER_CHAR = 0x1f, // advances the pen without drawing a glyph
     FONT_GLYPH_FALLBACK = 0x5f
 // out-of-range characters render this glyph
-HOMM2_ENUM_VALUES_END(FontGlyphConstant)
+H2_ENUM_END(FontGlyphConstant)
 
 #pragma pack(push, 1) // recovered layout is byte-packed
     // font is an asset subclass of resource (base ctor resource(5,K,1,0); slot-0 dtor override).

@@ -10,10 +10,10 @@ class CensusTest(unittest.TestCase):
     def test_classic_and_dual_mode_declarations(self):
         text = """
 typedef enum First { FIRST_NEG = -1, FIRST_ZERO, FIRST_MASK = 0x10UL } First;
-HOMM2_ENUM_BEGIN(Second)
+H2_ENUM_CLASS_BEGIN(Second)
     SECOND_START = FIRST_MASK << 1,
     SECOND_NEXT
-HOMM2_ENUM_END(Second)
+H2_ENUM_CLASS_END(Second)
 """
         declarations = parse_declarations(Path(__file__), text)
         evaluate_declarations(declarations)
