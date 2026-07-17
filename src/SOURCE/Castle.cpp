@@ -360,15 +360,15 @@ i32 CastleHandler(tag_message &message)
         else {
             if (message.payload.widget.id >= CASTLE_CONTROL_BUILDING_NAME_FIRST &&
                 message.payload.widget.id < CASTLE_CONTROL_BUILDING_NAME_FIRST +
-                                     CASTLE_SLOT_COUNT)
+                                     static_cast<i32>(CASTLE_SLOT_COUNT))
                 buildingIndex = message.payload.widget.id - CASTLE_CONTROL_BUILDING_NAME_FIRST;
             else if (message.payload.widget.id >= CASTLE_CONTROL_BUILDING_ICON_FIRST &&
                      message.payload.widget.id < CASTLE_CONTROL_BUILDING_ICON_FIRST +
-                                          CASTLE_SLOT_COUNT)
+                                          static_cast<i32>(CASTLE_SLOT_COUNT))
                 buildingIndex = message.payload.widget.id - CASTLE_CONTROL_BUILDING_ICON_FIRST;
             else if (message.payload.widget.id >= CASTLE_CONTROL_BUILDING_BUTTON_FIRST &&
                      message.payload.widget.id < CASTLE_CONTROL_BUILDING_BUTTON_FIRST +
-                                          CASTLE_SLOT_COUNT)
+                                          static_cast<i32>(CASTLE_SLOT_COUNT))
                 buildingIndex = message.payload.widget.id - CASTLE_CONTROL_BUILDING_BUTTON_FIRST;
             if (buildingIndex != -1)
                 buildingIndex = castleSlotsUse[buildingIndex];
