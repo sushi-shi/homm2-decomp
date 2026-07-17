@@ -275,7 +275,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
             case SPELL_DEATH_WAVE:
                 if (hasMindEffect) {
                 } else {
-                    EffectSpellDamage(&effect, IDX(spell), hexIndex);
+                    EffectSpellDamage(&effect, spell, hexIndex);
                     if (hasDamageReductionResult)
                         effect = static_cast<i32>(effect * COMBAT_SPELL_AI_REDUCED_EFFECT_MODIFIER);
                 }
@@ -1145,7 +1145,7 @@ void combatManager::EffectSpellResurrect(i32* effect, i32 hex, SpellType spell) 
 // do/finalize forms were exhausted; revisit with jump-table-aware explicit
 // ranges in the byte-last-mile phase.
 VA(0x00488d58, 0xcc9)
-void combatManager::EffectSpellDamage(i32* effect, i32 spell, i32 targetHex) {
+void combatManager::EffectSpellDamage(i32* effect, SpellType spell, i32 targetHex) {
     i32 fightValueKilledAI[2];
     i32 creaturesKilledResult;
     i32 remainderResult;
@@ -1165,46 +1165,46 @@ void combatManager::EffectSpellDamage(i32* effect, i32 spell, i32 targetHex) {
     i32 disruptingRayValueTotal;
 
     switch (spell) {
-        case IDX(SPELL_ARMAGEDDON):
+        case SPELL_ARMAGEDDON:
             damagePerPowerResult = COMBAT_SPELL_AI_ARMAGEDDON_DAMAGE_PER_POWER;
             break;
-        case IDX(SPELL_HOLY_WORD):
+        case SPELL_HOLY_WORD:
             damagePerPowerResult = COMBAT_SPELL_AI_HOLY_WORD_DAMAGE_PER_POWER;
             break;
-        case IDX(SPELL_HOLY_SHOUT):
+        case SPELL_HOLY_SHOUT:
             damagePerPowerResult = COMBAT_SPELL_AI_HOLY_SHOUT_DAMAGE_PER_POWER;
             break;
-        case IDX(SPELL_DEATH_RIPPLE):
+        case SPELL_DEATH_RIPPLE:
             damagePerPowerResult = COMBAT_SPELL_AI_DEATH_RIPPLE_DAMAGE_PER_POWER;
             break;
-        case IDX(SPELL_DEATH_WAVE):
+        case SPELL_DEATH_WAVE:
             damagePerPowerResult = COMBAT_SPELL_AI_DEATH_WAVE_DAMAGE_PER_POWER;
             break;
-        case IDX(SPELL_ELEMENTAL_STORM):
+        case SPELL_ELEMENTAL_STORM:
             damagePerPowerResult = COMBAT_SPELL_AI_ELEMENTAL_STORM_DAMAGE_PER_POWER;
             break;
-        case IDX(SPELL_FIREBALL):
+        case SPELL_FIREBALL:
             damagePerPowerResult = COMBAT_SPELL_AI_FIRE_DAMAGE_PER_POWER;
             break;
-        case IDX(SPELL_FIREBLAST):
+        case SPELL_FIREBLAST:
             damagePerPowerResult = COMBAT_SPELL_AI_FIRE_DAMAGE_PER_POWER;
             break;
-        case IDX(SPELL_METEOR_SHOWER):
+        case SPELL_METEOR_SHOWER:
             damagePerPowerResult = COMBAT_SPELL_AI_ELEMENTAL_STORM_DAMAGE_PER_POWER;
             break;
-        case IDX(SPELL_LIGHTNING_BOLT):
+        case SPELL_LIGHTNING_BOLT:
             damagePerPowerResult = COMBAT_SPELL_AI_LIGHTNING_DAMAGE_PER_POWER;
             break;
-        case IDX(SPELL_MAGIC_ARROW):
+        case SPELL_MAGIC_ARROW:
             damagePerPowerResult = COMBAT_SPELL_AI_MAGIC_ARROW_DAMAGE_PER_POWER;
             break;
-        case IDX(SPELL_CHAIN_LIGHTNING):
+        case SPELL_CHAIN_LIGHTNING:
             damagePerPowerResult = COMBAT_SPELL_AI_CHAIN_LIGHTNING_DAMAGE_PER_POWER;
             break;
-        case IDX(SPELL_COLD_RAY):
+        case SPELL_COLD_RAY:
             damagePerPowerResult = COMBAT_SPELL_AI_COLD_RAY_DAMAGE_PER_POWER;
             break;
-        case IDX(SPELL_COLD_RING):
+        case SPELL_COLD_RING:
             damagePerPowerResult = COMBAT_SPELL_AI_COLD_RING_DAMAGE_PER_POWER;
             break;
         default:
@@ -1231,16 +1231,16 @@ void combatManager::EffectSpellDamage(i32* effect, i32 spell, i32 targetHex) {
 
     while (!doneWork) {
         switch (spell) {
-            case IDX(SPELL_LIGHTNING_BOLT):
-            case IDX(SPELL_MAGIC_ARROW):
-            case IDX(SPELL_COLD_RAY):
-            case IDX(SPELL_DISRUPTING_RAY):
+            case SPELL_LIGHTNING_BOLT:
+            case SPELL_MAGIC_ARROW:
+            case SPELL_COLD_RAY:
+            case SPELL_DISRUPTING_RAY:
                 if (currentHex == targetHex)
                     doneWork = 1;
                 else
                     currentHex = targetHex;
                 break;
-            case IDX(SPELL_CHAIN_LIGHTNING):
+            case SPELL_CHAIN_LIGHTNING:
                 if (currentHex == 0) {
                     currentHex = targetHex;
                 } else {
@@ -1251,35 +1251,35 @@ void combatManager::EffectSpellDamage(i32* effect, i32 spell, i32 targetHex) {
                 if (step > 4 || currentHex == -1)
                     doneWork = 1;
                 break;
-            case IDX(SPELL_TELEPORT):
-            case IDX(SPELL_CURE):
-            case IDX(SPELL_MASS_CURE):
-            case IDX(SPELL_RESURRECT):
-            case IDX(SPELL_TRUE_RESURRECT):
-            case IDX(SPELL_HASTE):
-            case IDX(SPELL_MASS_HASTE):
-            case IDX(SPELL_SLOW):
-            case IDX(SPELL_MASS_SLOW):
-            case IDX(SPELL_BLIND):
-            case IDX(SPELL_BLESS):
-            case IDX(SPELL_MASS_BLESS):
-            case IDX(SPELL_STONE_SKIN):
-            case IDX(SPELL_STEEL_SKIN):
-            case IDX(SPELL_CURSE):
-            case IDX(SPELL_MASS_CURSE):
-            case IDX(SPELL_ANTI_MAGIC):
-            case IDX(SPELL_DISPEL):
-            case IDX(SPELL_MASS_DISPEL):
-            case IDX(SPELL_BERSERKER):
-            case IDX(SPELL_PARALYZE):
-            case IDX(SPELL_HYPNOTIZE):
+            case SPELL_TELEPORT:
+            case SPELL_CURE:
+            case SPELL_MASS_CURE:
+            case SPELL_RESURRECT:
+            case SPELL_TRUE_RESURRECT:
+            case SPELL_HASTE:
+            case SPELL_MASS_HASTE:
+            case SPELL_SLOW:
+            case SPELL_MASS_SLOW:
+            case SPELL_BLIND:
+            case SPELL_BLESS:
+            case SPELL_MASS_BLESS:
+            case SPELL_STONE_SKIN:
+            case SPELL_STEEL_SKIN:
+            case SPELL_CURSE:
+            case SPELL_MASS_CURSE:
+            case SPELL_ANTI_MAGIC:
+            case SPELL_DISPEL:
+            case SPELL_MASS_DISPEL:
+            case SPELL_BERSERKER:
+            case SPELL_PARALYZE:
+            case SPELL_HYPNOTIZE:
                 break;
-            case IDX(SPELL_HOLY_WORD):
-            case IDX(SPELL_HOLY_SHOUT):
-            case IDX(SPELL_ARMAGEDDON):
-            case IDX(SPELL_ELEMENTAL_STORM):
-            case IDX(SPELL_DEATH_RIPPLE):
-            case IDX(SPELL_DEATH_WAVE):
+            case SPELL_HOLY_WORD:
+            case SPELL_HOLY_SHOUT:
+            case SPELL_ARMAGEDDON:
+            case SPELL_ELEMENTAL_STORM:
+            case SPELL_DEATH_RIPPLE:
+            case SPELL_DEATH_WAVE:
                 NextPos(&currentHex);
                 if (currentHex < COMBAT_SPELL_AI_LAST_HEX + 1)
                     doneWork = 0;
@@ -1287,12 +1287,12 @@ void combatManager::EffectSpellDamage(i32* effect, i32 spell, i32 targetHex) {
                     doneWork = 1;
                 doneWork = currentHex >= COMBAT_SPELL_AI_LAST_HEX + 1;
                 break;
-            case IDX(SPELL_COLD_RING):
+            case SPELL_COLD_RING:
                 if (step == 0)
                     step++;
-            case IDX(SPELL_FIREBALL):
-            case IDX(SPELL_FIREBLAST):
-            case IDX(SPELL_METEOR_SHOWER):
+            case SPELL_FIREBALL:
+            case SPELL_FIREBLAST:
+            case SPELL_METEOR_SHOWER:
                 if (((step < 7) || spell == SPELL_FIREBLAST) && step < 19) {
                     if (step == 0)
                         currentHex = targetHex;
@@ -1342,8 +1342,8 @@ void combatManager::EffectSpellDamage(i32* effect, i32 spell, i32 targetHex) {
                     spellDamageWork = static_cast<i32l>(damage * workChanceWork);
                     monsterTotal = targetCreature->m_monsterType;
                     switch (spell) {
-                        case IDX(SPELL_FIREBALL):
-                        case IDX(SPELL_FIREBLAST):
+                        case SPELL_FIREBALL:
+                        case SPELL_FIREBLAST:
                             if (monsterTotal == CREATURE_IRON_GOLEM
                                 || monsterTotal == CREATURE_STEEL_GOLEM)
                                 spellDamageWork = static_cast<i32l>(
@@ -1352,9 +1352,9 @@ void combatManager::EffectSpellDamage(i32* effect, i32 spell, i32 targetHex) {
                             if (monsterTotal == CREATURE_WATER_ELEMENTAL)
                                 spellDamageWork <<= 1;
                             break;
-                        case IDX(SPELL_LIGHTNING_BOLT):
-                        case IDX(SPELL_CHAIN_LIGHTNING):
-                        case IDX(SPELL_ELEMENTAL_STORM):
+                        case SPELL_LIGHTNING_BOLT:
+                        case SPELL_CHAIN_LIGHTNING:
+                        case SPELL_ELEMENTAL_STORM:
                             if (monsterTotal == CREATURE_IRON_GOLEM
                                 || monsterTotal == CREATURE_STEEL_GOLEM)
                                 spellDamageWork = static_cast<i32l>(
@@ -1363,14 +1363,14 @@ void combatManager::EffectSpellDamage(i32* effect, i32 spell, i32 targetHex) {
                             if (monsterTotal == CREATURE_AIR_ELEMENTAL)
                                 spellDamageWork <<= 1;
                             break;
-                        case IDX(SPELL_ARMAGEDDON):
+                        case SPELL_ARMAGEDDON:
                             if (monsterTotal == CREATURE_IRON_GOLEM
                                 || monsterTotal == CREATURE_STEEL_GOLEM)
                                 spellDamageWork = static_cast<i32l>(
                                     spellDamageWork * SPELL_GOLEM_DAMAGE_MULTIPLIER
                                 );
                             break;
-                        case IDX(SPELL_METEOR_SHOWER):
+                        case SPELL_METEOR_SHOWER:
                             if (monsterTotal == CREATURE_IRON_GOLEM
                                 || monsterTotal == CREATURE_STEEL_GOLEM)
                                 spellDamageWork = static_cast<i32l>(
@@ -1379,8 +1379,8 @@ void combatManager::EffectSpellDamage(i32* effect, i32 spell, i32 targetHex) {
                             if (monsterTotal == CREATURE_EARTH_ELEMENTAL)
                                 spellDamageWork <<= 1;
                             break;
-                        case IDX(SPELL_COLD_RAY):
-                        case IDX(SPELL_COLD_RING):
+                        case SPELL_COLD_RAY:
+                        case SPELL_COLD_RING:
                             if (monsterTotal == CREATURE_IRON_GOLEM
                                 || monsterTotal == CREATURE_STEEL_GOLEM)
                                 spellDamageWork = static_cast<i32l>(
@@ -1393,7 +1393,7 @@ void combatManager::EffectSpellDamage(i32* effect, i32 spell, i32 targetHex) {
 
                     ModifyDamageForArtifacts(
                         &spellDamageWork,
-                        spell,
+                        IDX(spell),
                         m_heroes[m_currentSide],
                         m_heroes[targetCreature->m_side]
                     );
@@ -1458,7 +1458,7 @@ void combatManager::EffectSpellDamage(i32* effect, i32 spell, i32 targetHex) {
                   + disruptingRayValueTotal;
     } else {
         *effect =
-            COMBAT_SPELL_AI_DECISIVE_EFFECT - gsSpellInfo[spell].aiValue + disruptingRayValueTotal;
+            COMBAT_SPELL_AI_DECISIVE_EFFECT - gsSpellInfo[IDX(spell)].aiValue + disruptingRayValueTotal;
     }
     if (m_currentSide == COMBAT_ATTACKER_SIDE && m_inCastleCombat)
         *effect = static_cast<i32>(*effect * COMBAT_SPELL_AI_CASTLE_EFFECT_MODIFIER);

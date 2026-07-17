@@ -1852,7 +1852,7 @@ void game::RandomizeEvents(void) {
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ARTIFACT:
                     randomValue7 = Random(0, 99);
                     value26 = cell2->m_objectIndex >> 1;
-                    if (value26 != ARTIFACT_SPELL_SCROLL) {
+                    if (value26 != IDX(ARTIFACT_SPELL_SCROLL)) {
                         if (randomValue7 < 60) {
                             if (randomValue7 % 10 == 1)
                                 cell2->m_objectMetadata = 4;
