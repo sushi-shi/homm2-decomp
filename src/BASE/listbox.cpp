@@ -58,6 +58,13 @@ listBoxWidget::listBoxWidget(void) : widget(0, 0, 0, 0, 0, 0)
     m_lastSelectedIndex = -1;
 }
 
+// @semantic
+// Complete 0x86-byte destructor with all 11 relocation sites and owner/addends aligned.
+// The only raw-code residual is the item loop: retail uses EBX for the four-byte item
+// offset and EDI for the item index, while candidate assigns those equivalent induction
+// values to EDI and EBX. Semantic item naming, a source-level item temporary, and an
+// explicit preincrement loop did not improve the retained form; the latter two worsened
+// scheduling. Revisit only after a genuine declaration or combined-TU state change.
 VA(0x004db0d0, 0x86)
 listBoxWidget::~listBoxWidget()
 {
