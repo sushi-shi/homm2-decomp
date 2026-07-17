@@ -2050,9 +2050,9 @@ void philAI::ValueOfBuyingBuilding(
     i32& resourceValue,
     float& benefitCost
 ) {
-    i32 currentTownRace;
+    FactionType currentTownRace;
     i32 dwellingTotal;
-    BuildingSlotType highestDwellingId;
+    i32 highestDwellingId;
     i32 currentOccupiedSlots;
     i32 mageGuildLevelLocal;
     float adjustedValue;
@@ -2067,7 +2067,7 @@ void philAI::ValueOfBuyingBuilding(
     i32 projectedAttackValue;
     i32 estimatedAttackWeeks;
     float dangerRating;
-    currentTownRace = townPtr->m_type;
+    currentTownRace = FactionType(townPtr->m_type);
     dwellingTotal = 0;
     highestDwellingId = -1;
     for (indexBuilding = IDX(BUILDING_SLOT_DWELLING_FIRST); indexBuilding < IDX(BUILDING_SLOT_DWELLING_LAST);
@@ -2091,7 +2091,7 @@ void philAI::ValueOfBuyingBuilding(
     );
     if (building >= BUILDING_SLOT_UPGRADE_FIRST && building <= BUILDING_SLOT_UPGRADE_LAST) {
         adjustedValue -=
-            static_cast<float>(GetBuildingBaseResourceValue(currentTownRace, building - 5, 1));
+            static_cast<float>(GetBuildingBaseResourceValue(currentTownRace, BuildingSlotType(IDX(building) - 5), 1));
     }
     if (building == BUILDING_SLOT_DWELLING_LAST) {
         adjustedValue -= static_cast<float>(
@@ -2218,7 +2218,7 @@ void philAI::ValueOfBuyingBuilding(
                 (gpCurPlayer->m_attentionWeights.upgradeBase * 2.0f + 0.33) * adjustedValue
             );
             adjustedValue = static_cast<float>(
-                (1.0 - gpCurPlayer->BuildingsOwned(currentTownRace, BuildingSlotType(building), 0) * 0.05)
+                (1.0 - gpCurPlayer->BuildingsOwned(IDX(currentTownRace), BuildingSlotType(building), 0) * 0.05)
                 * adjustedValue
             );
             if (building - IDX(BUILDING_SLOT_DWELLING_FIRST) < highestDwellingId)

@@ -1424,7 +1424,7 @@ void game::NewMap(char* filename) {
     }
     m_ultimateArtifactX = static_cast<i8>(player2);
     m_ultimateArtifactY = static_cast<i8>(townIndex9);
-    m_ultimateArtifactId = static_cast<i8>(Random(IDX(ARTIFACT_ULTIMATE_BOOK), ARTIFACT_GOLDEN_GOOSE));
+    m_ultimateArtifactId = static_cast<i8>(Random(IDX(ARTIFACT_ULTIMATE_BOOK), IDX(ARTIFACT_GOLDEN_GOOSE)));
     if (gbInCampaign
         && ((m_campaignType == 0 && static_cast<i8>(m_campaignScenario) + 1 == 8)
             || (m_campaignType == 1 && static_cast<i8>(m_campaignScenario) + 1 == 9)))
@@ -5126,9 +5126,9 @@ void game::SetupTowns(void) {
                 } else {
                     attempts = 0;
                     do {
-                        spell = Random(IDX(SPELL_FIREBALL), SPELL_SET_WATER_GUARDIAN);
+                        spell = Random(IDX(SPELL_FIREBALL), IDX(SPELL_SET_WATER_GUARDIAN));
                         while (gsSpellInfo[IDX(spell)].level - 1 != spellLevel)
-                            spell = Random(IDX(SPELL_FIREBALL), SPELL_SET_WATER_GUARDIAN);
+                            spell = Random(IDX(SPELL_FIREBALL), IDX(SPELL_SET_WATER_GUARDIAN));
                         if (castle->m_owner != -1 && !gbHumanPlayer[castle->m_owner])
                             spellValue = (gsSpellInfo[IDX(spell)].attributes & 1 ? 4 : 1)
                                              * gsSpellInfo[IDX(spell)].aiValue

@@ -591,7 +591,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         -1,
                         IDX(RES_WOOD),
                         10,
-                        RES_GOLD,
+                        IDX(RES_GOLD),
                         500,
                         -1,
                         0
