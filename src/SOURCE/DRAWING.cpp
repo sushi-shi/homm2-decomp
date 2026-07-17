@@ -258,7 +258,7 @@ void combatManager::ResetLimitCreature(void) {
 
     for (side = 0; side < COMBAT_SIDE_COUNT_DRAWING; side++) {
         for (armySlotIndex = 0; armySlotIndex < COMBAT_ARMY_SLOT_COUNT_DRAWING; armySlotIndex++) {
-            if ((m_armies[side][armySlotIndex].m_monster.flags.all & COMBAT_ARMY_FLAG_MIRROR_IMAGE)
+            if ((m_armies[side][armySlotIndex].m_monster.flags.all & IDX(COMBAT_ARMY_FLAG_MIRROR_IMAGE))
                 != 0)
                 m_limitCreatureCount[side][OD_STEER(armySlotIndex)] = -1;
             else
