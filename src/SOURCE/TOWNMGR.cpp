@@ -1889,7 +1889,7 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
     mageLevel_k = 0;
     index_h = 0;
     costCount_o = 0;
-    description_b = static_cast<char*>(BaseAlloc(400, RETAIL_FILE, 2384));
+    description_b = static_cast<char*>(H2_ALLOC(400, 2384));
 
     for (index_h = 0; index_h < TOWN_RESOURCE_COUNT; ++index_h) {
         costs_e[index_h] = -1;
@@ -2095,7 +2095,7 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
             x_d = xStart_b;
             for (index_h = 0; index_h < resourcesInRow_l; ++index_h) {
                 entryWidth_o = GetIconEntry(resourceIcon_c, rowResourceTypes_a[index_h])->w;
-                amountText_n[widgetIndex_f] = static_cast<char*>(BaseAlloc(10, RETAIL_FILE, 2672));
+                amountText_n[widgetIndex_f] = static_cast<char*>(H2_ALLOC(10, 2672));
                 sprintf(amountText_n[widgetIndex_f], "%d", costs_e[widgetIndex_f]);
                 i32 widgetXOffset = 0;
                 amountWidgets_b[widgetIndex_f] = new textWidget(
@@ -3074,11 +3074,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                 if (strongestHeroPosition_first != -1) {
                     strongestHero_x = gpGame->GetPlayerHero(rank, strongestHeroPosition_first);
                     sprintf(gText, "Att.\nDef.\nPower\nKnowl.");
-                    widgetText_control = static_cast<char*>(BaseAlloc(
-                        strlen(gText) + 1,
-                        RETAIL_FILE,
-                        3598 + TOWN_THIEVES_SOURCE_LINE_HERO_LABELS
-                    ));
+                    widgetText_control = static_cast<char*>(H2_ALLOC(strlen(gText) + 1, 3598 + TOWN_THIEVES_SOURCE_LINE_HERO_LABELS));
                     strcpy(widgetText_control, gText);
                     textControl_icon = new textWidget(
                         static_cast<i16>(position_current * 0x44 + 0xef),
@@ -3101,11 +3097,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                         sprintf(statText_k, "%d\n", strongestHero_x->Stats(heroPosition_index));
                         strcat(gText, statText_k);
                     }
-                    widgetText_control = static_cast<char*>(BaseAlloc(
-                        strlen(gText) + 1,
-                        RETAIL_FILE,
-                        3598 + TOWN_THIEVES_SOURCE_LINE_HERO_STATS
-                    ));
+                    widgetText_control = static_cast<char*>(H2_ALLOC(strlen(gText) + 1, 3598 + TOWN_THIEVES_SOURCE_LINE_HERO_STATS));
                     strcpy(widgetText_control, gText);
                     textControl_icon = new textWidget(
                         static_cast<i16>(position_current * 0x44 + 0x11c),
@@ -3125,11 +3117,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                 if (informationLevel < TOWN_THIEVES_INFO_PERSONALITY) {
                 } else {
                     strcpy(gText, cPersonality[gpGame->m_players[rank].m_aiDifficulty]);
-                    widgetText_control = static_cast<char*>(BaseAlloc(
-                        strlen(gText) + 1,
-                        RETAIL_FILE,
-                        3598 + TOWN_THIEVES_SOURCE_LINE_PERSONALITY
-                    ));
+                    widgetText_control = static_cast<char*>(H2_ALLOC(strlen(gText) + 1, 3598 + TOWN_THIEVES_SOURCE_LINE_PERSONALITY));
                     strcpy(widgetText_control, gText);
                     textControl_icon = new textWidget(
                         static_cast<i16>(position_current * 0x44 + 0xe3),

@@ -621,7 +621,7 @@ char* GetRemoteData(i8 remove) {
     if (selected >= 0) {
         memcpy(rcvBufOut, rcvBuf[selected], REMOTE_MESSAGE_SIZE);
         if (remove != 0) {
-            BaseFree(rcvBuf[selected], RETAIL_FILE, gGetRemoteDataLineBase + 25);
+            H2_FREE(rcvBuf[selected], gGetRemoteDataLineBase + 25);
             rcvBuf[selected] = 0;
         }
         return rcvBufOut;
@@ -833,7 +833,7 @@ void PollRemote(void) {
                 if (queueIndex >= REMOTE_QUEUE_CAPACITY)
                     continue;
                 rcvBuf[queueIndex] = static_cast<char*>(
-                    BaseAlloc(REMOTE_MESSAGE_SIZE, RETAIL_FILE, gPollRemoteLineBase + 235)
+                    H2_ALLOC(REMOTE_MESSAGE_SIZE, gPollRemoteLineBase + 235)
                 );
                 iInOrder[queueIndex] = iInOrderCtr++;
                 memcpy(rcvBuf[queueIndex], rcvBufIn, REMOTE_MESSAGE_SIZE);

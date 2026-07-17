@@ -984,11 +984,7 @@ i32 SetGraphicsType(i32 graphicsType) {
     y = gConfig.gfx[giCurExe].y;
     width = gConfig.gfx[giCurExe].width;
     height7 = gConfig.gfx[giCurExe].height;
-    screenBuffer = BaseAlloc(
-        WINGRAPH_WIDTH * WINGRAPH_HEIGHT,
-        RETAIL_FILE,
-        gSetGraphicsTypeLineBase + 18
-    );
+    screenBuffer = H2_ALLOC(WINGRAPH_WIDTH * WINGRAPH_HEIGHT, gSetGraphicsTypeLineBase + 18);
     memcpy(screenBuffer, gpWindowManager->m_screen->m_pixels, WINGRAPH_WIDTH * WINGRAPH_HEIGHT);
     if (graphicsType == WINGRAPH_GRAPHICS_WING) {
         gConfig.gfx[giCurExe].fullScreen = 0;
@@ -1003,7 +999,7 @@ i32 SetGraphicsType(i32 graphicsType) {
         gpWindowManager->m_screen->m_pixels = static_cast<u8*>(lpInitWin);
     }
     memcpy(gpWindowManager->m_screen->m_pixels, screenBuffer, WINGRAPH_WIDTH * WINGRAPH_HEIGHT);
-    BaseFree(screenBuffer, RETAIL_FILE, gSetGraphicsTypeLineBase + 39);
+    H2_FREE(screenBuffer, gSetGraphicsTypeLineBase + 39);
     if (fullScreen != 0 && graphicsType == WINGRAPH_GRAPHICS_WING) {
         SetMenuStatus(1);
         ResizeWindow(x, y, width, height7);

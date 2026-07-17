@@ -31,6 +31,8 @@
 #include <SOURCE/PATH.h>
 #include <SOURCE/SPELLS.h>
 #include <SOURCE/X_GLOBAL.h>
+
+#define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\SPELLS.CPP"
 VA(0x004204c0, 0x86)
 i32 combatManager::HasValidSpellTarget(i32 spell) {
     i32 hex;
@@ -2448,11 +2450,7 @@ void combatManager::VaporizeCreature(i32 side, i32 armyIndex) {
     ResetLimitCreature();
     ++m_limitCreatureCount[side][armyIndex];
     gpCombatManager->DrawFrame(1, 1, 1, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
-    gyModify = static_cast<i8*>(BaseAlloc(
-        SPELL_MODIFIER_ROW_COUNT,
-        SPELLS_SOURCE_FILE,
-        vaporizeSourceLineBase + SPELL_VAPORIZE_ALLOC_LINE_OFFSET
-    ));
+    gyModify = static_cast<i8*>(H2_ALLOC(SPELL_MODIFIER_ROW_COUNT, vaporizeSourceLineBase + SPELL_VAPORIZE_ALLOC_LINE_OFFSET));
     memset(gyModify, 0, SPELL_MODIFIER_ROW_COUNT);
     i32 rowCount = giMaxExtentY - giMinExtentY + 1;
     target->m_palette = gyModify;
@@ -2492,11 +2490,7 @@ void combatManager::VaporizeCreature(i32 side, i32 armyIndex) {
     DelayMilli(static_cast<i32l>(gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_VANISH_END_DELAY));
     target->m_palette = 0;
     target->m_drawEnabled = 1;
-    BaseFree(
-        gyModify,
-        SPELLS_SOURCE_FILE,
-        vaporizeSourceLineBase + SPELL_VAPORIZE_FREE_LINE_OFFSET
-    );
+    H2_FREE(gyModify, vaporizeSourceLineBase + SPELL_VAPORIZE_FREE_LINE_OFFSET);
     gyModify = 0;
     gpCombatManager->DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
 }
@@ -2547,16 +2541,8 @@ void combatManager::RippleCreature(i32 side, i32 armyIndex, i32 mode) {
         gpCombatManager->DrawFrame(1, 1, 1, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
 
     i32 extentHeight = giMaxExtentY - giMinExtentY + 1;
-    gyModify = static_cast<i8*>(BaseAlloc(
-        SPELL_MODIFIER_ROW_COUNT,
-        SPELLS_SOURCE_FILE,
-        rippleSourceLineBase + SPELL_RIPPLE_MODIFIER_ALLOC_LINE_OFFSET
-    ));
-    float* wave = static_cast<float*>(BaseAlloc(
-        sizeof(float) * SPELL_MODIFIER_ROW_COUNT,
-        SPELLS_SOURCE_FILE,
-        rippleSourceLineBase + SPELL_RIPPLE_WAVE_ALLOC_LINE_OFFSET
-    ));
+    gyModify = static_cast<i8*>(H2_ALLOC(SPELL_MODIFIER_ROW_COUNT, rippleSourceLineBase + SPELL_RIPPLE_MODIFIER_ALLOC_LINE_OFFSET));
+    float* wave = static_cast<float*>(H2_ALLOC(sizeof(float) * SPELL_MODIFIER_ROW_COUNT, rippleSourceLineBase + SPELL_RIPPLE_WAVE_ALLOC_LINE_OFFSET));
     memset(gyModify, 0, SPELL_MODIFIER_ROW_COUNT);
     i32 row;
     for (row = 0; row < SPELL_MODIFIER_ROW_COUNT; ++row) {
@@ -2628,12 +2614,8 @@ void combatManager::RippleCreature(i32 side, i32 armyIndex, i32 mode) {
     DelayMilli(static_cast<i32l>(gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_VANISH_END_DELAY));
     target->m_palette = 0;
     target->m_drawEnabled = 1;
-    BaseFree(
-        gyModify,
-        SPELLS_SOURCE_FILE,
-        rippleSourceLineBase + SPELL_RIPPLE_MODIFIER_FREE_LINE_OFFSET
-    );
-    BaseFree(wave, SPELLS_SOURCE_FILE, rippleSourceLineBase + SPELL_RIPPLE_WAVE_FREE_LINE_OFFSET);
+    H2_FREE(gyModify, rippleSourceLineBase + SPELL_RIPPLE_MODIFIER_FREE_LINE_OFFSET);
+    H2_FREE(wave, rippleSourceLineBase + SPELL_RIPPLE_WAVE_FREE_LINE_OFFSET);
     gyModify = 0;
     if (mode != SPELL_RIPPLE_MODE_DEATH_RIPPLE)
         gpCombatManager->DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
