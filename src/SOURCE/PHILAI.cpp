@@ -390,7 +390,7 @@ i32 philAI::GoodAdjacent(i32* direction) {
     i32 val;
     i32 bestValue;
     float node;
-    CreatureType nb;
+    i32 nb;
     i32 kn;
     i32 jb;
     i32 idx;
@@ -410,27 +410,27 @@ i32 philAI::GoodAdjacent(i32* direction) {
         if (gpAdvManager->ValidMoveWithEvent(gpCurAIHero, jb)) {
             kn = normalDirTable[jb].x + gpCurAIHero->m_x;
             nb = normalDirTable[jb].y + gpCurAIHero->m_y;
-            if ((gpAdvManager->GetCell(kn, IDX(nb))->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
-                && !(mapExtra[kn + (MAP_WIDTH | 0) * IDX(nb)] & IDX(MAP_EXTRA_ADJACENT_MONSTER))
-                && ((gpAdvManager->GetCell(kn, IDX(nb))->m_triggerType & MAP_TRIGGER_TYPE_MASK)
+            if ((gpAdvManager->GetCell(kn, nb)->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
+                && !(mapExtra[kn + (MAP_WIDTH | 0) * nb] & IDX(MAP_EXTRA_ADJACENT_MONSTER))
+                && ((gpAdvManager->GetCell(kn, nb)->m_triggerType & MAP_TRIGGER_TYPE_MASK)
                     != MAP_OBJECT_MONSTER)
-                && ((gpAdvManager->GetCell(kn, IDX(nb))->m_triggerType & MAP_TRIGGER_TYPE_MASK)
+                && ((gpAdvManager->GetCell(kn, nb)->m_triggerType & MAP_TRIGGER_TYPE_MASK)
                     != MAP_OBJECT_ARTIFACT)) {
-                if (gpAdvManager->GetCell(kn, IDX(nb))->m_triggerType
+                if (gpAdvManager->GetCell(kn, nb)->m_triggerType
                     == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)) {
-                    ra = gpAdvManager->GetCell(kn, IDX(nb))->m_objectMetadata;
+                    ra = gpAdvManager->GetCell(kn, nb)->m_objectMetadata;
                     if (GetCastleSlot(ra)->m_owner == giCurPlayer)
                         if (gpCurAIHero->m_lastTownInteractionTurn == giCurTurn)
                             continue;
                 }
-                if (gpAdvManager->GetCell(kn, IDX(nb))->m_triggerType
+                if (gpAdvManager->GetCell(kn, nb)->m_triggerType
                     == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION)) {
-                    heroId = gpAdvManager->GetCell(kn, IDX(nb))->m_objectMetadata;
+                    heroId = gpAdvManager->GetCell(kn, nb)->m_objectMetadata;
                     if (GetHeroSlot(heroId)->m_owner == giCurPlayer)
                         if (gpCurAIHero->m_lastHeroInteractionTurn == giCurTurn)
                             continue;
                 }
-                val = ValueOfEventAtPosition(kn, IDX(nb), 2, &p);
+                val = ValueOfEventAtPosition(kn, nb, 2, &p);
                 if (p > 80)
                     if (bestValue < val) {
                         bestValue = val;
@@ -748,7 +748,7 @@ i32 philAI::DoAnywhereDDoorTownGate(i32 targetValue) {
 VA(0x004393a9, 0x158)
 i32 philAI::DoDimensionDoor(hero* pHero) {
     i32 node;    // i
-    CreatureType nb;               // y
+    i32 nb;               // y
     i32 kn;      // x
     mapCell* jb; // cell
     i32 idx;     // dist
@@ -760,9 +760,9 @@ i32 philAI::DoDimensionDoor(hero* pHero) {
     nb = pHero->m_y;
     for (node = gpSearchArray->m_pathLength - 1; node >= 1; node--) {
         kn += normalDirTable[static_cast<u8>(gpSearchArray->m_storage.aiPath.directions[node])].x;
-        nb += IDX(normalDirTable)[static_cast<u8>(gpSearchArray->m_storage.aiPath.directions[node])].y;
-        if (abs(kn - pHero->m_x) <= 7 && abs(nb - IDX(pHero->m_y)) <= 7) {
-            jb = gpAdvManager->GetCell(kn, IDX(nb));
+        nb += normalDirTable[static_cast<u8>(gpSearchArray->m_storage.aiPath.directions[node])].y;
+        if (abs(kn - pHero->m_x) <= 7 && abs(nb - pHero->m_y) <= 7) {
+            jb = gpAdvManager->GetCell(kn, nb);
             if (!(jb->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
                 && !(jb->m_flags & IDX(MAP_CELL_OCCUPIED))) {
                 bestX = kn;
@@ -3214,7 +3214,7 @@ i32 philAI::ValueOfTown(town* t) {
 // numerator first -> fdivp (al=0xf). Identical quotient; an /Od operand-eval-order pick.
 VA(0x0043fb8c, 0x180)
 void philAI::TurnCostResource(i32 player) {
-    CreatureType nb;         // i
+    i32 nb;         // i
     playerData* kn; // ptr
     float jb[7];    // per-resource ratio
     float idx;      // average turn cost
@@ -3222,15 +3222,15 @@ void philAI::TurnCostResource(i32 player) {
     i32 cost[7];
     kn = &gpGame->m_players[player];
     total = 0;
-    for (nb = 0; nb < 7; IDX(nb)++) {
-        cost[IDX(nb)] = (i32)(((double)(kn->m_income[IDX(nb)] * 5) * 0.7 + (double)kn->m_resources[IDX(nb)])
-                         * (double)gResourceBaseValue[IDX(nb)]);
-        total += cost[IDX(nb)];
+    for (nb = 0; nb < 7; nb++) {
+        cost[nb] = (i32)(((double)(kn->m_income[nb] * 5) * 0.7 + (double)kn->m_resources[nb])
+                         * (double)gResourceBaseValue[nb]);
+        total += cost[nb];
     }
     idx = (float)(total / 7);
-    for (nb = 0; nb < 7; IDX(nb)++) {
-        jb[IDX(nb)] = (float)cost[IDX(nb)] / idx;
-        gafAITurnCostResource[IDX(nb)] = (float)((jb[IDX(nb)] / 2.0f + 0.5) / gResourceBaseValue[IDX(nb)]);
+    for (nb = 0; nb < 7; nb++) {
+        jb[nb] = (float)cost[nb] / idx;
+        gafAITurnCostResource[nb] = (float)((jb[nb] / 2.0f + 0.5) / gResourceBaseValue[nb]);
     }
 }
 
@@ -4347,7 +4347,7 @@ i32 philAI::ChooseToFightForArtifact(i32 a, i32 b, i32 c) {
     i32 py;   // ProbableOutcomeOfBattle out o4 (-0x1c)
     i32 p;    // out o3 (-0x18)
     i32 node; // out o2 (-0x14)
-    CreatureType nb;   // out o1 (-0x10)
+    i32 nb;   // out o1 (-0x10)
     float kn; // fv (-0xc)
     i32 jb;   // artifact RV (-0x8)
     i32 idx;  // result (-0x4)
