@@ -106,7 +106,7 @@ void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, i32 x, i32 
                             i32 clip, i32 clipX, i32 clipY, i32 clipW, i32 clipH, i32 color,
                             u8 *colorTable, i32 dimGate)
 {
-    u8 *data = reinterpret_cast<u8 *>(srcIcon->m_data);
+    u8 *data = srcIcon->m_data;
     IconEntry *entry = &srcIcon->Entries()[frame];
     i32 entryX = entry->x;
     i32 sourceOffset = entry->srcOffset;

@@ -71,7 +71,7 @@ void IconToBitmapYModify(class icon *srcIcon, class bitmap *dest, i32 x, i32 y, 
 {
     IconEntry *entries = srcIcon->Entries();
     gYMEntry = &entries[frame];
-    gYMSrc = reinterpret_cast<u8 *>(srcIcon->m_data) + gYMEntry->srcOffset;
+    gYMSrc = srcIcon->m_data + gYMEntry->srcOffset;
     gYMX0 = gYMEntry->x + x;
     gYMPitch = dest->m_width;
     gYMY = gYMEntry->y + y;
