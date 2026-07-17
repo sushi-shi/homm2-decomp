@@ -164,7 +164,7 @@ To load it **everywhere** (outside the dev shell too), add it to your plugin
 manager instead — e.g. lazy.nvim, pointing at this in-repo directory:
 
 ```lua
-{ dir = "~/Projects/homm2/homm2-decomp/editor/nvim", ft = { "c", "cpp" } }
+{ dir = "/path/to/homm2-decomp/editor/nvim", ft = { "c", "cpp" } }
 ```
 
 Optional config (defaults shown):

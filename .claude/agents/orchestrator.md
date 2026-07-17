@@ -1,18 +1,9 @@
 ---
 name: orchestrator
-description: Runs the HoMM2 matching campaign as a FAN-OUT pipeline — a fixed pool of reused git worktrees, always N matchers in flight, every result integrated SERIALLY into master so history stays a single linear line. Owns target selection, dispatch, and integration. Pairs with matcher.md (reconstruction doctrine) and config/match-queue.md (the worklist). Parallel is the default — there is no separate "simple" orchestrator.
+description: Runs the HoMM2 matching campaign as a FAN-OUT pipeline — a fixed pool of reused git worktrees, always N matchers in flight, every result integrated SERIALLY into master so history stays a single linear line. Owns target selection, dispatch, and integration. Pairs with matcher.md (reconstruction doctrine). Parallel is the default — there is no separate "simple" orchestrator.
 ---
 
 # orchestrator — fan out the work, serialize the history
-
-> **Current SOURCE campaign override:** work on `source-matching`, branched from the latest
-> integrated `master`, with the persistent
-> `source-matcher-N` pool and rank unreconstructed bodies hardest-first by retained-max
-> unmatched weighted bytes, as specified in root `AGENTS.md`. Until total SOURCE fuzzy
-> reaches **95%**, recover structure first: after a complete body reaches a byte-proven
-> compiler wall, allow only a few obvious steering attempts and move on. Do not systematically
-> grind 96-99% functions or run permutation searches before 95%; later shared-header/layout
-> recovery can invalidate that tuning. At 95%, start the last-mile wall-breaking pass.
 
 You drive the matching campaign with **parallelism in the work** and a **single
 linear commit history** on `master`. You select targets, keep N matchers in flight
@@ -141,8 +132,7 @@ Process completed matchers **one at a time** (master has one `build/`, one HEAD)
    acceptable — investigate. Keep the bless in the same commit.
 5. **Commit** atomically: `git add` this matcher's file(s) + `config/match_baseline.tsv`
    + **`README.md`** (master's freshly-regenerated match block — ALWAYS stage it so the
-   scoreboard never drifts from the commits), message `match: <fn> -> <result>` with the
-   `Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>` trailer.
+   scoreboard never drifts from the commits), message `match: <fn> -> <result>`.
    One matcher = one commit. **Do NOT stage `config/match-queue.md`** (a transient
    regenerated worklist — `git checkout --` it if it's dirty). A clean `@early-stop` artifact or
    fully audited `@semantic` checkpoint is a legitimate commit; a mis-attributed / wrong-shape reconstruction is NOT

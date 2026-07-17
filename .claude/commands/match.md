@@ -46,7 +46,7 @@ In short (full rules in the two agent docs):
    `homm2 status update` (`--accept-regressions` only for trivial cross-fn fuzzy drift) →
    commit those files + `config/match_baseline.tsv` + **`README.md`** (ALWAYS stage the
    regenerated README so the scoreboard never drifts; do NOT stage `config/match-queue.md`)
-   as `match: <fn> -> <result>` with the Co-Authored-By trailer. One matcher = one commit.
+   as `match: <fn> -> <result>`. One matcher = one commit.
    **Refill immediately:** reset the slot to master, pick next, dispatch.
 5. **Stop** when no live non-100% function remains or the user winds down: let in-flight matchers
    finish, integrate, print the ledger (`fn -> result -> commit`) + a regressions summary.

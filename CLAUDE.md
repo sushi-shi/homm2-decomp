@@ -17,8 +17,9 @@ working executable.
   `build/objdiff/base/` contains objects compiled from this source tree. Do not call
   either side "original source"; all source structure remains a reconstruction.
 - Secondary references may help with names and semantics, but retail evidence wins:
-  `/home/sheep/Projects/homm2/fheroes2` and
-  `/home/sheep/Projects/homm2/project-ironfist` are read-only references.
+  local checkouts of [fheroes2](https://github.com/ihhub/fheroes2) and
+  [Project Ironfist](https://github.com/jkoppel/project-ironfist), if present, are
+  read-only references.
 
 See `docs/codeview-contents.md`, `docs/compiler-detection.md`, and
 `docs/candidate-data-topology.md` for the supporting evidence.
