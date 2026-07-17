@@ -2230,7 +2230,7 @@ void InitVars(void)
 
 // @early-stop
 // The 0xe0 frame and all retail stack slots match after hash-derived local
-// renaming. Retail has exactly two extra five-byte continuation jumps at +0x101
+// renaming. Retail has exactly two extra five-byte continuation jumps at +0xfc
 // and +0x60f. Deleting those ranges leaves only four branch-displacement bytes
 // caused by the inserted jumps; every non-jump opcode/operand matches, the size
 // delta is exactly 10, and all 119 relocation tuples align after offset adjustment.
@@ -2424,7 +2424,7 @@ void ClearMapExtra(void)
     DATA(0x005164bc) static short clearMapExtraSourceLineBase =
         KB_SOURCE_LINE_CLEAR_MAP_EXTRA_BASE;
     int i;
-    for (i = 0; i < iMaxMapExtra; i++) {
+    for (i = 0; 0[&i] < iMaxMapExtra; i++) {
         if (ppMapExtra[i])
             BaseFree(ppMapExtra[i], KBFILE,
                      clearMapExtraSourceLineBase +
@@ -2592,10 +2592,11 @@ int WaitForOtherPlayer(void)
 // @semantic
 // Complete 0xb85 body, 0x158 frame/slots, CFG, and 131/131 relocations align.
 // The sole code residual is the printable-key guard: retail emits direct unsigned
-// byte comparisons (`cmp byte; jb/jbe`), while ours zero-extends the low keyCode
-// byte before each signed int comparison, making the sequence eight bytes longer.
-// An unsigned-byte pointer lvalue and byte-cast bounds were byte-neutral; revisit
-// after a genuine keyboard payload low-byte view is recovered in the shared type.
+// byte comparisons (`cmp byte; jb/jbe`), while ours zero-extends the proven
+// keyboard low-byte view before each comparison, making the sequence eight bytes
+// longer. The three cyclicly misassigned control locals were corrected to their
+// retail slots. Pointer lvalues, byte casts, and the byte-neutral keyboard payload
+// union were tried without steering this lowering; revisit on compiler-state change.
 VA(0x0049d4a6, 0xb85)
 void PopNetBox(char *text, int netPlayer)
 {
@@ -2610,17 +2611,17 @@ void PopNetBox(char *text, int netPlayer)
     int inputLength_a;
     char inputText_c[NET_BOX_TEXT_LENGTH];
     int exitForIncomingData_i;
-    int redrawLines_a;
+    int sendText_e;
     tag_message event_a;
     tag_message updateMessage_f;
     int firstLineId_a;
     int delay_h;
     int lineTextLimit_p;
     int done_i;
-    int redrawAdventure;
+    int redrawLines_f;
     int redrawSavedShowIt_a;
     KbRemotePacket *remoteData_g;
-    int sendText_h;
+    int redrawAdventure_i;
     int cursorState;
 
     if (!gbRemoteOn)
@@ -2688,9 +2689,9 @@ void PopNetBox(char *text, int netPlayer)
     done_i = 0;
     updateInput_a = 1;
     cursorState = 0;
-    sendText_h = 0;
-    redrawLines_a = 1;
-    redrawAdventure = 0;
+    sendText_e = 0;
+    redrawLines_f = 1;
+    redrawAdventure_i = 0;
     strcpy(inputText_c, "");
     gpInputManager->SetKeyCodeType(0);
 
@@ -2707,7 +2708,7 @@ void PopNetBox(char *text, int netPlayer)
                         bShowIt = savedShowIt_a;
                         gpAdvManager->ProcessIncomingGroupMapChange(remoteData_g->payload.data);
                         bShowIt = 1;
-                        redrawAdventure = 1;
+                        redrawAdventure_i = 1;
                     }
                     gbLeaveNetBoxAlone = 0;
                     updateInput_a = 1;
@@ -2723,13 +2724,13 @@ void PopNetBox(char *text, int netPlayer)
                             remoteData_g->payload.data);
                     AddNetBoxLine(gText,
                                   gpGame->m_players[NetPosToGamePos(remoteData_g->sender)].m_color);
-                    redrawLines_a = 1;
+                    redrawLines_f = 1;
                     if (messageTime_b != 0)
                         messageTime_b = KBTickCount();
                     break;
                 default:
                     AddNetBoxLine("[ Incoming data, must exit... ]", NET_BOX_DEFAULT_COLOR);
-                    redrawLines_a = 1;
+                    redrawLines_f = 1;
                     exitForIncomingData_i = 1;
                     break;
                 }
@@ -2753,13 +2754,11 @@ void PopNetBox(char *text, int netPlayer)
                 cursorState = 1;
                 break;
             case NET_BOX_KEY_ENTER:
-                sendText_h = 1;
+                sendText_e = 1;
                 break;
             default:
-                if (static_cast<unsigned char>(event_a.payload.keyboard.keyCode) <
-                        NET_BOX_FIRST_PRINTABLE ||
-                    static_cast<unsigned char>(event_a.payload.keyboard.keyCode) >
-                        NET_BOX_LAST_PRINTABLE)
+                if (event_a.payload.keyboard.keyByte < NET_BOX_FIRST_PRINTABLE ||
+                    event_a.payload.keyboard.keyByte > NET_BOX_LAST_PRINTABLE)
                     break;
                 if (inputLength_a < NET_BOX_MAX_INPUT && event_a.payload.keyboard.keyCode != 0) {
                     inputText_c[inputLength_a] = 0;
@@ -2778,8 +2777,8 @@ void PopNetBox(char *text, int netPlayer)
             cursorState = 1 - cursorState;
             updateInput_a = 1;
         }
-        if (sendText_h) {
-            sendText_h = 0;
+        if (sendText_e) {
+            sendText_e = 0;
             inputText_c[inputLength_a] = 0;
             AddNetBoxLine(inputText_c, gpGame->m_players[NetPosToGamePos(giThisNetPos)].m_color);
             result_a = TransmitRemoteData(inputText_c, NET_BOX_PACKET_BUFFER_SIZE,
@@ -2790,11 +2789,11 @@ void PopNetBox(char *text, int netPlayer)
             inputLength_a = 0;
             strcpy(inputText_c, "");
             updateInput_a = 1;
-            redrawLines_a = 1;
+            redrawLines_f = 1;
         }
 
-        if (redrawLines_a) {
-            redrawLines_a = 0;
+        if (redrawLines_f) {
+            redrawLines_f = 0;
             updateMessage_f.type = NET_BOX_UPDATE_MESSAGE;
             updateMessage_f.payload.widget.command = NET_BOX_TEXT_COMMAND;
             updateMessage_f.payload.widget.id = 1;
@@ -2855,7 +2854,7 @@ void PopNetBox(char *text, int netPlayer)
     }
 
     gpInputManager->SetKeyCodeType(1);
-    if (redrawAdventure && gbMoveShown) {
+    if (redrawAdventure_i && gbMoveShown) {
         gbDrawWindowBackground = 0;
         gpWindowManager->RemoveWindow(netWindow_j);
         gbDrawWindowBackground = 1;
@@ -3727,6 +3726,11 @@ void TestDynamicWindow(int p1, int p2)
     delete p;
 }
 
+// @semantic
+// Complete body, 0xc frame/slots, CFG, and all 9 ordered relocations align. At
+// +0xc retail loads pos from -0xc and compares giThisGamePos; ours loads the
+// global and compares pos. Both equality operand orders and 0[&pos] were tried
+// without steering MSVC's TU-state load order. Revisit on compiler-state change.
 VA(0x004a0234, 0x91)
 void HandleRemoteDeadPlayerExit(int pos)
 {
@@ -3876,6 +3880,11 @@ void ReceiveHostReportsPlayerExit(int hostNetPosition, SPlayerExit exitInfo,
                      -1, -1, -1, PLAYER_EXIT_MESSAGE_TIME);
 }
 
+// @semantic
+// Complete body, 0x10 frame/slots, CFG, and all 45 ordered relocations align. At
+// +0x280 retail loads giNumHumanPlayers and compares recipient at -0xc; ours loads
+// recipient and compares the global. Reversed relational spelling was neutral and
+// qualified operands worsened the preceding branch. Revisit on compiler-state change.
 VA(0x004a07e3, 0x361)
 void ReceiveRemotePlayerExit(SPlayerExit exitInfo)
 {
@@ -4022,14 +4031,14 @@ void CheckShingleUpdate(void)
     }
 }
 
-// @match-note
-// Pre-95 structural checkpoint (97.02%): exact 0x120 frame, named slots, switch
-// case semantics/order, and external relocation targets (253/257 sites with no
-// base-only target). The first residual is table placement: base table ranges
-// begin at +0x2b2 and +0xafc, while retail begins at +0x2c6 and +0xb50. Split
-// the sizing and drawing heights, restored the inner panel-Y lifetime, aligned
-// every /Od bucket, and tried both resource-order and retail body-order sizing
-// switches. Revisit at 95% for systematic table/continuation steering.
+// @semantic
+// Complete body, 0x120 frame/slots, CFG, and all 257 ordered relocations align.
+// Corrected the resource-domain branch, 32-bit height temporaries, sizing/drawing
+// lifetimes, resource Y reuse, and screen bounds. The first residual at +0x1f7 is
+// equivalent no-value arithmetic (`sete/dec` versus retail `inc/cmp/adc`), followed
+// by sizing-switch body/table order (+0x2c6 and +0xb50) and spell-type equality
+// lowering. Direct arithmetic, unsigned comparison, width, lifetime, case-order,
+// and condition-polarity variants were exhausted; revisit with bounded AST variants.
 VA(0x004a0d9f, 0x17c6)
 void NormalDialog(char *text, int dialogType, int windowX, int windowY,
                   int firstResourceType, int firstResourceValue,
@@ -4038,8 +4047,9 @@ void NormalDialog(char *text, int dialogType, int windowX, int windowY,
 {
     DATA(0x00516d20) static short normalDialogSourceLineBase =
         KB_SOURCE_LINE_NORMAL_DIALOG_BASE;
-    short panelHeight_p;
-    short labelY_o;
+    // Retail's 0x120 /Od frame retains this otherwise unreferenced local word.
+    int panelHeight_p;
+    int labelY_o;
     widget *borderWidget_o;
     char iconFile_h[NORMAL_DIALOG_FILENAME_LENGTH];
     char *resourceText_e[NORMAL_DIALOG_RESOURCE_COUNT];
@@ -4072,6 +4082,7 @@ void NormalDialog(char *text, int dialogType, int windowX, int windowY,
     int savedSecondResourceValue_j;
     char *orText_f;
     int savedPointerFrame_j;
+    int imageHeight_b;
 
     if (!gbRemoteOn)
         timeout = 0;
@@ -4189,12 +4200,14 @@ void NormalDialog(char *text, int dialogType, int windowX, int windowY,
     windowHeight_k = windowRows_j * NORMAL_DIALOG_WINDOW_ROW_HEIGHT +
                    NORMAL_DIALOG_WINDOW_BASE_HEIGHT;
 
-    if (windowX == -1 || windowX + windowWidth_a > 638)
+    if (windowX == -1 ||
+        windowX + windowWidth_a >= NORMAL_DIALOG_SCREEN_RIGHT)
         windowX = 159;
-    if (windowY == -1 || windowY + windowHeight_k > 478) {
-        windowY = (480 - windowHeight_k) / 2;
-        if (windowY > 28)
-            windowY = 28;
+    if (windowY == -1 ||
+        windowY + windowHeight_k >= NORMAL_DIALOG_SCREEN_BOTTOM) {
+        windowY = (NORMAL_DIALOG_SCREEN_HEIGHT - windowHeight_k) / 2;
+        if (windowY > NORMAL_DIALOG_MAX_TOP)
+            windowY = NORMAL_DIALOG_MAX_TOP;
     }
 
     sprintf(iconFile_h, "evntwin%d.bin", windowRows_j);
@@ -4243,23 +4256,20 @@ void NormalDialog(char *text, int dialogType, int windowX, int windowY,
             NORMAL_DIALOG_TEXT_LENGTH, KBFILE,
             normalDialogSourceLineBase +
                 KB_SOURCE_LINE_NORMAL_DIALOG_FIRST_TEXT_ALLOC_OFFSET));
-        if (resourceType_l[resourceSlot_n] >= NORMAL_DIALOG_RESOURCE_FIRST &&
-            resourceType_l[resourceSlot_n] <= NORMAL_DIALOG_RESOURCE_LAST) {
-            if (resourceValue_l[resourceSlot_n] < 1) {
-                if (resourceValue_l[resourceSlot_n] == 0) {
-                    strcpy(resourceText_e[resourceSlot_n], "");
-                } else if (resourceValue_l[resourceSlot_n] <
-                           -NORMAL_DIALOG_DAILY_RESOURCE_OFFSET) {
-                    sprintf(resourceText_e[resourceSlot_n], "%d",
-                            resourceValue_l[resourceSlot_n] +
-                                NORMAL_DIALOG_DAILY_RESOURCE_OFFSET);
-                } else {
-                    sprintf(resourceText_e[resourceSlot_n], "%d/day",
-                            -resourceValue_l[resourceSlot_n]);
-                }
-            } else {
+        if (resourceType_l[resourceSlot_n] <= NORMAL_DIALOG_RESOURCE_LAST) {
+            if (resourceValue_l[resourceSlot_n] > 0) {
                 sprintf(resourceText_e[resourceSlot_n], "%d",
                         resourceValue_l[resourceSlot_n]);
+            } else if (resourceValue_l[resourceSlot_n] == 0) {
+                strcpy(resourceText_e[resourceSlot_n], "");
+            } else if (resourceValue_l[resourceSlot_n] <
+                       -NORMAL_DIALOG_DAILY_RESOURCE_OFFSET) {
+                sprintf(resourceText_e[resourceSlot_n], "%d",
+                        resourceValue_l[resourceSlot_n] +
+                            NORMAL_DIALOG_DAILY_RESOURCE_OFFSET);
+            } else {
+                sprintf(resourceText_e[resourceSlot_n], "%d/day",
+                        -resourceValue_l[resourceSlot_n]);
             }
             strcpy(iconFile_h, "resource.icn");
             resourceFrame_g = resourceType_l[resourceSlot_n];
@@ -4369,23 +4379,23 @@ void NormalDialog(char *text, int dialogType, int windowX, int windowY,
             break;
         }
 
-        iconHeight_d = sizingIconHeight_l;
+        imageHeight_b = sizingIconHeight_l;
         if (strlen(resourceText_e[resourceSlot_n]))
-            iconHeight_d += 12;
+            sizingIconHeight_l += 12;
 
         if (resourceSlot_n == 0) {
-            if (secondResourceType == NORMAL_DIALOG_NO_RESOURCE)
+            if (resourceType_l[1] == NORMAL_DIALOG_NO_RESOURCE)
                 resourceCenterX_a = (windowWidth_a - 17) / 2 + 17;
             else
                 resourceCenterX_a = 104;
         } else {
             resourceCenterX_a = windowWidth_a - 87;
         }
-        resourceY_l = windowHeight_k - iconHeight_d - 48;
+        resourceY_l = windowHeight_k - sizingIconHeight_l - 48;
         if (dialogType != NORMAL_DIALOG_QUICK_VIEW)
-            resourceY_l = windowHeight_k - iconHeight_d - 87;
+            resourceY_l -= 39;
         if (resourceType_l[0] == NORMAL_DIALOG_SECONDARY_SKILL &&
-            secondResourceType == NORMAL_DIALOG_SECONDARY_SKILL) {
+            resourceType_l[1] == NORMAL_DIALOG_SECONDARY_SKILL) {
             if (resourceSlot_n == 0)
                 resourceCenterX_a -= 4;
             else
@@ -4395,7 +4405,7 @@ void NormalDialog(char *text, int dialogType, int windowX, int windowY,
         iconPanel_j = new iconWidget(
             resourceCenterX_a - resourceImageHeight_g / 2 +
                 (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_SPELL) * 2,
-            resourceY_l, resourceImageHeight_g, sizingIconHeight_l, iconFile_h, resourceFrame_g,
+            resourceY_l, resourceImageHeight_g, imageHeight_b, iconFile_h, resourceFrame_g,
             0, -1, NORMAL_DIALOG_WIDGET_COLOR +
                         (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_SPELL),
             1);
@@ -4473,12 +4483,10 @@ void NormalDialog(char *text, int dialogType, int windowX, int windowY,
             pNormalDialogWindow->AddWidget(iconPanel_j, -1);
         }
 
-        short panelY;
-        panelHeight_p = iconHeight_d;
-        panelY = resourceY_l;
         if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_SECONDARY_SKILL) {
+            labelY_o = 0[&sizingIconHeight_l] + resourceY_l - 72;
             textPanel_h = new textWidget(
-                resourceCenterX_a - 50, panelHeight_p + panelY - 72, 100,
+                resourceCenterX_a - 50, labelY_o, 100,
                 (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_SPELL) * 12 + 12,
                 resourceText_e[resourceSlot_n], "smalfont.fnt", 1,
                 textWidgetId_h++, NORMAL_DIALOG_WIDGET_FLAGS, 1);
@@ -4490,16 +4498,15 @@ void NormalDialog(char *text, int dialogType, int windowX, int windowY,
                 NORMAL_DIALOG_TEXT_LENGTH, KBFILE,
                 normalDialogSourceLineBase +
                     KB_SOURCE_LINE_NORMAL_DIALOG_SECONDARY_TEXT_ALLOC_OFFSET));
-            labelY_o = static_cast<short>(iconHeight_d) +
-                     static_cast<short>(resourceY_l) - 24;
+            labelY_o = 0[&sizingIconHeight_l] + resourceY_l - 24;
             sprintf(resourceText_e[resourceSlot_n], "%s",
                     gSecondarySkillLevels[
                         resourceValue_l[resourceSlot_n] %
                         SECONDARY_SKILL_VALUE_LEVEL_COUNT]);
         } else if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_PRIMARY_SKILL) {
-            labelY_o = panelHeight_p + panelY - 93;
+            labelY_o = 0[&sizingIconHeight_l] + resourceY_l - 93;
         } else {
-            labelY_o = panelHeight_p + panelY - 10;
+            labelY_o = 0[&sizingIconHeight_l] + resourceY_l - 10;
         }
 
         textPanel_h = new textWidget(
@@ -4519,7 +4526,8 @@ void NormalDialog(char *text, int dialogType, int windowX, int windowY,
                     KB_SOURCE_LINE_NORMAL_DIALOG_PRIMARY_BONUS_ALLOC_OFFSET));
             strcpy(bonusText, "+1 ");
             textPanel_h = new textWidget(
-                resourceCenterX_a - 50, iconHeight_d + resourceY_l - 22, 100, 16,
+                resourceCenterX_a - 50,
+                0[&sizingIconHeight_l] + resourceY_l - 22, 100, 16,
                 bonusText, "bigfont.fnt", 1, textWidgetId_h++,
                 NORMAL_DIALOG_WIDGET_FLAGS, 1);
             if (!textPanel_h)
@@ -4529,7 +4537,7 @@ void NormalDialog(char *text, int dialogType, int windowX, int windowY,
 
         borderWidget_o = new border(
             resourceCenterX_a - resourceImageHeight_g / 2, resourceY_l,
-            resourceImageHeight_g, iconHeight_d,
+            resourceImageHeight_g, sizingIconHeight_l,
             resourceSlot_n + NORMAL_DIALOG_RESOURCE_BORDER_FIRST_ID,
             1, 0, 0);
         pNormalDialogWindow->AddWidget(borderWidget_o, -1);
