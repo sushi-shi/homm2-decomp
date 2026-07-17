@@ -829,7 +829,7 @@ void ConnectToDLLs(void) {
         );
     }
     if (lpDirectDrawCreate != 0) {
-        gbDDrawAttached = 1;
+        gbDDrawAttached = true;
     } else {
         gConfig.gfx[giCurExe].fullScreen = 0;
         SetMenuStatus(1);
@@ -1037,8 +1037,8 @@ i32 SetGraphicsType(i32 graphicsType) {
 // the aggregate retail hash differs only because of the proven owner order.
 // Do not add aliases, padding owners, or synthetic storage for these gaps.
 // ---- globals (definitions, RVA order) ----
-DATA(0x004f1288) i32 gbWinGAttached = 1;
-DATA(0x004f128c) i32 gbDDrawAttached = 0;
+DATA(0x004f1288) i32 gbWinGAttached = true;
+DATA(0x004f128c) i32 gbDDrawAttached = false;
 DATA(0x004f1290) i32 giGraphicsType = 1;
 DATA(0x004f1294) i32l Orientation = 1;
 DATA(0x004f1298) struct _PALETTE LogicalPalette = {WINGRAPH_PALETTE_VERSION, WINGRAPH_PALETTE_SIZE};

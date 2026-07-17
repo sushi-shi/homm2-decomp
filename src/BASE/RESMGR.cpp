@@ -27,7 +27,7 @@
 VA(0x004c7fa0, 0xdb)
 resourceManager::resourceManager(void) : baseManager() {
     i32 aggregateIndex;
-    m_active = 0;
+    m_active = false;
     m_resourceListHead = 0;
     m_expunging = 0;
     strcpy(m_lastFileName, "");
@@ -269,7 +269,7 @@ i32 resourceManager::Open(i32 priority) {
         return RESOURCE_MANAGER_ERROR;
     m_messageMask = RESOURCE_MANAGER_MESSAGE_MASK;
     m_priority = priority;
-    m_active = 1;
+    m_active = true;
     strcpy(m_name, "resourceManager");
     m_resourceListHead = 0;
     return RESOURCE_MANAGER_SUCCESS;
@@ -312,7 +312,7 @@ void resourceManager::Close(void) {
         }
     }
     m_numAggregates = 0;
-    m_active = 0;
+    m_active = false;
 }
 
 // @early-stop

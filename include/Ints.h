@@ -26,9 +26,14 @@ typedef unsigned __int64 u64;
 
 // Boolean-valued retail storage. MSVC 4.2 has no `bool`; retail flags are full
 // ints (occasionally bytes). These aliases mark boolean intent without changing
-// the ABI, and boolean fields must not be forced into enum domains.
+// the ABI, and boolean fields must not be forced into enum domains. b32/b8
+// state is written with true/false, defined here for the pre-bool compiler.
 typedef i32 b32;
 typedef u8 b8;
+#ifndef __clang__
+#define true 1
+#define false 0
+#endif
 
 // Production keeps reconstructed semantic domains integer-mangled and ABI-neutral.
 // The opt-in Clang audit sees scoped enums and rejects cross-domain data flow;

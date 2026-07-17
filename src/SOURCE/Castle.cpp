@@ -34,7 +34,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
     i32 slot7;
     i32 row9;
     i32 column8;
-    i32 widgetFrame12;
+    CastleWidgetFrame widgetFrame12;
     i32 terrainIconFrame27;
     i32 raceIconFrame;
     u32l captainBuilt;
@@ -61,7 +61,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
                 && m_town->m_type == FACTION_WARLOCK
                 && ((m_town->m_buildings & TOWN_BUILDING_UPGRADED_DWELLING_6)
                     || (m_town->m_buildings & TOWN_BUILDING_ALTERNATE_UPGRADED_DWELLING_6))) {
-                castleSlotsUse[slot7] = BUILDING_SLOT_DWELLING_LAST;
+                castleSlotsUse[slot7] = IDX(BUILDING_SLOT_DWELLING_LAST);
             } else {
                 castleSlotsUse[slot7] = castleSlotsBase[slot7] + CASTLE_UPGRADE_OFFSET;
             }
@@ -345,13 +345,13 @@ i32 CastleHandler(tag_message& message) {
     i32 result;
     i16 textControl;
     i32 quickFlag;
-    i32 buildingIndex;
+    CastleControl buildingIndex;
     i32 loopIndex;
     i32 cannotRecruitHero;
     i32 hoverMessage;
     i32 heroChoiceIndex;
 
-    textControl = CASTLE_CONTROL_STATUS_TEXT;
+    textControl = IDX(CASTLE_CONTROL_STATUS_TEXT);
     buildingIndex = -1;
     result = 0;
     hoverMessage = 0;
@@ -381,7 +381,7 @@ i32 CastleHandler(tag_message& message) {
                                                         + static_cast<i32>(CASTLE_SLOT_COUNT))
                 buildingIndex = message.payload.widget.id - CASTLE_CONTROL_BUILDING_BUTTON_FIRST;
             if (buildingIndex != -1)
-                buildingIndex = castleSlotsUse[buildingIndex];
+                buildingIndex = castleSlotsUse[IDX(buildingIndex)];
         }
     }
 

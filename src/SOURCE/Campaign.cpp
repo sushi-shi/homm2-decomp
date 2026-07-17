@@ -516,35 +516,35 @@ void game::CampaignInfoUpdate(i32 redraw) {
                 break;
             case CAMPAIGN_CHOICE_ARTIFACT:
                 switch (choice->value) {
-                    case ARTIFACT_MAGE_RING:
+                    case IDX(ARTIFACT_MAGE_RING):
                         strcpy(gText, "Mage's Ring");
                         break;
-                    case ARTIFACT_FIZBIN_OF_MISFORTUNE:
+                    case IDX(ARTIFACT_FIZBIN_OF_MISFORTUNE):
                         strcpy(gText, "Fizbin Medal");
                         break;
-                    case ARTIFACT_THUNDER_MACE:
+                    case IDX(ARTIFACT_THUNDER_MACE):
                         strcpy(gText, "Thunder Mace");
                         break;
-                    case ARTIFACT_ARMORED_GAUNTLETS:
+                    case IDX(ARTIFACT_ARMORED_GAUNTLETS):
                         strcpy(gText, "Gauntlets");
                         break;
-                    case ARTIFACT_DEFENDER_HELM:
+                    case IDX(ARTIFACT_DEFENDER_HELM):
                         strcpy(gText, "Defender Helm");
                         break;
-                    case ARTIFACT_DRAGON_SWORD:
+                    case IDX(ARTIFACT_DRAGON_SWORD):
                         strcpy(gText, "Dragon Sword");
                         break;
-                    case ARTIFACT_POWER_AXE:
+                    case IDX(ARTIFACT_POWER_AXE):
                         strcpy(gText, "Power Axe");
                         break;
-                    case ARTIFACT_DIVINE_BREASTPLATE:
+                    case IDX(ARTIFACT_DIVINE_BREASTPLATE):
                         strcpy(gText, "Breastplate");
                         break;
-                    case ARTIFACT_MINOR_SCROLL:
+                    case IDX(ARTIFACT_MINOR_SCROLL):
                         strcpy(gText, "Minor Scroll");
                         break;
-                    case ARTIFACT_HIDEOUS_MASK:
-                    case ARTIFACT_BLACK_PEARL:
+                    case IDX(ARTIFACT_HIDEOUS_MASK):
+                    case IDX(ARTIFACT_BLACK_PEARL):
                     default:
                         sprintf(gText, "%s", gArtifactNames[choice->value]);
                         break;
@@ -807,11 +807,11 @@ void game::InitCampaignMap(void) {
     }
 
     if (m_campaignScenario + 1 <= CAMPAIGN_EASY_SCENARIO_LIMIT)
-        gpGame->m_difficulty = CAMPAIGN_DIFFICULTY_EASY;
+        gpGame->m_difficulty = IDX(CAMPAIGN_DIFFICULTY_EASY);
     else if (m_campaignScenario + 1 <= CAMPAIGN_NORMAL_SCENARIO_LIMIT)
-        gpGame->m_difficulty = CAMPAIGN_DIFFICULTY_NORMAL;
+        gpGame->m_difficulty = IDX(CAMPAIGN_DIFFICULTY_NORMAL);
     else
-        gpGame->m_difficulty = CAMPAIGN_DIFFICULTY_HARD;
+        gpGame->m_difficulty = IDX(CAMPAIGN_DIFFICULTY_HARD);
     m_playerCount = m_mapHeader.playerCount;
     NewMap(gMapName);
 
@@ -935,17 +935,17 @@ void game::InitCampaignMap(void) {
             armyHero->m_army.m_creatureCounts[heroPositionValue] = 0;
         }
         switch (armyHero->m_cursorType) {
-            case FACTION_BARBARIAN:
+            case IDX(FACTION_BARBARIAN):
                 armyHero->m_army.Add(CREATURE_ORC_CHIEF, CAMPAIGN_BARBARIAN_ORC_CHIEF_COUNT, -1);
                 armyHero->m_army.Add(CREATURE_OGRE, CAMPAIGN_BARBARIAN_OGRE_COUNT, -1);
                 armyHero->m_army.Add(CREATURE_GOBLIN, CAMPAIGN_BARBARIAN_GOBLIN_COUNT, -1);
                 break;
-            case FACTION_WARLOCK:
+            case IDX(FACTION_WARLOCK):
                 armyHero->m_army.Add(CREATURE_CENTAUR, CAMPAIGN_WARLOCK_CENTAUR_COUNT, -1);
                 armyHero->m_army.Add(CREATURE_GARGOYLE, CAMPAIGN_WARLOCK_GARGOYLE_COUNT, -1);
                 armyHero->m_army.Add(CREATURE_GRIFFIN, CAMPAIGN_WARLOCK_GRIFFIN_COUNT, -1);
                 break;
-            case FACTION_NECROMANCER:
+            case IDX(FACTION_NECROMANCER):
                 armyHero->m_army.Add(CREATURE_SKELETON, CAMPAIGN_NECROMANCER_SKELETON_COUNT, -1);
                 armyHero->m_army.Add(CREATURE_ROYAL_MUMMY, CAMPAIGN_NECROMANCER_MUMMY_COUNT, -1);
                 armyHero->m_army.Add(CREATURE_VAMPIRE_LORD, CAMPAIGN_NECROMANCER_VAMPIRE_COUNT, -1);
@@ -973,12 +973,12 @@ void game::InitCampaignMap(void) {
     }
 
     if (m_campaignType == CAMPAIGN_ARCHIBALD && m_campaignScenario + 1 == 6) {
-        gpGame->m_mapHeader.victoryCondition = MAP_VICTORY_DEFEAT_SIDE;
+        gpGame->m_mapHeader.victoryCondition = IDX(MAP_VICTORY_DEFEAT_SIDE);
         gpGame->m_mapHeader.victoryConditionValue = CAMPAIGN_SWITCH_VICTORY_VALUE;
         gpGame->m_mapHeader.allowNormalVictory = 1;
     }
     if (m_campaignType == CAMPAIGN_ROLAND && m_campaignScenario + 1 == 9) {
-        gpGame->m_mapHeader.lossCondition = MAP_LOSS_STANDARD;
+        gpGame->m_mapHeader.lossCondition = IDX(MAP_LOSS_STANDARD);
         gpGame->m_mapHeader.lossConditionValue = 0;
     }
     if (m_campaignType == CAMPAIGN_ROLAND && m_campaignScenario + 1 == 7)

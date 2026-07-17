@@ -683,7 +683,7 @@ public:
     class icon* m_obstacleIcons[8];                     // +0x3232
     i32 m_obstacleCount;                                // +0x3252
     i16 m_eagleEyeSpell[2];                             // +0x3256
-    i32 m_drawbridgeState;                              // +0x325a
+    CombatDrawbridgeState m_drawbridgeState;                              // +0x325a
     i32 m_drawbridgeBackgroundVisible;                  // +0x325e
     u8 m_wallStates[9];                                 // +0x3262
     class bitmap* m_combatBuffer;                       // +0x326b
@@ -735,7 +735,7 @@ public:
     i32 m_selectedHex;                    // +0xf2c3
     i32 m_directionTargetHex;             // +0xf2c7
     i32 m_previousCommand;                // +0xf2cb
-    i32 m_currentCommand;                 // +0xf2cf
+    CombatMessageCommand m_currentCommand;                 // +0xf2cf
     struct SLimitData m_catapultLimits;   // +0xf2d3
     struct SLimitData m_gateLimits;       // +0xf2e3
     struct SLimitData m_upperWallLimits;  // +0xf2f3
@@ -744,7 +744,7 @@ public:
     i32 m_catapultAttackCount[2];         // +0xf31b
     i32 m_catapultAttacksRemaining[2];    // +0xf323
     i32 m_keepAttacksRemaining[2];        // +0xf32b
-    i32 m_inCastleCombat;                 // +0xf333
+    b32 m_inCastleCombat;                 // +0xf333
     i32 m_unknownF337[2];                 // +0xf337 zeroed per side in the ctor, never read
     i32 m_visitingHeroPresent[2];         // +0xf33f
     char _pad_0xf347[0x4];

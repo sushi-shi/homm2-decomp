@@ -293,13 +293,13 @@ void dpEvaluateMessage(u32l size, i32 sender) {
     i32 i;
 
     switch (rcvBufIn[0]) {
-        case NETWORK_PACKET_DATA:
+        case IDX(NETWORK_PACKET_DATA):
             ppDPRcvBuffer[iDPRcvBufferHead] = static_cast<u8*>(H2_ALLOC(size - 1, 363));
             memcpy(ppDPRcvBuffer[iDPRcvBufferHead], rcvBufIn + 1, size - 1);
             piDPRcvBufferSize[iDPRcvBufferHead] = size;
             iDPRcvBufferHead = (iDPRcvBufferHead + 1) % DP_TRANSPORT_BUFFER_COUNT;
             break;
-        case NETWORK_PACKET_GUEST_ARRIVED:
+        case IDX(NETWORK_PACKET_GUEST_ARRIVED):
             if (GameMode == REMOTE_GAME_NETWORK_HOST) {
                 for (i = 1; i < giNumHumanPlayers; i++) {
                     if (giNetPosToDCOPos[i] == sender) {
@@ -319,13 +319,13 @@ void dpEvaluateMessage(u32l size, i32 sender) {
                 }
             }
             break;
-        case NETWORK_PACKET_GUEST_ACCEPTED:
+        case IDX(NETWORK_PACKET_GUEST_ACCEPTED):
             giHostAcceptStatus = 1;
             break;
-        case NETWORK_PACKET_GUEST_REJECTED:
+        case IDX(NETWORK_PACKET_GUEST_REJECTED):
             giHostAcceptStatus = 2;
             break;
-        case NETWORK_PACKET_STARTUP:
+        case IDX(NETWORK_PACKET_STARTUP):
             giNumHumanPlayers = ptr[0];
             giThisNetPos = ptr[1];
             LogInt("DPMSGSTARTUP", giThisNetPos, sender, -999, -999, -999, -999, -999);

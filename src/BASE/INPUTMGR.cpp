@@ -241,7 +241,7 @@ afterMouseCoordinates:
 
 VA(0x004ce1d0, 0x56)
 inputManager::inputManager(void) : baseManager() {
-    m_active = 0;
+    m_active = false;
     m_mouseMessageActive = 0;
     m_requestedPriority = 1;
     field_0x84e = 0;
@@ -263,7 +263,7 @@ i32 inputManager::Open(i32 priority) {
     MakeScanCodeTable();
     m_messageMask = 4;
     m_priority = -1;
-    m_active = 1;
+    m_active = true;
     strcpy(m_name, gInputManagerText.managerName);
     return 0;
 }
@@ -274,7 +274,7 @@ void inputManager::Close(void) {
         m_writeIndex = 0;
         m_readIndex = 0;
         m_requestedPriority = 0;
-        m_active = 0;
+        m_active = false;
     }
 }
 

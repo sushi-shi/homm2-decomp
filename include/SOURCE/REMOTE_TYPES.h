@@ -36,4 +36,10 @@ struct SNetPlayerInfo {
 #pragma pack(pop)
 SIZE(SNetPlayerInfo, 34);
 
+HOMM2_ENUM_BEGIN(RemoteNetworkProtocol)
+    REMOTE_PROTOCOL_NETBIOS = 0,
+    REMOTE_PROTOCOL_DIRECT_PLAY = 1,
+    REMOTE_PROTOCOL_WINSOCK = 2
+HOMM2_ENUM_END(RemoteNetworkProtocol)
+
 #endif // HOMM2_REMOTE_TYPES_H

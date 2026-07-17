@@ -752,7 +752,7 @@ i32 combatManager::EffectSpellCreateCreature(i32 hex, i32 spell) {
         && !SpaceForElementalExists())
         return 0;
 
-    i32 creatureType;
+    CreatureType creatureType;
     switch (spell) {
         case SPELL_SUMMON_EARTH_ELEMENTAL:
             creatureType = CREATURE_EARTH_ELEMENTAL;
@@ -777,7 +777,7 @@ i32 combatManager::EffectSpellCreateCreature(i32 hex, i32 spell) {
             break;
     }
 
-    i32 creatureEffect = gMonsterDatabase[creatureType].fightValue * creatureType;
+    i32 creatureEffect = gMonsterDatabase[IDX(creatureType)].fightValue * creatureType;
     if (spell == SPELL_MIRROR_IMAGE) {
         float mirrorMod;
         if (m_spellPower[m_currentSide] == COMBAT_SPELL_AI_MIRROR_POWER_ONE)
@@ -787,7 +787,7 @@ i32 combatManager::EffectSpellCreateCreature(i32 hex, i32 spell) {
         else
             mirrorMod = COMBAT_SPELL_AI_MIRROR_DEFAULT_MODIFIER;
         creatureEffect = static_cast<i32>(creatureEffect * mirrorMod);
-        if (gMonsterDatabase[creatureType].flags.bytes.abilities & 4)
+        if (gMonsterDatabase[IDX(creatureType)].flags.bytes.abilities & 4)
             creatureEffect =
                 static_cast<i32>(creatureEffect * COMBAT_SPELL_AI_MIRROR_SHOOTER_MODIFIER);
     }
@@ -1160,7 +1160,7 @@ void combatManager::EffectSpellDamage(i32* effect, i32 spell, i32 targetHex) {
     i32l spellDamageWork;
     float workChanceWork;
     i32 newDefense;
-    i32 monsterTotal;
+    CreatureType monsterTotal;
     i32 step;
     i32 disruptingRayValueTotal;
 

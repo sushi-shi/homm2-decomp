@@ -50,7 +50,7 @@ combatManager::combatManager(void) {
     m_catapultFrame[COMBAT_DEFENDER_SIDE] = m_catapultFrame[COMBAT_ATTACKER_SIDE];
     m_unknownF337[COMBAT_ATTACKER_SIDE] = 0;
     m_unknownF337[COMBAT_DEFENDER_SIDE] = m_unknownF337[COMBAT_ATTACKER_SIDE];
-    m_inCastleCombat = 0;
+    m_inCastleCombat = false;
     m_mouseGridHex = -1;
     m_combatWindowOpen = 0;
     strcpy(m_previousCombatMessage, "");
@@ -182,9 +182,9 @@ void combatManager::SetupCombat(
         }
 
         if (defenderTown->m_buildings & TOWN_BUILDING_CASTLE)
-            m_inCastleCombat = 1;
+            m_inCastleCombat = true;
         else
-            m_inCastleCombat = 0;
+            m_inCastleCombat = false;
 
         if (m_inCastleCombat != 0) {
             if (defenderTown->m_buildings & TOWN_BUILDING_MOAT)
@@ -214,12 +214,12 @@ void combatManager::SetupCombat(
                 m_captain.m_army.m_creatureTypes[side] = ARMY_GROUP_EMPTY_SLOT;
             for (side = 0; side < HERO_ARTIFACT_SLOT_COUNT; side++)
                 m_captain.m_artifacts[side] = ARMY_GROUP_EMPTY_SLOT;
-            m_captain.m_artifacts[0] = ARTIFACT_MAGIC_BOOK;
+            m_captain.m_artifacts[0] = IDX(ARTIFACT_MAGIC_BOOK);
             m_combatTowns[COMBAT_DEFENDER_SIDE]->GiveSpells(&m_captain);
             m_captain.m_isCaptain = 1;
         }
     } else {
-        m_inCastleCombat = 0;
+        m_inCastleCombat = false;
         m_combatTowns[COMBAT_DEFENDER_SIDE] = 0;
     }
     m_combatTowns[COMBAT_ATTACKER_SIDE] = 0;
@@ -392,7 +392,7 @@ i32 combatManager::Open(i32 openFlags) {
     ResetMouse();
     m_messageMask = MESSAGE_WIDGET;
     m_priority = openFlags;
-    m_active = 1;
+    m_active = true;
     strcpy(m_name, "combatManager");
     LogStr("Op5");
     return 0;
@@ -455,7 +455,7 @@ void combatManager::Close(void) {
     delete m_combatWindow;
     if (!bMouseWasVis)
         gpMouseManager->HideColorPointer();
-    m_active = 0;
+    m_active = false;
     m_combatWindowOpen = 0;
 }
 
@@ -635,21 +635,21 @@ i32 combatManager::MoreTreesNear(void) {
                 combatCell = gpAdvManager->GetCell(x, y);
                 nearbyTileset = combatCell->m_objectTileset;
                 switch (nearbyTileset) {
-                    case COMBAT_TILESET_SNOW_MOUNTAINS:
-                    case COMBAT_TILESET_SWAMP_MOUNTAINS:
-                    case COMBAT_TILESET_LAVA_MOUNTAINS:
-                    case COMBAT_TILESET_DESERT_MOUNTAINS:
-                    case COMBAT_TILESET_DIRT_MOUNTAINS:
-                    case COMBAT_TILESET_MIXED_MOUNTAINS:
-                    case COMBAT_TILESET_CRACKED_MOUNTAINS:
-                    case COMBAT_TILESET_GRASS_MOUNTAINS:
+                    case IDX(COMBAT_TILESET_SNOW_MOUNTAINS):
+                    case IDX(COMBAT_TILESET_SWAMP_MOUNTAINS):
+                    case IDX(COMBAT_TILESET_LAVA_MOUNTAINS):
+                    case IDX(COMBAT_TILESET_DESERT_MOUNTAINS):
+                    case IDX(COMBAT_TILESET_DIRT_MOUNTAINS):
+                    case IDX(COMBAT_TILESET_MIXED_MOUNTAINS):
+                    case IDX(COMBAT_TILESET_CRACKED_MOUNTAINS):
+                    case IDX(COMBAT_TILESET_GRASS_MOUNTAINS):
                         nearbyTypeTable[radius][nearbyDirection] = 0;
                         break;
-                    case COMBAT_TILESET_JUNGLE_TREES:
-                    case COMBAT_TILESET_EVIL_TREES:
-                    case COMBAT_TILESET_SNOW_TREES:
-                    case COMBAT_TILESET_SUMMER_TREES:
-                    case COMBAT_TILESET_AUTUMN_TREES:
+                    case IDX(COMBAT_TILESET_JUNGLE_TREES):
+                    case IDX(COMBAT_TILESET_EVIL_TREES):
+                    case IDX(COMBAT_TILESET_SNOW_TREES):
+                    case IDX(COMBAT_TILESET_SUMMER_TREES):
+                    case IDX(COMBAT_TILESET_AUTUMN_TREES):
                         nearbyTypeTable[radius][nearbyDirection] = 1;
                         break;
                 }
@@ -1121,12 +1121,12 @@ void combatManager::CatAttack(i32 side) {
     i32 wallCount7 = 0;
     i32 towerCount1 = 0;
     i32 wallIndex17 = -1;
-    i32 towerIndex27 = -1;
+    CombatCastleWallSlot towerIndex27 = -1;
     i32 gateIndex2 = -1;
     i32 keepIndex6 = -1;
-    i32 targetHex4 = -1;
+    CombatCastleHex targetHex4 = -1;
     i32 missShot19 = 0;
-    i32 damageLevel13 = COMBAT_CATAPULT_DAMAGE_NORMAL;
+    CombatCatapultDamage damageLevel13 = COMBAT_CATAPULT_DAMAGE_NORMAL;
     i32 firstRoll7;
     i32 advancedRoll5;
     i32 index28;
@@ -1195,9 +1195,9 @@ void combatManager::CatAttack(i32 side) {
         targetHex4 = iWallToHexCell[wallIndex17];
     }
     if (towerIndex27 != -1) {
-        impactX5 = towerPos[towerIndex27][IDX(COMBAT_COORDINATE_X)];
-        impactY0 = towerPos[towerIndex27][IDX(COMBAT_COORDINATE_Y)];
-        targetHex4 = iTowerToHexCell[towerIndex27];
+        impactX5 = towerPos[IDX(towerIndex27)][IDX(COMBAT_COORDINATE_X)];
+        impactY0 = towerPos[IDX(towerIndex27)][IDX(COMBAT_COORDINATE_Y)];
+        targetHex4 = iTowerToHexCell[IDX(towerIndex27)];
     }
     if (gateIndex2 != -1) {
         impactX5 = doorPos[0][IDX(COMBAT_COORDINATE_X)];
@@ -1443,11 +1443,11 @@ void combatManager::CatAttack(i32 side) {
                            == COMBAT_WALL_STATE_SECTION_DESTROYED)
                     m_hexCells[iWallToHexCell[wallIndex17]].m_blocked = 0;
             } else if (towerIndex27 != -1) {
-                m_wallStates[towerIndex27] = COMBAT_WALL_STATE_DESTROYED;
+                m_wallStates[IDX(towerIndex27)] = IDX(COMBAT_WALL_STATE_DESTROYED);
             } else if (gateIndex2 != -1) {
                 m_drawbridgeState = COMBAT_CASTLE_GATE_HIDDEN;
             } else if (keepIndex6 != -1) {
-                m_wallStates[IDX(COMBAT_WALL_SLOT_KEEP)] = COMBAT_WALL_STATE_KEEP_DESTROYED;
+                m_wallStates[IDX(COMBAT_WALL_SLOT_KEEP)] = IDX(COMBAT_WALL_STATE_KEEP_DESTROYED);
             }
         }
     }
@@ -1486,7 +1486,7 @@ void combatManager::KeepAttack(i32 tower) {
 
     LogStr("KA1");
 
-    i32 bestPriority0 = -1;
+    CombatKeepTargetPriority bestPriority0 = -1;
     i32 bestValue10 = 0;
     i32 bestArmyIndex5 = -1;
     i32 armyIndex3;
@@ -1495,7 +1495,7 @@ void combatManager::KeepAttack(i32 tower) {
     for (armyIndex3 = 0; armyIndex3 < COMBAT_ARMY_CAPACITY; armyIndex3++) {
         if (m_armies[COMBAT_ATTACKER_SIDE][armyIndex3].IsAlive()) {
             target0 = &m_armies[COMBAT_ATTACKER_SIDE][armyIndex3];
-            i32 priority;
+            CombatKeepTargetPriority priority;
             if (target0->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BLIND)]
                 || target0->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PARALYZE)]
                 || target0->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PETRIFIED)]
@@ -1698,7 +1698,7 @@ void combatManager::SetupAndLoadObstacles(void) {
 
     m_debugFormation = 0;
     if (m_inCastleCombat) {
-        m_wallStates[IDX(COMBAT_WALL_SLOT_KEEP)] = COMBAT_WALL_STATE_KEEP_STANDING;
+        m_wallStates[IDX(COMBAT_WALL_SLOT_KEEP)] = IDX(COMBAT_WALL_STATE_KEEP_STANDING);
         for (cellIndex1 = 0; cellIndex1 < COMBAT_CASTLE_STRUCTURE_COUNT; cellIndex1++) {
             m_wallStates[cellIndex1 + COMBAT_WALL_SLOT_SECTION_FIRST] =
                 COMBAT_WALL_STATE_KEEP_STANDING;
@@ -1708,12 +1708,12 @@ void combatManager::SetupAndLoadObstacles(void) {
                 m_wallStates[cellIndex1 + COMBAT_WALL_SLOT_SECTION_FIRST] =
                     COMBAT_WALL_STATE_SECTION_DAMAGE_FIRST;
             }
-            m_wallStates[cellIndex1] = COMBAT_WALL_STATE_KEEP_STANDING;
+            m_wallStates[cellIndex1] = IDX(COMBAT_WALL_STATE_KEEP_STANDING);
         }
         if (m_combatTowns[COMBAT_DEFENDER_SIDE]->m_buildings & TOWN_BUILDING_LEFT_TURRET)
-            m_wallStates[IDX(COMBAT_WALL_SLOT_TOP_TOWER)] = COMBAT_WALL_STATE_TOWER_STANDING;
+            m_wallStates[IDX(COMBAT_WALL_SLOT_TOP_TOWER)] = IDX(COMBAT_WALL_STATE_TOWER_STANDING);
         if (m_combatTowns[COMBAT_DEFENDER_SIDE]->m_buildings & TOWN_BUILDING_RIGHT_TURRET)
-            m_wallStates[IDX(COMBAT_WALL_SLOT_BOTTOM_TOWER)] = COMBAT_WALL_STATE_TOWER_STANDING;
+            m_wallStates[IDX(COMBAT_WALL_SLOT_BOTTOM_TOWER)] = IDX(COMBAT_WALL_STATE_TOWER_STANDING);
 
         m_hexCells[IDX(COMBAT_CASTLE_HEX_TOP_TOWER)].m_blocked = 1;
         m_hexCells[IDX(COMBAT_CASTLE_HEX_TOP_WALL)].m_blocked = 1;

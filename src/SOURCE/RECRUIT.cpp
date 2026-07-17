@@ -146,7 +146,7 @@ i32 recruitUnit::Open(i32 priority) {
     KBChangeMenu(hmnuDflt);
     m_messageMask = RECRUIT_MANAGER_MASK;
     m_priority = priority;
-    m_active = 1;
+    m_active = true;
     strcpy(m_name, "recruitManager");
     return 0;
 }
@@ -179,7 +179,7 @@ void recruitUnit::Close(void) {
         gpTownManager->ResetStrips();
         gpTownManager->m_bankBox->Update(1);
     }
-    m_active = 0;
+    m_active = false;
     KBChangeMenu(hmnuRecruitSave);
 }
 

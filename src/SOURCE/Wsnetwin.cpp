@@ -362,14 +362,14 @@ void wsEvaluateMessage(u32l size, i32 sender) {
     i32 player;
 
     switch (rcvBufIn[0]) {
-        case NETWORK_PACKET_DATA:
+        case IDX(NETWORK_PACKET_DATA):
             ppDPRcvBuffer[iDPRcvBufferHead] =
                 static_cast<u8*>(H2_ALLOC(size - 1, 423));
             memcpy(ppDPRcvBuffer[iDPRcvBufferHead], rcvBufIn + 1, size - 1);
             piDPRcvBufferSize[iDPRcvBufferHead] = size;
             iDPRcvBufferHead = (iDPRcvBufferHead + 1) % WS_TRANSPORT_BUFFER_COUNT;
             break;
-        case NETWORK_PACKET_GUEST_ARRIVED:
+        case IDX(NETWORK_PACKET_GUEST_ARRIVED):
             if (GameMode == REMOTE_GAME_NETWORK_HOST) {
                 if (gbRemoteGameOpen != 0) {
                     for (player = 1; player < giNumHumanPlayers; player++) {
@@ -403,14 +403,14 @@ void wsEvaluateMessage(u32l size, i32 sender) {
                 }
             }
             break;
-        case NETWORK_PACKET_STARTUP:
+        case IDX(NETWORK_PACKET_STARTUP):
             giNumHumanPlayers = message[0];
             giThisNetPos = message[1];
             LogInt("WSMSGSTARTUP", giThisNetPos, sender, -999, -999, -999, -999, -999);
             memcpy(giNetPosToDCOPos, message + 2, sizeof(giNetPosToDCOPos));
             bStartUpInfoReceived = 1;
             break;
-        case NETWORK_PACKET_GUEST_REJECTED:
+        case IDX(NETWORK_PACKET_GUEST_REJECTED):
             sprintf(
                 cWSTextBuffer,
                 "The Host already has a game in progress and is not accepting new players."
@@ -418,7 +418,7 @@ void wsEvaluateMessage(u32l size, i32 sender) {
             NormalDialog(cWSTextBuffer, 1, -1, -1, -1, 0, -1, 0, -1, 0);
             ShutDown(0);
             break;
-        case NETWORK_PACKET_GUEST_ACCEPTED:
+        case IDX(NETWORK_PACKET_GUEST_ACCEPTED):
             sprintf(cWSTextBuffer, "Waiting for other remote player to set up game.");
             windowMessage.type = MESSAGE_WIDGET;
             windowMessage.payload.widget.command = WIDGET_COMMAND_SET_TEXT;

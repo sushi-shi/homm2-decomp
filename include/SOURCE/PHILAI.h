@@ -16,14 +16,14 @@ struct BHC {
     i32 num;     // 0x0c
 };
 
-HOMM2_ENUM_BEGIN(AIResourceValue)
+HOMM2_ENUM_VALUES_BEGIN(AIResourceValue)
     AI_RV_UNSET = -32001,
     AI_NEARBY_RADIUS = 10,
     AI_HERO_COUNT = 54,
     AI_MAP_SIZE_SMALL = 36,
     AI_MAP_SIZE_LARGE = 108,
     AI_MAP_SIZE_XLARGE = 144
-HOMM2_ENUM_END(AIResourceValue)
+HOMM2_ENUM_VALUES_END(AIResourceValue)
 
 HOMM2_ENUM_BEGIN(AIArtifactEventMode)
     AI_ARTIFACT_EVENT_MODE_MASK = 0xf,
