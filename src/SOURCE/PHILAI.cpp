@@ -615,7 +615,7 @@ void philAI::CheckBerserk(void) {
 }
 
 VA(0x00438f3f, 0x71)
-void philAI::DimensionDoorTo(i32 x, CreatureType y) {
+void philAI::DimensionDoorTo(i32 x, i32 y) {
     gpAdvManager->TeleportTo(gpCurAIHero, x, IDX(y), 0, 0);
     if (gpCurAIHero->m_remainingMobility < AI_MINIMUM_TURN_MOBILITY)
         gpCurAIHero->m_remainingMobility = 0;
@@ -5806,7 +5806,7 @@ VA(0x00445dde, 0xf5)
 i32 philAI::EvaluateRecruitSite(mapCell* cell) {
     i32 val;  // value (returned)
     i32 node; // color
-    CreatureType nb;   // monster type
+    i32 nb;   // monster type
     i32 kn;   // out param
     i32 jb;   // unused
     i32 idx;  // out param
@@ -5834,7 +5834,7 @@ i32 philAI::EvaluateRecruitSite(mapCell* cell) {
             nb = CREATURE_WATER_ELEMENTAL;
             break;
     }
-    EvaluateOneTimeCreaturePurchase(IDX(nb), lvl, 0, idx, val, kn);
+    EvaluateOneTimeCreaturePurchase(nb, lvl, 0, idx, val, kn);
     gbReduceByReload = false;
     return val;
 }
