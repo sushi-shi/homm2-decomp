@@ -62,7 +62,7 @@ public:
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (derived: base baseManager = 0x36 bytes at 0x00 via ': public baseManager'; own fields below)
     struct _DIG_DRIVER *m_digitalDriver;  // +0x36
-    i32    field_0x3a;  // +0x3a
+    i32    field_0x3a;  // +0x3a  constructor-initialized only; no retail reader
     i32    m_ready;  // +0x3e
     char _pad_0x42[0xe];
     FILE *m_midiFile;  // +0x50
@@ -77,9 +77,9 @@ public:
     char _pad_0x164[0x8];             // 0x164..0x16c
     u32l m_channelSampleSizes[14]; // 0x16c  sample byte length per channel
     char _pad_0x1a4[0x3c8];           // 0x1a4..0x56c
-    i32    field_0x56c;  // +0x56c
+    i32    field_0x56c;  // +0x56c  constructor-initialized only; no retail reader
     char _pad_0x570[0x4];
-    i32    field_0x574;  // +0x574
+    i32    field_0x574;  // +0x574  constructor-initialized only; no retail reader
     char   m_currentTrack;  // +0x578
     char   m_pollRequested;  // +0x579
     char   m_pollDue;  // +0x57a

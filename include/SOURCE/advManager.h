@@ -108,7 +108,7 @@ public:
     i32    m_forceCompleteDraw;  // +0x2ae
     i32    m_lastQuickViewX;  // +0x2b2
     i32    m_lastQuickViewY;  // +0x2b6
-    i32    m_field_0x2ba;  // +0x2ba
+    i32    m_mineGuardianFacingLeft;  // +0x2ba  set when the hero attacks a mine guardian from its left; picks the mirrored guardian frame
     i32    m_activeSoundMask;  // +0x2be
     adventureSoundCell m_activeSounds[4];  // +0x2c2
     class sample *m_loopingSamples[28];  // +0x2e2
