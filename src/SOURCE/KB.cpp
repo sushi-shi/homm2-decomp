@@ -1454,7 +1454,7 @@ i32 CanBuy(town* t, i32 type) {
 }
 
 VA(0x00499dbb, 0xc6)
-i32 GetBuildingBaseResourceValue(i32 race, i32 building, i32 level) {
+i32 GetBuildingBaseResourceValue(FactionType race, BuildingSlotType building, i32 level) {
     if (race == FACTION_NECROMANCER && building == BUILDING_SLOT_UPGRADE_CASTLE)
         return 1000;
     if (building < BUILDING_SLOT_DWELLING_FIRST || building > BUILDING_SLOT_DWELLING_LAST) {
@@ -1463,11 +1463,11 @@ i32 GetBuildingBaseResourceValue(i32 race, i32 building, i32 level) {
         else if (building == BUILDING_SLOT_MAGE_GUILD)
             return gMageBaseResourceValues[level];
         else if (building == BUILDING_SLOT_SPECIAL)
-            return gSpecialBuildingBaseResourceValues[race];
+            return gSpecialBuildingBaseResourceValues[IDX(race)];
         else
-            return gNeutralBaseResourceValues[building];
+            return gNeutralBaseResourceValues[IDX(building)];
     } else {
-        return gDwellingBaseResourceValues[race][building - BUILDING_SLOT_DWELLING_FIRST];
+        return gDwellingBaseResourceValues[IDX(race)][building - BUILDING_SLOT_DWELLING_FIRST];
     }
 }
 
