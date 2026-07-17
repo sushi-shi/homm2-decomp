@@ -877,7 +877,7 @@ public:
     void SetupSmallView(void);
     void ViewBallista(i32);
     i32 DoSpellAI(i32, i32);
-    void DetermineEffectOfSpell(i32, i32*, i32*);
+    void DetermineEffectOfSpell(SpellType, i32*, i32*);
     i32 EffectSpellCreateCreature(i32, i32);
     i32 RawEffectSpellInfluence(class army*, i32);
     void ClearEffects(void);

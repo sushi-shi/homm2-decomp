@@ -2697,7 +2697,7 @@ void game::ViewArmy(
             if (gDwellingType[static_cast<i8>(castle->m_type)][loopIndex0 - 19] == monsterType
                 && (castle->m_buildings & (1 << (loopIndex0 + 5)))) {
                 gbAllowUpgrade = true;
-                iViewArmyUpgradeToType = monsterType + 1;
+                iViewArmyUpgradeToType = static_cast<CreatureType>(IDX(monsterType) + 1);
             }
         }
         if ((monsterType == 35 || monsterType == 36)
@@ -6869,7 +6869,7 @@ DATA(0x00528458) b32 gbUpgradeArmy;
 DATA(0x00528460) i16 RandMineQty[8];
 DATA(0x00528470) char gcCurMapName[16];
 DATA(0x00528480) i8* gbNGDifficulty;
-DATA(0x00528488) i32 iViewArmyUpgradeToType;
+DATA(0x00528488) CreatureType iViewArmyUpgradeToType;
 DATA(0x0052848c) i32 viewArmyBaseX;
 DATA(0x00528490) i32 viewArmyBaseY;
 DATA(0x00528498) i8* gbNGColor;

@@ -467,7 +467,7 @@ extern class hero* viewSpellsHero;
 extern b32 gbUpgradeArmy;
 extern i16 RandMineQty[8];
 extern i8* gbNGDifficulty;
-extern i32 iViewArmyUpgradeToType;
+extern CreatureType iViewArmyUpgradeToType;
 extern i32 viewArmyBaseX;
 extern i32 viewArmyBaseY;
 extern i8* gbNGColor;

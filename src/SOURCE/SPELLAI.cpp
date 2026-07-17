@@ -51,7 +51,7 @@ i32 combatManager::DoSpellAI(i32 side, i32 restricted) {
                 && spellIndex != IDX(SPELL_COLD_RAY) && spellIndex != IDX(SPELL_COLD_RING)
                 && spellIndex != IDX(SPELL_DEATH_RIPPLE) && spellIndex != IDX(SPELL_DEATH_WAVE))
                 continue;
-            DetermineEffectOfSpell(spellIndex, &effectScore, &candidateHex);
+            DetermineEffectOfSpell(SpellType(spellIndex), &effectScore, &candidateHex);
 
             manaRatioResult =
                 m_heroes[side]->m_spellPoints / GetManaCost(SpellType(spellIndex), m_heroes[side]);
@@ -86,7 +86,7 @@ i32 combatManager::DoSpellAI(i32 side, i32 restricted) {
 // thereafter. Revisit slot naming and the local-table residual in the
 // byte-last-mile phase.
 VA(0x00486a39, 0x1155)
-void combatManager::DetermineEffectOfSpell(i32 spell, i32* bestEffect, i32* bestHex) {
+void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32* bestHex) {
     i32 doneResult;
     i32 fullQuantityFlag;
     i32 hexIndex;
@@ -113,72 +113,72 @@ void combatManager::DetermineEffectOfSpell(i32 spell, i32* bestEffect, i32* best
     *bestEffect = 0;
 
     switch (spell) {
-        case IDX(SPELL_MASS_CURE):
-        case IDX(SPELL_MASS_DISPEL):
-        case IDX(SPELL_ARMAGEDDON):
-        case IDX(SPELL_ELEMENTAL_STORM):
-        case IDX(SPELL_DEATH_RIPPLE):
-        case IDX(SPELL_DEATH_WAVE):
-        case IDX(SPELL_HOLY_WORD):
-        case IDX(SPELL_HOLY_SHOUT):
-        case IDX(SPELL_SUMMON_EARTH_ELEMENTAL):
-        case IDX(SPELL_SUMMON_AIR_ELEMENTAL):
-        case IDX(SPELL_SUMMON_FIRE_ELEMENTAL):
-        case IDX(SPELL_SUMMON_WATER_ELEMENTAL):
-        case IDX(SPELL_EARTHQUAKE):
+        case SPELL_MASS_CURE:
+        case SPELL_MASS_DISPEL:
+        case SPELL_ARMAGEDDON:
+        case SPELL_ELEMENTAL_STORM:
+        case SPELL_DEATH_RIPPLE:
+        case SPELL_DEATH_WAVE:
+        case SPELL_HOLY_WORD:
+        case SPELL_HOLY_SHOUT:
+        case SPELL_SUMMON_EARTH_ELEMENTAL:
+        case SPELL_SUMMON_AIR_ELEMENTAL:
+        case SPELL_SUMMON_FIRE_ELEMENTAL:
+        case SPELL_SUMMON_WATER_ELEMENTAL:
+        case SPELL_EARTHQUAKE:
             targetModeBySide[0] = COMBAT_SPELL_AI_GLOBAL;
             break;
-        case IDX(SPELL_FIREBALL):
-        case IDX(SPELL_FIREBLAST):
-        case IDX(SPELL_METEOR_SHOWER):
-        case IDX(SPELL_COLD_RING):
+        case SPELL_FIREBALL:
+        case SPELL_FIREBLAST:
+        case SPELL_METEOR_SHOWER:
+        case SPELL_COLD_RING:
             targetModeBySide[0] = COMBAT_SPELL_AI_AREA;
             break;
-        case IDX(SPELL_MASS_HASTE):
-        case IDX(SPELL_MASS_BLESS):
-        case IDX(SPELL_MASS_SHIELD):
+        case SPELL_MASS_HASTE:
+        case SPELL_MASS_BLESS:
+        case SPELL_MASS_SHIELD:
             targetModeBySide[0] = COMBAT_SPELL_AI_SUM_FRIENDLY;
             side = m_currentSide;
             break;
-        case IDX(SPELL_MASS_SLOW):
-        case IDX(SPELL_MASS_CURSE):
+        case SPELL_MASS_SLOW:
+        case SPELL_MASS_CURSE:
             targetModeBySide[0] = COMBAT_SPELL_AI_SUM_ENEMY;
             side = 1 - m_currentSide;
             break;
-        case IDX(SPELL_DISPEL):
+        case SPELL_DISPEL:
             targetModeBySide[0] = COMBAT_SPELL_AI_ANY_ARMY;
             side = COMBAT_SPELL_AI_ANY_SIDE;
             break;
-        case IDX(SPELL_TELEPORT):
-        case IDX(SPELL_CURE):
-        case IDX(SPELL_HASTE):
-        case IDX(SPELL_BLESS):
-        case IDX(SPELL_STONE_SKIN):
-        case IDX(SPELL_STEEL_SKIN):
-        case IDX(SPELL_ANTI_MAGIC):
-        case IDX(SPELL_DRAGON_SLAYER):
-        case IDX(SPELL_BLOOD_LUST):
-        case IDX(SPELL_MIRROR_IMAGE):
-        case IDX(SPELL_SHIELD):
+        case SPELL_TELEPORT:
+        case SPELL_CURE:
+        case SPELL_HASTE:
+        case SPELL_BLESS:
+        case SPELL_STONE_SKIN:
+        case SPELL_STEEL_SKIN:
+        case SPELL_ANTI_MAGIC:
+        case SPELL_DRAGON_SLAYER:
+        case SPELL_BLOOD_LUST:
+        case SPELL_MIRROR_IMAGE:
+        case SPELL_SHIELD:
             targetModeBySide[0] = COMBAT_SPELL_AI_FRIENDLY;
             side = m_currentSide;
             break;
-        case IDX(SPELL_RESURRECT):
-        case IDX(SPELL_TRUE_RESURRECT):
-        case IDX(SPELL_ANIMATE_DEAD):
+        case SPELL_RESURRECT:
+        case SPELL_TRUE_RESURRECT:
+        case SPELL_ANIMATE_DEAD:
             targetModeBySide[0] = COMBAT_SPELL_AI_RESURRECT;
             side = m_currentSide;
             break;
-        case IDX(SPELL_LIGHTNING_BOLT):
-        case IDX(SPELL_CHAIN_LIGHTNING):
-        case IDX(SPELL_SLOW):
-        case IDX(SPELL_BLIND):
-        case IDX(SPELL_CURSE):
-        case IDX(SPELL_MAGIC_ARROW):
-        case IDX(SPELL_BERSERKER):
-        case IDX(SPELL_PARALYZE):
-        case IDX(SPELL_HYPNOTIZE):
-        case IDX(SPELL_DISRUPTING_RAY):
+        case SPELL_LIGHTNING_BOLT:
+        case SPELL_CHAIN_LIGHTNING:
+        case SPELL_SLOW:
+        case SPELL_BLIND:
+        case SPELL_CURSE:
+        case SPELL_MAGIC_ARROW:
+        case SPELL_BERSERKER:
+        case SPELL_PARALYZE:
+        case SPELL_HYPNOTIZE:
+        case SPELL_DISRUPTING_RAY:
             targetModeBySide[0] = COMBAT_SPELL_AI_ENEMY;
             side = 1 - m_currentSide;
             break;
@@ -188,7 +188,7 @@ void combatManager::DetermineEffectOfSpell(i32 spell, i32* bestEffect, i32* best
     }
 
     if (targetModeBySide[0] == COMBAT_SPELL_AI_RESURRECT)
-        doneResult = FirstResurrectable(COMBAT_SPELL_AI_FIRST_HEX, &hexIndex, spell);
+        doneResult = FirstResurrectable(COMBAT_SPELL_AI_FIRST_HEX, &hexIndex, IDX(spell));
     if (targetModeBySide[0] == COMBAT_SPELL_AI_FRIENDLY
         || targetModeBySide[0] == COMBAT_SPELL_AI_ENEMY
         || targetModeBySide[0] == COMBAT_SPELL_AI_SUM_ENEMY
@@ -231,57 +231,57 @@ void combatManager::DetermineEffectOfSpell(i32 spell, i32* bestEffect, i32* best
         }
 
         switch (spell) {
-            case IDX(SPELL_CURE):
+            case SPELL_CURE:
                 EffectSpellCure(&effect, m_currentSide, hexIndex, 1);
                 break;
-            case IDX(SPELL_MASS_CURE):
+            case SPELL_MASS_CURE:
                 EffectSpellCure(&effect, m_currentSide, -1, 1);
                 break;
-            case IDX(SPELL_DISPEL):
+            case SPELL_DISPEL:
                 EffectSpellCure(&effect, targetCreature->m_side, targetCreature->m_index, 0);
                 break;
-            case IDX(SPELL_MASS_DISPEL):
+            case SPELL_MASS_DISPEL:
                 EffectSpellCure(&effect, COMBAT_SPELL_AI_ANY_SIDE, -1, 0);
                 break;
-            case IDX(SPELL_RESURRECT):
-            case IDX(SPELL_TRUE_RESURRECT):
-            case IDX(SPELL_ANIMATE_DEAD):
+            case SPELL_RESURRECT:
+            case SPELL_TRUE_RESURRECT:
+            case SPELL_ANIMATE_DEAD:
                 if (hasMindEffect) {
                 } else {
-                    EffectSpellResurrect(&effect, hexIndex, spell);
+                    EffectSpellResurrect(&effect, hexIndex, IDX(spell));
                 }
                 break;
-            case IDX(SPELL_MIRROR_IMAGE):
-            case IDX(SPELL_SUMMON_EARTH_ELEMENTAL):
-            case IDX(SPELL_SUMMON_AIR_ELEMENTAL):
-            case IDX(SPELL_SUMMON_FIRE_ELEMENTAL):
-            case IDX(SPELL_SUMMON_WATER_ELEMENTAL):
-                effect = EffectSpellCreateCreature(hexIndex, spell);
+            case SPELL_MIRROR_IMAGE:
+            case SPELL_SUMMON_EARTH_ELEMENTAL:
+            case SPELL_SUMMON_AIR_ELEMENTAL:
+            case SPELL_SUMMON_FIRE_ELEMENTAL:
+            case SPELL_SUMMON_WATER_ELEMENTAL:
+                effect = EffectSpellCreateCreature(hexIndex, IDX(spell));
                 break;
-            case IDX(SPELL_FIREBALL):
-            case IDX(SPELL_FIREBLAST):
-            case IDX(SPELL_LIGHTNING_BOLT):
-            case IDX(SPELL_CHAIN_LIGHTNING):
-            case IDX(SPELL_HOLY_WORD):
-            case IDX(SPELL_HOLY_SHOUT):
-            case IDX(SPELL_MAGIC_ARROW):
-            case IDX(SPELL_ARMAGEDDON):
-            case IDX(SPELL_ELEMENTAL_STORM):
-            case IDX(SPELL_METEOR_SHOWER):
-            case IDX(SPELL_COLD_RAY):
-            case IDX(SPELL_COLD_RING):
-            case IDX(SPELL_DISRUPTING_RAY):
-            case IDX(SPELL_DEATH_RIPPLE):
-            case IDX(SPELL_DEATH_WAVE):
+            case SPELL_FIREBALL:
+            case SPELL_FIREBLAST:
+            case SPELL_LIGHTNING_BOLT:
+            case SPELL_CHAIN_LIGHTNING:
+            case SPELL_HOLY_WORD:
+            case SPELL_HOLY_SHOUT:
+            case SPELL_MAGIC_ARROW:
+            case SPELL_ARMAGEDDON:
+            case SPELL_ELEMENTAL_STORM:
+            case SPELL_METEOR_SHOWER:
+            case SPELL_COLD_RAY:
+            case SPELL_COLD_RING:
+            case SPELL_DISRUPTING_RAY:
+            case SPELL_DEATH_RIPPLE:
+            case SPELL_DEATH_WAVE:
                 if (hasMindEffect) {
                 } else {
-                    EffectSpellDamage(&effect, spell, hexIndex);
+                    EffectSpellDamage(&effect, IDX(spell), hexIndex);
                     if (hasDamageReductionResult)
                         effect = static_cast<i32>(effect * COMBAT_SPELL_AI_REDUCED_EFFECT_MODIFIER);
                 }
                 break;
-            case IDX(SPELL_HASTE):
-            case IDX(SPELL_MASS_HASTE):
+            case SPELL_HASTE:
+            case SPELL_MASS_HASTE:
                 if (hasDamageReductionResult) {
                 } else {
                     if (hasMindEffect) {
@@ -314,7 +314,7 @@ void combatManager::DetermineEffectOfSpell(i32 spell, i32* bestEffect, i32* best
                     }
                 }
                 break;
-            case IDX(SPELL_BERSERKER):
+            case SPELL_BERSERKER:
                 if (hasDamageReductionResult) {
                 } else {
                     if (hasMindEffect) {
@@ -351,7 +351,7 @@ void combatManager::DetermineEffectOfSpell(i32 spell, i32* bestEffect, i32* best
                     }
                 }
                 break;
-            case IDX(SPELL_HYPNOTIZE):
+            case SPELL_HYPNOTIZE:
                 if (hasDamageReductionResult) {
                 } else {
                     if (hasMindEffect) {
@@ -388,8 +388,8 @@ void combatManager::DetermineEffectOfSpell(i32 spell, i32* bestEffect, i32* best
                     }
                 }
                 break;
-            case IDX(SPELL_SLOW):
-            case IDX(SPELL_MASS_SLOW):
+            case SPELL_SLOW:
+            case SPELL_MASS_SLOW:
                 if (hasDamageReductionResult) {
                 } else {
                     if (hasMindEffect) {
@@ -422,8 +422,8 @@ void combatManager::DetermineEffectOfSpell(i32 spell, i32* bestEffect, i32* best
                     }
                 }
                 break;
-            case IDX(SPELL_BLESS):
-            case IDX(SPELL_MASS_BLESS):
+            case SPELL_BLESS:
+            case SPELL_MASS_BLESS:
                 if (hasDamageReductionResult) {
                 } else {
                     if (hasMindEffect) {
@@ -456,8 +456,8 @@ void combatManager::DetermineEffectOfSpell(i32 spell, i32* bestEffect, i32* best
                     }
                 }
                 break;
-            case IDX(SPELL_CURSE):
-            case IDX(SPELL_MASS_CURSE):
+            case SPELL_CURSE:
+            case SPELL_MASS_CURSE:
                 if (hasDamageReductionResult) {
                 } else {
                     if (hasMindEffect) {
@@ -490,7 +490,7 @@ void combatManager::DetermineEffectOfSpell(i32 spell, i32* bestEffect, i32* best
                     }
                 }
                 break;
-            case IDX(SPELL_ANTI_MAGIC):
+            case SPELL_ANTI_MAGIC:
                 if (targetCreature->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_ANTI_MAGIC)]) {
                 } else {
                     if (spell == SPELL_ANTI_MAGIC && m_heroes[1 - m_currentSide] == 0) {
@@ -510,7 +510,7 @@ void combatManager::DetermineEffectOfSpell(i32 spell, i32* bestEffect, i32* best
                     }
                 }
                 break;
-            case IDX(SPELL_STONE_SKIN):
+            case SPELL_STONE_SKIN:
                 if (hasMindEffect) {
                 } else {
                     if (targetCreature->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_STONESKIN)]) {
@@ -538,7 +538,7 @@ void combatManager::DetermineEffectOfSpell(i32 spell, i32* bestEffect, i32* best
                     }
                 }
                 break;
-            case IDX(SPELL_STEEL_SKIN):
+            case SPELL_STEEL_SKIN:
                 if (hasMindEffect) {
                 } else {
                     if (targetCreature->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_STONESKIN)]) {
@@ -566,7 +566,7 @@ void combatManager::DetermineEffectOfSpell(i32 spell, i32* bestEffect, i32* best
                     }
                 }
                 break;
-            case IDX(SPELL_BLOOD_LUST):
+            case SPELL_BLOOD_LUST:
                 if (hasDamageReductionResult) {
                 } else {
                     if (hasMindEffect) {
@@ -584,8 +584,8 @@ void combatManager::DetermineEffectOfSpell(i32 spell, i32* bestEffect, i32* best
                     }
                 }
                 break;
-            case IDX(SPELL_SHIELD):
-            case IDX(SPELL_MASS_SHIELD):
+            case SPELL_SHIELD:
+            case SPELL_MASS_SHIELD:
                 if (hasMindEffect) {
                 } else {
                     if (targetCreature->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_SHIELD)]) {
@@ -604,7 +604,7 @@ void combatManager::DetermineEffectOfSpell(i32 spell, i32* bestEffect, i32* best
                     }
                 }
                 break;
-            case IDX(SPELL_BLIND):
+            case SPELL_BLIND:
                 if (hasDamageReductionResult) {
                 } else {
                     if (hasMindEffect) {
@@ -619,7 +619,7 @@ void combatManager::DetermineEffectOfSpell(i32 spell, i32* bestEffect, i32* best
                     }
                 }
                 break;
-            case IDX(SPELL_PARALYZE):
+            case SPELL_PARALYZE:
                 if (hasDamageReductionResult) {
                 } else {
                     if (hasMindEffect) {
@@ -637,7 +637,7 @@ void combatManager::DetermineEffectOfSpell(i32 spell, i32* bestEffect, i32* best
                     }
                 }
                 break;
-            case IDX(SPELL_DRAGON_SLAYER):
+            case SPELL_DRAGON_SLAYER:
                 if (hasDamageReductionResult) {
                 } else {
                     if (hasMindEffect) {
@@ -656,10 +656,10 @@ void combatManager::DetermineEffectOfSpell(i32 spell, i32* bestEffect, i32* best
                     }
                 }
                 break;
-            case IDX(SPELL_TELEPORT):
+            case SPELL_TELEPORT:
                 effect = 0;
                 break;
-            case IDX(SPELL_EARTHQUAKE):
+            case SPELL_EARTHQUAKE:
                 if (m_currentSide == COMBAT_ATTACKER_SIDE && m_inCastleCombat != 0) {
                     wallsDamagedTotal = 0;
                     for (indexWork = 0; indexWork < COMBAT_SPELL_AI_EARTHQUAKE_WALL_COUNT;
@@ -723,7 +723,7 @@ void combatManager::DetermineEffectOfSpell(i32 spell, i32* bestEffect, i32* best
                     doneResult = 1;
                 break;
             case IDX(COMBAT_SPELL_AI_RESURRECT):
-                doneResult = FirstResurrectable(hexIndex + 1, &hexIndex, spell);
+                doneResult = FirstResurrectable(hexIndex + 1, &hexIndex, IDX(spell));
         }
     }
 }
