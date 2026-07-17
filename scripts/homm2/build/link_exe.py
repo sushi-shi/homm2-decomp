@@ -19,6 +19,7 @@ import tomllib
 from collections import defaultdict
 from pathlib import Path
 
+from homm2.build.annotated_data import source_definitions as annotated_source_definitions
 from homm2.build.extract_resources import read_pe_resources
 from homm2.build.build_libcmt_gfy import (
     build_library as build_gfy_libcmt, expected_retail_literals,
@@ -853,11 +854,15 @@ def load_required_initialized_storage(path=None):
         } for row in rows]
 
 
-def required_initialized_storage_diagnostics(public_symbols, required):
+def required_initialized_storage_diagnostics(public_symbols, required, source_sizes=None):
     by_name = {row["name"]: row for row in public_symbols["symbols"]}
+    source_sizes = source_sizes or {}
     rows = []
     for expectation in required:
         symbol = by_name.get(expectation["name"])
+        source_size = (source_sizes.get(
+            (expectation["unit"], int(symbol["retail_rva"], 16)))
+            if source_sizes and symbol is not None and symbol.get("retail_rva") else None)
         if symbol is None:
             status = "retail-symbol-missing"
         elif symbol["unit"] != expectation["unit"]:
@@ -866,6 +871,8 @@ def required_initialized_storage_diagnostics(public_symbols, required):
             status = symbol["status"]
         elif not symbol["storage_class_matches"]:
             status = "storage-class-mismatch"
+        elif source_size is not None and source_size != expectation["size"]:
+            status = "source-extent-mismatch"
         elif (symbol["retail_payload"]["size"] != expectation["size"] or
               symbol["retail_payload"]["sha256"] != expectation["retail_sha256"] or
               symbol["retail_payload"]["highlow_base_relocation_count"] !=
@@ -900,6 +907,7 @@ def required_initialized_storage_diagnostics(public_symbols, required):
                 if symbol is not None and symbol["candidate_storage"] else None),
             "audit": expectation["audit"],
             "expected_size": expectation["size"],
+            "source_definition_size": source_size,
             "expected_retail_sha256": expectation["retail_sha256"],
             "expected_highlow_count": expectation["highlow_count"],
             "retail_payload": symbol.get("retail_payload") if symbol is not None else None,
@@ -1539,10 +1547,14 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
             for name in (".rdata", ".data")
         }
         required = load_required_initialized_storage(required_initialized_path)
+        source_sizes = {
+            (row.unit, row.rva): row.size
+            for row in annotated_source_definitions(REPO / "src", REPO)
+        }
         add_payload_evidence(
             report["static_storage"]["public_symbols"], RETAIL_EXE, output, required)
         required_diagnostics = required_initialized_storage_diagnostics(
-            report["static_storage"]["public_symbols"], required)
+            report["static_storage"]["public_symbols"], required, source_sizes)
         report["static_storage"]["required_initialized"] = required_diagnostics
         required_storage_ok = not required_diagnostics["violations"]
         if not required_storage_ok and report["status"] == "linked":
