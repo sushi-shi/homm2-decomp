@@ -12,6 +12,10 @@ typedef enum BitmapType {
     BITMAP_TYPE_MEMORY = 0x21
 } BitmapType;
 
+typedef enum BitmapConstant {
+    BITMAP_COPY_STRIDE = 640 // full-screen row stride assumed by CopyTo's fast path
+} BitmapConstant;
+
 #pragma pack(push, 1) // recovered layout is byte-packed
 class bitmap : public resource {
 public:

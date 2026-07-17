@@ -12,7 +12,7 @@
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/comwin.h>
 
-#define COMWIN_SOURCE_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\comwin.cpp"
+#define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\comwin.cpp"
 
 DATA(0x004f843c) static i16 s_comTermSourceLineBase = 199;
 DATA(0x004f84d8) static i16 s_comSendSourceLineBase = 247;
@@ -244,9 +244,9 @@ void com_term(i16 portIndex) {
         s_comPorts[portIndex].handle = INVALID_HANDLE_VALUE;
 
         while ((node = pop_node(&s_comPorts[portIndex].normalQueue)) != 0)
-            BaseFree(node, COMWIN_SOURCE_FILE, s_comTermSourceLineBase + 13);
+            BaseFree(node, RETAIL_FILE, s_comTermSourceLineBase + 13);
         while ((node = pop_node(&s_comPorts[portIndex].priorityQueue)) != 0)
-            BaseFree(node, COMWIN_SOURCE_FILE, s_comTermSourceLineBase + 17);
+            BaseFree(node, RETAIL_FILE, s_comTermSourceLineBase + 17);
     }
 }
 
@@ -300,7 +300,7 @@ i16 com_snd(i16 portIndex, u16, u16 length, void* data, i32 priority) {
         }
         sendNode = static_cast<tag_Node*>(BaseAlloc(
             length + COM_NODE_HEADER_SIZE,
-            COMWIN_SOURCE_FILE,
+            RETAIL_FILE,
             s_comSendSourceLineBase + 16
         ));
         if (sendNode != 0) {
@@ -364,6 +364,8 @@ void comm_wrt_task(void) {
                 ShutdownComError("Write communications data");
             writtenTotal += bytesWritten;
         }
-        BaseFree(packetNode, COMWIN_SOURCE_FILE, s_comWriteSourceLineBase + 28);
+        BaseFree(packetNode, RETAIL_FILE, s_comWriteSourceLineBase + 28);
     }
 }
+
+#undef RETAIL_FILE

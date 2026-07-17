@@ -19,18 +19,18 @@
 #include <string.h>
 #include <SOURCE/X_GLOBAL.h>
 
-#define LISTBOX_SOURCE_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\listbox.cpp"
+#define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\listbox.cpp"
 #define LISTBOX_SOURCE_FILE_SEPARATOR "\0\0\0\0"
 #define LISTBOX_DESTRUCTOR_SOURCE_FILES                                                            \
-    LISTBOX_SOURCE_FILE LISTBOX_SOURCE_FILE_SEPARATOR LISTBOX_SOURCE_FILE
+    RETAIL_FILE LISTBOX_SOURCE_FILE_SEPARATOR RETAIL_FILE
 #define LISTBOX_DELETE_SOURCE_FILES                                                                \
-    LISTBOX_SOURCE_FILE LISTBOX_SOURCE_FILE_SEPARATOR LISTBOX_SOURCE_FILE                          \
-        LISTBOX_SOURCE_FILE_SEPARATOR LISTBOX_SOURCE_FILE LISTBOX_SOURCE_FILE_SEPARATOR            \
-            LISTBOX_SOURCE_FILE
+    RETAIL_FILE LISTBOX_SOURCE_FILE_SEPARATOR RETAIL_FILE                          \
+        LISTBOX_SOURCE_FILE_SEPARATOR RETAIL_FILE LISTBOX_SOURCE_FILE_SEPARATOR            \
+            RETAIL_FILE
 #define LISTBOX_MAIN_SOURCE_FILES                                                                  \
-    LISTBOX_SOURCE_FILE LISTBOX_SOURCE_FILE_SEPARATOR LISTBOX_SOURCE_FILE                          \
-        LISTBOX_SOURCE_FILE_SEPARATOR LISTBOX_SOURCE_FILE LISTBOX_SOURCE_FILE_SEPARATOR            \
-            LISTBOX_SOURCE_FILE LISTBOX_SOURCE_FILE_SEPARATOR LISTBOX_SOURCE_FILE
+    RETAIL_FILE LISTBOX_SOURCE_FILE_SEPARATOR RETAIL_FILE                          \
+        LISTBOX_SOURCE_FILE_SEPARATOR RETAIL_FILE LISTBOX_SOURCE_FILE_SEPARATOR            \
+            RETAIL_FILE LISTBOX_SOURCE_FILE_SEPARATOR RETAIL_FILE
 
 // @data-layout-note Retail's initialized listbox contribution is
 // RVA 0x120e94..0x121078 (0x1e4), with eleven identical source-path views at
@@ -570,3 +570,5 @@ done:
 
 // ---- vtables (compiler-emitted; census) ----
 VTBL(listBoxWidget, 0x004ebac0);
+
+#undef RETAIL_FILE

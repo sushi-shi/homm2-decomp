@@ -44,7 +44,7 @@
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/x_arena.h>
 
-#define EVENTS_FILE const_cast<char*>("I:\\Projects\\Heroes\\Prog\\SOURCE\\EVENTS.CPP")
+#define RETAIL_FILE const_cast<char*>("I:\\Projects\\Heroes\\Prog\\SOURCE\\EVENTS.CPP")
 #define EVENTS_REMOTE_MESSAGE(buffer) (reinterpret_cast<RemoteMessage*>(buffer))
 #define EVENTS_REMOTE_COMBAT(buffer)                                                               \
     (reinterpret_cast<combatRemoteData*>(EVENTS_REMOTE_MESSAGE(buffer)->payload))
@@ -7150,15 +7150,15 @@ i32 advManager::DoNetCombat(char* packet) {
         );
     }
     if (firstArmy6)
-        BaseFree(firstArmy6, EVENTS_FILE, sourceLineBase + 0x46);
+        BaseFree(firstArmy6, RETAIL_FILE, sourceLineBase + 0x46);
     if (secondArmy10)
-        BaseFree(secondArmy10, EVENTS_FILE, sourceLineBase + 0x49);
+        BaseFree(secondArmy10, RETAIL_FILE, sourceLineBase + 0x49);
     if (combatTown[0])
-        BaseFree(combatTown[0], EVENTS_FILE, sourceLineBase + 0x4c);
+        BaseFree(combatTown[0], RETAIL_FILE, sourceLineBase + 0x4c);
     if (secondHero9)
-        BaseFree(secondHero9, EVENTS_FILE, sourceLineBase + 0x4f);
+        BaseFree(secondHero9, RETAIL_FILE, sourceLineBase + 0x4f);
     if (firstHero29)
-        BaseFree(firstHero29, EVENTS_FILE, sourceLineBase + 0x52);
+        BaseFree(firstHero29, RETAIL_FILE, sourceLineBase + 0x52);
     gbRetreatWin = 0;
     return 1;
 }
@@ -7270,25 +7270,25 @@ i32 advManager::DoCombat(
                                 );
                                 if (receivedFirstArmy) {
                                     memcpy(firstArmy, receivedFirstArmy, sizeof(armyGroup));
-                                    BaseFree(receivedFirstArmy, EVENTS_FILE, sourceLineBase + 0x71);
+                                    BaseFree(receivedFirstArmy, RETAIL_FILE, sourceLineBase + 0x71);
                                 }
                                 if (receivedSecondArmy2) {
                                     memcpy(secondArmy, receivedSecondArmy2, sizeof(armyGroup));
                                     BaseFree(
                                         receivedSecondArmy2,
-                                        EVENTS_FILE,
+                                        RETAIL_FILE,
                                         sourceLineBase + 0x77
                                     );
                                 }
                                 if (receivedTown) {
                                     memcpy(combatTown, receivedTown, sizeof(town));
-                                    BaseFree(receivedTown, EVENTS_FILE, sourceLineBase + 0x7d);
+                                    BaseFree(receivedTown, RETAIL_FILE, sourceLineBase + 0x7d);
                                 }
                                 if (receivedSecondHero9) {
                                     memcpy(secondHero, receivedSecondHero9, sizeof(hero));
                                     BaseFree(
                                         receivedSecondHero9,
-                                        EVENTS_FILE,
+                                        RETAIL_FILE,
                                         sourceLineBase + 0x83
                                     );
                                 }
@@ -7296,7 +7296,7 @@ i32 advManager::DoCombat(
                                     memcpy(firstHero, receivedFirstHero1, sizeof(hero));
                                     BaseFree(
                                         receivedFirstHero1,
-                                        EVENTS_FILE,
+                                        RETAIL_FILE,
                                         sourceLineBase + 0x89
                                     );
                                 }
@@ -7409,7 +7409,7 @@ void advManager::SendHeroTownData(
     combatRemoteData* buffer = 0;
 
     buffer = static_cast<combatRemoteData*>(
-        BaseAlloc(COMBAT_REMOTE_BUFFER_SIZE, EVENTS_FILE, sourceLineBase + 3)
+        BaseAlloc(COMBAT_REMOTE_BUFFER_SIZE, RETAIL_FILE, sourceLineBase + 3)
     );
     reply = 0;
     buffer->fragment = 0;
@@ -7524,7 +7524,7 @@ void advManager::SendHeroTownData(
         if (!result)
             ShutDown(0);
     }
-    BaseFree(buffer, EVENTS_FILE, sourceLineBase + 0x5c);
+    BaseFree(buffer, RETAIL_FILE, sourceLineBase + 0x5c);
 }
 
 VA(0x004b67cd, 0x462)
@@ -7586,14 +7586,14 @@ void advManager::ReceiveHeroTownData(
             EVENTS_REMOTE_COMBAT(packet)->secondGold;
 
     *firstArmy =
-        static_cast<armyGroup*>(BaseAlloc(sizeof(armyGroup), EVENTS_FILE, sourceLineBase + 0x26));
+        static_cast<armyGroup*>(BaseAlloc(sizeof(armyGroup), RETAIL_FILE, sourceLineBase + 0x26));
     memcpy(*firstArmy, &EVENTS_REMOTE_COMBAT(packet)->firstArmy, sizeof(armyGroup));
     *secondArmy =
-        static_cast<armyGroup*>(BaseAlloc(sizeof(armyGroup), EVENTS_FILE, sourceLineBase + 0x29));
+        static_cast<armyGroup*>(BaseAlloc(sizeof(armyGroup), RETAIL_FILE, sourceLineBase + 0x29));
     memcpy(*secondArmy, &EVENTS_REMOTE_COMBAT(packet)->secondArmy, sizeof(armyGroup));
     if (hasTown0) {
         *combatTown =
-            static_cast<town*>(BaseAlloc(sizeof(town), EVENTS_FILE, sourceLineBase + 0x2e));
+            static_cast<town*>(BaseAlloc(sizeof(town), RETAIL_FILE, sourceLineBase + 0x2e));
         memcpy(*combatTown, &EVENTS_REMOTE_COMBAT(packet)->combatTown, sizeof(town));
     }
 
@@ -7618,13 +7618,13 @@ void advManager::ReceiveHeroTownData(
     gotSecondHeroSecond6 = 1;
     if (hasFirstHero7) {
         *firstHero =
-            static_cast<hero*>(BaseAlloc(sizeof(hero), EVENTS_FILE, sourceLineBase + 0x47));
+            static_cast<hero*>(BaseAlloc(sizeof(hero), RETAIL_FILE, sourceLineBase + 0x47));
         gotFirstHeroFirst3 = 0;
         gotFirstHeroSecond9 = 0;
     }
     if (hasSecondHero8) {
         *secondHero =
-            static_cast<hero*>(BaseAlloc(sizeof(hero), EVENTS_FILE, sourceLineBase + 0x4d));
+            static_cast<hero*>(BaseAlloc(sizeof(hero), RETAIL_FILE, sourceLineBase + 0x4d));
         gotSecondHeroFirst13 = 0;
         gotSecondHeroSecond6 = 0;
     }
@@ -7810,3 +7810,5 @@ i32 RiddleStringsEqual(char* answer, char* expected) {
 // constrained group validator proves exact payloads, disjoint extents, complete
 // nonzero-byte coverage, and zero diagnostics for all 254 definitions.
 DATA(0x0051cc0c) i32 gbNoShowCombat = 0;
+
+#undef RETAIL_FILE

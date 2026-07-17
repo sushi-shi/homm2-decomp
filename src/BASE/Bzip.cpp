@@ -36,6 +36,8 @@
             ioError();                                                                             \
     }
 
+// The #define constants below keep their spellings from the ancestral bzip
+// sources this TU derives from; do not convert them to the enum-domain style.
 #define TWO_TO_THE(n) (1 << (n))
 #define MAX_BITS_OUTSTANDING 500000000
 #define smallB 26
@@ -153,7 +155,7 @@ DATA(0x00537024) FILE* outputHandleJustInCase;
 // NWC wraps malloc/free in BaseAlloc/BaseFree(ptr, __FILE__, __LINE__). __FILE__ is
 // the original build path (reloc-masked); __LINE__ immediates are hardcoded from the
 // retail disasm since our line layout differs.
-#define BZFILE const_cast<char*>("I:\\Projects\\Heroes\\Prog\\BASE\\Bzip.cpp")
+#define RETAIL_FILE const_cast<char*>("I:\\Projects\\Heroes\\Prog\\BASE\\Bzip.cpp")
 
 VA(0x004d4050, 0x1a)
 void initialiseCRC(void) {
@@ -659,11 +661,11 @@ void sendMTFVal(BitStream* bs, Int32 n) {
 VA(0x004d5270, 0x94)
 void FreeCompressStructures(void) {
     if (words != NULL)
-        H2_FREE(words, BZFILE, 0x461);
+        H2_FREE(words, RETAIL_FILE, 0x461);
     if (ftab != NULL)
-        H2_FREE(ftab, BZFILE, 0x462);
+        H2_FREE(ftab, RETAIL_FILE, 0x462);
     if (zptr != NULL)
-        H2_FREE(zptr, BZFILE, 0x463);
+        H2_FREE(zptr, RETAIL_FILE, 0x463);
     words = NULL;
     ftab = NULL;
     zptr = NULL;
@@ -673,9 +675,9 @@ VA(0x004d5310, 0xcf)
 void allocateCompressStructures(void) {
     Int32 n = 100000 * blockSize100k;
     FreeCompressStructures();
-    words = (UInt32*)H2_ALLOC((n + MAX_DENORM_OFFSET) * sizeof(Int32) + 1, BZFILE, 0x475);
-    zptr = (Int32*)H2_ALLOC(n * sizeof(Int32) + 1, BZFILE, 0x476);
-    ftab = (Int32*)H2_ALLOC(65537 * sizeof(Int32) + 1, BZFILE, 0x477);
+    words = (UInt32*)H2_ALLOC((n + MAX_DENORM_OFFSET) * sizeof(Int32) + 1, RETAIL_FILE, 0x475);
+    zptr = (Int32*)H2_ALLOC(n * sizeof(Int32) + 1, RETAIL_FILE, 0x476);
+    ftab = (Int32*)H2_ALLOC(65537 * sizeof(Int32) + 1, RETAIL_FILE, 0x477);
 
     if (words == NULL || zptr == NULL || ftab == NULL) {
         Int32 totalDraw =
@@ -688,11 +690,11 @@ void allocateCompressStructures(void) {
 VA(0x004d53e0, 0x94)
 void FreeDecompressStructures(void) {
     if (block != NULL)
-        H2_FREE(block, BZFILE, 0x489);
+        H2_FREE(block, RETAIL_FILE, 0x489);
     if (ll != NULL)
-        H2_FREE(ll, BZFILE, 0x48a);
+        H2_FREE(ll, RETAIL_FILE, 0x48a);
     if (zptr != NULL)
-        H2_FREE(zptr, BZFILE, 0x48b);
+        H2_FREE(zptr, RETAIL_FILE, 0x48b);
     block = NULL;
     ll = NULL;
     zptr = NULL;
@@ -708,9 +710,9 @@ void setDecompressStructureSizes(Int32 newSize100k) {
 
     if (newSize100k != 0) {
         Int32 n = 100000 * newSize100k;
-        block = (UChar*)H2_ALLOC(n * sizeof(UChar) + 1, BZFILE, 0x4a1);
-        ll = (UChar*)H2_ALLOC(n * sizeof(UChar) + 1, BZFILE, 0x4a2);
-        zptr = (Int32*)H2_ALLOC(n * sizeof(Int32) + 1, BZFILE, 0x4a3);
+        block = (UChar*)H2_ALLOC(n * sizeof(UChar) + 1, RETAIL_FILE, 0x4a1);
+        ll = (UChar*)H2_ALLOC(n * sizeof(UChar) + 1, RETAIL_FILE, 0x4a2);
+        zptr = (Int32*)H2_ALLOC(n * sizeof(Int32) + 1, RETAIL_FILE, 0x4a3);
 
         if (block == NULL || ll == NULL || zptr == NULL) {
             Int32 totalDraw = 6 * n * sizeof(UChar);
@@ -2048,3 +2050,5 @@ DATA(0x00537028) char inName[1024];
 DATA(0x00537430) char outName[1024];
 DATA(0x00537c58) char* progNameReally;
 DATA(0x00538078) i32 keepInputFiles;
+
+#undef RETAIL_FILE

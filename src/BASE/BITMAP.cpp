@@ -12,7 +12,6 @@
 #include <SOURCE/KB.h>
 #include <string.h>
 
-#define BITMAP_COPY_STRIDE 640
 VA(0x004cffc0, 0x2a)
 bitmap::bitmap(void) : resource(0, 0, -1, 0) {
     m_bitmapType = BITMAP_TYPE_NONE;

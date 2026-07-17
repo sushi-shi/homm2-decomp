@@ -32,9 +32,7 @@
 // Globals and called free functions come from their owner headers.
 
 // __FILE__ for the NWC BaseAlloc/BaseFree memory tracking (reloc-masked path string).
-#define PHFILE const_cast<char*>("I:\\Projects\\Heroes\\Prog\\SOURCE\\PHILAI.CPP")
-#define PHILAI_INIT_MAP_LINE_BASE 0x1b86
-#define PHILAI_CLOSE_MAP_LINE_BASE 0x1b96
+#define RETAIL_FILE const_cast<char*>("I:\\Projects\\Heroes\\Prog\\SOURCE\\PHILAI.CPP")
 
 // The AI position maps (gaiHeroStrategicRVOfPos, gaiHeroEventStratRVOfPos,
 // gaiLiveChanceOfPos) are heap-allocated MAP_WIDTH*MAP_HEIGHT i16 grids
@@ -73,8 +71,8 @@
 // references, 1231 pair at exact function-relative sites. The seven residuals
 // are two uncarved initializer references and five already documented
 // function-shape sites, not evidence for another data owner.
-DATA(0x004f2394) static i16 s_initAIMapLineBase = PHILAI_INIT_MAP_LINE_BASE;
-DATA(0x004f2474) static i16 s_closeAIMapLineBase = PHILAI_CLOSE_MAP_LINE_BASE;
+DATA(0x004f2394) static i16 s_initAIMapLineBase = 0x1b86;
+DATA(0x004f2474) static i16 s_closeAIMapLineBase = 0x1b96;
 
 DATA(0x005256f0) searchArray SVSearchArray;
 
@@ -5831,34 +5829,34 @@ void InitAIMapVars(void) {
     CloseAIMapVars();
     SVSearchArray.Init();
     gaiLiveChanceOfPos = static_cast<i16*>(
-        BaseAlloc(OD_STEER(MAP_WIDTH) * MAP_HEIGHT * 2, PHFILE, s_initAIMapLineBase + 8)
+        BaseAlloc(OD_STEER(MAP_WIDTH) * MAP_HEIGHT * 2, RETAIL_FILE, s_initAIMapLineBase + 8)
     );
     gaiHeroStrategicRVOfPos = static_cast<i16*>(
-        BaseAlloc(OD_STEER(MAP_WIDTH) * MAP_HEIGHT * 2, PHFILE, s_initAIMapLineBase + 9)
+        BaseAlloc(OD_STEER(MAP_WIDTH) * MAP_HEIGHT * 2, RETAIL_FILE, s_initAIMapLineBase + 9)
     );
     gaiHeroEventStratRVOfPos = static_cast<i16*>(
-        BaseAlloc(OD_STEER(MAP_WIDTH) * MAP_HEIGHT * 2, PHFILE, s_initAIMapLineBase + 10)
+        BaseAlloc(OD_STEER(MAP_WIDTH) * MAP_HEIGHT * 2, RETAIL_FILE, s_initAIMapLineBase + 10)
     );
     gaiTurnValueOfMine = static_cast<i8*>(
-        BaseAlloc(OD_STEER(MAP_WIDTH) * MAP_HEIGHT, PHFILE, s_initAIMapLineBase + 11)
+        BaseAlloc(OD_STEER(MAP_WIDTH) * MAP_HEIGHT, RETAIL_FILE, s_initAIMapLineBase + 11)
     );
     gaiEnemyHeroReachable = static_cast<i8*>(
-        BaseAlloc(OD_STEER(MAP_WIDTH) * MAP_HEIGHT, PHFILE, s_initAIMapLineBase + 12)
+        BaseAlloc(OD_STEER(MAP_WIDTH) * MAP_HEIGHT, RETAIL_FILE, s_initAIMapLineBase + 12)
     );
 }
 
 VA(0x00445fe6, 0x112)
 void CloseAIMapVars(void) {
     if (gaiLiveChanceOfPos != 0)
-        BaseFree(gaiLiveChanceOfPos, PHFILE, s_closeAIMapLineBase + 1);
+        BaseFree(gaiLiveChanceOfPos, RETAIL_FILE, s_closeAIMapLineBase + 1);
     if (gaiHeroStrategicRVOfPos != 0)
-        BaseFree(gaiHeroStrategicRVOfPos, PHFILE, s_closeAIMapLineBase + 2);
+        BaseFree(gaiHeroStrategicRVOfPos, RETAIL_FILE, s_closeAIMapLineBase + 2);
     if (gaiHeroEventStratRVOfPos != 0)
-        BaseFree(gaiHeroEventStratRVOfPos, PHFILE, s_closeAIMapLineBase + 3);
+        BaseFree(gaiHeroEventStratRVOfPos, RETAIL_FILE, s_closeAIMapLineBase + 3);
     if (gaiTurnValueOfMine != 0)
-        BaseFree(gaiTurnValueOfMine, PHFILE, s_closeAIMapLineBase + 4);
+        BaseFree(gaiTurnValueOfMine, RETAIL_FILE, s_closeAIMapLineBase + 4);
     if (gaiEnemyHeroReachable != 0)
-        BaseFree(gaiEnemyHeroReachable, PHFILE, s_closeAIMapLineBase + 5);
+        BaseFree(gaiEnemyHeroReachable, RETAIL_FILE, s_closeAIMapLineBase + 5);
     gaiLiveChanceOfPos = 0;
     gaiHeroStrategicRVOfPos = 0;
     gaiHeroEventStratRVOfPos = 0;
@@ -6518,3 +6516,5 @@ DATA(0x00527e10) i32 gbReduceByReload;
 DATA(0x00527e14) i32 gbTroopReload;
 DATA(0x00527e18) i32 giCurAIHeroLuck;
 DATA(0x00527e1c) i32 gbActualShipyardFound;
+
+#undef RETAIL_FILE
