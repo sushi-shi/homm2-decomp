@@ -1649,7 +1649,7 @@ i32 townManager::Main(tag_message &message)
             ShiftQualChange();
             break;
 
-        case 1:
+        case INPUT_SCAN_ESCAPE:
             ++exitTown_i;
             break;
         }

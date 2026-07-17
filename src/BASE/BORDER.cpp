@@ -90,7 +90,7 @@ VA(0x004d22f0, 0x181)
 i32 border::Main(struct tag_message &msg)
 {
     i16 flags = m_flags;
-    if ((flags & 2) == 0) {
+    if ((flags & WIDGET_FLAG_ENABLED) == 0) {
         if (msg.type == MESSAGE_WIDGET)
             return widget::Main(msg);
         return 0;
@@ -99,11 +99,11 @@ i32 border::Main(struct tag_message &msg)
     switch (type) {
     default:
         goto normalEvent;
-    case 8:
-    case 0x20:
+    case MESSAGE_LEFT_BUTTON_DOWN:
+    case MESSAGE_RIGHT_BUTTON_DOWN:
         goto hoverEvent;
-    case 0x10:
-    case 0x40:
+    case MESSAGE_LEFT_BUTTON_UP:
+    case MESSAGE_RIGHT_BUTTON_UP:
         goto leaveEvent;
     }
 
@@ -120,7 +120,7 @@ hoverEvent: {
             msg.payload.widget.parameter = MESSAGE_MODIFIER_RIGHT_BUTTON;
             msg.payload.widget.command = WIDGET_COMMAND_ALTERNATE_SELECT;
         } else {
-            m_flags = flags | 1;
+            m_flags = flags | WIDGET_FLAG_SELECTED;
             msg.payload.widget.command = WIDGET_COMMAND_SELECT;
         }
         msg.type = MESSAGE_WIDGET;
@@ -131,7 +131,7 @@ hoverEvent: {
 }
 
 leaveEvent:
-    if ((flags & 1) != 0) {
+    if ((flags & WIDGET_FLAG_SELECTED) != 0) {
         m_flags = flags & 0xfffe;
         msg.type = MESSAGE_WIDGET;
         msg.payload.widget.command = WIDGET_COMMAND_DESELECT;

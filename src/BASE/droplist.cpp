@@ -164,16 +164,16 @@ void dropListWidget::DeleteItem(i32 index)
 VA(0x004dc2e0, 0x350)
 i32 dropListWidget::Main(tag_message &message)
 {
-    if ((m_flags & 2) == 0) {
+    if ((m_flags & WIDGET_FLAG_ENABLED) == 0) {
         if (message.type == MESSAGE_WIDGET)
             return widget::Main(message);
         return 0;
     }
 
     switch (message.type) {
-    case 8:
-    case 0x20:
-        if (m_flags & 4) {
+    case MESSAGE_LEFT_BUTTON_DOWN:
+    case MESSAGE_RIGHT_BUTTON_DOWN:
+        if (m_flags & WIDGET_FLAG_DRAW) {
             i16 x = static_cast<i16>(message.payload.mouse.x) - static_cast<i16>(m_owner->m_posX);
             i16 y = static_cast<i16>(message.payload.mouse.y) - static_cast<i16>(m_owner->m_posY);
             if (message.type == MESSAGE_RIGHT_BUTTON_DOWN) {
@@ -198,7 +198,7 @@ i32 dropListWidget::Main(tag_message &message)
             }
         }
         break;
-    case 0x200:
+    case MESSAGE_WIDGET:
         switch (message.payload.widget.command) {
         case 0x36:
             if (m_id == message.payload.widget.id) {
@@ -265,7 +265,7 @@ void dropListWidget::Draw(void)
                              m_dropButtonFrame, 0);
     if (m_itemCount > 0 && m_selectedIndex >= 0) {
         i32 color = 3;
-        if ((m_flags & 8) == 0)
+        if ((m_flags & WIDGET_FLAG_DIMMED) == 0)
             color = m_normalColor;
         m_font->DrawBoundedString(m_items[m_selectedIndex],
                                       m_contentX + m_owner->m_posX,
@@ -455,14 +455,14 @@ void dropListWidget::ProcessSelectDialog(void)
         i32 mouseY = message.payload.mouse.screenY - ownerY;
 
         switch (message.type) {
-        case 1:
+        case MESSAGE_KEY_DOWN:
             switch (message.payload.keyboard.keyCode) {
-            case 0x47:
+            case INPUT_SCAN_NUMPAD_7:
                 m_topIndex = 0;
                 m_selectedIndex = 0;
                 DrawDropStuff();
                 continue;
-            case 0x48:
+            case INPUT_SCAN_NUMPAD_8:
                 if (m_selectedIndex > 0) {
                     m_selectedIndex--;
                 }
@@ -470,7 +470,7 @@ void dropListWidget::ProcessSelectDialog(void)
                     m_topIndex = m_selectedIndex;
                 DrawDropStuff();
                 continue;
-            case 0x49:
+            case INPUT_SCAN_NUMPAD_9:
                 m_topIndex = m_topIndex - m_maxVisibleItems + 1;
                 if (m_topIndex < 0)
                     m_topIndex = 0;
@@ -479,19 +479,19 @@ void dropListWidget::ProcessSelectDialog(void)
                     m_selectedIndex = 0;
                 DrawDropStuff();
                 continue;
-            case 0x4f:
+            case INPUT_SCAN_NUMPAD_1:
                 m_topIndex = m_scrollRange;
                 m_selectedIndex = m_itemCount - 1;
                 DrawDropStuff();
                 continue;
-            case 0x50:
+            case INPUT_SCAN_NUMPAD_2:
                 if (m_selectedIndex < m_itemCount - 1)
                     m_selectedIndex++;
                 if (m_topIndex + m_maxVisibleItems - 1 < m_selectedIndex)
                     m_topIndex = m_selectedIndex - m_maxVisibleItems + 1;
                 DrawDropStuff();
                 continue;
-            case 0x51:
+            case INPUT_SCAN_NUMPAD_3:
                 m_topIndex = m_topIndex - 1 + m_maxVisibleItems;
                 if (m_scrollRange < m_topIndex)
                     m_topIndex = m_scrollRange;
@@ -503,7 +503,7 @@ void dropListWidget::ProcessSelectDialog(void)
             }
             break;
 
-        case 4:
+        case MESSAGE_MOUSE_MOVE:
             if (m_itemSelectionTracking != 0) {
                 i32 item;
                 if (m_firstRowHeight < mouseY - m_listY)
@@ -536,7 +536,7 @@ void dropListWidget::ProcessSelectDialog(void)
             }
             break;
 
-        case 8:
+        case MESSAGE_LEFT_BUTTON_DOWN:
             if (mouseX < m_savedBackgroundX || mouseY < m_savedBackgroundY ||
                 mouseX >= m_savedBackgroundX + m_savedBackgroundWidth || mouseY >= m_savedBackgroundY + m_savedBackgroundHeight)
                 goto done;
@@ -578,7 +578,7 @@ void dropListWidget::ProcessSelectDialog(void)
             }
             break;
 
-        case 0x10:
+        case MESSAGE_LEFT_BUTTON_UP:
             if (firstRelease) {
                 firstRelease = 0;
                 m_icon->DrawToBuffer(m_dropButtonX + ownerX, m_dropButtonY + ownerY,

@@ -358,10 +358,10 @@ void inputManager::SetKeyCodeType(i32 keyCodeType)
 VA(0x004ce480, 0x1cb)
 void inputManager::AsciiConvert(tag_message &event)
 {
-    if ((event.payload.keyboard.keyCode >= 0x3b &&
-         event.payload.keyboard.keyCode <= 0x44) ||
-        event.payload.keyboard.keyCode == 0x57 ||
-        event.payload.keyboard.keyCode == 0x58)
+    if ((event.payload.keyboard.keyCode >= INPUT_SCAN_F1 &&
+         event.payload.keyboard.keyCode <= INPUT_SCAN_F10) ||
+        event.payload.keyboard.keyCode == INPUT_SCAN_F11 ||
+        event.payload.keyboard.keyCode == INPUT_SCAN_F12)
         event.payload.keyboard.keyCode =
             m_keyState[event.payload.keyboard.keyCode];
     else
