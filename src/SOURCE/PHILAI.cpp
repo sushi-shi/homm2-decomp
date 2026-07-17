@@ -3584,14 +3584,9 @@ void philAI::EvaluateOneTimeCreaturePurchase(
     }
 }
 
-// @early-stop
-// @early-stop-reloc-only: Current PHILAI.cpp/header epoch: all 0x768 code bytes
-// match after masking 85 ordered relocation sites. The fuzzy residual consists
-// only of compiler float-constant and division-guard symbol identities; frame,
-// slots, opcodes, operands, and CFG are exact. The OD_STEER(winChance37) escapes pin
-// the retail fst/fcomp schedule and the winChance37-first comparison load in
-// this epoch. Revisit only after the PHILAI source/TU/header or comparison
-// epoch changes.
+// The former reloc-only identity claim predates the strict enum epoch: one
+// relocation site drifted with the typed-domain source, so the claim is
+// retired until the function is re-proven.
 VA(0x00440cb1, 0x768)
 i32 philAI::QuickCombat(
     armyGroup* attacker,
