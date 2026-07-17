@@ -50,7 +50,7 @@ SIZE(SCmbtObstacle, 0xe);
 SIZE(SElevationOverlay, 0x11);
 
 enum {
-    HERO_TYPE_INITIAL_COUNT = HERO_CLASS_COUNT,
+    HERO_TYPE_INITIAL_COUNT = FACTION_COUNT,
     EXPANSION_HIGH_SCORE_CAMPAIGN_COUNT = 4,
     X_GLOBAL_RECRUIT_EMPTY_COUNT = 6,
     X_GLOBAL_RECRUIT_BUY_COUNT = 5,
@@ -105,19 +105,6 @@ typedef enum RadarColorTableCount {
     RADAR_OWNER_COLOR_COUNT = 8
 } RadarColorTableCount;
 
-typedef enum GroundTerrainType {
-    GROUND_TERRAIN_WATER = 0,
-    GROUND_TERRAIN_GRASS = 1,
-    GROUND_TERRAIN_SNOW = 2,
-    GROUND_TERRAIN_SWAMP = 3,
-    GROUND_TERRAIN_LAVA = 4,
-    GROUND_TERRAIN_DESERT = 5,
-    GROUND_TERRAIN_DIRT = 6,
-    GROUND_TERRAIN_WASTELAND = 7,
-    GROUND_TERRAIN_BEACH = 8,
-    GROUND_TERRAIN_TYPE_COUNT = 9
-} GroundTerrainType;
-
 typedef enum GroundTableConstant {
     GROUND_TILE_IMAGE_COUNT = 432,
     GROUND_SHAPE_FLIPPED = 0x80
@@ -159,7 +146,7 @@ typedef enum KbGameTableConstant {
     KB_SPELL_EFFECT_COUNT = 32,
     KB_COMBAT_BACKGROUND_COUNT = 20,
     KB_COMBAT_OBSTACLE_COUNT = 32,
-    KB_TERRAIN_TYPE_COUNT = GROUND_TERRAIN_TYPE_COUNT + 1,
+    KB_TERRAIN_TYPE_COUNT = TERRAIN_COUNT + 1,
     KB_TERRAIN_STEP_TYPE_COUNT = 2,
     KB_TRIGGER_TYPE_COUNT = 128,
     KB_TOWN_OBJECT_NAME_COUNT = 32,
@@ -169,7 +156,7 @@ typedef enum KbGameTableConstant {
     KB_COMBAT_COORDINATE_COUNT = 2,
     KB_TRADING_POST_EFFICIENCY_COUNT = 11,
     KB_MOAT_CELL_COUNT = 9,
-    KB_ALIGNMENT_NAME_COUNT = HERO_CLASS_COUNT + 2,
+    KB_ALIGNMENT_NAME_COUNT = FACTION_COUNT + 2,
     KB_QUICK_VIEW_TEXT_COUNT = 124,
     KB_EVENT_TEXT_TABLE_COUNT = 96,
     KB_CONTROL_PANEL_HELP_COUNT = 6,
@@ -229,7 +216,7 @@ typedef enum KbGameTableConstant {
     KB_WELL_EXTRA_NAME_COUNT = 8,
     KB_SPECIAL_BUILDING_NAME_COUNT = 8,
     KB_NEUTRAL_BUILDING_INFO_COUNT = 20,
-    KB_SPECIAL_BUILDING_INFO_COUNT = HERO_CLASS_COUNT,
+    KB_SPECIAL_BUILDING_INFO_COUNT = FACTION_COUNT,
     KB_DIRECTION_TEXT_COUNT = 10,
     KB_RUMOUR_TERRAIN_DESCRIPTION_COUNT = KB_TERRAIN_TYPE_COUNT,
     KB_INTERFACE_TYPE_TEXT_COUNT = 4,
@@ -338,7 +325,7 @@ typedef enum TownMusicTrack {
 } TownMusicTrack;
 
 extern i8 townTheme[TOWN_MUSIC_TABLE_SIZE];
-extern i8 gHeroSkillBonus[HERO_CLASS_COUNT][KB_HERO_LEVEL_BAND_COUNT]
+extern i8 gHeroSkillBonus[FACTION_COUNT][KB_HERO_LEVEL_BAND_COUNT]
                                   [HERO_PRIMARY_STAT_COUNT];
 extern i32 giMonoIconSkip;
 extern i32 giScrollX;
@@ -369,14 +356,14 @@ extern float gfSSNavigationMod[HERO_SKILL_LEVEL_COUNT];
 extern float gfSSArcheryMod[HERO_SKILL_LEVEL_COUNT];
 extern float gfSSAIArcheryMod[HERO_SKILL_LEVEL_COUNT];
 extern i8 giVisRange[HERO_SKILL_LEVEL_COUNT];
-extern u8 gStartingHeroStats[HERO_CLASS_COUNT][HERO_STARTING_STAT_COUNT];
+extern u8 gStartingHeroStats[FACTION_COUNT][HERO_STARTING_STAT_COUNT];
 extern i32 giTerrainCost[KB_TERRAIN_TYPE_COUNT][HERO_SKILL_LEVEL_COUNT]
                         [KB_TERRAIN_STEP_TYPE_COUNT];
-extern char *gTownPrefixNames[HERO_CLASS_COUNT];
+extern char *gTownPrefixNames[FACTION_COUNT];
 extern char *gTownObjNames[KB_TOWN_OBJECT_NAME_COUNT];
 extern i32 giDebugBuildingToBuild;
-extern u8 giTerrainToMusicTrack[GROUND_TERRAIN_TYPE_COUNT];
-extern char *cHeroTypeShortName[HERO_CLASS_COUNT];
+extern u8 giTerrainToMusicTrack[TERRAIN_COUNT];
+extern char *cHeroTypeShortName[FACTION_COUNT];
 extern char cHeroTypeInitial[HERO_TYPE_INITIAL_COUNT];
 extern i32 giDeferObjDrawX;
 extern i32 giDeferObjDrawY;
@@ -415,7 +402,7 @@ extern char *gLuckText[KB_LUCK_TEXT_COUNT];
 extern char *gMoraleText[KB_MORALE_TEXT_COUNT];
 extern char *onOffText[KB_ON_OFF_TEXT_COUNT];
 extern char *walkSpeedText[KB_WALK_SPEED_TEXT_COUNT];
-extern char *gColors[HERO_CLASS_COUNT];
+extern char *gColors[FACTION_COUNT];
 extern char *gMonthNames[KB_MONTH_NAME_COUNT];
 extern char *gWeekNames[KB_WEEK_NAME_COUNT];
 extern char *cHeroScreen[KB_HERO_SCREEN_TEXT_COUNT];

@@ -4,18 +4,9 @@
 // 9 methods, 0 own-virtual, 0 static data.
 #include <va.h>
 #include <SOURCE/armyGroup.h>
+#include <SOURCE/KB_TYPES.h>
 // forward declarations:
 class hero;
-
-typedef enum TownType {
-    TOWN_TYPE_KNIGHT = 0,
-    TOWN_TYPE_BARBARIAN = 1,
-    TOWN_TYPE_SORCERESS = 2,
-    TOWN_TYPE_WARLOCK = 3,
-    TOWN_TYPE_WIZARD = 4,
-    TOWN_TYPE_NECROMANCER = 5,
-    TOWN_TYPE_COUNT = 6
-} TownType;
 
 typedef enum TownBuilding {
     TOWN_BUILDING_MAGE_GUILD = 0x1,

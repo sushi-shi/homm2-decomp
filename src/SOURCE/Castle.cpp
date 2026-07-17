@@ -55,13 +55,13 @@ void townManager::SetupCastle(heroWindow *window, i32 updateOnly)
              (m_town->m_buildings &
               (1L << (castleSlotsBase[slot7] + CASTLE_UPGRADE_OFFSET))) ||
              (castleSlotsBase[slot7] == CASTLE_WARLOCK_TOP_DWELLING &&
-              m_town->m_type == TOWN_TYPE_WARLOCK &&
+              m_town->m_type == FACTION_WARLOCK &&
               (m_town->m_buildings &
                TOWN_BUILDING_ALTERNATE_UPGRADED_DWELLING_6))) &&
             (gTownEligibleBuildMask[m_town->m_type] &
              (1L << (castleSlotsBase[slot7] + CASTLE_UPGRADE_OFFSET)))) {
             if (castleSlotsBase[slot7] == CASTLE_WARLOCK_TOP_DWELLING &&
-                m_town->m_type == TOWN_TYPE_WARLOCK &&
+                m_town->m_type == FACTION_WARLOCK &&
                 ((m_town->m_buildings & TOWN_BUILDING_UPGRADED_DWELLING_6) ||
                  (m_town->m_buildings &
                   TOWN_BUILDING_ALTERNATE_UPGRADED_DWELLING_6))) {
@@ -307,7 +307,7 @@ void townManager::SetupCastle(heroWindow *window, i32 updateOnly)
                 ++backgroundFrame6;
             }
         }
-        if (xIsExpansionMap == 0 && m_town->m_type == TOWN_TYPE_NECROMANCER) {
+        if (xIsExpansionMap == 0 && m_town->m_type == FACTION_NECROMANCER) {
             backgroundWidget19 = new iconWidget(149, 157, 137, 72,
                                               "caslxtra.icn", 0, 0, -1,
                                               16, 1);

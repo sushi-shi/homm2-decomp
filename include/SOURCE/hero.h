@@ -4,6 +4,7 @@
 // 34 methods, 0 own-virtual, 0 static data.
 #include <va.h>
 #include <SOURCE/armyGroup.h>
+#include <SOURCE/KB_TYPES.h>
 
 // forward declarations:
 class town;
@@ -33,16 +34,6 @@ typedef enum HeroSkillLevel {
     HERO_SKILL_LEVEL_EXPERT = 3,
     HERO_SKILL_LEVEL_COUNT = 4
 } HeroSkillLevel;
-
-typedef enum HeroClassType {
-    HERO_CLASS_KNIGHT = 0,
-    HERO_CLASS_BARBARIAN = 1,
-    HERO_CLASS_SORCERESS = 2,
-    HERO_CLASS_WARLOCK = 3,
-    HERO_CLASS_WIZARD = 4,
-    HERO_CLASS_NECROMANCER = 5,
-    HERO_CLASS_COUNT = 6
-} HeroClassType;
 
 typedef enum HeroPrimaryStat {
     HERO_PRIMARY_ATTACK = 0,

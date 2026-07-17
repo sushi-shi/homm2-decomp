@@ -301,7 +301,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate)
                 iconCount++;
 
                 i32 captainMana =
-                    record->m_type == TOWN_TYPE_BARBARIAN || record->m_type == TOWN_TYPE_KNIGHT
+                    record->m_type == FACTION_BARBARIAN || record->m_type == FACTION_KNIGHT
                         ? 10
                         : 20;
                 OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] =

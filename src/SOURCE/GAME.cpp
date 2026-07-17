@@ -1115,9 +1115,9 @@ void game::NewMap(char *filename)
     if (extension0 != 0 && StrEqNoCase(extension0 + 1, "MX2"))
         xIsExpansionMap = 1;
     if (xIsExpansionMap)
-        gTownEligibleBuildMask[TOWN_TYPE_NECROMANCER] |= 4;
+        gTownEligibleBuildMask[FACTION_NECROMANCER] |= 4;
     else
-        gTownEligibleBuildMask[TOWN_TYPE_NECROMANCER] &= ~4;
+        gTownEligibleBuildMask[FACTION_NECROMANCER] &= ~4;
 
     gbInNewGameSetup = 1;
     giCurPlayer = 0;
@@ -3920,16 +3920,16 @@ void game::RandomizeHeroPool(void)
             Random(RANDOM_HERO_SEED_MIN, RANDOM_HERO_SEED_MAX));
         m_heroRecs[heroId].m_enabled = RANDOM_HERO_ENABLED;
 
-        if (m_heroRecs[heroId].m_cursorType == HERO_CLASS_SORCERESS)
+        if (m_heroRecs[heroId].m_cursorType == FACTION_SORCERESS)
             m_heroRecs[heroId].m_spells[RANDOM_HERO_SORCERESS_STARTING_SPELL] =
                 RANDOM_HERO_STARTING_SPELL_KNOWN;
-        else if (m_heroRecs[heroId].m_cursorType == HERO_CLASS_WARLOCK)
+        else if (m_heroRecs[heroId].m_cursorType == FACTION_WARLOCK)
             m_heroRecs[heroId].m_spells[RANDOM_HERO_WARLOCK_STARTING_SPELL] =
                 RANDOM_HERO_STARTING_SPELL_KNOWN;
-        else if (m_heroRecs[heroId].m_cursorType == HERO_CLASS_NECROMANCER)
+        else if (m_heroRecs[heroId].m_cursorType == FACTION_NECROMANCER)
             m_heroRecs[heroId].m_spells[RANDOM_HERO_NECROMANCER_STARTING_SPELL] =
                 RANDOM_HERO_STARTING_SPELL_KNOWN;
-        else if (m_heroRecs[heroId].m_cursorType == HERO_CLASS_WIZARD)
+        else if (m_heroRecs[heroId].m_cursorType == FACTION_WIZARD)
             m_heroRecs[heroId].m_spells[RANDOM_HERO_WIZARD_STARTING_SPELL] =
                 RANDOM_HERO_STARTING_SPELL_KNOWN;
     }
@@ -3946,7 +3946,7 @@ void game::SetRandomHeroArmies(i32 heroId, i32 strongArmy)
 {
     armyGroup *army2 = &m_heroRecs[heroId].m_army;
     i32 armySlot7 = 0;
-    RandomHeroArmyRange armyTable7[HERO_CLASS_COUNT][RANDOM_HERO_ARMY_OPTION_COUNT] = {
+    RandomHeroArmyRange armyTable7[FACTION_COUNT][RANDOM_HERO_ARMY_OPTION_COUNT] = {
         {{RANDOM_HERO_KNIGHT_FIRST, 30, 50},
          {RANDOM_HERO_KNIGHT_SECOND, 3, 5},
          {RANDOM_HERO_KNIGHT_THIRD, 2, 4}},
@@ -4306,7 +4306,7 @@ i32 game::GetLuck(hero *h, class army *, town *castle)
         luck = LUCK_MAXIMUM;
     if (h->HasArtifact(ARTIFACT_BATTLE_GARB))
         luck = LUCK_MAXIMUM;
-    if (castle != 0 && castle->m_type == TOWN_TYPE_SORCERESS &&
+    if (castle != 0 && castle->m_type == FACTION_SORCERESS &&
         (castle->m_buildings & TOWN_BUILDING_RAINBOW)) {
         luck += LUCK_RAINBOW_BONUS;
     }
@@ -6377,7 +6377,7 @@ i32 game::CountShrines(i32 player)
                     castle = GetCastle(cell->m_objectMetadata);
                     if (castle->m_owner == player &&
                         (castle->m_buildings & TOWN_BUILDING_TAVERN) &&
-                        castle->m_type == TOWN_TYPE_NECROMANCER)
+                        castle->m_type == FACTION_NECROMANCER)
                         count++;
                 }
             }

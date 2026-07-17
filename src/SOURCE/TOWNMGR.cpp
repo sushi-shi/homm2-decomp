@@ -48,7 +48,7 @@
 #include <string.h>
 
 DATA(0x004eb080) static const i8
-    gTownObjectOrder[TOWN_TYPE_COUNT][TOWN_BUILDING_COUNT] = {
+    gTownObjectOrder[FACTION_COUNT][TOWN_BUILDING_COUNT] = {
         {
             TOWN_OBJECT_SECOND_WELL,
             TOWN_OBJECT_CASTLE_UPGRADE,
@@ -269,7 +269,7 @@ DATA(0x004eb080) static const i8
 // is no TOWNMGR BSS contribution. Do not add padding, fallback identities,
 // aliases, cursor adjustments, or section pragmas to force allocation order.
 DATA(0x004ee750) SBuildingInfo
-    sBuildingInfo[TOWN_TYPE_COUNT][TOWN_BUILDING_COUNT] = {
+    sBuildingInfo[FACTION_COUNT][TOWN_BUILDING_COUNT] = {
         { // Knight
             { 0, 397, 46, 84, 138 },
             { 5, 0, 130, 53, 63 },
@@ -540,7 +540,7 @@ void townObject::Draw(i32 advanceAnimation)
     if (m_buildingId == TOWN_OBJECT_CASTLE_UPGRADE)
         return;
     if (m_buildingId == TOWN_OBJECT_KNIGHT_LEFT_OVERLAY &&
-        gpTownManager->m_town->m_type == TOWN_TYPE_KNIGHT &&
+        gpTownManager->m_town->m_type == FACTION_KNIGHT &&
         (!(gpTownManager->m_town->m_buildings & TOWN_RENDER_KNIGHT_LEFT_GATE) ||
          (!(gpTownManager->m_town->m_buildings &
             TOWN_RENDER_KNIGHT_LEFT_FIRST_OPTION) &&
@@ -550,7 +550,7 @@ void townObject::Draw(i32 advanceAnimation)
             TOWN_RENDER_KNIGHT_LEFT_THIRD_OPTION))))
         return;
     if (m_buildingId == TOWN_OBJECT_KNIGHT_RIGHT_OVERLAY &&
-        gpTownManager->m_town->m_type == TOWN_TYPE_KNIGHT &&
+        gpTownManager->m_town->m_type == FACTION_KNIGHT &&
         (!(gpTownManager->m_town->m_buildings & TOWN_RENDER_KNIGHT_RIGHT_GATE) ||
          (!(gpTownManager->m_town->m_buildings &
             TOWN_RENDER_KNIGHT_RIGHT_FIRST_OPTION) &&
@@ -558,27 +558,27 @@ void townObject::Draw(i32 advanceAnimation)
             TOWN_RENDER_KNIGHT_RIGHT_SECOND_OPTION))))
         return;
     if (m_buildingId == TOWN_OBJECT_KNIGHT_RIGHT_OVERLAY &&
-        gpTownManager->m_town->m_type == TOWN_TYPE_BARBARIAN &&
+        gpTownManager->m_town->m_type == FACTION_BARBARIAN &&
         (!(gpTownManager->m_town->m_buildings &
            TOWN_RENDER_BARBARIAN_RIGHT_GATE) ||
          !(gpTownManager->m_town->m_buildings &
            TOWN_RENDER_BARBARIAN_RIGHT_OPTION)))
         return;
     if (m_buildingId == TOWN_OBJECT_BARBARIAN_OVERLAY &&
-        gpTownManager->m_town->m_type == TOWN_TYPE_BARBARIAN &&
+        gpTownManager->m_town->m_type == FACTION_BARBARIAN &&
         (!(gpTownManager->m_town->m_buildings &
            TOWN_RENDER_BARBARIAN_OVERLAY_GATE) ||
          !(gpTownManager->m_town->m_buildings &
            TOWN_RENDER_BARBARIAN_OVERLAY_OPTION)))
         return;
-    if (gpTownManager->m_town->m_type == TOWN_TYPE_SORCERESS &&
+    if (gpTownManager->m_town->m_type == FACTION_SORCERESS &&
         m_buildingId == TOWN_OBJECT_KNIGHT_LEFT_OVERLAY &&
         (!(gpTownManager->m_town->m_buildings &
            TOWN_RENDER_SORCERESS_LEFT_GATE) ||
          !(gpTownManager->m_town->m_buildings &
            TOWN_RENDER_SORCERESS_LEFT_OPTION)))
         return;
-    if (gpTownManager->m_town->m_type == TOWN_TYPE_SORCERESS &&
+    if (gpTownManager->m_town->m_type == FACTION_SORCERESS &&
         (m_buildingId == TOWN_OBJECT_SORCERESS_LEFT_OVERLAY ||
          m_buildingId == TOWN_OBJECT_SORCERESS_RIGHT_OVERLAY) &&
         (gpTownManager->m_town->m_buildings &
@@ -587,10 +587,10 @@ void townObject::Draw(i32 advanceAnimation)
          TOWN_RENDER_SORCERESS_LEFT_OPTION))
         return;
     if (m_buildingId == TOWN_OBJECT_RACE_OVERLAY &&
-        (gpTownManager->m_town->m_type == TOWN_TYPE_NECROMANCER ||
-         gpTownManager->m_town->m_type == TOWN_TYPE_WARLOCK ||
-         gpTownManager->m_town->m_type == TOWN_TYPE_SORCERESS ||
-         gpTownManager->m_town->m_type == TOWN_TYPE_KNIGHT) &&
+        (gpTownManager->m_town->m_type == FACTION_NECROMANCER ||
+         gpTownManager->m_town->m_type == FACTION_WARLOCK ||
+         gpTownManager->m_town->m_type == FACTION_SORCERESS ||
+         gpTownManager->m_town->m_type == FACTION_KNIGHT) &&
         ((gpTownManager->m_town->m_buildings &
           TOWN_RENDER_RACE_OVERLAY_FIRST_OPTION) ||
          (gpTownManager->m_town->m_buildings &
@@ -602,7 +602,7 @@ void townObject::Draw(i32 advanceAnimation)
         return;
 
     if (m_buildingId == TOWN_OBJECT_PRIMARY_ANIMATION) {
-        if (gpTownManager->m_town->m_type == TOWN_TYPE_NECROMANCER) {
+        if (gpTownManager->m_town->m_type == FACTION_NECROMANCER) {
             baseFrame =
                 2 * (3 * (gpTownManager->m_town->m_buildState - 1));
         } else {
@@ -610,7 +610,7 @@ void townObject::Draw(i32 advanceAnimation)
         }
         m_icon->DrawToBuffer(0, 0, baseFrame, 0);
         if (m_animationFrameCount != 0) {
-            if (gpTownManager->m_town->m_type == TOWN_TYPE_BARBARIAN &&
+            if (gpTownManager->m_town->m_type == FACTION_BARBARIAN &&
                 gpTownManager->m_town->m_buildState <
                     TOWN_BARBARIAN_ANIMATION_BUILD_STATE)
                 return;
@@ -650,25 +650,25 @@ VA(0x00413f69, 0x1a0)
 void townManager::SetupExtraStuff(void)
 {
     m_town->m_buildings &= TOWN_EXTRA_DYNAMIC_CLEAR_MASK;
-    if (m_town->m_type == TOWN_TYPE_WIZARD)
+    if (m_town->m_type == FACTION_WIZARD)
         m_town->m_buildings |= TOWN_EXTRA_RACE_FIRST_MASK;
-    if (m_town->m_type == TOWN_TYPE_SORCERESS) {
+    if (m_town->m_type == FACTION_SORCERESS) {
         m_town->m_buildings |= TOWN_EXTRA_RACE_FIRST_MASK;
         m_town->m_buildings |= TOWN_EXTRA_RACE_SECOND_MASK;
     }
-    if (m_town->m_type == TOWN_TYPE_KNIGHT) {
+    if (m_town->m_type == FACTION_KNIGHT) {
         m_town->m_buildings |= TOWN_EXTRA_RACE_SECOND_MASK;
         m_town->m_buildings |= TOWN_EXTRA_RACE_THIRD_MASK;
     }
-    if (m_town->m_type == TOWN_TYPE_BARBARIAN) {
+    if (m_town->m_type == FACTION_BARBARIAN) {
         m_town->m_buildings |= TOWN_EXTRA_RACE_SECOND_MASK;
         m_town->m_buildings |= TOWN_EXTRA_RACE_THIRD_MASK;
         m_town->m_buildings |= TOWN_EXTRA_RACE_LAST_MASK;
     }
-    if ((m_town->m_type == TOWN_TYPE_WARLOCK ||
-         m_town->m_type == TOWN_TYPE_KNIGHT ||
-         m_town->m_type == TOWN_TYPE_BARBARIAN ||
-         m_town->m_type == TOWN_TYPE_NECROMANCER) &&
+    if ((m_town->m_type == FACTION_WARLOCK ||
+         m_town->m_type == FACTION_KNIGHT ||
+         m_town->m_type == FACTION_BARBARIAN ||
+         m_town->m_type == FACTION_NECROMANCER) &&
         m_town->CanBuildDock())
         m_town->m_buildings |= TOWN_EXTRA_RACE_FIRST_MASK;
     if ((m_town->m_buildings & TOWN_BUILDING_DOCK) &&
@@ -1104,7 +1104,7 @@ void townManager::SetCommandAndText(struct tag_message &message)
         strcpy(m_statusText, cTownCommand[TOWN_TEXT_THIEVES_GUILD]);
         break;
     case TOWN_OBJECT_TAVERN:
-        if (m_town->m_type == TOWN_TYPE_NECROMANCER)
+        if (m_town->m_type == FACTION_NECROMANCER)
             strcpy(m_statusText, xNecromancerShrine);
         else
             strcpy(m_statusText, cTownCommand[TOWN_TEXT_TAVERN]);
@@ -1411,7 +1411,7 @@ i32 townManager::Main(tag_message &message)
                 goto showBuildingInformation;
             }
             {
-                if (m_town->m_type == TOWN_TYPE_NECROMANCER) {
+                if (m_town->m_type == FACTION_NECROMANCER) {
                     sprintf(description_b,
                             GetBuildingInfo(m_town->m_type,
                                             message.payload.widget.id, 1));
@@ -1968,7 +1968,7 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView)
         dwelling_k = building - 19;
 
     if (building == TOWN_COMMAND_TAVERN &&
-        m_town->m_type == TOWN_TYPE_NECROMANCER) {
+        m_town->m_type == FACTION_NECROMANCER) {
         for (index_h = 0; index_h < TOWN_RESOURCE_COUNT; ++index_h) {
             if (xShrineBuildingCost[index_h] > 0) {
                 resourceTypes_o[costCount_o] = static_cast<i8>(index_h);
@@ -2065,7 +2065,7 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView)
                 strcat(description_b, GetBuildingName(m_town->m_type, index_h));
             }
         }
-        if (m_town->m_type == TOWN_TYPE_NECROMANCER &&
+        if (m_town->m_type == FACTION_NECROMANCER &&
             building == TOWN_COMMAND_NECROMANCER_MAGE_GUILD_PREREQUISITE &&
             m_town->m_buildState <= 2)
             strcat(description_b, "\nLevel 2 Mage Guild");
@@ -2285,7 +2285,7 @@ void townManager::BuildObj(i32 building)
         gbSaveBiggestExtent = 1;
         gbReturnAfterComputeExtent = 1;
         if (building == TOWN_COMMAND_MAGE_GUILD) {
-            if (gpTownManager->m_town->m_type == TOWN_TYPE_NECROMANCER)
+            if (gpTownManager->m_town->m_type == FACTION_NECROMANCER)
                 frame_g = (gpTownManager->m_town->m_buildState - 1) * 3 * 2;
             else
                 frame_g = gpTownManager->m_town->m_buildState - 1;
@@ -2364,7 +2364,7 @@ void townManager::SetupMage(heroWindow *window)
 
     for (level = 0; level < TOWN_MAGE_GUILD_MAX_LEVEL; ++level) {
         for (slot_m = 0; slot_m < TOWN_MAGE_SPELLS_PER_LEVEL; ++slot_m) {
-            if (m_town->m_type == TOWN_TYPE_WIZARD &&
+            if (m_town->m_type == FACTION_WIZARD &&
                 (m_town->m_buildings & TOWN_WIZARD_LIBRARY_BUILDING_FLAG))
                 hasLibrary_k = 1;
             else
@@ -2604,7 +2604,7 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit)
         newHeroClassCount =
             gpCurPlayer->m_availableHeroIds[1 - m_recruitState] / 9;
         newHeroClassCount =
-            (Random(1, 5) + newHeroClassCount) % TOWN_HERO_CLASS_COUNT;
+            (Random(1, 5) + newHeroClassCount) % TOWN_FACTION_COUNT;
         gpCurPlayer->m_availableHeroIds[m_recruitState] =
             static_cast<i8>(
                 gpGame->GetNewHeroId(giCurPlayer, newHeroClassCount, 0));

@@ -4655,16 +4655,16 @@ void advManager::GenericSiteAIEvent(mapCell *cell, hero *eventHero)
                 static_cast<i32>(eventHero->m_eventFlags) |
                 AI_GENERIC_SITE_SHIPWRECK_FLAG;
             switch (eventHero->m_cursorType) {
-            case HERO_CLASS_SORCERESS:
-            case HERO_CLASS_WARLOCK:
-            case HERO_CLASS_WIZARD:
-            case HERO_CLASS_NECROMANCER:
+            case FACTION_SORCERESS:
+            case FACTION_WARLOCK:
+            case FACTION_WIZARD:
+            case FACTION_NECROMANCER:
                 primaryStat16 = HERO_PRIMARY_SPELL_POWER;
                 break;
-            case HERO_CLASS_BARBARIAN:
+            case FACTION_BARBARIAN:
                 primaryStat16 = HERO_PRIMARY_ATTACK;
                 break;
-            case HERO_CLASS_KNIGHT:
+            case FACTION_KNIGHT:
                 primaryStat16 = HERO_PRIMARY_DEFENSE;
                 break;
             default:

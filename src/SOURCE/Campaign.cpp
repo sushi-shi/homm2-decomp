@@ -898,7 +898,7 @@ void game::InitCampaignMap(void)
             armyHero->m_army.m_creatureCounts[heroPositionValue] = 0;
         }
         switch (armyHero->m_cursorType) {
-        case HERO_CLASS_BARBARIAN:
+        case FACTION_BARBARIAN:
             armyHero->m_army.Add(ARMY_CREATURE_ORC_CHIEF,
                                  CAMPAIGN_BARBARIAN_ORC_CHIEF_COUNT, -1);
             armyHero->m_army.Add(ARMY_CREATURE_OGRE,
@@ -906,7 +906,7 @@ void game::InitCampaignMap(void)
             armyHero->m_army.Add(ARMY_CREATURE_GOBLIN,
                                  CAMPAIGN_BARBARIAN_GOBLIN_COUNT, -1);
             break;
-        case HERO_CLASS_WARLOCK:
+        case FACTION_WARLOCK:
             armyHero->m_army.Add(ARMY_CREATURE_CENTAUR,
                                  CAMPAIGN_WARLOCK_CENTAUR_COUNT, -1);
             armyHero->m_army.Add(ARMY_CREATURE_GARGOYLE,
@@ -914,7 +914,7 @@ void game::InitCampaignMap(void)
             armyHero->m_army.Add(ARMY_CREATURE_GRIFFIN,
                                  CAMPAIGN_WARLOCK_GRIFFIN_COUNT, -1);
             break;
-        case HERO_CLASS_NECROMANCER:
+        case FACTION_NECROMANCER:
             armyHero->m_army.Add(ARMY_CREATURE_SKELETON,
                                  CAMPAIGN_NECROMANCER_SKELETON_COUNT, -1);
             armyHero->m_army.Add(ARMY_CREATURE_ROYAL_MUMMY,

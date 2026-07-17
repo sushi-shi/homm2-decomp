@@ -101,10 +101,10 @@ i32 armyGroup::GetMorale(hero *armyHero, town *occupiedTown, armyGroup *enemyGro
         alignmentValue = 0;
     morale += alignmentValue;
 
-    if (occupiedTown != 0 && occupiedTown->m_type != TOWN_TYPE_NECROMANCER
+    if (occupiedTown != 0 && occupiedTown->m_type != FACTION_NECROMANCER
         && (occupiedTown->m_buildings & TOWN_BUILDING_TAVERN))
         ++morale;
-    if (occupiedTown != 0 && occupiedTown->m_type == TOWN_TYPE_BARBARIAN
+    if (occupiedTown != 0 && occupiedTown->m_type == FACTION_BARBARIAN
         && (occupiedTown->m_buildings & TOWN_BUILDING_COLISEUM))
         morale += 2;
 

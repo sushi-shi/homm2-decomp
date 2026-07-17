@@ -677,8 +677,8 @@ void hero::CheckLevel(void) {
             for (indexValue = 0; indexValue < HERO_SECONDARY_SKILL_CHOICE_COUNT;
                  indexValue++) {
                 skillChoicesResult[indexValue] = HERO_SECONDARY_SKILL_NONE;
-                if (indexValue == 0 && m_cursorType != HERO_CLASS_BARBARIAN &&
-                    m_cursorType != HERO_CLASS_KNIGHT &&
+                if (indexValue == 0 && m_cursorType != FACTION_BARBARIAN &&
+                    m_cursorType != FACTION_KNIGHT &&
                     m_secondarySkills[HERO_SKILL_WISDOM] < HERO_SKILL_LEVEL_EXPERT &&
                     currentLevelIndex - m_enabled >= HERO_SECONDARY_SKILL_OFFER_GAP) {
                     skillChoicesResult[indexValue] = HERO_SKILL_WISDOM;
@@ -1802,7 +1802,7 @@ i8 hero::GetSSLevel(i32 skill) {
         return level;
     if (HasArtifact(HERO_ARTIFACT_SPADE_NECROMANCY))
         shrineAndArtifactBonus++;
-    if (m_cursorType == HERO_CLASS_NECROMANCER)
+    if (m_cursorType == FACTION_NECROMANCER)
         shrineAndArtifactBonus += gpGame->CountShrines(m_owner);
     if (shrineAndArtifactBonus > HERO_NECROMANCY_BONUS_MAX)
         shrineAndArtifactBonus = HERO_NECROMANCY_BONUS_MAX;

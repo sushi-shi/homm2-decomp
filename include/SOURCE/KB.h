@@ -44,7 +44,7 @@ typedef enum GlobalTimerConstant {
 
 typedef enum CombatHeroTableConstant {
     KB_COMBAT_HERO_VARIANT_COUNT = 2,
-    KB_COMBAT_HERO_SPRITE_COUNT = HERO_CLASS_COUNT * KB_COMBAT_HERO_VARIANT_COUNT
+    KB_COMBAT_HERO_SPRITE_COUNT = FACTION_COUNT * KB_COMBAT_HERO_VARIANT_COUNT
 } CombatHeroTableConstant;
 
 typedef enum CampaignSide {
@@ -863,7 +863,7 @@ extern i32 gbAllBlack;
 extern i32 gbCheatMenus;
 extern i32 gbClosingApp;
 extern i8 gbCombatSurrender;
-extern i8 captainStats[HERO_CLASS_COUNT][HERO_PRIMARY_STAT_COUNT];
+extern i8 captainStats[FACTION_COUNT][HERO_PRIMARY_STAT_COUNT];
 extern i32 gbDrawSavedCursor;
 extern i32 gbForegroundApp;
 extern i32 gbFunctionComplete;
@@ -967,6 +967,6 @@ extern heroWindow *pNormalDialogWindow;
 extern void **ppMapExtra;
 extern i16 *pwSizeOfMapExtra;
 extern font *smallFont;
-extern u8 iGetSSByAlignment[HERO_SKILL_COUNT][HERO_CLASS_COUNT];
+extern u8 iGetSSByAlignment[HERO_SKILL_COUNT][FACTION_COUNT];
 
 #endif // HOMM2_KB_H

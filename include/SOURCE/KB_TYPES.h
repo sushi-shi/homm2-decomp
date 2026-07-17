@@ -12,6 +12,30 @@ class sample;
 // per-element .rdata float symbols referenced in philAI::RVConversion; the rest follow the
 // canonical order.
 enum { RES_WOOD, RES_MERCURY, RES_ORE, RES_SULFUR, RES_CRYSTAL, RES_GEMS, RES_GOLD };
+
+HOMM2_ENUM_BEGIN(FactionType)
+    FACTION_KNIGHT = 0,
+    FACTION_BARBARIAN = 1,
+    FACTION_SORCERESS = 2,
+    FACTION_WARLOCK = 3,
+    FACTION_WIZARD = 4,
+    FACTION_NECROMANCER = 5,
+    FACTION_COUNT = 6
+HOMM2_ENUM_END(FactionType)
+
+HOMM2_ENUM_BEGIN(TerrainType)
+    TERRAIN_WATER = 0,
+    TERRAIN_GRASS = 1,
+    TERRAIN_SNOW = 2,
+    TERRAIN_SWAMP = 3,
+    TERRAIN_LAVA = 4,
+    TERRAIN_DESERT = 5,
+    TERRAIN_DIRT = 6,
+    TERRAIN_WASTELAND = 7,
+    TERRAIN_BEACH = 8,
+    TERRAIN_COUNT = 9
+HOMM2_ENUM_END(TerrainType)
+
 typedef enum MonsterFlags {
     MONSTER_FLAGS_WIDE = 0x00000001,
     MONSTER_FLAGS_FLYING = 0x00000002,
