@@ -832,7 +832,7 @@ public:
     void VaporizeCreature(i32, i32);
     void RippleCreature(i32, i32, i32);
     void ShowMassSpell(i8 (*const)[20], i32, i32);
-    void CastMassSpell(i32, i32);
+    void CastMassSpell(SpellType, i32);
     void MirrorImage(i32);
     void SummonElemental(i32, i32);
     void DoLuck(i32, i32);

@@ -5138,7 +5138,7 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                 break;
             case MAP_OBJECT_ARTIFACT:
                 value_h =
-                    EvaluateArtifactEvent(cell_k->m_objectIndex >> 1, cell_k->m_objectMetadata);
+                    EvaluateArtifactEvent(ArtifactType(cell_k->m_objectIndex) >> 1, cell_k->m_objectMetadata);
                 break;
             case MAP_OBJECT_ALCHEMIST_LAB:
             case MAP_OBJECT_MINE:
@@ -5923,7 +5923,7 @@ i32 OnMySide(i32 player) {
 // table, every non-jump opcode and operand matches; retail has one extra five-byte
 // inline continuation after HasSpell. The size delta is exactly that one jump.
 VA(0x00446362, 0x2bc)
-i32 philAI::EvaluateArtifactEvent(i32 artifact, i32 eventData) {
+i32 philAI::EvaluateArtifactEvent(ArtifactType artifact, i32 eventData) {
     i32 battleScratch46;
     i32 guardedValue2;
     i32 result5;
@@ -5943,7 +5943,7 @@ i32 philAI::EvaluateArtifactEvent(i32 artifact, i32 eventData) {
         return 0;
 
     result5 = 0;
-    artifactValue15 = gArtifactBaseRV[artifact];
+    artifactValue15 = gArtifactBaseRV[IDX(artifact)];
 
     if (artifact == ARTIFACT_SPELL_SCROLL) {
         if (gpCurAIHero->HasSpell(SpellType(eventData)))
@@ -5978,7 +5978,7 @@ i32 philAI::EvaluateArtifactEvent(i32 artifact, i32 eventData) {
             defenderRemaining6,
             outcomeValue17
         );
-        guardedValue2 = static_cast<i32>(gArtifactBaseRV[artifact] * winChance9 + outcomeValue17);
+        guardedValue2 = static_cast<i32>(gArtifactBaseRV[IDX(artifact)] * winChance9 + outcomeValue17);
         if (guardedValue2 < 0)
             guardedValue2 = 0;
         result5 = guardedValue2;
@@ -6002,7 +6002,7 @@ i32 philAI::EvaluateArtifactEvent(i32 artifact, i32 eventData) {
             case AI_ARTIFACT_EVENT_NO_VALUE:
                 break;
             case AI_ARTIFACT_EVENT_PAY_GOLD:
-                result5 = NetValueOfArtifact(artifact, IDX(AI_ARTIFACT_EVENT_GOLD_COST), 0, 0);
+                result5 = NetValueOfArtifact(IDX(artifact), IDX(AI_ARTIFACT_EVENT_GOLD_COST), 0, 0);
                 break;
             case AI_ARTIFACT_EVENT_PAY_RESOURCE_THREE:
                 result5 = NetValueOfArtifact(
