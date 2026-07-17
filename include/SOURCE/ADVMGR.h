@@ -146,7 +146,6 @@ H2_ENUM_BEGIN(AdventureFrameConstant)
 H2_ENUM_END(AdventureFrameConstant)
 
 H2_ENUM_BEGIN(AdventureStateConstant)
-    ADVMGR_INVALID_CELL = -1,
     ADVMGR_INVALID_HERO = -1,
     ADVMGR_LOOPING_SOUND_LIMIT = 4,
     ADVMGR_OBJECT_ICON_COUNT = 64,
@@ -397,6 +396,7 @@ H2_ENUM_BEGIN(AdventureRouteConstant)
 H2_ENUM_END(AdventureRouteConstant)
 
 H2_ENUM_CLASS_BEGIN(AdventureCommand)
+    ADVMGR_INVALID_CELL = -1,
     ADVMGR_COMMAND_NONE = -1,
     ADVMGR_COMMAND_MOVE_TO = 1,
     ADVMGR_COMMAND_HERO_VIEW = 2,
