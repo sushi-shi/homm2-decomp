@@ -694,16 +694,16 @@ i32 combatManager::EffectSpellCreateCreature(i32 hex, i32 spell)
     i32 creatureType;
     switch (spell) {
     case SPELL_SUMMON_EARTH_ELEMENTAL:
-        creatureType = SPELL_MONSTER_EARTH_ELEMENTAL;
+        creatureType = CREATURE_EARTH_ELEMENTAL;
         break;
     case SPELL_SUMMON_AIR_ELEMENTAL:
-        creatureType = SPELL_MONSTER_AIR_ELEMENTAL;
+        creatureType = CREATURE_AIR_ELEMENTAL;
         break;
     case SPELL_SUMMON_FIRE_ELEMENTAL:
-        creatureType = SPELL_MONSTER_FIRE_ELEMENTAL;
+        creatureType = CREATURE_FIRE_ELEMENTAL;
         break;
     case SPELL_SUMMON_WATER_ELEMENTAL:
-        creatureType = SPELL_MONSTER_WATER_ELEMENTAL;
+        creatureType = CREATURE_WATER_ELEMENTAL;
         break;
     default:
         workChance =
@@ -857,10 +857,10 @@ i32 combatManager::RawEffectSpellInfluence(army *target, i32 influence)
         i32 i;
         for (i = 0; i < m_armyCount[1 - target->m_side]; i++) {
             otherArmy = &m_armies[target->m_side][i];
-            if (otherArmy->m_monsterType == ARMY_CREATURE_GREEN_DRAGON ||
-                otherArmy->m_monsterType == ARMY_CREATURE_RED_DRAGON ||
-                otherArmy->m_monsterType == ARMY_CREATURE_BLACK_DRAGON ||
-                otherArmy->m_monsterType == ARMY_CREATURE_BONE_DRAGON) {
+            if (otherArmy->m_monsterType == CREATURE_GREEN_DRAGON ||
+                otherArmy->m_monsterType == CREATURE_RED_DRAGON ||
+                otherArmy->m_monsterType == CREATURE_BLACK_DRAGON ||
+                otherArmy->m_monsterType == CREATURE_BONE_DRAGON) {
                 dragonCount++;
                 if (target->OtherArmyAdjacent(otherArmy->m_side,
                                                otherArmy->m_index))
@@ -1316,44 +1316,44 @@ void combatManager::EffectSpellDamage(i32 *effect, i32 spell, i32 targetHex)
                     switch (spell) {
                     case SPELL_FIREBALL:
                     case SPELL_FIREBLAST:
-                        if (monsterTotal == SPELL_MONSTER_IRON_GOLEM ||
-                            monsterTotal == SPELL_MONSTER_STEEL_GOLEM)
+                        if (monsterTotal == CREATURE_IRON_GOLEM ||
+                            monsterTotal == CREATURE_STEEL_GOLEM)
                             spellDamageWork = static_cast<i32l>(
                                 spellDamageWork * SPELL_GOLEM_DAMAGE_MULTIPLIER);
-                        if (monsterTotal == SPELL_MONSTER_WATER_ELEMENTAL)
+                        if (monsterTotal == CREATURE_WATER_ELEMENTAL)
                             spellDamageWork <<= 1;
                         break;
                     case SPELL_LIGHTNING_BOLT:
                     case SPELL_CHAIN_LIGHTNING:
                     case SPELL_ELEMENTAL_STORM:
-                        if (monsterTotal == SPELL_MONSTER_IRON_GOLEM ||
-                            monsterTotal == SPELL_MONSTER_STEEL_GOLEM)
+                        if (monsterTotal == CREATURE_IRON_GOLEM ||
+                            monsterTotal == CREATURE_STEEL_GOLEM)
                             spellDamageWork = static_cast<i32l>(
                                 spellDamageWork * SPELL_GOLEM_DAMAGE_MULTIPLIER);
-                        if (monsterTotal == SPELL_MONSTER_AIR_ELEMENTAL)
+                        if (monsterTotal == CREATURE_AIR_ELEMENTAL)
                             spellDamageWork <<= 1;
                         break;
                     case SPELL_ARMAGEDDON:
-                        if (monsterTotal == SPELL_MONSTER_IRON_GOLEM ||
-                            monsterTotal == SPELL_MONSTER_STEEL_GOLEM)
+                        if (monsterTotal == CREATURE_IRON_GOLEM ||
+                            monsterTotal == CREATURE_STEEL_GOLEM)
                             spellDamageWork = static_cast<i32l>(
                                 spellDamageWork * SPELL_GOLEM_DAMAGE_MULTIPLIER);
                         break;
                     case SPELL_METEOR_SHOWER:
-                        if (monsterTotal == SPELL_MONSTER_IRON_GOLEM ||
-                            monsterTotal == SPELL_MONSTER_STEEL_GOLEM)
+                        if (monsterTotal == CREATURE_IRON_GOLEM ||
+                            monsterTotal == CREATURE_STEEL_GOLEM)
                             spellDamageWork = static_cast<i32l>(
                                 spellDamageWork * SPELL_GOLEM_DAMAGE_MULTIPLIER);
-                        if (monsterTotal == SPELL_MONSTER_EARTH_ELEMENTAL)
+                        if (monsterTotal == CREATURE_EARTH_ELEMENTAL)
                             spellDamageWork <<= 1;
                         break;
                     case SPELL_COLD_RAY:
                     case SPELL_COLD_RING:
-                        if (monsterTotal == SPELL_MONSTER_IRON_GOLEM ||
-                            monsterTotal == SPELL_MONSTER_STEEL_GOLEM)
+                        if (monsterTotal == CREATURE_IRON_GOLEM ||
+                            monsterTotal == CREATURE_STEEL_GOLEM)
                             spellDamageWork = static_cast<i32l>(
                                 spellDamageWork * SPELL_GOLEM_DAMAGE_MULTIPLIER);
-                        if (monsterTotal == SPELL_MONSTER_FIRE_ELEMENTAL)
+                        if (monsterTotal == CREATURE_FIRE_ELEMENTAL)
                             spellDamageWork <<= 1;
                         break;
                     }

@@ -5082,23 +5082,23 @@ void advManager::CastSpell(i32 spell)
     switch (spell) {
     case ADVENTURE_SPELL_SET_EARTH_GUARDIAN:
         guardianTypes1[ADVMGR_MINE_GUARDIAN_TYPE_INDEX] =
-            ADVMGR_MINE_GUARDIAN_EARTH_ELEMENTAL;
+            CREATURE_EARTH_ELEMENTAL;
         goto setMineGuardian;
     case ADVENTURE_SPELL_SET_AIR_GUARDIAN:
         guardianTypes1[ADVMGR_MINE_GUARDIAN_TYPE_INDEX] =
-            ADVMGR_MINE_GUARDIAN_AIR_ELEMENTAL;
+            CREATURE_AIR_ELEMENTAL;
         goto setMineGuardian;
     case ADVENTURE_SPELL_SET_FIRE_GUARDIAN:
         guardianTypes1[ADVMGR_MINE_GUARDIAN_TYPE_INDEX] =
-            ADVMGR_MINE_GUARDIAN_FIRE_ELEMENTAL;
+            CREATURE_FIRE_ELEMENTAL;
         goto setMineGuardian;
     case ADVENTURE_SPELL_SET_WATER_GUARDIAN:
         guardianTypes1[ADVMGR_MINE_GUARDIAN_TYPE_INDEX] =
-            ADVMGR_MINE_GUARDIAN_WATER_ELEMENTAL;
+            CREATURE_WATER_ELEMENTAL;
         goto setMineGuardian;
     case ADVENTURE_SPELL_HAUNT:
         guardianTypes1[ADVMGR_MINE_GUARDIAN_TYPE_INDEX] =
-            ADVMGR_MINE_GUARDIAN_GHOST;
+            CREATURE_GHOST;
         goto setMineGuardian;
 setMineGuardian:
         currentCell = gpAdvManager->GetCell(currentHeroSlot->m_x, currentHeroSlot->m_y);
@@ -5479,7 +5479,7 @@ i32 advManager::ComboDraw(i32 originX, i32 originY, i32 animate)
         for (mapRow = 0; mapRow < ADVMGR_COMBO_VIEW_CELLS; ++mapRow) {
             cell = GetCell(column + originX, mapRow + originY);
             if (cell->m_triggerType == ADVMGR_MONSTER_TRIGGER) {
-                if (gpGame->m_mines[cell->m_objectMetadata].guardianType == ADVMGR_MONSTER_GHOST) {
+                if (gpGame->m_mines[cell->m_objectMetadata].guardianType == CREATURE_GHOST) {
                     ++bComboDraw[column][mapRow];
                     ++bComboDraw[column + 1][mapRow];
                     if (column < ADVMGR_COMBO_VIEW_CELLS)
@@ -8237,9 +8237,9 @@ i32 advManager::DoVisions(hero *visionHero)
     if (visionHero->m_army.CanJoin(creatureData) &&
         strengthRatioCurrent > MONSTER_STRENGTH_JOIN &&
         !visionHero->HasArtifact(MONSTER_NO_JOIN_ARTIFACT) &&
-        creatureData != MONSTER_GENIE && creatureData != MONSTER_EARTH_ELEMENTAL &&
-        creatureData != MONSTER_AIR_ELEMENTAL && creatureData != MONSTER_FIRE_ELEMENTAL &&
-        creatureData != MONSTER_WATER_ELEMENTAL) {
+        creatureData != CREATURE_GHOST && creatureData != CREATURE_EARTH_ELEMENTAL &&
+        creatureData != CREATURE_AIR_ELEMENTAL && creatureData != CREATURE_FIRE_ELEMENTAL &&
+        creatureData != CREATURE_WATER_ELEMENTAL) {
         if (forcedJoinState) {
             sprintf(visionMessageResult, "The creatures are willing to join us!");
             strcat(gText, visionMessageResult);

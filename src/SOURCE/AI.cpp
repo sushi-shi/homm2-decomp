@@ -350,8 +350,8 @@ void combatManager::DoCompAI(i32)
     case COMBAT_AI_ATTACK_SHOOT:
         if (AttemptAdjacentAttack(currentArmy9))
             goto finish;
-        if (currentArmy9->m_monsterType == ARMY_CREATURE_LICH ||
-            currentArmy9->m_monsterType == ARMY_CREATURE_POWER_LICH) {
+        if (currentArmy9->m_monsterType == CREATURE_LICH ||
+            currentArmy9->m_monsterType == CREATURE_POWER_LICH) {
             DoLichShot(currentArmy9);
             goto finish;
         }
@@ -878,7 +878,7 @@ i32 combatManager::AttemptAttack(class army *currentArmy, i32 side, i32 mask)
     i32 targetHex;
 
     while (mask != 0) {
-        if (currentArmy->m_monsterType == ARMY_CREATURE_GHOST)
+        if (currentArmy->m_monsterType == CREATURE_GHOST)
             targetArmy = GetWorstArmy(side, mask);
         else
             targetArmy = GetBestArmy(side, mask);
@@ -944,7 +944,7 @@ i32 combatManager::AttemptAdjacentAttack(class army *currentArmy)
                 1 << m_hexCells[attackHexes5[0]].m_occupantIndex;
         bit0 <<= 1;
     }
-    if (currentArmy->m_monsterType == ARMY_CREATURE_GHOST)
+    if (currentArmy->m_monsterType == CREATURE_GHOST)
         targetArmy15 = GetWorstArmy(
             COMBAT_DEFENDER_SIDE - m_currentSide, targetMask29);
     else

@@ -484,7 +484,7 @@ i32 swapManager::Main(tag_message &message)
                     if (m_heroes[SWAP_SIDE_LEFT]
                             ->m_army.m_creatureTypes[message.payload.widget.id -
                                                     SWAP_CONTROL_LEFT_ARMY_FIRST] !=
-                        SWAP_CREATURE_NONE) {
+                        CREATURE_NONE) {
                         gpGame->ViewArmy(
                             SWAP_ARMY_VIEW_X, SWAP_ARMY_VIEW_Y,
                             m_heroes[SWAP_SIDE_LEFT]
@@ -501,7 +501,7 @@ i32 swapManager::Main(tag_message &message)
                     if (m_heroes[SWAP_SIDE_LEFT]
                             ->m_army.m_creatureTypes[message.payload.widget.id -
                                                     SWAP_CONTROL_LEFT_ARMY_FIRST] !=
-                        SWAP_CREATURE_NONE) {
+                        CREATURE_NONE) {
                         m_selectedSide = SWAP_SIDE_LEFT;
                         m_targetSide = SWAP_SIDE_NONE;
                         m_itemType = SWAP_ITEM_ARMY;
@@ -523,7 +523,7 @@ i32 swapManager::Main(tag_message &message)
                                 SWAP_SPLIT_MODIFIER_MASK) != 0 &&
                                (m_heroes[m_targetSide]
                                         ->m_army.m_creatureTypes[m_targetSlot] ==
-                                    SWAP_CREATURE_NONE ||
+                                    CREATURE_NONE ||
                                 m_heroes[m_selectedSide]
                                         ->m_army.m_creatureTypes[m_selectedSlot] ==
                                     m_heroes[m_targetSide]
@@ -546,7 +546,7 @@ i32 swapManager::Main(tag_message &message)
                     if (m_heroes[SWAP_SIDE_RIGHT]
                             ->m_army.m_creatureTypes[message.payload.widget.id -
                                                     SWAP_CONTROL_RIGHT_ARMY_FIRST] !=
-                        SWAP_CREATURE_NONE) {
+                        CREATURE_NONE) {
                         gpGame->ViewArmy(
                             SWAP_ARMY_VIEW_X, SWAP_ARMY_VIEW_Y,
                             m_heroes[SWAP_SIDE_RIGHT]
@@ -563,7 +563,7 @@ i32 swapManager::Main(tag_message &message)
                     if (m_heroes[SWAP_SIDE_RIGHT]
                             ->m_army.m_creatureTypes[message.payload.widget.id -
                                                     SWAP_CONTROL_RIGHT_ARMY_FIRST] !=
-                        SWAP_CREATURE_NONE) {
+                        CREATURE_NONE) {
                         m_selectedSide = SWAP_SIDE_RIGHT;
                         m_targetSide = SWAP_SIDE_NONE;
                         m_itemType = SWAP_ITEM_ARMY;
@@ -585,7 +585,7 @@ i32 swapManager::Main(tag_message &message)
                                 SWAP_SPLIT_MODIFIER_MASK) != 0 &&
                                (m_heroes[m_targetSide]
                                         ->m_army.m_creatureTypes[m_targetSlot] ==
-                                    SWAP_CREATURE_NONE ||
+                                    CREATURE_NONE ||
                                 m_heroes[m_selectedSide]
                                         ->m_army.m_creatureTypes[m_selectedSlot] ==
                                     m_heroes[m_targetSide]
@@ -690,7 +690,7 @@ void swapManager::SwapMons(void)
     i32 selectedArmyCount = 0;
     for (i32 slot_1 = 0; slot_1 < ARMY_GROUP_SLOT_COUNT; ++slot_1) {
         if (m_heroes[m_selectedSide]->m_army.m_creatureTypes[slot_1] !=
-                SWAP_CREATURE_NONE &&
+                CREATURE_NONE &&
             m_heroes[m_selectedSide]->m_army.m_creatureCounts[slot_1] > 0)
             ++selectedArmyCount;
     }
@@ -704,12 +704,12 @@ void swapManager::SwapMons(void)
         targetArmy->m_creatureCounts[m_targetSlot] =
             0[&selectedArmy->m_creatureCounts[m_selectedSlot]] +
             targetArmy->m_creatureCounts[m_targetSlot];
-        selectedArmy->m_creatureTypes[m_selectedSlot] = SWAP_CREATURE_NONE;
+        selectedArmy->m_creatureTypes[m_selectedSlot] = CREATURE_NONE;
         selectedArmy->m_creatureCounts[m_selectedSlot] = 0;
         return;
     }
     if (0[&selectedArmy] != targetArmy && selectedArmy->GetNumArmies() == 1 &&
-        targetArmy->m_creatureTypes[m_targetSlot] == SWAP_CREATURE_NONE)
+        targetArmy->m_creatureTypes[m_targetSlot] == CREATURE_NONE)
         return;
     selectedArmy->Swap(m_selectedSlot, targetArmy, m_targetSlot);
 }
@@ -735,7 +735,7 @@ void swapManager::Update(void)
     for (slot = 0; slot < ARMY_GROUP_SLOT_COUNT; ++slot) {
         message_1.payload.widget.id = slot + SWAP_CONTROL_LEFT_ARMY_FIRST;
         if (m_heroes[SWAP_SIDE_LEFT]->m_army.m_creatureTypes[slot] ==
-            SWAP_CREATURE_NONE) {
+            CREATURE_NONE) {
             message_1.payload.widget.command = SWAP_MESSAGE_DISABLE;
             message_1.payload.widget.data.value = SWAP_EMPTY_ITEM_VALUE;
         } else {
@@ -752,7 +752,7 @@ void swapManager::Update(void)
     for (slot = 0; slot < ARMY_GROUP_SLOT_COUNT; ++slot) {
         message_1.payload.widget.id = slot + SWAP_LEFT_ARMY_COUNT_FIRST;
         if (m_heroes[SWAP_SIDE_LEFT]->m_army.m_creatureTypes[slot] ==
-            SWAP_CREATURE_NONE) {
+            CREATURE_NONE) {
             message_1.payload.widget.command = SWAP_MESSAGE_DISABLE;
             message_1.payload.widget.data.value = SWAP_EMPTY_ITEM_VALUE;
         } else {
@@ -770,7 +770,7 @@ void swapManager::Update(void)
     for (slot = 0; slot < ARMY_GROUP_SLOT_COUNT; ++slot) {
         message_1.payload.widget.id = slot + SWAP_CONTROL_RIGHT_ARMY_FIRST;
         if (m_heroes[SWAP_SIDE_RIGHT]->m_army.m_creatureTypes[slot] ==
-            SWAP_CREATURE_NONE) {
+            CREATURE_NONE) {
             message_1.payload.widget.command = SWAP_MESSAGE_DISABLE;
             message_1.payload.widget.data.value = SWAP_EMPTY_ITEM_VALUE;
         } else {
@@ -787,7 +787,7 @@ void swapManager::Update(void)
     for (slot = 0; slot < ARMY_GROUP_SLOT_COUNT; ++slot) {
         message_1.payload.widget.id = slot + SWAP_RIGHT_ARMY_COUNT_FIRST;
         if (m_heroes[SWAP_SIDE_RIGHT]->m_army.m_creatureTypes[slot] ==
-            SWAP_CREATURE_NONE) {
+            CREATURE_NONE) {
             message_1.payload.widget.command = SWAP_MESSAGE_DISABLE;
             message_1.payload.widget.data.value = SWAP_EMPTY_ITEM_VALUE;
         } else {
@@ -886,15 +886,15 @@ void swapManager::SplitMons(void)
                 gpTownManager->m_splitAmount;
             if (selectedArmy->m_creatureCounts[m_selectedSlot] == 0)
                 selectedArmy->m_creatureTypes[m_selectedSlot] =
-                    SWAP_CREATURE_NONE;
+                    CREATURE_NONE;
             return;
         }
         if (targetArmy->m_creatureTypes[m_targetSlot] !=
-            SWAP_CREATURE_NONE) {
+            CREATURE_NONE) {
             for (emptySlot = 0; emptySlot < ARMY_GROUP_SLOT_COUNT;
                  ++emptySlot) {
                 if (targetArmy->m_creatureTypes[emptySlot] ==
-                    SWAP_CREATURE_NONE)
+                    CREATURE_NONE)
                     break;
             }
             if (emptySlot < ARMY_GROUP_SLOT_COUNT)
@@ -908,7 +908,7 @@ void swapManager::SplitMons(void)
             gpTownManager->m_splitAmount;
         if (selectedArmy->m_creatureCounts[m_selectedSlot] == 0)
             selectedArmy->m_creatureTypes[m_selectedSlot] =
-                SWAP_CREATURE_NONE;
+                CREATURE_NONE;
     }
 }
 

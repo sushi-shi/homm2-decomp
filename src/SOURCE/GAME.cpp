@@ -2703,10 +2703,10 @@ i32 ViewArmyHandler(tag_message &msg)
                     (gMonsterDatabase[iViewArmyUpgradeToType].cost -
                      gMonsterDatabase[iViewArmyType].cost) *
                     iViewArmyNumTroops * 2;
-                if (iViewArmyUpgradeToType == MONSTER_BLACK_DRAGON) {
+                if (iViewArmyUpgradeToType == CREATURE_BLACK_DRAGON) {
                     resourceType0 = RES_SULFUR;
                     resourceCost5 = iViewArmyNumTroops * 2;
-                } else if (iViewArmyUpgradeToType == MONSTER_TITAN) {
+                } else if (iViewArmyUpgradeToType == CREATURE_TITAN) {
                     resourceType0 = RES_GEMS;
                     resourceCost5 = iViewArmyNumTroops * 2;
                 } else {
@@ -3947,24 +3947,24 @@ void game::SetRandomHeroArmies(i32 heroId, i32 strongArmy)
     armyGroup *army2 = &m_heroRecs[heroId].m_army;
     i32 armySlot7 = 0;
     RandomHeroArmyRange armyTable7[FACTION_COUNT][RANDOM_HERO_ARMY_OPTION_COUNT] = {
-        {{RANDOM_HERO_KNIGHT_FIRST, 30, 50},
-         {RANDOM_HERO_KNIGHT_SECOND, 3, 5},
-         {RANDOM_HERO_KNIGHT_THIRD, 2, 4}},
-        {{RANDOM_HERO_BARBARIAN_FIRST, 15, 25},
-         {RANDOM_HERO_BARBARIAN_SECOND, 3, 5},
-         {RANDOM_HERO_BARBARIAN_THIRD, 2, 3}},
-        {{RANDOM_HERO_SORCERESS_FIRST, 10, 20},
-         {RANDOM_HERO_SORCERESS_SECOND, 2, 4},
-         {RANDOM_HERO_SORCERESS_THIRD, 1, 2}},
-        {{RANDOM_HERO_WARLOCK_FIRST, 6, 10},
-         {RANDOM_HERO_WARLOCK_SECOND, 2, 4},
-         {RANDOM_HERO_WARLOCK_THIRD, 1, 2}},
-        {{RANDOM_HERO_WIZARD_FIRST, 6, 10},
-         {RANDOM_HERO_WIZARD_SECOND, 2, 4},
-         {RANDOM_HERO_WIZARD_THIRD, 1, 2}},
-        {{RANDOM_HERO_NECROMANCER_FIRST, 6, 10},
-         {RANDOM_HERO_NECROMANCER_SECOND, 2, 4},
-         {RANDOM_HERO_NECROMANCER_THIRD, 1, 2}}
+        {{CREATURE_PEASANT, 30, 50},
+         {CREATURE_ARCHER, 3, 5},
+         {CREATURE_PIKEMAN, 2, 4}},
+        {{CREATURE_GOBLIN, 15, 25},
+         {CREATURE_ORC, 3, 5},
+         {CREATURE_WOLF, 2, 3}},
+        {{CREATURE_SPRITE, 10, 20},
+         {CREATURE_DWARF, 2, 4},
+         {CREATURE_ELF, 1, 2}},
+        {{CREATURE_CENTAUR, 6, 10},
+         {CREATURE_GARGOYLE, 2, 4},
+         {CREATURE_GRIFFIN, 1, 2}},
+        {{CREATURE_HALFLING, 6, 10},
+         {CREATURE_BOAR, 2, 4},
+         {CREATURE_IRON_GOLEM, 1, 2}},
+        {{CREATURE_SKELETON, 6, 10},
+         {CREATURE_ZOMBIE, 2, 4},
+         {CREATURE_MUMMY, 1, 2}}
     };
     i32 selected9[3];
     i32 index9;
@@ -3982,7 +3982,7 @@ void game::SetRandomHeroArmies(i32 heroId, i32 strongArmy)
         selected9[1] = RANDOM_HERO_STACK_SELECTED;
 
     for (index9 = 0; index9 < RANDOM_HERO_ARMY_SLOT_COUNT; index9++) {
-        army2->m_creatureTypes[index9] = RANDOM_HERO_EMPTY_CREATURE;
+        army2->m_creatureTypes[index9] = CREATURE_NONE;
         army2->m_creatureCounts[index9] = RANDOM_HERO_EMPTY_COUNT;
     }
 

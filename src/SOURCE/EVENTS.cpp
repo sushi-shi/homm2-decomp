@@ -240,21 +240,21 @@ void advManager::DoEvent(mapCell *cell, i32 x, i32 y)
         thirdUpgrade = -1;
         secondUpgrade1 = -1;
         firstUpgrade_e = -1;
-        if (eventHero2->CreatureTypeCount(HILL_FORT_OGRE))
-            firstUpgrade_e = HILL_FORT_OGRE;
-        if (eventHero2->CreatureTypeCount(HILL_FORT_ORC)) {
+        if (eventHero2->CreatureTypeCount(CREATURE_OGRE))
+            firstUpgrade_e = CREATURE_OGRE;
+        if (eventHero2->CreatureTypeCount(CREATURE_ORC)) {
             if (firstUpgrade_e == -1)
-                firstUpgrade_e = HILL_FORT_ORC;
+                firstUpgrade_e = CREATURE_ORC;
             else
-                secondUpgrade1 = HILL_FORT_ORC;
+                secondUpgrade1 = CREATURE_ORC;
         }
-        if (eventHero2->CreatureTypeCount(HILL_FORT_DWARF)) {
+        if (eventHero2->CreatureTypeCount(CREATURE_DWARF)) {
             if (firstUpgrade_e == -1)
-                firstUpgrade_e = HILL_FORT_DWARF;
+                firstUpgrade_e = CREATURE_DWARF;
             else if (secondUpgrade1 == -1)
-                secondUpgrade1 = HILL_FORT_DWARF;
+                secondUpgrade1 = CREATURE_DWARF;
             else
-                thirdUpgrade = HILL_FORT_DWARF;
+                thirdUpgrade = CREATURE_DWARF;
         }
 
         if (firstUpgrade_e == -1) {
@@ -264,9 +264,9 @@ void advManager::DoEvent(mapCell *cell, i32 x, i32 y)
         }
         else {
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-            eventHero2->UpgradeCreatures(HILL_FORT_OGRE, HILL_FORT_OGRE_LORD);
-            eventHero2->UpgradeCreatures(HILL_FORT_ORC, HILL_FORT_ORC_CHIEF);
-            eventHero2->UpgradeCreatures(HILL_FORT_DWARF, HILL_FORT_BATTLE_DWARF);
+            eventHero2->UpgradeCreatures(CREATURE_OGRE, CREATURE_OGRE_LORD);
+            eventHero2->UpgradeCreatures(CREATURE_ORC, CREATURE_ORC_CHIEF);
+            eventHero2->UpgradeCreatures(CREATURE_DWARF, CREATURE_BATTLE_DWARF);
             if (thirdUpgrade == -1) {
                 if (secondUpgrade1 == -1) {
                     sprintf(gText,
@@ -287,8 +287,8 @@ void advManager::DoEvent(mapCell *cell, i32 x, i32 y)
                         gArmyNamesPlural[thirdUpgrade], gArmyNamesPlural[firstUpgrade_e + 1],
                         gArmyNamesPlural[secondUpgrade1 + 1], gArmyNamesPlural[thirdUpgrade + 1]);
             }
-            EventWindow(-1, 1, gText, FOUNDRY_DIALOG_CREATURE, firstUpgrade_e + 1,
-                        secondUpgrade1 == -1 ? -1 : FOUNDRY_DIALOG_CREATURE,
+            EventWindow(-1, 1, gText, EVENT_WINDOW_REWARD_CREATURE, firstUpgrade_e + 1,
+                        secondUpgrade1 == -1 ? -1 : EVENT_WINDOW_REWARD_CREATURE,
                         secondUpgrade1 + 1, -1);
         }
         break;
@@ -297,21 +297,21 @@ void advManager::DoEvent(mapCell *cell, i32 x, i32 y)
         thirdUpgrade = -1;
         secondUpgrade1 = -1;
         firstUpgrade_e = -1;
-        if (eventHero2->CreatureTypeCount(FOUNDRY_PIKEMAN))
-            firstUpgrade_e = FOUNDRY_PIKEMAN;
-        if (eventHero2->CreatureTypeCount(FOUNDRY_SWORDSMAN)) {
+        if (eventHero2->CreatureTypeCount(CREATURE_PIKEMAN))
+            firstUpgrade_e = CREATURE_PIKEMAN;
+        if (eventHero2->CreatureTypeCount(CREATURE_SWORDSMAN)) {
             if (firstUpgrade_e == -1)
-                firstUpgrade_e = FOUNDRY_SWORDSMAN;
+                firstUpgrade_e = CREATURE_SWORDSMAN;
             else
-                secondUpgrade1 = FOUNDRY_SWORDSMAN;
+                secondUpgrade1 = CREATURE_SWORDSMAN;
         }
-        if (eventHero2->CreatureTypeCount(FOUNDRY_IRON_GOLEM)) {
+        if (eventHero2->CreatureTypeCount(CREATURE_IRON_GOLEM)) {
             if (firstUpgrade_e == -1)
-                firstUpgrade_e = FOUNDRY_IRON_GOLEM;
+                firstUpgrade_e = CREATURE_IRON_GOLEM;
             else if (secondUpgrade1 == -1)
-                secondUpgrade1 = FOUNDRY_IRON_GOLEM;
+                secondUpgrade1 = CREATURE_IRON_GOLEM;
             else
-                thirdUpgrade = FOUNDRY_IRON_GOLEM;
+                thirdUpgrade = CREATURE_IRON_GOLEM;
         }
 
         if (firstUpgrade_e == -1) {
@@ -321,9 +321,9 @@ void advManager::DoEvent(mapCell *cell, i32 x, i32 y)
         }
         else {
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-            eventHero2->UpgradeCreatures(FOUNDRY_PIKEMAN, FOUNDRY_VETERAN_PIKEMAN);
-            eventHero2->UpgradeCreatures(FOUNDRY_SWORDSMAN, FOUNDRY_MASTER_SWORDSMAN);
-            eventHero2->UpgradeCreatures(FOUNDRY_IRON_GOLEM, FOUNDRY_STEEL_GOLEM);
+            eventHero2->UpgradeCreatures(CREATURE_PIKEMAN, CREATURE_VETERAN_PIKEMAN);
+            eventHero2->UpgradeCreatures(CREATURE_SWORDSMAN, CREATURE_MASTER_SWORDSMAN);
+            eventHero2->UpgradeCreatures(CREATURE_IRON_GOLEM, CREATURE_STEEL_GOLEM);
             if (thirdUpgrade == -1) {
                 if (secondUpgrade1 == -1) {
                     sprintf(gText,
@@ -344,8 +344,8 @@ void advManager::DoEvent(mapCell *cell, i32 x, i32 y)
                         gArmyNamesPlural[thirdUpgrade], gArmyNamesPlural[firstUpgrade_e + 1],
                         gArmyNamesPlural[secondUpgrade1 + 1], gArmyNamesPlural[thirdUpgrade + 1]);
             }
-            EventWindow(-1, 1, gText, FOUNDRY_DIALOG_CREATURE, firstUpgrade_e + 1,
-                        secondUpgrade1 == -1 ? -1 : FOUNDRY_DIALOG_CREATURE,
+            EventWindow(-1, 1, gText, EVENT_WINDOW_REWARD_CREATURE, firstUpgrade_e + 1,
+                        secondUpgrade1 == -1 ? -1 : EVENT_WINDOW_REWARD_CREATURE,
                         secondUpgrade1 + 1, -1);
         }
         break;
@@ -976,7 +976,7 @@ chestGold:
         EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
         EventWindow(19, 2, "", -1, 0, -1, 0, -1);
         if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
-            RecruitEvent(eventHero2, EVENT_RECRUIT_GENIE, cell);
+            RecruitEvent(eventHero2, CREATURE_GENIE, cell);
             if (!cell->m_objectMetadata) {
                 eraseObject = 1;
                 fizzleType3 = 1;
@@ -996,7 +996,7 @@ chestGold:
                         "{Tree City}\n\nSome of the Sprites living in the tree city are willing to join your army for a price.  Do you want to recruit Sprites?",
                         -1, 0, -1, 0, -1);
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
-                RecruitEvent(eventHero2, EVENT_RECRUIT_SPRITE, cell);
+                RecruitEvent(eventHero2, CREATURE_SPRITE, cell);
         }
         break;
 
@@ -1012,7 +1012,7 @@ chestGold:
                         "{Ruins}\n\nYou've found some Medusas living in the ruins.  They are willing to join your army for a price.  Do you want to recruit Medusas?",
                         -1, 0, -1, 0, -1);
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
-                RecruitEvent(eventHero2, EVENT_RECRUIT_MEDUSA, cell);
+                RecruitEvent(eventHero2, CREATURE_MEDUSA, cell);
         }
         break;
 
@@ -1028,9 +1028,9 @@ chestGold:
                         -1, 0, -1, 0, -1);
             if (gpWindowManager->m_dialogResult != MONSTER_DIALOG_YES)
                 break;
-            if (CombatMonsterEvent(eventHero2, TROLL_BRIDGE_TROLL, 12,
+            if (CombatMonsterEvent(eventHero2, CREATURE_TROLL, 12,
                                    cell, x, y, 0, x, y,
-                                   TROLL_BRIDGE_WAR_TROLL, 8, 2,
+                                   CREATURE_WAR_TROLL, 8, 2,
                                    -1, 0, 0) != 0)
                 break;
             eventHero2->CheckLevel();
@@ -1050,7 +1050,7 @@ chestGold:
             if (gpWindowManager->m_dialogResult != MONSTER_DIALOG_YES)
                 break;
 recruitTroll:
-            RecruitEvent(eventHero2, TROLL_BRIDGE_TROLL, cell);
+            RecruitEvent(eventHero2, CREATURE_TROLL, cell);
         }
         break;
 
@@ -1066,10 +1066,10 @@ recruitTroll:
                         -1, 0, -1, 0, -1);
             if (gpWindowManager->m_dialogResult != MONSTER_DIALOG_YES)
                 break;
-            if (CombatMonsterEvent(eventHero2, CITY_DEAD_PRIMARY, 10,
+            if (CombatMonsterEvent(eventHero2, CREATURE_VAMPIRE_LORD, 10,
                                    cell, x, y, 0, x, y,
-                                   CITY_DEAD_SECONDARY, 40, 2,
-                                   CITY_DEAD_TERTIARY, 5, 1) != 0)
+                                   CREATURE_ZOMBIE, 40, 2,
+                                   CREATURE_POWER_LICH, 5, 1) != 0)
                 break;
             eventHero2->CheckLevel();
             cell->m_objectMetadata -= DWELLING_GUARDED_FLAG;
@@ -1088,7 +1088,7 @@ recruitTroll:
             if (gpWindowManager->m_dialogResult != MONSTER_DIALOG_YES)
                 break;
 recruitLich:
-            RecruitEvent(eventHero2, CITY_DEAD_RECRUIT, cell);
+            RecruitEvent(eventHero2, CREATURE_POWER_LICH, cell);
         }
         break;
 
@@ -1108,10 +1108,10 @@ recruitLich:
             if (gbInCampaign && gpGame->m_campaignType == 1 &&
                 gpGame->m_campaignScenario == 6)
                 dragonFactor_d = 2;
-            if (CombatMonsterEvent(eventHero2, DRAGON_CITY_GREEN_DRAGON,
+            if (CombatMonsterEvent(eventHero2, CREATURE_GREEN_DRAGON,
                                    dragonFactor_d * 3, cell, x, y, 0, x, y,
-                                   DRAGON_CITY_RED_DRAGON, dragonFactor_d, 1,
-                                   DRAGON_CITY_BLACK_DRAGON, dragonFactor_d, 1) != 0)
+                                   CREATURE_RED_DRAGON, dragonFactor_d, 1,
+                                   CREATURE_BLACK_DRAGON, dragonFactor_d, 1) != 0)
                 break;
             CheckEndGame(0, 1);
             if (gbGameOver)
@@ -1133,7 +1133,7 @@ recruitLich:
             if (gpWindowManager->m_dialogResult != MONSTER_DIALOG_YES)
                 break;
 recruitDragon:
-            RecruitEvent(eventHero2, DRAGON_CITY_RECRUIT, cell);
+            RecruitEvent(eventHero2, CREATURE_RED_DRAGON, cell);
         }
         break;
 
@@ -1145,7 +1145,7 @@ recruitDragon:
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
             EventWindow(84, 2, "", -1, 0, -1, 0, -1);
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
-                RecruitEvent(eventHero2, EVENT_RECRUIT_ROGUE, cell);
+                RecruitEvent(eventHero2, CREATURE_ROGUE, cell);
         }
         break;
 
@@ -1157,7 +1157,7 @@ recruitDragon:
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
             EventWindow(82, 2, "", -1, 0, -1, 0, -1);
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
-                RecruitEvent(eventHero2, EVENT_RECRUIT_NOMAD, cell);
+                RecruitEvent(eventHero2, CREATURE_NOMAD, cell);
         }
         break;
 
@@ -1489,7 +1489,7 @@ artifactPickup:
         }
         else {
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-            if (guardedMonster5 == ARTIFACT_ROGUE_GUARD) {
+            if (guardedMonster5 == CREATURE_ROGUE) {
                 NormalDialog("{Artifact}\n\nYou come upon an ancient artifact.  As you reach for it, a pack of Rogues leap out of the brush to guard their stolen loot.",
                              1, -1, -1, -1, 0, -1, 0, -1, 0);
                 guardedCount = ARTIFACT_ROGUE_COUNT;
@@ -1763,9 +1763,9 @@ daemonExperienceGold:
                 }
             }
             else {
-                if (CombatMonsterEvent(eventHero2, PYRAMID_PRIMARY_MONSTER, 30,
+                if (CombatMonsterEvent(eventHero2, CREATURE_ROYAL_MUMMY, 30,
                                        cell, x, y, 0, x, y,
-                                       PYRAMID_SECONDARY_MONSTER, 20, 2,
+                                       CREATURE_VAMPIRE_LORD, 20, 2,
                                        -1, 0, 0) == 0) {
                     eventHero2->CheckLevel();
                     eventValue1 = cell->m_objectMetadata - 1;
@@ -2368,9 +2368,9 @@ void advManager::GenericSiteEvent(mapCell *cell, hero *eventHero)
             eventHero->m_remainingMobility += GENERIC_SITE_STABLE_MOBILITY;
             stableResult26 |= 1;
         }
-        if (eventHero->CreatureTypeCount(GENERIC_SITE_STABLE_CREATURE)) {
-            eventHero->UpgradeCreatures(GENERIC_SITE_STABLE_CREATURE,
-                                        GENERIC_SITE_STABLE_UPGRADE);
+        if (eventHero->CreatureTypeCount(CREATURE_CAVALRY)) {
+            eventHero->UpgradeCreatures(CREATURE_CAVALRY,
+                                        CREATURE_CHAMPION);
             stableResult26 |= 2;
         }
         if (stableResult26 != 0) {
@@ -2379,7 +2379,7 @@ void advManager::GenericSiteEvent(mapCell *cell, hero *eventHero)
         }
         sprintf(gText, xStableText[stableResult26]);
         if (stableResult26 & 2) {
-            EventWindow(-1, 1, gText, GENERIC_SITE_STABLE_REWARD_TYPE,
+            EventWindow(-1, 1, gText, EVENT_WINDOW_REWARD_CREATURE,
                         GENERIC_SITE_STABLE_REWARD_VALUE, -1, 0, -1);
         } else {
             EventWindow(-1, 1, gText, -1, 0, -1, 0, -1);
@@ -2407,20 +2407,20 @@ void advManager::RecruitSiteEvent(mapCell *cell, hero *eventHero)
     availableCount >>= AI_EVENT_RECRUIT_COUNT_SHIFT;
 
     switch (siteType2) {
-    case RECRUIT_SITE_GENIE:
-        creatureType1 = MONSTER_GENIE;
+    case RECRUIT_SITE_GHOST:
+        creatureType1 = CREATURE_GHOST;
         break;
     case RECRUIT_SITE_EARTH_ELEMENTAL:
-        creatureType1 = MONSTER_EARTH_ELEMENTAL;
+        creatureType1 = CREATURE_EARTH_ELEMENTAL;
         break;
     case RECRUIT_SITE_AIR_ELEMENTAL:
-        creatureType1 = MONSTER_AIR_ELEMENTAL;
+        creatureType1 = CREATURE_AIR_ELEMENTAL;
         break;
     case RECRUIT_SITE_FIRE_ELEMENTAL:
-        creatureType1 = MONSTER_FIRE_ELEMENTAL;
+        creatureType1 = CREATURE_FIRE_ELEMENTAL;
         break;
     case RECRUIT_SITE_WATER_ELEMENTAL:
-        creatureType1 = MONSTER_WATER_ELEMENTAL;
+        creatureType1 = CREATURE_WATER_ELEMENTAL;
         break;
     }
 
@@ -2858,7 +2858,7 @@ i32 advManager::SkeletonEvent(hero *eventHero, mapCell *cell, char *text,
 
     switch (cell->m_objectMetadata) {
     case UNDEAD_EVENT_LEVEL_SMALL:
-        if (CombatMonsterEvent(eventHero, ARMY_CREATURE_SKELETON,
+        if (CombatMonsterEvent(eventHero, CREATURE_SKELETON,
                                SKELETON_EVENT_SMALL_COUNT, cell, x, y, 0, x, y,
                                -1, 0, 0, -1, 0, 0) == 0) {
             EventWindow(-1, 1, text, RES_GOLD, SKELETON_EVENT_SMALL_GOLD,
@@ -2869,7 +2869,7 @@ i32 advManager::SkeletonEvent(hero *eventHero, mapCell *cell, char *text,
         }
         break;
     case UNDEAD_EVENT_LEVEL_MEDIUM:
-        if (CombatMonsterEvent(eventHero, ARMY_CREATURE_SKELETON,
+        if (CombatMonsterEvent(eventHero, CREATURE_SKELETON,
                                SKELETON_EVENT_MEDIUM_COUNT, cell, x, y, 0, x,
                                y, -1, 0, 0, -1, 0, 0) == 0) {
             EventWindow(-1, 1, text, RES_GOLD, SKELETON_EVENT_MEDIUM_GOLD,
@@ -2880,7 +2880,7 @@ i32 advManager::SkeletonEvent(hero *eventHero, mapCell *cell, char *text,
         }
         break;
     case UNDEAD_EVENT_LEVEL_LARGE:
-        if (CombatMonsterEvent(eventHero, ARMY_CREATURE_SKELETON,
+        if (CombatMonsterEvent(eventHero, CREATURE_SKELETON,
                                SKELETON_EVENT_LARGE_COUNT, cell, x, y, 0, x, y,
                                -1, 0, 0, -1, 0, 0) == 0) {
             EventWindow(-1, 1, text, RES_GOLD, SKELETON_EVENT_LARGE_GOLD,
@@ -2891,7 +2891,7 @@ i32 advManager::SkeletonEvent(hero *eventHero, mapCell *cell, char *text,
         }
         break;
     default:
-        if (CombatMonsterEvent(eventHero, ARMY_CREATURE_SKELETON,
+        if (CombatMonsterEvent(eventHero, CREATURE_SKELETON,
                                SKELETON_EVENT_HUGE_COUNT, cell, x, y, 0, x, y,
                                -1, 0, 0, -1, 0, 0) == 0) {
             EventWindow(-1, 1, text, RES_GOLD, SKELETON_EVENT_HUGE_GOLD,
@@ -2913,8 +2913,8 @@ i32 advManager::ZombieEvent(hero *eventHero, mapCell *cell, char *text,
     switch (cell->m_objectMetadata) {
     case UNDEAD_EVENT_LEVEL_SMALL:
         if (CombatMonsterEvent(
-                eventHero, ARMY_CREATURE_ZOMBIE, ZOMBIE_EVENT_SMALL_COUNT,
-                cell, x, y, 0, x, y, ARMY_CREATURE_MUTANT_ZOMBIE,
+                eventHero, CREATURE_ZOMBIE, ZOMBIE_EVENT_SMALL_COUNT,
+                cell, x, y, 0, x, y, CREATURE_MUTANT_ZOMBIE,
                 ZOMBIE_EVENT_SMALL_SUPPORT_COUNT, ZOMBIE_EVENT_SUPPORT_STACKS,
                 -1, 0, 0) == 0) {
             EventWindow(-1, 1, text, RES_GOLD, ZOMBIE_EVENT_SMALL_GOLD,
@@ -2926,9 +2926,9 @@ i32 advManager::ZombieEvent(hero *eventHero, mapCell *cell, char *text,
         break;
     case UNDEAD_EVENT_LEVEL_MEDIUM:
         if (CombatMonsterEvent(
-                eventHero, ARMY_CREATURE_MUTANT_ZOMBIE,
+                eventHero, CREATURE_MUTANT_ZOMBIE,
                 ZOMBIE_EVENT_MEDIUM_COUNT, cell, x, y, 0, x, y,
-                ARMY_CREATURE_MUTANT_ZOMBIE,
+                CREATURE_MUTANT_ZOMBIE,
                 ZOMBIE_EVENT_MEDIUM_SUPPORT_COUNT, ZOMBIE_EVENT_SUPPORT_STACKS,
                 -1, 0, 0) == 0) {
             EventWindow(-1, 1, text, RES_GOLD, ZOMBIE_EVENT_MEDIUM_GOLD,
@@ -2940,9 +2940,9 @@ i32 advManager::ZombieEvent(hero *eventHero, mapCell *cell, char *text,
         break;
     case UNDEAD_EVENT_LEVEL_LARGE:
         if (CombatMonsterEvent(
-                eventHero, ARMY_CREATURE_MUTANT_ZOMBIE,
+                eventHero, CREATURE_MUTANT_ZOMBIE,
                 ZOMBIE_EVENT_LARGE_COUNT, cell, x, y, 0, x, y,
-                ARMY_CREATURE_MUTANT_ZOMBIE,
+                CREATURE_MUTANT_ZOMBIE,
                 ZOMBIE_EVENT_LARGE_SUPPORT_COUNT, ZOMBIE_EVENT_SUPPORT_STACKS,
                 -1, 0, 0) == 0) {
             EventWindow(-1, 1, text, RES_GOLD, ZOMBIE_EVENT_LARGE_GOLD,
@@ -2954,9 +2954,9 @@ i32 advManager::ZombieEvent(hero *eventHero, mapCell *cell, char *text,
         break;
     default:
         if (CombatMonsterEvent(
-                eventHero, ARMY_CREATURE_MUTANT_ZOMBIE,
+                eventHero, CREATURE_MUTANT_ZOMBIE,
                 ZOMBIE_EVENT_HUGE_COUNT, cell, x, y, 0, x, y,
-                ARMY_CREATURE_MUTANT_ZOMBIE,
+                CREATURE_MUTANT_ZOMBIE,
                 ZOMBIE_EVENT_HUGE_SUPPORT_COUNT, ZOMBIE_EVENT_SUPPORT_STACKS,
                 -1, 0, 0) == 0) {
             artifactId = GiveRandomArtifact(eventHero);
@@ -2982,7 +2982,7 @@ i32 advManager::GhostEvent(hero *eventHero, mapCell *cell, char *text,
     i32 artifactId;
     switch (cell->m_objectMetadata) {
     case UNDEAD_EVENT_LEVEL_SMALL:
-        if (CombatMonsterEvent(eventHero, ARMY_CREATURE_GHOST,
+        if (CombatMonsterEvent(eventHero, CREATURE_GHOST,
                                GHOST_EVENT_SMALL_COUNT, cell, x, y, 0, x, y,
                                -1, 0, 0, -1, 0, 0) == 0) {
             sprintf(gText, "%s", text);
@@ -2994,7 +2994,7 @@ i32 advManager::GhostEvent(hero *eventHero, mapCell *cell, char *text,
         }
         break;
     case UNDEAD_EVENT_LEVEL_MEDIUM:
-        if (CombatMonsterEvent(eventHero, ARMY_CREATURE_GHOST,
+        if (CombatMonsterEvent(eventHero, CREATURE_GHOST,
                                GHOST_EVENT_MEDIUM_COUNT, cell, x, y, 0, x, y,
                                -1, 0, 0, -1, 0, 0) == 0) {
             sprintf(gText, "%s", text);
@@ -3006,7 +3006,7 @@ i32 advManager::GhostEvent(hero *eventHero, mapCell *cell, char *text,
         }
         break;
     case UNDEAD_EVENT_LEVEL_LARGE:
-        if (CombatMonsterEvent(eventHero, ARMY_CREATURE_GHOST,
+        if (CombatMonsterEvent(eventHero, CREATURE_GHOST,
                                GHOST_EVENT_LARGE_COUNT, cell, x, y, 0, x, y,
                                -1, 0, 0, -1, 0, 0) == 0) {
             sprintf(gText, "%s", text);
@@ -3018,7 +3018,7 @@ i32 advManager::GhostEvent(hero *eventHero, mapCell *cell, char *text,
         }
         break;
     default:
-        if (CombatMonsterEvent(eventHero, ARMY_CREATURE_GHOST,
+        if (CombatMonsterEvent(eventHero, CREATURE_GHOST,
                                GHOST_EVENT_HUGE_COUNT, cell, x, y, 0, x, y,
                                -1, 0, 0, -1, 0, 0) == 0) {
             artifactId = GiveRandomArtifact(eventHero);
@@ -3087,16 +3087,16 @@ void advManager::HouseEvent(hero *eventHero, mapCell *cell)
         EventWindow(siteIndex * 3 + HOUSE_EVENT_EMPTY_DIALOG_BASE, 1, "", -1,
                     0, -1, 0, -1);
     } else {
-        creatureTypes[HOUSE_RECRUIT_ARCHER] = ARMY_CREATURE_ARCHER;
-        creatureTypes[HOUSE_RECRUIT_GOBLIN] = ARMY_CREATURE_GOBLIN;
-        creatureTypes[HOUSE_RECRUIT_PEASANT] = ARMY_CREATURE_PEASANT;
-        creatureTypes[HOUSE_RECRUIT_DWARF] = ARMY_CREATURE_DWARF;
-        creatureTypes[HOUSE_RECRUIT_LOG_CABIN] = ARMY_CREATURE_DWARF;
-        creatureTypes[HOUSE_RECRUIT_TREE_HOUSE] = ARMY_CREATURE_SPRITE;
-        creatureTypes[HOUSE_RECRUIT_HALFLING] = ARMY_CREATURE_HALFLING;
-        creatureTypes[HOUSE_RECRUIT_WATCH_TOWER] = ARMY_CREATURE_ORC;
-        creatureTypes[HOUSE_RECRUIT_CAVE] = ARMY_CREATURE_CENTAUR;
-        creatureTypes[HOUSE_RECRUIT_EXCAVATION] = ARMY_CREATURE_SKELETON;
+        creatureTypes[HOUSE_RECRUIT_ARCHER] = CREATURE_ARCHER;
+        creatureTypes[HOUSE_RECRUIT_GOBLIN] = CREATURE_GOBLIN;
+        creatureTypes[HOUSE_RECRUIT_PEASANT] = CREATURE_PEASANT;
+        creatureTypes[HOUSE_RECRUIT_DWARF] = CREATURE_DWARF;
+        creatureTypes[HOUSE_RECRUIT_LOG_CABIN] = CREATURE_DWARF;
+        creatureTypes[HOUSE_RECRUIT_TREE_HOUSE] = CREATURE_SPRITE;
+        creatureTypes[HOUSE_RECRUIT_HALFLING] = CREATURE_HALFLING;
+        creatureTypes[HOUSE_RECRUIT_WATCH_TOWER] = CREATURE_ORC;
+        creatureTypes[HOUSE_RECRUIT_CAVE] = CREATURE_CENTAUR;
+        creatureTypes[HOUSE_RECRUIT_EXCAVATION] = CREATURE_SKELETON;
 
         EventWindow(siteIndex * 3 + HOUSE_EVENT_RECRUIT_DIALOG_BASE, 2, "", -1,
                     0, -1, 0, -1);
@@ -3152,7 +3152,7 @@ i32 advManager::CombatMonsterEvent(hero *eventHero, i32 monsterType,
         m_lastQuickViewX = -1;
     }
 
-    memset(gpMonGroup->m_creatureTypes, COMBAT_MONSTER_INVALID_TYPE,
+    memset(gpMonGroup->m_creatureTypes, CREATURE_NONE,
            COMBAT_MONSTER_ARMY_SLOTS);
     memset(gpMonGroup->m_creatureCounts, 0,
            COMBAT_MONSTER_ARMY_SLOTS * sizeof(i16));
@@ -3172,17 +3172,17 @@ i32 advManager::CombatMonsterEvent(hero *eventHero, i32 monsterType,
 
     for (stackIndex9 = 0; stackIndex9 < stackCount; stackIndex9++) {
         if (stackIndex9 == (stackCount >> 1) &&
-            (monsterType == ARMY_CREATURE_ARCHER || monsterType == ARMY_CREATURE_PIKEMAN ||
-             monsterType == ARMY_CREATURE_SWORDSMAN || monsterType == ARMY_CREATURE_CAVALRY ||
-             monsterType == ARMY_CREATURE_PALADIN || monsterType == ARMY_CREATURE_ORC ||
-             monsterType == ARMY_CREATURE_OGRE || monsterType == ARMY_CREATURE_TROLL ||
-             monsterType == ARMY_CREATURE_DWARF || monsterType == ARMY_CREATURE_ELF ||
-             monsterType == ARMY_CREATURE_DRUID || monsterType == ARMY_CREATURE_MINOTAUR ||
-             monsterType == ARMY_CREATURE_GREEN_DRAGON || monsterType == ARMY_CREATURE_RED_DRAGON ||
-             monsterType == ARMY_CREATURE_IRON_GOLEM || monsterType == ARMY_CREATURE_MAGE ||
-             monsterType == ARMY_CREATURE_GIANT || monsterType == ARMY_CREATURE_ZOMBIE ||
-             monsterType == ARMY_CREATURE_MUMMY || monsterType == ARMY_CREATURE_VAMPIRE ||
-             monsterType == ARMY_CREATURE_LICH) &&
+            (monsterType == CREATURE_ARCHER || monsterType == CREATURE_PIKEMAN ||
+             monsterType == CREATURE_SWORDSMAN || monsterType == CREATURE_CAVALRY ||
+             monsterType == CREATURE_PALADIN || monsterType == CREATURE_ORC ||
+             monsterType == CREATURE_OGRE || monsterType == CREATURE_TROLL ||
+             monsterType == CREATURE_DWARF || monsterType == CREATURE_ELF ||
+             monsterType == CREATURE_DRUID || monsterType == CREATURE_MINOTAUR ||
+             monsterType == CREATURE_GREEN_DRAGON || monsterType == CREATURE_RED_DRAGON ||
+             monsterType == CREATURE_IRON_GOLEM || monsterType == CREATURE_MAGE ||
+             monsterType == CREATURE_GIANT || monsterType == CREATURE_ZOMBIE ||
+             monsterType == CREATURE_MUMMY || monsterType == CREATURE_VAMPIRE ||
+             monsterType == CREATURE_LICH) &&
             SRandom(0, COMBAT_MONSTER_RANDOM_MAX) < COMBAT_MONSTER_UPGRADE_CHANCE &&
             secondaryCount == 0 && tertiaryCount == 0)
             gpMonGroup->m_creatureTypes[placement4[COMBAT_MONSTER_ARMY_SLOTS] + stackIndex9] =
@@ -3222,7 +3222,7 @@ i32 advManager::CombatMonsterEvent(hero *eventHero, i32 monsterType,
 
     for (stackIndex9 = 0; stackIndex9 < COMBAT_MONSTER_ARMY_SLOTS; stackIndex9++) {
         if (gpMonGroup->m_creatureCounts[stackIndex9] <= 0)
-            gpMonGroup->m_creatureTypes[stackIndex9] = COMBAT_MONSTER_INVALID_TYPE;
+            gpMonGroup->m_creatureTypes[stackIndex9] = CREATURE_NONE;
     }
     for (stackIndex9 = 0; stackIndex9 < COMBAT_MONSTER_ARMY_SLOTS; stackIndex9++)
         placement4[stackIndex9] = stackIndex9;
@@ -3561,7 +3561,7 @@ void advManager::DoWhirlpool(hero *eventHero)
             if (eventHero->m_army.GetNumArmies() > 1) {
                 eventHero->m_army.m_creatureCounts[selectedSlot] >>= 1;
                 if (eventHero->m_army.m_creatureCounts[selectedSlot] == 0)
-                    eventHero->m_army.m_creatureTypes[selectedSlot] = COMBAT_MONSTER_INVALID_TYPE;
+                    eventHero->m_army.m_creatureTypes[selectedSlot] = CREATURE_NONE;
             } else if (eventHero->m_army.m_creatureCounts[selectedSlot] > 1) {
                 eventHero->m_army.m_creatureCounts[selectedSlot] >>= 1;
             }
@@ -3721,7 +3721,7 @@ void advManager::DoAIEvent(mapCell *cell, hero *eventHero, i32 x, i32 y)
     case MAP_EVENT_SAWMILL:
         if (gpGame->m_mineOwners[cell->m_objectMetadata] == giCurPlayer)
             break;
-        if (gpGame->m_mines[cell->m_objectMetadata].guardianType != AI_EVENT_NO_CREATURE) {
+        if (gpGame->m_mines[cell->m_objectMetadata].guardianType != CREATURE_NONE) {
             index_h = gpGame->m_mines[cell->m_objectMetadata].guardianCount;
             combatResult_d = gpPhilAI->CombatMonsterEvent(
                 eventHero, gpGame->m_mines[cell->m_objectMetadata].guardianType,
@@ -3729,7 +3729,7 @@ void advManager::DoAIEvent(mapCell *cell, hero *eventHero, i32 x, i32 y)
             if (combatResult_d == 0)
                 break;
             gpGame->m_mines[cell->m_objectMetadata].guardianType =
-                AI_EVENT_NO_CREATURE;
+                CREATURE_NONE;
             gpGame->m_mines[cell->m_objectMetadata].guardianCount = 0;
             eventHero->CheckLevel();
         }
@@ -4013,94 +4013,94 @@ chestGoldOrExperience:
         break;
 
     case MAP_EVENT_HILL_FORT:
-        eventHero->UpgradeCreatures(HILL_FORT_OGRE, HILL_FORT_OGRE_LORD);
-        eventHero->UpgradeCreatures(HILL_FORT_ORC, HILL_FORT_ORC_CHIEF);
-        eventHero->UpgradeCreatures(HILL_FORT_DWARF,
-                                    HILL_FORT_BATTLE_DWARF);
+        eventHero->UpgradeCreatures(CREATURE_OGRE, CREATURE_OGRE_LORD);
+        eventHero->UpgradeCreatures(CREATURE_ORC, CREATURE_ORC_CHIEF);
+        eventHero->UpgradeCreatures(CREATURE_DWARF,
+                                    CREATURE_BATTLE_DWARF);
         break;
 
     case MAP_EVENT_FREEMANS_FOUNDRY:
-        eventHero->UpgradeCreatures(FOUNDRY_IRON_GOLEM,
-                                    FOUNDRY_STEEL_GOLEM);
-        eventHero->UpgradeCreatures(FOUNDRY_PIKEMAN,
-                                    FOUNDRY_VETERAN_PIKEMAN);
-        eventHero->UpgradeCreatures(FOUNDRY_SWORDSMAN,
-                                    FOUNDRY_MASTER_SWORDSMAN);
+        eventHero->UpgradeCreatures(CREATURE_IRON_GOLEM,
+                                    CREATURE_STEEL_GOLEM);
+        eventHero->UpgradeCreatures(CREATURE_PIKEMAN,
+                                    CREATURE_VETERAN_PIKEMAN);
+        eventHero->UpgradeCreatures(CREATURE_SWORDSMAN,
+                                    CREATURE_MASTER_SWORDSMAN);
         break;
 
     case MAP_EVENT_TREE_CITY:
-        creatureType_i = EVENT_RECRUIT_SPRITE;
+        creatureType_i = CREATURE_SPRITE;
         creatureFlag_l = 0;
         goto creaturePurchase;
     case MAP_EVENT_RUINS:
-        creatureType_i = EVENT_RECRUIT_MEDUSA;
+        creatureType_i = CREATURE_MEDUSA;
         creatureFlag_l = 0;
         goto creaturePurchase;
     case MAP_EVENT_TROLL_BRIDGE:
         if (cell->m_objectMetadata & DWELLING_GUARDED_FLAG)
             break;
-        creatureType_i = TROLL_BRIDGE_TROLL;
+        creatureType_i = CREATURE_TROLL;
         creatureFlag_l = 0;
         goto creaturePurchase;
     case MAP_EVENT_CITY_OF_DEAD:
         if (cell->m_objectMetadata & DWELLING_GUARDED_FLAG)
             break;
-        creatureType_i = CITY_DEAD_RECRUIT;
+        creatureType_i = CREATURE_POWER_LICH;
         creatureFlag_l = 0;
         goto creaturePurchase;
     case MAP_EVENT_DRAGON_CITY:
         if (cell->m_objectMetadata & DWELLING_GUARDED_FLAG)
             break;
-        creatureType_i = DRAGON_CITY_RECRUIT;
+        creatureType_i = CREATURE_RED_DRAGON;
         creatureFlag_l = 0;
         goto creaturePurchase;
     case MAP_EVENT_HALFLING_HOLE:
-        creatureType_i = AI_CREATURE_HALFLING;
+        creatureType_i = CREATURE_HALFLING;
         creatureFlag_l = 1;
         goto creaturePurchase;
     case MAP_EVENT_ANCIENT_LAMP:
-        creatureType_i = EVENT_RECRUIT_GENIE;
+        creatureType_i = CREATURE_GENIE;
         creatureFlag_l = 0;
         goto creaturePurchase;
     case MAP_EVENT_WAGON_CAMP:
-        creatureType_i = EVENT_RECRUIT_ROGUE;
+        creatureType_i = CREATURE_ROGUE;
         creatureFlag_l = 0;
         goto creaturePurchase;
     case MAP_EVENT_DESERT_TENT:
-        creatureType_i = EVENT_RECRUIT_NOMAD;
+        creatureType_i = CREATURE_NOMAD;
         creatureFlag_l = 0;
         goto creaturePurchase;
     case MAP_EVENT_WATCH_TOWER:
-        creatureType_i = AI_CREATURE_ORC;
+        creatureType_i = CREATURE_ORC;
         creatureFlag_l = 1;
         goto creaturePurchase;
     case MAP_EVENT_TREE_HOUSE:
-        creatureType_i = EVENT_RECRUIT_SPRITE;
+        creatureType_i = CREATURE_SPRITE;
         creatureFlag_l = 1;
         goto creaturePurchase;
     case MAP_EVENT_ARCHER_HOUSE:
-        creatureType_i = AI_CREATURE_ARCHER;
+        creatureType_i = CREATURE_ARCHER;
         creatureFlag_l = 1;
         goto creaturePurchase;
     case MAP_EVENT_GOBLIN_HUT:
-        creatureType_i = AI_CREATURE_GOBLIN;
+        creatureType_i = CREATURE_GOBLIN;
         creatureFlag_l = 1;
         goto creaturePurchase;
     case MAP_EVENT_PEASANT_HUT:
-        creatureType_i = AI_CREATURE_PEASANT;
+        creatureType_i = CREATURE_PEASANT;
         creatureFlag_l = 1;
         goto creaturePurchase;
     case MAP_EVENT_DWARF_COTTAGE:
     case MAP_EVENT_SIRENS:
-        creatureType_i = AI_CREATURE_DWARF;
+        creatureType_i = CREATURE_DWARF;
         creatureFlag_l = 1;
         goto creaturePurchase;
     case MAP_EVENT_CAVE:
-        creatureType_i = AI_CREATURE_CENTAUR;
+        creatureType_i = CREATURE_CENTAUR;
         creatureFlag_l = 1;
         goto creaturePurchase;
     case MAP_EVENT_EXCAVATION:
-        creatureType_i = AI_CREATURE_SKELETON;
+        creatureType_i = CREATURE_SKELETON;
         creatureFlag_l = 1;
 creaturePurchase:
         if (cell->m_objectMetadata != 0) {
@@ -4252,7 +4252,7 @@ teleportDestination:
             break;
         }
         if (cell->m_objectMetadata & ARTIFACT_GUARDED_FLAG) {
-            if (artifactGuardCount_b == AI_EVENT_ROGUE_GUARD) {
+            if (artifactGuardCount_b == CREATURE_ROGUE) {
                 artifactGuardResult_e = AI_EVENT_ROGUE_COUNT;
             } else {
                 artifactGuardResult_e = 1;
@@ -4391,7 +4391,7 @@ artifactPickup:
         if (cell->m_objectMetadata != 0 && eventHero->HasSpell(cell->m_objectMetadata - 1) == 0) {
             for (index_h = 0; index_h < AI_EVENT_ARMY_STACK_COUNT; ++index_h) {
                 gpMonGroup->m_creatureTypes[index_h] =
-                    PYRAMID_PRIMARY_MONSTER;
+                    CREATURE_ROYAL_MUMMY;
                 gpMonGroup->m_creatureCounts[index_h] = 10;
             }
             index_h = cell->m_objectMetadata - 1;
@@ -4415,7 +4415,7 @@ artifactPickup:
             } else {
                 index_h = PYRAMID_GUARD_COUNT;
                 combatResult_d = gpPhilAI->CombatMonsterEvent(
-                    eventHero, PYRAMID_PRIMARY_MONSTER,
+                    eventHero, CREATURE_ROYAL_MUMMY,
                     &index_h, cell);
                 if (combatResult_d == 0) {
                 } else {
@@ -4472,7 +4472,7 @@ artifactPickup:
                 gpGame->ConvertObject(x, y, x, y,
                                       29, 5, 5, 29, 4, 64, 23);
                 gpGame->m_mines[cell->m_objectMetadata].resourceType = RES_GOLD;
-                gpGame->m_mines[cell->m_objectMetadata].guardianType = AI_EVENT_NO_CREATURE;
+                gpGame->m_mines[cell->m_objectMetadata].guardianType = CREATURE_NONE;
                 gpGame->m_mines[cell->m_objectMetadata].guardianCount = 0;
                 gpGame->ClaimMine(cell->m_objectMetadata, giCurPlayer);
             }
@@ -4690,7 +4690,7 @@ void advManager::GenericSiteAIEvent(mapCell *cell, hero *eventHero)
                  artifactIndex1++) {
                 creatureType3 =
                     eventHero->m_army.m_creatureTypes[artifactIndex1];
-                if (creatureType3 != AI_EVENT_NO_CREATURE) {
+                if (creatureType3 != CREATURE_NONE) {
                     quantity6 = eventHero->m_army.m_quantities[artifactIndex1];
                     if (quantity6 > AI_EVENT_GRAVEYARD_ARMY_REMAINDER) {
                         eventHero->m_army.m_quantities[artifactIndex1] =
@@ -4718,9 +4718,9 @@ void advManager::GenericSiteAIEvent(mapCell *cell, hero *eventHero)
             eventHero->m_mobility += AI_EVENT_CREATURE_UPGRADE_MOBILITY;
             eventHero->m_remainingMobility += AI_EVENT_CREATURE_UPGRADE_MOBILITY;
         }
-        if (eventHero->CreatureTypeCount(AI_EVENT_CREATURE_UPGRADE_FROM))
-            eventHero->UpgradeCreatures(AI_EVENT_CREATURE_UPGRADE_FROM,
-                                        AI_EVENT_CREATURE_UPGRADE_TO);
+        if (eventHero->CreatureTypeCount(CREATURE_CAVALRY))
+            eventHero->UpgradeCreatures(CREATURE_CAVALRY,
+                                        CREATURE_CHAMPION);
         break;
     }
 }
@@ -4753,19 +4753,19 @@ void advManager::RecruitSiteAIEvent(mapCell *cell, hero *eventHero)
 
     switch (siteType3) {
     case 0:
-        creatureType13 = MONSTER_GENIE;
+        creatureType13 = CREATURE_GHOST;
         break;
     case 1:
-        creatureType13 = MONSTER_EARTH_ELEMENTAL;
+        creatureType13 = CREATURE_EARTH_ELEMENTAL;
         break;
     case 2:
-        creatureType13 = MONSTER_AIR_ELEMENTAL;
+        creatureType13 = CREATURE_AIR_ELEMENTAL;
         break;
     case 3:
-        creatureType13 = MONSTER_FIRE_ELEMENTAL;
+        creatureType13 = CREATURE_FIRE_ELEMENTAL;
         break;
     case 4:
-        creatureType13 = MONSTER_WATER_ELEMENTAL;
+        creatureType13 = CREATURE_WATER_ELEMENTAL;
         break;
     }
 
@@ -4865,18 +4865,18 @@ void advManager::PlayerMonsterInteract(mapCell *cell, mapCell *combatCell, hero 
 
     if (gbInCampaign &&
         ((gpGame->m_campaignAwards[CAMPAIGN_AWARD_DWARVEN_ALLIANCE] &&
-          (monster_n == MONSTER_DWARF || monster_n == MONSTER_BATTLE_DWARF)) ||
+          (monster_n == CREATURE_DWARF || monster_n == CREATURE_BATTLE_DWARF)) ||
          (gpGame->m_campaignAwards[CAMPAIGN_AWARD_OGRE_ALLIANCE] &&
-          (monster_n == MONSTER_OGRE || monster_n == MONSTER_OGRE_LORD)) ||
+          (monster_n == CREATURE_OGRE || monster_n == CREATURE_OGRE_LORD)) ||
          (gpGame->m_campaignAwards[CAMPAIGN_AWARD_DRAGON_ALLIANCE] &&
-          (monster_n == MONSTER_GREEN_DRAGON ||
-           monster_n == MONSTER_RED_DRAGON ||
-           monster_n == MONSTER_BLACK_DRAGON)))) {
+          (monster_n == CREATURE_GREEN_DRAGON ||
+           monster_n == CREATURE_RED_DRAGON ||
+           monster_n == CREATURE_BLACK_DRAGON)))) {
         if (!eventHero->m_army.CanJoin(monster_n)) {
-            if (monster_n == MONSTER_DWARF || monster_n == MONSTER_BATTLE_DWARF)
+            if (monster_n == CREATURE_DWARF || monster_n == CREATURE_BATTLE_DWARF)
                 NormalDialog("The dwarves hail you, \"Any friend of Roland is a friend of ours.  You may pass.\"",
                              1, -1, -1, -1, 0, -1, 0, -1, 0);
-            else if (monster_n == MONSTER_OGRE || monster_n == MONSTER_OGRE_LORD)
+            else if (monster_n == CREATURE_OGRE || monster_n == CREATURE_OGRE_LORD)
                 NormalDialog("The ogres give you a grunt of recognition, \"Archibald's allies may pass.\"",
                              1, -1, -1, -1, 0, -1, 0, -1, 0);
             else
@@ -4885,10 +4885,10 @@ void advManager::PlayerMonsterInteract(mapCell *cell, mapCell *combatCell, hero 
             *handled = 1;
         }
         else {
-            if (monster_n == MONSTER_DWARF || monster_n == MONSTER_BATTLE_DWARF)
+            if (monster_n == CREATURE_DWARF || monster_n == CREATURE_BATTLE_DWARF)
                 NormalDialog("The dwarves recognize their allies and gladly join your forces.",
                              1, -1, -1, -1, 0, -1, 0, -1, 0);
-            else if (monster_n == MONSTER_OGRE || monster_n == MONSTER_OGRE_LORD)
+            else if (monster_n == CREATURE_OGRE || monster_n == CREATURE_OGRE_LORD)
                 NormalDialog("The ogres recognize you as the Dwarfbane and lumber over to join you.",
                              1, -1, -1, -1, 0, -1, 0, -1, 0);
             else
@@ -4901,14 +4901,14 @@ void advManager::PlayerMonsterInteract(mapCell *cell, mapCell *combatCell, hero 
     }
 
     if (gbInCampaign && gpGame->m_campaignAwards[CAMPAIGN_AWARD_DWARFBANE] &&
-        (monster_n == MONSTER_DWARF || monster_n == MONSTER_BATTLE_DWARF)) {
+        (monster_n == CREATURE_DWARF || monster_n == CREATURE_BATTLE_DWARF)) {
         NormalDialog("\"The Dwarfbane!!!!, run for your lives.\"", 1, -1, -1, -1, 0, -1, 0, -1, 0);
         *handled = 1;
         return;
     }
 
     if (xIsPlayingExpansionCampaign && xCampaign.HasAward(0) &&
-        (monster_n == MONSTER_ELF || monster_n == MONSTER_GRAND_ELF)) {
+        (monster_n == CREATURE_ELF || monster_n == CREATURE_GRAND_ELF)) {
         *handled = 1;
         if (eventHero->m_army.CanJoin(monster_n)) {
             NormalDialog("As you approach the group of elves, their leader calls them all to attention.  He shouts to them, \"Who of you is brave enough to join this fearless ally of ours?\"  The group explodes with cheers as they run to join your ranks.",
@@ -4924,9 +4924,9 @@ void advManager::PlayerMonsterInteract(mapCell *cell, mapCell *combatCell, hero 
 
     if (eventHero->m_army.CanJoin(monster_n) && strengthRatio_p > MONSTER_STRENGTH_JOIN &&
         !eventHero->HasArtifact(MONSTER_NO_JOIN_ARTIFACT) &&
-        monster_n != MONSTER_GENIE && monster_n != MONSTER_EARTH_ELEMENTAL &&
-        monster_n != MONSTER_AIR_ELEMENTAL && monster_n != MONSTER_FIRE_ELEMENTAL &&
-        monster_n != MONSTER_WATER_ELEMENTAL) {
+        monster_n != CREATURE_GHOST && monster_n != CREATURE_EARTH_ELEMENTAL &&
+        monster_n != CREATURE_AIR_ELEMENTAL && monster_n != CREATURE_FIRE_ELEMENTAL &&
+        monster_n != CREATURE_WATER_ELEMENTAL) {
         if (forcedJoin_f) {
             sprintf(gText, gEventText[EVENT_TEXT_FOLLOWERS],
                     gArmyNamesPlural[monster_n]);
@@ -5045,11 +5045,11 @@ void advManager::ComputerMonsterInteract(mapCell *cell, hero *eventHero,
     if (eventHero->m_army.CanJoin(monsterType) &&
         !eventHero->HasArtifact(MONSTER_NO_JOIN_ARTIFACT) &&
         strengthRatio > MONSTER_STRENGTH_JOIN &&
-        monsterType != MONSTER_GENIE &&
-        monsterType != MONSTER_EARTH_ELEMENTAL &&
-        monsterType != MONSTER_AIR_ELEMENTAL &&
-        monsterType != MONSTER_FIRE_ELEMENTAL &&
-        monsterType != MONSTER_WATER_ELEMENTAL) {
+        monsterType != CREATURE_GHOST &&
+        monsterType != CREATURE_EARTH_ELEMENTAL &&
+        monsterType != CREATURE_AIR_ELEMENTAL &&
+        monsterType != CREATURE_FIRE_ELEMENTAL &&
+        monsterType != CREATURE_WATER_ELEMENTAL) {
         if (forcedJoin) {
             gpPhilAI->EvaluateOneTimeCreaturePurchase(
                 monsterType, monsterCount[0], 1, purchaseCount, purchaseValue,
@@ -5104,9 +5104,9 @@ computerMonstersFlee:
             gMonsterDatabase[monsterType].hitPoints * monsterCount[0], 1);
         eventHero->CheckLevel();
         if (eventHero->GetSSLevel(HERO_SKILL_NECROMANCY) &&
-            eventHero->m_army.CanJoin(MONSTER_SKELETON)) {
+            eventHero->m_army.CanJoin(CREATURE_SKELETON)) {
             gpGame->GiveArmy(
-                &eventHero->m_army, MONSTER_SKELETON,
+                &eventHero->m_army, CREATURE_SKELETON,
                 static_cast<i32>(static_cast<double>(monsterCount[0]) *
                                  eventHero->GetSSLevel(HERO_SKILL_NECROMANCY) *
                                  MONSTER_NECROMANCY_FRACTION),

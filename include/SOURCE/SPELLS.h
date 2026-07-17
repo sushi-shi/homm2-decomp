@@ -96,16 +96,6 @@ typedef enum SpellSourceLine {
     SPELL_RIPPLE_WAVE_FREE_LINE_OFFSET = 0x8f
 } SpellSourceLine;
 
-typedef enum CombatSpellMonster {
-    SPELL_MONSTER_GREEN_DRAGON = 0x23,
-    SPELL_MONSTER_IRON_GOLEM = 0x28,
-    SPELL_MONSTER_STEEL_GOLEM = 0x29,
-    SPELL_MONSTER_EARTH_ELEMENTAL = 0x3e,
-    SPELL_MONSTER_AIR_ELEMENTAL = 0x3f,
-    SPELL_MONSTER_FIRE_ELEMENTAL = 0x40,
-    SPELL_MONSTER_WATER_ELEMENTAL = 0x41
-} CombatSpellMonster;
-
 typedef enum CombatSpellArtifact {
     SPELL_ARTIFACT_ICE_CLOAK = 0x2d,
     SPELL_ARTIFACT_FIRE_CLOAK = 0x2e,

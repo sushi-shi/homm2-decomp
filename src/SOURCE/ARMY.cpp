@@ -122,10 +122,10 @@ void army::Init(i32 monsterType, i32 quantity, i32 side, i32 index, i32 hex, i32
         gpCombatManager->m_heroes[m_side],
         gpCombatManager->m_combatTowns[m_side],
         gpCombatManager->m_armyGroups[COMBAT_DEFENDER_SIDE - m_side]);
-    if (m_monsterType == ARMY_CREATURE_EARTH_ELEMENTAL ||
-        m_monsterType == ARMY_CREATURE_AIR_ELEMENTAL ||
-        m_monsterType == ARMY_CREATURE_FIRE_ELEMENTAL ||
-        m_monsterType == ARMY_CREATURE_WATER_ELEMENTAL ||
+    if (m_monsterType == CREATURE_EARTH_ELEMENTAL ||
+        m_monsterType == CREATURE_AIR_ELEMENTAL ||
+        m_monsterType == CREATURE_FIRE_ELEMENTAL ||
+        m_monsterType == CREATURE_WATER_ELEMENTAL ||
         (m_monster.flags.all & MONSTER_FLAGS_NO_MORALE)) {
         m_morale = 0;
     }
@@ -190,40 +190,40 @@ void army::LoadResources(void)
         sprintf(gText, "%sshot.82M", m_monster.spriteName);
         m_samples[ARMY_SAMPLE_SHOT] = gpResourceManager->GetSample(gText);
     }
-    if (m_monsterType == ARMY_CREATURE_VAMPIRE ||
-        m_monsterType == ARMY_CREATURE_VAMPIRE_LORD) {
+    if (m_monsterType == CREATURE_VAMPIRE ||
+        m_monsterType == CREATURE_VAMPIRE_LORD) {
         sprintf(gText, "%sext1.82M", m_monster.spriteName);
         m_samples[ARMY_SAMPLE_EXTRA_ONE] = gpResourceManager->GetSample(gText);
         sprintf(gText, "%sext2.82M", m_monster.spriteName);
         m_samples[ARMY_SAMPLE_EXTRA_TWO] = gpResourceManager->GetSample(gText);
     }
-    if (m_monsterType == ARMY_CREATURE_LICH ||
-        m_monsterType == ARMY_CREATURE_POWER_LICH) {
+    if (m_monsterType == CREATURE_LICH ||
+        m_monsterType == CREATURE_POWER_LICH) {
         sprintf(gText, "%sexpl.82M", m_monster.spriteName);
         m_samples[ARMY_SAMPLE_EXTRA_ONE] = gpResourceManager->GetSample(gText);
     }
 
     m_creatureIcon = gpResourceManager->GetIcon(cMonFilename[m_monsterType]);
     if (m_monster.flags.all & MONSTER_FLAGS_SHOOTER) {
-        if (m_monsterType == ARMY_CREATURE_GIANT ||
-            m_monsterType == ARMY_CREATURE_TITAN) {
+        if (m_monsterType == CREATURE_GIANT ||
+            m_monsterType == CREATURE_TITAN) {
             sprintf(gText, "titanmsl.icn");
-        } else if (m_monsterType == ARMY_CREATURE_HALFLING) {
+        } else if (m_monsterType == CREATURE_HALFLING) {
             sprintf(gText, "halflmsl.icn");
-        } else if (m_monsterType == ARMY_CREATURE_ARCHER ||
-                   m_monsterType == ARMY_CREATURE_RANGER) {
+        } else if (m_monsterType == CREATURE_ARCHER ||
+                   m_monsterType == CREATURE_RANGER) {
             sprintf(gText, "arch_msl.icn");
-        } else if (m_monsterType == ARMY_CREATURE_LICH ||
-                   m_monsterType == ARMY_CREATURE_POWER_LICH) {
+        } else if (m_monsterType == CREATURE_LICH ||
+                   m_monsterType == CREATURE_POWER_LICH) {
             sprintf(gText, "lich_msl.icn");
-        } else if (m_monsterType == ARMY_CREATURE_ORC ||
-                   m_monsterType == ARMY_CREATURE_ORC_CHIEF) {
+        } else if (m_monsterType == CREATURE_ORC ||
+                   m_monsterType == CREATURE_ORC_CHIEF) {
             sprintf(gText, "orc__msl.icn");
-        } else if (m_monsterType == ARMY_CREATURE_DRUID ||
-                   m_monsterType == ARMY_CREATURE_GREATER_DRUID) {
+        } else if (m_monsterType == CREATURE_DRUID ||
+                   m_monsterType == CREATURE_GREATER_DRUID) {
             sprintf(gText, "druidmsl.icn");
-        } else if (m_monsterType == ARMY_CREATURE_TROLL ||
-                   m_monsterType == ARMY_CREATURE_WAR_TROLL) {
+        } else if (m_monsterType == CREATURE_TROLL ||
+                   m_monsterType == CREATURE_WAR_TROLL) {
             sprintf(gText, "trollmsl.icn");
         } else {
             sprintf(gText, "elf__msl.icn");
@@ -827,8 +827,8 @@ void army::SpecialAttack(void)
 
     targetX_1 = target_1->MidX();
     targetY_1 = target_1->MidY();
-    if (m_monsterType == ARMY_CREATURE_LICH ||
-        m_monsterType == ARMY_CREATURE_POWER_LICH) {
+    if (m_monsterType == CREATURE_LICH ||
+        m_monsterType == CREATURE_POWER_LICH) {
         targetX_1 = gpCombatManager->m_hexCells[target_1->m_hex].m_x;
         targetY_1 = gpCombatManager->m_hexCells[target_1->m_hex].m_y - 17;
     }
@@ -905,8 +905,8 @@ void army::SpecialAttack(void)
     missileHalfHeight_1 = 25;
     missileSpacing_1 = 31;
     missileDelay_2 = 25;
-    if (m_monsterType == ARMY_CREATURE_LICH ||
-        m_monsterType == ARMY_CREATURE_POWER_LICH) {
+    if (m_monsterType == CREATURE_LICH ||
+        m_monsterType == CREATURE_POWER_LICH) {
         missileSpacing_1 = 26;
         missileDelay_2 = 7;
         missileHalfWidth = 10;
@@ -933,8 +933,8 @@ void army::SpecialAttack(void)
         xDistance_7 * xDistance_7 + yDistance_16 * yDistance_16)));
     missileSteps_7 = (distance_6 + (missileSpacing_1 >> 1)) / missileSpacing_1;
 
-    if (m_monsterType == ARMY_CREATURE_MAGE ||
-        m_monsterType == ARMY_CREATURE_ARCHMAGE) {
+    if (m_monsterType == CREATURE_MAGE ||
+        m_monsterType == CREATURE_ARCHMAGE) {
         gpWindowManager->UpdateScreenRegion(
             giMinExtentX,
             giMinExtentY,
@@ -1052,8 +1052,8 @@ void army::SpecialAttack(void)
     effectType_1 = -1;
     effectX_2 = -1;
     effectY_28 = -1;
-    if (m_monsterType == ARMY_CREATURE_LICH ||
-        m_monsterType == ARMY_CREATURE_POWER_LICH) {
+    if (m_monsterType == CREATURE_LICH ||
+        m_monsterType == CREATURE_POWER_LICH) {
         i32 adjacentHex;
         army *splashTarget;
 
@@ -1115,7 +1115,7 @@ void army::SpecialAttack(void)
     }
     strcpy(combatText, gText);
     switch (m_monsterType) {
-    case ARMY_CREATURE_ARCHMAGE:
+    case CREATURE_ARCHMAGE:
         if (SRandom(1, ARMY_PERCENT_MAX) < ARMY_ARCHMAGE_DISPEL_CHANCE &&
             target_1 && target_1->SpellCastWorks(102)) {
             target_1->m_spellEffect = 102;
@@ -1137,9 +1137,9 @@ void army::SpecialAttack(void)
         m_facing = originalFacing_6;
     }
     if (!bSecondAttack &&
-        (m_monsterType == ARMY_CREATURE_ELF ||
-         m_monsterType == ARMY_CREATURE_GRAND_ELF ||
-         m_monsterType == ARMY_CREATURE_RANGER) &&
+        (m_monsterType == CREATURE_ELF ||
+         m_monsterType == CREATURE_GRAND_ELF ||
+         m_monsterType == CREATURE_RANGER) &&
         target_1->m_quantity > 0) {
         bSecondAttack = 1;
         SpecialAttack();
@@ -1294,7 +1294,7 @@ void army::DoAttack(i32 retaliation)
     if (retaliation) {
         gpCombatManager->m_currentSide = 1 - gpCombatManager->m_currentSide;
     }
-    if (m_monsterType == ARMY_CREATURE_HYDRA) {
+    if (m_monsterType == CREATURE_HYDRA) {
         DoHydraAttack(retaliation);
     } else {
         originalDirection = m_attackDirection;
@@ -1410,7 +1410,7 @@ void army::DoAttack(i32 retaliation)
         strcpy(combatText, gText);
 
         switch (m_monsterType) {
-        case ARMY_CREATURE_CYCLOPS:
+        case CREATURE_CYCLOPS:
             if (target_1->m_quantity > 0) {
                 if (!breathTarget_6 || breathTarget_6->m_quantity > 0) {
                     if (SRandom(1, ARMY_PERCENT_MAX) < ARMY_ATTACK_EFFECT_CHANCE) {
@@ -1426,26 +1426,26 @@ void army::DoAttack(i32 retaliation)
                 }
             }
             break;
-        case ARMY_CREATURE_UNICORN:
+        case CREATURE_UNICORN:
             if (SRandom(1, ARMY_PERCENT_MAX) < ARMY_ATTACK_EFFECT_CHANCE && target_1 &&
                 target_1->SpellCastWorks(ARMY_ATTACK_SPELL_UNICORN)) {
                 target_1->m_spellEffect = ARMY_ATTACK_SPELL_UNICORN;
                 effectStopsRetaliation_4 = 1;
             }
             break;
-        case ARMY_CREATURE_MEDUSA:
+        case CREATURE_MEDUSA:
             if (SRandom(1, ARMY_PERCENT_MAX) < ARMY_ATTACK_EFFECT_CHANCE && target_1 &&
                 target_1->SpellCastWorks(ARMY_ATTACK_SPELL_MEDUSA)) {
                 target_1->m_spellEffect = ARMY_ATTACK_SPELL_MEDUSA;
                 effectStopsRetaliation_4 = 1;
             }
             break;
-        case ARMY_CREATURE_MUMMY:
+        case CREATURE_MUMMY:
             if (SRandom(1, ARMY_PERCENT_MAX) < ARMY_ATTACK_EFFECT_CHANCE) {
                 goto applyMummySpell;
             }
             break;
-        case ARMY_CREATURE_ROYAL_MUMMY:
+        case CREATURE_ROYAL_MUMMY:
             if (SRandom(1, ARMY_PERCENT_MAX) < ARMY_ROYAL_MUMMY_EFFECT_CHANCE) {
 applyMummySpell:
                 if (target_1 && target_1->SpellCastWorks(ARMY_ATTACK_SPELL_MUMMY)) {
@@ -1453,17 +1453,17 @@ applyMummySpell:
                 }
             }
             break;
-        case ARMY_CREATURE_ARCHMAGE:
+        case CREATURE_ARCHMAGE:
             if (SRandom(1, ARMY_PERCENT_MAX) < ARMY_ATTACK_EFFECT_CHANCE && target_1 &&
                 target_1->SpellCastWorks(ARMY_ATTACK_SPELL_ARCHMAGE)) {
                 target_1->m_spellEffect = ARMY_ATTACK_SPELL_ARCHMAGE;
             }
             break;
-        case ARMY_CREATURE_GHOST:
+        case CREATURE_GHOST:
             gpCombatManager->m_killBenefit[
                 gpCombatManager->m_hexCells[m_hex].m_occupantSide] = killed_13;
             break;
-        case ARMY_CREATURE_VAMPIRE_LORD:
+        case CREATURE_VAMPIRE_LORD:
             gpCombatManager->m_killBenefit[
                 gpCombatManager->m_hexCells[m_hex].m_occupantSide] =
                 target_1->m_monster.hitPoints * killed_13;
@@ -1473,11 +1473,11 @@ applyMummySpell:
         gpCombatManager->CombatMessage(combatText, 1, 1, 0);
         m_index[gpCombatManager->m_limitCreatureCount[m_side]] = 1;
 
-        if (m_monsterType == ARMY_CREATURE_GHOST) {
+        if (m_monsterType == CREATURE_GHOST) {
             m_quantity += gpCombatManager->m_killBenefit[
                 gpCombatManager->m_hexCells[m_hex].m_occupantSide];
         }
-        if (m_monsterType == ARMY_CREATURE_VAMPIRE_LORD) {
+        if (m_monsterType == CREATURE_VAMPIRE_LORD) {
             if (gpCombatManager->m_killBenefit[
                     gpCombatManager->m_hexCells[m_hex].m_occupantSide] < m_hitPointsLost) {
                 m_hitPointsLost -= gpCombatManager->m_killBenefit[
@@ -1499,12 +1499,12 @@ applyMummySpell:
         if (target_1 && target_1->m_quantity > 0 &&
             !target_1->m_spellInfluence[ARMY_SPELL_INFLUENCE_PARALYZE] &&
             !target_1->m_spellInfluence[ARMY_SPELL_INFLUENCE_PETRIFIED] &&
-            (target_1->m_monsterType == ARMY_CREATURE_GRIFFIN ||
+            (target_1->m_monsterType == CREATURE_GRIFFIN ||
              !(target_1->m_monster.flags.all & MONSTER_FLAGS_RETALIATED)) &&
-            m_monsterType != ARMY_CREATURE_ROGUE &&
-            m_monsterType != ARMY_CREATURE_SPRITE &&
-            m_monsterType != ARMY_CREATURE_VAMPIRE &&
-            m_monsterType != ARMY_CREATURE_VAMPIRE_LORD &&
+            m_monsterType != CREATURE_ROGUE &&
+            m_monsterType != CREATURE_SPRITE &&
+            m_monsterType != CREATURE_VAMPIRE &&
+            m_monsterType != CREATURE_VAMPIRE_LORD &&
             !effectStopsRetaliation_4 && !retaliation) {
             DelayMilli(static_cast<i32l>(
                 gfCombatSpeedMod[gConfig.combatSpeed] * ARMY_RETALIATION_DELAY));
@@ -1527,14 +1527,14 @@ applyMummySpell:
             target_1->m_monster.attributes |= MONSTER_ATTRIBUTE_RETALIATED;
             if (gbRemoteOn && gpCombatManager->m_networkArmyPresent[0] &&
                 gpCombatManager->m_networkArmyPresent[1] &&
-                target_1->m_monsterType == ARMY_CREATURE_GHOST) {
+                target_1->m_monsterType == CREATURE_GHOST) {
                 target_1->m_quantity += gpCombatManager->m_killBenefit[
                     gpCombatManager->m_hexCells[target_1->m_hex].m_occupantSide];
             }
         }
-        if ((m_monsterType == ARMY_CREATURE_WOLF ||
-             m_monsterType == ARMY_CREATURE_PALADIN ||
-             m_monsterType == ARMY_CREATURE_CRUSADER) &&
+        if ((m_monsterType == CREATURE_WOLF ||
+             m_monsterType == CREATURE_PALADIN ||
+             m_monsterType == CREATURE_CRUSADER) &&
             target_1 && target_1->m_quantity > 0 && !retaliation &&
             !m_spellInfluence[ARMY_SPELL_INFLUENCE_PARALYZE] &&
             !m_spellInfluence[ARMY_SPELL_INFLUENCE_PETRIFIED] &&
@@ -1842,10 +1842,10 @@ void army::DamageEnemy(army *target, i32 *damageResult, i32 *killedResult,
     attackDifference7 = m_monster.attack + attackBonus6 -
         (target->m_monster.defense + (defenseBonus9 + defenseModifier));
     if (m_spellInfluence[ARMY_SPELL_INFLUENCE_DRAGON_SLAYER] &&
-        (target->m_monsterType == ARMY_CREATURE_GREEN_DRAGON ||
-         target->m_monsterType == ARMY_CREATURE_RED_DRAGON ||
-         target->m_monsterType == ARMY_CREATURE_BLACK_DRAGON ||
-         target->m_monsterType == ARMY_CREATURE_BONE_DRAGON)) {
+        (target->m_monsterType == CREATURE_GREEN_DRAGON ||
+         target->m_monsterType == CREATURE_RED_DRAGON ||
+         target->m_monsterType == CREATURE_BLACK_DRAGON ||
+         target->m_monsterType == CREATURE_BONE_DRAGON)) {
         attackDifference7 += ARMY_DRAGON_SLAYER_BONUS;
     }
     if (gpCombatManager->m_drawbridgeBackgroundVisible) {
@@ -1869,16 +1869,16 @@ void army::DamageEnemy(army *target, i32 *damageResult, i32 *killedResult,
         attackDifference7 = -ARMY_DAMAGE_STAT_LIMIT;
     }
     damage1 *= gfBattleStat[attackDifference7 + ARMY_DAMAGE_STAT_LIMIT];
-    if ((m_monsterType == ARMY_CREATURE_CRUSADER &&
+    if ((m_monsterType == CREATURE_CRUSADER &&
          (target->m_monster.flags.all & MONSTER_FLAGS_UNDEAD)) ||
-        (m_monsterType == ARMY_CREATURE_EARTH_ELEMENTAL &&
-         target->m_monsterType == ARMY_CREATURE_AIR_ELEMENTAL) ||
-        (m_monsterType == ARMY_CREATURE_AIR_ELEMENTAL &&
-         target->m_monsterType == ARMY_CREATURE_EARTH_ELEMENTAL) ||
-        (m_monsterType == ARMY_CREATURE_WATER_ELEMENTAL &&
-         target->m_monsterType == ARMY_CREATURE_FIRE_ELEMENTAL) ||
-        (m_monsterType == ARMY_CREATURE_FIRE_ELEMENTAL &&
-         target->m_monsterType == ARMY_CREATURE_WATER_ELEMENTAL)) {
+        (m_monsterType == CREATURE_EARTH_ELEMENTAL &&
+         target->m_monsterType == CREATURE_AIR_ELEMENTAL) ||
+        (m_monsterType == CREATURE_AIR_ELEMENTAL &&
+         target->m_monsterType == CREATURE_EARTH_ELEMENTAL) ||
+        (m_monsterType == CREATURE_WATER_ELEMENTAL &&
+         target->m_monsterType == CREATURE_FIRE_ELEMENTAL) ||
+        (m_monsterType == CREATURE_FIRE_ELEMENTAL &&
+         target->m_monsterType == CREATURE_WATER_ELEMENTAL)) {
         damage1 *= 2.0f;
     }
     if (m_luckOutcome > 0) {
@@ -1897,9 +1897,9 @@ void army::DamageEnemy(army *target, i32 *damageResult, i32 *killedResult,
             gfSSArcheryMod[commander1->m_secondarySkills[HERO_SKILL_ARCHERY]];
     }
     if ((m_monster.flags.all & MONSTER_FLAGS_SHOOTER) && !rangedAttack &&
-        m_monsterType != ARMY_CREATURE_TITAN &&
-        m_monsterType != ARMY_CREATURE_MAGE &&
-        m_monsterType != ARMY_CREATURE_ARCHMAGE) {
+        m_monsterType != CREATURE_TITAN &&
+        m_monsterType != CREATURE_MAGE &&
+        m_monsterType != CREATURE_ARCHMAGE) {
         damage1 /= 2.0f;
     }
     if (rangedAttack &&
@@ -1914,7 +1914,7 @@ void army::DamageEnemy(army *target, i32 *damageResult, i32 *killedResult,
         damage1 /= 2.0f;
     }
     damageDone2 = static_cast<i32>(damage1 + 0.5);
-    if (m_monsterType == ARMY_CREATURE_GENIE &&
+    if (m_monsterType == CREATURE_GENIE &&
         SRandom(1, ARMY_GENIE_HALF_ROLL_MAX) == ARMY_GENIE_HALF_ROLL) {
         genieDamage26 =
             ((target->m_quantity + 1) / 2) * target->m_monster.hitPoints;
@@ -2026,12 +2026,12 @@ void army::PowEffect(i32 effect, i32 resetLimits, i32 effectX, i32 effectY)
     damageFrames = 0;
     drawEffect_1 = 0;
     overlapAdjustment_7 = 1;
-    if (m_monsterType == ARMY_CREATURE_PALADIN ||
-        m_monsterType == ARMY_CREATURE_CRUSADER) {
+    if (m_monsterType == CREATURE_PALADIN ||
+        m_monsterType == CREATURE_CRUSADER) {
         overlapAdjustment_7 = 0;
     }
-    if (m_monsterType == ARMY_CREATURE_DWARF ||
-        m_monsterType == ARMY_CREATURE_BATTLE_DWARF) {
+    if (m_monsterType == CREATURE_DWARF ||
+        m_monsterType == CREATURE_BATTLE_DWARF) {
         overlapAdjustment_7 = 2;
     }
     if (effectX != ARMY_NO_EFFECT) {
@@ -2382,10 +2382,10 @@ u32l army::Strength(void)
 VA(0x00451700, 0x66)
 i32 army::LeaveNoBody(void)
 {
-    return m_monsterType == ARMY_CREATURE_EARTH_ELEMENTAL ||
-        m_monsterType == ARMY_CREATURE_AIR_ELEMENTAL ||
-        m_monsterType == ARMY_CREATURE_FIRE_ELEMENTAL ||
-        m_monsterType == ARMY_CREATURE_WATER_ELEMENTAL ||
+    return m_monsterType == CREATURE_EARTH_ELEMENTAL ||
+        m_monsterType == CREATURE_AIR_ELEMENTAL ||
+        m_monsterType == CREATURE_FIRE_ELEMENTAL ||
+        m_monsterType == CREATURE_WATER_ELEMENTAL ||
         (m_monster.flags.all & MONSTER_FLAGS_MIRROR_IMAGE);
 }
 
@@ -2425,10 +2425,10 @@ void army::ProcessDeath(i32 immediate)
     }
     if (LeaveNoBody()) {
         if (immediate ||
-            (m_monsterType != ARMY_CREATURE_AIR_ELEMENTAL &&
-             m_monsterType != ARMY_CREATURE_FIRE_ELEMENTAL &&
-             m_monsterType != ARMY_CREATURE_WATER_ELEMENTAL &&
-             m_monsterType != ARMY_CREATURE_EARTH_ELEMENTAL)) {
+            (m_monsterType != CREATURE_AIR_ELEMENTAL &&
+             m_monsterType != CREATURE_FIRE_ELEMENTAL &&
+             m_monsterType != CREATURE_WATER_ELEMENTAL &&
+             m_monsterType != CREATURE_EARTH_ELEMENTAL)) {
             gpCombatManager->m_removedArmies[m_side][m_index] = 1;
             gpCombatManager->m_removedArmyPresent = 1;
         } else {
@@ -3024,9 +3024,9 @@ float army::SpellCastWorkChance(i32 spell)
          spell != SPELL_RESURRECT && spell != SPELL_TRUE_RESURRECT &&
          spell != SPELL_ANIMATE_DEAD) ||
         m_deathPending ||
-        m_monsterType == ARMY_CREATURE_GREEN_DRAGON ||
-        m_monsterType == ARMY_CREATURE_RED_DRAGON ||
-        m_monsterType == ARMY_CREATURE_BLACK_DRAGON) {
+        m_monsterType == CREATURE_GREEN_DRAGON ||
+        m_monsterType == CREATURE_RED_DRAGON ||
+        m_monsterType == CREATURE_BLACK_DRAGON) {
         return ARMY_SPELL_CHANCE_NONE;
     }
     if (spell == SPELL_MIRROR_IMAGE && m_mirrorImageIndex != -1) {
@@ -3050,24 +3050,24 @@ float army::SpellCastWorkChance(i32 spell)
         (m_monster.flags.all & MONSTER_FLAGS_UNDEAD)) {
         return ARMY_SPELL_CHANCE_NONE;
     }
-    if (m_monsterType == ARMY_CREATURE_PHOENIX &&
+    if (m_monsterType == CREATURE_PHOENIX &&
         spell != SPELL_FIREBALL && spell != SPELL_FIREBLAST &&
         spell != SPELL_LIGHTNING_BOLT && spell != SPELL_CHAIN_LIGHTNING &&
         spell != SPELL_COLD_RAY && spell != SPELL_COLD_RING &&
         spell != SPELL_ELEMENTAL_STORM) {
         return ARMY_SPELL_CHANCE_NONE;
     }
-    if (m_monsterType == ARMY_CREATURE_CRUSADER &&
+    if (m_monsterType == CREATURE_CRUSADER &&
         (spell == SPELL_CURSE || spell == SPELL_MASS_CURSE)) {
         return ARMY_SPELL_CHANCE_NONE;
     }
     if (((m_monster.flags.all & MONSTER_FLAGS_UNDEAD) ||
-         m_monsterType == ARMY_CREATURE_EARTH_ELEMENTAL ||
-         m_monsterType == ARMY_CREATURE_AIR_ELEMENTAL ||
-         m_monsterType == ARMY_CREATURE_FIRE_ELEMENTAL ||
-         m_monsterType == ARMY_CREATURE_WATER_ELEMENTAL ||
-         m_monsterType == ARMY_CREATURE_GIANT ||
-         m_monsterType == ARMY_CREATURE_TITAN) &&
+         m_monsterType == CREATURE_EARTH_ELEMENTAL ||
+         m_monsterType == CREATURE_AIR_ELEMENTAL ||
+         m_monsterType == CREATURE_FIRE_ELEMENTAL ||
+         m_monsterType == CREATURE_WATER_ELEMENTAL ||
+         m_monsterType == CREATURE_GIANT ||
+         m_monsterType == CREATURE_TITAN) &&
         (spell == SPELL_BERSERKER || spell == SPELL_HYPNOTIZE ||
          spell == SPELL_PARALYZE || spell == SPELL_BLIND)) {
         return ARMY_SPELL_CHANCE_NONE;
@@ -3077,20 +3077,20 @@ float army::SpellCastWorkChance(i32 spell)
          spell == SPELL_BLESS || spell == SPELL_MASS_BLESS)) {
         return ARMY_SPELL_CHANCE_NONE;
     }
-    if (m_monsterType == ARMY_CREATURE_EARTH_ELEMENTAL &&
+    if (m_monsterType == CREATURE_EARTH_ELEMENTAL &&
         (spell == SPELL_LIGHTNING_BOLT || spell == SPELL_CHAIN_LIGHTNING ||
          spell == SPELL_METEOR_SHOWER)) {
         return ARMY_SPELL_CHANCE_NONE;
     }
-    if (m_monsterType == ARMY_CREATURE_AIR_ELEMENTAL &&
+    if (m_monsterType == CREATURE_AIR_ELEMENTAL &&
         spell == SPELL_METEOR_SHOWER) {
         return ARMY_SPELL_CHANCE_NONE;
     }
-    if (m_monsterType == ARMY_CREATURE_FIRE_ELEMENTAL &&
+    if (m_monsterType == CREATURE_FIRE_ELEMENTAL &&
         (spell == SPELL_FIREBALL || spell == SPELL_FIREBLAST)) {
         return ARMY_SPELL_CHANCE_NONE;
     }
-    if (m_monsterType == ARMY_CREATURE_WATER_ELEMENTAL &&
+    if (m_monsterType == CREATURE_WATER_ELEMENTAL &&
         (spell == SPELL_COLD_RAY || spell == SPELL_COLD_RING)) {
         return ARMY_SPELL_CHANCE_NONE;
     }
@@ -3176,8 +3176,8 @@ float army::SpellCastWorkChance(i32 spell)
             return ARMY_SPELL_CHANCE_NONE;
         }
     }
-    if ((m_monsterType == ARMY_CREATURE_DWARF ||
-         m_monsterType == ARMY_CREATURE_BATTLE_DWARF) &&
+    if ((m_monsterType == CREATURE_DWARF ||
+         m_monsterType == CREATURE_BATTLE_DWARF) &&
         spell != SPELL_TELEPORT && spell != SPELL_CURE &&
         spell != SPELL_MASS_CURE && spell != SPELL_RESURRECT &&
         spell != SPELL_TRUE_RESURRECT && spell != SPELL_HASTE &&
@@ -3467,35 +3467,35 @@ void ModifyFrameInfo(struct SMonFrameInfo *frameInfo, i32 monsterType)
     i32 speedDifference;
 
     speedDifference = 0;
-    if (monsterType == ARMY_CREATURE_RANGER ||
-        monsterType == ARMY_CREATURE_VETERAN_PIKEMAN ||
-        monsterType == ARMY_CREATURE_MASTER_SWORDSMAN ||
-        monsterType == ARMY_CREATURE_CHAMPION ||
-        monsterType == ARMY_CREATURE_CRUSADER ||
-        monsterType == ARMY_CREATURE_ORC_CHIEF ||
-        monsterType == ARMY_CREATURE_OGRE_LORD ||
-        monsterType == ARMY_CREATURE_WAR_TROLL ||
-        monsterType == ARMY_CREATURE_BATTLE_DWARF ||
-        monsterType == ARMY_CREATURE_GRAND_ELF ||
-        monsterType == ARMY_CREATURE_GREATER_DRUID ||
-        monsterType == ARMY_CREATURE_MINOTAUR_KING ||
-        monsterType == ARMY_CREATURE_STEEL_GOLEM ||
-        monsterType == ARMY_CREATURE_ARCHMAGE ||
-        monsterType == ARMY_CREATURE_MUTANT_ZOMBIE ||
-        monsterType == ARMY_CREATURE_ROYAL_MUMMY ||
-        monsterType == ARMY_CREATURE_VAMPIRE_LORD ||
-        monsterType == ARMY_CREATURE_POWER_LICH) {
+    if (monsterType == CREATURE_RANGER ||
+        monsterType == CREATURE_VETERAN_PIKEMAN ||
+        monsterType == CREATURE_MASTER_SWORDSMAN ||
+        monsterType == CREATURE_CHAMPION ||
+        monsterType == CREATURE_CRUSADER ||
+        monsterType == CREATURE_ORC_CHIEF ||
+        monsterType == CREATURE_OGRE_LORD ||
+        monsterType == CREATURE_WAR_TROLL ||
+        monsterType == CREATURE_BATTLE_DWARF ||
+        monsterType == CREATURE_GRAND_ELF ||
+        monsterType == CREATURE_GREATER_DRUID ||
+        monsterType == CREATURE_MINOTAUR_KING ||
+        monsterType == CREATURE_STEEL_GOLEM ||
+        monsterType == CREATURE_ARCHMAGE ||
+        monsterType == CREATURE_MUTANT_ZOMBIE ||
+        monsterType == CREATURE_ROYAL_MUMMY ||
+        monsterType == CREATURE_VAMPIRE_LORD ||
+        monsterType == CREATURE_POWER_LICH) {
         speedDifference = gMonsterDatabase[monsterType].speed -
                           gMonsterDatabase[monsterType - 1].speed;
     }
-    if (monsterType == ARMY_CREATURE_EARTH_ELEMENTAL ||
-        monsterType == ARMY_CREATURE_AIR_ELEMENTAL ||
-        monsterType == ARMY_CREATURE_WATER_ELEMENTAL) {
+    if (monsterType == CREATURE_EARTH_ELEMENTAL ||
+        monsterType == CREATURE_AIR_ELEMENTAL ||
+        monsterType == CREATURE_WATER_ELEMENTAL) {
         speedDifference = gMonsterDatabase[monsterType].speed -
-                          gMonsterDatabase[ARMY_CREATURE_FIRE_ELEMENTAL].speed;
+                          gMonsterDatabase[CREATURE_FIRE_ELEMENTAL].speed;
     }
     if (speedDifference) {
-        if (monsterType == ARMY_CREATURE_RANGER) {
+        if (monsterType == CREATURE_RANGER) {
             frameInfo->attackDuration = static_cast<i32>(
                 frameInfo->attackDuration * ARMY_RANGER_ATTACK_DURATION_SCALE);
         } else {

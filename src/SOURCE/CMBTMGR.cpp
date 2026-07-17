@@ -501,13 +501,13 @@ void combatManager::UpdateArmyGroup(i32 side)
             m_armies[side][index].m_quantity > 0 &&
             (m_playerId[side] == -1 ||
              ((m_armies[side][index].m_monsterType !=
-                   ARMY_CREATURE_EARTH_ELEMENTAL &&
+                   CREATURE_EARTH_ELEMENTAL &&
                m_armies[side][index].m_monsterType !=
-                   ARMY_CREATURE_AIR_ELEMENTAL &&
+                   CREATURE_AIR_ELEMENTAL &&
                m_armies[side][index].m_monsterType !=
-                   ARMY_CREATURE_FIRE_ELEMENTAL &&
+                   CREATURE_FIRE_ELEMENTAL &&
                m_armies[side][index].m_monsterType !=
-                   ARMY_CREATURE_WATER_ELEMENTAL) ||
+                   CREATURE_WATER_ELEMENTAL) ||
               !(m_armies[side][index].m_monster.flags.all &
                 MONSTER_FLAGS_SUMMONED))) &&
             !(m_armies[side][index].m_monster.flags.all &
@@ -522,7 +522,7 @@ void combatManager::UpdateArmyGroup(i32 side)
     }
 
     if (giSkeletonsCreated && m_combatResult == side)
-        m_armyGroups[side]->Add(ARMY_CREATURE_SKELETON, giSkeletonsCreated,
+        m_armyGroups[side]->Add(CREATURE_SKELETON, giSkeletonsCreated,
                                 ARMY_GROUP_EMPTY_SLOT);
 }
 
