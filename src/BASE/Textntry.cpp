@@ -99,7 +99,7 @@ textEntryWidget::textEntryWidget(
     m_color = 1;
     m_rectH = m_height;
 #line 61 RETAIL_FILE
-    m_text = static_cast<char*>(H2_ALLOC(static_cast<u16>(maxLength) + 5, RETAIL_FILE, 0x3e));
+    m_text = static_cast<char*>(H2_ALLOC(static_cast<u16>(maxLength) + 5, 0x3e));
     strcpy(m_text, text);
     if (layout == 4) {
         m_innerX = horizontalInset + m_x;
@@ -131,7 +131,7 @@ void textEntryWidget::Read(i32 type) {
     m_height = gpResourceManager->ReadWord();
     m_maxLength = gpResourceManager->ReadWord();
 #line 99
-    m_text = static_cast<char*>(H2_ALLOC(m_maxLength + 5, RETAIL_FILE "\0", 0x63));
+    m_text = static_cast<char*>(H2_ALLOC_AT(m_maxLength + 5, RETAIL_FILE "\0", 0x63));
     gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_text), m_maxLength);
     gpResourceManager->Read13(reinterpret_cast<i8*>(resourceName));
     gpResourceManager->SavePosition();
@@ -330,14 +330,10 @@ i32 textEntryWidget::Main(struct tag_message& message) {
                                     if (typed != 0) {
                                         strcpy(scratch, m_text);
 #line 388
-                                        H2_FREE(m_text, TEXT_ENTRY_MAIN_SOURCE_FILES, 0x184);
+                                        H2_FREE_AT(m_text, TEXT_ENTRY_MAIN_SOURCE_FILES, 0x184);
 #line 389
-                                        m_text = static_cast<char*>(H2_ALLOC(
-                                            strlen(edit) + 6,
-                                            TEXT_ENTRY_MAIN_SOURCE_FILES
-                                                + TEXT_ENTRY_SOURCE_FILE_SLOT_SIZE,
-                                            0x185
-                                        ));
+                                        m_text = static_cast<char*>(H2_ALLOC_AT(strlen(edit) + 6, TEXT_ENTRY_MAIN_SOURCE_FILES
+                                                + TEXT_ENTRY_SOURCE_FILE_SLOT_SIZE, 0x185));
                                         strcpy(scratch, edit);
                                         scratch[m_cursorPosition] = typed;
                                         scratch[m_cursorPosition + 1] = 0;

@@ -271,7 +271,6 @@ enum {
 #define BOLT_CHILD_ANGLE_SCALE 0.66
 #define BOLT_CHILD_ANGLE_OFFSET 20.0
 #define BOLT_CHILD_MIN_ANGLE_OFFSET -20.0
-#define SPELLS_SOURCE_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\SPELLS.CPP"
 
 i32 CombatSpecialHandler(struct tag_message&);
 i32 HandleCastSpell(struct tag_message&);

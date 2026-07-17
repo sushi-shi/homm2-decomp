@@ -31,7 +31,7 @@ icon::icon(u32l id) : resource(1, id, 1, 0) {
     gpResourceManager->PointToFile(id);
     m_frameCount = gpResourceManager->ReadWord();
     u32 len = gpResourceManager->ReadLong();
-    m_data = static_cast<u8*>(H2_ALLOC(len, allocationSourceFile, 0x12));
+    m_data = static_cast<u8*>(H2_ALLOC_AT(len, allocationSourceFile, 0x12));
     gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_data), len);
 }
 
@@ -47,7 +47,7 @@ icon::icon(u32l id) : resource(1, id, 1, 0) {
 VA(0x004c7ad0, 0x21)
 icon::~icon() {
     DATA(0x0051e974) static char destructionSourceFile[] = RETAIL_FILE;
-    H2_FREE(m_data, destructionSourceFile, 0x1a);
+    H2_FREE_AT(m_data, destructionSourceFile, 0x1a);
 }
 
 VA(0x004c7b00, 0x44)

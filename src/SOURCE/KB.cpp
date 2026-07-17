@@ -2670,25 +2670,13 @@ void ClearMapExtra(void) {
     i32 i;
     for (i = 0; OD_STEER(i) < iMaxMapExtra; i++) {
         if (ppMapExtra[i])
-            BaseFree(
-                ppMapExtra[i],
-                RETAIL_FILE,
-                clearMapExtraSourceLineBase + KB_SOURCE_LINE_CLEAR_MAP_EXTRA_ITEM_FREE_OFFSET
-            );
+            H2_FREE(ppMapExtra[i], clearMapExtraSourceLineBase + KB_SOURCE_LINE_CLEAR_MAP_EXTRA_ITEM_FREE_OFFSET);
     }
     if (ppMapExtra)
-        BaseFree(
-            ppMapExtra,
-            RETAIL_FILE,
-            clearMapExtraSourceLineBase + KB_SOURCE_LINE_CLEAR_MAP_EXTRA_POINTER_FREE_OFFSET
-        );
+        H2_FREE(ppMapExtra, clearMapExtraSourceLineBase + KB_SOURCE_LINE_CLEAR_MAP_EXTRA_POINTER_FREE_OFFSET);
     ppMapExtra = 0;
     if (pwSizeOfMapExtra)
-        BaseFree(
-            pwSizeOfMapExtra,
-            RETAIL_FILE,
-            clearMapExtraSourceLineBase + KB_SOURCE_LINE_CLEAR_MAP_EXTRA_SIZE_FREE_OFFSET
-        );
+        H2_FREE(pwSizeOfMapExtra, clearMapExtraSourceLineBase + KB_SOURCE_LINE_CLEAR_MAP_EXTRA_SIZE_FREE_OFFSET);
     pwSizeOfMapExtra = 0;
     iMaxMapExtra = 0;
 }
@@ -3200,11 +3188,7 @@ void ShutDown(char* msg) {
         gEventHandle = 0;
     }
     if (mapExtra)
-        BaseFree(
-            mapExtra,
-            RETAIL_FILE,
-            shutdownSourceLineBase + KB_SOURCE_LINE_SHUTDOWN_MAP_FREE_OFFSET
-        );
+        H2_FREE(mapExtra, shutdownSourceLineBase + KB_SOURCE_LINE_SHUTDOWN_MAP_FREE_OFFSET);
     mapExtra = 0;
     CloseAIMapVars();
     DeleteMainClasses();
@@ -3247,16 +3231,8 @@ void SmackFade(u8* src, u8* dst) {
     a = 0;
     f = 0;
     k = -1;
-    a = static_cast<u8*>(BaseAlloc(
-        0x300,
-        RETAIL_FILE,
-        smackFadeSourceLineBase + KB_SOURCE_LINE_SMACK_FADE_PALETTE_ALLOC_OFFSET
-    ));
-    f = static_cast<u8*>(BaseAlloc(
-        0x100,
-        RETAIL_FILE,
-        smackFadeSourceLineBase + KB_SOURCE_LINE_SMACK_FADE_MAP_ALLOC_OFFSET
-    ));
+    a = static_cast<u8*>(H2_ALLOC(0x300, smackFadeSourceLineBase + KB_SOURCE_LINE_SMACK_FADE_PALETTE_ALLOC_OFFSET));
+    f = static_cast<u8*>(H2_ALLOC(0x100, smackFadeSourceLineBase + KB_SOURCE_LINE_SMACK_FADE_MAP_ALLOC_OFFSET));
     memset(a, 0, 0x300);
     memset(f, 0, 0x100);
     for (h = 0xa; h < 0xf6; h++) {
@@ -3283,8 +3259,8 @@ void SmackFade(u8* src, u8* dst) {
     }
     gpWindowManager->UpdateScreen();
     UpdatePalette(reinterpret_cast<i8*>(dst));
-    BaseFree(a, RETAIL_FILE, smackFadeSourceLineBase + KB_SOURCE_LINE_SMACK_FADE_PALETTE_FREE_OFFSET);
-    BaseFree(f, RETAIL_FILE, smackFadeSourceLineBase + KB_SOURCE_LINE_SMACK_FADE_MAP_FREE_OFFSET);
+    H2_FREE(a, smackFadeSourceLineBase + KB_SOURCE_LINE_SMACK_FADE_PALETTE_FREE_OFFSET);
+    H2_FREE(f, smackFadeSourceLineBase + KB_SOURCE_LINE_SMACK_FADE_MAP_FREE_OFFSET);
 }
 
 VA(0x0049e5fd, 0x303)
@@ -3298,11 +3274,7 @@ void ShowCongrats(i32 highScoreType) {
     gpMouseManager->HideColorPointer();
     memcpy(savedPalette, gpBufferPalette->m_data, CONGRATS_PALETTE_SIZE);
     gpWindowManager->m_updateFlags = 0;
-    congratsText = static_cast<char*>(BaseAlloc(
-        CONGRATS_TEXT_SIZE,
-        RETAIL_FILE,
-        congratsSourceLineBase + KB_SOURCE_LINE_CONGRATS_ALLOC_OFFSET
-    ));
+    congratsText = static_cast<char*>(H2_ALLOC(CONGRATS_TEXT_SIZE, congratsSourceLineBase + KB_SOURCE_LINE_CONGRATS_ALLOC_OFFSET));
     baseScore = CalcBaseScore(giCurTurn);
     score_e = gpGame->m_difficultyRating * baseScore / CONGRATS_DIFFICULTY_SCALE;
     gpSoundManager->PlayAmbientMusic(CONGRATS_MUSIC_SILENT, 0, CONGRATS_MUSIC_SILENT);
@@ -3358,7 +3330,7 @@ void ShowCongrats(i32 highScoreType) {
         CONGRATS_STANDARD,
         gpGame->m_mapHeader.name
     );
-    BaseFree(congratsText, RETAIL_FILE, congratsSourceLineBase + KB_SOURCE_LINE_CONGRATS_FREE_OFFSET);
+    H2_FREE(congratsText, congratsSourceLineBase + KB_SOURCE_LINE_CONGRATS_FREE_OFFSET);
     congratsText = 0;
     gpWindowManager->m_updateFlags = 1;
     memcpy(gpBufferPalette->m_data, gPalette->m_data, CONGRATS_PALETTE_SIZE);
@@ -4690,11 +4662,7 @@ void NormalDialog(
         if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_NO_RESOURCE)
             break;
 
-        resourceText_e[resourceSlot_n] = static_cast<char*>(BaseAlloc(
-            NORMAL_DIALOG_TEXT_LENGTH,
-            RETAIL_FILE,
-            normalDialogSourceLineBase + KB_SOURCE_LINE_NORMAL_DIALOG_FIRST_TEXT_ALLOC_OFFSET
-        ));
+        resourceText_e[resourceSlot_n] = static_cast<char*>(H2_ALLOC(NORMAL_DIALOG_TEXT_LENGTH, normalDialogSourceLineBase + KB_SOURCE_LINE_NORMAL_DIALOG_FIRST_TEXT_ALLOC_OFFSET));
         if (resourceType_l[resourceSlot_n] <= NORMAL_DIALOG_RESOURCE_LAST) {
             if (resourceValue_l[resourceSlot_n] > 0) {
                 sprintf(resourceText_e[resourceSlot_n], "%d", resourceValue_l[resourceSlot_n]);
@@ -5001,12 +4969,8 @@ void NormalDialog(
                 MemError();
             pNormalDialogWindow->AddWidget(textPanel_h, -1);
 
-            resourceText_e[resourceSlot_n] = static_cast<char*>(BaseAlloc(
-                NORMAL_DIALOG_TEXT_LENGTH,
-                RETAIL_FILE,
-                normalDialogSourceLineBase
-                    + KB_SOURCE_LINE_NORMAL_DIALOG_SECONDARY_TEXT_ALLOC_OFFSET
-            ));
+            resourceText_e[resourceSlot_n] = static_cast<char*>(H2_ALLOC(NORMAL_DIALOG_TEXT_LENGTH, normalDialogSourceLineBase
+                    + KB_SOURCE_LINE_NORMAL_DIALOG_SECONDARY_TEXT_ALLOC_OFFSET));
             labelY_o = OD_STEER(sizingIconHeight_l) + resourceY_l - 24;
             sprintf(
                 resourceText_e[resourceSlot_n],
@@ -5037,11 +5001,7 @@ void NormalDialog(
         pNormalDialogWindow->AddWidget(textPanel_h, -1);
 
         if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_PRIMARY_SKILL && showPrimaryBonus_e) {
-            char* bonusText = static_cast<char*>(BaseAlloc(
-                5,
-                RETAIL_FILE,
-                normalDialogSourceLineBase + KB_SOURCE_LINE_NORMAL_DIALOG_PRIMARY_BONUS_ALLOC_OFFSET
-            ));
+            char* bonusText = static_cast<char*>(H2_ALLOC(5, normalDialogSourceLineBase + KB_SOURCE_LINE_NORMAL_DIALOG_PRIMARY_BONUS_ALLOC_OFFSET));
             strcpy(bonusText, "+1 ");
             textPanel_h = new textWidget(
                 resourceCenterX_a - 50,
@@ -5080,11 +5040,7 @@ void NormalDialog(
     pNormalDialogWindow->BroadcastMessage(message_e);
 
     if (showOrText == NORMAL_DIALOG_SHOW_OR_TEXT) {
-        orText_f = static_cast<char*>(BaseAlloc(
-            3,
-            RETAIL_FILE,
-            normalDialogSourceLineBase + KB_SOURCE_LINE_NORMAL_DIALOG_OR_TEXT_ALLOC_OFFSET
-        ));
+        orText_f = static_cast<char*>(H2_ALLOC(3, normalDialogSourceLineBase + KB_SOURCE_LINE_NORMAL_DIALOG_OR_TEXT_ALLOC_OFFSET));
         strcpy(orText_f, "or");
         textPanel_h = new textWidget(
             windowWidth_a / 2 - 10,

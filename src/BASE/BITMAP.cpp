@@ -34,7 +34,7 @@ bitmap::bitmap(i16 p1, i16 p2, i16 p3) : resource(0, 0, -1, 0) {
     m_bitmapType = p1;
     m_width = p2;
     m_height = p3;
-    m_pixels = static_cast<u8*>(H2_ALLOC(p3 * p2, dimensionsAllocationSourceFile, 21));
+    m_pixels = static_cast<u8*>(H2_ALLOC_AT(p3 * p2, dimensionsAllocationSourceFile, 21));
 }
 
 #line 28
@@ -47,7 +47,7 @@ bitmap::bitmap(u32l id) : resource(0, id, 1, 0) {
     m_width = gpResourceManager->ReadWord();
     m_height = gpResourceManager->ReadWord();
     size = m_height * m_width;
-    m_pixels = static_cast<u8*>(H2_ALLOC(size, resourceAllocationSourceFile, 37));
+    m_pixels = static_cast<u8*>(H2_ALLOC_AT(size, resourceAllocationSourceFile, 37));
     PollSound();
     gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_pixels), size);
     PollSound();
@@ -57,7 +57,7 @@ VA(0x004d0130, 0x2c)
 inline bitmap::~bitmap() {
     DATA(0x0051fa48) static char destructionSourceFile[] = RETAIL_FILE;
     if (m_pixels != 0)
-        H2_FREE(m_pixels, destructionSourceFile, 51);
+        H2_FREE_AT(m_pixels, destructionSourceFile, 51);
     m_pixels = 0;
 }
 

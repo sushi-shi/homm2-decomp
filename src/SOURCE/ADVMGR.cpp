@@ -375,11 +375,7 @@ void advManager::Close(void) {
         gpSoundManager->StopAllSamples(0);
     }
     if (m_adventureBorder != 0) {
-        BaseFree(
-            m_adventureBorder,
-            RETAIL_FILE,
-            s_closeBorderFreeLineBase + ADVMGR_BORDER_INITIAL_FREE_LINE_OFFSET
-        );
+        H2_FREE(m_adventureBorder, s_closeBorderFreeLineBase + ADVMGR_BORDER_INITIAL_FREE_LINE_OFFSET);
         m_adventureBorder = 0;
     }
 
@@ -4778,11 +4774,7 @@ i32 advManager::UpdBottomViewNewTurn(void) {
     }
     m_adventureWindow->AddWidget(m_bottomViewHourglassBackground, -1);
 
-    weekText = static_cast<char*>(BaseAlloc(
-        ADVMGR_BOTTOM_VIEW_TEXT_BUFFER_SIZE,
-        RETAIL_FILE,
-        s_newTurnLineBase + ADVMGR_NEW_TURN_WEEK_ALLOC_LINE_OFFSET
-    ));
+    weekText = static_cast<char*>(H2_ALLOC(ADVMGR_BOTTOM_VIEW_TEXT_BUFFER_SIZE, s_newTurnLineBase + ADVMGR_NEW_TURN_WEEK_ALLOC_LINE_OFFSET));
     sprintf(weekText, "%s: %d  %s: %d", "Month", gpGame->m_month, "Week", gpGame->m_week);
     m_bottomViewAllTexts[0] = new textWidget(
         ADVMGR_NEW_TURN_DATE_TEXT_X,
@@ -4801,11 +4793,7 @@ i32 advManager::UpdBottomViewNewTurn(void) {
     }
     m_adventureWindow->AddWidget(m_bottomViewAllTexts[0], -1);
 
-    dayText = static_cast<char*>(BaseAlloc(
-        ADVMGR_BOTTOM_VIEW_TEXT_BUFFER_SIZE,
-        RETAIL_FILE,
-        s_newTurnLineBase + ADVMGR_NEW_TURN_DAY_ALLOC_LINE_OFFSET
-    ));
+    dayText = static_cast<char*>(H2_ALLOC(ADVMGR_BOTTOM_VIEW_TEXT_BUFFER_SIZE, s_newTurnLineBase + ADVMGR_NEW_TURN_DAY_ALLOC_LINE_OFFSET));
     sprintf(dayText, "%s: %d", "Day", gpGame->m_day);
     m_bottomViewAllTexts[0] = new textWidget(
         ADVMGR_NEW_TURN_DATE_TEXT_X,
@@ -4866,11 +4854,7 @@ i32 advManager::UpdBottomViewResMsg(void) {
         lineCount10 = smallFont->LineLength(gcBottomViewText, ADVMGR_BOTTOM_VIEW_PANEL_WIDTH);
         textY19 -= lineCount10 * ADVMGR_RESOURCE_VIEW_LINE_HEIGHT;
     }
-    messageText2 = static_cast<char*>(BaseAlloc(
-        strlen(gcBottomViewText) + 1,
-        RETAIL_FILE,
-        s_resourceViewLineBase + ADVMGR_RESOURCE_VIEW_MESSAGE_ALLOC_LINE_OFFSET
-    ));
+    messageText2 = static_cast<char*>(H2_ALLOC(strlen(gcBottomViewText) + 1, s_resourceViewLineBase + ADVMGR_RESOURCE_VIEW_MESSAGE_ALLOC_LINE_OFFSET));
     sprintf(messageText2, gcBottomViewText);
     m_bottomViewAllTexts[0] = new textWidget(
         ADVMGR_BOTTOM_VIEW_PANEL_X,
@@ -4915,11 +4899,7 @@ i32 advManager::UpdBottomViewResMsg(void) {
         }
         m_adventureWindow->AddWidget(m_bottomViewHourglassBackground, -1);
 
-        resourceCountText6 = static_cast<char*>(BaseAlloc(
-            ADVMGR_BOTTOM_VIEW_COUNT_BUFFER_SIZE,
-            RETAIL_FILE,
-            s_resourceViewLineBase + ADVMGR_RESOURCE_VIEW_COUNT_ALLOC_LINE_OFFSET
-        ));
+        resourceCountText6 = static_cast<char*>(H2_ALLOC(ADVMGR_BOTTOM_VIEW_COUNT_BUFFER_SIZE, s_resourceViewLineBase + ADVMGR_RESOURCE_VIEW_COUNT_ALLOC_LINE_OFFSET));
         sprintf(resourceCountText6, "%d", giBottomViewResourceQty);
         m_bottomViewAllTexts[1] = new textWidget(
             ADVMGR_RESOURCE_VIEW_COUNT_X,
@@ -5023,11 +5003,7 @@ i32 advManager::UpdBottomViewKingdom(void) {
     }
 
     for (index11 = 0; index11 < ADVMGR_KINGDOM_VIEW_ENTRY_COUNT; ++index11) {
-        countText14[index11] = static_cast<char*>(BaseAlloc(
-            ADVMGR_BOTTOM_VIEW_COUNT_BUFFER_SIZE,
-            RETAIL_FILE,
-            s_kingdomViewLineBase + ADVMGR_KINGDOM_VIEW_COUNT_ALLOC_LINE_OFFSET
-        ));
+        countText14[index11] = static_cast<char*>(H2_ALLOC(ADVMGR_BOTTOM_VIEW_COUNT_BUFFER_SIZE, s_kingdomViewLineBase + ADVMGR_KINGDOM_VIEW_COUNT_ALLOC_LINE_OFFSET));
         if (index11 < ADVMGR_KINGDOM_VIEW_RESOURCE_COUNT) {
             sprintf(countText14[index11], "%d", gpCurPlayer->m_resources[index11]);
         } else if (index11 == ADVMGR_KINGDOM_VIEW_CASTLE_ENTRY) {
@@ -5127,11 +5103,7 @@ i32 advManager::UpdBottomViewHero(void) {
                     {0, 1, 5, 6, 7}
                 };
 
-                armyCountLabelsResult[displayIndexData] = static_cast<char*>(BaseAlloc(
-                    ADVMGR_BOTTOM_HERO_LABEL_BYTES,
-                    RETAIL_FILE,
-                    s_bottomHeroLineBase + ADVMGR_BOTTOM_HERO_ALLOC_LINE_OFFSET
-                ));
+                armyCountLabelsResult[displayIndexData] = static_cast<char*>(H2_ALLOC(ADVMGR_BOTTOM_HERO_LABEL_BYTES, s_bottomHeroLineBase + ADVMGR_BOTTOM_HERO_ALLOC_LINE_OFFSET));
                 if (targetHero->m_army.m_creatureCounts[armySlot]
                     > ADVMGR_BOTTOM_HERO_MAX_FULL_COUNT) {
                     sprintf(
@@ -5344,11 +5316,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                     if (stackIconsWidgets[armyIndex] == 0) {
                         MemError();
                     }
-                    armyLabelsStrings[armyIndex] = static_cast<char*>(BaseAlloc(
-                        5,
-                        RETAIL_FILE,
-                        s_quickViewLineBase + ADVMGR_QUICK_VIEW_FIRST_ALLOC_LINE_OFFSET
-                    ));
+                    armyLabelsStrings[armyIndex] = static_cast<char*>(H2_ALLOC(5, s_quickViewLineBase + ADVMGR_QUICK_VIEW_FIRST_ALLOC_LINE_OFFSET));
                     sprintf(
                         armyLabelsStrings[armyIndex],
                         "%d",
@@ -5428,11 +5396,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
             if (stackIconsWidgets[armyIndex] == 0) {
                 MemError();
             }
-            armyLabelsStrings[armyIndex] = static_cast<char*>(BaseAlloc(
-                15,
-                RETAIL_FILE,
-                s_quickViewLineBase + ADVMGR_QUICK_VIEW_SECOND_ALLOC_LINE_OFFSET
-            ));
+            armyLabelsStrings[armyIndex] = static_cast<char*>(H2_ALLOC(15, s_quickViewLineBase + ADVMGR_QUICK_VIEW_SECOND_ALLOC_LINE_OFFSET));
             strcpy(
                 armyLabelsStrings[armyIndex],
                 GetArmySizeName(targetHero->m_army.m_creatureCounts[displayIndexValue], 0)
@@ -5489,11 +5453,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                 if (stackIconsWidgets[armyIndex] == 0) {
                     MemError();
                 }
-                armyLabelsStrings[armyIndex] = static_cast<char*>(BaseAlloc(
-                    15,
-                    RETAIL_FILE,
-                    s_quickViewLineBase + ADVMGR_QUICK_VIEW_THIRD_ALLOC_LINE_OFFSET
-                ));
+                armyLabelsStrings[armyIndex] = static_cast<char*>(H2_ALLOC(15, s_quickViewLineBase + ADVMGR_QUICK_VIEW_THIRD_ALLOC_LINE_OFFSET));
                 strcpy(
                     armyLabelsStrings[armyIndex],
                     GetArmySizeName(targetHero->m_army.m_creatureCounts[displayIndexValue], 0)
@@ -5691,11 +5651,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
     }
 
     if (informationLevel == 0 || armyCountLocal == 0) {
-        emptyArmyLabel = static_cast<char*>(BaseAlloc(
-            20,
-            RETAIL_FILE,
-            s_townViewLineBase + ADVMGR_TOWN_VIEW_FIRST_ALLOC_LINE_OFFSET
-        ));
+        emptyArmyLabel = static_cast<char*>(H2_ALLOC(20, s_townViewLineBase + ADVMGR_TOWN_VIEW_FIRST_ALLOC_LINE_OFFSET));
         if (informationLevel == 0) {
             sprintf(emptyArmyLabel, "Unknown");
         } else {
@@ -5777,11 +5733,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
             if (armyIcons[widgetIndexWidget] == 0) {
                 MemError();
             }
-            armyLabelsResult[widgetIndexWidget] = static_cast<char*>(BaseAlloc(
-                15,
-                RETAIL_FILE,
-                s_townViewLineBase + ADVMGR_TOWN_VIEW_SECOND_ALLOC_LINE_OFFSET
-            ));
+            armyLabelsResult[widgetIndexWidget] = static_cast<char*>(H2_ALLOC(15, s_townViewLineBase + ADVMGR_TOWN_VIEW_SECOND_ALLOC_LINE_OFFSET));
             if (informationLevel == 3) {
                 sprintf(
                     armyLabelsResult[widgetIndexWidget],
@@ -5853,11 +5805,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
                 if (armyIcons[widgetIndexWidget] == 0) {
                     MemError();
                 }
-                armyLabelsResult[widgetIndexWidget] = static_cast<char*>(BaseAlloc(
-                    15,
-                    RETAIL_FILE,
-                    s_townViewLineBase + ADVMGR_TOWN_VIEW_THIRD_ALLOC_LINE_OFFSET
-                ));
+                armyLabelsResult[widgetIndexWidget] = static_cast<char*>(H2_ALLOC(15, s_townViewLineBase + ADVMGR_TOWN_VIEW_THIRD_ALLOC_LINE_OFFSET));
                 if (informationLevel == 3) {
                     sprintf(
                         armyLabelsResult[widgetIndexWidget],
@@ -5930,11 +5878,7 @@ void advManager::RedrawAdvScreen(i32 update, i32 freeBorder) {
     }
     gpResourceManager->GetBackdrop("advbord.icn", gpWindowManager->m_screen, 1);
     if (freeBorder) {
-        BaseFree(
-            m_adventureBorder,
-            RETAIL_FILE,
-            s_redrawBorderFreeLineBase + ADVMGR_BORDER_SECONDARY_FREE_LINE_OFFSET
-        );
+        H2_FREE(m_adventureBorder, s_redrawBorderFreeLineBase + ADVMGR_BORDER_SECONDARY_FREE_LINE_OFFSET);
         m_adventureBorder = 0;
     }
     SaveAdventureBorder();
@@ -8500,11 +8444,7 @@ void advManager::SaveAdventureBorder(void) {
         return;
     }
 
-    m_adventureBorder = static_cast<u8*>(BaseAlloc(
-        ADVMGR_BORDER_BUFFER_SIZE,
-        RETAIL_FILE,
-        s_saveBorderAllocLineBase + ADVMGR_BORDER_ALLOC_LINE_OFFSET
-    ));
+    m_adventureBorder = static_cast<u8*>(H2_ALLOC(ADVMGR_BORDER_BUFFER_SIZE, s_saveBorderAllocLineBase + ADVMGR_BORDER_ALLOC_LINE_OFFSET));
     u8* savedPixels = m_adventureBorder;
     u8* screenPixel = gpWindowManager->m_screen->m_pixels;
     i32 row;
