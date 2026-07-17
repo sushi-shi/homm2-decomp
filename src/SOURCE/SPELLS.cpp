@@ -102,7 +102,7 @@ SpellType combatManager::ViewSpells(i32) {
                 goto check_elemental;
             check_elemental:
                 if (m_summonedCreatureType[m_currentSide] != 0
-                    && m_summonedCreatureType[m_currentSide] != elementalType) {
+                    && m_summonedCreatureType[m_currentSide] != IDX(elementalType)) {
                     NormalDialog(
                         "You may only summon one type of elemental per combat.",
                         NORMAL_DIALOG_INFO,
@@ -115,7 +115,7 @@ SpellType combatManager::ViewSpells(i32) {
                         NORMAL_DIALOG_NO_VALUE,
                         0
                     );
-                    return 0;
+                    return SpellType(0);
                 }
                 if (m_armyCount[m_currentSide] >= SPELL_ELEMENTAL_ARMY_LIMIT) {
                     sprintf(
@@ -135,7 +135,7 @@ SpellType combatManager::ViewSpells(i32) {
                         NORMAL_DIALOG_NO_VALUE,
                         0
                     );
-                    return 0;
+                    return SpellType(0);
                 }
                 if (!SpaceForElementalExists()) {
                     sprintf(
@@ -154,7 +154,7 @@ SpellType combatManager::ViewSpells(i32) {
                         NORMAL_DIALOG_NO_VALUE,
                         0
                     );
-                    return 0;
+                    return SpellType(0);
                 }
                 goto set_action;
 
@@ -171,7 +171,7 @@ SpellType combatManager::ViewSpells(i32) {
             case SPELL_DEATH_RIPPLE:
             case SPELL_DEATH_WAVE:
             case SPELL_MASS_SHIELD:
-                if (!HasValidSpellTarget(IDX(m_selectedSpell))) {
+                if (!HasValidSpellTarget(m_selectedSpell)) {
                     NormalDialog(
                         "That spell will affect no one!",
                         NORMAL_DIALOG_INFO,
@@ -184,7 +184,7 @@ SpellType combatManager::ViewSpells(i32) {
                         NORMAL_DIALOG_NO_VALUE,
                         0
                     );
-                    return 0;
+                    return SpellType(0);
                 }
             set_action:
                 giNextAction = SPELL_ACTION_CAST;
@@ -210,11 +210,11 @@ SpellType combatManager::ViewSpells(i32) {
                         NORMAL_DIALOG_NO_VALUE,
                         0
                     );
-                    return 0;
+                    return SpellType(0);
                 }
                 // fall through
             default:
-                if (!HasValidSpellTarget(IDX(m_selectedSpell))) {
+                if (!HasValidSpellTarget(m_selectedSpell)) {
                     NormalDialog(
                         "That spell will affect no one!",
                         NORMAL_DIALOG_INFO,
@@ -227,7 +227,7 @@ SpellType combatManager::ViewSpells(i32) {
                         NORMAL_DIALOG_NO_VALUE,
                         0
                     );
-                    return 0;
+                    return SpellType(0);
                 }
                 giNextAction = SPELL_ACTION_CAST;
                 giNextActionExtra = m_selectedSpell;

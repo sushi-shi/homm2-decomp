@@ -807,7 +807,7 @@ public:
     void DrawSmallView(i32, i32);
     i32 ViewGeneral(i32, i32, i32);
     void ViewArmy(class army*, i32);
-    i32 HasValidSpellTarget(i32);
+    i32 HasValidSpellTarget(SpellType);
     SpellType ViewSpells(i32);
     i32 FindResurrectArmyIndex(i32, i32, i32);
     i32 ValidSpellTarget(SpellType, i32);
