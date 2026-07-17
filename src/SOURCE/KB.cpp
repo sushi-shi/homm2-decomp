@@ -1322,14 +1322,12 @@ void GetMonsterCost(int monster, int *const cost)
     }
 }
 
-// @semantic: Current KB.cpp/header epoch: the complete 0x2b5 body, 0x10 frame,
-// local roles/slots, 170-instruction CFG, and all five ordered relocations align.
-// Raw bytes differ only at +0x261/+0x264: retail loads reqMask [ebp-8] then ANDs
-// haveMask [ebp-4], while ours loads haveMask then ANDs reqMask. Ten
-// non-improving variants exhausted commuting the AND/equality, qualifying either
-// scalar lvalue with 0[&...], and six match_variants identifier_rename spellings.
-// Revisit only after a relevant KB source/TU/header or comparison epoch changes
-// MSVC's commutative register choice.
+// @early-stop
+// Complete 0x2b5 body, 0x10 frame/slots, CFG, and all five ordered relocations
+// align. The only executable residual is the commutative pair at +0x25f/+0x262:
+// retail loads reqMask[-8] then ANDs haveMask[-4], while ours loads haveMask then
+// ANDs reqMask. Ten variants exhausted operand/equality order, qualified lvalues,
+// and hash-compatible names. Revisit only after relevant KB/TU state changes.
 VA(0x00499a6c, 0x2b5)
 int CanBuild(town *t, int building)
 {
