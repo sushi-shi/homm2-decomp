@@ -64,7 +64,7 @@ struct configStruct {
     char mciError;
     char needsDefaultInitialization;
     char reservedAfterAutoSave[0x12];
-    i32 musicSource;
+    ConfigMusicSource musicSource;
     char modemInitString[0x64];
     i32 comPort[IDX(CONFIG_CONNECTION_COUNT)];
     i32 baudRate[IDX(CONFIG_CONNECTION_COUNT)];

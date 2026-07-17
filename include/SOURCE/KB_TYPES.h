@@ -562,7 +562,7 @@ struct tag_monsterInfo {
         MonsterAttribute attributes;
         union {
             MonsterFlags all;
-            i32 abilityFlags;
+            MonsterAbilityFlags abilityFlags;
             struct {
                 i8 abilities;
                 i8 attributeFlags;

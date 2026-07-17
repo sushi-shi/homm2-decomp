@@ -935,7 +935,7 @@ void combatManager::CheckApplyGoodMorale(i32 side, i32 index) {
     }
 
     activeArmy->SpellEffect(COMBAT_GOOD_MORALE_EFFECT, COMBAT_MORALE_EFFECT_DURATION, 0);
-    if (activeArmy->m_monster.flags.abilityFlags & MONSTER_ABILITY_FLAG_BAD_MORALE)
+    if HAS(activeArmy->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_BAD_MORALE)
         activeArmy->m_monster.flags.abilityFlags -= MONSTER_ABILITY_FLAG_BAD_MORALE;
     activeArmy->m_monster.flags.abilityFlags |= MONSTER_ABILITY_FLAG_HIGH_MORALE;
 
@@ -1028,7 +1028,7 @@ restart:
                     ))
                     skipEntry = 1;
 
-                if (activeArmy->m_monster.flags.abilityFlags & MONSTER_ABILITY_FLAG_DEFERRED_TURN) {
+                if HAS(activeArmy->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_DEFERRED_TURN) {
                     skipEntry = 1;
                     hasDeferred = 1;
                 }
