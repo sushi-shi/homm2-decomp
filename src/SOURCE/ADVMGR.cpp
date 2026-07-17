@@ -1710,7 +1710,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
         currentCell->m_objectIndex = ADVMGR_DIG_HOLE_FRAME;
         currentCell->m_objectLayerBit0 = 1;
         currentCell->m_objectLayerBit1 = 1;
-        currentCell->m_flags |= 0x80;
+        currentCell->m_flags |= MAP_CELL_OBJECT_SHADOW_ONLY;
     }
     CompleteDraw(0);
     UpdateScreen(0, 0);

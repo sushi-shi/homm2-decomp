@@ -21,6 +21,9 @@
 #include <BASE/font.h>
 #include <BASE/bitmap.h>
 #include <BASE/palette.h>
+
+// __FILE__ for the NWC memory/assert tracking (reloc-masked path string).
+#define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\RESMGR.CPP"
 VA(0x004c7fa0, 0xdb)
 resourceManager::resourceManager(void) : baseManager() {
     i32 aggregateIndex;
@@ -302,11 +305,7 @@ void resourceManager::Close(void) {
     m_resourceListHead = 0;
     for (aggregateIndex = 0; aggregateIndex < RESOURCE_MANAGER_AGGREGATE_LIMIT; aggregateIndex++) {
         if (m_aggregateDir[aggregateIndex] != 0)
-            H2_FREE(
-                m_aggregateDir[aggregateIndex],
-                "I:\\Projects\\Heroes\\Prog\\BASE\\RESMGR.CPP",
-                0x1da
-            );
+            H2_FREE(m_aggregateDir[aggregateIndex], RETAIL_FILE, 0x1da);
         if (m_aggregateFd[aggregateIndex] != RESOURCE_MANAGER_INVALID_FILE) {
             close(m_aggregateFd[aggregateIndex]);
             m_aggregateFd[aggregateIndex] = RESOURCE_MANAGER_INVALID_FILE;
@@ -343,9 +342,8 @@ i32 resourceManager::LoadAggregateHeader(char* aggregateName) {
     read(m_aggregateFd[m_curAggregate], fileCountBuffer, sizeof(i16));
     m_aggregateEntryCount[m_curAggregate] = fileCountBuffer[0];
     directoryBytes = m_aggregateEntryCount[m_curAggregate] * RESOURCE_MANAGER_ENTRY_BYTES;
-    m_aggregateDir[m_curAggregate] = static_cast<aggEntry*>(
-        H2_ALLOC(directoryBytes, "I:\\Projects\\Heroes\\Prog\\BASE\\RESMGR.CPP", 0x21e)
-    );
+    m_aggregateDir[m_curAggregate] =
+        static_cast<aggEntry*>(H2_ALLOC(directoryBytes, RETAIL_FILE, 0x21e));
     read(m_aggregateFd[m_curAggregate], m_aggregateDir[m_curAggregate], directoryBytes);
     return RESOURCE_MANAGER_SUCCESS;
 }
@@ -434,11 +432,7 @@ void resourceManager::RestorePosition(void) {
 
 VA(0x004c8ee0, 0x81)
 i8 resourceManager::ReadByte(void) {
-    H2_ASSERT(
-        m_aggregateFd[m_curAggregate] != RESOURCE_MANAGER_INVALID_FILE,
-        "I:\\Projects\\Heroes\\Prog\\BASE\\RESMGR.CPP",
-        0x2bf
-    );
+    H2_ASSERT(m_aggregateFd[m_curAggregate] != RESOURCE_MANAGER_INVALID_FILE, RETAIL_FILE, 0x2bf);
     i8 value = 0;
     i32 bytesRead = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
     if (bytesRead == 0) {
@@ -452,11 +446,7 @@ i8 resourceManager::ReadByte(void) {
 
 VA(0x004c8f70, 0x84)
 i16 resourceManager::ReadWord(void) {
-    H2_ASSERT(
-        m_aggregateFd[m_curAggregate] != RESOURCE_MANAGER_INVALID_FILE,
-        "I:\\Projects\\Heroes\\Prog\\BASE\\RESMGR.CPP",
-        0x2dc
-    );
+    H2_ASSERT(m_aggregateFd[m_curAggregate] != RESOURCE_MANAGER_INVALID_FILE, RETAIL_FILE, 0x2dc);
     i16 value = 0;
     i32 bytesRead = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
     if (bytesRead == 0) {
@@ -470,11 +460,7 @@ i16 resourceManager::ReadWord(void) {
 
 VA(0x004c9000, 0x84)
 i32l resourceManager::ReadLong(void) {
-    H2_ASSERT(
-        m_aggregateFd[m_curAggregate] != RESOURCE_MANAGER_INVALID_FILE,
-        "I:\\Projects\\Heroes\\Prog\\BASE\\RESMGR.CPP",
-        0x2f8
-    );
+    H2_ASSERT(m_aggregateFd[m_curAggregate] != RESOURCE_MANAGER_INVALID_FILE, RETAIL_FILE, 0x2f8);
     i32l value = 0;
     i32 bytesRead = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
     if (bytesRead == 0) {
@@ -513,11 +499,7 @@ void resourceManager::Read13(i8* destination) {
 // of retail's named string constants.
 VA(0x004c91b0, 0xbd)
 void resourceManager::ReadBlock(i8* destination, u32l size) {
-    H2_ASSERT(
-        m_aggregateFd[m_curAggregate] != RESOURCE_MANAGER_INVALID_FILE,
-        "I:\\Projects\\Heroes\\Prog\\BASE\\RESMGR.CPP",
-        0x330
-    );
+    H2_ASSERT(m_aggregateFd[m_curAggregate] != RESOURCE_MANAGER_INVALID_FILE, RETAIL_FILE, 0x330);
     PollSound();
     i32 bytesRead = read(m_aggregateFd[m_curAggregate], destination, size);
     if (bytesRead != size) {
@@ -570,3 +552,5 @@ VTBL(resourceManager, 0x004eb9f0);
 DATA(0x0051e99c) i32 iSaveCtr = 0;
 DATA(0x005331e8) i32 lastAggZ[10];
 DATA(0x00533210) i32l lastPositionZ[10];
+
+#undef RETAIL_FILE

@@ -3388,7 +3388,7 @@ void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
                 extra_i = 0;
         }
 
-        currentCell_k->m_flags |= 0x80;
+        currentCell_k->m_flags |= MAP_CELL_OBJECT_SHADOW_ONLY;
     cellDone:
         changed_i = 0;
     }
@@ -7080,7 +7080,6 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
 
 VA(0x004b5c40, 0x1d0)
 i32 advManager::DoNetCombat(char* packet) {
-    static i16 sourceLineBase = 0x1655;
     hero* secondHero9;
     i32 secondSide15;
     i32 combatX1;
@@ -7150,15 +7149,15 @@ i32 advManager::DoNetCombat(char* packet) {
         );
     }
     if (firstArmy6)
-        BaseFree(firstArmy6, RETAIL_FILE, sourceLineBase + 0x46);
+        BaseFree(firstArmy6, RETAIL_FILE, 5787);
     if (secondArmy10)
-        BaseFree(secondArmy10, RETAIL_FILE, sourceLineBase + 0x49);
+        BaseFree(secondArmy10, RETAIL_FILE, 5790);
     if (combatTown[0])
-        BaseFree(combatTown[0], RETAIL_FILE, sourceLineBase + 0x4c);
+        BaseFree(combatTown[0], RETAIL_FILE, 5793);
     if (secondHero9)
-        BaseFree(secondHero9, RETAIL_FILE, sourceLineBase + 0x4f);
+        BaseFree(secondHero9, RETAIL_FILE, 5796);
     if (firstHero29)
-        BaseFree(firstHero29, RETAIL_FILE, sourceLineBase + 0x52);
+        BaseFree(firstHero29, RETAIL_FILE, 5799);
     gbRetreatWin = 0;
     return 1;
 }
@@ -7184,7 +7183,6 @@ i32 advManager::DoCombat(
     i32 randomSeed,
     i32 processLosses
 ) {
-    static i16 sourceLineBase = 0x16ba;
     armyGroup* receivedSecondArmy2;
     hero* receivedSecondHero9;
     hero* receivedFirstHero1;
@@ -7270,35 +7268,23 @@ i32 advManager::DoCombat(
                                 );
                                 if (receivedFirstArmy) {
                                     memcpy(firstArmy, receivedFirstArmy, sizeof(armyGroup));
-                                    BaseFree(receivedFirstArmy, RETAIL_FILE, sourceLineBase + 0x71);
+                                    BaseFree(receivedFirstArmy, RETAIL_FILE, 5931);
                                 }
                                 if (receivedSecondArmy2) {
                                     memcpy(secondArmy, receivedSecondArmy2, sizeof(armyGroup));
-                                    BaseFree(
-                                        receivedSecondArmy2,
-                                        RETAIL_FILE,
-                                        sourceLineBase + 0x77
-                                    );
+                                    BaseFree(receivedSecondArmy2, RETAIL_FILE, 5937);
                                 }
                                 if (receivedTown) {
                                     memcpy(combatTown, receivedTown, sizeof(town));
-                                    BaseFree(receivedTown, RETAIL_FILE, sourceLineBase + 0x7d);
+                                    BaseFree(receivedTown, RETAIL_FILE, 5943);
                                 }
                                 if (receivedSecondHero9) {
                                     memcpy(secondHero, receivedSecondHero9, sizeof(hero));
-                                    BaseFree(
-                                        receivedSecondHero9,
-                                        RETAIL_FILE,
-                                        sourceLineBase + 0x83
-                                    );
+                                    BaseFree(receivedSecondHero9, RETAIL_FILE, 5949);
                                 }
                                 if (receivedFirstHero1) {
                                     memcpy(firstHero, receivedFirstHero1, sizeof(hero));
-                                    BaseFree(
-                                        receivedFirstHero1,
-                                        RETAIL_FILE,
-                                        sourceLineBase + 0x89
-                                    );
+                                    BaseFree(receivedFirstHero1, RETAIL_FILE, 5955);
                                 }
                                 gpCombatManager->m_combatResult = combatResult3[0];
                                 goto combatFinished;
@@ -7403,14 +7389,12 @@ void advManager::SendHeroTownData(
     i32 retreatWin,
     i32 combatSurrender
 ) {
-    static i16 sourceLineBase = 0x17cc;
     char* reply;
     i32 result;
     combatRemoteData* buffer = 0;
 
-    buffer = static_cast<combatRemoteData*>(
-        BaseAlloc(COMBAT_REMOTE_BUFFER_SIZE, RETAIL_FILE, sourceLineBase + 3)
-    );
+    buffer =
+        static_cast<combatRemoteData*>(BaseAlloc(COMBAT_REMOTE_BUFFER_SIZE, RETAIL_FILE, 6095));
     reply = 0;
     buffer->fragment = 0;
     buffer->x = static_cast<i8>(x);
@@ -7524,7 +7508,7 @@ void advManager::SendHeroTownData(
         if (!result)
             ShutDown(0);
     }
-    BaseFree(buffer, RETAIL_FILE, sourceLineBase + 0x5c);
+    BaseFree(buffer, RETAIL_FILE, 6184);
 }
 
 VA(0x004b67cd, 0x462)
@@ -7545,7 +7529,6 @@ void advManager::ReceiveHeroTownData(
     i8* retreatWin,
     i8* combatSurrender
 ) {
-    static i16 sourceLineBase = 0x183d;
     i32 hasFirstHero7;
     i32 hasTown0;
     i32 hasSecondHero8;
@@ -7585,15 +7568,12 @@ void advManager::ReceiveHeroTownData(
         gpGame->m_players[secondOwner28].m_resources[RES_GOLD] =
             EVENTS_REMOTE_COMBAT(packet)->secondGold;
 
-    *firstArmy =
-        static_cast<armyGroup*>(BaseAlloc(sizeof(armyGroup), RETAIL_FILE, sourceLineBase + 0x26));
+    *firstArmy = static_cast<armyGroup*>(BaseAlloc(sizeof(armyGroup), RETAIL_FILE, 6243));
     memcpy(*firstArmy, &EVENTS_REMOTE_COMBAT(packet)->firstArmy, sizeof(armyGroup));
-    *secondArmy =
-        static_cast<armyGroup*>(BaseAlloc(sizeof(armyGroup), RETAIL_FILE, sourceLineBase + 0x29));
+    *secondArmy = static_cast<armyGroup*>(BaseAlloc(sizeof(armyGroup), RETAIL_FILE, 6246));
     memcpy(*secondArmy, &EVENTS_REMOTE_COMBAT(packet)->secondArmy, sizeof(armyGroup));
     if (hasTown0) {
-        *combatTown =
-            static_cast<town*>(BaseAlloc(sizeof(town), RETAIL_FILE, sourceLineBase + 0x2e));
+        *combatTown = static_cast<town*>(BaseAlloc(sizeof(town), RETAIL_FILE, 6251));
         memcpy(*combatTown, &EVENTS_REMOTE_COMBAT(packet)->combatTown, sizeof(town));
     }
 
@@ -7617,14 +7597,12 @@ void advManager::ReceiveHeroTownData(
     gotSecondHeroFirst13 = 1;
     gotSecondHeroSecond6 = 1;
     if (hasFirstHero7) {
-        *firstHero =
-            static_cast<hero*>(BaseAlloc(sizeof(hero), RETAIL_FILE, sourceLineBase + 0x47));
+        *firstHero = static_cast<hero*>(BaseAlloc(sizeof(hero), RETAIL_FILE, 6276));
         gotFirstHeroFirst3 = 0;
         gotFirstHeroSecond9 = 0;
     }
     if (hasSecondHero8) {
-        *secondHero =
-            static_cast<hero*>(BaseAlloc(sizeof(hero), RETAIL_FILE, sourceLineBase + 0x4d));
+        *secondHero = static_cast<hero*>(BaseAlloc(sizeof(hero), RETAIL_FILE, 6282));
         gotSecondHeroFirst13 = 0;
         gotSecondHeroSecond6 = 0;
     }

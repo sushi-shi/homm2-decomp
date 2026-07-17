@@ -1935,7 +1935,7 @@ void game::RandomizeEvents(void) {
                     extraIndex3 = extra15->nextIndex;
                 }
                 if (valid27)
-                    cell2->m_flags |= 0x80;
+                    cell2->m_flags |= MAP_CELL_OBJECT_SHADOW_ONLY;
             }
         }
     }
@@ -1946,16 +1946,19 @@ void game::RandomizeEvents(void) {
             if ((cell2->m_triggerType & 0x7f) == 0x67 && cell2->m_objectTileset == 0x3e)
                 cell2->m_flags |= 8;
             if (cell2->m_objectIndex != 0xff && !(cell2->m_triggerType & 0x80)
-                && !(cell2->m_flags & 0x80) && cell2->m_overlayIndex != 0xff)
+                && !(cell2->m_flags & MAP_CELL_OBJECT_SHADOW_ONLY) && cell2->m_overlayIndex != 0xff)
                 cell2->m_flags |= 8;
             upperCount = 0;
             lowerCount16 = 0;
             if (!(cell2->m_flags & 8) && yPos19 < MAP_HEIGHT - 1 && cell2->m_objectIndex != 0xff
-                && !(cell2->m_triggerType & 0x80) && !(cell2->m_flags & 0x80)) {
+                && !(cell2->m_triggerType & 0x80)
+                && !(cell2->m_flags & MAP_CELL_OBJECT_SHADOW_ONLY)) {
                 mapCell* below0;
                 if (m_worldMap.GetCell(xPos2, yPos19 + 1)->m_objectIndex != 0xff
                     && !(m_worldMap.GetCell(xPos2, yPos19 + 1)->m_triggerType & 0x80)
-                    && !(m_worldMap.GetCell(xPos2, yPos19 + 1)->m_flags & 0x80)) {
+                    && !(
+                        m_worldMap.GetCell(xPos2, yPos19 + 1)->m_flags & MAP_CELL_OBJECT_SHADOW_ONLY
+                    )) {
                     if (!cell2->m_objectLayerBit1) {
                         upperTilesets29[upperCount] = cell2->m_objectTileset;
                         upperIndexes1[upperCount] = cell2->m_objectIndex;
@@ -2015,7 +2018,7 @@ void game::RandomizeEvents(void) {
                     cell2->m_flags |= 8;
             }
             if (cell2->m_objectIndex != 0xff && !(cell2->m_triggerType & 0x80)
-                && !(cell2->m_flags & 0x80)
+                && !(cell2->m_flags & MAP_CELL_OBJECT_SHADOW_ONLY)
                 && (yPos19 == MAP_HEIGHT - 1 || (m_worldMap.Row(yPos19 + 1)[xPos2].m_flags & 4)))
                 cell2->m_flags |= 8;
         }
@@ -4167,7 +4170,7 @@ void game::InitRandomArtifacts(void) {
     for (x = 0; x < MAP_WIDTH; x++) {
         for (i32 y = 0; y < MAP_HEIGHT; y++) {
             mapCell* cell = WORLDMAP->Row(y) + x;
-            if (cell->m_triggerType == MAP_TRIGGER_RANDOM_ARTIFACT)
+            if (cell->m_triggerType == MAP_TRIGGER_ARTIFACT)
                 m_randomArtifacts[cell->m_objectIndex >> 1] = 1;
         }
     }
@@ -4327,7 +4330,7 @@ void game::ProcessRandomObjects(void) {
         for (x10 = 0; x10 < MAP_WIDTH; x10++) {
             cell6 = WORLDMAP->GetCell(x10, y8);
             switch (cell6->m_triggerType) {
-                case 0xac:
+                case MAP_TRIGGER_RANDOM_ULTIMATE_ARTIFACT:
                     giUABaseX = static_cast<i16>(x10);
                     giUABaseY = static_cast<i16>(y8);
                     giUARadius = static_cast<i16>(cell6->m_objectMetadata);
@@ -4335,29 +4338,29 @@ void game::ProcessRandomObjects(void) {
                     cell6->m_objectTileset = 0;
                     cell6->m_objectIndex = -1;
                     break;
-                case 0xb0:
+                case MAP_TRIGGER_RANDOM_TOWN:
                     RandomizeTown(x10, y8, 0);
                     break;
-                case 0xb1:
+                case MAP_TRIGGER_RANDOM_CASTLE:
                     RandomizeTown(x10, y8, 1);
                     break;
-                case 0xaf:
+                case MAP_TRIGGER_RANDOM_MONSTER:
                     minValue7 = 80;
                     maxValue17 = 2000;
                     goto randomMonster;
-                case 0xb3:
+                case MAP_TRIGGER_RANDOM_MONSTER_LEVEL_1:
                     minValue7 = 0;
                     maxValue17 = 400;
                     goto randomMonster;
-                case 0xb4:
+                case MAP_TRIGGER_RANDOM_MONSTER_LEVEL_2:
                     minValue7 = 400;
                     maxValue17 = 1000;
                     goto randomMonster;
-                case 0xb5:
+                case MAP_TRIGGER_RANDOM_MONSTER_LEVEL_3:
                     minValue7 = 1000;
                     maxValue17 = 2500;
                     goto randomMonster;
-                case 0xb6:
+                case MAP_TRIGGER_RANDOM_MONSTER_LEVEL_4:
                     minValue7 = 2500;
                     maxValue17 = 100000;
                     goto randomMonster;
@@ -4366,33 +4369,33 @@ void game::ProcessRandomObjects(void) {
                         && cell6->m_objectIndex <= 0x46) {
                         randomObjectType3 = cell6->m_objectIndex + 0x70;
                         switch (randomObjectType3) {
-                            case 0xb3:
+                            case MAP_TRIGGER_RANDOM_MONSTER_LEVEL_1:
                                 minValue7 = 0;
                                 maxValue17 = 400;
                                 goto monsterBoundsReady;
-                            case 0xb4:
+                            case MAP_TRIGGER_RANDOM_MONSTER_LEVEL_2:
                                 minValue7 = 400;
                                 maxValue17 = 1000;
                                 goto monsterBoundsReady;
-                            case 0xb5:
+                            case MAP_TRIGGER_RANDOM_MONSTER_LEVEL_3:
                                 minValue7 = 1000;
                                 maxValue17 = 2500;
                                 goto monsterBoundsReady;
-                            case 0xb6:
+                            case MAP_TRIGGER_RANDOM_MONSTER_LEVEL_4:
                                 minValue7 = 2500;
                                 maxValue17 = 100000;
                                 goto monsterBoundsReady;
                         }
                     }
                 monsterBoundsReady:
-                    cell6->m_triggerType = 0x98;
+                    cell6->m_triggerType = MAP_TRIGGER_MONSTER;
                     cell6->m_objectIndex = static_cast<u8>(Random(0, 65));
                     while (gMonsterDatabase[cell6->m_objectIndex].randomValue <= minValue7
                            || gMonsterDatabase[cell6->m_objectIndex].randomValue >= maxValue17)
                         cell6->m_objectIndex = static_cast<u8>(Random(0, 65));
                     break;
-                case 0xae:
-                    cell6->m_triggerType = 0x9b;
+                case MAP_TRIGGER_RANDOM_RESOURCE:
+                    cell6->m_triggerType = MAP_TRIGGER_RESOURCE;
                     randomType0 = Random(0, 6);
                     ConvertObject(
                         x10 - 1,
@@ -4433,9 +4436,9 @@ void game::ProcessRandomObjects(void) {
                             break;
                     }
                     break;
-                case 0xad:
+                case MAP_TRIGGER_RANDOM_ARTIFACT:
                     artifactId18 = GetRandomArtifactId(14, 0);
-                    cell6->m_triggerType = 0xa9;
+                    cell6->m_triggerType = MAP_TRIGGER_ARTIFACT;
                     ConvertObject(
                         x10 - 1,
                         y8,
@@ -4463,9 +4466,9 @@ void game::ProcessRandomObjects(void) {
                         -1
                     );
                     break;
-                case 0xf4:
+                case MAP_TRIGGER_RANDOM_ARTIFACT_LEVEL_1:
                     artifactId18 = GetRandomArtifactId(8, 0);
-                    cell6->m_triggerType = 0xa9;
+                    cell6->m_triggerType = MAP_TRIGGER_ARTIFACT;
                     ConvertObject(
                         x10 - 1,
                         y8,
@@ -4493,9 +4496,9 @@ void game::ProcessRandomObjects(void) {
                         -1
                     );
                     break;
-                case 0xf5:
+                case MAP_TRIGGER_RANDOM_ARTIFACT_LEVEL_2:
                     artifactId18 = GetRandomArtifactId(4, 0);
-                    cell6->m_triggerType = 0xa9;
+                    cell6->m_triggerType = MAP_TRIGGER_ARTIFACT;
                     ConvertObject(
                         x10 - 1,
                         y8,
@@ -4523,9 +4526,9 @@ void game::ProcessRandomObjects(void) {
                         -1
                     );
                     break;
-                case 0xf6:
+                case MAP_TRIGGER_RANDOM_ARTIFACT_LEVEL_3:
                     artifactId18 = GetRandomArtifactId(2, 0);
-                    cell6->m_triggerType = 0xa9;
+                    cell6->m_triggerType = MAP_TRIGGER_ARTIFACT;
                     ConvertObject(
                         x10 - 1,
                         y8,
@@ -4553,7 +4556,7 @@ void game::ProcessRandomObjects(void) {
                         -1
                     );
                     break;
-                case 0xb2:
+                case MAP_TRIGGER_RANDOM_MINE:
                     RandomizeMine(x10, y8);
                     break;
             }

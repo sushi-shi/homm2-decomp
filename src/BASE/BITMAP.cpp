@@ -12,6 +12,9 @@
 #include <SOURCE/KB.h>
 #include <string.h>
 
+// __FILE__ for the NWC memory/assert tracking (reloc-masked path string).
+#define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\BITMAP.CPP"
+
 typedef enum BitmapConstant {
     COPY_STRIDE = 640 // full-screen row stride assumed by CopyTo's fast path
 } BitmapConstant;
@@ -27,8 +30,7 @@ bitmap::bitmap(void) : resource(0, 0, -1, 0) {
 #line 15
 VA(0x004d0040, 0x53)
 bitmap::bitmap(i16 p1, i16 p2, i16 p3) : resource(0, 0, -1, 0) {
-    DATA(0x0051f9f8) static char dimensionsAllocationSourceFile[] =
-        "I:\\Projects\\Heroes\\Prog\\BASE\\BITMAP.CPP";
+    DATA(0x0051f9f8) static char dimensionsAllocationSourceFile[] = RETAIL_FILE;
     m_bitmapType = p1;
     m_width = p2;
     m_height = p3;
@@ -38,8 +40,7 @@ bitmap::bitmap(i16 p1, i16 p2, i16 p3) : resource(0, 0, -1, 0) {
 #line 28
 VA(0x004d00a0, 0x8f)
 bitmap::bitmap(u32l id) : resource(0, id, 1, 0) {
-    DATA(0x0051fa20) static char resourceAllocationSourceFile[] =
-        "I:\\Projects\\Heroes\\Prog\\BASE\\BITMAP.CPP";
+    DATA(0x0051fa20) static char resourceAllocationSourceFile[] = RETAIL_FILE;
     i32 size;
     gpResourceManager->PointToFile(id);
     m_bitmapType = gpResourceManager->ReadWord();
@@ -54,8 +55,7 @@ bitmap::bitmap(u32l id) : resource(0, id, 1, 0) {
 #line 48
 VA(0x004d0130, 0x2c)
 inline bitmap::~bitmap() {
-    DATA(0x0051fa48) static char destructionSourceFile[] =
-        "I:\\Projects\\Heroes\\Prog\\BASE\\BITMAP.CPP";
+    DATA(0x0051fa48) static char destructionSourceFile[] = RETAIL_FILE;
     if (m_pixels != 0)
         H2_FREE(m_pixels, destructionSourceFile, 51);
     m_pixels = 0;
@@ -255,3 +255,5 @@ void bitmap::CopyToCareful(
 
 // ---- vtables (compiler-emitted; census) ----
 VTBL(bitmap, 0x004eba3c);
+
+#undef RETAIL_FILE

@@ -67,10 +67,29 @@ typedef enum GameSourceLine {
     GAME_CALC_CRC_FREE_OFFSET = 0xe
 } GameSourceLine;
 
+// Action trigger ids carried in mapCell::m_triggerType (non-action id | the
+// MAP_TRIGGER_ACTION_FLAG 0x80 bit). ProcessRandomObjects converts every
+// MAP_TRIGGER_RANDOM_* cell into its concrete counterpart at map load.
 typedef enum GameMapTrigger {
     MAP_TRIGGER_TOWN_BASE = 0x23,
+    MAP_TRIGGER_MONSTER = 0x98,
+    MAP_TRIGGER_RESOURCE = 0x9b,
     MAP_TRIGGER_TOWN = 0xa3,
-    MAP_TRIGGER_RANDOM_ARTIFACT = 0xa9
+    MAP_TRIGGER_ARTIFACT = 0xa9,
+    MAP_TRIGGER_RANDOM_ULTIMATE_ARTIFACT = 0xac,
+    MAP_TRIGGER_RANDOM_ARTIFACT = 0xad,
+    MAP_TRIGGER_RANDOM_RESOURCE = 0xae,
+    MAP_TRIGGER_RANDOM_MONSTER = 0xaf,
+    MAP_TRIGGER_RANDOM_TOWN = 0xb0,
+    MAP_TRIGGER_RANDOM_CASTLE = 0xb1,
+    MAP_TRIGGER_RANDOM_MINE = 0xb2,
+    MAP_TRIGGER_RANDOM_MONSTER_LEVEL_1 = 0xb3,
+    MAP_TRIGGER_RANDOM_MONSTER_LEVEL_2 = 0xb4,
+    MAP_TRIGGER_RANDOM_MONSTER_LEVEL_3 = 0xb5,
+    MAP_TRIGGER_RANDOM_MONSTER_LEVEL_4 = 0xb6,
+    MAP_TRIGGER_RANDOM_ARTIFACT_LEVEL_1 = 0xf4,
+    MAP_TRIGGER_RANDOM_ARTIFACT_LEVEL_2 = 0xf5,
+    MAP_TRIGGER_RANDOM_ARTIFACT_LEVEL_3 = 0xf6
 } GameMapTrigger;
 
 typedef enum GameDifficultyConstant {
