@@ -228,7 +228,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                     static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 31),
                     51,
                     27,
-                    hasCaptain ? "minicapt.icn" : "miniport.icn",
+                    const_cast<char*>(hasCaptain ? "minicapt.icn" : "miniport.icn"),
                     hasCaptain ? static_cast<u8>(record->m_type) : static_cast<u8>(heroData0->m_id),
                     0,
                     static_cast<i16>(rowWidgetId6 + 40),

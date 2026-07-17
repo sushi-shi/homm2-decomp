@@ -70,10 +70,10 @@ void ProcessAssert(i32 condition, char* file, i32 line);
 // H2_ALLOC/H2_FREE take the retail line and read the file operand from the TU's RETAIL_FILE
 // define. The _AT forms keep an explicit file operand for TUs whose retail relocations
 // reference per-site source-file slot data instead of one pooled path string.
-#define H2_ALLOC(size, originalLine) BaseAlloc(size, RETAIL_FILE, originalLine)
-#define H2_FREE(ptr, originalLine) BaseFree(ptr, RETAIL_FILE, originalLine)
-#define H2_ALLOC_AT(size, originalFile, originalLine) BaseAlloc(size, originalFile, originalLine)
-#define H2_FREE_AT(ptr, originalFile, originalLine) BaseFree(ptr, originalFile, originalLine)
+#define H2_ALLOC(size, originalLine) BaseAlloc(size, const_cast<char*>(RETAIL_FILE), originalLine)
+#define H2_FREE(ptr, originalLine) BaseFree(ptr, const_cast<char*>(RETAIL_FILE), originalLine)
+#define H2_ALLOC_AT(size, originalFile, originalLine) BaseAlloc(size, const_cast<char*>(originalFile), originalLine)
+#define H2_FREE_AT(ptr, originalFile, originalLine) BaseFree(ptr, const_cast<char*>(originalFile), originalLine)
 #define H2_ASSERT(condition, originalFile, originalLine)                                           \
     ProcessAssert(condition, originalFile, originalLine)
 char* FindStringInString(char* text, char* pattern);
