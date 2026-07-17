@@ -102,6 +102,9 @@ void ResetHeroRVs(i32 resetAll, i32 x, i32 y) {
         }
         gaiHeroEventStratRVOfPos[x + y * MAP_WIDTH] = AI_RV_UNSET;
         for (node = 0; node < AI_HERO_COUNT; node++) {
+            // Retail bug, faithfully reproduced: both axes compare against the
+            // hero's m_x — retail bytes read offset +0x27dd (m_x) twice, never
+            // m_y, so the nearby test uses the X coordinate for both terms.
             if (resetAll == 0
                 || abs(y - gpGame->m_heroRecs[node].m_x) + abs(x - gpGame->m_heroRecs[node].m_x)
                        < AI_NEARBY_RADIUS)
@@ -872,7 +875,7 @@ void philAI::DoAI(i32 player) {
     while ((currentHero15 = DetermineHeroToMove(player)) != 0) {
         ValidateHero(currentHero15);
         gpCurAIHero = currentHero15;
-        if (gpCurAIHero->m_boatId != 0xff && gpCurAIHero->m_unknown2b == 0) {
+        if (gpCurAIHero->m_boatId != 0xff && gpCurAIHero->m_boatTravelRange == 0) {
             gpCurAIHero->m_remainingMobility = 0;
             continue;
         }
@@ -1699,9 +1702,9 @@ i32 philAI::DetermineTargetPosition(i32& targetX, i32& targetY, i32 mobility, i3
 
                     if (candidate && gpCurAIHero->m_boatId != 0xff) {
                         boatTravelDistanceCounter =
-                            abs(y - static_cast<u8>(gpCurAIHero->m_unknown2a))
+                            abs(y - static_cast<u8>(gpCurAIHero->m_boatDestY))
                             + abs(x - gpCurAIHero->m_boatId);
-                        if (gpCurAIHero->m_unknown2b < boatTravelDistanceCounter)
+                        if (gpCurAIHero->m_boatTravelRange < boatTravelDistanceCounter)
                             candidate = 0;
                     }
                     if (candidate) {
@@ -1797,7 +1800,7 @@ i32 philAI::DetermineTargetPosition(i32& targetX, i32& targetY, i32 mobility, i3
     targetY = targetBestYLocal;
     if (gpCurAIHero->m_boatId != 0xff && bestValue <= 0) {
         targetX = gpCurAIHero->m_boatId;
-        targetY = static_cast<u8>(gpCurAIHero->m_unknown2a);
+        targetY = static_cast<u8>(gpCurAIHero->m_boatDestY);
     }
     LogInt(
         "Hero, Best RV target XY  current XY",
@@ -2091,7 +2094,7 @@ void philAI::ValueOfBuyingBuilding(
 
     switch (building) {
         case BUILDING_SLOT_CASTLE:
-            if (townPtr->m_unknown37 != 0)
+            if (townPtr->m_mayNotUpgradeToCastle != 0)
                 adjustedValue = -99.0f;
             break;
         case BUILDING_SLOT_MAGE_GUILD:

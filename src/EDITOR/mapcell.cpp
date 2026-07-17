@@ -48,7 +48,7 @@ void fullMap::ClearCellExtra(i32 index) {
     extras[index].animatedObject = 0;
     extras[index].objectLayerBit0 = 0;
     extras[index].objectLayerBit1 = 0;
-    extras[index].unknownObjectFlag = 0;
+    extras[index].objectDrawnAsOverlay = 0;
     extras[index].overlayTileset = 0;
     extras[index].overlayIndex = 0xFF;
     extras[index].animatedOverlay = 0;
@@ -235,7 +235,7 @@ void fullMap::ChangeTilesetIndex(
                     ptr->animatedObject = 0;
                     ptr->objectLayerBit0 = 0;
                     ptr->objectLayerBit1 = 0;
-                    ptr->unknownObjectFlag = 0;
+                    ptr->objectDrawnAsOverlay = 0;
                     ptr->objectTileset = t;
                     ptr->objectIndex = index;
                     break;
@@ -250,7 +250,7 @@ void fullMap::ChangeTilesetIndex(
             cell->m_animatedObject = 0;
             cell->m_objectLayerBit0 = 0;
             cell->m_objectLayerBit1 = 0;
-            cell->m_unknownObjectFlag = 0;
+            cell->m_objectDrawnAsOverlay = 0;
             cell->m_objectTileset = static_cast<u8>(t);
             cell->m_objectIndex = index;
         }

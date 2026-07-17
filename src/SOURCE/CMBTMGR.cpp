@@ -250,8 +250,8 @@ void combatManager::InitNonVisualVars(void) {
     m_eagleEyeSpell[COMBAT_ATTACKER_SIDE] = -1;
     m_eagleEyeSpell[COMBAT_DEFENDER_SIDE] = -1;
     giNextAction = 0;
-    m_unknown351D[0] = 0;
-    m_unknown351D[1] = 0;
+    m_summonedCreatureType[0] = 0;
+    m_summonedCreatureType[1] = 0;
     m_selectedHex = -1;
     m_limitCreatureHex = -1;
     m_previousCommand = COMBAT_INVALID_HISTORY_INDEX;

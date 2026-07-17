@@ -16,19 +16,20 @@ typedef enum MapTilesetConstant {
 } MapTilesetConstant;
 
 #pragma pack(push, 1)
-struct mapCellExtra {         // 7 bytes (packed)
-    u16 nextIndex;            // +0  next-in-chain / free-pool marker (0xFFFF == free)
-    u8 animatedObject : 1;    // +2 bit0
-    u8 objectTileset : 7;     // +2 bits1-7
-    u8 objectIndex;           // +3  object sprite index (0xFF == none)
-    u8 objectLayerBit0 : 1;   // +4 bit0; bits0-1 encode the object render layer
-    u8 objectLayerBit1 : 1;   // +4 bit1; 0=object, 1=background, 2=shadow, 3=terrain
-    u8 unknownObjectFlag : 1; // +4 bit2 (purpose remains unknown)
-    u8 objectMetadata : 5;    // +4 bits3-7
-    u8 animatedOverlay : 1;   // +5 bit0
-    u8 drawOverlayOnTop : 1;  // +5 bit1
-    u8 overlayTileset : 6;    // +5 bits2-7
-    u8 overlayIndex;          // +6  overlay sprite index (0xFF == none)
+struct mapCellExtra {       // 7 bytes (packed)
+    u16 nextIndex;          // +0  next-in-chain / free-pool marker (0xFFFF == free)
+    u8 animatedObject : 1;  // +2 bit0
+    u8 objectTileset : 7;   // +2 bits1-7
+    u8 objectIndex;         // +3  object sprite index (0xFF == none)
+    u8 objectLayerBit0 : 1; // +4 bit0; bits0-1 encode the object render layer
+    u8 objectLayerBit1 : 1; // +4 bit1; 0=object, 1=background, 2=shadow, 3=terrain
+    u8 objectDrawnAsOverlay
+        : 1;                 // +4 bit2: draw the object sprite in the OVERLAY pass, above the hero
+    u8 objectMetadata : 5;   // +4 bits3-7
+    u8 animatedOverlay : 1;  // +5 bit0
+    u8 drawOverlayOnTop : 1; // +5 bit1
+    u8 overlayTileset : 6;   // +5 bits2-7
+    u8 overlayIndex;         // +6  overlay sprite index (0xFF == none)
 };
 #pragma pack(pop)
 SIZE(mapCellExtra, 7);
@@ -49,10 +50,11 @@ public:
     union {
         u16 m_objectData; // +4 complete object data word
         struct {
-            u16 m_objectLayerBit0 : 1;   // +4 bit0; bits0-1 encode the object render layer
-            u16 m_objectLayerBit1 : 1;   // +4 bit1; 0=object, 1=background, 2=shadow, 3=terrain
-            u16 m_unknownObjectFlag : 1; // +4 bit2 (purpose remains unknown)
-            u16 m_objectMetadata : 13;   // +4 bits3-15
+            u16 m_objectLayerBit0 : 1; // +4 bit0; bits0-1 encode the object render layer
+            u16 m_objectLayerBit1 : 1; // +4 bit1; 0=object, 1=background, 2=shadow, 3=terrain
+            u16 m_objectDrawnAsOverlay
+                : 1; // +4 bit2: draw the object sprite in the OVERLAY pass, above the hero (still a TODO in fheroes2, unnamed in Ironfist; decoded from the ADVMGR draw gates)
+            u16 m_objectMetadata : 13; // +4 bits3-15
         };
         struct {
             u16 m_tentFlags : 3;
