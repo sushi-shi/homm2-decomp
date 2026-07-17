@@ -1216,21 +1216,21 @@ VA(0x00499589, 0x1a7)
 char *GetBuildingInfo(i32 race, i32 building, i32 mode)
 {
     char buf[400];
-    if (race == FACTION_NECROMANCER && building == KB_BUILDING_NECROMANCER_SHRINE) {
+    if (race == FACTION_NECROMANCER && building == BUILDING_SLOT_NECROMANCER_SHRINE) {
         sprintf(buf, xNecromancerShrineDesc);
-    } else if (building == KB_BUILDING_WELL_EXTRA) {
+    } else if (building == BUILDING_SLOT_WELL_EXTRA) {
         sprintf(buf, "The %s increases production of %s by 8 per week.",
                 GetBuildingName(race, building),
                 gArmyNamesPlural[gDwellingType[race][0]]);
-    } else if (building == KB_BUILDING_SPECIAL) {
+    } else if (building == BUILDING_SLOT_SPECIAL) {
         sprintf(buf, gBuildingInfoSpecial[race]);
-    } else if (building < KB_BUILDING_DWELLING_FIRST) {
+    } else if (building < BUILDING_SLOT_DWELLING_FIRST) {
         sprintf(buf, cBuildingInfoNeutral[building]);
     } else {
         sprintf(gText, "The %s produces %s.",
                 GetBuildingName(race, building),
                 gArmyNamesPlural[
-                    gDwellingType[race][building - KB_BUILDING_DWELLING_FIRST]]);
+                    gDwellingType[race][building - BUILDING_SLOT_DWELLING_FIRST]]);
         return gText;
     }
     if (mode) {
@@ -1244,33 +1244,33 @@ char *GetBuildingInfo(i32 race, i32 building, i32 mode)
 VA(0x00499730, 0xa4)
 char *GetBuildingName(i32 race, i32 building)
 {
-    if (race == FACTION_NECROMANCER && building == KB_BUILDING_NECROMANCER_SHRINE)
+    if (race == FACTION_NECROMANCER && building == BUILDING_SLOT_NECROMANCER_SHRINE)
         return xNecromancerShrine;
-    if (building == KB_BUILDING_WELL_EXTRA)
+    if (building == BUILDING_SLOT_WELL_EXTRA)
         return gWellExtraNames[race];
-    else if (building == KB_BUILDING_SPECIAL)
+    else if (building == BUILDING_SLOT_SPECIAL)
         return gSpecialBuildingNames[race];
-    else if (building < KB_BUILDING_DWELLING_FIRST)
+    else if (building < BUILDING_SLOT_DWELLING_FIRST)
         return gNeutralBuildingNames[building];
     else
-        return gDwellingNames[race][building - KB_BUILDING_DWELLING_FIRST];
+        return gDwellingNames[race][building - BUILDING_SLOT_DWELLING_FIRST];
 }
 
 VA(0x004997d4, 0x138)
 void GetBuildingCost(i32 race, i32 building, i32 *const dest, i32 mageLevel)
 {
     i32 level;
-    if (building == KB_BUILDING_NECROMANCER_SHRINE && race == FACTION_NECROMANCER) {
+    if (building == BUILDING_SLOT_NECROMANCER_SHRINE && race == FACTION_NECROMANCER) {
         memcpy(dest, xShrineBuildingCost, KB_BUILDING_RESOURCE_COUNT * sizeof(i32));
-    } else if (building >= KB_BUILDING_DWELLING_FIRST && building <= KB_BUILDING_DWELLING_LAST) {
-        memcpy(dest, gDwellingCosts[race][building - KB_BUILDING_DWELLING_FIRST],
+    } else if (building >= BUILDING_SLOT_DWELLING_FIRST && building <= BUILDING_SLOT_DWELLING_LAST) {
+        memcpy(dest, gDwellingCosts[race][building - BUILDING_SLOT_DWELLING_FIRST],
                KB_BUILDING_RESOURCE_COUNT * sizeof(i32));
-    } else if (building == KB_BUILDING_MAGE_GUILD) {
+    } else if (building == BUILDING_SLOT_MAGE_GUILD) {
         level = mageLevel + 1;
         if (level > KB_MAGE_GUILD_MAX_LEVEL)
             level = KB_MAGE_GUILD_MAX_LEVEL;
         memcpy(dest, gMageBuildingCosts[mageLevel + 1], KB_BUILDING_RESOURCE_COUNT * sizeof(i32));
-    } else if (building == KB_BUILDING_SPECIAL) {
+    } else if (building == BUILDING_SLOT_SPECIAL) {
         memcpy(dest, gSpecialBuildingCosts[race], KB_BUILDING_RESOURCE_COUNT * sizeof(i32));
     } else {
         if (building >= KB_BUILDING_NEUTRAL_LIMIT)
@@ -1335,40 +1335,40 @@ i32 CanBuild(town *t, i32 building)
     i32 haveMask;
     if (BitTest(gpGame->m_knownTowns, t->m_id))
         return 0;
-    if (building != KB_BUILDING_CASTLE && !(t->m_buildings & TOWN_BUILDING_CASTLE))
+    if (building != BUILDING_SLOT_CASTLE && !(t->m_buildings & TOWN_BUILDING_CASTLE))
         return 0;
-    if (!xIsExpansionMap && building == KB_BUILDING_NECROMANCER_SHRINE &&
+    if (!xIsExpansionMap && building == BUILDING_SLOT_NECROMANCER_SHRINE &&
         t->m_type == FACTION_NECROMANCER)
         return 0;
-    if (building == KB_BUILDING_DOCK) {
+    if (building == BUILDING_SLOT_DOCK) {
         if (t->CanBuildDock())
             return 1;
         else
             return 0;
     }
-    if (building == KB_BUILDING_MAGE_GUILD && t->m_buildState >= KB_MAGE_GUILD_MAX_LEVEL)
+    if (building == BUILDING_SLOT_MAGE_GUILD && t->m_buildState >= KB_MAGE_GUILD_MAX_LEVEL)
         return 0;
-    if (building == KB_BUILDING_UPGRADE_CASTLE || building == KB_BUILDING_DISABLED_FIRST ||
-        building == KB_BUILDING_DISABLED_SECOND || building == KB_BUILDING_DISABLED_THIRD ||
-        building == KB_BUILDING_DISABLED_FOURTH || building == KB_BUILDING_DISABLED_LAST)
+    if (building == BUILDING_SLOT_UPGRADE_CASTLE || building == BUILDING_SLOT_DISABLED_FIRST ||
+        building == BUILDING_SLOT_DISABLED_SECOND || building == BUILDING_SLOT_DISABLED_THIRD ||
+        building == BUILDING_SLOT_DISABLED_FOURTH || building == BUILDING_SLOT_DISABLED_LAST)
         return 0;
-    if (building < KB_BUILDING_DWELLING_FIRST || building > KB_BUILDING_DWELLING_LAST)
+    if (building < BUILDING_SLOT_DWELLING_FIRST || building > BUILDING_SLOT_DWELLING_LAST)
         return 1;
-    if ((building == KB_BUILDING_DWELLING_SECOND &&
+    if ((building == BUILDING_SLOT_DWELLING_SECOND &&
          (t->m_buildings & KB_DWELLING_UPGRADE_FIRST_FLAG)) ||
-        (building == KB_BUILDING_DWELLING_THIRD &&
+        (building == BUILDING_SLOT_DWELLING_THIRD &&
          (t->m_buildings & KB_DWELLING_UPGRADE_SECOND_FLAG)) ||
-        (building == KB_BUILDING_DWELLING_FOURTH &&
+        (building == BUILDING_SLOT_DWELLING_FOURTH &&
          (t->m_buildings & KB_DWELLING_UPGRADE_THIRD_FLAG)) ||
-        (building == KB_BUILDING_DWELLING_FIFTH &&
+        (building == BUILDING_SLOT_DWELLING_FIFTH &&
          (t->m_buildings & KB_DWELLING_UPGRADE_FOURTH_FLAG)) ||
-        (building == KB_BUILDING_DWELLING_SIXTH &&
+        (building == BUILDING_SLOT_DWELLING_SIXTH &&
          ((t->m_buildings & KB_DWELLING_UPGRADE_FIFTH_FLAG) ||
           (t->m_buildings & KB_DWELLING_UPGRADE_SIXTH_FLAG))) ||
-        (building == KB_BUILDING_UPGRADE_LAST &&
+        (building == BUILDING_SLOT_UPGRADE_LAST &&
          (t->m_buildings & KB_DWELLING_UPGRADE_SIXTH_FLAG)))
         return 0;
-    reqMask = gHierarchyMask[t->m_type][building - KB_BUILDING_DWELLING_FIRST];
+    reqMask = gHierarchyMask[t->m_type][building - BUILDING_SLOT_DWELLING_FIRST];
     haveMask = t->m_buildings;
     if (haveMask & KB_DWELLING_UPGRADE_FIRST_FLAG)
         haveMask |= KB_DWELLING_FIRST_FLAG;
@@ -1384,7 +1384,7 @@ i32 CanBuild(town *t, i32 building)
         haveMask |= KB_DWELLING_FIFTH_FLAG;
     if ((reqMask & haveMask) == reqMask) {
         if (t->m_type == FACTION_NECROMANCER &&
-            building == KB_BUILDING_NECROMANCER_MAGE_PREREQUISITE && t->m_buildState <= 1)
+            building == BUILDING_SLOT_NECROMANCER_MAGE_PREREQUISITE && t->m_buildState <= 1)
             return 0;
         return 1;
     }
@@ -1408,19 +1408,19 @@ i32 CanBuy(town *t, i32 type)
 VA(0x00499dbb, 0xc6)
 i32 GetBuildingBaseResourceValue(i32 race, i32 building, i32 level)
 {
-    if (race == FACTION_NECROMANCER && building == KB_BUILDING_UPGRADE_CASTLE)
+    if (race == FACTION_NECROMANCER && building == BUILDING_SLOT_UPGRADE_CASTLE)
         return 1000;
-    if (building < KB_BUILDING_DWELLING_FIRST || building > KB_BUILDING_DWELLING_LAST) {
-        if (building > KB_BUILDING_NEUTRAL_LAST)
+    if (building < BUILDING_SLOT_DWELLING_FIRST || building > BUILDING_SLOT_DWELLING_LAST) {
+        if (building > BUILDING_SLOT_NEUTRAL_LAST)
             return 0;
-        else if (building == KB_BUILDING_MAGE_GUILD)
+        else if (building == BUILDING_SLOT_MAGE_GUILD)
             return gMageBaseResourceValues[level];
-        else if (building == KB_BUILDING_SPECIAL)
+        else if (building == BUILDING_SLOT_SPECIAL)
             return gSpecialBuildingBaseResourceValues[race];
         else
             return gNeutralBaseResourceValues[building];
     } else {
-        return gDwellingBaseResourceValues[race][building - KB_BUILDING_DWELLING_FIRST];
+        return gDwellingBaseResourceValues[race][building - BUILDING_SLOT_DWELLING_FIRST];
     }
 }
 
@@ -5848,7 +5848,7 @@ DATA(0x004fcda0) i32 gMageBaseResourceValues[KB_MAGE_GUILD_LEVEL_COUNT] = {
     0, 4000, 6500, 8500, 10500, 15000
 };
 DATA(0x004fcdb8) i32
-    gNeutralBaseResourceValues[KB_BUILDING_DWELLING_FIRST + 1] = {
+    gNeutralBaseResourceValues[BUILDING_SLOT_DWELLING_FIRST + 1] = {
     5000, 300, 350, 2000, 3000, 0, 12000, 2500,
     1500, 1500, 200, 1000, 500, 0, 0, 1100,
     0, 0, 0, 0
