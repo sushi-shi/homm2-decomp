@@ -84,7 +84,7 @@ heroWindow::heroWindow(i32 param_1, i32 param_2, char* param_3) {
     m_winWidth = gpResourceManager->ReadWord();
     m_winHeight = gpResourceManager->ReadWord();
     m_winFlags = gpResourceManager->ReadWord();
-    m_winFlags |= 0x4000;
+    m_winFlags |= WIDGET_FLAG_UPDATE;
     m_widgetListHead = 0;
     m_widgetListTail = m_widgetListHead;
     idx = 0;

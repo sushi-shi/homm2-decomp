@@ -473,7 +473,7 @@ u32l MAKEFILEID(char* text) {
     i32 sum = 0;
     for (i32 i = strlen(text) - 1; i >= 0; --i) {
         if (text[i] >= 'a' && text[i] <= 'z') {
-            text[i] &= ~0x20;
+            text[i] &= ~('a' - 'A');
         }
         u32 shiftedHash = hash << 5;
         hash >>= 25;
@@ -582,11 +582,11 @@ void FadeOut(i32 increment) {
             }
             level = MISC_FADE_LEVEL_LAST;
         }
-        i32 delayUntil = KBTickCount() + 0x14;
+        i32 delayUntil = KBTickCount() + 20;
         PollSound();
         if (level == MISC_FADE_LEVEL_LAST)
             done = 1;
-        for (i32 i = 0; i < 0x300; ++i) {
+        for (i32 i = 0; i < PALETTE_DATA_SIZE; ++i) {
             if (fadePalette->m_data[i] > 0) {
                 if (fadePalette->m_data[i] > increment)
                     fadePalette->m_data[i] -= increment;
@@ -617,7 +617,8 @@ void ProcessAssert(i32 condition, char* file, i32 line) {
         gpMouseManager->SetColorMice(0);
         SetFullScreenStatus(0);
         sprintf(gText, gMiscText.memory.assertMessage.text, file, line);
-        if (MessageBoxA(hwndApp, gText, gMiscText.memory.assertTitle.text, MB_YESNO | MB_ICONHAND) != IDNO) {
+        if (MessageBoxA(hwndApp, gText, gMiscText.memory.assertTitle.text, MB_YESNO | MB_ICONHAND)
+            != IDNO) {
             ShutDown(0);
         }
     }
@@ -931,7 +932,7 @@ void ReadPrefsFromRegistry(void) {
         reinterpret_cast<u8*>(&gConfig.baudRate[CONFIG_CONNECTION_MODEM]),
         &dwSize
     );
-    dwSize = 0x63;
+    dwSize = MODEM_INIT_STRING_SIZE + 1;
     RegQueryValueExA(
         hKey,
         gMiscText.readRegistry.modemInitString.text,
@@ -952,7 +953,7 @@ void ReadPrefsFromRegistry(void) {
     // Retail relocation at function +0x2f6 resolves to gConfig +0x125, the terminator byte after
     // this four-byte ID, rather than the unrelated modem string at gConfig +0x110.
     gConfig.uniqueSystemID[3] = 0;
-    dwSize = 0x1f;
+    dwSize = NETWORK_DEFAULT_NAME_SIZE + 1;
     RegQueryValueExA(
         hKey,
         gMiscText.readRegistry.networkDefaultName.text,
@@ -1194,7 +1195,7 @@ void ReadPrefsFromRegistry(void) {
         reinterpret_cast<u8*>(&gConfig.gfx[1].colorMouseCursor),
         &dwSize
     );
-    dwSize = 0x63;
+    dwSize = MODEM_INIT_STRING_SIZE + 1;
     if (RegQueryValueExA(
             hKey,
             gMiscText.readRegistry.appPath.text,
@@ -1218,13 +1219,13 @@ void ReadPrefsFromRegistry(void) {
     RegCloseKey(hKey);
     // Clamp the saved window geometry to sane defaults / on-screen bounds.
     if (gConfig.gfx[giCurExe].width <= 0)
-        gConfig.gfx[giCurExe].width = 0x140; // default 320 wide
+        gConfig.gfx[giCurExe].width = 320;
     if (gConfig.gfx[giCurExe].height <= 0)
-        gConfig.gfx[giCurExe].height = 0xf0; // default 240 tall
+        gConfig.gfx[giCurExe].height = 240;
     if (gConfig.gfx[giCurExe].x < 0)
         gConfig.gfx[giCurExe].x = 0;
-    if (gConfig.gfx[giCurExe].x > giMainVideoModeHeight - 0xc8) // keep >= 200px on-screen
-        gConfig.gfx[giCurExe].x = giMainVideoModeHeight - 0xc8;
+    if (gConfig.gfx[giCurExe].x > giMainVideoModeHeight - 200)
+        gConfig.gfx[giCurExe].x = giMainVideoModeHeight - 200;
     if (gConfig.gfx[giCurExe].y < 0)
         gConfig.gfx[giCurExe].y = 0;
     if (gConfig.gfx[giCurExe].y > giMainVideoModeWidth - MISC_WINDOW_POSITION_MARGIN)
@@ -1253,7 +1254,7 @@ void WritePrefsToFile(void) {
     i32 zeroBuffer[25];
     i32 i;
     i32* p = zeroBuffer;
-    for (i = 0x19; i != 0; i--) {
+    for (i = 25; i != 0; i--) {
         *p = 0;
         p++;
     }
@@ -2108,7 +2109,8 @@ void FadeToColorTable(u8* colorTable, i32 increment) {
 
 VA(0x004c66a0, 0x29)
 i32 IsCycleColor(i32 color) {
-    if ((color >= MISC_CYCLE_RANGE_ONE_FIRST && color <= MISC_CYCLE_RANGE_ONE_LAST) || (color >= MISC_CYCLE_RANGE_TWO_FIRST && color <= MISC_CYCLE_RANGE_TWO_LAST)) {
+    if ((color >= MISC_CYCLE_RANGE_ONE_FIRST && color <= MISC_CYCLE_RANGE_ONE_LAST)
+        || (color >= MISC_CYCLE_RANGE_TWO_FIRST && color <= MISC_CYCLE_RANGE_TWO_LAST)) {
         return 1;
     }
     return 0;
@@ -2327,13 +2329,13 @@ void GetDataEntry(
     iDEMaxLen = maximumLength;
     strcpy(destination, gMiscText.dataEntry.destinationDefault.text);
 
-    i32 rows = bigFont->LineLength(prompt, 0xf0) * 0x10;
+    i32 rows = bigFont->LineLength(prompt, 240) * 16;
     if (showCancel != 0)
-        rows += 0x27;
-    rows = (rows + 0xf) / 0x2d;
+        rows += 39;
+    rows = (rows + 15) / 45;
     if (rows > 6)
         rows = 6;
-    i32 entryY = rows * 0x2d - (showCancel != 0 ? 0x1e : 0) + 0x5f;
+    i32 entryY = rows * 45 - (showCancel != 0 ? 30 : 0) + 95;
 
     char windowName[16];
     sprintf(windowName, gMiscText.dataEntry.windowFilenameFormat.text, rows);
@@ -2395,7 +2397,7 @@ void GetDataEntry(
     if (entry == 0)
         MemError();
     inBoxY = entryY + DATA_ENTRY_INPUT_BOX_Y_OFFSET;
-    inBoxX = 0xd5;
+    inBoxX = 213;
     DataEntryWin->AddWidget(entry, -1);
 
     if (useImmediateHandler != 0) {

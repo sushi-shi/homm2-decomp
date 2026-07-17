@@ -94,7 +94,7 @@ VA(0x004daf70, 0x72)
 MIDIWrap::MIDIWrap(char* name) : resource(6, gpResourceManager->MakeId(name, 1), 1, 0) {
     u32l size = gpResourceManager->GetFileSize(m_id);
 #line 110
-    m_data = static_cast<char*>(H2_ALLOC_AT(size, gSampleSourceFiles.midiAllocation, 0x6e));
+    m_data = static_cast<char*>(H2_ALLOC_AT(size, gSampleSourceFiles.midiAllocation, 110));
     gpResourceManager->PointToFile(m_id);
     gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_data), size);
 }

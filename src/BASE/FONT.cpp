@@ -68,7 +68,7 @@ void font::DrawStringExecute(
             m_suppressDraw = 0;
             goto next;
         }
-        c -= 0x20;
+        c -= 'a' - 'A';
         if (c < 0 || c > FONT_GLYPH_FALLBACK)
             c = FONT_GLYPH_FALLBACK;
         if (c != 0) {

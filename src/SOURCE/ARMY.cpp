@@ -31,7 +31,6 @@
 #include <SOURCE/SPELLS.h>
 #include <SOURCE/X_GLOBAL.h>
 
-
 VA(0x0044a8c0, 0xcf)
 army::army(void) {
     i32 i;
@@ -315,10 +314,10 @@ void army::DrawToBuffer(i32 x, i32 y, i32 effectsOnly) {
         }
     }
     if (giSpellEffectShowType == 0 && standing7 && m_spellCount > 0) {
-        color = 0xed;
+        color = 237;
     }
     if (m_hex == gpCombatManager->m_limitCreatureHex && gpCombatManager->m_limitCreature == 1) {
-        color = 0xec;
+        color = 236;
     }
 
     palette8 = 0;

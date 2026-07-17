@@ -187,7 +187,7 @@ class sample* resourceManager::GetSample(char* name) {
         r->m_refCount++;
         return static_cast<sample*>(r);
     } else {
-        r = new sample(name, 0, 0x7f, 1);
+        r = new sample(name, 0, 127, 1);
         AddResource(r);
         return static_cast<sample*>(r);
     }
@@ -342,8 +342,7 @@ i32 resourceManager::LoadAggregateHeader(char* aggregateName) {
     read(m_aggregateFd[m_curAggregate], fileCountBuffer, sizeof(i16));
     m_aggregateEntryCount[m_curAggregate] = fileCountBuffer[0];
     directoryBytes = m_aggregateEntryCount[m_curAggregate] * RESOURCE_MANAGER_ENTRY_BYTES;
-    m_aggregateDir[m_curAggregate] =
-        static_cast<aggEntry*>(H2_ALLOC(directoryBytes, 0x21e));
+    m_aggregateDir[m_curAggregate] = static_cast<aggEntry*>(H2_ALLOC(directoryBytes, 0x21e));
     read(m_aggregateFd[m_curAggregate], m_aggregateDir[m_curAggregate], directoryBytes);
     return RESOURCE_MANAGER_SUCCESS;
 }
@@ -432,7 +431,7 @@ void resourceManager::RestorePosition(void) {
 
 VA(0x004c8ee0, 0x81)
 i8 resourceManager::ReadByte(void) {
-    H2_ASSERT(m_aggregateFd[m_curAggregate] != RESOURCE_MANAGER_INVALID_FILE, RETAIL_FILE, 0x2bf);
+    H2_ASSERT(m_aggregateFd[m_curAggregate] != RESOURCE_MANAGER_INVALID_FILE, RETAIL_FILE, 703);
     i8 value = 0;
     i32 bytesRead = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
     if (bytesRead == 0) {
@@ -446,7 +445,7 @@ i8 resourceManager::ReadByte(void) {
 
 VA(0x004c8f70, 0x84)
 i16 resourceManager::ReadWord(void) {
-    H2_ASSERT(m_aggregateFd[m_curAggregate] != RESOURCE_MANAGER_INVALID_FILE, RETAIL_FILE, 0x2dc);
+    H2_ASSERT(m_aggregateFd[m_curAggregate] != RESOURCE_MANAGER_INVALID_FILE, RETAIL_FILE, 732);
     i16 value = 0;
     i32 bytesRead = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
     if (bytesRead == 0) {
@@ -460,7 +459,7 @@ i16 resourceManager::ReadWord(void) {
 
 VA(0x004c9000, 0x84)
 i32l resourceManager::ReadLong(void) {
-    H2_ASSERT(m_aggregateFd[m_curAggregate] != RESOURCE_MANAGER_INVALID_FILE, RETAIL_FILE, 0x2f8);
+    H2_ASSERT(m_aggregateFd[m_curAggregate] != RESOURCE_MANAGER_INVALID_FILE, RETAIL_FILE, 760);
     i32l value = 0;
     i32 bytesRead = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
     if (bytesRead == 0) {
@@ -499,7 +498,7 @@ void resourceManager::Read13(i8* destination) {
 // of retail's named string constants.
 VA(0x004c91b0, 0xbd)
 void resourceManager::ReadBlock(i8* destination, u32l size) {
-    H2_ASSERT(m_aggregateFd[m_curAggregate] != RESOURCE_MANAGER_INVALID_FILE, RETAIL_FILE, 0x330);
+    H2_ASSERT(m_aggregateFd[m_curAggregate] != RESOURCE_MANAGER_INVALID_FILE, RETAIL_FILE, 816);
     PollSound();
     i32 bytesRead = read(m_aggregateFd[m_curAggregate], destination, size);
     if (bytesRead != size) {

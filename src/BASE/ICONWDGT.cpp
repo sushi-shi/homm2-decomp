@@ -147,7 +147,7 @@ i32 iconWidget::Main(tag_message& msg) {
         case MESSAGE_LEFT_BUTTON_UP:
         case MESSAGE_RIGHT_BUTTON_UP:
             if ((flags & WIDGET_FLAG_SELECTED) != 0) {
-                m_flags = flags & 0xfffe;
+                m_flags = flags & ~WIDGET_FLAG_SELECTED;
                 msg.payload.widget.command = WIDGET_COMMAND_DESELECT;
                 msg.type = MESSAGE_WIDGET;
                 msg.payload.widget.id = m_id;

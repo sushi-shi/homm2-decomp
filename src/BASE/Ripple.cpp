@@ -25,10 +25,10 @@
 VA(0x004d26a0, 0x23f)
 void DoRipple(bitmap* source, bitmap* destination, i32 height, i32 strength) {
     i32 profileIndex;
-    const i32 screenWidth = 0x280;
-    const i32 profileRadius = 0x19;
-    const i32 redrawRadius = 0x16;
-    const i32 redrawWidth = 0x29;
+    const i32 screenWidth = 640;
+    const i32 profileRadius = 25;
+    const i32 redrawRadius = 22;
+    const i32 redrawWidth = 41;
 
     gpMouseManager->HideColorPointer();
 

@@ -259,17 +259,12 @@ i32 game::NewGame(void) {
     SetupNetPlayerNames();
     glTimers[0] = 0;
     for (textBufferIndex = 0; textBufferIndex < NEW_GAME_TEXT_BUFFER_COUNT; ++textBufferIndex) {
-        cTextReceivedBuffer[textBufferIndex] = static_cast<char*>(
-            H2_ALLOC(NEW_GAME_TEXT_BUFFER_SIZE, 364)
-        );
+        cTextReceivedBuffer[textBufferIndex] =
+            static_cast<char*>(H2_ALLOC(NEW_GAME_TEXT_BUFFER_SIZE, 364));
         strcpy(cTextReceivedBuffer[textBufferIndex], "");
     }
-    cNGKPCore = static_cast<char*>(
-        H2_ALLOC(NEW_GAME_KEY_BUFFER_SIZE, 367)
-    );
-    cNGKPDisplay = static_cast<char*>(
-        H2_ALLOC(NEW_GAME_KEY_BUFFER_SIZE, 368)
-    );
+    cNGKPCore = static_cast<char*>(H2_ALLOC(NEW_GAME_KEY_BUFFER_SIZE, 367));
+    cNGKPDisplay = static_cast<char*>(H2_ALLOC(NEW_GAME_KEY_BUFFER_SIZE, 368));
     strcpy(cNGKPCore, "");
     strcpy(cNGKPDisplay, "");
     NGKPcursorIndex = 0;
@@ -582,8 +577,7 @@ void game::InitNewGameWindow(void) {
         m_newGameWindow->AddWidget(iconControlLocal, -1);
 
         if (giNumHumanPlayers > 1) {
-            label =
-                static_cast<char*>(H2_ALLOC(2, 715));
+            label = static_cast<char*>(H2_ALLOC(2, 715));
             sprintf(label, " ");
             textControlLocal = new textWidget(
                 static_cast<i16>(playerSpacingTemp * playerCounter + firstPlayerXLocal + 19),
@@ -1454,7 +1448,7 @@ void game::NGKPSetupDisplayString(char* text, u16 cursor) {
         strncpy(cNGKPDisplay, text, cursor);
 
     if (NGKPcursorFlashOn)
-        cNGKPDisplay[cursor] = 0x1f;
+        cNGKPDisplay[cursor] = FONT_SPACER_CHAR;
     else
         cNGKPDisplay[cursor] = '_';
 
@@ -1655,8 +1649,7 @@ void game::ShowScenInfo(void) {
         scenarioWindowValue->AddWidget(iconControlLocal, -1);
 
         if (giNumHumanPlayers > 1) {
-            label =
-                static_cast<char*>(H2_ALLOC(2, 1729));
+            label = static_cast<char*>(H2_ALLOC(2, 1729));
             sprintf(label, " ");
             textControlLocal = new textWidget(
                 static_cast<i16>(

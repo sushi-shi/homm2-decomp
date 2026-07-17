@@ -37,6 +37,7 @@ typedef enum AIArtifactEventMode {
 } AIArtifactEventMode;
 
 typedef enum AIArtifactEventValue {
+    AI_EVENT_RESOURCE_TYPE_MASK = 0xf,
     AI_ARTIFACT_EVENT_RESOURCE_MASK = 0xf0,
     AI_ARTIFACT_EVENT_RESOURCE_SHIFT = 4,
     AI_ARTIFACT_EVENT_RESOURCE_THREE_AMOUNT = 3,

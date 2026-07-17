@@ -17,6 +17,7 @@ typedef enum WidgetFlag {
     WIDGET_FLAG_ENABLED = 2,
     WIDGET_FLAG_DRAW = 4,
     WIDGET_FLAG_DIMMED = 8,
+    WIDGET_FLAG_GRAYED = 0x1000,
     WIDGET_FLAG_UPDATE = 0x4000
 } WidgetFlag;
 

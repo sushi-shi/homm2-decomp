@@ -26,6 +26,7 @@
 #include <SOURCE/combatManager.h>
 #include <SOURCE/CMBTMGR.h>
 #include <SOURCE/game.h>
+#include <SOURCE/GAME.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/NOOPT.h>
@@ -389,7 +390,7 @@ i32 combatManager::Open(i32 openFlags) {
     LogStr("Op4");
     gpInputManager->Flush();
     ResetMouse();
-    m_messageMask = 0x200;
+    m_messageMask = MESSAGE_WIDGET;
     m_priority = openFlags;
     m_active = 1;
     strcpy(m_name, "combatManager");
@@ -433,7 +434,7 @@ void combatManager::Close(void) {
     if (m_battlefieldCell->m_triggerType == COMBAT_TRIGGER_MONSTER) {
         if (total > 4000)
             total = 4000;
-        m_battlefieldCell->m_objectMetadata = total & 0xfff;
+        m_battlefieldCell->m_objectMetadata = total & MAP_MONSTER_COUNT_MASK;
     }
 
     if (m_battlefieldCell->m_triggerType == COMBAT_TRIGGER_MINE
