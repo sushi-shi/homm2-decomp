@@ -22,7 +22,7 @@
 #include <SOURCE/KB.h>        // EventWindowHandler, FileError, ShutDown
 #include <SOURCE/wingraph.h>
 #include <SOURCE/NOOPT.h>  // SetFullScreenStatus
-#include <_carcass_types.h>   // tag_message (member access)
+#include <BASE/message.h>   // tag_message (member access)
 #include <windows.h>      // MessageBoxA
 #include <stdlib.h>
 #include <stdio.h>

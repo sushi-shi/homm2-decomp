@@ -1,7 +1,7 @@
 #ifndef HOMM2_X_GLOBAL_H
 #define HOMM2_X_GLOBAL_H
 // Globals owned by this data-only TU (from CodeView).
-#include <_types.h>
+#include <SOURCE/KB_TYPES.h>
 #include <va.h>
 #include <SOURCE/CURSOR.h>
 #include <SOURCE/dimPalette.h>

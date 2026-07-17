@@ -1,6 +1,6 @@
 #ifndef HOMM2_KBWIN_H
 #define HOMM2_KBWIN_H
-#include <_types.h>
+#include <SOURCE/KB_TYPES.h>
 #include <va.h>
 #include <windows.h>
 // Declarations of the free functions DEFINED in kbwin.cpp — the single home for these
