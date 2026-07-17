@@ -697,7 +697,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         "bird's legs for stilts teaches you %s for her own inscrutable purposes.",
                         gSecondarySkills[cell->m_objectMetadata]
                     );
-                    EventWindow(-1, 1, gText, IDX(ResourceType)(17), cell->m_objectMetadata * 3, -1, 0, -1);
+                    EventWindow(-1, 1, gText, 17, cell->m_objectMetadata * 3, -1, 0, -1);
                     eventHero2->GiveSS(cell->m_objectMetadata, 1);
                 } else {
                     sprintf(
@@ -922,7 +922,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_ALCHEMIST_LAB:
             if (gpGame->m_mineOwners[cell->m_objectMetadata] != giCurPlayer) {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-                EventWindow(0, 1, "", IDX(ResourceType)(1), -1, -1, 0, -1);
+                EventWindow(0, 1, "", 1, -1, -1, 0, -1);
                 goto claimMine;
             }
             break;
@@ -930,7 +930,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_SAWMILL:
             if (gpGame->m_mineOwners[cell->m_objectMetadata] != giCurPlayer) {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-                EventWindow(73, 1, "", IDX(ResourceType)(0), -2, -1, 0, -1);
+                EventWindow(73, 1, "", 0, -2, -1, 0, -1);
                 goto claimMine;
             }
             break;
@@ -1006,7 +1006,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 eventHero2->m_eventFlags = eventHero2->m_eventFlags | HERO_EVENT_BUOY;
                 eventHero2->m_morale++;
-                EventWindow(3, 1, "", IDX(ResourceType)(12), 0, -1, 0, -1);
+                EventWindow(3, 1, "", 12, 0, -1, 0, -1);
             } else {
                 EventWindow(2, 1, "", -1, 0, -1, 0, -1);
             }
@@ -1017,7 +1017,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 eventHero2->m_eventFlags = eventHero2->m_eventFlags | HERO_EVENT_FAERIE_RING;
                 eventHero2->m_luck++;
-                EventWindow(13, 1, "", IDX(ResourceType)(10), 0, -1, 0, -1);
+                EventWindow(13, 1, "", 10, 0, -1, 0, -1);
             } else {
                 EventWindow(12, 1, "", -1, 0, -1, 0, -1);
             }
@@ -1060,7 +1060,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 eventHero2->m_eventFlags = eventHero2->m_eventFlags | HERO_EVENT_FOUNTAIN;
                 eventHero2->m_luck++;
-                EventWindow(16, 1, "", IDX(ResourceType)(10), 0, -1, 0, -1);
+                EventWindow(16, 1, "", 10, 0, -1, 0, -1);
             } else {
                 EventWindow(15, 1, "", -1, 0, -1, 0, -1);
             }
@@ -1530,7 +1530,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_GAZEBO:
             if (!(eventHero2->m_gazeboVisits & (1 << cell->m_objectMetadata))) {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-                EventWindow(18, 1, "", IDX(ResourceType)(14), GAZEBO_EXPERIENCE, -1, 0, -1);
+                EventWindow(18, 1, "", 14, GAZEBO_EXPERIENCE, -1, 0, -1);
                 GiveExperience(eventHero2, GAZEBO_EXPERIENCE, 0);
                 eventHero2->m_gazeboVisits |= 1 << cell->m_objectMetadata;
                 eventHero2->CheckLevel();
@@ -1583,7 +1583,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_WINDMILL:
             if (cell->m_objectMetadata < SPHINX_RESOURCE_COUNT) {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-                EventWindow(87, 1, "", IDX(ResourceType)(cell->m_objectMetadata), WINDMILL_RESOURCE_AMOUNT, -1, 0, -1);
+                EventWindow(87, 1, "", cell->m_objectMetadata, WINDMILL_RESOURCE_AMOUNT, -1, 0, -1);
                 GiveResource(eventHero2, cell->m_objectMetadata, WINDMILL_RESOURCE_AMOUNT);
                 cell->m_objectMetadata = WINDMILL_EMPTY;
             } else {
@@ -2168,7 +2168,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 eventHero2->AddSpell(eventValue1, eventHero2->Stats(HeroPrimaryStat(3)));
-                EventWindow(-1, 1, gText, IDX(ResourceType)(8), eventValue1, -1, 0, -1);
+                EventWindow(-1, 1, gText, 8, eventValue1, -1, 0, -1);
             }
             break;
 
@@ -2878,7 +2878,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                 switch (cell->m_objectMetadata) {
                     case SKELETON_EMPTY:
-                        EventWindow(EVENT_TEXT_GRAVEYARD_EMPTY, 1, "", IDX(ResourceType)(13), 0, -1, 0, -1);
+                        EventWindow(EVENT_TEXT_GRAVEYARD_EMPTY, 1, "", 13, 0, -1, 0, -1);
                         if (!HAS(eventHero2->m_eventFlags, HERO_EVENT_GRAVEYARD)) {
                             eventHero2->m_eventFlags =
                                 eventHero2->m_eventFlags | HERO_EVENT_GRAVEYARD;
@@ -3035,7 +3035,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             EventWindow(-1, 1, eventText, -1, 0, -1, 0, -1);
                         } else {
                             eventHero2->AddSpell(eventValue1, eventHero2->Stats(HeroPrimaryStat(3)));
-                            EventWindow(-1, 1, eventText, IDX(ResourceType)(8), eventValue1, -1, 0, -1);
+                            EventWindow(-1, 1, eventText, 8, eventValue1, -1, 0, -1);
                         }
                         cell->m_objectMetadata = 0;
                     }
