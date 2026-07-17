@@ -135,7 +135,7 @@ i32 combatManager::ValidHexToStandOn(i32 hexIndex) {
               && (gpCombatManager->m_inCastleCombat == 0
                   || (hexIndex != COMBAT_CASTLE_GATE_APPROACH_HEX
                       && hexIndex != COMBAT_CASTLE_GATE_HEX)
-                  || (gpCombatManager->m_drawbridgeState == IDX(COMBAT_CASTLE_GATE_OPEN)
+                  || (gpCombatManager->m_drawbridgeState == COMBAT_CASTLE_GATE_OPEN
                       && (gpCombatManager->m_currentSide != COMBAT_DEFENDER_SIDE
                           || gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX]
                                      .m_occupantSide
@@ -633,7 +633,7 @@ i32 combatManager::ProcessCombatMsg(tag_message& message) {
                                 CheckSetMouseDirection(mouseX, mouseY, selectedHex_36);
                             } else {
                                 gpMouseManager->SetPointer(
-                                    GetPointer(IDX(m_currentCommand), selectedHex_36)
+                                    GetPointer(m_currentCommand, selectedHex_36)
                                 );
                             }
                         } else if (m_currentCommand == COMBAT_MESSAGE_COMMAND_ATTACK) {
@@ -897,7 +897,7 @@ i32 combatManager::CheckWin(struct tag_message* message) {
 // if/else and restored switch forms were tested. The remaining delta is branch
 // layout around the special cases and the late empty-cell arm.
 VA(0x0042c8ff, 0x51a)
-i32 combatManager::GetCommand(i32 hexIndex) {
+CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
     i32 column = hexIndex % COMBAT_GRID_ROW_LENGTH;
     i32 row = hexIndex / COMBAT_GRID_ROW_LENGTH;
     CombatMessageCommand command = COMBAT_MESSAGE_COMMAND_DEFAULT;
@@ -949,7 +949,7 @@ i32 combatManager::GetCommand(i32 hexIndex) {
                     && (gpCombatManager->m_inCastleCombat == 0
                         || (hexIndex != COMBAT_CASTLE_GATE_APPROACH_HEX
                             && hexIndex != COMBAT_CASTLE_GATE_HEX)
-                        || (gpCombatManager->m_drawbridgeState == IDX(COMBAT_CASTLE_GATE_OPEN)
+                        || (gpCombatManager->m_drawbridgeState == COMBAT_CASTLE_GATE_OPEN
                             && (gpCombatManager->m_currentSide != COMBAT_DEFENDER_SIDE
                                 || gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX]
                                            .m_occupantSide
@@ -1058,7 +1058,7 @@ i32 combatManager::RightClick(i32 hexIndex) {
                 && (gpCombatManager->m_inCastleCombat == 0
                     || (hexIndex != COMBAT_CASTLE_GATE_APPROACH_HEX
                         && hexIndex != COMBAT_CASTLE_GATE_HEX)
-                    || (gpCombatManager->m_drawbridgeState == IDX(COMBAT_CASTLE_GATE_OPEN)
+                    || (gpCombatManager->m_drawbridgeState == COMBAT_CASTLE_GATE_OPEN
                         && (gpCombatManager->m_currentSide != COMBAT_DEFENDER_SIDE
                             || gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX]
                                        .m_occupantSide
