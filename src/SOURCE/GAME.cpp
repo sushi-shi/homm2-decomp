@@ -4250,11 +4250,11 @@ i32 game::GetRandomArtifactId(i32 levelMask, i32 allowCursed) {
 
         if (!(levelMask & gArtifactLevel[artifact]))
             continue;
-        if (artifact == ARTIFACT_EDITOR_ANY_ULTIMATE || artifact == ARTIFACT_EDITOR_UNUSED_84
-            || artifact == ARTIFACT_EDITOR_UNUSED_85 || artifact == ARTIFACT_EDITOR_UNUSED_86
-            || artifact == ARTIFACT_SPELL_SCROLL || artifact == ARTIFACT_BREASTPLATE_ANDURAN
-            || artifact == ARTIFACT_BATTLE_GARB || artifact == ARTIFACT_HELMET_ANDURAN
-            || artifact == ARTIFACT_SWORD_ANDURAN || artifact == ARTIFACT_SPHERE_NEGATION)
+        if (artifact == IDX(ARTIFACT_EDITOR_ANY_ULTIMATE) || artifact == IDX(ARTIFACT_EDITOR_UNUSED_84)
+            || artifact == IDX(ARTIFACT_EDITOR_UNUSED_85) || artifact == IDX(ARTIFACT_EDITOR_UNUSED_86)
+            || artifact == IDX(ARTIFACT_SPELL_SCROLL) || artifact == IDX(ARTIFACT_BREASTPLATE_ANDURAN)
+            || artifact == IDX(ARTIFACT_BATTLE_GARB) || artifact == IDX(ARTIFACT_HELMET_ANDURAN)
+            || artifact == IDX(ARTIFACT_SWORD_ANDURAN) || artifact == IDX(ARTIFACT_SPHERE_NEGATION))
             continue;
         if (attempts++ < RANDOM_ARTIFACT_UNIQUE_RETRIES && m_randomArtifacts[artifact])
             continue;

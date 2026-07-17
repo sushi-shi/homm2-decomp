@@ -1761,9 +1761,9 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
                 }
                 NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
                 if (specialArtifactValue) {
-                    searchingHeroState->ViewArtifact(IDX(ARTIFACT_SPHERE_NEGATION), 0, -1);
+                    searchingHeroState->ViewArtifact(ARTIFACT_SPHERE_NEGATION, 0, -1);
                 } else {
-                    searchingHeroState->ViewArtifact(gpGame->m_ultimateArtifactId, 0, -1);
+                    searchingHeroState->ViewArtifact(ArtifactType(gpGame->m_ultimateArtifactId), 0, -1);
                 }
                 gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[m_currentTerrain]);
             }

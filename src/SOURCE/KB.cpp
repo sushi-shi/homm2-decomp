@@ -1651,7 +1651,7 @@ i32 EventWindowHandler(struct tag_message& msg) {
                             );
                             break;
                         case NORMAL_DIALOG_ARTIFACT:
-                            if (extra == ARTIFACT_SPELL_SCROLL) {
+                            if (extra == IDX(ARTIFACT_SPELL_SCROLL)) {
                                 sprintf(gText, gArtifactDesc[extra], gSpellNames[xTheSpell]);
                                 NormalDialog(
                                     gText,

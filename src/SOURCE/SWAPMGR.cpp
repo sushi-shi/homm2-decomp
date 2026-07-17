@@ -404,7 +404,7 @@ i32 swapManager::Main(tag_message& message) {
                                     == IDX(ARTIFACT_NONE))
                                     break;
                                 m_heroes[IDX(SWAP_SIDE_LEFT)]->ViewArtifact(
-                                    m_heroes[IDX(SWAP_SIDE_LEFT)]->m_artifacts[artifactSlot_2],
+                                    ArtifactType(m_heroes[IDX(SWAP_SIDE_LEFT)]->m_artifacts[artifactSlot_2]),
                                     SWAP_VIEW_QUICK,
                                     m_heroes[IDX(SWAP_SIDE_LEFT)]->m_artifactExtra[artifactSlot_2]
                                 );
@@ -425,7 +425,7 @@ i32 swapManager::Main(tag_message& message) {
                                 if (m_selectedSide == SWAP_SIDE_LEFT
                                     && m_selectedSlot == m_targetSlot) {
                                     m_heroes[IDX(SWAP_SIDE_LEFT)]->ViewArtifact(
-                                        m_heroes[IDX(SWAP_SIDE_LEFT)]->m_artifacts[artifactSlot_2],
+                                        ArtifactType(m_heroes[IDX(SWAP_SIDE_LEFT)]->m_artifacts[artifactSlot_2]),
                                         SWAP_VIEW_FULL,
                                         m_heroes[IDX(SWAP_SIDE_LEFT)]
                                             ->m_artifactExtra[artifactSlot_2]
@@ -474,7 +474,7 @@ i32 swapManager::Main(tag_message& message) {
                                     == IDX(ARTIFACT_NONE))
                                     break;
                                 m_heroes[IDX(SWAP_SIDE_RIGHT)]->ViewArtifact(
-                                    m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_artifacts[artifactSlot_2],
+                                    ArtifactType(m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_artifacts[artifactSlot_2]),
                                     SWAP_VIEW_QUICK,
                                     m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_artifactExtra[artifactSlot_2]
                                 );
@@ -495,7 +495,7 @@ i32 swapManager::Main(tag_message& message) {
                                 if (m_selectedSide == SWAP_SIDE_RIGHT
                                     && m_selectedSlot == m_targetSlot) {
                                     m_heroes[IDX(SWAP_SIDE_RIGHT)]->ViewArtifact(
-                                        m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_artifacts[artifactSlot_2],
+                                        ArtifactType(m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_artifacts[artifactSlot_2]),
                                         SWAP_VIEW_FULL,
                                         m_heroes[IDX(SWAP_SIDE_RIGHT)]
                                             ->m_artifactExtra[artifactSlot_2]

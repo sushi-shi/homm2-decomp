@@ -331,9 +331,9 @@ void hero::ViewStat(i32 stat, i32 quickView) {
 }
 
 VA(0x0046cdf0, 0x9b)
-void hero::ViewArtifact(i32 artifact, i32 quickView, i32 extra) {
+void hero::ViewArtifact(ArtifactType artifact, b32 quickView, i32 extra) {
     if (artifact == ARTIFACT_SPELL_SCROLL) {
-        sprintf(gText, gArtifactDesc[artifact], gSpellNames[extra]);
+        sprintf(gText, gArtifactDesc[IDX(artifact)], gSpellNames[extra]);
         NormalDialog(
             gText,
             quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW,
@@ -348,7 +348,7 @@ void hero::ViewArtifact(i32 artifact, i32 quickView, i32 extra) {
         );
     } else {
         NormalDialog(
-            gArtifactDesc[artifact],
+            gArtifactDesc[IDX(artifact)],
             quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW,
             -1,
             HERO_UI_ARTIFACT_DIALOG_ICON,
@@ -1405,7 +1405,7 @@ i32 HeroHandler(struct tag_message& message) {
                                 );
                             } else {
                                 gpHVHero->ViewArtifact(
-                                    gpHVHero->m_artifacts
+                                    ArtifactType(gpHVHero->m_artifacts)
                                         [message.payload.widget.id - HERO_UI_ARTIFACT_FIRST],
                                     quickView0,
                                     gpHVHero->m_artifactExtra
