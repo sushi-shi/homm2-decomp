@@ -791,8 +791,15 @@ skipDefaults:
     strcpy(gcRegAppPath, gMiscText.readFile.appPathDefault.text);
 }
 
-// Byte counts the registry string values are written with (hard-coded in retail; not the
-// same as the in-struct buffer sizes).
+// Registry value byte counts passed to RegQueryValueExA/RegSetValueExA. They are
+// retail literals, NOT sizeof the gConfig fields: modemInitString is char[0x64]
+// but retail moves 0x62 bytes, and networkDefaultName is char[0x18] but retail
+// moves 0x1e — six bytes past the field, faithfully reproduced.
+typedef enum RegistryValueSize {
+    REG_MODEM_INIT_STRING_SIZE = 0x62,
+    REG_UNIQUE_SYSTEM_ID_SIZE = 4,
+    REG_NETWORK_DEFAULT_NAME_SIZE = 0x1e
+} RegistryValueSize;
 
 VA(0x004c4ca0, 0x7ab)
 void ReadPrefsFromRegistry(void) {

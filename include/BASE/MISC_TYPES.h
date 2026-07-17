@@ -6,16 +6,6 @@
 #define MISC_REGISTRY_KEY "SOFTWARE\\New World Computing\\Heroes of Might and Magic 2\\1.0"
 #define MISC_PCX_SOURCE_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\Misc.cpp"
 
-// Registry value byte counts passed to RegQueryValueExA/RegSetValueExA. They are
-// retail literals, NOT sizeof the gConfig fields: modemInitString is char[0x64]
-// but retail moves 0x62 bytes, and networkDefaultName is char[0x18] but retail
-// moves 0x1e — six bytes past the field, faithfully reproduced.
-typedef enum RegistryValueSize {
-    REG_MODEM_INIT_STRING_SIZE = 0x62,
-    REG_UNIQUE_SYSTEM_ID_SIZE = 4,
-    REG_NETWORK_DEFAULT_NAME_SIZE = 0x1e
-} RegistryValueSize;
-
 template<i32 TextSize> union SMiscTextSlot {
     char text[TextSize];
     u32l alignmentValue;
