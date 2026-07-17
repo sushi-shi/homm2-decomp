@@ -48,7 +48,7 @@ public:
         i32&
     );
     float GetOddsOfWinning(i32);
-    void ValueOfBuyingBuilding(class town*, i32, i32&, float&);
+    void ValueOfBuyingBuilding(class town*, BuildingSlotType, i32&, float&);
     void GetBestBuilding(class town*, struct BHC&, float&);
     void ValueOfBuyingCreature(class town*, i32, i32&, i32, float&);
     void GetBestCreature(class town*, struct BHC&, float&);
@@ -121,7 +121,7 @@ public:
     i32 EvaluateJail(class mapCell*);
     i32 EvaluateArtifactEvent(i32, i32);
     i32 EvaluateMineEvent(i32, i32, i32, i32*);
-    i32 EvaluateMonsterEvent(i32, i32, i32*);
+    i32 EvaluateMonsterEvent(CreatureType, i32, i32*);
     i32 EvaluateHeroEvent(i32, i32, i32, i32, i32*);
     i32 EvaluateTownEvent(i32, i32, i32, i32, i32*);
 };
