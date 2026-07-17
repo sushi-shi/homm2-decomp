@@ -4226,7 +4226,7 @@ void advManager::EventWindow(
 // CFG, and three ordered relocation sites/effective targets match after removing
 // the empty loop else arm.
 VA(0x004b0033, 0xb6)
-i32 GiveArtifact(hero* eventHero, i32 artifact, i32 checkEndGame, i8 artifactExtra) {
+i32 GiveArtifact(hero* eventHero, ArtifactType artifact, b32 checkEndGame, i8 artifactExtra) {
     i32 artifactSlot;
 
     for (artifactSlot = 0; artifactSlot < EVENT_ARTIFACT_SLOT_COUNT; artifactSlot++) {
@@ -4239,7 +4239,7 @@ i32 GiveArtifact(hero* eventHero, i32 artifact, i32 checkEndGame, i8 artifactExt
         return ARTIFACT_NONE;
     }
 
-    eventHero->m_artifacts[artifactSlot] = artifact;
+    eventHero->m_artifacts[artifactSlot] = IDX(artifact);
     eventHero->m_artifactExtra[artifactSlot] = artifactExtra;
     GiveTakeArtifactStat(eventHero, artifact, 0);
     eventHero->CheckAnduranPieces(0);

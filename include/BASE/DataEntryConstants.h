@@ -14,7 +14,7 @@ HOMM2_ENUM_BEGIN(DataEntryPhase)
 HOMM2_ENUM_END(DataEntryPhase)
 
 // Widget identifiers serialized in the evntwin*.bin data-entry windows.
-HOMM2_ENUM_BEGIN(DataEntryWidgetId)
+HOMM2_ENUM_VALUES_BEGIN(DataEntryWidgetId)
     DATA_ENTRY_PROMPT_WIDGET = 1,
     DATA_ENTRY_TEXT_WIDGET = 10,
     DATA_ENTRY_BUTTON_ONE = 0x7801,
@@ -23,6 +23,6 @@ HOMM2_ENUM_BEGIN(DataEntryWidgetId)
     DATA_ENTRY_BUTTON_SIX = 0x7806,
     DATA_ENTRY_BUTTON_SEVEN = 0x7807,
     DATA_ENTRY_BUTTON_EIGHT = 0x7808
-HOMM2_ENUM_END(DataEntryWidgetId)
+HOMM2_ENUM_VALUES_END(DataEntryWidgetId)
 
 #endif // HOMM2_BASE_DATA_ENTRY_CONSTANTS_H
