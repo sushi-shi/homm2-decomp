@@ -42,19 +42,19 @@ i32 combatManager::DoSpellAI(i32 side, i32 restricted) {
     for (spellIndex = 0; spellIndex < IDX(SPELL_COUNT); spellIndex++) {
         if (m_heroes[side]->HasSpell(SpellType(spellIndex))
             && (gsSpellInfo[spellIndex].attributes & SPELL_ATTRIBUTE_COMBAT)
-            && GetManaCost(spellIndex, m_heroes[side]) <= m_heroes[side]->m_spellPoints) {
-            if (restricted && spellIndex != SPELL_FIREBALL && spellIndex != SPELL_FIREBLAST
-                && spellIndex != SPELL_LIGHTNING_BOLT && spellIndex != SPELL_CHAIN_LIGHTNING
-                && spellIndex != SPELL_HOLY_WORD && spellIndex != SPELL_HOLY_SHOUT
-                && spellIndex != SPELL_MAGIC_ARROW && spellIndex != SPELL_ARMAGEDDON
-                && spellIndex != SPELL_ELEMENTAL_STORM && spellIndex != SPELL_METEOR_SHOWER
-                && spellIndex != SPELL_COLD_RAY && spellIndex != SPELL_COLD_RING
-                && spellIndex != SPELL_DEATH_RIPPLE && spellIndex != SPELL_DEATH_WAVE)
+            && GetManaCost(SpellType(spellIndex), m_heroes[side]) <= m_heroes[side]->m_spellPoints) {
+            if (restricted && spellIndex != IDX(SPELL_FIREBALL) && spellIndex != IDX(SPELL_FIREBLAST)
+                && spellIndex != IDX(SPELL_LIGHTNING_BOLT) && spellIndex != IDX(SPELL_CHAIN_LIGHTNING)
+                && spellIndex != IDX(SPELL_HOLY_WORD) && spellIndex != IDX(SPELL_HOLY_SHOUT)
+                && spellIndex != IDX(SPELL_MAGIC_ARROW) && spellIndex != IDX(SPELL_ARMAGEDDON)
+                && spellIndex != IDX(SPELL_ELEMENTAL_STORM) && spellIndex != IDX(SPELL_METEOR_SHOWER)
+                && spellIndex != IDX(SPELL_COLD_RAY) && spellIndex != IDX(SPELL_COLD_RING)
+                && spellIndex != IDX(SPELL_DEATH_RIPPLE) && spellIndex != IDX(SPELL_DEATH_WAVE))
                 continue;
             DetermineEffectOfSpell(spellIndex, &effectScore, &candidateHex);
 
             manaRatioResult =
-                m_heroes[side]->m_spellPoints / GetManaCost(spellIndex, m_heroes[side]);
+                m_heroes[side]->m_spellPoints / GetManaCost(SpellType(spellIndex), m_heroes[side]);
             if (manaRatioResult > COMBAT_SPELL_AI_MAX_MANA_RATIO)
                 manaRatioResult = COMBAT_SPELL_AI_MAX_MANA_RATIO;
             effectScore = static_cast<i32>(effectScore * gfSpellCastableCombatMod[manaRatioResult]);
