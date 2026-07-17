@@ -846,12 +846,12 @@ public:
     i32 ValidHexToStandOn(i32);
     void SetCombatDirections(i32);
     void CheckSetMouseDirection(i32, i32, i32);
-    i32 GetPointer(i32, i32);
+    i32 GetPointer(CombatMessageCommand, i32);
     i32 ProcessCombatMsg(struct tag_message&);
     i32 IsNegationSphereInEffect(void);
     void ResetRound(void);
     i32 CheckWin(struct tag_message*);
-    i32 GetCommand(i32);
+    CombatMessageCommand GetCommand(i32);
     i32 RightClick(i32);
     void DoCommand(i32);
     void ClearWinLoseBottom(class heroWindow*);
