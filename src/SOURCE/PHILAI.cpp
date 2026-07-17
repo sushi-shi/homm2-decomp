@@ -2146,13 +2146,13 @@ void philAI::ValueOfBuyingBuilding(
             break;
         case BUILDING_SLOT_SPECIAL_EIGHT:
         case BUILDING_SLOT_SPECIAL_NINE:
-        case 12:
-        case 15:
+        case BUILDING_SLOT_SPECIAL_TWELVE:
+        case BUILDING_SLOT_NEUTRAL_LAST:
         deferEarlyBuilding:
             if (giCurTurn < 16)
                 adjustedValue = 0.0f;
             break;
-        case 13:
+        case BUILDING_SLOT_SPECIAL:
             if (townPtr->m_type == 0 || townPtr->m_type == 2 || townPtr->m_type == 1
                 || townPtr->m_type == 5) {
                 goto deferEarlyBuilding;
