@@ -159,7 +159,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     "of magic mushrooms.  In exchange for his freedom, he guides you to a small "
                     "pot filled with precious things.",
                     cell->m_objectMetadata - MAP_EVENT_RESOURCE_OFFSET,
-                    cell->m_objectMetadata - MAP_EVENT_RESOURCE_OFFSET == RES_GOLD
+                    cell->m_objectMetadata - MAP_EVENT_RESOURCE_OFFSET == IDX(RES_GOLD)
                         ? MAP_EVENT_GOLD_AMOUNT
                         : MAP_EVENT_RESOURCE_AMOUNT,
                     -1,
@@ -169,7 +169,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 GiveResource(
                     eventHero2,
                     cell->m_objectMetadata - MAP_EVENT_RESOURCE_OFFSET,
-                    cell->m_objectMetadata - MAP_EVENT_RESOURCE_OFFSET == RES_GOLD
+                    cell->m_objectMetadata - MAP_EVENT_RESOURCE_OFFSET == IDX(RES_GOLD)
                         ? MAP_EVENT_GOLD_AMOUNT
                         : MAP_EVENT_RESOURCE_AMOUNT
                 );
@@ -5653,7 +5653,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 GiveResource(
                     eventHero,
                     cell->m_objectMetadata - MAP_EVENT_RESOURCE_OFFSET,
-                    cell->m_objectMetadata - MAP_EVENT_RESOURCE_OFFSET == RES_GOLD
+                    cell->m_objectMetadata - MAP_EVENT_RESOURCE_OFFSET == IDX(RES_GOLD)
                         ? MAP_EVENT_GOLD_AMOUNT
                         : MAP_EVENT_RESOURCE_AMOUNT
                 );

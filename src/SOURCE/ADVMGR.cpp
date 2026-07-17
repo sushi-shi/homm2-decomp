@@ -5664,7 +5664,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
     messageLocal.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
     messageLocal.payload.widget.id = 2;
     messageLocal.payload.widget.data.value = quickTownLocal->m_type + 9;
-    if ((gpGame->GetTown(townId)->m_buildings & (1 << BUILDING_SLOT_CASTLE)) == 0) {
+    if ((gpGame->GetTown(townId)->m_buildings & BIT(BUILDING_SLOT_CASTLE)) == 0) {
         messageLocal.payload.widget.data.value += 6;
     }
     townQuickWindow->BroadcastMessage(messageLocal);

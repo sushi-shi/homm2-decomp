@@ -411,7 +411,7 @@ i32 philAI::GoodAdjacent(i32* direction) {
             kn = normalDirTable[jb].x + gpCurAIHero->m_x;
             nb = normalDirTable[jb].y + gpCurAIHero->m_y;
             if ((gpAdvManager->GetCell(kn, IDX(nb))->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
-                && !(mapExtra[kn + (MAP_WIDTH | 0) * nb] & MAP_EXTRA_ADJACENT_MONSTER)
+                && !(mapExtra[kn + (MAP_WIDTH | 0) * nb] & IDX(MAP_EXTRA_ADJACENT_MONSTER))
                 && ((gpAdvManager->GetCell(kn, IDX(nb))->m_triggerType & MAP_TRIGGER_TYPE_MASK)
                     != MAP_OBJECT_MONSTER)
                 && ((gpAdvManager->GetCell(kn, IDX(nb))->m_triggerType & MAP_TRIGGER_TYPE_MASK)
@@ -2127,13 +2127,13 @@ void philAI::ValueOfBuyingBuilding(
             break;
         case IDX(BUILDING_SLOT_SPECIAL_ONE):
             if (townPtr->m_type == 5
-                && (townPtr->m_buildings & (1 << BUILDING_SLOT_DWELLING_THIRD)))
+                && (townPtr->m_buildings & BIT(BUILDING_SLOT_DWELLING_THIRD)))
                 adjustedValue = 1500.0f;
             else if (giCurTurn < 21)
                 adjustedValue = 0.0f;
             break;
         case IDX(BUILDING_SLOT_SPECIAL_SEVEN):
-            if (giCurTurn < 3 && !(townPtr->m_buildings & (1 << BUILDING_SLOT_DWELLING_THIRD)))
+            if (giCurTurn < 3 && !(townPtr->m_buildings & BIT(BUILDING_SLOT_DWELLING_THIRD)))
                 adjustedValue = 0.0f;
             break;
         case 10:
@@ -2172,7 +2172,7 @@ void philAI::ValueOfBuyingBuilding(
             );
             adjustedValue = static_cast<float>((dwellingTotal * 0.33 + 0.66) * adjustedValue);
             if ((townPtr->m_type != 0
-                 || !(townPtr->m_buildings & (1 << BUILDING_SLOT_DWELLING_SECOND)))
+                 || !(townPtr->m_buildings & BIT(BUILDING_SLOT_DWELLING_SECOND)))
                 && gpGame->m_day < 6)
                 adjustedValue = 0.0f;
             break;
@@ -2180,9 +2180,9 @@ void philAI::ValueOfBuyingBuilding(
             if (townPtr->m_type == 5)
                 break;
             if ((townPtr->m_type == 0
-                 && (townPtr->m_buildings & (1 << BUILDING_SLOT_DWELLING_THIRD)))
+                 && (townPtr->m_buildings & BIT(BUILDING_SLOT_DWELLING_THIRD)))
                 || (townPtr->m_type == 2
-                    && (townPtr->m_buildings & (1 << BUILDING_SLOT_DWELLING_THIRD)))) {
+                    && (townPtr->m_buildings & BIT(BUILDING_SLOT_DWELLING_THIRD)))) {
                 adjustedValue = 1000.0f;
             } else {
                 goto deferEarlyBuilding;
@@ -2223,7 +2223,7 @@ void philAI::ValueOfBuyingBuilding(
             );
             if (building - BUILDING_SLOT_DWELLING_FIRST < highestDwellingId)
                 adjustedValue = static_cast<float>((1.66 - dwellingTotal * 0.33) * adjustedValue);
-            if (townPtr->m_buildings & (1 << BUILDING_SLOT_SPECIAL_FOUR))
+            if (townPtr->m_buildings & BIT(BUILDING_SLOT_SPECIAL_FOUR))
                 adjustedValue = static_cast<float>(adjustedValue * 1.1);
             for (buildingLevel = 0; buildingLevel < AI_DWELLING_LEVELS; buildingLevel++) {
                 currentCreatureType = gDwellingType[townPtr->m_type][buildingLevel];
@@ -5267,7 +5267,7 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
             case MAP_OBJECT_MAGIC_GARDEN:
                 if (!cell_k->m_objectMetadata)
                     value_h = 0;
-                else if (cell_k->m_objectMetadata - 1 == RES_GOLD)
+                else if (cell_k->m_objectMetadata - 1 == IDX(RES_GOLD))
                     value_h = static_cast<i32>(
                         gafAITurnCostResource[IDX(RES_GOLD)] * AI_MAGIC_GARDEN_GOLD_AMOUNT
                     );

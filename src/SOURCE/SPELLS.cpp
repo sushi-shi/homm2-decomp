@@ -3526,30 +3526,30 @@ void combatManager::Earthquake(void) {
             i32 width =
                 COMBAT_SCREEN_WIDTH
                 - abs(
-                    shakeOffsets[frame * EARTHQUAKE_SHAKE_COORDINATE_COUNT + COMBAT_COORDINATE_X]
+                    shakeOffsets[frame * EARTHQUAKE_SHAKE_COORDINATE_COUNT + IDX(COMBAT_COORDINATE_X)]
                 );
             i32 height =
                 COMBAT_AREA_HEIGHT
-                - abs(shakeOffsets[frame * EARTHQUAKE_SHAKE_COORDINATE_COUNT + COMBAT_COORDINATE_Y])
+                - abs(shakeOffsets[frame * EARTHQUAKE_SHAKE_COORDINATE_COUNT + IDX(COMBAT_COORDINATE_Y)])
                 - 1;
             u8* source =
                 m_backgroundBuffer->m_pixels
-                + (shakeOffsets[frame * EARTHQUAKE_SHAKE_COORDINATE_COUNT + COMBAT_COORDINATE_Y] > 0
+                + (shakeOffsets[frame * EARTHQUAKE_SHAKE_COORDINATE_COUNT + IDX(COMBAT_COORDINATE_Y)] > 0
                        ? shakeOffsets
-                             [frame * EARTHQUAKE_SHAKE_COORDINATE_COUNT + COMBAT_COORDINATE_Y]
+                             [frame * EARTHQUAKE_SHAKE_COORDINATE_COUNT + IDX(COMBAT_COORDINATE_Y)]
                        : 0)
                       * COMBAT_SCREEN_WIDTH
-                + (shakeOffsets[frame * EARTHQUAKE_SHAKE_COORDINATE_COUNT + COMBAT_COORDINATE_X] > 0
+                + (shakeOffsets[frame * EARTHQUAKE_SHAKE_COORDINATE_COUNT + IDX(COMBAT_COORDINATE_X)] > 0
                        ? shakeOffsets
-                             [frame * EARTHQUAKE_SHAKE_COORDINATE_COUNT + COMBAT_COORDINATE_X]
+                             [frame * EARTHQUAKE_SHAKE_COORDINATE_COUNT + IDX(COMBAT_COORDINATE_X)]
                        : 0);
             i32 destinationX =
-                shakeOffsets[frame * EARTHQUAKE_SHAKE_COORDINATE_COUNT + COMBAT_COORDINATE_X] <= 0
-                    ? -shakeOffsets[frame * EARTHQUAKE_SHAKE_COORDINATE_COUNT + COMBAT_COORDINATE_X]
+                shakeOffsets[frame * EARTHQUAKE_SHAKE_COORDINATE_COUNT + IDX(COMBAT_COORDINATE_X)] <= 0
+                    ? -shakeOffsets[frame * EARTHQUAKE_SHAKE_COORDINATE_COUNT + IDX(COMBAT_COORDINATE_X)]
                     : 0;
             i32 destinationY =
-                shakeOffsets[frame * EARTHQUAKE_SHAKE_COORDINATE_COUNT + COMBAT_COORDINATE_Y] <= 0
-                    ? -shakeOffsets[frame * EARTHQUAKE_SHAKE_COORDINATE_COUNT + COMBAT_COORDINATE_Y]
+                shakeOffsets[frame * EARTHQUAKE_SHAKE_COORDINATE_COUNT + IDX(COMBAT_COORDINATE_Y)] <= 0
+                    ? -shakeOffsets[frame * EARTHQUAKE_SHAKE_COORDINATE_COUNT + IDX(COMBAT_COORDINATE_Y)]
                     : 0;
             u8* destination = gpWindowManager->m_screen->m_pixels
                               + destinationY * COMBAT_SCREEN_WIDTH + destinationX;

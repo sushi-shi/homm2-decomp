@@ -747,7 +747,7 @@ void hero::CheckLevel(void) {
                                 break;
                             }
                         }
-                        skillIndexValue = (skillIndexValue + 1) % HERO_SKILL_COUNT;
+                        skillIndexValue = (skillIndexValue + 1) % IDX(HERO_SKILL_COUNT);
                     }
                     attempts--;
                 }
