@@ -903,6 +903,10 @@ extern i32 iNextShingleAnim;
 extern i32 iShingleAnimFrame;
 extern i32 MAP_HEIGHT;
 extern i32 MAP_WIDTH;
+typedef enum MapExtraFlag {
+    MAP_EXTRA_ADJACENT_MONSTER = 0x80,
+    MAP_EXTRA_ADJACENT_CLEAR_MASK = 0x7f
+} MapExtraFlag;
 extern u8* mapExtra;
 extern tag_tilePoint normalDirTable[];
 extern SAMPLE2 NULL_SAMPLE2;

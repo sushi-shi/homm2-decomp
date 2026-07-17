@@ -452,7 +452,7 @@ void inputManager::MakeScanCodeTable(void) {
     m_keyState[INPUT_SCAN_0] = '0';
     m_keyState[INPUT_SCAN_MINUS] = '-';
     m_keyState[INPUT_SCAN_EQUALS] = '=';
-    m_keyState[INPUT_SCAN_BACKSPACE] = 0x7f;
+    m_keyState[INPUT_SCAN_BACKSPACE] = 127;
     m_keyState[INPUT_SCAN_TAB] = '\t';
     m_keyState[INPUT_SCAN_Q] = 'Q';
     m_keyState[INPUT_SCAN_W] = 'W';

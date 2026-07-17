@@ -29,12 +29,12 @@
 
 VA(0x004d2580, 0x2e)
 palette::palette(void) : resource(2, 0, 1, 0) {
-    m_data = static_cast<i8*>(H2_ALLOC(0x300, 8));
+    m_data = static_cast<i8*>(H2_ALLOC(PALETTE_DATA_SIZE, 8));
 }
 
 VA(0x004d2600, 0x55)
 palette::palette(u32l id) : resource(2, id, 1, 0) {
-    m_data = static_cast<i8*>(H2_ALLOC_AT(0x300, RETAIL_FILE "\0", 13));
+    m_data = static_cast<i8*>(H2_ALLOC_AT(PALETTE_DATA_SIZE, RETAIL_FILE "\0", 13));
     gpResourceManager->PointToFile(id);
     gpResourceManager->ReadBlock(m_data, MISC_PALETTE_BYTE_COUNT);
 }

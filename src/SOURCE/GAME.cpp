@@ -86,9 +86,32 @@ DATA(0x004f7e90) static i16 gCompressTest2SourceLine = 0x1f72;
 DATA(0x004f7f84) static i16 gCompressTestSourceLine = 0x1f95;
 
 #define RETAIL_FILE const_cast<char*>("I:\\Projects\\Heroes\\Prog\\SOURCE\\GAME.CPP")
-// Call sites pass hardcoded retail line numbers by policy; the line-base DATA
-// words above still own their retail storage. (Retail itself loads the words
-// and adds an offset — a known, accepted divergence.)
+
+// GAME-private tuning and encoding constants.
+typedef enum GameTuningConstant {
+    RANDOM_SCAN_RETRY_LIMIT = 10000,
+    EXPERIENCE_HERO_PRESENCE_BONUS = 500,
+    MINE_FLAG_OVERWRITE_LIMIT = 0x30,   // highest passive object id a mine flag may cover
+    RANDOM_MONSTER_SPRITE_FIRST = 0x43, // MONS32 placeholder frames for random monsters 1-4
+    RANDOM_MONSTER_SPRITE_LAST = 0x46,
+    RANDOM_MONSTER_SPRITE_TO_TRIGGER =
+        0x70,                     // sprite index + 0x70 == its MAP_TRIGGER_RANDOM_MONSTER_LEVEL_*
+    BANK_GUARDIAN_FLAG = 0x100,   // creature-bank metadata: defenders present
+    TOWN_RECORD_TYPE_MASK = 0x7f, // saved town record: low bits carry the race
+    COMPRESS_TEST_ITERATIONS = 100
+} GameTuningConstant;
+
+typedef enum ViewArmyControlId {
+    VIEW_ARMY_QUICK_VIEW_ID = 0x7800,
+    VIEW_ARMY_UPGRADE_ID = 0x7803
+} ViewArmyControlId;
+
+// Retail's original source passed plain __FILE__/__LINE__ here: under /Od /Gi,
+// MSVC 4.2 lowers __LINE__ to a compiler-synthesized per-function static i16
+// anchor (?__LINE__Var@...) loaded with movsx and offset with add — that is the
+// entire origin of the retail "line base" words. The DATA statics above stand
+// in for that synthesized storage; call sites pass the resulting retail line
+// numbers as literals.
 // Retail folds the embedded member offset into Row/Extra accesses after inlining.
 #define WORLDMAP (&m_worldMap)
 
@@ -411,7 +434,7 @@ i32 game::CreateBoat(i32 x, i32 y, i32 notify) {
         mapCell* cell = WORLDMAP->Row(y) + x;
         boat->savedTriggerType = cell->m_triggerType;
         boat->savedEventData = static_cast<u8>(cell->m_objectMetadata);
-        cell->m_triggerType = 0xab;
+        cell->m_triggerType = MAP_TRIGGER_BOAT;
         cell->m_objectMetadata = boatIdx;
     }
     return boatIdx;
@@ -431,7 +454,7 @@ VA(0x004719f7, 0x76)
 i32 game::RandomScan(i8* array, i32 start, i32 range, i32 unused, i8 target) {
     i32 idx = target;
     i32 i;
-    for (i = 0; i < 0x2710; i++) {
+    for (i = 0; i < RANDOM_SCAN_RETRY_LIMIT; i++) {
         idx = start + Random(0, range - 1);
         if (array[idx] == target)
             return idx;
@@ -1247,7 +1270,7 @@ void game::NewMap(char* filename) {
                                    .m_occupyingHeroId
                                == -1
                         && ((m_castleRecs[(m_players + player2)->m_townIds[townIndex9]].m_buildings
-                             & 0x40)
+                             & TOWN_BUILDING_CASTLE)
                                 != 0
                             || pass27 == 1))
                         selectedTown14 = townIndex9;
@@ -1315,7 +1338,7 @@ void game::NewMap(char* filename) {
         }
         {
             if (xIsPlayingExpansionCampaign && player2 == 0) {
-                specialClass6 = 0xffffffff;
+                specialClass6 = GAME_SPECIAL_HERO_CLASS_NONE;
                 if (xCampaign.HasAward(6)) {
                     specialClass6 = 4;
                     specialName3 = xCampaign.JosephName();
@@ -1367,7 +1390,7 @@ void game::NewMap(char* filename) {
                 m_worldMap.GetCell(heroX6, heroY16)->m_triggerType;
             m_heroRecs[m_players[player2].m_heroIds[campaignHero15]].m_occupiedTown =
                 m_worldMap.GetCell(heroX6, heroY16)->m_objectMetadata;
-            m_worldMap.GetCell(heroX6, heroY16)->m_triggerType = 0xaa;
+            m_worldMap.GetCell(heroX6, heroY16)->m_triggerType = MAP_TRIGGER_HERO;
             m_worldMap.GetCell(heroX6, heroY16)->m_objectMetadata =
                 m_players[player2].m_heroIds[campaignHero15];
         }
@@ -1647,7 +1670,7 @@ void game::RandomizeEvents(void) {
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_TREASURE_CHEST:
                     if (giGroundToTerrain[cell2->m_terrainImageIndex] == 0) {
-                        cell2->m_triggerType = 0xa1;
+                        cell2->m_triggerType = MAP_TRIGGER_SEA_CHEST;
                         randomValue7 = Random(0, 100);
                         if (randomValue7 < 20)
                             cell2->m_objectMetadata = 0;
@@ -1742,7 +1765,7 @@ void game::RandomizeEvents(void) {
                         if (cell2->m_objectIndex != 59 && cell2->m_objectIndex != 62
                             && cell2->m_objectIndex != 63 && cell2->m_objectIndex != 64
                             && cell2->m_objectIndex != 65 && Random(0, 100) < 20)
-                            cell2->m_objectMetadata |= 0x1000;
+                            cell2->m_objectMetadata |= MAP_MONSTER_GUARD_FLAG;
                     }
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RESOURCE:
@@ -1803,13 +1826,13 @@ void game::RandomizeEvents(void) {
                     cell2->m_objectMetadata = Random(20, 40);
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_TROLL_BRIDGE:
-                    cell2->m_objectMetadata = Random(4, 6) | 0x100;
+                    cell2->m_objectMetadata = Random(4, 6) | BANK_GUARDIAN_FLAG;
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CITY_OF_DEAD:
-                    cell2->m_objectMetadata = Random(4, 6) | 0x100;
+                    cell2->m_objectMetadata = Random(4, 6) | BANK_GUARDIAN_FLAG;
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_DRAGON_CITY:
-                    cell2->m_objectMetadata = 0x102;
+                    cell2->m_objectMetadata = BANK_GUARDIAN_FLAG | 2;
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CAVE:
                     cell2->m_objectMetadata = Random(10, 20);
@@ -1845,19 +1868,19 @@ void game::RandomizeEvents(void) {
                             else if (gArtifactLevel[value26] == 2)
                                 cell2->m_objectMetadata = (Random(0, 5) << 4) | 7;
                         } else {
-                            artifactChoices17[6] = 9;
-                            artifactChoices17[7] = 10;
-                            artifactChoices17[8] = 19;
-                            artifactChoices17[9] = 60;
-                            artifactChoices17[0] = 35;
-                            artifactChoices17[1] = 36;
-                            artifactChoices17[2] = 37;
-                            artifactChoices17[3] = 56;
-                            artifactChoices17[4] = 45;
-                            artifactChoices17[5] = 46;
+                            artifactChoices17[6] = CREATURE_PALADIN;
+                            artifactChoices17[7] = CREATURE_CRUSADER;
+                            artifactChoices17[8] = CREATURE_CYCLOPS;
+                            artifactChoices17[9] = CREATURE_GENIE;
+                            artifactChoices17[0] = CREATURE_GREEN_DRAGON;
+                            artifactChoices17[1] = CREATURE_RED_DRAGON;
+                            artifactChoices17[2] = CREATURE_BLACK_DRAGON;
+                            artifactChoices17[3] = CREATURE_BONE_DRAGON;
+                            artifactChoices17[4] = CREATURE_GIANT;
+                            artifactChoices17[5] = CREATURE_TITAN;
                             cell2->m_objectMetadata = 1;
                             if (gArtifactLevel[value26] == 8)
-                                cell2->m_objectMetadata |= 0x39;
+                                cell2->m_objectMetadata |= CREATURE_ROGUE;
                             else if (gArtifactLevel[value26] == 4)
                                 cell2->m_objectMetadata |= artifactChoices17[Random(0, 3) + 6];
                             else
@@ -2060,7 +2083,7 @@ void game::InitializePasswords(void) {
     for (i = 0; i < 8; i++) {
         flag = 0;
         while (flag == 0) {
-            xPasswordStringsIndex[i] = Random(0, 0xd2);
+            xPasswordStringsIndex[i] = Random(0, 210);
             flag = 1;
             for (j = 0; j < i; j++) {
                 if (xPasswordStringsIndex[j] == xPasswordStringsIndex[i])
@@ -2109,11 +2132,11 @@ i32 game::LoadMap(char* filename) {
             m_castleRecs[i37].m_onMap = 1;
             m_castleRecs[i37].m_x = static_cast<u8>(column5[0]);
             m_castleRecs[i37].m_y = static_cast<u8>(row9[0]);
-            m_castleRecs[i37].m_type = static_cast<i8>(type5[0] & 0x7f);
+            m_castleRecs[i37].m_type = static_cast<i8>(type5[0] & TOWN_RECORD_TYPE_MASK);
             if (type5[0] < 0)
-                m_castleRecs[i37].m_buildings |= 0x40;
+                m_castleRecs[i37].m_buildings |= TOWN_BUILDING_CASTLE;
             else
-                m_castleRecs[i37].m_buildings |= 0x20;
+                m_castleRecs[i37].m_buildings |= TOWN_BUILDING_TENT;
         }
     }
 
@@ -2307,7 +2330,7 @@ i32 game::ViewSpells(hero* spellHero, i32 spellType, i32 (*callback)(tag_message
         m_viewSpellsCount[0] = spellHero->GetNumSpells(0);
         m_viewSpellsTop[1] = 0;
         m_viewSpellsCount[1] = spellHero->GetNumSpells(1);
-        m_viewSpellsWindow = new heroWindow(0x56, 0x57, const_cast<char*>("spellwin.bin"));
+        m_viewSpellsWindow = new heroWindow(86, 87, const_cast<char*>("spellwin.bin"));
         if (m_viewSpellsWindow == 0)
             MemError();
         if (spellType != 2) {
@@ -2453,7 +2476,7 @@ i32 ViewSpellsHandler(tag_message& msg) {
         switch (msg.payload.widget.command) {
             case WIDGET_COMMAND_DESELECT:
                 if (msg.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT
-                    || (msg.payload.widget.parameter & 0x200) != 0)
+                    || (msg.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) != 0)
                     break;
                 {
                     switch (msg.payload.widget.id) {
@@ -2499,7 +2522,7 @@ i32 ViewSpellsHandler(tag_message& msg) {
             case WIDGET_COMMAND_SELECT:
             case WIDGET_COMMAND_ALTERNATE_SELECT:
                 if (msg.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT
-                    || (msg.payload.widget.parameter & 0x200) != 0) {
+                    || (msg.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) != 0) {
                     switch (msg.payload.widget.id) {
                         case 100:
                         case 101:
@@ -2749,7 +2772,7 @@ void game::ViewArmy(
     message6.payload.widget.data.text = armyName8;
     m_viewArmyWindow->BroadcastMessage(message6);
 
-    char* details9 = static_cast<char*>(H2_ALLOC(0x226, 3684));
+    char* details9 = static_cast<char*>(H2_ALLOC(550, 3684));
     i32 morale2 = theGroup ? theGroup->GetMorale(theHero, castle, 0) : 0;
     if (monster8->flags.all & MONSTER_FLAGS_NO_MORALE)
         morale2 = 0;
@@ -2827,13 +2850,13 @@ void game::ViewArmy(
     if (disableUpgrade) {
         message6.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message6.payload.widget.data.text = reinterpret_cast<char*>(6);
-        message6.payload.widget.id = 0x7803;
+        message6.payload.widget.id = VIEW_ARMY_UPGRADE_ID;
         m_viewArmyWindow->BroadcastMessage(message6);
     }
     if (quickView) {
         message6.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message6.payload.widget.data.text = reinterpret_cast<char*>(6);
-        message6.payload.widget.id = 0x7800;
+        message6.payload.widget.id = VIEW_ARMY_QUICK_VIEW_ID;
         m_viewArmyWindow->BroadcastMessage(message6);
     }
     if (numTroops < 1) {
@@ -3458,7 +3481,8 @@ void game::PerDay(void) {
     }
 
     for (player = 0; player < GAME_HERO_COUNT; player++)
-        m_heroRecs[player].m_eventFlags = m_heroRecs[player].m_eventFlags & 0xfffeffff;
+        m_heroRecs[player].m_eventFlags =
+            m_heroRecs[player].m_eventFlags & ~WEEKLY_HERO_RESERVED_FLAG;
 
     for (player = 0; player < gpGame->m_playerCount; player++) {
         for (resource8 = 0; resource8 < 6; resource8++) {
@@ -3495,7 +3519,7 @@ void game::PerDay(void) {
         if (currentHero6->m_spellPoints < restoredSpellPoints13)
             currentHero6->m_spellPoints = static_cast<i16>(restoredSpellPoints13);
         if (currentHero6->m_eventFlags & HERO_EVENT_MAGIC_WELL)
-            currentHero6->m_eventFlags = currentHero6->m_eventFlags - 0x1000U;
+            currentHero6->m_eventFlags = currentHero6->m_eventFlags - HERO_EVENT_MAGIC_WELL;
     }
 
     for (player = 0; player < GAME_TOWN_COUNT; player++) {
@@ -3630,7 +3654,8 @@ void game::PerWeek(void) {
         for (mapX8 = 0; mapX8 < MAP_WIDTH; mapX8++) {
             switch (WORLDMAP->Row(mapY5)[mapX8].m_triggerType) {
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MONSTER: {
-                    monsterCount36 = WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata & 0xfff;
+                    monsterCount36 =
+                        WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata & MAP_MONSTER_COUNT_MASK;
                     monsterIncrease16 = monsterCount36 / 7;
                     if (Random(1, 7) <= static_cast<i32>(monsterCount36 % 7))
                         monsterIncrease16++;
@@ -3638,7 +3663,7 @@ void game::PerWeek(void) {
                     if (monsterCount36 > WEEKLY_MONSTER_LIMIT)
                         monsterCount36 = WEEKLY_MONSTER_LIMIT;
                     WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata =
-                        (WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata & 0x1000)
+                        (WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata & MAP_MONSTER_GUARD_FLAG)
                         | monsterCount36;
                     break;
                 }
@@ -3805,7 +3830,7 @@ void game::WeeklyRecruitSite(mapCell* cell) {
 VA(0x0047ebd5, 0x6f)
 void game::WeeklyGenericSite(mapCell* cell) {
     i32 type = cell->m_objectMetadata;
-    type &= 0x3f;
+    type &= WEEKLY_SITE_TYPE_MASK;
     switch (type) {
         case 4:
             cell->m_objectMetadata = type;
@@ -3886,7 +3911,7 @@ void game::PerMonth(void) {
                         cell0->m_objectMetadata = ((firstCount5 | 0) + secondCount4) | 0;
                         if (Random(MONTH_MONSTER_SPAWN_MIN, MONTH_MONSTER_GUARD_ROLL_MAX)
                             < MONTH_MONSTER_GUARD_CHANCE)
-                            cell0->m_objectMetadata |= MONTH_MONSTER_GUARD_FLAG;
+                            cell0->m_objectMetadata |= MAP_MONSTER_GUARD_FLAG;
                     }
                 }
             }
@@ -4181,7 +4206,7 @@ void game::RandomizeMine(i32 x, i32 y) {
                 > 0)
                 if ((WORLDMAP->GetCell(columnOffset4 + x, y - rowOffset0)->m_triggerType
                      & MAP_TRIGGER_TYPE_MASK)
-                    <= 0x30)
+                    <= MINE_FLAG_OVERWRITE_LIMIT)
                     continue;
             WORLDMAP->GetCell(columnOffset4 + x, y - rowOffset0)->m_objectMetadata = mineId;
             WORLDMAP->GetCell(columnOffset4 + x, y - rowOffset0)->m_triggerType = triggerType19;
@@ -4400,9 +4425,10 @@ void game::ProcessRandomObjects(void) {
                     maxValue17 = 100000;
                     goto randomMonster;
                 randomMonster:
-                    if (cell6->m_objectTileset == TILESET_MONS32 && cell6->m_objectIndex >= 0x43
-                        && cell6->m_objectIndex <= 0x46) {
-                        randomObjectType3 = cell6->m_objectIndex + 0x70;
+                    if (cell6->m_objectTileset == TILESET_MONS32
+                        && cell6->m_objectIndex >= RANDOM_MONSTER_SPRITE_FIRST
+                        && cell6->m_objectIndex <= RANDOM_MONSTER_SPRITE_LAST) {
+                        randomObjectType3 = cell6->m_objectIndex + RANDOM_MONSTER_SPRITE_TO_TRIGGER;
                         switch (randomObjectType3) {
                             case MAP_TRIGGER_RANDOM_MONSTER_LEVEL_1:
                                 minValue7 = 0;
@@ -4714,7 +4740,7 @@ i32 game::ExperienceValueOfStack(armyGroup* group, hero* h) {
         }
     }
     if (h != 0)
-        exp += 0x1f4;
+        exp += EXPERIENCE_HERO_PRESENCE_BONUS;
     return exp;
 }
 
@@ -4759,14 +4785,14 @@ VA(0x0048111f, 0xf1)
 void game::SetupAdjacentMons(void) {
     i32 col;
     i32 row;
-    u8 mask = 0x7f;
+    u8 mask = MAP_EXTRA_ADJACENT_CLEAR_MASK;
     {
         i32 x;
         i32 y;
         for (x = 0; x < MAP_WIDTH; x++) {
             for (y = 0; y < MAP_HEIGHT; y++) {
                 if (gpAdvManager->FindAdjacentMonster(x, y, &col, &row, -1, -1))
-                    mapExtra[y * MAP_WIDTH + x] |= 0x80;
+                    mapExtra[y * MAP_WIDTH + x] |= MAP_EXTRA_ADJACENT_MONSTER;
                 else
                     mapExtra[y * MAP_WIDTH + x] &= mask;
             }
@@ -5030,8 +5056,9 @@ void game::SetupTowns(void) {
         }
 
         if (extra->hasCustomBuildings) {
-            castle->m_buildings = (gTownEligibleBuildMask[castle->m_type] & extra->buildings)
-                                  | (castle->m_buildings & 0x60);
+            castle->m_buildings =
+                (gTownEligibleBuildMask[castle->m_type] & extra->buildings)
+                | (castle->m_buildings & (TOWN_BUILDING_CASTLE | TOWN_BUILDING_TENT));
             castle->m_buildState = extra->mageGuildLevel;
         } else {
             defaultDwellingRoll[0] = 1;
@@ -5045,11 +5072,11 @@ void game::SetupTowns(void) {
             defaultDwellingRoll[8] = 1;
             defaultDwellingRoll[9] = 2;
             dwellingCount = defaultDwellingRoll[Random(0, 99) / 10];
-            castle->m_buildings |= 0x80000;
+            castle->m_buildings |= TOWN_BUILDING_DWELLING_1;
             if (!gbHumanPlayer[castle->m_owner] && dwellingCount == 1 && Random(1, 10) < 4)
                 dwellingCount++;
             if (--dwellingCount != 0)
-                castle->m_buildings |= 0x100000;
+                castle->m_buildings |= TOWN_BUILDING_DWELLING_2;
             dwellingCount--;
             castle->m_buildState = 0;
         }
@@ -5076,7 +5103,7 @@ void game::SetupTowns(void) {
             }
         }
         if (extra->hasShrine)
-            castle->m_buildings |= 0x8000;
+            castle->m_buildings |= TOWN_BUILDING_CAPTAIN_QUARTERS;
         castle->m_mayNotUpgradeToCastle = extra->unknown28;
         strcpy(castle->m_name, extra->name);
 
@@ -5284,7 +5311,7 @@ void game::ProcessOnMapHeroes(void) {
 
                         if (isJail6) {
                             mapHero0->m_owner = -1;
-                            m_availableHeroes[extra0->heroId] = 0x41;
+                            m_availableHeroes[extra0->heroId] = HERO_AVAILABILITY_JAILED;
                         } else {
                             mapHero0->m_owner = extra0->owner;
                             m_availableHeroes[extra0->heroId] = mapHero0->m_owner;
@@ -5535,7 +5562,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
     fileSize = FileSize(filename);
     LogInt(const_cast<char*>("PostDiffFileSize"), fileSize, -999, -999, -999, -999, -999, -999);
 
-    header = static_cast<i32*>(H2_ALLOC(0x100, 6797));
+    header = static_cast<i32*>(H2_ALLOC(256, 6797));
     if (gbUseRegularCompression)
         transmitData = static_cast<u8*>(H2_ALLOC(fileSize + 2000, 6799));
     fileData = static_cast<u8*>(H2_ALLOC(fileSize + 2000, 6800));
@@ -5767,7 +5794,7 @@ i32 game::ReceiveSaveGame(
     memset(received, 0, 5000);
     if (gbUseRegularCompression)
         decodedData = static_cast<u8*>(H2_ALLOC(700000, 7012));
-    ackBuffer = static_cast<u8*>(H2_ALLOC(0x100, 7014));
+    ackBuffer = static_cast<u8*>(H2_ALLOC(256, 7014));
     incomingData = static_cast<u8*>(H2_ALLOC(dataSize + 2000, 7015));
 
     lastPacketTime = KBTickCount();
@@ -5982,7 +6009,7 @@ void game::DoNewTurn(void) {
                     sprintf(gText, cNewTurn[2], gMonthNames[giMonthTypeExtra]);
                 } else if (giMonthType == 1) {
                     strcpy(lowerName19, gArmyNames[giMonthTypeExtra]);
-                    lowerName19[0] -= 0x20;
+                    lowerName19[0] -= 'a' - 'A';
                     sprintf(gText, cNewTurn[3], gArmyNames[giMonthTypeExtra], lowerName19);
                 } else {
                     sprintf(gText, cNewTurn[4]);
@@ -5994,7 +6021,7 @@ void game::DoNewTurn(void) {
                     sprintf(gText, cNewTurn[5], gWeekNames[giWeekTypeExtra]);
                 } else {
                     strcpy(lowerName19, gArmyNames[giWeekTypeExtra]);
-                    lowerName19[0] -= 0x20;
+                    lowerName19[0] -= 'a' - 'A';
                     sprintf(gText, cNewTurn[6], gArmyNames[giWeekTypeExtra], lowerName19);
                 }
             }
@@ -6042,23 +6069,23 @@ i32 game::CalcDifficultyRating(void) {
     i32 notused;
     i32 rating = 0;
     if (m_difficulty == 0)
-        rating += 0x32;
+        rating += 50;
     else if (m_difficulty == 1)
-        rating += 0x50;
+        rating += 80;
     else if (m_difficulty == 2)
-        rating += 0x64;
+        rating += 100;
     else if (m_difficulty == 3)
-        rating += 0x78;
+        rating += 120;
     else if (m_difficulty == 4)
-        rating += 0x8c;
+        rating += 140;
     if (m_mapHeader.difficulty == 0)
         ;
     else if (m_mapHeader.difficulty == 1)
-        rating += 0x14;
+        rating += 20;
     else if (m_mapHeader.difficulty == 2)
-        rating += 0x28;
+        rating += 40;
     else if (m_mapHeader.difficulty == 3)
-        rating += 0x50;
+        rating += 80;
     return rating;
 }
 
@@ -6156,8 +6183,8 @@ void WriteDiffHeaderInfo(u8 cmd, i32 len, u8* buf, i32* pos) {
     flags = (cmd << DIFF_COMMAND_SHIFT) | flags;
     if (len > DIFF_LEN_WORD_MAX) {
         flags |= DIFF_LEN_WORD_FLAG;
-        flags |= (len & 0x2f0000) >> 16;
-        u16 word = static_cast<u16>(len & 0xffff);
+        flags |= (len & DIFF_LEN_HIGH_MASK) >> 16;
+        u16 word = static_cast<u16>(len & DIFF_LEN_LOW_MASK);
         buf[*pos] = flags;
         *reinterpret_cast<u16*>(buf + *pos + 1) = word;
         *pos += 3;
@@ -6271,9 +6298,8 @@ void CreateDiffFile(
         close(oldFile17);
     }
 
-    diffData6 = static_cast<u8*>(
-        H2_ALLOC((oldSize37 > joinSize36 ? oldSize37 : joinSize36) + 5000, 7581)
-    );
+    diffData6 =
+        static_cast<u8*>(H2_ALLOC((oldSize37 > joinSize36 ? oldSize37 : joinSize36) + 5000, 7581));
     if (sendWhole4) {
         diffData6[0] = 0;
         diffData6[1] = 0;
@@ -6382,8 +6408,7 @@ void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
     read(diffFile2, diffData5, diffSize1);
     close(diffFile2);
 
-    joinData9 =
-        static_cast<u8*>(H2_ALLOC(GAME_JOIN_BUFFER_SIZE, 7717));
+    joinData9 = static_cast<u8*>(H2_ALLOC(GAME_JOIN_BUFFER_SIZE, 7717));
     if (diffData5[0] == 0) {
         memcpy(joinData9, diffData5 + GAME_JOIN_HEADER_SIZE, diffSize1 - GAME_JOIN_HEADER_SIZE);
         joinSize37 = diffSize1 - GAME_JOIN_HEADER_SIZE;
@@ -6733,15 +6758,12 @@ void CompressTest2(void) {
     char* encodedData6;
 
     dataSize2 = Random(COMPRESSION_TEST_RANDOM_SIZE_MIN, COMPRESSION_TEST_RANDOM_SIZE_MAX);
-    sourceData6 = static_cast<char*>(
-        H2_ALLOC(dataSize2 + COMPRESSION_TEST_RANDOM_BUFFER_EXTRA, 8057)
-    );
-    encodedData6 = static_cast<char*>(
-        H2_ALLOC(dataSize2 + COMPRESSION_TEST_RANDOM_BUFFER_EXTRA, 8058)
-    );
-    decodedData6 = static_cast<char*>(
-        H2_ALLOC(dataSize2 + COMPRESSION_TEST_RANDOM_BUFFER_EXTRA, 8059)
-    );
+    sourceData6 =
+        static_cast<char*>(H2_ALLOC(dataSize2 + COMPRESSION_TEST_RANDOM_BUFFER_EXTRA, 8057));
+    encodedData6 =
+        static_cast<char*>(H2_ALLOC(dataSize2 + COMPRESSION_TEST_RANDOM_BUFFER_EXTRA, 8058));
+    decodedData6 =
+        static_cast<char*>(H2_ALLOC(dataSize2 + COMPRESSION_TEST_RANDOM_BUFFER_EXTRA, 8059));
     for (index7 = 0; index7 < dataSize2; index7++)
         sourceData6[index7] = static_cast<char>(Random(0, 255));
     sourceCrc0 = calc_crc_long(reinterpret_cast<u8*>(sourceData6), dataSize2);
@@ -6771,17 +6793,14 @@ void CompressTest(void) {
     LogStr(const_cast<char*>("C1"));
     strcpy(filename3, "c:\\TEMP\\Z.DIF");
     fileSize7 = FileSize(filename3);
-    sourceData6 = static_cast<char*>(
-        H2_ALLOC(fileSize7 + COMPRESSION_TEST_FILE_BUFFER_EXTRA, 8094)
-    );
-    encodedData6 = static_cast<char*>(
-        H2_ALLOC(fileSize7 + COMPRESSION_TEST_FILE_BUFFER_EXTRA, 8095)
-    );
-    decodedData6 = static_cast<char*>(
-        H2_ALLOC(fileSize7 + COMPRESSION_TEST_FILE_BUFFER_EXTRA, 8096)
-    );
+    sourceData6 =
+        static_cast<char*>(H2_ALLOC(fileSize7 + COMPRESSION_TEST_FILE_BUFFER_EXTRA, 8094));
+    encodedData6 =
+        static_cast<char*>(H2_ALLOC(fileSize7 + COMPRESSION_TEST_FILE_BUFFER_EXTRA, 8095));
+    decodedData6 =
+        static_cast<char*>(H2_ALLOC(fileSize7 + COMPRESSION_TEST_FILE_BUFFER_EXTRA, 8096));
     LogStr(const_cast<char*>("C2"));
-    fileHandle4 = open(filename3, 0x8000);
+    fileHandle4 = open(filename3, _O_BINARY);
     if (fileHandle4 == -1)
         FileError(filename3);
     read(fileHandle4, sourceData6, fileSize7);
@@ -6806,7 +6825,7 @@ VA(0x00486652, 0x53)
 void CompressTest3(void) {
     char buf[40];
     i32 i;
-    for (i = 0; i < 0x64; i++) {
+    for (i = 0; i < COMPRESS_TEST_ITERATIONS; i++) {
         sprintf(buf, "Test # %d", i);
         AiPrint(buf);
         CompressTest2();
@@ -6844,8 +6863,20 @@ i32 game::CountShrines(i32 player) {
 }
 
 // ---- remaining globals (retail RVA order) ----
-DATA(0x004f7550) i8
-    giMonType[] = {0, 0x11, 0x15, 0x2a, 0x0f, 0x19, 0x34, 0x0e, 0x1d, 0x1e, 0x1b, 0x36};
+DATA(0x004f7550) i8 giMonType[] = {
+    CREATURE_PEASANT,
+    CREATURE_TROLL,
+    CREATURE_DWARF,
+    CREATURE_ROC,
+    CREATURE_OGRE,
+    CREATURE_DRUID,
+    CREATURE_VAMPIRE,
+    CREATURE_WOLF,
+    CREATURE_CENTAUR,
+    CREATURE_GARGOYLE,
+    CREATURE_UNICORN,
+    CREATURE_LICH
+};
 DATA(0x004f7a08) char bMapInitialized = 0;
 // @data-layout-note Retail's loader-zero GAME contribution is
 // 0x1280e8..0x1284b4 (0x3cc); candidate .bss is 0x3b4. All 23 public

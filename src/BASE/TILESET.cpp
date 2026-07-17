@@ -22,7 +22,7 @@ tileset::tileset(u32l id) : resource(3, id, 1, 0) {
     m_tileHeight = gpResourceManager->ReadWord();
     m_tileCount = gpResourceManager->ReadWord();
     u32 size = m_tileCount * m_tileWidth * m_tileHeight;
-    m_data = static_cast<char*>(H2_ALLOC_AT(size, gTilesetSourceFiles.allocation, 0x12));
+    m_data = static_cast<char*>(H2_ALLOC_AT(size, gTilesetSourceFiles.allocation, 18));
     gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_data), size);
 }
 

@@ -32,6 +32,7 @@
 #include <SOURCE/wingraph.h>
 #include <BASE/BITS.h>
 #include <BASE/bmap2.h>
+#include <BASE/bitmap.h>
 #include <BASE/sample.h>
 #include <SOURCE/KB.h>
 #include <windows.h>
@@ -1245,7 +1246,7 @@ i32 RecruitHeroHandler(tag_message& msg) {
         }
     }
     if (a == 1) {
-        msg.payload.widget.id = 0xa;
+        msg.payload.widget.id = 10;
         msg.payload.widget.command = msg.payload.widget.id;
         return 2;
     }
@@ -2462,7 +2463,7 @@ void InitVars(void) {
     ppMapExtra = 0;
     pwSizeOfMapExtra = 0;
     iMaxMapExtra = 0;
-    for (i = 0; i < 0xa; i++)
+    for (i = 0; i < 10; i++)
         glTimers[i] = 0;
     if (gbCheatMenus) {
         hmnuDflt = LoadMenuA(hInstApp, "mnuDflt");
@@ -2779,7 +2780,7 @@ i32 AddScoreToHighScore(i32 score, i32 days, i32 scenario, i32 highScoreType, ch
 VA(0x0049d2c0, 0x66)
 void BVResMsg(char* s, i32 res, i32 qty) {
     giBottomViewOverride = 5;
-    giBottomViewOverrideEndTime = KBTickCount() + 0x1388;
+    giBottomViewOverrideEndTime = KBTickCount() + 5000;
     giBottomViewResource = res;
     giBottomViewResourceQty = qty;
     strcpy(gcBottomViewText, s);
@@ -3232,14 +3233,14 @@ void SmackFade(u8* src, u8* dst) {
     a = 0;
     f = 0;
     k = -1;
-    a = static_cast<u8*>(H2_ALLOC(0x300, 3950));
-    f = static_cast<u8*>(H2_ALLOC(0x100, 3951));
+    a = static_cast<u8*>(H2_ALLOC(768, 3950));
+    f = static_cast<u8*>(H2_ALLOC(256, 3951));
     memset(a, 0, MISC_PALETTE_BYTE_COUNT);
     memset(f, 0, 0x100);
-    for (h = 0xa; h < 0xf6; h++) {
+    for (h = 10; h < 246; h++) {
         e = (OD_STEER(src[h * 3 + 2]) + OD_STEER(src[h * 3]) + src[h * 3 + 1]) / 3;
-        d = 0x3e7;
-        for (i = 0xa; i < 0x24; i++) {
+        d = 999;
+        for (i = 10; i < 36; i++) {
             b = (OD_STEER(dst[i * 3 + 2]) + OD_STEER(dst[i * 3]) + dst[i * 3 + 1]) / 3;
             p = abs(e - b);
             if (OD_STEER(d) > p) {
@@ -3251,9 +3252,9 @@ void SmackFade(u8* src, u8* dst) {
         f[h] = (u8)k;
     }
     FadeTo(src, a, 8);
-    j = *(u8**)(*(char**)((char*)gpWindowManager + 0x46) + 0x16);
-    for (c = 0; c < 0x280; c++) {
-        for (g = 0; g < 0x1e0; g++) {
+    j = gpWindowManager->m_screen->m_pixels;
+    for (c = 0; c < 640; c++) {
+        for (g = 0; g < 480; g++) {
             *j = f[*j];
             j++;
         }
@@ -3287,7 +3288,7 @@ void ShowCongrats(i32 highScoreType) {
     } else {
         sprintf(rating, gArmyNames[GetMonType(gpGame->m_campaignScore, highScoreType)]);
     }
-    rating[0] -= 0x20;
+    rating[0] -= 'a' - 'A';
     if (static_cast<i8>(gpGame->m_cheated))
         sprintf(rating, "Cheater!!!");
 
@@ -4663,9 +4664,8 @@ void NormalDialog(
         if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_NO_RESOURCE)
             break;
 
-        resourceText_e[resourceSlot_n] = static_cast<char*>(
-            H2_ALLOC(NORMAL_DIALOG_TEXT_LENGTH, 5472)
-        );
+        resourceText_e[resourceSlot_n] =
+            static_cast<char*>(H2_ALLOC(NORMAL_DIALOG_TEXT_LENGTH, 5472));
         if (resourceType_l[resourceSlot_n] <= NORMAL_DIALOG_RESOURCE_LAST) {
             if (resourceValue_l[resourceSlot_n] > 0) {
                 sprintf(resourceText_e[resourceSlot_n], "%d", resourceValue_l[resourceSlot_n]);
@@ -4972,9 +4972,8 @@ void NormalDialog(
                 MemError();
             pNormalDialogWindow->AddWidget(textPanel_h, -1);
 
-            resourceText_e[resourceSlot_n] = static_cast<char*>(
-                H2_ALLOC(NORMAL_DIALOG_TEXT_LENGTH, 5716)
-            );
+            resourceText_e[resourceSlot_n] =
+                static_cast<char*>(H2_ALLOC(NORMAL_DIALOG_TEXT_LENGTH, 5716));
             labelY_o = OD_STEER(sizingIconHeight_l) + resourceY_l - 24;
             sprintf(
                 resourceText_e[resourceSlot_n],

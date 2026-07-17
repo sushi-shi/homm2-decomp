@@ -21,16 +21,14 @@
 
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\listbox.cpp"
 #define LISTBOX_SOURCE_FILE_SEPARATOR "\0\0\0\0"
-#define LISTBOX_DESTRUCTOR_SOURCE_FILES                                                            \
-    RETAIL_FILE LISTBOX_SOURCE_FILE_SEPARATOR RETAIL_FILE
+#define LISTBOX_DESTRUCTOR_SOURCE_FILES RETAIL_FILE LISTBOX_SOURCE_FILE_SEPARATOR RETAIL_FILE
 #define LISTBOX_DELETE_SOURCE_FILES                                                                \
-    RETAIL_FILE LISTBOX_SOURCE_FILE_SEPARATOR RETAIL_FILE                          \
-        LISTBOX_SOURCE_FILE_SEPARATOR RETAIL_FILE LISTBOX_SOURCE_FILE_SEPARATOR            \
-            RETAIL_FILE
+    RETAIL_FILE LISTBOX_SOURCE_FILE_SEPARATOR RETAIL_FILE LISTBOX_SOURCE_FILE_SEPARATOR            \
+        RETAIL_FILE LISTBOX_SOURCE_FILE_SEPARATOR RETAIL_FILE
 #define LISTBOX_MAIN_SOURCE_FILES                                                                  \
-    RETAIL_FILE LISTBOX_SOURCE_FILE_SEPARATOR RETAIL_FILE                          \
-        LISTBOX_SOURCE_FILE_SEPARATOR RETAIL_FILE LISTBOX_SOURCE_FILE_SEPARATOR            \
-            RETAIL_FILE LISTBOX_SOURCE_FILE_SEPARATOR RETAIL_FILE
+    RETAIL_FILE LISTBOX_SOURCE_FILE_SEPARATOR RETAIL_FILE LISTBOX_SOURCE_FILE_SEPARATOR            \
+        RETAIL_FILE LISTBOX_SOURCE_FILE_SEPARATOR RETAIL_FILE LISTBOX_SOURCE_FILE_SEPARATOR        \
+            RETAIL_FILE
 
 // @data-layout-note Retail's initialized listbox contribution is
 // RVA 0x120e94..0x121078 (0x1e4), with eleven identical source-path views at
@@ -75,7 +73,11 @@ listBoxWidget::~listBoxWidget() {
 #line 25
         H2_FREE_AT(m_items[i], LISTBOX_DESTRUCTOR_SOURCE_FILES, 25);
 #line 27
-    H2_FREE_AT(m_items, LISTBOX_DESTRUCTOR_SOURCE_FILES + LISTBOX_DESTRUCTOR_LIST_SOURCE_FILE_OFFSET, 27);
+    H2_FREE_AT(
+        m_items,
+        LISTBOX_DESTRUCTOR_SOURCE_FILES + LISTBOX_DESTRUCTOR_LIST_SOURCE_FILE_OFFSET,
+        27
+    );
     gbSendMouseMoveMessages = 0;
 }
 
@@ -181,17 +183,29 @@ void listBoxWidget::DeleteItem(i32 index) {
     if (m_itemCount == 1) {
 #line 156
         H2_FREE_AT(m_items[0], LISTBOX_DELETE_SOURCE_FILES, 0x9c);
-        H2_FREE_AT(m_items, LISTBOX_DELETE_SOURCE_FILES + LISTBOX_DELETE_LIST_SOURCE_FILE_OFFSET, 0x9d);
+        H2_FREE_AT(
+            m_items,
+            LISTBOX_DELETE_SOURCE_FILES + LISTBOX_DELETE_LIST_SOURCE_FILE_OFFSET,
+            0x9d
+        );
         m_items = 0;
     } else {
 #line 162
-        char** newItems = static_cast<char**>(H2_ALLOC_AT((m_itemCount - 1) * 4, LISTBOX_DELETE_SOURCE_FILES + LISTBOX_DELETE_ALLOCATION_SOURCE_FILE_OFFSET, 0xa2));
+        char** newItems = static_cast<char**>(H2_ALLOC_AT(
+            (m_itemCount - 1) * 4,
+            LISTBOX_DELETE_SOURCE_FILES + LISTBOX_DELETE_ALLOCATION_SOURCE_FILE_OFFSET,
+            162
+        ));
         memcpy(newItems, m_items, (m_itemCount - 1) * 4);
         if (m_itemCount - index - 1 > 0)
             memcpy(&newItems[index], &m_items[index + 1], (m_itemCount - index - 1) * 4);
         if (m_items != 0)
 #line 169
-            H2_FREE_AT(m_items, LISTBOX_DELETE_SOURCE_FILES + LISTBOX_DELETE_OLD_LIST_SOURCE_FILE_OFFSET, 0xa9);
+            H2_FREE_AT(
+                m_items,
+                LISTBOX_DELETE_SOURCE_FILES + LISTBOX_DELETE_OLD_LIST_SOURCE_FILE_OFFSET,
+                0xa9
+            );
         m_items = newItems;
     }
     m_itemCount--;
@@ -262,9 +276,17 @@ i32 listBoxWidget::Main(tag_message& message) {
                         if (m_itemCount <= message.payload.widget.parameter)
                             break;
 #line 222
-                        H2_FREE_AT(m_items[message.payload.widget.parameter], LISTBOX_MAIN_SOURCE_FILES, 0xde);
-                        m_items[message.payload.widget.parameter] = static_cast<char*>(H2_ALLOC_AT(strlen(text) + 1, LISTBOX_MAIN_SOURCE_FILES
-                                + LISTBOX_REPLACE_ALLOCATION_SOURCE_FILE_OFFSET, 0xdf));
+                        H2_FREE_AT(
+                            m_items[message.payload.widget.parameter],
+                            LISTBOX_MAIN_SOURCE_FILES,
+                            0xde
+                        );
+                        m_items[message.payload.widget.parameter] = static_cast<char*>(H2_ALLOC_AT(
+                            strlen(text) + 1,
+                            LISTBOX_MAIN_SOURCE_FILES
+                                + LISTBOX_REPLACE_ALLOCATION_SOURCE_FILE_OFFSET,
+                            0xdf
+                        ));
                         strcpy(m_items[message.payload.widget.parameter], text);
                     }
                     break;
@@ -272,19 +294,31 @@ i32 listBoxWidget::Main(tag_message& message) {
                     if (m_id == message.payload.widget.id) {
                         char* text = message.payload.widget.data.text;
 #line 233
-                        char** newItems = static_cast<char**>(H2_ALLOC_AT((m_itemCount + 1) * 4, LISTBOX_MAIN_SOURCE_FILES
-                                + LISTBOX_APPEND_LIST_ALLOCATION_SOURCE_FILE_OFFSET, 0xe9));
+                        char** newItems = static_cast<char**>(H2_ALLOC_AT(
+                            (m_itemCount + 1) * 4,
+                            LISTBOX_MAIN_SOURCE_FILES
+                                + LISTBOX_APPEND_LIST_ALLOCATION_SOURCE_FILE_OFFSET,
+                            0xe9
+                        ));
                         if (m_itemCount != 0)
                             memcpy(newItems, m_items, m_itemCount * 4);
 #line 236
-                        newItems[m_itemCount] = static_cast<char*>(H2_ALLOC_AT(strlen(text) + 1, LISTBOX_MAIN_SOURCE_FILES
-                                + LISTBOX_APPEND_ITEM_ALLOCATION_SOURCE_FILE_OFFSET, 0xec));
+                        newItems[m_itemCount] = static_cast<char*>(H2_ALLOC_AT(
+                            strlen(text) + 1,
+                            LISTBOX_MAIN_SOURCE_FILES
+                                + LISTBOX_APPEND_ITEM_ALLOCATION_SOURCE_FILE_OFFSET,
+                            0xec
+                        ));
                         strcpy(newItems[m_itemCount], text);
                         m_itemCount++;
                         if (m_items != 0)
 #line 240
-                            H2_FREE_AT(m_items, LISTBOX_MAIN_SOURCE_FILES
-                                    + LISTBOX_APPEND_OLD_LIST_SOURCE_FILE_OFFSET, 0xf0);
+                            H2_FREE_AT(
+                                m_items,
+                                LISTBOX_MAIN_SOURCE_FILES
+                                    + LISTBOX_APPEND_OLD_LIST_SOURCE_FILE_OFFSET,
+                                0xf0
+                            );
                         m_items = newItems;
                         if (m_maxVisibleItems < m_itemCount) {
                             m_scrollRange = m_itemCount - m_maxVisibleItems;
