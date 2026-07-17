@@ -14,6 +14,17 @@
     },
     {
       "unit": "BASE/BITMAP",
+      "function": "?CopyTo@bitmap@@QAEXPAV1@HHHHHH@Z",
+      "source_hash": "be99d53e7ede",
+      "epoch": "cc7b2cff78090f65c374e818fede1f9ad8ce32ee0d5a55ec7d5ccd3ec4dc8628",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 90.901405,
+      "after": 90.901405,
+      "note": "Complete 0xcb two-path memcpy semantics, row strides and CFG with 2/2 canonical ordered relocation owner/addends; residual is register scheduling plus one alignment NOP."
+    },
+    {
+      "unit": "BASE/BITMAP",
       "function": "?CopyToCareful@bitmap@@QAEXPAV1@HHHHHH@Z",
       "source_hash": "e4f5184f80e8",
       "epoch": "cc7b2cff78090f65c374e818fede1f9ad8ce32ee0d5a55ec7d5ccd3ec4dc8628",
@@ -77,6 +88,17 @@
       "before": 41.842106,
       "after": 41.842106,
       "note": "Complete zero-relocation normalized bit test. Retail uses a materialized address and branch result; the candidate emits indexed test/setne despite the previously exhausted profile/source/frontend families."
+    },
+    {
+      "unit": "BASE/BORDER",
+      "function": "?Draw@border@@UAEXXZ",
+      "source_hash": "20cb9ff33649",
+      "epoch": "cc7b2cff78090f65c374e818fede1f9ad8ce32ee0d5a55ec7d5ccd3ec4dc8628",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 75.53623,
+      "after": 75.53623,
+      "note": "Complete solid/bitmap/icon semantics and CFG with 7/7 canonical ordered relocation owner/addends; candidate 0xaf versus retail 0xab is saved-register/scheduling state and x/y reach identical call arguments."
     },
     {
       "unit": "BASE/BORDER",
@@ -220,6 +242,17 @@
       "before": 99.81868,
       "after": 99.81868,
       "note": "files=src/BASE/Bzip.cpp; masked code/frame/CFG exact; relocs=79/79 only-base=0; strings/constants and __adjust_fdiv vs retail owner+0x10 alias resolve identically; behavioral bug=none"
+    },
+    {
+      "unit": "BASE/Bzip",
+      "function": "?doReversibleTransformation@@YIXXZ",
+      "source_hash": "90660cde9d11",
+      "epoch": "cc7b2cff78090f65c374e818fede1f9ad8ce32ee0d5a55ec7d5ccd3ec4dc8628",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 95.5,
+      "after": 95.5,
+      "note": "Complete 0xa4 sort/origPtr semantics and CFG with 14/14 canonical ordered relocation owner/addends; only volatile strings and equivalent last/index loop comparison order differ."
     },
     {
       "unit": "BASE/Bzip",
@@ -454,6 +487,28 @@
     },
     {
       "unit": "BASE/FONT",
+      "function": "?DrawBoundedString@font@@QAEXPADHHHHHH@Z",
+      "source_hash": "e0d21d3d84cc",
+      "epoch": "cc7b2cff78090f65c374e818fede1f9ad8ce32ee0d5a55ec7d5ccd3ec4dc8628",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.31896,
+      "after": 99.31896,
+      "note": "Complete 0x313 semantics/CFG and 5/5 canonical ordered relocation owner/addends; residuals are equivalent comparison reversals and commutative coordinate additions."
+    },
+    {
+      "unit": "BASE/FONT",
+      "function": "?DrawStringExecute@font@@IAEXPADHHHHHHH@Z",
+      "source_hash": "6a2d23f59be7",
+      "epoch": "cc7b2cff78090f65c374e818fede1f9ad8ce32ee0d5a55ec7d5ccd3ec4dc8628",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.891304,
+      "after": 99.891304,
+      "note": "Complete 0x24a semantics/CFG and 13/13 canonical ordered relocation owner/addends; only two equivalent commutative string-index address load orders differ."
+    },
+    {
+      "unit": "BASE/FONT",
       "function": "?GetCharacterWidth@font@@QAEHE@Z",
       "source_hash": "b27a06bb4b2f",
       "epoch": "cc7b2cff78090f65c374e818fede1f9ad8ce32ee0d5a55ec7d5ccd3ec4dc8628",
@@ -462,6 +517,28 @@
       "before": 86.93104,
       "after": 86.93104,
       "note": "Complete Od frame/CFG and zero relocations. Retail loads the glyph data base before forming c*13; ordinary, commuted, and raw-offset spellings were byte-neutral."
+    },
+    {
+      "unit": "BASE/FONT",
+      "function": "?LineLength@font@@QAEHPADH@Z",
+      "source_hash": "899d56b8089e",
+      "epoch": "cc7b2cff78090f65c374e818fede1f9ad8ce32ee0d5a55ec7d5ccd3ec4dc8628",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.5,
+      "after": 99.5,
+      "note": "Complete 0x1b3 semantics/CFG and 3/3 canonical ordered relocation owner/addends; only the equivalent length/index comparison operand order and JLE/JGE polarity differ."
+    },
+    {
+      "unit": "BASE/FONT",
+      "function": "?LineWidth@font@@QAEHPAD@Z",
+      "source_hash": "af9d30875267",
+      "epoch": "cc7b2cff78090f65c374e818fede1f9ad8ce32ee0d5a55ec7d5ccd3ec4dc8628",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.96491,
+      "after": 99.96491,
+      "note": "Complete 0xc4 semantics/CFG; all 58 masked instructions and 1/1 canonical ordered relocation owner/addends agree; residual is comparison metadata only."
     },
     {
       "unit": "BASE/ICON",
@@ -473,6 +550,17 @@
       "before": 97.20492,
       "after": 97.20492,
       "note": "Complete O2 extent/draw dispatcher; 37/37 resolved relocations and identical dispatcher after the setup delta. Prior bounded AST and TU-state families exhausted; remaining setup register allocation is compiler shape."
+    },
+    {
+      "unit": "BASE/ICON",
+      "function": "?FillToBuffer@icon@@QAEXHHHHHPAUSLimitData@@@Z",
+      "source_hash": "025bde1385b5",
+      "epoch": "cc7b2cff78090f65c374e818fede1f9ad8ce32ee0d5a55ec7d5ccd3ec4dc8628",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.247314,
+      "after": 99.247314,
+      "note": "Complete 0x103 semantics/frame/CFG and 10/10 canonical ordered relocation owner/addends; only the documented equivalent top/max-Y CMP/JG versus reversed CMP/JL remains."
     },
     {
       "unit": "BASE/ICONWDGT",
@@ -828,6 +916,17 @@
     },
     {
       "unit": "BASE/Misc",
+      "function": "?MAKEFILEID@@YIKPAD@Z",
+      "source_hash": "5a4c4f7ce22f",
+      "epoch": "cc7b2cff78090f65c374e818fede1f9ad8ce32ee0d5a55ec7d5ccd3ec4dc8628",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 90.685715,
+      "after": 90.685715,
+      "note": "Complete 0x48 reverse-scan uppercase rotate-and-accumulate semantics/CFG; there are zero relocations and the residual is hash/sum/text register coloring."
+    },
+    {
+      "unit": "BASE/Misc",
       "function": "?PrintMemoryLeaks@@YIXXZ",
       "source_hash": "37896478cf9a",
       "epoch": "cc7b2cff78090f65c374e818fede1f9ad8ce32ee0d5a55ec7d5ccd3ec4dc8628",
@@ -1125,6 +1224,17 @@
     },
     {
       "unit": "BASE/WIDGET",
+      "function": "?Dim@widget@@QAEXXZ",
+      "source_hash": "fa97c398f829",
+      "epoch": "cc7b2cff78090f65c374e818fede1f9ad8ce32ee0d5a55ec7d5ccd3ec4dc8628",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 74.30769,
+      "after": 74.30769,
+      "note": "Complete kind guards and DimBitmapArea semantics/CFG with 2/2 canonical ordered relocation owner/addends; candidate 0x46 versus retail 0x47 is coordinate-load/push scheduling state."
+    },
+    {
+      "unit": "BASE/WIDGET",
       "function": "?Main@widget@@UAEHAAUtag_message@@@Z",
       "source_hash": "ed4b9c712dd0",
       "epoch": "cc7b2cff78090f65c374e818fede1f9ad8ce32ee0d5a55ec7d5ccd3ec4dc8628",
@@ -1342,6 +1452,17 @@
       "before": 99.04878,
       "after": 99.04878,
       "note": "files=src/BASE/listbox.cpp; complete 0x368 frame/CFG and message behavior; relocs=23/23 only-base=0 with exact effective owner/addends; 23 raw bytes differ only by mouse-bound register allocation and delinked local jump-table labels; behavioral bug=none"
+    },
+    {
+      "unit": "BASE/listbox",
+      "function": "?ProcessMouseMessage@listBoxWidget@@QAEHAAUtag_message@@@Z",
+      "source_hash": "095f2ad7a9cb",
+      "epoch": "cc7b2cff78090f65c374e818fede1f9ad8ce32ee0d5a55ec7d5ccd3ec4dc8628",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.13223,
+      "after": 99.13223,
+      "note": "Complete 0x312 mouse-hit/scroll semantics and CFG with 6/6 canonical ordered relocation owner/addends; only three equivalent rectangle comparison operand/polarity reversals differ."
     },
     {
       "unit": "BASE/miscwin",
