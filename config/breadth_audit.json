@@ -3028,6 +3028,17 @@
     },
     {
       "unit": "SOURCE/GAME",
+      "function": "?CheckValidAvailableHeroes@@YIXXZ",
+      "source_hash": "681598fb2faa",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 95.90804,
+      "after": 95.90804,
+      "note": "files=src/SOURCE/GAME.cpp; 0x143 frame/loops and relocs=8/8 agree; 17 raw bytes +0xc5..+0xe8 are equivalent heroIndex+player*283 lowering; prior direct/commuted/accessor/AST variants exhausted; behavioral bug=none"
+    },
+    {
+      "unit": "SOURCE/GAME",
       "function": "?ClaimMine@game@@QAEXHH@Z",
       "source_hash": "5c186256d8da",
       "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
@@ -3116,6 +3127,17 @@
     },
     {
       "unit": "SOURCE/GAME",
+      "function": "?CreateBoat@game@@QAEHHHH@Z",
+      "source_hash": "763fe2df72fe",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 3,
+      "before": 95.37778,
+      "after": 95.37778,
+      "note": "files=src/SOURCE/GAME.cpp; 0x11e frame/CFG and relocs=3/3 agree; 12 raw bytes +0xf5..+0x104 reverse equivalent packed-cell/boatIdx evaluation; whole-word/cast/|0 variants exhausted; behavioral bug=none"
+    },
+    {
+      "unit": "SOURCE/GAME",
       "function": "?CreateDiffFile@@YIXPAD00HH@Z",
       "source_hash": "a70033bca438",
       "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
@@ -3146,6 +3168,17 @@
       "before": 99.98239,
       "after": 100.0,
       "note": "Non-human arm is a direct early return; 1109 raw bytes and 102 relocations agree."
+    },
+    {
+      "unit": "SOURCE/GAME",
+      "function": "?ExperienceValueOfStack@game@@QAEHPAVarmyGroup@@PAVhero@@@Z",
+      "source_hash": "af052ff71e64",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 1,
+      "before": 99.71429,
+      "after": 99.71429,
+      "note": "files=src/SOURCE/GAME.cpp; 0x91 frame/CFG and reloc=1/1 agree; only ModRM bytes +0x41/+0x44 reverse equivalent i/group subscript loads; i[array] did not hold under canonical TU state; behavioral bug=none"
     },
     {
       "unit": "SOURCE/GAME",
@@ -3278,6 +3311,28 @@
       "before": 94.242935,
       "after": 94.242935,
       "note": "Logic is complete. The residual is one coupled TU-cumulative /Od lowering choice: retail evaluates the packed m_objectMetadata lvalue first and reserves two hidden temporary words; this partial TU evaluates townId first and omits them. The same parity flips the three inner MAP_WIDTH comparisons. Direct packed-word spellings, |0 steering, relational swaps, and the fixed AST permuter did not reproduce the retail field-first lowering; anonymous source padding would conceal rather than reconstruct this compiler state."
+    },
+    {
+      "unit": "SOURCE/GAME",
+      "function": "?ProcessOnMapHeroes@game@@QAEXXZ",
+      "source_hash": "0816456f02a6",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 1,
+      "before": 99.3271,
+      "after": 99.3271,
+      "note": "files=src/SOURCE/GAME.cpp; real mapHeroExtra layout/0x7c frame/CFG and relocs=23/23 agree; both global loop tests are one byte longer plus compiler-local $SG spelling; |0 bounds did not steer; behavioral bug=none"
+    },
+    {
+      "unit": "SOURCE/GAME",
+      "function": "?ProcessRandomObjects@game@@QAEXXZ",
+      "source_hash": "1cccd10e7a85",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 1,
+      "before": 99.61626,
+      "after": 99.61626,
+      "note": "files=src/SOURCE/GAME.cpp; complete semantics/0x40 frame/CFG and relocs=56/56 agree; MAP_HEIGHT/MAP_WIDTH loop tests are each one byte longer from equivalent load order; |0 bounds did not steer; behavioral bug=none"
     },
     {
       "unit": "SOURCE/GAME",
@@ -3465,6 +3520,17 @@
       "before": 99.78411,
       "after": 99.78411,
       "note": "Complete semantics, 0x18 frame/slots, CFG, and all 101 relocation identities/counts/effective targets agree. At +0x27 retail uses the five-byte absolute-EAX load for gpWindowManager before loading the hover id; base loads the hover id first and needs a six-byte absolute-ECX load, making its body one byte longer and shifting later relocation sites/local switch-table addends. Reversing the source equality is byte-neutral. Revisit after a relevant GAME predecessor/header change alters this TU-cumulative commutative load order."
+    },
+    {
+      "unit": "SOURCE/GAME",
+      "function": "?WeeklyGenericSite@game@@QAEXPAVmapCell@@@Z",
+      "source_hash": "bbe66ffedb79",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 3,
+      "before": 82.542854,
+      "after": 82.542854,
+      "note": "files=src/SOURCE/GAME.cpp; complete 0x6f body/frame/CFG and no relocs; 12 raw bytes +0x30..+0x3f reverse equivalent packed-cell/type evaluation; whole-word/cast/|0 variants exhausted; behavioral bug=none"
     },
     {
       "unit": "SOURCE/GAME",
