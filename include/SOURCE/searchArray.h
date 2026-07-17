@@ -5,7 +5,7 @@
 #include <va.h>
 // forward declarations:
 class army;
-extern int MAP_WIDTH;
+extern i32 MAP_WIDTH;
 
 typedef enum SearchConstant {
     SEARCH_DIRECTION_COUNT = 8,
@@ -44,9 +44,9 @@ typedef enum SearchConstant {
 
 #pragma pack(push, 1)
 struct searchCell {
-    unsigned short cost;
-    unsigned short previous;
-    unsigned char flags : 1;
+    u16 cost;
+    u16 previous;
+    u8 flags : 1;
     char pad[4];
 };
 #pragma pack(pop)
@@ -57,36 +57,36 @@ union searchStorage {
     struct searchNode *nodes;
     struct {
         char pad[3];
-        signed char directions[SEARCH_PATH_CAPACITY + 1];
+        i8 directions[SEARCH_PATH_CAPACITY + 1];
     } path;
     struct {
         char pad[4];
-        signed char directions[0x100];
+        i8 directions[0x100];
     } aiPath;
 };
 
 #pragma pack(push, 1)
 struct searchNode {
-    unsigned char x;
-    unsigned char y;
-    unsigned short distance;
-    unsigned char visited : 1;
-    unsigned char unknownFlag : 1;
-    unsigned char rvFlag1 : 1;
-    unsigned char rvFlag2 : 1;
-    unsigned char direction : 4;
+    u8 x;
+    u8 y;
+    u16 distance;
+    u8 visited : 1;
+    u8 unknownFlag : 1;
+    u8 rvFlag1 : 1;
+    u8 rvFlag2 : 1;
+    u8 direction : 4;
     union {
         struct {
-            unsigned char adjacentMonsterX;
-            unsigned char adjacentMonsterY;
-            unsigned char previousFlags;
-            unsigned char terrain;
+            u8 adjacentMonsterX;
+            u8 adjacentMonsterY;
+            u8 previousFlags;
+            u8 terrain;
         };
         struct {
-            signed char valueX;
-            signed char valueY;
-            signed char previousX;
-            signed char previousY;
+            i8 valueX;
+            i8 valueY;
+            i8 previousX;
+            i8 previousY;
         };
     };
 };
@@ -98,51 +98,51 @@ class searchArray {
 public:
     union {
         struct {
-            int m_queueSize;       // +0x00, overland queue count
-            int m_queueCursor;     // +0x04, overland queue high-water mark
+            i32 m_queueSize;       // +0x00, overland queue count
+            i32 m_queueCursor;     // +0x04, overland queue high-water mark
         };
         struct {
-            unsigned int m_queueCount;     // +0x00, combat queue count
-            unsigned int m_maxQueueCount;  // +0x04, combat queue high-water mark
+            u32 m_queueCount;     // +0x00, combat queue count
+            u32 m_maxQueueCount;  // +0x04, combat queue high-water mark
         };
     };
-    int    m_pathLength;  // +0x08
+    i32    m_pathLength;  // +0x08
     union {
         struct {
-            int m_lastY;  // +0x0c, overland destination
-            int m_lastX;  // +0x10
+            i32 m_lastY;  // +0x0c, overland destination
+            i32 m_lastX;  // +0x10
         };
         struct {
-            int m_specialTargetX;  // +0x0c, combat special target
-            int m_specialTargetY;  // +0x10
+            i32 m_specialTargetX;  // +0x0c, combat special target
+            i32 m_specialTargetY;  // +0x10
         };
     };
     searchNode m_queue[SEARCH_QUEUE_CAPACITY];  // +0x14
     searchStorage m_storage;  // +0x2414, path directions overlap the search-cell pointer
-    searchNode *GetRow(int y, int width) { return m_storage.nodes + y * (width | 0); }
-    searchNode &GetNode(int x, int y) {
+    searchNode *GetRow(i32 y, i32 width) { return m_storage.nodes + y * (width | 0); }
+    searchNode &GetNode(i32 x, i32 y) {
         return *(m_storage.nodes + y * (MAP_WIDTH | 0) + x);
     }
     // --- constructors ---
     searchArray(void);
     ~searchArray();
     // --- methods ---
-    int BuildPath(int, int, int, int, int);
-    void SeedPosition(int, int, int, int, int, int, int, int, int, int, int, int);
+    i32 BuildPath(i32, i32, i32, i32, i32);
+    void SeedPosition(i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32);
     void Init(void);
     void Close(void);
     void Clear(void);
-    int QuickDistance(int, int, int, int);
-    void PushPoint(int, int, int, int, int, int, int, int, int, int, int, int);
-    void TestPossibleDirections(int, int, signed char * const, signed char * const, int, int);
+    i32 QuickDistance(i32, i32, i32, i32);
+    void PushPoint(i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32);
+    void TestPossibleDirections(i32, i32, i8 * const, i8 * const, i32, i32);
     void SeedCombatPosition(class army *);
-    int FindCombatPath(int, int, class army *, int, int);
-    void PushCombatPoint(int, int, int, int);
-    searchCell &GetCell(int x, int y) { return (m_storage.cells + y * MAP_WIDTH)[x]; }
+    i32 FindCombatPath(i32, i32, class army *, i32, i32);
+    void PushCombatPoint(i32, i32, i32, i32);
+    searchCell &GetCell(i32 x, i32 y) { return (m_storage.cells + y * MAP_WIDTH)[x]; }
 };
 #pragma pack(pop)
 SIZE(searchArray, 0x2518);
 // ---- globals (declarations, RVA order) ----
-extern unsigned char bIsMoatSlowed[117];
+extern u8 bIsMoatSlowed[117];
 
 #endif // HOMM2_SOURCE_SEARCHARRAY_H

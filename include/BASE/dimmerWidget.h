@@ -15,13 +15,13 @@ public:
     // (derived: base widget = 0x20 bytes at 0x00 via ': public widget'; own fields below)
     // --- constructors ---
     dimmerWidget(void);
-    dimmerWidget(short int, short int, short int, short int, short int, short int);
+    dimmerWidget(i16, i16, i16, i16, i16, i16);
     virtual ~dimmerWidget() OVERRIDE {}   // EXPLICIT but inline: retail has ??_E/??_G (deleting
                                           // dtors) at 0x4dd410 with the base dtor folded in and
                                           // NO standalone ??1 — an out-of-line body would emit one.
     // --- virtual methods (vtable order) ---
     virtual void Draw(void) OVERRIDE;
-    virtual int Main(struct tag_message &) OVERRIDE;
+    virtual i32 Main(struct tag_message &) OVERRIDE;
     // --- methods ---
     void Read(void);
 };

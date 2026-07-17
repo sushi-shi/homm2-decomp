@@ -7,7 +7,7 @@
 // symbols. Other TUs call them by including this header (no local externs).
 // forward declarations (was <_all.h>):
 
-void ConvertSmackerPalette(unsigned char *);
+void ConvertSmackerPalette(u8 *);
 class icon;
 
 typedef enum SmackManagerConstant {
@@ -47,10 +47,10 @@ typedef enum SmackManagerConstant {
 
 #pragma pack(push, 1)
 struct tag_rect {
-    short x;
-    short y;
-    short width;
-    short height;
+    i16 x;
+    i16 y;
+    i16 width;
+    i16 height;
 };
 
 struct SSmackOptions {
@@ -58,13 +58,13 @@ struct SSmackOptions {
     char companionFileName[9];
     char slowFileName[9];
     char slowCompanionFileName[9];
-    signed char fadeIn;
-    signed char fadeOut;
-    signed char preload;
-    signed char waitForInput;
-    signed char drawCompanion;
-    short companionX;
-    short companionY;
+    i8 fadeIn;
+    i8 fadeOut;
+    i8 preload;
+    i8 waitForInput;
+    i8 drawCompanion;
+    i16 companionX;
+    i16 companionY;
 };
 
 struct SmackMilesDigitalDriver {
@@ -77,26 +77,26 @@ SIZE(SSmackOptions, 45);
 SIZE(SmackMilesDigitalDriver, 0x50);
 SIZE(SmackSum, 0x54);
 
-void DoAdvance(Smack *, int, int, int, int);
+void DoAdvance(Smack *, i32, i32, i32, i32);
 void SmackManagerMain(void);
 void ShutDownSmacker(void);
-int PlaySmacker(int);
-int ExpansionCampaignRect(int, int);
-signed char PointInRect(int, int, struct tag_rect *);
+i32 PlaySmacker(i32);
+i32 ExpansionCampaignRect(i32, i32);
+i8 PointInRect(i32, i32, struct tag_rect *);
 void PrintSummaryInfo(SmackSum *);
 
 // ---- globals (declarations, RVA order) ----
-extern int bSmackSound;
+extern i32 bSmackSound;
 extern class icon *brotherIcon;
 extern class icon *backImage;
 extern struct SSmackOptions SmackOptions[];
-extern int bTesting;
+extern i32 bTesting;
 extern Smack *smk1;
 extern Smack *smk2;
-extern signed char bSmackNum;
-extern int gbLastFramePlayed;
+extern i8 bSmackNum;
+extern i32 gbLastFramePlayed;
 extern SmackSum smksum;
-extern int gbPlayedThrough;
-extern signed char bMainDone;
+extern i32 gbPlayedThrough;
+extern i8 bMainDone;
 
 #endif // HOMM2_SMACKMGR_H

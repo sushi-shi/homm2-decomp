@@ -12,23 +12,23 @@
 #include <SOURCE/dimPalette.h>
 #include <string.h>
 // Per-call decoder scratch — its own file-static block (0x534ca8+).
-DATA(0x00534ca8) static int gCTPitch;
-DATA(0x00534cac) static unsigned int gCTCnt;
-DATA(0x00534cb0) static int gCTX;
-DATA(0x00534cb4) static int gCTY;
+DATA(0x00534ca8) static i32 gCTPitch;
+DATA(0x00534cac) static u32 gCTCnt;
+DATA(0x00534cb0) static i32 gCTX;
+DATA(0x00534cb4) static i32 gCTY;
 DATA(0x00534cb8) static IconEntry *gCTEntry;
-DATA(0x00534cbc) static unsigned char *gCTRow;
-DATA(0x00534cc0) static unsigned char *gCTDimPal;
-DATA(0x00534cc4) static int gCTClipB;
-DATA(0x00534cc8) static int gCTClipR;
-DATA(0x00534ccc) static unsigned char *gCTSrcCopy;
-DATA(0x00534cd0) static unsigned int gCTDimLen;
-DATA(0x00534cd4) static unsigned char *gCTDst;
-DATA(0x00534cd8) static unsigned char *gCTSrc;
-DATA(0x00534cdc) static unsigned int gCTCnt2;
-DATA(0x00534ce0) static int gCTX0;
-DATA(0x00534ce4) static unsigned char gCTColor;
-DATA(0x00534ce8) static unsigned int gCTRun;
+DATA(0x00534cbc) static u8 *gCTRow;
+DATA(0x00534cc0) static u8 *gCTDimPal;
+DATA(0x00534cc4) static i32 gCTClipB;
+DATA(0x00534cc8) static i32 gCTClipR;
+DATA(0x00534ccc) static u8 *gCTSrcCopy;
+DATA(0x00534cd0) static u32 gCTDimLen;
+DATA(0x00534cd4) static u8 *gCTDst;
+DATA(0x00534cd8) static u8 *gCTSrc;
+DATA(0x00534cdc) static u32 gCTCnt2;
+DATA(0x00534ce0) static i32 gCTX0;
+DATA(0x00534ce4) static u8 gCTColor;
+DATA(0x00534ce8) static u32 gCTRun;
 
 // Colour-table variant: literals and solid runs use colorTable[], and dimming is gated by dimGate.
 // Earlier setup, owner, command, lifetime, and CFG families are hash-pinned under
@@ -102,23 +102,23 @@ DATA(0x00534ce8) static unsigned int gCTRun;
 // shared helper gives 81.14554% and 91/91 relocations without inventing targets. Per-owner counts
 // still expose the real residual: gCTX0 and gCTCnt are each short once while gCTY is excess twice.
 VA(0x004d32a0, 0x5af)
-void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
-                            int clip, int clipX, int clipY, int clipW, int clipH, int color,
-                            unsigned char *colorTable, int dimGate)
+void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, i32 x, i32 y, i32 frame,
+                            i32 clip, i32 clipX, i32 clipY, i32 clipW, i32 clipH, i32 color,
+                            u8 *colorTable, i32 dimGate)
 {
-    unsigned char *data = reinterpret_cast<unsigned char *>(srcIcon->m_data);
+    u8 *data = reinterpret_cast<u8 *>(srcIcon->m_data);
     IconEntry *entry = reinterpret_cast<IconEntry *>(data) + frame;
-    int entryX = entry->x;
-    int sourceOffset = entry->srcOffset;
-    unsigned char *savedDst;
+    i32 entryX = entry->x;
+    i32 sourceOffset = entry->srcOffset;
+    u8 *savedDst;
     gCTEntry = entry;
     gCTSrc = data + sourceOffset;
-    int X = x + entryX;
+    i32 X = x + entryX;
     gCTX0 = X;
     gCTPitch = dest->m_width;
     gCTY = entry->y + y;
     if (clip != 0) {
-        int currentY = gCTY;
+        i32 currentY = gCTY;
         if (X < clipX || clipW + clipX < entry->w + gCTX0 ||
             currentY < clipY ||
             clipY + clipH < entry->h + currentY) {
@@ -129,12 +129,12 @@ void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int 
             clip = 0;
         }
     }
-    unsigned char *row = dest->m_pixels + gCTPitch * gCTY;
+    u8 *row = dest->m_pixels + gCTPitch * gCTY;
     savedDst = gCTDst;
-    int cmd;
+    i32 cmd;
     for (;;) {
         cmd = ReadIconRleByte(gCTSrc);
-        if (static_cast<signed char>(cmd) < 0) {
+        if (static_cast<i8>(cmd) < 0) {
             if ((cmd & ICON_RLE_COMMAND_SOLID_FLAG) == 0) {
                 // skip run / end-of-sprite
                 gCTX = X;
@@ -148,8 +148,8 @@ void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int 
             }
             // 0xc0 - 0xff
             gCTRun = cmd;
-            unsigned int count = cmd & ICON_RLE_COMMAND_RUN_MASK;
-            int flags = 0;
+            u32 count = cmd & ICON_RLE_COMMAND_RUN_MASK;
+            i32 flags = 0;
             if (count != 0) {
                 // 0xc1 - 0xff : solid colour run
                 if (cmd == ICON_RLE_LONG_SOLID_COMMAND) {
@@ -169,7 +169,7 @@ void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int 
                 gCTRun = flags;
                 if (flags & ICON_RLE_DIM_RECOLOR_FLAG) {
                     gCTCnt = count;
-                    gCTColor = static_cast<unsigned char>(color);
+                    gCTColor = static_cast<u8>(color);
                     goto do_fill;
                 }
             }
@@ -178,8 +178,8 @@ void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int 
             if (clip == 0) {
                 memset(row + X, gCTColor, count);
             } else {
-                int right;
-                int fillLen;
+                i32 right;
+                i32 fillLen;
                 if (clipY <= gCTY && gCTClipB >= gCTY &&
                     (right = X + count, clipX < right) && gCTClipR >= X) {
                     if (X >= clipX) {
@@ -208,15 +208,15 @@ void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int 
             gCTCnt = count;
             gCTRun = flags;
             if (flags & ICON_RLE_DIM_APPLY_FLAG) {
-                unsigned char *palette =
-                    reinterpret_cast<unsigned char *>(uDimPal) +
+                u8 *palette =
+                    reinterpret_cast<u8 *>(uDimPal) +
                     (flags & ICON_RLE_DIM_LEVEL_MASK) * ICON_RLE_DIM_PALETTE_LEVEL_STRIDE;
                 gCTDst = savedDst;
                 gCTDimPal = palette;
                 if (clip == 0) {
                     savedDst = row + X;
                     gCTDimLen = 0;
-                    int dimCount = count;
+                    i32 dimCount = count;
                     if (dimCount > 0) {
                         gCTDimLen = dimCount;
                         do {
@@ -230,18 +230,18 @@ void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int 
                 } else {
                     gCTCnt = count;
                     if (clipY <= gCTY && gCTClipB >= gCTY &&
-                        static_cast<int>(X + count) > clipX &&
+                        static_cast<i32>(X + count) > clipX &&
                         (gCTDst = savedDst, gCTClipR >= X)) {
-                        int right = X + count;
-                        unsigned int cn;
+                        i32 right = X + count;
+                        u32 cn;
                         if (X >= clipX) {
-                            int clipRight = gCTClipR;
+                            i32 clipRight = gCTClipR;
                             cn = count;
                             if (clipRight < right)
                                 cn = (clipRight - X) + 1;
                             savedDst = row + X;
                         } else {
-                            int clipRight = gCTClipR;
+                            i32 clipRight = gCTClipR;
                             gCTCnt = count;
                             if (right <= clipRight)
                                 count = (count - clipX) + X;
@@ -253,7 +253,7 @@ void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int 
                         gCTDimPal = palette;
                         gCTCnt = cn;
                         gCTDimLen = 0;
-                        int dimCount = cn;
+                        i32 dimCount = cn;
                         if (dimCount > 0) {
                             gCTDimLen = dimCount;
                             do {
@@ -274,7 +274,7 @@ void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int 
         gCTX = X;
         gCTRun = cmd;
         if (cmd != 0) {
-            unsigned int cnt;
+            u32 cnt;
             do {
                 gCTDst = savedDst;
                 gCTSrcCopy = gCTSrc;
@@ -286,12 +286,12 @@ void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int 
                         cnt = 0;
                         break;
                     }
-                    int right = X + cmd;
+                    i32 right = X + cmd;
                     if (right <= clipX || (gCTDst = savedDst, gCTClipR < X)) {
                         cnt = 0;
                         break;
                     }
-                    int clipRight = gCTClipR;
+                    i32 clipRight = gCTClipR;
                     if (clipX <= X) {
                         savedDst = row + X;
                         if (clipRight >= right)
@@ -313,10 +313,10 @@ void IconToBitmapColorTable(class icon *srcIcon, class bitmap *dest, int x, int 
             gCTCnt = cnt;
             if (cnt != 0) {
                 gCTDimLen = 0;
-                if (static_cast<int>(cnt) > 0) {
+                if (static_cast<i32>(cnt) > 0) {
                     gCTDimLen = cnt;
                     do {
-                        int b = *gCTSrcCopy;
+                        i32 b = *gCTSrcCopy;
                         savedDst = savedDst + 1;
                         savedDst[-1] = colorTable[b];
                         gCTSrcCopy = gCTSrcCopy + 1;

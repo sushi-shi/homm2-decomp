@@ -66,16 +66,16 @@ textEntryWidget::textEntryWidget(void) : textWidget()
 // independent store. A bounded AST pass found small fuzzy gains from store permutations,
 // but each broadened the structural diff, so none was retained. Revisit after TU state changes.
 VA(0x004d87b0, 0x134)
-textEntryWidget::textEntryWidget(short x, short y, short width, short height, short maxLength,
-                                 char *text, char *fontName, short color, char *iconName,
-                                 short iconFrame, short id, short kind, short layout,
-                                 int horizontalInset, int verticalInset)
+textEntryWidget::textEntryWidget(i16 x, i16 y, i16 width, i16 height, i16 maxLength,
+                                 char *text, char *fontName, i16 color, char *iconName,
+                                 i16 iconFrame, i16 id, i16 kind, i16 layout,
+                                 i32 horizontalInset, i32 verticalInset)
     : textWidget(x, y, width, height, text, fontName, color, id, kind, 1)
 {
     m_cursorPosition = 0;
     m_maxLength = maxLength;
     icon *loadedIcon = gpResourceManager->GetIcon(iconName);
-    short rectX = m_x;
+    i16 rectX = m_x;
     m_displayOffset = 0;
     m_icon = loadedIcon;
     m_iconFrame = iconFrame;
@@ -90,7 +90,7 @@ textEntryWidget::textEntryWidget(short x, short y, short width, short height, sh
     m_rectH = m_height;
 #line 61 "I:\\Projects\\Heroes\\Prog\\BASE\\Textntry.cpp"
     m_text = static_cast<char *>(
-        H2_ALLOC(static_cast<unsigned short>(maxLength) + 5,
+        H2_ALLOC(static_cast<u16>(maxLength) + 5,
                  TEXT_ENTRY_SOURCE_FILE, 0x3e));
     strcpy(m_text, text);
     if (layout == 4) {
@@ -116,7 +116,7 @@ textEntryWidget::~textEntryWidget()
 // the preserved local with direct constant stores all broadened the diff; 22 bounded AST variants
 // also did not improve the canonical score. Revisit after TU state changes.
 VA(0x004d8920, 0x26c)
-void textEntryWidget::Read(int type)
+void textEntryWidget::Read(i32 type)
 {
     char resourceName[13];
     m_x = gpResourceManager->ReadWord();
@@ -128,18 +128,18 @@ void textEntryWidget::Read(int type)
     m_text = static_cast<char *>(H2_ALLOC(
         m_maxLength + 5,
         TEXT_ENTRY_SOURCE_FILE "\0", 0x63));
-    gpResourceManager->ReadBlock(reinterpret_cast<signed char *>(m_text), m_maxLength);
-    gpResourceManager->Read13(reinterpret_cast<signed char *>(resourceName));
+    gpResourceManager->ReadBlock(reinterpret_cast<i8 *>(m_text), m_maxLength);
+    gpResourceManager->Read13(reinterpret_cast<i8 *>(resourceName));
     gpResourceManager->SavePosition();
     m_font = gpResourceManager->GetFont(resourceName);
     gpResourceManager->RestorePosition();
     m_color = gpResourceManager->ReadWord() & 0xff;
     m_alignment = static_cast<char>(gpResourceManager->ReadWord());
-    gpResourceManager->Read13(reinterpret_cast<signed char *>(resourceName));
+    gpResourceManager->Read13(reinterpret_cast<i8 *>(resourceName));
     gpResourceManager->SavePosition();
     m_icon = gpResourceManager->GetIcon(resourceName);
     gpResourceManager->RestorePosition();
-    m_entryType = static_cast<short>(type);
+    m_entryType = static_cast<i16>(type);
     if (type == 2) {
         m_rectX = gpResourceManager->ReadWord();
         m_rectY = gpResourceManager->ReadWord();
@@ -151,7 +151,7 @@ void textEntryWidget::Read(int type)
         m_rectX = m_x;
         m_rectY = m_y;
         m_rectW = m_width;
-        int preserveText;
+        i32 preserveText;
         m_rectH = m_height;
         if (type == 3)
             preserveText = 1;
@@ -185,7 +185,7 @@ void textEntryWidget::Read(int type)
 }
 
 VA(0x004d8b90, 0x874)
-int textEntryWidget::Main(struct tag_message &message)
+i32 textEntryWidget::Main(struct tag_message &message)
 {
     if ((m_flags & WIDGET_FLAG_ENABLED) == 0) {
         if (message.type == MESSAGE_WIDGET)
@@ -198,10 +198,10 @@ int textEntryWidget::Main(struct tag_message &message)
         case MESSAGE_LEFT_BUTTON_DOWN:
         case MESSAGE_RIGHT_BUTTON_DOWN: {
             m_cursorBlink = 1;
-            short windowX = static_cast<short>(m_owner->m_posX);
-            short mouseX = static_cast<short>(message.payload.mouse.x - windowX);
-            short windowY = static_cast<short>(m_owner->m_posY);
-            short mouseY = static_cast<short>(message.payload.mouse.y - windowY);
+            i16 windowX = static_cast<i16>(m_owner->m_posX);
+            i16 mouseX = static_cast<i16>(message.payload.mouse.x - windowX);
+            i16 windowY = static_cast<i16>(m_owner->m_posY);
+            i16 mouseY = static_cast<i16>(message.payload.mouse.y - windowY);
             if (message.type == MESSAGE_RIGHT_BUTTON_DOWN) {
                 if (mouseX < m_x || mouseY < m_y || mouseX >= m_x + m_width ||
                     mouseY >= m_y + m_height)
@@ -222,7 +222,7 @@ int textEntryWidget::Main(struct tag_message &message)
                 mouseY = m_y + windowY;
                 strcpy(original, m_text);
                 if ((m_preserveTextOnFocus & 1) != 0) {
-                    m_cursorPosition = static_cast<unsigned short>(strlen(m_text));
+                    m_cursorPosition = static_cast<u16>(strlen(m_text));
                 } else {
                     m_cursorPosition = 0;
                     m_text[0] = 0;
@@ -231,7 +231,7 @@ int textEntryWidget::Main(struct tag_message &message)
                 SetupDisplayString(edit, m_cursorPosition);
                 Draw();
                 gpWindowManager->UpdateScreenRegion(mouseX, mouseY, m_width, m_height);
-                short done = 0;
+                i16 done = 0;
                 glTimers[0] = KBTickCount() + 0x168;
                 gpMouseManager->ReallyHidePointer();
                 tag_message event;
@@ -321,7 +321,7 @@ int textEntryWidget::Main(struct tag_message &message)
                                     m_cursorPosition++;
                                     SetupDisplayString(edit, m_cursorPosition);
                                     if (m_entryType != 3) {
-                                        int lineLength = m_font->LineLength(m_text, m_innerW);
+                                        i32 lineLength = m_font->LineLength(m_text, m_innerW);
                                         if (m_maxLines >= lineLength) {
                                         } else {
                                             strcpy(edit, backup);
@@ -365,7 +365,7 @@ int textEntryWidget::Main(struct tag_message &message)
                 break;
             case WIDGET_COMMAND_SET_MAX_LENGTH:
                 if (message.payload.widget.id == m_id) {
-                    m_maxLength = static_cast<unsigned short>(message.payload.widget.data.value);
+                    m_maxLength = static_cast<u16>(message.payload.widget.data.value);
                     return 1;
                 }
                 break;
@@ -381,7 +381,7 @@ void textEntryWidget::Draw(void)
     if (m_entryType == 3) {
         char display[600];
         strcpy(display, m_text + m_displayOffset);
-        unsigned int length = strlen(display);
+        u32 length = strlen(display);
         if (m_font->LineWidth(display) > m_innerW) {
             do {
                 display[length - 1] = 0;
@@ -396,7 +396,7 @@ void textEntryWidget::Draw(void)
     } else {
         m_icon->DrawToBuffer(m_rectX + m_owner->m_posX, m_rectY + m_owner->m_posY,
                              m_iconFrame, 0);
-        int color = 3;
+        i32 color = 3;
         if ((m_flags & WIDGET_FLAG_DIMMED) == 0)
             color = m_color;
         m_font->DrawBoundedString(m_text, m_innerX + m_owner->m_posX,
@@ -406,7 +406,7 @@ void textEntryWidget::Draw(void)
 }
 
 VA(0x004d9570, 0x1be)
-void textEntryWidget::SetupDisplayString(char *source, unsigned short cursor)
+void textEntryWidget::SetupDisplayString(char *source, u16 cursor)
 {
     if (KBTickCount() > glTimers[0]) {
         m_cursorBlink = 1 - m_cursorBlink;
@@ -424,7 +424,7 @@ void textEntryWidget::SetupDisplayString(char *source, unsigned short cursor)
         m_text[cursor + 1] = 0;
 
     if (m_entryType == 3) {
-        int shifted;
+        i32 shifted;
         char display[300];
         do {
             shifted = 0;

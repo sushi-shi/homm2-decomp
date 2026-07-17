@@ -33,38 +33,38 @@ typedef enum WinsockWaitType {
 
 #pragma pack(push, 1)
 struct WinsockStartupMessage {
-    unsigned char playerCount;
-    unsigned char netPosition;
-    int playerAddresses[WS_TRANSPORT_PLAYER_COUNT];
+    u8 playerCount;
+    u8 netPosition;
+    i32 playerAddresses[WS_TRANSPORT_PLAYER_COUNT];
 };
 #pragma pack(pop)
 SIZE(WinsockStartupMessage, 0x1a);
 
-short int wsnet_init(void);
+i16 wsnet_init(void);
 void wsnet_term(void);
-void wsSendMessage(int, unsigned char, unsigned short int, void *);
-int wsnet_snd(int, int, void *);
-short int wsnet_rcv(short int, unsigned short int, void *);
+void wsSendMessage(i32, u8, u16, void *);
+i32 wsnet_snd(i32, i32, void *);
+i16 wsnet_rcv(i16, u16, void *);
 void wsProcessMessages(void);
-void wsEvaluateMessage(unsigned long int, int);
-int wsWaitForFirstGuest(void);
-int wsWaitForExtraGuests(void);
-int wsWaitForHost(void);
+void wsEvaluateMessage(u32l, i32);
+i32 wsWaitForFirstGuest(void);
+i32 wsWaitForExtraGuests(void);
+i32 wsWaitForHost(void);
 
 // ---- globals (declarations, RVA order) ----
-extern int bHostFound;
-extern unsigned int sd_dg;
-extern int iWSLastMsgNumHumanPlayers;
-extern int iWSAttempts;
-extern int iWSNextTickCount;
-extern int iWSWaitForHostStatus;
-extern int iRc;
+extern i32 bHostFound;
+extern u32 sd_dg;
+extern i32 iWSLastMsgNumHumanPlayers;
+extern i32 iWSAttempts;
+extern i32 iWSNextTickCount;
+extern i32 iWSWaitForHostStatus;
+extern i32 iRc;
 extern char cWSTextBuffer[WS_TRANSPORT_BUFFER_SIZE];
 extern struct sockaddr_in saddr_loc;
-extern unsigned short wVer;
+extern u16 wVer;
 extern struct WSAData wsadata;
 extern struct in_addr gIn_addrIP;
 extern struct sockaddr_in saddr_remote;
-extern int iAddrLen;
+extern i32 iAddrLen;
 
 #endif // HOMM2_WSNETWIN_H

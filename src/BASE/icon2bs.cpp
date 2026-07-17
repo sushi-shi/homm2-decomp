@@ -54,35 +54,35 @@
 // retail assembly/stack map but no source reconstruction. No generated state or sub-100 shape is
 // retained; the missing scale=EBX, step=EBP, tmpPixels/dstRow spills remain unresolved.
 VA(0x004d2f90, 0x179)
-void IconToBitmapScale(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
-                       int clip, int clipX, int clipY, int clipW, int clipH, int scale)
+void IconToBitmapScale(class icon *srcIcon, class bitmap *dest, i32 x, i32 y, i32 frame,
+                       i32 clip, i32 clipX, i32 clipY, i32 clipW, i32 clipH, i32 scale)
 {
     if (scale == ICON_SCALE_NATIVE_SIZE) {
         IconToBitmap(srcIcon, dest, x, y, frame, clip, clipX, clipY, clipW, clipH, 0);
         return;
     }
-    int step = ICON_SCALE_NATIVE_SIZE / scale;
-    int srcBase = ((1 - scale) * step + ICON_SCALE_NATIVE_SIZE) >> 1;
-    int srcAdv = step * ICON_SCALE_WORK_BITMAP_SIZE;
+    i32 step = ICON_SCALE_NATIVE_SIZE / scale;
+    i32 srcBase = ((1 - scale) * step + ICON_SCALE_NATIVE_SIZE) >> 1;
+    i32 srcAdv = step * ICON_SCALE_WORK_BITMAP_SIZE;
     bitmap *tmp = new bitmap(0, ICON_SCALE_WORK_BITMAP_SIZE, ICON_SCALE_WORK_BITMAP_SIZE);
-    int rowOff = 0;
-    unsigned char *tmpPixels = tmp->m_pixels;
+    i32 rowOff = 0;
+    u8 *tmpPixels = tmp->m_pixels;
     do {
         memset(tmpPixels + rowOff, 0, ICON_SCALE_NATIVE_SIZE);
         rowOff = rowOff + ICON_SCALE_NATIVE_SIZE;
     } while (rowOff < ICON_SCALE_NATIVE_SIZE * ICON_SCALE_WORK_BITMAP_SIZE);
     IconToBitmap(srcIcon, tmp, 0, 0, frame, 1, 0, 0, ICON_SCALE_NATIVE_SIZE,
                  ICON_SCALE_NATIVE_SIZE, 0);
-    int pitch = dest->m_width;
-    unsigned char *dstRow = dest->m_pixels + y * pitch + x;
-    unsigned char *srcRow =
+    i32 pitch = dest->m_width;
+    u8 *dstRow = dest->m_pixels + y * pitch + x;
+    u8 *srcRow =
         tmp->m_pixels + srcBase * ICON_SCALE_WORK_BITMAP_SIZE + srcBase;
     if (0 < scale) {
-        int rows = scale;
+        i32 rows = scale;
         do {
-            int cols = scale;
-            unsigned char *dstPix = dstRow;
-            unsigned char *srcPix = srcRow;
+            i32 cols = scale;
+            u8 *dstPix = dstRow;
+            u8 *srcPix = srcRow;
             if (0 < scale) {
                 do {
                     if (*srcPix != 0)

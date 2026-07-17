@@ -49,24 +49,24 @@ public:
     heroWindow *m_owner;  // +0x04  owning window
     widget *m_next;  // +0x08  next widget in the owner window's list
     widget *m_prev;  // +0x0c  prev widget in the owner window's list
-    short  m_id;  // +0x10
-    short  m_zOrder;  // +0x12
-    short  m_kind;  // +0x14  serialized widget rendering/behavior kind
-    short  m_flags;  // +0x16
-    short  m_x;  // +0x18
-    short  m_y;  // +0x1a
-    short  m_width;  // +0x1c
-    short  m_height;  // +0x1e
+    i16  m_id;  // +0x10
+    i16  m_zOrder;  // +0x12
+    i16  m_kind;  // +0x14  serialized widget rendering/behavior kind
+    i16  m_flags;  // +0x16
+    i16  m_x;  // +0x18
+    i16  m_y;  // +0x1a
+    i16  m_width;  // +0x1c
+    i16  m_height;  // +0x1e
     // --- constructors ---
-    widget(short int x, short int y, short int width, short int height,
-           short int id, short int kind);
+    widget(i16 x, i16 y, i16 width, i16 height,
+           i16 id, i16 kind);
     widget(void);
     // --- virtual methods (vtable order) ---
     virtual void Draw(void) = 0;
     virtual ~widget(void) = 0;
-    virtual int Main(struct tag_message &message) = 0;
+    virtual i32 Main(struct tag_message &message) = 0;
     // --- methods ---
-    int Open(int zOrder, class heroWindow *owner);
+    i32 Open(i32 zOrder, class heroWindow *owner);
     void Close(void);
     void Dim(void);
 };

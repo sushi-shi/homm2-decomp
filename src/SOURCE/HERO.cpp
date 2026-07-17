@@ -46,7 +46,7 @@ hero::hero(void) {
 }
 
 VA(0x0046c40f, 0x53)
-void hero::Read(int file, signed char expansion) {
+void hero::Read(i32 file, i8 expansion) {
     if (expansion)
         read(file, this, sizeof(hero));
     else
@@ -54,7 +54,7 @@ void hero::Read(int file, signed char expansion) {
 }
 
 VA(0x0046c462, 0x53)
-void hero::Write(int file, signed char expansion) {
+void hero::Write(i32 file, i8 expansion) {
     if (expansion)
         write(file, this, sizeof(hero));
     else
@@ -62,11 +62,11 @@ void hero::Write(int file, signed char expansion) {
 }
 
 VA(0x0046c4b5, 0x18)
-void hero::GetArmyStrengths(unsigned long int * const) {}
+void hero::GetArmyStrengths(u32l * const) {}
 
 VA(0x0046c4cd, 0x59)
-int hero::HasArtifact(int artifact) {
-    int artifactIndex;
+i32 hero::HasArtifact(i32 artifact) {
+    i32 artifactIndex;
 
     for (artifactIndex = 0; artifactIndex < HERO_ARTIFACT_SLOT_COUNT; artifactIndex++) {
         if (m_artifacts[artifactIndex] == artifact)
@@ -76,23 +76,23 @@ int hero::HasArtifact(int artifact) {
 }
 
 VA(0x0046c526, 0x277)
-int hero::CalcMobility(void) {
-    short landMobility[8] = {
+i32 hero::CalcMobility(void) {
+    i16 landMobility[8] = {
         1000, 1000, 1000, 1100, 1200, 1300, 1400, 1500
     };
-    const short seaBaseMobilityCurrent = HERO_SEA_BASE_MOBILITY;
-    const short lighthouseBonusIncrement = HERO_LIGHTHOUSE_MOBILITY_BONUS;
-    const short astrolabeBonus = HERO_ASTROLABE_MOBILITY_BONUS;
-    const short compassMobility = HERO_COMPASS_MOBILITY_BONUS;
-    const short nomadBootsMobilityBonus = HERO_NOMAD_BOOTS_MOBILITY_BONUS;
-    const short travelerBonus = HERO_TRAVELER_BOOTS_MOBILITY_BONUS;
-    int mobilityResult;
-    int slowestSpeedValue;
-    int armySlotIndex;
+    const i16 seaBaseMobilityCurrent = HERO_SEA_BASE_MOBILITY;
+    const i16 lighthouseBonusIncrement = HERO_LIGHTHOUSE_MOBILITY_BONUS;
+    const i16 astrolabeBonus = HERO_ASTROLABE_MOBILITY_BONUS;
+    const i16 compassMobility = HERO_COMPASS_MOBILITY_BONUS;
+    const i16 nomadBootsMobilityBonus = HERO_NOMAD_BOOTS_MOBILITY_BONUS;
+    const i16 travelerBonus = HERO_TRAVELER_BOOTS_MOBILITY_BONUS;
+    i32 mobilityResult;
+    i32 slowestSpeedValue;
+    i32 armySlotIndex;
 
     if (m_eventFlags & HERO_EVENT_EMBARKED) {
         mobilityResult = seaBaseMobilityCurrent;
-        mobilityResult = static_cast<int>(mobilityResult *
+        mobilityResult = static_cast<i32>(mobilityResult *
             gfSSNavigationMod[m_secondarySkills[HERO_SKILL_NAVIGATION]]);
         if (m_owner != -1)
             mobilityResult += gpGame->MineTypesOwned(m_owner, HERO_LIGHTHOUSE_MINE_TYPE) *
@@ -108,7 +108,7 @@ int hero::CalcMobility(void) {
             }
         }
         mobilityResult = landMobility[slowestSpeedValue];
-        mobilityResult = static_cast<int>(mobilityResult *
+        mobilityResult = static_cast<i32>(mobilityResult *
             gfSSLogisticsMod[m_secondarySkills[HERO_SKILL_LOGISTICS]]);
         if (HasArtifact(HERO_ARTIFACT_NOMAD_BOOTS))
             mobilityResult += nomadBootsMobilityBonus;
@@ -131,8 +131,8 @@ int hero::CalcMobility(void) {
 }
 
 VA(0x0046c79d, 0xcf)
-int hero::HasSpell(int spell) {
-    int artifactIndex;
+i32 hero::HasSpell(i32 spell) {
+    i32 artifactIndex;
 
     if (!HasArtifact(HERO_ARTIFACT_MAGIC_BOOK))
         return 0;
@@ -158,9 +158,9 @@ int hero::HasSpell(int spell) {
 // two gsSpellInfo relocations resolve to the same attributes bytes through retail's
 // interior const_000fbe8d label; the remaining delta is TU code-selection noise.
 VA(0x0046c86c, 0xc5)
-int hero::GetNthSpell(int type, int spellNumber) {
-    int spell;
-    int spellOrdinalCount = 0;
+i32 hero::GetNthSpell(i32 type, i32 spellNumber) {
+    i32 spell;
+    i32 spellOrdinalCount = 0;
 
     for (spell = 0; spell < HERO_SPELL_COUNT; spell++) {
         if (HasSpell(spell)) {
@@ -183,10 +183,10 @@ int hero::GetNthSpell(int type, int spellNumber) {
 // Both relocation targets agree; retail delinks gsSpellInfo[0].attributes as the interior
 // label const_000fbe8d while the typed source uses gsSpellInfo with addend 0x15.
 VA(0x0046c931, 0xd0)
-int hero::GetNumSpells(int type) {
-    int numAdventureSpells;
-    int numCombatSpells;
-    int spellIndexCurrent;
+i32 hero::GetNumSpells(i32 type) {
+    i32 numAdventureSpells;
+    i32 numCombatSpells;
+    i32 spellIndexCurrent;
 
     numCombatSpells = 0;
     numAdventureSpells = 0;
@@ -211,7 +211,7 @@ int hero::GetNumSpells(int type) {
 }
 
 VA(0x0046ca01, 0x8a)
-void hero::UseSpell(int spell) {
+void hero::UseSpell(i32 spell) {
     if (spell == HERO_SPELL_NONE)
         return;
 
@@ -223,7 +223,7 @@ void hero::UseSpell(int spell) {
 }
 
 VA(0x0046ca8b, 0x26)
-void hero::AddSpell(int spell, int) {
+void hero::AddSpell(i32 spell, i32) {
     m_spells[spell] = 1;
 }
 
@@ -246,7 +246,7 @@ void HeroMessageUpdate(char *text) {
 VA(0x0046cb33, 0xa8)
 void hero::HeroScreenUpdate(void) {
     tag_message message;
-    int index;
+    i32 index;
 
     message.type = HERO_UI_MESSAGE;
     UpdateArmies();
@@ -266,7 +266,7 @@ void hero::HeroScreenUpdate(void) {
 VA(0x0046cbdb, 0x1d2)
 void hero::UpdateArmies(void) {
     tag_message message;
-    int index;
+    i32 index;
 
     message.type = HERO_UI_MESSAGE;
     for (index = 0; index < HERO_UI_ARMY_SLOT_COUNT; index++) {
@@ -314,13 +314,13 @@ void hero::UpdateArmies(void) {
 }
 
 VA(0x0046cdad, 0x43)
-void hero::ViewStat(int stat, int quickView) {
+void hero::ViewStat(i32 stat, i32 quickView) {
     NormalDialog(gStatDesc[stat], quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW,
         -1, -1, -1, 0, -1, 0, -1, 0);
 }
 
 VA(0x0046cdf0, 0x9b)
-void hero::ViewArtifact(int artifact, int quickView, int extra) {
+void hero::ViewArtifact(i32 artifact, i32 quickView, i32 extra) {
     if (artifact == HERO_ARTIFACT_SPELL_SCROLL) {
         sprintf(gText, gArtifactDesc[artifact], gSpellNames[extra]);
         NormalDialog(gText, quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW,
@@ -333,7 +333,7 @@ void hero::ViewArtifact(int artifact, int quickView, int extra) {
 }
 
 VA(0x0046ce8b, 0x5d)
-int hero::Dismiss(void) {
+i32 hero::Dismiss(void) {
     NormalDialog("Are you sure you want to dismiss this Hero?", NORMAL_DIALOG_CONFIRM,
         -1, -1, -1, 0, -1, 0, -1, 0);
     if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
@@ -358,18 +358,18 @@ int hero::Dismiss(void) {
 // TU-state sweep also found no audited exact closure; generated probes were
 // discarded. Revisit only after a material accessor or shared-layout change.
 VA(0x0046cee8, 0x587)
-void hero::Deallocate(int updateMap) {
-    int availableHeroSlotCurrent;
+void hero::Deallocate(i32 updateMap) {
+    i32 availableHeroSlotCurrent;
     playerData *player;
-    int playerHeroIndex;
-    int heroOwner;
-    int index;
+    i32 playerHeroIndex;
+    i32 heroOwner;
+    i32 index;
     town *occupiedTownValue;
     mapCell *mapCellRecord;
 
     if (updateMap)
-        SendMapChange(MAP_CHANGE_DEAD_HERO, m_id, static_cast<unsigned char>(m_x),
-            static_cast<unsigned char>(m_y), HERO_MAP_CHANGE_UNUSED, 0, 0);
+        SendMapChange(MAP_CHANGE_DEAD_HERO, m_id, static_cast<u8>(m_x),
+            static_cast<u8>(m_y), HERO_MAP_CHANGE_UNUSED, 0, 0);
 
     heroOwner = m_owner;
     player = &gpGame->m_players[m_owner];
@@ -466,22 +466,22 @@ void hero::Deallocate(int updateMap) {
 }
 
 VA(0x0046d46f, 0x9e)
-int hero::GetExperience(int level) {
-    int experience;
-    int levelCounter;
-    int increment;
+i32 hero::GetExperience(i32 level) {
+    i32 experience;
+    i32 levelCounter;
+    i32 increment;
 
     if (level <= HERO_EXPERIENCE_LEVEL_TABLE_COUNT)
         return gMinExpForLevel[level - 1];
 
     levelCounter = HERO_EXPERIENCE_EXTRAPOLATION_FIRST_LEVEL;
-    increment = static_cast<int>(
+    increment = static_cast<i32>(
         (gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT - 1] -
          gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT - 2]) *
         HERO_EXPERIENCE_GROWTH_FACTOR);
     experience = gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT - 1] + increment;
     while (levelCounter < level) {
-        increment = static_cast<int>(increment * HERO_EXPERIENCE_GROWTH_FACTOR);
+        increment = static_cast<i32>(increment * HERO_EXPERIENCE_GROWTH_FACTOR);
         experience += increment;
         levelCounter++;
     }
@@ -494,24 +494,24 @@ int hero::GetExperience(int level) {
 // the argument with JLE. Direct and reversed source inequalities compile
 // byte-identically; remaining differences are the local double-pool identity.
 VA(0x0046d50d, 0xc0)
-int hero::GetLevel(int experienceValue) {
-    int experience;
-    int levelCounter;
-    int increment;
+i32 hero::GetLevel(i32 experienceValue) {
+    i32 experience;
+    i32 levelCounter;
+    i32 increment;
 
     for (levelCounter = 1; levelCounter <= HERO_EXPERIENCE_LEVEL_TABLE_COUNT; levelCounter++) {
         if (experienceValue < gMinExpForLevel[levelCounter - 1])
             return levelCounter - 1;
     }
 
-    increment = static_cast<int>(
+    increment = static_cast<i32>(
         (gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT - 1] -
          gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT - 2]) *
         HERO_EXPERIENCE_GROWTH_FACTOR);
     experience = gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT - 1] + increment;
     levelCounter = HERO_EXPERIENCE_EXTRAPOLATION_FIRST_LEVEL;
     while (experience < experienceValue) {
-        increment = static_cast<int>(increment * HERO_EXPERIENCE_GROWTH_FACTOR);
+        increment = static_cast<i32>(increment * HERO_EXPERIENCE_GROWTH_FACTOR);
         experience += increment;
         levelCounter++;
     }
@@ -607,19 +607,19 @@ void hero::ApplyBattleLossTemps(void) {
 // retail PE stores 0x50cb24 there, the " a level.\n" cHeroLevel[1] string.
 VA(0x0046d83f, 0x828)
 void hero::CheckLevel(void) {
-    int statBonuses[HERO_PRIMARY_STAT_COUNT];
+    i32 statBonuses[HERO_PRIMARY_STAT_COUNT];
     char line[HERO_LEVEL_TEXT_BUFFER_SIZE];
-    int levelsGained;
-    int newLevel;
-    int attempts;
-    int skillChoicesResult[HERO_SECONDARY_SKILL_CHOICE_COUNT];
-    int highLevelIndex;
-    int indexValue;
+    i32 levelsGained;
+    i32 newLevel;
+    i32 attempts;
+    i32 skillChoicesResult[HERO_SECONDARY_SKILL_CHOICE_COUNT];
+    i32 highLevelIndex;
+    i32 indexValue;
     SAMPLE2 sampleValue;
-    int currentLevelIndex;
-    int skillIndexValue;
-    int randomValue;
-    int skillWeightIndex;
+    i32 currentLevelIndex;
+    i32 skillIndexValue;
+    i32 randomValue;
+    i32 skillWeightIndex;
 
     newLevel = GetLevel(m_experience);
     if (m_level == newLevel) {
@@ -709,7 +709,7 @@ void hero::CheckLevel(void) {
 
             if (skillChoicesResult[0] == HERO_SKILL_WISDOM ||
                 skillChoicesResult[1] == HERO_SKILL_WISDOM) {
-                m_enabled = static_cast<unsigned char>(currentLevelIndex);
+                m_enabled = static_cast<u8>(currentLevelIndex);
             }
 
             if (!gbInNewGameSetup && m_owner >= 0 && gbThisNetHumanPlayer[m_owner]) {
@@ -762,15 +762,15 @@ void hero::CheckLevel(void) {
                 }
             }
         }
-        m_level = static_cast<short>(newLevel);
+        m_level = static_cast<i16>(newLevel);
         WaitEndSample(sampleValue, -1);
     }
 }
 
 VA(0x0046e067, 0x57)
-int hero::NumArtifacts(void) {
-    int cnt = 0;
-    int i;
+i32 hero::NumArtifacts(void) {
+    i32 cnt = 0;
+    i32 i;
 
     for (i = 0; i < HERO_ARTIFACT_SLOT_COUNT; i++) {
         if (m_artifacts[i] >= 0)
@@ -792,8 +792,8 @@ int hero::NumArtifacts(void) {
 // comparison-tool change.
 VA(0x0046e0be, 0x758)
 void UpdateHeroScreenStatusBar(struct tag_message &message) {
-    int armySlot;
-    int secondarySkillSlot;
+    i32 armySlot;
+    i32 secondarySkillSlot;
 
     switch (message.payload.widget.id) {
     case HERO_UI_PRIMARY_STAT_FIRST:
@@ -970,16 +970,16 @@ default_hero_text:
 // formation updates; reversing the hover equality was byte-neutral. An isolated
 // eight-trial TU-state sweep found no audited exact closure.
 VA(0x0046e816, 0xaef)
-int HeroHandler(struct tag_message &message) {
-    int handlerValue16;
-    int temp1;
-    int armySlot7;
-    int exitHero36 = 0;
-    int secondarySkillSlot18;
-    int quickView0;
-    int heroPosition5;
-    int nextExperience12;
-    int level14;
+i32 HeroHandler(struct tag_message &message) {
+    i32 handlerValue16;
+    i32 temp1;
+    i32 armySlot7;
+    i32 exitHero36 = 0;
+    i32 secondarySkillSlot18;
+    i32 quickView0;
+    i32 heroPosition5;
+    i32 nextExperience12;
+    i32 level14;
 
     if (message.payload.widget.parameter & HERO_UI_QUICK_VIEW_MODIFIER)
         quickView0 = 1;
@@ -1037,7 +1037,7 @@ int HeroHandler(struct tag_message &message) {
                             heroPosition5 =
                                 gpGame->HeroIDToHeroPos(gpCurPlayer, gpHVHero->m_id);
                             heroPosition5 =
-                                ((static_cast<unsigned int>(message.payload.widget.id -
+                                ((static_cast<u32>(message.payload.widget.id -
                                       HERO_UI_PREVIOUS_HERO) >= 1 ? 1 : -1) +
                                     gpCurPlayer->m_heroCount + heroPosition5) %
                                 gpCurPlayer->m_heroCount;
@@ -1144,7 +1144,7 @@ int HeroHandler(struct tag_message &message) {
             case HERO_UI_ARMY_SELECTOR_FIRST + 3:
             case HERO_UI_ARMY_SELECTOR_LAST: {
                 tag_message dialogMessage;
-                int armyValue;
+                i32 armyValue;
 
                 armySlot7 = message.payload.widget.id - HERO_UI_ARMY_SELECTOR_FIRST;
                 if (quickView0 == 0 && giHeroScreenSrcIndex == HERO_UI_ARMY_SELECTION_NONE) {
@@ -1156,7 +1156,7 @@ int HeroHandler(struct tag_message &message) {
                                gpHVHero->m_army.m_creatureTypes[armySlot7] !=
                                    ARMY_GROUP_EMPTY_SLOT) ||
                            (quickView0 == 0 && armySlot7 == giHeroScreenSrcIndex)) {
-                    int canDismiss;
+                    i32 canDismiss;
 
                     if (quickView0 == 0 && gpTownManager->m_castleDialogActive !=
                             HERO_UI_CASTLE_DIALOG_ACTIVE &&
@@ -1197,12 +1197,12 @@ int HeroHandler(struct tag_message &message) {
                                 gpHVHero->m_army.m_creatureTypes[armySlot7] =
                                     gpHVHero->m_army.m_creatureTypes[giHeroScreenSrcIndex];
                                 gpHVHero->m_army.m_creatureTypes[giHeroScreenSrcIndex] =
-                                    static_cast<signed char>(temp1);
+                                    static_cast<i8>(temp1);
                                 temp1 = gpHVHero->m_army.m_creatureCounts[armySlot7];
                                 gpHVHero->m_army.m_creatureCounts[armySlot7] =
                                     gpHVHero->m_army.m_creatureCounts[giHeroScreenSrcIndex];
                                 gpHVHero->m_army.m_creatureCounts[giHeroScreenSrcIndex] =
-                                    static_cast<short>(temp1);
+                                    static_cast<i16>(temp1);
                             }
                         } else {
                             DoHeroSplit(armySlot7, giHeroScreenSrcIndex);
@@ -1298,7 +1298,7 @@ void RedrawHeroScreen(void) {
 // for the ownership comparison; base evaluates them in reverse. The remaining
 // relocation identity is the TU-local coalesced herowind.bin literal.
 VA(0x0046f354, 0x218)
-int HeroView(int heroId, int noDismiss, int fadeAlreadyOut) {
+i32 HeroView(i32 heroId, i32 noDismiss, i32 fadeAlreadyOut) {
     mapCell *heroCell;
 
     gbNoDismiss = noDismiss;
@@ -1360,15 +1360,15 @@ int HeroView(int heroId, int noDismiss, int fadeAlreadyOut) {
 // differences are TU-cumulative compiler shape.
 VA(0x0046f56c, 0x9c5)
 void SetupHeroView(void) {
-    int cannotDismiss;
+    i32 cannotDismiss;
     tag_message message;
-    int index;
-    int displayIndex;
-    int magnitude;
-    int luck;
-    int morale;
-    int secondarySkillBonus;
-    int secondarySkill;
+    i32 index;
+    i32 displayIndex;
+    i32 magnitude;
+    i32 luck;
+    i32 morale;
+    i32 secondarySkillBonus;
+    i32 secondarySkill;
     tag_message statusMessage;
 
     cannotDismiss = gbNoDismiss;
@@ -1624,9 +1624,9 @@ void SetupHeroView(void) {
 // bytes at +0x18c/+0x19a; lite disassembly otherwise differs only in local
 // string-literal identities.
 VA(0x0046ff31, 0x2b0)
-void DoHeroSplit(int destinationSlot, int sourceSlot) {
-    short splitTextSlot = HERO_UI_SPLIT_TEXT;
-    short splitAmount = HERO_UI_SPLIT_AMOUNT;
+void DoHeroSplit(i32 destinationSlot, i32 sourceSlot) {
+    i16 splitTextSlot = HERO_UI_SPLIT_TEXT;
+    i16 splitAmount = HERO_UI_SPLIT_AMOUNT;
     tag_message message;
 
     gpTownManager->m_heroWindow1 = new heroWindow(
@@ -1665,7 +1665,7 @@ void DoHeroSplit(int destinationSlot, int sourceSlot) {
             gpHVHero->m_army.m_creatureCounts[sourceSlot] -=
                 gpTownManager->m_splitAmount;
             gpHVHero->m_army.m_creatureCounts[destinationSlot] =
-                static_cast<short>(gpTownManager->m_splitAmount);
+                static_cast<i16>(gpTownManager->m_splitAmount);
             gpHVHero->m_army.m_creatureTypes[destinationSlot] =
                 gpHVHero->m_army.m_creatureTypes[sourceSlot];
             if (gpHVHero->m_army.m_creatureCounts[sourceSlot] == 0)
@@ -1676,11 +1676,11 @@ void DoHeroSplit(int destinationSlot, int sourceSlot) {
 }
 
 VA(0x004701e1, 0x6a)
-void hero::SetSS(int skill, int level) {
+void hero::SetSS(i32 skill, i32 level) {
     if (level == HERO_SKILL_LEVEL_NONE)
         TakeSS(skill, HERO_SKILL_LEVEL_EXPERT);
     else if (m_secondarySkills[skill] != HERO_SKILL_LEVEL_NONE)
-        m_secondarySkills[skill] = static_cast<signed char>(level);
+        m_secondarySkills[skill] = static_cast<i8>(level);
     else
         GiveSS(skill, level);
 }
@@ -1692,9 +1692,9 @@ void hero::SetSS(int skill, int level) {
 // otherSkill[m_secondarySkillOrder] compiled byte-identically. Revisit after a
 // HERO TU-state change or in the byte-last-mile phase.
 VA(0x0047024b, 0xfa)
-int hero::TakeSS(int skill, int levels) {
-    int oldLevel;
-    int otherSkill;
+i32 hero::TakeSS(i32 skill, i32 levels) {
+    i32 oldLevel;
+    i32 otherSkill;
 
     oldLevel = m_secondarySkills[skill];
     if (m_secondarySkills[skill] != HERO_SKILL_LEVEL_NONE) {
@@ -1716,18 +1716,18 @@ int hero::TakeSS(int skill, int levels) {
 }
 
 VA(0x00470345, 0xbf)
-int hero::GiveSS(int skill, int levels) {
-    int oldLevel;
+i32 hero::GiveSS(i32 skill, i32 levels) {
+    i32 oldLevel;
 
     oldLevel = m_secondarySkills[skill];
     if (m_secondarySkills[skill] != HERO_SKILL_LEVEL_NONE) {
         m_secondarySkills[skill] += levels;
     } else {
         if (m_secondarySkillCount < HERO_SECONDARY_SKILL_CAPACITY) {
-            m_secondarySkills[skill] = static_cast<signed char>(levels);
+            m_secondarySkills[skill] = static_cast<i8>(levels);
             m_secondarySkillCount++;
             m_secondarySkillOrder[skill] =
-                static_cast<unsigned char>(m_secondarySkillCount);
+                static_cast<u8>(m_secondarySkillCount);
         }
     }
     if (m_secondarySkills[skill] > HERO_SKILL_LEVEL_EXPERT)
@@ -1736,9 +1736,9 @@ int hero::GiveSS(int skill, int levels) {
 }
 
 VA(0x00470404, 0x6a)
-int hero::CreatureTypeCount(int creatureType) {
-    int creatureCount;
-    int armySlot;
+i32 hero::CreatureTypeCount(i32 creatureType) {
+    i32 creatureCount;
+    i32 armySlot;
 
     creatureCount = 0;
     for (armySlot = 0; armySlot < ARMY_GROUP_SLOT_COUNT; armySlot++) {
@@ -1751,20 +1751,20 @@ int hero::CreatureTypeCount(int creatureType) {
 }
 
 VA(0x0047046e, 0x5e)
-void hero::UpgradeCreatures(int oldCreatureType, int newCreatureType) {
-    int numberUpgraded = 0;
-    int armySlot;
+void hero::UpgradeCreatures(i32 oldCreatureType, i32 newCreatureType) {
+    i32 numberUpgraded = 0;
+    i32 armySlot;
 
     for (armySlot = 0; armySlot < ARMY_GROUP_SLOT_COUNT; armySlot++) {
         if (m_army.m_creatureTypes[armySlot] == oldCreatureType)
             m_army.m_creatureTypes[armySlot] =
-                static_cast<signed char>(newCreatureType);
+                static_cast<i8>(newCreatureType);
     }
 }
 
 VA(0x004704cc, 0x5e)
-int hero::GetNthSS(int ordinal) {
-    int skill;
+i32 hero::GetNthSS(i32 ordinal) {
+    i32 skill;
 
     for (skill = 0; skill < HERO_SKILL_COUNT; skill++) {
         if (m_secondarySkillOrder[skill] ==
@@ -1782,7 +1782,7 @@ class town * hero::GetOccupiedTown(void) {
 }
 
 VA(0x0047057b, 0x47)
-signed char hero::Stats(int stat) {
+i8 hero::Stats(i32 stat) {
     if (stat == HERO_PRIMARY_SPELL_POWER &&
         m_primaryStats[stat] < HERO_MINIMUM_SPELL_POWER) {
         return HERO_MINIMUM_SPELL_POWER;
@@ -1791,9 +1791,9 @@ signed char hero::Stats(int stat) {
 }
 
 VA(0x004705c2, 0xc3)
-signed char hero::GetSSLevel(int skill) {
-    signed char shrineAndArtifactBonus = 0;
-    signed char level;
+i8 hero::GetSSLevel(i32 skill) {
+    i8 shrineAndArtifactBonus = 0;
+    i8 level;
 
     level = m_secondarySkills[skill];
     if (skill != HERO_SKILL_NECROMANCY)
@@ -1817,8 +1817,8 @@ signed char hero::GetSSLevel(int skill) {
 // All 0xf4 relocation-masked bytes and all 11 ordered relocation sites/effective
 // targets agree; objdiff differs only on the compiler-local long format literal.
 VA(0x00470685, 0xf4)
-void hero::DoSSLevelDialog(int skill, int quickView) {
-    int skillBonusValue;
+void hero::DoSSLevelDialog(i32 skill, i32 quickView) {
+    i32 skillBonusValue;
     char *skillLevelText;
 
     skillBonusValue = GetSSLevel(skill) - m_secondarySkills[skill];
@@ -1844,8 +1844,8 @@ void hero::DoSSLevelDialog(int skill, int quickView) {
 }
 
 VA(0x00470779, 0x12f)
-void hero::CheckAnduranPieces(int showDialog) {
-    int artifactSlot;
+void hero::CheckAnduranPieces(i32 showDialog) {
+    i32 artifactSlot;
 
     if (HasArtifact(HERO_ARTIFACT_BREASTPLATE_ANDURAN) &&
         HasArtifact(HERO_ARTIFACT_HELMET_ANDURAN) &&
@@ -1893,8 +1893,8 @@ void hero::CheckAnduranPieces(int showDialog) {
 // allocation order; do not add aliases, padding owners, or section pragmas.
 DATA(0x004f6c88) class hero *gpHVHero = 0;
 DATA(0x004f6c8c) class heroWindow *gheroWin = 0;
-DATA(0x004f6cd0) short gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT] = {
+DATA(0x004f6cd0) i16 gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT] = {
     0, 1000, 2000, 3200, 4500, 6000, 7700, 9000, 11000, 13200, 15500, 18500
 };
-DATA(0x005280dc) int iOrigHeroViewID;
-DATA(0x005280e0) int gbNoDismiss;
+DATA(0x005280dc) i32 iOrigHeroViewID;
+DATA(0x005280e0) i32 gbNoDismiss;

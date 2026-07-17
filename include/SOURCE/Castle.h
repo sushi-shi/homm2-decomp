@@ -1,5 +1,7 @@
 #ifndef HOMM2_CASTLE_H
 #define HOMM2_CASTLE_H
+
+#include <Ints.h>
 // Declarations of the free functions DEFINED in Castle.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
 // forward declarations (was <_all.h>):
@@ -93,10 +95,10 @@ typedef enum CastleConstant {
     CASTLE_RACE_ICON_FRAMES = 32
 } CastleConstant;
 
-int CastleHandler(struct tag_message &);
+i32 CastleHandler(struct tag_message &);
 
-extern unsigned char castleSlotsBase[CASTLE_SLOT_COUNT];
+extern u8 castleSlotsBase[CASTLE_SLOT_COUNT];
 extern class heroWindow *casWin;
-extern unsigned char castleSlotsUse[CASTLE_SLOT_COUNT];
+extern u8 castleSlotsUse[CASTLE_SLOT_COUNT];
 
 #endif // HOMM2_CASTLE_H

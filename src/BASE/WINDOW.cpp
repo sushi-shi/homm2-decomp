@@ -42,7 +42,7 @@ heroWindow::heroWindow(void)
 }
 
 VA(0x004cec20, 0xa5)
-heroWindow::heroWindow(int x, int y, int w, int h, int flags)
+heroWindow::heroWindow(i32 x, i32 y, i32 w, i32 h, i32 flags)
 {
     strcpy(name, "Dynamic Construct");
     m_prevWindow = 0;
@@ -60,13 +60,13 @@ heroWindow::heroWindow(int x, int y, int w, int h, int flags)
 }
 
 VA(0x004cecd0, 0x521)
-heroWindow::heroWindow(int param_1, int param_2, char *param_3)
+heroWindow::heroWindow(i32 param_1, i32 param_2, char *param_3)
 {
-    unsigned long jb;
-    int idx;
+    u32l jb;
+    i32 idx;
     textEntryWidget *pte;
     textWidget *ptw;
-    int type;
+    i32 type;
     button *pbtn;
     dropListWidget *pdl;
     border *pbd;
@@ -166,7 +166,7 @@ heroWindow::heroWindow(int param_1, int param_2, char *param_3)
 }
 
 VA(0x004cf200, 0x73)
-int heroWindow::Open(int x, int flags)
+i32 heroWindow::Open(i32 x, i32 flags)
 {
     if (m_winState & 1)
         return 3;
@@ -179,7 +179,7 @@ int heroWindow::Open(int x, int flags)
 }
 
 VA(0x004cf280, 0x90)
-void heroWindow::RemoveAndDeleteWidget(int id)
+void heroWindow::RemoveAndDeleteWidget(i32 id)
 {
     widget *w, *next;
     w = m_widgetListHead;
@@ -213,7 +213,7 @@ void heroWindow::Close(void)
 }
 
 VA(0x004cf3c0, 0x13c)
-void heroWindow::AddWidget(class widget *param_1, int param_2)
+void heroWindow::AddWidget(class widget *param_1, i32 param_2)
 {
     widget *local_8 = m_widgetListHead;
     if (param_2 == -1) {
@@ -279,9 +279,9 @@ void heroWindow::RemoveWidget(class widget *w)
 }
 
 VA(0x004cf620, 0x95)
-int heroWindow::BroadcastMessage(struct tag_message &param_1)
+i32 heroWindow::BroadcastMessage(struct tag_message &param_1)
 {
-    int local_8 = 0;
+    i32 local_8 = 0;
     widget *local_c = m_widgetListHead;
     while (local_c != 0) {
         switch (local_8 = local_c->Main(param_1)) {
@@ -300,10 +300,10 @@ VA(0x004cf6c0, 0x20)
 void heroWindow::DrawWindow(void) { DrawWindow(1); }
 
 VA(0x004cf6e0, 0x2e)
-void heroWindow::DrawWindow(int flags) { DrawWindow(flags, -0xffff, 0xffff); }
+void heroWindow::DrawWindow(i32 flags) { DrawWindow(flags, -0xffff, 0xffff); }
 
 VA(0x004cf710, 0x116)
-void heroWindow::DrawWindow(int param_1, int param_2, int param_3)
+void heroWindow::DrawWindow(i32 param_1, i32 param_2, i32 param_3)
 {
     tag_message local_24;
     widget *local_8;
@@ -329,7 +329,7 @@ void heroWindow::DrawWindow(int param_1, int param_2, int param_3)
 }
 
 VA(0x004cf830, 0x7f)
-int heroWindow::SaveBackground(void)
+i32 heroWindow::SaveBackground(void)
 {
     m_savedBackground = new bitmap(BITMAP_TYPE_MEMORY, m_winWidth, m_winHeight);
     PollSound();
@@ -350,14 +350,14 @@ void heroWindow::RestoreBackground(void)
 }
 
 VA(0x004cf950, 0x186)
-void heroWindow::MoveWindow(int dx, int dy)
+void heroWindow::MoveWindow(i32 dx, i32 dy)
 {
-    int oldX = m_posX;
-    int oldY = m_posY;
-    int oldW = m_winWidth;
-    int oldH = m_winHeight;
-    int newX = m_posX + dx;
-    int newY = m_posY + dy;
+    i32 oldX = m_posX;
+    i32 oldY = m_posY;
+    i32 oldW = m_winWidth;
+    i32 oldH = m_winHeight;
+    i32 newX = m_posX + dx;
+    i32 newY = m_posY + dy;
     if (newX < 0)
         newX = 0;
     if (newY < 0)

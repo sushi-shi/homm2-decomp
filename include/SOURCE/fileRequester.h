@@ -126,8 +126,8 @@ struct FileRequesterExtension {
 class fileRequester : public baseManager {
 public:
     heroWindow *m_window;                        // +0x036
-    int m_x;                                     // +0x03a
-    int m_y;                                     // +0x03e
+    i32 m_x;                                     // +0x03a
+    i32 m_y;                                     // +0x03e
     FileRequesterMode m_mode;                    // +0x042
     char m_filePattern[FILE_REQUESTER_PATH_SIZE]; // +0x046
     char m_directory[FILE_REQUESTER_PATH_SIZE];   // +0x172
@@ -137,26 +137,26 @@ public:
     void *m_previousMenu;                         // +0x2aa
     char m_defaultExtension[FILE_REQUESTER_EXTENSION_SIZE]; // +0x2ae
     char m_filename[FILE_REQUESTER_NAME_SIZE];    // +0x2b3
-    int m_fileCount;                              // +0x412
-    int m_topIndex;                               // +0x416
-    int m_selectedIndex;                          // +0x41a
-    int m_result;                                 // +0x41e
+    i32 m_fileCount;                              // +0x412
+    i32 m_topIndex;                               // +0x416
+    i32 m_selectedIndex;                          // +0x41a
+    i32 m_result;                                 // +0x41e
     char m_listState[9];                          // +0x422
     iconWidget *m_scrollKnob;                     // +0x42b
     // --- constructors ---
-    fileRequester(int, int, int, char *, char *, char *);
+    fileRequester(i32, i32, i32, char *, char *, char *);
     // --- virtual methods (vtable order) ---
-    virtual int Open(int) OVERRIDE;
+    virtual i32 Open(i32) OVERRIDE;
     virtual void Close(void) OVERRIDE;
-    virtual int Main(struct tag_message &) OVERRIDE;
+    virtual i32 Main(struct tag_message &) OVERRIDE;
     // --- methods ---
-    int InitializeFiles(char *, char *, int);
-    int MapExistsForFilter(FileRequesterMapSizeFilter);
+    i32 InitializeFiles(char *, char *, i32);
+    i32 MapExistsForFilter(FileRequesterMapSizeFilter);
     void SetupFiles(void);
     void CleanUpData(void);
-    void SetOK(int);
+    void SetOK(i32);
     void DoKnob(void);
-    void Update(int);
+    void Update(i32);
     char * GetFilename(void);
 };
 #pragma pack(pop)
@@ -166,6 +166,6 @@ extern FileRequesterMapSizeFilter giMapSizeFilter;
 extern char *cFRDummy;
 extern float fGutterMinY;
 extern float fGutterTravelLength;
-extern int iMaxListSize;
+extern i32 iMaxListSize;
 
 #endif // HOMM2_SOURCE_FILEREQUESTER_H

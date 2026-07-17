@@ -28,25 +28,25 @@
 #include <string.h>
 
 VA(0x0041d040, 0x10bb)
-void townManager::SetupCastle(heroWindow *window, int updateOnly)
+void townManager::SetupCastle(heroWindow *window, i32 updateOnly)
 {
     widget *backgroundWidget19;
-    int backgroundFrame6;
-    int slot7;
-    int row9;
-    int column8;
-    int widgetFrame12;
-    int terrainIconFrame27;
-    int raceIconFrame;
-    unsigned long captainBuilt;
+    i32 backgroundFrame6;
+    i32 slot7;
+    i32 row9;
+    i32 column8;
+    i32 widgetFrame12;
+    i32 terrainIconFrame27;
+    i32 raceIconFrame;
+    u32l captainBuilt;
     char iconName4[16];
     char statLine11[200];
     tag_message message3;
 
     casWin = window;
-    short builtFrame7 = CASTLE_FRAME_BUILT;
-    short cannotBuildFrame17 = CASTLE_FRAME_CANNOT_BUILD;
-    short cannotAffordFrame6 = CASTLE_FRAME_CANNOT_AFFORD;
+    i16 builtFrame7 = CASTLE_FRAME_BUILT;
+    i16 cannotBuildFrame17 = CASTLE_FRAME_CANNOT_BUILD;
+    i16 cannotAffordFrame6 = CASTLE_FRAME_CANNOT_AFFORD;
     for (slot7 = 0; slot7 < CASTLE_SLOT_COUNT; ++slot7) {
         castleSlotsUse[slot7] = castleSlotsBase[slot7];
         if (castleSlotsBase[slot7] >= CASTLE_FIRST_DWELLING + 1 &&
@@ -266,8 +266,8 @@ void townManager::SetupCastle(heroWindow *window, int updateOnly)
         casWin->BroadcastMessage(message3);
     }
 
-    int backgroundLeft4 = CASTLE_BACKGROUND_LEFT;
-    int backgroundTop12 = CASTLE_BACKGROUND_TOP;
+    i32 backgroundLeft4 = CASTLE_BACKGROUND_LEFT;
+    i32 backgroundTop12 = CASTLE_BACKGROUND_TOP;
     terrainIconFrame27 =
         (giGroundToTerrain[
              gpGame->m_worldMap.GetCell(m_town->m_x, m_town->m_y)->m_terrainImageIndex] - 1) *
@@ -278,10 +278,10 @@ void townManager::SetupCastle(heroWindow *window, int updateOnly)
         for (row9 = 5; row9 <= 6; ++row9) {
             for (column8 = 4; column8 <= 8; ++column8) {
                 backgroundWidget19 = new iconWidget(
-                    static_cast<short>((column8 - 4) * 32 + CASTLE_BACKGROUND_LEFT),
-                    static_cast<short>((row9 - 2) * 32), 32, 32,
+                    static_cast<i16>((column8 - 4) * 32 + CASTLE_BACKGROUND_LEFT),
+                    static_cast<i16>((row9 - 2) * 32), 32, 32,
                     "objntwba.icn",
-                    static_cast<short>(0[&terrainIconFrame27] + backgroundFrame6),
+                    static_cast<i16>(0[&terrainIconFrame27] + backgroundFrame6),
                     0, -1, 16, 1);
                 if (backgroundWidget19 == 0)
                     MemError();
@@ -296,10 +296,10 @@ void townManager::SetupCastle(heroWindow *window, int updateOnly)
                     continue;
                 }
                 backgroundWidget19 = new iconWidget(
-                    static_cast<short>((column8 - 4) * 32 + CASTLE_BACKGROUND_LEFT),
-                    static_cast<short>((row9 - 2) * 32), 32, 32,
+                    static_cast<i16>((column8 - 4) * 32 + CASTLE_BACKGROUND_LEFT),
+                    static_cast<i16>((row9 - 2) * 32), 32, 32,
                     "objntown.icn",
-                    static_cast<short>(0[&raceIconFrame] + backgroundFrame6),
+                    static_cast<i16>(0[&raceIconFrame] + backgroundFrame6),
                     0, -1, 16, 1);
                 if (backgroundWidget19 == 0)
                     MemError();
@@ -329,16 +329,16 @@ void townManager::SetupCastle(heroWindow *window, int updateOnly)
 // command CFG was also tried and regressed layout. Revisit after a material Castle
 // predecessor/header or comparison-tool change.
 VA(0x0041e0fb, 0xca3)
-int CastleHandler(tag_message &message)
+i32 CastleHandler(tag_message &message)
 {
-    int result;
-    short textControl;
-    int quickFlag;
-    int buildingIndex;
-    int loopIndex;
-    int cannotRecruitHero;
-    int hoverMessage;
-    int heroChoiceIndex;
+    i32 result;
+    i16 textControl;
+    i32 quickFlag;
+    i32 buildingIndex;
+    i32 loopIndex;
+    i32 cannotRecruitHero;
+    i32 hoverMessage;
+    i32 heroChoiceIndex;
 
     textControl = CASTLE_CONTROL_STATUS_TEXT;
     buildingIndex = -1;
@@ -633,8 +633,8 @@ selection_done:
 }
 
 // ---- globals (definitions, RVA order) ----
-DATA(0x004ef5e0) unsigned char castleSlotsBase[CASTLE_SLOT_COUNT] = {
+DATA(0x004ef5e0) u8 castleSlotsBase[CASTLE_SLOT_COUNT] = {
     19, 20, 21, 22, 23, 24, 0, 2, 1, 3, 7, 10, 4, 11, 13, 8, 9, 12
 };
 DATA(0x00525040) heroWindow *casWin;
-DATA(0x00525048) unsigned char castleSlotsUse[CASTLE_SLOT_COUNT];
+DATA(0x00525048) u8 castleSlotsUse[CASTLE_SLOT_COUNT];

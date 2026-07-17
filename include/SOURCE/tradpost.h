@@ -1,5 +1,7 @@
 #ifndef HOMM2_TRADPOST_H
 #define HOMM2_TRADPOST_H
+
+#include <Ints.h>
 // Declarations of the free functions DEFINED in tradpost.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
 // forward declarations (was <_all.h>):
@@ -46,28 +48,28 @@ typedef enum TradingPostHandlerResult {
     TRADING_POST_HANDLER_EXIT = 2
 } TradingPostHandlerResult;
 
-void DoTradingPost(int, float);
-void UpdateTradingPost(int);
-void ComputeTradeRatios(int, int, int *, int *, int *);
+void DoTradingPost(i32, float);
+void UpdateTradingPost(i32);
+void ComputeTradeRatios(i32, i32, i32 *, i32 *, i32 *);
 void DoTradeKnob(struct tag_message);
 void SetupNewTrade(void);
-int TradingPostHandler(struct tag_message &);
+i32 TradingPostHandler(struct tag_message &);
 
 // ---- globals (declarations, RVA order) ----
-extern unsigned short coreRatio[TRADING_POST_RESOURCE_COUNT];
+extern u16 coreRatio[TRADING_POST_RESOURCE_COUNT];
 extern class iconWidget *tradeKnob;
-extern int qtyToTrade;
-extern int leftResource;
-extern int iTradeRatio;
-extern int bTradeMade;
+extern i32 qtyToTrade;
+extern i32 leftResource;
+extern i32 iTradeRatio;
+extern i32 bTradeMade;
 extern float fTradingPostEfficiency;
-extern int tpX;
-extern int tpY;
-extern int bIsMarketPlace;
-extern int bLeftDenominated;
+extern i32 tpX;
+extern i32 tpY;
+extern i32 bIsMarketPlace;
+extern i32 bLeftDenominated;
 extern class heroWindow *tpWindow;
-extern int rightResource;
-extern int iMaxUnitsToTrade;
-extern int maxUnitsToTrade;
+extern i32 rightResource;
+extern i32 iMaxUnitsToTrade;
+extern i32 maxUnitsToTrade;
 
 #endif // HOMM2_TRADPOST_H

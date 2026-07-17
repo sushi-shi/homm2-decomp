@@ -39,27 +39,27 @@ class strip {
 public:
     heroWindow *m_window;  // +0x00
     char m_unused04[0x18];
-    int m_x;  // +0x1c
-    int m_y;  // +0x20
-    int m_stripType;  // +0x24
-    int m_selectedSlot;  // +0x28
+    i32 m_x;  // +0x1c
+    i32 m_y;  // +0x20
+    i32 m_stripType;  // +0x24
+    i32 m_selectedSlot;  // +0x28
     border *m_borders[STRIP_BORDER_COUNT];  // +0x2c
     icon *m_stripIcon;  // +0x44
     icon *m_creatureIcons[STRIP_ARMY_SLOT_COUNT];  // +0x48
-    int m_cachedCreatureTypes[STRIP_ARMY_SLOT_COUNT];  // +0x5c
+    i32 m_cachedCreatureTypes[STRIP_ARMY_SLOT_COUNT];  // +0x5c
     icon *m_portraitIcon;  // +0x70
     icon *m_flagIcon;  // +0x74
-    int m_portraitFrame;  // +0x78
-    int m_flagFrame;  // +0x7c
+    i32 m_portraitFrame;  // +0x78
+    i32 m_flagFrame;  // +0x7c
     armyGroup *m_army;  // +0x80
     // --- constructors ---
-    strip(int x, int y, int stripType, unsigned long portraitIconId,
-          int portraitFrame, class armyGroup *army, int firstBorderId,
-          int drawWindow, int flagFrame);
+    strip(i32 x, i32 y, i32 stripType, u32l portraitIconId,
+          i32 portraitFrame, class armyGroup *army, i32 firstBorderId,
+          i32 drawWindow, i32 flagFrame);
     ~strip();
     // --- methods ---
     void Draw(void);
-    void DrawIcons(int);
+    void DrawIcons(i32);
     void DrawFrame(void);
 };
 #pragma pack(pop)

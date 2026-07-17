@@ -15,22 +15,22 @@ public:
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (derived: base widget = 0x20 bytes at 0x00 via ': public widget'; own fields below)
     icon   *m_icon;  // +0x20  the icon resource
-    short  m_frame;  // +0x24  icon frame index
-    signed char m_flip;  // +0x26  signed flip/mirror flag passed to icon drawing
-    short  m_fillColor;  // +0x27  color index used by filled-icon draw mode
-    unsigned long m_iconId;  // +0x29  aggregate resource id
+    i16  m_frame;  // +0x24  icon frame index
+    i8 m_flip;  // +0x26  signed flip/mirror flag passed to icon drawing
+    i16  m_fillColor;  // +0x27  color index used by filled-icon draw mode
+    u32l m_iconId;  // +0x29  aggregate resource id
     // --- constructors ---
     iconWidget(void);
-    iconWidget(short int x, short int y, short int width, short int height,
-               unsigned long int iconId, short int frame, signed char flip,
-               short int id, short int kind, short int fillColor);
-    iconWidget(short int x, short int y, short int width, short int height,
-               char *iconName, short int frame, signed char flip,
-               short int id, short int kind, short int fillColor);
+    iconWidget(i16 x, i16 y, i16 width, i16 height,
+               u32l iconId, i16 frame, i8 flip,
+               i16 id, i16 kind, i16 fillColor);
+    iconWidget(i16 x, i16 y, i16 width, i16 height,
+               char *iconName, i16 frame, i8 flip,
+               i16 id, i16 kind, i16 fillColor);
     virtual ~iconWidget() OVERRIDE;
     // --- virtual methods (vtable order) ---
     virtual void Draw(void) OVERRIDE;
-    virtual int Main(struct tag_message &) OVERRIDE;
+    virtual i32 Main(struct tag_message &) OVERRIDE;
     // --- methods ---
     void Read(void);
 };

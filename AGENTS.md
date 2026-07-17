@@ -74,6 +74,11 @@ do not add current assignments, queue snapshots, percentages, or next actions.
   C++ cast explicitly.
 - Prefer repository naming over secondary projects. Use named constants instead of magic
   numbers.
+- Use the fixed-width aliases from `Ints.h` throughout reconstructed game code: `i8`/`u8`
+  through `i64`/`u64`. Plain `char` remains the text character type. Reserve `i32l`/`u32l`
+  for proven retail `long` declarations whose distinct C++ type identity affects mangling or
+  overload resolution, and retain SDK aliases such as `DWORD`, `WPARAM`, and `U32` at external
+  ABI boundaries. The fixed-width build assertion enforces this scope.
 - Put type and enum declarations in headers. For known serialized numeric domains, prefer
   a header-level `typedef enum` with explicit values while preserving storage width and
   packed layout.

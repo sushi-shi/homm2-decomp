@@ -45,40 +45,40 @@ typedef enum MapLossCondition {
 
 #pragma pack(push, 1)
 struct SMapHeader {
-    unsigned int magic;
-    unsigned char difficulty;
-    unsigned char unknown5;
-    unsigned char width;
-    unsigned char height;
-    unsigned char playerEnabled[MAP_HEADER_PLAYER_COUNT];
-    unsigned char playerCanHuman[MAP_HEADER_PLAYER_COUNT];
-    unsigned char playerCanComputer[MAP_HEADER_PLAYER_COUNT];
-    unsigned char playerCount;
-    unsigned char minHumanPlayers;
-    unsigned char maxHumanPlayers;
-    unsigned char victoryCondition;
-    unsigned char computerAlsoWins;
-    unsigned char allowNormalVictory;
-    unsigned short victoryConditionValue;
-    unsigned char lossCondition;
-    unsigned short lossConditionValue;
-    unsigned char unknown25;
-    signed char playerRace[MAP_HEADER_PLAYER_COUNT];
-    unsigned short victoryTownY;
-    unsigned short lossTownY;
-    unsigned short victorySideThreshold;
-    unsigned char reserved32[8];
+    u32 magic;
+    u8 difficulty;
+    u8 unknown5;
+    u8 width;
+    u8 height;
+    u8 playerEnabled[MAP_HEADER_PLAYER_COUNT];
+    u8 playerCanHuman[MAP_HEADER_PLAYER_COUNT];
+    u8 playerCanComputer[MAP_HEADER_PLAYER_COUNT];
+    u8 playerCount;
+    u8 minHumanPlayers;
+    u8 maxHumanPlayers;
+    u8 victoryCondition;
+    u8 computerAlsoWins;
+    u8 allowNormalVictory;
+    u16 victoryConditionValue;
+    u8 lossCondition;
+    u16 lossConditionValue;
+    u8 unknown25;
+    i8 playerRace[MAP_HEADER_PLAYER_COUNT];
+    u16 victoryTownY;
+    u16 lossTownY;
+    u16 victorySideThreshold;
+    u8 reserved32[8];
     char name[MAP_HEADER_NAME_SIZE];
     char description[MAP_HEADER_DESCRIPTION_SIZE];
-    unsigned char rumourCount;
-    unsigned char timeEventCount;
+    u8 rumourCount;
+    u8 timeEventCount;
 };
 #pragma pack(pop)
 SIZE(SMapHeader, MAP_HEADER_SIZE);
 
-int GetMapHeader(char *, struct SMapHeader *);
-int CheckSumIsDemoOK(char *);
-int ShowThisMapGame(char *);
-int ShowThisMap(char *);
+i32 GetMapHeader(char *, struct SMapHeader *);
+i32 CheckSumIsDemoOK(char *);
+i32 ShowThisMapGame(char *);
+i32 ShowThisMap(char *);
 
 #endif // HOMM2_REQUEST_H

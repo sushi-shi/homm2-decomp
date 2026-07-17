@@ -30,8 +30,8 @@ void hexcell::DrawGround(void)
 VA(0x0044a41c, 0xc6)
 void hexcell::DrawLowerDeadOccupants(void)
 {
-    int currentFrame;
-    int i;
+    i32 currentFrame;
+    i32 i;
     army *occupant;
 
     if (m_deadOccupantCount > 0) {
@@ -52,8 +52,8 @@ void hexcell::DrawLowerDeadOccupants(void)
 VA(0x0044a4e2, 0xc8)
 void hexcell::DrawUpperDeadOccupant(void)
 {
-    int currentFrame;
-    int i;
+    i32 currentFrame;
+    i32 i;
     army *occupant;
 
     if (m_deadOccupantCount > 0) {
@@ -67,7 +67,7 @@ void hexcell::DrawUpperDeadOccupant(void)
 }
 
 VA(0x0044a5aa, 0x165)
-void hexcell::DrawOccupant(int creature, int frame)
+void hexcell::DrawOccupant(i32 creature, i32 frame)
 {
     if (m_occupantSide != -1) {
         if (creature != 100) {
@@ -84,13 +84,13 @@ void hexcell::DrawOccupant(int creature, int frame)
 }
 
 VA(0x0044a70f, 0x149)
-void hexcell::DrawTower(int frame)
+void hexcell::DrawTower(i32 frame)
 {
-    int level = 0;
-    int row;
-    int drawX;
-    int rightX;
-    int temp;
+    i32 level = 0;
+    i32 row;
+    i32 drawX;
+    i32 rightX;
+    i32 temp;
 
     if (level)
         drawX = m_x;

@@ -5,10 +5,10 @@
 #include <va.h>
 #include <BASE/resource.h>
 struct SLimitData {
-    int left;
-    int right;
-    int top;
-    int bottom;
+    i32 left;
+    i32 right;
+    i32 top;
+    i32 bottom;
 };
 SIZE(SLimitData, 0x10);
 
@@ -17,17 +17,17 @@ SIZE(SLimitData, 0x10);
 class icon : public resource {
 public:
     // --- own members (base resource occupies 0x00..0x10; widths from access-analysis) ---
-    short  m_frameCount;  // +0x10
+    i16  m_frameCount;  // +0x10
     char  *m_data;  // +0x12  (glyph/sprite data; indexed as a byte pointer)
     // --- constructors ---
-    icon(unsigned long int);
+    icon(u32l);
     virtual ~icon();
     // --- methods ---
-    void DrawToBuffer(int, int, int, int);
-    int CombatClipDrawToBuffer(int, int, int, struct SLimitData *, int, int, unsigned char *, signed char *);
-    void ClipFillToBuffer(int, int, int, int, int, int, int, int, int);
-    void FillToBuffer(int, int, int, int, int, struct SLimitData *);
-    void DimToBuffer(int, int, int, int);
+    void DrawToBuffer(i32, i32, i32, i32);
+    i32 CombatClipDrawToBuffer(i32, i32, i32, struct SLimitData *, i32, i32, u8 *, i8 *);
+    void ClipFillToBuffer(i32, i32, i32, i32, i32, i32, i32, i32, i32);
+    void FillToBuffer(i32, i32, i32, i32, i32, struct SLimitData *);
+    void DimToBuffer(i32, i32, i32, i32);
 };
 #pragma pack(pop)
 SIZE(icon, 0x16);

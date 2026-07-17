@@ -12,17 +12,17 @@ class townObject {
 public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
-    int m_animationFrameCount;  // +0x00
-    int m_animationFrame;  // +0x04
-    int m_visible;  // +0x08
-    int m_buildingId;  // +0x0c
+    i32 m_animationFrameCount;  // +0x00
+    i32 m_animationFrame;  // +0x04
+    i32 m_visible;  // +0x08
+    i32 m_buildingId;  // +0x0c
     icon *m_icon;  // +0x10
     border *m_border;  // +0x14
     // --- constructors ---
-    townObject(int, int, char *);
+    townObject(i32, i32, char *);
     ~townObject();
     // --- methods ---
-    void Draw(int);
+    void Draw(i32);
 };
 #pragma pack(pop)
 SIZE(townObject, 0x18);

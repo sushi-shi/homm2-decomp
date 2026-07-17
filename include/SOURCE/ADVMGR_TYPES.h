@@ -9,10 +9,10 @@
 union AdventureRemotePayload {
     char bytes[ADVMGR_REMOTE_PAYLOAD_VIEW_SIZE];
     struct {
-        int saveDataSize;
-        int saveCrc;
-        int saveTransmitCrc;
-        int savePlayerExited;
+        i32 saveDataSize;
+        i32 saveCrc;
+        i32 saveTransmitCrc;
+        i32 savePlayerExited;
     };
     SPlayerExit playerExit;
 };

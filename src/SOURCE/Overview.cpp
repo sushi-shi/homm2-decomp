@@ -57,25 +57,25 @@
 // their public ABI and are not a valid reconstruction. Revisit for slot/equality
 // steering; do not repeat these forms.
 VA(0x00407870, 0x223e)
-void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
+void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate)
 {
-    DATA(0x004eda04) static short overviewDynamicSourceLine =
+    DATA(0x004eda04) static i16 overviewDynamicSourceLine =
         OVERVIEW_DYNAMIC_SOURCE_LINE;
-    int row;
-    int item;
-    int textItemCount;
-    int iconCount;
-    int rowWidgetId6;
+    i32 row;
+    i32 item;
+    i32 textItemCount;
+    i32 iconCount;
+    i32 rowWidgetId6;
     char *valueText0;
 
     if (updateKnob) {
         if (giOverviewItems[giOverviewType] <= OVERVIEW_VISIBLE_ROWS) {
             OVScrollKnob->m_y = 169;
         } else {
-            int scrollDivisor = giOverviewItems[giOverviewType] - OVERVIEW_VISIBLE_ROWS;
+            i32 scrollDivisor = giOverviewItems[giOverviewType] - OVERVIEW_VISIBLE_ROWS;
             float knobScale = 303.0 / scrollDivisor;
             OVScrollKnob->m_y =
-                static_cast<short>(giOverviewTop[giOverviewType] * knobScale + 18.0f + 0.4);
+                static_cast<i16>(giOverviewTop[giOverviewType] * knobScale + 18.0f + 0.4);
         }
     }
 
@@ -114,13 +114,13 @@ void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
 
         OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] = new iconWidget(
             30,
-            static_cast<short>(row * OVERVIEW_ROW_HEIGHT + 17),
+            static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 17),
             594,
             82,
             const_cast<char *>("overview.icn"),
-            static_cast<short>(giOverviewType + 10),
+            static_cast<i16>(giOverviewType + 10),
             0,
-            static_cast<short>(rowWidgetId6 + 2),
+            static_cast<i16>(rowWidgetId6 + 2),
             16,
             1
         );
@@ -149,13 +149,13 @@ void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
                 OVERVIEW_TEXT_WIDGET_ROWS[row][textItemCount] =
                     new textWidget(
                         35,
-                        static_cast<short>(row * OVERVIEW_ROW_HEIGHT + 80),
+                        static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 80),
                         132,
                         10,
                         valueText0,
                         const_cast<char *>("smalfont.fnt"),
                         1,
-                        static_cast<short>(rowWidgetId6 + 3),
+                        static_cast<i16>(rowWidgetId6 + 3),
                         0x200,
                         1
                     );
@@ -167,20 +167,20 @@ void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
             }
 
             {
-                int townFrame = record->m_type;
+                i32 townFrame = record->m_type;
                 if ((record->m_buildings & TOWN_BUILDING_CASTLE) == 0) {
                     townFrame += 6;
                 }
                 OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] =
                     new iconWidget(
                         47,
-                        static_cast<short>(row * OVERVIEW_ROW_HEIGHT + 36),
+                        static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 36),
                         46,
                         22,
                         const_cast<char *>("minitown.icn"),
                         townFrame,
                         0,
-                        static_cast<short>(rowWidgetId6 + 4),
+                        static_cast<i16>(rowWidgetId6 + 4),
                         16,
                         1
                     );
@@ -194,17 +194,17 @@ void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
             iconCount++;
             }
 
-            if (BitTest(gpGame->m_knownTowns, static_cast<unsigned int>(record->m_id))) {
+            if (BitTest(gpGame->m_knownTowns, static_cast<u32>(record->m_id))) {
                 OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] =
                     new iconWidget(
                         42,
-                        static_cast<short>(row * OVERVIEW_ROW_HEIGHT + 31),
+                        static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 31),
                         0,
                         0,
                         const_cast<char *>("locators.icn"),
                         24,
                         0,
-                        static_cast<short>(rowWidgetId6 + 44),
+                        static_cast<i16>(rowWidgetId6 + 44),
                         16,
                         1
                     );
@@ -218,7 +218,7 @@ void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
                 iconCount++;
             }
 
-            int hasCaptain = 0;
+            i32 hasCaptain = 0;
             heroData0 = 0;
             if (record->m_occupyingHeroId != -1) {
                 heroData0 = GetHero(record->m_occupyingHeroId);
@@ -232,13 +232,13 @@ void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
                 OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] =
                     new iconWidget(
                         112,
-                        static_cast<short>(row * OVERVIEW_ROW_HEIGHT + 36),
+                        static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 36),
                         46,
                         22,
                         const_cast<char *>("portxtra.icn"),
                         0,
                         0,
-                        static_cast<short>(rowWidgetId6 + 39),
+                        static_cast<i16>(rowWidgetId6 + 39),
                         16,
                         1
                     );
@@ -254,14 +254,14 @@ void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
                 OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] =
                     new iconWidget(
                         107,
-                        static_cast<short>(row * OVERVIEW_ROW_HEIGHT + 31),
+                        static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 31),
                         51,
                         27,
                         hasCaptain ? "minicapt.icn" : "miniport.icn",
-                        hasCaptain ? static_cast<unsigned char>(record->m_type)
-                                   : static_cast<unsigned char>(heroData0->m_id),
+                        hasCaptain ? static_cast<u8>(record->m_type)
+                                   : static_cast<u8>(heroData0->m_id),
                         0,
-                        static_cast<short>(rowWidgetId6 + 40),
+                        static_cast<i16>(rowWidgetId6 + 40),
                         16,
                         1
                     );
@@ -278,15 +278,15 @@ void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
                 OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] =
                     new iconWidget(
                         112,
-                        static_cast<short>(row * OVERVIEW_ROW_HEIGHT + 36),
+                        static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 36),
                         0,
                         0,
                         const_cast<char *>("mobility.icn"),
-                        static_cast<short>(
+                        static_cast<i16>(
                             GetMobilityFrame(hasCaptain ? 0 : heroData0->m_remainingMobility)
                         ),
                         0,
-                        static_cast<short>(rowWidgetId6 + 43),
+                        static_cast<i16>(rowWidgetId6 + 43),
                         16,
                         1
                     );
@@ -300,22 +300,22 @@ void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
                 );
                 iconCount++;
 
-                int captainMana =
+                i32 captainMana =
                     record->m_type == TOWN_TYPE_BARBARIAN || record->m_type == TOWN_TYPE_KNIGHT
                         ? 10
                         : 20;
                 OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] =
                     new iconWidget(
                         151,
-                        static_cast<short>(row * OVERVIEW_ROW_HEIGHT + 36),
+                        static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 36),
                         0,
                         0,
                         const_cast<char *>("mana.icn"),
-                        static_cast<short>(
+                        static_cast<i16>(
                             GetManaFrame(hasCaptain ? captainMana : heroData0->m_spellPoints)
                         ),
                         0,
-                        static_cast<short>(rowWidgetId6 + 41),
+                        static_cast<i16>(rowWidgetId6 + 41),
                         16,
                         1
                     );
@@ -331,20 +331,20 @@ void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
             }
 
             {
-            int displayedTroops = 0;
+            i32 displayedTroops = 0;
             for (item = 0; item < OVERVIEW_TROOP_SLOTS; item++) {
                     if (record->m_army.m_creatureTypes[item] != -1
                         && record->m_army.m_creatureCounts[item] > 0) {
                     OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] =
                         new iconWidget(
-                            static_cast<short>(displayedTroops * 41 + 173),
-                                static_cast<short>(row * OVERVIEW_ROW_HEIGHT + 35),
+                            static_cast<i16>(displayedTroops * 41 + 173),
+                                static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 35),
                                 42,
                                 40,
                                 const_cast<char *>("mons32.icn"),
-                                static_cast<short>(record->m_army.m_creatureTypes[item]),
+                                static_cast<i16>(record->m_army.m_creatureTypes[item]),
                                 0,
-                                static_cast<short>(rowWidgetId6 + item + 5),
+                                static_cast<i16>(rowWidgetId6 + item + 5),
                                 17,
                                 1
                             );
@@ -365,18 +365,18 @@ void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
                         sprintf(
                             valueText0,
                             "%d",
-                            static_cast<int>(record->m_army.m_creatureCounts[item])
+                            static_cast<i32>(record->m_army.m_creatureCounts[item])
                         );
                         OVERVIEW_TEXT_WIDGET_ROWS[row][textItemCount] =
                         new textWidget(
-                            static_cast<short>(displayedTroops * 41 + 173),
-                                static_cast<short>(row * OVERVIEW_ROW_HEIGHT + 81),
+                            static_cast<i16>(displayedTroops * 41 + 173),
+                                static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 81),
                                 40,
                                 12,
                                 valueText0,
                                 const_cast<char *>("smalfont.fnt"),
                                 1,
-                                static_cast<short>(
+                                static_cast<i16>(
                                     rowWidgetId6 + item + 10
                                 ),
                                 0x200,
@@ -393,9 +393,9 @@ void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
             }
 
             {
-                int displayedTroops = 0;
+                i32 displayedTroops = 0;
             for (item = 0; item < OVERVIEW_DWELLING_SLOTS; item++) {
-                    int detailIndex;
+                    i32 detailIndex;
                 switch (item) {
                         case 0:
                             detailIndex = 0;
@@ -438,17 +438,17 @@ void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
                     if ((record->m_buildings & (1 << (detailIndex + 19))) != 0) {
                     OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] =
                         new iconWidget(
-                                static_cast<short>(displayedTroops * 41 + 378),
-                                static_cast<short>(row * OVERVIEW_ROW_HEIGHT + 35),
+                                static_cast<i16>(displayedTroops * 41 + 378),
+                                static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 35),
                                 42,
                                 40,
                                 const_cast<char *>("mons32.icn"),
-                            static_cast<short>(
-                                    gDwellingType[static_cast<signed char>(record->m_type)]
+                            static_cast<i16>(
+                                    gDwellingType[static_cast<i8>(record->m_type)]
                                                  [detailIndex]
                                 ),
                                 0,
-                                static_cast<short>(
+                                static_cast<i16>(
                                     rowWidgetId6 + detailIndex + 15
                                 ),
                                 17,
@@ -468,17 +468,17 @@ void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
                             BaseAlloc(6, OVERVIEW_SOURCE_FILE,
                                       overviewDynamicSourceLine + 0x12a)
                         );
-                        sprintf(valueText0, "%d", static_cast<int>(record->m_garrison[detailIndex]));
+                        sprintf(valueText0, "%d", static_cast<i32>(record->m_garrison[detailIndex]));
                         OVERVIEW_TEXT_WIDGET_ROWS[row][textItemCount] =
                         new textWidget(
-                                static_cast<short>(displayedTroops * 41 + 378),
-                                static_cast<short>(row * OVERVIEW_ROW_HEIGHT + 81),
+                                static_cast<i16>(displayedTroops * 41 + 378),
+                                static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 81),
                                 40,
                                 12,
                                 valueText0,
                                 const_cast<char *>("smalfont.fnt"),
                                 1,
-                                static_cast<short>(
+                                static_cast<i16>(
                                     rowWidgetId6 + detailIndex + 27
                                 ),
                                 0x200,
@@ -495,20 +495,20 @@ void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
             }
         } else {
             hero *heroData0;
-            int detailRow;
-            int detailColumn;
-            int detailIndex;
+            i32 detailRow;
+            i32 detailColumn;
+            i32 detailIndex;
             heroData0 = &m_heroRecs[gpCurPlayer->m_heroIds[giOverviewTop[giOverviewType] + row]];
 
             OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] = new iconWidget(
                 35,
-                static_cast<short>(row * OVERVIEW_ROW_HEIGHT + 21),
+                static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 21),
                 46,
                 22,
                 const_cast<char *>("portxtra.icn"),
                 0,
                 0,
-                static_cast<short>(rowWidgetId6 + 100),
+                static_cast<i16>(rowWidgetId6 + 100),
                 16,
                 1
             );
@@ -523,13 +523,13 @@ void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
 
             OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] = new iconWidget(
                 30,
-                static_cast<short>(row * OVERVIEW_ROW_HEIGHT + 16),
+                static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 16),
                 51,
                 27,
                 const_cast<char *>("miniport.icn"),
-                static_cast<short>(heroData0->m_id),
+                static_cast<i16>(heroData0->m_id),
                 0,
-                static_cast<short>(rowWidgetId6 + 101),
+                static_cast<i16>(rowWidgetId6 + 101),
                 16,
                 1
             );
@@ -544,13 +544,13 @@ void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
 
             OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] = new iconWidget(
                 35,
-                static_cast<short>(row * OVERVIEW_ROW_HEIGHT + 21),
+                static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 21),
                 0,
                 0,
                 const_cast<char *>("mobility.icn"),
-                static_cast<short>(GetMobilityFrame(heroData0->m_remainingMobility)),
+                static_cast<i16>(GetMobilityFrame(heroData0->m_remainingMobility)),
                 0,
-                static_cast<short>(rowWidgetId6 + 103),
+                static_cast<i16>(rowWidgetId6 + 103),
                 16,
                 1
             );
@@ -565,13 +565,13 @@ void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
 
             OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] = new iconWidget(
                 74,
-                static_cast<short>(row * OVERVIEW_ROW_HEIGHT + 21),
+                static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 21),
                 0,
                 0,
                 const_cast<char *>("mana.icn"),
-                static_cast<short>(GetManaFrame(heroData0->m_spellPoints)),
+                static_cast<i16>(GetManaFrame(heroData0->m_spellPoints)),
                 0,
-                static_cast<short>(rowWidgetId6 + 41),
+                static_cast<i16>(rowWidgetId6 + 41),
                 16,
                 1
             );
@@ -589,17 +589,17 @@ void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
                     BaseAlloc(4, OVERVIEW_SOURCE_FILE,
                               overviewDynamicSourceLine + 0x182)
                 );
-                sprintf(valueText0, "%d", static_cast<int>(heroData0->Stats(item)));
+                sprintf(valueText0, "%d", static_cast<i32>(heroData0->Stats(item)));
                 OVERVIEW_TEXT_WIDGET_ROWS[row][textItemCount] =
                     new textWidget(
-                        static_cast<short>(item * 35 + 105),
-                        static_cast<short>(row * OVERVIEW_ROW_HEIGHT + 39),
+                        static_cast<i16>(item * 35 + 105),
+                        static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 39),
                         14,
                         8,
                         valueText0,
                         const_cast<char *>("smalfont.fnt"),
                         1,
-                        static_cast<short>(rowWidgetId6 + item + 142),
+                        static_cast<i16>(rowWidgetId6 + item + 142),
                         0x200,
                         2
                     );
@@ -613,14 +613,14 @@ void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
             for (item = 0; item < 4; item++) {
                 OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] =
                     new iconWidget(
-                        static_cast<short>(item * 35 + 87),
-                        static_cast<short>(row * OVERVIEW_ROW_HEIGHT + 17),
+                        static_cast<i16>(item * 35 + 87),
+                        static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 17),
                         35,
                         30,
                         const_cast<char *>("overview.icn"),
                         15,
                         0,
-                        static_cast<short>(rowWidgetId6 + item + 170),
+                        static_cast<i16>(rowWidgetId6 + item + 170),
                         16,
                         1
                     );
@@ -635,20 +635,20 @@ void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
             }
 
             {
-            int displayedTroops = 0;
+            i32 displayedTroops = 0;
             for (item = 0; item < OVERVIEW_TROOP_SLOTS; item++) {
                     if (heroData0->m_army.m_creatureTypes[item] != -1
                         && heroData0->m_army.m_creatureCounts[item] > 0) {
                     OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] =
                         new iconWidget(
-                            static_cast<short>(displayedTroops * 40 + 30),
-                                static_cast<short>(row * OVERVIEW_ROW_HEIGHT + 47),
+                            static_cast<i16>(displayedTroops * 40 + 30),
+                                static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 47),
                                 42,
                                 40,
                                 const_cast<char *>("mons32.icn"),
-                                static_cast<short>(heroData0->m_army.m_creatureTypes[item]),
+                                static_cast<i16>(heroData0->m_army.m_creatureTypes[item]),
                                 0,
-                                static_cast<short>(
+                                static_cast<i16>(
                                     rowWidgetId6 + item + 104
                                 ),
                                 17,
@@ -671,18 +671,18 @@ void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
                         sprintf(
                             valueText0,
                             "%d",
-                            static_cast<int>(heroData0->m_army.m_creatureCounts[item])
+                            static_cast<i32>(heroData0->m_army.m_creatureCounts[item])
                         );
                         OVERVIEW_TEXT_WIDGET_ROWS[row][textItemCount] =
                         new textWidget(
-                            static_cast<short>(displayedTroops * 40 + 30),
-                                static_cast<short>(row * OVERVIEW_ROW_HEIGHT + 87),
+                            static_cast<i16>(displayedTroops * 40 + 30),
+                                static_cast<i16>(row * OVERVIEW_ROW_HEIGHT + 87),
                                 40,
                                 12,
                                 valueText0,
                                 const_cast<char *>("smalfont.fnt"),
                                 1,
-                                static_cast<short>(
+                                static_cast<i16>(
                                     rowWidgetId6 + item + 109
                                 ),
                                 0x200,
@@ -705,10 +705,10 @@ void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
                     detailColumn = item % OVERVIEW_SECONDARY_SKILL_COLUMNS;
                     OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] =
                         new iconWidget(
-                            static_cast<short>(
+                            static_cast<i16>(
                                 detailColumn * 35 + 233
                             ),
-                            static_cast<short>(
+                            static_cast<i16>(
                                 row * OVERVIEW_ROW_HEIGHT
                                 + detailRow * 42 + 20
                             ),
@@ -717,7 +717,7 @@ void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
                             const_cast<char *>("overview.icn"),
                             12,
                             0,
-                            static_cast<short>(rowWidgetId6 + item + 154),
+                            static_cast<i16>(rowWidgetId6 + item + 154),
                             16,
                             1
                         );
@@ -732,19 +732,19 @@ void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
 
                     OVERVIEW_ICON_WIDGET_ROWS[row][iconCount + 1] =
                         new iconWidget(
-                            static_cast<short>(
+                            static_cast<i16>(
                                 detailColumn * 35 + 234
                             ),
-                            static_cast<short>(
+                            static_cast<i16>(
                                 row * OVERVIEW_ROW_HEIGHT
                                 + detailRow * 42 + 21
                             ),
                             32,
                             32,
                             const_cast<char *>("miniss.icn"),
-                            static_cast<short>(detailIndex),
+                            static_cast<i16>(detailIndex),
                             0,
-                            static_cast<short>(rowWidgetId6 + item + 146),
+                            static_cast<i16>(rowWidgetId6 + item + 146),
                             16,
                             1
                         );
@@ -762,13 +762,13 @@ void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
                         BaseAlloc(2, OVERVIEW_SOURCE_FILE,
                                   overviewDynamicSourceLine + 0x1fb)
                     );
-                    sprintf(valueText0, "%d", static_cast<int>(heroData0->GetSSLevel(detailIndex)));
+                    sprintf(valueText0, "%d", static_cast<i32>(heroData0->GetSSLevel(detailIndex)));
                     OVERVIEW_TEXT_WIDGET_ROWS[row][textItemCount] =
                         new textWidget(
-                            static_cast<short>(
+                            static_cast<i16>(
                                 detailColumn * 35 + 255
                             ),
-                            static_cast<short>(
+                            static_cast<i16>(
                                 row * OVERVIEW_ROW_HEIGHT
                                 + detailRow * 42 + 45
                             ),
@@ -777,7 +777,7 @@ void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
                             valueText0,
                             const_cast<char *>("smalfont.fnt"),
                             1,
-                            static_cast<short>(rowWidgetId6 + item + 162),
+                            static_cast<i16>(rowWidgetId6 + item + 162),
                             0x200,
                             2
                         );
@@ -789,17 +789,17 @@ void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
                 }
             }
 
-            int displayedArtifacts = 0;
+            i32 displayedArtifacts = 0;
             for (item = 0; item < OVERVIEW_ARTIFACT_SLOTS; item++) {
                 if (heroData0->m_artifacts[item] != -1) {
                     detailRow = displayedArtifacts / OVERVIEW_ARTIFACT_COLUMNS;
                     detailColumn = displayedArtifacts % OVERVIEW_ARTIFACT_COLUMNS;
                     OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] =
                         new iconWidget(
-                            static_cast<short>(
+                            static_cast<i16>(
                                 detailColumn * 35 + 378
                             ),
-                            static_cast<short>(
+                            static_cast<i16>(
                                 row * OVERVIEW_ROW_HEIGHT
                                 + detailRow * 42 + 20
                             ),
@@ -808,7 +808,7 @@ void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
                             const_cast<char *>("overview.icn"),
                             12,
                             0,
-                            static_cast<short>(rowWidgetId6 + item + 128),
+                            static_cast<i16>(rowWidgetId6 + item + 128),
                             16,
                             1
                         );
@@ -823,19 +823,19 @@ void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
 
                     OVERVIEW_ICON_WIDGET_ROWS[row][iconCount + 1] =
                         new iconWidget(
-                            static_cast<short>(
+                            static_cast<i16>(
                                 detailColumn * 35 + 379
                             ),
-                            static_cast<short>(
+                            static_cast<i16>(
                                 row * OVERVIEW_ROW_HEIGHT
                                 + detailRow * 42 + 21
                             ),
                             32,
                             32,
                             const_cast<char *>("artfx.icn"),
-                            static_cast<short>(heroData0->m_artifacts[item]),
+                            static_cast<i16>(heroData0->m_artifacts[item]),
                             0,
-                            static_cast<short>(rowWidgetId6 + item + 114),
+                            static_cast<i16>(rowWidgetId6 + item + 114),
                             16,
                             1
                         );
@@ -862,11 +862,11 @@ void game::SetupDynamicStuff(int redraw, int updateKnob, int forceUpdate)
 }
 
 VA(0x00409aae, 0x357)
-void game::SetupNewOverviewType(int overviewType, int redrawFrom)
+void game::SetupNewOverviewType(i32 overviewType, i32 redrawFrom)
 {
-    DATA(0x004edca8) static short overviewSetupSourceLine =
+    DATA(0x004edca8) static i16 overviewSetupSourceLine =
         OVERVIEW_SETUP_SOURCE_LINE;
-    int title;
+    i32 title;
     tag_message message;
     char *titleCopy;
 
@@ -899,8 +899,8 @@ void game::SetupNewOverviewType(int overviewType, int redrawFrom)
     }
     overWin->BroadcastMessage(message);
 
-    short titleLefts[2][OVERVIEW_TITLE_COUNT] = {{35, 232, 377}, {35, 177, 379}};
-    short titleWidth[2][OVERVIEW_TITLE_COUNT] = {{194, 142, 241}, {140, 199, 239}};
+    i16 titleLefts[2][OVERVIEW_TITLE_COUNT] = {{35, 232, 377}, {35, 177, 379}};
+    i16 titleWidth[2][OVERVIEW_TITLE_COUNT] = {{194, 142, 241}, {140, 199, 239}};
 
     for (title = 0; title < OVERVIEW_TITLE_COUNT; title++) {
         if (textWidgetTitle[title] != 0) {
@@ -924,7 +924,7 @@ void game::SetupNewOverviewType(int overviewType, int redrawFrom)
             titleCopy,
             const_cast<char *>("smalfont.fnt"),
             1,
-            static_cast<short>(title + 110),
+            static_cast<i16>(title + 110),
             0x200,
             1
         );
@@ -939,7 +939,7 @@ void game::SetupNewOverviewType(int overviewType, int redrawFrom)
 VA(0x00409e05, 0x84)
 void game::SetupResources(void)
 {
-    int resourceIdx;
+    i32 resourceIdx;
     tag_message message;
 
     message.type = MESSAGE_WIDGET;
@@ -955,13 +955,13 @@ void game::SetupResources(void)
 VA(0x00409e89, 0x4c7)
 void game::Overview(void)
 {
-    DATA(0x004edcec) static short overviewDialogSourceLine =
+    DATA(0x004edcec) static i16 overviewDialogSourceLine =
         OVERVIEW_DIALOG_SOURCE_LINE;
     char mineCounts4[8];
-    int sawmills4;
-    int mine4;
+    i32 sawmills4;
+    i32 mine4;
     tag_message message8;
-    int row0;
+    i32 row0;
 
     giOverviewReturnAction = OVERVIEW_RETURN_NONE;
     giOverviewReturnActionExtra = OVERVIEW_RETURN_NONE;
@@ -1032,7 +1032,7 @@ void game::Overview(void)
     for (mine4 = 0; mine4 < OVERVIEW_RESOURCE_COUNT; mine4++) {
         message8.payload.widget.command = OVERVIEW_WIDGET_SET_TEXT;
         message8.payload.widget.data.text = gText;
-        sprintf(gText, "%d", static_cast<int>(mineCounts4[mine4]));
+        sprintf(gText, "%d", static_cast<i32>(mineCounts4[mine4]));
         message8.payload.widget.id = mine4 + OVERVIEW_MINE_FIRST_WIDGET;
         overWin->BroadcastMessage(message8);
     }
@@ -1072,13 +1072,13 @@ void game::DoKnob(void)
 {
     tag_message pendingMessage4;
     float scrollRange13;
-    int mouseY8;
-    int mouseX9;
+    i32 mouseY8;
+    i32 mouseX9;
     float scrollTop11;
     double pixelsPerItem13;
-    int newTop8;
+    i32 newTop8;
     tag_message message9;
-    int previousTop6;
+    i32 previousTop6;
 
     if (giOverviewItems[giOverviewType] <= OVERVIEW_VISIBLE_ROWS) {
         return;
@@ -1097,18 +1097,18 @@ void game::DoKnob(void)
                && message9.type != MESSAGE_RIGHT_BUTTON_UP) {
             if (message9.type == MESSAGE_MOUSE_MOVE) {
                 if (static_cast<float>(message9.payload.mouse.y) < scrollTop11) {
-                    message9.payload.mouse.y = static_cast<int>(scrollTop11);
+                    message9.payload.mouse.y = static_cast<i32>(scrollTop11);
                 }
                 if (scrollRange13 + scrollTop11 - OVERVIEW_SCROLL_LAST_PIXEL_ADJUST
                     < static_cast<float>(message9.payload.mouse.y)) {
-                    message9.payload.mouse.y = static_cast<int>(
+                    message9.payload.mouse.y = static_cast<i32>(
                         scrollRange13 + scrollTop11 - OVERVIEW_SCROLL_LAST_PIXEL_ADJUST
                     );
                 }
                 gpMouseManager->Main(message9);
                 OVScrollKnob->m_y =
-                    static_cast<short>(message9.payload.mouse.y - OVERVIEW_SCROLL_KNOB_OFFSET);
-                newTop8 = static_cast<int>((OVScrollKnob->m_y - scrollTop11) / pixelsPerItem13);
+                    static_cast<i16>(message9.payload.mouse.y - OVERVIEW_SCROLL_KNOB_OFFSET);
+                newTop8 = static_cast<i32>((OVScrollKnob->m_y - scrollTop11) / pixelsPerItem13);
                 if (0[&previousTop6] != newTop8) {
                     if (newTop8 > giOverviewItems[giOverviewType] - OVERVIEW_VISIBLE_ROWS) {
                         newTop8 = giOverviewItems[giOverviewType] - OVERVIEW_VISIBLE_ROWS;
@@ -1118,7 +1118,7 @@ void game::DoKnob(void)
                     }
                     giOverviewTop[giOverviewType] = newTop8;
                     OVScrollKnob->m_y =
-                        static_cast<short>(message9.payload.mouse.y - OVERVIEW_SCROLL_KNOB_OFFSET);
+                        static_cast<i16>(message9.payload.mouse.y - OVERVIEW_SCROLL_KNOB_OFFSET);
                     SetupDynamicStuff(1, 0, 0);
                     previousTop6 = newTop8;
                 } else {
@@ -1128,7 +1128,7 @@ void game::DoKnob(void)
             Process1WindowsMessage();
             message9 = gpInputManager->GetEvent();
             if (message9.type == MESSAGE_MOUSE_MOVE) {
-                int discardMouseMoves7 = 1;
+                i32 discardMouseMoves7 = 1;
                 while (discardMouseMoves7) {
                     pendingMessage4 = gpInputManager->PeekEvent();
                     if (pendingMessage4.type == MESSAGE_MOUSE_MOVE) {
@@ -1151,14 +1151,14 @@ void game::DoKnob(void)
 // positions and external targets agree. Residual is only folded local
 // identities/addends for the three mid-function jump/selector tables.
 VA(0x0040a66f, 0x4fd)
-int OverviewHandler(struct tag_message &message)
+i32 OverviewHandler(struct tag_message &message)
 {
-    int closeDialog5;
-    int quickView15;
-    int scrollItemCount0;
-    int scrollDivisor3;
-    int scrollY7;
-    int newTop8;
+    i32 closeDialog5;
+    i32 quickView15;
+    i32 scrollItemCount0;
+    i32 scrollDivisor3;
+    i32 scrollY7;
+    i32 newTop8;
 
     closeDialog5 = 0;
     quickView15 = 0;
@@ -1292,10 +1292,10 @@ int OverviewHandler(struct tag_message &message)
 }
 
 VA(0x0040ab6c, 0x4fa)
-int game::ProcessIconSelect(int widgetId, int quickView)
+i32 game::ProcessIconSelect(i32 widgetId, i32 quickView)
 {
-    int row0;
-    int selectionIndex2;
+    i32 row0;
+    i32 selectionIndex2;
     hero *selectedHero13;
     town *selectedTown3;
 
@@ -1490,11 +1490,11 @@ int game::ProcessIconSelect(int widgetId, int quickView)
 DATA(0x004ed9e8) class heroWindow *overWin = 0;
 DATA(0x004ed9ec) class textWidget **textWidgetDynamic = 0;
 DATA(0x004ed9f0) class iconWidget **iconWidgetDynamic = 0;
-DATA(0x004ed9f4) int giOverviewType = 0;
-DATA(0x004ed9f8) int giOverviewTop[2] = {0};
+DATA(0x004ed9f4) i32 giOverviewType = 0;
+DATA(0x004ed9f8) i32 giOverviewTop[2] = {0};
 DATA(0x004eda00) class iconWidget *OVScrollKnob = 0;
-DATA(0x00523258) int iLastDynamicType;
-DATA(0x0052325c) int iLastDynamicTop;
-DATA(0x00523260) int iOverviewItems;
-DATA(0x00523268) int giOverviewItems[2];
+DATA(0x00523258) i32 iLastDynamicType;
+DATA(0x0052325c) i32 iLastDynamicTop;
+DATA(0x00523260) i32 iOverviewItems;
+DATA(0x00523268) i32 giOverviewItems[2];
 DATA(0x00523270) class textWidget *textWidgetTitle[4];

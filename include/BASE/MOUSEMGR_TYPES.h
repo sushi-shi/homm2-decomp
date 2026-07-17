@@ -14,25 +14,25 @@
 
 union SMouseManagerName {
     char text[sizeof(MOUSE_MANAGER_NAME)];
-    unsigned long alignmentValue;
+    u32l alignmentValue;
 };
 SIZE(SMouseManagerName, 0x10);
 
 union SMouseManagerSourceFile {
     char text[sizeof(MOUSE_MANAGER_SOURCE_FILE)];
-    unsigned long alignmentValue;
+    u32l alignmentValue;
 };
 SIZE(SMouseManagerSourceFile, 0x2c);
 
 union SMouseManagerIconName {
     char text[sizeof(MOUSE_MANAGER_ADVENTURE_ICON)];
-    unsigned long alignmentValue;
+    u32l alignmentValue;
 };
 SIZE(SMouseManagerIconName, 0xc);
 
 union SMouseManagerBitmapName {
     char text[sizeof(MOUSE_MANAGER_ADVENTURE_BITMAP)];
-    unsigned long alignmentValue;
+    u32l alignmentValue;
 };
 SIZE(SMouseManagerBitmapName, 0x10);
 

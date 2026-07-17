@@ -5,7 +5,7 @@
 the build** — they are not warnings. All gate scripts live in `scripts/homm2/build/` and run
 from the repo root; each is independently runnable (`python3 -m homm2.build.<name>`).
 
-Ordering in `cli.py`: compile must succeed first (ninja), then the eight gates below in order.
+Ordering in `cli.py`: compile must succeed first (ninja), then the nine gates below in order.
 
 ## 0. Compile + header-dependency tracking (ninja)
 
@@ -15,7 +15,7 @@ error fails the build. MSVC 4.2 has no `/showIncludes`, so `cc_wrap.py` scans ea
 header recompiles exactly its includers**, so a header change can never leave a stale object
 (this previously masked drift). See `docs/patterns/` and the `cc_wrap.py` header.
 
-## The eight hard gates
+## The nine hard gates
 
 ### 1. `assert_decls` — header discipline (no local declarations)
 No `.cpp` may carry its own `class` / `struct` / `enum` definition, `extern` declaration, or
@@ -114,6 +114,23 @@ not deferred through the retained-maximum model: a later shared-header or TU-sta
 invalidates the byte proof makes the hard gate red until the claim is restored or downgraded.
 New relocation-only or instruction-identical proofs must use the tag; do not add untagged prose that
 makes the same claim.
+
+### 9. `assert_fixed_width_ints` — explicit game integer widths
+
+Reconstructed code under `src/{SOURCE,BASE,EDITOR}` and
+`include/{SOURCE,BASE,EDITOR}` uses `i8`/`u8` through `i64`/`u64` from `Ints.h`
+instead of raw signed and unsigned integer keywords. This makes storage and APIs retain their
+intended widths when the game is ported away from the 32-bit MSVC data model. Plain `char` remains
+the text character type. Win32, CRT, and vendored SDK headers retain their native ABI spellings and
+are outside this gate.
+
+VC4.2 gives `int` and `long` distinct C++ type identities even though both are 32 bits.
+The compatibility aliases `i32l` and `u32l` preserve a retail long-backed declaration where that
+identity affects mangling or overload resolution; ordinary 32-bit game integers use `i32`/`u32`.
+
+The scanner is lexical and ignores comments and quoted literals, so historical assembly notes,
+retail strings, and format strings do not create exceptions. `long double` is also allowed because
+it is a floating-point type.
 
 ## The owner model these enforce
 

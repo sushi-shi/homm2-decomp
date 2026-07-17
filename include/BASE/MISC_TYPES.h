@@ -6,10 +6,10 @@
 #define MISC_REGISTRY_KEY "SOFTWARE\\New World Computing\\Heroes of Might and Magic 2\\1.0"
 #define MISC_PCX_SOURCE_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\Misc.cpp"
 
-template <int TextSize>
+template <i32 TextSize>
 union SMiscTextSlot {
     char text[TextSize];
-    unsigned long alignmentValue;
+    u32l alignmentValue;
 };
 
 struct SMiscMemoryText {

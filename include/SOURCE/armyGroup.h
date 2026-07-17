@@ -24,28 +24,28 @@ public:
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // NOTE: sparse this-access recovery (few/no this-relative probes).
     union {
-        signed char m_creatureTypes[ARMY_GROUP_SLOT_COUNT];  // +0x00
-        signed char m_troopTypes[ARMY_GROUP_SLOT_COUNT];
+        i8 m_creatureTypes[ARMY_GROUP_SLOT_COUNT];  // +0x00
+        i8 m_troopTypes[ARMY_GROUP_SLOT_COUNT];
     };
     union {
-        short m_creatureCounts[ARMY_GROUP_SLOT_COUNT];       // +0x05
-        unsigned short m_troopCounts[ARMY_GROUP_SLOT_COUNT];
-        signed short m_quantities[ARMY_GROUP_SLOT_COUNT];
+        i16 m_creatureCounts[ARMY_GROUP_SLOT_COUNT];       // +0x05
+        u16 m_troopCounts[ARMY_GROUP_SLOT_COUNT];
+        i16 m_quantities[ARMY_GROUP_SLOT_COUNT];
     };
     // --- constructors ---
     armyGroup(void);
     // --- methods ---
-    void View(int);
-    int HasAllUndead(void);
-    int HasSomeUndead(void);
-    int GetMorale(class hero *, class town *, class armyGroup *);
-    void Dismiss(int);
-    int IsMember(int);
-    int IsHomogeneous(int);
-    int CanJoin(int);
-    int GetNumArmies(void);
-    int Add(int, int, int);
-    void Swap(int, class armyGroup *, int);
+    void View(i32);
+    i32 HasAllUndead(void);
+    i32 HasSomeUndead(void);
+    i32 GetMorale(class hero *, class town *, class armyGroup *);
+    void Dismiss(i32);
+    i32 IsMember(i32);
+    i32 IsHomogeneous(i32);
+    i32 CanJoin(i32);
+    i32 GetNumArmies(void);
+    i32 Add(i32, i32, i32);
+    void Swap(i32, class armyGroup *, i32);
     void DamageGroup(float);
 };
 #pragma pack(pop)

@@ -1,13 +1,15 @@
 #ifndef HOMM2_CMBTMGR_H
 #define HOMM2_CMBTMGR_H
+
+#include <Ints.h>
 // Declarations of the free functions DEFINED in CMBTMGR.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
 // forward declarations (was <_all.h>):
 struct tag_message;
 
 struct CombatTowerOrigin {
-    unsigned short x;
-    unsigned short y;
+    u16 x;
+    u16 y;
 };
 
 typedef enum CombatSystemOptionWidget {
@@ -48,8 +50,8 @@ enum {
     COMBAT_SYSTEM_OPTION_DRAW_MASK = 0x7fff
 };
 
-int ValidHex(int);
-void UpdateCombatSystemOptions(int);
-int CombatSystemOptionsHandler(struct tag_message &);
+i32 ValidHex(i32);
+void UpdateCombatSystemOptions(i32);
+i32 CombatSystemOptionsHandler(struct tag_message &);
 
 #endif // HOMM2_CMBTMGR_H

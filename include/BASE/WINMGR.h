@@ -1,5 +1,7 @@
 #ifndef HOMM2_WINMGR_H
 #define HOMM2_WINMGR_H
+
+#include <Ints.h>
 // Declarations of the free functions DEFINED in WINMGR.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
 
@@ -69,7 +71,7 @@ typedef enum WindowFizzleConstant {
     WINDOW_FIZZLE_CYCLE_TABLE_BYTES = 0x10000
 } WindowFizzleConstant;
 
-void CycleColors(int);
+void CycleColors(i32);
 void CreateFizzleTables(void);
 void CreateColorTables(void);
 void CreateColorLookupTables(void);

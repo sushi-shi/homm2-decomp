@@ -18,10 +18,10 @@
 #include <BASE/INPUTMGR_TYPES.h>
 #include <BASE/message.h>
 
-DATA(0x0051f980) int iCurSwapPalette = 0;
-DATA(0x0051f984) int bLastMouseOffscreen = 0;
-DATA(0x0051f988) int bLastOnscreenMouseColor = 0;
-DATA(0x0051f98c) int bInCheckChangeCursor = 0;
+DATA(0x0051f980) i32 iCurSwapPalette = 0;
+DATA(0x0051f984) i32 bLastMouseOffscreen = 0;
+DATA(0x0051f988) i32 bLastOnscreenMouseColor = 0;
+DATA(0x0051f98c) i32 bInCheckChangeCursor = 0;
 DATA(0x0051f990) static SInputManagerText gInputManagerText = {
     "ReleaseCapture Failed",
     "ReleaseCapture Failed",
@@ -42,7 +42,7 @@ DATA(0x0051f990) static SInputManagerText gInputManagerText = {
 // by the delinker as this function plus local offsets, and gConfig+0x30, whose retail
 // interior label is the same VA 0x00528d50.
 VA(0x004cdb50, 0x308)
-int KeyboardMessageHandler(void *, unsigned int message, unsigned int, long int messageData)
+i32 KeyboardMessageHandler(void *, u32 message, u32, i32l messageData)
 {
     if (gpInputManager == 0)
         return 1;
@@ -60,7 +60,7 @@ int KeyboardMessageHandler(void *, unsigned int message, unsigned int, long int 
     switch (message) {
     case WM_KEYDOWN:
         event->type = MESSAGE_KEY_DOWN;
-        event->payload.keyboard.keyCode = static_cast<unsigned short>(static_cast<unsigned long>(messageData) >> 16) & INPUT_SCAN_CODE_MASK;
+        event->payload.keyboard.keyCode = static_cast<u16>(static_cast<u32l>(messageData) >> 16) & INPUT_SCAN_CODE_MASK;
         event->payload.keyboard.unknown0x08 = 0;
         event->payload.keyboard.modifiers = 0;
         switch (event->payload.keyboard.keyCode) {
@@ -80,7 +80,7 @@ int KeyboardMessageHandler(void *, unsigned int message, unsigned int, long int 
         break;
     case WM_KEYUP:
         event->type = MESSAGE_KEY_UP;
-        event->payload.keyboard.keyCode = static_cast<unsigned short>(static_cast<unsigned long>(messageData) >> 16) & INPUT_SCAN_CODE_MASK;
+        event->payload.keyboard.keyCode = static_cast<u16>(static_cast<u32l>(messageData) >> 16) & INPUT_SCAN_CODE_MASK;
         event->payload.keyboard.unknown0x08 = 0;
         event->payload.keyboard.modifiers = 0;
         switch (event->payload.keyboard.keyCode) {
@@ -134,7 +134,7 @@ int KeyboardMessageHandler(void *, unsigned int message, unsigned int, long int 
 // +0/+0x18. All nonlocal runtime addresses and owner-relative addends agree,
 // including gConfig +0x30/+0x34, SetCapture, and ReleaseCapture.
 VA(0x004cde60, 0x36c)
-int MouseMessageHandler(void *, unsigned int message, unsigned int, long int messageData)
+i32 MouseMessageHandler(void *, u32 message, u32, i32l messageData)
 {
     if (gpInputManager == 0)
         return 1;
@@ -185,9 +185,9 @@ int MouseMessageHandler(void *, unsigned int message, unsigned int, long int mes
     }
 
     event->payload.mouse.x =
-        (static_cast<short>(messageData) * MOUSE_SCREEN_WIDTH) / iMainWinScreenWidth;
+        (static_cast<i16>(messageData) * MOUSE_SCREEN_WIDTH) / iMainWinScreenWidth;
     event->payload.mouse.y =
-        (static_cast<short>(static_cast<unsigned long>(messageData) >> 16) * MOUSE_SCREEN_HEIGHT) /
+        (static_cast<i16>(static_cast<u32l>(messageData) >> 16) * MOUSE_SCREEN_HEIGHT) /
         iMainWinScreenHeight;
     event->payload.mouse.screenX = event->payload.mouse.x;
     event->payload.mouse.screenY = event->payload.mouse.y;
@@ -205,8 +205,8 @@ int MouseMessageHandler(void *, unsigned int message, unsigned int, long int mes
 
 afterMouseCoordinates:
     if (message == WM_MOUSEMOVE && gpMouseManager != 0) {
-        int y = event->payload.mouse.y;
-        int x = event->payload.mouse.x;
+        i32 y = event->payload.mouse.y;
+        i32 x = event->payload.mouse.x;
         if (bInCheckChangeCursor == 0 && gConfig.gfx[giCurExe].fullScreen == 0 &&
             gConfig.gfx[giCurExe].colorMouseCursor != 0) {
             bInCheckChangeCursor = 1;
@@ -231,7 +231,7 @@ afterMouseCoordinates:
         event->payload.mouse.modifiers = gpInputManager->m_modifiers;
         gpInputManager->m_writeIndex++;
         gpInputManager->m_writeIndex %= INPUT_EVENT_RING_CAPACITY;
-        int readIndex = gpInputManager->m_readIndex;
+        i32 readIndex = gpInputManager->m_readIndex;
         if (gpInputManager->m_writeIndex == readIndex) {
             gpInputManager->m_readIndex = readIndex + 1;
             gpInputManager->m_readIndex %= INPUT_EVENT_RING_CAPACITY;
@@ -257,7 +257,7 @@ inputManager::inputManager(void) : baseManager()
 }
 
 VA(0x004ce230, 0x78)
-int inputManager::Open(int param_1)
+i32 inputManager::Open(i32 param_1)
 {
     memset(m_eventRing, 0, sizeof(m_eventRing));
     m_writeIndex = 0;
@@ -284,7 +284,7 @@ void inputManager::Close(void)
 }
 
 VA(0x004ce2d0, 0x5)
-int inputManager::Main(struct tag_message &) { return 0; }
+i32 inputManager::Main(struct tag_message &) { return 0; }
 
 VA(0x004ce2e0, 0xf)
 void inputManager::Flush(void)
@@ -333,10 +333,10 @@ tag_message inputManager::PeekEvent(void)
 }
 
 VA(0x004ce450, 0x3)
-void inputManager::SetMouseCoords(int, int) {}
+void inputManager::SetMouseCoords(i32, i32) {}
 
 VA(0x004ce460, 0x1b)
-void inputManager::SetKeyCodeType(int keyCodeType)
+void inputManager::SetKeyCodeType(i32 keyCodeType)
 {
     m_keyCodeType = static_cast<InputManagerKeyCodeType>(keyCodeType);
     m_writeIndex = 0;
@@ -368,10 +368,10 @@ void inputManager::AsciiConvert(tag_message &event)
         event.payload.keyboard.keyCode =
             m_keyState[event.payload.keyboard.keyCode] & 0xff;
 
-    int modifiers = event.payload.keyboard.modifiers &
+    i32 modifiers = event.payload.keyboard.modifiers &
                     (MESSAGE_MODIFIER_RIGHT_SHIFT | MESSAGE_MODIFIER_LEFT_SHIFT);
     if (modifiers == 0) {
-        int value = event.payload.keyboard.keyCode;
+        i32 value = event.payload.keyboard.keyCode;
         if (value > 'A' - 1 && value < 'Z' + 1) {
             value += 'a' - 'A';
             event.payload.keyboard.keyCode = value;
@@ -406,7 +406,7 @@ void inputManager::AsciiConvert(tag_message &event)
 VA(0x004ce650, 0x33c)
 void inputManager::MakeScanCodeTable(void)
 {
-    for (unsigned int scanCode = 0; scanCode < INPUT_SCAN_CODE_CAPACITY; scanCode++)
+    for (u32 scanCode = 0; scanCode < INPUT_SCAN_CODE_CAPACITY; scanCode++)
         m_keyState[scanCode] = scanCode << 8;
 
     m_keyState[INPUT_SCAN_NONE] = 0;
@@ -511,7 +511,7 @@ void inputManager::MakeScanCodeTable(void)
 // +0x34 addends are confirmed; revisit only after a genuine predecessor/TU-state
 // change, since the residual is register coloring rather than missing behavior.
 VA(0x004ce990, 0xe4)
-void CheckChangeCursor(int x, int y, int force)
+void CheckChangeCursor(i32 x, i32 y, i32 force)
 {
     if (bInCheckChangeCursor != 0)
         return;
@@ -551,7 +551,7 @@ void CheckChangeCursor(int x, int y, int force)
 VA(0x004cea80, 0xe9)
 void inputManager::ForceMouseMove(void)
 {
-    int mouseMessageActive = gpInputManager->m_mouseMessageActive;
+    i32 mouseMessageActive = gpInputManager->m_mouseMessageActive;
     if (mouseMessageActive != 0)
         return;
     gpInputManager->m_mouseMessageActive = 1;
@@ -581,4 +581,4 @@ void inputManager::ForceMouseMove(void)
 VTBL(inputManager, 0x004eba30);
 
 // ---- globals (definitions, RVA order) ----
-DATA(0x00534bc8) int iLastBWOnScreenCheck;
+DATA(0x00534bc8) i32 iLastBWOnScreenCheck;

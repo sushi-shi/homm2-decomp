@@ -29,10 +29,10 @@
 #define smallB 26
 #define smallF 18
 
-DATA(0x00538070) unsigned int globalCrc;
-DATA(0x0053806c) int bsInUse;
+DATA(0x00538070) u32 globalCrc;
+DATA(0x0053806c) i32 bsInUse;
 DATA(0x00534ed0) BitStream aBitStreamBuffer;
-DATA(0x00537428) int bytesOut;
+DATA(0x00537428) i32 bytesOut;
 DATA(0x0053701c) UInt32 bigL;
 DATA(0x00537020) UInt32 bigR;
 DATA(0x00537018) UInt32 bigD;
@@ -179,19 +179,19 @@ void initialiseCRC(void)
 }
 
 VA(0x004d4070, 0x17)
-unsigned int getFinalCRC(void)
+u32 getFinalCRC(void)
 {
     return ~globalCrc;
 }
 
 VA(0x004d4090, 0x15)
-unsigned int getGlobalCRC(void)
+u32 getGlobalCRC(void)
 {
     return globalCrc;
 }
 
 VA(0x004d40b0, 0x1e)
-void setGlobalCRC(unsigned int newCrc)
+void setGlobalCRC(u32 newCrc)
 {
     globalCrc = newCrc;
 }
@@ -225,11 +225,11 @@ BitStream * bsOpenWriteStream(FILE *f)
 }
 
 VA(0x004d41b0, 0x8c)
-void bsPutBit(BitStream *bs, int bit)
+void bsPutBit(BitStream *bs, i32 bit)
 {
-    int retVal;
+    i32 retVal;
     if (bs->buffLive == 8) {
-        retVal = putc((unsigned char)bs->buffer, bs->handle);
+        retVal = putc((u8)bs->buffer, bs->handle);
         if (retVal == EOF) ioError();
         bytesOut++;
         bs->buffLive = 1;
@@ -241,9 +241,9 @@ void bsPutBit(BitStream *bs, int bit)
 }
 
 VA(0x004d4240, 0x95)
-int bsGetBit(BitStream *bs)
+i32 bsGetBit(BitStream *bs)
 {
-    int retVal;
+    i32 retVal;
     if (bs->buffLive > 0) {
         bs->buffLive--;
         return (bs->buffer >> bs->buffLive) & 1;
@@ -258,7 +258,7 @@ int bsGetBit(BitStream *bs)
 }
 
 VA(0x004d42e0, 0x50)
-unsigned char bsGetUChar(BitStream *bs)
+u8 bsGetUChar(BitStream *bs)
 {
     Int32  i;
     UInt32 c;
@@ -271,11 +271,11 @@ unsigned char bsGetUChar(BitStream *bs)
 }
 
 VA(0x004d4330, 0x4e)
-void bsPutUChar(BitStream *bs, unsigned char c)
+void bsPutUChar(BitStream *bs, u8 c)
 {
-    int i;
+    i32 i;
     for (i = 7; i >= 0; i--)
-        bsPutBit(bs, ((unsigned int)c >> i) & 1);
+        bsPutBit(bs, ((u32)c >> i) & 1);
 }
 
 VA(0x004d4380, 0xe8)
@@ -302,7 +302,7 @@ void bsClose(BitStream *bs)
 }
 
 VA(0x004d4470, 0x35)
-unsigned int minUInt32(unsigned int a, unsigned int b)
+u32 minUInt32(u32 a, u32 b)
 {
     if (a < b) return a; else return b;
 }
@@ -1841,13 +1841,13 @@ void uncompress(Char *name)
 // agree. Residuals are local literals and _open/_write/_close import-name aliases that
 // resolve to the same retail addresses with zero addends.
 VA(0x004d7f60, 0x2d5)
-long EncodeData(char *dst, char *src, unsigned long srcLen)
+i32l EncodeData(char *dst, char *src, u32l srcLen)
 {
     char  fname[450] = { 0 };
-    int   fd;
-    int   retVal;
+    i32   fd;
+    i32   retVal;
     FILE *fp;
-    long  flen;
+    i32l  flen;
 
     outputHandleJustInCase = NULL;
     bsInUse = 0;
@@ -1887,13 +1887,13 @@ long EncodeData(char *dst, char *src, unsigned long srcLen)
 // agree. Residuals are local literals and _open/_write/_close import-name aliases that
 // resolve to the same retail addresses with zero addends.
 VA(0x004d8240, 0x2f3)
-long DecodeData(char *dst, char *src, unsigned long srcLen)
+i32l DecodeData(char *dst, char *src, u32l srcLen)
 {
     char  fname[450] = { 0 };
-    int   fd;
-    int   retVal;
+    i32   fd;
+    i32   retVal;
     FILE *fp;
-    long  flen;
+    i32l  flen;
 
     outputHandleJustInCase = NULL;
     bsInUse = 0;
@@ -1949,9 +1949,9 @@ long DecodeData(char *dst, char *src, unsigned long srcLen)
 // references and sortIt has 23 versus 35; those residuals belong to their
 // incomplete function structure, not to data ownership or layout.
 // ---- globals (definitions, RVA order) ----
-DATA(0x00534ee4) int longestFileName;
-DATA(0x00534ee8) int opMode;
+DATA(0x00534ee4) i32 longestFileName;
+DATA(0x00534ee8) i32 opMode;
 DATA(0x00537028) char inName[1024];
 DATA(0x00537430) char outName[1024];
 DATA(0x00537c58) char *progNameReally;
-DATA(0x00538078) int keepInputFiles;
+DATA(0x00538078) i32 keepInputFiles;

@@ -23,17 +23,17 @@
 // Ten non-improving current-state variants exhausted operand orders and trivial local
 // hoists. Revisit only after a material Ripple header/declaration-state change.
 VA(0x004d26a0, 0x23f)
-void DoRipple(bitmap *source, bitmap *destination, int height, int strength)
+void DoRipple(bitmap *source, bitmap *destination, i32 height, i32 strength)
 {
-    int profileIndex;
-    const int screenWidth = 0x280;
-    const int profileRadius = 0x19;
-    const int redrawRadius = 0x16;
-    const int redrawWidth = 0x29;
+    i32 profileIndex;
+    const i32 screenWidth = 0x280;
+    const i32 profileRadius = 0x19;
+    const i32 redrawRadius = 0x16;
+    const i32 redrawWidth = 0x29;
 
     gpMouseManager->HideColorPointer();
 
-    unsigned char profile[51] = {
+    u8 profile[51] = {
         0, 0, 0, 0, 0, 0, 0,
         1, 1, 1, 1, 1,
         2, 2, 2, 2,
@@ -45,26 +45,26 @@ void DoRipple(bitmap *source, bitmap *destination, int height, int strength)
         1, 1, 1, 1, 1,
         0, 0, 0, 0, 0, 0, 0
     };
-    unsigned char previous[screenWidth];
+    u8 previous[screenWidth];
     memset(previous, 0, sizeof(previous));
-    int position = -profileRadius;
+    i32 position = -profileRadius;
 
     do {
         PollSound();
-        int deadline = KBTickCount() +
+        i32 deadline = KBTickCount() +
             gfCombatSpeedMod[gConfig.combatSpeed] * 9.0f;
 
         for (profileIndex = 0; profileIndex <= 50; ++profileIndex) {
-            int column = profileIndex + position - profileRadius;
+            i32 column = profileIndex + position - profileRadius;
             if (column < 0 || column >= screenWidth)
                 continue;
 
             if (previous[column] == profile[profileIndex])
                 continue;
 
-            unsigned char *destinationPixel = destination->m_pixels + column;
-            int sourceRow = profile[profileIndex] * strength;
-            unsigned char *sourcePixel = source->m_pixels + sourceRow * screenWidth + column;
+            u8 *destinationPixel = destination->m_pixels + column;
+            i32 sourceRow = profile[profileIndex] * strength;
+            u8 *sourcePixel = source->m_pixels + sourceRow * screenWidth + column;
 
             if (height > sourceRow) {
                 do {
@@ -79,8 +79,8 @@ void DoRipple(bitmap *source, bitmap *destination, int height, int strength)
             previous[column] = profile[profileIndex];
         }
 
-        int redrawX = position - redrawRadius;
-        int width = redrawWidth;
+        i32 redrawX = position - redrawRadius;
+        i32 width = redrawWidth;
         if (redrawX < 0) {
             width += redrawX;
             redrawX = 0;

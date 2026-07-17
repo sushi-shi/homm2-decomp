@@ -17,14 +17,14 @@ public:
     // (derived: base widget = 0x20 bytes at 0x00 via ': public widget'; own fields below)
     bitmap *m_backgroundBitmap;  // +0x20  background bitmap
     icon  *m_backgroundIcon;  // +0x24  background icon
-    short m_fillColor;  // +0x28  palette index for a solid-color border
+    i16 m_fillColor;  // +0x28  palette index for a solid-color border
     // --- constructors ---
     border(void);
-    border(short int, short int, short int, short int, short int, short int, short int, char *);
+    border(i16, i16, i16, i16, i16, i16, i16, char *);
     virtual ~border() OVERRIDE;
     // --- virtual methods (vtable order) ---
     virtual void Draw(void) OVERRIDE;
-    virtual int Main(struct tag_message &) OVERRIDE;
+    virtual i32 Main(struct tag_message &) OVERRIDE;
     // --- methods ---
     void Read(void);
 };

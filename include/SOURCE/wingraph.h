@@ -49,50 +49,50 @@ typedef HRESULT (__stdcall *DirectDrawCreateProc)(
     GUID *guid, IDirectDraw **directDraw, IUnknown *outerUnknown);
 
 void DDRestoreDisplayMode(void);
-int DDQueryNewPalette(void);
+i32 DDQueryNewPalette(void);
 void CreatePrimary(void);
 void SetupClipper(void);
 void DDInitGraphics(void);
-int DDAppPaint(void *, void *);
+i32 DDAppPaint(void *, void *);
 void DDInitializePalette(void);
-int DDSetPalette(void);
-struct IDirectDrawSurface * DDCreateSurface(unsigned long int, unsigned long int, int);
-void DDSD(int, char *, int);
-void DDUpdatePalette(signed char *);
+i32 DDSetPalette(void);
+struct IDirectDrawSurface * DDCreateSurface(u32l, u32l, i32);
+void DDSD(i32, char *, i32);
+void DDUpdatePalette(i8 *);
 void DDCleanUpWinGraphics(void);
-void DDSetFullScreenStatus(int);
-int WGQueryNewPalette(void);
+void DDSetFullScreenStatus(i32);
+i32 WGQueryNewPalette(void);
 void WGInitGraphics(void);
-void WGUpdatePalette(signed char *);
+void WGUpdatePalette(i8 *);
 void WGInitializePalette(void);
-int WGAppPaint(void *, void *);
+i32 WGAppPaint(void *, void *);
 void WGCleanUpWinGraphics(void);
 void ConnectToDLLs(void);
 void DisconnectDLLs(void);
 void RestoreDisplayMode(void);
-int SetPalette(void);
+i32 SetPalette(void);
 void GetGraphicsInfo(void);
 void InitGraphics(void);
-int AppPaint(void *, void *);
+i32 AppPaint(void *, void *);
 void InitializePalette(void);
-void UpdatePalette(signed char *);
+void UpdatePalette(i8 *);
 void CleanUpWinGraphics(void);
-void SetFullScreenStatus(int);
-int QueryNewPalette(void);
-int SetGraphicsType(int);
+void SetFullScreenStatus(i32);
+i32 QueryNewPalette(void);
+i32 SetGraphicsType(i32);
 
 
 // --- globals owned by this TU (moved from _globals.h; CodeView-attributed) ---
-extern int giGraphicsType;
+extern i32 giGraphicsType;
 
 // ---- globals (declarations, RVA order) ----
-extern int gbWinGAttached;
-extern int gbDDrawAttached;
-extern long Orientation;
+extern i32 gbWinGAttached;
+extern i32 gbDDrawAttached;
+extern i32l Orientation;
 extern void *lpInitWin;
-extern int bPaletteInitialized;
-extern int giTtlBlts;
-extern int gbWinGraphBusy;
+extern i32 bPaletteInitialized;
+extern i32 giTtlBlts;
+extern i32 gbWinGraphBusy;
 extern DirectDrawCreateProc lpDirectDrawCreate;
 extern struct _PALETTE LogicalPalette;
 extern struct _IMAGE screenImage;
@@ -101,14 +101,14 @@ extern struct IDirectDrawSurface *lpDDSPrimary;
 extern struct IDirectDrawSurface *lpDDSOne;
 extern struct IDirectDrawClipper *lpClipper;
 extern struct IDirectDrawPalette *lpDDPal;
-extern int iBusyRetry;
-extern int bInDDSD;
+extern i32 iBusyRetry;
+extern i32 bInDDSD;
 extern HDC hdcImage;
 extern HBITMAP gbmOldMonoBitmap;
 extern HPALETTE hpalApp;
 extern HINSTANCE hWinGLibrary;
 extern HINSTANCE hDDrawLibrary;
-extern long lDelayRefresh;
-extern long lPaintStart;
+extern i32l lDelayRefresh;
+extern i32l lPaintStart;
 
 #endif // HOMM2_WINGRAPH_H

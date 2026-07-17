@@ -1,5 +1,7 @@
 #ifndef HOMM2_OVERVIEW_H
 #define HOMM2_OVERVIEW_H
+
+#include <Ints.h>
 // Declarations of the free functions DEFINED in Overview.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
 // forward declarations (was <_all.h>):
@@ -97,6 +99,6 @@ typedef enum OverviewUiConstant {
     OVERVIEW_KEY_PAGE_DOWN = 0x51
 } OverviewUiConstant;
 
-int OverviewHandler(struct tag_message &);
+i32 OverviewHandler(struct tag_message &);
 
 #endif // HOMM2_OVERVIEW_H

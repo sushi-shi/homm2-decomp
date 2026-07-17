@@ -12,22 +12,22 @@ class icon;
 class font : public resource {
 public:
     // --- own members (base resource occupies 0x00..0x10; widths from access-analysis) ---
-    int    m_height;  // +0x10
-    int    m_isLarge;  // +0x14
-    int    m_suppressDraw;  // +0x18
+    i32    m_height;  // +0x10
+    i32    m_isLarge;  // +0x14
+    i32    m_suppressDraw;  // +0x18
     icon  *m_glyphIcon;  // +0x1c  (resourceManager::GetIcon result)
     // --- constructors ---
-    font(unsigned long int);
+    font(u32l);
     virtual ~font();
     // --- methods ---
 protected:
-    void DrawStringExecute(char *, int, int, int, int, int, int, int);   // ?...@font@@IAE... (protected)
+    void DrawStringExecute(char *, i32, i32, i32, i32, i32, i32, i32);   // ?...@font@@IAE... (protected)
 public:
-    void DrawString(char *, int, int, int);
-    int GetCharacterWidth(unsigned char);
-    void DrawBoundedString(char *, int, int, int, int, int, int);
-    int LineLength(char *, int);
-    int LineWidth(char *);
+    void DrawString(char *, i32, i32, i32);
+    i32 GetCharacterWidth(u8);
+    void DrawBoundedString(char *, i32, i32, i32, i32, i32, i32);
+    i32 LineLength(char *, i32);
+    i32 LineWidth(char *);
 };
 #pragma pack(pop)
 SIZE(font, 0x20);

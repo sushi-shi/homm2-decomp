@@ -84,20 +84,20 @@ typedef enum MapChangeType {
 
 #pragma pack(push, 1)
 struct SMapChange {
-    unsigned char type;
-    signed char id;
-    unsigned char x;
-    unsigned char y;
-    signed char direction;
-    signed char stopAfterMove;
-    signed char player;
-    int sequence;
+    u8 type;
+    i8 id;
+    u8 x;
+    u8 y;
+    i8 direction;
+    i8 stopAfterMove;
+    i8 player;
+    i32 sequence;
 };
 #pragma pack(pop)
 SIZE(SMapChange, 11);
 
 extern SMapChange sMapChangeLastFew[CURSOR_MAP_CHANGE_RECENT_COUNT];
 
-void SendMapChange(int, signed char, unsigned char, unsigned char, int, unsigned char, unsigned char);
+void SendMapChange(i32, i8, u8, u8, i32, u8, u8);
 
 #endif // HOMM2_CURSOR_H

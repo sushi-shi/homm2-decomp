@@ -162,18 +162,18 @@ typedef enum ExpansionCampaignChoiceConstant {
 #pragma pack(push, 1)  // recovered layout is byte-packed
 class ExpCampaign {
 public:
-    int m_campaignId;  // +0x00
-    int m_currentMap;  // +0x04
-    int m_mapCount;  // +0x08
-    unsigned char m_mapChoices[EXPANSION_CAMPAIGN_MAX_MAP_COUNT];  // +0x0c
-    unsigned char m_mapsPlayed[EXPANSION_CAMPAIGN_MAX_MAP_COUNT];  // +0x14
-    short m_mapDays[EXPANSION_CAMPAIGN_MAX_MAP_COUNT];  // +0x1c
-    unsigned char m_awards[EXPANSION_CAMPAIGN_AWARD_COUNT];  // +0x2c
-    unsigned char m_bonusChoices[EXPANSION_CAMPAIGN_MAX_MAP_COUNT];  // +0x37
+    i32 m_campaignId;  // +0x00
+    i32 m_currentMap;  // +0x04
+    i32 m_mapCount;  // +0x08
+    u8 m_mapChoices[EXPANSION_CAMPAIGN_MAX_MAP_COUNT];  // +0x0c
+    u8 m_mapsPlayed[EXPANSION_CAMPAIGN_MAX_MAP_COUNT];  // +0x14
+    i16 m_mapDays[EXPANSION_CAMPAIGN_MAX_MAP_COUNT];  // +0x1c
+    u8 m_awards[EXPANSION_CAMPAIGN_AWARD_COUNT];  // +0x2c
+    u8 m_bonusChoices[EXPANSION_CAMPAIGN_MAX_MAP_COUNT];  // +0x37
     char m_pad_0x3f[4];
-    int m_viewMap;  // +0x43
+    i32 m_viewMap;  // +0x43
     class heroWindow *m_window;  // +0x47
-    int m_viewOnly;  // +0x4b
+    i32 m_viewOnly;  // +0x4b
     char m_pad_0x4f;
     // --- constructors ---
     ExpCampaign(void);
@@ -183,15 +183,15 @@ public:
     void ResetMapsPlayed(void);
     void ResetAwards(void);
     void ResetBonusChoices(void);
-    void GrantAward(int);
-    void RemoveAward(int);
-    signed char HasAward(int);
+    void GrantAward(i32);
+    void RemoveAward(i32);
+    i8 HasAward(i32);
     void SetMapWasPlayed(void);
-    void InitNewCampaign(int);
+    void InitNewCampaign(i32);
     void InitMap(void);
-    void ShowInfo(int, int);
-    void UpdateInfo(int);
-    int HandleVictory(void);
+    void ShowInfo(i32, i32);
+    void UpdateInfo(i32);
+    i32 HandleVictory(void);
     void HandleVictory1(void);
     void HandleVictory2(void);
     void HandleVictory3(void);
@@ -201,20 +201,20 @@ public:
     void ReplaySmacker2(void);
     void ReplaySmacker3(void);
     void ReplaySmacker4(void);
-    unsigned char IsCompleted(void);
-    signed char IsThisMapCompleted(void);
+    u8 IsCompleted(void);
+    i8 IsThisMapCompleted(void);
 private:
-    static int MessageHandler(struct tag_message &);   // ?...@ExpCampaign@@CIH... (private static)
+    static i32 MessageHandler(struct tag_message &);   // ?...@ExpCampaign@@CIH... (private static)
 public:
     void Autosave(void);
-    int Choose(void);
-    short int Days(void);
-    int CampaignID(void);
+    i32 Choose(void);
+    i16 Days(void);
+    i32 CampaignID(void);
     char * JosephName(void);
     char * IvanName(void);
-    signed char IsSpecialGoldenBow(int, int);
-    signed char IsSpecialUA(void);
-    signed char IsSpecialLossCondition(int);
+    i8 IsSpecialGoldenBow(i32, i32);
+    i8 IsSpecialUA(void);
+    i8 IsSpecialLossCondition(i32);
 };
 #pragma pack(pop)
 SIZE(ExpCampaign, 0x50);

@@ -73,34 +73,34 @@ struct RemotePacketHeader {
     char destination;
     char reserved;
     char payloadSize;
-    unsigned short crc;
+    u16 crc;
 };
 
 struct RemoteMessage {
-    signed char sender;
-    int id;
-    signed char type;
-    signed char command;
-    unsigned short payloadSize;
-    unsigned char payload[REMOTE_MESSAGE_PAYLOAD_SIZE];
+    i8 sender;
+    i32 id;
+    i8 type;
+    i8 command;
+    u16 payloadSize;
+    u8 payload[REMOTE_MESSAGE_PAYLOAD_SIZE];
 };
 #pragma pack(pop)
 SIZE(RemotePacketHeader, REMOTE_PACKET_HEADER_SIZE);
 SIZE(RemoteMessage, REMOTE_MESSAGE_SIZE);
 
 void RemoteCleanup(void);
-void RemoteMain(int);
-void UnloadRemoteDriver(short int);
-int calc_crc_long(unsigned char *, int);
-void calc_crc(unsigned short int *, unsigned char *, int);
-int EncodePacket(unsigned char *, char, char, int);
-int DecodePacket(unsigned char *, int);
-int SendRemoteData(unsigned char *, unsigned char *, int, int);
-int ReceiveRemoteData(unsigned char *, unsigned char *, int);
-int TransmitRemoteData(char *, int, int, signed char, signed char, signed char, signed char);
-char * GetRemoteData(signed char);
+void RemoteMain(i32);
+void UnloadRemoteDriver(i16);
+i32 calc_crc_long(u8 *, i32);
+void calc_crc(u16 *, u8 *, i32);
+i32 EncodePacket(u8 *, char, char, i32);
+i32 DecodePacket(u8 *, i32);
+i32 SendRemoteData(u8 *, u8 *, i32, i32);
+i32 ReceiveRemoteData(u8 *, u8 *, i32);
+i32 TransmitRemoteData(char *, i32, i32, i8, i8, i8, i8);
+char * GetRemoteData(i8);
 void PollRemote(void);
-int TransmitAndWait(char *, int, int, signed char, signed char, char * *);
+i32 TransmitAndWait(char *, i32, i32, i8, i8, char * *);
 
 
 // --- globals owned by this TU (moved from _globals.h; CodeView-attributed) ---
@@ -109,32 +109,32 @@ extern char gbUseRegularCompression;
 extern SNetPlayerInfo gsNetPlayerInfo[REMOTE_PLAYER_COUNT];
 
 // ---- globals (declarations, RVA order) ----
-extern int iInOrderCtr;
-extern int iCurLastID;
-extern int giLastConfirm;
-extern unsigned char GameMode;
-extern long lLastHeartbeatSend;
-extern int gbInRemoteMain;
-extern int gbInRemoteCleanup;
-extern int iIDCtr;
-extern int iTimesDropped;
-extern signed char gbInNetSetup;
-extern int bUseDirectPlay;
-extern int bUseWinsock;
-extern signed char bInTimeoutFail;
-extern int iBaud[REMOTE_BAUD_RATE_COUNT];
-extern int iIRQ[REMOTE_IRQ_COUNT];
+extern i32 iInOrderCtr;
+extern i32 iCurLastID;
+extern i32 giLastConfirm;
+extern u8 GameMode;
+extern i32l lLastHeartbeatSend;
+extern i32 gbInRemoteMain;
+extern i32 gbInRemoteCleanup;
+extern i32 iIDCtr;
+extern i32 iTimesDropped;
+extern i8 gbInNetSetup;
+extern i32 bUseDirectPlay;
+extern i32 bUseWinsock;
+extern i8 bInTimeoutFail;
+extern i32 iBaud[REMOTE_BAUD_RATE_COUNT];
+extern i32 iIRQ[REMOTE_IRQ_COUNT];
 extern char rcvBufOut[REMOTE_TRANSPORT_BUFFER_SIZE];
-extern int iLastIds[REMOTE_RECENT_ID_COUNT];
+extern i32 iLastIds[REMOTE_RECENT_ID_COUNT];
 extern char PacketSend[REMOTE_ENCODED_BUFFER_SIZE];
-extern int iInOrder[REMOTE_QUEUE_STORAGE_COUNT];
+extern i32 iInOrder[REMOTE_QUEUE_STORAGE_COUNT];
 extern char sndBuf[REMOTE_TRANSPORT_BUFFER_SIZE];
 extern char gcThisNetName[32];
-extern long lLastHeartbeatReceive[REMOTE_PLAYER_COUNT];
+extern i32l lLastHeartbeatReceive[REMOTE_PLAYER_COUNT];
 extern char packet[REMOTE_TRANSPORT_BUFFER_SIZE];
 extern char rcvBufIn[REMOTE_TRANSPORT_BUFFER_SIZE];
 extern char *rcvBuf[REMOTE_QUEUE_STORAGE_COUNT];
-extern int bGotGameType;
+extern i32 bGotGameType;
 extern SNetPlayerInfo gsThisNetPlayerInfo;
 
 #endif // HOMM2_REMOTE_H

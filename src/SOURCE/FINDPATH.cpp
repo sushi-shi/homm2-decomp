@@ -24,18 +24,18 @@
 // ---- module-private synthetic globals (retail xref: single-module) ----
 // Retail .data raw storage ends at VA 0x00523000. These VAs are in its loader-zero
 // virtual tail, so the definitions intentionally have no initializer.
-DATA(0x0052adc0) static int gSearchLow;
+DATA(0x0052adc0) static i32 gSearchLow;
 DATA(0x0052adc4) static mapCell *gSearchNextCell;
 DATA(0x0052ae40) static searchNode *gSearchCell;
-DATA(0x0052ae44) static int gSearchNextY;
+DATA(0x0052ae44) static i32 gSearchNextY;
 DATA(0x0052ae48) static mapCell *gSearchCurrentCell;
-DATA(0x0052ae4c) static int gSearchDirection;
-DATA(0x0052ae50) static int gSearchTriggerType;
-DATA(0x0052ae54) static int gSearchNextX;
-DATA(0x0052ae58) static int gSearchTerrain;
+DATA(0x0052ae4c) static i32 gSearchDirection;
+DATA(0x0052ae50) static i32 gSearchTriggerType;
+DATA(0x0052ae54) static i32 gSearchNextX;
+DATA(0x0052ae58) static i32 gSearchTerrain;
 DATA(0x0052ae5c) static searchNode *gSearchQueueNode;
-DATA(0x0052ae60) static int gSearchMiddle;
-DATA(0x0052ae64) static int gSearchHigh;
+DATA(0x0052ae60) static i32 gSearchMiddle;
+DATA(0x0052ae64) static i32 gSearchHigh;
 
 // ---- initialized allocation provenance (retail RVA order) ----
 // @data-layout-note Retail initialized storage is exactly two contiguous 0x30-byte
@@ -122,10 +122,10 @@ void searchArray::Clear(void)
 // while candidate emits CMP EAX,ESI/JG; retail also has a trailing alignment LEA.
 // x>=y, y<=x, y<x, and x<y with reversed return-arm order were all compiled.
 VA(0x004a4b60, 0x40)
-int searchArray::QuickDistance(int x1, int y1, int x2, int y2)
+i32 searchArray::QuickDistance(i32 x1, i32 y1, i32 x2, i32 y2)
 {
-    int xDistance = abs(x1 - x2);
-    int yDistance = abs(y1 - y2);
+    i32 xDistance = abs(x1 - x2);
+    i32 yDistance = abs(y1 - y2);
 
     if (xDistance >= yDistance)
         return xDistance + yDistance / 2;
@@ -138,13 +138,13 @@ int searchArray::QuickDistance(int x1, int y1, int x2, int y2)
 // and top-level locals, operand reversal, row pointers, semantic aliases, register
 // hints, declaration order, and parameter names; revisit after 95%/TU-state changes.
 VA(0x004a4ba0, 0x80)
-int CalcTerrainCost(int terrain, int diagonal, int mobility,
-                    int direction, int useRoad, int usePathfinding)
+i32 CalcTerrainCost(i32 terrain, i32 diagonal, i32 mobility,
+                    i32 direction, i32 useRoad, i32 usePathfinding)
 {
-    int roadCost;
+    i32 roadCost;
 
     if (mobility < giTerrainCost[terrain][direction][1]) {
-        int baseCost = giTerrainCost[terrain][direction][0];
+        i32 baseCost = giTerrainCost[terrain][direction][0];
         if (mobility < baseCost) {
             if (useRoad == 0)
                 goto terrainCost;
@@ -169,10 +169,10 @@ terrainCost:
 // scratch globals. First divergence is scratch-register assignment at queue setup;
 // revisit after 95% or shared-layout/TU-state changes.
 VA(0x004a4c20, 0x270)
-void searchArray::PushPoint(int x, int y, int direction, int cost,
-                            int mobility, int unknownFlag, int rvFlag1,
-                            int valueX, int valueY, int rvFlag2,
-                            int previousX, int previousY)
+void searchArray::PushPoint(i32 x, i32 y, i32 direction, i32 cost,
+                            i32 mobility, i32 unknownFlag, i32 rvFlag1,
+                            i32 valueX, i32 valueY, i32 rvFlag2,
+                            i32 previousX, i32 previousY)
 {
     if (cost > mobility && mobility > 0)
         return;
@@ -197,7 +197,7 @@ void searchArray::PushPoint(int x, int y, int direction, int cost,
                     gSearchHigh = gSearchMiddle;
             }
 
-            if (static_cast<unsigned int>(gSearchMiddle) < m_queueCount) {
+            if (static_cast<u32>(gSearchMiddle) < m_queueCount) {
                 memmove(gSearchQueueNode + 1, gSearchQueueNode,
                         (m_queueCount - gSearchMiddle) * sizeof(searchNode));
             }
@@ -206,22 +206,22 @@ void searchArray::PushPoint(int x, int y, int direction, int cost,
             if (giCurTempMobility < cost && rvFlag2 == 0) {
                 gSearchQueueNode->rvFlag2 = 1;
                 gSearchQueueNode->previousX =
-                    static_cast<signed char>(x - normalDirTable[direction].x);
+                    static_cast<i8>(x - normalDirTable[direction].x);
                 gSearchQueueNode->previousY =
-                    static_cast<signed char>(y - normalDirTable[direction].y);
+                    static_cast<i8>(y - normalDirTable[direction].y);
             } else {
-                gSearchQueueNode->rvFlag2 = static_cast<unsigned char>(rvFlag2);
-                gSearchQueueNode->previousX = static_cast<signed char>(previousX);
-                gSearchQueueNode->previousY = static_cast<signed char>(previousY);
+                gSearchQueueNode->rvFlag2 = static_cast<u8>(rvFlag2);
+                gSearchQueueNode->previousX = static_cast<i8>(previousX);
+                gSearchQueueNode->previousY = static_cast<i8>(previousY);
             }
-            gSearchQueueNode->x = static_cast<unsigned char>(x);
-            gSearchQueueNode->y = static_cast<unsigned char>(y);
-            gSearchQueueNode->direction = static_cast<unsigned char>(direction);
-            gSearchQueueNode->distance = static_cast<unsigned short>(cost);
-            gSearchQueueNode->unknownFlag = static_cast<unsigned char>(unknownFlag);
-            gSearchQueueNode->rvFlag1 = static_cast<unsigned char>(rvFlag1);
-            gSearchQueueNode->valueX = static_cast<signed char>(valueX);
-            gSearchQueueNode->valueY = static_cast<signed char>(valueY);
+            gSearchQueueNode->x = static_cast<u8>(x);
+            gSearchQueueNode->y = static_cast<u8>(y);
+            gSearchQueueNode->direction = static_cast<u8>(direction);
+            gSearchQueueNode->distance = static_cast<u16>(cost);
+            gSearchQueueNode->unknownFlag = static_cast<u8>(unknownFlag);
+            gSearchQueueNode->rvFlag1 = static_cast<u8>(rvFlag1);
+            gSearchQueueNode->valueX = static_cast<i8>(valueX);
+            gSearchQueueNode->valueY = static_cast<i8>(valueY);
             gSearchQueueNode->visited = 1;
             *gSearchCell = *gSearchQueueNode;
         }
@@ -233,12 +233,12 @@ void searchArray::PushPoint(int x, int y, int direction, int cost,
 // First divergence is EBX/EDI ownership in occupied-array initialization; memset,
 // byte stores, sentinels and both terrain-arm orders were tried. Revisit after 95%.
 VA(0x004a4e90, 0x36f)
-void searchArray::TestPossibleDirections(int x, int y,
-                                         signed char * const terrain,
-                                         signed char * const occupied,
-                                         int allowOccupied, int waterMode)
+void searchArray::TestPossibleDirections(i32 x, i32 y,
+                                         i8 * const terrain,
+                                         i8 * const occupied,
+                                         i32 allowOccupied, i32 waterMode)
 {
-    int invalidTerrain = SEARCH_INVALID_COORDINATE;
+    i32 invalidTerrain = SEARCH_INVALID_COORDINATE;
 
     memset(occupied, 0, SEARCH_DIRECTION_COUNT);
     gSearchCurrentCell = gpAdvManager->GetCell(x, y);
@@ -331,7 +331,7 @@ void searchArray::TestPossibleDirections(int x, int y,
     invalidDirection:
         gSearchTerrain = invalidTerrain;
     storeDirection:
-        terrain[gSearchDirection] = static_cast<signed char>(gSearchTerrain);
+        terrain[gSearchDirection] = static_cast<i8>(gSearchTerrain);
         gSearchDirection++;
     } while (gSearchDirection < SEARCH_DIRECTION_COUNT);
 }
@@ -342,7 +342,7 @@ void searchArray::TestPossibleDirections(int x, int y,
 VA(0x004a5200, 0x1f0)
 void searchArray::SeedCombatPosition(class army *unit)
 {
-    int hex;
+    i32 hex;
 
     for (hex = 0; hex < COMBAT_HEX_COUNT; hex++)
         gpCombatManager->m_hexCells[hex].m_pathReachable = 0;
@@ -359,7 +359,7 @@ void searchArray::SeedCombatPosition(class army *unit)
         }
     }
 
-    for (int index = 0;
+    for (i32 index = 0;
          index < gpCombatManager->m_armyCount[1 - unit->m_side]; index++) {
         army *enemy = &gpCombatManager->m_armies[1 - unit->m_side][index];
         unit->m_targetSide = enemy->m_side;
@@ -394,24 +394,24 @@ void searchArray::SeedCombatPosition(class army *unit)
 // ECX for the moat-cell byte. Result/attack-target lifetime reuse and branch
 // polarities are recovered; revisit after 95% for register allocation only.
 VA(0x004a53f0, 0x410)
-int searchArray::FindCombatPath(int sourceHex, int targetHex, class army *unit,
-                                int attackPath, int ignoreTargetMoat)
+i32 searchArray::FindCombatPath(i32 sourceHex, i32 targetHex, class army *unit,
+                                i32 attackPath, i32 ignoreTargetMoat)
 {
-    unsigned char savedMoatState[9];
+    u8 savedMoatState[9];
     memset(bIsMoatSlowed, 0, sizeof(bIsMoatSlowed));
 
     if (gpCombatManager->m_drawbridgeBackgroundVisible != 0) {
-        int moatIndex;
-        int sourceWideHex = -1;
-        int targetWideHex = -1;
+        i32 moatIndex;
+        i32 sourceWideHex = -1;
+        i32 targetWideHex = -1;
         if ((unit->m_monster.attributes & MONSTER_ATTRIBUTE_WIDE) != 0) {
-            int offset = unit->m_facing == 1 ? 1 : -1;
+            i32 offset = unit->m_facing == 1 ? 1 : -1;
             sourceWideHex = unit->m_hex + offset;
             targetWideHex = targetHex + offset;
         }
 
         for (moatIndex = 0; moatIndex < 9; moatIndex++) {
-            int moatHex = moatCell[moatIndex];
+            i32 moatHex = moatCell[moatIndex];
             savedMoatState[moatIndex] =
                 gpCombatManager->m_hexCells[moatHex].m_pathReachable;
             if ((moatIndex != 4 || gpCombatManager->m_drawbridgeState == 4) &&
@@ -423,9 +423,9 @@ int searchArray::FindCombatPath(int sourceHex, int targetHex, class army *unit,
         }
     }
 
-    int bestDistance = 640;
-    int bestHex = -1;
-    int attackTargetHex = targetHex;
+    i32 bestDistance = 640;
+    i32 bestHex = -1;
+    i32 attackTargetHex = targetHex;
     if (attackPath == 0)
         attackTargetHex = -1;
     memset(m_queue, 0, sizeof(m_queue));
@@ -433,12 +433,12 @@ int searchArray::FindCombatPath(int sourceHex, int targetHex, class army *unit,
     m_queueCount = 0;
     m_pathLength = 0;
 
-    signed char *path;
+    i8 *path;
     if (ValidHex(sourceHex) && ValidHex(targetHex) && unit != 0) {
         path = m_storage.aiPath.directions;
-        unsigned int attackMask;
-        int attackDirection;
-        int currentHex;
+        u32 attackMask;
+        i32 attackDirection;
+        i32 currentHex;
         PushCombatPoint(sourceHex,
                         unit->m_facing == 0 ? COMBAT_DIRECTION_SOUTHWEST
                                             : COMBAT_DIRECTION_NORTHEAST,
@@ -450,11 +450,11 @@ int searchArray::FindCombatPath(int sourceHex, int targetHex, class army *unit,
                 continue;
 
             currentHex = node.x;
-            int xDistance = abs(gpCombatManager->m_hexCells[currentHex].m_x -
+            i32 xDistance = abs(gpCombatManager->m_hexCells[currentHex].m_x -
                                 gpCombatManager->m_hexCells[targetHex].m_x);
-            int yDistance = abs(gpCombatManager->m_hexCells[currentHex].m_y -
+            i32 yDistance = abs(gpCombatManager->m_hexCells[currentHex].m_y -
                                 gpCombatManager->m_hexCells[targetHex].m_y);
-            int distance;
+            i32 distance;
             if (xDistance >= yDistance)
                 distance = xDistance + yDistance / 2;
             else
@@ -475,11 +475,11 @@ int searchArray::FindCombatPath(int sourceHex, int targetHex, class army *unit,
                     break;
             }
 
-            unsigned int moveMask = unit->GetMoveMask(currentHex);
-            for (int direction = 0; direction < 8; direction++) {
+            u32 moveMask = unit->GetMoveMask(currentHex);
+            for (i32 direction = 0; direction < 8; direction++) {
                 if ((moveMask & (1U << direction)) == 0) {
-                    int nextHex = unit->GetAdjacentCellIndex(currentHex, direction);
-                    int moatCost = 0;
+                    i32 nextHex = unit->GetAdjacentCellIndex(currentHex, direction);
+                    i32 moatCost = 0;
                     if (bIsMoatSlowed[nextHex])
                         moatCost = unit->m_speed + 2;
                     PushCombatPoint(nextHex, direction,
@@ -493,7 +493,7 @@ int searchArray::FindCombatPath(int sourceHex, int targetHex, class army *unit,
     findAttackDirection:
         if ((attackMask & (1U << attackDirection)) == 0) {
             path++;
-            path[-1] = static_cast<signed char>(attackDirection);
+            path[-1] = static_cast<i8>(attackDirection);
             bestHex = currentHex;
             m_pathLength++;
             goto searchComplete;
@@ -517,7 +517,7 @@ restoreMoatFailure:
     attackTargetHex = 0;
 restoreMoat:
     if (gpCombatManager->m_drawbridgeBackgroundVisible != 0) {
-        for (int moatIndex = 0; moatIndex < 9; moatIndex++)
+        for (i32 moatIndex = 0; moatIndex < 9; moatIndex++)
             gpCombatManager->m_hexCells[moatCell[moatIndex]].m_pathReachable =
                 savedMoatState[moatIndex];
     }
@@ -527,11 +527,11 @@ reconstructPath:
     path = m_storage.aiPath.directions + m_pathLength;
     while (bestHex != sourceHex) {
         searchNode &cell = m_storage.nodes[bestHex];
-        *path++ = static_cast<signed char>(cell.direction);
+        *path++ = static_cast<i8>(cell.direction);
         m_pathLength++;
         if (m_pathLength > 0xff)
             break;
-        int opposite = OppositeDirection(cell.direction);
+        i32 opposite = OppositeDirection(cell.direction);
         bestHex = unit->GetAdjacentCellIndex(bestHex, opposite);
     }
     attackTargetHex = m_pathLength;
@@ -543,17 +543,17 @@ reconstructPath:
 // divergence is ESI/EDI ownership in the prologue. Compound/nested gates, signed
 // and unsigned indices, and early/late cell formation were tried; revisit at 95%.
 VA(0x004a5800, 0x100)
-void searchArray::PushCombatPoint(int hex, int direction, int distance, int speed)
+void searchArray::PushCombatPoint(i32 hex, i32 direction, i32 distance, i32 speed)
 {
     if (ValidHex(hex)) {
-        int low = 0;
-        int high = m_queueCount;
+        i32 low = 0;
+        i32 high = m_queueCount;
         searchNode *cell;
         if (speed <= 0 || distance <= speed) {
             cell = &m_storage.nodes[hex];
             if ((!cell->visited || distance < cell->distance) &&
                 m_queueCount < 1024) {
-                int middle;
+                i32 middle;
                 searchNode *node;
 
                 for (;;) {
@@ -574,18 +574,18 @@ void searchArray::PushCombatPoint(int hex, int direction, int distance, int spee
                 if (m_maxQueueCount < m_queueCount)
                     m_maxQueueCount = m_queueCount;
 
-                node->x = static_cast<unsigned char>(hex);
+                node->x = static_cast<u8>(hex);
                 node->y = 0;
-                node->direction = static_cast<unsigned char>(direction);
-                node->distance = static_cast<unsigned short>(distance);
+                node->direction = static_cast<u8>(direction);
+                node->distance = static_cast<u16>(distance);
 
                 cell->visited = 1;
-                cell->direction = static_cast<unsigned char>(direction);
-                cell->distance = static_cast<unsigned short>(distance);
+                cell->direction = static_cast<u8>(direction);
+                cell->distance = static_cast<u16>(distance);
             }
         }
     }
 }
 
 // ---- globals (definitions, RVA order) ----
-DATA(0x0052adc8) unsigned char bIsMoatSlowed[117];
+DATA(0x0052adc8) u8 bIsMoatSlowed[117];

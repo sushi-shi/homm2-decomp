@@ -24,7 +24,7 @@
 VA(0x004c7fa0, 0xdb)
 resourceManager::resourceManager(void) : baseManager()
 {
-    int aggregateIndex;
+    i32 aggregateIndex;
     m_active = 0;
     m_resourceListHead = 0;
     m_expunging = 0;
@@ -40,7 +40,7 @@ resourceManager::resourceManager(void) : baseManager()
 }
 
 VA(0x004c8080, 0xa2)
-void resourceManager::GetBackdrop(char *name, class bitmap *backdrop, int useIcon)
+void resourceManager::GetBackdrop(char *name, class bitmap *backdrop, i32 useIcon)
 {
     if (useIcon) {
         icon *backdropIcon = GetIcon(name);
@@ -51,7 +51,7 @@ void resourceManager::GetBackdrop(char *name, class bitmap *backdrop, int useIco
         ReadWord();
         ReadWord();
         ReadWord();
-        ReadBlock(reinterpret_cast<signed char *>(backdrop->m_pixels),
+        ReadBlock(reinterpret_cast<i8 *>(backdrop->m_pixels),
                   backdrop->m_width * backdrop->m_height);
     }
 }
@@ -68,13 +68,13 @@ void resourceManager::GetBackdrop(char *name, class bitmap *backdrop, int useIco
 // Revisit after shared RESMGR header state changes.
 VA(0x004c8130, 0xd2)
 void resourceManager::GetBackdropAtLoc(char *filename, class bitmap *destination,
-                                       int destinationX, int destinationY,
-                                       int useIcon)
+                                       i32 destinationX, i32 destinationY,
+                                       i32 useIcon)
 {
     icon *backdropIcon;
-    int dataWidth;
-    int imageHeight;
-    int row;
+    i32 dataWidth;
+    i32 imageHeight;
+    i32 row;
     if (useIcon != 0) {
         backdropIcon = GetIcon(filename);
         backdropIcon->DrawToBuffer(destinationX, destinationY, 0, 0);
@@ -85,7 +85,7 @@ void resourceManager::GetBackdropAtLoc(char *filename, class bitmap *destination
         dataWidth = ReadWord();
         imageHeight = ReadWord();
         for (row = destinationY; row < destinationY + imageHeight; row++) {
-            ReadBlock(reinterpret_cast<signed char *>(destination->m_pixels) +
+            ReadBlock(reinterpret_cast<i8 *>(destination->m_pixels) +
                           (row * RESOURCE_MANAGER_BACKDROP_ROW_BYTES) + destinationX,
                       dataWidth);
         }
@@ -95,7 +95,7 @@ void resourceManager::GetBackdropAtLoc(char *filename, class bitmap *destination
 VA(0x004c8210, 0x97)
 class palette * resourceManager::GetPalette(char *name)
 {
-    unsigned long id = MakeId(name, 1);
+    u32l id = MakeId(name, 1);
     resource *r = Query(id);
     if (r != 0) {
         r->m_refCount++;
@@ -110,7 +110,7 @@ class palette * resourceManager::GetPalette(char *name)
 VA(0x004c82b0, 0x97)
 class bitmap * resourceManager::GetBitmap(char *name)
 {
-    unsigned long id = MakeId(name, 1);
+    u32l id = MakeId(name, 1);
     resource *r = Query(id);
     if (r != 0) {
         r->m_refCount++;
@@ -126,7 +126,7 @@ VA(0x004c8350, 0x2f)
 class icon * resourceManager::GetIcon(char *name) { return GetIcon(MakeId(name, 1)); }
 
 VA(0x004c8380, 0x86)
-class icon *resourceManager::GetIcon(unsigned long resourceId)
+class icon *resourceManager::GetIcon(u32l resourceId)
 {
     icon *iconPointer = static_cast<icon *>(Query(resourceId));
     if (iconPointer != 0) {
@@ -142,7 +142,7 @@ class icon *resourceManager::GetIcon(unsigned long resourceId)
 VA(0x004c8410, 0x97)
 class tileset * resourceManager::GetTileset(char *name)
 {
-    unsigned long id = MakeId(name, 1);
+    u32l id = MakeId(name, 1);
     resource *r = Query(id);
     if (r != 0) {
         r->m_refCount++;
@@ -160,7 +160,7 @@ class mouse * resourceManager::GetMouse(char *) { return 0; }
 VA(0x004c84d0, 0x97)
 class font * resourceManager::GetFont(char *name)
 {
-    unsigned long resourceId = MakeId(name, 1);
+    u32l resourceId = MakeId(name, 1);
     resource *fontEntry = Query(resourceId);
     if (fontEntry != 0) {
         fontEntry->m_refCount++;
@@ -175,7 +175,7 @@ class font * resourceManager::GetFont(char *name)
 VA(0x004c8570, 0x9d)
 class sample *resourceManager::GetSample(char *name)
 {
-    unsigned long id = MakeId(name, 1);
+    u32l id = MakeId(name, 1);
     resource *r = Query(id);
     if (r != 0) {
         r->m_refCount++;
@@ -190,7 +190,7 @@ class sample *resourceManager::GetSample(char *name)
 VA(0x004c8610, 0x97)
 class MIDIWrap *resourceManager::GetMIDIWrap(char *name)
 {
-    unsigned long id = MakeId(name, 1);
+    u32l id = MakeId(name, 1);
     resource *r = Query(id);
     if (r != 0) {
         r->m_refCount++;
@@ -246,7 +246,7 @@ void resourceManager::Expunge(void)
 }
 
 VA(0x004c8830, 0x4b)
-class resource *resourceManager::Query(unsigned long resourceId)
+class resource *resourceManager::Query(u32l resourceId)
 {
     resource *cursorResource = m_resourceListHead;
     while (cursorResource != 0 && cursorResource->m_id != resourceId) {
@@ -256,10 +256,10 @@ class resource *resourceManager::Query(unsigned long resourceId)
 }
 
 VA(0x004c8880, 0x1a)
-int resourceManager::Main(struct tag_message &) { return RESOURCE_MANAGER_SUCCESS; }
+i32 resourceManager::Main(struct tag_message &) { return RESOURCE_MANAGER_SUCCESS; }
 
 VA(0x004c88a0, 0xab)
-int resourceManager::Open(int priority)
+i32 resourceManager::Open(i32 priority)
 {
     if (LoadAggregateHeader(EXPANSION_AGGREGATE_NAME) != RESOURCE_MANAGER_SUCCESS)
         return RESOURCE_MANAGER_ERROR;
@@ -298,7 +298,7 @@ void resourceManager::RemoveResource(class resource *resourceToRemove)
 VA(0x004c89e0, 0xc8)
 void resourceManager::Close(void)
 {
-    int aggregateIndex;
+    i32 aggregateIndex;
     if (m_active != 1)
         return;
     Expunge();
@@ -321,11 +321,11 @@ void resourceManager::Close(void)
 // instead of retail named constants; all 15 ordered offsets/types/runtime targets
 // and addends agree.
 VA(0x004c8ab0, 0x143)
-int resourceManager::LoadAggregateHeader(char *aggregateName)
+i32 resourceManager::LoadAggregateHeader(char *aggregateName)
 {
-    short fileCountBuffer[2];
-    int aggregateFile;
-    unsigned int directoryBytes;
+    i16 fileCountBuffer[2];
+    i32 aggregateFile;
+    u32 directoryBytes;
     if (m_numAggregates >= RESOURCE_MANAGER_AGGREGATE_LIMIT) {
         sprintf(gText, "Only %d .AGG files can be used at once.", RESOURCE_MANAGER_AGGREGATE_LIMIT);
         ShutDown(gText);
@@ -340,7 +340,7 @@ int resourceManager::LoadAggregateHeader(char *aggregateName)
     m_curAggregate = m_numAggregates;
     m_numAggregates = m_numAggregates + 1;
     m_aggregateFd[m_curAggregate] = aggregateFile;
-    read(m_aggregateFd[m_curAggregate], fileCountBuffer, sizeof(short));
+    read(m_aggregateFd[m_curAggregate], fileCountBuffer, sizeof(i16));
     m_aggregateEntryCount[m_curAggregate] = fileCountBuffer[0];
     directoryBytes = m_aggregateEntryCount[m_curAggregate] * RESOURCE_MANAGER_ENTRY_BYTES;
     m_aggregateDir[m_curAggregate] = static_cast<aggEntry *>(H2_ALLOC(directoryBytes, "I:\\Projects\\Heroes\\Prog\\BASE\\RESMGR.CPP", 0x21e));
@@ -349,11 +349,11 @@ int resourceManager::LoadAggregateHeader(char *aggregateName)
 }
 
 VA(0x004c8c00, 0x11c)
-void resourceManager::PointToFile(unsigned long fileId)
+void resourceManager::PointToFile(u32l fileId)
 {
     char isFound = 0;
-    int entryIndex;
-    int aggregateIndex;
+    i32 entryIndex;
+    i32 aggregateIndex;
     for (aggregateIndex = 0; aggregateIndex < RESOURCE_MANAGER_AGGREGATE_LIMIT; aggregateIndex++) {
         if (m_aggregateDir[aggregateIndex] != 0) {
             entryIndex = 0;
@@ -375,17 +375,17 @@ void resourceManager::PointToFile(unsigned long fileId)
                 fileId, m_lastFileId, m_lastFileName);
         ShutDown(gText);
     }
-    long ignoredPosition = lseek(m_aggregateFd[m_curAggregate],
+    i32l ignoredPosition = lseek(m_aggregateFd[m_curAggregate],
                                  m_aggregateDir[m_curAggregate][entryIndex].offset, 0);
 }
 
 VA(0x004c8d20, 0xfa)
-unsigned long resourceManager::GetFileSize(unsigned long fileId)
+u32l resourceManager::GetFileSize(u32l fileId)
 {
     char isFound = 0;
-    int entryIndex;
-    int matchedAggregate;
-    int fileIndex;
+    i32 entryIndex;
+    i32 matchedAggregate;
+    i32 fileIndex;
     for (fileIndex = 0; fileIndex < RESOURCE_MANAGER_AGGREGATE_LIMIT; fileIndex++) {
         if (m_aggregateDir[fileIndex] != 0) {
             entryIndex = 0;
@@ -427,14 +427,14 @@ void resourceManager::RestorePosition(void)
 }
 
 VA(0x004c8ee0, 0x81)
-signed char resourceManager::ReadByte(void)
+i8 resourceManager::ReadByte(void)
 {
     H2_ASSERT(m_aggregateFd[m_curAggregate] != RESOURCE_MANAGER_INVALID_FILE, "I:\\Projects\\Heroes\\Prog\\BASE\\RESMGR.CPP", 0x2bf);
-    signed char value = 0;
-    int bytesRead = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
+    i8 value = 0;
+    i32 bytesRead = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
     if (bytesRead == 0) {
-        int errorCode = errno;
-        int debugTrap = 0;
+        i32 errorCode = errno;
+        i32 debugTrap = 0;
         debugTrap++;
         debugTrap++;
     }
@@ -442,14 +442,14 @@ signed char resourceManager::ReadByte(void)
 }
 
 VA(0x004c8f70, 0x84)
-short resourceManager::ReadWord(void)
+i16 resourceManager::ReadWord(void)
 {
     H2_ASSERT(m_aggregateFd[m_curAggregate] != RESOURCE_MANAGER_INVALID_FILE, "I:\\Projects\\Heroes\\Prog\\BASE\\RESMGR.CPP", 0x2dc);
-    short value = 0;
-    int bytesRead = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
+    i16 value = 0;
+    i32 bytesRead = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
     if (bytesRead == 0) {
-        int errorCode = errno;
-        int debugTrap = 0;
+        i32 errorCode = errno;
+        i32 debugTrap = 0;
         debugTrap++;
         debugTrap++;
     }
@@ -457,14 +457,14 @@ short resourceManager::ReadWord(void)
 }
 
 VA(0x004c9000, 0x84)
-long resourceManager::ReadLong(void)
+i32l resourceManager::ReadLong(void)
 {
     H2_ASSERT(m_aggregateFd[m_curAggregate] != RESOURCE_MANAGER_INVALID_FILE, "I:\\Projects\\Heroes\\Prog\\BASE\\RESMGR.CPP", 0x2f8);
-    long value = 0;
-    int bytesRead = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
+    i32l value = 0;
+    i32 bytesRead = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
     if (bytesRead == 0) {
-        int errorCode = errno;
-        int debugTrap = 0;
+        i32 errorCode = errno;
+        i32 debugTrap = 0;
         debugTrap++;
         debugTrap++;
     }
@@ -472,22 +472,22 @@ long resourceManager::ReadLong(void)
 }
 
 VA(0x004c9090, 0xe3)
-unsigned long resourceManager::MakeId(char *name, int translate)
+u32l resourceManager::MakeId(char *name, i32 translate)
 {
     strcpy(m_lastFileName, name);
     if (gbUseEvilInterface != 0 && translate != 0) {
-        for (int translatedIndex = 0; translatedIndex < RESOURCE_MANAGER_EVIL_TRANSLATION_COUNT; translatedIndex++) {
+        for (i32 translatedIndex = 0; translatedIndex < RESOURCE_MANAGER_EVIL_TRANSLATION_COUNT; translatedIndex++) {
             if (strcmpi(m_lastFileName, cEvilTranslate[translatedIndex][0]) == 0)
                 strcpy(m_lastFileName, cEvilTranslate[translatedIndex][1]);
         }
     }
-    unsigned long result = MAKEFILEID(m_lastFileName);
+    u32l result = MAKEFILEID(m_lastFileName);
     m_lastFileId = result;
     return result;
 }
 
 VA(0x004c9180, 0x26)
-void resourceManager::Read13(signed char *destination)
+void resourceManager::Read13(i8 *destination)
 {
     ReadBlock(destination, RESOURCE_MANAGER_READ13_BYTES);
 }
@@ -498,18 +498,18 @@ void resourceManager::Read13(signed char *destination)
 // Only the assert filename and file-error format have local $SG identities instead
 // of retail's named string constants.
 VA(0x004c91b0, 0xbd)
-void resourceManager::ReadBlock(signed char *destination, unsigned long size)
+void resourceManager::ReadBlock(i8 *destination, u32l size)
 {
     H2_ASSERT(m_aggregateFd[m_curAggregate] != RESOURCE_MANAGER_INVALID_FILE, "I:\\Projects\\Heroes\\Prog\\BASE\\RESMGR.CPP", 0x330);
     PollSound();
-    int bytesRead = read(m_aggregateFd[m_curAggregate], destination, size);
+    i32 bytesRead = read(m_aggregateFd[m_curAggregate], destination, size);
     if (bytesRead != size) {
-        int errorCode = errno;
+        i32 errorCode = errno;
         sprintf(gText,
                 "File error - bytes read %d, bytes requested %d, errno %d, last file '%s'",
                 bytesRead, size, errno, m_lastFileName);
         LogStr(gText);
-        int debugTrap = 0;
+        i32 debugTrap = 0;
         debugTrap++;
         debugTrap++;
     }
@@ -546,6 +546,6 @@ VTBL(resourceManager, 0x004eb9f0);
 // residual rather than inventing aliases, padding, pragmas, or fake owners.
 
 // ---- globals (definitions, RVA order) ----
-DATA(0x0051e99c) int iSaveCtr = 0;
-DATA(0x005331e8) int lastAggZ[10];
-DATA(0x00533210) long lastPositionZ[10];
+DATA(0x0051e99c) i32 iSaveCtr = 0;
+DATA(0x005331e8) i32 lastAggZ[10];
+DATA(0x00533210) i32l lastPositionZ[10];

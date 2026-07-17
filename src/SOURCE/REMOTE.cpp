@@ -34,25 +34,25 @@
 #define REMOTE_PLAYER_INFO(message) \
     (reinterpret_cast<SNetPlayerInfo *>((message)->payload))
 
-DATA(0x00516f60) int iInOrderCtr = 0;
-DATA(0x00516f64) int iCurLastID = 0;
-DATA(0x00516f68) int giLastConfirm = -1;
-DATA(0x00516f6c) unsigned char GameMode = 0;
-DATA(0x00516f70) long lLastHeartbeatSend = 0;
-DATA(0x00516f74) int gbInRemoteMain = 0;
-DATA(0x00516f78) int gbInRemoteCleanup = 0;
-DATA(0x00516f7c) int iIDCtr = 0;
-DATA(0x00516f80) int iTimesDropped = 0;
-DATA(0x00516f84) signed char gbInNetSetup = 0;
-DATA(0x00516f88) int bUseDirectPlay = 0;
-DATA(0x00516f8c) int bUseWinsock = 0;
-DATA(0x00516f90) signed char bInTimeoutFail = 0;
-DATA(0x00516f98) int iBaud[REMOTE_BAUD_RATE_COUNT] = {
+DATA(0x00516f60) i32 iInOrderCtr = 0;
+DATA(0x00516f64) i32 iCurLastID = 0;
+DATA(0x00516f68) i32 giLastConfirm = -1;
+DATA(0x00516f6c) u8 GameMode = 0;
+DATA(0x00516f70) i32l lLastHeartbeatSend = 0;
+DATA(0x00516f74) i32 gbInRemoteMain = 0;
+DATA(0x00516f78) i32 gbInRemoteCleanup = 0;
+DATA(0x00516f7c) i32 iIDCtr = 0;
+DATA(0x00516f80) i32 iTimesDropped = 0;
+DATA(0x00516f84) i8 gbInNetSetup = 0;
+DATA(0x00516f88) i32 bUseDirectPlay = 0;
+DATA(0x00516f8c) i32 bUseWinsock = 0;
+DATA(0x00516f90) i8 bInTimeoutFail = 0;
+DATA(0x00516f98) i32 iBaud[REMOTE_BAUD_RATE_COUNT] = {
     300, 1200, 2400, 9600, 19200, 38400, 57600, 0
 };
-DATA(0x00516fb8) int iIRQ[REMOTE_IRQ_COUNT] = { 1, 2, 3, 4, 5, 7, 9 };
-DATA(0x00517118) static short gGetRemoteDataLineBase = 716;
-DATA(0x00517148) static short gPollRemoteLineBase = 757;
+DATA(0x00516fb8) i32 iIRQ[REMOTE_IRQ_COUNT] = { 1, 2, 3, 4, 5, 7, 9 };
+DATA(0x00517118) static i16 gGetRemoteDataLineBase = 716;
+DATA(0x00517148) static i16 gPollRemoteLineBase = 757;
 
 // @data-layout-note Retail's initialized REMOTE contribution is
 // 0x116f60..0x11733c (0x3dc); candidate .data is 0x3db. The public initialized
@@ -136,18 +136,18 @@ void RemoteCleanup(void)
 // polarity, log placement, struct copies, and host-name arm order. Revisit in the
 // 95% last-mile phase when local-label walls enter the active queue.
 VA(0x004a3208, 0x6da)
-void RemoteMain(int gameMode)
+void RemoteMain(i32 gameMode)
 {
-    unsigned char receivedPlayers[REMOTE_PLAYER_COUNT];
-    int playerState;
+    u8 receivedPlayers[REMOTE_PLAYER_COUNT];
+    i32 playerState;
     char *incomingData;
-    int waitingForPlayers;
-    int netPlayer;
-    int savedColorMice;
+    i32 waitingForPlayers;
+    i32 netPlayer;
+    i32 savedColorMice;
     char netNameBuffer[64];
-    int player;
+    i32 player;
     char *remoteGameType;
-    int setupCounter;
+    i32 setupCounter;
 
     gbInRemoteMain = 1;
     bGotGameType = 0;
@@ -180,7 +180,7 @@ void RemoteMain(int gameMode)
         rcvBuf[player] = 0;
     LogStr("RM 5");
     memset(iLastIds, 0, REMOTE_RECENT_ID_COUNT);
-    GameMode = static_cast<unsigned char>(gameMode);
+    GameMode = static_cast<u8>(gameMode);
     LogStr("RM 6");
     memset(gsNetPlayerInfo, 0, sizeof(gsNetPlayerInfo));
     memset(&gsThisNetPlayerInfo, 0, sizeof(gsThisNetPlayerInfo));
@@ -283,7 +283,7 @@ initializeNetwork:
     remoteGameType = 0;
     if (giThisNetPos == 0) {
         TransmitRemoteData(0, REMOTE_BROADCAST_PLAYER, 0,
-            static_cast<signed char>(giSetupGameType == 1 ?
+            static_cast<i8>(giSetupGameType == 1 ?
                 REMOTE_SETUP_CAMPAIGN_GAME : REMOTE_SETUP_STANDARD_GAME),
             1, 1, -1);
     } else {
@@ -316,7 +316,7 @@ initializeNetwork:
 }
 
 VA(0x004a38e2, 0x85)
-void UnloadRemoteDriver(short int networkDriver)
+void UnloadRemoteDriver(i16 networkDriver)
 {
     switch (networkDriver) {
     case 0:
@@ -334,12 +334,12 @@ void UnloadRemoteDriver(short int networkDriver)
 }
 
 VA(0x004a3967, 0x8d)
-int calc_crc_long(unsigned char *data, int length)
+i32 calc_crc_long(u8 *data, i32 length)
 {
-    unsigned int shifted;
-    unsigned int crc;
-    unsigned int sum;
-    int unused;
+    u32 shifted;
+    u32 crc;
+    u32 sum;
+    i32 unused;
 
     crc = 0;
     sum = 0;
@@ -359,15 +359,15 @@ int calc_crc_long(unsigned char *data, int length)
 }
 
 VA(0x004a39f4, 0x2c)
-void calc_crc(unsigned short int *crc, unsigned char *data, int length)
+void calc_crc(u16 *crc, u8 *data, i32 length)
 {
-    *crc = static_cast<unsigned short>(calc_crc_long(data, length));
+    *crc = static_cast<u16>(calc_crc_long(data, length));
 }
 
 VA(0x004a3a20, 0x87)
-int EncodePacket(unsigned char *data, char source, char destination, int length)
+i32 EncodePacket(u8 *data, char source, char destination, i32 length)
 {
-    unsigned short crc[2];
+    u16 crc[2];
 
     REMOTE_PACKET(PacketSend)->source = source;
     REMOTE_PACKET(PacketSend)->destination = destination;
@@ -376,7 +376,7 @@ int EncodePacket(unsigned char *data, char source, char destination, int length)
     crc[0] = 0;
     REMOTE_PACKET(PacketSend)->crc = crc[0];
     memcpy(PacketSend + REMOTE_PACKET_HEADER_SIZE, data, length);
-    calc_crc(crc, reinterpret_cast<unsigned char *>(PacketSend),
+    calc_crc(crc, reinterpret_cast<u8 *>(PacketSend),
         length + REMOTE_PACKET_HEADER_SIZE);
     REMOTE_PACKET(PacketSend)->crc = crc[0];
     return length + REMOTE_PACKET_HEADER_SIZE;
@@ -389,11 +389,11 @@ int EncodePacket(unsigned char *data, char source, char destination, int length)
 // code range, so it is not valid to claim the entire public span as raw exact.
 // Revisit only after private-function/boundary evidence or comparison-epoch changes.
 VA(0x004a3aa7, 0x13a)
-int DecodePacket(unsigned char *data, int)
+i32 DecodePacket(u8 *data, i32)
 {
-    unsigned short receivedCRC;
-    unsigned short calculatedCRC[2];
-    unsigned int length;
+    u16 receivedCRC;
+    u16 calculatedCRC[2];
+    u32 length;
     char errorText[200];
 
     calculatedCRC[0] = 0;
@@ -403,10 +403,10 @@ int DecodePacket(unsigned char *data, int)
         LogStr(errorText);
         return 0;
     }
-    length = static_cast<unsigned char>(REMOTE_PACKET(packet)->payloadSize);
+    length = static_cast<u8>(REMOTE_PACKET(packet)->payloadSize);
     receivedCRC = REMOTE_PACKET(packet)->crc;
     REMOTE_PACKET(packet)->crc = 0;
-    calc_crc(calculatedCRC, reinterpret_cast<unsigned char *>(packet),
+    calc_crc(calculatedCRC, reinterpret_cast<u8 *>(packet),
         length + REMOTE_PACKET_HEADER_SIZE);
     if (receivedCRC != calculatedCRC[0]) {
         sprintf(errorText, "CRC Check Failed CRC 1 %d CRC 2 %d\n",
@@ -426,13 +426,13 @@ int DecodePacket(unsigned char *data, int)
 // dispatch. Both nested inverse and positive backend polarities were tested.
 // Revisit in the 95% last-mile phase.
 VA(0x004a3be1, 0x18e)
-int SendRemoteData(unsigned char *dataToSend, unsigned char *, int destination,
-                   int length)
+i32 SendRemoteData(u8 *dataToSend, u8 *, i32 destination,
+                   i32 length)
 {
-    int sendStatus;
-    int out;
-    int size;
-    unsigned char remotePacket[REMOTE_MESSAGE_SIZE + sizeof(int)];
+    i32 sendStatus;
+    i32 out;
+    i32 size;
+    u8 remotePacket[REMOTE_MESSAGE_SIZE + sizeof(i32)];
 
     out = 1;
     if (destination == REMOTE_BROADCAST_PLAYER &&
@@ -449,9 +449,9 @@ int SendRemoteData(unsigned char *dataToSend, unsigned char *, int destination,
         } else if (bUseWinsock != 0) {
             sendStatus = wsnet_snd(destination, size, PacketSend);
         } else {
-            sendStatus = static_cast<short>(
-                nb_snd(static_cast<short>(destination),
-                    static_cast<short>(size), PacketSend));
+            sendStatus = static_cast<i16>(
+                nb_snd(static_cast<i16>(destination),
+                    static_cast<i16>(size), PacketSend));
             if (sendStatus != 0) {
                 LogInt("Bad return on Send Data", destination,
                     sendStatus, size, 0, 0, -999, -999);
@@ -476,10 +476,10 @@ int SendRemoteData(unsigned char *dataToSend, unsigned char *, int destination,
 // are switch relocation addends at +0x135/+0x136/+0x139/+0x13d/+0x141/+0x145;
 // all 19 relocation sites and external targets agree.
 VA(0x004a3d6f, 0x158)
-int ReceiveRemoteData(unsigned char *, unsigned char *data, int decodeType)
+i32 ReceiveRemoteData(u8 *, u8 *data, i32 decodeType)
 {
-    int result;
-    int receiveResult;
+    i32 result;
+    i32 receiveResult;
 
     result = 1;
     switch (GameMode) {
@@ -496,7 +496,7 @@ int ReceiveRemoteData(unsigned char *, unsigned char *data, int decodeType)
                 return 0;
             result = DecodePacket(data, decodeType);
         } else {
-            receiveResult = static_cast<short>(
+            receiveResult = static_cast<i16>(
                 nb_rcv(REMOTE_RECEIVE_BUFFER_SIZE, packet));
             if (receiveResult == 0)
                 return 0;
@@ -523,22 +523,22 @@ int ReceiveRemoteData(unsigned char *, unsigned char *data, int decodeType)
 // operand orders, and both message-type polarities were tested. Revisit in the 95%
 // last-mile phase.
 VA(0x004a3ec7, 0x21a)
-int TransmitRemoteData(char *data, int destination, int length,
-                       signed char command, signed char reliable,
-                       signed char allowRetryDialog, signed char messageType)
+i32 TransmitRemoteData(char *data, i32 destination, i32 length,
+                       i8 command, i8 reliable,
+                       i8 allowRetryDialog, i8 messageType)
 {
-    int poll;
-    int attempt0;
+    i32 poll;
+    i32 attempt0;
     RemoteMessage outgoing;
-    int unused4;
-    int result;
+    i32 unused4;
+    i32 result;
 
     if (gbRemoteOn == 0 || gbInNetSetup != 0)
         return 1;
     result = 0;
     attempt0 = 0;
     iIDCtr++;
-    outgoing.sender = static_cast<signed char>(giThisNetPos);
+    outgoing.sender = static_cast<i8>(giThisNetPos);
     outgoing.id = iIDCtr;
     if (messageType != -1) {
         outgoing.type = messageType;
@@ -548,13 +548,13 @@ int TransmitRemoteData(char *data, int destination, int length,
         else
             outgoing.type = REMOTE_MESSAGE_UNRELIABLE;
     }
-    outgoing.payloadSize = static_cast<unsigned short>(length);
+    outgoing.payloadSize = static_cast<u16>(length);
     outgoing.command = command;
     if (length > 0)
         memcpy(outgoing.payload, data, length);
     while (result == 0 && attempt0 <= REMOTE_RETRY_COUNT) {
         result = SendRemoteData(
-            reinterpret_cast<unsigned char *>(&outgoing), 0, destination,
+            reinterpret_cast<u8 *>(&outgoing), 0, destination,
             length + REMOTE_MESSAGE_HEADER_SIZE);
         if (reliable == 0 && result != 0)
             return 1;
@@ -584,11 +584,11 @@ int TransmitRemoteData(char *data, int destination, int length,
 }
 
 VA(0x004a40e1, 0x10b)
-char * GetRemoteData(signed char remove)
+char * GetRemoteData(i8 remove)
 {
-    int oldestOrder;
-    int queueIndex;
-    int selected;
+    i32 oldestOrder;
+    i32 queueIndex;
+    i32 selected;
 
     if (gbRemoteOn == 0 || gbInNetSetup != 0)
         return 0;
@@ -626,14 +626,14 @@ char * GetRemoteData(signed char remove)
 VA(0x004a41ec, 0x6f4)
 void PollRemote(void)
 {
-    int savedInPollSound;
-    int queueCount;
-    int timeout;
-    int queueIndex;
-    int receiveResult;
-    signed char netCommand;
-    signed char queueFull;
-    int destination;
+    i32 savedInPollSound;
+    i32 queueCount;
+    i32 timeout;
+    i32 queueIndex;
+    i32 receiveResult;
+    i8 netCommand;
+    i8 queueFull;
+    i32 destination;
     SPlayerExit hostExit;
     SPlayerExit guestExit;
 
@@ -658,13 +658,13 @@ void PollRemote(void)
     queueFull = 0;
     if (KBTickCount() - lLastHeartbeatSend > REMOTE_HEARTBEAT_INTERVAL) {
         REMOTE_MESSAGE(sndBuf)->sender =
-            static_cast<signed char>(giThisNetPos);
+            static_cast<i8>(giThisNetPos);
         REMOTE_MESSAGE(sndBuf)->type =
             REMOTE_MESSAGE_HEARTBEAT;
         REMOTE_MESSAGE(sndBuf)->payloadSize = 0;
         if (gbThisNetGotAdventureControl != 0) {
             REMOTE_MESSAGE(sndBuf)->command =
-                static_cast<signed char>(
+                static_cast<i8>(
                     ((giCurPlayer + 1) << 4) | iCurHourGlassPhase |
                     REMOTE_HEARTBEAT_CONTROL_FLAG);
         } else {
@@ -674,7 +674,7 @@ void PollRemote(void)
             destination = REMOTE_BROADCAST_PLAYER;
         else
             destination = 0;
-        SendRemoteData(reinterpret_cast<unsigned char *>(sndBuf), 0,
+        SendRemoteData(reinterpret_cast<u8 *>(sndBuf), 0,
             destination, REMOTE_HEARTBEAT_MESSAGE_SIZE);
         lLastHeartbeatSend = KBTickCount();
     }
@@ -694,8 +694,8 @@ void PollRemote(void)
                 if (gpWindowManager->m_dialogResult == PLAYER_EXIT_CONFIRM_OK) {
                     lLastHeartbeatReceive[queueIndex] = KBTickCount();
                 } else {
-                    hostExit.netPosition = static_cast<signed char>(queueIndex);
-                    hostExit.gamePosition = static_cast<signed char>(
+                    hostExit.netPosition = static_cast<i8>(queueIndex);
+                    hostExit.gamePosition = static_cast<i8>(
                         NetPosToGamePos(queueIndex));
                     hostExit.updateNetworkControl = 1;
                     hostExit.timedOut = 1;
@@ -727,7 +727,7 @@ void PollRemote(void)
                 lLastHeartbeatReceive[0] = KBTickCount();
             } else if (giThisNetPos == 1) {
                 guestExit.netPosition = 0;
-                guestExit.gamePosition = static_cast<signed char>(
+                guestExit.gamePosition = static_cast<i8>(
                     NetPosToGamePos(0));
                 guestExit.updateNetworkControl = 1;
                 guestExit.timedOut = 1;
@@ -757,7 +757,7 @@ void PollRemote(void)
     receiveResult = 1;
     while (receiveResult != 0) {
         receiveResult = ReceiveRemoteData(0,
-            reinterpret_cast<unsigned char *>(rcvBufIn),
+            reinterpret_cast<u8 *>(rcvBufIn),
             REMOTE_BROADCAST_PLAYER);
         if (receiveResult == 0 ||
             REMOTE_MESSAGE(rcvBufIn)->sender == giThisNetPos)
@@ -786,13 +786,13 @@ void PollRemote(void)
         if (REMOTE_MESSAGE(rcvBufIn)->type ==
             REMOTE_MESSAGE_RELIABLE) {
             REMOTE_MESSAGE(sndBuf)->sender =
-                static_cast<signed char>(giThisNetPos);
+                static_cast<i8>(giThisNetPos);
             REMOTE_MESSAGE(sndBuf)->id =
                 REMOTE_MESSAGE(rcvBufIn)->id;
             REMOTE_MESSAGE(sndBuf)->type =
                 REMOTE_MESSAGE_CONFIRM;
             REMOTE_MESSAGE(sndBuf)->payloadSize = 0;
-            SendRemoteData(reinterpret_cast<unsigned char *>(sndBuf), 0,
+            SendRemoteData(reinterpret_cast<u8 *>(sndBuf), 0,
                 REMOTE_MESSAGE(rcvBufIn)->sender,
                 REMOTE_MESSAGE_HEADER_SIZE);
         }
@@ -843,15 +843,15 @@ void PollRemote(void)
 // breaks, compound predicates, and the explicit common label were tested. Revisit
 // in the 95% last-mile phase.
 VA(0x004a48e0, 0x163)
-int TransmitAndWait(char *data, int destination, int length,
-                    signed char command, signed char responseCommand,
+i32 TransmitAndWait(char *data, i32 destination, i32 length,
+                    i8 command, i8 responseCommand,
                     char **response)
 {
     char *receivedData;
-    int result;
-    int waitStart;
-    signed char complete;
-    int unusedResponseState;
+    i32 result;
+    i32 waitStart;
+    i8 complete;
+    i32 unusedResponseState;
 
     if (gbRemoteOn == 0 || gbInNetSetup != 0)
         return 1;
@@ -890,17 +890,17 @@ transmitComplete:
 
 // ---- loader-zero globals (definitions, retail RVA order) ----
 DATA(0x0052a268) char rcvBufOut[REMOTE_TRANSPORT_BUFFER_SIZE];
-DATA(0x0052a378) int iLastIds[REMOTE_RECENT_ID_COUNT];
+DATA(0x0052a378) i32 iLastIds[REMOTE_RECENT_ID_COUNT];
 DATA(0x0052a3f0) char PacketSend[REMOTE_ENCODED_BUFFER_SIZE];
 DATA(0x0052a4fc) char gbUseDiffCompression;
 DATA(0x0052a500) char gbUseRegularCompression;
-DATA(0x0052a508) int iInOrder[REMOTE_QUEUE_STORAGE_COUNT];
+DATA(0x0052a508) i32 iInOrder[REMOTE_QUEUE_STORAGE_COUNT];
 DATA(0x0052a730) char sndBuf[REMOTE_TRANSPORT_BUFFER_SIZE];
 DATA(0x0052a840) char gcThisNetName[32];
-DATA(0x0052a860) long lLastHeartbeatReceive[REMOTE_PLAYER_COUNT];
+DATA(0x0052a860) i32l lLastHeartbeatReceive[REMOTE_PLAYER_COUNT];
 DATA(0x0052a878) char packet[REMOTE_TRANSPORT_BUFFER_SIZE];
 DATA(0x0052a988) SNetPlayerInfo gsNetPlayerInfo[REMOTE_PLAYER_COUNT];
 DATA(0x0052aa58) char rcvBufIn[REMOTE_TRANSPORT_BUFFER_SIZE];
 DATA(0x0052ab68) char *rcvBuf[REMOTE_QUEUE_STORAGE_COUNT];
-DATA(0x0052ad90) int bGotGameType;
+DATA(0x0052ad90) i32 bGotGameType;
 DATA(0x0052ad98) SNetPlayerInfo gsThisNetPlayerInfo;

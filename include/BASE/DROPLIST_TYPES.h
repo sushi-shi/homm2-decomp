@@ -7,7 +7,7 @@
 
 union SDropListSourceFile {
     char text[sizeof(DROPLIST_SOURCE_FILE)];
-    unsigned long alignmentValue;
+    u32l alignmentValue;
 };
 SIZE(SDropListSourceFile, 0x2c);
 

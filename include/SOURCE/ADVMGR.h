@@ -373,12 +373,12 @@ HOMM2_ENUM_BEGIN(AdventureSystemOption)
 HOMM2_ENUM_END(AdventureSystemOption)
 
 #ifdef HOMM2_STRICT_ENUM_TYPES
-inline int EncodeAdventureSystemOption(AdventureSystemOption option)
+inline i32 EncodeAdventureSystemOption(AdventureSystemOption option)
 {
-    return static_cast<int>(option);
+    return static_cast<i32>(option);
 }
 
-inline AdventureSystemOption DecodeAdventureSystemOption(int value)
+inline AdventureSystemOption DecodeAdventureSystemOption(i32 value)
 {
     return static_cast<AdventureSystemOption>(value);
 }
@@ -968,7 +968,7 @@ typedef enum AdventureSystemOptionsConstant {
 } AdventureSystemOptionsConstant;
 
 #ifdef HOMM2_STRICT_ENUM_TYPES
-inline int EncodeAdventureSystemOptionTextControl(AdventureSystemOption option)
+inline i32 EncodeAdventureSystemOptionTextControl(AdventureSystemOption option)
 {
     return EncodeAdventureSystemOption(option) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
 }
@@ -977,52 +977,52 @@ inline int EncodeAdventureSystemOptionTextControl(AdventureSystemOption option)
     ((option) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET)
 #endif
 
-int SaveGame(void);
-int DimensionDoorHandler(struct tag_message &);
-int TownPortalHandler(struct tag_message &);
+i32 SaveGame(void);
+i32 DimensionDoorHandler(struct tag_message &);
+i32 TownPortalHandler(struct tag_message &);
 void ComputeAdvNetControl(void);
-int MapExtraPosAndAdjacentsSet(int, int, unsigned char);
-int APanelHandler(struct tag_message &);
-int CPanelHandler(struct tag_message &);
-void UpdateSystemOptions(int);
-int SystemOptionsHandler(struct tag_message &);
-int GetMobilityFrame(int);
-int GetManaFrame(int);
-unsigned char StopOnTrigger(class mapCell *);
+i32 MapExtraPosAndAdjacentsSet(i32, i32, u8);
+i32 APanelHandler(struct tag_message &);
+i32 CPanelHandler(struct tag_message &);
+void UpdateSystemOptions(i32);
+i32 SystemOptionsHandler(struct tag_message &);
+i32 GetMobilityFrame(i32);
+i32 GetManaFrame(i32);
+u8 StopOnTrigger(class mapCell *);
 
 
 // ---- globals (declarations, RVA order) ----
 extern float fFirstWeekTownFV;
-extern int iVepCacheHits;
-extern int iTotalVepHits;
-extern int giShowComputerRoute;
-extern long glLastStartTick;
-extern long glCurTicks;
-extern long glTotalTicks;
+extern i32 iVepCacheHits;
+extern i32 iTotalVepHits;
+extern i32 giShowComputerRoute;
+extern i32l glLastStartTick;
+extern i32l glCurTicks;
+extern i32l glTotalTicks;
 extern float gfAttackHumanBonus;
 extern float gfAttackComputerBonus;
-extern int bSVSearchArrayInUse;
-extern int bEvaluatingTravelGates;
-extern int gbReduceByBerserk;
+extern i32 bSVSearchArrayInUse;
+extern i32 bEvaluatingTravelGates;
+extern i32 gbReduceByBerserk;
 extern float fBerserkFactor;
-extern int giMaxHeroesForThisPlayer;
+extern i32 giMaxHeroesForThisPlayer;
 extern float fReduceFactor;
-extern unsigned char giCurPlayerBit;
-extern int giBestShipyardDist;
-extern short gaiHeroLiveChance[54];
-extern int giHumanTownConquered;
-extern int costTemp[7];
-extern int gbPossibleShipyardFound;
-extern int iCurPlaceToVisit;
-extern int giBestShipyardId;
-extern int gbActualBoatFound;
-extern unsigned char giCurWatchPlayerBit;
+extern u8 giCurPlayerBit;
+extern i32 giBestShipyardDist;
+extern i16 gaiHeroLiveChance[54];
+extern i32 giHumanTownConquered;
+extern i32 costTemp[7];
+extern i32 gbPossibleShipyardFound;
+extern i32 iCurPlaceToVisit;
+extern i32 giBestShipyardId;
+extern i32 gbActualBoatFound;
+extern u8 giCurWatchPlayerBit;
 extern float gfHeroInteractionBonus[54];
-extern int gbBerserk;
-extern int giCurAIHeroMorale;
-extern int iPlacesVisited[30][2];
-extern int gbTroopReload;
-extern int giCurAIHeroLuck;
-extern int gbActualShipyardFound;
+extern i32 gbBerserk;
+extern i32 giCurAIHeroMorale;
+extern i32 iPlacesVisited[30][2];
+extern i32 gbTroopReload;
+extern i32 giCurAIHeroLuck;
+extern i32 gbActualShipyardFound;
 
 #endif // HOMM2_ADVMGR_H

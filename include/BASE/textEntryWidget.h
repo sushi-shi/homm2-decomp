@@ -18,35 +18,35 @@ public:
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (derived: base widget = 0x20 bytes at 0x00 via ': public widget'; own fields below)
     icon   *m_icon;  // +0x2b  the loaded icon (disposed in dtor)
-    short  m_iconFrame;  // +0x2f
-    unsigned short m_cursorPosition;  // +0x31  text cursor position
-    unsigned short m_maxLength;  // +0x33
-    short  m_rectX;  // +0x35
-    short  m_rectY;  // +0x37
-    short  m_rectW;  // +0x39
-    short  m_rectH;  // +0x3b
-    short  m_innerW;  // +0x3d
-    short  m_innerH;  // +0x3f
-    short  m_innerX;  // +0x41
-    short  m_innerY;  // +0x43
-    short  m_maxLines;  // +0x45  maximum accepted wrapped line count
-    short  m_preserveTextOnFocus;  // +0x47  nonzero begins editing at the existing text
-    short  m_entryType;  // +0x49
-    short  m_displayOffset;  // +0x4b
+    i16  m_iconFrame;  // +0x2f
+    u16 m_cursorPosition;  // +0x31  text cursor position
+    u16 m_maxLength;  // +0x33
+    i16  m_rectX;  // +0x35
+    i16  m_rectY;  // +0x37
+    i16  m_rectW;  // +0x39
+    i16  m_rectH;  // +0x3b
+    i16  m_innerW;  // +0x3d
+    i16  m_innerH;  // +0x3f
+    i16  m_innerX;  // +0x41
+    i16  m_innerY;  // +0x43
+    i16  m_maxLines;  // +0x45  maximum accepted wrapped line count
+    i16  m_preserveTextOnFocus;  // +0x47  nonzero begins editing at the existing text
+    i16  m_entryType;  // +0x49
+    i16  m_displayOffset;  // +0x4b
     char   m_cursorBlink;  // +0x4d
     // --- constructors ---
     textEntryWidget(void);
-    textEntryWidget(short int x, short int y, short int width, short int height,
-                    short int maxLength, char *text, char *fontName, short int color,
-                    char *iconName, short int iconFrame, short int id, short int kind,
-                    short int layout, int horizontalInset, int verticalInset);
+    textEntryWidget(i16 x, i16 y, i16 width, i16 height,
+                    i16 maxLength, char *text, char *fontName, i16 color,
+                    char *iconName, i16 iconFrame, i16 id, i16 kind,
+                    i16 layout, i32 horizontalInset, i32 verticalInset);
     virtual ~textEntryWidget() OVERRIDE;
     // --- virtual methods (vtable order) ---
     virtual void Draw(void) OVERRIDE;
-    virtual int Main(struct tag_message &) OVERRIDE;
+    virtual i32 Main(struct tag_message &) OVERRIDE;
     // --- methods ---
-    void Read(int);
-    void SetupDisplayString(char *, unsigned short int);
+    void Read(i32);
+    void SetupDisplayString(char *, u16);
 };
 #pragma pack(pop)
 SIZE(textEntryWidget, 0x4e);

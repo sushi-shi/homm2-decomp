@@ -18,9 +18,9 @@
 #include <SOURCE/strip.h>
 
 VA(0x00432230, 0x27e)
-strip::strip(int x, int y, int stripType, unsigned long portraitIconId,
-             int portraitFrame, class armyGroup *army, int firstBorderId,
-             int drawWindow, int flagFrame)
+strip::strip(i32 x, i32 y, i32 stripType, u32l portraitIconId,
+             i32 portraitFrame, class armyGroup *army, i32 firstBorderId,
+             i32 drawWindow, i32 flagFrame)
 {
     m_selectedSlot = ARMY_GROUP_EMPTY_SLOT;
     m_x = x;
@@ -31,7 +31,7 @@ strip::strip(int x, int y, int stripType, unsigned long portraitIconId,
     m_army = army;
     m_stripIcon = gpResourceManager->GetIcon("strip.icn");
 
-    for (int slot = 0; slot < STRIP_ARMY_SLOT_COUNT; slot++) {
+    for (i32 slot = 0; slot < STRIP_ARMY_SLOT_COUNT; slot++) {
         m_creatureIcons[slot] = 0;
         m_cachedCreatureTypes[slot] = ARMY_GROUP_EMPTY_SLOT;
     }
@@ -52,7 +52,7 @@ strip::strip(int x, int y, int stripType, unsigned long portraitIconId,
             MemError();
         m_window->AddWidget(m_borders[0], -1);
 
-        for (int slot = 0; slot < STRIP_ARMY_SLOT_COUNT; slot++) {
+        for (i32 slot = 0; slot < STRIP_ARMY_SLOT_COUNT; slot++) {
             m_borders[slot + 1] = new border(
                 slot * STRIP_ARMY_X_STEP + STRIP_ARMY_FIRST_X,
                 STRIP_CONTENT_Y, STRIP_ARMY_BORDER_WIDTH,
@@ -71,7 +71,7 @@ strip::strip(int x, int y, int stripType, unsigned long portraitIconId,
 VA(0x004324ae, 0x144)
 strip::~strip()
 {
-    int slot;
+    i32 slot;
 
     gpWindowManager->RemoveWindow(m_window);
     if (m_army != 0) {
@@ -98,13 +98,13 @@ void strip::Draw(void)
 }
 
 VA(0x00432632, 0x3d3)
-void strip::DrawIcons(int drawWindow)
+void strip::DrawIcons(i32 drawWindow)
 {
     icon *oldIcons[STRIP_ARMY_SLOT_COUNT];
-    int oldCreatureTypes[STRIP_ARMY_SLOT_COUNT];
-    int iconsCurrent_8;
-    int slot;
-    int creatureType;
+    i32 oldCreatureTypes[STRIP_ARMY_SLOT_COUNT];
+    i32 iconsCurrent_8;
+    i32 slot;
+    i32 creatureType;
 
     m_portraitIcon->DrawToBuffer(m_x + STRIP_PORTRAIT_X,
                                  m_y + STRIP_CONTENT_Y, m_portraitFrame, 0);
@@ -189,7 +189,7 @@ void strip::DrawFrame(void)
 }
 
 VA(0x00432a38, 0xb2)
-bankBox::bankBox(int x, int y, class playerData *player)
+bankBox::bankBox(i32 x, i32 y, class playerData *player)
 {
     m_player = player;
     m_x = x;
@@ -210,11 +210,11 @@ bankBox::~bankBox()
 }
 
 VA(0x00432b2d, 0xcd)
-void bankBox::Update(int drawWindow)
+void bankBox::Update(i32 drawWindow)
 {
     char text[BANK_BOX_TEXT_SIZE];
     tag_message message;
-    int resource_1;
+    i32 resource_1;
 
     message.type = EVENT_WINDOW_MESSAGE;
     message.payload.widget.command = BANK_BOX_SET_TEXT_COMMAND;

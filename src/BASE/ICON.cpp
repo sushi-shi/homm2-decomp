@@ -23,16 +23,16 @@
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
 VA(0x004c7a20, 0x67)
-icon::icon(unsigned long int id) : resource(1, id, 1, 0)
+icon::icon(u32l id) : resource(1, id, 1, 0)
 {
     DATA(0x0051e94c) static char allocationSourceFile[] =
         "I:\\Projects\\Heroes\\Prog\\BASE\\ICON.CPP";
     gpResourceManager->PointToFile(id);
     m_frameCount = gpResourceManager->ReadWord();
-    unsigned int len = gpResourceManager->ReadLong();
+    u32 len = gpResourceManager->ReadLong();
     m_data = static_cast<char *>(
         H2_ALLOC(len, allocationSourceFile, 0x12));
-    gpResourceManager->ReadBlock(reinterpret_cast<signed char *>(m_data), len);
+    gpResourceManager->ReadBlock(reinterpret_cast<i8 *>(m_data), len);
 }
 
 // @early-stop
@@ -53,7 +53,7 @@ icon::~icon()
 }
 
 VA(0x004c7b00, 0x44)
-void icon::DrawToBuffer(int x, int y, int frame, int flip)
+void icon::DrawToBuffer(i32 x, i32 y, i32 frame, i32 flip)
 {
     if (flip == ICON_DRAW_NORMAL) {
         IconToBitmap(this, gpWindowManager->m_screen, x, y, frame,
@@ -82,13 +82,13 @@ void icon::DrawToBuffer(int x, int y, int frame, int flip)
 // after a material exact predecessor/header-state change; this is not a
 // certified permanent wall.
 VA(0x004c7b50, 0x2bb)
-int icon::CombatClipDrawToBuffer(int x, int y, int frame, struct SLimitData *limits,
-                                 int flip, int offset, unsigned char *colorTable,
-                                 signed char *yModify)
+i32 icon::CombatClipDrawToBuffer(i32 x, i32 y, i32 frame, struct SLimitData *limits,
+                                 i32 flip, i32 offset, u8 *colorTable,
+                                 i8 *yModify)
 {
     if (gbComputeExtent != 0) {
-        int mirror = flip;
-        int entryOffset = frame * sizeof(IconEntry);
+        i32 mirror = flip;
+        i32 entryOffset = frame * sizeof(IconEntry);
         if (mirror != 0) {
             limits->right = x -
                             reinterpret_cast<IconEntry *>(m_data + entryOffset)->x;
@@ -171,8 +171,8 @@ int icon::CombatClipDrawToBuffer(int x, int y, int frame, struct SLimitData *lim
 }
 
 VA(0x004c7e10, 0x3d)
-void icon::ClipFillToBuffer(int x, int y, int frame, int color, int flip,
-                            int clipX, int clipY, int clipW, int clipH)
+void icon::ClipFillToBuffer(i32 x, i32 y, i32 frame, i32 color, i32 flip,
+                            i32 clipX, i32 clipY, i32 clipW, i32 clipH)
 {
     MonoIconToBitmap(this, gpWindowManager->m_screen, x, y, frame, color,
                      ICON_DRAW_CLIP, clipX, clipY, clipW, clipH);
@@ -189,7 +189,7 @@ void icon::ClipFillToBuffer(int x, int y, int frame, int color, int flip,
 // AST pass found no gain. Revisit after an exact predecessor or shared-header
 // state change.
 VA(0x004c7e50, 0x103)
-void icon::FillToBuffer(int x, int y, int frame, int color, int flip,
+void icon::FillToBuffer(i32 x, i32 y, i32 frame, i32 color, i32 flip,
                         struct SLimitData *limits)
 {
     if (flip != ICON_DRAW_NORMAL) {
@@ -214,7 +214,7 @@ void icon::FillToBuffer(int x, int y, int frame, int color, int flip,
 }
 
 VA(0x004c7f60, 0x3e)
-void icon::DimToBuffer(int x, int y, int frame, int flip)
+void icon::DimToBuffer(i32 x, i32 y, i32 frame, i32 flip)
 {
     if (flip == ICON_DRAW_NORMAL) {
         DimIconToBitmap(this, gpWindowManager->m_screen, x, y, frame,

@@ -25,7 +25,7 @@
 DATA(0x00534970) static PCMWAVEFORMAT gWaveFormat; // digital-driver PCM format (WAVE_init_driver)
 
 VA(0x004cb630, 0x68)
-void HandleMCIError(int param_1, char *param_2)
+void HandleMCIError(i32 param_1, char *param_2)
 {
     mciGetErrorStringA(param_1, lpszReturnString, 0xff);
     sprintf(gText,
@@ -43,7 +43,7 @@ void HandleMCIError(int param_1, char *param_2)
 }
 
 VA(0x004cb6a0, 0xc7)
-void soundManager::ValidatePreviousPosition(int param_1)
+void soundManager::ValidatePreviousPosition(i32 param_1)
 {
     char buf[20];
     char *cur;
@@ -94,7 +94,7 @@ void soundManager::CDStop(void)
 // relocation sites/effective targets agree. Residual identities are local
 // strings and the _stricmp/_strcmpi alias at the same retail address.
 VA(0x004cb8b0, 0xb3)
-int soundManager::CDIsPlaying(void)
+i32 soundManager::CDIsPlaying(void)
 {
     if (gbNoSound != 0)
         return 0;
@@ -155,10 +155,10 @@ void soundManager::CDShutdown(void)
 }
 
 VA(0x004cbb50, 0xe5)
-void soundManager::CDSetVolume(int param_1, int param_2)
+void soundManager::CDSetVolume(i32 param_1, i32 param_2)
 {
-    int local_c;
-    unsigned long local_8;
+    i32 local_c;
+    u32l local_8;
     if (gbNoSound != 0)
         return;
     if (m_cdReady == 0)
@@ -170,7 +170,7 @@ void soundManager::CDSetVolume(int param_1, int param_2)
     else
         local_c = param_1;
     if (local_c != 0) {
-        int local_10;
+        i32 local_10;
         if (param_2 != 0)
             local_10 = 0xc - (0xb - local_c / 0xc);
         else
@@ -189,13 +189,13 @@ void soundManager::CDSetVolume(int param_1, int param_2)
 // ordered relocation sites/effective targets agree. Residual identities are
 // local strings and the _stricmp/_strcmpi alias at the same retail address.
 VA(0x004cbc40, 0x473)
-void soundManager::CDPlay(int param_1, int param_2, int param_3, int param_4)
+void soundManager::CDPlay(i32 param_1, i32 param_2, i32 param_3, i32 param_4)
 {
-    long t1;
-    long t2;
-    long t3;
+    i32l t1;
+    i32l t2;
+    i32l t3;
     char buffer[20];
-    int notify;
+    i32 notify;
     HWND wnd;
     HWND wndn;
     if (gbNoSound != 0)
@@ -302,9 +302,9 @@ void soundManager::CDPoll(void)
 }
 
 VA(0x004cc1c0, 0xdd)
-int soundManager::ConvertVolume(int param_1, int param_2)
+i32 soundManager::ConvertVolume(i32 param_1, i32 param_2)
 {
-    int local_8 = 0;
+    i32 local_8 = 0;
     if (param_2 == SOUND_VOLUME_MUSIC) {
         if (gConfig.musicVolume >= 1 && gConfig.musicVolume <= 0xa) {
             local_8 = ((0xb - gConfig.musicVolume) * param_1) / 10;
@@ -324,7 +324,7 @@ int soundManager::ConvertVolume(int param_1, int param_2)
 }
 
 VA(0x004cc2a0, 0x5e)
-void __stdcall SetReady2Poll(unsigned long int)
+void __stdcall SetReady2Poll(u32l)
 {
     if (gpSoundManager == 0)
         return;
@@ -334,7 +334,7 @@ void __stdcall SetReady2Poll(unsigned long int)
 }
 
 VA(0x004cc300, 0x26)
-void __stdcall UpdateTimers(unsigned long int)
+void __stdcall UpdateTimers(u32l)
 {
     iCalibrateLoop++;
     glMilliCounter += 0x10;
@@ -344,7 +344,7 @@ void __stdcall UpdateTimers(unsigned long int)
 VA(0x004cc330, 0xd7)
 soundManager::soundManager(void) : baseManager(), field_0x574(1)
 {
-    int local_8;
+    i32 local_8;
     m_active = 0;
     m_fadeSteps = 0;
     field_0x56c = 0;
@@ -359,13 +359,13 @@ soundManager::soundManager(void) : baseManager(), field_0x574(1)
 }
 
 VA(0x004cc410, 0x14a)
-struct _DIG_DRIVER *WAVE_init_driver(unsigned long param_1, unsigned short param_2,
-                                     unsigned short param_3, unsigned short param_4)
+struct _DIG_DRIVER *WAVE_init_driver(u32l param_1, u16 param_2,
+                                     u16 param_3, u16 param_4)
 {
-    unsigned int numDevs;
+    u32 numDevs;
     struct _DIG_DRIVER *drvr;
     WAVEOUTCAPSA caps;
-    int rc;
+    i32 rc;
     numDevs = waveOutGetNumDevs();
     if (numDevs == 0) {
         drvr = 0;
@@ -398,10 +398,10 @@ struct _DIG_DRIVER *WAVE_init_driver(unsigned long param_1, unsigned short param
 }
 
 VA(0x004cc560, 0x3a8)
-int soundManager::Open(int)
+i32 soundManager::Open(i32)
 {
-    int keyState;
-    int musicTrack;
+    i32 keyState;
+    i32 musicTrack;
 
     m_cdStarted = 0;
     m_midiStarted = 0;
@@ -513,7 +513,7 @@ managerReady:
 VA(0x004cc910, 0x91)
 void soundManager::AllocateSampleHandles(void)
 {
-    int local_8;
+    i32 local_8;
     if (gbNoSound != 0)
         return;
     if (m_digitalDriver == 0)
@@ -546,17 +546,17 @@ soundClosed:
 }
 
 VA(0x004cca50, 0x1a)
-int soundManager::Main(struct tag_message &) { return 0; }
+i32 soundManager::Main(struct tag_message &) { return 0; }
 
 VA(0x004cca70, 0x1a)
-struct _SAMPLE * soundManager::StartSample(char *, char * *, short int, short int, int, int, long int) { return 0; }
+struct _SAMPLE * soundManager::StartSample(char *, char * *, i16, i16, i32, i32, i32l) { return 0; }
 
 VA(0x004cca90, 0x126)
-void soundManager::StopAllSamples(int param_1)
+void soundManager::StopAllSamples(i32 param_1)
 {
-    short sampleIdx;
-    int waitCounter;
-    int sampleStatus;
+    i16 sampleIdx;
+    i32 waitCounter;
+    i32 sampleStatus;
     if (gbNoSound != 0)
         return;
     if (m_digitalDriver == 0)
@@ -586,8 +586,8 @@ void soundManager::StopAllSamples(int param_1)
 VA(0x004ccbc0, 0xb1)
 void soundManager::StopSample(struct _SAMPLE *param_1)
 {
-    int local_c;
-    int local_10;
+    i32 local_c;
+    i32 local_10;
     if (gbNoSound != 0)
         return;
     if (m_digitalDriver == 0)
@@ -615,11 +615,11 @@ void soundManager::StopSample(struct _SAMPLE *param_1)
 // residual identities are local switch labels, three $SG versus delinker-named string
 // constants with the same bytes, and gConfig+0xaa at the same retail VA 0x00528dca.
 VA(0x004ccc80, 0x202)
-void soundManager::ModifySample(struct _SAMPLE *sampleHandle, short operation, long value)
+void soundManager::ModifySample(struct _SAMPLE *sampleHandle, i16 operation, i32l value)
 {
-    int foundChannel;
-    int unused;
-    int sampleIndex;
+    i32 foundChannel;
+    i32 unused;
+    i32 sampleIndex;
 
     if (gbNoSound != 0)
         return;
@@ -642,13 +642,13 @@ void soundManager::ModifySample(struct _SAMPLE *sampleHandle, short operation, l
     case SOUND_SAMPLE_OPERATION_EFFECT_VOLUME:
         AIL_set_sample_volume(sampleHandle, ConvertVolume(value, SOUND_VOLUME_EFFECT));
         if (foundChannel >= 0)
-            iLastVolume[foundChannel] = static_cast<short>(value);
+            iLastVolume[foundChannel] = static_cast<i16>(value);
         break;
     case SOUND_SAMPLE_OPERATION_MUSIC_VOLUME:
         H2_ASSERT(gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI, "I:\\Projects\\Heroes\\Prog\\BASE\\soundmgr.cpp", 0x52f);
         AIL_set_sample_volume(sampleHandle, ConvertVolume(value, SOUND_VOLUME_MUSIC));
         if (foundChannel >= 0)
-            iLastVolume[foundChannel] = static_cast<short>(value);
+            iLastVolume[foundChannel] = static_cast<i16>(value);
         break;
     case SOUND_SAMPLE_OPERATION_START:
         AIL_start_sample(sampleHandle);
@@ -660,9 +660,9 @@ void soundManager::ModifySample(struct _SAMPLE *sampleHandle, short operation, l
 }
 
 VA(0x004cce90, 0xa3)
-long soundManager::DigitalReport(struct _SAMPLE *param_1, short param_2)
+i32l soundManager::DigitalReport(struct _SAMPLE *param_1, i16 param_2)
 {
-    int sampleStatus;
+    i32 sampleStatus;
 
     if (gbNoSound != 0)
         return 0;
@@ -681,7 +681,7 @@ long soundManager::DigitalReport(struct _SAMPLE *param_1, short param_2)
 VA(0x004ccf40, 0xe8)
 void soundManager::AdjustSoundVolumes(void)
 {
-    int sampleIndex;
+    i32 sampleIndex;
     struct _SAMPLE *sampleHandle;
 
     if (gbNoSound != 0)
@@ -715,7 +715,7 @@ void soundManager::AdjustMusicVolumes(void)
     if (m_currentTrack < 0)
         return;
     LogStr("Adjust Music Volumes 1");
-    int local_4 = 0;
+    i32 local_4 = 0;
     if (bSaveMusicPosition[m_currentTrack] != 0)
         local_4 = 1;
     if (gConfig.musicVolume != 0) {
@@ -742,9 +742,9 @@ void soundManager::ForcePollSound(void)
 }
 
 VA(0x004cd160, 0xe3)
-void soundManager::SetMusicQuality(int param_1)
+void soundManager::SetMusicQuality(i32 param_1)
 {
-    int local_8;
+    i32 local_8;
     if (gbNoSound != 0)
         return;
     if (m_ready == 0)
@@ -768,7 +768,7 @@ void soundManager::SetMusicQuality(int param_1)
 }
 
 VA(0x004cd250, 0xc5)
-void soundManager::PlayAmbientMusic(int param_1, long param_2, int param_3)
+void soundManager::PlayAmbientMusic(i32 param_1, i32l param_2, i32 param_3)
 {
     if (gbNoSound != 0)
         return;
@@ -792,11 +792,11 @@ void soundManager::PlayAmbientMusic(int param_1, long param_2, int param_3)
 VA(0x004cd320, 0x38f)
 void soundManager::PollSound(void)
 {
-    int volume;
+    i32 volume;
     struct _SAMPLE *smp;
-    long delta;
-    int snap;
-    long now;
+    i32l delta;
+    i32 snap;
+    i32l now;
     if (gbNoSound != 0)
         return;
     if (gConfig.musicSource != CONFIG_MUSIC_SOURCE_MIDI)
@@ -819,7 +819,7 @@ void soundManager::PollSound(void)
         if (m_fadeSteps <= 0xa && m_currentTrack != m_fadeTargetTrack) {
             if (m_midiFile != 0 && bSaveMusicPosition[m_currentTrack] != 0) {
                 if (gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI) {
-                    H2_ASSERT(reinterpret_cast<int>(m_midiFile), "I:\\Projects\\Heroes\\Prog\\BASE\\soundmgr.cpp",
+                    H2_ASSERT(reinterpret_cast<i32>(m_midiFile), "I:\\Projects\\Heroes\\Prog\\BASE\\soundmgr.cpp",
                               0x61a);
                     m_savedTrackPositions[m_currentTrack] =
                         ftell(m_midiFile);
@@ -867,7 +867,7 @@ void soundManager::PollSound(void)
 }
 
 VA(0x004cd6b0, 0x138)
-void soundManager::SwitchAmbientMusic(int param_1)
+void soundManager::SwitchAmbientMusic(i32 param_1)
 {
     if (gbNoSound != 0)
         return;
@@ -901,7 +901,7 @@ VA(0x004cd7f0, 0x28f)
 struct _SAMPLE *soundManager::MemorySample(class sample *sampleResource)
 {
     struct _SAMPLE *smp;
-    short ch;
+    i16 ch;
     SampleChannelStruct *scs;
     SamplePlaybackData *playbackData;
     if (gbNoSound != 0)
@@ -917,7 +917,7 @@ struct _SAMPLE *soundManager::MemorySample(class sample *sampleResource)
         return 0;
     LogStr("Memory Sample 1");
     scs = &SCS[playbackData->channelType];
-    for (ch = static_cast<short>(scs->startChannel); scs->endChannel > ch; ch++) {
+    for (ch = static_cast<i16>(scs->startChannel); scs->endChannel > ch; ch++) {
         if (AIL_sample_status(m_sampleHandles[ch]) == SOUND_SAMPLE_STATUS_DONE)
             break;
     }
@@ -926,17 +926,17 @@ struct _SAMPLE *soundManager::MemorySample(class sample *sampleResource)
             LogStr("Memory Sample 2a");
             return 0;
         }
-        ch = static_cast<short>(scs->currentChannel);
+        ch = static_cast<i16>(scs->currentChannel);
         scs->currentChannel++;
         if (scs->endChannel <= scs->currentChannel) {
             scs->currentChannel = scs->startChannel;
-            ch = static_cast<short>(scs->currentChannel);
+            ch = static_cast<i16>(scs->currentChannel);
         }
         StopSample(m_sampleHandles[ch]);
     }
     smp = m_sampleHandles[ch];
     m_channelVolumes[ch] = static_cast<char>(playbackData->volume);
-    iLastVolume[ch] = static_cast<short>(playbackData->volume);
+    iLastVolume[ch] = static_cast<i16>(playbackData->volume);
     AIL_init_sample(smp);
     AIL_set_sample_type(smp, playbackData->format, 0);
     AIL_set_sample_playback_rate(smp, playbackData->sampleRate);
@@ -967,7 +967,7 @@ void soundManager::ServiceSound(void)
 }
 
 VA(0x004cdad0, 0x7f)
-int soundManager::MusicPlaying(void)
+i32 soundManager::MusicPlaying(void)
 {
     if (gbNoSound != 0)
         return 0;
@@ -1024,10 +1024,10 @@ DATA(0x0051f050) SampleChannelStruct SCS[4] = {
     { 6, 16, 6 }
 };
 DATA(0x0051f080) char CDPreviousPosition[60][15] = { 0 };
-DATA(0x0051f404) int CDWaiting = -1;
-DATA(0x0051f408) int CDPlaying = 0;
-DATA(0x0051f40c) int iCalibrateLoop = 0;
+DATA(0x0051f404) i32 CDWaiting = -1;
+DATA(0x0051f408) i32 CDPlaying = 0;
+DATA(0x0051f40c) i32 iCalibrateLoop = 0;
 DATA(0x00534980) char lpszReturnString[0x100];
-DATA(0x00534a80) unsigned long nMCIError;
-DATA(0x00534a88) short iLastVolume[0x20];
+DATA(0x00534a80) u32l nMCIError;
+DATA(0x00534a88) i16 iLastVolume[0x20];
 DATA(0x00534ac8) char CommandString[0x100];

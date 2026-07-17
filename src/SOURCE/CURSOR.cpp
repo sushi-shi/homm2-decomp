@@ -44,12 +44,12 @@
 // byte-neutral. Revisit after an earlier CURSOR source edit or relevant
 // advManager layout/header change perturbs TU-cumulative operand evaluation.
 VA(0x0040d5e0, 0x138)
-void advManager::StartCursor(int direction)
+void advManager::StartCursor(i32 direction)
 {
-    int directionX_a;
-    int directionY_a1;
-    int cellX;
-    int cellY;
+    i32 directionX_a;
+    i32 directionY_a1;
+    i32 cellX;
+    i32 cellY;
 
     m_cursorDirection = direction;
     m_cursorFrame = GetCursorBaseFrame(direction) + 1;
@@ -79,7 +79,7 @@ void advManager::StartCursor(int direction)
 // were byte-neutral. Revisit after an earlier CURSOR source edit or relevant
 // advManager layout/header change perturbs TU-cumulative operand evaluation.
 VA(0x0040d718, 0x11c)
-void advManager::StopCursor(int stopSound)
+void advManager::StopCursor(i32 stopSound)
 {
     if (stopSound) {
         bMoveSoundMade = 1;
@@ -103,8 +103,8 @@ void advManager::StopCursor(int stopSound)
 VA(0x0040d834, 0x5f8)
 void advManager::DrawCursor(void)
 {
-    int drawY;
-    int drawFrame_f;
+    i32 drawY;
+    i32 drawFrame_f;
 
     if (bShowIt == 0 || bSpecialHideCursor)
         return;
@@ -116,7 +116,7 @@ void advManager::DrawCursor(void)
             m_cursorTurning = S1cursorTurning;
         }
 
-        int drawX = m_updateMinX + CURSOR_DRAW_X;
+        i32 drawX = m_updateMinX + CURSOR_DRAW_X;
         drawY = m_updateMinY + CURSOR_DRAW_Y;
         if (m_cursorType == CURSOR_HERO_TYPE_BOAT)
             drawY -= CURSOR_DRAW_Y - CURSOR_BOAT_DRAW_Y;
@@ -139,7 +139,7 @@ void advManager::DrawCursor(void)
                              drawFrame_f, 1, 0, 0, CURSOR_CLIP_SIZE,
                              CURSOR_CLIP_SIZE, 0);
             if (m_cursorType == CURSOR_HERO_TYPE_BOAT) {
-                int flagDrawn;
+                i32 flagDrawn;
 
                 FlipIconToBitmap(m_boatFlagIcons[gpCurPlayer->m_color],
                                  gpWindowManager->m_screen, drawX, drawY,
@@ -172,7 +172,7 @@ void advManager::DrawCursor(void)
                          drawX, drawY, drawFrame_f, 1, 0, 0,
                          CURSOR_CLIP_SIZE, CURSOR_CLIP_SIZE, 0);
             if (m_cursorType == CURSOR_HERO_TYPE_BOAT) {
-                int flagDrawn;
+                i32 flagDrawn;
 
                 IconToBitmap(m_boatFlagIcons[gpCurPlayer->m_color],
                              gpWindowManager->m_screen, drawX, drawY,
@@ -234,12 +234,12 @@ void advManager::DrawCursor(void)
 VA(0x0040de2c, 0x36c)
 void advManager::DrawCursorShadow(void)
 {
-    int shadowOffset;
-    int boatShadowOffset;
-    int drawFrame_f;
-    int boatFrame_i;
-    int shadowFrame;
-    int drawY;
+    i32 shadowOffset;
+    i32 boatShadowOffset;
+    i32 drawFrame_f;
+    i32 boatFrame_i;
+    i32 shadowFrame;
+    i32 drawY;
 
     if (bShowIt == 0 || bSpecialHideCursor)
         return;
@@ -251,7 +251,7 @@ void advManager::DrawCursorShadow(void)
             m_cursorTurning = S1cursorTurning;
         }
 
-        int drawX = m_updateMinX + CURSOR_DRAW_X;
+        i32 drawX = m_updateMinX + CURSOR_DRAW_X;
         drawY = m_updateMinY + CURSOR_DRAW_Y;
         if (m_cursorType == CURSOR_HERO_TYPE_BOAT)
             drawY -= CURSOR_DRAW_Y - CURSOR_BOAT_DRAW_Y;
@@ -324,7 +324,7 @@ void advManager::DrawCursorShadow(void)
 }
 
 VA(0x0040e198, 0x85)
-int advManager::GetCursorBaseFrame(int direction)
+i32 advManager::GetCursorBaseFrame(i32 direction)
 {
     if (direction > 4) {
         switch (direction) {
@@ -343,23 +343,23 @@ int advManager::GetCursorBaseFrame(int direction)
 }
 
 VA(0x0040e21d, 0x256)
-void advManager::TurnTo(int direction)
+void advManager::TurnTo(i32 direction)
 {
-    int turnStep_c = 1;
-    int directionDifference = direction - m_cursorDirection;
+    i32 turnStep_c = 1;
+    i32 directionDifference = direction - m_cursorDirection;
     if (directionDifference == 0)
         return;
     if ((directionDifference < 0 && directionDifference >= -4) ||
         (directionDifference > 0 && directionDifference > 4))
         turnStep_c = -1;
         m_cursorTurning = 1;
-        int frameIndex_i = m_cursorDirection * 2;
-        int delay_f = giStepDelay[
+        i32 frameIndex_i = m_cursorDirection * 2;
+        i32 delay_f = giStepDelay[
             (&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]]];
         if ((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]] == 0)
             delay_f *= CURSOR_SLOW_TURN_MULTIPLIER;
         if ((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]] == 1)
-            delay_f = static_cast<int>(delay_f * 1.5);
+            delay_f = static_cast<i32>(delay_f * 1.5);
 
         do {
             m_cursorCycle = 1;
@@ -390,10 +390,10 @@ void advManager::TurnTo(int direction)
 }
 
 VA(0x0040e473, 0xac)
-int advManager::GetMoveShowIt(hero *movingHero, int direction)
+i32 advManager::GetMoveShowIt(hero *movingHero, i32 direction)
 {
-    int directionX = normalDirTable[direction].x;
-    int directionY = normalDirTable[direction].y;
+    i32 directionX = normalDirTable[direction].x;
+    i32 directionY = normalDirTable[direction].y;
     if ((gbThisNetHumanPlayer[giCurPlayer] || !gConfig.blackoutComputer) &&
         (MapExtraPosAndAdjacentsSet(movingHero->m_x, movingHero->m_y,
                                    giCurWatchPlayerBit) ||
@@ -416,10 +416,10 @@ int advManager::GetMoveShowIt(hero *movingHero, int direction)
 // positive eventCell arm were already rejected. Revisit if CURSOR TU state,
 // relevant hero/map layout, or continuation-target normalization changes.
 VA(0x0040e51f, 0x1234)
-mapCell *advManager::MoveHero(int direction, int stopAfterMove,
-                             int *eventX, int *eventY,
-                             int *outOfMobility, int processEvent,
-                             int *adjacentMonster, int forceMove)
+mapCell *advManager::MoveHero(i32 direction, i32 stopAfterMove,
+                             i32 *eventX, i32 *eventY,
+                             i32 *outOfMobility, i32 processEvent,
+                             i32 *adjacentMonster, i32 forceMove)
 {
     EventExtra *mapEvent_e = 0;
     SAMPLE2 fizzleSample_h = NULL_SAMPLE2;
@@ -428,16 +428,16 @@ mapCell *advManager::MoveHero(int direction, int stopAfterMove,
     mapCell *currentCell_f;
     mapCell *destinationCell_j;
     mapCell *cursorCell_m;
-    int oldHeroX_b;
-    int oldHeroY_b;
-    int directionX_b;
-    int directionY_b;
-    int terrainCost_e;
-    int nextTerrainCost_b;
-    int pixelsPerStep_o;
-    int stepDelay_d;
-    int halfSteps_o;
-    int step_a;
+    i32 oldHeroX_b;
+    i32 oldHeroY_b;
+    i32 directionX_b;
+    i32 directionY_b;
+    i32 terrainCost_e;
+    i32 nextTerrainCost_b;
+    i32 pixelsPerStep_o;
+    i32 stepDelay_d;
+    i32 halfSteps_o;
+    i32 step_a;
 
     if (gbThisNetHumanPlayer[giCurPlayer])
         SetNoDialogMenus(0);
@@ -457,7 +457,7 @@ mapCell *advManager::MoveHero(int direction, int stopAfterMove,
         gbMoveShown = 1;
 
     currentCell_f = GetCell(movingHero_f->m_x, movingHero_f->m_y);
-    int currentTerrain_b = giGroundToTerrain[currentCell_f->m_terrainImageIndex];
+    i32 currentTerrain_b = giGroundToTerrain[currentCell_f->m_terrainImageIndex];
     destinationCell_j = GetCell(movingHero_f->m_x + directionX_b,
                               movingHero_f->m_y + directionY_b);
     terrainCost_e = CalcTerrainCost(
@@ -479,37 +479,37 @@ mapCell *advManager::MoveHero(int direction, int stopAfterMove,
     }
 
     SendMapChange(1, movingHero_f->m_id,
-                  static_cast<unsigned char>(movingHero_f->m_x),
-                  static_cast<unsigned char>(movingHero_f->m_y),
-                  giCurPlayer, static_cast<unsigned char>(stopAfterMove),
-                  static_cast<unsigned char>(direction));
+                  static_cast<u8>(movingHero_f->m_x),
+                  static_cast<u8>(movingHero_f->m_y),
+                  giCurPlayer, static_cast<u8>(stopAfterMove),
+                  static_cast<u8>(direction));
     MobilizeCurrHero(0);
     *eventX = movingHero_f->m_x + directionX_b;
     *eventY = movingHero_f->m_y + directionY_b;
     if (m_cursorDirection != direction)
         TurnTo(direction);
-    movingHero_f->m_direction = static_cast<unsigned char>(direction);
+    movingHero_f->m_direction = static_cast<u8>(direction);
 
     if ((movingHero_f->m_eventFlags & HERO_EVENT_EMBARKED) &&
         destinationCell_j->m_triggerType == MAP_EVENT_COAST) {
         for (step_a = 0; step_a < CURSOR_BOAT_COUNT; ++step_a) {
             if (gpGame->m_boats[step_a].heroId ==
-                static_cast<unsigned char>(movingHero_f->m_id))
+                static_cast<u8>(movingHero_f->m_id))
                 break;
         }
         boatRecord *boat = &gpGame->m_boats[step_a];
         mapCell *boatCell_a = GetCell(movingHero_f->m_x, movingHero_f->m_y);
         boat->savedTriggerType = boatCell_a->m_triggerType;
         boat->savedEventData =
-            static_cast<unsigned char>(boatCell_a->m_objectMetadata);
-        boat->direction = static_cast<signed char>(m_cursorDirection);
-        boat->heroId = static_cast<signed char>(
+            static_cast<u8>(boatCell_a->m_objectMetadata);
+        boat->direction = static_cast<i8>(m_cursorDirection);
+        boat->heroId = static_cast<i8>(
             boat->heroId | MAP_EVENT_ACTION_FLAG);
         boatCell_a->m_triggerType = MAP_EVENT_ACTION_FLAG | MAP_EVENT_BOAT;
         boatCell_a->m_objectMetadata =
-            static_cast<unsigned short>(0[&step_a]);
-        boat->x = static_cast<signed char>(movingHero_f->m_x);
-        boat->y = static_cast<signed char>(movingHero_f->m_y);
+            static_cast<u16>(0[&step_a]);
+        boat->x = static_cast<i8>(movingHero_f->m_x);
+        boat->y = static_cast<i8>(movingHero_f->m_y);
         StopCursor(1);
         CompleteDraw(m_mapOriginX, m_mapOriginY, 0, 1);
         UpdateScreen(0, 0);
@@ -651,7 +651,7 @@ stoppingEvent:
                     m_updateMinX = startVals[directionX_b + 1];
                     m_updateMinY = startVals[directionY_b + 1];
                 }
-                long tick = KBTickCount();
+                i32l tick = KBTickCount();
                 if (0[&step_a] + 1 == halfSteps_o * 2) {
                     m_updateMinX = 0;
                     m_updateMinY = 0;
@@ -771,12 +771,12 @@ checkAdjacent:
                     mapEvent_e->active = 0;
             }
         } else {
-            int primaryType_k = -1;
-            int primaryAmount_a = 0;
-            int secondaryType_k = -1;
-            int secondaryAmount_e = 0;
+            i32 primaryType_k = -1;
+            i32 primaryAmount_a = 0;
+            i32 secondaryType_k = -1;
+            i32 secondaryAmount_e = 0;
             for (step_a = 0; step_a < CURSOR_RESOURCE_COUNT; ++step_a) {
-                int eventAmount = mapEvent_e->resources[step_a];
+                i32 eventAmount = mapEvent_e->resources[step_a];
                 if (gpGame->m_players[giCurPlayer].m_resources[step_a] <
                     -eventAmount) {
                     eventAmount =
@@ -824,12 +824,12 @@ checkAdjacent:
 }
 
 VA(0x0040f753, 0x174)
-void advManager::CheckAdjacentMon(int *adjacentMonster)
+void advManager::CheckAdjacentMon(i32 *adjacentMonster)
 {
     hero *currentHero_f;
-    int killed_e;
-    int monsterX_e;
-    int monsterY_f;
+    i32 killed_e;
+    i32 monsterX_e;
+    i32 monsterY_f;
     mapCell *monsterCell_d;
     mapCell *heroCell_f;
 
@@ -858,12 +858,12 @@ void advManager::CheckAdjacentMon(int *adjacentMonster)
 }
 
 VA(0x0040f8c7, 0x14e)
-int advManager::ValidMoveWithEvent(hero *movingHero, int direction)
+i32 advManager::ValidMoveWithEvent(hero *movingHero, i32 direction)
 {
-    int directionX0;
-    int destinationX0;
-    int directionY0;
-    int destinationY0;
+    i32 directionX0;
+    i32 destinationX0;
+    i32 directionY0;
+    i32 destinationY0;
     mapCell *destinationCell0;
 
     directionX0 = normalDirTable[direction].x;
@@ -900,22 +900,22 @@ int advManager::ValidMoveWithEvent(hero *movingHero, int direction)
 // an earlier CURSOR source edit or relevant advManager layout/header change
 // perturbs TU-cumulative operand evaluation. Retail also delinks normalDirTable.y.
 VA(0x0040fa15, 0x4f2)
-int advManager::ValidMove(int direction, int eventMode)
+i32 advManager::ValidMove(i32 direction, i32 eventMode)
 {
-    int directionX_j;
-    int directionY_h;
-    int destinationMapX_e;
-    int destinationMapY_e;
-    int centerX_p;
-    int centerY_n;
-    int destinationCellX_h;
-    int destinationCellY_e;
+    i32 directionX_j;
+    i32 directionY_h;
+    i32 destinationMapX_e;
+    i32 destinationMapY_e;
+    i32 centerX_p;
+    i32 centerY_n;
+    i32 destinationCellX_h;
+    i32 destinationCellY_e;
     mapCell *destinationCell_g;
     mapCell *currentCell_c;
     mapCell *northNeighborCell_b;
     mapCell *southNeighborCell_g;
-    int northDirection_b;
-    int southDirection_e;
+    i32 northDirection_b;
+    i32 southDirection_e;
 
     directionX_j = normalDirTable[direction].x;
     directionY_h = normalDirTable[direction].y;
@@ -1010,12 +1010,12 @@ int advManager::ValidMove(int direction, int eventMode)
 // GetCell accessor/source changes, an earlier CURSOR edit moves inline tails, or
 // comparison gains proved continuation-target normalization.
 VA(0x0040ff07, 0x24b)
-void advManager::MoveOrigin(int directionX, int directionY)
+void advManager::MoveOrigin(i32 directionX, i32 directionY)
 {
-    int oldOriginX0;
-    int cellY1;
-    int cellX5;
-    int oldOriginY9;
+    i32 oldOriginX0;
+    i32 cellY1;
+    i32 cellX5;
+    i32 oldOriginY9;
     mapCell *newCursorCell5;
     mapCell *oldCursorCell0;
     mapCell *newPreviousCell4;
@@ -1067,10 +1067,10 @@ void advManager::ProcessMapChange(SMapChange change)
 {
     hero *mapHero_n;
     mapCell *eventCell_n;
-    int eventX_b;
-    int eventY_c;
-    int outOfMobility_g;
-    int adjacentMonster_m;
+    i32 eventX_b;
+    i32 eventY_c;
+    i32 outOfMobility_g;
+    i32 adjacentMonster_m;
     mapCell *recruitCell_i;
     mapCell *heroCell_i;
 
@@ -1218,7 +1218,7 @@ void advManager::ProcessMapChange(SMapChange change)
 VA(0x004108a1, 0x1ba)
 void advManager::ProcessIncomingSingleMapChange(SMapChange *incoming)
 {
-    int slot;
+    i32 slot;
 
     if (incoming->sequence < giMapChangeCtr)
         return;
@@ -1261,12 +1261,12 @@ duplicateChange:
 VA(0x00410a5b, 0xce)
 void advManager::ProcessIncomingGroupMapChange(char *incomingData)
 {
-    DATA(0x004ee1dc) static short s_groupLineBase = CURSOR_GROUP_LINE_BASE;
+    DATA(0x004ee1dc) static i16 s_groupLineBase = CURSOR_GROUP_LINE_BASE;
     SMapChange *ptr;
-    int size;
+    i32 size;
     SMapChange *buf;
-    int i;
-    int processed;
+    i32 i;
+    i32 processed;
 
     size = sizeof(sMapChangeLastFew);
     buf = static_cast<SMapChange *>(
@@ -1288,7 +1288,7 @@ void advManager::ProcessIncomingGroupMapChange(char *incomingData)
 VA(0x00410b29, 0x75)
 void advManager::PurgeMapChangeQueue(void)
 {
-    int slot;
+    i32 slot;
 
     for (slot = 0; slot < CURSOR_MAP_CHANGE_QUEUE_COUNT; ++slot)
         sMapChangeQueue[slot].type = 0;
@@ -1307,14 +1307,14 @@ void advManager::PurgeMapChangeQueue(void)
 // evaluation, or comparison gains proved relational-swap normalization. Retail
 // also delinks three sMapChangeQueue+7 references as a string identity.
 VA(0x00410b9e, 0x1d4)
-void advManager::UnwindMapChangeQueue(int maximumToUnwind, int processChanges)
+void advManager::UnwindMapChangeQueue(i32 maximumToUnwind, i32 processChanges)
 {
-    int queuedChanges;
-    int unwoundChanges;
-    int lowestSlot;
-    int lowestSequence;
-    int continueUnwinding;
-    int slot;
+    i32 queuedChanges;
+    i32 unwoundChanges;
+    i32 lowestSlot;
+    i32 lowestSequence;
+    i32 continueUnwinding;
+    i32 slot;
 
     queuedChanges = CURSOR_MAP_CHANGE_PENDING_SENTINEL;
     unwoundChanges = 0;
@@ -1356,9 +1356,9 @@ void advManager::UnwindMapChangeQueue(int maximumToUnwind, int processChanges)
 }
 
 VA(0x00410d72, 0x11a)
-void SendMapChange(int type, signed char id, unsigned char x, unsigned char y,
-                   int player, unsigned char stopAfterMove,
-                   unsigned char direction)
+void SendMapChange(i32 type, i8 id, u8 x, u8 y,
+                   i32 player, u8 stopAfterMove,
+                   u8 direction)
 {
     SMapChange change;
 
@@ -1371,13 +1371,13 @@ void SendMapChange(int type, signed char id, unsigned char x, unsigned char y,
     LogInt("Send Map Change", type, id, x, y,
            CURSOR_LOG_UNUSED, CURSOR_LOG_UNUSED, CURSOR_LOG_UNUSED);
     memset(&change, 0, sizeof(change));
-    change.type = static_cast<unsigned char>(type);
+    change.type = static_cast<u8>(type);
     change.id = id;
     change.x = x;
     change.y = y;
-    change.player = static_cast<signed char>(player);
-    change.stopAfterMove = static_cast<signed char>(stopAfterMove);
-    change.direction = static_cast<signed char>(direction);
+    change.player = static_cast<i8>(player);
+    change.stopAfterMove = static_cast<i8>(stopAfterMove);
+    change.direction = static_cast<i8>(direction);
     change.sequence = giMapChangeCtr;
     ++giMapChangeCtr;
     memmove(&sMapChangeLastFew[1], &sMapChangeLastFew[0],
@@ -1416,16 +1416,16 @@ void SendMapChange(int type, signed char id, unsigned char x, unsigned char y,
 // 2/2, and 14/14 ordered relocations with only-base=0. Revisit only with a
 // natural compiler allocation-order change; do not add padding, aliases,
 // synthetic identities, or unattached literals.
-DATA(0x004ee020) int bMoveSoundMade = 1;
-DATA(0x004ee028) int giPixelsPerStep[6] = { 2, 4, 6, 8, 16, 0 };
-DATA(0x004ee040) int giStepDelay[5] = { 20, 25, 20, 15, 15 };
+DATA(0x004ee020) i32 bMoveSoundMade = 1;
+DATA(0x004ee028) i32 giPixelsPerStep[6] = { 2, 4, 6, 8, 16, 0 };
+DATA(0x004ee040) i32 giStepDelay[5] = { 20, 25, 20, 15, 15 };
 DATA(0x004ee054) struct _SAMPLE *hOldWalkSample = 0;
 DATA(0x004ee058) struct _SAMPLE *hNewWalkSample = 0;
-DATA(0x004ee05c) int EveryOther = 0;
-DATA(0x004ee060) int startVals[3] = { 16, 0, -16 };
-DATA(0x00524bc0) int S1cursorCycle;
-DATA(0x00524bc4) int S1cursorFrameCount;
-DATA(0x00524bc8) int S1cursorTurning;
-DATA(0x00524bcc) int S1cursorBaseFrame;
-DATA(0x00524bd0) int S1cursorDirection;
+DATA(0x004ee05c) i32 EveryOther = 0;
+DATA(0x004ee060) i32 startVals[3] = { 16, 0, -16 };
+DATA(0x00524bc0) i32 S1cursorCycle;
+DATA(0x00524bc4) i32 S1cursorFrameCount;
+DATA(0x00524bc8) i32 S1cursorTurning;
+DATA(0x00524bcc) i32 S1cursorBaseFrame;
+DATA(0x00524bd0) i32 S1cursorDirection;
 DATA(0x00524bd8) SMapChange sMapChangeLastFew[CURSOR_MAP_CHANGE_RECENT_COUNT];

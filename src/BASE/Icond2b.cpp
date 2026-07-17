@@ -12,18 +12,18 @@
 #include <BASE/bitmap.h>
 #include <SOURCE/dimPalette.h>
 // Per-call decoder scratch — its own file-static block (0x534bf0+).
-DATA(0x00534bf0) static unsigned char *gDimRow;
-DATA(0x00534bf4) static unsigned int gDimCnt;
-DATA(0x00534bf8) static unsigned int gDimRun;
-DATA(0x00534bfc) static int gDimY;
-DATA(0x00534c00) static unsigned int gDimCnt2;
+DATA(0x00534bf0) static u8 *gDimRow;
+DATA(0x00534bf4) static u32 gDimCnt;
+DATA(0x00534bf8) static u32 gDimRun;
+DATA(0x00534bfc) static i32 gDimY;
+DATA(0x00534c00) static u32 gDimCnt2;
 DATA(0x00534c04) static IconEntry *gDimEntry;
-DATA(0x00534c08) static int gDimClipB;
-DATA(0x00534c0c) static unsigned char *gDimSrc;
-DATA(0x00534c10) static unsigned char *gDimDst;
-DATA(0x00534c14) static int gDimX;
-DATA(0x00534c18) static int gDimClipR;
-DATA(0x00534c1c) static int gDimX0;
+DATA(0x00534c08) static i32 gDimClipB;
+DATA(0x00534c0c) static u8 *gDimSrc;
+DATA(0x00534c10) static u8 *gDimDst;
+DATA(0x00534c14) static i32 gDimX;
+DATA(0x00534c18) static i32 gDimClipR;
+DATA(0x00534c1c) static i32 gDimX0;
 
 // @semantic
 // Complete decoder CFG: negative skip/end, newline, unclipped dim, and all four clipped-run
@@ -48,22 +48,22 @@ DATA(0x00534c1c) static int gDimX0;
 // the honest 34/37 relocation shape and raises the live score to 79.24138%; two gDimX0 and one
 // gDimY reload remain absent, with the row symbol difference only a delinked owner alias.
 VA(0x004cfd50, 0x26e)
-void DimIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int frame,
-                     int color, int clip, int clipX, int clipY, int clipW, int clipH)
+void DimIconToBitmap(class icon *srcIcon, class bitmap *dest, i32 x, i32 y, i32 frame,
+                     i32 color, i32 clip, i32 clipX, i32 clipY, i32 clipW, i32 clipH)
 {
     IconEntry *entries = reinterpret_cast<IconEntry *>(srcIcon->m_data);
-    int entryX = entries[frame].x;
+    i32 entryX = entries[frame].x;
     IconEntry * const entry = &entries[frame];
-    unsigned char * const srcData =
-        reinterpret_cast<unsigned char *>(entries) + entries[frame].srcOffset;
+    u8 * const srcData =
+        reinterpret_cast<u8 *>(entries) + entries[frame].srcOffset;
     gDimEntry = entry;
-    const int entryY = entry->y;
+    const i32 entryY = entry->y;
     gDimSrc = srcData;
-    int X = x + entryX;
+    i32 X = x + entryX;
     gDimX0 = X;
     gDimY = y + entryY;
-    int right;
-    unsigned int cnt;
+    i32 right;
+    u32 cnt;
     if (clip != 0) {
         if (clipX > gDimX0 || gDimX0 + entry->w > clipX + clipW || gDimY < clipY ||
             gDimY + entry->h > clipY + clipH) {
@@ -74,18 +74,18 @@ void DimIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int 
             clip = 0;
         }
     }
-    int rowOffset = gDimY;
-    short pitch = dest->m_width;
+    i32 rowOffset = gDimY;
+    i16 pitch = dest->m_width;
     rowOffset = rowOffset * pitch;
-    unsigned char *row = dest->m_pixels + rowOffset;
+    u8 *row = dest->m_pixels + rowOffset;
     for (;;) {
         gDimX = X;
-        int cmd = ReadIconRleByte(gDimSrc);
-        if (static_cast<signed char>(cmd) < 0) {
+        i32 cmd = ReadIconRleByte(gDimSrc);
+        if (static_cast<i8>(cmd) < 0) {
             // skip run / end-of-sprite
             gDimRow = row;
             gDimRun = cmd;
-            int n = cmd & ICON_RLE_MONO_RUN_MASK;
+            i32 n = cmd & ICON_RLE_MONO_RUN_MASK;
             if (n == 0)
                 return;
             X = X + n;
@@ -94,16 +94,16 @@ void DimIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int 
         gDimRun = cmd;
         if (cmd != 0) {
             if (clip == 0) {
-                unsigned char *dst = row + X;
-                unsigned int paletteOffset;
+                u8 *dst = row + X;
+                u32 paletteOffset;
                 gDimCnt = 0;
                 gDimDst = dst;
-                if (static_cast<int>(cmd) > 0) {
+                if (static_cast<i32>(cmd) > 0) {
                     paletteOffset = color * sizeof(uDimPal[0][0]);
                     gDimCnt = cmd;
                     cnt = cmd;
                     do {
-                        int px = *dst++;
+                        i32 px = *dst++;
                         cnt--;
                         gDimDst = dst;
                         dst[-1] = (&uDimPal[0][0][0])[paletteOffset + px];
@@ -112,8 +112,8 @@ void DimIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int 
             } else {
                 if (gDimY >= clipY && gDimY <= gDimClipB &&
                     (right = X + cmd, clipX < right) && X <= gDimClipR) {
-                    unsigned int palOffset;
-                    unsigned char *dst;
+                    u32 palOffset;
+                    u8 *dst;
                     if (X >= clipX) {
                         right = gDimClipR < right ? (gDimClipR - X) + 1 : cmd;
                         dst = row + X;
@@ -122,7 +122,7 @@ void DimIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int 
                         dst = row + clipX;
                     }
                     cnt = right;
-                    int cn = cnt;
+                    i32 cn = cnt;
                     gDimDst = dst;
                     gDimCnt2 = right;
                     gDimCnt = 0;
@@ -130,7 +130,7 @@ void DimIconToBitmap(class icon *srcIcon, class bitmap *dest, int x, int y, int 
                         palOffset = color * sizeof(uDimPal[0][0]);
                         gDimCnt = cn;
                         do {
-                            int px = *dst++;
+                            i32 px = *dst++;
                             cnt--;
                             gDimDst = dst;
                             dst[-1] = (&uDimPal[0][0][0])[palOffset + px];
