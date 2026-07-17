@@ -541,6 +541,28 @@
       "note": "Genuine nested sample playback member restores retail's cached member pointer, exact 0x14 frame/five slots, all instructions, and all 13 relocations."
     },
     {
+      "unit": "EDITOR/mapcell",
+      "function": "?Read@fullMap@@QAEXHH@Z",
+      "source_hash": "577570e3dd3e",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "exact",
+      "iterations": 1,
+      "before": 99.84163,
+      "after": 100.0,
+      "note": "Legacy VC4.2 read spelling restores all seven retail _read owners; all 661 raw bytes, frame/slots/CFG, and 16 ordered REL32 identities/addends match; serialized widths/order and 20/15-to-12/7 conversion remain exact."
+    },
+    {
+      "unit": "EDITOR/mapcell",
+      "function": "?Write@fullMap@@QAEXH@Z",
+      "source_hash": "c8b5fb463a4e",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "exact",
+      "iterations": 1,
+      "before": 99.609375,
+      "after": 100.0,
+      "note": "Legacy VC4.2 write spelling restores all five retail _write owners; all 158 raw bytes, frame/CFG, and five ordered REL32 identities/addends match; serialized widths/order remain exact."
+    },
+    {
       "unit": "SOURCE/ADVMGR",
       "function": "?APanelHandler@@YIHAAUtag_message@@@Z",
       "source_hash": "98769448686e",
