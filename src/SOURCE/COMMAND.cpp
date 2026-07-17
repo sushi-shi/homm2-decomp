@@ -869,7 +869,7 @@ i32 combatManager::CheckWin(struct tag_message* message) {
         i32 unusedWinWord37;
         i32 armyIndex;
         for (armyIndex = 0; armyIndex < COMBAT_ARMY_SLOT_COUNT; armyIndex++) {
-            if (m_armies[m_combatResult][armyIndex].m_monsterType != -1
+            if (m_armies[m_combatResult][armyIndex].m_monsterType != CREATURE_NONE
                 && m_armies[m_combatResult][armyIndex].m_quantity > 0
                 && (m_armies[m_combatResult][armyIndex].m_monster.flags.all
                     & MONSTER_FLAGS_SUMMONED)
@@ -1633,7 +1633,7 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
     for (side_9 = 0; side_9 < COMBAT_MANAGER_SIDE_COUNT; ++side_9) {
         casualtyQuantity_0[side_9] = 0;
         for (armyIndex_8 = 0; armyIndex_8 < COMBAT_ARMY_SLOT_COUNT; ++armyIndex_8) {
-            if (m_armies[side_9][armyIndex_8].m_monsterType != -1
+            if (m_armies[side_9][armyIndex_8].m_monsterType != CREATURE_NONE
                 && m_armies[side_9][armyIndex_8].m_quantity
                        < m_armies[side_9][armyIndex_8].m_initialQuantity) {
                 *(&casualtyType_1[0][0] + side_9 * COMBAT_ARMY_SLOT_COUNT
@@ -2144,7 +2144,7 @@ i32 combatManager::DoSurrender(void) {
         if (m_armies[m_currentSide][armyIndex_n].IsAlive()) {
             giSurrenderCost +=
                 static_cast<i16>(
-                    gMonsterDatabase[m_armies[m_currentSide][armyIndex_n].m_monsterType].cost
+                    gMonsterDatabase[IDX(m_armies[m_currentSide][armyIndex_n].m_monsterType)].cost
                 )
                 * m_armies[m_currentSide][armyIndex_n].m_quantity;
         }
@@ -2817,7 +2817,7 @@ void combatManager::AddArmy(
     i32 index_g;
     army* newArmy;
     for (index_g = 0; index_g < COMBAT_ARMY_CAPACITY; ++index_g) {
-        if (m_armies[side][index_g].m_monsterType == ARMY_GROUP_EMPTY_SLOT) {
+        if (m_armies[side][index_g].m_monsterType == IDX(ARMY_GROUP_EMPTY_SLOT)) {
             armyIndex_r = index_g;
             break;
         }

@@ -172,27 +172,27 @@ void army::LoadResources(void) {
     m_walkDuration = m_frameInfo.walkDuration;
 
     sprintf(gText, "%smove.82M", m_monster.spriteName);
-    m_samples[ARMY_SAMPLE_MOVE] = gpResourceManager->GetSample(gText);
+    m_samples[IDX(ARMY_SAMPLE_MOVE)] = gpResourceManager->GetSample(gText);
     sprintf(gText, "%sattk.82M", m_monster.spriteName);
-    m_samples[ARMY_SAMPLE_ATTACK] = gpResourceManager->GetSample(gText);
+    m_samples[IDX(ARMY_SAMPLE_ATTACK)] = gpResourceManager->GetSample(gText);
     sprintf(gText, "%swnce.82M", m_monster.spriteName);
-    m_samples[ARMY_SAMPLE_WINCE] = gpResourceManager->GetSample(gText);
+    m_samples[IDX(ARMY_SAMPLE_WINCE)] = gpResourceManager->GetSample(gText);
     sprintf(gText, "%skill.82M", m_monster.spriteName);
-    m_samples[ARMY_SAMPLE_KILL] = gpResourceManager->GetSample(gText);
+    m_samples[IDX(ARMY_SAMPLE_KILL)] = gpResourceManager->GetSample(gText);
 
     if (HAS(m_monster.flags.all, MONSTER_FLAGS_SHOOTER)) {
         sprintf(gText, "%sshot.82M", m_monster.spriteName);
-        m_samples[ARMY_SAMPLE_SHOT] = gpResourceManager->GetSample(gText);
+        m_samples[IDX(ARMY_SAMPLE_SHOT)] = gpResourceManager->GetSample(gText);
     }
     if (m_monsterType == CREATURE_VAMPIRE || m_monsterType == CREATURE_VAMPIRE_LORD) {
         sprintf(gText, "%sext1.82M", m_monster.spriteName);
-        m_samples[ARMY_SAMPLE_EXTRA_ONE] = gpResourceManager->GetSample(gText);
+        m_samples[IDX(ARMY_SAMPLE_EXTRA_ONE)] = gpResourceManager->GetSample(gText);
         sprintf(gText, "%sext2.82M", m_monster.spriteName);
-        m_samples[ARMY_SAMPLE_EXTRA_TWO] = gpResourceManager->GetSample(gText);
+        m_samples[IDX(ARMY_SAMPLE_EXTRA_TWO)] = gpResourceManager->GetSample(gText);
     }
     if (m_monsterType == CREATURE_LICH || m_monsterType == CREATURE_POWER_LICH) {
         sprintf(gText, "%sexpl.82M", m_monster.spriteName);
-        m_samples[ARMY_SAMPLE_EXTRA_ONE] = gpResourceManager->GetSample(gText);
+        m_samples[IDX(ARMY_SAMPLE_EXTRA_ONE)] = gpResourceManager->GetSample(gText);
     }
 
     m_creatureIcon = gpResourceManager->GetIcon(cMonFilename[IDX(m_monsterType)]);
@@ -216,7 +216,7 @@ void army::LoadResources(void) {
         }
         m_missileIcon = gpResourceManager->GetIcon(gText);
     } else {
-        m_samples[ARMY_SAMPLE_SHOT] = 0;
+        m_samples[IDX(ARMY_SAMPLE_SHOT)] = 0;
         m_missileIcon = 0;
     }
 
@@ -592,7 +592,7 @@ void army::Walk(i32 direction, i32 finishStanding, i32 skipDrawing) {
     m_animationFrame = 0;
     m_animationSequence = ARMY_ANIMATION_WALK;
     if (!gbNoShowCombat) {
-        gpSoundManager->MemorySample(m_samples[ARMY_SAMPLE_MOVE]);
+        gpSoundManager->MemorySample(m_samples[IDX(ARMY_SAMPLE_MOVE)]);
     }
 
     if (skipDrawing == 0) {
@@ -838,7 +838,7 @@ void army::SpecialAttack(void) {
     }
 
     CheckLuck();
-    gpSoundManager->MemorySample(m_samples[ARMY_SAMPLE_SHOT]);
+    gpSoundManager->MemorySample(m_samples[IDX(ARMY_SAMPLE_SHOT)]);
     gpCombatManager->ResetLimitCreature();
     gpCombatManager->m_limitCreatureCount[m_side][m_index]++;
     gpCombatManager->DrawFrame(0, 1, 0, 1, ARMY_COMBAT_FRAME_DELAY, 1, 1);
@@ -1129,7 +1129,7 @@ void army::SpecialAttack(void) {
         effectType_1 = ARMY_LICH_EXPLOSION_EFFECT;
         effectX_2 = gpCombatManager->m_hexCells[adjacentHex].m_x;
         effectY_28 = gpCombatManager->m_hexCells[adjacentHex].m_y - 17;
-        gpSoundManager->MemorySample(m_samples[ARMY_SAMPLE_EXTRA_ONE]);
+        gpSoundManager->MemorySample(m_samples[IDX(ARMY_SAMPLE_EXTRA_ONE)]);
     } else {
         DamageEnemy(target_1, &damage, &killed_13, 1, 0);
     }
@@ -1272,7 +1272,7 @@ void army::DoHydraAttack(i32) {
     gpCombatManager->DrawFrame(0, 1, 0, 1, ARMY_COMBAT_FRAME_DELAY, 1, 1);
     m_animationState = 1;
     m_pendingAnimationSequence = ARMY_ATTACK_DELAY_NORMAL;
-    gpSoundManager->MemorySample(m_samples[ARMY_SAMPLE_ATTACK]);
+    gpSoundManager->MemorySample(m_samples[IDX(ARMY_SAMPLE_ATTACK)]);
     if (totalKilled_7 > 0) {
         sprintf(
             gText,
@@ -1422,7 +1422,7 @@ void army::DoAttack(i32 retaliation) {
         if (breathTarget_6) {
             m_pendingAnimationSequence += ARMY_BREATH_ATTACK_DELAY_BONUS;
         }
-        gpSoundManager->MemorySample(m_samples[ARMY_SAMPLE_ATTACK]);
+        gpSoundManager->MemorySample(m_samples[IDX(ARMY_SAMPLE_ATTACK)]);
         DamageEnemy(target_1, &damage, &killed_13, 0, 0);
         if (breathTarget_6) {
             DamageEnemy(breathTarget_6, &breathDamage, &breathKilled, 0, 0);
@@ -2250,12 +2250,12 @@ void army::PowEffect(i32 effect, i32 resetLimits, i32 effectX, i32 effectY) {
                         if (!gbNoShowCombat
                             && current->m_effectAnimationStart == IDX(ARMY_ANIMATION_WINCE)) {
                             gpSoundManager->MemorySample(gpCombatManager->m_armies[side_4][index_10]
-                                                             .m_samples[ARMY_SAMPLE_WINCE]);
+                                                             .m_samples[IDX(ARMY_SAMPLE_WINCE)]);
                         }
                         if (!gbNoShowCombat
                             && current->m_effectAnimationStart == IDX(ARMY_ANIMATION_DEATH)) {
                             gpSoundManager->MemorySample(gpCombatManager->m_armies[side_4][index_10]
-                                                             .m_samples[ARMY_SAMPLE_KILL]);
+                                                             .m_samples[IDX(ARMY_SAMPLE_KILL)]);
                         }
                         current->m_animationSequence = current->m_effectAnimationStart;
                         current->m_animationFrame = 0;

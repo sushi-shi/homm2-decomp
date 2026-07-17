@@ -76,7 +76,7 @@ public:
     struct SMonFrameInfo m_frameInfo;                // +0x129
     class icon* m_creatureIcon;                      // +0x45e
     class icon* m_missileIcon;                       // +0x462
-    class sample* m_samples[ARMY_SAMPLE_COUNT];      // +0x466
+    class sample* m_samples[IDX(ARMY_SAMPLE_COUNT)];      // +0x466
     // --- constructors ---
     army(void);
     // --- methods ---
