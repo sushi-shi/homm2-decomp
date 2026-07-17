@@ -239,7 +239,7 @@ public:
     void TownEvent(class mapCell*, i32, i32);
     void EventSound(i32, i32, struct SAMPLE2*);
     void EventWindow(i32, i32, char*, i32, i32, i32, i32, i32);
-    i32 GiveRandomArtifact(class hero*);
+    ArtifactType GiveRandomArtifact(class hero*);
     i32 GiveExperience(class hero*, i32, i32);
     void GiveResource(class hero*, i32, i32);
     void RecruitEvent(class hero*, i32, class mapCell*);
