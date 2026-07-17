@@ -1166,7 +1166,7 @@ i32 game::ProcessIconSelect(i32 widgetId, i32 quickView) {
                 && widgetId <= OVERVIEW_HERO_ARTIFACT_LAST) {
                 selectionIndex2 =
                     selectedHero13->m_artifacts[widgetId - OVERVIEW_HERO_ARTIFACT_FIRST];
-                if (selectionIndex2 == ARTIFACT_MAGIC_BOOK) {
+                if (selectionIndex2 == IDX(ARTIFACT_MAGIC_BOOK)) {
                     gpGame->ViewSpells(selectedHero13, 2, ViewSpecialHandler, 1);
                 } else {
                     NormalDialog(

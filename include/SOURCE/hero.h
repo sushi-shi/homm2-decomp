@@ -209,7 +209,7 @@ public:
     void HeroScreenUpdate(void);
     void UpdateArmies(void);
     void ViewStat(i32, i32);
-    void ViewArtifact(i32, i32, i32);
+    void ViewArtifact(ArtifactType, b32, i32);
     i32 Dismiss(void);
     void Deallocate(i32);
     i32 GetExperience(i32);
