@@ -3113,12 +3113,10 @@ void advManager::HouseEvent(hero *eventHero, mapCell *cell)
     }
 }
 
-// @early-stop
-// @early-stop-reloc-only
-// All 0x62f relocation-masked bytes, 425 normalized instructions, the frame,
-// slots, and CFG match after restoring lastStackCount use and retail coordinate
-// evaluation order. All 29 ordered relocation sites/effective targets agree; the
-// retained residual is folded gMonsterDatabase/constant symbol identity.
+// @semantic
+// Shared enum declaration state reversed equivalent compare operand/polarity
+// pairs at +0x164, +0x2f6, and +0x367. Frame, slots, CFG, and all 29 external
+// relocation sites remain aligned; revisit during the byte-last-mile pass.
 VA(0x004b0d51, 0x62f)
 i32 advManager::CombatMonsterEvent(hero *eventHero, i32 monsterType,
                                    i32 monsterCount, mapCell *, i32 mapX,
