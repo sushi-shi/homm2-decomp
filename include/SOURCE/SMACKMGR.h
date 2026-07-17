@@ -10,7 +10,7 @@
 void ConvertSmackerPalette(u8*);
 class icon;
 
-HOMM2_ENUM_VALUES_BEGIN(SmackManagerConstant)
+H2_ENUM_BEGIN(SmackManagerConstant)
     SMACK_SCREEN_WIDTH = 640,
     SMACK_SCREEN_HEIGHT = 480,
     SMACK_PALETTE_SIZE = 768,
@@ -38,7 +38,7 @@ HOMM2_ENUM_VALUES_BEGIN(SmackManagerConstant)
     SMACK_POINTER_DEFAULT = 0,
     SMACK_POINTER_HIDDEN_HOTSPOT = -999,
     SMACK_EXPANSION_RECT_COUNT = 4
-HOMM2_ENUM_VALUES_END(SmackManagerConstant)
+H2_ENUM_END(SmackManagerConstant)
 
 #pragma pack(push, 1)
 struct tag_rect {

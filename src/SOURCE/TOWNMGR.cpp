@@ -335,12 +335,12 @@ DATA(0x004ee750) SBuildingInfo sBuildingInfo[IDX(FACTION_COUNT)][TOWN_BUILDING_C
 // post-95 TU-state sweep found several disposable 99.7685% candidates but no
 // audited exact closure; every candidate failed the strict size/identity guard.
 // Revisit only after a material TU-state change.
-HOMM2_ENUM_BEGIN(TownDialogResult)
+H2_ENUM_CLASS_BEGIN(TownDialogResult)
     DIALOG_CANCEL_ID = 0x7801
-HOMM2_ENUM_END(TownDialogResult)
-HOMM2_ENUM_BEGIN(TownPortraitIcon)
+H2_ENUM_CLASS_END(TownDialogResult)
+H2_ENUM_CLASS_BEGIN(TownPortraitIcon)
     TOWN_PORTRAIT_ICON_BASE = 90
-HOMM2_ENUM_END(TownPortraitIcon)
+H2_ENUM_CLASS_END(TownPortraitIcon)
 
 VA(0x00413900, 0x16a)
 townObject::townObject(i32 townType, i32 buildingId, char* iconBaseName) {

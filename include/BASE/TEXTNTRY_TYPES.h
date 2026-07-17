@@ -3,12 +3,12 @@
 
 #include <va.h>
 
-HOMM2_ENUM_VALUES_BEGIN(TextEntryKeyConstant)
+H2_ENUM_BEGIN(TextEntryKeyConstant)
     TEXT_ENTRY_KEY_DELETE = 0x7f
-HOMM2_ENUM_VALUES_END(TextEntryKeyConstant)
+H2_ENUM_END(TextEntryKeyConstant)
 
-HOMM2_ENUM_VALUES_BEGIN(TextEntrySourceFileConstant)
+H2_ENUM_BEGIN(TextEntrySourceFileConstant)
     TEXT_ENTRY_SOURCE_FILE_SLOT_SIZE = 0x2c
-HOMM2_ENUM_VALUES_END(TextEntrySourceFileConstant)
+H2_ENUM_END(TextEntrySourceFileConstant)
 
 #endif

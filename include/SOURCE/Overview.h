@@ -9,12 +9,12 @@ struct tag_message;
 class iconWidget;
 class textWidget;
 
-HOMM2_ENUM_BEGIN(OverviewType)
+H2_ENUM_CLASS_BEGIN(OverviewType)
     OVERVIEW_HEROES = 0,
     OVERVIEW_TOWNS = 1
-HOMM2_ENUM_END(OverviewType)
+H2_ENUM_CLASS_END(OverviewType)
 
-HOMM2_ENUM_VALUES_BEGIN(OverviewLayoutConstant)
+H2_ENUM_BEGIN(OverviewLayoutConstant)
     OVERVIEW_VISIBLE_ROWS = 4,
     OVERVIEW_DYNAMIC_WIDGETS_PER_ROW = 70,
     OVERVIEW_ROW_HEIGHT = 86,
@@ -25,12 +25,12 @@ HOMM2_ENUM_VALUES_BEGIN(OverviewLayoutConstant)
     OVERVIEW_ARTIFACT_SLOTS = 14,
     OVERVIEW_SECONDARY_SKILL_COLUMNS = 4,
     OVERVIEW_ARTIFACT_COLUMNS = 7
-HOMM2_ENUM_VALUES_END(OverviewLayoutConstant)
+H2_ENUM_END(OverviewLayoutConstant)
 
 typedef iconWidget* OverviewIconWidgetRow[OVERVIEW_DYNAMIC_WIDGETS_PER_ROW];
 typedef textWidget* OverviewTextWidgetRow[OVERVIEW_DYNAMIC_WIDGETS_PER_ROW];
 
-HOMM2_ENUM_VALUES_BEGIN(OverviewUiConstant)
+H2_ENUM_BEGIN(OverviewUiConstant)
     OVERVIEW_DYNAMIC_ARRAY_BYTES = 0x2bc0,
     OVERVIEW_WIDGET_SET_TEXT = 3,
     OVERVIEW_WIDGET_SET_FRAME = 4,
@@ -89,7 +89,7 @@ HOMM2_ENUM_VALUES_BEGIN(OverviewUiConstant)
     OVERVIEW_TOWN_RECRUIT_ALT_LAST = 38,
     OVERVIEW_TOWN_HERO_FIRST = 39,
     OVERVIEW_TOWN_HERO_LAST = 43
-HOMM2_ENUM_VALUES_END(OverviewUiConstant)
+H2_ENUM_END(OverviewUiConstant)
 
 i32 OverviewHandler(struct tag_message&);
 

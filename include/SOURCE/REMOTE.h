@@ -5,11 +5,11 @@
 // Declarations of the free functions DEFINED in REMOTE.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
 
-HOMM2_ENUM_VALUES_BEGIN(RemoteCrcConstant)
+H2_ENUM_BEGIN(RemoteCrcConstant)
     REMOTE_CRC_FEEDBACK_BIT = 0x08000000
-HOMM2_ENUM_VALUES_END(RemoteCrcConstant)
+H2_ENUM_END(RemoteCrcConstant)
 
-HOMM2_ENUM_VALUES_BEGIN(RemoteConstant)
+H2_ENUM_BEGIN(RemoteConstant)
     REMOTE_PLAYER_COUNT = 6,
     REMOTE_QUEUE_CAPACITY = 128,
     REMOTE_QUEUE_STORAGE_COUNT = 138,
@@ -38,27 +38,27 @@ HOMM2_ENUM_VALUES_BEGIN(RemoteConstant)
     REMOTE_CHAIN_TIMEOUT = 90000,
     REMOTE_INITIAL_HEARTBEAT = 1999999999,
     REMOTE_ORDER_SENTINEL = 999999999
-HOMM2_ENUM_VALUES_END(RemoteConstant)
+H2_ENUM_END(RemoteConstant)
 
-HOMM2_ENUM_BEGIN(RemoteGameMode)
+H2_ENUM_CLASS_BEGIN(RemoteGameMode)
     REMOTE_GAME_NETWORK_HOST = 1,
     REMOTE_GAME_NETWORK_GUEST = 2,
     REMOTE_GAME_MODEM_HOST = 3,
     REMOTE_GAME_MODEM_GUEST = 4
-HOMM2_ENUM_END(RemoteGameMode)
+H2_ENUM_CLASS_END(RemoteGameMode)
 
-HOMM2_ENUM_BEGIN(RemoteMessageType)
+H2_ENUM_CLASS_BEGIN(RemoteMessageType)
     REMOTE_MESSAGE_CONFIRM = 1,
     REMOTE_MESSAGE_RELIABLE = 2,
     REMOTE_MESSAGE_UNRELIABLE = 3,
     REMOTE_MESSAGE_HEARTBEAT = 4
-HOMM2_ENUM_END(RemoteMessageType)
+H2_ENUM_CLASS_END(RemoteMessageType)
 
-HOMM2_ENUM_BEGIN(RemoteSetupCommand)
+H2_ENUM_CLASS_BEGIN(RemoteSetupCommand)
     REMOTE_SETUP_PLAYER_INFO = 0x22,
     REMOTE_SETUP_STANDARD_GAME = 0x3d,
     REMOTE_SETUP_CAMPAIGN_GAME = 0x3e
-HOMM2_ENUM_END(RemoteSetupCommand)
+H2_ENUM_CLASS_END(RemoteSetupCommand)
 
 #pragma pack(push, 1)
 struct RemotePacketHeader {

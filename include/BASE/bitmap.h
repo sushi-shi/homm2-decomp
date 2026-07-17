@@ -7,10 +7,10 @@
 
 // Proven bitmap storage tags. The packed class member remains a short because
 // bitmap resources serialize this value as a 16-bit word.
-HOMM2_ENUM_BEGIN(BitmapType)
+H2_ENUM_CLASS_BEGIN(BitmapType)
     BITMAP_TYPE_NONE = 0,
     BITMAP_TYPE_MEMORY = 0x21
-HOMM2_ENUM_END(BitmapType)
+H2_ENUM_CLASS_END(BitmapType)
 
 #pragma pack(push, 1) // recovered layout is byte-packed
 class bitmap : public resource {

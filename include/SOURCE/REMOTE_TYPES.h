@@ -3,26 +3,26 @@
 
 #include <va.h>
 
-HOMM2_ENUM_VALUES_BEGIN(NetPlayerInfoConstant)
+H2_ENUM_BEGIN(NetPlayerInfoConstant)
     NET_PLAYER_INFO_SYSTEM_ID_SIZE = 4,
     NET_PLAYER_INFO_NAME_SIZE = 21,
     NET_PLAYER_INFO_RESERVED_SIZE = 6
-HOMM2_ENUM_VALUES_END(NetPlayerInfoConstant)
+H2_ENUM_END(NetPlayerInfoConstant)
 
-HOMM2_ENUM_BEGIN(NetworkPacketType)
+H2_ENUM_CLASS_BEGIN(NetworkPacketType)
     NETWORK_PACKET_DATA = 1,
     NETWORK_PACKET_GUEST_ARRIVED = 2,
     NETWORK_PACKET_STARTUP = 3,
     NETWORK_PACKET_GUEST_ACCEPTED = 4,
     NETWORK_PACKET_GUEST_REJECTED = 5
-HOMM2_ENUM_END(NetworkPacketType)
+H2_ENUM_CLASS_END(NetworkPacketType)
 
-HOMM2_ENUM_BEGIN(MultiplayerBaseType)
+H2_ENUM_CLASS_BEGIN(MultiplayerBaseType)
     MULTIPLAYER_BASE_MODEM = 0,
     MULTIPLAYER_BASE_NETWORK = 1,
     MULTIPLAYER_BASE_HOT_SEAT = 2,
     MULTIPLAYER_BASE_UNINITIALIZED = 10
-HOMM2_ENUM_END(MultiplayerBaseType)
+H2_ENUM_CLASS_END(MultiplayerBaseType)
 
 #pragma pack(push, 1)
 struct SNetPlayerInfo {
@@ -36,10 +36,10 @@ struct SNetPlayerInfo {
 #pragma pack(pop)
 SIZE(SNetPlayerInfo, 34);
 
-HOMM2_ENUM_BEGIN(RemoteNetworkProtocol)
+H2_ENUM_CLASS_BEGIN(RemoteNetworkProtocol)
     REMOTE_PROTOCOL_NETBIOS = 0,
     REMOTE_PROTOCOL_DIRECT_PLAY = 1,
     REMOTE_PROTOCOL_WINSOCK = 2
-HOMM2_ENUM_END(RemoteNetworkProtocol)
+H2_ENUM_CLASS_END(RemoteNetworkProtocol)
 
 #endif // HOMM2_REMOTE_TYPES_H

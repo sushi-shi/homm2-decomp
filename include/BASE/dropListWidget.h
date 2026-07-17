@@ -9,7 +9,7 @@ struct tag_message;
 
 // Frame layout of the drop-list ICN resource; the m_*Frame members are
 // initialized from these in Read and the entry table is indexed with them.
-HOMM2_ENUM_BEGIN(DropListFrame)
+H2_ENUM_CLASS_BEGIN(DropListFrame)
     DROPLIST_FRAME_CLOSED_CONTENT = 0,
     DROPLIST_FRAME_DROP_BUTTON = 1,
     DROPLIST_FRAME_DROP_BUTTON_PRESSED = 2,
@@ -24,7 +24,7 @@ HOMM2_ENUM_BEGIN(DropListFrame)
     DROPLIST_FRAME_SCROLL_TRACK_MIDDLE = 11,
     DROPLIST_FRAME_SCROLL_TRACK_LAST = 12,
     DROPLIST_FRAME_SCROLL_THUMB = 13
-HOMM2_ENUM_END(DropListFrame)
+H2_ENUM_CLASS_END(DropListFrame)
 
 #pragma pack(push, 1) // recovered layout is byte-packed
 class bitmap;

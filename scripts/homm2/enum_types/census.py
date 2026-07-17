@@ -201,13 +201,13 @@ def parse_declarations(path: Path, text: str | None = None) -> list[EnumDeclarat
             ))
             i = close + 2
             continue
-        if token == "HOMM2_ENUM_BEGIN" and i + 3 < len(tokens) and tokens[i + 1].text == "(":
+        if token == "H2_ENUM_CLASS_BEGIN" and i + 3 < len(tokens) and tokens[i + 1].text == "(":
             end_name = _match(tokens, i + 1, "(", ")")
             name = tokens[i + 2].text
             end = next((j for j in range(end_name + 1, len(tokens))
-                        if tokens[j].text == "HOMM2_ENUM_END"), None)
+                        if tokens[j].text == "H2_ENUM_CLASS_END"), None)
             if end is None:
-                raise ValueError(f"{owner}:{tokens[i].line}: missing HOMM2_ENUM_END")
+                raise ValueError(f"{owner}:{tokens[i].line}: missing H2_ENUM_CLASS_END")
             result.append(EnumDeclaration(
                 name=name,
                 tag=name,

@@ -14,17 +14,17 @@
 // forward declarations:
 struct tag_message;
 
-HOMM2_ENUM_VALUES_BEGIN(BaseManagerMessageMask)
+H2_ENUM_BEGIN(BaseManagerMessageMask)
     BASE_MANAGER_MESSAGE_MASK_ALL = -1
-HOMM2_ENUM_VALUES_END(BaseManagerMessageMask)
+H2_ENUM_END(BaseManagerMessageMask)
 
-HOMM2_ENUM_VALUES_BEGIN(BaseManagerPriority)
+H2_ENUM_BEGIN(BaseManagerPriority)
     BASE_MANAGER_PRIORITY_UNASSIGNED = -1
-HOMM2_ENUM_VALUES_END(BaseManagerPriority)
+H2_ENUM_END(BaseManagerPriority)
 
-HOMM2_ENUM_VALUES_BEGIN(BaseManagerConstant)
+H2_ENUM_BEGIN(BaseManagerConstant)
     BASE_MANAGER_NAME_CAPACITY = 0x1e
-HOMM2_ENUM_VALUES_END(BaseManagerConstant)
+H2_ENUM_END(BaseManagerConstant)
 
 #pragma pack(push, 1) // recovered layout is byte-packed
 class baseManager /* abstract */ {

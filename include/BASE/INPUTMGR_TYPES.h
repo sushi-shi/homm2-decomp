@@ -3,10 +3,10 @@
 
 #include <va.h>
 
-HOMM2_ENUM_VALUES_BEGIN(InputManagerTextSlotSize)
+H2_ENUM_BEGIN(InputManagerTextSlotSize)
     INPUT_MANAGER_RELEASE_CAPTURE_SLOT_SIZE = 0x18,
     INPUT_MANAGER_NAME_SLOT_SIZE = 0x10
-HOMM2_ENUM_VALUES_END(InputManagerTextSlotSize)
+H2_ENUM_END(InputManagerTextSlotSize)
 
 typedef struct SInputManagerText {
     char leftReleaseCaptureFailure[INPUT_MANAGER_RELEASE_CAPTURE_SLOT_SIZE];

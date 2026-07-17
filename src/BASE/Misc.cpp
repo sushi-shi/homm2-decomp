@@ -218,12 +218,12 @@ DATA(0x0051dd10) static SMiscText gMiscText = {
 // includes four unowned tail bytes. Keep the DATA-proved owners and leave that as a
 // final-link packing residual rather than adding aliases, padding, or placement rules.
 
-HOMM2_ENUM_VALUES_BEGIN(StatusBarLayout)
+H2_ENUM_BEGIN(StatusBarLayout)
     STATUS_BAR_Y = 460,
     STATUS_BAR_HEIGHT = 20,
     STATUS_TEXT_Y = 464,
     STATUS_TEXT_HEIGHT = 16
-HOMM2_ENUM_VALUES_END(StatusBarLayout)
+H2_ENUM_END(StatusBarLayout)
 
 VA(0x004c3d10, 0x58)
 void InitMemEntry(void) {
@@ -812,11 +812,11 @@ skipDefaults:
 // retail literals, NOT sizeof the gConfig fields: modemInitString is char[0x64]
 // but retail moves 0x62 bytes, and networkDefaultName is char[0x18] but retail
 // moves 0x1e — six bytes past the field, faithfully reproduced.
-HOMM2_ENUM_VALUES_BEGIN(RegistryValueSize)
+H2_ENUM_BEGIN(RegistryValueSize)
     MODEM_INIT_STRING_SIZE = 0x62,
     UNIQUE_SYSTEM_ID_SIZE = 4,
     NETWORK_DEFAULT_NAME_SIZE = 0x1e
-HOMM2_ENUM_VALUES_END(RegistryValueSize)
+H2_ENUM_END(RegistryValueSize)
 
 VA(0x004c4ca0, 0x7ab)
 void ReadPrefsFromRegistry(void) {

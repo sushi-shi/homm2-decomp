@@ -3,10 +3,10 @@
 
 #include <Ints.h>
 
-HOMM2_ENUM_VALUES_BEGIN(BitIndexConstant)
+H2_ENUM_BEGIN(BitIndexConstant)
     BIT_INDEX_BYTE_SHIFT = 3,
     BIT_INDEX_WITHIN_BYTE_MASK = 7
-HOMM2_ENUM_VALUES_END(BitIndexConstant)
+H2_ENUM_END(BitIndexConstant)
 
 typedef u8 BitByte;
 typedef u32 BitWord;
