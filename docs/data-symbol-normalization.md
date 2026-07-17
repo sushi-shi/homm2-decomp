@@ -87,3 +87,18 @@ python3 -m homm2.build.canonicalize_data_symbols \
   --summary-root build/delink \
   --summary-output build/gen/data_symbol_canonicalization_summary.json
 ```
+
+## Breadth-audit epoch
+
+The breadth-audit comparison epoch hashes normalized target objects by logical
+COFF content rather than whole-file bytes. Section order, characteristics,
+payloads, relocation sites/types/targets, symbol identities, and auxiliary
+records remain part of the digest. Primary-symbol record order and string-table
+packing do not: objdiff does not assign semantic meaning to those serialization
+choices, and a Vostok regeneration can change them without changing any
+instruction, relocation, or logical symbol multiset.
+
+The canonicalizer itself deliberately does not sort symbol records. Preserving
+symbol indices is a stronger and simpler safety property for the comparison
+copies; the epoch projection is the appropriate place to ignore irrelevant
+serialization order.

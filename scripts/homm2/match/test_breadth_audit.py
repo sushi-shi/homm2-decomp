@@ -1,12 +1,13 @@
 import json
 import io
+import struct
 import tempfile
 import unittest
 from contextlib import redirect_stdout
 from pathlib import Path
 
 from homm2.match.breadth_audit import (
-    AuditError, _load_batch, classify, comparison_epoch, exact_max_rows,
+    AuditError, _load_batch, _logical_target_sha256, classify, comparison_epoch, exact_max_rows,
     load_state, main, record_audits, write_state,
 )
 
@@ -96,6 +97,41 @@ class ComparisonEpochTest(unittest.TestCase):
         self.target.unlink()
         with self.assertRaisesRegex(AuditError, "target is missing"):
             self._epoch()
+
+    def test_logical_target_hash_ignores_symbol_and_string_table_order(self):
+        def coff(names):
+            symbol_offset = 20
+            strings = bytearray(struct.pack("<I", 4))
+            records = bytearray()
+            for name in names:
+                offset = len(strings)
+                strings.extend(name.encode("ascii") + b"\0")
+                records.extend(struct.pack("<IIIhHBB", 0, offset, 0, 0, 0, 2, 0))
+            struct.pack_into("<I", strings, 0, len(strings))
+            header = struct.pack("<HHIIIHH", 0x14C, 0, 0, symbol_offset,
+                                 len(names), 0, 0)
+            return header + records + strings
+
+        first = self.root / "first.obj"
+        second = self.root / "second.obj"
+        first.write_bytes(coff(("long_symbol_alpha", "long_symbol_beta")))
+        second.write_bytes(coff(("long_symbol_beta", "long_symbol_alpha")))
+        self.assertNotEqual(first.read_bytes(), second.read_bytes())
+        self.assertEqual(_logical_target_sha256(first),
+                         _logical_target_sha256(second))
+
+    def test_logical_target_hash_detects_symbol_identity_change(self):
+        def coff(name):
+            strings = struct.pack("<I", 4 + len(name) + 1) + name.encode("ascii") + b"\0"
+            record = struct.pack("<IIIhHBB", 0, 4, 0, 0, 0, 2, 0)
+            return struct.pack("<HHIIIHH", 0x14C, 0, 0, 20, 1, 0, 0) + record + strings
+
+        first = self.root / "first.obj"
+        second = self.root / "second.obj"
+        first.write_bytes(coff("long_symbol_alpha"))
+        second.write_bytes(coff("long_symbol_beta"))
+        self.assertNotEqual(_logical_target_sha256(first),
+                            _logical_target_sha256(second))
 
 
 class AuditStateTest(unittest.TestCase):
