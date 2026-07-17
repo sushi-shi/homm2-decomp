@@ -1895,7 +1895,7 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
                         -1,
                         -1,
                         -1,
-                        CHECK_END_GAME_REMOTE_DIALOG_TIME
+                        IDX(CHECK_END_GAME_REMOTE_DIALOG_TIME)
                     );
                 }
             } else if (rec->m_townCount == 0) {
