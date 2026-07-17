@@ -814,7 +814,7 @@ public:
     void SpellMessage(i32, i32);
     void CastSpell(SpellType, i32, i32, i32);
     void DefaultSpell(i32);
-    void Fireball(i32, i32);
+    void Fireball(i32, SpellType);
     void MeteorShower(i32);
     void ElementalStorm(void);
     void Armageddon(void);

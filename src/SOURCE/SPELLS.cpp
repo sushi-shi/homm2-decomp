@@ -1078,13 +1078,13 @@ void combatManager::CastSpell(
                 TurnToStone(target_i);
                 break;
             case SPELL_COLD_RING:
-                Fireball(targetHex, IDX(SPELL_COLD_RING));
+                Fireball(targetHex, SPELL_COLD_RING);
                 break;
             case SPELL_FIREBALL:
-                Fireball(targetHex, IDX(SPELL_FIREBALL));
+                Fireball(targetHex, SPELL_FIREBALL);
                 break;
             case SPELL_FIREBLAST:
-                Fireball(targetHex, IDX(SPELL_FIREBLAST));
+                Fireball(targetHex, SPELL_FIREBLAST);
                 break;
             case SPELL_METEOR_SHOWER:
                 MeteorShower(targetHex);
@@ -1158,7 +1158,7 @@ void combatManager::DefaultSpell(i32 targetHex) {
 // bound and uses `jge`, while ours loads the index and uses `jle`. Reversed
 // relational and OD_STEER(affectedCount) forms were byte-neutral; revisit on TU change.
 VA(0x00423762, 0x623)
-void combatManager::Fireball(i32 targetHex, i32 spell) {
+void combatManager::Fireball(i32 targetHex, SpellType spell) {
     if (!ValidHex(targetHex))
         return;
 
@@ -1300,7 +1300,7 @@ void combatManager::Fireball(i32 targetHex, i32 spell) {
     if (anyAffected_g) {
         ModifyDamageForArtifacts(
             &baseDamage_w,
-            spell,
+            IDX(spell),
             m_heroes[m_currentSide],
             m_heroes[1 - m_currentSide]
         );

@@ -280,7 +280,7 @@ void GenerateStandardFileName(char*, char*);
 i32 ViewSpellsHandler(struct tag_message&);
 i32 ViewSpecialHandler(struct tag_message&);
 i32 ViewArmyHandler(struct tag_message&);
-i32 IsCursedItem(i32 item);
+i32 IsCursedItem(ArtifactType item);
 i32 CalcBaseScore(i32);
 void WriteDiffHeaderInfo(u8 cmd, i32 len, u8* buf, i32* pos);
 i32 GetSkipCopyLen(u8* buf, i32* pos);

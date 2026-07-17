@@ -4275,7 +4275,7 @@ i32 game::GetRandomArtifactId(i32 levelMask, i32 allowCursed) {
 }
 
 VA(0x0047fe4f, 0x68)
-i32 IsCursedItem(i32 item) {
+i32 IsCursedItem(ArtifactType item) {
     if (item == ARTIFACT_FIZBIN_OF_MISFORTUNE || item == ARTIFACT_HIDEOUS_MASK
         || item == ARTIFACT_TAX_LIEN || item == ARTIFACT_ARM_OF_MARTYR
         || item == ARTIFACT_BROACH_SHIELDING || item == ARTIFACT_HEART_FIRE
