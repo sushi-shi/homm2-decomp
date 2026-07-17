@@ -2,6 +2,17 @@
   "version": 1,
   "records": [
     {
+      "unit": "BASE/BASEMGR",
+      "function": "??0baseManager@@QAE@XZ",
+      "source_hash": "6c59f1fedcc0",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 79.666664,
+      "after": 79.666664,
+      "note": "Complete root-class constructor and proven vtable shape; 2/2 resolved relocations. Retail delays the vptr store, while VC4.2 candidate emits it before saved-register setup."
+    },
+    {
       "unit": "BASE/BITMAP",
       "function": "?CopyToCareful@bitmap@@QAEXPAV1@HHHHHH@Z",
       "source_hash": "e4f5184f80e8",
@@ -14,6 +25,17 @@
     },
     {
       "unit": "BASE/BITMAP",
+      "function": "?DrawToBufferCareful@bitmap@@QAEXFF@Z",
+      "source_hash": "7f3c0b559949",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 10,
+      "before": 82.53061,
+      "after": 82.53061,
+      "note": "Complete O2 clipping CFG with one real stack slot and 7/7 resolved relocations. Ten audited declaration, alias, guard, and expression-order variants did not recover retail register coloring."
+    },
+    {
+      "unit": "BASE/BITMAP",
       "function": "?GrabBitmapCareful@bitmap@@QAEXPAV1@FF@Z",
       "source_hash": "4a90b8eb671a",
       "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
@@ -22,6 +44,39 @@
       "before": 99.17583,
       "after": 100.0,
       "note": "Height-before-width declaration order restores retail register roles; all 0xf0 raw bytes and both ordered BlitBitmap REL32 owner/addend tuples are exact."
+    },
+    {
+      "unit": "BASE/BITS",
+      "function": "_BitClear",
+      "source_hash": "85e759227953",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 55.3125,
+      "after": 55.3125,
+      "note": "Complete zero-relocation bit clear. Retail materializes the byte address and mask in ESI/EAX; the candidate keeps an indexed address/mask allocation despite the previously exhausted profile/source families."
+    },
+    {
+      "unit": "BASE/BITS",
+      "function": "_BitSet",
+      "source_hash": "b8182433ca15",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 52.666668,
+      "after": 52.666668,
+      "note": "Complete zero-relocation bit set. Retail materializes the byte address and mask in ESI/EAX; the candidate keeps an indexed address/mask allocation despite the previously exhausted profile/source families."
+    },
+    {
+      "unit": "BASE/BITS",
+      "function": "_BitTest",
+      "source_hash": "ad5e7ea1c2aa",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 41.842106,
+      "after": 41.842106,
+      "note": "Complete zero-relocation normalized bit test. Retail uses a materialized address and branch result; the candidate emits indexed test/setne despite the previously exhausted profile/source/frontend families."
     },
     {
       "unit": "BASE/BORDER",
@@ -66,6 +121,17 @@
       "before": 94.71739,
       "after": 94.71739,
       "note": "files=src/BASE/BUTTON.cpp; complete semantics and relocs=6/6; /O2 coordinate register-allocation wall with identical shifted setup; behavioral bug=none"
+    },
+    {
+      "unit": "BASE/Blur",
+      "function": "?DoBlur@@YIXPAVbitmap@@0HHHH@Z",
+      "source_hash": "5cb1aa013094",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 87.17932,
+      "after": 87.17932,
+      "note": "Complete blur/palette/fizzle CFG with proven 0xc5c frame and 43/43 resolved relocations. Addend report differs only by compiler-private aggregate/temp aliases; first argument scheduling remains compiler shape."
     },
     {
       "unit": "BASE/Bzip",
@@ -387,6 +453,28 @@
       "note": "Retained exact maximum; sole current residual is commutative current/mouse-manager compare; reversal neutral; exact frame/CFG and 11/11 relocations."
     },
     {
+      "unit": "BASE/FONT",
+      "function": "?GetCharacterWidth@font@@QAEHE@Z",
+      "source_hash": "b27a06bb4b2f",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 3,
+      "before": 86.93104,
+      "after": 86.93104,
+      "note": "Complete Od frame/CFG and zero relocations. Retail loads the glyph data base before forming c*13; ordinary, commuted, and raw-offset spellings were byte-neutral."
+    },
+    {
+      "unit": "BASE/ICON",
+      "function": "?CombatClipDrawToBuffer@icon@@QAEHHHHPAUSLimitData@@HHPAEPAC@Z",
+      "source_hash": "dc7486b61830",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 97.20492,
+      "after": 97.20492,
+      "note": "Complete O2 extent/draw dispatcher; 37/37 resolved relocations and identical dispatcher after the setup delta. Prior bounded AST and TU-state families exhausted; remaining setup register allocation is compiler shape."
+    },
+    {
       "unit": "BASE/ICONWDGT",
       "function": "?Draw@iconWidget@@UAEXXZ",
       "source_hash": "002628e2796d",
@@ -451,6 +539,72 @@
       "before": 99.95763,
       "after": 99.95763,
       "note": "Proven early-stop: complete 0x36c code/table range is raw-exact after relocation-union masking; 55/55 sites and all runtime targets/addends agree, residual is local switch and static-text owner naming"
+    },
+    {
+      "unit": "BASE/Icon2b",
+      "function": "?IconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z",
+      "source_hash": "c8387c2a6519",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 75.60989,
+      "after": 75.60989,
+      "note": "Complete forward decoder CFG; 80/83 resolved relocations, only gIcX0, gIcY, and gIcCnt2 short once each. Extensive prior setup/enum/CFG families exhausted without fake reloads."
+    },
+    {
+      "unit": "BASE/Icond2b",
+      "function": "?DimIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z",
+      "source_hash": "ef5bdfeeaedb",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 79.21265,
+      "after": 79.21265,
+      "note": "Complete dim decoder CFG and one-word frame; 34/37 resolved relocations, only gDimX0 short twice and gDimY short once. No fabricated reloads retained."
+    },
+    {
+      "unit": "BASE/Icondf2b",
+      "function": "?FlipDimIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z",
+      "source_hash": "a16ec4a2f506",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 79.00603,
+      "after": 79.00603,
+      "note": "Complete flipped-dim decoder CFG and one-word frame; exact 37/37 resolved relocation owner/addend multiset. Residual is setup scheduling/register allocation."
+    },
+    {
+      "unit": "BASE/Iconf2b",
+      "function": "?FlipIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z",
+      "source_hash": "7be2736c9534",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 85.79045,
+      "after": 85.79045,
+      "note": "Complete O2 decoder, 0x8 frame, CFG, and current 81/81 resolved relocations. Extensive prior typed-lifetime/CFG/header-state families exhausted; setup allocation remains compiler shape."
+    },
+    {
+      "unit": "BASE/Iconm2b",
+      "function": "?MonoIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z",
+      "source_hash": "a1d6fac66b4c",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 80.0442,
+      "after": 80.0442,
+      "note": "Complete mono decoder CFG and one-word pitch frame; 36/38 resolved relocations with only gMonoX0 and gMonoY each short once. Typed entry/source lifetime is retained."
+    },
+    {
+      "unit": "BASE/Iconmf2b",
+      "function": "?FlipMonoIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z",
+      "source_hash": "b48e094229c2",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 78.32934,
+      "after": 78.32934,
+      "note": "Complete flipped-mono decoder with recovered three-value geometry; 26/27 resolved relocations, only gFMY short once. No wrong target/addend."
     },
     {
       "unit": "BASE/MOUSEMGR",
@@ -770,6 +924,17 @@
       "before": 99.90741,
       "after": 100.0,
       "note": "Retail legacy CRT spelling restores exact external relocation identity; code, CFG, frame/slots, and owner-relative addends match; remaining $SG labels are byte-identical local literals"
+    },
+    {
+      "unit": "BASE/RESMGR",
+      "function": "?GetBackdropAtLoc@resourceManager@@QAEXPADPAVbitmap@@HHH@Z",
+      "source_hash": "e1558d842c96",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 2,
+      "before": 94.39436,
+      "after": 94.39436,
+      "note": "Complete Od frame, slots, loop, and 9/9 resolved relocations. Row-limit and address operand orders remain; both obvious commutations were byte-neutral."
     },
     {
       "unit": "BASE/RESMGR",
@@ -1102,6 +1267,61 @@
       "note": "files=src/BASE/droplist.cpp; complete 0x21d resource/layout reader; relocs=44/44 only-base=0 with exact effective owner/addends; iconX and closed-width AX/BX roles are swapped; commute and named-width forms were byte-neutral while direct members worsened prologue; behavioral bug=none"
     },
     {
+      "unit": "BASE/icon2bc",
+      "function": "?IconToBitmapColorTable@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAEH@Z",
+      "source_hash": "83eb3dcb12b7",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 81.098595,
+      "after": 81.098595,
+      "note": "Complete 86-block typed decoder and 91/91 resolved relocations. Per-owner counts are gCTX0 and gCTCnt short once and gCTY excess twice; no value/addend mismatch or wrong target."
+    },
+    {
+      "unit": "BASE/icon2bs",
+      "function": "?IconToBitmapScale@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z",
+      "source_hash": "8444208704e7",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 73.46099,
+      "after": 73.46099,
+      "note": "Complete scale-wrapper CFG with exact 4/4 relocation owner/addend multiset. Retail and candidate differ in frame homes and register allocation despite matching loop topology and statement order."
+    },
+    {
+      "unit": "BASE/icon2by",
+      "function": "?IconToBitmapYModify@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAC@Z",
+      "source_hash": "25fc8d78e635",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 86.56091,
+      "after": 86.56091,
+      "note": "Complete 64-block O2 decoder; 129/130 relocations, no wrong resolved target, only one missing gYMX occurrence. Prior bounded lifetime, predicate, AST, and declaration-state families were exhausted."
+    },
+    {
+      "unit": "BASE/iconf2bc",
+      "function": "?FlipIconToBitmapColorTable@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAE@Z",
+      "source_hash": "f9a74faa2809",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 81.89673,
+      "after": 81.89673,
+      "note": "Complete 76-block typed decoder; 86/83 resolved relocations with no wrong target, only three excess gFCY reloads. Prior 256-state exact-only search and structural families exhausted."
+    },
+    {
+      "unit": "BASE/iconf2by",
+      "function": "?FlipIconToBitmapYModify@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAC@Z",
+      "source_hash": "eba4f0d1a010",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 91.03217,
+      "after": 91.03217,
+      "note": "Complete O2 decoder CFG and 144/144 resolved relocation set. Synthetic private-scratch identities have count-only differences and must be revisited in the linker/static-data pass; no value/addend mismatch was found."
+    },
+    {
       "unit": "BASE/listbox",
       "function": "??1listBoxWidget@@UAE@XZ",
       "source_hash": "310fd2d547ab",
@@ -1122,6 +1342,17 @@
       "before": 99.04878,
       "after": 99.04878,
       "note": "files=src/BASE/listbox.cpp; complete 0x368 frame/CFG and message behavior; relocs=23/23 only-base=0 with exact effective owner/addends; 23 raw bytes differ only by mouse-bound register allocation and delinked local jump-table labels; behavioral bug=none"
+    },
+    {
+      "unit": "BASE/miscwin",
+      "function": "@BlitBitmapToScreenVesa@28",
+      "source_hash": "d63e894c78f3",
+      "epoch": "eb9642ec7706a03264fa0ba2d78ccf74bbeae0319611b177a49c07577f7e170d",
+      "outcome": "parked",
+      "iterations": 3,
+      "before": 97.5329,
+      "after": 97.5329,
+      "note": "Complete 0x1e2 O2 blit; 18/18 resolved relocations. Destination association, loop compare, and scaled multiply order remain; three direct source-order/lifetime variants were byte-neutral."
     },
     {
       "unit": "BASE/soundmgr",
