@@ -41,7 +41,7 @@ i32 combatManager::HasValidSpellTarget(SpellType spell) {
         if (hex % SPELL_HEX_COLUMN_COUNT == 0
             || hex % SPELL_HEX_COLUMN_COUNT == SPELL_HEX_RIGHT_BORDER)
             continue;
-        if (ValidSpellTarget(spell, hex))
+        if (ValidSpellTarget(IDX(spell), hex))
             return 1;
     }
     return 0;
@@ -171,7 +171,7 @@ SpellType combatManager::ViewSpells(i32) {
             case SPELL_DEATH_RIPPLE:
             case SPELL_DEATH_WAVE:
             case SPELL_MASS_SHIELD:
-                if (!HasValidSpellTarget(m_selectedSpell)) {
+                if (!HasValidSpellTarget(IDX(m_selectedSpell))) {
                     NormalDialog(
                         "That spell will affect no one!",
                         NORMAL_DIALOG_INFO,
@@ -214,7 +214,7 @@ SpellType combatManager::ViewSpells(i32) {
                 }
                 // fall through
             default:
-                if (!HasValidSpellTarget(m_selectedSpell)) {
+                if (!HasValidSpellTarget(IDX(m_selectedSpell))) {
                     NormalDialog(
                         "That spell will affect no one!",
                         NORMAL_DIALOG_INFO,
@@ -304,7 +304,7 @@ i32 HandleCastSpell(tag_message& message) {
         case SPELL_MESSAGE_HOVER:
             hex = gpCombatManager->GetGridIndex(message.payload.mouse.x, message.payload.mouse.y);
             if (indexToCastOn != hex) {
-                if (!gpCombatManager->ValidSpellTarget(gpCombatManager->m_selectedSpell, hex)) {
+                if (!gpCombatManager->ValidSpellTarget(IDX(gpCombatManager->m_selectedSpell), hex)) {
                     indexToCastOn = SPELL_NO_SELECTION;
                     gpMouseManager->SetPointer(0);
                     if (gpCombatManager->m_selectedSpell == SPELL_TELEPORT && bInTeleportGetDest) {
@@ -317,7 +317,7 @@ i32 HandleCastSpell(tag_message& message) {
                     gpMouseManager->SetPointer(
                         gsSpellInfo[IDX(gpCombatManager->m_selectedSpell)].iconIndex
                     );
-                    gpCombatManager->SpellMessage(gpCombatManager->m_selectedSpell, hex);
+                    gpCombatManager->SpellMessage(IDX(gpCombatManager->m_selectedSpell), hex);
                 }
             }
             break;
@@ -428,41 +428,41 @@ i32 combatManager::ValidSpellTarget(i32 spell, i32 hex) {
         return 0;
 
     switch (spell) {
-        case SPELL_HOLY_WORD:
-        case SPELL_HOLY_SHOUT:
-        case SPELL_DISPEL:
-        case SPELL_MASS_DISPEL:
-        case SPELL_ARMAGEDDON:
-        case SPELL_ELEMENTAL_STORM:
-        case SPELL_DEATH_RIPPLE:
-        case SPELL_DEATH_WAVE:
+        case IDX(SPELL_HOLY_WORD):
+        case IDX(SPELL_HOLY_SHOUT):
+        case IDX(SPELL_DISPEL):
+        case IDX(SPELL_MASS_DISPEL):
+        case IDX(SPELL_ARMAGEDDON):
+        case IDX(SPELL_ELEMENTAL_STORM):
+        case IDX(SPELL_DEATH_RIPPLE):
+        case IDX(SPELL_DEATH_WAVE):
             if (m_hexCells[hex].m_occupantSide == COMBAT_HEX_EMPTY)
                 return 0;
             break;
 
-        case SPELL_RESURRECT:
-        case SPELL_TRUE_RESURRECT:
-        case SPELL_ANIMATE_DEAD:
+        case IDX(SPELL_RESURRECT):
+        case IDX(SPELL_TRUE_RESURRECT):
+        case IDX(SPELL_ANIMATE_DEAD):
             return FindResurrectArmyIndex(m_currentSide, spell, hex) != SPELL_NO_SELECTION;
 
-        case SPELL_CURE:
-        case SPELL_MASS_CURE:
-        case SPELL_HASTE:
-        case SPELL_MASS_HASTE:
-        case SPELL_BLESS:
-        case SPELL_MASS_BLESS:
-        case SPELL_STONE_SKIN:
-        case SPELL_STEEL_SKIN:
-        case SPELL_ANTI_MAGIC:
-        case SPELL_DRAGON_SLAYER:
-        case SPELL_BLOOD_LUST:
-        case SPELL_SHIELD:
-        case SPELL_MASS_SHIELD:
+        case IDX(SPELL_CURE):
+        case IDX(SPELL_MASS_CURE):
+        case IDX(SPELL_HASTE):
+        case IDX(SPELL_MASS_HASTE):
+        case IDX(SPELL_BLESS):
+        case IDX(SPELL_MASS_BLESS):
+        case IDX(SPELL_STONE_SKIN):
+        case IDX(SPELL_STEEL_SKIN):
+        case IDX(SPELL_ANTI_MAGIC):
+        case IDX(SPELL_DRAGON_SLAYER):
+        case IDX(SPELL_BLOOD_LUST):
+        case IDX(SPELL_SHIELD):
+        case IDX(SPELL_MASS_SHIELD):
             if (m_hexCells[hex].m_occupantSide != m_currentSide)
                 return 0;
             break;
 
-        case SPELL_MIRROR_IMAGE:
+        case IDX(SPELL_MIRROR_IMAGE):
             if (m_hexCells[hex].m_occupantSide != m_currentSide)
                 return 0;
             if (m_armies[m_hexCells[hex].m_occupantSide][m_hexCells[hex].m_occupantIndex]
@@ -474,24 +474,24 @@ i32 combatManager::ValidSpellTarget(i32 spell, i32 hex) {
                 return 0;
             break;
 
-        case SPELL_LIGHTNING_BOLT:
-        case SPELL_CHAIN_LIGHTNING:
-        case SPELL_SLOW:
-        case SPELL_MASS_SLOW:
-        case SPELL_BLIND:
-        case SPELL_CURSE:
-        case SPELL_MASS_CURSE:
-        case SPELL_MAGIC_ARROW:
-        case SPELL_BERSERKER:
-        case SPELL_PARALYZE:
-        case SPELL_HYPNOTIZE:
-        case SPELL_COLD_RAY:
-        case SPELL_DISRUPTING_RAY:
+        case IDX(SPELL_LIGHTNING_BOLT):
+        case IDX(SPELL_CHAIN_LIGHTNING):
+        case IDX(SPELL_SLOW):
+        case IDX(SPELL_MASS_SLOW):
+        case IDX(SPELL_BLIND):
+        case IDX(SPELL_CURSE):
+        case IDX(SPELL_MASS_CURSE):
+        case IDX(SPELL_MAGIC_ARROW):
+        case IDX(SPELL_BERSERKER):
+        case IDX(SPELL_PARALYZE):
+        case IDX(SPELL_HYPNOTIZE):
+        case IDX(SPELL_COLD_RAY):
+        case IDX(SPELL_DISRUPTING_RAY):
             if (m_hexCells[hex].m_occupantSide != 1 - m_currentSide)
                 return 0;
             break;
 
-        case SPELL_TELEPORT:
+        case IDX(SPELL_TELEPORT):
             if (!bInTeleportGetDest) {
                 if (m_hexCells[hex].m_occupantSide != m_currentSide)
                     return 0;
@@ -506,10 +506,10 @@ i32 combatManager::ValidSpellTarget(i32 spell, i32 hex) {
             }
             break;
 
-        case SPELL_FIREBALL:
-        case SPELL_FIREBLAST:
-        case SPELL_METEOR_SHOWER:
-        case SPELL_COLD_RING:
+        case IDX(SPELL_FIREBALL):
+        case IDX(SPELL_FIREBLAST):
+        case IDX(SPELL_METEOR_SHOWER):
+        case IDX(SPELL_COLD_RING):
             if (hex == COMBAT_HEX_EMPTY || hex % SPELL_HEX_COLUMN_COUNT == 0
                 || hex % SPELL_HEX_COLUMN_COUNT == SPELL_HEX_RIGHT_BORDER)
                 return 0;
@@ -533,21 +533,21 @@ void combatManager::SpellMessage(i32 spell, i32 hex) {
         return;
 
     switch (spell) {
-        case SPELL_FIREBALL:
-        case SPELL_FIREBLAST:
-        case SPELL_METEOR_SHOWER:
-        case SPELL_COLD_RING:
+        case IDX(SPELL_FIREBALL):
+        case IDX(SPELL_FIREBLAST):
+        case IDX(SPELL_METEOR_SHOWER):
+        case IDX(SPELL_COLD_RING):
             sprintf(gText, "Cast %s", gSpellNames[spell]);
             break;
-        case SPELL_TELEPORT:
+        case IDX(SPELL_TELEPORT):
             if (bInTeleportGetDest) {
                 sprintf(gText, "Teleport Here");
                 break;
             }
             goto occupied_target;
-        case SPELL_RESURRECT:
-        case SPELL_TRUE_RESURRECT:
-        case SPELL_ANIMATE_DEAD:
+        case IDX(SPELL_RESURRECT):
+        case IDX(SPELL_TRUE_RESURRECT):
+        case IDX(SPELL_ANIMATE_DEAD):
             target_i = &m_armies[m_currentSide][FindResurrectArmyIndex(m_currentSide, spell, hex)];
             goto format_target;
         default:
@@ -612,7 +612,7 @@ void combatManager::CastSpell(
     if (castByCreature == 0 && m_eagleEyeSpell[1 - m_currentSide] == -1
         && m_heroes[1 - m_currentSide] != 0 && !m_heroes[1 - m_currentSide]->HasSpell(spell)
         && m_heroes[1 - m_currentSide]->m_secondarySkills[IDX(HERO_SKILL_EAGLE_EYE)]
-               != HERO_SKILL_LEVEL_NONE
+               != IDX(HERO_SKILL_LEVEL_NONE)
         && m_heroes[1 - m_currentSide]->m_secondarySkills[IDX(HERO_SKILL_EAGLE_EYE)] + 1
                >= gsSpellInfo[spell].level) {
         if (SRandom(0, 9)
@@ -667,11 +667,11 @@ void combatManager::CastSpell(
         spellPower_i = SPELL_DEFAULT_CREATURE_POWER;
     } else {
         spellPower_i = m_spellPower[m_currentSide];
-        if (m_heroes[m_currentSide]->HasArtifact(ARTIFACT_ENCHANTED_HOURGLASS)
+        if (m_heroes[m_currentSide]->HasArtifact(IDX(ARTIFACT_ENCHANTED_HOURGLASS))
             && (gsSpellInfo[spell].attributes & SPELL_ATTRIBUTE_DURATION)) {
             spellPower_i += SPELL_HOURGLASS_POWER_BONUS;
         }
-        if (m_heroes[m_currentSide]->HasArtifact(ARTIFACT_WIZARD_HAT)
+        if (m_heroes[m_currentSide]->HasArtifact(IDX(ARTIFACT_WIZARD_HAT))
             && (gsSpellInfo[spell].attributes & SPELL_ATTRIBUTE_DURATION)) {
             spellPower_i += SPELL_WIZARD_HAT_POWER_BONUS;
         }
@@ -744,7 +744,7 @@ void combatManager::CastSpell(
     } else {
         spellSample = LoadPlaySample(sampleName_i);
         switch (spell) {
-            case SPELL_TELEPORT:
+            case IDX(SPELL_TELEPORT):
                 teleportArmy_i = target_i;
                 targetHex = teleportDestination;
                 RippleCreature(teleportArmy_i->m_side, teleportArmy_i->m_index, 1);
@@ -813,7 +813,7 @@ void combatManager::CastSpell(
                     RippleCreature(teleportArmy_i->m_side, teleportArmy_i->m_index, 2);
                 }
                 break;
-            case SPELL_DISRUPTING_RAY:
+            case IDX(SPELL_DISRUPTING_RAY):
                 oldDefense = target_i->m_monster.defense;
                 target_i->m_monster.defense -= SPELL_DISRUPTING_RAY_DEFENSE_REDUCTION;
                 if (target_i->m_monster.defense < SPELL_MINIMUM_DEFENSE)
@@ -827,7 +827,7 @@ void combatManager::CastSpell(
                 DoBlast(targetHex, spell);
                 RippleCreature(target_i->m_side, target_i->m_index, 0);
                 break;
-            case SPELL_COLD_RAY:
+            case IDX(SPELL_COLD_RAY):
                 DelayMilli(
                     static_cast<i32l>(gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_COLD_RAY_DELAY)
                 );
@@ -858,10 +858,10 @@ void combatManager::CastSpell(
                 target_i->Damage(damage_m, -1);
                 target_i->PowEffect(-1, 1, -1, -1);
                 break;
-            case SPELL_CHAIN_LIGHTNING:
+            case IDX(SPELL_CHAIN_LIGHTNING):
                 ChainLightning(targetHex, spellPower_i);
                 break;
-            case SPELL_MAGIC_ARROW:
+            case IDX(SPELL_MAGIC_ARROW):
                 DelayMilli(
                     static_cast<i32l>(
                         gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_MAGIC_ARROW_DELAY
@@ -906,7 +906,7 @@ void combatManager::CastSpell(
                 target_i->Damage(damage_m, -1);
                 target_i->PowEffect(-1, 1, -1, -1);
                 break;
-            case SPELL_LIGHTNING_BOLT:
+            case IDX(SPELL_LIGHTNING_BOLT):
                 damage_m = spellPower_i * SPELL_LIGHTNING_DAMAGE_PER_POWER;
                 if (target_i->m_monsterType == CREATURE_AIR_ELEMENTAL)
                     damage_m = spellPower_i * SPELL_LIGHTNING_AIR_ELEMENTAL_DAMAGE_PER_POWER;
@@ -952,150 +952,150 @@ void combatManager::CastSpell(
                 target_i->Damage(damage_m, -1);
                 target_i->PowEffect(-1, 1, -1, -1);
                 break;
-            case SPELL_MASS_CURE:
-            case SPELL_MASS_HASTE:
-            case SPELL_MASS_SLOW:
-            case SPELL_MASS_BLESS:
-            case SPELL_MASS_CURSE:
-            case SPELL_HOLY_WORD:
-            case SPELL_HOLY_SHOUT:
-            case SPELL_MASS_DISPEL:
-            case SPELL_DEATH_RIPPLE:
-            case SPELL_DEATH_WAVE:
-            case SPELL_MASS_SHIELD:
+            case IDX(SPELL_MASS_CURE):
+            case IDX(SPELL_MASS_HASTE):
+            case IDX(SPELL_MASS_SLOW):
+            case IDX(SPELL_MASS_BLESS):
+            case IDX(SPELL_MASS_CURSE):
+            case IDX(SPELL_HOLY_WORD):
+            case IDX(SPELL_HOLY_SHOUT):
+            case IDX(SPELL_MASS_DISPEL):
+            case IDX(SPELL_DEATH_RIPPLE):
+            case IDX(SPELL_DEATH_WAVE):
+            case IDX(SPELL_MASS_SHIELD):
                 CastMassSpell(spell, spellPower_i);
                 break;
-            case SPELL_MIRROR_IMAGE:
+            case IDX(SPELL_MIRROR_IMAGE):
                 MirrorImage(targetHex);
                 break;
-            case SPELL_SUMMON_EARTH_ELEMENTAL:
-                SummonElemental(CREATURE_EARTH_ELEMENTAL, spellPower_i);
+            case IDX(SPELL_SUMMON_EARTH_ELEMENTAL):
+                SummonElemental(IDX(CREATURE_EARTH_ELEMENTAL), spellPower_i);
                 break;
-            case SPELL_SUMMON_AIR_ELEMENTAL:
-                SummonElemental(CREATURE_AIR_ELEMENTAL, spellPower_i);
+            case IDX(SPELL_SUMMON_AIR_ELEMENTAL):
+                SummonElemental(IDX(CREATURE_AIR_ELEMENTAL), spellPower_i);
                 break;
-            case SPELL_SUMMON_FIRE_ELEMENTAL:
-                SummonElemental(CREATURE_FIRE_ELEMENTAL, spellPower_i);
+            case IDX(SPELL_SUMMON_FIRE_ELEMENTAL):
+                SummonElemental(IDX(CREATURE_FIRE_ELEMENTAL), spellPower_i);
                 break;
-            case SPELL_SUMMON_WATER_ELEMENTAL:
-                SummonElemental(CREATURE_WATER_ELEMENTAL, spellPower_i);
+            case IDX(SPELL_SUMMON_WATER_ELEMENTAL):
+                SummonElemental(IDX(CREATURE_WATER_ELEMENTAL), spellPower_i);
                 break;
-            case SPELL_RESURRECT:
-            case SPELL_TRUE_RESURRECT:
-            case SPELL_ANIMATE_DEAD:
+            case IDX(SPELL_RESURRECT):
+            case IDX(SPELL_TRUE_RESURRECT):
+            case IDX(SPELL_ANIMATE_DEAD):
                 Resurrect(spell, targetHex, spellPower_i);
                 break;
-            case SPELL_CURE:
+            case IDX(SPELL_CURE):
                 ShowSpellMessage(castByCreature, spell, target_i);
                 target_i->SpellEffect(gsSpellInfo[IDX(SPELL_CURE)].combatEffect, 0, 0);
                 target_i->Cure(spellPower_i);
                 DrawFrame(1, 0, 0, 0, COMBAT_DRAW_DELAY, 1, 1);
                 break;
-            case SPELL_SLOW:
+            case IDX(SPELL_SLOW):
                 ShowSpellMessage(castByCreature, spell, target_i);
                 target_i->SetSpellInfluence(SPELL_INFLUENCE_SLOW, spellPower_i);
                 target_i->SpellEffect(gsSpellInfo[IDX(SPELL_SLOW)].combatEffect, 0, 0);
                 break;
-            case SPELL_HASTE:
+            case IDX(SPELL_HASTE):
                 ShowSpellMessage(castByCreature, spell, target_i);
                 target_i->SetSpellInfluence(SPELL_INFLUENCE_HASTE, spellPower_i);
                 target_i->SpellEffect(gsSpellInfo[IDX(SPELL_HASTE)].combatEffect, 0, 0);
                 break;
-            case SPELL_SHIELD:
+            case IDX(SPELL_SHIELD):
                 ShowSpellMessage(castByCreature, spell, target_i);
                 target_i->SetSpellInfluence(SPELL_INFLUENCE_SHIELD, spellPower_i);
                 target_i->SpellEffect(gsSpellInfo[IDX(SPELL_SHIELD)].combatEffect, 0, 0);
                 break;
-            case SPELL_DRAGON_SLAYER:
+            case IDX(SPELL_DRAGON_SLAYER):
                 ShowSpellMessage(castByCreature, spell, target_i);
                 target_i->SetSpellInfluence(SPELL_INFLUENCE_DRAGON_SLAYER, spellPower_i);
                 target_i->SpellEffect(gsSpellInfo[IDX(SPELL_DRAGON_SLAYER)].combatEffect, 0, 0);
                 break;
-            case SPELL_BLESS:
+            case IDX(SPELL_BLESS):
                 ShowSpellMessage(castByCreature, spell, target_i);
                 target_i->SetSpellInfluence(SPELL_INFLUENCE_BLESS, spellPower_i);
                 target_i->SpellEffect(gsSpellInfo[IDX(SPELL_BLESS)].combatEffect, 0, 0);
                 break;
-            case SPELL_STONE_SKIN:
+            case IDX(SPELL_STONE_SKIN):
                 ShowSpellMessage(castByCreature, spell, target_i);
                 target_i->SetSpellInfluence(SPELL_INFLUENCE_STONE_SKIN, spellPower_i);
                 target_i->SpellEffect(gsSpellInfo[IDX(SPELL_STONE_SKIN)].combatEffect, 0, 0);
                 break;
-            case SPELL_STEEL_SKIN:
+            case IDX(SPELL_STEEL_SKIN):
                 ShowSpellMessage(castByCreature, spell, target_i);
                 target_i->SetSpellInfluence(SPELL_INFLUENCE_STEEL_SKIN, spellPower_i);
                 target_i->SpellEffect(gsSpellInfo[IDX(SPELL_STEEL_SKIN)].combatEffect, 0, 0);
                 break;
-            case SPELL_CURSE:
+            case IDX(SPELL_CURSE):
                 ShowSpellMessage(castByCreature, spell, target_i);
                 target_i->SetSpellInfluence(SPELL_INFLUENCE_CURSE, spellPower_i);
                 target_i->SpellEffect(gsSpellInfo[IDX(SPELL_CURSE)].combatEffect, 0, 0);
                 break;
-            case SPELL_BERSERKER:
+            case IDX(SPELL_BERSERKER):
                 ShowSpellMessage(castByCreature, spell, target_i);
                 target_i->SetSpellInfluence(SPELL_INFLUENCE_BERSERKER, spellPower_i);
                 target_i->SpellEffect(gsSpellInfo[IDX(SPELL_BERSERKER)].combatEffect, 0, 0);
                 break;
-            case SPELL_HYPNOTIZE:
+            case IDX(SPELL_HYPNOTIZE):
                 ShowSpellMessage(castByCreature, spell, target_i);
                 target_i->SetSpellInfluence(SPELL_INFLUENCE_HYPNOTIZE, spellPower_i);
                 target_i->SpellEffect(gsSpellInfo[IDX(SPELL_HYPNOTIZE)].combatEffect, 0, 0);
                 break;
-            case SPELL_PARALYZE:
+            case IDX(SPELL_PARALYZE):
                 ShowSpellMessage(castByCreature, spell, target_i);
                 target_i->SetSpellInfluence(SPELL_INFLUENCE_PARALYZE, spellPower_i);
                 target_i->SpellEffect(gsSpellInfo[IDX(SPELL_PARALYZE)].combatEffect, 0, 0);
                 break;
-            case CREATURE_SPELL_DISPEL:
+            case IDX(CREATURE_SPELL_DISPEL):
                 ShowSpellMessage(castByCreature, spell, target_i);
                 target_i->DispelGood();
                 target_i->SpellEffect(gsSpellInfo[IDX(SPELL_DISPEL)].combatEffect, 0, 1);
                 break;
-            case SPELL_DISPEL:
+            case IDX(SPELL_DISPEL):
                 ShowSpellMessage(castByCreature, spell, target_i);
                 target_i->DispelGood();
                 target_i->SpellEffect(gsSpellInfo[IDX(SPELL_DISPEL)].combatEffect, 0, 0);
                 for (influence = 0; influence < SPELL_INFLUENCE_COUNT; influence++)
                     target_i->CancelIndividualSpell(influence);
                 break;
-            case SPELL_BLIND:
+            case IDX(SPELL_BLIND):
                 ShowSpellMessage(castByCreature, spell, target_i);
                 target_i->SetSpellInfluence(SPELL_INFLUENCE_BLIND, spellPower_i);
                 target_i->SpellEffect(gsSpellInfo[IDX(SPELL_BLIND)].combatEffect, 0, 0);
                 break;
-            case SPELL_BLOOD_LUST:
+            case IDX(SPELL_BLOOD_LUST):
                 ShowSpellMessage(castByCreature, spell, target_i);
                 BloodLustEffect(target_i, SPELL_BLOOD_LUST_EFFECT);
                 target_i->SetSpellInfluence(SPELL_INFLUENCE_BLOOD_LUST, SPELL_BLOOD_LUST_DURATION);
                 break;
-            case SPELL_ANTI_MAGIC:
+            case IDX(SPELL_ANTI_MAGIC):
                 ShowSpellMessage(castByCreature, spell, target_i);
                 target_i->SetSpellInfluence(SPELL_INFLUENCE_ANTI_MAGIC, spellPower_i);
                 target_i->SpellEffect(gsSpellInfo[IDX(SPELL_ANTI_MAGIC)].combatEffect, 0, 0);
                 break;
-            case CREATURE_SPELL_PETRIFY:
+            case IDX(CREATURE_SPELL_PETRIFY):
                 ShowSpellMessage(castByCreature, spell, target_i);
                 TurnToStone(target_i);
                 break;
-            case SPELL_COLD_RING:
-                Fireball(targetHex, SPELL_COLD_RING);
+            case IDX(SPELL_COLD_RING):
+                Fireball(targetHex, IDX(SPELL_COLD_RING));
                 break;
-            case SPELL_FIREBALL:
-                Fireball(targetHex, SPELL_FIREBALL);
+            case IDX(SPELL_FIREBALL):
+                Fireball(targetHex, IDX(SPELL_FIREBALL));
                 break;
-            case SPELL_FIREBLAST:
-                Fireball(targetHex, SPELL_FIREBLAST);
+            case IDX(SPELL_FIREBLAST):
+                Fireball(targetHex, IDX(SPELL_FIREBLAST));
                 break;
-            case SPELL_METEOR_SHOWER:
+            case IDX(SPELL_METEOR_SHOWER):
                 MeteorShower(targetHex);
                 break;
-            case SPELL_ELEMENTAL_STORM:
+            case IDX(SPELL_ELEMENTAL_STORM):
                 ElementalStorm();
                 break;
-            case SPELL_ARMAGEDDON:
+            case IDX(SPELL_ARMAGEDDON):
                 Armageddon();
                 break;
-            case SPELL_EARTHQUAKE:
+            case IDX(SPELL_EARTHQUAKE):
                 Earthquake();
                 break;
             default:
@@ -1375,7 +1375,7 @@ void combatManager::MeteorShower(i32 targetHex) {
                     damage_c = baseDamage_w;
                     if (target_k->m_monsterType == CREATURE_EARTH_ELEMENTAL)
                         damage_c <<= 1;
-                    target_k->Damage(damage_c, SPELL_METEOR_SHOWER);
+                    target_k->Damage(damage_c, IDX(SPELL_METEOR_SHOWER));
                     anyAffected_h = 1;
                 }
             }
@@ -1448,10 +1448,10 @@ void combatManager::ElementalStorm(void) {
                     || target_m->m_monsterType == CREATURE_STEEL_GOLEM) {
                     damage_e = static_cast<i32l>(damage_e * SPELL_GOLEM_DAMAGE_MULTIPLIER);
                 }
-                if (m_heroes[side_h] && m_heroes[side_h]->HasArtifact(ARTIFACT_BROACH_SHIELDING)) {
+                if (m_heroes[side_h] && m_heroes[side_h]->HasArtifact(IDX(ARTIFACT_BROACH_SHIELDING))) {
                     damage_e = static_cast<i32l>(damage_e * SPELL_GOLEM_DAMAGE_MULTIPLIER);
                 }
-                target_m->Damage(damage_e, SPELL_ELEMENTAL_STORM);
+                target_m->Damage(damage_e, IDX(SPELL_ELEMENTAL_STORM));
                 anyAffected_f = 1;
             }
         }
@@ -1496,10 +1496,10 @@ void combatManager::Armageddon(void) {
                     || target18->m_monsterType == CREATURE_STEEL_GOLEM) {
                     damage9 = static_cast<i32l>(damage9 * SPELL_GOLEM_DAMAGE_MULTIPLIER);
                 }
-                if (m_heroes[side11] && m_heroes[side11]->HasArtifact(ARTIFACT_BROACH_SHIELDING)) {
+                if (m_heroes[side11] && m_heroes[side11]->HasArtifact(IDX(ARTIFACT_BROACH_SHIELDING))) {
                     damage9 = static_cast<i32l>(damage9 * SPELL_GOLEM_DAMAGE_MULTIPLIER);
                 }
-                target18->Damage(damage9, SPELL_ARMAGEDDON);
+                target18->Damage(damage9, IDX(SPELL_ARMAGEDDON));
                 anyAffected6 = 1;
             }
         }
@@ -1918,7 +1918,7 @@ void combatManager::DrawBolt(SBolt* bolt, i32 stepCount) {
                     else
                         edgeDistance = widthLast - widthIndex;
                     switch (bolt->colorMode) {
-                        case BOLT_COLOR_RED_TABLE:
+                        case IDX(BOLT_COLOR_RED_TABLE):
                             gpWindowManager->m_screen
                                 ->m_pixels[drawY * COMBAT_SCREEN_WIDTH + drawX] =
                                 gColorTableRed[static_cast<i8>(
@@ -1926,22 +1926,22 @@ void combatManager::DrawBolt(SBolt* bolt, i32 stepCount) {
                                         ->m_pixels[drawY * COMBAT_SCREEN_WIDTH + drawX]
                                 )];
                             break;
-                        case BOLT_COLOR_RED_BEAM:
+                        case IDX(BOLT_COLOR_RED_BEAM):
                             gpWindowManager->m_screen
                                 ->m_pixels[drawY * COMBAT_SCREEN_WIDTH + drawX] =
                                 uRedBeam[edgeDistance];
                             break;
-                        case BOLT_COLOR_RAINBOW_FORWARD:
+                        case IDX(BOLT_COLOR_RAINBOW_FORWARD):
                             gpWindowManager->m_screen
                                 ->m_pixels[drawY * COMBAT_SCREEN_WIDTH + drawX] =
                                 uRainbow[widthIndex - widthFirst];
                             break;
-                        case BOLT_COLOR_RAINBOW_REVERSE:
+                        case IDX(BOLT_COLOR_RAINBOW_REVERSE):
                             gpWindowManager->m_screen
                                 ->m_pixels[drawY * COMBAT_SCREEN_WIDTH + drawX] =
                                 uRainbow[BOLT_RAINBOW_LAST_INDEX - (widthIndex - widthFirst)];
                             break;
-                        case BOLT_COLOR_LIGHTNING: {
+                        case IDX(BOLT_COLOR_LIGHTNING): {
                             u8 color;
                             if (edgeDistance == 0)
                                 color = BOLT_LIGHTNING_SHADE_0;
@@ -2516,13 +2516,13 @@ void combatManager::RippleCreature(i32 side, i32 armyIndex, i32 mode) {
     float amplitudeBase;
     float amplitudeStep;
     switch (mode) {
-        case SPELL_RIPPLE_MODE_WAVE:
+        case IDX(SPELL_RIPPLE_MODE_WAVE):
             phaseStep = 2;
             frameDelay = 20;
             amplitudeBase = RIPPLE_MODE_ZERO_AMPLITUDE_BASE;
             amplitudeStep = RIPPLE_MODE_ZERO_AMPLITUDE_STEP;
             break;
-        case SPELL_RIPPLE_MODE_DEATH_RIPPLE:
+        case IDX(SPELL_RIPPLE_MODE_DEATH_RIPPLE):
             phaseStep = 1;
             frameDelay = 30;
             amplitudeBase = RIPPLE_OTHER_AMPLITUDE_BASE;
@@ -2787,8 +2787,8 @@ void combatManager::CastMassSpell(i32 spell, i32 spellPower) {
     i32 anyAffected_i;
     CombatSpellInfluence influence_e;
     switch (spell) {
-        case SPELL_MASS_SLOW:
-        case SPELL_MASS_CURSE:
+        case IDX(SPELL_MASS_SLOW):
+        case IDX(SPELL_MASS_CURSE):
             side_i = 1 - m_currentSide;
             for (armyIndex_k = 0; armyIndex_k < m_armyCount[side_i]; ++armyIndex_k) {
                 if (m_armies[side_i][armyIndex_k].SpellCastWorks(spell))
@@ -2796,10 +2796,10 @@ void combatManager::CastMassSpell(i32 spell, i32 spellPower) {
             }
             break;
 
-        case SPELL_MASS_CURE:
-        case SPELL_MASS_HASTE:
-        case SPELL_MASS_BLESS:
-        case SPELL_MASS_SHIELD:
+        case IDX(SPELL_MASS_CURE):
+        case IDX(SPELL_MASS_HASTE):
+        case IDX(SPELL_MASS_BLESS):
+        case IDX(SPELL_MASS_SHIELD):
             side_i = m_currentSide;
             for (armyIndex_k = 0; armyIndex_k < m_armyCount[side_i]; ++armyIndex_k) {
                 if (m_armies[side_i][armyIndex_k].SpellCastWorks(spell))
@@ -2807,7 +2807,7 @@ void combatManager::CastMassSpell(i32 spell, i32 spellPower) {
             }
             break;
 
-        case SPELL_MASS_DISPEL:
+        case IDX(SPELL_MASS_DISPEL):
             for (side_i = 0; side_i < COMBAT_SIDE_COUNT; ++side_i) {
                 for (armyIndex_k = 0; armyIndex_k < m_armyCount[side_i]; ++armyIndex_k) {
                     if (m_armies[side_i][armyIndex_k].SpellCastWorks(spell))
@@ -2816,8 +2816,8 @@ void combatManager::CastMassSpell(i32 spell, i32 spellPower) {
             }
             break;
 
-        case SPELL_HOLY_WORD:
-        case SPELL_HOLY_SHOUT: {
+        case IDX(SPELL_HOLY_WORD):
+        case IDX(SPELL_HOLY_SHOUT): {
             animateCreatures_k = 1;
             damage_c = (spell == SPELL_HOLY_WORD ? 10 : 20) * spellPower;
             for (side_i = 0; side_i < COMBAT_SIDE_COUNT; ++side_i) {
@@ -2848,8 +2848,8 @@ void combatManager::CastMassSpell(i32 spell, i32 spellPower) {
             break;
         }
 
-        case SPELL_DEATH_RIPPLE:
-        case SPELL_DEATH_WAVE: {
+        case IDX(SPELL_DEATH_RIPPLE):
+        case IDX(SPELL_DEATH_WAVE): {
             animateCreatures_k = 1;
             for (side_i = 0; side_i < COMBAT_SIDE_COUNT; ++side_i) {
                 for (armyIndex_k = 0; armyIndex_k < m_armyCount[side_i]; ++armyIndex_k) {
@@ -2890,33 +2890,33 @@ void combatManager::CastMassSpell(i32 spell, i32 spellPower) {
             if (affected[side_i][armyIndex_k] != 0) {
                 target_i = &m_armies[side_i][armyIndex_k];
                 switch (spell) {
-                    case SPELL_MASS_CURSE:
+                    case IDX(SPELL_MASS_CURSE):
                         target_i->SetSpellInfluence(SPELL_INFLUENCE_CURSE, spellPower);
                         break;
-                    case SPELL_MASS_SLOW:
+                    case IDX(SPELL_MASS_SLOW):
                         target_i->SetSpellInfluence(SPELL_INFLUENCE_SLOW, spellPower);
                         break;
-                    case SPELL_MASS_HASTE:
+                    case IDX(SPELL_MASS_HASTE):
                         target_i->SetSpellInfluence(SPELL_INFLUENCE_HASTE, spellPower);
                         break;
-                    case SPELL_MASS_BLESS:
+                    case IDX(SPELL_MASS_BLESS):
                         target_i->SetSpellInfluence(SPELL_INFLUENCE_BLESS, spellPower);
                         break;
-                    case SPELL_MASS_SHIELD:
+                    case IDX(SPELL_MASS_SHIELD):
                         target_i->SetSpellInfluence(SPELL_INFLUENCE_SHIELD, spellPower);
                         break;
-                    case SPELL_MASS_CURE:
+                    case IDX(SPELL_MASS_CURE):
                         target_i->Cure(spellPower);
                         break;
-                    case SPELL_MASS_DISPEL: {
+                    case IDX(SPELL_MASS_DISPEL): {
                         for (influence_e = 0; influence_e < SPELL_INFLUENCE_COUNT; ++influence_e)
                             target_i->CancelIndividualSpell(influence_e);
                         break;
                     }
-                    case SPELL_HOLY_WORD:
-                    case SPELL_HOLY_SHOUT:
-                    case SPELL_DEATH_RIPPLE:
-                    case SPELL_DEATH_WAVE:
+                    case IDX(SPELL_HOLY_WORD):
+                    case IDX(SPELL_HOLY_SHOUT):
+                    case IDX(SPELL_DEATH_RIPPLE):
+                    case IDX(SPELL_DEATH_WAVE):
                         break;
                 }
             }
@@ -2994,7 +2994,7 @@ void combatManager::MirrorImage(i32 targetHex) {
 mirror_found:
     AddArmy(
         m_currentSide,
-        source->m_monsterType,
+        IDX(source->m_monsterType),
         source->m_quantity,
         mirrorHex,
         MIRROR_ARMY_FLAG,
@@ -3004,9 +3004,9 @@ mirror_found:
         &m_armies[m_hexCells[mirrorHex].m_occupantSide][m_hexCells[mirrorHex].m_occupantIndex];
     image->m_monster.flags.abilityFlags |= MIRROR_MONSTER_ABILITY;
     i32 duration = m_spellPower[m_currentSide];
-    if (m_heroes[m_currentSide]->HasArtifact(ARTIFACT_ENCHANTED_HOURGLASS))
+    if (m_heroes[m_currentSide]->HasArtifact(IDX(ARTIFACT_ENCHANTED_HOURGLASS)))
         duration += SPELL_HOURGLASS_POWER_BONUS;
-    if (m_heroes[m_currentSide]->HasArtifact(ARTIFACT_WIZARD_HAT))
+    if (m_heroes[m_currentSide]->HasArtifact(IDX(ARTIFACT_WIZARD_HAT)))
         duration += SPELL_WIZARD_HAT_POWER_BONUS;
     image->m_roundCounter = duration;
     source->m_mirrorImageIndex = image->m_index;
@@ -3058,7 +3058,7 @@ void combatManager::SummonElemental(i32 monsterType, i32 spellPower) {
     i32 randomOffset_a = SRandom(0, 2);
     u32 summonHex = static_cast<u32>(COMBAT_HEX_EMPTY);
     if (m_heroes[m_currentSide] != 0
-        && m_heroes[m_currentSide]->HasArtifact(ARTIFACT_BOOK_ELEMENTS))
+        && m_heroes[m_currentSide]->HasArtifact(IDX(ARTIFACT_BOOK_ELEMENTS)))
         spellPower <<= 1;
     i32 offset;
     for (offset = 0; offset < 3; ++offset) {
@@ -3080,9 +3080,9 @@ void combatManager::SummonElemental(i32 monsterType, i32 spellPower) {
         &m_armies[m_hexCells[summonHex].m_occupantSide][m_hexCells[summonHex].m_occupantIndex];
     elementals->m_monster.flags.abilityFlags |= MIRROR_MONSTER_ABILITY;
     spellPower = m_spellPower[m_currentSide];
-    if (m_heroes[m_currentSide]->HasArtifact(ARTIFACT_ENCHANTED_HOURGLASS))
+    if (m_heroes[m_currentSide]->HasArtifact(IDX(ARTIFACT_ENCHANTED_HOURGLASS)))
         spellPower += SPELL_HOURGLASS_POWER_BONUS;
-    if (m_heroes[m_currentSide]->HasArtifact(ARTIFACT_WIZARD_HAT))
+    if (m_heroes[m_currentSide]->HasArtifact(IDX(ARTIFACT_WIZARD_HAT)))
         spellPower += SPELL_WIZARD_HAT_POWER_BONUS;
 }
 
@@ -3262,7 +3262,7 @@ void combatManager::Resurrect(i32 spell, i32 targetHex, i32 spellPower) {
     i32 unusedResurrectWord3;
     i32 unusedResurrectWord9;
 
-    if (m_heroes[m_currentSide] != 0 && m_heroes[m_currentSide]->HasArtifact(ARTIFACT_ANKH))
+    if (m_heroes[m_currentSide] != 0 && m_heroes[m_currentSide]->HasArtifact(IDX(ARTIFACT_ANKH)))
         spellPower <<= 1;
     armyIndex_f = FindResurrectArmyIndex(m_currentSide, spell, targetHex);
     target_i = &m_armies[m_currentSide][armyIndex_f];
@@ -3431,33 +3431,33 @@ void combatManager::ModifyDamageForArtifacts(
     hero* defender
 ) {
     if (attacker != 0) {
-        if (attacker->HasArtifact(ARTIFACT_EVERCOLD_ICICLE)
+        if (attacker->HasArtifact(IDX(ARTIFACT_EVERCOLD_ICICLE))
             && (spell == SPELL_COLD_RAY || spell == SPELL_COLD_RING))
             *damage = static_cast<i32l>(*damage * SPELL_ARTIFACT_DAMAGE_BONUS);
-        if (attacker->HasArtifact(ARTIFACT_EVERHOT_LAVA_ROCK)
+        if (attacker->HasArtifact(IDX(ARTIFACT_EVERHOT_LAVA_ROCK))
             && (spell == SPELL_FIREBALL || spell == SPELL_FIREBLAST))
             *damage = static_cast<i32l>(*damage * SPELL_ARTIFACT_DAMAGE_BONUS);
-        if (attacker->HasArtifact(ARTIFACT_LIGHTNING_ROD)
+        if (attacker->HasArtifact(IDX(ARTIFACT_LIGHTNING_ROD))
             && (spell == SPELL_LIGHTNING_BOLT || spell == SPELL_CHAIN_LIGHTNING))
             *damage = static_cast<i32l>(*damage * SPELL_ARTIFACT_DAMAGE_BONUS);
     }
     if (defender != 0) {
-        if (defender->HasArtifact(ARTIFACT_ICE_CLOAK)
+        if (defender->HasArtifact(IDX(ARTIFACT_ICE_CLOAK))
             && (spell == SPELL_COLD_RAY || spell == SPELL_COLD_RING))
             *damage = static_cast<i32l>(*damage * SPELL_ARTIFACT_DAMAGE_REDUCTION);
-        if (defender->HasArtifact(ARTIFACT_FIRE_CLOAK)
+        if (defender->HasArtifact(IDX(ARTIFACT_FIRE_CLOAK))
             && (spell == SPELL_FIREBALL || spell == SPELL_FIREBLAST))
             *damage = static_cast<i32l>(*damage * SPELL_ARTIFACT_DAMAGE_REDUCTION);
-        if (defender->HasArtifact(ARTIFACT_LIGHTNING_HELM)
+        if (defender->HasArtifact(IDX(ARTIFACT_LIGHTNING_HELM))
             && (spell == SPELL_LIGHTNING_BOLT || spell == SPELL_CHAIN_LIGHTNING))
             *damage = static_cast<i32l>(*damage * SPELL_ARTIFACT_DAMAGE_REDUCTION);
-        if (defender->HasArtifact(ARTIFACT_HEART_FIRE)) {
+        if (defender->HasArtifact(IDX(ARTIFACT_HEART_FIRE))) {
             if (spell == SPELL_COLD_RAY || spell == SPELL_COLD_RING)
                 *damage <<= 1;
             else if (spell == SPELL_FIREBALL || spell == SPELL_FIREBLAST)
                 *damage = static_cast<i32l>(*damage * SPELL_ARTIFACT_DAMAGE_REDUCTION);
         }
-        if (defender->HasArtifact(ARTIFACT_HEART_ICE)) {
+        if (defender->HasArtifact(IDX(ARTIFACT_HEART_ICE))) {
             if (spell == SPELL_COLD_RAY || spell == SPELL_COLD_RING)
                 *damage = static_cast<i32l>(*damage * SPELL_ARTIFACT_DAMAGE_REDUCTION);
             else if (spell == SPELL_FIREBALL || spell == SPELL_FIREBLAST)
@@ -3607,7 +3607,7 @@ void combatManager::Earthquake(void) {
         }
 
         newTowerStates[structure] = m_wallStates[structure];
-        if (m_wallStates[structure] != COMBAT_WALL_STATE_DESTROYED
+        if (m_wallStates[structure] != IDX(COMBAT_WALL_STATE_DESTROYED)
             && SRandom(0, 100) < EARTHQUAKE_TOWER_HIT_CHANCE) {
             newTowerStates[structure] = COMBAT_WALL_STATE_DESTROYED;
             impactPositions[impactCount][IDX(COMBAT_COORDINATE_X)] =

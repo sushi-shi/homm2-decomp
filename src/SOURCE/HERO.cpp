@@ -96,7 +96,7 @@ i32 hero::CalcMobility(void) {
         if (m_owner != -1)
             mobilityResult += gpGame->MineTypesOwned(m_owner, HERO_LIGHTHOUSE_MINE_TYPE)
                               * lighthouseBonusIncrement;
-        if (HasArtifact(ARTIFACT_SAILORS_ASTROLABE))
+        if (HasArtifact(IDX(ARTIFACT_SAILORS_ASTROLABE)))
             mobilityResult += astrolabeBonus;
     } else {
         slowestSpeedValue = 7;
@@ -111,15 +111,15 @@ i32 hero::CalcMobility(void) {
         mobilityResult = static_cast<i32>(
             mobilityResult * gfSSLogisticsMod[m_secondarySkills[IDX(HERO_SKILL_LOGISTICS)]]
         );
-        if (HasArtifact(ARTIFACT_NOMAD_BOOTS))
+        if (HasArtifact(IDX(ARTIFACT_NOMAD_BOOTS)))
             mobilityResult += nomadBootsMobilityBonus;
-        if (HasArtifact(ARTIFACT_TRAVELER_BOOTS))
+        if (HasArtifact(IDX(ARTIFACT_TRAVELER_BOOTS)))
             mobilityResult += travelerBonus;
         if (HAS(m_eventFlags, HERO_EVENT_STABLES))
             mobilityResult += HERO_STABLES_MOBILITY_BONUS;
     }
 
-    if (HasArtifact(ARTIFACT_TRUE_COMPASS))
+    if (HasArtifact(IDX(ARTIFACT_TRUE_COMPASS)))
         mobilityResult += compassMobility;
 
     if (m_owner >= 0 && m_owner < 6 && !gbHumanPlayer[m_owner] && gpGame->m_difficulty >= 2) {
@@ -134,17 +134,17 @@ VA(0x0046c79d, 0xcf)
 i32 hero::HasSpell(i32 spell) {
     i32 artifactIndex;
 
-    if (!HasArtifact(ARTIFACT_MAGIC_BOOK))
+    if (!HasArtifact(IDX(ARTIFACT_MAGIC_BOOK)))
         return 0;
     if (m_spells[spell])
         return 1;
     for (artifactIndex = 0; artifactIndex < HERO_ARTIFACT_SLOT_COUNT; artifactIndex++) {
-        if (m_artifacts[artifactIndex] == ARTIFACT_SPELL_SCROLL
+        if (m_artifacts[artifactIndex] == IDX(ARTIFACT_SPELL_SCROLL)
             && m_artifactExtra[artifactIndex] == spell) {
             return 1;
         }
     }
-    if (HasArtifact(ARTIFACT_BATTLE_GARB) && spell == SPELL_TOWN_PORTAL)
+    if (HasArtifact(IDX(ARTIFACT_BATTLE_GARB)) && spell == SPELL_TOWN_PORTAL)
         return 1;
     return 0;
 }
@@ -200,11 +200,11 @@ i32 hero::GetNumSpells(i32 type) {
     }
 
     switch (type) {
-        case HERO_SPELL_TYPE_COMBAT:
+        case IDX(HERO_SPELL_TYPE_COMBAT):
             return numCombatSpells;
-        case HERO_SPELL_TYPE_ADVENTURE:
+        case IDX(HERO_SPELL_TYPE_ADVENTURE):
             return numAdventureSpells;
-        case HERO_SPELL_TYPE_ALL:
+        case IDX(HERO_SPELL_TYPE_ALL):
             return numCombatSpells + numAdventureSpells;
     }
     return 0;
@@ -503,8 +503,8 @@ void hero::Deallocate(i32 updateMap) {
     if (!gbCombatSurrender)
         gpGame->SetRandomHeroArmies(m_id, RANDOM_HERO_NORMAL_ARMY);
 
-    if (gbInCampaign && m_portrait == CAMPAIGN_HERO_CORLAGON
-        && gpGame->m_campaignType == CAMPAIGN_ROLAND
+    if (gbInCampaign && m_portrait == IDX(CAMPAIGN_HERO_CORLAGON)
+        && gpGame->m_campaignType == IDX(CAMPAIGN_ROLAND)
         && gpGame->m_campaignScenario + 1 == CAMPAIGN_ROLAND_FINAL_SCENARIO && !gbRetreatWin
         && !gbCombatSurrender) {
         gpGame->m_campaignAwards[IDX(CAMPAIGN_AWARD_CORLAGON_DEFEATED)] = 1;
@@ -725,9 +725,9 @@ void hero::CheckLevel(void) {
 
             for (indexValue = 0; indexValue < HERO_SECONDARY_SKILL_CHOICE_COUNT; indexValue++) {
                 skillChoicesResult[indexValue] = HERO_SECONDARY_SKILL_NONE;
-                if (indexValue == 0 && m_cursorType != FACTION_BARBARIAN
-                    && m_cursorType != FACTION_KNIGHT
-                    && m_secondarySkills[IDX(HERO_SKILL_WISDOM)] < HERO_SKILL_LEVEL_EXPERT
+                if (indexValue == 0 && m_cursorType != IDX(FACTION_BARBARIAN)
+                    && m_cursorType != IDX(FACTION_KNIGHT)
+                    && m_secondarySkills[IDX(HERO_SKILL_WISDOM)] < IDX(HERO_SKILL_LEVEL_EXPERT)
                     && currentLevelIndex - m_enabled >= HERO_SECONDARY_SKILL_OFFER_GAP) {
                     skillChoicesResult[indexValue] = HERO_SKILL_WISDOM;
                 } else {
@@ -737,9 +737,9 @@ void hero::CheckLevel(void) {
                     while (attempts < HERO_SECONDARY_SKILL_SEARCH_LIMIT) {
                         attempts++;
                         if ((indexValue == 0 || skillChoicesResult[0] != skillIndexValue)
-                            && ((m_secondarySkills[skillIndexValue] != HERO_SKILL_LEVEL_NONE
-                                 && m_secondarySkills[skillIndexValue] < HERO_SKILL_LEVEL_EXPERT)
-                                || (m_secondarySkills[skillIndexValue] == HERO_SKILL_LEVEL_NONE
+                            && ((m_secondarySkills[skillIndexValue] != IDX(HERO_SKILL_LEVEL_NONE)
+                                 && m_secondarySkills[skillIndexValue] < IDX(HERO_SKILL_LEVEL_EXPERT))
+                                || (m_secondarySkills[skillIndexValue] == IDX(HERO_SKILL_LEVEL_NONE)
                                     && m_secondarySkillCount < HERO_SECONDARY_SKILL_CAPACITY))) {
                             skillWeightIndex -= iGetSSByAlignment[skillIndexValue][m_cursorType];
                             if (skillWeightIndex <= 0) {
@@ -992,10 +992,10 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
         case HERO_UI_ARTIFACT_FIRST + 12:
         case HERO_UI_ARTIFACT_LAST:
             if (gpHVHero->m_artifacts[message.payload.widget.id - HERO_UI_ARTIFACT_FIRST]
-                == ARTIFACT_NONE)
+                == IDX(ARTIFACT_NONE))
                 sprintf(gText, cHeroScreen[IDX(HERO_TEXT_EMPTY)]);
             else if (gpHVHero->m_artifacts[message.payload.widget.id - HERO_UI_ARTIFACT_FIRST]
-                     == ARTIFACT_MAGIC_BOOK)
+                     == IDX(ARTIFACT_MAGIC_BOOK))
                 strcpy(gText, cHeroScreen[IDX(HERO_TEXT_VIEW_SPELLS)]);
             else
                 sprintf(
@@ -1392,11 +1392,11 @@ i32 HeroHandler(struct tag_message& message) {
                     case HERO_UI_ARTIFACT_LAST:
                         if (gpHVHero
                                 ->m_artifacts[message.payload.widget.id - HERO_UI_ARTIFACT_FIRST]
-                            != ARTIFACT_NONE) {
+                            != IDX(ARTIFACT_NONE)) {
                             if (quickView0 == 0
                                 && gpHVHero->m_artifacts
                                            [message.payload.widget.id - HERO_UI_ARTIFACT_FIRST]
-                                       == ARTIFACT_MAGIC_BOOK) {
+                                       == IDX(ARTIFACT_MAGIC_BOOK)) {
                                 gpGame->ViewSpells(
                                     gpHVHero,
                                     HERO_UI_VIEW_SPELLS_ALL,
@@ -1757,7 +1757,7 @@ void SetupHeroView(void) {
 
     for (index = 0; index < HERO_ARTIFACT_SLOT_COUNT; index++) {
         message.payload.widget.id = HERO_UI_ARTIFACT_FIRST + index;
-        if (gpHVHero->m_artifacts[index] != ARTIFACT_NONE) {
+        if (gpHVHero->m_artifacts[index] != IDX(ARTIFACT_NONE)) {
             message.payload.widget.command = HERO_UI_WIDGET_ENABLE;
             message.payload.widget.data.value = HERO_UI_ARTIFACT_CONTROL_VALUE;
             heroWin->BroadcastMessage(message);
@@ -1832,8 +1832,8 @@ void DoHeroSplit(i32 destinationSlot, i32 sourceSlot) {
 VA(0x004701e1, 0x6a)
 void hero::SetSS(i32 skill, i32 level) {
     if (level == HERO_SKILL_LEVEL_NONE)
-        TakeSS(skill, HERO_SKILL_LEVEL_EXPERT);
-    else if (m_secondarySkills[skill] != HERO_SKILL_LEVEL_NONE)
+        TakeSS(skill, IDX(HERO_SKILL_LEVEL_EXPERT));
+    else if (m_secondarySkills[skill] != IDX(HERO_SKILL_LEVEL_NONE))
         m_secondarySkills[skill] = static_cast<i8>(level);
     else
         GiveSS(skill, level);
@@ -1851,11 +1851,11 @@ i32 hero::TakeSS(i32 skill, i32 levels) {
     i32 otherSkill;
 
     oldLevel = m_secondarySkills[skill];
-    if (m_secondarySkills[skill] != HERO_SKILL_LEVEL_NONE) {
+    if (m_secondarySkills[skill] != IDX(HERO_SKILL_LEVEL_NONE)) {
         m_secondarySkills[skill] -= levels;
-        if (m_secondarySkills[skill] < HERO_SKILL_LEVEL_NONE)
+        if (m_secondarySkills[skill] < IDX(HERO_SKILL_LEVEL_NONE))
             m_secondarySkills[skill] = IDX(HERO_SKILL_LEVEL_NONE);
-        if (m_secondarySkills[skill] == HERO_SKILL_LEVEL_NONE) {
+        if (m_secondarySkills[skill] == IDX(HERO_SKILL_LEVEL_NONE)) {
             for (otherSkill = 0; otherSkill < HERO_SKILL_COUNT; otherSkill++) {
                 if (m_secondarySkillOrder[otherSkill] > m_secondarySkillOrder[skill]) {
                     m_secondarySkillOrder[otherSkill]--;
@@ -1873,7 +1873,7 @@ i32 hero::GiveSS(i32 skill, i32 levels) {
     i32 oldLevel;
 
     oldLevel = m_secondarySkills[skill];
-    if (m_secondarySkills[skill] != HERO_SKILL_LEVEL_NONE) {
+    if (m_secondarySkills[skill] != IDX(HERO_SKILL_LEVEL_NONE)) {
         m_secondarySkills[skill] += levels;
     } else {
         if (m_secondarySkillCount < HERO_SECONDARY_SKILL_CAPACITY) {
@@ -1882,7 +1882,7 @@ i32 hero::GiveSS(i32 skill, i32 levels) {
             m_secondarySkillOrder[skill] = static_cast<u8>(m_secondarySkillCount);
         }
     }
-    if (m_secondarySkills[skill] > HERO_SKILL_LEVEL_EXPERT)
+    if (m_secondarySkills[skill] > IDX(HERO_SKILL_LEVEL_EXPERT))
         m_secondarySkills[skill] = IDX(HERO_SKILL_LEVEL_EXPERT);
     return m_secondarySkills[skill] - oldLevel;
 }
@@ -1947,11 +1947,11 @@ i8 hero::GetSSLevel(i32 skill) {
     level = m_secondarySkills[skill];
     if (skill != HERO_SKILL_NECROMANCY)
         return level;
-    if (level == HERO_SKILL_LEVEL_NONE)
+    if (level == IDX(HERO_SKILL_LEVEL_NONE))
         return level;
-    if (HasArtifact(ARTIFACT_SPADE_NECROMANCY))
+    if (HasArtifact(IDX(ARTIFACT_SPADE_NECROMANCY)))
         shrineAndArtifactBonus++;
-    if (m_cursorType == FACTION_NECROMANCER)
+    if (m_cursorType == IDX(FACTION_NECROMANCER))
         shrineAndArtifactBonus += gpGame->CountShrines(m_owner);
     if (shrineAndArtifactBonus > HERO_NECROMANCY_BONUS_MAX)
         shrineAndArtifactBonus = HERO_NECROMANCY_BONUS_MAX;
@@ -2005,12 +2005,12 @@ VA(0x00470779, 0x12f)
 void hero::CheckAnduranPieces(i32 showDialog) {
     i32 artifactSlot;
 
-    if (HasArtifact(ARTIFACT_BREASTPLATE_ANDURAN) && HasArtifact(ARTIFACT_HELMET_ANDURAN)
-        && HasArtifact(ARTIFACT_SWORD_ANDURAN)) {
+    if (HasArtifact(IDX(ARTIFACT_BREASTPLATE_ANDURAN)) && HasArtifact(IDX(ARTIFACT_HELMET_ANDURAN))
+        && HasArtifact(IDX(ARTIFACT_SWORD_ANDURAN))) {
         for (artifactSlot = 0; artifactSlot < HERO_ARTIFACT_SLOT_COUNT; artifactSlot++) {
-            if (m_artifacts[artifactSlot] == ARTIFACT_BREASTPLATE_ANDURAN
-                || m_artifacts[artifactSlot] == ARTIFACT_HELMET_ANDURAN
-                || m_artifacts[artifactSlot] == ARTIFACT_SWORD_ANDURAN) {
+            if (m_artifacts[artifactSlot] == IDX(ARTIFACT_BREASTPLATE_ANDURAN)
+                || m_artifacts[artifactSlot] == IDX(ARTIFACT_HELMET_ANDURAN)
+                || m_artifacts[artifactSlot] == IDX(ARTIFACT_SWORD_ANDURAN)) {
                 GiveTakeArtifactStat(this, m_artifacts[artifactSlot], EVENT_ARTIFACT_TAKE);
                 m_artifacts[artifactSlot] = IDX(ARTIFACT_NONE);
             }

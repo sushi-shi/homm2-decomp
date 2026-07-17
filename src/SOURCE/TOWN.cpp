@@ -52,9 +52,9 @@ void town::GiveSpells(hero* targetHero) {
     else
         activeHero = gpGame->GetHero(m_occupyingHeroId);
 
-    if (!activeHero->HasArtifact(ARTIFACT_MAGIC_BOOK))
+    if (!activeHero->HasArtifact(IDX(ARTIFACT_MAGIC_BOOK)))
         return;
-    if (!(m_buildings & TOWN_BUILDING_MAGE_GUILD))
+    if (!(m_buildings & IDX(TOWN_BUILDING_MAGE_GUILD)))
         return;
 
     for (level = 0; level < activeHero->m_secondarySkills[IDX(HERO_SKILL_WISDOM)]
@@ -156,12 +156,12 @@ void town::BuildBuilding(i32 building) {
     if (building == TOWN_OBJECT_MAGE_GUILD) {
         ++m_buildState;
         m_spellCounts[m_buildState] = gSpellLimits[m_buildState - TOWN_MAGE_GUILD_FIRST_LEVEL];
-        if (m_type == FACTION_WIZARD && (m_buildings & TOWN_BUILDING_LIBRARY))
+        if (m_type == IDX(FACTION_WIZARD) && (m_buildings & IDX(TOWN_BUILDING_LIBRARY)))
             ++m_spellCounts[m_buildState];
         if (m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE)
             GiveSpells(0);
     }
-    if (building == TOWN_OBJECT_SPECIAL_BUILDING && m_type == FACTION_WIZARD) {
+    if (building == TOWN_OBJECT_SPECIAL_BUILDING && m_type == IDX(FACTION_WIZARD)) {
         for (level = 0; level < m_buildState; ++level)
             ++m_spellCounts[level + TOWN_MAGE_GUILD_FIRST_LEVEL];
         if (m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE)
@@ -170,17 +170,17 @@ void town::BuildBuilding(i32 building) {
 
     m_buildings |= 1L << building;
     if (building == TOWN_OBJECT_UPGRADED_DWELLING_2)
-        m_buildings &= ~TOWN_BUILDING_DWELLING_2;
+        m_buildings &= ~IDX(TOWN_BUILDING_DWELLING_2);
     if (building == TOWN_OBJECT_UPGRADED_DWELLING_3)
-        m_buildings &= ~TOWN_BUILDING_DWELLING_3;
+        m_buildings &= ~IDX(TOWN_BUILDING_DWELLING_3);
     if (building == TOWN_OBJECT_UPGRADED_DWELLING_4)
-        m_buildings &= ~TOWN_BUILDING_DWELLING_4;
+        m_buildings &= ~IDX(TOWN_BUILDING_DWELLING_4);
     if (building == TOWN_OBJECT_UPGRADED_DWELLING_5)
-        m_buildings &= ~TOWN_BUILDING_DWELLING_5;
+        m_buildings &= ~IDX(TOWN_BUILDING_DWELLING_5);
     if (building == TOWN_OBJECT_UPGRADED_DWELLING_6)
-        m_buildings &= ~TOWN_BUILDING_DWELLING_6;
+        m_buildings &= ~IDX(TOWN_BUILDING_DWELLING_6);
     if (building == TOWN_OBJECT_ALTERNATE_UPGRADED_DWELLING_6)
-        m_buildings &= ~(TOWN_BUILDING_DWELLING_6 | TOWN_BUILDING_UPGRADED_DWELLING_6);
+        m_buildings &= ~(IDX(TOWN_BUILDING_DWELLING_6) | IDX(TOWN_BUILDING_UPGRADED_DWELLING_6));
 
     if (building >= TOWN_OBJECT_DWELLING_1 && building <= TOWN_OBJECT_DWELLING_6) {
         m_garrison[building - TOWN_OBJECT_DWELLING_1] =
@@ -196,7 +196,7 @@ void town::BuildBuilding(i32 building) {
             m_garrison[building - TOWN_OBJECT_DWELLING_2];
     }
     if (building == TOWN_OBJECT_CASTLE) {
-        m_buildings &= ~TOWN_BUILDING_TENT;
+        m_buildings &= ~IDX(TOWN_BUILDING_TENT);
         XformToCastle();
     }
     GiveSpells(0);

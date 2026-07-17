@@ -1347,26 +1347,26 @@ void GetMonsterCost(i32 monster, i32* const cost) {
         cost[idx] = 0;
     cost[IDX(RES_GOLD)] = gMonsterDatabase[monster].cost;
     switch (monster) {
-        case KB_MONSTER_NEEDS_GEMS_EXPANSION:
+        case IDX(KB_MONSTER_NEEDS_GEMS_EXPANSION):
             cost[IDX(RES_GEMS)] = 1;
             break;
-        case KB_MONSTER_NEEDS_MERCURY:
+        case IDX(KB_MONSTER_NEEDS_MERCURY):
             cost[IDX(RES_MERCURY)] = 1;
             break;
-        case KB_MONSTER_NEEDS_CRYSTAL:
+        case IDX(KB_MONSTER_NEEDS_CRYSTAL):
             cost[IDX(RES_CRYSTAL)] = 1;
             break;
-        case KB_MONSTER_NEEDS_SULFUR_FIRST:
-        case KB_MONSTER_NEEDS_SULFUR_SECOND:
+        case IDX(KB_MONSTER_NEEDS_SULFUR_FIRST):
+        case IDX(KB_MONSTER_NEEDS_SULFUR_SECOND):
             cost[IDX(RES_SULFUR)] = 1;
             break;
-        case KB_MONSTER_NEEDS_TWO_SULFUR:
+        case IDX(KB_MONSTER_NEEDS_TWO_SULFUR):
             cost[IDX(RES_SULFUR)] = 2;
             break;
-        case KB_MONSTER_NEEDS_GEMS:
+        case IDX(KB_MONSTER_NEEDS_GEMS):
             cost[IDX(RES_GEMS)] = 1;
             break;
-        case KB_MONSTER_NEEDS_TWO_GEMS:
+        case IDX(KB_MONSTER_NEEDS_TWO_GEMS):
             cost[IDX(RES_GEMS)] = 2;
             break;
     }
@@ -1384,10 +1384,10 @@ i32 CanBuild(town* t, i32 building) {
     i32 haveMask;
     if (BitTest(gpGame->m_knownTowns, t->m_id))
         return 0;
-    if (building != BUILDING_SLOT_CASTLE && !(t->m_buildings & TOWN_BUILDING_CASTLE))
+    if (building != IDX(BUILDING_SLOT_CASTLE) && !(t->m_buildings & IDX(TOWN_BUILDING_CASTLE)))
         return 0;
     if (!xIsExpansionMap && building == BUILDING_SLOT_NECROMANCER_SHRINE
-        && t->m_type == FACTION_NECROMANCER)
+        && t->m_type == IDX(FACTION_NECROMANCER))
         return 0;
     if (building == BUILDING_SLOT_DOCK) {
         if (t->CanBuildDock())
@@ -1404,18 +1404,18 @@ i32 CanBuild(town* t, i32 building) {
     if (building < BUILDING_SLOT_DWELLING_FIRST || building > BUILDING_SLOT_DWELLING_LAST)
         return 1;
     if ((building == BUILDING_SLOT_DWELLING_SECOND
-         && (t->m_buildings & KB_DWELLING_UPGRADE_FIRST_FLAG))
+         && (t->m_buildings & IDX(KB_DWELLING_UPGRADE_FIRST_FLAG)))
         || (building == BUILDING_SLOT_DWELLING_THIRD
-            && (t->m_buildings & KB_DWELLING_UPGRADE_SECOND_FLAG))
+            && (t->m_buildings & IDX(KB_DWELLING_UPGRADE_SECOND_FLAG)))
         || (building == BUILDING_SLOT_DWELLING_FOURTH
-            && (t->m_buildings & KB_DWELLING_UPGRADE_THIRD_FLAG))
+            && (t->m_buildings & IDX(KB_DWELLING_UPGRADE_THIRD_FLAG)))
         || (building == BUILDING_SLOT_DWELLING_FIFTH
-            && (t->m_buildings & KB_DWELLING_UPGRADE_FOURTH_FLAG))
+            && (t->m_buildings & IDX(KB_DWELLING_UPGRADE_FOURTH_FLAG)))
         || (building == BUILDING_SLOT_DWELLING_SIXTH
-            && ((t->m_buildings & KB_DWELLING_UPGRADE_FIFTH_FLAG)
-                || (t->m_buildings & KB_DWELLING_UPGRADE_SIXTH_FLAG)))
+            && ((t->m_buildings & IDX(KB_DWELLING_UPGRADE_FIFTH_FLAG))
+                || (t->m_buildings & IDX(KB_DWELLING_UPGRADE_SIXTH_FLAG))))
         || (building == BUILDING_SLOT_UPGRADE_LAST
-            && (t->m_buildings & KB_DWELLING_UPGRADE_SIXTH_FLAG)))
+            && (t->m_buildings & IDX(KB_DWELLING_UPGRADE_SIXTH_FLAG))))
         return 0;
     reqMask = gHierarchyMask[t->m_type][building - BUILDING_SLOT_DWELLING_FIRST];
     haveMask = t->m_buildings;
@@ -1432,7 +1432,7 @@ i32 CanBuild(town* t, i32 building) {
     if (haveMask & KB_DWELLING_UPGRADE_FIFTH_FLAG)
         haveMask |= KB_DWELLING_FIFTH_FLAG;
     if ((reqMask & haveMask) == reqMask) {
-        if (t->m_type == FACTION_NECROMANCER
+        if (t->m_type == IDX(FACTION_NECROMANCER)
             && building == BUILDING_SLOT_NECROMANCER_MAGE_PREREQUISITE && t->m_buildState <= 1)
             return 0;
         return 1;
@@ -1722,13 +1722,13 @@ i32 EventWindowHandler(struct tag_message& msg) {
                                 0
                             );
                             break;
-                        case RES_WOOD:
-                        case RES_MERCURY:
-                        case RES_ORE:
-                        case RES_SULFUR:
-                        case RES_CRYSTAL:
-                        case RES_GEMS:
-                        case RES_GOLD:
+                        case IDX(RES_WOOD):
+                        case IDX(RES_MERCURY):
+                        case IDX(RES_ORE):
+                        case IDX(RES_SULFUR):
+                        case IDX(RES_CRYSTAL):
+                        case IDX(RES_GEMS):
+                        case IDX(RES_GOLD):
                             NormalDialog(
                                 "{Resources}\n\nThere are seven resources in Heroes 2, used to "
                                 "build and improves castles, purchase troops and recruit heroes.  "
@@ -1982,18 +1982,18 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
     winFlag = 0;
     defeated = 0;
     allowNormalVictory = 1;
-    if ((gpGame->m_mapHeader.victoryCondition != MAP_VICTORY_DEFEAT_ALL
+    if ((gpGame->m_mapHeader.victoryCondition != IDX(MAP_VICTORY_DEFEAT_ALL)
          && !gpGame->m_mapHeader.allowNormalVictory)
-        || (gbInCampaign && gpGame->m_campaignType == CHECK_END_GAME_ARCHIBALD_CAMPAIGN
-            && gpGame->m_campaignScenario + CHECK_END_GAME_SCENARIO_OFFSET
+        || (gbInCampaign && gpGame->m_campaignType == IDX(CHECK_END_GAME_ARCHIBALD_CAMPAIGN)
+            && gpGame->m_campaignScenario + IDX(CHECK_END_GAME_SCENARIO_OFFSET)
                    == CHECK_END_GAME_SIDE_SCENARIO)) {
         allowNormalVictory = 0;
     }
 
-    if (gpGame->m_mapHeader.victoryCondition == MAP_VICTORY_DEFEAT_SIDE
-        && gpGame->m_mapHeader.victoryConditionValue != CHECK_END_GAME_SIDE_SPECIAL_VALUE
-        && (!gbInCampaign || gpGame->m_campaignType != CHECK_END_GAME_ARCHIBALD_CAMPAIGN
-            || gpGame->m_campaignScenario + CHECK_END_GAME_SCENARIO_OFFSET
+    if (gpGame->m_mapHeader.victoryCondition == IDX(MAP_VICTORY_DEFEAT_SIDE)
+        && gpGame->m_mapHeader.victoryConditionValue != IDX(CHECK_END_GAME_SIDE_SPECIAL_VALUE)
+        && (!gbInCampaign || gpGame->m_campaignType != IDX(CHECK_END_GAME_ARCHIBALD_CAMPAIGN)
+            || gpGame->m_campaignScenario + IDX(CHECK_END_GAME_SCENARIO_OFFSET)
                    != CHECK_END_GAME_SIDE_SCENARIO)) {
         sideBelow_i = 0;
         sideAbove = 0;
@@ -2035,12 +2035,12 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
         }
     }
 
-    if (gpGame->m_mapHeader.victoryCondition == MAP_VICTORY_CAPTURE_TOWN) {
+    if (gpGame->m_mapHeader.victoryCondition == IDX(MAP_VICTORY_CAPTURE_TOWN)) {
         victoryTownData = gpGame->GetTown(gpGame->GetTownId(
             gpGame->m_mapHeader.victoryConditionValue,
             gpGame->m_mapHeader.victoryTownY
         ));
-        if (victoryTownData->m_owner != CHECK_END_GAME_NO_PLAYER
+        if (victoryTownData->m_owner != IDX(CHECK_END_GAME_NO_PLAYER)
             && (gbHumanPlayer[victoryTownData->m_owner] || gpGame->m_mapHeader.computerAlsoWins)) {
             if (gbThisNetHumanPlayer[victoryTownData->m_owner]) {
                 winFlag = 1;
@@ -2067,11 +2067,11 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
         }
     }
 
-    if (gpGame->m_mapHeader.lossCondition == MAP_LOSS_TOWN) {
+    if (gpGame->m_mapHeader.lossCondition == IDX(MAP_LOSS_TOWN)) {
         lossTown = gpGame->GetTown(
             gpGame->GetTownId(gpGame->m_mapHeader.lossConditionValue, gpGame->m_mapHeader.lossTownY)
         );
-        if (lossTown->m_owner == CHECK_END_GAME_NO_PLAYER || !gbHumanPlayer[lossTown->m_owner]) {
+        if (lossTown->m_owner == IDX(CHECK_END_GAME_NO_PLAYER) || !gbHumanPlayer[lossTown->m_owner]) {
             defeated = 1;
             if (!showedDialog) {
                 showedDialog = 1;
@@ -2081,13 +2081,13 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
         }
     }
 
-    if (gpGame->m_mapHeader.victoryCondition == MAP_VICTORY_ACCUMULATE_GOLD) {
+    if (gpGame->m_mapHeader.victoryCondition == IDX(MAP_VICTORY_ACCUMULATE_GOLD)) {
         bestGold = 0;
         winnerPlayer = CHECK_END_GAME_NO_PLAYER;
         for (player = 0; player < gpGame->m_playerCount; player++) {
             if ((gbHumanPlayer[player] || gpGame->m_mapHeader.computerAlsoWins)
                 && gpGame->m_players[player].m_resources[IDX(CHECK_END_GAME_GOLD_RESOURCE)]
-                       >= gpGame->m_mapHeader.victoryConditionValue * CHECK_END_GAME_GOLD_SCALE
+                       >= gpGame->m_mapHeader.victoryConditionValue * IDX(CHECK_END_GAME_GOLD_SCALE)
                 && gpGame->m_players[player].m_resources[IDX(CHECK_END_GAME_GOLD_RESOURCE)]
                        >= bestGold) {
                 bestGold = gpGame->m_players[player].m_resources[IDX(CHECK_END_GAME_GOLD_RESOURCE)];
@@ -2122,10 +2122,10 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
         }
     }
 
-    if (gpGame->m_mapHeader.victoryCondition == MAP_VICTORY_DEFEAT_HERO) {
+    if (gpGame->m_mapHeader.victoryCondition == IDX(MAP_VICTORY_DEFEAT_HERO)) {
         winningHeroEntry = GetHeroSlot(gpGame->m_mapHeader.victoryConditionValue);
         if (winningHeroEntry->m_owner < 0
-            || winningHeroEntry->m_owner >= CHECK_END_GAME_PLAYER_COUNT
+            || winningHeroEntry->m_owner >= IDX(CHECK_END_GAME_PLAYER_COUNT)
             || gbHumanPlayer[winningHeroEntry->m_owner]) {
             winFlag = 1;
             if (!showedDialog) {
@@ -2140,9 +2140,9 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
         }
     }
 
-    if (gpGame->m_mapHeader.lossCondition == MAP_LOSS_HERO) {
+    if (gpGame->m_mapHeader.lossCondition == IDX(MAP_LOSS_HERO)) {
         lossHero = GetHeroSlot(gpGame->m_mapHeader.lossConditionValue);
-        if (lossHero->m_owner < 0 || lossHero->m_owner >= CHECK_END_GAME_PLAYER_COUNT
+        if (lossHero->m_owner < 0 || lossHero->m_owner >= IDX(CHECK_END_GAME_PLAYER_COUNT)
             || !gbHumanPlayer[lossHero->m_owner]) {
             defeated = 1;
             if (!showedDialog) {
@@ -2153,7 +2153,7 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
         }
     }
 
-    if (gpGame->m_mapHeader.lossCondition == MAP_LOSS_TIME) {
+    if (gpGame->m_mapHeader.lossCondition == IDX(MAP_LOSS_TIME)) {
         if (gpGame->m_mapHeader.lossConditionValue
             < (gpGame->m_week - 1) * CHECK_END_GAME_DAYS_PER_WEEK
                   + (gpGame->m_month - 1) * CHECK_END_GAME_DAYS_PER_MONTH + gpGame->m_day) {
@@ -2166,7 +2166,7 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
         }
     }
 
-    if (gpGame->m_mapHeader.victoryCondition == MAP_VICTORY_FIND_ARTIFACT) {
+    if (gpGame->m_mapHeader.victoryCondition == IDX(MAP_VICTORY_FIND_ARTIFACT)) {
         artifactWinnerPerson = CHECK_END_GAME_NO_PLAYER;
         for (player = 0; player < gpGame->m_playerCount; player++) {
             if (!gpGame->m_playerDead[player]) {
@@ -2174,21 +2174,21 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
                      heroIndex++) {
                     artifactHeroPtr = gpGame->GetPlayerHero(player, heroIndex);
                     if (gpGame->m_mapHeader.victoryConditionValue
-                        > CHECK_END_GAME_ULTIMATE_ARTIFACT) {
+                        > IDX(CHECK_END_GAME_ULTIMATE_ARTIFACT)) {
                         if (artifactHeroPtr->HasArtifact(
                                 gpGame->m_mapHeader.victoryConditionValue - 1
                             )) {
                             artifactWinnerPerson = player;
                         }
                     } else {
-                        if (artifactHeroPtr->HasArtifact(ARTIFACT_ULTIMATE_BOOK)
-                            || artifactHeroPtr->HasArtifact(ARTIFACT_ULTIMATE_SWORD)
-                            || artifactHeroPtr->HasArtifact(ARTIFACT_ULTIMATE_CLOAK)
-                            || artifactHeroPtr->HasArtifact(ARTIFACT_ULTIMATE_WAND)
-                            || artifactHeroPtr->HasArtifact(ARTIFACT_ULTIMATE_SHIELD)
-                            || artifactHeroPtr->HasArtifact(ARTIFACT_ULTIMATE_STAFF)
-                            || artifactHeroPtr->HasArtifact(ARTIFACT_ULTIMATE_CROWN)
-                            || artifactHeroPtr->HasArtifact(ARTIFACT_GOLDEN_GOOSE)) {
+                        if (artifactHeroPtr->HasArtifact(IDX(ARTIFACT_ULTIMATE_BOOK))
+                            || artifactHeroPtr->HasArtifact(IDX(ARTIFACT_ULTIMATE_SWORD))
+                            || artifactHeroPtr->HasArtifact(IDX(ARTIFACT_ULTIMATE_CLOAK))
+                            || artifactHeroPtr->HasArtifact(IDX(ARTIFACT_ULTIMATE_WAND))
+                            || artifactHeroPtr->HasArtifact(IDX(ARTIFACT_ULTIMATE_SHIELD))
+                            || artifactHeroPtr->HasArtifact(IDX(ARTIFACT_ULTIMATE_STAFF))
+                            || artifactHeroPtr->HasArtifact(IDX(ARTIFACT_ULTIMATE_CROWN))
+                            || artifactHeroPtr->HasArtifact(IDX(ARTIFACT_GOLDEN_GOOSE))) {
                             artifactWinnerPerson = player;
                         }
                     }
@@ -2203,7 +2203,7 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
             }
             if (!showedDialog) {
                 showedDialog = 1;
-                if (gpGame->m_mapHeader.victoryConditionValue == CHECK_END_GAME_ULTIMATE_ARTIFACT) {
+                if (gpGame->m_mapHeader.victoryConditionValue == IDX(CHECK_END_GAME_ULTIMATE_ARTIFACT)) {
                     sprintf(artifactName, "Ultimate Artifact");
                 } else {
                     sprintf(
@@ -2225,13 +2225,13 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
         }
     }
 
-    if (gbInCampaign && gpGame->m_campaignType == CHECK_END_GAME_ROLAND_CAMPAIGN
-        && gpGame->m_campaignScenario + CHECK_END_GAME_SCENARIO_OFFSET
+    if (gbInCampaign && gpGame->m_campaignType == IDX(CHECK_END_GAME_ROLAND_CAMPAIGN)
+        && gpGame->m_campaignScenario + IDX(CHECK_END_GAME_SCENARIO_OFFSET)
                == CHECK_END_GAME_DWARF_SCENARIO) {
         hasDwarfTown = 0;
         for (player = 0; player < gpGame->m_players[0].m_townCount; player++) {
             if (gpGame->GetTown(gpGame->m_players[0].m_townIds[player])->m_type
-                == CHECK_END_GAME_DWARF_TOWN) {
+                == IDX(CHECK_END_GAME_DWARF_TOWN)) {
                 hasDwarfTown = 1;
             }
         }
@@ -2249,8 +2249,8 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
         }
     }
 
-    if (gbInCampaign && gpGame->m_campaignType == CHECK_END_GAME_ARCHIBALD_CAMPAIGN
-        && gpGame->m_campaignScenario + CHECK_END_GAME_SCENARIO_OFFSET
+    if (gbInCampaign && gpGame->m_campaignType == IDX(CHECK_END_GAME_ARCHIBALD_CAMPAIGN)
+        && gpGame->m_campaignScenario + IDX(CHECK_END_GAME_SCENARIO_OFFSET)
                == CHECK_END_GAME_SIDE_SCENARIO
         && dragonCityCaptured) {
         winFlag = 1;
@@ -2261,12 +2261,12 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
         }
     }
 
-    if (gbInCampaign && gpGame->m_campaignType == CHECK_END_GAME_ROLAND_CAMPAIGN
-        && gpGame->m_campaignScenario + CHECK_END_GAME_SCENARIO_OFFSET
+    if (gbInCampaign && gpGame->m_campaignType == IDX(CHECK_END_GAME_ROLAND_CAMPAIGN)
+        && gpGame->m_campaignScenario + IDX(CHECK_END_GAME_SCENARIO_OFFSET)
                == CHECK_END_GAME_ROLAND_CAPTURE_SCENARIO) {
         hasRoland_j = 0;
         for (player = 0; player < CHECK_END_GAME_HERO_COUNT; player++) {
-            if (gpGame->m_heroRecs[player].m_portrait == CHECK_END_GAME_ROLAND_HERO
+            if (gpGame->m_heroRecs[player].m_portrait == IDX(CHECK_END_GAME_ROLAND_HERO)
                 && gpGame->m_heroRecs[player].m_owner >= 0
                 && gpGame->m_heroRecs[player].m_owner <= CHECK_END_GAME_PLAYER_COUNT - 1) {
                 hasRoland_j = 1;
@@ -2282,14 +2282,14 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
         }
     }
 
-    if (gbInCampaign && gpGame->m_campaignType == CHECK_END_GAME_ROLAND_CAMPAIGN
-        && gpGame->m_campaignScenario + CHECK_END_GAME_SCENARIO_OFFSET
+    if (gbInCampaign && gpGame->m_campaignType == IDX(CHECK_END_GAME_ROLAND_CAMPAIGN)
+        && gpGame->m_campaignScenario + IDX(CHECK_END_GAME_SCENARIO_OFFSET)
                == CHECK_END_GAME_ROLAND_CAPTURE_SCENARIO) {
         enemyRemaining = 0;
         for (player = 0; player < gpGame->m_playerCount; player++) {
             if (!gpGame->m_playerDead[player]
-                && gpGame->m_players[player].m_color != CHECK_END_GAME_ROLAND_COLOR
-                && gpGame->m_players[player].m_color != CHECK_END_GAME_ALLY_COLOR) {
+                && gpGame->m_players[player].m_color != IDX(CHECK_END_GAME_ROLAND_COLOR)
+                && gpGame->m_players[player].m_color != IDX(CHECK_END_GAME_ALLY_COLOR)) {
                 enemyRemaining = 1;
             }
         }
@@ -2359,25 +2359,25 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
             + gpGame->m_campaignScenarioBonus[gpGame->m_campaignType][gpGame->m_campaignScenario];
 
         carryoverHeroId = CHECK_END_GAME_NO_PLAYER;
-        if (gpGame->m_campaignType == CHECK_END_GAME_ROLAND_CAMPAIGN
-            && gpGame->m_campaignScenario + CHECK_END_GAME_SCENARIO_OFFSET
+        if (gpGame->m_campaignType == IDX(CHECK_END_GAME_ROLAND_CAMPAIGN)
+            && gpGame->m_campaignScenario + IDX(CHECK_END_GAME_SCENARIO_OFFSET)
                    == CHECK_END_GAME_SIDE_SCENARIO) {
             carryoverHeroId = CHECK_END_GAME_SIDE_SPECIAL_VALUE;
         }
-        if (gpGame->m_campaignType == CHECK_END_GAME_ARCHIBALD_CAMPAIGN
-            && gpGame->m_campaignScenario + CHECK_END_GAME_SCENARIO_OFFSET
+        if (gpGame->m_campaignType == IDX(CHECK_END_GAME_ARCHIBALD_CAMPAIGN)
+            && gpGame->m_campaignScenario + IDX(CHECK_END_GAME_SCENARIO_OFFSET)
                    == CHECK_END_GAME_FIRST_NO_SAVE_SCENARIO) {
             carryoverHeroId = CHECK_END_GAME_SIDE_SPECIAL_VALUE;
         }
 
-        if (carryoverHeroId != CHECK_END_GAME_NO_PLAYER) {
+        if (carryoverHeroId != IDX(CHECK_END_GAME_NO_PLAYER)) {
             for (player = 0; player < CHECK_END_GAME_ARMY_SLOTS; player++) {
                 gpGame->m_campaignCarryoverCreatureTypes[player] = IDX(CHECK_END_GAME_EMPTY_ARMY);
                 gpGame->m_campaignCarryoverCreatureCounts[player] = 0;
             }
             for (campaignHeroIndex = 0; campaignHeroIndex < gpGame->m_players[0].m_heroCount;
                  campaignHeroIndex++) {
-                if (carryoverHeroId == CHECK_END_GAME_SIDE_SPECIAL_VALUE
+                if (carryoverHeroId == IDX(CHECK_END_GAME_SIDE_SPECIAL_VALUE)
                     || gpGame->m_heroRecs[gpGame->m_players[0].m_heroIds[campaignHeroIndex]]
                                .m_portrait
                            == carryoverHeroId) {
@@ -2399,16 +2399,16 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
             }
         }
 
-        if (gpGame->m_campaignScenario + CHECK_END_GAME_SCENARIO_OFFSET
+        if (gpGame->m_campaignScenario + IDX(CHECK_END_GAME_SCENARIO_OFFSET)
                 != CHECK_END_GAME_LAST_SCENARIO
-            && (gpGame->m_campaignScenario + CHECK_END_GAME_SCENARIO_OFFSET
+            && (gpGame->m_campaignScenario + IDX(CHECK_END_GAME_SCENARIO_OFFSET)
                     != CHECK_END_GAME_FIRST_NO_SAVE_SCENARIO
-                || gpGame->m_campaignType != CHECK_END_GAME_ROLAND_CAMPAIGN)) {
+                || gpGame->m_campaignType != IDX(CHECK_END_GAME_ROLAND_CAMPAIGN))) {
             sprintf(
                 campaignSaveName,
                 "%s%c_%02d",
                 "WIN_",
-                gpGame->m_campaignType == CHECK_END_GAME_ROLAND_CAMPAIGN ? 'G' : 'E',
+                gpGame->m_campaignType == IDX(CHECK_END_GAME_ROLAND_CAMPAIGN) ? 'G' : 'E',
                 gpGame->m_campaignScenario + 1
             );
             gpGame->SaveGame(campaignSaveName, 1, 0);
@@ -2513,7 +2513,7 @@ void game::ShowMoraleInfo(hero* h, i32 dialogType) {
     if (h->m_army.HasAllUndead()) {
         strcat(gText, cMoraleInfo[IDX(MORALE_INFO_ALL_UNDEAD)]);
     } else {
-        if (h->m_army.HasSomeUndead() || h->HasArtifact(ARTIFACT_ARM_OF_MARTYR)) {
+        if (h->m_army.HasSomeUndead() || h->HasArtifact(IDX(ARTIFACT_ARM_OF_MARTYR))) {
             strcat(gText, cMoraleInfo[IDX(MORALE_INFO_SOME_UNDEAD)]);
             mixedUndead4 = 1;
         }
@@ -2549,28 +2549,28 @@ void game::ShowMoraleInfo(hero* h, i32 dialogType) {
             strcat(gText, description);
         }
 
-        if (h->GetOccupiedTown() != 0 && h->GetOccupiedTown()->m_type == FACTION_BARBARIAN
-            && (h->GetOccupiedTown()->m_buildings & TOWN_BUILDING_COLISEUM)) {
+        if (h->GetOccupiedTown() != 0 && h->GetOccupiedTown()->m_type == IDX(FACTION_BARBARIAN)
+            && (h->GetOccupiedTown()->m_buildings & IDX(TOWN_BUILDING_COLISEUM))) {
             strcat(gText, cMoraleInfo[IDX(MORALE_INFO_COLISEUM)]);
         }
         if (h->GetOccupiedTown() != 0
-            && (h->GetOccupiedTown()->m_buildings & TOWN_BUILDING_TAVERN)) {
+            && (h->GetOccupiedTown()->m_buildings & IDX(TOWN_BUILDING_TAVERN))) {
             strcat(gText, cMoraleInfo[IDX(MORALE_INFO_TAVERN)]);
         }
 
-        if (h->HasArtifact(ARTIFACT_MEDAL_OF_VALOR)) {
+        if (h->HasArtifact(IDX(ARTIFACT_MEDAL_OF_VALOR))) {
             strcat(gText, cMoraleInfo[IDX(MORALE_INFO_MEDAL_OF_VALOR)]);
         }
-        if (h->HasArtifact(ARTIFACT_MEDAL_OF_COURAGE)) {
+        if (h->HasArtifact(IDX(ARTIFACT_MEDAL_OF_COURAGE))) {
             strcat(gText, cMoraleInfo[IDX(MORALE_INFO_MEDAL_OF_COURAGE)]);
         }
-        if (h->HasArtifact(ARTIFACT_MEDAL_OF_HONOR)) {
+        if (h->HasArtifact(IDX(ARTIFACT_MEDAL_OF_HONOR))) {
             strcat(gText, cMoraleInfo[IDX(MORALE_INFO_MEDAL_OF_HONOR)]);
         }
-        if (h->HasArtifact(ARTIFACT_MEDAL_OF_DISTINCTION)) {
+        if (h->HasArtifact(IDX(ARTIFACT_MEDAL_OF_DISTINCTION))) {
             strcat(gText, cMoraleInfo[IDX(MORALE_INFO_MEDAL_OF_DISTINCTION)]);
         }
-        if (h->HasArtifact(ARTIFACT_FIZBIN_OF_MISFORTUNE)) {
+        if (h->HasArtifact(IDX(ARTIFACT_FIZBIN_OF_MISFORTUNE))) {
             strcat(gText, cMoraleInfo[IDX(MORALE_INFO_FIZBIN)]);
         }
         if (HAS(h->m_eventFlags, HERO_EVENT_BUOY)) {
@@ -2594,19 +2594,19 @@ void game::ShowMoraleInfo(hero* h, i32 dialogType) {
         if (HAS(h->m_eventFlags, HERO_EVENT_DERELICT_SHIP)) {
             strcat(gText, cMoraleInfo[IDX(MORALE_INFO_DERELICT_SHIP)]);
         }
-        if (h->m_secondarySkills[IDX(HERO_SKILL_LEADERSHIP)] == HERO_SKILL_LEVEL_BASIC) {
+        if (h->m_secondarySkills[IDX(HERO_SKILL_LEADERSHIP)] == IDX(HERO_SKILL_LEVEL_BASIC)) {
             strcat(gText, cMoraleInfo[IDX(MORALE_INFO_BASIC_LEADERSHIP)]);
         }
-        if (h->m_secondarySkills[IDX(HERO_SKILL_LEADERSHIP)] == HERO_SKILL_LEVEL_ADVANCED) {
+        if (h->m_secondarySkills[IDX(HERO_SKILL_LEADERSHIP)] == IDX(HERO_SKILL_LEVEL_ADVANCED)) {
             strcat(gText, cMoraleInfo[IDX(MORALE_INFO_ADVANCED_LEADERSHIP)]);
         }
-        if (h->m_secondarySkills[IDX(HERO_SKILL_LEADERSHIP)] == HERO_SKILL_LEVEL_EXPERT) {
+        if (h->m_secondarySkills[IDX(HERO_SKILL_LEADERSHIP)] == IDX(HERO_SKILL_LEVEL_EXPERT)) {
             strcat(gText, cMoraleInfo[IDX(MORALE_INFO_EXPERT_LEADERSHIP)]);
         }
-        if (h->HasArtifact(ARTIFACT_MASTHEAD) && HAS(h->m_eventFlags, HERO_EVENT_EMBARKED)) {
+        if (h->HasArtifact(IDX(ARTIFACT_MASTHEAD)) && HAS(h->m_eventFlags, HERO_EVENT_EMBARKED)) {
             strcat(gText, cMoraleInfo[IDX(MORALE_INFO_MASTHEAD)]);
         }
-        if (h->HasArtifact(ARTIFACT_BATTLE_GARB)) {
+        if (h->HasArtifact(IDX(ARTIFACT_BATTLE_GARB))) {
             strcat(gText, cMoraleInfo[IDX(MORALE_INFO_BATTLE_GARB)]);
         }
         if (static_cast<i32>(strlen(gText)) == modifierStart) {
@@ -2634,16 +2634,16 @@ void game::ShowLuckInfo(hero* h, i32 dialogType) {
 
     sprintf(gText, cLuckInfo[IDX(LUCK_INFO_HEADER)], description);
     modifierStart = strlen(gText);
-    if (h->GetOccupiedTown() != 0 && h->GetOccupiedTown()->m_type == FACTION_SORCERESS
-        && (h->GetOccupiedTown()->m_buildings & TOWN_BUILDING_RAINBOW))
+    if (h->GetOccupiedTown() != 0 && h->GetOccupiedTown()->m_type == IDX(FACTION_SORCERESS)
+        && (h->GetOccupiedTown()->m_buildings & IDX(TOWN_BUILDING_RAINBOW)))
         strcat(gText, cLuckInfo[IDX(LUCK_INFO_RAINBOW)]);
-    if (h->HasArtifact(ARTIFACT_RABBIT_FOOT))
+    if (h->HasArtifact(IDX(ARTIFACT_RABBIT_FOOT)))
         strcat(gText, cLuckInfo[IDX(LUCK_INFO_RABBIT_FOOT)]);
-    if (h->HasArtifact(ARTIFACT_GOLDEN_HORSESHOE))
+    if (h->HasArtifact(IDX(ARTIFACT_GOLDEN_HORSESHOE)))
         strcat(gText, cLuckInfo[IDX(LUCK_INFO_HORSESHOE)]);
-    if (h->HasArtifact(ARTIFACT_GAMBLERS_COIN))
+    if (h->HasArtifact(IDX(ARTIFACT_GAMBLERS_COIN)))
         strcat(gText, cLuckInfo[IDX(LUCK_INFO_LUCKY_COIN)]);
-    if (h->HasArtifact(ARTIFACT_FOUR_LEAF_CLOVER))
+    if (h->HasArtifact(IDX(ARTIFACT_FOUR_LEAF_CLOVER)))
         strcat(gText, cLuckInfo[IDX(LUCK_INFO_CLOVER)]);
     if (HAS(h->m_eventFlags, HERO_EVENT_FAERIE_RING))
         strcat(gText, cLuckInfo[IDX(LUCK_INFO_FAERIE_RING)]);
@@ -2653,17 +2653,17 @@ void game::ShowLuckInfo(hero* h, i32 dialogType) {
         strcat(gText, cLuckInfo[IDX(LUCK_INFO_FOUNTAIN)]);
     if (HAS(h->m_eventFlags, HERO_EVENT_PYRAMID))
         strcat(gText, cLuckInfo[IDX(LUCK_INFO_PYRAMID)]);
-    if (h->m_secondarySkills[IDX(HERO_SKILL_LUCK)] == HERO_SKILL_LEVEL_BASIC)
+    if (h->m_secondarySkills[IDX(HERO_SKILL_LUCK)] == IDX(HERO_SKILL_LEVEL_BASIC))
         strcat(gText, cLuckInfo[IDX(LUCK_INFO_BASIC_SKILL)]);
-    if (h->m_secondarySkills[IDX(HERO_SKILL_LUCK)] == HERO_SKILL_LEVEL_ADVANCED)
+    if (h->m_secondarySkills[IDX(HERO_SKILL_LUCK)] == IDX(HERO_SKILL_LEVEL_ADVANCED))
         strcat(gText, cLuckInfo[IDX(LUCK_INFO_ADVANCED_SKILL)]);
-    if (h->m_secondarySkills[IDX(HERO_SKILL_LUCK)] == HERO_SKILL_LEVEL_EXPERT)
+    if (h->m_secondarySkills[IDX(HERO_SKILL_LUCK)] == IDX(HERO_SKILL_LEVEL_EXPERT))
         strcat(gText, cLuckInfo[IDX(LUCK_INFO_EXPERT_SKILL)]);
-    if (h->HasArtifact(ARTIFACT_MASTHEAD) && HAS(h->m_eventFlags, HERO_EVENT_EMBARKED))
+    if (h->HasArtifact(IDX(ARTIFACT_MASTHEAD)) && HAS(h->m_eventFlags, HERO_EVENT_EMBARKED))
         strcat(gText, cLuckInfo[IDX(LUCK_INFO_MASTHEAD)]);
     if (HAS(h->m_eventFlags, HERO_EVENT_MERMAID))
         strcat(gText, cLuckInfo[IDX(LUCK_INFO_MERMAID)]);
-    if (h->HasArtifact(ARTIFACT_BATTLE_GARB))
+    if (h->HasArtifact(IDX(ARTIFACT_BATTLE_GARB)))
         strcat(gText, cLuckInfo[IDX(LUCK_INFO_BATTLE_GARB)]);
     if (static_cast<i32>(strlen(gText)) == modifierStart)
         strcat(gText, cLuckInfo[IDX(LUCK_INFO_NONE)]);
@@ -3583,7 +3583,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
             break;
 
         case APP_MENU_VIEW_WORLD:
-            gpAdvManager->ViewWorld(SPELL_VIEW_ALL, 0, 0);
+            gpAdvManager->ViewWorld(IDX(SPELL_VIEW_ALL), 0, 0);
             break;
         case APP_MENU_VIEW_PUZZLE:
             gpAdvManager->ViewPuzzle();
@@ -4403,17 +4403,17 @@ VA(0x004a0b6d, 0x109)
 i32 GetManaCost(i32 spell, hero* h) {
     i32 c = gsSpellInfo[spell].cost;
     if (h != 0) {
-        if (h->HasArtifact(ARTIFACT_EVIL_EYE)
+        if (h->HasArtifact(IDX(ARTIFACT_EVIL_EYE))
             && (spell == SPELL_CURSE || spell == SPELL_MASS_CURSE))
             c >>= 1;
-        if (h->HasArtifact(ARTIFACT_SKULLCAP)
+        if (h->HasArtifact(IDX(ARTIFACT_SKULLCAP))
             && (spell == SPELL_BERSERKER || spell == SPELL_HYPNOTIZE || spell == SPELL_PARALYZE
                 || spell == SPELL_BLIND))
             c >>= 1;
-        if (h->HasArtifact(ARTIFACT_SNAKE_RING)
+        if (h->HasArtifact(IDX(ARTIFACT_SNAKE_RING))
             && (spell == SPELL_BLESS || spell == SPELL_MASS_BLESS))
             c >>= 1;
-        if (h->HasArtifact(ARTIFACT_ELEMENTAL_RING)
+        if (h->HasArtifact(IDX(ARTIFACT_ELEMENTAL_RING))
             && (spell == SPELL_SUMMON_EARTH_ELEMENTAL || spell == SPELL_SUMMON_AIR_ELEMENTAL
                 || spell == SPELL_SUMMON_FIRE_ELEMENTAL || spell == SPELL_SUMMON_WATER_ELEMENTAL))
             c >>= 1;
@@ -4584,15 +4584,15 @@ void NormalDialog(
             case NORMAL_DIALOG_HERO:
                 sizingIconHeight_l = 111;
                 break;
-            case RES_GOLD:
+            case IDX(RES_GOLD):
                 sizingIconHeight_l = 26;
                 break;
-            case RES_WOOD:
-            case RES_MERCURY:
-            case RES_ORE:
-            case RES_SULFUR:
-            case RES_CRYSTAL:
-            case RES_GEMS:
+            case IDX(RES_WOOD):
+            case IDX(RES_MERCURY):
+            case IDX(RES_ORE):
+            case IDX(RES_SULFUR):
+            case IDX(RES_CRYSTAL):
+            case IDX(RES_GEMS):
                 sizingIconHeight_l = 44;
                 break;
             case NORMAL_DIALOG_SPELL:
@@ -4743,16 +4743,16 @@ void NormalDialog(
         }
 
         switch (resourceType_l[resourceSlot_n]) {
-            case RES_WOOD:
-            case RES_MERCURY:
-            case RES_ORE:
-            case RES_SULFUR:
-            case RES_CRYSTAL:
-            case RES_GEMS:
+            case IDX(RES_WOOD):
+            case IDX(RES_MERCURY):
+            case IDX(RES_ORE):
+            case IDX(RES_SULFUR):
+            case IDX(RES_CRYSTAL):
+            case IDX(RES_GEMS):
                 resourceImageHeight_g = 38;
                 sizingIconHeight_l = 32;
                 break;
-            case RES_GOLD:
+            case IDX(RES_GOLD):
                 resourceImageHeight_g = 76;
                 sizingIconHeight_l = 26;
                 break;
@@ -5841,33 +5841,33 @@ DATA(0x004faea8) i32 giDebugLevel = 0;
 DATA(0x004faeac) i8 giVisRangeTown = 5;
 DATA(0x004faeb0) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
     {{20, 33}, 17, 12, 1, 0, 2, 1, 1, 1, 1, 0, "psnt", 0},
-    {{150, 312}, 21, 8, 10, 0, 2, 5, 3, 2, 3, 12, "arch", MONSTER_ATTRIBUTE_RANGED},
-    {{200, 463}, 23, 8, 10, 0, 4, 5, 3, 2, 3, 24, "arch", MONSTER_ATTRIBUTE_RANGED},
+    {{150, 312}, 21, 8, 10, 0, 2, 5, 3, 2, 3, 12, "arch", IDX(MONSTER_ATTRIBUTE_RANGED)},
+    {{200, 463}, 23, 8, 10, 0, 4, 5, 3, 2, 3, 24, "arch", IDX(MONSTER_ATTRIBUTE_RANGED)},
     {{200, 639}, 32, 5, 15, 0, 4, 5, 9, 3, 4, 0, "pike", 0},
     {{250, 824}, 33, 5, 20, 0, 5, 5, 9, 3, 4, 0, "pike", 0},
     {{250, 1130}, 45, 4, 25, 0, 4, 7, 9, 4, 6, 0, "swdm", 0},
     {{300, 1350}, 45, 4, 30, 0, 5, 7, 9, 4, 6, 0, "swdm", 0},
-    {{300, 1830}, 61, 3, 30, 0, 6, 10, 9, 5, 10, 0, "cavl", MONSTER_ATTRIBUTE_WIDE},
-    {{375, 2273}, 61, 3, 40, 0, 7, 10, 9, 5, 10, 0, "cavl", MONSTER_ATTRIBUTE_WIDE},
+    {{300, 1830}, 61, 3, 30, 0, 6, 10, 9, 5, 10, 0, "cavl", IDX(MONSTER_ATTRIBUTE_WIDE)},
+    {{375, 2273}, 61, 3, 40, 0, 7, 10, 9, 5, 10, 0, "cavl", IDX(MONSTER_ATTRIBUTE_WIDE)},
     {{600, 4704}, 78, 2, 50, 0, 5, 11, 12, 10, 20, 0, "pldn", 0},
     {{1000, 5822}, 58, 2, 65, 0, 6, 11, 12, 10, 20, 0, "pldn", 0},
     {{40, 109}, 27, 10, 3, 1, 4, 3, 1, 1, 2, 0, "gbln", 0},
-    {{140, 299}, 21, 8, 10, 1, 2, 3, 4, 2, 3, 8, "elf_", MONSTER_ATTRIBUTE_RANGED},
-    {{175, 512}, 29, 8, 15, 1, 3, 3, 4, 3, 4, 16, "elf_", MONSTER_ATTRIBUTE_RANGED},
-    {{200, 865}, 43, 5, 20, 1, 6, 6, 2, 3, 5, 0, "wolf", MONSTER_ATTRIBUTE_WIDE},
+    {{140, 299}, 21, 8, 10, 1, 2, 3, 4, 2, 3, 8, "elf_", IDX(MONSTER_ATTRIBUTE_RANGED)},
+    {{175, 512}, 29, 8, 15, 1, 3, 3, 4, 3, 4, 16, "elf_", IDX(MONSTER_ATTRIBUTE_RANGED)},
+    {{200, 865}, 43, 5, 20, 1, 6, 6, 2, 3, 5, 0, "wolf", IDX(MONSTER_ATTRIBUTE_WIDE)},
     {{300, 1065}, 36, 4, 40, 1, 2, 9, 5, 4, 6, 0, "ogre", 0},
     {{500, 2070}, 41, 4, 60, 1, 4, 9, 5, 5, 7, 0, "ogre", 0},
-    {{600, 1921}, 32, 3, 40, 1, 4, 10, 5, 5, 7, 8, "trll", MONSTER_ATTRIBUTE_RANGED},
-    {{700, 2337}, 33, 3, 40, 1, 5, 10, 5, 7, 9, 16, "trll", MONSTER_ATTRIBUTE_RANGED},
-    {{750, 6074}, 58, 2, 80, 1, 5, 12, 9, 12, 24, 0, "cycl", MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER},
-    {{50, 129}, 26, 8, 2, 2, 4, 4, 2, 1, 2, 0, "sprt", MONSTER_ATTRIBUTE_FLYING},
+    {{600, 1921}, 32, 3, 40, 1, 4, 10, 5, 5, 7, 8, "trll", IDX(MONSTER_ATTRIBUTE_RANGED)},
+    {{700, 2337}, 33, 3, 40, 1, 5, 10, 5, 7, 9, 16, "trll", IDX(MONSTER_ATTRIBUTE_RANGED)},
+    {{750, 6074}, 58, 2, 80, 1, 5, 12, 9, 12, 24, 0, "cycl", IDX(MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER)},
+    {{50, 129}, 26, 8, 2, 2, 4, 4, 2, 1, 2, 0, "sprt", IDX(MONSTER_ATTRIBUTE_FLYING)},
     {{200, 500}, 25, 6, 20, 2, 2, 6, 5, 2, 4, 0, "dwrf", 0},
     {{250, 716}, 29, 6, 20, 2, 4, 6, 6, 2, 4, 0, "dwrf", 0},
-    {{250, 554}, 22, 4, 15, 2, 4, 4, 3, 2, 3, 24, "elf_", MONSTER_ATTRIBUTE_RANGED},
-    {{300, 658}, 22, 4, 15, 2, 6, 5, 5, 2, 3, 24, "elf_", MONSTER_ATTRIBUTE_RANGED},
-    {{350, 1290}, 37, 3, 25, 2, 5, 7, 5, 5, 8, 8, "drui", MONSTER_ATTRIBUTE_RANGED},
-    {{400, 1428}, 36, 3, 25, 2, 6, 7, 7, 5, 8, 16, "drui", MONSTER_ATTRIBUTE_RANGED},
-    {{500, 2702}, 54, 2, 40, 2, 5, 10, 9, 7, 14, 0, "unic", MONSTER_ATTRIBUTE_WIDE},
+    {{250, 554}, 22, 4, 15, 2, 4, 4, 3, 2, 3, 24, "elf_", IDX(MONSTER_ATTRIBUTE_RANGED)},
+    {{300, 658}, 22, 4, 15, 2, 6, 5, 5, 2, 3, 24, "elf_", IDX(MONSTER_ATTRIBUTE_RANGED)},
+    {{350, 1290}, 37, 3, 25, 2, 5, 7, 5, 5, 8, 8, "drui", IDX(MONSTER_ATTRIBUTE_RANGED)},
+    {{400, 1428}, 36, 3, 25, 2, 6, 7, 7, 5, 8, 16, "drui", IDX(MONSTER_ATTRIBUTE_RANGED)},
+    {{500, 2702}, 54, 2, 40, 2, 5, 10, 9, 7, 14, 0, "unic", IDX(MONSTER_ATTRIBUTE_WIDE)},
     {{1500, 10114},
      56,
      1,
@@ -5880,7 +5880,7 @@ DATA(0x004faeb0) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      40,
      0,
      "phoe",
-     MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER},
+     IDX(MONSTER_ATTRIBUTE_WIDE) | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER},
     {{60, 154},
      26,
      8,
@@ -5893,8 +5893,8 @@ DATA(0x004faeb0) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      2,
      8,
      "cntr",
-     MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_RANGED},
-    {{200, 579}, 29, 6, 15, 3, 6, 4, 7, 2, 3, 0, "garg", MONSTER_ATTRIBUTE_FLYING},
+     IDX(MONSTER_ATTRIBUTE_WIDE) | MONSTER_ATTRIBUTE_RANGED},
+    {{200, 579}, 29, 6, 15, 3, 6, 4, 7, 2, 3, 0, "garg", IDX(MONSTER_ATTRIBUTE_FLYING)},
     {{300, 1101},
      37,
      4,
@@ -5907,10 +5907,10 @@ DATA(0x004faeb0) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      5,
      0,
      "grif",
-     MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING},
+     IDX(MONSTER_ATTRIBUTE_WIDE) | MONSTER_ATTRIBUTE_FLYING},
     {{400, 1751}, 44, 3, 35, 3, 4, 9, 8, 5, 10, 0, "mino", 0},
     {{500, 2252}, 45, 3, 45, 3, 6, 9, 8, 5, 10, 0, "mino", 0},
-    {{800, 2878}, 36, 2, 75, 3, 2, 8, 9, 6, 12, 0, "hydr", MONSTER_ATTRIBUTE_WIDE},
+    {{800, 2878}, 36, 2, 75, 3, 2, 8, 9, 6, 12, 0, "hydr", IDX(MONSTER_ATTRIBUTE_WIDE)},
     {{3000, 18153},
      55,
      1,
@@ -5923,7 +5923,7 @@ DATA(0x004faeb0) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      50,
      0,
      "drgn",
-     MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER},
+     IDX(MONSTER_ATTRIBUTE_WIDE) | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER},
     {{3500, 22962},
      68,
      1,
@@ -5936,7 +5936,7 @@ DATA(0x004faeb0) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      50,
      0,
      "drgn",
-     MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER},
+     IDX(MONSTER_ATTRIBUTE_WIDE) | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER},
     {{4000, 28144},
      74,
      1,
@@ -5949,9 +5949,9 @@ DATA(0x004faeb0) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      50,
      0,
      "drgn",
-     MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER},
-    {{50, 134}, 27, 8, 3, 4, 3, 2, 1, 1, 3, 12, "half", MONSTER_ATTRIBUTE_RANGED},
-    {{150, 493}, 33, 6, 15, 4, 6, 5, 4, 2, 3, 0, "boar", MONSTER_ATTRIBUTE_WIDE},
+     IDX(MONSTER_ATTRIBUTE_WIDE) | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER},
+    {{50, 134}, 27, 8, 3, 4, 3, 2, 1, 1, 3, 12, "half", IDX(MONSTER_ATTRIBUTE_RANGED)},
+    {{150, 493}, 33, 6, 15, 4, 6, 5, 4, 2, 3, 0, "boar", IDX(MONSTER_ATTRIBUTE_WIDE)},
     {{300, 951}, 19, 4, 30, 4, 2, 5, 10, 4, 5, 0, "golm", 0},
     {{350, 1324}, 24, 4, 35, 4, 3, 7, 10, 4, 5, 0, "golm", 0},
     {{400, 1739},
@@ -5966,16 +5966,16 @@ DATA(0x004faeb0) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      8,
      0,
      "roc_",
-     MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING},
-    {{600, 1935}, 32, 2, 30, 4, 5, 11, 7, 7, 9, 12, "mage", MONSTER_ATTRIBUTE_RANGED},
-    {{700, 2469}, 35, 2, 35, 4, 6, 12, 8, 7, 9, 24, "mage", MONSTER_ATTRIBUTE_RANGED},
+     IDX(MONSTER_ATTRIBUTE_WIDE) | MONSTER_ATTRIBUTE_FLYING},
+    {{600, 1935}, 32, 2, 30, 4, 5, 11, 7, 7, 9, 12, "mage", IDX(MONSTER_ATTRIBUTE_RANGED)},
+    {{700, 2469}, 35, 2, 35, 4, 6, 12, 8, 7, 9, 24, "mage", IDX(MONSTER_ATTRIBUTE_RANGED)},
     {{2000, 9589}, 42, 1, 150, 4, 4, 13, 10, 20, 30, 0, "titn", 0},
-    {{5000, 22933}, 79, 1, 300, 4, 6, 15, 15, 20, 30, 24, "titn", MONSTER_ATTRIBUTE_RANGED},
-    {{75, 203}, 27, 8, 4, 5, 4, 4, 3, 2, 3, 0, "skel", MONSTER_ATTRIBUTE_UNDEAD},
-    {{150, 310}, 21, 6, 15, 5, 2, 5, 2, 2, 3, 0, "zomb", MONSTER_ATTRIBUTE_UNDEAD},
-    {{200, 506}, 25, 6, 20, 5, 4, 5, 2, 2, 3, 0, "zomb", MONSTER_ATTRIBUTE_UNDEAD},
-    {{250, 868}, 35, 4, 25, 5, 4, 6, 6, 3, 4, 0, "mumy", MONSTER_ATTRIBUTE_UNDEAD},
-    {{300, 1056}, 35, 4, 30, 5, 5, 6, 6, 3, 4, 0, "mumy", MONSTER_ATTRIBUTE_UNDEAD},
+    {{5000, 22933}, 79, 1, 300, 4, 6, 15, 15, 20, 30, 24, "titn", IDX(MONSTER_ATTRIBUTE_RANGED)},
+    {{75, 203}, 27, 8, 4, 5, 4, 4, 3, 2, 3, 0, "skel", IDX(MONSTER_ATTRIBUTE_UNDEAD)},
+    {{150, 310}, 21, 6, 15, 5, 2, 5, 2, 2, 3, 0, "zomb", IDX(MONSTER_ATTRIBUTE_UNDEAD)},
+    {{200, 506}, 25, 6, 20, 5, 4, 5, 2, 2, 3, 0, "zomb", IDX(MONSTER_ATTRIBUTE_UNDEAD)},
+    {{250, 868}, 35, 4, 25, 5, 4, 6, 6, 3, 4, 0, "mumy", IDX(MONSTER_ATTRIBUTE_UNDEAD)},
+    {{300, 1056}, 35, 4, 30, 5, 5, 6, 6, 3, 4, 0, "mumy", IDX(MONSTER_ATTRIBUTE_UNDEAD)},
     {{500, 1685},
      42,
      3,
@@ -5988,7 +5988,7 @@ DATA(0x004faeb0) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      7,
      0,
      "vamp",
-     MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_UNDEAD},
+     IDX(MONSTER_ATTRIBUTE_FLYING) | MONSTER_ATTRIBUTE_UNDEAD},
     {{650, 2461},
      45,
      3,
@@ -6001,7 +6001,7 @@ DATA(0x004faeb0) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      7,
      0,
      "vamp",
-     MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_UNDEAD},
+     IDX(MONSTER_ATTRIBUTE_FLYING) | MONSTER_ATTRIBUTE_UNDEAD},
     {{750, 2069},
      28,
      2,
@@ -6014,7 +6014,7 @@ DATA(0x004faeb0) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      10,
      12,
      "lich",
-     MONSTER_ATTRIBUTE_RANGED | MONSTER_ATTRIBUTE_UNDEAD},
+     IDX(MONSTER_ATTRIBUTE_RANGED) | MONSTER_ATTRIBUTE_UNDEAD},
     {{900, 2625},
      29,
      2,
@@ -6027,7 +6027,7 @@ DATA(0x004faeb0) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      10,
      24,
      "lich",
-     MONSTER_ATTRIBUTE_RANGED | MONSTER_ATTRIBUTE_UNDEAD},
+     IDX(MONSTER_ATTRIBUTE_RANGED) | MONSTER_ATTRIBUTE_UNDEAD},
     {{1500, 11744},
      78,
      1,
@@ -6040,9 +6040,9 @@ DATA(0x004faeb0) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      45,
      0,
      "drgn",
-     MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_UNDEAD},
+     IDX(MONSTER_ATTRIBUTE_WIDE) | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_UNDEAD},
     {{50, 177}, 35, 12, 4, 6, 5, 6, 1, 1, 2, 0, "rogu", 0},
-    {{200, 805}, 40, 4, 20, 6, 6, 7, 6, 2, 5, 0, "nmad", MONSTER_ATTRIBUTE_WIDE},
+    {{200, 805}, 40, 4, 20, 6, 6, 7, 6, 2, 5, 0, "nmad", IDX(MONSTER_ATTRIBUTE_WIDE)},
     {{1000, 1545},
      62,
      3,
@@ -6055,9 +6055,9 @@ DATA(0x004faeb0) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      6,
      0,
      "ghst",
-     MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_UNDEAD},
-    {{650, 5692}, 60, 2, 50, 6, 6, 10, 9, 20, 30, 0, "geni", MONSTER_ATTRIBUTE_FLYING},
-    {{500, 1979}, 40, 5, 35, 6, 4, 8, 9, 6, 10, 0, "meds", MONSTER_ATTRIBUTE_WIDE},
+     IDX(MONSTER_ATTRIBUTE_FLYING) | MONSTER_ATTRIBUTE_UNDEAD},
+    {{650, 5692}, 60, 2, 50, 6, 6, 10, 9, 20, 30, 0, "geni", IDX(MONSTER_ATTRIBUTE_FLYING)},
+    {{500, 1979}, 40, 5, 35, 6, 4, 8, 9, 6, 10, 0, "meds", IDX(MONSTER_ATTRIBUTE_WIDE)},
     {{500, 1732}, 35, 3, 50, 6, 3, 8, 8, 4, 5, 0, "eelm", 0},
     {{500, 1412}, 28, 3, 35, 6, 6, 7, 7, 2, 8, 0, "aelm", 0},
     {{500, 1501}, 30, 3, 40, 6, 5, 8, 6, 4, 6, 0, "felm", 0},
@@ -6272,7 +6272,7 @@ DATA(0x004fbe78) SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)] = {
      500,
      9,
      {10, 10, 10, 10, 10, 10},
-     SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT},
+     IDX(SPELL_INFO_ATTRIBUTE_POWER) | SPELL_INFO_ATTRIBUTE_COMBAT},
     {"fireball",
      4,
      9,
@@ -6280,7 +6280,7 @@ DATA(0x004fbe78) SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)] = {
      750,
      15,
      {10, 10, 10, 10, 10, 10},
-     SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT},
+     IDX(SPELL_INFO_ATTRIBUTE_POWER) | SPELL_INFO_ATTRIBUTE_COMBAT},
     {"lightblt",
      2,
      4,
@@ -6288,7 +6288,7 @@ DATA(0x004fbe78) SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)] = {
      450,
      7,
      {10, 10, 10, 10, 10, 10},
-     SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT},
+     IDX(SPELL_INFO_ATTRIBUTE_POWER) | SPELL_INFO_ATTRIBUTE_COMBAT},
     {"chainlte",
      4,
      5,
@@ -6296,10 +6296,10 @@ DATA(0x004fbe78) SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)] = {
      650,
      15,
      {10, 10, 10, 10, 10, 10},
-     SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT},
-    {"telptout", 3, 10, 0, 30, 9, {10, 10, 10, 10, 10, 10}, SPELL_INFO_ATTRIBUTE_COMBAT},
-    {"cure", 1, 6, 1, 250, 6, {10, 10, 10, 10, 10, 10}, SPELL_INFO_ATTRIBUTE_COMBAT},
-    {"masscure", 4, 6, 1, 700, 15, {10, 10, 10, 10, 10, 10}, SPELL_INFO_ATTRIBUTE_COMBAT},
+     IDX(SPELL_INFO_ATTRIBUTE_POWER) | SPELL_INFO_ATTRIBUTE_COMBAT},
+    {"telptout", 3, 10, 0, 30, 9, {10, 10, 10, 10, 10, 10}, IDX(SPELL_INFO_ATTRIBUTE_COMBAT)},
+    {"cure", 1, 6, 1, 250, 6, {10, 10, 10, 10, 10, 10}, IDX(SPELL_INFO_ATTRIBUTE_COMBAT)},
+    {"masscure", 4, 6, 1, 700, 15, {10, 10, 10, 10, 10, 10}, IDX(SPELL_INFO_ATTRIBUTE_COMBAT)},
     {"resurect",
      4,
      13,
@@ -6307,7 +6307,7 @@ DATA(0x004fbe78) SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)] = {
      400,
      12,
      {10, 10, 10, 10, 10, 10},
-     SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT},
+     IDX(SPELL_INFO_ATTRIBUTE_POWER) | SPELL_INFO_ATTRIBUTE_COMBAT},
     {"resurtru",
      5,
      12,
@@ -6315,7 +6315,7 @@ DATA(0x004fbe78) SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)] = {
      550,
      15,
      {10, 10, 10, 10, 10, 10},
-     SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT},
+     IDX(SPELL_INFO_ATTRIBUTE_POWER) | SPELL_INFO_ATTRIBUTE_COMBAT},
     {"haste",
      1,
      14,
@@ -6323,7 +6323,7 @@ DATA(0x004fbe78) SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)] = {
      300,
      3,
      {10, 10, 10, 10, 10, 10},
-     SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION},
+     IDX(SPELL_INFO_ATTRIBUTE_POWER) | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION},
     {"masshast",
      3,
      14,
@@ -6331,7 +6331,7 @@ DATA(0x004fbe78) SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)] = {
      950,
      10,
      {10, 10, 10, 10, 10, 10},
-     SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION},
+     IDX(SPELL_INFO_ATTRIBUTE_POWER) | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION},
     {"slow",
      1,
      1,
@@ -6339,7 +6339,7 @@ DATA(0x004fbe78) SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)] = {
      350,
      3,
      {10, 10, 10, 10, 10, 10},
-     SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION},
+     IDX(SPELL_INFO_ATTRIBUTE_POWER) | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION},
     {"massslow",
      4,
      1,
@@ -6347,7 +6347,7 @@ DATA(0x004fbe78) SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)] = {
      1000,
      15,
      {10, 10, 10, 10, 10, 10},
-     SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION},
+     IDX(SPELL_INFO_ATTRIBUTE_POWER) | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION},
     {"blind",
      2,
      21,
@@ -6355,7 +6355,7 @@ DATA(0x004fbe78) SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)] = {
      500,
      6,
      {10, 10, 10, 10, 10, 10},
-     SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION},
+     IDX(SPELL_INFO_ATTRIBUTE_POWER) | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION},
     {"bless",
      1,
      7,
@@ -6363,7 +6363,7 @@ DATA(0x004fbe78) SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)] = {
      200,
      3,
      {10, 10, 10, 10, 10, 10},
-     SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION},
+     IDX(SPELL_INFO_ATTRIBUTE_POWER) | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION},
     {"massbles",
      3,
      7,
@@ -6371,7 +6371,7 @@ DATA(0x004fbe78) SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)] = {
      650,
      12,
      {10, 10, 10, 10, 10, 10},
-     SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION},
+     IDX(SPELL_INFO_ATTRIBUTE_POWER) | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION},
     {"stonskin",
      1,
      31,
@@ -6379,7 +6379,7 @@ DATA(0x004fbe78) SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)] = {
      300,
      3,
      {10, 10, 10, 10, 10, 10},
-     SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION},
+     IDX(SPELL_INFO_ATTRIBUTE_POWER) | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION},
     {"stelskin",
      2,
      30,
@@ -6387,7 +6387,7 @@ DATA(0x004fbe78) SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)] = {
      575,
      6,
      {10, 10, 10, 10, 10, 10},
-     SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION},
+     IDX(SPELL_INFO_ATTRIBUTE_POWER) | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION},
     {"curse",
      1,
      3,
@@ -6395,7 +6395,7 @@ DATA(0x004fbe78) SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)] = {
      200,
      3,
      {10, 10, 10, 10, 10, 10},
-     SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION},
+     IDX(SPELL_INFO_ATTRIBUTE_POWER) | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION},
     {"masscurs",
      3,
      3,
@@ -6403,7 +6403,7 @@ DATA(0x004fbe78) SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)] = {
      500,
      12,
      {10, 10, 10, 10, 10, 10},
-     SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION},
+     IDX(SPELL_INFO_ATTRIBUTE_POWER) | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION},
     {"masscurs",
      3,
      22,
@@ -6411,7 +6411,7 @@ DATA(0x004fbe78) SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)] = {
      300,
      9,
      {10, 10, 10, 10, 10, 0},
-     SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT},
+     IDX(SPELL_INFO_ATTRIBUTE_POWER) | SPELL_INFO_ATTRIBUTE_COMBAT},
     {"masscurs",
      4,
      23,
@@ -6419,7 +6419,7 @@ DATA(0x004fbe78) SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)] = {
      450,
      12,
      {10, 10, 10, 10, 10, 0},
-     SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT},
+     IDX(SPELL_INFO_ATTRIBUTE_POWER) | SPELL_INFO_ATTRIBUTE_COMBAT},
     {"antimagk",
      3,
      17,
@@ -6427,9 +6427,9 @@ DATA(0x004fbe78) SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)] = {
      100,
      7,
      {10, 10, 10, 10, 10, 10},
-     SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION},
-    {"dipmagk", 1, 18, 7, 275, 5, {10, 10, 10, 10, 10, 10}, SPELL_INFO_ATTRIBUTE_COMBAT},
-    {"dipmagk", 3, 18, 7, 450, 12, {10, 10, 10, 10, 10, 10}, SPELL_INFO_ATTRIBUTE_COMBAT},
+     IDX(SPELL_INFO_ATTRIBUTE_POWER) | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION},
+    {"dipmagk", 1, 18, 7, 275, 5, {10, 10, 10, 10, 10, 10}, IDX(SPELL_INFO_ATTRIBUTE_COMBAT)},
+    {"dipmagk", 3, 18, 7, 450, 12, {10, 10, 10, 10, 10, 10}, IDX(SPELL_INFO_ATTRIBUTE_COMBAT)},
     {"magcarow",
      1,
      38,
@@ -6437,7 +6437,7 @@ DATA(0x004fbe78) SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)] = {
      200,
      3,
      {10, 10, 10, 10, 10, 10},
-     SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT},
+     IDX(SPELL_INFO_ATTRIBUTE_POWER) | SPELL_INFO_ATTRIBUTE_COMBAT},
     {"berzerk",
      4,
      19,
@@ -6445,7 +6445,7 @@ DATA(0x004fbe78) SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)] = {
      1000,
      12,
      {10, 10, 10, 10, 10, 10},
-     SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION},
+     IDX(SPELL_INFO_ATTRIBUTE_POWER) | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION},
     {"armgedn",
      5,
      16,
@@ -6453,7 +6453,7 @@ DATA(0x004fbe78) SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)] = {
      2000,
      20,
      {10, 10, 10, 10, 10, 10},
-     SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT},
+     IDX(SPELL_INFO_ATTRIBUTE_POWER) | SPELL_INFO_ATTRIBUTE_COMBAT},
     {"storm",
      4,
      11,
@@ -6461,7 +6461,7 @@ DATA(0x004fbe78) SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)] = {
      1300,
      15,
      {10, 10, 10, 10, 10, 10},
-     SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT},
+     IDX(SPELL_INFO_ATTRIBUTE_POWER) | SPELL_INFO_ATTRIBUTE_COMBAT},
     {"meteor~1",
      4,
      24,
@@ -6469,7 +6469,7 @@ DATA(0x004fbe78) SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)] = {
      1000,
      15,
      {10, 10, 10, 10, 10, 10},
-     SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT},
+     IDX(SPELL_INFO_ATTRIBUTE_POWER) | SPELL_INFO_ATTRIBUTE_COMBAT},
     {"paralize",
      3,
      20,
@@ -6477,7 +6477,7 @@ DATA(0x004fbe78) SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)] = {
      700,
      9,
      {10, 10, 10, 10, 10, 10},
-     SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION},
+     IDX(SPELL_INFO_ATTRIBUTE_POWER) | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION},
     {"hypnotiz",
      5,
      37,
@@ -6485,7 +6485,7 @@ DATA(0x004fbe78) SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)] = {
      1300,
      15,
      {10, 10, 10, 10, 10, 10},
-     SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION},
+     IDX(SPELL_INFO_ATTRIBUTE_POWER) | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION},
     {"coldray",
      2,
      36,
@@ -6493,7 +6493,7 @@ DATA(0x004fbe78) SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)] = {
      375,
      6,
      {10, 10, 10, 10, 10, 10},
-     SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT},
+     IDX(SPELL_INFO_ATTRIBUTE_POWER) | SPELL_INFO_ATTRIBUTE_COMBAT},
     {"coldring",
      3,
      35,
@@ -6501,7 +6501,7 @@ DATA(0x004fbe78) SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)] = {
      500,
      9,
      {10, 10, 10, 10, 10, 10},
-     SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT},
+     IDX(SPELL_INFO_ATTRIBUTE_POWER) | SPELL_INFO_ATTRIBUTE_COMBAT},
     {"disruptr",
      2,
      34,
@@ -6509,7 +6509,7 @@ DATA(0x004fbe78) SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)] = {
      500,
      7,
      {10, 10, 10, 10, 10, 10},
-     SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT},
+     IDX(SPELL_INFO_ATTRIBUTE_POWER) | SPELL_INFO_ATTRIBUTE_COMBAT},
     {"mnrdeath",
      2,
      29,
@@ -6517,7 +6517,7 @@ DATA(0x004fbe78) SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)] = {
      300,
      6,
      {0, 0, 0, 0, 0, 10},
-     SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT},
+     IDX(SPELL_INFO_ATTRIBUTE_POWER) | SPELL_INFO_ATTRIBUTE_COMBAT},
     {"mnrdeath",
      3,
      28,
@@ -6525,7 +6525,7 @@ DATA(0x004fbe78) SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)] = {
      450,
      10,
      {0, 0, 0, 0, 0, 10},
-     SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT},
+     IDX(SPELL_INFO_ATTRIBUTE_POWER) | SPELL_INFO_ATTRIBUTE_COMBAT},
     {"drgnslay",
      2,
      32,
@@ -6533,7 +6533,7 @@ DATA(0x004fbe78) SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)] = {
      100,
      6,
      {10, 10, 10, 10, 10, 10},
-     SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION},
+     IDX(SPELL_INFO_ATTRIBUTE_POWER) | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION},
     {"bloodlus",
      1,
      27,
@@ -6541,7 +6541,7 @@ DATA(0x004fbe78) SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)] = {
      300,
      3,
      {10, 10, 10, 10, 10, 10},
-     SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION},
+     IDX(SPELL_INFO_ATTRIBUTE_POWER) | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION},
     {"resurect",
      3,
      25,
@@ -6549,7 +6549,7 @@ DATA(0x004fbe78) SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)] = {
      400,
      10,
      {10, 10, 10, 10, 10, 10},
-     SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT},
+     IDX(SPELL_INFO_ATTRIBUTE_POWER) | SPELL_INFO_ATTRIBUTE_COMBAT},
     {"mirrorim",
      5,
      26,
@@ -6557,7 +6557,7 @@ DATA(0x004fbe78) SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)] = {
      800,
      25,
      {10, 10, 10, 10, 10, 10},
-     SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION},
+     IDX(SPELL_INFO_ATTRIBUTE_POWER) | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION},
     {"shield",
      1,
      15,
@@ -6565,7 +6565,7 @@ DATA(0x004fbe78) SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)] = {
      150,
      3,
      {10, 10, 10, 10, 10, 10},
-     SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION},
+     IDX(SPELL_INFO_ATTRIBUTE_POWER) | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION},
     {"shield",
      4,
      15,
@@ -6573,7 +6573,7 @@ DATA(0x004fbe78) SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)] = {
      375,
      7,
      {10, 10, 10, 10, 10, 10},
-     SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION},
+     IDX(SPELL_INFO_ATTRIBUTE_POWER) | SPELL_INFO_ATTRIBUTE_COMBAT | SPELL_INFO_ATTRIBUTE_DURATION},
     {"sumnelm",
      5,
      56,
@@ -6581,7 +6581,7 @@ DATA(0x004fbe78) SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)] = {
      1000,
      30,
      {0, 0, 0, 0, 0, 0},
-     SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT},
+     IDX(SPELL_INFO_ATTRIBUTE_POWER) | SPELL_INFO_ATTRIBUTE_COMBAT},
     {"sumnelm",
      5,
      57,
@@ -6589,7 +6589,7 @@ DATA(0x004fbe78) SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)] = {
      1000,
      30,
      {0, 0, 0, 0, 0, 0},
-     SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT},
+     IDX(SPELL_INFO_ATTRIBUTE_POWER) | SPELL_INFO_ATTRIBUTE_COMBAT},
     {"sumnelm",
      5,
      58,
@@ -6597,7 +6597,7 @@ DATA(0x004fbe78) SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)] = {
      1000,
      30,
      {0, 0, 0, 0, 0, 0},
-     SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT},
+     IDX(SPELL_INFO_ATTRIBUTE_POWER) | SPELL_INFO_ATTRIBUTE_COMBAT},
     {"sumnelm",
      5,
      59,
@@ -6605,7 +6605,7 @@ DATA(0x004fbe78) SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)] = {
      1000,
      30,
      {0, 0, 0, 0, 0, 0},
-     SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT},
+     IDX(SPELL_INFO_ATTRIBUTE_POWER) | SPELL_INFO_ATTRIBUTE_COMBAT},
     {"erthquak",
      3,
      33,
@@ -6613,24 +6613,24 @@ DATA(0x004fbe78) SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)] = {
      300,
      15,
      {10, 10, 10, 10, 10, 10},
-     SPELL_INFO_ATTRIBUTE_POWER | SPELL_INFO_ATTRIBUTE_COMBAT},
-    {"", 1, 39, 0, 30, 1, {10, 10, 10, 10, 10, 10}, SPELL_INFO_ATTRIBUTE_ADVENTURE},
-    {"", 1, 40, 0, 30, 1, {10, 10, 10, 10, 10, 10}, SPELL_INFO_ATTRIBUTE_ADVENTURE},
-    {"", 2, 41, 0, 30, 2, {10, 10, 10, 10, 10, 10}, SPELL_INFO_ATTRIBUTE_ADVENTURE},
-    {"", 3, 42, 0, 30, 2, {10, 10, 10, 10, 10, 10}, SPELL_INFO_ATTRIBUTE_ADVENTURE},
-    {"", 3, 43, 0, 30, 2, {10, 10, 10, 10, 10, 10}, SPELL_INFO_ATTRIBUTE_ADVENTURE},
-    {"", 4, 44, 0, 30, 3, {10, 10, 10, 10, 10, 10}, SPELL_INFO_ATTRIBUTE_ADVENTURE},
-    {"", 3, 45, 0, 30, 3, {10, 10, 10, 10, 10, 10}, SPELL_INFO_ATTRIBUTE_ADVENTURE},
-    {"", 2, 46, 0, 30, 5, {10, 10, 10, 10, 10, 10}, SPELL_INFO_ATTRIBUTE_ADVENTURE},
-    {"", 5, 47, 0, 1500, 10, {10, 10, 10, 10, 10, 10}, SPELL_INFO_ATTRIBUTE_ADVENTURE},
-    {"", 4, 48, 0, 30, 10, {10, 10, 10, 10, 10, 10}, SPELL_INFO_ATTRIBUTE_ADVENTURE},
-    {"", 5, 49, 0, 30, 20, {0, 0, 0, 0, 0, 0}, SPELL_INFO_ATTRIBUTE_ADVENTURE},
-    {"", 2, 50, 0, 30, 6, {0, 0, 0, 0, 0, 0}, SPELL_INFO_ATTRIBUTE_ADVENTURE},
-    {"", 2, 51, 0, 30, 8, {0, 0, 0, 0, 0, 0}, SPELL_INFO_ATTRIBUTE_ADVENTURE},
-    {"", 4, 52, 0, 700, 15, {0, 0, 0, 0, 0, 0}, SPELL_INFO_ATTRIBUTE_ADVENTURE},
-    {"", 4, 53, 0, 700, 15, {0, 0, 0, 0, 0, 0}, SPELL_INFO_ATTRIBUTE_ADVENTURE},
-    {"", 4, 54, 0, 700, 15, {0, 0, 0, 0, 0, 0}, SPELL_INFO_ATTRIBUTE_ADVENTURE},
-    {"", 4, 55, 0, 700, 15, {0, 0, 0, 0, 0, 0}, SPELL_INFO_ATTRIBUTE_ADVENTURE}
+     IDX(SPELL_INFO_ATTRIBUTE_POWER) | SPELL_INFO_ATTRIBUTE_COMBAT},
+    {"", 1, 39, 0, 30, 1, {10, 10, 10, 10, 10, 10}, IDX(SPELL_INFO_ATTRIBUTE_ADVENTURE)},
+    {"", 1, 40, 0, 30, 1, {10, 10, 10, 10, 10, 10}, IDX(SPELL_INFO_ATTRIBUTE_ADVENTURE)},
+    {"", 2, 41, 0, 30, 2, {10, 10, 10, 10, 10, 10}, IDX(SPELL_INFO_ATTRIBUTE_ADVENTURE)},
+    {"", 3, 42, 0, 30, 2, {10, 10, 10, 10, 10, 10}, IDX(SPELL_INFO_ATTRIBUTE_ADVENTURE)},
+    {"", 3, 43, 0, 30, 2, {10, 10, 10, 10, 10, 10}, IDX(SPELL_INFO_ATTRIBUTE_ADVENTURE)},
+    {"", 4, 44, 0, 30, 3, {10, 10, 10, 10, 10, 10}, IDX(SPELL_INFO_ATTRIBUTE_ADVENTURE)},
+    {"", 3, 45, 0, 30, 3, {10, 10, 10, 10, 10, 10}, IDX(SPELL_INFO_ATTRIBUTE_ADVENTURE)},
+    {"", 2, 46, 0, 30, 5, {10, 10, 10, 10, 10, 10}, IDX(SPELL_INFO_ATTRIBUTE_ADVENTURE)},
+    {"", 5, 47, 0, 1500, 10, {10, 10, 10, 10, 10, 10}, IDX(SPELL_INFO_ATTRIBUTE_ADVENTURE)},
+    {"", 4, 48, 0, 30, 10, {10, 10, 10, 10, 10, 10}, IDX(SPELL_INFO_ATTRIBUTE_ADVENTURE)},
+    {"", 5, 49, 0, 30, 20, {0, 0, 0, 0, 0, 0}, IDX(SPELL_INFO_ATTRIBUTE_ADVENTURE)},
+    {"", 2, 50, 0, 30, 6, {0, 0, 0, 0, 0, 0}, IDX(SPELL_INFO_ATTRIBUTE_ADVENTURE)},
+    {"", 2, 51, 0, 30, 8, {0, 0, 0, 0, 0, 0}, IDX(SPELL_INFO_ATTRIBUTE_ADVENTURE)},
+    {"", 4, 52, 0, 700, 15, {0, 0, 0, 0, 0, 0}, IDX(SPELL_INFO_ATTRIBUTE_ADVENTURE)},
+    {"", 4, 53, 0, 700, 15, {0, 0, 0, 0, 0, 0}, IDX(SPELL_INFO_ATTRIBUTE_ADVENTURE)},
+    {"", 4, 54, 0, 700, 15, {0, 0, 0, 0, 0, 0}, IDX(SPELL_INFO_ATTRIBUTE_ADVENTURE)},
+    {"", 4, 55, 0, 700, 15, {0, 0, 0, 0, 0, 0}, IDX(SPELL_INFO_ATTRIBUTE_ADVENTURE)}
 };
 DATA(0x004fc410) char* cArmyFrameFileNames[IDX(CREATURE_COUNT)] = {
     "peas_frm.bin", "archrfrm.bin", "archrfrm.bin", "pikmnfrm.bin", "pikmnfrm.bin", "swrdsfrm.bin",

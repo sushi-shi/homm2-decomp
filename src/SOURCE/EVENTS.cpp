@@ -302,27 +302,27 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_HILL_FORT:
-            thirdUpgrade = -1;
-            secondUpgrade1 = -1;
-            firstUpgrade_e = -1;
-            if (eventHero2->CreatureTypeCount(CREATURE_OGRE))
+            thirdUpgrade = CREATURE_NONE;
+            secondUpgrade1 = CREATURE_NONE;
+            firstUpgrade_e = CREATURE_NONE;
+            if (eventHero2->CreatureTypeCount(IDX(CREATURE_OGRE)))
                 firstUpgrade_e = CREATURE_OGRE;
-            if (eventHero2->CreatureTypeCount(CREATURE_ORC)) {
-                if (firstUpgrade_e == -1)
+            if (eventHero2->CreatureTypeCount(IDX(CREATURE_ORC))) {
+                if (firstUpgrade_e == CREATURE_NONE)
                     firstUpgrade_e = CREATURE_ORC;
                 else
                     secondUpgrade1 = CREATURE_ORC;
             }
-            if (eventHero2->CreatureTypeCount(CREATURE_DWARF)) {
-                if (firstUpgrade_e == -1)
+            if (eventHero2->CreatureTypeCount(IDX(CREATURE_DWARF))) {
+                if (firstUpgrade_e == CREATURE_NONE)
                     firstUpgrade_e = CREATURE_DWARF;
-                else if (secondUpgrade1 == -1)
+                else if (secondUpgrade1 == CREATURE_NONE)
                     secondUpgrade1 = CREATURE_DWARF;
                 else
                     thirdUpgrade = CREATURE_DWARF;
             }
 
-            if (firstUpgrade_e == -1) {
+            if (firstUpgrade_e == CREATURE_NONE) {
                 EventWindow(
                     -1,
                     1,
@@ -337,11 +337,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 );
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-                eventHero2->UpgradeCreatures(CREATURE_OGRE, CREATURE_OGRE_LORD);
-                eventHero2->UpgradeCreatures(CREATURE_ORC, CREATURE_ORC_CHIEF);
-                eventHero2->UpgradeCreatures(CREATURE_DWARF, CREATURE_BATTLE_DWARF);
-                if (thirdUpgrade == -1) {
-                    if (secondUpgrade1 == -1) {
+                eventHero2->UpgradeCreatures(IDX(CREATURE_OGRE), IDX(CREATURE_OGRE_LORD));
+                eventHero2->UpgradeCreatures(IDX(CREATURE_ORC), IDX(CREATURE_ORC_CHIEF));
+                eventHero2->UpgradeCreatures(IDX(CREATURE_DWARF), IDX(CREATURE_BATTLE_DWARF));
+                if (thirdUpgrade == CREATURE_NONE) {
+                    if (secondUpgrade1 == CREATURE_NONE) {
                         sprintf(
                             gText,
                             "{Hill Fort}\n\nAll of the %s you have in your army have been trained "
@@ -381,7 +381,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     gText,
                     EVENT_WINDOW_REWARD_CREATURE,
                     firstUpgrade_e + 1,
-                    secondUpgrade1 == -1 ? -1 : EVENT_WINDOW_REWARD_CREATURE,
+                    secondUpgrade1 == CREATURE_NONE ? -1 : EVENT_WINDOW_REWARD_CREATURE,
                     secondUpgrade1 + 1,
                     -1
                 );
@@ -389,27 +389,27 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_FREEMANS_FOUNDRY:
-            thirdUpgrade = -1;
-            secondUpgrade1 = -1;
-            firstUpgrade_e = -1;
-            if (eventHero2->CreatureTypeCount(CREATURE_PIKEMAN))
+            thirdUpgrade = CREATURE_NONE;
+            secondUpgrade1 = CREATURE_NONE;
+            firstUpgrade_e = CREATURE_NONE;
+            if (eventHero2->CreatureTypeCount(IDX(CREATURE_PIKEMAN)))
                 firstUpgrade_e = CREATURE_PIKEMAN;
-            if (eventHero2->CreatureTypeCount(CREATURE_SWORDSMAN)) {
-                if (firstUpgrade_e == -1)
+            if (eventHero2->CreatureTypeCount(IDX(CREATURE_SWORDSMAN))) {
+                if (firstUpgrade_e == CREATURE_NONE)
                     firstUpgrade_e = CREATURE_SWORDSMAN;
                 else
                     secondUpgrade1 = CREATURE_SWORDSMAN;
             }
-            if (eventHero2->CreatureTypeCount(CREATURE_IRON_GOLEM)) {
-                if (firstUpgrade_e == -1)
+            if (eventHero2->CreatureTypeCount(IDX(CREATURE_IRON_GOLEM))) {
+                if (firstUpgrade_e == CREATURE_NONE)
                     firstUpgrade_e = CREATURE_IRON_GOLEM;
-                else if (secondUpgrade1 == -1)
+                else if (secondUpgrade1 == CREATURE_NONE)
                     secondUpgrade1 = CREATURE_IRON_GOLEM;
                 else
                     thirdUpgrade = CREATURE_IRON_GOLEM;
             }
 
-            if (firstUpgrade_e == -1) {
+            if (firstUpgrade_e == CREATURE_NONE) {
                 EventWindow(
                     -1,
                     1,
@@ -426,11 +426,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 );
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-                eventHero2->UpgradeCreatures(CREATURE_PIKEMAN, CREATURE_VETERAN_PIKEMAN);
-                eventHero2->UpgradeCreatures(CREATURE_SWORDSMAN, CREATURE_MASTER_SWORDSMAN);
-                eventHero2->UpgradeCreatures(CREATURE_IRON_GOLEM, CREATURE_STEEL_GOLEM);
-                if (thirdUpgrade == -1) {
-                    if (secondUpgrade1 == -1) {
+                eventHero2->UpgradeCreatures(IDX(CREATURE_PIKEMAN), IDX(CREATURE_VETERAN_PIKEMAN));
+                eventHero2->UpgradeCreatures(IDX(CREATURE_SWORDSMAN), IDX(CREATURE_MASTER_SWORDSMAN));
+                eventHero2->UpgradeCreatures(IDX(CREATURE_IRON_GOLEM), IDX(CREATURE_STEEL_GOLEM));
+                if (thirdUpgrade == CREATURE_NONE) {
+                    if (secondUpgrade1 == CREATURE_NONE) {
                         sprintf(
                             gText,
                             "{Freeman's Foundry}\n\nAll of your %s have been upgraded into %s.",
@@ -467,7 +467,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     gText,
                     EVENT_WINDOW_REWARD_CREATURE,
                     firstUpgrade_e + 1,
-                    secondUpgrade1 == -1 ? -1 : EVENT_WINDOW_REWARD_CREATURE,
+                    secondUpgrade1 == CREATURE_NONE ? -1 : EVENT_WINDOW_REWARD_CREATURE,
                     secondUpgrade1 + 1,
                     -1
                 );
@@ -505,7 +505,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         -1,
                         0
                     );
-                    GiveResource(eventHero2, RES_GOLD, SEA_CHEST_GOLD);
+                    GiveResource(eventHero2, IDX(RES_GOLD), SEA_CHEST_GOLD);
                 }
             } else {
                 eventValue1 = cell->m_objectMetadata & CHEST_ARTIFACT_MASK;
@@ -528,7 +528,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     0
                 );
                 GiveArtifact(eventHero2, eventValue1, 1, -1);
-                GiveResource(eventHero2, RES_GOLD, SEA_CHEST_ARTIFACT_GOLD);
+                GiveResource(eventHero2, IDX(RES_GOLD), SEA_CHEST_ARTIFACT_GOLD);
             }
             fizzleType3 = 1;
             eraseObject = 1;
@@ -563,7 +563,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         -1,
                         0
                     );
-                    GiveResource(eventHero2, RES_WOOD, 5);
+                    GiveResource(eventHero2, IDX(RES_WOOD), 5);
                     break;
                 case 2:
                     NormalDialog(
@@ -579,8 +579,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         -1,
                         0
                     );
-                    GiveResource(eventHero2, RES_WOOD, 5);
-                    GiveResource(eventHero2, RES_GOLD, 200);
+                    GiveResource(eventHero2, IDX(RES_WOOD), 5);
+                    GiveResource(eventHero2, IDX(RES_GOLD), 200);
                     break;
                 case 3:
                     NormalDialog(
@@ -596,8 +596,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         -1,
                         0
                     );
-                    GiveResource(eventHero2, RES_WOOD, 10);
-                    GiveResource(eventHero2, RES_GOLD, 500);
+                    GiveResource(eventHero2, IDX(RES_WOOD), 10);
+                    GiveResource(eventHero2, IDX(RES_GOLD), 500);
                     break;
             }
             fizzleType3 = 1;
@@ -897,9 +897,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     eventHero2->CheckLevel();
                 }
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-                if (gpGame->m_mines[cell->m_objectMetadata].resourceType == RES_GOLD)
+                if (gpGame->m_mines[cell->m_objectMetadata].resourceType == IDX(RES_GOLD))
                     resourceAmount6 = MINE_GOLD_INCOME;
-                else if (gpGame->m_mines[cell->m_objectMetadata].resourceType == RES_ORE)
+                else if (gpGame->m_mines[cell->m_objectMetadata].resourceType == IDX(RES_ORE))
                     resourceAmount6 = MINE_ORE_INCOME;
                 else
                     resourceAmount6 = 1;
@@ -952,7 +952,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     "{Chest}\n\nAfter scouring the area, you fall upon a hidden treasure cache.  "
                     "You may take the gold or distribute the gold to the peasants for experience.  "
                     "Do you wish to keep the gold?",
-                    RES_GOLD,
+                    IDX(RES_GOLD),
                     cell->m_objectMetadata * CHEST_GOLD_MULTIPLIER,
                     14,
                     (cell->m_objectMetadata * 4 - 4) * CHEST_EXPERIENCE_MULTIPLIER,
@@ -961,7 +961,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
                     GiveResource(
                         eventHero2,
-                        RES_GOLD,
+                        IDX(RES_GOLD),
                         cell->m_objectMetadata * CHEST_GOLD_MULTIPLIER
                     );
                 else
@@ -1267,8 +1267,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                     if (eventHero2->NumArtifacts() == EVENT_ARTIFACT_CAPACITY) {
                         sprintf(gText, "%s.", "Treasure");
-                        EventWindow(-1, 1, gText, RES_GOLD, SKELETON_GOLD, -1, 0, -1);
-                        GiveResource(eventHero2, RES_GOLD, SKELETON_GOLD);
+                        EventWindow(-1, 1, gText, IDX(RES_GOLD), SKELETON_GOLD, -1, 0, -1);
+                        GiveResource(eventHero2, IDX(RES_GOLD), SKELETON_GOLD);
                     } else {
                         eventValue1 = cell->m_objectMetadata - SKELETON_ARTIFACT_OFFSET;
                         sprintf(
@@ -1300,7 +1300,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 14,
                 1,
                 "",
-                RES_GOLD,
+                IDX(RES_GOLD),
                 (cell->m_objectMetadata >> CAMPFIRE_AMOUNT_SHIFT) * CAMPFIRE_GOLD_MULTIPLIER,
                 cell->m_objectMetadata & CAMPFIRE_RESOURCE_MASK,
                 cell->m_objectMetadata >> CAMPFIRE_AMOUNT_SHIFT,
@@ -1308,7 +1308,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             );
             GiveResource(
                 eventHero2,
-                RES_GOLD,
+                IDX(RES_GOLD),
                 (cell->m_objectMetadata >> CAMPFIRE_AMOUNT_SHIFT) * CAMPFIRE_GOLD_MULTIPLIER
             );
             GiveResource(
@@ -1548,13 +1548,13 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     60,
                     1,
                     "",
-                    RES_GOLD,
+                    IDX(RES_GOLD),
                     cell->m_objectMetadata * MAP_EVENT_GOLD_AMOUNT,
                     -1,
                     0,
                     -1
                 );
-                GiveResource(eventHero2, RES_GOLD, cell->m_objectMetadata * MAP_EVENT_GOLD_AMOUNT);
+                GiveResource(eventHero2, IDX(RES_GOLD), cell->m_objectMetadata * MAP_EVENT_GOLD_AMOUNT);
                 cell->m_objectMetadata = 0;
             }
             break;
@@ -1595,7 +1595,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
             EventWindow(19, 2, "", -1, 0, -1, 0, -1);
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
-                RecruitEvent(eventHero2, CREATURE_GENIE, cell);
+                RecruitEvent(eventHero2, IDX(CREATURE_GENIE), cell);
                 if (!cell->m_objectMetadata) {
                     eraseObject = 1;
                     fizzleType3 = 1;
@@ -1630,7 +1630,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     -1
                 );
                 if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
-                    RecruitEvent(eventHero2, CREATURE_SPRITE, cell);
+                    RecruitEvent(eventHero2, IDX(CREATURE_SPRITE), cell);
             }
             break;
 
@@ -1661,7 +1661,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     -1
                 );
                 if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
-                    RecruitEvent(eventHero2, CREATURE_MEDUSA, cell);
+                    RecruitEvent(eventHero2, IDX(CREATURE_MEDUSA), cell);
             }
             break;
 
@@ -1695,7 +1695,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     break;
                 if (CombatMonsterEvent(
                         eventHero2,
-                        CREATURE_TROLL,
+                        IDX(CREATURE_TROLL),
                         12,
                         cell,
                         x,
@@ -1703,7 +1703,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         0,
                         x,
                         y,
-                        CREATURE_WAR_TROLL,
+                        IDX(CREATURE_WAR_TROLL),
                         8,
                         2,
                         -1,
@@ -1745,7 +1745,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 if (gpWindowManager->m_dialogResult != MONSTER_DIALOG_YES)
                     break;
             recruitTroll:
-                RecruitEvent(eventHero2, CREATURE_TROLL, cell);
+                RecruitEvent(eventHero2, IDX(CREATURE_TROLL), cell);
             }
             break;
 
@@ -1778,7 +1778,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     break;
                 if (CombatMonsterEvent(
                         eventHero2,
-                        CREATURE_VAMPIRE_LORD,
+                        IDX(CREATURE_VAMPIRE_LORD),
                         10,
                         cell,
                         x,
@@ -1786,10 +1786,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         0,
                         x,
                         y,
-                        CREATURE_ZOMBIE,
+                        IDX(CREATURE_ZOMBIE),
                         40,
                         2,
-                        CREATURE_POWER_LICH,
+                        IDX(CREATURE_POWER_LICH),
                         5,
                         1
                     )
@@ -1828,7 +1828,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 if (gpWindowManager->m_dialogResult != MONSTER_DIALOG_YES)
                     break;
             recruitLich:
-                RecruitEvent(eventHero2, CREATURE_POWER_LICH, cell);
+                RecruitEvent(eventHero2, IDX(CREATURE_POWER_LICH), cell);
             }
             break;
 
@@ -1865,7 +1865,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     dragonFactor_d = 2;
                 if (CombatMonsterEvent(
                         eventHero2,
-                        CREATURE_GREEN_DRAGON,
+                        IDX(CREATURE_GREEN_DRAGON),
                         dragonFactor_d * 3,
                         cell,
                         x,
@@ -1873,10 +1873,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         0,
                         x,
                         y,
-                        CREATURE_RED_DRAGON,
+                        IDX(CREATURE_RED_DRAGON),
                         dragonFactor_d,
                         1,
-                        CREATURE_BLACK_DRAGON,
+                        IDX(CREATURE_BLACK_DRAGON),
                         dragonFactor_d,
                         1
                     )
@@ -1918,7 +1918,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 if (gpWindowManager->m_dialogResult != MONSTER_DIALOG_YES)
                     break;
             recruitDragon:
-                RecruitEvent(eventHero2, CREATURE_RED_DRAGON, cell);
+                RecruitEvent(eventHero2, IDX(CREATURE_RED_DRAGON), cell);
             }
             break;
 
@@ -1929,7 +1929,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 EventWindow(84, 2, "", -1, 0, -1, 0, -1);
                 if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
-                    RecruitEvent(eventHero2, CREATURE_ROGUE, cell);
+                    RecruitEvent(eventHero2, IDX(CREATURE_ROGUE), cell);
             }
             break;
 
@@ -1940,7 +1940,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 EventWindow(82, 2, "", -1, 0, -1, 0, -1);
                 if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
-                    RecruitEvent(eventHero2, CREATURE_NOMAD, cell);
+                    RecruitEvent(eventHero2, IDX(CREATURE_NOMAD), cell);
             }
             break;
 
@@ -2154,7 +2154,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 gSpellNames[eventValue1]
             );
         shrineSpell:
-            if (!eventHero2->HasArtifact(ARTIFACT_MAGIC_BOOK)) {
+            if (!eventHero2->HasArtifact(IDX(ARTIFACT_MAGIC_BOOK))) {
                 strcat(gText, "Unfortunately, you have no Magic Book to record the spell with.");
                 EventWindow(-1, 1, gText, -1, 0, -1, 0, -1);
             } else if (eventHero2->m_secondarySkills[IDX(HERO_SKILL_WISDOM)] + SHRINE_WISDOM_BONUS
@@ -2546,7 +2546,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 }
                 if (CombatMonsterEvent(
                         eventHero2,
-                        guardedMonster5,
+                        IDX(guardedMonster5),
                         guardedCount,
                         cell,
                         x,
@@ -2711,7 +2711,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         -1,
                         0
                     );
-                    GiveResource(eventHero2, RES_GOLD, DAEMON_GOLD);
+                    GiveResource(eventHero2, IDX(RES_GOLD), DAEMON_GOLD);
                     cell->m_objectMetadata = DAEMON_CAVE_EMPTY;
                 }
                 break;
@@ -2769,14 +2769,14 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         "The Demon screams its challenge and attacks!  After a short, desperate "
                         "battle, you slay the monster and receive 1,000 experience points and "
                         "2,500 gold.",
-                        RES_GOLD,
+                        IDX(RES_GOLD),
                         DAEMON_GOLD,
                         14,
                         DAEMON_EXPERIENCE,
                         -1
                     );
                     GiveExperience(eventHero2, DAEMON_EXPERIENCE, 0);
-                    GiveResource(eventHero2, RES_GOLD, DAEMON_GOLD);
+                    GiveResource(eventHero2, IDX(RES_GOLD), DAEMON_GOLD);
                     cell->m_objectMetadata = DAEMON_CAVE_EMPTY;
                     eventHero2->CheckLevel();
                     break;
@@ -2994,7 +2994,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 } else {
                     if (CombatMonsterEvent(
                             eventHero2,
-                            CREATURE_ROYAL_MUMMY,
+                            IDX(CREATURE_ROYAL_MUMMY),
                             30,
                             cell,
                             x,
@@ -3002,7 +3002,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             0,
                             x,
                             y,
-                            CREATURE_VAMPIRE_LORD,
+                            IDX(CREATURE_VAMPIRE_LORD),
                             20,
                             2,
                             -1,
@@ -3019,7 +3019,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             "wall, telling the secret of the spell - ",
                             gSpellNames[eventValue1]
                         );
-                        if (!eventHero2->HasArtifact(ARTIFACT_MAGIC_BOOK)) {
+                        if (!eventHero2->HasArtifact(IDX(ARTIFACT_MAGIC_BOOK))) {
                             strcat(
                                 eventText,
                                 "  Unfortunately, you have no Magic Book to record the spell with."
@@ -3216,23 +3216,23 @@ void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
     }
 
     erased_a = 1;
-    if (cell->m_objectTileset == ERASE_TILESET_11)
+    if (cell->m_objectTileset == IDX(ERASE_TILESET_11))
         frame_k = cell->m_objectIndex - 1;
-    if (cell->m_objectTileset == ERASE_TILESET_63)
+    if (cell->m_objectTileset == IDX(ERASE_TILESET_63))
         frame_k = cell->m_objectIndex - 1;
-    if (cell->m_objectTileset == ERASE_TILESET_62 && cell->m_objectIndex == 9) {
+    if (cell->m_objectTileset == IDX(ERASE_TILESET_62) && cell->m_objectIndex == 9) {
         frame_k = 9;
         isWide_d = 1;
     }
-    if (cell->m_objectTileset == ERASE_TILESET_59 && cell->m_objectIndex == 131)
+    if (cell->m_objectTileset == IDX(ERASE_TILESET_59) && cell->m_objectIndex == 131)
         frame_k = 124;
-    if (cell->m_objectTileset == ERASE_TILESET_55 && cell->m_objectIndex == 61)
+    if (cell->m_objectTileset == IDX(ERASE_TILESET_55) && cell->m_objectIndex == 61)
         frame_k = 54;
-    if (cell->m_objectTileset == ERASE_TILESET_50 && cell->m_objectIndex == 45)
+    if (cell->m_objectTileset == IDX(ERASE_TILESET_50) && cell->m_objectIndex == 45)
         frame_k = 38;
-    if (cell->m_objectTileset == ERASE_TILESET_50 && cell->m_objectIndex == 19)
+    if (cell->m_objectTileset == IDX(ERASE_TILESET_50) && cell->m_objectIndex == 19)
         frame_k = 12;
-    if (cell->m_objectTileset == ERASE_TILESET_46) {
+    if (cell->m_objectTileset == IDX(ERASE_TILESET_46)) {
         switch (cell->m_objectIndex) {
             case 1:
                 frame_k = 0;
@@ -3389,7 +3389,7 @@ void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
                 extra_i = 0;
         }
 
-        currentCell_k->m_flags |= MAP_CELL_OBJECT_SHADOW_ONLY;
+        currentCell_k->m_flags |= IDX(MAP_CELL_OBJECT_SHADOW_ONLY);
     cellDone:
         changed_i = 0;
     }
@@ -3538,7 +3538,7 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
     siteLevel6 >>= GENERIC_SITE_LEVEL_SHIFT;
 
     switch (siteType2) {
-        case GENERIC_SITE_ALCHEMIST_TOWER:
+        case IDX(GENERIC_SITE_ALCHEMIST_TOWER):
             for (index3 = 0; index3 < GENERIC_SITE_ARTIFACT_SLOT_COUNT; index3++) {
                 if (IsCursedItem(eventHero->m_artifacts[index3]))
                     cursedArtifactCount9++;
@@ -3604,7 +3604,7 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
             }
             break;
 
-        case GENERIC_SITE_ARENA:
+        case IDX(GENERIC_SITE_ARENA):
             if (HAS(eventHero->m_eventFlags, HERO_EVENT_ARENA)) {
                 NormalDialog("The Arena guards turn you away.", 1, -1, -1, -1, 0, -1, 0, -1, 0);
             } else {
@@ -3615,7 +3615,7 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
             }
             break;
 
-        case GENERIC_SITE_MERMAIDS:
+        case IDX(GENERIC_SITE_MERMAIDS):
             if (HAS(eventHero->m_eventFlags, HERO_EVENT_MERMAID)) {
                 NormalDialog(
                     "The mermaids silently entice you to return later and be "
@@ -3650,7 +3650,7 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
             }
             break;
 
-        case GENERIC_SITE_HUT_OF_MAGI:
+        case IDX(GENERIC_SITE_HUT_OF_MAGI):
             EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, siteType2, &eventSample5);
             NormalDialog(
                 "You enter a rickety hut and talk to the magician who lives there.  "
@@ -3687,7 +3687,7 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
             }
             break;
 
-        case GENERIC_SITE_EYE_OF_MAGI:
+        case IDX(GENERIC_SITE_EYE_OF_MAGI):
             NormalDialog(
                 "This eye seems to be intently studying its surroundings.",
                 1,
@@ -3702,7 +3702,7 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
             );
             break;
 
-        case GENERIC_SITE_SIRENS:
+        case IDX(GENERIC_SITE_SIRENS):
             if (HAS(eventHero->m_eventFlags, HERO_EVENT_SIRENS)) {
                 NormalDialog(
                     "You have your crew stop up their ears with wax before the "
@@ -3768,7 +3768,7 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
             }
             break;
 
-        case GENERIC_SITE_STABLES:
+        case IDX(GENERIC_SITE_STABLES):
             unusedOne18 = 1;
             unusedTwo6 = 2;
             stableResult26 = 0;
@@ -3778,8 +3778,8 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
                 eventHero->m_remainingMobility += GENERIC_SITE_STABLE_MOBILITY;
                 stableResult26 |= 1;
             }
-            if (eventHero->CreatureTypeCount(CREATURE_CAVALRY)) {
-                eventHero->UpgradeCreatures(CREATURE_CAVALRY, CREATURE_CHAMPION);
+            if (eventHero->CreatureTypeCount(IDX(CREATURE_CAVALRY))) {
+                eventHero->UpgradeCreatures(IDX(CREATURE_CAVALRY), IDX(CREATURE_CHAMPION));
                 stableResult26 |= 2;
             }
             if (stableResult26 != 0) {
@@ -3822,19 +3822,19 @@ void advManager::RecruitSiteEvent(mapCell* cell, hero* eventHero) {
     availableCount >>= AI_EVENT_RECRUIT_COUNT_SHIFT;
 
     switch (siteType2) {
-        case RECRUIT_SITE_GHOST:
+        case IDX(RECRUIT_SITE_GHOST):
             creatureType1 = CREATURE_GHOST;
             break;
-        case RECRUIT_SITE_EARTH_ELEMENTAL:
+        case IDX(RECRUIT_SITE_EARTH_ELEMENTAL):
             creatureType1 = CREATURE_EARTH_ELEMENTAL;
             break;
-        case RECRUIT_SITE_AIR_ELEMENTAL:
+        case IDX(RECRUIT_SITE_AIR_ELEMENTAL):
             creatureType1 = CREATURE_AIR_ELEMENTAL;
             break;
-        case RECRUIT_SITE_FIRE_ELEMENTAL:
+        case IDX(RECRUIT_SITE_FIRE_ELEMENTAL):
             creatureType1 = CREATURE_FIRE_ELEMENTAL;
             break;
-        case RECRUIT_SITE_WATER_ELEMENTAL:
+        case IDX(RECRUIT_SITE_WATER_ELEMENTAL):
             creatureType1 = CREATURE_WATER_ELEMENTAL;
             break;
     }
@@ -3846,7 +3846,7 @@ void advManager::RecruitSiteEvent(mapCell* cell, hero* eventHero) {
         EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, availableCount, &eventSample);
         EventWindow(-1, 2, xRecruitBuy[siteIndex], -1, 0, -1, 0, -1);
         if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
-            ExpansionRecruitEvent(eventHero, creatureType1, &availableCount);
+            ExpansionRecruitEvent(eventHero, IDX(creatureType1), &availableCount);
             packedSite1 = (availableCount << AI_EVENT_RECRUIT_COUNT_SHIFT) | siteType2;
             cell->m_objectMetadata = packedSite1;
         }
@@ -4121,24 +4121,24 @@ void advManager::EventSound(i32 eventType, i32 eventData, struct SAMPLE2* outSam
             break;
         case MAP_OBJECT_EXPANSION_OBJECT:
             switch (eventData) {
-                case EVENT_SOUND_VARIANT_0:
+                case IDX(EVENT_SOUND_VARIANT_0):
                     musicTrack_e = experienceSound_o;
                     break;
-                case EVENT_SOUND_VARIANT_1:
+                case IDX(EVENT_SOUND_VARIANT_1):
                     musicTrack_e = experienceSound_o;
                     break;
-                case EVENT_SOUND_VARIANT_5:
+                case IDX(EVENT_SOUND_VARIANT_5):
                     musicTrack_e = luckSound_g;
                     break;
-                case EVENT_SOUND_VARIANT_2:
+                case IDX(EVENT_SOUND_VARIANT_2):
                     musicTrack_e = experienceSound_o;
                     break;
-                case EVENT_SOUND_VARIANT_3:
+                case IDX(EVENT_SOUND_VARIANT_3):
                     break;
-                case EVENT_SOUND_VARIANT_6:
+                case IDX(EVENT_SOUND_VARIANT_6):
                     musicTrack_e = experienceSound_o;
                     break;
-                case EVENT_SOUND_VARIANT_4:
+                case IDX(EVENT_SOUND_VARIANT_4):
                     musicTrack_e = experienceSound_o;
                     break;
                 default:;
@@ -4230,7 +4230,7 @@ i32 GiveArtifact(hero* eventHero, i32 artifact, i32 checkEndGame, i8 artifactExt
     i32 artifactSlot;
 
     for (artifactSlot = 0; artifactSlot < EVENT_ARTIFACT_SLOT_COUNT; artifactSlot++) {
-        if (eventHero->m_artifacts[artifactSlot] == ARTIFACT_NONE) {
+        if (eventHero->m_artifacts[artifactSlot] == IDX(ARTIFACT_NONE)) {
             break;
         }
     }
@@ -4253,7 +4253,7 @@ i32 advManager::GiveRandomArtifact(hero* eventHero) {
     i32 artifactId = gpGame->GetRandomArtifactId(EVENT_RANDOM_ARTIFACT_ANY, 1);
 
     if (artifactId == ARTIFACT_NONE)
-        GiveResource(eventHero, RES_GOLD, EVENT_RANDOM_ARTIFACT_GOLD);
+        GiveResource(eventHero, IDX(RES_GOLD), EVENT_RANDOM_ARTIFACT_GOLD);
     else
         GiveArtifact(eventHero, artifactId, 1, ARTIFACT_NONE);
     return artifactId;
@@ -4308,7 +4308,7 @@ i32 advManager::SkeletonEvent(hero* eventHero, mapCell* cell, char* text, i32 x,
         case IDX(UNDEAD_EVENT_LEVEL_SMALL):
             if (CombatMonsterEvent(
                     eventHero,
-                    CREATURE_SKELETON,
+                    IDX(CREATURE_SKELETON),
                     SKELETON_EVENT_SMALL_COUNT,
                     cell,
                     x,
@@ -4324,8 +4324,8 @@ i32 advManager::SkeletonEvent(hero* eventHero, mapCell* cell, char* text, i32 x,
                     0
                 )
                 == 0) {
-                EventWindow(-1, 1, text, RES_GOLD, SKELETON_EVENT_SMALL_GOLD, -1, 0, -1);
-                GiveResource(eventHero, RES_GOLD, SKELETON_EVENT_SMALL_GOLD);
+                EventWindow(-1, 1, text, IDX(RES_GOLD), SKELETON_EVENT_SMALL_GOLD, -1, 0, -1);
+                GiveResource(eventHero, IDX(RES_GOLD), SKELETON_EVENT_SMALL_GOLD);
                 eventHero->CheckLevel();
                 return 1;
             }
@@ -4333,7 +4333,7 @@ i32 advManager::SkeletonEvent(hero* eventHero, mapCell* cell, char* text, i32 x,
         case IDX(UNDEAD_EVENT_LEVEL_MEDIUM):
             if (CombatMonsterEvent(
                     eventHero,
-                    CREATURE_SKELETON,
+                    IDX(CREATURE_SKELETON),
                     SKELETON_EVENT_MEDIUM_COUNT,
                     cell,
                     x,
@@ -4349,8 +4349,8 @@ i32 advManager::SkeletonEvent(hero* eventHero, mapCell* cell, char* text, i32 x,
                     0
                 )
                 == 0) {
-                EventWindow(-1, 1, text, RES_GOLD, SKELETON_EVENT_MEDIUM_GOLD, -1, 0, -1);
-                GiveResource(eventHero, RES_GOLD, SKELETON_EVENT_MEDIUM_GOLD);
+                EventWindow(-1, 1, text, IDX(RES_GOLD), SKELETON_EVENT_MEDIUM_GOLD, -1, 0, -1);
+                GiveResource(eventHero, IDX(RES_GOLD), SKELETON_EVENT_MEDIUM_GOLD);
                 eventHero->CheckLevel();
                 return 1;
             }
@@ -4358,7 +4358,7 @@ i32 advManager::SkeletonEvent(hero* eventHero, mapCell* cell, char* text, i32 x,
         case IDX(UNDEAD_EVENT_LEVEL_LARGE):
             if (CombatMonsterEvent(
                     eventHero,
-                    CREATURE_SKELETON,
+                    IDX(CREATURE_SKELETON),
                     SKELETON_EVENT_LARGE_COUNT,
                     cell,
                     x,
@@ -4374,8 +4374,8 @@ i32 advManager::SkeletonEvent(hero* eventHero, mapCell* cell, char* text, i32 x,
                     0
                 )
                 == 0) {
-                EventWindow(-1, 1, text, RES_GOLD, SKELETON_EVENT_LARGE_GOLD, -1, 0, -1);
-                GiveResource(eventHero, RES_GOLD, SKELETON_EVENT_LARGE_GOLD);
+                EventWindow(-1, 1, text, IDX(RES_GOLD), SKELETON_EVENT_LARGE_GOLD, -1, 0, -1);
+                GiveResource(eventHero, IDX(RES_GOLD), SKELETON_EVENT_LARGE_GOLD);
                 eventHero->CheckLevel();
                 return 1;
             }
@@ -4383,7 +4383,7 @@ i32 advManager::SkeletonEvent(hero* eventHero, mapCell* cell, char* text, i32 x,
         default:
             if (CombatMonsterEvent(
                     eventHero,
-                    CREATURE_SKELETON,
+                    IDX(CREATURE_SKELETON),
                     SKELETON_EVENT_HUGE_COUNT,
                     cell,
                     x,
@@ -4399,8 +4399,8 @@ i32 advManager::SkeletonEvent(hero* eventHero, mapCell* cell, char* text, i32 x,
                     0
                 )
                 == 0) {
-                EventWindow(-1, 1, text, RES_GOLD, SKELETON_EVENT_HUGE_GOLD, -1, 0, -1);
-                GiveResource(eventHero, RES_GOLD, SKELETON_EVENT_HUGE_GOLD);
+                EventWindow(-1, 1, text, IDX(RES_GOLD), SKELETON_EVENT_HUGE_GOLD, -1, 0, -1);
+                GiveResource(eventHero, IDX(RES_GOLD), SKELETON_EVENT_HUGE_GOLD);
                 eventHero->CheckLevel();
                 return 1;
             }
@@ -4416,7 +4416,7 @@ i32 advManager::ZombieEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i
         case IDX(UNDEAD_EVENT_LEVEL_SMALL):
             if (CombatMonsterEvent(
                     eventHero,
-                    CREATURE_ZOMBIE,
+                    IDX(CREATURE_ZOMBIE),
                     ZOMBIE_EVENT_SMALL_COUNT,
                     cell,
                     x,
@@ -4424,7 +4424,7 @@ i32 advManager::ZombieEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i
                     0,
                     x,
                     y,
-                    CREATURE_MUTANT_ZOMBIE,
+                    IDX(CREATURE_MUTANT_ZOMBIE),
                     ZOMBIE_EVENT_SMALL_SUPPORT_COUNT,
                     ZOMBIE_EVENT_SUPPORT_STACKS,
                     -1,
@@ -4432,8 +4432,8 @@ i32 advManager::ZombieEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i
                     0
                 )
                 == 0) {
-                EventWindow(-1, 1, text, RES_GOLD, ZOMBIE_EVENT_SMALL_GOLD, -1, 0, -1);
-                GiveResource(eventHero, RES_GOLD, ZOMBIE_EVENT_SMALL_GOLD);
+                EventWindow(-1, 1, text, IDX(RES_GOLD), ZOMBIE_EVENT_SMALL_GOLD, -1, 0, -1);
+                GiveResource(eventHero, IDX(RES_GOLD), ZOMBIE_EVENT_SMALL_GOLD);
                 eventHero->CheckLevel();
                 return 1;
             }
@@ -4441,7 +4441,7 @@ i32 advManager::ZombieEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i
         case IDX(UNDEAD_EVENT_LEVEL_MEDIUM):
             if (CombatMonsterEvent(
                     eventHero,
-                    CREATURE_MUTANT_ZOMBIE,
+                    IDX(CREATURE_MUTANT_ZOMBIE),
                     ZOMBIE_EVENT_MEDIUM_COUNT,
                     cell,
                     x,
@@ -4449,7 +4449,7 @@ i32 advManager::ZombieEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i
                     0,
                     x,
                     y,
-                    CREATURE_MUTANT_ZOMBIE,
+                    IDX(CREATURE_MUTANT_ZOMBIE),
                     ZOMBIE_EVENT_MEDIUM_SUPPORT_COUNT,
                     ZOMBIE_EVENT_SUPPORT_STACKS,
                     -1,
@@ -4457,8 +4457,8 @@ i32 advManager::ZombieEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i
                     0
                 )
                 == 0) {
-                EventWindow(-1, 1, text, RES_GOLD, ZOMBIE_EVENT_MEDIUM_GOLD, -1, 0, -1);
-                GiveResource(eventHero, RES_GOLD, ZOMBIE_EVENT_MEDIUM_GOLD);
+                EventWindow(-1, 1, text, IDX(RES_GOLD), ZOMBIE_EVENT_MEDIUM_GOLD, -1, 0, -1);
+                GiveResource(eventHero, IDX(RES_GOLD), ZOMBIE_EVENT_MEDIUM_GOLD);
                 eventHero->CheckLevel();
                 return 1;
             }
@@ -4466,7 +4466,7 @@ i32 advManager::ZombieEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i
         case IDX(UNDEAD_EVENT_LEVEL_LARGE):
             if (CombatMonsterEvent(
                     eventHero,
-                    CREATURE_MUTANT_ZOMBIE,
+                    IDX(CREATURE_MUTANT_ZOMBIE),
                     ZOMBIE_EVENT_LARGE_COUNT,
                     cell,
                     x,
@@ -4474,7 +4474,7 @@ i32 advManager::ZombieEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i
                     0,
                     x,
                     y,
-                    CREATURE_MUTANT_ZOMBIE,
+                    IDX(CREATURE_MUTANT_ZOMBIE),
                     ZOMBIE_EVENT_LARGE_SUPPORT_COUNT,
                     ZOMBIE_EVENT_SUPPORT_STACKS,
                     -1,
@@ -4482,8 +4482,8 @@ i32 advManager::ZombieEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i
                     0
                 )
                 == 0) {
-                EventWindow(-1, 1, text, RES_GOLD, ZOMBIE_EVENT_LARGE_GOLD, -1, 0, -1);
-                GiveResource(eventHero, RES_GOLD, ZOMBIE_EVENT_LARGE_GOLD);
+                EventWindow(-1, 1, text, IDX(RES_GOLD), ZOMBIE_EVENT_LARGE_GOLD, -1, 0, -1);
+                GiveResource(eventHero, IDX(RES_GOLD), ZOMBIE_EVENT_LARGE_GOLD);
                 eventHero->CheckLevel();
                 return 1;
             }
@@ -4491,7 +4491,7 @@ i32 advManager::ZombieEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i
         default:
             if (CombatMonsterEvent(
                     eventHero,
-                    CREATURE_MUTANT_ZOMBIE,
+                    IDX(CREATURE_MUTANT_ZOMBIE),
                     ZOMBIE_EVENT_HUGE_COUNT,
                     cell,
                     x,
@@ -4499,7 +4499,7 @@ i32 advManager::ZombieEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i
                     0,
                     x,
                     y,
-                    CREATURE_MUTANT_ZOMBIE,
+                    IDX(CREATURE_MUTANT_ZOMBIE),
                     ZOMBIE_EVENT_HUGE_SUPPORT_COUNT,
                     ZOMBIE_EVENT_SUPPORT_STACKS,
                     -1,
@@ -4513,15 +4513,15 @@ i32 advManager::ZombieEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i
                         -1,
                         1,
                         text,
-                        RES_GOLD,
+                        IDX(RES_GOLD),
                         ZOMBIE_EVENT_HUGE_GOLD,
                         MAP_EVENT_REWARD_ARTIFACT,
                         artifactId,
                         -1
                     );
                 else
-                    EventWindow(-1, 1, text, RES_GOLD, ZOMBIE_EVENT_HUGE_GOLD, -1, 0, -1);
-                GiveResource(eventHero, RES_GOLD, ZOMBIE_EVENT_HUGE_GOLD);
+                    EventWindow(-1, 1, text, IDX(RES_GOLD), ZOMBIE_EVENT_HUGE_GOLD, -1, 0, -1);
+                GiveResource(eventHero, IDX(RES_GOLD), ZOMBIE_EVENT_HUGE_GOLD);
                 eventHero->CheckLevel();
                 return 1;
             }
@@ -4537,7 +4537,7 @@ i32 advManager::GhostEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i3
         case IDX(UNDEAD_EVENT_LEVEL_SMALL):
             if (CombatMonsterEvent(
                     eventHero,
-                    CREATURE_GHOST,
+                    IDX(CREATURE_GHOST),
                     GHOST_EVENT_SMALL_COUNT,
                     cell,
                     x,
@@ -4554,8 +4554,8 @@ i32 advManager::GhostEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i3
                 )
                 == 0) {
                 sprintf(gText, "%s", text);
-                EventWindow(-1, 1, gText, RES_GOLD, GHOST_EVENT_SMALL_GOLD, -1, 0, -1);
-                GiveResource(eventHero, RES_GOLD, GHOST_EVENT_SMALL_GOLD);
+                EventWindow(-1, 1, gText, IDX(RES_GOLD), GHOST_EVENT_SMALL_GOLD, -1, 0, -1);
+                GiveResource(eventHero, IDX(RES_GOLD), GHOST_EVENT_SMALL_GOLD);
                 eventHero->CheckLevel();
                 return 1;
             }
@@ -4563,7 +4563,7 @@ i32 advManager::GhostEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i3
         case IDX(UNDEAD_EVENT_LEVEL_MEDIUM):
             if (CombatMonsterEvent(
                     eventHero,
-                    CREATURE_GHOST,
+                    IDX(CREATURE_GHOST),
                     GHOST_EVENT_MEDIUM_COUNT,
                     cell,
                     x,
@@ -4580,8 +4580,8 @@ i32 advManager::GhostEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i3
                 )
                 == 0) {
                 sprintf(gText, "%s", text);
-                EventWindow(-1, 1, gText, RES_GOLD, GHOST_EVENT_MEDIUM_GOLD, -1, 0, -1);
-                GiveResource(eventHero, RES_GOLD, GHOST_EVENT_MEDIUM_GOLD);
+                EventWindow(-1, 1, gText, IDX(RES_GOLD), GHOST_EVENT_MEDIUM_GOLD, -1, 0, -1);
+                GiveResource(eventHero, IDX(RES_GOLD), GHOST_EVENT_MEDIUM_GOLD);
                 eventHero->CheckLevel();
                 return 1;
             }
@@ -4589,7 +4589,7 @@ i32 advManager::GhostEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i3
         case IDX(UNDEAD_EVENT_LEVEL_LARGE):
             if (CombatMonsterEvent(
                     eventHero,
-                    CREATURE_GHOST,
+                    IDX(CREATURE_GHOST),
                     GHOST_EVENT_LARGE_COUNT,
                     cell,
                     x,
@@ -4606,8 +4606,8 @@ i32 advManager::GhostEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i3
                 )
                 == 0) {
                 sprintf(gText, "%s", text);
-                EventWindow(-1, 1, gText, RES_GOLD, GHOST_EVENT_LARGE_GOLD, -1, 0, -1);
-                GiveResource(eventHero, RES_GOLD, GHOST_EVENT_LARGE_GOLD);
+                EventWindow(-1, 1, gText, IDX(RES_GOLD), GHOST_EVENT_LARGE_GOLD, -1, 0, -1);
+                GiveResource(eventHero, IDX(RES_GOLD), GHOST_EVENT_LARGE_GOLD);
                 eventHero->CheckLevel();
                 return 1;
             }
@@ -4615,7 +4615,7 @@ i32 advManager::GhostEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i3
         default:
             if (CombatMonsterEvent(
                     eventHero,
-                    CREATURE_GHOST,
+                    IDX(CREATURE_GHOST),
                     GHOST_EVENT_HUGE_COUNT,
                     cell,
                     x,
@@ -4638,15 +4638,15 @@ i32 advManager::GhostEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i3
                         -1,
                         1,
                         gText,
-                        RES_GOLD,
+                        IDX(RES_GOLD),
                         GHOST_EVENT_HUGE_GOLD,
                         MAP_EVENT_REWARD_ARTIFACT,
                         artifactId,
                         -1
                     );
                 else
-                    EventWindow(-1, 1, gText, RES_GOLD, GHOST_EVENT_HUGE_GOLD, -1, 0, -1);
-                GiveResource(eventHero, RES_GOLD, GHOST_EVENT_HUGE_GOLD);
+                    EventWindow(-1, 1, gText, IDX(RES_GOLD), GHOST_EVENT_HUGE_GOLD, -1, 0, -1);
+                GiveResource(eventHero, IDX(RES_GOLD), GHOST_EVENT_HUGE_GOLD);
                 eventHero->CheckLevel();
                 return 1;
             }
@@ -4937,255 +4937,255 @@ void GiveTakeArtifactStat(hero* targetHero, i32 artifact, i32 take) {
     statChanges[IDX(HERO_PRIMARY_KNOWLEDGE)] = 0;
 
     switch (artifact) {
-        case ARTIFACT_ULTIMATE_BOOK:
+        case IDX(ARTIFACT_ULTIMATE_BOOK):
             statChanges[IDX(HERO_PRIMARY_KNOWLEDGE)] = 12;
             break;
-        case ARTIFACT_ULTIMATE_SWORD:
+        case IDX(ARTIFACT_ULTIMATE_SWORD):
             statChanges[IDX(HERO_PRIMARY_ATTACK)] = 12;
             break;
-        case ARTIFACT_ULTIMATE_CLOAK:
+        case IDX(ARTIFACT_ULTIMATE_CLOAK):
             statChanges[IDX(HERO_PRIMARY_DEFENSE)] = 12;
             break;
-        case ARTIFACT_ULTIMATE_WAND:
+        case IDX(ARTIFACT_ULTIMATE_WAND):
             statChanges[IDX(HERO_PRIMARY_SPELL_POWER)] = 12;
             break;
-        case ARTIFACT_ULTIMATE_SHIELD:
+        case IDX(ARTIFACT_ULTIMATE_SHIELD):
             statChanges[IDX(HERO_PRIMARY_ATTACK)] = 6;
             statChanges[IDX(HERO_PRIMARY_DEFENSE)] = 6;
             break;
-        case ARTIFACT_ULTIMATE_STAFF:
+        case IDX(ARTIFACT_ULTIMATE_STAFF):
             statChanges[IDX(HERO_PRIMARY_SPELL_POWER)] = 6;
             statChanges[IDX(HERO_PRIMARY_KNOWLEDGE)] = 6;
             break;
-        case ARTIFACT_ULTIMATE_CROWN:
+        case IDX(ARTIFACT_ULTIMATE_CROWN):
             statChanges[IDX(HERO_PRIMARY_ATTACK)] = 4;
             statChanges[IDX(HERO_PRIMARY_DEFENSE)] = 4;
             statChanges[IDX(HERO_PRIMARY_SPELL_POWER)] = 4;
             statChanges[IDX(HERO_PRIMARY_KNOWLEDGE)] = 4;
             break;
-        case ARTIFACT_GOLDEN_GOOSE:
+        case IDX(ARTIFACT_GOLDEN_GOOSE):
             break;
-        case ARTIFACT_ARCANE_NECKLACE:
+        case IDX(ARTIFACT_ARCANE_NECKLACE):
             statChanges[IDX(HERO_PRIMARY_SPELL_POWER)] = 4;
             break;
-        case ARTIFACT_CASTER_BRACELET:
+        case IDX(ARTIFACT_CASTER_BRACELET):
             statChanges[IDX(HERO_PRIMARY_SPELL_POWER)] = 2;
             break;
-        case ARTIFACT_MAGE_RING:
+        case IDX(ARTIFACT_MAGE_RING):
             statChanges[IDX(HERO_PRIMARY_SPELL_POWER)] = 2;
             break;
-        case ARTIFACT_WITCHES_BROACH:
+        case IDX(ARTIFACT_WITCHES_BROACH):
             statChanges[IDX(HERO_PRIMARY_SPELL_POWER)] = 3;
             break;
-        case ARTIFACT_MEDAL_OF_VALOR:
+        case IDX(ARTIFACT_MEDAL_OF_VALOR):
             break;
-        case ARTIFACT_MEDAL_OF_COURAGE:
+        case IDX(ARTIFACT_MEDAL_OF_COURAGE):
             break;
-        case ARTIFACT_MEDAL_OF_HONOR:
+        case IDX(ARTIFACT_MEDAL_OF_HONOR):
             break;
-        case ARTIFACT_MEDAL_OF_DISTINCTION:
+        case IDX(ARTIFACT_MEDAL_OF_DISTINCTION):
             break;
-        case ARTIFACT_FIZBIN_OF_MISFORTUNE:
+        case IDX(ARTIFACT_FIZBIN_OF_MISFORTUNE):
             break;
-        case ARTIFACT_THUNDER_MACE:
+        case IDX(ARTIFACT_THUNDER_MACE):
             statChanges[IDX(HERO_PRIMARY_ATTACK)] = 1;
             break;
-        case ARTIFACT_ARMORED_GAUNTLETS:
+        case IDX(ARTIFACT_ARMORED_GAUNTLETS):
             statChanges[IDX(HERO_PRIMARY_DEFENSE)] = 1;
             break;
-        case ARTIFACT_DEFENDER_HELM:
+        case IDX(ARTIFACT_DEFENDER_HELM):
             statChanges[IDX(HERO_PRIMARY_DEFENSE)] = 1;
             break;
-        case ARTIFACT_GIANT_FLAIL:
+        case IDX(ARTIFACT_GIANT_FLAIL):
             statChanges[IDX(HERO_PRIMARY_ATTACK)] = 1;
             break;
-        case ARTIFACT_BALLISTA:
+        case IDX(ARTIFACT_BALLISTA):
             break;
-        case ARTIFACT_STEALTH_SHIELD:
+        case IDX(ARTIFACT_STEALTH_SHIELD):
             statChanges[IDX(HERO_PRIMARY_DEFENSE)] = 2;
             break;
-        case ARTIFACT_DRAGON_SWORD:
+        case IDX(ARTIFACT_DRAGON_SWORD):
             statChanges[IDX(HERO_PRIMARY_ATTACK)] = 3;
             break;
-        case ARTIFACT_POWER_AXE:
+        case IDX(ARTIFACT_POWER_AXE):
             statChanges[IDX(HERO_PRIMARY_ATTACK)] = 2;
             break;
-        case ARTIFACT_DIVINE_BREASTPLATE:
+        case IDX(ARTIFACT_DIVINE_BREASTPLATE):
             statChanges[IDX(HERO_PRIMARY_DEFENSE)] = 3;
             break;
-        case ARTIFACT_MINOR_SCROLL:
+        case IDX(ARTIFACT_MINOR_SCROLL):
             statChanges[IDX(HERO_PRIMARY_KNOWLEDGE)] = 2;
             break;
-        case ARTIFACT_MAJOR_SCROLL:
+        case IDX(ARTIFACT_MAJOR_SCROLL):
             statChanges[IDX(HERO_PRIMARY_KNOWLEDGE)] = 3;
             break;
-        case ARTIFACT_SUPERIOR_SCROLL:
+        case IDX(ARTIFACT_SUPERIOR_SCROLL):
             statChanges[IDX(HERO_PRIMARY_KNOWLEDGE)] = 4;
             break;
-        case ARTIFACT_FOREMOST_SCROLL:
+        case IDX(ARTIFACT_FOREMOST_SCROLL):
             statChanges[IDX(HERO_PRIMARY_KNOWLEDGE)] = 5;
             break;
-        case ARTIFACT_ENDLESS_SACK_GOLD:
+        case IDX(ARTIFACT_ENDLESS_SACK_GOLD):
             break;
-        case ARTIFACT_ENDLESS_BAG_GOLD:
+        case IDX(ARTIFACT_ENDLESS_BAG_GOLD):
             break;
-        case ARTIFACT_ENDLESS_PURSE_GOLD:
+        case IDX(ARTIFACT_ENDLESS_PURSE_GOLD):
             break;
-        case ARTIFACT_NOMAD_BOOTS:
+        case IDX(ARTIFACT_NOMAD_BOOTS):
             break;
-        case ARTIFACT_TRAVELER_BOOTS:
+        case IDX(ARTIFACT_TRAVELER_BOOTS):
             break;
-        case ARTIFACT_RABBIT_FOOT:
+        case IDX(ARTIFACT_RABBIT_FOOT):
             break;
-        case ARTIFACT_GOLDEN_HORSESHOE:
+        case IDX(ARTIFACT_GOLDEN_HORSESHOE):
             break;
-        case ARTIFACT_GAMBLERS_COIN:
+        case IDX(ARTIFACT_GAMBLERS_COIN):
             break;
-        case ARTIFACT_FOUR_LEAF_CLOVER:
+        case IDX(ARTIFACT_FOUR_LEAF_CLOVER):
             break;
-        case ARTIFACT_TRUE_COMPASS:
+        case IDX(ARTIFACT_TRUE_COMPASS):
             break;
-        case ARTIFACT_SAILORS_ASTROLABE:
+        case IDX(ARTIFACT_SAILORS_ASTROLABE):
             break;
-        case ARTIFACT_EVIL_EYE:
+        case IDX(ARTIFACT_EVIL_EYE):
             break;
-        case ARTIFACT_ENCHANTED_HOURGLASS:
+        case IDX(ARTIFACT_ENCHANTED_HOURGLASS):
             break;
-        case ARTIFACT_GOLD_WATCH:
+        case IDX(ARTIFACT_GOLD_WATCH):
             break;
-        case ARTIFACT_SKULLCAP:
+        case IDX(ARTIFACT_SKULLCAP):
             break;
-        case ARTIFACT_ICE_CLOAK:
+        case IDX(ARTIFACT_ICE_CLOAK):
             break;
-        case ARTIFACT_FIRE_CLOAK:
+        case IDX(ARTIFACT_FIRE_CLOAK):
             break;
-        case ARTIFACT_LIGHTNING_HELM:
+        case IDX(ARTIFACT_LIGHTNING_HELM):
             break;
-        case ARTIFACT_EVERCOLD_ICICLE:
+        case IDX(ARTIFACT_EVERCOLD_ICICLE):
             break;
-        case ARTIFACT_EVERHOT_LAVA_ROCK:
+        case IDX(ARTIFACT_EVERHOT_LAVA_ROCK):
             break;
-        case ARTIFACT_LIGHTNING_ROD:
+        case IDX(ARTIFACT_LIGHTNING_ROD):
             break;
-        case ARTIFACT_SNAKE_RING:
+        case IDX(ARTIFACT_SNAKE_RING):
             break;
-        case ARTIFACT_ANKH:
+        case IDX(ARTIFACT_ANKH):
             break;
-        case ARTIFACT_BOOK_ELEMENTS:
+        case IDX(ARTIFACT_BOOK_ELEMENTS):
             break;
-        case ARTIFACT_ELEMENTAL_RING:
+        case IDX(ARTIFACT_ELEMENTAL_RING):
             break;
-        case ARTIFACT_HOLY_PENDANT:
+        case IDX(ARTIFACT_HOLY_PENDANT):
             break;
-        case ARTIFACT_PENDANT_FREE_WILL:
+        case IDX(ARTIFACT_PENDANT_FREE_WILL):
             break;
-        case ARTIFACT_PENDANT_LIFE:
+        case IDX(ARTIFACT_PENDANT_LIFE):
             break;
-        case ARTIFACT_SERENITY_PENDANT:
+        case IDX(ARTIFACT_SERENITY_PENDANT):
             break;
-        case ARTIFACT_SEEING_EYE_PENDANT:
+        case IDX(ARTIFACT_SEEING_EYE_PENDANT):
             break;
-        case ARTIFACT_KINETIC_PENDANT:
+        case IDX(ARTIFACT_KINETIC_PENDANT):
             break;
-        case ARTIFACT_PENDANT_DEATH:
+        case IDX(ARTIFACT_PENDANT_DEATH):
             break;
-        case ARTIFACT_WAND_NEGATION:
+        case IDX(ARTIFACT_WAND_NEGATION):
             break;
-        case ARTIFACT_GOLDEN_BOW:
+        case IDX(ARTIFACT_GOLDEN_BOW):
             break;
-        case ARTIFACT_TELESCOPE:
+        case IDX(ARTIFACT_TELESCOPE):
             break;
-        case ARTIFACT_STATESMANS_QUILL:
+        case IDX(ARTIFACT_STATESMANS_QUILL):
             break;
-        case ARTIFACT_WIZARD_HAT:
+        case IDX(ARTIFACT_WIZARD_HAT):
             break;
-        case ARTIFACT_POWER_RING:
+        case IDX(ARTIFACT_POWER_RING):
             break;
-        case ARTIFACT_AMMO_CART:
+        case IDX(ARTIFACT_AMMO_CART):
             break;
-        case ARTIFACT_TAX_LIEN:
+        case IDX(ARTIFACT_TAX_LIEN):
             break;
-        case ARTIFACT_HIDEOUS_MASK:
+        case IDX(ARTIFACT_HIDEOUS_MASK):
             break;
-        case ARTIFACT_ENDLESS_POUCH_SULFUR:
+        case IDX(ARTIFACT_ENDLESS_POUCH_SULFUR):
             break;
-        case ARTIFACT_ENDLESS_VIAL_MERCURY:
+        case IDX(ARTIFACT_ENDLESS_VIAL_MERCURY):
             break;
-        case ARTIFACT_ENDLESS_POUCH_GEMS:
+        case IDX(ARTIFACT_ENDLESS_POUCH_GEMS):
             break;
-        case ARTIFACT_ENDLESS_CORD_WOOD:
+        case IDX(ARTIFACT_ENDLESS_CORD_WOOD):
             break;
-        case ARTIFACT_ENDLESS_CART_ORE:
+        case IDX(ARTIFACT_ENDLESS_CART_ORE):
             break;
-        case ARTIFACT_ENDLESS_POUCH_CRYSTAL:
+        case IDX(ARTIFACT_ENDLESS_POUCH_CRYSTAL):
             break;
-        case ARTIFACT_SPIKED_HELM:
+        case IDX(ARTIFACT_SPIKED_HELM):
             statChanges[IDX(HERO_PRIMARY_ATTACK)] = 1;
             statChanges[IDX(HERO_PRIMARY_DEFENSE)] = 1;
             break;
-        case ARTIFACT_SPIKED_SHIELD:
+        case IDX(ARTIFACT_SPIKED_SHIELD):
             statChanges[IDX(HERO_PRIMARY_ATTACK)] = 2;
             statChanges[IDX(HERO_PRIMARY_DEFENSE)] = 2;
             break;
-        case ARTIFACT_WHITE_PEARL:
+        case IDX(ARTIFACT_WHITE_PEARL):
             statChanges[IDX(HERO_PRIMARY_SPELL_POWER)] = 1;
             statChanges[IDX(HERO_PRIMARY_KNOWLEDGE)] = 1;
             break;
-        case ARTIFACT_BLACK_PEARL:
+        case IDX(ARTIFACT_BLACK_PEARL):
             statChanges[IDX(HERO_PRIMARY_SPELL_POWER)] = 2;
             statChanges[IDX(HERO_PRIMARY_KNOWLEDGE)] = 2;
             break;
-        case ARTIFACT_MAGIC_BOOK:
+        case IDX(ARTIFACT_MAGIC_BOOK):
             break;
-        case ARTIFACT_SPELL_SCROLL:
+        case IDX(ARTIFACT_SPELL_SCROLL):
             break;
-        case ARTIFACT_ARM_OF_MARTYR:
+        case IDX(ARTIFACT_ARM_OF_MARTYR):
             statChanges[IDX(HERO_PRIMARY_SPELL_POWER)] = 3;
             break;
-        case ARTIFACT_BREASTPLATE_ANDURAN:
+        case IDX(ARTIFACT_BREASTPLATE_ANDURAN):
             statChanges[IDX(HERO_PRIMARY_DEFENSE)] = 5;
             break;
-        case ARTIFACT_BROACH_SHIELDING:
+        case IDX(ARTIFACT_BROACH_SHIELDING):
             statChanges[IDX(HERO_PRIMARY_SPELL_POWER)] = -2;
             break;
-        case ARTIFACT_BATTLE_GARB:
+        case IDX(ARTIFACT_BATTLE_GARB):
             statChanges[IDX(HERO_PRIMARY_SPELL_POWER)] = 5;
             statChanges[IDX(HERO_PRIMARY_DEFENSE)] = 5;
             statChanges[IDX(HERO_PRIMARY_ATTACK)] = 5;
             break;
-        case ARTIFACT_CRYSTAL_BALL:
+        case IDX(ARTIFACT_CRYSTAL_BALL):
             break;
-        case ARTIFACT_HEART_FIRE:
+        case IDX(ARTIFACT_HEART_FIRE):
             break;
-        case ARTIFACT_HEART_ICE:
+        case IDX(ARTIFACT_HEART_ICE):
             break;
-        case ARTIFACT_HELMET_ANDURAN:
+        case IDX(ARTIFACT_HELMET_ANDURAN):
             statChanges[IDX(HERO_PRIMARY_SPELL_POWER)] = 5;
             break;
-        case ARTIFACT_HOLY_HAMMER:
+        case IDX(ARTIFACT_HOLY_HAMMER):
             statChanges[IDX(HERO_PRIMARY_ATTACK)] = 5;
             break;
-        case ARTIFACT_LEGENDARY_SCEPTER:
+        case IDX(ARTIFACT_LEGENDARY_SCEPTER):
             statChanges[IDX(HERO_PRIMARY_SPELL_POWER)] = 2;
             statChanges[IDX(HERO_PRIMARY_ATTACK)] = 2;
             statChanges[IDX(HERO_PRIMARY_DEFENSE)] = 2;
             statChanges[IDX(HERO_PRIMARY_KNOWLEDGE)] = 2;
             break;
-        case ARTIFACT_MASTHEAD:
+        case IDX(ARTIFACT_MASTHEAD):
             break;
-        case ARTIFACT_SPHERE_NEGATION:
+        case IDX(ARTIFACT_SPHERE_NEGATION):
             break;
-        case ARTIFACT_STAFF_WIZARDRY:
+        case IDX(ARTIFACT_STAFF_WIZARDRY):
             statChanges[IDX(HERO_PRIMARY_SPELL_POWER)] = 5;
             break;
-        case ARTIFACT_SWORD_BREAKER:
+        case IDX(ARTIFACT_SWORD_BREAKER):
             statChanges[IDX(HERO_PRIMARY_DEFENSE)] = 4;
             statChanges[IDX(HERO_PRIMARY_ATTACK)] = 1;
             break;
-        case ARTIFACT_SWORD_ANDURAN:
+        case IDX(ARTIFACT_SWORD_ANDURAN):
             statChanges[IDX(HERO_PRIMARY_ATTACK)] = 5;
             break;
-        case ARTIFACT_SPADE_NECROMANCY:
+        case IDX(ARTIFACT_SPADE_NECROMANCY):
             break;
         default:
             break;
@@ -5225,11 +5225,11 @@ void advManager::TransferArtifacts(hero* sourceHero, hero* destinationHero) {
         if (destinationHero == 0) {
         } else {
             for (targetSlot = 0; targetSlot < EVENT_ARTIFACT_SLOT_COUNT; targetSlot++) {
-                if (destinationHero->m_artifacts[targetSlot] == ARTIFACT_NONE) {
+                if (destinationHero->m_artifacts[targetSlot] == IDX(ARTIFACT_NONE)) {
                     for (sourceArtifactSlot = 0; sourceArtifactSlot < EVENT_ARTIFACT_SLOT_COUNT;
                          sourceArtifactSlot++) {
-                        if (sourceHero->m_artifacts[sourceArtifactSlot] != ARTIFACT_NONE
-                            && sourceHero->m_artifacts[sourceArtifactSlot] != ARTIFACT_MAGIC_BOOK) {
+                        if (sourceHero->m_artifacts[sourceArtifactSlot] != IDX(ARTIFACT_NONE)
+                            && sourceHero->m_artifacts[sourceArtifactSlot] != IDX(ARTIFACT_MAGIC_BOOK)) {
                             if (sourceHero->m_artifacts[sourceArtifactSlot]
                                 <= EVENT_ARTIFACT_NON_TRANSFERABLE_LAST) {
                                 if (gbThisNetHumanPlayer[sourceHero->m_owner]
@@ -5506,7 +5506,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
         case MAP_OBJECT_SAWMILL:
             if (gpGame->m_mineOwners[cell->m_objectMetadata] == giCurPlayer)
                 break;
-            if (gpGame->m_mines[cell->m_objectMetadata].guardianType != CREATURE_NONE) {
+            if (gpGame->m_mines[cell->m_objectMetadata].guardianType != IDX(CREATURE_NONE)) {
                 index_h = gpGame->m_mines[cell->m_objectMetadata].guardianCount;
                 combatResult_d = gpPhilAI->CombatMonsterEvent(
                     eventHero,
@@ -5564,7 +5564,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                     )) {
                     GiveResource(
                         eventHero,
-                        RES_GOLD,
+                        IDX(RES_GOLD),
                         cell->m_objectMetadata * CHEST_GOLD_MULTIPLIER
                     );
                 } else {
@@ -5700,9 +5700,9 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             if ((cell->m_objectMetadata & CHEST_ARTIFACT_FLAG) != 0
                 && eventHero->NumArtifacts() < AI_EVENT_ARTIFACT_LIMIT) {
                 GiveArtifact(eventHero, cell->m_objectMetadata & CHEST_ARTIFACT_MASK, 1, -1);
-                GiveResource(eventHero, RES_GOLD, AI_EVENT_SEA_CHEST_ARTIFACT_GOLD);
+                GiveResource(eventHero, IDX(RES_GOLD), AI_EVENT_SEA_CHEST_ARTIFACT_GOLD);
             } else if (cell->m_objectMetadata != 0) {
-                GiveResource(eventHero, RES_GOLD, AI_EVENT_SEA_CHEST_GOLD);
+                GiveResource(eventHero, IDX(RES_GOLD), AI_EVENT_SEA_CHEST_GOLD);
             }
             eventResults[0] = 1;
             break;
@@ -5712,15 +5712,15 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 case 0:
                     break;
                 case 1:
-                    GiveResource(eventHero, RES_WOOD, 5);
+                    GiveResource(eventHero, IDX(RES_WOOD), 5);
                     break;
                 case 2:
-                    GiveResource(eventHero, RES_WOOD, 5);
-                    GiveResource(eventHero, RES_GOLD, 200);
+                    GiveResource(eventHero, IDX(RES_WOOD), 5);
+                    GiveResource(eventHero, IDX(RES_GOLD), 200);
                     break;
                 case 3:
-                    GiveResource(eventHero, RES_WOOD, 10);
-                    GiveResource(eventHero, RES_GOLD, 500);
+                    GiveResource(eventHero, IDX(RES_WOOD), 10);
+                    GiveResource(eventHero, IDX(RES_GOLD), 500);
                     break;
             }
             eventResults[0] = 1;
@@ -5729,7 +5729,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
         case MAP_OBJECT_CAMPFIRE:
             GiveResource(
                 eventHero,
-                RES_GOLD,
+                IDX(RES_GOLD),
                 (cell->m_objectMetadata >> CAMPFIRE_AMOUNT_SHIFT) * CAMPFIRE_GOLD_MULTIPLIER
             );
             GiveResource(
@@ -5790,7 +5790,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
 
         case MAP_OBJECT_WATER_WHEEL:
             if (cell->m_objectMetadata != 0) {
-                GiveResource(eventHero, RES_GOLD, cell->m_objectMetadata * CHEST_GOLD_MULTIPLIER);
+                GiveResource(eventHero, IDX(RES_GOLD), cell->m_objectMetadata * CHEST_GOLD_MULTIPLIER);
                 cell->m_objectMetadata = MAP_EVENT_DATA_EMPTY;
             }
             break;
@@ -5812,15 +5812,15 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_HILL_FORT:
-            eventHero->UpgradeCreatures(CREATURE_OGRE, CREATURE_OGRE_LORD);
-            eventHero->UpgradeCreatures(CREATURE_ORC, CREATURE_ORC_CHIEF);
-            eventHero->UpgradeCreatures(CREATURE_DWARF, CREATURE_BATTLE_DWARF);
+            eventHero->UpgradeCreatures(IDX(CREATURE_OGRE), IDX(CREATURE_OGRE_LORD));
+            eventHero->UpgradeCreatures(IDX(CREATURE_ORC), IDX(CREATURE_ORC_CHIEF));
+            eventHero->UpgradeCreatures(IDX(CREATURE_DWARF), IDX(CREATURE_BATTLE_DWARF));
             break;
 
         case MAP_OBJECT_FREEMANS_FOUNDRY:
-            eventHero->UpgradeCreatures(CREATURE_IRON_GOLEM, CREATURE_STEEL_GOLEM);
-            eventHero->UpgradeCreatures(CREATURE_PIKEMAN, CREATURE_VETERAN_PIKEMAN);
-            eventHero->UpgradeCreatures(CREATURE_SWORDSMAN, CREATURE_MASTER_SWORDSMAN);
+            eventHero->UpgradeCreatures(IDX(CREATURE_IRON_GOLEM), IDX(CREATURE_STEEL_GOLEM));
+            eventHero->UpgradeCreatures(IDX(CREATURE_PIKEMAN), IDX(CREATURE_VETERAN_PIKEMAN));
+            eventHero->UpgradeCreatures(IDX(CREATURE_SWORDSMAN), IDX(CREATURE_MASTER_SWORDSMAN));
             break;
 
         case MAP_OBJECT_TREE_CITY:
@@ -5900,7 +5900,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
         creaturePurchase:
             if (cell->m_objectMetadata != 0) {
                 gpPhilAI->EvaluateOneTimeCreaturePurchase(
-                    creatureType_i,
+                    IDX(creatureType_i),
                     cell->m_objectMetadata,
                     creatureFlag_l,
                     eventResults[2],
@@ -5910,7 +5910,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 if (eventResults[2] > 0) {
                     gpGame->GiveArmy(
                         &eventHero->m_army,
-                        creatureType_i,
+                        IDX(creatureType_i),
                         eventResults[2],
                         purchaseValue_a
                     );
@@ -5977,7 +5977,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
         case MAP_OBJECT_SHRINE_FIRST_CIRCLE:
         case MAP_OBJECT_SHRINE_SECOND_CIRCLE:
         case MAP_OBJECT_SHRINE_THIRD_CIRCLE:
-            if (eventHero->HasArtifact(ARTIFACT_MAGIC_BOOK)
+            if (eventHero->HasArtifact(IDX(ARTIFACT_MAGIC_BOOK))
                 && gsSpellInfo[cell->m_objectMetadata - 1].level
                        <= eventHero->m_secondarySkills[IDX(HERO_SKILL_WISDOM)] + 2) {
                 eventHero->AddSpell(
@@ -6048,7 +6048,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 break;
             }
             if (cell->m_objectMetadata & ARTIFACT_EVENT_GUARDED_FLAG) {
-                if (artifactGuardCount_b == CREATURE_ROGUE) {
+                if (artifactGuardCount_b == IDX(CREATURE_ROGUE)) {
                     artifactGuardResult_e = AI_EVENT_ROGUE_COUNT;
                 } else {
                     artifactGuardResult_e = 1;
@@ -6194,7 +6194,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                     break;
                 case DAEMON_REWARD_EXPERIENCE_GOLD:
                     GiveExperience(eventHero, DAEMON_EXPERIENCE, 1);
-                    GiveResource(eventHero, RES_GOLD, AI_EVENT_DAEMON_GOLD);
+                    GiveResource(eventHero, IDX(RES_GOLD), AI_EVENT_DAEMON_GOLD);
                     break;
                 case DAEMON_REWARD_RANSOM:
                     if (gpGame->m_players[eventHero->m_owner].m_resources[IDX(RES_GOLD)]
@@ -6250,7 +6250,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                     index_h = PYRAMID_GUARD_COUNT;
                     combatResult_d =
                         gpPhilAI
-                            ->CombatMonsterEvent(eventHero, CREATURE_ROYAL_MUMMY, &index_h, cell);
+                            ->CombatMonsterEvent(eventHero, IDX(CREATURE_ROYAL_MUMMY), &index_h, cell);
                     if (combatResult_d == 0) {
                     } else {
                         eventHero->AddSpell(
@@ -6356,7 +6356,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
 
         case MAP_OBJECT_WITCH_HUT:
             if (eventHero->m_secondarySkills[cell->m_objectMetadata] == 0)
-                eventHero->GiveSS(cell->m_objectMetadata, HERO_SKILL_LEVEL_BASIC);
+                eventHero->GiveSS(cell->m_objectMetadata, IDX(HERO_SKILL_LEVEL_BASIC));
             break;
 
         case MAP_OBJECT_MAGELLAN_MAPS:
@@ -6542,8 +6542,8 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
                 eventHero->m_mobility += AI_EVENT_CREATURE_UPGRADE_MOBILITY;
                 eventHero->m_remainingMobility += AI_EVENT_CREATURE_UPGRADE_MOBILITY;
             }
-            if (eventHero->CreatureTypeCount(CREATURE_CAVALRY))
-                eventHero->UpgradeCreatures(CREATURE_CAVALRY, CREATURE_CHAMPION);
+            if (eventHero->CreatureTypeCount(IDX(CREATURE_CAVALRY)))
+                eventHero->UpgradeCreatures(IDX(CREATURE_CAVALRY), IDX(CREATURE_CHAMPION));
             break;
     }
 }
@@ -6593,7 +6593,7 @@ void advManager::RecruitSiteAIEvent(mapCell* cell, hero* eventHero) {
 
     if (availableCount1 != 0) {
         gpPhilAI->EvaluateOneTimeCreaturePurchase(
-            creatureType13,
+            IDX(creatureType13),
             availableCount1,
             0,
             purchaseCount17,
@@ -6602,7 +6602,7 @@ void advManager::RecruitSiteAIEvent(mapCell* cell, hero* eventHero) {
         );
         if (purchaseCount17 > 0) {
             gpGame
-                ->GiveArmy(&eventHero->m_army, creatureType13, purchaseCount17, replacementSlot26);
+                ->GiveArmy(&eventHero->m_army, IDX(creatureType13), purchaseCount17, replacementSlot26);
             availableCount1 = static_cast<i16>(availableCount1 - purchaseCount17);
             packedSite17 = (availableCount1 << AI_EVENT_RECRUIT_COUNT_SHIFT) | siteType3;
             cell->m_objectMetadata = packedSite17;
@@ -6844,7 +6844,7 @@ void advManager::PlayerMonsterInteract(
     }
 
     if (eventHero->m_army.CanJoin(monster_n) && strengthRatio_p > MONSTER_STRENGTH_JOIN
-        && !eventHero->HasArtifact(ARTIFACT_HIDEOUS_MASK) && monster_n != CREATURE_GHOST
+        && !eventHero->HasArtifact(IDX(ARTIFACT_HIDEOUS_MASK)) && monster_n != CREATURE_GHOST
         && monster_n != CREATURE_EARTH_ELEMENTAL && monster_n != CREATURE_AIR_ELEMENTAL
         && monster_n != CREATURE_FIRE_ELEMENTAL && monster_n != CREATURE_WATER_ELEMENTAL) {
         if (forcedJoin_f) {
@@ -6989,7 +6989,7 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
         static_cast<float>(gpPhilAI->FightValueOfStack(&eventHero->m_army, eventHero, 0, 0, 0, 0))
         / static_cast<float>(gMonsterDatabase[monsterType].fightValue * monsterCount[0]);
 
-    if (eventHero->m_army.CanJoin(monsterType) && !eventHero->HasArtifact(ARTIFACT_HIDEOUS_MASK)
+    if (eventHero->m_army.CanJoin(monsterType) && !eventHero->HasArtifact(IDX(ARTIFACT_HIDEOUS_MASK))
         && strengthRatio > MONSTER_STRENGTH_JOIN && monsterType != CREATURE_GHOST
         && monsterType != CREATURE_EARTH_ELEMENTAL && monsterType != CREATURE_AIR_ELEMENTAL
         && monsterType != CREATURE_FIRE_ELEMENTAL && monsterType != CREATURE_WATER_ELEMENTAL) {
@@ -7057,14 +7057,14 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
             1
         );
         eventHero->CheckLevel();
-        if (eventHero->GetSSLevel(HERO_SKILL_NECROMANCY)
-            && eventHero->m_army.CanJoin(CREATURE_SKELETON)) {
+        if (eventHero->GetSSLevel(IDX(HERO_SKILL_NECROMANCY))
+            && eventHero->m_army.CanJoin(IDX(CREATURE_SKELETON))) {
             gpGame->GiveArmy(
                 &eventHero->m_army,
-                CREATURE_SKELETON,
+                IDX(CREATURE_SKELETON),
                 static_cast<i32>(
                     static_cast<double>(monsterCount[0])
-                    * eventHero->GetSSLevel(HERO_SKILL_NECROMANCY) * MONSTER_NECROMANCY_FRACTION
+                    * eventHero->GetSSLevel(IDX(HERO_SKILL_NECROMANCY)) * MONSTER_NECROMANCY_FRACTION
                 ),
                 -1
             );
@@ -7637,14 +7637,14 @@ void advManager::ReceiveHeroTownData(
                 ShutDown(const_cast<char*>("Game canceled."));
         }
         packet = GetRemoteData(1);
-        if (packet && EVENTS_REMOTE_MESSAGE(packet)->type == REMOTE_MESSAGE_RELIABLE
-            && EVENTS_REMOTE_MESSAGE(packet)->command == COMBAT_REMOTE_COMMAND) {
+        if (packet && EVENTS_REMOTE_MESSAGE(packet)->type == IDX(REMOTE_MESSAGE_RELIABLE)
+            && EVENTS_REMOTE_MESSAGE(packet)->command == IDX(COMBAT_REMOTE_COMMAND)) {
             lastPacketTime36 = KBTickCount();
-            if (EVENTS_REMOTE_HERO(packet)->fragment == COMBAT_REMOTE_FIRST_HERO_FIRST) {
+            if (EVENTS_REMOTE_HERO(packet)->fragment == IDX(COMBAT_REMOTE_FIRST_HERO_FIRST)) {
                 memcpy(*firstHero, EVENTS_REMOTE_HERO(packet)->data, COMBAT_REMOTE_HERO_FIRST_SIZE);
                 gotFirstHeroFirst3 = 1;
             }
-            if (EVENTS_REMOTE_HERO(packet)->fragment == COMBAT_REMOTE_FIRST_HERO_SECOND) {
+            if (EVENTS_REMOTE_HERO(packet)->fragment == IDX(COMBAT_REMOTE_FIRST_HERO_SECOND)) {
                 memcpy(
                     &(*firstHero)->m_spells[COMBAT_REMOTE_HERO_SECOND_SPELL_INDEX],
                     EVENTS_REMOTE_HERO(packet)->data,
@@ -7652,7 +7652,7 @@ void advManager::ReceiveHeroTownData(
                 );
                 gotFirstHeroSecond9 = 1;
             }
-            if (EVENTS_REMOTE_HERO(packet)->fragment == COMBAT_REMOTE_SECOND_HERO_FIRST) {
+            if (EVENTS_REMOTE_HERO(packet)->fragment == IDX(COMBAT_REMOTE_SECOND_HERO_FIRST)) {
                 memcpy(
                     *secondHero,
                     EVENTS_REMOTE_HERO(packet)->data,
@@ -7660,7 +7660,7 @@ void advManager::ReceiveHeroTownData(
                 );
                 gotSecondHeroFirst13 = 1;
             }
-            if (EVENTS_REMOTE_HERO(packet)->fragment == COMBAT_REMOTE_SECOND_HERO_SECOND) {
+            if (EVENTS_REMOTE_HERO(packet)->fragment == IDX(COMBAT_REMOTE_SECOND_HERO_SECOND)) {
                 memcpy(
                     &(*secondHero)->m_spells[COMBAT_REMOTE_HERO_SECOND_SPELL_INDEX],
                     EVENTS_REMOTE_HERO(packet)->data,

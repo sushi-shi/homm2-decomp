@@ -99,7 +99,7 @@ i16 dpnet_init(void) {
         if (result != DP_RESULT_OK)
             DPSD(result, RETAIL_FILE, 136);
 
-        if (GameMode == REMOTE_GAME_NETWORK_HOST) {
+        if (GameMode == IDX(REMOTE_GAME_NETWORK_HOST)) {
             gbRemoteGameOpen = 1;
             giWaitType = DP_WAIT_FIRST_GUEST;
             sprintf(gText, "Waiting On Guest.\n\n  Press 'CANCEL' to abort.");
@@ -300,7 +300,7 @@ void dpEvaluateMessage(u32l size, i32 sender) {
             iDPRcvBufferHead = (iDPRcvBufferHead + 1) % DP_TRANSPORT_BUFFER_COUNT;
             break;
         case IDX(NETWORK_PACKET_GUEST_ARRIVED):
-            if (GameMode == REMOTE_GAME_NETWORK_HOST) {
+            if (GameMode == IDX(REMOTE_GAME_NETWORK_HOST)) {
                 for (i = 1; i < giNumHumanPlayers; i++) {
                     if (giNetPosToDCOPos[i] == sender) {
                         dpSendMessage(sender, NETWORK_PACKET_GUEST_ACCEPTED, 0, 0);
@@ -526,7 +526,7 @@ void DPSD(i32 result, char* file, i32 line) {
     bInDPSD = 1;
     errorFlag = 0;
     switch (result) {
-        case DP_RESULT_OK:
+        case IDX(DP_RESULT_OK):
             return;
         case DPERR_ALREADYINITIALIZED:
             strcpy(errorText, "DPERR_ALREADYINITIALIZED ");

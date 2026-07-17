@@ -488,7 +488,7 @@ i32 heroWindowManager::DoDialog(
             SetPalette(dialogPalette->m_data, 0);
         i32 fadeType = WINDOW_FADE_IN;
         switch (fadeType) {
-            case WINDOW_FADE_IN: {
+            case IDX(WINDOW_FADE_IN): {
                 u32 savedUpdate = manager->m_updateFlags;
                 manager->m_updateFlags = 0;
                 PollSound();
@@ -496,7 +496,7 @@ i32 heroWindowManager::DoDialog(
                 manager->m_updateFlags = FadeSavedUpdate() | savedUpdate;
                 break;
             }
-            case WINDOW_FADE_OUT:
+            case IDX(WINDOW_FADE_OUT):
                 FadeSavedUpdate() = manager->m_updateFlags;
                 manager->m_updateFlags = 0;
                 PollSound();

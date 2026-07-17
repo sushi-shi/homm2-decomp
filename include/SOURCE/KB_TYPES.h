@@ -492,6 +492,7 @@ HOMM2_ENUM_BEGIN(MonsterAbilityFlags)
     MONSTER_ABILITY_FLAG_FULL_AI_QUANTITY = 0x80,
     MONSTER_ABILITY_FLAG_DEFERRED_TURN = 0x1000
 HOMM2_ENUM_END(MonsterAbilityFlags)
+HOMM2_ENUM_FLAGS(MonsterAbilityFlags)
 
 // Retained in the historical declaration sequence because MSVC 4.2's cumulative TU state
 // changes code generation when these otherwise redundant declarations are removed.
@@ -580,6 +581,7 @@ HOMM2_ENUM_BEGIN(SpellInfoAttribute)
     SPELL_INFO_ATTRIBUTE_ADVENTURE = 0x04,
     SPELL_INFO_ATTRIBUTE_DURATION = 0x08
 HOMM2_ENUM_END(SpellInfoAttribute)
+HOMM2_ENUM_FLAGS(SpellInfoAttribute)
 
 struct SSpellInfo {
     char soundName[9];
@@ -607,6 +609,7 @@ HOMM2_ENUM_BEGIN(MonsterAttribute)
     MONSTER_ATTRIBUTE_RETALIATED = 0x40,
     MONSTER_ATTRIBUTE_WOKE_FROM_DAMAGE = 0x80
 HOMM2_ENUM_END(MonsterAttribute)
+HOMM2_ENUM_FLAGS(MonsterAttribute)
 #pragma pack(push, 1)
 struct SWinSetup {
     u8 windowId;

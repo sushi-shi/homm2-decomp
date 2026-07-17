@@ -29,7 +29,7 @@ i32 game::HandleCampaignWin(void) {
     i32 mapIndex;
 
     memset(m_campaignMapEnabled, 0, sizeof(m_campaignMapEnabled));
-    if (m_campaignType == CAMPAIGN_ROLAND) {
+    if (m_campaignType == IDX(CAMPAIGN_ROLAND)) {
         switch (m_campaignScenario + 1) {
             case 0:
                 PlaySmacker(CAMPAIGN_SMACKER_ROLAND_INTRO);
@@ -55,7 +55,7 @@ i32 game::HandleCampaignWin(void) {
                 m_campaignMapEnabled[IDX(CAMPAIGN_ROLAND)][11] = 1;
                 break;
             case 5:
-                if (m_campaignStartingSide == CAMPAIGN_ROLAND)
+                if (m_campaignStartingSide == IDX(CAMPAIGN_ROLAND))
                     PlaySmacker(CAMPAIGN_SMACKER_ROLAND_5A);
                 else
                     PlaySmacker(CAMPAIGN_SMACKER_ROLAND_5B);
@@ -116,7 +116,7 @@ i32 game::HandleCampaignWin(void) {
                 m_campaignAwards[IDX(CAMPAIGN_AWARD_OGRE_ALLIANCE)] = 1;
                 break;
             case 5:
-                if (m_campaignStartingSide == CAMPAIGN_ARCHIBALD)
+                if (m_campaignStartingSide == IDX(CAMPAIGN_ARCHIBALD))
                     PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_5A);
                 else
                     PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_5B);
@@ -157,7 +157,7 @@ i32 game::HandleCampaignWin(void) {
 
     if (m_campaignScenario + 1 != CAMPAIGN_ARCHIBALD_FINAL_SCENARIO + 1
         && (gpGame->m_campaignScenario + 1 != CAMPAIGN_ROLAND_FINAL_SCENARIO + 1
-            || gpGame->m_campaignType != CAMPAIGN_ROLAND)) {
+            || gpGame->m_campaignType != IDX(CAMPAIGN_ROLAND))) {
         m_campaignScenario = CAMPAIGN_NO_SCENARIO;
         for (sideIndex = 0; sideIndex < CAMPAIGN_SIDE_COUNT; ++sideIndex) {
             for (mapIndex = 0; mapIndex < CAMPAIGN_REGULAR_MAP_COUNT; ++mapIndex) {
@@ -205,7 +205,7 @@ void game::PlayPreScenarioSmacker(i32 side, i32 map) {
                 PlaySmacker(CAMPAIGN_SMACKER_ROLAND_4);
                 break;
             case 6:
-                if (m_campaignStartingSide == CAMPAIGN_ROLAND)
+                if (m_campaignStartingSide == IDX(CAMPAIGN_ROLAND))
                     PlaySmacker(CAMPAIGN_SMACKER_ROLAND_5A);
                 else
                     PlaySmacker(CAMPAIGN_SMACKER_ROLAND_5B);
@@ -249,7 +249,7 @@ void game::PlayPreScenarioSmacker(i32 side, i32 map) {
                 PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_4_END);
                 break;
             case 6:
-                if (m_campaignStartingSide == CAMPAIGN_ARCHIBALD)
+                if (m_campaignStartingSide == IDX(CAMPAIGN_ARCHIBALD))
                     PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_5A);
                 else
                     PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_5B);
@@ -300,12 +300,12 @@ void game::ShowCampaignInfo(i32 viewOnly, i32) {
     gpMouseManager->SetPointer("advmice.mse", 0, CAMPAIGN_POINTER_HIDDEN_HOTSPOT);
     gpMouseManager->ReallyShowPointer();
     savedInterface = gbUseEvilInterface;
-    gbUseEvilInterface = m_campaignType == CAMPAIGN_ARCHIBALD;
+    gbUseEvilInterface = m_campaignType == IDX(CAMPAIGN_ARCHIBALD);
     bCampaignViewOnly = viewOnly;
     iCurViewSide = m_campaignType;
     iCurViewMap = m_campaignScenario;
     if (m_campaignScenario == CAMPAIGN_SWITCHING_SCENARIO && !viewOnly) {
-        if (m_campaignType == CAMPAIGN_ROLAND)
+        if (m_campaignType == IDX(CAMPAIGN_ROLAND))
             iCampaignTrackType = 4;
         else if (m_campaignScenarioCompleted[IDX(CAMPAIGN_ARCHIBALD)][2])
             iCampaignTrackType = 5;
@@ -366,7 +366,7 @@ void game::ShowCampaignInfo(i32 viewOnly, i32) {
         campWin->BroadcastMessage(message);
     }
     gpSoundManager->SwitchAmbientMusic(
-        m_campaignType == CAMPAIGN_ROLAND ? CAMPAIGN_GOOD_MUSIC : CAMPAIGN_EVIL_MUSIC
+        m_campaignType == IDX(CAMPAIGN_ROLAND) ? CAMPAIGN_GOOD_MUSIC : CAMPAIGN_EVIL_MUSIC
     );
     CampaignInfoUpdate(0);
     gpWindowManager->DoDialog(campWin, CampaignHandler, 0);
@@ -429,16 +429,16 @@ void game::CampaignInfoUpdate(i32 redraw) {
             else if (map + 1 == 5 && iCampaignTrackType == 2)
                 message.payload.widget.data.value += 9;
             else if (map + 1 > CAMPAIGN_REGULAR_MAP_COUNT) {
-                if (m_campaignStartingSide == CAMPAIGN_ROLAND)
+                if (m_campaignStartingSide == IDX(CAMPAIGN_ROLAND))
                     message.payload.widget.data.value += 6;
                 else
                     message.payload.widget.data.value += 3;
             } else if (map + 1 < 5) {
-                if (m_campaignStartingSide == CAMPAIGN_ROLAND)
+                if (m_campaignStartingSide == IDX(CAMPAIGN_ROLAND))
                     message.payload.widget.data.value += 3;
                 else
                     message.payload.widget.data.value += 6;
-            } else if (m_campaignType == CAMPAIGN_ROLAND) {
+            } else if (m_campaignType == IDX(CAMPAIGN_ROLAND)) {
                 message.payload.widget.data.value += 3;
             } else {
                 message.payload.widget.data.value += 6;
@@ -551,7 +551,7 @@ void game::CampaignInfoUpdate(i32 redraw) {
                 }
                 break;
             case CAMPAIGN_CHOICE_SPELL:
-                if (choice->value == SPELL_SUMMON_EARTH_ELEMENTAL)
+                if (choice->value == IDX(SPELL_SUMMON_EARTH_ELEMENTAL))
                     sprintf(gText, "Summon Earth");
                 else
                     sprintf(gText, "%s", gSpellNames[choice->value]);
@@ -776,14 +776,14 @@ void game::InitCampaignMap(void) {
         sprintf(
             m_mapFilename,
             "CAMP%c%02dB.H2C",
-            m_campaignType == CAMPAIGN_ROLAND ? 'E' : 'G',
+            m_campaignType == IDX(CAMPAIGN_ROLAND) ? 'E' : 'G',
             m_campaignScenario + 1
         );
     } else {
         sprintf(
             m_mapFilename,
             "CAMP%c%02d.H2C",
-            m_campaignType == CAMPAIGN_ROLAND ? 'G' : 'E',
+            m_campaignType == IDX(CAMPAIGN_ROLAND) ? 'G' : 'E',
             m_campaignScenario + 1
         );
     }
@@ -797,7 +797,7 @@ void game::InitCampaignMap(void) {
 
     if (choiceBest->type == CAMPAIGN_CHOICE_ALIGNMENT) {
         playerSlotSlot = 0;
-        if (m_campaignType == CAMPAIGN_ARCHIBALD) {
+        if (m_campaignType == IDX(CAMPAIGN_ARCHIBALD)) {
             if (m_mapHeader.playerEnabled[0])
                 ++playerSlotSlot;
             if (m_mapHeader.playerEnabled[1])
@@ -824,16 +824,16 @@ void game::InitCampaignMap(void) {
              scanPositionId < campaignPlayerCurrent->m_heroCount;
              ++scanPositionId) {
             if (gpGame->m_heroRecs[campaignPlayerCurrent->m_heroIds[scanPositionId]].m_portrait
-                    == CAMPAIGN_HERO_ROLAND
+                    == IDX(CAMPAIGN_HERO_ROLAND)
                 || gpGame->m_heroRecs[campaignPlayerCurrent->m_heroIds[scanPositionId]].m_portrait
-                       == CAMPAIGN_HERO_ARCHIBALD) {
+                       == IDX(CAMPAIGN_HERO_ARCHIBALD)) {
                 heroPriorityBest = CAMPAIGN_HERO_PRIORITY_HIGH;
             } else if (gpGame->m_heroRecs[campaignPlayerCurrent->m_heroIds[scanPositionId]]
                                .m_portrait
-                           == CAMPAIGN_HERO_CORLAGON
+                           == IDX(CAMPAIGN_HERO_CORLAGON)
                        || gpGame->m_heroRecs[campaignPlayerCurrent->m_heroIds[scanPositionId]]
                                   .m_portrait
-                              == CAMPAIGN_HERO_HALTON) {
+                              == IDX(CAMPAIGN_HERO_HALTON)) {
                 heroPriorityBest = CAMPAIGN_HERO_PRIORITY_NORMAL;
             } else {
                 heroPriorityBest = 0;
@@ -865,7 +865,7 @@ void game::InitCampaignMap(void) {
         case CAMPAIGN_CHOICE_SPELL:
             if (m_players[0].m_heroCount > 0) {
                 bonusHeroIndexPosition = 0;
-                if (m_campaignType == CAMPAIGN_ROLAND && m_campaignScenario + 1 == 6
+                if (m_campaignType == IDX(CAMPAIGN_ROLAND) && m_campaignScenario + 1 == 6
                     && m_players[0].m_heroCount > 1)
                     bonusHeroIndexPosition = 1;
                 gpGame->GetHero(m_players[0].m_heroIds[bonusHeroIndexPosition])
@@ -909,7 +909,7 @@ void game::InitCampaignMap(void) {
 
     if (m_campaignAwards[IDX(CAMPAIGN_AWARD_CORLAGON_DEFEATED)]) {
         for (heroPositionValue = 0; heroPositionValue < CAMPAIGN_HERO_COUNT; ++heroPositionValue) {
-            if (gpGame->m_heroRecs[heroPositionValue].m_portrait == CAMPAIGN_HERO_CORLAGON)
+            if (gpGame->m_heroRecs[heroPositionValue].m_portrait == IDX(CAMPAIGN_HERO_CORLAGON))
                 gpGame->m_heroRecs[heroPositionValue].Deallocate(0);
         }
     }
@@ -924,7 +924,7 @@ void game::InitCampaignMap(void) {
         }
     }
 
-    if (m_campaignScenario + 1 == 7 && m_campaignType == CAMPAIGN_ARCHIBALD) {
+    if (m_campaignScenario + 1 == 7 && m_campaignType == IDX(CAMPAIGN_ARCHIBALD)) {
         i32 savedNewGameSetup = gbInNewGameSetup;
         hero* armyHero;
         gbInNewGameSetup = 1;
@@ -936,19 +936,19 @@ void game::InitCampaignMap(void) {
         }
         switch (armyHero->m_cursorType) {
             case IDX(FACTION_BARBARIAN):
-                armyHero->m_army.Add(CREATURE_ORC_CHIEF, CAMPAIGN_BARBARIAN_ORC_CHIEF_COUNT, -1);
-                armyHero->m_army.Add(CREATURE_OGRE, CAMPAIGN_BARBARIAN_OGRE_COUNT, -1);
-                armyHero->m_army.Add(CREATURE_GOBLIN, CAMPAIGN_BARBARIAN_GOBLIN_COUNT, -1);
+                armyHero->m_army.Add(IDX(CREATURE_ORC_CHIEF), CAMPAIGN_BARBARIAN_ORC_CHIEF_COUNT, -1);
+                armyHero->m_army.Add(IDX(CREATURE_OGRE), CAMPAIGN_BARBARIAN_OGRE_COUNT, -1);
+                armyHero->m_army.Add(IDX(CREATURE_GOBLIN), CAMPAIGN_BARBARIAN_GOBLIN_COUNT, -1);
                 break;
             case IDX(FACTION_WARLOCK):
-                armyHero->m_army.Add(CREATURE_CENTAUR, CAMPAIGN_WARLOCK_CENTAUR_COUNT, -1);
-                armyHero->m_army.Add(CREATURE_GARGOYLE, CAMPAIGN_WARLOCK_GARGOYLE_COUNT, -1);
-                armyHero->m_army.Add(CREATURE_GRIFFIN, CAMPAIGN_WARLOCK_GRIFFIN_COUNT, -1);
+                armyHero->m_army.Add(IDX(CREATURE_CENTAUR), CAMPAIGN_WARLOCK_CENTAUR_COUNT, -1);
+                armyHero->m_army.Add(IDX(CREATURE_GARGOYLE), CAMPAIGN_WARLOCK_GARGOYLE_COUNT, -1);
+                armyHero->m_army.Add(IDX(CREATURE_GRIFFIN), CAMPAIGN_WARLOCK_GRIFFIN_COUNT, -1);
                 break;
             case IDX(FACTION_NECROMANCER):
-                armyHero->m_army.Add(CREATURE_SKELETON, CAMPAIGN_NECROMANCER_SKELETON_COUNT, -1);
-                armyHero->m_army.Add(CREATURE_ROYAL_MUMMY, CAMPAIGN_NECROMANCER_MUMMY_COUNT, -1);
-                armyHero->m_army.Add(CREATURE_VAMPIRE_LORD, CAMPAIGN_NECROMANCER_VAMPIRE_COUNT, -1);
+                armyHero->m_army.Add(IDX(CREATURE_SKELETON), CAMPAIGN_NECROMANCER_SKELETON_COUNT, -1);
+                armyHero->m_army.Add(IDX(CREATURE_ROYAL_MUMMY), CAMPAIGN_NECROMANCER_MUMMY_COUNT, -1);
+                armyHero->m_army.Add(IDX(CREATURE_VAMPIRE_LORD), CAMPAIGN_NECROMANCER_VAMPIRE_COUNT, -1);
                 break;
         }
         gpGame->GetHero(m_players[0].m_heroIds[0])->m_experience += CAMPAIGN_EXPERIENCE_BONUS;
@@ -972,16 +972,16 @@ void game::InitCampaignMap(void) {
         }
     }
 
-    if (m_campaignType == CAMPAIGN_ARCHIBALD && m_campaignScenario + 1 == 6) {
+    if (m_campaignType == IDX(CAMPAIGN_ARCHIBALD) && m_campaignScenario + 1 == 6) {
         gpGame->m_mapHeader.victoryCondition = IDX(MAP_VICTORY_DEFEAT_SIDE);
         gpGame->m_mapHeader.victoryConditionValue = CAMPAIGN_SWITCH_VICTORY_VALUE;
         gpGame->m_mapHeader.allowNormalVictory = 1;
     }
-    if (m_campaignType == CAMPAIGN_ROLAND && m_campaignScenario + 1 == 9) {
+    if (m_campaignType == IDX(CAMPAIGN_ROLAND) && m_campaignScenario + 1 == 9) {
         gpGame->m_mapHeader.lossCondition = IDX(MAP_LOSS_STANDARD);
         gpGame->m_mapHeader.lossConditionValue = 0;
     }
-    if (m_campaignType == CAMPAIGN_ROLAND && m_campaignScenario + 1 == 7)
+    if (m_campaignType == IDX(CAMPAIGN_ROLAND) && m_campaignScenario + 1 == 7)
         gpGame->m_mapHeader.lossConditionValue = CAMPAIGN_ROLAND_TIME_LIMIT;
 }
 

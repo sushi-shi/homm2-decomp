@@ -643,13 +643,13 @@ void soundManager::ModifySample(struct _SAMPLE* sampleHandle, i16 operation, i32
     switch (operation) {
         case IDX(SOUND_SAMPLE_OPERATION_VOLUME):
         case IDX(SOUND_SAMPLE_OPERATION_EFFECT_VOLUME):
-            AIL_set_sample_volume(sampleHandle, ConvertVolume(value, SOUND_VOLUME_EFFECT));
+            AIL_set_sample_volume(sampleHandle, ConvertVolume(value, IDX(SOUND_VOLUME_EFFECT)));
             if (foundChannel >= 0)
                 iLastVolume[foundChannel] = static_cast<i16>(value);
             break;
         case IDX(SOUND_SAMPLE_OPERATION_MUSIC_VOLUME):
             H2_ASSERT(gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI, RETAIL_FILE, 1327);
-            AIL_set_sample_volume(sampleHandle, ConvertVolume(value, SOUND_VOLUME_MUSIC));
+            AIL_set_sample_volume(sampleHandle, ConvertVolume(value, IDX(SOUND_VOLUME_MUSIC)));
             if (foundChannel >= 0)
                 iLastVolume[foundChannel] = static_cast<i16>(value);
             break;
@@ -939,7 +939,7 @@ struct _SAMPLE* soundManager::MemorySample(class sample* sampleResource) {
     AIL_set_sample_loop_count(smp, playbackData->loopCount);
     AIL_set_sample_address(smp, playbackData->data, playbackData->size);
     if (gConfig.soundVolume != 0)
-        AIL_set_sample_volume(smp, ConvertVolume(playbackData->volume, SOUND_VOLUME_EFFECT));
+        AIL_set_sample_volume(smp, ConvertVolume(playbackData->volume, IDX(SOUND_VOLUME_EFFECT)));
     else
         AIL_set_sample_volume(smp, 0);
     AIL_start_sample(smp);
