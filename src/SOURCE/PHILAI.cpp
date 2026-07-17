@@ -2443,7 +2443,7 @@ void philAI::GetBestCreature(town* townPtr, BHC& best, float& bestValue) {
     for (dwelling = 0; dwelling < AI_CREATURE_PURCHASE_DWELLING_COUNT; dwelling++) {
         creature = gDwellingType[townPtr->m_type][dwelling];
         leastArmyValue = AI_CREATURE_PURCHASE_VALUE_LIMIT;
-        if ((townPtr->m_buildings & (1 << (dwelling + BUILDING_SLOT_DWELLING_FIRST)))
+        if ((townPtr->m_buildings & BIT(dwelling + IDX(BUILDING_SLOT_DWELLING_FIRST)))
             && townPtr->m_garrison[dwelling] > 0) {
             canJoin = 0;
             for (armyIndex = 0; armyIndex < AI_CREATURE_PURCHASE_ARMY_SLOT_COUNT; armyIndex++) {
@@ -3816,7 +3816,7 @@ void philAI::HeroInteractionAtHero(
     hero* dominantHero19;
     float armyShare0, transferFraction35, dominantShare19, desiredShare6, shareDelta1;
     i32 interactionValue8;
-    i32 artifactType15;
+    ArtifactType artifactType15;
     i32 dominantFightValue4;
     i32 heroIndex9;
     i32 heroValues27[AI_HERO_INTERACTION_HERO_COUNT];
@@ -3900,9 +3900,9 @@ void philAI::HeroInteractionAtHero(
             );
             if (evaluateOnly != 0) {
                 for (statIndex8 = 0; statIndex8 < AI_BATTLE_ARTIFACT_SLOT_COUNT; statIndex8++) {
-                    artifactType15 = recipientHero36->m_artifacts[statIndex8];
-                    if (artifactType15 != -1 && artifactType15 != ARTIFACT_MAGIC_BOOK)
-                        interactionValue8 += gArtifactBaseRV[artifactType15];
+                    artifactType15 = static_cast<ArtifactType>(recipientHero36->m_artifacts[statIndex8]);
+                    if (artifactType15 != ARTIFACT_NONE && artifactType15 != ARTIFACT_MAGIC_BOOK)
+                        interactionValue8 += gArtifactBaseRV[IDX(artifactType15)];
                 }
             } else {
                 gpAdvManager->TransferArtifacts(recipientHero36, dominantHero19);
