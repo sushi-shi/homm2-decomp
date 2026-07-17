@@ -479,14 +479,14 @@ class mapCell* advManager::DoAdvCommand(void) {
     }
 
     switch (m_selectedCell) {
-        case IDX(ADVMGR_COMMAND_MOVE_TO):
+        case ADVMGR_COMMAND_MOVE_TO:
             if (currentHeroState == 0) {
                 break;
             }
             currentHeroState->m_destinationX = m_commandTargetX,
             currentHeroState->m_destinationY = m_commandTargetY;
             goto continue_route;
-        case IDX(ADVMGR_COMMAND_CONTINUE_ROUTE):
+        case ADVMGR_COMMAND_CONTINUE_ROUTE:
         continue_route:
             if (currentHeroState == 0) {
                 break;
@@ -576,7 +576,7 @@ class mapCell* advManager::DoAdvCommand(void) {
             }
             break;
 
-        case IDX(ADVMGR_COMMAND_OCCUPIED_TOWN_VIEW):
+        case ADVMGR_COMMAND_OCCUPIED_TOWN_VIEW:
             DemobilizeCurrHero();
             gpMouseManager->SetPointer(0);
             viewTownValue = gpGame->GetTown(currentHeroState->m_occupiedTown);
@@ -584,7 +584,7 @@ class mapCell* advManager::DoAdvCommand(void) {
             eventCellState = 0;
             break;
 
-        case IDX(ADVMGR_COMMAND_TOWN_VIEW):
+        case ADVMGR_COMMAND_TOWN_VIEW:
             DemobilizeCurrHero();
             gpMouseManager->SetPointer(0);
             eventCellState = GetCell(
@@ -595,7 +595,7 @@ class mapCell* advManager::DoAdvCommand(void) {
             eventCellState = 0;
             break;
 
-        case IDX(ADVMGR_COMMAND_HERO_VIEW):
+        case ADVMGR_COMMAND_HERO_VIEW:
             if (currentHeroState == 0) {
                 break;
             }
@@ -612,7 +612,7 @@ class mapCell* advManager::DoAdvCommand(void) {
             gpWindowManager->FadeScreen(0, 8, 0);
             break;
 
-        case IDX(ADVMGR_COMMAND_SELECT_HERO):
+        case ADVMGR_COMMAND_SELECT_HERO:
             SetHeroContext(
                 GetCell(m_mapOriginX + m_lastHoverCell, m_hoverCellY + m_mapOriginY)
                     ->m_objectMetadata,
@@ -620,12 +620,12 @@ class mapCell* advManager::DoAdvCommand(void) {
             );
             break;
 
-        case IDX(ADVMGR_COMMAND_SELECT_TOWN):
+        case ADVMGR_COMMAND_SELECT_TOWN:
             SetTownContext(GetCell(m_mapOriginX + m_lastHoverCell, m_hoverCellY + m_mapOriginY)
                                ->m_objectMetadata);
             break;
 
-        case IDX(ADVMGR_COMMAND_NONE):
+        case ADVMGR_COMMAND_NONE:
             break;
     }
 
