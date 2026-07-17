@@ -3618,7 +3618,7 @@ void combatManager::Earthquake(void) {
         }
     }
 
-    i32 newKeepState = m_drawbridgeState;
+    i32 IDX(newKeepState) = m_drawbridgeState;
     if (m_drawbridgeState != 3 && IDX(SRandom)(0, 100) < EARTHQUAKE_KEEP_HIT_CHANCE) {
         newKeepState = 3;
         impactPositions[impactCount][IDX(COMBAT_COORDINATE_X)] =

@@ -1683,10 +1683,10 @@ i32 SetupCDDrive(void) {
     i32 file = _open(gText, _O_BINARY);
     if (file == -1) {
         if (_chdir(gcRegAppPath) == -1)
-            return MISC_CD_APP_PATH_UNAVAILABLE;
+            return IDX(MISC_CD_APP_PATH_UNAVAILABLE);
         file = _open(gText, _O_BINARY);
         if (file == -1)
-            return MISC_CD_DATA_ARCHIVE_UNAVAILABLE;
+            return IDX(MISC_CD_DATA_ARCHIVE_UNAVAILABLE);
     }
     _close(file);
 
@@ -1712,7 +1712,7 @@ i32 SetupCDDrive(void) {
             _close(file);
             sprintf(gText + 2, gMiscText.cd.stringFormat.text, gcAnimPath);
             strcpy(gcAnimPath, gText);
-            return MISC_CD_DRIVE_READY;
+            return IDX(MISC_CD_DRIVE_READY);
         }
     }
 
@@ -1762,13 +1762,13 @@ i32 SetupCDDrive(void) {
                         gcAnimPath
                     );
                     strcpy(gcAnimPath, gText);
-                    return MISC_CD_DRIVE_READY;
+                    return IDX(MISC_CD_DRIVE_READY);
                 }
             }
             Sleep(MISC_CD_RETRY_DELAY_MILLISECONDS);
             ++attempts;
             if (attempts >= MISC_CD_RETRY_LIMIT)
-                return MISC_CD_DRIVE_NOT_FOUND;
+                return IDX(MISC_CD_DRIVE_NOT_FOUND);
         }
     }
 }

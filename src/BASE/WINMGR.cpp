@@ -486,7 +486,7 @@ i32 heroWindowManager::DoDialog(
         heroWindowManager* manager = gpWindowManager;
         if (dialogPalette != 0)
             SetPalette(dialogPalette->m_data, 0);
-        i32 fadeType = WINDOW_FADE_IN;
+        i32 IDX(fadeType) = WINDOW_FADE_IN;
         switch (fadeType) {
             case IDX(WINDOW_FADE_IN): {
                 u32 savedUpdate = manager->m_updateFlags;
