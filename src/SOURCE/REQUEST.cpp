@@ -24,7 +24,7 @@
 
 // Frames of the requester's map-info icons: the map-size frames are selected
 // directly; player-count, victory, and loss frames are base + header value.
-typedef enum RequesterIconFrame {
+HOMM2_ENUM_BEGIN(RequesterIconFrame)
     PLAYER_COUNT_FRAME_BASE = 0x13,
     MAP_SIZE_FRAME_SMALL = 0x1a,
     MAP_SIZE_FRAME_MEDIUM = 0x1b,
@@ -32,7 +32,7 @@ typedef enum RequesterIconFrame {
     MAP_SIZE_FRAME_XLARGE = 0x1d,
     VICTORY_FRAME_BASE = 0x1e,
     LOSS_FRAME_BASE = 0x24
-} RequesterIconFrame;
+HOMM2_ENUM_END(RequesterIconFrame)
 
 // @early-stop
 // @early-stop-reloc-only
@@ -118,7 +118,7 @@ i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly
                 if (mapHeader.minHumanPlayers <= giNumHumanPlayers
                     && giNumHumanPlayers <= mapHeader.maxHumanPlayers
                     && (giMapSizeFilter == FILE_REQUESTER_MAP_SIZE_ALL
-                        || giMapSizes[giMapSizeFilter] == mapHeader.width)
+                        || giMapSizes[IDX(giMapSizeFilter)] == mapHeader.width)
                     && ShowThisMapGame(findDataPath.cFileName)) {
                 } else {
                     goto CountNextFile;
@@ -127,7 +127,7 @@ i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly
             if (m_mode == FILE_REQUESTER_MAP) {
                 GetMapHeader(findDataPath.cFileName, &mapHeader);
                 if ((giMapSizeFilter == FILE_REQUESTER_MAP_SIZE_ALL
-                     || giMapSizes[giMapSizeFilter] == mapHeader.width)
+                     || giMapSizes[IDX(giMapSizeFilter)] == mapHeader.width)
                     && ShowThisMap(findDataPath.cFileName)) {
                 } else {
                     goto CountNextFile;
@@ -175,7 +175,7 @@ i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly
                 if (mapHeader.minHumanPlayers <= giNumHumanPlayers
                     && giNumHumanPlayers <= mapHeader.maxHumanPlayers
                     && (giMapSizeFilter == FILE_REQUESTER_MAP_SIZE_ALL
-                        || giMapSizes[giMapSizeFilter] == mapHeader.width)
+                        || giMapSizes[IDX(giMapSizeFilter)] == mapHeader.width)
                     && ShowThisMapGame(findDataPath.cFileName)) {
                 } else {
                     goto InsertNextFile;
@@ -184,7 +184,7 @@ i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly
             if (m_mode == FILE_REQUESTER_MAP) {
                 GetMapHeader(findDataPath.cFileName, &mapHeader);
                 if ((giMapSizeFilter == FILE_REQUESTER_MAP_SIZE_ALL
-                     || giMapSizes[giMapSizeFilter] == mapHeader.width)
+                     || giMapSizes[IDX(giMapSizeFilter)] == mapHeader.width)
                     && ShowThisMap(findDataPath.cFileName)) {
                 } else {
                     goto InsertNextFile;
@@ -422,7 +422,7 @@ void fileRequester::SetOK(i32 enabled) {
         message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
     }
     message.payload.widget.id = FILE_REQUESTER_OK;
-    if (m_active == 1) {
+    if (m_active) {
         message.payload.widget.data.value = 8;
     } else {
         message.payload.widget.data.value = WIDGET_FLAG_GRAYED;

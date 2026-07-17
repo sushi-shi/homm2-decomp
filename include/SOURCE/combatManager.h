@@ -51,7 +51,7 @@ struct SBolt {
 SIZE(SBolt, 0x78);
 struct tag_message;
 
-typedef enum CombatDrawLayer {
+HOMM2_ENUM_BEGIN(CombatDrawLayer)
     COMBAT_DRAW_LAYER_COUNT = 9,
     COMBAT_DRAW_RIGHT_HERO_LAYER = 1,
     COMBAT_DRAW_LEFT_HERO_LAYER = 2,
@@ -59,9 +59,9 @@ typedef enum CombatDrawLayer {
     COMBAT_DRAW_WALL_MIDDLE_LAYER = 5,
     COMBAT_DRAW_GATE_LAYER = 6,
     COMBAT_DRAW_CATAPULT_LAYER = 7
-} CombatDrawLayer;
+HOMM2_ENUM_END(CombatDrawLayer)
 
-typedef enum CombatCastleHex {
+HOMM2_ENUM_BEGIN(CombatCastleHex)
     COMBAT_CASTLE_HEX_TOP_TOWER = 9,
     COMBAT_CASTLE_HEX_TOP_WALL = 22,
     COMBAT_CASTLE_HEX_SECOND_TOWER = 34,
@@ -75,16 +75,16 @@ typedef enum CombatCastleHex {
     COMBAT_CASTLE_HEX_BOTTOM_TOWER = 113,
     COMBAT_CASTLE_SPECIAL_HEX_FIRST = 114,
     COMBAT_CASTLE_SPECIAL_HEX_SECOND = 115
-} CombatCastleHex;
+HOMM2_ENUM_END(CombatCastleHex)
 
-typedef enum CombatDrawbridgeState {
+HOMM2_ENUM_BEGIN(CombatDrawbridgeState)
     COMBAT_DRAWBRIDGE_LOWERED = 0,
     COMBAT_DRAWBRIDGE_RAISE_FRAME_FIRST = 1,
     COMBAT_DRAWBRIDGE_RAISE_FRAME_SECOND = 2,
     COMBAT_DRAWBRIDGE_RAISED = 4
-} CombatDrawbridgeState;
+HOMM2_ENUM_END(CombatDrawbridgeState)
 
-typedef enum CombatCastleInteriorRange {
+HOMM2_ENUM_BEGIN(CombatCastleInteriorRange)
     COMBAT_CASTLE_INTERIOR_ROW_0_FIRST = 0,
     COMBAT_CASTLE_INTERIOR_ROW_0_LAST = 8,
     COMBAT_CASTLE_INTERIOR_ROW_1_FIRST = 13,
@@ -103,9 +103,9 @@ typedef enum CombatCastleInteriorRange {
     COMBAT_CASTLE_INTERIOR_ROW_7_LAST = 99,
     COMBAT_CASTLE_INTERIOR_ROW_8_FIRST = 104,
     COMBAT_CASTLE_INTERIOR_ROW_8_LAST = 112
-} CombatCastleInteriorRange;
+HOMM2_ENUM_END(CombatCastleInteriorRange)
 
-typedef enum CombatCastleWallSlot {
+HOMM2_ENUM_BEGIN(CombatCastleWallSlot)
     COMBAT_WALL_SLOT_TOP_TOWER = 0,
     COMBAT_WALL_SLOT_BOTTOM_TOWER = 3,
     COMBAT_WALL_SLOT_SECTION_FIRST = 4,
@@ -114,9 +114,9 @@ typedef enum CombatCastleWallSlot {
     COMBAT_WALL_SLOT_SECTION_FOURTH = 7,
     COMBAT_WALL_SLOT_KEEP = 8,
     COMBAT_WALL_SECTION_COUNT = 4
-} CombatCastleWallSlot;
+HOMM2_ENUM_END(CombatCastleWallSlot)
 
-typedef enum CombatCastleWallState {
+HOMM2_ENUM_BEGIN(CombatCastleWallState)
     COMBAT_WALL_STATE_KEEP_STANDING = 0,
     COMBAT_WALL_STATE_KEEP_DESTROYED = 1,
     COMBAT_WALL_STATE_TOWER_STANDING = 1,
@@ -124,31 +124,31 @@ typedef enum CombatCastleWallState {
     COMBAT_WALL_STATE_SECTION_DAMAGE_FIRST = 3,
     COMBAT_WALL_STATE_SECTION_DAMAGE_LAST = 5,
     COMBAT_WALL_STATE_SECTION_DESTROYED = 6
-} CombatCastleWallState;
+HOMM2_ENUM_END(CombatCastleWallState)
 
-typedef enum CombatTowerSelector {
+HOMM2_ENUM_BEGIN(CombatTowerSelector)
     COMBAT_TOWER_SELECTOR_GARRISON = 0,
     COMBAT_TOWER_SELECTOR_TOP = 1,
     COMBAT_TOWER_SELECTOR_BOTTOM = 2
-} CombatTowerSelector;
+HOMM2_ENUM_END(CombatTowerSelector)
 
-typedef enum CombatCoordinateAxis {
+HOMM2_ENUM_BEGIN(CombatCoordinateAxis)
     COMBAT_COORDINATE_X = 0,
     COMBAT_COORDINATE_Y = 1
-} CombatCoordinateAxis;
+HOMM2_ENUM_END(CombatCoordinateAxis)
 
-typedef enum CombatCatapultDamage {
+HOMM2_ENUM_BEGIN(CombatCatapultDamage)
     COMBAT_CATAPULT_DAMAGE_NONE = 0,
     COMBAT_CATAPULT_DAMAGE_NORMAL = 1,
     COMBAT_CATAPULT_DAMAGE_DOUBLE = 2
-} CombatCatapultDamage;
+HOMM2_ENUM_END(CombatCatapultDamage)
 
-typedef enum CombatKeepTargetPriority {
+HOMM2_ENUM_BEGIN(CombatKeepTargetPriority)
     COMBAT_KEEP_PRIORITY_DISABLED = 0,
     COMBAT_KEEP_PRIORITY_WALKER = 1,
     COMBAT_KEEP_PRIORITY_FLYER = 2,
     COMBAT_KEEP_PRIORITY_SHOOTER = 3
-} CombatKeepTargetPriority;
+HOMM2_ENUM_END(CombatKeepTargetPriority)
 
 #define COMBAT_CATAPULT_TARGET_ROLL_MIN 0
 #define COMBAT_CATAPULT_TARGET_ROLL_MAX 20
@@ -214,7 +214,7 @@ typedef enum CombatKeepTargetPriority {
 #define COMBAT_MISSILE_DIRECTION_AVERAGE_DIVISOR 2.0f
 #define COMBAT_CREATURE_VANISH_DURATION 150.0f
 
-typedef enum CombatSmallViewText {
+HOMM2_ENUM_BEGIN(CombatSmallViewText)
     COMBAT_SMALL_VIEW_TEXT_QUANTITY_PLURAL = 0,
     COMBAT_SMALL_VIEW_TEXT_QUANTITY_SINGULAR = 1,
     COMBAT_SMALL_VIEW_TEXT_ATTACK = 2,
@@ -224,16 +224,16 @@ typedef enum CombatSmallViewText {
     COMBAT_SMALL_VIEW_TEXT_MORALE = 6,
     COMBAT_SMALL_VIEW_TEXT_LUCK = 7,
     COMBAT_SMALL_VIEW_TEXT_SHOTS = 8
-} CombatSmallViewText;
+HOMM2_ENUM_END(CombatSmallViewText)
 
-typedef enum CombatSmallViewModifierFrame {
+HOMM2_ENUM_BEGIN(CombatSmallViewModifierFrame)
     COMBAT_SMALL_VIEW_BAD_LUCK_FRAME = 0,
     COMBAT_SMALL_VIEW_GOOD_LUCK_FRAME = 1,
     COMBAT_SMALL_VIEW_NEUTRAL_LUCK_FRAME = 2,
     COMBAT_SMALL_VIEW_BAD_MORALE_FRAME = 3,
     COMBAT_SMALL_VIEW_GOOD_MORALE_FRAME = 4,
     COMBAT_SMALL_VIEW_NEUTRAL_MORALE_FRAME = 5
-} CombatSmallViewModifierFrame;
+HOMM2_ENUM_END(CombatSmallViewModifierFrame)
 
 enum {
     COMBAT_GRID_ROW_COUNT = 9,
@@ -409,7 +409,7 @@ enum {
     COMBAT_CASTLE_BACKGROUND_DEFAULT_FRAME = 3
 };
 
-typedef enum CombatMoraleConstant {
+HOMM2_ENUM_VALUES_BEGIN(CombatMoraleConstant)
     COMBAT_MORALE_ROLL_MIN = 1,
     COMBAT_GOOD_MORALE_ROLL_MAX = 24,
     COMBAT_BAD_MORALE_ROLL_MAX = 12,
@@ -418,15 +418,15 @@ typedef enum CombatMoraleConstant {
     COMBAT_GOOD_MORALE_EFFECT = 11,
     COMBAT_BAD_MORALE_EFFECT = 12,
     COMBAT_MORALE_EFFECT_DURATION = 180
-} CombatMoraleConstant;
+HOMM2_ENUM_VALUES_END(CombatMoraleConstant)
 
-typedef enum CombatMapTrigger {
+HOMM2_ENUM_BEGIN(CombatMapTrigger)
     COMBAT_TRIGGER_MINE = 0x97,
     COMBAT_TRIGGER_MONSTER = 0x98,
     COMBAT_TRIGGER_HERO = 0xaa
-} CombatMapTrigger;
+HOMM2_ENUM_END(CombatMapTrigger)
 
-typedef enum CombatNearbyTileset {
+HOMM2_ENUM_BEGIN(CombatNearbyTileset)
     COMBAT_TILESET_SNOW_MOUNTAINS = 0x16,
     COMBAT_TILESET_SWAMP_MOUNTAINS = 0x17,
     COMBAT_TILESET_LAVA_MOUNTAINS = 0x18,
@@ -440,9 +440,9 @@ typedef enum CombatNearbyTileset {
     COMBAT_TILESET_SNOW_TREES = 0x2a,
     COMBAT_TILESET_SUMMER_TREES = 0x2b,
     COMBAT_TILESET_AUTUMN_TREES = 0x2c
-} CombatNearbyTileset;
+HOMM2_ENUM_END(CombatNearbyTileset)
 
-typedef enum CombatIconIndex {
+HOMM2_ENUM_BEGIN(CombatIconIndex)
     COMBAT_ICON_STATUS = 1,
     COMBAT_ICON_CATAPULT = 3,
     COMBAT_ICON_TOWER = 5,
@@ -454,7 +454,7 @@ typedef enum CombatIconIndex {
     COMBAT_ICON_SMALL_VIEW_SPELL = 12,
     COMBAT_ICON_MOAT = 13,
     COMBAT_ICON_DRAWBRIDGE = 14
-} CombatIconIndex;
+HOMM2_ENUM_END(CombatIconIndex)
 
 #define COMBAT_RANDOM_X_MULTIPLIER 100
 #define COMBAT_CAPTAIN_SPELL_POINT_MULTIPLIER 10
@@ -462,13 +462,13 @@ typedef enum CombatIconIndex {
 #define COMBAT_INITIAL_COMMAND 15
 #define COMBAT_INVALID_HISTORY_INDEX (-99)
 
-typedef enum CombatGridShade {
+HOMM2_ENUM_BEGIN(CombatGridShade)
     COMBAT_GRID_SHADE_NONE = 0,
     COMBAT_GRID_SHADE_REACHABLE = 1,
     COMBAT_GRID_SHADE_EMPTY_BLOCKED = 3
-} CombatGridShade;
+HOMM2_ENUM_END(CombatGridShade)
 
-typedef enum CombatAIConstant {
+HOMM2_ENUM_VALUES_BEGIN(CombatAIConstant)
     COMBAT_AI_SIDE_COUNT = 2,
     COMBAT_AI_ARMY_SLOT_COUNT = 20,
     COMBAT_AI_GROUP_SLOT_COUNT = 5,
@@ -527,9 +527,9 @@ typedef enum CombatAIConstant {
     COMBAT_AI_STRENGTH_30000 = 30000,
     COMBAT_AI_STRENGTH_40000 = 40000,
     COMBAT_AI_EXPERIENCE_DIVISOR = 200000
-} CombatAIConstant;
+HOMM2_ENUM_VALUES_END(CombatAIConstant)
 
-typedef enum CombatSpellAITargetMode {
+HOMM2_ENUM_BEGIN(CombatSpellAITargetMode)
     COMBAT_SPELL_AI_GLOBAL = 0,
     COMBAT_SPELL_AI_SUM_FRIENDLY = 1,
     COMBAT_SPELL_AI_SUM_ENEMY = 2,
@@ -538,7 +538,7 @@ typedef enum CombatSpellAITargetMode {
     COMBAT_SPELL_AI_ENEMY = 5,
     COMBAT_SPELL_AI_RESURRECT = 6,
     COMBAT_SPELL_AI_ANY_ARMY = 7
-} CombatSpellAITargetMode;
+HOMM2_ENUM_END(CombatSpellAITargetMode)
 
 enum {
     COMBAT_SPELL_AI_FIRST_HEX = 1,
@@ -630,7 +630,7 @@ static const float COMBAT_SPELL_AI_FULL_EFFECT_MODIFIER = 1.0f;
 #define COMBAT_AI_LICH_HIT_POINT_SCALE 100.0f
 #define COMBAT_AI_MIN_LICH_DAMAGE_SCORE (-99999.0f)
 
-typedef enum CombatMessageCommand {
+HOMM2_ENUM_BEGIN(CombatMessageCommand)
     COMBAT_MESSAGE_COMMAND_DEFAULT = 0,
     COMBAT_MESSAGE_COMMAND_MOVE = 1,
     COMBAT_MESSAGE_COMMAND_FLY = 2,
@@ -643,9 +643,9 @@ typedef enum CombatMessageCommand {
     COMBAT_MESSAGE_COMMAND_SURRENDER = 12,
     COMBAT_MESSAGE_COMMAND_OPPOSING_OPTIONS = 13,
     COMBAT_MESSAGE_COMMAND_SHOOT_THROUGH_WALL = 15
-} CombatMessageCommand;
+HOMM2_ENUM_END(CombatMessageCommand)
 
-typedef enum CombatMessageText {
+HOMM2_ENUM_BEGIN(CombatMessageText)
     COMBAT_MESSAGE_TEXT_DEFAULT = 0,
     COMBAT_MESSAGE_TEXT_MOVE = 1,
     COMBAT_MESSAGE_TEXT_FLY = 2,
@@ -658,7 +658,7 @@ typedef enum CombatMessageText {
     COMBAT_MESSAGE_TEXT_CAPTAIN_OPTIONS = 9,
     COMBAT_MESSAGE_TEXT_OPPOSING_CAPTAIN = 10,
     COMBAT_MESSAGE_TEXT_BALLISTA = 11
-} CombatMessageText;
+HOMM2_ENUM_END(CombatMessageText)
 
 #pragma pack(push, 1) // recovered layout is byte-packed
 class combatManager : public baseManager {
@@ -783,7 +783,7 @@ public:
     char m_battlefieldBackgroundName[13];                                 // +0xf5a0
     i8 m_adjacency[COMBAT_HEX_COUNT][COMBAT_AI_ADJACENT_DIRECTION_COUNT]; // +0xf5ad
     class heroWindow* m_winLoseWindow;                                    // +0xf86b
-    i32 m_selectedSpell;                                                  // +0xf86f
+    SpellType m_selectedSpell;                                            // +0xf86f
     i32 m_combatResult;                                                   // +0xf873
     // --- constructors ---
     combatManager(void);
@@ -808,7 +808,7 @@ public:
     i32 ViewGeneral(i32, i32, i32);
     void ViewArmy(class army*, i32);
     i32 HasValidSpellTarget(i32);
-    i32 ViewSpells(i32);
+    SpellType ViewSpells(i32);
     i32 FindResurrectArmyIndex(i32, i32, i32);
     i32 ValidSpellTarget(i32, i32);
     void SpellMessage(i32, i32);

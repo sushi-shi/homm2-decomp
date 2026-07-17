@@ -9,7 +9,7 @@
 // forward declarations:
 class town;
 
-typedef enum HeroSecondarySkill {
+HOMM2_ENUM_BEGIN(HeroSecondarySkill)
     HERO_SKILL_PATHFINDING = 0,
     HERO_SKILL_ARCHERY = 1,
     HERO_SKILL_LOGISTICS = 2,
@@ -25,28 +25,28 @@ typedef enum HeroSecondarySkill {
     HERO_SKILL_NECROMANCY = 12,
     HERO_SKILL_ESTATES = 13,
     HERO_SKILL_COUNT = 14
-} HeroSecondarySkill;
+HOMM2_ENUM_END(HeroSecondarySkill)
 
-typedef enum HeroSkillLevel {
+HOMM2_ENUM_BEGIN(HeroSkillLevel)
     HERO_SKILL_LEVEL_NONE = 0,
     HERO_SKILL_LEVEL_BASIC = 1,
     HERO_SKILL_LEVEL_ADVANCED = 2,
     HERO_SKILL_LEVEL_EXPERT = 3,
     HERO_SKILL_LEVEL_COUNT = 4
-} HeroSkillLevel;
+HOMM2_ENUM_END(HeroSkillLevel)
 
-typedef enum HeroPrimaryStat {
+HOMM2_ENUM_BEGIN(HeroPrimaryStat)
     HERO_PRIMARY_ATTACK = 0,
     HERO_PRIMARY_DEFENSE = 1,
     HERO_PRIMARY_SPELL_POWER = 2,
     HERO_PRIMARY_KNOWLEDGE = 3
-} HeroPrimaryStat;
+HOMM2_ENUM_END(HeroPrimaryStat)
 
 #define HERO_PRIMARY_STAT_COUNT 4
 #define HERO_ARTIFACT_SLOT_COUNT 14
 #define HERO_EXPERIENCE_GROWTH_FACTOR 1.2
 
-typedef enum HeroConstant {
+HOMM2_ENUM_VALUES_BEGIN(HeroConstant)
     HERO_OWNER_NONE = -1,
     HERO_BOAT_NONE = 0xff,
     HERO_DESTINATION_NONE = -1,
@@ -79,19 +79,19 @@ typedef enum HeroConstant {
     HERO_NECROMANCY_BONUS_MAX = 6,
     HERO_NECROMANCY_EFFECTIVE_LEVEL_MAX = 9,
     HERO_NECROMANCY_PERCENT_PER_LEVEL = 10
-} HeroConstant;
+HOMM2_ENUM_VALUES_END(HeroConstant)
 
-typedef enum HeroArtifactConstant {
-    HERO_ARTIFACT_TRANSFERABLE_FIRST = ARTIFACT_ARCANE_NECKLACE
-} HeroArtifactConstant;
+HOMM2_ENUM_VALUES_BEGIN(HeroArtifactConstant)
+    HERO_ARTIFACT_TRANSFERABLE_FIRST = IDX(ARTIFACT_ARCANE_NECKLACE)
+HOMM2_ENUM_VALUES_END(HeroArtifactConstant)
 
-typedef enum HeroSpellType {
+HOMM2_ENUM_BEGIN(HeroSpellType)
     HERO_SPELL_TYPE_COMBAT = 0,
     HERO_SPELL_TYPE_ADVENTURE = 1,
     HERO_SPELL_TYPE_ALL = 2
-} HeroSpellType;
+HOMM2_ENUM_END(HeroSpellType)
 
-typedef enum HeroMobilityConstant {
+HOMM2_ENUM_VALUES_BEGIN(HeroMobilityConstant)
     HERO_BASE_RECORD_SIZE = 0xec,
     HERO_SEA_BASE_MOBILITY = 1500,
     HERO_LIGHTHOUSE_MOBILITY_BONUS = 500,
@@ -103,9 +103,10 @@ typedef enum HeroMobilityConstant {
     HERO_AI_DIFFICULTY_MOBILITY_BONUS = 75,
     HERO_AI_STATE_MOBILITY_BONUS = 50,
     HERO_LIGHTHOUSE_MINE_TYPE = 100
-} HeroMobilityConstant;
+HOMM2_ENUM_VALUES_END(HeroMobilityConstant)
 
-typedef enum HeroEventFlag {
+HOMM2_ENUM_BEGIN_T(HeroEventFlag, u32)
+    HERO_EVENT_NONE = 0,
     HERO_EVENT_BUOY = 0x2,
     HERO_EVENT_FOUNTAIN = 0x4,
     HERO_EVENT_OASIS = 0x8,
@@ -125,7 +126,8 @@ typedef enum HeroEventFlag {
     HERO_EVENT_ARENA = 0x400000,
     HERO_EVENT_STABLES = 0x800000,
     HERO_EVENT_GROUPED_FORMATION = 0x00008000
-} HeroEventFlag;
+HOMM2_ENUM_END_T(HeroEventFlag, u32)
+HOMM2_ENUM_FLAGS(HeroEventFlag)
 
 #pragma pack(push, 1) // recovered layout is byte-packed
 class hero {
@@ -182,14 +184,14 @@ public:
     i8 m_secondarySkills[14];                 // +0x74
     u8 m_secondarySkillOrder[14];             // +0x82
     i32 m_secondarySkillCount;                // +0x90
-    i8 m_spells[SPELL_COUNT];                 // +0x94
+    i8 m_spells[IDX(SPELL_COUNT)];            // +0x94
     i8 m_artifacts[HERO_ARTIFACT_SLOT_COUNT]; // +0xd5
-    u32 m_eventFlags;                         // +0xe3
+    HeroEventFlag m_eventFlags;               // +0xe3
     u8 m_isCaptain;                           // +0xe7
     float m_aiFightValue;                     // +0xe8
     i8 m_artifactExtra[14];                   // +0xec
     i32 IsEmbarked(void) {
-        return m_eventFlags & HERO_EVENT_EMBARKED;
+        return HAS(m_eventFlags, HERO_EVENT_EMBARKED);
     }
     // --- constructors ---
     hero(void);
@@ -223,7 +225,7 @@ public:
     void UpgradeCreatures(i32, i32);
     i32 GetNthSS(i32);
     class town* GetOccupiedTown(void);
-    i8 Stats(i32);
+    i8 Stats(HeroPrimaryStat);
     i8 GetSSLevel(i32);
     void DoSSLevelDialog(i32, i32);
     void CheckAnduranPieces(i32);

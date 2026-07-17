@@ -7,7 +7,7 @@
 class army;
 extern i32 MAP_WIDTH;
 
-typedef enum SearchConstant {
+HOMM2_ENUM_VALUES_BEGIN(SearchConstant)
     SEARCH_DIRECTION_COUNT = 8,
     SEARCH_DIRECTION_REVERSE = 4,
     SEARCH_DIRECTION_MASK = 7,
@@ -40,7 +40,7 @@ typedef enum SearchConstant {
     SEARCH_DIRECTION_OBJECT_MASK = 0x38,
     SEARCH_OBJECT_TYPE_MASK = 0xfc,
     SEARCH_BLOCKING_OBJECT_TYPE = 0xbc
-} SearchConstant;
+HOMM2_ENUM_VALUES_END(SearchConstant)
 
 #pragma pack(push, 1)
 struct searchCell {

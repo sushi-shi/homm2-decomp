@@ -571,7 +571,7 @@ mapCell* advManager::MoveHero(
         currentTerrain_b,
         direction & 1,
         movingHero_f->m_remainingMobility,
-        movingHero_f->m_secondarySkills[HERO_SKILL_PATHFINDING],
+        movingHero_f->m_secondarySkills[IDX(HERO_SKILL_PATHFINDING)],
         currentCell_f->m_isRoad,
         destinationCell_j->m_isRoad
     );
@@ -579,7 +579,7 @@ mapCell* advManager::MoveHero(
         giGroundToTerrain[destinationCell_j->m_terrainImageIndex],
         0,
         movingHero_f->m_remainingMobility - terrainCost_e,
-        movingHero_f->m_secondarySkills[HERO_SKILL_PATHFINDING],
+        movingHero_f->m_secondarySkills[IDX(HERO_SKILL_PATHFINDING)],
         destinationCell_j->m_isRoad,
         1
     );
@@ -607,7 +607,7 @@ mapCell* advManager::MoveHero(
         TurnTo(direction);
     movingHero_f->m_direction = static_cast<u8>(direction);
 
-    if ((movingHero_f->m_eventFlags & HERO_EVENT_EMBARKED)
+    if (HAS(movingHero_f->m_eventFlags, HERO_EVENT_EMBARKED)
         && destinationCell_j->m_triggerType == MAP_OBJECT_COAST) {
         for (step_a = 0; step_a < CURSOR_BOAT_COUNT; ++step_a) {
             if (gpGame->m_boats[step_a].heroId == static_cast<u8>(movingHero_f->m_id))
@@ -633,7 +633,7 @@ mapCell* advManager::MoveHero(
         && gpAdvManager->ValidMoveWithEvent(movingHero_f, direction)) {
         switch (destinationCell_j->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
             case MAP_OBJECT_BOAT:
-                if (movingHero_f->m_eventFlags & HERO_EVENT_EMBARKED)
+                if (HAS(movingHero_f->m_eventFlags, HERO_EVENT_EMBARKED))
                     goto movementDone;
                 StopCursor(1);
                 m_cursorActive = 0;
@@ -659,7 +659,7 @@ mapCell* advManager::MoveHero(
                 break;
 
             case MAP_OBJECT_HERO_INTERACTION:
-                if (movingHero_f->m_eventFlags & HERO_EVENT_EMBARKED) {
+                if (HAS(movingHero_f->m_eventFlags, HERO_EVENT_EMBARKED)) {
                     if (gpGame->GetHero(destinationCell_j->m_objectMetadata)->m_eventFlags
                         & HERO_EVENT_EMBARKED)
                         goto stoppingEvent;
@@ -721,7 +721,7 @@ mapCell* advManager::MoveHero(
         m_mapOriginX + directionX_b + CURSOR_MAP_DRAW_OFFSET,
         m_mapOriginY + directionY_b + CURSOR_MAP_DRAW_OFFSET,
         giCurPlayer,
-        giVisRange[movingHero_f->m_secondarySkills[HERO_SKILL_SCOUTING]]
+        giVisRange[movingHero_f->m_secondarySkills[IDX(HERO_SKILL_SCOUTING)]]
             + (movingHero_f->HasArtifact(CURSOR_VISIBILITY_ARTIFACT) != 0)
     );
     m_forceCompleteDraw = 1;
@@ -818,7 +818,7 @@ mapCell* advManager::MoveHero(
     *eventX = m_cursorMapX + m_mapOriginX;
     *eventY = m_cursorMapY + m_mapOriginY;
     if ((cursorCell_m->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
-        || ((movingHero_f->m_eventFlags & HERO_EVENT_EMBARKED)
+        || (HAS(movingHero_f->m_eventFlags, HERO_EVENT_EMBARKED)
             && cursorCell_m->m_triggerType == MAP_OBJECT_COAST)) {
         eventCell_g = cursorCell_m;
         switch (cursorCell_m->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
@@ -851,7 +851,7 @@ movementDone:
         if (movingHero_f->m_x != oldHeroX_b || movingHero_f->m_y != oldHeroY_b) {
             if (mapExtra[movingHero_f->m_y * MAP_WIDTH + movingHero_f->m_x]
                 & MAP_TRIGGER_ACTION_FLAG) {
-                if (movingHero_f->m_eventFlags & HERO_EVENT_EMBARKED) {
+                if (HAS(movingHero_f->m_eventFlags, HERO_EVENT_EMBARKED)) {
                 } else {
                     if (!eventCell_g)
                         goto checkAdjacent;
@@ -1007,7 +1007,7 @@ i32 advManager::ValidMoveWithEvent(hero* movingHero, i32 direction) {
     destinationCell0 = m_mapData->GetCell(destinationX0, destinationY0);
     switch (destinationCell0->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
         case MAP_OBJECT_HERO_INTERACTION:
-            if (movingHero->m_eventFlags & HERO_EVENT_EMBARKED) {
+            if (HAS(movingHero->m_eventFlags, HERO_EVENT_EMBARKED)) {
                 if (gpGame->GetHero(destinationCell0->m_objectMetadata)->m_eventFlags
                     & HERO_EVENT_EMBARKED)
                     return 1;
@@ -1362,7 +1362,7 @@ void advManager::ProcessMapChange(SMapChange change) {
             mapHero_n = gpGame->GetHero(change.id);
             mapHero_n->m_x = change.x;
             mapHero_n->m_y = change.y;
-            mapHero_n->m_eventFlags = 0;
+            mapHero_n->m_eventFlags = HERO_EVENT_NONE;
             mapHero_n->m_direction = CURSOR_RECRUIT_HERO_DIRECTION;
             mapHero_n->m_locationType =
                 gpGame->m_worldMap.GetCell(change.x, change.y)->m_triggerType;
@@ -1465,9 +1465,7 @@ void advManager::ProcessIncomingGroupMapChange(char* incomingData) {
     i32 processed;
 
     size = sizeof(sMapChangeLastFew);
-    buf = static_cast<SMapChange*>(
-        H2_ALLOC(size, 1512)
-    );
+    buf = static_cast<SMapChange*>(H2_ALLOC(size, 1512));
     memcpy(buf, incomingData, size);
     for (i = CURSOR_MAP_CHANGE_RECENT_COUNT - 1; i >= 0; --i) {
         ptr = &buf[i];

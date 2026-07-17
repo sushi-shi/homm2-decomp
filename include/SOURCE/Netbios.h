@@ -5,7 +5,7 @@
 // Declarations of the free functions DEFINED in Netbios.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
 
-typedef enum NetbiosSetupConstant {
+HOMM2_ENUM_VALUES_BEGIN(NetbiosSetupConstant)
     NETBIOS_INIT_UNAVAILABLE = 1,
     NETBIOS_SETUP_SESSION_COUNT = 5,
     NETBIOS_HOST_SESSION = 0,
@@ -18,32 +18,32 @@ typedef enum NetbiosSetupConstant {
     NETBIOS_BROADCAST_INTERVAL = 500,
     NETBIOS_REGISTERED_STATE_ADVANCE = 3,
     NETBIOS_DETACH_SOURCE_SESSION = 1
-} NetbiosSetupConstant;
+HOMM2_ENUM_VALUES_END(NetbiosSetupConstant)
 
-typedef enum NetbiosSetupState {
+HOMM2_ENUM_BEGIN(NetbiosSetupState)
     NETBIOS_SETUP_INITIALIZE = 0,
     NETBIOS_SETUP_CHECK_LOCAL_NAME = 1,
     NETBIOS_SETUP_REGISTER_LOCAL_NAME = 2,
     NETBIOS_SETUP_WAIT_FOR_LOCAL_NAME = 3,
     NETBIOS_SETUP_START_RECEIVE = 4
-} NetbiosSetupState;
+HOMM2_ENUM_END(NetbiosSetupState)
 
-typedef enum NetbiosWaitState {
+HOMM2_ENUM_BEGIN(NetbiosWaitState)
     NETBIOS_WAIT_START = 0,
     NETBIOS_WAIT_POLL = 1
-} NetbiosWaitState;
+HOMM2_ENUM_END(NetbiosWaitState)
 
-typedef enum NetbiosDialogWaitType {
+HOMM2_ENUM_BEGIN(NetbiosDialogWaitType)
     NETBIOS_WAIT_FOR_GUEST = 1,
     NETBIOS_WAIT_FOR_HOST = 2,
     NETBIOS_INITIALIZE_GUEST = 3,
     NETBIOS_INITIALIZE_HOST = 4
-} NetbiosDialogWaitType;
+HOMM2_ENUM_END(NetbiosDialogWaitType)
 
-typedef enum NetbiosGameMode {
+HOMM2_ENUM_BEGIN(NetbiosGameMode)
     NETBIOS_GAME_MODE_HOST = 1,
     NETBIOS_GAME_MODE_GUEST = 2
-} NetbiosGameMode;
+HOMM2_ENUM_END(NetbiosGameMode)
 
 i8 InitNetHost(void);
 i8 InitNetGuest(void);

@@ -86,7 +86,7 @@ i32 combatManager::Main(tag_message& message) {
 
     {
         army* currentArmy = &m_armies[OD_STEER(m_currentArmySide)][m_currentArmyIndex];
-        if (currentArmy->m_spellInfluence[ARMY_SPELL_INFLUENCE_BERSERK] != 0) {
+        if (currentArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BERSERK)] != 0) {
             currentArmy->GoBerserk();
             if (CheckWin(&message) != 0)
                 return COMBAT_MAIN_FINISHED;
@@ -186,7 +186,7 @@ void combatManager::SetCombatDirections(i32 targetHex) {
     for (direction_27 = 0; direction_27 < COMBAT_DIRECTION_COUNT; direction_27++) {
         if (direction_27 == COMBAT_DIRECTION_SPECIAL_FIRST
             || direction_27 == COMBAT_DIRECTION_SPECIAL_SECOND) {
-            if ((currentArmy_3->m_monster.flags.all & MONSTER_FLAGS_WIDE) != 0) {
+            if (HAS(currentArmy_3->m_monster.flags.all, MONSTER_FLAGS_WIDE) != 0) {
                 if (currentArmy_3->m_facing == 1) {
                     if (direction_27 == COMBAT_DIRECTION_SPECIAL_FIRST)
                         directionHexes_4[direction_27] = m_adjacency[targetHex][5];
@@ -206,7 +206,7 @@ void combatManager::SetCombatDirections(i32 targetHex) {
                 *(&m_adjacency[0][0] + targetHex * COMBAT_ADJACENT_DIRECTION_COUNT + direction_27);
         }
 
-        if ((currentArmy_3->m_monster.flags.all & MONSTER_FLAGS_WIDE) != 0
+        if (HAS(currentArmy_3->m_monster.flags.all, MONSTER_FLAGS_WIDE) != 0
             && directionHexes_4[direction_27] != COMBAT_INVALID_HEX) {
             if (currentArmy_3->m_facing == 1) {
                 if (direction_27 == 5 || direction_27 == 4 || direction_27 == 3) {
@@ -246,7 +246,7 @@ void combatManager::SetCombatDirections(i32 targetHex) {
             standable_3[direction_27] = 0;
     }
 
-    if ((currentArmy_3->m_monster.flags.all & MONSTER_FLAGS_FLYING) != 0) {
+    if (HAS(currentArmy_3->m_monster.flags.all, MONSTER_FLAGS_FLYING) != 0) {
         for (direction_27 = 0; direction_27 < COMBAT_DIRECTION_COUNT; direction_27++)
             pathValid_1[direction_27] = standable_3[direction_27];
     } else {
@@ -283,7 +283,7 @@ void combatManager::SetCombatDirections(i32 targetHex) {
             mappedDirection_7 = COMBAT_DIRECTION_SPECIAL_FIRST;
 
         if (pathValid_1[mappedDirection_7] != 0) {
-            if ((targetArmy_1->m_monster.flags.all & MONSTER_FLAGS_WIDE) != 0) {
+            if (HAS(targetArmy_1->m_monster.flags.all, MONSTER_FLAGS_WIDE) != 0) {
                 if (direction_27 == 0 && m_hexCells[targetHex - 1].m_occupantSide == targetSide_36
                     && m_hexCells[targetHex - 1].m_occupantIndex == targetIndex_6) {
                     outputDirection_11 = COMBAT_DIRECTION_SPECIAL_FIRST;
@@ -433,7 +433,7 @@ void combatManager::CheckSetMouseDirection(i32 mouseX, i32 mouseY, i32 targetHex
 
     if (direction == COMBAT_DIRECTION_SPECIAL_FIRST
         || direction == COMBAT_DIRECTION_SPECIAL_SECOND) {
-        if ((currentArmy->m_monster.flags.all & MONSTER_FLAGS_WIDE) != 0) {
+        if (HAS(currentArmy->m_monster.flags.all, MONSTER_FLAGS_WIDE) != 0) {
             if (currentArmy->m_facing == 1 && direction == COMBAT_DIRECTION_SPECIAL_FIRST) {
                 direction = 5;
                 alternateDirection = 0;
@@ -459,11 +459,11 @@ void combatManager::CheckSetMouseDirection(i32 mouseX, i32 mouseY, i32 targetHex
         }
     } else {
         if (currentArmy->m_facing == 1
-            && (currentArmy->m_monster.flags.all & MONSTER_FLAGS_WIDE) != 0) {
+            && HAS(currentArmy->m_monster.flags.all, MONSTER_FLAGS_WIDE) != 0) {
             if (direction == 5 || direction == 4 || direction == 3)
                 targetHex--;
         } else if (currentArmy->m_facing == 0
-                   && (currentArmy->m_monster.flags.all & MONSTER_FLAGS_WIDE) != 0
+                   && HAS(currentArmy->m_monster.flags.all, MONSTER_FLAGS_WIDE) != 0
                    && (direction == 0 || direction == 1 || direction == 2)) {
             targetHex++;
         }
@@ -472,15 +472,15 @@ void combatManager::CheckSetMouseDirection(i32 mouseX, i32 mouseY, i32 targetHex
     m_directionTargetHex = m_adjacency[targetHex][direction];
     i32 rearHex = COMBAT_IGNORED_HEX;
     if (currentArmy->m_facing == 0
-        && (currentArmy->m_monster.flags.all & MONSTER_FLAGS_WIDE) != 0) {
+        && HAS(currentArmy->m_monster.flags.all, MONSTER_FLAGS_WIDE) != 0) {
         rearHex = m_directionTargetHex - 1;
     }
     if (currentArmy->m_facing == 1
-        && (currentArmy->m_monster.flags.all & MONSTER_FLAGS_WIDE) != 0) {
+        && HAS(currentArmy->m_monster.flags.all, MONSTER_FLAGS_WIDE) != 0) {
         rearHex = m_directionTargetHex + 1;
     }
     if (ValidHexToStandOn(m_directionTargetHex) == 0 || ValidHexToStandOn(rearHex) == 0) {
-        if ((currentArmy->m_monster.flags.all & MONSTER_FLAGS_WIDE) != 0
+        if (HAS(currentArmy->m_monster.flags.all, MONSTER_FLAGS_WIDE) != 0
             && (direction == COMBAT_DIRECTION_SPECIAL_FIRST
                 || direction == COMBAT_DIRECTION_SPECIAL_SECOND)) {
             if (currentArmy->m_facing == 1)
@@ -645,14 +645,14 @@ i32 combatManager::ProcessCombatMsg(tag_message& message) {
                         }
                     } else {
                         if (mouseX >= COMBAT_CONTROL_RIGHT_MIN_X) {
-                            CombatMessage(cCombatHelp[COMBAT_HELP_SKIP_UNIT], 1, 0, 0);
+                            CombatMessage(cCombatHelp[IDX(COMBAT_HELP_SKIP_UNIT)], 1, 0, 0);
                         } else if (mouseX <= COMBAT_CONTROL_LEFT_MAX_X
                                    && mouseY < COMBAT_CONTROL_SYSTEM_OPTIONS_MIN_Y) {
-                            CombatMessage(cCombatHelp[COMBAT_HELP_AUTO_COMBAT], 1, 0, 0);
+                            CombatMessage(cCombatHelp[IDX(COMBAT_HELP_AUTO_COMBAT)], 1, 0, 0);
                         } else if (mouseX <= COMBAT_CONTROL_LEFT_MAX_X) {
-                            CombatMessage(cCombatHelp[COMBAT_HELP_SYSTEM_OPTIONS], 1, 0, 0);
+                            CombatMessage(cCombatHelp[IDX(COMBAT_HELP_SYSTEM_OPTIONS)], 1, 0, 0);
                         } else {
-                            CombatMessage(cCombatHelp[COMBAT_HELP_OTHER_CONTROL], 1, 0, 0);
+                            CombatMessage(cCombatHelp[IDX(COMBAT_HELP_OTHER_CONTROL)], 1, 0, 0);
                         }
                         gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
                         m_selectedHex = COMBAT_INVALID_HEX;
@@ -1177,7 +1177,7 @@ void combatManager::DoCommand(i32 command) {
             break;
         case COMBAT_MESSAGE_COMMAND_SURRENDER:
             if (DoSurrender() == 1) {
-                if (gpGame->m_players[m_playerId[m_currentSide]].m_resources[RES_GOLD]
+                if (gpGame->m_players[m_playerId[m_currentSide]].m_resources[IDX(RES_GOLD)]
                     < giSurrenderCost) {
                     NormalDialog(
                         "You don't have enough gold!",
@@ -1853,7 +1853,7 @@ void combatManager::DoVictory(i32 winningSide) {
                 livingCreatureCount += currentArmy->m_quantity;
             }
             if (side == winningSide && currentArmy->m_quantity > 0
-                && (currentArmy->m_monster.flags.all & MONSTER_FLAGS_LIGHT_PALETTE) == 0
+                && HAS(currentArmy->m_monster.flags.all, MONSTER_FLAGS_LIGHT_PALETTE) == 0
                 && currentArmy->m_monsterType != CREATURE_EARTH_ELEMENTAL
                 && currentArmy->m_monsterType != CREATURE_AIR_ELEMENTAL
                 && currentArmy->m_monsterType != CREATURE_FIRE_ELEMENTAL
@@ -1981,17 +1981,17 @@ void combatManager::DoVictory(i32 winningSide) {
 
                 if (m_heroes[winningSide] != 0) {
                     if (gbCombatSurrender != 0) {
-                        sprintf(gText, cBattleResults[COMBAT_RESULT_TEXT_ENEMY_SURRENDERED]);
+                        sprintf(gText, cBattleResults[IDX(COMBAT_RESULT_TEXT_ENEMY_SURRENDERED)]);
                     } else if (gbRetreatWin != 0) {
-                        sprintf(gText, cBattleResults[COMBAT_RESULT_TEXT_ENEMY_FLED]);
+                        sprintf(gText, cBattleResults[IDX(COMBAT_RESULT_TEXT_ENEMY_FLED)]);
                     } else {
-                        sprintf(gText, cBattleResults[COMBAT_RESULT_TEXT_VICTORY]);
+                        sprintf(gText, cBattleResults[IDX(COMBAT_RESULT_TEXT_VICTORY)]);
                     }
                     if (experienceLevels > 0 && winningSide == COMBAT_DEFENDER_SIDE
                         && giNumHumanPlayers > 1) {
                         sprintf(
                             experienceText,
-                            cBattleResults[COMBAT_RESULT_TEXT_NETWORK_EXPERIENCE],
+                            cBattleResults[IDX(COMBAT_RESULT_TEXT_NETWORK_EXPERIENCE)],
                             m_heroes[winningSide]->m_name,
                             m_experienceValue[COMBAT_DEFENDER_SIDE - winningSide],
                             experienceLevels
@@ -1999,7 +1999,7 @@ void combatManager::DoVictory(i32 winningSide) {
                     } else {
                         sprintf(
                             experienceText,
-                            cBattleResults[COMBAT_RESULT_TEXT_EXPERIENCE],
+                            cBattleResults[IDX(COMBAT_RESULT_TEXT_EXPERIENCE)],
                             m_heroes[winningSide]->m_name,
                             m_experienceValue[COMBAT_DEFENDER_SIDE - winningSide]
                         );
@@ -2008,11 +2008,11 @@ void combatManager::DoVictory(i32 winningSide) {
                     m_heroes[winningSide]->ApplyBattleWinTemps();
                 } else {
                     if (gbCombatSurrender != 0) {
-                        sprintf(gText, cBattleResults[COMBAT_RESULT_TEXT_ENEMY_SURRENDERED]);
+                        sprintf(gText, cBattleResults[IDX(COMBAT_RESULT_TEXT_ENEMY_SURRENDERED)]);
                     } else if (gbRetreatWin != 0) {
-                        sprintf(gText, cBattleResults[COMBAT_RESULT_TEXT_ENEMY_FLED]);
+                        sprintf(gText, cBattleResults[IDX(COMBAT_RESULT_TEXT_ENEMY_FLED)]);
                     } else {
-                        sprintf(gText, cBattleResults[COMBAT_RESULT_TEXT_VICTORY]);
+                        sprintf(gText, cBattleResults[IDX(COMBAT_RESULT_TEXT_VICTORY)]);
                     }
                 }
                 message.type = MESSAGE_WIDGET;
@@ -2082,29 +2082,29 @@ void combatManager::DoLoseWindow(void) {
         if (gbCombatSurrender != 0) {
             sprintf(
                 gText,
-                cBattleResults[COMBAT_RESULT_TEXT_HERO_SURRENDER],
+                cBattleResults[IDX(COMBAT_RESULT_TEXT_HERO_SURRENDER)],
                 m_heroes[losingSide_h]->m_name
             );
         } else if (gbRetreatWin != 0) {
             sprintf(
                 gText,
-                cBattleResults[COMBAT_RESULT_TEXT_HERO_FLEE],
+                cBattleResults[IDX(COMBAT_RESULT_TEXT_HERO_FLEE)],
                 m_heroes[losingSide_h]->m_name
             );
         } else {
             sprintf(
                 gText,
-                cBattleResults[COMBAT_RESULT_TEXT_HERO_DEFEAT],
+                cBattleResults[IDX(COMBAT_RESULT_TEXT_HERO_DEFEAT)],
                 m_heroes[losingSide_h]->m_name
             );
         }
     } else {
         if (gbCombatSurrender != 0) {
-            sprintf(gText, cBattleResults[COMBAT_RESULT_TEXT_FORCES_SURRENDER]);
+            sprintf(gText, cBattleResults[IDX(COMBAT_RESULT_TEXT_FORCES_SURRENDER)]);
         } else if (gbRetreatWin != 0) {
-            sprintf(gText, cBattleResults[COMBAT_RESULT_TEXT_FORCES_FLEE]);
+            sprintf(gText, cBattleResults[IDX(COMBAT_RESULT_TEXT_FORCES_FLEE)]);
         } else {
-            sprintf(gText, cBattleResults[COMBAT_RESULT_TEXT_FORCES_DEFEAT]);
+            sprintf(gText, cBattleResults[IDX(COMBAT_RESULT_TEXT_FORCES_DEFEAT)]);
         }
     }
 
@@ -2156,7 +2156,7 @@ i32 combatManager::DoSurrender(void) {
     giSurrenderCost = static_cast<i32>(
         giSurrenderCost
         * (1.0
-           - m_heroes[m_currentSide]->m_secondarySkills[HERO_SKILL_DIPLOMACY]
+           - m_heroes[m_currentSide]->m_secondarySkills[IDX(HERO_SKILL_DIPLOMACY)]
                  * COMBAT_SURRENDER_DIPLOMACY_FACTOR)
     );
 
@@ -2278,7 +2278,7 @@ void combatManager::GetControl(void) {
     // Retail emits two stores to +0xf2cb here; +0xf2cf is not the second target.
     m_previousCommand = COMBAT_INVALID_COMMAND;
     m_previousCommand = COMBAT_INVALID_COMMAND;
-    if (gpCombatManager->m_active == 1)
+    if (gpCombatManager->m_active)
         gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
     CheckChangeSelector();
     if (gbRemoteOn == 0 || m_playerId[COMBAT_ATTACKER_SIDE] < 0
@@ -2335,7 +2335,7 @@ void combatManager::ResetMouse(void) {
 // order were tried. Revisit when total SOURCE fuzzy reaches 95%.
 VA(0x00430536, 0x65b)
 i32 combatManager::ProcessNextAction(struct tag_message& message) {
-    i32 actionData[COMBAT_ACTION_DATA_COUNT];
+    i32 actionData[IDX(COMBAT_ACTION_DATA_COUNT)];
     i32 transmitResult;
     army* currentArmy;
     i32 advanceArmy;
@@ -2376,10 +2376,10 @@ i32 combatManager::ProcessNextAction(struct tag_message& message) {
         && m_playerId[COMBAT_DEFENDER_SIDE] >= 0
         && gbHumanPlayer[m_playerId[COMBAT_DEFENDER_SIDE]] != 0
         && gbHumanPlayer[m_playerId[COMBAT_ATTACKER_SIDE]] != 0) {
-        actionData[COMBAT_ACTION_DATA_ACTION] = giNextAction;
-        actionData[COMBAT_ACTION_DATA_EXTRA] = giNextActionExtra;
-        actionData[COMBAT_ACTION_DATA_GRID] = giNextActionGridIndex;
-        actionData[COMBAT_ACTION_DATA_SECOND_GRID] = giNextActionGridIndex2;
+        actionData[IDX(COMBAT_ACTION_DATA_ACTION)] = giNextAction;
+        actionData[IDX(COMBAT_ACTION_DATA_EXTRA)] = giNextActionExtra;
+        actionData[IDX(COMBAT_ACTION_DATA_GRID)] = giNextActionGridIndex;
+        actionData[IDX(COMBAT_ACTION_DATA_SECOND_GRID)] = giNextActionGridIndex2;
         LogInt(
             "About to T",
             iCombatControlNetPos[COMBAT_DEFENDER_SIDE - m_currentSide],
@@ -2453,10 +2453,10 @@ i32 combatManager::ProcessNextAction(struct tag_message& message) {
                 gbCombatSurrender = 1;
                 gbRetreatWin = 1;
                 m_sideDefeated[m_currentSide] = 1;
-                gpGame->m_players[m_playerId[m_currentSide]].m_resources[RES_GOLD] -=
+                gpGame->m_players[m_playerId[m_currentSide]].m_resources[IDX(RES_GOLD)] -=
                     giNextActionExtra;
                 gpGame->m_players[m_playerId[COMBAT_DEFENDER_SIDE - m_currentSide]]
-                    .m_resources[RES_GOLD] += giNextActionExtra;
+                    .m_resources[IDX(RES_GOLD)] += giNextActionExtra;
                 ResetCycleTimers();
                 break;
             case COMBAT_ACTION_WAIT:
@@ -2607,9 +2607,9 @@ void combatManager::CycleCombatScreen(void) {
         for (index = 0; index < gpCombatManager->m_armyCount[side]; ++index) {
             currentArmy = gpCombatManager->m_armies[side] + index;
             if ((currentArmy->m_monster.flags.all & MONSTER_ABILITY_FLAG_AI_EXCLUDED) == 0
-                && currentArmy->m_spellInfluence[ARMY_SPELL_INFLUENCE_PARALYZE] == 0
-                && currentArmy->m_spellInfluence[ARMY_SPELL_INFLUENCE_BLIND] == 0
-                && currentArmy->m_spellInfluence[ARMY_SPELL_INFLUENCE_PETRIFIED] == 0
+                && currentArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PARALYZE)] == 0
+                && currentArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BLIND)] == 0
+                && currentArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PETRIFIED)] == 0
                 && ((currentArmy->m_animationSequence >= COMBAT_CREATURE_CYCLE_SEQUENCE_FIRST
                      && currentArmy->m_animationSequence <= COMBAT_CREATURE_CYCLE_SEQUENCE_LAST)
                     || (currentArmy->m_animationSequence == ARMY_ANIMATION_STAND
@@ -2822,8 +2822,8 @@ void combatManager::AddArmy(
             break;
         }
         if (m_armies[side][index_g].m_quantity == 0
-            && (m_armies[side][index_g].m_monster.flags.all & MONSTER_FLAGS_AI_EXCLUDED) != 0
-            && ((m_armies[side][index_g].m_monster.flags.all & MONSTER_FLAGS_MIRROR_IMAGE) != 0
+            && HAS(m_armies[side][index_g].m_monster.flags.all, MONSTER_FLAGS_AI_EXCLUDED) != 0
+            && (HAS(m_armies[side][index_g].m_monster.flags.all, MONSTER_FLAGS_MIRROR_IMAGE) != 0
                 || m_armies[side][index_g].m_monsterType == CREATURE_EARTH_ELEMENTAL
                 || m_armies[side][index_g].m_monsterType == CREATURE_AIR_ELEMENTAL
                 || m_armies[side][index_g].m_monsterType == CREATURE_FIRE_ELEMENTAL
@@ -2913,7 +2913,7 @@ void combatManager::ViewBallista(i32 quickView) {
     m_combatTowns[COMBAT_DEFENDER_SIDE]->CalcNumLevelArchers(&archerCount, &attackBonus);
     sprintf(gText, "Ballista");
     strcpy(description, "");
-    if (m_wallStates[COMBAT_WALL_SLOT_KEEP] != COMBAT_WALL_STATE_KEEP_STANDING) {
+    if (m_wallStates[IDX(COMBAT_WALL_SLOT_KEEP)] != COMBAT_WALL_STATE_KEEP_STANDING) {
         sprintf(description, "\n\nThe %s is destroyed.", "Ballista");
     } else if (attackBonus > 0) {
         sprintf(
@@ -2936,9 +2936,10 @@ void combatManager::ViewBallista(i32 quickView) {
 
     strcpy(description, "");
     if ((m_combatTowns[COMBAT_DEFENDER_SIDE]->m_buildings & TOWN_BUILDING_LEFT_TURRET) != 0) {
-        if (m_wallStates[COMBAT_WALL_SLOT_TOP_TOWER] == COMBAT_WALL_STATE_DESTROYED) {
+        if (m_wallStates[IDX(COMBAT_WALL_SLOT_TOP_TOWER)] == COMBAT_WALL_STATE_DESTROYED) {
             sprintf(description, "\n\nThe %s is destroyed.", "Left Turret");
-        } else if (m_wallStates[COMBAT_WALL_SLOT_TOP_TOWER] == COMBAT_WALL_STATE_TOWER_STANDING) {
+        } else if (m_wallStates[IDX(COMBAT_WALL_SLOT_TOP_TOWER)]
+                   == COMBAT_WALL_STATE_TOWER_STANDING) {
             if (attackBonus > 0) {
                 sprintf(
                     description,
@@ -2962,9 +2963,9 @@ void combatManager::ViewBallista(i32 quickView) {
 
     if ((m_combatTowns[COMBAT_DEFENDER_SIDE]->m_buildings & TOWN_BUILDING_RIGHT_TURRET) != 0) {
         strcpy(description, "");
-        if (m_wallStates[COMBAT_WALL_SLOT_BOTTOM_TOWER] == COMBAT_WALL_STATE_DESTROYED) {
+        if (m_wallStates[IDX(COMBAT_WALL_SLOT_BOTTOM_TOWER)] == COMBAT_WALL_STATE_DESTROYED) {
             sprintf(description, "\n\nThe %s is destroyed.", "Right Turret");
-        } else if (m_wallStates[COMBAT_WALL_SLOT_BOTTOM_TOWER]
+        } else if (m_wallStates[IDX(COMBAT_WALL_SLOT_BOTTOM_TOWER)]
                    == COMBAT_WALL_STATE_TOWER_STANDING) {
             if (attackBonus > 0) {
                 sprintf(

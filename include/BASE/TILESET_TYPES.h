@@ -3,10 +3,10 @@
 
 #include <va.h>
 
-typedef enum TilesetSourceFileSize {
+HOMM2_ENUM_VALUES_BEGIN(TilesetSourceFileSize)
     TILESET_SOURCE_FILE_SLOT_SIZE = 0x2c,
     TILESET_SOURCE_FILE_SIZE = 0x29
-} TilesetSourceFileSize;
+HOMM2_ENUM_VALUES_END(TilesetSourceFileSize)
 
 typedef struct STilesetSourceFiles {
     char allocation[TILESET_SOURCE_FILE_SLOT_SIZE];

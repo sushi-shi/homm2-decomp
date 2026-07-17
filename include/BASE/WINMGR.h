@@ -5,14 +5,14 @@
 // Declarations of the free functions DEFINED in WINMGR.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
 
-typedef enum WindowColorCycleMode {
+HOMM2_ENUM_BEGIN(WindowColorCycleMode)
     WINDOW_COLOR_CYCLE_DEFAULT = 0,
     WINDOW_COLOR_CYCLE_COMBAT = 1,
     WINDOW_COLOR_CYCLE_WORLD_VIEW = 2,
     WINDOW_COLOR_CYCLE_COMBAT_ALTERNATE = 3
-} WindowColorCycleMode;
+HOMM2_ENUM_END(WindowColorCycleMode)
 
-typedef enum WindowColorCycleConstant {
+HOMM2_ENUM_VALUES_BEGIN(WindowColorCycleConstant)
     WINDOW_CYCLE_FRAME_COUNT = 8,
     WINDOW_WORLD_CYCLE_COLOR_COUNT = 8,
     WINDOW_ALTERNATE_CYCLE_FRAME_COUNT = 6,
@@ -22,9 +22,9 @@ typedef enum WindowColorCycleConstant {
     WINDOW_CYCLE_PALETTE_BYTES = 84,
     WINDOW_COMBAT_CYCLE_SOURCE_OFFSET = 0x14a,
     WINDOW_ALTERNATE_CYCLE_SOURCE_OFFSET = 0x144
-} WindowColorCycleConstant;
+HOMM2_ENUM_VALUES_END(WindowColorCycleConstant)
 
-typedef enum WindowColorCyclePaletteOffset {
+HOMM2_ENUM_VALUES_BEGIN(WindowColorCyclePaletteOffset)
     WINDOW_CYCLE_ROTATION_1_SAVE_OFFSET = 9,
     WINDOW_CYCLE_ROTATION_1_DESTINATION_OFFSET = 3,
     WINDOW_CYCLE_ROTATION_1_BYTES = 9,
@@ -46,30 +46,30 @@ typedef enum WindowColorCyclePaletteOffset {
     WINDOW_CYCLE_ROTATION_5_BYTES = 9,
     WINDOW_DEFAULT_CYCLE_SOURCE_OFFSET = 66,
     WINDOW_DEFAULT_CYCLE_SAVE_OFFSET = 69
-} WindowColorCyclePaletteOffset;
+HOMM2_ENUM_VALUES_END(WindowColorCyclePaletteOffset)
 
-typedef enum WindowFadeMode {
+HOMM2_ENUM_BEGIN(WindowFadeMode)
     WINDOW_FADE_IN = 0,
     WINDOW_FADE_OUT = 1
-} WindowFadeMode;
+HOMM2_ENUM_END(WindowFadeMode)
 
-typedef enum WindowScreenConstant {
+HOMM2_ENUM_VALUES_BEGIN(WindowScreenConstant)
     WINDOW_SCREEN_WIDTH = 640,
     WINDOW_SCREEN_HEIGHT = 480,
     WINDOW_FRAMEBUFFER_DWORD_COUNT = 0x12c00,
     WINDOW_FRAMEBUFFER_FILL_COLOR = 0x24
-} WindowScreenConstant;
+HOMM2_ENUM_VALUES_END(WindowScreenConstant)
 
-typedef enum WindowPaletteConstant {
+HOMM2_ENUM_VALUES_BEGIN(WindowPaletteConstant)
     WINDOW_PALETTE_COLOR_BYTES = 3,
     WINDOW_PALETTE_BYTE_COUNT = 0x300,
     WINDOW_PALETTE_DWORD_COUNT = 0xc0
-} WindowPaletteConstant;
+HOMM2_ENUM_VALUES_END(WindowPaletteConstant)
 
-typedef enum WindowFizzleConstant {
+HOMM2_ENUM_VALUES_BEGIN(WindowFizzleConstant)
     WINDOW_FIZZLE_DEFAULT_DELAY = 150,
     WINDOW_FIZZLE_CYCLE_TABLE_BYTES = 0x10000
-} WindowFizzleConstant;
+HOMM2_ENUM_VALUES_END(WindowFizzleConstant)
 
 void CycleColors(i32);
 void CreateFizzleTables(void);

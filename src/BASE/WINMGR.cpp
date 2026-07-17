@@ -81,7 +81,7 @@ VA(0x004ca6d0, 0x3a3)
 void CycleColors(i32 forceUpdate) {
     i8 savedColor[WINDOW_PALETTE_COLOR_BYTES];
     iCycle1Count++;
-    if (gpWindowManager == 0 || gpBufferPalette == 0 || gpWindowManager->m_active != 1)
+    if (gpWindowManager == 0 || gpBufferPalette == 0 || !gpWindowManager->m_active)
         return;
     if (gpWindowManager->m_updateFlags == 0 && forceUpdate == 0)
         return;
@@ -307,7 +307,7 @@ i32 heroWindowManager::Open(i32 managerOrder) {
 
 VA(0x004cabb0, 0x45)
 void heroWindowManager::Close(void) {
-    if (m_active == 1) {
+    if (m_active) {
         heroWindow* w = m_windowListTail;
         while (w != 0) {
             heroWindow* prev = w->m_prevWindow;

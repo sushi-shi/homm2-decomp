@@ -88,7 +88,7 @@ DATA(0x004f7f84) static i16 gCompressTestSourceLine = 0x1f95;
 #define RETAIL_FILE const_cast<char*>("I:\\Projects\\Heroes\\Prog\\SOURCE\\GAME.CPP")
 
 // GAME-private tuning and encoding constants.
-typedef enum GameTuningConstant {
+HOMM2_ENUM_VALUES_BEGIN(GameTuningConstant)
     RANDOM_SCAN_RETRY_LIMIT = 10000,
     EXPERIENCE_HERO_PRESENCE_BONUS = 500,
     MINE_FLAG_OVERWRITE_LIMIT = 0x30,   // highest passive object id a mine flag may cover
@@ -99,12 +99,12 @@ typedef enum GameTuningConstant {
     BANK_GUARDIAN_FLAG = 0x100,   // creature-bank metadata: defenders present
     TOWN_RECORD_TYPE_MASK = 0x7f, // saved town record: low bits carry the race
     COMPRESS_TEST_ITERATIONS = 100
-} GameTuningConstant;
+HOMM2_ENUM_VALUES_END(GameTuningConstant)
 
-typedef enum ViewArmyControlId {
+HOMM2_ENUM_BEGIN(ViewArmyControlId)
     VIEW_ARMY_QUICK_VIEW_ID = 0x7800,
     VIEW_ARMY_UPGRADE_ID = 0x7803
-} ViewArmyControlId;
+HOMM2_ENUM_END(ViewArmyControlId)
 
 // Retail's original source passed plain __FILE__/__LINE__ here: under /Od /Gi,
 // MSVC 4.2 lowers __LINE__ to a compiler-synthesized per-function static i16
@@ -401,7 +401,7 @@ i32 game::IsMobile(i32 heroId) {
                giGroundToTerrain[cp->m_terrainImageIndex],
                1,
                mobileHero->m_remainingMobility,
-               mobileHero->m_secondarySkills[HERO_SKILL_PATHFINDING],
+               mobileHero->m_secondarySkills[IDX(HERO_SKILL_PATHFINDING)],
                cp->m_isRoad,
                0
            )
@@ -1176,9 +1176,9 @@ void game::NewMap(char* filename) {
     if (extension0 != 0 && StrEqNoCase(extension0 + 1, "MX2"))
         xIsExpansionMap = 1;
     if (xIsExpansionMap)
-        gTownEligibleBuildMask[FACTION_NECROMANCER] |= 4;
+        gTownEligibleBuildMask[IDX(FACTION_NECROMANCER)] |= 4;
     else
-        gTownEligibleBuildMask[FACTION_NECROMANCER] &= ~4;
+        gTownEligibleBuildMask[IDX(FACTION_NECROMANCER)] &= ~4;
 
     gbInNewGameSetup = 1;
     giCurPlayer = 0;
@@ -1307,9 +1307,9 @@ void game::NewMap(char* filename) {
 
     for (player2 = 0; player2 < m_playerCount; player2++) {
         if (player2 == 0 && gbInCampaign
-            && (m_campaignAwards[CAMPAIGN_AWARD_SORCERESS_GUILD] != 0
-                || m_campaignAwards[CAMPAIGN_AWARD_DWARFBANE] != 0)) {
-            if (m_campaignAwards[CAMPAIGN_AWARD_SORCERESS_GUILD] != 0)
+            && (m_campaignAwards[IDX(CAMPAIGN_AWARD_SORCERESS_GUILD)] != 0
+                || m_campaignAwards[IDX(CAMPAIGN_AWARD_DWARFBANE)] != 0)) {
+            if (m_campaignAwards[IDX(CAMPAIGN_AWARD_SORCERESS_GUILD)] != 0)
                 specialPortrait6 = 2;
             else
                 specialPortrait6 = 5;
@@ -1319,7 +1319,7 @@ void game::NewMap(char* filename) {
                     break;
             }
             if (campaignHero15 < GAME_HERO_COUNT) {
-                if (m_campaignAwards[CAMPAIGN_AWARD_SORCERESS_GUILD] != 0) {
+                if (m_campaignAwards[IDX(CAMPAIGN_AWARD_SORCERESS_GUILD)] != 0) {
                     m_heroRecs[campaignHero15].m_experience += 5000;
                     m_heroRecs[campaignHero15].CheckLevel();
                     strcpy(m_heroRecs[campaignHero15].m_name, "Sister Eliza");
@@ -2311,7 +2311,8 @@ void game::ClaimMine(i32 mineId, i32 player) {
 // Relocation-masked comparison is identical for the full 0x1e2-byte span;
 // both objects contain the same 16 relocation sites and objdiff reports 100%.
 VA(0x00479856, 0x1e2)
-i32 game::ViewSpells(hero* spellHero, i32 spellType, i32 (*callback)(tag_message&), i32 readOnly) {
+SpellType
+game::ViewSpells(hero* spellHero, i32 spellType, i32 (*callback)(tag_message&), i32 readOnly) {
     tag_message message;
 
     viewSpellsHero = spellHero;
@@ -2691,7 +2692,7 @@ void game::ViewArmy(
     iViewArmyNumTroops = numTroops;
     gbAllowUpgrade = 0;
 
-    if (castle && (gpAdvManager->m_active == 1 || gpTownManager->m_active == 1)) {
+    if (castle && (gpAdvManager->m_active || gpTownManager->m_active)) {
         for (loopIndex0 = 20; loopIndex0 <= 24; loopIndex0++) {
             if (gDwellingType[static_cast<i8>(castle->m_type)][loopIndex0 - 19] == monsterType
                 && (castle->m_buildings & (1 << (loopIndex0 + 5)))) {
@@ -2736,7 +2737,7 @@ void game::ViewArmy(
         strcpy(filename4, cMonFilename[monsterType]);
 
     icon* monsterIcon5 = gpResourceManager->GetIcon(filename4);
-    i32 iconFrame15 = sViewArmyMonFrameInfo.animationFrames[ARMY_ANIMATION_WALK][0];
+    i32 iconFrame15 = sViewArmyMonFrameInfo.animationFrames[IDX(ARMY_ANIMATION_WALK)][0];
     viewArmyBaseX += (GetIconEntry(monsterIcon5, iconFrame15)->w / 2) * viewArmyFacingWIPXMod;
     viewArmyBaseX += GetIconEntry(monsterIcon5, iconFrame15)->x * viewArmyFacingWIPXMod
                      + sViewArmyMonFrameInfo.walkXOffsets[0] * viewArmyFacingWIPXMod;
@@ -2753,7 +2754,7 @@ void game::ViewArmy(
         86,
         149,
         filename4,
-        gbLowMemory ? 0 : sViewArmyMonFrameInfo.animationFrames[ARMY_ANIMATION_WALK][0],
+        gbLowMemory ? 0 : sViewArmyMonFrameInfo.animationFrames[IDX(ARMY_ANIMATION_WALK)][0],
         facing == 0,
         5,
         16,
@@ -2774,7 +2775,7 @@ void game::ViewArmy(
 
     char* details9 = static_cast<char*>(H2_ALLOC(550, 3684));
     i32 morale2 = theGroup ? theGroup->GetMorale(theHero, castle, 0) : 0;
-    if (monster8->flags.all & MONSTER_FLAGS_NO_MORALE)
+    if (HAS(monster8->flags.all, MONSTER_FLAGS_NO_MORALE))
         morale2 = 0;
 
     sprintf(details9, "");
@@ -2802,10 +2803,10 @@ void game::ViewArmy(
         strcat(details9, gText);
     }
 
-    if (monster8->flags.all & MONSTER_FLAGS_SHOOTER) {
+    if (HAS(monster8->flags.all, MONSTER_FLAGS_SHOOTER)) {
         i32 shots8 = armyMonster11->shots;
         if (shots8 > 0) {
-            if (gpCombatManager->m_active == 1)
+            if (gpCombatManager->m_active)
                 sprintf(gText, "\n%s%d", cArmyDetail[2], shots8);
             else
                 sprintf(gText, "\n%s%d", cArmyDetail[8], shots8);
@@ -2821,7 +2822,7 @@ void game::ViewArmy(
     }
     sprintf(gText, "\n%s%d", cArmyDetail[4], static_cast<u32>(monster8->hitPoints));
     strcat(details9, gText);
-    if (gpCombatManager->m_active == 1) {
+    if (gpCombatManager->m_active) {
         sprintf(
             gText,
             "\n%s%d",
@@ -2987,7 +2988,7 @@ i32 ViewArmyHandler(tag_message& msg) {
                             resourceType0 = -1;
                             resourceCost5 = 0;
                         }
-                        if (gpCurPlayer->m_resources[RES_GOLD] >= goldCost6
+                        if (gpCurPlayer->m_resources[IDX(RES_GOLD)] >= goldCost6
                             && (resourceType0 == -1
                                 || gpCurPlayer->m_resources[resourceType0] >= resourceCost5)) {
                             NormalDialog(
@@ -3006,7 +3007,7 @@ i32 ViewArmyHandler(tag_message& msg) {
                                 0
                             );
                             if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
-                                gpCurPlayer->m_resources[RES_GOLD] -= goldCost6;
+                                gpCurPlayer->m_resources[IDX(RES_GOLD)] -= goldCost6;
                                 if (resourceType0 != -1)
                                     gpCurPlayer->m_resources[resourceType0] -= resourceCost5;
                                 gbUpgradeArmy = 1;
@@ -3042,10 +3043,10 @@ i32 ViewArmyHandler(tag_message& msg) {
         msg.type = MESSAGE_WIDGET;
         msg.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
         msg.payload.widget.id = 5;
-        iViewArmyFrame =
-            (iViewArmyFrame + 1) % sViewArmyMonFrameInfo.animationFrameCount[ARMY_ANIMATION_WALK];
+        iViewArmyFrame = (iViewArmyFrame + 1)
+                         % sViewArmyMonFrameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WALK)];
         msg.payload.widget.data.value =
-            sViewArmyMonFrameInfo.animationFrames[ARMY_ANIMATION_WALK][iViewArmyFrame];
+            sViewArmyMonFrameInfo.animationFrames[IDX(ARMY_ANIMATION_WALK)][iViewArmyFrame];
         gpGame->m_viewArmyWindow->BroadcastMessage(msg);
         msg.payload.widget.command = 52;
         msg.payload.widget.data.value =
@@ -3056,7 +3057,7 @@ i32 ViewArmyHandler(tag_message& msg) {
         glTimers[0] = static_cast<i32>(
             KBTickCount()
             + sViewArmyMonFrameInfo.walkDuration * GAME_VIEW_ARMY_FRAME_DELAY_SCALE
-                  / sViewArmyMonFrameInfo.animationFrameCount[ARMY_ANIMATION_WALK]
+                  / sViewArmyMonFrameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WALK)]
         );
     }
     return 1;
@@ -3364,7 +3365,7 @@ i32 game::ComputeDailyGold(i32 player) {
 
     for (heroIndex = 0; heroIndex < m_players[player].m_heroCount; heroIndex++) {
         gold += gEstatesGoldLevel[gpGame->m_heroRecs[m_players[player].m_heroIds[heroIndex]]
-                                      .m_secondarySkills[HERO_SKILL_ESTATES]];
+                                      .m_secondarySkills[IDX(HERO_SKILL_ESTATES)]];
     }
 
     if (!gbHumanPlayer[player]) {
@@ -3434,29 +3435,29 @@ void game::PerDay(void) {
         m_castleRecs[player].m_turnsOwned++;
 
     for (player = 0; player < m_playerCount; player++) {
-        m_players[player].m_resources[RES_SULFUR] +=
+        m_players[player].m_resources[IDX(RES_SULFUR)] +=
             m_players[player].NumOfGivenArtifact(ARTIFACT_ENDLESS_POUCH_SULFUR);
-        m_players[player].m_resources[RES_MERCURY] +=
+        m_players[player].m_resources[IDX(RES_MERCURY)] +=
             m_players[player].NumOfGivenArtifact(ARTIFACT_ENDLESS_VIAL_MERCURY);
-        m_players[player].m_resources[RES_GEMS] +=
+        m_players[player].m_resources[IDX(RES_GEMS)] +=
             m_players[player].NumOfGivenArtifact(ARTIFACT_ENDLESS_POUCH_GEMS);
-        m_players[player].m_resources[RES_WOOD] +=
+        m_players[player].m_resources[IDX(RES_WOOD)] +=
             m_players[player].NumOfGivenArtifact(ARTIFACT_ENDLESS_CORD_WOOD);
-        m_players[player].m_resources[RES_ORE] +=
+        m_players[player].m_resources[IDX(RES_ORE)] +=
             m_players[player].NumOfGivenArtifact(ARTIFACT_ENDLESS_CART_ORE);
-        m_players[player].m_resources[RES_CRYSTAL] +=
+        m_players[player].m_resources[IDX(RES_CRYSTAL)] +=
             m_players[player].NumOfGivenArtifact(ARTIFACT_ENDLESS_POUCH_CRYSTAL);
-        m_players[player].m_resources[RES_GOLD] += ComputeDailyGold(player);
+        m_players[player].m_resources[IDX(RES_GOLD)] += ComputeDailyGold(player);
     }
 
     if (xIsPlayingExpansionCampaign && xCampaign.HasAward(2))
-        m_players[0].m_resources[RES_WOOD] += 2;
+        m_players[0].m_resources[IDX(RES_WOOD)] += 2;
 
     for (player = 0; player < m_playerCount; player++) {
         if (!gbHumanPlayer[player]) {
             if (gpGame->m_difficulty >= GAME_DIFFICULTY_HARD) {
-                m_players[player].m_resources[RES_WOOD]++;
-                m_players[player].m_resources[RES_ORE]++;
+                m_players[player].m_resources[IDX(RES_WOOD)]++;
+                m_players[player].m_resources[IDX(RES_ORE)]++;
             }
             if (gpGame->m_difficulty >= GAME_DIFFICULTY_EXPERT && m_day >= 1 && m_day <= 6)
                 m_players[player].m_resources[m_day - 1]++;
@@ -3518,7 +3519,7 @@ void game::PerDay(void) {
             restoredSpellPoints13 = maxSpellPoints9;
         if (currentHero6->m_spellPoints < restoredSpellPoints13)
             currentHero6->m_spellPoints = static_cast<i16>(restoredSpellPoints13);
-        if (currentHero6->m_eventFlags & HERO_EVENT_MAGIC_WELL)
+        if (HAS(currentHero6->m_eventFlags, HERO_EVENT_MAGIC_WELL))
             currentHero6->m_eventFlags = currentHero6->m_eventFlags - HERO_EVENT_MAGIC_WELL;
     }
 
@@ -4297,13 +4298,13 @@ void game::RandomizeHeroPool(void) {
         m_heroRecs[heroId].m_enabled = RANDOM_HERO_ENABLED;
 
         if (m_heroRecs[heroId].m_cursorType == FACTION_SORCERESS)
-            m_heroRecs[heroId].m_spells[SPELL_BLESS] = RANDOM_HERO_STARTING_SPELL_KNOWN;
+            m_heroRecs[heroId].m_spells[IDX(SPELL_BLESS)] = RANDOM_HERO_STARTING_SPELL_KNOWN;
         else if (m_heroRecs[heroId].m_cursorType == FACTION_WARLOCK)
-            m_heroRecs[heroId].m_spells[SPELL_CURSE] = RANDOM_HERO_STARTING_SPELL_KNOWN;
+            m_heroRecs[heroId].m_spells[IDX(SPELL_CURSE)] = RANDOM_HERO_STARTING_SPELL_KNOWN;
         else if (m_heroRecs[heroId].m_cursorType == FACTION_NECROMANCER)
-            m_heroRecs[heroId].m_spells[SPELL_HASTE] = RANDOM_HERO_STARTING_SPELL_KNOWN;
+            m_heroRecs[heroId].m_spells[IDX(SPELL_HASTE)] = RANDOM_HERO_STARTING_SPELL_KNOWN;
         else if (m_heroRecs[heroId].m_cursorType == FACTION_WIZARD)
-            m_heroRecs[heroId].m_spells[SPELL_STONE_SKIN] = RANDOM_HERO_STARTING_SPELL_KNOWN;
+            m_heroRecs[heroId].m_spells[IDX(SPELL_STONE_SKIN)] = RANDOM_HERO_STARTING_SPELL_KNOWN;
     }
 }
 
@@ -4317,7 +4318,7 @@ VA(0x004800a6, 0x378)
 void game::SetRandomHeroArmies(i32 heroId, i32 strongArmy) {
     armyGroup* army2 = &m_heroRecs[heroId].m_army;
     i32 armySlot7 = 0;
-    RandomHeroArmyRange armyTable7[FACTION_COUNT][RANDOM_HERO_ARMY_OPTION_COUNT] = {
+    RandomHeroArmyRange armyTable7[IDX(FACTION_COUNT)][RANDOM_HERO_ARMY_OPTION_COUNT] = {
         {{CREATURE_PEASANT, 30, 50}, {CREATURE_ARCHER, 3, 5}, {CREATURE_PIKEMAN, 2, 4}},
         {{CREATURE_GOBLIN, 15, 25}, {CREATURE_ORC, 3, 5}, {CREATURE_WOLF, 2, 3}},
         {{CREATURE_SPRITE, 10, 20}, {CREATURE_DWARF, 2, 4}, {CREATURE_ELF, 1, 2}},
@@ -4710,11 +4711,11 @@ i32 game::GetLuck(hero* h, class army*, town* castle) {
         luck++;
     if (h->HasArtifact(ARTIFACT_FOUR_LEAF_CLOVER))
         luck++;
-    if (h->HasArtifact(ARTIFACT_MASTHEAD) && (h->m_eventFlags & HERO_EVENT_EMBARKED)) {
+    if (h->HasArtifact(ARTIFACT_MASTHEAD) && HAS(h->m_eventFlags, HERO_EVENT_EMBARKED)) {
         luck++;
     }
     luck += h->m_luck;
-    luck += h->m_secondarySkills[HERO_SKILL_LUCK];
+    luck += h->m_secondarySkills[IDX(HERO_SKILL_LUCK)];
     if (luck < LUCK_MINIMUM)
         luck = LUCK_MINIMUM;
     if (luck > LUCK_MAXIMUM)
@@ -4966,7 +4967,7 @@ VA(0x00481c47, 0x900)
 void game::SetupTowns(void) {
     DATA(0x004f756c) static i16 setupTownsSourceLineBase = 0x17f9;
     char defaultDwellingRoll[12];
-    i8 usedSpells[SPELL_COUNT];
+    i8 usedSpells[IDX(SPELL_COUNT)];
     i32 spellsPerLevel[5];
     i32 townIndex;
     i32 slot;
@@ -5504,7 +5505,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
     gpSoundManager->m_samplesReady = samplesReady;
 
     LogStr(const_cast<char*>("Transmit Game Start"));
-    if (gpAdvManager->m_active == 1)
+    if (gpAdvManager->m_active)
         BVResMsg(const_cast<char*>("Sending Data"), -1, 0);
     AiPrint(const_cast<char*>("Transmit Start - Compressing"));
 
@@ -5635,7 +5636,7 @@ transmitCleanup:
         H2_FREE(acknowledged, 6936);
 
     AiPrint(const_cast<char*>("Transmit End"));
-    if (gpAdvManager->m_active == 1) {
+    if (gpAdvManager->m_active) {
         giBottomViewOverride = 0;
         gpAdvManager->UpdBottomView(1, 1, 1);
     }
@@ -5737,7 +5738,7 @@ i32 game::ReceiveSaveGame(
     oldTrack = -1;
 
     gpAdvManager->UnwindMapChangeQueue(999, 0);
-    if (gpAdvManager->m_active == 1)
+    if (gpAdvManager->m_active)
         BVResMsg(const_cast<char*>("Receiving Data"), -1, 0);
 
     samplesReady = gpSoundManager->m_samplesReady;
@@ -5882,7 +5883,7 @@ i32 game::ReceiveSaveGame(
 
     CreateJoinFile(gConfig.rmtRLName, gConfig.rmtRDName, gConfig.rmtRCName);
     AiPrint(const_cast<char*>("Receive End"));
-    if (gpAdvManager->m_active == 1) {
+    if (gpAdvManager->m_active) {
         giBottomViewOverride = 0;
         gpAdvManager->UpdBottomView(1, 1, 1);
     }

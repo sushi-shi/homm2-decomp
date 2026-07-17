@@ -8,10 +8,10 @@
 class bitmap;
 class icon;
 
-typedef enum IconScaleConstant {
+HOMM2_ENUM_VALUES_BEGIN(IconScaleConstant)
     ICON_SCALE_NATIVE_SIZE = 0x20,
     ICON_SCALE_WORK_BITMAP_SIZE = 0x40
-} IconScaleConstant;
+HOMM2_ENUM_VALUES_END(IconScaleConstant)
 
 void IconToBitmapScale(class icon*, class bitmap*, i32, i32, i32, i32, i32, i32, i32, i32, i32);
 

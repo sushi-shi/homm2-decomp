@@ -8,19 +8,19 @@
 class heroWindow;
 struct tag_message;
 
-typedef enum ExpansionCampaignSaveConstant {
-    EXPANSION_CAMPAIGN_SAVE_PREFIX_SIZE = 0x4f  // persisted prefix, up to m_pad_0x4f
-} ExpansionCampaignSaveConstant;
+HOMM2_ENUM_VALUES_BEGIN(ExpansionCampaignSaveConstant)
+    EXPANSION_CAMPAIGN_SAVE_PREFIX_SIZE = 0x4f // persisted prefix, up to m_pad_0x4f
+HOMM2_ENUM_VALUES_END(ExpansionCampaignSaveConstant)
 
-typedef enum ExpansionCampaignId {
+HOMM2_ENUM_BEGIN(ExpansionCampaignId)
     EXPANSION_CAMPAIGN_PRICE_OF_LOYALTY = 0,
     EXPANSION_CAMPAIGN_DESCENDANTS = 1,
     EXPANSION_CAMPAIGN_WIZARDS_ISLE = 2,
     EXPANSION_CAMPAIGN_VOYAGE_HOME = 3,
     EXPANSION_CAMPAIGN_COUNT = 4
-} ExpansionCampaignId;
+HOMM2_ENUM_END(ExpansionCampaignId)
 
-typedef enum ExpansionCampaignConstant {
+HOMM2_ENUM_VALUES_BEGIN(ExpansionCampaignConstant)
     EXPANSION_CAMPAIGN_MAX_MAP_COUNT = 8,
     EXPANSION_CAMPAIGN_BONUS_CHOICE_COUNT = 3,
     EXPANSION_CAMPAIGN_AWARD_COUNT = 11,
@@ -43,15 +43,15 @@ typedef enum ExpansionCampaignConstant {
     EXPANSION_CAMPAIGN_MAIN_PLAYER = 0,
     EXPANSION_CAMPAIGN_GOLDEN_BOW_EVENT_X = 5,
     EXPANSION_CAMPAIGN_GOLDEN_BOW_EVENT_Y = 0
-} ExpansionCampaignConstant;
+HOMM2_ENUM_VALUES_END(ExpansionCampaignConstant)
 
-typedef enum ExpansionCampaignHeroPortrait {
+HOMM2_ENUM_BEGIN(ExpansionCampaignHeroPortrait)
     EXPANSION_HERO_DAINWIN = 0x3d,
     EXPANSION_HERO_GALLAVANT = 0x41,
     EXPANSION_HERO_CEALLACH = 0x43
-} ExpansionCampaignHeroPortrait;
+HOMM2_ENUM_END(ExpansionCampaignHeroPortrait)
 
-typedef enum ExpansionCampaignAward {
+HOMM2_ENUM_BEGIN(ExpansionCampaignAward)
     EXPANSION_AWARD_ELVEN_ALLIANCE = 0,
     EXPANSION_AWARD_BREASTPLATE_ANDURAN = 1,
     EXPANSION_AWARD_WOOD_BONUS = 2,
@@ -63,9 +63,9 @@ typedef enum ExpansionCampaignAward {
     EXPANSION_AWARD_LEGENDARY_SCEPTER = 8,
     EXPANSION_AWARD_SET_GUARDIAN = 9,
     EXPANSION_AWARD_SPHERE_NEGATION = 10
-} ExpansionCampaignAward;
+HOMM2_ENUM_END(ExpansionCampaignAward)
 
-typedef enum ExpansionCampaignMap {
+HOMM2_ENUM_BEGIN(ExpansionCampaignMap)
     EXPANSION_MAP_NONE = -1,
     EXPANSION_MAP_POL_UPRISING = 0,
     EXPANSION_MAP_POL_ISLAND_OF_CHAOS = 1,
@@ -91,9 +91,9 @@ typedef enum ExpansionCampaignMap {
     EXPANSION_MAP_VOY_PIRATE_ISLES = 1,
     EXPANSION_MAP_VOY_KING_AND_COUNTRY = 2,
     EXPANSION_MAP_VOY_BLOOD_IS_THICKER = 3
-} ExpansionCampaignMap;
+HOMM2_ENUM_END(ExpansionCampaignMap)
 
-typedef enum ExpansionCampaignSmacker {
+HOMM2_ENUM_BEGIN(ExpansionCampaignSmacker)
     EXPANSION_SMACKER_POL_INTRO = 0x27,
     EXPANSION_SMACKER_POL_UPRISING = 0x28,
     EXPANSION_SMACKER_POL_ISLAND_OF_CHAOS = 0x29,
@@ -120,9 +120,9 @@ typedef enum ExpansionCampaignSmacker {
     EXPANSION_SMACKER_VOY_KING_AND_COUNTRY = 0x3e,
     EXPANSION_SMACKER_VOY_BLOOD_IS_THICKER = 0x3f,
     EXPANSION_SMACKER_CAMPAIGN_CHOICE = 0x43
-} ExpansionCampaignSmacker;
+HOMM2_ENUM_END(ExpansionCampaignSmacker)
 
-typedef enum ExpansionCampaignChoiceConstant {
+HOMM2_ENUM_VALUES_BEGIN(ExpansionCampaignChoiceConstant)
     EXPANSION_CAMPAIGN_CHOICE_UNUSED_VALUE = -1,
     EXPANSION_CAMPAIGN_CHOICE_NO_AMOUNT = -1,
     EXPANSION_CAMPAIGN_CHOICE_ZERO_AMOUNT = 0,
@@ -146,7 +146,7 @@ typedef enum ExpansionCampaignChoiceConstant {
     EXPANSION_CAMPAIGN_GOLD_PENALTY_ONE_THOUSAND = -1000,
     EXPANSION_CAMPAIGN_WOOD_PENALTY_TEN = -10,
     EXPANSION_CAMPAIGN_MERCURY_PENALTY_TWO = -2
-} ExpansionCampaignChoiceConstant;
+HOMM2_ENUM_VALUES_END(ExpansionCampaignChoiceConstant)
 
 #pragma pack(push, 1) // recovered layout is byte-packed
 class ExpCampaign {
@@ -209,7 +209,7 @@ public:
 #pragma pack(pop)
 SIZE(ExpCampaign, 0x50);
 
-extern struct SCampaignChoice xCampaignChoices[EXPANSION_CAMPAIGN_COUNT]
+extern struct SCampaignChoice xCampaignChoices[IDX(EXPANSION_CAMPAIGN_COUNT)]
                                               [EXPANSION_CAMPAIGN_MAX_MAP_COUNT]
                                               [EXPANSION_CAMPAIGN_BONUS_CHOICE_COUNT];
 #endif // HOMM2_SOURCE_EXPCAMPAIGN_H

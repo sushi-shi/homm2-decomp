@@ -176,7 +176,7 @@ i32 mouseManager::Open(i32 priority) {
 VA(0x004c93f0, 0xed)
 void mouseManager::Close(void) {
     i32 cursorIndex;
-    if (m_active == 1) {
+    if (m_active) {
         m_active = 0;
         if (m_savedUnderlying != 0)
             delete m_savedUnderlying;
@@ -268,7 +268,7 @@ void mouseManager::SetPointer(char* name, i32 frame, i32 cursorType) {
 // retain the base allocation. Revisit after TU-state changes or in last-mile AST work.
 VA(0x004c9630, 0x405)
 void mouseManager::SetPointer(i32 frame) {
-    if (m_forcePointerUpdate != 0 || frame < 0 || m_active != 1 || m_cursorFrame == frame
+    if (m_forcePointerUpdate != 0 || frame < 0 || !m_active || m_cursorFrame == frame
         || gbInSetPointer != 0)
         return;
 

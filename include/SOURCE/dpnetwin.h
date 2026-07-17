@@ -9,7 +9,7 @@
 #include <SOURCE/REMOTE_TYPES.h>
 // forward declarations (was <_all.h>):
 
-typedef enum DirectPlayTransportConstant {
+HOMM2_ENUM_VALUES_BEGIN(DirectPlayTransportConstant)
     DP_TRANSPORT_BUFFER_COUNT = 200,
     DP_TRANSPORT_RECEIVE_SIZE = 0x100,
     DP_TRANSPORT_BROADCAST_POSITION = 0x7f,
@@ -24,32 +24,31 @@ typedef enum DirectPlayTransportConstant {
     DP_TRANSPORT_ENUM_LONG_PHASE = 4,
     DP_TRANSPORT_RETRY_WAIT_COUNT = 30,
     DP_TRANSPORT_RETRY_DELAY = 100
-} DirectPlayTransportConstant;
+HOMM2_ENUM_VALUES_END(DirectPlayTransportConstant)
 
-typedef enum DirectPlayProtocol {
+HOMM2_ENUM_BEGIN(DirectPlayProtocol)
     DP_PROTOCOL_IPX = 1,
     DP_PROTOCOL_TCP = 2
-} DirectPlayProtocol;
+HOMM2_ENUM_END(DirectPlayProtocol)
 
-typedef enum DirectPlaySessionOpenFlag {
+HOMM2_ENUM_BEGIN(DirectPlaySessionOpenFlag)
     DP_SESSION_OPEN_JOIN = 1,
     DP_SESSION_OPEN_CREATE = 2
-} DirectPlaySessionOpenFlag;
+HOMM2_ENUM_END(DirectPlaySessionOpenFlag)
 
-typedef enum DirectPlayWaitType {
+HOMM2_ENUM_BEGIN(DirectPlayWaitType)
     DP_WAIT_FIRST_GUEST = 8,
     DP_WAIT_EXTRA_GUESTS = 9,
     DP_WAIT_HOST = 10
-} DirectPlayWaitType;
+HOMM2_ENUM_END(DirectPlayWaitType)
 
-typedef enum DirectPlayResult {
+HOMM2_ENUM_BEGIN(DirectPlayResult)
     DP_RESULT_OK = 0,
     DP_RESULT_INVALID_ARGUMENT = static_cast<i32>(0x80070057),
     DP_RESULT_INVALID_PLAYER = static_cast<i32>(0x88770096),
     DP_RESULT_NO_MESSAGES = static_cast<i32>(0x887700be),
     DP_RESULT_NO_SESSIONS = static_cast<i32>(0x887700dc)
-} DirectPlayResult;
-
+HOMM2_ENUM_END(DirectPlayResult)
 
 #pragma pack(push, 1)
 struct DirectPlayStartupMessage {

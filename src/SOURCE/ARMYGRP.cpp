@@ -70,7 +70,7 @@ i32 armyGroup::GetMorale(hero* armyHero, town* occupiedTown, armyGroup* enemyGro
         if (armyHero->HasArtifact(ARTIFACT_BATTLE_GARB))
             return ARMY_GROUP_MORALE_MAX;
 
-        morale += armyHero->m_secondarySkills[HERO_SKILL_LEADERSHIP];
+        morale += armyHero->m_secondarySkills[IDX(HERO_SKILL_LEADERSHIP)];
         morale += armyHero->m_morale;
         if (armyHero->HasArtifact(ARTIFACT_MEDAL_OF_VALOR))
             ++morale;
@@ -85,7 +85,7 @@ i32 armyGroup::GetMorale(hero* armyHero, town* occupiedTown, armyGroup* enemyGro
         if (armyHero->HasArtifact(ARTIFACT_ARM_OF_MARTYR))
             hasSomeUndead = 1;
         if (armyHero->HasArtifact(ARTIFACT_MASTHEAD)
-            && (armyHero->m_eventFlags & HERO_EVENT_EMBARKED))
+            && HAS(armyHero->m_eventFlags, HERO_EVENT_EMBARKED))
             ++morale;
     }
 

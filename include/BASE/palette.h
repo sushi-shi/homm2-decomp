@@ -5,9 +5,9 @@
 #include <va.h>
 #include <BASE/resource.h>
 
-typedef enum PaletteConstant {
+HOMM2_ENUM_VALUES_BEGIN(PaletteConstant)
     PALETTE_DATA_SIZE = 0x300
-} PaletteConstant;
+HOMM2_ENUM_VALUES_END(PaletteConstant)
 
 #pragma pack(push, 1) // recovered layout is byte-packed
 class palette : public resource {

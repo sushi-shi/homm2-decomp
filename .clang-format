@@ -76,6 +76,16 @@ StatementMacros:
   - VA
   - VAU
   - SYMBOL
+  - HOMM2_ENUM_FLAGS
+# Teach the formatter that the enum macros open and close a brace block so
+# enumerators format exactly like a native enum body.
+Macros:
+  - HOMM2_ENUM_BEGIN(name)=enum name {
+  - HOMM2_ENUM_BEGIN_T(name, storage)=enum name {
+  - HOMM2_ENUM_VALUES_BEGIN(name)=enum name {
+  - HOMM2_ENUM_END(name)=};
+  - HOMM2_ENUM_END_T(name, storage)=};
+  - HOMM2_ENUM_VALUES_END(name)=};
 AttributeMacros:
   - OVERRIDE
   - DATA

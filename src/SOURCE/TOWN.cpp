@@ -57,7 +57,7 @@ void town::GiveSpells(hero* targetHero) {
     if (!(m_buildings & TOWN_BUILDING_MAGE_GUILD))
         return;
 
-    for (level = 0; level < activeHero->m_secondarySkills[HERO_SKILL_WISDOM]
+    for (level = 0; level < activeHero->m_secondarySkills[IDX(HERO_SKILL_WISDOM)]
                                 + TOWN_MAGE_GUILD_WISDOM_LEVEL_BONUS;
          ++level) {
         for (slot = 0; slot < m_spellCounts[level + TOWN_MAGE_GUILD_FIRST_LEVEL]; ++slot) {

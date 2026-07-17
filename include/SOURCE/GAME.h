@@ -31,7 +31,7 @@ struct RandomHeroArmyRange {
     i16 maximum;
 };
 
-typedef enum GameSerializationConstant {
+HOMM2_ENUM_VALUES_BEGIN(GameSerializationConstant)
     GAME_SOURCE_LINE = 660,
     GAME_LOAD_SOURCE_LINE = 1103,
     GAME_SAVE_BUFFER_SIZE = 50000,
@@ -42,12 +42,12 @@ typedef enum GameSerializationConstant {
     GAME_TOWN_COUNT = 72,
     GAME_MINE_COUNT = 144,
     GAME_BOAT_COUNT = 48
-} GameSerializationConstant;
+HOMM2_ENUM_VALUES_END(GameSerializationConstant)
 
 // Action trigger ids carried in mapCell::m_triggerType (non-action id | the
 // MAP_TRIGGER_ACTION_FLAG 0x80 bit). ProcessRandomObjects converts every
 // MAP_TRIGGER_RANDOM_* cell into its concrete counterpart at map load.
-typedef enum GameMapTrigger {
+HOMM2_ENUM_BEGIN(GameMapTrigger)
     MAP_TRIGGER_TOWN_BASE = 0x23,
     MAP_TRIGGER_MONSTER = 0x98,
     MAP_TRIGGER_RESOURCE = 0x9b,
@@ -70,22 +70,22 @@ typedef enum GameMapTrigger {
     MAP_TRIGGER_RANDOM_ARTIFACT_LEVEL_1 = 0xf4,
     MAP_TRIGGER_RANDOM_ARTIFACT_LEVEL_2 = 0xf5,
     MAP_TRIGGER_RANDOM_ARTIFACT_LEVEL_3 = 0xf6
-} GameMapTrigger;
+HOMM2_ENUM_END(GameMapTrigger)
 
 // mapCell::m_objectMetadata layout for monster cells: low 12 bits carry the
 // troop count, bit 0x1000 marks a placed guardian.
-typedef enum GameMonsterMetadata {
+HOMM2_ENUM_BEGIN(GameMonsterMetadata)
     MAP_MONSTER_COUNT_MASK = 0xfff,
     MAP_MONSTER_GUARD_FLAG = 0x1000
-} GameMonsterMetadata;
+HOMM2_ENUM_END(GameMonsterMetadata)
 
-typedef enum GameDifficultyConstant {
+HOMM2_ENUM_VALUES_BEGIN(GameDifficultyConstant)
     GAME_DIFFICULTY_HARD = 2,
     GAME_DIFFICULTY_EXPERT = 3,
     GAME_DIFFICULTY_IMPOSSIBLE = 4
-} GameDifficultyConstant;
+HOMM2_ENUM_VALUES_END(GameDifficultyConstant)
 
-typedef enum GameScoreConstant {
+HOMM2_ENUM_VALUES_BEGIN(GameScoreConstant)
     GAME_SCORE_MAP_SMALL = 36,
     GAME_SCORE_MAP_MEDIUM = 72,
     GAME_SCORE_MAP_LARGE = 108,
@@ -95,20 +95,20 @@ typedef enum GameScoreConstant {
     GAME_SCORE_SECOND_TIER = 120,
     GAME_SCORE_THIRD_TIER = 360,
     GAME_SCORE_MINIMUM = 20
-} GameScoreConstant;
+HOMM2_ENUM_VALUES_END(GameScoreConstant)
 
 #define GAME_SCORE_EXTRA_LARGE_DAY_SCALE 0.6
 #define GAME_SCORE_LARGE_DAY_SCALE 0.8
 #define GAME_SCORE_SMALL_DAY_SCALE 1.4
 #define GAME_VIEW_ARMY_FRAME_DELAY_SCALE 1.35
 
-typedef enum GameJoinConstant {
+HOMM2_ENUM_VALUES_BEGIN(GameJoinConstant)
     GAME_JOIN_HEADER_SIZE = 2,
     GAME_JOIN_BUFFER_SIZE = 700000,
     GAME_JOIN_LOG_UNUSED = -999
-} GameJoinConstant;
+HOMM2_ENUM_VALUES_END(GameJoinConstant)
 
-typedef enum GameDiffEncoding {
+HOMM2_ENUM_BEGIN(GameDiffEncoding)
     DIFF_COMMAND_SHIFT = 7,
     DIFF_LEN_WORD_FLAG = 0x40,
     DIFF_LEN_BYTE_FLAG = 0x20,
@@ -118,13 +118,13 @@ typedef enum GameDiffEncoding {
     DIFF_LEN_SHORT_MASK = 0x1f,
     DIFF_LEN_BYTE_MAX = 0x1f,
     DIFF_LEN_WORD_MAX = 0x1fff
-} GameDiffEncoding;
+HOMM2_ENUM_END(GameDiffEncoding)
 
-typedef enum GameSaveSentinel {
+HOMM2_ENUM_BEGIN(GameSaveSentinel)
     GAME_SAVED_TOWN_OFF_MAP = 0xff
-} GameSaveSentinel;
+HOMM2_ENUM_END(GameSaveSentinel)
 
-typedef enum GameWeeklyConstant {
+HOMM2_ENUM_VALUES_BEGIN(GameWeeklyConstant)
     WEEKLY_WATER_WHEEL_EMPTY = 0xff,
     WEEKLY_MONSTER_POPULATION_LIMIT = 0x1fe1,
     WEEKLY_DWELLING_NO_GROWTH_FLAG = 0x80,
@@ -142,9 +142,9 @@ typedef enum GameWeeklyConstant {
     WEEKLY_AVAILABLE_HERO = 64,
     WEEKLY_HERO_RESERVED_FLAG = 0x10000,
     WEEKLY_HERO_VISIT_FLAG = 0x800000
-} GameWeeklyConstant;
+HOMM2_ENUM_VALUES_END(GameWeeklyConstant)
 
-typedef enum GameMonthlyConstant {
+HOMM2_ENUM_VALUES_BEGIN(GameMonthlyConstant)
     MONTH_TYPE_NORMAL = 0,
     MONTH_TYPE_CREATURE = 1,
     MONTH_TYPE_PLAGUE = 2,
@@ -167,9 +167,9 @@ typedef enum GameMonthlyConstant {
     MONTH_MONSTER_SPAWN_ROLL = 10,
     MONTH_MONSTER_GUARD_ROLL_MAX = 100,
     MONTH_MONSTER_GUARD_CHANCE = 20
-} GameMonthlyConstant;
+HOMM2_ENUM_VALUES_END(GameMonthlyConstant)
 
-typedef enum GameRandomTownConstant {
+HOMM2_ENUM_VALUES_BEGIN(GameRandomTownConstant)
     NEUTRAL_TOWN_CASTLE_REINFORCE_CHANCE = 80,
     NEUTRAL_TOWN_REINFORCE_CHANCE = 40,
     RANDOM_TOWN_UNOWNED_COLOR = -1,
@@ -191,21 +191,21 @@ typedef enum GameRandomTownConstant {
     RANDOM_TOWN_FIRST_TRIGGER = 0x30,
     RANDOM_TOWN_SECOND_TRIGGER = 0x31,
     RANDOM_TOWN_TRIGGER = 0x23
-} GameRandomTownConstant;
+HOMM2_ENUM_VALUES_END(GameRandomTownConstant)
 
-typedef enum GameRandomArtifactConstant {
-    RANDOM_ARTIFACT_BASE_TABLE_SIZE = ARTIFACT_MAGIC_BOOK + 1,
+HOMM2_ENUM_VALUES_BEGIN(GameRandomArtifactConstant)
+    RANDOM_ARTIFACT_BASE_TABLE_SIZE = IDX(ARTIFACT_MAGIC_BOOK) + 1,
     GAME_SPECIAL_HERO_CLASS_NONE = -1,
-    RANDOM_ARTIFACT_FIRST = ARTIFACT_ULTIMATE_BOOK,
-    RANDOM_ARTIFACT_BASE_LAST = ARTIFACT_MAGIC_BOOK,
-    RANDOM_ARTIFACT_EXPANSION_LAST = ARTIFACT_SPADE_NECROMANCY,
+    RANDOM_ARTIFACT_FIRST = IDX(ARTIFACT_ULTIMATE_BOOK),
+    RANDOM_ARTIFACT_BASE_LAST = IDX(ARTIFACT_MAGIC_BOOK),
+    RANDOM_ARTIFACT_EXPANSION_LAST = IDX(ARTIFACT_SPADE_NECROMANCY),
     RANDOM_ARTIFACT_UNIQUE_RETRIES = 100,
     RANDOM_ARTIFACT_CURSED_ROLL_MAX = 100,
     RANDOM_ARTIFACT_CURSED_REJECT_CHANCE = 30,
     VICTORY_ARTIFACT_ID_OFFSET = 1
-} GameRandomArtifactConstant;
+HOMM2_ENUM_VALUES_END(GameRandomArtifactConstant)
 
-typedef enum GameRandomHeroConstant {
+HOMM2_ENUM_VALUES_BEGIN(GameRandomHeroConstant)
     RANDOM_HERO_COUNT = 54,
     RANDOM_HERO_NORMAL_ARMY = 0,
     RANDOM_HERO_EXPERIENCE_MIN = 0,
@@ -228,9 +228,9 @@ typedef enum GameRandomHeroConstant {
     RANDOM_HERO_COUNT_SCALE = 10,
     RANDOM_HERO_COUNT_ROUNDING = 9,
     RANDOM_HERO_EMPTY_COUNT = -1
-} GameRandomHeroConstant;
+HOMM2_ENUM_VALUES_END(GameRandomHeroConstant)
 
-typedef enum GameVisibilityConstant {
+HOMM2_ENUM_VALUES_BEGIN(GameVisibilityConstant)
     VISIBILITY_EARLY_TURN_LAST = 20,
     VISIBILITY_MIDDLE_TURN_LAST = 40,
     VISIBILITY_EARLY_AI_BONUS = 1,
@@ -240,39 +240,39 @@ typedef enum GameVisibilityConstant {
     VISIBILITY_SMALL_RADIUS_THRESHOLD = 2,
     VISIBILITY_LARGE_RADIUS_THRESHOLD = 3,
     VISIBILITY_RADIAL_RADIUS_LIMIT = 10
-} GameVisibilityConstant;
+HOMM2_ENUM_VALUES_END(GameVisibilityConstant)
 
-typedef enum GameLuckConstant {
+HOMM2_ENUM_VALUES_BEGIN(GameLuckConstant)
     LUCK_NEUTRAL = 0,
     LUCK_MINIMUM = -3,
     LUCK_MAXIMUM = 3,
     LUCK_RAINBOW_BONUS = 2
-} GameLuckConstant;
+HOMM2_ENUM_VALUES_END(GameLuckConstant)
 
-typedef enum GameWaitConstant {
+HOMM2_ENUM_VALUES_BEGIN(GameWaitConstant)
     WAIT_BOTTOM_VIEW_TIMEOUT = 9999999,
     WAIT_AMBIENT_MUSIC = 21,
     WAIT_DIALOG_TYPE = 9
-} GameWaitConstant;
+HOMM2_ENUM_VALUES_END(GameWaitConstant)
 
-typedef enum GameTimeEventConstant {
+HOMM2_ENUM_VALUES_BEGIN(GameTimeEventConstant)
     TIME_EVENT_DAYS_PER_WEEK = 7,
     TIME_EVENT_DAYS_PER_MONTH = 28,
     TIME_EVENT_RESOURCE_COUNT = 7,
     TIME_EVENT_RESOURCE_PENALTY = 100000
-} GameTimeEventConstant;
+HOMM2_ENUM_VALUES_END(GameTimeEventConstant)
 
-typedef enum GameHeroPoolConstant {
+HOMM2_ENUM_VALUES_BEGIN(GameHeroPoolConstant)
     AVAILABLE_HERO_SLOTS = 2
-} GameHeroPoolConstant;
+HOMM2_ENUM_VALUES_END(GameHeroPoolConstant)
 
-typedef enum GameCompressionTestConstant {
+HOMM2_ENUM_VALUES_BEGIN(GameCompressionTestConstant)
     COMPRESSION_TEST_RANDOM_SIZE_MIN = 20000,
     COMPRESSION_TEST_RANDOM_SIZE_MAX = 100000,
     COMPRESSION_TEST_RANDOM_BUFFER_EXTRA = 5000,
     COMPRESSION_TEST_FILE_BUFFER_EXTRA = 2000,
     COMPRESSION_TEST_FILENAME_SIZE = 32
-} GameCompressionTestConstant;
+HOMM2_ENUM_VALUES_END(GameCompressionTestConstant)
 
 i32 GetNumObelisks(i32 color);
 void ComputeUALoc(i32);

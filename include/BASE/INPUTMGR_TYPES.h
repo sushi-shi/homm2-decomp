@@ -3,10 +3,10 @@
 
 #include <va.h>
 
-typedef enum InputManagerTextSlotSize {
+HOMM2_ENUM_VALUES_BEGIN(InputManagerTextSlotSize)
     INPUT_MANAGER_RELEASE_CAPTURE_SLOT_SIZE = 0x18,
     INPUT_MANAGER_NAME_SLOT_SIZE = 0x10
-} InputManagerTextSlotSize;
+HOMM2_ENUM_VALUES_END(InputManagerTextSlotSize)
 
 typedef struct SInputManagerText {
     char leftReleaseCaptureFailure[INPUT_MANAGER_RELEASE_CAPTURE_SLOT_SIZE];

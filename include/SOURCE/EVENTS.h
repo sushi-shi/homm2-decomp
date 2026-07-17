@@ -19,17 +19,17 @@ enum {
     COMBAT_REMOTE_TIMEOUT = 90000
 };
 
-typedef enum CombatRemoteCommand {
+HOMM2_ENUM_BEGIN(CombatRemoteCommand)
     COMBAT_REMOTE_COMMAND = 0x15,
     COMBAT_REMOTE_CONFIRM_COMMAND = 0x16
-} CombatRemoteCommand;
+HOMM2_ENUM_END(CombatRemoteCommand)
 
-typedef enum CombatRemoteFragment {
+HOMM2_ENUM_BEGIN(CombatRemoteFragment)
     COMBAT_REMOTE_FIRST_HERO_FIRST = 1,
     COMBAT_REMOTE_FIRST_HERO_SECOND = 2,
     COMBAT_REMOTE_SECOND_HERO_FIRST = 3,
     COMBAT_REMOTE_SECOND_HERO_SECOND = 4
-} CombatRemoteFragment;
+HOMM2_ENUM_END(CombatRemoteFragment)
 
 #pragma pack(push, 1)
 struct mapEventExtra {
@@ -99,7 +99,7 @@ struct mapTownExtra {
 };
 #pragma pack(pop)
 
-typedef enum MapEventConstant {
+HOMM2_ENUM_VALUES_BEGIN(MapEventConstant)
     MAP_EVENT_DATA_EMPTY = 0,
     MAP_EVENT_ARTIFACT_GUARD_FLAG = 0x100,
     MAP_EVENT_ARTIFACT_CONDITION_FLAG = 0x80,
@@ -215,15 +215,15 @@ typedef enum MapEventConstant {
     COAST_FIZZLE_Y = 192,
     COAST_FIZZLE_WIDTH = 96,
     COAST_FIZZLE_HEIGHT = 96
-} MapEventConstant;
+HOMM2_ENUM_VALUES_END(MapEventConstant)
 
-typedef enum UndeadEventLevel {
+HOMM2_ENUM_BEGIN(UndeadEventLevel)
     UNDEAD_EVENT_LEVEL_SMALL = 2,
     UNDEAD_EVENT_LEVEL_MEDIUM = 3,
     UNDEAD_EVENT_LEVEL_LARGE = 4
-} UndeadEventLevel;
+HOMM2_ENUM_END(UndeadEventLevel)
 
-typedef enum UndeadEventConstant {
+HOMM2_ENUM_VALUES_BEGIN(UndeadEventConstant)
     SKELETON_EVENT_SMALL_COUNT = 25,
     SKELETON_EVENT_MEDIUM_COUNT = 50,
     SKELETON_EVENT_LARGE_COUNT = 100,
@@ -253,9 +253,9 @@ typedef enum UndeadEventConstant {
     GHOST_EVENT_MEDIUM_GOLD = 2000,
     GHOST_EVENT_LARGE_GOLD = 5000,
     GHOST_EVENT_HUGE_GOLD = 2000
-} UndeadEventConstant;
+HOMM2_ENUM_VALUES_END(UndeadEventConstant)
 
-typedef enum AIEventConstant {
+HOMM2_ENUM_VALUES_BEGIN(AIEventConstant)
     AI_EVENT_RESOURCE_COUNT = 7,
     AI_EVENT_ARMY_STACK_COUNT = 5,
     AI_EVENT_NO_OWNER = -1,
@@ -299,16 +299,16 @@ typedef enum AIEventConstant {
     AI_EVENT_HERO_DIRECTION = 2,
     AI_EVENT_HERO_MAP_CHANGE = 3,
     AI_EVENT_HERO_MAP_CHANGE_VALUE = -999
-} AIEventConstant;
+HOMM2_ENUM_VALUES_END(AIEventConstant)
 
-typedef enum BarrierEventConstant {
+HOMM2_ENUM_VALUES_BEGIN(BarrierEventConstant)
     BARRIER_COLOR_MASK = 7,
     BARRIER_PASSWORD_SHIFT = 3,
     BARRIER_INPUT_LENGTH = 14,
     BARRIER_INPUT_BUFFER_SIZE = 16
-} BarrierEventConstant;
+HOMM2_ENUM_VALUES_END(BarrierEventConstant)
 
-typedef enum GenericSiteType {
+HOMM2_ENUM_BEGIN(GenericSiteType)
     GENERIC_SITE_ALCHEMIST_TOWER = 0,
     GENERIC_SITE_ARENA = 1,
     GENERIC_SITE_HUT_OF_MAGI = 2,
@@ -316,9 +316,9 @@ typedef enum GenericSiteType {
     GENERIC_SITE_STABLES = 4,
     GENERIC_SITE_MERMAIDS = 5,
     GENERIC_SITE_SIRENS = 6
-} GenericSiteType;
+HOMM2_ENUM_END(GenericSiteType)
 
-typedef enum GenericSiteConstant {
+HOMM2_ENUM_VALUES_BEGIN(GenericSiteConstant)
     GENERIC_SITE_TYPE_MASK = 0x3f,
     GENERIC_SITE_LEVEL_SHIFT = 6,
     GENERIC_SITE_ARTIFACT_SLOT_COUNT = 14,
@@ -330,23 +330,23 @@ typedef enum GenericSiteConstant {
     GENERIC_SITE_STABLE_REWARD_VALUE = 8,
     GENERIC_SITE_MERMAID_WINDOW_ICON = 10,
     GENERIC_SITE_STRING_LIMIT = 10
-} GenericSiteConstant;
+HOMM2_ENUM_VALUES_END(GenericSiteConstant)
 
 #define GENERIC_SITE_SIREN_ARMY_REMAINDER 0.7
 
-typedef enum EventWindowRewardConstant {
+HOMM2_ENUM_VALUES_BEGIN(EventWindowRewardConstant)
     EVENT_WINDOW_REWARD_CREATURE = 18
-} EventWindowRewardConstant;
+HOMM2_ENUM_VALUES_END(EventWindowRewardConstant)
 
-typedef enum RecruitSiteType {
+HOMM2_ENUM_BEGIN(RecruitSiteType)
     RECRUIT_SITE_GHOST = 0,
     RECRUIT_SITE_EARTH_ELEMENTAL = 1,
     RECRUIT_SITE_AIR_ELEMENTAL = 2,
     RECRUIT_SITE_FIRE_ELEMENTAL = 3,
     RECRUIT_SITE_WATER_ELEMENTAL = 4
-} RecruitSiteType;
+HOMM2_ENUM_END(RecruitSiteType)
 
-typedef enum HouseRecruitmentSite {
+HOMM2_ENUM_BEGIN(HouseRecruitmentSite)
     HOUSE_RECRUIT_ARCHER = 0,
     HOUSE_RECRUIT_GOBLIN = 1,
     HOUSE_RECRUIT_PEASANT = 2,
@@ -358,15 +358,15 @@ typedef enum HouseRecruitmentSite {
     HOUSE_RECRUIT_CAVE = 8,
     HOUSE_RECRUIT_EXCAVATION = 9,
     HOUSE_RECRUIT_SITE_COUNT = 10
-} HouseRecruitmentSite;
+HOMM2_ENUM_END(HouseRecruitmentSite)
 
-typedef enum HouseEventConstant {
+HOMM2_ENUM_VALUES_BEGIN(HouseEventConstant)
     HOUSE_EVENT_RECRUIT_DIALOG_BASE = 23,
     HOUSE_EVENT_ARMY_FULL_DIALOG_BASE = 24,
     HOUSE_EVENT_EMPTY_DIALOG_BASE = 25
-} HouseEventConstant;
+HOMM2_ENUM_VALUES_END(HouseEventConstant)
 
-typedef enum EventSoundConstant {
+HOMM2_ENUM_VALUES_BEGIN(EventSoundConstant)
     EVENT_SOUND_NONE = -1,
     EVENT_SOUND_TRACK_1 = 1,
     EVENT_SOUND_TREASURE = 19,
@@ -387,9 +387,9 @@ typedef enum EventSoundConstant {
     EVENT_SOUND_MINE = 103,
     EVENT_SOUND_FILENAME_LENGTH = 32,
     EVENT_SOUND_SAMPLE_NAME_EMPTY_LIMIT = 1
-} EventSoundConstant;
+HOMM2_ENUM_VALUES_END(EventSoundConstant)
 
-typedef enum EventSoundVariant {
+HOMM2_ENUM_BEGIN(EventSoundVariant)
     EVENT_SOUND_VARIANT_0 = 0,
     EVENT_SOUND_VARIANT_1 = 1,
     EVENT_SOUND_VARIANT_2 = 2,
@@ -397,9 +397,9 @@ typedef enum EventSoundVariant {
     EVENT_SOUND_VARIANT_4 = 4,
     EVENT_SOUND_VARIANT_5 = 5,
     EVENT_SOUND_VARIANT_6 = 6
-} EventSoundVariant;
+HOMM2_ENUM_END(EventSoundVariant)
 
-typedef enum EraseObjectConstant {
+HOMM2_ENUM_VALUES_BEGIN(EraseObjectConstant)
     ERASE_NEIGHBOR_COUNT = 4,
     ERASE_CELL_COUNT = 5,
     ERASE_NO_FRAME = -1,
@@ -408,9 +408,9 @@ typedef enum EraseObjectConstant {
     ERASE_MAP_CHANGE_OBJECT = 5,
     ERASE_MAP_CHANGE_VALUE = -999,
     ERASE_ENVIRONMENT_BORDER = 7
-} EraseObjectConstant;
+HOMM2_ENUM_VALUES_END(EraseObjectConstant)
 
-typedef enum EraseObjectTileset {
+HOMM2_ENUM_BEGIN(EraseObjectTileset)
     ERASE_TILESET_11 = 11,
     ERASE_TILESET_46 = 46,
     ERASE_TILESET_50 = 50,
@@ -418,9 +418,9 @@ typedef enum EraseObjectTileset {
     ERASE_TILESET_59 = 59,
     ERASE_TILESET_62 = 62,
     ERASE_TILESET_63 = 63
-} EraseObjectTileset;
+HOMM2_ENUM_END(EraseObjectTileset)
 
-typedef enum MonsterInteractionConstant {
+HOMM2_ENUM_VALUES_BEGIN(MonsterInteractionConstant)
     MONSTER_JOIN_FORCED = 0x1000,
     MONSTER_COUNT_MASK = 0xfff,
     MONSTER_DIPLOMACY_NONE = 0,
@@ -430,7 +430,7 @@ typedef enum MonsterInteractionConstant {
     MONSTER_DIALOG_YES = 0x7805,
     MONSTER_DIALOG_NO = 0x7806,
     MONSTER_OFFER_BUFFER_SIZE = 300
-} MonsterInteractionConstant;
+HOMM2_ENUM_VALUES_END(MonsterInteractionConstant)
 
 #define MONSTER_STRENGTH_JOIN 2.0
 #define MONSTER_STRENGTH_FLEE 5.0
@@ -438,23 +438,23 @@ typedef enum MonsterInteractionConstant {
 #define MONSTER_NECROMANCY_FRACTION 0.1
 #define MONSTER_AI_JOIN_COST_FRACTION 0.75
 
-typedef enum CombatMonsterEventConstant {
+HOMM2_ENUM_VALUES_BEGIN(CombatMonsterEventConstant)
     COMBAT_MONSTER_ARMY_SLOTS = 5,
     COMBAT_MONSTER_RANDOM_MAX = 100,
     COMBAT_MONSTER_REDUCED_STACK_CHANCE = 25,
     COMBAT_MONSTER_FOUR_STACK_THRESHOLD = 50,
     COMBAT_MONSTER_UPGRADE_CHANCE = 50
-} CombatMonsterEventConstant;
+HOMM2_ENUM_VALUES_END(CombatMonsterEventConstant)
 
-typedef enum EventArtifactStatConstant {
+HOMM2_ENUM_VALUES_BEGIN(EventArtifactStatConstant)
     EVENT_ARTIFACT_PRIMARY_STAT_COUNT = 4,
     EVENT_ARTIFACT_SLOT_COUNT = 14,
-    EVENT_ARTIFACT_NON_TRANSFERABLE_LAST = ARTIFACT_ULTIMATE_WAND,
+    EVENT_ARTIFACT_NON_TRANSFERABLE_LAST = IDX(ARTIFACT_ULTIMATE_WAND),
     EVENT_ARTIFACT_TAKE = 1,
     EVENT_ARTIFACT_SPELL_POINT_MULTIPLIER = 10
-} EventArtifactStatConstant;
+HOMM2_ENUM_VALUES_END(EventArtifactStatConstant)
 
-typedef enum EventEffectConstant {
+HOMM2_ENUM_VALUES_BEGIN(EventEffectConstant)
     EVENT_WHIRLPOOL_TRIGGER_ROLL = 1,
     EVENT_WHIRLPOOL_TRIGGER_MAX = 3,
     EVENT_WHIRLPOOL_ARMY_VALUE_LIMIT = 99999999,
@@ -465,7 +465,7 @@ typedef enum EventEffectConstant {
     EVENT_FIZZLE_WIDTH = 132,
     EVENT_FIZZLE_HEIGHT = 132,
     EVENT_FIZZLE_STEPS = 65
-} EventEffectConstant;
+HOMM2_ENUM_VALUES_END(EventEffectConstant)
 
 i8 StrEqNoCase(char*, char*);
 i32 GiveArtifact(class hero*, i32, i32, i8);

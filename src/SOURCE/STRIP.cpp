@@ -238,7 +238,7 @@ void bankBox::Update(i32 drawWindow) {
         message.payload.widget.data.text = text;
         m_window->BroadcastMessage(message);
     }
-    sprintf(text, "%d", m_player->m_resources[RES_GOLD]);
+    sprintf(text, "%d", m_player->m_resources[IDX(RES_GOLD)]);
     message.payload.widget.id = BANK_BOX_GOLD_WIDGET;
     message.payload.widget.data.text = text;
     m_window->BroadcastMessage(message);

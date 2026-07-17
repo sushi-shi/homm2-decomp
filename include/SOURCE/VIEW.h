@@ -7,7 +7,7 @@
 // forward declarations (was <_all.h>):
 struct tag_message;
 
-typedef enum ViewGeneralConstant {
+HOMM2_ENUM_VALUES_BEGIN(ViewGeneralConstant)
     VIEW_GENERAL_WINDOW_X = 179,
     VIEW_GENERAL_WINDOW_Y = 60,
     VIEW_GENERAL_SET_TEXT = 3,
@@ -31,7 +31,7 @@ typedef enum ViewGeneralConstant {
     VIEW_ARMY_Y_OFFSET = 164,
     VIEW_ARMY_RIGHT_CLAMP = 151,
     VIEW_ARMY_BOTTOM_CLAMP = 230
-} ViewGeneralConstant;
+HOMM2_ENUM_VALUES_END(ViewGeneralConstant)
 
 i32 HandleViewGeneral(struct tag_message&);
 extern i32 iViewGeneralWhichSide;

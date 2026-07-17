@@ -1,21 +1,21 @@
 #ifndef HOMM2_BASE_MISC_GRAPHICS_CONSTANTS_H
 #define HOMM2_BASE_MISC_GRAPHICS_CONSTANTS_H
 
-typedef enum MiscPaletteConstant {
+HOMM2_ENUM_VALUES_BEGIN(MiscPaletteConstant)
     MISC_PALETTE_COMPONENT_BYTES = 3,
     MISC_PALETTE_BYTE_COUNT = 0x300,
     MISC_PALETTE_LEVEL_COUNT = 0x40,
     MISC_PALETTE_MAX_LEVEL = 0x3f
-} MiscPaletteConstant;
+HOMM2_ENUM_VALUES_END(MiscPaletteConstant)
 
-typedef enum MiscCycleColorRange {
+HOMM2_ENUM_BEGIN(MiscCycleColorRange)
     MISC_CYCLE_RANGE_ONE_FIRST = 0xd6,
     MISC_CYCLE_RANGE_ONE_LAST = 0xdd,
     MISC_CYCLE_RANGE_TWO_FIRST = 0xe7,
     MISC_CYCLE_RANGE_TWO_LAST = 0xed
-} MiscCycleColorRange;
+HOMM2_ENUM_END(MiscCycleColorRange)
 
-typedef enum MiscFadeConstant {
+HOMM2_ENUM_VALUES_BEGIN(MiscFadeConstant)
     MISC_FADE_LEVEL_COUNT = 0x40,
     MISC_FADE_LEVEL_LAST = 0x3f,
     MISC_WINDOW_POSITION_MARGIN = 0xc8,
@@ -23,13 +23,13 @@ typedef enum MiscFadeConstant {
     MISC_FADE_TO_INCREMENT_SHIFT = 2,
     MISC_FADE_TO_START_LEVEL = 0x30,
     MISC_FADE_TO_FRAME_DELAY = 0x32
-} MiscFadeConstant;
+HOMM2_ENUM_VALUES_END(MiscFadeConstant)
 
-typedef enum MiscBlitConstant {
+HOMM2_ENUM_VALUES_BEGIN(MiscBlitConstant)
     MISC_BLIT_SCROLL_OFFSET = 0x10,
     MISC_BLIT_SCROLL_EXTENT = 0x1c0,
     MISC_BLIT_SCREEN_WIDTH = 0x280,
     MISC_BLIT_SCREEN_HEIGHT = 0x1e0
-} MiscBlitConstant;
+HOMM2_ENUM_VALUES_END(MiscBlitConstant)
 
 #endif // HOMM2_BASE_MISC_GRAPHICS_CONSTANTS_H

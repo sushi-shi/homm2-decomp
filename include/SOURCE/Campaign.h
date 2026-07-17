@@ -8,7 +8,7 @@
 // forward declarations (was <_all.h>):
 struct tag_message;
 
-typedef enum CampaignAward {
+HOMM2_ENUM_BEGIN(CampaignAward)
     CAMPAIGN_AWARD_DWARVEN_ALLIANCE = 0,
     CAMPAIGN_AWARD_SORCERESS_GUILD = 1,
     CAMPAIGN_AWARD_ROLAND_STRENGTHENED = 2,
@@ -21,9 +21,9 @@ typedef enum CampaignAward {
     CAMPAIGN_AWARD_DRAGON_ALLIANCE = 9,
     CAMPAIGN_AWARD_ARCHIBALD_ULTIMATE_CROWN = 10,
     CAMPAIGN_AWARD_ARCHIBALD_CARRYOVER_FORCES = 11
-} CampaignAward;
+HOMM2_ENUM_END(CampaignAward)
 
-typedef enum CampaignScenarioArmyCount {
+HOMM2_ENUM_VALUES_BEGIN(CampaignScenarioArmyCount)
     CAMPAIGN_BARBARIAN_ORC_CHIEF_COUNT = 12,
     CAMPAIGN_BARBARIAN_OGRE_COUNT = 18,
     CAMPAIGN_BARBARIAN_GOBLIN_COUNT = 40,
@@ -33,9 +33,9 @@ typedef enum CampaignScenarioArmyCount {
     CAMPAIGN_NECROMANCER_SKELETON_COUNT = 50,
     CAMPAIGN_NECROMANCER_MUMMY_COUNT = 18,
     CAMPAIGN_NECROMANCER_VAMPIRE_COUNT = 8
-} CampaignScenarioArmyCount;
+HOMM2_ENUM_VALUES_END(CampaignScenarioArmyCount)
 
-typedef enum CampaignMessageConstant {
+HOMM2_ENUM_VALUES_BEGIN(CampaignMessageConstant)
     CAMPAIGN_MESSAGE_SELECT = 5,
     CAMPAIGN_MESSAGE_DESELECT = 6,
     CAMPAIGN_MESSAGE_SET_ICON = 9,
@@ -63,9 +63,9 @@ typedef enum CampaignMessageConstant {
     CAMPAIGN_WIDGET_ENABLE_FRAME = 8,
     CAMPAIGN_WIDGET_DISABLE_FRAME = 9,
     CAMPAIGN_WIDGET_REFRESH_FRAME = 4
-} CampaignMessageConstant;
+HOMM2_ENUM_VALUES_END(CampaignMessageConstant)
 
-typedef enum CampaignDisplayConstant {
+HOMM2_ENUM_VALUES_BEGIN(CampaignDisplayConstant)
     CAMPAIGN_TRACK_ICON_SIZE = 41,
     CAMPAIGN_TRACK_ICON_OFFSET = 2,
     CAMPAIGN_TRACK_ICON_FRAME = 10,
@@ -79,9 +79,9 @@ typedef enum CampaignDisplayConstant {
     CAMPAIGN_POINTER_HIDDEN_HOTSPOT = -999,
     CAMPAIGN_GOOD_MUSIC = 24,
     CAMPAIGN_EVIL_MUSIC = 22
-} CampaignDisplayConstant;
+HOMM2_ENUM_VALUES_END(CampaignDisplayConstant)
 
-typedef enum CampaignSmacker {
+HOMM2_ENUM_BEGIN(CampaignSmacker)
     CAMPAIGN_SMACKER_ROLAND_INTRO = 5,
     CAMPAIGN_SMACKER_ROLAND_1 = 6,
     CAMPAIGN_SMACKER_ROLAND_2 = 7,
@@ -111,20 +111,20 @@ typedef enum CampaignSmacker {
     CAMPAIGN_SMACKER_ARCHIBALD_9 = 32,
     CAMPAIGN_SMACKER_ARCHIBALD_10 = 33,
     CAMPAIGN_SMACKER_ARCHIBALD_END = 34
-} CampaignSmacker;
+HOMM2_ENUM_END(CampaignSmacker)
 
-typedef enum CampaignHeroPortrait {
+HOMM2_ENUM_BEGIN(CampaignHeroPortrait)
     CAMPAIGN_HERO_ROLAND = 54,
     CAMPAIGN_HERO_CORLAGON = 55,
     CAMPAIGN_HERO_ARCHIBALD = 57,
     CAMPAIGN_HERO_HALTON = 58
-} CampaignHeroPortrait;
+HOMM2_ENUM_END(CampaignHeroPortrait)
 
-typedef enum CampaignMapDifficulty {
+HOMM2_ENUM_BEGIN(CampaignMapDifficulty)
     CAMPAIGN_DIFFICULTY_EASY = 0,
     CAMPAIGN_DIFFICULTY_NORMAL = 1,
     CAMPAIGN_DIFFICULTY_HARD = 2
-} CampaignMapDifficulty;
+HOMM2_ENUM_END(CampaignMapDifficulty)
 
 i32 CampaignHandler(struct tag_message&);
 

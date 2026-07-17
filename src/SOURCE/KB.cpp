@@ -77,9 +77,9 @@ inline hero* GetHeroSlot(i32 i) {
     return &gpGame->m_heroRecs[i];
 }
 
-typedef enum NormalDialogDrawLimit {
+HOMM2_ENUM_BEGIN(NormalDialogDrawLimit)
     NORMAL_DIALOG_DRAW_ID_LIMIT = 0x9000
-} NormalDialogDrawLimit;
+HOMM2_ENUM_END(NormalDialogDrawLimit)
 
 VA(0x00496450, 0x14e)
 extern "C" void PollSound(void) {
@@ -1099,10 +1099,10 @@ i32 InitMenuHandler(struct tag_message& msg) {
                     gpInitWin->BroadcastMessage(msg);
                     gpInitWin->DrawWindow(0, idx, idx);
                     gpWindowManager->UpdateScreenRegion(
-                        IMHotSpots[menu][INIT_MENU_HOTSPOT_X],
-                        IMHotSpots[menu][INIT_MENU_HOTSPOT_Y],
-                        IMHotSpots[menu][INIT_MENU_HOTSPOT_WIDTH],
-                        IMHotSpots[menu][INIT_MENU_HOTSPOT_HEIGHT]
+                        IMHotSpots[menu][IDX(INIT_MENU_HOTSPOT_X)],
+                        IMHotSpots[menu][IDX(INIT_MENU_HOTSPOT_Y)],
+                        IMHotSpots[menu][IDX(INIT_MENU_HOTSPOT_WIDTH)],
+                        IMHotSpots[menu][IDX(INIT_MENU_HOTSPOT_HEIGHT)]
                     );
                     break;
                 case INIT_MENU_CLICK_COMMAND:
@@ -1142,13 +1142,14 @@ i32 InitMenuHandler(struct tag_message& msg) {
         } else if (msg.type == INIT_MENU_MOUSE_MOVE) {
             hoverIndex = -1;
             for (idx = 0; idx < INIT_MENU_HOTSPOT_COUNT; idx++) {
-                if (IMHotSpots[idx][INIT_MENU_HOTSPOT_X] <= msg.payload.mouse.screenX
-                    && IMHotSpots[idx][INIT_MENU_HOTSPOT_Y] <= msg.payload.mouse.screenY
-                    && msg.payload.mouse.screenX < IMHotSpots[idx][INIT_MENU_HOTSPOT_X]
-                                                       + IMHotSpots[idx][INIT_MENU_HOTSPOT_WIDTH]
+                if (IMHotSpots[idx][IDX(INIT_MENU_HOTSPOT_X)] <= msg.payload.mouse.screenX
+                    && IMHotSpots[idx][IDX(INIT_MENU_HOTSPOT_Y)] <= msg.payload.mouse.screenY
+                    && msg.payload.mouse.screenX
+                           < IMHotSpots[idx][IDX(INIT_MENU_HOTSPOT_X)]
+                                 + IMHotSpots[idx][IDX(INIT_MENU_HOTSPOT_WIDTH)]
                     && msg.payload.mouse.screenY
-                           < IMHotSpots[idx][INIT_MENU_HOTSPOT_Y]
-                                 + IMHotSpots[idx][INIT_MENU_HOTSPOT_HEIGHT]) {
+                           < IMHotSpots[idx][IDX(INIT_MENU_HOTSPOT_Y)]
+                                 + IMHotSpots[idx][IDX(INIT_MENU_HOTSPOT_HEIGHT)]) {
                     hoverIndex = idx;
                 }
             }
@@ -1166,10 +1167,10 @@ i32 InitMenuHandler(struct tag_message& msg) {
                         lastIMHoverID + INIT_MENU_WIDGET_OFFSET
                     );
                     gpWindowManager->UpdateScreenRegion(
-                        IMHotSpots[lastIMHoverID][INIT_MENU_HOTSPOT_X],
-                        IMHotSpots[lastIMHoverID][INIT_MENU_HOTSPOT_Y],
-                        IMHotSpots[lastIMHoverID][INIT_MENU_HOTSPOT_WIDTH],
-                        IMHotSpots[lastIMHoverID][INIT_MENU_HOTSPOT_HEIGHT]
+                        IMHotSpots[lastIMHoverID][IDX(INIT_MENU_HOTSPOT_X)],
+                        IMHotSpots[lastIMHoverID][IDX(INIT_MENU_HOTSPOT_Y)],
+                        IMHotSpots[lastIMHoverID][IDX(INIT_MENU_HOTSPOT_WIDTH)],
+                        IMHotSpots[lastIMHoverID][IDX(INIT_MENU_HOTSPOT_HEIGHT)]
                     );
                 }
                 if (hoverIndex != -1) {
@@ -1185,10 +1186,10 @@ i32 InitMenuHandler(struct tag_message& msg) {
                         hoverIndex + INIT_MENU_WIDGET_OFFSET
                     );
                     gpWindowManager->UpdateScreenRegion(
-                        IMHotSpots[hoverIndex][INIT_MENU_HOTSPOT_X],
-                        IMHotSpots[hoverIndex][INIT_MENU_HOTSPOT_Y],
-                        IMHotSpots[hoverIndex][INIT_MENU_HOTSPOT_WIDTH],
-                        IMHotSpots[hoverIndex][INIT_MENU_HOTSPOT_HEIGHT]
+                        IMHotSpots[hoverIndex][IDX(INIT_MENU_HOTSPOT_X)],
+                        IMHotSpots[hoverIndex][IDX(INIT_MENU_HOTSPOT_Y)],
+                        IMHotSpots[hoverIndex][IDX(INIT_MENU_HOTSPOT_WIDTH)],
+                        IMHotSpots[hoverIndex][IDX(INIT_MENU_HOTSPOT_HEIGHT)]
                     );
                 }
                 lastIMHoverID = hoverIndex;
@@ -1344,29 +1345,29 @@ void GetMonsterCost(i32 monster, i32* const cost) {
     i32 idx;
     for (idx = 0; idx < KB_BUILDING_RESOURCE_COUNT; idx++)
         cost[idx] = 0;
-    cost[RES_GOLD] = gMonsterDatabase[monster].cost;
+    cost[IDX(RES_GOLD)] = gMonsterDatabase[monster].cost;
     switch (monster) {
         case KB_MONSTER_NEEDS_GEMS_EXPANSION:
-            cost[RES_GEMS] = 1;
+            cost[IDX(RES_GEMS)] = 1;
             break;
         case KB_MONSTER_NEEDS_MERCURY:
-            cost[RES_MERCURY] = 1;
+            cost[IDX(RES_MERCURY)] = 1;
             break;
         case KB_MONSTER_NEEDS_CRYSTAL:
-            cost[RES_CRYSTAL] = 1;
+            cost[IDX(RES_CRYSTAL)] = 1;
             break;
         case KB_MONSTER_NEEDS_SULFUR_FIRST:
         case KB_MONSTER_NEEDS_SULFUR_SECOND:
-            cost[RES_SULFUR] = 1;
+            cost[IDX(RES_SULFUR)] = 1;
             break;
         case KB_MONSTER_NEEDS_TWO_SULFUR:
-            cost[RES_SULFUR] = 2;
+            cost[IDX(RES_SULFUR)] = 2;
             break;
         case KB_MONSTER_NEEDS_GEMS:
-            cost[RES_GEMS] = 1;
+            cost[IDX(RES_GEMS)] = 1;
             break;
         case KB_MONSTER_NEEDS_TWO_GEMS:
-            cost[RES_GEMS] = 2;
+            cost[IDX(RES_GEMS)] = 2;
             break;
     }
 }
@@ -1550,7 +1551,7 @@ i32 EventWindowHandler(struct tag_message& msg) {
     i32 type;
     i32 extra;
 
-    if (!gpSoundManager->MusicPlaying() && gpAdvManager->m_active == 1)
+    if (!gpSoundManager->MusicPlaying() && gpAdvManager->m_active)
         gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[gpAdvManager->m_currentTerrain]);
     if (giDialogTimeout != 0 && KBTickCount() > giDialogTimeout) {
         msg.type = MESSAGE_WIDGET;
@@ -1580,7 +1581,7 @@ i32 EventWindowHandler(struct tag_message& msg) {
                     switch (type) {
                         case EVENT_WINDOW_LUCK:
                             NormalDialog(
-                                cLuckInfo[LUCK_INFO_GOOD],
+                                cLuckInfo[IDX(LUCK_INFO_GOOD)],
                                 NORMAL_DIALOG_QUICK_VIEW,
                                 -1,
                                 -1,
@@ -1594,7 +1595,7 @@ i32 EventWindowHandler(struct tag_message& msg) {
                             break;
                         case EVENT_WINDOW_BAD_LUCK:
                             NormalDialog(
-                                cLuckInfo[LUCK_INFO_BAD],
+                                cLuckInfo[IDX(LUCK_INFO_BAD)],
                                 NORMAL_DIALOG_QUICK_VIEW,
                                 -1,
                                 -1,
@@ -1608,7 +1609,7 @@ i32 EventWindowHandler(struct tag_message& msg) {
                             break;
                         case EVENT_WINDOW_MORALE:
                             NormalDialog(
-                                cMoraleInfo[MORALE_INFO_GOOD],
+                                cMoraleInfo[IDX(MORALE_INFO_GOOD)],
                                 NORMAL_DIALOG_QUICK_VIEW,
                                 -1,
                                 -1,
@@ -1622,7 +1623,7 @@ i32 EventWindowHandler(struct tag_message& msg) {
                             break;
                         case EVENT_WINDOW_BAD_MORALE:
                             NormalDialog(
-                                cMoraleInfo[MORALE_INFO_BAD],
+                                cMoraleInfo[IDX(MORALE_INFO_BAD)],
                                 NORMAL_DIALOG_QUICK_VIEW,
                                 -1,
                                 -1,
@@ -1838,8 +1839,8 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
     playerData* rec;
     i32 savedRemoteOn;
     i32 numAlive;
-    char unusedTextA_c[CHECK_END_GAME_TEXT_BUFFER_SIZE];
-    char unusedTextB_c[CHECK_END_GAME_TEXT_BUFFER_SIZE];
+    char unusedTextA_c[IDX(CHECK_END_GAME_TEXT_BUFFER_SIZE)];
+    char unusedTextB_c[IDX(CHECK_END_GAME_TEXT_BUFFER_SIZE)];
     i32 sideBelow_i;
     i32 sideAbove;
     i32 bestGold;
@@ -1849,7 +1850,7 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
     i32 enemyRemaining;
     i32 hasRoland_j;
     i32 hasDwarfTown;
-    char artifactName[CHECK_END_GAME_TEXT_BUFFER_SIZE];
+    char artifactName[IDX(CHECK_END_GAME_TEXT_BUFFER_SIZE)];
     hero* artifactHeroPtr;
     i32 artifactWinnerPerson;
     hero* lossHero;
@@ -2085,11 +2086,11 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
         winnerPlayer = CHECK_END_GAME_NO_PLAYER;
         for (player = 0; player < gpGame->m_playerCount; player++) {
             if ((gbHumanPlayer[player] || gpGame->m_mapHeader.computerAlsoWins)
-                && gpGame->m_players[player].m_resources[CHECK_END_GAME_GOLD_RESOURCE]
+                && gpGame->m_players[player].m_resources[IDX(CHECK_END_GAME_GOLD_RESOURCE)]
                        >= gpGame->m_mapHeader.victoryConditionValue * CHECK_END_GAME_GOLD_SCALE
-                && gpGame->m_players[player].m_resources[CHECK_END_GAME_GOLD_RESOURCE]
+                && gpGame->m_players[player].m_resources[IDX(CHECK_END_GAME_GOLD_RESOURCE)]
                        >= bestGold) {
-                bestGold = gpGame->m_players[player].m_resources[CHECK_END_GAME_GOLD_RESOURCE];
+                bestGold = gpGame->m_players[player].m_resources[IDX(CHECK_END_GAME_GOLD_RESOURCE)];
                 winnerPlayer = player;
             }
             if (winnerPlayer != CHECK_END_GAME_NO_PLAYER) {
@@ -2499,21 +2500,21 @@ void game::ShowMoraleInfo(hero* h, i32 dialogType) {
 
     mixedUndead4 = 0;
     if (h->m_army.GetMorale(h, h->GetOccupiedTown(), 0) > 0)
-        sprintf(description, cMoraleInfo[MORALE_INFO_GOOD]);
+        sprintf(description, cMoraleInfo[IDX(MORALE_INFO_GOOD)]);
     else {
         if (h->m_army.GetMorale(h, h->GetOccupiedTown(), 0) == 0)
-            sprintf(description, cMoraleInfo[MORALE_INFO_NEUTRAL]);
+            sprintf(description, cMoraleInfo[IDX(MORALE_INFO_NEUTRAL)]);
         else
-            sprintf(description, cMoraleInfo[MORALE_INFO_BAD]);
+            sprintf(description, cMoraleInfo[IDX(MORALE_INFO_BAD)]);
     }
 
-    sprintf(gText, cMoraleInfo[MORALE_INFO_HEADER], description);
+    sprintf(gText, cMoraleInfo[IDX(MORALE_INFO_HEADER)], description);
     modifierStart = strlen(gText);
     if (h->m_army.HasAllUndead()) {
-        strcat(gText, cMoraleInfo[MORALE_INFO_ALL_UNDEAD]);
+        strcat(gText, cMoraleInfo[IDX(MORALE_INFO_ALL_UNDEAD)]);
     } else {
         if (h->m_army.HasSomeUndead() || h->HasArtifact(ARTIFACT_ARM_OF_MARTYR)) {
-            strcat(gText, cMoraleInfo[MORALE_INFO_SOME_UNDEAD]);
+            strcat(gText, cMoraleInfo[IDX(MORALE_INFO_SOME_UNDEAD)]);
             mixedUndead4 = 1;
         }
 
@@ -2530,86 +2531,86 @@ void game::ShowMoraleInfo(hero* h, i32 dialogType) {
             }
             sprintf(
                 description,
-                cMoraleInfo[MORALE_INFO_SAME_ALIGNMENT],
+                cMoraleInfo[IDX(MORALE_INFO_SAME_ALIGNMENT)],
                 gAlignmentNames[alignment_e]
             );
             strcat(gText, description);
         }
         if (homogeneous3 == -1) {
-            sprintf(description, cMoraleInfo[MORALE_INFO_THREE_ALIGNMENTS]);
+            sprintf(description, cMoraleInfo[IDX(MORALE_INFO_THREE_ALIGNMENTS)]);
             strcat(gText, description);
         }
         if (homogeneous3 == -2) {
-            sprintf(description, cMoraleInfo[MORALE_INFO_FOUR_ALIGNMENTS]);
+            sprintf(description, cMoraleInfo[IDX(MORALE_INFO_FOUR_ALIGNMENTS)]);
             strcat(gText, description);
         }
         if (homogeneous3 == -3) {
-            sprintf(description, cMoraleInfo[MORALE_INFO_FIVE_ALIGNMENTS]);
+            sprintf(description, cMoraleInfo[IDX(MORALE_INFO_FIVE_ALIGNMENTS)]);
             strcat(gText, description);
         }
 
         if (h->GetOccupiedTown() != 0 && h->GetOccupiedTown()->m_type == FACTION_BARBARIAN
             && (h->GetOccupiedTown()->m_buildings & TOWN_BUILDING_COLISEUM)) {
-            strcat(gText, cMoraleInfo[MORALE_INFO_COLISEUM]);
+            strcat(gText, cMoraleInfo[IDX(MORALE_INFO_COLISEUM)]);
         }
         if (h->GetOccupiedTown() != 0
             && (h->GetOccupiedTown()->m_buildings & TOWN_BUILDING_TAVERN)) {
-            strcat(gText, cMoraleInfo[MORALE_INFO_TAVERN]);
+            strcat(gText, cMoraleInfo[IDX(MORALE_INFO_TAVERN)]);
         }
 
         if (h->HasArtifact(ARTIFACT_MEDAL_OF_VALOR)) {
-            strcat(gText, cMoraleInfo[MORALE_INFO_MEDAL_OF_VALOR]);
+            strcat(gText, cMoraleInfo[IDX(MORALE_INFO_MEDAL_OF_VALOR)]);
         }
         if (h->HasArtifact(ARTIFACT_MEDAL_OF_COURAGE)) {
-            strcat(gText, cMoraleInfo[MORALE_INFO_MEDAL_OF_COURAGE]);
+            strcat(gText, cMoraleInfo[IDX(MORALE_INFO_MEDAL_OF_COURAGE)]);
         }
         if (h->HasArtifact(ARTIFACT_MEDAL_OF_HONOR)) {
-            strcat(gText, cMoraleInfo[MORALE_INFO_MEDAL_OF_HONOR]);
+            strcat(gText, cMoraleInfo[IDX(MORALE_INFO_MEDAL_OF_HONOR)]);
         }
         if (h->HasArtifact(ARTIFACT_MEDAL_OF_DISTINCTION)) {
-            strcat(gText, cMoraleInfo[MORALE_INFO_MEDAL_OF_DISTINCTION]);
+            strcat(gText, cMoraleInfo[IDX(MORALE_INFO_MEDAL_OF_DISTINCTION)]);
         }
         if (h->HasArtifact(ARTIFACT_FIZBIN_OF_MISFORTUNE)) {
-            strcat(gText, cMoraleInfo[MORALE_INFO_FIZBIN]);
+            strcat(gText, cMoraleInfo[IDX(MORALE_INFO_FIZBIN)]);
         }
-        if (h->m_eventFlags & HERO_EVENT_BUOY) {
-            strcat(gText, cMoraleInfo[MORALE_INFO_BUOY]);
+        if (HAS(h->m_eventFlags, HERO_EVENT_BUOY)) {
+            strcat(gText, cMoraleInfo[IDX(MORALE_INFO_BUOY)]);
         }
-        if (h->m_eventFlags & HERO_EVENT_OASIS) {
-            strcat(gText, cMoraleInfo[MORALE_INFO_OASIS]);
+        if (HAS(h->m_eventFlags, HERO_EVENT_OASIS)) {
+            strcat(gText, cMoraleInfo[IDX(MORALE_INFO_OASIS)]);
         }
-        if (h->m_eventFlags & HERO_EVENT_TEMPLE) {
-            strcat(gText, cMoraleInfo[MORALE_INFO_TEMPLE]);
+        if (HAS(h->m_eventFlags, HERO_EVENT_TEMPLE)) {
+            strcat(gText, cMoraleInfo[IDX(MORALE_INFO_TEMPLE)]);
         }
-        if (h->m_eventFlags & HERO_EVENT_GRAVEYARD) {
-            strcat(gText, cMoraleInfo[MORALE_INFO_GRAVEYARD]);
+        if (HAS(h->m_eventFlags, HERO_EVENT_GRAVEYARD)) {
+            strcat(gText, cMoraleInfo[IDX(MORALE_INFO_GRAVEYARD)]);
         }
-        if (h->m_eventFlags & HERO_EVENT_SHIPWRECK) {
-            strcat(gText, cMoraleInfo[MORALE_INFO_SHIPWRECK]);
+        if (HAS(h->m_eventFlags, HERO_EVENT_SHIPWRECK)) {
+            strcat(gText, cMoraleInfo[IDX(MORALE_INFO_SHIPWRECK)]);
         }
-        if (h->m_eventFlags & HERO_EVENT_WATERING_HOLE) {
-            strcat(gText, cMoraleInfo[MORALE_INFO_WATERING_HOLE]);
+        if (HAS(h->m_eventFlags, HERO_EVENT_WATERING_HOLE)) {
+            strcat(gText, cMoraleInfo[IDX(MORALE_INFO_WATERING_HOLE)]);
         }
-        if (h->m_eventFlags & HERO_EVENT_DERELICT_SHIP) {
-            strcat(gText, cMoraleInfo[MORALE_INFO_DERELICT_SHIP]);
+        if (HAS(h->m_eventFlags, HERO_EVENT_DERELICT_SHIP)) {
+            strcat(gText, cMoraleInfo[IDX(MORALE_INFO_DERELICT_SHIP)]);
         }
-        if (h->m_secondarySkills[HERO_SKILL_LEADERSHIP] == HERO_SKILL_LEVEL_BASIC) {
-            strcat(gText, cMoraleInfo[MORALE_INFO_BASIC_LEADERSHIP]);
+        if (h->m_secondarySkills[IDX(HERO_SKILL_LEADERSHIP)] == HERO_SKILL_LEVEL_BASIC) {
+            strcat(gText, cMoraleInfo[IDX(MORALE_INFO_BASIC_LEADERSHIP)]);
         }
-        if (h->m_secondarySkills[HERO_SKILL_LEADERSHIP] == HERO_SKILL_LEVEL_ADVANCED) {
-            strcat(gText, cMoraleInfo[MORALE_INFO_ADVANCED_LEADERSHIP]);
+        if (h->m_secondarySkills[IDX(HERO_SKILL_LEADERSHIP)] == HERO_SKILL_LEVEL_ADVANCED) {
+            strcat(gText, cMoraleInfo[IDX(MORALE_INFO_ADVANCED_LEADERSHIP)]);
         }
-        if (h->m_secondarySkills[HERO_SKILL_LEADERSHIP] == HERO_SKILL_LEVEL_EXPERT) {
-            strcat(gText, cMoraleInfo[MORALE_INFO_EXPERT_LEADERSHIP]);
+        if (h->m_secondarySkills[IDX(HERO_SKILL_LEADERSHIP)] == HERO_SKILL_LEVEL_EXPERT) {
+            strcat(gText, cMoraleInfo[IDX(MORALE_INFO_EXPERT_LEADERSHIP)]);
         }
-        if (h->HasArtifact(ARTIFACT_MASTHEAD) && (h->m_eventFlags & HERO_EVENT_EMBARKED)) {
-            strcat(gText, cMoraleInfo[MORALE_INFO_MASTHEAD]);
+        if (h->HasArtifact(ARTIFACT_MASTHEAD) && HAS(h->m_eventFlags, HERO_EVENT_EMBARKED)) {
+            strcat(gText, cMoraleInfo[IDX(MORALE_INFO_MASTHEAD)]);
         }
         if (h->HasArtifact(ARTIFACT_BATTLE_GARB)) {
-            strcat(gText, cMoraleInfo[MORALE_INFO_BATTLE_GARB]);
+            strcat(gText, cMoraleInfo[IDX(MORALE_INFO_BATTLE_GARB)]);
         }
         if (static_cast<i32>(strlen(gText)) == modifierStart) {
-            strcat(gText, cMoraleInfo[MORALE_INFO_NONE]);
+            strcat(gText, cMoraleInfo[IDX(MORALE_INFO_NONE)]);
         }
     }
 
@@ -2623,49 +2624,49 @@ void game::ShowLuckInfo(hero* h, i32 dialogType) {
     i32 modifierStart;
 
     if (gpGame->GetLuck(h, 0, h->GetOccupiedTown()) > 0)
-        sprintf(description, cLuckInfo[LUCK_INFO_GOOD]);
+        sprintf(description, cLuckInfo[IDX(LUCK_INFO_GOOD)]);
     else {
         if (gpGame->GetLuck(h, 0, h->GetOccupiedTown()) == 0)
-            sprintf(description, cLuckInfo[LUCK_INFO_NEUTRAL]);
+            sprintf(description, cLuckInfo[IDX(LUCK_INFO_NEUTRAL)]);
         else
-            sprintf(description, cLuckInfo[LUCK_INFO_BAD]);
+            sprintf(description, cLuckInfo[IDX(LUCK_INFO_BAD)]);
     }
 
-    sprintf(gText, cLuckInfo[LUCK_INFO_HEADER], description);
+    sprintf(gText, cLuckInfo[IDX(LUCK_INFO_HEADER)], description);
     modifierStart = strlen(gText);
     if (h->GetOccupiedTown() != 0 && h->GetOccupiedTown()->m_type == FACTION_SORCERESS
         && (h->GetOccupiedTown()->m_buildings & TOWN_BUILDING_RAINBOW))
-        strcat(gText, cLuckInfo[LUCK_INFO_RAINBOW]);
+        strcat(gText, cLuckInfo[IDX(LUCK_INFO_RAINBOW)]);
     if (h->HasArtifact(ARTIFACT_RABBIT_FOOT))
-        strcat(gText, cLuckInfo[LUCK_INFO_RABBIT_FOOT]);
+        strcat(gText, cLuckInfo[IDX(LUCK_INFO_RABBIT_FOOT)]);
     if (h->HasArtifact(ARTIFACT_GOLDEN_HORSESHOE))
-        strcat(gText, cLuckInfo[LUCK_INFO_HORSESHOE]);
+        strcat(gText, cLuckInfo[IDX(LUCK_INFO_HORSESHOE)]);
     if (h->HasArtifact(ARTIFACT_GAMBLERS_COIN))
-        strcat(gText, cLuckInfo[LUCK_INFO_LUCKY_COIN]);
+        strcat(gText, cLuckInfo[IDX(LUCK_INFO_LUCKY_COIN)]);
     if (h->HasArtifact(ARTIFACT_FOUR_LEAF_CLOVER))
-        strcat(gText, cLuckInfo[LUCK_INFO_CLOVER]);
-    if (h->m_eventFlags & HERO_EVENT_FAERIE_RING)
-        strcat(gText, cLuckInfo[LUCK_INFO_FAERIE_RING]);
-    if (h->m_eventFlags & HERO_EVENT_IDOL)
-        strcat(gText, cLuckInfo[LUCK_INFO_IDOL]);
-    if (h->m_eventFlags & HERO_EVENT_FOUNTAIN)
-        strcat(gText, cLuckInfo[LUCK_INFO_FOUNTAIN]);
-    if (h->m_eventFlags & HERO_EVENT_PYRAMID)
-        strcat(gText, cLuckInfo[LUCK_INFO_PYRAMID]);
-    if (h->m_secondarySkills[HERO_SKILL_LUCK] == HERO_SKILL_LEVEL_BASIC)
-        strcat(gText, cLuckInfo[LUCK_INFO_BASIC_SKILL]);
-    if (h->m_secondarySkills[HERO_SKILL_LUCK] == HERO_SKILL_LEVEL_ADVANCED)
-        strcat(gText, cLuckInfo[LUCK_INFO_ADVANCED_SKILL]);
-    if (h->m_secondarySkills[HERO_SKILL_LUCK] == HERO_SKILL_LEVEL_EXPERT)
-        strcat(gText, cLuckInfo[LUCK_INFO_EXPERT_SKILL]);
-    if (h->HasArtifact(ARTIFACT_MASTHEAD) && (h->m_eventFlags & HERO_EVENT_EMBARKED))
-        strcat(gText, cLuckInfo[LUCK_INFO_MASTHEAD]);
-    if (h->m_eventFlags & HERO_EVENT_MERMAID)
-        strcat(gText, cLuckInfo[LUCK_INFO_MERMAID]);
+        strcat(gText, cLuckInfo[IDX(LUCK_INFO_CLOVER)]);
+    if (HAS(h->m_eventFlags, HERO_EVENT_FAERIE_RING))
+        strcat(gText, cLuckInfo[IDX(LUCK_INFO_FAERIE_RING)]);
+    if (HAS(h->m_eventFlags, HERO_EVENT_IDOL))
+        strcat(gText, cLuckInfo[IDX(LUCK_INFO_IDOL)]);
+    if (HAS(h->m_eventFlags, HERO_EVENT_FOUNTAIN))
+        strcat(gText, cLuckInfo[IDX(LUCK_INFO_FOUNTAIN)]);
+    if (HAS(h->m_eventFlags, HERO_EVENT_PYRAMID))
+        strcat(gText, cLuckInfo[IDX(LUCK_INFO_PYRAMID)]);
+    if (h->m_secondarySkills[IDX(HERO_SKILL_LUCK)] == HERO_SKILL_LEVEL_BASIC)
+        strcat(gText, cLuckInfo[IDX(LUCK_INFO_BASIC_SKILL)]);
+    if (h->m_secondarySkills[IDX(HERO_SKILL_LUCK)] == HERO_SKILL_LEVEL_ADVANCED)
+        strcat(gText, cLuckInfo[IDX(LUCK_INFO_ADVANCED_SKILL)]);
+    if (h->m_secondarySkills[IDX(HERO_SKILL_LUCK)] == HERO_SKILL_LEVEL_EXPERT)
+        strcat(gText, cLuckInfo[IDX(LUCK_INFO_EXPERT_SKILL)]);
+    if (h->HasArtifact(ARTIFACT_MASTHEAD) && HAS(h->m_eventFlags, HERO_EVENT_EMBARKED))
+        strcat(gText, cLuckInfo[IDX(LUCK_INFO_MASTHEAD)]);
+    if (HAS(h->m_eventFlags, HERO_EVENT_MERMAID))
+        strcat(gText, cLuckInfo[IDX(LUCK_INFO_MERMAID)]);
     if (h->HasArtifact(ARTIFACT_BATTLE_GARB))
-        strcat(gText, cLuckInfo[LUCK_INFO_BATTLE_GARB]);
+        strcat(gText, cLuckInfo[IDX(LUCK_INFO_BATTLE_GARB)]);
     if (static_cast<i32>(strlen(gText)) == modifierStart)
-        strcat(gText, cLuckInfo[LUCK_INFO_NONE]);
+        strcat(gText, cLuckInfo[IDX(LUCK_INFO_NONE)]);
 
     NormalDialog(gText, dialogType, -1, -1, -1, 0, -1, 0, -1, 0);
 }
@@ -2692,14 +2693,14 @@ i32 GetMonType(i32 score, i32 campaign) {
     i32 idx;
     for (idx = CREATURE_COUNT - 1; idx >= 0; idx--) {
         if (campaign == HIGH_SCORE_CAMPAIGN || campaign == HIGH_SCORE_EXPANSION_CAMPAIGN) {
-            if (giScoreCampaignMon[idx][MONSTER_SCORE_THRESHOLD] >= score)
-                return giScoreCampaignMon[idx][MONSTER_SCORE_TYPE];
+            if (giScoreCampaignMon[idx][IDX(MONSTER_SCORE_THRESHOLD)] >= score)
+                return giScoreCampaignMon[idx][IDX(MONSTER_SCORE_TYPE)];
         } else {
-            if (giScoreMon[idx][MONSTER_SCORE_THRESHOLD] <= score)
-                return giScoreMon[idx][MONSTER_SCORE_TYPE];
+            if (giScoreMon[idx][IDX(MONSTER_SCORE_THRESHOLD)] <= score)
+                return giScoreMon[idx][IDX(MONSTER_SCORE_TYPE)];
         }
     }
-    return giScoreMon[0][MONSTER_SCORE_TYPE];
+    return giScoreMon[0][IDX(MONSTER_SCORE_TYPE)];
 }
 
 VA(0x0049ce14, 0x4ac)
@@ -2793,7 +2794,7 @@ void BVResMsg(char* s, i32 res, i32 qty) {
 
 VA(0x0049d326, 0x2d)
 void GOut(char* str) {
-    if (gpAdvManager->m_active == 1)
+    if (gpAdvManager->m_active)
         AiPrint(str);
 }
 
@@ -2956,7 +2957,7 @@ void PopNetBox(char* text, i32 netPlayer) {
                 switch (remoteData_g->command) {
                     case NET_BOX_REMOTE_MAP_CHANGE:
                         gbLeaveNetBoxAlone = 1;
-                        if (gpAdvManager->m_active == 1) {
+                        if (gpAdvManager->m_active) {
                             bShowIt = savedShowIt_a;
                             gpAdvManager->ProcessIncomingGroupMapChange(remoteData_g->payload.data);
                             bShowIt = 1;
@@ -3419,9 +3420,8 @@ void EarlyShutDownSystem(void) {}
 
 VA(0x0049eb90, 0x75)
 i32 GameUnsaved(void) {
-    if ((gpAdvManager && gpAdvManager->m_active == 1)
-        || (gpCombatManager && gpCombatManager->m_active == 1)
-        || (gpTownManager && gpTownManager->m_active == 1))
+    if ((gpAdvManager && gpAdvManager->m_active) || (gpCombatManager && gpCombatManager->m_active)
+        || (gpTownManager && gpTownManager->m_active))
         return 1;
     else
         return 0;
@@ -3482,7 +3482,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
                 "Are you sure you want to load a new game?  (Your current game will be lost)"
             );
         confirmMenuCommand:
-            if (gpAdvManager->m_active == 1) {
+            if (gpAdvManager->m_active) {
                 NormalDialog(gText, APP_MENU_CONFIRM_DIALOG, -1, -1, -1, 0, -1, 0, -1, 0);
                 if (gpWindowManager->m_dialogResult != APP_MENU_CONFIRM_OK)
                     break;
@@ -4675,8 +4675,7 @@ void NormalDialog(
             if (resourceValue_l[resourceSlot_n] < 1) {
                 if (resourceValue_l[resourceSlot_n] == 0) {
                     strcpy(resourceText_e[resourceSlot_n], "");
-                } else if (resourceValue_l[resourceSlot_n]
-                           < -NORMAL_DIALOG_DAILY_RESOURCE_OFFSET) {
+                } else if (resourceValue_l[resourceSlot_n] < -NORMAL_DIALOG_DAILY_RESOURCE_OFFSET) {
                     sprintf(
                         resourceText_e[resourceSlot_n],
                         "%d",
@@ -5802,7 +5801,7 @@ DATA(0x004fab48) i32
         {30, 10, 30, 10, 10, 10, 10000}
 };
 DATA(0x004fabd8) i32 gMineCharacteristics[MINE_CHARACTERISTIC_COUNT] = {2, 1, 2, 1, 1, 1, 1000, 0};
-DATA(0x004fabf8) i32 gSSValues[HERO_SKILL_COUNT][SECONDARY_SKILL_VALUE_LEVEL_COUNT] = {
+DATA(0x004fabf8) i32 gSSValues[IDX(HERO_SKILL_COUNT)][SECONDARY_SKILL_VALUE_LEVEL_COUNT] = {
     {400, 750, 1000},
     {200, 450, 850},
     {450, 1000, 1675},
@@ -5840,7 +5839,7 @@ DATA(0x004fad08) i32 gArtifactBaseRV[KB_ARTIFACT_BASE_VALUE_COUNT] = {
 DATA(0x004faea4) i32 gUltArtifactAvgValue = 16500;
 DATA(0x004faea8) i32 giDebugLevel = 0;
 DATA(0x004faeac) i8 giVisRangeTown = 5;
-DATA(0x004faeb0) tag_monsterInfo gMonsterDatabase[CREATURE_COUNT] = {
+DATA(0x004faeb0) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
     {{20, 33}, 17, 12, 1, 0, 2, 1, 1, 1, 1, 0, "psnt", 0},
     {{150, 312}, 21, 8, 10, 0, 2, 5, 3, 2, 3, 12, "arch", MONSTER_ATTRIBUTE_RANGED},
     {{200, 463}, 23, 8, 10, 0, 4, 5, 3, 2, 3, 24, "arch", MONSTER_ATTRIBUTE_RANGED},
@@ -6115,7 +6114,7 @@ DATA(0x004fb7e0) u8 giCloudType[KB_CLOUD_MASK_COUNT] = {
     0x0b, 0x07, 0x08, 0x81, 0x09, 0x0a, 0x70, 0x7f, 0x6c, 0x0d, 0x1e, 0x1f, 0x0e, 0x03, 0x01, 0x10,
     0x0b, 0x07, 0x08, 0x73, 0x09, 0x0a, 0x72, 0x67, 0x6c, 0x0f, 0x1e, 0x05, 0x0e, 0x03, 0x01, 0x00
 };
-DATA(0x004fb8e0) i16 giScoreMon[CREATURE_COUNT][MONSTER_SCORE_FIELD_COUNT] = {
+DATA(0x004fb8e0) i16 giScoreMon[IDX(CREATURE_COUNT)][IDX(MONSTER_SCORE_FIELD_COUNT)] = {
     {0, 0},    {4, 11},   {8, 20},   {12, 38},  {16, 29},  {20, 57},  {24, 47},  {28, 12},
     {32, 48},  {36, 1},   {40, 2},   {44, 39},  {48, 21},  {52, 49},  {56, 13},  {60, 23},
     {64, 30},  {68, 3},   {72, 24},  {76, 22},  {80, 58},  {84, 4},   {88, 14},  {92, 50},
@@ -6126,7 +6125,7 @@ DATA(0x004fb8e0) i16 giScoreMon[CREATURE_COUNT][MONSTER_SCORE_FIELD_COUNT] = {
     {201, 60}, {204, 10}, {207, 19}, {210, 45}, {213, 28}, {216, 56}, {219, 35}, {222, 36},
     {225, 46}, {228, 37}
 };
-DATA(0x004fb9e8) i16 giScoreCampaignMon[CREATURE_COUNT][MONSTER_SCORE_FIELD_COUNT] = {
+DATA(0x004fb9e8) i16 giScoreCampaignMon[IDX(CREATURE_COUNT)][IDX(MONSTER_SCORE_FIELD_COUNT)] = {
     {9999, 0},  {5800, 11}, {5600, 20}, {5400, 38}, {5200, 29}, {5000, 57}, {4800, 47}, {4600, 12},
     {4400, 48}, {4200, 1},  {4000, 2},  {3800, 39}, {3600, 21}, {3400, 49}, {3200, 13}, {3000, 23},
     {2800, 30}, {2600, 3},  {2400, 24}, {2200, 22}, {2000, 58}, {1900, 4},  {1800, 14}, {1700, 50},
@@ -6137,7 +6136,7 @@ DATA(0x004fb9e8) i16 giScoreCampaignMon[CREATURE_COUNT][MONSTER_SCORE_FIELD_COUN
     {480, 60},  {460, 10},  {440, 19},  {420, 45},  {400, 28},  {380, 56},  {360, 35},  {340, 36},
     {320, 46},  {300, 37}
 };
-DATA(0x004fbaf0) i8 townTheme[TOWN_MUSIC_TABLE_SIZE] = {
+DATA(0x004fbaf0) i8 townTheme[IDX(TOWN_MUSIC_TABLE_SIZE)] = {
     TOWN_MUSIC_KNIGHT,
     TOWN_MUSIC_BARBARIAN,
     TOWN_MUSIC_WARLOCK,
@@ -6148,7 +6147,7 @@ DATA(0x004fbaf0) i8 townTheme[TOWN_MUSIC_TABLE_SIZE] = {
     TOWN_MUSIC_NONE
 };
 DATA(0x004fbaf8) i8
-    gHeroSkillBonus[FACTION_COUNT][KB_HERO_LEVEL_BAND_COUNT][HERO_PRIMARY_STAT_COUNT] = {
+    gHeroSkillBonus[IDX(FACTION_COUNT)][KB_HERO_LEVEL_BAND_COUNT][HERO_PRIMARY_STAT_COUNT] = {
         {{35, 45, 10, 10}, {25, 25, 25, 25}},
         {{55, 35, 5, 5}, {25, 25, 25, 25}},
         {{10, 10, 30, 50}, {20, 20, 30, 30}},
@@ -6249,7 +6248,7 @@ DATA(0x004fbd50) void* hmnuDflt = 0;
 DATA(0x004fbd54) void* hmnuCmbt = 0;
 DATA(0x004fbd58) void* hmnuAdv = 0;
 DATA(0x004fbd5c) void* hmnuTown = 0;
-DATA(0x004fbd60) char* cMonFilename[CREATURE_COUNT] = {
+DATA(0x004fbd60) char* cMonFilename[IDX(CREATURE_COUNT)] = {
     "peasant.icn",  "archer.icn",   "archer2.icn",  "pikeman.icn",  "pikeman2.icn", "swordsmn.icn",
     "swordsm2.icn", "cavalryr.icn", "cavalryb.icn", "paladin.icn",  "paladin2.icn", "goblin.icn",
     "orc.icn",      "orc2.icn",     "wolf.icn",     "ogre.icn",     "ogre2.icn",    "troll.icn",
@@ -6265,7 +6264,7 @@ DATA(0x004fbd60) char* cMonFilename[CREATURE_COUNT] = {
 DATA(0x004fbe68) i32 gbProcessingCombatAction = 0;
 DATA(0x004fbe6c) i32 iMPNetProtocol = 0;
 DATA(0x004fbe70) i32 iLastDiffSendTo = -2;
-DATA(0x004fbe78) SSpellInfo gsSpellInfo[SPELL_COUNT] = {
+DATA(0x004fbe78) SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)] = {
     {"fireball",
      3,
      8,
@@ -6633,7 +6632,7 @@ DATA(0x004fbe78) SSpellInfo gsSpellInfo[SPELL_COUNT] = {
     {"", 4, 54, 0, 700, 15, {0, 0, 0, 0, 0, 0}, SPELL_INFO_ATTRIBUTE_ADVENTURE},
     {"", 4, 55, 0, 700, 15, {0, 0, 0, 0, 0, 0}, SPELL_INFO_ATTRIBUTE_ADVENTURE}
 };
-DATA(0x004fc410) char* cArmyFrameFileNames[CREATURE_COUNT] = {
+DATA(0x004fc410) char* cArmyFrameFileNames[IDX(CREATURE_COUNT)] = {
     "peas_frm.bin", "archrfrm.bin", "archrfrm.bin", "pikmnfrm.bin", "pikmnfrm.bin", "swrdsfrm.bin",
     "swrdsfrm.bin", "cvlryfrm.bin", "cvlr2frm.bin", "paladfrm.bin", "paladfrm.bin", "goblnfrm.bin",
     "orc__frm.bin", "orc__frm.bin", "wolf_frm.bin", "ogre_frm.bin", "ogre_frm.bin", "trollfrm.bin",
@@ -6718,13 +6717,13 @@ DATA(0x004fc5b8) struct SCmbtObstacle sCmbtObstacles[KB_COMBAT_OBSTACLE_COUNT] =
     {0x00000002, 3, 1, {0, 0, 0, 0, 0, 0, 0, 0}}, {0x00000010, 1, 1, {0, 0, 0, 0, 0, 0, 0, 0}},
     {0x00000000, 1, 2, {0, 1, 0, 0, 0, 0, 0, 0}}, {0x00000010, 2, 2, {0, 1, 0, 0, 0, 0, 0, 0}}
 };
-DATA(0x004fc778) i32 gEstatesGoldLevel[HERO_SKILL_LEVEL_COUNT] = {0, 100, 250, 500};
-DATA(0x004fc788) float gfSSLogisticsMod[HERO_SKILL_LEVEL_COUNT] = {1.0f, 1.1f, 1.2f, 1.3f};
-DATA(0x004fc798) float gfSSNavigationMod[HERO_SKILL_LEVEL_COUNT] = {1.0f, 1.33f, 1.66f, 2.0f};
-DATA(0x004fc7a8) float gfSSArcheryMod[HERO_SKILL_LEVEL_COUNT] = {1.0f, 1.1f, 1.25f, 1.5f};
-DATA(0x004fc7b8) float gfSSAIArcheryMod[HERO_SKILL_LEVEL_COUNT] = {1.0f, 1.04f, 1.1f, 1.2f};
-DATA(0x004fc7c8) i8 giVisRange[HERO_SKILL_LEVEL_COUNT] = {4, 5, 6, 7};
-DATA(0x004fc7d0) u8 gStartingHeroStats[FACTION_COUNT][HERO_STARTING_STAT_COUNT] = {
+DATA(0x004fc778) i32 gEstatesGoldLevel[IDX(HERO_SKILL_LEVEL_COUNT)] = {0, 100, 250, 500};
+DATA(0x004fc788) float gfSSLogisticsMod[IDX(HERO_SKILL_LEVEL_COUNT)] = {1.0f, 1.1f, 1.2f, 1.3f};
+DATA(0x004fc798) float gfSSNavigationMod[IDX(HERO_SKILL_LEVEL_COUNT)] = {1.0f, 1.33f, 1.66f, 2.0f};
+DATA(0x004fc7a8) float gfSSArcheryMod[IDX(HERO_SKILL_LEVEL_COUNT)] = {1.0f, 1.1f, 1.25f, 1.5f};
+DATA(0x004fc7b8) float gfSSAIArcheryMod[IDX(HERO_SKILL_LEVEL_COUNT)] = {1.0f, 1.04f, 1.1f, 1.2f};
+DATA(0x004fc7c8) i8 giVisRange[IDX(HERO_SKILL_LEVEL_COUNT)] = {4, 5, 6, 7};
+DATA(0x004fc7d0) u8 gStartingHeroStats[IDX(FACTION_COUNT)][HERO_STARTING_STAT_COUNT] = {
     {2, 2, 1, 1, 1},
     {3, 1, 1, 1, 1},
     {0, 0, 2, 3, 1},
@@ -6733,32 +6732,31 @@ DATA(0x004fc7d0) u8 gStartingHeroStats[FACTION_COUNT][HERO_STARTING_STAT_COUNT] 
     {1, 0, 2, 2, 1}
 };
 DATA(0x004fc7f0) i32
-    giTerrainCost[KB_TERRAIN_TYPE_COUNT][HERO_SKILL_LEVEL_COUNT][KB_TERRAIN_STEP_TYPE_COUNT] = {
-        {{100, 150}, {100, 150}, {100, 150}, {100, 150}},
-        {{100, 150}, {100, 150}, {100, 150}, {100, 150}},
-        {{150, 225}, {125, 187}, {100, 150}, {100, 150}},
-        {{175, 262}, {150, 225}, {125, 187}, {100, 150}},
-        {{100, 150}, {100, 150}, {100, 150}, {100, 150}},
-        {{200, 300}, {175, 262}, {150, 225}, {100, 150}},
-        {{100, 150}, {100, 150}, {100, 150}, {100, 150}},
-        {{125, 187}, {100, 150}, {100, 150}, {100, 150}},
-        {{125, 187}, {100, 150}, {100, 150}, {100, 150}},
-        {{75, 112}, {75, 112}, {75, 112}, {75, 112}}
-};
+    giTerrainCost[KB_TERRAIN_TYPE_COUNT][IDX(HERO_SKILL_LEVEL_COUNT)][KB_TERRAIN_STEP_TYPE_COUNT] =
+        {{{100, 150}, {100, 150}, {100, 150}, {100, 150}},
+         {{100, 150}, {100, 150}, {100, 150}, {100, 150}},
+         {{150, 225}, {125, 187}, {100, 150}, {100, 150}},
+         {{175, 262}, {150, 225}, {125, 187}, {100, 150}},
+         {{100, 150}, {100, 150}, {100, 150}, {100, 150}},
+         {{200, 300}, {175, 262}, {150, 225}, {100, 150}},
+         {{100, 150}, {100, 150}, {100, 150}, {100, 150}},
+         {{125, 187}, {100, 150}, {100, 150}, {100, 150}},
+         {{125, 187}, {100, 150}, {100, 150}, {100, 150}},
+         {{75, 112}, {75, 112}, {75, 112}, {75, 112}}};
 DATA(0x004fc930) u8 bStopOnTrigger[KB_TRIGGER_TYPE_COUNT] = {
     0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0,
     1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0,
     0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0
 };
-DATA(0x004fc9b0) char* gTownPrefixNames[FACTION_COUNT] =
+DATA(0x004fc9b0) char* gTownPrefixNames[IDX(FACTION_COUNT)] =
     {"twnk", "twnb", "twns", "twnw", "twnz", "twnn"};
 DATA(0x004fc9c8) char* gTownObjNames[KB_TOWN_OBJECT_NAME_COUNT] = {
     "mage", "thie", "tvrn", "dock", "well", "tent", "cstl", "stat", "ltur", "rtur", "mark",
     "wel2", "moat", "spec", "boat", "capt", "ext0", "ext1", "ext2", "dw_0", "dw_1", "dw_2",
     "dw_3", "dw_4", "dw_5", "up_1", "up_2", "up_3", "up_4", "up_5", "up5b", "ext3"
 };
-DATA(0x004fca48) i8 gDwellingType[FACTION_COUNT][KB_DWELLING_TYPE_COUNT] = {
+DATA(0x004fca48) i8 gDwellingType[IDX(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT] = {
     {CREATURE_PEASANT,
      CREATURE_ARCHER,
      CREATURE_PIKEMAN,
@@ -6840,7 +6838,7 @@ DATA(0x004fca90) i32 gMageBuildingCosts[KB_MAGE_GUILD_LEVEL_COUNT][KB_BUILDING_R
     {5, 8, 5, 8, 8, 8, 1000},
     {5, 10, 5, 10, 10, 10, 1000}
 };
-DATA(0x004fcb38) i32 gSpecialBuildingCosts[FACTION_COUNT][KB_BUILDING_RESOURCE_COUNT] = {
+DATA(0x004fcb38) i32 gSpecialBuildingCosts[IDX(FACTION_COUNT)][KB_BUILDING_RESOURCE_COUNT] = {
     {5, 0, 15, 0, 0, 0, 1500},
     {10, 0, 10, 0, 0, 0, 2000},
     {0, 0, 0, 0, 10, 0, 1500},
@@ -6871,8 +6869,8 @@ DATA(0x004fcdb8) i32 gNeutralBaseResourceValues[BUILDING_SLOT_DWELLING_FIRST + 1
     5000, 300, 350, 2000, 3000, 0, 12000, 2500, 1500, 1500, 200, 1000, 500, 0, 0, 1100, 0, 0, 0, 0
 };
 DATA(0x004fce08) i32
-    gSpecialBuildingBaseResourceValues[FACTION_COUNT] = {1500, 1000, 1000, 4500, 3500, 1000};
-DATA(0x004fce20) i32 gDwellingBaseResourceValues[FACTION_COUNT][KB_DWELLING_TYPE_COUNT] = {
+    gSpecialBuildingBaseResourceValues[IDX(FACTION_COUNT)] = {1500, 1000, 1000, 4500, 3500, 1000};
+DATA(0x004fce20) i32 gDwellingBaseResourceValues[IDX(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT] = {
     {858, 2225, 2816, 7385, 13754, 29785, 4000, 3200, 8000, 16000, 40000, 0},
     {1802, 2615, 3414, 6967, 13212, 38141, 3500, 0, 8000, 16000, 0, 0},
     {1684, 3000, 3500, 7213, 15181, 27684, 4000, 4000, 12000, 0, 0, 0},
@@ -6881,7 +6879,7 @@ DATA(0x004fce20) i32 gDwellingBaseResourceValues[FACTION_COUNT][KB_DWELLING_TYPE
     {2200, 2100, 3800, 6000, 9500, 90000, 3000, 4900, 15000, 12000, 0, 0}
 };
 DATA(0x004fcf40) i32
-    gDwellingCosts[FACTION_COUNT][KB_DWELLING_TYPE_COUNT][KB_BUILDING_RESOURCE_COUNT] = {
+    gDwellingCosts[IDX(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT][KB_BUILDING_RESOURCE_COUNT] = {
         {{0, 0, 0, 0, 0, 0, 200},
          {0, 0, 0, 0, 0, 0, 1000},
          {0, 0, 5, 0, 0, 0, 1000},
@@ -6955,7 +6953,7 @@ DATA(0x004fcf40) i32
          {0, 0, 0, 0, 0, 0, 0},
          {0, 0, 0, 0, 0, 0, 0}}
 };
-DATA(0x004fd720) u32l gHierarchyMask[FACTION_COUNT][KB_DWELLING_TYPE_COUNT] = {
+DATA(0x004fd720) u32l gHierarchyMask[IDX(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT] = {
     {0x00000000UL,
      0x00080000UL,
      0x00080010UL,
@@ -7030,14 +7028,15 @@ DATA(0x004fd720) u32l gHierarchyMask[FACTION_COUNT][KB_DWELLING_TYPE_COUNT] = {
      0xffffffffUL}
 };
 DATA(0x004fd840) i32 giDebugBuildingToBuild = -1;
-DATA(0x004fd848) u8 giTerrainToMusicTrack[TERRAIN_COUNT] = {16, 18, 14, 15, 11, 13, 17, 12, 16};
-DATA(0x004fd858) char* cHeroTypeShortName[FACTION_COUNT] =
+DATA(0x004fd848) u8
+    giTerrainToMusicTrack[IDX(TERRAIN_COUNT)] = {16, 18, 14, 15, 11, 13, 17, 12, 16};
+DATA(0x004fd858) char* cHeroTypeShortName[IDX(FACTION_COUNT)] =
     {"kngt", "barb", "sorc", "wrlk", "wzrd", "necr"};
 DATA(0x004fd870) char cHeroTypeInitial[HERO_TYPE_INITIAL_COUNT] = {'k', 'b', 's', 'w', 'z', 'n'};
 DATA(0x004fd878) i32 giDeferObjDrawX = -1;
 DATA(0x004fd87c) i32 giDeferObjDrawY = -1;
 DATA(0x004fd880) class heroWindow* gpInitWin = 0;
-DATA(0x004fd888) u8 iGetSSByAlignment[HERO_SKILL_COUNT][FACTION_COUNT] = {
+DATA(0x004fd888) u8 iGetSSByAlignment[IDX(HERO_SKILL_COUNT)][IDX(FACTION_COUNT)] = {
     {3, 4, 2, 2, 2, 3},
     {2, 3, 3, 1, 1, 1},
     {3, 3, 2, 2, 2, 2},
@@ -7284,7 +7283,7 @@ DATA(0x004fdf50) struct SElevationOverlay sElevationOverlay[ELEVATION_OVERLAY_CO
     {0x0080, {43, 30, 18, 84, 85, 73, 60, -1, -1, -1, -1, -1, -1, -1, -1}},
     {0x0080, {21, 34, 48, 70, 83, 97, 98, -1, -1, -1, -1, -1, -1, -1, -1}}
 };
-DATA(0x004fe100) i8 captainStats[FACTION_COUNT][HERO_PRIMARY_STAT_COUNT] =
+DATA(0x004fe100) i8 captainStats[IDX(FACTION_COUNT)][HERO_PRIMARY_STAT_COUNT] =
     {{1, 1, 1, 1}, {1, 1, 1, 1}, {0, 0, 2, 2}, {0, 0, 2, 2}, {0, 0, 2, 2}, {0, 0, 2, 2}};
 DATA(0x004fe118) i32 gbDrawingPuzzle = 0;
 DATA(0x004fe11c) i32 giWalkingFrom = -1;
@@ -7294,7 +7293,7 @@ DATA(0x004fe128) i32 giWalkingTo2 = -1;
 DATA(0x004fe12c) i32 giWalkingYMod = 0;
 DATA(0x004fe130) u8 moatCell[KB_MOAT_CELL_COUNT] = {8, 21, 33, 46, 58, 72, 85, 99, 112};
 DATA(0x004fe140) SCampaignChoice
-    campaignChoices[CAMPAIGN_SIDE_COUNT][CAMPAIGN_MAP_COUNT][CAMPAIGN_BONUS_CHOICE_COUNT] = {
+    campaignChoices[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT][CAMPAIGN_BONUS_CHOICE_COUNT] = {
         {{{CAMPAIGN_CHOICE_RESOURCE, RES_GOLD, CAMPAIGN_CHOICE_GOLD_BONUS},
           {CAMPAIGN_CHOICE_ARTIFACT, ARTIFACT_THUNDER_MACE, CAMPAIGN_CHOICE_NO_AMOUNT},
           {CAMPAIGN_CHOICE_ARTIFACT, ARTIFACT_ARMORED_GAUNTLETS, CAMPAIGN_CHOICE_NO_AMOUNT}},
@@ -7875,7 +7874,7 @@ DATA(0x004fe7a0) char* gStatDesc[HERO_PRIMARY_STAT_COUNT] = {
 };
 DATA(0x004fe7b0) char* gAlignmentNames[KB_ALIGNMENT_NAME_COUNT] =
     {"Knight", "Barbarian", "Sorceress", "Warlock", "Wizard", "Necromancer", "Multiple", "Random"};
-DATA(0x004fe7d0) char* gArmyShortNames[CREATURE_COUNT] = {
+DATA(0x004fe7d0) char* gArmyShortNames[IDX(CREATURE_COUNT)] = {
     "peasn", "archr", "arch2", "pikmn", "pikm2", "swman", "swma2", "cvlry", "cvlr2", "paldn",
     "pald2", "gobln", "orc__", "orc_2", "Wolf_", "Ogre_", "Ogre2", "Troll", "trol2", "cyclp",
     "sprit", "Dwarf", "dwar2", "elf__", "elf_2", "druid", "drui2", "uncrn", "phoen", "centr",
@@ -7884,7 +7883,7 @@ DATA(0x004fe7d0) char* gArmyShortNames[CREATURE_COUNT] = {
     "Mummy", "mumm2", "vampr", "vamp2", "lich_", "lich2", "boned", "Rogue", "Nomad", "Ghost",
     "Genie", "medus", "eleme", "elema", "elemf", "elemw"
 };
-DATA(0x004fe8d8) char* gArmyNames[CREATURE_COUNT] = {
+DATA(0x004fe8d8) char* gArmyNames[IDX(CREATURE_COUNT)] = {
     "peasant",
     "archer",
     "ranger",
@@ -7952,7 +7951,7 @@ DATA(0x004fe8d8) char* gArmyNames[CREATURE_COUNT] = {
     "fire elemental",
     "water elemental"
 };
-DATA(0x004fe9e0) char* gArmyNamesPlural[CREATURE_COUNT] = {
+DATA(0x004fe9e0) char* gArmyNamesPlural[IDX(CREATURE_COUNT)] = {
     "peasants",
     "archers",
     "rangers",
@@ -8361,7 +8360,7 @@ DATA(0x004fef68) char* onOffText[KB_ON_OFF_TEXT_COUNT] = {
 };
 DATA(0x004fef98) char* walkSpeedText[KB_WALK_SPEED_TEXT_COUNT] =
     {"Walk", "Trot", "Canter", "Gallop", "Jump", 0};
-DATA(0x004fefb0) char* gColors[FACTION_COUNT] =
+DATA(0x004fefb0) char* gColors[IDX(FACTION_COUNT)] =
     {"blue", "green", "red", "yellow", "orange", "purple"};
 DATA(0x004fefc8) char* gMonthNames[KB_MONTH_NAME_COUNT] = {
     "Grasshopper",
@@ -9035,7 +9034,7 @@ DATA(0x004ff918) char* gWellExtraNames[KB_WELL_EXTRA_NAME_COUNT] = {
 };
 DATA(0x004ff938) char* gSpecialBuildingNames[KB_SPECIAL_BUILDING_NAME_COUNT] =
     {"Fortifications", "Coliseum", "Rainbow", "Dungeon", "Library", "Storm", "Special", 0};
-DATA(0x004ff958) char* gDwellingNames[FACTION_COUNT][KB_DWELLING_TYPE_COUNT] = {
+DATA(0x004ff958) char* gDwellingNames[IDX(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT] = {
     {"Thatched Hut",
      "Archery Range",
      "Blacksmith",
@@ -9109,7 +9108,7 @@ DATA(0x004ff958) char* gDwellingNames[FACTION_COUNT][KB_DWELLING_TYPE_COUNT] = {
      "",
      ""}
 };
-DATA(0x004ffa78) char* cSecSkillDesc[HERO_SKILL_COUNT][SECONDARY_SKILL_VALUE_LEVEL_COUNT] = {
+DATA(0x004ffa78) char* cSecSkillDesc[IDX(HERO_SKILL_COUNT)][SECONDARY_SKILL_VALUE_LEVEL_COUNT] = {
     {"{Basic Pathfinding}\n\nBasic Pathfinding reduces the movement penalty for rough "
      "terrain by 25 percent.",
      "{Advanced Pathfinding}\n\nAdvanced Pathfinding reduces the movement penalty for "
@@ -9353,7 +9352,7 @@ DATA(0x004ffd90) char* cCampaignAwards[KB_CAMPAIGN_AWARD_TEXT_COUNT] = {
     "Ultimate crown",
     "Carry over forces"
 };
-DATA(0x004ffdc0) char* cCampaignName[CAMPAIGN_SIDE_COUNT][CAMPAIGN_MAP_COUNT] = {
+DATA(0x004ffdc0) char* cCampaignName[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT] = {
     {"Force of Arms",
      "Annexation",
      "Save the Dwarves",
@@ -9379,7 +9378,7 @@ DATA(0x004ffdc0) char* cCampaignName[CAMPAIGN_SIDE_COUNT][CAMPAIGN_MAP_COUNT] = 
      "Apocalypse",
      "Betrayal"}
 };
-DATA(0x004ffe20) char* cCampaignDescription[CAMPAIGN_SIDE_COUNT][CAMPAIGN_MAP_COUNT] = {
+DATA(0x004ffe20) char* cCampaignDescription[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT] = {
     {"Roland needs you to defeat the lords near his castle to begin his war of "
      "rebellion against his brother.  They are not allied with each other, so "
      "they will spend most of their time fighting with one another.  Victory is "
@@ -9628,7 +9627,7 @@ DATA(0x005157ac) i32 bEarlySetupDone = 0;
 DATA(0x005159f8) i32 bKBDone = 0;
 DATA(0x005159fc) struct _REDBOOK* hRedbookz = 0;
 DATA(0x00515a00) i32 bForceCheckTimeEvent = 0;
-DATA(0x00515ca0) u16 IMHotSpots[KB_INIT_MENU_HOTSPOT_COUNT][INIT_MENU_HOTSPOT_FIELD_COUNT] = {
+DATA(0x00515ca0) u16 IMHotSpots[KB_INIT_MENU_HOTSPOT_COUNT][IDX(INIT_MENU_HOTSPOT_FIELD_COUNT)] = {
     {481, 185, 83, 96},
     {194, 179, 82, 79},
     {412, 105, 75, 76},
