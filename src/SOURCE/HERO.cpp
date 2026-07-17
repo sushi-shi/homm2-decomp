@@ -150,7 +150,7 @@ int hero::HasSpell(int spell) {
     return 0;
 }
 
-// @match-note 99.78%: the 0x0c frame, count/spell/this slots at -0x04/-0x08/-0x0c,
+// @semantic: The 0x0c frame, count/spell/this slots at -0x04/-0x08/-0x0c,
 // CFG, and all 3/3 relocations agree. The first non-relocation residual is +0x9b:
 // retail loads the count and compares the second argument, while this build loads
 // the second argument and compares the count (two displacement bytes, same equality).
@@ -344,7 +344,7 @@ int hero::Dismiss(void) {
     return 0;
 }
 
-// @match-note 96.65% live, 98.19% retained maximum: semantics, the 0x20 frame,
+// @semantic: Semantics, the 0x20 frame,
 // player/playerHeroIndex/heroOwner/index/occupiedTown/availableHeroSlot/mapCell
 // slots at -0x04/-0x08/-0x0c/-0x10/-0x14/
 // -0x18/-0x1c, CFG, and all 44/44 relocation targets agree. First divergence is
@@ -489,6 +489,11 @@ int hero::GetExperience(int level) {
     return experience;
 }
 
+// @semantic: Complete extrapolation behavior, 0x10 frame/slots, CFG, and all
+// eight ordered relocations align. At +0x7b retail loads experienceValue and
+// compares the local experience with JGE; base loads experience and compares
+// the argument with JLE. Direct and reversed source inequalities compile
+// byte-identically; remaining differences are the local double-pool identity.
 VA(0x0046d50d, 0xc0)
 int hero::GetLevel(int experienceValue) {
     int experience;
@@ -514,8 +519,7 @@ int hero::GetLevel(int experienceValue) {
     return levelCounter - 1;
 }
 
-// @early-stop
-// 69.40%: semantics, the 0x04 frame with this at -0x04, CFG, and the
+// @semantic: Semantics, the 0x04 frame with this at -0x04, CFG, and the
 // zero-relocation set agree. First divergence is +0x37: retail reads m_eventFlags,
 // subtracts 0x20 in EAX, and writes it back (18 bytes after the common this load),
 // while base emits a seven-byte memory SUB. The same 11-byte shortening repeats for
@@ -952,7 +956,7 @@ default_hero_text:
     HeroMessageUpdate(gText);
 }
 
-// @match-note 94.47%: complete message, hero-cycle, stat, army, artifact, skill,
+// @semantic: Complete message, hero-cycle, stat, army, artifact, skill,
 // formation, and exit behavior. Retail and base both use a 0x60 frame: message is
 // at -0x4c, exit/quick-view at -0x10/-0x18, army temporaries at -0x08/-0x0c,
 // secondary skill at -0x14, hero position at -0x1c, experience temporaries at
@@ -1290,10 +1294,10 @@ void RedrawHeroScreen(void) {
         HERO_UI_SCREEN_HEIGHT);
 }
 
-// @early-stop
-// All 0x218 code bytes and all 47 relocation sites match after
-// masking the herowind.bin relocation. Objdiff gives this TU-local coalesced
-// literal a generated $SG identity while retail retains its string symbol.
+// @semantic: Complete behavior, 0x08 frame/slots, CFG, and all 47 ordered
+// relocations align. Retail evaluates gpHVHero->m_owner before gpCurPlayer->m_id
+// for the ownership comparison; base evaluates them in reverse. The remaining
+// relocation identity is the TU-local coalesced herowind.bin literal.
 VA(0x0046f354, 0x218)
 int HeroView(int heroId, int noDismiss, int fadeAlreadyOut) {
     mapCell *heroCell;
@@ -1338,7 +1342,7 @@ int HeroView(int heroId, int noDismiss, int fadeAlreadyOut) {
     }
 }
 
-// @match-note retained 98.99%: complete title, hero-cycle, stat, dismissal, portrait,
+// @semantic: Complete title, hero-cycle, stat, dismissal, portrait,
 // luck, morale, experience, formation, spell-point, crest, army, secondary-
 // skill, artifact, and status-message behavior. The retail 0x58 frame is
 // restored with distinct luck, morale, and skill-bonus locals. All 143
@@ -1616,6 +1620,10 @@ void SetupHeroView(void) {
     UpdateHeroScreenStatusBar(statusMessage);
 }
 
+// @semantic: Complete split behavior, 0x18 frame/slots, CFG, and all 50 ordered
+// relocations align. Raw review finds two exchanged local stack-displacement
+// bytes at +0x18c/+0x19a; lite disassembly otherwise differs only in local
+// string-literal identities.
 VA(0x0046ff31, 0x2b0)
 void DoHeroSplit(int destinationSlot, int sourceSlot) {
     short splitTextSlot = HERO_UI_SPLIT_TEXT;
@@ -1678,6 +1686,12 @@ void hero::SetSS(int skill, int level) {
         GiveSS(skill, level);
 }
 
+// @semantic: The complete 71-instruction CFG, 0x0c frame, oldLevel/otherSkill/
+// this slots, and zero relocation sites agree. At +0xb7/+0xba retail loads
+// otherSkill from -0x08 into EAX and this from -0x0c into ECX for the decrement
+// SIB; ours assigns those registers in reverse. Reversing the subscript to
+// otherSkill[m_secondarySkillOrder] compiled byte-identically. Revisit after a
+// HERO TU-state change or in the byte-last-mile phase.
 VA(0x0047024b, 0xfa)
 int hero::TakeSS(int skill, int levels) {
     int oldLevel;

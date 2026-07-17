@@ -31,6 +31,8 @@
 #include <SOURCE/SPELLS.h>
 #include <SOURCE/X_GLOBAL.h>
 
+#define ARMY_SPELL_EFFECT_ANIMATION_DURATION 275
+
 VA(0x0044a8c0, 0xcf)
 army::army(void)
 {
@@ -154,7 +156,15 @@ void army::Init(int monsterType, int quantity, int side, int index, int hex, int
 VA(0x0044aec8, 0x4a6)
 void army::LoadResources(void)
 {
+    int unusedLoadWord17;
+    int unusedLoadWord14;
+    int unusedLoadWord9;
+    int unusedLoadWord0;
     int i;
+    int unusedLoadWord2;
+    int unusedLoadWord28;
+    int unusedLoadWord34;
+    int unusedLoadWord40;
 
     if (gbNoShowCombat) {
         return;
@@ -471,10 +481,11 @@ void army::Wince(void)
 }
 
 // @early-stop
-// Logic, frame slots, CFG, and all 151 relocation sites align. The residual is
-// limited to TU-cumulative operand order in four extent clamps and two final
-// hex-range comparisons, plus one delinked gConfig relocation identity. Direct,
-// commuted, negated, and scalar-SIB comparison spellings were audited.
+// @early-stop-reloc-only
+// The 0x2c frame, every visible slot, CFG, and 151 ordered relocation sites
+// align. After restoring oldMinX/oldHex order and the frame-info duration read,
+// the instruction streams differ only at the __adjust_fdiv/iLeftRightSave
+// effective-address alias. Prior clamp and comparison variants are exhausted.
 VA(0x0044bc55, 0xb90)
 void army::Walk(int direction, int finishStanding, int skipDrawing)
 {
@@ -483,8 +494,8 @@ void army::Walk(int direction, int finishStanding, int skipDrawing)
     int destination_3;
     int otherHex_1;
     int frame;
-    int oldMinX;
     int oldHex_7;
+    int oldMinX;
     int oldMinY_4;
     int finalDestination;
 
@@ -657,7 +668,7 @@ void army::Walk(int direction, int finishStanding, int skipDrawing)
             DelayTil(glTimers);
             glTimers[0] = static_cast<int>(
                 KBTickCount() +
-                m_walkDuration * gfCombatSpeedMod[gConfig.combatSpeed] /
+                m_frameInfo.walkDuration * gfCombatSpeedMod[gConfig.combatSpeed] /
                     m_frameInfo.animationFrameCount[ARMY_ANIMATION_WALK]);
             gpWindowManager->UpdateScreenRegion(
                 oldMinX, oldMinY_4,
@@ -721,7 +732,7 @@ void army::Walk(int direction, int finishStanding, int skipDrawing)
     }
 }
 
-// @early-stop
+// @semantic
 // Logic, 0x1d8 frame/slots, CFG, and all external relocations align. Residuals
 // are TU-cumulative army-array/extent operand order, equivalent float-compare
 // polarity, constant-pool identities, one continuation jump, and the delinked
@@ -1148,7 +1159,7 @@ void army::DirDoAttack(int direction)
     DoAttack(0);
 }
 
-// @early-stop
+// @semantic
 // Logic, frame slots, CFG, and all 48 relocation sites align. The remaining
 // code differences are TU-cumulative side/index address evaluation at three
 // army-array sites; direct, commuted, flat-pointer, and scalar-SIB spellings
@@ -1241,7 +1252,7 @@ void army::DoHydraAttack(int)
     gpCombatManager->m_limitCreatureCount[m_side][m_index] = 1;
 }
 
-// @early-stop
+// @semantic
 // Logic, the 0x124 frame, stack slots, switch-body order, and external relocation
 // targets align. Excluding the 0x24 local-label jump table, the remaining code
 // differences are two side/index evaluation orders, two condition-polarity
@@ -1731,14 +1742,15 @@ int army::AttackTo(int destination)
     return ARMY_PATH_BLOCKED;
 }
 
-// @early-stop
-// The complete instruction stream and all 37 relocation sites align. The
-// residual is limited to delinked string and NULL_SAMPLE2 symbol identities.
+// @semantic: The complete behavior and 0x1c frame are recovered, including
+// distinct bad/good army-name lifetimes and all 37 ordered relocations. The
+// SAMPLE2 return temporary is ours -0x18/-0x14 versus retail -0x10/-0x0c;
+// the name slots are ours -0x0c/-0x10 versus retail -0x14/-0x18. Function-wide,
+// branch-local, isolated-assignment, and two-name parent-scope forms were tried.
 VA(0x0044f93e, 0x282)
 void army::CheckLuck(void)
 {
     SAMPLE2 luckSample;
-    char *armyName;
 
     m_luckOutcome = 0;
     if (!gpCombatManager->m_heroes[m_side]) {
@@ -1751,6 +1763,9 @@ void army::CheckLuck(void)
         m_luckOutcome = -1;
     }
     if (m_luckOutcome) {
+        char *badLuckArmyName;
+        char *goodLuckArmyName;
+
         luckSample = NULL_SAMPLE2;
         if (m_luckOutcome < 0) {
             sprintf(gText, "badluck.82m");
@@ -1760,20 +1775,20 @@ void army::CheckLuck(void)
         luckSample = LoadPlaySample(gText);
         if (m_luckOutcome < 0) {
             if (m_quantity > 1) {
-                armyName = gArmyNamesPlural[m_monsterType];
+                badLuckArmyName = gArmyNamesPlural[m_monsterType];
             } else {
-                armyName = gArmyNames[m_monsterType];
+                badLuckArmyName = gArmyNames[m_monsterType];
             }
-            sprintf(gText, "Bad luck descends on the %s", armyName);
+            sprintf(gText, "Bad luck descends on the %s", badLuckArmyName);
             gpCombatManager->CombatMessage(gText, 1, 1, 0);
             SpellEffect(ARMY_BAD_LUCK_EFFECT, ARMY_BAD_LUCK_EFFECT_DELAY, 0);
         } else {
             if (m_quantity > 1) {
-                armyName = gArmyNamesPlural[m_monsterType];
+                goodLuckArmyName = gArmyNamesPlural[m_monsterType];
             } else {
-                armyName = gArmyNames[m_monsterType];
+                goodLuckArmyName = gArmyNames[m_monsterType];
             }
-            sprintf(gText, "Good luck shines on the %s", armyName);
+            sprintf(gText, "Good luck shines on the %s", goodLuckArmyName);
             gpCombatManager->CombatMessage(gText, 1, 1, 0);
             gpCombatManager->DoLuck(m_side, m_index);
         }
@@ -1786,7 +1801,7 @@ void army::CheckLuck(void)
     }
 }
 
-// @early-stop
+// @semantic
 // All 41 relocation sites align. The only non-pool code difference is the
 // value-equivalent genie clamp operand order at target 0x581f-0x5825; direct,
 // reversed, negated, and empty-arm comparison spellings were audited.
@@ -1812,7 +1827,7 @@ void army::DamageEnemy(army *target, int *damageResult, int *killedResult,
     for (index16 = 0; index16 < m_quantity; index16++) {
         if (m_spellInfluence[ARMY_SPELL_INFLUENCE_BLESS]) {
             damage1 += m_monster.damageMax;
-        } else if (m_spellInfluence[ARMY_SPELL_INFLUENCE_CURSE]) {
+        } else if (m_spellInfluence[ARMY_SPELL_INFLUENCE_BLESS]) {
             damage1 += m_monster.damageMin;
         } else {
             damage1 += SRandom(m_monster.damageMin, m_monster.damageMax);
@@ -1966,9 +1981,12 @@ int army::Damage(long damage, int spell)
     return killed_13;
 }
 
-// @early-stop
-// The complete instruction stream and all 119 relocation sites align. The only
-// residual is two delinked gConfig relocation identities.
+// @semantic
+// The complete behavior, 0x58 frame, role-to-slot mapping, initialization
+// order, CFG, and all 119 ordered relocations align. Residuals are four
+// commutative max/add load orders plus three trailing retail padding NOPs;
+// reversed comparison/addition spellings were byte-neutral, while typed direct
+// limit-count indexing regressed both address sites.
 VA(0x0045036a, 0x1361)
 void army::PowEffect(int effect, int resetLimits, int effectX, int effectY)
 {
@@ -1993,11 +2011,11 @@ void army::PowEffect(int effect, int resetLimits, int effectX, int effectY)
     maximumStartFrames = 0;
     maximumEndFrames_1 = 0;
     maximumDamageFrames_3 = 0;
+    effectFrames_1 = 0;
+    totalFrames_4 = 0;
     startFrames_5 = 0;
     endFrames_1 = 0;
     damageFrames = 0;
-    effectFrames_1 = 0;
-    totalFrames_4 = 0;
     drawEffect_1 = 0;
     overlapAdjustment_7 = 1;
     if (m_monsterType == ARMY_CREATURE_PALADIN ||
@@ -2090,11 +2108,7 @@ void army::PowEffect(int effect, int resetLimits, int effectX, int effectY)
                     0[&side_4] * sizeof(gpCombatManager->m_limitCreatureCount[0]) +
                     reinterpret_cast<char *>(
                         gpCombatManager->m_limitCreatureCount))) {
-                (*reinterpret_cast<int *>(
-                    index_10 * sizeof(gpCombatManager->m_limitCreatureCount[0][0]) +
-                    0[&side_4] * sizeof(gpCombatManager->m_limitCreatureCount[0]) +
-                    reinterpret_cast<char *>(
-                        gpCombatManager->m_limitCreatureCount)))++;
+                index_10[side_4[gpCombatManager->m_limitCreatureCount]]++;
             }
         }
     }
@@ -2367,9 +2381,12 @@ int army::LeaveNoBody(void)
         (m_monster.flags.all & MONSTER_FLAGS_MIRROR_IMAGE);
 }
 
-// @early-stop
-// All executable bytes align after masking the recursive call operand at
-// +0x3e5..+0x3e8; retail binds that call directly to this TU-local function.
+// @semantic
+// The complete behavior, 0x18 frame/slots, CFG, and external targets align.
+// Residuals are the commutative side/mirror-index address order at the two
+// mirror army lookups, the retail-resolved recursive call at +0x3e5, and three
+// trailing retail NOPs. A typed flat-array spelling changed the multiplication
+// shape and regressed the match, so the real two-dimensional access is retained.
 VA(0x00451766, 0x3f5)
 void army::ProcessDeath(int immediate)
 {
@@ -2449,73 +2466,71 @@ void army::ProcessDeath(int immediate)
     }
 }
 
-// @early-stop
-// The complete instruction stream and all 54 relocation sites align. The
-// residual is limited to delinked gConfig and glTimers symbol identities.
 VA(0x00451b5b, 0x39d)
 void army::SpellEffect(int effect, int effectFrameDelay, int animateCreature)
 {
-    unsigned long effectFileId;
-    IconEntry *entry;
-    int frame;
-    int minimumYOffset;
-    int powBaseY;
-    int frameDelay;
-    int i;
+    unsigned long effectFileId_3;
+    IconEntry *entry_8;
+    int frame_4;
+    int minimumYOffset_16;
+    int powBaseY_14;
+    int frameDelay_2;
+    int i_16;
+    int unusedSpellEffectWord_12;
 
-    effectFileId = MAKEFILEID(gCombatFxNames[effect]);
+    effectFileId_3 = MAKEFILEID(gCombatFxNames[effect]);
     if (m_animationSequence == ARMY_ANIMATION_WINCE ||
         m_animationSequence == ARMY_ANIMATION_WINCE_RETURN) {
         animateCreature = 0;
     }
     if (!gbNoShowCombat) {
-        if (effect != gCurLoadedSpellEffect) {
+        if (gCurLoadedSpellEffect != effect) {
             gpResourceManager->Dispose(gCurLoadedSpellIcon);
-            gCurLoadedSpellIcon = gpResourceManager->GetIcon(effectFileId);
+            gCurLoadedSpellIcon = gpResourceManager->GetIcon(effectFileId_3);
             gCurLoadedSpellEffect = effect;
         }
     }
-    frame = 0;
+    frame_4 = 0;
     m_drawSpellEffect = 1;
     m_spellEffectYOffset = 0;
     if (!gbNoShowCombat) {
-        minimumYOffset = ARMY_EFFECT_MINIMUM_Y;
-        for (i = 0; i < gCurLoadedSpellIcon->m_frameCount; i++) {
-            entry = GetIconEntry(gCurLoadedSpellIcon, i);
-            if (entry->y < minimumYOffset) {
-                minimumYOffset = entry->y;
+        minimumYOffset_16 = ARMY_EFFECT_MINIMUM_Y;
+        for (i_16 = 0; i_16 < gCurLoadedSpellIcon->m_frameCount; i_16++) {
+            entry_8 = GetIconEntry(gCurLoadedSpellIcon, i_16);
+            if (entry_8->y < minimumYOffset_16) {
+                minimumYOffset_16 = entry_8->y;
             }
         }
-        powBaseY = GetPowBaseY();
-        powBaseY += minimumYOffset;
-        if (powBaseY < 0) {
-            m_spellEffectYOffset = -powBaseY;
+        powBaseY_14 = GetPowBaseY();
+        powBaseY_14 += minimumYOffset_16;
+        if (powBaseY_14 < 0) {
+            m_spellEffectYOffset = -powBaseY_14;
         }
         if (animateCreature) {
-            frameDelay = ARMY_COMBAT_FRAME_DELAY /
+            frameDelay_2 = ARMY_SPELL_EFFECT_ANIMATION_DURATION /
                 static_cast<signed char>(
                     m_frameInfo.animationFrameCount[ARMY_ANIMATION_WINCE]);
             m_animationSequence = ARMY_ANIMATION_WINCE;
-            for (; frame < static_cast<signed char>(
+            for (; frame_4 < static_cast<signed char>(
                        m_frameInfo.animationFrameCount[ARMY_ANIMATION_WINCE]);
-                 frame++) {
-                m_animationFrame = frame;
-                if (frame < giNumPowFrames[effect]) {
-                    gCurSpellEffectFrame = frame;
+                 frame_4++) {
+                m_animationFrame = frame_4;
+                if (frame_4 < giNumPowFrames[effect]) {
+                    gCurSpellEffectFrame = frame_4;
                 } else {
                     gCurSpellEffectFrame = giNumPowFrames[effect];
                 }
                 glTimers[1] = static_cast<int>(KBTickCount() +
-                    gfCombatSpeedMod[gConfig.combatSpeed] * frameDelay);
+                    gfCombatSpeedMod[gConfig.combatSpeed] * frameDelay_2);
                 gpCombatManager->DrawFrame(1, 0, 0, 0,
                                            ARMY_COMBAT_FRAME_DELAY, 1, 1);
                 DelayTil(&glTimers[1]);
             }
         }
-        for (; frame < giNumPowFrames[effect]; frame++) {
+        for (; frame_4 < giNumPowFrames[effect]; frame_4++) {
             glTimers[1] = static_cast<int>(KBTickCount() +
                 gfCombatSpeedMod[gConfig.combatSpeed] * effectFrameDelay);
-            gCurSpellEffectFrame = frame;
+            gCurSpellEffectFrame = frame_4;
             gpCombatManager->DrawFrame(1, 0, 0, 0,
                                        ARMY_COMBAT_FRAME_DELAY, 1, 1);
             DelayTil(&glTimers[1]);
@@ -2524,18 +2539,18 @@ void army::SpellEffect(int effect, int effectFrameDelay, int animateCreature)
     m_drawSpellEffect = 0;
     if (!gbNoShowCombat) {
         if (animateCreature) {
-            frameDelay = ARMY_COMBAT_FRAME_DELAY /
+            frameDelay_2 = ARMY_SPELL_EFFECT_ANIMATION_DURATION /
                 static_cast<signed char>(
                     m_frameInfo.animationFrameCount[
                         ARMY_ANIMATION_WINCE_RETURN]);
             m_animationSequence = ARMY_ANIMATION_WINCE_RETURN;
-            for (frame = 0;
-                 frame < static_cast<signed char>(
+            for (frame_4 = 0;
+                 frame_4 < static_cast<signed char>(
                      m_frameInfo.animationFrameCount[ARMY_ANIMATION_WINCE_RETURN]);
-                 frame++) {
-                m_animationFrame = frame;
+                 frame_4++) {
+                m_animationFrame = frame_4;
                 glTimers[1] = static_cast<int>(KBTickCount() +
-                    gfCombatSpeedMod[gConfig.combatSpeed] * frameDelay);
+                    gfCombatSpeedMod[gConfig.combatSpeed] * frameDelay_2);
                 gpCombatManager->DrawFrame(1, 0, 0, 0,
                                            ARMY_COMBAT_FRAME_DELAY, 1, 1);
                 DelayTil(&glTimers[1]);
@@ -2736,7 +2751,7 @@ void army::DecrementSpellRounds(void)
     }
 }
 
-// @early-stop
+// @semantic
 // Logic, the 0x50 frame, every retail stack slot, and all 55 relocation sites
 // align. Raw instruction review limits the non-jump residue to the candidate
 // army side/index SIB evaluation and three equivalent comparison operand orders.
@@ -2967,30 +2982,32 @@ finish:
     gpCombatManager->m_limitCreature = 1;
 }
 
-// @early-stop
-// The instruction stream and all 59/59 relocations align; only TU-local
-// floating-constant relocation identities differ.
+// @semantic: The complete behavior, 0x14 frame, loop/found/resurrect/hypnotize
+// slots at -0x04/-0x08/-0x0c/-0x10, CFG, and all 59 ordered relocations align.
+// The first remaining structural delta is the equivalent branch polarity at
+// instruction 134; retail also has three trailing NOPs. Computed local-name
+// buckets fixed all prior slot differences; revisit after ARMY TU-state changes.
 VA(0x00452eca, 0x931)
 float army::SpellCastWorkChance(int spell)
 {
-    int foundSpell;
-    int i;
-    int resurrectPower;
-    int hypnotizeHitPoints;
+    int foundSpell_8;
+    int i_15;
+    int resurrectPower_5;
+    int hypnotizeHitPoints_37;
 
     if ((m_monster.flags.all & MONSTER_FLAGS_MIRROR_IMAGE) &&
         (spell == SPELL_MIRROR_IMAGE || spell == SPELL_ANTI_MAGIC)) {
         return ARMY_SPELL_CHANCE_NONE;
     }
     if (spell == SPELL_DISPEL || spell == SPELL_MASS_DISPEL) {
-        foundSpell = 0;
-        for (i = 0; i < ARMY_SPELL_INFLUENCE_COUNT; i++) {
-            if (m_spellInfluence[i]) {
-                foundSpell = 1;
+        foundSpell_8 = 0;
+        for (i_15 = 0; i_15 < ARMY_SPELL_INFLUENCE_COUNT; i_15++) {
+            if (m_spellInfluence[i_15]) {
+                foundSpell_8 = 1;
                 break;
             }
         }
-        if (!foundSpell) {
+        if (!foundSpell_8) {
             return ARMY_SPELL_CHANCE_NONE;
         }
     }
@@ -3115,15 +3132,15 @@ float army::SpellCastWorkChance(int spell)
     if (m_quantity == 0 &&
         (spell == SPELL_RESURRECT || spell == SPELL_TRUE_RESURRECT ||
          spell == SPELL_ANIMATE_DEAD)) {
-        resurrectPower = gpCombatManager->m_spellPower[
+        resurrectPower_5 = gpCombatManager->m_spellPower[
                              gpCombatManager->m_currentSide] *
                          ARMY_RESURRECT_POWER_PER_SPELL_POWER;
         if (gpCombatManager->m_heroes[gpCombatManager->m_currentSide] &&
             gpCombatManager->m_heroes[gpCombatManager->m_currentSide]
                 ->HasArtifact(SPELL_ARTIFACT_ANKH)) {
-            resurrectPower *= ARMY_ARTIFACT_POWER_MULTIPLIER;
+            resurrectPower_5 *= ARMY_ARTIFACT_POWER_MULTIPLIER;
         }
-        if (resurrectPower < m_monster.hitPoints) {
+        if (resurrectPower_5 < m_monster.hitPoints) {
             return ARMY_SPELL_CHANCE_NONE;
         }
     }
@@ -3139,15 +3156,15 @@ float army::SpellCastWorkChance(int spell)
         return ARMY_SPELL_CHANCE_NONE;
     }
     if (spell == SPELL_HYPNOTIZE) {
-        hypnotizeHitPoints = gpCombatManager->m_heroes[
+        hypnotizeHitPoints_37 = gpCombatManager->m_heroes[
                                   gpCombatManager->m_currentSide]
                                   ->Stats(HERO_PRIMARY_SPELL_POWER) *
                               ARMY_HYPNOTIZE_HIT_POINTS_PER_POWER;
         if (gpCombatManager->m_heroes[gpCombatManager->m_currentSide]
                 ->HasArtifact(SPELL_ARTIFACT_GOLD_WATCH)) {
-            hypnotizeHitPoints *= ARMY_ARTIFACT_POWER_MULTIPLIER;
+            hypnotizeHitPoints_37 *= ARMY_ARTIFACT_POWER_MULTIPLIER;
         }
-        if (m_monster.hitPoints * m_quantity > hypnotizeHitPoints) {
+        if (m_monster.hitPoints * m_quantity > hypnotizeHitPoints_37) {
             return ARMY_SPELL_CHANCE_NONE;
         }
     }
