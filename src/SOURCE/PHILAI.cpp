@@ -2221,7 +2221,7 @@ void philAI::ValueOfBuyingBuilding(
                 (1.0 - gpCurPlayer->BuildingsOwned(IDX(currentTownRace), BuildingSlotType(building), 0) * 0.05)
                 * adjustedValue
             );
-            if (building - IDX(BUILDING_SLOT_DWELLING_FIRST) < highestDwellingId)
+            if (IDX(building) - IDX(BUILDING_SLOT_DWELLING_FIRST) < highestDwellingId)
                 adjustedValue = static_cast<float>((1.66 - dwellingTotal * 0.33) * adjustedValue);
             if (townPtr->m_buildings & BIT(BUILDING_SLOT_SPECIAL_FOUR))
                 adjustedValue = static_cast<float>(adjustedValue * 1.1);
@@ -2230,7 +2230,7 @@ void philAI::ValueOfBuyingBuilding(
                 if ((townPtr->m_buildings & BIT(buildingLevel + IDX(BUILDING_SLOT_DWELLING_FIRST)))
                     && townPtr->m_garrison[buildingLevel] > 0
                     && gMonsterDatabase[gDwellingType[townPtr->m_type]
-                                                     [building - IDX(BUILDING_SLOT_DWELLING_FIRST)]]
+                                                     [IDX(building) - IDX(BUILDING_SLOT_DWELLING_FIRST)]]
                                .iconIndex
                            < gMonsterDatabase[currentCreatureType].iconIndex * 1.2) {
                     adjustedValue = 0.0f;
@@ -2477,7 +2477,7 @@ void philAI::GetBestCreature(town* townPtr, BHC& best, float& bestValue) {
                 if (currentPurchaseCount > 0) {
                     ValueOfBuyingCreature(
                         townPtr,
-                        IDX(creature),
+                        creature,
                         resourceValue,
                         currentPurchaseCount,
                         rawValue

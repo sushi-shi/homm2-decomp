@@ -50,7 +50,7 @@ public:
     float GetOddsOfWinning(i32);
     void ValueOfBuyingBuilding(class town*, BuildingSlotType, i32&, float&);
     void GetBestBuilding(class town*, struct BHC&, float&);
-    void ValueOfBuyingCreature(class town*, i32, i32&, i32, float&);
+    void ValueOfBuyingCreature(class town*, CreatureType, i32&, i32, float&);
     void GetBestCreature(class town*, struct BHC&, float&);
     i32 CreaturesToBuy(class town*, i32);
     i32 CreaturesToBuy(i32, i32);
