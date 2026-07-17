@@ -34,7 +34,7 @@
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\COMMAND.CPP"
 VA(0x0042a6d0, 0x36d)
 i32 combatManager::Main(tag_message& message) {
-    i32 result = COMBAT_MAIN_CONTINUE;
+    i32 IDX(result) = COMBAT_MAIN_CONTINUE;
 
     if (gbNoShowCombat == 0) {
         if (KBTickCount() > glTimers[0]) {
@@ -53,7 +53,7 @@ i32 combatManager::Main(tag_message& message) {
 
     CheckCastleAttack();
     if (CheckWin(&message) != 0)
-        return COMBAT_MAIN_FINISHED;
+        return IDX(COMBAT_MAIN_FINISHED);
 
     if (gbNoShowCombat == 0) {
         CombatRemotePacket* packet =
@@ -80,7 +80,7 @@ i32 combatManager::Main(tag_message& message) {
                         break;
                 }
             }
-            return COMBAT_MAIN_CONTINUE;
+            return IDX(COMBAT_MAIN_CONTINUE);
         }
     }
 
@@ -89,7 +89,7 @@ i32 combatManager::Main(tag_message& message) {
         if (currentArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BERSERK)] != 0) {
             currentArmy->GoBerserk();
             if (CheckWin(&message) != 0)
-                return COMBAT_MAIN_FINISHED;
+                return IDX(COMBAT_MAIN_FINISHED);
         }
     }
 
@@ -508,10 +508,10 @@ i32 combatManager::GetPointer(CombatMessageCommand command, i32 hexIndex) {
             case COMBAT_MESSAGE_COMMAND_VIEW_INFO: {
                 i32 x = hexIndex % COMBAT_GRID_ROW_LENGTH;
                 i32 y = hexIndex / COMBAT_GRID_ROW_LENGTH;
-                return command;
+                return IDX(command);
             }
             default:
-                return command;
+                return IDX(command);
         }
     }
 }
@@ -660,7 +660,7 @@ i32 combatManager::ProcessCombatMsg(tag_message& message) {
                     }
                 }
             }
-            return COMBAT_MAIN_CONTINUE;
+            return IDX(COMBAT_MAIN_CONTINUE);
 
         case MESSAGE_KEY_DOWN:
             switch (message.payload.keyboard.keyCode) {
@@ -791,7 +791,7 @@ i32 combatManager::ProcessCombatMsg(tag_message& message) {
             break;
     }
 
-    return COMBAT_MAIN_CONTINUE;
+    return IDX(COMBAT_MAIN_CONTINUE);
 }
 
 VA(0x0042c40a, 0x70)
@@ -973,7 +973,7 @@ i32 combatManager::GetCommand(i32 hexIndex) {
                             if (m_currentSide == targetSide
                                 || (m_currentArmySide == targetSide
                                     && m_currentArmyIndex == targetIndex)) {
-                                return COMBAT_MESSAGE_COMMAND_VIEW_INFO;
+                                return IDX(COMBAT_MESSAGE_COMMAND_VIEW_INFO);
                             }
                             currentArmy->m_targetSide = targetSide;
                             currentArmy->m_targetIndex = targetIndex;
@@ -986,11 +986,11 @@ i32 combatManager::GetCommand(i32 hexIndex) {
                                         hexIndex
                                     )
                                     != 0)
-                                    return COMBAT_MESSAGE_COMMAND_SHOOT_THROUGH_WALL;
-                                return COMBAT_MESSAGE_COMMAND_SHOOT;
+                                    return IDX(COMBAT_MESSAGE_COMMAND_SHOOT_THROUGH_WALL);
+                                return IDX(COMBAT_MESSAGE_COMMAND_SHOOT);
                             }
                             if (currentArmy->ValidPath(hexIndex, 0) == 1)
-                                return COMBAT_MESSAGE_COMMAND_ATTACK;
+                                return IDX(COMBAT_MESSAGE_COMMAND_ATTACK);
                             currentArmy->m_targetSide = -1;
                             currentArmy->m_targetIndex = -1;
                     }
@@ -1015,7 +1015,7 @@ i32 combatManager::GetCommand(i32 hexIndex) {
         m_smallViewSide[1] = -1;
         DrawSmallView(1, 1);
     }
-    return command;
+    return IDX(command);
 }
 
 // @semantic: code span is 0x290 versus retail 0x2a6, frame 0x1c
@@ -1216,7 +1216,7 @@ i32 WinCombatHandler(struct tag_message& message) {
         message.payload.widget.id = COMBAT_WIN_LOSE_CLOSE_COMMAND;
         message.payload.widget.command = message.payload.widget.id;
         giDialogTimeout = 0;
-        return COMBAT_MAIN_FINISHED;
+        return IDX(COMBAT_MAIN_FINISHED);
     }
 
     if (message.type == MESSAGE_WIDGET) {
@@ -1253,7 +1253,7 @@ i32 WinCombatHandler(struct tag_message& message) {
                                 gpWindowManager->m_dialogResult = message.payload.widget.id;
                                 message.payload.widget.id = COMBAT_WIN_LOSE_CLOSE_COMMAND;
                                 message.payload.widget.command = message.payload.widget.id;
-                                return COMBAT_MAIN_FINISHED;
+                                return IDX(COMBAT_MAIN_FINISHED);
                             }
                         }
                         break;
@@ -1347,7 +1347,7 @@ i32 WinCombatHandler(struct tag_message& message) {
         gpCombatManager->m_winLoseWindow->DrawWindow(1, 0, COMBAT_WIN_LOSE_DRAW_DEPTH);
         glTimers[0] = KBTickCount() + iDelay;
     }
-    return COMBAT_MAIN_CONTINUE;
+    return IDX(COMBAT_MAIN_CONTINUE);
 }
 
 // @early-stop
@@ -2484,7 +2484,7 @@ i32 combatManager::ProcessNextAction(struct tag_message& message) {
 Finished:
     gbProcessingCombatAction = false;
     ResetMouse();
-    return result;
+    return IDX(result);
 }
 
 // @early-stop

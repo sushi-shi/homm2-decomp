@@ -175,7 +175,7 @@ i32 hero::GetNthSpell(i32 type, i32 spellNumber) {
                 return spell;
         }
     }
-    return SPELL_NONE;
+    return IDX(SPELL_NONE);
 }
 
 // @early-stop

@@ -211,7 +211,7 @@ extern "C" u16 __fastcall nb_snd(i16 session, i16 len, void* data) {
         return 0;
     }
     if ((gNetStatus[session] & IDX(NETBIOS_SESSION_ACTIVE)) == 0)
-        return NETBIOS_RESULT_SESSION_OUT_OF_RANGE;
+        return IDX(NETBIOS_RESULT_SESSION_OUT_OF_RANGE);
     node = static_cast<tag_Node*>(H2_ALLOC(len + NETBIOS_PACKET_HEADER_SIZE, 260));
     node->len = len;
     node->sessionIndex = static_cast<u8>(session);

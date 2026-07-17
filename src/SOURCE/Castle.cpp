@@ -43,9 +43,9 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
     tag_message message3;
 
     casWin = window;
-    i16 builtFrame7 = CASTLE_FRAME_BUILT;
-    i16 cannotBuildFrame17 = CASTLE_FRAME_CANNOT_BUILD;
-    i16 cannotAffordFrame6 = CASTLE_FRAME_CANNOT_AFFORD;
+    i16 IDX(builtFrame7) = CASTLE_FRAME_BUILT;
+    i16 IDX(cannotBuildFrame17) = CASTLE_FRAME_CANNOT_BUILD;
+    i16 IDX(cannotAffordFrame6) = CASTLE_FRAME_CANNOT_AFFORD;
     for (slot7 = 0; slot7 < CASTLE_SLOT_COUNT; ++slot7) {
         castleSlotsUse[slot7] = castleSlotsBase[slot7];
         if (castleSlotsBase[slot7] >= BUILDING_SLOT_DWELLING_FIRST + 1

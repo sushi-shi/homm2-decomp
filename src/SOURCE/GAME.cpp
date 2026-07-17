@@ -4738,7 +4738,7 @@ VA(0x0048111f, 0xf1)
 void game::SetupAdjacentMons(void) {
     i32 col;
     i32 row;
-    u8 mask = MAP_EXTRA_ADJACENT_CLEAR_MASK;
+    u8 IDX(mask) = MAP_EXTRA_ADJACENT_CLEAR_MASK;
     {
         i32 x;
         i32 y;
@@ -4747,7 +4747,7 @@ void game::SetupAdjacentMons(void) {
                 if (gpAdvManager->FindAdjacentMonster(x, y, &col, &row, -1, -1))
                     mapExtra[y * MAP_WIDTH + x] |= IDX(MAP_EXTRA_ADJACENT_MONSTER);
                 else
-                    mapExtra[y * MAP_WIDTH + x] &= mask;
+                    mapExtra[y * MAP_WIDTH + x] &= IDX(mask);
             }
         }
     }
