@@ -1482,7 +1482,7 @@ i32 HeroView(i32 heroId, i32 noDismiss, i32 fadeAlreadyOut) {
 
     if (gpCurPlayer->m_currentHero == gpHVHero->m_id) {
         heroCell = gpAdvManager->GetCell(gpHVHero->m_x, gpHVHero->m_y);
-        if (heroCell->m_triggerType != ADVMGR_HERO_TRIGGER) {
+        if (heroCell->m_triggerType != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION)) {
             gpHVHero->m_locationType = heroCell->m_triggerType;
             gpHVHero->m_occupiedTown = heroCell->m_objectMetadata;
         }

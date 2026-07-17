@@ -1,6 +1,7 @@
 #ifndef HOMM2_ADVMGR_H
 #define HOMM2_ADVMGR_H
 #include <va.h>
+#include <SOURCE/KB_TYPES.h>
 // Declarations of the free functions DEFINED in ADVMGR.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
 // forward declarations (was <_all.h>):
@@ -88,8 +89,6 @@ typedef enum AdventureButtonConstant {
 } AdventureButtonConstant;
 
 typedef enum AdventureTriggerConstant {
-    ADVMGR_TRIGGER_TYPE_MASK = 0x7f,
-    ADVMGR_TRIGGER_ACTION_FLAG = 0x80,
     ADVMGR_SPECIAL_TRIGGER = 0x7a,
     ADVMGR_SPECIAL_TRIGGER_MASK = 0x3f,
     ADVMGR_TRIGGER_EVENT_5 = 5,
@@ -103,7 +102,7 @@ typedef enum AdventureHoverObject {
     ADVMGR_HOVER_TOWN = 0x23,
     ADVMGR_HOVER_HERO = 0x2a,
     ADVMGR_HOVER_BOAT = 0x2b,
-    ADVMGR_HOVER_SHIPWRECK_TRIGGER = ADVMGR_HOVER_SHIPWRECK | ADVMGR_TRIGGER_ACTION_FLAG
+    ADVMGR_HOVER_SHIPWRECK_TRIGGER = ADVMGR_HOVER_SHIPWRECK | MAP_TRIGGER_ACTION_FLAG
 } AdventureHoverObject;
 
 typedef enum AdventureHoverConstant {
@@ -437,9 +436,6 @@ typedef enum AdventureDrawConstant {
     ADVMGR_TILESET_MINE = 12,
     ADVMGR_TILESET_ROUTE = 17,
     ADVMGR_TILESET_BOAT = 39,
-    ADVMGR_MONSTER_TRIGGER = 0x97,
-    ADVMGR_HERO_TRIGGER = 0xaa,
-    ADVMGR_BOAT_TRIGGER = 0xab
 } AdventureDrawConstant;
 
 typedef enum AdventureComboDrawConstant {

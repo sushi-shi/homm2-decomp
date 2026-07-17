@@ -2954,8 +2954,6 @@ declaration = "AdventureTriggerConstant"
 owner = "include/SOURCE/ADVMGR.h"
 category = "flags"
 enumerators = [
-  "ADVMGR_TRIGGER_TYPE_MASK",
-  "ADVMGR_TRIGGER_ACTION_FLAG",
   "ADVMGR_SPECIAL_TRIGGER_MASK",
 ]
 evidence = [
@@ -3781,9 +3779,6 @@ enumerators = [
   "ADVMGR_TILESET_MINE",
   "ADVMGR_TILESET_ROUTE",
   "ADVMGR_TILESET_BOAT",
-  "ADVMGR_MONSTER_TRIGGER",
-  "ADVMGR_HERO_TRIGGER",
-  "ADVMGR_BOAT_TRIGGER",
 ]
 evidence = [
   "suffix/value partition of the mixed bag: 16 of 16 enumerators",
@@ -11933,13 +11928,6 @@ enumerators = [
   "VIEW_WORLD_HIGHLIGHT_BASE",
   "VIEW_WORLD_ARTIFACT_HIGHLIGHT",
   "VIEW_WORLD_RESOURCE_HIGHLIGHT",
-  "VIEW_WORLD_TRIGGER_ARTIFACT",
-  "VIEW_WORLD_TRIGGER_TOWN",
-  "VIEW_WORLD_TRIGGER_HERO",
-  "VIEW_WORLD_TRIGGER_RESOURCE",
-  "VIEW_WORLD_TRIGGER_MINE",
-  "VIEW_WORLD_TRIGGER_ALCHEMIST_LAB",
-  "VIEW_WORLD_TRIGGER_SAWMILL",
   "VIEW_WORLD_SELECT",
   "VIEW_WORLD_RELEASE",
   "VIEW_WORLD_SCALE_CONTROL",
@@ -11998,7 +11986,6 @@ declaration = "ViewWorldConstant"
 owner = "include/SOURCE/Viewwrld.h"
 category = "flags"
 enumerators = [
-  "VIEW_WORLD_TRIGGER_TYPE_MASK",
   "VIEW_WORLD_GROUND_SHAPE_MASK",
 ]
 evidence = [
@@ -14861,5 +14848,19 @@ enumerators = [
 evidence = [
   "widget chrome icon-frame index namespace",
   "first-pass constant taxonomy sweep; refinement queue in docs/constant-taxonomy.md",
+]
+status = "provisional"
+
+[[constant_group]]
+name = "MapCellSentinel"
+declaration = "MapCellSentinel"
+owner = "include/EDITOR/mapcell.h"
+category = "sentinel"
+enumerators = [
+  "MAPCELL_SPRITE_NONE",
+  "MAPCELL_EXTRA_FREE",
+]
+evidence = [
+  "documented no-sprite and free-pool markers in the mapCell record comments",
 ]
 status = "provisional"
