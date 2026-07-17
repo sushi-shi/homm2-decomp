@@ -2,6 +2,39 @@
   "version": 1,
   "records": [
     {
+      "unit": "BASE/EXEC",
+      "function": "?DoDialog@executive@@QAEHPAVbaseManager@@@Z",
+      "source_hash": "a62bdf56e5ce",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 99.4375,
+      "after": 99.4375,
+      "note": "Snapshot loop exact; only restore-loop register coloring differs at +0xce..+0xe9; existing 25 AST plus 78 TU-state probes exhausted; exact 0x100 frame/CFG, 16/16 relocations, and text-owner addends 0x100/0x114/0x128/0x13c."
+    },
+    {
+      "unit": "BASE/EXEC",
+      "function": "?MainLoop@executive@@QAEXXZ",
+      "source_hash": "0a7a305e2ca5",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 1,
+      "before": 99.885056,
+      "after": 99.885056,
+      "note": "Retained exact maximum; sole current residual is commutative manager/window-manager compare; operand reversal neutral; exact frame/CFG and 7/7 relocations."
+    },
+    {
+      "unit": "BASE/EXEC",
+      "function": "?ShutDownSystem@executive@@QAEXXZ",
+      "source_hash": "8787bbebb46d",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 1,
+      "before": 99.8,
+      "after": 99.8,
+      "note": "Retained exact maximum; sole current residual is commutative current/mouse-manager compare; reversal neutral; exact frame/CFG and 11/11 relocations."
+    },
+    {
       "unit": "BASE/INPUTMGR",
       "function": "?AsciiConvert@inputManager@@QAEXAAUtag_message@@@Z",
       "source_hash": "5675c84ee1db",
@@ -418,6 +451,50 @@
       "before": 99.969696,
       "after": 99.969696,
       "note": "Nested playback member preserves the exact frame, CFG, executable bytes under relocation-union masking, and all 23 ordered relocation targets/table entries."
+    },
+    {
+      "unit": "BASE/Textntry",
+      "function": "??0textEntryWidget@@QAE@FFFFFPAD0F0FFFFHH@Z",
+      "source_hash": "f29eef3d8ec7",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 0,
+      "before": 98.652176,
+      "after": 98.652176,
+      "note": "Only iconFrame store is delayed past three independent constant stores; prior bounded store-order search remains exhaustive; exact size/frame/CFG and 6/6 relocations."
+    },
+    {
+      "unit": "BASE/Textntry",
+      "function": "?Main@textEntryWidget@@UAEHAAUtag_message@@@Z",
+      "source_hash": "67491a456d26",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 1,
+      "before": 99.79552,
+      "after": 99.79552,
+      "note": "Retained exact maximum; complete edit-buffer/message payload behavior and exact 0x9a8 frame/CFG; two commutative signed-bound compares plus delinked local labels; 55/55 relocations."
+    },
+    {
+      "unit": "BASE/Textntry",
+      "function": "?Read@textEntryWidget@@QAEXH@Z",
+      "source_hash": "657538279cec",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 1,
+      "before": 98.6755,
+      "after": 98.6755,
+      "note": "Only adjacent type compare versus m_height load schedule differs; retail-order move fell to 97.7351 and was rejected; exact size/frame/CFG and 52/52 relocations."
+    },
+    {
+      "unit": "BASE/Textntry",
+      "function": "?SetupDisplayString@textEntryWidget@@QAEXPADG@Z",
+      "source_hash": "b0d716620ff2",
+      "epoch": "ed71c781e260b2e6bbe78b0907d92927c6b4145678ee07abf95fcfb78dcb0dc3",
+      "outcome": "parked",
+      "iterations": 2,
+      "before": 99.932434,
+      "after": 99.932434,
+      "note": "Retained raw-exact maximum; current residual is one commutative SIB byte after two neutral source/TU-state spellings; exact 0x130 frame and 8/8 ordered relocations."
     },
     {
       "unit": "BASE/soundmgr",
