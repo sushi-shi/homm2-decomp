@@ -559,7 +559,7 @@ void philAI::DimensionDoorTo(i32 x, i32 y) {
         gpCurAIHero->m_remainingMobility = 0;
     else
         gpCurAIHero->m_remainingMobility -= 0xe1;
-    gpCurAIHero->UseSpell(0x38);
+    gpCurAIHero->UseSpell(SPELL_DIMENSION_DOOR);
 }
 
 // @semantic
@@ -589,7 +589,7 @@ i32 philAI::DoAnywhereDDoorTownGate(i32 targetValue) {
             bestValue = targetValue + 1000;
         else
             bestValue = Random(0, 125) - 50;
-        if (gpCurAIHero->HasSpell(AI_SPELL_DIMENSION_DOOR)) {
+        if (gpCurAIHero->HasSpell(SPELL_DIMENSION_DOOR)) {
           if (gpCurAIHero->m_spellPoints >= AI_DIMENSION_DOOR_SPELL_POINTS) {
             for (x = 0; MAP_WIDTH > x; x++) {
                 for (y = 0; y < MAP_HEIGHT; y++) {
@@ -947,7 +947,7 @@ void philAI::DoAI(i32 player) {
                             goto aiMovementDone;
                         gpAdvManager->UpdateScreen(0, 0);
                     } while (targetValue11 > 1000 &&
-                             gpCurAIHero->HasSpell(AI_SPELL_DIMENSION_DOOR) &&
+                             gpCurAIHero->HasSpell(SPELL_DIMENSION_DOOR) &&
                              gpCurAIHero->m_spellPoints >= AI_DIMENSION_DOOR_SPELL_POINTS &&
                              DoDimensionDoor(gpCurAIHero));
 
@@ -3095,7 +3095,7 @@ i32 philAI::FightValueOfStack(armyGroup *group, hero *heroPtr, i32 useHero,
     townRecord19 = 0;
 
     if (useEnemyMods) {
-        if (heroPtr->HasArtifact(ARTIFACT_BALLISTA) || heroPtr->HasSpell(0x2f) ||
+        if (heroPtr->HasArtifact(ARTIFACT_BALLISTA) || heroPtr->HasSpell(SPELL_EARTHQUAKE) ||
             heroPtr->m_secondarySkills[10]) {
             enemyMeleeModifierIndex = 1.05f;
             enemyFlyingModifier36 = 0.95f;
@@ -3557,7 +3557,7 @@ i32 philAI::QuickCombat(armyGroup *attacker, hero *attackerHero,
     if (defeatedHero5 != 0 &&
         defeatedHero5->m_secondarySkills[HERO_SKILL_EAGLE_EYE] != 0 &&
         victoriousHero4 != 0) {
-        for (armyIndex0 = 0; armyIndex0 < AI_QUICK_COMBAT_SPELL_COUNT;
+        for (armyIndex0 = 0; armyIndex0 < SPELL_COUNT;
              armyIndex0++) {
             if (defeatedHero5->HasSpell(armyIndex0) != 0 &&
                 victoriousHero4->HasSpell(armyIndex0) == 0 &&

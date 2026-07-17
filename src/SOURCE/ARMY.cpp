@@ -1414,29 +1414,29 @@ void army::DoAttack(i32 retaliation)
             if (target_1->m_quantity > 0) {
                 if (!breathTarget_6 || breathTarget_6->m_quantity > 0) {
                     if (SRandom(1, ARMY_PERCENT_MAX) < ARMY_ATTACK_EFFECT_CHANCE) {
-                        if (target_1 && target_1->SpellCastWorks(ARMY_ATTACK_SPELL_CYCLOPS)) {
-                            target_1->m_spellEffect = ARMY_ATTACK_SPELL_CYCLOPS;
+                        if (target_1 && target_1->SpellCastWorks(SPELL_PARALYZE)) {
+                            target_1->m_spellEffect = SPELL_PARALYZE;
                             effectStopsRetaliation_4 = 1;
                         }
                     } else if (SRandom(1, ARMY_PERCENT_MAX) < ARMY_ATTACK_EFFECT_CHANCE &&
                                breathTarget_6 &&
-                               breathTarget_6->SpellCastWorks(ARMY_ATTACK_SPELL_CYCLOPS)) {
-                        breathTarget_6->m_spellEffect = ARMY_ATTACK_SPELL_CYCLOPS;
+                               breathTarget_6->SpellCastWorks(SPELL_PARALYZE)) {
+                        breathTarget_6->m_spellEffect = SPELL_PARALYZE;
                     }
                 }
             }
             break;
         case CREATURE_UNICORN:
             if (SRandom(1, ARMY_PERCENT_MAX) < ARMY_ATTACK_EFFECT_CHANCE && target_1 &&
-                target_1->SpellCastWorks(ARMY_ATTACK_SPELL_UNICORN)) {
-                target_1->m_spellEffect = ARMY_ATTACK_SPELL_UNICORN;
+                target_1->SpellCastWorks(SPELL_BLIND)) {
+                target_1->m_spellEffect = SPELL_BLIND;
                 effectStopsRetaliation_4 = 1;
             }
             break;
         case CREATURE_MEDUSA:
             if (SRandom(1, ARMY_PERCENT_MAX) < ARMY_ATTACK_EFFECT_CHANCE && target_1 &&
-                target_1->SpellCastWorks(ARMY_ATTACK_SPELL_MEDUSA)) {
-                target_1->m_spellEffect = ARMY_ATTACK_SPELL_MEDUSA;
+                target_1->SpellCastWorks(CREATURE_SPELL_PETRIFY)) {
+                target_1->m_spellEffect = CREATURE_SPELL_PETRIFY;
                 effectStopsRetaliation_4 = 1;
             }
             break;
@@ -1448,15 +1448,15 @@ void army::DoAttack(i32 retaliation)
         case CREATURE_ROYAL_MUMMY:
             if (SRandom(1, ARMY_PERCENT_MAX) < ARMY_ROYAL_MUMMY_EFFECT_CHANCE) {
 applyMummySpell:
-                if (target_1 && target_1->SpellCastWorks(ARMY_ATTACK_SPELL_MUMMY)) {
-                    target_1->m_spellEffect = ARMY_ATTACK_SPELL_MUMMY;
+                if (target_1 && target_1->SpellCastWorks(SPELL_CURSE)) {
+                    target_1->m_spellEffect = SPELL_CURSE;
                 }
             }
             break;
         case CREATURE_ARCHMAGE:
             if (SRandom(1, ARMY_PERCENT_MAX) < ARMY_ATTACK_EFFECT_CHANCE && target_1 &&
-                target_1->SpellCastWorks(ARMY_ATTACK_SPELL_ARCHMAGE)) {
-                target_1->m_spellEffect = ARMY_ATTACK_SPELL_ARCHMAGE;
+                target_1->SpellCastWorks(CREATURE_SPELL_DISPEL)) {
+                target_1->m_spellEffect = CREATURE_SPELL_DISPEL;
             }
             break;
         case CREATURE_GHOST:
@@ -1945,7 +1945,7 @@ i32 army::Damage(i32l damage, i32 spell)
     i32 quantityFifth;
 
     damage += m_hitPointsLost;
-    if (spell != -1) {
+    if (spell != SPELL_NONE) {
         if (gbRemoteOn) {
             gpCombatManager->ModifyDamageForArtifacts(
                 &damage, spell,
@@ -3133,7 +3133,7 @@ float army::SpellCastWorkChance(i32 spell)
         if (gpCombatManager->m_heroes[m_side]->HasArtifact(
                 ARTIFACT_WAND_NEGATION) &&
             (spell == SPELL_DISPEL || spell == SPELL_MASS_DISPEL ||
-             spell == SPELL_CREATURE_DISPEL)) {
+             spell == CREATURE_SPELL_DISPEL)) {
             return ARMY_SPELL_CHANCE_NONE;
         }
     }
@@ -3152,7 +3152,7 @@ float army::SpellCastWorkChance(i32 spell)
             return ARMY_SPELL_CHANCE_NONE;
         }
     }
-    if (spell == SPELL_CREATURE_DISPEL &&
+    if (spell == CREATURE_SPELL_DISPEL &&
         !m_spellInfluence[ARMY_SPELL_INFLUENCE_HASTE] &&
         !m_spellInfluence[ARMY_SPELL_INFLUENCE_BLESS] &&
         !m_spellInfluence[ARMY_SPELL_INFLUENCE_DRAGON_SLAYER] &&
