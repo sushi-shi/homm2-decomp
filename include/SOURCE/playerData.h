@@ -39,10 +39,10 @@ public:
     i8 m_evilInterface;              // +0xab
     i8 m_barrierTents;               // +0xac
     char m_unknownad
-        [6]; // +0xad save-serialized in playerData::Write/Read but never otherwise read; unknown in Ironfist (_4_2_1) too
+        [6]; // +0xad save-serialized in playerData::Write/Read but never otherwise read
     playerAttentionWeights m_attentionWeights; // +0xb3
     char m_unknownCb
-        [0x1c]; // +0xcb never referenced; sits after the AI attention weights; unknown in Ironfist (_4_2_2) too
+        [0x1c]; // +0xcb never referenced; sits after the AI attention weights
     i32 m_income[7];            // +0xe7
     i32 m_obeliskValue;         // +0x103
     i32 m_totalObeliskValue;    // +0x107

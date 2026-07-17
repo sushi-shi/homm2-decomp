@@ -87,8 +87,8 @@ do not add current assignments, queue snapshots, percentages, or next actions.
   keeps `SIZE` byte-neutral; do not turn it into emitted declarations.
 - Use inline accessors where retail `/Ob1` traces prove them. Do not replace modeled fields
   with `reinterpret_cast<unsigned char *>(this)[offset]` merely for a local score gain.
-- Do not search for unavailable original source. fheroes2 and Project Ironfist are
-  secondary naming/semantic references only; adapt useful names to this repository.
+- Do not search for unavailable original source. Secondary references are for
+  naming/semantic guidance only; adapt useful names to this repository.
 
 ## Data And Linking
 

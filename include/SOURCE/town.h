@@ -80,7 +80,7 @@ public:
     u32l m_buildings;       // +0x18
     i8 m_buildState;        // +0x1c
     char
-        m_unknown1d; // +0x1d zero-initialized only, never read; unknown in Ironfist (field_1D) and fheroes2 alike
+        m_unknown1d; // +0x1d zero-initialized only, never read
     i16 m_garrison[12];         // +0x1e
     u8 m_onMap;                 // +0x36
     i8 m_mayNotUpgradeToCastle; // +0x37
