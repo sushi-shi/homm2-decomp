@@ -21,7 +21,7 @@ struct SAMPLE2;
 struct SMapChange;
 struct tag_message;
 
-#define ADVMGR_MONSTER_ANIMATION_FRAME_COUNT 16
+#define ADVMGR_MONSTER_ANIMATION_FRAME_COUNT 18
 
 struct adventureSoundCell {
     int soundId;
