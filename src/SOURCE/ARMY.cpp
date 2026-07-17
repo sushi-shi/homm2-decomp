@@ -236,9 +236,9 @@ void army::LoadResources(void)
 
     for (i = 0; i < ARMY_PRIMARY_SAMPLE_COUNT; i++) {
         if (m_samples[i]) {
-            m_samples[i]->m_volume = ARMY_SAMPLE_VOLUME;
-            m_samples[i]->m_channelType = ARMY_SAMPLE_CHANNEL;
-            m_samples[i]->m_loopCount = 1;
+            m_samples[i]->m_playbackData.volume = ARMY_SAMPLE_VOLUME;
+            m_samples[i]->m_playbackData.channelType = ARMY_SAMPLE_CHANNEL;
+            m_samples[i]->m_playbackData.loopCount = 1;
         }
     }
 }
@@ -480,12 +480,12 @@ void army::Wince(void)
     m_animationFrame = 0;
 }
 
-// @early-stop
-// @early-stop-reloc-only
-// The 0x2c frame, every visible slot, CFG, and 151 ordered relocation sites
-// align. After restoring oldMinX/oldHex order and the frame-info duration read,
-// the instruction streams differ only at the __adjust_fdiv/iLeftRightSave
-// effective-address alias. Prior clamp and comparison variants are exhausted.
+// @semantic: The 0x2c frame, every visible slot, complete CFG, and all 151
+// ordered relocations align after the nested sample-layout correction. Live
+// residuals are two equivalent extent-clamp operand orders, the two final
+// range-branch polarities, and the __adjust_fdiv/iLeftRightSave alias. Direct,
+// commuted, negated, and scalar-SIB forms were previously exhausted; revisit
+// after later ARMY TU-state changes.
 VA(0x0044bc55, 0xb90)
 void army::Walk(int direction, int finishStanding, int skipDrawing)
 {
