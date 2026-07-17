@@ -1287,7 +1287,7 @@ recruitDragon:
                 "{Shrine of the 3rd Circle}\n\nYou come across a lavish shrine attended by a group of high priests.  In exchange for your protection, they agree to teach you a sophisticated spell - ",
                 gSpellNames[eventValue1]);
 shrineSpell:
-        if (!eventHero2->HasArtifact(PYRAMID_SPELLBOOK_ARTIFACT)) {
+        if (!eventHero2->HasArtifact(ARTIFACT_MAGIC_BOOK)) {
             strcat(gText, "Unfortunately, you have no Magic Book to record the spell with.");
             EventWindow(-1, 1, gText, -1, 0, -1, 0, -1);
         }
@@ -1356,9 +1356,9 @@ teleportHero:
         goto findTeleportDestination;
 
     case MAP_EVENT_ARTIFACT: {
-        artifactResourceType = (cell->m_objectMetadata & ARTIFACT_RESOURCE_MASK) >> ARTIFACT_RESOURCE_SHIFT;
+        artifactResourceType = (cell->m_objectMetadata & ARTIFACT_EVENT_RESOURCE_MASK) >> ARTIFACT_EVENT_RESOURCE_SHIFT;
         artifact8 = cell->m_objectIndex >> 1;
-        guardedMonster5 = cell->m_objectMetadata & ARTIFACT_MONSTER_MASK;
+        guardedMonster5 = cell->m_objectMetadata & ARTIFACT_EVENT_MONSTER_MASK;
         if (eventHero2->NumArtifacts() == EVENT_ARTIFACT_CAPACITY) {
             NormalDialog("You cannot pick up this artifact, you already have a full load!",
                          1, -1, -1, -1, 0, -1, 0, -1, 0);
@@ -1388,16 +1388,16 @@ teleportHero:
             break;
         }
 
-        if (!(cell->m_objectMetadata & ARTIFACT_GUARDED_FLAG)) {
-            switch (cell->m_objectMetadata & ARTIFACT_MODE_MASK) {
-            case ARTIFACT_MODE_PICKUP:
+        if (!(cell->m_objectMetadata & ARTIFACT_EVENT_GUARDED_FLAG)) {
+            switch (cell->m_objectMetadata & ARTIFACT_EVENT_MODE_MASK) {
+            case ARTIFACT_EVENT_MODE_PICKUP:
 artifactPickup:
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 EventWindow(-1, 1, gArtifactEvent[artifact8], MAP_EVENT_REWARD_ARTIFACT, artifact8,
                             -1, 0, -1);
                 goto giveArtifact;
 
-            case ARTIFACT_MODE_GOLD:
+            case ARTIFACT_EVENT_MODE_GOLD:
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 sprintf(gText,
                         "{Artifact}\n\nA leprechaun offers you the %s for the small price of 2000 gold.  Do you wish to buy this artifact?",
@@ -1405,8 +1405,8 @@ artifactPickup:
                 EventWindow(-1, 2, gText, MAP_EVENT_REWARD_ARTIFACT, artifact8,
                             -1, 0, -1);
                 if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
-                    if (gpGame->m_players[eventHero2->m_owner].m_resources[RES_GOLD] >= ARTIFACT_GOLD_COST) {
-                        gpGame->m_players[eventHero2->m_owner].m_resources[RES_GOLD] -= ARTIFACT_GOLD_COST;
+                    if (gpGame->m_players[eventHero2->m_owner].m_resources[RES_GOLD] >= ARTIFACT_EVENT_GOLD_COST) {
+                        gpGame->m_players[eventHero2->m_owner].m_resources[RES_GOLD] -= ARTIFACT_EVENT_GOLD_COST;
                         goto giveArtifact;
                     }
                     NormalDialog("You try to pay the leprechaun, but realize that you can't afford it.  The leprechaun stamps his foot and ignores you.",
@@ -1418,7 +1418,7 @@ artifactPickup:
                 }
                 break;
 
-            case ARTIFACT_MODE_WISDOM:
+            case ARTIFACT_EVENT_MODE_WISDOM:
                 if (eventHero2->m_secondarySkills[HERO_SKILL_WISDOM])
                     goto artifactPickup;
                 sprintf(gText,
@@ -1427,7 +1427,7 @@ artifactPickup:
                 NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
                 break;
 
-            case ARTIFACT_MODE_LEADERSHIP:
+            case ARTIFACT_EVENT_MODE_LEADERSHIP:
                 if (eventHero2->m_secondarySkills[HERO_SKILL_LEADERSHIP])
                     goto artifactPickup;
                 sprintf(gText,
@@ -1436,7 +1436,7 @@ artifactPickup:
                 NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
                 break;
 
-            case ARTIFACT_MODE_RESOURCE_3:
+            case ARTIFACT_EVENT_MODE_RESOURCE_3:
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 sprintf(sphinxAnswer_a, gResourceNames[artifactResourceType]);
                 sphinxAnswer_a[0] += ' ';
@@ -1446,10 +1446,10 @@ artifactPickup:
                 NormalDialog(gText, 2, -1, -1, MAP_EVENT_REWARD_ARTIFACT, artifact8,
                              -1, 0, -1, 0);
                 if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
-                    if (gpGame->m_players[eventHero2->m_owner].m_resources[RES_GOLD] >= ARTIFACT_RESOURCE_3_GOLD_COST &&
-                        gpGame->m_players[eventHero2->m_owner].m_resources[artifactResourceType] >= ARTIFACT_RESOURCE_3_AMOUNT) {
-                        gpGame->m_players[eventHero2->m_owner].m_resources[RES_GOLD] -= ARTIFACT_RESOURCE_3_GOLD_COST;
-                        gpGame->m_players[eventHero2->m_owner].m_resources[artifactResourceType] -= ARTIFACT_RESOURCE_3_AMOUNT;
+                    if (gpGame->m_players[eventHero2->m_owner].m_resources[RES_GOLD] >= ARTIFACT_EVENT_RESOURCE_3_GOLD_COST &&
+                        gpGame->m_players[eventHero2->m_owner].m_resources[artifactResourceType] >= ARTIFACT_EVENT_RESOURCE_3_AMOUNT) {
+                        gpGame->m_players[eventHero2->m_owner].m_resources[RES_GOLD] -= ARTIFACT_EVENT_RESOURCE_3_GOLD_COST;
+                        gpGame->m_players[eventHero2->m_owner].m_resources[artifactResourceType] -= ARTIFACT_EVENT_RESOURCE_3_AMOUNT;
                         goto giveArtifact;
                     }
                     NormalDialog("You try to pay the leprechaun, but realize that you can't afford it.  The leprechaun stamps his foot and ignores you.",
@@ -1461,7 +1461,7 @@ artifactPickup:
                 }
                 break;
 
-            case ARTIFACT_MODE_RESOURCE_5:
+            case ARTIFACT_EVENT_MODE_RESOURCE_5:
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 sprintf(sphinxAnswer_a, gResourceNames[artifactResourceType]);
                 sphinxAnswer_a[0] += ' ';
@@ -1471,10 +1471,10 @@ artifactPickup:
                 NormalDialog(gText, 2, -1, -1, MAP_EVENT_REWARD_ARTIFACT, artifact8,
                              -1, 0, -1, 0);
                 if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
-                    if (gpGame->m_players[eventHero2->m_owner].m_resources[RES_GOLD] >= ARTIFACT_RESOURCE_5_GOLD_COST &&
-                        gpGame->m_players[eventHero2->m_owner].m_resources[artifactResourceType] >= ARTIFACT_RESOURCE_5_AMOUNT) {
-                        gpGame->m_players[eventHero2->m_owner].m_resources[RES_GOLD] -= ARTIFACT_RESOURCE_5_GOLD_COST;
-                        gpGame->m_players[eventHero2->m_owner].m_resources[artifactResourceType] -= ARTIFACT_RESOURCE_5_AMOUNT;
+                    if (gpGame->m_players[eventHero2->m_owner].m_resources[RES_GOLD] >= ARTIFACT_EVENT_RESOURCE_5_GOLD_COST &&
+                        gpGame->m_players[eventHero2->m_owner].m_resources[artifactResourceType] >= ARTIFACT_EVENT_RESOURCE_5_AMOUNT) {
+                        gpGame->m_players[eventHero2->m_owner].m_resources[RES_GOLD] -= ARTIFACT_EVENT_RESOURCE_5_GOLD_COST;
+                        gpGame->m_players[eventHero2->m_owner].m_resources[artifactResourceType] -= ARTIFACT_EVENT_RESOURCE_5_AMOUNT;
                         goto giveArtifact;
                     }
                     NormalDialog("You try to pay the leprechaun, but realize that you can't afford it.  The leprechaun stamps his foot and ignores you.",
@@ -1492,7 +1492,7 @@ artifactPickup:
             if (guardedMonster5 == CREATURE_ROGUE) {
                 NormalDialog("{Artifact}\n\nYou come upon an ancient artifact.  As you reach for it, a pack of Rogues leap out of the brush to guard their stolen loot.",
                              1, -1, -1, -1, 0, -1, 0, -1, 0);
-                guardedCount = ARTIFACT_ROGUE_COUNT;
+                guardedCount = ARTIFACT_EVENT_GUARD_ROGUE_COUNT;
             }
             else {
                 guardedCount = 1;
@@ -1772,7 +1772,7 @@ daemonExperienceGold:
                     sprintf(eventText, "%s'%s'.  ",
                             "Upon defeating the monsters, you decipher an ancient glyph on the wall, telling the secret of the spell - ",
                             gSpellNames[eventValue1]);
-                    if (!eventHero2->HasArtifact(PYRAMID_SPELLBOOK_ARTIFACT)) {
+                    if (!eventHero2->HasArtifact(ARTIFACT_MAGIC_BOOK)) {
                         strcat(eventText,
                                "  Unfortunately, you have no Magic Book to record the spell with.");
                         EventWindow(-1, 1, eventText, -1, 0, -1, 0, -1);
@@ -2223,7 +2223,7 @@ void advManager::GenericSiteEvent(mapCell *cell, hero *eventHero)
                     for (index3 = 0;
                          index3 < GENERIC_SITE_ARTIFACT_SLOT_COUNT; index3++) {
                         if (IsCursedItem(eventHero->m_artifacts[index3]))
-                            eventHero->m_artifacts[index3] = -1;
+                            eventHero->m_artifacts[index3] = ARTIFACT_NONE;
                     }
                     gpCurPlayer->m_resources[RES_GOLD] -=
                         GENERIC_SITE_ALCHEMIST_COST;
@@ -2776,13 +2776,13 @@ i32 GiveArtifact(hero *eventHero, i32 artifact, i32 checkEndGame,
 
     for (artifactSlot = 0; artifactSlot < EVENT_ARTIFACT_SLOT_COUNT;
          artifactSlot++) {
-        if (eventHero->m_artifacts[artifactSlot] == EVENT_ARTIFACT_NONE) {
+        if (eventHero->m_artifacts[artifactSlot] == ARTIFACT_NONE) {
             break;
         }
     }
 
     if (artifactSlot == EVENT_ARTIFACT_SLOT_COUNT) {
-        return EVENT_ARTIFACT_NONE;
+        return ARTIFACT_NONE;
     }
 
     eventHero->m_artifacts[artifactSlot] = artifact;
@@ -2799,10 +2799,10 @@ i32 advManager::GiveRandomArtifact(hero *eventHero)
 {
     i32 artifactId = gpGame->GetRandomArtifactId(EVENT_RANDOM_ARTIFACT_ANY, 1);
 
-    if (artifactId == EVENT_ARTIFACT_NONE)
+    if (artifactId == ARTIFACT_NONE)
         GiveResource(eventHero, RES_GOLD, EVENT_RANDOM_ARTIFACT_GOLD);
     else
-        GiveArtifact(eventHero, artifactId, 1, EVENT_ARTIFACT_NONE);
+        GiveArtifact(eventHero, artifactId, 1, ARTIFACT_NONE);
     return artifactId;
 }
 
@@ -2960,7 +2960,7 @@ i32 advManager::ZombieEvent(hero *eventHero, mapCell *cell, char *text,
                 ZOMBIE_EVENT_HUGE_SUPPORT_COUNT, ZOMBIE_EVENT_SUPPORT_STACKS,
                 -1, 0, 0) == 0) {
             artifactId = GiveRandomArtifact(eventHero);
-            if (artifactId != EVENT_ARTIFACT_NONE)
+            if (artifactId != ARTIFACT_NONE)
                 EventWindow(-1, 1, text, RES_GOLD, ZOMBIE_EVENT_HUGE_GOLD,
                             MAP_EVENT_REWARD_ARTIFACT, artifactId, -1);
             else
@@ -3023,7 +3023,7 @@ i32 advManager::GhostEvent(hero *eventHero, mapCell *cell, char *text,
                                -1, 0, 0, -1, 0, 0) == 0) {
             artifactId = GiveRandomArtifact(eventHero);
             sprintf(gText, "%s", text);
-            if (artifactId != EVENT_ARTIFACT_NONE)
+            if (artifactId != ARTIFACT_NONE)
                 EventWindow(-1, 1, gText, RES_GOLD, GHOST_EVENT_HUGE_GOLD,
                             MAP_EVENT_REWARD_ARTIFACT, artifactId, -1);
             else
@@ -3281,7 +3281,7 @@ void GiveTakeArtifactStat(hero *targetHero, i32 artifact, i32 take)
     i32 statChanges[EVENT_ARTIFACT_PRIMARY_STAT_COUNT + 1];
     i32 maxSpellPoints;
 
-    if (artifact == EVENT_ARTIFACT_NONE)
+    if (artifact == ARTIFACT_NONE)
         return;
     statChanges[HERO_PRIMARY_ATTACK] = 0;
     statChanges[HERO_PRIMARY_DEFENSE] = 0;
@@ -3289,141 +3289,141 @@ void GiveTakeArtifactStat(hero *targetHero, i32 artifact, i32 take)
     statChanges[HERO_PRIMARY_KNOWLEDGE] = 0;
 
     switch (artifact) {
-    case EVENT_ARTIFACT_ULTIMATE_BOOK: statChanges[HERO_PRIMARY_KNOWLEDGE] = 12; break;
-    case EVENT_ARTIFACT_ULTIMATE_SWORD: statChanges[HERO_PRIMARY_ATTACK] = 12; break;
-    case EVENT_ARTIFACT_ULTIMATE_CLOAK: statChanges[HERO_PRIMARY_DEFENSE] = 12; break;
-    case EVENT_ARTIFACT_ULTIMATE_WAND: statChanges[HERO_PRIMARY_SPELL_POWER] = 12; break;
-    case EVENT_ARTIFACT_ULTIMATE_SHIELD:
+    case ARTIFACT_ULTIMATE_BOOK: statChanges[HERO_PRIMARY_KNOWLEDGE] = 12; break;
+    case ARTIFACT_ULTIMATE_SWORD: statChanges[HERO_PRIMARY_ATTACK] = 12; break;
+    case ARTIFACT_ULTIMATE_CLOAK: statChanges[HERO_PRIMARY_DEFENSE] = 12; break;
+    case ARTIFACT_ULTIMATE_WAND: statChanges[HERO_PRIMARY_SPELL_POWER] = 12; break;
+    case ARTIFACT_ULTIMATE_SHIELD:
         statChanges[HERO_PRIMARY_ATTACK] = 6;
         statChanges[HERO_PRIMARY_DEFENSE] = 6;
         break;
-    case EVENT_ARTIFACT_ULTIMATE_STAFF:
+    case ARTIFACT_ULTIMATE_STAFF:
         statChanges[HERO_PRIMARY_SPELL_POWER] = 6;
         statChanges[HERO_PRIMARY_KNOWLEDGE] = 6;
         break;
-    case EVENT_ARTIFACT_ULTIMATE_CROWN:
+    case ARTIFACT_ULTIMATE_CROWN:
         statChanges[HERO_PRIMARY_ATTACK] = 4;
         statChanges[HERO_PRIMARY_DEFENSE] = 4;
         statChanges[HERO_PRIMARY_SPELL_POWER] = 4;
         statChanges[HERO_PRIMARY_KNOWLEDGE] = 4;
         break;
-    case EVENT_ARTIFACT_GOLDEN_GOOSE: break;
-    case EVENT_ARTIFACT_ARCANE_NECKLACE: statChanges[HERO_PRIMARY_SPELL_POWER] = 4; break;
-    case EVENT_ARTIFACT_CASTER_BRACELET: statChanges[HERO_PRIMARY_SPELL_POWER] = 2; break;
-    case EVENT_ARTIFACT_MAGE_RING: statChanges[HERO_PRIMARY_SPELL_POWER] = 2; break;
-    case EVENT_ARTIFACT_WITCHES_BROACH: statChanges[HERO_PRIMARY_SPELL_POWER] = 3; break;
-    case EVENT_ARTIFACT_MEDAL_VALOR: break;
-    case EVENT_ARTIFACT_MEDAL_COURAGE: break;
-    case EVENT_ARTIFACT_MEDAL_HONOR: break;
-    case EVENT_ARTIFACT_MEDAL_DISTINCTION: break;
-    case EVENT_ARTIFACT_FIZBIN_MISFORTUNE: break;
-    case EVENT_ARTIFACT_THUNDER_MACE: statChanges[HERO_PRIMARY_ATTACK] = 1; break;
-    case EVENT_ARTIFACT_ARMORED_GAUNTLETS: statChanges[HERO_PRIMARY_DEFENSE] = 1; break;
-    case EVENT_ARTIFACT_DEFENDER_HELM: statChanges[HERO_PRIMARY_DEFENSE] = 1; break;
-    case EVENT_ARTIFACT_GIANT_FLAIL: statChanges[HERO_PRIMARY_ATTACK] = 1; break;
-    case EVENT_ARTIFACT_BALLISTA: break;
-    case EVENT_ARTIFACT_STEALTH_SHIELD: statChanges[HERO_PRIMARY_DEFENSE] = 2; break;
-    case EVENT_ARTIFACT_DRAGON_SWORD: statChanges[HERO_PRIMARY_ATTACK] = 3; break;
-    case EVENT_ARTIFACT_POWER_AXE: statChanges[HERO_PRIMARY_ATTACK] = 2; break;
-    case EVENT_ARTIFACT_DIVINE_BREASTPLATE: statChanges[HERO_PRIMARY_DEFENSE] = 3; break;
-    case EVENT_ARTIFACT_MINOR_SCROLL: statChanges[HERO_PRIMARY_KNOWLEDGE] = 2; break;
-    case EVENT_ARTIFACT_MAJOR_SCROLL: statChanges[HERO_PRIMARY_KNOWLEDGE] = 3; break;
-    case EVENT_ARTIFACT_SUPERIOR_SCROLL: statChanges[HERO_PRIMARY_KNOWLEDGE] = 4; break;
-    case EVENT_ARTIFACT_FOREMOST_SCROLL: statChanges[HERO_PRIMARY_KNOWLEDGE] = 5; break;
-    case EVENT_ARTIFACT_ENDLESS_SACK_GOLD: break;
-    case EVENT_ARTIFACT_ENDLESS_BAG_GOLD: break;
-    case EVENT_ARTIFACT_ENDLESS_PURSE_GOLD: break;
-    case EVENT_ARTIFACT_NOMAD_BOOTS: break;
-    case EVENT_ARTIFACT_TRAVELER_BOOTS: break;
-    case EVENT_ARTIFACT_RABBIT_FOOT: break;
-    case EVENT_ARTIFACT_GOLDEN_HORSESHOE: break;
-    case EVENT_ARTIFACT_GAMBLERS_COIN: break;
-    case EVENT_ARTIFACT_FOUR_LEAF_CLOVER: break;
-    case EVENT_ARTIFACT_TRUE_COMPASS: break;
-    case EVENT_ARTIFACT_SAILORS_ASTROLABE: break;
-    case EVENT_ARTIFACT_EVIL_EYE: break;
-    case EVENT_ARTIFACT_ENCHANTED_HOURGLASS: break;
-    case EVENT_ARTIFACT_GOLD_WATCH: break;
-    case EVENT_ARTIFACT_SKULLCAP: break;
-    case EVENT_ARTIFACT_ICE_CLOAK: break;
-    case EVENT_ARTIFACT_FIRE_CLOAK: break;
-    case EVENT_ARTIFACT_LIGHTNING_HELM: break;
-    case EVENT_ARTIFACT_EVERCOLD_ICICLE: break;
-    case EVENT_ARTIFACT_EVERHOT_LAVA_ROCK: break;
-    case EVENT_ARTIFACT_LIGHTNING_ROD: break;
-    case EVENT_ARTIFACT_SNAKE_RING: break;
-    case EVENT_ARTIFACT_ANKH: break;
-    case EVENT_ARTIFACT_BOOK_ELEMENTS: break;
-    case EVENT_ARTIFACT_ELEMENTAL_RING: break;
-    case EVENT_ARTIFACT_HOLY_PENDANT: break;
-    case EVENT_ARTIFACT_PENDANT_FREE_WILL: break;
-    case EVENT_ARTIFACT_PENDANT_LIFE: break;
-    case EVENT_ARTIFACT_SERENITY_PENDANT: break;
-    case EVENT_ARTIFACT_SEEING_EYE_PENDANT: break;
-    case EVENT_ARTIFACT_KINETIC_PENDANT: break;
-    case EVENT_ARTIFACT_PENDANT_DEATH: break;
-    case EVENT_ARTIFACT_WAND_NEGATION: break;
-    case EVENT_ARTIFACT_GOLDEN_BOW: break;
-    case EVENT_ARTIFACT_TELESCOPE: break;
-    case EVENT_ARTIFACT_STATESMAN_QUILL: break;
-    case EVENT_ARTIFACT_WIZARD_HAT: break;
-    case EVENT_ARTIFACT_POWER_RING: break;
-    case EVENT_ARTIFACT_AMMO_CART: break;
-    case EVENT_ARTIFACT_TAX_LIEN: break;
-    case EVENT_ARTIFACT_HIDEOUS_MASK: break;
-    case EVENT_ARTIFACT_ENDLESS_POUCH_SULFUR: break;
-    case EVENT_ARTIFACT_ENDLESS_VIAL_MERCURY: break;
-    case EVENT_ARTIFACT_ENDLESS_POUCH_GEMS: break;
-    case EVENT_ARTIFACT_ENDLESS_CORD_WOOD: break;
-    case EVENT_ARTIFACT_ENDLESS_CART_ORE: break;
-    case EVENT_ARTIFACT_ENDLESS_POUCH_CRYSTAL: break;
-    case EVENT_ARTIFACT_SPIKED_HELM:
+    case ARTIFACT_GOLDEN_GOOSE: break;
+    case ARTIFACT_ARCANE_NECKLACE: statChanges[HERO_PRIMARY_SPELL_POWER] = 4; break;
+    case ARTIFACT_CASTER_BRACELET: statChanges[HERO_PRIMARY_SPELL_POWER] = 2; break;
+    case ARTIFACT_MAGE_RING: statChanges[HERO_PRIMARY_SPELL_POWER] = 2; break;
+    case ARTIFACT_WITCHES_BROACH: statChanges[HERO_PRIMARY_SPELL_POWER] = 3; break;
+    case ARTIFACT_MEDAL_OF_VALOR: break;
+    case ARTIFACT_MEDAL_OF_COURAGE: break;
+    case ARTIFACT_MEDAL_OF_HONOR: break;
+    case ARTIFACT_MEDAL_OF_DISTINCTION: break;
+    case ARTIFACT_FIZBIN_OF_MISFORTUNE: break;
+    case ARTIFACT_THUNDER_MACE: statChanges[HERO_PRIMARY_ATTACK] = 1; break;
+    case ARTIFACT_ARMORED_GAUNTLETS: statChanges[HERO_PRIMARY_DEFENSE] = 1; break;
+    case ARTIFACT_DEFENDER_HELM: statChanges[HERO_PRIMARY_DEFENSE] = 1; break;
+    case ARTIFACT_GIANT_FLAIL: statChanges[HERO_PRIMARY_ATTACK] = 1; break;
+    case ARTIFACT_BALLISTA: break;
+    case ARTIFACT_STEALTH_SHIELD: statChanges[HERO_PRIMARY_DEFENSE] = 2; break;
+    case ARTIFACT_DRAGON_SWORD: statChanges[HERO_PRIMARY_ATTACK] = 3; break;
+    case ARTIFACT_POWER_AXE: statChanges[HERO_PRIMARY_ATTACK] = 2; break;
+    case ARTIFACT_DIVINE_BREASTPLATE: statChanges[HERO_PRIMARY_DEFENSE] = 3; break;
+    case ARTIFACT_MINOR_SCROLL: statChanges[HERO_PRIMARY_KNOWLEDGE] = 2; break;
+    case ARTIFACT_MAJOR_SCROLL: statChanges[HERO_PRIMARY_KNOWLEDGE] = 3; break;
+    case ARTIFACT_SUPERIOR_SCROLL: statChanges[HERO_PRIMARY_KNOWLEDGE] = 4; break;
+    case ARTIFACT_FOREMOST_SCROLL: statChanges[HERO_PRIMARY_KNOWLEDGE] = 5; break;
+    case ARTIFACT_ENDLESS_SACK_GOLD: break;
+    case ARTIFACT_ENDLESS_BAG_GOLD: break;
+    case ARTIFACT_ENDLESS_PURSE_GOLD: break;
+    case ARTIFACT_NOMAD_BOOTS: break;
+    case ARTIFACT_TRAVELER_BOOTS: break;
+    case ARTIFACT_RABBIT_FOOT: break;
+    case ARTIFACT_GOLDEN_HORSESHOE: break;
+    case ARTIFACT_GAMBLERS_COIN: break;
+    case ARTIFACT_FOUR_LEAF_CLOVER: break;
+    case ARTIFACT_TRUE_COMPASS: break;
+    case ARTIFACT_SAILORS_ASTROLABE: break;
+    case ARTIFACT_EVIL_EYE: break;
+    case ARTIFACT_ENCHANTED_HOURGLASS: break;
+    case ARTIFACT_GOLD_WATCH: break;
+    case ARTIFACT_SKULLCAP: break;
+    case ARTIFACT_ICE_CLOAK: break;
+    case ARTIFACT_FIRE_CLOAK: break;
+    case ARTIFACT_LIGHTNING_HELM: break;
+    case ARTIFACT_EVERCOLD_ICICLE: break;
+    case ARTIFACT_EVERHOT_LAVA_ROCK: break;
+    case ARTIFACT_LIGHTNING_ROD: break;
+    case ARTIFACT_SNAKE_RING: break;
+    case ARTIFACT_ANKH: break;
+    case ARTIFACT_BOOK_ELEMENTS: break;
+    case ARTIFACT_ELEMENTAL_RING: break;
+    case ARTIFACT_HOLY_PENDANT: break;
+    case ARTIFACT_PENDANT_FREE_WILL: break;
+    case ARTIFACT_PENDANT_LIFE: break;
+    case ARTIFACT_SERENITY_PENDANT: break;
+    case ARTIFACT_SEEING_EYE_PENDANT: break;
+    case ARTIFACT_KINETIC_PENDANT: break;
+    case ARTIFACT_PENDANT_DEATH: break;
+    case ARTIFACT_WAND_NEGATION: break;
+    case ARTIFACT_GOLDEN_BOW: break;
+    case ARTIFACT_TELESCOPE: break;
+    case ARTIFACT_STATESMANS_QUILL: break;
+    case ARTIFACT_WIZARD_HAT: break;
+    case ARTIFACT_POWER_RING: break;
+    case ARTIFACT_AMMO_CART: break;
+    case ARTIFACT_TAX_LIEN: break;
+    case ARTIFACT_HIDEOUS_MASK: break;
+    case ARTIFACT_ENDLESS_POUCH_SULFUR: break;
+    case ARTIFACT_ENDLESS_VIAL_MERCURY: break;
+    case ARTIFACT_ENDLESS_POUCH_GEMS: break;
+    case ARTIFACT_ENDLESS_CORD_WOOD: break;
+    case ARTIFACT_ENDLESS_CART_ORE: break;
+    case ARTIFACT_ENDLESS_POUCH_CRYSTAL: break;
+    case ARTIFACT_SPIKED_HELM:
         statChanges[HERO_PRIMARY_ATTACK] = 1;
         statChanges[HERO_PRIMARY_DEFENSE] = 1;
         break;
-    case EVENT_ARTIFACT_SPIKED_SHIELD:
+    case ARTIFACT_SPIKED_SHIELD:
         statChanges[HERO_PRIMARY_ATTACK] = 2;
         statChanges[HERO_PRIMARY_DEFENSE] = 2;
         break;
-    case EVENT_ARTIFACT_WHITE_PEARL:
+    case ARTIFACT_WHITE_PEARL:
         statChanges[HERO_PRIMARY_SPELL_POWER] = 1;
         statChanges[HERO_PRIMARY_KNOWLEDGE] = 1;
         break;
-    case EVENT_ARTIFACT_BLACK_PEARL:
+    case ARTIFACT_BLACK_PEARL:
         statChanges[HERO_PRIMARY_SPELL_POWER] = 2;
         statChanges[HERO_PRIMARY_KNOWLEDGE] = 2;
         break;
-    case EVENT_ARTIFACT_MAGIC_BOOK: break;
-    case EVENT_ARTIFACT_SPELL_SCROLL:
+    case ARTIFACT_MAGIC_BOOK: break;
+    case ARTIFACT_SPELL_SCROLL:
         break;
-    case EVENT_ARTIFACT_ARM_OF_MARTYR: statChanges[HERO_PRIMARY_SPELL_POWER] = 3; break;
-    case EVENT_ARTIFACT_BREASTPLATE_ANDURAN: statChanges[HERO_PRIMARY_DEFENSE] = 5; break;
-    case EVENT_ARTIFACT_BROACH_SHIELDING: statChanges[HERO_PRIMARY_SPELL_POWER] = -2; break;
-    case EVENT_ARTIFACT_BATTLE_GARB:
+    case ARTIFACT_ARM_OF_MARTYR: statChanges[HERO_PRIMARY_SPELL_POWER] = 3; break;
+    case ARTIFACT_BREASTPLATE_ANDURAN: statChanges[HERO_PRIMARY_DEFENSE] = 5; break;
+    case ARTIFACT_BROACH_SHIELDING: statChanges[HERO_PRIMARY_SPELL_POWER] = -2; break;
+    case ARTIFACT_BATTLE_GARB:
         statChanges[HERO_PRIMARY_SPELL_POWER] = 5;
         statChanges[HERO_PRIMARY_DEFENSE] = 5;
         statChanges[HERO_PRIMARY_ATTACK] = 5;
         break;
-    case EVENT_ARTIFACT_CRYSTAL_BALL: break;
-    case EVENT_ARTIFACT_HEART_FIRE: break;
-    case EVENT_ARTIFACT_HEART_ICE: break;
-    case EVENT_ARTIFACT_HELMET_ANDURAN: statChanges[HERO_PRIMARY_SPELL_POWER] = 5; break;
-    case EVENT_ARTIFACT_HOLY_HAMMER: statChanges[HERO_PRIMARY_ATTACK] = 5; break;
-    case EVENT_ARTIFACT_LEGENDARY_SCEPTER:
+    case ARTIFACT_CRYSTAL_BALL: break;
+    case ARTIFACT_HEART_FIRE: break;
+    case ARTIFACT_HEART_ICE: break;
+    case ARTIFACT_HELMET_ANDURAN: statChanges[HERO_PRIMARY_SPELL_POWER] = 5; break;
+    case ARTIFACT_HOLY_HAMMER: statChanges[HERO_PRIMARY_ATTACK] = 5; break;
+    case ARTIFACT_LEGENDARY_SCEPTER:
         statChanges[HERO_PRIMARY_SPELL_POWER] = 2;
         statChanges[HERO_PRIMARY_ATTACK] = 2;
         statChanges[HERO_PRIMARY_DEFENSE] = 2;
         statChanges[HERO_PRIMARY_KNOWLEDGE] = 2;
         break;
-    case EVENT_ARTIFACT_MASTHEAD: break;
-    case EVENT_ARTIFACT_SPHERE_NEGATION: break;
-    case EVENT_ARTIFACT_STAFF_WIZARDRY: statChanges[HERO_PRIMARY_SPELL_POWER] = 5; break;
-    case EVENT_ARTIFACT_SWORD_BREAKER:
+    case ARTIFACT_MASTHEAD: break;
+    case ARTIFACT_SPHERE_NEGATION: break;
+    case ARTIFACT_STAFF_WIZARDRY: statChanges[HERO_PRIMARY_SPELL_POWER] = 5; break;
+    case ARTIFACT_SWORD_BREAKER:
         statChanges[HERO_PRIMARY_DEFENSE] = 4;
         statChanges[HERO_PRIMARY_ATTACK] = 1;
         break;
-    case EVENT_ARTIFACT_SWORD_ANDURAN: statChanges[HERO_PRIMARY_ATTACK] = 5; break;
-    case EVENT_ARTIFACT_SPADE_NECROMANCY: break;
+    case ARTIFACT_SWORD_ANDURAN: statChanges[HERO_PRIMARY_ATTACK] = 5; break;
+    case ARTIFACT_SPADE_NECROMANCY: break;
     default: break;
     }
 
@@ -3464,12 +3464,12 @@ void advManager::TransferArtifacts(hero *sourceHero, hero *destinationHero)
         } else {
             for (targetSlot = 0; targetSlot < EVENT_ARTIFACT_SLOT_COUNT;
                  targetSlot++) {
-                if (destinationHero->m_artifacts[targetSlot] == EVENT_ARTIFACT_NONE) {
+                if (destinationHero->m_artifacts[targetSlot] == ARTIFACT_NONE) {
                     for (sourceArtifactSlot = 0;
                          sourceArtifactSlot < EVENT_ARTIFACT_SLOT_COUNT;
                          sourceArtifactSlot++) {
-                        if (sourceHero->m_artifacts[sourceArtifactSlot] != EVENT_ARTIFACT_NONE &&
-                            sourceHero->m_artifacts[sourceArtifactSlot] != EVENT_ARTIFACT_MAGIC_BOOK) {
+                        if (sourceHero->m_artifacts[sourceArtifactSlot] != ARTIFACT_NONE &&
+                            sourceHero->m_artifacts[sourceArtifactSlot] != ARTIFACT_MAGIC_BOOK) {
                             if (sourceHero->m_artifacts[sourceArtifactSlot] <=
                                 EVENT_ARTIFACT_NON_TRANSFERABLE_LAST) {
                                 if (gbThisNetHumanPlayer[sourceHero->m_owner] ||
@@ -3492,8 +3492,8 @@ void advManager::TransferArtifacts(hero *sourceHero, hero *destinationHero)
                             }
                             GiveTakeArtifactStat(sourceHero,
                                                  sourceHero->m_artifacts[sourceArtifactSlot], 1);
-                            sourceHero->m_artifacts[sourceArtifactSlot] = EVENT_ARTIFACT_NONE;
-                            sourceHero->m_artifactExtra[sourceArtifactSlot] = EVENT_ARTIFACT_NONE;
+                            sourceHero->m_artifacts[sourceArtifactSlot] = ARTIFACT_NONE;
+                            sourceHero->m_artifactExtra[sourceArtifactSlot] = ARTIFACT_NONE;
                             break;
                         }
                     }
@@ -3875,9 +3875,9 @@ chestGoldOrExperience:
     case MAP_EVENT_LEAN_TO:
         if (cell->m_objectMetadata != MAP_EVENT_DATA_EMPTY) {
             GiveResource(eventHero,
-                         (cell->m_objectMetadata & ARTIFACT_MODE_MASK) - 1,
-                         (cell->m_objectMetadata & ARTIFACT_RESOURCE_MASK) >>
-                             ARTIFACT_RESOURCE_SHIFT);
+                         (cell->m_objectMetadata & ARTIFACT_EVENT_MODE_MASK) - 1,
+                         (cell->m_objectMetadata & ARTIFACT_EVENT_RESOURCE_MASK) >>
+                             ARTIFACT_EVENT_RESOURCE_SHIFT);
             cell->m_objectMetadata = MAP_EVENT_DATA_EMPTY;
         }
         break;
@@ -3891,9 +3891,9 @@ chestGoldOrExperience:
                 cell->m_objectMetadata = MAP_EVENT_DATA_EMPTY;
             } else {
                 GiveResource(eventHero,
-                             (cell->m_objectMetadata & ARTIFACT_MODE_MASK) - 1,
-                             (cell->m_objectMetadata & ARTIFACT_RESOURCE_MASK) >>
-                                 ARTIFACT_RESOURCE_SHIFT);
+                             (cell->m_objectMetadata & ARTIFACT_EVENT_MODE_MASK) - 1,
+                             (cell->m_objectMetadata & ARTIFACT_EVENT_RESOURCE_MASK) >>
+                                 ARTIFACT_EVENT_RESOURCE_SHIFT);
                 cell->m_objectMetadata = MAP_EVENT_DATA_EMPTY;
             }
         }
@@ -4180,7 +4180,7 @@ creaturePurchase:
     case MAP_EVENT_SHRINE_FIRST_CIRCLE:
     case MAP_EVENT_SHRINE_SECOND_CIRCLE:
     case MAP_EVENT_SHRINE_THIRD_CIRCLE:
-        if (eventHero->HasArtifact(AI_EVENT_MAGIC_BOOK) &&
+        if (eventHero->HasArtifact(ARTIFACT_MAGIC_BOOK) &&
             gsSpellInfo[cell->m_objectMetadata - 1].level <=
                 eventHero->m_secondarySkills[HERO_SKILL_WISDOM] + 2) {
             eventHero->AddSpell(cell->m_objectMetadata - 1,
@@ -4239,19 +4239,19 @@ teleportDestination:
         break;
 
     case MAP_EVENT_ARTIFACT:
-        artifactResource_p = (cell->m_objectMetadata & ARTIFACT_RESOURCE_MASK) >>
-                           ARTIFACT_RESOURCE_SHIFT;
+        artifactResource_p = (cell->m_objectMetadata & ARTIFACT_EVENT_RESOURCE_MASK) >>
+                           ARTIFACT_EVENT_RESOURCE_SHIFT;
         artifact_g = cell->m_objectIndex >> 1;
-        artifactGuardCount_b = cell->m_objectMetadata & ARTIFACT_MONSTER_MASK;
+        artifactGuardCount_b = cell->m_objectMetadata & ARTIFACT_EVENT_MONSTER_MASK;
         if (eventHero->NumArtifacts() == AI_EVENT_ARTIFACT_LIMIT)
             break;
-        if (artifact_g == AI_EVENT_SPELL_SCROLL) {
+        if (artifact_g == ARTIFACT_SPELL_SCROLL) {
             GiveArtifact(eventHero, artifact_g, 1,
                          static_cast<i8>(cell->m_objectMetadata));
             eventResults[0] = 1;
             break;
         }
-        if (cell->m_objectMetadata & ARTIFACT_GUARDED_FLAG) {
+        if (cell->m_objectMetadata & ARTIFACT_EVENT_GUARDED_FLAG) {
             if (artifactGuardCount_b == CREATURE_ROGUE) {
                 artifactGuardResult_e = AI_EVENT_ROGUE_COUNT;
             } else {
@@ -4266,8 +4266,8 @@ teleportDestination:
                 break;
             goto artifactPickup;
         }
-        switch (cell->m_objectMetadata & ARTIFACT_MODE_MASK) {
-        case ARTIFACT_MODE_PICKUP:
+        switch (cell->m_objectMetadata & ARTIFACT_EVENT_MODE_MASK) {
+        case ARTIFACT_EVENT_MODE_PICKUP:
 artifactPickup:
             for (index_h = 0; index_h < AI_EVENT_RESOURCE_COUNT; ++index_h) {
                 if (gpCurPlayer->m_resources[index_h] < 0)
@@ -4276,7 +4276,7 @@ artifactPickup:
             GiveArtifact(eventHero, artifact_g, 1, -1);
             eventResults[0] = 1;
             break;
-        case ARTIFACT_MODE_GOLD:
+        case ARTIFACT_EVENT_MODE_GOLD:
             if (gpPhilAI->NetValueOfArtifact(
                     artifact_g, AI_EVENT_ARTIFACT_GOLD, 0, 0)) {
                 gpGame->m_players[eventHero->m_owner].m_resources[RES_GOLD] -=
@@ -4284,15 +4284,15 @@ artifactPickup:
                 goto artifactPickup;
             }
             break;
-        case ARTIFACT_MODE_WISDOM:
+        case ARTIFACT_EVENT_MODE_WISDOM:
             if (eventHero->m_secondarySkills[HERO_SKILL_WISDOM] != 0)
                 goto artifactPickup;
             break;
-        case ARTIFACT_MODE_LEADERSHIP:
+        case ARTIFACT_EVENT_MODE_LEADERSHIP:
             if (eventHero->m_secondarySkills[HERO_SKILL_LEADERSHIP] != 0)
                 goto artifactPickup;
             break;
-        case ARTIFACT_MODE_RESOURCE_3:
+        case ARTIFACT_EVENT_MODE_RESOURCE_3:
             if (gpPhilAI->NetValueOfArtifact(
                     artifact_g, AI_EVENT_ARTIFACT_RESOURCE_3_GOLD,
                     artifactResource_p, AI_EVENT_ARTIFACT_RESOURCE_3)) {
@@ -4304,7 +4304,7 @@ artifactPickup:
                 goto artifactPickup;
             }
             break;
-        case ARTIFACT_MODE_RESOURCE_5:
+        case ARTIFACT_EVENT_MODE_RESOURCE_5:
             if (gpPhilAI->NetValueOfArtifact(
                     artifact_g, AI_EVENT_ARTIFACT_RESOURCE_5_GOLD,
                     artifactResource_p, AI_EVENT_ARTIFACT_RESOURCE_5)) {
@@ -4642,7 +4642,7 @@ void advManager::GenericSiteAIEvent(mapCell *cell, hero *eventHero)
             for (artifactIndex1 = 0; artifactIndex1 < AI_EVENT_ARTIFACT_LIMIT;
                  artifactIndex1++) {
                 if (IsCursedItem(eventHero->m_artifacts[artifactIndex1]))
-                    eventHero->m_artifacts[artifactIndex1] = -1;
+                    eventHero->m_artifacts[artifactIndex1] = ARTIFACT_NONE;
             }
             gpCurPlayer->m_resources[RES_GOLD] -= AI_EVENT_CURSED_ARTIFACT_COST;
         }
@@ -4923,7 +4923,7 @@ void advManager::PlayerMonsterInteract(mapCell *cell, mapCell *combatCell, hero 
     }
 
     if (eventHero->m_army.CanJoin(monster_n) && strengthRatio_p > MONSTER_STRENGTH_JOIN &&
-        !eventHero->HasArtifact(MONSTER_NO_JOIN_ARTIFACT) &&
+        !eventHero->HasArtifact(ARTIFACT_HIDEOUS_MASK) &&
         monster_n != CREATURE_GHOST && monster_n != CREATURE_EARTH_ELEMENTAL &&
         monster_n != CREATURE_AIR_ELEMENTAL && monster_n != CREATURE_FIRE_ELEMENTAL &&
         monster_n != CREATURE_WATER_ELEMENTAL) {
@@ -5043,7 +5043,7 @@ void advManager::ComputerMonsterInteract(mapCell *cell, hero *eventHero,
                                        monsterCount[0]);
 
     if (eventHero->m_army.CanJoin(monsterType) &&
-        !eventHero->HasArtifact(MONSTER_NO_JOIN_ARTIFACT) &&
+        !eventHero->HasArtifact(ARTIFACT_HIDEOUS_MASK) &&
         strengthRatio > MONSTER_STRENGTH_JOIN &&
         monsterType != CREATURE_GHOST &&
         monsterType != CREATURE_EARTH_ELEMENTAL &&

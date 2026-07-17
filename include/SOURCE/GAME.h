@@ -1,6 +1,7 @@
 #ifndef HOMM2_GAME_H
 #define HOMM2_GAME_H
 #include <va.h>
+#include <SOURCE/KB_TYPES.h>
 // Declarations of the free functions DEFINED in GAME.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
 // forward declarations (was <_all.h>):
@@ -101,16 +102,6 @@ typedef enum GameJoinConstant {
     GAME_JOIN_LOG_UNUSED = -999
 } GameJoinConstant;
 
-typedef enum GameDailyArtifactConstant {
-    ARTIFACT_POWER_RING = 0x43,
-    ARTIFACT_ENDLESS_POUCH_SULFUR = 0x47,
-    ARTIFACT_ENDLESS_VIAL_MERCURY = 0x48,
-    ARTIFACT_ENDLESS_POUCH_GEMS = 0x49,
-    ARTIFACT_ENDLESS_CORD_WOOD = 0x4a,
-    ARTIFACT_ENDLESS_CART_ORE = 0x4b,
-    ARTIFACT_ENDLESS_POUCH_CRYSTAL = 0x4c
-} GameDailyArtifactConstant;
-
 typedef enum GameWeeklyConstant {
     WEEKLY_FIRST_DWELLING = 19,
     WEEKLY_LAST_DWELLING = 30,
@@ -176,29 +167,12 @@ typedef enum GameRandomTownConstant {
 } GameRandomTownConstant;
 
 typedef enum GameRandomArtifactConstant {
-    ARTIFACT_MEDAL_OF_VALOR = 0xc,
-    ARTIFACT_MEDAL_OF_COURAGE = 0xd,
-    ARTIFACT_MEDAL_OF_HONOR = 0xe,
-    ARTIFACT_MEDAL_OF_DISTINCTION = 0xf,
-    ARTIFACT_FIZBIN_OF_MISFORTUNE = 0x10,
-    RANDOM_ARTIFACT_FIRST = 0,
-    RANDOM_ARTIFACT_BASE_LAST = 0x51,
-    RANDOM_ARTIFACT_EXPANSION_LAST = 0x66,
-    ARTIFACT_EDITOR_ANY_ULTIMATE = 0x52,
-    ARTIFACT_EDITOR_UNUSED_84 = 0x53,
-    ARTIFACT_EDITOR_UNUSED_85 = 0x54,
-    ARTIFACT_EDITOR_UNUSED_86 = 0x55,
-    ARTIFACT_RANDOM_SPELL_SCROLL = 0x56,
-    ARTIFACT_UNDEAD_MORALE = 0x57,
-    ARTIFACT_BREASTPLATE_ANDURAN = 0x58,
-    ARTIFACT_BATTLE_GARB = 0x5a,
-    ARTIFACT_HELMET_ANDURAN = 0x5e,
-    ARTIFACT_SPHERE_NEGATION = 0x62,
-    ARTIFACT_SWORD_ANDURAN = 0x65,
+    RANDOM_ARTIFACT_FIRST = ARTIFACT_ULTIMATE_BOOK,
+    RANDOM_ARTIFACT_BASE_LAST = ARTIFACT_MAGIC_BOOK,
+    RANDOM_ARTIFACT_EXPANSION_LAST = ARTIFACT_SPADE_NECROMANCY,
     RANDOM_ARTIFACT_UNIQUE_RETRIES = 100,
     RANDOM_ARTIFACT_CURSED_ROLL_MAX = 100,
     RANDOM_ARTIFACT_CURSED_REJECT_CHANCE = 30,
-    VICTORY_CONDITION_ARTIFACT = 3,
     VICTORY_ARTIFACT_ID_OFFSET = 1
 } GameRandomArtifactConstant;
 
@@ -244,11 +218,6 @@ typedef enum GameVisibilityConstant {
 } GameVisibilityConstant;
 
 typedef enum GameLuckConstant {
-    ARTIFACT_RABBIT_FOOT = 0x23,
-    ARTIFACT_GOLDEN_HORSESHOE = 0x24,
-    ARTIFACT_GAMBLERS_LUCKY_COIN = 0x25,
-    ARTIFACT_FOUR_LEAF_CLOVER = 0x26,
-    ARTIFACT_MASTHEAD = 0x61,
     LUCK_NEUTRAL = 0,
     LUCK_MINIMUM = -3,
     LUCK_MAXIMUM = 3,

@@ -634,11 +634,11 @@ void combatManager::CastSpell(i32 spell, i32 targetHex, i32 castByCreature, i32 
         spellPower_i = SPELL_DEFAULT_CREATURE_POWER;
     } else {
         spellPower_i = m_spellPower[m_currentSide];
-        if (m_heroes[m_currentSide]->HasArtifact(SPELL_ARTIFACT_ENCHANTED_HOURGLASS) &&
+        if (m_heroes[m_currentSide]->HasArtifact(ARTIFACT_ENCHANTED_HOURGLASS) &&
             (gsSpellInfo[spell].attributes & SPELL_ATTRIBUTE_DURATION)) {
             spellPower_i += SPELL_HOURGLASS_POWER_BONUS;
         }
-        if (m_heroes[m_currentSide]->HasArtifact(SPELL_ARTIFACT_WIZARD_HAT) &&
+        if (m_heroes[m_currentSide]->HasArtifact(ARTIFACT_WIZARD_HAT) &&
             (gsSpellInfo[spell].attributes & SPELL_ATTRIBUTE_DURATION)) {
             spellPower_i += SPELL_WIZARD_HAT_POWER_BONUS;
         }
@@ -1335,7 +1335,7 @@ void combatManager::ElementalStorm(void)
                         damage_e * SPELL_GOLEM_DAMAGE_MULTIPLIER);
                 }
                 if (m_heroes[side_h] && m_heroes[side_h]->HasArtifact(
-                                          SPELL_ARTIFACT_BROACH_SHIELDING)) {
+                                          ARTIFACT_BROACH_SHIELDING)) {
                     damage_e = static_cast<i32l>(
                         damage_e * SPELL_GOLEM_DAMAGE_MULTIPLIER);
                 }
@@ -1389,7 +1389,7 @@ void combatManager::Armageddon(void)
                         damage9 * SPELL_GOLEM_DAMAGE_MULTIPLIER);
                 }
                 if (m_heroes[side11] && m_heroes[side11]->HasArtifact(
-                                          SPELL_ARTIFACT_BROACH_SHIELDING)) {
+                                          ARTIFACT_BROACH_SHIELDING)) {
                     damage9 = static_cast<i32l>(
                         damage9 * SPELL_GOLEM_DAMAGE_MULTIPLIER);
                 }
@@ -2875,9 +2875,9 @@ mirror_found:
     image->m_monster.flags.abilityFlags |= MIRROR_MONSTER_ABILITY;
     i32 duration = m_spellPower[m_currentSide];
     if (m_heroes[m_currentSide]->HasArtifact(
-            SPELL_ARTIFACT_ENCHANTED_HOURGLASS))
+            ARTIFACT_ENCHANTED_HOURGLASS))
         duration += SPELL_HOURGLASS_POWER_BONUS;
-    if (m_heroes[m_currentSide]->HasArtifact(SPELL_ARTIFACT_WIZARD_HAT))
+    if (m_heroes[m_currentSide]->HasArtifact(ARTIFACT_WIZARD_HAT))
         duration += SPELL_WIZARD_HAT_POWER_BONUS;
     image->m_roundCounter = duration;
     source->m_mirrorImageIndex = image->m_index;
@@ -2931,7 +2931,7 @@ void combatManager::SummonElemental(i32 monsterType, i32 spellPower)
     i32 randomOffset_a = SRandom(0, 2);
     u32 summonHex = static_cast<u32>(COMBAT_HEX_EMPTY);
     if (m_heroes[m_currentSide] != 0 &&
-        m_heroes[m_currentSide]->HasArtifact(SPELL_ARTIFACT_BOOK_ELEMENTS))
+        m_heroes[m_currentSide]->HasArtifact(ARTIFACT_BOOK_ELEMENTS))
         spellPower <<= 1;
     i32 offset;
     for (offset = 0; offset < 3; ++offset) {
@@ -2949,9 +2949,9 @@ void combatManager::SummonElemental(i32 monsterType, i32 spellPower)
     elementals->m_monster.flags.abilityFlags |= MIRROR_MONSTER_ABILITY;
     spellPower = m_spellPower[m_currentSide];
     if (m_heroes[m_currentSide]->HasArtifact(
-            SPELL_ARTIFACT_ENCHANTED_HOURGLASS))
+            ARTIFACT_ENCHANTED_HOURGLASS))
         spellPower += SPELL_HOURGLASS_POWER_BONUS;
-    if (m_heroes[m_currentSide]->HasArtifact(SPELL_ARTIFACT_WIZARD_HAT))
+    if (m_heroes[m_currentSide]->HasArtifact(ARTIFACT_WIZARD_HAT))
         spellPower += SPELL_WIZARD_HAT_POWER_BONUS;
 }
 
@@ -3112,7 +3112,7 @@ void combatManager::Resurrect(i32 spell, i32 targetHex, i32 spellPower)
     i32 unusedResurrectWord9;
 
     if (m_heroes[m_currentSide] != 0 &&
-        m_heroes[m_currentSide]->HasArtifact(SPELL_ARTIFACT_ANKH))
+        m_heroes[m_currentSide]->HasArtifact(ARTIFACT_ANKH))
         spellPower <<= 1;
     armyIndex_f = FindResurrectArmyIndex(m_currentSide, spell, targetHex);
     target_i = &m_armies[m_currentSide][armyIndex_f];
@@ -3271,34 +3271,34 @@ void combatManager::ModifyDamageForArtifacts(i32l *damage, i32 spell,
                                               hero *attacker, hero *defender)
 {
     if (attacker != 0) {
-        if (attacker->HasArtifact(SPELL_ARTIFACT_EVERCOLD_ICICLE) &&
+        if (attacker->HasArtifact(ARTIFACT_EVERCOLD_ICICLE) &&
             (spell == SPELL_COLD_RAY || spell == SPELL_COLD_RING))
             *damage = static_cast<i32l>(*damage * SPELL_ARTIFACT_DAMAGE_BONUS);
-        if (attacker->HasArtifact(SPELL_ARTIFACT_EVERHOT_LAVA_ROCK) &&
+        if (attacker->HasArtifact(ARTIFACT_EVERHOT_LAVA_ROCK) &&
             (spell == SPELL_FIREBALL || spell == SPELL_FIREBLAST))
             *damage = static_cast<i32l>(*damage * SPELL_ARTIFACT_DAMAGE_BONUS);
-        if (attacker->HasArtifact(SPELL_ARTIFACT_LIGHTNING_ROD) &&
+        if (attacker->HasArtifact(ARTIFACT_LIGHTNING_ROD) &&
             (spell == SPELL_LIGHTNING_BOLT || spell == SPELL_CHAIN_LIGHTNING))
             *damage = static_cast<i32l>(*damage * SPELL_ARTIFACT_DAMAGE_BONUS);
     }
     if (defender != 0) {
-        if (defender->HasArtifact(SPELL_ARTIFACT_ICE_CLOAK) &&
+        if (defender->HasArtifact(ARTIFACT_ICE_CLOAK) &&
             (spell == SPELL_COLD_RAY || spell == SPELL_COLD_RING))
             *damage = static_cast<i32l>(*damage * SPELL_ARTIFACT_DAMAGE_REDUCTION);
-        if (defender->HasArtifact(SPELL_ARTIFACT_FIRE_CLOAK) &&
+        if (defender->HasArtifact(ARTIFACT_FIRE_CLOAK) &&
             (spell == SPELL_FIREBALL || spell == SPELL_FIREBLAST))
             *damage = static_cast<i32l>(*damage * SPELL_ARTIFACT_DAMAGE_REDUCTION);
-        if (defender->HasArtifact(SPELL_ARTIFACT_LIGHTNING_HELM) &&
+        if (defender->HasArtifact(ARTIFACT_LIGHTNING_HELM) &&
             (spell == SPELL_LIGHTNING_BOLT || spell == SPELL_CHAIN_LIGHTNING))
             *damage = static_cast<i32l>(*damage * SPELL_ARTIFACT_DAMAGE_REDUCTION);
-        if (defender->HasArtifact(SPELL_ARTIFACT_HEART_FIRE)) {
+        if (defender->HasArtifact(ARTIFACT_HEART_FIRE)) {
             if (spell == SPELL_COLD_RAY || spell == SPELL_COLD_RING)
                 *damage <<= 1;
             else if (spell == SPELL_FIREBALL || spell == SPELL_FIREBLAST)
                 *damage = static_cast<i32l>(
                     *damage * SPELL_ARTIFACT_DAMAGE_REDUCTION);
         }
-        if (defender->HasArtifact(SPELL_ARTIFACT_HEART_ICE)) {
+        if (defender->HasArtifact(ARTIFACT_HEART_ICE)) {
             if (spell == SPELL_COLD_RAY || spell == SPELL_COLD_RING)
                 *damage = static_cast<i32l>(
                     *damage * SPELL_ARTIFACT_DAMAGE_REDUCTION);

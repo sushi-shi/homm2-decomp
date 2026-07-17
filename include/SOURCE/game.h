@@ -98,7 +98,7 @@ public:
     i8 m_availableHeroes[54];  // +0x5c80
     mineRecord m_mines[144];      // 0x5cb6
     i8 m_mineOwners[144];  // 0x60a6
-    char m_randomArtifacts[0x67];  // 0x6136
+    char m_randomArtifacts[ARTIFACT_COUNT];  // 0x6136
     boatRecord m_boats[48];        // 0x619d
     i8 m_boatSlots[48];   // 0x631d, active boat record indices
     i8 m_obeliskVisitors[48];  // 0x634d
