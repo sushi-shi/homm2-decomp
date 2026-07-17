@@ -1363,7 +1363,7 @@ void combatManager::CatAttack(i32 side) {
     if (giMaxExtentY > COMBAT_MAX_EXTENT_Y)
         giMaxExtentY = COMBAT_MAX_EXTENT_Y;
 
-    icon* cloud29 = gpResourceManager->GetIcon(missShot19 ? "smalclod.icn" : "lichclod.icn");
+    icon* cloud29 = gpResourceManager->GetIcon(const_cast<char*>(missShot19 ? "smalclod.icn" : "lichclod.icn"));
 
     for (frame18 = 0; frame18 < COMBAT_CATAPULT_CLOUD_FRAME_COUNT; frame18++) {
         if (frame18 >= COMBAT_CATAPULT_CLOUD_VISIBLE_FRAME_COUNT

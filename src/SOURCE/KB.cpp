@@ -750,7 +750,7 @@ i32 oldmain(void) {
                     gpGame->m_campaignScore,
                     0,
                     CONGRATS_CAMPAIGN,
-                    gpGame->m_campaignType ? "Archibald" : "Roland"
+                    const_cast<char*>(gpGame->m_campaignType ? "Archibald" : "Roland")
                 );
             }
             if (result_i) {
