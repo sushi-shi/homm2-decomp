@@ -1323,10 +1323,10 @@ SOURCE/Viewwrld	?ViewWorldDialogHandler@@YIHAAUtag_message@@@Z	99.9677	c2c14bd48
 SOURCE/Wsnetwin	?wsEvaluateMessage@@YIXKH@Z	99.8684	26f960648197
 SOURCE/Wsnetwin	?wsProcessMessages@@YIXXZ	99.7778	2f5d24985962
 SOURCE/Wsnetwin	?wsSendMessage@@YIXHEGPAX@Z	98.4615	cfd5e25b50da
-SOURCE/Wsnetwin	?wsWaitForExtraGuests@@YIHXZ	100.0000	4f5ccbfa5b43
+SOURCE/Wsnetwin	?wsWaitForExtraGuests@@YIHXZ	100.0000	5ae0577adbb5
 SOURCE/Wsnetwin	?wsWaitForFirstGuest@@YIHXZ	99.7059	0c397dff2efb
 SOURCE/Wsnetwin	?wsWaitForHost@@YIHXZ	100.0000	1c735844bb6f
-SOURCE/Wsnetwin	?wsnet_init@@YIFXZ	99.5640	cdb5dc54141a
+SOURCE/Wsnetwin	?wsnet_init@@YIFXZ	99.5640	51eeb8b0e9d6
 SOURCE/Wsnetwin	?wsnet_rcv@@YIFFGPAX@Z	100.0000	26c848325774
 SOURCE/Wsnetwin	?wsnet_snd@@YIHHHPAX@Z	100.0000	54ccca0906df
 SOURCE/Wsnetwin	?wsnet_term@@YIXXZ	100.0000	b67dbaa98e3f
