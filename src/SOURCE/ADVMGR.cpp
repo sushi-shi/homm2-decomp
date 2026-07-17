@@ -400,8 +400,10 @@ void advManager::GetCursorSampleSet(int sampleSet)
     for (int index = 0; index < ADVMGR_CURSOR_SAMPLE_COUNT; ++index) {
         sprintf(gText, "wsnd%1d%1d.82M", sampleSet, sampleSuffix[index]);
         m_cursorSamples[index] = gpResourceManager->GetSample(gText);
-        m_cursorSamples[index]->m_volume = ADVMGR_CURSOR_SAMPLE_VOLUME;
-        m_cursorSamples[index]->m_channelType = ADVMGR_CURSOR_SAMPLE_CHANNEL;
+        m_cursorSamples[index]->m_playbackData.volume =
+            ADVMGR_CURSOR_SAMPLE_VOLUME;
+        m_cursorSamples[index]->m_playbackData.channelType =
+            ADVMGR_CURSOR_SAMPLE_CHANNEL;
     }
 }
 
@@ -5675,7 +5677,7 @@ void advManager::SetEnvironmentOrigin(int originX, int originY, int stopSounds)
                        ADVMGR_ENVIRONMENT_SOUND_LOG_UNUSED);
                 gpSoundManager->StopSample(
                     m_loopingSamples[m_activeSounds[edgeOffset].soundId]
-                        ->m_activeSample);
+                        ->m_playbackData.activeSample);
                 m_activeSounds[edgeOffset].soundId = ADVMGR_ENVIRONMENT_SOUND_NONE;
                 m_activeSounds[edgeOffset].volume =
                     ADVMGR_ENVIRONMENT_SOUND_DEFAULT_VOLUME;
@@ -5717,7 +5719,7 @@ void advManager::SetEnvironmentOrigin(int originX, int originY, int stopSounds)
                     ADVMGR_ENVIRONMENT_SOUND_MAX_DISTANCE) {
                 gpSoundManager->StopSample(
                     m_loopingSamples[m_activeSounds[edgeOffset].soundId]
-                        ->m_activeSample);
+                        ->m_playbackData.activeSample);
                 m_activeSounds[edgeOffset].soundId = ADVMGR_ENVIRONMENT_SOUND_NONE;
             }
             if (m_activeSounds[edgeOffset].soundId != ADVMGR_ENVIRONMENT_SOUND_NONE &&
@@ -5725,7 +5727,7 @@ void advManager::SetEnvironmentOrigin(int originX, int originY, int stopSounds)
                  (1 << m_activeSounds[edgeOffset].soundId)) != 0) {
                 gpSoundManager->ModifySample(
                     m_loopingSamples[m_activeSounds[edgeOffset].soundId]
-                        ->m_activeSample,
+                        ->m_playbackData.activeSample,
                     SOUND_SAMPLE_OPERATION_EFFECT_VOLUME,
                     ADVMGR_ENVIRONMENT_VOLUME(m_activeSounds[edgeOffset].volume));
             }
@@ -5909,15 +5911,15 @@ void advManager::InsertSound(int x, int mapY, int distance, int soundLayer)
             ADVMGR_ENVIRONMENT_SOUND_NONE) {
             gpSoundManager->StopSample(
                 m_loopingSamples[m_activeSounds[soundSlot].soundId]
-                    ->m_activeSample);
+                    ->m_playbackData.activeSample);
         }
         m_activeSounds[soundSlot].soundId = soundId;
         m_activeSounds[soundSlot].volume = distance;
         CheckLoadSample(soundId);
-        m_loopingSamples[soundId]->m_volume =
+        m_loopingSamples[soundId]->m_playbackData.volume =
             ADVMGR_ENVIRONMENT_VOLUME(distance);
-        m_loopingSamples[soundId]->m_loopCount = 0;
-        m_loopingSamples[soundId]->m_channelType =
+        m_loopingSamples[soundId]->m_playbackData.loopCount = 0;
+        m_loopingSamples[soundId]->m_playbackData.channelType =
             ADVMGR_ENVIRONMENT_SOUND_CHANNEL_TYPE;
         gpSoundManager->MemorySample(m_loopingSamples[soundId]);
         m_activeSoundMask ^=
