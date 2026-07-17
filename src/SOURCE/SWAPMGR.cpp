@@ -141,7 +141,7 @@ i32 swapManager::Open(i32 id) {
     m_selectorIcon = gpResourceManager->GetIcon("swapbtn.icn");
     giMonoIconSkip = SWAP_MONO_ICON_DEFAULT;
     gpMouseManager->SetPointer(0);
-    m_messageMask = SWAP_MANAGER_MESSAGE;
+    m_messageMask = BASE_MANAGER_ACCEPT_SWAP;
     m_priority = id;
     m_active = true;
     strcpy(m_name, "swapManager");

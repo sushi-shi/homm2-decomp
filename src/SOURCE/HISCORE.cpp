@@ -44,7 +44,7 @@ i32 highScoreManager::Open(i32 id) {
         MemError();
     Update();
     gpWindowManager->AddWindow(m_window, -1, 1);
-    m_messageMask = MESSAGE_EXECUTIVE;
+    m_messageMask = BASE_MANAGER_ACCEPT_EXECUTIVE;
     m_priority = id;
     m_active = true;
     strcpy(m_name, "highScoreManager");

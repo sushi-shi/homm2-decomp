@@ -507,8 +507,8 @@ i32 soundManager::Open(i32) {
     m_fading = 1;
 
 managerReady:
-    m_messageMask = MESSAGE_LEFT_BUTTON_UP;
-    m_priority = -1;
+    m_messageMask = BASE_MANAGER_ACCEPT_LEFT_BUTTON_UP;
+    m_priority = SOUND_MANAGER_PRIORITY;
     m_active = true;
     strcpy(m_name, "soundManager");
     return 0;
