@@ -21,7 +21,7 @@ void ModemSetup(i32 mode) {
     char command[104];
 
     LogStr("MS1");
-    gbRemoteOn = 1;
+    gbRemoteOn = true;
     inque.writePosition = 0;
     inque.readPosition = 0;
     outque.writePosition = 0;

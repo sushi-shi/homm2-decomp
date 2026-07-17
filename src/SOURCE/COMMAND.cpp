@@ -45,9 +45,9 @@ i32 combatManager::Main(tag_message& message) {
         }
         if (KBTickCount() > glTimers[GLOBAL_COMBAT_CYCLE_TIMER_SLOT]
             && gbProcessingCombatAction == 0) {
-            gbProcessingCombatAction = 1;
+            gbProcessingCombatAction = true;
             CycleCombatScreen();
-            gbProcessingCombatAction = 0;
+            gbProcessingCombatAction = false;
         }
     }
 
@@ -857,7 +857,7 @@ i32 combatManager::CheckWin(struct tag_message* message) {
         m_combatResult = 1 - m_currentSide;
     } else if (m_sideRetreated[0] != 0 || m_sideRetreated[1] != 0) {
         combatEnded = 1;
-        gbRetreatWin = 1;
+        gbRetreatWin = true;
         if (m_sideRetreated[0] != 0)
             m_combatResult = 1;
         else
@@ -1828,8 +1828,8 @@ void combatManager::DoVictory(i32 winningSide) {
 
     if (m_heroes[COMBAT_DEFENDER_SIDE] != 0 && m_heroes[COMBAT_DEFENDER_SIDE]->m_isCaptain != 0)
         m_heroes[COMBAT_DEFENDER_SIDE] = 0;
-    gbShowingLoseWindow = 0;
-    gbWhichAnimationPlaying = 1;
+    gbShowingLoseWindow = false;
+    gbWhichAnimationPlaying = true;
     giWinCmbtFrame = 0;
     giSkeletonsCreated = 0;
     iMaxTransferArtifacts = 0;
@@ -2062,7 +2062,7 @@ void combatManager::DoLoseWindow(void) {
         losingSide_h = COMBAT_DEFENDER_SIDE;
     }
 
-    gbShowingLoseWindow = 1;
+    gbShowingLoseWindow = true;
     if (gbCombatSurrender != 0) {
         sprintf(animationFile_j, "cmbtsurr.icn");
         gbWhichAnimationPlaying = COMBAT_WIN_LOSE_ANIMATION_CYCLE_SECOND;
@@ -2287,13 +2287,13 @@ void combatManager::GetControl(void) {
         || (gbHumanPlayer[m_playerId[COMBAT_ATTACKER_SIDE]] == 0
             && (gbHumanPlayer[m_playerId[COMBAT_ATTACKER_SIDE]] != 0
                 || m_playerId[COMBAT_DEFENDER_SIDE] == 0))) {
-        gbThisNetHasControl = 1;
+        gbThisNetHasControl = true;
     } else {
         if (m_playerId[m_currentSide] != -1 && gbHumanPlayer[m_playerId[m_currentSide]] != 0
             && gbThisNetHumanPlayer[m_playerId[m_currentSide]] == 0)
-            gbThisNetHasControl = 0;
+            gbThisNetHasControl = false;
         else
-            gbThisNetHasControl = 1;
+            gbThisNetHasControl = true;
     }
     m_smallViewSide[COMBAT_DEFENDER_SIDE] = -1;
     SetupSmallView();
@@ -2345,7 +2345,7 @@ i32 combatManager::ProcessNextAction(struct tag_message& message) {
     ClearCombatMessages(0);
     result = COMBAT_MAIN_CONTINUE;
     redraw = 0;
-    gbProcessingCombatAction = 1;
+    gbProcessingCombatAction = true;
     if (m_smallViewSide[COMBAT_ATTACKER_SIDE] != -1
         || m_smallViewSide[COMBAT_DEFENDER_SIDE] != -1) {
         m_smallViewSide[COMBAT_DEFENDER_SIDE] = -1;
@@ -2446,12 +2446,12 @@ i32 combatManager::ProcessNextAction(struct tag_message& message) {
                 break;
             case IDX(COMBAT_ACTION_RETREAT):
                 m_sideRetreated[m_currentSide] = 1;
-                gbRetreatWin = 1;
+                gbRetreatWin = true;
                 ResetCycleTimers();
                 break;
             case IDX(COMBAT_ACTION_SURRENDER):
-                gbCombatSurrender = 1;
-                gbRetreatWin = 1;
+                gbCombatSurrender = true;
+                gbRetreatWin = true;
                 m_sideDefeated[m_currentSide] = 1;
                 gpGame->m_players[m_playerId[m_currentSide]].m_resources[IDX(RES_GOLD)] -=
                     giNextActionExtra;
@@ -2482,7 +2482,7 @@ i32 combatManager::ProcessNextAction(struct tag_message& message) {
     }
 
 Finished:
-    gbProcessingCombatAction = 0;
+    gbProcessingCombatAction = false;
     ResetMouse();
     return result;
 }
@@ -3026,14 +3026,14 @@ void combatManager::ViewBallista(i32 quickView) {
 // Keep the source extents and leave this section unassigned rather than adding
 // fake objects or replaying the candidate section as a contiguous contribution.
 // ---- globals (definitions, RVA order) ----
-DATA(0x005250b8) i32 gbThisNetHasControl;
+DATA(0x005250b8) b32 gbThisNetHasControl;
 DATA(0x005250bc) i32 iCurTransferArtifact;
 DATA(0x005250c0) i8 iTransferArtifactsInfo[16];
-DATA(0x005250d0) i32 gbWhichAnimationPlaying;
+DATA(0x005250d0) b32 gbWhichAnimationPlaying;
 DATA(0x005250d4) i32 iMaxTransferArtifacts;
 DATA(0x005250d8) i32 giNextActionExtra;
 DATA(0x005250dc) i32 bSkeletonsShown;
-DATA(0x005250e0) i32 gbShowingLoseWindow;
+DATA(0x005250e0) b32 gbShowingLoseWindow;
 DATA(0x005250e4) i32 giWinCmbtFrame;
 DATA(0x005250e8) i32 giNextActionGridIndex;
 DATA(0x005250ec) i32 giSurrenderCost;

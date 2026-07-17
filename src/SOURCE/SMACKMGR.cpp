@@ -98,7 +98,7 @@ void SmackManagerMain(void) {
     i8 savedPalette9[SMACK_PALETTE_SIZE];
     i32 unusedFrameHead36;
 
-    gbLastFramePlayed = 0;
+    gbLastFramePlayed = false;
     musicStarted36 = 0;
     if (bSmackNum == SMACK_CHOOSE_CAMPAIGN) {
         i32 initialMouseY29;
@@ -297,7 +297,7 @@ void SmackManagerMain(void) {
                     drawLastFrame = 0;
                 }
                 DoAdvance(smk2, drawLastFrame, advanceLastFrame, 0, 1);
-                gbLastFramePlayed = 1;
+                gbLastFramePlayed = true;
                 while (SmackWait(smk2))
                     Process1WindowsMessage();
             } else {
@@ -417,7 +417,7 @@ void SmackManagerMain(void) {
                     && (smk1->Frames <= smk1->FrameNum
                         || (smk1->FrameNum <= 0 && primaryStarted9))))) {
             playing16 = 0;
-            gbPlayedThrough = 1;
+            gbPlayedThrough = true;
         }
     }
 
@@ -510,8 +510,8 @@ i32 PlaySmacker(i32 smackNumber) {
     if (gbNoCDRom)
         return 0;
 
-    gbInSmackMgr = 1;
-    gbPlayedThrough = 0;
+    gbInSmackMgr = true;
+    gbPlayedThrough = false;
     memcpy(savedPalette, gpBufferPalette->m_data, SMACK_PALETTE_SIZE);
     oldUpdateFlags = gpWindowManager->m_updateFlags;
     gpWindowManager->m_updateFlags = 0;
@@ -537,7 +537,7 @@ i32 PlaySmacker(i32 smackNumber) {
     SmackManagerMain();
     memcpy(gpBufferPalette->m_data, savedPalette, SMACK_PALETTE_SIZE);
     gpWindowManager->m_updateFlags = oldUpdateFlags;
-    gbInSmackMgr = 0;
+    gbInSmackMgr = false;
     return gbPlayedThrough;
 }
 
@@ -751,7 +751,7 @@ DATA(0x004ecd50) Smack* smk2 = 0;
 // same 9 retail RVAs, including smksum addends +0x8, +0x1c, and +0x20. Do not
 // add padding, aliases, or section pragmas to hide this allocation-order wall.
 DATA(0x00522f20) i8 bSmackNum;
-DATA(0x00522f24) i32 gbLastFramePlayed;
+DATA(0x00522f24) b32 gbLastFramePlayed;
 DATA(0x00522f28) SmackSum smksum;
-DATA(0x00522f80) i32 gbPlayedThrough;
+DATA(0x00522f80) b32 gbPlayedThrough;
 DATA(0x00522f84) i8 bMainDone;

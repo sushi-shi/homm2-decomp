@@ -27,9 +27,9 @@ font::font(u32l id) : resource(5, id, 1, 0) {
     // Read13 takes signed char*, GetIcon char* — one filename buffer feeds both, so bridge the
     // API signedness once (codegen-identical: both are byte pointers).
     gpResourceManager->Read13(reinterpret_cast<i8*>(fname));
-    gbLoadingMonoIcon = 1;
+    gbLoadingMonoIcon = true;
     m_glyphIcon = gpResourceManager->GetIcon(fname);
-    gbLoadingMonoIcon = 0;
+    gbLoadingMonoIcon = false;
 }
 
 VA(0x004c70e0, 0x39)

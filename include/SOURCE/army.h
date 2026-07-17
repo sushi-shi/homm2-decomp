@@ -144,6 +144,6 @@ public:
 SIZE(army, 0x482);
 // ---- globals (declarations, RVA order) ----
 extern i32 bSecondAttack;
-extern i32 gbGenieHalf;
+extern b32 gbGenieHalf;
 
 #endif // HOMM2_SOURCE_ARMY_H

@@ -65,6 +65,6 @@ i32 ExpStdGameHandler(struct tag_message&);
 i32 BaseSetupHandler(struct tag_message&);
 
 // ---- globals (declarations, RVA order) ----
-extern i32 gbDoModemConfig;
+extern b32 gbDoModemConfig;
 
 #endif // HOMM2_SETUP_H

@@ -252,7 +252,7 @@ i32 textEntryWidget::Main(struct tag_message& message) {
                                 if (gbAllowTextEntryEscape != 0) {
                                     strcpy(edit, original);
                                     done++;
-                                    gbTextEntryEscaped = 1;
+                                    gbTextEntryEscaped = true;
                                 }
                                 break;
                             case INPUT_SCAN_NUMPAD_4:
@@ -275,7 +275,7 @@ i32 textEntryWidget::Main(struct tag_message& message) {
                             default:
                                 gpInputManager->AsciiConvert(event);
                                 if (event.payload.keyboard.keyCode == 10) {
-                                    gbTextEntryEscaped = 0;
+                                    gbTextEntryEscaped = false;
                                     done++;
                                 } else if (event.payload.keyboard.keyCode
                                            == TEXT_ENTRY_KEY_DELETE) {

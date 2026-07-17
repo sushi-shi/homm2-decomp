@@ -75,7 +75,7 @@ DATA(0x0051ec98) i8 iHotSpot[MOUSE_CURSOR_COUNT][2] = {
     {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1},
     {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}
 };
-DATA(0x0051ed58) i32 gbInSetPointer = 0;
+DATA(0x0051ed58) b32 gbInSetPointer = false;
 DATA(0x0051ed5c) i32 bInNewMouseUpdate = 0;
 
 DATA(0x0051ed60) static SMouseManagerStrings gMouseManagerStrings = {
@@ -272,7 +272,7 @@ void mouseManager::SetPointer(i32 frame) {
         || gbInSetPointer != 0)
         return;
 
-    gbInSetPointer = 1;
+    gbInSetPointer = true;
     gbPutzingWithMouseCtr++;
     gpResourceManager->SavePosition();
     if (giCurExe == 1)
@@ -385,7 +385,7 @@ void mouseManager::SetPointer(i32 frame) {
         SetCursor(hMouseCursor[m_cursorSizeIndex]);
     }
     gpResourceManager->RestorePosition();
-    gbInSetPointer = 0;
+    gbInSetPointer = false;
     gbPutzingWithMouseCtr--;
 }
 

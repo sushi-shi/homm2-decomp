@@ -136,7 +136,7 @@ i32 DDAppPaint(void* window, void* paintDC) {
     if (lpDD == 0)
         return 1;
     {
-        gbWinGraphBusy = 1;
+        gbWinGraphBusy = true;
         paintDC = BeginPaint(reinterpret_cast<HWND>(window), &paint3);
         GetClientRect(reinterpret_cast<HWND>(window), &gDDClientRect);
         if (paint3.rcPaint.right == 0 || paint3.rcPaint.bottom == 0)
@@ -226,7 +226,7 @@ i32 DDAppPaint(void* window, void* paintDC) {
         if (gDDResult != DD_OK)
             DDSD(gDDResult, RETAIL_FILE, 286);
         EndPaint(reinterpret_cast<HWND>(window), &paint3);
-        gbWinGraphBusy = 0;
+        gbWinGraphBusy = false;
     }
     return 1;
 }
@@ -527,7 +527,7 @@ void DDSetFullScreenStatus(i32 fullScreen) {
         y = gConfig.gfx[giCurExe].y;
         width = gConfig.gfx[giCurExe].width;
         windowHeight0 = gConfig.gfx[giCurExe].height;
-        gbWinGraphBusy = 1;
+        gbWinGraphBusy = true;
         gConfig.gfx[giCurExe].fullScreen = fullScreen;
         if (gConfig.gfx[giCurExe].fullScreen != 0)
             SetMenuStatus(0);
@@ -559,7 +559,7 @@ void DDSetFullScreenStatus(i32 fullScreen) {
         if (result0 != DD_OK)
             DDSD(result0, RETAIL_FILE, 623);
         WritePrefs();
-        gbWinGraphBusy = 0;
+        gbWinGraphBusy = false;
         if (gConfig.gfx[giCurExe].fullScreen == 0) {
             SetMenuStatus(1);
             ResizeWindow(x, y, width, windowHeight0);
@@ -1037,15 +1037,15 @@ i32 SetGraphicsType(i32 graphicsType) {
 // the aggregate retail hash differs only because of the proven owner order.
 // Do not add aliases, padding owners, or synthetic storage for these gaps.
 // ---- globals (definitions, RVA order) ----
-DATA(0x004f1288) i32 gbWinGAttached = true;
-DATA(0x004f128c) i32 gbDDrawAttached = false;
+DATA(0x004f1288) b32 gbWinGAttached = true;
+DATA(0x004f128c) b32 gbDDrawAttached = false;
 DATA(0x004f1290) i32 giGraphicsType = 1;
 DATA(0x004f1294) i32l Orientation = 1;
 DATA(0x004f1298) struct _PALETTE LogicalPalette = {WINGRAPH_PALETTE_VERSION, WINGRAPH_PALETTE_SIZE};
 DATA(0x004f169c) void* lpInitWin = 0;
 DATA(0x004f16a0) i32 bPaletteInitialized = 0;
 DATA(0x004f16a4) i32 giTtlBlts = 0;
-DATA(0x004f16a8) i32 gbWinGraphBusy = 0;
+DATA(0x004f16a8) b32 gbWinGraphBusy = false;
 DATA(0x004f16ac) DirectDrawCreateProc lpDirectDrawCreate = 0;
 DATA(0x004f16b0) struct IDirectDraw* lpDD = 0;
 DATA(0x004f16b4) struct IDirectDrawSurface* lpDDSPrimary = 0;

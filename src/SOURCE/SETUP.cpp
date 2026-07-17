@@ -314,7 +314,7 @@ i32 game::SetupModemGame(void) {
                 return 0;
             break;
         case 3:
-            gbDoModemConfig = 1;
+            gbDoModemConfig = true;
             break;
         case SETUP_DIALOG_CANCEL:
             return 0;
@@ -343,7 +343,7 @@ i32 game::SetupMultiPlayerGame(void) {
     gpWindowManager->DoDialog(window, SetupMultiPlayerGameHandler, 0);
     delete window;
 
-    gbDirectConnect = 0;
+    gbDirectConnect = false;
     switch (gpWindowManager->m_dialogResult) {
         case 1:
             iMPBaseType = MULTIPLAYER_BASE_HOT_SEAT;
@@ -356,10 +356,10 @@ i32 game::SetupMultiPlayerGame(void) {
                 return 0;
             break;
         case 4:
-            gbDirectConnect = 1;
+            gbDirectConnect = true;
             goto setupModem;
         case 3:
-            gbDirectConnect = 0;
+            gbDirectConnect = false;
         setupModem:
             iMPBaseType = MULTIPLAYER_BASE_MODEM;
             continueFlag = 1;
@@ -371,7 +371,7 @@ i32 game::SetupMultiPlayerGame(void) {
                 LogStr("Common Modem 3");
                 if (gbDoModemConfig != 0) {
                     LogStr("Common Modem 4");
-                    gbDoModemConfig = 0;
+                    gbDoModemConfig = false;
                     if (!SetupComPort())
                         return 0;
                     LogStr("Common Modem 5");
@@ -397,14 +397,14 @@ i32 game::SetupGame(void) {
     result = 1;
     xIsPlayingExpansionCampaign = 0;
     xIsExpansionMap = 0;
-    gbInCampaign = 0;
-    gbCampaignSideChoice = 0;
+    gbInCampaign = false;
+    gbCampaignSideChoice = false;
     iMPExtendedType = 10;
     iMPBaseType = MULTIPLAYER_BASE_UNINITIALIZED;
     giNumHumanPlayers = 1;
-    gbWaitForRemoteReceive = 0;
-    gbDirectConnect = 0;
-    gbInSetupDialog = 1;
+    gbWaitForRemoteReceive = false;
+    gbDirectConnect = false;
+    gbInSetupDialog = true;
 
     if (giMenuCommand != -1) {
         switch (giMenuCommand) {
@@ -452,13 +452,13 @@ i32 game::SetupGame(void) {
             case APP_MENU_LOAD_9:
                 iMPBaseType = MULTIPLAYER_BASE_MODEM;
                 iMPExtendedType = SETUP_REMOTE_MODEM_DIAL;
-                gbDirectConnect = 1;
+                gbDirectConnect = true;
                 goto remoteSetup;
             case APP_MENU_RESTART_13:
             case APP_MENU_LOAD_10:
                 iMPBaseType = MULTIPLAYER_BASE_MODEM;
                 iMPExtendedType = SETUP_REMOTE_MODEM_ANSWER;
-                gbDirectConnect = 1;
+                gbDirectConnect = true;
                 goto remoteSetup;
 
             remoteSetup:
@@ -466,7 +466,7 @@ i32 game::SetupGame(void) {
                 RemoteMain(iMPExtendedType);
                 if (iMPExtendedType == SETUP_REMOTE_NETWORK_GUEST
                     || iMPExtendedType == SETUP_REMOTE_MODEM_ANSWER)
-                    gbWaitForRemoteReceive = 1;
+                    gbWaitForRemoteReceive = true;
                 break;
             default:;
         }
@@ -509,7 +509,7 @@ i32 game::SetupGame(void) {
 
                 switch (static_cast<i16>(gpWindowManager->m_dialogResult)) {
                     case 1:
-                        gbInCampaign = 1;
+                        gbInCampaign = true;
                         break;
                     case 2:
                         xIsPlayingExpansionCampaign = 1;
@@ -528,7 +528,7 @@ i32 game::SetupGame(void) {
 
                 switch (static_cast<i16>(gpWindowManager->m_dialogResult)) {
                     case 1:
-                        gbInCampaign = 1;
+                        gbInCampaign = true;
                         if (!SetupCampaignGame()) {
                             result = 0;
                             goto done;
@@ -565,11 +565,11 @@ i32 game::SetupGame(void) {
         LogStr(" Setup 3");
         if (iMPExtendedType == SETUP_REMOTE_NETWORK_GUEST
             || iMPExtendedType == SETUP_REMOTE_MODEM_ANSWER)
-            gbWaitForRemoteReceive = 1;
+            gbWaitForRemoteReceive = true;
     }
 
 done:
-    gbInSetupDialog = 0;
+    gbInSetupDialog = false;
     return result;
 }
 
@@ -1169,4 +1169,4 @@ i32 BaseSetupHandler(struct tag_message& message) {
 }
 
 // ---- globals (definitions, RVA order) ----
-DATA(0x004ee248) i32 gbDoModemConfig = 0;
+DATA(0x004ee248) b32 gbDoModemConfig = false;

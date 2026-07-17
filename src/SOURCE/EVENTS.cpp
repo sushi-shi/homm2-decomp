@@ -7164,7 +7164,7 @@ i32 advManager::DoNetCombat(char* packet) {
         H2_FREE(secondHero9, 5796);
     if (firstHero29)
         H2_FREE(firstHero29, 5799);
-    gbRetreatWin = 0;
+    gbRetreatWin = false;
     return 1;
 }
 
@@ -7219,7 +7219,7 @@ i32 advManager::DoCombat(
             randomSeed,
             processLosses
         );
-    gbInCombat = 1;
+    gbInCombat = true;
     firstPlayer4 = firstHero ? firstHero->m_owner : -1;
     secondPlayer7 = secondHero ? secondHero->m_owner : (combatTown ? combatTown->m_owner : -1);
     if (randomSeed == -1)
@@ -7372,8 +7372,8 @@ combatFinished:
     }
     MobilizeCurrHero(0);
     if (processLosses)
-        gbRetreatWin = 0;
-    gbInCombat = 0;
+        gbRetreatWin = false;
+    gbInCombat = false;
     while (gpMouseManager->m_hideCount)
         gpMouseManager->ShowColorPointer();
     return gpCombatManager->m_combatResult;
@@ -7696,7 +7696,7 @@ i32 advManager::AutoResolveCombat(
     tag_message message;
     i32 savedShowIt37;
 
-    gbNoShowCombat = 1;
+    gbNoShowCombat = true;
     savedShowIt37 = bShowIt;
     bShowIt = 0;
     gpMouseManager->SetPointer(0);
@@ -7719,7 +7719,7 @@ i32 advManager::AutoResolveCombat(
     gpCombatManager->m_gridSelectionDisabled = 1;
     while (!gpCombatManager->m_nonVisualCombat)
         gpCombatManager->Main(message);
-    gbNoShowCombat = 0;
+    gbNoShowCombat = false;
     if (firstHero)
         firstHero->CheckLevel();
     if (secondHero)
@@ -7753,8 +7753,8 @@ i32 advManager::AutoResolveCombat(
     }
     MobilizeCurrHero(0);
     if (processLosses)
-        gbRetreatWin = 0;
-    gbInCombat = 0;
+        gbRetreatWin = false;
+    gbInCombat = false;
     gpMouseManager->m_forcePointerUpdate = 0;
     return gpCombatManager->m_combatResult;
 }
@@ -7795,6 +7795,6 @@ i32 RiddleStringsEqual(char* answer, char* expected) {
 // .rdata temporaries replay exactly over the 0x38-byte retail contribution. The
 // constrained group validator proves exact payloads, disjoint extents, complete
 // nonzero-byte coverage, and zero diagnostics for all 254 definitions.
-DATA(0x0051cc0c) i32 gbNoShowCombat = 0;
+DATA(0x0051cc0c) b32 gbNoShowCombat = false;
 
 #undef RETAIL_FILE

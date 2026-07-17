@@ -2247,9 +2247,9 @@ void townManager::BuildObj(i32 building) {
         giMaxExtentX = giMaxExtentY;
         giMinExtentX = 639;
         giMinExtentY = 255;
-        gbComputeExtent = 1;
-        gbSaveBiggestExtent = 1;
-        gbReturnAfterComputeExtent = 1;
+        gbComputeExtent = true;
+        gbSaveBiggestExtent = true;
+        gbReturnAfterComputeExtent = true;
         if (building == TOWN_COMMAND_MAGE_GUILD) {
             if (gpTownManager->m_town->m_type == IDX(FACTION_NECROMANCER))
                 frame_g = (gpTownManager->m_town->m_buildState - 1) * 3 * 2;
@@ -2267,9 +2267,9 @@ void townManager::BuildObj(i32 building) {
                 m_townObjects[objectIndex_k]
                     ->m_icon->CombatClipDrawToBuffer(0, 0, 1, &limits_h, 0, 0, 0, 0);
         }
-        gbComputeExtent = 0;
-        gbSaveBiggestExtent = 0;
-        gbReturnAfterComputeExtent = 0;
+        gbComputeExtent = false;
+        gbSaveBiggestExtent = false;
+        gbReturnAfterComputeExtent = false;
 
         gpWindowManager->SaveFizzleSource(
             giMinExtentX,

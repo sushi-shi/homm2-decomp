@@ -265,14 +265,14 @@ i32 advManager::Open(i32 id) {
         m_heroIcons[7] = gpResourceManager->GetIcon("froth.icn");
     }
 
-    gbLoadingMonoIcon = 1;
+    gbLoadingMonoIcon = true;
     if (m_shadowIcon == 0) {
         m_shadowIcon = gpResourceManager->GetIcon("shadow32.icn");
     }
     if (m_boatShadowIcon == 0) {
         m_boatShadowIcon = gpResourceManager->GetIcon("boatshad.icn");
     }
-    gbLoadingMonoIcon = 0;
+    gbLoadingMonoIcon = false;
 
     if (m_flagIcons[0] == 0) {
         m_flagIcons[0] = gpResourceManager->GetIcon("b-flag32.icn");
@@ -311,11 +311,11 @@ i32 advManager::Open(i32 id) {
         m_boatFlagIcons[5] = gpResourceManager->GetIcon("p-bflg32.icn");
     }
 
-    gbLoadingMonoIcon = 1;
+    gbLoadingMonoIcon = true;
     if (m_puzzleIcon == 0) {
         m_puzzleIcon = gpResourceManager->GetIcon("radar.icn");
     }
-    gbLoadingMonoIcon = 0;
+    gbLoadingMonoIcon = false;
 
     for (resourceIndex = 0; resourceIndex < ADVMGR_LOOPING_SAMPLE_COUNT; ++resourceIndex) {
         m_loopingSamples[resourceIndex] = 0;
@@ -4600,7 +4600,7 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
     message.type = ADVMGR_ENEMY_TURN_MESSAGE_TYPE;
     if (iCurBottomView != ADVMGR_ENEMY_TURN_VIEW_ID) {
         updated = 1;
-        gbForceUpdate = 1;
+        gbForceUpdate = true;
         ClearBottomView();
         iCurBottomView = ADVMGR_ENEMY_TURN_VIEW_ID;
 
@@ -8227,7 +8227,7 @@ void advManager::SetInitialMapOrigin(void) {
     m_hoverCellY = 0;
     m_lastHoverCell = m_hoverCellY;
     m_cursorActive = 0;
-    gbHeroMoving = 0;
+    gbHeroMoving = false;
 
     if (gbThisNetHumanPlayer[giCurPlayer] && gpCurPlayer->CurrentTown() != ADVMGR_INVALID_CELL) {
         currentTown9 = &gpGame->m_castleRecs[gpCurPlayer->CurrentTown()];
@@ -8292,7 +8292,7 @@ void advManager::LoadRemote(void) {
 
     if (gbThisNetHumanPlayer[giCurPlayer]) {
         gpGame->CancelComputerScreen();
-        gbThisNetGotAdventureControl = 1;
+        gbThisNetGotAdventureControl = true;
         gpSoundManager->m_samplesReady = 0;
     }
 
@@ -8683,7 +8683,7 @@ foundAdjacentMonster:
 VA(0x00469fc2, 0x125)
 void ComputeAdvNetControl(void) {
     if (!gbRemoteOn) {
-        gbThisNetGotAdventureControl = 1;
+        gbThisNetGotAdventureControl = true;
     } else {
         i32 selectedPlayer = -1;
         i32 player;
@@ -8868,9 +8868,9 @@ void advManager::ViewPuzzle(void) {
 // when adjacent source or recovered local evidence explains the retail frame.
 VA(0x0046a6a3, 0x81)
 void advManager::PuzzleDraw(i32 left, i32 top, i32 right, i32 bottom) {
-    gbDrawingPuzzle = 1;
+    gbDrawingPuzzle = true;
     CompleteDraw(left, top, 0, 0);
-    gbDrawingPuzzle = 0;
+    gbDrawingPuzzle = false;
     IconToBitmap(
         m_objectIcons[ADVMGR_TILESET_ROUTE],
         gpWindowManager->m_screen,
@@ -9821,7 +9821,7 @@ DATA(0x004f57c8) i32 iCurBottomView = 0;
 DATA(0x004f57cc) i32 iCurBottomViewEnemy = -1;
 DATA(0x004f57d0) i32 iCurHourGlassPhase = 0;
 DATA(0x004f57d4) i32 iLastHourGlassPhase = 1;
-DATA(0x004f57d8) i32 gbForceUpdate = 0;
+DATA(0x004f57d8) b32 gbForceUpdate = false;
 DATA(0x004f59e8) i32 giCheatSeq = 0;
 DATA(0x004f59ec) i32 iQWE = 0;
 DATA(0x004f5e38) u8 monAnimDrawFrame[ADVMGR_MONSTER_ANIMATION_TABLE_SIZE] =
