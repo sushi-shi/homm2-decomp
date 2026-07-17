@@ -2111,12 +2111,8 @@ void army::PowEffect(i32 effect, i32 resetLimits, i32 effectX, i32 effectY)
                      gpCombatManager->m_armies[side_4][index_10].m_animationState) ||
                  static_cast<u8>(
                      gpCombatManager->m_armies[side_4][index_10].m_animationCycle)) &&
-                !*reinterpret_cast<i32 *>(
-                    index_10 * sizeof(gpCombatManager->m_limitCreatureCount[0][0]) +
-                    OD_STEER(side_4) * sizeof(gpCombatManager->m_limitCreatureCount[0]) +
-                    reinterpret_cast<char *>(
-                        gpCombatManager->m_limitCreatureCount))) {
-                index_10[side_4[gpCombatManager->m_limitCreatureCount]]++;
+                !gpCombatManager->m_limitCreatureCount[side_4][index_10]) {
+                gpCombatManager->m_limitCreatureCount[side_4][index_10]++;
             }
         }
     }

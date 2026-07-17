@@ -38,11 +38,10 @@ public:
     mapCell      *Cells(void)  { return cells; }
     mapCell      *Row(i32 y)   { return &cells[width * y]; }   // row base ptr; caller does [x]
     // Retail closes this inline region after assigning the caller's pointer. The
-    // output reference is therefore part of the recovered source shape.
-    void Cell(mapCell *&cell, i32 x, i32 y) {
-        cell = reinterpret_cast<mapCell *>(reinterpret_cast<u8 *>(cells) +
-                                           width * y * sizeof(mapCell)) + x;
-    }
+    // output reference is therefore part of the recovered source shape. (Retail's
+    // inline lowering used byte-offset addressing here; natural indexing is kept
+    // by policy — correctness over byte identity.)
+    void Cell(mapCell *&cell, i32 x, i32 y) { cell = &cells[width * y + x]; }
     mapCell      *GetCell(i32 x, i32 y) { return cells + width * y + x; }
     mapCellExtra *Extra(i32 i) { return &extras[i]; }          // &extras[i] (stride 7)
 };

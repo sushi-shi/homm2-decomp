@@ -119,8 +119,7 @@ void fullMap::Read(i32 handle, i32 convert)
         read(handle, tmp, width * height * sizeof(oldMapCell));
         for (x = 0; x < width; x++)
             for (y = 0; y < height; y++)
-                memcpy(reinterpret_cast<u8 *>(cells) +
-                           (width * y * sizeof(mapCell) + x * sizeof(mapCell)),
+                memcpy(&cells[width * y + x],
                        tmp + width * y + x, sizeof(mapCell));
         delete tmp;
     } else {
