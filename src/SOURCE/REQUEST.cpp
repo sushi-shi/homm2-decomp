@@ -917,11 +917,11 @@ void fileRequester::DoKnob(void)
     Update(1);
 }
 
-// @early-stop
-// @early-stop-reloc-only
-// All relocation-masked instructions, the 0x1bc frame/slots, CFG, and 71
-// ordered effective targets agree. Only pooled %s identities and the FP-adjust
-// compiler alias differ.
+// @semantic
+// Complete 0x1bc frame/slots and CFG; all 71/71 relocation owners/addends agree.
+// First divergence is at +0x81: retail loads giMapSizeFilter then compares the
+// loop index against EAX, while candidate loads the loop index then compares the
+// global against EAX. The equivalent operand order shifts later relocation sites.
 VA(0x0048ef82, 0xc42)
 void fileRequester::Update(int drawWindow)
 {

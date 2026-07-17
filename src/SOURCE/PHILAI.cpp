@@ -6,7 +6,6 @@
 #include <va.h>
 #include <SOURCE/ADVMGR.h>
 #include <SOURCE/PHILAI.h>
-#include <SOURCE/KB_TYPES.h>
 #include <BASE/Misc.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/NOOPT.h>
@@ -30,8 +29,7 @@
 #include <EDITOR/mapcell.h>
 #include <BASE/mouseManager.h>
 
-// Globals -> X_GLOBAL.h; tag_tilePoint/tag_monsterInfo -> KB_TYPES.h; called free functions
-// from owner headers (Misc.h/KB.h/kbwin.h/NOOPT.h); PHILAI's own -> SOURCE/PHILAI.h.
+// Globals and called free functions come from their owner headers.
 
 // __FILE__ for the NWC BaseAlloc/BaseFree memory tracking (reloc-masked path string).
 #define PHFILE const_cast<char *>("I:\\Projects\\Heroes\\Prog\\SOURCE\\PHILAI.CPP")

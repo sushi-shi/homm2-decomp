@@ -1,7 +1,6 @@
 #ifndef HOMM2_MISC_H
 #define HOMM2_MISC_H
 #include <va.h>
-#include <SOURCE/KB_TYPES.h>
 // Declarations of the free functions DEFINED in Misc.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
 // forward declarations (was <_all.h>):
