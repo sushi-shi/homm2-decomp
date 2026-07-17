@@ -20,8 +20,8 @@
 #include <BASE/icon.h>
 #include <string.h>
 
-#define TEXT_ENTRY_SOURCE_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\Textntry.cpp"
-#define TEXT_ENTRY_MAIN_SOURCE_FILES TEXT_ENTRY_SOURCE_FILE "\0\0\0" TEXT_ENTRY_SOURCE_FILE
+#define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\Textntry.cpp"
+#define TEXT_ENTRY_MAIN_SOURCE_FILES RETAIL_FILE "\0\0\0" RETAIL_FILE
 
 // @data-layout-note Retail's initialized Textntry contribution is
 // RVA 0x120cec..0x120d9c (0xb0), with four identical source-path views at
@@ -100,7 +100,7 @@ textEntryWidget::textEntryWidget(
     m_rectH = m_height;
 #line 61 "I:\\Projects\\Heroes\\Prog\\BASE\\Textntry.cpp"
     m_text =
-        static_cast<char*>(H2_ALLOC(static_cast<u16>(maxLength) + 5, TEXT_ENTRY_SOURCE_FILE, 0x3e));
+        static_cast<char*>(H2_ALLOC(static_cast<u16>(maxLength) + 5, RETAIL_FILE, 0x3e));
     strcpy(m_text, text);
     if (layout == 4) {
         m_innerX = horizontalInset + m_x;
@@ -132,7 +132,7 @@ void textEntryWidget::Read(i32 type) {
     m_height = gpResourceManager->ReadWord();
     m_maxLength = gpResourceManager->ReadWord();
 #line 99
-    m_text = static_cast<char*>(H2_ALLOC(m_maxLength + 5, TEXT_ENTRY_SOURCE_FILE "\0", 0x63));
+    m_text = static_cast<char*>(H2_ALLOC(m_maxLength + 5, RETAIL_FILE "\0", 0x63));
     gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_text), m_maxLength);
     gpResourceManager->Read13(reinterpret_cast<i8*>(resourceName));
     gpResourceManager->SavePosition();
@@ -493,3 +493,5 @@ void textEntryWidget::SetupDisplayString(char* source, u16 cursor) {
 
 // ---- vtables (compiler-emitted; census) ----
 VTBL(textEntryWidget, 0x004ebaa0);
+
+#undef RETAIL_FILE
