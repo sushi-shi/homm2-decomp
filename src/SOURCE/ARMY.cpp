@@ -290,7 +290,7 @@ void army::DrawToBuffer(i32 x, i32 y, i32 effectsOnly) {
     color = 0;
     standing7 = m_animationSequence == ARMY_ANIMATION_STAND
                 || (m_animationSequence >= ARMY_ANIMATION_STANDING_FIRST
-                    && m_animationSequence <= ARMY_ANIMATION_STANDING_END - 1);
+                    && IDX(m_animationSequence) <= IDX(ARMY_ANIMATION_STANDING_END) - 1);
     y += m_yOffset;
     x += m_xOffset;
     if (m_animationSequence == ARMY_ANIMATION_WALK
@@ -460,14 +460,14 @@ void army::DrawToBuffer(i32 x, i32 y, i32 effectsOnly) {
                 spellX2 -= 22;
             }
         }
-        if (gCurLoadedSpellEffect == 23) {
+        if (gCurLoadedSpellEffect == SPELL_DISPEL) {
             if (m_facing == 1) {
                 spellX2 = RightX();
             } else {
                 spellX2 = LeftX();
             }
         }
-        if (gCurLoadedSpellEffect == 28) {
+        if (gCurLoadedSpellEffect == SPELL_ELEMENTAL_STORM) {
             spellX2 = ((-(m_facing == 1) & 2) - 1) * m_frameInfo.spellEffectX + x;
             spellY = m_frameInfo.spellEffectY + y;
         }

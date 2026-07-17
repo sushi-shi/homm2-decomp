@@ -347,7 +347,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             "{Hill Fort}\n\nAll of the %s you have in your army have been trained "
                             "by the battle masters of the fort.  Your army now contains %s.",
                             gArmyNamesPlural[IDX(firstUpgrade_e)],
-                            gArmyNamesPlural[firstUpgrade_e + 1]
+                            gArmyNamesPlural[IDX(firstUpgrade_e) + 1]
                         );
                     } else {
                         sprintf(
@@ -357,8 +357,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             "and %s.",
                             gArmyNamesPlural[IDX(firstUpgrade_e)],
                             gArmyNamesPlural[IDX(secondUpgrade1)],
-                            gArmyNamesPlural[firstUpgrade_e + 1],
-                            gArmyNamesPlural[secondUpgrade1 + 1]
+                            gArmyNamesPlural[IDX(firstUpgrade_e) + 1],
+                            gArmyNamesPlural[IDX(secondUpgrade1) + 1]
                         );
                     }
                 } else {
@@ -370,8 +370,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         gArmyNamesPlural[IDX(firstUpgrade_e)],
                         gArmyNamesPlural[IDX(secondUpgrade1)],
                         gArmyNamesPlural[IDX(thirdUpgrade)],
-                        gArmyNamesPlural[firstUpgrade_e + 1],
-                        gArmyNamesPlural[secondUpgrade1 + 1],
+                        gArmyNamesPlural[IDX(firstUpgrade_e) + 1],
+                        gArmyNamesPlural[IDX(secondUpgrade1) + 1],
                         gArmyNamesPlural[thirdUpgrade + 1]
                     );
                 }
@@ -435,7 +435,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             gText,
                             "{Freeman's Foundry}\n\nAll of your %s have been upgraded into %s.",
                             gArmyNamesPlural[IDX(firstUpgrade_e)],
-                            gArmyNamesPlural[firstUpgrade_e + 1]
+                            gArmyNamesPlural[IDX(firstUpgrade_e) + 1]
                         );
                     } else {
                         sprintf(
@@ -444,8 +444,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             "%s and %s.",
                             gArmyNamesPlural[IDX(firstUpgrade_e)],
                             gArmyNamesPlural[IDX(secondUpgrade1)],
-                            gArmyNamesPlural[firstUpgrade_e + 1],
-                            gArmyNamesPlural[secondUpgrade1 + 1]
+                            gArmyNamesPlural[IDX(firstUpgrade_e) + 1],
+                            gArmyNamesPlural[IDX(secondUpgrade1) + 1]
                         );
                     }
                 } else {
@@ -456,8 +456,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         gArmyNamesPlural[IDX(firstUpgrade_e)],
                         gArmyNamesPlural[IDX(secondUpgrade1)],
                         gArmyNamesPlural[IDX(thirdUpgrade)],
-                        gArmyNamesPlural[firstUpgrade_e + 1],
-                        gArmyNamesPlural[secondUpgrade1 + 1],
+                        gArmyNamesPlural[IDX(firstUpgrade_e) + 1],
+                        gArmyNamesPlural[IDX(secondUpgrade1) + 1],
                         gArmyNamesPlural[thirdUpgrade + 1]
                     );
                 }
