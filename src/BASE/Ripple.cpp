@@ -15,13 +15,17 @@
 #include <SOURCE/NOOPT.h>
 #include <string.h>
 // @semantic
-// The recovered /O2 kernel has the retail 0x2c4 frame, CFG, loop bounds, and all 13
-// external relocations. The retained canonical-source state differs after relocation
-// masking only at +0x156 (SIB 08 versus 01) for commutative profileIndex + position;
-// current shared-header state additionally reschedules equivalent pixel-address loads.
+// The complete /O2 kernel has the retail 0x23f extent, 0x2c4 frame, CFG, profile and
+// previous-row arrays, pixel/redraw bounds, and all 13 ordered relocation targets and
+// addends. Hoisting profileIndex to function scope fixed the +0x156 commutative SIB;
+// the first remaining code divergence is +0x196, where retail `cmp esi,eax; jle` and
+// ours `cmp eax,esi; jge` encode the same height <= sourceRow exit (repeated at +0x1b8).
+// Ten non-improving current-state variants exhausted operand orders and trivial local
+// hoists. Revisit only after a material Ripple header/declaration-state change.
 VA(0x004d26a0, 0x23f)
 void DoRipple(bitmap *source, bitmap *destination, int height, int strength)
 {
+    int profileIndex;
     const int screenWidth = 0x280;
     const int profileRadius = 0x19;
     const int redrawRadius = 0x16;
@@ -50,7 +54,7 @@ void DoRipple(bitmap *source, bitmap *destination, int height, int strength)
         int deadline = KBTickCount() +
             gfCombatSpeedMod[gConfig.combatSpeed] * 9.0f;
 
-        for (int profileIndex = 0; profileIndex <= 50; ++profileIndex) {
+        for (profileIndex = 0; profileIndex <= 50; ++profileIndex) {
             int column = profileIndex + position - profileRadius;
             if (column < 0 || column >= screenWidth)
                 continue;
