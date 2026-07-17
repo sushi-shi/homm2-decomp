@@ -1529,19 +1529,19 @@ void game::RandomizeEvents(void) {
         for (xPos2 = 0; (xPos2 | 0) < MAP_WIDTH; xPos2++) {
             cell2 = m_worldMap.Row(yPos19) + xPos2;
             switch (cell2->m_triggerType) {
-                case 0xd5:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_WITCH_HUT:
                     cell2->m_objectMetadata = 12;
                     while (cell2->m_objectMetadata == 12 || cell2->m_objectMetadata == 6)
                         cell2->m_objectMetadata = Random(0, 13);
                     break;
-                case 0xab:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_BOAT:
                     cell2->m_objectTileset = 0;
                     cell2->m_objectIndex = 0xff;
                     cell2->m_objectMetadata = 0;
                     cell2->m_triggerType = 0;
                     CreateBoat(xPos2, yPos19, 1);
                     break;
-                case 0xcf:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SPHINX:
                     eventData16 =
                         reinterpret_cast<mapEventExtra*>(ppMapExtra[cell2->m_objectMetadata]);
                     if (strlen(eventData16->riddle) > 1 && eventData16->answerCount >= 1)
@@ -1549,7 +1549,7 @@ void game::RandomizeEvents(void) {
                     else
                         eventData16->active = 0;
                     break;
-                case 0x93:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MAP_EVENT:
                     m_mapEventIndices[m_mapEventCount] = cell2->m_objectMetadata;
                     mapEvent1 = reinterpret_cast<EventExtra*>(ppMapExtra[cell2->m_objectMetadata]);
                     mapEvent1->x = static_cast<i16>(xPos2);
@@ -1561,39 +1561,39 @@ void game::RandomizeEvents(void) {
                     cell2->m_objectTileset = 0;
                     m_mapEventCount++;
                     break;
-                case 0x8a:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_GAZEBO:
                     cell2->m_objectMetadata = bottleId11++;
                     break;
-                case 0xbe:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_FORT:
                     cell2->m_objectMetadata = jailId28++;
                     break;
-                case 0xc5:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_WITCH_DOCTOR_HUT:
                     cell2->m_objectMetadata = sphinxId26;
                     sphinxId26++;
                     break;
-                case 0xc9:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MERCENARY_CAMP:
                     cell2->m_objectMetadata = tentId10++;
                     break;
-                case 0xc2:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_STANDING_STONES:
                     if (xPos2 <= 0 || m_worldMap.GetCell(xPos2 - 1, yPos19)->m_triggerType != 0xc2)
                         cell2->m_objectMetadata = hutId11++;
                     else
                         cell2->m_objectMetadata =
                             m_worldMap.GetCell(xPos2 - 1, yPos19)->m_objectMetadata;
                     break;
-                case 0xd6:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_XANADU:
                     cell2->m_objectMetadata = signId4++;
                     break;
-                case 0x27:
+                case MAP_OBJECT_WHIRLPOOL:
                     cell2->m_triggerType |= 0x80;
                     break;
-                case 0x99:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_OBELISK:
                     cell2->m_objectMetadata = shrineId8++;
                     break;
-                case 0xda:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_FLOTSAM:
                     cell2->m_objectMetadata = Random(0, 3);
                     break;
-                case 0x84:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SKELETON:
                     if (!HasObjectTilesetIndex(xPos2, yPos19, 0x37, 0x54)) {
                         cell2->m_triggerType &= 0x7f;
                     } else if (Random(0, 9) > 2) {
@@ -1602,7 +1602,7 @@ void game::RandomizeEvents(void) {
                         cell2->m_objectMetadata = GetRandomArtifactId(14, 1) + 2;
                     }
                     break;
-                case 0xd0:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_WAGON:
                     randomValue7 = Random(0, 100);
                     if (randomValue7 < 40)
                         cell2->m_objectMetadata = 0;
@@ -1611,10 +1611,10 @@ void game::RandomizeEvents(void) {
                     else
                         cell2->m_objectMetadata = Random(0, 5) + (Random(2, 5) << 4) + 1;
                     break;
-                case 0xd8:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_LEAN_TO:
                     cell2->m_objectMetadata = Random(0, 5) + (Random(1, 4) << 4) + 1;
                     break;
-                case 0x85:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_DAEMON_CAVE:
                     switch (Random(0, 99) % 10) {
                         case 0:
                         case 1:
@@ -1636,7 +1636,7 @@ void game::RandomizeEvents(void) {
                             break;
                     }
                     break;
-                case 0x86:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_TREASURE_CHEST:
                     if (giGroundToTerrain[cell2->m_terrainImageIndex] == 0) {
                         cell2->m_triggerType = 0xa1;
                         randomValue7 = Random(0, 100);
@@ -1658,14 +1658,14 @@ void game::RandomizeEvents(void) {
                             cell2->m_objectMetadata = GetRandomArtifactId(8, 1) | 0x100;
                     }
                     break;
-                case 0x88:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CAMPFIRE:
                     cell2->m_objectMetadata = Random(4, 6) << 4;
                     cell2->m_objectMetadata |= Random(0, 5);
                     break;
-                case 0x8b:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ANCIENT_LAMP:
                     cell2->m_objectMetadata = Random(0, 2) + 2;
                     break;
-                case 0xdc:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SHIPWRECK_SURVIVOR:
                     randomValue7 = Random(0, 100);
                     if (randomValue7 < 60)
                         cell2->m_objectMetadata = GetRandomArtifactId(8, 1);
@@ -1674,9 +1674,9 @@ void game::RandomizeEvents(void) {
                     else
                         cell2->m_objectMetadata = GetRandomArtifactId(2, 1);
                     break;
-                case 0x8c:
-                case 0xa0:
-                case 0xdb:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_GRAVEYARD:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SHIPWRECK:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_DERELICT_SHIP:
                     switch (Random(0, 99) % 10) {
                         case 0:
                         case 1:
@@ -1698,34 +1698,34 @@ void game::RandomizeEvents(void) {
                             break;
                     }
                     break;
-                case 0x8d:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ARCHER_HOUSE:
                     cell2->m_objectMetadata = Random(10, 25);
                     break;
-                case 0x8e:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_GOBLIN_HUT:
                     cell2->m_objectMetadata = Random(15, 40);
                     break;
-                case 0x8f:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_DWARF_COTTAGE:
                     cell2->m_objectMetadata = Random(0, 20) + 1;
                     break;
-                case 0x90:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_PEASANT_HUT:
                     cell2->m_objectMetadata = Random(0, 40) + 1;
                     break;
-                case 0x91:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_LOG_CABIN:
                     cell2->m_objectMetadata = Random(20, 50);
                     break;
-                case 0x96:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_WATER_WHEEL:
                     cell2->m_objectMetadata = 1;
                     break;
-                case 0xd2:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ARTESIAN_SPRING:
                     cell2->m_objectMetadata = 1;
                     break;
-                case 0xdf:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MAGIC_GARDEN:
                     cell2->m_objectMetadata = Random(0, 1) == 0 ? 6 : 7;
                     break;
-                case 0xc4:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_TREE_OF_KNOWLEDGE:
                     cell2->m_objectMetadata = (Random(1, 3) << 6) | eyeId13++;
                     break;
-                case 0x98:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MONSTER:
                     if (cell2->m_objectMetadata == 0) {
                         cell2->m_objectMetadata = GetRandomNumTroops(cell2->m_objectIndex);
                         if (cell2->m_objectIndex != 59 && cell2->m_objectIndex != 62
@@ -1734,7 +1734,7 @@ void game::RandomizeEvents(void) {
                             cell2->m_objectMetadata |= 0x1000;
                     }
                     break;
-                case 0x9b:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RESOURCE:
                     cell2->m_objectMetadata = cell2->m_objectIndex >> 1;
                     switch (cell2->m_objectMetadata) {
                         case 0:
@@ -1749,73 +1749,73 @@ void game::RandomizeEvents(void) {
                             break;
                     }
                     break;
-                case 0x9f:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SHRINE_FIRST_CIRCLE:
                     cell2->m_objectMetadata = Random(0, 64) + 1;
                     while (gsSpellInfo[cell2->m_objectMetadata - 1].level != 1) {
                         cell2->m_objectMetadata = Random(0, 64) + 1;
                     }
                     break;
-                case 0xca:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SHRINE_SECOND_CIRCLE:
                     cell2->m_objectMetadata = Random(0, 64) + 1;
                     while (gsSpellInfo[cell2->m_objectMetadata - 1].level != 2) {
                         cell2->m_objectMetadata = Random(0, 64) + 1;
                     }
                     break;
-                case 0xcb:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SHRINE_THIRD_CIRCLE:
                     cell2->m_objectMetadata = Random(0, 64) + 1;
                     while (gsSpellInfo[cell2->m_objectMetadata - 1].level != 3) {
                         cell2->m_objectMetadata = Random(0, 64) + 1;
                     }
                     break;
-                case 0xcc:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_PYRAMID:
                     cell2->m_objectMetadata = Random(0, 64) + 1;
                     while (gsSpellInfo[cell2->m_objectMetadata - 1].level != 5) {
                         cell2->m_objectMetadata = Random(0, 64) + 1;
                     }
                     break;
-                case 0xbb:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_TREE_HOUSE:
                     cell2->m_objectMetadata = Random(15, 25);
                     break;
-                case 0xc1:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SIRENS:
                     cell2->m_objectMetadata = Random(10, 20);
                     break;
-                case 0xba:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_WATCH_TOWER:
                     cell2->m_objectMetadata = Random(7, 10);
                     break;
-                case 0xbd:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RUINS:
                     cell2->m_objectMetadata = Random(3, 5);
                     break;
-                case 0xbc:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_TREE_CITY:
                     cell2->m_objectMetadata = Random(20, 40);
                     break;
-                case 0xc8:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HALFLING_HOLE:
                     cell2->m_objectMetadata = Random(20, 40);
                     break;
-                case 0xd3:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_TROLL_BRIDGE:
                     cell2->m_objectMetadata = Random(4, 6) | 0x100;
                     break;
-                case 0xcd:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CITY_OF_DEAD:
                     cell2->m_objectMetadata = Random(4, 6) | 0x100;
                     break;
-                case 0x94:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_DRAGON_CITY:
                     cell2->m_objectMetadata = 0x102;
                     break;
-                case 0xd7:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CAVE:
                     cell2->m_objectMetadata = Random(10, 20);
                     break;
-                case 0xce:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_EXCAVATION:
                     cell2->m_objectMetadata = Random(10, 25);
                     break;
-                case 0xa2:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_DESERT_TENT:
                     cell2->m_objectMetadata = Random(10, 20);
                     break;
-                case 0xa5:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_WAGON_CAMP:
                     if (!HasObjectTilesetIndex(xPos2, yPos19, 0x29, 0x81))
                         cell2->m_triggerType &= 0x7f;
                     else
                         cell2->m_objectMetadata = Random(30, 50);
                     break;
-                case 0xa9:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ARTIFACT:
                     randomValue7 = Random(0, 99);
                     value26 = cell2->m_objectIndex >> 1;
                     if (value26 != 0x56) {
@@ -1854,7 +1854,7 @@ void game::RandomizeEvents(void) {
                         }
                     }
                     break;
-                case 0xa3:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE:
                     mineId2 = GetTownId(xPos2, yPos19);
                     for (row18 = yPos19 - 2; row18 <= yPos19 + 1; row18++) {
                         for (column1 = xPos2 - 2; column1 <= xPos2 + 2; column1++) {
@@ -1880,17 +1880,17 @@ void game::RandomizeEvents(void) {
                         }
                     }
                     break;
-                case 0x95: {
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_LIGHTHOUSE: {
                     m_worldMap.GetCell(xPos2, yPos19)->m_objectMetadata = GetMineId(xPos2, yPos19);
                     break;
                 }
-                case 0xc0:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ABANDONED_MINE:
                     mineId2 = GetMineId(xPos2, yPos19);
                     m_mines[mineId2].guardianType = 59;
                     m_mines[mineId2].guardianCount = static_cast<u8>(Random(30, 60));
-                case 0x81:
-                case 0x97:
-                case 0x9d:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ALCHEMIST_LAB:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MINE:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SAWMILL:
                     mineId2 = GetMineId(xPos2, yPos19);
                     for (row18 = yPos19 - 1; row18 <= yPos19; row18++) {
                         for (column1 = xPos2 - 2; column1 <= xPos2 + 1; column1++) {
@@ -1903,19 +1903,19 @@ void game::RandomizeEvents(void) {
                         }
                     }
                     break;
-                case 0xa8:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_WINDMILL:
                     cell2->m_objectMetadata = Random(1, 5);
                     break;
-                case 0xf7:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_BARRIER:
                     RandomizeBarrier(cell2);
                     break;
-                case 0xf8:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_TRAVELER_TENT:
                     RandomizePassword(cell2);
                     break;
-                case 0xfa:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_EXPANSION_OBJECT:
                     WeeklyGenericSite(cell2);
                     break;
-                case 0xf9:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_EXPANSION_DWELLING:
                     WeeklyRecruitSite(cell2);
                     break;
             }
@@ -2465,7 +2465,7 @@ i32 ViewSpellsHandler(tag_message& msg) {
                             gpGame->UpdateSpellWidgets();
                             gpGame->m_viewSpellsWindow->MoveWindow(0, 0);
                             break;
-                        case 0x7800:
+                        case EVENT_WINDOW_FIRST_BUTTON:
                             msg.payload.widget.id = 10;
                             break;
                     }
@@ -2592,7 +2592,7 @@ i32 ViewSpecialHandler(tag_message& msg) {
             case 5:
                 strcpy(gText, cSpellHelp[3]);
                 break;
-            case 0x7800:
+            case EVENT_WINDOW_FIRST_BUTTON:
                 strcpy(gText, cSpellHelp[4]);
                 break;
             case 6:
@@ -2900,13 +2900,13 @@ i32 ViewArmyHandler(tag_message& msg) {
         switch (msg.payload.widget.command) {
             case WIDGET_COMMAND_DESELECT:
                 switch (msg.payload.widget.id) {
-                    case 0x7800:
-                    case 0x7801:
+                    case EVENT_WINDOW_FIRST_BUTTON:
+                    case EVENT_WINDOW_SECOND_BUTTON:
                         gpWindowManager->m_dialogResult = msg.payload.widget.id;
                         msg.payload.widget.id = 10;
                         msg.payload.widget.command = msg.payload.widget.id;
                         return 2;
-                    case 0x7803:
+                    case EVENT_WINDOW_FOURTH_BUTTON:
                         NormalDialog(
                             const_cast<char*>("Are you sure you want to dismiss this army?"),
                             2,

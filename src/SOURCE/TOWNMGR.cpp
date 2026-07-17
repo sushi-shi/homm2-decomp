@@ -2608,8 +2608,8 @@ i32 TavernHandler(tag_message& message) {
         switch (message.payload.widget.command) {
             case TOWN_INPUT_DESELECT:
                 switch (message.payload.widget.id) {
-                    case 0x7800:
-                    case 0x7801:
+                    case EVENT_WINDOW_FIRST_BUTTON:
+                    case EVENT_WINDOW_SECOND_BUTTON:
                     case TOWN_DIALOG_CONFIRM:
                         gpWindowManager->m_dialogResult = message.payload.widget.id;
                         message.payload.widget.id = 10;
@@ -2706,8 +2706,8 @@ i32 SplitArmyHandler(tag_message& message) {
                         if (gpTownManager->m_splitAmount < 0)
                             gpTownManager->m_splitAmount = 0;
                         goto update_amount;
-                    case 0x7800:
-                    case 0x7801:
+                    case EVENT_WINDOW_FIRST_BUTTON:
+                    case EVENT_WINDOW_SECOND_BUTTON:
                         gpTownManager->m_splitAmount = 0;
                         gpWindowManager->m_dialogResult = message.payload.widget.id;
                         handled = 1;

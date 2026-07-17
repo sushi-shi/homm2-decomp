@@ -5620,10 +5620,10 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                 value_h = ComputeValueOfFreeSS(gpCurAIHero, cell_k->m_objectMetadata);
                 break;
             case MAP_OBJECT_SIGN:
-            case 0x1e:
+            case MAP_OBJECT_ORACLE:
             case MAP_OBJECT_TRADING_POST:
             case MAP_OBJECT_SPHINX:
-            case 0x51:
+            case MAP_OBJECT_TAR_PIT:
             case MAP_OBJECT_MAGELLAN_MAPS:
             case MAP_OBJECT_OBSERVATION_TOWER:
                 value_h = 0;
