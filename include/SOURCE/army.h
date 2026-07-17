@@ -3,7 +3,7 @@
 // Reconstructed class (SOURCE) from CodeView NB09 of HEROES2W.EXE — NOT original source.
 // 57 methods, 0 own-virtual, 0 static data.
 #include <va.h>
-#include <_types.h>
+#include <SOURCE/KB_TYPES.h>
 #include <BASE/icon.h>
 #include <SOURCE/ARMY.h>
 

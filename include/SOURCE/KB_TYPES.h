@@ -1,12 +1,9 @@
-#ifndef HOMM2_TYPES_H
-#define HOMM2_TYPES_H
-// Hand-maintained shared home for record/model structs that GLOBAL declarations reference,
-// so their layout is declared once and cannot drift between TUs. TU-PRIVATE modelling
-// structs do NOT belong here — they live in per-TU headers (they often need TU-local
-// typedefs). Move each type below to its owning module header as ownership becomes clear.
-// Included by _globals.h.
+#ifndef HOMM2_SOURCE_KB_TYPES_H
+#define HOMM2_SOURCE_KB_TYPES_H
+// Shared records for data owned by KB.cpp. These layouts are used by multiple SOURCE
+// modules and are kept separate from KB.h's function and global declarations.
 #include <Ints.h>
-// forward declarations (was <_all.h>):
+// Forward declarations for opaque pointer members.
 class sample;
 
 // Resource-type index for the game's per-resource arrays (gafAITurnCostResource, p[] amounts,
@@ -46,8 +43,10 @@ typedef enum MonsterAbilityFlags {
     MONSTER_ABILITY_FLAG_DEFERRED_TURN = 0x1000
 } MonsterAbilityFlags;
 
-typedef unsigned int UInt32;   // crc32Table[]
-struct MemEntry;               // gpMemEntry — full def not yet reconstructed; used via pointer
+// Retained in the historical declaration sequence because MSVC 4.2's cumulative TU state
+// changes code generation when these otherwise redundant declarations are removed.
+typedef unsigned int UInt32;
+struct MemEntry;
 struct _SAMPLE;                // SAMPLE2::pMem — opaque
 
 enum { MENU_ENABLE_STATUS_COUNT = 70 };
@@ -245,4 +244,4 @@ struct SWinSetup {
 SIZE(SWinSetup, 7);
 #pragma pack(pop)
 
-#endif // HOMM2_TYPES_H
+#endif // HOMM2_SOURCE_KB_TYPES_H

@@ -1,10 +1,8 @@
-#ifndef HOMM2_CARCASS_TYPES_H
-#define HOMM2_CARCASS_TYPES_H
+#ifndef HOMM2_BASE_MESSAGE_H
+#define HOMM2_BASE_MESSAGE_H
 #include <va.h>
-// Minimal COMPLETE definitions for structs that some functions pass/return BY VALUE but
-// that the recovered headers only forward-declare. Needed so carcass-phase stub bodies
-// compile (a by-value param/return requires a complete type at the definition). Included
-// at the tail of _all.h; recovered layouts are pinned as byte-matching proves them.
+// Shared event ABI emitted by inputManager and consumed by BASE and SOURCE managers.
+// The complete definition is required anywhere a message is passed or returned by value.
 
 // Values emitted by INPUTMGR and consumed by manager/widget Main loops.
 typedef enum MessageType {
@@ -121,4 +119,4 @@ struct tag_message {
     tag_messagePayload payload;
 };
 SIZE(tag_message, 0x1c);
-#endif // HOMM2_CARCASS_TYPES_H
+#endif // HOMM2_BASE_MESSAGE_H

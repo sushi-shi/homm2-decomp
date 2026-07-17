@@ -7,7 +7,7 @@
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/widget.h>
-#include <_carcass_types.h>
+#include <BASE/message.h>
 #include <BASE/mouseManager.h>
 #include <SOURCE/kbwin.h>
 #include <BASE/listBoxWidget.h>

@@ -15,7 +15,7 @@
 #include <SOURCE/kbwin.h>
 #include <SOURCE/NOOPT.h>
 #include <BASE/heroWindow.h>
-#include <_carcass_types.h>
+#include <BASE/message.h>
 #include <SOURCE/dpnetwin.h>
 
 #define DPFILE const_cast<char *>("I:\\Projects\\Heroes\\Prog\\SOURCE\\dpnetwin.cpp")

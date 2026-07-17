@@ -60,8 +60,8 @@
 #include <BASE/border.h>
 
 // Types now from headers: game/mouseManager/townManager/town/executive + combatManager/
-// palette/font -> _all.h; tag_message -> _carcass_types.h; SAMPLE2/tag_monsterInfo/SSpellInfo/
-// SWinSetup -> _types.h; SNetPlayerInfo -> REMOTE_TYPES.h;
+// tag_message -> BASE/message.h; SAMPLE2/tag_monsterInfo/SSpellInfo/SWinSetup ->
+// SOURCE/KB_TYPES.h; SNetPlayerInfo -> SOURCE/REMOTE_TYPES.h;
 // SPlayerExit -> KB.h.
 
 #define KBFILE const_cast<char *>("I:\\Projects\\Heroes\\Prog\\SOURCE\\KB.CPP")

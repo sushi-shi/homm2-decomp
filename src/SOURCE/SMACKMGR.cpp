@@ -2,8 +2,8 @@
 // compiland: .\Win32_Re\SMACKMGR.OBJ   from: (directly linked into exe)
 
 #include <va.h>
-#include <_types.h>
-#include <_carcass_types.h>
+#include <SOURCE/KB_TYPES.h>
+#include <BASE/message.h>
 #include <BASE/Misc.h>
 #include <BASE/bitmap.h>
 #include <BASE/bmap2.h>

@@ -4,8 +4,8 @@
 // VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
 
 #include <va.h>
-#include <_carcass_types.h>
-#include <_types.h>
+#include <BASE/message.h>
+#include <SOURCE/KB_TYPES.h>
 #include <BASE/Misc.h>
 #include <BASE/border.h>
 #include <BASE/executive.h>

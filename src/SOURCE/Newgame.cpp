@@ -6,7 +6,7 @@
 #include <va.h>
 #include <stdio.h>
 #include <string.h>
-#include <_carcass_types.h>
+#include <BASE/message.h>
 #include <BASE/Misc.h>
 #include <BASE/executive.h>
 #include <BASE/font.h>

@@ -18,7 +18,7 @@
 #include <SOURCE/dpnetwin.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/wingraph.h>
-#include <_carcass_types.h>
+#include <BASE/message.h>
 #include <SOURCE/Wsnetwin.h>
 
 #define WSFILE const_cast<char *>("I:\\Projects\\Heroes\\Prog\\SOURCE\\Wsnetwin.cpp")
