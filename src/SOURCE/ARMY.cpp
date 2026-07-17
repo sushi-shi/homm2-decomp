@@ -512,7 +512,7 @@ void army::Walk(i32 direction, i32 finishStanding, i32 skipDrawing) {
     if (m_side == 1 && gpCombatManager->m_inCastleCombat
         && (destination_3 == 58 || destination_3 == 59
             || (destination_3 == 60 && m_side == 1 && HAS(m_monster.flags.all, MONSTER_FLAGS_WIDE)))
-        && gpCombatManager->m_drawbridgeState == 4) {
+        && gpCombatManager->m_drawbridgeState == COMBAT_DRAWBRIDGE_RAISED) {
         m_animationSequence = ARMY_ANIMATION_STAND;
         m_animationFrame = 0;
         gpCombatManager->DrawFrame(1, 0, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
@@ -951,7 +951,7 @@ void army::SpecialAttack(void) {
             giMaxExtentX - giMinExtentX + 1,
             giMaxExtentY - giMinExtentY + 1
         );
-        DelayMilli(static_cast<i32l>(gfCombatSpeedMod[gConfig.combatSpeed] * ARMY_MAGE_BOLT_DELAY));
+        DelayMilli(static_cast<i32l>(gfCombatSpeedMod[gConfig.combatSpeed] * IDX(ARMY_MAGE_BOLT_DELAY)));
         gpCombatManager->DoBolt(
             1,
             missileX_7,
