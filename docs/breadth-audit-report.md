@@ -45,7 +45,6 @@ The audit found and corrected these behavioral or storage defects:
 | KB::PopNetBox | Three control/stack locals were cyclically assigned and the keyboard byte view was mis-modeled. |
 | PATH::ValidAttack | The wide-east facing branch was reversed. |
 | dpnetwin::dpnet_term | A 104-byte frame buffer was passed where the retail protocol requests a 100-byte payload. |
-| Monster animation data | monAnimDrawFrame was modeled as 16 bytes instead of 18. A valid monster animation read crossed into adjacent ASCII, producing invalid frame values and map-load hangs. |
 | Monster runtime flags | Runtime monster flag bits were shifted to the wrong values; the retail bit assignments are restored. |
 | Sample playback data | A raw overlay used incorrect field offsets. It was replaced by the real nested SamplePlaybackData layout at sample offsets 0x10..0x2f. |
 | Global field references | Owner-only relocation masking had hidden wrong owner-relative offsets such as gConfig+0x1c versus retail gConfig+0x30. The layouts and references were corrected and are now checked by ordered addends. |
@@ -69,6 +68,12 @@ demoted or corrected instead of being carried forward:
 town::SetupThievesGuild was likewise retained as semantic/compiler-shape work after
 non-jump differences disproved a jump-only claim. This is why the current audit treats
 old markers only as leads and reproduces their byte and relocation evidence.
+
+A later COFF audit also disproved the claimed 18-byte monAnimDrawFrame allocation.
+Retail stores 16 bytes and its 18-phase readers intentionally obtain two trailing zeros
+from the immediately following zero-valued word. The temporary 18-byte model did not
+change the lookup bytes or address and therefore cannot explain the observed crash; that
+crash remains unattributed rather than being recorded as a false fix.
 
 ## Tooling Defects Fixed
 
