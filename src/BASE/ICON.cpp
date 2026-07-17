@@ -132,13 +132,13 @@ i32 icon::CombatClipDrawToBuffer(
                 giMaxExtentY = limits->bottom;
         }
         if (gbReturnAfterComputeExtent != 0)
-            return ICON_DRAW_SKIPPED;
+            return IDX(ICON_DRAW_SKIPPED);
     }
 
     if (gbLimitToExtent != 0
         && (gbCurrArmyDrawn == 0 || limits->left > giMaxExtentX || limits->right < giMinExtentX
             || limits->top > giMaxExtentY || limits->bottom < giMinExtentY))
-        return ICON_DRAW_SKIPPED;
+        return IDX(ICON_DRAW_SKIPPED);
 
     if (yModify != 0) {
         if (flip == IDX(ICON_DRAW_NORMAL))
@@ -261,7 +261,7 @@ i32 icon::CombatClipDrawToBuffer(
             offset
         );
     }
-    return ICON_DRAW_COMPLETED;
+    return IDX(ICON_DRAW_COMPLETED);
 }
 
 VA(0x004c7e10, 0x3d)

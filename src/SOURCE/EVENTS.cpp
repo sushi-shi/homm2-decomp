@@ -4236,7 +4236,7 @@ i32 GiveArtifact(hero* eventHero, ArtifactType artifact, b32 checkEndGame, i8 ar
     }
 
     if (artifactSlot == EVENT_ARTIFACT_SLOT_COUNT) {
-        return ARTIFACT_NONE;
+        return IDX(ARTIFACT_NONE);
     }
 
     eventHero->m_artifacts[artifactSlot] = IDX(artifact);

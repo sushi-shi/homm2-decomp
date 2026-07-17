@@ -394,9 +394,9 @@ i32 TradingPostHandler(struct tag_message& message) {
     if (exitFlag) {
         message.payload.widget.id = WIDGET_COMMAND_DIALOG_SELECT;
         message.payload.widget.command = message.payload.widget.id;
-        return TRADING_POST_HANDLER_EXIT;
+        return IDX(TRADING_POST_HANDLER_EXIT);
     }
-    return TRADING_POST_HANDLER_CONTINUE;
+    return IDX(TRADING_POST_HANDLER_CONTINUE);
 }
 
 // ---- globals (definitions, RVA order) ----
