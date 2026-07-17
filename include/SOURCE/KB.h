@@ -715,7 +715,7 @@ i32 InitMenuHandler(struct tag_message&);
 i32 NullHandler(struct tag_message& msg);
 i32 RecruitHeroHandler(tag_message& msg);
 char* GetBuildingInfo(i32 race, i32 building, i32 mode);
-char* GetBuildingName(i32 race, i32 building);
+char* GetBuildingName(FactionType race, BuildingSlotType building);
 void GetBuildingCost(i32 race, i32 building, i32* const dest, i32 mageLevel);
 char* GetMonsterName(i32 m);
 void GetMonsterCost(i32 monster, i32* const cost);
