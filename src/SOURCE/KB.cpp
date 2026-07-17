@@ -1292,17 +1292,17 @@ char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 mode) {
 }
 
 VA(0x00499730, 0xa4)
-char* GetBuildingName(i32 race, i32 building) {
+char* GetBuildingName(FactionType race, BuildingSlotType building) {
     if (race == FACTION_NECROMANCER && building == BUILDING_SLOT_NECROMANCER_SHRINE)
         return xNecromancerShrine;
     if (building == BUILDING_SLOT_WELL_EXTRA)
-        return gWellExtraNames[race];
+        return gWellExtraNames[IDX(race)];
     else if (building == BUILDING_SLOT_SPECIAL)
-        return gSpecialBuildingNames[race];
+        return gSpecialBuildingNames[IDX(race)];
     else if (building < BUILDING_SLOT_DWELLING_FIRST)
-        return gNeutralBuildingNames[building];
+        return gNeutralBuildingNames[IDX(building)];
     else
-        return gDwellingNames[race][building - BUILDING_SLOT_DWELLING_FIRST];
+        return gDwellingNames[IDX(race)][building - BUILDING_SLOT_DWELLING_FIRST];
 }
 
 VA(0x004997d4, 0x138)

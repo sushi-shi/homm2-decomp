@@ -4741,7 +4741,7 @@ void advManager::HouseEvent(hero* eventHero, mapCell* cell) {
 VA(0x004b0d51, 0x62f)
 i32 advManager::CombatMonsterEvent(
     hero* eventHero,
-    i32 monsterType,
+    CreatureType monsterType,
     i32 monsterCount,
     mapCell*,
     i32 mapX,
@@ -4790,7 +4790,7 @@ i32 advManager::CombatMonsterEvent(
     placement4[COMBAT_MONSTER_ARMY_SLOTS] = 0;
     SRand(combatY + combatX);
     if (stackCount == COMBAT_MONSTER_ARMY_SLOTS
-        && (gMonsterDatabase[monsterType].attributes & MONSTER_ATTRIBUTE_RANGED) == 0) {
+        && (gMonsterDatabase[IDX(monsterType)].attributes & MONSTER_ATTRIBUTE_RANGED) == 0) {
         i32 roll = SRandom(0, COMBAT_MONSTER_RANDOM_MAX);
         if (roll < COMBAT_MONSTER_REDUCED_STACK_CHANCE)
             stackCount = 3;
