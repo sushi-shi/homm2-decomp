@@ -99,7 +99,7 @@ public:
     i32 AttackTo(i32);
     void CheckLuck(void);
     void DamageEnemy(class army*, i32*, i32*, i32, i32);
-    i32 Damage(i32l, i32);
+    i32 Damage(i32l, SpellType);
     void PowEffect(i32, i32, i32, i32);
     u32l Strength(void);
     i32 LeaveNoBody(void);

@@ -408,7 +408,7 @@ i32 combatManager::FindResurrectArmyIndex(i32 side, i32 spell, i32 hex) {
 // equivalent occupant side/index multiplication order; direct/pointer forms,
 // cached indices, and both case-body orders were already exhausted.
 VA(0x0042107b, 0x521)
-i32 combatManager::ValidSpellTarget(i32 spell, i32 hex) {
+i32 combatManager::ValidSpellTarget(SpellType spell, i32 hex) {
     army* target_j = 0;
     i32 unusedSpellWord5;
     i32 teleportBlocked;
@@ -443,7 +443,7 @@ i32 combatManager::ValidSpellTarget(i32 spell, i32 hex) {
         case IDX(SPELL_RESURRECT):
         case IDX(SPELL_TRUE_RESURRECT):
         case IDX(SPELL_ANIMATE_DEAD):
-            return FindResurrectArmyIndex(m_currentSide, spell, hex) != SPELL_NO_SELECTION;
+            return FindResurrectArmyIndex(m_currentSide, IDX(spell), hex) != SPELL_NO_SELECTION;
 
         case IDX(SPELL_CURE):
         case IDX(SPELL_MASS_CURE):
@@ -855,7 +855,7 @@ void combatManager::CastSpell(
                 CombatMessage(gText, 1, 1, 0);
                 DoBlast(targetHex, spell);
                 target_i->SpellEffect(gsSpellInfo[IDX(SPELL_COLD_RAY)].combatEffect, 0, 0);
-                target_i->Damage(damage_m, -1);
+                target_i->Damage(damage_m, SPELL_NONE);
                 target_i->PowEffect(-1, 1, -1, -1);
                 break;
             case IDX(SPELL_CHAIN_LIGHTNING):
@@ -903,7 +903,7 @@ void combatManager::CastSpell(
                     missileIcon_p
                 );
                 gpResourceManager->Dispose(missileIcon_p);
-                target_i->Damage(damage_m, -1);
+                target_i->Damage(damage_m, SPELL_NONE);
                 target_i->PowEffect(-1, 1, -1, -1);
                 break;
             case IDX(SPELL_LIGHTNING_BOLT):
@@ -949,7 +949,7 @@ void combatManager::CastSpell(
                     1
                 );
                 target_i->SpellEffect(gsSpellInfo[IDX(SPELL_LIGHTNING_BOLT)].combatEffect, 0, 0);
-                target_i->Damage(damage_m, -1);
+                target_i->Damage(damage_m, SPELL_NONE);
                 target_i->PowEffect(-1, 1, -1, -1);
                 break;
             case IDX(SPELL_MASS_CURE):

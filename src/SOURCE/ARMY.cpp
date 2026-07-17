@@ -1975,7 +1975,7 @@ void army::DamageEnemy(
         damageDone2 = -1;
     }
     *damageResult = damageDone2;
-    *killedResult = target->Damage(damageDone2, -1);
+    *killedResult = target->Damage(damageDone2, SPELL_NONE);
 }
 
 // @semantic: Complete behavior, 0x10 frame, CFG, and ordered relocations. The
@@ -1983,7 +1983,7 @@ void army::DamageEnemy(
 // the m_armies address, while the candidate evaluates the equivalent two
 // subscripts in reverse order. Direct and commuted subscript forms were checked.
 VA(0x0045012e, 0x23c)
-i32 army::Damage(i32l damage, i32 spell) {
+i32 army::Damage(i32l damage, SpellType spell) {
     i32 killed_13;
     i32 originalFacing;
     i32 quantityFifth;
@@ -1993,14 +1993,14 @@ i32 army::Damage(i32l damage, i32 spell) {
         if (gbRemoteOn) {
             gpCombatManager->ModifyDamageForArtifacts(
                 &damage,
-                spell,
+                IDX(spell),
                 gpCombatManager->m_heroes[m_side],
                 gpCombatManager->m_heroes[gpCombatManager->m_currentSide]
             );
         } else {
             gpCombatManager->ModifyDamageForArtifacts(
                 &damage,
-                spell,
+                IDX(spell),
                 gpCombatManager->m_heroes[gpCombatManager->m_currentSide],
                 gpCombatManager->m_heroes[m_side]
             );
