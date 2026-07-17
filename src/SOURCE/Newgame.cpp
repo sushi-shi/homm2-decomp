@@ -202,7 +202,7 @@ void game::SetupNetPlayerNames(void)
     i32 player;
 
     if (giNumHumanPlayers > 1) {
-        for (player = 0; 0[&giNumHumanPlayers] > player; ++player) {
+        for (player = 0; OD_STEER(giNumHumanPlayers) > player; ++player) {
             if (iMPBaseType != MULTIPLAYER_BASE_HOT_SEAT)
                 strcpy(cPlayerNames[player], gsNetPlayerInfo[player].name);
         }
@@ -593,7 +593,7 @@ void game::InitNewGameWindow(void)
         iconControlLocal = new iconWidget(
             static_cast<i16>(playerSpacingTemp * playerCounter +
                                firstPlayerXLocal + 11),
-            static_cast<i16>(0[&multiplayerYOffsetValue] +
+            static_cast<i16>(OD_STEER(multiplayerYOffsetValue) +
                                singlePlayerYOffsetValue + 277),
             64, 47, "ngextra.icn", 61, 0,
             static_cast<i16>(playerCounter + NEW_GAME_RACE_ICON_FIRST), 16,
@@ -618,7 +618,7 @@ void game::InitNewGameWindow(void)
             static_cast<i16>(playerSpacingTemp * playerCounter +
                                firstPlayerXLocal + 15 -
                                raceTextWidth / 2),
-            static_cast<i16>(0[&multiplayerYOffsetValue] +
+            static_cast<i16>(OD_STEER(multiplayerYOffsetValue) +
                                singlePlayerYOffsetValue + 322),
             static_cast<i16>(raceTextWidth + 64), 12, label,
             "smalfont.fnt", 1,
@@ -631,7 +631,7 @@ void game::InitNewGameWindow(void)
         iconControlLocal = new iconWidget(
             static_cast<i16>(playerSpacingTemp * playerCounter +
                                firstPlayerXLocal + 16),
-            static_cast<i16>(0[&multiplayerYOffsetValue] +
+            static_cast<i16>(OD_STEER(multiplayerYOffsetValue) +
                                singlePlayerYOffsetValue + 274),
             62, 45, "ngextra.icn", 51, 0,
             static_cast<i16>(playerCounter + NEW_GAME_RACE_CYCLE_FIRST), 16,
@@ -1515,7 +1515,7 @@ void game::ShowScenInfo(void)
     for (playerCounter = 0; playerCounter < m_mapHeader.playerCount; ++playerCounter) {
         if (giNumHumanPlayers > 1) {
             iconControlLocal = new iconWidget(
-                static_cast<i16>(0[&playerSpacingTemp] * playerCounter +
+                static_cast<i16>(OD_STEER(playerSpacingTemp) * playerCounter +
                                    firstPlayerXLocal + 13),
                 static_cast<i16>(multiplayerYOffsetValue + 309), 64, 28,
                 "ngextra.icn", 59, 0,
@@ -1526,7 +1526,7 @@ void game::ShowScenInfo(void)
             scenarioWindowValue->AddWidget(iconControlLocal, -1);
 
             iconControlLocal = new iconWidget(
-                static_cast<i16>(0[&playerSpacingTemp] * playerCounter +
+                static_cast<i16>(OD_STEER(playerSpacingTemp) * playerCounter +
                                    firstPlayerXLocal + 16),
                 static_cast<i16>(multiplayerYOffsetValue + 306), 62, 26,
                 "ngextra.icn", 0, 0,
@@ -1537,7 +1537,7 @@ void game::ShowScenInfo(void)
         }
 
         iconControlLocal = new iconWidget(
-            static_cast<i16>(0[&playerSpacingTemp] * playerCounter + firstPlayerXLocal +
+            static_cast<i16>(OD_STEER(playerSpacingTemp) * playerCounter + firstPlayerXLocal +
                                11),
             163, 68,
             static_cast<i16>(
@@ -1557,7 +1557,7 @@ void game::ShowScenInfo(void)
         scenarioWindowValue->AddWidget(iconControlLocal, -1);
 
         iconControlLocal = new iconWidget(
-            static_cast<i16>(0[&playerSpacingTemp] * playerCounter + firstPlayerXLocal +
+            static_cast<i16>(OD_STEER(playerSpacingTemp) * playerCounter + firstPlayerXLocal +
                                16),
             160, 62, 58, "ngextra.icn",
             static_cast<i16>(
@@ -1576,7 +1576,7 @@ void game::ShowScenInfo(void)
                 scenarioInfoSourceLineBase + 0x72));
             sprintf(label, " ");
             textControlLocal = new textWidget(
-                static_cast<i16>(0[&playerSpacingTemp] * playerCounter +
+                static_cast<i16>(OD_STEER(playerSpacingTemp) * playerCounter +
                                    firstPlayerXLocal + 19),
                 206, 56, 9, label, "smalfont.fnt", 1,
                 static_cast<i16>(playerCounter + NEW_GAME_PLAYER_NAME_FIRST),
@@ -1588,9 +1588,9 @@ void game::ShowScenInfo(void)
 
         singlePlayerYOffsetValue = 0;
         iconControlLocal = new iconWidget(
-            static_cast<i16>(0[&playerSpacingTemp] * playerCounter + firstPlayerXLocal +
+            static_cast<i16>(OD_STEER(playerSpacingTemp) * playerCounter + firstPlayerXLocal +
                                11),
-            static_cast<i16>(0[&multiplayerYOffsetValue] +
+            static_cast<i16>(OD_STEER(multiplayerYOffsetValue) +
                                singlePlayerYOffsetValue + 243),
             64, 47,
             "ngextra.icn", 61, 0,
@@ -1612,9 +1612,9 @@ void game::ShowScenInfo(void)
             raceTextWidth = 26;
         }
         textControlLocal = new textWidget(
-            static_cast<i16>(0[&playerSpacingTemp] * playerCounter + firstPlayerXLocal +
+            static_cast<i16>(OD_STEER(playerSpacingTemp) * playerCounter + firstPlayerXLocal +
                                15 - raceTextWidth / 2),
-            static_cast<i16>(0[&multiplayerYOffsetValue] +
+            static_cast<i16>(OD_STEER(multiplayerYOffsetValue) +
                                singlePlayerYOffsetValue + 288),
             static_cast<i16>(raceTextWidth + 64), 12, label,
             "smalfont.fnt", 1,
@@ -1625,9 +1625,9 @@ void game::ShowScenInfo(void)
         scenarioWindowValue->AddWidget(textControlLocal, -1);
 
         iconControlLocal = new iconWidget(
-            static_cast<i16>(0[&playerSpacingTemp] * playerCounter + firstPlayerXLocal +
+            static_cast<i16>(OD_STEER(playerSpacingTemp) * playerCounter + firstPlayerXLocal +
                                16),
-            static_cast<i16>(0[&multiplayerYOffsetValue] +
+            static_cast<i16>(OD_STEER(multiplayerYOffsetValue) +
                                singlePlayerYOffsetValue + 240),
             62, 45,
             "ngextra.icn", 51, 0,
@@ -1861,8 +1861,8 @@ i32 game::GetSideDesc(char *text, i32 firstPlayer, i32 lastPlayer)
             localPlayerIndex = player5;
     }
 
-    if (0[&localPlayerIndex] >= firstPlayer &&
-        0[&localPlayerIndex] <= lastPlayer)
+    if (OD_STEER(localPlayerIndex) >= firstPlayer &&
+        OD_STEER(localPlayerIndex) <= lastPlayer)
         localPlayerOnSide = 1;
     else
         localPlayerOnSide = 0;
@@ -1878,8 +1878,8 @@ i32 game::GetSideDesc(char *text, i32 firstPlayer, i32 lastPlayer)
                 sprintf(text, "You and your ally ");
 
             listedPlayerCount5 = 0;
-            for (player5 = firstPlayer; 0[&player5] <= lastPlayer; ++player5) {
-                if (player5 != 0[&localPlayerIndex]) {
+            for (player5 = firstPlayer; OD_STEER(player5) <= lastPlayer; ++player5) {
+                if (player5 != OD_STEER(localPlayerIndex)) {
                     ++listedPlayerCount5;
                     sprintf(colorName3, gColors[m_setupPlayerColor[player5]]);
                     colorName3[0] -= 'a' - 'A';
@@ -1900,7 +1900,7 @@ i32 game::GetSideDesc(char *text, i32 firstPlayer, i32 lastPlayer)
             strcpy(text, "the enemy - ");
 
         listedPlayerCount5 = 0;
-        for (player5 = firstPlayer; 0[&player5] <= lastPlayer; ++player5) {
+        for (player5 = firstPlayer; OD_STEER(player5) <= lastPlayer; ++player5) {
             ++listedPlayerCount5;
             sprintf(colorName3, gColors[m_setupPlayerColor[player5]]);
             colorName3[0] -= 'a' - 'A';

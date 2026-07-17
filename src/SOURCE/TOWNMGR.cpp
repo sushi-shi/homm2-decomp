@@ -735,7 +735,7 @@ void townManager::ChangeTown(void)
 // every non-jump opcode and operand agree. The 0x950-byte base stream is exactly
 // ten bytes short of retail's 0x95a bytes: two five-byte jump-to-next inline
 // continuations at retail +0x58e and +0x692 account for the complete delta.
-// Color() regressed; color and occupying-hero 0[&value] spellings were stagnant.
+// Color() regressed; color and occupying-hero OD_STEER(value) spellings were stagnant.
 // Revisit only after either accessor, source/TU/header, or comparison epoch changes.
 VA(0x0041436f, 0x95a)
 void townManager::SetupTown(void)
@@ -3347,7 +3347,7 @@ void SortStats(i32l * const stats, i8 * const order)
          ++firstPlayer) {
         for (secondPlayer = firstPlayer + 1;
              secondPlayer < gpGame->m_playerCount; ++secondPlayer) {
-            if (stats[0[&secondPlayer]] > stats[firstPlayer]) {
+            if (stats[OD_STEER(secondPlayer)] > stats[firstPlayer]) {
                 tempStat = stats[firstPlayer];
                 stats[firstPlayer] = stats[secondPlayer];
                 stats[secondPlayer] = tempStat;

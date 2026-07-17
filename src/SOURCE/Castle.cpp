@@ -281,7 +281,7 @@ void townManager::SetupCastle(heroWindow *window, i32 updateOnly)
                     static_cast<i16>((column8 - 4) * 32 + CASTLE_BACKGROUND_LEFT),
                     static_cast<i16>((row9 - 2) * 32), 32, 32,
                     "objntwba.icn",
-                    static_cast<i16>(0[&terrainIconFrame27] + backgroundFrame6),
+                    static_cast<i16>(OD_STEER(terrainIconFrame27) + backgroundFrame6),
                     0, -1, 16, 1);
                 if (backgroundWidget19 == 0)
                     MemError();
@@ -299,7 +299,7 @@ void townManager::SetupCastle(heroWindow *window, i32 updateOnly)
                     static_cast<i16>((column8 - 4) * 32 + CASTLE_BACKGROUND_LEFT),
                     static_cast<i16>((row9 - 2) * 32), 32, 32,
                     "objntown.icn",
-                    static_cast<i16>(0[&raceIconFrame] + backgroundFrame6),
+                    static_cast<i16>(OD_STEER(raceIconFrame) + backgroundFrame6),
                     0, -1, 16, 1);
                 if (backgroundWidget19 == 0)
                     MemError();

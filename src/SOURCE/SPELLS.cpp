@@ -1055,7 +1055,7 @@ void combatManager::DefaultSpell(i32 targetHex)
 // relocations align. The only executable residual at +0x366..+0x371 is the
 // equivalent affectedCount[-0xc]/frame[-0x18] loop comparison: retail loads the
 // bound and uses `jge`, while ours loads the index and uses `jle`. Reversed
-// relational and 0[&affectedCount] forms were byte-neutral; revisit on TU change.
+// relational and OD_STEER(affectedCount) forms were byte-neutral; revisit on TU change.
 VA(0x00423762, 0x623)
 void combatManager::Fireball(i32 targetHex, i32 spell)
 {
@@ -2194,7 +2194,7 @@ i32 combatManager::GetNextChainLightningTarget(army *source, i32 requireWorks)
                     deltaY_n = abs(candidate_p->MidY() - sourceY);
                     distance = static_cast<i32>(sqrt(static_cast<double>(
                         deltaX_e * deltaX_e + deltaY_n * deltaY_n)));
-                    if (0[&distance] < closestDistance) {
+                    if (OD_STEER(distance) < closestDistance) {
                         closestDistance = distance;
                         closestHex_f = candidate_p->m_hex;
                     }
@@ -3003,8 +3003,8 @@ void combatManager::DoLuck(i32 side, i32 armyIndex)
 // @early-stop
 // @early-stop-reloc-only
 // All 0x33a bytes match after masking 50 relocation sites; the 0x7c frame/slots,
-// CFG, and effective targets align. 0[&deltaX_a] fixes the commutative squared-
-// distance load order, and 0[&currentX_i]/0[&currentY_d] fix both float updates.
+// CFG, and effective targets align. OD_STEER(deltaX_a) fixes the commutative squared-
+// distance load order, and OD_STEER(currentX_i)/OD_STEER(currentY_d) fix both float updates.
 // The retained report residual is only compiler-local strings/constants and the
 // retail iLeftRightSave+0x10 identity for __adjust_fdiv. Revisit after relocation
 // identity normalization or a material SPELLS source/header change.
@@ -3047,7 +3047,7 @@ void combatManager::DoBlast(i32 targetHex, i32 spell)
     deltaX_a = targetX_a - startX_d;
     deltaY_a = targetY_a - startY_d;
     distance_d = static_cast<i32>(
-        sqrt(static_cast<double>(0[&deltaX_a] * deltaX_a +
+        sqrt(static_cast<double>(OD_STEER(deltaX_a) * deltaX_a +
                                  deltaY_a * deltaY_a)));
     segmentCount_f = distance_d / frameSpacing_c;
     currentX_i = static_cast<float>(startX_d);
@@ -3059,8 +3059,8 @@ void combatManager::DoBlast(i32 targetHex, i32 spell)
         ResetLimitCreature();
         gbComputeExtent = 1;
         gbSaveBiggestExtent = 1;
-        currentX_i = 0[&currentX_i] + stepX_a;
-        currentY_d = 0[&currentY_d] + stepY_e;
+        currentX_i = OD_STEER(currentX_i) + stepX_a;
+        currentY_d = OD_STEER(currentY_d) + stepY_e;
         frame_j = (segment_h * BLAST_FRAME_COUNT - 1) / segmentCount_f;
         blastIcon_h->CombatClipDrawToBuffer(
             static_cast<i32>(currentX_i), static_cast<i32>(currentY_d), frame_j,

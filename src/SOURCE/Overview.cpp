@@ -917,9 +917,9 @@ void game::SetupNewOverviewType(i32 overviewType, i32 redrawFrom)
         ));
         strcpy(titleCopy, cOverviewText[giOverviewType * OVERVIEW_TITLE_COUNT + title]);
         textWidgetTitle[title] = new textWidget(
-            titleLefts[giOverviewType][0[&title]],
+            titleLefts[giOverviewType][OD_STEER(title)],
             3,
-            titleWidth[giOverviewType][0[&title]],
+            titleWidth[giOverviewType][OD_STEER(title)],
             12,
             titleCopy,
             const_cast<char *>("smalfont.fnt"),
@@ -1037,7 +1037,7 @@ void game::Overview(void)
         overWin->BroadcastMessage(message8);
     }
     for (mine4 = OVERVIEW_VISIBLE_ROWS; mine4 > 0; mine4--) {
-        if (0[&sawmills4] < mine4) {
+        if (OD_STEER(sawmills4) < mine4) {
             message8.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
             message8.payload.widget.id = mine4 + 49;
             message8.payload.widget.data.value = 4;
@@ -1109,7 +1109,7 @@ void game::DoKnob(void)
                 OVScrollKnob->m_y =
                     static_cast<i16>(message9.payload.mouse.y - OVERVIEW_SCROLL_KNOB_OFFSET);
                 newTop8 = static_cast<i32>((OVScrollKnob->m_y - scrollTop11) / pixelsPerItem13);
-                if (0[&previousTop6] != newTop8) {
+                if (OD_STEER(previousTop6) != newTop8) {
                     if (newTop8 > giOverviewItems[giOverviewType] - OVERVIEW_VISIBLE_ROWS) {
                         newTop8 = giOverviewItems[giOverviewType] - OVERVIEW_VISIBLE_ROWS;
                     }

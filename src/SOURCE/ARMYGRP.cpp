@@ -137,7 +137,7 @@ i32 armyGroup::IsMember(i32 creatureType)
 // Complete 0x14e body, 0x1c frame/all five slots, 86-instruction CFG, and both
 // ordered relocations align. The only executable residual at +0x60/+0x63 swaps
 // the independent `this`[-0x1c] and index[-0xc] loads before the same indexed
-// monster-race access. Direct indexing, i[array], and 0[&i] were byte-neutral.
+// monster-race access. Direct indexing, i[array], and OD_STEER(i) were byte-neutral.
 // Revisit only after relevant ARMYGRP/TU state changes.
 VA(0x0048c44b, 0x14e)
 i32 armyGroup::IsHomogeneous(i32 countRaces)

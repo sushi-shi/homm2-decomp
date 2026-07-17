@@ -2638,7 +2638,7 @@ void advManager::DrawCell(i32 mapX, i32 mapY, i32 screenX, i32 screenY,
 // MAP_HEIGHT relocation targets agree. The only residual is the width guard:
 // retail loads x, compares MAP_WIDTH, and uses jle; base loads MAP_WIDTH,
 // compares x, and uses jge. The equivalent x>=MAP_WIDTH, MAP_WIDTH<=x, and
-// MAP_WIDTH<=0[&x] spellings compiled identically. Revisit after a material
+// MAP_WIDTH<=OD_STEER(x) spellings compiled identically. Revisit after a material
 // ADVMGR predecessor/header or comparison-tool change.
 VA(0x0045e047, 0x93)
 class mapCell * advManager::GetCell(i32 x, i32 y)
@@ -5866,7 +5866,7 @@ i32 advManager::GetSoundId(i32 x, i32 y)
 // agree. At the Y bound retail loads mapY then compares MAP_HEIGHT/EAX with JG;
 // candidate loads MAP_HEIGHT then compares mapY/EAX with JL. This makes candidate's
 // meaningful body 0x239 bytes versus retail's 0x23a and places the next candidate
-// symbol at +0x239. Direct bounds and MAP_WIDTH <= 0[&x] were already tried.
+// symbol at +0x239. Direct bounds and MAP_WIDTH <= OD_STEER(x) were already tried.
 VA(0x00466ef0, 0x23a)
 void advManager::InsertSound(i32 x, i32 mapY, i32 distance, i32 soundLayer)
 {
@@ -5875,7 +5875,7 @@ void advManager::InsertSound(i32 x, i32 mapY, i32 distance, i32 soundLayer)
     i32 activeIndex;
     i32 soundId;
 
-    if (x < 0 || mapY < 0 || MAP_WIDTH <= 0[&x] || mapY >= MAP_HEIGHT)
+    if (x < 0 || mapY < 0 || MAP_WIDTH <= OD_STEER(x) || mapY >= MAP_HEIGHT)
         return;
 
     soundId = GetSoundId(x, mapY);
@@ -7301,9 +7301,9 @@ i32 MapExtraPosAndAdjacentsSet(i32 x, i32 y, u8 mask)
             continue;
         for (i32 checkY = y - 1; checkY <= y + 1; ++checkY) {
             if (checkY >= 0) {
-                if (MAP_HEIGHT <= 0[&checkY]) {
+                if (MAP_HEIGHT <= OD_STEER(checkY)) {
                 } else {
-                    if (mapExtra[0[&checkY] * MAP_WIDTH + checkX] & mask)
+                    if (mapExtra[OD_STEER(checkY) * MAP_WIDTH + checkX] & mask)
                         return 1;
                 }
             }

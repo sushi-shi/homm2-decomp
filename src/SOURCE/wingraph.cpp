@@ -171,7 +171,7 @@ i32 DDAppPaint(void *window, void *paintDC)
             sourceHeight3 = WINGRAPH_SCROLL_SIZE;
         }
         gDDSourceRect.left = sourceLeft3;
-        gDDSourceRect.right = 0[&sourceWidth5] + sourceLeft3 - 1;
+        gDDSourceRect.right = OD_STEER(sourceWidth5) + sourceLeft3 - 1;
         gDDSourceRect.top = sourceTop4;
         gDDSourceRect.bottom = sourceTop4 + sourceHeight3 - 1;
 
@@ -798,8 +798,8 @@ i32 WGAppPaint(void *window, void *paintDC)
             destY1 = paint5.rcPaint.top;
             destHeight3 = paint5.rcPaint.bottom - destY1 + 1;
             WinGBitBlt(static_cast<HDC>(paintDC), destX7, destY1,
-                destWidth0, destHeight3, hdcImage, 0[&giScrollX] + destX7,
-                0[&giScrollY] + destY1);
+                destWidth0, destHeight3, hdcImage, OD_STEER(giScrollX) + destX7,
+                OD_STEER(giScrollY) + destY1);
         } else {
             WinGStretchBlt(static_cast<HDC>(paintDC), destX7, destY1,
                 destWidth0, destHeight3, hdcImage, sourceX7, sourceY7,
@@ -992,7 +992,7 @@ i32 SetGraphicsType(i32 graphicsType)
     i32 height7;
     void *screenBuffer;
 
-    if (0[&giGraphicsType] == graphicsType)
+    if (OD_STEER(giGraphicsType) == graphicsType)
         return 1;
     if (graphicsType == WINGRAPH_GRAPHICS_WING && gbWinGAttached == 0)
         return 0;

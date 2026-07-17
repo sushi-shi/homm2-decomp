@@ -2144,7 +2144,7 @@ void philAI::ValueOfBuyingBuilding(town *townPtr, i32 building, i32 &resourceVal
 // @early-stop-reloc-only: Current PHILAI.cpp/header epoch: all 0x19b bytes match after
 // masking 17 ordered relocation sites. The sole raw difference is byte +0xd8,
 // inside the proven __adjust_fdiv versus iLeftRightSave+0x10 delinker spelling;
-// the remaining constant/string rows are identity-only. 0[&kn] pins the retail
+// the remaining constant/string rows are identity-only. OD_STEER(kn) pins the retail
 // fst/fcomp store-before-compare schedule in this epoch. Revisit only after the
 // PHILAI source/TU/header or comparison epoch.
 VA(0x0043d6b7, 0x19b)
@@ -2167,7 +2167,7 @@ void philAI::GetBestBuilding(town *t, BHC &bhc, float &fOut) {
                 if (gpCurPlayer->m_aiDifficulty == 1)
                     cost = static_cast<i32>(cost * 1.3);
                 score = (Random(1, 5) + 0x5f) * idx / 100.0f;
-                if (score > 0[&kn]) {
+                if (score > OD_STEER(kn)) {
                     jb = node;
                     nb = idx;
                     kn = score;
@@ -3366,7 +3366,7 @@ void philAI::EvaluateOneTimeCreaturePurchase(i32 creature, i32 availableCount,
 // @early-stop-reloc-only: Current PHILAI.cpp/header epoch: all 0x768 code bytes
 // match after masking 85 ordered relocation sites. The fuzzy residual consists
 // only of compiler float-constant and division-guard symbol identities; frame,
-// slots, opcodes, operands, and CFG are exact. The 0[&winChance37] escapes pin
+// slots, opcodes, operands, and CFG are exact. The OD_STEER(winChance37) escapes pin
 // the retail fst/fcomp schedule and the winChance37-first comparison load in
 // this epoch. Revisit only after the PHILAI source/TU/header or comparison
 // epoch changes.
@@ -3427,7 +3427,7 @@ i32 philAI::QuickCombat(armyGroup *attacker, hero *attackerHero,
     float randomRoll8 = static_cast<float>(
         Random(0, AI_QUICK_COMBAT_RANDOM_LIMIT) /
         static_cast<double>(AI_QUICK_COMBAT_RANDOM_LIMIT));
-    if (randomRoll8 < 0[&winChance37]) {
+    if (randomRoll8 < OD_STEER(winChance37)) {
         attackerWon2 = 1;
         winnerChance0 = winChance37;
         selectedGroup36 = attacker;
@@ -3436,7 +3436,7 @@ i32 philAI::QuickCombat(armyGroup *attacker, hero *attackerHero,
         selectedGroup36 = defender;
     }
 
-    if (0[&winChance37] < randomRoll8)
+    if (OD_STEER(winChance37) < randomRoll8)
         rollDifference8 = randomRoll8 - winChance37;
     else
         rollDifference8 = winChance37 - randomRoll8;
@@ -5493,19 +5493,19 @@ void InitAIMapVars(void) {
     CloseAIMapVars();
     SVSearchArray.Init();
     gaiLiveChanceOfPos = static_cast<i16 *>(
-        BaseAlloc(0[&MAP_WIDTH] * MAP_HEIGHT * 2, PHFILE,
+        BaseAlloc(OD_STEER(MAP_WIDTH) * MAP_HEIGHT * 2, PHFILE,
                   s_initAIMapLineBase + 8));
     gaiHeroStrategicRVOfPos = static_cast<i16 *>(
-        BaseAlloc(0[&MAP_WIDTH] * MAP_HEIGHT * 2, PHFILE,
+        BaseAlloc(OD_STEER(MAP_WIDTH) * MAP_HEIGHT * 2, PHFILE,
                   s_initAIMapLineBase + 9));
     gaiHeroEventStratRVOfPos = static_cast<i16 *>(
-        BaseAlloc(0[&MAP_WIDTH] * MAP_HEIGHT * 2, PHFILE,
+        BaseAlloc(OD_STEER(MAP_WIDTH) * MAP_HEIGHT * 2, PHFILE,
                   s_initAIMapLineBase + 10));
     gaiTurnValueOfMine = static_cast<i8 *>(
-        BaseAlloc(0[&MAP_WIDTH] * MAP_HEIGHT, PHFILE,
+        BaseAlloc(OD_STEER(MAP_WIDTH) * MAP_HEIGHT, PHFILE,
                   s_initAIMapLineBase + 11));
     gaiEnemyHeroReachable = static_cast<i8 *>(
-        BaseAlloc(0[&MAP_WIDTH] * MAP_HEIGHT, PHFILE,
+        BaseAlloc(OD_STEER(MAP_WIDTH) * MAP_HEIGHT, PHFILE,
                   s_initAIMapLineBase + 12));
 }
 

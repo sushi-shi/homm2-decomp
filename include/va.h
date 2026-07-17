@@ -56,4 +56,15 @@
 
 #endif
 
+// OD_STEER(x) - the scalar-lvalue SIB escape (docs/patterns/tu-cumulative-eval-order.md).
+// `0[&(x)]` is the identical lvalue `x` (array subscripting is symmetric), but its
+// subscript/dereference expression shape makes MSVC 4.2's /Od code generator commit to
+// the other emission order for a commutative operand pair: which comparison operand
+// loads first, or an FPU store-before-compare (fst;fcomp) versus compare-before-store
+// (fcom;fstp) schedule. Zero effect on the value, frame slots, relocations, or CFG.
+// Unlike the label macros above it expands to the SAME tokens under every compiler:
+// the spelling IS the mechanism, and clang must type-check exactly what MSVC compiles.
+// Use only where a byte proof demands it, and note it in the function's annotation.
+#define OD_STEER(x) 0[&(x)]
+
 #endif // HOMM2_VA_H

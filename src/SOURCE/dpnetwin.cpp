@@ -53,7 +53,7 @@ BOOL WINAPI dpEnumSession(DPSESSIONDESC *session, void *,
 // loop residual loads giNumHumanPlayers before guestIndex and emits JGE, while
 // retail reverses the loads and emits JLE. Ten bounded attempts exhausted seven
 // identifier_rename spellings, relational reversal, their rejected overlapping
-// combination, and 0[&guestIndex]. Earlier residuals are delinked LoadLibraryA/
+// combination, and OD_STEER(guestIndex). Earlier residuals are delinked LoadLibraryA/
 // GetProcAddress import-call shapes. Revisit only after relevant import-thunk,
 // declaration, source/TU/header, or comparison-epoch changes.
 VA(0x0041eeaf, 0x311)
@@ -269,7 +269,7 @@ void dpProcessMessages(void) {
         if (senderId == 0) {
         } else {
             if (destinationIds[0] == 0 ||
-                destinationIds[0] == 0[&dcoID])
+                destinationIds[0] == OD_STEER(dcoID))
                 dpEvaluateMessage(packetSize[0], senderId);
         }
     }
@@ -392,7 +392,7 @@ i32 dpWaitForExtraGuests(void) {
     tag_message message;
 
     dpProcessMessages();
-    if (iLastMsgNumHumanPlayers != 0[&giNumHumanPlayers]) {
+    if (iLastMsgNumHumanPlayers != OD_STEER(giNumHumanPlayers)) {
         iLastMsgNumHumanPlayers = giNumHumanPlayers;
         sprintf(gText, "You have %d guest(s) now logged in.  Click 'OK' to move on, or wait for additional guests.",
                 giNumHumanPlayers - 1);
