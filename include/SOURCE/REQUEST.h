@@ -5,6 +5,7 @@
 // forward declarations (was <_all.h>):
 
 #include <va.h>
+#include <SOURCE/GAME.h>
 
 H2_ENUM_BEGIN(RequestConstant)
     MAP_HEADER_SIZE = 0x1a4,
@@ -15,7 +16,7 @@ H2_ENUM_BEGIN(RequestConstant)
     MAP_HEADER_NAME_SIZE = 0x3c,
     MAP_HEADER_DESCRIPTION_OFFSET = 0x76,
     MAP_HEADER_DESCRIPTION_SIZE = 300,
-    MAP_HEADER_PLAYER_COUNT = 6,
+    MAP_HEADER_PLAYER_COUNT = IDX(GAME_PLAYER_COUNT),
     MAP_HEADER_MAGIC_BASE_GAME = 90,
     MAP_HEADER_MAGIC_EXPANSION_GAME = 92
 H2_ENUM_END(RequestConstant)
