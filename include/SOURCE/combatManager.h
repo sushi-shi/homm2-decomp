@@ -118,6 +118,7 @@ H2_ENUM_BEGIN(CombatCastleWallSlot)
     COMBAT_WALL_SLOT_SECTION_THIRD = 6,
     COMBAT_WALL_SLOT_SECTION_FOURTH = 7,
     COMBAT_WALL_SLOT_KEEP = 8,
+    COMBAT_WALL_SLOT_COUNT = 9,
     COMBAT_WALL_SECTION_COUNT = 4
 H2_ENUM_END(CombatCastleWallSlot)
 
@@ -690,7 +691,7 @@ public:
     i16 m_eagleEyeSpell[2];                             // +0x3256
     CombatDrawbridgeState m_drawbridgeState;                              // +0x325a
     i32 m_drawbridgeBackgroundVisible;                  // +0x325e
-    u8 m_wallStates[9];                                 // +0x3262
+    u8 m_wallStates[IDX(COMBAT_WALL_SLOT_COUNT)];                                 // +0x3262
     class bitmap* m_combatBuffer;                       // +0x326b
     class bitmap* m_backgroundBuffer;                   // +0x326f
     class bitmap* m_mouseGridBuffer;                    // +0x3273
@@ -715,7 +716,7 @@ public:
     i32 m_heroOverlayFrame[2];                          // +0x33d5
     struct SLimitData m_heroLimits[2];                  // +0x33dd
     struct SLimitData m_heroOverlayLimits[2];           // +0x33fd
-    struct SLimitData m_moatLimits[9];                  // +0x341d
+    struct SLimitData m_moatLimits[IDX(COMBAT_WALL_SLOT_COUNT)];                  // +0x341d
     i32l m_previousCombatMessageExpiration;             // +0x34ad
     i32l m_combatMessageExpiration;                     // +0x34b1
     i32 m_combatMessagePending;                         // +0x34b5

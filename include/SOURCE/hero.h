@@ -171,7 +171,7 @@ public:
     i32 m_remainingMobility;                     // +0x35
     i32 m_experience;                            // +0x39
     i16 m_level;                                 // +0x3d
-    i8 m_primaryStats[HERO_STARTING_STAT_COUNT]; // +0x3f
+    i8 m_primaryStats[IDX(HERO_STARTING_STAT_COUNT)]; // +0x3f
     i8 m_morale;                                 // +0x44
     i8 m_luck;                                   // +0x45
     char _pad_0x46[0x1];
