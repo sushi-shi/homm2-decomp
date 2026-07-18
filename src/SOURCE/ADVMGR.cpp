@@ -4409,7 +4409,7 @@ void advManager::UpdateHeroLocators(i32 drawWindow, i32 updateScreen) {
         scrollStep = static_cast<double>(ADVMGR_LOCATOR_HERO_SCROLL_SPAN)
                      / (gpCurPlayer->m_heroCount - ADVMGR_LOCATOR_PAGE_DENOMINATOR_OFFSET);
         m_scrollLeftButton->m_y = static_cast<i16>(
-            gpCurPlayer->m_heroLocatorPage * scrollStep + ADVMGR_LOCATOR_SCROLL_BASE_Y
+            gpCurPlayer->m_heroLocatorPage * scrollStep + IDX(ADVMGR_LOCATOR_SCROLL_BASE_Y)
         );
     }
     if (drawWindow) {
@@ -4488,7 +4488,7 @@ void advManager::UpdateTownLocators(i32 drawWindow, i32 updateScreen) {
         scrollStep = static_cast<double>(ADVMGR_LOCATOR_TOWN_SCROLL_SPAN)
                      / (gpCurPlayer->m_townCount - ADVMGR_LOCATOR_PAGE_DENOMINATOR_OFFSET);
         m_scrollRightButton->m_y = static_cast<i16>(
-            gpCurPlayer->m_townLocatorPage * scrollStep + ADVMGR_LOCATOR_SCROLL_BASE_Y
+            gpCurPlayer->m_townLocatorPage * scrollStep + IDX(ADVMGR_LOCATOR_SCROLL_BASE_Y)
         );
     }
     if (drawWindow) {
