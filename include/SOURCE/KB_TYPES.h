@@ -13,6 +13,7 @@ class sample;
 // canonical order.
 H2_ENUM_CLASS_BEGIN(ResourceType)
     RES_NONE = -1,
+    RECRUIT_NO_RESOURCE = RES_NONE,
     RES_WOOD = 0,
     RES_MERCURY = 1,
     RES_ORE = 2,

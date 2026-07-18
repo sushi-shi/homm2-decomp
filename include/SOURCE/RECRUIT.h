@@ -11,7 +11,6 @@ class town;
 H2_ENUM_BEGIN(RecruitConstant)
     RECRUIT_RESOURCE_COUNT = 6,
     RECRUIT_GOLD_RESOURCE = 6,
-    RECRUIT_NO_RESOURCE = -1,
     RECRUIT_SOURCE_EVENT = -1,
     RECRUIT_SOURCE_TOWN = 0x23,
     RECRUIT_WINDOW_X = 0x8f,
@@ -46,7 +45,7 @@ H2_ENUM_BEGIN(RecruitControl)
     RECRUIT_CONFIRM_CONTROL = 0x7802
 H2_ENUM_END(RecruitControl)
 
-void SetupRecruitWin(class heroWindow*, i32, i32, i32, i32, i32);
+void SetupRecruitWin(class heroWindow*, i32, i32, ResourceType, i32, i32);
 void QuickViewRecruit(class town*, i32);
 
 #endif // HOMM2_RECRUIT_H
