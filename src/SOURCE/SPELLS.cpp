@@ -1717,7 +1717,7 @@ void combatManager::BloodLustEffect(army* target, i32 effect) {
         giMaxExtentY - giMinExtentY + 1
     );
     DrawFrame(0, 1, 0, 1, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
-    target->m_monster.flags.abilityFlags |= IDX(effect);
+    target->m_monster.flags.abilityFlags |= MonsterAbilityFlags(IDX(effect));
     gpCombatManager->DrawFrame(0, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
     gpWindowManager->FizzleForward(
         giMinExtentX,
@@ -3002,7 +3002,7 @@ mirror_found:
     );
     army* image =
         &m_armies[m_hexCells[mirrorHex].m_occupantSide][m_hexCells[mirrorHex].m_occupantIndex];
-    image->m_monster.flags.abilityFlags |= IDX(MIRROR_MONSTER_ABILITY);
+    image->m_monster.flags.abilityFlags |= MonsterAbilityFlags(IDX(MIRROR_MONSTER_ABILITY));
     i32 duration = m_spellPower[m_currentSide];
     if (m_heroes[m_currentSide]->HasArtifact(ARTIFACT_ENCHANTED_HOURGLASS))
         duration += SPELL_HOURGLASS_POWER_BONUS;
@@ -3078,7 +3078,7 @@ void combatManager::SummonElemental(i32 monsterType, i32 spellPower) {
     );
     army* elementals =
         &m_armies[m_hexCells[summonHex].m_occupantSide][m_hexCells[summonHex].m_occupantIndex];
-    elementals->m_monster.flags.abilityFlags |= IDX(MIRROR_MONSTER_ABILITY);
+    elementals->m_monster.flags.abilityFlags |= MonsterAbilityFlags(IDX(MIRROR_MONSTER_ABILITY));
     spellPower = m_spellPower[m_currentSide];
     if (m_heroes[m_currentSide]->HasArtifact(ARTIFACT_ENCHANTED_HOURGLASS))
         spellPower += SPELL_HOURGLASS_POWER_BONUS;
@@ -3380,7 +3380,7 @@ void combatManager::Resurrect(i32 spell, i32 targetHex, i32 spellPower) {
         gpResourceManager->Dispose(resurrectIcon);
     }
     DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
-    target_i->m_monster.flags.abilityFlags &= ~IDX(RESURRECT_MONSTER_ABILITY);
+    target_i->m_monster.flags.abilityFlags &= ~MonsterAbilityFlags(IDX(RESURRECT_MONSTER_ABILITY);
 }
 
 VA(0x004296de, 0xb9)

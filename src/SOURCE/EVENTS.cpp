@@ -4662,7 +4662,7 @@ i32 advManager::GhostEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i3
 // all six external relocation targets agree.
 VA(0x004b0add, 0x274)
 void advManager::HouseEvent(hero* eventHero, mapCell* cell) {
-    HouseRecruitmentSite siteIndex = HOUSE_RECRUIT_ARCHER;
+    i32 siteIndex = IDX(HOUSE_RECRUIT_ARCHER);
     i32 creatureTypes[IDX(HOUSE_RECRUIT_SITE_COUNT)];
 
     switch (cell->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
