@@ -583,51 +583,51 @@ void hero::ApplyBattleWinTemps(void) {
 
     if (HAS(m_eventFlags, HERO_EVENT_GRAVEYARD)) {
         m_morale++;
-        m_eventFlags = m_eventFlags - IDX(HERO_EVENT_GRAVEYARD);
+        m_eventFlags = m_eventFlags - HERO_EVENT_GRAVEYARD;
     }
     if (HAS(m_eventFlags, HERO_EVENT_SHIPWRECK)) {
         m_morale++;
-        m_eventFlags = m_eventFlags - IDX(HERO_EVENT_SHIPWRECK);
+        m_eventFlags = m_eventFlags - HERO_EVENT_SHIPWRECK;
     }
     if (HAS(m_eventFlags, HERO_EVENT_BUOY)) {
         m_morale--;
-        m_eventFlags = m_eventFlags - IDX(HERO_EVENT_BUOY);
+        m_eventFlags = m_eventFlags - HERO_EVENT_BUOY;
     }
     if (HAS(m_eventFlags, HERO_EVENT_OASIS)) {
         m_morale--;
-        m_eventFlags = m_eventFlags - IDX(HERO_EVENT_OASIS);
+        m_eventFlags = m_eventFlags - HERO_EVENT_OASIS;
     }
     if (HAS(m_eventFlags, HERO_EVENT_TEMPLE)) {
         m_morale -= 2;
-        m_eventFlags = m_eventFlags - IDX(HERO_EVENT_TEMPLE);
+        m_eventFlags = m_eventFlags - HERO_EVENT_TEMPLE;
     }
     if (HAS(m_eventFlags, HERO_EVENT_FAERIE_RING)) {
         m_luck--;
-        m_eventFlags = m_eventFlags - IDX(HERO_EVENT_FAERIE_RING);
+        m_eventFlags = m_eventFlags - HERO_EVENT_FAERIE_RING;
     }
     if (HAS(m_eventFlags, HERO_EVENT_IDOL)) {
         m_luck--;
-        m_eventFlags = m_eventFlags - IDX(HERO_EVENT_IDOL);
+        m_eventFlags = m_eventFlags - HERO_EVENT_IDOL;
     }
     if (HAS(m_eventFlags, HERO_EVENT_FOUNTAIN)) {
         m_luck--;
-        m_eventFlags = m_eventFlags - IDX(HERO_EVENT_FOUNTAIN);
+        m_eventFlags = m_eventFlags - HERO_EVENT_FOUNTAIN;
     }
     if (HAS(m_eventFlags, HERO_EVENT_WATERING_HOLE)) {
         m_morale--;
-        m_eventFlags = m_eventFlags - IDX(HERO_EVENT_WATERING_HOLE);
+        m_eventFlags = m_eventFlags - HERO_EVENT_WATERING_HOLE;
     }
     if (HAS(m_eventFlags, HERO_EVENT_DERELICT_SHIP)) {
         m_morale++;
-        m_eventFlags = m_eventFlags - IDX(HERO_EVENT_DERELICT_SHIP);
+        m_eventFlags = m_eventFlags - HERO_EVENT_DERELICT_SHIP;
     }
     if (HAS(m_eventFlags, HERO_EVENT_PYRAMID)) {
         m_luck += 2;
-        m_eventFlags = m_eventFlags - IDX(HERO_EVENT_PYRAMID);
+        m_eventFlags = m_eventFlags - HERO_EVENT_PYRAMID;
     }
     if (HAS(m_eventFlags, HERO_EVENT_MERMAID)) {
         m_luck = m_luck - 1;
-        m_eventFlags = m_eventFlags - IDX(HERO_EVENT_MERMAID);
+        m_eventFlags = m_eventFlags - HERO_EVENT_MERMAID;
     }
 }
 
@@ -738,7 +738,8 @@ void hero::CheckLevel(void) {
                         attempts++;
                         if ((indexValue == 0 || skillChoicesResult[0] != skillIndexValue)
                             && ((m_secondarySkills[skillIndexValue] != IDX(HERO_SKILL_LEVEL_NONE)
-                                 && m_secondarySkills[skillIndexValue] < IDX(HERO_SKILL_LEVEL_EXPERT))
+                                 && m_secondarySkills[skillIndexValue]
+                                        < IDX(HERO_SKILL_LEVEL_EXPERT))
                                 || (m_secondarySkills[skillIndexValue] == IDX(HERO_SKILL_LEVEL_NONE)
                                     && m_secondarySkillCount < HERO_SECONDARY_SKILL_CAPACITY))) {
                             skillWeightIndex -= iGetSSByAlignment[skillIndexValue][m_cursorType];
@@ -2013,11 +2014,15 @@ void hero::CheckAnduranPieces(i32 showDialog) {
             if (m_artifacts[artifactSlot] == IDX(ARTIFACT_BREASTPLATE_ANDURAN)
                 || m_artifacts[artifactSlot] == IDX(ARTIFACT_HELMET_ANDURAN)
                 || m_artifacts[artifactSlot] == IDX(ARTIFACT_SWORD_ANDURAN)) {
-                GiveTakeArtifactStat(this, ArtifactType(m_artifacts[artifactSlot]), EVENT_ARTIFACT_TAKE);
+                GiveTakeArtifactStat(
+                    this,
+                    ArtifactType(m_artifacts[artifactSlot]),
+                    EVENT_ARTIFACT_TAKE
+                );
                 m_artifacts[artifactSlot] = IDX(ARTIFACT_NONE);
             }
         }
-        GiveArtifact(this, ARTIFACT_BATTLE_GARB, showDialog, ARTIFACT_NONE);
+        GiveArtifact(this, ARTIFACT_BATTLE_GARB, showDialog, IDX(ARTIFACT_NONE));
         if (gbThisNetHumanPlayer[m_owner]) {
             LoadPlaySample("treasure.82m");
             NormalDialog(
