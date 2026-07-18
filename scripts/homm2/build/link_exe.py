@@ -78,7 +78,7 @@ SYSTEM_LIBS_AFTER_VENDOR = (
 
 
 def build_link_command(link_exe, map_path, output, object_paths, import_libraries,
-                       resource_path):
+                       resource_path, definition_path=None):
     """Compose the proven LINK 3.00 input and forced-import order."""
     command = [
         "wine", str(link_exe), *RETAIL_LINK_FLAGS,
@@ -89,9 +89,77 @@ def build_link_command(link_exe, map_path, output, object_paths, import_librarie
         *map(str, import_libraries),
         *SYSTEM_LIBS_AFTER_VENDOR,
         *map(str, object_paths),
+        *(["/DEF:" + str(definition_path)] if definition_path else []),
         str(resource_path),
     ]
     return command
+
+
+def strip_coff_export_directives(source, destination):
+    """Copy a candidate COFF while removing source-only ``dllexport`` directives.
+
+    Several reconstructed inline bodies need ``dllexport`` to make VC4.2 retain
+    the same out-of-line COMDAT as retail.  Those compiler directives are not
+    retail final-link inputs, however: the executable exports only AppAbout and
+    AppWndProc.  Keep the object used for byte comparison untouched and sanitize
+    only the disposable final-link copy.
+    """
+    source = Path(source)
+    destination = Path(destination)
+    payload = bytearray(source.read_bytes())
+    if len(payload) < COFF_FILE_HEADER_SIZE:
+        raise ValueError("short COFF object: %s" % source)
+    section_count = struct.unpack_from("<H", payload, 2)[0]
+    optional_size = struct.unpack_from("<H", payload, 16)[0]
+    first_section = COFF_FILE_HEADER_SIZE + optional_size
+    changed = False
+    for index in range(section_count):
+        header = first_section + index * COFF_SECTION_HEADER_SIZE
+        name = bytes(payload[header:header + 8]).rstrip(b"\0")
+        if name != b".drectve":
+            continue
+        raw_size, raw_offset = struct.unpack_from("<II", payload, header + 16)
+        directives = bytes(payload[raw_offset:raw_offset + raw_size]).decode("latin-1")
+        tokens = directives.split()
+        retained = [
+            token for token in tokens
+            if not token.lower().startswith(("-export:", "/export:"))
+        ]
+        replacement = " ".join(retained).encode("latin-1")
+        if len(replacement) > raw_size:
+            raise ValueError("sanitized .drectve grew in %s" % source)
+        if len(retained) != len(tokens):
+            payload[raw_offset:raw_offset + raw_size] = replacement.ljust(raw_size, b" ")
+            changed = True
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    destination.write_bytes(payload)
+    return changed
+
+
+def final_link_objects(objects, output_root):
+    """Return disposable COFF copies with source-only exports removed."""
+    root = Path(output_root)
+    result = []
+    changed = 0
+    for index, source in enumerate(map(Path, objects)):
+        destination = root / ("%03d" % index) / source.name
+        changed += strip_coff_export_directives(source, destination)
+        result.append(destination.resolve())
+    return result, changed
+
+
+def write_module_definition(path):
+    """Write the retail executable description and public export surface."""
+    path = Path(path)
+    path.write_text(
+        "NAME HEROES2W.EXE\n"
+        "DESCRIPTION 'Heroes of Might and Magic 2'\n"
+        "EXPORTS\n"
+        "    AppAbout=?AppAbout@@YGHPAXIIJ@Z\n"
+        "    AppWndProc=?AppWndProc@@YGJPAXIIJ@Z\n",
+        encoding="ascii",
+    )
+    return path
 
 
 def die(message):
@@ -1538,13 +1606,17 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
             vc40_libcmt.read_bytes()).hexdigest() == PINNED_VC40_LIBCMT_SHA256:
         search_directories.insert(0, vc40_lib_dir)
     library_path = ";".join(winepaths_w(search_directories))
+    link_objects, stripped_export_objects = final_link_objects(
+        response_objects, output.parent / "objects-noexport")
+    definition_path = write_module_definition(output.parent / "HEROES2W.def")
     command = build_link_command(
         link_exe,
         winepath_w(map_path),
         winepath_w(output),
-        winepaths_w(response_objects),
+        winepaths_w(link_objects),
         winepaths_w(imports_libraries),
         winepath_w(resource_path),
+        winepath_w(definition_path),
     )
     run = subprocess.run(command, cwd=output.parent,
                          env=link_environment(library_path, link_exe.parent), text=True,
@@ -1603,6 +1675,8 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
         "order_source": "NB09 sstModule executable contribution order",
         "link_flags": list(RETAIL_LINK_FLAGS),
         "forced_vendor_imports": list(LINK300_FORCED_VENDOR_IMPORTS),
+        "stripped_source_export_objects": stripped_export_objects,
+        "module_definition": str(definition_path),
         "link_input_order": {
             "system_libraries_before_vendor": list(SYSTEM_LIBS_BEFORE_VENDOR),
             "vendor_import_libraries": [str(path) for path in imports_libraries],
