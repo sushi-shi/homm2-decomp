@@ -317,7 +317,7 @@ void advManager::DrawCursorShadow(void) {
     i32 boatShadowOffset;
     i32 drawFrame_f;
     i32 boatFrame_i;
-    CursorHeroShadowFrame shadowFrame;
+    i32 shadowFrame;
     i32 drawY;
 
     if (bShowIt == 0 || bSpecialHideCursor)
