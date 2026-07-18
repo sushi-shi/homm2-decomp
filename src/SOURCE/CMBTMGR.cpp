@@ -1601,7 +1601,7 @@ void combatManager::KeepAttack(i32 tower) {
             "damage",
             killed29,
             armyNameValue,
-            killed29 > 1 ? "perishes" : "perish"
+            killed29 <= 1 ? "perishes" : "perish"
         );
     } else {
         sprintf(
