@@ -98,7 +98,7 @@ public:
         i32&
     );
     i32 ChooseToFightForArtifact(i32, i32, i32);
-    i32 NetValueOfArtifact(i32, i32, i32, i32);
+    i32 NetValueOfArtifact(i32, AIArtifactEventValue, i32, i32);
     i32 ChooseToPayRansomOnHero(i32);
     void BuildBuilding(class town*, i32);
     void BuildHero(class town*, i32);
