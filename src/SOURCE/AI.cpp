@@ -306,12 +306,12 @@ void combatManager::DoCompAI(i32) {
     if (static_cast<i32>(enemyShooterStrength18) > static_cast<i32>(currentShooterStrength5))
         enemyStronger3 = 1;
 
-    if ((currentArmy9->m_monster.flags.abilityFlags & MONSTER_ABILITY_FLAG_SHOOTER) != 0) {
+    if (HAS(currentArmy9->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_SHOOTER) != 0) {
         if (currentArmy9->m_monster.shots > 0)
             attackType3 = COMBAT_AI_ATTACK_SHOOT;
         else
             attackType3 = COMBAT_AI_ATTACK_WALK;
-    } else if ((currentArmy9->m_monster.flags.abilityFlags & MONSTER_ABILITY_FLAG_FLYING) != 0) {
+    } else if (HAS(currentArmy9->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_FLYING) != 0) {
         attackType3 = COMBAT_AI_ATTACK_FLY;
     } else {
         attackType3 = COMBAT_AI_ATTACK_WALK;
@@ -504,9 +504,9 @@ float combatManager::GetModLichDamage(class army* target, float damage) {
 
     if (remainingHitPoints < modifiedDamage)
         modifiedDamage = remainingHitPoints;
-    if ((target->m_monster.flags.abilityFlags & MONSTER_ABILITY_FLAG_SHOOTER) != 0)
+    if (HAS(target->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_SHOOTER) != 0)
         modifiedDamage = static_cast<float>(modifiedDamage * COMBAT_AI_LICH_PRIORITY_MULTIPLIER);
-    if ((target->m_monster.flags.abilityFlags & MONSTER_ABILITY_FLAG_FLYING) != 0)
+    if (HAS(target->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_FLYING) != 0)
         modifiedDamage = static_cast<float>(modifiedDamage * COMBAT_AI_LICH_PRIORITY_MULTIPLIER);
     modifiedDamage = static_cast<float>(
         (target->m_monster.hitPoints + COMBAT_AI_LICH_HIT_POINT_BONUS) * modifiedDamage
@@ -535,7 +535,7 @@ void combatManager::DoLichShot(class army* lich) {
         damageValue10 = 0;
         target17 = &m_armies[COMBAT_DEFENDER_SIDE - m_currentSide][armyIndex37];
         if (target17 == 0
-            || (target17->m_monster.flags.abilityFlags & MONSTER_ABILITY_FLAG_AI_EXCLUDED) != 0
+            || HAS(target17->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_AI_EXCLUDED) != 0
             || target17->m_quantity <= 0)
             continue;
         damageValue10 = GetModLichDamage(target17, lichDamage5);
@@ -584,7 +584,7 @@ i32 combatManager::GetShooterMask(i32 side) {
         currentArmy10 = armyIndex2 + m_armies[side];
         if (currentArmy10 != 0
             && (currentArmy10->m_monster.flags.abilityFlags & MONSTER_ABILITY_FLAG_AI_EXCLUDED) == 0
-            && (currentArmy10->m_monster.flags.abilityFlags & MONSTER_ABILITY_FLAG_SHOOTER) != 0
+            && HAS(currentArmy10->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_SHOOTER) != 0
             && currentArmy10->m_monster.shots > 0
             && currentArmy10->m_spellInfluence[IDX(SPELL_INFLUENCE_BLIND)] == 0
             && currentArmy10->m_spellInfluence[IDX(SPELL_INFLUENCE_PARALYZE)] == 0
@@ -626,7 +626,7 @@ i32 combatManager::GetFlyerMask(i32 side) {
         currentArmy10 = m_armies[side] + armyIndex2;
         if (currentArmy10 != 0
             && (currentArmy10->m_monster.flags.abilityFlags & MONSTER_ABILITY_FLAG_AI_EXCLUDED) == 0
-            && (currentArmy10->m_monster.flags.abilityFlags & MONSTER_ABILITY_FLAG_FLYING) != 0
+            && HAS(currentArmy10->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_FLYING) != 0
             && currentArmy10->m_spellInfluence[IDX(SPELL_INFLUENCE_BLIND)] == 0
             && currentArmy10->m_spellInfluence[IDX(SPELL_INFLUENCE_PARALYZE)] == 0
             && currentArmy10->m_spellInfluence[IDX(SPELL_INFLUENCE_MIRROR_IMAGE)] == 0
@@ -1002,7 +1002,7 @@ i32 combatManager::WalkTowardArmy(class army* currentArmy, i32 side, i32 mask) {
         0
     );
     if (pathFound5 == 0
-        && (targetPtr9->m_monster.flags.abilityFlags & MONSTER_ABILITY_FLAG_WIDE) != 0) {
+        && HAS(targetPtr9->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_WIDE) != 0) {
         switch (targetPtr9->m_facing) {
             case 0:
                 targetHex7--;
