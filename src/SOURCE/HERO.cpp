@@ -166,13 +166,13 @@ SpellType hero::GetNthSpell(i32 type, i32 spellNumber) {
         if (HasSpell(SpellType(spell))) {
             if (type == IDX(HERO_SPELL_TYPE_ALL)
                 || (type == IDX(HERO_SPELL_TYPE_COMBAT)
-                    && (gsSpellInfo[spell].attributes & IDX(SPELL_INFO_ATTRIBUTE_COMBAT)))
+                    && HAS(gsSpellInfo[spell].attributes, SPELL_INFO_ATTRIBUTE_COMBAT))
                 || (type == IDX(HERO_SPELL_TYPE_ADVENTURE)
-                    && !(gsSpellInfo[spell].attributes & IDX(SPELL_INFO_ATTRIBUTE_COMBAT)))) {
+                    && !HAS(gsSpellInfo[spell].attributes, SPELL_INFO_ATTRIBUTE_COMBAT))) {
                 spellOrdinalCount++;
             }
             if (spellOrdinalCount == spellNumber)
-                return spell;
+                return SpellType(spell);
         }
     }
     return IDX(SPELL_NONE);
