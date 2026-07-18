@@ -4782,7 +4782,7 @@ i32 advManager::CombatMonsterEvent(
         m_lastQuickViewX = -1;
     }
 
-    memset(gpMonGroup->m_creatureTypes, CREATURE_NONE, COMBAT_MONSTER_ARMY_SLOTS);
+    memset(gpMonGroup->m_creatureTypes, IDX(CREATURE_NONE), COMBAT_MONSTER_ARMY_SLOTS);
     memset(gpMonGroup->m_creatureCounts, 0, COMBAT_MONSTER_ARMY_SLOTS * sizeof(i16));
     stackCount = COMBAT_MONSTER_ARMY_SLOTS - secondaryStacks - tertiaryStacks;
     if (stackCount < 1)
@@ -4790,7 +4790,7 @@ i32 advManager::CombatMonsterEvent(
     placement4[COMBAT_MONSTER_ARMY_SLOTS] = 0;
     SRand(combatY + combatX);
     if (stackCount == COMBAT_MONSTER_ARMY_SLOTS
-        && (gMonsterDatabase[IDX(monsterType)].attributes & MONSTER_ATTRIBUTE_RANGED) == 0) {
+        && HAS(gMonsterDatabase[IDX(monsterType)].attributes, MONSTER_ATTRIBUTE_RANGED) == 0) {
         i32 roll = SRandom(0, COMBAT_MONSTER_RANDOM_MAX);
         if (roll < COMBAT_MONSTER_REDUCED_STACK_CHANCE)
             stackCount = 3;
@@ -4814,7 +4814,7 @@ i32 advManager::CombatMonsterEvent(
             && SRandom(0, COMBAT_MONSTER_RANDOM_MAX) < COMBAT_MONSTER_UPGRADE_CHANCE
             && secondaryCount == 0 && tertiaryCount == 0)
             gpMonGroup->m_creatureTypes[placement4[COMBAT_MONSTER_ARMY_SLOTS] + stackIndex9] =
-                static_cast<i8>(monsterType + 1);
+                static_cast<i8>(IDX(monsterType) + 1);
         else
             gpMonGroup->m_creatureTypes[placement4[COMBAT_MONSTER_ARMY_SLOTS] + stackIndex9] =
                 static_cast<i8>(monsterType);
