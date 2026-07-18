@@ -216,17 +216,17 @@ i32 mouseManager::Main(struct tag_message&) {
 }
 
 VA(0x004c94f0, 0x135)
-void mouseManager::SetPointer(char* name, i32 frame, i32 cursorType) {
+void mouseManager::SetPointer(char* name, i32 frame, MouseCursorType cursorType) {
     if (m_forcePointerUpdate == 0) {
         gbPutzingWithMouseCtr++;
         gpResourceManager->SavePosition();
         if (cursorType == MOUSE_AUTO_CURSOR_TYPE) {
             if (giCurExe == 1 || *name == 'a' || *name == 'A')
-                cursorType = IDX(MOUSE_CURSOR_ADVENTURE);
+                cursorType = MOUSE_CURSOR_ADVENTURE;
             else if (*name == 's' || *name == 'S')
-                cursorType = IDX(MOUSE_CURSOR_SPELL);
+                cursorType = MOUSE_CURSOR_SPELL;
             else
-                cursorType = IDX(MOUSE_CURSOR_COMBAT);
+                cursorType = MOUSE_CURSOR_COMBAT;
         }
         if (m_cursorType != cursorType && (m_cursorType = cursorType, gbColorMice != 0)) {
             i32 saved82 = m_cursorReady;
@@ -234,9 +234,9 @@ void mouseManager::SetPointer(char* name, i32 frame, i32 cursorType) {
             if (m_cursorIcon != 0)
                 gpResourceManager->Dispose(m_cursorIcon);
             char local_10[16];
-            if (m_cursorType == IDX(MOUSE_CURSOR_ADVENTURE))
+            if (m_cursorType == MOUSE_CURSOR_ADVENTURE)
                 sprintf(local_10, gMouseManagerStrings.adventureIcon.text);
-            else if (m_cursorType == IDX(MOUSE_CURSOR_SPELL))
+            else if (m_cursorType == MOUSE_CURSOR_SPELL)
                 sprintf(local_10, gMouseManagerStrings.spellIcon.text);
             else
                 sprintf(local_10, gMouseManagerStrings.combatIcon.text);
@@ -276,12 +276,12 @@ void mouseManager::SetPointer(i32 frame) {
     gbPutzingWithMouseCtr++;
     gpResourceManager->SavePosition();
     if (giCurExe == 1)
-        m_cursorType = IDX(MOUSE_CURSOR_ADVENTURE);
+        m_cursorType = MOUSE_CURSOR_ADVENTURE;
     if (frame == MOUSE_KEEP_CURRENT_FRAME)
         frame = m_cursorFrame;
     else
         m_cursorFrame = frame;
-    m_cursorSizeIndex = iMouseOffset[m_cursorType] + frame;
+    m_cursorSizeIndex = iMouseOffset[IDX(m_cursorType)] + frame;
     H2_ASSERT(
         m_cursorSizeIndex >= 0 && m_cursorSizeIndex < MOUSE_CURSOR_COUNT,
         gMouseManagerStrings.cursorSizeAssertion.text,
@@ -304,9 +304,9 @@ void mouseManager::SetPointer(i32 frame) {
             );
 
             char filename[16];
-            if (m_cursorType == IDX(MOUSE_CURSOR_ADVENTURE))
+            if (m_cursorType == MOUSE_CURSOR_ADVENTURE)
                 sprintf(filename, gMouseManagerStrings.adventureBitmap.text, frame + 1);
-            else if (m_cursorType == IDX(MOUSE_CURSOR_SPELL))
+            else if (m_cursorType == MOUSE_CURSOR_SPELL)
                 sprintf(filename, gMouseManagerStrings.spellBitmap.text, frame);
             else
                 sprintf(filename, gMouseManagerStrings.combatBitmap.text, frame + 1);
@@ -366,7 +366,7 @@ void mouseManager::SetPointer(i32 frame) {
             );
 
             IconInfo[m_cursorSizeIndex].fIcon = 0;
-            if (m_cursorType == IDX(MOUSE_CURSOR_SPELL)) {
+            if (m_cursorType == MOUSE_CURSOR_SPELL) {
                 IconInfo[m_cursorSizeIndex].xHotspot = MOUSE_SPELL_CURSOR_HOTSPOT;
                 IconInfo[m_cursorSizeIndex].yHotspot = MOUSE_SPELL_CURSOR_HOTSPOT;
             } else {
@@ -697,7 +697,7 @@ void mouseManager::SetColorMice(i32 enabled) {
             ShowCursor(0);
         }
         i32 savedX = m_cursorFrame;
-        i32 savedY = m_cursorType;
+        MouseCursorType savedY = m_cursorType;
         i32 saved7e = m_forcePointerUpdate;
         m_cursorReady = 0;
         gbColorMice = enabled;

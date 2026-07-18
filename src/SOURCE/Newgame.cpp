@@ -1509,7 +1509,7 @@ void game::ShowScenInfo(void) {
     i32 raceTextWidth;
     i32 singlePlayerYOffsetValue;
 
-    gpMouseManager->SetPointer("advmice.mse", 0, NEW_GAME_POINTER_DEFAULT_FRAME);
+    gpMouseManager->SetPointer("advmice.mse", 0, MOUSE_AUTO_CURSOR_TYPE);
     scenarioWindowValue = new heroWindow(90, 4, "sceninfo.bin");
     if (scenarioWindowValue == 0)
         MemError();

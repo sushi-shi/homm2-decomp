@@ -205,9 +205,9 @@ i32 advManager::Open(i32 id) {
     }
 
     if (gbThisNetHumanPlayer[giCurPlayer]) {
-        gpMouseManager->SetPointer("advmice.mse", 0, ADVMGR_DEFAULT_POINTER_FRAME);
+        gpMouseManager->SetPointer("advmice.mse", 0, MOUSE_AUTO_CURSOR_TYPE);
     } else {
-        gpMouseManager->SetPointer("advmice.mse", 1, ADVMGR_DEFAULT_POINTER_FRAME);
+        gpMouseManager->SetPointer("advmice.mse", 1, MOUSE_AUTO_CURSOR_TYPE);
     }
 
     if (m_visibilityMap == 0) {
@@ -6410,7 +6410,7 @@ i32 SaveGame(void) {
     i32 result11 = 0;
     i32 humanPlayerCount1 = 0;
     gpAdvManager->DisableButtons();
-    gpMouseManager->SetPointer("advmice.mse", ADVMGR_SAVE_POINTER_FRAME, ADVMGR_SAVE_POINTER_DELAY);
+    gpMouseManager->SetPointer("advmice.mse", ADVMGR_SAVE_POINTER_FRAME, MOUSE_AUTO_CURSOR_TYPE);
     i32 playerLocal;
     for (playerLocal = 0; playerLocal < ADVMGR_SAVE_PLAYER_COUNT; ++playerLocal) {
         if (!gpGame->m_playerDead[playerLocal] && gbHumanPlayer[playerLocal]) {
@@ -6465,8 +6465,7 @@ void advManager::CheckCastSpell(void) {
         MobilizeCurrHero(0);
         CompleteDraw(0);
         UpdateScreen(0, 0);
-        gpMouseManager
-            ->SetPointer("advmice.mse", ADVMGR_POINTER_DEFAULT, ADVMGR_DEFAULT_POINTER_FRAME);
+        gpMouseManager->SetPointer("advmice.mse", ADVMGR_POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
         CastSpell(SpellType(
             gpGame->ViewSpells(gpGame->GetHero(gpCurPlayer->m_currentHero), 1, NullHandler, 0)
         ));
@@ -8286,8 +8285,7 @@ void advManager::SetInitialMapOrigin(void) {
 VA(0x00469160, 0x1be)
 void advManager::LoadRemote(void) {
     if (gbThisNetHumanPlayer[giCurPlayer]) {
-        gpMouseManager
-            ->SetPointer("advmice.mse", ADVMGR_POINTER_DEFAULT, ADVMGR_DEFAULT_POINTER_FRAME);
+        gpMouseManager->SetPointer("advmice.mse", ADVMGR_POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
     }
 
     gpGame->LoadGame(gConfig.rmtRCName, 0, 1);
@@ -8315,7 +8313,7 @@ void advManager::LoadRemote(void) {
     UpdateRadar(1, 0);
     UpdBottomView(1, 1, 1);
     gpAdvManager->ForceNewHover();
-    SendMapChange(ADVMGR_REMOTE_LOAD_MAP_CHANGE, 0, 0, 0, ADVMGR_DEFAULT_POINTER_FRAME, 0, 0);
+    SendMapChange(ADVMGR_REMOTE_LOAD_MAP_CHANGE, 0, 0, 0, CURSOR_LOG_UNUSED, 0, 0);
     gpSoundManager->m_samplesReady = 1;
 }
 
@@ -8769,7 +8767,7 @@ void advManager::ViewPuzzle(void) {
     i32 puzzlePiecesVisible = 0;
 
     gpSoundManager->SwitchAmbientMusic(ADVMGR_PUZZLE_MUSIC);
-    gpMouseManager->SetPointer("advmice.mse", ADVMGR_POINTER_DEFAULT, ADVMGR_DEFAULT_POINTER_FRAME);
+    gpMouseManager->SetPointer("advmice.mse", ADVMGR_POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
     icon* puzzleIconObjectPointer = gpResourceManager->GetIcon("puzzle.icn");
     i32 pieceIndexPosition;
     for (pieceIndexPosition = 0; pieceIndexPosition < ADVMGR_PUZZLE_PIECE_COUNT;
@@ -8909,8 +8907,7 @@ void advManager::AdvPanel(void) {
     heroWindow* adventurePanel;
     {
         TrimLoopingSounds(ADVMGR_LOOPING_SOUND_LIMIT);
-        gpMouseManager
-            ->SetPointer("advmice.mse", ADVMGR_POINTER_DEFAULT, ADVMGR_DEFAULT_POINTER_FRAME);
+        gpMouseManager->SetPointer("advmice.mse", ADVMGR_POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
         i32 heroWasMobilized = m_heroContextLocked;
         tag_message message;
         DemobilizeCurrHero();
@@ -9047,7 +9044,7 @@ VA(0x0046ab9a, 0x1e4)
 i32 advManager::ControlPanel(void) {
     TrimLoopingSounds(ADVMGR_LOOPING_SOUND_LIMIT);
     i32 selectedCommand = ADVMGR_PANEL_NO_HELP;
-    gpMouseManager->SetPointer("advmice.mse", ADVMGR_POINTER_DEFAULT, ADVMGR_DEFAULT_POINTER_FRAME);
+    gpMouseManager->SetPointer("advmice.mse", ADVMGR_POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
     i32 heroWasMobilized = m_heroContextLocked;
     DemobilizeCurrHero();
 
@@ -9195,7 +9192,7 @@ i32 CPanelHandler(tag_message& message) {
 VA(0x0046b082, 0x197)
 void advManager::SystemOptions(void) {
     TrimLoopingSounds(ADVMGR_LOOPING_SOUND_LIMIT);
-    gpMouseManager->SetPointer("advmice.mse", ADVMGR_POINTER_DEFAULT, ADVMGR_DEFAULT_POINTER_FRAME);
+    gpMouseManager->SetPointer("advmice.mse", ADVMGR_POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
     i32 oldInterfaceMode = gConfig.evilInterfaceUsage;
     i32 oldWalkSpeed = gConfig.walkSpeed;
     i32 heroWasMobilized = m_heroContextLocked;

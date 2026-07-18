@@ -234,14 +234,14 @@ i32 combatManager::ViewSpells(i32) {
                 gpMouseManager->SetPointer(
                     "spelmous.mse",
                     gsSpellInfo[IDX(m_selectedSpell)].iconIndex,
-                    SPELL_POINTER_DEFAULT_ID
+                    MOUSE_AUTO_CURSOR_TYPE
                 );
                 gpWindowManager->DoDialog(0, HandleCastSpell, 0);
                 break;
         }
 
     restore_pointer:
-        gpMouseManager->SetPointer("cmbtmous.mse", 0, SPELL_POINTER_DEFAULT_ID);
+        gpMouseManager->SetPointer("cmbtmous.mse", 0, MOUSE_AUTO_CURSOR_TYPE);
     }
     return m_selectedSpell != SPELL_NONE;
 }
