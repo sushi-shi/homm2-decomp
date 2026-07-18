@@ -3380,7 +3380,7 @@ void combatManager::Resurrect(i32 spell, i32 targetHex, i32 spellPower) {
         gpResourceManager->Dispose(resurrectIcon);
     }
     DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
-    target_i->m_monster.flags.abilityFlags &= ~MonsterAbilityFlags(IDX(RESURRECT_MONSTER_ABILITY);
+    target_i->m_monster.flags.abilityFlags &= ~MonsterAbilityFlags(IDX(RESURRECT_MONSTER_ABILITY));
 }
 
 VA(0x004296de, 0xb9)
