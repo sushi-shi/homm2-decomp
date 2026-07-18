@@ -9,6 +9,7 @@
 #include <SOURCE/playerData.h>
 #include <SOURCE/town.h>
 #include <SOURCE/Overview.h>
+#include <SOURCE/X_GLOBAL.h>
 // forward declarations:
 class army;
 class armyGroup;
@@ -216,7 +217,7 @@ public:
     void WeeklyRecruitSite(class mapCell*);
     void WeeklyGenericSite(class mapCell*);
     void PerMonth(void);
-    void ConvertObject(i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32);
+    void ConvertObject(i32, i32, i32, i32, TilesetId, i32, i32, i32, i32, i32, i32);
     void RandomizeTown(i32, i32, i32);
     void RandomizeMine(i32, i32);
     void InitRandomArtifacts(void);
