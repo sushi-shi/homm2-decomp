@@ -35,7 +35,7 @@ sample::sample(char* name, i32l channelType, i32l volume, i32l loopCount)
     m_playbackData.channelType = channelType;
     m_playbackData.volume = volume;
     m_playbackData.loopCount = loopCount;
-    formatFlags = SAMPLE_FORMAT_STEREO;
+    formatFlags = IDX(SAMPLE_FORMAT_STEREO);
 
     char filename[32];
     strcpy(filename, name);
@@ -44,19 +44,19 @@ sample::sample(char* name, i32l channelType, i32l volume, i32l loopCount)
     for (i32 i = 0; i < 3; i++) {
         switch (filename[i]) {
             case '1':
-                m_playbackData.sampleRate = SAMPLE_RATE_11025;
+                m_playbackData.sampleRate = IDX(SAMPLE_RATE_11025);
                 break;
             case '2':
-                m_playbackData.sampleRate = SAMPLE_RATE_22050;
+                m_playbackData.sampleRate = IDX(SAMPLE_RATE_22050);
                 break;
             case '4':
-                m_playbackData.sampleRate = SAMPLE_RATE_44100;
+                m_playbackData.sampleRate = IDX(SAMPLE_RATE_44100);
                 break;
             case '6':
-                m_playbackData.format = SAMPLE_FORMAT_16_BIT;
+                m_playbackData.format = IDX(SAMPLE_FORMAT_16_BIT);
                 break;
             case '8':
-                m_playbackData.format = SAMPLE_FORMAT_8_BIT;
+                m_playbackData.format = IDX(SAMPLE_FORMAT_8_BIT);
                 break;
             case 'M':
             case 'm':

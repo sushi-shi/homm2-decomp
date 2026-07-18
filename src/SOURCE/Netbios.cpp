@@ -35,7 +35,8 @@ i8 InitNetHost(void) {
             break;
         case IDX(NETBIOS_SETUP_CHECK_LOCAL_NAME):
             status =
-                !(static_cast<u8>(nb_stat(NETBIOS_HOST_SESSION)) & IDX(NETBIOS_SESSION_NAME_REGISTERED));
+                !(static_cast<u8>(nb_stat(NETBIOS_HOST_SESSION))
+                  & IDX(NETBIOS_SESSION_NAME_REGISTERED));
             if (status)
                 iInitNetHostStatus++;
             else
@@ -43,7 +44,7 @@ i8 InitNetHost(void) {
             break;
         case IDX(NETBIOS_SETUP_REGISTER_LOCAL_NAME):
             sprintf(localName, "H2H%d", Random(NETBIOS_RANDOM_NAME_MIN, NETBIOS_RANDOM_NAME_MAX));
-            if (static_cast<i16>(nb_sess(NETBIOS_SESSION_REGISTER, localName))
+            if (static_cast<i16>(nb_sess(IDX(NETBIOS_SESSION_REGISTER), localName))
                 == IDX(NETBIOS_RESULT_SUCCESS))
                 iInitNetHostStatus++;
             else
@@ -80,14 +81,15 @@ i8 InitNetGuest(void) {
             }
             break;
         case IDX(NETBIOS_SETUP_CHECK_LOCAL_NAME):
-            if (static_cast<u8>(nb_stat(NETBIOS_GUEST_SESSION)) & IDX(NETBIOS_SESSION_NAME_REGISTERED))
+            if (static_cast<u8>(nb_stat(NETBIOS_GUEST_SESSION))
+                & IDX(NETBIOS_SESSION_NAME_REGISTERED))
                 iInitNetGuestStatus += NETBIOS_REGISTERED_STATE_ADVANCE;
             else
                 iInitNetGuestStatus++;
             break;
         case IDX(NETBIOS_SETUP_REGISTER_LOCAL_NAME):
             sprintf(localName, "H2G%d", Random(NETBIOS_RANDOM_NAME_MIN, NETBIOS_RANDOM_NAME_MAX));
-            if (static_cast<i16>(nb_sess(NETBIOS_SESSION_REGISTER, localName))
+            if (static_cast<i16>(nb_sess(IDX(NETBIOS_SESSION_REGISTER), localName))
                 == IDX(NETBIOS_RESULT_SUCCESS))
                 iInitNetGuestStatus++;
             else
@@ -107,7 +109,7 @@ i8 InitNetGuest(void) {
             break;
         }
         case IDX(NETBIOS_SETUP_START_RECEIVE):
-            if (static_cast<i16>(nb_sess(NETBIOS_SESSION_RECEIVE_ANY, NETBIOS_HOST_SESSION))
+            if (static_cast<i16>(nb_sess(IDX(NETBIOS_SESSION_RECEIVE_ANY), NETBIOS_HOST_SESSION))
                 != IDX(NETBIOS_RESULT_SUCCESS)) {
                 sprintf(gText, "Network initialization failed");
                 ShutDown(gText);
@@ -139,12 +141,14 @@ i8 WaitForGuest(void) {
 
     switch (iWaitForGuestStatus) {
         case IDX(NETBIOS_WAIT_START):
-            status = static_cast<i16>(nb_sess(NETBIOS_SESSION_LISTEN_ANY, NETBIOS_GUEST_SESSION));
+            status =
+                static_cast<i16>(nb_sess(IDX(NETBIOS_SESSION_LISTEN_ANY), NETBIOS_GUEST_SESSION));
             if (status == IDX(NETBIOS_RESULT_SUCCESS))
                 iWaitForGuestStatus++;
             return 0;
         case IDX(NETBIOS_WAIT_POLL):
-            status = !(static_cast<u8>(nb_stat(NETBIOS_GUEST_SESSION)) & IDX(NETBIOS_SESSION_ACTIVE));
+            status =
+                !(static_cast<u8>(nb_stat(NETBIOS_GUEST_SESSION)) & IDX(NETBIOS_SESSION_ACTIVE));
             if (status) {
                 if (KBTickCount() > iLastBroadcastTime + NETBIOS_BROADCAST_INTERVAL) {
                     iLastBroadcastTime = KBTickCount();
