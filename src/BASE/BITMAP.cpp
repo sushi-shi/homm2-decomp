@@ -20,7 +20,7 @@ H2_ENUM_BEGIN(BitmapConstant)
 H2_ENUM_END(BitmapConstant)
 
 VA(0x004cffc0, 0x2a)
-bitmap::bitmap(void) : resource(0, 0, -1, 0) {
+bitmap::bitmap(void) : resource(RESOURCE_CATEGORY_BITMAP, 0, -1, 0) {
     m_bitmapType = BITMAP_TYPE_NONE;
     m_width = 0;
     m_height = 0;
@@ -29,7 +29,7 @@ bitmap::bitmap(void) : resource(0, 0, -1, 0) {
 
 #line 15
 VA(0x004d0040, 0x53)
-bitmap::bitmap(BitmapType p1, i16 p2, i16 p3) : resource(0, 0, -1, 0) {
+bitmap::bitmap(BitmapType p1, i16 p2, i16 p3) : resource(RESOURCE_CATEGORY_BITMAP, 0, -1, 0) {
     DATA(0x0051f9f8) static char dimensionsAllocationSourceFile[] = RETAIL_FILE;
     m_bitmapType = p1;
     m_width = p2;
@@ -39,7 +39,7 @@ bitmap::bitmap(BitmapType p1, i16 p2, i16 p3) : resource(0, 0, -1, 0) {
 
 #line 28
 VA(0x004d00a0, 0x8f)
-bitmap::bitmap(u32l id) : resource(0, id, 1, 0) {
+bitmap::bitmap(u32l id) : resource(RESOURCE_CATEGORY_BITMAP, id, 1, 0) {
     DATA(0x0051fa20) static char resourceAllocationSourceFile[] = RETAIL_FILE;
     i32 size;
     gpResourceManager->PointToFile(id);

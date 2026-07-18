@@ -15,7 +15,7 @@
 #include <SOURCE/KB.h>
 
 VA(0x004c6fd0, 0xc8)
-font::font(u32l id) : resource(5, id, 1, 0) {
+font::font(u32l id) : resource(RESOURCE_CATEGORY_FONT, id, 1, 0) {
     gpResourceManager->PointToFile(id);
     m_height = gpResourceManager->ReadWord();
     i32 h = gpResourceManager->ReadWord();
