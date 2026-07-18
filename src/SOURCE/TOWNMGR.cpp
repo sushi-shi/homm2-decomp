@@ -546,7 +546,7 @@ i32 townManager::Open(i32 id) {
     SetupExtraStuff();
     SetupTown();
     KBChangeMenu(hmnuTown);
-    gpMouseManager->SetPointer("advmice.mse", 0, TOWN_MAP_CHANGE_UNUSED);
+    gpMouseManager->SetPointer("advmice.mse", 0, MOUSE_AUTO_CURSOR_TYPE);
     m_messageMask = BASE_MANAGER_ACCEPT_TOWN_EVENT;
     m_priority = BaseManagerPriority(id);
     m_active = true;
@@ -2595,7 +2595,7 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
             (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION);
         gpGame->m_worldMap.GetCell(townXh, townYWork)->m_objectMetadata =
             gpCurPlayer->m_availableHeroIds[m_recruitState];
-        SendMapChange(3, m_recruitHero->m_id, townXh, townYWork, TOWN_MAP_CHANGE_UNUSED, 0, 0);
+        SendMapChange(3, m_recruitHero->m_id, townXh, townYWork, CURSOR_LOG_UNUSED, 0, 0);
         m_recruitResult = 1;
         m_town->m_occupyingHeroId = m_recruitHero->m_id;
         gpGame->m_availableHeroes[gpCurPlayer->m_availableHeroIds[m_recruitState]] =

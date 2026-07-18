@@ -823,7 +823,7 @@ void game::Overview(void) {
     iLastDynamicTop = -1;
     giOverviewItems[IDX(OVERVIEW_HEROES)] = gpCurPlayer->m_heroCount;
     giOverviewItems[IDX(OVERVIEW_TOWNS)] = gpCurPlayer->m_townCount;
-    gpMouseManager->SetPointer(const_cast<char*>("advmice.mse"), 0, -999);
+    gpMouseManager->SetPointer(const_cast<char*>("advmice.mse"), 0, MOUSE_AUTO_CURSOR_TYPE);
     gpResourceManager->GetBackdrop(const_cast<char*>("overback.icn"), gpWindowManager->m_screen, 1);
     overWin = new heroWindow(0, 0, const_cast<char*>("overwind.bin"));
     if (overWin == 0) {

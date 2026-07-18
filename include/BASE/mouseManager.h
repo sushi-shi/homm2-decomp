@@ -11,18 +11,26 @@ class bitmap;
 class resource;
 class icon;
 
+H2_ENUM_CLASS_BEGIN(MouseCursorType)
+    MOUSE_INVALID_CURSOR_TYPE = -1,
+    MOUSE_AUTO_CURSOR_TYPE = -999,
+    MOUSE_CURSOR_ADVENTURE = 0,
+    MOUSE_CURSOR_COMBAT = 1,
+    MOUSE_CURSOR_SPELL = 2
+H2_ENUM_CLASS_END(MouseCursorType)
+
 #pragma pack(push, 1) // recovered layout is byte-packed
 class mouseManager : public baseManager {
 public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (derived: base baseManager = 0x36 bytes at 0x00 via ': public baseManager'; own fields below)
-    bitmap* m_savedUnderlying;  // +0x36  saved-underlying bitmap
-    i32 m_cursorFrame;          // +0x3a
-    icon* m_cursorIcon;         // +0x3e  the loaded cursor icon
-    i32 m_cursorType;           // +0x42
-    i32 m_cursorSizeIndex;      // +0x46
-    i32 m_drawnCursorSizeIndex; // +0x4a  size-table entry currently drawn/saved
+    bitmap* m_savedUnderlying;    // +0x36  saved-underlying bitmap
+    i32 m_cursorFrame;            // +0x3a
+    icon* m_cursorIcon;           // +0x3e  the loaded cursor icon
+    MouseCursorType m_cursorType; // +0x42
+    i32 m_cursorSizeIndex;        // +0x46
+    i32 m_drawnCursorSizeIndex;   // +0x4a  size-table entry currently drawn/saved
     char _pad_0x4e[0x8];
     i32 m_mouseX;             // +0x56
     i32 m_mouseY;             // +0x5a
@@ -44,7 +52,7 @@ public:
     virtual void Close(void) OVERRIDE;
     virtual i32 Main(struct tag_message&) OVERRIDE;
     // --- methods ---
-    void SetPointer(char*, i32, i32);
+    void SetPointer(char*, i32, MouseCursorType);
     void SetPointer(i32);
     void NewUpdate(i32);
     void MouseCoords(i32&, i32&);
@@ -80,17 +88,10 @@ H2_ENUM_BEGIN(MouseManagerConstant)
     MOUSE_CURSOR_MASK_HIGH_BIT = 7,
     MOUSE_SPELL_CURSOR_HOTSPOT = 15,
     MOUSE_MANAGER_MESSAGE_MASK = 0x40,
-    MOUSE_INVALID_CURSOR_TYPE = -1,
     MOUSE_INVALID_CURSOR_FRAME = -1,
     MOUSE_RELOAD_CURSOR_FRAME = -99,
-    MOUSE_KEEP_CURRENT_FRAME = 1000,
-    MOUSE_AUTO_CURSOR_TYPE = -999
+    MOUSE_KEEP_CURRENT_FRAME = 1000
 H2_ENUM_END(MouseManagerConstant)
-H2_ENUM_CLASS_BEGIN(MouseCursorType)
-    MOUSE_CURSOR_ADVENTURE = 0,
-    MOUSE_CURSOR_COMBAT = 1,
-    MOUSE_CURSOR_SPELL = 2
-H2_ENUM_CLASS_END(MouseCursorType)
 // ---- globals (declarations, RVA order) ----
 extern i32 iMouseOffset[4];
 extern i8 iMouseSize[MOUSE_CURSOR_COUNT][2];

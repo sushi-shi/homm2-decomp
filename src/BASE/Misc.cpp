@@ -2351,7 +2351,7 @@ void GetDataEntry(
     i32 showCancel,
     i32 useImmediateHandler
 ) {
-    i32 savedCursorType = gpMouseManager->m_cursorType;
+    MouseCursorType savedCursorType = gpMouseManager->m_cursorType;
     i32 savedCursorFrame = gpMouseManager->m_cursorFrame;
     while (gpMouseManager->m_hideCount != 0)
         gpMouseManager->ShowColorPointer();

@@ -297,7 +297,7 @@ void game::ShowCampaignInfo(i32 viewOnly, i32) {
     widget* trackWidget;
     tag_message message;
 
-    gpMouseManager->SetPointer("advmice.mse", 0, CAMPAIGN_POINTER_HIDDEN_HOTSPOT);
+    gpMouseManager->SetPointer("advmice.mse", 0, MOUSE_AUTO_CURSOR_TYPE);
     gpMouseManager->ReallyShowPointer();
     savedInterface = gbUseEvilInterface;
     gbUseEvilInterface = m_campaignType == IDX(CAMPAIGN_ARCHIBALD);

@@ -230,8 +230,7 @@ void SmackManagerMain(void) {
     while (playing16) {
         if (bSmackNum == SMACK_EXPANSION_CAMPAIGN) {
             if (!primaryStarted9) {
-                gpMouseManager
-                    ->SetPointer("advmice.mse", SMACK_POINTER_ID, SMACK_POINTER_HIDDEN_HOTSPOT);
+                gpMouseManager->SetPointer("advmice.mse", SMACK_POINTER_ID, MOUSE_AUTO_CURSOR_TYPE);
                 gpMouseManager->ReallyShowPointer();
                 gpSoundManager->PlayAmbientMusic(SMACK_MAIN_MUSIC, 0, -1);
                 backImage = gpResourceManager->GetIcon("x_ivy.icn");
@@ -262,11 +261,8 @@ void SmackManagerMain(void) {
             if (smk1->FrameNum > 0 || smk1->Frames <= 1) {
                 if (!primaryStarted9) {
                     if (bSmackNum == SMACK_CHOOSE_CAMPAIGN) {
-                        gpMouseManager->SetPointer(
-                            "advmice.mse",
-                            SMACK_POINTER_ID,
-                            SMACK_POINTER_HIDDEN_HOTSPOT
-                        );
+                        gpMouseManager
+                            ->SetPointer("advmice.mse", SMACK_POINTER_ID, MOUSE_AUTO_CURSOR_TYPE);
                         gpMouseManager->ReallyShowPointer();
                     }
                     if (SmackOptions[bSmackNum].fadeIn) {
@@ -424,8 +420,7 @@ void SmackManagerMain(void) {
 playbackDone:
     if (bSmackNum == SMACK_CHOOSE_CAMPAIGN) {
         gpMouseManager->HideColorPointer();
-        gpMouseManager
-            ->SetPointer("advmice.mse", SMACK_POINTER_DEFAULT, SMACK_POINTER_HIDDEN_HOTSPOT);
+        gpMouseManager->SetPointer("advmice.mse", SMACK_POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
     }
 
     if (SmackOptions[bSmackNum].fadeOut) {

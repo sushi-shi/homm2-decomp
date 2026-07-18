@@ -317,7 +317,7 @@ i32 oldmain(void) {
     gpWindowManager->m_updateFlags = 1;
     smallFont = gpResourceManager->GetFont("smalfont.fnt");
     bigFont = gpResourceManager->GetFont("bigfont.fnt");
-    gpMouseManager->SetPointer("advmice.mse", 0, OLD_MAIN_POINTER_TYPE);
+    gpMouseManager->SetPointer("advmice.mse", 0, MOUSE_AUTO_CURSOR_TYPE);
     gpMouseManager->SetColorMice(gConfig.gfx[giCurExe].colorMouseCursor);
     LogStr("OM4");
     SetupCDRom();
@@ -381,7 +381,7 @@ i32 oldmain(void) {
                     gpWindowManager->FadeScreen(0, OLD_MAIN_FADE_SPEED, gPalette);
                 firstMainScreen_c = 0;
             }
-            gpMouseManager->SetPointer("advmice.mse", 0, OLD_MAIN_POINTER_TYPE);
+            gpMouseManager->SetPointer("advmice.mse", 0, MOUSE_AUTO_CURSOR_TYPE);
         }
         mainScreenLoaded_b = 1;
         if (gGameCommand != OLD_MAIN_EXIT)
@@ -711,7 +711,7 @@ i32 oldmain(void) {
 
         RemoteCleanup();
         bShowIt = 1;
-        gpMouseManager->SetPointer("advmice.mse", 0, OLD_MAIN_POINTER_TYPE);
+        gpMouseManager->SetPointer("advmice.mse", 0, MOUSE_AUTO_CURSOR_TYPE);
         sprintf(
             gcWinText,
             "My heroes, our foes have been scattered, their castles broken and laid bare.  The "
@@ -4500,7 +4500,7 @@ void NormalDialog(
     i16 showMessage_h;
     i32 windowHeight_k;
     i32 resourceSlot_n;
-    i32 savedPointerType_e;
+    MouseCursorType savedPointerType_e;
     i32 dialogContentHeight_h;
     i32 textWidgetId_h;
     tag_message message_e;
@@ -5086,7 +5086,7 @@ void NormalDialog(
     savedPointerFrame_j = gpMouseManager->m_cursorFrame;
     while (gpMouseManager->m_hideCount)
         gpMouseManager->ShowColorPointer();
-    gpMouseManager->SetPointer("advmice.mse", 0, NORMAL_DIALOG_POINTER_ID);
+    gpMouseManager->SetPointer("advmice.mse", 0, MOUSE_AUTO_CURSOR_TYPE);
 
     if (dialogType == NORMAL_DIALOG_WAIT_LAST || dialogType == NORMAL_DIALOG_WAIT_FIRST) {
         gpWindowManager->DoDialog(pNormalDialogWindow, WaitHandler, 0);
