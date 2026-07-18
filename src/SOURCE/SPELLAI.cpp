@@ -79,8 +79,8 @@ i32 combatManager::DoSpellAI(i32 side, i32 restricted) {
 }
 
 // @semantic
-// Exact 0xd4 frame and all source roles are recovered; all 156/156 external
-// relocation occurrences agree. Named local allocation order still differs
+// Exact 0xd4 frame and all source roles are recovered; the exhaustive data-target
+// multiset agrees. Named local allocation order still differs
 // (for example, ours -0x4/-0x24/-0x28 map to retail
 // -0x34/-0x4/-0x18). The immediate 1.0f spelling now matches the opening
 // initializer. The first normalized report boundary is the local first switch
@@ -752,7 +752,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
 }
 
 // @semantic
-// Exact 0x28 frame, named local slots, and 14/14 external relocations after
+// Exact 0x28 frame, named local slots, and exact data-target multiset after
 // restoring the immediate 1.0f initializer and semantic local names. The
 // first 52 normalized instructions agree, then objdump stops ours at a local
 // switch label; the explicit-range residual begins in local branch/table
@@ -822,9 +822,10 @@ i32 combatManager::EffectSpellCreateCreature(i32 hex, SpellType spell) {
 // order differs, and retail's 0xb0 frame has one compiler-only word beyond
 // ours' 0xac frame. The first normalized residual is pooled 0.0 identity
 // ($T4772 versus const_000eb7f0), followed by the first local switch boundary;
-// 65/62 COFF sites have no candidate-only external target. Float and double
-// zero spellings were tried; revisit slot naming and the local-table residual
-// in the byte-last-mile phase.
+// The remaining COFF count deficit is structural; the complete candidate
+// `.rdata`/`.data` target multiset is a subset of retail with no substitution.
+// Float and double zero spellings were tried; revisit slot naming and the
+// local-table residual in the byte-last-mile phase.
 VA(0x00487eda, 0x72d)
 i32 combatManager::RawEffectSpellInfluence(army* target, i32 influence) {
     i32 effect = 0;
@@ -867,7 +868,7 @@ i32 combatManager::RawEffectSpellInfluence(army* target, i32 influence) {
 
             float oldTurns;
             if (HAS(target->m_monster.flags.all, MONSTER_FLAGS_FLYING))
-                oldTurns = COMBAT_SPELL_AI_FULL_EFFECT_MODIFIER;
+                oldTurns = COMBAT_SPELL_AI_FULL_EFFECT_IMMEDIATE;
             else
                 oldTurns = static_cast<float>(distance) / target->m_monster.speed;
             float newTurns = static_cast<float>(distance) / newSpeed;
@@ -937,7 +938,7 @@ i32 combatManager::RawEffectSpellInfluence(army* target, i32 influence) {
             }
             float dragonMod;
             if (adjacent)
-                dragonMod = COMBAT_SPELL_AI_FULL_EFFECT_MODIFIER;
+                dragonMod = COMBAT_SPELL_AI_FULL_EFFECT_IMMEDIATE;
             else
                 dragonMod = static_cast<float>(dragonCount / m_armyCount[1 - target->m_side]);
             effect = static_cast<i32>(COMBAT_SPELL_AI_DRAGON_SLAYER_MODIFIER * dragonMod);
@@ -955,7 +956,7 @@ i32 combatManager::RawEffectSpellInfluence(army* target, i32 influence) {
             if (target->m_side == 0 && m_inCastleCombat) {
                 shooterMod = static_cast<float>(shooterMod + COMBAT_SPELL_AI_SIEGE_SHIELD_BONUS);
                 if (shooterMod > COMBAT_SPELL_AI_FULL_EFFECT_MODIFIER)
-                    shooterMod = COMBAT_SPELL_AI_FULL_EFFECT_MODIFIER;
+                    shooterMod = COMBAT_SPELL_AI_FULL_EFFECT_IMMEDIATE;
             }
             effect = static_cast<i32>(COMBAT_SPELL_AI_SHIELD_MODIFIER * shooterMod);
             break;

@@ -46,10 +46,11 @@ DATA(0x0052ae64) static i32 gSearchHigh;
 // and retail BSS are both 0xa8 and contain the same 13 DATA-proved logical owners.
 // The candidate's internal owner order differs from retail packing. Thirty-one
 // directly aligned owner references have exact RVAs/addends; all remaining BSS
-// references use zero addends. The breadth include audit removed the former extra
-// gSearchNextY site from TestPossibleDirections: its current 66/66 relocation set
-// has no base-only owner. Preserve other nonexact call-site topology as function/link
-// packing work; do not add aliases, padding, or placement rules.
+// references use zero addends. Recomputing both diagonal neighbor coordinates in
+// TestPossibleDirections removes the former extra gSearchNextX/gSearchNextY
+// publications; the exhaustive PE target multiset now has no substitution.
+// Preserve other nonexact call-site topology as function/link packing work; do
+// not add aliases, padding, or placement rules.
 DATA(0x0051733c) static SFindPathSourceLocation gSearchAllocationSource = {
     {20, 0},
     FINDPATH_SOURCE_FILE
@@ -206,9 +207,9 @@ void searchArray::PushPoint(
                 && (cost < gSearchCell->distance || (gSearchCell->rvFlag1 && !rvFlag1)))) {
 
             for (;;) {
-                gSearchMiddle = (gSearchLow + gSearchHigh) / 2;
+                gSearchMiddle = (gSearchHigh + gSearchLow) >> 1;
                 gSearchQueueNode = &m_queue[gSearchMiddle];
-                if (gSearchHigh <= gSearchLow)
+                if (gSearchLow >= gSearchHigh)
                     break;
                 if (cost < gSearchQueueNode->distance)
                     gSearchLow = gSearchMiddle + 1;
@@ -298,11 +299,15 @@ void searchArray::TestPossibleDirections(
                         == SEARCH_TERRAIN_WATER
                     && normalDirTable[gSearchDirection].x != 0
                     && normalDirTable[gSearchDirection].y != 0) {
-                    if (giGroundToTerrain[gpAdvManager->GetCell(gSearchNextX, y)
-                                              ->m_terrainImageIndex]
+                    if (giGroundToTerrain
+                            [gpAdvManager
+                                 ->GetCell(x + normalDirTable[gSearchDirection].x, y)
+                                 ->m_terrainImageIndex]
                             != SEARCH_TERRAIN_WATER
-                        || giGroundToTerrain[gpAdvManager->GetCell(x, gSearchNextY)
-                                                 ->m_terrainImageIndex]
+                        || giGroundToTerrain
+                               [gpAdvManager
+                                    ->GetCell(x, y + normalDirTable[gSearchDirection].y)
+                                    ->m_terrainImageIndex]
                                != SEARCH_TERRAIN_WATER)
                         goto invalidDirection;
                 }

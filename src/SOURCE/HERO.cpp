@@ -1730,14 +1730,14 @@ void SetupHeroView(void) {
                 sprintf(
                     gText,
                     "%s+%d",
-                    gSecondarySkillLevels[gpHVHero->m_secondarySkills[secondarySkill]],
+                    gSecondarySkillLevels[gpHVHero->m_secondarySkills[secondarySkill] - 1],
                     secondarySkillBonus
                 );
             } else {
                 sprintf(
                     gText,
                     "%s",
-                    gSecondarySkillLevels[gpHVHero->m_secondarySkills[secondarySkill]]
+                    gSecondarySkillLevels[gpHVHero->m_secondarySkills[secondarySkill] - 1]
                 );
             }
             message.payload.widget.data.text = gText;
