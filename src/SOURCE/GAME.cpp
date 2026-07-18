@@ -2417,7 +2417,7 @@ void game::UpdateSpellWidgets(void) {
             if (GetManaCost(SpellType(spell2), m_viewSpellsHero) > m_viewSpellsHero->m_spellPoints)
                 message9.payload.widget.data.value = 3;
             else
-                message9.payload.widget.command = 1;
+                message9.payload.executive.command = EXECUTIVE_COMMAND_TERMINATE_LOOP;
             m_viewSpellsWindow->BroadcastMessage(message9);
             message9.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
             message9.payload.widget.data.value = 6;
@@ -2635,7 +2635,7 @@ i32 ViewSpellsHandler(tag_message& msg) {
         }
 
         if (msg.payload.widget.id == 10) {
-            msg.payload.widget.command = msg.payload.widget.id;
+            msg.payload.widget.command = BaseWidgetCommand(msg.payload.widget.id);
             return 2;
         }
     }
@@ -2977,7 +2977,7 @@ i32 ViewArmyHandler(tag_message& msg) {
                     case EVENT_WINDOW_SECOND_BUTTON:
                         gpWindowManager->m_dialogResult = msg.payload.widget.id;
                         msg.payload.widget.id = 10;
-                        msg.payload.widget.command = msg.payload.widget.id;
+                        msg.payload.widget.command = BaseWidgetCommand(msg.payload.widget.id);
                         return 2;
                     case EVENT_WINDOW_FOURTH_BUTTON:
                         NormalDialog(
@@ -2995,7 +2995,7 @@ i32 ViewArmyHandler(tag_message& msg) {
                         if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
                             gbDismissArmy = true;
                             msg.payload.widget.id = 10;
-                            msg.payload.widget.command = msg.payload.widget.id;
+                            msg.payload.widget.command = BaseWidgetCommand(msg.payload.widget.id);
                             return 2;
                         }
                         break;
@@ -3037,7 +3037,8 @@ i32 ViewArmyHandler(tag_message& msg) {
                                     gpCurPlayer->m_resources[IDX(resourceType0)] -= resourceCost5;
                                 gbUpgradeArmy = true;
                                 msg.payload.widget.id = 10;
-                                msg.payload.widget.command = msg.payload.widget.id;
+                                msg.payload.widget.command =
+                                    BaseWidgetCommand(msg.payload.widget.id);
                                 return 2;
                             }
                         } else {
@@ -3073,7 +3074,7 @@ i32 ViewArmyHandler(tag_message& msg) {
         msg.payload.widget.data.value =
             sViewArmyMonFrameInfo.animationFrames[IDX(ARMY_ANIMATION_WALK)][iViewArmyFrame];
         gpGame->m_viewArmyWindow->BroadcastMessage(msg);
-        msg.payload.widget.command = 52;
+        msg.payload.widget.command = WIDGET_COMMAND_SET_X;
         msg.payload.widget.data.value =
             sViewArmyMonFrameInfo.walkXOffsets[iViewArmyFrame] * viewArmyFacingWIPXMod
             + viewArmyBaseX;

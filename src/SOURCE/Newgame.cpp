@@ -857,7 +857,7 @@ i32 NewGameHandler(struct tag_message& message) {
                     gpWindowManager->m_dialogResult = NEW_GAME_DIALOG_OK;
                     message.type = MESSAGE_WIDGET;
                     message.payload.widget.id = NEW_GAME_DIALOG_CLOSE_MESSAGE;
-                    message.payload.widget.command = message.payload.widget.id;
+                    message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
                     return 2;
 
                 case NEW_GAME_REMOTE_CANCEL:
@@ -1033,7 +1033,7 @@ i32 NewGameHandler(struct tag_message& message) {
                     }
                     gpWindowManager->m_dialogResult = message.payload.widget.id;
                     message.payload.widget.id = NEW_GAME_DIALOG_CLOSE_MESSAGE;
-                    message.payload.widget.command = message.payload.widget.id;
+                    message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
                     gbNewGameDialogOver = true;
                     return 2;
 
@@ -1052,7 +1052,7 @@ i32 NewGameHandler(struct tag_message& message) {
                     }
                     gpWindowManager->m_dialogResult = message.payload.widget.id;
                     message.payload.widget.id = NEW_GAME_DIALOG_CLOSE_MESSAGE;
-                    message.payload.widget.command = message.payload.widget.id;
+                    message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
                     gbNewGameDialogOver = true;
                     return 2;
 

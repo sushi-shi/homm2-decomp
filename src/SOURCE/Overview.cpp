@@ -1113,7 +1113,7 @@ i32 OverviewHandler(struct tag_message& message) {
     }
     if (closeDialog5 == 1) {
         message.payload.widget.id = OVERVIEW_SCROLL_UP_WIDGET;
-        message.payload.widget.command = message.payload.widget.id;
+        message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
         return OVERVIEW_DIALOG_CLOSE;
     }
     return OVERVIEW_DIALOG_CONTINUE;

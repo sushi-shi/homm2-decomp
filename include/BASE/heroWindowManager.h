@@ -40,7 +40,7 @@ public:
     virtual i32 Main(struct tag_message&) OVERRIDE;
     // --- methods ---
     i32 ConvertToHover(struct tag_message&);
-    i32 BroadcastMessage(MessageType, i32, i32, i32);
+    i32 BroadcastMessage(MessageType, BaseWidgetCommand, i32, i32);
     void AddWindow(class heroWindow*, i32, i32);
     void RemoveWindow(class heroWindow*);
     i32 DoDialog(class heroWindow*, i32 (*)(struct tag_message&), i32);

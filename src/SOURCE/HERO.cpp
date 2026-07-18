@@ -1449,7 +1449,7 @@ i32 HeroHandler(struct tag_message& message) {
     if (exitHero36) {
         gpWindowManager->m_dialogResult = message.payload.widget.id;
         message.payload.widget.id = HERO_UI_DIALOG_CLOSE_COMMAND;
-        message.payload.widget.command = message.payload.widget.id;
+        message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
         return HERO_UI_HANDLER_CLOSE;
     }
     return HERO_UI_HANDLER_CONTINUE;

@@ -227,7 +227,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
     }
 
     message3.payload.widget.command =
-        widgetFrame12 == -1 ? IDX(CASTLE_WIDGET_DISABLE) : CASTLE_WIDGET_ENABLE;
+        widgetFrame12 == -1 ? CASTLE_WIDGET_DISABLE : CASTLE_WIDGET_ENABLE;
     message3.payload.widget.id = CASTLE_CONTROL_CAPTAIN_BUTTON;
     message3.payload.widget.data.value = 4;
     casWin->BroadcastMessage(message3);
@@ -702,7 +702,7 @@ selection_done:
     if (result == 0)
         return 1;
     message.payload.widget.id = CASTLE_EXIT_COMMAND;
-    message.payload.widget.command = message.payload.widget.id;
+    message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
     return 2;
 }
 

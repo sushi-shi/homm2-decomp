@@ -320,7 +320,7 @@ i32 recruitUnit::Main(struct tag_message& message) {
 
         if (close == 1) {
             message.type = MESSAGE_EXECUTIVE;
-            message.payload.executive.command = IDX(EXECUTIVE_COMMAND_RETURN_RESULT);
+            message.payload.executive.command = EXECUTIVE_COMMAND_RETURN_RESULT;
             return 2;
         }
     }

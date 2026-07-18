@@ -27,7 +27,6 @@ H2_ENUM_CLASS_BEGIN(SwapManagerMessage)
     SWAP_COMMAND_HOVER = 0xc,
     SWAP_COMMAND_SELECT = 0xd,
     SWAP_COMMAND_HELP = 0xe,
-    SWAP_COMMAND_EXIT = 4,
     SWAP_CONTROL_CLOSE = 0x7800,
     SWAP_SPLIT_MODIFIER_MASK = 3
 H2_ENUM_CLASS_END(SwapManagerMessage)
@@ -101,11 +100,11 @@ public:
     heroWindow* m_window;                 // +0x36
     icon* m_selectorIcon;                 // +0x3a
     hero* m_heroes[IDX(SWAP_SIDE_COUNT)]; // +0x3e
-    SwapManagerSide m_selectedSide;                   // +0x46
+    SwapManagerSide m_selectedSide;       // +0x46
     SwapManagerSide m_targetSide;         // +0x4a
     i32 m_selectedSlot;                   // +0x4e
     i32 m_targetSlot;                     // +0x52
-    SwapManagerItemType m_itemType;                       // +0x56
+    SwapManagerItemType m_itemType;       // +0x56
     // --- constructors ---
     swapManager(void);
     swapManager(class hero*, class hero*);

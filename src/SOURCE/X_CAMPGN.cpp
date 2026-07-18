@@ -1156,7 +1156,7 @@ i32 ExpCampaign::MessageHandler(struct tag_message& message) {
         message.type = MESSAGE_WIDGET;
         gpWindowManager->m_dialogResult = message.payload.widget.id;
         message.payload.widget.id = CAMPAIGN_CLOSE_COMMAND;
-        message.payload.widget.command = message.payload.widget.id;
+        message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
         giDialogTimeout = 0;
         return CAMPAIGN_HANDLER_CLOSE;
     }
@@ -1228,7 +1228,8 @@ i32 ExpCampaign::MessageHandler(struct tag_message& message) {
                     case CAMPAIGN_DIALOG_RESTART:
                         gpWindowManager->m_dialogResult = message.payload.widget.id;
                         message.payload.widget.id = CAMPAIGN_CLOSE_COMMAND;
-                        message.payload.widget.command = message.payload.widget.id;
+                        message.payload.widget.command =
+                            BaseWidgetCommand(message.payload.widget.id);
                         giDialogTimeout = 0;
                         return CAMPAIGN_HANDLER_CLOSE;
                     default:

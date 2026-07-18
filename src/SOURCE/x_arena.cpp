@@ -125,7 +125,7 @@ i32 ArenaWindowHandler(struct tag_message& message_1) {
         message_1.type = MESSAGE_WIDGET;
         gpWindowManager->m_dialogResult = message_1.payload.widget.id;
         message_1.payload.widget.id = EVENT_WINDOW_CLOSE_COMMAND;
-        message_1.payload.widget.command = message_1.payload.widget.id;
+        message_1.payload.widget.command = BaseWidgetCommand(message_1.payload.widget.id);
         giDialogTimeout = 0;
         return EVENT_WINDOW_CLOSE;
     }
@@ -177,7 +177,8 @@ i32 ArenaWindowHandler(struct tag_message& message_1) {
                     case EVENT_WINDOW_THIRD_BUTTON:
                         gpWindowManager->m_dialogResult = message_1.payload.widget.id;
                         message_1.payload.widget.id = EVENT_WINDOW_CLOSE_COMMAND;
-                        message_1.payload.widget.command = message_1.payload.widget.id;
+                        message_1.payload.widget.command =
+                            BaseWidgetCommand(message_1.payload.widget.id);
                         giDialogTimeout = 0;
                         return EVENT_WINDOW_CLOSE;
                     default:
