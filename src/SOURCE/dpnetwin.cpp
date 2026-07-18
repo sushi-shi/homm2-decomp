@@ -68,7 +68,8 @@ i16 dpnet_init(void) {
         return 0;
     {
         ppDPRcvBuffer = static_cast<u8**>(H2_ALLOC(DP_TRANSPORT_BUFFER_COUNT * sizeof(u8*), 102));
-        piDPRcvBufferSize = static_cast<i32*>(H2_ALLOC(DP_TRANSPORT_BUFFER_COUNT * sizeof(i32), 103));
+        piDPRcvBufferSize =
+            static_cast<i32*>(H2_ALLOC(DP_TRANSPORT_BUFFER_COUNT * sizeof(i32), 103));
         memset(ppDPRcvBuffer, 0, DP_TRANSPORT_BUFFER_COUNT * sizeof(u8*));
         memset(piDPRcvBufferSize, 0, DP_TRANSPORT_BUFFER_COUNT * sizeof(i32));
         hinstDplayx = LoadLibraryA("DPLAYX.DLL");
@@ -87,11 +88,11 @@ i16 dpnet_init(void) {
         if (enumerateFunction == 0)
             ShutDown("Can't load 'DPLAYX.DLL'");
         enumerateFunction(dpEnumServiceProvider, 0);
-        switch (iMPNetProtocol) {
-            case DP_PROTOCOL_IPX:
+        switch (IDX(iMPNetProtocol)) {
+            case IDX(DP_PROTOCOL_IPX):
                 g_lpGuid = IPXGuid;
                 break;
-            case DP_PROTOCOL_TCP:
+            case IDX(DP_PROTOCOL_TCP):
                 g_lpGuid = TCPGuid;
                 break;
         }
@@ -122,7 +123,7 @@ i16 dpnet_init(void) {
                 startup.netPosition = static_cast<u8>(guestIndex);
                 dpSendMessage(
                     giNetPosToDCOPos[guestIndex],
-                    NETWORK_PACKET_STARTUP,
+                    IDX(NETWORK_PACKET_STARTUP),
                     sizeof(startup),
                     &startup
                 );
@@ -189,9 +190,7 @@ void dpnet_term(void) {
 VA(0x0041f3a4, 0xee)
 void dpSendMessage(i32 destination, u8 type, u16 size, void* data) {
     DATA(0x004efa5c) static i16 sendSourceLineBase = 254;
-    u8* message = static_cast<u8*>(
-        H2_ALLOC(size + 1, 256)
-    );
+    u8* message = static_cast<u8*>(H2_ALLOC(size + 1, 256));
     i32 result;
 
     message[0] = type;
@@ -214,7 +213,7 @@ i32 dpnet_snd(i32 position, i32 size, void* data) {
         destination = 0;
     else
         destination = giNetPosToDCOPos[position];
-    dpSendMessage(destination, NETWORK_PACKET_DATA, static_cast<u16>(size), data);
+    dpSendMessage(destination, IDX(NETWORK_PACKET_DATA), static_cast<u16>(size), data);
     return 0;
 }
 
@@ -265,11 +264,7 @@ void dpProcessMessages(void) {
         if (receiveResult == IDX(DP_RESULT_NO_MESSAGES))
             return;
         if (receiveResult != IDX(DP_RESULT_OK))
-            DPSD(
-                receiveResult,
-                RETAIL_FILE,
-                335
-            );
+            DPSD(receiveResult, RETAIL_FILE, 335);
         if (senderId == 0) {
         } else {
             if (destinationIds[0] == 0 || destinationIds[0] == OD_STEER(dcoID))
@@ -303,7 +298,7 @@ void dpEvaluateMessage(u32l size, i32 sender) {
             if (GameMode == IDX(REMOTE_GAME_NETWORK_HOST)) {
                 for (i = 1; i < giNumHumanPlayers; i++) {
                     if (giNetPosToDCOPos[i] == sender) {
-                        dpSendMessage(sender, NETWORK_PACKET_GUEST_ACCEPTED, 0, 0);
+                        dpSendMessage(sender, IDX(NETWORK_PACKET_GUEST_ACCEPTED), 0, 0);
                         return;
                     }
                 }
@@ -312,10 +307,10 @@ void dpEvaluateMessage(u32l size, i32 sender) {
                     gsNetPlayerInfo[giNumHumanPlayers] = *reinterpret_cast<SNetPlayerInfo*>(ptr);
                     if (gsNetPlayerInfo[giNumHumanPlayers].reserved[0] == 0)
                         xNetHasOldPlayers = 1;
-                    dpSendMessage(sender, NETWORK_PACKET_GUEST_ACCEPTED, 0, 0);
+                    dpSendMessage(sender, IDX(NETWORK_PACKET_GUEST_ACCEPTED), 0, 0);
                     giNumHumanPlayers++;
                 } else {
-                    dpSendMessage(sender, NETWORK_PACKET_GUEST_REJECTED, 0, 0);
+                    dpSendMessage(sender, IDX(NETWORK_PACKET_GUEST_REJECTED), 0, 0);
                 }
             }
             break;
@@ -357,15 +352,11 @@ i32 dpWaitForFirstGuest(void) {
             session.dwSize = sizeof(session);
             session.dwMaxPlayers = DP_TRANSPORT_MAX_PLAYERS;
             session.guidSession = *g_lpGuid;
-            session.dwFlags = DP_SESSION_OPEN_CREATE;
+            session.dwFlags = IDX(DP_SESSION_OPEN_CREATE);
             strcpy(session.szSessionName, "Heroes 2");
             result = lpIDC->Open(&session);
             if (result != IDX(DP_RESULT_OK))
-                DPSD(
-                    result,
-                    RETAIL_FILE,
-                    442
-                );
+                DPSD(result, RETAIL_FILE, 442);
             iDPWaitForFirstGuestStatus++;
             break;
         case 1:
@@ -376,11 +367,7 @@ i32 dpWaitForFirstGuest(void) {
         case 2:
             result = lpIDC->CreatePlayer(&dcoID, "Dude", "Heroes Player", &dphEvent);
             if (result != IDX(DP_RESULT_OK))
-                DPSD(
-                    result,
-                    RETAIL_FILE,
-                    472
-                );
+                DPSD(result, RETAIL_FILE, 472);
             giNetPosToDCOPos[0] = dcoID;
             iDPWaitForFirstGuestStatus++;
             break;
@@ -464,7 +451,7 @@ i32 dpWaitForHost(void) {
             sessionDescription.dwSize = sizeof(sessionDescription);
             sessionDescription.dwMaxPlayers = DP_TRANSPORT_MAX_PLAYERS;
             sessionDescription.guidSession = *g_lpGuid;
-            sessionDescription.dwFlags = DP_SESSION_OPEN_JOIN;
+            sessionDescription.dwFlags = IDX(DP_SESSION_OPEN_JOIN);
             sessionDescription.dwSession = lSessions[iSessionToTry];
             strcpy(sessionDescription.szSessionName, "Heroes 2");
             playResult = lpIDC->Open(&sessionDescription);
@@ -483,7 +470,7 @@ i32 dpWaitForHost(void) {
             giHostAcceptStatus = 0;
             dpSendMessage(
                 0,
-                NETWORK_PACKET_GUEST_ARRIVED,
+                IDX(NETWORK_PACKET_GUEST_ARRIVED),
                 sizeof(SNetPlayerInfo),
                 &gsThisNetPlayerInfo
             );

@@ -71,7 +71,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
     m_buildableBuildings = 0;
     m_affordableBuildings = m_buildableBuildings;
     for (slot7 = 0; slot7 < CASTLE_SLOT_COUNT; ++slot7) {
-        if (CanBuy(m_town, castleSlotsUse[slot7]))
+        if (CanBuy(m_town, BuildingSlotType(castleSlotsUse[slot7])))
             m_affordableBuildings |= 1L << castleSlotsUse[slot7];
         if (CanBuild(m_town, BuildingSlotType(castleSlotsUse[slot7])))
             m_buildableBuildings |= 1L << castleSlotsUse[slot7];
@@ -96,7 +96,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
     message3.payload.widget.command = CASTLE_WIDGET_TEXT;
     for (slot7 = 0; slot7 < CASTLE_SLOT_COUNT; ++slot7) {
         message3.payload.widget.id = CASTLE_CONTROL_BUILDING_NAME_FIRST + slot7;
-        if (castleSlotsUse[slot7] == CASTLE_MAGE_GUILD) {
+        if (castleSlotsUse[slot7] == IDX(CASTLE_MAGE_GUILD)) {
             sprintf(
                 gText,
                 "Mage Guild, Level %d",
@@ -105,8 +105,10 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
             );
             message3.payload.widget.data.text = gText;
         } else {
-            message3.payload.widget.data.text =
-                GetBuildingName(FactionType(m_town->m_type), BuildingSlotType(castleSlotsUse[slot7]));
+            message3.payload.widget.data.text = GetBuildingName(
+                FactionType(m_town->m_type),
+                BuildingSlotType(castleSlotsUse[slot7])
+            );
         }
         casWin->BroadcastMessage(message3);
     }
@@ -114,7 +116,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
     for (slot7 = 0; slot7 < CASTLE_SLOT_COUNT; ++slot7) {
         widgetFrame12 = -1;
         if ((m_town->m_buildings & (1L << castleSlotsUse[slot7]))
-            && (castleSlotsUse[slot7] != CASTLE_MAGE_GUILD
+            && (castleSlotsUse[slot7] != IDX(CASTLE_MAGE_GUILD)
                 || m_town->m_buildState == CASTLE_MAGE_GUILD_MAX_LEVEL)) {
             widgetFrame12 = CASTLE_FRAME_BUILT;
         } else {
@@ -345,7 +347,7 @@ i32 CastleHandler(tag_message& message) {
     i32 result;
     i16 textControl;
     i32 quickFlag;
-    CastleControl buildingIndex;
+    i32 buildingIndex;
     i32 loopIndex;
     i32 cannotRecruitHero;
     i32 hoverMessage;
@@ -362,7 +364,7 @@ i32 CastleHandler(tag_message& message) {
             hoverMessage = 1;
         }
         if (message.payload.widget.id == CASTLE_CONTROL_CAPTAIN_ICON)
-            buildingIndex = CASTLE_CAPTAIN;
+            buildingIndex = IDX(CASTLE_CAPTAIN);
         else if (message.payload.widget.id == CASTLE_CONTROL_CAPTAIN_FORMATION_GROUPED)
             buildingIndex = CASTLE_CONTROL_CAPTAIN_FORMATION_GROUPED;
         else if (message.payload.widget.id == CASTLE_CONTROL_CAPTAIN_FORMATION_SPREAD)
@@ -381,7 +383,7 @@ i32 CastleHandler(tag_message& message) {
                                                         + static_cast<i32>(CASTLE_SLOT_COUNT))
                 buildingIndex = message.payload.widget.id - CASTLE_CONTROL_BUILDING_BUTTON_FIRST;
             if (buildingIndex != -1)
-                buildingIndex = castleSlotsUse[IDX(buildingIndex)];
+                buildingIndex = castleSlotsUse[buildingIndex];
         }
     }
 
@@ -397,18 +399,24 @@ i32 CastleHandler(tag_message& message) {
                 sprintf(gText, cCastleInfo[IDX(CASTLE_INFO_SPREAD_FORMATION)]);
                 break;
 
-            case CASTLE_MAGE_GUILD:
+            case IDX(CASTLE_MAGE_GUILD):
                 if (!(gpTownManager->m_buildableBuildings & (1L << buildingIndex))) {
                     sprintf(
                         gText,
                         cCastleInfo[IDX(CASTLE_INFO_CANNOT_BUILD)],
-                        GetBuildingName(FactionType(gpTownManager->m_town->m_type), BuildingSlotType(buildingIndex))
+                        GetBuildingName(
+                            FactionType(gpTownManager->m_town->m_type),
+                            BuildingSlotType(buildingIndex)
+                        )
                     );
                 } else if (!(gpTownManager->m_affordableBuildings & (1L << buildingIndex))) {
                     sprintf(
                         gText,
                         cCastleInfo[IDX(CASTLE_INFO_CANNOT_AFFORD)],
-                        GetBuildingName(FactionType(gpTownManager->m_town->m_type), BuildingSlotType(buildingIndex))
+                        GetBuildingName(
+                            FactionType(gpTownManager->m_town->m_type),
+                            BuildingSlotType(buildingIndex)
+                        )
                     );
                 } else {
                     if (!(gpTownManager->m_town->m_buildings & 1L))
@@ -453,26 +461,38 @@ i32 CastleHandler(tag_message& message) {
                     sprintf(
                         gText,
                         cCastleInfo[IDX(CASTLE_INFO_ALREADY_BUILT)],
-                        GetBuildingName(FactionType(gpTownManager->m_town->m_type), BuildingSlotType(buildingIndex))
+                        GetBuildingName(
+                            FactionType(gpTownManager->m_town->m_type),
+                            BuildingSlotType(buildingIndex)
+                        )
                     );
                 } else {
                     if (!(gpTownManager->m_buildableBuildings & (1L << buildingIndex)))
                         sprintf(
                             gText,
                             cCastleInfo[IDX(CASTLE_INFO_CANNOT_BUILD)],
-                            GetBuildingName(FactionType(gpTownManager->m_town->m_type), BuildingSlotType(buildingIndex))
+                            GetBuildingName(
+                                FactionType(gpTownManager->m_town->m_type),
+                                BuildingSlotType(buildingIndex)
+                            )
                         );
                     else if (!(gpTownManager->m_affordableBuildings & (1L << buildingIndex)))
                         sprintf(
                             gText,
                             cCastleInfo[IDX(CASTLE_INFO_CANNOT_AFFORD)],
-                            GetBuildingName(FactionType(gpTownManager->m_town->m_type), BuildingSlotType(buildingIndex))
+                            GetBuildingName(
+                                FactionType(gpTownManager->m_town->m_type),
+                                BuildingSlotType(buildingIndex)
+                            )
                         );
                     else
                         sprintf(
                             gText,
                             cCastleInfo[IDX(CASTLE_INFO_BUILD)],
-                            GetBuildingName(FactionType(gpTownManager->m_town->m_type), BuildingSlotType(buildingIndex))
+                            GetBuildingName(
+                                FactionType(gpTownManager->m_town->m_type),
+                                BuildingSlotType(buildingIndex)
+                            )
                         );
                 }
                 break;
@@ -591,7 +611,7 @@ i32 CastleHandler(tag_message& message) {
                         }
                         break;
 
-                    case CASTLE_MAGE_GUILD:
+                    case IDX(CASTLE_MAGE_GUILD):
                         if (quickFlag
                             || gpTownManager->m_town->m_buildState == CASTLE_MAGE_GUILD_MAX_LEVEL
                             || (gpTownManager->m_buildableBuildings & (1L << buildingIndex)))

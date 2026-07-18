@@ -68,12 +68,8 @@ i16 wsnet_init(void) {
         SetFullScreenStatus(0);
     }
     gbRemoteOn = true;
-    ppDPRcvBuffer = static_cast<u8**>(
-        H2_ALLOC(WS_TRANSPORT_BUFFER_COUNT * sizeof(u8*), 71)
-    );
-    piDPRcvBufferSize = static_cast<i32*>(
-        H2_ALLOC(WS_TRANSPORT_BUFFER_COUNT * sizeof(i32), 72)
-    );
+    ppDPRcvBuffer = static_cast<u8**>(H2_ALLOC(WS_TRANSPORT_BUFFER_COUNT * sizeof(u8*), 71));
+    piDPRcvBufferSize = static_cast<i32*>(H2_ALLOC(WS_TRANSPORT_BUFFER_COUNT * sizeof(i32), 72));
     memset(ppDPRcvBuffer, 0, WS_TRANSPORT_BUFFER_COUNT * sizeof(u8*));
     memset(piDPRcvBufferSize, 0, WS_TRANSPORT_BUFFER_COUNT * sizeof(i32));
 
@@ -168,7 +164,7 @@ i16 wsnet_init(void) {
             startup.netPosition = static_cast<u8>(player);
             wsSendMessage(
                 giNetPosToDCOPos[player],
-                NETWORK_PACKET_STARTUP,
+                IDX(NETWORK_PACKET_STARTUP),
                 sizeof(startup),
                 &startup
             );
@@ -294,12 +290,12 @@ i32 wsnet_snd(i32 destination, i32 size, void* data) {
     if (destination != WS_TRANSPORT_BROADCAST_POSITION)
         wsSendMessage(
             giNetPosToDCOPos[destination],
-            NETWORK_PACKET_DATA,
+            IDX(NETWORK_PACKET_DATA),
             static_cast<u16>(size),
             data
         );
     else
-        wsSendMessage(0, NETWORK_PACKET_DATA, static_cast<u16>(size), data);
+        wsSendMessage(0, IDX(NETWORK_PACKET_DATA), static_cast<u16>(size), data);
     return 0;
 }
 
@@ -363,8 +359,7 @@ void wsEvaluateMessage(u32l size, i32 sender) {
 
     switch (rcvBufIn[0]) {
         case IDX(NETWORK_PACKET_DATA):
-            ppDPRcvBuffer[iDPRcvBufferHead] =
-                static_cast<u8*>(H2_ALLOC(size - 1, 423));
+            ppDPRcvBuffer[iDPRcvBufferHead] = static_cast<u8*>(H2_ALLOC(size - 1, 423));
             memcpy(ppDPRcvBuffer[iDPRcvBufferHead], rcvBufIn + 1, size - 1);
             piDPRcvBufferSize[iDPRcvBufferHead] = size;
             iDPRcvBufferHead = (iDPRcvBufferHead + 1) % WS_TRANSPORT_BUFFER_COUNT;
@@ -378,7 +373,7 @@ void wsEvaluateMessage(u32l size, i32 sender) {
                                    == reinterpret_cast<SNetPlayerInfo*>(message)) {
                             wsSendMessage(
                                 giNetPosToDCOPos[player],
-                                NETWORK_PACKET_GUEST_ACCEPTED,
+                                IDX(NETWORK_PACKET_GUEST_ACCEPTED),
                                 0,
                                 0
                             );
@@ -393,13 +388,13 @@ void wsEvaluateMessage(u32l size, i32 sender) {
                         xNetHasOldPlayers = 1;
                     wsSendMessage(
                         giNetPosToDCOPos[giNumHumanPlayers],
-                        NETWORK_PACKET_GUEST_ACCEPTED,
+                        IDX(NETWORK_PACKET_GUEST_ACCEPTED),
                         0,
                         0
                     );
                     giNumHumanPlayers++;
                 } else {
-                    wsSendMessage(sender, NETWORK_PACKET_GUEST_REJECTED, 0, 0);
+                    wsSendMessage(sender, IDX(NETWORK_PACKET_GUEST_REJECTED), 0, 0);
                 }
             }
             break;
@@ -487,7 +482,7 @@ i32 wsWaitForHost(void) {
             }
             wsSendMessage(
                 0,
-                NETWORK_PACKET_GUEST_ARRIVED,
+                IDX(NETWORK_PACKET_GUEST_ARRIVED),
                 sizeof(SNetPlayerInfo),
                 &gsThisNetPlayerInfo
             );

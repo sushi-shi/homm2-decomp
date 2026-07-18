@@ -133,7 +133,7 @@ public:
     u8 m_gameLoaded;                                  // +0x660e
     // --- methods ---
     void SetupDynamicStuff(i32, i32, i32);
-    void SetupNewOverviewType(i32, i32);
+    void SetupNewOverviewType(OverviewType, i32);
     void SetupResources(void);
     void Overview(void);
     void DoKnob(void);
