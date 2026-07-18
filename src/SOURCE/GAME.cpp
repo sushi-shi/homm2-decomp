@@ -101,10 +101,10 @@ H2_ENUM_BEGIN(GameTuningConstant)
     COMPRESS_TEST_ITERATIONS = 100
 H2_ENUM_END(GameTuningConstant)
 
-H2_ENUM_CLASS_BEGIN(ViewArmyControlId)
+H2_ENUM_BEGIN(ViewArmyControlId)
     VIEW_ARMY_QUICK_VIEW_ID = 0x7800,
     VIEW_ARMY_UPGRADE_ID = 0x7803
-H2_ENUM_CLASS_END(ViewArmyControlId)
+H2_ENUM_END(ViewArmyControlId)
 
 // Retail's original source passed plain __FILE__/__LINE__ here: under /Od /Gi,
 // MSVC 4.2 lowers __LINE__ to a compiler-synthesized per-function static i16
@@ -2703,7 +2703,7 @@ void game::ViewArmy(
         if ((monsterType == 35 || monsterType == 36)
             && (castle->m_buildings & IDX(KB_DWELLING_UPGRADE_SIXTH_FLAG))) {
             gbAllowUpgrade = true;
-            iViewArmyUpgradeToType = 37;
+            iViewArmyUpgradeToType = CREATURE_BLACK_DRAGON;
         }
     }
 

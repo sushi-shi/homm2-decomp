@@ -5255,8 +5255,8 @@ void advManager::TransferArtifacts(hero* sourceHero, hero* destinationHero) {
                             } else {
                                 GiveTakeArtifactStat(
                                     destinationHero,
-                                    sourceHero->m_artifacts[sourceArtifactSlot],
-                                    0
+                                    ArtifactType(sourceHero->m_artifacts[sourceArtifactSlot]),
+                                    false
                                 );
                                 destinationHero->m_artifacts[targetSlot] =
                                     sourceHero->m_artifacts[sourceArtifactSlot];
@@ -5265,8 +5265,8 @@ void advManager::TransferArtifacts(hero* sourceHero, hero* destinationHero) {
                             }
                             GiveTakeArtifactStat(
                                 sourceHero,
-                                sourceHero->m_artifacts[sourceArtifactSlot],
-                                1
+                                ArtifactType(sourceHero->m_artifacts[sourceArtifactSlot]),
+                                true
                             );
                             sourceHero->m_artifacts[sourceArtifactSlot] = IDX(ARTIFACT_NONE);
                             sourceHero->m_artifactExtra[sourceArtifactSlot] = IDX(ARTIFACT_NONE);
@@ -5639,7 +5639,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 default:
                     GiveArtifact(
                         eventHero,
-                        cell->m_objectMetadata - SKELETON_ARTIFACT_OFFSET,
+                        ArtifactType(cell->m_objectMetadata - SKELETON_ARTIFACT_OFFSET),
                         1,
                         -1
                     );
