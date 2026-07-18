@@ -1,41 +1,45 @@
 # Readonly contribution audit
 
-This audit separates whole-section placement from contribution drift. Retail `.rdata`
-starts at RVA `0xeb000`; the pinned LINK 3.00 candidate starts at RVA `0xf0000`.
-Offsets below are relative to each image's own `.rdata`, so that `0x5000` section-RVA
-difference is intentionally removed.
+This audit separates section placement, allocation topology, and relocation
+destination identity. Retail `.rdata` starts at RVA `0xeb000`; the current pinned
+LINK 3.00 candidate starts at `0xea000` because its preceding `.text` is one page
+shorter. Both sections have raw size `0xe00` and virtual size `0xc9d`.
 
-The current linked result is exact through the TOWNMGR vtable at relative offset
-`0x140`. The first later public anchor, the swapManager vtable, is at `0x650` in
-retail and `0x658` in the candidate (`+0x8`). The advManager vtable retains that
-`+0x8` delta. Alignment after it raises the inherited delta to `+0x10` at the
-highScoreManager vtable. FONT (`0x9e4` retail, `0x9f4` candidate) and RESMGR
-(`0x9f0` retail, `0xa00` candidate) retain the same `+0x10`; they do not prove a
-new BASE contribution defect.
+All 31 retained public `.rdata` symbols now have the exact retail
+section-relative offset. This includes the TOWNMGR vtable at `0x140`, the
+swapManager vtable at `0x650`, the advManager vtable, FONT, and RESMGR. The old
+claim that the first relative drift was `+0x8` at swapManager is obsolete: it
+described a PHILAI candidate constant-pool excess which has been removed.
 
-The underlying SOURCE payload difference is narrower than those anchor deltas.
-SPELLS (`0xb4`), COMMAND (`0x64`), Viewwrld (`0x10`), and ARMY (`0x70`) reach
-their next retail anchors with the expected sizes and alignment. PHILAI's
-ordinary readonly contribution is `0x368`, while the retail owner span is
-`0x360`. That `+0x8` payload appears directly at swapManager/advManager and rises
-to `+0x10` after later alignment. It remains source/compiler constant-pool
-recovery work, not a linker or BASE/FONT placement issue.
+Raw `.rdata` is not byte-exact because vtables contain displaced candidate
+function RVAs and the export directory contains link-time fields. Those bytes do
+not imply a readonly allocation-order defect. The final-link report records the
+raw comparison separately from public section-relative topology and direct code
+relocation targets. The current direct-operand pass compared 435 aligned
+`.rdata` sites and found neither a section-offset nor an identity divergence.
 
 `philAI::DetermineTargetPosition` multiplies the selected human target by the
-anonymous `1.1f` temporary. The retail pool orders that temporary between the
-function's own `1.05` double and the battle `1.11` double, a position only a
-literal at this site can produce; an earlier revision substituted the
-`AI_EVENT_HUMAN_VALUE_FACTOR` owner (`1.5f`) on masked-relocation evidence and
-has been reverted. The other former `0x8` excess came from a typed
-hero-purchase divisor and an eight-byte attention identity; the divisor is a
-double macro and the identity a float again, so the contribution matches the
-reviewed 0x368 candidate layout (retail payload multiset plus two alignment
-zero words).
+retained `AI_EVENT_HUMAN_VALUE_FACTOR` owner (`1.5f`). At the same
+function-relative DIR32 site, the retail instruction operand reads RVA
+`0xeb280`. The anonymous `1.1f` spelling instead relocated to a different
+candidate allocation which payload pairing had associated with equal `1.1f`
+bytes elsewhere in the retail pool. That proved a possible allocation mapping;
+it did not prove that this code site selected it. The retail PE operand does,
+and it selects `1.5f`.
+
+The former `0x368` delinked comparison object was synthesized from that reviewed
+candidate-derived model; it was not an original retail COFF object. We therefore
+cannot claim that retail compilation emitted a dead `1.1f` slot or that LINK
+discarded one. Correcting the model first dropped the object-level data score, as
+expected. Regenerating the canonical target then removed the invalid eight bytes
+from both the target and denominator: current candidate and target PHILAI
+`.rdata` are `0x360`, and the program data score is again 100% for the corrected
+evidence set.
 
 ## Historical SOURCE recovery
 
-The measurements below record the contribution defects that led to the current
-exact SOURCE prefix. They are retained as recovery evidence, not current offsets.
+The measurements below record contribution defects from older candidate epochs.
+They are retained as recovery evidence, not current offsets or conclusions.
 
 The first public, `??_7townManager@@6B@`, is at offset `0x140` in both images. The
 candidate `TOWNMGR.obj` ordinary readonly contribution is `0xc0` bytes at offset `0x80`;
@@ -86,6 +90,9 @@ resolved even though earlier SPELLS/PHILAI/ARMY contributions still displace bot
 ## Linker identity
 
 Current measurements use the archive.org-verified LINK 3.00.5270 component and
-its sibling CVPACK/CVTRES/MSPDB40 tools. Its PE linker version matches retail.
-The VC 4.2 LINK 4.20 result is no longer the final-link baseline. See
-`compiler-detection.md` and `toolchain-vc42.md` for hashes and reproduction.
+its sibling CVPACK/CVTRES/MSPDB40 tools and `LIBCMT.LIB`. The disposable
+final-link objects remove source-only `dllexport` directives, and an explicit
+module definition restores only retail's `AppAbout` and `AppWndProc` exports plus
+the `Heroes of Might and Magic 2` description. The resulting `.edata` is the
+retail `0x5d` bytes at `.rdata+0xc40`. See `compiler-detection.md` and
+`toolchain-vc42.md` for hashes and reproduction.
