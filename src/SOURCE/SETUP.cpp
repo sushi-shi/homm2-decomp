@@ -231,16 +231,16 @@ i32 game::SetupNetworkGame2(void) {
 
     switch (gpWindowManager->m_dialogResult) {
         case 1:
-            iMPNetProtocol = 1;
+            iMPNetProtocol = RemoteNetworkProtocol(1);
             break;
         case 2:
-            iMPNetProtocol = 2;
+            iMPNetProtocol = RemoteNetworkProtocol(2);
             break;
         case 3:
-            iMPNetProtocol = 3;
+            iMPNetProtocol = RemoteNetworkProtocol(3);
             break;
         case 4:
-            iMPNetProtocol = 4;
+            iMPNetProtocol = RemoteNetworkProtocol(4);
             break;
         case SETUP_DIALOG_CANCEL:
             return 0;
@@ -310,7 +310,8 @@ i32 game::SetupModemGame(void) {
             break;
         case 2:
             iMPExtendedType = SETUP_REMOTE_MODEM_ANSWER;
-            if (gConfig.comPort[gbDirectConnect] == IDX(SETUP_COM_PORT_UNCONFIGURED) && !SetupComPort())
+            if (gConfig.comPort[gbDirectConnect] == IDX(SETUP_COM_PORT_UNCONFIGURED)
+                && !SetupComPort())
                 return 0;
             break;
         case 3:
