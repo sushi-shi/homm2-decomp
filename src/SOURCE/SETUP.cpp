@@ -231,16 +231,16 @@ i32 game::SetupNetworkGame2(void) {
 
     switch (gpWindowManager->m_dialogResult) {
         case 1:
-            iMPNetProtocol = RemoteNetworkProtocol(1);
+            iMPNetProtocol = REMOTE_PROTOCOL_DIRECT_PLAY;
             break;
         case 2:
-            iMPNetProtocol = RemoteNetworkProtocol(2);
+            iMPNetProtocol = REMOTE_PROTOCOL_WINSOCK;
             break;
         case 3:
-            iMPNetProtocol = RemoteNetworkProtocol(3);
+            iMPNetProtocol = REMOTE_PROTOCOL_MODEM;
             break;
         case 4:
-            iMPNetProtocol = RemoteNetworkProtocol(4);
+            iMPNetProtocol = REMOTE_PROTOCOL_DIRECT_CONNECT;
             break;
         case SETUP_DIALOG_CANCEL:
             return 0;

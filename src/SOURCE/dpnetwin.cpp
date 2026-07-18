@@ -88,11 +88,11 @@ i16 dpnet_init(void) {
         if (enumerateFunction == 0)
             ShutDown("Can't load 'DPLAYX.DLL'");
         enumerateFunction(dpEnumServiceProvider, 0);
-        switch (IDX(iMPNetProtocol)) {
-            case IDX(DP_PROTOCOL_IPX):
+        switch (iMPNetProtocol) {
+            case DP_PROTOCOL_IPX:
                 g_lpGuid = IPXGuid;
                 break;
-            case IDX(DP_PROTOCOL_TCP):
+            case DP_PROTOCOL_TCP:
                 g_lpGuid = TCPGuid;
                 break;
         }

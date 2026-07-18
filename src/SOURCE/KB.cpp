@@ -391,7 +391,7 @@ i32 oldmain(void) {
             gbTCPFirstTime = false;
             giNumHumanPlayers = 1;
             iMPBaseType = MULTIPLAYER_BASE_NETWORK;
-            iMPNetProtocol = RemoteNetworkProtocol(OLD_MAIN_NETWORK_PROTOCOL);
+            iMPNetProtocol = OLD_MAIN_NETWORK_PROTOCOL;
             iMPExtendedType = giTCPHostStatus ? OLD_MAIN_REMOTE_HOST : OLD_MAIN_REMOTE_CLIENT;
             giSetupGameType = static_cast<u8>(giTCPType);
             RemoteMain(iMPExtendedType);
@@ -6275,7 +6275,7 @@ DATA(0x004fbd60) char* cMonFilename[IDX(CREATURE_COUNT)] = {
     "genie.icn",    "medusa.icn",   "eelem.icn",    "aelem.icn",    "felem.icn",    "welem.icn"
 };
 DATA(0x004fbe68) b32 gbProcessingCombatAction = false;
-DATA(0x004fbe6c) RemoteNetworkProtocol iMPNetProtocol = RemoteNetworkProtocol(0);
+DATA(0x004fbe6c) RemoteNetworkProtocol iMPNetProtocol = REMOTE_PROTOCOL_NETBIOS;
 DATA(0x004fbe70) i32 iLastDiffSendTo = -2;
 DATA(0x004fbe78) SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)] = {
     {"fireball",
