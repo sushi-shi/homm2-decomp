@@ -743,7 +743,7 @@ i32 fileRequester::Main(struct tag_message& message) {
                                 if (positions < 1)
                                     positions = 1;
                                 gutterStepScreen = static_cast<i32>(
-                                    (fGutterTravelLength * FILE_REQUESTER_GUTTER_SCALE) / positions
+                                    (fGutterTravelLength * IDX(FILE_REQUESTER_GUTTER_SCALE)) / positions
                                 );
                                 mouseXIndex = message.payload.widget.screenX;
                                 screenY = message.payload.widget.screenY;

@@ -2121,7 +2121,7 @@ void combatManager::ShootMissile(
             gpWindowManager->UpdateScreenRegion(minX8, minY5, maxX9 - minX8 + 1, maxY6 - minY5 + 1);
         }
         glTimers[0] = static_cast<i32>(
-            KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * COMBAT_MISSILE_TIMER_DELAY
+            KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * IDX(COMBAT_MISSILE_TIMER_DELAY)
         );
         oldX8 = missileX16;
         oldY5 = missileY7;

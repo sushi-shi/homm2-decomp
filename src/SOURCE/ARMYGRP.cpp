@@ -233,7 +233,7 @@ void armyGroup::Swap(i32 slot, armyGroup* otherGroup, i32 otherSlot) {
 VA(0x0048c7d2, 0x14d)
 void armyGroup::DamageGroup(float damagePercent) {
     i32 numKilled;
-    i32 percentChance = static_cast<i32>(damagePercent * ARMY_GROUP_RANDOM_PERCENT_MAX);
+    i32 percentChance = static_cast<i32>(damagePercent * IDX(ARMY_GROUP_RANDOM_PERCENT_MAX));
     i32 i;
     i32 isFirstTroop = 1;
     i32 j;
