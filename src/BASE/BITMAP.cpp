@@ -29,7 +29,7 @@ bitmap::bitmap(void) : resource(0, 0, -1, 0) {
 
 #line 15
 VA(0x004d0040, 0x53)
-bitmap::bitmap(i16 p1, i16 p2, i16 p3) : resource(0, 0, -1, 0) {
+bitmap::bitmap(BitmapType p1, i16 p2, i16 p3) : resource(0, 0, -1, 0) {
     DATA(0x0051f9f8) static char dimensionsAllocationSourceFile[] = RETAIL_FILE;
     m_bitmapType = p1;
     m_width = p2;
@@ -43,7 +43,7 @@ bitmap::bitmap(u32l id) : resource(0, id, 1, 0) {
     DATA(0x0051fa20) static char resourceAllocationSourceFile[] = RETAIL_FILE;
     i32 size;
     gpResourceManager->PointToFile(id);
-    m_bitmapType = gpResourceManager->ReadWord();
+    m_bitmapType = BitmapType(gpResourceManager->ReadWord());
     m_width = gpResourceManager->ReadWord();
     m_height = gpResourceManager->ReadWord();
     size = m_height * m_width;

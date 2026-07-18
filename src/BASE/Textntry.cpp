@@ -290,7 +290,7 @@ i32 textEntryWidget::Main(struct tag_message& message) {
                                            && event.payload.keyboard.keyCode != 0) {
                                     strcpy(backup, edit);
                                     char typed = 0;
-                                    if (event.payload.keyboard.keyCode >= INPUT_EXTENDED_KEY_BASE) {
+                                    if (event.payload.keyboard.keyCode >= IDX(INPUT_EXTENDED_KEY_BASE)) {
                                         switch ((event.payload.keyboard.keyCode >> 8) & 0xFF) {
                                             case INPUT_SCAN_NUMPAD_7:
                                                 typed = '7';

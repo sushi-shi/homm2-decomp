@@ -289,7 +289,7 @@ i32 heroWindowManager::Open(i32 managerOrder) {
     m_screen = new bitmap();
     if (m_screen == 0)
         MemError();
-    m_screen->m_bitmapType = IDX(BITMAP_TYPE_MEMORY);
+    m_screen->m_bitmapType = BITMAP_TYPE_MEMORY;
     m_screen->m_width = WINDOW_SCREEN_WIDTH;
     m_screen->m_height = WINDOW_SCREEN_HEIGHT;
     m_screen->m_pixels = reinterpret_cast<u8*>(lpInitWin);
@@ -627,7 +627,8 @@ void heroWindowManager::SaveFizzleSource(i32 x, i32 y, i32 width, i32 height) {
         if (width > 0 && height > 0) {
             if (m_fizzleSource != 0)
                 delete m_fizzleSource;
-            m_fizzleSource = new bitmap(0, static_cast<i16>(width), static_cast<i16>(height));
+            m_fizzleSource =
+                new bitmap(BITMAP_TYPE_NONE, static_cast<i16>(width), static_cast<i16>(height));
             BlitBitmap(gpWindowManager->m_screen, x, y, width, height, m_fizzleSource, 0, 0);
         }
     }
@@ -697,7 +698,8 @@ void heroWindowManager::FizzleForward(
                 gWindowManagerText.fadePaletteAllocSource,
                 808
             ));
-            m_fizzleWork = new bitmap(0, static_cast<i16>(width), static_cast<i16>(height));
+            m_fizzleWork =
+                new bitmap(BITMAP_TYPE_NONE, static_cast<i16>(width), static_cast<i16>(height));
             i8* cycleTable = static_cast<i8*>(H2_ALLOC_AT(
                 WINDOW_FIZZLE_CYCLE_TABLE_BYTES,
                 gWindowManagerText.cycleTableAllocSource,

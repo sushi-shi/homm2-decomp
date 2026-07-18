@@ -63,7 +63,7 @@ void DoBlur(
     gpMouseManager->HideColorPointer();
     gpWindowManager->SaveFizzleSource(0, 0, BLUR_SCREEN_WIDTH, height);
 
-    bitmap* saved = new bitmap(0, BLUR_SCREEN_WIDTH, static_cast<i16>(height));
+    bitmap* saved = new bitmap(BITMAP_TYPE_NONE, BLUR_SCREEN_WIDTH, static_cast<i16>(height));
     u32 imageSize = height * BLUR_SCREEN_WIDTH;
     memcpy(saved->m_pixels, source->m_pixels, imageSize);
 

@@ -73,7 +73,8 @@ void IconToBitmapScale(
     i32 step = ICON_SCALE_NATIVE_SIZE / scale;
     i32 srcBase = ((1 - scale) * step + ICON_SCALE_NATIVE_SIZE) >> 1;
     i32 srcAdv = step * ICON_SCALE_WORK_BITMAP_SIZE;
-    bitmap* tmp = new bitmap(0, ICON_SCALE_WORK_BITMAP_SIZE, ICON_SCALE_WORK_BITMAP_SIZE);
+    bitmap* tmp =
+        new bitmap(BITMAP_TYPE_NONE, ICON_SCALE_WORK_BITMAP_SIZE, ICON_SCALE_WORK_BITMAP_SIZE);
     i32 rowOff = 0;
     u8* tmpPixels = tmp->m_pixels;
     do {

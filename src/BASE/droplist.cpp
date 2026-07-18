@@ -399,7 +399,8 @@ void dropListWidget::DrawDropStuff(void) {
 
 VA(0x004dca60, 0x50)
 void dropListWidget::SaveDropBackground(void) {
-    m_savedBackground = new bitmap(0, m_savedBackgroundWidth, m_savedBackgroundHeight);
+    m_savedBackground =
+        new bitmap(BITMAP_TYPE_NONE, m_savedBackgroundWidth, m_savedBackgroundHeight);
     m_savedBackground->GrabScreen(m_savedBackgroundX, m_savedBackgroundY);
 }
 
@@ -519,7 +520,8 @@ void dropListWidget::ProcessSelectDialog(void) {
         m_dropButtonWidth,
         m_dropButtonHeight
     );
-    m_savedBackground = new bitmap(0, m_savedBackgroundWidth, m_savedBackgroundHeight);
+    m_savedBackground =
+        new bitmap(BITMAP_TYPE_NONE, m_savedBackgroundWidth, m_savedBackgroundHeight);
     m_savedBackground->GrabScreen(m_savedBackgroundX, m_savedBackgroundY);
 
     DrawDropStuff();
