@@ -35,8 +35,9 @@ See `docs/codeview-contents.md`, `docs/compiler-detection.md`, and
   preserve that distinction when reading retail intent.
 - `/Od` stack positions depend on identifier hashes. Use `scripts/od_slots.py` and
   `docs/od-stack-layout.md`; do not brute-force local names.
-- Compile with the pinned VC 4.2 compiler. Final-link with pinned VC 4.0
-  LINK 3.00.5270 under `build/toolchain/link300`.
+- Compile with the pinned VC 4.2 compiler. Final-link with the pinned VC 4.0
+  component under `build/toolchain/link300`: LINK 3.00.5270 and its sibling
+  `LIBCMT.LIB`, which supplies the retail runtime objects.
 
 ## Build
 

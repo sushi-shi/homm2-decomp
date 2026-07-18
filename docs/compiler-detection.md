@@ -1,10 +1,11 @@
 # Compiler detection — PoL HEROES2W.EXE
 
-**Conclusion: Microsoft Visual C++ 4.2 compiler and CRT** (cl 10.20), with a final
-linker that stamped PE version **3.00**, and CVTRES 4.00. Compiler identity is high
-confidence from static evidence and matching behavior. A checksum-verified VC 4.0
-LINK 3.00.5270 from archive.org reproduces that final-link version and is now the
-pinned final-link component.
+**Conclusion: Microsoft Visual C++ 4.2 compiler** (cl 10.20), with the older
+Visual C++ 4.0 final-link component: LINK **3.00.5270**, its matching CVPACK/PDB
+tools, and its static `LIBCMT.LIB`. Compiler identity is high confidence from
+matching behavior. The final-linker identity comes from the retail PE stamp, and
+the runtime-library identity comes from exact private CRT literals selected from
+the checksum-verified VC 4.0 archive.
 
 The closest evidence-backed shipping pipeline is:
 
@@ -55,16 +56,19 @@ in the minimal NB09 stream.
   game `S_GPROC32`, `S_LPROC32`, labels, locals, types, or source lines; consequently the
   shipping stream does not provide function lengths.
 - **No Rich header** (`@comp.id`) — the Rich header is VC6+, so this is pre-VC6 (rules out VC5.0/6.0).
-- CRT (`LIBCMT`) exports the MBCS/locale helpers `_setmbcp`, `__initmbctable`,
-  `__crtLCMapStringA/W`, `__crtGetStringTypeA/W`, `__crtGetEnvironmentStringsA/W` — the multibyte
-  locale support **introduced in VC++ 4.2**; VC 4.0/4.1 CRTs predate it.
 - Build date 1997-05-05 → 4.2 (the final VC4, shipped 1996) is what a mid-1997 build would use.
+- Repeated object-level A/B comparisons reproduce retail instruction selection,
+  `/Od` local-slot behavior, mangling, and TU-state effects with cl 10.20. This is
+  compiler evidence independent of the separately selected runtime archive.
 
 ## Why the compiler is not 4.0/4.1
 
-- The 4.0/4.1 CRT lacks the `_setmbcp`/`__initmbctable` MBCS layer present here.
-- The PE 3.00 linker stamp does not contradict a VC4.2 compiler and CRT. Microsoft tools
-  can be mixed, and the shipping build may have retained an older final linker.
+- The matching cl 10.20 code-generation fingerprints and object-level A/B results
+  identify the compiler. CRT symbol inventory is not valid compiler-version
+  evidence here because the final link demonstrably selected the older library.
+- The PE 3.00 linker stamp and VC 4.0 runtime do not contradict a VC 4.2 compiler.
+  Microsoft compiler, headers, linker, and libraries can be mixed; the shipping
+  build retained the older final-link installation for both LINK and `LIBCMT`.
 
 ## Final-linker identification
 
@@ -75,16 +79,18 @@ MD5 `772b1bbd7d7ff95399145f02d719587b` and SHA-1
 `81109c8cb534debc0c5645db7c3a1b99dd646d982b0fd545070ceb1c77f9cb6c`,
 and writes the same PE linker version 3.00 as retail.
 
-The valid A/B must also select the sibling VC 4.0 CVPACK and MSPDB40. Mixing LINK
-3.00 with VC 4.2 CVPACK fails with LNK4027. CVTRES is byte-identical between the
-verified VC 4.0 and VC 4.2 media. The pinned combined run returns success, emits a
-minimal NB09 stream, matches the resource tree and vendor import ABI, and leaves
-the remaining section/public differences attributable to current objects,
-libraries, and static-storage reconstruction.
+The valid A/B must also select the sibling VC 4.0 CVPACK, MSPDB40, and
+`LIBCMT.LIB`. Mixing LINK 3.00 with VC 4.2 CVPACK fails with LNK4027. CVTRES is
+byte-identical between the verified VC 4.0 and VC 4.2 media. The VC 4.0
+`testfdiv.obj` supplies 17 exact retail private-literal identities missing from
+the VC 4.2 runtime archive. The pinned combined run returns success, emits a
+minimal NB09 stream, and matches the resource tree and vendor import ABI.
 
-The final-link driver accepts `--linker` or `HOMM2_LINK_EXE` without changing the VC4.2
-compiler, object files, SDK libraries, resource input, object order, or flags. After building
-the normal link inputs, run an isolated A/B output:
+The final-link driver accepts `--linker` or `HOMM2_LINK_EXE` without changing the
+VC 4.2 compiler, object files, non-CRT SDK libraries, resource input, object
+order, or flags. When the selected linker's sibling `LIB` directory contains the
+pinned VC 4.0 `LIBCMT.LIB`, that directory is deliberately placed first. After
+building the normal link inputs, run an isolated A/B output:
 
 ```sh
 python3 -m homm2.build.link_exe \

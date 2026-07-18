@@ -4,7 +4,8 @@
 This is the Gruntz create-toolchain-release.py pattern adapted to the actual
 en_vc42ent disc1 layout. The RAR SFX already contains a complete installed
 MSDEV/{BIN,INCLUDE,LIB} tree; make_toolchain performs extraction and strict
-artifact validation, then this script normalizes the release archive metadata.
+artifact validation. The VC 4.0 component includes LINK/CVPACK and the sibling
+LIBCMT archive selected by retail. This script normalizes the release metadata.
 """
 
 from __future__ import annotations
@@ -21,7 +22,7 @@ import make_linker
 
 
 REPO = Path(os.environ.get("HOMM2_DIR", Path(__file__).resolve().parent.parent)).resolve()
-RELEASE_EPOCH = 1782573438  # v0.1.0 publication day, 2026-06-27 UTC.
+RELEASE_EPOCH = 1782573438  # Fixed project release epoch, 2026-06-27 UTC.
 
 
 def log(message: str) -> None:
