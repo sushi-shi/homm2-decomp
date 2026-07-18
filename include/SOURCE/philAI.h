@@ -109,7 +109,7 @@ public:
     i32 DamageGroup(class armyGroup*, class hero*, class hero*, float);
     void IncrementHourGlass(void);
     void TownEvent(class mapCell*, class hero*, i32, i32);
-    i32 ComputeUpgradeValue(CreatureType, i32);
+    i32 ComputeUpgradeValue(CreatureType, CreatureType);
     i32 ComputeValueOfSS(class hero*, i32, i32);
     i32 ComputeValueOfFreeSS(class hero*, i32);
     i32 ManaRefreshValue(class hero*, i32);

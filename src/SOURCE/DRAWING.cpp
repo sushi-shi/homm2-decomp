@@ -672,7 +672,8 @@ void combatManager::UpdateMouseGrid(i32 hexIndex, i32 forceUpdate) {
         return;
 
     if (m_mouseGridBuffer == 0)
-        m_mouseGridBuffer = new bitmap(0, COMBAT_MOUSE_HEX_WIDTH, COMBAT_MOUSE_HEX_HEIGHT);
+        m_mouseGridBuffer =
+            new bitmap(BITMAP_TYPE_NONE, COMBAT_MOUSE_HEX_WIDTH, COMBAT_MOUSE_HEX_HEIGHT);
 
     if (m_mouseGridHex != -1) {
         if (m_hexCells[m_mouseGridHex].m_gridTop + COMBAT_MOUSE_HEX_MAX_Y_OFFSET

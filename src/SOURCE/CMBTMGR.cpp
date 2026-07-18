@@ -340,8 +340,9 @@ i32 combatManager::Open(i32 openFlags) {
     m_combatMessagePending = 0;
     m_combatWindowOpen = 0;
     gpSoundManager->PlayAmbientMusic(-1, 0, -1);
-    m_combatBuffer = new bitmap(0, COMBAT_BACKGROUND_COPY_WIDTH, COMBAT_BACKGROUND_COPY_HEIGHT);
-    m_backgroundBuffer = new bitmap(0, COMBAT_SCREEN_WIDTH, COMBAT_AREA_HEIGHT);
+    m_combatBuffer =
+        new bitmap(BITMAP_TYPE_NONE, COMBAT_BACKGROUND_COPY_WIDTH, COMBAT_BACKGROUND_COPY_HEIGHT);
+    m_backgroundBuffer = new bitmap(BITMAP_TYPE_NONE, COMBAT_SCREEN_WIDTH, COMBAT_AREA_HEIGHT);
     m_mouseGridBuffer = 0;
     m_smallViewLastX[COMBAT_ATTACKER_SIDE] = -1;
     m_smallViewLastX[COMBAT_DEFENDER_SIDE] = -1;
@@ -935,7 +936,7 @@ void combatManager::CheckApplyGoodMorale(i32 side, i32 index) {
     }
 
     activeArmy->SpellEffect(COMBAT_GOOD_MORALE_EFFECT, COMBAT_MORALE_EFFECT_DURATION, 0);
-    if HAS(activeArmy->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_BAD_MORALE)
+    if HAS (activeArmy->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_BAD_MORALE)
         activeArmy->m_monster.flags.abilityFlags -= MONSTER_ABILITY_FLAG_BAD_MORALE;
     activeArmy->m_monster.flags.abilityFlags |= MONSTER_ABILITY_FLAG_HIGH_MORALE;
 
@@ -1028,7 +1029,8 @@ restart:
                     ))
                     skipEntry = 1;
 
-                if HAS(activeArmy->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_DEFERRED_TURN) {
+                if HAS (activeArmy->m_monster.flags.abilityFlags,
+                        MONSTER_ABILITY_FLAG_DEFERRED_TURN) {
                     skipEntry = 1;
                     hasDeferred = 1;
                 }
@@ -1132,14 +1134,16 @@ void combatManager::CatAttack(i32 side) {
     i32 index28;
 
     if (m_wallStates[IDX(COMBAT_WALL_SLOT_SECTION_FIRST)] != IDX(COMBAT_WALL_STATE_DESTROYED)
-        && m_wallStates[IDX(COMBAT_WALL_SLOT_SECTION_FIRST)] != IDX(COMBAT_WALL_STATE_SECTION_DESTROYED))
+        && m_wallStates[IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
+               != IDX(COMBAT_WALL_STATE_SECTION_DESTROYED))
         wallCount7++;
     if (m_wallStates[IDX(COMBAT_WALL_SLOT_SECTION_SECOND)] != IDX(COMBAT_WALL_STATE_DESTROYED)
         && m_wallStates[IDX(COMBAT_WALL_SLOT_SECTION_SECOND)]
                != IDX(COMBAT_WALL_STATE_SECTION_DESTROYED))
         wallCount7++;
     if (m_wallStates[IDX(COMBAT_WALL_SLOT_SECTION_THIRD)] != IDX(COMBAT_WALL_STATE_DESTROYED)
-        && m_wallStates[IDX(COMBAT_WALL_SLOT_SECTION_THIRD)] != IDX(COMBAT_WALL_STATE_SECTION_DESTROYED))
+        && m_wallStates[IDX(COMBAT_WALL_SLOT_SECTION_THIRD)]
+               != IDX(COMBAT_WALL_STATE_SECTION_DESTROYED))
         wallCount7++;
     if (m_wallStates[IDX(COMBAT_WALL_SLOT_SECTION_FOURTH)] != IDX(COMBAT_WALL_STATE_DESTROYED)
         && m_wallStates[IDX(COMBAT_WALL_SLOT_SECTION_FOURTH)]
@@ -1175,7 +1179,8 @@ void combatManager::CatAttack(i32 side) {
             keepIndex6 = 0;
     }
 
-    if (towerIndex27 == COMBAT_WALL_SLOT_NONE && wallIndex17 == -1 && gateIndex2 == -1 && keepIndex6 == -1)
+    if (towerIndex27 == COMBAT_WALL_SLOT_NONE && wallIndex17 == -1 && gateIndex2 == -1
+        && keepIndex6 == -1)
         return;
 
     sprintf(gText, "catsnd%02d.82M", COMBAT_CATAPULT_IMPACT_SOUND);
@@ -1425,7 +1430,8 @@ void combatManager::CatAttack(i32 side) {
                         >= IDX(COMBAT_WALL_STATE_SECTION_DAMAGE_FIRST)
                     && m_wallStates[wallIndex17 + COMBAT_WALL_SLOT_SECTION_FIRST]
                            <= IDX(COMBAT_WALL_STATE_SECTION_DAMAGE_LAST)) {
-                    m_wallStates[wallIndex17 + COMBAT_WALL_SLOT_SECTION_FIRST] += IDX(damageLevel13);
+                    m_wallStates[wallIndex17 + COMBAT_WALL_SLOT_SECTION_FIRST] +=
+                        IDX(damageLevel13);
                     if (m_wallStates[wallIndex17 + COMBAT_WALL_SLOT_SECTION_FIRST]
                         > IDX(COMBAT_WALL_STATE_SECTION_DAMAGE_LAST))
                         m_wallStates[wallIndex17 + COMBAT_WALL_SLOT_SECTION_FIRST] =
@@ -1478,7 +1484,8 @@ void combatManager::KeepAttack(i32 tower) {
     if ((tower == IDX(COMBAT_TOWER_SELECTOR_GARRISON)
          && m_wallStates[IDX(COMBAT_WALL_SLOT_KEEP)] != IDX(COMBAT_WALL_STATE_KEEP_STANDING))
         || (tower == IDX(COMBAT_TOWER_SELECTOR_TOP)
-            && m_wallStates[IDX(COMBAT_WALL_SLOT_TOP_TOWER)] != IDX(COMBAT_WALL_STATE_TOWER_STANDING))
+            && m_wallStates[IDX(COMBAT_WALL_SLOT_TOP_TOWER)]
+                   != IDX(COMBAT_WALL_STATE_TOWER_STANDING))
         || (tower == IDX(COMBAT_TOWER_SELECTOR_BOTTOM)
             && m_wallStates[IDX(COMBAT_WALL_SLOT_BOTTOM_TOWER)]
                    != IDX(COMBAT_WALL_STATE_TOWER_STANDING)))
@@ -1713,7 +1720,8 @@ void combatManager::SetupAndLoadObstacles(void) {
         if (m_combatTowns[COMBAT_DEFENDER_SIDE]->m_buildings & IDX(TOWN_BUILDING_LEFT_TURRET))
             m_wallStates[IDX(COMBAT_WALL_SLOT_TOP_TOWER)] = IDX(COMBAT_WALL_STATE_TOWER_STANDING);
         if (m_combatTowns[COMBAT_DEFENDER_SIDE]->m_buildings & IDX(TOWN_BUILDING_RIGHT_TURRET))
-            m_wallStates[IDX(COMBAT_WALL_SLOT_BOTTOM_TOWER)] = IDX(COMBAT_WALL_STATE_TOWER_STANDING);
+            m_wallStates[IDX(COMBAT_WALL_SLOT_BOTTOM_TOWER)] =
+                IDX(COMBAT_WALL_STATE_TOWER_STANDING);
 
         m_hexCells[IDX(COMBAT_CASTLE_HEX_TOP_TOWER)].m_blocked = 1;
         m_hexCells[IDX(COMBAT_CASTLE_HEX_TOP_WALL)].m_blocked = 1;

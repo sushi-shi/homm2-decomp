@@ -156,7 +156,7 @@ i8 WaitForGuest(void) {
                 }
             } else {
                 nb_sess(
-                    NETBIOS_SESSION_MOVE,
+                    IDX(NETBIOS_SESSION_MOVE),
                     NETBIOS_GUEST_SESSION,
                     NETBIOS_CONNECTED_SESSION,
                     NETBIOS_DETACH_SOURCE_SESSION

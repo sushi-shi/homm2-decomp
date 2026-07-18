@@ -1358,7 +1358,10 @@ i32 townManager::Main(tag_message& message) {
                                 } else {
                                     if (BuyBuild(
                                             IDX(TOWN_COMMAND_CASTLE),
-                                            CanBuy(m_town, IDX(TOWN_COMMAND_CASTLE)) == 0,
+                                            CanBuy(
+                                                m_town,
+                                                BuildingSlotType(IDX(TOWN_COMMAND_CASTLE))
+                                            ) == 0,
                                             quickView_k
                                         ))
                                         BuildObj(IDX(TOWN_COMMAND_CASTLE));
@@ -2177,7 +2180,7 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
         window_a->BroadcastMessage(message_m);
         message_m.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message_m.payload.widget.data.value = 6;
-        message_m.payload.widget.id = DIALOG_CANCEL_ID;
+        message_m.payload.widget.id = IDX(DIALOG_CANCEL_ID);
         window_a->BroadcastMessage(message_m);
         message_m.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message_m.payload.widget.data.value = 6;
@@ -2742,7 +2745,7 @@ i32 SplitArmyHandler(tag_message& message) {
                         break;
                     case TOWN_DIALOG_CONFIRM:
                         if (gpTownManager->m_splitAmount == 0)
-                            gpWindowManager->m_dialogResult = DIALOG_CANCEL_ID;
+                            gpWindowManager->m_dialogResult = IDX(DIALOG_CANCEL_ID);
                         else
                             gpWindowManager->m_dialogResult = IDX(TOWN_DIALOG_CONFIRM);
                         handled = 1;

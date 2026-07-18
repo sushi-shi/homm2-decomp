@@ -294,7 +294,7 @@ void heroWindow::DrawWindow(void) {
 
 VA(0x004cf6e0, 0x2e)
 void heroWindow::DrawWindow(i32 flags) {
-    DrawWindow(flags, WINDOW_ALL_WIDGETS_LOW, WINDOW_ALL_WIDGETS_HIGH);
+    DrawWindow(flags, IDX(WINDOW_ALL_WIDGETS_LOW), IDX(WINDOW_ALL_WIDGETS_HIGH));
 }
 
 VA(0x004cf710, 0x116)

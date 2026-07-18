@@ -47,7 +47,9 @@ swapManager::swapManager(hero* leftHero, hero* rightHero) {
 
 VA(0x00454482, 0x50)
 void swapManager::Reset(void) {
-    m_selectedSide = m_targetSide = m_itemType = m_selectedSlot = m_targetSlot = SWAP_SLOT_NONE;
+    m_selectedSide = m_targetSide = SwapManagerSide(
+        IDX(m_itemType = SwapManagerItemType(m_selectedSlot = m_targetSlot = IDX(SWAP_SLOT_NONE)))
+    );
 }
 
 VA(0x004544d2, 0x30)
@@ -404,7 +406,9 @@ i32 swapManager::Main(tag_message& message) {
                                     == IDX(ARTIFACT_NONE))
                                     break;
                                 m_heroes[IDX(SWAP_SIDE_LEFT)]->ViewArtifact(
-                                    ArtifactType(m_heroes[IDX(SWAP_SIDE_LEFT)]->m_artifacts[artifactSlot_2]),
+                                    ArtifactType(
+                                        m_heroes[IDX(SWAP_SIDE_LEFT)]->m_artifacts[artifactSlot_2]
+                                    ),
                                     SWAP_VIEW_QUICK,
                                     m_heroes[IDX(SWAP_SIDE_LEFT)]->m_artifactExtra[artifactSlot_2]
                                 );
@@ -425,7 +429,10 @@ i32 swapManager::Main(tag_message& message) {
                                 if (m_selectedSide == SWAP_SIDE_LEFT
                                     && m_selectedSlot == m_targetSlot) {
                                     m_heroes[IDX(SWAP_SIDE_LEFT)]->ViewArtifact(
-                                        ArtifactType(m_heroes[IDX(SWAP_SIDE_LEFT)]->m_artifacts[artifactSlot_2]),
+                                        ArtifactType(
+                                            m_heroes[IDX(SWAP_SIDE_LEFT)]
+                                                ->m_artifacts[artifactSlot_2]
+                                        ),
                                         SWAP_VIEW_FULL,
                                         m_heroes[IDX(SWAP_SIDE_LEFT)]
                                             ->m_artifactExtra[artifactSlot_2]
@@ -474,7 +481,9 @@ i32 swapManager::Main(tag_message& message) {
                                     == IDX(ARTIFACT_NONE))
                                     break;
                                 m_heroes[IDX(SWAP_SIDE_RIGHT)]->ViewArtifact(
-                                    ArtifactType(m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_artifacts[artifactSlot_2]),
+                                    ArtifactType(
+                                        m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_artifacts[artifactSlot_2]
+                                    ),
                                     SWAP_VIEW_QUICK,
                                     m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_artifactExtra[artifactSlot_2]
                                 );
@@ -495,7 +504,10 @@ i32 swapManager::Main(tag_message& message) {
                                 if (m_selectedSide == SWAP_SIDE_RIGHT
                                     && m_selectedSlot == m_targetSlot) {
                                     m_heroes[IDX(SWAP_SIDE_RIGHT)]->ViewArtifact(
-                                        ArtifactType(m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_artifacts[artifactSlot_2]),
+                                        ArtifactType(
+                                            m_heroes[IDX(SWAP_SIDE_RIGHT)]
+                                                ->m_artifacts[artifactSlot_2]
+                                        ),
                                         SWAP_VIEW_FULL,
                                         m_heroes[IDX(SWAP_SIDE_RIGHT)]
                                             ->m_artifactExtra[artifactSlot_2]

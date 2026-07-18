@@ -545,7 +545,7 @@ i32 listBoxWidget::ProcessMouseMessage(tag_message& message) {
                 if (m_lastSelectedIndex == m_selectedIndex) {
                     i32 lastTick = m_lastClickTime;
                     i32 currentTick = KBTickCount();
-                    if (lastTick + LISTBOX_DOUBLE_CLICK_TICKS > currentTick)
+                    if (lastTick + IDX(LISTBOX_DOUBLE_CLICK_TICKS) > currentTick)
                         message.payload.widget.parameter = 2;
                 }
                 m_lastSelectedIndex = m_selectedIndex;

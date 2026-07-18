@@ -113,7 +113,7 @@ void RemoteCleanup(void) {
                 bUseDirectPlay = 0;
                 bUseWinsock = 0;
                 bInTimeoutFail = 0;
-                iMPNetProtocol = 0;
+                iMPNetProtocol = REMOTE_PROTOCOL_NETBIOS;
                 iLastDiffSendTo = -2;
                 gbGotFirstHeartbeat = false;
                 gbInRemoteCleanup = false;
@@ -279,7 +279,7 @@ void RemoteMain(i32 gameMode) {
                 reinterpret_cast<char*>(&gsThisNetPlayerInfo),
                 0,
                 sizeof(SNetPlayerInfo),
-                REMOTE_SETUP_PLAYER_INFO,
+                IDX(REMOTE_SETUP_PLAYER_INFO),
                 1,
                 1,
                 -1
@@ -832,9 +832,7 @@ void PollRemote(void) {
                 }
                 if (queueIndex >= REMOTE_QUEUE_CAPACITY)
                     continue;
-                rcvBuf[queueIndex] = static_cast<char*>(
-                    H2_ALLOC(REMOTE_MESSAGE_SIZE, 992)
-                );
+                rcvBuf[queueIndex] = static_cast<char*>(H2_ALLOC(REMOTE_MESSAGE_SIZE, 992));
                 iInOrder[queueIndex] = iInOrderCtr++;
                 memcpy(rcvBuf[queueIndex], rcvBufIn, REMOTE_MESSAGE_SIZE);
                 queueCount++;
@@ -892,7 +890,8 @@ i32 TransmitAndWait(
             receivedData = GetRemoteData(1);
             if (receivedData != 0)
                 unusedResponseState = 0;
-            if (receivedData != 0 && REMOTE_MESSAGE(receivedData)->type == IDX(REMOTE_MESSAGE_RELIABLE)
+            if (receivedData != 0
+                && REMOTE_MESSAGE(receivedData)->type == IDX(REMOTE_MESSAGE_RELIABLE)
                 && REMOTE_MESSAGE(receivedData)->command == responseCommand) {
                 complete = 1;
             }

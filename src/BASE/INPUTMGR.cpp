@@ -117,7 +117,7 @@ i32 KeyboardMessageHandler(void*, u32 message, u32, i32l messageData) {
             if (event->type == MESSAGE_KEY_DOWN
                 && event->payload.keyboard.keyCode == INPUT_SCAN_F1) {
                 SetFullScreenStatus(0);
-                AppCommand(hwndApp, 0, KBWIN_MENU_HELP, 0);
+                AppCommand(hwndApp, 0, IDX(KBWIN_MENU_HELP), 0);
             }
             if (event->type == MESSAGE_KEY_DOWN && event->payload.keyboard.keyCode == INPUT_SCAN_F4)
                 SetFullScreenStatus(1 - gConfig.gfx[giCurExe].fullScreen);

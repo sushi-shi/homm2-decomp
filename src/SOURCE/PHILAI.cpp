@@ -308,7 +308,7 @@ void philAI::CheckBuyStuff(void) {
             idx = 0;
         }
         if (giBuildShipyard[giCurPlayer] >= 0) {
-            if (CanBuy(idx, 3) && CanBuild(idx, BuildingSlotType(3))) {
+            if (CanBuy(idx, BUILDING_SLOT_DOCK) && CanBuild(idx, BUILDING_SLOT_DOCK)) {
                 BuildBuilding(idx, 3);
                 giBuildShipyard[giCurPlayer] = -1;
             } else {
@@ -4589,7 +4589,7 @@ i32 philAI::CanBuyBHC(BHC& bhc) {
     i32 cost[7];
     switch (bhc.type) {
         case 0:
-            if (CanBuy(bhc.pTown, bhc.what))
+            if (CanBuy(bhc.pTown, BuildingSlotType(bhc.what)))
                 return 1;
             break;
         case 1:
@@ -4954,17 +4954,17 @@ void philAI::TownEvent(mapCell* cell, hero* h, i32 x, i32 y) {
 }
 
 VA(0x00443ba7, 0xad)
-i32 philAI::ComputeUpgradeValue(CreatureType a1, i32 a2) {
+i32 philAI::ComputeUpgradeValue(CreatureType a1, CreatureType a2) {
     i32 cnt = gpCurAIHero->CreatureTypeCount(IDX(a1));
     if (cnt == 0)
         return 0;
     i32 result = static_cast<i32>(
         static_cast<float>(
-            (gMonsterDatabase[a2].fightValue - gMonsterDatabase[IDX(a1)].fightValue) * cnt
+            (gMonsterDatabase[IDX(a2)].fightValue - gMonsterDatabase[IDX(a1)].fightValue) * cnt
         )
         * gpCurPlayer->m_upgradeValueWeight
     );
-    if (gpCurAIHero->CreatureTypeCount(a2) != 0)
+    if (gpCurAIHero->CreatureTypeCount(IDX(a2)) != 0)
         result = static_cast<i32>(result * 0.6);
     return result;
 }
@@ -5641,19 +5641,16 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                 value_h = 105;
                 break;
             case MAP_OBJECT_HILL_FORT:
-                value_h =
-                    (ComputeUpgradeValue(CREATURE_DWARF, IDX(CREATURE_BATTLE_DWARF)) | 0)
-                    + (((ComputeUpgradeValue(CREATURE_ORC, IDX(CREATURE_ORC_CHIEF)) | 0)
-                        + (ComputeUpgradeValue(CREATURE_OGRE, IDX(CREATURE_OGRE_LORD)) | 0))
-                       | 0);
+                value_h = (ComputeUpgradeValue(CREATURE_DWARF, CREATURE_BATTLE_DWARF) | 0)
+                          + (((ComputeUpgradeValue(CREATURE_ORC, CREATURE_ORC_CHIEF) | 0)
+                              + (ComputeUpgradeValue(CREATURE_OGRE, CREATURE_OGRE_LORD) | 0))
+                             | 0);
                 break;
             case MAP_OBJECT_FREEMANS_FOUNDRY:
                 value_h =
-                    (ComputeUpgradeValue(CREATURE_SWORDSMAN, IDX(CREATURE_MASTER_SWORDSMAN))
-                     | 0)
-                    + (((ComputeUpgradeValue(CREATURE_PIKEMAN, IDX(CREATURE_VETERAN_PIKEMAN)))
-                        + (ComputeUpgradeValue(CREATURE_IRON_GOLEM, IDX(CREATURE_STEEL_GOLEM))
-                           | 0))
+                    (ComputeUpgradeValue(CREATURE_SWORDSMAN, CREATURE_MASTER_SWORDSMAN) | 0)
+                    + (((ComputeUpgradeValue(CREATURE_PIKEMAN, CREATURE_VETERAN_PIKEMAN))
+                        + (ComputeUpgradeValue(CREATURE_IRON_GOLEM, CREATURE_STEEL_GOLEM) | 0))
                        | 0);
                 break;
             case MAP_OBJECT_MAGIC_WELL:

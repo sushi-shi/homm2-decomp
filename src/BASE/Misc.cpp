@@ -1781,7 +1781,7 @@ void BitmapToScreen(class bitmap* bmp) {
 VA(0x004c5e70, 0x3d)
 void SetPalette(i8* paletteData, i32 updateDisplay) {
     memcpy(gpBufferPalette->m_data, paletteData, MISC_PALETTE_BYTE_COUNT);
-    memcpy(gCyclePal, paletteData + MISC_CYCLE_RANGE_ONE_FIRST * 3, sizeof(gCyclePal));
+    memcpy(gCyclePal, paletteData + IDX(MISC_CYCLE_RANGE_ONE_FIRST) * 3, sizeof(gCyclePal));
     if (updateDisplay != 0)
         UpdatePalette(gpBufferPalette->m_data);
 }
