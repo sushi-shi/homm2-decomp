@@ -720,7 +720,7 @@ void GetBuildingCost(FactionType race, BuildingSlotType building, i32* const des
 char* GetMonsterName(i32 m);
 void GetMonsterCost(i32 monster, i32* const cost);
 i32 CanBuild(town* t, BuildingSlotType building);
-i32 CanBuy(town* t, i32 type);
+i32 CanBuy(town* t, BuildingSlotType type);
 i32 GetBuildingBaseResourceValue(FactionType race, BuildingSlotType building, i32 level);
 i32 WaitHandler(tag_message& msg);
 i32 EventWindowHandler(struct tag_message&);

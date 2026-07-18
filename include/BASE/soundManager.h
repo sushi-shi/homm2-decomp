@@ -123,7 +123,7 @@ public:
     void CDSetVolume(i32, i32);
     void CDPlay(i32, i32, i32, i32);
     void CDPoll(void);
-    i32 ConvertVolume(i32, i32);
+    i32 ConvertVolume(i32, SoundVolumeConversionMode);
     void AllocateSampleHandles(void);
     struct _SAMPLE* StartSample(char*, char**, i16, i16, i32, i32, i32l);
     void StopAllSamples(i32);
