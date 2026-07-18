@@ -2987,7 +2987,7 @@ i32 philAI::StrategicValueOfPosition(
     i32 distance15;
     searchArray* search5;
     i32 eventValue13;
-    HeroEventFlag eventFlags8;
+    b32 eventFlags8;
     i32 x13;
     i32 enemyMobility19;
     i32 seedMobility2;
@@ -3039,9 +3039,9 @@ i32 philAI::StrategicValueOfPosition(
         search5 = &SVSearchArray;
     }
 
-    eventFlags8 = gpCurAIHero->m_eventFlags & HERO_EVENT_EMBARKED;
-    if (eventFlags8 && IDX(gpAdvManager->GetCell)(targetX, targetY)->m_triggerType == MAP_OBJECT_COAST)
-        eventFlags8 = 0;
+    eventFlags8 = HAS(gpCurAIHero->m_eventFlags, HERO_EVENT_EMBARKED);
+    if (eventFlags8 && gpAdvManager->GetCell(targetX, targetY)->m_triggerType == MAP_OBJECT_COAST)
+        eventFlags8 = false;
     shortDistance13 = 700;
     if (immediate || checkEnemies)
         seedMobility2 = 1700;
@@ -3192,7 +3192,7 @@ i32 philAI::ValueOfTown(town* t) {
     i32 idx; // i
     for (idx = 0; idx <= 24; idx++) {
         if (t->m_buildings & (1 << idx))
-            sum += GetBuildingBaseResourceValue(t->m_type, idx, t->m_buildState);
+            sum += GetBuildingBaseResourceValue(FactionType(t->m_type), BuildingSlotType(idx), t->m_buildState);
     }
     sum = (i32)(gafAITurnCostResource[IDX(RES_GOLD)] * 1250.0f * 1.5 + sum);
     sum += 750;
