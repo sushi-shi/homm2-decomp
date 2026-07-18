@@ -639,7 +639,7 @@ i32 combatManager::ProcessCombatMsg(tag_message& message) {
                         } else if (m_currentCommand == COMBAT_MESSAGE_COMMAND_ATTACK) {
                             CheckSetMouseDirection(mouseX, mouseY, selectedHex_36);
                         }
-                        if (m_previousCommand != IDX(m_currentCommand)) {
+                        if (m_previousCommand != m_currentCommand) {
                             m_previousCommand = m_currentCommand;
                             CombatMessage(m_currentCommand);
                         }
