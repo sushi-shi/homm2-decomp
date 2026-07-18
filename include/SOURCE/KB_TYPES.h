@@ -19,7 +19,8 @@ H2_ENUM_CLASS_BEGIN(ResourceType)
     RES_SULFUR = 3,
     RES_CRYSTAL = 4,
     RES_GEMS = 5,
-    RES_GOLD = 6
+    RES_GOLD = 6,
+    RES_COUNT = 7
 H2_ENUM_CLASS_END(ResourceType)
 
 H2_ENUM_CLASS_BEGIN(CreatureType)
