@@ -163,8 +163,7 @@ H2_ENUM_END(CombatCommandConstant)
 H2_ENUM_BEGIN(CombatRoundConstant)
     COMBAT_ROUND_INITIAL_SPEED = 15,
     COMBAT_ROUND_ABILITY_FLAGS = 0xff1f,
-    COMBAT_RESULT_DRAW = -1,
-    COMBAT_WIN_MESSAGE = 0x4000
+    COMBAT_RESULT_DRAW = -1
 H2_ENUM_END(CombatRoundConstant)
 
 H2_ENUM_BEGIN(CombatCommandGeometry)
