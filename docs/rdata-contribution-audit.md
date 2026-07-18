@@ -11,10 +11,13 @@ swapManager vtable at `0x650`, the advManager vtable, FONT, and RESMGR. The old
 claim that the first relative drift was `+0x8` at swapManager is obsolete: it
 described a PHILAI candidate constant-pool excess which has been removed.
 
-Raw `.rdata` is not byte-exact because vtables contain displaced candidate
-function RVAs and the export directory contains link-time fields. Those bytes do
-not imply a readonly allocation-order defect. The final-link report records the
-raw comparison separately from public section-relative topology and direct code
+Raw `.rdata` agrees in 3,401 of 3,584 bytes. Every one of the 183 differences is
+classified: 151 bytes are inside the 76 HIGHLOW operands at identical
+section-relative sites, 18 are build-dependent fields in the PE debug directory
+at `+0x0`, and 14 are image-relative fields in the export directory at `+0xc40`.
+No ordinary readonly payload byte remains unexplained, so these differences do
+not imply an allocation-order defect. The final-link report records the raw
+comparison separately from public section-relative topology and direct code
 relocation targets. The exhaustive pass sees 781 retail and 762 candidate
 `.rdata` references: all 762 candidate identities match retail, while 19 retail
 occurrences are absent from structurally incomplete candidate code. The ordered

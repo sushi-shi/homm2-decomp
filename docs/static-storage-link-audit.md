@@ -98,7 +98,8 @@ only raw-backed initialized bytes and a loader-zero virtual tail. File alignment
 also make the last raw-backed page larger than the meaningful initializer payload.
 
 The candidate MAP exposes only symbols emitted by the current link. Private static
-objects without a public name cannot be correlated individually. An exact symbol RVA
+objects without a public name cannot be correlated individually from the MAP alone;
+reviewed retail code operands can still recover their identities. An exact symbol RVA
 and class also does not prove that all bytes or pointer relocations within the object
 match retail; those still require an initializer and relocation audit against the
 shipping PE.
@@ -117,18 +118,29 @@ original ordering.
 
 The current exhaustive census covers all 1,499 unique functions and 21,664 retail
 data targets: 781 into `.rdata` and 20,883 into `.data`. Candidate code has 21,380
-targets; 21,307 match a retail allocation identity. There are zero equal-count
-identity substitutions and zero unresolved candidate identities. The 73 unmatched
-candidate occurrences all belong to six structurally incomplete functions; their
-functions also have unequal reference counts, so they are shape residuals rather
-than evidence that a recovered expression names a retail-unreferenced allocation.
-The report retains all 357 retail-only and 73 candidate-only occurrences.
-Those six functions are the five nonexact icon blitters `FlipIconToBitmap`,
-`IconToBitmapColorTable`, `IconToBitmapYModify`,
-`FlipIconToBitmapColorTable`, and `FlipIconToBitmapYModify`, plus
-`searchArray::SeedPosition`. Their local comments and experiment ledgers account
-for the remaining publication/register-liveness shapes; none has an equal-count
-identity substitution.
+targets; 21,373 match a retail allocation identity. There are zero equal-count
+identity substitutions, zero unresolved candidate identities, and zero candidate
+targets whose identity is absent from the corresponding retail function. The report
+retains all 291 retail-only and seven candidate-only occurrences.
+
+Those seven over-publications belong to five structurally incomplete functions:
+the four nonexact icon blitters `FlipIconToBitmap`, `IconToBitmapColorTable`,
+`IconToBitmapYModify`, and `FlipIconToBitmapColorTable`, plus
+`searchArray::SeedPosition`. Direct instruction review attributes them to retained
+versus reloaded scratch values. SEARCH, for example, reloads `s_candidateY` where
+retail keeps it live, while retail reloads `s_adjacentX` where candidate keeps that
+value live. Their local comments and experiment ledgers record the exact sites.
+The remaining 109 shape-divergent functions are pure candidate subsets. The verifier
+reports candidate-excess and novel-identity shape classes separately so an unequal
+count can no longer suppress that review.
+
+Before this review, `FlipIconToBitmapYModify` appeared to have 68 retail-only and
+66 candidate-only targets. That was a genuine topology-model error: its 18 distinct
+four-byte private BSS owners all contain zero, and the manifest had paired their
+names to retail addresses by candidate section order. Repeated retail code operands
+recover the complete semantic permutation instead. With those placements corrected,
+all 142 candidate targets match retail and the function has only two retail-only
+register-lifetime occurrences.
 
 The ordered context pass compares 12,078 sites (507 `.rdata`, 11,571 `.data`) and
 rejects 1,098 shifted contexts. All 10,710 final-placement divergences are in
@@ -140,7 +152,16 @@ current/previous player-count comparison in Wsnetwin, and two quantity/ratio
 comparisons in tradpost. They remain visible because balanced identities alone do
 not prove semantic equivalence.
 
-## Recovered source divergences
+The linked `.rdata` raw payloads are both `0xe00` bytes and agree in 3,401 of 3,584
+bytes. All 183 differing bytes have PE-format causes rather than unaccounted storage:
+151 are within the 76 HIGHLOW pointer operands at identical section-relative sites,
+18 are in the `0x54`-byte debug directory at offset zero, and 14 are in the
+`0x5d`-byte export directory at offset `0xc40`. The pointer values change with the
+candidate image layout; the debug records contain the build timestamp and debug
+payload addresses/sizes; and the export records contain image-relative addresses.
+No raw `.rdata` mismatch byte remains outside those three reviewed classes.
+
+## Recovered source and model divergences
 
 Widening the audit from the former near-exact/site-aligned subset to all functions
 exposed these genuine reconstruction errors. Each correction is supported by the
@@ -154,6 +175,7 @@ candidate-derived target object:
 | PHILAI event/town scoring | Danger `0.9`, transfer `0.05`, third-week share `0.75`, travel-gate scale `0.75`, campfire resource amount `4`, magic-garden gold `175`, and town-event base `1.0`. | Direct operands select `0.2`, `0.04`, `0.8`, `0.85`, `5`, `500`, and `0.9`, respectively. The event-human multiplier is the retail double `1.5`; the target-human boost remains the separate float `1.5f`. |
 | PHILAI magic-garden resource index | Used `gafAITurnCostResource[metadata]`. | Retail addresses the table at base minus four with the metadata index; use `metadata - 1`. |
 | SPELLAI full-effect constant | A retained `static const float` made five assignments load storage. | Retail encodes those assignments as immediate `0x3f800000` and retains one anonymous pool value only for floating use; a macro reproduces both code and the exact SPELLAI `.rdata` pool. |
+| `iconf2by` private BSS identities | Paired 18 identical zero-filled owners to retail addresses by candidate section order. | Repeated setup and decoder operands recover every semantic owner-to-RVA edge. Correcting the permutation raises the exhaustive identity match by 66 occurrences and removes all candidate-only targets from the function. |
 
 Several additional edits recover retail expression factoring without changing game
 semantics: EVENTS spells use `gSpellNames[cell->m_objectMetadata - 1]` directly;
