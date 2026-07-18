@@ -1837,10 +1837,10 @@ void combatManager::ResetBoltAngle(SBolt* bolt) {
             return;
         float randomAngle;
         if (bolt->minAngle == bolt->maxAngle)
-            randomAngle = static_cast<float>(bolt->minAngle) / BOLT_ANGLE_PERCENT_SCALE;
+            randomAngle = static_cast<float>(bolt->minAngle) / IDX(BOLT_ANGLE_PERCENT_SCALE);
         else
             randomAngle = static_cast<float>(Random(bolt->minAngle, bolt->maxAngle))
-                          / BOLT_ANGLE_PERCENT_SCALE;
+                          / IDX(BOLT_ANGLE_PERCENT_SCALE);
         randomAngle = static_cast<float>(
                           (BOLT_RANDOM_ANGLE_BIAS - bolt->distanceRatio) / BOLT_RANDOM_ANGLE_DIVISOR
                       )
@@ -2238,7 +2238,7 @@ void combatManager::DoBolt(
                                 static_cast<float>(
                                     Random(BOLT_BRANCH_RANDOM_LOW, BOLT_BRANCH_RANDOM_HIGH)
                                 )
-                                / BOLT_ANGLE_PERCENT_SCALE;
+                                / IDX(BOLT_ANGLE_PERCENT_SCALE);
                             if (Random(0, 1) != 0)
                                 branchAngle = -branchAngle;
                             float currentAngle = bolts[boltIndex].angle;
@@ -2420,7 +2420,7 @@ void combatManager::ChainLightning(i32 targetHex, i32 spellPower) {
         startX = targetX;
         startY = targetY;
         DelayMilli(
-            static_cast<i32l>(gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_FIZZLE_FRAME_DELAY)
+            static_cast<i32l>(gfCombatSpeedMod[gConfig.combatSpeed] * IDX(SPELL_FIZZLE_FRAME_DELAY))
         );
         i32 nextTarget = GetNextChainLightningTarget(target, 1);
         if (nextTarget == COMBAT_HEX_EMPTY)
@@ -2429,7 +2429,7 @@ void combatManager::ChainLightning(i32 targetHex, i32 spellPower) {
         DrawFrame(1, 0, 0, 0, 0, 1, 1);
         DelayTil(&deadline);
         deadline = static_cast<i32>(
-            KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_FIZZLE_FRAME_DELAY
+            KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * IDX(SPELL_FIZZLE_FRAME_DELAY)
         );
     }
     ShowMassSpell(gArmyEffected, gsSpellInfo[IDX(SPELL_CHAIN_LIGHTNING)].combatEffect, 1);
@@ -3346,7 +3346,7 @@ void combatManager::Resurrect(i32 spell, i32 targetHex, i32 spellPower) {
         resurrectIcon = gpResourceManager->GetIcon("yinyang.icn");
         for (index_o = 0; index_o < RESURRECT_ANIMATION_FRAME_COUNT; ++index_o) {
             glTimers[0] = static_cast<i32>(
-                KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_FIZZLE_FRAME_DELAY
+                KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * IDX(SPELL_FIZZLE_FRAME_DELAY)
             );
             IconToBitmap(
                 resurrectIcon,
@@ -3645,7 +3645,7 @@ void combatManager::Earthquake(void) {
         i32 frame;
         for (frame = 0; frame < EARTHQUAKE_CLOUD_FRAME_COUNT; ++frame) {
             glTimers[1] = static_cast<i32>(
-                KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_FIZZLE_FRAME_DELAY
+                KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * IDX(SPELL_FIZZLE_FRAME_DELAY)
             );
             DrawFrame(0, 0, 1, 0, 0, 1, 0);
             i32 impact;
