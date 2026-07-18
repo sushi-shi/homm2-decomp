@@ -14,9 +14,33 @@ from homm2.build.link_exe import (
     parse_map_symbols, parse_unresolved, read_coff_section, read_imports, read_order_response,
     read_pe, required_initialized_storage_diagnostics, resolve_link_executable,
     sibling_tool_identities, static_symbol_diagnostics)
+from homm2.build.link_exe import strip_coff_export_directives, write_module_definition
 
 
 class LinkExeTest(unittest.TestCase):
+    def test_module_definition_has_retail_description_and_exports(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = write_module_definition(Path(directory) / "HEROES2W.def")
+            payload = path.read_text(encoding="ascii")
+        self.assertIn("DESCRIPTION 'Heroes of Might and Magic 2'", payload)
+        self.assertIn("AppAbout=?AppAbout@@YGHPAXIIJ@Z", payload)
+        self.assertIn("AppWndProc=?AppWndProc@@YGJPAXIIJ@Z", payload)
+
+    def test_final_link_copy_strips_only_export_directives(self):
+        payload = bytearray(20 + 40 + 64)
+        struct.pack_into("<HHIIIHH", payload, 0, 0x14C, 1, 0, 0, 0, 0, 0)
+        payload[20:28] = b".drectve"
+        struct.pack_into("<II", payload, 20 + 16, 64, 60)
+        directives = b"-defaultlib:LIBCMT -export:?body@@YAXXZ /export:other"
+        payload[60:60 + len(directives)] = directives
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "in.obj"
+            output = Path(directory) / "out.obj"
+            source.write_bytes(payload)
+            self.assertTrue(strip_coff_export_directives(source, output))
+            copied = output.read_bytes()[60:124]
+        self.assertIn(b"-defaultlib:LIBCMT", copied)
+        self.assertNotIn(b"export:", copied.lower())
     def test_link300_command_forces_vendor_members_before_game_objects(self):
         objects = [r"Z:\\obj\\one.obj", r"Z:\\obj\\two.obj"]
         vendors = [r"Z:\\lib\\smack.lib", r"Z:\\lib\\mss.lib", r"Z:\\lib\\wing.lib"]
