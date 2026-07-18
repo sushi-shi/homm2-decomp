@@ -10,6 +10,7 @@ class iconWidget;
 class textWidget;
 
 H2_ENUM_CLASS_BEGIN(OverviewType)
+    OVERVIEW_NONE = -1,
     OVERVIEW_HEROES = 0,
     OVERVIEW_TOWNS = 1
 H2_ENUM_CLASS_END(OverviewType)
