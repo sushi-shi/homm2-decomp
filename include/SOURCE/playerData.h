@@ -3,6 +3,7 @@
 // Reconstructed class (SOURCE) from CodeView NB09 of HEROES2W.EXE — NOT original source.
 // 6 methods, 0 own-virtual, 0 static data.
 #include <va.h>
+#include <SOURCE/GAME.h>
 
 #pragma pack(push, 1) // recovered layout is byte-packed
 struct playerAttentionWeights {
@@ -34,8 +35,8 @@ public:
     i8 m_townCount;                  // +0x44
     i8 m_currentTown;                // +0x45
     i8 m_townLocatorPage;            // +0x46
-    i8 m_townIds[72];                // +0x47
-    i32 m_resources[7];              // +0x8f
+    i8 m_townIds[IDX(GAME_TOWN_COUNT)];                // +0x47
+    i32 m_resources[IDX(RES_COUNT)];              // +0x8f
     i8 m_evilInterface;              // +0xab
     i8 m_barrierTents;               // +0xac
     char m_unknownad
@@ -43,7 +44,7 @@ public:
     playerAttentionWeights m_attentionWeights; // +0xb3
     char m_unknownCb
         [0x1c]; // +0xcb never referenced; sits after the AI attention weights
-    i32 m_income[7];            // +0xe7
+    i32 m_income[IDX(RES_COUNT)];            // +0xe7
     i32 m_obeliskValue;         // +0x103
     i32 m_totalObeliskValue;    // +0x107
     i32 m_unexploredValue;      // +0x10b

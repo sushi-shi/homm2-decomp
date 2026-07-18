@@ -10,6 +10,7 @@
 #include <SOURCE/town.h>
 #include <SOURCE/Overview.h>
 #include <SOURCE/X_GLOBAL.h>
+#include <SOURCE/GAME.h>
 // forward declarations:
 class army;
 class armyGroup;
@@ -80,29 +81,29 @@ public:
     char _pad_0x47c[0x12];
     i8 m_playerCount;              // +0x48e
     i8 m_deadPlayerCount;          // +0x48f
-    i8 m_playerDead[6];            // +0x490
+    i8 m_playerDead[IDX(GAME_PLAYER_COUNT)];            // +0x490
     u16 m_day;                     // +0x496
     u16 m_week;                    // +0x498
     u16 m_month;                   // +0x49a
-    class playerData m_players[6]; // +0x49c
+    class playerData m_players[IDX(GAME_PLAYER_COUNT)]; // +0x49c
     class fullMap m_worldMap;      // +0xb3e
     i8 m_obeliskCount;             // +0xb52
-    town m_castleRecs[72];         // 0xb53
+    town m_castleRecs[IDX(GAME_TOWN_COUNT)];         // 0xb53
     union {
-        i8 m_castleOwners[72]; // +0x2773
-        i8 m_townOwners[72];
+        i8 m_castleOwners[IDX(GAME_TOWN_COUNT)]; // +0x2773
+        i8 m_townOwners[IDX(GAME_TOWN_COUNT)];
     };
     union {
         char m_dailyEventFlags[9]; // +0x27bb
         u8 m_knownTowns[9];
     };
-    hero m_heroRecs[54];                         // 0x27c4  hero record slots (GetHeroSlot)
-    i8 m_availableHeroes[54];                    // +0x5c80
-    mineRecord m_mines[144];                     // 0x5cb6
-    i8 m_mineOwners[144];                        // 0x60a6
+    hero m_heroRecs[IDX(GAME_HERO_COUNT)];                         // 0x27c4  hero record slots (GetHeroSlot)
+    i8 m_availableHeroes[IDX(GAME_HERO_COUNT)];                    // +0x5c80
+    mineRecord m_mines[IDX(GAME_MINE_COUNT)];                     // 0x5cb6
+    i8 m_mineOwners[IDX(GAME_MINE_COUNT)];                        // 0x60a6
     char m_randomArtifacts[IDX(ARTIFACT_COUNT)]; // 0x6136
-    boatRecord m_boats[48];                      // 0x619d
-    i8 m_boatSlots[48];                          // 0x631d, active boat record indices
+    boatRecord m_boats[IDX(GAME_BOAT_COUNT)];                      // 0x619d
+    i8 m_boatSlots[IDX(GAME_BOAT_COUNT)];                          // 0x631d, active boat record indices
     i8 m_obeliskVisitors[48];                    // 0x634d
     char m_defaultPlayerNames[24];               // +0x637d
     i8 m_ultimateArtifactX;                      // +0x6395
