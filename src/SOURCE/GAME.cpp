@@ -2316,7 +2316,7 @@ game::ViewSpells(hero* spellHero, i32 spellType, i32 (*callback)(tag_message&), 
     tag_message message;
 
     viewSpellsHero = spellHero;
-    m_viewSpell = -1;
+    m_viewSpell = SPELL_NONE;
     if (spellHero->GetNumSpells(spellType) == 0) {
         NormalDialog(const_cast<char*>("No spells to cast."), 1, -1, -1, -1, 0, -1, 0, -1, 0);
     } else {
@@ -2359,7 +2359,7 @@ void game::UpdateSpellWidgets(void) {
     tag_message message9;
     i32 spellSlot6;
     i32 spellPoints0;
-    i32 spell2;
+    SpellType spell2;
     i32 lineLength0;
 
     message9.type = MESSAGE_WIDGET;
@@ -2427,21 +2427,21 @@ void game::UpdateSpellWidgets(void) {
                 m_viewSpellsWindow->BroadcastMessage(message9);
             }
             message9.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
-            message9.payload.widget.data.value = gsSpellInfo[spell2].iconIndex;
+            message9.payload.widget.data.value = gsSpellInfo[IDX(spell2)].iconIndex;
             m_viewSpellsWindow->BroadcastMessage(message9);
-            lineLength0 = smallFont->LineLength(gSpellNames[spell2], 78);
+            lineLength0 = smallFont->LineLength(gSpellNames[IDX(spell2)], 78);
             if (lineLength0 == 1) {
                 sprintf(
                     gText,
                     "%s\n[%d]",
-                    gSpellNames[spell2],
+                    gSpellNames[IDX(spell2)],
                     GetManaCost(SpellType(spell2), m_viewSpellsHero)
                 );
             } else {
                 sprintf(
                     gText,
                     "%s [%d]",
-                    gSpellNames[spell2],
+                    gSpellNames[IDX(spell2)],
                     GetManaCost(SpellType(spell2), m_viewSpellsHero)
                 );
             }
