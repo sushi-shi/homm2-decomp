@@ -55,7 +55,7 @@ void advManager::ViewWorld(ViewWorldMode whatToDraw, b32 drawAllObjects, b32 dra
     iVWDrawAllObjs = drawAllObjects;
     iVWDrawAllTerrains = drawAllTerrains;
     gpWindowManager->m_updateFlags = 0;
-    giCycleType = 2;
+    giCycleType = WINDOW_COLOR_CYCLE_WORLD_VIEW;
     VWInit(m_mapOriginX + 7, m_mapOriginY + 7);
     VWCompleteDraw();
     gpWindowManager->m_updateFlags = 1;
@@ -91,7 +91,7 @@ void advManager::ViewWorld(ViewWorldMode whatToDraw, b32 drawAllObjects, b32 dra
     gbInViewWorld = false;
     gpWindowManager->m_updateFlags = 0;
     RedrawAdvScreen(1, 0);
-    giCycleType = 0;
+    giCycleType = WINDOW_COLOR_CYCLE_DEFAULT;
     gpWindowManager->m_updateFlags = 1;
     SetPalette(paletteData, 1);
 }
