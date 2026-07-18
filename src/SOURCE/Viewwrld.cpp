@@ -134,7 +134,7 @@ void advManager::VWInit(i32 centerX, i32 centerY) {
 
     iVWXPixelOffset = (VIEW_WORLD_WINDOW_X - IDX(giViewWorldScale) * IDX(iVWViewableCells)) >> 1;
     iVWYPixelOffset = iVWXPixelOffset;
-    gpMouseManager->SetPointer("advmice.mse", VIEW_WORLD_POINTER_FRAME, VIEW_WORLD_POINTER_COLOR);
+    gpMouseManager->SetPointer("advmice.mse", VIEW_WORLD_POINTER_FRAME, MOUSE_AUTO_CURSOR_TYPE);
     sprintf(gText, "ground%d.icn", giViewWorldScale);
     pVWGround = gpResourceManager->GetIcon(gText);
     sprintf(gText, "vwflag%d.icn", giViewWorldScale);
