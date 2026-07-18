@@ -9819,10 +9819,13 @@ VTBL(advManager, 0x004eb6c8);
 // @data-layout-note
 // Candidate and retail .data are byte-identical: 0x14d0 bytes with SHA-256
 // e49c0fee285991feeb3b0b394a8a82789560db423f4efbe40b991189e0f0c15d.
-// Retail stores 16 monAnimDrawFrame bytes at section offset 0x58 and places
-// zero-valued iLastSandAnimTime immediately at 0x68. Retail callers can produce
-// indices 16 and 17, so preserve this evidenced adjacency rather than inflating
-// the allocation from bytes read past the public symbol.
+// Retail leaves 20 bytes at 0x004f5e38 before the "qwikinfo.bin" literal at
+// 0x004f5e4c. Two independent retail consumers generate indices 0..17 (HISCORE
+// seeds with Random(0, 17) and advances modulo 18), and elements 16..17 are
+// zero, so 18 elements is the narrowest semantically supported extent; the two
+// trailing zero bytes are literal alignment the PE cannot distinguish from
+// array payload. An 18-byte array also 4-aligns the following literal exactly
+// at its retail address.
 DATA(0x004f57b0) i32 giLimitUpdMinX = -1;
 DATA(0x004f57b4) i32 iLastScrollTime = 0;
 DATA(0x004f57b8) i32 iSandAnim = 0;
@@ -9837,7 +9840,7 @@ DATA(0x004f57d8) b32 gbForceUpdate = false;
 DATA(0x004f59e8) i32 giCheatSeq = 0;
 DATA(0x004f59ec) i32 iQWE = 0;
 DATA(0x004f5e38) u8 monAnimDrawFrame[ADVMGR_MONSTER_ANIMATION_TABLE_SIZE] =
-    {0, 0, 0, 1, 2, 2, 1, 0, 0, 0, 3, 4, 5, 5, 4, 3};
+    {0, 0, 0, 1, 2, 2, 1, 0, 0, 0, 3, 4, 5, 5, 4, 3, 0, 0};
 DATA(0x004f60e0) i32 iLastSandAnimTime = 0;
 DATA(0x004f60e4) i32 iLastNewSandAnimTime = 0;
 DATA(0x004f6720) i32 giFrameCount = 0;
