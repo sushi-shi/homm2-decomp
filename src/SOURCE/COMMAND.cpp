@@ -827,7 +827,7 @@ void combatManager::ResetRound(void) {
         for (armyIndex = 0; armyIndex < COMBAT_ARMY_SLOT_COUNT; armyIndex++) {
             army* currentArmy = m_armies[side] + armyIndex;
             if (currentArmy->m_quantity > 0) {
-                currentArmy->m_monster.flags.abilityFlags &= IDX(COMBAT_ROUND_ABILITY_FLAGS);
+                currentArmy->m_monster.flags.abilityFlags &= MonsterAbilityFlags(IDX(COMBAT_ROUND_ABILITY_FLAGS));
                 if (currentArmy->m_monsterType == CREATURE_TROLL
                     || currentArmy->m_monsterType == CREATURE_WAR_TROLL)
                     currentArmy->m_hitPointsLost = 0;
@@ -871,8 +871,8 @@ i32 combatManager::CheckWin(struct tag_message* message) {
         for (armyIndex = 0; armyIndex < COMBAT_ARMY_SLOT_COUNT; armyIndex++) {
             if (m_armies[m_combatResult][armyIndex].m_monsterType != CREATURE_NONE
                 && m_armies[m_combatResult][armyIndex].m_quantity > 0
-                && (m_armies[m_combatResult][armyIndex].m_monster.flags.all
-                    & MONSTER_FLAGS_SUMMONED)
+                && HAS(m_armies[m_combatResult][armyIndex].m_monster.flags.all,
+                       MONSTER_FLAGS_SUMMONED)
                        == 0) {
                 armyAlive = 1;
             }
