@@ -3,6 +3,7 @@
 // Declarations of the free functions DEFINED in Wsnetwin.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
 #include <va.h>
+#include <SOURCE/GAME.h>
 #include <winsock.h>
 #include <SOURCE/REMOTE_TYPES.h>
 
@@ -10,7 +11,7 @@ H2_ENUM_BEGIN(WinsockTransportConstant)
     WS_TRANSPORT_BUFFER_COUNT = 200,
     WS_TRANSPORT_BUFFER_SIZE = 0x100,
     WS_TRANSPORT_BROADCAST_POSITION = 0x7f,
-    WS_TRANSPORT_PLAYER_COUNT = 6,
+    WS_TRANSPORT_PLAYER_COUNT = IDX(GAME_PLAYER_COUNT),
     WS_TRANSPORT_PORT = 2000,
     WS_TRANSPORT_SEND_RETRY_DELAY = 300,
     WS_TRANSPORT_HOST_RETRY_DELAY = 3000,
