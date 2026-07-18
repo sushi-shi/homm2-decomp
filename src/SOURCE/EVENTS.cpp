@@ -5900,7 +5900,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
         creaturePurchase:
             if (cell->m_objectMetadata != 0) {
                 gpPhilAI->EvaluateOneTimeCreaturePurchase(
-                    IDX(creatureType_i),
+                    creatureType_i,
                     cell->m_objectMetadata,
                     creatureFlag_l,
                     eventResults[2],
@@ -6593,7 +6593,7 @@ void advManager::RecruitSiteAIEvent(mapCell* cell, hero* eventHero) {
 
     if (availableCount1 != 0) {
         gpPhilAI->EvaluateOneTimeCreaturePurchase(
-            IDX(creatureType13),
+            creatureType13,
             availableCount1,
             0,
             purchaseCount17,
@@ -6995,7 +6995,7 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
         && monsterType != CREATURE_FIRE_ELEMENTAL && monsterType != CREATURE_WATER_ELEMENTAL) {
         if (forcedJoin) {
             gpPhilAI->EvaluateOneTimeCreaturePurchase(
-                IDX(monsterType),
+                monsterType,
                 monsterCount[0],
                 1,
                 purchaseCount,
@@ -7032,7 +7032,7 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
                     goto fightComputerMonsters;
                 }
                 gpPhilAI->EvaluateOneTimeCreaturePurchase(
-                    IDX(monsterType),
+                    monsterType,
                     monsterCount[0],
                     1,
                     purchaseCount,
