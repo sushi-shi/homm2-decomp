@@ -3779,7 +3779,7 @@ i32 philAI::QuickCombat(
                 && victoriousHero4->HasSpell(SpellType(armyIndex0)) == 0
                 && gsSpellInfo[armyIndex0].level
                        <= victoriousHero4->m_secondarySkills[IDX(HERO_SKILL_EAGLE_EYE)] + 1
-                && (gsSpellInfo[armyIndex0].attributes & IDX(AI_QUICK_COMBAT_LEARNABLE_SPELL))) {
+                && HAS(gsSpellInfo[armyIndex0].attributes, SPELL_INFO_ATTRIBUTE_COMBAT)) {
                 victoriousHero4->m_spells[armyIndex0] = 1;
                 break;
             }
@@ -4027,7 +4027,7 @@ void philAI::HeroInteractionAtTown(hero* heroPtr, town* townPtr, i32 doInteracti
             for (spellIndex = 0; spellIndex < townPtr->m_spellCounts[spellLevel14 - 1];
                  spellIndex++) {
                 if (!heroPtr->HasSpell(SpellType(townPtr->m_spells[spellLevel14 - 1][spellIndex]))) {
-                    if (gsSpellInfo[townPtr->m_spells[spellLevel14 - 1][spellIndex]].attributes & 1)
+                    if (HAS(gsSpellInfo[townPtr->m_spells[spellLevel14 - 1][spellIndex]].attributes, SPELL_INFO_ATTRIBUTE_POWER))
                         spellMultiplier1 = heroPtr->Stats(HeroPrimaryStat(3));
                     else
                         spellMultiplier1 = 1;
@@ -5996,12 +5996,12 @@ i32 philAI::EvaluateArtifactEvent(ArtifactType artifact, i32 eventData) {
             case IDX(AI_ARTIFACT_EVENT_NO_VALUE):
                 break;
             case IDX(AI_ARTIFACT_EVENT_PAY_GOLD):
-                result5 = NetValueOfArtifact(IDX(artifact), IDX(AI_ARTIFACT_EVENT_GOLD_COST), 0, 0);
+                result5 = NetValueOfArtifact(IDX(artifact), AI_ARTIFACT_EVENT_GOLD_COST, 0, 0);
                 break;
             case IDX(AI_ARTIFACT_EVENT_PAY_RESOURCE_THREE):
                 result5 = NetValueOfArtifact(
                     IDX(artifact),
-                    IDX(AI_ARTIFACT_EVENT_RESOURCE_THREE_COST),
+                    AI_ARTIFACT_EVENT_RESOURCE_THREE_COST,
                     (eventData & IDX(AI_ARTIFACT_EVENT_RESOURCE_MASK))
                         >> IDX(AI_ARTIFACT_EVENT_RESOURCE_SHIFT),
                     IDX(AI_ARTIFACT_EVENT_RESOURCE_THREE_AMOUNT)
@@ -6010,7 +6010,7 @@ i32 philAI::EvaluateArtifactEvent(ArtifactType artifact, i32 eventData) {
             case IDX(AI_ARTIFACT_EVENT_PAY_RESOURCE_FIVE):
                 result5 = NetValueOfArtifact(
                     IDX(artifact),
-                    IDX(AI_ARTIFACT_EVENT_RESOURCE_FIVE_COST),
+                    AI_ARTIFACT_EVENT_RESOURCE_FIVE_COST,
                     (eventData & IDX(AI_ARTIFACT_EVENT_RESOURCE_MASK))
                         >> IDX(AI_ARTIFACT_EVENT_RESOURCE_SHIFT),
                     IDX(AI_ARTIFACT_EVENT_RESOURCE_FIVE_AMOUNT)
