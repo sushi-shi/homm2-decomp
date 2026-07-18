@@ -3461,9 +3461,9 @@ i32 philAI::FightValueOfStack(
             for (armySlotRecord = 0; armySlotRecord < 46; armySlotRecord++) {
                 if (heroPtr->HasSpell(SpellType(armySlotRecord))) {
                     spellScoreTotal = gsSpellInfo[armySlotRecord].aiValue;
-                    if (gsSpellInfo[armySlotRecord].attributes & 8)
+                    if (HAS(gsSpellInfo[armySlotRecord].attributes, SPELL_INFO_ATTRIBUTE_DURATION))
                         spellScoreTotal = static_cast<i32>(spellScoreTotal * durationModifier7);
-                    else if (gsSpellInfo[armySlotRecord].attributes & 1)
+                    else if (HAS(gsSpellInfo[armySlotRecord].attributes, SPELL_INFO_ATTRIBUTE_POWER))
                         spellScoreTotal = static_cast<i32>(spellScoreTotal * spellPowerModifier);
                     numSpellCastsValue =
                         heroPtr->m_spellPoints / GetManaCost(SpellType(armySlotRecord), heroPtr);
@@ -5390,7 +5390,7 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                 creatureFlag_k = 0;
             creature_purchase:
                 EvaluateOneTimeCreaturePurchase(
-                    IDX(creature),
+                    creature,
                     cell_k->m_objectMetadata,
                     creatureFlag_k,
                     purchaseCost_j,
@@ -5828,7 +5828,7 @@ i32 philAI::EvaluateRecruitSite(mapCell* cell) {
             nb = IDX(CREATURE_WATER_ELEMENTAL);
             break;
     }
-    EvaluateOneTimeCreaturePurchase(nb, lvl, 0, idx, val, kn);
+    EvaluateOneTimeCreaturePurchase(CreatureType(nb), lvl, 0, idx, val, kn);
     gbReduceByReload = false;
     return val;
 }
@@ -6167,7 +6167,7 @@ i32 philAI::EvaluateMonsterEvent(CreatureType monsterType, i32 eventData, i32* l
         outcomeValue0
     );
     EvaluateOneTimeCreaturePurchase(
-        IDX(monsterType),
+        monsterType,
         monsterCount4,
         1,
         purchaseCost9,
