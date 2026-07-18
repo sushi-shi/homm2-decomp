@@ -93,6 +93,7 @@ Current measurements use the archive.org-verified LINK 3.00.5270 component and
 its sibling CVPACK/CVTRES/MSPDB40 tools and `LIBCMT.LIB`. The disposable
 final-link objects remove source-only `dllexport` directives, and an explicit
 module definition restores only retail's `AppAbout` and `AppWndProc` exports plus
-the `Heroes of Might and Magic 2` description. The resulting `.edata` is the
-retail `0x5d` bytes at `.rdata+0xc40`. See `compiler-detection.md` and
+the `Heroes of Might and Magic 2` description. The resulting `.edata` has the
+retail `0x5d` span at `.rdata+0xc40`; its function RVAs remain displaced with
+`.text`. See `compiler-detection.md` and
 `toolchain-vc42.md` for hashes and reproduction.
