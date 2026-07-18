@@ -407,7 +407,7 @@ void combatManager::Close(void) {
         memcpy(gpBufferPalette->m_data, m_savedPalette, COMBAT_PALETTE_DATA_SIZE);
     }
     gpWindowManager->FadeScreen(1, 8, 0);
-    giCycleType = WindowColorCycleMode(0);
+    giCycleType = WINDOW_COLOR_CYCLE_DEFAULT;
     CycleColors(0);
     delete m_combatBuffer;
     delete m_backgroundBuffer;
@@ -539,7 +539,7 @@ void combatManager::GenerateMap(void) {
 VA(0x004919a6, 0x224)
 char* combatManager::GetBackgroundName(void) {
     i32 backgroundIndex;
-    m_colorCycleType = 1;
+    m_colorCycleType = WINDOW_COLOR_CYCLE_COMBAT;
     m_battlefieldFringe = -1;
     switch (m_terrainType) {
         case IDX(TERRAIN_WATER):
@@ -556,7 +556,7 @@ char* combatManager::GetBackgroundName(void) {
             }
             break;
         case IDX(TERRAIN_SNOW):
-            m_colorCycleType = 3;
+            m_colorCycleType = WINDOW_COLOR_CYCLE_COMBAT_ALTERNATE;
             if (MoreTreesNear()) {
                 backgroundIndex = 4;
                 m_battlefieldFringe = 6;
@@ -574,7 +574,7 @@ char* combatManager::GetBackgroundName(void) {
             m_battlefieldFringe = 5;
             break;
         case IDX(TERRAIN_DESERT):
-            m_colorCycleType = 3;
+            m_colorCycleType = WINDOW_COLOR_CYCLE_COMBAT_ALTERNATE;
             backgroundIndex = 10;
             m_battlefieldFringe = 4;
             break;
@@ -588,12 +588,12 @@ char* combatManager::GetBackgroundName(void) {
             }
             break;
         case IDX(TERRAIN_WASTELAND):
-            m_colorCycleType = 3;
+            m_colorCycleType = WINDOW_COLOR_CYCLE_COMBAT_ALTERNATE;
             backgroundIndex = 14;
             m_battlefieldFringe = 3;
             break;
         case IDX(TERRAIN_BEACH):
-            m_colorCycleType = 3;
+            m_colorCycleType = WINDOW_COLOR_CYCLE_COMBAT_ALTERNATE;
             backgroundIndex = 16;
             m_battlefieldFringe = 2;
             break;
