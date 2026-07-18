@@ -33,7 +33,7 @@ void SetupRecruitWin(
     class heroWindow* window,
     i32 creatureType,
     i32 goldCost,
-    i32 resourceType,
+    ResourceType resourceType,
     i32 resourceCost,
     i32 available
 ) {
@@ -73,7 +73,7 @@ void SetupRecruitWin(
     if (resourceType != RECRUIT_NO_RESOURCE) {
         message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
         message.payload.widget.id = RECRUIT_RESOURCE_ICON_CONTROL;
-        message.payload.widget.data.value = resourceType;
+        message.payload.widget.data.value = IDX(resourceType);
         window->BroadcastMessage(message);
         message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
         message.payload.widget.id = RECRUIT_RESOURCE_IMAGE_CONTROL;
@@ -120,7 +120,7 @@ i32 recruitUnit::Open(i32 priority) {
 
     goldMaximum = gpCurPlayer->m_resources[RECRUIT_GOLD_RESOURCE] / m_goldCost;
     if (m_resourceType != RECRUIT_NO_RESOURCE) {
-        resourceMaximum = gpCurPlayer->m_resources[m_resourceType] / m_resourceCost;
+        resourceMaximum = gpCurPlayer->m_resources[IDX(m_resourceType)] / m_resourceCost;
         m_maximum = goldMaximum < resourceMaximum ? goldMaximum : resourceMaximum;
     } else
         m_maximum = goldMaximum;
@@ -307,7 +307,8 @@ i32 recruitUnit::Main(struct tag_message& message) {
                         }
                         gpCurPlayer->m_resources[RECRUIT_GOLD_RESOURCE] -= m_quantity * m_goldCost;
                         if (m_resourceType != RECRUIT_NO_RESOURCE) {
-                            gpCurPlayer->m_resources[m_resourceType] -= m_quantity * m_resourceCost;
+                            gpCurPlayer->m_resources[IDX(m_resourceType)] -=
+                                m_quantity * m_resourceCost;
                         }
                         *m_available -= m_quantity;
                         m_recruited = 1;
@@ -343,8 +344,8 @@ recruitUnit::recruitUnit(class armyGroup* army, i32 creatureType, i16* available
             break;
     }
     if (resource < RECRUIT_RESOURCE_COUNT) {
-        m_resourceType = resource;
-        m_resourceCost = costs[m_resourceType];
+        m_resourceType = ResourceType(resource);
+        m_resourceCost = costs[IDX(m_resourceType)];
     } else {
         m_resourceType = RECRUIT_NO_RESOURCE;
         m_resourceCost = 0;
@@ -368,8 +369,8 @@ recruitUnit::recruitUnit(class town* townData, i32 dwelling, i32 refreshTown) {
             break;
     }
     if (resource < RECRUIT_RESOURCE_COUNT) {
-        m_resourceType = resource;
-        m_resourceCost = costs[m_resourceType];
+        m_resourceType = ResourceType(resource);
+        m_resourceCost = costs[IDX(m_resourceType)];
     } else {
         m_resourceType = RECRUIT_NO_RESOURCE;
         m_resourceCost = 0;
@@ -384,7 +385,7 @@ VA(0x0048bee5, 0x14f)
 void QuickViewRecruit(class town* townData, i32 dwelling) {
     i32 costs[RECRUIT_RESOURCE_COUNT + 1];
     i32 goldCost;
-    i32 resourceType;
+    ResourceType resourceType;
     i32 creatureType;
     i32 resourceCost;
     heroWindow* window;
@@ -400,7 +401,7 @@ void QuickViewRecruit(class town* townData, i32 dwelling) {
             break;
     }
     if (resource < RECRUIT_RESOURCE_COUNT) {
-        resourceType = resource;
+        resourceType = ResourceType(resource);
         resourceCost = costs[resource];
     } else {
         resourceType = RECRUIT_NO_RESOURCE;
