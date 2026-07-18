@@ -2264,9 +2264,9 @@ void army::PowEffect(i32 effect, i32 resetLimits, i32 effectX, i32 effectY) {
                             < current->m_frameInfo
                                   .animationFrameCount[IDX(current->m_animationSequence)]) {
                             current->m_animationFrame++;
-                        } else if (current->m_animationSequence != IDX(current->m_effectAnimationEnd)
+                        } else if (IDX(current->m_animationSequence) != current->m_effectAnimationEnd
                                    && current->m_effectAnimationEnd != -1) {
-                            current->m_animationSequence = current->m_effectAnimationEnd;
+                            current->m_animationSequence = ArmyAnimationSequence(current->m_effectAnimationEnd);
                             current->m_animationFrame = 0;
                         } else {
                             if (current->m_animationSequence != ARMY_ANIMATION_STAND
@@ -2325,7 +2325,7 @@ void army::PowEffect(i32 effect, i32 resetLimits, i32 effectX, i32 effectY) {
         for (side_4 = 0; side_4 < ARMY_COMBAT_SIDE_COUNT; side_4++) {
             for (index_10 = 0; index_10 < gpCombatManager->m_armyCount[side_4]; index_10++) {
                 current = &gpCombatManager->m_armies[side_4][index_10];
-                if (current->m_animationSequence == 14 || IDX(current->m_animationSequence) == 16
+                if (current->m_animationSequence == ARMY_ANIMATION_WINCE || IDX(current->m_animationSequence) == 16
                     || current->m_animationSequence == 20 || IDX(current->m_animationSequence) == 24
                     || current->m_animationSequence == 18 || IDX(current->m_animationSequence) == 22
                     || current->m_animationSequence == 26 || IDX(current->m_animationSequence) == 28
