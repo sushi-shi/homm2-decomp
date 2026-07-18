@@ -2363,10 +2363,9 @@ void philAI::ValueOfBuyingCreature(
                  visitingArmySlot++) {
                 if (visitingHeroCandidate->m_army.m_creatureTypes[visitingArmySlot]
                         != AI_TROOP_EMPTY_SLOT
-                    && (IDX(gMonsterDatabase)[visitingHeroCandidate->m_army
-                                             .m_creatureTypes[visitingArmySlot]]
-                            .attributes
-                        & MONSTER_ATTRIBUTE_RANGED)) {
+                    && HAS(gMonsterDatabase[visitingHeroCandidate->m_army.m_creatureTypes[visitingArmySlot]]
+                               .attributes,
+                           MONSTER_ATTRIBUTE_RANGED)) {
                     missileStacks++;
                 }
             }
