@@ -28,6 +28,13 @@ to the retained `1.5f` allocation. The synthesized delinked target is not an
 original retail object and cannot override the shipping operand or establish that
 retail emitted an additional dead slot.
 
+The same rule applies to identical zero-fill owners. `BASE/iconf2by` has 18 distinct
+four-byte private BSS objects with identical payloads. Candidate section-order
+translation produced a closed allocation group but attached the semantic names to
+the wrong retail addresses, making 66 valid candidate references appear novel.
+Repeated retail setup and decoder operands determine the full owner permutation;
+those code-edge placements, not section order, are the reviewed identities.
+
 Linker-sorted `.CRT$...` subsections do not participate in ordinary `.data` cursor replay. The
 mapper assigns one only when the same owner has exactly one physical retail contribution with the
 same writable domain and size, then removes that contribution from ordinary replay. A missing or
