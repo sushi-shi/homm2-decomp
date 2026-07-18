@@ -349,7 +349,7 @@ soundManager::soundManager(void) : baseManager(), field_0x574(1) {
     field_0x56c = 0;
     for (local_8 = 0; local_8 < 32; local_8++)
         iLastVolume[local_8] = 0;
-    memset(&m_ready, 0, SOUND_STATE_RESET_SPAN);
+    memset(&m_ready, 0, IDX(SOUND_STATE_RESET_SPAN));
     m_samplesReady = 0;
     m_digitalDriver = 0;
     field_0x3a = 0;
@@ -493,7 +493,7 @@ i32 soundManager::Open(i32) {
     }
 
     m_samplesReady = 1;
-    memset(&m_ready, 0, SOUND_STATE_RESET_SPAN);
+    memset(&m_ready, 0, IDX(SOUND_STATE_RESET_SPAN));
     if (gbDontTryDigital == 0 && m_digitalDriver == 0)
         m_digitalDriver = WAVE_init_driver(22050, 8, 1, 0);
     if (m_digitalDriver == 0) {
@@ -643,13 +643,13 @@ void soundManager::ModifySample(struct _SAMPLE* sampleHandle, i16 operation, i32
     switch (operation) {
         case IDX(SOUND_SAMPLE_OPERATION_VOLUME):
         case IDX(SOUND_SAMPLE_OPERATION_EFFECT_VOLUME):
-            AIL_set_sample_volume(sampleHandle, ConvertVolume(value, IDX(SOUND_VOLUME_EFFECT)));
+            AIL_set_sample_volume(sampleHandle, ConvertVolume(value, SOUND_VOLUME_EFFECT));
             if (foundChannel >= 0)
                 iLastVolume[foundChannel] = static_cast<i16>(value);
             break;
         case IDX(SOUND_SAMPLE_OPERATION_MUSIC_VOLUME):
             H2_ASSERT(gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI, RETAIL_FILE, 1327);
-            AIL_set_sample_volume(sampleHandle, ConvertVolume(value, IDX(SOUND_VOLUME_MUSIC)));
+            AIL_set_sample_volume(sampleHandle, ConvertVolume(value, SOUND_VOLUME_MUSIC));
             if (foundChannel >= 0)
                 iLastVolume[foundChannel] = static_cast<i16>(value);
             break;
@@ -763,7 +763,7 @@ void soundManager::SetMusicQuality(i32 musicSource) {
         MIDIStop();
     }
     memset(m_savedTrackPositions, 0, 240);
-    gConfig.musicSource = musicSource;
+    gConfig.musicSource = ConfigMusicSource(musicSource);
     if (local_8 >= 0)
         PlayAmbientMusic(local_8, 0, -1);
 }
@@ -939,7 +939,7 @@ struct _SAMPLE* soundManager::MemorySample(class sample* sampleResource) {
     AIL_set_sample_loop_count(smp, playbackData->loopCount);
     AIL_set_sample_address(smp, playbackData->data, playbackData->size);
     if (gConfig.soundVolume != 0)
-        AIL_set_sample_volume(smp, ConvertVolume(playbackData->volume, IDX(SOUND_VOLUME_EFFECT)));
+        AIL_set_sample_volume(smp, ConvertVolume(playbackData->volume, SOUND_VOLUME_EFFECT));
     else
         AIL_set_sample_volume(smp, 0);
     AIL_start_sample(smp);
