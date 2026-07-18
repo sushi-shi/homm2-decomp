@@ -770,7 +770,8 @@ i32 ViewWorldDialogHandler(struct tag_message& message) {
                     case EVENT_WINDOW_SIXTH_BUTTON:
                         gpWindowManager->m_dialogResult = message.payload.widget.id;
                         message.payload.widget.id = VIEW_WORLD_DIALOG_CLOSE;
-                        message.payload.widget.command = message.payload.widget.id;
+                        message.payload.widget.command =
+                            BaseWidgetCommand(message.payload.widget.id);
                         return 2;
                     default:
                         break;

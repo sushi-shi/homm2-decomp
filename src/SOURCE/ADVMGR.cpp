@@ -705,7 +705,7 @@ i32 advManager::Main(struct tag_message& message) {
     }
     if (gbGameOver) {
         message.type = MESSAGE_EXECUTIVE;
-        message.payload.executive.command = IDX(EXECUTIVE_COMMAND_TERMINATE_LOOP);
+        message.payload.executive.command = EXECUTIVE_COMMAND_TERMINATE_LOOP;
         return 2;
     }
 
@@ -1136,7 +1136,7 @@ finish_message:
     }
     if (gbGameOver || exitRequestedFlag == 1 || giMenuCommand != -1) {
         message.type = MESSAGE_EXECUTIVE;
-        message.payload.executive.command = IDX(EXECUTIVE_COMMAND_TERMINATE_LOOP);
+        message.payload.executive.command = EXECUTIVE_COMMAND_TERMINATE_LOOP;
         return 2;
     }
     return processResult;
@@ -6563,7 +6563,7 @@ i32 DimensionDoorHandler(tag_message& message) {
 
     if (handled) {
         message.payload.widget.id = ADVMGR_DIMENSION_DOOR_FIRST_BUTTON;
-        message.payload.widget.command = message.payload.widget.id;
+        message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
         return ADVMGR_DIMENSION_DOOR_HANDLED;
     }
     return ADVMGR_DIMENSION_DOOR_UNHANDLED;
@@ -7506,7 +7506,8 @@ i32 TownPortalHandler(tag_message& message) {
                         giTownPortalChoice = choiceMessage.payload.widget.data.value;
                         gpWindowManager->m_dialogResult = message.payload.widget.id;
                         message.payload.widget.id = ADVMGR_TOWN_PORTAL_CLOSE_COMMAND;
-                        message.payload.widget.command = message.payload.widget.id;
+                        message.payload.widget.command =
+                            BaseWidgetCommand(message.payload.widget.id);
                         return ADVMGR_TOWN_PORTAL_HANDLED;
                     default:
                         break;
@@ -7955,7 +7956,7 @@ void advManager::ShowRoute(i32 redraw, i32, i32 updateButton) {
             buttonFrame = routeReachable8 ? ADVMGR_BUTTON_DISABLE : ADVMGR_BUTTON_ENABLE;
             gpWindowManager->BroadcastMessage(
                 ADVMGR_BUTTON_MESSAGE,
-                buttonFrame,
+                BaseWidgetCommand(buttonFrame),
                 ADVMGR_BUTTON_TARGET,
                 ADVMGR_BUTTON_BROADCAST_FLAGS
             );
@@ -8026,7 +8027,7 @@ void advManager::CheckDimNextHeroBut(void) {
     }
     gpWindowManager->BroadcastMessage(
         ADVMGR_BUTTON_MESSAGE,
-        frame,
+        BaseWidgetCommand(frame),
         ADVMGR_BUTTON_BROADCAST_ARG,
         ADVMGR_BUTTON_BROADCAST_FLAGS
     );
@@ -8406,7 +8407,7 @@ i32 advManager::CheckHandleNetPlayerWait(struct tag_message& message, i32 doMain
             case ADVMGR_REMOTE_WAIT_EXIT_COMMAND:
                 if (message.payload.widget.parameter & ADVMGR_REMOTE_WAIT_EXIT_MODIFIER_MASK) {
                     message.type = ADVMGR_REMOTE_WAIT_EXIT_MESSAGE;
-                    message.payload.widget.command = 1;
+                    message.payload.executive.command = EXECUTIVE_COMMAND_TERMINATE_LOOP;
                     return ADVMGR_REMOTE_WAIT_EXIT_RESULT;
                 }
 
@@ -9028,7 +9029,7 @@ i32 APanelHandler(tag_message& message) {
     if (handled) {
         gpWindowManager->m_dialogResult = message.payload.widget.id;
         message.payload.widget.id = WIDGET_COMMAND_DIALOG_SELECT;
-        message.payload.widget.command = message.payload.widget.id;
+        message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
         return ADVMGR_DIMENSION_DOOR_HANDLED;
     }
     return ADVMGR_DIMENSION_DOOR_UNHANDLED;
@@ -9177,7 +9178,7 @@ i32 CPanelHandler(tag_message& message) {
     if (handled) {
         gpWindowManager->m_dialogResult = message.payload.widget.id;
         message.payload.widget.id = WIDGET_COMMAND_DIALOG_SELECT;
-        message.payload.widget.command = message.payload.widget.id;
+        message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
         return ADVMGR_DIMENSION_DOOR_HANDLED;
     }
     return ADVMGR_DIMENSION_DOOR_UNHANDLED;
@@ -9583,7 +9584,7 @@ i32 SystemOptionsHandler(struct tag_message& message) {
     if (accepted) {
         gpWindowManager->m_dialogResult = message.payload.widget.id;
         message.payload.widget.id = EncodeAdventureSystemOption(ADVMGR_SYSTEM_OPTION_FIRST);
-        message.payload.widget.command = message.payload.widget.id;
+        message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
         return ADVMGR_SYSTEM_OPTIONS_HANDLED;
     }
     return ADVMGR_SYSTEM_OPTIONS_UNHANDLED;

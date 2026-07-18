@@ -36,11 +36,6 @@ H2_ENUM_BEGIN(CastleControl)
 H2_ENUM_END(CastleControl)
 
 H2_ENUM_BEGIN(CastleWidgetCommand)
-    CASTLE_WIDGET_TEXT = 3,
-    CASTLE_WIDGET_FRAME = 4,
-    CASTLE_WIDGET_ENABLE = 5,
-    CASTLE_WIDGET_DISABLE = 6,
-    CASTLE_WIDGET_ICON_FILE = 9
 H2_ENUM_END(CastleWidgetCommand)
 
 H2_ENUM_BEGIN(CastleWidgetFrame)

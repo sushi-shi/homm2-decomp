@@ -356,7 +356,7 @@ i32 heroWindowManager::ConvertToHover(struct tag_message& msg) {
 // baseManager alias were byte-identical. Revisit after a genuine combined-TU
 // change; this is not a proven wall.
 VA(0x004cac40, 0x35)
-i32 heroWindowManager::BroadcastMessage(MessageType type, i32 p2, i32 p3, i32 p4) {
+i32 heroWindowManager::BroadcastMessage(MessageType type, BaseWidgetCommand p2, i32 p3, i32 p4) {
     tag_message msg;
     msg.type = type;
     msg.payload.widget.command = p2;

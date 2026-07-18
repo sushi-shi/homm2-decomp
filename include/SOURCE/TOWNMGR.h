@@ -20,9 +20,6 @@ struct SBuildingInfo {
 SIZE(SBuildingInfo, 9);
 
 H2_ENUM_BEGIN(TownManagerInputCode)
-    TOWN_WIDGET_SET_TEXT = 3,
-    TOWN_WIDGET_DISABLE = 5,
-    TOWN_WIDGET_ENABLE = 6,
     TOWN_INPUT_SELECT = 12,
     TOWN_INPUT_DESELECT = 13,
     TOWN_INPUT_ALTERNATE_SELECT = 14,

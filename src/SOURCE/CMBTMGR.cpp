@@ -2331,7 +2331,7 @@ i32 CombatSystemOptionsHandler(tag_message& message) {
     if (bDone) {
         gpWindowManager->m_dialogResult = message.payload.widget.id;
         message.payload.widget.id = COMBAT_SYSTEM_OPTION_SPEED_BUTTON;
-        message.payload.widget.command = message.payload.widget.id;
+        message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
         return COMBAT_SYSTEM_OPTION_HANDLER_CLOSE;
     }
     return COMBAT_SYSTEM_OPTION_HANDLER_CONTINUE;
