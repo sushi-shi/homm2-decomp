@@ -2385,8 +2385,8 @@ void philAI::ValueOfBuyingCreature(
         for (garrisonSlot = 0; garrisonSlot < AI_CREATURE_PURCHASE_ARMY_SLOT_COUNT;
              garrisonSlot++) {
             if (townPtr->m_army.m_creatureTypes[garrisonSlot] != AI_TROOP_EMPTY_SLOT
-                && (IDX(gMonsterDatabase)[townPtr->m_army.m_creatureTypes[garrisonSlot]].attributes
-                    & MONSTER_ATTRIBUTE_RANGED)) {
+                && HAS(gMonsterDatabase[townPtr->m_army.m_creatureTypes[garrisonSlot]].attributes,
+                       MONSTER_ATTRIBUTE_RANGED)) {
                 missileStacks++;
             }
         }
