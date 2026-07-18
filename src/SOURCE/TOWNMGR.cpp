@@ -2818,7 +2818,7 @@ void townManager::SetupWell(heroWindow* window) {
         messaged.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
         messaged.payload.widget.id = dwellingResult + 1;
         messaged.payload.widget.data.value =
-            BuildingSlotType(dwellingTypesValue[dwellingResult] + IDX(TOWN_COMMAND_FIRST_DWELLING));
+            dwellingTypesValue[dwellingResult] + IDX(TOWN_COMMAND_FIRST_DWELLING);
         window->BroadcastMessage(messaged);
         sprintf(
             gText,
@@ -2837,7 +2837,7 @@ void townManager::SetupWell(heroWindow* window) {
         sprintf(
             gText,
             GetBuildingName(
-                m_town->m_type,
+                FactionType(m_town->m_type),
                 BuildingSlotType(
                     dwellingTypesValue[dwellingResult] + IDX(TOWN_COMMAND_FIRST_DWELLING)
                 )
@@ -2848,9 +2848,7 @@ void townManager::SetupWell(heroWindow* window) {
         window->BroadcastMessage(messaged);
 
         if (m_town->m_buildings
-            & (1L << (BuildingSlotType(
-                   dwellingTypesValue[dwellingResult] + IDX(TOWN_COMMAND_FIRST_DWELLING)
-               )))) {
+            & (1L << (dwellingTypesValue[dwellingResult] + IDX(TOWN_COMMAND_FIRST_DWELLING)))) {
             availablen = m_town->m_garrison[dwellingTypesValue[dwellingResult]];
             sprintf(gText, "Available:");
             messaged.payload.widget.id = dwellingResult + TOWN_WELL_FIRST_AVAILABLE_CONTROL;
@@ -2891,9 +2889,7 @@ void townManager::SetupWell(heroWindow* window) {
         sprintf(detailTextf, cWellDetail[7], speedText[monsterInfoi.speed]);
         strcat(gText, detailTextf);
         if (m_town->m_buildings
-            & (1L << (BuildingSlotType(
-                   dwellingTypesValue[dwellingResult] + IDX(TOWN_COMMAND_FIRST_DWELLING)
-               )))) {
+            & (1L << (dwellingTypesValue[dwellingResult] + IDX(TOWN_COMMAND_FIRST_DWELLING)))) {
             growthd =
                 gMonsterDatabase[gDwellingType[m_town->m_type][dwellingTypesValue[dwellingResult]]]
                     .growth;

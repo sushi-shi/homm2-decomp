@@ -76,7 +76,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
         }
     }
 
-    if (!forceUpdate && giOverviewType == IDX(iLastDynamicType)
+    if (!forceUpdate && giOverviewType == iLastDynamicType
         && giOverviewTop[IDX(iLastDynamicType)] == iLastDynamicTop) {
         return;
     }
@@ -881,7 +881,7 @@ void game::Overview(void) {
     message8.payload.widget.data.text = gText;
     sprintf(gText, "%d", ComputeDailyGold(giCurPlayer));
     overWin->BroadcastMessage(message8);
-    SetupNewOverviewType(IDX(giOverviewType), 0);
+    SetupNewOverviewType(giOverviewType, 0);
     gpWindowManager->DoDialog(overWin, OverviewHandler, 1);
     gpWindowManager->FadeScreen(1, OVERVIEW_FADE_STEPS, 0);
     delete overWin;
@@ -1036,7 +1036,7 @@ i32 OverviewHandler(struct tag_message& message) {
                         }
                     selectHeroes:
                         if (giOverviewType != OVERVIEW_HEROES) {
-                            gpGame->SetupNewOverviewType(IDX(OVERVIEW_HEROES), 1);
+                            gpGame->SetupNewOverviewType(OVERVIEW_HEROES, 1);
                         }
                         break;
                     case OVERVIEW_TOWN_TAB_WIDGET:
@@ -1045,7 +1045,7 @@ i32 OverviewHandler(struct tag_message& message) {
                         }
                     selectTowns:
                         if (giOverviewType != OVERVIEW_TOWNS) {
-                            gpGame->SetupNewOverviewType(IDX(OVERVIEW_TOWNS), 1);
+                            gpGame->SetupNewOverviewType(OVERVIEW_TOWNS, 1);
                         }
                         break;
                     default:
