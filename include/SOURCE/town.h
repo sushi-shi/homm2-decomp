@@ -41,6 +41,7 @@ H2_ENUM_CLASS_END(TownBuilding)
 H2_ENUM_FLAGS(TownBuilding)
 
 H2_ENUM_BEGIN(TownConstant)
+    TOWN_GARRISON_SLOT_COUNT = 12, // slots 19..30: dwellings + upgrades (see BuildingSlotType)
     TOWN_OWNER_NONE = -1,
     TOWN_ID_NONE = -1,
     TOWN_OCCUPYING_HERO_NONE = -1,
@@ -68,25 +69,25 @@ class town {
 public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
-    char m_id;                  // +0x00
-    char m_owner;               // +0x01
-    i8 m_threat;                // +0x02
-    char m_type;                // +0x03
-    u8 m_x;                     // +0x04
-    u8 m_y;                     // +0x05
-    u8 m_boatX;                 // +0x06
-    u8 m_boatY;                 // +0x07
-    armyGroup m_army;           // +0x08
-    char m_occupyingHeroId;     // +0x17
-    u32l m_buildings;           // +0x18
-    i8 m_buildState;            // +0x1c
-    char m_unknown1d;           // +0x1d zero-initialized only, never read
-    i16 m_garrison[12];         // +0x1e
-    u8 m_onMap;                 // +0x36
-    i8 m_mayNotUpgradeToCastle; // +0x37
-    i8 m_formation;             // +0x38
-    i8 m_originalOwner;         // +0x39
-    u16 m_extraIndex;           // +0x3a
+    char m_id;                                     // +0x00
+    char m_owner;                                  // +0x01
+    i8 m_threat;                                   // +0x02
+    char m_type;                                   // +0x03
+    u8 m_x;                                        // +0x04
+    u8 m_y;                                        // +0x05
+    u8 m_boatX;                                    // +0x06
+    u8 m_boatY;                                    // +0x07
+    armyGroup m_army;                              // +0x08
+    char m_occupyingHeroId;                        // +0x17
+    u32l m_buildings;                              // +0x18
+    i8 m_buildState;                               // +0x1c
+    char m_unknown1d;                              // +0x1d zero-initialized only, never read
+    i16 m_garrison[IDX(TOWN_GARRISON_SLOT_COUNT)]; // +0x1e
+    u8 m_onMap;                                    // +0x36
+    i8 m_mayNotUpgradeToCastle;                    // +0x37
+    i8 m_formation;                                // +0x38
+    i8 m_originalOwner;                            // +0x39
+    u16 m_extraIndex;                              // +0x3a
     union {
         i8 m_spells[TOWN_MAGE_GUILD_LEVEL_COUNT][TOWN_MAGE_GUILD_SPELLS_PER_LEVEL]; // +0x3c
         i8 m_spellSlots[TOWN_MAGE_GUILD_LEVEL_COUNT * TOWN_MAGE_GUILD_SPELLS_PER_LEVEL];
