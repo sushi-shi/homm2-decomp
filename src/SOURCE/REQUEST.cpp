@@ -229,7 +229,7 @@ VA(0x0048d252, 0x16e)
 fileRequester::fileRequester(
     i32 x,
     i32 y,
-    i32 mode,
+    FileRequesterMode mode,
     char* pattern,
     char* directory,
     char* defaultExtension
@@ -244,9 +244,9 @@ fileRequester::fileRequester(
     m_mapHeaders = 0;
     m_x = x;
     m_y = y;
-    m_mode = static_cast<FileRequesterMode>(mode);
+    m_mode = mode;
     strcpy(m_defaultExtension, defaultExtension);
-    if (mode == IDX(FILE_REQUESTER_MAP_GAME) || mode == IDX(FILE_REQUESTER_MAP)) {
+    if (mode == FILE_REQUESTER_MAP_GAME || mode == FILE_REQUESTER_MAP) {
         fGutterTravelLength = 123.0f;
         fGutterMinY = 73.0f;
         iMaxListSize = 9;
