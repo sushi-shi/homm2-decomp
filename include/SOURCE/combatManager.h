@@ -85,7 +85,8 @@ H2_ENUM_CLASS_BEGIN(CombatDrawbridgeState)
     COMBAT_DRAWBRIDGE_RAISE_FRAME_SECOND = 2,
     COMBAT_CASTLE_GATE_HIDDEN = 3, // gate sprite suppressed once the bridge clears this frame
     COMBAT_DRAWBRIDGE_RAISED = 4,
-    COMBAT_CASTLE_GATE_OPEN = COMBAT_DRAWBRIDGE_RAISED // alias: raised bridge reads as open gate in town view
+    COMBAT_CASTLE_GATE_OPEN =
+        COMBAT_DRAWBRIDGE_RAISED // alias: raised bridge reads as open gate in town view
 H2_ENUM_CLASS_END(CombatDrawbridgeState)
 
 H2_ENUM_BEGIN(CombatCastleInteriorRange)
@@ -341,10 +342,6 @@ H2_ENUM_BEGIN(CombatGridConstant)
     COMBAT_SMALL_VIEW_NEUTRAL_LUCK_X = 50,
     COMBAT_ATTACKER_SIDE = 0,
     COMBAT_DEFENDER_SIDE = 1,
-    COMBAT_ARMY_FLAG_FLYER = 2,
-    COMBAT_ARMY_FLAG_SHOOTER = 4,
-    COMBAT_ARMY_FLAG_MIRROR_IMAGE = 0x10,
-    COMBAT_ARMY_FLAG_FULL_AI_QUANTITY = 0x80,
     COMBAT_MESSAGE_LINE_SIZE = 120,
     COMBAT_MESSAGE_WRAP_BUFFER_SIZE = 400,
     COMBAT_MESSAGE_LOG_BUFFER_SIZE = 700,
@@ -682,77 +679,77 @@ public:
     i32 m_terrainType;                                      // +0x31de
     i32 m_battlefieldFringe;                                // +0x31e2
     class town* m_originalCombatTown;                       // +0x31e6
-    WindowColorCycleMode m_colorCycleType;                                   // +0x31ea
+    WindowColorCycleMode m_colorCycleType;                  // +0x31ea
     char _pad_0x31ee[0x4];
-    i32 m_debugFormation;                               // +0x31f2
-    class icon* m_combatIcons[COMBAT_FIXED_ICON_COUNT]; // +0x31f6
-    class icon* m_obstacleIcons[8];                     // +0x3232
-    i32 m_obstacleCount;                                // +0x3252
-    i16 m_eagleEyeSpell[2];                             // +0x3256
-    CombatDrawbridgeState m_drawbridgeState;                              // +0x325a
-    i32 m_drawbridgeBackgroundVisible;                  // +0x325e
-    u8 m_wallStates[IDX(COMBAT_WALL_SLOT_COUNT)];                                 // +0x3262
-    class bitmap* m_combatBuffer;                       // +0x326b
-    class bitmap* m_backgroundBuffer;                   // +0x326f
-    class bitmap* m_mouseGridBuffer;                    // +0x3273
-    i32 m_backgroundDrawn;                              // +0x3277
-    class mapCell* m_battlefieldCell;                   // +0x327b
-    class town* m_combatTowns[2];                       // +0x327f
-    class hero* m_heroes[2];                            // +0x3287
-    class hero m_captain;                               // +0x328f
-    i32 m_spellPower[2];                                // +0x3389
-    class armyGroup* m_armyGroups[2];                   // +0x3391
-    i32 m_mouseGridHex;                                 // +0x3399
-    u8 m_heroDeathPending[2];                           // +0x339d
-    u8 m_heroAlternateDeathPending[2];                  // +0x339f
-    u8 m_heroDeathAnimationPlayed[2];                   // +0x33a1
-    u8 m_heroAlternateDeathAnimationPlayed[2];          // +0x33a3
-    i32 m_heroAnimationState[2];                        // +0x33a5
-    i32 m_heroAnimationFrame[2];                        // +0x33ad
-    i32 m_heroSpriteIndex[2];                           // +0x33b5
-    i32l m_heroCycleTimer[2];                           // +0x33bd
-    class icon* m_heroIcons[2];                         // +0x33c5
-    class icon* m_heroOverlayIcons[2];                  // +0x33cd
-    i32 m_heroOverlayFrame[2];                          // +0x33d5
-    struct SLimitData m_heroLimits[2];                  // +0x33dd
-    struct SLimitData m_heroOverlayLimits[2];           // +0x33fd
-    struct SLimitData m_moatLimits[IDX(COMBAT_WALL_SLOT_COUNT)];                  // +0x341d
-    i32l m_previousCombatMessageExpiration;             // +0x34ad
-    i32l m_combatMessageExpiration;                     // +0x34b1
-    i32 m_combatMessagePending;                         // +0x34b5
+    i32 m_debugFormation;                                        // +0x31f2
+    class icon* m_combatIcons[COMBAT_FIXED_ICON_COUNT];          // +0x31f6
+    class icon* m_obstacleIcons[8];                              // +0x3232
+    i32 m_obstacleCount;                                         // +0x3252
+    i16 m_eagleEyeSpell[2];                                      // +0x3256
+    CombatDrawbridgeState m_drawbridgeState;                     // +0x325a
+    i32 m_drawbridgeBackgroundVisible;                           // +0x325e
+    u8 m_wallStates[IDX(COMBAT_WALL_SLOT_COUNT)];                // +0x3262
+    class bitmap* m_combatBuffer;                                // +0x326b
+    class bitmap* m_backgroundBuffer;                            // +0x326f
+    class bitmap* m_mouseGridBuffer;                             // +0x3273
+    i32 m_backgroundDrawn;                                       // +0x3277
+    class mapCell* m_battlefieldCell;                            // +0x327b
+    class town* m_combatTowns[2];                                // +0x327f
+    class hero* m_heroes[2];                                     // +0x3287
+    class hero m_captain;                                        // +0x328f
+    i32 m_spellPower[2];                                         // +0x3389
+    class armyGroup* m_armyGroups[2];                            // +0x3391
+    i32 m_mouseGridHex;                                          // +0x3399
+    u8 m_heroDeathPending[2];                                    // +0x339d
+    u8 m_heroAlternateDeathPending[2];                           // +0x339f
+    u8 m_heroDeathAnimationPlayed[2];                            // +0x33a1
+    u8 m_heroAlternateDeathAnimationPlayed[2];                   // +0x33a3
+    i32 m_heroAnimationState[2];                                 // +0x33a5
+    i32 m_heroAnimationFrame[2];                                 // +0x33ad
+    i32 m_heroSpriteIndex[2];                                    // +0x33b5
+    i32l m_heroCycleTimer[2];                                    // +0x33bd
+    class icon* m_heroIcons[2];                                  // +0x33c5
+    class icon* m_heroOverlayIcons[2];                           // +0x33cd
+    i32 m_heroOverlayFrame[2];                                   // +0x33d5
+    struct SLimitData m_heroLimits[2];                           // +0x33dd
+    struct SLimitData m_heroOverlayLimits[2];                    // +0x33fd
+    struct SLimitData m_moatLimits[IDX(COMBAT_WALL_SLOT_COUNT)]; // +0x341d
+    i32l m_previousCombatMessageExpiration;                      // +0x34ad
+    i32l m_combatMessageExpiration;                              // +0x34b1
+    i32 m_combatMessagePending;                                  // +0x34b5
     char _pad_0x34b9[0x64];
     u8 m_summonedCreatureType
         [2]; // +0x351d per-side elemental type summoned this battle; gates Summon Elemental
-    i32 m_sideDefeated[2];                // +0x351f
-    i32 m_networkArmyPresent[2];          // +0x3527
-    i32 m_playerId[2];                    // +0x352f
-    i32 m_experienceValue[2];             // +0x3537
-    i32 m_heroCastSpell[2];               // +0x353f
-    i32 m_armyCount[2];                   // +0x3547
-    class army m_armies[2][21];           // +0x354f
-    i32 m_currentArmySide;                // +0xf2a3
-    i32 m_currentArmyIndex;               // +0xf2a7
-    i32 m_currentSpeed;                   // +0xf2ab
-    i32 m_currentSide;                    // +0xf2af
-    i32 m_gridSelectionDisabled;          // +0xf2b3
-    i32 m_limitCreature;                  // +0xf2b7
-    i32 m_limitCreatureHex;               // +0xf2bb
-    i32 m_showArmyQuantities;             // +0xf2bf
-    i32 m_selectedHex;                    // +0xf2c3
-    i32 m_directionTargetHex;             // +0xf2c7
-    CombatMessageCommand m_previousCommand;                // +0xf2cb
-    CombatMessageCommand m_currentCommand;                 // +0xf2cf
-    struct SLimitData m_catapultLimits;   // +0xf2d3
-    struct SLimitData m_gateLimits;       // +0xf2e3
-    struct SLimitData m_upperWallLimits;  // +0xf2f3
-    struct SLimitData m_middleWallLimits; // +0xf303
-    i32 m_catapultFrame[2];               // +0xf313
-    i32 m_catapultAttackCount[2];         // +0xf31b
-    i32 m_catapultAttacksRemaining[2];    // +0xf323
-    i32 m_keepAttacksRemaining[2];        // +0xf32b
-    b32 m_inCastleCombat;                 // +0xf333
-    i32 m_unknownF337[2];                 // +0xf337 zeroed per side in the ctor, never read
-    i32 m_visitingHeroPresent[2];         // +0xf33f
+    i32 m_sideDefeated[2];                  // +0x351f
+    i32 m_networkArmyPresent[2];            // +0x3527
+    i32 m_playerId[2];                      // +0x352f
+    i32 m_experienceValue[2];               // +0x3537
+    i32 m_heroCastSpell[2];                 // +0x353f
+    i32 m_armyCount[2];                     // +0x3547
+    class army m_armies[2][21];             // +0x354f
+    i32 m_currentArmySide;                  // +0xf2a3
+    i32 m_currentArmyIndex;                 // +0xf2a7
+    i32 m_currentSpeed;                     // +0xf2ab
+    i32 m_currentSide;                      // +0xf2af
+    i32 m_gridSelectionDisabled;            // +0xf2b3
+    i32 m_limitCreature;                    // +0xf2b7
+    i32 m_limitCreatureHex;                 // +0xf2bb
+    i32 m_showArmyQuantities;               // +0xf2bf
+    i32 m_selectedHex;                      // +0xf2c3
+    i32 m_directionTargetHex;               // +0xf2c7
+    CombatMessageCommand m_previousCommand; // +0xf2cb
+    CombatMessageCommand m_currentCommand;  // +0xf2cf
+    struct SLimitData m_catapultLimits;     // +0xf2d3
+    struct SLimitData m_gateLimits;         // +0xf2e3
+    struct SLimitData m_upperWallLimits;    // +0xf2f3
+    struct SLimitData m_middleWallLimits;   // +0xf303
+    i32 m_catapultFrame[2];                 // +0xf313
+    i32 m_catapultAttackCount[2];           // +0xf31b
+    i32 m_catapultAttacksRemaining[2];      // +0xf323
+    i32 m_keepAttacksRemaining[2];          // +0xf32b
+    b32 m_inCastleCombat;                   // +0xf333
+    i32 m_unknownF337[2];                   // +0xf337 zeroed per side in the ctor, never read
+    i32 m_visitingHeroPresent[2];           // +0xf33f
     char _pad_0xf347[0x4];
     i32 m_unknownF34B;     // +0xf34b zeroed at the end of CatAttack, never read
     i32 m_unknownF34F;     // +0xf34f seeds m_catapultFrame in the ctor, zeroed in CatAttack

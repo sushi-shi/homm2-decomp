@@ -175,7 +175,7 @@ void combatManager::CombatMessage(i32 messageType) {
     currentArmyPtr = &m_armies[m_currentArmySide][m_currentArmyIndex];
     actingMonsterType = currentArmyPtr->m_monsterType;
     targetArmy = 0;
-    targetMonsterType = 0;
+    targetMonsterType = CreatureType(0);
     if (currentArmyPtr->m_targetSide >= 0 && currentArmyPtr->m_targetIndex >= 0) {
         targetArmy = &m_armies[currentArmyPtr->m_targetSide][currentArmyPtr->m_targetIndex];
         targetMonsterType = targetArmy->m_monsterType;
@@ -183,7 +183,7 @@ void combatManager::CombatMessage(i32 messageType) {
 
     switch (messageType) {
         case IDX(COMBAT_MESSAGE_COMMAND_DEFAULT):
-            if ((currentArmyPtr->m_monster.flags.all & IDX(COMBAT_ARMY_FLAG_SHOOTER)) != 0
+            if (HAS(currentArmyPtr->m_monster.flags.all, COMBAT_ARMY_FLAG_SHOOTER) != 0
                 && currentArmyPtr->m_monster.shots == 0 && targetArmy != 0)
                 strcpy(gText, cCombatMessage[IDX(COMBAT_MESSAGE_TEXT_NO_SHOTS)]);
             else
@@ -237,7 +237,7 @@ void combatManager::CombatMessage(i32 messageType) {
                 actingMonsterType =
                     m_armies[m_currentArmySide][m_hexCells[m_selectedHex].m_occupantIndex]
                         .m_monsterType;
-                if (actingMonsterType >= 0)
+                if (IDX(actingMonsterType) >= 0)
                     sprintf(
                         gText,
                         cCombatMessage[IDX(COMBAT_MESSAGE_TEXT_VIEW_INFO)],
@@ -258,7 +258,8 @@ void combatManager::ResetLimitCreature(void) {
 
     for (side = 0; side < COMBAT_SIDE_COUNT_DRAWING; side++) {
         for (armySlotIndex = 0; armySlotIndex < COMBAT_ARMY_SLOT_COUNT_DRAWING; armySlotIndex++) {
-            if ((m_armies[side][armySlotIndex].m_monster.flags.all & IDX(COMBAT_ARMY_FLAG_MIRROR_IMAGE))
+            if (HAS(m_armies[side][armySlotIndex].m_monster.flags.all,
+                    COMBAT_ARMY_FLAG_MIRROR_IMAGE)
                 != 0)
                 m_limitCreatureCount[side][OD_STEER(armySlotIndex)] = -1;
             else
@@ -300,7 +301,7 @@ void combatManager::SetupGridForArmy(army* armyPtr) {
         return;
 
     attackMask = armyPtr->GetAttackMask(armyPtr->m_hex, 2, -1);
-    memset(m_gridState, COMBAT_GRID_SHADE_NONE, sizeof(m_gridState));
+    memset(m_gridState, IDX(COMBAT_GRID_SHADE_NONE), sizeof(m_gridState));
     savedTargetSide = armyPtr->m_targetSide;
     targetIndexSave = armyPtr->m_targetIndex;
     armyPtr->m_targetSide = -1;
@@ -350,7 +351,7 @@ i32 combatManager::UpdateGrid(i32 resetGridDisplay, i32 rebuildGrid) {
     if (rebuildGrid != 0) {
         if (m_playerId[m_currentSide] == -1 || gbThisNetHumanPlayer[m_playerId[m_currentSide]] == 0
             || m_gridSelectionDisabled != 0) {
-            memset(m_gridState, COMBAT_GRID_SHADE_NONE, sizeof(m_gridState));
+            memset(m_gridState, IDX(COMBAT_GRID_SHADE_NONE), sizeof(m_gridState));
         } else {
             SetupGridForArmy(&m_armies[OD_STEER(m_currentArmySide)][m_currentArmyIndex]);
         }
@@ -1028,11 +1029,11 @@ void combatManager::DrawFrame(
             );
         }
         if (m_inCastleCombat != 0 && row == IDX(COMBAT_DRAW_WALL_TOP_LAYER)
-            && m_drawbridgeState != IDX(COMBAT_CASTLE_GATE_OPEN)) {
+            && m_drawbridgeState != COMBAT_CASTLE_GATE_OPEN) {
             m_combatIcons[IDX(COMBAT_ICON_TOWER)]->CombatClipDrawToBuffer(
                 0,
                 0,
-                m_drawbridgeState + 21,
+                IDX(m_drawbridgeState) + 21,
                 &m_upperWallLimits,
                 0,
                 0,
@@ -1041,7 +1042,7 @@ void combatManager::DrawFrame(
             );
         }
         if (m_inCastleCombat != 0 && row == IDX(COMBAT_DRAW_WALL_MIDDLE_LAYER)
-            && m_drawbridgeState == 0) {
+            && m_drawbridgeState == COMBAT_DRAWBRIDGE_LOWERED) {
             m_combatIcons[IDX(COMBAT_ICON_TOWER)]->CombatClipDrawToBuffer(
                 0,
                 0,
@@ -1171,7 +1172,8 @@ void combatManager::DrawFrame(
                 }
 
                 if (skipSpecialOccupants6 == 0
-                    || (row * COMBAT_GRID_ROW_LENGTH + column1 != IDX(COMBAT_CASTLE_SPECIAL_HEX_FIRST)
+                    || (row * COMBAT_GRID_ROW_LENGTH + column1
+                            != IDX(COMBAT_CASTLE_SPECIAL_HEX_FIRST)
                         && row * COMBAT_GRID_ROW_LENGTH + column1
                                != IDX(COMBAT_CASTLE_SPECIAL_HEX_SECOND))) {
                     m_hexCells[row * COMBAT_GRID_ROW_LENGTH + column1].DrawOccupant(side5, 0);
@@ -1182,7 +1184,7 @@ void combatManager::DrawFrame(
         if (m_inCastleCombat == 0
             || (m_combatTowns[COMBAT_DEFENDER_SIDE]->m_buildings & IDX(TOWN_BUILDING_MOAT)) == 0)
             goto endRow;
-        if (row == COMBAT_CASTLE_GATE_ROW && m_drawbridgeState != IDX(COMBAT_CASTLE_GATE_OPEN))
+        if (row == COMBAT_CASTLE_GATE_ROW && m_drawbridgeState != COMBAT_CASTLE_GATE_OPEN)
             goto endRow;
 
         if (moatCell[row] == giWalkingTo || moatCell[row] == giWalkingTo2
@@ -1195,7 +1197,7 @@ void combatManager::DrawFrame(
                 != row)
                 goto endRow;
 
-            if (gpCombatManager->m_drawbridgeState != IDX(COMBAT_CASTLE_GATE_OPEN)
+            if (gpCombatManager->m_drawbridgeState != COMBAT_CASTLE_GATE_OPEN
                 && (giWalkingTo / COMBAT_GRID_ROW_LENGTH == COMBAT_CASTLE_GATE_ROW
                     || giWalkingFrom / COMBAT_GRID_ROW_LENGTH == COMBAT_CASTLE_GATE_ROW)) {
                 if (giWalkingTo / COMBAT_GRID_ROW_LENGTH == COMBAT_CASTLE_GATE_ROW
@@ -1514,7 +1516,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                 1,
                 0
             );
-            if (viewArmy1->m_monster.flags.all & IDX(COMBAT_ARMY_FLAG_SHOOTER))
+            if (HAS(viewArmy1->m_monster.flags.all, COMBAT_ARMY_FLAG_SHOOTER))
                 smallFont->DrawBoundedString(
                     cMiniViewText[IDX(COMBAT_SMALL_VIEW_TEXT_SHOTS)],
                     viewX + COMBAT_SMALL_VIEW_TEXT_X,
@@ -1631,7 +1633,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                 );
             }
 
-            if (viewArmy1->m_monster.flags.all & IDX(COMBAT_ARMY_FLAG_SHOOTER)) {
+            if (HAS(viewArmy1->m_monster.flags.all, COMBAT_ARMY_FLAG_SHOOTER)) {
                 sprintf(gText, "%d", static_cast<i32>(viewArmy1->m_monster.shots));
                 smallFont->DrawBoundedString(
                     gText,
