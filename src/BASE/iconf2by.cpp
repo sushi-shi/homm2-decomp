@@ -42,12 +42,15 @@ static inline i32 IconRowVisible(i8* shear, i32 clipTop) {
 // extracting that block into an inline function instead duplicates it (0x628, 156 relocations), so
 // the shared block is intentional CFG rather than a helper. The literal paths likewise need no
 // labels: nested setup arms flow into one copy tail, then continue the outer loop.
-// Current structured source has the retail four-byte frame home, candidate 0x586 versus retail
-// 0x58d, and exact 144/144 external relocation occurrences. The repeated complete row-visibility
-// predicate is retained as the only helper supported by both reuse and codegen evidence; nested,
-// row-only, one-use geometry, fill, and literal helpers were rejected. First raw divergence is the
-// setup lifetime at +0x5c: retail keeps shear in ESI and clipW in EBP, while candidate keeps shear
-// in EBP and later reloads width. Do not reintroduce labels merely to chase fuzzy scheduling.
+// Current structured source has the retail four-byte frame home and candidate 0x586 versus retail
+// 0x58d. Retail code operands recover the complete permutation of all 18 otherwise indistinguishable
+// four-byte private BSS owners; section-order pairing had mislabeled them. With that mapping fixed,
+// all 142 candidate data-target occurrences match retail and only retail's gFYClipR at +0x4b3 and
+// gFYX at +0x56e remain absent. The repeated complete row-visibility predicate is retained as the
+// only helper supported by both reuse and codegen evidence; nested, row-only, one-use geometry,
+// fill, and literal helpers were rejected. First raw divergence is the setup lifetime at +0x5c:
+// retail keeps shear in ESI and clipW in EBP, while candidate keeps shear in EBP and later reloads
+// width. Do not reintroduce labels merely to chase fuzzy scheduling.
 VA(0x004d9ce0, 0x58d)
 void FlipIconToBitmapYModify(
     class icon* srcIcon,
