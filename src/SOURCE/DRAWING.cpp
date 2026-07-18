@@ -1152,7 +1152,7 @@ void combatManager::DrawFrame(
                                 wallCoordinates1[m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type][7];
                             break;
                         case IDX(COMBAT_CASTLE_HEX_GATE):
-                            if (m_drawbridgeState != IDX(COMBAT_CASTLE_GATE_HIDDEN))
+                            if (m_drawbridgeState != COMBAT_CASTLE_GATE_HIDDEN)
                                 wallFrame1 = 4;
                             break;
                     }

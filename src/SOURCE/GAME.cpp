@@ -2985,11 +2985,11 @@ i32 ViewArmyHandler(tag_message& msg) {
                             resourceType0 = RES_GEMS;
                             resourceCost5 = iViewArmyNumTroops * 2;
                         } else {
-                            resourceType0 = -1;
+                            resourceType0 = RES_NONE;
                             resourceCost5 = 0;
                         }
                         if (gpCurPlayer->m_resources[IDX(RES_GOLD)] >= goldCost6
-                            && (resourceType0 == -1
+                            && (resourceType0 == RES_NONE
                                 || gpCurPlayer->m_resources[IDX(resourceType0)] >= resourceCost5)) {
                             NormalDialog(
                                 const_cast<char*>(
@@ -3008,7 +3008,7 @@ i32 ViewArmyHandler(tag_message& msg) {
                             );
                             if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
                                 gpCurPlayer->m_resources[IDX(RES_GOLD)] -= goldCost6;
-                                if (resourceType0 != -1)
+                                if (resourceType0 != RES_NONE)
                                     gpCurPlayer->m_resources[IDX(resourceType0)] -= resourceCost5;
                                 gbUpgradeArmy = true;
                                 msg.payload.widget.id = 10;
@@ -3053,7 +3053,7 @@ i32 ViewArmyHandler(tag_message& msg) {
             sViewArmyMonFrameInfo.walkXOffsets[iViewArmyFrame] * viewArmyFacingWIPXMod
             + viewArmyBaseX;
         gpGame->m_viewArmyWindow->BroadcastMessage(msg);
-        gpGame->m_viewArmyWindow->DrawWindow(1, 0, WINDOW_DRAW_ID_LIMIT);
+        gpGame->m_viewArmyWindow->DrawWindow(1, 0, IDX(WINDOW_DRAW_ID_LIMIT));
         glTimers[0] = static_cast<i32>(
             KBTickCount()
             + sViewArmyMonFrameInfo.walkDuration * GAME_VIEW_ARMY_FRAME_DELAY_SCALE
@@ -3520,7 +3520,7 @@ void game::PerDay(void) {
         if (currentHero6->m_spellPoints < restoredSpellPoints13)
             currentHero6->m_spellPoints = static_cast<i16>(restoredSpellPoints13);
         if (HAS(currentHero6->m_eventFlags, HERO_EVENT_MAGIC_WELL))
-            currentHero6->m_eventFlags = currentHero6->m_eventFlags - IDX(HERO_EVENT_MAGIC_WELL);
+            currentHero6->m_eventFlags = currentHero6->m_eventFlags - HERO_EVENT_MAGIC_WELL;
     }
 
     for (player = 0; player < GAME_TOWN_COUNT; player++) {
@@ -3619,12 +3619,12 @@ void game::PerWeek(void) {
                     innerIndex3 - outerIndex5 + outerIndex5 * (sizeof(playerData) + 1)
                 )[gpGame->m_players[0].m_availableHeroIds]]
                 == WEEKLY_AVAILABLE_HERO) {
-                if (gpGame
-                        ->m_heroRecs[(
-                            innerIndex3 - outerIndex5 + outerIndex5 * (sizeof(playerData) + 1)
-                        )[gpGame->m_players[0].m_availableHeroIds]]
-                        .m_eventFlags
-                    & IDX(WEEKLY_HERO_RESERVED_FLAG))
+                if (HAS(gpGame
+                            ->m_heroRecs[(
+                                innerIndex3 - outerIndex5 + outerIndex5 * (sizeof(playerData) + 1)
+                            )[gpGame->m_players[0].m_availableHeroIds]]
+                            .m_eventFlags,
+                        WEEKLY_HERO_RESERVED_FLAG))
                     continue;
             }
             {
@@ -3778,9 +3778,8 @@ void game::PerWeek(void) {
 
     for (outerIndex5 = 0; outerIndex5 < GAME_HERO_COUNT; outerIndex5++) {
         weeklyHero4 = &m_heroRecs[outerIndex5];
-        if (weeklyHero4->m_eventFlags & IDX(WEEKLY_HERO_VISIT_FLAG))
-            weeklyHero4->m_eventFlags =
-                static_cast<u32>(weeklyHero4->m_eventFlags) - WEEKLY_HERO_VISIT_FLAG;
+        if (HAS(weeklyHero4->m_eventFlags, WEEKLY_HERO_VISIT_FLAG))
+            weeklyHero4->m_eventFlags = weeklyHero4->m_eventFlags - IDX(WEEKLY_HERO_VISIT_FLAG);
     }
 
     m_week++;
@@ -4464,7 +4463,7 @@ void game::ProcessRandomObjects(void) {
                         y8,
                         x10 - 1,
                         y8,
-                        IDX(TILESET_OBJNRSRC),
+                        TILESET_OBJNRSRC,
                         16,
                         16,
                         IDX(TILESET_OBJNRSRC),
@@ -4477,7 +4476,7 @@ void game::ProcessRandomObjects(void) {
                         y8,
                         x10,
                         y8,
-                        IDX(TILESET_OBJNRSRC),
+                        TILESET_OBJNRSRC,
                         17,
                         17,
                         IDX(TILESET_OBJNRSRC),
@@ -4506,7 +4505,7 @@ void game::ProcessRandomObjects(void) {
                         y8,
                         x10 - 1,
                         y8,
-                        11,
+                        TilesetId(11),
                         162,
                         162,
                         11,
@@ -4514,7 +4513,7 @@ void game::ProcessRandomObjects(void) {
                         -1,
                         -1
                     );
-                    ConvertObject(x10, y8, x10, y8, 11, 163, 163, 11, artifactId18 * 2 + 1, -1, -1);
+                    ConvertObject(x10, y8, x10, y8, TilesetId(11), 163, 163, 11, artifactId18 * 2 + 1, -1, -1);
                     break;
                 case IDX(MAP_TRIGGER_RANDOM_ARTIFACT_LEVEL_1):
                     artifactId18 = GetRandomArtifactId(8, 0);
@@ -4524,7 +4523,7 @@ void game::ProcessRandomObjects(void) {
                         y8,
                         x10 - 1,
                         y8,
-                        11,
+                        TilesetId(11),
                         166,
                         166,
                         11,
@@ -4532,7 +4531,7 @@ void game::ProcessRandomObjects(void) {
                         -1,
                         -1
                     );
-                    ConvertObject(x10, y8, x10, y8, 11, 167, 167, 11, artifactId18 * 2 + 1, -1, -1);
+                    ConvertObject(x10, y8, x10, y8, TilesetId(11), 167, 167, 11, artifactId18 * 2 + 1, -1, -1);
                     break;
                 case IDX(MAP_TRIGGER_RANDOM_ARTIFACT_LEVEL_2):
                     artifactId18 = GetRandomArtifactId(4, 0);
@@ -4542,7 +4541,7 @@ void game::ProcessRandomObjects(void) {
                         y8,
                         x10 - 1,
                         y8,
-                        11,
+                        TilesetId(11),
                         168,
                         168,
                         11,
@@ -4550,7 +4549,7 @@ void game::ProcessRandomObjects(void) {
                         -1,
                         -1
                     );
-                    ConvertObject(x10, y8, x10, y8, 11, 169, 169, 11, artifactId18 * 2 + 1, -1, -1);
+                    ConvertObject(x10, y8, x10, y8, TilesetId(11), 169, 169, 11, artifactId18 * 2 + 1, -1, -1);
                     break;
                 case IDX(MAP_TRIGGER_RANDOM_ARTIFACT_LEVEL_3):
                     artifactId18 = GetRandomArtifactId(2, 0);
@@ -4560,7 +4559,7 @@ void game::ProcessRandomObjects(void) {
                         y8,
                         x10 - 1,
                         y8,
-                        11,
+                        TilesetId(11),
                         170,
                         170,
                         11,
@@ -4568,7 +4567,7 @@ void game::ProcessRandomObjects(void) {
                         -1,
                         -1
                     );
-                    ConvertObject(x10, y8, x10, y8, 11, 171, 171, 11, artifactId18 * 2 + 1, -1, -1);
+                    ConvertObject(x10, y8, x10, y8, TilesetId(11), 171, 171, 11, artifactId18 * 2 + 1, -1, -1);
                     break;
                 case IDX(MAP_TRIGGER_RANDOM_MINE):
                     RandomizeMine(x10, y8);
@@ -5070,7 +5069,7 @@ void game::SetupTowns(void) {
         castle->m_mayNotUpgradeToCastle = extra->unknown28;
         strcpy(castle->m_name, extra->name);
 
-        memset(usedSpells, 0, SPELL_COUNT);
+        memset(usedSpells, 0, IDX(SPELL_COUNT));
         for (spellLevel = 0; spellLevel < TOWN_MAGE_GUILD_LEVEL_COUNT; spellLevel++) {
             spellsPerLevel[spellLevel] = 0;
             for (spellSlot = 0; spellSlot < TOWN_MAGE_GUILD_SPELLS_PER_LEVEL; spellSlot++)
@@ -5126,22 +5125,22 @@ void game::SetupTowns(void) {
                 } else {
                     attempts = 0;
                     do {
-                        spell = Random(IDX(SPELL_FIREBALL), IDX(SPELL_SET_WATER_GUARDIAN));
+                        spell = SpellType(Random(IDX(SPELL_FIREBALL), IDX(SPELL_SET_WATER_GUARDIAN)));
                         while (gsSpellInfo[IDX(spell)].level - 1 != spellLevel)
-                            spell = Random(IDX(SPELL_FIREBALL), IDX(SPELL_SET_WATER_GUARDIAN));
+                            spell = SpellType(Random(IDX(SPELL_FIREBALL), IDX(SPELL_SET_WATER_GUARDIAN)));
                         if (castle->m_owner != -1 && !gbHumanPlayer[castle->m_owner])
-                            spellValue = (gsSpellInfo[IDX(spell)].attributes & 1 ? 4 : 1)
+                            spellValue = (HAS(gsSpellInfo[IDX(spell)].attributes, SPELL_INFO_ATTRIBUTE_POWER) ? 4 : 1)
                                              * gsSpellInfo[IDX(spell)].aiValue
                                          + 50;
                         else
                             spellValue = 1500;
                         if (spell == SPELL_DIMENSION_DOOR)
                             spellValue = 1500;
-                    } while ((combatSpells == 1 && (gsSpellInfo[IDX(spell)].attributes & 4))
+                    } while ((combatSpells == 1 && HAS(gsSpellInfo[IDX(spell)].attributes, SPELL_INFO_ATTRIBUTE_ADVENTURE))
                              || gsSpellInfo[IDX(spell)].raceChance[castle->m_type] < Random(0, 10)
                              || attempts++ > 500 || usedSpells[IDX(spell)]
                              || spellValue < Random(1, 1500));
-                    if (gsSpellInfo[IDX(spell)].attributes & 4)
+                    if (HAS(gsSpellInfo[IDX(spell)].attributes, SPELL_INFO_ATTRIBUTE_ADVENTURE))
                         combatSpells++;
                     castle
                         ->m_spellSlots[spellLevel * TOWN_MAGE_GUILD_SPELLS_PER_LEVEL + spellSlot] =
