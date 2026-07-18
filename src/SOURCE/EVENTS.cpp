@@ -4667,35 +4667,35 @@ void advManager::HouseEvent(hero* eventHero, mapCell* cell) {
 
     switch (cell->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
         case MAP_OBJECT_ARCHER_HOUSE:
-            siteIndex = HOUSE_RECRUIT_ARCHER;
+            siteIndex = IDX(HOUSE_RECRUIT_ARCHER);
             break;
         case MAP_OBJECT_GOBLIN_HUT:
-            siteIndex = HOUSE_RECRUIT_GOBLIN;
+            siteIndex = IDX(HOUSE_RECRUIT_GOBLIN);
             break;
         case MAP_OBJECT_PEASANT_HUT:
-            siteIndex = HOUSE_RECRUIT_PEASANT;
+            siteIndex = IDX(HOUSE_RECRUIT_PEASANT);
             break;
         case MAP_OBJECT_DWARF_COTTAGE:
         case MAP_OBJECT_SIRENS:
-            siteIndex = HOUSE_RECRUIT_DWARF;
+            siteIndex = IDX(HOUSE_RECRUIT_DWARF);
             break;
         case MAP_OBJECT_LOG_CABIN:
-            siteIndex = HOUSE_RECRUIT_LOG_CABIN;
+            siteIndex = IDX(HOUSE_RECRUIT_LOG_CABIN);
             break;
         case MAP_OBJECT_TREE_HOUSE:
-            siteIndex = HOUSE_RECRUIT_TREE_HOUSE;
+            siteIndex = IDX(HOUSE_RECRUIT_TREE_HOUSE);
             break;
         case MAP_OBJECT_HALFLING_HOLE:
-            siteIndex = HOUSE_RECRUIT_HALFLING;
+            siteIndex = IDX(HOUSE_RECRUIT_HALFLING);
             break;
         case MAP_OBJECT_WATCH_TOWER:
-            siteIndex = HOUSE_RECRUIT_WATCH_TOWER;
+            siteIndex = IDX(HOUSE_RECRUIT_WATCH_TOWER);
             break;
         case MAP_OBJECT_CAVE:
-            siteIndex = HOUSE_RECRUIT_CAVE;
+            siteIndex = IDX(HOUSE_RECRUIT_CAVE);
             break;
         case MAP_OBJECT_EXCAVATION:
-            siteIndex = HOUSE_RECRUIT_EXCAVATION;
+            siteIndex = IDX(HOUSE_RECRUIT_EXCAVATION);
             break;
     }
 
