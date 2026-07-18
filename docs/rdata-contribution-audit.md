@@ -15,17 +15,17 @@ Raw `.rdata` is not byte-exact because vtables contain displaced candidate
 function RVAs and the export directory contains link-time fields. Those bytes do
 not imply a readonly allocation-order defect. The final-link report records the
 raw comparison separately from public section-relative topology and direct code
-relocation targets. The current direct-operand pass compared 435 aligned
-`.rdata` sites and found neither a section-offset nor an identity divergence.
+relocation targets. The exhaustive pass sees 781 retail and 762 candidate
+`.rdata` references: all 762 candidate identities match retail, while 19 retail
+occurrences are absent from structurally incomplete candidate code. The ordered
+context pass compares 507 `.rdata` sites and finds no section-offset divergence.
 
 `philAI::DetermineTargetPosition` multiplies the selected human target by the
-retained `AI_EVENT_HUMAN_VALUE_FACTOR` owner (`1.5f`). At the same
-function-relative DIR32 site, the retail instruction operand reads RVA
-`0xeb280`. The anonymous `1.1f` spelling instead relocated to a different
-candidate allocation which payload pairing had associated with equal `1.1f`
-bytes elsewhere in the retail pool. That proved a possible allocation mapping;
-it did not prove that this code site selected it. The retail PE operand does,
-and it selects `1.5f`.
+retained `AI_TARGET_HUMAN_VALUE_FACTOR` owner (`1.5f`). At the relevant DIR32
+site, the retail instruction operand reads RVA `0xeb280`. The earlier model was
+wrong because it used an anonymous candidate `1.1f` allocation and payload
+pairing to infer the code edge instead of reading this available retail operand.
+Retail was never ambiguous here: it selects `1.5f`.
 
 The former `0x368` delinked comparison object was synthesized from that reviewed
 candidate-derived model; it was not an original retail COFF object. We therefore
