@@ -693,6 +693,27 @@ def _maximum_data_identity_matching(expected_sites, candidate_sites):
     )
 
 
+def _classify_candidate_excess(expected_sites, excess_sites):
+    """Mark excess candidate occurrences whose identity is novel to the function.
+
+    Unequal relocation counts prove a code-shape residual, but they must not hide
+    a candidate edge to storage which retail never references in that function.
+    An over-publication of an otherwise retail-used identity remains visible as a
+    multiplicity residual; a disjoint identity is the stronger review class.
+    """
+    retail_rvas = {record["rva"] for record in expected_sites}
+    annotated = []
+    novel = []
+    for record in excess_sites:
+        record = dict(record)
+        overlap = sorted(retail_rvas.intersection(record.get("identities", ())))
+        record["retail_function_identity_overlap"] = overlap
+        annotated.append(record)
+        if not overlap:
+            novel.append(record)
+    return annotated, novel
+
+
 def _unique_report_functions(functions):
     """Select one objdiff record per decorated COFF function name.
 
@@ -757,7 +778,8 @@ def check_pe_data_target_multiset(sym, data, dups, local_rvas, unit,
     missing_indexes, excess_indexes = _maximum_data_identity_matching(
         expected, candidate)
     missing = [expected[index] for index in missing_indexes]
-    excess = [candidate[index] for index in excess_indexes]
+    excess, novel_excess = _classify_candidate_excess(
+        expected, [candidate[index] for index in excess_indexes])
     unresolved = [record for record in candidate if not record["identities"]]
     missing_index_set = set(missing_indexes)
     matched_expected = [
@@ -776,6 +798,7 @@ def check_pe_data_target_multiset(sym, data, dups, local_rvas, unit,
             record["section"] for record in matched_expected)),
         "missing_retail_targets": missing,
         "excess_candidate_targets": excess,
+        "novel_candidate_targets": novel_excess,
         "unresolved_candidate_targets": unresolved,
     }
 
@@ -1064,6 +1087,8 @@ def review_pe_data_targets():
     identity_bad = []
     multiset_identity_bad = []
     relocation_shape_bad = []
+    shape_candidate_excess_bad = []
+    shape_novel_identity_bad = []
     unresolved_identity_bad = []
     unavailable_functions = []
     duplicate_report_records = []
@@ -1148,6 +1173,10 @@ def review_pe_data_targets():
                 unresolved_identity_bad.append(multiset_record)
             if multiset["expected_count"] != multiset["candidate_count"]:
                 relocation_shape_bad.append(multiset_record)
+                if multiset["excess_candidate_targets"]:
+                    shape_candidate_excess_bad.append(multiset_record)
+                if multiset["novel_candidate_targets"]:
+                    shape_novel_identity_bad.append(multiset_record)
             elif (not multiset["unresolved_candidate_targets"] and
                   (multiset["missing_retail_targets"] or
                    multiset["excess_candidate_targets"])):
@@ -1209,7 +1238,7 @@ def review_pe_data_targets():
                 break
 
     output = {
-        "schema": 4,
+        "schema": 5,
         "scope": "all configured functions with retail and candidate linked owners",
         "ordered_identity_scope": (
             "equal data-target count and matching linked instruction context"),
@@ -1236,6 +1265,8 @@ def review_pe_data_targets():
         "multiset_exact_functions": audit_stats["multiset_exact_functions"],
         "multiset_identity_divergences": multiset_identity_bad,
         "relocation_shape_divergences": relocation_shape_bad,
+        "shape_candidate_excess_divergences": shape_candidate_excess_bad,
+        "shape_novel_identity_divergences": shape_novel_identity_bad,
         "unresolved_identity_divergences": unresolved_identity_bad,
         "divergences": [dict(
             unit=unit, function=name, **problem._asdict())
@@ -1266,6 +1297,14 @@ def review_pe_data_targets():
         "unpaired_identity_divergences": len(unmatched_identity),
         "multiset_identity_divergence_functions": len(multiset_identity_bad),
         "relocation_shape_divergence_functions": len(relocation_shape_bad),
+        "shape_candidate_excess_functions": len(shape_candidate_excess_bad),
+        "shape_candidate_excess_sites": sum(
+            len(record["excess_candidate_targets"])
+            for record in shape_candidate_excess_bad),
+        "shape_novel_identity_functions": len(shape_novel_identity_bad),
+        "shape_novel_identity_sites": sum(
+            len(record["novel_candidate_targets"])
+            for record in shape_novel_identity_bad),
         "unresolved_identity_functions": len(unresolved_identity_bad),
         "unresolved_identity_sites": audit_stats["multiset_unresolved_sites"],
         "unavailable_functions": len(unavailable_functions),
@@ -1299,12 +1338,15 @@ def review_pe_data_targets():
               "%d unique destination mapping(s); %d ordered identity divergence(s), "
               "%d balanced transposition(s), %d unpaired; %d all-function "
               "multiset identity divergence(s), %d relocation-shape divergence(s), "
-              "%d unresolved identity function(s), %d unavailable function(s); "
+              "%d shape function(s) with candidate excess, %d novel candidate "
+              "identity function(s), %d unresolved identity function(s), "
+              "%d unavailable function(s); "
               "report=%s" %
               (len(bad), len({(unit, name) for unit, name, _problem in bad}),
                len(grouped), len(identity_bad), len(identity_transpositions),
                len(unmatched_identity), len(multiset_identity_bad),
-               len(relocation_shape_bad), len(unresolved_identity_bad),
+               len(relocation_shape_bad), len(shape_candidate_excess_bad),
+               len(shape_novel_identity_bad), len(unresolved_identity_bad),
                len(unavailable_functions), output_path))
         return 1
     print("PE data relocs OK: %d functions and %d DIR32 sites checked "

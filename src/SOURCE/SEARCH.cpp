@@ -93,9 +93,12 @@ i32 searchArray::BuildPath(
 // are saved, this is ESI, continueSeed is EBX, and target X is EDI. Base has 0x9ea
 // meaningful bytes versus retail 0x9df plus one pad byte. The first code divergence is
 // target visibility indexing: base adds mapExtra before target X and tests [EAX+EDI],
-// while retail adds target X first and tests [EAX+ECX]. Relocs are base 231/retail 232:
-// every candidate owner/addend occurs in retail, and candidate is short one zero-addend
-// s_adjacentX reference; every external global/callee count agrees. Tried direct/local target
+// while retail adds target X first and tests [EAX+ECX]. The exhaustive data-target pass has
+// candidate 210/retail 209 occurrences with 208 matched and no novel identity. Retail reloads
+// s_adjacentX once for the upper-width comparison while candidate keeps it live; candidate
+// instead reloads s_candidateY once for the upper-height comparison while retail keeps that
+// live, and similarly reloads s_adjacentMonsterX once in the earlier traversal. These are
+// register-lifetime multiplicities, not target substitutions. Tried direct/local target
 // indexing, branch polarities, nested cost arguments, queue aliases, register/const alias
 // orders, and both top- and bottom-tested queue loops. Revisit in the 95% /O2 pass.
 VA(0x004a26a0, 0x9df)

@@ -8,6 +8,7 @@ from unittest.mock import patch
 
 from homm2.build.assert_relocs import (
     _PARSE_CACHE,
+    _classify_candidate_excess,
     _maximum_data_identity_matching,
     _unique_report_functions,
     check_owner_offset_multisets,
@@ -258,6 +259,18 @@ class OrderedRelocFieldTest(unittest.TestCase):
         ]
         self.assertEqual(
             _maximum_data_identity_matching(expected, candidate), ([1], [1]))
+
+    def test_candidate_excess_separates_overpublication_from_novel_identity(self):
+        expected = [{"rva": 0x100}, {"rva": 0x104}]
+        excess = [
+            {"site": 4, "identities": [0x100]},
+            {"site": 8, "identities": [0x108]},
+        ]
+        annotated, novel = _classify_candidate_excess(expected, excess)
+        self.assertEqual(
+            [record["retail_function_identity_overlap"] for record in annotated],
+            [[0x100], []])
+        self.assertEqual([record["site"] for record in novel], [8])
 
     def test_duplicate_objdiff_record_prefers_live_score(self):
         functions, duplicates = _unique_report_functions([
