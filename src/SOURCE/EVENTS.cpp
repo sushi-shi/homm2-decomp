@@ -5665,7 +5665,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             if (cell->m_objectMetadata != MAP_EVENT_DATA_EMPTY) {
                 GiveResource(
                     eventHero,
-                    (ResourceType(cell->m_objectMetadata) & IDX(ARTIFACT_EVENT_MODE_MASK)) - 1,
+                    ResourceType((cell->m_objectMetadata & IDX(ARTIFACT_EVENT_MODE_MASK)) - 1),
                     (cell->m_objectMetadata & ARTIFACT_EVENT_RESOURCE_MASK)
                         >> ARTIFACT_EVENT_RESOURCE_SHIFT
                 );
@@ -5679,7 +5679,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                     if (eventHero->NumArtifacts() != AI_EVENT_ARTIFACT_LIMIT)
                         GiveArtifact(
                             eventHero,
-                            cell->m_objectMetadata & WAGON_ARTIFACT_MASK,
+                            ArtifactType(cell->m_objectMetadata & WAGON_ARTIFACT_MASK),
                             1,
                             -1
                         );
@@ -5687,7 +5687,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 } else {
                     GiveResource(
                         eventHero,
-                        (ResourceType(cell->m_objectMetadata) & IDX(ARTIFACT_EVENT_MODE_MASK)) - 1,
+                        ResourceType((cell->m_objectMetadata & IDX(ARTIFACT_EVENT_MODE_MASK)) - 1),
                         (cell->m_objectMetadata & ARTIFACT_EVENT_RESOURCE_MASK)
                             >> ARTIFACT_EVENT_RESOURCE_SHIFT
                     );
