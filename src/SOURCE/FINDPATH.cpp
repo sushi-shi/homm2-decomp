@@ -370,7 +370,7 @@ void searchArray::SeedCombatPosition(class army* unit) {
     for (hex = 0; hex < COMBAT_HEX_COUNT; hex++)
         gpCombatManager->m_hexCells[hex].m_pathReachable = 0;
 
-    if ((unit->m_monster.attributes & MONSTER_ATTRIBUTE_FLYING) != 0) {
+    if (HAS(unit->m_monster.attributes, MONSTER_ATTRIBUTE_FLYING) != 0) {
         for (hex = 0; hex < COMBAT_HEX_COUNT; hex++) {
             if (unit->CanFit(hex, 0, 0))
                 gpCombatManager->m_hexCells[hex].m_pathReachable = 1;
@@ -396,7 +396,7 @@ void searchArray::SeedCombatPosition(class army* unit) {
             gpCombatManager->m_hexCells[hex].m_pathReachable = 1;
         }
 
-        if ((enemy->m_monster.attributes & MONSTER_ATTRIBUTE_WIDE) != 0) {
+        if (HAS(enemy->m_monster.attributes, MONSTER_ATTRIBUTE_WIDE) != 0) {
             hex = enemy->GetAdjacentCellIndex(
                 hex,
                 enemy->m_facing == 1 ? COMBAT_DIRECTION_NORTHEAST : COMBAT_DIRECTION_SOUTHWEST
@@ -431,7 +431,7 @@ i32 searchArray::FindCombatPath(
         i32 moatIndex;
         i32 sourceWideHex = -1;
         i32 targetWideHex = -1;
-        if ((unit->m_monster.attributes & MONSTER_ATTRIBUTE_WIDE) != 0) {
+        if (HAS(unit->m_monster.attributes, MONSTER_ATTRIBUTE_WIDE) != 0) {
             i32 offset = unit->m_facing == 1 ? 1 : -1;
             sourceWideHex = unit->m_hex + offset;
             targetWideHex = targetHex + offset;
@@ -440,7 +440,7 @@ i32 searchArray::FindCombatPath(
         for (moatIndex = 0; moatIndex < 9; moatIndex++) {
             i32 moatHex = moatCell[moatIndex];
             savedMoatState[moatIndex] = gpCombatManager->m_hexCells[moatHex].m_pathReachable;
-            if ((moatIndex != 4 || gpCombatManager->m_drawbridgeState == 4)
+            if ((moatIndex != 4 || gpCombatManager->m_drawbridgeState == COMBAT_DRAWBRIDGE_RAISED)
                 && ((targetHex != moatHex && targetWideHex != moatHex) || ignoreTargetMoat != 0)
                 && (unit->m_hex != moatHex && sourceWideHex != moatHex)) {
                 bIsMoatSlowed[moatHex] = 1;

@@ -79,16 +79,16 @@ public:
     i8 m_newGameInitialized;                            // +0x47a
     i8 m_newGameHumanCount;                             // +0x47b
     char _pad_0x47c[0x12];
-    i8 m_playerCount;              // +0x48e
-    i8 m_deadPlayerCount;          // +0x48f
+    i8 m_playerCount;                                   // +0x48e
+    i8 m_deadPlayerCount;                               // +0x48f
     i8 m_playerDead[IDX(GAME_PLAYER_COUNT)];            // +0x490
-    u16 m_day;                     // +0x496
-    u16 m_week;                    // +0x498
-    u16 m_month;                   // +0x49a
+    u16 m_day;                                          // +0x496
+    u16 m_week;                                         // +0x498
+    u16 m_month;                                        // +0x49a
     class playerData m_players[IDX(GAME_PLAYER_COUNT)]; // +0x49c
-    class fullMap m_worldMap;      // +0xb3e
-    i8 m_obeliskCount;             // +0xb52
-    town m_castleRecs[IDX(GAME_TOWN_COUNT)];         // 0xb53
+    class fullMap m_worldMap;                           // +0xb3e
+    i8 m_obeliskCount;                                  // +0xb52
+    town m_castleRecs[IDX(GAME_TOWN_COUNT)];            // 0xb53
     union {
         i8 m_castleOwners[IDX(GAME_TOWN_COUNT)]; // +0x2773
         i8 m_townOwners[IDX(GAME_TOWN_COUNT)];
@@ -97,13 +97,13 @@ public:
         char m_dailyEventFlags[9]; // +0x27bb
         u8 m_knownTowns[9];
     };
-    hero m_heroRecs[IDX(GAME_HERO_COUNT)];                         // 0x27c4  hero record slots (GetHeroSlot)
-    i8 m_availableHeroes[IDX(GAME_HERO_COUNT)];                    // +0x5c80
-    mineRecord m_mines[IDX(GAME_MINE_COUNT)];                     // 0x5cb6
-    i8 m_mineOwners[IDX(GAME_MINE_COUNT)];                        // 0x60a6
+    hero m_heroRecs[IDX(GAME_HERO_COUNT)];       // 0x27c4  hero record slots (GetHeroSlot)
+    i8 m_availableHeroes[IDX(GAME_HERO_COUNT)];  // +0x5c80
+    mineRecord m_mines[IDX(GAME_MINE_COUNT)];    // 0x5cb6
+    i8 m_mineOwners[IDX(GAME_MINE_COUNT)];       // 0x60a6
     char m_randomArtifacts[IDX(ARTIFACT_COUNT)]; // 0x6136
-    boatRecord m_boats[IDX(GAME_BOAT_COUNT)];                      // 0x619d
-    i8 m_boatSlots[IDX(GAME_BOAT_COUNT)];                          // 0x631d, active boat record indices
+    boatRecord m_boats[IDX(GAME_BOAT_COUNT)];    // 0x619d
+    i8 m_boatSlots[IDX(GAME_BOAT_COUNT)];        // 0x631d, active boat record indices
     i8 m_obeliskVisitors[48];                    // 0x634d
     char m_defaultPlayerNames[24];               // +0x637d
     i8 m_ultimateArtifactX;                      // +0x6395
@@ -127,7 +127,7 @@ public:
     i32 m_viewSpellsType;                             // +0x65f1
     i32 m_viewSpellsTop[2];                           // +0x65f5
     i32 m_viewSpellsCount[2];                         // +0x65fd
-    SpellType m_viewSpell;                                  // +0x6605
+    SpellType m_viewSpell;                            // +0x6605
     i32 (*m_viewSpellsCallback)(struct tag_message&); // +0x6609
     i8 m_viewSpellsReadOnly;                          // +0x660d
     u8 m_gameLoaded;                                  // +0x660e
@@ -290,7 +290,7 @@ extern i16 trackXY[2][13][2];
 extern class heroWindow* campWin;
 extern b32 gbNewGameDialogOver;
 extern i32 NGKPcursorFlashOn;
-extern i32 iLastDynamicType;
+extern OverviewType iLastDynamicType;
 extern i32 iLastDynamicTop;
 extern i32 iOverviewItems;
 extern i32 giOverviewItems[2];
