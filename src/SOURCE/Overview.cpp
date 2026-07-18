@@ -819,7 +819,7 @@ void game::Overview(void) {
         }
     }
 
-    iLastDynamicType = IDX(OVERVIEW_NONE);
+    iLastDynamicType = OVERVIEW_NONE;
     iLastDynamicTop = -1;
     giOverviewItems[IDX(OVERVIEW_HEROES)] = gpCurPlayer->m_heroCount;
     giOverviewItems[IDX(OVERVIEW_TOWNS)] = gpCurPlayer->m_townCount;

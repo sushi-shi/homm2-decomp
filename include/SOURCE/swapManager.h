@@ -102,7 +102,7 @@ public:
     icon* m_selectorIcon;                 // +0x3a
     hero* m_heroes[IDX(SWAP_SIDE_COUNT)]; // +0x3e
     SwapManagerSide m_selectedSide;                   // +0x46
-    i32 m_targetSide;                     // +0x4a
+    SwapManagerSide m_targetSide;         // +0x4a
     i32 m_selectedSlot;                   // +0x4e
     i32 m_targetSlot;                     // +0x52
     SwapManagerItemType m_itemType;                       // +0x56

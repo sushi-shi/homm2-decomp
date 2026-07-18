@@ -7,10 +7,11 @@
 
 // Proven bitmap storage tags. The packed class member remains a short because
 // bitmap resources serialize this value as a 16-bit word.
-H2_ENUM_CLASS_BEGIN(BitmapType)
+H2_ENUM_CLASS_BEGIN_T(BitmapType, i16)
     BITMAP_TYPE_NONE = 0,
-    BITMAP_TYPE_MEMORY = 0x21
-H2_ENUM_CLASS_END(BitmapType)
+    BITMAP_TYPE_MEMORY = 0x21,
+    COMBAT_MISSILE_BITMAP_TYPE = BITMAP_TYPE_MEMORY
+H2_ENUM_CLASS_END_T(BitmapType, i16)
 
 #pragma pack(push, 1) // recovered layout is byte-packed
 class bitmap : public resource {
@@ -18,13 +19,13 @@ public:
     // --- members (offsets from Ghidra this+off access-analysis; widths are
     // access-widths, NOT confirmed types; refine during byte-matching) ---
     // (vptr auto-emitted at 0x00; own data starts at 0x04)
-    i16 m_bitmapType; // +0x10  bitmap storage/drawing type
-    i16 m_width;      // +0x12
-    i16 m_height;     // +0x14
-    u8* m_pixels;     // +0x16  pixel data
+    BitmapType m_bitmapType; // +0x10  bitmap storage/drawing type
+    i16 m_width;             // +0x12
+    i16 m_height;            // +0x14
+    u8* m_pixels;            // +0x16  pixel data
     // --- constructors ---
     bitmap(void);
-    bitmap(i16, i16, i16);
+    bitmap(BitmapType, i16, i16);
     bitmap(u32l);
     __declspec(dllexport) virtual inline ~bitmap();
     // --- methods ---

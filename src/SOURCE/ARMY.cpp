@@ -984,7 +984,7 @@ void army::SpecialAttack(void) {
         currentMissileX_7 = missileX_7;
         currentMissileY_7 = missileY_7;
         missileBackground = new bitmap(
-            33,
+            BITMAP_TYPE_MEMORY,
             static_cast<i16>(missileHalfWidth * 2),
             static_cast<i16>(missileHalfHeight_1 * 2)
         );
