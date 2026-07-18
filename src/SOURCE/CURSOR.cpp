@@ -359,17 +359,18 @@ void advManager::DrawCursorShadow(void) {
             );
         } else if (m_drawHeroShadows && m_cursorType != CURSOR_HERO_TYPE_BOAT) {
             shadowFrame = drawFrame_f;
-            if (shadowFrame == HERO_SPRITE_UP_STEP_5)
-                shadowFrame = HERO_SPRITE_UP_SHADOW_STEP_5;
-            if (shadowFrame == HERO_SPRITE_UP_STEP_4)
-                shadowFrame = HERO_SPRITE_UP_SHADOW_STEP_4;
-            if (shadowFrame == HERO_SPRITE_UP_STEP_3)
-                shadowFrame = HERO_SPRITE_UP_SHADOW_STEP_3;
-            if (shadowFrame == HERO_SPRITE_UP_STEP_2)
-                shadowFrame = HERO_SPRITE_UP_SHADOW_WIDE;
-            if (shadowFrame == HERO_SPRITE_UP_STEP_1)
-                shadowFrame = HERO_SPRITE_UP_SHADOW_WIDE;
-            if (shadowFrame >= IDX(CURSOR_SHADOW_ANIM_FIRST) && shadowFrame < IDX(CURSOR_SHADOW_ANIM_END))
+            if (shadowFrame == IDX(HERO_SPRITE_UP_STEP_5))
+                shadowFrame = IDX(HERO_SPRITE_UP_SHADOW_STEP_5);
+            if (shadowFrame == IDX(HERO_SPRITE_UP_STEP_4))
+                shadowFrame = IDX(HERO_SPRITE_UP_SHADOW_STEP_4);
+            if (shadowFrame == IDX(HERO_SPRITE_UP_STEP_3))
+                shadowFrame = IDX(HERO_SPRITE_UP_SHADOW_STEP_3);
+            if (shadowFrame == IDX(HERO_SPRITE_UP_STEP_2))
+                shadowFrame = IDX(HERO_SPRITE_UP_SHADOW_WIDE);
+            if (shadowFrame == IDX(HERO_SPRITE_UP_STEP_1))
+                shadowFrame = IDX(HERO_SPRITE_UP_SHADOW_WIDE);
+            if (shadowFrame >= IDX(CURSOR_SHADOW_ANIM_FIRST)
+                && shadowFrame < IDX(CURSOR_SHADOW_ANIM_END))
                 shadowOffset = CURSOR_HORSE_SHADOW_OFFSET;
             else
                 shadowOffset = 0;
@@ -660,8 +661,8 @@ mapCell* advManager::MoveHero(
 
             case MAP_OBJECT_HERO_INTERACTION:
                 if (HAS(movingHero_f->m_eventFlags, HERO_EVENT_EMBARKED)) {
-                    if (gpGame->GetHero(destinationCell_j->m_objectMetadata)->m_eventFlags
-                        & HERO_EVENT_EMBARKED)
+                    if (HAS(gpGame->GetHero(destinationCell_j->m_objectMetadata)->m_eventFlags,
+                            HERO_EVENT_EMBARKED))
                         goto stoppingEvent;
                     else
                         goto movementDone;
@@ -1008,8 +1009,8 @@ i32 advManager::ValidMoveWithEvent(hero* movingHero, i32 direction) {
     switch (destinationCell0->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
         case MAP_OBJECT_HERO_INTERACTION:
             if (HAS(movingHero->m_eventFlags, HERO_EVENT_EMBARKED)) {
-                if (gpGame->GetHero(destinationCell0->m_objectMetadata)->m_eventFlags
-                    & HERO_EVENT_EMBARKED)
+                if (HAS(gpGame->GetHero(destinationCell0->m_objectMetadata)->m_eventFlags,
+                        HERO_EVENT_EMBARKED))
                     return 1;
                 else
                     return 0;

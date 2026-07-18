@@ -4177,7 +4177,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     } else {
                         sprintf(gText, xGenericSiteNames[siteIndexName]);
                     }
-                    if (heroLocal != 0 && visitedMaskValue != 0) {
+                    if (heroLocal != 0 && visitedMaskValue != HERO_EVENT_NONE) {
                         strcat(gText, "\n\n");
                         strcat(
                             gText,
@@ -4231,7 +4231,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     break;
                 default:
                 quick_info_default:
-                    if (visitedMaskValue != 0 && IDX(heroLocal) != 0) {
+                    if (visitedMaskValue != HERO_EVENT_NONE && heroLocal != 0) {
                         sprintf(
                             gText,
                             "%s\n\n%s",
@@ -7105,7 +7105,7 @@ void advManager::CheckLoadSample(i32 index) {
 VA(0x00466a2f, 0x4c1)
 AdventureEnvironmentSoundId advManager::GetSoundId(i32 x, i32 y) {
     mapCell* currentCell = &m_mapData->Row(y)[x];
-    i32 soundId = ADVMGR_ENVIRONMENT_SOUND_NONE;
+    AdventureEnvironmentSoundId soundId = ADVMGR_ENVIRONMENT_SOUND_NONE;
 
     if (!giGroundToTerrain[currentCell->m_terrainImageIndex]
         && (giGroundShape[currentCell->m_terrainImageIndex] & ADVMGR_SOUND_GROUND_SHAPE_MASK)) {
@@ -7232,7 +7232,7 @@ AdventureEnvironmentSoundId advManager::GetSoundId(i32 x, i32 y) {
 // symbol at +0x239. Direct bounds and MAP_WIDTH <= OD_STEER(x) were already tried.
 VA(0x00466ef0, 0x23a)
 void advManager::InsertSound(i32 x, i32 mapY, i32 distance, i32 soundLayer) {
-    AdventureEnvironmentSoundId soundSlot;
+    i32 soundSlot;
     i32 distanceLimit;
     i32 activeIndex;
     AdventureEnvironmentSoundId soundId;
@@ -7247,10 +7247,10 @@ void advManager::InsertSound(i32 x, i32 mapY, i32 distance, i32 soundLayer) {
     }
 
     for (activeIndex = 0; activeIndex < ADVMGR_SOUND_CELL_COUNT; ++activeIndex) {
-        if (m_activeSounds[activeIndex].soundId == IDX(soundId)) {
+        if (m_activeSounds[activeIndex].soundId == soundId) {
             if (m_activeSounds[activeIndex].volume > distance) {
                 m_activeSounds[activeIndex].volume = distance;
-                m_activeSoundMask |= 1 << IDX(m_activeSounds[activeIndex].soundId);
+                m_activeSoundMask |= BIT(m_activeSounds[activeIndex].soundId);
             }
             return;
         }
@@ -7261,7 +7261,7 @@ void advManager::InsertSound(i32 x, i32 mapY, i32 distance, i32 soundLayer) {
     }
 
     distanceLimit = distance;
-    soundSlot = IDX(ADVMGR_ENVIRONMENT_SOUND_NONE);
+    soundSlot = -1;
     for (activeIndex = 0; activeIndex < ADVMGR_SOUND_CELL_COUNT; ++activeIndex) {
         if (m_activeSounds[activeIndex].volume > distanceLimit) {
             distanceLimit = m_activeSounds[activeIndex].volume;
@@ -7269,21 +7269,22 @@ void advManager::InsertSound(i32 x, i32 mapY, i32 distance, i32 soundLayer) {
         }
     }
 
-    if (soundSlot != IDX(ADVMGR_ENVIRONMENT_SOUND_NONE)) {
-        if (m_activeSounds[IDX(soundSlot)].soundId != ADVMGR_ENVIRONMENT_SOUND_NONE) {
+    if (soundSlot != -1) {
+        if (m_activeSounds[soundSlot].soundId != ADVMGR_ENVIRONMENT_SOUND_NONE) {
             gpSoundManager->StopSample(
-                m_loopingSamples[IDX(m_activeSounds[IDX(soundSlot)].soundId)]->m_playbackData.activeSample
+                m_loopingSamples[IDX(m_activeSounds[soundSlot].soundId)]
+                    ->m_playbackData.activeSample
             );
         }
-        m_activeSounds[IDX(soundSlot)].soundId = soundId;
-        m_activeSounds[IDX(soundSlot)].volume = distance;
+        m_activeSounds[soundSlot].soundId = soundId;
+        m_activeSounds[soundSlot].volume = distance;
         CheckLoadSample(IDX(soundId));
         m_loopingSamples[IDX(soundId)]->m_playbackData.volume = ADVMGR_ENVIRONMENT_VOLUME(distance);
         m_loopingSamples[IDX(soundId)]->m_playbackData.loopCount = 0;
         m_loopingSamples[IDX(soundId)]->m_playbackData.channelType =
             ADVMGR_ENVIRONMENT_SOUND_CHANNEL_TYPE;
         gpSoundManager->MemorySample(m_loopingSamples[IDX(soundId)]);
-        m_activeSoundMask ^= 1 << IDX(m_activeSounds[IDX(soundSlot)].soundId);
+        m_activeSoundMask ^= 1 << IDX(m_activeSounds[soundSlot].soundId);
     }
 }
 
@@ -8444,8 +8445,8 @@ void advManager::TrimLoopingSounds(i32 maxSamples) {
 
     i32 soundIndex;
     for (soundIndex = 0; soundIndex < ADVMGR_SOUND_CELL_COUNT; ++soundIndex) {
-        if (m_activeSounds[soundIndex].soundId >= 0
-            && m_activeSounds[soundIndex].soundId < IDX(ADVMGR_LOOPING_SAMPLE_COUNT)) {
+        if (IDX(m_activeSounds[soundIndex].soundId) >= 0
+            && IDX(m_activeSounds[soundIndex].soundId) < IDX(ADVMGR_LOOPING_SAMPLE_COUNT)) {
             ++retainedSamples[IDX(m_activeSounds[soundIndex].soundId)];
         }
     }
@@ -9515,9 +9516,7 @@ i32 SystemOptionsHandler(struct tag_message& message) {
                                     gpSoundManager->MIDIStartup();
                                 }
                                 if (gpSoundManager->m_midiReady == 0) {
-                                    gConfig.useOpera = ConfigOperaMode(
-                                        IDX(CONFIG_OPERA_ENABLED) - IDX(gConfig.useOpera)
-                                    );
+                                    gConfig.useOpera = IDX(CONFIG_OPERA_ENABLED) - gConfig.useOpera;
                                 } else {
                                     gpSoundManager->SetMusicQuality(IDX(CONFIG_MUSIC_SOURCE_MIDI));
                                 }

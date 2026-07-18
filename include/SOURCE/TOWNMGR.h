@@ -99,6 +99,7 @@ H2_ENUM_CLASS_BEGIN_T(TownExtraBuildingMask, u32)
     TOWN_EXTRA_DYNAMIC_CLEAR_MASK = 0x7ff8bfff,
     TOWN_CLOSE_DYNAMIC_CLEAR_MASK = 0xfff8bfff
 H2_ENUM_CLASS_END_T(TownExtraBuildingMask, u32)
+H2_ENUM_FLAGS(TownExtraBuildingMask)
 
 H2_ENUM_CLASS_BEGIN(TownManagerCommand)
     TOWN_COMMAND_MAGE_GUILD = 0,
