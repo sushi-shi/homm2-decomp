@@ -641,7 +641,7 @@ i32 combatManager::ProcessCombatMsg(tag_message& message) {
                         }
                         if (m_previousCommand != m_currentCommand) {
                             m_previousCommand = m_currentCommand;
-                            CombatMessage(m_currentCommand);
+                            CombatMessage(IDX(m_currentCommand));
                         }
                     } else {
                         if (mouseX >= COMBAT_CONTROL_RIGHT_MIN_X) {
@@ -998,10 +998,10 @@ CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
                 } else {
                     if (m_armies[m_currentArmySide][m_currentArmyIndex].ValidPath(hexIndex, 0)
                         == 1) {
-                        command = static_cast<char>(
+                        command = CombatMessageCommand(
                             2
-                            - ((m_armies[m_currentArmySide][m_currentArmyIndex].m_monster.flags.all
-                                & MONSTER_FLAGS_FLYING)
+                            - (HAS(m_armies[m_currentArmySide][m_currentArmyIndex].m_monster.flags.all,
+                                   MONSTER_FLAGS_FLYING)
                                == 0)
                         );
                     }

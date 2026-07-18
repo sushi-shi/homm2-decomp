@@ -34,7 +34,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
     i32 slot7;
     i32 row9;
     i32 column8;
-    CastleWidgetFrame widgetFrame12;
+    i32 widgetFrame12;
     i32 terrainIconFrame27;
     i32 raceIconFrame;
     u32l captainBuilt;
@@ -112,7 +112,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
     }
 
     for (slot7 = 0; slot7 < CASTLE_SLOT_COUNT; ++slot7) {
-        widgetFrame12 = CastleWidgetFrame(-1);
+        widgetFrame12 = -1;
         if ((m_town->m_buildings & (1L << castleSlotsUse[slot7]))
             && (castleSlotsUse[slot7] != CASTLE_MAGE_GUILD
                 || m_town->m_buildState == CASTLE_MAGE_GUILD_MAX_LEVEL)) {
@@ -183,7 +183,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
         casWin->BroadcastMessage(message3);
     }
 
-    widgetFrame12 = CastleWidgetFrame(-1);
+    widgetFrame12 = -1;
     if (captainBuilt != 0) {
         message3.payload.widget.command = CASTLE_WIDGET_TEXT;
         message3.payload.widget.data.text = gText;
@@ -242,7 +242,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
     else if (m_recruitResult != 0)
         widgetFrame12 = CASTLE_FRAME_BUILT;
     else
-        widgetFrame12 = CastleWidgetFrame(-1);
+        widgetFrame12 = -1;
 
     for (slot7 = 0; slot7 < 2; ++slot7) {
         message3.payload.widget.data.value = 4;
