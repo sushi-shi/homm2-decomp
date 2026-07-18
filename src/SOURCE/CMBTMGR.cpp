@@ -1010,8 +1010,8 @@ restart:
             for (armyCounter = 0; armyCounter < m_armyCount[stackSide]; armyCounter++) {
                 skipEntry = 0;
                 activeArmy = armyCounter + m_armies[stackSide];
-                if ((activeArmy->m_monster.flags.abilityFlags
-                     & (MONSTER_ABILITY_FLAG_AI_EXCLUDED | MONSTER_ABILITY_FLAG_BAD_MORALE))
+                if (HAS(activeArmy->m_monster.flags.abilityFlags,
+                        MONSTER_ABILITY_FLAG_AI_EXCLUDED | MONSTER_ABILITY_FLAG_BAD_MORALE)
                     || IDX(activeArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PARALYZE)])
                     || activeArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PETRIFIED)]
                     || activeArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BLIND)]
@@ -1121,10 +1121,10 @@ void combatManager::CatAttack(i32 side) {
     i32 wallCount7 = 0;
     i32 towerCount1 = 0;
     i32 wallIndex17 = -1;
-    CombatCastleWallSlot towerIndex27 = -1;
+    CombatCastleWallSlot towerIndex27 = COMBAT_WALL_SLOT_NONE;
     i32 gateIndex2 = -1;
     i32 keepIndex6 = -1;
-    CombatCastleHex targetHex4 = -1;
+    CombatCastleHex targetHex4 = COMBAT_CASTLE_HEX_NONE;
     i32 missShot19 = 0;
     CombatCatapultDamage damageLevel13 = COMBAT_CATAPULT_DAMAGE_NORMAL;
     i32 firstRoll7;
@@ -1168,14 +1168,14 @@ void combatManager::CatAttack(i32 side) {
             towerIndex27 = COMBAT_WALL_SLOT_BOTTOM_TOWER;
         else
             towerIndex27 = COMBAT_WALL_SLOT_TOP_TOWER;
-    } else if (m_drawbridgeState != IDX(COMBAT_CASTLE_GATE_HIDDEN)) {
+    } else if (m_drawbridgeState != COMBAT_CASTLE_GATE_HIDDEN) {
         gateIndex2 = 1;
     } else {
         if (m_wallStates[IDX(COMBAT_WALL_SLOT_KEEP)] == IDX(COMBAT_WALL_STATE_KEEP_STANDING))
             keepIndex6 = 0;
     }
 
-    if (towerIndex27 == -1 && wallIndex17 == -1 && gateIndex2 == -1 && keepIndex6 == -1)
+    if (towerIndex27 == COMBAT_WALL_SLOT_NONE && wallIndex17 == -1 && gateIndex2 == -1 && keepIndex6 == -1)
         return;
 
     sprintf(gText, "catsnd%02d.82M", COMBAT_CATAPULT_IMPACT_SOUND);
@@ -1192,12 +1192,12 @@ void combatManager::CatAttack(i32 side) {
     if (wallIndex17 != -1) {
         impactX5 = wallPos[wallIndex17][IDX(COMBAT_COORDINATE_X)];
         impactY0 = wallPos[wallIndex17][IDX(COMBAT_COORDINATE_Y)];
-        targetHex4 = iWallToHexCell[wallIndex17];
+        targetHex4 = CombatCastleHex(iWallToHexCell[wallIndex17]);
     }
-    if (towerIndex27 != -1) {
+    if (towerIndex27 != COMBAT_WALL_SLOT_NONE) {
         impactX5 = towerPos[IDX(towerIndex27)][IDX(COMBAT_COORDINATE_X)];
         impactY0 = towerPos[IDX(towerIndex27)][IDX(COMBAT_COORDINATE_Y)];
-        targetHex4 = iTowerToHexCell[IDX(towerIndex27)];
+        targetHex4 = CombatCastleHex(iTowerToHexCell[IDX(towerIndex27)]);
     }
     if (gateIndex2 != -1) {
         impactX5 = doorPos[0][IDX(COMBAT_COORDINATE_X)];
@@ -1442,7 +1442,7 @@ void combatManager::CatAttack(i32 side) {
                     || m_wallStates[wallIndex17 + COMBAT_WALL_SLOT_SECTION_FIRST]
                            == IDX(COMBAT_WALL_STATE_SECTION_DESTROYED))
                     m_hexCells[iWallToHexCell[wallIndex17]].m_blocked = 0;
-            } else if (towerIndex27 != -1) {
+            } else if (towerIndex27 != COMBAT_WALL_SLOT_NONE) {
                 m_wallStates[IDX(towerIndex27)] = IDX(COMBAT_WALL_STATE_DESTROYED);
             } else if (gateIndex2 != -1) {
                 m_drawbridgeState = COMBAT_CASTLE_GATE_HIDDEN;
@@ -1486,7 +1486,7 @@ void combatManager::KeepAttack(i32 tower) {
 
     LogStr("KA1");
 
-    CombatKeepTargetPriority bestPriority0 = -1;
+    CombatKeepTargetPriority bestPriority0 = COMBAT_KEEP_PRIORITY_NONE;
     i32 bestValue10 = 0;
     i32 bestArmyIndex5 = -1;
     i32 armyIndex3;
@@ -1515,8 +1515,8 @@ void combatManager::KeepAttack(i32 tower) {
             // Retail +0x25b loads bestValue10, compares value26, then uses jle.
             // Reversing both operands produces equivalent jge and differs at
             // function offsets +0x25d, +0x260, and +0x262.
-            if ((bestPriority0 | 0) < IDX(priority)
-                || ((bestPriority0 | 0) == IDX(priority) && bestValue10 < value26)) {
+            if ((IDX(bestPriority0) | 0) < IDX(priority)
+                || ((IDX(bestPriority0) | 0) == IDX(priority) && bestValue10 < value26)) {
                 bestValue10 = value26;
                 bestPriority0 = priority;
                 bestArmyIndex5 = armyIndex3;
@@ -1868,7 +1868,7 @@ void combatManager::LowerDoor(void) {
     for (bridgeFrame = IDX(COMBAT_DRAWBRIDGE_RAISE_FRAME_SECOND);
          bridgeFrame >= IDX(COMBAT_DRAWBRIDGE_LOWERED);
          bridgeFrame--) {
-        m_drawbridgeState = bridgeFrame;
+        m_drawbridgeState = CombatDrawbridgeState(bridgeFrame);
         DrawFrame(1, 0, 1, 0, COMBAT_DOOR_ANIMATION_DELAY, 1, 1);
     }
     WaitEndSample(drawbridgeSample, -1);

@@ -6308,11 +6308,11 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 if (combatResult_d == 0) {
                 } else {
                     eventHero->CheckLevel();
-                    gpGame->ConvertObject(x - 2, y - 1, x + 1, y - 1, 56, 0, 4, 26, 104, 64, 23);
-                    gpGame->ConvertObject(x - 2, y, x + 1, y, 56, 5, 9, 26, 109, 64, 23);
-                    gpGame->ConvertObject(x - 2, y - 1, x + 1, y - 1, 51, 0, 3, 32, 75, 64, 23);
-                    gpGame->ConvertObject(x - 2, y, x + 1, y, 51, 4, 7, 32, 80, 64, 23);
-                    gpGame->ConvertObject(x, y, x, y, 29, 5, 5, 29, 4, 64, 23);
+                    gpGame->ConvertObject(x - 2, y - 1, x + 1, y - 1, TilesetId(56), 0, 4, 26, 104, 64, 23);
+                    gpGame->ConvertObject(x - 2, y, x + 1, y, TilesetId(56), 5, 9, 26, 109, 64, 23);
+                    gpGame->ConvertObject(x - 2, y - 1, x + 1, y - 1, TilesetId(51), 0, 3, 32, 75, 64, 23);
+                    gpGame->ConvertObject(x - 2, y, x + 1, y, TilesetId(51), 4, 7, 32, 80, 64, 23);
+                    gpGame->ConvertObject(x, y, x, y, TilesetId(29), 5, 5, 29, 4, 64, 23);
                     gpGame->m_mines[cell->m_objectMetadata].resourceType = IDX(RES_GOLD);
                     gpGame->m_mines[cell->m_objectMetadata].guardianType = IDX(CREATURE_NONE);
                     gpGame->m_mines[cell->m_objectMetadata].guardianCount = 0;

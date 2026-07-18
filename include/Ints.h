@@ -80,6 +80,15 @@ typedef i8 b8;
     }                                                                                              \
     inline constexpr name& operator^=(name& a, name b) {                                                     \
         return a = a ^ b;                                                                          \
+    }                                                                                              \
+    inline constexpr name operator-(name a, name b) {                                                        \
+        return static_cast<name>(static_cast<i64>(a) - static_cast<i64>(b));                       \
+    }                                                                                              \
+    inline constexpr name& operator-=(name& a, name b) {                                                     \
+        return a = a - b;                                                                          \
+    }                                                                                              \
+    inline constexpr bool operator!(name a) {                                                                \
+        return !static_cast<i64>(a);                                                               \
     }
 #else
 #define H2_ENUM_BEGIN(name) enum {
@@ -112,7 +121,7 @@ typedef i8 b8;
 // argument and bit share one H2_ENUM_FLAGS domain; production expands to
 // the plain bitwise AND.
 #ifdef HOMM2_STRICT_ENUM_TYPES
-#define HAS(flags, bit) IDX((flags) & (bit))
+#define HAS(flags, bit) (IDX((flags) & (bit)))
 #else
 #define HAS(flags, bit) ((flags) & (bit))
 #endif
