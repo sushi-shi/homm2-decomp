@@ -8,6 +8,8 @@ from unittest.mock import patch
 
 from homm2.build.assert_relocs import (
     _PARSE_CACHE,
+    _maximum_data_identity_matching,
+    _unique_report_functions,
     check_owner_offset_multisets,
     check_ordered_owner_offsets,
     check_ordered_reloc_addresses,
@@ -237,6 +239,37 @@ class OrderedRelocFieldTest(unittest.TestCase):
             image(0x110, 0x320, 0xA1), image(0x120, 0x338, 0x68),
             stats=stats), [])
         self.assertEqual(stats["context_mismatch"], 1)
+
+    def test_multiset_matching_preserves_duplicate_occurrences(self):
+        expected = [{"rva": 0x100}, {"rva": 0x100}, {"rva": 0x104}]
+        candidate = [
+            {"site": 8, "identities": [0x100, 0x104]},
+            {"site": 4, "identities": [0x100]},
+            {"site": 12, "identities": [0x100]},
+        ]
+        self.assertEqual(
+            _maximum_data_identity_matching(expected, candidate), ([], []))
+
+    def test_multiset_matching_reports_each_unmatched_side(self):
+        expected = [{"rva": 0x100}, {"rva": 0x104}]
+        candidate = [
+            {"site": 4, "identities": [0x100]},
+            {"site": 8, "identities": [0x108]},
+        ]
+        self.assertEqual(
+            _maximum_data_identity_matching(expected, candidate), ([1], [1]))
+
+    def test_duplicate_objdiff_record_prefers_live_score(self):
+        functions, duplicates = _unique_report_functions([
+            {"name": "?same@@YIXXZ", "fuzzy_match_percent": None},
+            {"name": "?same@@YIXXZ", "fuzzy_match_percent": 100.0},
+            {"name": "?other@@YIXXZ", "fuzzy_match_percent": 80.0},
+        ])
+        self.assertEqual(duplicates, {"?same@@YIXXZ": 2})
+        self.assertEqual(
+            {record["name"]: record["fuzzy_match_percent"]
+             for record in functions},
+            {"?other@@YIXXZ": 80.0, "?same@@YIXXZ": 100.0})
 
 
 class CoffAddendTest(unittest.TestCase):
