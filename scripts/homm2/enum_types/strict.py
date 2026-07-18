@@ -280,6 +280,11 @@ def run(jobs: int = 0, filters: list[str] | None = None) -> int:
     compiler = _compiler()
     _probe_warnings(compiler)
     entries = _entries()
+    # MSVC __declspec(naked) bodies reference parameters by name, which clang
+    # rejects outright; these hand-asm TUs are audited by eye instead.
+    NAKED_ASM_UNITS = ("/BASE/TILE.cpp",)
+    entries = [entry for entry in entries
+               if not any(entry["file"].endswith(name) for name in NAKED_ASM_UNITS)]
     filters = filters or []
     if filters:
         entries = [entry for entry in entries

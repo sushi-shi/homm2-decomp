@@ -108,27 +108,39 @@ H2_ENUM_END(HeroMobilityConstant)
 H2_ENUM_CLASS_BEGIN_T(HeroEventFlag, u32)
     HERO_EVENT_NONE = 0,
     HERO_EVENT_BUOY = 0x2,
+    ADVMGR_VISIT_FORT = HERO_EVENT_BUOY,
     HERO_EVENT_FOUNTAIN = 0x4,
+    ADVMGR_VISIT_GAZEBO = HERO_EVENT_FOUNTAIN,
     HERO_EVENT_OASIS = 0x8,
+    ADVMGR_VISIT_MERCENARY_CAMP = HERO_EVENT_OASIS,
     HERO_EVENT_FAERIE_RING = 0x10,
+    ADVMGR_VISIT_STANDING_STONES = HERO_EVENT_FAERIE_RING,
     HERO_EVENT_GRAVEYARD = 0x20,
     HERO_EVENT_SHIPWRECK = 0x40,
     HERO_EVENT_EMBARKED = 0x80,
     HERO_EVENT_TEMPLE = 0x100,
+    ADVMGR_VISIT_WITCH_DOCTOR = HERO_EVENT_TEMPLE,
     HERO_EVENT_WATERING_HOLE = 0x200,
+    ADVMGR_VISIT_EVENT_SITE = HERO_EVENT_WATERING_HOLE,
     HERO_EVENT_DERELICT_SHIP = 0x400,
     HERO_EVENT_MAGIC_WELL = 0x1000,
+    ADVMGR_VISIT_XANADU = HERO_EVENT_MAGIC_WELL,
     HERO_EVENT_IDOL = 0x2000,
+    ADVMGR_VISIT_TREE_OF_KNOWLEDGE = HERO_EVENT_IDOL,
     HERO_EVENT_PYRAMID = 0x4000,
     HERO_EVENT_WEEKLY_VISIT = 0x10000,
     HERO_EVENT_MERMAID = 0x100000,
     AI_GENERIC_SITE_FAERIE_RING_FLAG = HERO_EVENT_MERMAID,
+    ADVMGR_VISIT_GENERIC_TOWER = HERO_EVENT_MERMAID,
     HERO_EVENT_SIRENS = 0x200000,
     AI_GENERIC_SITE_GRAVEYARD_FLAG = HERO_EVENT_SIRENS,
+    ADVMGR_VISIT_GENERIC_SPRING = HERO_EVENT_SIRENS,
     HERO_EVENT_ARENA = 0x400000,
     AI_GENERIC_SITE_SHIPWRECK_FLAG = HERO_EVENT_ARENA,
+    ADVMGR_VISIT_GENERIC_HUT = HERO_EVENT_ARENA,
     HERO_EVENT_STABLES = 0x800000,
     AI_GENERIC_SITE_CREATURE_UPGRADE_FLAG = HERO_EVENT_STABLES,
+    ADVMGR_VISIT_GENERIC_ALTAR = HERO_EVENT_STABLES,
     HERO_EVENT_GROUPED_FORMATION = 0x00008000
 H2_ENUM_CLASS_END_T(HeroEventFlag, u32)
 H2_ENUM_FLAGS(HeroEventFlag)
@@ -164,16 +176,16 @@ public:
             i8 m_patrolRadius; // +0x2b
         };
     };
-    u8 m_direction;                              // +0x2c
-    i16 m_locationType;                          // +0x2d
-    i16 m_occupiedTown;                          // +0x2f
-    i32 m_mobility;                              // +0x31
-    i32 m_remainingMobility;                     // +0x35
-    i32 m_experience;                            // +0x39
-    i16 m_level;                                 // +0x3d
+    u8 m_direction;                                   // +0x2c
+    i16 m_locationType;                               // +0x2d
+    i16 m_occupiedTown;                               // +0x2f
+    i32 m_mobility;                                   // +0x31
+    i32 m_remainingMobility;                          // +0x35
+    i32 m_experience;                                 // +0x39
+    i16 m_level;                                      // +0x3d
     i8 m_primaryStats[IDX(HERO_STARTING_STAT_COUNT)]; // +0x3f
-    i8 m_morale;                                 // +0x44
-    i8 m_luck;                                   // +0x45
+    i8 m_morale;                                      // +0x44
+    i8 m_luck;                                        // +0x45
     char _pad_0x46[0x1];
     u32 m_gazeboVisits;                       // +0x47
     u32 m_fortVisits;                         // +0x4b

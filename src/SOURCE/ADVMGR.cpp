@@ -939,56 +939,56 @@ i32 advManager::Main(struct tag_message& message) {
                     }
                     case 72:
                         if (message.payload.keyboard.modifiers & MESSAGE_MODIFIER_CONTROL_KEYS) {
-                            ScreenScroll(0, 0);
+                            ScreenScroll(AdventureScrollDirection(0), 0);
                         } else {
                             moveDirectionState = 0;
                         }
                         break;
                     case 73:
                         if (message.payload.keyboard.modifiers & MESSAGE_MODIFIER_CONTROL_KEYS) {
-                            ScreenScroll(1, 0);
+                            ScreenScroll(AdventureScrollDirection(1), 0);
                         } else {
                             moveDirectionState = 1;
                         }
                         break;
                     case 77:
                         if (message.payload.keyboard.modifiers & MESSAGE_MODIFIER_CONTROL_KEYS) {
-                            ScreenScroll(2, 0);
+                            ScreenScroll(AdventureScrollDirection(2), 0);
                         } else {
                             moveDirectionState = 2;
                         }
                         break;
                     case 81:
                         if (message.payload.keyboard.modifiers & MESSAGE_MODIFIER_CONTROL_KEYS) {
-                            ScreenScroll(3, 0);
+                            ScreenScroll(AdventureScrollDirection(3), 0);
                         } else {
                             moveDirectionState = 3;
                         }
                         break;
                     case 80:
                         if (message.payload.keyboard.modifiers & MESSAGE_MODIFIER_CONTROL_KEYS) {
-                            ScreenScroll(4, 0);
+                            ScreenScroll(AdventureScrollDirection(4), 0);
                         } else {
                             moveDirectionState = 4;
                         }
                         break;
                     case 79:
                         if (message.payload.keyboard.modifiers & MESSAGE_MODIFIER_CONTROL_KEYS) {
-                            ScreenScroll(5, 0);
+                            ScreenScroll(AdventureScrollDirection(5), 0);
                         } else {
                             moveDirectionState = 5;
                         }
                         break;
                     case 75:
                         if (message.payload.keyboard.modifiers & MESSAGE_MODIFIER_CONTROL_KEYS) {
-                            ScreenScroll(6, 0);
+                            ScreenScroll(AdventureScrollDirection(6), 0);
                         } else {
                             moveDirectionState = 6;
                         }
                         break;
                     case 71:
                         if (message.payload.keyboard.modifiers & MESSAGE_MODIFIER_CONTROL_KEYS) {
-                            ScreenScroll(7, 0);
+                            ScreenScroll(AdventureScrollDirection(7), 0);
                         } else {
                             moveDirectionState = 7;
                         }
@@ -1763,15 +1763,20 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
                 if (specialArtifactValue) {
                     searchingHeroState->ViewArtifact(ARTIFACT_SPHERE_NEGATION, 0, -1);
                 } else {
-                    searchingHeroState->ViewArtifact(ArtifactType(gpGame->m_ultimateArtifactId), 0, -1);
+                    searchingHeroState
+                        ->ViewArtifact(ArtifactType(gpGame->m_ultimateArtifactId), 0, -1);
                 }
                 gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[m_currentTerrain]);
             }
             if (specialArtifactValue) {
                 GiveArtifact(searchingHeroState, ARTIFACT_SPHERE_NEGATION, 1, -1);
             } else {
-                artifactResultLocal =
-                    GiveArtifact(searchingHeroState, ArtifactType(gpGame->m_ultimateArtifactId), 1, -1);
+                artifactResultLocal = GiveArtifact(
+                    searchingHeroState,
+                    ArtifactType(gpGame->m_ultimateArtifactId),
+                    1,
+                    -1
+                );
             }
             gpGame->m_ultimateArtifactId = IDX(ARTIFACT_NONE);
         }
@@ -3283,7 +3288,8 @@ void advManager::DrawCell(
 
                 if (s_drawCell->m_overlayIndex != IDX(MAPCELL_SPRITE_NONE)
                     && ((HAS(drawMask, ADVMGR_DRAW_OVERLAY) && !s_drawCell->m_drawOverlayOnTop)
-                        || (HAS(drawMask, ADVMGR_DRAW_OVERLAY_TOP) && s_drawCell->m_drawOverlayOnTop))
+                        || (HAS(drawMask, ADVMGR_DRAW_OVERLAY_TOP)
+                            && s_drawCell->m_drawOverlayOnTop))
                     && (gbDrawingPuzzle == 0 || bPuzzleDraw[s_drawCell->m_overlayTileset])) {
                     IconToBitmap(
                         m_objectIcons[s_drawCell->m_overlayTileset],
@@ -3828,7 +3834,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
     i32 quickInfoScreenX;
     i32 dialogTopPosition;
     heroWindow* windowLocal;
-    u32 visitedMaskValue;
+    HeroEventFlag visitedMaskValue;
     char savedTextLocal[200];
     char guardCaption[200];
     i32 siteIndexName;
@@ -3864,7 +3870,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
     if (windowLocal == 0) {
         MemError();
     }
-    visitedMaskValue = 0;
+    visitedMaskValue = HERO_EVENT_NONE;
 
     if (m_mapOriginX + cellX < 0 || m_mapOriginX + cellX >= MAP_WIDTH || m_mapOriginY + cellY < 0
         || m_mapOriginY + cellY >= MAP_HEIGHT) {
@@ -4002,28 +4008,28 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     }
                     break;
                 case MAP_OBJECT_BUOY:
-                    visitedMaskValue = IDX(ADVMGR_VISIT_FORT);
+                    visitedMaskValue = ADVMGR_VISIT_FORT;
                     goto quick_info_default;
                 case MAP_OBJECT_FOUNTAIN:
-                    visitedMaskValue = IDX(ADVMGR_VISIT_GAZEBO);
+                    visitedMaskValue = ADVMGR_VISIT_GAZEBO;
                     goto quick_info_default;
                 case MAP_OBJECT_OASIS:
-                    visitedMaskValue = IDX(ADVMGR_VISIT_MERCENARY_CAMP);
+                    visitedMaskValue = ADVMGR_VISIT_MERCENARY_CAMP;
                     goto quick_info_default;
                 case MAP_OBJECT_FAERIE_RING:
-                    visitedMaskValue = IDX(ADVMGR_VISIT_STANDING_STONES);
+                    visitedMaskValue = ADVMGR_VISIT_STANDING_STONES;
                     goto quick_info_default;
                 case MAP_OBJECT_TEMPLE:
-                    visitedMaskValue = IDX(ADVMGR_VISIT_WITCH_DOCTOR);
+                    visitedMaskValue = ADVMGR_VISIT_WITCH_DOCTOR;
                     goto quick_info_default;
                 case MAP_OBJECT_WATERING_HOLE:
-                    visitedMaskValue = IDX(ADVMGR_VISIT_EVENT_SITE);
+                    visitedMaskValue = ADVMGR_VISIT_EVENT_SITE;
                     goto quick_info_default;
                 case MAP_OBJECT_MAGIC_WELL:
-                    visitedMaskValue = IDX(ADVMGR_VISIT_XANADU);
+                    visitedMaskValue = ADVMGR_VISIT_XANADU;
                     goto quick_info_default;
                 case MAP_OBJECT_IDOL:
-                    visitedMaskValue = IDX(ADVMGR_VISIT_TREE_OF_KNOWLEDGE);
+                    visitedMaskValue = ADVMGR_VISIT_TREE_OF_KNOWLEDGE;
                     goto quick_info_default;
                 case MAP_OBJECT_NONE:
                 case MAP_OBJECT_MAP_EVENT:
@@ -4132,7 +4138,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                                     siteIndexName = 0;
                                 } else if (siteFrameLocal[0] < ADVMGR_GENERIC_SITE_2_END) {
                                     siteIndexName = 1;
-                                    visitedMaskValue = IDX(ADVMGR_VISIT_GENERIC_HUT);
+                                    visitedMaskValue = ADVMGR_VISIT_GENERIC_HUT;
                                 }
                             }
                             break;
@@ -4142,15 +4148,15 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                             } else {
                                 if (siteFrameLocal[0] < ADVMGR_GENERIC_ALTAR_END) {
                                     siteIndexName = 4;
-                                    visitedMaskValue = IDX(ADVMGR_VISIT_GENERIC_ALTAR);
+                                    visitedMaskValue = ADVMGR_VISIT_GENERIC_ALTAR;
                                 } else if (siteFrameLocal[0] < ADVMGR_GENERIC_UNUSED_END) {
                                     siteIndexName = -1;
                                 } else if (siteFrameLocal[0] < ADVMGR_GENERIC_TOWER_END) {
                                     siteIndexName = 5;
-                                    visitedMaskValue = IDX(ADVMGR_VISIT_GENERIC_TOWER);
+                                    visitedMaskValue = ADVMGR_VISIT_GENERIC_TOWER;
                                 } else if (siteFrameLocal[0] < ADVMGR_GENERIC_SPRING_END) {
                                     siteIndexName = 6;
-                                    visitedMaskValue = IDX(ADVMGR_VISIT_GENERIC_SPRING);
+                                    visitedMaskValue = ADVMGR_VISIT_GENERIC_SPRING;
                                 }
                             }
                             break;
@@ -4175,8 +4181,8 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         strcat(gText, "\n\n");
                         strcat(
                             gText,
-                            (heroLocal->m_eventFlags & IDX(visitedMaskValue)) ? "(already visited)"
-                                                                         : "(not visited)"
+                            HAS(heroLocal->m_eventFlags, visitedMaskValue) ? "(already visited)"
+                                                                           : "(not visited)"
                         );
                     }
                     break;
@@ -4225,13 +4231,13 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     break;
                 default:
                 quick_info_default:
-                    if (visitedMaskValue != 0 && heroLocal != 0) {
+                    if (visitedMaskValue != 0 && IDX(heroLocal) != 0) {
                         sprintf(
                             gText,
                             "%s\n\n%s",
                             gQuickViewText[currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK],
-                            (heroLocal->m_eventFlags & IDX(visitedMaskValue)) ? "(already visited)"
-                                                                         : "(not visited)"
+                            HAS(heroLocal->m_eventFlags, visitedMaskValue) ? "(already visited)"
+                                                                           : "(not visited)"
                         );
                     } else {
                         sprintf(
@@ -5332,7 +5338,12 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
             quickViewMessageState.payload.widget.data.text = gText;
             quickWindowSlot->BroadcastMessage(quickViewMessageState);
         }
-        sprintf(gText, "%d/%d", targetHero->m_spellPoints, targetHero->Stats(HeroPrimaryStat(3)) * 10);
+        sprintf(
+            gText,
+            "%d/%d",
+            targetHero->m_spellPoints,
+            targetHero->Stats(HeroPrimaryStat(3)) * 10
+        );
         quickViewMessageState.payload.widget.id = 7;
         quickViewMessageState.payload.widget.data.text = gText;
         quickWindowSlot->BroadcastMessage(quickViewMessageState);
@@ -6330,7 +6341,7 @@ void advManager::CastSpell(SpellType spell) {
         case SPELL_VIEW_TOWNS:
         case SPELL_VIEW_HEROES:
         case SPELL_VIEW_ALL:
-            ViewWorld(spell, spell == SPELL_VIEW_ALL, spell == SPELL_VIEW_ALL);
+            ViewWorld(ViewWorldMode(IDX(spell)), spell == SPELL_VIEW_ALL, spell == SPELL_VIEW_ALL);
             break;
         case SPELL_IDENTIFY_HERO:
             m_identifyHeroActive = 1;
@@ -6377,7 +6388,7 @@ void advManager::CastSpell(SpellType spell) {
             if (spell == SPELL_DIMENSION_DOOR) {
                 DimensionDoor();
             } else {
-                TownGate(IDX(spell));
+                TownGate(spell);
             }
             break;
         case SPELL_VISIONS:
@@ -6456,9 +6467,9 @@ void advManager::CheckCastSpell(void) {
         UpdateScreen(0, 0);
         gpMouseManager
             ->SetPointer("advmice.mse", ADVMGR_POINTER_DEFAULT, ADVMGR_DEFAULT_POINTER_FRAME);
-        CastSpell(
-            IDX(gpGame->ViewSpells)(gpGame->GetHero(gpCurPlayer->m_currentHero), 1, NullHandler, 0)
-        );
+        CastSpell(SpellType(
+            gpGame->ViewSpells(gpGame->GetHero(gpCurPlayer->m_currentHero), 1, NullHandler, 0)
+        ));
     }
 }
 
@@ -7006,7 +7017,7 @@ void advManager::SetEnvironmentOrigin(i32 originX, i32 originY, i32 stopSounds) 
                     ADVMGR_ENVIRONMENT_SOUND_LOG_UNUSED
                 );
                 gpSoundManager->StopSample(
-                    m_loopingSamples[m_activeSounds[edgeOffset].soundId]
+                    m_loopingSamples[IDX(m_activeSounds[edgeOffset].soundId)]
                         ->m_playbackData.activeSample
                 );
                 m_activeSounds[edgeOffset].soundId = ADVMGR_ENVIRONMENT_SOUND_NONE;
@@ -7017,7 +7028,7 @@ void advManager::SetEnvironmentOrigin(i32 originX, i32 originY, i32 stopSounds) 
         }
     }
 
-    if (originX == ADVMGR_ENVIRONMENT_SOUND_NONE) {
+    if (originX == IDX(ADVMGR_ENVIRONMENT_SOUND_NONE)) {
         return;
     }
 
@@ -7061,15 +7072,15 @@ void advManager::SetEnvironmentOrigin(i32 originX, i32 originY, i32 stopSounds) 
             if (m_activeSounds[edgeOffset].soundId != ADVMGR_ENVIRONMENT_SOUND_NONE
                 && m_activeSounds[edgeOffset].volume > ADVMGR_ENVIRONMENT_SOUND_MAX_DISTANCE) {
                 gpSoundManager->StopSample(
-                    m_loopingSamples[m_activeSounds[edgeOffset].soundId]
+                    m_loopingSamples[IDX(m_activeSounds[edgeOffset].soundId)]
                         ->m_playbackData.activeSample
                 );
                 m_activeSounds[edgeOffset].soundId = ADVMGR_ENVIRONMENT_SOUND_NONE;
             }
             if (m_activeSounds[edgeOffset].soundId != ADVMGR_ENVIRONMENT_SOUND_NONE
-                && (m_activeSoundMask & (1 << m_activeSounds[edgeOffset].soundId)) != 0) {
+                && (m_activeSoundMask & BIT(m_activeSounds[edgeOffset].soundId)) != 0) {
                 gpSoundManager->ModifySample(
-                    m_loopingSamples[m_activeSounds[edgeOffset].soundId]
+                    m_loopingSamples[IDX(m_activeSounds[edgeOffset].soundId)]
                         ->m_playbackData.activeSample,
                     IDX(SOUND_SAMPLE_OPERATION_EFFECT_VOLUME),
                     ADVMGR_ENVIRONMENT_VOLUME(m_activeSounds[edgeOffset].volume)
@@ -7221,7 +7232,7 @@ AdventureEnvironmentSoundId advManager::GetSoundId(i32 x, i32 y) {
 // symbol at +0x239. Direct bounds and MAP_WIDTH <= OD_STEER(x) were already tried.
 VA(0x00466ef0, 0x23a)
 void advManager::InsertSound(i32 x, i32 mapY, i32 distance, i32 soundLayer) {
-    i32 soundSlot;
+    AdventureEnvironmentSoundId soundSlot;
     i32 distanceLimit;
     i32 activeIndex;
     AdventureEnvironmentSoundId soundId;
@@ -7231,7 +7242,7 @@ void advManager::InsertSound(i32 x, i32 mapY, i32 distance, i32 soundLayer) {
     }
 
     soundId = GetSoundId(x, mapY);
-    if (soundId == IDX(ADVMGR_ENVIRONMENT_SOUND_NONE)) {
+    if (soundId == ADVMGR_ENVIRONMENT_SOUND_NONE) {
         return;
     }
 
@@ -7239,7 +7250,7 @@ void advManager::InsertSound(i32 x, i32 mapY, i32 distance, i32 soundLayer) {
         if (m_activeSounds[activeIndex].soundId == IDX(soundId)) {
             if (m_activeSounds[activeIndex].volume > distance) {
                 m_activeSounds[activeIndex].volume = distance;
-                m_activeSoundMask |= 1 << m_activeSounds[activeIndex].soundId;
+                m_activeSoundMask |= 1 << IDX(m_activeSounds[activeIndex].soundId);
             }
             return;
         }
@@ -7250,7 +7261,7 @@ void advManager::InsertSound(i32 x, i32 mapY, i32 distance, i32 soundLayer) {
     }
 
     distanceLimit = distance;
-    soundSlot = ADVMGR_ENVIRONMENT_SOUND_NONE;
+    soundSlot = IDX(ADVMGR_ENVIRONMENT_SOUND_NONE);
     for (activeIndex = 0; activeIndex < ADVMGR_SOUND_CELL_COUNT; ++activeIndex) {
         if (m_activeSounds[activeIndex].volume > distanceLimit) {
             distanceLimit = m_activeSounds[activeIndex].volume;
@@ -7258,21 +7269,21 @@ void advManager::InsertSound(i32 x, i32 mapY, i32 distance, i32 soundLayer) {
         }
     }
 
-    if (soundSlot != ADVMGR_ENVIRONMENT_SOUND_NONE) {
-        if (m_activeSounds[soundSlot].soundId != ADVMGR_ENVIRONMENT_SOUND_NONE) {
+    if (soundSlot != IDX(ADVMGR_ENVIRONMENT_SOUND_NONE)) {
+        if (m_activeSounds[IDX(soundSlot)].soundId != ADVMGR_ENVIRONMENT_SOUND_NONE) {
             gpSoundManager->StopSample(
-                m_loopingSamples[m_activeSounds[soundSlot].soundId]->m_playbackData.activeSample
+                m_loopingSamples[IDX(m_activeSounds[IDX(soundSlot)].soundId)]->m_playbackData.activeSample
             );
         }
-        m_activeSounds[soundSlot].soundId = soundId;
-        m_activeSounds[soundSlot].volume = distance;
+        m_activeSounds[IDX(soundSlot)].soundId = soundId;
+        m_activeSounds[IDX(soundSlot)].volume = distance;
         CheckLoadSample(IDX(soundId));
         m_loopingSamples[IDX(soundId)]->m_playbackData.volume = ADVMGR_ENVIRONMENT_VOLUME(distance);
         m_loopingSamples[IDX(soundId)]->m_playbackData.loopCount = 0;
         m_loopingSamples[IDX(soundId)]->m_playbackData.channelType =
             ADVMGR_ENVIRONMENT_SOUND_CHANNEL_TYPE;
         gpSoundManager->MemorySample(m_loopingSamples[IDX(soundId)]);
-        m_activeSoundMask ^= 1 << m_activeSounds[soundSlot].soundId;
+        m_activeSoundMask ^= 1 << IDX(m_activeSounds[IDX(soundSlot)].soundId);
     }
 }
 
@@ -7385,7 +7396,7 @@ void advManager::TeleportTo(
             ADVMGR_UPDATE_VIEWPORT_ORIGIN,
             ADVMGR_UPDATE_VIEWPORT_SIZE,
             ADVMGR_UPDATE_VIEWPORT_SIZE,
-            ADVMGR_ENVIRONMENT_SOUND_NONE,
+            IDX(ADVMGR_ENVIRONMENT_SOUND_NONE),
             0,
             0
         );
@@ -8123,7 +8134,7 @@ void advManager::ScreenScroll(AdventureScrollDirection direction, i32 updatePoin
     }
 
     if (updatePointer) {
-        gpMouseManager->SetPointer(direction + IDX(ADVMGR_HOVER_SCROLL_FRAME_FIRST));
+        gpMouseManager->SetPointer(IDX(direction) + IDX(ADVMGR_HOVER_SCROLL_FRAME_FIRST));
     }
 
     if (originX < ADVMGR_SCROLL_MIN_ORIGIN) {
@@ -8166,24 +8177,24 @@ void advManager::CheckScreenScroll(void) {
             && mouseY1 < ADVMGR_SCREEN_HEIGHT) {
             if (mouseX6 < ADVMGR_SCROLL_BORDER) {
                 if (mouseY1 < ADVMGR_SCROLL_BORDER) {
-                    ScreenScroll(IDX(ADVMGR_SCROLL_NORTH_WEST), 1);
+                    ScreenScroll(ADVMGR_SCROLL_NORTH_WEST, 1);
                 } else if (mouseY1 > ADVMGR_SCREEN_HEIGHT - ADVMGR_SCROLL_BORDER) {
-                    ScreenScroll(IDX(ADVMGR_SCROLL_SOUTH_WEST), 1);
+                    ScreenScroll(ADVMGR_SCROLL_SOUTH_WEST, 1);
                 } else {
-                    ScreenScroll(IDX(ADVMGR_SCROLL_WEST), 1);
+                    ScreenScroll(ADVMGR_SCROLL_WEST, 1);
                 }
             } else if (mouseX6 > ADVMGR_SCREEN_WIDTH - ADVMGR_SCROLL_BORDER - 1) {
                 if (mouseY1 < ADVMGR_SCROLL_BORDER) {
-                    ScreenScroll(IDX(ADVMGR_SCROLL_NORTH_EAST), 1);
+                    ScreenScroll(ADVMGR_SCROLL_NORTH_EAST, 1);
                 } else if (mouseY1 > ADVMGR_SCREEN_HEIGHT - ADVMGR_SCROLL_BORDER) {
-                    ScreenScroll(IDX(ADVMGR_SCROLL_SOUTH_EAST), 1);
+                    ScreenScroll(ADVMGR_SCROLL_SOUTH_EAST, 1);
                 } else {
-                    ScreenScroll(IDX(ADVMGR_SCROLL_EAST), 1);
+                    ScreenScroll(ADVMGR_SCROLL_EAST, 1);
                 }
             } else if (mouseY1 < ADVMGR_SCROLL_BORDER) {
-                ScreenScroll(IDX(ADVMGR_SCROLL_NORTH), 1);
+                ScreenScroll(ADVMGR_SCROLL_NORTH, 1);
             } else if (mouseY1 > ADVMGR_SCREEN_HEIGHT - ADVMGR_SCROLL_BORDER) {
-                ScreenScroll(IDX(ADVMGR_SCROLL_SOUTH), 1);
+                ScreenScroll(ADVMGR_SCROLL_SOUTH, 1);
             }
         }
 
@@ -8229,7 +8240,8 @@ void advManager::SetInitialMapOrigin(void) {
     m_cursorActive = 0;
     gbHeroMoving = false;
 
-    if (gbThisNetHumanPlayer[giCurPlayer] && gpCurPlayer->CurrentTown() != IDX(ADVMGR_INVALID_CELL)) {
+    if (gbThisNetHumanPlayer[giCurPlayer]
+        && gpCurPlayer->CurrentTown() != IDX(ADVMGR_INVALID_CELL)) {
         currentTown9 = &gpGame->m_castleRecs[gpCurPlayer->CurrentTown()];
         m_mapOriginX = currentTown9->m_x - ADVMGR_VIEW_CENTER_OFFSET;
         m_mapOriginY = currentTown9->m_y - ADVMGR_VIEW_CENTER_OFFSET;
@@ -8433,8 +8445,8 @@ void advManager::TrimLoopingSounds(i32 maxSamples) {
     i32 soundIndex;
     for (soundIndex = 0; soundIndex < ADVMGR_SOUND_CELL_COUNT; ++soundIndex) {
         if (m_activeSounds[soundIndex].soundId >= 0
-            && m_activeSounds[soundIndex].soundId < ADVMGR_LOOPING_SAMPLE_COUNT) {
-            ++retainedSamples[m_activeSounds[soundIndex].soundId];
+            && m_activeSounds[soundIndex].soundId < IDX(ADVMGR_LOOPING_SAMPLE_COUNT)) {
+            ++retainedSamples[IDX(m_activeSounds[soundIndex].soundId)];
         }
     }
 
@@ -9503,7 +9515,9 @@ i32 SystemOptionsHandler(struct tag_message& message) {
                                     gpSoundManager->MIDIStartup();
                                 }
                                 if (gpSoundManager->m_midiReady == 0) {
-                                    gConfig.useOpera = CONFIG_OPERA_ENABLED - IDX(gConfig.useOpera);
+                                    gConfig.useOpera = ConfigOperaMode(
+                                        IDX(CONFIG_OPERA_ENABLED) - IDX(gConfig.useOpera)
+                                    );
                                 } else {
                                     gpSoundManager->SetMusicQuality(IDX(CONFIG_MUSIC_SOURCE_MIDI));
                                 }
@@ -9682,7 +9696,8 @@ i32 advManager::DoVisions(hero* visionHero) {
         static_cast<float>(gpPhilAI->FightValueOfStack(&visionHero->m_army, visionHero, 0, 0, 0, 0))
         / static_cast<float>(gMonsterDatabase[IDX(creatureData)].fightValue * monsterCountIndex);
 
-    if (visionHero->m_army.CanJoin(IDX(creatureData)) && strengthRatioCurrent > MONSTER_STRENGTH_JOIN
+    if (visionHero->m_army.CanJoin(IDX(creatureData))
+        && strengthRatioCurrent > MONSTER_STRENGTH_JOIN
         && !visionHero->HasArtifact(ARTIFACT_HIDEOUS_MASK) && creatureData != CREATURE_GHOST
         && creatureData != CREATURE_EARTH_ELEMENTAL && creatureData != CREATURE_AIR_ELEMENTAL
         && creatureData != CREATURE_FIRE_ELEMENTAL && creatureData != CREATURE_WATER_ELEMENTAL) {

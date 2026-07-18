@@ -26,7 +26,7 @@ struct tag_message;
 #define ADVMGR_MONSTER_ANIMATION_TABLE_SIZE 16
 
 struct adventureSoundCell {
-    i32 soundId;
+    AdventureEnvironmentSoundId soundId;
     i32 volume;
 };
 
@@ -189,7 +189,7 @@ public:
     void SetHeroContext(i32, i32);
     void DoHeroKnob(void);
     void DoTownKnob(void);
-    void CastSpell(i32);
+    void CastSpell(SpellType);
     void CheckCastSpell(void);
     i32 ComboDraw(i32, i32, i32);
     i32 ComboDraw(i32);
@@ -199,7 +199,7 @@ public:
     void InsertSound(i32, i32, i32, i32);
     void TeleportTo(class hero*, i32, i32, i32, i32);
     void DimensionDoor(void);
-    void TownGate(i32);
+    void TownGate(SpellType);
     void SummonBoat(void);
     void ShowRoute(i32, i32, i32);
     void HideRoute(i32, i32, i32);
@@ -207,7 +207,7 @@ public:
     void CheckDimNextHeroBut(void);
     void SeedTo(i32, i32);
     void ForceNewHover(void);
-    void ScreenScroll(i32, i32);
+    void ScreenScroll(AdventureScrollDirection, i32);
     void CheckScreenScroll(void);
     i32 MouseInScrollZone(void);
     void SetInitialMapOrigin(void);

@@ -125,7 +125,7 @@ public:
     char m_listState[9];                                    // +0x422
     iconWidget* m_scrollKnob;                               // +0x42b
     // --- constructors ---
-    fileRequester(i32, i32, i32, char*, char*, char*);
+    fileRequester(i32, i32, FileRequesterMode, char*, char*, char*);
     // --- virtual methods (vtable order) ---
     virtual i32 Open(i32) OVERRIDE;
     virtual void Close(void) OVERRIDE;

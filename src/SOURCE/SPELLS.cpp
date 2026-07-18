@@ -3786,11 +3786,11 @@ void combatManager::ShowSpellMessage(i32 castByCreature, i32 spell, army* target
             sprintf(message_m, "The %s are paralyzed by the Cyclopes!", targetName_b);
         else if (spell == IDX(SPELL_BLIND))
             sprintf(message_m, "The Unicorns' attack blinds the %s!", targetName_b);
-        else if (spell == CREATURE_SPELL_PETRIFY)
+        else if (spell == IDX(CREATURE_SPELL_PETRIFY))
             sprintf(message_m, "The Medusas' gaze turns the %s to stone!", targetName_b);
         else if (spell == IDX(SPELL_CURSE))
             sprintf(message_m, "The Mummies' curse falls upon the %s!", targetName_b);
-        else if (spell == CREATURE_SPELL_DISPEL)
+        else if (spell == IDX(CREATURE_SPELL_DISPEL))
             sprintf(message_m, "The Archmages dispel all good spells\non your %s!", targetName_b);
         else {
             unhandledSpell_j = 0;
