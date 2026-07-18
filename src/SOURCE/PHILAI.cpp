@@ -3371,9 +3371,9 @@ i32 philAI::FightValueOfStack(
                 else
                     quantityModifierTarget = -0.58f;
 
-                if ((gMonsterDatabase[group->m_creatureTypes[armySlotRecord]].attributes
-                     & MONSTER_ATTRIBUTE_RANGED)
-                    || IDX(group->m_creatureTypes[armySlotRecord]) == IDX(CREATURE_VAMPIRE)
+                if (HAS(gMonsterDatabase[group->m_creatureTypes[armySlotRecord]].attributes,
+                        MONSTER_ATTRIBUTE_RANGED)
+                    || group->m_creatureTypes[armySlotRecord] == IDX(CREATURE_VAMPIRE)
                     || group->m_creatureTypes[armySlotRecord] == IDX(CREATURE_VAMPIRE_LORD)
                     || group->m_creatureTypes[armySlotRecord] == IDX(CREATURE_SPRITE)
                     || group->m_creatureTypes[armySlotRecord] == IDX(CREATURE_ROGUE)
