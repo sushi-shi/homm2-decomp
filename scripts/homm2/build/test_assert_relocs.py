@@ -1,6 +1,7 @@
 import struct
 import tempfile
 import unittest
+from collections import Counter
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -10,6 +11,8 @@ from homm2.build.assert_relocs import (
     check_owner_offset_multisets,
     check_ordered_owner_offsets,
     check_ordered_reloc_addresses,
+    check_linked_pe_data_targets,
+    check_pe_data_targets,
     compare_function_reloc_addends,
     load_canonical_data_names,
     parse_obj,
@@ -152,6 +155,88 @@ class OrderedRelocFieldTest(unittest.TestCase):
         base = [(0x20, "DIR32", "$SG123", 0)]
         self.assertEqual(check_ordered_reloc_addresses(
             self.sym, {}, {}, [], base, target), [])
+
+    def test_pe_data_gate_catches_wrong_compiler_local_identity(self):
+        unit = "SOURCE/PHILAI"
+        base = [(0xB4E, "DIR32", "$T40623", 0)]
+        target = [(0xB4E, "DIR32", "_AI_EVENT_HUMAN_VALUE_FACTOR$S1540", 0)]
+        local_rvas = {(unit, "$T40623"): {0xEB4D4}}
+        pe_read = lambda _rva, _size: struct.pack("<I", 0x4EB280)
+        problems = check_pe_data_targets(
+            {}, {}, {}, local_rvas, unit, 0x3B865, base, target,
+            [(".rdata", 0xEB000, 0xEBD00)], pe_read)
+        self.assertEqual(len(problems), 1)
+        self.assertIn("expected RVA 0xeb280, actual RVA 0xeb4d4",
+                      problems[0].diagnostic())
+
+    def test_pe_data_gate_accepts_exact_compiler_local_identity(self):
+        unit = "SOURCE/PHILAI"
+        base = [(0xB4E, "DIR32", "_AI_EVENT_HUMAN_VALUE_FACTOR$S1540", 0)]
+        target = list(base)
+        local_rvas = {(unit, base[0][2]): {0xEB280}}
+        pe_read = lambda _rva, _size: struct.pack("<I", 0x4EB280)
+        self.assertEqual(check_pe_data_targets(
+            {}, {}, {}, local_rvas, unit, 0x3B865, base, target,
+            [(".rdata", 0xEB000, 0xEBD00)], pe_read), [])
+
+    def test_linked_pe_gate_compares_section_relative_destinations(self):
+        def image(function_rva, target_rva):
+            payload = bytearray(0x500)
+            struct.pack_into("<I", payload, function_rva + 2,
+                             0x400000 + target_rva)
+            return (payload, 0x400000, [
+                (".text", 0x100, 0x200, 0x100, 0x100),
+                (".rdata", 0x300, 0x400, 0x300, 0x100),
+            ])
+
+        sites = [(2, "DIR32", "$T1", 0)]
+        problems = check_linked_pe_data_targets(
+            sites, sites, 0x110, 0x120,
+            image(0x110, 0x320), image(0x120, 0x338))
+        self.assertEqual(len(problems), 1)
+        self.assertIn("retail .rdata+0x20, candidate .rdata+0x38",
+                      problems[0].diagnostic())
+        self.assertEqual(check_linked_pe_data_targets(
+            sites, sites, 0x110, 0x120,
+            image(0x110, 0x320), image(0x120, 0x320)), [])
+
+    def test_linked_pe_gate_counts_each_section(self):
+        def image(function_rva, target_rva):
+            payload = bytearray(0x600)
+            struct.pack_into("<I", payload, function_rva + 2,
+                             0x400000 + target_rva)
+            return (payload, 0x400000, [
+                (".text", 0x100, 0x200, 0x100, 0x100),
+                (".rdata", 0x300, 0x400, 0x300, 0x100),
+                (".data", 0x400, 0x500, 0x400, 0x100),
+            ])
+
+        sites = [(2, "DIR32", "$T1", 0)]
+        stats = Counter()
+        self.assertEqual(check_linked_pe_data_targets(
+            sites, sites, 0x110, 0x120,
+            image(0x110, 0x320), image(0x120, 0x320), stats=stats), [])
+        self.assertEqual(stats["compared_section_sites"], 1)
+        self.assertEqual(stats["compared_rdata_sites"], 1)
+
+    def test_linked_pe_gate_rejects_same_offset_in_different_context(self):
+        def image(function_rva, target_rva, opcode):
+            payload = bytearray(0x500)
+            payload[function_rva + 1] = opcode
+            struct.pack_into("<I", payload, function_rva + 2,
+                             0x400000 + target_rva)
+            return (payload, 0x400000, [
+                (".text", 0x100, 0x200, 0x100, 0x100),
+                (".rdata", 0x300, 0x400, 0x300, 0x100),
+            ])
+
+        sites = [(2, "DIR32", "$T1", 0)]
+        stats = Counter()
+        self.assertEqual(check_linked_pe_data_targets(
+            sites, sites, 0x110, 0x120,
+            image(0x110, 0x320, 0xA1), image(0x120, 0x338, 0x68),
+            stats=stats), [])
+        self.assertEqual(stats["context_mismatch"], 1)
 
 
 class CoffAddendTest(unittest.TestCase):
