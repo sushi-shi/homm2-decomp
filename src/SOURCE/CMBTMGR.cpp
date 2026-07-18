@@ -255,7 +255,7 @@ void combatManager::InitNonVisualVars(void) {
     m_summonedCreatureType[1] = 0;
     m_selectedHex = -1;
     m_limitCreatureHex = -1;
-    m_previousCommand = COMBAT_INVALID_HISTORY_INDEX;
+    m_previousCommand = COMBAT_INVALID_COMMAND;
     m_currentSide = COMBAT_DEFENDER_SIDE;
     m_currentArmySide = COMBAT_DEFENDER_SIDE;
     m_currentSpeed = COMBAT_INITIAL_COMMAND;
@@ -407,7 +407,7 @@ void combatManager::Close(void) {
         memcpy(gpBufferPalette->m_data, m_savedPalette, COMBAT_PALETTE_DATA_SIZE);
     }
     gpWindowManager->FadeScreen(1, 8, 0);
-    giCycleType = 0;
+    giCycleType = WindowColorCycleMode(0);
     CycleColors(0);
     delete m_combatBuffer;
     delete m_backgroundBuffer;
