@@ -4,6 +4,7 @@
 // 149 methods, 3 own-virtual, 0 static data.
 #include <va.h>
 #include "../BASE/baseManager.h"
+#include <BASE/WINMGR.h>
 #include "../BASE/icon.h"
 #include "army.h"
 #include "hero.h"
@@ -677,7 +678,7 @@ public:
     i32 m_terrainType;                                      // +0x31de
     i32 m_battlefieldFringe;                                // +0x31e2
     class town* m_originalCombatTown;                       // +0x31e6
-    i32 m_colorCycleType;                                   // +0x31ea
+    WindowColorCycleMode m_colorCycleType;                                   // +0x31ea
     char _pad_0x31ee[0x4];
     i32 m_debugFormation;                               // +0x31f2
     class icon* m_combatIcons[COMBAT_FIXED_ICON_COUNT]; // +0x31f6

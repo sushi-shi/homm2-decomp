@@ -1734,7 +1734,8 @@ void combatManager::BloodLustEffect(army* target, i32 effect) {
         giMaxExtentX - giMinExtentX + 1,
         giMaxExtentY - giMinExtentY + 1
     );
-    target->m_monster.flags.abilityFlags -= IDX(effect);
+    target->m_monster.flags.abilityFlags =
+            MonsterAbilityFlags(IDX(target->m_monster.flags.abilityFlags) - IDX(effect));
     gpCombatManager->DrawFrame(0, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
     gpWindowManager->FizzleForward(
         giMinExtentX,
