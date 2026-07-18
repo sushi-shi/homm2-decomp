@@ -175,7 +175,7 @@ SpellType hero::GetNthSpell(i32 type, i32 spellNumber) {
                 return SpellType(spell);
         }
     }
-    return IDX(SPELL_NONE);
+    return SPELL_NONE;
 }
 
 // @early-stop
@@ -192,7 +192,7 @@ i32 hero::GetNumSpells(i32 type) {
     numAdventureSpells = 0;
     for (spellIndexCurrent = 0; spellIndexCurrent < IDX(SPELL_COUNT); spellIndexCurrent++) {
         if (HasSpell(SpellType(spellIndexCurrent))) {
-            if (gsSpellInfo[spellIndexCurrent].attributes & IDX(SPELL_INFO_ATTRIBUTE_COMBAT))
+            if (HAS(gsSpellInfo[spellIndexCurrent].attributes, SPELL_INFO_ATTRIBUTE_COMBAT))
                 numCombatSpells++;
             else
                 numAdventureSpells++;
@@ -476,11 +476,11 @@ void hero::Deallocate(i32 updateMap) {
 
     if (gbRetreatWin) {
         availableHeroSlotCurrent = Random(0, HERO_AVAILABLE_SLOT_COUNT - 1);
-        if (gpGame
-                ->m_heroRecs[gpGame->m_players[m_owner]
-                                 .m_availableHeroIds[availableHeroSlotCurrent]]
-                .m_eventFlags
-            & HERO_EVENT_WEEKLY_VISIT) {
+        if (HAS(gpGame
+                    ->m_heroRecs[gpGame->m_players[m_owner]
+                                     .m_availableHeroIds[availableHeroSlotCurrent]]
+                    .m_eventFlags,
+                HERO_EVENT_WEEKLY_VISIT)) {
             availableHeroSlotCurrent = 1 - availableHeroSlotCurrent;
         }
         if (gpGame->m_availableHeroes[gpGame->m_players[m_owner]
