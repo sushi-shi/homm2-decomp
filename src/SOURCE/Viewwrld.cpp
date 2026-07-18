@@ -76,7 +76,7 @@ void advManager::ViewWorld(ViewWorldMode whatToDraw, b32 drawAllObjects, b32 dra
     if (whatToDraw == VIEW_WORLD_ALL && drawAllObjects == 0 && drawAllTerrains == 0)
         legendMode = 6;
     else
-        legendMode = whatToDraw - IDX(VIEW_WORLD_MINES);
+        legendMode = IDX(whatToDraw) - IDX(VIEW_WORLD_MINES);
     sprintf(gText, "view%s.icn", viewIconNames[legendMode]);
     dialogMessage.type = VIEW_WORLD_MESSAGE;
     dialogMessage.payload.widget.command = VIEW_WORLD_ICON_MESSAGE;
@@ -132,7 +132,7 @@ void advManager::VWInit(i32 centerX, i32 centerY) {
             iVWMapOriginY = MAP_HEIGHT - iVWViewableCells;
     }
 
-    iVWXPixelOffset = (VIEW_WORLD_WINDOW_X - giViewWorldScale * IDX(iVWViewableCells)) >> 1;
+    iVWXPixelOffset = (VIEW_WORLD_WINDOW_X - IDX(giViewWorldScale) * IDX(iVWViewableCells)) >> 1;
     iVWYPixelOffset = iVWXPixelOffset;
     gpMouseManager->SetPointer("advmice.mse", VIEW_WORLD_POINTER_FRAME, VIEW_WORLD_POINTER_COLOR);
     sprintf(gText, "ground%d.icn", giViewWorldScale);
@@ -203,7 +203,8 @@ void advManager::VWCompleteDraw(void) {
             if ((giCurPlayerBit & mapExtra[MAP_WIDTH * mapY3 + mapX7]) || iVWDrawAllTerrains
                 || (iVWWhatToDraw == VIEW_WORLD_TOWNS
                     && (((cell0->m_triggerType & MAP_TRIGGER_TYPE_MASK) == MAP_OBJECT_CASTLE)
-                        || (cell0->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION)
+                        || (cell0->m_triggerType
+                                == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION)
                             && gpGame->m_heroRecs[cell0->m_objectMetadata].m_locationType
                                    == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE))))) {
                 flipped5 = 0;
@@ -267,7 +268,7 @@ void advManager::VWCompleteDraw(void) {
                     giGroundToTerrain[cell0->m_terrainImageIndex] * VIEW_WORLD_TERRAIN_FRAME_STRIDE;
                 if ((giCurPlayerBit & mapExtra[MAP_WIDTH * mapY3 + mapX7]) || iVWDrawAllTerrains) {
                     if (flipped5 == 1)
-                        townIconHighlight1 = giViewWorldScale - 1;
+                        townIconHighlight1 = IDX(giViewWorldScale) - 1;
                     else
                         townIconHighlight1 = 0;
                     pVWGround->DrawToBuffer(
@@ -428,9 +429,9 @@ void advManager::VWCompleteDraw(void) {
     for (mapY3 = iVWMapOriginY; mapY3 < iVWMapOriginY + iVWViewableCells; mapY3++) {
         for (mapX7 = iVWMapOriginX; mapX7 < iVWMapOriginX + iVWViewableCells; mapX7++) {
             cell0 = GetCell(mapX7, mapY3);
-            pixelX6 = (mapX7 - iVWMapOriginX) * IDX(giViewWorldScale) + (giViewWorldScale >> 1)
+            pixelX6 = (mapX7 - iVWMapOriginX) * IDX(giViewWorldScale) + (IDX(giViewWorldScale) >> 1)
                       + iVWXPixelOffset;
-            pixelY2 = (mapY3 - iVWMapOriginY) * IDX(giViewWorldScale) + (giViewWorldScale >> 1)
+            pixelY2 = (mapY3 - iVWMapOriginY) * IDX(giViewWorldScale) + (IDX(giViewWorldScale) >> 1)
                       + iVWYPixelOffset;
 
             if (cell0->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ARTIFACT)
@@ -519,7 +520,8 @@ void advManager::VWCompleteDraw(void) {
                 currentHeroHere = 0;
             else
                 currentHeroHere = 1;
-            if ((cell0->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION) || currentHeroHere)
+            if ((cell0->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION)
+                 || currentHeroHere)
                 && (iVWDrawAllObjs || (giCurPlayerBit & mapExtra[MAP_WIDTH * mapY3 + mapX7])
                     || iVWWhatToDraw == VIEW_WORLD_HEROES)) {
                 if (!currentHeroHere)
@@ -784,7 +786,7 @@ i32 ViewWorldDialogHandler(struct tag_message& message) {
 // ---- globals (definitions, RVA order) ----
 DATA(0x004f11b8) i8 iVWHalf[3][6][2] = {3,  3, 5, 5, 6, 6, 8, 5, 2, 3, 2,  2,  4,  5, 6, 6, 8, 8,
                                         11, 7, 3, 4, 3, 3, 7, 7, 8, 8, 10, 10, 14, 8, 3, 6, 4, 4};
-DATA(0x004f11dc) i32 giViewWorldScale = 6;
+DATA(0x004f11dc) ViewWorldScale giViewWorldScale = VIEW_WORLD_SCALE_MIDDLE;
 DATA(0x004f11e0) i32 giViewWorldScaleLookup = 1;
 DATA(0x004f11e4) b32 gbInViewWorld = false;
 DATA(0x00525110) class icon* pVWMisc;
