@@ -123,7 +123,7 @@ i32 highScoreManager::Main(struct tag_message& message) {
 
     if (result == 1) {
         message.type = MESSAGE_EXECUTIVE;
-        message.payload.executive.command = IDX(EXECUTIVE_COMMAND_RETURN_RESULT);
+        message.payload.executive.command = EXECUTIVE_COMMAND_RETURN_RESULT;
         return HIGH_SCORE_MANAGER_CLOSE;
     }
     return HIGH_SCORE_MANAGER_CONTINUE;

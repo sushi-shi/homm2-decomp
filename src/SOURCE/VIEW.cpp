@@ -290,7 +290,7 @@ i32 HandleViewGeneral(tag_message& message) {
     }
     if (handled) {
         message.payload.widget.id = VIEW_GENERAL_CLOSE;
-        message.payload.widget.command = message.payload.widget.id;
+        message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
         return 2;
     }
     return 1;

@@ -39,8 +39,6 @@ H2_ENUM_CLASS_BEGIN(TradingPostWidgetId)
 H2_ENUM_CLASS_END(TradingPostWidgetId)
 
 H2_ENUM_CLASS_BEGIN(TradingPostWidgetCommand)
-    TRADING_POST_SET_TEXT = 3,
-    TRADING_POST_SET_ICON = 4
 H2_ENUM_CLASS_END(TradingPostWidgetCommand)
 
 H2_ENUM_CLASS_BEGIN(TradingPostHandlerResult)

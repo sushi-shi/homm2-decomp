@@ -1376,7 +1376,7 @@ i32 townManager::Main(tag_message& message) {
                             {
                                 gpWindowManager->BroadcastMessage(
                                     MESSAGE_WIDGET,
-                                    5,
+                                    WIDGET_COMMAND_SET_FLAGS,
                                     IDX(TOWN_CONTROL_CLOSE),
                                     TOWN_INTERFACE_BROADCAST_FLAGS
                                 );
@@ -1435,7 +1435,7 @@ i32 townManager::Main(tag_message& message) {
                                 }
                                 gpWindowManager->BroadcastMessage(
                                     MESSAGE_WIDGET,
-                                    6,
+                                    WIDGET_COMMAND_CLEAR_FLAGS,
                                     IDX(TOWN_CONTROL_CLOSE),
                                     TOWN_INTERFACE_BROADCAST_FLAGS
                                 );
@@ -1629,7 +1629,7 @@ i32 townManager::Main(tag_message& message) {
 
     if (exitTown_i == 1) {
         message.type = MESSAGE_EXECUTIVE;
-        message.payload.widget.command = 1;
+        message.payload.executive.command = EXECUTIVE_COMMAND_TERMINATE_LOOP;
         return 2;
     }
     return 1;
@@ -2168,7 +2168,7 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
     if (quickView == 0)
         gpWindowManager->BroadcastMessage(
             MESSAGE_WIDGET,
-            5,
+            WIDGET_COMMAND_SET_FLAGS,
             IDX(TOWN_CONTROL_CLOSE),
             TOWN_INTERFACE_BROADCAST_FLAGS
         );
@@ -2210,7 +2210,7 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
     if (quickView == 0)
         gpWindowManager->BroadcastMessage(
             MESSAGE_WIDGET,
-            6,
+            WIDGET_COMMAND_CLEAR_FLAGS,
             IDX(TOWN_CONTROL_CLOSE),
             TOWN_INTERFACE_BROADCAST_FLAGS
         );
@@ -2308,7 +2308,7 @@ void townManager::BuildObj(i32 building) {
         m_selectedBuilding = -1;
         gpWindowManager->BroadcastMessage(
             MESSAGE_WIDGET,
-            6,
+            WIDGET_COMMAND_CLEAR_FLAGS,
             IDX(TOWN_CONTROL_CLOSE),
             TOWN_INTERFACE_BROADCAST_FLAGS
         );
@@ -2620,7 +2620,7 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
     m_bankBox->Update(1);
     gpWindowManager->BroadcastMessage(
         MESSAGE_WIDGET,
-        6,
+        WIDGET_COMMAND_CLEAR_FLAGS,
         IDX(TOWN_CONTROL_CLOSE),
         TOWN_INTERFACE_BROADCAST_FLAGS
     );
@@ -2644,7 +2644,8 @@ i32 TavernHandler(tag_message& message) {
                     case TOWN_DIALOG_CONFIRM:
                         gpWindowManager->m_dialogResult = message.payload.widget.id;
                         message.payload.widget.id = 10;
-                        message.payload.widget.command = message.payload.widget.id;
+                        message.payload.widget.command =
+                            BaseWidgetCommand(message.payload.widget.id);
                         return 2;
                     default:
                         break;
@@ -2759,7 +2760,7 @@ i32 SplitArmyHandler(tag_message& message) {
 
     if (handled == 1) {
         message.payload.widget.id = 10;
-        message.payload.widget.command = message.payload.widget.id;
+        message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
         return 2;
     }
     return 1;

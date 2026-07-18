@@ -1200,7 +1200,7 @@ i32 InitMenuHandler(struct tag_message& msg) {
     if (handled || giMenuCommand != -1) {
         msg.type = INIT_MENU_MESSAGE;
         msg.payload.widget.id = INIT_MENU_CLOSE_COMMAND;
-        msg.payload.widget.command = msg.payload.widget.id;
+        msg.payload.widget.command = BaseWidgetCommand(msg.payload.widget.id);
         return INIT_MENU_HANDLER_CLOSE;
     }
     CheckShingleUpdate();
@@ -1252,7 +1252,7 @@ i32 RecruitHeroHandler(tag_message& msg) {
     }
     if (a == 1) {
         msg.payload.widget.id = 10;
-        msg.payload.widget.command = msg.payload.widget.id;
+        msg.payload.widget.command = BaseWidgetCommand(msg.payload.widget.id);
         return 2;
     }
     return 1;
@@ -1546,7 +1546,7 @@ i32 WaitHandler(tag_message& msg) {
         gpWindowManager->m_dialogResult = EVENT_WINDOW_SECOND_BUTTON;
         msg.type = MESSAGE_WIDGET;
         msg.payload.widget.id = EVENT_WINDOW_CLOSE_COMMAND;
-        msg.payload.widget.command = msg.payload.widget.id;
+        msg.payload.widget.command = BaseWidgetCommand(msg.payload.widget.id);
         return 2;
     }
     return 1;
@@ -1563,7 +1563,7 @@ i32 EventWindowHandler(struct tag_message& msg) {
         msg.type = MESSAGE_WIDGET;
         gpWindowManager->m_dialogResult = msg.payload.widget.id;
         msg.payload.widget.id = EVENT_WINDOW_CLOSE_COMMAND;
-        msg.payload.widget.command = msg.payload.widget.id;
+        msg.payload.widget.command = BaseWidgetCommand(msg.payload.widget.id);
         giDialogTimeout = 0;
         return EVENT_WINDOW_CLOSE;
     }
@@ -1768,7 +1768,7 @@ i32 EventWindowHandler(struct tag_message& msg) {
                     case EVENT_WINDOW_EIGHTH_BUTTON:
                         gpWindowManager->m_dialogResult = msg.payload.widget.id;
                         msg.payload.widget.id = EVENT_WINDOW_CLOSE_COMMAND;
-                        msg.payload.widget.command = msg.payload.widget.id;
+                        msg.payload.widget.command = BaseWidgetCommand(msg.payload.widget.id);
                         giDialogTimeout = 0;
                         return EVENT_WINDOW_CLOSE;
                     case EVENT_WINDOW_IGNORED_BUTTON:

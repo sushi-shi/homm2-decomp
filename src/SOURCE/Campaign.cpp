@@ -624,7 +624,7 @@ i32 CampaignHandler(struct tag_message& message) {
         message.type = MESSAGE_WIDGET;
         gpWindowManager->m_dialogResult = message.payload.widget.id;
         message.payload.widget.id = CAMPAIGN_CLOSE_COMMAND;
-        message.payload.widget.command = message.payload.widget.id;
+        message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
         giDialogTimeout = 0;
         return CAMPAIGN_HANDLER_CLOSE;
     }
@@ -721,7 +721,8 @@ i32 CampaignHandler(struct tag_message& message) {
                     case CAMPAIGN_DIALOG_RESTART:
                         gpWindowManager->m_dialogResult = message.payload.widget.id;
                         message.payload.widget.id = CAMPAIGN_CLOSE_COMMAND;
-                        message.payload.widget.command = message.payload.widget.id;
+                        message.payload.widget.command =
+                            BaseWidgetCommand(message.payload.widget.id);
                         giDialogTimeout = 0;
                         return CAMPAIGN_HANDLER_CLOSE;
                 }
@@ -860,7 +861,12 @@ void game::InitCampaignMap(void) {
             break;
         case CAMPAIGN_CHOICE_ARTIFACT:
             if (m_players[0].m_heroCount > 0)
-                GiveArtifact(gpGame->GetHero(m_players[0].m_heroIds[0]), ArtifactType(choiceBest->value), 0, -1);
+                GiveArtifact(
+                    gpGame->GetHero(m_players[0].m_heroIds[0]),
+                    ArtifactType(choiceBest->value),
+                    0,
+                    -1
+                );
             break;
         case CAMPAIGN_CHOICE_SPELL:
             if (m_players[0].m_heroCount > 0) {
@@ -936,7 +942,8 @@ void game::InitCampaignMap(void) {
         }
         switch (armyHero->m_cursorType) {
             case IDX(FACTION_BARBARIAN):
-                armyHero->m_army.Add(IDX(CREATURE_ORC_CHIEF), CAMPAIGN_BARBARIAN_ORC_CHIEF_COUNT, -1);
+                armyHero->m_army
+                    .Add(IDX(CREATURE_ORC_CHIEF), CAMPAIGN_BARBARIAN_ORC_CHIEF_COUNT, -1);
                 armyHero->m_army.Add(IDX(CREATURE_OGRE), CAMPAIGN_BARBARIAN_OGRE_COUNT, -1);
                 armyHero->m_army.Add(IDX(CREATURE_GOBLIN), CAMPAIGN_BARBARIAN_GOBLIN_COUNT, -1);
                 break;
@@ -946,9 +953,12 @@ void game::InitCampaignMap(void) {
                 armyHero->m_army.Add(IDX(CREATURE_GRIFFIN), CAMPAIGN_WARLOCK_GRIFFIN_COUNT, -1);
                 break;
             case IDX(FACTION_NECROMANCER):
-                armyHero->m_army.Add(IDX(CREATURE_SKELETON), CAMPAIGN_NECROMANCER_SKELETON_COUNT, -1);
-                armyHero->m_army.Add(IDX(CREATURE_ROYAL_MUMMY), CAMPAIGN_NECROMANCER_MUMMY_COUNT, -1);
-                armyHero->m_army.Add(IDX(CREATURE_VAMPIRE_LORD), CAMPAIGN_NECROMANCER_VAMPIRE_COUNT, -1);
+                armyHero->m_army
+                    .Add(IDX(CREATURE_SKELETON), CAMPAIGN_NECROMANCER_SKELETON_COUNT, -1);
+                armyHero->m_army
+                    .Add(IDX(CREATURE_ROYAL_MUMMY), CAMPAIGN_NECROMANCER_MUMMY_COUNT, -1);
+                armyHero->m_army
+                    .Add(IDX(CREATURE_VAMPIRE_LORD), CAMPAIGN_NECROMANCER_VAMPIRE_COUNT, -1);
                 break;
         }
         gpGame->GetHero(m_players[0].m_heroIds[0])->m_experience += CAMPAIGN_EXPERIENCE_BONUS;
