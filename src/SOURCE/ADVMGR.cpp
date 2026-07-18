@@ -3721,7 +3721,7 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                 break;
             case ADVMGR_RADAR_MAP_MEDIUM:
                 radarScaleState = 2.0f;
-                if (giViewWorldScale <= 6) {
+                if (giViewWorldScale <= VIEW_WORLD_SCALE_MIDDLE) {
                     skipFrameIndex = 1;
                 } else {
                     radarFrameLocal = 6;
@@ -3729,9 +3729,9 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                 break;
             case ADVMGR_RADAR_MAP_LARGE:
                 radarScaleState = 1.33f;
-                if (giViewWorldScale <= 4) {
+                if (giViewWorldScale <= VIEW_WORLD_SCALE_FAR) {
                     skipFrameIndex = 1;
-                } else if (giViewWorldScale == 6) {
+                } else if (giViewWorldScale == VIEW_WORLD_SCALE_MIDDLE) {
                     radarFrameLocal = 9;
                 } else {
                     radarFrameLocal = 8;
@@ -3739,9 +3739,9 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                 break;
             default:
                 radarScaleState = 1.0f;
-                if (giViewWorldScale == 4) {
+                if (giViewWorldScale == VIEW_WORLD_SCALE_FAR) {
                     radarFrameLocal = 7;
-                } else if (giViewWorldScale == 6) {
+                } else if (giViewWorldScale == VIEW_WORLD_SCALE_MIDDLE) {
                     radarFrameLocal = 6;
                 } else {
                     radarFrameLocal = 4;
