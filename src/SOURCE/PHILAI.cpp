@@ -54,12 +54,13 @@
 // either line base.
 //
 // Retail .rdata is 0xeb280..0xeb5e0 (0x360 bytes). DetermineTargetPosition's
-// target boost relocates to the retained AI_EVENT_HUMAN_VALUE_FACTOR owner at
-// 0xeb280 (1.5f). An anonymous 1.1f spelling emitted an extra allocation and
-// alignment tail which relocation-masked code and payload-only pool pairing did
-// not expose. The former 0x368 delinked target was synthesized from that model;
-// it is not evidence that the unavailable original retail object contained a
-// dead slot. Retail proves the linked 0x360 span and this code operand. The
+// target boost relocates to the retained AI_TARGET_HUMAN_VALUE_FACTOR owner at
+// 0xeb280 (1.5f). The earlier analysis incorrectly inferred the code edge from
+// an anonymous candidate 1.1f allocation and payload pairing instead of reading
+// this available retail operand. That spelling emitted an extra allocation and
+// alignment tail, and the former 0x368 delinked target was synthesized from the
+// wrong model; it is not evidence that the unavailable original retail object
+// contained a dead slot. Retail proves the linked 0x360 span and code operand. The
 // hero-purchase divisor remains float, its arithmetic identity remains double,
 // and the attention expressions retain their separately evidenced widths.
 // The pool distinguishes campfire 500.0f, buoy 400.0f,
@@ -1759,7 +1760,7 @@ i32 philAI::DetermineTargetPosition(i32& targetX, i32& targetY, i32 mobility, i3
                     }
                     if (targetX == x && targetY == y) {
                         targetScoreLocal = static_cast<i32>(
-                            targetScoreLocal * AI_EVENT_HUMAN_VALUE_FACTOR);
+                            targetScoreLocal * AI_TARGET_HUMAN_VALUE_FACTOR);
                         targetScoreLocal += 20;
                     }
 
@@ -3127,7 +3128,7 @@ i32 philAI::StrategicValueOfPosition(
                                     }
                                 } else {
                                     danger26 = static_cast<i32>(
-                                        (100 - gaiHeroLiveChance[cell9->m_objectMetadata]) * 0.9
+                                        (100 - gaiHeroLiveChance[cell9->m_objectMetadata]) * 0.2
                                     );
                                 }
                             } else {
@@ -4094,7 +4095,8 @@ void philAI::HeroInteractionAtTown(hero* heroPtr, town* townPtr, i32 doInteracti
     else if (giCurTurn <= AI_SECOND_WEEK_END_TURN)
         desiredShare0 = static_cast<float>(desiredShare0 * 0.5);
     else if (giCurTurn <= AI_THIRD_WEEK_END_TURN)
-        desiredShare0 = static_cast<float>(desiredShare0 * 0.75);
+        desiredShare0 =
+            static_cast<float>(desiredShare0 * AI_THIRD_WEEK_TOWN_SHARE_FACTOR);
     if (static_cast<u8>(heroPtr->m_id) == iAlphaMale)
         desiredShare0 = static_cast<float>(desiredShare0 * 0.5);
     if (gpGame->m_mapHeader.victoryCondition == IDX(MAP_VICTORY_CAPTURE_TOWN)
@@ -5310,7 +5312,9 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                     );
                 else
                     value_h =
-                        static_cast<i32>(gafAITurnCostResource[cell_k->m_objectMetadata] * 5.0f);
+                        static_cast<i32>(
+                            gafAITurnCostResource[cell_k->m_objectMetadata - 1] * 5.0f
+                        );
                 break;
             case MAP_OBJECT_FLOTSAM:
                 value_h =
@@ -6500,7 +6504,7 @@ i32 philAI::EvaluateTownEvent(i32 townId, i32 x, i32 y, i32 mode, i32* liveChanc
                 py
                 * (((AI_EVENT_EARLY_TURN_DIFFICULTY_STEP - gpGame->m_playerCount)
                         * AI_EVENT_TOWN_PLAYER_FACTOR
-                    + AI_EVENT_VALUE_BASE_FACTOR)
+                    + AI_TOWN_EVENT_VALUE_BASE_FACTOR)
                    * ra)
             );
         }

@@ -2135,7 +2135,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 "{Shrine of the 1st Circle}\n\nYou come across a small shrine attended by a group "
                 "of novice acolytes.  In exchange for your protection, they agree to teach you a "
                 "simple spell - ",
-                gSpellNames[eventValue1]
+                gSpellNames[cell->m_objectMetadata - 1]
             );
             goto shrineSpell;
 
@@ -2147,7 +2147,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 "{Shrine of the 2nd Circle}\n\nYou come across an ornate shrine attended by a "
                 "group of rotund friars.  In exchange for your protection, they agree to teach you "
                 "a spell - ",
-                gSpellNames[eventValue1]
+                gSpellNames[cell->m_objectMetadata - 1]
             );
             goto shrineSpell;
 
@@ -2159,7 +2159,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 "{Shrine of the 3rd Circle}\n\nYou come across a lavish shrine attended by a group "
                 "of high priests.  In exchange for your protection, they agree to teach you a "
                 "sophisticated spell - ",
-                gSpellNames[eventValue1]
+                gSpellNames[cell->m_objectMetadata - 1]
             );
         shrineSpell:
             if (!eventHero2->HasArtifact(ARTIFACT_MAGIC_BOOK)) {
@@ -3035,7 +3035,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             "%s'%s'.  ",
                             "Upon defeating the monsters, you decipher an ancient glyph on the "
                             "wall, telling the secret of the spell - ",
-                            gSpellNames[eventValue1]
+                            gSpellNames[cell->m_objectMetadata - 1]
                         );
                         if (!eventHero2->HasArtifact(ARTIFACT_MAGIC_BOOK)) {
                             strcat(
