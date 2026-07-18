@@ -288,7 +288,7 @@ def run(jobs: int = 0, filters: list[str] | None = None) -> int:
         print("[enum-types] strict: no translation units selected")
         return 2
 
-    worker_count = jobs if jobs > 0 else min(8, os.cpu_count() or 1)
+    worker_count = jobs if jobs > 0 else max(1, (os.cpu_count() or 8) - 2)
     with ThreadPoolExecutor(max_workers=worker_count) as pool:
         results = list(pool.map(lambda entry: _run_entry(entry, compiler), entries))
     results.sort(key=lambda item: item["source"])
