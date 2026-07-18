@@ -3389,26 +3389,26 @@ i32 philAI::FightValueOfStack(
                 stackValueMap = static_cast<i32>((quantityModifierTarget + 1.0f) * stackValueMap);
 
                 if (useTown) {
-                    if (gMonsterDatabase[group->m_creatureTypes[armySlotRecord]].attributes
-                        & MONSTER_ATTRIBUTE_RANGED)
+                    if (HAS(gMonsterDatabase[group->m_creatureTypes[armySlotRecord]].attributes,
+                            MONSTER_ATTRIBUTE_RANGED))
                         stackValueMap = static_cast<i32>(stackValueMap * 1.18);
-                    if (gMonsterDatabase[group->m_creatureTypes[armySlotRecord]].attributes
-                        & MONSTER_ATTRIBUTE_FLYING)
+                    if (HAS(gMonsterDatabase[group->m_creatureTypes[armySlotRecord]].attributes,
+                            MONSTER_ATTRIBUTE_FLYING))
                         stackValueMap = static_cast<i32>(stackValueMap * 0.95);
                 }
-                if ((gMonsterDatabase[group->m_creatureTypes[armySlotRecord]].attributes
-                     & MONSTER_ATTRIBUTE_RANGED)
-                    && IDX(heroPtr) && heroPtr->m_secondarySkills[1]) {
+                if (HAS(gMonsterDatabase[group->m_creatureTypes[armySlotRecord]].attributes,
+                         MONSTER_ATTRIBUTE_RANGED)
+                    && heroPtr && heroPtr->m_secondarySkills[1]) {
                     stackValueMap = static_cast<i32>(
                         stackValueMap * gfSSAIArcheryMod[heroPtr->m_secondarySkills[1]]
                     );
                 }
                 if (useEnemyMods) {
-                    if (gMonsterDatabase[group->m_creatureTypes[armySlotRecord]].attributes
-                        & MONSTER_ATTRIBUTE_RANGED)
+                    if (HAS(gMonsterDatabase[group->m_creatureTypes[armySlotRecord]].attributes,
+                            MONSTER_ATTRIBUTE_RANGED))
                         stackValueMap = static_cast<i32>(stackValueMap * enemyRangedModifier27);
-                    if (gMonsterDatabase[group->m_creatureTypes[armySlotRecord]].attributes
-                        & MONSTER_ATTRIBUTE_FLYING)
+                    if (HAS(gMonsterDatabase[group->m_creatureTypes[armySlotRecord]].attributes,
+                            MONSTER_ATTRIBUTE_FLYING))
                         stackValueMap = static_cast<i32>(stackValueMap * enemyMeleeModifierIndex);
                     else
                         stackValueMap = static_cast<i32>(stackValueMap * enemyFlyingModifier36);
