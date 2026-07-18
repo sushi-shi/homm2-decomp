@@ -2245,8 +2245,8 @@ void army::PowEffect(i32 effect, i32 resetLimits, i32 effectX, i32 effectY) {
                                 || current->m_animationFrame + 1
                                        < current->m_frameInfo.animationFrameCount
                                              [IDX(current->m_animationSequence)])))) {
-                    if (current->m_animationSequence != IDX(current->m_effectAnimationStart)
-                        && current->m_animationSequence != IDX(current->m_effectAnimationEnd)) {
+                    if (IDX(current->m_animationSequence) != current->m_effectAnimationStart
+                        && IDX(current->m_animationSequence) != current->m_effectAnimationEnd) {
                         if (!gbNoShowCombat
                             && current->m_effectAnimationStart == IDX(ARMY_ANIMATION_WINCE)) {
                             gpSoundManager->MemorySample(gpCombatManager->m_armies[side_4][index_10]
@@ -2257,7 +2257,7 @@ void army::PowEffect(i32 effect, i32 resetLimits, i32 effectX, i32 effectY) {
                             gpSoundManager->MemorySample(gpCombatManager->m_armies[side_4][index_10]
                                                              .m_samples[IDX(ARMY_SAMPLE_KILL)]);
                         }
-                        current->m_animationSequence = current->m_effectAnimationStart;
+                        current->m_animationSequence = ArmyAnimationSequence(current->m_effectAnimationStart);
                         current->m_animationFrame = 0;
                     } else {
                         if (current->m_animationFrame + 1
