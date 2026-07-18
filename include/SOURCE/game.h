@@ -125,7 +125,7 @@ public:
     i32 m_viewSpellsType;                             // +0x65f1
     i32 m_viewSpellsTop[2];                           // +0x65f5
     i32 m_viewSpellsCount[2];                         // +0x65fd
-    i32 m_viewSpell;                                  // +0x6605
+    SpellType m_viewSpell;                                  // +0x6605
     i32 (*m_viewSpellsCallback)(struct tag_message&); // +0x6609
     i8 m_viewSpellsReadOnly;                          // +0x660d
     u8 m_gameLoaded;                                  // +0x660e

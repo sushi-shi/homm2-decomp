@@ -158,7 +158,7 @@ i32 hero::HasSpell(SpellType spell) {
 // two gsSpellInfo relocations resolve to the same attributes bytes through retail's
 // interior const_000fbe8d label; the remaining delta is TU code-selection noise.
 VA(0x0046c86c, 0xc5)
-i32 hero::GetNthSpell(i32 type, i32 spellNumber) {
+SpellType hero::GetNthSpell(i32 type, i32 spellNumber) {
     i32 spell;
     i32 spellOrdinalCount = 0;
 

@@ -202,7 +202,7 @@ public:
     i32 HasArtifact(ArtifactType);
     i32 CalcMobility(void);
     i32 HasSpell(SpellType);
-    i32 GetNthSpell(i32, i32);
+    SpellType GetNthSpell(i32, i32);
     i32 GetNumSpells(i32);
     void UseSpell(SpellType);
     void AddSpell(i32, i32);
