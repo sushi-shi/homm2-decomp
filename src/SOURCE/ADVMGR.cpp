@@ -2436,7 +2436,7 @@ void advManager::DrawCell(
                 s_drawCloudFrame = GetCloudLookup(mapX, mapY);
             }
             if (s_drawCloudFrame == 0) {
-                if HAS(drawMask, ADVMGR_DRAW_CLOUD) {
+                if (HAS(drawMask, ADVMGR_DRAW_CLOUD)) {
                     TileToBitmap(
                         m_cloudTiles,
                         (mapY + mapX) & 3,
@@ -2463,7 +2463,7 @@ void advManager::DrawCell(
             s_drawCovered = 0;
         }
 
-        if ((drawMask & ADVMGR_DRAW_CLOUD) != 0 && IDX(gbDrawingPuzzle) == 0) {
+        if (HAS(drawMask, ADVMGR_DRAW_CLOUD) && !gbDrawingPuzzle) {
             if (s_drawCovered != 0) {
                 if (s_drawFlipCloud != 0) {
                     FlipIconToBitmap(
@@ -2529,7 +2529,7 @@ void advManager::DrawCell(
                 }
             }
         } else {
-            if HAS(drawMask, ADVMGR_DRAW_GROUND) {
+            if (HAS(drawMask, ADVMGR_DRAW_GROUND)) {
                 s_drawGroundTile = s_drawCell->m_flags;
                 s_drawGroundTile <<= 14;
                 s_drawGroundTile |= s_drawCell->m_terrainImageIndex;
@@ -2724,7 +2724,7 @@ void advManager::DrawCell(
                 }
             }
 
-            if HAS(drawMask, ADVMGR_DRAW_OBJECT) {
+            if (HAS(drawMask, ADVMGR_DRAW_OBJECT)) {
                 if (s_drawCell->m_objectIndex != IDX(MAPCELL_SPRITE_NONE)
                     && !s_drawCell->m_objectLayerBit0 && !s_drawCell->m_objectLayerBit1
                     && !s_drawCell->m_objectDrawnAsOverlay
@@ -2834,7 +2834,7 @@ void advManager::DrawCell(
                 && gbDrawingPuzzle == 0) {
                 s_drawHasHero = 0;
                 s_drawHero = 0;
-                if HAS(drawMask, ADVMGR_DRAW_HERO) {
+                if (HAS(drawMask, ADVMGR_DRAW_HERO)) {
                     if (mapX > 0) {
                         s_drawAdjacentCell = GetCell(mapX - 1, mapY);
                         if (s_drawAdjacentCell->m_triggerType
@@ -2953,7 +2953,7 @@ void advManager::DrawCell(
 
                 if (s_drawHasHero) {
                     if (s_drawHeroFrame & ADVMGR_HERO_FRAME_MIRROR_FLAG) {
-                        if HAS(drawMask, ADVMGR_DRAW_HERO_SHADOW) {
+                        if (HAS(drawMask, ADVMGR_DRAW_HERO_SHADOW)) {
                             if (m_drawHeroShadows != 0 && s_drawHeroType != ADVMGR_HERO_TYPE_BOAT) {
                                 cursorFrame = s_drawHeroFrame & ADVMGR_HERO_FRAME_INDEX_MASK;
                                 if (cursorFrame == 51) {
@@ -3077,7 +3077,7 @@ void advManager::DrawCell(
                             }
                         }
                     } else {
-                        if HAS(drawMask, ADVMGR_DRAW_HERO_SHADOW) {
+                        if (HAS(drawMask, ADVMGR_DRAW_HERO_SHADOW)) {
                             if (m_drawHeroShadows != 0 && s_drawHeroType != ADVMGR_HERO_TYPE_BOAT
                                 && HAS(drawMask, ADVMGR_DRAW_HERO_SHADOW)) {
                                 IconToBitmap(
@@ -3178,7 +3178,7 @@ void advManager::DrawCell(
                 if (m_cursorActive != 0 && (s_drawCell->m_flags & CURSOR_MAP_VISIBLE_FLAG) != 0
                     && (m_comboHeroDrawn == 0 || HAS(drawMask, ADVMGR_DRAW_HERO_SHADOW))
                     && m_mapOriginX + 7 == mapX && m_mapOriginY + 7 == mapY) {
-                    if HAS(drawMask, ADVMGR_DRAW_HERO_SHADOW) {
+                    if (HAS(drawMask, ADVMGR_DRAW_HERO_SHADOW)) {
                         cursorSuppressed = 1;
                     } else {
                         DrawCursorShadow();
