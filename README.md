@@ -57,9 +57,10 @@ The final link is opt-in, so object matching stays fast. Its Ninja graph exposes
 (NB09 `sstModule` object order), `link-imports` (exact middleware import archive), `link`, and
 `link-map` (PE section, entry-point, unresolved-symbol, and per-unit RVA diagnostics).
 
-The matching toolchain (VC4.2) is provisioned into `build/toolchain/` from an
-installed `MSDEV` tree or the `en_vc42ent` disc1 RAR SFX. The provisioner validates
-the pinned compiler, linker, headers, and CRT before publishing the tree atomically:
+The matching toolchain is provisioned into `build/toolchain/` from two preserved
+components: the VC 4.2 compiler/header tree and the older VC 4.0 final-link tree.
+The provisioners validate the pinned compiler, linker, headers, import libraries,
+and both CRT archives before publishing either tree atomically:
 
 ```sh
 scripts/make-toolchain.sh /path/to/en_vc42ent_disc1.exe
@@ -70,8 +71,11 @@ scripts/make-linker.sh --check build/toolchain/link300
 
 Object compilation always uses VC 4.2. When the separately pinned `link300`
 component is present, `homm2 link` uses VC 4.0 LINK 3.00.5270 and its sibling
-CVPACK/CVTRES tools, matching the retail PE linker stamp. The deterministic Gruntz-style release builder is
-`scripts/create-toolchain-release.nix`; provenance and recovery history are in
+CVPACK/CVTRES tools and `LIBCMT.LIB`. The VC 4.0 runtime archive supplies the
+retail CRT members; in particular, its `testfdiv.obj` carries private literal
+identities absent from the VC 4.2 archive. The deterministic Gruntz-style release
+builder is `scripts/create-toolchain-release.nix`; provenance, the release hash,
+and recovery history are in
 [`docs/toolchain-vc42.md`](docs/toolchain-vc42.md). `clang`/`clangd` is editor tooling only;
 the Wine MSVC 4.2 build is the sole verdict on a match.
 

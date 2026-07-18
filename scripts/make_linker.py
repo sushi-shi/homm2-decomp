@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Provision the pinned VC 4.0 LINK 3.00 final-link component."""
+"""Provision the pinned VC 4.0 LINK 3.00 and runtime-library component."""
 
 from __future__ import annotations
 
@@ -104,8 +104,9 @@ def validate(root: Path, allow_unpinned: bool, source_label: str, write: bool) -
     if write:
         manifest = {
             "schema": 1,
-            "toolchain": "Microsoft Visual C++ 4.0 final-link tools",
-            "matching_profile": "LINK 3.00.5270 / CVPACK 3.00 / CVTRES 4.00",
+            "toolchain": "Microsoft Visual C++ 4.0 final-link component",
+            "matching_profile": (
+                "LINK 3.00.5270 / CVPACK 3.00 / CVTRES 4.00 / LIBCMT"),
             "pinned_match": not mismatches,
             "source": source_label,
             "sha256": dict(sorted(hashes.items())),
