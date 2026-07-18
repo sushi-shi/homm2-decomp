@@ -168,7 +168,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 );
                 GiveResource(
                     eventHero2,
-                    ResourceType(cell->m_objectMetadata) - IDX(MAP_EVENT_RESOURCE_OFFSET),
+                    ResourceType(cell->m_objectMetadata - IDX(MAP_EVENT_RESOURCE_OFFSET)),
                     cell->m_objectMetadata - MAP_EVENT_RESOURCE_OFFSET == IDX(RES_GOLD)
                         ? MAP_EVENT_GOLD_AMOUNT
                         : MAP_EVENT_RESOURCE_AMOUNT
@@ -1313,7 +1313,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             );
             GiveResource(
                 eventHero2,
-                ResourceType(cell->m_objectMetadata) & IDX(CAMPFIRE_RESOURCE_MASK),
+                ResourceType(cell->m_objectMetadata & IDX(CAMPFIRE_RESOURCE_MASK)),
                 cell->m_objectMetadata >> CAMPFIRE_AMOUNT_SHIFT
             );
             eraseObject = 1;
@@ -5652,7 +5652,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             if (cell->m_objectMetadata != MAP_EVENT_DATA_EMPTY) {
                 GiveResource(
                     eventHero,
-                    ResourceType(cell->m_objectMetadata) - IDX(MAP_EVENT_RESOURCE_OFFSET),
+                    ResourceType(cell->m_objectMetadata - IDX(MAP_EVENT_RESOURCE_OFFSET)),
                     cell->m_objectMetadata - MAP_EVENT_RESOURCE_OFFSET == IDX(RES_GOLD)
                         ? MAP_EVENT_GOLD_AMOUNT
                         : MAP_EVENT_RESOURCE_AMOUNT
@@ -5734,7 +5734,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             );
             GiveResource(
                 eventHero,
-                ResourceType(cell->m_objectMetadata) & IDX(CAMPFIRE_RESOURCE_MASK),
+                ResourceType(cell->m_objectMetadata & IDX(CAMPFIRE_RESOURCE_MASK)),
                 cell->m_objectMetadata >> CAMPFIRE_AMOUNT_SHIFT
             );
             eventResults[0] = 1;
