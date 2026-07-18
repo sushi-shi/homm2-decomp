@@ -8,8 +8,6 @@
 struct tag_message;
 
 H2_ENUM_BEGIN(HeroUiConstant)
-    HERO_UI_HOVER = 4,
-    HERO_UI_MESSAGE = 0x200,
     HERO_UI_INPUT_SELECT = 12,
     HERO_UI_INPUT_DESELECT = 13,
     HERO_UI_INPUT_ALTERNATE_SELECT = 14,

@@ -3,6 +3,7 @@
 // Reconstructed class (BASE) from CodeView NB09 of HEROES2W.EXE — NOT original source.
 // 17 methods, 3 own-virtual, 0 static data.
 #include <va.h>
+#include <BASE/message.h>
 #include "baseManager.h"
 // forward declarations:
 class heroWindow;
@@ -39,7 +40,7 @@ public:
     virtual i32 Main(struct tag_message&) OVERRIDE;
     // --- methods ---
     i32 ConvertToHover(struct tag_message&);
-    i32 BroadcastMessage(i32, i32, i32, i32);
+    i32 BroadcastMessage(MessageType, i32, i32, i32);
     void AddWindow(class heroWindow*, i32, i32);
     void RemoveWindow(class heroWindow*);
     i32 DoDialog(class heroWindow*, i32 (*)(struct tag_message&), i32);
