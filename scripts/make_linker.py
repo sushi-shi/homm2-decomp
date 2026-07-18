@@ -25,6 +25,10 @@ REQUIRED_FILES = (
     "CVTRES.ERR",
     "MSPDB40.DLL",
 )
+# Retail's final link resolved the C runtime from THIS VC 4.0 library (its
+# testfdiv.obj carries the exact retail literal identities the VC 4.2 LIBCMT
+# lacks), so the link tree stages it alongside the tools.
+REQUIRED_LIB_FILES = ("LIBCMT.LIB",)
 PINNED_SHA256 = {
     "LINK.EXE": "81109c8cb534debc0c5645db7c3a1b99dd646d982b0fd545070ceb1c77f9cb6c",
     "CVPACK.EXE": "09426223bc4537ad58b46d5abc188c11fcd95f0e3701bd7fe19ce7f20a820d3b",
@@ -32,6 +36,9 @@ PINNED_SHA256 = {
     "CVTRES.EXE": "7d66e9e5437b8d983432d8addedd7ea342bb814a34b1ffdebbc30018485004e8",
     "CVTRES.ERR": "c2d246a342f3aa9dddbb7145a2c06477a446935bc3d0e92afa31cee4d9d37fbb",
     "MSPDB40.DLL": "7c99519244e1dfe9f8cbc0b54842a757c22121c4269572c7c744d8bd7da0d419",
+}
+PINNED_LIB_SHA256 = {
+    "LIBCMT.LIB": "d7bdb49c0a3bc77dee026b9aa9a994c5a78963c8aefc6512dbb298b4d41c4907",
 }
 
 
@@ -71,10 +78,20 @@ def validate(root: Path, allow_unpinned: bool, source_label: str, write: bool) -
         if path is None:
             fail(f"required VC 4.0 linker file is missing: bin/{name}")
         hashes[f"bin/{name}"] = sha256(path)
+    lib_dir = root / "lib"
+    for name in REQUIRED_LIB_FILES:
+        path = make_toolchain.file_ci(lib_dir, name) if lib_dir.is_dir() else None
+        if path is None:
+            fail(f"required VC 4.0 runtime library is missing: lib/{name}")
+        hashes[f"lib/{name}"] = sha256(path)
     mismatches = [
         (name, PINNED_SHA256[name], hashes[f"bin/{name}"])
         for name in REQUIRED_FILES
         if hashes[f"bin/{name}"] != PINNED_SHA256[name]
+    ] + [
+        (name, PINNED_LIB_SHA256[name], hashes[f"lib/{name}"])
+        for name in REQUIRED_LIB_FILES
+        if hashes[f"lib/{name}"] != PINNED_LIB_SHA256[name]
     ]
     if mismatches:
         for name, expected, actual in mismatches:
@@ -130,6 +147,17 @@ def provision(source: Path, output: Path, force: bool, allow_unpinned: bool) -> 
             for name in REQUIRED_FILES:
                 source_file = make_toolchain.file_ci(source_bin, name)
                 shutil.copy2(source_file, bin_dir / name)
+            source_lib = next((path for path in source_bin.parent.iterdir()
+                               if path.is_dir() and path.name.upper() == "LIB"), None)
+            if source_lib is None:
+                fail("no MSDEV/LIB directory next to the VC 4.0 BIN tool set")
+            lib_dir = staging / "lib"
+            lib_dir.mkdir()
+            for name in REQUIRED_LIB_FILES:
+                source_file = make_toolchain.file_ci(source_lib, name)
+                if source_file is None:
+                    fail(f"VC 4.0 LIB does not provide {name}")
+                shutil.copy2(source_file, lib_dir / name)
             validate(staging, allow_unpinned, source.name, write=True)
             if output.exists():
                 shutil.rmtree(output)
