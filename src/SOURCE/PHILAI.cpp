@@ -4378,7 +4378,7 @@ i32 philAI::ChooseToFightForArtifact(i32 a, i32 b, i32 c) {
 }
 
 VA(0x00442771, 0x53)
-i32 philAI::NetValueOfArtifact(i32 a1, AIArtifactEventValue a2, i32 a3, i32 a4) {
+i32 philAI::NetValueOfArtifact(i32 a1, i32 a2, i32 a3, i32 a4) {
     return static_cast<i32>(
         static_cast<float>(gArtifactBaseRV[a1])
         - (static_cast<float>(a4) * gafAITurnCostResource[a3]
@@ -5996,12 +5996,12 @@ i32 philAI::EvaluateArtifactEvent(ArtifactType artifact, i32 eventData) {
             case IDX(AI_ARTIFACT_EVENT_NO_VALUE):
                 break;
             case IDX(AI_ARTIFACT_EVENT_PAY_GOLD):
-                result5 = NetValueOfArtifact(IDX(artifact), AI_ARTIFACT_EVENT_GOLD_COST, 0, 0);
+                result5 = NetValueOfArtifact(IDX(artifact), IDX(AI_ARTIFACT_EVENT_GOLD_COST), 0, 0);
                 break;
             case IDX(AI_ARTIFACT_EVENT_PAY_RESOURCE_THREE):
                 result5 = NetValueOfArtifact(
                     IDX(artifact),
-                    AI_ARTIFACT_EVENT_RESOURCE_THREE_COST,
+                    IDX(AI_ARTIFACT_EVENT_RESOURCE_THREE_COST),
                     (eventData & IDX(AI_ARTIFACT_EVENT_RESOURCE_MASK))
                         >> IDX(AI_ARTIFACT_EVENT_RESOURCE_SHIFT),
                     IDX(AI_ARTIFACT_EVENT_RESOURCE_THREE_AMOUNT)
@@ -6010,7 +6010,7 @@ i32 philAI::EvaluateArtifactEvent(ArtifactType artifact, i32 eventData) {
             case IDX(AI_ARTIFACT_EVENT_PAY_RESOURCE_FIVE):
                 result5 = NetValueOfArtifact(
                     IDX(artifact),
-                    AI_ARTIFACT_EVENT_RESOURCE_FIVE_COST,
+                    IDX(AI_ARTIFACT_EVENT_RESOURCE_FIVE_COST),
                     (eventData & IDX(AI_ARTIFACT_EVENT_RESOURCE_MASK))
                         >> IDX(AI_ARTIFACT_EVENT_RESOURCE_SHIFT),
                     IDX(AI_ARTIFACT_EVENT_RESOURCE_FIVE_AMOUNT)
