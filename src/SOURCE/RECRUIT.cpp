@@ -145,7 +145,7 @@ i32 recruitUnit::Open(i32 priority) {
     hmnuRecruitSave = hmnuCurrent;
     KBChangeMenu(hmnuDflt);
     m_messageMask = BASE_MANAGER_ACCEPT_EXECUTIVE;
-    m_priority = priority;
+    m_priority = BaseManagerPriority(priority);
     m_active = true;
     strcpy(m_name, "recruitManager");
     return 0;
