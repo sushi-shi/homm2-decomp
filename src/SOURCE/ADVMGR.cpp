@@ -1629,7 +1629,7 @@ i32 advManager::ProcessDeSelect(
 // byte /Ob1 continuation: ours is at +0x0c and retail's is at +0x1d. Declaration
 // initialization and post-declaration assignment compile to the same placement.
 VA(0x0045a07c, 0x5c8)
-i32 advManager::ProcessSearch(i32 x, AdventureCommand y) {
+i32 advManager::ProcessSearch(i32 x, i32 y) {
     mapCell* currentCell;
     i32 playerState;
     tag_message messageValue;
@@ -2142,7 +2142,7 @@ void advManager::CompleteDraw(i32 originX, i32 originY, i32 forceDraw, i32 updat
 
     for (drawY = 0; drawY < ADVMGR_DRAW_VIEW_CELLS; ++drawY) {
         for (drawX = 0; drawX < ADVMGR_DRAW_VIEW_CELLS; ++drawX) {
-            DrawCell(originX + drawX, originY + drawY, drawX, drawY, IDX(ADVMGR_DRAW_GROUND), forceDraw);
+            DrawCell(originX + drawX, originY + drawY, drawX, drawY, ADVMGR_DRAW_GROUND, forceDraw);
         }
     }
 
@@ -2153,14 +2153,14 @@ void advManager::CompleteDraw(i32 originX, i32 originY, i32 forceDraw, i32 updat
                 originY + drawY,
                 drawX,
                 drawY,
-                IDX(ADVMGR_DRAW_HERO_SHADOW),
+                ADVMGR_DRAW_HERO_SHADOW,
                 forceDraw
             );
         }
     }
 
     for (drawX = 0; drawX < ADVMGR_DRAW_VIEW_CELLS; ++drawX) {
-        DrawCell(originX + drawX, originY, drawX, 0, IDX(ADVMGR_DRAW_OBJECT), forceDraw);
+        DrawCell(originX + drawX, originY, drawX, 0, ADVMGR_DRAW_OBJECT, forceDraw);
     }
 
     for (drawY = 1; drawY < ADVMGR_DRAW_VIEW_CELLS; ++drawY) {
@@ -2172,7 +2172,7 @@ void advManager::CompleteDraw(i32 originX, i32 originY, i32 forceDraw, i32 updat
                     originY + drawY - 1,
                     drawX,
                     drawY - 1,
-                    IDX(ADVMGR_DRAW_HERO),
+                    ADVMGR_DRAW_HERO,
                     forceDraw
                 );
             }
@@ -2182,7 +2182,7 @@ void advManager::CompleteDraw(i32 originX, i32 originY, i32 forceDraw, i32 updat
                     originY + drawY - 1,
                     drawX,
                     drawY - 1,
-                    IDX(ADVMGR_DRAW_OVERLAY),
+                    ADVMGR_DRAW_OVERLAY,
                     forceDraw
                 );
             }
@@ -2193,7 +2193,7 @@ void advManager::CompleteDraw(i32 originX, i32 originY, i32 forceDraw, i32 updat
                     originY + drawY - 1,
                     drawX,
                     drawY - 1,
-                    IDX(ADVMGR_DRAW_HERO),
+                    ADVMGR_DRAW_HERO,
                     forceDraw
                 );
             }
@@ -2203,14 +2203,14 @@ void advManager::CompleteDraw(i32 originX, i32 originY, i32 forceDraw, i32 updat
                     originY + drawY - 1,
                     drawX,
                     drawY - 1,
-                    IDX(ADVMGR_DRAW_OVERLAY),
+                    ADVMGR_DRAW_OVERLAY,
                     forceDraw
                 );
             }
         }
 
         for (drawX = 0; drawX < ADVMGR_DRAW_VIEW_CELLS; ++drawX) {
-            DrawCell(originX + drawX, originY + drawY, drawX, drawY, IDX(ADVMGR_DRAW_OBJECT), forceDraw);
+            DrawCell(originX + drawX, originY + drawY, drawX, drawY, ADVMGR_DRAW_OBJECT, forceDraw);
         }
     }
 
@@ -2220,7 +2220,7 @@ void advManager::CompleteDraw(i32 originX, i32 originY, i32 forceDraw, i32 updat
             originY + ADVMGR_DRAW_LAST_CELL,
             drawX,
             ADVMGR_DRAW_LAST_CELL,
-            IDX(ADVMGR_DRAW_HERO),
+            ADVMGR_DRAW_HERO,
             forceDraw
         );
     }
@@ -2230,7 +2230,7 @@ void advManager::CompleteDraw(i32 originX, i32 originY, i32 forceDraw, i32 updat
             originY + ADVMGR_DRAW_LAST_CELL,
             drawX,
             ADVMGR_DRAW_LAST_CELL,
-            IDX(ADVMGR_DRAW_OVERLAY),
+            ADVMGR_DRAW_OVERLAY,
             forceDraw
         );
     }
@@ -2242,14 +2242,14 @@ void advManager::CompleteDraw(i32 originX, i32 originY, i32 forceDraw, i32 updat
                 originY + drawY,
                 drawX,
                 drawY,
-                IDX(ADVMGR_DRAW_OVERLAY_TOP),
+                ADVMGR_DRAW_OVERLAY_TOP,
                 forceDraw
             );
         }
     }
     for (drawY = 0; drawY < ADVMGR_DRAW_VIEW_CELLS; ++drawY) {
         for (drawX = 0; drawX < ADVMGR_DRAW_VIEW_CELLS; ++drawX) {
-            DrawCell(originX + drawX, originY + drawY, drawX, drawY, IDX(ADVMGR_DRAW_CLOUD), forceDraw);
+            DrawCell(originX + drawX, originY + drawY, drawX, drawY, ADVMGR_DRAW_CLOUD, forceDraw);
         }
     }
 
@@ -6784,7 +6784,7 @@ i32 advManager::ComboDraw(i32 originX, i32 originY, i32 animate) {
     for (mapRow = 0; mapRow < ADVMGR_COMBO_VIEW_CELLS; ++mapRow) {
         for (column = 0; column < ADVMGR_COMBO_VIEW_CELLS; ++column) {
             if (bComboDraw[column][mapRow] != 0) {
-                DrawCell(column + originX, mapRow + originY, column, mapRow, IDX(ADVMGR_DRAW_GROUND), 0);
+                DrawCell(column + originX, mapRow + originY, column, mapRow, ADVMGR_DRAW_GROUND, 0);
             }
         }
     }
@@ -6797,7 +6797,7 @@ i32 advManager::ComboDraw(i32 originX, i32 originY, i32 animate) {
                     mapRow + originY,
                     column,
                     mapRow,
-                    IDX(ADVMGR_DRAW_HERO_SHADOW),
+                    ADVMGR_DRAW_HERO_SHADOW,
                     0
                 );
             }
@@ -6806,7 +6806,7 @@ i32 advManager::ComboDraw(i32 originX, i32 originY, i32 animate) {
 
     for (column = 0; column < ADVMGR_COMBO_VIEW_CELLS; ++column) {
         if (bComboDraw[column][0] != 0) {
-            DrawCell(column + originX, originY, column, 0, IDX(ADVMGR_DRAW_OBJECT), 0);
+            DrawCell(column + originX, originY, column, 0, ADVMGR_DRAW_OBJECT, 0);
         }
     }
 
@@ -6819,7 +6819,7 @@ i32 advManager::ComboDraw(i32 originX, i32 originY, i32 animate) {
                     mapRow + originY - 1,
                     column,
                     mapRow - 1,
-                    IDX(ADVMGR_DRAW_HERO),
+                    ADVMGR_DRAW_HERO,
                     0
                 );
             }
@@ -6831,7 +6831,7 @@ i32 advManager::ComboDraw(i32 originX, i32 originY, i32 animate) {
                     mapRow + originY - 1,
                     column,
                     mapRow - 1,
-                    IDX(ADVMGR_DRAW_OVERLAY),
+                    ADVMGR_DRAW_OVERLAY,
                     0
                 );
             }
@@ -6846,12 +6846,12 @@ i32 advManager::ComboDraw(i32 originX, i32 originY, i32 animate) {
                     mapRow + originY - 1,
                     column,
                     mapRow - 1,
-                    IDX(ADVMGR_DRAW_OBJECT),
+                    ADVMGR_DRAW_OBJECT,
                     0
                 );
             }
             if (bComboDraw[column][mapRow] != 0) {
-                DrawCell(column + originX, mapRow + originY, column, mapRow, IDX(ADVMGR_DRAW_OBJECT), 0);
+                DrawCell(column + originX, mapRow + originY, column, mapRow, ADVMGR_DRAW_OBJECT, 0);
             }
         }
     }
@@ -6863,7 +6863,7 @@ i32 advManager::ComboDraw(i32 originX, i32 originY, i32 animate) {
                 originY + ADVMGR_COMBO_VIEW_CELLS - 1,
                 column,
                 ADVMGR_COMBO_VIEW_CELLS - 1,
-                IDX(ADVMGR_DRAW_HERO),
+                ADVMGR_DRAW_HERO,
                 0
             );
         }
@@ -6875,7 +6875,7 @@ i32 advManager::ComboDraw(i32 originX, i32 originY, i32 animate) {
                 originY + ADVMGR_COMBO_VIEW_CELLS - 1,
                 column,
                 ADVMGR_COMBO_VIEW_CELLS - 1,
-                IDX(ADVMGR_DRAW_OVERLAY),
+                ADVMGR_DRAW_OVERLAY,
                 0
             );
         }
@@ -6889,7 +6889,7 @@ i32 advManager::ComboDraw(i32 originX, i32 originY, i32 animate) {
                     mapRow + originY,
                     column,
                     mapRow,
-                    IDX(ADVMGR_DRAW_OVERLAY_TOP),
+                    ADVMGR_DRAW_OVERLAY_TOP,
                     0
                 );
             }
@@ -6898,7 +6898,7 @@ i32 advManager::ComboDraw(i32 originX, i32 originY, i32 animate) {
     for (mapRow = 0; mapRow < ADVMGR_COMBO_VIEW_CELLS; ++mapRow) {
         for (column = 0; column < ADVMGR_COMBO_VIEW_CELLS; ++column) {
             if (bComboDraw[column][mapRow] != 0) {
-                DrawCell(column + originX, mapRow + originY, column, mapRow, IDX(ADVMGR_DRAW_CLOUD), 0);
+                DrawCell(column + originX, mapRow + originY, column, mapRow, ADVMGR_DRAW_CLOUD, 0);
             }
         }
     }
