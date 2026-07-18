@@ -951,7 +951,9 @@ void army::SpecialAttack(void) {
             giMaxExtentX - giMinExtentX + 1,
             giMaxExtentY - giMinExtentY + 1
         );
-        DelayMilli(static_cast<i32l>(gfCombatSpeedMod[gConfig.combatSpeed] * IDX(ARMY_MAGE_BOLT_DELAY)));
+        DelayMilli(
+            static_cast<i32l>(gfCombatSpeedMod[gConfig.combatSpeed] * IDX(ARMY_MAGE_BOLT_DELAY))
+        );
         gpCombatManager->DoBolt(
             1,
             missileX_7,
@@ -1567,7 +1569,9 @@ void army::DoAttack(i32 retaliation) {
             && m_monsterType != CREATURE_VAMPIRE && m_monsterType != CREATURE_VAMPIRE_LORD
             && !effectStopsRetaliation_4 && !retaliation) {
             DelayMilli(
-                static_cast<i32l>(gfCombatSpeedMod[gConfig.combatSpeed] * IDX(ARMY_RETALIATION_DELAY))
+                static_cast<i32l>(
+                    gfCombatSpeedMod[gConfig.combatSpeed] * IDX(ARMY_RETALIATION_DELAY)
+                )
             );
             target_1->m_attackDirection = OppositeDirection(m_attackDirection);
             if (HAS(target_1->m_monster.flags.all, MONSTER_FLAGS_WIDE)) {
@@ -1603,7 +1607,9 @@ void army::DoAttack(i32 retaliation) {
             && !m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PETRIFIED)]
             && !m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BLIND)] && m_quantity > 0) {
             DelayMilli(
-                static_cast<i32l>(gfCombatSpeedMod[gConfig.combatSpeed] * IDX(ARMY_SECOND_ATTACK_DELAY))
+                static_cast<i32l>(
+                    gfCombatSpeedMod[gConfig.combatSpeed] * IDX(ARMY_SECOND_ATTACK_DELAY)
+                )
             );
             secondAttackDirection_6 = m_attackDirection;
             m_attackDirection = originalDirection;
@@ -2257,16 +2263,19 @@ void army::PowEffect(i32 effect, i32 resetLimits, i32 effectX, i32 effectY) {
                             gpSoundManager->MemorySample(gpCombatManager->m_armies[side_4][index_10]
                                                              .m_samples[IDX(ARMY_SAMPLE_KILL)]);
                         }
-                        current->m_animationSequence = ArmyAnimationSequence(current->m_effectAnimationStart);
+                        current->m_animationSequence =
+                            ArmyAnimationSequence(current->m_effectAnimationStart);
                         current->m_animationFrame = 0;
                     } else {
                         if (current->m_animationFrame + 1
                             < current->m_frameInfo
                                   .animationFrameCount[IDX(current->m_animationSequence)]) {
                             current->m_animationFrame++;
-                        } else if (IDX(current->m_animationSequence) != current->m_effectAnimationEnd
+                        } else if (IDX(current->m_animationSequence)
+                                       != current->m_effectAnimationEnd
                                    && current->m_effectAnimationEnd != -1) {
-                            current->m_animationSequence = ArmyAnimationSequence(current->m_effectAnimationEnd);
+                            current->m_animationSequence =
+                                ArmyAnimationSequence(current->m_effectAnimationEnd);
                             current->m_animationFrame = 0;
                         } else {
                             if (current->m_animationSequence != ARMY_ANIMATION_STAND
@@ -2313,8 +2322,12 @@ void army::PowEffect(i32 effect, i32 resetLimits, i32 effectX, i32 effectY) {
             current = &gpCombatManager->m_armies[side_4][index_10];
             if (current->m_damagePending && current->m_spellEffect != ARMY_NO_EFFECT
                 && current->m_spellEffect != ARMY_DELAYED_MEDUSA_EFFECT) {
-                gpCombatManager
-                    ->CastSpell(SpellType(current->m_spellEffect), current->m_hex, 1, ARMY_NO_EFFECT);
+                gpCombatManager->CastSpell(
+                    SpellType(current->m_spellEffect),
+                    current->m_hex,
+                    1,
+                    ARMY_NO_EFFECT
+                );
                 current->m_spellEffect = ARMY_NO_EFFECT;
             }
         }
@@ -2325,24 +2338,30 @@ void army::PowEffect(i32 effect, i32 resetLimits, i32 effectX, i32 effectY) {
         for (side_4 = 0; side_4 < ARMY_COMBAT_SIDE_COUNT; side_4++) {
             for (index_10 = 0; index_10 < gpCombatManager->m_armyCount[side_4]; index_10++) {
                 current = &gpCombatManager->m_armies[side_4][index_10];
-                if (current->m_animationSequence == ARMY_ANIMATION_WINCE || current->m_animationSequence == ARMY_ANIMATION_ATTACK_UP
-                    || current->m_animationSequence == ARMY_ANIMATION_ATTACK_DOWN || current->m_animationSequence == ARMY_ANIMATION_BREATH_FORWARD
-                    || current->m_animationSequence == ARMY_ANIMATION_ATTACK_FORWARD || current->m_animationSequence == ARMY_ANIMATION_BREATH_UP
-                    || current->m_animationSequence == ARMY_ANIMATION_BREATH_DOWN || current->m_animationSequence == ARMY_ANIMATION_SHOOT_UP
-                    || current->m_animationSequence == ARMY_ANIMATION_SHOOT_FORWARD || current->m_animationSequence == ARMY_ANIMATION_SHOOT_DOWN) {
+                if (current->m_animationSequence == ARMY_ANIMATION_WINCE
+                    || current->m_animationSequence == ARMY_ANIMATION_ATTACK_UP
+                    || current->m_animationSequence == ARMY_ANIMATION_ATTACK_DOWN
+                    || current->m_animationSequence == ARMY_ANIMATION_BREATH_FORWARD
+                    || current->m_animationSequence == ARMY_ANIMATION_ATTACK_FORWARD
+                    || current->m_animationSequence == ARMY_ANIMATION_BREATH_UP
+                    || current->m_animationSequence == ARMY_ANIMATION_BREATH_DOWN
+                    || current->m_animationSequence == ARMY_ANIMATION_SHOOT_UP
+                    || current->m_animationSequence == ARMY_ANIMATION_SHOOT_FORWARD
+                    || current->m_animationSequence == ARMY_ANIMATION_SHOOT_DOWN) {
                     current->m_animationSequence++;
                     current->m_animationFrame = 0;
                     keepAnimating_1 = 1;
-                } else if (current->m_animationSequence == 13 || IDX(current->m_animationSequence) == 15
-                           || current->m_animationSequence == 17
-                           || current->m_animationSequence == 21
-                           || current->m_animationSequence == 25
-                           || current->m_animationSequence == 19
-                           || current->m_animationSequence == 23
-                           || current->m_animationSequence == 27
-                           || current->m_animationSequence == 29
-                           || current->m_animationSequence == 31
-                           || current->m_animationSequence == 33) {
+                } else if (current->m_animationSequence == ARMY_ANIMATION_DEATH
+                           || current->m_animationSequence == ARMY_ANIMATION_WINCE_RETURN
+                           || current->m_animationSequence == ARMY_ANIMATION_ATTACK_UP_RETURN
+                           || current->m_animationSequence == ARMY_ANIMATION_ATTACK_DOWN_RETURN
+                           || current->m_animationSequence == ARMY_ANIMATION_BREATH_FORWARD_RETURN
+                           || current->m_animationSequence == ARMY_ANIMATION_ATTACK_FORWARD_RETURN
+                           || current->m_animationSequence == ARMY_ANIMATION_BREATH_UP_RETURN
+                           || current->m_animationSequence == ARMY_ANIMATION_BREATH_DOWN_RETURN
+                           || current->m_animationSequence == ARMY_ANIMATION_SHOOT_UP_RETURN
+                           || current->m_animationSequence == ARMY_ANIMATION_SHOOT_FORWARD_RETURN
+                           || current->m_animationSequence == ARMY_ANIMATION_SHOOT_DOWN_RETURN) {
                     if (current->m_animationFrame + 1
                         < current->m_frameInfo
                               .animationFrameCount[IDX(current->m_animationSequence)]) {
@@ -2383,8 +2402,12 @@ void army::PowEffect(i32 effect, i32 resetLimits, i32 effectX, i32 effectY) {
         for (index_10 = 0; index_10 < gpCombatManager->m_armyCount[side_4]; index_10++) {
             current = &gpCombatManager->m_armies[side_4][index_10];
             if (current->m_damagePending && current->m_spellEffect == ARMY_DELAYED_MEDUSA_EFFECT) {
-                gpCombatManager
-                    ->CastSpell(SpellType(current->m_spellEffect), current->m_hex, 1, ARMY_NO_EFFECT);
+                gpCombatManager->CastSpell(
+                    SpellType(current->m_spellEffect),
+                    current->m_hex,
+                    1,
+                    ARMY_NO_EFFECT
+                );
                 current->m_spellEffect = ARMY_NO_EFFECT;
             }
             current->m_drawSpellEffect = 0;
@@ -2514,7 +2537,7 @@ void army::SpellEffect(i32 effect, i32 effectFrameDelay, i32 animateCreature) {
         animateCreature = 0;
     }
     if (!gbNoShowCombat) {
-        if (gCurLoadedSpellEffect != IDX(effect)) {
+        if (gCurLoadedSpellEffect != SpellType(effect)) {
             gpResourceManager->Dispose(gCurLoadedSpellIcon);
             gCurLoadedSpellIcon = gpResourceManager->GetIcon(effectFileId_3);
             gCurLoadedSpellEffect = SpellType(effect);
@@ -2699,7 +2722,7 @@ i32 army::SetSpellInfluence(ArmySpellInfluence influence, i32 rounds) {
         case ARMY_SPELL_INFLUENCE_SLOW:
             CancelIndividualSpell(ARMY_SPELL_INFLUENCE_HASTE);
             m_monster.speed = static_cast<i8>((m_monster.speed + 1) / 2);
-            if HAS(m_monster.attributes, MONSTER_ATTRIBUTE_FLYING) {
+            if HAS (m_monster.attributes, MONSTER_ATTRIBUTE_FLYING) {
                 m_monster.attributes -= MONSTER_ATTRIBUTE_FLYING;
             }
             m_frameInfo.walkDuration =
@@ -3126,7 +3149,7 @@ float army::SpellCastWorkChance(SpellType spell) {
         }
         if (gpCombatManager->m_heroes[m_side]->HasArtifact(ARTIFACT_WAND_NEGATION)
             && (spell == SPELL_DISPEL || spell == SPELL_MASS_DISPEL
-                || spell == IDX(CREATURE_SPELL_DISPEL))) {
+                || spell == CREATURE_SPELL_DISPEL)) {
             return ARMY_SPELL_CHANCE_NONE;
         }
     }
@@ -3145,7 +3168,7 @@ float army::SpellCastWorkChance(SpellType spell) {
             return ARMY_SPELL_CHANCE_NONE;
         }
     }
-    if (spell == IDX(CREATURE_SPELL_DISPEL) && !m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_HASTE)]
+    if (spell == CREATURE_SPELL_DISPEL && !m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_HASTE)]
         && !m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BLESS)]
         && !m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_DRAGON_SLAYER)]
         && !m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BLOODLUST)]

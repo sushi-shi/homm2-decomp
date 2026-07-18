@@ -472,7 +472,7 @@ i32 fileRequester::Main(struct tag_message& message) {
                         strcpy(cycleNameBuffer, "");
                     }
                     giMapSizeFilter = static_cast<FileRequesterMapSizeFilter>(
-                        (giMapSizeFilter + 1) % IDX(FILE_REQUESTER_MAP_SIZE_COUNT)
+                        (IDX(giMapSizeFilter) + 1) % IDX(FILE_REQUESTER_MAP_SIZE_COUNT)
                     );
                     SetupFiles();
                     if (strlen(cycleNameBuffer) != 0) {
@@ -624,7 +624,7 @@ i32 fileRequester::Main(struct tag_message& message) {
                                 }
                                 break;
                         }
-                        if (helpIndexMouse >= 0) {
+                        if (IDX(helpIndexMouse) >= 0) {
                             NormalDialog(
                                 gFileRequestHelp[IDX(helpIndexMouse)],
                                 NORMAL_DIALOG_QUICK_VIEW,
@@ -743,7 +743,8 @@ i32 fileRequester::Main(struct tag_message& message) {
                                 if (positions < 1)
                                     positions = 1;
                                 gutterStepScreen = static_cast<i32>(
-                                    (fGutterTravelLength * IDX(FILE_REQUESTER_GUTTER_SCALE)) / positions
+                                    (fGutterTravelLength * IDX(FILE_REQUESTER_GUTTER_SCALE))
+                                    / positions
                                 );
                                 mouseXIndex = message.payload.widget.screenX;
                                 screenY = message.payload.widget.screenY;
@@ -923,13 +924,13 @@ void fileRequester::DoKnob(void) {
                     m_topIndex = newTopIndex;
                     Update(0);
                     m_scrollKnob->m_y = dragMessage.payload.mouse.y - mouseOffset2;
-                    m_window->DrawWindow(1, 0, WINDOW_DRAW_ID_LIMIT);
+                    m_window->DrawWindow(1, 0, IDX(WINDOW_DRAW_ID_LIMIT));
                     oldTopIndex = newTopIndex;
                 } else {
-                    m_window->DrawWindow(1, 0, WINDOW_DRAW_ID_LIMIT);
+                    m_window->DrawWindow(1, 0, IDX(WINDOW_DRAW_ID_LIMIT));
                 }
             } else {
-                m_window->DrawWindow(1, 0, WINDOW_DRAW_ID_LIMIT);
+                m_window->DrawWindow(1, 0, IDX(WINDOW_DRAW_ID_LIMIT));
             }
         }
         Process1WindowsMessage();
@@ -959,7 +960,7 @@ void fileRequester::Update(i32 drawWindow) {
         for (i = 0; i < IDX(FILE_REQUESTER_MAP_SIZE_COUNT); ++i) {
             broadcastMessage.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
             broadcastMessage.payload.widget.id = FILE_REQUESTER_FILTER_SMALL + i;
-            broadcastMessage.payload.widget.data.value = (giMapSizeFilter == IDX(i)) + i * 2 + 9;
+            broadcastMessage.payload.widget.data.value = (IDX(giMapSizeFilter) == i) + i * 2 + 9;
             m_window->BroadcastMessage(broadcastMessage);
         }
         if (m_selectedIndex == FILE_REQUESTER_SELECTION_NONE && m_fileCount > 0) {
@@ -970,13 +971,13 @@ void fileRequester::Update(i32 drawWindow) {
         broadcastMessage.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
         broadcastMessage.payload.widget.id = FILE_REQUESTER_MAP_SIZE;
         if (m_mapHeaders[m_selectedIndex].width == IDX(MAP_DIMENSION_SMALL)) {
-            broadcastMessage.payload.widget.data.value = MAP_SIZE_FRAME_SMALL;
+            broadcastMessage.payload.widget.data.value = IDX(MAP_SIZE_FRAME_SMALL);
         } else if (m_mapHeaders[m_selectedIndex].width == IDX(MAP_DIMENSION_MEDIUM)) {
-            broadcastMessage.payload.widget.data.value = MAP_SIZE_FRAME_MEDIUM;
+            broadcastMessage.payload.widget.data.value = IDX(MAP_SIZE_FRAME_MEDIUM);
         } else if (m_mapHeaders[m_selectedIndex].width == IDX(MAP_DIMENSION_LARGE)) {
-            broadcastMessage.payload.widget.data.value = MAP_SIZE_FRAME_LARGE;
+            broadcastMessage.payload.widget.data.value = IDX(MAP_SIZE_FRAME_LARGE);
         } else {
-            broadcastMessage.payload.widget.data.value = MAP_SIZE_FRAME_XLARGE;
+            broadcastMessage.payload.widget.data.value = IDX(MAP_SIZE_FRAME_XLARGE);
         }
         m_window->BroadcastMessage(broadcastMessage);
 
@@ -1045,13 +1046,13 @@ void fileRequester::Update(i32 drawWindow) {
                 broadcastMessage.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
                 broadcastMessage.payload.widget.id = i + FILE_REQUESTER_MAP_SIZE_ICON_FIRST;
                 if (m_mapHeaders[m_topIndex + i].width == IDX(MAP_DIMENSION_SMALL)) {
-                    broadcastMessage.payload.widget.data.value = MAP_SIZE_FRAME_SMALL;
+                    broadcastMessage.payload.widget.data.value = IDX(MAP_SIZE_FRAME_SMALL);
                 } else if (m_mapHeaders[m_topIndex + i].width == IDX(MAP_DIMENSION_MEDIUM)) {
-                    broadcastMessage.payload.widget.data.value = MAP_SIZE_FRAME_MEDIUM;
+                    broadcastMessage.payload.widget.data.value = IDX(MAP_SIZE_FRAME_MEDIUM);
                 } else if (m_mapHeaders[m_topIndex + i].width == IDX(MAP_DIMENSION_LARGE)) {
-                    broadcastMessage.payload.widget.data.value = MAP_SIZE_FRAME_LARGE;
+                    broadcastMessage.payload.widget.data.value = IDX(MAP_SIZE_FRAME_LARGE);
                 } else {
-                    broadcastMessage.payload.widget.data.value = MAP_SIZE_FRAME_XLARGE;
+                    broadcastMessage.payload.widget.data.value = IDX(MAP_SIZE_FRAME_XLARGE);
                 }
                 m_window->BroadcastMessage(broadcastMessage);
 
@@ -1120,7 +1121,7 @@ void fileRequester::Update(i32 drawWindow) {
         m_scrollKnob->m_y = static_cast<i16>(m_topIndex * gutterStepCount + fGutterMinY);
     }
     if (drawWindow) {
-        m_window->DrawWindow(1, 0, WINDOW_DRAW_ID_LIMIT);
+        m_window->DrawWindow(1, 0, IDX(WINDOW_DRAW_ID_LIMIT));
     }
 }
 
