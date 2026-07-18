@@ -2325,11 +2325,11 @@ void army::PowEffect(i32 effect, i32 resetLimits, i32 effectX, i32 effectY) {
         for (side_4 = 0; side_4 < ARMY_COMBAT_SIDE_COUNT; side_4++) {
             for (index_10 = 0; index_10 < gpCombatManager->m_armyCount[side_4]; index_10++) {
                 current = &gpCombatManager->m_armies[side_4][index_10];
-                if (current->m_animationSequence == ARMY_ANIMATION_WINCE || IDX(current->m_animationSequence) == 16
-                    || current->m_animationSequence == 20 || IDX(current->m_animationSequence) == 24
-                    || current->m_animationSequence == 18 || IDX(current->m_animationSequence) == 22
-                    || current->m_animationSequence == 26 || IDX(current->m_animationSequence) == 28
-                    || current->m_animationSequence == 30 || IDX(current->m_animationSequence) == 32) {
+                if (current->m_animationSequence == ARMY_ANIMATION_WINCE || current->m_animationSequence == ARMY_ANIMATION_ATTACK_UP
+                    || current->m_animationSequence == ARMY_ANIMATION_ATTACK_DOWN || current->m_animationSequence == ARMY_ANIMATION_BREATH_FORWARD
+                    || current->m_animationSequence == ARMY_ANIMATION_ATTACK_FORWARD || current->m_animationSequence == ARMY_ANIMATION_BREATH_UP
+                    || current->m_animationSequence == ARMY_ANIMATION_BREATH_DOWN || current->m_animationSequence == ARMY_ANIMATION_SHOOT_UP
+                    || current->m_animationSequence == ARMY_ANIMATION_SHOOT_FORWARD || current->m_animationSequence == ARMY_ANIMATION_SHOOT_DOWN) {
                     current->m_animationSequence++;
                     current->m_animationFrame = 0;
                     keepAnimating_1 = 1;
