@@ -82,7 +82,7 @@ void UpdatePalette(i8*);
 void CleanUpWinGraphics(void);
 void SetFullScreenStatus(i32);
 i32 QueryNewPalette(void);
-i32 SetGraphicsType(i32);
+i32 SetGraphicsType(WingraphGraphicsType);
 
 // --- globals owned by this TU (moved from _globals.h; CodeView-attributed) ---
 extern WingraphGraphicsType giGraphicsType;

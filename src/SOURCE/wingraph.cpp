@@ -459,11 +459,7 @@ void DDUpdatePalette(i8* paletteData) {
         LogicalPalette.entries[entry].peBlue = paletteData[entry * 3 + 2] << 2;
         LogicalPalette.entries[entry].peFlags = PC_NOCOLLAPSE;
     }
-    ProcessAssert(
-        reinterpret_cast<i32>(lpDDPal),
-        RETAIL_FILE,
-        518
-    );
+    ProcessAssert(reinterpret_cast<i32>(lpDDPal), RETAIL_FILE, 518);
     result0 = lpDDPal->SetEntries(
         0,
         WINGRAPH_SYSTEM_PALETTE_SIZE,
@@ -943,11 +939,11 @@ void SetFullScreenStatus(i32 fullScreen) {
         if (gbDDrawAttached == 0)
             return;
         gConfig.gfx[giCurExe].fullScreen = 1;
-        if (IDX(SetGraphicsType(WINGRAPH_GRAPHICS_DIRECT_DRAW) != 0))
+        if (SetGraphicsType(WINGRAPH_GRAPHICS_DIRECT_DRAW) != 0)
             DDSetFullScreenStatus(fullScreen);
     } else if (fullScreen == 0) {
         if (gbWinGAttached != 0)
-            SetGraphicsType(IDX(WINGRAPH_GRAPHICS_WING));
+            SetGraphicsType(WINGRAPH_GRAPHICS_WING);
     } else {
         DDSetFullScreenStatus(fullScreen);
     }
@@ -964,7 +960,7 @@ i32 QueryNewPalette(void) {
 }
 
 VA(0x00437595, 0x286)
-i32 SetGraphicsType(i32 graphicsType) {
+i32 SetGraphicsType(WingraphGraphicsType graphicsType) {
     i32 fullScreen;
     i32 x;
     i32 y;
@@ -972,9 +968,9 @@ i32 SetGraphicsType(i32 graphicsType) {
     i32 height7;
     void* screenBuffer;
 
-    if (OD_STEER(giGraphicsType) == IDX(graphicsType))
+    if (OD_STEER(giGraphicsType) == graphicsType)
         return 1;
-    if (graphicsType == IDX(WINGRAPH_GRAPHICS_WING) && gbWinGAttached == 0)
+    if (graphicsType == WINGRAPH_GRAPHICS_WING && gbWinGAttached == 0)
         return 0;
     if (graphicsType == IDX(WINGRAPH_GRAPHICS_DIRECT_DRAW) && gbDDrawAttached == 0)
         return 0;
@@ -986,7 +982,7 @@ i32 SetGraphicsType(i32 graphicsType) {
     height7 = gConfig.gfx[giCurExe].height;
     screenBuffer = H2_ALLOC(WINGRAPH_WIDTH * WINGRAPH_HEIGHT, 1265);
     memcpy(screenBuffer, gpWindowManager->m_screen->m_pixels, WINGRAPH_WIDTH * WINGRAPH_HEIGHT);
-    if (graphicsType == IDX(WINGRAPH_GRAPHICS_WING)) {
+    if (graphicsType == WINGRAPH_GRAPHICS_WING) {
         gConfig.gfx[giCurExe].fullScreen = 0;
         DDCleanUpWinGraphics();
         giGraphicsType = WINGRAPH_GRAPHICS_WING;
@@ -1039,7 +1035,7 @@ i32 SetGraphicsType(i32 graphicsType) {
 // ---- globals (definitions, RVA order) ----
 DATA(0x004f1288) b32 gbWinGAttached = true;
 DATA(0x004f128c) b32 gbDDrawAttached = false;
-DATA(0x004f1290) i32 giGraphicsType = 1;
+DATA(0x004f1290) WingraphGraphicsType giGraphicsType = WINGRAPH_GRAPHICS_WING;
 DATA(0x004f1294) i32l Orientation = 1;
 DATA(0x004f1298) struct _PALETTE LogicalPalette = {WINGRAPH_PALETTE_VERSION, WINGRAPH_PALETTE_SIZE};
 DATA(0x004f169c) void* lpInitWin = 0;
