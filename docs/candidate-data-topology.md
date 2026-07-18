@@ -17,6 +17,16 @@ Ambiguity, overlap, a missing definition, or an uncovered reference leaves the w
 Those individual placements may enter the review queue with their contradictions, but never a
 canonical manifest or target.
 
+This proves allocation identity and placement; it does not by itself prove which
+allocation a particular instruction uses. Two identical constants can both have
+valid retail placements while a candidate code relocation selects the wrong one.
+The direct retail-PE operand audit (`assert_relocs --pe-data`) is the authority for
+that code-site relationship. PHILAI's former `1.1f` reconstruction was the
+regression fixture: payload/topology paired equal `1.1f` bytes elsewhere in the
+retail pool, whereas this retail instruction operand selected the retained
+`1.5f` owner. The synthesized delinked target is not an original retail object
+and cannot establish that retail emitted an additional dead slot.
+
 Linker-sorted `.CRT$...` subsections do not participate in ordinary `.data` cursor replay. The
 mapper assigns one only when the same owner has exactly one physical retail contribution with the
 same writable domain and size, then removes that contribution from ordinary replay. A missing or
