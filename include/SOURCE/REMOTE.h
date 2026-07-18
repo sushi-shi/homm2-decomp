@@ -1,6 +1,7 @@
 #ifndef HOMM2_REMOTE_H
 #define HOMM2_REMOTE_H
 #include <va.h>
+#include <SOURCE/GAME.h>
 #include <SOURCE/REMOTE_TYPES.h>
 // Declarations of the free functions DEFINED in REMOTE.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
@@ -10,7 +11,7 @@ H2_ENUM_BEGIN(RemoteCrcConstant)
 H2_ENUM_END(RemoteCrcConstant)
 
 H2_ENUM_BEGIN(RemoteConstant)
-    REMOTE_PLAYER_COUNT = 6,
+    REMOTE_PLAYER_COUNT = IDX(GAME_PLAYER_COUNT),
     REMOTE_QUEUE_CAPACITY = 128,
     REMOTE_QUEUE_STORAGE_COUNT = 138,
     REMOTE_RECENT_ID_COUNT = 30,

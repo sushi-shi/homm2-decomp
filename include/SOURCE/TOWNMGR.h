@@ -1,6 +1,7 @@
 #ifndef HOMM2_TOWNMGR_H
 #define HOMM2_TOWNMGR_H
 #include <va.h>
+#include <SOURCE/GAME.h>
 #include <SOURCE/KB_TYPES.h>
 // Declarations of the free functions DEFINED in TOWNMGR.cpp — the single home for these
 // symbols. Other TUs call them by including this header (no local externs).
@@ -266,7 +267,7 @@ H2_ENUM_BEGIN(TownManagerConstant)
     TOWN_WELL_FIRST_DWELLING_GROWTH_BUILDING = 11,
     TOWN_WELL_BASE_GROWTH_BONUS = 2,
     TOWN_WELL_FIRST_DWELLING_GROWTH_BONUS = 8,
-    TOWN_THIEVES_PLAYER_COUNT = 6,
+    TOWN_THIEVES_PLAYER_COUNT = IDX(GAME_PLAYER_COUNT),
     TOWN_THIEVES_ORDER_BUFFER_SIZE = 8,
     TOWN_THIEVES_FIRST_RANK_CONTROL = 800,
     TOWN_THIEVES_FIRST_PLAYER_CONTROL = 900,
