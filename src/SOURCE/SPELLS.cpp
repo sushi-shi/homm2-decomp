@@ -2464,7 +2464,7 @@ void combatManager::ChainLightning(i32 targetHex, i32 spellPower) {
         startX = targetX;
         startY = targetY;
         DelayMilli(
-            static_cast<i32l>(gfCombatSpeedMod[gConfig.combatSpeed] * IDX(SPELL_FIZZLE_FRAME_DELAY))
+            static_cast<i32l>(gfCombatSpeedMod[gConfig.combatSpeed] * CHAIN_LIGHTNING_FRAME_DELAY)
         );
         i32 nextTarget = GetNextChainLightningTarget(target, 1);
         if (nextTarget == COMBAT_HEX_EMPTY)
@@ -2473,7 +2473,7 @@ void combatManager::ChainLightning(i32 targetHex, i32 spellPower) {
         DrawFrame(1, 0, 0, 0, 0, 1, 1);
         DelayTil(&deadline);
         deadline = static_cast<i32>(
-            KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * IDX(SPELL_FIZZLE_FRAME_DELAY)
+            KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * CHAIN_LIGHTNING_FRAME_DELAY
         );
     }
     ShowMassSpell(gArmyEffected, gsSpellInfo[IDX(SPELL_CHAIN_LIGHTNING)].combatEffect, 1);
@@ -3835,10 +3835,7 @@ void combatManager::ShowSpellMessage(i32 castByCreature, i32 spell, army* target
 // 0xb8 bytes at 0xeb150..0xeb208. All 104 logical extents are disjoint and
 // byte-exact. The only uncovered data bytes are alignment at 0xf04c5..0xf04c8,
 // 0xf04d7, 0xf04e6..0xf04e8, 0xf0542..0xf0544, and the 0xf085f tail byte;
-// rdata has four bytes of tail alignment. Candidate section SHA-256 values are
-// f1d571be911cbefa4a7e71a321c94eb2066288bf93972fed8b6ff79f2a196b85
-// for data and b34aa88d87447a6f3ecc02cc0ec32e87b57466a46817b252b16af407ca052173
-// for rdata.
+// rdata has four bytes of tail alignment.
 //
 // The 62 compiler-local data owners each have one zero-addend code reference,
 // and all 62 pair to exact retail targets. Sixty use equal-count function
@@ -3847,13 +3844,12 @@ void combatManager::ShowSpellMessage(i32 castByCreature, i32 spell, army* target
 // +0x3fb and retail +0x3f9 -> 0xf05f4, while $SG37532 is bracketed by gText
 // sites at candidate +0x5d6 and retail +0x5d0 -> 0xf062c.
 //
-// The rdata bijection uses 65 exact sites across 19 referenced owners, then
-// payload/extent compatibility uniquely forces the other 14; removing any
-// chosen edge prevents a perfect matching. Candidate pooling still combines
-// two byte-identical uses that retail splits: $T38049 maps to its unique pool
-// slot at 0xeb184 while ChainLightning refers to the equal value at 0xeb160,
-// and $T38127 maps to 0xeb200 while RippleCreature refers to the equal value at
-// 0xeb190. These are reference-pooling walls, not aliases or missing storage.
+// The corrected ChainLightning delay, Ripple divisor, MirrorImage delay, and
+// DoBlast delay restore the retail constant identities and tail order. The
+// candidate and fixed target .rdata sections are both 0xb4 bytes, and the direct
+// retail-PE operand audit has no SPELLS rdata identity or section-offset
+// divergence. Payload-equivalent pool slots are not used as a substitute for
+// code-site relocation evidence.
 //
 // Retail disassembly also proved the function-local source-line owners at
 // 0xf04e4 and 0xf0540 and all six offset uses. Exact owner payload comparison

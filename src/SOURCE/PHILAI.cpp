@@ -53,14 +53,16 @@
 // at 0xec004. Do not restore the former five overlapping literal aliases for
 // either line base.
 //
-// Retail .rdata is 0xeb280..0xeb5e0 (0x360 bytes). Candidate .rdata is 0x368
-// bytes and contains the complete retail four-byte payload multiset plus two
-// candidate-only zero words, so whole-section translation is not valid.
-// DetermineTargetPosition's target boost is the anonymous 1.1f temporary: the
-// pool places it between that function's 1.05 double and the battle 1.11
-// double, which a named 1.5f owner cannot reproduce. The hero-purchase divisor
-// stays a double macro and the attention identity a float so neither adds a
-// named slot. The pool distinguishes campfire 500.0f, buoy 400.0f,
+// Retail .rdata is 0xeb280..0xeb5e0 (0x360 bytes). DetermineTargetPosition's
+// target boost relocates to the retained AI_EVENT_HUMAN_VALUE_FACTOR owner at
+// 0xeb280 (1.5f). An anonymous 1.1f spelling emitted an extra allocation and
+// alignment tail which relocation-masked code and payload-only pool pairing did
+// not expose. The former 0x368 delinked target was synthesized from that model;
+// it is not evidence that the unavailable original retail object contained a
+// dead slot. Retail proves the linked 0x360 span and this code operand. The
+// hero-purchase divisor remains float, its arithmetic identity remains double,
+// and the attention expressions retain their separately evidenced widths.
+// The pool distinguishes campfire 500.0f, buoy 400.0f,
 // watering-hole 300.0f, and the shared 200.0f land-site factor.
 //
 // All 33 zero-fill owners are source DATA definitions. Their retail public
@@ -1756,7 +1758,8 @@ i32 philAI::DetermineTargetPosition(i32& targetX, i32& targetY, i32 mobility, i3
                         targetScoreLocal = -100;
                     }
                     if (targetX == x && targetY == y) {
-                        targetScoreLocal = static_cast<i32>(targetScoreLocal * 1.1f);
+                        targetScoreLocal = static_cast<i32>(
+                            targetScoreLocal * AI_EVENT_HUMAN_VALUE_FACTOR);
                         targetScoreLocal += 20;
                     }
 
@@ -2618,13 +2621,13 @@ void philAI::ValueOfBuyingHero(
                  || heroPtr->m_cursorType == IDX(FACTION_WIZARD)
                  || heroPtr->m_cursorType == IDX(FACTION_NECROMANCER);
     if (townPtr->m_type == heroPtr->m_cursorType) {
-        value27 *= AI_HERO_PURCHASE_SAME_RACE_FACTOR + AI_ATTENTION_IDENTITY;
+        value27 *= AI_HERO_PURCHASE_SAME_RACE_FACTOR + AI_HERO_PURCHASE_IDENTITY;
     } else if ((townPtr->m_buildState >= 2 && magicHero6)
                || (townPtr->m_buildState < 2 && !magicHero6)) {
         value27 *= AI_HERO_PURCHASE_SAME_RACE_FACTOR / AI_HERO_PURCHASE_CLASS_DIVISOR
-                   + AI_ATTENTION_IDENTITY;
+                   + AI_HERO_PURCHASE_IDENTITY;
     } else {
-        value27 *= AI_ATTENTION_IDENTITY
+        value27 *= AI_HERO_PURCHASE_IDENTITY
                    - AI_HERO_PURCHASE_SAME_RACE_FACTOR / AI_HERO_PURCHASE_CLASS_DIVISOR;
     }
     value27 = static_cast<i32>(FutureDeflator(costs2) * value27);
@@ -2726,9 +2729,9 @@ void philAI::GetGameAttentionValue(i32 player) {
     attention->gameWeightB *=
         (AI_ATTENTION_IDENTITY_FLOAT + AI_ATTENTION_PLAYER_CENTER) / AI_ATTENTION_NORMALIZER;
     attention->gameWeightB *=
-        (AI_ATTENTION_UPPER_BOUND - AI_ATTENTION_IDENTITY_FLOAT) / AI_ATTENTION_NORMALIZER;
+        (AI_ATTENTION_UPPER_BOUND - AI_ATTENTION_IDENTITY) / AI_ATTENTION_NORMALIZER;
     attention->gameWeightA *=
-        (AI_ATTENTION_IDENTITY_FLOAT + AI_ATTENTION_PLAYER_CENTER) / AI_ATTENTION_NORMALIZER;
+        (AI_ATTENTION_IDENTITY + AI_ATTENTION_PLAYER_CENTER) / AI_ATTENTION_NORMALIZER;
     attention->gameWeightB = static_cast<float>(
         ((AI_ATTENTION_PLAYER_CENTER - gpGame->m_playerCount) * AI_ATTENTION_WEIGHT_B_PLAYER_FACTOR
          + 1.0)
@@ -2740,7 +2743,7 @@ void philAI::GetGameAttentionValue(i32 player) {
         * attention->gameWeightA
     );
     attention->gameRemainder = static_cast<float>(
-        (AI_ATTENTION_IDENTITY_FLOAT - attention->gameWeightB) - attention->gameWeightA
+        (1.0f - attention->gameWeightB) - attention->gameWeightA
     );
 }
 
@@ -3526,9 +3529,11 @@ i32 philAI::FightValueOfStack(
     if (armyValue * 2 < townArcherValueValue)
         townArcherValueValue = static_cast<i32>(armyValue * 1.5);
     else if (townArcherValueValue > armyValue * 1.5) {
-        townArcherValueValue = static_cast<i32>(armyValue * 0.9);
+        townArcherValueValue =
+            static_cast<i32>(armyValue * AI_TOWN_ARCHER_OVERWHELMING_FACTOR);
     } else if ((armyValue | 0) < townArcherValueValue)
-        townArcherValueValue = static_cast<i32>(armyValue * 1.25);
+        townArcherValueValue =
+            static_cast<i32>(armyValue * AI_TOWN_ARCHER_ADVANTAGE_FACTOR);
     if (giDebugLevel == 9)
         LogInt("FV3", armyValue, spellValueMap, townArcherValueValue, 0, 0, -999, -999);
     armyValue += spellValueMap;
@@ -4075,10 +4080,15 @@ void philAI::HeroInteractionAtTown(hero* heroPtr, town* townPtr, i32 doInteracti
     if (primarySkills3 > 10)
         primarySkills3 = 10;
     if (townPtr->m_buildings & AI_BUILDING_CASTLE_MASK)
-        desiredShare0 = static_cast<float>(0.55 - primarySkills3 * 0.02);
+        desiredShare0 = static_cast<float>(
+            AI_TOWN_CASTLE_PRIMARY_SKILL_SHARE_BASE
+            - primarySkills3 * AI_TOWN_CASTLE_PRIMARY_SKILL_SHARE_STEP
+        );
     else
-        desiredShare0 =
-            static_cast<float>(AI_TOWN_PRIMARY_SKILL_SHARE_BASE - primarySkills3 * 0.01);
+        desiredShare0 = static_cast<float>(
+            AI_TOWN_PRIMARY_SKILL_SHARE_BASE
+            - primarySkills3 * AI_TOWN_PRIMARY_SKILL_SHARE_STEP
+        );
     if (giCurTurn <= AI_EARLY_TOWN_SHARE_TURN)
         desiredShare0 = fFirstWeekTownFV;
     else if (giCurTurn <= AI_SECOND_WEEK_END_TURN)
@@ -4856,7 +4866,7 @@ i32 philAI::FightEvent(hero* h, mapCell* cell, i32 evaluateOnly) {
 
 VA(0x00443842, 0x73)
 i32 philAI::DamageGroup(armyGroup* ag, hero* loser, hero*, float dmg) {
-    if (dmg < 1.0) {
+    if (dmg < AI_QUICK_COMBAT_DEFEAT_THRESHOLD) {
         ag->DamageGroup(dmg);
         return 0;
     } else {
@@ -4965,7 +4975,7 @@ i32 philAI::ComputeUpgradeValue(CreatureType a1, CreatureType a2) {
         * gpCurPlayer->m_upgradeValueWeight
     );
     if (gpCurAIHero->CreatureTypeCount(IDX(a2)) != 0)
-        result = static_cast<i32>(result * 0.6);
+        result = static_cast<i32>(result * AI_UPGRADE_EXISTING_STACK_FACTOR);
     return result;
 }
 

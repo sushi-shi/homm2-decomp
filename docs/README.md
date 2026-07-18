@@ -19,9 +19,9 @@ one-run progress summaries belong under `build/`, not here.
   `delinker-contribution-manifest.md` define candidate/target object reconstruction.
 - `relocation-canonicalization.md`, `static-storage-link-audit.md`,
   `missing-public-data-audit.md`, and `link-layout-tracker.md` define the final-link checks.
-- `rdata-contribution-audit.md` is retained as explicitly labeled checkpoint evidence for the
-  first readonly-layout divergence; current offsets come from `homm2 link-layout` and the link
-  report.
+- `rdata-contribution-audit.md` records the resolved readonly-layout investigation and retains
+  older contribution measurements as explicitly labeled historical evidence; current offsets
+  come from `homm2 link-layout` and the link report.
 
 ## Matching and proof
 

@@ -101,6 +101,9 @@ H2_ENUM_BEGIN(GameTuningConstant)
     COMPRESS_TEST_ITERATIONS = 100
 H2_ENUM_END(GameTuningConstant)
 
+#define GAME_HANDICAP_MODERATE_RESOURCE_FACTOR 0.85
+#define GAME_HANDICAP_SEVERE_RESOURCE_FACTOR 0.7
+
 H2_ENUM_BEGIN(ViewArmyControlId)
     VIEW_ARMY_QUICK_VIEW_ID = 0x7800,
     VIEW_ARMY_UPGRADE_ID = 0x7803
@@ -1438,9 +1441,9 @@ void game::NewMap(char* filename) {
                 for (townIndex9 = 0; townIndex9 < 7; townIndex9++) {
                     double resourceScale;
                     if (m_playerHandicap[player2] == 1)
-                        resourceScale = 0.85;
+                        resourceScale = GAME_HANDICAP_MODERATE_RESOURCE_FACTOR;
                     else
-                        resourceScale = 0.7;
+                        resourceScale = GAME_HANDICAP_SEVERE_RESOURCE_FACTOR;
                     (m_players + player2)->m_resources[townIndex9] = static_cast<i32>(
                         (m_players + player2)->m_resources[townIndex9] * resourceScale
                     );
@@ -3408,9 +3411,9 @@ i32 game::ComputeDailyGold(i32 player) {
     }
 
     if (m_playerHandicap[player] == 1)
-        gold = static_cast<i32>(gold * 0.15);
+        gold = static_cast<i32>(gold * GAME_HANDICAP_MODERATE_RESOURCE_FACTOR);
     else if (m_playerHandicap[player] == 2)
-        gold = static_cast<i32>(gold * 0.3);
+        gold = static_cast<i32>(gold * GAME_HANDICAP_SEVERE_RESOURCE_FACTOR);
     return gold;
 }
 
@@ -6651,13 +6654,13 @@ void game::SetupNewRumour(void) {
                 }
                 sprintf(
                     m_rumour,
-                    "The ultimate artifact may be found %s.",
+                    "The ultimate artifact may be found in the %s regions of the world.",
                     cDirections[direction9]
                 );
             } else if (category10 < 66) {
                 sprintf(
                     m_rumour,
-                    "The ultimate artifact may be found in the %s regions of the world.",
+                    "The ultimate artifact may be found %s.",
                     cRumourTerrainDescriptions
                         [giGroundToTerrain[gpAdvManager
                                                ->GetCell(m_ultimateArtifactX, m_ultimateArtifactY)
