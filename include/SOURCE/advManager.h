@@ -23,7 +23,7 @@ struct SAMPLE2;
 struct SMapChange;
 struct tag_message;
 
-#define ADVMGR_MONSTER_ANIMATION_TABLE_SIZE 16
+#define ADVMGR_MONSTER_ANIMATION_TABLE_SIZE 18
 
 struct adventureSoundCell {
     AdventureEnvironmentSoundId soundId;
