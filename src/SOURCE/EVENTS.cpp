@@ -220,7 +220,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         primaryAmount1 = 0;
                         secondaryReward_f = MAP_EVENT_REWARD_NONE;
                         secondaryAmount = 0;
-                        for (eventValue1 = 0; eventValue1 < IDX(SPHINX_RESOURCE_COUNT); eventValue1++) {
+                        for (eventValue1 = 0; eventValue1 < IDX(SPHINX_RESOURCE_COUNT);
+                             eventValue1++) {
                             gpGame->m_players[giCurPlayer].m_resources[eventValue1] +=
                                 eventExtra1->resources[eventValue1];
                             if (gpGame->m_players[giCurPlayer].m_resources[eventValue1] < 0)
@@ -427,7 +428,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 eventHero2->UpgradeCreatures(IDX(CREATURE_PIKEMAN), IDX(CREATURE_VETERAN_PIKEMAN));
-                eventHero2->UpgradeCreatures(IDX(CREATURE_SWORDSMAN), IDX(CREATURE_MASTER_SWORDSMAN));
+                eventHero2->UpgradeCreatures(
+                    IDX(CREATURE_SWORDSMAN),
+                    IDX(CREATURE_MASTER_SWORDSMAN)
+                );
                 eventHero2->UpgradeCreatures(IDX(CREATURE_IRON_GOLEM), IDX(CREATURE_STEEL_GOLEM));
                 if (thirdUpgrade == CREATURE_NONE) {
                     if (secondUpgrade1 == CREATURE_NONE) {
@@ -1565,7 +1569,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 eventHero2,
                 ResourceType(resourceType),
                 resourceType == IDX(RES_GOLD) ? cell->m_objectMetadata * CAMPFIRE_GOLD_MULTIPLIER
-                                         : cell->m_objectMetadata
+                                              : cell->m_objectMetadata
             );
             strcpy(sphinxAnswer_a, gResourceNames[resourceType]);
             sphinxAnswer_a[0] += ' ';
@@ -1574,7 +1578,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 gText,
                 resourceType,
                 resourceType == IDX(RES_GOLD) ? cell->m_objectMetadata * CAMPFIRE_GOLD_MULTIPLIER
-                                         : cell->m_objectMetadata
+                                              : cell->m_objectMetadata
             );
             eraseObject = 1;
             fizzleType3 = 1;
@@ -1584,7 +1588,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             if (cell->m_objectMetadata < SPHINX_RESOURCE_COUNT) {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 EventWindow(87, 1, "", cell->m_objectMetadata, WINDMILL_RESOURCE_AMOUNT, -1, 0, -1);
-                GiveResource(eventHero2, ResourceType(cell->m_objectMetadata), WINDMILL_RESOURCE_AMOUNT);
+                GiveResource(
+                    eventHero2,
+                    ResourceType(cell->m_objectMetadata),
+                    WINDMILL_RESOURCE_AMOUNT
+                );
                 cell->m_objectMetadata = WINDMILL_EMPTY;
             } else {
                 EventWindow(86, 1, "", -1, 0, -1, 0, -1);
@@ -2227,7 +2235,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             artifactResourceType = (cell->m_objectMetadata & ARTIFACT_EVENT_RESOURCE_MASK)
                                    >> ARTIFACT_EVENT_RESOURCE_SHIFT;
             artifact8 = static_cast<ArtifactType>(cell->m_objectIndex >> 1);
-            guardedMonster5 = static_cast<CreatureType>(cell->m_objectMetadata & ARTIFACT_EVENT_MONSTER_MASK);
+            guardedMonster5 =
+                static_cast<CreatureType>(cell->m_objectMetadata & ARTIFACT_EVENT_MONSTER_MASK);
             if (eventHero2->NumArtifacts() == EVENT_ARTIFACT_CAPACITY) {
                 NormalDialog(
                     "You cannot pick up this artifact, you already have a full load!",
@@ -2303,7 +2312,16 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             "2000 gold.  Do you wish to buy this artifact?",
                             gArtifactNames[IDX(artifact8)]
                         );
-                        EventWindow(-1, 2, gText, MAP_EVENT_REWARD_ARTIFACT, IDX(artifact8), -1, 0, -1);
+                        EventWindow(
+                            -1,
+                            2,
+                            gText,
+                            MAP_EVENT_REWARD_ARTIFACT,
+                            IDX(artifact8),
+                            -1,
+                            0,
+                            -1
+                        );
                         if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                             if (gpGame->m_players[eventHero2->m_owner].m_resources[IDX(RES_GOLD)]
                                 >= ARTIFACT_EVENT_GOLD_COST) {
@@ -3034,7 +3052,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             );
                             EventWindow(-1, 1, eventText, -1, 0, -1, 0, -1);
                         } else {
-                            eventHero2->AddSpell(eventValue1, eventHero2->Stats(HeroPrimaryStat(3)));
+                            eventHero2->AddSpell(
+                                eventValue1,
+                                eventHero2->Stats(HeroPrimaryStat(3))
+                            );
                             EventWindow(-1, 1, eventText, 8, eventValue1, -1, 0, -1);
                         }
                         cell->m_objectMetadata = 0;
@@ -4250,7 +4271,8 @@ i32 GiveArtifact(hero* eventHero, ArtifactType artifact, b32 checkEndGame, i8 ar
 
 VA(0x004b00e9, 0x5e)
 ArtifactType advManager::GiveRandomArtifact(hero* eventHero) {
-    ArtifactType artifactId = ArtifactType(gpGame->GetRandomArtifactId(EVENT_RANDOM_ARTIFACT_ANY, 1));
+    ArtifactType artifactId =
+        ArtifactType(gpGame->GetRandomArtifactId(EVENT_RANDOM_ARTIFACT_ANY, 1));
 
     if (artifactId == ARTIFACT_NONE)
         GiveResource(eventHero, RES_GOLD, EVENT_RANDOM_ARTIFACT_GOLD);
@@ -5229,7 +5251,8 @@ void advManager::TransferArtifacts(hero* sourceHero, hero* destinationHero) {
                     for (sourceArtifactSlot = 0; sourceArtifactSlot < EVENT_ARTIFACT_SLOT_COUNT;
                          sourceArtifactSlot++) {
                         if (sourceHero->m_artifacts[sourceArtifactSlot] != IDX(ARTIFACT_NONE)
-                            && sourceHero->m_artifacts[sourceArtifactSlot] != IDX(ARTIFACT_MAGIC_BOOK)) {
+                            && sourceHero->m_artifacts[sourceArtifactSlot]
+                                   != IDX(ARTIFACT_MAGIC_BOOK)) {
                             if (sourceHero->m_artifacts[sourceArtifactSlot]
                                 <= EVENT_ARTIFACT_NON_TRANSFERABLE_LAST) {
                                 if (gbThisNetHumanPlayer[sourceHero->m_owner]
@@ -5522,7 +5545,8 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             }
             gpGame->ClaimMine(cell->m_objectMetadata, giCurPlayer);
             if (eventType_g == MAP_OBJECT_MINE) {
-                for (index_h = IDX(SPELL_SET_EARTH_GUARDIAN); index_h < IDX(SPELL_SET_WATER_GUARDIAN);
+                for (index_h = IDX(SPELL_SET_EARTH_GUARDIAN);
+                     index_h < IDX(SPELL_SET_WATER_GUARDIAN);
                      ++index_h) {
                     if (eventHero->HasSpell(SpellType(index_h))
                         && GetManaCost(SpellType(index_h), eventHero) < eventHero->m_spellPoints) {
@@ -5555,7 +5579,12 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                     cell->m_objectMetadata = CHEST_GOLD_ONLY;
                     goto chestGoldOrExperience;
                 }
-                GiveArtifact(eventHero, ArtifactType(cell->m_objectMetadata & CHEST_ARTIFACT_MASK), 1, -1);
+                GiveArtifact(
+                    eventHero,
+                    ArtifactType(cell->m_objectMetadata & CHEST_ARTIFACT_MASK),
+                    1,
+                    -1
+                );
             } else {
             chestGoldOrExperience:
                 if (gpPhilAI->ChooseGoldOrExperience(
@@ -5699,7 +5728,12 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
         case MAP_OBJECT_SEA_CHEST:
             if ((cell->m_objectMetadata & CHEST_ARTIFACT_FLAG) != 0
                 && eventHero->NumArtifacts() < AI_EVENT_ARTIFACT_LIMIT) {
-                GiveArtifact(eventHero, ArtifactType(cell->m_objectMetadata & CHEST_ARTIFACT_MASK), 1, -1);
+                GiveArtifact(
+                    eventHero,
+                    ArtifactType(cell->m_objectMetadata & CHEST_ARTIFACT_MASK),
+                    1,
+                    -1
+                );
                 GiveResource(eventHero, RES_GOLD, AI_EVENT_SEA_CHEST_ARTIFACT_GOLD);
             } else if (cell->m_objectMetadata != 0) {
                 GiveResource(eventHero, RES_GOLD, AI_EVENT_SEA_CHEST_GOLD);
@@ -5806,7 +5840,11 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
 
         case MAP_OBJECT_WINDMILL:
             if (cell->m_objectMetadata != AI_EVENT_WINDMILL_EMPTY) {
-                GiveResource(eventHero, ResourceType(cell->m_objectMetadata), WINDMILL_RESOURCE_AMOUNT);
+                GiveResource(
+                    eventHero,
+                    ResourceType(cell->m_objectMetadata),
+                    WINDMILL_RESOURCE_AMOUNT
+                );
                 cell->m_objectMetadata = AI_EVENT_WINDMILL_EMPTY;
             }
             break;
@@ -6077,7 +6115,8 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                     eventResults[0] = 1;
                     break;
                 case ARTIFACT_EVENT_MODE_GOLD:
-                    if (gpPhilAI->NetValueOfArtifact(IDX(artifact_g), AI_EVENT_ARTIFACT_GOLD, 0, 0)) {
+                    if (gpPhilAI
+                            ->NetValueOfArtifact(IDX(artifact_g), AI_EVENT_ARTIFACT_GOLD, 0, 0)) {
                         gpGame->m_players[eventHero->m_owner].m_resources[IDX(RES_GOLD)] -=
                             AI_EVENT_ARTIFACT_GOLD;
                         goto artifactPickup;
@@ -6248,9 +6287,12 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 if (battleWon_j == 0) {
                 } else {
                     index_h = PYRAMID_GUARD_COUNT;
-                    combatResult_d =
-                        gpPhilAI
-                            ->CombatMonsterEvent(eventHero, IDX(CREATURE_ROYAL_MUMMY), &index_h, cell);
+                    combatResult_d = gpPhilAI->CombatMonsterEvent(
+                        eventHero,
+                        IDX(CREATURE_ROYAL_MUMMY),
+                        &index_h,
+                        cell
+                    );
                     if (combatResult_d == 0) {
                     } else {
                         eventHero->AddSpell(
@@ -6308,11 +6350,60 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 if (combatResult_d == 0) {
                 } else {
                     eventHero->CheckLevel();
-                    gpGame->ConvertObject(x - 2, y - 1, x + 1, y - 1, TilesetId(56), 0, 4, TilesetId(26), 104, 64, 23);
-                    gpGame->ConvertObject(x - 2, y, x + 1, y, TilesetId(56), 5, 9, TilesetId(26), 109, 64, 23);
-                    gpGame->ConvertObject(x - 2, y - 1, x + 1, y - 1, TilesetId(51), 0, 3, TilesetId(32), 75, 64, 23);
-                    gpGame->ConvertObject(x - 2, y, x + 1, y, TilesetId(51), 4, 7, TilesetId(32), 80, 64, 23);
-                    gpGame->ConvertObject(x, y, x, y, TilesetId(29), 5, 5, TilesetId(29), 4, 64, 23);
+                    gpGame->ConvertObject(
+                        x - 2,
+                        y - 1,
+                        x + 1,
+                        y - 1,
+                        TilesetId(56),
+                        0,
+                        4,
+                        TilesetId(26),
+                        104,
+                        64,
+                        23
+                    );
+                    gpGame->ConvertObject(
+                        x - 2,
+                        y,
+                        x + 1,
+                        y,
+                        TilesetId(56),
+                        5,
+                        9,
+                        TilesetId(26),
+                        109,
+                        64,
+                        23
+                    );
+                    gpGame->ConvertObject(
+                        x - 2,
+                        y - 1,
+                        x + 1,
+                        y - 1,
+                        TilesetId(51),
+                        0,
+                        3,
+                        TilesetId(32),
+                        75,
+                        64,
+                        23
+                    );
+                    gpGame->ConvertObject(
+                        x - 2,
+                        y,
+                        x + 1,
+                        y,
+                        TilesetId(51),
+                        4,
+                        7,
+                        TilesetId(32),
+                        80,
+                        64,
+                        23
+                    );
+                    gpGame
+                        ->ConvertObject(x, y, x, y, TilesetId(29), 5, 5, TilesetId(29), 4, 64, 23);
                     gpGame->m_mines[cell->m_objectMetadata].resourceType = IDX(RES_GOLD);
                     gpGame->m_mines[cell->m_objectMetadata].guardianType = IDX(CREATURE_NONE);
                     gpGame->m_mines[cell->m_objectMetadata].guardianCount = 0;
@@ -6518,7 +6609,9 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
                 armyValue7 = 0;
                 for (artifactIndex1 = 0; artifactIndex1 < AI_EVENT_ARMY_STACK_COUNT;
                      artifactIndex1++) {
-                    creatureType3 = static_cast<CreatureType>(eventHero->m_army.m_creatureTypes[artifactIndex1]);
+                    creatureType3 = static_cast<CreatureType>(
+                        eventHero->m_army.m_creatureTypes[artifactIndex1]
+                    );
                     if (creatureType3 != CREATURE_NONE) {
                         quantity6 = eventHero->m_army.m_quantities[artifactIndex1];
                         if (quantity6 > AI_EVENT_GRAVEYARD_ARMY_REMAINDER) {
@@ -6601,8 +6694,12 @@ void advManager::RecruitSiteAIEvent(mapCell* cell, hero* eventHero) {
             replacementSlot26
         );
         if (purchaseCount17 > 0) {
-            gpGame
-                ->GiveArmy(&eventHero->m_army, IDX(creatureType13), purchaseCount17, replacementSlot26);
+            gpGame->GiveArmy(
+                &eventHero->m_army,
+                IDX(creatureType13),
+                purchaseCount17,
+                replacementSlot26
+            );
             availableCount1 = static_cast<i16>(availableCount1 - purchaseCount17);
             packedSite17 = (availableCount1 << AI_EVENT_RECRUIT_COUNT_SHIFT) | siteType3;
             cell->m_objectMetadata = packedSite17;
@@ -6989,10 +7086,11 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
         static_cast<float>(gpPhilAI->FightValueOfStack(&eventHero->m_army, eventHero, 0, 0, 0, 0))
         / static_cast<float>(gMonsterDatabase[IDX(monsterType)].fightValue * monsterCount[0]);
 
-    if (eventHero->m_army.CanJoin(IDX(monsterType)) && !eventHero->HasArtifact(ARTIFACT_HIDEOUS_MASK)
-        && strengthRatio > MONSTER_STRENGTH_JOIN && monsterType != CREATURE_GHOST
-        && monsterType != CREATURE_EARTH_ELEMENTAL && monsterType != CREATURE_AIR_ELEMENTAL
-        && monsterType != CREATURE_FIRE_ELEMENTAL && monsterType != CREATURE_WATER_ELEMENTAL) {
+    if (eventHero->m_army.CanJoin(IDX(monsterType))
+        && !eventHero->HasArtifact(ARTIFACT_HIDEOUS_MASK) && strengthRatio > MONSTER_STRENGTH_JOIN
+        && monsterType != CREATURE_GHOST && monsterType != CREATURE_EARTH_ELEMENTAL
+        && monsterType != CREATURE_AIR_ELEMENTAL && monsterType != CREATURE_FIRE_ELEMENTAL
+        && monsterType != CREATURE_WATER_ELEMENTAL) {
         if (forcedJoin) {
             gpPhilAI->EvaluateOneTimeCreaturePurchase(
                 monsterType,
@@ -7003,7 +7101,12 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
                 replacementSlot
             );
             if (purchaseCount > 0) {
-                gpGame->GiveArmy(&eventHero->m_army, IDX(monsterType), monsterCount[0], replacementSlot);
+                gpGame->GiveArmy(
+                    &eventHero->m_army,
+                    IDX(monsterType),
+                    monsterCount[0],
+                    replacementSlot
+                );
                 *handled = 1;
             } else {
                 *handled = 1;
@@ -7041,8 +7144,12 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
                 );
                 if (purchaseCount > 0) {
                     gpGame->m_players[eventHero->m_owner].m_resources[IDX(RES_GOLD)] -= joiningCost;
-                    gpGame
-                        ->GiveArmy(&eventHero->m_army, IDX(monsterType), joiningCount, replacementSlot);
+                    gpGame->GiveArmy(
+                        &eventHero->m_army,
+                        IDX(monsterType),
+                        joiningCount,
+                        replacementSlot
+                    );
                     *handled = 1;
                 }
             }
@@ -7064,7 +7171,8 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
                 IDX(CREATURE_SKELETON),
                 static_cast<i32>(
                     static_cast<double>(monsterCount[0])
-                    * eventHero->GetSSLevel(IDX(HERO_SKILL_NECROMANCY)) * MONSTER_NECROMANCY_FRACTION
+                    * eventHero->GetSSLevel(IDX(HERO_SKILL_NECROMANCY))
+                    * MONSTER_NECROMANCY_FRACTION
                 ),
                 -1
             );
@@ -7072,7 +7180,8 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
         *handled = 1;
     } else {
     fightComputerMonsters:
-        monsterCount[1] = gpPhilAI->CombatMonsterEvent(eventHero, IDX(monsterType), monsterCount, cell);
+        monsterCount[1] =
+            gpPhilAI->CombatMonsterEvent(eventHero, IDX(monsterType), monsterCount, cell);
         if (monsterCount[1] != 0) {
             *handled = 1;
             return;
@@ -7458,7 +7567,7 @@ void advManager::SendHeroTownData(
             reinterpret_cast<char*>(buffer),
             remotePlayer,
             COMBAT_REMOTE_HERO_FIRST_SIZE + 1,
-            COMBAT_REMOTE_COMMAND,
+            IDX(COMBAT_REMOTE_COMMAND),
             COMBAT_REMOTE_FRAGMENT_TYPE,
             COMBAT_REMOTE_FRAGMENT_TYPE,
             -1
@@ -7475,7 +7584,7 @@ void advManager::SendHeroTownData(
             reinterpret_cast<char*>(buffer),
             remotePlayer,
             COMBAT_REMOTE_HERO_SECOND_SIZE + 1,
-            COMBAT_REMOTE_COMMAND,
+            IDX(COMBAT_REMOTE_COMMAND),
             COMBAT_REMOTE_FRAGMENT_TYPE,
             COMBAT_REMOTE_FRAGMENT_TYPE,
             -1
@@ -7490,7 +7599,7 @@ void advManager::SendHeroTownData(
             reinterpret_cast<char*>(buffer),
             remotePlayer,
             COMBAT_REMOTE_HERO_FIRST_SIZE + 1,
-            COMBAT_REMOTE_COMMAND,
+            IDX(COMBAT_REMOTE_COMMAND),
             COMBAT_REMOTE_FRAGMENT_TYPE,
             COMBAT_REMOTE_FRAGMENT_TYPE,
             -1
@@ -7507,7 +7616,7 @@ void advManager::SendHeroTownData(
             reinterpret_cast<char*>(buffer),
             remotePlayer,
             COMBAT_REMOTE_HERO_SECOND_SIZE + 1,
-            COMBAT_REMOTE_COMMAND,
+            IDX(COMBAT_REMOTE_COMMAND),
             COMBAT_REMOTE_FRAGMENT_TYPE,
             COMBAT_REMOTE_FRAGMENT_TYPE,
             -1
@@ -7591,7 +7700,7 @@ void advManager::ReceiveHeroTownData(
         0,
         *remotePlayer,
         0,
-        COMBAT_REMOTE_CONFIRM_COMMAND,
+        IDX(COMBAT_REMOTE_CONFIRM_COMMAND),
         COMBAT_REMOTE_FRAGMENT_TYPE,
         COMBAT_REMOTE_FRAGMENT_TYPE,
         -1

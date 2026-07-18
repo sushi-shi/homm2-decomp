@@ -425,15 +425,15 @@ void UpdateDfltMenu(HMENU menu) {
     if (gConfig.gfx[giCurExe].showMenu == 0)
         return;
     if (giMainVideoModeWidth <= 640)
-        EnableMenuItem(menu, KBWIN_MENU_SIZE_640_480, MF_GRAYED);
+        EnableMenuItem(menu, IDX(KBWIN_MENU_SIZE_640_480), MF_GRAYED);
     if (giMainVideoModeWidth <= 800)
-        EnableMenuItem(menu, KBWIN_MENU_SIZE_800_600, MF_GRAYED);
+        EnableMenuItem(menu, IDX(KBWIN_MENU_SIZE_800_600), MF_GRAYED);
     if (giMainVideoModeWidth <= 1024)
-        EnableMenuItem(menu, KBWIN_MENU_SIZE_1024_768, MF_GRAYED);
+        EnableMenuItem(menu, IDX(KBWIN_MENU_SIZE_1024_768), MF_GRAYED);
     if (giMainVideoModeWidth <= 1280)
-        EnableMenuItem(menu, KBWIN_MENU_SIZE_1280_1024, MF_GRAYED);
+        EnableMenuItem(menu, IDX(KBWIN_MENU_SIZE_1280_1024), MF_GRAYED);
     if (gbDDrawAttached == 0)
-        EnableMenuItem(menu, KBWIN_MENU_FULLSCREEN, MF_GRAYED);
+        EnableMenuItem(menu, IDX(KBWIN_MENU_FULLSCREEN), MF_GRAYED);
 }
 
 // @semantic: semantics, the 0x04 frame, menu slot, both arms, and all 11 ordered

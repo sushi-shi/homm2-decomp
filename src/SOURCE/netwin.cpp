@@ -244,7 +244,8 @@ extern "C" u16 __cdecl nb_sess(i16 operation, ...) {
             nb_format_name(callName, gNbNameBuf[gNbMaxSess].bytes);
             memset(&gNbSessNcb[gNbMaxSess], 0, sizeof(NetbiosControlBlock));
             memcpy(gNbSessNcb[gNbMaxSess].name, gNbNameBuf[gNbMaxSess].bytes, NETBIOS_NAME_SIZE);
-            gNbSessNcb[gNbMaxSess].command = NETBIOS_COMMAND_ADD_NAME | IDX(NETBIOS_COMMAND_ASYNC);
+            gNbSessNcb[gNbMaxSess].command =
+                IDX(NETBIOS_COMMAND_ADD_NAME) | IDX(NETBIOS_COMMAND_ASYNC);
             gNbSessNcb[gNbMaxSess].postRoutine = nb_add_name_done;
             gNbSessNcb[gNbMaxSess].commandComplete = IDX(NETBIOS_RESULT_PENDING);
             gNbSessNcb[gNbMaxSess].adapterNumber = gNetbiosLana;
@@ -442,7 +443,7 @@ static void nb_add_name(void) {
             NETBIOS_NAME_SIZE
         );
         memset(&gNbCtlNcb, 0, sizeof(gNbCtlNcb));
-        gNbCtlNcb.command = NETBIOS_COMMAND_RECEIVE_DATAGRAM | IDX(NETBIOS_COMMAND_ASYNC);
+        gNbCtlNcb.command = IDX(NETBIOS_COMMAND_RECEIVE_DATAGRAM) | IDX(NETBIOS_COMMAND_ASYNC);
         gNbCtlNcb.nameNumber = gNbLocalNum;
         gNbCtlNcb.length = strlen(gNbGroupName) + NETBIOS_NAME_SIZE;
         gNbCtlNcb.buffer = gNbSessBuf.bytes;
@@ -494,7 +495,8 @@ VA(0x004a7c4b, 0xbe)
 static u16 __fastcall nb_recv_any(i32 session) {
     if (gNbSessNcb[session].commandComplete != IDX(NETBIOS_RESULT_PENDING)) {
         memset(&gNbSessNcb[session], 0, sizeof(NetbiosControlBlock));
-        gNbSessNcb[session].command = NETBIOS_COMMAND_RECEIVE_BROADCAST | IDX(NETBIOS_COMMAND_ASYNC);
+        gNbSessNcb[session].command =
+            IDX(NETBIOS_COMMAND_RECEIVE_BROADCAST) | IDX(NETBIOS_COMMAND_ASYNC);
         gNbSessNcb[session].nameNumber = gNbLocalNum;
         gNbSessNcb[session].length = NETBIOS_PAYLOAD_SIZE;
         gNbSessNcb[session].buffer = gNbRcvData[session].bytes;
@@ -537,7 +539,7 @@ static u16 __fastcall nb_call(i32 session, void* name) {
     memset(&gNbSessNcb[session], 0, sizeof(NetbiosControlBlock));
     memcpy(gNbSessNcb[session].callName, name, NETBIOS_NAME_SIZE);
     memcpy(gNbSessNcb[session].name, gNbNameBuf[gNbMaxSess].bytes, NETBIOS_NAME_SIZE);
-    gNbSessNcb[session].command = NETBIOS_COMMAND_CALL | IDX(NETBIOS_COMMAND_ASYNC);
+    gNbSessNcb[session].command = IDX(NETBIOS_COMMAND_CALL) | IDX(NETBIOS_COMMAND_ASYNC);
     gNbSessNcb[session].commandComplete = IDX(NETBIOS_RESULT_PENDING);
     gNbSessNcb[session].postRoutine = nb_call_done;
     gNbSessNcb[session].adapterNumber = gNetbiosLana;
@@ -550,7 +552,7 @@ static u16 __fastcall nb_listen(i32 session, void* name) {
     memset(&gNbSessNcb[session], 0, sizeof(NetbiosControlBlock));
     memcpy(gNbSessNcb[session].callName, name, NETBIOS_NAME_SIZE);
     memcpy(gNbSessNcb[session].name, gNbNameBuf[gNbMaxSess].bytes, NETBIOS_NAME_SIZE);
-    gNbSessNcb[session].command = NETBIOS_COMMAND_LISTEN | IDX(NETBIOS_COMMAND_ASYNC);
+    gNbSessNcb[session].command = IDX(NETBIOS_COMMAND_LISTEN) | IDX(NETBIOS_COMMAND_ASYNC);
     gNbSessNcb[session].commandComplete = IDX(NETBIOS_RESULT_PENDING);
     gNbSessNcb[session].postRoutine = nb_call_done;
     gNbSessNcb[session].adapterNumber = gNetbiosLana;
@@ -598,7 +600,7 @@ static void __fastcall nb_arm_recv(i32 session) {
             710 + (715 - 710)
         );
         memset(&gNbSessNcb[session], 0, sizeof(NetbiosControlBlock));
-        gNbSessNcb[session].command = NETBIOS_COMMAND_RECEIVE | IDX(NETBIOS_COMMAND_ASYNC);
+        gNbSessNcb[session].command = IDX(NETBIOS_COMMAND_RECEIVE) | IDX(NETBIOS_COMMAND_ASYNC);
         gNbSessNcb[session].sessionNumber = gNbSessLsn[session];
         gNbSessNcb[session].buffer = gNbRcvData[session].bytes;
         gNbSessNcb[session].length = NETBIOS_PAYLOAD_SIZE;
