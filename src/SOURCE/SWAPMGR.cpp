@@ -142,7 +142,7 @@ i32 swapManager::Open(i32 id) {
     giMonoIconSkip = SWAP_MONO_ICON_DEFAULT;
     gpMouseManager->SetPointer(0);
     m_messageMask = BASE_MANAGER_ACCEPT_SWAP;
-    m_priority = id;
+    m_priority = BaseManagerPriority(id);
     m_active = true;
     strcpy(m_name, "swapManager");
     return 0;

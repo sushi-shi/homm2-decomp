@@ -542,7 +542,7 @@ i32 townManager::Open(i32 id) {
     KBChangeMenu(hmnuTown);
     gpMouseManager->SetPointer("advmice.mse", 0, TOWN_MAP_CHANGE_UNUSED);
     m_messageMask = BASE_MANAGER_ACCEPT_TOWN_EVENT;
-    m_priority = id;
+    m_priority = BaseManagerPriority(id);
     m_active = true;
     strcpy(m_name, "townManager");
     gpWindowManager->FadeScreen(0, TOWN_FADE_STEPS, 0);

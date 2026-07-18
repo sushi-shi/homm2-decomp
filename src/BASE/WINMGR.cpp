@@ -298,7 +298,7 @@ i32 heroWindowManager::Open(i32 managerOrder) {
         WINDOW_FRAMEBUFFER_FILL_COLOR,
         WINDOW_SCREEN_WIDTH * WINDOW_SCREEN_HEIGHT
     );
-    m_priority = managerOrder;
+    m_priority = BaseManagerPriority(managerOrder);
     m_messageMask = BASE_MANAGER_ACCEPT_RIGHT_BUTTON_DOWN;
     m_active = true;
     strcpy(m_name, gWindowManagerText.managerName);

@@ -6215,13 +6215,13 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
 
         case MAP_OBJECT_PYRAMID:
             if (cell->m_objectMetadata != 0
-                && eventHero->HasSpell(SpellType(cell->m_objectMetadata) - 1) == 0) {
+                && eventHero->HasSpell(SpellType(cell->m_objectMetadata - 1)) == 0) {
                 for (index_h = 0; index_h < AI_EVENT_ARMY_STACK_COUNT; ++index_h) {
                     gpMonGroup->m_creatureTypes[index_h] = IDX(CREATURE_ROYAL_MUMMY);
                     gpMonGroup->m_creatureCounts[index_h] = 10;
                 }
                 index_h = cell->m_objectMetadata - 1;
-                if (gsSpellInfo[index_h].attributes & 1) {
+                if (HAS(gsSpellInfo[index_h].attributes, SPELL_INFO_ATTRIBUTE_POWER)) {
                     battleStatValue_o =
                         eventHero->Stats(HERO_PRIMARY_SPELL_POWER) > 40
                             ? gfBattleStat[40]
@@ -6308,11 +6308,11 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 if (combatResult_d == 0) {
                 } else {
                     eventHero->CheckLevel();
-                    gpGame->ConvertObject(x - 2, y - 1, x + 1, y - 1, TilesetId(56), 0, 4, 26, 104, 64, 23);
-                    gpGame->ConvertObject(x - 2, y, x + 1, y, TilesetId(56), 5, 9, 26, 109, 64, 23);
-                    gpGame->ConvertObject(x - 2, y - 1, x + 1, y - 1, TilesetId(51), 0, 3, 32, 75, 64, 23);
-                    gpGame->ConvertObject(x - 2, y, x + 1, y, TilesetId(51), 4, 7, 32, 80, 64, 23);
-                    gpGame->ConvertObject(x, y, x, y, TilesetId(29), 5, 5, 29, 4, 64, 23);
+                    gpGame->ConvertObject(x - 2, y - 1, x + 1, y - 1, TilesetId(56), 0, 4, TilesetId(26), 104, 64, 23);
+                    gpGame->ConvertObject(x - 2, y, x + 1, y, TilesetId(56), 5, 9, TilesetId(26), 109, 64, 23);
+                    gpGame->ConvertObject(x - 2, y - 1, x + 1, y - 1, TilesetId(51), 0, 3, TilesetId(32), 75, 64, 23);
+                    gpGame->ConvertObject(x - 2, y, x + 1, y, TilesetId(51), 4, 7, TilesetId(32), 80, 64, 23);
+                    gpGame->ConvertObject(x, y, x, y, TilesetId(29), 5, 5, TilesetId(29), 4, 64, 23);
                     gpGame->m_mines[cell->m_objectMetadata].resourceType = IDX(RES_GOLD);
                     gpGame->m_mines[cell->m_objectMetadata].guardianType = IDX(CREATURE_NONE);
                     gpGame->m_mines[cell->m_objectMetadata].guardianCount = 0;
@@ -6482,8 +6482,8 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
             }
             break;
         case AI_GENERIC_SITE_SHIPWRECK:
-            if (!(eventHero->m_eventFlags & IDX(AI_GENERIC_SITE_SHIPWRECK_FLAG))) {
-                eventHero->m_eventFlags = eventHero->m_eventFlags | IDX(AI_GENERIC_SITE_SHIPWRECK_FLAG);
+            if (!(eventHero->m_eventFlags & AI_GENERIC_SITE_SHIPWRECK_FLAG)) {
+                eventHero->m_eventFlags = eventHero->m_eventFlags | AI_GENERIC_SITE_SHIPWRECK_FLAG;
                 switch (eventHero->m_cursorType) {
                     case IDX(FACTION_SORCERESS):
                     case IDX(FACTION_WARLOCK):
@@ -6504,9 +6504,9 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
             }
             break;
         case AI_GENERIC_SITE_FAERIE_RING:
-            if (!(eventHero->m_eventFlags & IDX(AI_GENERIC_SITE_FAERIE_RING_FLAG))) {
+            if (!(eventHero->m_eventFlags & AI_GENERIC_SITE_FAERIE_RING_FLAG)) {
                 eventHero->m_eventFlags =
-                    eventHero->m_eventFlags | IDX(AI_GENERIC_SITE_FAERIE_RING_FLAG);
+                    eventHero->m_eventFlags | AI_GENERIC_SITE_FAERIE_RING_FLAG;
                 eventHero->m_luck = eventHero->m_luck + 1;
             }
             break;
@@ -6514,7 +6514,7 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
         case AI_GENERIC_SITE_UNUSED_3:
             break;
         case AI_GENERIC_SITE_GRAVEYARD:
-            if (!(eventHero->m_eventFlags & IDX(AI_GENERIC_SITE_GRAVEYARD_FLAG))) {
+            if (!(eventHero->m_eventFlags & AI_GENERIC_SITE_GRAVEYARD_FLAG)) {
                 armyValue7 = 0;
                 for (artifactIndex1 = 0; artifactIndex1 < AI_EVENT_ARMY_STACK_COUNT;
                      artifactIndex1++) {
@@ -6532,13 +6532,13 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
                 }
                 if (armyValue7 != 0)
                     GiveExperience(eventHero, armyValue7, 1);
-                eventHero->m_eventFlags = eventHero->m_eventFlags | IDX(AI_GENERIC_SITE_GRAVEYARD_FLAG);
+                eventHero->m_eventFlags = eventHero->m_eventFlags | AI_GENERIC_SITE_GRAVEYARD_FLAG;
             }
             break;
         case AI_GENERIC_SITE_CREATURE_UPGRADE:
-            if (!(eventHero->m_eventFlags & IDX(AI_GENERIC_SITE_CREATURE_UPGRADE_FLAG))) {
+            if (!(eventHero->m_eventFlags & AI_GENERIC_SITE_CREATURE_UPGRADE_FLAG)) {
                 eventHero->m_eventFlags =
-                    eventHero->m_eventFlags | IDX(AI_GENERIC_SITE_CREATURE_UPGRADE_FLAG);
+                    eventHero->m_eventFlags | AI_GENERIC_SITE_CREATURE_UPGRADE_FLAG;
                 eventHero->m_mobility += AI_EVENT_CREATURE_UPGRADE_MOBILITY;
                 eventHero->m_remainingMobility += AI_EVENT_CREATURE_UPGRADE_MOBILITY;
             }
@@ -7444,8 +7444,8 @@ void advManager::SendHeroTownData(
         reinterpret_cast<char*>(buffer),
         remotePlayer,
         COMBAT_REMOTE_HEADER_SIZE,
-        COMBAT_REMOTE_COMMAND,
-        COMBAT_REMOTE_CONFIRM_COMMAND,
+        i8(IDX(COMBAT_REMOTE_COMMAND)),
+        i8(IDX(COMBAT_REMOTE_CONFIRM_COMMAND)),
         &reply
     );
     if (!result)

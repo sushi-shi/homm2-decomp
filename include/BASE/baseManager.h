@@ -33,8 +33,8 @@ H2_ENUM_FLAGS(BaseManagerMessageMask)
 // Executive ordering keys stay arithmetic; the catalog names each manager.
 H2_ENUM_BEGIN(BaseManagerPriority)
     BASE_MANAGER_PRIORITY_UNASSIGNED = -1,
-    INPUT_MANAGER_PRIORITY = -1,
-    SOUND_MANAGER_PRIORITY = -1
+    INPUT_MANAGER_PRIORITY = BASE_MANAGER_PRIORITY_UNASSIGNED,
+    SOUND_MANAGER_PRIORITY = BASE_MANAGER_PRIORITY_UNASSIGNED
 H2_ENUM_END(BaseManagerPriority)
 
 H2_ENUM_BEGIN(BaseManagerConstant)
@@ -50,7 +50,7 @@ public:
     baseManager* m_next;                     // +0x04  next in the executive manager list
     baseManager* m_prev;                     // +0x08  prev in the executive manager list
     BaseManagerMessageMask m_messageMask;                       // +0x0c  event/message classes accepted by Main
-    i32 m_priority;                          // +0x10  executive manager-list ordering key
+    BaseManagerPriority m_priority;                          // +0x10  executive manager-list ordering key
     char m_name[BASE_MANAGER_NAME_CAPACITY]; // +0x14  manager name
     b32 m_active;                            // +0x32
     // --- constructors ---

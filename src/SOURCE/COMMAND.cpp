@@ -1015,7 +1015,7 @@ CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
         m_smallViewSide[1] = -1;
         DrawSmallView(1, 1);
     }
-    return IDX(command);
+    return command;
 }
 
 // @semantic: code span is 0x290 versus retail 0x2a6, frame 0x1c
@@ -1637,7 +1637,7 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
                 && m_armies[side_9][armyIndex_8].m_quantity
                        < m_armies[side_9][armyIndex_8].m_initialQuantity) {
                 *(&casualtyType_1[0][0] + side_9 * COMBAT_ARMY_SLOT_COUNT
-                  + casualtyQuantity_0[side_9]) = m_armies[side_9][armyIndex_8].m_monsterType;
+                  + casualtyQuantity_0[side_9]) = IDX(m_armies[side_9][armyIndex_8].m_monsterType);
                 *(&casualtyQuantity_0[COMBAT_MANAGER_SIDE_COUNT] + side_9 * COMBAT_ARMY_SLOT_COUNT
                   + casualtyQuantity_0[side_9]) = m_armies[side_9][armyIndex_8].m_initialQuantity
                                                   - m_armies[side_9][armyIndex_8].m_quantity;
@@ -2420,7 +2420,7 @@ i32 combatManager::ProcessNextAction(struct tag_message& message) {
             case IDX(COMBAT_ACTION_MOVE):
                 ResetCyclingCreatures();
                 currentArmy->MoveAttack(giNextActionGridIndex, 0);
-                currentArmy->m_monster.flags.all |= IDX(MONSTER_ABILITY_FLAG_BAD_MORALE);
+                currentArmy->m_monster.flags.abilityFlags |= MONSTER_ABILITY_FLAG_BAD_MORALE;
                 if (CheckWin(&message) != 0) {
                     result = COMBAT_MAIN_FINISHED;
                     goto Finished;
@@ -2435,7 +2435,7 @@ i32 combatManager::ProcessNextAction(struct tag_message& message) {
                     currentArmy->MoveAttack(giNextActionExtra, 1);
                 }
                 currentArmy->MoveAttack(giNextActionGridIndex, 0);
-                currentArmy->m_monster.flags.all |= IDX(MONSTER_ABILITY_FLAG_BAD_MORALE);
+                currentArmy->m_monster.flags.abilityFlags |= MONSTER_ABILITY_FLAG_BAD_MORALE;
                 if (CheckWin(&message) != 0) {
                     result = COMBAT_MAIN_FINISHED;
                     goto Finished;
@@ -2460,11 +2460,11 @@ i32 combatManager::ProcessNextAction(struct tag_message& message) {
                 ResetCycleTimers();
                 break;
             case IDX(COMBAT_ACTION_WAIT):
-                currentArmy->m_monster.flags.all |= IDX(MONSTER_ABILITY_FLAG_BAD_MORALE);
+                currentArmy->m_monster.flags.abilityFlags |= MONSTER_ABILITY_FLAG_BAD_MORALE;
                 advanceArmy = 1;
                 break;
             case IDX(COMBAT_ACTION_DEFEND):
-                currentArmy->m_monster.flags.all |= IDX(MONSTER_ABILITY_FLAG_DEFERRED_TURN);
+                currentArmy->m_monster.flags.abilityFlags |= MONSTER_ABILITY_FLAG_DEFERRED_TURN;
                 advanceArmy = 1;
                 break;
         }
@@ -2503,9 +2503,9 @@ void combatManager::ResetCyclingCreatures(void) {
     for (side = 0; side < COMBAT_MANAGER_SIDE_COUNT; ++side) {
         for (index = 0; index < gpCombatManager->m_armyCount[side]; ++index) {
             currentArmy_p = gpCombatManager->m_armies[side] + index;
-            if ((currentArmy_p->m_monster.flags.all & IDX(MONSTER_ABILITY_FLAG_AI_EXCLUDED)) == 0
-                && currentArmy_p->m_animationSequence >= IDX(COMBAT_CREATURE_CYCLE_SEQUENCE_FIRST)
-                && currentArmy_p->m_animationSequence <= IDX(COMBAT_CREATURE_CYCLE_SEQUENCE_LAST)) {
+            if (HAS(currentArmy_p->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_AI_EXCLUDED) == 0
+                && currentArmy_p->m_animationSequence >= COMBAT_CREATURE_CYCLE_SEQUENCE_FIRST
+                && currentArmy_p->m_animationSequence <= COMBAT_CREATURE_CYCLE_SEQUENCE_LAST) {
                 ++cyclingCount;
                 ++gpCombatManager->m_limitCreatureCount[side][index];
             }
@@ -2517,7 +2517,7 @@ void combatManager::ResetCyclingCreatures(void) {
         for (side = 0; side < COMBAT_MANAGER_SIDE_COUNT; ++side) {
             for (index = 0; index < gpCombatManager->m_armyCount[side]; ++index) {
                 currentArmy_p = gpCombatManager->m_armies[side] + index;
-                if ((currentArmy_p->m_monster.flags.all & IDX(MONSTER_ABILITY_FLAG_AI_EXCLUDED)) == 0) {
+                if (HAS(currentArmy_p->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_AI_EXCLUDED) == 0) {
                     currentArmy_p = gpCombatManager->m_armies[side] + index;
                     currentArmy_p->m_animationSequence = ARMY_ANIMATION_STAND;
                     currentArmy_p->m_animationFrame = 0;
@@ -2606,12 +2606,12 @@ void combatManager::CycleCombatScreen(void) {
     for (side = 0; side < COMBAT_MANAGER_SIDE_COUNT; ++side) {
         for (index = 0; index < gpCombatManager->m_armyCount[side]; ++index) {
             currentArmy = gpCombatManager->m_armies[side] + index;
-            if ((currentArmy->m_monster.flags.all & IDX(MONSTER_ABILITY_FLAG_AI_EXCLUDED)) == 0
+            if (HAS(currentArmy->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_AI_EXCLUDED) == 0
                 && currentArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PARALYZE)] == 0
                 && currentArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BLIND)] == 0
                 && currentArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PETRIFIED)] == 0
-                && ((currentArmy->m_animationSequence >= IDX(COMBAT_CREATURE_CYCLE_SEQUENCE_FIRST)
-                     && currentArmy->m_animationSequence <= IDX(COMBAT_CREATURE_CYCLE_SEQUENCE_LAST))
+                && ((currentArmy->m_animationSequence >= COMBAT_CREATURE_CYCLE_SEQUENCE_FIRST
+                     && currentArmy->m_animationSequence <= COMBAT_CREATURE_CYCLE_SEQUENCE_LAST)
                     || (currentArmy->m_animationSequence == ARMY_ANIMATION_STAND
                         && currentArmy->m_frameInfo.standStillDelay
                                    + currentArmy->m_lastAnimationTime
@@ -2715,8 +2715,9 @@ void combatManager::CycleCombatScreen(void) {
                                 animationIndex = 99;
                             }
                         }
-                        currentArmy->m_animationSequence =
-                            currentArmy->m_standingAnimation + COMBAT_CREATURE_CYCLE_SEQUENCE_FIRST;
+                        currentArmy->m_animationSequence = ArmyAnimationSequence(
+                            currentArmy->m_standingAnimation + IDX(COMBAT_CREATURE_CYCLE_SEQUENCE_FIRST)
+                        );
                         currentArmy->m_animationFrame = 0;
                     } else {
                         ++currentArmy->m_animationFrame;
@@ -2728,7 +2729,7 @@ void combatManager::CycleCombatScreen(void) {
                         if (currentArmy->m_animationFrame
                             >= currentArmy->m_frameInfo.animationFrameCount
                                    [currentArmy->m_standingAnimation
-                                    + COMBAT_CREATURE_CYCLE_SEQUENCE_FIRST]) {
+                                    + IDX(COMBAT_CREATURE_CYCLE_SEQUENCE_FIRST)]) {
                             currentArmy->m_animationSequence = ARMY_ANIMATION_STAND;
                             currentArmy->m_animationFrame = 0;
                             currentArmy->m_lastAnimationTime = KBTickCount();
@@ -2817,7 +2818,7 @@ void combatManager::AddArmy(
     i32 index_g;
     army* newArmy;
     for (index_g = 0; index_g < COMBAT_ARMY_CAPACITY; ++index_g) {
-        if (m_armies[side][index_g].m_monsterType == IDX(ARMY_GROUP_EMPTY_SLOT)) {
+        if (m_armies[side][index_g].m_monsterType == CREATURE_NONE) {
             armyIndex_r = index_g;
             break;
         }
@@ -2841,7 +2842,7 @@ void combatManager::AddArmy(
         newArmy = &m_armies[side][armyIndex_r];
         newArmy->Init(CreatureType(monsterType), quantity, side, armyIndex_r, hex, COMBAT_INVALID_HEX);
         newArmy->LoadResources();
-        newArmy->m_monster.flags.all |= IDX(flags);
+        newArmy->m_monster.flags.all |= MonsterFlags(flags);
         if (reusedArmy_m == 0)
             ++m_armyCount[side];
 

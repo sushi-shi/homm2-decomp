@@ -5725,13 +5725,13 @@ i32 philAI::EvaluateGenericSite(mapCell* cell) {
             }
             break;
         case AI_GENERIC_SITE_SHIPWRECK:
-            if (!(gpCurAIHero->m_eventFlags & IDX(AI_GENERIC_SITE_SHIPWRECK_FLAG))) {
+            if (!(gpCurAIHero->m_eventFlags & AI_GENERIC_SITE_SHIPWRECK_FLAG)) {
                 value1 =
                     static_cast<i32>(gpCurAIHero->m_aiFightValue * AI_GENERIC_SITE_SHIPWRECK_VALUE);
             }
             break;
         case AI_GENERIC_SITE_FAERIE_RING:
-            if (!(gpCurAIHero->m_eventFlags & IDX(AI_GENERIC_SITE_FAERIE_RING_FLAG))
+            if (!(gpCurAIHero->m_eventFlags & AI_GENERIC_SITE_FAERIE_RING_FLAG)
                 && giCurAIHeroLuck < AI_GENERIC_SITE_MAX_LUCK) {
                 value1 = static_cast<i32>(
                     gpCurAIHero->m_aiFightValue * AI_GENERIC_SITE_FAERIE_RING_VALUE
@@ -5742,7 +5742,7 @@ i32 philAI::EvaluateGenericSite(mapCell* cell) {
         case AI_GENERIC_SITE_UNUSED_3:
             break;
         case AI_GENERIC_SITE_GRAVEYARD:
-            if (!(gpCurAIHero->m_eventFlags & IDX(AI_GENERIC_SITE_GRAVEYARD_FLAG))) {
+            if (!(gpCurAIHero->m_eventFlags & AI_GENERIC_SITE_GRAVEYARD_FLAG)) {
                 armyValue7 = 0;
                 for (artifactIndex1 = 0; artifactIndex1 < AI_GENERIC_SITE_ARMY_SLOTS;
                      artifactIndex1++) {
@@ -5760,7 +5760,7 @@ i32 philAI::EvaluateGenericSite(mapCell* cell) {
             break;
         case AI_GENERIC_SITE_CREATURE_UPGRADE:
             value1 = ComputeUpgradeValue(AI_GENERIC_SITE_UPGRADE_FROM, AI_GENERIC_SITE_UPGRADE_TO);
-            if (!(gpCurAIHero->m_eventFlags & IDX(AI_GENERIC_SITE_CREATURE_UPGRADE_FLAG))) {
+            if (!(gpCurAIHero->m_eventFlags & AI_GENERIC_SITE_CREATURE_UPGRADE_FLAG)) {
                 value1 = static_cast<i32>(
                     value1
                     + (AI_GENERIC_SITE_WEEK_END - gpGame->m_day) * AI_GENERIC_SITE_DAY_VALUE
