@@ -36,10 +36,17 @@ struct SNetPlayerInfo {
 #pragma pack(pop)
 SIZE(SNetPlayerInfo, 34);
 
+// stpnet2.bin protocol picker: 1=IPX (rides DirectPlay), 2=TCP (rides Winsock),
+// 3=modem, 4=direct connect; NT dims options 1 and 3.
 H2_ENUM_CLASS_BEGIN(RemoteNetworkProtocol)
     REMOTE_PROTOCOL_NETBIOS = 0,
     REMOTE_PROTOCOL_DIRECT_PLAY = 1,
-    REMOTE_PROTOCOL_WINSOCK = 2
+    DP_PROTOCOL_IPX = REMOTE_PROTOCOL_DIRECT_PLAY,
+    REMOTE_PROTOCOL_WINSOCK = 2,
+    DP_PROTOCOL_TCP = REMOTE_PROTOCOL_WINSOCK,
+    OLD_MAIN_NETWORK_PROTOCOL = REMOTE_PROTOCOL_WINSOCK,
+    REMOTE_PROTOCOL_MODEM = 3,
+    REMOTE_PROTOCOL_DIRECT_CONNECT = 4
 H2_ENUM_CLASS_END(RemoteNetworkProtocol)
 
 #endif // HOMM2_REMOTE_TYPES_H
