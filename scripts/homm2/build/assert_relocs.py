@@ -624,6 +624,162 @@ def check_pe_data_targets(sym, data, dups, local_rvas, unit, function_rva,
     return problems
 
 
+def _direct_image_data_sites(image, function_rva, relocations,
+                             names=(".rdata", ".data")):
+    """Read every DIR32 destination in selected sections from a linked image.
+
+    The relocation sites come from the corresponding COFF function, but the
+    destination and section identity come only from the linked PE operand.  This
+    keeps the retail side independent of delinker symbol names and lets callers
+    compare relocation multisets even when code-shape differences move sites.
+    """
+    result = []
+    for site, relocation_type, symbol, addend in relocations:
+        if relocation_type != "DIR32":
+            continue
+        raw = _image_read_rva(image, function_rva + site, 4)
+        if raw is None or len(raw) != 4:
+            continue
+        rva = (struct.unpack("<I", raw)[0] - image[1]) & 0xFFFFFFFF
+        section = _image_section_offset(image, rva)
+        if section is None or section[0] not in names:
+            continue
+        result.append({
+            "site": site,
+            "symbol": symbol,
+            "addend": addend,
+            "rva": rva,
+            "section": section[0],
+            "section_offset": section[1],
+        })
+    return result
+
+
+def _maximum_data_identity_matching(expected_sites, candidate_sites):
+    """Maximum-match candidate identity sets against retail RVA occurrences.
+
+    A content-hashed literal name can legitimately denote several identical
+    retail allocations, so one candidate site may have more than one reviewed
+    identity.  Treat retail occurrences as distinct right-hand nodes and use an
+    augmenting-path matching instead of a greedy choice.  The returned indexes
+    make every unmatched retail and candidate occurrence explicit.
+    """
+    matched_expected = {}
+
+    def augment(candidate_index, seen):
+        identities = candidate_sites[candidate_index].get("identities", ())
+        for expected_index, expected in enumerate(expected_sites):
+            if (expected_index in seen or
+                    expected["rva"] not in identities):
+                continue
+            seen.add(expected_index)
+            previous = matched_expected.get(expected_index)
+            if previous is None or augment(previous, seen):
+                matched_expected[expected_index] = candidate_index
+                return True
+        return False
+
+    order = sorted(
+        range(len(candidate_sites)),
+        key=lambda index: (len(candidate_sites[index].get("identities", ())),
+                           candidate_sites[index].get("site", -1)))
+    matched_candidates = set()
+    for candidate_index in order:
+        if augment(candidate_index, set()):
+            matched_candidates.add(candidate_index)
+    return (
+        sorted(set(range(len(expected_sites))) - set(matched_expected)),
+        sorted(set(range(len(candidate_sites))) - matched_candidates),
+    )
+
+
+def _unique_report_functions(functions):
+    """Select one objdiff record per decorated COFF function name.
+
+    Objdiff can expose the same COMDAT twice when an alias/null comparison record
+    accompanies the live comparison.  The COFF parser and linked MAP still have
+    one function, so auditing both report rows would count every relocation twice.
+    Prefer a scored record, then the highest score, while retaining the duplicate
+    count for the generated audit report.
+    """
+    selected = {}
+    record_counts = Counter()
+    for function in functions:
+        name = function["name"]
+        record_counts[name] += 1
+        current = selected.get(name)
+        score = function.get("fuzzy_match_percent")
+        rank = (score is not None, score if score is not None else -1.0)
+        if current is None:
+            selected[name] = function
+            continue
+        current_score = current.get("fuzzy_match_percent")
+        current_rank = (
+            current_score is not None,
+            current_score if current_score is not None else -1.0,
+        )
+        if rank > current_rank:
+            selected[name] = function
+    duplicates = {
+        name: count for name, count in record_counts.items() if count > 1
+    }
+    return [selected[name] for name in sorted(selected)], duplicates
+
+
+def check_pe_data_target_multiset(sym, data, dups, local_rvas, unit,
+                                  retail_function_rva,
+                                  candidate_function_rva,
+                                  base_sites, target_sites,
+                                  retail_image, candidate_image,
+                                  retail_section_ranges):
+    """Compare every linked data-target identity without assuming site alignment.
+
+    This is the exhaustive complement to the ordered context pass.  Retail
+    identities are read directly from the shipping PE.  Candidate identities
+    are resolved from public/DATA symbols or reviewed compiler-local COFF
+    coordinates, while the candidate PE independently proves that the operand
+    actually targets `.rdata`/`.data` in the current link.
+    """
+    expected = _direct_image_data_sites(
+        retail_image, retail_function_rva, target_sites)
+    candidate = _direct_image_data_sites(
+        candidate_image, candidate_function_rva, base_sites)
+    base_by_site = {relocation[0]: relocation for relocation in base_sites}
+    for record in candidate:
+        relocation = base_by_site[record["site"]]
+        identities = candidate_reloc_rvas(
+            sym, data, dups, local_rvas, unit, relocation[1:])
+        record["identities"] = sorted(
+            rva for rva in identities
+            if any(start <= rva < end
+                   for _name, start, end in retail_section_ranges))
+
+    missing_indexes, excess_indexes = _maximum_data_identity_matching(
+        expected, candidate)
+    missing = [expected[index] for index in missing_indexes]
+    excess = [candidate[index] for index in excess_indexes]
+    unresolved = [record for record in candidate if not record["identities"]]
+    missing_index_set = set(missing_indexes)
+    matched_expected = [
+        record for index, record in enumerate(expected)
+        if index not in missing_index_set
+    ]
+    return {
+        "expected_count": len(expected),
+        "candidate_count": len(candidate),
+        "matched_count": len(expected) - len(missing),
+        "expected_section_counts": dict(Counter(
+            record["section"] for record in expected)),
+        "candidate_section_counts": dict(Counter(
+            record["section"] for record in candidate)),
+        "matched_section_counts": dict(Counter(
+            record["section"] for record in matched_expected)),
+        "missing_retail_targets": missing,
+        "excess_candidate_targets": excess,
+        "unresolved_candidate_targets": unresolved,
+    }
+
+
 # Pre-existing reloc-target discrepancies surfaced when this gate was introduced (objdiff masked
 # them, so they scored ~100%). Two kinds: (A) SUSPECTED wrong VA — a base symbol that disagrees with
 # where retail reads (likely a wrong synthetic-global DATA(0x..) guess, or a wrong array base — the
@@ -876,7 +1032,7 @@ def review_fields(resolved_addresses=False):
 
 
 def review_pe_data_targets():
-    """Audit near-exact linked references into `.rdata` and `.data`.
+    """Audit every configured linked reference into `.rdata` and `.data`.
 
     Both operands come from final linked images. Only the section base is
     normalized, so no delinker symbol, payload pairing, or reviewed private-name
@@ -906,6 +1062,12 @@ def review_pe_data_targets():
     report = json.load(open("build/objdiff/report.json"))
     bad = []
     identity_bad = []
+    multiset_identity_bad = []
+    relocation_shape_bad = []
+    unresolved_identity_bad = []
+    unavailable_functions = []
+    duplicate_report_records = []
+    configured_functions = 0
     checked_functions = 0
     checked_sites = 0
     skipped_functions = 0
@@ -920,7 +1082,15 @@ def review_pe_data_targets():
             base_obj, with_sites=True, include_imports=True)
         target_functions = parse_obj(
             target_obj, with_sites=True, include_imports=True)
-        for function in unit_record.get("functions", []):
+        functions, duplicates = _unique_report_functions(
+            unit_record.get("functions", []))
+        duplicate_report_records.extend({
+            "unit": unit,
+            "function": name,
+            "records": count,
+        } for name, count in sorted(duplicates.items()))
+        for function in functions:
+            configured_functions += 1
             name = function["name"]
             function_rva = function_rvas.get((unit, name))
             owner = Path(unit).name.lower() + ".obj"
@@ -928,15 +1098,63 @@ def review_pe_data_targets():
                 record for record in candidate_functions.get(name, [])
                 if (record.get("object") or "").lower() == owner
             ]
-            if (function.get("fuzzy_match_percent", 0) < FIELD_AUDIT_THRESHOLD or
-                    function_rva is None or name not in base_functions or
-                    name not in target_functions):
+            missing_inputs = []
+            if function_rva is None:
+                missing_inputs.append("retail-function-rva")
+            if name not in base_functions:
+                missing_inputs.append("candidate-coff-function")
+            if name not in target_functions:
+                missing_inputs.append("target-coff-function")
+            if missing_inputs:
+                unavailable_functions.append({
+                    "unit": unit,
+                    "function": name,
+                    "reasons": missing_inputs,
+                })
                 continue
             if len(candidates) != 1:
                 skipped_functions += 1
+                unavailable_functions.append({
+                    "unit": unit,
+                    "function": name,
+                    "reasons": ["candidate-map-owner-count-%d" % len(candidates)],
+                })
                 continue
             checked_functions += 1
             candidate_function_rva = candidates[0]["va"] - candidate_image[1]
+            multiset = check_pe_data_target_multiset(
+                sym, data, dups, local_rvas, unit, function_rva,
+                candidate_function_rva, base_functions[name],
+                target_functions[name], retail_image, candidate_image,
+                section_ranges)
+            audit_stats["retail_multiset_sites"] += multiset["expected_count"]
+            audit_stats["candidate_multiset_sites"] += multiset["candidate_count"]
+            audit_stats["multiset_matched_sites"] += multiset["matched_count"]
+            for section, count in multiset["expected_section_counts"].items():
+                audit_stats["retail_multiset_%s_sites" % section.lstrip(".")] += count
+            for section, count in multiset["candidate_section_counts"].items():
+                audit_stats["candidate_multiset_%s_sites" % section.lstrip(".")] += count
+            for section, count in multiset["matched_section_counts"].items():
+                audit_stats["multiset_matched_%s_sites" % section.lstrip(".")] += count
+            audit_stats["multiset_unresolved_sites"] += len(
+                multiset["unresolved_candidate_targets"])
+            multiset_record = {
+                "unit": unit,
+                "function": name,
+                "fuzzy_match_percent": function.get("fuzzy_match_percent"),
+                **multiset,
+            }
+            if multiset["unresolved_candidate_targets"]:
+                unresolved_identity_bad.append(multiset_record)
+            if multiset["expected_count"] != multiset["candidate_count"]:
+                relocation_shape_bad.append(multiset_record)
+            elif (not multiset["unresolved_candidate_targets"] and
+                  (multiset["missing_retail_targets"] or
+                   multiset["excess_candidate_targets"])):
+                multiset_identity_bad.append(multiset_record)
+            elif (not multiset["missing_retail_targets"] and
+                  not multiset["excess_candidate_targets"]):
+                audit_stats["multiset_exact_functions"] += 1
             problems = check_linked_pe_data_targets(
                 base_functions[name], target_functions[name], function_rva,
                 candidate_function_rva, retail_image, candidate_image,
@@ -954,9 +1172,14 @@ def review_pe_data_targets():
                         relocation[0], function_rva, candidate_function_rva,
                         retail_image, candidate_image))
             ]
-            identity_problems = check_pe_data_targets(
-                sym, data, dups, local_rvas, unit, function_rva,
-                aligned_base, target_functions[name], section_ranges)
+            # Equal numeric sites are not a reliable instruction pairing after a
+            # function gains or loses data operands.  The order-independent
+            # multiset above is authoritative for those shape-divergent functions.
+            identity_problems = []
+            if multiset["expected_count"] == multiset["candidate_count"]:
+                identity_problems = check_pe_data_targets(
+                    sym, data, dups, local_rvas, unit, function_rva,
+                    aligned_base, target_functions[name], section_ranges)
             checked_sites += sum(
                 relocation[1] == "DIR32" for relocation in base_functions[name])
             for problem in problems:
@@ -986,15 +1209,34 @@ def review_pe_data_targets():
                 break
 
     output = {
-        "schema": 2,
-        "threshold": FIELD_AUDIT_THRESHOLD,
+        "schema": 4,
+        "scope": "all configured functions with retail and candidate linked owners",
+        "ordered_identity_scope": (
+            "equal data-target count and matching linked instruction context"),
+        "legacy_field_threshold": FIELD_AUDIT_THRESHOLD,
+        "configured_functions": configured_functions,
         "checked_functions": checked_functions,
         "checked_dir32_sites": checked_sites,
         "skipped_functions": skipped_functions,
+        "unavailable_functions": unavailable_functions,
+        "duplicate_report_records": duplicate_report_records,
         "compared_data_sites": audit_stats["compared_section_sites"],
         "compared_rdata_sites": audit_stats["compared_rdata_sites"],
         "compared_writable_data_sites": audit_stats["compared_writable_data_sites"],
         "context_mismatch_sites": audit_stats["context_mismatch"],
+        "retail_multiset_sites": audit_stats["retail_multiset_sites"],
+        "candidate_multiset_sites": audit_stats["candidate_multiset_sites"],
+        "multiset_matched_sites": audit_stats["multiset_matched_sites"],
+        "retail_multiset_rdata_sites": audit_stats["retail_multiset_rdata_sites"],
+        "retail_multiset_data_sites": audit_stats["retail_multiset_data_sites"],
+        "candidate_multiset_rdata_sites": audit_stats["candidate_multiset_rdata_sites"],
+        "candidate_multiset_data_sites": audit_stats["candidate_multiset_data_sites"],
+        "multiset_matched_rdata_sites": audit_stats["multiset_matched_rdata_sites"],
+        "multiset_matched_data_sites": audit_stats["multiset_matched_data_sites"],
+        "multiset_exact_functions": audit_stats["multiset_exact_functions"],
+        "multiset_identity_divergences": multiset_identity_bad,
+        "relocation_shape_divergences": relocation_shape_bad,
+        "unresolved_identity_divergences": unresolved_identity_bad,
         "divergences": [dict(
             unit=unit, function=name, **problem._asdict())
             for unit, name, problem in bad],
@@ -1022,6 +1264,12 @@ def review_pe_data_targets():
             (unit, name) for unit, name, _problem in identity_bad}),
         "identity_transpositions": len(identity_transpositions),
         "unpaired_identity_divergences": len(unmatched_identity),
+        "multiset_identity_divergence_functions": len(multiset_identity_bad),
+        "relocation_shape_divergence_functions": len(relocation_shape_bad),
+        "unresolved_identity_functions": len(unresolved_identity_bad),
+        "unresolved_identity_sites": audit_stats["multiset_unresolved_sites"],
+        "unavailable_functions": len(unavailable_functions),
+        "duplicate_report_records": len(duplicate_report_records),
     }
     output_path = Path("build/gen/linked_data_relocs.json")
     temporary = output_path.with_suffix(".tmp.%d" % os.getpid())
@@ -1041,16 +1289,25 @@ def review_pe_data_targets():
     for unit, name, problem in identity_bad:
         print("  IDENTITY %s  %s: %s" %
               (unit, name, problem.diagnostic()))
+    for record in multiset_identity_bad:
+        print("  MULTISET IDENTITY %s  %s: %d missing, %d excess" %
+              (record["unit"], record["function"],
+               len(record["missing_retail_targets"]),
+               len(record["excess_candidate_targets"])))
     if bad:
-        print("\nPE DATA RELOCS FAIL: %d divergence(s) in %d near-exact function(s); "
+        print("\nPE DATA RELOCS FAIL: %d linked-placement divergence(s) in %d function(s); "
               "%d unique destination mapping(s); %d ordered identity divergence(s), "
-              "%d balanced transposition(s), %d unpaired; "
+              "%d balanced transposition(s), %d unpaired; %d all-function "
+              "multiset identity divergence(s), %d relocation-shape divergence(s), "
+              "%d unresolved identity function(s), %d unavailable function(s); "
               "report=%s" %
               (len(bad), len({(unit, name) for unit, name, _problem in bad}),
                len(grouped), len(identity_bad), len(identity_transpositions),
-               len(unmatched_identity), output_path))
+               len(unmatched_identity), len(multiset_identity_bad),
+               len(relocation_shape_bad), len(unresolved_identity_bad),
+               len(unavailable_functions), output_path))
         return 1
-    print("PE data relocs OK: %d near-exact functions and %d DIR32 sites checked "
+    print("PE data relocs OK: %d functions and %d DIR32 sites checked "
           "between final linked images; %d function(s) lacked a unique MAP owner." %
           (checked_functions, checked_sites, skipped_functions))
     return 0
