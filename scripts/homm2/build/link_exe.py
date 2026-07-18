@@ -26,6 +26,11 @@ from homm2.build.build_libcmt_gfy import (
 )
 from homm2.build.gen_vendor_imports import LINK300_FORCED_VENDOR_IMPORTS
 
+# Retail resolved CRT members from the VC 4.0 LIB tree of the linker install;
+# its testfdiv.obj exposes the retail literal identities missing from VC 4.2.
+PINNED_VC40_LIBCMT_SHA256 = (
+    "d7bdb49c0a3bc77dee026b9aa9a994c5a78963c8aefc6512dbb298b4d41c4907")
+
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO = next((p for p in SCRIPT_DIR.parents if (p / "flake.nix").exists()), SCRIPT_DIR)
 RETAIL_EXE = REPO / "build/orig/HEROES2W.EXE"
@@ -1526,7 +1531,13 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
     runtime_library = build_gfy_libcmt(
         original_libcmt, derived_libcmt,
         derived_crt_dir / "LIBCMT.gfy.json")
-    library_path = ";".join(winepaths_w((derived_crt_dir, toolchain / "lib")))
+    search_directories = [derived_crt_dir, toolchain / "lib"]
+    vc40_lib_dir = link_exe.parent.parent / "lib"
+    vc40_libcmt = find_ci(vc40_lib_dir, "LIBCMT.LIB") if vc40_lib_dir.is_dir() else None
+    if vc40_libcmt is not None and hashlib.sha256(
+            vc40_libcmt.read_bytes()).hexdigest() == PINNED_VC40_LIBCMT_SHA256:
+        search_directories.insert(0, vc40_lib_dir)
+    library_path = ";".join(winepaths_w(search_directories))
     command = build_link_command(
         link_exe,
         winepath_w(map_path),
