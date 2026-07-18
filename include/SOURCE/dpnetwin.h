@@ -26,11 +26,6 @@ H2_ENUM_BEGIN(DirectPlayTransportConstant)
     DP_TRANSPORT_RETRY_DELAY = 100
 H2_ENUM_END(DirectPlayTransportConstant)
 
-H2_ENUM_CLASS_BEGIN(DirectPlayProtocol)
-    DP_PROTOCOL_IPX = 1,
-    DP_PROTOCOL_TCP = 2
-H2_ENUM_CLASS_END(DirectPlayProtocol)
-
 H2_ENUM_CLASS_BEGIN(DirectPlaySessionOpenFlag)
     DP_SESSION_OPEN_JOIN = 1,
     DP_SESSION_OPEN_CREATE = 2
