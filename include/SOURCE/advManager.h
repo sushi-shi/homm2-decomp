@@ -163,7 +163,7 @@ public:
     void CompleteDraw(i32, i32, i32, i32);
     void CompleteDraw(i32);
     i32 GetCloudLookup(i32, i32);
-    void DrawCell(i32, i32, i32, i32, i32, i32);
+    void DrawCell(i32, i32, i32, i32, AdventureDrawMask, i32);
     class mapCell* GetCell(i32, i32);
     void UpdateRadar(i32, i32);
     void QuickInfo(i32, i32);
