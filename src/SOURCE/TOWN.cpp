@@ -79,8 +79,8 @@ void town::XformToCastle(void) {
         TOWN_CONVERT_ANY_FRAME,
         RANDOM_TOWN_OBJECT_TILESET,
         TOWN_CONVERT_OBJECT_NONE,
-        RANDOM_TOWN_OBJECT_TILESET,
-        RANDOM_TOWN_OBJECT_TILESET
+        RANDOM_TOWN_TRIGGER,
+        RANDOM_TOWN_TRIGGER
     );
     gpGame->ConvertObject(
         m_x + RANDOM_TOWN_LEFT,
@@ -92,8 +92,8 @@ void town::XformToCastle(void) {
         TOWN_CONVERT_ANY_FRAME,
         RANDOM_TOWN_OVERLAY_TILESET,
         TOWN_CONVERT_OBJECT_NONE,
-        RANDOM_TOWN_OBJECT_TILESET,
-        RANDOM_TOWN_OBJECT_TILESET
+        RANDOM_TOWN_TRIGGER,
+        RANDOM_TOWN_TRIGGER
     );
 }
 

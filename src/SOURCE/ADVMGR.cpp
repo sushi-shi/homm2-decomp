@@ -361,7 +361,7 @@ i32 advManager::Open(i32 id) {
     gConfig.soundVolume = oldSampleVolumeState;
     gpSoundManager->AdjustSoundVolumes();
     m_messageMask = BASE_MANAGER_ACCEPT_ADVENTURE;
-    m_priority = id;
+    m_priority = BaseManagerPriority(id);
     m_active = true;
     strcpy(m_name, "advManager");
     return 0;

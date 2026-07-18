@@ -3934,7 +3934,7 @@ void game::ConvertObject(
     TilesetId oldTileset,
     i32 oldFirstIndex,
     i32 oldLastIndex,
-    i32 newTileset,
+    TilesetId newTileset,
     i32 newFirstIndex,
     i32 oldTrigger,
     i32 newTrigger
@@ -3951,7 +3951,7 @@ void game::ConvertObject(
                 if (cell->m_objectIndex != static_cast<u8>(-1)
                     && cell->m_objectTileset == IDX(oldTileset) && cell->m_objectIndex >= oldFirstIndex
                     && cell->m_objectIndex <= oldLastIndex) {
-                    cell->m_objectTileset = static_cast<u8>(newTileset);
+                    cell->m_objectTileset = static_cast<u8>(IDX(newTileset));
                     cell->m_objectIndex =
                         static_cast<u8>(cell->m_objectIndex - oldFirstIndex + newFirstIndex);
                 }
@@ -3968,7 +3968,7 @@ void game::ConvertObject(
                 while (extra != 0) {
                     if (extra->objectTileset == IDX(oldTileset) && extra->objectIndex >= oldFirstIndex
                         && extra->objectIndex <= oldLastIndex) {
-                        extra->objectTileset = static_cast<u8>(newTileset);
+                        extra->objectTileset = static_cast<u8>(IDX(newTileset));
                         extra->objectIndex =
                             static_cast<u8>(extra->objectIndex - oldFirstIndex + newFirstIndex);
                     }
@@ -3982,7 +3982,7 @@ void game::ConvertObject(
                 if (cell->m_overlayIndex != static_cast<u8>(-1)
                     && cell->m_overlayTileset == IDX(oldTileset) && cell->m_overlayIndex >= oldFirstIndex
                     && cell->m_overlayIndex <= oldLastIndex) {
-                    cell->m_overlayTileset = static_cast<u8>(newTileset);
+                    cell->m_overlayTileset = static_cast<u8>(IDX(newTileset));
                     cell->m_overlayIndex =
                         static_cast<u8>(cell->m_overlayIndex - oldFirstIndex + newFirstIndex);
                 }
@@ -3994,7 +3994,7 @@ void game::ConvertObject(
                 while (extra != 0) {
                     if (extra->overlayTileset == IDX(oldTileset) && extra->overlayIndex >= oldFirstIndex
                         && extra->overlayIndex <= oldLastIndex) {
-                        extra->overlayTileset = static_cast<u8>(newTileset);
+                        extra->overlayTileset = static_cast<u8>(IDX(newTileset));
                         extra->overlayIndex =
                             static_cast<u8>(extra->overlayIndex - oldFirstIndex + newFirstIndex);
                     }
@@ -4466,7 +4466,7 @@ void game::ProcessRandomObjects(void) {
                         TILESET_OBJNRSRC,
                         16,
                         16,
-                        IDX(TILESET_OBJNRSRC),
+                        TILESET_OBJNRSRC,
                         randomType0 * 2,
                         -1,
                         -1
@@ -4479,7 +4479,7 @@ void game::ProcessRandomObjects(void) {
                         TILESET_OBJNRSRC,
                         17,
                         17,
-                        IDX(TILESET_OBJNRSRC),
+                        TILESET_OBJNRSRC,
                         randomType0 * 2 + 1,
                         -1,
                         -1
@@ -4508,12 +4508,12 @@ void game::ProcessRandomObjects(void) {
                         TilesetId(11),
                         162,
                         162,
-                        11,
+                        TilesetId(11),
                         artifactId18 * 2,
                         -1,
                         -1
                     );
-                    ConvertObject(x10, y8, x10, y8, TilesetId(11), 163, 163, 11, artifactId18 * 2 + 1, -1, -1);
+                    ConvertObject(x10, y8, x10, y8, TilesetId(11), 163, 163, TilesetId(11), artifactId18 * 2 + 1, -1, -1);
                     break;
                 case IDX(MAP_TRIGGER_RANDOM_ARTIFACT_LEVEL_1):
                     artifactId18 = GetRandomArtifactId(8, 0);
@@ -4526,12 +4526,12 @@ void game::ProcessRandomObjects(void) {
                         TilesetId(11),
                         166,
                         166,
-                        11,
+                        TilesetId(11),
                         artifactId18 * 2,
                         -1,
                         -1
                     );
-                    ConvertObject(x10, y8, x10, y8, TilesetId(11), 167, 167, 11, artifactId18 * 2 + 1, -1, -1);
+                    ConvertObject(x10, y8, x10, y8, TilesetId(11), 167, 167, TilesetId(11), artifactId18 * 2 + 1, -1, -1);
                     break;
                 case IDX(MAP_TRIGGER_RANDOM_ARTIFACT_LEVEL_2):
                     artifactId18 = GetRandomArtifactId(4, 0);
@@ -4544,12 +4544,12 @@ void game::ProcessRandomObjects(void) {
                         TilesetId(11),
                         168,
                         168,
-                        11,
+                        TilesetId(11),
                         artifactId18 * 2,
                         -1,
                         -1
                     );
-                    ConvertObject(x10, y8, x10, y8, TilesetId(11), 169, 169, 11, artifactId18 * 2 + 1, -1, -1);
+                    ConvertObject(x10, y8, x10, y8, TilesetId(11), 169, 169, TilesetId(11), artifactId18 * 2 + 1, -1, -1);
                     break;
                 case IDX(MAP_TRIGGER_RANDOM_ARTIFACT_LEVEL_3):
                     artifactId18 = GetRandomArtifactId(2, 0);
@@ -4562,12 +4562,12 @@ void game::ProcessRandomObjects(void) {
                         TilesetId(11),
                         170,
                         170,
-                        11,
+                        TilesetId(11),
                         artifactId18 * 2,
                         -1,
                         -1
                     );
-                    ConvertObject(x10, y8, x10, y8, TilesetId(11), 171, 171, 11, artifactId18 * 2 + 1, -1, -1);
+                    ConvertObject(x10, y8, x10, y8, TilesetId(11), 171, 171, TilesetId(11), artifactId18 * 2 + 1, -1, -1);
                     break;
                 case IDX(MAP_TRIGGER_RANDOM_MINE):
                     RandomizeMine(x10, y8);

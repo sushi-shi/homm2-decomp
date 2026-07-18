@@ -406,7 +406,7 @@ i32 fileRequester::Open(i32 id) {
     }
     SetOK(okEnabled3);
     m_messageMask = BASE_MANAGER_ACCEPT_EXECUTIVE;
-    m_priority = id;
+    m_priority = BaseManagerPriority(id);
     m_active = true;
     strcpy(m_name, "fileRequester");
     return 0;
