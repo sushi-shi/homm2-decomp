@@ -161,6 +161,13 @@ it is a floating-point type.
   real folded-function identities; synthetic relocation identities are errors.
   `homm2 relocs 0x<rva>` reviews one function. Full rationale:
   memory `[[objdiff-masks-all-relocs]]`.
+- **`python3 -m homm2.build.assert_relocs --pe-data`** — opt-in final-image
+  `.rdata`/`.data` audit. It reads the authoritative operand at each aligned
+  retail PE code site, so a payload-equivalent compiler local at another address
+  cannot pass. It separately records final linked section-offset drift and
+  ordered relocation-identity drift in
+  `build/gen/linked_data_relocs.json`; balanced target transpositions remain
+  visible rather than being silently treated as equivalent.
 - `verify_carcass.py` — every CodeView **function** symbol is present in its object (carcass
   completeness). Was the carcass-phase acceptance check; run it manually
   (`python3 scripts/homm2/match/verify_carcass.py`).

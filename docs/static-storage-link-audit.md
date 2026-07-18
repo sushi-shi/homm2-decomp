@@ -12,6 +12,24 @@ are recorded. This whole-section comparison is the final authority: a normalized
 object-level 100% score is not proof when either linked section differs. Per-symbol
 and contribution diagnostics exist to attribute the first whole-section mismatch.
 
+`python3 -m homm2.build.assert_relocs --pe-data` supplies the complementary
+code-site audit. For a near-exact function it reads the DIR32 operand from the
+retail PE, identifies the exact retail `.rdata` or `.data` section offset, and
+compares that with the current candidate relocation identity. Candidate
+compiler-local names are resolved only through reviewed COFF coordinates. Thus an
+equal anonymous payload at another retail address cannot satisfy the check. A
+small relocation-masked code window must also match, preventing unrelated
+instructions which happen to use the same function-relative site from being
+paired.
+
+The command reports two independent classes. `divergences` are final linked
+section-offset differences and therefore expose cumulative allocation/link order.
+`identity_divergences` mean the ordered candidate relocation names a different
+retail allocation at the same code site. Balanced transpositions are reported
+separately: they still differ in ordered relocation identity, but require
+instruction semantics to decide whether they are merely commutative operand
+ordering.
+
 For every entry in `config/required_initialized_storage.tsv`, the link gate also
 requires the current source `DATA()` allocation size reported by Clang to equal
 the reviewed retail extent. Hashing only the reviewed prefix is insufficient: a
@@ -79,3 +97,25 @@ objects without a public name cannot be correlated individually. An exact symbol
 and class also does not prove that all bytes or pointer relocations within the object
 match retail; those still require an initializer and relocation audit against the
 shipping PE.
+
+The current `.data` result illustrates the limit. Raw size is exact at `0x37000`,
+while virtual size is `0x4d49c` versus retail `0x4d4b0` (20 bytes short). All 1,447
+name-joined public static symbols have the same storage class, and every configured
+game candidate/target `.data` and `.bss` COFF section has the same size. The final
+20-byte difference is the net result of different BSS/common ordering and alignment,
+not evidence for a missing 20-byte source object. For example, DRAWING's candidate
+and fixed target `.data` are byte-identical `0x7f` sections, yet retail places its
+two public zero globals among its private literals while the reconstructed COFF puts
+them first. The retail PE operands and reviewed non-affine manifest preserve the
+real addresses even though the flattened delinked object cannot reproduce that
+original ordering.
+
+The current direct-operand census compares 8,780 aligned sites: 435 into
+`.rdata` and 8,345 into `.data`; 220 sites with different surrounding code are
+excluded rather than paired by numeric offset alone. All 7,621 final-placement
+divergences are in `.data`. The identity pass has no unpaired divergence. Its ten
+ordered differences form five balanced transpositions, all manually verified as
+commutative operand order: two `MAP_WIDTH * MAP_HEIGHT` pairs in ADVMGR, one
+`TotalOpenTime + TotalReadTime` pair in SMACKMGR, and two center-plus-origin pairs
+in Viewwrld. These remain reported because balanced targets alone do not prove
+commutativity.

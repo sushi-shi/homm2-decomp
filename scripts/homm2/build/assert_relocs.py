@@ -89,6 +89,34 @@ class RelocAddressMismatch(NamedTuple):
                  self.target_symbol, self.base_symbol))
 
 
+class UnresolvedCandidateReloc(NamedTuple):
+    site: int
+    expected: int
+    base_symbol: str
+
+    def diagnostic(self):
+        return ("UNRESOLVED DATA RELOC at +0x%x: retail RVA 0x%x, candidate %s "
+                "has no public, DATA(), or reviewed compiler-local identity" %
+                (self.site, self.expected, self.base_symbol))
+
+
+class LinkedSectionRelocMismatch(NamedTuple):
+    site: int
+    expected_section: str
+    expected_offset: int
+    actual_section: str
+    actual_offset: int
+    target_symbol: str
+    base_symbol: str
+
+    def diagnostic(self):
+        return ("WRONG LINKED DATA TARGET at +0x%x: retail %s+0x%x, candidate "
+                "%s+0x%x (retail %s, base %s)" %
+                (self.site, self.expected_section, self.expected_offset,
+                 self.actual_section, self.actual_offset,
+                 self.target_symbol, self.base_symbol))
+
+
 def _norm(s):   # llvm-objdump renders each non-printable mangled byte as one '_'; symbol_names.csv
     s = s.replace('\xef\xbf\xbd', '_')          # stores it as the UTF-8 replacement char (3 bytes)
     return ''.join(c if 0x20 <= ord(c) < 0x7f else '_' for c in s)
@@ -332,6 +360,70 @@ def load_canonical_data_names(
     return names
 
 
+def load_candidate_local_rvas(
+        manifests=("config/delink_data_supplemental.tsv",
+                   "build/gen/delink_data_from_source.tsv"),
+        base_root="build/objdiff/base"):
+    """Map current candidate local spellings to canonical retail RVAs.
+
+    Reviewed compiler counters are deliberately stable in the supplemental file,
+    while an MSVC rebuild may rename them.  The topology audit proves such a rename
+    by exact COFF section ordinal/offset plus canonical payload and relocation
+    identity.  Recreate that association here from the current candidate symbol
+    table; a discovery-only review-queue payload match is never treated as proof.
+    """
+    coordinates = {}
+    for path in manifests:
+        if not os.path.exists(path):
+            continue
+        with open(path, encoding="utf-8", newline="") as stream:
+            rows = csv.DictReader(
+                (line for line in stream if not line.lstrip().startswith("#")),
+                delimiter="\t")
+            for row in rows:
+                unit = row["object"].replace("\\", "/")
+                if unit.endswith(".c"):
+                    unit = unit[:-2]
+                try:
+                    key = (int(row["section_ordinal"], 0),
+                           int(row["section_offset"], 0))
+                    rva = int(row["rva"], 0)
+                except (KeyError, ValueError):
+                    continue
+                coordinates.setdefault(unit, {}).setdefault(key, set()).add(rva)
+
+    result = {}
+    symbol_pattern = re.compile(
+        r"\]\(sec\s+(-?\d+)\).*?\s0x([0-9a-fA-F]+)\s+(\S+)\s*$")
+    for unit, unit_coordinates in coordinates.items():
+        obj = os.path.join(base_root, unit + ".obj")
+        if not os.path.exists(obj):
+            continue
+        table = subprocess.run(
+            ["llvm-objdump", "-t", obj], check=True,
+            stdout=subprocess.PIPE, text=True).stdout
+        for line in table.splitlines():
+            match = symbol_pattern.search(line)
+            if match is None:
+                continue
+            coordinate = (int(match.group(1)), int(match.group(2), 16))
+            rvas = unit_coordinates.get(coordinate)
+            if rvas:
+                result.setdefault((unit, match.group(3)), set()).update(rvas)
+    return result
+
+
+def candidate_reloc_rvas(sym, data, dups, local_rvas, unit, reloc):
+    """Resolve a candidate relocation, including reviewed TU-local storage."""
+    typ, symbol, addend = reloc
+    candidates = _resolved_reloc_candidates(sym, data, dups, reloc)
+    if typ == "DIR32":
+        candidates.update(
+            (rva + addend) & 0xFFFFFFFF
+            for rva in local_rvas.get((unit, symbol), ()))
+    return candidates
+
+
 _PE_SECTIONS = None
 
 
@@ -365,6 +457,171 @@ def _pe_read(rva, size):
             offset = raw_offset + rva - start
             return data[offset:offset + size]
     return None
+
+
+def _pe_named_section_ranges(names=(".rdata", ".data")):
+    """Return authoritative retail RVA ranges for selected PE sections."""
+    data, _sections = _pe_sections()
+    pe = struct.unpack_from("<L", data, 0x3c)[0]
+    section_count = struct.unpack_from("<H", data, pe + 6)[0]
+    optional_header_size = struct.unpack_from("<H", data, pe + 20)[0]
+    section_table = pe + 24 + optional_header_size
+    ranges = []
+    for index in range(section_count):
+        header = section_table + index * 40
+        name = data[header:header + 8].rstrip(b"\0").decode("latin-1")
+        if name not in names:
+            continue
+        virtual_size, rva, raw_size = struct.unpack_from("<LLL", data, header + 8)
+        ranges.append((name, rva, rva + max(virtual_size, raw_size)))
+    return ranges
+
+
+def _load_pe_image(path):
+    payload = Path(path).read_bytes()
+    pe = struct.unpack_from("<L", payload, 0x3c)[0]
+    section_count = struct.unpack_from("<H", payload, pe + 6)[0]
+    optional_size = struct.unpack_from("<H", payload, pe + 20)[0]
+    optional = pe + 24
+    image_base = struct.unpack_from("<I", payload, optional + 28)[0]
+    section_table = optional + optional_size
+    sections = []
+    for index in range(section_count):
+        header = section_table + index * 40
+        name = payload[header:header + 8].rstrip(b"\0").decode("latin-1")
+        virtual_size, rva, raw_size, raw_offset = struct.unpack_from(
+            "<LLLL", payload, header + 8)
+        sections.append((name, rva, rva + max(virtual_size, raw_size),
+                         raw_offset, raw_size))
+    return payload, image_base, sections
+
+
+def _image_read_rva(image, rva, size):
+    payload, _image_base, sections = image
+    for _name, start, end, raw_offset, raw_size in sections:
+        if start <= rva and rva + size <= min(end, start + raw_size):
+            offset = raw_offset + rva - start
+            return payload[offset:offset + size]
+    return None
+
+
+def _image_section_offset(image, rva):
+    for name, start, end, _raw_offset, _raw_size in image[2]:
+        if start <= rva < end:
+            return name, rva - start
+    return None
+
+
+def _matching_linked_site_context(base_sites, target_sites, site,
+                                  retail_function_rva,
+                                  candidate_function_rva,
+                                  retail_image, candidate_image,
+                                  radius=8):
+    """Require the relocation to belong to the same linked instruction context.
+
+    Equal function-relative offsets are insufficient when an earlier code-shape
+    difference shifts instructions: an unrelated relocation can then occupy the
+    same numeric site. Compare a small raw-code window and mask only relocation
+    fields which exist with the same type at the same site on both sides.
+    """
+    start = max(0, site - radius)
+    end = site + 4 + radius
+    retail = _image_read_rva(
+        retail_image, retail_function_rva + start, end - start)
+    candidate = _image_read_rva(
+        candidate_image, candidate_function_rva + start, end - start)
+    if retail is None or candidate is None:
+        return False
+    retail = bytearray(retail)
+    candidate = bytearray(candidate)
+    base_types = {reloc[0]: reloc[1] for reloc in base_sites}
+    target_types = {reloc[0]: reloc[1] for reloc in target_sites}
+    for reloc_site, reloc_type in base_types.items():
+        if target_types.get(reloc_site) != reloc_type:
+            continue
+        overlap_start = max(reloc_site, start)
+        overlap_end = min(reloc_site + 4, end)
+        for function_offset in range(overlap_start, overlap_end):
+            retail[function_offset - start] = 0
+            candidate[function_offset - start] = 0
+    return retail == candidate
+
+
+def check_linked_pe_data_targets(base_sites, target_sites, retail_function_rva,
+                                 candidate_function_rva, retail_image,
+                                 candidate_image, names=(".rdata", ".data"),
+                                 stats=None):
+    """Compare final linked destinations normalized by each PE section base."""
+    problems = []
+    target_by_site = {reloc[0]: reloc[1:] for reloc in target_sites}
+    for site, base_type, base_symbol, _base_addend in base_sites:
+        target = target_by_site.get(site)
+        if target is None or base_type != "DIR32" or target[0] != "DIR32":
+            continue
+        retail_raw = _image_read_rva(retail_image, retail_function_rva + site, 4)
+        candidate_raw = _image_read_rva(
+            candidate_image, candidate_function_rva + site, 4)
+        if retail_raw is None or candidate_raw is None:
+            continue
+        retail_target = (struct.unpack("<I", retail_raw)[0] -
+                         retail_image[1]) & 0xFFFFFFFF
+        candidate_target = (struct.unpack("<I", candidate_raw)[0] -
+                            candidate_image[1]) & 0xFFFFFFFF
+        expected = _image_section_offset(retail_image, retail_target)
+        if expected is None or expected[0] not in names:
+            continue
+        if not _matching_linked_site_context(
+                base_sites, target_sites, site, retail_function_rva,
+                candidate_function_rva, retail_image, candidate_image):
+            if stats is not None:
+                stats["context_mismatch"] += 1
+            continue
+        if stats is not None:
+            stats["compared_section_sites"] += 1
+            stats["compared_%s_sites" %
+                  ("rdata" if expected[0] == ".rdata" else "writable_data")] += 1
+        actual = _image_section_offset(candidate_image, candidate_target)
+        if actual == expected:
+            continue
+        actual = actual or ("outside-image", candidate_target)
+        problems.append(LinkedSectionRelocMismatch(
+            site, expected[0], expected[1], actual[0], actual[1],
+            target[1], base_symbol))
+    return problems
+
+
+def check_pe_data_targets(sym, data, dups, local_rvas, unit, function_rva,
+                          base_sites, target_sites, section_ranges, pe_read=_pe_read):
+    """Compare aligned candidate DIR32 destinations with raw retail PE operands.
+
+    Delinked target symbols are useful topology, but the linked retail operand is
+    the authority.  Reading it directly also avoids treating a payload-equivalent
+    compiler local as proof that the function references that allocation.
+    """
+    problems = []
+    target_by_site = {reloc[0]: reloc[1:] for reloc in target_sites}
+    for site, base_type, base_symbol, base_addend in base_sites:
+        target = target_by_site.get(site)
+        if target is None or base_type != "DIR32" or target[0] != "DIR32":
+            continue
+        raw = pe_read(function_rva + site, 4)
+        if raw is None or len(raw) != 4:
+            continue
+        absolute = struct.unpack("<I", raw)[0]
+        expected = (absolute - IMAGE_BASE) & 0xFFFFFFFF
+        if not any(start <= expected < end
+                   for _name, start, end in section_ranges):
+            continue
+        actual = candidate_reloc_rvas(
+            sym, data, dups, local_rvas, unit,
+            (base_type, base_symbol, base_addend))
+        if not actual:
+            problems.append(UnresolvedCandidateReloc(
+                site, expected, base_symbol))
+        elif expected not in actual:
+            problems.append(RelocAddressMismatch(
+                site, expected, min(actual), target[1], base_symbol))
+    return problems
 
 
 # Pre-existing reloc-target discrepancies surfaced when this gate was introduced (objdiff masked
@@ -617,6 +874,187 @@ def review_fields(resolved_addresses=False):
           % (label, checked_functions, checked_sites, len(review)))
     return 0
 
+
+def review_pe_data_targets():
+    """Audit near-exact linked references into `.rdata` and `.data`.
+
+    Both operands come from final linked images. Only the section base is
+    normalized, so no delinker symbol, payload pairing, or reviewed private-name
+    mapping can hide a different destination.
+    """
+    from homm2.build.link_exe import parse_map_symbol_records
+
+    retail_image = _load_pe_image("build/orig/HEROES2W.EXE")
+    candidate_image = _load_pe_image("build/link/HEROES2W.EXE")
+    sym, data, dups = load_symbols()
+    local_rvas = load_candidate_local_rvas()
+    section_ranges = _pe_named_section_ranges()
+    map_records = parse_map_symbol_records("build/link/HEROES2W.map")
+    candidate_functions = {}
+    for record in map_records:
+        candidate_functions.setdefault(record["name"], []).append(record)
+    function_rvas = {}
+    with open("build/gen/symbol_names.csv", encoding="latin-1", newline="") as stream:
+        for row in csv.DictReader(stream):
+            if row.get("kind") != "func":
+                continue
+            try:
+                function_rvas[(row["unit"], row["name"])] = int(row["rva"], 0)
+            except (KeyError, ValueError):
+                continue
+
+    report = json.load(open("build/objdiff/report.json"))
+    bad = []
+    identity_bad = []
+    checked_functions = 0
+    checked_sites = 0
+    skipped_functions = 0
+    audit_stats = Counter()
+    for unit_record in report["units"]:
+        unit = unit_record["name"]
+        base_obj = "build/objdiff/base/%s.obj" % unit
+        target_obj = "build/delink/%s.c.obj" % unit
+        if not (os.path.exists(base_obj) and os.path.exists(target_obj)):
+            continue
+        base_functions = parse_obj(
+            base_obj, with_sites=True, include_imports=True)
+        target_functions = parse_obj(
+            target_obj, with_sites=True, include_imports=True)
+        for function in unit_record.get("functions", []):
+            name = function["name"]
+            function_rva = function_rvas.get((unit, name))
+            owner = Path(unit).name.lower() + ".obj"
+            candidates = [
+                record for record in candidate_functions.get(name, [])
+                if (record.get("object") or "").lower() == owner
+            ]
+            if (function.get("fuzzy_match_percent", 0) < FIELD_AUDIT_THRESHOLD or
+                    function_rva is None or name not in base_functions or
+                    name not in target_functions):
+                continue
+            if len(candidates) != 1:
+                skipped_functions += 1
+                continue
+            checked_functions += 1
+            candidate_function_rva = candidates[0]["va"] - candidate_image[1]
+            problems = check_linked_pe_data_targets(
+                base_functions[name], target_functions[name], function_rva,
+                candidate_function_rva, retail_image, candidate_image,
+                stats=audit_stats)
+            target_types = {
+                relocation[0]: relocation[1]
+                for relocation in target_functions[name]
+            }
+            aligned_base = [
+                relocation for relocation in base_functions[name]
+                if (relocation[1] == "DIR32" and
+                    target_types.get(relocation[0]) == "DIR32" and
+                    _matching_linked_site_context(
+                        base_functions[name], target_functions[name],
+                        relocation[0], function_rva, candidate_function_rva,
+                        retail_image, candidate_image))
+            ]
+            identity_problems = check_pe_data_targets(
+                sym, data, dups, local_rvas, unit, function_rva,
+                aligned_base, target_functions[name], section_ranges)
+            checked_sites += sum(
+                relocation[1] == "DIR32" for relocation in base_functions[name])
+            for problem in problems:
+                bad.append((unit, name, problem))
+            for problem in identity_problems:
+                identity_bad.append((unit, name, problem))
+    identity_transpositions = []
+    unmatched_identity = set(range(len(identity_bad)))
+    for first_index, (first_unit, first_name, first_problem) in enumerate(identity_bad):
+        if first_index not in unmatched_identity:
+            continue
+        for second_index in sorted(unmatched_identity):
+            if second_index <= first_index:
+                continue
+            second_unit, second_name, second_problem = identity_bad[second_index]
+            if (first_unit == second_unit and first_name == second_name and
+                    first_problem.expected == second_problem.actual and
+                    first_problem.actual == second_problem.expected):
+                identity_transpositions.append({
+                    "unit": first_unit,
+                    "function": first_name,
+                    "sites": [first_problem.site, second_problem.site],
+                    "retail_rvas": [first_problem.expected, second_problem.expected],
+                })
+                unmatched_identity.remove(first_index)
+                unmatched_identity.remove(second_index)
+                break
+
+    output = {
+        "schema": 2,
+        "threshold": FIELD_AUDIT_THRESHOLD,
+        "checked_functions": checked_functions,
+        "checked_dir32_sites": checked_sites,
+        "skipped_functions": skipped_functions,
+        "compared_data_sites": audit_stats["compared_section_sites"],
+        "compared_rdata_sites": audit_stats["compared_rdata_sites"],
+        "compared_writable_data_sites": audit_stats["compared_writable_data_sites"],
+        "context_mismatch_sites": audit_stats["context_mismatch"],
+        "divergences": [dict(
+            unit=unit, function=name, **problem._asdict())
+            for unit, name, problem in bad],
+        "identity_divergences": [dict(
+            unit=unit, function=name, diagnostic=problem.diagnostic(),
+            **problem._asdict())
+            for unit, name, problem in identity_bad],
+        "identity_transpositions": identity_transpositions,
+        "unpaired_identity_divergences": [
+            dict(unit=identity_bad[index][0], function=identity_bad[index][1],
+                 diagnostic=identity_bad[index][2].diagnostic(),
+                 **identity_bad[index][2]._asdict())
+            for index in sorted(unmatched_identity)
+        ],
+    }
+    output["summary"] = {
+        "divergences": len(bad),
+        "functions": len({(unit, name) for unit, name, _problem in bad}),
+        "rdata": sum(problem.expected_section == ".rdata"
+                     for _unit, _name, problem in bad),
+        "data": sum(problem.expected_section == ".data"
+                    for _unit, _name, problem in bad),
+        "identity_divergences": len(identity_bad),
+        "identity_functions": len({
+            (unit, name) for unit, name, _problem in identity_bad}),
+        "identity_transpositions": len(identity_transpositions),
+        "unpaired_identity_divergences": len(unmatched_identity),
+    }
+    output_path = Path("build/gen/linked_data_relocs.json")
+    temporary = output_path.with_suffix(".tmp.%d" % os.getpid())
+    temporary.write_text(json.dumps(output, indent=2) + "\n", encoding="utf-8")
+    os.replace(str(temporary), str(output_path))
+    grouped = Counter(
+        (problem.expected_section, problem.expected_offset,
+         problem.actual_section, problem.actual_offset,
+         problem.target_symbol, problem.base_symbol)
+        for _unit, _name, problem in bad)
+    for group, count in sorted(
+            grouped.items(), key=lambda item: (-item[1], item[0]))[:80]:
+        expected_section, expected_offset, actual_section, actual_offset, target, base = group
+        print("  x%d retail %s+0x%x -> candidate %s+0x%x (retail %s, base %s)" %
+              (count, expected_section, expected_offset, actual_section,
+               actual_offset, target, base))
+    for unit, name, problem in identity_bad:
+        print("  IDENTITY %s  %s: %s" %
+              (unit, name, problem.diagnostic()))
+    if bad:
+        print("\nPE DATA RELOCS FAIL: %d divergence(s) in %d near-exact function(s); "
+              "%d unique destination mapping(s); %d ordered identity divergence(s), "
+              "%d balanced transposition(s), %d unpaired; "
+              "report=%s" %
+              (len(bad), len({(unit, name) for unit, name, _problem in bad}),
+               len(grouped), len(identity_bad), len(identity_transpositions),
+               len(unmatched_identity), output_path))
+        return 1
+    print("PE data relocs OK: %d near-exact functions and %d DIR32 sites checked "
+          "between final linked images; %d function(s) lacked a unique MAP owner." %
+          (checked_functions, checked_sites, skipped_functions))
+    return 0
+
 def _function_for_arg(arg):
     """Resolve an RVA or decorated name to the generated (unit, function) identity."""
     try:
@@ -847,6 +1285,8 @@ def review_addends(scope=None):
     return 1 if output["functions"] or output["missing_objects"] else 0
 
 def main():
+    if len(sys.argv) > 1 and sys.argv[1] == "--pe-data":
+        return review_pe_data_targets()
     if len(sys.argv) > 1 and sys.argv[1] == "--resolved":
         return review_fields(resolved_addresses=True)
     if len(sys.argv) > 1 and sys.argv[1] == "--fields":
