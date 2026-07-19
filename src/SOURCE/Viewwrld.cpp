@@ -30,13 +30,13 @@
 #include <string.h>
 
 H2_ENUM_BEGIN(ViewWorldConstant)
-    WORLD_PALETTE_SIZE         = 0x300,
+    WORLD_PALETTE_SIZE         = PALETTE_DATA_SIZE,
     WORLD_WINDOW_X             = 0x1e0,
     WORLD_WINDOW_Y             = 0x10,
     WORLD_ICON_WIDGET          = 3,
     WORLD_POINTER_FRAME        = 0,
-    WORLD_TILESET_COUNT        = 64,
-    WORLD_GROUND_SHAPE_MASK    = 0x7f,
+    WORLD_TILESET_COUNT        = IDX(TILESET_COUNT),
+    WORLD_GROUND_SHAPE_MASK    = GROUND_SHAPE_FLIPPED - 1,
     WORLD_TERRAIN_FRAME_STRIDE = 21,
     WORLD_DRAW_SIZE            = 0x1c0,
     WORLD_LEFT                 = 0x10,
@@ -50,23 +50,74 @@ H2_ENUM_BEGIN(ViewWorldConstant)
     WORLD_HIGHLIGHT_BASE       = 0xd7,
     WORLD_ARTIFACT_HIGHLIGHT   = 0xd6,
     WORLD_RESOURCE_HIGHLIGHT   = 0xdd,
-    WORLD_NO_SPRITE            = 0xFF,
+    WORLD_NO_SPRITE            = IDX(MAPCELL_SPRITE_NONE),
     WORLD_RADAR_WIDGET         = 9,
     WORLD_SCALE_CONTROL        = 2,
-    WORLD_DIALOG_FIRST         = 0x7800,
-    WORLD_DIALOG_EXCLUDED      = 0x7804,
-    WORLD_DIALOG_LAST          = 0x7806,
-    WORLD_DIALOG_CLOSE         = 10,
     WORLD_RADAR_LEFT           = 0x1e0,
     WORLD_RADAR_RIGHT          = 0x270,
     WORLD_RADAR_TOP            = 0x10,
-    WORLD_RADAR_BOTTOM         = 0xa0
+    WORLD_RADAR_BOTTOM         = 0xa0,
+    INITIAL_CENTER_OFFSET      = 7,
+    SCALE_OFFSET_CAPACITY      = 4,
+    GROUND_HORIZONTAL_FLIP     = 2,
+    GROUND_ALTERNATE_SET       = 1,
+    GROUND_ALTERNATE_OFFSET    = 9,
+    GROUND_RANDOM_X_MULTIPLIER = 2,
+    GROUND_RANDOM_FRAME_MASK   = 3,
+    GROUND_FRAME_OFFSET        = 3,
+    ARTIFACT_ICON_FRAME        = 14,
+    HERO_ICON_FRAME_BASE       = 7,
+    RESOURCE_ICON_FRAME        = 13,
+    RADAR_DRAG_MAP_SCALE       = 2
 H2_ENUM_END(ViewWorldConstant)
+
+H2_ENUM_BEGIN(ViewWorldLegendIndex)
+    LEGEND_MINES     = 0,
+    LEGEND_RESOURCES = 1,
+    LEGEND_ARTIFACTS = 2,
+    LEGEND_TOWNS     = 3,
+    LEGEND_HEROES    = 4,
+    LEGEND_ALL       = 5,
+    LEGEND_WORLD     = 6,
+    LEGEND_COUNT     = 7
+H2_ENUM_END(ViewWorldLegendIndex)
+
+H2_ENUM_BEGIN(ViewWorldScaleIndex)
+    SCALE_INDEX_FAR    = 0,
+    SCALE_INDEX_MIDDLE = 1,
+    SCALE_INDEX_NEAR   = 2
+H2_ENUM_END(ViewWorldScaleIndex)
+
+H2_ENUM_BEGIN(ViewWorldOffsetKind)
+    OFFSET_HERO     = 0,
+    OFFSET_RESOURCE = 1,
+    OFFSET_ARTIFACT = 2,
+    OFFSET_MINE     = 3,
+    OFFSET_TOWN     = 4,
+    OFFSET_LETTER   = 5
+H2_ENUM_END(ViewWorldOffsetKind)
+
+H2_ENUM_BEGIN(ViewWorldCoordinateAxis)
+    AXIS_X = 0,
+    AXIS_Y = 1
+H2_ENUM_END(ViewWorldCoordinateAxis)
+
+H2_ENUM_BEGIN(ViewWorldGroundFrame)
+    GROUND_FRAME_ZERO  = 0,
+    GROUND_FRAME_ONE   = 1,
+    GROUND_FRAME_TWO   = 2,
+    GROUND_FRAME_THREE = 3,
+    GROUND_FRAME_FOUR  = 4,
+    GROUND_FRAME_FIVE  = 5,
+    GROUND_FRAME_SIX   = 6,
+    GROUND_FRAME_SEVEN = 7,
+    GROUND_FRAME_EIGHT = 8
+H2_ENUM_END(ViewWorldGroundFrame)
 
 VA(0x004333c0, 0x267)
 void advManager::ViewWorld(ViewWorldMode whatToDraw, b32 drawAllObjects, b32 drawAllTerrains) {
     i8 paletteData[WORLD_PALETTE_SIZE];
-    char* viewIconNames[7];
+    char* viewIconNames[LEGEND_COUNT];
     tag_message dialogMessage;
     heroWindow* viewWorldWindow;
 
@@ -77,7 +128,7 @@ void advManager::ViewWorld(ViewWorldMode whatToDraw, b32 drawAllObjects, b32 dra
     iVWDrawAllTerrains = drawAllTerrains;
     gpWindowManager->m_updateFlags = 0;
     giCycleType = WINDOW_COLOR_CYCLE_WORLD_VIEW;
-    VWInit(m_mapOriginX + 7, m_mapOriginY + 7);
+    VWInit(m_mapOriginX + INITIAL_CENTER_OFFSET, m_mapOriginY + INITIAL_CENTER_OFFSET);
     VWCompleteDraw();
     gpWindowManager->m_updateFlags = 1;
 
@@ -87,15 +138,15 @@ void advManager::ViewWorld(ViewWorldMode whatToDraw, b32 drawAllObjects, b32 dra
         MemError();
 
     i32 legendMode;
-    viewIconNames[0] = "MINE";
-    viewIconNames[1] = "RSRC";
-    viewIconNames[2] = "RTFX";
-    viewIconNames[3] = "TWNS";
-    viewIconNames[4] = "HROS";
-    viewIconNames[5] = "_ALL";
-    viewIconNames[6] = "WRLD";
+    viewIconNames[LEGEND_MINES] = "MINE";
+    viewIconNames[LEGEND_RESOURCES] = "RSRC";
+    viewIconNames[LEGEND_ARTIFACTS] = "RTFX";
+    viewIconNames[LEGEND_TOWNS] = "TWNS";
+    viewIconNames[LEGEND_HEROES] = "HROS";
+    viewIconNames[LEGEND_ALL] = "_ALL";
+    viewIconNames[LEGEND_WORLD] = "WRLD";
     if (whatToDraw == VIEW_WORLD_ALL && drawAllObjects == 0 && drawAllTerrains == 0)
-        legendMode = 6;
+        legendMode = LEGEND_WORLD;
     else
         legendMode = IDX(whatToDraw) - IDX(VIEW_WORLD_MINES);
     sprintf(gText, "view%s.icn", viewIconNames[legendMode]);
@@ -128,11 +179,11 @@ void advManager::VWCleanup(void) {
 VA(0x00433681, 0x253)
 void advManager::VWInit(i32 centerX, i32 centerY) {
     if (giViewWorldScale == VIEW_WORLD_SCALE_FAR)
-        giViewWorldScaleLookup = 0;
+        giViewWorldScaleLookup = SCALE_INDEX_FAR;
     else if (giViewWorldScale == VIEW_WORLD_SCALE_MIDDLE)
-        giViewWorldScaleLookup = 1;
+        giViewWorldScaleLookup = SCALE_INDEX_MIDDLE;
     else
-        giViewWorldScaleLookup = 2;
+        giViewWorldScaleLookup = SCALE_INDEX_NEAR;
 
     iVWViewableCells = WORLD_DRAW_SIZE / IDX(giViewWorldScale);
     if (MAP_WIDTH < iVWViewableCells)
@@ -174,9 +225,9 @@ void advManager::VWCompleteDraw(void) {
     i32 artifactHighlight2;
     i32 townFlagHighlight3;
     i32 townIconHighlight1;
-    i8 mineLetterY0[4];
-    i8 townIconX2[4];
-    i8 townFlagX15[4];
+    i8 mineLetterY0[SCALE_OFFSET_CAPACITY];
+    i8 townIconX2[SCALE_OFFSET_CAPACITY];
+    i8 townFlagX15[SCALE_OFFSET_CAPACITY];
     i32 currentHeroHere;
     i32 pixelY2;
     i32 pixelX6;
@@ -205,9 +256,9 @@ void advManager::VWCompleteDraw(void) {
         WORLD_BACKGROUND_COLOR
     );
     memset(drawTilesets0, 1, WORLD_TILESET_COUNT);
-    drawTilesets0[11] = 0;
-    drawTilesets0[13] = 0;
-    drawTilesets0[14] = 0;
+    drawTilesets0[IDX(TILESET_OBJNARTI)] = 0;
+    drawTilesets0[IDX(TILESET_ART32)] = 0;
+    drawTilesets0[IDX(TILESET_FLAG32)] = 0;
 
     for (mapY3 = iVWMapOriginY; mapY3 < iVWMapOriginY + iVWViewableCells; mapY3++) {
         for (mapX7 = iVWMapOriginX; mapX7 < iVWMapOriginX + iVWViewableCells; mapX7++) {
@@ -224,6 +275,8 @@ void advManager::VWCompleteDraw(void) {
                 pixelY2 = (mapY3 - iVWMapOriginY) * IDX(giViewWorldScale) + iVWYPixelOffset;
                 groundShape1 =
                     giGroundShape[cell0->m_terrainImageIndex] & WORLD_GROUND_SHAPE_MASK;
+                // Retail ground-shape groups select the overview terrain frame.
+                // NOLINTBEGIN(readability-magic-numbers)
                 switch (groundShape1) {
                     case 0:
                     case 9:
@@ -231,51 +284,53 @@ void advManager::VWCompleteDraw(void) {
                     case 19:
                     case 20:
                     case 21:
-                        groundFrame29 = 0;
+                        groundFrame29 = GROUND_FRAME_ZERO;
                         break;
                     case 1:
                     case 12:
                     case 15:
                     case 16:
-                        groundFrame29 = 1;
+                        groundFrame29 = GROUND_FRAME_ONE;
                         break;
                     case 2:
                     case 10:
                     case 11:
-                        groundFrame29 = 2;
+                        groundFrame29 = GROUND_FRAME_TWO;
                         break;
                     case 3:
                     case 13:
                     case 14:
                     case 17:
-                        groundFrame29 = 3;
+                        groundFrame29 = GROUND_FRAME_THREE;
                         break;
                     case 4:
-                        groundFrame29 = 4;
+                        groundFrame29 = GROUND_FRAME_FOUR;
                         break;
                     case 5:
-                        groundFrame29 = 5;
+                        groundFrame29 = GROUND_FRAME_FIVE;
                         break;
                     case 6:
-                        groundFrame29 = 6;
+                        groundFrame29 = GROUND_FRAME_SIX;
                         break;
                     case 7:
-                        groundFrame29 = 7;
+                        groundFrame29 = GROUND_FRAME_SEVEN;
                         break;
                     case 8:
-                        groundFrame29 = 8;
+                        groundFrame29 = GROUND_FRAME_EIGHT;
                         break;
                     default:
                         break;
                 }
-                if (cell0->m_flags & 2)
+                // NOLINTEND(readability-magic-numbers)
+                if (cell0->m_flags & GROUND_HORIZONTAL_FLIP)
                     flipped5 = 1;
-                if (cell0->m_flags & 1)
-                    groundFrame29 += 9;
+                if (cell0->m_flags & GROUND_ALTERNATE_SET)
+                    groundFrame29 += GROUND_ALTERNATE_OFFSET;
                 if (groundFrame29 == 0)
-                    groundFrame29 = (mapY3 * 2 + mapX7) & 3;
+                    groundFrame29 =
+                        (mapY3 * GROUND_RANDOM_X_MULTIPLIER + mapX7) & GROUND_RANDOM_FRAME_MASK;
                 else
-                    groundFrame29 += 3;
+                    groundFrame29 += GROUND_FRAME_OFFSET;
                 groundFrame29 +=
                     giGroundToTerrain[cell0->m_terrainImageIndex] * WORLD_TERRAIN_FRAME_STRIDE;
                 if ((giCurPlayerBit & mapExtra[MAP_WIDTH * mapY3 + mapX7]) || iVWDrawAllTerrains) {
@@ -454,9 +509,9 @@ void advManager::VWCompleteDraw(void) {
                 IconToBitmap(
                     pVWMisc,
                     gpWindowManager->m_screen,
-                    pixelX6 - iVWHalf[giViewWorldScaleLookup][2][0],
-                    pixelY2 - iVWHalf[giViewWorldScaleLookup][2][1],
-                    14,
+                    pixelX6 - iVWHalf[giViewWorldScaleLookup][OFFSET_ARTIFACT][AXIS_X],
+                    pixelY2 - iVWHalf[giViewWorldScaleLookup][OFFSET_ARTIFACT][AXIS_Y],
+                    ARTIFACT_ICON_FRAME,
                     1,
                     WORLD_LEFT,
                     WORLD_TOP,
@@ -482,12 +537,15 @@ void advManager::VWCompleteDraw(void) {
                     playerColor26 = WORLD_NO_OWNER_COLOR;
                 else
                     playerColor26 = gpGame->m_players[playerColor26].m_color;
-                townFlagX15[0] = -2;
-                townFlagX15[1] = -3;
-                townFlagX15[2] = -6;
-                townIconX2[0] = 5;
-                townIconX2[1] = 7;
-                townIconX2[2] = 10;
+                // Retail scale-specific town marker offsets.
+                // NOLINTBEGIN(readability-magic-numbers)
+                townFlagX15[SCALE_INDEX_FAR] = -2;
+                townFlagX15[SCALE_INDEX_MIDDLE] = -3;
+                townFlagX15[SCALE_INDEX_NEAR] = -6;
+                townIconX2[SCALE_INDEX_FAR] = 5;
+                townIconX2[SCALE_INDEX_MIDDLE] = 7;
+                townIconX2[SCALE_INDEX_NEAR] = 10;
+                // NOLINTEND(readability-magic-numbers)
                 if (iVWWhatToDraw == VIEW_WORLD_TOWNS)
                     townFlagHighlight3 = playerColor26 + WORLD_HIGHLIGHT_BASE;
                 else
@@ -496,8 +554,8 @@ void advManager::VWCompleteDraw(void) {
                     pVWFlags,
                     gpWindowManager->m_screen,
                     townFlagX15[giViewWorldScaleLookup] + pixelX6
-                        - iVWHalf[giViewWorldScaleLookup][4][0],
-                    pixelY2 - iVWHalf[giViewWorldScaleLookup][4][1],
+                        - iVWHalf[giViewWorldScaleLookup][OFFSET_TOWN][AXIS_X],
+                    pixelY2 - iVWHalf[giViewWorldScaleLookup][OFFSET_TOWN][AXIS_Y],
                     playerColor26,
                     1,
                     WORLD_LEFT,
@@ -514,8 +572,8 @@ void advManager::VWCompleteDraw(void) {
                     pVWFlags,
                     gpWindowManager->m_screen,
                     townIconX2[giViewWorldScaleLookup] + pixelX6
-                        - iVWHalf[giViewWorldScaleLookup][4][0],
-                    pixelY2 - iVWHalf[giViewWorldScaleLookup][4][1],
+                        - iVWHalf[giViewWorldScaleLookup][OFFSET_TOWN][AXIS_X],
+                    pixelY2 - iVWHalf[giViewWorldScaleLookup][OFFSET_TOWN][AXIS_Y],
                     playerColor26,
                     1,
                     WORLD_LEFT,
@@ -549,9 +607,9 @@ void advManager::VWCompleteDraw(void) {
                     IconToBitmap(
                         pVWMisc,
                         gpWindowManager->m_screen,
-                        pixelX6 - iVWHalf[giViewWorldScaleLookup][0][0],
-                        pixelY2 - iVWHalf[giViewWorldScaleLookup][0][1],
-                        groundFrame29 + 7,
+                        pixelX6 - iVWHalf[giViewWorldScaleLookup][OFFSET_HERO][AXIS_X],
+                        pixelY2 - iVWHalf[giViewWorldScaleLookup][OFFSET_HERO][AXIS_Y],
+                        groundFrame29 + HERO_ICON_FRAME_BASE,
                         1,
                         WORLD_LEFT,
                         WORLD_TOP,
@@ -569,9 +627,9 @@ void advManager::VWCompleteDraw(void) {
                 IconToBitmap(
                     pVWMisc,
                     gpWindowManager->m_screen,
-                    pixelX6 - iVWHalf[giViewWorldScaleLookup][1][0],
-                    pixelY2 - iVWHalf[giViewWorldScaleLookup][1][1],
-                    13,
+                    pixelX6 - iVWHalf[giViewWorldScaleLookup][OFFSET_RESOURCE][AXIS_X],
+                    pixelY2 - iVWHalf[giViewWorldScaleLookup][OFFSET_RESOURCE][AXIS_Y],
+                    RESOURCE_ICON_FRAME,
                     1,
                     WORLD_LEFT,
                     WORLD_TOP,
@@ -582,8 +640,8 @@ void advManager::VWCompleteDraw(void) {
                 IconToBitmap(
                     pVWLetters,
                     gpWindowManager->m_screen,
-                    pixelX6 - iVWHalf[giViewWorldScaleLookup][5][0],
-                    pixelY2 - iVWHalf[giViewWorldScaleLookup][5][1],
+                    pixelX6 - iVWHalf[giViewWorldScaleLookup][OFFSET_LETTER][AXIS_X],
+                    pixelY2 - iVWHalf[giViewWorldScaleLookup][OFFSET_LETTER][AXIS_Y],
                     groundFrame29,
                     1,
                     WORLD_LEFT,
@@ -611,8 +669,8 @@ void advManager::VWCompleteDraw(void) {
                 IconToBitmap(
                     pVWMisc,
                     gpWindowManager->m_screen,
-                    pixelX6 - iVWHalf[giViewWorldScaleLookup][3][0],
-                    pixelY2 - iVWHalf[giViewWorldScaleLookup][3][1],
+                    pixelX6 - iVWHalf[giViewWorldScaleLookup][OFFSET_MINE][AXIS_X],
+                    pixelY2 - iVWHalf[giViewWorldScaleLookup][OFFSET_MINE][AXIS_Y],
                     groundFrame29,
                     1,
                     WORLD_LEFT,
@@ -621,16 +679,19 @@ void advManager::VWCompleteDraw(void) {
                     WORLD_DRAW_SIZE,
                     mineHighlight18
                 );
-                mineLetterY0[0] = 0;
-                mineLetterY0[1] = 0;
-                mineLetterY0[2] = 2;
+                // Retail scale-specific mine-letter offsets.
+                // NOLINTBEGIN(readability-magic-numbers)
+                mineLetterY0[SCALE_INDEX_FAR] = 0;
+                mineLetterY0[SCALE_INDEX_MIDDLE] = 0;
+                mineLetterY0[SCALE_INDEX_NEAR] = 2;
+                // NOLINTEND(readability-magic-numbers)
                 resourceType9 = gpGame->m_mines[cell0->m_objectMetadata].resourceType;
                 IconToBitmap(
                     pVWLetters,
                     gpWindowManager->m_screen,
-                    pixelX6 - iVWHalf[giViewWorldScaleLookup][5][0],
+                    pixelX6 - iVWHalf[giViewWorldScaleLookup][OFFSET_LETTER][AXIS_X],
                     mineLetterY0[giViewWorldScaleLookup] + pixelY2
-                        - iVWHalf[giViewWorldScaleLookup][5][1],
+                        - iVWHalf[giViewWorldScaleLookup][OFFSET_LETTER][AXIS_Y],
                     resourceType9,
                     1,
                     WORLD_LEFT,
@@ -672,6 +733,8 @@ i32 ViewWorldDialogHandler(struct tag_message& message) {
                     if (giViewWorldScale == VIEW_WORLD_SCALE_FAR
                         && MAP_WIDTH <= IDX(VIEW_WORLD_FAR_MAX_MAP_SIZE))
                         break;
+                    // Retail radar scale ratios for the three supported map sizes.
+                    // NOLINTBEGIN(readability-magic-numbers)
                     switch (MAP_HEIGHT) {
                         case IDX(VIEW_WORLD_NEAR_MAX_MAP_SIZE):
                             radarScale6 = 4.0f;
@@ -686,6 +749,7 @@ i32 ViewWorldDialogHandler(struct tag_message& message) {
                             radarScale6 = 1.0f;
                             break;
                     }
+                    // NOLINTEND(readability-magic-numbers)
 
                     radarX0 = message.payload.mouse.screenX;
                     radarY1 = message.payload.mouse.screenY;
@@ -721,12 +785,12 @@ i32 ViewWorldDialogHandler(struct tag_message& message) {
                                 savedMessage.payload.mouse.x = WORLD_RADAR_LEFT;
                             if (savedMessage.payload.mouse.x >= WORLD_RADAR_RIGHT)
                                 savedMessage.payload.mouse.x =
-                                    MAP_WIDTH * 2 + WORLD_RADAR_LEFT - 1;
+                                    MAP_WIDTH * RADAR_DRAG_MAP_SCALE + WORLD_RADAR_LEFT - 1;
                             if (savedMessage.payload.mouse.y < WORLD_RADAR_TOP)
                                 savedMessage.payload.mouse.y = WORLD_RADAR_TOP;
                             if (savedMessage.payload.mouse.y >= WORLD_RADAR_BOTTOM)
                                 savedMessage.payload.mouse.y =
-                                    MAP_HEIGHT * 2 + WORLD_RADAR_TOP - 1;
+                                    MAP_HEIGHT * RADAR_DRAG_MAP_SCALE + WORLD_RADAR_TOP - 1;
                             gpMouseManager->Main(savedMessage);
                             radarX0 = static_cast<i32>(
                                 (savedMessage.payload.mouse.x - WORLD_RADAR_LEFT) / radarScale6
@@ -774,10 +838,10 @@ i32 ViewWorldDialogHandler(struct tag_message& message) {
                     case EVENT_WINDOW_FIFTH_BUTTON:
                     case EVENT_WINDOW_SIXTH_BUTTON:
                         gpWindowManager->m_dialogResult = message.payload.widget.id;
-                        message.payload.widget.id = WORLD_DIALOG_CLOSE;
+                        message.payload.widget.id = EVENT_WINDOW_CLOSE_COMMAND;
                         message.payload.widget.command =
                             BaseWidgetCommand(message.payload.widget.id);
-                        return 2;
+                        return EVENT_WINDOW_CLOSE;
                     default:
                         break;
                 }
@@ -786,13 +850,19 @@ i32 ViewWorldDialogHandler(struct tag_message& message) {
                 break;
         }
     }
-    return 1;
+    return EVENT_WINDOW_CONTINUE;
 }
 
-DATA(0x004f11b8) i8 iVWHalf[3][6][2] = {3,  3, 5, 5, 6, 6, 8, 5, 2, 3, 2,  2,  4,  5, 6, 6, 8, 8,
-                                        11, 7, 3, 4, 3, 3, 7, 7, 8, 8, 10, 10, 14, 8, 3, 6, 4, 4};
+// Retail scale/kind/axis pixel-offset payload.
+// NOLINTBEGIN(readability-magic-numbers)
+DATA(0x004f11b8)
+i8 iVWHalf[ADVMGR_VIEW_WORLD_SCALE_COUNT][ADVMGR_VIEW_WORLD_OFFSET_KIND_COUNT]
+            [ADVMGR_VIEW_WORLD_AXIS_COUNT] = {3,  3, 5, 5, 6, 6, 8, 5, 2, 3, 2,  2,
+                                              4,  5, 6, 6, 8, 8, 11, 7, 3, 4, 3, 3,
+                                              7,  7, 8, 8, 10, 10, 14, 8, 3, 6, 4, 4};
+// NOLINTEND(readability-magic-numbers)
 DATA(0x004f11dc) ViewWorldScale giViewWorldScale = VIEW_WORLD_SCALE_MIDDLE;
-DATA(0x004f11e0) i32 giViewWorldScaleLookup = 1;
+DATA(0x004f11e0) i32 giViewWorldScaleLookup = SCALE_INDEX_MIDDLE;
 DATA(0x004f11e4) b32 gbInViewWorld = false;
 DATA(0x00525110) class icon* pVWMisc;
 DATA(0x00525114) class icon* pVWLetters;
