@@ -13,7 +13,7 @@ class palette : public resource {
 public:
     i8* m_data;
     palette(void);
-    palette(u32l);
+    palette(u32l id);
     virtual ~palette();
     i8* Data(void);
 };
