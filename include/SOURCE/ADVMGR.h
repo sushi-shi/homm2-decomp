@@ -62,7 +62,8 @@ H2_ENUM_CLASS_BEGIN(AdventureEnvironmentSoundId)
     ADVMGR_SOUND_RUINS                = 24,
     ADVMGR_SOUND_DWELLING             = 25,
     ADVMGR_SOUND_ABANDONED_MINE       = 26,
-    ADVMGR_SOUND_LARGE_VOLCANO        = 27
+    ADVMGR_SOUND_LARGE_VOLCANO        = 27,
+    ADVMGR_ENVIRONMENT_SOUND_COUNT    = 28
 H2_ENUM_CLASS_END(AdventureEnvironmentSoundId)
 
 H2_ENUM_CLASS_BEGIN(AdventureSystemOption)
