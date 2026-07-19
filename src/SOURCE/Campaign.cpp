@@ -1063,13 +1063,13 @@ void game::InitCampaignMap(void) {
 
     if (m_campaignType == IDX(CAMPAIGN_ARCHIBALD)
         && m_campaignScenario + 1 == SCENARIO_SIX) {
-        gpGame->m_mapHeader.victoryCondition = IDX(MAP_VICTORY_DEFEAT_SIDE);
+        gpGame->m_mapHeader.victoryCondition = MAP_VICTORY_DEFEAT_SIDE;
         gpGame->m_mapHeader.victoryConditionValue = CAMPAIGN_SWITCH_VICTORY_VALUE;
         gpGame->m_mapHeader.allowNormalVictory = 1;
     }
     if (m_campaignType == IDX(CAMPAIGN_ROLAND)
         && m_campaignScenario + 1 == SCENARIO_NINE) {
-        gpGame->m_mapHeader.lossCondition = IDX(MAP_LOSS_STANDARD);
+        gpGame->m_mapHeader.lossCondition = MAP_LOSS_STANDARD;
         gpGame->m_mapHeader.lossConditionValue = 0;
     }
     if (m_campaignType == IDX(CAMPAIGN_ROLAND)

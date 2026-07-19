@@ -26,21 +26,21 @@ H2_ENUM_CLASS_BEGIN(MapDimension)
     MAP_DIMENSION_XLARGE = 144
 H2_ENUM_CLASS_END(MapDimension)
 
-H2_ENUM_CLASS_BEGIN(MapVictoryCondition)
+H2_ENUM_CLASS_BEGIN_T(MapVictoryCondition, u8)
     MAP_VICTORY_DEFEAT_ALL      = 0,
     MAP_VICTORY_CAPTURE_TOWN    = 1,
     MAP_VICTORY_DEFEAT_HERO     = 2,
     MAP_VICTORY_FIND_ARTIFACT   = 3,
     MAP_VICTORY_DEFEAT_SIDE     = 4,
     MAP_VICTORY_ACCUMULATE_GOLD = 5
-H2_ENUM_CLASS_END(MapVictoryCondition)
+H2_ENUM_CLASS_END_T(MapVictoryCondition, u8)
 
-H2_ENUM_CLASS_BEGIN(MapLossCondition)
+H2_ENUM_CLASS_BEGIN_T(MapLossCondition, u8)
     MAP_LOSS_STANDARD = 0,
     MAP_LOSS_TOWN     = 1,
     MAP_LOSS_HERO     = 2,
     MAP_LOSS_TIME     = 3
-H2_ENUM_CLASS_END(MapLossCondition)
+H2_ENUM_CLASS_END_T(MapLossCondition, u8)
 
 #pragma pack(push, 1)
 struct SMapHeader {
@@ -55,11 +55,11 @@ struct SMapHeader {
     u8 playerCount;
     u8 minHumanPlayers;
     u8 maxHumanPlayers;
-    u8 victoryCondition;
+    MapVictoryCondition victoryCondition;
     u8 computerAlsoWins;
     u8 allowNormalVictory;
     u16 victoryConditionValue;
-    u8 lossCondition;
+    MapLossCondition lossCondition;
     u16 lossConditionValue;
     u8 unknown25;
     i8 playerRace[MAP_HEADER_PLAYER_COUNT];

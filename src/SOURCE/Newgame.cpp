@@ -1887,9 +1887,9 @@ void game::GetLossConditionText(char* text) {
     town* lossTown9;
     i32 townId12;
 
-    if (m_mapHeader.lossCondition != IDX(MAP_LOSS_STANDARD)) {
+    if (m_mapHeader.lossCondition != MAP_LOSS_STANDARD) {
         switch (m_mapHeader.lossCondition) {
-            case IDX(MAP_LOSS_TOWN):
+            case MAP_LOSS_TOWN:
                 townId12 = GetTownId(m_mapHeader.lossConditionValue, m_mapHeader.lossTownY);
                 lossTown9 = GetTown(townId12);
                 sprintf(
@@ -1900,12 +1900,12 @@ void game::GetLossConditionText(char* text) {
                 );
                 break;
 
-            case IDX(MAP_LOSS_HERO):
+            case MAP_LOSS_HERO:
                 lossHero11 = GetHero(m_mapHeader.lossConditionValue);
                 sprintf(text, "Lose the hero '%s'.", lossHero11->m_name);
                 break;
 
-            case IDX(MAP_LOSS_TIME):
+            case MAP_LOSS_TIME:
                 month19 =
                     (gpGame->m_mapHeader.lossConditionValue - 1) / GAME_DAYS_PER_MONTH + 1;
                 week2 = (gpGame->m_mapHeader.lossConditionValue
@@ -1937,9 +1937,9 @@ void game::GetVictoryConditionText(char* text) {
     town* victoryTown;
     i32 townId;
 
-    if (m_mapHeader.victoryCondition != IDX(MAP_VICTORY_DEFEAT_ALL)) {
+    if (m_mapHeader.victoryCondition != MAP_VICTORY_DEFEAT_ALL) {
         switch (m_mapHeader.victoryCondition) {
-            case IDX(MAP_VICTORY_CAPTURE_TOWN):
+            case MAP_VICTORY_CAPTURE_TOWN:
                 townId = GetTownId(m_mapHeader.victoryConditionValue, m_mapHeader.victoryTownY);
                 victoryTown = GetTown(townId);
                 sprintf(
@@ -1950,12 +1950,12 @@ void game::GetVictoryConditionText(char* text) {
                 );
                 break;
 
-            case IDX(MAP_VICTORY_DEFEAT_HERO):
+            case MAP_VICTORY_DEFEAT_HERO:
                 victoryHeroData = GetHero(m_mapHeader.victoryConditionValue);
                 sprintf(text, "Defeat the hero '%s'", victoryHeroData->m_name);
                 break;
 
-            case IDX(MAP_VICTORY_FIND_ARTIFACT):
+            case MAP_VICTORY_FIND_ARTIFACT:
                 if (m_mapHeader.victoryConditionValue == 0)
                     sprintf(text, "Find the ultimate artifact");
                 else
@@ -1966,7 +1966,7 @@ void game::GetVictoryConditionText(char* text) {
                     );
                 break;
 
-            case IDX(MAP_VICTORY_ACCUMULATE_GOLD):
+            case MAP_VICTORY_ACCUMULATE_GOLD:
                 sprintf(
                     text,
                     "Accumulate %d gold",
@@ -1974,7 +1974,7 @@ void game::GetVictoryConditionText(char* text) {
                 );
                 break;
 
-            case IDX(MAP_VICTORY_DEFEAT_SIDE):
+            case MAP_VICTORY_DEFEAT_SIDE:
                 firstSideIsLocalResult =
                     GetSideDesc(firstSide, 0, m_mapHeader.victoryConditionValue - 1);
                 GetSideDesc(
@@ -1988,7 +1988,7 @@ void game::GetVictoryConditionText(char* text) {
                     sprintf(text, "%s must defeat %s", secondSideValue, firstSide);
         }
 
-        if (m_mapHeader.victoryCondition != IDX(MAP_VICTORY_DEFEAT_SIDE)
+        if (m_mapHeader.victoryCondition != MAP_VICTORY_DEFEAT_SIDE
             && m_mapHeader.allowNormalVictory != 0)
             strcat(
                 text,
