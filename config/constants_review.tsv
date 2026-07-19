@@ -220,7 +220,7 @@ src/SOURCE/VIEW.cpp	pending
 src/SOURCE/Viewwrld.cpp	pending
 src/SOURCE/Wsnetwin.cpp	pending
 src/SOURCE/X_CAMPGN.cpp	pending
-src/SOURCE/X_GLOBAL.cpp	pending
+src/SOURCE/X_GLOBAL.cpp	reviewed	The TU contains reviewed global data definitions only. Expansion text/name tables and alignment/resource-cost initializers are retail payload; the shrine cost row follows the canonical resource extent and its numeric entries remain data rather than policy constants.
 src/SOURCE/comwin.cpp	pending
 src/SOURCE/dpnetwin.cpp	pending
 src/SOURCE/kbwin.cpp	pending
