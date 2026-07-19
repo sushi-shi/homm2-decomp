@@ -6,7 +6,8 @@ VA(0x004dd330, 0x1e)
 dimmerWidget::dimmerWidget(void) : widget(0, 0, 0, 0, 0, 0) {}
 
 VA(0x004dd350, 0x34)
-dimmerWidget::dimmerWidget(i16 a, i16 b, i16 c, i16 d, i16 e, i16 f) : widget(a, b, c, d, e, f) {}
+dimmerWidget::dimmerWidget(i16 x, i16 y, i16 width, i16 height, i16 id, i16 kind)
+    : widget(x, y, width, height, id, kind) {}
 
 VA(0x004dd390, 0x5f)
 void dimmerWidget::Read(void) {
