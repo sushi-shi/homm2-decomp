@@ -123,8 +123,23 @@ H2_ENUM_BEGIN(ExpansionCampaignChoiceConstant)
     CAMPAIGN_MERCURY_PENALTY_TWO       = -2
 H2_ENUM_END(ExpansionCampaignChoiceConstant)
 
+H2_ENUM_BEGIN(ExpansionCampaignImplementationConstant)
+    TRACK_COORDINATE_COUNT         = 2,
+    CAMPAIGN_ICON_X                = 24,
+    CAMPAIGN_ICON_Y                = 25,
+    CAMPAIGN_ICON_WIDTH            = 376,
+    CAMPAIGN_ICON_HEIGHT           = 49,
+    UNUSED_CAMPAIGN_DATA_COUNT     = 5,
+    TRACK_FRAME_PLAYED             = 0,
+    TRACK_FRAME_AVAILABLE          = 1,
+    TRACK_FRAME_LOCKED             = 2,
+    TRACK_FRAME_CAMPAIGN_STRIDE    = 3,
+    TRACK_SELECTED_CAMPAIGN_OFFSET = 1
+H2_ENUM_END(ExpansionCampaignImplementationConstant)
+
 DATA(0x0051d450) static i32
-    expansionCampaignTrackXY[IDX(EXPANSION_CAMPAIGN_COUNT)][EXPANSION_CAMPAIGN_MAX_MAP_COUNT][2] = {
+    expansionCampaignTrackXY[IDX(EXPANSION_CAMPAIGN_COUNT)][EXPANSION_CAMPAIGN_MAX_MAP_COUNT]
+                            [TRACK_COORDINATE_COUNT] = {
         {{113, 310},
          {187, 310},
          {261, 352},
@@ -396,12 +411,13 @@ void ExpCampaign::InitMap(void) {
             if (player->m_heroCount > 0) {
                 for (heroPosition = 0; heroPosition < player->m_heroCount; ++heroPosition) {
                     choiceHero = gpGame->GetHero(player->m_heroIds[heroPosition]);
-                    if (m_campaignId == IDX(EXPANSION_CAMPAIGN_VOYAGE_HOME) && m_currentMap == 3) {
+                    if (m_campaignId == IDX(EXPANSION_CAMPAIGN_VOYAGE_HOME)
+                        && m_currentMap == MAP_VOY_BLOOD_IS_THICKER) {
                         if (choiceHero->m_portrait == IDX(HERO_GALLAVANT))
                             break;
                     } else {
                         if (m_campaignId == IDX(EXPANSION_CAMPAIGN_VOYAGE_HOME)
-                            && m_currentMap == 2) {
+                            && m_currentMap == MAP_VOY_KING_AND_COUNTRY) {
                             if (choiceHero->m_portrait == IDX(HERO_CEALLACH))
                                 break;
                         } else {
@@ -436,7 +452,8 @@ void ExpCampaign::InitMap(void) {
             if (player->m_heroCount > 0) {
                 for (heroPosition = 0; heroPosition < player->m_heroCount; ++heroPosition) {
                     choiceHero = gpGame->GetHero(player->m_heroIds[heroPosition]);
-                    if (m_campaignId == IDX(EXPANSION_CAMPAIGN_VOYAGE_HOME) && m_currentMap == 2) {
+                    if (m_campaignId == IDX(EXPANSION_CAMPAIGN_VOYAGE_HOME)
+                        && m_currentMap == MAP_VOY_KING_AND_COUNTRY) {
                         if (choiceHero->m_portrait == IDX(HERO_CEALLACH))
                             break;
                     } else {
@@ -566,10 +583,10 @@ void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
 
     widget* campaignIcon = NULL;
     campaignIcon = new iconWidget(
-        24,
-        25,
-        376,
-        49,
+        CAMPAIGN_ICON_X,
+        CAMPAIGN_ICON_Y,
+        CAMPAIGN_ICON_WIDTH,
+        CAMPAIGN_ICON_HEIGHT,
         "x_cmpext.icn",
         m_campaignId + EXPANSION_CAMPAIGN_ICON_FRAME_BASE,
         0,
@@ -630,7 +647,7 @@ VA(0x004bc34d, 0x921)
 void ExpCampaign::UpdateInfo(i32 redraw) {
     tag_message message;
     i8 hasVisibleAward;
-    i32 unusedCampaignData[5];
+    i32 unusedCampaignData[UNUSED_CAMPAIGN_DATA_COUNT];
     i32 map;
     SCampaignChoice* choice;
     i8 showScroll;
@@ -639,13 +656,15 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
     message.type = MESSAGE_WIDGET;
     for (map = 0; map < m_mapCount; ++map) {
         if (m_mapChoices[map] != 0)
-            message.payload.widget.data.value = 1;
+            message.payload.widget.data.value = TRACK_FRAME_AVAILABLE;
         else if (m_mapsPlayed[map] != 0)
-            message.payload.widget.data.value = 0;
+            message.payload.widget.data.value = TRACK_FRAME_PLAYED;
         else
-            message.payload.widget.data.value = 2;
+            message.payload.widget.data.value = TRACK_FRAME_LOCKED;
         if (m_viewMap == map)
-            message.payload.widget.data.value += (m_campaignId + 1) * 3;
+            message.payload.widget.data.value +=
+                (m_campaignId + TRACK_SELECTED_CAMPAIGN_OFFSET)
+                * TRACK_FRAME_CAMPAIGN_STRIDE;
         message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
         message.payload.widget.id = map + CAMPAIGN_TRACK_WIDGET_FIRST;
         m_window->BroadcastMessage(message);
@@ -1186,18 +1205,18 @@ i32 ExpCampaign::MessageHandler(struct tag_message& message) {
             case CAMPAIGN_MESSAGE_HOVER:
             case CAMPAIGN_MESSAGE_HELP:
                 switch (message.payload.widget.id) {
-                    case CAMPAIGN_TRACK_WIDGET_FIRST:
-                    case CAMPAIGN_TRACK_WIDGET_FIRST + 1:
-                    case CAMPAIGN_TRACK_WIDGET_FIRST + 2:
-                    case CAMPAIGN_TRACK_WIDGET_FIRST + 3:
-                    case CAMPAIGN_TRACK_WIDGET_FIRST + 4:
-                    case CAMPAIGN_TRACK_WIDGET_FIRST + 5:
-                    case CAMPAIGN_TRACK_WIDGET_FIRST + 6:
-                    case CAMPAIGN_TRACK_WIDGET_FIRST + 7:
-                    case CAMPAIGN_TRACK_WIDGET_FIRST + 8:
-                    case CAMPAIGN_TRACK_WIDGET_FIRST + 9:
-                    case CAMPAIGN_TRACK_WIDGET_FIRST + 10:
-                    case CAMPAIGN_TRACK_WIDGET_LAST:
+                    case CAMPAIGN_TRACK_WIDGET_0:
+                    case CAMPAIGN_TRACK_WIDGET_1:
+                    case CAMPAIGN_TRACK_WIDGET_2:
+                    case CAMPAIGN_TRACK_WIDGET_3:
+                    case CAMPAIGN_TRACK_WIDGET_4:
+                    case CAMPAIGN_TRACK_WIDGET_5:
+                    case CAMPAIGN_TRACK_WIDGET_6:
+                    case CAMPAIGN_TRACK_WIDGET_7:
+                    case CAMPAIGN_TRACK_WIDGET_8:
+                    case CAMPAIGN_TRACK_WIDGET_9:
+                    case CAMPAIGN_TRACK_WIDGET_10:
+                    case CAMPAIGN_TRACK_WIDGET_11:
                         map = message.payload.widget.id - CAMPAIGN_TRACK_WIDGET_FIRST;
                         if (giDebugLevel >= 1 || xCampaign.m_mapChoices[map]
                             || xCampaign.m_mapsPlayed[map]) {
@@ -1205,9 +1224,9 @@ i32 ExpCampaign::MessageHandler(struct tag_message& message) {
                             xCampaign.UpdateInfo(1);
                         }
                         break;
-                    case CAMPAIGN_BONUS_WIDGET_FIRST:
-                    case CAMPAIGN_BONUS_WIDGET_FIRST + 1:
-                    case CAMPAIGN_BONUS_WIDGET_LAST:
+                    case CAMPAIGN_BONUS_WIDGET_0:
+                    case CAMPAIGN_BONUS_WIDGET_1:
+                    case CAMPAIGN_BONUS_WIDGET_2:
                         if (xCampaign.m_viewOnly == 0
                             && xCampaign.m_mapChoices[xCampaign.m_viewMap]) {
                             xCampaign.m_bonusChoices[xCampaign.m_viewMap] =
