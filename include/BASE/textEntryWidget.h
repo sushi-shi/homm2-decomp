@@ -7,6 +7,14 @@
 
 struct tag_message;
 
+H2_ENUM_BEGIN(TextEntryReadMode)
+    TEXT_ENTRY_READ_DEFAULT    = 1,
+    TEXT_ENTRY_READ_RECT       = 2,
+    TEXT_ENTRY_READ_MULTILINE  = 3,
+    TEXT_ENTRY_READ_INSET_FIVE = 4,
+    TEXT_ENTRY_READ_INSET_FOUR = 5
+H2_ENUM_END(TextEntryReadMode)
+
 #pragma pack(push, 1)
 class resource;
 class icon;
