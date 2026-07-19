@@ -38,7 +38,7 @@ include/BASE/bitmap.h	pending
 include/BASE/bmap2.h	pending
 include/BASE/border.h	reviewed	Public class interface contains only pure-virtual overrides and packed-layout SIZE evidence.
 include/BASE/button.h	reviewed	Public class interface contains only packed-layout SIZE evidence; dispatch-return storage widths are proven by the retail ABI.
-include/BASE/dimmerWidget.h	pending
+include/BASE/dimmerWidget.h	reviewed	Public constructor parameters are named; remaining literals are language-level pure override and packed-layout SIZE evidence.
 include/BASE/dropListWidget.h	pending
 include/BASE/executive.h	reviewed	The interface carries no numeric policy; the sole literal is proven class-layout SIZE evidence.
 include/BASE/font.h	reviewed	Glyph behavior, draw modes, and horizontal/vertical alignment domains are named and aligned; strict builds use enums while production uses expansion constants to keep VC4.2 declaration state neutral. Remaining literal is packed-layout SIZE evidence.
@@ -143,7 +143,7 @@ src/BASE/BORDER.cpp	reviewed	Resource-name capacity, color mask, and dispatch re
 src/BASE/BUTTON.cpp	reviewed	Private select-mode, hotkey, repeat-delay, and resource-capacity values are named; dispatch results use the shared ABI names. Repeated message setup uses a scoped expansion helper because an inline function perturbs VC4.2 CSE. Remaining zeros and ones are initialization, frame origins, booleans, or message-state resets. Non-debug sections and relocations are A/B exact.
 src/BASE/Blur.cpp	pending
 src/BASE/Bzip.cpp	pending
-src/BASE/DIMMER.cpp	pending
+src/BASE/DIMMER.cpp	reviewed	The implementation contains no policy literals; constructor zeros are empty-widget initialization and all other numerics are address/size annotations.
 src/BASE/EXEC.cpp	reviewed	Manager results, dispatch states, priority, and capacity are private named constants; dialog storage derives from sizeof(executive), and executable selection uses the shared game/editor selectors. Non-debug section bytes and ordered relocations are unchanged.
 src/BASE/FONT.cpp	reviewed	Large-font threshold, resource-name extent, full-screen clip bounds, draw modes, and alignment cases are named. Remaining zeros, ones, and twos are state booleans, clipping origins, icon-call flags, sequence steps, or midpoint arithmetic. The proven fname local identity is retained because renaming it changes VC4.2 stack slots. Non-debug sections and relocations are A/B exact.
 src/BASE/ICON.cpp	pending
