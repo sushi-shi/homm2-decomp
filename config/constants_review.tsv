@@ -34,7 +34,7 @@ include/BASE/TILESET_TYPES.h	reviewed	Named source-file storage extents plus SIZ
 include/BASE/WINMGR.h	pending
 include/BASE/WINMGR_TYPES.h	pending
 include/BASE/baseManager.h	reviewed	Named message-mask, priority, and capacity domains; zeroes are pure-virtual syntax.
-include/BASE/bitmap.h	pending
+include/BASE/bitmap.h	reviewed	Serialized bitmap-type domain and all public method parameters are named; remaining literals are packing and SIZE layout evidence.
 include/BASE/bmap2.h	pending
 include/BASE/border.h	reviewed	Public class interface contains only pure-virtual overrides and packed-layout SIZE evidence.
 include/BASE/button.h	reviewed	Public class interface contains only packed-layout SIZE evidence; dispatch-return storage widths are proven by the retail ABI.
@@ -137,7 +137,7 @@ include/SOURCE/wingraph.h	pending
 include/SOURCE/x_arena.h	pending
 include/SOURCE/x_cdtest.h	pending
 src/BASE/BASEMGR.cpp	reviewed	Only VA/VTBL evidence; initialization uses named values and NULL.
-src/BASE/BITMAP.cpp	pending
+src/BASE/BITMAP.cpp	reviewed	TU-private full-screen copy stride is named with a prefix-free value; resource lifecycle and bitmap type are explicit. Remaining zeros/ones are clipping origins, bounds, booleans, or loop initialization; allocation/free operands 21, 37, and 51 preserve retail source-line evidence. Inline width/pixel helpers consolidate repeated row-copy access. Proven constructor-local identities and the functional enum conversion are retained because equivalent renamings/spellings perturb later VC4.2 code generation.
 src/BASE/BITS.cpp	reviewed	Private shift/mask domain; remaining zero and one are direct bit arithmetic and result values.
 src/BASE/BORDER.cpp	reviewed	Resource-name capacity, color mask, and dispatch results are named; remaining zeros are initialization or drawing origins. Private enum form perturbed VC4.2 register allocation, so the two read constants are scoped expansion macros. Non-debug sections and relocations are A/B exact.
 src/BASE/BUTTON.cpp	reviewed	Private select-mode, hotkey, repeat-delay, and resource-capacity values are named; dispatch results use the shared ABI names. Repeated message setup uses a scoped expansion helper because an inline function perturbs VC4.2 CSE. Remaining zeros and ones are initialization, frame origins, booleans, or message-state resets. Non-debug sections and relocations are A/B exact.

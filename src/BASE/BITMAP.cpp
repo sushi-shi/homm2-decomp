@@ -10,7 +10,7 @@
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\BITMAP.CPP"
 
 H2_ENUM_BEGIN(BitmapConstant)
-    COPY_STRIDE = 640 // full-screen row stride assumed by CopyTo's fast path
+    COPY_STRIDE = 640 // Full-screen row stride assumed by CopyTo's fast path.
 H2_ENUM_END(BitmapConstant)
 
 VA(0x004cffc0, 0x2a)
