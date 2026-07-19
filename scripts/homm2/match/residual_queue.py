@@ -4,7 +4,6 @@
 import csv
 import json
 import os
-import re
 from pathlib import Path
 
 
@@ -13,32 +12,6 @@ IMAGE_BASE = 0x400000
 REPORT = REPO / "build/objdiff/report.json"
 SYMBOLS = REPO / "build/gen/symbol_names.csv"
 OUTPUT = REPO / "build/gen/residual_function_queue.tsv"
-VA_RE = re.compile(r"^\s*VA\(0x([0-9a-fA-F]+),")
-
-
-def source_markers(source_root):
-    markers = {}
-    for path in sorted(Path(source_root).rglob("*.cpp")):
-        lines = path.read_text(encoding="latin-1").splitlines()
-        for index, line in enumerate(lines):
-            match = VA_RE.match(line)
-            if not match:
-                continue
-            marker = ""
-            cursor = index - 1
-            while cursor >= 0 and (not lines[cursor].strip() or
-                                   lines[cursor].lstrip().startswith("//")):
-                text = lines[cursor]
-                if "@early-stop" in text:
-                    marker = "early-stop"
-                elif "@semantic" in text and not marker:
-                    marker = "semantic"
-                cursor -= 1
-            va = int(match.group(1), 16)
-            markers[va - IMAGE_BASE if va >= IMAGE_BASE else va] = marker
-    return markers
-
-
 def symbol_inventory(path):
     rows = {}
     with Path(path).open(encoding="latin-1", newline="") as stream:
@@ -49,7 +22,7 @@ def symbol_inventory(path):
     return rows
 
 
-def residual_rows(report, symbols, markers):
+def residual_rows(report, symbols):
     rows = []
     missing = []
     for unit in report["units"]:
@@ -72,7 +45,6 @@ def residual_rows(report, symbols, markers):
                 "name": function["name"],
                 "demangled": function.get("metadata", {}).get(
                     "demangled_name", function["name"]),
-                "marker": markers.get(rva, ""),
             })
     if missing:
         sample = ", ".join("%s:%s" % row for row in missing[:5])
@@ -87,8 +59,7 @@ def residual_rows(report, symbols, markers):
 def write_queue(path, rows):
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    fields = ("rank", "fuzzy", "unit", "rva", "va", "size", "marker",
-              "name", "demangled")
+    fields = ("rank", "fuzzy", "unit", "rva", "va", "size", "name", "demangled")
     with path.open("w", encoding="utf-8", newline="") as stream:
         writer = csv.DictWriter(stream, fieldnames=fields, delimiter="\t",
                                 lineterminator="\n")
@@ -103,12 +74,10 @@ def write_queue(path, rows):
 
 def main():
     report = json.loads(REPORT.read_text(encoding="utf-8"))
-    rows = residual_rows(report, symbol_inventory(SYMBOLS),
-                         source_markers(REPO / "src"))
+    rows = residual_rows(report, symbol_inventory(SYMBOLS))
     write_queue(OUTPUT, rows)
-    marked = sum(bool(row["marker"]) for row in rows)
-    print("residual queue: %d live non-exact functions, %d with prior markers -> %s" %
-          (len(rows), marked, OUTPUT.relative_to(REPO)))
+    print("residual queue: %d live non-exact functions -> %s" %
+          (len(rows), OUTPUT.relative_to(REPO)))
 
 
 if __name__ == "__main__":

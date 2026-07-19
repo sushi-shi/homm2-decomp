@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Hard gate for ``@early-stop`` raw-byte identity claims.
+"""Archived hard gate for historical ``@early-stop`` raw-byte identity claims.
 
 Some early-stop markers state that the complete instruction bytes agree and that
 only COFF relocation identity remains. Those claims use the explicit
@@ -28,7 +28,7 @@ from pathlib import Path
 from homm2.build.canonicalize_relocs import CoffFile
 
 
-REPO = Path(__file__).resolve().parents[3]
+REPO = Path(__file__).resolve().parents[2]
 VA_RE = re.compile(r"^\s*VA\(0x([0-9a-fA-F]+),\s*0x[0-9a-fA-F]+\)\s*$")
 RELOCATION_WIDTHS = {
     0x0000: 0,  # ABSOLUTE

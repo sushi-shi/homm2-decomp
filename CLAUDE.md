@@ -106,11 +106,8 @@ See `docs/data-symbol-normalization.md`, `docs/delinker-contribution-manifest.md
 
 - Exact means raw function bytes, size, and ordered relocation semantics agree after
   only the repository's reviewed target normalization.
-- `// @early-stop` is reserved for a byte-proven permitted artifact. A
-  relocation-only claim also uses `// @early-stop-reloc-only` and must pass its hard
-  gate.
-- `// @semantic` marks structurally and behaviorally complete code with a documented
-  residual. It is not exactness and never excuses missing semantics or relocations.
+- Source comments may record enduring semantic or codegen facts, but never queue state,
+  scores, retained maxima, or a claim that a live residual is complete.
 - Objdiff fuzzy percentages guide the queue but are not proof. They can hide wrong
   stack displacements and relocation fields.
 

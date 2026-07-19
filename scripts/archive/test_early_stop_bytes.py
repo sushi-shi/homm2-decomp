@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from homm2.build.assert_early_stop_bytes import (
+from scripts.archive.early_stop_bytes import (
     FunctionSpan,
     compare_masked_spans,
     is_raw_identity_claim,
