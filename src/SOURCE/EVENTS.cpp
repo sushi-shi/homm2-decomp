@@ -406,7 +406,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         "The Sphinx asks you the following riddle:\n\n'%s'\n\nYour answer?",
                         eventExtra1->riddle
                     );
-                    GetDataEntry(gText, sphinxAnswer_a, SPHINX_INPUT_LENGTH, 0, 0, 1);
+                    GetDataEntry(gText, sphinxAnswer_a, SPHINX_INPUT_LENGTH, NULL, 0, 1);
                     correctAnswer1 = 0;
                     for (eventValue1 = 0; eventValue1 < eventExtra1->answerCount; eventValue1++) {
                         if (RiddleStringsEqual(sphinxAnswer_a, eventExtra1->answers[eventValue1]))
@@ -1050,8 +1050,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     COAST_FIZZLE_WIDTH,
                     COAST_FIZZLE_HEIGHT,
                     -1,
-                    0,
-                    0
+                    NULL,
+                    NULL
                 );
                 WaitEndSample(playedSample3, -1);
                 CheckAdjacentMon(&adjacentMonster8);
@@ -2310,7 +2310,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
             EventWindow(74, 1, "", -1, 0, -1, 0, -1);
             oracleWindow = new heroWindow(0, 0, "thiefwin.bin");
-            if (oracleWindow == 0)
+            if (oracleWindow == NULL)
                 MemError();
             SetWinText(oracleWindow, ORACLE_WINDOW_TEXT_ID);
             gpTownManager->SetupThievesGuild(oracleWindow, ORACLE_THIEVES_GUILD_RANK);
@@ -2811,7 +2811,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             if (otherHero6->m_owner == giCurPlayer) {
                 HeroSwap(eventHero2, otherHero6);
             } else {
-                occupiedTown4 = 0;
+                occupiedTown4 = NULL;
                 if (otherHero6->m_locationType == HERO_TOWN_LOCATION) {
                     occupiedTown4 = gpGame->GetTown(otherHero6->m_occupiedTown);
                     occupiedTown4->m_occupyingHeroId = otherHero6->m_id;
@@ -2829,7 +2829,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     -1,
                     1
                 );
-                if (heroCombatResult3 == 0 && occupiedTown4 != 0)
+                if (heroCombatResult3 == 0 && occupiedTown4 != NULL)
                     gpGame->ClaimTown(occupiedTown4->m_id, giCurPlayer, 0);
             }
             break;
@@ -3430,8 +3430,8 @@ void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
     volatile i32 changed_i;
 
     for (i_e = 0; i_e < NEIGHBOR_COUNT; i_e++) {
-        cells_h[i_e] = 0;
-        extras_b[i_e] = 0;
+        cells_h[i_e] = NULL;
+        extras_b[i_e] = NULL;
     }
 
     erased_a = 1;
@@ -3523,7 +3523,7 @@ void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
                                    != EMPTY_INDEX)
                             extras_b[i_e] = m_mapData->Extra(cells_h[i_e]->m_extraIndex);
                         else
-                            extras_b[i_e] = 0;
+                            extras_b[i_e] = NULL;
 
                         while (extras_b[i_e]) {
                             if (extras_b[i_e]->objectIndex == frame_k
@@ -3538,7 +3538,7 @@ void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
                                        != EMPTY_INDEX)
                                 extras_b[i_e] = m_mapData->Extra(extras_b[i_e]->nextIndex);
                             else
-                                extras_b[i_e] = 0;
+                                extras_b[i_e] = NULL;
                         }
                     }
                 }
@@ -3594,7 +3594,7 @@ void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
                    != EMPTY_INDEX)
             extra_i = OD_STEER(m_mapData)->Extra(currentCell_k->m_extraIndex);
         else
-            extra_i = 0;
+            extra_i = NULL;
 
         while (extra_i) {
             if (extra_i->objectTileset != CLEARED_TILESET
@@ -3605,7 +3605,7 @@ void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
                 && OD_STEER(m_mapData)->Extra(extra_i->nextIndex)->objectIndex != EMPTY_INDEX)
                 extra_i = OD_STEER(m_mapData)->Extra(extra_i->nextIndex);
             else
-                extra_i = 0;
+                extra_i = NULL;
         }
 
         currentCell_k->m_flags |= IDX(MAP_CELL_OBJECT_SHADOW_ONLY);
@@ -3625,7 +3625,7 @@ void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
 VA(0x004aea02, 0x90)
 void advManager::HeroSwap(hero* firstHero, hero* secondHero) {
     swapManager* swapWindow = new swapManager(firstHero, secondHero);
-    if (swapWindow == 0)
+    if (swapWindow == NULL)
         MemError();
     gpExec->DoDialog(swapWindow);
     delete swapWindow;
@@ -3647,7 +3647,7 @@ i32 advManager::BarrierEvent(mapCell* cell, hero*) {
         "Runes on the arch read, \"Speak the key and you may pass.\"",
         xBarrierColor[color]
     );
-    GetDataEntry(gText, response, INPUT_LENGTH, 0, 0, 1);
+    GetDataEntry(gText, response, INPUT_LENGTH, NULL, 0, 1);
     if (StrEqNoCase(response, xPasswordStrings[passwordIndex])
         && (gpCurPlayer->m_barrierTents & (1 << color))) {
         EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, color, &eventSample);
@@ -4065,7 +4065,7 @@ void advManager::ExpansionRecruitEvent(hero* eventHero, i32 creatureType, i16* a
     tag_message dialogMessage2;
     baseManager* dialogManager = new recruitUnit(&eventHero->m_army, creatureType, availableCount);
     i32 dialogResult;
-    if (dialogManager == 0)
+    if (dialogManager == NULL)
         MemError();
     gpExec->DoDialog(dialogManager);
     delete dialogManager;
@@ -4166,7 +4166,7 @@ void advManager::TownEvent(mapCell* cell, i32 x, i32 y) {
         eventTown1->View(0);
     } else if (eventTown1->HasGarrison()) {
         defendingHero = eventTown1->m_occupyingHeroId == -1
-                            ? 0
+                            ? NULL
                             : gpGame->GetHero(eventTown1->m_occupyingHeroId);
         combatResult1 = DoCombat(
             x,
@@ -4193,7 +4193,7 @@ void advManager::TownEvent(mapCell* cell, i32 x, i32 y) {
         eventTown1->m_occupyingHeroId = gpCurPlayer->CurrentHero();
         eventTown1->View(0);
     }
-    eventTown1->GiveSpells(0);
+    eventTown1->GiveSpells(NULL);
     eventHero1->CheckLevel();
 }
 
@@ -4484,7 +4484,7 @@ void advManager::RecruitEvent(hero* eventHero, i32 creatureType, mapCell* cell) 
         new recruitUnit(&eventHero->m_army, creatureType, &availableCount15);
     i32 dialogResult;
 
-    if (dialogManager == 0)
+    if (dialogManager == NULL)
         MemError();
     gpExec->DoDialog(dialogManager);
     delete dialogManager;
@@ -5080,9 +5080,9 @@ i32 advManager::CombatMonsterEvent(
         combatResult7 = DoCombat(
             combatX,
             combatY,
-            0,
+            NULL,
             gpMonGroup,
-            0,
+            NULL,
             eventHero,
             &eventHero->m_army,
             mapX,
@@ -5096,8 +5096,8 @@ i32 advManager::CombatMonsterEvent(
             combatY,
             eventHero,
             &eventHero->m_army,
-            0,
-            0,
+            NULL,
+            NULL,
             gpMonGroup,
             mapX,
             mapY,
@@ -5397,8 +5397,8 @@ void advManager::TransferArtifacts(hero* sourceHero, hero* destinationHero) {
     i32 targetSlot;
     i32 sourceArtifactSlot;
 
-    if (sourceHero != 0) {
-        if (destinationHero == 0) {
+    if (sourceHero != NULL) {
+        if (destinationHero == NULL) {
         } else {
             for (targetSlot = 0; targetSlot < EVENT_ARTIFACT_SLOT_COUNT; targetSlot++) {
                 if (destinationHero->m_artifacts[targetSlot] == IDX(ARTIFACT_NONE)) {
@@ -5461,7 +5461,7 @@ void advManager::TransferArtifacts(hero* sourceHero, hero* destinationHero) {
 // @early-stop-reloc-only: relocation naming only.
 VA(0x004b1b50, 0x7f)
 void advManager::HeroLoses(hero* lostHero) {
-    if (lostHero == 0)
+    if (lostHero == NULL)
         return;
     {
         CompleteDraw(m_mapOriginX, m_mapOriginY, 0, 1);
@@ -5549,8 +5549,8 @@ void advManager::FizzleCenter(i32 fizzleType) {
             EVENT_FIZZLE_WIDTH,
             EVENT_FIZZLE_HEIGHT,
             fizzleStepCount,
-            0,
-            0
+            NULL,
+            NULL
         );
         gpMouseManager->ShowColorPointer();
         WaitEndSample(playedSample, -1);
@@ -5611,7 +5611,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     CreatureType creatureType_i;
     i32 creatureFlag_l;
 
-    occupiedTown_b = 0;
+    occupiedTown_b = NULL;
     eventType_g = cell->m_triggerType & MAP_TRIGGER_TYPE_MASK;
     eventResults[0] = 0;
     eventResults[1] = 0;
@@ -6314,12 +6314,12 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                     attackerLoss_c,
                     defenderLoss_k
                 );
-                if (combatResult_d != 0 && occupiedTown_b != 0) {
+                if (combatResult_d != 0 && occupiedTown_b != NULL) {
                     combatResult_d = gpPhilAI->QuickCombat(
                         &eventHero->m_army,
                         eventHero,
                         &occupiedTown_b->m_army,
-                        0,
+                        NULL,
                         1,
                         occupiedTown_b->m_id,
                         attackerLoss_c,
@@ -6327,7 +6327,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                     );
                 }
             } else {
-                if (occupiedTown_b != 0)
+                if (occupiedTown_b != NULL)
                     occupiedTown_b->m_occupyingHeroId = otherHero_e->m_id;
                 heroCombatResult_h = DoCombat(
                     x,
@@ -6342,7 +6342,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                     -1,
                     1
                 );
-                if (heroCombatResult_h == 0 && occupiedTown_b != 0)
+                if (heroCombatResult_h == 0 && occupiedTown_b != NULL)
                     gpGame->ClaimTown(occupiedTown_b->m_id, giCurPlayer, 0);
             }
             CompleteDraw(0);
@@ -6409,7 +6409,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                     &eventHero->m_army,
                     eventHero,
                     gpMonGroup,
-                    0,
+                    NULL,
                     0,
                     0,
                     pyramidBattleValue_l,
@@ -6460,7 +6460,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 &eventHero->m_army,
                 eventHero,
                 gpMonGroup,
-                0,
+                NULL,
                 0,
                 0,
                 abandonedMineValue_f,
@@ -7308,11 +7308,11 @@ i32 advManager::DoNetCombat(char* packet) {
     armyGroup* firstArmy6;
     town* combatTown[3];
 
-    firstHero29 = 0;
-    firstArmy6 = 0;
-    combatTown[0] = 0;
-    secondHero9 = 0;
-    secondArmy10 = 0;
+    firstHero29 = NULL;
+    firstArmy6 = NULL;
+    combatTown[0] = NULL;
+    secondHero9 = NULL;
+    secondArmy10 = NULL;
     ReceiveHeroTownData(
         packet,
         &remotePlayer8,
@@ -7601,16 +7601,16 @@ void advManager::SendHeroTownData(
     static i16 sourceLineBase = 0x17cc;
     char* reply;
     i32 result;
-    combatRemoteData* buffer = 0;
+    combatRemoteData* buffer = NULL;
 
     buffer = static_cast<combatRemoteData*>(H2_ALLOC(COMBAT_REMOTE_BUFFER_SIZE, 6095));
-    reply = 0;
+    reply = NULL;
     buffer->fragment = 0;
     buffer->x = static_cast<i8>(x);
     buffer->y = static_cast<i8>(y);
-    buffer->hasFirstHero = firstHero != 0;
-    buffer->hasTown = combatTown != 0;
-    buffer->hasSecondHero = secondHero != 0;
+    buffer->hasFirstHero = firstHero != NULL;
+    buffer->hasTown = combatTown != NULL;
+    buffer->hasSecondHero = secondHero != NULL;
     buffer->firstSide = static_cast<i8>(firstSide);
     buffer->secondSide = static_cast<i8>(secondSide);
     buffer->randomSeed = randomSeed;
@@ -7651,7 +7651,7 @@ void advManager::SendHeroTownData(
         &reply
     );
     if (!result)
-        ShutDown(0);
+        ShutDown(NULL);
 
     if (firstHero) {
         EVENTS_HERO_BUFFER(buffer)->fragment = IDX(REMOTE_FIRST_HERO_FIRST);
@@ -7666,7 +7666,7 @@ void advManager::SendHeroTownData(
             -1
         );
         if (!result)
-            ShutDown(0);
+            ShutDown(NULL);
         EVENTS_HERO_BUFFER(buffer)->fragment = IDX(REMOTE_FIRST_HERO_SECOND);
         memcpy(
             EVENTS_HERO_BUFFER(buffer)->data,
@@ -7683,7 +7683,7 @@ void advManager::SendHeroTownData(
             -1
         );
         if (!result)
-            ShutDown(0);
+            ShutDown(NULL);
     }
     if (secondHero) {
         EVENTS_HERO_BUFFER(buffer)->fragment = IDX(REMOTE_SECOND_HERO_FIRST);
@@ -7698,7 +7698,7 @@ void advManager::SendHeroTownData(
             -1
         );
         if (!result)
-            ShutDown(0);
+            ShutDown(NULL);
         EVENTS_HERO_BUFFER(buffer)->fragment = IDX(REMOTE_SECOND_HERO_SECOND);
         memcpy(
             EVENTS_HERO_BUFFER(buffer)->data,
@@ -7715,7 +7715,7 @@ void advManager::SendHeroTownData(
             -1
         );
         if (!result)
-            ShutDown(0);
+            ShutDown(NULL);
     }
     H2_FREE(buffer, 6184);
 }
@@ -7751,11 +7751,11 @@ void advManager::ReceiveHeroTownData(
     i32 firstOwner29;
     i32 secondOwner28;
 
-    *firstHero = 0;
-    *firstArmy = 0;
-    *combatTown = 0;
-    *secondHero = 0;
-    *secondArmy = 0;
+    *firstHero = NULL;
+    *firstArmy = NULL;
+    *combatTown = NULL;
+    *secondHero = NULL;
+    *secondArmy = NULL;
     hasFirstHero7 = hasSecondHero8 = hasTown0 = 0;
     *remotePlayer = EVENTS_REMOTE_MESSAGE(packet)->sender;
     *x = EVENTS_REMOTE_COMBAT(packet)->x;
@@ -7790,7 +7790,7 @@ void advManager::ReceiveHeroTownData(
     iCombatControlNetPos[COMBAT_ATTACKER_SIDE] = *remotePlayer;
     iCombatControlNetPos[COMBAT_DEFENDER_SIDE] = giThisNetPos;
     result7 = TransmitRemoteData(
-        0,
+        NULL,
         *remotePlayer,
         0,
         IDX(REMOTE_CONFIRM_COMMAND),
@@ -7799,7 +7799,7 @@ void advManager::ReceiveHeroTownData(
         -1
     );
     if (!result7)
-        ShutDown(0);
+        ShutDown(NULL);
 
     lastPacketTime36 = KBTickCount();
     gotFirstHeroFirst3 = 1;

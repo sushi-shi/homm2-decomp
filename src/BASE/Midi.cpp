@@ -20,7 +20,7 @@ H2_ENUM_BEGIN(MidiVolumeConstant)
     MAX_VOLUME        = 127
 H2_ENUM_END(MidiVolumeConstant)
 
-DATA(0x0051fec8) struct _MDI_DRIVER* hMDI = 0;
+DATA(0x0051fec8) struct _MDI_DRIVER* hMDI = NULL;
 DATA(0x0051fecc) i32 CurrentMidiFile = MIDI_NO_TRACK;
 DATA(0x0051fed0) u8 bGotMidi[MIDI_TRACK_COUNT] = {0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1,
                                                   1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -37,12 +37,12 @@ void soundManager::MIDIStartup(void) {
     if (gbNoSound == 0 && (m_midiStarted = 1, gbDontTryMIDI == 0)) {
         LogStr(gMidiText.startupDriver);
         for (i = 0; i < MIDI_TRACK_COUNT; i++)
-            pMIDIWrap[i] = 0;
+            pMIDIWrap[i] = NULL;
         for (i = 0; i < MIDI_TRACK_COUNT; i++)
-            hSequence[i] = 0;
+            hSequence[i] = NULL;
         m_midiReady = 1;
         LogStr(gMidiText.startupOpen);
-        i = AIL_midiOutOpen(&hMDI, 0, MIDI_MAPPER);
+        i = AIL_midiOutOpen(&hMDI, NULL, MIDI_MAPPER);
         LogInt(gMidiText.startupOpenResult, i, -999, -999, -999, -999, -999, -999);
         if (i != 0)
             m_midiReady = 0;
@@ -56,18 +56,18 @@ void soundManager::MIDIShutdown(void) {
         MIDIStop();
         LogStr(gMidiText.shutdownBegin);
         for (i = 0; i < MIDI_TRACK_COUNT; i++) {
-            if (hSequence[i] != 0)
+            if (hSequence[i] != NULL)
                 AIL_release_sequence_handle(hSequence[i]);
-            hSequence[i] = 0;
+            hSequence[i] = NULL;
         }
         LogStr(gMidiText.shutdownDriver);
         AIL_midiOutClose(hMDI);
-        hMDI = 0;
+        hMDI = NULL;
         m_midiReady = 0;
         for (i = 0; i < MIDI_TRACK_COUNT; i++) {
-            if (pMIDIWrap[i] != 0)
+            if (pMIDIWrap[i] != NULL)
                 gpResourceManager->Dispose(pMIDIWrap[i]);
-            pMIDIWrap[i] = 0;
+            pMIDIWrap[i] = NULL;
         }
         LogStr(gMidiText.shutdownComplete);
     }
@@ -89,9 +89,9 @@ void soundManager::MIDIPlay(i32 midiTrack) {
 
             char filename[16];
             sprintf(filename, gMidiText.filenameFormat, midiTrack);
-            if (hSequence[midiTrack] == 0) {
+            if (hSequence[midiTrack] == NULL) {
                 hSequence[midiTrack] = AIL_allocate_sequence_handle(hMDI);
-                if (hSequence[midiTrack] == 0)
+                if (hSequence[midiTrack] == NULL)
                     MIDIShutdown();
                 pMIDIWrap[midiTrack] = gpResourceManager->GetMIDIWrap(filename);
                 if (AIL_init_sequence(hSequence[midiTrack], pMIDIWrap[midiTrack]->m_data, 0) == 0)
@@ -114,14 +114,14 @@ void soundManager::MIDIPlay(i32 midiTrack) {
 VA(0x004d3e70, 0x108)
 inline void soundManager::MIDIStop(void) {
     if (gbNoSound == 0 && m_midiReady != 0 && CurrentMidiFile != MIDI_NO_TRACK) {
-        if (MIDIIsPlaying() && hSequence[CurrentMidiFile] != 0) {
+        if (MIDIIsPlaying() && hSequence[CurrentMidiFile] != NULL) {
             AIL_stop_sequence(hSequence[CurrentMidiFile]);
             if (gbLowMemory != 0 || bSaveMusicPosition[CurrentMidiFile] == 0) {
                 AIL_release_sequence_handle(hSequence[CurrentMidiFile]);
-                hSequence[CurrentMidiFile] = 0;
-                if (pMIDIWrap[CurrentMidiFile] != 0)
+                hSequence[CurrentMidiFile] = NULL;
+                if (pMIDIWrap[CurrentMidiFile] != NULL)
                     gpResourceManager->Dispose(pMIDIWrap[CurrentMidiFile]);
-                pMIDIWrap[CurrentMidiFile] = 0;
+                pMIDIWrap[CurrentMidiFile] = NULL;
             }
         }
         CurrentMidiFile = MIDI_NO_TRACK;
@@ -132,7 +132,7 @@ inline void soundManager::MIDIStop(void) {
 VA(0x004d3f80, 0x46)
 inline i32 soundManager::MIDIIsPlaying(void) {
     if (gbNoSound == 0 && gConfig.musicVolume != 0 && m_midiReady != 0
-        && CurrentMidiFile != MIDI_NO_TRACK && hSequence[CurrentMidiFile] != 0) {
+        && CurrentMidiFile != MIDI_NO_TRACK && hSequence[CurrentMidiFile] != NULL) {
         return AIL_sequence_status(hSequence[CurrentMidiFile]) == IDX(SEQUENCE_PLAYING);
     }
     return 0;

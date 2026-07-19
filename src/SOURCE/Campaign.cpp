@@ -357,9 +357,9 @@ void game::ShowCampaignInfo(i32 viewOnly, i32) {
     }
 
     campWin = new heroWindow(0, 0, "campaign.bin");
-    if (campWin == 0)
+    if (campWin == NULL)
         MemError();
-    trackWidget = 0;
+    trackWidget = NULL;
     for (map = 0; map < CAMPAIGN_TRACK_POINT_COUNT; ++map) {
         if (iCampaignTrackType < 4 && map >= CAMPAIGN_REGULAR_MAP_COUNT)
             continue;
@@ -387,7 +387,7 @@ void game::ShowCampaignInfo(i32 viewOnly, i32) {
                 CAMPAIGN_TRACK_ICON_COLOR,
                 1
             );
-            if (trackWidget == 0)
+            if (trackWidget == NULL)
                 MemError();
             campWin->AddWidget(trackWidget, -1);
         }
@@ -815,7 +815,7 @@ void game::InitCampaignMap(void) {
     strcpy(gMapName, m_mapFilename);
     mapHeaderResultCampaign = GetMapHeader(m_mapFilename, &m_mapHeader);
     LoadGame("origdata.bin", 1, 0);
-    InitNewGame(0);
+    InitNewGame(NULL);
 
     if (choiceBest->type == CAMPAIGN_CHOICE_ALIGNMENT) {
         playerSlotSlot = 0;
@@ -1021,7 +1021,7 @@ DATA(0x004f4f28) i16 trackXY[2][13][2] = {39,  336, 113, 336, 150, 294, 187, 336
                                           261, 378, -1,  -1,  39,  336, 113, 336, 187, 294, 187,
                                           378, 261, 336, 335, 336, 372, 294, 409, 336, 483, 294,
                                           483, 378, 557, 336, 261, 294, 261, 378};
-DATA(0x004f4f90) class heroWindow* campWin = 0;
+DATA(0x004f4f90) class heroWindow* campWin = NULL;
 DATA(0x00527ea4) i32 iCurViewSide;
 DATA(0x00527ea8) i32 iCampaignTrackType;
 DATA(0x00527eac) i32 bCampaignViewOnly;

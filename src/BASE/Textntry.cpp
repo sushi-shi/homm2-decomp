@@ -33,7 +33,7 @@ H2_ENUM_CLASS_END(InputManagerExtendedKey)
 VA(0x004d8740, 0x2d)
 textEntryWidget::textEntryWidget(void) : textWidget() {
     m_cursorPosition = 0;
-    m_icon = 0;
+    m_icon = NULL;
     m_kind = EncodeWidgetKind(WIDGET_KIND_TEXT_ENTRY);
     m_maxLength = 0;
     m_iconFrame = 0;

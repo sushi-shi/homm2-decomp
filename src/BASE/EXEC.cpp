@@ -45,9 +45,9 @@ DATA(0x0051fb20) static SExecutiveText gExecutiveText = {
 
 VA(0x004d1610, 0x10)
 executive::executive(void) {
-    m_managerListHead = 0;
-    m_managerListTail = 0;
-    m_activeManager = 0;
+    m_managerListHead = NULL;
+    m_managerListTail = NULL;
+    m_activeManager = NULL;
     m_result = 0;
 }
 
@@ -74,7 +74,7 @@ void executive::ShutDownSystem(void) {
     gpSoundManager->Close();
     baseManager* next = m_managerListHead;
     baseManager* cur;
-    while ((cur = next) != 0) {
+    while ((cur = next) != NULL) {
         next = cur->m_next;
         if (cur != gpWindowManager && cur != gpMouseManager)
             RemoveManager(cur);
@@ -99,13 +99,13 @@ i32 executive::DoDialog(class baseManager* manager) {
     i32 managerIndex;
     i32 managerCount;
     managerCount = 0;
-    dialog->m_managerListHead = 0;
-    dialog->m_managerListTail = 0;
-    dialog->m_activeManager = 0;
+    dialog->m_managerListHead = NULL;
+    dialog->m_managerListTail = NULL;
+    dialog->m_activeManager = NULL;
     listManager = m_managerListHead;
     dialog->m_result = 0;
     managerIndex = 0;
-    if (listManager != 0) {
+    if (listManager != NULL) {
         do {
             managerList[managerIndex] = listManager;
             previousList[managerIndex] = listManager->m_prev;
@@ -113,7 +113,7 @@ i32 executive::DoDialog(class baseManager* manager) {
             nextList[managerIndex] = listManager;
             managerIndex++;
             managerCount++;
-        } while (listManager != 0);
+        } while (listManager != NULL);
     }
     if (AddManager(manager, MANAGER_DEFAULT_PRIORITY) != 0)
         ShutDown(gExecutiveText.dialogManagerError1);
@@ -145,7 +145,7 @@ void executive::PrintManagerList(void) {
     sprintf(gText, gExecutiveText.managerListHeaderFormat, m_managerListHead, m_managerListTail);
     LogStr(gText);
     LogStr(gExecutiveText.managerListDivider2);
-    for (baseManager* m = m_managerListHead; m != 0; m = m->m_next) {
+    for (baseManager* m = m_managerListHead; m != NULL; m = m->m_next) {
         sprintf(gText, gExecutiveText.managerListEntryFormat, m->m_name, m, m->m_prev, m->m_next);
         LogStr(gText);
     }
@@ -154,32 +154,32 @@ void executive::PrintManagerList(void) {
 
 VA(0x004d18e0, 0xce)
 i32 executive::AddManager(class baseManager* mgr, i32 priority) {
-    if (mgr == 0)
+    if (mgr == NULL)
         return MANAGER_ERROR;
     if (priority == MANAGER_DEFAULT_PRIORITY) {
-        priority = m_managerListTail == 0 ? 0 : m_managerListTail->m_priority + 1;
+        priority = m_managerListTail == NULL ? 0 : m_managerListTail->m_priority + 1;
     }
     if (!mgr->m_active && mgr->Open(priority) != 0)
         return MANAGER_ERROR;
     baseManager* tail = m_managerListTail;
     baseManager* cur = m_managerListTail;
-    if (cur != 0) {
+    if (cur != NULL) {
         do {
             if (cur->m_priority <= priority)
                 break;
             cur = cur->m_prev;
-        } while (cur != 0);
+        } while (cur != NULL);
     }
-    if (cur == 0) {
+    if (cur == NULL) {
         mgr->m_next = m_managerListHead;
-        mgr->m_prev = 0;
-        if (m_managerListHead != 0)
+        mgr->m_prev = NULL;
+        if (m_managerListHead != NULL)
             m_managerListHead->m_prev = mgr;
         m_managerListHead = mgr;
-        if (m_managerListTail == 0)
+        if (m_managerListTail == NULL)
             m_managerListTail = mgr;
-    } else if (cur->m_next == 0) {
-        mgr->m_next = 0;
+    } else if (cur->m_next == NULL) {
+        mgr->m_next = NULL;
         mgr->m_prev = tail;
         m_managerListTail->m_next = mgr;
         m_managerListTail = mgr;
@@ -194,32 +194,32 @@ i32 executive::AddManager(class baseManager* mgr, i32 priority) {
 
 VA(0x004d19b0, 0x76)
 void executive::RemoveManager(class baseManager* mgr) {
-    if (mgr != 0) {
+    if (mgr != NULL) {
         mgr->Close();
         baseManager* next;
         baseManager* prev = mgr->m_prev;
-        if (prev == 0) {
+        if (prev == NULL) {
             baseManager* tail = m_managerListTail;
             if (m_managerListHead == tail) {
-                m_managerListTail = 0;
-                m_managerListHead = 0;
+                m_managerListTail = NULL;
+                m_managerListHead = NULL;
             } else {
                 next = mgr->m_next;
                 m_managerListHead = next;
-                next->m_prev = 0;
+                next->m_prev = NULL;
             }
-            mgr->m_prev = 0;
-            mgr->m_next = 0;
+            mgr->m_prev = NULL;
+            mgr->m_next = NULL;
             return;
         }
         next = mgr->m_next;
         prev->m_next = next;
-        if (next == 0)
+        if (next == NULL)
             m_managerListTail = prev;
         else
             next->m_prev = prev;
-        mgr->m_prev = 0;
-        mgr->m_next = 0;
+        mgr->m_prev = NULL;
+        mgr->m_next = NULL;
     }
 }
 
@@ -243,14 +243,14 @@ void executive::MainLoop(void) {
     i32 done = 0;
     i32 result;
     baseManager* manager;
-    if (m_managerListHead != 0) {
+    if (m_managerListHead != NULL) {
         gpInputManager->Flush();
         do {
             Process1WindowsMessage();
             message = gpInputManager->GetEvent();
             keepDispatching = 1;
             m_activeManager = m_managerListHead;
-            if (m_managerListHead == 0)
+            if (m_managerListHead == NULL)
                 return;
             do {
                 if (!keepDispatching)
@@ -274,7 +274,7 @@ void executive::MainLoop(void) {
                                     break;
                                 case IDX(EXECUTIVE_COMMAND_REMOVE_MANAGER):
                                     RemoveManager(m_activeManager);
-                                    m_activeManager = 0;
+                                    m_activeManager = NULL;
                                     break;
                                 case IDX(EXECUTIVE_COMMAND_RETURN_RESULT):
                                     m_result = message.payload.executive.result;
@@ -284,9 +284,9 @@ void executive::MainLoop(void) {
                             break;
                     }
                 }
-                if (m_activeManager != 0)
+                if (m_activeManager != NULL)
                     m_activeManager = m_activeManager->m_next;
-            } while (m_activeManager != 0);
+            } while (m_activeManager != NULL);
         } while (!done);
     }
 }

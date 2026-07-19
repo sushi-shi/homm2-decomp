@@ -116,7 +116,7 @@ i16 wsnet_init(void) {
             NormalDialog(cWSTextBuffer, 6, -1, -1, -1, 0, -1, 0, -1, 0);
         }
         if (gbFunctionComplete == 0)
-            ShutDown(0);
+            ShutDown(NULL);
         iWSLastMsgNumHumanPlayers = giNumHumanPlayers;
         giWaitType = IDX(WAIT_EXTRA_GUESTS);
         if (giTCPHostStatus != -1) {
@@ -164,7 +164,7 @@ i16 wsnet_init(void) {
                     "Enter the host IP address.\n(i.e. 220.415.119.223)",
                     cWSTextBuffer,
                     20,
-                    0,
+                    NULL,
                     0,
                     1
                 );
@@ -178,7 +178,7 @@ i16 wsnet_init(void) {
         sprintf(cWSTextBuffer, "Searching for host.");
         NormalDialog(cWSTextBuffer, 6, -1, -1, -1, 0, -1, 0, -1, 0);
         if (gbFunctionComplete == 0)
-            ShutDown(0);
+            ShutDown(NULL);
     }
     return 0;
 }
@@ -187,12 +187,12 @@ VA(0x00406e65, 0xd2)
 void wsnet_term(void) {
     if (sd_dg != INVALID_SOCKET)
         closesocket(sd_dg);
-    if (ppDPRcvBuffer != 0)
+    if (ppDPRcvBuffer != NULL)
         H2_FREE(ppDPRcvBuffer, 255);
-    ppDPRcvBuffer = 0;
-    if (piDPRcvBufferSize != 0)
+    ppDPRcvBuffer = NULL;
+    if (piDPRcvBufferSize != NULL)
         H2_FREE(piDPRcvBufferSize, 259);
-    piDPRcvBufferSize = 0;
+    piDPRcvBufferSize = NULL;
     WSACleanup();
     bHostFound = 0;
     sd_dg = INVALID_SOCKET;
@@ -348,7 +348,7 @@ void wsEvaluateMessage(u32l size, i32 sender) {
                                 giNetPosToDCOPos[player],
                                 IDX(NETWORK_PACKET_GUEST_ACCEPTED),
                                 0,
-                                0
+                                NULL
                             );
                             return;
                         }
@@ -363,11 +363,11 @@ void wsEvaluateMessage(u32l size, i32 sender) {
                         giNetPosToDCOPos[giNumHumanPlayers],
                         IDX(NETWORK_PACKET_GUEST_ACCEPTED),
                         0,
-                        0
+                        NULL
                     );
                     giNumHumanPlayers++;
                 } else {
-                    wsSendMessage(sender, IDX(NETWORK_PACKET_GUEST_REJECTED), 0, 0);
+                    wsSendMessage(sender, IDX(NETWORK_PACKET_GUEST_REJECTED), 0, NULL);
                 }
             }
             break;
@@ -384,7 +384,7 @@ void wsEvaluateMessage(u32l size, i32 sender) {
                 "The Host already has a game in progress and is not accepting new players."
             );
             NormalDialog(cWSTextBuffer, 1, -1, -1, -1, 0, -1, 0, -1, 0);
-            ShutDown(0);
+            ShutDown(NULL);
             break;
         case IDX(NETWORK_PACKET_GUEST_ACCEPTED):
             sprintf(cWSTextBuffer, "Waiting for other remote player to set up game.");
@@ -463,7 +463,7 @@ i32 wsWaitForHost(void) {
                 sprintf(cWSTextBuffer, "The Host is not responding.  Keep waiting?");
                 NormalDialog(cWSTextBuffer, 2, -1, -1, -1, 0, -1, 0, -1, 0);
                 if (gpWindowManager->m_dialogResult != NORMAL_DIALOG_BUTTON_FIVE)
-                    ShutDown(0);
+                    ShutDown(NULL);
                 iWSAttempts = 0;
             }
             break;

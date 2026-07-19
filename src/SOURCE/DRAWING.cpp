@@ -144,7 +144,7 @@ void combatManager::CombatMessage(char* message, i32 updateScreen, i32 retainPre
         }
 
         newlinePtr = FindToken(message, '\n');
-        if (newlinePtr != 0) {
+        if (newlinePtr != NULL) {
             *newlinePtr = 0;
             strcpy(wrappedMessage, message);
             if (newlinePtr > message && newlinePtr[-1] == '.')
@@ -205,7 +205,7 @@ void combatManager::CombatMessage(i32 messageType) {
 
     currentArmyPtr = &m_armies[m_currentArmySide][m_currentArmyIndex];
     actingMonsterType = currentArmyPtr->m_monsterType;
-    targetArmy = 0;
+    targetArmy = NULL;
     targetMonsterType = CreatureType(0);
     if (currentArmyPtr->m_targetSide >= 0 && currentArmyPtr->m_targetIndex >= 0) {
         targetArmy = &m_armies[currentArmyPtr->m_targetSide][currentArmyPtr->m_targetIndex];
@@ -215,7 +215,7 @@ void combatManager::CombatMessage(i32 messageType) {
     switch (messageType) {
         case IDX(COMBAT_MESSAGE_COMMAND_DEFAULT):
             if (HAS(currentArmyPtr->m_monster.flags.all, COMBAT_ARMY_FLAG_SHOOTER) != 0
-                && currentArmyPtr->m_monster.shots == 0 && targetArmy != 0)
+                && currentArmyPtr->m_monster.shots == 0 && targetArmy != NULL)
                 strcpy(gText, cCombatMessage[IDX(MESSAGE_TEXT_NO_SHOTS)]);
             else
                 strcpy(gText, cCombatMessage[IDX(MESSAGE_TEXT_DEFAULT)]);
@@ -250,13 +250,13 @@ void combatManager::CombatMessage(i32 messageType) {
             );
             break;
         case IDX(COMBAT_MESSAGE_COMMAND_OPTIONS):
-            if (m_heroes[m_currentSide] != 0 && m_heroes[m_currentSide]->m_isCaptain != 0)
+            if (m_heroes[m_currentSide] != NULL && m_heroes[m_currentSide]->m_isCaptain != 0)
                 strcpy(gText, cCombatMessage[IDX(MESSAGE_TEXT_CAPTAIN_OPTIONS)]);
             else
                 strcpy(gText, cCombatMessage[IDX(MESSAGE_TEXT_HERO_OPTIONS)]);
             break;
         case IDX(COMBAT_MESSAGE_COMMAND_OPPOSING_OPTIONS):
-            if (m_heroes[1 - m_currentSide] != 0 && m_heroes[1 - m_currentSide]->m_isCaptain != 0)
+            if (m_heroes[1 - m_currentSide] != NULL && m_heroes[1 - m_currentSide]->m_isCaptain != 0)
                 strcpy(gText, cCombatMessage[IDX(MESSAGE_TEXT_OPPOSING_CAPTAIN)]);
             else
                 strcpy(gText, cCombatMessage[IDX(MESSAGE_TEXT_OPPOSING_HERO)]);
@@ -695,7 +695,7 @@ void combatManager::UpdateMouseGrid(i32 hexIndex, i32 forceUpdate) {
     if (m_mouseGridHex == hexIndex)
         return;
 
-    if (m_mouseGridBuffer == 0)
+    if (m_mouseGridBuffer == NULL)
         m_mouseGridBuffer =
             new bitmap(BITMAP_TYPE_NONE, COMBAT_MOUSE_HEX_WIDTH, COMBAT_MOUSE_HEX_HEIGHT);
 
@@ -873,8 +873,8 @@ void combatManager::DrawFrame(
                     &m_heroLimits[side5],
                     1,
                     0,
-                    0,
-                    0
+                    NULL,
+                    NULL
                 );
                 gbReturnAfterComputeExtent = false;
                 gbComputeExtent = false;
@@ -899,8 +899,8 @@ void combatManager::DrawFrame(
                     &m_heroOverlayLimits[side5],
                     1,
                     0,
-                    0,
-                    0
+                    NULL,
+                    NULL
                 );
                 gbReturnAfterComputeExtent = false;
                 gbComputeExtent = false;
@@ -961,7 +961,7 @@ void combatManager::DrawFrame(
     }
 
     for (row = 0; row < IDX(DRAW_LAYER_COUNT); row++) {
-        if (row == IDX(DRAW_RIGHT_HERO_LAYER) && m_heroes[1] != 0) {
+        if (row == IDX(DRAW_RIGHT_HERO_LAYER) && m_heroes[1] != NULL) {
             m_heroIcons[1]->CombatClipDrawToBuffer(
                 ((m_heroes[1]->m_isCaptain ? -1 : 0)
                  & (COMBAT_HERO_RIGHT_ALT_X - COMBAT_HERO_RIGHT_X))
@@ -975,8 +975,8 @@ void combatManager::DrawFrame(
                 &m_heroLimits[1],
                 1,
                 0,
-                0,
-                0
+                NULL,
+                NULL
             );
             m_heroOverlayIcons[1]->CombatClipDrawToBuffer(
                 COMBAT_HERO_RIGHT_X,
@@ -985,12 +985,12 @@ void combatManager::DrawFrame(
                 &m_heroOverlayLimits[1],
                 1,
                 0,
-                0,
-                0
+                NULL,
+                NULL
             );
         }
 
-        if (row == IDX(DRAW_LEFT_HERO_LAYER) && m_heroes[0] != 0) {
+        if (row == IDX(DRAW_LEFT_HERO_LAYER) && m_heroes[0] != NULL) {
             m_heroIcons[0]->CombatClipDrawToBuffer(
                 COMBAT_HERO_LEFT_X,
                 COMBAT_HERO_LEFT_Y,
@@ -1000,8 +1000,8 @@ void combatManager::DrawFrame(
                 &m_heroLimits[0],
                 0,
                 0,
-                0,
-                0
+                NULL,
+                NULL
             );
             m_heroOverlayIcons[0]->CombatClipDrawToBuffer(
                 COMBAT_HERO_LEFT_X,
@@ -1010,8 +1010,8 @@ void combatManager::DrawFrame(
                 &m_heroOverlayLimits[0],
                 0,
                 0,
-                0,
-                0
+                NULL,
+                NULL
             );
         }
 
@@ -1032,8 +1032,8 @@ void combatManager::DrawFrame(
                 &m_catapultLimits,
                 0,
                 0,
-                0,
-                0
+                NULL,
+                NULL
             );
         }
         if (m_inCastleCombat != 0 && row == IDX(DRAW_WALL_TOP_LAYER)
@@ -1045,8 +1045,8 @@ void combatManager::DrawFrame(
                 &m_upperWallLimits,
                 0,
                 0,
-                0,
-                0
+                NULL,
+                NULL
             );
         }
         if (m_inCastleCombat != 0 && row == IDX(DRAW_WALL_MIDDLE_LAYER)
@@ -1058,8 +1058,8 @@ void combatManager::DrawFrame(
                 &m_middleWallLimits,
                 0,
                 0,
-                0,
-                0
+                NULL,
+                NULL
             );
         }
         if (m_inCastleCombat != 0 && row == IDX(DRAW_GATE_LAYER)) {
@@ -1070,8 +1070,8 @@ void combatManager::DrawFrame(
                 &m_gateLimits,
                 0,
                 0,
-                0,
-                0
+                NULL,
+                NULL
             );
         }
 
@@ -1173,8 +1173,8 @@ void combatManager::DrawFrame(
                             &m_hexCells[hexIndex6].m_limits[0],
                             0,
                             0,
-                            0,
-                            0
+                            NULL,
+                            NULL
                         );
                     }
                 }
@@ -1251,7 +1251,7 @@ void combatManager::DrawFrame(
                 goto endRow;
         drawMoat:
             m_combatIcons[IDX(COMBAT_ICON_MOAT)]
-                ->CombatClipDrawToBuffer(0, 0, row, &m_moatLimits[row], 0, 0, 0, 0);
+                ->CombatClipDrawToBuffer(0, 0, row, &m_moatLimits[row], 0, 0, NULL, NULL);
             m_hexCells[moatCell[row] - 1].DrawOccupant(COMBAT_DRAW_ALL_OCCUPANTS, 1);
             m_hexCells[moatCell[row]].DrawOccupant(COMBAT_DRAW_ALL_OCCUPANTS, 1);
             m_hexCells[moatCell[row] + 1].DrawOccupant(COMBAT_DRAW_ALL_OCCUPANTS, 1);
@@ -1435,8 +1435,8 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
         &m_smallViewLimits,
         0,
         0,
-        0,
-        0
+        NULL,
+        NULL
     );
     viewX += COMBAT_SMALL_VIEW_INSET_X;
     if (drawn6 != 0) {

@@ -613,7 +613,7 @@ i32 game::GetMineId(i32 col, i32 row) {
 VA(0x00471d89, 0x12e)
 void GenerateStandardFileName(char* source, char* destination) {
     char* extension = FindLastToken(source, '.');
-    if (extension == 0) {
+    if (extension == NULL) {
         strcpy(destination, source);
         return;
     }
@@ -780,7 +780,7 @@ i32 game::SaveGame(char* filename, i32 generateName, i8 expansionFormat) {
     for (indexFile = 1; indexFile < iMaxMapExtra; indexFile++) {
         write(fileInfo, markerBuffer, 4);
         write(fileInfo, pwSizeOfMapExtra + indexFile, 2);
-        if (ppMapExtra[indexFile] != 0)
+        if (ppMapExtra[indexFile] != NULL)
             write(fileInfo, ppMapExtra[indexFile], pwSizeOfMapExtra[indexFile]);
         else
             write(fileInfo, emptyPayload, pwSizeOfMapExtra[indexFile]);
@@ -1263,7 +1263,7 @@ void game::NewMap(char* filename) {
     i32 resource13;
 
     extension0 = FindLastToken(gMapName, '.');
-    if (extension0 != 0 && StrEqNoCase(extension0 + 1, "MX2"))
+    if (extension0 != NULL && StrEqNoCase(extension0 + 1, "MX2"))
         xIsExpansionMap = 1;
     if (xIsExpansionMap)
         gTownEligibleBuildMask[IDX(FACTION_NECROMANCER)] |= 4;
@@ -1592,7 +1592,7 @@ void game::NewMap(char* filename) {
         if (gbInCampaign && player2 == 0)
             m_players[player2].m_evilInterface = m_campaignType == 1;
         for (townIndex9 = 0; townIndex9 < gpGame->m_players[player2].m_townCount; townIndex9++)
-            GetCastle(gpGame->m_players[player2].m_townIds[townIndex9])->GiveSpells(0);
+            GetCastle(gpGame->m_players[player2].m_townIds[townIndex9])->GiveSpells(NULL);
         gpGame->m_players[player2].m_minimumHeroCount = gpGame->m_players[player2].m_heroCount;
     }
     gpPhilAI->GetGameAIVars();
@@ -2103,8 +2103,8 @@ void game::RandomizeEvents(void) {
                     if (cell2->m_extraIndex != 0)
                         extra15 = m_worldMap.Extra(cell2->m_extraIndex);
                     else
-                        extra15 = 0;
-                    while (upperCount < 5 && extra15 != 0) {
+                        extra15 = NULL;
+                    while (upperCount < 5 && extra15 != NULL) {
                         if (extra15->objectIndex != IDX(MAPCELL_SPRITE_NONE)
                             && !extra15->objectLayerBit1) {
                             upperTilesets29[upperCount] = extra15->objectTileset;
@@ -2114,7 +2114,7 @@ void game::RandomizeEvents(void) {
                         if (extra15->nextIndex != 0)
                             extra15 = m_worldMap.Extra(extra15->nextIndex);
                         else
-                            extra15 = 0;
+                            extra15 = NULL;
                     }
                     below0 = m_worldMap.GetCell(xPos2, yPos19 + 1);
                     if (!below0->m_objectLayerBit1) {
@@ -2125,8 +2125,8 @@ void game::RandomizeEvents(void) {
                     if (below0->m_extraIndex != 0)
                         extra15 = m_worldMap.Extra(below0->m_extraIndex);
                     else
-                        extra15 = 0;
-                    while (lowerCount16 < 5 && extra15 != 0) {
+                        extra15 = NULL;
+                    while (lowerCount16 < 5 && extra15 != NULL) {
                         if (extra15->objectIndex != IDX(MAPCELL_SPRITE_NONE)
                             && !extra15->objectLayerBit1) {
                             lowerTilesets4[lowerCount16] = extra15->objectTileset;
@@ -2136,7 +2136,7 @@ void game::RandomizeEvents(void) {
                         if (extra15->nextIndex != 0)
                             extra15 = m_worldMap.Extra(extra15->nextIndex);
                         else
-                            extra15 = 0;
+                            extra15 = NULL;
                     }
                     for (randomValue7 = 0; randomValue7 < upperCount; randomValue7++) {
                         for (j9 = 0; lowerCount16 > j9; j9++) {
@@ -2420,7 +2420,7 @@ game::ViewSpells(hero* spellHero, i32 spellType, i32 (*callback)(tag_message&), 
         m_viewSpellsTop[1] = 0;
         m_viewSpellsCount[1] = spellHero->GetNumSpells(1);
         m_viewSpellsWindow = new heroWindow(86, 87, const_cast<char*>("spellwin.bin"));
-        if (m_viewSpellsWindow == 0)
+        if (m_viewSpellsWindow == NULL)
             MemError();
         if (spellType != 2) {
             message.type = MESSAGE_WIDGET;
@@ -2871,7 +2871,7 @@ void game::ViewArmy(
     m_viewArmyWindow->BroadcastMessage(message6);
 
     char* details9 = static_cast<char*>(H2_ALLOC(550, 3684));
-    i32 morale2 = theGroup ? theGroup->GetMorale(theHero, castle, 0) : 0;
+    i32 morale2 = theGroup ? theGroup->GetMorale(theHero, castle, NULL) : 0;
     if (HAS(monster8->flags.all, MONSTER_FLAGS_NO_MORALE))
         morale2 = 0;
 
@@ -3369,7 +3369,7 @@ void game::NextPlayer(void) {
             gbThisNetGotAdventureControl = false;
             i32 remotePlayer = gbGamePosToNetPos[giCurPlayer];
             if (!gpGame->TransmitSaveGame(remotePlayer, 0, 0))
-                ShutDown(0);
+                ShutDown(NULL);
         }
         if (giBottomViewOverride == 6)
             giBottomViewOverride = 0;
@@ -4033,8 +4033,8 @@ void game::ConvertObject(
                     && WORLDMAP->Extra(cell->m_extraIndex)->objectIndex != static_cast<u8>(-1))
                     extra = WORLDMAP->Extra(cell->m_extraIndex);
                 else
-                    extra = 0;
-                while (extra != 0) {
+                    extra = NULL;
+                while (extra != NULL) {
                     if (extra->objectTileset == IDX(oldTileset)
                         && extra->objectIndex >= oldFirstIndex
                         && extra->objectIndex <= oldLastIndex) {
@@ -4046,7 +4046,7 @@ void game::ConvertObject(
                         && WORLDMAP->Extra(extra->nextIndex)->objectIndex != static_cast<u8>(-1))
                         extra = WORLDMAP->Extra(extra->nextIndex);
                     else
-                        extra = 0;
+                        extra = NULL;
                 }
 
                 if (cell->m_overlayIndex != static_cast<u8>(-1)
@@ -4061,8 +4061,8 @@ void game::ConvertObject(
                     && WORLDMAP->Extra(cell->m_extraIndex)->overlayIndex != static_cast<u8>(-1))
                     extra = WORLDMAP->Extra(cell->m_extraIndex);
                 else
-                    extra = 0;
-                while (extra != 0) {
+                    extra = NULL;
+                while (extra != NULL) {
                     if (extra->overlayTileset == IDX(oldTileset)
                         && extra->overlayIndex >= oldFirstIndex
                         && extra->overlayIndex <= oldLastIndex) {
@@ -4074,7 +4074,7 @@ void game::ConvertObject(
                         && WORLDMAP->Extra(extra->nextIndex)->overlayIndex != static_cast<u8>(-1))
                         extra = WORLDMAP->Extra(extra->nextIndex);
                     else
-                        extra = 0;
+                        extra = NULL;
                 }
             }
         }
@@ -4788,7 +4788,7 @@ i32 game::ExperienceValueOfStack(armyGroup* group, hero* h) {
             exp += gMonsterDatabase[group->m_creatureTypes[i]].hitPoints * group->m_quantities[i];
         }
     }
-    if (h != 0)
+    if (h != NULL)
         exp += EXPERIENCE_HERO_PRESENCE_BONUS;
     return exp;
 }
@@ -4796,7 +4796,7 @@ i32 game::ExperienceValueOfStack(armyGroup* group, hero* h) {
 VA(0x00480ff9, 0x126)
 i32 game::GetLuck(hero* h, class army*, town* castle) {
     i32 luck;
-    if (h == 0)
+    if (h == NULL)
         return NEUTRAL;
     luck = NEUTRAL;
     if (h->HasArtifact(ARTIFACT_RABBIT_FOOT))
@@ -4818,7 +4818,7 @@ i32 game::GetLuck(hero* h, class army*, town* castle) {
         luck = MAXIMUM;
     if (h->HasArtifact(ARTIFACT_BATTLE_GARB))
         luck = MAXIMUM;
-    if (castle != 0 && castle->m_type == IDX(FACTION_SORCERESS)
+    if (castle != NULL && castle->m_type == IDX(FACTION_SORCERESS)
         && (castle->m_buildings & IDX(TOWN_BUILDING_RAINBOW))) {
         luck += RAINBOW_BONUS;
     }
@@ -4933,11 +4933,11 @@ i32 game::HasLateOverlay(i32 col, i32 row) {
     mapCell* cell = WORLDMAP->Row(row) + col;
     if (cell->m_drawOverlayOnTop)
         return 1;
-    mapCellExtra* extra = cell->m_extraIndex ? WORLDMAP->Extra(cell->m_extraIndex) : 0;
+    mapCellExtra* extra = cell->m_extraIndex ? WORLDMAP->Extra(cell->m_extraIndex) : NULL;
     while (extra) {
         if (extra->drawOverlayOnTop)
             return 1;
-        extra = extra->nextIndex ? WORLDMAP->Extra(extra->nextIndex) : 0;
+        extra = extra->nextIndex ? WORLDMAP->Extra(extra->nextIndex) : NULL;
     }
     return 0;
 }
@@ -4948,11 +4948,11 @@ void game::ConvertFlagToLateOverlay(i32 col, i32 row) {
     mapCell* cell = WORLDMAP->Row(row) + col;
     if (cell->m_overlayTileset == TILESET_FLAG)
         cell->m_drawOverlayOnTop = 1;
-    mapCellExtra* extra = cell->m_extraIndex ? WORLDMAP->Extra(cell->m_extraIndex) : 0;
+    mapCellExtra* extra = cell->m_extraIndex ? WORLDMAP->Extra(cell->m_extraIndex) : NULL;
     while (extra) {
         if (extra->overlayTileset == TILESET_FLAG)
             extra->drawOverlayOnTop = 1;
-        extra = extra->nextIndex ? WORLDMAP->Extra(extra->nextIndex) : 0;
+        extra = extra->nextIndex ? WORLDMAP->Extra(extra->nextIndex) : NULL;
     }
 }
 
@@ -4962,11 +4962,11 @@ i32 game::HasObjectTilesetIndex(i32 col, i32 row, i32 tileset, i32 index) {
     mapCell* cell = WORLDMAP->Row(row) + col;
     if (cell->m_objectTileset == tileset && cell->m_objectIndex == index)
         return 1;
-    mapCellExtra* extra = cell->m_extraIndex ? WORLDMAP->Extra(cell->m_extraIndex) : 0;
+    mapCellExtra* extra = cell->m_extraIndex ? WORLDMAP->Extra(cell->m_extraIndex) : NULL;
     while (extra) {
         if (extra->objectTileset == tileset && extra->objectIndex == index)
             return 1;
-        extra = extra->nextIndex ? WORLDMAP->Extra(extra->nextIndex) : 0;
+        extra = extra->nextIndex ? WORLDMAP->Extra(extra->nextIndex) : NULL;
     }
     return 0;
 }
@@ -4977,11 +4977,11 @@ void game::ConvertAllToLateOverlay(i32 col, i32 row) {
     mapCell* cell = WORLDMAP->Row(row) + col;
     if (cell->m_overlayIndex != IDX(MAPCELL_SPRITE_NONE))
         cell->m_drawOverlayOnTop = 1;
-    mapCellExtra* extra = cell->m_extraIndex ? WORLDMAP->Extra(cell->m_extraIndex) : 0;
+    mapCellExtra* extra = cell->m_extraIndex ? WORLDMAP->Extra(cell->m_extraIndex) : NULL;
     while (extra) {
         if (extra->overlayIndex != IDX(MAPCELL_SPRITE_NONE))
             extra->drawOverlayOnTop = 1;
-        extra = extra->nextIndex ? WORLDMAP->Extra(extra->nextIndex) : 0;
+        extra = extra->nextIndex ? WORLDMAP->Extra(extra->nextIndex) : NULL;
     }
 }
 
@@ -5230,7 +5230,7 @@ void game::SetupTowns(void) {
             }
         }
         H2_FREE(ppMapExtra[extraIndex], 6375);
-        ppMapExtra[extraIndex] = 0;
+        ppMapExtra[extraIndex] = NULL;
     }
 }
 
@@ -5409,7 +5409,7 @@ void game::ProcessOnMapHeroes(void) {
                             );
                         }
                         H2_FREE(ppMapExtra[extraIndex0], 6604);
-                        ppMapExtra[extraIndex0] = 0;
+                        ppMapExtra[extraIndex0] = NULL;
                     }
                 }
             }
@@ -5477,7 +5477,7 @@ void game::CheckHeroConsistency(void) {
                                 mapHero3->m_y,
                                 mapHero3->m_locationType,
                                 mapHero3->m_occupiedTown,
-                                0,
+                                NULL,
                                 1
                             );
                         } else {
@@ -5560,13 +5560,13 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
     i32 done;
 
     gpAdvManager->TrimLoopingSounds(4);
-    header = 0;
-    reply = 0;
-    transmitData = 0;
-    fileData = 0;
+    header = NULL;
+    reply = NULL;
+    transmitData = NULL;
+    fileData = NULL;
     success = 0;
     result = 0;
-    acknowledged = 0;
+    acknowledged = NULL;
     oldTrack = -1;
 
     samplesReady = gpSoundManager->m_samplesReady;
@@ -5633,7 +5633,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
         header[3] = player;
         result = TransmitAndWait(reinterpret_cast<char*>(header), remotePlayer, 16, 1, 2, &reply);
         if (!result)
-            ShutDown(0);
+            ShutDown(NULL);
 
         packetCount = (fileSize - 1) / 200 + 1;
         batchCount = (packetCount - 1) / 100 + 1;
@@ -5669,7 +5669,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
                             -1
                         );
                         if (!result)
-                            ShutDown(0);
+                            ShutDown(NULL);
                     }
                 }
                 LogStr(const_cast<char*>("PreWait"));
@@ -5678,7 +5678,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
                     TransmitAndWait(reinterpret_cast<char*>(header), remotePlayer, 2, 4, 5, &reply);
                 LogStr(const_cast<char*>("PostWait"));
                 if (!result)
-                    ShutDown(0);
+                    ShutDown(NULL);
                 for (packet = 0; packetsInBatch > packet; packet++) {
                     if (reinterpret_cast<RemoteMessage*>(reply)->payload[packet] > 0)
                         acknowledged[batch * 100 + packet] = 1;
@@ -5690,9 +5690,9 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
                 }
             }
         }
-        result = TransmitRemoteData(0, remotePlayer, 0, 6, 1, 1, -1);
+        result = TransmitRemoteData(NULL, remotePlayer, 0, 6, 1, 1, -1);
         if (!result)
-            ShutDown(0);
+            ShutDown(NULL);
         success = 1;
     }
 
@@ -5792,14 +5792,14 @@ i32 game::ReceiveSaveGame(
     AiPrint(const_cast<char*>("Receive Start - Getting Data"));
     gpAdvManager->TrimLoopingSounds(4);
 
-    ackBuffer = 0;
-    incomingData = 0;
-    decodedData = 0;
-    packet = 0;
+    ackBuffer = NULL;
+    incomingData = NULL;
+    decodedData = NULL;
+    packet = NULL;
     file = 0;
     finished = 0;
     unused20819 = 0;
-    received = 0;
+    received = NULL;
     success = 0;
     oldTrack = -1;
 
@@ -5814,10 +5814,10 @@ i32 game::ReceiveSaveGame(
     gpSoundManager->m_samplesReady = samplesReady;
 
     LogStr(const_cast<char*>("Begin Transmit Init Confirm"));
-    result = TransmitRemoteData(0, remotePlayer, 0, 2, 1, 1, -1);
+    result = TransmitRemoteData(NULL, remotePlayer, 0, 2, 1, 1, -1);
     LogStr(const_cast<char*>("End Transmit Init Confirm"));
     if (!result)
-        ShutDown(0);
+        ShutDown(NULL);
 
     received = static_cast<char*>(H2_ALLOC(5000, 7008));
     memset(received, 0, 5000);
@@ -5847,7 +5847,7 @@ i32 game::ReceiveSaveGame(
             if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE)
                 lastPacketTime = KBTickCount();
             else
-                ShutDown(0);
+                ShutDown(NULL);
         }
 
         packet = reinterpret_cast<RemoteMessage*>(GetRemoteData(1));
@@ -5887,7 +5887,7 @@ i32 game::ReceiveSaveGame(
                         -1
                     );
                     if (!result)
-                        ShutDown(0);
+                        ShutDown(NULL);
                     break;
                 case 6:
                     finished = 1;
@@ -6259,9 +6259,9 @@ void CreateDiffFile(
     i32 oldFile17;
 
     startTime11 = KBTickCount();
-    oldData13 = 0;
-    joinData29 = 0;
-    diffData6 = 0;
+    oldData13 = NULL;
+    joinData29 = NULL;
+    diffData6 = NULL;
     oldSize37 = 0;
     joinSize36 = 0;
     diffSize29 = 0;
@@ -6373,11 +6373,11 @@ void CreateDiffFile(
     write(joinFile1, joinData29, joinSize36);
     close(joinFile1);
 
-    if (oldData13 != 0)
+    if (oldData13 != NULL)
         H2_FREE(oldData13, 7687);
-    if (joinData29 != 0)
+    if (joinData29 != NULL)
         H2_FREE(joinData29, 7689);
-    if (diffData6 != 0)
+    if (diffData6 != NULL)
         H2_FREE(diffData6, 7691);
     return;
 }
@@ -6386,9 +6386,9 @@ void CreateDiffFile(
 VA(0x00485107, 0x3ce)
 void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
     DATA(0x004f7bc4) static i16 createJoinFileSourceLineBase = 0x1e0f;
-    u8* oldData13 = 0;
-    u8* diffData5 = 0;
-    u8* joinData9 = 0;
+    u8* oldData13 = NULL;
+    u8* diffData5 = NULL;
+    u8* joinData9 = NULL;
     i32 joinSize37 = 0;
     i32 diffSize1;
     i32 copyLength9;
@@ -6618,7 +6618,7 @@ EventExtra* GetMapEvent(i32 x, i32 y) {
             && ev->players[PlayerEventByte(giCurPlayer)] != 0)
             return ev;
     }
-    return 0;
+    return NULL;
 }
 
 // @semantic: compiler-shape residual.

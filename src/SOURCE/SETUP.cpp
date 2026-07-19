@@ -62,7 +62,7 @@ i32 game::SetupCampaignGame(void) {
 VA(0x00410ebf, 0x141)
 i32 game::SetupBaud(void) {
     heroWindow* window = new heroWindow(WINDOW_X, WINDOW_Y, "stpbaud.bin");
-    if (window == 0)
+    if (window == NULL)
         MemError();
     gpWindowManager->DoDialog(window, SetupBaudHandler, 0);
     delete window;
@@ -93,7 +93,7 @@ i32 game::SetupComPort(void) {
 
     LogStr("SCP 1");
     heroWindow* setupWindow = new heroWindow(WINDOW_X, WINDOW_Y, "stpcom.bin");
-    if (setupWindow == 0)
+    if (setupWindow == NULL)
         MemError();
     LogStr("SCP 2");
     gpWindowManager->DoDialog(setupWindow, SetupComPortHandler, 0);
@@ -145,7 +145,7 @@ i32 game::SetupHotSeatGame(void) {
     i32 ix;
 
     heroWindow* window = new heroWindow(WINDOW_X, WINDOW_Y, "stphotst.bin");
-    if (window == 0)
+    if (window == NULL)
         MemError();
     gpWindowManager->DoDialog(window, SetupHotSeatGameHandler, 0);
     delete window;
@@ -191,7 +191,7 @@ VA(0x00411438, 0x127)
 i32 game::SetupNetworkGame(void) {
     tag_message message;
     heroWindow* window = new heroWindow(WINDOW_X, WINDOW_Y, "stpnet.bin");
-    if (window == 0)
+    if (window == NULL)
         MemError();
 
     if (gbNoCDRom != 0) {
@@ -226,7 +226,7 @@ i32 game::SetupNetworkGame2(void) {
     i32 result;
 
     heroWindow* window = new heroWindow(WINDOW_X, WINDOW_Y, "stpnet2.bin");
-    if (window == 0)
+    if (window == NULL)
         MemError();
 
     memset(&osInfo, 0, sizeof(osInfo));
@@ -294,7 +294,7 @@ i32 game::SetupModemGame(void) {
         else
             window = new heroWindow(WINDOW_X, WINDOW_Y, "stpmcfg.bin");
     }
-    if (window == 0)
+    if (window == NULL)
         MemError();
 
     LogStr("SMC 2");
@@ -327,7 +327,7 @@ i32 game::SetupModemGame(void) {
                     "Please enter the telephone number.",
                     numbuf,
                     TELEPHONE_ENTRY_LENGTH,
-                    0,
+                    NULL,
                     0,
                     1
                 );
@@ -356,7 +356,7 @@ i32 game::SetupMultiPlayerGame(void) {
     i32 continueFlag;
 
     heroWindow* window = new heroWindow(WINDOW_X, WINDOW_Y, "stpmp.bin");
-    if (window == 0)
+    if (window == NULL)
         MemError();
 
     if (gbNoCDRom != 0) {
@@ -504,7 +504,7 @@ i32 game::SetupGame(void) {
     }
 
     window = new heroWindow(WINDOW_X, WINDOW_Y, "stpnewgm.bin");
-    if (window == 0)
+    if (window == NULL)
         MemError();
 
     if (gbNoCDRom != 0) {
@@ -528,7 +528,7 @@ i32 game::SetupGame(void) {
         case 2:
             if (giSetupGameType == OLD_MAIN_SETUP_LOAD) {
                 window = new heroWindow(WINDOW_X, WINDOW_Y, "x_loadcm.bin");
-                if (window == 0)
+                if (window == NULL)
                     MemError();
                 gpWindowManager->DoDialog(window, ExpLoadCampaignHandler, 0);
                 delete window;
@@ -547,7 +547,7 @@ i32 game::SetupGame(void) {
                 }
             } else {
                 window = new heroWindow(WINDOW_X, WINDOW_Y, "x_loadcm.bin");
-                if (window == 0)
+                if (window == NULL)
                     MemError();
                 gpWindowManager->DoDialog(window, ExpLoadCampaignHandler, 0);
                 delete window;
@@ -630,7 +630,7 @@ i32 game::PickLoadGame(void) {
         sprintf(filePattern_4, "*.GM%d", giNumHumanPlayers);
     } else {
         window_27 = new heroWindow(WINDOW_X, WINDOW_Y, "x_mapmnu.bin");
-        if (window_27 == 0)
+        if (window_27 == NULL)
             MemError();
         gpWindowManager->DoDialog(window_27, ExpStdGameHandler, 0);
         delete window_27;
@@ -660,7 +660,7 @@ i32 game::PickLoadGame(void) {
         gcGamePath,
         filePattern_4
     );
-    if (requester_11 == 0)
+    if (requester_11 == NULL)
         MemError();
     dialogResult_18 = gpExec->DoDialog(requester_11);
     if (dialogResult_18 == FILE_REQUESTER_OK) {

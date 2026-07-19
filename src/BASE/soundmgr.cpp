@@ -65,7 +65,7 @@ void soundManager::ValidatePreviousPosition(i32 track) {
         return;
     strcpy(buf, CDPreviousPosition[track]);
     cur = FindToken(buf, ':');
-    if (cur != 0)
+    if (cur != NULL)
         *cur = 0;
     if (atoi(buf) != track)
         CDPreviousPosition[track][0] = 0;
@@ -81,12 +81,12 @@ void soundManager::CDStop(void) {
     if (m_cdReady == 0)
         return;
     wsprintfA(CommandString, "stop CD wait");
-    nMCIError = mciSendStringA(CommandString, lpszReturnString, 0xFF, 0);
+    nMCIError = mciSendStringA(CommandString, lpszReturnString, 0xFF, NULL);
     if (nMCIError != 0)
         HandleMCIError(nMCIError, CommandString);
     if (stricmp(lpszReturnString, "stopped") != 0 && m_currentTrack >= 0) {
         wsprintfA(CommandString, "status CD position");
-        nMCIError = mciSendStringA(CommandString, position, sizeof(position), 0);
+        nMCIError = mciSendStringA(CommandString, position, sizeof(position), NULL);
         if (nMCIError != 0)
             HandleMCIError(nMCIError, CommandString);
         strcpy(CDPreviousPosition[m_currentTrack], position);
@@ -104,7 +104,7 @@ i32 soundManager::CDIsPlaying(void) {
     if (m_cdReady == 0)
         return 0;
     wsprintfA(CommandString, "status CD mode");
-    nMCIError = mciSendStringA(CommandString, lpszReturnString, 0xFF, 0);
+    nMCIError = mciSendStringA(CommandString, lpszReturnString, 0xFF, NULL);
     if (nMCIError != 0)
         HandleMCIError(nMCIError, CommandString);
     return stricmp(lpszReturnString, "playing") == 0;
@@ -123,7 +123,7 @@ void soundManager::CDStartup(void) {
     if (gbDontTryRedbook != 0)
         return;
     wsprintfA(CommandString, "open %c: type cdaudio alias CD shareable", gcAnimPath[0]);
-    nMCIError = mciSendStringA(CommandString, lpszReturnString, 0xFF, 0);
+    nMCIError = mciSendStringA(CommandString, lpszReturnString, 0xFF, NULL);
     if (nMCIError != 0) {
         m_cdReady = 0;
         gConfig.mciError = 1;
@@ -141,11 +141,11 @@ void soundManager::CDShutdown(void) {
     if (m_cdReady == 0)
         return;
     wsprintfA(CommandString, "stop CD");
-    nMCIError = mciSendStringA(CommandString, lpszReturnString, 0xFF, 0);
+    nMCIError = mciSendStringA(CommandString, lpszReturnString, 0xFF, NULL);
     if (nMCIError != 0)
         HandleMCIError(nMCIError, CommandString);
     wsprintfA(CommandString, "close CD");
-    nMCIError = mciSendStringA(CommandString, lpszReturnString, 0xFF, 0);
+    nMCIError = mciSendStringA(CommandString, lpszReturnString, 0xFF, NULL);
     if (nMCIError != 0)
         HandleMCIError(nMCIError, CommandString);
 }
@@ -207,16 +207,16 @@ void soundManager::CDPlay(i32 track, i32 resume, i32 volume, i32 restart) {
     ServiceSound();
     t1 = KBTickCount();
     wsprintfA(CommandString, "set CD time format tmsf");
-    nMCIError = mciSendStringA(CommandString, lpszReturnString, 0xFF, 0);
+    nMCIError = mciSendStringA(CommandString, lpszReturnString, 0xFF, NULL);
     if (nMCIError != 0)
         HandleMCIError(nMCIError, CommandString);
     wsprintfA(CommandString, "status CD mode");
-    nMCIError = mciSendStringA(CommandString, lpszReturnString, 0xFF, 0);
+    nMCIError = mciSendStringA(CommandString, lpszReturnString, 0xFF, NULL);
     if (nMCIError != 0)
         HandleMCIError(nMCIError, CommandString);
     if (stricmp(lpszReturnString, "stopped") != 0) {
         wsprintfA(CommandString, "status CD position");
-        nMCIError = mciSendStringA(CommandString, buffer, 20, 0);
+        nMCIError = mciSendStringA(CommandString, buffer, 20, NULL);
         if (nMCIError != 0)
             HandleMCIError(nMCIError, CommandString);
         strcpy(CDPreviousPosition[m_currentTrack], buffer);
@@ -245,7 +245,7 @@ void soundManager::CDPlay(i32 track, i32 resume, i32 volume, i32 restart) {
         if (notify != 0)
             wnd = static_cast<HWND>(hwndApp);
         else
-            wnd = 0;
+            wnd = NULL;
         nMCIError = mciSendStringA(CommandString, lpszReturnString, 0xFF, wnd);
         if (nMCIError != 0)
             HandleMCIError(nMCIError, CommandString);
@@ -263,7 +263,7 @@ void soundManager::CDPlay(i32 track, i32 resume, i32 volume, i32 restart) {
         if (notify != 0)
             wndn = static_cast<HWND>(hwndApp);
         else
-            wndn = 0;
+            wndn = NULL;
         nMCIError = mciSendStringA(CommandString, lpszReturnString, 0xFF, wndn);
         if (nMCIError != 0)
             HandleMCIError(nMCIError, CommandString);
@@ -326,7 +326,7 @@ i32 soundManager::ConvertVolume(i32 volume, SoundVolumeConversionMode soundType)
 
 VA(0x004cc2a0, 0x5e)
 void __stdcall SetReady2Poll(u32l) {
-    if (gpSoundManager == 0)
+    if (gpSoundManager == NULL)
         return;
     gpSoundManager->m_pollToggle ^= 1;
     if (gpSoundManager->m_pollToggle != 0)
@@ -350,7 +350,7 @@ soundManager::soundManager(void) : baseManager(), field_0x574(1) {
         iLastVolume[local_8] = 0;
     memset(&m_ready, 0, IDX(SOUND_STATE_RESET_SPAN));
     m_samplesReady = 0;
-    m_digitalDriver = 0;
+    m_digitalDriver = NULL;
     field_0x3a = 0;
     m_cdTrack = 0;
     m_cdPlayFrame = 0;
@@ -365,8 +365,8 @@ WAVE_init_driver(u32l sampleRate, u16 bitsPerSample, u16 channels, u16 showError
     i32 rc;
     numDevs = waveOutGetNumDevs();
     if (numDevs == 0) {
-        drvr = 0;
-        return 0;
+        drvr = NULL;
+        return NULL;
     }
     if (waveOutGetDevCapsA(0, &caps, sizeof(caps)) != 0) {
         MessageBoxA(
@@ -375,8 +375,8 @@ WAVE_init_driver(u32l sampleRate, u16 bitsPerSample, u16 channels, u16 showError
             "Startup Error",
             0
         );
-        drvr = 0;
-        return 0;
+        drvr = NULL;
+        return NULL;
     }
     if (gbUseWaveout != 0)
         AIL_set_preference(15, 1);
@@ -386,7 +386,7 @@ WAVE_init_driver(u32l sampleRate, u16 bitsPerSample, u16 channels, u16 showError
     gWaveFormat.wf.nAvgBytesPerSec = (bitsPerSample >> 3) * channels * sampleRate;
     gWaveFormat.wf.nBlockAlign = (bitsPerSample >> 3) * channels;
     gWaveFormat.wBitsPerSample = bitsPerSample;
-    rc = AIL_waveOutOpen(&drvr, 0, 0, &gWaveFormat.wf);
+    rc = AIL_waveOutOpen(&drvr, NULL, 0, &gWaveFormat.wf);
     if (rc != 0) {
         if (showErrors != 0)
             MessageBoxA(
@@ -395,8 +395,8 @@ WAVE_init_driver(u32l sampleRate, u16 bitsPerSample, u16 channels, u16 showError
                 "Sound initialization error!",
                 0
             );
-        drvr = 0;
-        return 0;
+        drvr = NULL;
+        return NULL;
     }
     return drvr;
 }
@@ -493,15 +493,15 @@ i32 soundManager::Open(i32) {
 
     m_samplesReady = 1;
     memset(&m_ready, 0, IDX(SOUND_STATE_RESET_SPAN));
-    if (gbDontTryDigital == 0 && m_digitalDriver == 0)
+    if (gbDontTryDigital == 0 && m_digitalDriver == NULL)
         m_digitalDriver = WAVE_init_driver(22050, 8, 1, 0);
-    if (m_digitalDriver == 0) {
+    if (m_digitalDriver == NULL) {
         gConfig.soundVolume = 0;
         WritePrefs();
     }
     AllocateSampleHandles();
     m_ready = 1;
-    m_midiFile = 0;
+    m_midiFile = NULL;
     memset(m_savedTrackPositions, 0, sizeof(m_savedTrackPositions));
     m_fading = 1;
 
@@ -518,11 +518,11 @@ void soundManager::AllocateSampleHandles(void) {
     i32 local_8;
     if (gbNoSound != 0)
         return;
-    if (m_digitalDriver == 0)
+    if (m_digitalDriver == NULL)
         return;
     for (local_8 = 0; local_8 < 14; local_8++) {
         m_sampleHandles[local_8] = AIL_allocate_sample_handle(m_digitalDriver);
-        if (m_sampleHandles[local_8] == 0)
+        if (m_sampleHandles[local_8] == NULL)
             break;
     }
     m_numSampleHandles = local_8;
@@ -553,7 +553,7 @@ i32 soundManager::Main(struct tag_message&) {
 
 VA(0x004cca70, 0x1a)
 struct _SAMPLE* soundManager::StartSample(char*, char**, i16, i16, i32, i32, i32l) {
-    return 0;
+    return NULL;
 }
 
 VA(0x004cca90, 0x126)
@@ -563,7 +563,7 @@ void soundManager::StopAllSamples(i32 stopMusic) {
     i32 sampleStatus;
     if (gbNoSound != 0)
         return;
-    if (m_digitalDriver == 0)
+    if (m_digitalDriver == NULL)
         return;
     if (m_samplesReady == 0)
         return;
@@ -593,7 +593,7 @@ void soundManager::StopSample(struct _SAMPLE* sample) {
     i32 local_10;
     if (gbNoSound != 0)
         return;
-    if (m_digitalDriver == 0)
+    if (m_digitalDriver == NULL)
         return;
     local_10 = 0;
     LogStr("Stop Sample 1");
@@ -618,7 +618,7 @@ void soundManager::ModifySample(struct _SAMPLE* sampleHandle, i16 operation, i32
 
     if (gbNoSound != 0)
         return;
-    if (m_digitalDriver == 0)
+    if (m_digitalDriver == NULL)
         return;
     if (m_samplesReady == 0)
         return;
@@ -660,7 +660,7 @@ i32l soundManager::DigitalReport(struct _SAMPLE* sample, i16 reportType) {
 
     if (gbNoSound != 0)
         return 0;
-    if (m_digitalDriver == 0)
+    if (m_digitalDriver == NULL)
         return 0;
     switch (reportType) {
         case IDX(SOUND_DIGITAL_REPORT_VOLUME):
@@ -679,7 +679,7 @@ void soundManager::AdjustSoundVolumes(void) {
 
     if (gbNoSound != 0)
         return;
-    if (m_digitalDriver == 0)
+    if (m_digitalDriver == NULL)
         return;
     if (m_samplesReady == 0)
         return;
@@ -809,7 +809,7 @@ void soundManager::PollSound(void) {
             m_fadeSteps = 0;
         LogStr("Poll Sound 1b");
         if (m_fadeSteps <= FADE_HOLD_STEPS && m_currentTrack != m_fadeTargetTrack) {
-            if (m_midiFile != 0 && bSaveMusicPosition[m_currentTrack] != 0) {
+            if (m_midiFile != NULL && bSaveMusicPosition[m_currentTrack] != 0) {
                 if (gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI) {
                     H2_ASSERT(reinterpret_cast<i32>(m_midiFile), RETAIL_FILE, 0x61a);
                     m_savedTrackPositions[m_currentTrack] = ftell(m_midiFile);
@@ -893,16 +893,16 @@ struct _SAMPLE* soundManager::MemorySample(class sample* sampleResource) {
     SampleChannelStruct* scs;
     SamplePlaybackData* playbackData;
     if (gbNoSound != 0)
-        return 0;
-    if (m_digitalDriver == 0)
-        return 0;
+        return NULL;
+    if (m_digitalDriver == NULL)
+        return NULL;
     if (m_samplesReady == 0)
-        return 0;
+        return NULL;
     if (gConfig.soundVolume == 0)
-        return 0;
+        return NULL;
     playbackData = &sampleResource->m_playbackData;
     if (m_ready == 0 || playbackData->volume == 0)
-        return 0;
+        return NULL;
     LogStr("Memory Sample 1");
     scs = &SCS[playbackData->channelType];
     for (ch = static_cast<i16>(scs->startChannel); scs->endChannel > ch; ch++) {
@@ -912,7 +912,7 @@ struct _SAMPLE* soundManager::MemorySample(class sample* sampleResource) {
     if (scs->endChannel == ch) {
         if (playbackData->channelType == 4) {
             LogStr("Memory Sample 2a");
-            return 0;
+            return NULL;
         }
         ch = static_cast<i16>(scs->currentChannel);
         scs->currentChannel++;
@@ -986,7 +986,7 @@ DATA(0x0051f018) char* digitalDriverNames[14] = {
     "sb16.dig",
     "sbpro.dig",
     "sblaster.dig",
-    0
+    NULL
 };
 DATA(0x0051f050) SampleChannelStruct SCS[4] = {{0, 1, 0}, {1, 2, 1}, {2, 6, 2}, {6, 16, 6}};
 DATA(0x0051f080) char CDPreviousPosition[60][15] = {0};

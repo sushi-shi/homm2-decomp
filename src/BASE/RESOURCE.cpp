@@ -6,7 +6,7 @@ resource::resource(void) {
     m_resourceType = RESOURCE_CATEGORY_BITMAP;
     m_id = 0;
     m_refCount = 0;
-    m_next = 0;
+    m_next = NULL;
 }
 
 VA(0x004d9750, 0x2d)

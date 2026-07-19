@@ -10,7 +10,7 @@ VA(0x004d0a60, 0x2d)
 iconWidget::iconWidget(void) : widget(0, 0, 0, 0, 0, 0) {
     m_frame = 0;
     m_fillColor = 0;
-    m_icon = 0;
+    m_icon = NULL;
     m_flip = 0;
     m_iconId = 0;
 }
@@ -149,7 +149,7 @@ i32 iconWidget::Main(tag_message& msg) {
                 case WIDGET_COMMAND_SET_ICON:
                     if (m_id != msg.payload.widget.id)
                         goto normalEvent;
-                    if (m_icon != 0) {
+                    if (m_icon != NULL) {
                         gpResourceManager->Dispose(m_icon);
                         m_icon = gpResourceManager->GetIcon(msg.payload.widget.data.text);
                     }
@@ -209,7 +209,7 @@ void iconWidget::Draw(void) {
         }
 
         case WIDGET_KIND_ICON_FILL:
-            m_icon->FillToBuffer(x, y, m_frame, m_fillColor, m_flip, 0);
+            m_icon->FillToBuffer(x, y, m_frame, m_fillColor, m_flip, NULL);
             return;
     }
 }

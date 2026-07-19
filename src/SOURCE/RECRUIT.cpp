@@ -120,7 +120,7 @@ i32 recruitUnit::Open(i32 priority) {
         WINDOW_Y,
         const_cast<char*>(m_resourceType == RECRUIT_NO_RESOURCE ? "recruit0.bin" : "recruit1.bin")
     );
-    if (m_window == 0)
+    if (m_window == NULL)
         MemError();
     m_quantity = 0;
     m_goldTotal = 0;
@@ -261,13 +261,13 @@ i32 recruitUnit::Main(struct tag_message& message) {
                             VIEW_ARMY_Y,
                             m_creatureType,
                             0,
-                            0,
+                            NULL,
                             1,
                             1,
                             quickView,
-                            0,
-                            0,
-                            0,
+                            NULL,
+                            NULL,
+                            NULL,
                             0
                         );
                         break;
@@ -427,7 +427,7 @@ void QuickViewRecruit(class town* townData, i32 dwelling) {
         QUICK_WINDOW_Y,
         const_cast<char*>(resourceType == RECRUIT_NO_RESOURCE ? "recruiq0.bin" : "recruiq1.bin")
     );
-    if (window == 0)
+    if (window == NULL)
         MemError();
     SetupRecruitWin(window, creatureType, goldCost, resourceType, resourceCost, available);
     gpWindowManager->AddWindow(window, -1, 1);

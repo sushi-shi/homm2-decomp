@@ -30,7 +30,7 @@ i32 army::CanFit(i32 hex, i32 tryOtherSide, i32* fittingHex) {
     i32 candidateHex;
 
     candidateHex = hex;
-    cell_9 = 0;
+    cell_9 = NULL;
     if (fittingHex) {
         *fittingHex = hex;
     }
@@ -100,7 +100,7 @@ i32 army::ValidFlight(i32 destination, i32 fromTargetHex) {
     }
     if (m_targetSide < 0 || m_targetSide > COMBAT_DEFENDER_SIDE || m_targetIndex < 0
         || m_targetIndex > COMBAT_ARMY_SLOT_COUNT - 1) {
-        if (CanFit(destination, 0, 0)) {
+        if (CanFit(destination, 0, NULL)) {
             m_moveTargetHex = destination;
             return 1;
         }
@@ -175,7 +175,7 @@ i32 army::ValidFlight(i32 destination, i32 fromTargetHex) {
         while (directionMask != ALL_ADJACENT_DIRECTIONS) {
             direction = GetBestDirection(targetHex, m_hex, directionMask);
             adjacentHex = GetAdjacentCellIndex(targetHex, direction);
-            if (ValidHex(adjacentHex) && CanFit(adjacentHex, 0, 0)) {
+            if (ValidHex(adjacentHex) && CanFit(adjacentHex, 0, NULL)) {
                 m_moveTargetHex = adjacentHex;
                 m_attackDirection = GetBestDirection(m_moveTargetHex, targetHex, 0);
                 return 1;

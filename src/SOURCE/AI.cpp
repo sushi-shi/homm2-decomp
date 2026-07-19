@@ -17,9 +17,9 @@
 // @semantic: compiler-shape residual.
 VA(0x004c0790, 0x8d7)
 i32 combatManager::AICheckRetreat(void) {
-    if (m_combatTowns[m_currentSide] != 0)
+    if (m_combatTowns[m_currentSide] != NULL)
         return 0;
-    if (m_heroes[m_currentSide] == 0)
+    if (m_heroes[m_currentSide] == NULL)
         return 0;
     if (m_heroes[m_currentSide]->m_isCaptain != 0)
         return 0;
@@ -47,13 +47,13 @@ i32 combatManager::AICheckRetreat(void) {
     float retreatThreshold7;
 
     for (side9 = 0; side9 < COMBAT_AI_SIDE_COUNT; side9++) {
-        if (m_heroes[side9] != 0) {
+        if (m_heroes[side9] != NULL) {
             retreatHero8 = *m_heroes[side9];
             heroPtr9 = &retreatHero8;
             armyGroupPtr1 = &heroPtr9->m_army;
         } else {
             armyGroupPtr1 = &retreatArmy6;
-            heroPtr9 = 0;
+            heroPtr9 = NULL;
         }
 
         for (armyIndex36 = 0; armyIndex36 < COMBAT_AI_GROUP_SLOT_COUNT; armyIndex36++) {
@@ -93,12 +93,12 @@ i32 combatManager::AICheckRetreat(void) {
         strengths1[side9] =
             gpPhilAI
                 ->FightValueOfStack(armyGroupPtr1, heroPtr9, COMBAT_AI_FIGHT_VALUE_MODE, 0, 0, 0);
-        if (m_combatTowns[side9] != 0)
+        if (m_combatTowns[side9] != NULL)
             strengths1[side9] =
                 static_cast<i32>(strengths1[side9] * COMBAT_AI_TOWN_STRENGTH_MODIFIER);
 
         artifactValues[side9] = 0;
-        if (heroPtr9 != 0) {
+        if (heroPtr9 != NULL) {
             for (armyIndex36 = 0; armyIndex36 < AI_BATTLE_ARTIFACT_SLOT_COUNT; armyIndex36++) {
                 if (heroPtr9->m_artifacts[armyIndex36] >= 0
                     && heroPtr9->m_artifacts[armyIndex36] < AI_BATTLE_BASE_ARTIFACT_LIMIT) {
@@ -253,7 +253,7 @@ void combatManager::DoCompAI(i32) {
                 (archerLevel18 * COMBAT_AI_TOWER_LEVEL_SCALE + COMBAT_AI_TOWER_BASE_SCALE)
                 * (numArchers6 * COMBAT_AI_TOWER_STRENGTH)
             );
-            if (m_heroes[COMBAT_ATTACKER_SIDE] != 0
+            if (m_heroes[COMBAT_ATTACKER_SIDE] != NULL
                 && (m_heroes[COMBAT_ATTACKER_SIDE]->HasArtifact(ARTIFACT_GOLDEN_BOW)
                     || m_heroes[COMBAT_ATTACKER_SIDE]->m_secondarySkills[IDX(HERO_SKILL_ARCHERY)]
                            != IDX(HERO_SKILL_LEVEL_NONE)))
@@ -267,13 +267,13 @@ void combatManager::DoCompAI(i32) {
         }
     }
 
-    if (m_heroes[m_currentSide] != 0) {
+    if (m_heroes[m_currentSide] != NULL) {
         currentShooterStrength5 = static_cast<i32>(
             static_cast<i32>(currentShooterStrength5)
             * gfSSArcheryMod[m_heroes[m_currentSide]->m_secondarySkills[IDX(HERO_SKILL_ARCHERY)]]
         );
     }
-    if (m_heroes[COMBAT_DEFENDER_SIDE - m_currentSide] != 0) {
+    if (m_heroes[COMBAT_DEFENDER_SIDE - m_currentSide] != NULL) {
         enemyShooterStrength18 = static_cast<i32>(
             static_cast<i32>(enemyShooterStrength18)
             * gfSSArcheryMod[m_heroes[COMBAT_DEFENDER_SIDE - m_currentSide]
@@ -512,7 +512,7 @@ void combatManager::DoLichShot(class army* lich) {
         memset(damaged19, 0, sizeof(damaged19));
         damageValue10 = 0;
         target17 = &m_armies[COMBAT_DEFENDER_SIDE - m_currentSide][armyIndex37];
-        if (target17 == 0
+        if (target17 == NULL
             || HAS(target17->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_AI_EXCLUDED) != 0
             || target17->m_quantity <= 0)
             continue;
@@ -560,7 +560,7 @@ i32 combatManager::GetShooterMask(i32 side) {
 
     for (armyIndex2 = 0; armyIndex2 < m_armyCount[side]; armyIndex2++) {
         currentArmy10 = armyIndex2 + m_armies[side];
-        if (currentArmy10 != 0
+        if (currentArmy10 != NULL
             && HAS(currentArmy10->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_AI_EXCLUDED)
                    == 0
             && HAS(currentArmy10->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_SHOOTER) != 0
@@ -585,7 +585,7 @@ i32 combatManager::GetMirrorImageMask(i32 side) {
 
     for (armyIndex2 = 0; armyIndex2 < m_armyCount[side]; armyIndex2++) {
         currentArmy10 = m_armies[side] + armyIndex2;
-        if (currentArmy10 != 0
+        if (currentArmy10 != NULL
             && HAS(currentArmy10->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_AI_EXCLUDED)
                    == 0
             && HAS(currentArmy10->m_monster.flags.all, MONSTER_FLAGS_MIRROR_IMAGE) != 0)
@@ -604,7 +604,7 @@ i32 combatManager::GetFlyerMask(i32 side) {
 
     for (armyIndex2 = 0; armyIndex2 < m_armyCount[side]; armyIndex2++) {
         currentArmy10 = m_armies[side] + armyIndex2;
-        if (currentArmy10 != 0
+        if (currentArmy10 != NULL
             && HAS(currentArmy10->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_AI_EXCLUDED)
                    == 0
             && HAS(currentArmy10->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_FLYING) != 0
@@ -628,7 +628,7 @@ i32 combatManager::GetAllMask(i32 side) {
 
     for (armyIndex11 = 0; armyIndex11 < m_armyCount[side]; armyIndex11++) {
         currentArmy38 = &m_armies[side][armyIndex11];
-        if (currentArmy38 != 0
+        if (currentArmy38 != NULL
             && HAS(currentArmy38->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_AI_EXCLUDED)
                    == 0
             && currentArmy38->m_quantity > 0)
@@ -647,7 +647,7 @@ i32 combatManager::GetWalkerMask(i32 side) {
 
     for (armyIndex2 = 0; armyIndex2 < m_armyCount[side]; armyIndex2++) {
         currentArmy10 = m_armies[side] + armyIndex2;
-        if (currentArmy10 != 0
+        if (currentArmy10 != NULL
             && HAS(currentArmy10->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_AI_EXCLUDED)
                    == 0
             && HAS(currentArmy10->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_FLYING) == 0
@@ -673,7 +673,7 @@ i32 combatManager::GetOutOfItMask(i32 side) {
 
     for (armyIndex2 = 0; armyIndex2 < m_armyCount[side]; armyIndex2++) {
         currentArmy10 = m_armies[side] + armyIndex2;
-        if (currentArmy10 != 0
+        if (currentArmy10 != NULL
             && HAS(currentArmy10->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_AI_EXCLUDED)
                    == 0
             && (currentArmy10->m_spellInfluence[IDX(SPELL_INFLUENCE_BLIND)] != 0
@@ -694,7 +694,7 @@ i32 combatManager::GetTraitorMask(i32 side) {
 
     for (armyIndex2 = 0; armyIndex2 < m_armyCount[side]; armyIndex2++) {
         currentArmy10 = armyIndex2 + m_armies[side];
-        if (currentArmy10 != 0
+        if (currentArmy10 != NULL
             && HAS(currentArmy10->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_AI_EXCLUDED)
                    == 0
             && (currentArmy10->m_spellInfluence[IDX(SPELL_INFLUENCE_BERSERKER)] != 0
@@ -798,7 +798,7 @@ u32l combatManager::GetStrength(i32 side, i32 mask) {
     for (armyIndex4 = 0; armyIndex4 < m_armyCount[side]; armyIndex4++) {
         if ((bit36 & mask) != 0) {
             currentArmy8 = &m_armies[side][armyIndex4];
-            if (currentArmy8 != 0
+            if (currentArmy8 != NULL
                 && HAS(currentArmy8->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_AI_EXCLUDED)
                        == 0)
                 strength7 += currentArmy8->Strength();

@@ -10,8 +10,8 @@
 #include <SOURCE/KB.h>
 VA(0x004d20a0, 0x32)
 border::border(void) : widget(0, 0, 0, 0, 0, 0) {
-    m_backgroundBitmap = 0;
-    m_backgroundIcon = 0;
+    m_backgroundBitmap = NULL;
+    m_backgroundIcon = NULL;
     m_fillColor = 0;
 }
 
@@ -19,19 +19,19 @@ border::border(void) : widget(0, 0, 0, 0, 0, 0) {
 VA(0x004d2130, 0x64)
 border::border(i16 x, i16 y, i16 w, i16 h, i16 e, i16 f, i16 fillColor, char* name)
     : widget(x, y, w, h, e, f) {
-    if (name != 0)
+    if (name != NULL)
         m_backgroundBitmap = gpResourceManager->GetBitmap(name);
     else
-        m_backgroundBitmap = 0;
-    m_backgroundIcon = 0;
+        m_backgroundBitmap = NULL;
+    m_backgroundIcon = NULL;
     m_fillColor = fillColor;
 }
 
 VA(0x004d21a0, 0x38)
 border::~border() {
-    if (m_backgroundBitmap != 0)
+    if (m_backgroundBitmap != NULL)
         gpResourceManager->Dispose(m_backgroundBitmap);
-    if (m_backgroundIcon != 0)
+    if (m_backgroundIcon != NULL)
         gpResourceManager->Dispose(m_backgroundIcon);
 }
 
@@ -43,8 +43,8 @@ void border::Read(void) {
     m_height = gpResourceManager->ReadWord();
     m_id = gpResourceManager->ReadWord();
     i16 kind = gpResourceManager->ReadWord();
-    m_backgroundBitmap = 0;
-    m_backgroundIcon = 0;
+    m_backgroundBitmap = NULL;
+    m_backgroundIcon = NULL;
     m_kind = kind;
     char name[16];
     if (DecodeWidgetKind(kind) == WIDGET_KIND_BITMAP) {

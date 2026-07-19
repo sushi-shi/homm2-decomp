@@ -75,8 +75,8 @@ void advManager::StopCursor(i32 stopSound) {
         m_cursorFrame = GetCursorBaseFrame(m_cursorDirection);
         m_cursorFrameCount = 0;
         EveryOther = 0;
-        hOldWalkSample = 0;
-        hNewWalkSample = 0;
+        hOldWalkSample = NULL;
+        hNewWalkSample = NULL;
     }
     m_cursorCycle = 0;
     if (m_previousCursorMapX != -1) {
@@ -513,7 +513,7 @@ mapCell* advManager::MoveHero(
     i32* adjacentMonster,
     i32 forceMove
 ) {
-    EventExtra* mapEvent_e = 0;
+    EventExtra* mapEvent_e = NULL;
     SAMPLE2 fizzleSample_h = NULL_SAMPLE2;
     mapCell* eventCell_g;
     hero* movingHero_f;
@@ -537,7 +537,7 @@ mapCell* advManager::MoveHero(
     *adjacentMonster = 0;
     *outOfMobility = 0;
     gbHeroMoving = true;
-    eventCell_g = 0;
+    eventCell_g = NULL;
 
     movingHero_f = gpGame->GetHero(gpCurPlayer->m_currentHero);
     oldHeroX_b = movingHero_f->m_x;
@@ -636,8 +636,8 @@ mapCell* advManager::MoveHero(
                     CURSOR_FIZZLE_HEIGHT,
                     gbThisNetHumanPlayer[giCurPlayer] ? CURSOR_INVALID_POSITION
                                                       : CURSOR_FIZZLE_COMPUTER_TYPE,
-                    0,
-                    0
+                    NULL,
+                    NULL
                 );
                 WaitEndSample(fizzleSample_h, -1);
                 break;
@@ -824,7 +824,7 @@ mapCell* advManager::MoveHero(
             case MAP_OBJECT_DUNE:
             case MAP_OBJECT_LAVA_POOL:
             case MAP_OBJECT_SHRUB:
-                eventCell_g = 0;
+                eventCell_g = NULL;
         }
     }
 
@@ -844,7 +844,7 @@ movementDone:
                     checkAdjacent:
                         CheckAdjacentMon(adjacentMonster);
                         if (movingHero_f->m_owner != giCurPlayer)
-                            eventCell_g = 0;
+                            eventCell_g = NULL;
                     }
                 }
             }
@@ -1205,7 +1205,7 @@ void advManager::ProcessMapChange(SMapChange change) {
                 &adjacentMonster_m,
                 1
             );
-            if (eventCell_n != 0) {
+            if (eventCell_n != NULL) {
                 switch (eventCell_n->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
                     case MAP_OBJECT_COAST:
                     case MAP_OBJECT_BOAT:
@@ -1548,8 +1548,8 @@ void SendMapChange(i32 type, i8 id, u8 x, u8 y, i32 player, u8 stopAfterMove, u8
 DATA(0x004ee020) i32 bMoveSoundMade = 1;
 DATA(0x004ee028) i32 giPixelsPerStep[6] = {2, 4, 6, 8, 16, 0};
 DATA(0x004ee040) i32 giStepDelay[5] = {20, 25, 20, 15, 15};
-DATA(0x004ee054) struct _SAMPLE* hOldWalkSample = 0;
-DATA(0x004ee058) struct _SAMPLE* hNewWalkSample = 0;
+DATA(0x004ee054) struct _SAMPLE* hOldWalkSample = NULL;
+DATA(0x004ee058) struct _SAMPLE* hNewWalkSample = NULL;
 DATA(0x004ee05c) i32 EveryOther = 0;
 DATA(0x004ee060) i32 startVals[3] = {16, 0, -16};
 DATA(0x00524bc0) i32 S1cursorCycle;

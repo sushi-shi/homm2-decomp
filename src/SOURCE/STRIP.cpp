@@ -43,7 +43,7 @@ strip::strip(
     m_stripIcon = gpResourceManager->GetIcon("strip.icn");
 
     for (i32 slot = 0; slot < STRIP_ARMY_SLOT_COUNT; slot++) {
-        m_creatureIcons[slot] = 0;
+        m_creatureIcons[slot] = NULL;
         m_cachedCreatureTypes[slot] = ARMY_GROUP_EMPTY_SLOT;
     }
 
@@ -51,10 +51,10 @@ strip::strip(
     m_flagFrame = flagFrame;
     m_window =
         new heroWindow(m_x, m_y, STRIP_WINDOW_WIDTH, STRIP_WINDOW_HEIGHT, STRIP_WINDOW_FLAGS);
-    if (m_window == 0)
+    if (m_window == NULL)
         MemError();
 
-    if (m_army != 0) {
+    if (m_army != NULL) {
         m_borders[0] = new border(
             STRIP_PORTRAIT_X,
             STRIP_CONTENT_Y,
@@ -63,9 +63,9 @@ strip::strip(
             firstBorderId,
             STRIP_BORDER_FILL_COLOR,
             0,
-            0
+            NULL
         );
-        if (m_borders[0] == 0)
+        if (m_borders[0] == NULL)
             MemError();
         m_window->AddWidget(m_borders[0], -1);
 
@@ -78,9 +78,9 @@ strip::strip(
                 OD_STEER(slot) + firstBorderId + 1,
                 STRIP_BORDER_FILL_COLOR,
                 0,
-                0
+                NULL
             );
-            if (m_borders[slot + 1] == 0)
+            if (m_borders[slot + 1] == NULL)
                 MemError();
             m_window->AddWidget(m_borders[slot + 1], -1);
         }
@@ -95,7 +95,7 @@ strip::~strip() {
     i32 slot;
 
     gpWindowManager->RemoveWindow(m_window);
-    if (m_army != 0) {
+    if (m_army != NULL) {
         for (slot = 0; slot < STRIP_ARMY_SLOT_COUNT; slot++)
             delete m_borders[slot];
         delete m_borders[STRIP_ARMY_SLOT_COUNT];
@@ -103,7 +103,7 @@ strip::~strip() {
     delete m_window;
     gpResourceManager->Dispose(m_stripIcon);
     for (slot = 0; slot < STRIP_ARMY_SLOT_COUNT; slot++) {
-        if (m_creatureIcons[slot] != 0)
+        if (m_creatureIcons[slot] != NULL)
             gpResourceManager->Dispose(m_creatureIcons[slot]);
     }
     gpResourceManager->Dispose(m_portraitIcon);
@@ -128,7 +128,7 @@ void strip::DrawIcons(i32 drawWindow) {
     if (m_flagFrame != ARMY_GROUP_EMPTY_SLOT)
         m_flagIcon->DrawToBuffer(m_x + STRIP_PORTRAIT_X, m_y + STRIP_CONTENT_Y, m_flagFrame, 0);
 
-    if (m_army == 0) {
+    if (m_army == NULL) {
         m_stripIcon
             ->DrawToBuffer(m_x + STRIP_ARMY_FIRST_X, m_y + STRIP_CONTENT_Y, STRIP_NO_ARMY_FRAME, 0);
         m_window->DrawWindow(drawWindow);
@@ -146,7 +146,7 @@ void strip::DrawIcons(i32 drawWindow) {
             oldIcons[slot] = m_creatureIcons[slot];
             oldCreatureTypes[slot] = m_cachedCreatureTypes[slot];
             if (m_army->m_creatureTypes[slot] == ARMY_GROUP_EMPTY_SLOT) {
-                m_creatureIcons[slot] = 0;
+                m_creatureIcons[slot] = NULL;
                 m_cachedCreatureTypes[slot] = ARMY_GROUP_EMPTY_SLOT;
             } else {
                 sprintf(gText, "monh%04d.icn", m_army->m_creatureTypes[slot]);
@@ -216,7 +216,7 @@ bankBox::bankBox(i32 x, i32 y, class playerData* player) {
     m_x = x;
     m_y = y;
     m_window = new heroWindow(m_x, m_y, "bankbox.bin");
-    if (m_window == 0)
+    if (m_window == NULL)
         MemError();
     gpWindowManager->AddWindow(m_window, BOX_WINDOW_Z_ORDER, BOX_WINDOW_ACTIVE);
     Update(1);

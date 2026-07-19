@@ -69,7 +69,7 @@ void ModemSetup(i32 mode) {
         );
         NormalDialog(directConnectMessage3, 6, -1, -1, -1, 0, -1, 0, -1, 0);
         if (gbFunctionComplete == 0)
-            ShutDown(0);
+            ShutDown(NULL);
         LogStr("MS5");
     } else {
         Connect();
@@ -104,7 +104,7 @@ void GUIModemCommand(char* message, char* command) {
     strcpy(cModemCommand, command);
     NormalDialog(message, 6, -1, -1, -1, 0, -1, 0, -1, 0);
     if (gbFunctionComplete == 0)
-        ShutDown(0);
+        ShutDown(NULL);
 }
 
 // @semantic: First residual +0x43: retail loads the local command length and compares the global position with jge.
@@ -146,7 +146,7 @@ i8 GUIModemResponse(char* message, char* response) {
     giWaitType = MODEM_WAIT_RESPONSE;
     NormalDialog(message, 6, -1, -1, -1, 0, -1, 0, -1, 0);
     if (gbFunctionComplete == 0)
-        ShutDown(0);
+        ShutDown(NULL);
     return 0;
 }
 

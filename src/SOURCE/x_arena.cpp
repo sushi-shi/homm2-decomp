@@ -70,7 +70,7 @@ i32 DoArenaDialog(void) {
     choice = 0;
     sprintf(windowName_3, "evntwin%d.bin", windowLines_7);
     arenaWinPtr = new heroWindow(windowX_9, windowY_12, windowName_3);
-    if (arenaWinPtr == 0)
+    if (arenaWinPtr == NULL)
         MemError();
 
     strcpy(
@@ -102,7 +102,7 @@ i32 DoArenaDialog(void) {
             ICON_FILL_COLOR,
             1
         );
-        if (skillWidget[widgetIndex_12] == 0)
+        if (skillWidget[widgetIndex_12] == NULL)
             MemError();
 
         statWidgets[widgetIndex_12] = new textWidget(
@@ -117,7 +117,7 @@ i32 DoArenaDialog(void) {
             TEXT_FLAGS,
             1
         );
-        if (statWidgets[widgetIndex_12] == 0)
+        if (statWidgets[widgetIndex_12] == NULL)
             MemError();
         arenaWinPtr->AddWidget(skillWidget[widgetIndex_12], -1);
         arenaWinPtr->AddWidget(statWidgets[widgetIndex_12], -1);
@@ -230,7 +230,7 @@ void UpdateArenaIcons(void) {
     for (widgetIndex = 0; widgetIndex < CHOICE_COUNT; widgetIndex++) {
         arenaWinPtr->RemoveWidget(skillWidget[widgetIndex]);
         delete skillWidget[widgetIndex];
-        skillWidget[widgetIndex] = 0;
+        skillWidget[widgetIndex] = NULL;
         skillWidget[widgetIndex] = new iconWidget(
             widgetIndex * WIDGET_X_STEP + ICON_FIRST_X,
             ICON_Y,
@@ -243,7 +243,7 @@ void UpdateArenaIcons(void) {
             ICON_FILL_COLOR,
             1
         );
-        if (skillWidget[widgetIndex] == 0)
+        if (skillWidget[widgetIndex] == NULL)
             MemError();
         arenaWinPtr->AddWidget(skillWidget[widgetIndex], -1);
     }

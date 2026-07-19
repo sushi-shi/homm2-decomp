@@ -150,16 +150,16 @@ i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly
     }
 
     m_fileNames = new FileRequesterName[m_fileCount + 1];
-    if (m_fileNames == 0) {
+    if (m_fileNames == NULL) {
         MemError();
     }
     m_extensions = new FileRequesterExtension[m_fileCount + 1];
-    if (m_extensions == 0) {
+    if (m_extensions == NULL) {
         MemError();
     }
     if (m_mode == FILE_REQUESTER_MAP || m_mode == FILE_REQUESTER_MAP_GAME) {
         m_mapHeaders = new SMapHeader[m_fileCount];
-        if (m_mapHeaders == 0) {
+        if (m_mapHeaders == NULL) {
             MemError();
         }
     }
@@ -198,7 +198,7 @@ i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly
 
             strcpy(fileName, findDataPath.cFileName);
             dotSource = FindLastToken(fileName, '.');
-            if (dotSource != 0) {
+            if (dotSource != NULL) {
                 strcpy(extensionEntry, dotSource);
                 *dotSource = 0;
             }
@@ -244,9 +244,9 @@ fileRequester::fileRequester(
     m_selectedIndex = FILE_REQUESTER_SELECTION_NONE;
     m_fileCount = 0;
     m_topIndex = 0;
-    m_fileNames = 0;
-    m_extensions = 0;
-    m_mapHeaders = 0;
+    m_fileNames = NULL;
+    m_extensions = NULL;
+    m_mapHeaders = NULL;
     m_x = x;
     m_y = y;
     m_mode = mode;
@@ -288,18 +288,18 @@ void fileRequester::SetupFiles(void) {
 
 VA(0x0048d48f, 0xc7)
 void fileRequester::CleanUpData(void) {
-    if (m_fileNames != 0) {
+    if (m_fileNames != NULL) {
         delete[] m_fileNames;
     }
-    m_fileNames = 0;
-    if (m_extensions != 0) {
+    m_fileNames = NULL;
+    if (m_extensions != NULL) {
         delete[] m_extensions;
     }
-    m_extensions = 0;
-    if (m_mapHeaders != 0) {
+    m_extensions = NULL;
+    if (m_mapHeaders != NULL) {
         delete[] m_mapHeaders;
     }
-    m_mapHeaders = 0;
+    m_mapHeaders = NULL;
 }
 
 VA(0x0048d556, 0x8b)
@@ -331,13 +331,13 @@ i32 fileRequester::Open(i32 id) {
                                                                               : "request.bin"
         )
     );
-    if (m_window == 0) {
+    if (m_window == NULL) {
         MemError();
     }
 
     m_scrollKnob =
         new iconWidget(346, static_cast<i16>(fGutterMinY), 8, 17, "scrollcn.icn", 4, 0, 14, 16, 1);
-    if (m_scrollKnob == 0) {
+    if (m_scrollKnob == NULL) {
         MemError();
     }
     m_window->AddWidget(m_scrollKnob, -1);
@@ -351,7 +351,7 @@ i32 fileRequester::Open(i32 id) {
         okEnabled3 = 1;
         strcpy(m_filename, gpGame->m_saveName);
         char* dot = FindLastToken(m_filename, '.');
-        if (dot != 0) {
+        if (dot != NULL) {
             *dot = 0;
         }
         message.payload.widget.id = FILE_REQUESTER_FILENAME_ENTRY;
@@ -710,7 +710,7 @@ i32 fileRequester::Main(struct tag_message& message) {
                                           || FindToken(
                                                  "$%'-_@~`!(){}^#&+,;=[].",
                                                  newNameData[iResult]
-                                             ) != 0)) {
+                                             ) != NULL)) {
                                         newNameData[iResult] = 0;
                                     }
                                 }

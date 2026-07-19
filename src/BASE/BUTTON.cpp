@@ -29,7 +29,7 @@ button::button(void) : widget(0, 0, 0, 0, 0, 0) {
     m_iconId = 0;
     m_selectMode = 0;
     m_hotkey = NO_HOTKEY;
-    m_icon = 0;
+    m_icon = NULL;
 }
 
 VA(0x004dd4c0, 0x6e)

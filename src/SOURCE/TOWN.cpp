@@ -39,10 +39,10 @@ void town::GiveSpells(hero* targetHero) {
     i32 level;
     i32 slot;
 
-    if (targetHero == 0 && m_occupyingHeroId == TOWN_OCCUPYING_HERO_NONE)
+    if (targetHero == NULL && m_occupyingHeroId == TOWN_OCCUPYING_HERO_NONE)
         return;
 
-    if (targetHero != 0)
+    if (targetHero != NULL)
         activeHero = targetHero;
     else
         activeHero = gpGame->GetHero(m_occupyingHeroId);
@@ -103,7 +103,7 @@ void town::View(i32 noFade) {
     townManager* manager = gpTownManager;
     manager->SetTown(this);
     if (!noFade)
-        gpWindowManager->FadeScreen(1, TOWN_FADE_STEPS, 0);
+        gpWindowManager->FadeScreen(1, TOWN_FADE_STEPS, NULL);
     gpExec->CallManager(gpTownManager);
     if (m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE)
         gpAdvManager->SetHeroContext(m_occupyingHeroId, 0);
@@ -147,13 +147,13 @@ void town::BuildBuilding(i32 building) {
         if (m_type == IDX(FACTION_WIZARD) && (m_buildings & IDX(TOWN_BUILDING_LIBRARY)))
             ++m_spellCounts[m_buildState];
         if (m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE)
-            GiveSpells(0);
+            GiveSpells(NULL);
     }
     if (building == TOWN_OBJECT_SPECIAL_BUILDING && m_type == IDX(FACTION_WIZARD)) {
         for (level = 0; level < m_buildState; ++level)
             ++m_spellCounts[level + TOWN_MAGE_GUILD_FIRST_LEVEL];
         if (m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE)
-            GiveSpells(0);
+            GiveSpells(NULL);
     }
 
     m_buildings |= 1L << building;
@@ -187,7 +187,7 @@ void town::BuildBuilding(i32 building) {
         m_buildings &= ~IDX(TOWN_BUILDING_TENT);
         XformToCastle();
     }
-    GiveSpells(0);
+    GiveSpells(NULL);
     BitSet(gpGame->m_knownTowns, m_id);
 }
 

@@ -386,49 +386,49 @@ VA(0x0049695c, 0x344)
 void DeleteMainClasses(void) {
     if (gpBufferPalette)
         delete gpBufferPalette;
-    gpBufferPalette = 0;
+    gpBufferPalette = NULL;
     if (gpMonGroup)
         delete gpMonGroup;
-    gpMonGroup = 0;
+    gpMonGroup = NULL;
     if (gpPhilAI)
         delete gpPhilAI;
-    gpPhilAI = 0;
+    gpPhilAI = NULL;
     if (gpSearchArray)
         delete gpSearchArray;
-    gpSearchArray = 0;
+    gpSearchArray = NULL;
     if (gpTownManager)
         delete gpTownManager;
-    gpTownManager = 0;
+    gpTownManager = NULL;
     if (gpCombatManager)
         delete gpCombatManager;
-    gpCombatManager = 0;
+    gpCombatManager = NULL;
     if (gpAdvManager)
         delete gpAdvManager;
-    gpAdvManager = 0;
+    gpAdvManager = NULL;
     if (gpGame)
         delete gpGame;
-    gpGame = 0;
+    gpGame = NULL;
     if (gpHighScoreManager)
         delete gpHighScoreManager;
-    gpHighScoreManager = 0;
+    gpHighScoreManager = NULL;
     if (gpSoundManager)
         delete gpSoundManager;
-    gpSoundManager = 0;
+    gpSoundManager = NULL;
     if (gpWindowManager)
         delete gpWindowManager;
-    gpWindowManager = 0;
+    gpWindowManager = NULL;
     if (gpMouseManager)
         delete gpMouseManager;
-    gpMouseManager = 0;
+    gpMouseManager = NULL;
     if (gpInputManager)
         delete gpInputManager;
-    gpInputManager = 0;
+    gpInputManager = NULL;
     if (gpExec)
         delete gpExec;
-    gpExec = 0;
+    gpExec = NULL;
     if (gpResourceManager)
         delete gpResourceManager;
-    gpResourceManager = 0;
+    gpResourceManager = NULL;
 }
 
 VA(0x00496ca0, 0x39)
@@ -688,7 +688,7 @@ i32 oldmain(void) {
                 gbInSetupDialog = true;
                 gpWindowManager->DoDialog(gpInitWin, InitMenuHandler, 0);
                 delete gpInitWin;
-                gpInitWin = 0;
+                gpInitWin = NULL;
                 command_a = gpWindowManager->m_dialogResult;
                 gbInSetupDialog = false;
             }
@@ -847,11 +847,11 @@ i32 oldmain(void) {
                         -1
                     );
                     if (!transmissionResult_i)
-                        ShutDown(0);
+                        ShutDown(NULL);
                 }
                 for (netPlayer_i = 1; netPlayer_i < giNumHumanPlayers; netPlayer_i++) {
                     if (!gpGame->TransmitSaveGame(netPlayer_i, 0, 1))
-                        ShutDown(0);
+                        ShutDown(NULL);
                 }
                 memset(gbThisNetHumanPlayer, 0, OLD_MAIN_PLAYER_COUNT);
                 gbThisNetHumanPlayer[giThisGamePos] = 1;
@@ -875,7 +875,7 @@ i32 oldmain(void) {
                     0
                 );
                 if (!gbFunctionComplete)
-                    ShutDown(0);
+                    ShutDown(NULL);
                 gpGame->LoadGame(gConfig.rmtRCName, 0, 1);
                 sprintf(gpGame->m_saveName, "NEWGAME");
                 iLastDiffSendTo = -1;
@@ -887,7 +887,7 @@ i32 oldmain(void) {
         gpWindowManager->m_updateFlags = 1;
         if (gShingleAnim)
             gpResourceManager->Dispose(gShingleAnim);
-        gShingleAnim = 0;
+        gShingleAnim = NULL;
 
         if (giNumHumanPlayers > 1) {
             for (player_h = 0; player_h < giNumHumanPlayers; player_h++) {
@@ -909,7 +909,7 @@ i32 oldmain(void) {
         gbGameInitialized = true;
         mainScreenLoaded_b = 0;
         gpSoundManager->StopAllSamples(1);
-        gpWindowManager->FadeScreen(1, OLD_MAIN_FADE_SPEED, 0);
+        gpWindowManager->FadeScreen(1, OLD_MAIN_FADE_SPEED, NULL);
         gMapX = 0;
         gMapY = 0;
         for (giCurWatchPlayer = giCurPlayer; !gbThisNetHumanPlayer[giCurWatchPlayer];
@@ -1050,7 +1050,7 @@ i32 oldmain(void) {
             quit_g = 1;
     }
 
-    ShutDown(0);
+    ShutDown(NULL);
     return 0;
 }
 
@@ -1449,7 +1449,7 @@ i32 RecruitHeroHandler(tag_message& msg) {
                         gpTownManager->RedrawTownScreen();
                         gpTownManager->m_heroWindow0->DrawWindow();
                         gpTownManager->m_heroWindow1->DrawWindow();
-                        gpWindowManager->FadeScreen(0, 8, 0);
+                        gpWindowManager->FadeScreen(0, 8, NULL);
                         break;
                     default:
                         break;
@@ -2661,10 +2661,10 @@ VA(0x0049c111, 0x201)
 void InitVars(void) {
     i32 i;
     i32 j;
-    NULL_SAMPLE2.pSample = 0;
+    NULL_SAMPLE2.pSample = NULL;
     NULL_SAMPLE2.pMem = reinterpret_cast<struct _SAMPLE*>(NULL_SAMPLE2.pSample);
     gGameCommand = -1;
-    gPalette = 0;
+    gPalette = NULL;
     gbCombatSurrender = false;
     gpGame->m_viewArmyResult = 0;
     strcpy(gpGame->m_mapFilename, "brokena.mp2");
@@ -2678,8 +2678,8 @@ void InitVars(void) {
     cNetBoxColor[1] = 6;
     cNetBoxColor[2] = 6;
     cNetBoxColor[3] = 6;
-    ppMapExtra = 0;
-    pwSizeOfMapExtra = 0;
+    ppMapExtra = NULL;
+    pwSizeOfMapExtra = NULL;
     iMaxMapExtra = 0;
     for (i = 0; i < 10; i++)
         glTimers[i] = 0;
@@ -2707,10 +2707,10 @@ void game::ShowMoraleInfo(hero* h, i32 dialogType) {
     i32 slot8;
 
     mixedUndead4 = 0;
-    if (h->m_army.GetMorale(h, h->GetOccupiedTown(), 0) > 0)
+    if (h->m_army.GetMorale(h, h->GetOccupiedTown(), NULL) > 0)
         sprintf(description, cMoraleInfo[IDX(MORALE_INFO_GOOD)]);
     else {
-        if (h->m_army.GetMorale(h, h->GetOccupiedTown(), 0) == 0)
+        if (h->m_army.GetMorale(h, h->GetOccupiedTown(), NULL) == 0)
             sprintf(description, cMoraleInfo[IDX(MORALE_INFO_NEUTRAL)]);
         else
             sprintf(description, cMoraleInfo[IDX(MORALE_INFO_BAD)]);
@@ -2757,11 +2757,11 @@ void game::ShowMoraleInfo(hero* h, i32 dialogType) {
             strcat(gText, description);
         }
 
-        if (h->GetOccupiedTown() != 0 && h->GetOccupiedTown()->m_type == IDX(FACTION_BARBARIAN)
+        if (h->GetOccupiedTown() != NULL && h->GetOccupiedTown()->m_type == IDX(FACTION_BARBARIAN)
             && (h->GetOccupiedTown()->m_buildings & IDX(TOWN_BUILDING_COLISEUM))) {
             strcat(gText, cMoraleInfo[IDX(INFO_COLISEUM)]);
         }
-        if (h->GetOccupiedTown() != 0
+        if (h->GetOccupiedTown() != NULL
             && (h->GetOccupiedTown()->m_buildings & IDX(TOWN_BUILDING_TAVERN))) {
             strcat(gText, cMoraleInfo[IDX(INFO_TAVERN)]);
         }
@@ -2831,10 +2831,10 @@ void game::ShowLuckInfo(hero* h, i32 dialogType) {
     i32 luckValue;
     i32 modifierStart;
 
-    if (gpGame->GetLuck(h, 0, h->GetOccupiedTown()) > 0)
+    if (gpGame->GetLuck(h, NULL, h->GetOccupiedTown()) > 0)
         sprintf(description, cLuckInfo[IDX(LUCK_INFO_GOOD)]);
     else {
-        if (gpGame->GetLuck(h, 0, h->GetOccupiedTown()) == 0)
+        if (gpGame->GetLuck(h, NULL, h->GetOccupiedTown()) == 0)
             sprintf(description, cLuckInfo[IDX(LUCK_INFO_NEUTRAL)]);
         else
             sprintf(description, cLuckInfo[IDX(LUCK_INFO_BAD)]);
@@ -2842,7 +2842,7 @@ void game::ShowLuckInfo(hero* h, i32 dialogType) {
 
     sprintf(gText, cLuckInfo[IDX(LUCK_INFO_HEADER)], description);
     modifierStart = strlen(gText);
-    if (h->GetOccupiedTown() != 0 && h->GetOccupiedTown()->m_type == IDX(FACTION_SORCERESS)
+    if (h->GetOccupiedTown() != NULL && h->GetOccupiedTown()->m_type == IDX(FACTION_SORCERESS)
         && (h->GetOccupiedTown()->m_buildings & IDX(TOWN_BUILDING_RAINBOW)))
         strcat(gText, cLuckInfo[IDX(INFO_RAINBOW)]);
     if (h->HasArtifact(ARTIFACT_RABBIT_FOOT))
@@ -2889,10 +2889,10 @@ void ClearMapExtra(void) {
     }
     if (ppMapExtra)
         H2_FREE(ppMapExtra, 3271);
-    ppMapExtra = 0;
+    ppMapExtra = NULL;
     if (pwSizeOfMapExtra)
         H2_FREE(pwSizeOfMapExtra, 3275);
-    pwSizeOfMapExtra = 0;
+    pwSizeOfMapExtra = NULL;
     iMaxMapExtra = 0;
 }
 
@@ -2964,7 +2964,7 @@ i32 AddScoreToHighScore(i32 score, i32 days, i32 scenario, i32 highScoreType, ch
             "Please enter your name for the high score list.",
             playerName_c,
             HIGH_SCORE_NAME_LENGTH,
-            0,
+            NULL,
             0,
             1
         );
@@ -3085,7 +3085,7 @@ void PopNetBox(char* text, i32 netPlayer) {
     textX_d = BOX_TEXT_X;
     textY_d = BOX_TEXT_Y;
     messageTime_b = 0;
-    if (text != 0) {
+    if (text != NULL) {
         if (netPlayer >= 0) {
             sprintf(gText, "%s:  %s", gsNetPlayerInfo[netPlayer].name, text);
             gText[BOX_LINE_TEXT_LIMIT] = 0;
@@ -3103,7 +3103,7 @@ void PopNetBox(char* text, i32 netPlayer) {
     bShowIt = 1;
     gbMoveShown = false;
     netWindow_j = new heroWindow(0, BOX_WINDOW_Y, "netbox.bin");
-    if (netWindow_j == 0)
+    if (netWindow_j == NULL)
         MemError();
 
     updateMessage_f.type = NET_BOX_UPDATE_MESSAGE;
@@ -3152,7 +3152,7 @@ void PopNetBox(char* text, i32 netPlayer) {
     while (!done_i) {
         PollSound();
         remoteData_g = reinterpret_cast<KbRemotePacket*>(GetRemoteData(0));
-        if (remoteData_g != 0) {
+        if (remoteData_g != NULL) {
             if (remoteData_g->group == BOX_REMOTE_GROUP) {
                 remoteData_g = reinterpret_cast<KbRemotePacket*>(GetRemoteData(1));
                 switch (remoteData_g->command) {
@@ -3254,7 +3254,7 @@ void PopNetBox(char* text, i32 netPlayer) {
                 -1
             );
             if (!result_a)
-                ShutDown(0);
+                ShutDown(NULL);
             inputLength_a = 0;
             strcpy(inputText_c, "");
             updateInput_a = 1;
@@ -3379,32 +3379,32 @@ void ShutDown(char* msg) {
         HandleRemoteSuddenExit();
     if (gPalette) {
         gpResourceManager->Dispose((resource*)gPalette);
-        gPalette = 0;
+        gPalette = NULL;
     }
     if (bigFont) {
         gpResourceManager->Dispose((resource*)bigFont);
-        bigFont = 0;
+        bigFont = NULL;
     }
     if (smallFont) {
         gpResourceManager->Dispose((resource*)smallFont);
-        smallFont = 0;
+        smallFont = NULL;
     }
     RemoteCleanup();
     gpExec->ShutDownSystem();
     if (gEventHandle) {
         CloseHandle(gEventHandle);
-        gEventHandle = 0;
+        gEventHandle = NULL;
     }
     if (mapExtra)
         H2_FREE(mapExtra, 3899);
-    mapExtra = 0;
+    mapExtra = NULL;
     CloseAIMapVars();
     DeleteMainClasses();
     AppExit();
     PrintMemoryLeaks();
     if (gpMemEntry)
         free(gpMemEntry);
-    gpMemEntry = 0;
+    gpMemEntry = NULL;
     exit(0);
 }
 
@@ -3433,8 +3433,8 @@ void SmackFade(u8* src, u8* dst) {
     u8* j;
     i32 c, g;
 
-    a = 0;
-    f = 0;
+    a = NULL;
+    f = NULL;
     k = -1;
     a = static_cast<u8*>(H2_ALLOC(768, 3950));
     f = static_cast<u8*>(H2_ALLOC(256, 3951));
@@ -3536,7 +3536,7 @@ void ShowCongrats(i32 highScoreType) {
         gpGame->m_mapHeader.name
     );
     H2_FREE(congratsText, 4069);
-    congratsText = 0;
+    congratsText = NULL;
     gpWindowManager->m_updateFlags = 1;
     memcpy(gpBufferPalette->m_data, gPalette->m_data, PALETTE_SIZE);
 }
@@ -3636,8 +3636,8 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
     i32 formationHexIndex;
 
     menuChanged = 0;
-    currentHeroRec = 0;
-    if (gpCurPlayer != 0 && gpCurPlayer->CurrentHero() != -1)
+    currentHeroRec = NULL;
+    if (gpCurPlayer != NULL && gpCurPlayer->CurrentHero() != -1)
         currentHeroRec = &gpGame->m_heroRecs[gpCurPlayer->CurrentHero()];
 
     switch (command) {
@@ -3797,7 +3797,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
                 giCurPlayer,
                 APP_MENU_REVEAL_RADIUS
             );
-            if (currentHeroRec != 0)
+            if (currentHeroRec != NULL)
                 gpAdvManager->Reseed(0, 0);
             gpAdvManager->UpdateRadar(1, 0);
             gpAdvManager->CompleteDraw(0);
@@ -3808,7 +3808,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
             gpGame->m_cheated = 1;
             if (gbInCampaign)
                 gpGame->m_campaignCheated = 1;
-            if (currentHeroRec != 0)
+            if (currentHeroRec != NULL)
                 currentHeroRec->m_remainingMobility = APP_MENU_MOVEMENT_BONUS;
             break;
 
@@ -3816,7 +3816,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
             gpGame->m_cheated = 1;
             if (gbInCampaign)
                 gpGame->m_campaignCheated = 1;
-            if (currentHeroRec != 0) {
+            if (currentHeroRec != NULL) {
                 for (loopIndex = 0; loopIndex < APP_MENU_MAX_SPELLS; loopIndex++)
                     currentHeroRec->AddSpell(loopIndex, APP_MENU_SPELL_COUNT);
                 currentHeroRec->m_spellPoints = 999;
@@ -3866,7 +3866,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
                 secondarySkillIndex =
                     (command - APP_MENU_SECONDARY_FIRST) / APP_MENU_SECONDARY_LEVELS;
                 secondaryLevel = (command - APP_MENU_SECONDARY_FIRST) % APP_MENU_SECONDARY_LEVELS;
-                if (currentHeroRec != 0)
+                if (currentHeroRec != NULL)
                     currentHeroRec->SetSS(secondarySkillIndex, secondaryLevel);
             }
             if (command >= APP_MENU_COMBAT_FIRST && command < APP_MENU_COMBAT_LAST) {
@@ -3903,7 +3903,7 @@ void UpdateSystemOptionsMenu(void) {
 
     if (gConfig.gfx[giCurExe].showMenu == 0)
         return;
-    if (hmnuApp == 0)
+    if (hmnuApp == NULL)
         return;
     if (OD_STEER(hmnuAdv) != hmnuApp)
         return;
@@ -4003,7 +4003,7 @@ void UpdateSystemOptionsMenu(void) {
 VA(0x0049f92d, 0x99)
 void CleanUpMenus(void) {
     if (hmnuApp) {
-        SetMenu(hwndApp, 0);
+        SetMenu(hwndApp, NULL);
         if (hmnuAdv)
             DestroyMenu(hmnuAdv);
         if (hmnuDflt)
@@ -4013,7 +4013,7 @@ void CleanUpMenus(void) {
         if (hmnuTown)
             DestroyMenu(hmnuTown);
     }
-    hmnuApp = 0;
+    hmnuApp = NULL;
 }
 
 // @semantic: compiler-shape residual.
@@ -4091,7 +4091,7 @@ void SetupDynamicWindow(
     rightCornerPaddingValue = CONTENT_TOP;
     centeredPadding = CONTENT_LEFT;
     stoneWidgetColorSize = WIDGET_COLOR;
-    newWidgetTemp = 0;
+    newWidgetTemp = NULL;
     columnsSize = (contentWidth - 1) / TILE_SIZE + 1;
     numRows = (contentHeight - 1) / TILE_SIZE + 1;
     *windowWidth = columnsSize * TILE_SIZE + WINDOW_PADDING;
@@ -4129,7 +4129,7 @@ void SetupDynamicWindow(
                 WIDGET_COLOR,
                 1
             );
-            if (newWidgetTemp == 0)
+            if (newWidgetTemp == NULL)
                 MemError();
             (*window)->AddWidget(newWidgetTemp, -1);
         }
@@ -4147,7 +4147,7 @@ void SetupDynamicWindow(
         WIDGET_COLOR,
         1
     );
-    if (newWidgetTemp == 0)
+    if (newWidgetTemp == NULL)
         MemError();
     (*window)->AddWidget(newWidgetTemp, -1);
 
@@ -4163,7 +4163,7 @@ void SetupDynamicWindow(
         WIDGET_COLOR,
         1
     );
-    if (newWidgetTemp == 0)
+    if (newWidgetTemp == NULL)
         MemError();
     (*window)->AddWidget(newWidgetTemp, -1);
 
@@ -4179,7 +4179,7 @@ void SetupDynamicWindow(
         WIDGET_COLOR,
         1
     );
-    if (newWidgetTemp == 0)
+    if (newWidgetTemp == NULL)
         MemError();
     (*window)->AddWidget(newWidgetTemp, -1);
 
@@ -4195,7 +4195,7 @@ void SetupDynamicWindow(
         WIDGET_COLOR,
         1
     );
-    if (newWidgetTemp == 0)
+    if (newWidgetTemp == NULL)
         MemError();
     (*window)->AddWidget(newWidgetTemp, -1);
 
@@ -4212,7 +4212,7 @@ void SetupDynamicWindow(
             WIDGET_COLOR,
             1
         );
-        if (newWidgetTemp == 0)
+        if (newWidgetTemp == NULL)
             MemError();
         (*window)->AddWidget(newWidgetTemp, -1);
 
@@ -4228,7 +4228,7 @@ void SetupDynamicWindow(
             WIDGET_COLOR,
             1
         );
-        if (newWidgetTemp == 0)
+        if (newWidgetTemp == NULL)
             MemError();
         (*window)->AddWidget(newWidgetTemp, -1);
     }
@@ -4246,7 +4246,7 @@ void SetupDynamicWindow(
             WIDGET_COLOR,
             1
         );
-        if (newWidgetTemp == 0)
+        if (newWidgetTemp == NULL)
             MemError();
         (*window)->AddWidget(newWidgetTemp, -1);
 
@@ -4262,7 +4262,7 @@ void SetupDynamicWindow(
             WIDGET_COLOR,
             1
         );
-        if (newWidgetTemp == 0)
+        if (newWidgetTemp == NULL)
             MemError();
         (*window)->AddWidget(newWidgetTemp, -1);
     }
@@ -4296,7 +4296,7 @@ void HandleRemoteDeadPlayerExit(i32 pos) {
     SPlayerExit pe;
     if (giThisGamePos == pos) {
         if (!gpGame->TransmitSaveGame((giThisNetPos + 1) % giNumHumanPlayers, 1, 0))
-            ShutDown(0);
+            ShutDown(NULL);
         RemoteCleanup();
     } else {
         pe.netPosition = gbGamePosToNetPos[pos];
@@ -4389,7 +4389,7 @@ void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, i32
                 DropDownToOnePlayer();
             } else {
                 RemoteCleanup();
-                ShutDown(0);
+                ShutDown(NULL);
             }
         } else {
             if (exitInfo.timedOut) {
@@ -4560,7 +4560,7 @@ playerExitHandled:
         return;
     }
     if (!exitInfo.continueGame) {
-        ShutDown(0);
+        ShutDown(NULL);
     }
 }
 
@@ -4574,7 +4574,7 @@ i32 CheckMem(void) {
 VA(0x004a0b6d, 0x109)
 i32 GetManaCost(SpellType spell, hero* h) {
     i32 c = gsSpellInfo[IDX(spell)].cost;
-    if (h != 0) {
+    if (h != NULL) {
         if (h->HasArtifact(ARTIFACT_EVIL_EYE)
             && (spell == SPELL_CURSE || spell == SPELL_MASS_CURSE))
             c >>= 1;
@@ -4827,8 +4827,8 @@ void NormalDialog(
     }
 
     for (resourceSlot_n = 0; resourceSlot_n < NORMAL_DIALOG_RESOURCE_COUNT; resourceSlot_n++) {
-        iconPanel_j = 0;
-        textPanel_h = 0;
+        iconPanel_j = NULL;
+        textPanel_h = NULL;
         if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_NO_RESOURCE)
             break;
 
@@ -5206,7 +5206,7 @@ void NormalDialog(
             resourceSlot_n + NORMAL_DIALOG_RESOURCE_BORDER_FIRST_ID,
             1,
             0,
-            0
+            NULL
         );
         pNormalDialogWindow->AddWidget(borderWidget_o, -1);
     }
@@ -5493,7 +5493,7 @@ DATA(0x004f95b8) u8 gColorTableDarkBrown[DIM_PALETTE_COLOR_COUNT] = {
 };
 DATA(0x004f96b8) i32 MAP_WIDTH = 72;
 DATA(0x004f96bc) i32 MAP_HEIGHT = 72;
-DATA(0x004f96c0) u8* mapExtra = 0;
+DATA(0x004f96c0) u8* mapExtra = NULL;
 DATA(0x004f96c4) b32 gbClosingApp = false;
 DATA(0x004f96c8) b32 gbForegroundApp = false;
 DATA(0x004f96cc) i32 giMainVideoModeColorDepth = 8;
@@ -5832,8 +5832,8 @@ DATA(0x004fa548) u8 gColorTableNoCycle[DIM_PALETTE_COLOR_COUNT] = {
     0xe0, 0xe1, 0xe2, 0xe3, 0xe4, 0xe5, 0xe6, 0x45, 0x45, 0x45, 0x45, 0x45, 0x45, 0x45, 0x45, 0x45,
     0x45, 0x45, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6, 0xf7, 0xf8, 0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xFF
 };
-DATA(0x004fa648) font* smallFont = 0;
-DATA(0x004fa64c) font* bigFont = 0;
+DATA(0x004fa648) font* smallFont = NULL;
+DATA(0x004fa64c) font* bigFont = NULL;
 DATA(0x004fa650) b32 gbReturnAfterComputeExtent = false;
 DATA(0x004fa654) b32 gbAllowTextEntryEscape = true;
 DATA(0x004fa658) WindowColorCycleMode giCycleType = WINDOW_COLOR_CYCLE_DEFAULT;
@@ -5885,7 +5885,7 @@ DATA(0x004fa948) b32 gbDontTryRedbook = false;
 DATA(0x004fa94c) b32 gbDontTryMIDI = false;
 DATA(0x004fa950) b32 gbDontTryDigital = false;
 DATA(0x004fa958) float gfCombatSpeedMod[KB_COMBAT_SPEED_COUNT] = {1.0f, 0.7f, 0.35f};
-DATA(0x004fa964) icon* gShingleAnim = 0;
+DATA(0x004fa964) icon* gShingleAnim = NULL;
 DATA(0x004fa968) i32 iNextShingleAnim = 0;
 DATA(0x004fa96c) i32 giDialogTimeout = 0;
 DATA(0x004fa970) i32 giNewMonsterCycleFrame = 0;
@@ -6409,10 +6409,10 @@ DATA(0x004fbd40) b32 gbInSmackMgr = false;
 DATA(0x004fbd44) i32 glBottomRefresh = 0;
 DATA(0x004fbd48) b32 gbBothMachinesWin95 = false;
 DATA(0x004fbd4c) b32 gbGotFirstHeartbeat = false;
-DATA(0x004fbd50) void* hmnuDflt = 0;
-DATA(0x004fbd54) void* hmnuCmbt = 0;
-DATA(0x004fbd58) void* hmnuAdv = 0;
-DATA(0x004fbd5c) void* hmnuTown = 0;
+DATA(0x004fbd50) void* hmnuDflt = NULL;
+DATA(0x004fbd54) void* hmnuCmbt = NULL;
+DATA(0x004fbd58) void* hmnuAdv = NULL;
+DATA(0x004fbd5c) void* hmnuTown = NULL;
 DATA(0x004fbd60) char* cMonFilename[IDX(CREATURE_COUNT)] = {
     "peasant.icn",  "archer.icn",   "archer2.icn",  "pikeman.icn",  "pikeman2.icn", "swordsmn.icn",
     "swordsm2.icn", "cavalryr.icn", "cavalryb.icn", "paladin.icn",  "paladin2.icn", "goblin.icn",
@@ -6862,7 +6862,7 @@ DATA(0x004fc568) char* cCombatBkgNames[KB_COMBAT_BACKGROUND_COUNT] = {
     "CBKGDITR.icn", "CBKGDIMT.icn",
     "CBKGCRCK.icn", "",
     "CBKGBEAC.icn", "",
-    "CBKGGRAV.icn", 0
+    "CBKGGRAV.icn", NULL
 };
 DATA(0x004fc5b8) struct SCmbtObstacle sCmbtObstacles[KB_COMBAT_OBSTACLE_COUNT] = {
     {0x00000200, 1, 1, {0, 0, 0, 0, 0, 0, 0, 0}}, {0x00000200, 1, 1, {0, 0, 0, 0, 0, 0, 0, 0}},
@@ -7200,7 +7200,7 @@ DATA(0x004fd858) char* cHeroTypeShortName[IDX(FACTION_COUNT)] =
 DATA(0x004fd870) char cHeroTypeInitial[HERO_TYPE_INITIAL_COUNT] = {'k', 'b', 's', 'w', 'z', 'n'};
 DATA(0x004fd878) i32 giDeferObjDrawX = -1;
 DATA(0x004fd87c) i32 giDeferObjDrawY = -1;
-DATA(0x004fd880) class heroWindow* gpInitWin = 0;
+DATA(0x004fd880) class heroWindow* gpInitWin = NULL;
 DATA(0x004fd888) u8 iGetSSByAlignment[IDX(HERO_SKILL_COUNT)][IDX(FACTION_COUNT)] = {
     {3, 4, 2, 2, 2, 3},
     {2, 3, 3, 1, 1, 1},
@@ -7533,7 +7533,7 @@ DATA(0x004fe140) SCampaignChoice campaignChoices[IDX(
       {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WARLOCK), CHOICE_NO_AMOUNT},
       {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_BARBARIAN), CHOICE_NO_AMOUNT}}}
 };
-DATA(0x004fe2a8) char* congratsText = 0;
+DATA(0x004fe2a8) char* congratsText = NULL;
 DATA(0x004fe2b0) char* gArtifactNames[KB_ARTIFACT_LEVEL_COUNT] = {
     "Ultimate Book of Knowledge",
     "Ultimate Sword of Dominion",
@@ -7638,7 +7638,7 @@ DATA(0x004fe2b0) char* gArtifactNames[KB_ARTIFACT_LEVEL_COUNT] = {
     "Sword Breaker",
     "Sword of Anduran",
     "Spade of Necromancy",
-    0
+    NULL
 };
 DATA(0x004fe450) char* gArtifactDesc[KB_ARTIFACT_LEVEL_COUNT] = {
     "{Ultimate Book\n(+12 Knowledge)}\n\nThe Ultimate Book of Knowledge increases your knowledge "
@@ -7778,7 +7778,7 @@ DATA(0x004fe450) char* gArtifactDesc[KB_ARTIFACT_LEVEL_COUNT] = {
     "{Sword Breaker}\n\nThe Sword Breaker increases your defense by 4 and attack by 1.",
     "{Sword of Anduran}\n\nThe Sword increases your attack skill by 5.",
     "{Spade of Necromancy}\n\nThe Spade gives you increased necromancy skill.",
-    0
+    NULL
 };
 DATA(0x004fe5f0) char* gArtifactEvent[KB_ARTIFACT_LEVEL_COUNT] = {
     "",
@@ -8027,7 +8027,7 @@ DATA(0x004fe5f0) char* gArtifactEvent[KB_ARTIFACT_LEVEL_COUNT] = {
     "grab the wrong end of sharp objects.",
     "A dirty shovel has been thrust into a dirt mound nearby. Upon investigation, you discover it "
     "to be the enchanted shovel of the Gravediggers, long thought lost by mortals.",
-    0
+    NULL
 };
 DATA(0x004fe790) char* gStatNames[HERO_PRIMARY_STAT_COUNT] =
     {"Attack Skill", "Defense Skill", "Spell Power", "Knowledge"};
@@ -8186,9 +8186,9 @@ DATA(0x004fe9e0) char* gArmyNamesPlural[IDX(CREATURE_COUNT)] = {
     "water elementals"
 };
 DATA(0x004feae8) char* gTerrainNames[KB_TERRAIN_TYPE_COUNT] =
-    {"Ocean", "Grass", "Snow", "Swamp", "Lava", "Desert", "Dirt", "Wasteland", "Beach", 0};
+    {"Ocean", "Grass", "Snow", "Swamp", "Lava", "Desert", "Dirt", "Wasteland", "Beach", NULL};
 DATA(0x004feb10) char* gResourceNames[RESOURCE_VALUE_COUNT] =
-    {"Wood", "Mercury", "Ore", "Sulfur", "Crystal", "Gems", "Gold", 0};
+    {"Wood", "Mercury", "Ore", "Sulfur", "Crystal", "Gems", "Gold", NULL};
 DATA(0x004feb30) char* gQuickViewText[KB_QUICK_VIEW_TEXT_COUNT] = {
     "",
     "Alchemist Lab",
@@ -8452,7 +8452,7 @@ DATA(0x004fed20) char* gEventText[KB_EVENT_TEXT_TABLE_COUNT] = {
     "tattered clothing, you find nothing.",
     "{Skeleton}\n\nYou come upon the remains of an unfortunate adventurer.  Searching through the "
     "tattered clothing, you find ",
-    0
+    NULL
 };
 DATA(0x004feea0) char* gCPanelHelp[KB_CONTROL_PANEL_HELP_COUNT] = {
     "Start a single or multi-player game.",
@@ -8460,7 +8460,7 @@ DATA(0x004feea0) char* gCPanelHelp[KB_CONTROL_PANEL_HELP_COUNT] = {
     "Save the current game.",
     "Quit out of Heroes of Might and Magic II.",
     "Exit this menu without doing anything.",
-    0
+    NULL
 };
 DATA(0x004feeb8) char* gCSPanelHelp[KB_COMBAT_SPELL_PANEL_HELP_COUNT] = {
     "{OK}\n\nExit this menu.",
@@ -8478,7 +8478,7 @@ DATA(0x004feeb8) char* gCSPanelHelp[KB_COMBAT_SPELL_PANEL_HELP_COUNT] = {
     "{Shadow Cursor}\n\nToggle on or off a shadowing system showing where the hex grid that the "
     "mouse cursor is currently over is shadowed.  When this is turned on, there is a slight "
     "performance cost, most noticeable on 486 computers.",
-    0
+    NULL
 };
 DATA(0x004feed8) char* gAPanelHelp[KB_ADVENTURE_PANEL_HELP_COUNT] = {
     "View the entire world.",
@@ -8486,7 +8486,7 @@ DATA(0x004feed8) char* gAPanelHelp[KB_ADVENTURE_PANEL_HELP_COUNT] = {
     "View information on the scenario you are currently playing.",
     "Dig for the Ultimate Artifact.",
     "Exit this menu without doing anything.",
-    0
+    NULL
 };
 DATA(0x004feef0) char* gInitMenuHelp[KB_INIT_MENU_HELP_COUNT] = {
     "{New Game}\n\nStart a single or multi-player game.",
@@ -8494,7 +8494,7 @@ DATA(0x004feef0) char* gInitMenuHelp[KB_INIT_MENU_HELP_COUNT] = {
     "{High Scores}\n\nView the high score screen.",
     "{Credits}\n\nView the credits screen.",
     "{Quit}\n\nQuit Heroes of Might and Magic and return to the operating system.",
-    0
+    NULL
 };
 DATA(0x004fef08) char* gAdvMenuHelp[KB_ADVENTURE_MENU_HELP_COUNT] = {
     "{Next Hero}\n\nSelect the next Hero.",
@@ -8507,9 +8507,9 @@ DATA(0x004fef08) char* gAdvMenuHelp[KB_ADVENTURE_MENU_HELP_COUNT] = {
     "{Cast Spell}\n\nCast an adventure spell."
 };
 DATA(0x004fef28) char* gLuckText[KB_LUCK_TEXT_COUNT] =
-    {"Cursed", "Awful", "Bad", "Normal", "Good", "Great", "Irish", 0};
+    {"Cursed", "Awful", "Bad", "Normal", "Good", "Great", "Irish", NULL};
 DATA(0x004fef48) char* gMoraleText[KB_MORALE_TEXT_COUNT] =
-    {"Treason", "Awful", "Poor", "Normal", "Good", "Great", "Blood!", 0};
+    {"Treason", "Awful", "Poor", "Normal", "Good", "Great", "Blood!", NULL};
 DATA(0x004fef68) char* onOffText[KB_ON_OFF_TEXT_COUNT] = {
     "Off",
     "On",
@@ -8522,10 +8522,10 @@ DATA(0x004fef68) char* onOffText[KB_ON_OFF_TEXT_COUNT] = {
     "On\nVolume 3",
     "On\nVolume 2",
     "On\nVolume 1",
-    0
+    NULL
 };
 DATA(0x004fef98) char* walkSpeedText[KB_WALK_SPEED_TEXT_COUNT] =
-    {"Walk", "Trot", "Canter", "Gallop", "Jump", 0};
+    {"Walk", "Trot", "Canter", "Gallop", "Jump", NULL};
 DATA(0x004fefb0) char* gColors[IDX(FACTION_COUNT)] =
     {"blue", "green", "red", "yellow", "orange", "purple"};
 DATA(0x004fefc8) char* gMonthNames[KB_MONTH_NAME_COUNT] = {
@@ -8556,7 +8556,7 @@ DATA(0x004feff0) char* gWeekNames[KB_WEEK_NAME_COUNT] = {
     "Tortoise",
     "Hedgehog",
     "Condor",
-    0
+    NULL
 };
 DATA(0x004ff030) char* cHeroScreen[KB_HERO_SCREEN_TEXT_COUNT] = {
     "Kingdom Overview",
@@ -8584,7 +8584,7 @@ DATA(0x004ff030) char* cHeroScreen[KB_HERO_SCREEN_TEXT_COUNT] = {
     "View Spell Points Info",
     "Set army combat formation to 'Spread'",
     "Set army combat formation to 'Grouped'",
-    0
+    NULL
 };
 DATA(0x004ff098) char* cCastleInfo[KB_CASTLE_INFO_TEXT_COUNT] = {
     "Build Mage Guild",
@@ -8629,10 +8629,10 @@ DATA(0x004ff0d8) char* cLuckInfo[KB_LUCK_INFO_TEXT_COUNT] = {
     "\nMasthead bonus at sea +1",
     "\nMermaid visited +1",
     "\nBattle Garb of Anduran gives you maximum luck.",
-    0
+    NULL
 };
 DATA(0x004ff130) char* IQnames[KB_IQ_NAME_COUNT] =
-    {"None", "Dumb", "Average", "Smart", "Genius", 0};
+    {"None", "Dumb", "Average", "Smart", "Genius", NULL};
 DATA(0x004ff148) char* cSpellHelp[KB_SPELL_HELP_TEXT_COUNT] = {
     "View previous page",
     "View next page",
@@ -8643,7 +8643,7 @@ DATA(0x004ff148) char* cSpellHelp[KB_SPELL_HELP_TEXT_COUNT] = {
     "Select Spell",
     "View Combat Spells",
     "Your hero has %d spell points remaining",
-    0
+    NULL
 };
 DATA(0x004ff170) char* speedText[KB_SPEED_TEXT_COUNT] = {
     "",
@@ -8667,7 +8667,7 @@ DATA(0x004ff198) char* cArmyDetail[KB_ARMY_DETAIL_TEXT_COUNT] = {
     "Morale: ",
     "Luck: ",
     "Shots: ",
-    0
+    NULL
 };
 DATA(0x004ff1c0) char* cWellDetail[KB_WELL_DETAIL_TEXT_COUNT] = {
     "Attack: ",
@@ -8679,13 +8679,13 @@ DATA(0x004ff1c0) char* cWellDetail[KB_WELL_DETAIL_TEXT_COUNT] = {
     "Available: ",
     "\n\nSpeed:\n%s",
     "\n\nGrowth\n + %d / week",
-    0
+    NULL
 };
 DATA(0x004ff1e8) char* cKingdomOverview[KB_KINGDOM_OVERVIEW_TEXT_COUNT] = {
     "Kingdom Overview     Month %d, Week %d, Day %d",
     "You own Dragon City.",
     "You own the Lighthouse.",
-    0
+    NULL
 };
 DATA(0x004ff1f8) char* cNewTurn[KB_NEW_TURN_TEXT_COUNT] = {
     "%s, you only have %d days left to capture a town, or you will be banished from this land.",
@@ -8696,7 +8696,7 @@ DATA(0x004ff1f8) char* cNewTurn[KB_NEW_TURN_TEXT_COUNT] = {
     "Astrologers proclaim month of the PLAGUE!\n\nAll populations are halved.",
     "Astrologers proclaim week of the %s.\n\nAll dwellings increase population.",
     "Astrologers proclaim week of the %s.\n\n%s growth +5.\n\nAll dwellings increase population.",
-    0
+    NULL
 };
 DATA(0x004ff218) char* cViewGeneralLabels[KB_VIEW_GENERAL_LABEL_COUNT] = {
     "Attack: ",
@@ -8706,7 +8706,7 @@ DATA(0x004ff218) char* cViewGeneralLabels[KB_VIEW_GENERAL_LABEL_COUNT] = {
     "Morale: ",
     "Luck: ",
     "Spell Points: ",
-    0
+    NULL
 };
 DATA(0x004ff238) char* cViewGeneralHelp[KB_VIEW_GENERAL_HELP_COUNT] = {
     "Stop Catapult",
@@ -8716,7 +8716,7 @@ DATA(0x004ff238) char* cViewGeneralHelp[KB_VIEW_GENERAL_HELP_COUNT] = {
     "Cancel",
     "Hero's Options",
     "Captain's Options",
-    0
+    NULL
 };
 DATA(0x004ff258) char* cViewGeneralLongHelp[KB_VIEW_GENERAL_LONG_HELP_COUNT] = {
     "{Cast Spell}\n\nCast a magical spell.  You may only cast one spell per combat round.  The "
@@ -8742,14 +8742,14 @@ DATA(0x004ff268) char* cCombatMessage[KB_COMBAT_MESSAGE_COUNT] = {
     "View Ballista Info"
 };
 DATA(0x004ff298) char* cHeroLevel[KB_HERO_LEVEL_TEXT_COUNT] =
-    {"%s has gained", " a level.\n", " %d levels.\n", 0};
+    {"%s has gained", " a level.\n", " %d levels.\n", NULL};
 DATA(0x004ff2a8) char* cCombatHelp[KB_COMBAT_HELP_COUNT] = {
     "Wait for other units to go.",
     "Skip this unit",
     "Auto combat",
     "Customize system options.",
     "",
-    0
+    NULL
 };
 DATA(0x004ff2c0) char* cLongCombatHelp[KB_LONG_COMBAT_HELP_COUNT] = {
     "{Wait}\n\nHave the current creature wait to take its turn until all the other creatures have "
@@ -8759,7 +8759,7 @@ DATA(0x004ff2c0) char* cLongCombatHelp[KB_LONG_COMBAT_HELP_COUNT] = {
     "{Auto Combat}\n\nAllows the computer to fight out the battle for you.",
     "{System Options}\n\nAllows you to customize the combat screen.",
     "{Message Bar}\n\nShows the results of individual monster's actions.",
-    0
+    NULL
 };
 DATA(0x004ff2d8) char* cTownCommand[28] = {
     "Redistribute %s army",
@@ -8830,7 +8830,7 @@ DATA(0x004ff440) char* gSetupBaudHelp[KB_SETUP_BAUD_HELP_COUNT] = {
     "{38400 Baud}\n\nUse a 38400 baud connection speed.\n\nNote: For a 14400 baud modem, use the "
     "19200 baud speed.  For a 28800 baud modem, use the 38400 baud speed.",
     "{Cancel}\n\nCancel back to the main menu.",
-    0
+    NULL
 };
 DATA(0x004ff458) char* gSetupComPortHelp[KB_SETUP_COM_PORT_HELP_COUNT] = {
     "{COM 1}\n\nUse COM Port 1 for the modem connection.",
@@ -8838,7 +8838,7 @@ DATA(0x004ff458) char* gSetupComPortHelp[KB_SETUP_COM_PORT_HELP_COUNT] = {
     "{COM 3}\n\nUse COM Port 3 for the modem connection.",
     "{COM 4}\n\nUse COM Port 4 for the modem connection.",
     "{Cancel}\n\nCancel back to the main menu.",
-    0
+    NULL
 };
 DATA(0x004ff470) char* gSetupDCBaudHelp[KB_SETUP_DC_BAUD_HELP_COUNT] = {
     "{2400 Baud}\n\nUse a 2400 baud connection speed. \n\nNote: In general, computers with the "
@@ -8858,7 +8858,7 @@ DATA(0x004ff470) char* gSetupDCBaudHelp[KB_SETUP_DC_BAUD_HELP_COUNT] = {
     "should use 38400 baud.  When in doubt, try slower speeds first, and if they work, then try "
     "faster speeds.  Most computers made in 1994 or later have a UART 16550 chip.",
     "{Cancel}\n\nCancel back to the main menu.",
-    0
+    NULL
 };
 DATA(0x004ff488) char* gSetupDCComPortHelp[KB_SETUP_DC_COM_PORT_HELP_COUNT] = {
     "{COM 1}\n\nUse COM Port 1 for the direct connection.",
@@ -8866,7 +8866,7 @@ DATA(0x004ff488) char* gSetupDCComPortHelp[KB_SETUP_DC_COM_PORT_HELP_COUNT] = {
     "{COM 3}\n\nUse COM Port 3 for the direct connection.",
     "{Com 4}\n\nUse COM Port 4 for the direct connection.",
     "{Cancel}\n\nCancel back to the main menu.",
-    0
+    NULL
 };
 DATA(0x004ff4a0) char* gSetupHotSeatGameHelp[KB_SETUP_HOT_SEAT_HELP_COUNT] = {
     "{2 Players}\n\nPlay with 2 human players, and optionally, up to 4 additional computer "
@@ -8901,14 +8901,14 @@ DATA(0x004ff4d8) char* gSetupMultiPlayerGameHelp[KB_SETUP_MULTIPLAYER_HELP_COUNT
     "{Direct Connect}\n\nPlay a direct connect game, where 2 players use their own computers "
     "directly connected through their serial port by a null modem.",
     "{Cancel}\n\nCancel back to the main menu.",
-    0
+    NULL
 };
 DATA(0x004ff4f0) char* gSetupNetworkGameHelp[KB_SETUP_NETWORK_HELP_COUNT] = {
     "{Host}\n\nThe host sets up the game options.  There can only be one host per network game.",
     "{Guest}\n\nThe guest waits for the host to set up the game, then is automatically added in.  "
     "There can be multiple guests for TCP/IP and IPX games, but only 1 guest for NetBIOS games.",
     "{Cancel}\n\nCancel back to the main menu.",
-    0
+    NULL
 };
 DATA(0x004ff500) char* gSetupNetworkGame2Help[KB_SETUP_NETWORK_SECOND_HELP_COUNT] = {
     "{IPX}\n\nIPX networking is the most commonly used form of network in Windows 95.  Up to 6 "
@@ -8943,7 +8943,7 @@ DATA(0x004ff520) char* cBattleResults[KB_BATTLE_RESULT_TEXT_COUNT] = {
     "Your cowardly forces flee from battle.",
     "Your forces suffer a bitter defeat.",
     "\n\nFor valor in combat, %s receives %d experience, and gains %d level(s).",
-    0
+    NULL
 };
 DATA(0x004ff550) char* cMoraleInfo[KB_MORALE_INFO_TEXT_COUNT] = {
     "{Good Morale}\n\nGood morale may give your armies extra attacks in combat.",
@@ -8982,19 +8982,19 @@ DATA(0x004ff550) char* cMoraleInfo[KB_MORALE_INFO_TEXT_COUNT] = {
 };
 DATA(0x004ff5d0) char* cMapSize[KB_MAP_SIZE_TEXT_COUNT] = {"Small", "Medium", "Large", "Huge"};
 DATA(0x004ff5e0) char* cDifficulty[KB_DIFFICULTY_TEXT_COUNT] =
-    {"Easy", "Normal", "Hard", "Expert", "Impossible", 0};
+    {"Easy", "Normal", "Hard", "Expert", "Impossible", NULL};
 DATA(0x004ff5f8) char* cStartDifficulty[KB_START_DIFFICULTY_TEXT_COUNT] =
     {"Easy", "Normal", "Hard", "Expert"};
 DATA(0x004ff608) char* cCampaignLeaders[KB_CAMPAIGN_LEADER_TEXT_COUNT] =
     {"Lord Ironfist", "Lord Slayer", "Queen Lamanda", "Lord Alamar"};
 DATA(0x004ff618) char* cWinText[KB_WIN_TEXT_COUNT] =
-    {"Days Spent:", "Base Score:", "Difficulty Rating:", "Final Score:", "Ranking:", 0};
+    {"Days Spent:", "Base Score:", "Difficulty Rating:", "Final Score:", "Ranking:", NULL};
 DATA(0x004ff630) char* cHumanDifficulty[KB_HUMAN_DIFFICULTY_TEXT_COUNT] =
-    {"Human\n", "Human\nEasy", "Human\nNormal", "Human\nHard", "Human\nExpert", 0};
+    {"Human\n", "Human\nEasy", "Human\nNormal", "Human\nHard", "Human\nExpert", NULL};
 DATA(0x004ff648) char* cHumanInfoDifficulty[KB_HUMAN_INFO_DIFFICULTY_TEXT_COUNT] =
-    {"Human-", "Human-Easy", "Human-Normal", "Human-Hard", "Human-Expert", 0};
+    {"Human-", "Human-Easy", "Human-Normal", "Human-Hard", "Human-Expert", NULL};
 DATA(0x004ff660) char* musicQualityText[KB_MUSIC_QUALITY_TEXT_COUNT] =
-    {"MIDI", "CD Stereo w/o Opera", "CD Stereo with Opera", 0};
+    {"MIDI", "CD Stereo w/o Opera", "CD Stereo with Opera", NULL};
 DATA(0x004ff670) char* gSpellDesc[KB_SPELL_TEXT_COUNT] = {
     "{Fireball}\n\nCauses a giant fireball to strike the selected area, damaging all nearby "
     "creatures.",
@@ -9078,7 +9078,7 @@ DATA(0x004ff670) char* gSpellDesc[KB_SPELL_TEXT_COUNT] = {
     "{Set Air Guardian}\n\nSets Air Elementals to guard a mine against enemy armies.",
     "{Set Fire Guardian}\n\nSets Fire Elementals to guard a mine against enemy armies.",
     "{Set Water Guardian}\n\nSets Water Elementals to guard a mine against enemy armies.",
-    0
+    NULL
 };
 DATA(0x004ff778) char* gSpellNames[KB_SPELL_TEXT_COUNT] = {
     "Fireball",
@@ -9146,10 +9146,10 @@ DATA(0x004ff778) char* gSpellNames[KB_SPELL_TEXT_COUNT] = {
     "Set Air Guardian",
     "Set Fire Guardian",
     "Set Water Guardian",
-    0
+    NULL
 };
 DATA(0x004ff880) char* gSecondarySkillLevels[KB_SECONDARY_SKILL_LEVEL_TEXT_COUNT] =
-    {"Basic", "Advanced", "Expert", 0};
+    {"Basic", "Advanced", "Expert", NULL};
 DATA(0x004ff890) char* gSecondarySkills[KB_SECONDARY_SKILL_TEXT_COUNT] = {
     "Pathfinding",
     "Archery",
@@ -9186,7 +9186,7 @@ DATA(0x004ff8c8) char* gNeutralBuildingNames[KB_NEUTRAL_BUILDING_TEXT_COUNT] = {
     "",
     "",
     "",
-    0
+    NULL
 };
 DATA(0x004ff918) char* gWellExtraNames[KB_WELL_EXTRA_NAME_COUNT] = {
     "Farm",
@@ -9196,10 +9196,10 @@ DATA(0x004ff918) char* gWellExtraNames[KB_WELL_EXTRA_NAME_COUNT] = {
     "Orchard",
     "Skull Pile",
     "1st Lvl Growth",
-    0
+    NULL
 };
 DATA(0x004ff938) char* gSpecialBuildingNames[KB_SPECIAL_BUILDING_NAME_COUNT] =
-    {"Fortifications", "Coliseum", "Rainbow", "Dungeon", "Library", "Storm", "Special", 0};
+    {"Fortifications", "Coliseum", "Rainbow", "Dungeon", "Library", "Storm", "Special", NULL};
 DATA(0x004ff958) char* gDwellingNames[IDX(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT] = {
     {"Thatched Hut",
      "Archery Range",
@@ -9378,7 +9378,7 @@ DATA(0x004ffb20) char* cBuildingInfoNeutral[KB_NEUTRAL_BUILDING_INFO_COUNT] = {
     "",
     "",
     "",
-    0
+    NULL
 };
 DATA(0x004ffb70) char* gBuildingInfoSpecial[KB_SPECIAL_BUILDING_INFO_COUNT] = {
     "The Fortifications increase the toughness of the walls, increasing the number of turns it "
@@ -9400,7 +9400,7 @@ DATA(0x004ffb88) char* cDirections[KB_DIRECTION_TEXT_COUNT] = {
     "western",
     "northwestern",
     "central",
-    0
+    NULL
 };
 DATA(0x004ffbb0) char* cRumourTerrainDescriptions[KB_RUMOUR_TERRAIN_DESCRIPTION_COUNT] = {
     "in the murky depths of the ocean.",
@@ -9412,15 +9412,15 @@ DATA(0x004ffbb0) char* cRumourTerrainDescriptions[KB_RUMOUR_TERRAIN_DESCRIPTION_
     "in the dirt.",
     "in a parched wasteland.",
     "buried on a beach.",
-    0
+    NULL
 };
 DATA(0x004ffbd8) char* gInterfaceTypeText[KB_INTERFACE_TYPE_TEXT_COUNT] =
-    {"Dynamic", "Good", "Evil", 0};
+    {"Dynamic", "Good", "Evil", NULL};
 DATA(0x004ffbe8) char* cBWMouseText[KB_BW_MOUSE_TEXT_COUNT] = {"Black & White", "Color"};
 DATA(0x004ffbf0) char* combatSpeedText[KB_COMBAT_SPEED_TEXT_COUNT] =
-    {"Normal", "Fast", "Very Fast", 0};
+    {"Normal", "Fast", "Very Fast", NULL};
 DATA(0x004ffc00) char* combatMiniInfoText[KB_COMBAT_MINI_INFO_TEXT_COUNT] =
-    {"None", "Spells Only", "Full", 0};
+    {"None", "Spells Only", "Full", NULL};
 DATA(0x004ffc10) char* gcCommandLineHelp[KB_COMMAND_LINE_HELP_COUNT] = {
     "\n\n\n***Command Line Help***\n",
     "\n",
@@ -9449,7 +9449,7 @@ DATA(0x004ffc60) char* cWinComError[KB_WIN_COM_ERROR_TEXT_COUNT] = {
     "\n  4) Consider lowering the BAUD rate in 'CONFIG' to 19200 or 9600."
 };
 DATA(0x004ffc78) char* cMiniViewText[KB_MINI_VIEW_TEXT_COUNT] =
-    {"%d Units", "%d Unit", "Attack", "Defense", "HP ", "Dmg", "Mrl", "Luk", "Shots", 0};
+    {"%d Units", "%d Unit", "Attack", "Defense", "HP ", "Dmg", "Mrl", "Luk", "Shots", NULL};
 DATA(0x004ffca0) char* gFileRequestHelp[KB_FILE_REQUEST_HELP_COUNT] = {
     "{Small Maps}\n\nView only maps of size small (36 x 36).",
     "{Medium Maps}\n\nView only maps of size medium (72 x 72).",
@@ -9477,7 +9477,7 @@ DATA(0x004ffca0) char* gFileRequestHelp[KB_FILE_REQUEST_HELP_COUNT] = {
     "difficulty is determined by the scenario designer.  More difficult maps might include more or "
     "stronger enemies, fewer resources, or other special conditions making things tougher for the "
     "human player.",
-    0
+    NULL
 };
 DATA(0x004ffce0) char* cPersonality[KB_PERSONALITY_TEXT_COUNT] =
     {"Warrior", "Builder", "Explorer", "Human"};
@@ -9661,7 +9661,7 @@ DATA(0x004ffed8) char* xGenericSiteNames[KB_GENERIC_SITE_NAME_COUNT] = {
     "Stables",
     "Mermaid",
     "Sirens",
-    0
+    NULL
 };
 DATA(0x004ffef8) char* xRecruitmentSiteNames[KB_RECRUITMENT_SITE_NAME_COUNT] = {
     "Barrow Mounds",
@@ -9669,7 +9669,7 @@ DATA(0x004ffef8) char* xRecruitmentSiteNames[KB_RECRUITMENT_SITE_NAME_COUNT] = {
     "Air Summoning Altar",
     "Fire Summoning Altar",
     "Water Summoning Altar",
-    0
+    NULL
 };
 DATA(0x004fff10) SWinSetup gWinSetup[KB_WIN_SETUP_COUNT] = {
     {0, 100, "Build improvement:"},
@@ -9768,14 +9768,14 @@ DATA(0x00500158) i32 giHighScoreType = 1;
 DATA(0x0050015c) b32 gbShowHighScore = false;
 DATA(0x00500160) b32 gbLowMemory = false;
 DATA(0x00500164) i32 giHighMemBuffer = 5;
-DATA(0x00500168) void* gLowPage = 0;
+DATA(0x00500168) void* gLowPage = NULL;
 DATA(0x0050016c) b32 gbLowPageGrabbed = false;
 DATA(0x00500170) i8 xSmackFromNetwork = 0;
 DATA(0x00500174) b32 gbInPollSound = false;
 DATA(0x005157a8) i32 iCDRomErr = 0;
 DATA(0x005157ac) i32 bEarlySetupDone = 0;
 DATA(0x005159f8) i32 bKBDone = 0;
-DATA(0x005159fc) struct _REDBOOK* hRedbookz = 0;
+DATA(0x005159fc) struct _REDBOOK* hRedbookz = NULL;
 DATA(0x00515a00) i32 bForceCheckTimeEvent = 0;
 DATA(0x00515ca0) u16 IMHotSpots[KB_INIT_MENU_HOTSPOT_COUNT][IDX(INIT_MENU_HOTSPOT_FIELD_COUNT)] = {
     {481, 185, 83, 96},
