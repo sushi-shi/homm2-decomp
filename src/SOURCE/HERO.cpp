@@ -29,23 +29,48 @@
 
 H2_ENUM_BEGIN(HeroUiConstant)
     UI_STATUS_TEXT_WIDGET          = 0x12f,
-    UI_ARTIFACT_FIRST              = 0x14,
-    UI_ARTIFACT_LAST               = 0x21,
-    UI_PRIMARY_STAT_FIRST          = 0x51,
-    UI_PRIMARY_STAT_LAST           = 0x54,
+    UI_ARTIFACT_SLOT_0             = 0x14,
+    UI_ARTIFACT_SLOT_1             = 0x15,
+    UI_ARTIFACT_SLOT_2             = 0x16,
+    UI_ARTIFACT_SLOT_3             = 0x17,
+    UI_ARTIFACT_SLOT_4             = 0x18,
+    UI_ARTIFACT_SLOT_5             = 0x19,
+    UI_ARTIFACT_SLOT_6             = 0x1a,
+    UI_ARTIFACT_SLOT_7             = 0x1b,
+    UI_ARTIFACT_SLOT_8             = 0x1c,
+    UI_ARTIFACT_SLOT_9             = 0x1d,
+    UI_ARTIFACT_SLOT_10            = 0x1e,
+    UI_ARTIFACT_SLOT_11            = 0x1f,
+    UI_ARTIFACT_SLOT_12            = 0x20,
+    UI_ARTIFACT_SLOT_13            = 0x21,
+    UI_ARTIFACT_FIRST              = UI_ARTIFACT_SLOT_0,
+    UI_ARTIFACT_LAST               = UI_ARTIFACT_SLOT_13,
+    UI_PRIMARY_STAT_ATTACK         = 0x51,
+    UI_PRIMARY_STAT_DEFENSE        = 0x52,
+    UI_PRIMARY_STAT_SPELL_POWER    = 0x53,
+    UI_PRIMARY_STAT_KNOWLEDGE      = 0x54,
+    UI_PRIMARY_STAT_FIRST          = UI_PRIMARY_STAT_ATTACK,
+    UI_PRIMARY_STAT_LAST           = UI_PRIMARY_STAT_KNOWLEDGE,
     UI_ADDITIONAL_STATS            = 0x55,
     UI_ARMY_ICON_FIRST             = 0x57,
     UI_ARMY_PORTRAIT_FIRST         = 0x5c,
     UI_ARMY_COUNT_FIRST            = 0x61,
-    UI_ARMY_SELECTOR_FIRST         = 0x66,
-    UI_ARMY_SELECTOR_LAST          = 0x6a,
+    UI_ARMY_SELECTOR_SLOT_0        = 0x66,
+    UI_ARMY_SELECTOR_SLOT_1        = 0x67,
+    UI_ARMY_SELECTOR_SLOT_2        = 0x68,
+    UI_ARMY_SELECTOR_SLOT_3        = 0x69,
+    UI_ARMY_SELECTOR_SLOT_4        = 0x6a,
+    UI_ARMY_SELECTOR_FIRST         = UI_ARMY_SELECTOR_SLOT_0,
+    UI_ARMY_SELECTOR_LAST          = UI_ARMY_SELECTOR_SLOT_4,
     UI_HERO_TITLE                  = 2,
     UI_HERO_PORTRAIT               = 0x41,
     UI_PRIMARY_STAT_VALUE_FIRST    = 0x4c,
     UI_PLAYER_CREST                = 0x56,
     UI_MORALE_FIRST                = 0xc8,
+    UI_MORALE_MIDDLE               = 0xc9,
     UI_MORALE_LAST                 = 0xca,
     UI_LUCK_FIRST                  = 0xcb,
+    UI_LUCK_MIDDLE                 = 0xcc,
     UI_LUCK_LAST                   = 0xcd,
     UI_EXPERIENCE_FIRST            = 0xce,
     UI_EXPERIENCE_LAST             = 0xcf,
@@ -87,6 +112,8 @@ H2_ENUM_BEGIN(HeroUiConstant)
     UI_ARMY_SLOT_COUNT             = 5,
     UI_SCREEN_WIDTH                = 640,
     UI_SCREEN_HEIGHT               = 480,
+    UI_STATUS_REGION_Y             = 459,
+    UI_STATUS_REGION_HEIGHT        = 20,
     UI_FADE_STEPS                  = 8,
     UI_FADE_IN                     = 0,
     UI_FADE_OUT                    = 1,
@@ -113,7 +140,8 @@ H2_ENUM_BEGIN(HeroUiConstant)
     UI_MORALE_POSITIVE_FRAME       = 4,
     UI_EMPTY_SKILL_FRAME           = 0,
     UI_EMPTY_ARTIFACT_FRAME        = 0,
-    UI_ARTIFACT_CONTROL_VALUE      = 2
+    UI_ARTIFACT_CONTROL_VALUE      = 2,
+    UI_ARMY_RACE_FRAME_OFFSET      = 4
 H2_ENUM_END(HeroUiConstant)
 
 H2_ENUM_CLASS_BEGIN(HeroScreenText)
@@ -151,6 +179,8 @@ H2_ENUM_CLASS_END(HeroSpellType)
 
 H2_ENUM_BEGIN(HeroMobilityConstant)
     BASE_RECORD_SIZE              = 0xec,
+    LAND_SPEED_COUNT              = 8,
+    SLOWEST_LAND_SPEED            = LAND_SPEED_COUNT - 1,
     SEA_BASE_MOBILITY             = 1500,
     LIGHTHOUSE_MOBILITY_BONUS     = 500,
     ASTROLABE_MOBILITY_BONUS      = 1000,
@@ -160,8 +190,16 @@ H2_ENUM_BEGIN(HeroMobilityConstant)
     STABLES_MOBILITY_BONUS        = 400,
     AI_DIFFICULTY_MOBILITY_BONUS  = 75,
     AI_STATE_MOBILITY_BONUS       = 50,
-    LIGHTHOUSE_MINE_TYPE          = 100
+    LIGHTHOUSE_MINE_TYPE          = 100,
+    HARD_GAME_DIFFICULTY          = 2,
+    HIGH_AI_DIFFICULTY            = 2
 H2_ENUM_END(HeroMobilityConstant)
+
+H2_ENUM_BEGIN(HeroImplementationConstant)
+    EXPERIENCE_PREVIOUS_ENTRY_OFFSET = 2,
+    TEMPLE_MORALE_BONUS              = 2,
+    PYRAMID_LUCK_PENALTY             = 2
+H2_ENUM_END(HeroImplementationConstant)
 
 VA(0x0046c3a0, 0x6f)
 hero::hero(void) {
@@ -208,7 +246,7 @@ i32 hero::HasArtifact(ArtifactType artifact) {
 
 VA(0x0046c526, 0x277)
 i32 hero::CalcMobility(void) {
-    i16 landMobility[8] = {1000, 1000, 1000, 1100, 1200, 1300, 1400, 1500};
+    i16 landMobility[LAND_SPEED_COUNT] = {1000, 1000, 1000, 1100, 1200, 1300, 1400, 1500}; // NOLINT(readability-magic-numbers)
     const i16 seaBaseMobilityCurrent = SEA_BASE_MOBILITY;
     const i16 lighthouseBonusIncrement = LIGHTHOUSE_MOBILITY_BONUS;
     const i16 astrolabeBonus = ASTROLABE_MOBILITY_BONUS;
@@ -230,7 +268,7 @@ i32 hero::CalcMobility(void) {
         if (HasArtifact(ARTIFACT_SAILORS_ASTROLABE))
             mobilityResult += astrolabeBonus;
     } else {
-        slowestSpeedValue = 7;
+        slowestSpeedValue = SLOWEST_LAND_SPEED;
         for (armySlotIndex = 0; armySlotIndex < ARMY_GROUP_SLOT_COUNT; armySlotIndex++) {
             if (m_army.m_creatureTypes[armySlotIndex] != ARMY_GROUP_EMPTY_SLOT
                 && gMonsterDatabase[m_army.m_creatureTypes[armySlotIndex]].speed
@@ -253,9 +291,10 @@ i32 hero::CalcMobility(void) {
     if (HasArtifact(ARTIFACT_TRUE_COMPASS))
         mobilityResult += compassMobility;
 
-    if (m_owner >= 0 && m_owner < 6 && !gbHumanPlayer[m_owner] && gpGame->m_difficulty >= 2) {
+    if (m_owner >= 0 && m_owner < IDX(GAME_PLAYER_COUNT) && !gbHumanPlayer[m_owner]
+        && gpGame->m_difficulty >= HARD_GAME_DIFFICULTY) {
         mobilityResult += AI_DIFFICULTY_MOBILITY_BONUS;
-        if (gpGame->m_players[m_owner].m_aiDifficulty == 2)
+        if (gpGame->m_players[m_owner].m_aiDifficulty == HIGH_AI_DIFFICULTY)
             mobilityResult += AI_STATE_MOBILITY_BONUS;
     }
     return mobilityResult;
@@ -358,8 +397,10 @@ void HeroMessageUpdate(char* text) {
     message.payload.widget.id = UI_STATUS_TEXT_WIDGET;
     message.payload.widget.data.text = text;
     gheroWin->BroadcastMessage(message);
-    gheroWin->DrawWindow(0, 300, 303);
-    gpWindowManager->UpdateScreenRegion(0, 459, 640, 20);
+    gheroWin->DrawWindow(0, UI_PREVIOUS_HERO, UI_STATUS_TEXT_WIDGET);
+    gpWindowManager->UpdateScreenRegion(
+        0, UI_STATUS_REGION_Y, UI_SCREEN_WIDTH, UI_STATUS_REGION_HEIGHT
+    );
 }
 
 VA(0x0046cb33, 0xa8)
@@ -379,7 +420,7 @@ void hero::HeroScreenUpdate(void) {
         heroWin->BroadcastMessage(message);
     }
     heroWin->DrawWindow();
-    gpWindowManager->UpdateScreenRegion(0, 0, 640, 480);
+    gpWindowManager->UpdateScreenRegion(0, 0, UI_SCREEN_WIDTH, UI_SCREEN_HEIGHT);
 }
 
 VA(0x0046cbdb, 0x1d2)
@@ -407,7 +448,8 @@ void hero::UpdateArmies(void) {
             message.payload.widget.command = HERO_UI_WIDGET_FRAME;
             message.payload.widget.id = index + UI_ARMY_ICON_FIRST;
             message.payload.widget.data.value =
-                gMonsterDatabase[m_army.m_creatureTypes[index]].race + 4;
+                gMonsterDatabase[m_army.m_creatureTypes[index]].race
+                + UI_ARMY_RACE_FRAME_OFFSET;
             heroWin->BroadcastMessage(message);
 
             message.payload.widget.command = HERO_UI_WIDGET_ICON_FILE;
@@ -631,7 +673,8 @@ i32 hero::GetExperience(i32 level) {
     levelCounter = HERO_EXPERIENCE_EXTRAPOLATION_FIRST_LEVEL;
     increment = static_cast<i32>(
         (gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT - 1]
-         - gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT - 2])
+         - gMinExpForLevel
+               [HERO_EXPERIENCE_LEVEL_TABLE_COUNT - EXPERIENCE_PREVIOUS_ENTRY_OFFSET])
         * HERO_EXPERIENCE_GROWTH_FACTOR
     );
     experience = gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT - 1] + increment;
@@ -656,7 +699,8 @@ i32 hero::GetLevel(i32 experienceValue) {
 
     increment = static_cast<i32>(
         (gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT - 1]
-         - gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT - 2])
+         - gMinExpForLevel
+               [HERO_EXPERIENCE_LEVEL_TABLE_COUNT - EXPERIENCE_PREVIOUS_ENTRY_OFFSET])
         * HERO_EXPERIENCE_GROWTH_FACTOR
     );
     experience = gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT - 1] + increment;
@@ -691,7 +735,7 @@ void hero::ApplyBattleWinTemps(void) {
         m_eventFlags = m_eventFlags - HERO_EVENT_OASIS;
     }
     if (HAS(m_eventFlags, HERO_EVENT_TEMPLE)) {
-        m_morale -= 2;
+        m_morale -= TEMPLE_MORALE_BONUS;
         m_eventFlags = m_eventFlags - HERO_EVENT_TEMPLE;
     }
     if (HAS(m_eventFlags, HERO_EVENT_FAERIE_RING)) {
@@ -715,7 +759,7 @@ void hero::ApplyBattleWinTemps(void) {
         m_eventFlags = m_eventFlags - HERO_EVENT_DERELICT_SHIP;
     }
     if (HAS(m_eventFlags, HERO_EVENT_PYRAMID)) {
-        m_luck += 2;
+        m_luck += PYRAMID_LUCK_PENALTY;
         m_eventFlags = m_eventFlags - HERO_EVENT_PYRAMID;
     }
     if (HAS(m_eventFlags, HERO_EVENT_MERMAID)) {
@@ -925,10 +969,10 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
     i32 secondarySkillSlot;
 
     switch (message.payload.widget.id) {
-        case UI_PRIMARY_STAT_FIRST:
-        case UI_PRIMARY_STAT_FIRST + 1:
-        case UI_PRIMARY_STAT_FIRST + 2:
-        case UI_PRIMARY_STAT_LAST:
+        case UI_PRIMARY_STAT_ATTACK:
+        case UI_PRIMARY_STAT_DEFENSE:
+        case UI_PRIMARY_STAT_SPELL_POWER:
+        case UI_PRIMARY_STAT_KNOWLEDGE:
             sprintf(
                 gText,
                 cHeroScreen[IDX(TEXT_PRIMARY_STAT)],
@@ -941,7 +985,7 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
             break;
 
         case UI_MORALE_FIRST:
-        case UI_MORALE_FIRST + 1:
+        case UI_MORALE_MIDDLE:
         case UI_MORALE_LAST:
             if (gpHVHero->m_army.GetMorale(gpHVHero, gpHVHero->GetOccupiedTown(), NULL) > 0)
                 sprintf(gText, cHeroScreen[IDX(TEXT_GOOD_MORALE)]);
@@ -952,7 +996,7 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
             break;
 
         case UI_LUCK_FIRST:
-        case UI_LUCK_FIRST + 1:
+        case UI_LUCK_MIDDLE:
         case UI_LUCK_LAST:
             if (gpGame->GetLuck(gpHVHero, NULL, gpHVHero->GetOccupiedTown()) > 0)
                 sprintf(gText, cHeroScreen[IDX(TEXT_GOOD_LUCK)]);
@@ -980,11 +1024,11 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
             sprintf(gText, cHeroScreen[IDX(TEXT_GROUPED_FORMATION)]);
             break;
 
-        case UI_ARMY_SELECTOR_FIRST:
-        case UI_ARMY_SELECTOR_FIRST + 1:
-        case UI_ARMY_SELECTOR_FIRST + 2:
-        case UI_ARMY_SELECTOR_FIRST + 3:
-        case UI_ARMY_SELECTOR_LAST:
+        case UI_ARMY_SELECTOR_SLOT_0:
+        case UI_ARMY_SELECTOR_SLOT_1:
+        case UI_ARMY_SELECTOR_SLOT_2:
+        case UI_ARMY_SELECTOR_SLOT_3:
+        case UI_ARMY_SELECTOR_SLOT_4:
             armySlot = message.payload.widget.id - UI_ARMY_SELECTOR_FIRST;
             if (giHeroScreenSrcIndex == UI_ARMY_SELECTION_NONE) {
                 if (gpHVHero->m_army.m_creatureTypes[armySlot] != ARMY_GROUP_EMPTY_SLOT)
@@ -1040,20 +1084,20 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
             }
             break;
 
-        case UI_ARTIFACT_FIRST:
-        case UI_ARTIFACT_FIRST + 1:
-        case UI_ARTIFACT_FIRST + 2:
-        case UI_ARTIFACT_FIRST + 3:
-        case UI_ARTIFACT_FIRST + 4:
-        case UI_ARTIFACT_FIRST + 5:
-        case UI_ARTIFACT_FIRST + 6:
-        case UI_ARTIFACT_FIRST + 7:
-        case UI_ARTIFACT_FIRST + 8:
-        case UI_ARTIFACT_FIRST + 9:
-        case UI_ARTIFACT_FIRST + 10:
-        case UI_ARTIFACT_FIRST + 11:
-        case UI_ARTIFACT_FIRST + 12:
-        case UI_ARTIFACT_LAST:
+        case UI_ARTIFACT_SLOT_0:
+        case UI_ARTIFACT_SLOT_1:
+        case UI_ARTIFACT_SLOT_2:
+        case UI_ARTIFACT_SLOT_3:
+        case UI_ARTIFACT_SLOT_4:
+        case UI_ARTIFACT_SLOT_5:
+        case UI_ARTIFACT_SLOT_6:
+        case UI_ARTIFACT_SLOT_7:
+        case UI_ARTIFACT_SLOT_8:
+        case UI_ARTIFACT_SLOT_9:
+        case UI_ARTIFACT_SLOT_10:
+        case UI_ARTIFACT_SLOT_11:
+        case UI_ARTIFACT_SLOT_12:
+        case UI_ARTIFACT_SLOT_13:
             if (gpHVHero->m_artifacts[message.payload.widget.id - UI_ARTIFACT_FIRST]
                 == IDX(ARTIFACT_NONE))
                 sprintf(gText, cHeroScreen[IDX(TEXT_EMPTY)]);
@@ -1205,10 +1249,10 @@ i32 HeroHandler(struct tag_message& message) {
             case HERO_UI_INPUT_SELECT:
             case HERO_UI_INPUT_ALTERNATE_SELECT:
                 switch (message.payload.widget.id) {
-                    case UI_PRIMARY_STAT_FIRST:
-                    case UI_PRIMARY_STAT_FIRST + 1:
-                    case UI_PRIMARY_STAT_FIRST + 2:
-                    case UI_PRIMARY_STAT_LAST:
+                    case UI_PRIMARY_STAT_ATTACK:
+                    case UI_PRIMARY_STAT_DEFENSE:
+                    case UI_PRIMARY_STAT_SPELL_POWER:
+                    case UI_PRIMARY_STAT_KNOWLEDGE:
                         gpHVHero->ViewStat(
                             message.payload.widget.id - UI_PRIMARY_STAT_FIRST,
                             quickView0
@@ -1216,7 +1260,7 @@ i32 HeroHandler(struct tag_message& message) {
                         break;
 
                     case UI_MORALE_FIRST:
-                    case UI_MORALE_FIRST + 1:
+                    case UI_MORALE_MIDDLE:
                     case UI_MORALE_LAST:
                         gpGame->ShowMoraleInfo(
                             gpHVHero,
@@ -1225,7 +1269,7 @@ i32 HeroHandler(struct tag_message& message) {
                         break;
 
                     case UI_LUCK_FIRST:
-                    case UI_LUCK_FIRST + 1:
+                    case UI_LUCK_MIDDLE:
                     case UI_LUCK_LAST:
                         gpGame->ShowLuckInfo(
                             gpHVHero,
@@ -1331,11 +1375,11 @@ i32 HeroHandler(struct tag_message& message) {
                         break;
                     }
 
-                    case UI_ARMY_SELECTOR_FIRST:
-                    case UI_ARMY_SELECTOR_FIRST + 1:
-                    case UI_ARMY_SELECTOR_FIRST + 2:
-                    case UI_ARMY_SELECTOR_FIRST + 3:
-                    case UI_ARMY_SELECTOR_LAST: {
+                    case UI_ARMY_SELECTOR_SLOT_0:
+                    case UI_ARMY_SELECTOR_SLOT_1:
+                    case UI_ARMY_SELECTOR_SLOT_2:
+                    case UI_ARMY_SELECTOR_SLOT_3:
+                    case UI_ARMY_SELECTOR_SLOT_4: {
                         tag_message dialogMessage;
                         i32 armyValue;
 
@@ -1425,20 +1469,20 @@ i32 HeroHandler(struct tag_message& message) {
                         break;
                     }
 
-                    case UI_ARTIFACT_FIRST:
-                    case UI_ARTIFACT_FIRST + 1:
-                    case UI_ARTIFACT_FIRST + 2:
-                    case UI_ARTIFACT_FIRST + 3:
-                    case UI_ARTIFACT_FIRST + 4:
-                    case UI_ARTIFACT_FIRST + 5:
-                    case UI_ARTIFACT_FIRST + 6:
-                    case UI_ARTIFACT_FIRST + 7:
-                    case UI_ARTIFACT_FIRST + 8:
-                    case UI_ARTIFACT_FIRST + 9:
-                    case UI_ARTIFACT_FIRST + 10:
-                    case UI_ARTIFACT_FIRST + 11:
-                    case UI_ARTIFACT_FIRST + 12:
-                    case UI_ARTIFACT_LAST:
+                    case UI_ARTIFACT_SLOT_0:
+                    case UI_ARTIFACT_SLOT_1:
+                    case UI_ARTIFACT_SLOT_2:
+                    case UI_ARTIFACT_SLOT_3:
+                    case UI_ARTIFACT_SLOT_4:
+                    case UI_ARTIFACT_SLOT_5:
+                    case UI_ARTIFACT_SLOT_6:
+                    case UI_ARTIFACT_SLOT_7:
+                    case UI_ARTIFACT_SLOT_8:
+                    case UI_ARTIFACT_SLOT_9:
+                    case UI_ARTIFACT_SLOT_10:
+                    case UI_ARTIFACT_SLOT_11:
+                    case UI_ARTIFACT_SLOT_12:
+                    case UI_ARTIFACT_SLOT_13:
                         if (gpHVHero
                                 ->m_artifacts[message.payload.widget.id - UI_ARTIFACT_FIRST]
                             != IDX(ARTIFACT_NONE)) {
@@ -2057,6 +2101,6 @@ void hero::CheckAnduranPieces(i32 showDialog) {
 DATA(0x004f6c88) class hero* gpHVHero = NULL;
 DATA(0x004f6c8c) class heroWindow* gheroWin = NULL;
 DATA(0x004f6cd0) i16 gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT] =
-    {0, 1000, 2000, 3200, 4500, 6000, 7700, 9000, 11000, 13200, 15500, 18500};
+    {0, 1000, 2000, 3200, 4500, 6000, 7700, 9000, 11000, 13200, 15500, 18500}; // NOLINT(readability-magic-numbers)
 DATA(0x005280dc) i32 iOrigHeroViewID;
 DATA(0x005280e0) b32 gbNoDismiss;
