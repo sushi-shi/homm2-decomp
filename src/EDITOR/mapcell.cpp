@@ -51,6 +51,9 @@ void fullMap::ClearCellExtra(i32 index) {
     extras[index].nextIndex = 0;
 }
 
+// Expansion-only to avoid perturbing VC4.2's later code generation in this TU.
+#define EXTRA_ALLOCATION_STEP 100
+
 VA(0x0040b266, 0x130)
 i32 fullMap::GetNewCellExtraIndex(void) {
     i32 nb;
@@ -63,16 +66,20 @@ i32 fullMap::GetNewCellExtraIndex(void) {
             return nb;
         }
     }
-    i = static_cast<mapCellExtra*>(operator new((extraCount + 100) * sizeof(mapCellExtra)));
+    i = static_cast<mapCellExtra*>(
+        operator new((extraCount + EXTRA_ALLOCATION_STEP) * sizeof(mapCellExtra))
+    );
     memcpy(i, extras, extraCount * sizeof(mapCellExtra));
     delete extras;
     extras = i;
-    for (j = extraCount; j < extraCount + 100; j++)
+    for (j = extraCount; j < extraCount + EXTRA_ALLOCATION_STEP; j++)
         extras[j].nextIndex = IDX(MAPCELL_EXTRA_FREE);
-    extraCount += 100;
-    ClearCellExtra(extraCount - 100);
-    return extraCount - 100;
+    extraCount += EXTRA_ALLOCATION_STEP;
+    ClearCellExtra(extraCount - EXTRA_ALLOCATION_STEP);
+    return extraCount - EXTRA_ALLOCATION_STEP;
 }
+
+#undef EXTRA_ALLOCATION_STEP
 
 VA(0x0040b73c, 0x9e)
 void fullMap::Write(i32 handle) {
