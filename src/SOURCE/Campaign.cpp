@@ -606,36 +606,36 @@ void game::CampaignInfoUpdate(i32 redraw) {
                 sprintf(gText, "%d %s", choice->amount, gResourceNames[choice->value]);
                 break;
             case CAMPAIGN_CHOICE_ARTIFACT:
-                switch (choice->value) {
-                    case IDX(ARTIFACT_MAGE_RING):
+                switch (static_cast<ArtifactType>(choice->value)) {
+                    case ARTIFACT_MAGE_RING:
                         strcpy(gText, "Mage's Ring");
                         break;
-                    case IDX(ARTIFACT_FIZBIN_OF_MISFORTUNE):
+                    case ARTIFACT_FIZBIN_OF_MISFORTUNE:
                         strcpy(gText, "Fizbin Medal");
                         break;
-                    case IDX(ARTIFACT_THUNDER_MACE):
+                    case ARTIFACT_THUNDER_MACE:
                         strcpy(gText, "Thunder Mace");
                         break;
-                    case IDX(ARTIFACT_ARMORED_GAUNTLETS):
+                    case ARTIFACT_ARMORED_GAUNTLETS:
                         strcpy(gText, "Gauntlets");
                         break;
-                    case IDX(ARTIFACT_DEFENDER_HELM):
+                    case ARTIFACT_DEFENDER_HELM:
                         strcpy(gText, "Defender Helm");
                         break;
-                    case IDX(ARTIFACT_DRAGON_SWORD):
+                    case ARTIFACT_DRAGON_SWORD:
                         strcpy(gText, "Dragon Sword");
                         break;
-                    case IDX(ARTIFACT_POWER_AXE):
+                    case ARTIFACT_POWER_AXE:
                         strcpy(gText, "Power Axe");
                         break;
-                    case IDX(ARTIFACT_DIVINE_BREASTPLATE):
+                    case ARTIFACT_DIVINE_BREASTPLATE:
                         strcpy(gText, "Breastplate");
                         break;
-                    case IDX(ARTIFACT_MINOR_SCROLL):
+                    case ARTIFACT_MINOR_SCROLL:
                         strcpy(gText, "Minor Scroll");
                         break;
-                    case IDX(ARTIFACT_HIDEOUS_MASK):
-                    case IDX(ARTIFACT_BLACK_PEARL):
+                    case ARTIFACT_HIDEOUS_MASK:
+                    case ARTIFACT_BLACK_PEARL:
                     default:
                         sprintf(gText, "%s", gArtifactNames[choice->value]);
                         break;
@@ -1019,19 +1019,19 @@ void game::InitCampaignMap(void) {
             armyHero->m_army.m_creatureTypes[heroPositionValue] = ARMY_GROUP_EMPTY_SLOT;
             armyHero->m_army.m_creatureCounts[heroPositionValue] = 0;
         }
-        switch (armyHero->m_cursorType) {
-            case IDX(FACTION_BARBARIAN):
+        switch (static_cast<FactionType>(armyHero->m_cursorType)) {
+            case FACTION_BARBARIAN:
                 armyHero->m_army
                     .Add(IDX(CREATURE_ORC_CHIEF), BARBARIAN_ORC_CHIEF_COUNT, -1);
                 armyHero->m_army.Add(IDX(CREATURE_OGRE), BARBARIAN_OGRE_COUNT, -1);
                 armyHero->m_army.Add(IDX(CREATURE_GOBLIN), BARBARIAN_GOBLIN_COUNT, -1);
                 break;
-            case IDX(FACTION_WARLOCK):
+            case FACTION_WARLOCK:
                 armyHero->m_army.Add(IDX(CREATURE_CENTAUR), WARLOCK_CENTAUR_COUNT, -1);
                 armyHero->m_army.Add(IDX(CREATURE_GARGOYLE), WARLOCK_GARGOYLE_COUNT, -1);
                 armyHero->m_army.Add(IDX(CREATURE_GRIFFIN), WARLOCK_GRIFFIN_COUNT, -1);
                 break;
-            case IDX(FACTION_NECROMANCER):
+            case FACTION_NECROMANCER:
                 armyHero->m_army
                     .Add(IDX(CREATURE_SKELETON), NECROMANCER_SKELETON_COUNT, -1);
                 armyHero->m_army
