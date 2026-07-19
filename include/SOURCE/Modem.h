@@ -1,8 +1,6 @@
 #ifndef HOMM2_MODEM_H
 #define HOMM2_MODEM_H
 #include <va.h>
-// Declarations of the free functions DEFINED in Modem.cpp — the single home for these
-// symbols. Other TUs call them by including this header (no local externs).
 
 void ModemSetup(i32);
 i32l Dial(void);
@@ -65,7 +63,6 @@ struct outque_t {
 SIZE(inque_t, 0x1008);
 SIZE(outque_t, 0x808);
 
-// ---- globals (declarations, RVA order) ----
 extern i32 iBaudBits;
 extern i32 inescape;
 extern i32 newpacket;
@@ -93,4 +90,4 @@ inline void TruncateModemResponse(void) {
     GUIMRresponse[MODEM_RESPONSE_TRUNCATE_INDEX] = 0;
 }
 
-#endif // HOMM2_MODEM_H
+#endif

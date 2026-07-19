@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_RE\ICONWDGT.OBJ   from: .\basewin.lib
-// functions: 9   data: 1
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <BASE/iconWidget.h>
 #include <BASE/widgetKind.h>
@@ -20,15 +15,7 @@ iconWidget::iconWidget(void) : widget(0, 0, 0, 0, 0, 0) {
     m_iconId = 0;
 }
 
-// @early-stop
-// Compiler COMDAT-folding artifact: retail carries two strong, byte-identical 0x36
-// ??_E/??_G deleting-destructor sections (10 relocations apiece), while retaining the
-// exact standalone 0x21 ??1 destructor below makes VC4.2 emit a 0x1f ??_G wrapper and
-// a weak ??_E alias with no section. Making the destructor inline produces the folded
-// deleting body but removes the separately mapped exact ??1 symbol, so the ABI-correct
-// standalone destructor is retained rather than traded for weak aliases.
-// VA(0x004d0a90, 0x36) ??_E/??_G iconWidget deleting-destructor aliases
-
+// @early-stop: inline continuation artifact.
 VA(0x004d0ad0, 0x6a)
 iconWidget::iconWidget(
     i16 x,
@@ -97,17 +84,7 @@ iconWidget::~iconWidget() {
     gpResourceManager->Dispose(m_icon);
 }
 
-// @semantic
-// Candidate and retail are both 0x291 with the same frame and CFG. In the required
-// WidgetKind enum TU state, the only non-relocation spans are +0x9e..+0x9f and
-// +0xa1..+0xa2: candidate compares m_x to relativeX and branches JG, while retail
-// compares relativeX to m_x and branches JL. All 17 relocation offsets/types align;
-// the 10 external targets agree, while two switch-dispatch references and five
-// jump-table entries are the proven retail-containing-function versus $L identity
-// artifact. m_x<=relativeX, relativeX>=m_x, and !(relativeX<m_x) lower identically
-// in this typed TU state. The latter polarity was raw exact before introducing the
-// canonical enum header, but that untyped state is not retained. Revisit after a real
-// predecessor/header TU-state change; this is not a byte-proven early stop.
+// @semantic: jump-table placement residual.
 VA(0x004d0cd0, 0x291)
 i32 iconWidget::Main(tag_message& msg) {
     u16 flags = m_flags;
@@ -200,19 +177,7 @@ normalEvent:
     return widget::Main(msg);
 }
 
-// @semantic
-// Candidate and retail are both 0xe5 with the same frame, switch CFG, and 4 ordered
-// relocation offsets/types/targets. In the required WidgetKind enum TU state the
-// non-relocation spans are +0x62..+0x63, +0x65..+0x68, +0x69..+0x6c, +0x71..+0x72,
-// +0x76..+0x77, +0x79..+0x7a, +0x7b..+0x7c, +0x7d..+0x7e, and +0x80..+0x81.
-// Candidate assigns iconWidth/widgetWidth to CX/DX and centers through EDX; retail
-// uses DX/CX and EBP. Direct/cached widths, declaration and subtraction order,
-// comma sequencing, all three libclang AST variants, normal enum-include positions,
-// and a separate semantic top/left-local form were tried. Twenty-four guarded
-// typed-TU probes produced no exact closure; several recovered the earlier six-byte
-// schedule residual, but those sub-100 probe scores were correctly discarded.
-// Revisit after a real predecessor/header TU-state change; this is not a
-// byte-proven early stop.
+// @semantic: compiler-shape residual.
 VA(0x004d0f70, 0xe5)
 void iconWidget::Draw(void) {
     heroWindow* window = m_owner;
@@ -249,10 +214,5 @@ void iconWidget::Draw(void) {
     }
 }
 
-// ===== vtable iconWidget : public widget  (3 slots) =====
-//  [ 0] VA(0x004d0f70, 0xe5)  void iconWidget::Draw(void)   <- override (implements widget pure virtual)
-//  [ 1] VA(0x004d0a90, 0x36)  void * iconWidget::scalar_dtor(unsigned int)   <- override (implements widget pure virtual)
-//  [ 2] VA(0x004d0cd0, 0x291)  int iconWidget::Main(struct tag_message &)   <- override (implements widget pure virtual)
 
-// ---- vtables (compiler-emitted; census) ----
 VTBL(iconWidget, 0x004eba40);

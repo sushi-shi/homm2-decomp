@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_RE\EXEC.OBJ   from: .\basewin.lib
-// functions: 10   data: 0
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <BASE/executive.h>
 #include <BASE/EXEC_TYPES.h>
@@ -18,19 +13,6 @@
 #include <SOURCE/kbwin.h>
 #include <SOURCE/X_GLOBAL.h>
 
-// @data-layout-note Retail's EXEC contribution is one initialized-data interval,
-// RVA 0x11fb20..0x11fd34 (0x214), with no rdata or loader-zero contribution.
-// The former source produced 12 pooled literal COMDATs: raw size 0x156 and a
-// replay end at offset 0x163. It collapsed six "Can't add manager!" uses and two
-// "-----" uses, and five initialization/list payloads differed from the PE.
-// Retail HIGHLOW sites prove 18 distinct addresses in call order at owner addends
-// 0x000, 0x038, 0x088, 0x0a4, 0x0c0, 0x100, 0x114, 0x128, 0x13c, 0x150,
-// 0x170, 0x178, 0x18c, 0x194, 0x1c0, 0x1e0, 0x1f4, and 0x208. Separate static
-// arrays were tested and rejected because VC4.2 aligned each owner to eight bytes,
-// growing candidate data to 0x23b. This structured owner compiles to one 0x214
-// section whose bytes equal the retail interval and whose 18 relocation addends
-// equal those PE addresses. Do not reintroduce pooled literals, independent arrays,
-// padding symbols, aliases, supplemental identities, or section pragmas.
 DATA(0x0051fb20) static SExecutiveText gExecutiveText = {
     "Unable to initialize resources - possible disk problem.",
     "Unable to initialize input devices - possible problem with mouse or keyboard.",
@@ -77,12 +59,6 @@ i32 executive::InitSystem(void) {
     return 0;
 }
 
-// Complete /O2 structure with an exact frame/CFG and 11/11 ordered external
-// relocations. The only canonical byte residual is the commutative comparison at
-// +0x2d (ours cmp ECX,EAX; retail cmp EAX,ECX). Reordering the condition, naming
-// the window-manager operand, and 20 AST permutations did not steer it. A bounded
-// tu_state_noise seed-45 enum probe produced an audited exact closure without
-// changing exact siblings; revisit only if earlier EXEC TU state changes.
 VA(0x004d16c0, 0x86)
 void executive::ShutDownSystem(void) {
     EarlyShutDownSystem();
@@ -102,14 +78,7 @@ void executive::ShutDownSystem(void) {
     gpResourceManager->Close();
 }
 
-// @semantic
-// Complete /O2 structure with the retail frame/CFG and all 16 ordered external
-// relocations. The snapshot loop at +0x19..+0x40 is byte-exact. The only structural
-// residual is +0xce..+0xe9 in the manager restoration loop: ours assigns EDX=manager
-// and ECX=index while retail assigns ECX=manager and EDX=index. Declaration/init
-// reordering and 25 AST permutations did not steer it; two bounded TU-state probes
-// (78 trials total) reached only a disposable 99.4375%. Revisit after earlier EXEC
-// TU-state changes.
+// @semantic: only structural residual is +0xce..+0xe9 in the manager restoration loop.
 VA(0x004d1750, 0xfb)
 i32 executive::DoDialog(class baseManager* manager) {
     baseManager* managerList[EXECUTIVE_DIALOG_MANAGER_CAPACITY];
@@ -214,12 +183,6 @@ i32 executive::AddManager(class baseManager* mgr, i32 priority) {
     return EXECUTIVE_MANAGER_SUCCESS;
 }
 
-// Complete /O2 structure and CFG with 0/0 relocations. The only canonical byte
-// residual is +0x15..+0x1b: ours loads head then tail, while retail loads tail then
-// head before the same equality test. A shared next lifetime, an explicit tail
-// local, swapped condition spelling, and 25 AST permutations were tried. A bounded
-// tu_state_noise seed-45 enum probe produced an audited exact closure without
-// changing exact siblings; revisit only if earlier EXEC TU state changes.
 VA(0x004d19b0, 0x76)
 void executive::RemoveManager(class baseManager* mgr) {
     if (mgr != 0) {

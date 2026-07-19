@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_Re\REMOTE.OBJ   from: (directly linked into exe)
-// functions: 13   data: 30
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <stdio.h>
 #include <string.h>
 #include <va.h>
@@ -50,31 +45,7 @@ DATA(0x00516fb8) i32 iIRQ[REMOTE_IRQ_COUNT] = {1, 2, 3, 4, 5, 7, 9};
 DATA(0x00517118) static i16 gGetRemoteDataLineBase = 716;
 DATA(0x00517148) static i16 gPollRemoteLineBase = 757;
 
-// @data-layout-note Retail's initialized REMOTE contribution is
-// 0x116f60..0x11733c (0x3dc); candidate .data is 0x3db. The public initialized
-// owners occupy candidate and retail offsets 0x0..0x73 exactly. All 34 compiler
-// literals have byte-exact payloads and singleton ordered DIR32/HIGHLOW proofs.
-// The two signed-short source-line owners are independently proved at
-// 0x117118=0x02cc (GetRemoteData, addend 25) and 0x117148=0x02f5 (PollRemote,
-// addend 235). VC4.2 buckets them at candidate offsets 0x74 and 0x78, while
-// retail interleaves them at contribution offsets 0x1b8 and 0x1e8. The reviewed
-// literal mappings account for both insertions and leave one terminal retail
-// alignment zero at offset 0x3db. REMOTE has no candidate .rdata contribution.
-// Retail's loader-zero contribution is 0x12a268..0x12adc0 (0xb58), while the
-// candidate .bss is 0xb50. All 176 retail HIGHLOW targets in that range resolve
-// inside the 15 source DATA owners with proven owner-relative addends; none land
-// in an alignment gap. Retail has 0x18 bytes of inter-owner/tail alignment versus
-// 0x10 in candidate common order, exactly explaining the eight-byte extent
-// residual. There is no missing private BSS storage. Revisit only with original
-// COFF/link-order evidence. Do not add padding, aliases, synthetic identities,
-// cursor snapping, guessed allocations, or section pragmas to force either
-// contribution extent.
-// @semantic: Complete cleanup guards, backend switch, and all state resets. The
-// 0x04 frame and switch temporary at -0x04 agree, including the retail duplicate protocol
-// reset block. All 38 relocation occurrences and external targets agree. The
-// first residual is the delinked switch continuation/local-label trampoline.
-// Empty positive arms and direct early exits were both tested. Revisit in the
-// 95% last-mile phase when local-label walls enter the active queue.
+// @semantic: first residual is the delinked switch continuation/local-label trampoline.
 VA(0x004a3080, 0x188)
 void RemoteCleanup(void) {
     LogStr("RC1");
@@ -122,14 +93,7 @@ void RemoteCleanup(void) {
     }
 }
 
-// @semantic: Complete setup, transport initialization, player exchange, and
-// game-type synchronization CFG. The 0x74 frame and live slots agree, including the legacy
-// 64-byte name buffer, player-state word, setup counter, and command switch temp.
-// All 143 raw relocation entries and external targets agree. llvm-objdump starts
-// the retail post-table block one byte inside its compare at .text+0x559; the raw
-// relocation at +0x55c has a zero addend, matching base +0x557. Tested protocol
-// polarity, log placement, struct copies, and host-name arm order. Revisit in the
-// 95% last-mile phase when local-label walls enter the active queue.
+// @semantic: compiler-shape residual.
 VA(0x004a3208, 0x6da)
 void RemoteMain(i32 gameMode) {
     u8 receivedPlayers[REMOTE_PLAYER_COUNT];
@@ -391,12 +355,7 @@ i32 EncodePacket(u8* data, char source, char destination, i32 length) {
     return length + REMOTE_PACKET_HEADER_SIZE;
 }
 
-// @semantic: The complete 0x11c-byte candidate code range, 0xcc frame, stack
-// slots, and CFG agree. All 17 ordered relocation owners/addends agree; the only
-// normalized instruction identities are two volatile $SG literal spellings.
-// Retail's provisional 0x13a next-public span has 30 trailing bytes beyond this
-// code range, so it is not valid to claim the entire public span as raw exact.
-// Revisit only after private-function/boundary evidence or comparison-epoch changes.
+// @semantic: stack-slot/code-shape residual.
 VA(0x004a3aa7, 0x13a)
 i32 DecodePacket(u8* data, i32) {
     u16 receivedCRC;
@@ -424,13 +383,7 @@ i32 DecodePacket(u8* data, i32) {
     return 1;
 }
 
-// @semantic: Complete destination folding and all network/modem switch bodies in
-// retail DirectPlay/Winsock/NetBIOS body order. The 0x11c frame is exact: size -0x04,
-// result -0x08, backend status -0x0c, the retail-proven dead 260-byte aggregate
-// through -0x110, fastcall spills -0x114/-0x118, and switch temporary -0x11c.
-// All 23 relocations agree; the first comparison boundary is the delinked switch
-// dispatch. Both nested inverse and positive backend polarities were tested.
-// Revisit in the 95% last-mile phase.
+// @semantic: compiler-shape residual.
 VA(0x004a3be1, 0x18e)
 i32 SendRemoteData(u8* dataToSend, u8*, i32 destination, i32 length) {
     i32 sendStatus;
@@ -483,13 +436,7 @@ i32 SendRemoteData(u8* dataToSend, u8*, i32 destination, i32 length) {
     return out;
 }
 
-// @early-stop
-// Complete DirectPlay, Winsock, NetBIOS, and modem receive/decode paths. The 0x14
-// frame and slots agree: result -0x04, 32-bit receive status -0x08, fastcall spills
-// -0x0c/-0x10, and switch temporary -0x14. The functions have the same 0x158-byte
-// size and every non-relocation byte is identical. The only six raw byte differences
-// are switch relocation addends at +0x135/+0x136/+0x139/+0x13d/+0x141/+0x145;
-// all 19 relocation sites and external targets agree.
+// @early-stop: byte-proven compiler artifact.
 VA(0x004a3d6f, 0x158)
 i32 ReceiveRemoteData(u8*, u8* data, i32 decodeType) {
     i32 result;
@@ -527,14 +474,7 @@ i32 ReceiveRemoteData(u8*, u8* data, i32 decodeType) {
     return result;
 }
 
-// @semantic: Complete message construction, retry/dialog loop, confirmation
-// polling, and reliable/unreliable exits. The 0x118 frame is exact: result -0x04, message through
-// -0x108, retail-proven dead word -0x10c, attempt -0x110, poll -0x114, and fastcall
-// spills through -0x118. All 15 relocation targets agree. The first residual is a
-// retail five-byte continuation after the unreliable-success return, followed by
-// the iIDCtr/giLastConfirm load order. Guarded/early-return loops, both comparison
-// operand orders, and both message-type polarities were tested. Revisit in the 95%
-// last-mile phase.
+// @semantic: first residual is a retail five-byte continuation after the unreliable-success return.
 VA(0x004a3ec7, 0x21a)
 i32 TransmitRemoteData(
     char* data,
@@ -629,15 +569,7 @@ char* GetRemoteData(i8 remove) {
     return 0;
 }
 
-// @semantic: Complete backend pumping, heartbeat, host/guest timeout recovery,
-// confirmation, duplicate suppression, queue allocation, and recent-ID rotation. The retail
-// queue-full snapshot is byte-sized; its -0x14 slot, queue count -0x0c, saved poll
-// state -0x08, both seven-byte exit records, and the 0x30 frame agree. All 132
-// relocation occurrences and external targets agree. Ignoring delinked literal
-// identities, the first code residual is the host-loop queueIndex/giThisNetPos load
-// order; both operand orders, empty guards, and arm polarities were tested. Revisit
-// in the 95% last-mile phase. Retail explicitly stores 1 to bInTimeoutFail after
-// restoring gbInPollSound in the guest-timeout path; that unusual state is authentic.
+// @semantic: first code residual is the host-loop queueIndex/giThisNetPos load order.
 VA(0x004a41ec, 0x6f4)
 void PollRemote(void) {
     i32 savedInPollSound;
@@ -845,14 +777,7 @@ void PollRemote(void) {
     }
 }
 
-// @semantic: Complete transmit, timeout/retry dialog, response filtering, and
-// common result path. The 0x1c frame is exact: wait start -0x04, result -0x08, response -0x0c,
-// byte completion flag -0x10, retail-proven dead response state -0x14, and fastcall
-// spills -0x18/-0x1c. All 11 relocation targets agree. The first residual is one
-// retail five-byte continuation after successful transmit, with one final local-label
-// jump at the epilogue. Empty positive arms, direct cancellation returns, common
-// breaks, compound predicates, and the explicit common label were tested. Revisit
-// in the 95% last-mile phase.
+// @semantic: first residual is one retail five-byte continuation after successful transmit.
 VA(0x004a48e0, 0x163)
 i32 TransmitAndWait(
     char* data,
@@ -902,7 +827,6 @@ transmitComplete:
     return result;
 }
 
-// ---- loader-zero globals (definitions, retail RVA order) ----
 DATA(0x0052a268) char rcvBufOut[REMOTE_TRANSPORT_BUFFER_SIZE];
 DATA(0x0052a378) i32 iLastIds[REMOTE_RECENT_ID_COUNT];
 DATA(0x0052a3f0) char PacketSend[REMOTE_ENCODED_BUFFER_SIZE];

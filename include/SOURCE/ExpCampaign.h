@@ -1,10 +1,7 @@
 #ifndef HOMM2_SOURCE_EXPCAMPAIGN_H
 #define HOMM2_SOURCE_EXPCAMPAIGN_H
-// Reconstructed class (SOURCE) from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// 36 methods, 0 own-virtual, 0 static data.
 #include <va.h>
 #include <SOURCE/Campaign.h>
-// forward declarations:
 class heroWindow;
 struct tag_message;
 
@@ -148,26 +145,24 @@ H2_ENUM_BEGIN(ExpansionCampaignChoiceConstant)
     EXPANSION_CAMPAIGN_MERCURY_PENALTY_TWO = -2
 H2_ENUM_END(ExpansionCampaignChoiceConstant)
 
-#pragma pack(push, 1) // recovered layout is byte-packed
+#pragma pack(push, 1)
 class ExpCampaign {
 public:
-    i32 m_campaignId;                                    // +0x00
-    i32 m_currentMap;                                    // +0x04
-    i32 m_mapCount;                                      // +0x08
-    u8 m_mapChoices[EXPANSION_CAMPAIGN_MAX_MAP_COUNT];   // +0x0c
-    u8 m_mapsPlayed[EXPANSION_CAMPAIGN_MAX_MAP_COUNT];   // +0x14
-    i16 m_mapDays[EXPANSION_CAMPAIGN_MAX_MAP_COUNT];     // +0x1c
-    u8 m_awards[EXPANSION_CAMPAIGN_AWARD_COUNT];         // +0x2c
-    u8 m_bonusChoices[EXPANSION_CAMPAIGN_MAX_MAP_COUNT]; // +0x37
+    i32 m_campaignId;
+    i32 m_currentMap;
+    i32 m_mapCount;
+    u8 m_mapChoices[EXPANSION_CAMPAIGN_MAX_MAP_COUNT];
+    u8 m_mapsPlayed[EXPANSION_CAMPAIGN_MAX_MAP_COUNT];
+    i16 m_mapDays[EXPANSION_CAMPAIGN_MAX_MAP_COUNT];
+    u8 m_awards[EXPANSION_CAMPAIGN_AWARD_COUNT];
+    u8 m_bonusChoices[EXPANSION_CAMPAIGN_MAX_MAP_COUNT];
     char m_pad_0x3f[4];
-    i32 m_viewMap;              // +0x43
-    class heroWindow* m_window; // +0x47
-    i32 m_viewOnly;             // +0x4b
+    i32 m_viewMap;
+    class heroWindow* m_window;
+    i32 m_viewOnly;
     char m_pad_0x4f;
-    // --- constructors ---
     ExpCampaign(void);
     ~ExpCampaign();
-    // --- methods ---
     void ResetMapChoices(void);
     void ResetMapsPlayed(void);
     void ResetAwards(void);
@@ -194,7 +189,7 @@ public:
     i8 IsThisMapCompleted(void);
 
 private:
-    static i32 MessageHandler(struct tag_message&); // ?...@ExpCampaign@@CIH... (private static)
+    static i32 MessageHandler(struct tag_message&);
 public:
     void Autosave(void);
     i32 Choose(void);
@@ -212,4 +207,4 @@ SIZE(ExpCampaign, 0x50);
 extern struct SCampaignChoice xCampaignChoices[IDX(EXPANSION_CAMPAIGN_COUNT)]
                                               [EXPANSION_CAMPAIGN_MAX_MAP_COUNT]
                                               [EXPANSION_CAMPAIGN_BONUS_CHOICE_COUNT];
-#endif // HOMM2_SOURCE_EXPCAMPAIGN_H
+#endif

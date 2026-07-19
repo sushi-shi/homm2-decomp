@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_Re\Newgame.obj   from: (directly linked into exe)
-// functions: 16   data: 8
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <stdio.h>
 #include <string.h>
@@ -29,13 +24,10 @@
 #include <SOURCE/kbwin.h>
 #include <SOURCE/Newgame.h>
 
-// __FILE__ for the NWC memory/assert tracking (reloc-masked path string).
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\Newgame.cpp"
 
 // @early-stop
-// @early-stop-reloc-only: Current Newgame.cpp/header epoch: all 0x1d5 bytes
-// match after masking 37 ordered relocation sites. Effective targets agree;
-// residual rows only rename compiler-local strings and _strcmpi/__strcmpi.
+// @early-stop-reloc-only: relocation naming only.
 VA(0x004b6f40, 0x1d5)
 void game::GetMap(void) {
     fileRequester* requesterResult;
@@ -84,11 +76,7 @@ void game::GetMap(void) {
     }
 }
 
-// @early-stop 99.85714%: byte-proven branch-destination wall. The 0x04 frame,
-// all 33 non-jump instructions and operands, and all 6 ordered relocation
-// types/resolved targets agree. The sole unmasked byte residual is the branch
-// displacement at +0x35. A positive-arm spelling emitted an extra jne/jmp pair
-// and dropped to 95.43%; do not retry it without a TU-state change.
+// @early-stop: byte-proven compiler artifact.
 VA(0x004b7115, 0x77)
 void game::ProcessNewMap(struct SMapHeader* header) {
     m_newGameInitialized = 0;
@@ -103,11 +91,7 @@ void game::ProcessNewMap(struct SMapHeader* header) {
     }
 }
 
-// @early-stop 99.22932%: byte-proven /Od continuation-jump wall. The 0x1c
-// frame and local slots, all 244 non-jump instructions and operands, and all 7
-// ordered relocation types/resolved targets agree. Retail has 22 unconditional
-// jumps versus 20 here, exactly accounting for the 10-byte size delta. Commuting
-// the two human-player comparisons removed the only operand-order residual.
+// @early-stop: byte-proven compiler artifact.
 VA(0x004b718c, 0x491)
 void game::InitNewGame(struct SMapHeader* header) {
     i32 activePlayerCount;
@@ -211,13 +195,7 @@ void game::SetupNetPlayerNames(void) {
     }
 }
 
-// @early-stop 98.35664%: byte-proven /Od continuation-jump wall. The complete
-// new-game menu, allocation, remote packet wait/dispatch, map selection,
-// transmit, dialog, and cleanup flow has the retail 0x1f0 frame. All 537
-// non-jump instructions and operands and all 156 ordered relocation types and
-// semantic targets agree; every resolvable pair has the same RVA/addend. Retail
-// has 35 unconditional jumps versus 30 here, exactly accounting for the
-// 25-byte size delta.
+// @early-stop: byte-proven compiler artifact.
 VA(0x004b769e, 0xaca)
 i32 game::NewGame(void) {
     DATA(0x0051cdd0) static i16 newGameSourceLineBase = 319;
@@ -662,9 +640,7 @@ void game::InitNewGameWindow(void) {
 }
 
 // @early-stop
-// @early-stop-reloc-only: Current Newgame.cpp/header epoch: all 0x59c bytes
-// match after masking 50 ordered relocation sites. Effective targets agree;
-// residual rows only rename three compiler-local string symbols.
+// @early-stop-reloc-only: relocation naming only.
 VA(0x004b88d6, 0x59c)
 void game::UpdateNewGameWindow(void) {
     i32 playerLockedValue;
@@ -809,15 +785,7 @@ void game::UpdateNewGameWindow(void) {
     DrawNGKPDisplayString(0);
 }
 
-// @early-stop
-// After excluding retail switch data [0x21fe,0x2242) and
-// [0x2d11,0x2d8d), and base switch data [0x21c8,0x220c) and
-// [0x2cf3,0x2d73), the base has eight extra five-byte continuation jumps. Its
-// equivalent race increment load order saves one byte, and its second local
-// switch table has one extra four-byte entry, exactly accounting for the 0x2b
-// size delta. External relocation order was audited over the full object
-// ranges; residual identities are equivalent adjacent-global addends and
-// delinked local labels.
+// @early-stop: delinker artifact.
 VA(0x004b8e72, 0xf46)
 i32 NewGameHandler(struct tag_message& message) {
     i32 transmitResultTemp;
@@ -1313,14 +1281,7 @@ finish:
     return 1;
 }
 
-// @semantic: Current Newgame.cpp/header epoch has the exact 0x80 frame/slots,
-// 0x418 extent, complete semantics, and 84/84 ordered relocation sites/effective
-// targets. The real local branch residuals are +0x16d (adjacent +0x370 hop versus
-// direct +0x400) and +0x289 (no-op brace filter +0x297 versus direct insertion
-// +0x2b5). Ten bounded CFG/guard attempts exhausted shared/default labels,
-// nested/zero-aware/empty arms, operand reversals, and backspace polarity; the
-// best alternatives regressed to 99.39341%. Revisit only after a relevant
-// Newgame source/TU/header or comparison-state change affects local routing.
+// @semantic: branch/code-shape residual.
 VA(0x004b9db8, 0x418)
 i32 game::ProcessNGKeyPress(struct tag_message& message) {
     char workText[NEW_GAME_KEY_BUFFER_SIZE];
@@ -1824,9 +1785,7 @@ void game::ShowScenInfo(void) {
 }
 
 // @early-stop
-// @early-stop-reloc-only: Current Newgame.cpp/header epoch: all 0x1c7 bytes
-// match after masking 14 ordered relocation sites. Semantic suffixes restore
-// the six retail local slots; remaining rows only rename string symbols.
+// @early-stop-reloc-only: relocation naming only.
 VA(0x004baf0d, 0x1c7)
 void game::GetLossConditionText(char* text) {
     i32 week2;
@@ -2021,35 +1980,6 @@ i32 game::GetSideDesc(char* text, i32 firstPlayer, i32 lastPlayer) {
     return localPlayerOnSide;
 }
 
-// @data-layout-note
-// Retail initialized storage is 0x11cd20..0x11d450 (0x730 bytes): 105 real
-// definitions cover 0x72a bytes exactly and the final six bytes are zero tail
-// alignment. VC 4.2 puts the three explicit function statics first at candidate
-// offsets 0, 4, and 8; retail interleaves them at offsets 0xb0, 0x280, and
-// 0x3dc. The remaining candidate ranges translate as [0x14,0xbc) - 0xc,
-// [0xbc,0x288) - 8, [0x288,0x3e0) - 4, and [0x3e0,0x72a) unchanged. All 105
-// owner extents are disjoint and byte-exact after that transformation
-// (candidate SHA-256 caa3177722a117716f26b34dd4753e91b4ff168e0812d8ebbc1630bf60116e48).
-// The three static words contain 0x013f, 0x027b, and 0x064f and have 6, 2,
-// and 2 zero-addend references.
-//
-// All 100 compiler-local definitions have one candidate code reference and
-// all 100 pair to the translated retail owner. In particular, retail sites
-// 0xb9240, 0xb9253, and 0xb9e09 target $SG35237 at 0x11d0c0, $SG35238 at
-// 0x11d0c4, and $SG35362 at 0x11d0f8. NewGameHandler has one unrelated extra
-// candidate DIR32 at public-range index 116, to local label $L35342; deleting
-// only that local-label site aligns its other 121 DIR32 records with retail.
-// This is not an allocation identity or a reason to add synthetic storage.
-//
-// Retail and candidate zero-fill are both 0x20 bytes and contain the same six
-// source-defined owners. Candidate reference counts are 20, 3, 12, 20, 3,
-// and 11 for NGKPcursorIndex, gbNewGameShadowHidden, cTextReceivedBuffer,
-// cNGKPCore, NGKPBkg, and cNGKPDisplay; cTextReceivedBuffer addends are six
-// at 0, two at 4, and four at 8, and every other addend is zero. Retail COMMON
-// order is cNGKPDisplay, gbNewGameShadowHidden, cNGKPCore, NGKPcursorIndex,
-// cTextReceivedBuffer[3], NGKPBkg; candidate order differs but every owner and
-// extent is present. Do not introduce aliases, padding, or fake storage.
-// ---- globals (definitions, RVA order) ----
 DATA(0x0051cd20) b32 gbNewGameDialogOver = true;
 DATA(0x0051cd24) i32 NGKPcursorFlashOn = 1;
 DATA(0x00533150) char* cNGKPDisplay;

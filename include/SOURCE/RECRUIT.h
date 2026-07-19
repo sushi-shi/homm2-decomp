@@ -2,9 +2,6 @@
 #define HOMM2_RECRUIT_H
 
 #include <Ints.h>
-// Declarations of the free functions DEFINED in RECRUIT.cpp — the single home for these
-// symbols. Other TUs call them by including this header (no local externs).
-// forward declarations (was <_all.h>):
 class heroWindow;
 class town;
 
@@ -48,4 +45,4 @@ H2_ENUM_END(RecruitControl)
 void SetupRecruitWin(class heroWindow*, i32, i32, ResourceType, i32, i32);
 void QuickViewRecruit(class town*, i32);
 
-#endif // HOMM2_RECRUIT_H
+#endif

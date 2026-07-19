@@ -3,8 +3,6 @@
 #include <va.h>
 #include <SOURCE/GAME.h>
 #include <SOURCE/REMOTE_TYPES.h>
-// Declarations of the free functions DEFINED in REMOTE.cpp — the single home for these
-// symbols. Other TUs call them by including this header (no local externs).
 
 H2_ENUM_BEGIN(RemoteCrcConstant)
     REMOTE_CRC_FEEDBACK_BIT = 0x08000000
@@ -96,12 +94,10 @@ char* GetRemoteData(i8);
 void PollRemote(void);
 i32 TransmitAndWait(char*, i32, i32, i8, i8, char**);
 
-// --- globals owned by this TU (moved from _globals.h; CodeView-attributed) ---
 extern char gbUseDiffCompression;
 extern char gbUseRegularCompression;
 extern SNetPlayerInfo gsNetPlayerInfo[REMOTE_PLAYER_COUNT];
 
-// ---- globals (declarations, RVA order) ----
 extern i32 iInOrderCtr;
 extern i32 iCurLastID;
 extern i32 giLastConfirm;
@@ -130,4 +126,4 @@ extern char* rcvBuf[REMOTE_QUEUE_STORAGE_COUNT];
 extern i32 bGotGameType;
 extern SNetPlayerInfo gsThisNetPlayerInfo;
 
-#endif // HOMM2_REMOTE_H
+#endif

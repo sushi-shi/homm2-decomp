@@ -32,4 +32,4 @@ H2_ENUM_BEGIN(MiscBlitConstant)
     MISC_BLIT_SCREEN_HEIGHT = 0x1e0
 H2_ENUM_END(MiscBlitConstant)
 
-#endif // HOMM2_BASE_MISC_GRAPHICS_CONSTANTS_H
+#endif

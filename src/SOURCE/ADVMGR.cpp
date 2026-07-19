@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_Re\ADVMGR.OBJ   from: (directly linked into exe)
-// functions: 92   data: 33
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <BASE/message.h>
 #include <BASE/icon.h>
@@ -454,12 +449,7 @@ void advManager::GetCursorSampleSet(i32 sampleSet) {
     }
 }
 
-// @semantic
-// Current epoch: exact 0x80 frame/slots, CFG, all 87 relocation sites/targets,
-// and same-function table destinations. The only unmasked bytes are +0x2eb and
-// +0x2ee: retail loads m_y before comparing m_destinationY, while ours uses the
-// commutative equality order. Both source operand orders compile identically;
-// 31 prior syntax-aware AST variants also failed to steer the remaining shape.
+// @semantic: evaluation-order residual.
 VA(0x0045751b, 0x6c0)
 class mapCell* advManager::DoAdvCommand(void) {
     mapCell* eventCellState = 0;
@@ -638,12 +628,7 @@ class mapCell* advManager::DoAdvCommand(void) {
     return eventCellState;
 }
 
-// @semantic
-// Current epoch: complete interface-toggle semantics and all 23 resolved
-// relocation targets. At the second translation lookup retail evaluates
-// gbUseEvilInterface before translationIndex; ours evaluates the same 2D
-// address in the opposite order. Symmetric subscript and both pointer-add
-// orders compiled identically in two bounded attempts.
+// @semantic: compiler-shape residual.
 VA(0x00457bdb, 0x191)
 void advManager::CheckSetEvilInterface(i32 redraw, i32 player) {
     if (player == -1) {
@@ -687,17 +672,7 @@ void advManager::CheckSetEvilInterface(i32 redraw, i32 player) {
     }
 }
 
-// @semantic: the 0x48 frame, CFG, semantics, all 232 relocation sites/external
-// targets, and every non-relocation byte agree except +0x7f0. The same-function
-// table differs only at +0xd0c: base selects +0x48e and retail +0x83e, but both
-// labels are unconditional jumps to the same +0xdf1 epilogue. Retail's failed
-// coordinate-cheat comparison selects the first of two adjacent jumps to that
-// epilogue; VC4.2 selects the second.
-// Ten bounded attempts are exhausted: inverted guard, removed inner break,
-// comparison-order AST swap, matched/miss gotos, empty-else, negated/boolean
-// guards, single-case switch, and do/while body. Revisit only after Main's
-// source hash or an included declaration changes, or the canonicalizer learns
-// a proven same-destination branch normalization; this is not a permanent wall.
+// @semantic: differs only at +0xd0c: base selects +0x48e and retail +0x83e.
 VA(0x00457d6c, 0xfda)
 i32 advManager::Main(struct tag_message& message) {
     if (KBTickCount() > glTimers[0] && ComboDraw(1)) {
@@ -1147,14 +1122,7 @@ void advManager::Reseed(i32, i32) {
     giSeedingValid = 0;
 }
 
-// @semantic
-// The retained source-hash object has the complete 0xb8 frame/slots, switch and radar
-// CFG, 999 aligned instructions, and all 118 relocation targets. The first code
-// residual is commutative load order at +0x73b; later residuals at +0xa94..+0xd21
-// have the same cause, followed by one moved /Ob1 continuation and one adjacent-
-// block jump at +0xd71. Reversing the commutative expressions, using direct
-// members versus CurrentHero(), and both boundary-test polarities were checked.
-// Revisit after a material predecessor/TU-state change or in the last-mile phase.
+// @semantic: first code residual is commutative load order at +0x73b.
 VA(0x00458d68, 0xeb1)
 i32 advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell) {
     i32 mouseX;
@@ -1492,8 +1460,7 @@ i32 advManager::ProcessSelect(struct tag_message* message, class mapCell** event
     return 1;
 }
 
-// @early-stop
-// All 0x463 bytes / 401 instructions match with relocation bytes masked; residual is one string symbol, 15 delinked switch-table local-label identities, and the same iCurBottomView target.
+// @early-stop: delinker artifact.
 VA(0x00459c19, 0x463)
 i32 advManager::ProcessDeSelect(
     struct tag_message* message,
@@ -1623,11 +1590,7 @@ i32 advManager::ProcessDeSelect(
     return 1;
 }
 
-// @early-stop
-// Both sides are 0x5c8 bytes / 390 instructions with the same 0x44 frame, CFG,
-// and 84 relocation targets. The only code difference is GetNullSample's five-
-// byte /Ob1 continuation: ours is at +0x0c and retail's is at +0x1d. Declaration
-// initialization and post-declaration assignment compile to the same placement.
+// @early-stop: byte-proven compiler artifact.
 VA(0x0045a07c, 0x5c8)
 i32 advManager::ProcessSearch(i32 x, i32 y) {
     mapCell* currentCell;
@@ -1800,13 +1763,7 @@ search_end:
     return 1;
 }
 
-// @semantic
-// Current epoch: complete 0x2c frame/slots, hover semantics, CFG, and all 106
-// resolved relocation targets. The first normalized divergence reassociates
-// the same search-cell address: retail adds the scaled X term before loading
-// m_storage.cells, while ours adds the storage pointer before scaled X. The
-// eight-entry switch table has the same case mapping after its uniform 6-byte
-// code shift. Revisit with a proven shared GetCell accessor shape.
+// @semantic: first normalized divergence reassociates the same search-cell address.
 VA(0x0045a644, 0xa50)
 i32 advManager::ProcessHover(i32 mouseX, i32 mouseY) {
     i32 heroXHero;
@@ -2117,12 +2074,7 @@ void advManager::UpdateScreen(i32, i32 forceUpdate) {
     Process1WindowsMessage();
 }
 
-// @early-stop
-// Exact size and all 23 relocation targets; only twelve commutative X adds
-// exchange [ebp-4] drawX and [ebp+8] originX at +0xf9/+0xfc, +0x15c/+0x15f,
-// +0x19e/+0x1a1, +0x210/+0x213, +0x254/+0x257, +0x29d/+0x2a0,
-// +0x2e1/+0x2e4, +0x323/+0x326, +0x368/+0x36b, +0x3a8/+0x3ab,
-// +0x403/+0x406, and +0x463/+0x466.
+// @early-stop: byte-proven compiler artifact.
 VA(0x0045b2ae, 0x4eb)
 void advManager::CompleteDraw(i32 originX, i32 originY, i32 forceDraw, i32 updateBottomView) {
     i32 drawY;
@@ -2276,13 +2228,7 @@ void advManager::CompleteDraw(i32 update) {
     CompleteDraw(m_mapOriginX, m_mapOriginY, update, 1);
 }
 
-// @semantic
-// Complete 0x8 frame, mask/edge CFG, and all 51 relocation targets agree.
-// The four residual index blocks are the east and west lookups in each path:
-// retail loads MAP_WIDTH before y for east and forms x+mapExtra before the row
-// term for west. Reassociating the west pointer terms recovered both diagonals;
-// both multiplication orders and all 99 legal single-step AST variants were
-// checked without steering the remaining /Od evaluation order.
+// @semantic: evaluation-order residual.
 VA(0x0045b7d3, 0x3a9)
 i32 advManager::GetCloudLookup(i32 x, i32 y) {
     u32 cloudMask = 0;
@@ -2361,15 +2307,7 @@ i32 advManager::GetCloudLookup(i32 x, i32 y) {
     return giCloudType[cloudMask];
 }
 
-// @semantic
-// The retained source-hash object accounts for all 2373 retail instructions, the
-// complete 0x1c frame/slots and draw CFG, and all 551 relocation targets; there
-// is no data island. The first real code divergence is the MAP_WIDTH boundary
-// compare at +0x74. The residual set is four reversed boundary compares, one
-// moved continuation, equivalent frame-boolean lowering, and eight commutative
-// +31 associations with consequent branch displacements. Both comparison
-// polarities, direct versus temporary booleans, both +31 associations, and the
-// accessor/direct forms were checked. Revisit after a material TU-state change.
+// @semantic: first real code divergence is the MAP_WIDTH boundary compare at +0x74.
 VA(0x0045bb7c, 0x24cb)
 void advManager::DrawCell(
     i32 mapX,
@@ -3388,12 +3326,7 @@ void advManager::DrawCell(
     }
 }
 
-// @semantic: Complete bounds semantics, frame/slots, CFG, and both MAP_WIDTH/
-// MAP_HEIGHT relocation targets agree. The only residual is the width guard:
-// retail loads x, compares MAP_WIDTH, and uses jle; base loads MAP_WIDTH,
-// compares x, and uses jge. The equivalent x>=MAP_WIDTH, MAP_WIDTH<=x, and
-// MAP_WIDTH<=OD_STEER(x) spellings compiled identically. Revisit after a material
-// ADVMGR predecessor/header or comparison-tool change.
+// @semantic: only residual is the width guard: retail loads x, compares MAP_WIDTH, and uses jle.
 VA(0x0045e047, 0x93)
 class mapCell* advManager::GetCell(i32 x, i32 y) {
     if (x < 0 || y < 0 || x >= MAP_WIDTH || MAP_HEIGHT <= y) {
@@ -3403,13 +3336,7 @@ class mapCell* advManager::GetCell(i32 x, i32 y) {
     }
 }
 
-// @semantic
-// Complete semantics, 0xb4 frame/slots, radar CFG, and all 122 relocation targets
-// agree. The first divergence is commutative operand order at +0x141; the other
-// spans are +0x1d3..+0x1eb, +0x234..+0x23d, and +0x47d..+0x488, plus retail
-// alignment NOPs. Reversed operands, explicit temporaries, symmetric subscript,
-// and pointer-add forms compile to the same order. Revisit after a material
-// predecessor/TU-state change.
+// @semantic: first divergence is commutative operand order at +0x141.
 VA(0x0045e0da, 0x104d)
 void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
     i32 maxXLocal;
@@ -3437,7 +3364,6 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
     i32 skipFrameIndex;
     u32 objectTilesetLocal;
 
-    // Retail reserves these four unreferenced named-local words above `this`.
 
     if (partial == 0) {
         minXSlot = 0;
@@ -3822,10 +3748,7 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
     }
 }
 
-// @early-stop
-// All 0x133e retail bytes match after masking the 205 relocation fields, including
-// the 0x7c pointer table and adjacent byte lookup. All resolved relocation targets,
-// the 0x1fc frame, slots, and CFG agree; ours only has two trailing alignment NOPs.
+// @early-stop: retail alignment artifact.
 VA(0x0045f127, 0x133e)
 void advManager::QuickInfo(i32 cellX, i32 cellY) {
     i32 quickInfoShowFlag = 1;
@@ -4279,14 +4202,7 @@ quick_info_ready:
     delete windowLocal;
 }
 
-// @semantic
-// Complete semantics and 0x3c frame/explicit slots match; CFG differs only by
-// missing five-byte /Ob1 continuations at retail +0x3b (after CurrentHero) and
-// +0x1c5 (before the populated locator body). All 25 relocation targets agree.
-// Direct m_currentHero access omits +0x3b; CurrentHero() moves it before the
-// load. Both loop-bound polarities were checked. Revisit only if the real
-// inline accessor/expression context is recovered, or after the SOURCE
-// placeholder census reaches zero; do not repeat these spellings beforehand.
+// @semantic: missing /Ob1 continuations at +0x3b and +0x1c5.
 VA(0x00460465, 0x348)
 void advManager::UpdateHeroLocator(i32 locatorSlot, i32 drawWindow, i32 updateScreen) {
     hero* locatorHero8;
@@ -4393,9 +4309,7 @@ void advManager::UpdateHeroLocator(i32 locatorSlot, i32 drawWindow, i32 updateSc
 }
 
 // @early-stop
-// @early-stop-reloc-only: all 0x102 bytes agree after masking the 14 identical
-// ordered relocation fields; every effective target agrees. The sole raw byte
-// residual is inside the delinked __adjust_fdiv/iLeftRightSave relocation.
+// @early-stop-reloc-only: relocation naming only.
 VA(0x004607ad, 0x102)
 void advManager::UpdateHeroLocators(i32 drawWindow, i32 updateScreen) {
     i32 locatorSlot;
@@ -4424,9 +4338,7 @@ void advManager::UpdateHeroLocators(i32 drawWindow, i32 updateScreen) {
 }
 
 // @early-stop
-// @early-stop-reloc-only: all 0x2e8 bytes agree after masking the 30 identical
-// ordered relocation fields; every effective target agrees. The sole raw byte
-// residual is inside the delinked __adjust_fdiv/iLeftRightSave relocation.
+// @early-stop-reloc-only: relocation naming only.
 VA(0x004608af, 0x2e8)
 void advManager::UpdateTownLocators(i32 drawWindow, i32 updateScreen) {
     i32 locatorSlot;
@@ -4502,12 +4414,7 @@ void advManager::UpdateTownLocators(i32 drawWindow, i32 updateScreen) {
     }
 }
 
-// @semantic
-// Complete semantics, 0x0c frame/slots, switch order, CFG, and all 24
-// relocation targets agree. The first and only instruction divergence is the
-// missing retail jmp $+0 at +0x12d after UpdBottomViewEnemyTurn. An explicit
-// enemy-path goto emits two extra continuations; both expiry-test polarities
-// were checked. Revisit only after the SOURCE placeholder census reaches zero.
+// @semantic: first and only instruction divergence is the missing retail jmp $+0 at +0x12d after UpdBottomViewEnemyTurn.
 VA(0x00460b97, 0x1cc)
 void advManager::UpdBottomView(i32 forceUpdate, i32 drawWindow, i32 updateScreen) {
     i32 updated;
@@ -4590,13 +4497,7 @@ void advManager::ClearBottomView(void) {
     iLastAnimFrame = ADVMGR_BOTTOM_VIEW_NO_ANIMATION;
 }
 
-// @semantic
-// The 0x38 frame/slots, complete CFG, exact size, and all 73 relocation targets
-// agree. The first divergence is commutative global comparison order at
-// +0x29e..+0x2c6; later residuals are the moved GetPlayerColor /Ob1 continuation
-// at +0x2f5..+0x320 and comparison order at +0x3ef..+0x418. Both comparison
-// orders compile identically, while direct member access only moves the inline
-// continuation. Revisit after a material TU-state change or in the last-mile phase.
+// @semantic: first divergence is commutative global comparison order at +0x29e..+0x2c6.
 VA(0x00460e95, 0x51b)
 i32 advManager::UpdBottomViewEnemyTurn(void) {
     i32 updated;
@@ -4751,16 +4652,7 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
     return updated;
 }
 
-// @semantic: Complete semantics/CFG and all 45 ordered relocation sites/targets
-// agree. The first byte divergence is the frame allocation at +0x03: retail
-// uses 0x24, ours 0x20.
-// Retail slots are dateIconFrame=-0x4, unused=-0x8, dayText=-0xc,
-// weekText=-0x10; ours are weekText=-0x4, dayText=-0x8,
-// dateIconFrame=-0xc. The decompile/local-use audit found no real source local
-// for -0x8, and declaration ordering cannot create it without fake padding.
-// The current audit rechecked the three real locals with od_slots and found no
-// source-supported fourth role. Revisit only if later type/predecessor recovery
-// explains the word or a relevant ADVMGR TU/header change alters the frame.
+// @semantic: first byte divergence is the frame allocation at +0x03: retail uses 0x24, ours 0x20.
 VA(0x004613b0, 0x366)
 i32 advManager::UpdBottomViewNewTurn(void) {
     DATA(0x004f6134) static i16 s_newTurnLineBase = 4560;
@@ -5088,8 +4980,7 @@ i32 advManager::UpdBottomViewKingdom(void) {
     return 1;
 }
 
-// @early-stop
-// Exact bytes and all 36 relocation targets.
+// @early-stop: byte-proven compiler artifact.
 VA(0x00461dd8, 0x583)
 i32 advManager::UpdBottomViewHero(void) {
     DATA(0x004f6300) static i16 s_bottomHeroLineBase = 4835;
@@ -5248,13 +5139,7 @@ i32 advManager::UpdBottomViewHero(void) {
     return 1;
 }
 
-// @semantic: Complete semantics, 0xf0 frame/slots, CFG, and all 109 relocation targets
-// agree. The first code divergence is the commutative loop comparison at +0x409;
-// later residuals are multiply/load order, folding of literal 30 + 6, consequent
-// jump displacements, and two retail NOPs. Reversing the loop comparison and
-// multiplication operands, splitting the literal sum, and a value-neutral OR-zero
-// barrier were checked; the current loop reversal and OR-zero forms were byte-neutral.
-// Revisit after a material ADVMGR predecessor/header or comparison-tool change.
+// @semantic: first code divergence is the commutative loop comparison at +0x409.
 VA(0x0046235b, 0xd32)
 void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 windowY) {
     DATA(0x004f6370) static i16 s_quickViewLineBase = 4982;
@@ -5603,14 +5488,7 @@ char* advManager::GetArmySizeName(i32 armySize, i32 grammar) {
     return gArmySizeNames[8][grammar];
 }
 
-// @semantic: the 0xec frame/slots, CFG, 0xc29 retail span, tail bytes, and all
-// 102 ordered relocation sites/effective targets agree. OR-zero steering closes both
-// first-row multiplication-order residuals. The only eight unmasked bytes are
-// +0x831..+0x838: retail loads firstRowCountState then adds secondRowCountState,
-// while base loads/adds the same two ints oppositely. The two prior retained
-// iterations were commuted multiplication followed by OR-zero steering; directly
-// commuting this loop bound was also byte-neutral. Revisit after a material
-// ADVMGR predecessor/header or comparison-tool change.
+// @semantic: compiler-shape residual.
 VA(0x004631ad, 0xc29)
 void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 windowY) {
     DATA(0x004f6488) static i16 s_townViewLineBase = 5346;
@@ -6001,14 +5879,7 @@ void advManager::MobilizeCurrHero(i32 update) {
     SetHeroContext(gpCurPlayer->m_currentHero, update);
 }
 
-// @semantic
-// First residual at +0xd9: retail loads m_eventFlags, ORs EAX with 0x80, then
-// stores it; ours emits the equivalent OR dword ptr [hero+0xe3],0x80. The 0xc
-// frame and all three slots, CFG, remaining instructions, and all 7 relocation
-// targets agree. Both `|=` and explicit `= HERO_EVENT_EMBARKED | m_eventFlags`
-// collapse to the memory OR; m_objectMetadata bitfield assignment fixed the other residual.
-// Revisit with specific new evidence or after the SOURCE placeholder census is
-// zero.
+// @semantic: First residual at +0xd9: retail loads m_eventFlags, ORs EAX with 0x80, then stores it.
 VA(0x00463f95, 0x16c)
 void advManager::DemobilizeCurrHero(void) {
     if (gpCurPlayer->m_currentHero == ADVMGR_INVALID_HERO) {
@@ -6161,14 +6032,7 @@ void advManager::SetHeroContext(i32 heroId, i32 update) {
     }
 }
 
-// @semantic
-// First residual bytes are +0xcc/+0xd0: retail uses `cmp eax,[message.y]; jle`,
-// ours uses `cmp [message.y],eax; jge`; the mirrored upper clamp differs at
-// +0xe8/+0xec. The 0x80 frame, every named/compiler slot, CFG, all other code,
-// and all 26 relocation targets agree. `message.y < sum` and `sum > message.y`
-// lower identically; an empty positive arm plus else adds two 5-byte jumps and
-// regresses the match. Revisit with specific new evidence or after the SOURCE
-// placeholder census is zero.
+// @semantic: First residual bytes are +0xcc/+0xd0: retail uses cmp eax,[message.y]; jle, ours uses cmp [message.y],eax; jge.
 VA(0x004646aa, 0x22f)
 void advManager::DoHeroKnob(void) {
     i32 previousPageSlot = gpCurPlayer->m_heroLocatorPage;
@@ -6217,14 +6081,7 @@ void advManager::DoHeroKnob(void) {
     UpdateHeroLocators(1, 1);
 }
 
-// @semantic
-// First residual bytes are +0xcc/+0xd0: retail uses `cmp eax,[message.y]; jle`,
-// ours uses `cmp [message.y],eax; jge`; the mirrored upper clamp differs at
-// +0xe8/+0xec. The 0x80 frame, every named/compiler slot, CFG, all other code,
-// and all 26 relocation targets agree. `message.y < sum` and `sum > message.y`
-// lower identically; an empty positive arm plus else adds two 5-byte jumps and
-// regresses the match. Revisit with specific new evidence or after the SOURCE
-// placeholder census is zero.
+// @semantic: First residual bytes are +0xcc/+0xd0: retail uses cmp eax,[message.y]; jle, ours uses cmp [message.y],eax; jge.
 VA(0x004648d9, 0x22f)
 void advManager::DoTownKnob(void) {
     i32 previousPageSlot = gpCurPlayer->m_townLocatorPage;
@@ -6273,10 +6130,7 @@ void advManager::DoTownKnob(void) {
     UpdateTownLocators(1, 1);
 }
 
-// @early-stop
-// All 0x397 relocation-masked bytes are identical and all 38 relocation targets
-// agree; ours only has one trailing alignment NOP. Objdiff's residual is delinked
-// switch/jump-table local-label identity.
+// @early-stop: delinker jump-table artifact.
 VA(0x00464b08, 0x397)
 void advManager::CastSpell(SpellType spell) {
     hero* currentHeroSlot;
@@ -6472,14 +6326,7 @@ void advManager::CheckCastSpell(void) {
     }
 }
 
-// @semantic
-// Complete 0x24 frame/slots and message/mouse CFG; all 28 relocation targets
-// agree. Residuals are three continuation-jump placements: one extra retail
-// jump after the accepted widget path, one after the valid-cell SetPointer,
-// and one base-only jump after the invalid-map SetPointer return. Tried both
-// shift-condition polarities, nested/flat dialog-result checks, both map/cell
-// branch polarities, and both SetPointer arm orders. Revisit only with new TU
-// compiler-state evidence or after the SOURCE placeholder census is zero.
+// @semantic: branch/code-shape residual.
 VA(0x00465191, 0x31c)
 i32 DimensionDoorHandler(tag_message& message) {
     if (glTimers[0] < KBTickCount()) {
@@ -6569,18 +6416,7 @@ i32 DimensionDoorHandler(tag_message& message) {
     return ADVMGR_DIMENSION_DOOR_UNHANDLED;
 }
 
-// @semantic
-// Complete 0x1c frame/slots and draw CFG; all 161 resolved relocation targets agree.
-// After masking relocations, the first code-byte difference is +0x3ed: ours loads
-// mapRow before forming the column stride, while retail forms the stride first. The
-// typed visibility-grid access retains an equivalent MAP_WIDTH/mapY imul operand order
-// at +0xaa6. A byte-pointer cast plus constant offset raised the live score to 99.17%
-// but was removed because it was a fake view of this real unsigned-short array; the
-// retained source maximum remains 99.28%. Later residuals are equivalent min/max
-// load/compare orders, delinked biased bComboDraw aliases, and three retail alignment
-// NOPs. Direct/reversed flat-index, multiplication, and relational AST forms compile
-// identically or regress; explicit temporaries and pointer/subscript variants were also
-// worse. Revisit after a material TU-state change or in the post-coverage last-mile phase.
+// @semantic: evaluation-order residual.
 VA(0x004654ad, 0x11a9)
 i32 advManager::ComboDraw(i32 originX, i32 originY, i32 animate) {
     i32 updateCount;
@@ -6973,14 +6809,7 @@ i32 advManager::ComboDraw(i32 update) {
     return ComboDraw(m_mapOriginX, m_mapOriginY, update);
 }
 
-// @semantic
-// Raw bytes differ only at +0x1dd/+0x1e0, +0x1f4/+0x1f7,
-// +0x1fb/+0x1fe, and +0x215/+0x218: four commutative /Od add operand
-// orders. The frame, size, logic, and all 18 relocation targets agree. The
-// environment-volume relocation reaches the same retail table address; only
-// the delinker's synthetic constant-pool identity differs. Commuting all four
-// origin-plus-radius expressions was byte-neutral. Revisit after a material
-// ADVMGR predecessor/header or comparison-tool change.
+// @semantic: evaluation-order residual.
 VA(0x0046668e, 0x338)
 void advManager::SetEnvironmentOrigin(i32 originX, i32 originY, i32 stopSounds) {
     i32 soundLayer;
@@ -7098,9 +6927,7 @@ void advManager::CheckLoadSample(i32 index) {
     }
 }
 
-// @early-stop
-// All 0x4c1 bytes are identical after masking 39 relocations. Retail delinks
-// 37 switch-table local-label relocations as the containing function.
+// @early-stop: delinker artifact.
 VA(0x00466a2f, 0x4c1)
 AdventureEnvironmentSoundId advManager::GetSoundId(i32 x, i32 y) {
     mapCell* currentCell = &m_mapData->Row(y)[x];
@@ -7223,12 +7050,7 @@ AdventureEnvironmentSoundId advManager::GetSoundId(i32 x, i32 y) {
     return ADVMGR_ENVIRONMENT_SOUND_NONE;
 }
 
-// @semantic
-// Complete semantics, 0x14 frame/slots and CFG; all 9/9 relocation owners/addends
-// agree. At the Y bound retail loads mapY then compares MAP_HEIGHT/EAX with JG;
-// candidate loads MAP_HEIGHT then compares mapY/EAX with JL. This makes candidate's
-// meaningful body 0x239 bytes versus retail's 0x23a and places the next candidate
-// symbol at +0x239. Direct bounds and MAP_WIDTH <= OD_STEER(x) were already tried.
+// @semantic: compiler-shape residual.
 VA(0x00466ef0, 0x23a)
 void advManager::InsertSound(i32 x, i32 mapY, i32 distance, i32 soundLayer) {
     i32 soundSlot;
@@ -7287,13 +7109,7 @@ void advManager::InsertSound(i32 x, i32 mapY, i32 distance, i32 soundLayer) {
     }
 }
 
-// @semantic
-// The exact 0x24 frame/slots, CFG, instruction stream outside +0x343..+0x359,
-// and all 44 relocation targets agree. Retail emits a 23-byte load/OR/store for
-// m_eventFlags; ours folds to the equivalent 13-byte memory OR, accounting for
-// the entire ten-byte size delta. Direct `|=`, explicit load/OR/store, enum/int
-// temporaries, and both operand orders all fold to the memory OR. Revisit only
-// after a material TU-state change or in the last-mile phase.
+// @semantic: evaluation-order residual.
 VA(0x0046712a, 0x40f)
 void advManager::TeleportTo(
     hero* mapHero,
@@ -7433,10 +7249,7 @@ void advManager::TeleportTo(
     ForceNewHover();
 }
 
-// @early-stop
-// Relocation-masked instructions, the 0x14 frame/slots, and CFG are exact.
-// All 27 relocation offsets and effective targets agree; the residual is only
-// delinked local string and floating-constant symbol identity.
+// @early-stop: delinker artifact.
 VA(0x00467539, 0x1fb)
 void advManager::DimensionDoor(void) {
     hero* targetHero;
@@ -7521,12 +7334,7 @@ i32 TownPortalHandler(tag_message& message) {
     return ADVMGR_TOWN_PORTAL_UNHANDLED;
 }
 
-// @early-stop
-// Exact 0x40 frame, 0x43e size, CFG, and all bytes outside the signed loop
-// comparison at +0x2bb..+0x2c7. Retail has `8b45d4 3945f8 0f8d`; ours has
-// the equivalent operand-reversed `8b45f8 3945d4 0f8e`. Direct/reversed,
-// negated, empty-arm, `| 0`, semantic-name, and AST permutations do not steer
-// this TU-cumulative /Od operand order (tu-cumulative-eval-order.md).
+// @early-stop: byte-proven compiler artifact.
 VA(0x0046785d, 0x43e)
 void advManager::TownGate(SpellType spellId) {
     i32 distance0;
@@ -7650,15 +7458,7 @@ void advManager::TownGate(SpellType spellId) {
     gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[m_currentTerrain]);
 }
 
-// @semantic
-// The exact 0x40 frame/slots, complete CFG, 0x5ac size, and 41 relocation sites
-// agree after manual interior-alias resolution. The first code residual is the
-// CurrentHero /Ob1 continuation at +0x174 versus retail +0x180; the screen-bound
-// sums at +0x3e8..+0x40d reverse commutative stack loads, and the unreachable
-// +0x5a3 jump has a different local target. Direct/accessor hero spellings and
-// both coordinate operand orders were checked. The two apparent relocation
-// extras resolve to normalDirTable+1 at retail RVA 0xfaa79; one is delinked as
-// the interior string symbol at RVA 0xfaa79. Revisit after material TU-state change.
+// @semantic: first code residual is the CurrentHero /Ob1 continuation at +0x174 versus retail +0x180.
 VA(0x00467c9b, 0x5ac)
 void advManager::SummonBoat(void) {
     i32 boatIndex9;
@@ -7824,10 +7624,7 @@ void advManager::SummonBoat(void) {
 }
 
 // @early-stop
-// @early-stop-reloc-only: all 0x4d9 bytes match after masking the same 34
-// relocation sites, and same-function destinations agree. Explicit unsigned
-// direction loads corrected the two former MOVSX/MOVZX semantic mismatches;
-// only delinked relocation identities keep the raw objdiff score below 100%.
+// @early-stop-reloc-only: relocation naming only.
 VA(0x00468247, 0x4d9)
 void advManager::ShowRoute(i32 redraw, i32, i32 updateButton) {
     i32 routeReachable8;
@@ -8091,9 +7888,7 @@ void advManager::ForceNewHover(void) {
     ProcessHover(x, y);
 }
 
-// @early-stop
-// All non-table bytes match. The 32-byte jump table has the same eight case
-// offsets; retail delinks its entries as ScreenScroll while base retains local labels.
+// @early-stop: delinker jump-table artifact.
 VA(0x00468ab6, 0x1a6)
 void advManager::ScreenScroll(AdventureScrollDirection direction, i32 updatePointer) {
     i32 originX;
@@ -8224,7 +8019,7 @@ i32 advManager::MouseInScrollZone(void) {
 
 VA(0x00468ea8, 0x2b8)
 void advManager::SetInitialMapOrigin(void) {
-    game* gameState; // outer-scope retail slot retained in the frame
+    game* gameState;
     town* currentTown9;
     playerData* initialPlayer8;
     hero* initialHero5;
@@ -8318,9 +8113,7 @@ void advManager::LoadRemote(void) {
     gpSoundManager->m_samplesReady = 1;
 }
 
-// @early-stop
-// All non-table bytes and 17 external targets match. The command lookup and
-// seven case offsets match; retail delinks nine local relocations as this function.
+// @early-stop: delinker artifact.
 VA(0x0046931e, 0x20c)
 char* advManager::CheckHandleNet(void) {
     RemoteMessage* packet9;
@@ -8420,10 +8213,7 @@ i32 advManager::CheckHandleNetPlayerWait(struct tag_message& message, i32 doMain
     return 0;
 }
 
-// @early-stop
-// Retail adds continuation jumps at +0x14e and +0x1c9. Excluding those two
-// five-byte jumps, every opcode/operand, the 0x28 frame/slots and CFG, and all
-// six relocation targets match.
+// @early-stop: byte-proven compiler artifact.
 VA(0x004695f7, 0x1d5)
 void advManager::TrimLoopingSounds(i32 maxSamples) {
     if (giHighMemBuffer > 0) {
@@ -8592,13 +8382,7 @@ void advManager::DrawAdventureBorder(void) {
     }
 }
 
-// @semantic
-// Complete 0x4 frame, edge/interior loops, duplicated eligibility/exclusion CFG,
-// success writes, and all 52 relocation targets. The instruction streams align;
-// residuals are the six delinked static identities and four excluded-Y comparison
-// operand orientations. Tried cursor/end loop reversals, a shared body (wrong CFG),
-// compound duplicated predicates, and both excluded-Y inequality orientations.
-// Revisit only with new static-symbol/TU evidence or in the last-mile phase.
+// @semantic: compiler-shape residual.
 VA(0x00469bef, 0x3d3)
 i32 advManager::FindAdjacentMonster(
     i32 originX,
@@ -8686,12 +8470,7 @@ foundAdjacentMonster:
     return 1;
 }
 
-// @semantic
-// Exact retail 0x0c frame and live slots, including the inferred unused
-// currentPlayer local, the retail non-advancing dead-player loop, and all 16
-// relocation sites/targets. The only unmasked byte is +0x21: retail's
-// non-remote arm jumps directly to the epilogue, while ours visits the adjacent
-// jmp $+0 continuation. One frame-recovery attempt closed the other 16 bytes.
+// @semantic: compiler-shape residual.
 VA(0x00469fc2, 0x125)
 void ComputeAdvNetControl(void) {
     if (!gbRemoteOn) {
@@ -8721,12 +8500,7 @@ void ComputeAdvNetControl(void) {
     }
 }
 
-// @semantic
-// All 77 normalized instructions and six relocation targets agree. Five
-// bounded source spellings recovered the positive Y-bound arm and local-first
-// row multiplication. The remaining raw bytes +0x98 and +0xab..+0xae are only
-// corresponding local branch displacements; do not claim relocation-only
-// identity until those destinations are normalized or made byte-exact.
+// @semantic: branch/code-shape residual.
 VA(0x0046a0e7, 0xf6)
 i32 MapExtraPosAndAdjacentsSet(i32 x, i32 y, u8 mask) {
     if (mapExtra[MAP_WIDTH * y + x] & mask) {
@@ -8750,13 +8524,7 @@ i32 MapExtraPosAndAdjacentsSet(i32 x, i32 y, u8 mask) {
     return 0;
 }
 
-// @semantic: Complete 0x6c frame/slots, CFG, semantics, and all 54 relocation
-// target identities agree. The y-adjustment expression is reassociated at +0x26f,
-// shifting one later DIR32 site from +0x244 to +0x247; both forms compute
-// y*5+x*2. At +0x385 base loads pixelIterator then compares rowLimitAddress and
-// emits jbe, while retail loads rowLimitAddress then compares pixelIterator and
-// emits jae. Both comparison orders compile identically. Revisit after a material
-// ADVMGR predecessor/header or comparison-tool change.
+// @semantic: compiler-shape residual.
 VA(0x0046a1dd, 0x4c6)
 void advManager::ViewPuzzle(void) {
     gpGame->SetupPuzzlePieces(giCurPlayer, 0);
@@ -8872,12 +8640,7 @@ void advManager::ViewPuzzle(void) {
     gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[m_currentTerrain]);
 }
 
-// @semantic: retail and source now both pass object icon 17 (this+0x112) to
-// IconToBitmap; the prior m_puzzleIcon (this+0x1ce) access was a runtime bug.
-// All opcodes, CFG, and five ordered relocations agree. The remaining four bytes
-// are frame/slot shape: retail reserves 0x1c and saves this at -0x1c, while the
-// reconstructed body needs 0x04/-0x04. Do not invent six unused locals; revisit
-// when adjacent source or recovered local evidence explains the retail frame.
+// @semantic: compiler-shape residual.
 VA(0x0046a6a3, 0x81)
 void advManager::PuzzleDraw(i32 left, i32 top, i32 right, i32 bottom) {
     gbDrawingPuzzle = true;
@@ -8898,11 +8661,7 @@ void advManager::PuzzleDraw(i32 left, i32 top, i32 right, i32 bottom) {
     );
 }
 
-// @early-stop
-// Excluding the 0x10-byte jump table at RVA 0x6a9a2, every instruction and
-// operand matches after normalizing branch destinations. All 46 relocation
-// sites and target addresses agree; the residual is the delinked local table
-// base/labels and string-pool symbol identities.
+// @early-stop: delinker jump-table artifact.
 VA(0x0046a724, 0x2ac)
 void advManager::AdvPanel(void) {
     heroWindow* adventurePanel;
@@ -8974,12 +8733,7 @@ void advManager::AdvPanel(void) {
     }
 }
 
-// @semantic
-// Complete 0x18 frame, shift-help/selection CFG, and all 8 external relocations agree.
-// The diff first diverges at the delinked 0x10-byte switch table at RVA 0x6aa99;
-// the 23 preceding instructions match. Tried compound command tests in both arms and
-// switch-based command dispatch in both arms; the retained mixed form is closest.
-// Revisit only after shared message/layout evidence changes or in the last-mile phase.
+// @semantic: compiler-shape residual.
 VA(0x0046a9d0, 0x1ca)
 i32 APanelHandler(tag_message& message) {
     i32 handled = 0;
@@ -9035,12 +8789,7 @@ i32 APanelHandler(tag_message& message) {
     return ADVMGR_DIMENSION_DOOR_UNHANDLED;
 }
 
-// @semantic
-// Complete modal/control-disable CFG and all 30 external relocations agree. The first
-// 102 diff lines align apart from string identities, then the helper stops at the
-// delinked result switch table. Retained direct remote-disable broadcasts and result
-// switch after testing equivalent compound and nested spellings.
-// Revisit only after shared dialog/message evidence changes or in the last-mile phase.
+// @semantic: compiler-shape residual.
 VA(0x0046ab9a, 0x1e4)
 i32 advManager::ControlPanel(void) {
     TrimLoopingSounds(ADVMGR_LOOPING_SOUND_LIMIT);
@@ -9094,12 +8843,7 @@ i32 advManager::ControlPanel(void) {
     return selectedCommand != ADVMGR_PANEL_NO_HELP;
 }
 
-// @semantic
-// Complete 200-byte confirmation buffer, shift-help/confirmation CFG, and all
-// 26 external relocation targets. Both six-entry tables map every widget ID to
-// the same semantic body; retail emits the Save-help body before Main Menu.
-// Reordering those case bodies aligned source order in one attempt without a
-// fuzzy gain. Prior compound-command and alternate-nesting attempts were worse.
+// @semantic: compiler-shape residual.
 VA(0x0046ad7e, 0x304)
 i32 CPanelHandler(tag_message& message) {
     i32 handled = 0;
@@ -9184,12 +8928,7 @@ i32 CPanelHandler(tag_message& message) {
     return ADVMGR_DIMENSION_DOOR_UNHANDLED;
 }
 
-// @semantic
-// Complete option-dialog semantics and all 34 resolved relocation targets.
-// Current source uses a 0x20 frame; retail uses 0x3c, with the same three live
-// saved values at -0x20/-0x24/-0x28 and additional unreferenced slots. Do not
-// restore the old byte-identity claim or invent padding locals without source
-// evidence for those declarations.
+// @semantic: compiler-shape residual.
 VA(0x0046b082, 0x197)
 void advManager::SystemOptions(void) {
     TrimLoopingSounds(ADVMGR_LOOPING_SOUND_LIMIT);
@@ -9231,12 +8970,7 @@ void advManager::SystemOptions(void) {
     }
 }
 
-// @semantic
-// Complete 0x24 frame, all 18 frame/text broadcasts, draw CFG, and all 68 external
-// relocations agree. Residual lowering is around music-source, blackout-computer, and
-// slow-video expressions plus gConfig/string overlay identities. Tried direct ternary
-// and explicit branch forms; retained forms follow retail broadcast order.
-// Revisit only after shared config layout evidence changes or in the last-mile phase.
+// @semantic: branch/code-shape residual.
 VA(0x0046b219, 0x35f)
 void UpdateSystemOptions(i32 initialDraw) {
     tag_message message;
@@ -9339,9 +9073,7 @@ void UpdateSystemOptions(i32 initialDraw) {
     }
 }
 
-// @early-stop
-// Exact size, all non-relocation bytes, and all 94 relocation sites match. Residuals are
-// delinked jump-table labels, gConfig field overlays, and string-pool symbol names.
+// @early-stop: delinker jump-table artifact.
 VA(0x0046b578, 0x672)
 i32 SystemOptionsHandler(struct tag_message& message) {
     i32 preferencesChanged = 0;
@@ -9622,13 +9354,7 @@ i32 GetManaFrame(i32 mana) {
     return frame;
 }
 
-// @semantic: Complete semantics, frame/slots, CFG, and all 42 ordered relocation
-// sites/effective targets agree. The only unmasked code residual is the nearest
-// monster comparison at +0xfc, +0x102, and +0x107: base spells nearest>distance
-// with the operands opposite retail's distance<nearest form. Reversing the source
-// comparison produced broader block-layout changes and was reverted; ten bounded
-// TU-state perturbations also failed to close it. Revisit after a material ADVMGR
-// predecessor/header or comparison-tool change.
+// @semantic: only unmasked code residual is the nearest monster comparison at +0xfc, +0x102.
 VA(0x0046bce8, 0x559)
 i32 advManager::DoVisions(hero* visionHero) {
     char visionMessageResult[ADVMGR_VISIONS_MESSAGE_BUFFER_SIZE];
@@ -9762,12 +9488,7 @@ showVision:
     return 1;
 }
 
-// @semantic
-// Complete hero loop, artifact/radius semantics, frame slots, and all 6 external
-// relocations agree. The first byte-level divergence is one extra retail continuation
-// jump after the loop guard; the remaining instruction stream aligns. Tried repeated
-// inline hero expressions and retained named locals, which is the closest source shape.
-// Revisit after inline GetHero evidence changes or in the last-mile phase.
+// @semantic: first byte-level divergence is one extra retail continuation jump after the loop guard.
 VA(0x0046c241, 0xd7)
 i32 advManager::IsCrystalBallInEffect(i32 x, i32 y, i32 radius) {
     i32 heroIndex;
@@ -9807,25 +9528,9 @@ u8 StopOnTrigger(class mapCell* cell) {
     return 0;
 }
 
-// ===== vtable advManager : public baseManager  (3 slots) =====
-//  [ 0] VA(0x0045665f, 0x9c9)  int advManager::Open(int)   <- override (implements baseManager pure virtual)
-//  [ 1] VA(0x00457028, 0x40a)  void advManager::Close(void)   <- override (implements baseManager pure virtual)
-//  [ 2] VA(0x00457d6c, 0xfda)  int advManager::Main(struct tag_message &)   <- override (implements baseManager pure virtual)
 
-// ---- vtables (compiler-emitted; census) ----
 VTBL(advManager, 0x004eb6c8);
 
-// ---- globals (definitions, RVA order) ----
-// @data-layout-note
-// Candidate and retail .data are byte-identical: 0x14d0 bytes with SHA-256
-// e49c0fee285991feeb3b0b394a8a82789560db423f4efbe40b991189e0f0c15d.
-// Retail leaves 20 bytes at 0x004f5e38 before the "qwikinfo.bin" literal at
-// 0x004f5e4c. Two independent retail consumers generate indices 0..17 (HISCORE
-// seeds with Random(0, 17) and advances modulo 18), and elements 16..17 are
-// zero, so 18 elements is the narrowest semantically supported extent; the two
-// trailing zero bytes are literal alignment the PE cannot distinguish from
-// array payload. An 18-byte array also 4-aligns the following literal exactly
-// at its retail address.
 DATA(0x004f57b0) i32 giLimitUpdMinX = -1;
 DATA(0x004f57b4) i32 iLastScrollTime = 0;
 DATA(0x004f57b8) i32 iSandAnim = 0;

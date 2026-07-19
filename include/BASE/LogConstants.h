@@ -9,4 +9,4 @@ H2_ENUM_BEGIN(LogConstant)
     LOG_TEXT_BUFFER_SIZE = 500
 H2_ENUM_END(LogConstant)
 
-#endif // HOMM2_BASE_LOG_CONSTANTS_H
+#endif

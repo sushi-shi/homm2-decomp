@@ -1,9 +1,6 @@
 #ifndef HOMM2_SOURCE_SEARCHARRAY_H
 #define HOMM2_SOURCE_SEARCHARRAY_H
-// Reconstructed class (SOURCE) from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// 13 methods, 0 own-virtual, 0 static data.
 #include <va.h>
-// forward declarations:
 class army;
 extern i32 MAP_WIDTH;
 
@@ -93,42 +90,40 @@ struct searchNode {
 #pragma pack(pop)
 SIZE(searchNode, 9);
 
-#pragma pack(push, 1) // recovered layout is byte-packed
+#pragma pack(push, 1)
 class searchArray {
 public:
     union {
         struct {
-            i32 m_queueSize;   // +0x00, overland queue count
-            i32 m_queueCursor; // +0x04, overland queue high-water mark
+            i32 m_queueSize;
+            i32 m_queueCursor;
         };
         struct {
-            u32 m_queueCount;    // +0x00, combat queue count
-            u32 m_maxQueueCount; // +0x04, combat queue high-water mark
+            u32 m_queueCount;
+            u32 m_maxQueueCount;
         };
     };
-    i32 m_pathLength; // +0x08
+    i32 m_pathLength;
     union {
         struct {
-            i32 m_lastY; // +0x0c, overland destination
-            i32 m_lastX; // +0x10
+            i32 m_lastY;
+            i32 m_lastX;
         };
         struct {
-            i32 m_specialTargetX; // +0x0c, combat special target
-            i32 m_specialTargetY; // +0x10
+            i32 m_specialTargetX;
+            i32 m_specialTargetY;
         };
     };
-    searchNode m_queue[SEARCH_QUEUE_CAPACITY]; // +0x14
-    searchStorage m_storage; // +0x2414, path directions overlap the search-cell pointer
+    searchNode m_queue[SEARCH_QUEUE_CAPACITY];
+    searchStorage m_storage;
     searchNode* GetRow(i32 y, i32 width) {
         return m_storage.nodes + y * (width | 0);
     }
     searchNode& GetNode(i32 x, i32 y) {
         return *(m_storage.nodes + y * (MAP_WIDTH | 0) + x);
     }
-    // --- constructors ---
     searchArray(void);
     ~searchArray();
-    // --- methods ---
     i32 BuildPath(i32, i32, i32, i32, i32);
     void SeedPosition(i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32);
     void Init(void);
@@ -146,7 +141,6 @@ public:
 };
 #pragma pack(pop)
 SIZE(searchArray, 0x2518);
-// ---- globals (declarations, RVA order) ----
 extern u8 bIsMoatSlowed[117];
 
-#endif // HOMM2_SOURCE_SEARCHARRAY_H
+#endif

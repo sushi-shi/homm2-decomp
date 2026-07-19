@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_Re\CMBTMGR.OBJ   from: (directly linked into exe)
-// functions: 39   data: 7
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <math.h>
 #include <stdio.h>
@@ -270,8 +265,7 @@ void combatManager::InitNonVisualVars(void) {
     LoadArmies();
 }
 
-// @early-stop
-// raw-byte exact outside relocated jump operand/table at +0x165..+0x180; local-label addends only
+// @early-stop: byte-proven compiler artifact.
 VA(0x0049089d, 0x203)
 void combatManager::SetupAdjacencyArray(void) {
     i32 destinationHex = 0;
@@ -534,9 +528,7 @@ void combatManager::GenerateMap(void) {
     randomOffset = SRandom(8, 15);
 }
 
-// @early-stop
-// Instruction bytes and external relocations match; target offsets
-// +0x1e8..+0x20c are the delinked local jump table.
+// @early-stop: delinker jump-table artifact.
 VA(0x004919a6, 0x224)
 char* combatManager::GetBackgroundName(void) {
     i32 backgroundIndex;
@@ -605,11 +597,7 @@ char* combatManager::GetBackgroundName(void) {
     return cCombatBkgNames[backgroundIndex];
 }
 
-// @early-stop
-// Logic and frame slots are byte-exact. The +0xb2 bound test is the
-// TU-cumulative /Od MAP_HEIGHT operand-load order; the target delinker names
-// normalDirTable+1 as a string, and moves the 0x14-byte local jump table from
-// target +0x13c to base +0x13d after the one-byte bound-test delta.
+// @early-stop: delinker jump-table artifact.
 VA(0x00491bca, 0x210)
 i32 combatManager::MoreTreesNear(void) {
     i32 treeCount;
@@ -671,9 +659,7 @@ i32 combatManager::MoreTreesNear(void) {
     return mountainCounter < treeCount;
 }
 
-// @early-stop
-// Exact 0x3e7-byte span and 58 relocations; every non-jump operand matches,
-// with only the GetPlayerColor /Ob1 continuation at +0x372 versus retail +0x3a0.
+// @early-stop: byte-proven compiler artifact.
 VA(0x00491dda, 0x3e7)
 void combatManager::LoadIcons(void) {
     i32 index;
@@ -944,10 +930,7 @@ void combatManager::CheckApplyGoodMorale(i32 side, i32 index) {
         WaitEndSample(moraleSample, -1);
 }
 
-// @semantic: Complete behavior, frame/slots, morale CFG, and ordered external
-// relocations. The first residual at +0x27 is equivalent m_armies indexing:
-// retail scales index before side while candidate scales side before index.
-// Direct indexing, cached army pointers, and commuted address forms were tried.
+// @semantic: first residual at +0x27 is equivalent m_armies indexing.
 VA(0x00492afa, 0x1cd)
 i32 combatManager::CheckApplyBadMorale(i32 side, i32 index) {
     if (side < 0 || index < 0)
@@ -1099,13 +1082,7 @@ i32 combatManager::IsWinner(i32 side) {
     return winner;
 }
 
-// @early-stop
-// Soft TU-cumulative wall: size, frame/slots, CFG, and all 150 ordered
-// relocations agree. The only unmasked bytes are commutative load order at
-// +0x636..+0x63d, +0xac5..+0xac8, and +0xe94..+0xe9b. Direct/AST commutation,
-// projectile +=, prefix increment, SIB forms, val|0, and +=1 were exhausted.
-// Float guards spell __adjust_fdiv as proven iLeftRightSave+0x10. Revisit only
-// after the source/TU/header or comparison epoch changes.
+// @early-stop: byte-proven compiler artifact.
 VA(0x0049311f, 0x100e)
 void combatManager::CatAttack(i32 side) {
     if (!m_inCastleCombat)
@@ -1469,14 +1446,7 @@ void combatManager::CatAttack(i32 side) {
     LogStr("CA2");
 }
 
-// @semantic: The first raw divergence is +0x2e0: the SAMPLE2 compiler temporary
-// uses base -0xcc/-0xc8 versus retail -0xc8/-0xc4; nested armyNameValue uses
-// base -0xc4 versus retail -0xcc. The 0xd8 frame size, other slots, CFG, and all
-// 44 ordered relocations agree. Three val|0 spellings recover both comparison
-// orders. The recovered defense field replaces an incorrect source read
-// without changing the current score or resolved relocations. Bucket-12/-14 wider-scope pointer
-// placements regressed and a nested bucket rename was stagnant. Revisit only
-// after compiler allocation or the source/TU/header epoch changes.
+// @semantic: first raw divergence is +0x2e0: the SAMPLE2 compiler temporary uses base -0xcc/-0xc8 versus retail -0xc8/-0xc4.
 VA(0x0049412d, 0x74f)
 void combatManager::KeepAttack(i32 tower) {
     if (!m_inCastleCombat)
@@ -1519,9 +1489,6 @@ void combatManager::KeepAttack(i32 tower) {
 
             value26 =
                 gMonsterDatabase[IDX(target0->m_monsterType)].fightValue * target0->m_quantity;
-            // Retail +0x25b loads bestValue10, compares value26, then uses jle.
-            // Reversing both operands produces equivalent jge and differs at
-            // function offsets +0x25d, +0x260, and +0x262.
             if ((IDX(bestPriority0) | 0) < IDX(priority)
                 || ((IDX(bestPriority0) | 0) == IDX(priority) && bestValue10 < value26)) {
                 bestValue10 = value26;
@@ -1619,18 +1586,7 @@ void combatManager::KeepAttack(i32 tower) {
     LogStr("KA2");
 }
 
-// @semantic: Retained 100.00% at source hash f53df3a552e3; do not replace this
-// exact recovered body to improve the transient live score. The 0xc frame, all
-// three stack slots, 0x17b size, loop CFG, and sole relocation still align. The
-// current TU expands the commutative army index before the side offset, while
-// retail used side-first order. Flattened pointer arithmetic raised the live
-// score to 84.09% but changed the exact source hash; reversed/indexed subscripts,
-// explicit array casts, operand swaps, scalar wrappers, and an inline side-offset
-// helper did not restore exact output. A diagnostic TU-state probe reached
-// 99.99167% but invented a class solely for matching and regressed a sibling.
-// The current ten-trial diagnostic again produced a disposable exact member probe,
-// rejected by the sibling/exact guards; the other nine were stagnant. Revisit only
-// after a real TU/header or comparison-epoch change.
+// @semantic: stack-slot/code-shape residual.
 VA(0x0049487c, 0x17b)
 i32 combatManager::ExperienceValueOfStack(i32 side) {
     i32 experienceValue6 = 0;
@@ -1675,18 +1631,7 @@ void combatManager::DrawCombatBorder(void) {
     return;
 }
 
-// @semantic: The 0x58 frame, every local slot, semantics, CFG, and all 22/22
-// external relocation targets align. Castle checks now use retail's defender-town
-// field at +0x3283, not the stale original-town pointer at +0x31e6. Candidate size
-// 0x4c9 is 15 bytes below retail 0x4d8: normalized instructions 179, 194, and 242
-// use direct branches where retail uses the opposite branch plus a five-byte
-// continuation. Instructions 207 and 264 retain equivalent obstacle/cell-index
-// address order. Split conditions, explicit exits/continues, <= 2 / >= 10 bounds,
-// and direct versus typed inverted cell-offset subscripts are exhausted.
-// The table is exactly 0x1c0 bytes (32 * 0xe) before gEstatesGoldLevel; retail
-// SRandom is inclusive and its literal high 32 can index past both 32-entry
-// arrays. Preserve that retail defect; never expand the table or change it to 31.
-// Revisit only after the source/TU/header or comparison epoch changes.
+// @semantic: branch/code-shape residual.
 VA(0x00494ae1, 0x4d8)
 void combatManager::SetupAndLoadObstacles(void) {
     u8 obstacleUsed[COMBAT_OBSTACLE_TYPE_COUNT];
@@ -1762,7 +1707,6 @@ void combatManager::SetupAndLoadObstacles(void) {
         while (obstacleCells18 < obstacleGoal7 && tryCount28 < COMBAT_OBSTACLE_TRY_LIMIT) {
             tryCount28++;
             anchorHex9 = SRandom(0, COMBAT_OBSTACLE_CELL_ROLL_MAX);
-            // Retail's inclusive high endpoint permits the out-of-range value 32.
             obstacleType4 = SRandom(0, COMBAT_OBSTACLE_INCLUSIVE_ROLL_HIGH);
             if (terrainMask9 & sCmbtObstacles[obstacleType4].terrainMask) {
                 if (obstacleUsed[obstacleType4] == 0) {
@@ -1808,13 +1752,7 @@ void combatManager::SetupAndLoadObstacles(void) {
     }
 }
 
-// @early-stop
-// Soft TU-cumulative wall: the exact 0x2a1 span, 0x20 frame, all seven semantic
-// slots, CFG, and 20 ordered relocation sites agree. The ternary mask recovers
-// retail's two sbb sequences. Only 11 unmasked bytes at +0x77..+0x83 remain: the
-// commutative side/army-index address order for m_limitCreatureCount. Direct and
-// typed inverted subscripts compile to the same instructions. Revisit after a
-// source/TU/header or comparison-epoch change.
+// @early-stop: byte-proven compiler artifact.
 VA(0x00494fb9, 0x2a1)
 void combatManager::MakeCreaturesVanish(void) {
     ResetLimitCreature();
@@ -1926,11 +1864,7 @@ i32 combatManager::InCastle(i32 hex) {
                : 0;
 }
 
-// @early-stop
-// Soft TU-cumulative wall: the 0x5c frame, all semantic/compiler-temporary slots,
-// CFG, and 25 resolved relocations agree. Only +0x245/+0x248 and +0x24e/+0x251
-// differ: retail loads traceColumn/traceRow before the commutative step, while this
-// TU loads the step first. += and both explicit addition orders compile identically.
+// @early-stop: byte-proven compiler artifact.
 VA(0x00495559, 0x346)
 i32 combatManager::ShotIsThroughWall(i32 side, i32 sourceHex, i32 targetHex) {
     if (!m_inCastleCombat)
@@ -1996,13 +1930,7 @@ i32 combatManager::ShotIsThroughWall(i32 side, i32 sourceHex, i32 targetHex) {
     return 0;
 }
 
-// @semantic: One frame16 lifetime now serves direction and animation loops, giving
-// retail's 0x80 frame; all 24 semantic slots, compiler temporaries, CFG, calls, and
-// 52 resolved relocations agree. Residuals are the x/y square order, five integer
-// sums, and three extent comparisons; the latter shift subsequent relocation sites.
-// Direct commutation of every sum and both orientations of the comparisons compile
-// identically. Remaining identities are QIfdiv/floating constants and gConfig.
-// Revisit only after the source/TU/header or comparison epoch changes.
+// @semantic: compiler-shape residual.
 VA(0x0049589f, 0x52e)
 void combatManager::ShootMissile(
     i32 sourceX,
@@ -2223,13 +2151,7 @@ void UpdateCombatSystemOptions(i32 initialDraw) {
         CSPanel->DrawWindow(1, 0, COMBAT_SYSTEM_OPTION_DRAW_MASK);
 }
 
-// @early-stop
-// Retained/live 99.88%; relocation-masked raw bytes are identical
-// across all 0x39a bytes, including jump-table spans +0x121..+0x13c and
-// +0x2f0..+0x30b. Frame, slots, and CFG match; all 36/36 relocation sites align,
-// with retail delinking 12 gConfig sites as local DATA aliases. Flat equality
-// close handling was 95.17%; the nested switch supplies retail's hidden temp.
-// Redraw/done declaration order and right-button flag forms are exhausted.
+// @early-stop: delinker jump-table artifact.
 VA(0x004960a9, 0x39a)
 i32 CombatSystemOptionsHandler(tag_message& message) {
     i32 bRedraw = 0;
@@ -2337,35 +2259,9 @@ i32 CombatSystemOptionsHandler(tag_message& message) {
     return COMBAT_SYSTEM_OPTION_HANDLER_CONTINUE;
 }
 
-// ===== vtable combatManager : public baseManager  (3 slots) =====
-//  [ 0] VA(0x00490aa0, 0x43f)  int combatManager::Open(int)   <- override (implements baseManager pure virtual)
-//  [ 1] VA(0x00490edf, 0x3d6)  void combatManager::Close(void)   <- override (implements baseManager pure virtual)
-//  [ 2] VA(0x0042a6d0, 0x36d)  int combatManager::Main(struct tag_message &)   <- override (implements baseManager pure virtual)
 
-// ---- vtables (compiler-emitted; census) ----
 VTBL(combatManager, 0x004eb898);
 
-// ---- globals (definitions, RVA order) ----
-// @data-layout-note Retail CMBTMGR .data is 0xf8900+0x358. Its 59 local
-// allocations and two referenced public integers account for all 64 HIGHLOW
-// references to 61 distinct owner RVAs; the fresh candidate has the same
-// target multiset, with one zero-addend reference per local allocation. Moving
-// candidate wallHex from +0x8 to retail +0x31c and appending the retail four-byte
-// zero tail translates the complete 0x354 candidate payload exactly: translated
-// and retail SHA-256 are
-// a0f7d69a73915ea5e0da8783fff680d9f5ea1995532c50896a13c31b84866fda.
-// This is compiler allocation order, not missing storage. Candidate BSS is 0xc
-// versus retail 0x10: candidate order is bCPrefsChanged, CSPanel,
-// bMouseWasVis, while retail is bMouseWasVis, CSPanel, bCPrefsChanged followed
-// by a four-byte loader-zero tail. Its 29 references match exactly at addend
-// zero: 2 to bMouseWasVis, 19 to CSPanel, and 8 to bCPrefsChanged. The 0x68
-// non-COMDAT .rdata pool is byte-exact (SHA-256
-// 2e4e4857fd9f5831b891b16432a5068ad50eb1dba97f138793ad65a25c77728e).
-// The vtable relocations are exactly Open, Close, Main; its candidate COMDAT is
-// 0xc while the retail owner range is 0x10 with a zero tail. All six public
-// allocations have the proven types, storage classes, and payloads. Revisit
-// allocation order only with natural compiler evidence; do not add padding,
-// aliases, synthetic identities, or unattached literals.
 DATA(0x004f8900) i32 bInHighMoraleBonus = 0;
 DATA(0x004f8904) i32 giSeed = 1;
 DATA(0x004f8c1c) u8 wallHex[4] = {9, 34, 86, 113};

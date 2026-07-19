@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_Re\KB.OBJ   from: (directly linked into exe)
-// functions: 71   data: 441
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/town.h>
@@ -62,10 +57,6 @@
 #include <BASE/textWidget.h>
 #include <BASE/border.h>
 
-// Types now from headers: game/mouseManager/townManager/town/executive + combatManager/
-// tag_message -> BASE/message.h; SAMPLE2/tag_monsterInfo/SSpellInfo/SWinSetup ->
-// SOURCE/KB_TYPES.h; SNetPlayerInfo -> SOURCE/REMOTE_TYPES.h;
-// SPlayerExit -> KB.h.
 
 #define RETAIL_FILE const_cast<char*>("I:\\Projects\\Heroes\\Prog\\SOURCE\\KB.CPP")
 
@@ -119,10 +110,7 @@ void ForcePollSound(void) {
     PollSound();
 }
 
-// @early-stop
-// Normalized disassembly is identical for all 264 instructions; the frame and
-// 62/62 relocation sites also match with no base-only target. The retained
-// 99.995% residual is local compiler-symbol identity, not a code-byte mismatch.
+// @early-stop: byte-proven compiler artifact.
 VA(0x004965be, 0x39e)
 void InitMainClasses(void) {
     gpExec = new executive;
@@ -274,15 +262,7 @@ i32 EarlySetup(void) {
     return 1;
 }
 
-// @semantic
-// Exact 0x164 frame, live/generated slots, CFG, and first table at +0x4d4 after
-// recovering the menu/TCP arm order and both setup switches. Excluding table
-// data, the first residual is retail's local continuation jump at +0x533; two
-// more retail-only continuations at +0x652/+0x657 account exactly for the
-// second-table offset (base +0x8e5, retail +0x8f4) and 486/489 relocations.
-// External targets agree except two proven gsNetPlayerInfo interior aliases.
-// Tried raw assignments, a void setter (wrong local jmp $+0), and a reference
-// accessor (wrong pointer temporaries/frame). Revisit for inline-tail placement.
+// @semantic: first residual is retail's local continuation jump at +0x533.
 VA(0x00496e98, 0x16c0)
 i32 oldmain(void) {
     i32 command_a;
@@ -291,7 +271,6 @@ i32 oldmain(void) {
     i32 firstMainScreen_c;
     i32 savedUpdateFlags_l;
     i32 player_h;
-    // Retail reserves three unreferenced /Od locals around the live state slots.
     i32 unusedMainState_o;
     i32 unusedMenuState_d;
     i32 unusedPlayerState_c;
@@ -1002,15 +981,7 @@ i32 InterpretCommandLine(void) {
     return 1;
 }
 
-// @semantic
-// Explicit-range first opcode divergence at +0x354: ours emits a five-byte
-// continuation jmp where retail enters the next body; retail later uses lea at
-// +0x39b where ours uses shl/sub at +0x3a0 after that shifted continuation.
-// The 0x24 frame/slots, source CFG and semantics are complete; jump tables at
-// +0xad/0x14 and +0x1ab/0x18 align, and all 89 relocations resolve with no
-// base-only target. Direct retail-order cases and the frame-expression operand
-// swap were tried without changing the residual. Revisit with focused exact-span
-// variants after the TU's pre-target libclang diagnostics are resolved.
+// @semantic: first opcode divergence at +0x354: ours emits a five-byte continuation jmp where retail enters the next body.
 VA(0x00498d2d, 0x698)
 i32 InitMenuHandler(struct tag_message& msg) {
     i32 handled = 0;
@@ -1214,7 +1185,6 @@ i32 NullHandler(struct tag_message& msg) {
 
 VA(0x004993e0, 0x1a9)
 i32 RecruitHeroHandler(tag_message& msg) {
-    // e/p/c/d are the (dead) event-id shorts; a = handled flag; b reserves a slot.
     i16 e = 2, p = 3, c = 8, d = 9;
     i32 a = 0;
     i32 b;
@@ -1341,10 +1311,7 @@ char* GetMonsterName(i32 m) {
     return gArmyNames[m];
 }
 
-// @early-stop
-// All 320 relocation-masked bytes are identical and 11/11 effective targets
-// agree. Only delinked local-label DIR32 names differ at +0xe1, +0xe8 and the
-// +0xec..+0x108 switch table ($L... versus containing-function plus addend).
+// @early-stop: delinker artifact.
 VA(0x0049992c, 0x140)
 void GetMonsterCost(i32 monster, i32* const cost) {
     i32 idx;
@@ -1377,12 +1344,7 @@ void GetMonsterCost(i32 monster, i32* const cost) {
     }
 }
 
-// @early-stop
-// Complete 0x2b5 body, 0x10 frame/slots, CFG, and all five ordered relocations
-// align. The only executable residual is the commutative pair at +0x25f/+0x262:
-// retail loads reqMask[-8] then ANDs haveMask[-4], while ours loads haveMask then
-// ANDs reqMask. Ten variants exhausted operand/equality order, qualified lvalues,
-// and hash-compatible names. Revisit only after relevant KB/TU state changes.
+// @early-stop: byte-proven compiler artifact.
 VA(0x00499a6c, 0x2b5)
 i32 CanBuild(town* t, BuildingSlotType building) {
     i32 reqMask;
@@ -1823,13 +1785,7 @@ void PlayerDead(i32 player) {
     }
 }
 
-// @semantic
-// Complete 0x19bb body, 0x1c4 frame/slots, CFG, and 300/300 effective relocation
-// targets align. The shared playerData epoch leaves one 17-byte residual at
-// +0xe32: retail materializes campaign type before scenario for the completed
-// table address, while base reverses the equivalent index arithmetic. Commuted
-// subscripts and qualifying m_campaignType regressed or were byte-neutral.
-// Revisit after a later KB TU/header change.
+// @semantic: compiler-shape residual.
 VA(0x0049a6c1, 0x19bb)
 void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
     i32 showedDialog;
@@ -2448,11 +2404,7 @@ void QuickViewWait(void) {
     gpMouseManager->ReallyShowPointer();
 }
 
-// @early-stop
-// All 513 authoritative bytes are identical after masking the union of COFF
-// relocation sites. All 57 effective targets agree; the only unpaired sites
-// are eight base __imp__LoadMenuA@8 relocations whose target operands retain
-// the linked 0x53a648 IAT address without COFF relocation records.
+// @early-stop: byte-proven compiler artifact.
 VA(0x0049c111, 0x201)
 void InitVars(void) {
     i32 i;
@@ -2492,12 +2444,7 @@ void InitVars(void) {
     }
 }
 
-// @early-stop
-// The 0xe0 frame and all retail stack slots match after hash-derived local
-// renaming. Retail has exactly two extra five-byte continuation jumps at +0xfc
-// and +0x60f. Deleting those ranges leaves only four branch-displacement bytes
-// caused by the inserted jumps; every non-jump opcode/operand matches, the size
-// delta is exactly 10, and all 119 relocation tuples align after offset adjustment.
+// @early-stop: byte-proven compiler artifact.
 VA(0x0049c312, 0x61b)
 void game::ShowMoraleInfo(hero* h, i32 dialogType) {
     i32 mixedUndead4;
@@ -2851,14 +2798,7 @@ i32 WaitForOtherPlayer(void) {
     return result;
 }
 
-// @semantic
-// Complete 0xb85 body, 0x158 frame/slots, CFG, and 131/131 relocations align.
-// The sole code residual is the printable-key guard: retail emits direct unsigned
-// byte comparisons (`cmp byte; jb/jbe`), while ours zero-extends the proven
-// keyboard low-byte view before each comparison, making the sequence eight bytes
-// longer. The three cyclicly misassigned control locals were corrected to their
-// retail slots. Pointer lvalues, byte casts, and the byte-neutral keyboard payload
-// union were tried without steering this lowering; revisit on compiler-state change.
+// @semantic: printable-key guard uses a different unsigned-byte comparison encoding.
 VA(0x0049d4a6, 0xb85)
 void PopNetBox(char* text, i32 netPlayer) {
     i32 textY_d;
@@ -3231,18 +3171,15 @@ void FileError(char* filename) {
 VA(0x0049e3a8, 0x255)
 void SmackFade(u8* src, u8* dst) {
     DATA(0x00516668) static i16 smackFadeSourceLineBase = 0x0f61;
-    // /Od frame slots (od_oracle-verified): a=newPal(-8) b=avg2(-c) c=x(-10)
-    // d=minDist(-14) e=avg1(-18) f=map(-1c) g=y(-20) h=outer(-24) i=inner(-28)
-    // j=screen(-2c) k=best(-30) p=dist(-4)
-    u8* a;    /* newPal */
-    u8* f;    /* map    */
-    i32 k;    /* best   */
-    i32 h, i; /* outer / inner loop */
-    i32 e, b; /* avg1, avg2 */
-    i32 d;    /* minDist */
-    i32 p;    /* dist   */
-    u8* j;    /* screen */
-    i32 c, g; /* x, y   */
+    u8* a;
+    u8* f;
+    i32 k;
+    i32 h, i;
+    i32 e, b;
+    i32 d;
+    i32 p;
+    u8* j;
+    i32 c, g;
 
     a = 0;
     f = 0;
@@ -3436,13 +3373,7 @@ i32 GameUnsaved(void) {
         return 0;
 }
 
-// @early-stop
-// Excluding the two switch data tables at function offsets [0x84d, 0x905) and
-// [0x905, 0x98a), explicit-range comparison finds all 477 instructions aligned;
-// only the delinked table-address operands retain different symbol identities.
-// The 0x20 frame and stack slots match. All 163 target relocations agree by
-// offset/type; the base-only PostMessageA and WritePrefs entries are resolved by
-// delinking, and the remaining aliases are literals or local switch labels.
+// @early-stop: delinker artifact.
 VA(0x0049ec05, 0xa18)
 i32 HandleAppSpecificMenuCommands(i32 command) {
     i32 menuChanged;
@@ -3833,10 +3764,7 @@ void CleanUpMenus(void) {
     hmnuApp = 0;
 }
 
-// @semantic
-// Complete 0x2a body, 0x4 frame/slots, CFG, and both ordered relocations agree.
-// At +0xe retail loads hMenu from -0x4 and compares hmnuAdv; base loads the
-// global first. Swapped operands and OD_STEER(hMenu) were byte-neutral.
+// @semantic: compiler-shape residual.
 VA(0x0049f9c6, 0x2a)
 void UpdateAppSpecificMenus(void* hMenu) {
     if (hmnuAdv == hMenu)
@@ -3855,13 +3783,7 @@ i32 InMapArea(i32 x, i32 y) {
 }
 
 // @early-stop
-// @early-stop-reloc-only: Current KB.cpp/header epoch: all 0x6bc bytes match
-// after masking 51 ordered relocation sites. Qualifying columnIndex through
-// OD_STEER(columnIndex) and spelling the first edge loop as columnsSize > OD_STEER(edge)
-// close the two loop load/polarity residuals; all remaining disassembly rows are
-// equivalent delinked string identities. Nine bounded variants were compiled,
-// including five exact forms. Revisit only after the KB source/TU/header or
-// comparison epoch.
+// @early-stop-reloc-only: relocation naming only.
 VA(0x0049fa70, 0x6bc)
 void SetupDynamicWindow(
     i32 x,
@@ -4116,11 +4038,7 @@ void TestDynamicWindow(i32 p1, i32 p2) {
     delete p;
 }
 
-// @semantic
-// Complete body, 0xc frame/slots, CFG, and all 9 ordered relocations align. At
-// +0xc retail loads pos from -0xc and compares giThisGamePos; ours loads the
-// global and compares pos. Both equality operand orders and OD_STEER(pos) were tried
-// without steering MSVC's TU-state load order. Revisit on compiler-state change.
+// @semantic: evaluation-order residual.
 VA(0x004a0234, 0x91)
 void HandleRemoteDeadPlayerExit(i32 pos) {
     SPlayerExit pe;
@@ -4162,10 +4080,7 @@ void HandleRemoteSuddenExit(void) {
     DelayMilli(500);
 }
 
-// @semantic
-// Complete 0x62 body, 0x8 frame/slots, CFG, and all five ordered relocations
-// agree. At +0x2b retail loads i from -0x8 and compares giThisNetPos; base
-// loads the global and compares i. Swapped operands and OD_STEER(i) were byte-neutral.
+// @semantic: compiler-shape residual.
 VA(0x004a036f, 0x62)
 void DropDownToOnePlayer(void) {
     RemoteCleanup();
@@ -4285,11 +4200,7 @@ void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, i32
         );
 }
 
-// @semantic
-// Complete body, 0x10 frame/slots, CFG, and all 45 ordered relocations align. At
-// +0x280 retail loads giNumHumanPlayers and compares recipient at -0xc; ours loads
-// recipient and compares the global. Reversed relational spelling was neutral and
-// qualified operands worsened the preceding branch. Revisit on compiler-state change.
+// @semantic: branch/code-shape residual.
 VA(0x004a07e3, 0x361)
 void ReceiveRemotePlayerExit(SPlayerExit exitInfo) {
     i32 localPlayerLost;
@@ -4459,14 +4370,7 @@ void CheckShingleUpdate(void) {
     }
 }
 
-// @semantic
-// Complete body, 0x120 frame/slots, CFG, and all 257 ordered relocations align.
-// Corrected the resource-domain branch, 32-bit height temporaries, sizing/drawing
-// lifetimes, resource Y reuse, and screen bounds. The first residual at +0x1f7 is
-// equivalent no-value arithmetic (`sete/dec` versus retail `inc/cmp/adc`), followed
-// by sizing-switch body/table order (+0x2c6 and +0xb50) and spell-type equality
-// lowering. Direct arithmetic, unsigned comparison, width, lifetime, case-order,
-// and condition-polarity variants were exhausted; revisit with bounded AST variants.
+// @semantic: first residual at +0x1f7 is equivalent no-value arithmetic (sete/dec versus retail inc/cmp/adc).
 VA(0x004a0d9f, 0x17c6)
 void NormalDialog(
     char* text,
@@ -4481,7 +4385,6 @@ void NormalDialog(
     i32 timeout
 ) {
     DATA(0x00516d20) static i16 normalDialogSourceLineBase = 0x14a5;
-    // Retail's 0x120 /Od frame retains this otherwise unreferenced local word.
     i32 panelHeight_p;
     i32 labelY_o;
     widget* borderWidget_o;
@@ -5120,7 +5023,6 @@ void UpdateNormalDialog(char* text) {
     pNormalDialogWindow->DrawWindow(1, -65535, -256);
 }
 
-// ---- globals (definitions, RVA order) ----
 #define GROUND_REPEAT_2(value) value, value
 #define GROUND_REPEAT_4(value) GROUND_REPEAT_2(value), GROUND_REPEAT_2(value)
 #define GROUND_REPEAT_8(value) GROUND_REPEAT_4(value), GROUND_REPEAT_4(value)
@@ -6176,8 +6078,6 @@ DATA(0x004fbb38) b32 gbNoBorder = false;
 DATA(0x004fbb3c) b32 gbEnlargeScreenBlit = true;
 DATA(0x004fbb40) i32 giCurExe = 0;
 DATA(0x004fbb44) b32 gbInDialog = false;
-// APP_MENU_UNKNOWN_9C6D and APP_MENU_UNKNOWN_9CAD occur only in this retail
-// table; executable and menu-resource evidence does not identify their actions.
 DATA(0x004fbb48) struct SMenuEnableStatus gsMenuEnableStatus[MENU_ENABLE_STATUS_COUNT] = {
     {APP_MENU_NONE, 0, 0, 0},
     {IDX(KBWIN_MENU_SIZE_640_480), 1, 1, 0},
@@ -9620,22 +9520,6 @@ DATA(0x00500168) void* gLowPage = 0;
 DATA(0x0050016c) b32 gbLowPageGrabbed = false;
 DATA(0x00500170) i8 xSmackFromNetwork = 0;
 DATA(0x00500174) b32 gbInPollSound = false;
-// @data-layout-note Retail's initialized KB contribution is
-// 0xf8c58..0x116f60 (0x1e308); candidate .data is 0x1e309. All 2,719 initialized
-// candidate definitions close: 315 typed source DATA owners plus 2,404 reviewed
-// compiler-private allocations. Every logical non-relocation byte agrees, and
-// all 2,196 candidate DIR32 sites agree with retail in offset, target identity,
-// addend, HIGHLOW presence, and value. The 36 uncovered ranges (132 bytes) are
-// all retail zero fill; this includes the gArtifactNames-4 prebias target at
-// 0xfe2ac, which is an alignment gap rather than an allocation. The residual 33
-// private owners use 31 relocation/payload-proved remaining slots and one
-// explicit two-member equivalence class for NormalDialog's identical "%d"
-// literals. Five former string-backed short views are now typed owners at
-// 0x1164bc, 0x1165e0, 0x116668, 0x11670c, and 0x116d20. Candidate/retail raw
-// SHA-256 values are fa172a30c9d76e7541ceae2c4aac45b190bd4aacef277452cef3fed57e9a487c
-// and 75bba73ed144117efade24fa386a3dfb14f2717d48ef2246817e900e687499b7.
-// KB has no candidate or NB09 .rdata contribution. Do not invent padding,
-// aliases, synthetic owners, or section pragmas for the physical stream delta.
 DATA(0x005157a8) i32 iCDRomErr = 0;
 DATA(0x005157ac) i32 bEarlySetupDone = 0;
 DATA(0x005159f8) i32 bKBDone = 0;
@@ -9653,19 +9537,6 @@ DATA(0x00515f78) i32 bInCheckEndGame = 0;
 DATA(0x005165dc) i32 bInShutDown = 0;
 DATA(0x00516810) b32 gbInMemError = false;
 DATA(0x00516d1c) i32 iShingleAnimFrame = 0;
-// @data-layout-note Retail's loader-zero KB contribution is
-// 0x128598..0x12a1d8 (0x1c40); candidate .bss is 0x1a7c. Its 131 public
-// definitions have 125 inconsistent section bases because VC4.2 emits the
-// candidate in identifier-hash order, not retail RVA order. All 7,970 retail
-// HIGHLOW references into the contribution land inside recovered logical DATA
-// extents; none targets unexplained storage. In particular, the unreferenced
-// holes 0x12864c..0x1286df and 0x12978c..0x1298b3 must not become invented
-// arrays. PollSound/ForcePollSound prove that 0x128d04, 0x128d08, and 0x128d0c
-// are glTimers[5], glTimers[6], and glTimers[7], so the former glNext* globals
-// were duplicate identities. Declaration reorder, extern-before-definition,
-// and file/function-static probes do not recover retail's order. Revisit only
-// with evidence for original common/section topology or referenced private
-// storage; do not add padding definitions solely to close the 0x1c4 size delta.
 DATA(0x00528598) b32 gbHumanPlayer[6];
 DATA(0x005285b0) b32 gbHitEvent;
 DATA(0x005285b4) i32 giMaxExtentX;

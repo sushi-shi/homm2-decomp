@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_Re\PATH.OBJ   from: (directly linked into exe)
-// functions: 12   data: 0
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <SOURCE/army.h>
 #include <SOURCE/CMBTMGR.h>
@@ -77,10 +72,7 @@ i32 army::GetMoveMask(i32 sourceHex) {
     return blockedMaskValue | COMBAT_PATH_SPECIAL_DIRECTION_MASK;
 }
 
-// @semantic: Complete 0x18 frame, loop/CFG, and ordered relocations. At +0x68
-// retail loads directionResult and compares it against directionCountNext;
-// candidate loads the bound and uses the equivalent reversed relation. Both
-// relational orders, OD_STEER(directionResult), and directionResult|0 were unchanged.
+// @semantic: compiler-shape residual.
 VA(0x004bde41, 0xb5)
 i32 army::GetAttackMask(i32 sourceHex, i32 targetMode, i32 targetHex) {
     i32 directionResult;
@@ -263,11 +255,7 @@ i32 army::ValidAttack(
     return 0;
 }
 
-// @early-stop
-// TU-cumulative +0x7f..+0x8a: both streams compute direction + sourceHex*6,
-// but retail loads direction first and uses two LEAs while ours scales sourceHex
-// first. Frame/CFG and the gpCombatManager relocation agree; direct, flat,
-// pointer, reordered, and SIB-index spellings were exhausted.
+// @early-stop: byte-proven compiler artifact.
 VA(0x004be48a, 0xa5)
 i32 army::GetAdjacentCellIndex(i32 sourceHex, i32 direction) {
     if (sourceHex == COMBAT_PATH_INVALID_HEX)

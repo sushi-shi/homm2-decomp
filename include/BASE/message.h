@@ -8,7 +8,7 @@
 H2_ENUM_BEGIN(MessageType)
     MESSAGE_NONE = 0,
     MESSAGE_KEY_DOWN = 1,
-    SPELL_MESSAGE_MOUSE_DOWN = MESSAGE_KEY_DOWN, // reconstruction name predates value proof
+    SPELL_MESSAGE_MOUSE_DOWN = MESSAGE_KEY_DOWN,
     INIT_MENU_KEY_PRESS = MESSAGE_KEY_DOWN,
     ADVMGR_REMOTE_WAIT_COMMAND_MESSAGE = MESSAGE_KEY_DOWN,
     MESSAGE_KEY_UP = 2,
@@ -264,4 +264,4 @@ struct tag_message {
     tag_messagePayload payload;
 };
 SIZE(tag_message, 0x1c);
-#endif // HOMM2_BASE_MESSAGE_H
+#endif

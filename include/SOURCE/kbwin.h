@@ -3,8 +3,6 @@
 #include <SOURCE/KB_TYPES.h>
 #include <va.h>
 #include <windows.h>
-// Declarations of the free functions DEFINED in kbwin.cpp — the single home for these
-// symbols. Other TUs call them by including this header (no local externs).
 
 H2_ENUM_BEGIN(KbWinConstant)
     KBWIN_PROCESS_MESSAGE_MAX = 0x3ff,
@@ -59,13 +57,11 @@ void SetMenus(HMENU, i32);
 i32l KBTickCount(void);
 void InitVideo(void);
 
-// --- globals owned by this TU (moved from _globals.h; CodeView-attributed) ---
 extern HANDLE gEventHandle;
 extern HINSTANCE hInstApp;
 extern HMENU hmnuApp;
 extern HWND hwndApp;
 
-// ---- globals (declarations, RVA order) ----
 extern char szAppName[16];
 extern char szTitle[32];
 extern i32l lLastGTimerTickCount;
@@ -86,4 +82,4 @@ extern i32l lTemp;
 extern u8 bProcessMessage[KBWIN_PROCESS_MESSAGE_COUNT];
 extern i32 iMainWinScreenWidth;
 
-#endif // HOMM2_KBWIN_H
+#endif

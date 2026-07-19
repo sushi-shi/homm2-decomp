@@ -2,9 +2,6 @@
 #define HOMM2_BMAP2_H
 
 #include <Ints.h>
-// Declarations of the free functions DEFINED in bmap2.cpp — the single home for these
-// symbols. Other TUs call them by including this header (no local externs).
-// forward declarations (was <_all.h>):
 class bitmap;
 
 H2_ENUM_BEGIN(BitmapDimConstant)
@@ -16,4 +13,4 @@ void FillBitmapAreaClip(class bitmap*, i32, i32, i32, i32, i32, i32, i32, i32, i
 void BlitBitmap(class bitmap*, i32, i32, i32, i32, class bitmap*, i32, i32);
 void DimBitmapArea(class bitmap*, i32, i32, i32, i32, i32);
 
-#endif // HOMM2_BMAP2_H
+#endif

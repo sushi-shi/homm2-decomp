@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_Re\kbwin.obj   from: (directly linked into exe)
-// functions: 16   data: 21
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -146,10 +141,7 @@ i32 AppInit(HINSTANCE instance, HINSTANCE previousInstance, i32 showCommand, cha
     }
 }
 
-// @semantic: semantics, the zero-byte frame, both return arms, and the sole
-// ordered relocation agree. The first residual is retail's `mov eax, 0` in the
-// false arm versus this compiler state's `xor eax, eax`; explicit if/else is the
-// best of the tested direct, comparison, and conditional-return forms.
+// @semantic: first residual is retail's mov eax, 0 in the false arm versus this compiler state's xor eax, eax.
 VA(0x0041c15f, 0x31)
 i32 AppIdle(void) {
     if (gbForegroundApp != 0)
@@ -158,10 +150,7 @@ i32 AppIdle(void) {
         return 0;
 }
 
-// @semantic: complete message switch, frame, CFG, and all 79 ordered relocation
-// identities/addends agree. The first residual is the embedded 0x14-byte jump
-// table at RVA 0x1c61b; the candidate's next public begins one byte earlier, so
-// the old full-span raw-identity claim was invalid.
+// @semantic: first residual is the embedded 0x14-byte jump table at RVA 0x1c61b.
 VA(0x0041c190, 0x57e)
 LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPARAM messageData) {
     if (message > KBWIN_PROCESS_MESSAGE_MAX || bProcessMessage[message] == 0) {
@@ -377,10 +366,7 @@ void ResizeWindow(i32 x, i32 y, i32 width, i32 height) {
     WritePrefs();
 }
 
-// @early-stop
-// All 0x197 bytes, including the 0x20-byte jump table at retail RVA 0x1caff,
-// match after masking aligned COFF relocations. The 99.66% fuzzy result is
-// delinked local-label identity; all 6/6 external REL32 callees agree.
+// @early-stop: delinker jump-table artifact.
 VA(0x0041c9c7, 0x197)
 LRESULT AppCommand(HWND window, UINT message, WPARAM messageParam, LPARAM messageData) {
     i32 command;
@@ -418,7 +404,6 @@ LRESULT AppCommand(HWND window, UINT message, WPARAM messageParam, LPARAM messag
 
 VA(0x0041cb5e, 0xd7)
 void UpdateDfltMenu(HMENU menu) {
-    // Retail reserves these dwords but never reads or initializes them.
     i32 result;
     i32 value;
 
@@ -436,10 +421,7 @@ void UpdateDfltMenu(HMENU menu) {
         EnableMenuItem(menu, IDX(KBWIN_MENU_FULLSCREEN), MF_GRAYED);
 }
 
-// @semantic: semantics, the 0x04 frame, menu slot, both arms, and all 11 ordered
-// relocation identities/addends agree. Retail has one five-byte continuation
-// jump immediately after the null-menu fallback; an explicit empty positive arm
-// lowered the match to 94.70%.
+// @semantic: compiler-shape residual.
 VA(0x0041cc35, 0xac)
 void KBChangeMenu(HMENU menu) {
     if (menu == 0)
@@ -497,14 +479,7 @@ void SetNoDialogMenus(i32 menusEnabled) {
     SetMenus(hmnuApp, menusEnabled);
 }
 
-// @semantic: The recursive traversal, 0x20 frame, eight parameter/local slots,
-// menu-status layout, and CFG match retail. First residual +0x2b: retail loads
-// the loop index and compares count with `jle`; this build loads count and
-// compares index with the equivalent `jge`. Symmetric relational and
-// pointer-index forms were byte-neutral; an explicit break guard was worse. The
-// only relocation-count difference is the candidate REL32 recursive self-call,
-// which retail's delinked object resolves internally. Revisit after a kbwin
-// TU/header change alters compiler state.
+// @semantic: First residual +0x2b: retail loads the loop index and compares count with jle.
 VA(0x0041ceb8, 0x159)
 void SetMenus(HMENU menu, i32 enabled) {
     i32 count;
@@ -555,7 +530,6 @@ void InitVideo(void) {
     return;
 }
 
-// ---- globals (definitions, RVA order) ----
 DATA(0x004ef4c8) char szAppName[16] = "Heroes II";
 DATA(0x004ef4d8) char szTitle[32] = "Heroes of Might and Magic II";
 DATA(0x004ef4f8) HWND hwndApp = 0;

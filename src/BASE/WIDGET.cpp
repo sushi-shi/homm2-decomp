@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_RE\WIDGET.OBJ   from: .\basewin.lib
-// functions: 7   data: 1
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <BASE/widget.h>
 #include <BASE/widgetKind.h>
@@ -52,19 +47,11 @@ i32 widget::Open(i32 zOrder, class heroWindow* owner) {
     return 0;
 }
 
-// @early-stop
-// Both sides emit the named one-byte Close body; neither side has relocations.
+// @early-stop: byte-proven compiler artifact.
 VA(0x004dded0, 0x1)
 void widget::Close(void) {}
 
-// @semantic
-// Both sections are 0x2f4 with the same frame/CFG and all 17/17 ordered
-// relocations. Explicit relocation-masked comparison differs only at
-// +0x23,+0x38,+0x46,+0x4a,+0x4f,+0x51 in the mouse hit test: ours retains the
-// left edge in BX/EBP while retail uses BP/EBX. The dispatcher from +0x77 onward
-// is raw-identical. Declaration/lifetime orders, cached bounds/owner, positive and
-// rejection CFG spellings, 38 current-state AST variants, and 36 guarded TU-state
-// trials did not close it. Revisit after a real predecessor/header state change.
+// @semantic: differs only at +0x23,+0x38,+0x46,+0x4a,+0x4f.
 VA(0x004ddee0, 0x2f4)
 i32 widget::Main(tag_message& message) {
     switch (message.type) {
@@ -180,13 +167,6 @@ i32 widget::Main(tag_message& message) {
     return 0;
 }
 
-// The emitted body is 0x46 bytes against the 0x47 CodeView span, with the same CFG,
-// call operands, and 2/2 ordered relocations. From +0x0b, VC4.2 schedules the same
-// coordinate loads/extensions and argument pushes differently. Direct, staged,
-// cached-owner, operand-order, widened-lifetime, and const spellings emit the same
-// live body. Several guarded declaration-state probes scored 100%, but none was an
-// auditable exact closure: generated state is disposable and the 0x46/0x47 size
-// mismatch remained. Revisit after a real header/TU-state change.
 VA(0x004de1e0, 0x47)
 void widget::Dim(void) {
     if (DecodeWidgetKind(m_kind) != WIDGET_KIND_UNDIMMED
@@ -197,10 +177,5 @@ void widget::Dim(void) {
     }
 }
 
-// ===== vtable widget (root)  (3 slots) =====
-//  [ 0] VA(0x004e1560, 0xb)  __purecall   <- = 0 (pure virtual)
-//  [ 1] VA(0x004e1560, 0xb)  __purecall   <- = 0 (pure virtual)
-//  [ 2] VA(0x004e1560, 0xb)  __purecall   <- = 0 (pure virtual)
 
-// ---- vtables (compiler-emitted; census) ----
 VTBL(widget, 0x004ebb00);

@@ -1,14 +1,6 @@
 #ifndef HOMM2_BASE_WIDGET_H
 #define HOMM2_BASE_WIDGET_H
-// Reconstructed class (BASE) from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// 7 methods, 3 own-virtual (all pure), 0 static data.
-// Abstract root of the BASE UI-widget hierarchy. Verified from ??_7widget@@6B@: the
-// vtable is 3 all-__purecall slots in order [Draw, ~widget, Main]. Draw is pure with
-// NO body (emits no symbol); ~widget (??1widget@@UAE, 0x7) and Main (?Main@widget@@UAE,
-// 0x2f4) are pure-virtual-WITH-body. Declaration order == vtable slot order; derived
-// classes (border, iconWidget, textWidget, dimmerWidget, ...) override these 3 slots.
 #include <va.h>
-// forward declarations:
 class heroWindow;
 struct tag_message;
 
@@ -25,35 +17,29 @@ H2_ENUM_BEGIN(WidgetCommandArgument)
     WIDGET_COMMAND_DIMMED = 0x1000
 H2_ENUM_END(WidgetCommandArgument)
 
-#pragma pack(push, 1) // recovered layout is byte-packed
-class widget /* abstract */ {
+#pragma pack(push, 1)
+class widget   {
 public:
-    // --- members (offsets from Ghidra this+off access-analysis; widths are
-    // access-widths, NOT confirmed types; refine during byte-matching) ---
-    // (vptr auto-emitted at 0x00; own data starts at 0x04)
-    heroWindow* m_owner; // +0x04  owning window
-    widget* m_next;      // +0x08  next widget in the owner window's list
-    widget* m_prev;      // +0x0c  prev widget in the owner window's list
-    i16 m_id;            // +0x10
-    i16 m_zOrder;        // +0x12
-    i16 m_kind;          // +0x14  serialized widget rendering/behavior kind
-    i16 m_flags;         // +0x16
-    i16 m_x;             // +0x18
-    i16 m_y;             // +0x1a
-    i16 m_width;         // +0x1c
-    i16 m_height;        // +0x1e
-    // --- constructors ---
+    heroWindow* m_owner;
+    widget* m_next;
+    widget* m_prev;
+    i16 m_id;
+    i16 m_zOrder;
+    i16 m_kind;
+    i16 m_flags;
+    i16 m_x;
+    i16 m_y;
+    i16 m_width;
+    i16 m_height;
     widget(i16 x, i16 y, i16 width, i16 height, i16 id, i16 kind);
     widget(void);
-    // --- virtual methods (vtable order) ---
     virtual void Draw(void) = 0;
     virtual ~widget(void) = 0;
     virtual i32 Main(struct tag_message& message) = 0;
-    // --- methods ---
     i32 Open(i32 zOrder, class heroWindow* owner);
     void Close(void);
     void Dim(void);
 };
 #pragma pack(pop)
 SIZE(widget, 0x20);
-#endif // HOMM2_BASE_WIDGET_H
+#endif

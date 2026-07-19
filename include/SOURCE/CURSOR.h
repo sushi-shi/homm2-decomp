@@ -1,11 +1,8 @@
 #ifndef HOMM2_CURSOR_H
 #define HOMM2_CURSOR_H
 #include <va.h>
-// Declarations of the free functions DEFINED in CURSOR.cpp — the single home for these
-// symbols. Other TUs call them by including this header (no local externs).
 
-// Hero sprite sheet: frames 45+ hold the vertical-walk steps; 0x37-0x3a are their
-// dedicated shadow sprites (fheroes2 corroborates the 45-frame boundary).
+// Vertical-walk frames begin at 45; frames 0x37-0x3a contain their shadows.
 H2_ENUM_CLASS_BEGIN(CursorHeroShadowFrame)
     HERO_SPRITE_UP_STEP_1 = 0x2e,
     HERO_SPRITE_UP_STEP_2 = 0x2f,
@@ -110,4 +107,4 @@ extern SMapChange sMapChangeLastFew[CURSOR_MAP_CHANGE_RECENT_COUNT];
 
 void SendMapChange(i32, i8, u8, u8, i32, u8, u8);
 
-#endif // HOMM2_CURSOR_H
+#endif

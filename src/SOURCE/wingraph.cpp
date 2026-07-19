@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_Re\wingraph.obj   from: (directly linked into exe)
-// functions: 32   data: 25
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <stdio.h>
 #include <string.h>
 #include <va.h>
@@ -322,10 +317,7 @@ struct IDirectDrawSurface* DDCreateSurface(u32l width, u32l height, i32 primary)
     return surface;
 }
 
-// @early-stop
-// reloc-masked: all 1450 non-table bytes are identical; 0x52c..0x553 is a
-// delinked local-label jump table. Only local/constant relocation names differ;
-// every external relocation target agrees.
+// @early-stop: delinker jump-table artifact.
 VA(0x00435e4f, 0x5d2)
 void DDSD(i32 error, char* file, i32 line) {
     HRESULT restoreResult;
@@ -1005,34 +997,6 @@ i32 SetGraphicsType(WingraphGraphicsType graphicsType) {
     return 1;
 }
 
-// @data-layout-note
-// Fresh VC 4.2 storage has 113 definitions: 106 initialized owners in a
-// 0xe58-byte .data section and seven source-defined owners in a 0x4d4-byte
-// .bss section. Retail contributes 0xe58 bytes at 0xf1288..0xf20e0 and 0x4d8
-// zero-fill bytes at 0x125148..0x125620. The initialized allocation order
-// differs because the candidate groups the twelve explicit line-number
-// statics first, but every one of the 113 logical owner extents is disjoint
-// and has exact retail payload. The twelve shorts each leave two zero
-// alignment bytes in retail. Zero-fill has only the real four-byte hole at
-// 0x12516c and four-byte tail alignment at 0x12561c.
-//
-// All 71 compiler-local initialized owners have exactly one zero-addend code
-// reference. Function-relative relocation pairing proves all 71 retail owner
-// RVAs, while another 505 known owner/addend pairs anchor the sequences. Every
-// containing function has equal candidate/retail DIR32 counts except
-// SetGraphicsType: its first 29 sites align, including $SG33754 at retail site
-// +0xdb -> 0xf2088 and $SG33759 at +0x1a2 -> 0xf20b4. Retail's final three
-// sites (+0x23c, +0x259, +0x273) are unrelated text/search-array targets.
-//
-// The payload audit also recovered two real source errors: DDSD has one
-// newline, not two, between its File and Line fields, and the color-depth
-// shutdown message includes the complete Windows 95 instructions. The latter
-// expands $SG33695 from 0x30 to the retail 0xe0 bytes and accounts for the
-// former 0xb0 gap. Candidate initialized-section SHA-256 is
-// 5ef4b5f038b2c91e98bbc71294a6f418f2b74fd357543b8a9158cb538fc0e5c6;
-// the aggregate retail hash differs only because of the proven owner order.
-// Do not add aliases, padding owners, or synthetic storage for these gaps.
-// ---- globals (definitions, RVA order) ----
 DATA(0x004f1288) b32 gbWinGAttached = true;
 DATA(0x004f128c) b32 gbDDrawAttached = false;
 DATA(0x004f1290) WingraphGraphicsType giGraphicsType = WINGRAPH_GRAPHICS_WING;

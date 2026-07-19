@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_RE\droplist.obj   from: .\basewin.lib
-// functions: 12   data: 1
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <BASE/DROPLIST_TYPES.h>
 #include <BASE/dropListWidget.h>
@@ -19,8 +14,6 @@
 #include <SOURCE/kbwin.h>
 #include <string.h>
 
-// Retail stores eleven independently emitted source-path constants at 4-byte boundaries.
-// The typed slots preserve their natural two-byte tail padding without synthetic objects.
 DATA(0x00521078) static SDropListSourceFiles gDropListSourceFiles = {
     {DROPLIST_SOURCE_FILE},
     {DROPLIST_SOURCE_FILE},
@@ -43,13 +36,7 @@ dropListWidget::dropListWidget(void) : widget(0, 0, 0, 0, 0, 0) {
     m_selectedIndex = -1;
 }
 
-// @semantic
-// Complete 0x7c-byte destructor with all ten relocation sites and resolved
-// owner/addends aligned. The two source-path relocations differ only by compiler-local
-// symbol identity. In the item loop retail uses EBX for the four-byte item offset and
-// EDI for the item index, while candidate assigns those equivalent induction values to
-// EDI and EBX. Commuted subscript and indirect loop-condition spellings were byte-neutral.
-// Revisit only after a genuine declaration or combined-TU state change.
+// @semantic: compiler-shape residual.
 VA(0x004dbf60, 0x7c)
 dropListWidget::~dropListWidget() {
     gpResourceManager->Dispose(m_font);
@@ -61,13 +48,7 @@ dropListWidget::~dropListWidget() {
     H2_FREE_AT(m_items, gDropListSourceFiles.listDestruction.text, 27);
 }
 
-// @semantic
-// Complete 0x21d-byte resource/layout reader with all 44 relocation sites and resolved
-// owner/addends aligned. The sole raw residual begins after the frame-index stores:
-// candidate retains iconX in AX and the closed-content width in BX, while retail swaps
-// those register roles and schedules the same member stores accordingly. Commuting the
-// sum and naming the width were byte-neutral; removing the icon coordinate locals lost
-// the retail EBP save and worsened the stream. Revisit after a genuine TU-state change.
+// @semantic: sole raw residual begins after the frame-index stores.
 VA(0x004dbfe0, 0x21d)
 void dropListWidget::Read(void) {
     i8 name[16];
@@ -154,11 +135,7 @@ void dropListWidget::DeleteItem(i32 index) {
     }
 }
 
-// @early-stop
-// The complete 0x350-byte range is raw-exact after relocation-union masking, proving
-// frame/slots and CFG. All 15 external relocation targets/addends agree. The other seven
-// of 22 ordered sites are the dispatch at +0x15b and six-word table at +0x338: MSVC
-// emits $L locals, while the delinker rewrites them as Main plus the same local offsets.
+// @early-stop: delinker artifact.
 VA(0x004dc2e0, 0x350)
 i32 dropListWidget::Main(tag_message& message) {
     if ((m_flags & WIDGET_FLAG_ENABLED) == 0) {
@@ -418,22 +395,10 @@ void dropListWidget::RestoreDropBackground(void) {
     m_savedBackground = 0;
 }
 
-// @semantic: complete shared-header/TU-state checkpoint (live 93.946310%).
-// Explicit ranges are base 0x827 versus retail 0x81f.
-// Retail has a 0x48 frame; base has 0x4c, with every real stack object shifted
-// uniformly by four bytes rather than an extra live variable. With the embedded
-// tables excluded, both have 76 branches and 17 calls. All 36 relocation targets
-// remain in the same order, but base's 24 external sites are shifted +7 and its
-// twelve local-table sites +8. The historical 0x81f/0x48 retained state had only
-// three scheduling residuals; current tagged-message/shared-header state changed
-// the prologue before any event access. Retried after that trigger: plausible
-// include orders, exact Save assignment/call, semantic local names, and owner
-// scope were byte-identical; narrowing the message scope fell to 95.19%.
-// Do not run AST permutations until the retail frame/size state is recovered.
+// @semantic: branch/code-shape residual.
 VA(0x004dcb10, 0x81f)
 void dropListWidget::ProcessSelectDialog(void) {
     IconEntry* iconEntry;
-    // Retail reserves a four-byte stack object for each 16-bit dimension temporary.
     i16 scrollWidth[2];
     i16 scrollTopHeight[2];
     i16 scrollBottomWidth[2];
@@ -713,10 +678,5 @@ done:
         ->UpdateScreenRegion(m_x + m_owner->m_posX, m_y + m_owner->m_posY, m_width, m_height);
 }
 
-// ===== vtable dropListWidget : public widget  (3 slots) =====
-//  [ 0] VA(0x004dc630, 0xaf)  void dropListWidget::Draw(void)   <- override (implements widget pure virtual)
-//  [ 1] VA(0x004dbf40, 0x1f)  void * dropListWidget::scalar_dtor(unsigned int)   <- override (implements widget pure virtual)
-//  [ 2] VA(0x004dc2e0, 0x350)  int dropListWidget::Main(struct tag_message &)   <- override (implements widget pure virtual)
 
-// ---- vtables (compiler-emitted; census) ----
 VTBL(dropListWidget, 0x004ebad0);

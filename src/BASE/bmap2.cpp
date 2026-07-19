@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_RE\bmap2.obj   from: .\basewin.lib
-// functions: 4   data: 0
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <BASE/bmap2.h>
 #include <BASE/bitmap.h>
@@ -31,21 +26,7 @@ void FillBitmapArea(class bitmap* bmp, i32 x, i32 y, i32 w, i32 h, i32 color) {
     }
 }
 
-// @semantic: the retail/base CodeView spans are both 0x114 bytes, with the
-// same 0x8-byte local area, saved-register set, CFG, and 7/7 external
-// relocation occurrences. Masking those relocations leaves only four byte
-// differences: +0x1a ca/d1 and +0x1c 8e/8d are base `cmp ecx,edx; jle`
-// versus retail `cmp edx,ecx; jge`; +0x4a df/fb and +0x4c 8e/8d repeat the
-// same equivalent reversal for EBX/EDI. Publishing gFillPtr before clearing
-// gFillRow is required: it makes the entire later address-calculation/store
-// schedule exact and raises the live match from 94.44% to 98.44%.
-// Relational polarity/reassociation, combined/split/const bound declarations,
-// positive and early-return overlap forms, semantic parameter/local names,
-// and exact-preserving predecessor expression/loop/include-order variants did
-// not steer the remaining compares. Moving or narrowing later-only headers
-// regressed this target (and in some cases the exact predecessor). A bounded
-// libclang AST pass found no gain. Revisit only after a genuine shared-header
-// or predecessor declaration-state change; this is not a certified wall.
+// @semantic: compiler-shape residual.
 VA(0x004ca450, 0x114)
 void FillBitmapAreaClip(
     class bitmap* bmp,
@@ -110,16 +91,6 @@ void BlitBitmap(
     }
 }
 
-// Retained exact-max checkpoint: retail/base are both 0xa8 bytes, save EBX/ESI/EDI/EBP with no
-// local frame, share the same CFG, and have 15/15 relocations by manual COFF
-// audit, including uDimPal at +0x5f on both sides (the helper misresolves its
-// addend). The first non-relocation byte divergence is +0x80: base emits
-// `cmp eax,ebx; jg`, retail `cmp ebx,eax; jl`; the outer loop repeats that at
-// +0x9d. Naming the 256-entry dim-palette level stride moved the canonical
-// live match to 97.20%, but relational reversals and a bounded libclang AST
-// pass found no further gain. A corrected 300-trial parser-visible TU-state
-// pass also found no exact closure and retained nothing. Revisit only after a
-// predecessor or shared-header state change.
 VA(0x004ca620, 0xa8)
 void DimBitmapArea(class bitmap* bmp, i32 x, i32 y, i32 w, i32 h, i32 level) {
     gDimPtr = bmp->m_pixels + bmp->m_width * y + x;

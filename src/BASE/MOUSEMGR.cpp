@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_RE\MOUSEMGR.OBJ   from: .\basewin.lib
-// functions: 17   data: 12
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <BASE/MOUSEMGR_TYPES.h>
 #include <BASE/mouseManager.h>
@@ -20,7 +15,6 @@
 #include <SOURCE/kbwin.h>
 #include <BASE/INPUTMGR.h>
 
-// ---- zero-fill storage (retail RVA order) ----
 DATA(0x00533238) static i32 gOldMouseRight;
 DATA(0x00533240) BITMAP bmpAndMask[MOUSE_CURSOR_COUNT];
 DATA(0x00533b40) static POINT gMouseScreenPt; // GetCursorPos scratch (mouseManager::MouseCoords)
@@ -35,15 +29,7 @@ DATA(0x00533fdc) static i32 gOldMouseLeft;
 DATA(0x00533fe0) ICONINFO IconInfo[MOUSE_CURSOR_COUNT];
 DATA(0x00534760) HBITMAP hbmpAndMask[MOUSE_CURSOR_COUNT];
 
-// @data-layout-note Retail loader-zero storage spans 0x133238..0x1348e0
-// (0x16a8). All twelve owners above have proved addresses, types, and extents,
-// and all code references use their exact retail owner-relative addends. VC 4.2
-// emits the same 0x16a0 bytes of owned storage in a 0x16a4 BSS contribution but
-// orders the symbols differently; moving the real definitions into retail order
-// is byte-neutral. This is a final-link/common-allocation packing residual. Do not
-// add padding symbols, aliases, cursor placement, or section pragmas to force it.
 
-// ---- initialized storage (retail RVA order) ----
 DATA(0x0051ebc8) i32 iMouseOffset[4] = {0, 41, 57, 0};
 // Per-cursor bitmap {width, height} pairs.
 DATA(0x0051ebd8) i8 iMouseSize[MOUSE_CURSOR_COUNT][2] = {
@@ -97,12 +83,6 @@ DATA(0x0051ed60) static SMouseManagerStrings gMouseManagerStrings = {
     ""
 };
 
-// @data-layout-note Retail initialized storage spans 0x11ebc8..0x11ef28
-// (0x360). The public cursor tables occupy the first 0x198 bytes. Retail then
-// stores sixteen independently referenced strings at 4-byte boundaries; the
-// typed owner above reproduces their complete payload and addends 0x0, 0x10,
-// 0x3c, 0x68, 0x74, 0x80, 0x8c, 0xb8, 0xe4, 0x110, 0x13c, 0x14c, 0x15c,
-// 0x16c, 0x198, and 0x1c4. The complete candidate contribution is byte-exact.
 
 VA(0x004c9270, 0xd9)
 mouseManager::mouseManager(void) : baseManager() {
@@ -131,15 +111,7 @@ mouseManager::mouseManager(void) : baseManager() {
     m_hideCount = 1;
 }
 
-// @semantic coverage checkpoint: semantics, member layout, and no-frame CFG are
-// complete. The relocation counts are 3/3; the delinked target embeds ShowCursor's
-// IAT address, but manual -dr review confirms the same external access at the same
-// call site. Base .text is 0x91 versus retail 0x94. The first code divergence is
-// base +0x52: MSVC keeps 0xf0 in ECX and
-// shares it across the two stores, while retail emits two immediate stores at
-// +0x5b..+0x68; the suffix is identical after the three-byte shift. Direct stores
-// and spelling the second value as 0xef+1 still select the shared-load form.
-// Revisit after a predecessor/shared-header TU-state change, not with predicates.
+// @semantic: first code divergence is base +0x52: MSVC keeps 0xf0 in ECX and shares it across the two stores.
 VA(0x004c9350, 0x94)
 i32 mouseManager::Open(i32 priority) {
     m_forcePointerUpdate = 0;
@@ -163,16 +135,7 @@ i32 mouseManager::Open(i32 priority) {
     return 0;
 }
 
-// @semantic coverage checkpoint: semantics and the zero-frame loop CFG are
-// complete; both bodies are 0xed bytes. Relocation counts are 14/14, and manual -dr
-// review confirms the same ordered arrays, allocator calls, resource manager, and
-// Dispose target; the delinked target embeds the four Win32 IAT addresses. The first
-// divergence is the loop setup at +0x2b: base uses EBX as the byte offset and EBP
-// for DeleteObject, while retail uses EBP as the offset and EBX for DeleteObject.
-// The later differences are only that register exchange. for-scope, hoisted, and
-// register-qualified counters retain the base allocation. A bounded libclang AST
-// pass tested eight single mutations in 30 walks and retained none. Revisit after
-// TU-state changes or during the AST last-mile phase.
+// @semantic: first divergence is the loop setup at +0x2b: base uses EBX as the byte offset and EBP for DeleteObject.
 VA(0x004c93f0, 0xed)
 void mouseManager::Close(void) {
     i32 cursorIndex;
@@ -255,17 +218,7 @@ void mouseManager::SetPointer(char* name, i32 frame, MouseCursorType cursorType)
     }
 }
 
-// @semantic coverage checkpoint: semantics, 0x14-byte local area, CFG, cursor
-// table types, and external relocations are reconstructed (70/70, no base-only
-// target). This is still not an early stop. Base code is 0x3d9 versus retail
-// 0x405. The first divergence is the
-// prologue: retail spills this at [esp] before saving EBX/ESI/EDI/EBP; base keeps
-// this in EBP and later spills the color-row offset. The retail mask loop uses
-// independent color and mask byte offsets, which this source now models directly.
-// A row/column multiplication form scores ~94% but is structurally false; direct
-// offset forms score ~75%. A nested lifetime block and the hash-informed semantic
-// name sourceOffset do not change allocation. Register-qualified counters also
-// retain the base allocation. Revisit after TU-state changes or in last-mile AST work.
+// @semantic: first divergence is the prologue: retail spills this at [esp] before saving EBX/ESI/EDI/EBP.
 VA(0x004c9630, 0x405)
 void mouseManager::SetPointer(i32 frame) {
     if (m_forcePointerUpdate != 0 || frame < 0 || !m_active || m_cursorFrame == frame
@@ -389,18 +342,7 @@ void mouseManager::SetPointer(i32 frame) {
     gbPutzingWithMouseCtr--;
 }
 
-// @semantic coverage checkpoint: semantics, member layout, zero-frame CFG, local
-// lifetimes, and all 83 relocation occurrences are complete. Manual -dr review
-// confirms the canonical private globals and arrays; the delinked target uses
-// interior/addend aliases for their second columns and embeds two Win32 IAT addresses.
-// Base .text is 0x46a versus retail 0x47a. Their non-branch instruction streams are
-// otherwise aligned: retail selects the near form for two additional JG and two
-// additional JL instructions, accounting exactly for the 16-byte delta (4 * 4).
-// Direct/reversed comparisons were byte-neutral, while ternary/direct-field width
-// forms regress. A libclang pass exposed 62 syntax-valid variants but produced no
-// retained improvement before its nine-minute bound; interrupted candidates were
-// reverted. Revisit after a predecessor/shared-layout TU-state change, or with a
-// last-mile branch-width-aware pass rather than more local predicate spellings.
+// @semantic: branch/code-shape residual.
 VA(0x004c9a40, 0x47a)
 void mouseManager::NewUpdate(i32 force) {
     i32 width;
@@ -731,10 +673,5 @@ void mouseManager::SetColorMice(i32 enabled) {
     }
 }
 
-// ===== vtable mouseManager : public baseManager  (3 slots) =====
-//  [ 0] VA(0x004c9350, 0x94)  int mouseManager::Open(int)   <- override (implements baseManager pure virtual)
-//  [ 1] VA(0x004c93f0, 0xed)  void mouseManager::Close(void)   <- override (implements baseManager pure virtual)
-//  [ 2] VA(0x004c94e0, 0x5)  int mouseManager::Main(struct tag_message &)   <- override (implements baseManager pure virtual)
 
-// ---- vtables (compiler-emitted; census) ----
 VTBL(mouseManager, 0x004eba00);

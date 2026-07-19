@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_Re\dpnetwin.obj   from: (directly linked into exe)
-// functions: 16   data: 25
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <windows.h>
 #include <dplay.h>
@@ -44,15 +39,7 @@ BOOL WINAPI dpEnumSession(DPSESSIONDESC* session, void*, LPDWORD, DWORD flags) {
     return 1;
 }
 
-// @semantic: Current dpnetwin.cpp/header epoch: semantics, CFG, the 0x30 frame,
-// and all 71 semantic ordered relocations agree. Renaming player to guestIndex
-// recovers retail's -0x8 slot and improves 99.02577% to 99.04124%. The remaining
-// loop residual loads giNumHumanPlayers before guestIndex and emits JGE, while
-// retail reverses the loads and emits JLE. Ten bounded attempts exhausted seven
-// identifier_rename spellings, relational reversal, their rejected overlapping
-// combination, and OD_STEER(guestIndex). Earlier residuals are delinked LoadLibraryA/
-// GetProcAddress import-call shapes. Revisit only after relevant import-thunk,
-// declaration, source/TU/header, or comparison-epoch changes.
+// @semantic: remaining loop residual loads giNumHumanPlayers before guestIndex and emits JGE.
 VA(0x0041eeaf, 0x311)
 i16 dpnet_init(void) {
     DATA(0x004ef83c) static i16 initSourceLineBase = 95;
@@ -273,14 +260,7 @@ void dpProcessMessages(void) {
     }
 }
 
-// @early-stop
-// Current dpnetwin.cpp/header epoch: the base symbol is 0x273 bytes versus the
-// provisional 0x274 retail span, so the relocation-only hard gate correctly
-// refuses to overlap the following function. Across the complete base range,
-// instruction semantics, case-body order, and all 52 ordered relocation targets
-// agree; the residual is the delinked switch jump-table/local-label identity and
-// one-byte boundary artifact. Revisit only after function-boundary, source/TU/
-// header, or comparison-epoch changes.
+// @early-stop: named one-byte retail stub.
 VA(0x0041f681, 0x274)
 void dpEvaluateMessage(u32l size, i32 sender) {
     DATA(0x004efb44) static i16 evaluateSourceLineBase = 355;
@@ -334,12 +314,7 @@ void dpEvaluateMessage(u32l size, i32 sender) {
     }
 }
 
-// @semantic: Current dpnetwin.cpp/header epoch: the 0x84 frame and all session,
-// result, and compiler slots match. Excluding the retail jump table at +0x166/0x10, every
-// non-jump opcode and operand and all 33 ordered relocations agree. One five-byte
-// continuation after case 3 shifts the dispatch/table and epilogue; the two
-// target literal aliases are proven gsThisNetPlayerInfo +26/+27 fields. Revisit
-// only after the source/TU/header or comparison epoch changes.
+// @semantic: jump-table placement residual.
 VA(0x0041f8f5, 0x182)
 i32 dpWaitForFirstGuest(void) {
     DATA(0x004efb9c) static i16 firstGuestSourceLineBase = 426;
@@ -403,9 +378,7 @@ i32 dpWaitForExtraGuests(void) {
     return 0;
 }
 
-// @early-stop 99.85%: all 0x3d2 relocation-masked bytes, the 0xa8 frame and
-// status/result/session/timeout slots, and all 78 ordered relocations match.
-// The objdiff residual is only delinked switch-table/local-label identity.
+// @early-stop: delinker artifact.
 VA(0x0041fafb, 0x3d2)
 i32 dpWaitForHost(void) {
     DATA(0x004efc78) static i16 hostSourceLineBase = 510;
@@ -611,32 +584,6 @@ void DPSD(i32 result, char* file, i32 line) {
     ShutDown(gText);
 }
 
-// @data-layout-note
-// Fresh VC 4.2 storage contains 103 real definitions: 97 initialized owners
-// in one 0x8e3-byte .data section and six loader-zero owners in one 0x54-byte
-// .bss section. Retail contributes 0x8e8 bytes at 0xef7c8..0xf00b0 and 0x58
-// bytes at 0x125060..0x1250b8; this TU owns no .rdata.
-//
-// All 97 initialized logical payloads are byte-exact. The eight function-local
-// signed-short source-line owners are proved at 0xef83c, 0xefa00, 0xefa5c,
-// 0xefae4, 0xefb14, 0xefb44, 0xefb9c, and 0xefc78. Each leaves two zero
-// alignment bytes, and the final 0x2f-byte DPSD format leaves five terminal
-// zero bytes. Those 21 bytes exactly explain the candidate/retail extent gap.
-// The .data payload SHA-256 is
-// fd3770c478657698e62fb1e6a8c5f3cf94af7d5b764ce5e26237b7e2d1bf74b6.
-//
-// All 238 code references to dpnetwin-owned storage resolve to the exact owner
-// with addend zero: 227 pair at the same function-relative DIR32/HIGHLOW site,
-// and 11 pair in complete equal-count ordered streams after validation against
-// the surrounding source-DATA anchors. Retail BSS has only two four-byte zero
-// alignment gaps at 0x12506c and 0x12508c; all six logical owners and all BSS
-// reference targets are exact.
-//
-// Retail payloads also prove the multiline host/guest dialog text, the newline
-// in the unknown-message log, the Dude/Heroes Player argument order, and the
-// multiline DPSD format. Do not restore raw string-dereference line constants,
-// duplicate owners, aliases, padding, cursor replay, or synthetic identities.
-// ---- globals (definitions, RVA order) ----
 DATA(0x004ef7c8) struct IDirectPlay* lpIDC = 0;
 DATA(0x004ef7cc) DPID dcoID = 0;
 DATA(0x004ef7d0) struct _GUID* IPXGuid = 0;

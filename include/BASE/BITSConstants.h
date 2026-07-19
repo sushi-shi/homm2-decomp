@@ -12,4 +12,4 @@ typedef u8 BitByte;
 typedef u32 BitWord;
 typedef u32 BitIndex;
 
-#endif // HOMM2_BASE_BITS_CONSTANTS_H
+#endif

@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_Re\FINDPATH.OBJ   from: (directly linked into exe)
-// functions: 12   data: 1
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <BASE/Misc.h>
 #include <SOURCE/KB.h>
@@ -21,9 +16,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-// ---- module-private synthetic globals (retail xref: single-module) ----
-// Retail .data raw storage ends at VA 0x00523000. These VAs are in its loader-zero
-// virtual tail, so the definitions intentionally have no initializer.
 DATA(0x0052adc0) static i32 gSearchLow;
 DATA(0x0052adc4) static mapCell* gSearchNextCell;
 DATA(0x0052ae40) static searchNode* gSearchCell;
@@ -37,20 +29,6 @@ DATA(0x0052ae5c) static searchNode* gSearchQueueNode;
 DATA(0x0052ae60) static i32 gSearchMiddle;
 DATA(0x0052ae64) static i32 gSearchHigh;
 
-// ---- initialized allocation provenance (retail RVA order) ----
-// @data-layout-note Retail initialized storage is exactly two contiguous 0x30-byte
-// source-location records at 0x11733c..0x11739c. The fresh candidate has the same
-// extent and SHA-256 d657e9dc9d8c980efa0bc771232ecc88ad147ea956dbf4cfbcc79d4a302975de.
-// Its eight code relocations use the record starts and sourceFile at owner +0x4;
-// retail has the same 1/1 allocation and 3/3 destruction target counts. Candidate
-// and retail BSS are both 0xa8 and contain the same 13 DATA-proved logical owners.
-// The candidate's internal owner order differs from retail packing. Thirty-one
-// directly aligned owner references have exact RVAs/addends; all remaining BSS
-// references use zero addends. Recomputing both diagonal neighbor coordinates in
-// TestPossibleDirections removes the former extra gSearchNextX/gSearchNextY
-// publications; the exhaustive PE target multiset now has no substitution.
-// Preserve other nonexact call-site topology as function/link packing work; do
-// not add aliases, padding, or placement rules.
 DATA(0x0051733c) static SFindPathSourceLocation gSearchAllocationSource = {
     {20, 0},
     FINDPATH_SOURCE_FILE
@@ -60,17 +38,14 @@ DATA(0x0051736c) static SFindPathSourceLocation gSearchDestructionSource = {
     FINDPATH_SOURCE_FILE
 };
 
-// @early-stop: all 14 meaningful bytes are raw-identical and both sides have zero
-// relocations; retail's only residual is the trailing 8B FF two-byte alignment pad.
+// @early-stop: retail alignment artifact.
 VA(0x004a4a50, 0x10)
 searchArray::searchArray(void) {
     m_storage.cells = 0;
     m_maxQueueCount = 0;
 }
 
-// @early-stop: relocation-masked instructions are identical; the 3/3 external
-// relocations agree and the residual is the delinked line-constant identity plus
-// one retail alignment LEA after RET.
+// @early-stop: retail alignment artifact.
 VA(0x004a4a60, 0x30)
 searchArray::~searchArray() {
     if (m_storage.cells != 0)
@@ -82,9 +57,7 @@ searchArray::~searchArray() {
     m_storage.cells = 0;
 }
 
-// @early-stop: relocation-masked instructions are identical; all 8/8 external
-// relocations agree and only two delinked line-constant identities and retail
-// post-RET alignment remain.
+// @early-stop: retail alignment artifact.
 VA(0x004a4a90, 0x60)
 void searchArray::Init(void) {
     if (m_storage.cells != 0)
@@ -101,9 +74,7 @@ void searchArray::Init(void) {
     ));
 }
 
-// @early-stop: relocation-masked instructions are identical; the 3/3 external
-// relocations agree and the residual is one delinked line constant plus a retail
-// alignment LEA after RET.
+// @early-stop: retail alignment artifact.
 VA(0x004a4af0, 0x30)
 void searchArray::Close(void) {
     if (m_storage.cells != 0)
@@ -115,8 +86,7 @@ void searchArray::Close(void) {
     m_storage.cells = 0;
 }
 
-// @early-stop: every meaningful instruction and both external relocations match;
-// retail has one trailing alignment LEA after RET.
+// @early-stop: retail alignment artifact.
 VA(0x004a4b20, 0x40)
 void searchArray::Clear(void) {
     memset(m_queue, 0, sizeof(m_queue));
@@ -125,11 +95,7 @@ void searchArray::Clear(void) {
     m_queueCount = 0;
 }
 
-// @semantic
-// Complete distance semantics, no frame, zero relocations, and matching return
-// blocks. First residual is the compare at +0x1f: retail emits CMP ESI,EAX/JL,
-// while candidate emits CMP EAX,ESI/JG; retail also has a trailing alignment LEA.
-// x>=y, y<=x, y<x, and x<y with reversed return-arm order were all compiled.
+// @semantic: First residual is the compare at +0x1f: retail emits CMP ESI,EAX/JL, while candidate emits CMP EAX,ESI/JG.
 VA(0x004a4b60, 0x40)
 i32 searchArray::QuickDistance(i32 x1, i32 y1, i32 x2, i32 y2) {
     i32 xDistance = abs(x1 - x2);
@@ -140,11 +106,7 @@ i32 searchArray::QuickDistance(i32 x1, i32 y1, i32 x2, i32 y2) {
     return yDistance + xDistance / 2;
 }
 
-// @semantic: complete semantics, no stack frame, matching CFG and 5/5 external
-// relocations. First live divergence is retail keeping mobility in EBX and saving
-// EBP for roadCost while ours uses EDI/EBX. Tried direct/reused cost values, scoped
-// and top-level locals, operand reversal, row pointers, semantic aliases, register
-// hints, declaration order, and parameter names; revisit after 95%/TU-state changes.
+// @semantic: first divergence is retail keeping mobility in EBX and saving EBP for roadCost while ours uses EDI/EBX.
 VA(0x004a4ba0, 0x80)
 i32 CalcTerrainCost(
     i32 terrain,
@@ -177,10 +139,7 @@ terrainCost:
     return giTerrainCost[terrain][direction][diagonal & SEARCH_DIAGONAL_COST_MASK];
 }
 
-// @semantic: complete queue semantics, slots and CFG; 38/38 relocation
-// occurrences, with only delinked interior aliases for normalDirTable and search
-// scratch globals. First divergence is scratch-register assignment at queue setup;
-// revisit after 95% or shared-layout/TU-state changes.
+// @semantic: first divergence is scratch-register assignment at queue setup.
 VA(0x004a4c20, 0x270)
 void searchArray::PushPoint(
     i32 x,
@@ -249,10 +208,7 @@ void searchArray::PushPoint(
     }
 }
 
-// @semantic: complete eight-direction CFG, object/trigger semantics and no local
-// frame; 66/66 relocation occurrences, with four delinked interior aliases only.
-// First divergence is EBX/EDI ownership in occupied-array initialization; memset,
-// byte stores, sentinels and both terrain-arm orders were tried. Revisit after 95%.
+// @semantic: First divergence is EBX/EDI ownership in occupied-array initialization.
 VA(0x004a4e90, 0x36f)
 void searchArray::TestPossibleDirections(
     i32 x,
@@ -365,9 +321,7 @@ void searchArray::TestPossibleDirections(
     } while (gSearchDirection < SEARCH_DIRECTION_COUNT);
 }
 
-// @early-stop: after restoring the signed speed <= 0 predicate, every meaningful
-// instruction and all 16/16 ordered external relocations match. Retail alone has
-// a trailing three-byte alignment LEA after RET.
+// @early-stop: retail alignment artifact.
 VA(0x004a5200, 0x1f0)
 void searchArray::SeedCombatPosition(class army* unit) {
     i32 hex;
@@ -417,10 +371,7 @@ void searchArray::SeedCombatPosition(class army* unit) {
     unit->m_targetSide = -1;
 }
 
-// @semantic: complete moat, queue, attack and reconstruction CFG with the retail
-// 0x30 frame; all 23/23 external relocations agree. First divergence is EAX versus
-// ECX for the moat-cell byte. Result/attack-target lifetime reuse and branch
-// polarities are recovered; revisit after 95% for register allocation only.
+// @semantic: First divergence is EAX versus ECX for the moat-cell byte.
 VA(0x004a53f0, 0x410)
 i32 searchArray::FindCombatPath(
     i32 sourceHex,
@@ -575,10 +526,7 @@ reconstructPath:
     goto restoreMoat;
 }
 
-// @semantic: complete nested gates, signed binary search, queue update and packed
-// node writes; both external relocations agree and there is no frame. First
-// divergence is ESI/EDI ownership in the prologue. Compound/nested gates, signed
-// and unsigned indices, and early/late cell formation were tried; revisit at 95%.
+// @semantic: First divergence is ESI/EDI ownership in the prologue.
 VA(0x004a5800, 0x100)
 void searchArray::PushCombatPoint(i32 hex, i32 direction, i32 distance, i32 speed) {
     if (ValidHex(hex)) {
@@ -621,5 +569,4 @@ void searchArray::PushCombatPoint(i32 hex, i32 direction, i32 distance, i32 spee
     }
 }
 
-// ---- globals (definitions, RVA order) ----
 DATA(0x0052adc8) u8 bIsMoatSlowed[117];

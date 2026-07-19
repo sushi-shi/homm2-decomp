@@ -1,11 +1,8 @@
 #ifndef HOMM2_BASE_MOUSEMANAGER_H
 #define HOMM2_BASE_MOUSEMANAGER_H
-// Reconstructed class (BASE) from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// 17 methods, 3 own-virtual, 0 static data.
 #include <va.h>
 #include <windows.h>
 #include "baseManager.h"
-// forward declarations:
 struct tag_message;
 class bitmap;
 class resource;
@@ -19,39 +16,33 @@ H2_ENUM_CLASS_BEGIN(MouseCursorType)
     MOUSE_CURSOR_SPELL = 2
 H2_ENUM_CLASS_END(MouseCursorType)
 
-#pragma pack(push, 1) // recovered layout is byte-packed
+#pragma pack(push, 1)
 class mouseManager : public baseManager {
 public:
-    // --- members (offsets from Ghidra this+off access-analysis; widths are
-    // access-widths, NOT confirmed types; refine during byte-matching) ---
-    // (derived: base baseManager = 0x36 bytes at 0x00 via ': public baseManager'; own fields below)
-    bitmap* m_savedUnderlying;    // +0x36  saved-underlying bitmap
-    i32 m_cursorFrame;            // +0x3a
-    icon* m_cursorIcon;           // +0x3e  the loaded cursor icon
-    MouseCursorType m_cursorType; // +0x42
-    i32 m_cursorSizeIndex;        // +0x46
-    i32 m_drawnCursorSizeIndex;   // +0x4a  size-table entry currently drawn/saved
+    bitmap* m_savedUnderlying;
+    i32 m_cursorFrame;
+    icon* m_cursorIcon;
+    MouseCursorType m_cursorType;
+    i32 m_cursorSizeIndex;
+    i32 m_drawnCursorSizeIndex;
     char _pad_0x4e[0x8];
-    i32 m_mouseX;             // +0x56
-    i32 m_mouseY;             // +0x5a
-    i32 m_savedLeft;          // +0x5e  clipped left edge of saved underlying pixels
-    i32 m_savedTop;           // +0x62  clipped top edge of saved underlying pixels
-    i32 m_cursorLeft;         // +0x66  unclipped cursor draw origin
-    i32 m_cursorTop;          // +0x6a  unclipped cursor draw origin
-    i32 m_cursorRight;        // +0x6e  clipped inclusive right edge
-    i32 m_cursorBottom;       // +0x72  clipped inclusive bottom edge
-    i32 m_savedWidth;         // +0x76  clipped saved-underlying width
-    i32 m_savedHeight;        // +0x7a  clipped saved-underlying height
-    i32 m_forcePointerUpdate; // +0x7e
-    i32 m_cursorReady;        // +0x82
-    i32 m_hideCount;          // +0x86
-    // --- constructors ---
+    i32 m_mouseX;
+    i32 m_mouseY;
+    i32 m_savedLeft;
+    i32 m_savedTop;
+    i32 m_cursorLeft;
+    i32 m_cursorTop;
+    i32 m_cursorRight;
+    i32 m_cursorBottom;
+    i32 m_savedWidth;
+    i32 m_savedHeight;
+    i32 m_forcePointerUpdate;
+    i32 m_cursorReady;
+    i32 m_hideCount;
     mouseManager(void);
-    // --- virtual methods (vtable order) ---
     virtual i32 Open(i32) OVERRIDE;
     virtual void Close(void) OVERRIDE;
     virtual i32 Main(struct tag_message&) OVERRIDE;
-    // --- methods ---
     void SetPointer(char*, i32, MouseCursorType);
     void SetPointer(i32);
     void NewUpdate(i32);
@@ -92,7 +83,6 @@ H2_ENUM_BEGIN(MouseManagerConstant)
     MOUSE_RELOAD_CURSOR_FRAME = -99,
     MOUSE_KEEP_CURRENT_FRAME = 1000
 H2_ENUM_END(MouseManagerConstant)
-// ---- globals (declarations, RVA order) ----
 extern i32 iMouseOffset[4];
 extern i8 iMouseSize[MOUSE_CURSOR_COUNT][2];
 extern i8 iHotSpot[MOUSE_CURSOR_COUNT][2];
@@ -105,4 +95,4 @@ extern void* cColorBits[MOUSE_CURSOR_COUNT];
 extern ICONINFO IconInfo[MOUSE_CURSOR_COUNT];
 extern HBITMAP hbmpAndMask[MOUSE_CURSOR_COUNT];
 
-#endif // HOMM2_BASE_MOUSEMANAGER_H
+#endif

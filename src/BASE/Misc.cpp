@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_RE\Misc.obj   from: .\basewin.lib
-// functions: 46   data: 11
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #define HOMM2_MISC_INLINE_ICONENTRY
 #include <va.h>
 #include <SOURCE/kbwin.h>
@@ -18,12 +13,12 @@
 #include <BASE/MiscConstants.h>
 #include <BASE/MISC_TYPES.h>
 #undef HOMM2_MISC_INLINE_ICONENTRY
-#include <BASE/miscwin.h> // this TU's own free functions + indexArray/IconEntry
-#include <SOURCE/KB.h>    // EventWindowHandler, FileError, ShutDown
+#include <BASE/miscwin.h>
+#include <SOURCE/KB.h>
 #include <SOURCE/wingraph.h>
-#include <SOURCE/NOOPT.h> // SetFullScreenStatus
-#include <BASE/message.h> // tag_message (member access)
-#include <windows.h>      // MessageBoxA
+#include <SOURCE/NOOPT.h>
+#include <BASE/message.h>
+#include <windows.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <io.h>
@@ -36,11 +31,9 @@
 
 DATA(0x005331c0) static i32 giFindMid;
 
-// ---- module-private synthetic globals (retail xref: single-module) ----
 DATA(0x005331cc) static i32 gBlitRight;  // BlitBitmapToScreen computed blit-rect right edge
 DATA(0x005331d0) static i32 gBlitBottom; // BlitBitmapToScreen computed blit-rect bottom edge
 
-// ---- initialized storage (retail RVA order) ----
 DATA(0x0051dce8) i32 iMemEntries = 0;
 DATA(0x0051dcec) MemEntry* gpMemEntry = 0;
 DATA(0x0051dcf0) i32 giTotalMemAllocated = 0;
@@ -49,9 +42,6 @@ DATA(0x0051dcf8) u8
 DATA(0x0051dd08) i32 iLastSeed = 0x08156a03;
 DATA(0x0051dd0c) static char gMemEntryTag[sizeof("IME")] = "IME";
 
-// Retail emits each text operand as an independent aligned allocation. Grouping
-// them by owning workflow preserves those physical owners and their call-site
-// addends without relying on compiler literal pooling.
 DATA(0x0051dd10) static SMiscText gMiscText = {
     {{"KBAlloc    Size %d   Ptr %d   File %s  Line %d"},
      {"Free "},
@@ -204,19 +194,6 @@ DATA(0x0051dd10) static SMiscText gMiscText = {
     {{"advmice.mse"}, {""}, {"evntwin%d.bin"}, {""}, {"buybuild.icn"}, {"bigfont.fnt"}, {""}}
 };
 
-// @data-layout-note Retail initialized storage is the contiguous contribution
-// 0x11dce8..0x11e94c (0xc64). The rebuilt section has the same extent and SHA-256
-// 3a271f06aa947cc55114c53bb6d01778a45127f3e381ca1736ba0ebf00ff7e13. Its five
-// public owners occupy offsets 0x0..0x20, gMemEntryTag is the real allocation at
-// +0x24, and gMiscText owns the remaining typed text record at +0x28. All 274
-// initialized/BSS target occurrences and owner-relative addends match retail as
-// a multiset; 272 also align in relocation order. BlitBitmapToScreen interleaves
-// two gBlitRight/gBlitBottom loads with gpMouseManager differently, as documented
-// at that function, but retains the exact six blit-global targets and zero addends.
-// The candidate owns the same nine BSS objects in 0x24 bytes, but VC 4.2 currently
-// packs them in a different internal order; retail's NB09 contribution is 0x28 and
-// includes four unowned tail bytes. Keep the DATA-proved owners and leave that as a
-// final-link packing residual rather than adding aliases, padding, or placement rules.
 
 H2_ENUM_BEGIN(StatusBarLayout)
     STATUS_BAR_Y = 460,
@@ -233,15 +210,7 @@ void InitMemEntry(void) {
         gpMemEntry[i].used = 0;
 }
 
-// @semantic
-// Structurally complete /O2 checkpoint: allocation/tracking semantics, the 12-branch CFG,
-// and all 29 relocations agree.  With the required real icon definition in this TU, base
-// currently reserves 0x2c4 bytes and ends at 0x204; retail reserves 0x2bc and is 0x20f.
-// The first divergence is the frame immediate at +0x2, followed at +0xc by base keeping
-// size in EBP while retail uses EBX.  The two arrays account for the retail 700-byte frame;
-// there is no missing local.  Earlier exact-frame TU states left only the newline intrinsic.
-// `strcat`, strcpy/memcpy-at-strlen, direct word stores, volatile loads, and a manual scan
-// were already tried.  Revisit only after required shared-header/TU state changes.
+// @semantic: first divergence is the frame immediate at +0x2, followed at +0xc by base keeping size in EBP while retail uses EBX.
 VA(0x004c3d70, 0x20f)
 void* BaseAlloc(u32 size, char* originalFile, i32 originalLine) {
     char text[200];
@@ -297,14 +266,7 @@ void* BaseAlloc(u32 size, char* originalFile, i32 originalLine) {
     return ptr;
 }
 
-// @semantic
-// Structurally complete /O2 checkpoint: both spans are 0x386 with the same 0x2c4 frame,
-// 20-branch CFG, and all 52 relocations.  The first residual is the first newline append:
-// base preloads the word then derives `buf+strlen`; retail scans first and writes `[edi-1]`.
-// The other two append sites have the same scheduling difference.  All allocation/free,
-// MemEntry, logging, and bad-delete paths agree.  The BaseAlloc append spellings were also
-// tested here; a cached MemEntry reference regressed the loop allocation. Revisit only
-// after exact-preserving predecessor/TU-state changes.
+// @semantic: first residual is the first newline append: base preloads the word then derives buf+strlen.
 VA(0x004c3f80, 0x386)
 void BaseFree(void* ptr, char* originalFile, i32 originalLine) {
     char logText[500];
@@ -403,15 +365,7 @@ void BaseFree(void* ptr, char* originalFile, i32 originalLine) {
     }
 }
 
-// @semantic
-// Structurally complete /O2 checkpoint: base .text is 0x137 bytes versus retail 0x134.
-// Only the completed log-line append differs: base loads `"\n"` at +0xd6 (reloc
-// +0xd9) before deriving `buf+strlen`, while retail loads it at +0xe3 (reloc +0xe6)
-// after `repne scasb` and stores through `[edi-1]`. LogInt, sprintf, fopen/fputs/
-// fclose and OutputDebugStringA targets are otherwise identical. `strcat`, strlen+
-// strcpy/memcpy, direct and named word stores, volatile load, and manual scan tried.
-// A bounded libclang AST pass tested nine variants in 30 walks and retained none.
-// Revisit through exact-preserving predecessor/TU-state variants; not byte-proven.
+// @semantic: optimized register-allocation residual.
 VA(0x004c4310, 0x134)
 void PrintMemoryLeaks(void) {
     char logText[500];
@@ -475,13 +429,6 @@ void ShowMemoryStatus(void) {
     giDebugLevel = savedDebugLevel;
 }
 
-// Structurally complete /O2 checkpoint: both sections are 0x48 with identical CFG and
-// no relocations.  Recovering the explicit shifted-hash temporary changed the rotate from
-// base `shr eax,25; shl esi,5` to retail's `shl eax,5; shr esi,25`, raising this from
-// 93.29% to 99.14%. The only remaining bytes are the three equivalent SIB encodings at
-// +0x1b, +0x28 and +0x35 (`[ecx+edx]` versus `[edx+ecx]`).  `text[i]`, `i[text]`, both
-// rotate-expression orders were tried. A bounded 30-walk libclang AST pass exposed four
-// variants and retained none; revisit after an exact-preserving predecessor/TU-state change.
 VA(0x004c44f0, 0x48)
 u32l MAKEFILEID(char* text) {
     u32 hash = 0;
@@ -499,13 +446,7 @@ u32l MAKEFILEID(char* text) {
     return hash;
 }
 
-// @semantic
-// Structurally complete /O2 checkpoint: base is 0x97 bytes, retail 0x95, with the same
-// eight-branch CFG and four giFindMid relocations to 0x5331c0.  The first current
-// divergence is +0x2a: base emits `cmp edi,eax; jge`, retail `cmp eax,edi; jle` and then
-// reuses those flags for equality where base emits another compare at +0x38.  The key/value
-// fields are typed and named.  Direct tests, saved values, reversed/negated predicates,
-// combined conditions, and three-way forms were tried; this is not a proven artifact.
+// @semantic: first divergence is +0x2a: base emits cmp edi,eax; jge, retail cmp eax,edi.
 VA(0x004c4540, 0x95)
 i32 FindIndex(struct indexArray* entries, i32 low, i32 high, i32 key) {
     giFindMid = (low + high) >> 1;
@@ -531,15 +472,7 @@ i32 FindIndex(struct indexArray* entries, i32 low, i32 high, i32 key) {
 
 #include <BASE/MiscGraphicsConstants.h>
 
-// @semantic
-// Structurally complete /O2 checkpoint: both sections are 0xea with the same CFG and
-// exact 11/11 relocation identities (the retail gConfig reference is its interior member).
-// Explicit `threshold = maxLevel - level` preserves the recovered loop semantics. The
-// typed graphics-domain boundary rotates base's EBX/ESI/EBP allocation and leaves live at
-// 95.56% versus a retained 96.79%; the first divergence remains base testing ECX after
-// allocation while retail tests EAX before construction. `new palette`, value-init and
-// split declaration/assignment were tried. At head 34c93d1, the pre-domain bounded AST
-// pass found eight variants and retained none after 30 walks with all 144 siblings pinned.
+// @semantic: first divergence remains base testing ECX after allocation while retail tests EAX before construction.
 VA(0x004c45e0, 0xea)
 void FadeIn(i32 increment) {
     palette* fadePalette = new palette;
@@ -639,14 +572,7 @@ void ProcessAssert(i32 condition, char* file, i32 line) {
     }
 }
 
-// @semantic
-// Structurally complete /O2 checkpoint with equal 0x66-byte sections, the same frame/CFG,
-// and the sole strncmp relocation.  The explicit MAKEFILEID rotate temporary moved this
-// from the old wholesale register-allocation residual to 98.60%; all instructions now agree
-// except the final +0x57 loop test (`cmp esi,ebx; jl` versus `cmp ebx,esi; jg`). Pointer
-// swaps, `&i[text]`, lvalue count loads, for/while/do forms, count|0, reversed bounds and a
-// bounded 30-walk libclang AST pass were tried. Revisit only after another exact-preserving
-// predecessor/TU-state change; this operand order is not a proven artifact.
+// @semantic: optimized register-allocation residual.
 VA(0x004c4850, 0x66)
 char* FindStringInString(char* text, char* pattern) {
     i32 text_len = strlen(text);
@@ -663,14 +589,7 @@ char* FindStringInString(char* text, char* pattern) {
     return 0;
 }
 
-// @semantic
-// Structurally complete /O2 checkpoint with equal 0x31-byte sections and no relocs/calls.
-// The MAKEFILEID predecessor change fixed the old SIB residual; the only current difference
-// is the +0x21 loop test (`cmp eax,ecx; jl` versus `cmp ecx,eax; jg`).
-// for/while/do loops, explicit backedges, length/index `|0`, reversed bounds/returns,
-// `i[text]`, lvalue length loads and a bounded 30-walk libclang AST pass did not steer
-// them. Revisit after exact-preserving TU-state changes; these operand-order encodings are
-// not byte-proven artifacts.
+// @semantic: optimized register-allocation residual.
 VA(0x004c48c0, 0x31)
 char* FindToken(char* text, char token) {
     i32 len = strlen(text);
@@ -705,19 +624,7 @@ void SetInstallDefaults(void) {
 
 #include <BASE/MiscConfigConstants.h>
 
-// @semantic
-// Structurally complete /O2 checkpoint: base is 0x1b7, retail 0x1b5, with the same
-// three-branch CFG and the same 42 relocation occurrences. Manual target-address review
-// confirms the intended gConfig/giMainVideoModeWidth owners; `homm2 relocs` reports six
-// only-base entries because the delinker names gConfig interior labels as constants/strings.
-// Iteration now uses the real exeGfxConfig type and advances one seven-word record at a time
-// to the showCombatGrid
-// endpoint (+0x68); the former interior-int reconstruction and its EBP spill are gone.
-// The first residual is +0x1: after the common `push ebx`, base materializes gfx[0]
-// (+0x1c) before saving ESI/EDI, while retail saves them first and materializes
-// &gfx[0].fullScreen (+0x30), addressing the other fields relative to that member.
-// Direct typed-pointer, interior-member, index, and field-order variants have been tried;
-// revisit after exact-preserving predecessor/shared-header TU state.
+// @semantic: first residual is +0x1: after the common push ebx, base materializes gfx[0] (+0x1c) before saving ESI/EDI.
 VA(0x004c49a0, 0x1b5)
 void SetGameDefaults(void) {
     i32* fullScreen = &gConfig.gfx[0].fullScreen;
@@ -779,10 +686,7 @@ void SetGameDefaults(void) {
 }
 
 // @early-stop
-// @early-stop-reloc-only
-// All 0x13f relocation-masked bytes and all 28 ordered relocation sites and
-// effective targets agree. Residual identities are the Misc text block and the
-// _access/__access CRT alias at the same retail address.
+// @early-stop-reloc-only: relocation naming only.
 VA(0x004c4b60, 0x13f)
 void ReadPrefsFromFile(void) {
     sprintf(gText, gMiscText.readFile.stringFormat.text, gMiscText.readFile.configFilename.text);
@@ -808,10 +712,6 @@ skipDefaults:
     strcpy(gcRegAppPath, gMiscText.readFile.appPathDefault.text);
 }
 
-// Registry value byte counts passed to RegQueryValueExA/RegSetValueExA. They are
-// retail literals, NOT sizeof the gConfig fields: modemInitString is char[0x64]
-// but retail moves 0x62 bytes, and networkDefaultName is char[0x18] but retail
-// moves 0x1e — six bytes past the field, faithfully reproduced.
 H2_ENUM_BEGIN(RegistryValueSize)
     MODEM_INIT_STRING_SIZE = 0x62,
     UNIQUE_SYSTEM_ID_SIZE = 4,
@@ -966,8 +866,6 @@ void ReadPrefsFromRegistry(void) {
         reinterpret_cast<u8*>(gConfig.uniqueSystemID),
         &dwSize
     );
-    // Retail relocation at function +0x2f6 resolves to gConfig +0x125, the terminator byte after
-    // this four-byte ID, rather than the unrelated modem string at gConfig +0x110.
     gConfig.uniqueSystemID[3] = 0;
     dwSize = NETWORK_DEFAULT_NAME_SIZE + 1;
     RegQueryValueExA(
@@ -1261,10 +1159,7 @@ void ReadPrefs(void) {
 }
 
 // @early-stop
-// @early-stop-reloc-only
-// All 0x6a relocation-masked bytes, CFG, and nine ordered relocation sites and
-// effective targets agree. Residual identities are the Misc text block and the
-// _open/_write/_close CRT aliases at their retail addresses.
+// @early-stop-reloc-only: relocation naming only.
 VA(0x004c5500, 0x6a)
 void WritePrefsToFile(void) {
     i32 zeroBuffer[25];
@@ -1661,15 +1556,7 @@ i32 IsCDDrive(i32 driveIndex) {
     return GetDriveTypeA(gText) == DRIVE_CDROM;
 }
 
-// @semantic
-// Structurally complete /O2 checkpoint: both sections are 0x3ed with the same 0x2f0 frame,
-// CFG and 51 relocation occurrences. Manual raw review confirms the indirect Win32/MCI
-// targets; `homm2 relocs` reports only three delinker owner aliases (the archive literal and
-// gText interior labels). The sole code-order residual is +0x19b: base loads mciSendStringA
-// into ESI then wsprintfA into EBP, while retail loads EBP then ESI; every following use is
-// identical. Standard `_O_BINARY`, `SEEK_*`, `KEY_WRITE`, typed buffers/results and a bounded
-// 30-walk libclang AST pass preserve that residual. Revisit after an exact-preserving
-// predecessor/TU-state change; this is not a proven artifact.
+// @semantic: sole code-order residual is +0x19b: base loads mciSendStringA into ESI then wsprintfA into EBP.
 VA(0x004c5a60, 0x3ed)
 i32 SetupCDDrive(void) {
     char registryPath[MISC_CD_PATH_BUFFER_SIZE];
@@ -1799,19 +1686,7 @@ void BlitBitmapToScreenNoMouseCheck(
     BlitBitmapToScreenVesa(bmp, sourceX, sourceY, width, height, destinationX, destinationY);
 }
 
-// @semantic
-// Structurally complete /O2 checkpoint: retail decomp proves a real adjusted-source-X local;
-// recovering it removes the prior unjustified volatile bitmap alias and gives the same 0x18b
-// code span, four-blit CFG, and 24 relocation occurrences. Base reserves four stack bytes while
-// retail reserves eight and spills bmp in the second slot. The current 88.61% live score is lower
-// than the artifact-assisted retained 98.89%, but the source is now structurally honest. Manual
-// relocation audit shows the same globals/callees and totals, with gpMouseManager CSE placement
-// still differing: retail reloads between the horizontal/vertical entry tests, while base reloads
-// between the later redraw tests. Flat versus axis-nested predicates are byte-neutral in this TU.
-// Prior work exhausted relational reversal, width/source ordering, 22 local AST variants,
-// 65 exact-predecessor variants, 149 deterministic predecessor combinations, and private-bound
-// placement. Revisit only after a semantic predecessor/type change, never by restoring the
-// volatile alias or inventing reloads.
+// @semantic: optimized register-allocation residual.
 VA(0x004c5ee0, 0x18b)
 void BlitBitmapToScreen(
     class bitmap* bmp,
@@ -1880,13 +1755,7 @@ void BlitBitmapToScreen(
 
 #include <BASE/LogConstants.h>
 
-// @semantic
-// Structurally complete /O2 checkpoint: the 0x1f4 frame, CFG and 7/7 relocations agree.
-// Only base +0x5c..+0x7c differs from retail +0x5c..+0x75: base loads the newline
-// word before strlen and addresses via `not ecx`, while retail scans first and
-// writes through `[edi-1]`. Direct word stores, strcat, strcpy-at-strlen, memcpy
-// and a manual end scan were tried. At integrated head 56a50b7, the combined-TU
-// strcat retest emitted a full second string scan/copy and regressed to 70.80%.
+// @semantic: optimized register-allocation residual.
 VA(0x004c6070, 0xa6)
 void LogTruncate(void) {
     char logText[LOG_TEXT_BUFFER_SIZE];
@@ -1906,16 +1775,8 @@ void LogTruncate(void) {
     }
 }
 
-// LogTruncate matching history: `strchr(logText, '\0')` emitted an out-of-line call
-// and regressed to 84.98%; it is not a viable spelling for the retail inline scan.
 
-// @semantic
-// Structurally complete /O2 checkpoint: the 0x1f4 frame, CFG and external targets
-// agree. The newline append is base +0x53..+0x73 versus retail
-// +0x4f..+0x6c (preloaded word/not-ECX versus post-scan `[edi-1]`); retail's raw
-// OutputDebugString IAT operand at +0x8e is not named by delink. The same direct,
-// strcpy-at-strlen, memcpy and manual-scan forms were tried. At integrated head
-// 56a50b7, strcat emitted a full second string scan/copy and regressed to 64.70%.
+// @semantic: optimized register-allocation residual.
 VA(0x004c6120, 0x9e)
 void LogStr(char* text) {
     char logText[LOG_TEXT_BUFFER_SIZE];
@@ -1933,14 +1794,7 @@ void LogStr(char* text) {
     }
 }
 
-// @semantic
-// Structurally complete /O2 checkpoint: the 0x2bc frame, all external targets and
-// all seven sprintf call/format branches agree. Only the newline
-// append differs (base +0x1c9..+0x1f2, retail +0x1c9..+0x1ec), followed by the
-// unnamed retail OutputDebugString IAT operand at +0x211. Direct word, strcat,
-// strcpy-at-strlen, memcpy and manual end-scan spellings were tried. Strcat regressed
-// to 88.81%; a bounded libclang AST pass retained none after 30 walks, and 24 reversible
-// predecessor/TU-state probes produced no exact closure or eligible score change.
+// @semantic: optimized register-allocation residual.
 VA(0x004c61c0, 0x224)
 void LogInt(
     char* label,
@@ -2047,14 +1901,7 @@ void AbsAiPrint(char* text) {
     giDebugLevel = saved;
 }
 
-// @semantic
-// Structurally complete /O2 checkpoint: the typed graphics-domain boundary restores the
-// retail 0x310 frame and makes every byte through PollSound at +0x55 exact, raising live
-// from 86.18% to 95.12%. The 768-byte loop, CFG and all six relocation identities agree.
-// The residual begins with threshold/cursor scheduling and then exchanges ECX/EBX roles
-// in the byte adjustment. Signed/unsigned difference, abs/ternary and volatile level forms
-// were tried earlier; at head 34c93d1, cursor/threshold lifetime order regressed to 92.79%
-// and `distance > threshold` versus its commuted spelling was byte-neutral.
+// @semantic: residual begins with threshold/cursor scheduling and then exchanges ECX/EBX roles in the byte adjustment.
 VA(0x004c64e0, 0xf8)
 void FadeTo(u8* source, u8* destination, i32 increment) {
     u8 colors[MISC_PALETTE_BYTE_COUNT];
@@ -2095,14 +1942,7 @@ void FadeTo(u8* source, u8* destination, i32 increment) {
     UpdatePalette(reinterpret_cast<i8*>(destination));
 }
 
-// @semantic
-// Structurally complete /O2 checkpoint: base is 0xba versus retail 0xb8; both have the
-// 0x304 frame, complete two-loop CFG, and all eight ordered relocation identities. The
-// typed palette/screen constants leave live at 95.55% (retained 95.71%). Current residuals
-// are equivalent SIB base/index encodings in the color-table/palette reads, FadeTo argument
-// scheduling, and EAX/ECX exchange in the screen loop. Indexed output, pre/post-increment,
-// explicit row pointers, linear pointer loop, inner/outer column scope and explicit pixel
-// value were tried; at head 34c93d1, commuted palette-pointer addition was byte-neutral.
+// @semantic: optimized register-allocation residual.
 VA(0x004c65e0, 0xb8)
 void FadeToColorTable(u8* colorTable, i32 increment) {
     u8 translatedPalette[MISC_PALETTE_BYTE_COUNT];
@@ -2148,15 +1988,7 @@ i32 IsCycleColor(i32 color) {
     return 0;
 }
 
-// @semantic
-// Structurally complete /O2 checkpoint: the 0x8c frame, all 14 ordered relocations,
-// and every open/write/alloc/free/close target agree. The PCX header, RLE and VGA
-// palette constants are now named in the private header. Differences are confined
-// to the RLE loop (base +0x67..+0xe0 / retail +0x67..+0xdf), where EBX and EDI swap
-// encoded-size/run-end roles. `<2`, `==1`, and `<=1` run tests, reordered locals,
-// predicate polarity and commuted SIB forms were tried. At integrated head b8c73ff,
-// a fresh bounded libclang AST pass found 23 single variants and retained none after
-// 30 walks with all 144 siblings pinned.
+// @semantic: optimized register-allocation residual.
 VA(0x004c66d0, 0x1ee)
 void CreatePCXFile(char* filename, u8* pixels, i32 width, i32 height, u8* paletteData) {
     PCXHeader header;
@@ -2231,17 +2063,7 @@ struct IconEntry* GetIconEntry(class icon* iconPtr, i32 index) {
 
 #include <BASE/SeededRandomConstants.h>
 
-// @semantic
-// Structurally complete /O2 checkpoint: base and retail are both 0xb8 with the same
-// seeded-random CFG and all 3 ordered relocations. Moving the result lifetime before
-// the mix raised the retained maximum from 67.80% to 91.87%. Reusing `mix` for the
-// post-loop seed and naming the range restores retail's first `add edi,esi`; live is
-// 91.87%. The bit test still has the symmetric operand encoding, then base folds the
-// high contribution into ECX and stores before idiv while retail keeps EDI live and
-// stores after idiv. Direct term locals, folded/incremental seed arithmetic, both
-// final-update orders, explicit bit-loop forms, commuted bit tests and a volatile seed
-// store were checked. In-place modulo regressed to 88.13%; 24 reversible TU-state
-// probes found no exact closure, so every generated variant was discarded.
+// @semantic: optimized register-allocation residual.
 VA(0x004c6930, 0xb8)
 i32 SRandom(i32 low, i32 high) {
     if (high == low) {
@@ -2275,11 +2097,7 @@ i32 SRandom(i32 low, i32 high) {
     return rangedResult;
 }
 
-// @semantic: Complete seeded-coordinate mixing semantics and both ordered
-// iLastSeed relocations agree. The 0x5c retail register allocation keeps x in
-// ESI, y in EDX, and the seed in ECX; base assigns EDI/ECX/EDX respectively.
-// A direct xTerm/yTerm/seed-local form regressed to 46.53%, so the compact
-// in-place expression is retained. Revisit after Misc TU-state changes.
+// @semantic: optimized register-allocation residual.
 VA(0x004c69f0, 0x5c)
 void SIncRandomize(i32 x, i32 y) {
     x *= SEEDED_RANDOM_TERM_MULTIPLIER;
@@ -2298,16 +2116,7 @@ void SRand(i32 seed) {
     srand(seed);
 }
 
-// @semantic
-// Structurally complete /O2 checkpoint: base and retail are both 0x48 bytes and
-// all 3 relocations agree. The retained 90.64% state differed only in the six-byte
-// iLastSeed store: base placed it before the bit loop and retail after `dec ecx` inside
-// the loop. Splitting the RNG/data-entry enum domains leaves live at 90.18% with one
-// additional symmetric `test` operand encoding. for/do-while placement, commuted bit
-// tests, assignment in the loop condition and a volatile store were tried; the condition
-// spelling was byte-neutral, volatile spills the mix, and nonvolatile forms are hoisted.
-// Twenty-four reversible predecessor/TU-state probes found no exact closure; their
-// sub-100 disposable improvement was discarded.
+// @semantic: optimized register-allocation residual.
 VA(0x004c6a60, 0x48)
 i32 SGenRand(void) {
     i32 result = 0;
@@ -2332,16 +2141,7 @@ i32 MemSize(i32) {
 
 #include <BASE/DataEntryConstants.h>
 
-// @semantic
-// Structurally aligned /O2 checkpoint: both code spans are 0x386, the 0x9c frame,
-// CFG and 59 relocation occurrences agree. The recovered conditional Y adjustment leaves
-// only 12 unmasked bytes: one `mov ecx,0x2d` schedule at +0xbc and swapped LEAs for
-// entryText/message near +0x141, plus three delinked empty-string owner names.
-// Boolean-mask/branched Y forms, direct/local empty strings and declaration order
-// were tried. A bounded libclang AST pass found 25 single variants and retained none
-// after 30 walks. The current manual relocation audit remains 59/59; its four only-base
-// reports are delinked gpMouseManager/empty-string owner identities. Revisit only after
-// exact-preserving predecessor/TU state changes.
+// @semantic: optimized register-allocation residual.
 VA(0x004c6ac0, 0x386)
 void GetDataEntry(
     char* prompt,
@@ -2447,16 +2247,7 @@ void GetDataEntry(
     gbAllowTextEntryEscape = true;
 }
 
-// @early-stop
-// Structurally complete /O2 checkpoint: the command-domain switch preserves the
-// retail case-body order, including the physical cancel tail. Base and retail are
-// both 0x173 with an identical relocation-masked instruction stream and 23 relocation
-// occurrences. The remaining raw residual is one exchanged near/short JE and one near/short
-// JNE; the
-// total size is unchanged. The current manual audit remains 23/23 relocations; its seven
-// only-base reports are interior aliases for the same DataEntry globals. A bounded libclang
-// AST pass tested 16 variants in 30 walks and retained none. Revisit after an
-// exact-preserving predecessor/TU-state change.
+// @early-stop: byte-proven compiler artifact.
 VA(0x004c6e50, 0x173)
 i32 DataEntryWindowHandler(struct tag_message& message) {
     if (bDataEntryTime == IDX(DATA_ENTRY_PHASE_IMMEDIATE)) {
@@ -2517,7 +2308,6 @@ normalEvent:
     return EventWindowHandler(message);
 }
 
-// ---- zero-fill globals (definitions, RVA order) ----
 DATA(0x005331c4) class heroWindow* DataEntryWin;
 DATA(0x005331c8) char* cDEDest;
 DATA(0x005331d4) i32 iDEMaxLen;

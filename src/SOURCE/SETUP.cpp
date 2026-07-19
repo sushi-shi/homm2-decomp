@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_Re\SETUP.OBJ   from: (directly linked into exe)
-// functions: 23   data: 1
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <BASE/Misc.h>
 #include <BASE/executive.h>
@@ -29,8 +24,7 @@ i32 game::SetupCampaignGame(void) {
     return 1;
 }
 
-// @early-stop All 0x141 code bytes match after relocation masking; external
-// relocations match 22/22. Residual is delinked local/interior symbol identity.
+// @early-stop: delinker artifact.
 VA(0x00410ebf, 0x141)
 i32 game::SetupBaud(void) {
     heroWindow* window = new heroWindow(SETUP_WINDOW_X, SETUP_WINDOW_Y, "stpbaud.bin");
@@ -58,8 +52,7 @@ i32 game::SetupBaud(void) {
     return 1;
 }
 
-// @early-stop All 0x200 code bytes match after relocation masking; external
-// relocations match 47/47. Target-only entries are local jump-table relocs.
+// @early-stop: delinker jump-table artifact.
 VA(0x00411000, 0x200)
 i32 game::SetupComPort(void) {
     char initString[SETUP_MODEM_INIT_ENTRY_LENGTH];
@@ -191,8 +184,7 @@ i32 game::SetupNetworkGame(void) {
     return 1;
 }
 
-// @early-stop All 0x236 code bytes match after relocation masking; external
-// relocations match 24/24. Residual is fixed IAT/local jump-table identity.
+// @early-stop: delinker jump-table artifact.
 VA(0x0041155f, 0x236)
 i32 game::SetupNetworkGame2(void) {
     tag_message message;
@@ -323,8 +315,7 @@ i32 game::SetupModemGame(void) {
     return 1;
 }
 
-// @early-stop All 0x257 code bytes match after relocation masking; external
-// relocations match 42/42. Residual is delinked local jump-table identity.
+// @early-stop: delinker jump-table artifact.
 VA(0x00411aac, 0x257)
 i32 game::SetupMultiPlayerGame(void) {
     tag_message message;
@@ -1169,5 +1160,4 @@ i32 BaseSetupHandler(struct tag_message& message) {
     return SETUP_HANDLER_CONTINUE;
 }
 
-// ---- globals (definitions, RVA order) ----
 DATA(0x004ee248) b32 gbDoModemConfig = false;
