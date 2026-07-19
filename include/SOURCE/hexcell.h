@@ -3,6 +3,7 @@
 
 #include <va.h>
 #include <BASE/icon.h>
+#include <SOURCE/combatTypes.h>
 
 H2_ENUM_BEGIN(CombatOccupant)
     COMBAT_OCCUPANT_NONE = -1
@@ -38,7 +39,7 @@ public:
     void DrawGround(void);
     void DrawLowerDeadOccupants(void);
     void DrawUpperDeadOccupant(void);
-    void DrawOccupant(i32, i32);
+    void DrawOccupant(ArmyDrawState, i32);
     void DrawTower(i32);
     void DrawClouds(void);
     void DrawObstacle(void);
