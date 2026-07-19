@@ -191,7 +191,7 @@ src/SOURCE/Castle.cpp	pending
 src/SOURCE/DRAWING.cpp	pending
 src/SOURCE/EVENTS.cpp	pending
 src/SOURCE/FINDPATH.cpp	pending
-src/SOURCE/FLY.cpp	pending
+src/SOURCE/FLY.cpp	reviewed	Private flight direction, mask, timing, and attack-buffer constants are aligned enums; repeated branchless facing arithmetic was replaced by inline direction/rear-offset helpers. Remaining zeros and ones are coordinates, booleans, frame and loop initialization, bounds, and occupant sentinels.
 src/SOURCE/GAME.cpp	pending
 src/SOURCE/HERO.cpp	pending
 src/SOURCE/HEXCELL.cpp	pending
