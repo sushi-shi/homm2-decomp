@@ -106,65 +106,68 @@ H2_ENUM_CLASS_BEGIN(CombatCoordinateAxis)
     COMBAT_COORDINATE_Y = 1
 H2_ENUM_CLASS_END(CombatCoordinateAxis)
 
-#define COMBAT_CATAPULT_TARGET_ROLL_MIN 0
-#define COMBAT_CATAPULT_TARGET_ROLL_MAX 20
-#define COMBAT_CATAPULT_BALLISTICS_ROLL_MIN 0
-#define COMBAT_CATAPULT_BALLISTICS_ROLL_MAX 100
-#define COMBAT_CATAPULT_AI_ROLL_PENALTY 5
-#define COMBAT_CATAPULT_NO_SKILL_DOUBLE_THRESHOLD 25
-#define COMBAT_CATAPULT_NO_SKILL_MISS_THRESHOLD 75
-#define COMBAT_CATAPULT_ADVANCED_DOUBLE_THRESHOLD 50
-#define COMBAT_CATAPULT_MISS_HEX_COUNT 11
-#define COMBAT_CATAPULT_DIRECTION_COUNT 6
-#define COMBAT_CATAPULT_DIRECTION_ROLL_MIN 0
-#define COMBAT_CATAPULT_DIRECTION_ROLL_MAX 5
-#define COMBAT_CATAPULT_MISS_Y_OFFSET 17
-#define COMBAT_CATAPULT_LOAD_FRAME_COUNT 5
-#define COMBAT_CATAPULT_PROJECTILE_FRAME_COUNT 25
-#define COMBAT_CATAPULT_DESCENT_FRAME 12
-#define COMBAT_CATAPULT_EARLY_EXTENT_LAST_FRAME 6
-#define COMBAT_CATAPULT_BOULDER_FRAME_COUNT 8
-#define COMBAT_CATAPULT_ADVANCE_FRAME_COUNT 4
-#define COMBAT_CATAPULT_CLOUD_FRAME_COUNT 12
-#define COMBAT_CATAPULT_CLOUD_VISIBLE_FRAME_COUNT 10
-#define COMBAT_CATAPULT_GATE_CLOUD_FIRST_FRAME 2
-#define COMBAT_CATAPULT_WALL_IMPACT_FRAME 6
-#define COMBAT_CATAPULT_GATE_IMPACT_FRAME 7
-#define COMBAT_CATAPULT_ANIMATION_DELAY 75
-#define COMBAT_CATAPULT_PROJECTILE_DELAY 63
-#define COMBAT_CATAPULT_TIMER_SLOT 1
-#define COMBAT_CATAPULT_LAUNCH_SOUND 0
-#define COMBAT_CATAPULT_IMPACT_SOUND 2
-#define COMBAT_CATAPULT_INITIAL_MAX_X 160
-#define COMBAT_CATAPULT_INITIAL_MIN_Y 263
-#define COMBAT_CATAPULT_INITIAL_MAX_Y 413
-#define COMBAT_CATAPULT_START_X 84
-#define COMBAT_CATAPULT_START_Y 304
-#define COMBAT_CATAPULT_MIDPOINT_DIVISOR 2
-#define COMBAT_CATAPULT_PROJECTILE_EXTENT_RADIUS 15
-#define COMBAT_CATAPULT_MIN_VISIBLE_EXTENT_Y 1
-#define COMBAT_CATAPULT_IMPACT_EXTENT_X 75
-#define COMBAT_CATAPULT_IMPACT_EXTENT_TOP 50
-#define COMBAT_CATAPULT_IMPACT_EXTENT_BOTTOM 150
-#define COMBAT_CATAPULT_GATE_CLOUD_X_OFFSET 45
-#define COMBAT_CATAPULT_GATE_CLOUD_Y_OFFSET 70
-#define COMBAT_CATAPULT_CLOUD_Y_OFFSET 25
-#define COMBAT_CATAPULT_KEEP_IMPACT_X 600
-#define COMBAT_CATAPULT_KEEP_IMPACT_Y 160
+H2_ENUM_BEGIN(CombatCatapultConstant)
+    COMBAT_CATAPULT_TARGET_ROLL_MIN           = 0,
+    COMBAT_CATAPULT_TARGET_ROLL_MAX           = 20,
+    COMBAT_CATAPULT_BALLISTICS_ROLL_MIN       = 0,
+    COMBAT_CATAPULT_BALLISTICS_ROLL_MAX       = 100,
+    COMBAT_CATAPULT_AI_ROLL_PENALTY           = 5,
+    COMBAT_CATAPULT_NO_SKILL_DOUBLE_THRESHOLD = 25,
+    COMBAT_CATAPULT_NO_SKILL_MISS_THRESHOLD   = 75,
+    COMBAT_CATAPULT_ADVANCED_DOUBLE_THRESHOLD = 50,
+    COMBAT_CATAPULT_MISS_HEX_COUNT            = 11,
+    COMBAT_CATAPULT_DIRECTION_COUNT           = 6,
+    COMBAT_CATAPULT_DIRECTION_ROLL_MIN        = 0,
+    COMBAT_CATAPULT_DIRECTION_ROLL_MAX        = 5,
+    COMBAT_CATAPULT_MISS_Y_OFFSET             = 17,
+    COMBAT_CATAPULT_LOAD_FRAME_COUNT          = 5,
+    COMBAT_CATAPULT_PROJECTILE_FRAME_COUNT    = 25,
+    COMBAT_CATAPULT_DESCENT_FRAME             = 12,
+    COMBAT_CATAPULT_EARLY_EXTENT_LAST_FRAME   = 6,
+    COMBAT_CATAPULT_BOULDER_FRAME_COUNT       = 8,
+    COMBAT_CATAPULT_ADVANCE_FRAME_COUNT       = 4,
+    COMBAT_CATAPULT_CLOUD_FRAME_COUNT         = 12,
+    COMBAT_CATAPULT_CLOUD_VISIBLE_FRAME_COUNT = 10,
+    COMBAT_CATAPULT_GATE_CLOUD_FIRST_FRAME    = 2,
+    COMBAT_CATAPULT_WALL_IMPACT_FRAME         = 6,
+    COMBAT_CATAPULT_GATE_IMPACT_FRAME         = 7,
+    COMBAT_CATAPULT_ANIMATION_DELAY           = 75,
+    COMBAT_CATAPULT_PROJECTILE_DELAY          = 63,
+    COMBAT_CATAPULT_TIMER_SLOT                = 1,
+    COMBAT_CATAPULT_LAUNCH_SOUND              = 0,
+    COMBAT_CATAPULT_IMPACT_SOUND              = 2,
+    COMBAT_CATAPULT_INITIAL_MAX_X             = 160,
+    COMBAT_CATAPULT_INITIAL_MIN_Y             = 263,
+    COMBAT_CATAPULT_INITIAL_MAX_Y             = 413,
+    COMBAT_CATAPULT_START_X                   = 84,
+    COMBAT_CATAPULT_START_Y                   = 304,
+    COMBAT_CATAPULT_MIDPOINT_DIVISOR          = 2,
+    COMBAT_CATAPULT_PROJECTILE_EXTENT_RADIUS  = 15,
+    COMBAT_CATAPULT_MIN_VISIBLE_EXTENT_Y      = 1,
+    COMBAT_CATAPULT_IMPACT_EXTENT_X           = 75,
+    COMBAT_CATAPULT_IMPACT_EXTENT_TOP         = 50,
+    COMBAT_CATAPULT_IMPACT_EXTENT_BOTTOM      = 150,
+    COMBAT_CATAPULT_GATE_CLOUD_X_OFFSET       = 45,
+    COMBAT_CATAPULT_GATE_CLOUD_Y_OFFSET       = 70,
+    COMBAT_CATAPULT_CLOUD_Y_OFFSET            = 25,
+    COMBAT_CATAPULT_KEEP_IMPACT_X             = 600,
+    COMBAT_CATAPULT_KEEP_IMPACT_Y             = 160,
+    COMBAT_KEEP_FACTION_COUNT                 = 6,
+    COMBAT_KEEP_TOWER_COUNT                   = 3,
+    COMBAT_KEEP_MISSILE_ANGLE_COUNT           = 9,
+    COMBAT_KEEP_TOWER_DAMAGE_BONUS            = 2,
+    COMBAT_KEEP_ATTACK_STAT_LIMIT             = 20,
+    COMBAT_KEEP_ATTACK_STAT_INDEX_OFFSET      = 20,
+    COMBAT_KEEP_RANDOM_DAMAGE_MIN             = 2,
+    COMBAT_KEEP_RANDOM_DAMAGE_MAX             = 3,
+    COMBAT_KEEP_SIDE_TOWER_SHOT_DIVISOR       = 2,
+    COMBAT_KEEP_MIN_DAMAGE                    = 1
+H2_ENUM_END(CombatCatapultConstant)
+
 #define COMBAT_CATAPULT_HORIZONTAL_STEP_DIVISOR 12.5
 #define COMBAT_CATAPULT_VERTICAL_STEP_DIVISOR 78.0f
 #define COMBAT_CATAPULT_DISTANCE_ARC_SCALE 0.3
 #define COMBAT_CATAPULT_TARGET_ARC_SCALE 0.35
-#define COMBAT_KEEP_FACTION_COUNT 6
-#define COMBAT_KEEP_TOWER_COUNT 3
-#define COMBAT_KEEP_MISSILE_ANGLE_COUNT 9
-#define COMBAT_KEEP_TOWER_DAMAGE_BONUS 2
-#define COMBAT_KEEP_ATTACK_STAT_LIMIT 20
-#define COMBAT_KEEP_ATTACK_STAT_INDEX_OFFSET 20
-#define COMBAT_KEEP_RANDOM_DAMAGE_MIN 2
-#define COMBAT_KEEP_RANDOM_DAMAGE_MAX 3
-#define COMBAT_KEEP_SIDE_TOWER_SHOT_DIVISOR 2
-#define COMBAT_KEEP_MIN_DAMAGE 1
 #define COMBAT_MISSILE_DEGREES_PER_RADIAN 180.0
 #define COMBAT_MISSILE_PI 3.14159
 #define COMBAT_MISSILE_DIRECTION_AVERAGE_DIVISOR 2.0f
@@ -180,6 +183,16 @@ H2_ENUM_BEGIN(CombatGridConstant)
     COMBAT_MANAGER_SIDE_COUNT               = 2,
     COMBAT_ARMY_SLOT_COUNT                  = 20,
     COMBAT_ARMY_STORAGE_SLOT_COUNT          = 21,
+    COMBAT_RUNTIME_ALIGNMENT_SIZE           = 4,
+    COMBAT_MESSAGE_STATE_PAD_SIZE           = 0x64,
+    COMBAT_RUNTIME_DOUBLE_PAD_SIZE          = 0x8,
+    COMBAT_SMALL_VIEW_PAD_SIZE              = 0x10,
+    COMBAT_WIN_LOSE_WIDGET_COUNT            = 25,
+    COMBAT_DIRECTION_MAP_COUNT              = 24,
+    COMBAT_BACKGROUND_NAME_SIZE             = 13,
+    COMBAT_DURATION_MOD_COUNT               = 12,
+    COMBAT_CANCEL_DURATION_MOD_COUNT        = 11,
+    COMBAT_TRANSFER_ARTIFACT_COUNT          = 16,
     COMBAT_DRAW_PHASE_COUNT                 = 4,
     COMBAT_DRAW_ALL_OCCUPANTS               = 100,
     COMBAT_CASTLE_REVERSE_ROW               = 5,
@@ -349,11 +362,13 @@ H2_ENUM_CLASS_BEGIN(CombatIconIndex)
     COMBAT_ICON_DRAWBRIDGE            = 14
 H2_ENUM_CLASS_END(CombatIconIndex)
 
-#define COMBAT_RANDOM_X_MULTIPLIER 100
-#define COMBAT_CAPTAIN_SPELL_POINT_MULTIPLIER 10
-#define COMBAT_CAPTAIN_PORTRAIT_BASE 90
-#define COMBAT_INITIAL_COMMAND 15
-#define COMBAT_INVALID_HISTORY_INDEX (-99)
+H2_ENUM_BEGIN(CombatRuntimeConstant)
+    COMBAT_RANDOM_X_MULTIPLIER            = 100,
+    COMBAT_CAPTAIN_SPELL_POINT_MULTIPLIER = 10,
+    COMBAT_CAPTAIN_PORTRAIT_BASE          = 90,
+    COMBAT_INITIAL_COMMAND                = 15,
+    COMBAT_INVALID_HISTORY_INDEX          = -99
+H2_ENUM_END(CombatRuntimeConstant)
 
 H2_ENUM_BEGIN(CombatAIConstant)
     COMBAT_AI_SIDE_COUNT               = 2,
@@ -421,29 +436,31 @@ H2_ENUM_END(CombatAIConstant)
 #define COMBAT_AI_BASE_RETREAT_CHANCE 0.16f
 #define COMBAT_SPELL_AI_REDUCED_EFFECT_MODIFIER 0.5
 #define COMBAT_SPELL_AI_SIEGE_SHOOTER_MODIFIER 1.5
-#define COMBAT_SPELL_AI_MIRROR_POWER_ONE 1
-#define COMBAT_SPELL_AI_MIRROR_POWER_TWO 2
-#define COMBAT_SPELL_AI_HASTE_SPEED_BONUS 2
-#define COMBAT_SPELL_AI_MINIMUM_DISTANCE 2
-#define COMBAT_SPELL_AI_CASTLE_DISTANCE_BONUS 3
-#define COMBAT_SPELL_AI_RIGHT_DISTANCE_COLUMN 10
-#define COMBAT_SPELL_AI_ALL_ATTACK_DIRECTIONS 0xFF
-#define COMBAT_SPELL_AI_CURE_POINTS_PER_POWER 5
-#define COMBAT_SPELL_AI_RESURRECT_POINTS_PER_POWER 50
-#define COMBAT_SPELL_AI_FIRE_DAMAGE_PER_POWER 10
-#define COMBAT_SPELL_AI_LIGHTNING_DAMAGE_PER_POWER 25
-#define COMBAT_SPELL_AI_CHAIN_LIGHTNING_DAMAGE_PER_POWER 40
-#define COMBAT_SPELL_AI_HOLY_WORD_DAMAGE_PER_POWER 10
-#define COMBAT_SPELL_AI_HOLY_SHOUT_DAMAGE_PER_POWER 20
-#define COMBAT_SPELL_AI_MAGIC_ARROW_DAMAGE_PER_POWER 10
-#define COMBAT_SPELL_AI_ARMAGEDDON_DAMAGE_PER_POWER 50
-#define COMBAT_SPELL_AI_ELEMENTAL_STORM_DAMAGE_PER_POWER 25
-#define COMBAT_SPELL_AI_COLD_RAY_DAMAGE_PER_POWER 20
-#define COMBAT_SPELL_AI_COLD_RING_DAMAGE_PER_POWER 10
-#define COMBAT_SPELL_AI_DEATH_RIPPLE_DAMAGE_PER_POWER 5
-#define COMBAT_SPELL_AI_DEATH_WAVE_DAMAGE_PER_POWER 10
-#define COMBAT_SPELL_AI_DECISIVE_EFFECT 100000000
-#define COMBAT_SPELL_AI_MIRROR_LETHAL_DAMAGE 999999
+H2_ENUM_BEGIN(CombatSpellAIConstant)
+    COMBAT_SPELL_AI_MIRROR_POWER_ONE                 = 1,
+    COMBAT_SPELL_AI_MIRROR_POWER_TWO                 = 2,
+    COMBAT_SPELL_AI_HASTE_SPEED_BONUS                = 2,
+    COMBAT_SPELL_AI_MINIMUM_DISTANCE                 = 2,
+    COMBAT_SPELL_AI_CASTLE_DISTANCE_BONUS            = 3,
+    COMBAT_SPELL_AI_RIGHT_DISTANCE_COLUMN            = 10,
+    COMBAT_SPELL_AI_ALL_ATTACK_DIRECTIONS            = 0xFF,
+    COMBAT_SPELL_AI_CURE_POINTS_PER_POWER            = 5,
+    COMBAT_SPELL_AI_RESURRECT_POINTS_PER_POWER       = 50,
+    COMBAT_SPELL_AI_FIRE_DAMAGE_PER_POWER            = 10,
+    COMBAT_SPELL_AI_LIGHTNING_DAMAGE_PER_POWER       = 25,
+    COMBAT_SPELL_AI_CHAIN_LIGHTNING_DAMAGE_PER_POWER = 40,
+    COMBAT_SPELL_AI_HOLY_WORD_DAMAGE_PER_POWER       = 10,
+    COMBAT_SPELL_AI_HOLY_SHOUT_DAMAGE_PER_POWER      = 20,
+    COMBAT_SPELL_AI_MAGIC_ARROW_DAMAGE_PER_POWER     = 10,
+    COMBAT_SPELL_AI_ARMAGEDDON_DAMAGE_PER_POWER      = 50,
+    COMBAT_SPELL_AI_ELEMENTAL_STORM_DAMAGE_PER_POWER = 25,
+    COMBAT_SPELL_AI_COLD_RAY_DAMAGE_PER_POWER        = 20,
+    COMBAT_SPELL_AI_COLD_RING_DAMAGE_PER_POWER       = 10,
+    COMBAT_SPELL_AI_DEATH_RIPPLE_DAMAGE_PER_POWER    = 5,
+    COMBAT_SPELL_AI_DEATH_WAVE_DAMAGE_PER_POWER      = 10,
+    COMBAT_SPELL_AI_DECISIVE_EFFECT                  = 100000000,
+    COMBAT_SPELL_AI_MIRROR_LETHAL_DAMAGE             = 999999
+H2_ENUM_END(CombatSpellAIConstant)
 static const float COMBAT_SPELL_AI_BLIND_MODIFIER = -0.4f;
 static const float COMBAT_SPELL_AI_BERSERK_MODIFIER = -0.55f;
 static const float COMBAT_SPELL_AI_PARALYZE_MODIFIER = -0.5f;
@@ -521,12 +538,12 @@ public:
     i32 m_battlefieldFringe;
     class town* m_originalCombatTown;
     WindowColorCycleMode m_colorCycleType;
-    char _pad_0x31ee[0x4];
+    char _pad_0x31ee[COMBAT_RUNTIME_ALIGNMENT_SIZE];
     i32 m_debugFormation;
     class icon* m_combatIcons[COMBAT_FIXED_ICON_COUNT];
-    class icon* m_obstacleIcons[8];
+    class icon* m_obstacleIcons[COMBAT_OBSTACLE_ICON_LOAD_COUNT];
     i32 m_obstacleCount;
-    i16 m_eagleEyeSpell[2];
+    i16 m_eagleEyeSpell[COMBAT_MANAGER_SIDE_COUNT];
     CombatDrawbridgeState m_drawbridgeState;
     i32 m_drawbridgeBackgroundVisible;
     u8 m_wallStates[IDX(COMBAT_WALL_SLOT_COUNT)];
@@ -535,38 +552,38 @@ public:
     class bitmap* m_mouseGridBuffer;
     i32 m_backgroundDrawn;
     class mapCell* m_battlefieldCell;
-    class town* m_combatTowns[2];
-    class hero* m_heroes[2];
+    class town* m_combatTowns[COMBAT_MANAGER_SIDE_COUNT];
+    class hero* m_heroes[COMBAT_MANAGER_SIDE_COUNT];
     class hero m_captain;
-    i32 m_spellPower[2];
-    class armyGroup* m_armyGroups[2];
+    i32 m_spellPower[COMBAT_MANAGER_SIDE_COUNT];
+    class armyGroup* m_armyGroups[COMBAT_MANAGER_SIDE_COUNT];
     i32 m_mouseGridHex;
-    u8 m_heroDeathPending[2];
-    u8 m_heroAlternateDeathPending[2];
-    u8 m_heroDeathAnimationPlayed[2];
-    u8 m_heroAlternateDeathAnimationPlayed[2];
-    i32 m_heroAnimationState[2];
-    i32 m_heroAnimationFrame[2];
-    i32 m_heroSpriteIndex[2];
-    i32l m_heroCycleTimer[2];
-    class icon* m_heroIcons[2];
-    class icon* m_heroOverlayIcons[2];
-    i32 m_heroOverlayFrame[2];
-    struct SLimitData m_heroLimits[2];
-    struct SLimitData m_heroOverlayLimits[2];
+    u8 m_heroDeathPending[COMBAT_MANAGER_SIDE_COUNT];
+    u8 m_heroAlternateDeathPending[COMBAT_MANAGER_SIDE_COUNT];
+    u8 m_heroDeathAnimationPlayed[COMBAT_MANAGER_SIDE_COUNT];
+    u8 m_heroAlternateDeathAnimationPlayed[COMBAT_MANAGER_SIDE_COUNT];
+    i32 m_heroAnimationState[COMBAT_MANAGER_SIDE_COUNT];
+    i32 m_heroAnimationFrame[COMBAT_MANAGER_SIDE_COUNT];
+    i32 m_heroSpriteIndex[COMBAT_MANAGER_SIDE_COUNT];
+    i32l m_heroCycleTimer[COMBAT_MANAGER_SIDE_COUNT];
+    class icon* m_heroIcons[COMBAT_MANAGER_SIDE_COUNT];
+    class icon* m_heroOverlayIcons[COMBAT_MANAGER_SIDE_COUNT];
+    i32 m_heroOverlayFrame[COMBAT_MANAGER_SIDE_COUNT];
+    struct SLimitData m_heroLimits[COMBAT_MANAGER_SIDE_COUNT];
+    struct SLimitData m_heroOverlayLimits[COMBAT_MANAGER_SIDE_COUNT];
     struct SLimitData m_moatLimits[IDX(COMBAT_WALL_SLOT_COUNT)];
     i32l m_previousCombatMessageExpiration;
     i32l m_combatMessageExpiration;
     i32 m_combatMessagePending;
-    char _pad_0x34b9[0x64];
-    u8 m_summonedCreatureType[2];
-    i32 m_sideDefeated[2];
-    i32 m_networkArmyPresent[2];
-    i32 m_playerId[2];
-    i32 m_experienceValue[2];
-    i32 m_heroCastSpell[2];
-    i32 m_armyCount[2];
-    class army m_armies[2][21];
+    char _pad_0x34b9[COMBAT_MESSAGE_STATE_PAD_SIZE];
+    u8 m_summonedCreatureType[COMBAT_MANAGER_SIDE_COUNT];
+    i32 m_sideDefeated[COMBAT_MANAGER_SIDE_COUNT];
+    i32 m_networkArmyPresent[COMBAT_MANAGER_SIDE_COUNT];
+    i32 m_playerId[COMBAT_MANAGER_SIDE_COUNT];
+    i32 m_experienceValue[COMBAT_MANAGER_SIDE_COUNT];
+    i32 m_heroCastSpell[COMBAT_MANAGER_SIDE_COUNT];
+    i32 m_armyCount[COMBAT_MANAGER_SIDE_COUNT];
+    class army m_armies[COMBAT_MANAGER_SIDE_COUNT][COMBAT_ARMY_STORAGE_SLOT_COUNT];
     i32 m_currentArmySide;
     i32 m_currentArmyIndex;
     i32 m_currentSpeed;
@@ -583,47 +600,47 @@ public:
     struct SLimitData m_gateLimits;
     struct SLimitData m_upperWallLimits;
     struct SLimitData m_middleWallLimits;
-    i32 m_catapultFrame[2];
-    i32 m_catapultAttackCount[2];
-    i32 m_catapultAttacksRemaining[2];
-    i32 m_keepAttacksRemaining[2];
+    i32 m_catapultFrame[COMBAT_MANAGER_SIDE_COUNT];
+    i32 m_catapultAttackCount[COMBAT_MANAGER_SIDE_COUNT];
+    i32 m_catapultAttacksRemaining[COMBAT_MANAGER_SIDE_COUNT];
+    i32 m_keepAttacksRemaining[COMBAT_MANAGER_SIDE_COUNT];
     b32 m_inCastleCombat;
-    i32 m_unknownF337[2];
-    i32 m_visitingHeroPresent[2];
-    char _pad_0xf347[0x4];
+    i32 m_unknownF337[COMBAT_MANAGER_SIDE_COUNT];
+    i32 m_visitingHeroPresent[COMBAT_MANAGER_SIDE_COUNT];
+    char _pad_0xf347[COMBAT_RUNTIME_ALIGNMENT_SIZE];
     i32 m_unknownF34B;
     i32 m_unknownF34F;
     i32 m_unknownF353;
     i32 m_nonVisualCombat;
     i32 m_unknownF35B;
-    i32 m_killBenefit[2];
+    i32 m_killBenefit[COMBAT_MANAGER_SIDE_COUNT];
     class heroWindow* m_combatWindow;
-    char _pad_0xf36b[0x8];
+    char _pad_0xf36b[COMBAT_RUNTIME_DOUBLE_PAD_SIZE];
     i32 m_unknownF373;
-    i32 m_sideRetreated[2];
-    i32 m_limitCreatureCount[2][20];
-    i32 m_drawHero[2];
-    i32 m_drawHeroOverlay[2];
+    i32 m_sideRetreated[COMBAT_MANAGER_SIDE_COUNT];
+    i32 m_limitCreatureCount[COMBAT_MANAGER_SIDE_COUNT][COMBAT_ARMY_SLOT_COUNT];
+    i32 m_drawHero[COMBAT_MANAGER_SIDE_COUNT];
+    i32 m_drawHeroOverlay[COMBAT_MANAGER_SIDE_COUNT];
     i32 m_combatWindowOpen;
-    class widget* m_winLoseBottomWidgets[25];
-    class widget* m_winLoseBottomTextWidgets[25];
+    class widget* m_winLoseBottomWidgets[COMBAT_WIN_LOSE_WIDGET_COUNT];
+    class widget* m_winLoseBottomTextWidgets[COMBAT_WIN_LOSE_WIDGET_COUNT];
     i32 m_combatX;
     i32 m_combatY;
-    i8 m_directionMap[24];
+    i8 m_directionMap[COMBAT_DIRECTION_MAP_COUNT];
     i32 m_mouseDirection;
     i32 m_validDirectionCount;
     struct SLimitData m_smallViewLimits;
-    char _pad_0xf533[0x10];
-    i32 m_smallViewSide[2];
-    i32 m_smallViewArmyIndex[2];
-    i32 m_smallViewLastX[2];
-    i32 m_smallViewLastY[2];
-    i32 m_smallViewWidth[2];
-    i32 m_smallViewHeight[2];
-    char _pad_0xf573[0x4];
-    u8 m_removedArmies[2][20];
+    char _pad_0xf533[COMBAT_SMALL_VIEW_PAD_SIZE];
+    i32 m_smallViewSide[COMBAT_MANAGER_SIDE_COUNT];
+    i32 m_smallViewArmyIndex[COMBAT_MANAGER_SIDE_COUNT];
+    i32 m_smallViewLastX[COMBAT_MANAGER_SIDE_COUNT];
+    i32 m_smallViewLastY[COMBAT_MANAGER_SIDE_COUNT];
+    i32 m_smallViewWidth[COMBAT_MANAGER_SIDE_COUNT];
+    i32 m_smallViewHeight[COMBAT_MANAGER_SIDE_COUNT];
+    char _pad_0xf573[COMBAT_RUNTIME_ALIGNMENT_SIZE];
+    u8 m_removedArmies[COMBAT_MANAGER_SIDE_COUNT][COMBAT_ARMY_SLOT_COUNT];
     u8 m_removedArmyPresent;
-    char m_battlefieldBackgroundName[13];
+    char m_battlefieldBackgroundName[COMBAT_BACKGROUND_NAME_SIZE];
     i8 m_adjacency[COMBAT_HEX_COUNT][COMBAT_AI_ADJACENT_DIRECTION_COUNT];
     class heroWindow* m_winLoseWindow;
     SpellType m_selectedSpell;
@@ -671,7 +688,7 @@ public:
     void ChainLightning(i32, i32);
     void VaporizeCreature(i32, i32);
     void RippleCreature(i32, i32, i32);
-    void ShowMassSpell(i8 (*const)[20], i32, i32);
+    void ShowMassSpell(i8 (*const)[COMBAT_ARMY_SLOT_COUNT], i32, i32);
     void CastMassSpell(SpellType, i32);
     void MirrorImage(i32);
     void SummonElemental(i32, i32);
@@ -802,14 +819,14 @@ extern i32 indexToCastOn;
 extern u8 uRedBeam[];
 extern u8 uRainbow[];
 extern i8* gyModify;
-extern float gfDurationMods[12];
-extern float gfCancelDurationMods[11];
+extern float gfDurationMods[COMBAT_DURATION_MOD_COUNT];
+extern float gfCancelDurationMods[COMBAT_CANCEL_DURATION_MOD_COUNT];
 extern i32 bInHighMoraleBonus;
 extern i32 giSeed;
-extern u8 wallHex[4];
+extern u8 wallHex[COMBAT_WALL_SECTION_COUNT];
 extern b32 gbThisNetHasControl;
 extern i32 iCurTransferArtifact;
-extern i8 iTransferArtifactsInfo[16];
+extern i8 iTransferArtifactsInfo[COMBAT_TRANSFER_ARTIFACT_COUNT];
 extern b32 gbWhichAnimationPlaying;
 extern i32 iMaxTransferArtifacts;
 extern i32 giNextActionExtra;
@@ -819,7 +836,7 @@ extern i32 giWinCmbtFrame;
 extern i32 giNextActionGridIndex;
 extern i32 giSurrenderCost;
 extern i32 giSkeletonsCreated;
-extern i8 iTransferArtifacts[16];
+extern i8 iTransferArtifacts[COMBAT_TRANSFER_ARTIFACT_COUNT];
 extern i32 giNextAction;
 extern i32 giNextActionGridIndex2;
 extern i32 giCurrSpellGroup;
