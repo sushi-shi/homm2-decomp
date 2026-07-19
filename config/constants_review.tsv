@@ -93,7 +93,7 @@ include/SOURCE/Newgame.h	pending
 include/SOURCE/Overview.h	pending
 include/SOURCE/PATH.h	reviewed	The public combat-hex direction domain has explicit aligned values; no unexplained literals remain.
 include/SOURCE/PHILAI.h	pending
-include/SOURCE/RECRUIT.h	pending
+include/SOURCE/RECRUIT.h	reviewed	The public setup and quick-view functions expose no numeric policy.
 include/SOURCE/REMOTE.h	pending
 include/SOURCE/REMOTE_TYPES.h	pending
 include/SOURCE/REQUEST.h	pending
@@ -123,7 +123,7 @@ include/SOURCE/netwin.h	pending
 include/SOURCE/netwin_private.h	pending
 include/SOURCE/philAI.h	pending
 include/SOURCE/playerData.h	pending
-include/SOURCE/recruitUnit.h	pending
+include/SOURCE/recruitUnit.h	reviewed	The manager interface exposes no numeric policy; three four-byte opaque gaps and SIZE are proven packed-layout evidence.
 include/SOURCE/searchArray.h	pending
 include/SOURCE/strip.h	pending
 include/SOURCE/swapManager.h	pending
@@ -204,7 +204,7 @@ src/SOURCE/Newgame.cpp	pending
 src/SOURCE/Overview.cpp	pending
 src/SOURCE/PATH.cpp	reviewed	Private geometry constants are prefix-free and aligned; shared attack/path/facing/hex/occupant domains are named. Remaining zeroes and ones are results, booleans, loops, bit construction, or parity. Non-debug section bytes and ordered relocations are unchanged.
 src/SOURCE/PHILAI.cpp	pending
-src/SOURCE/RECRUIT.cpp	pending
+src/SOURCE/RECRUIT.cpp	reviewed	Private aligned domains name resource slots, source kinds, geometry, controls, dialog coordinates, and storage extents. Shared widget flags and dispatch results replace raw ABI values; remaining zeros and ones are initialization, booleans, indices, draw arguments, or update flags.
 src/SOURCE/REMOTE.cpp	pending
 src/SOURCE/REQUEST.cpp	pending
 src/SOURCE/SEARCH.cpp	pending
