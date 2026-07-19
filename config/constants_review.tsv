@@ -61,7 +61,7 @@ include/BASE/sample.h	reviewed	The declaration uses named types; the sole litera
 include/BASE/sampleData.h	reviewed	The record fields are named; the sole literal is packed-layout SIZE evidence.
 include/BASE/soundManager.h	pending
 include/BASE/soundmgr.h	pending
-include/BASE/textEntryWidget.h	pending
+include/BASE/textEntryWidget.h	reviewed	Shared serialized read-mode and constructor-layout domains are named and aligned; the remaining literal is proven packed class-layout SIZE evidence.
 include/BASE/textWidget.h	reviewed	Public class interface contains only packed-layout SIZE evidence.
 include/BASE/tileset.h	reviewed	Only packed-layout SIZE evidence.
 include/BASE/widget.h	reviewed	Public widget flags, command argument, and dispatch ABI values are named; packed SIZE and pure-virtual zeros are layout/language evidence.
@@ -164,7 +164,7 @@ src/BASE/SAMPLE.cpp	reviewed	Private format, playback-rate, filename-capacity, a
 src/BASE/TEXTWDGT.cpp	reviewed	Private resource-name capacity, draw-mode mask, and buffer growth are enums; font modes, alignment, and dispatch results use shared domains. The statement helper is not a constant domain. Remaining allocation/free operands are retail source-line evidence, and other zeros/ones are initialization or booleans.
 src/BASE/TILE.cpp	reviewed	Private constants name the hand-written blitter's proven field offsets, dword/copy-group shifts, and unrolled row batch; public index and flip bits use the shared tile domain. Repeated byte-copy instructions and zero-initialized static scratch state are algorithm structure rather than unnamed policy.
 src/BASE/TILESET.cpp	reviewed	Allocation/free operands 18 and 0x1c preserve retail source-line evidence; other values are named or annotations.
-src/BASE/Textntry.cpp	pending
+src/BASE/Textntry.cpp	reviewed	Private enums name key conversion, masks, buffer capacities, serialized insets, allocation padding, blink timing, dim color, and preservation state; shared read modes, layout, Read13 extent, and dispatch results cover public domains. Remaining zeros and ones are booleans, terminators, origins, or index steps, while allocation/free operands preserve source-location evidence.
 src/BASE/WIDGET.cpp	reviewed	The private default extent and shared dispatch results are enums; remaining zeros and -1 are initialization, boolean, draw-mode, or z-order sentinels.
 src/BASE/WINDOW.cpp	reviewed	Private constants name screen bounds and the open failure result; public window flag/state and text-entry read-mode domains cover every executable literal. Remaining zeros, ones, and -1 values are initialization, list/z-order sentinels, draw toggles, or inclusive-bound steps.
 src/BASE/WINMGR.cpp	reviewed	Private enums name screen, palette, cycle, fade, fizzle, screenshot, and lookup constants; shared window flags, fade modes, sentinels, and cycle-buffer extent use their public domains. World-cycle indices remain a narrowly suppressed retail local payload, while allocation/free operands preserve source-location evidence.
