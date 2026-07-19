@@ -15,12 +15,31 @@
 #include <string.h>
 
 H2_ENUM_BEGIN(TextEntryKeyConstant)
-    ENTRY_KEY_DELETE = 0x7f
+    ACCEPT_KEY         = 10,
+    DELETE_KEY         = 0x7f,
+    EXTENDED_KEY_SHIFT = 8,
+    EXTENDED_KEY_MASK  = 0xff
 H2_ENUM_END(TextEntryKeyConstant)
 
 H2_ENUM_BEGIN(TextEntrySourceFileConstant)
     ENTRY_SOURCE_FILE_SLOT_SIZE = 0x2c
 H2_ENUM_END(TextEntrySourceFileConstant)
+
+H2_ENUM_BEGIN(TextEntryConstant)
+    RESOURCE_NAME_CAPACITY      = RESOURCE_MANAGER_READ13_BYTES,
+    COLOR_MASK                  = 0xff,
+    HORIZONTAL_INSET_SIDE_COUNT = 2,
+    SERIALIZED_HORIZONTAL_INSET = 7,
+    INSET_FIVE_VERTICAL_INSET   = 5,
+    INSET_FOUR_VERTICAL_INSET   = 4,
+    EDIT_BUFFER_CAPACITY        = 600,
+    DISPLAY_BUFFER_CAPACITY     = 300,
+    CURSOR_BLINK_TICKS          = 360,
+    DIMMED_COLOR                = 3,
+    TEXT_ALLOCATION_PADDING     = 5,
+    EDIT_ALLOCATION_PADDING     = 6,
+    PRESERVE_TEXT_FLAG          = 1
+H2_ENUM_END(TextEntryConstant)
 
 H2_ENUM_CLASS_BEGIN(InputManagerExtendedKey)
     EXTENDED_KEY_BASE = 0x100
@@ -76,13 +95,15 @@ textEntryWidget::textEntryWidget(
     m_color = 1;
     m_rectH = m_height;
 #line 61 RETAIL_FILE
-    m_text = static_cast<char*>(H2_ALLOC(static_cast<u16>(maxLength) + 5, 62));
+    m_text = static_cast<char*>(
+        H2_ALLOC(static_cast<u16>(maxLength) + TEXT_ALLOCATION_PADDING, 62)
+    );
     strcpy(m_text, text);
-    if (layout == 4) {
+    if (layout == TEXT_ENTRY_LAYOUT_INSET) {
         m_innerX = horizontalInset + m_x;
         m_preserveTextOnFocus = 1;
         m_innerY = verticalInset + m_y;
-        m_innerW = m_width + -2 * horizontalInset;
+        m_innerW = m_width + -HORIZONTAL_INSET_SIDE_COUNT * horizontalInset;
         m_innerH = m_height;
     }
 }
@@ -94,27 +115,29 @@ textEntryWidget::~textEntryWidget() {
 
 VA(0x004d8920, 0x26c)
 void textEntryWidget::Read(i32 type) {
-    char resourceName[13];
+    char resourceName[RESOURCE_NAME_CAPACITY];
     m_x = gpResourceManager->ReadWord();
     m_y = gpResourceManager->ReadWord();
     m_width = gpResourceManager->ReadWord();
     m_height = gpResourceManager->ReadWord();
     m_maxLength = gpResourceManager->ReadWord();
 #line 99
-    m_text = static_cast<char*>(H2_ALLOC_AT(m_maxLength + 5, RETAIL_FILE "\0", 99));
+    m_text = static_cast<char*>(
+        H2_ALLOC_AT(m_maxLength + TEXT_ALLOCATION_PADDING, RETAIL_FILE "\0", 99)
+    );
     gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_text), m_maxLength);
     gpResourceManager->Read13(reinterpret_cast<i8*>(resourceName));
     gpResourceManager->SavePosition();
     m_font = gpResourceManager->GetFont(resourceName);
     gpResourceManager->RestorePosition();
-    m_color = gpResourceManager->ReadWord() & 0xFF;
+    m_color = gpResourceManager->ReadWord() & COLOR_MASK;
     m_alignment = static_cast<char>(gpResourceManager->ReadWord());
     gpResourceManager->Read13(reinterpret_cast<i8*>(resourceName));
     gpResourceManager->SavePosition();
     m_icon = gpResourceManager->GetIcon(resourceName);
     gpResourceManager->RestorePosition();
     m_entryType = static_cast<i16>(type);
-    if (type == 2) {
+    if (type == TEXT_ENTRY_READ_RECT) {
         m_rectX = gpResourceManager->ReadWord();
         m_rectY = gpResourceManager->ReadWord();
         m_rectW = gpResourceManager->ReadWord();
@@ -127,24 +150,24 @@ void textEntryWidget::Read(i32 type) {
         m_rectW = m_width;
         i32 preserveText;
         m_rectH = m_height;
-        if (type == 3)
+        if (type == TEXT_ENTRY_READ_MULTILINE)
             preserveText = 1;
         else
             preserveText = 1;
         m_maxLines = preserveText;
         m_preserveTextOnFocus = preserveText;
-        if (type != 3)
+        if (type != TEXT_ENTRY_READ_MULTILINE)
             m_preserveTextOnFocus = 0;
     }
-    if (type == 4) {
-        m_innerX = m_x + 7;
-        m_innerY = m_y + 5;
-        m_innerW = m_width - 14;
+    if (type == TEXT_ENTRY_READ_INSET_FIVE) {
+        m_innerX = m_x + SERIALIZED_HORIZONTAL_INSET;
+        m_innerY = m_y + INSET_FIVE_VERTICAL_INSET;
+        m_innerW = m_width - SERIALIZED_HORIZONTAL_INSET * HORIZONTAL_INSET_SIDE_COUNT;
         m_innerH = m_height;
-    } else if (type == 5) {
-        m_innerX = m_x + 7;
-        m_innerY = m_y + 4;
-        m_innerW = m_width - 14;
+    } else if (type == TEXT_ENTRY_READ_INSET_FOUR) {
+        m_innerX = m_x + SERIALIZED_HORIZONTAL_INSET;
+        m_innerY = m_y + INSET_FOUR_VERTICAL_INSET;
+        m_innerW = m_width - SERIALIZED_HORIZONTAL_INSET * HORIZONTAL_INSET_SIDE_COUNT;
         m_innerH = m_height;
     } else {
         m_innerX = m_x;
@@ -183,18 +206,18 @@ i32 textEntryWidget::Main(struct tag_message& message) {
                 message.type = MESSAGE_WIDGET;
                 message.payload.widget.id = m_id;
                 message.payload.widget.parameter = MESSAGE_MODIFIER_RIGHT_BUTTON;
-                return 2;
+                return WIDGET_DISPATCH_FORWARD;
             }
             if (mouseX >= m_x && mouseY >= m_y && mouseX < m_x + m_width
                 && mouseY < m_y + m_height) {
                 mouseX = m_x + windowX;
-                char original[600];
-                char edit[600];
-                char scratch[600];
-                char backup[600];
+                char original[EDIT_BUFFER_CAPACITY];
+                char edit[EDIT_BUFFER_CAPACITY];
+                char scratch[EDIT_BUFFER_CAPACITY];
+                char backup[EDIT_BUFFER_CAPACITY];
                 mouseY = m_y + windowY;
                 strcpy(original, m_text);
-                if ((m_preserveTextOnFocus & 1) != 0) {
+                if ((m_preserveTextOnFocus & PRESERVE_TEXT_FLAG) != 0) {
                     m_cursorPosition = static_cast<u16>(strlen(m_text));
                 } else {
                     m_cursorPosition = 0;
@@ -205,7 +228,7 @@ i32 textEntryWidget::Main(struct tag_message& message) {
                 Draw();
                 gpWindowManager->UpdateScreenRegion(mouseX, mouseY, m_width, m_height);
                 i16 done = 0;
-                glTimers[0] = KBTickCount() + 360;
+                glTimers[0] = KBTickCount() + CURSOR_BLINK_TICKS;
                 gpMouseManager->ReallyHidePointer();
                 tag_message event;
                 do {
@@ -244,11 +267,11 @@ i32 textEntryWidget::Main(struct tag_message& message) {
                                 break;
                             default:
                                 gpInputManager->AsciiConvert(event);
-                                if (event.payload.keyboard.keyCode == 10) {
+                                if (event.payload.keyboard.keyCode == ACCEPT_KEY) {
                                     gbTextEntryEscaped = false;
                                     done++;
                                 } else if (event.payload.keyboard.keyCode
-                                           == ENTRY_KEY_DELETE) {
+                                           == DELETE_KEY) {
                                     if (m_cursorPosition != 0) {
                                         strcpy(scratch, edit + m_cursorPosition);
                                         strcpy(edit + m_cursorPosition - 1, scratch);
@@ -261,7 +284,9 @@ i32 textEntryWidget::Main(struct tag_message& message) {
                                     strcpy(backup, edit);
                                     char typed = 0;
                                     if (event.payload.keyboard.keyCode >= IDX(EXTENDED_KEY_BASE)) {
-                                        switch ((event.payload.keyboard.keyCode >> 8) & 0xFF) {
+                                        switch ((event.payload.keyboard.keyCode
+                                                 >> EXTENDED_KEY_SHIFT)
+                                                & EXTENDED_KEY_MASK) {
                                             case INPUT_SCAN_NUMPAD_7:
                                                 typed = '7';
                                                 break;
@@ -304,7 +329,7 @@ i32 textEntryWidget::Main(struct tag_message& message) {
                                         H2_FREE_AT(m_text, TEXT_ENTRY_MAIN_SOURCE_FILES, 0x184);
 #line 389
                                         m_text = static_cast<char*>(H2_ALLOC_AT(
-                                            strlen(edit) + 6,
+                                            strlen(edit) + EDIT_ALLOCATION_PADDING,
                                             TEXT_ENTRY_MAIN_SOURCE_FILES
                                                 + ENTRY_SOURCE_FILE_SLOT_SIZE,
                                             389
@@ -316,7 +341,7 @@ i32 textEntryWidget::Main(struct tag_message& message) {
                                         strcpy(edit, scratch);
                                         m_cursorPosition++;
                                         SetupDisplayString(edit, m_cursorPosition);
-                                        if (m_entryType != 3) {
+                                        if (m_entryType != TEXT_ENTRY_READ_MULTILINE) {
                                             i32 lineLength = m_font->LineLength(m_text, m_innerW);
                                             if (m_maxLines >= lineLength) {
                                             } else {
@@ -341,7 +366,7 @@ i32 textEntryWidget::Main(struct tag_message& message) {
                 message.payload.widget.command = WIDGET_COMMAND_SELECT;
                 message.type = MESSAGE_WIDGET;
                 message.payload.widget.id = m_id;
-                return 2;
+                return WIDGET_DISPATCH_FORWARD;
             }
             return 0;
         }
@@ -350,19 +375,19 @@ i32 textEntryWidget::Main(struct tag_message& message) {
                 case WIDGET_COMMAND_SET_TEXT:
                     if (message.payload.widget.id == m_id) {
                         SetText(message.payload.widget.data.text);
-                        return 1;
+                        return WIDGET_DISPATCH_CONSUME;
                     }
                     break;
                 case WIDGET_COMMAND_GET_TEXT:
                     if (message.payload.widget.id == m_id) {
                         message.payload.widget.data.text = m_text;
-                        return 1;
+                        return WIDGET_DISPATCH_CONSUME;
                     }
                     break;
                 case WIDGET_COMMAND_SET_MAX_LENGTH:
                     if (message.payload.widget.id == m_id) {
                         m_maxLength = static_cast<u16>(message.payload.widget.data.value);
-                        return 1;
+                        return WIDGET_DISPATCH_CONSUME;
                     }
                     break;
             }
@@ -373,8 +398,8 @@ i32 textEntryWidget::Main(struct tag_message& message) {
 
 VA(0x004d9410, 0x160)
 void textEntryWidget::Draw(void) {
-    if (m_entryType == 3) {
-        char display[600];
+    if (m_entryType == TEXT_ENTRY_READ_MULTILINE) {
+        char display[EDIT_BUFFER_CAPACITY];
         strcpy(display, m_text + m_displayOffset);
         u32 length = strlen(display);
         if (m_font->LineWidth(display) > m_innerW) {
@@ -395,7 +420,7 @@ void textEntryWidget::Draw(void) {
         );
     } else {
         m_icon->DrawToBuffer(m_rectX + m_owner->m_posX, m_rectY + m_owner->m_posY, m_iconFrame, 0);
-        i32 color = 3;
+        i32 color = DIMMED_COLOR;
         if ((m_flags & WIDGET_FLAG_DIMMED) == 0)
             color = m_color;
         m_font->DrawBoundedString(
@@ -414,7 +439,7 @@ VA(0x004d9570, 0x1be)
 void textEntryWidget::SetupDisplayString(char* source, u16 cursor) {
     if (KBTickCount() > glTimers[0]) {
         m_cursorBlink = 1 - m_cursorBlink;
-        glTimers[0] = KBTickCount() + 360;
+        glTimers[0] = KBTickCount() + CURSOR_BLINK_TICKS;
     }
     if (cursor != 0)
         strncpy(m_text, source, cursor);
@@ -427,9 +452,9 @@ void textEntryWidget::SetupDisplayString(char* source, u16 cursor) {
     else
         m_text[cursor + 1] = 0;
 
-    if (m_entryType == 3) {
+    if (m_entryType == TEXT_ENTRY_READ_MULTILINE) {
         i32 shifted;
-        char display[300];
+        char display[DISPLAY_BUFFER_CAPACITY];
         do {
             shifted = 0;
             strcpy(display, m_text + m_displayOffset);

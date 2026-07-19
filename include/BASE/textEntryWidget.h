@@ -15,6 +15,10 @@ H2_ENUM_BEGIN(TextEntryReadMode)
     TEXT_ENTRY_READ_INSET_FOUR = 5
 H2_ENUM_END(TextEntryReadMode)
 
+H2_ENUM_BEGIN(TextEntryLayout)
+    TEXT_ENTRY_LAYOUT_INSET = 4
+H2_ENUM_END(TextEntryLayout)
+
 #pragma pack(push, 1)
 class resource;
 class icon;
