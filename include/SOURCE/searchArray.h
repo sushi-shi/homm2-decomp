@@ -12,6 +12,12 @@ H2_ENUM_BEGIN(SearchConstant)
     SEARCH_DIRECTION_MASK             = 7,
     SEARCH_QUEUE_CAPACITY             = 1024,
     SEARCH_PATH_CAPACITY              = 256,
+    SEARCH_FLAG_BIT_COUNT             = 1,
+    SEARCH_DIRECTION_BIT_COUNT        = 4,
+    SEARCH_CELL_PAD_SIZE              = 4,
+    SEARCH_PATH_HEADER_SIZE           = 3,
+    SEARCH_AI_PATH_HEADER_SIZE        = 4,
+    SEARCH_COMBAT_HEX_COUNT           = 117,
     SEARCH_MAX_COST                   = 999999,
     SEARCH_TARGET_COST_WINDOW         = 75,
     SEARCH_MONSTER_RESEED_WINDOW      = 300,
@@ -45,8 +51,8 @@ H2_ENUM_END(SearchConstant)
 struct searchCell {
     u16 cost;
     u16 previous;
-    u8 flags : 1;
-    char pad[4];
+    u8 flags : SEARCH_FLAG_BIT_COUNT;
+    char pad[SEARCH_CELL_PAD_SIZE];
 };
 #pragma pack(pop)
 SIZE(searchCell, 9);
@@ -55,12 +61,12 @@ union searchStorage {
     struct searchCell* cells;
     struct searchNode* nodes;
     struct {
-        char pad[3];
+        char pad[SEARCH_PATH_HEADER_SIZE];
         i8 directions[SEARCH_PATH_CAPACITY + 1];
     } path;
     struct {
-        char pad[4];
-        i8 directions[0x100];
+        char pad[SEARCH_AI_PATH_HEADER_SIZE];
+        i8 directions[SEARCH_PATH_CAPACITY];
     } aiPath;
 };
 
@@ -69,11 +75,11 @@ struct searchNode {
     u8 x;
     u8 y;
     u16 distance;
-    u8 visited : 1;
-    u8 unknownFlag : 1;
-    u8 rvFlag1 : 1;
-    u8 rvFlag2 : 1;
-    u8 direction : 4;
+    u8 visited : SEARCH_FLAG_BIT_COUNT;
+    u8 unknownFlag : SEARCH_FLAG_BIT_COUNT;
+    u8 rvFlag1 : SEARCH_FLAG_BIT_COUNT;
+    u8 rvFlag2 : SEARCH_FLAG_BIT_COUNT;
+    u8 direction : SEARCH_DIRECTION_BIT_COUNT;
     union {
         struct {
             u8 adjacentMonsterX;
@@ -119,10 +125,10 @@ public:
     searchNode m_queue[SEARCH_QUEUE_CAPACITY];
     searchStorage m_storage;
     searchNode* GetRow(i32 y, i32 width) {
-        return m_storage.nodes + y * (width | 0);
+        return m_storage.nodes + y * width;
     }
     searchNode& GetNode(i32 x, i32 y) {
-        return *(m_storage.nodes + y * (MAP_WIDTH | 0) + x);
+        return *(m_storage.nodes + y * MAP_WIDTH + x);
     }
     searchArray(void);
     ~searchArray();
@@ -143,6 +149,6 @@ public:
 };
 #pragma pack(pop)
 SIZE(searchArray, 0x2518);
-extern u8 bIsMoatSlowed[117];
+extern u8 bIsMoatSlowed[SEARCH_COMBAT_HEX_COUNT];
 
 #endif
