@@ -561,7 +561,7 @@ void combatManager::CastSpell(
     i32 targetIndex_k;
     SpellType soundSpell_q;
     i32 armyIndex;
-    char sampleName_i[16];
+    char sampleName_i[SPELL_SAMPLE_NAME_CAPACITY];
     SAMPLE2 spellSample;
     i32 targetY_b;
     i32 targetX_b;
@@ -575,7 +575,7 @@ void combatManager::CastSpell(
     char* lightningArmyName_d;
     char* magicArrowArmyName_n;
     char* coldRayArmyName_f;
-    float missileAngles[9];
+    float missileAngles[SPELL_MISSILE_ANGLE_COUNT];
 
     if (castByCreature == 0 && m_eagleEyeSpell[1 - m_currentSide] == -1
         && m_heroes[1 - m_currentSide] != NULL && !m_heroes[1 - m_currentSide]->HasSpell(spell)
@@ -583,7 +583,7 @@ void combatManager::CastSpell(
                != IDX(HERO_SKILL_LEVEL_NONE)
         && m_heroes[1 - m_currentSide]->m_secondarySkills[IDX(HERO_SKILL_EAGLE_EYE)] + 1
                >= gsSpellInfo[IDX(spell)].level) {
-        if (SRandom(0, 9)
+        if (SRandom(0, SPELL_EAGLE_EYE_ROLL_MAX)
             <= m_heroes[1 - m_currentSide]->m_secondarySkills[IDX(HERO_SKILL_EAGLE_EYE)]) {
             m_eagleEyeSpell[1 - m_currentSide] = static_cast<i16>(spell);
         }
@@ -731,7 +731,7 @@ void combatManager::CastSpell(
                     sprintf(gText, "telptin.82m");
                     spellSample = LoadPlaySample(gText);
                 }
-                if (HAS(teleportArmy_i->m_monster.flags.all, MonsterFlags(IDX(ARMY_FLAG_WIDE)))
+                if (HAS(teleportArmy_i->m_monster.flags.all, MONSTER_FLAGS_WIDE)
                     != 0) {
                     adjacentHex_q = teleportDestination;
                     if (teleportArmy_i->m_facing == ARMY_FACING_RIGHT) {
@@ -2863,7 +2863,7 @@ void combatManager::MirrorImage(i32 targetHex) {
             if (sourcePart == 0) {
                 searchHex = source->m_hex;
             } else {
-                if (HAS(source->m_monster.flags.all, MonsterFlags(IDX(ARMY_FLAG_WIDE))) == 0)
+                if (HAS(source->m_monster.flags.all, MONSTER_FLAGS_WIDE) == 0)
                     continue;
                 if (source->m_facing == ARMY_FACING_RIGHT)
                     searchHex = source->m_hex + 1;
