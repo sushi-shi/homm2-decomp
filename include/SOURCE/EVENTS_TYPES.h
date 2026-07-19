@@ -39,4 +39,4 @@ struct combatRemoteHeroFragment {
 SIZE(combatRemoteData, COMBAT_REMOTE_HEADER_SIZE);
 SIZE(combatRemoteHeroFragment, COMBAT_REMOTE_HERO_FIRST_SIZE + 1);
 
-#endif // HOMM2_EVENTS_TYPES_H
+#endif

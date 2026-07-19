@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_Re\REQUEST.OBJ   from: (directly linked into exe)
-// functions: 16   data: 6
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <fcntl.h>
 #include <io.h>
@@ -35,9 +30,7 @@ H2_ENUM_CLASS_BEGIN(RequesterIconFrame)
 H2_ENUM_CLASS_END(RequesterIconFrame)
 
 // @early-stop
-// @early-stop-reloc-only
-// All 0x80 relocation-masked bytes and eight ordered relocation sites/effective
-// targets agree; residuals are CRT/compiler-local symbol spellings only.
+// @early-stop-reloc-only: relocation naming only.
 VA(0x0048c920, 0x80)
 i32 GetMapHeader(char* filename, struct SMapHeader* header) {
     sprintf(gText, "%s%s", gcMapPath, filename);
@@ -56,10 +49,7 @@ i32 CheckSumIsDemoOK(char*) {
 }
 
 // @early-stop
-// @early-stop-reloc-only
-// All relocation-masked bytes in the retail extent, the 0x134 frame/slots,
-// CFG, and four ordered effective targets agree. Only the pooled "BROKENA"
-// and _strcmpi compiler/import aliases differ.
+// @early-stop-reloc-only: relocation naming only.
 VA(0x0048c9bb, 0xbb)
 i32 ShowThisMapGame(char* filename) {
     return 1;
@@ -84,15 +74,7 @@ i32 ShowThisMap(char*) {
     return 1;
 }
 
-// @semantic
-// Both enumeration passes, allocation, sorted insertion, extensions, and
-// map-header population are complete; the 0x65c frame, aggregate/local slots,
-// CFG, and all 53 ordered effective relocation targets agree. The first
-// executable residual is the map-size comparison: base emits a local jne,
-// while retail emits je followed by two continuation jumps. Negative and
-// combined-positive predicates were tried; splitting nested positive arms
-// lowered the match materially. Revisit if REQUEST TU state or inline
-// continuation normalization changes.
+// @semantic: first executable residual is the map-size comparison: base emits a local jne.
 VA(0x0048ca91, 0x7c1)
 i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly) {
     char fullPath[FILE_REQUESTER_PATH_SIZE];
@@ -311,10 +293,7 @@ void fileRequester::Close(void) {
 }
 
 // @early-stop
-// @early-stop-reloc-only
-// All relocation-masked bytes, the 0x44 frame/slots, CFG, and 47 ordered
-// effective targets agree. Only pooled-string and _strcmpi import aliases
-// differ.
+// @early-stop-reloc-only: relocation naming only.
 VA(0x0048d5e1, 0x466)
 i32 fileRequester::Open(i32 id) {
     strcpy(gLastFilename, "");
@@ -437,15 +416,7 @@ void fileRequester::SetOK(i32 enabled) {
     m_window->BroadcastMessage(message);
 }
 
-// @semantic
-// Key, click, hover/help, filters, filename editing, knob/list selection,
-// saved-game validation, and executive exit are complete. The primary retail
-// slots and all 76 jump-table-excluded external relocations agree. Base's 0x41c
-// frame lacks one retail compiler-generated FP temporary below this; adding a
-// source local shifts real slots and is invalid. The first executable residual
-// is the key-up selected/top comparison polarity. Empty positive <= and >=
-// arms and moving click behind hover/help were rejected by lower scores.
-// Revisit if switch/FP lowering or REQUEST TU state changes.
+// @semantic: first executable residual is the key-up selected/top comparison polarity.
 VA(0x0048daec, 0x11ae)
 i32 fileRequester::Main(struct tag_message& message) {
     i32 acceptStep = 0;
@@ -884,9 +855,7 @@ i32 fileRequester::Main(struct tag_message& message) {
 }
 
 // @early-stop
-// @early-stop-reloc-only
-// All 228 relocation-masked instructions, the 0x94 frame/slots, CFG, and 36
-// ordered effective targets agree. Only the FP-adjust compiler alias differs.
+// @early-stop-reloc-only: relocation naming only.
 VA(0x0048ec9a, 0x2e8)
 void fileRequester::DoKnob(void) {
     i32 oldTopIndex = m_topIndex;
@@ -940,11 +909,7 @@ void fileRequester::DoKnob(void) {
     Update(1);
 }
 
-// @semantic
-// Complete 0x1bc frame/slots and CFG; all 71/71 relocation owners/addends agree.
-// First divergence is at +0x81: retail loads giMapSizeFilter then compares the
-// loop index against EAX, while candidate loads the loop index then compares the
-// global against EAX. The equivalent operand order shifts later relocation sites.
+// @semantic: First divergence is at +0x81: retail loads giMapSizeFilter then compares the loop index against EAX.
 VA(0x0048ef82, 0xc42)
 void fileRequester::Update(i32 drawWindow) {
     tag_message broadcastMessage;
@@ -1125,11 +1090,7 @@ void fileRequester::Update(i32 drawWindow) {
     }
 }
 
-// @semantic
-// Complete 0x15b body, 0x4 frame/this slot, CFG, and all 12 ordered relocations
-// agree. At +0x3c retail keeps the positive fileCount > selectedIndex test as
-// `jg`; base canonicalizes the equivalent invalid guard to `jl`. Positive-arm,
-// negated-positive, and explicit !(>) spellings were exhausted.
+// @semantic: compiler-shape residual.
 VA(0x0048fbc4, 0x15b)
 char* fileRequester::GetFilename(void) {
     if (m_mode != FILE_REQUESTER_SAVE_GAME
@@ -1154,25 +1115,10 @@ char* fileRequester::GetFilename(void) {
     return m_filename;
 }
 
-// ===== vtable fileRequester : public baseManager  (3 slots) =====
-//  [ 0] VA(0x0048d5e1, 0x466)  int fileRequester::Open(int)   <- override (implements baseManager pure virtual)
-//  [ 1] VA(0x0048d556, 0x8b)  void fileRequester::Close(void)   <- override (implements baseManager pure virtual)
-//  [ 2] VA(0x0048daec, 0x11ae)  int fileRequester::Main(struct tag_message &)   <- override (implements baseManager pure virtual)
 
-// ---- vtables (compiler-emitted; census) ----
 VTBL(fileRequester, 0x004eb888);
 
-// @data-layout-note Retail initialized storage is 0xf8674..0xf8900.
-// Thirty-six private owners plus giMapSizeFilter and cFRDummy cover all
-// non-alignment bytes. cFRDummy's stored pointer proves its empty-string owner
-// at 0xf88e4. In Main, the first absolute relocation proves the empty string at
-// 0xf8710; the later corresponding strcpy site proves the copy at 0xf87b0.
-// Both candidate addends are zero. The remaining owners have singleton
-// relocation or unique-payload proof. The final three retail bytes are zero
-// alignment. Both rdata contributions and the 0xc-byte BSS contribution are
-// already exact; do not model alignment with a fake owner.
 
-// ---- globals (definitions, RVA order) ----
 DATA(0x004f8674) FileRequesterMapSizeFilter giMapSizeFilter = FILE_REQUESTER_MAP_SIZE_ALL;
 DATA(0x004f88c4) char* cFRDummy = "";
 DATA(0x0052857c) float fGutterMinY;

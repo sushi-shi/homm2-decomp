@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_Re\HERO.OBJ   from: (directly linked into exe)
-// functions: 41   data: 5
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <io.h>
 #include <stdio.h>
@@ -149,14 +144,7 @@ i32 hero::HasSpell(SpellType spell) {
     return 0;
 }
 
-// @semantic: The 0x0c frame, count/spell/this slots at -0x04/-0x08/-0x0c,
-// CFG, and all 3/3 relocations agree. The first non-relocation residual is +0x9b:
-// retail loads the count and compares the second argument, while this build loads
-// the second argument and compares the count (two displacement bytes, same equality).
-// Operand swaps, the AST permuter, semantic identifier changes, unary-plus,
-// subtraction, and an explicit continue shape did not retain an improvement. The
-// two gsSpellInfo relocations resolve to the same attributes bytes through retail's
-// interior const_000fbe8d label; the remaining delta is TU code-selection noise.
+// @semantic: first non-relocation residual is +0x9b: retail loads the count and compares the second argument.
 VA(0x0046c86c, 0xc5)
 SpellType hero::GetNthSpell(i32 type, i32 spellNumber) {
     i32 spell;
@@ -178,10 +166,7 @@ SpellType hero::GetNthSpell(i32 type, i32 spellNumber) {
     return SPELL_NONE;
 }
 
-// @early-stop
-// All 0xd0 bytes match after masking the two aligned COFF relocations.
-// Both relocation targets agree; retail delinks gsSpellInfo[0].attributes as the interior
-// label const_000fbe8d while the typed source uses gsSpellInfo with addend 0x15.
+// @early-stop: delinker artifact.
 VA(0x0046c931, 0xd0)
 i32 hero::GetNumSpells(i32 type) {
     i32 numAdventureSpells;
@@ -383,20 +368,7 @@ i32 hero::Dismiss(void) {
     return 0;
 }
 
-// @semantic: Semantics, the 0x20 frame,
-// player/playerHeroIndex/heroOwner/index/occupiedTown/availableHeroSlot/mapCell
-// slots at -0x04/-0x08/-0x0c/-0x10/-0x14/
-// -0x18/-0x1c, CFG, and all 44/44 relocation targets agree. First divergence is
-// +0x122: retail has a five-byte inline continuation before the occupied-town lookup.
-// Removing the alias-only event bitfields also changes the existing GetCell inline expression's
-// instruction order while preserving its value and stack slot. Two later continuations still
-// differ around cursor clearing/map-cell materialization. Retail expands both final flag masks
-// to load/OR-or-AND/store, while whole-word compound and explicit assignments select memory
-// operations. The removed 32-bit/split bitfield aliases were also tried; the residual is
-// compiler-selected accessor and mask-operation shape.
-// A post-95 40-walk AST pass retained no mutation. An isolated eight-trial
-// TU-state sweep also found no audited exact closure; generated probes were
-// discarded. Revisit only after a material accessor or shared-layout change.
+// @semantic: First divergence is +0x122: retail has a five-byte inline continuation before the occupied-town lookup.
 VA(0x0046cee8, 0x587)
 void hero::Deallocate(i32 updateMap) {
     i32 availableHeroSlotCurrent;
@@ -538,11 +510,7 @@ i32 hero::GetExperience(i32 level) {
     return experience;
 }
 
-// @semantic: Complete extrapolation behavior, 0x10 frame/slots, CFG, and all
-// eight ordered relocations align. At +0x7b retail loads experienceValue and
-// compares the local experience with JGE; base loads experience and compares
-// the argument with JLE. Direct and reversed source inequalities compile
-// byte-identically; remaining differences are the local double-pool identity.
+// @semantic: compiler-shape residual.
 VA(0x0046d50d, 0xc0)
 i32 hero::GetLevel(i32 experienceValue) {
     i32 experience;
@@ -569,13 +537,7 @@ i32 hero::GetLevel(i32 experienceValue) {
     return levelCounter - 1;
 }
 
-// @semantic: Semantics, the 0x04 frame with this at -0x04, CFG, and the
-// zero-relocation set agree. First divergence is +0x37: retail reads m_eventFlags,
-// subtracts 0x20 in EAX, and writes it back (18 bytes after the common this load),
-// while base emits a seven-byte memory SUB. The same 11-byte shortening repeats for
-// all twelve cleared temporary flags; morale/luck updates, order, tests, and branches
-// otherwise agree. Tried `-=`, explicit `field = field - flag`, addition of a negative
-// flag, and a 32-bit bitfield declaration; all select the same memory SUB lowering.
+// @semantic: First divergence is +0x37: retail reads m_eventFlags, subtracts 0x20 in EAX.
 VA(0x0046d5cd, 0x254)
 void hero::ApplyBattleWinTemps(void) {
     m_lastTownInteractionTurn = HERO_INTERACTION_TURN_NONE;
@@ -636,26 +598,7 @@ void hero::ApplyBattleLossTemps(void) {
     ApplyBattleWinTemps();
 }
 
-// @early-stop
-// Semantics, CFG, the 0x118 frame, line/statBonuses/newLevel/
-// levelsGained/currentLevel/sample/index/highLevel/skillChoices/attempts/skillIndex/
-// skillWeight/randomValue slots at -0xc8/-0xd8/-0xdc/-0xe0/-0xe4/-0xec..-0xe8/
-// -0xf0/-0xf4/-0xfc..-0xf8/-0x100/-0x104/-0x108/-0x10c, and all 58/58
-// relocation targets agree. First code divergence is +0x4be: retail adds a five-byte
-// jump through its local trampoline at +0x81e, which adds the second five-byte jump
-// back to the search-loop cleanup; base jumps directly to cleanup. Function sizes differ
-// by exactly those 10 bytes and every non-jump opcode, operand, and visible stack offset
-// agrees. Empty-positive/else outer flow, branch polarity, regular `break`, indexed Wisdom
-// assignment, real table typing, and computed stack-name/declaration order were tried;
-// only the byte-proven local-label/trampoline shape remains. The current audit
-// reproduced the 0x81e base/0x828 retail spans and 58/58 external relocation
-// targets without replaying exhausted forms. A post-95
-// 30-walk AST pass retained no mutation. Fresh masked disassembly reconfirmed
-// the two jumps as the only non-relocation instruction differences. Ordered
-// COFF audit proves the disputed +0xc3 relocation: base cHeroLevel+4 and retail
-// ??_C@_03HHHK... both resolve to RVA 0xff29c. symbol_names classifies the
-// retail identity as a pe-reloc-constant at that interior pointer slot; the
-// retail PE stores 0x50cb24 there, the " a level.\n" cHeroLevel[1] string.
+// @early-stop: byte-proven compiler artifact.
 VA(0x0046d83f, 0x828)
 void hero::CheckLevel(void) {
     i32 statBonuses[HERO_PRIMARY_STAT_COUNT];
@@ -846,17 +789,7 @@ i32 hero::NumArtifacts(void) {
     return cnt;
 }
 
-// @semantic: Semantics, the 0x10 frame, army/secondary-skill slots at
-// -0x04/-0x08, message at -0x0c, switch CFG, and all 150 external relocation
-// identities/counts agree. Base is 0x766 bytes versus retail 0x758. The first
-// normalized divergence is +0x390: equivalent army-type equality operands load
-// giHeroScreenSrcIndex first in base and armySlot first in retail; reversing the
-// source equality is byte-neutral. Near +0x583, base lowers the third skill-row
-// range with jl plus two continuation jumps while retail uses a direct jge;
-// splitting the two invalid-range guards regressed to 0x775 bytes. Prior direct
-// bounds, polarity forms, a 30-walk AST pass, and eight TU-state trials also
-// found no closure. Revisit only after a material HERO predecessor/header or
-// comparison-tool change.
+// @semantic: first residual is army-type equality load order at +0x390.
 VA(0x0046e0be, 0x758)
 void UpdateHeroScreenStatusBar(struct tag_message& message) {
     i32 armySlot;
@@ -1054,20 +987,7 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
     HeroMessageUpdate(gText);
 }
 
-// @semantic: Complete message, hero-cycle, stat, army, artifact, skill,
-// formation, and exit behavior. Retail and base both use a 0x60 frame: message is
-// at -0x4c, exit/quick-view at -0x10/-0x18, army temporaries at -0x08/-0x0c,
-// secondary skill at -0x14, hero position at -0x1c, experience temporaries at
-// -0x20/-0x24, and canDismiss at -0x48. The unused tag_message and scalar recover
-// retail's -0x28..-0x44 handler scratch span. All 23 callee identities/counts and
-// the main jump table agree; the relocation multiset differs only by retail's two
-// extra gpHVHero loads in the formation assignments. Retail call order places the
-// ViewArmy body before transfer/split, recovered with the positive view condition.
-// The direct direction ternary recovers retail's `sbb; and -2; inc` hero-cycle
-// arithmetic and raised the retained score from 94.00%. Residuals are hover
-// operand load order, two local continuations, and the two load/modify/store
-// formation updates; reversing the hover equality was byte-neutral. An isolated
-// eight-trial TU-state sweep found no audited exact closure.
+// @semantic: differs only by retail's two extra gpHVHero loads in the formation assignments.
 VA(0x0046e816, 0xaef)
 i32 HeroHandler(struct tag_message& message) {
     i32 handlerValue16;
@@ -1463,10 +1383,7 @@ void RedrawHeroScreen(void) {
     gpWindowManager->UpdateScreenRegion(0, 0, HERO_UI_SCREEN_WIDTH, HERO_UI_SCREEN_HEIGHT);
 }
 
-// @semantic: Complete behavior, 0x08 frame/slots, CFG, and all 47 ordered
-// relocations align. Retail evaluates gpHVHero->m_owner before gpCurPlayer->m_id
-// for the ownership comparison; base evaluates them in reverse. The remaining
-// relocation identity is the TU-local coalesced herowind.bin literal.
+// @semantic: compiler-shape residual.
 VA(0x0046f354, 0x218)
 i32 HeroView(i32 heroId, i32 noDismiss, i32 fadeAlreadyOut) {
     mapCell* heroCell;
@@ -1511,23 +1428,7 @@ i32 HeroView(i32 heroId, i32 noDismiss, i32 fadeAlreadyOut) {
     }
 }
 
-// @semantic: Complete title, hero-cycle, stat, dismissal, portrait,
-// luck, morale, experience, formation, spell-point, crest, army, secondary-
-// skill, artifact, and status-message behavior. The retail 0x58 frame is
-// restored with distinct luck, morale, and skill-bonus locals. All 143
-// relocation sites agree; the two gSecondarySkillLevels entries resolve to
-// retail's interior const_000ff87c label. The built body is five bytes larger
-// from one equivalent hero-cycle condition trampoline. The first normalized
-// instruction difference is at +0x1b4 after comparing m_heroCount with one:
-// ours emits je (0f 84), retail emits jne (0f 85), so the first differing raw
-// byte is +0x1b5; opposite arm order selects the same enable/disable values.
-// Later differences are dismissal and formation assignment load order and the
-// repeated modifier-icon comparisons. The player-color inline accessor
-// continuation is present, with its jump placed before rather than after the
-// field load. Structural recovery and direct source-polarity steering are
-// exhausted. A post-95 30-walk AST pass retained no mutation, and an isolated
-// eight-trial TU-state sweep found no audited exact closure. The remaining
-// differences are TU-cumulative compiler shape.
+// @semantic: evaluation-order residual.
 VA(0x0046f56c, 0x9c5)
 void SetupHeroView(void) {
     i32 cannotDismiss;
@@ -1782,10 +1683,7 @@ void SetupHeroView(void) {
     UpdateHeroScreenStatusBar(statusMessage);
 }
 
-// @semantic: Complete split behavior, 0x18 frame/slots, CFG, and all 50 ordered
-// relocations align. Raw review finds two exchanged local stack-displacement
-// bytes at +0x18c/+0x19a; lite disassembly otherwise differs only in local
-// string-literal identities.
+// @semantic: differs only in local string-literal identities.
 VA(0x0046ff31, 0x2b0)
 void DoHeroSplit(i32 destinationSlot, i32 sourceSlot) {
     i16 splitTextSlot = HERO_UI_SPLIT_TEXT;
@@ -1842,12 +1740,7 @@ void hero::SetSS(i32 skill, i32 level) {
         GiveSS(skill, level);
 }
 
-// @semantic: The complete 71-instruction CFG, 0x0c frame, oldLevel/otherSkill/
-// this slots, and zero relocation sites agree. At +0xb7/+0xba retail loads
-// otherSkill from -0x08 into EAX and this from -0x0c into ECX for the decrement
-// SIB; ours assigns those registers in reverse. Reversing the subscript to
-// otherSkill[m_secondarySkillOrder] compiled byte-identically. Revisit after a
-// HERO TU-state change or in the byte-last-mile phase.
+// @semantic: compiler-shape residual.
 VA(0x0047024b, 0xfa)
 i32 hero::TakeSS(i32 skill, i32 levels) {
     i32 oldLevel;
@@ -1965,9 +1858,7 @@ i8 hero::GetSSLevel(i32 skill) {
 }
 
 // @early-stop
-// @early-stop-reloc-only
-// All 0xf4 relocation-masked bytes and all 11 ordered relocation sites/effective
-// targets agree; objdiff differs only on the compiler-local long format literal.
+// @early-stop-reloc-only: relocation naming only.
 VA(0x00470685, 0xf4)
 void hero::DoSSLevelDialog(i32 skill, i32 quickView) {
     i32 skillBonusValue;
@@ -2041,22 +1932,6 @@ void hero::CheckAnduranPieces(i32 showDialog) {
     }
 }
 
-// @data-layout-note Retail and candidate .data are both 0xf6c88+0x458.
-// Moving the candidate 0x18-byte gMinExpForLevel table from +0x8 to retail
-// +0x48, ahead of the candidate +0x20..+0x60 literal pool, translates the
-// complete payload exactly. Translated and retail SHA-256 are
-// 1569dd769d4201aed37a68372a558fb95075f4c4d221238e4b1fbae32845a142.
-// The 27 local allocations each have one zero-addend reference at the mapped
-// retail RVA. gheroWin has 5 exact zero-addend references. The table's 8
-// references also match at owner-relative addends -2 (2), +0x14 (2), and +0x16
-// (4). Candidate gpHVHero has 136 zero-addend references versus retail's 138;
-// this is incomplete function-body coverage, not missing or aliased storage.
-// Candidate BSS is 0x8 versus retail's 0xc contribution: iOrigHeroViewID has one
-// and gbNoDismiss two exact zero-addend references, followed by a retail
-// four-byte loader-zero tail. The 0x8 .rdata constant is byte-exact (SHA-256
-// 9fbabc0d08aa3515342ef4669b29ff3d6a8ae8ef8ad05a606e81c43d383fc723)
-// with four zero-addend references. Preserve these owners and natural compiler
-// allocation order; do not add aliases, padding owners, or section pragmas.
 DATA(0x004f6c88) class hero* gpHVHero = 0;
 DATA(0x004f6c8c) class heroWindow* gheroWin = 0;
 DATA(0x004f6cd0) i16 gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT] =

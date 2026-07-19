@@ -3,9 +3,6 @@
 
 #include <Ints.h>
 #include <SOURCE/REMOTE_TYPES.h>
-// Declarations of the free functions DEFINED in SETUP.cpp — the single home for these
-// symbols. Other TUs call them by including this header (no local externs).
-// forward declarations (was <_all.h>):
 struct tag_message;
 
 H2_ENUM_BEGIN(SetupConstant)
@@ -64,7 +61,6 @@ i32 ExpLoadCampaignHandler(struct tag_message&);
 i32 ExpStdGameHandler(struct tag_message&);
 i32 BaseSetupHandler(struct tag_message&);
 
-// ---- globals (declarations, RVA order) ----
 extern b32 gbDoModemConfig;
 
-#endif // HOMM2_SETUP_H
+#endif

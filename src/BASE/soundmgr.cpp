@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_RE\soundmgr.obj   from: .\basewin.lib
-// functions: 34   data: 11
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <BASE/soundManager.h>
 #include <BASE/sample.h>
@@ -18,10 +13,8 @@
 #include <windows.h>
 #include <BASE/Misc.h>
 
-// __FILE__ for the NWC memory/assert tracking (reloc-masked path string).
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\soundmgr.cpp"
 
-// ---- module-private synthetic globals (retail xref: single-module) ----
 DATA(0x00534970) static PCMWAVEFORMAT gWaveFormat; // digital-driver PCM format (WAVE_init_driver)
 
 H2_ENUM_CLASS_BEGIN(SoundStateSpan)
@@ -64,10 +57,7 @@ void soundManager::ValidatePreviousPosition(i32 track) {
 }
 
 // @early-stop
-// @early-stop-reloc-only
-// All 0x13c relocation-masked bytes, the 0x18 frame/slots/CFG, and all 25
-// ordered relocation sites/effective targets agree. Residual identities are
-// local strings and the _stricmp/_strcmpi alias at the same retail address.
+// @early-stop-reloc-only: relocation naming only.
 VA(0x004cb770, 0x13c)
 void soundManager::CDStop(void) {
     char position[20];
@@ -91,10 +81,7 @@ void soundManager::CDStop(void) {
 }
 
 // @early-stop
-// @early-stop-reloc-only
-// All 0xb3 relocation-masked bytes, the 0x04 this slot/CFG, and all 13 ordered
-// relocation sites/effective targets agree. Residual identities are local
-// strings and the _stricmp/_strcmpi alias at the same retail address.
+// @early-stop-reloc-only: relocation naming only.
 VA(0x004cb8b0, 0xb3)
 i32 soundManager::CDIsPlaying(void) {
     if (gbNoSound != 0)
@@ -177,10 +164,7 @@ void soundManager::CDSetVolume(i32 volume, i32 fadeScale) {
 }
 
 // @early-stop
-// @early-stop-reloc-only
-// All 0x473 relocation-masked bytes, the 0x30 frame/slots/CFG, and all 86
-// ordered relocation sites/effective targets agree. Residual identities are
-// local strings and the _stricmp/_strcmpi alias at the same retail address.
+// @early-stop-reloc-only: relocation naming only.
 VA(0x004cbc40, 0x473)
 void soundManager::CDPlay(i32 track, i32 resume, i32 volume, i32 restart) {
     i32l t1;
@@ -610,14 +594,7 @@ void soundManager::StopSample(struct _SAMPLE* sample) {
     LogStr("Stop Sample 2");
 }
 
-// @early-stop
-// The explicit 0x202-byte CodeView range is raw-exact after relocation-union masking;
-// retail's enclosing row has two trailing padding bytes. Frame/slots and CFG are exact.
-// Candidate has 23 relocations versus retail's 20: candidate-only calls +0xc8/+0x11a
-// resolve to the linked AIL_set_sample_volume IAT VA 0x0053a78c, and +0x141 resolves
-// to AIL_start_sample at 0x0053a780, exactly the immediates embedded by retail. Other
-// residual identities are local switch labels, three $SG versus delinker-named string
-// constants with the same bytes, and gConfig+0xaa at the same retail VA 0x00528dca.
+// @early-stop: retail alignment artifact.
 VA(0x004ccc80, 0x202)
 void soundManager::ModifySample(struct _SAMPLE* sampleHandle, i16 operation, i32l value) {
     i32 foundChannel;
@@ -976,35 +953,10 @@ i32 soundManager::MusicPlaying(void) {
     }
 }
 
-// ===== vtable soundManager : public baseManager  (3 slots) =====
-//  [ 0] VA(0x004cc560, 0x3a8)  int soundManager::Open(int)   <- override (implements baseManager pure virtual)
-//  [ 1] VA(0x004cc9b0, 0x96)  void soundManager::Close(void)   <- override (implements baseManager pure virtual)
-//  [ 2] VA(0x004cca50, 0x1a)  int soundManager::Main(struct tag_message &)   <- override (implements baseManager pure virtual)
 
-// ---- vtables (compiler-emitted; census) ----
 VTBL(soundManager, 0x004eba20);
 
-// @data-layout-note Retail's initialized soundmgr contribution is
-// RVA 0x11f018..0x11f980 (0x968). Candidate section 2 is one align-eight
-// ordinary .data section of 0x965 bytes. Its public owners are exact at offsets
-// 0, 0x38, 0x68, 0x3ec, 0x3f0, and 0x3f4. Seventy compiler-local $SG owners
-// cover 0x3f8..0x965: thirteen driver-name strings, the 0x100-byte MCI error
-// format, and every later diagnostic literal. Bytes 0x38..0x964 are directly
-// identical to retail. The thirteen pointer slots at 0..0x30 relocate in order
-// to retail VAs 0x0051f410..0x0051f4a4, and the final three contribution bytes
-// are zero alignment. Those thirteen data relocations plus 57 code references
-// cover every local owner; all owner-relative addends are zero. The only rdata
-// owner is the reviewed 0xc soundManager vtable at RVA 0x0eba20; its 0x10
-// contribution includes four bytes of natural alignment.
-// Retail loader-zero storage is 0x134970..0x134bc8 (0x258), ordered as
-// gWaveFormat, lpszReturnString, nMCIError, iLastVolume, and CommandString at
-// offsets 0, 0x10, 0x110, 0x118, and 0x158. Candidate BSS has the exact size and
-// align-eight class, but emits those owners at 0x208, 0x108, 0, 0x218, and 0x8.
-// Their definitions already occur in retail order. Keep the resulting
-// inconsistent-anchor-bases residual instead of inventing aliases, aggregates,
-// padding, pragmas, or fake owners.
 
-// ---- globals (definitions, RVA order) ----
 DATA(0x0051f018) char* digitalDriverNames[14] = {
     "",
     "ultra.dig",

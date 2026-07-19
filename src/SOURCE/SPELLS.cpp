@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_Re\SPELLS.OBJ   from: (directly linked into exe)
-// functions: 37   data: 7
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -47,22 +42,7 @@ i32 combatManager::HasValidSpellTarget(SpellType spell) {
     return 0;
 }
 
-// @semantic: recovered retail body order and CFG, including the
-// in-switch common action block, all four elemental continuation jumps, ordinary
-// switch-break cleanup, and the no-selection scope. The 0x0c frame has
-// elementalType at -0x4, this at -0x8, and the switch temporary at -0x0c. Explicit
-// objdiff ranges align every switch instruction and the embedded tables relative
-// to the function; the first 41 ordered external relocations agree, and the
-// remaining 18 table entries use equivalent delinked local-label targets (62
-// sites total, with three earlier function-local sites). Outside
-// the +0x383..+0x3c3 switch data, raw bytes differ only at +0x45 and +0x41a:
-// the entry no-selection branch and its paired terminal target. Retail jumps
-// directly to the false result, while the
-// equal-size canonical form jumps to the final comparison. Explicit early label,
-// nested return, explicit terminal false label, selected-arm constant returns,
-// reversed comparison operands, and OR-zero comparison spellings added 1-18 bytes,
-// kept the same two-byte residual, or reversed the branch. Revisit only after a
-// material TU-state change.
+// @semantic: branch/code-shape residual.
 VA(0x00420546, 0x44a)
 i32 combatManager::ViewSpells(i32) {
     CreatureType elementalType;
@@ -246,14 +226,7 @@ i32 combatManager::ViewSpells(i32) {
     return m_selectedSpell != SPELL_NONE;
 }
 
-// @semantic: semantics and CFG agree, including hover conversion/cache,
-// common return, and retail case order. There are no source locals: the message
-// reference arrives in ECX and is stored at -0x4; the only other 0x08-frame slot
-// is the implicit switch temporary at -0x8. All external calls/globals are
-// recovered. First residual is after the switch dispatch at +0x31, where delinked
-// help-pointer/table identities truncate the normal diff. Tried early-return and
-// retail positive-arm forms. Revisit only after total SOURCE fuzzy reaches 95%,
-// or earlier if later same-TU structural work changes this function.
+// @semantic: First residual is after the switch dispatch at +0x31.
 VA(0x00420990, 0x15c)
 i32 CombatSpecialHandler(tag_message& message) {
     if (message.type == SPELL_MESSAGE_HOVER) {
@@ -286,16 +259,7 @@ i32 CombatSpecialHandler(tag_message& message) {
     return SPELL_HANDLER_CONTINUE;
 }
 
-// @semantic: complete two-stage teleport, recursive hover,
-// select, and mouse-down/cancel CFG. Reordering the teleport-destination arm and
-// replacing the cancel goto with case fallthrough recovered every middle/tail
-// structural difference. The message reference is at -0x8, hex at -0x4, and the
-// switch temporary at -0x0c. Explicit objdiff ranges align relative instruction
-// positions through the embedded table. The first residual at +0x35 is load order:
-// retail loads hex then compares indexToCastOn, while MSVC canonicalizes both
-// operand spellings to the reverse order. The target delinker also represents the
-// recursive self-call as an intra-function label; external relocation identities
-// otherwise agree. Revisit only after a TU-state change.
+// @semantic: first residual at +0x35 is load order: retail loads hex then compares indexToCastOn.
 VA(0x00420aec, 0x2aa)
 i32 HandleCastSpell(tag_message& message) {
     i32 hex;
@@ -362,15 +326,7 @@ i32 HandleCastSpell(tag_message& message) {
     return SPELL_HANDLER_CONTINUE;
 }
 
-// @semantic: semantics and CFG agree, including the live-first arm and
-// descending corpse scan. The 0x0c frame has target_j at -0x4, corpse at -0x8,
-// and this at -0x0c; arguments are side +0x8, spell +0x0c, and hex +0x10, with no
-// other locals. Both SpellCastWorkChance relocations match. First code residual is
-// the corpse/hex index formation near +0x124: retail forms corpse + 0x61*hex,
-// ours forms 0x62*hex + corpse. Tried empty-first do/while, live-first for, direct
-// army expressions, an army pointer local, and slot suffixes. Revisit only after
-// total SOURCE fuzzy reaches 95%, or earlier if later same-TU structural work
-// changes this function.
+// @semantic: First code residual is the corpse/hex index formation near +0x124: retail forms corpse + 0x61*hex.
 VA(0x00420d96, 0x2e5)
 i32 combatManager::FindResurrectArmyIndex(i32 side, i32 spell, i32 hex) {
     army* target_j;
@@ -401,12 +357,7 @@ i32 combatManager::FindResurrectArmyIndex(i32 side, i32 spell, i32 hex) {
     return SPELL_NO_SELECTION;
 }
 
-// @semantic: all target filters and retail case-body order agree, as do all 37
-// ordered relocation targets. The unused bucket-0 word, target_j, and the real
-// teleportBlocked temporary restore retail's 0x14 frame at -0x4/-0x8/-0x0c,
-// followed by this and the switch temporary. The first executable residual is
-// equivalent occupant side/index multiplication order; direct/pointer forms,
-// cached indices, and both case-body orders were already exhausted.
+// @semantic: first executable residual is equivalent occupant side/index multiplication order.
 VA(0x0042107b, 0x521)
 i32 combatManager::ValidSpellTarget(SpellType spell, i32 hex) {
     army* target_j = 0;
@@ -518,12 +469,7 @@ i32 combatManager::ValidSpellTarget(SpellType spell, i32 hex) {
     return 1;
 }
 
-// @semantic: the 0x10 frame, switch CFG, 27 ordered relocations, and all code
-// outside +0xed..+0x128 agree after current compiler-local normalization. The
-// residual is the occupied-target army address: retail evaluates occupantIndex
-// before occupantSide, while VC4.2 evaluates the equivalent two-dimensional
-// subscript in the reverse order. Flattened index-first addition, OR-zero, and
-// reversed pointer addition compile identically. Revisit after TU-state changes.
+// @semantic: residual is the occupied-target army address: retail evaluates occupantIndex before occupantSide.
 VA(0x0042159c, 0x222)
 void combatManager::SpellMessage(i32 spell, i32 hex) {
     army* target_i;
@@ -565,21 +511,7 @@ void combatManager::SpellMessage(i32 spell, i32 hex) {
     CombatMessage(gText, 1, 0, 0);
 }
 
-// @semantic: The complete dispatch, creature-cast handling, spell-specific
-// bodies, sound/hero animation, cleanup, and final selector CFG agree with retail.
-// All 270 external relocation targets agree. Retail reserves a 0xb4 frame and
-// stores this at -0xa4; ours reserves 0xa8 and stores this at -0x9c. Retail has
-// unreferenced interior words at -0x10 and -0x3c and places the three
-// case-specific army-name pointers at -0x98..-0xa0; ours places those pointers
-// at -0x7c..-0x84, ahead of the switch temporaries. The recovered sample buffer,
-// SAMPLE2, and float[9] ranges otherwise account for every named aggregate. The
-// first normalized residual is the typed
-// gsSpellInfo field relocation versus retail's interior label, followed by one
-// inline continuation jump and side/index multiplication order. Local scopes,
-// direct member expressions, the aggregate shapes, and flattening the final
-// Eagle Eye predicate were audited; flattening was byte-neutral, and fake
-// padding would not recover the interior layout. Revisit for switch/case scope
-// and compiler-slot shaping.
+// @semantic: first normalized residual is the typed gsSpellInfo field relocation versus retail's interior label.
 VA(0x004217be, 0x1eca)
 void combatManager::CastSpell(
     SpellType spell,
@@ -1176,13 +1108,7 @@ void combatManager::CastSpell(
     CheckChangeSelector();
 }
 
-// @semantic: the 0x08 frame, body operands, CFG semantics, and all three ordered
-// relocations agree. The only raw residual is the branch byte at +0x18: retail routes a
-// failed ValidHex test to the shared empty-cell return trampoline at +0x3f,
-// while VC4.2 targets the common epilogue directly. Nested empty/else, two early
-// guards, positive-arm goto, explicit common-tail goto, and scoped label variants
-// were tried; the retained nested early return removes the former +0x40 residual.
-// Revisit only after a material TU-state change.
+// @semantic: only raw residual is the branch byte at +0x18.
 VA(0x00423688, 0xda)
 void combatManager::DefaultSpell(i32 targetHex) {
     if (ValidHex(targetHex)) {
@@ -1194,12 +1120,7 @@ void combatManager::DefaultSpell(i32 targetHex) {
     }
 }
 
-// @early-stop
-// Complete 0x623 body, 0x5c frame/slots, 422-instruction CFG, and all 51 ordered
-// relocations align. The only executable residual at +0x366..+0x371 is the
-// equivalent affectedCount[-0xc]/frame[-0x18] loop comparison: retail loads the
-// bound and uses `jge`, while ours loads the index and uses `jle`. Reversed
-// relational and OD_STEER(affectedCount) forms were byte-neutral; revisit on TU change.
+// @early-stop: byte-proven compiler artifact.
 VA(0x00423762, 0x623)
 void combatManager::Fireball(i32 targetHex, SpellType spell) {
     if (!ValidHex(targetHex))
@@ -1506,23 +1427,7 @@ void combatManager::ElementalStorm(void) {
     }
 }
 
-// @semantic: complete damage, palette
-// brighten/fade, 15-step shake,
-// buffer copy, redraw, cleanup, and PowEffect CFG. Retail and ours both use a
-// 0x120 frame, emit 573 instructions, and have the same 79 relocation targets.
-// Retail slots base/affected/side/index/target/damage at
-// -0x8/-0x24/-0x2c/-0x10/-0x14/-0x30; the current semantic suffix pass has
-// -0x8/-0x1c/-0x24/-0x28/-0x10/-0x2c. First non-relocation stream divergence
-// is retail +0x6d4 in source-buffer address evaluation; a later unsigned fade
-// comparison has opposite block polarity. Tried cached and repeated palette
-// components, signed/unsigned empty-arm fades, pointer-addition order, and one
-// od_slots suffix pass. Retail +0x1c0 branches straight to +0x7e5 when
-// gbNoShowCombat is set; from there PowEffect at +0x81e and both palette Data
-// calls at +0x826/+0x831 are unguarded, followed by restore/dispose/delete and
-// ShowColorPointer. This preserves retail's unsafe no-show path deliberately.
-// The army pointer is assigned before SpellCastWorks on every nonempty combat
-// stack iteration, and retail likewise calls PowEffect without the affected
-// flag guarding it. Revisit at 95%; do not add guards or permute these paths.
+// @semantic: First non-relocation stream divergence is retail +0x6d4 in source-buffer address evaluation.
 VA(0x00424449, 0x9ff)
 void combatManager::Armageddon(void) {
     i32 baseDamage2 = m_spellPower[m_currentSide] * SPELL_ARMAGEDDON_DAMAGE_PER_POWER;
@@ -1717,12 +1622,7 @@ void combatManager::Armageddon(void) {
     gpMouseManager->ShowColorPointer();
 }
 
-// @early-stop
-// Complete 0x101 body, 0x4 frame/slot, 86-instruction CFG, and all 23 ordered
-// relocations align. The only executable residual at +0x17..+0x2f computes the
-// same m_limitCreatureCount element: retail loads target index (+0xea) before
-// side (+0xe6), while ours loads side first. Reversed indexing and three flat/
-// pointer-addition spellings were byte-neutral or worse; revisit on TU change.
+// @early-stop: byte-proven compiler artifact.
 VA(0x00424e48, 0x101)
 void combatManager::TurnToStone(army* target) {
     ResetLimitCreature();
@@ -1824,15 +1724,7 @@ void combatManager::Blur(i32 redAdjust, i32 greenAdjust, i32 blueAdjust) {
     m_backgroundDrawn = 0;
 }
 
-// @semantic: complete distance/width interpolation and both angle
-// perturbation paths; all 30 relocation targets agree. A bucket-11 unused word
-// restores the retail 0x58 frame and mapped slots. The first normalized-stream
-// difference is retail +0x1c8 `fld qword ptr
-// [const_000eb1a8]` (DIR32 operand at +0x1ca) versus the same opcode/value using
-// ours $T8146 identity. The first opcode/CFG divergence is retail +0x21c
-// `jne +0x5` versus ours `je +0xf2` for the second zero-angle guard. Tried
-// direct/compound intermediate angle assignments and nested zero-angle guards.
-// Revisit at 95% for od_slots; do not repeat these spellings beforehand.
+// @semantic: first opcode/CFG divergence is retail +0x21c jne +0x5 versus ours je +0xf2 for the second zero-angle guard.
 VA(0x004251cd, 0x320)
 void combatManager::ResetBoltAngle(SBolt* bolt) {
     i32 unusedBoltAngleWord1;
@@ -1892,21 +1784,7 @@ void combatManager::ResetBoltAngle(SBolt* bolt) {
     }
 }
 
-// @semantic: complete stepping, clipping, width
-// drawing, all six color
-// modes, target approach, and finish CFG with the exact 0x40 frame. Retail is
-// 0x4f0 bytes and ours 0x503. The first raw differing byte is +0x19, the local
-// displacement in `mov [ebp-local], eax` for oldX: retail 0xd4 (-0x2c), ours
-// 0xfc (-0x04). The first normalized instruction divergence is retail +0x6a
-// `fld dword ptr [eax+0x38]`; ours starts `mov eax,[eax+0x38]`, stores a local,
-// emits two `jmp $+0` continuations, then loads that local. The delinked switch
-// boundary truncates homm2 relocs: explicit object ranges contain 28 relocations
-// on both sides, with every external target agreeing and eight local entries
-// targeting their respective DrawBolt labels. Tried direct and compound sin/cos
-// assignment, both loop polarities, direct per-case pixel expressions, the
-// positive movement wrapper, a nested lightning switch, and removing the random
-// result slot. Horizontal-first distance evaluation is byte-neutral and retained
-// because it matches retail. Revisit at 95% or after predecessor slot changes.
+// @semantic: first normalized instruction divergence is retail +0x6a fld dword ptr [eax+0x38].
 VA(0x004254ed, 0x4f0)
 void combatManager::DrawBolt(SBolt* bolt, i32 stepCount) {
     i32 oldX = static_cast<i32>(bolt->currentX);
@@ -2102,21 +1980,7 @@ void combatManager::AddBolt(
     ResetBoltAngle(bolt);
 }
 
-// @semantic: complete palette, 25-record bolt pool, extent/timer/blit,
-// branching, angle reset, and cleanup CFG; all 60 relocation targets agree. The
-// first raw differing byte is +0x05, the sub esp immediate: retail 0xac, ours
-// 0xbc. After masking frame/local slots, the first relocation-identity difference
-// is the retail +0x7d DIR32 operand for "kb.pal" versus ours equivalent string
-// symbol. The first normalized instruction divergence is retail +0x1a1
-// `mov eax,[ebp+0x28]` versus ours +0x1a4 `mov eax,[ebp+0x24]`; the following
-// loads reverse the startWidth/endWidth operands of the equivalent maximum.
-// Retail's executable size is 0xa82 through the `ret`; its 0xa84 object span
-// additionally contains NOPs at +0xa82 and +0xa83. Ours uses a 0xac0 object span.
-// Later residuals are loop-slot allocation and constant-pool identities. Tried
-// inline/pointer record access, top/tail cleanup, positive/continue branch arms,
-// ternary width selection, and stored/inline child angles. Retail itself leaves
-// parameter 14 unused and uses scalar delete for the POD bolt allocation; both
-// are preserved. Revisit at 95% for od_slots and AST permutation, not before.
+// @semantic: first normalized instruction divergence is retail +0x1a1 mov eax,[ebp+0x28] versus ours +0x1a4 mov eax,[ebp+0x24].
 VA(0x00425c4c, 0xa82)
 void combatManager::DoBolt(
     i32 managePointer,
@@ -2348,11 +2212,7 @@ void combatManager::DoBolt(
     gpWindowManager->m_updateFlags = 1;
 }
 
-// @semantic
-// Complete 0x18c body, 0x2c frame/slots, CFG, and all 12 ordered relocations
-// agree. Qualifying distance fixes the final minimum branch. The remaining
-// +0x12e/+0x132/+0x135/+0x139 bytes reverse the commutative deltaX/deltaY
-// square loads; writing/qualifying deltaY first was byte-neutral.
+// @semantic: branch/code-shape residual.
 VA(0x004266ce, 0x18c)
 i32 combatManager::GetNextChainLightningTarget(army* source, i32 requireWorks) {
     army* candidate_p;
@@ -2392,12 +2252,7 @@ i32 combatManager::GetNextChainLightningTarget(army* source, i32 requireWorks) {
     return closestHex_f;
 }
 
-// @semantic: complete four-target damage/selection/bolt CFG, exact 0x5c frame
-// and slots, and all 37 ordered relocation targets align. Three evidenced unused
-// bucket-12/13/14 words restore retail slots -0x2c, -0x3c, and -0x44. The only
-// executable residual is the branch-distance clamp: retail lowers inclusive
-// jge/jle tests while VC4.2 canonicalizes both equivalent assignments to jg/jl.
-// Inclusive and MIN-1 spellings were byte-neutral or perturbed only TU state.
+// @semantic: only executable residual is the branch-distance clamp.
 VA(0x0042685a, 0x361)
 void combatManager::ChainLightning(i32 targetHex, i32 spellPower) {
     i32 firstBolt = 1;
@@ -2481,14 +2336,7 @@ void combatManager::ChainLightning(i32 targetHex, i32 spellPower) {
     gpMouseManager->ShowColorPointer();
 }
 
-// @semantic: The complete three-phase vapor mask and cleanup CFG agree. Retail
-// stores the initial extent height, then replaces it with a stripe count based on
-// the scaled first Y, 5 * (giMinExtentY / 5); both operations are preserved.
-// Retail has a 0x30 frame versus ours 0x28. All 31 relocations now agree after
-// recovering the 0x09dc source-line owner and its +9/+0x38 allocator offsets.
-// The first normalized residual is stripe address evaluation order. Tried
-// extent initialization before/after palette assignment and semantic slot
-// suffixes. Revisit for slot shaping.
+// @semantic: first normalized residual is stripe address evaluation order.
 VA(0x00426bbb, 0x292)
 void combatManager::VaporizeCreature(i32 side, i32 armyIndex) {
     DATA(0x004f04e4) static i16 vaporizeSourceLineBase = 2524;
@@ -2543,15 +2391,7 @@ void combatManager::VaporizeCreature(i32 side, i32 armyIndex) {
     gpCombatManager->DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
 }
 
-// @semantic: complete mode parameters, sine table, amplitude scaling,
-// both fade masks, draw, and cleanup CFG agree. The effect predicate matches
-// retail: phases outside the center band always draw, while center-band phases
-// skip only five distances. Restoring the otherwise-unused initial extent height
-// closed both missing extent-global targets. Retail has a 0x54 frame versus
-// ours 0x58. All 68 relocations now agree after recovering the 0x0a1b
-// source-line owner and its +0x2c/+0x2d/+0x8e/+0x8f allocator offsets. The
-// first normalized residual is side/index multiplication order. Tried both
-// wave scalings and direct/pointer army access.
+// @semantic: first normalized residual is side/index multiplication order.
 VA(0x00426e4d, 0x592)
 void combatManager::RippleCreature(i32 side, i32 armyIndex, i32 mode) {
     DATA(0x004f0540) static i16 rippleSourceLineBase = 2587;
@@ -2675,13 +2515,7 @@ void combatManager::RippleCreature(i32 side, i32 armyIndex, i32 mode) {
         gpCombatManager->DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
 }
 
-// @semantic:
-// complete effect loading, creature animation, death processing, and vanish
-// CFG; all 23 relocation targets agree. Retail has a 0x28 frame versus ours
-// 0x40. The first normalized divergence is affected[side][armyIndex] address
-// multiplication order, followed by wince/death arm layout. Tried target
-// pointer locals, direct indexing, and both frame-loop spellings. Revisit at
-// 95% for od_slots/header stabilization; do not restore the transient live max.
+// @semantic: first normalized divergence is affected[side][armyIndex] address multiplication order.
 VA(0x004273df, 0x6b2)
 void combatManager::ShowMassSpell(i8 (*const affected)[20], i32 effect, i32 animateCreatures) {
     u32l effectFile = MAKEFILEID(gCombatFxNames[effect]);
@@ -2807,16 +2641,7 @@ void combatManager::ShowMassSpell(i8 (*const affected)[20], i32 effect, i32 anim
         MakeCreaturesVanish();
 }
 
-// @semantic: complete mass-target selection, damage, presentation,
-// influence application, and final draw CFG agree with the retail 0x54 frame.
-// The first normalized residual is gsSpellInfo's typed field relocation versus
-// retail's interior constant label; the delink helper then stops at the switch.
-// Explicit llvm-objdump range review shows every external callee/global agrees
-// and only one extra local-label attribution remains. The recovered slot order,
-// MASS_DISPEL-before-damage body order, positive affected wrapper, and final
-// influence-call order are required. A case-scoped spelling raised fuzzy to
-// 92.14% but incorrectly expanded the frame to 0x88 and was rejected. Revisit
-// switch-label shaping after the pre-95 structural campaign.
+// @semantic: first normalized residual is gsSpellInfo's typed field relocation versus retail's interior constant label.
 VA(0x00427a91, 0x8f8)
 void combatManager::CastMassSpell(SpellType spell, i32 spellPower) {
     army* target_i = 0;
@@ -2988,15 +2813,7 @@ void combatManager::CastMassSpell(SpellType spell, i32 spellPower) {
     gpWindowManager->m_updateFlags = 1;
 }
 
-// @semantic: complete search, failure dialog, army creation, duration
-// artifacts, links, and slide animation; the 0x44 frame and all 38 relocations
-// match. Restoring the combat-speed deadline before the first slide frame closed
-// four missing targets. The first residual is search-loop initialization and
-// trampoline order. Tried success inline and retail failure-before-success via
-// goto. The recovered 50.0f slide delay and DoBlast's 10.0f delay make SPELLS
-// .rdata exact-sized; its only raw pool residual is those final two values in
-// reverse `$T` order. Swapping their header declaration order did not change
-// emission. Revisit at 95% for loop CFG/slots; do not repeat either body placement.
+// @semantic: first residual is search-loop initialization and trampoline order.
 VA(0x00428389, 0x5c8)
 void combatManager::MirrorImage(i32 targetHex) {
     army* source =
@@ -3206,13 +3023,7 @@ void combatManager::DoLuck(i32 side, i32 armyIndex) {
 }
 
 // @early-stop
-// @early-stop-reloc-only
-// All 0x33a bytes match after masking 50 relocation sites; the 0x7c frame/slots,
-// CFG, and effective targets align. OD_STEER(deltaX_a) fixes the commutative squared-
-// distance load order, and OD_STEER(currentX_i)/OD_STEER(currentY_d) fix both float updates.
-// The retained report residual is only compiler-local strings/constants and the
-// retail iLeftRightSave+0x10 identity for __adjust_fdiv. Revisit after relocation
-// identity normalization or a material SPELLS source/header change.
+// @early-stop-reloc-only: relocation naming only.
 VA(0x00428d4f, 0x33a)
 void combatManager::DoBlast(i32 targetHex, i32 spell) {
     float stepY_e;
@@ -3301,12 +3112,7 @@ void combatManager::DoBlast(i32 targetHex, i32 spell) {
     gpResourceManager->Dispose(blastIcon_h);
 }
 
-// @semantic: quantity/artifact handling, both dead-hex removals, message,
-// reverse-death animation, and cleanup agree; all 33 ordered relocation targets
-// match. Bucket-4 and bucket-10 unused words restore retail's -0x18/-0x34 gaps
-// and exact 0x44 frame. The first executable residual is corpse address
-// evaluation: retail forms index + 0x61*hex while ours forms 0x62*hex + index.
-// Reversed subscripts and a materialized resurrected pointer were exhausted.
+// @semantic: first executable residual is corpse address evaluation.
 VA(0x00429089, 0x655)
 void combatManager::Resurrect(i32 spell, i32 targetHex, i32 spellPower) {
     i32 armyIndex_f;
@@ -3459,14 +3265,7 @@ i32 combatManager::SpaceForElementalExists(void) {
         return 1;
 }
 
-// @semantic: normalized compiler-local strings, NULL_SAMPLE2 addends, all 15
-// relocation sites, CFG, and semantics agree. The real residual is stack layout:
-// retail stores the aggregate return temporary at -0x10/-0x0c and armyName at
-// -0x14; VC4.2 uses -0x14/-0x10 and -0x0c. Semantic bucket-13/bucket-15 names,
-// declaration order, nested/separate scopes, cached result assignment, and direct
-// result initialization all failed to improve or added an extra aggregate copy.
-// Seven raw stack-displacement bytes remain. Revisit after an earlier SPELLS edit
-// or relevant SAMPLE2/header change perturbs aggregate-temporary placement.
+// @semantic: residual is stack layout: retail stores the aggregate return temporary at -0x10/-0x0c and armyName at -0x14.
 VA(0x00429797, 0xd9)
 void combatManager::ShowSpellCastFailure(army* target, i32) {
     SAMPLE2 sample = NULL_SAMPLE2;
@@ -3529,15 +3328,7 @@ void combatManager::ModifyDamageForArtifacts(
     }
 }
 
-// @semantic: complete shake, randomized wall/tower/keep damage, cloud
-// animation, state application, and input restore; the 0x160 frame and all 62
-// relocation targets agree. After constant identity, the first code divergence
-// is the screen-copy row loop branch (`jge` versus retail `jle`); later residuals
-// are packed wallPos/towerPos local-label identities and keep impact ordering.
-// Tried cached/direct offsets, both height association orders, <= zero tests,
-// both loop polarities, and an 80-walk syntax-aware AST permutation pass after
-// the 95% phase switch; the AST pass was byte-neutral. Revisit only for a new
-// frame/layout discovery, not further generic permutation.
+// @semantic: first code divergence is the screen-copy row loop branch (jge versus retail jle).
 VA(0x00429ae0, 0x931)
 void combatManager::Earthquake(void) {
     i32 shakeOffsets[30];
@@ -3828,36 +3619,6 @@ void combatManager::ShowSpellMessage(i32 castByCreature, i32 spell, army* target
     CombatMessage(message_m, 1, 1, 0);
 }
 
-// @data-layout-note
-// Fresh VC 4.2 storage contains 104 real definitions: 71 initialized owners
-// in a 0x7af-byte .data section and 33 constant-pool owners in a 0xb4-byte
-// .rdata section. Retail contributes 0x7b0 bytes at 0xf00b0..0xf0860 and
-// 0xb8 bytes at 0xeb150..0xeb208. All 104 logical extents are disjoint and
-// byte-exact. The only uncovered data bytes are alignment at 0xf04c5..0xf04c8,
-// 0xf04d7, 0xf04e6..0xf04e8, 0xf0542..0xf0544, and the 0xf085f tail byte;
-// rdata has four bytes of tail alignment.
-//
-// The 62 compiler-local data owners each have one zero-addend code reference,
-// and all 62 pair to exact retail targets. Sixty use equal-count function
-// sequences. CastMassSpell has one later candidate-only jump-table relocation;
-// before it, $SG37516 is bracketed by gSpellNames/gText at candidate
-// +0x3fb and retail +0x3f9 -> 0xf05f4, while $SG37532 is bracketed by gText
-// sites at candidate +0x5d6 and retail +0x5d0 -> 0xf062c.
-//
-// The corrected ChainLightning delay, Ripple divisor, MirrorImage delay, and
-// DoBlast delay restore the retail constant identities and tail order. The
-// candidate and fixed target .rdata sections are both 0xb4 bytes, and the direct
-// retail-PE operand audit has no SPELLS rdata identity or section-offset
-// divergence. Payload-equivalent pool slots are not used as a substitute for
-// code-site relocation evidence.
-//
-// Retail disassembly also proved the function-local source-line owners at
-// 0xf04e4 and 0xf0540 and all six offset uses. Exact owner payload comparison
-// recovered twelve incorrect user-visible literals, including allocator-path
-// line records, embedded damage-message newlines, mass-spell target text, and
-// Archmage target substitution. Do not restore the old strings or replace the
-// proven topology with synthetic aliases, padding owners, or cursor replay.
-// ---- globals (definitions, RVA order) ----
 DATA(0x004f00b0) i32 castX = 0;
 DATA(0x004f00b4) i32 castY = 0;
 DATA(0x004f00b8) i32 bInTeleportGetDest = 0;

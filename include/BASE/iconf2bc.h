@@ -2,9 +2,6 @@
 #define HOMM2_ICONF2BC_H
 
 #include <Ints.h>
-// Declarations of the free functions DEFINED in iconf2bc.cpp — the single home for these
-// symbols. Other TUs call them by including this header (no local externs).
-// forward declarations (was <_all.h>):
 class bitmap;
 class icon;
 
@@ -23,4 +20,4 @@ void FlipIconToBitmapColorTable(
     u8*
 );
 
-#endif // HOMM2_ICONF2BC_H
+#endif

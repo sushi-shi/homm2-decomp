@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_RE\BUTTON.OBJ   from: .\basewin.lib
-// functions: 11   data: 2
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <BASE/button.h>
 #include <BASE/widgetKind.h>
@@ -97,29 +92,7 @@ inline button::~button() {
     gpResourceManager->Dispose(m_icon);
 }
 
-// @early-stop
-// Delinker symbol artifact: inline+dllexport emits one strong 0x36 ??_G body and a
-// weak sectionless ??_E alias while retail exposes two byte-identical ??_E copies.
-// The candidate is relocation-masked raw exact against each copy at 5/5 relocations;
-// the separately mapped 0x21 ??1 destructor remains raw exact at 4/4 relocations.
-// VA(0x004dd480, 0x36) ??_E/??_G button deleting-destructor aliases
-
-// @semantic
-// Candidate is 0x585 versus retail 0x595. The first non-relocation byte divergence
-// is +0x47: candidate loads the vptr after storing m_flags, while retail loads it
-// before the store. The modal loop, message CFG, frame, calls, and all 36 ordered
-// relocations are present with matching identities. Later residuals are CX/DX flag
-// allocation, hit-test register allocation/polarity, and four deselection schedules;
-// relocation offsets accumulate
-// retail deltas of +6, +12, then +16 bytes. Negative key-up gating, per-site short
-// flag snapshots, cached/global flags, hit-test polarity, and goto/break spellings
-// were tried. A completed 40-iteration libclang AST pass and 24 guarded TU-state
-// probes found no improvement or exact closure. Revisit after a real predecessor,
-// header, or TU-state change; correcting m_iconId to its unsigned resource-ID type
-// preserved the 0x585 body and first +0x47 divergence. Removing the unused synthetic
-// _globals_model include restored the retained 95.57% schedule without changing any
-// exact predecessor. This residual remains unresolved; it is not a byte-proven early
-// stop.
+// @semantic: first non-relocation byte divergence is +0x47: candidate loads the vptr after storing m_flags.
 VA(0x004dd6d0, 0x595)
 i32 button::Main(tag_message& msg) {
     if (DecodeWidgetKind(m_kind) == WIDGET_KIND_AUTO_REPEAT && (m_flags & WIDGET_FLAG_SELECTED) != 0
@@ -304,18 +277,7 @@ normalEvent:
     return widget::Main(msg);
 }
 
-// @semantic
-// After removing BUTTON's unused synthetic _globals_model include, candidate is 0x95
-// versus retail 0x96 and live match returns to 94.72%. The first non-relocation
-// divergence is +0x0a: candidate loads both owner coordinates first; retail starts
-// button Y in CX, completes X in DX, then adds owner Y to CX. Everything from
-// DrawToBuffer onward is instruction-identical after the one-byte setup shift, and all
-// 6 ordered relocations agree in type and target. Cached/direct owner access, X/Y
-// declaration order, staged Y,
-// split/combined sums, and the matching iconWidget staged-coordinate pattern were
-// tried. A separate int X/Y form reached only 90.15% and was reverted. Revisit after a
-// real predecessor/header TU-state change. This residual remains unresolved; it is not
-// a byte-proven early stop.
+// @semantic: first non-relocation divergence is +0x0a: candidate loads both owner coordinates first.
 VA(0x004ddc70, 0x96)
 i16 button::Select(struct tag_message& msg) {
     heroWindow* window = m_owner;
@@ -336,14 +298,7 @@ i16 button::Select(struct tag_message& msg) {
     return 2;
 }
 
-// @semantic
-// Semantics, types, CFG, frame, 0x83 CodeView body, virtual Draw dispatch, and all four
-// ordered relocations are correct. The only residual is scheduling at +0x19/+0x1f:
-// retail loads the vptr, stores m_flags, then sets ECX; candidate stores m_flags, sets
-// ECX, then loads the vptr. Exact-preserving ctor/dtor inline, dllexport, definition,
-// and declaration-placement variants did not change it; a direct compound flag clear
-// also emitted the same current-epoch schedule. Variants that changed COMDAT emission
-// broke the destructor/alias shape.
+// @semantic: only residual is scheduling at +0x19/+0x1f: retail loads the vptr, stores m_flags, then sets ECX.
 VA(0x004ddd10, 0x83)
 i16 button::Deselect(struct tag_message& msg) {
     i16 flags = m_flags;
@@ -372,13 +327,7 @@ void button::Draw(void) {
     m_icon->DrawToBuffer(m_x + win->m_posX, m_y + win->m_posY, m_normalFrame, 0);
 }
 
-// ===== vtable button : public widget  (3 slots) =====
-//  [ 0] VA(0x004ddda0, 0x55)  void button::Draw(void)   <- override (implements widget pure virtual)
-//  [ 1] VA(0x004dd480, 0x36)  void * button::scalar_dtor(unsigned int)   <- override (implements widget pure virtual)
-//  [ 2] VA(0x004dd6d0, 0x595)  int button::Main(struct tag_message &)   <- override (implements widget pure virtual)
 
-// ---- vtables (compiler-emitted; census) ----
 VTBL(button, 0x004ebaf0);
 
-// ---- globals (definitions, RVA order) ----
 DATA(0x0052125c) i32 iLeftRightSave = 0;

@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_Re\RECRUIT.OBJ   from: (directly linked into exe)
-// functions: 8   data: 2
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -23,11 +18,7 @@
 #include <SOURCE/town.h>
 #include <SOURCE/townManager.h>
 
-// @early-stop
-// The complete 0x60 frame, seven broadcast sites, optional resource arm, and
-// relocation-masked instruction stream agree. Manual object review confirms
-// all 25/25 relocation occurrences and targets; the reported 99.71% residual
-// is delinked pooled-string identity (the helper also mislabels two gText uses).
+// @early-stop: delinker artifact.
 VA(0x0048b310, 0x18c)
 void SetupRecruitWin(
     class heroWindow* window,
@@ -81,10 +72,7 @@ void SetupRecruitWin(
     }
 }
 
-// @early-stop
-// The recovered 0x10 frame, affordability locals/minimum expression, CFG, and
-// all non-relocation instructions are exact. All 26/26 relocation occurrences
-// resolve to the same owners/addends; only delinked pooled-string identities differ.
+// @early-stop: delinker artifact.
 VA(0x0048b49c, 0x24b)
 i32 recruitUnit::Open(i32 priority) {
     i32 goldMaximum;
@@ -183,10 +171,7 @@ void recruitUnit::Close(void) {
     KBChangeMenu(hmnuRecruitSave);
 }
 
-// @early-stop
-// The complete 0x38 frame, totals/update CFG, and relocation-masked instruction
-// stream agree. Manual object review confirms all 18/18 relocation occurrences
-// and targets; 99.67% is pooled-string identity (the helper mislabels one gText).
+// @early-stop: byte-proven compiler artifact.
 VA(0x0048b7ce, 0x122)
 void recruitUnit::Update(void) {
     tag_message message;
@@ -212,12 +197,7 @@ void recruitUnit::Update(void) {
     }
 }
 
-// @early-stop
-// Jump-only proof: the 0x3fd-byte candidate versus the 0x41b-byte retail span
-// differs by exactly six five-byte continuation JMPs (0x1e bytes). Every
-// non-jump opcode/operand and all 16/16 ordered external relocations match; this
-// function has no embedded jump table. Guard-clause cases, confirmation shared
-// tails, right-button quick view, frame/slots, and final close==1 CFG are recovered.
+// @early-stop: delinker jump-table artifact.
 VA(0x0048b8f0, 0x41b)
 i32 recruitUnit::Main(struct tag_message& message) {
     i32 close = 0;
@@ -377,10 +357,7 @@ recruitUnit::recruitUnit(class town* townData, i32 dwelling, i32 refreshTown) {
     }
 }
 
-// @early-stop
-// The complete 0x3c frame, cost search, window lifecycle, and relocation-masked
-// instruction stream agree. All 13/13 relocation occurrences resolve to the
-// same targets; the 99.68% residual is the two pooled window-name symbols.
+// @early-stop: byte-proven compiler artifact.
 VA(0x0048bee5, 0x14f)
 void QuickViewRecruit(class town* townData, i32 dwelling) {
     i32 costs[RECRUIT_RESOURCE_COUNT + 1];
@@ -421,13 +398,7 @@ void QuickViewRecruit(class town* townData, i32 dwelling) {
     gpWindowManager->RemoveWindow(window);
 }
 
-// ===== vtable recruitUnit : public baseManager  (3 slots) =====
-//  [ 0] VA(0x0048b49c, 0x24b)  int recruitUnit::Open(int)   <- override (implements baseManager pure virtual)
-//  [ 1] VA(0x0048b6e7, 0xe7)  void recruitUnit::Close(void)   <- override (implements baseManager pure virtual)
-//  [ 2] VA(0x0048b8f0, 0x41b)  int recruitUnit::Main(struct tag_message &)   <- override (implements baseManager pure virtual)
 
-// ---- vtables (compiler-emitted; census) ----
 VTBL(recruitUnit, 0x004eb848);
 
-// ---- globals (definitions, RVA order) ----
 DATA(0x00528578) HMENU hmnuRecruitSave;

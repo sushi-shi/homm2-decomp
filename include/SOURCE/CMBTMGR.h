@@ -2,9 +2,6 @@
 #define HOMM2_CMBTMGR_H
 
 #include <Ints.h>
-// Declarations of the free functions DEFINED in CMBTMGR.cpp — the single home for these
-// symbols. Other TUs call them by including this header (no local externs).
-// forward declarations (was <_all.h>):
 struct tag_message;
 
 struct CombatTowerOrigin {
@@ -48,4 +45,4 @@ i32 ValidHex(i32);
 void UpdateCombatSystemOptions(i32);
 i32 CombatSystemOptionsHandler(struct tag_message&);
 
-#endif // HOMM2_CMBTMGR_H
+#endif

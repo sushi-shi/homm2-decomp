@@ -1,12 +1,9 @@
 #ifndef HOMM2_SOURCE_HERO_H
 #define HOMM2_SOURCE_HERO_H
-// Reconstructed class (SOURCE) from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// 34 methods, 0 own-virtual, 0 static data.
 #include <va.h>
 #include <SOURCE/armyGroup.h>
 #include <SOURCE/KB_TYPES.h>
 
-// forward declarations:
 class town;
 
 H2_ENUM_CLASS_BEGIN(HeroSecondarySkill)
@@ -147,73 +144,69 @@ H2_ENUM_CLASS_BEGIN_T(HeroEventFlag, u32)
 H2_ENUM_CLASS_END_T(HeroEventFlag, u32)
 H2_ENUM_FLAGS(HeroEventFlag)
 
-#pragma pack(push, 1) // recovered layout is byte-packed
+#pragma pack(push, 1)
 class hero {
 public:
-    // --- members (offsets from Ghidra this+off access-analysis; widths are
-    // access-widths, NOT confirmed types; refine during byte-matching) ---
-    i16 m_spellPoints;             // +0x00
-    u8 m_id;                       // +0x02
-    char m_owner;                  // +0x03
-    i16 m_lastHeroInteractionTurn; // +0x04
-    i8 m_lastInteractionHeroId;    // +0x06
-    i16 m_lastTownInteractionTurn; // +0x07
-    u8 m_visitedTownId;            // +0x09
-    char m_name[13];               // +0x0a
-    u8 m_cursorType;               // +0x17
-    u8 m_portrait;                 // +0x18
-    i32 m_x;                       // +0x19
-    i32 m_y;                       // +0x1d
-    i32 m_destinationX;            // +0x21
-    i32 m_destinationY;            // +0x25
+    i16 m_spellPoints;
+    u8 m_id;
+    char m_owner;
+    i16 m_lastHeroInteractionTurn;
+    i8 m_lastInteractionHeroId;
+    i16 m_lastTownInteractionTurn;
+    u8 m_visitedTownId;
+    char m_name[13];
+    u8 m_cursorType;
+    u8 m_portrait;
+    i32 m_x;
+    i32 m_y;
+    i32 m_destinationX;
+    i32 m_destinationY;
     union {
         struct {
-            u8 m_boatId;          // +0x29
-            char m_boatDestY;     // +0x2a
-            i8 m_boatTravelRange; // +0x2b
+            u8 m_boatId;
+            char m_boatDestY;
+            i8 m_boatTravelRange;
         };
         struct {
-            i8 m_patrolX;      // +0x29
-            i8 m_patrolY;      // +0x2a
-            i8 m_patrolRadius; // +0x2b
+            i8 m_patrolX;
+            i8 m_patrolY;
+            i8 m_patrolRadius;
         };
     };
-    u8 m_direction;                                   // +0x2c
-    i16 m_locationType;                               // +0x2d
-    i16 m_occupiedTown;                               // +0x2f
-    i32 m_mobility;                                   // +0x31
-    i32 m_remainingMobility;                          // +0x35
-    i32 m_experience;                                 // +0x39
-    i16 m_level;                                      // +0x3d
-    i8 m_primaryStats[IDX(HERO_STARTING_STAT_COUNT)]; // +0x3f
-    i8 m_morale;                                      // +0x44
-    i8 m_luck;                                        // +0x45
+    u8 m_direction;
+    i16 m_locationType;
+    i16 m_occupiedTown;
+    i32 m_mobility;
+    i32 m_remainingMobility;
+    i32 m_experience;
+    i16 m_level;
+    i8 m_primaryStats[IDX(HERO_STARTING_STAT_COUNT)];
+    i8 m_morale;
+    i8 m_luck;
     char _pad_0x46[0x1];
-    u32 m_gazeboVisits;                       // +0x47
-    u32 m_fortVisits;                         // +0x4b
-    u32 m_witchDoctorVisits;                  // +0x4f
-    u32 m_mercenaryCampVisits;                // +0x53
-    u32 m_standingStoneVisits;                // +0x57
-    u32 m_treeKnowledgeVisits;                // +0x5b
-    u32 m_xanaduVisits;                       // +0x5f
-    u8 m_randomSeed;                          // +0x63
-    u8 m_enabled;                             // +0x64
-    class armyGroup m_army;                   // +0x65
-    i8 m_secondarySkills[14];                 // +0x74
-    u8 m_secondarySkillOrder[14];             // +0x82
-    i32 m_secondarySkillCount;                // +0x90
-    i8 m_spells[IDX(SPELL_COUNT)];            // +0x94
-    i8 m_artifacts[HERO_ARTIFACT_SLOT_COUNT]; // +0xd5
-    HeroEventFlag m_eventFlags;               // +0xe3
-    u8 m_isCaptain;                           // +0xe7
-    float m_aiFightValue;                     // +0xe8
-    i8 m_artifactExtra[14];                   // +0xec
+    u32 m_gazeboVisits;
+    u32 m_fortVisits;
+    u32 m_witchDoctorVisits;
+    u32 m_mercenaryCampVisits;
+    u32 m_standingStoneVisits;
+    u32 m_treeKnowledgeVisits;
+    u32 m_xanaduVisits;
+    u8 m_randomSeed;
+    u8 m_enabled;
+    class armyGroup m_army;
+    i8 m_secondarySkills[14];
+    u8 m_secondarySkillOrder[14];
+    i32 m_secondarySkillCount;
+    i8 m_spells[IDX(SPELL_COUNT)];
+    i8 m_artifacts[HERO_ARTIFACT_SLOT_COUNT];
+    HeroEventFlag m_eventFlags;
+    u8 m_isCaptain;
+    float m_aiFightValue;
+    i8 m_artifactExtra[14];
     i32 IsEmbarked(void) {
         return HAS(m_eventFlags, HERO_EVENT_EMBARKED);
     }
-    // --- constructors ---
     hero(void);
-    // --- methods ---
     void Read(i32, i8);
     void Write(i32, i8);
     void GetArmyStrengths(u32l* const);
@@ -250,11 +243,10 @@ public:
 };
 #pragma pack(pop)
 SIZE(hero, 250);
-// ---- globals (declarations, RVA order) ----
 extern class hero* gpHVHero;
 extern class heroWindow* gheroWin;
 extern i16 gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT];
 extern i32 iOrigHeroViewID;
 extern b32 gbNoDismiss;
 
-#endif // HOMM2_SOURCE_HERO_H
+#endif

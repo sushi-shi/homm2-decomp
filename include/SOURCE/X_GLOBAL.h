@@ -1,6 +1,5 @@
 #ifndef HOMM2_X_GLOBAL_H
 #define HOMM2_X_GLOBAL_H
-// Globals owned by this data-only TU (from CodeView).
 #include <SOURCE/KB_TYPES.h>
 #include <SOURCE/REMOTE_TYPES.h>
 #include <va.h>
@@ -72,7 +71,6 @@ H2_ENUM_END(GlobalConstant)
 
 #define X_GLOBAL_PASSWORD_STRING_INDEX_COUNT 8
 
-// --- globals owned by this TU (moved from _globals.h; CodeView-attributed) ---
 extern i8 xIsExpansionMap;
 extern i32 xLastChoice;
 extern u8 xIsPlayingExpansionCampaign;
@@ -98,7 +96,6 @@ extern u8 xNewHeroAlignment[X_GLOBAL_NEW_HERO_ALIGNMENT_COUNT];
 extern i32 xPasswordStringsIndex[X_GLOBAL_PASSWORD_STRING_INDEX_COUNT];
 extern i32 xShrineBuildingCost[X_GLOBAL_BUILDING_RESOURCE_COUNT];
 
-// ---- globals (declarations, RVA order) ----
 H2_ENUM_BEGIN(RadarColorTableCount)
     RADAR_MAP_COLOR_COUNT = 16,
     RADAR_OBJECT_COLOR_COUNT = 16,
@@ -602,7 +599,7 @@ extern char gFullMapName[GLOBAL_MAP_NAME_SIZE];
 extern char gcTCPName[GLOBAL_TCP_TEXT_SIZE];
 extern i32 giShowIntro;
 extern i32 giScore;
-extern char gcRegAppPath[0x160]; // CodeView size 0x160; typed char* (array-decayed)
+extern char gcRegAppPath[0x160];
 extern u32l gTimeMark;
 extern char* EXPANSION_AGGREGATE_NAME;
 extern i8 xNetHasOldPlayers;
@@ -617,7 +614,7 @@ extern i32 iCombatControlNetPos[COMBAT_CONTROL_SIDE_COUNT];
 extern char cExpAggPathName[GLOBAL_AGGREGATE_PATH_SIZE];
 extern b32 gbMoveShown;
 extern b8 gbSetupGamePosToRealGamePos[8];
-extern char gcRegCDRomPath[0x160]; // CodeView size 0x160; typed char* (array-decayed)
+extern char gcRegCDRomPath[0x160];
 extern class heroWindow* heroWin;
 extern i32 giOverviewReturnActionExtra;
 extern i32 giCurGeneral;
@@ -644,4 +641,4 @@ extern SMapChange sMapChangeQueue[CURSOR_MAP_CHANGE_QUEUE_COUNT];
 extern b32 gbWaitForRemoteReceive;
 extern u8 bMusicIsLooping[0x3c];
 
-#endif // HOMM2_X_GLOBAL_H
+#endif

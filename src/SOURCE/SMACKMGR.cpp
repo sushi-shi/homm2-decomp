@@ -1,6 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE - NOT original source.
-// compiland: .\Win32_Re\SMACKMGR.OBJ   from: (directly linked into exe)
-
 #include <va.h>
 #include <BASE/message.h>
 #include <BASE/Misc.h>
@@ -77,13 +74,7 @@ void DoAdvance(Smack* smack, i32 drawFrame, i32 advanceFrame, i32 updatePalette,
         SmackNextFrame(smack);
 }
 
-// @early-stop
-// Complete 0x118c body, 0x510 frame/slots, CFG, and all 334 ordered relocations
-// align. Excluding the embedded switch table at +0xde7/0x14, the only executable
-// residual is +0xb0b: retail loads campaignChoice4[-0x4c4] then compares the
-// global, while ours loads the global then compares the local. The one-byte
-// instruction-size difference shifts the table/following offsets. Both equality
-// orders and OD_STEER(campaignChoice4) were byte-neutral; revisit on relevant TU change.
+// @early-stop: named one-byte retail stub.
 VA(0x0040126d, 0x118c)
 void SmackManagerMain(void) {
     i32 soundFlags4;
@@ -638,7 +629,6 @@ void PrintSummaryInfo(SmackSum* summary) {
 #undef LOG_SUMMARY_VALUE
 }
 
-// ---- globals (definitions, RVA order) ----
 DATA(0x004ec068) icon* backImage = 0;
 DATA(0x004ec070) SSmackOptions SmackOptions[73] = {
     {"H2INTRO", "", "SH2INTRO", "", 1, 1, 0, 0, 0, 0, 0},
@@ -718,33 +708,6 @@ DATA(0x004ec070) SSmackOptions SmackOptions[73] = {
 DATA(0x004ecd48) i32 bTesting = 0;
 DATA(0x004ecd4c) Smack* smk1 = 0;
 DATA(0x004ecd50) Smack* smk2 = 0;
-// @data-layout-note
-// Retail initialized storage is 0xec040..0xed22c (0x11ec bytes). Candidate
-// ordinal 2 is a byte-exact 0x11e9-byte prefix; retail contributes the three
-// trailing zero alignment bytes. The exact prefix SHA-256 is
-// b74e91cd227e894136650c6d7121bdf092353b72cba98d19148809e3a6b428b6.
-// All 34 compiler literals have exact same-offset payload/owner translations
-// and one zero-addend reference each. Candidate and retail both have 141
-// references to the same 49 initialized-data RVAs, including every public owner
-// and SmackOptions interior addend. All 12 retained public identities have exact
-// source DATA definitions. Their NB09 next-public spans are not object sizes:
-// brotherIcon's span contains expansionCampaignRects, smk2's span contains the
-// literal pool, and smksum's span contains bExpansionSmackNum. These private
-// allocations are not missing public storage and must not become aliases.
-//
-// Retail loader-zero storage is 0x522f20..0x522f88 (0x68 bytes). Smacker 3.0g's
-// SmackSummary implementation writes output offsets +0x4c and +0x50 after
-// HighestExtraUsed, copying its retained GDI bitmap handle and prior sound-window
-// procedure. Recovering those real fields makes SmackSum 0x54 and naturally makes
-// the candidate contribution 0x68. VC4.2 still emits COMMON/hash order:
-// bSmackNum +0, gbPlayedThrough +4, smksum +8, bExpansionSmackNum +0x5c,
-// bMainDone +0x60, gbLastFramePlayed +0x64. Retail instead places
-// gbLastFramePlayed +4, gbPlayedThrough +0x60, and bMainDone +0x64: a three-way
-// COMMON allocation-order difference. Declaration reorder,
-// extern-before-definition, file/function static placement, /Z7, /Gy, /Gf, and
-// a custom bss_seg retain the candidate order. All 65 BSS references match the
-// same 9 retail RVAs, including smksum addends +0x8, +0x1c, and +0x20. Do not
-// add padding, aliases, or section pragmas to hide this allocation-order wall.
 DATA(0x00522f20) i8 bSmackNum;
 DATA(0x00522f24) b32 gbLastFramePlayed;
 DATA(0x00522f28) SmackSum smksum;

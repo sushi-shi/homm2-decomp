@@ -4,9 +4,6 @@
 #include <ddraw.h>
 #include <wing.h>
 #include <va.h>
-// Declarations of the free functions DEFINED in wingraph.cpp — the single home for these
-// symbols. Other TUs call them by including this header (no local externs).
-// forward declarations (was <_all.h>):
 
 H2_ENUM_BEGIN(WingraphConstant)
     WINGRAPH_WIDTH = 640,
@@ -84,10 +81,8 @@ void SetFullScreenStatus(i32);
 i32 QueryNewPalette(void);
 i32 SetGraphicsType(WingraphGraphicsType);
 
-// --- globals owned by this TU (moved from _globals.h; CodeView-attributed) ---
 extern WingraphGraphicsType giGraphicsType;
 
-// ---- globals (declarations, RVA order) ----
 extern b32 gbWinGAttached;
 extern b32 gbDDrawAttached;
 extern i32l Orientation;
@@ -113,4 +108,4 @@ extern HINSTANCE hDDrawLibrary;
 extern i32l lDelayRefresh;
 extern i32l lPaintStart;
 
-#endif // HOMM2_WINGRAPH_H
+#endif

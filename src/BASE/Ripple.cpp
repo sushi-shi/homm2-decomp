@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_RE\Ripple.obj   from: .\basewin.lib
-// functions: 1   data: 0
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <BASE/Ripple.h>
 #include <BASE/bitmap.h>
@@ -14,14 +9,7 @@
 #include <SOURCE/kbwin.h>
 #include <SOURCE/NOOPT.h>
 #include <string.h>
-// @semantic
-// The complete /O2 kernel has the retail 0x23f extent, 0x2c4 frame, CFG, profile and
-// previous-row arrays, pixel/redraw bounds, and all 13 ordered relocation targets and
-// addends. Hoisting profileIndex to function scope fixed the +0x156 commutative SIB;
-// the first remaining code divergence is +0x196, where retail `cmp esi,eax; jle` and
-// ours `cmp eax,esi; jge` encode the same height <= sourceRow exit (repeated at +0x1b8).
-// Ten non-improving current-state variants exhausted operand orders and trivial local
-// hoists. Revisit only after a material Ripple header/declaration-state change.
+// @semantic: first remaining code divergence is +0x196, where retail cmp esi,eax; jle and ours cmp eax,esi.
 VA(0x004d26a0, 0x23f)
 void DoRipple(bitmap* source, bitmap* destination, i32 height, i32 strength) {
     i32 profileIndex;

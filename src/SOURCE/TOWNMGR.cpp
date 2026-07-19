@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_Re\TOWNMGR.OBJ   from: (directly linked into exe)
-// functions: 33   data: 2
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <BASE/message.h>
 #include <BASE/Misc.h>
@@ -48,7 +43,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-// __FILE__ for the NWC memory/assert tracking (reloc-masked path string).
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\TOWNMGR.CPP"
 
 DATA(0x004eb080) static const i8 gTownObjectOrder[IDX(FACTION_COUNT)][TOWN_BUILDING_COUNT] = {
@@ -246,19 +240,6 @@ DATA(0x004eb080) static const i8 gTownObjectOrder[IDX(FACTION_COUNT)][TOWN_BUILD
      TOWN_OBJECT_NONE}
 };
 
-// @data-layout-note Retail's initialized TOWNMGR contribution is
-// 0xee750..0xef4c8 (0xd78); candidate .data is 0xd77. The 84 candidate owners
-// cover every candidate byte: sBuildingInfo, two signed-short function line
-// bases, and 81 private literals. Owner-wise translation is byte-exact with
-// SHA-256 8bd72565ea607f957ee8d39c3c3f1e087251f2ae67d401d1d336aefcccf94fa.
-// Retail interleaves the line bases at 0xef174 and 0xef3b4, while VC4.2 hoists
-// them to candidate offsets 0x6c0 and 0x6c4. The three repeated port/build
-// filenames at 0xeeeac, 0xeeebc, and 0xeeecc are fixed by their code relocation
-// sites. Retail has one terminal zero byte. The 0xc0 object-order table and
-// 0xc townManager vtable sections are assigned at 0xeb080 and 0xeb140; the
-// latter occupies a retail 0x10 contribution with four zero tail bytes. There
-// is no TOWNMGR BSS contribution. Do not add padding, fallback identities,
-// aliases, cursor adjustments, or section pragmas to force allocation order.
 DATA(0x004ee750) SBuildingInfo sBuildingInfo[IDX(FACTION_COUNT)][TOWN_BUILDING_COUNT] = {
     {// Knight
      {0, 397, 46, 84, 138},  {5, 0, 130, 53, 63},    {5, 345, 114, 83, 62},  {5, 531, 214, 113, 42},
@@ -322,19 +303,6 @@ DATA(0x004ee750) SBuildingInfo sBuildingInfo[IDX(FACTION_COUNT)][TOWN_BUILDING_C
     }
 };
 
-// @match-note 90.65%: construction semantics, exact 0x30 frame, and all 12/12
-// relocations agree. fileName/w/h/x/buildingId_h/tempY/y occupy retail
-// -0x10/-0x14/-0x18/-0x1c/-0x20/-0x24/-0x28, followed by the compiler new
-// temporary and this at -0x2c/-0x30. The first relocation-masked raw byte
-// differs at +0x36: retail 08 versus ours 0c, the displacement operand of the
-// mov eax,[ebp+...] at +0x34. Retail forms
-// each SBuildingInfo address with townType*0x120 in eax and buildingId*9 in
-// ecx; this compiler state selects the commutative reverse register order for
-// all five field reads. Direct indexing, inverted subscript, and explicit
-// typed pointer-add spellings select the same order. A guarded 20-trial
-// post-95 TU-state sweep found several disposable 99.7685% candidates but no
-// audited exact closure; every candidate failed the strict size/identity guard.
-// Revisit only after a material TU-state change.
 H2_ENUM_CLASS_BEGIN(TownDialogResult)
     DIALOG_CANCEL_ID = 0x7801
 H2_ENUM_CLASS_END(TownDialogResult)
@@ -569,13 +537,7 @@ void townManager::ChangeTown(void) {
     SetCommandAndText(message);
 }
 
-// @early-stop
-// Jump-only proof: the exact 0x58 frame/slots, all 85 ordered relocations, and
-// every non-jump opcode and operand agree. The 0x950-byte base stream is exactly
-// ten bytes short of retail's 0x95a bytes: two five-byte jump-to-next inline
-// continuations at retail +0x58e and +0x692 account for the complete delta.
-// Color() regressed; color and occupying-hero OD_STEER(value) spellings were stagnant.
-// Revisit only after either accessor, source/TU/header, or comparison epoch changes.
+// @early-stop: inline continuation artifact.
 VA(0x0041436f, 0x95a)
 void townManager::SetupTown(void) {
     tag_message message;
@@ -871,13 +833,7 @@ void townManager::SetArmyCommand(i32 qualifier) {
     }
 }
 
-// @early-stop
-// Permanent delinker-label artifact: all 0x5c5 relocation-masked bytes match.
-// Manual llvm-objdump audit finds 73/73 relocations: 55 external plus 18 local
-// jump-table entries. Retail absolute operands prove cTownCommand indices
-// 8, 9, and 11 through 27, plus gWellExtraNames, gSpecialBuildingNames, and
-// gDwellingType-19; the helper
-// truncates at the delinked local jump-table symbol and reports only 2 base.
+// @early-stop: delinker jump-table artifact.
 VA(0x0041531b, 0x5c5)
 void townManager::SetCommandAndText(struct tag_message& message) {
     i32 objectId = message.payload.widget.id;
@@ -1037,12 +993,7 @@ void townManager::ShowText(char*) {
     );
 }
 
-// @semantic: Explicit-range comparison excluding the 0x38-byte jump
-// table has 1306 instructions on both sides, an identical opcode multiset, the
-// exact 0x250 frame/0x1830 size, and all 215/215 ordered relocations. Three
-// /Ob1 continuation jumps move between six otherwise aligned spans. A bounded
-// 512-candidate AST pass and integral-global-read pass retained no canonical
-// mutation. Revisit only with a shared inline-accessor/TU-state discovery.
+// @semantic: jump-table placement residual.
 VA(0x0041595d, 0x1830)
 i32 townManager::Main(tag_message& message) {
     char description_b[400];
@@ -1635,17 +1586,7 @@ i32 townManager::Main(tag_message& message) {
     return 1;
 }
 
-// @semantic: Exact 0x4e3 size, 0x18 frame, all six command bodies/CFG,
-// retail -0x4/-0x8/-0xc/-0x10 local slots, and 23/23 ordered relocation owners
-// and addends. Fifteen of sixteen external relocation offsets are exact; the
-// first gpGame site is five bytes late because the inlined GetHero continuation
-// is before its body here but after it in retail. Relocation-masked raw proof
-// leaves 90 bytes in the evaluation-order spans 0x6b-0xa3, 0xc7-0xce,
-// 0x207-0x233, 0x2ba-0x2e7, 0x32f-0x346, and 0x37b-0x3cf. Both hero-strip
-// equality orders compile identically. Combined-condition and compound-add
-// forms were worse; the explicit loop break and read/add/write are retail.
-// A 295-candidate value-neutral AST run found no exact-size improvement; its
-// 98.9088% best adds a spurious five-byte m_dialogResult inline continuation.
+// @semantic: compiler-shape residual.
 VA(0x0041718d, 0x4e3)
 void townManager::DoCommand(i32 command) {
     hero* viewedHero;
@@ -1756,10 +1697,7 @@ void townManager::RedrawTownScreen(void) {
     gpWindowManager->UpdateScreenRegion(0, 0, 640, 480);
 }
 
-// @early-stop
-// Relocation-masked instruction streams are identical with the exact 0x40
-// frame and 27/27 relocations; only delinked string-literal symbol identities
-// differ (splitwin.bin, prompt/army labels, and numeric format).
+// @early-stop: delinker artifact.
 VA(0x0041771d, 0x374)
 void townManager::SplitArmy(void) {
     i16 unusedValue = 1;
@@ -1857,17 +1795,10 @@ void townManager::DrawTown(i32 updateScreen, i32 drawFlags) {
     PollSound();
 }
 
-// @early-stop 99.29%: exact 0xf35 span, 801 instructions, 0x14c frame, every
-// visible slot/CFG edge, and all 102/102 relocation sites and targets agree.
-// The 54 unmasked bytes are five value-neutral evaluation-order spans:
-// +0x2f5..+0x303 and +0x326..+0x334 form neutral-cost addresses index-first
-// versus building-first; +0xb98..+0xb9f, +0xc18..+0xc1f and +0xca1..+0xca8
-// reverse commutative widget-offset/spacing loads. Operand/subscript reversal
-// was byte-neutral, flattening shortened both neutral accesses, and bounded
-// 31-name index plus 32-name offset AST searches retained no gain.
+// @early-stop: byte-proven compiler artifact.
 VA(0x00417c9d, 0xf35)
 i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
-    static i16 sourceLineBase = 0x0948; // retail /Gi __LINE__Var word
+    static i16 sourceLineBase = 0x0948;
     u32l prerequisiteMask_c;
     i32 prerequisiteCount_p;
     i16 dialogLeft_a;
@@ -2316,13 +2247,7 @@ void townManager::BuildObj(i32 building) {
     }
 }
 
-// @semantic: First raw divergence is the frame byte at +0x5: base 0x5c versus
-// retail 0x60. Message(-0x3c), loop/condition CFG, and all 34 ordered relocations
-// agree, but retail reserves an unreferenced word at -0x48 and consequently has
-// hasLibrary/this at -0x5c/-0x60 versus -0x58/-0x5c. Flattened and typed-row
-// spellings and reversed guild-frame assignment order were worse; no padding
-// declaration was invented. Revisit only after compiler state, layout evidence,
-// or the source/TU/header comparison epoch changes.
+// @semantic: First raw divergence is the frame byte at +0x5: base 0x5c versus retail 0x60.
 VA(0x00418fbb, 0x3d8)
 void townManager::SetupMage(heroWindow* window) {
     i16 unusedZero_f = 0;
@@ -2437,13 +2362,7 @@ void townManager::SetupMage(heroWindow* window) {
     window->BroadcastMessage(message_b);
 }
 
-// @semantic: The 0x28 frame, local slots, select/switch CFG, and all five ordered
-// relocations agree. The first raw divergence is the spell-table address:
-// current code folds slot_p into the town base before loading level, while retail
-// forms base + 4*level and then loads slot_p. Scalar wrappers on level, slot_p,
-// and the town pointer, reversed subscripts, and the flat spell-slot view all
-// produced the same worse level-before-base order. Revisit after a relevant
-// accessor, layout, or TOWNMGR TU-state change.
+// @semantic: first raw divergence is the spell-table address: candidate code folds slot_p into the town base before loading level.
 VA(0x00419393, 0x190)
 i32 MageGuildHandler(tag_message& message) {
     i16 unusedFirstSpell = TOWN_MAGE_FIRST_SPELL_CONTROL;
@@ -2693,16 +2612,7 @@ void townManager::DoTavern(void) {
     delete m_heroWindow0;
 }
 
-// @semantic: Exact 0x328 size, 0x24 frame, complete amount/clamp,
-// confirm/cancel/redraw CFG, and 32/32 resolved relocation owners/addends.
-// Retail slots are plusButton -0x4, handled -0x8, unusedAction -0xc,
-// minusButton -0x10, amountControl -0x14, and message -0x18; their initializer
-// order and the final handled == 1 predicate are byte-exact. Relocation-masked
-// raw proof leaves 71 bytes at +0x10c, +0x1b6, and +0x1f1..+0x241: equivalent
-// branch destinations around one extra pre-ID-dispatch jump and the confirm
-// arm. Removing the empty default shrank incorrectly to 0x323; moving confirm
-// before cancel regressed to 91.74%. All 106 safe atomic AST variants found no
-// gain. Revisit only with a new dispatch/body placement discovery.
+// @semantic: branch/code-shape residual.
 VA(0x00419e8c, 0x328)
 i32 SplitArmyHandler(tag_message& message) {
     i16 plusButton = TOWN_SPLIT_INCREASE_CONTROL;
@@ -2911,19 +2821,10 @@ void townManager::SetupWell(heroWindow* window) {
     }
 }
 
-// @semantic: The 0x1b0 frame/slots, complete guild-rank/UI CFG, and all 114
-// ordered relocations agree. The first raw divergence at +0x249 loads the loop
-// counter before the bound and uses cmp/jle; retail loads the bound first and
-// uses cmp/jge. This is not a jump-only wall: at +0x5d3 the equivalent hero-id
-// address calculation also uses a different non-jump instruction sequence.
-// Direct m_heroCount/m_townCount reads remove three false inline continuations,
-// and value-before-position assignment is byte-exact. Positive, negated,
-// empty-else, and explicit-continue forms were worse or changed rank
-// progression; a prior bounded AST pass found no exact closure. Revisit after
-// a rank-loop source-shape or relevant TOWNMGR TU-state discovery.
+// @semantic: first raw divergence at +0x249 loads the loop counter before the bound and uses cmp/jle.
 VA(0x0041a783, 0xf0f)
 void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
-    static i16 sourceLineBase = 0x0e0e; // retail /Gi __LINE__Var word
+    static i16 sourceLineBase = 0x0e0e;
     i16 unusedRankX_last = 258;
     i16 unusedRankWidth_category = 68;
     i16 unusedRankY_j = 27;
@@ -3249,14 +3150,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
     }
 }
 
-// @semantic: Complete ten-case CFG, exact 0x56a size, 0x2c
-// frame/slots, and the exact +0x531/0x28 jump table. All 31 external and 42
-// total relocations agree in ordered offset/type/identity/addend. Relocation-
-// masked raw proof leaves 38 bytes: four one-byte branches crossing the two
-// equivalent playerData::m_heroIds address spans at +0x3df..+0x3f2 and
-// +0x47e..+0x491. Reversed subscripts compile identically; direct GetHero was
-// worse. The consolidated runner tried all 122 safe atomic AST mutations with
-// no gain. Revisit only after a playerData/accessor or TU-state change.
+// @semantic: jump-table placement residual.
 VA(0x0041b692, 0x56a)
 void GetCategoryStats(i32 category, i32l* const stats, i8* const order) {
     i32 player;
@@ -3383,12 +3277,7 @@ void SortStats(i32l* const stats, i8* const order) {
     }
 }
 
-// ===== vtable townManager : public baseManager  (3 slots) =====
-//  [ 0] VA(0x00414109, 0x1ef)  int townManager::Open(int)   <- override (implements baseManager pure virtual)
-//  [ 1] VA(0x00414e98, 0xca)  void townManager::Close(void)   <- override (implements baseManager pure virtual)
-//  [ 2] VA(0x0041595d, 0x1830)  int townManager::Main(struct tag_message &)   <- override (implements baseManager pure virtual)
 
-// ---- vtables (compiler-emitted; census) ----
 VTBL(townManager, 0x004eb140);
 
 #undef RETAIL_FILE

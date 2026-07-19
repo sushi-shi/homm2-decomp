@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_Re\Campaign.obj   from: (directly linked into exe)
-// functions: 7   data: 6
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <stdio.h>
 #include <string.h>
@@ -285,10 +280,6 @@ void game::PlayPreScenarioSmacker(i32 side, i32 map) {
     gpWindowManager->m_updateFlags = 1;
 }
 
-// @match-note: Complete 0x48 frame/CFG and 68/68 relocation audit. First reported
-// residual is the local advmice.mse symbol identity at +0x13..+0x17; first code
-// residual is the savedInterface slot at +0x33..+0x35. Declaration order and
-// od_slots-guided local names were tried.
 VA(0x00447fb6, 0x48d)
 void game::ShowCampaignInfo(i32 viewOnly, i32) {
     i32 savedInterface;
@@ -398,13 +389,7 @@ void game::ShowCampaignInfo(i32 viewOnly, i32) {
     }
 }
 
-// @semantic: Current Campaign.cpp/Campaign.h award-enum epoch: the 0x68 frame,
-// local slots, CFG, and semantic external relocation identities are complete.
-// First residual +0x2c: retail loads map before side for the enabled-grid index.
-// Final bounded pass exhausted five non-improving variants total: direct and
-// symmetric indexing, plus match_variants commutative_order, relational_order,
-// and the exact pointer-add axis. Revisit only after a relevant Campaign source,
-// TU/header, or comparison epoch changes index evaluation/compiler state.
+// @semantic: First residual +0x2c: retail loads map before side for the enabled-grid index.
 VA(0x00448443, 0xa0f)
 void game::CampaignInfoUpdate(i32 redraw) {
     i32 map;
@@ -606,14 +591,7 @@ void game::CampaignInfoUpdate(i32 redraw) {
         campWin->DrawWindow();
 }
 
-// @semantic: Current Campaign.cpp/Campaign.h award-enum epoch: the 0x1c frame,
-// map slot, switch CFG, and semantic external relocations are complete after
-// coalescing the hover guard's shared break. First residual +0xa8 is a one-byte
-// branch displacement caused by the later map/side index load order. Final
-// bounded pass exhausted five non-improving variants total: timeout/symmetric
-// spellings, plus match_variants relational_order and the exact pointer-add
-// axis; switch arm order was also stagnant. Revisit only after a relevant
-// Campaign source, TU/header, or comparison epoch changes compiler state.
+// @semantic: First residual +0xa8 is a one-byte branch displacement caused by the later map/side index load order.
 VA(0x00448e52, 0x521)
 i32 CampaignHandler(struct tag_message& message) {
     i32 map;
@@ -740,14 +718,7 @@ void game::InitEntireCampaign(i32 side) {
     m_campaignScenario = CAMPAIGN_NO_SCENARIO;
 }
 
-// @semantic: The full 0x5c frame and CFG are reconstructed; all twelve named
-// locals occupy the retail role slots. All 80 ordered external relocation sites
-// now agree after separating direct `this->m_players` access from hero lookup
-// through gpGame. First residual +0x0c: retail loads iCurViewMap before
-// iCurViewSide, while the equivalent array expression lowers side-first. Eight
-// bounded index/evaluation-order variants were non-improving. Revisit only after
-// a relevant Campaign source, TU/header, or comparison epoch changes compiler
-// state.
+// @semantic: First residual +0x0c: retail loads iCurViewMap before iCurViewSide.
 VA(0x004493ba, 0xbb7)
 void game::InitCampaignMap(void) {
     i32 selectedChoicePosition;
@@ -995,29 +966,12 @@ void game::InitCampaignMap(void) {
         gpGame->m_mapHeader.lossConditionValue = CAMPAIGN_ROLAND_TIME_LIMIT;
 }
 
-// ---- globals (definitions, RVA order) ----
-// @data-layout-note Retail initialized storage is 0xf4f28+0x260. Candidate
-// .data is 0x25d: trackXY, campWin, and 40 literal allocations have exact
-// payloads after mapping the nine artifact-name literals as a pure permutation
-// inside +0x10c..+0x18c. The sole uncovered extent is three terminal zero
-// alignment bytes at +0x25d. All 65 retail HIGHLOW targets are owned: trackXY
-// uses addends 0/2, the final literal uses 0/8/0xc (two suffix references from
-// other code), and every other initialized-data reference uses addend zero.
 DATA(0x004f4f28) i16 trackXY[2][13][2] = {39,  336, 113, 336, 150, 294, 187, 336, 261, 336, 335,
                                           336, 409, 378, 409, 294, 483, 336, 557, 336, -1,  -1,
                                           261, 378, -1,  -1,  39,  336, 113, 336, 187, 294, 187,
                                           378, 261, 336, 335, 336, 372, 294, 409, 336, 483, 294,
                                           483, 378, 557, 336, 261, 294, 261, 378};
 DATA(0x004f4f90) class heroWindow* campWin = 0;
-// @data-layout-note Retail and candidate BSS both cover 0x127ea4+0x10 with
-// these four public identities. Retail COMMON order is side/track/viewOnly/map
-// at +0/+4/+8/+0xc; VC4.2 currently emits track/viewOnly/side/map. Declaration
-// order is byte-neutral for these fixed external names, so retain the proven
-// storage and RVAs rather than introducing aliases or initialized data. Track,
-// viewOnly, and side have exact candidate/retail reference counts (11/4/24),
-// all with addend zero. iCurViewMap has 27 candidate versus 29 retail references;
-// that two-site code residual belongs to incomplete function reconstruction,
-// not to BSS ownership.
 DATA(0x00527ea4) i32 iCurViewSide;
 DATA(0x00527ea8) i32 iCampaignTrackType;
 DATA(0x00527eac) i32 bCampaignViewOnly;

@@ -26,4 +26,4 @@ struct SDropListSourceFiles {
 };
 SIZE(SDropListSourceFiles, 0x1e4);
 
-#endif // HOMM2_BASE_DROPLIST_TYPES_H
+#endif

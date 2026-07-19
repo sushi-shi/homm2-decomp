@@ -1,23 +1,15 @@
 #ifndef HOMM2_BASE_MIDIWRAP_H
 #define HOMM2_BASE_MIDIWRAP_H
-// Reconstructed class (BASE) from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// 3 methods, 0 own-virtual, 0 static data.
 #include <va.h>
 #include <BASE/resource.h>
 
-#pragma pack(push, 1) // recovered layout is byte-packed
+#pragma pack(push, 1)
 class MIDIWrap : public resource {
 public:
-    // --- members (offsets from Ghidra this+off access-analysis; widths are
-    // access-widths, NOT confirmed types; refine during byte-matching) ---
-    // (vptr auto-emitted at 0x00; own data starts at 0x04)
-    char* m_data; // +0x10  MIDI data buffer
-    // --- constructors ---
+    char* m_data;
     MIDIWrap(char*);
-    // Inline lets the compiler fold the body into ??_G; dllexport also retains the
-    // standalone ??1 body required by retail.
     __declspec(dllexport) virtual inline ~MIDIWrap() OVERRIDE;
 };
 #pragma pack(pop)
 SIZE(MIDIWrap, 0x14);
-#endif // HOMM2_BASE_MIDIWRAP_H
+#endif

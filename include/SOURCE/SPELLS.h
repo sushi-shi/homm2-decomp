@@ -3,9 +3,6 @@
 
 #include <Ints.h>
 #include <SOURCE/KB_TYPES.h>
-// Declarations of the free functions DEFINED in SPELLS.cpp — the single home for these
-// symbols. Other TUs call them by including this header (no local externs).
-// forward declarations (was <_all.h>):
 struct tag_message;
 
 H2_ENUM_CLASS_BEGIN(CombatSpellInfluence)
@@ -266,4 +263,4 @@ H2_ENUM_END(SpellCastConstant)
 i32 CombatSpecialHandler(struct tag_message&);
 i32 HandleCastSpell(struct tag_message&);
 
-#endif // HOMM2_SPELLS_H
+#endif

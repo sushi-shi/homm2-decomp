@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_RE\Blur.obj   from: .\basewin.lib
-// functions: 1   data: 0
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #define HOMM2_MISC_INLINE_ICONENTRY
 #include <va.h>
 #include <BASE/Blur.h>
@@ -20,7 +15,6 @@
 #include <SOURCE/X_GLOBAL.h>
 #include <string.h>
 
-// __FILE__ for the NWC memory/assert tracking (reloc-masked path string).
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\Blur.cpp"
 
 #define BLUR_COMPONENT(table, offset)                                                              \
@@ -29,27 +23,7 @@
 DATA(0x0051fdc0) static SBlurText gBlurText =
     {RETAIL_FILE, "RGBLOOKP.BIN", RETAIL_FILE, RETAIL_FILE, RETAIL_FILE, RETAIL_FILE, RETAIL_FILE};
 
-// @semantic
-// Coverage-phase structural checkpoint, not a proven wall. The complete CFG saves the source,
-// loads the RGB quantization table, applies the 16-sample blur to rows 4..height-5 and columns
-// 4..635, builds a clamped adjusted palette, performs both fizzles, restores the source, and
-// releases all three explicit-provenance allocations. The RGB component tables are one contiguous
-// [3][256] aggregate and the lookup allocation is addressed as 1024 rows of 32 bytes; the related
-// H2X build independently corroborates those two source shapes, while PoL disassembly determines
-// the different red/green/blue order used here. Both sides reserve 0xc5c bytes and agree on the
-// saved bitmap (+0x10), row/y (+0x14/+0x18), sample spills (+0x20..+0x50), output/count
-// (+0x54/+0x64), and red/green/blue tables (+0x6c/+0x46c/+0x86c). First divergence is +0x22:
-// ours loads height into eax and loads gpWindowManager before pushing the four arguments; retail
-// loads height into ecx, pushes height/width/zero, then loads gpWindowManager before the last zero.
-// Ours ends at +0x6ab versus retail +0x6a4. All 43 ordered relocations remain present with no
-// external-only mismatch; gConfig+0x12e, gfCombatSpeedMod, and 350.0f were audited manually.
-// Correct channel-table declaration
-// order, retail channel-addition order, direct resource/palette aliases, lookup declaration
-// initialization, and moving the aggregate across the lookup allocation were tried. A named
-// BlurSampleIndex enum and fully semantic names for the three scalar samples grew the frame to
-// 0xc60, so the enum was removed and exact allocation-preserving names retained with semantic
-// comments. Revisit after a reachable TU-state change or in the post-coverage last-mile phase.
-// No AST permutation or TU-state noise was run because the canonical score is below their gate.
+// @semantic: First divergence is +0x22: ours loads height into eax and loads gpWindowManager before pushing the four arguments.
 VA(0x004d28e0, 0x6a4)
 void DoBlur(
     bitmap* destination,
@@ -250,18 +224,6 @@ void DoBlur(
     H2_FREE_AT(newPalette, gBlurText.newPaletteFreeSource, 0xae);
 }
 
-// @data-layout-note
-// Blur has no owned loader-zero storage. Retail DoBlur loads
-// gConfig.combatSpeed at gConfig+0x12e (VA 0x528e4e) and then indexes the
-// real gfCombatSpeedMod table at VA 0x4fa958. The former giCombatSpeed
-// DATA(0x4fa954) declaration was a false interior alias one word before that
-// table and has been removed.
-//
-// Candidate ordinal 3 and retail 0xeba84+0x4 are byte-exact (350.0f).
-// Retail initialized storage is one 0x100-byte writable record at 0x11fdc0.
-// gBlurText reproduces it exactly: the six source-file slots surround the
-// lookup filename in allocation/free call order, and each relocation uses the
-// corresponding owner-relative field offset.
 
 #undef BLUR_COMPONENT
 

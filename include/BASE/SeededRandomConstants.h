@@ -16,4 +16,4 @@ H2_ENUM_BEGIN(SeededRandomConstant)
     SEEDED_RANDOM_TOP_BIT = 31
 H2_ENUM_END(SeededRandomConstant)
 
-#endif // HOMM2_BASE_SEEDED_RANDOM_CONSTANTS_H
+#endif

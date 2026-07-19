@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_Re\mapcell.obj   from: (directly linked into exe)
-// functions: 11   data: 0
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include "EDITOR/fullMap.h"
 #include "EDITOR/mapcell.h"
@@ -34,7 +29,7 @@ void fullMap::Close(void) {
 
 VA(0x0040b145, 0x53)
 void fullMap::Init(i32 w, i32 h) {
-    i32 n; // retail reserves one unused /Od slot at -0x4 (this spills to -0x8)
+    i32 n;
     width = w;
     height = h;
     Close();
@@ -58,12 +53,9 @@ void fullMap::ClearCellExtra(i32 index) {
 
 VA(0x0040b266, 0x130)
 i32 fullMap::GetNewCellExtraIndex(void) {
-    // NOTE: /Od stack-slot order is MSVC symbol-HASH order, not declaration order.
-    // The retail frame is loop1@-4, newbuf@-8, loop2@-c; names are chosen so their
-    // hashes sort in that order (hash(nb) < hash(i) < hash(j)). See docs/patterns/od-hash-slots.md.
-    i32 nb;          // loop1 counter  -> -0x4
-    mapCellExtra* i; // grown buffer   -> -0x8
-    i32 j;           // loop2 counter  -> -0xc
+    i32 nb;
+    mapCellExtra* i;
+    i32 j;
 
     for (nb = 1; nb < extraCount; nb++) {
         if (extras[nb].nextIndex == IDX(MAPCELL_EXTRA_FREE)) {
@@ -91,17 +83,12 @@ void fullMap::Write(i32 handle) {
     write(handle, extras, extraCount * sizeof(mapCellExtra));
 }
 
-// The legacy cell stride is 20 bytes, while the current record is 12 bytes. Keeping
-// the destination byte offset factored by each current-record index reproduces the
-// retail conversion loop's separate scaled y and x address terms.
 VA(0x0040b7da, 0x295)
 void fullMap::Read(i32 handle, i32 convert) {
-    // /Od slots are MSVC symbol-hash order: retail frame is
-    //   extraLoop@-4, oldCells@-8, x@-c, y@-10, oldExtras@-14.
-    i32 nb;                // extras-convert loop counter -> -0x4
-    oldMapCell* tmp;       // legacy cell scratch buffer  -> -0x8
-    i32 x, y;              // cell convert loops          -> -0xc / -0x10
-    oldMapCellExtra* tmp2; // legacy extra scratch buffer -> -0x14
+    i32 nb;
+    oldMapCell* tmp;
+    i32 x, y;
+    oldMapCellExtra* tmp2;
 
     read(handle, &width, sizeof(width));
     read(handle, &height, sizeof(height));
@@ -131,14 +118,12 @@ void fullMap::Read(i32 handle, i32 convert) {
     }
 }
 
-// Cell's output-reference form places its /Ob1 continuation after the caller's
-// cell-pointer assignment, matching the retail inline boundary.
 VA(0x0040b396, 0x1d3)
 mapCellExtra* fullMap::GetNewCellExtraOverlay(i32 x, i32 y) {
-    mapCellExtra* node; // -0x4
-    i32 ix;             // -0x8
-    i32 ni;             // -0xc
-    mapCell* cell;      // -0x10
+    mapCellExtra* node;
+    i32 ix;
+    i32 ni;
+    mapCell* cell;
 
     if (Row(y)[x].m_extraIndex == 0) {
         Cell(cell, x, y);
@@ -165,10 +150,10 @@ mapCellExtra* fullMap::GetNewCellExtraOverlay(i32 x, i32 y) {
 
 VA(0x0040b569, 0x1d3)
 mapCellExtra* fullMap::GetNewCellExtraObject(i32 x, i32 y) {
-    mapCellExtra* node; // -0x4
-    i32 ix;             // -0x8
-    i32 ni;             // -0xc
-    mapCell* cell;      // -0x10
+    mapCellExtra* node;
+    i32 ix;
+    i32 ni;
+    mapCell* cell;
 
     if (Row(y)[x].m_extraIndex == 0) {
         Cell(cell, x, y);
@@ -193,16 +178,7 @@ mapCellExtra* fullMap::GetNewCellExtraObject(i32 x, i32 y) {
     }
 }
 
-// Sets the object (overlay==0) or overlay (overlay!=0) tileset+index on a cell:
-// either directly on the cell (when its current obj/ovl is empty or already on the
-// requested tileset) or by walking/appending the cell's extras chain.
-// /Od slots are MSVC symbol-hash order: retail frame is idx@-4, ptr@-8, t@-c, with
-// one reserved unused local @-10 (this spills to -0x14). Names chosen so their
-// buckets (0,1,4,6) sort into that order. The 7th param is unused in retail.
-//
-// The explicit u8 conversion on the direct-cell object assignment preserves the
-// field-first read/modify/write schedule used by retail after the earlier legacy
-// allocation casts are expressed with C++ casts.
+// Updates a cell directly or appends to its extra-object chain.
 VA(0x0040ba6f, 0x2ea)
 void fullMap::ChangeTilesetIndex(
     mapCell* cell,
@@ -213,10 +189,10 @@ void fullMap::ChangeTilesetIndex(
     i32 overlay,
     i32
 ) {
-    i32 idx;           // chain index        -> -0x4
-    mapCellExtra* ptr; // current chain node -> -0x8
-    i32 t;             // tileset to store   -> -0xc
-    i32 dummy;         // reserved unused    -> -0x10
+    i32 idx;
+    mapCellExtra* ptr;
+    i32 t;
+    i32 dummy;
 
     ptr = 0;
     if (index == IDX(MAPCELL_SPRITE_NONE))

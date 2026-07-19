@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_Re\Viewwrld.obj   from: (directly linked into exe)
-// functions: 5   data: 17
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <BASE/message.h>
 #include <BASE/bitmap.h>
@@ -34,14 +29,7 @@
 #include <stdio.h>
 #include <string.h>
 
-// @semantic
-// Exact 0x350 frame, 0x267 extent, CFG/semantics, and 42/42 broad relocation targets.
-// The eight raw residual bytes at +0xc7/+0xcd/+0xe6/+0x15e/+0x173/+0x179/+0x1d7/+0x1dd
-// are a three-slot permutation: retail allocation/delete/legend at -0x340/-0x344/-0x348,
-// ours legend/allocation/delete. `legendMode`/`mode` (bucket 15), `viewIndex`
-// (bucket 14), moving the declaration to function entry, a nested lexical scope, and
-// declaring the window pointer at its initializer did not recover retail ordering.
-// Revisit only after TU-state changes expose different hidden-temporary ordering.
+// @semantic: compiler-shape residual.
 VA(0x004333c0, 0x267)
 void advManager::ViewWorld(ViewWorldMode whatToDraw, b32 drawAllObjects, b32 drawAllTerrains) {
     i8 paletteData[VIEW_WORLD_PALETTE_SIZE];
@@ -146,15 +134,7 @@ void advManager::VWInit(i32 centerX, i32 centerY) {
     UpdateRadar(1, 0);
 }
 
-// @semantic
-// Exact 0xa8 frame, live/generated stack slots, complete source CFG/semantics, and 198/198
-// broad relocation targets. The first residual at +0x65 is the Y-bound global load order;
-// the first opcode-shape residual at +0xb3 is ours `mov mapY; imul MAP_WIDTH` versus retail
-// `mov MAP_WIDTH; imul mapY`. The 0x58-byte first jump table starts at ours +0x23b versus
-// retail +0x23a after restoring retail's two explicit default continuations. Both Y-bound
-// operand orders and both multiply orders compile byte-identically. Ten reviewed depth-one
-// commutative/relational AST variants also produced no improvement; revisit only after TU-state
-// changes or a source-structure discovery beyond operand spelling.
+// @semantic: first residual at +0x65 is the Y-bound global load order; the first opcode-shape residual at +0xb3 is ours mov mapY.
 VA(0x004338d4, 0x1346)
 void advManager::VWCompleteDraw(void) {
     i32 mineHighlight18;
@@ -638,13 +618,7 @@ void advManager::VWCompleteDraw(void) {
     );
 }
 
-// @semantic
-// Exact 0x9c frame, all named/generated slots, complete CFG/semantics, and 99/99 broad
-// relocation targets. Explicit switch defaults recover the three retail continuation jumps.
-// The remaining normalized residuals are only commutative global-load order at +0x218,
-// +0x433, and +0x4e3 (Y bounds and the second VWInit argument). Swapping each addition's
-// operands compiled byte-identically. Ten reviewed depth-one commutative/relational AST
-// variants produced the same bytes; revisit only after TU-state changes.
+// @semantic: evaluation-order residual.
 VA(0x00434c1a, 0x5e2)
 i32 ViewWorldDialogHandler(struct tag_message& message) {
     float radarScale6;
@@ -784,7 +758,6 @@ i32 ViewWorldDialogHandler(struct tag_message& message) {
     return 1;
 }
 
-// ---- globals (definitions, RVA order) ----
 DATA(0x004f11b8) i8 iVWHalf[3][6][2] = {3,  3, 5, 5, 6, 6, 8, 5, 2, 3, 2,  2,  4,  5, 6, 6, 8, 8,
                                         11, 7, 3, 4, 3, 3, 7, 7, 8, 8, 10, 10, 14, 8, 3, 6, 4, 4};
 DATA(0x004f11dc) ViewWorldScale giViewWorldScale = VIEW_WORLD_SCALE_MIDDLE;

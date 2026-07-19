@@ -1,7 +1,5 @@
 #ifndef HOMM2_BASE_SAMPLE_H
 #define HOMM2_BASE_SAMPLE_H
-// Reconstructed class (BASE) from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// 3 methods, 0 own-virtual, 0 static data.
 #include <va.h>
 #include <BASE/resource.h>
 #include <BASE/sampleData.h>
@@ -18,19 +16,13 @@ H2_ENUM_CLASS_BEGIN(samplePlaybackRate)
     SAMPLE_RATE_44100 = 44100
 H2_ENUM_CLASS_END(samplePlaybackRate)
 
-#pragma pack(push, 1) // recovered layout is byte-packed
+#pragma pack(push, 1)
 class sample : public resource {
 public:
-    // --- members (offsets from Ghidra this+off access-analysis; widths are
-    // access-widths, NOT confirmed types; refine during byte-matching) ---
-    // (vptr auto-emitted at 0x00; own data starts at 0x04)
-    SamplePlaybackData m_playbackData; // +0x10..+0x2f
-    // --- constructors ---
+    SamplePlaybackData m_playbackData;
     sample(char*, i32l, i32l, i32l);
-    // Inline lets the compiler fold the body into ??_G; dllexport also retains the
-    // standalone ??1 body required by retail.
     __declspec(dllexport) virtual inline ~sample() OVERRIDE;
 };
 #pragma pack(pop)
 SIZE(sample, 0x30);
-#endif // HOMM2_BASE_SAMPLE_H
+#endif

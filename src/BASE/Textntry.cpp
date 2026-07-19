@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_RE\Textntry.obj   from: .\basewin.lib
-// functions: 9   data: 1
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <BASE/textEntryWidget.h>
 #include <BASE/TEXTNTRY_TYPES.h>
@@ -23,21 +18,6 @@
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\Textntry.cpp"
 #define TEXT_ENTRY_MAIN_SOURCE_FILES RETAIL_FILE "\0\0\0" RETAIL_FILE
 
-// @data-layout-note Retail's initialized Textntry contribution is
-// RVA 0x120cec..0x120d9c (0xb0), with four identical source-path views at
-// addends 0, 0x2c, 0x58, and 0x84. Constructor allocation, Read allocation,
-// Main free, and Main reallocation use those addresses in order. The only rdata
-// contribution is the reviewed 0xc textEntryWidget vtable at RVA 0x0ebaa0, and
-// the TU has no loader-zero contribution. The former source pooled all four uses
-// into one 0x2a COMDAT. `/Gf-` retained that pooling and `/GF-` only moved it to
-// rdata. A typed 0xb0 aggregate reproduced bytes and addends but emitted an
-// align-eight section at the align-four-only retail start, adding
-// section-outside-contributions and unconsumed-contribution diagnostics.
-// The retained align-four COMDATs are 0x2a, 0x2b, and 0x56 bytes. The last is a
-// two-slot Main owner whose second relocation has addend 0x2c. Their bytes plus
-// natural 2/1/2-byte section alignment tails equal the complete retail interval,
-// and strict replay closes the group. Do not pool the paths or add padding
-// symbols, aliases, fake owners, section pragmas, or per-TU flag exceptions.
 
 VA(0x004d8740, 0x2d)
 textEntryWidget::textEntryWidget(void) : textWidget() {
@@ -49,20 +29,7 @@ textEntryWidget::textEntryWidget(void) : textWidget() {
     m_displayOffset = 0;
 }
 
-// @early-stop
-// Compiler folding artifact: keeping the standalone destructor exact makes VC4.2 emit a
-// 0x1f ??_G wrapper that calls it, while each retail ??_E body is 0x36 and folds the same
-// destructor operations inline. Marking the declaration inline reproduced the 0x36 body
-// and 5/5 targets byte-for-byte but removed the separately mapped exact ??1 destructor,
-// so the ABI-correct non-inline declaration is retained.
-// VA(0x004d8770, 0x36) ??_E/??_G textEntryWidget deleting destructor aliases
-
-// @semantic
-// Base/retail sections are both 0x134 with the same frame, CFG, and all 6/6 ordered
-// external relocations. The only raw residual is +0x7f..+0x93: retail stores iconFrame
-// before initializing m_maxLines/m_preserveTextOnFocus/m_color, while VC4.2 delays that
-// independent store. A bounded AST pass found small fuzzy gains from store permutations,
-// but each broadened the structural diff, so none was retained. Revisit after TU state changes.
+// @semantic: only residual is store order at +0x7f..+0x93.
 VA(0x004d87b0, 0x134)
 textEntryWidget::textEntryWidget(
     i16 x,
@@ -115,13 +82,7 @@ textEntryWidget::~textEntryWidget() {
     gpResourceManager->Dispose(m_icon);
 }
 
-// @semantic
-// Base/retail are both 0x26c with the same frame/CFG and all 52/52 ordered external
-// relocations. The only raw residual is +0x18b..+0x191: retail compares type before
-// loading m_height, while VC4.2 schedules those independent instructions in reverse.
-// Moving the comparison earlier, duplicating the height store in both type arms, and replacing
-// the preserved local with direct constant stores all broadened the diff; 22 bounded AST variants
-// also did not improve the canonical score. Revisit after TU state changes.
+// @semantic: only raw residual is +0x18b..+0x191: retail compares type before loading m_height.
 VA(0x004d8920, 0x26c)
 void textEntryWidget::Read(i32 type) {
     char resourceName[13];
@@ -486,12 +447,7 @@ void textEntryWidget::SetupDisplayString(char* source, u16 cursor) {
     }
 }
 
-// ===== vtable textEntryWidget : public widget  (3 slots) =====
-//  [ 0] VA(0x004d9410, 0x160)  void textEntryWidget::Draw(void)   <- override (implements widget pure virtual)
-//  [ 1] VA(0x004d8770, 0x36)  void * textEntryWidget::scalar_dtor(unsigned int)   <- override (implements widget pure virtual)
-//  [ 2] VA(0x004d8b90, 0x874)  int textEntryWidget::Main(struct tag_message &)   <- override (implements widget pure virtual)
 
-// ---- vtables (compiler-emitted; census) ----
 VTBL(textEntryWidget, 0x004ebaa0);
 
 #undef RETAIL_FILE

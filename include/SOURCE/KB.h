@@ -4,9 +4,6 @@
 #include <SOURCE/armyGroup.h>
 #include <SOURCE/hero.h>
 #include <SOURCE/REMOTE_TYPES.h>
-// Declarations of the free functions DEFINED in KB.cpp — the single home for these
-// symbols. Other TUs call them by including this header (no local externs).
-// forward declarations (was <_all.h>):
 struct SAMPLE2;
 struct SSpellInfo;
 struct SWinSetup;
@@ -771,7 +768,6 @@ void CheckShingleUpdate(void);
 void NormalDialog(char*, i32, i32, i32, i32, i32, i32, i32, i32, i32);
 void UpdateNormalDialog(char* text);
 
-// --- globals owned by this TU (moved from _globals.h; CodeView-attributed) ---
 extern i32 bDoColorCycle;
 extern b32 gbDrawWindowBackground;
 extern i32 bEarlySetupDone;
@@ -905,4 +901,4 @@ extern i16* pwSizeOfMapExtra;
 extern font* smallFont;
 extern u8 iGetSSByAlignment[IDX(HERO_SKILL_COUNT)][IDX(FACTION_COUNT)];
 
-#endif // HOMM2_KB_H
+#endif

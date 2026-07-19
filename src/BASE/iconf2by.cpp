@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_RE\iconf2by.obj   from: .\basewin.lib
-// functions: 1   data: 0
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <BASE/iconf2by.h>
 #include <BASE/IconEntry.h>
@@ -12,7 +7,6 @@
 #include <BASE/bitmap.h>
 #include <SOURCE/dimPalette.h>
 #include <string.h>
-// Per-call decoder scratch — its own file-static block.
 static IconEntry* gFYEntry;
 static u8* gFYSrc;
 static i32 gFYX0;
@@ -36,21 +30,7 @@ static inline i32 IconRowVisible(i8* shear, i32 clipTop) {
     return shear[gFYY] != ICON_SHEAR_SKIP_ROW && clipTop <= gFYY && gFYY <= gFYClipB;
 }
 
-// @semantic
-// The decoder is structured as one command-fetch loop with `continue` edges. Replacing the former
-// `goto do_fill` reconstruction with an if/else fallthrough to one shared fill block is byte-neutral;
-// extracting that block into an inline function instead duplicates it (0x628, 156 relocations), so
-// the shared block is intentional CFG rather than a helper. The literal paths likewise need no
-// labels: nested setup arms flow into one copy tail, then continue the outer loop.
-// Current structured source has the retail four-byte frame home and candidate 0x586 versus retail
-// 0x58d. Retail code operands recover the complete permutation of all 18 otherwise indistinguishable
-// four-byte private BSS owners; section-order pairing had mislabeled them. With that mapping fixed,
-// all 142 candidate data-target occurrences match retail and only retail's gFYClipR at +0x4b3 and
-// gFYX at +0x56e remain absent. The repeated complete row-visibility predicate is retained as the
-// only helper supported by both reuse and codegen evidence; nested, row-only, one-use geometry,
-// fill, and literal helpers were rejected. First raw divergence is the setup lifetime at +0x5c:
-// retail keeps shear in ESI and clipW in EBP, while candidate keeps shear in EBP and later reloads
-// width. Do not reintroduce labels merely to chase fuzzy scheduling.
+// @semantic: First raw divergence is the setup lifetime at +0x5c: retail keeps shear in ESI and clipW in EBP.
 VA(0x004d9ce0, 0x58d)
 void FlipIconToBitmapYModify(
     class icon* srcIcon,
@@ -147,7 +127,6 @@ void FlipIconToBitmapYModify(
             gFYX = gFYX - gFYRun;
             continue;
         }
-        // ---- positive command : backward literal copy / newline ----
         if (gFYRun != 0) {
             if (IconRowVisible(shear, clipY)) {
                 i32 left = (gFYX - gFYRun) + 1;
@@ -190,7 +169,6 @@ void FlipIconToBitmapYModify(
             gFYX -= gFYRun;
             continue;
         }
-        // newline
         gFYX = gFYXEnd - shear[gFYY];
         gFYY = gFYY + 1;
         gFYRow = gFYRow + dest->m_width;

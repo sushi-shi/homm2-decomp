@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_Re\SEARCH.OBJ   from: (directly linked into exe)
-// functions: 2   data: 0
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <EDITOR/mapcell.h>
 #include <SOURCE/ADVMGR.h>
@@ -46,15 +41,7 @@ DATA(0x0052a254) static i32 s_hasTarget;
 DATA(0x0052a258) static i8 s_directionCosts[SEARCH_DIRECTION_COUNT];
 DATA(0x0052a260) static hero* s_currentHero;
 
-// @semantic
-// /O2 structural checkpoint: complete loop/CFG and FPO saved-register set; base has
-// 0xbc meaningful bytes versus retail 0xbc plus a four-byte trailing alignment LEA.
-// First divergence is +0x0: base loads destination X into EAX before saving EBX,
-// while retail saves EBX and materializes the path cursor in EAX first. Relocs are
-// 3/3; retail's normalDirTable+1 relocation is delinked as the adjacent local ??_C
-// alias, and MAP_WIDTH agrees. Tried explicit and register cursors, direct member
-// indexing, comma sequencing, coordinate aliases, both union views, condition
-// polarity, multiplication order, and shared-return CFG. Revisit in the 95% /O2 pass.
+// @semantic: First divergence is +0x0: base loads destination X into EAX before saving EBX.
 VA(0x004a25e0, 0xc0)
 i32 searchArray::BuildPath(
     i32 startX,
@@ -87,20 +74,7 @@ i32 searchArray::BuildPath(
     return m_pathLength;
 }
 
-// @semantic
-// /O2 structural checkpoint: complete semantics, 1024x9 queue layout, stack arguments,
-// call order, and bottom-tested queue CFG. The FPO prologue is exact: EBX/ESI/EDI/EBP
-// are saved, this is ESI, continueSeed is EBX, and target X is EDI. Base has 0x9ea
-// meaningful bytes versus retail 0x9df plus one pad byte. The first code divergence is
-// target visibility indexing: base adds mapExtra before target X and tests [EAX+EDI],
-// while retail adds target X first and tests [EAX+ECX]. The exhaustive data-target pass has
-// candidate 210/retail 209 occurrences with 208 matched and no novel identity. Retail reloads
-// s_adjacentX once for the upper-width comparison while candidate keeps it live; candidate
-// instead reloads s_candidateY once for the upper-height comparison while retail keeps that
-// live, and similarly reloads s_adjacentMonsterX once in the earlier traversal. These are
-// register-lifetime multiplicities, not target substitutions. Tried direct/local target
-// indexing, branch polarities, nested cost arguments, queue aliases, register/const alias
-// orders, and both top- and bottom-tested queue loops. Revisit in the 95% /O2 pass.
+// @semantic: first code divergence is target visibility indexing: base adds mapExtra before target X and tests [EAX+EDI].
 VA(0x004a26a0, 0x9df)
 void searchArray::SeedPosition(
     i32 seedX,

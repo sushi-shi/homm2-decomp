@@ -2,9 +2,6 @@
 #define HOMM2_COMMAND_H
 
 #include <Ints.h>
-// Declarations of the free functions DEFINED in COMMAND.cpp — the single home for these
-// symbols. Other TUs call them by including this header (no local externs).
-// forward declarations (was <_all.h>):
 struct tag_message;
 
 H2_ENUM_CLASS_BEGIN(CombatMainResult)
@@ -262,4 +259,4 @@ SIZE(CombatRemotePacket, 0x19);
 i32 WinCombatHandler(struct tag_message&);
 i32 InCombatArea(i32, i32);
 
-#endif // HOMM2_COMMAND_H
+#endif

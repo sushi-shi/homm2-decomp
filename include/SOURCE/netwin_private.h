@@ -20,4 +20,4 @@ static void __fastcall nb_format_name(char* source, u8* destination);
 
 extern "C" u8 __stdcall Netbios(NetbiosControlBlock* controlBlock);
 
-#endif // HOMM2_NETWIN_PRIVATE_H
+#endif

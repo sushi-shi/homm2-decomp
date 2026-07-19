@@ -1,16 +1,8 @@
 #ifndef HOMM2_SOURCE_KB_TYPES_H
 #define HOMM2_SOURCE_KB_TYPES_H
-// Compatibility aggregate for shared records used by KB.cpp and its consumers. Domain
-// headers are canonical where split out; MSVC mirrors remain flattened when a nested include
-// boundary would perturb cumulative compiler state.
 #include <va.h>
-// Forward declarations for opaque pointer members.
 class sample;
 
-// Resource-type index for the game's per-resource arrays (gafAITurnCostResource, p[] amounts,
-// etc.), in the standard HoMM2 order. MERCURY/ORE/CRYSTAL are confirmed by the retail's
-// per-element .rdata float symbols referenced in philAI::RVConversion; the rest follow the
-// canonical order.
 H2_ENUM_CLASS_BEGIN(ResourceType)
     RES_NONE = -1,
     RECRUIT_NO_RESOURCE = RES_NONE,
@@ -509,11 +501,9 @@ H2_ENUM_CLASS_BEGIN(MonsterAbilityFlags)
 H2_ENUM_CLASS_END(MonsterAbilityFlags)
 H2_ENUM_FLAGS(MonsterAbilityFlags)
 
-// Retained in the historical declaration sequence because MSVC 4.2's cumulative TU state
-// changes code generation when these otherwise redundant declarations are removed.
 typedef u32 UInt32;
 struct MemEntry;
-struct _SAMPLE; // SAMPLE2::pMem — opaque
+struct _SAMPLE;
 
 H2_ENUM_BEGIN(KbLayoutConstant)
     MENU_ENABLE_STATUS_COUNT = 70
@@ -523,7 +513,6 @@ struct SMenuEnableStatus {
     u32 command;
     u8 normalEnabled;
     u8 setupEnabled;
-    // All 70 retail values are zero, and the executable has no xref to this byte.
     u8 reserved;
 };
 #pragma pack(pop)
@@ -619,12 +608,12 @@ struct SSpellInfo {
     u8 cost;
     u8 raceChance[6];
     SpellInfoAttribute attributes;
-}; // gsSpellInfo[] (sizeof 22)
+};
 SIZE(SSpellInfo, 0x16);
 struct SAMPLE2 {
     class sample* pSample;
     struct _SAMPLE* pMem;
-}; // NULL_SAMPLE2
+};
 
 #pragma pack(push, 1)
 struct SWinSetup {
@@ -635,4 +624,4 @@ struct SWinSetup {
 SIZE(SWinSetup, 7);
 #pragma pack(pop)
 
-#endif // HOMM2_SOURCE_KB_TYPES_H
+#endif

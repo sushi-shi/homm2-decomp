@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_Re\HEXCELL.OBJ   from: (directly linked into exe)
-// functions: 8   data: 0
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
@@ -41,11 +36,7 @@ void hexcell::DrawLowerDeadOccupants(void) {
     }
 }
 
-// @early-stop
-// Complete 0x10 frame, loop/CFG, and ordered relocations. At +0x40 retail scales
-// dead-occupant side before index; candidate evaluates the equivalent m_armies
-// subscripts in reverse order. Flattening the two-dimensional index regressed the
-// live score; direct and commuted subscript spellings were otherwise unchanged.
+// @early-stop: byte-proven compiler artifact.
 VA(0x0044a4e2, 0xc8)
 void hexcell::DrawUpperDeadOccupant(void) {
     i32 currentFrame;

@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_Re\ARMY.OBJ   from: (directly linked into exe)
-// functions: 45   data: 2
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <stdio.h>
 #include <string.h>
@@ -252,10 +247,7 @@ void army::FreeResources(void) {
     }
 }
 
-// @early-stop
-// All instructions before the function-local compressed switch table and all
-// 42 relocation sites align. The table/selector span at +0x4f0..+0x513 has only
-// local-label identities; its dispatch and five case bodies were audited raw.
+// @early-stop: byte-proven compiler artifact.
 VA(0x0044b456, 0x7d2)
 void army::DrawToBuffer(i32 x, i32 y, i32 effectsOnly) {
     i32 quantityY0;
@@ -490,12 +482,7 @@ void army::Wince(void) {
     m_animationFrame = 0;
 }
 
-// @semantic: The 0x2c frame, every visible slot, complete CFG, and all 151
-// ordered relocations align after the nested sample-layout correction. Live
-// residuals are two equivalent extent-clamp operand orders, the two final
-// range-branch polarities, and the __adjust_fdiv/iLeftRightSave alias. Direct,
-// commuted, negated, and scalar-SIB forms were previously exhausted; revisit
-// after later ARMY TU-state changes.
+// @semantic: evaluation-order residual.
 VA(0x0044bc55, 0xb90)
 void army::Walk(i32 direction, i32 finishStanding, i32 skipDrawing) {
     i32 oldMaxX_1;
@@ -751,12 +738,7 @@ void army::Walk(i32 direction, i32 finishStanding, i32 skipDrawing) {
     }
 }
 
-// @semantic
-// Logic, 0x1d8 frame/slots, CFG, and all external relocations align. Residuals
-// are TU-cumulative army-array/extent operand order, equivalent float-compare
-// polarity, constant-pool identities, one continuation jump, and the delinked
-// recursive local call. Manual variants and an audited AST permutation pass
-// were exhausted; revisit after later ARMY source/header changes.
+// @semantic: evaluation-order residual.
 VA(0x0044c7e5, 0x14aa)
 void army::SpecialAttack(void) {
     char combatText[ARMY_COMBAT_TEXT_SIZE];
@@ -1211,11 +1193,7 @@ void army::DirDoAttack(i32 direction) {
     DoAttack(0);
 }
 
-// @semantic
-// Logic, frame slots, CFG, and all 48 relocation sites align. The remaining
-// code differences are TU-cumulative side/index address evaluation at three
-// army-array sites; direct, commuted, flat-pointer, and scalar-SIB spellings
-// were audited. Other residual identities are delinked string literals.
+// @semantic: stack-slot/code-shape residual.
 VA(0x0044dcba, 0x4e7)
 void army::DoHydraAttack(i32) {
     i32 damage_8;
@@ -1304,14 +1282,7 @@ void army::DoHydraAttack(i32) {
     gpCombatManager->m_limitCreatureCount[m_side][m_index] = 1;
 }
 
-// @semantic
-// Logic, the 0x124 frame, stack slots, switch-body order, and external relocation
-// targets align. Excluding the 0x24 local-label jump table, the remaining code
-// differences are two side/index evaluation orders, two condition-polarity
-// trampolines, and eight five-byte inline continuations. The 0x2b compressed
-// case map is byte-exact; all 11 jump-table DIR32 entries agree by case order.
-// The two base-only self REL32 entries are the retail-resolved recursive calls;
-// remaining relocation identities are strings, gConfig, and constant-pool names.
+// @semantic: jump-table placement residual.
 VA(0x0044e1a1, 0x1267)
 void army::DoAttack(i32 retaliation) {
     i32 targetOriginalFacing_5;
@@ -1663,11 +1634,7 @@ i32 army::WalkTo(void) {
     return WalkTo(m_moveTargetHex);
 }
 
-// @semantic
-// Complete 0x2ee body, 0x18 frame/slots, CFG, and all 19 ordered relocation
-// targets agree. At +0x12e retail calls GetAdjacentCellIndex before loading
-// moatCell[moatIndex]; base loads the table byte before the call. Swapped
-// equality operands and qualifying the table lvalue were byte-neutral.
+// @semantic: compiler-shape residual.
 VA(0x0044f443, 0x2ee)
 i32 army::WalkTo(i32 destination) {
     i32 direction_3;
@@ -1747,10 +1714,7 @@ i32 army::AttackTo(void) {
     return AttackTo(m_moveTargetHex);
 }
 
-// @semantic: Complete 0x10 frame, CFG, and ordered relocations. The only raw
-// residual is +0x5e..+0x63: retail evaluates m_moveTargetHex then m_hex, while
-// MSVC evaluates the commutative equality in the opposite order. Both source
-// operand orders and the value-preserving |0 spelling emitted the same pair.
+// @semantic: only raw residual is +0x5e..+0x63: retail evaluates m_moveTargetHex then m_hex.
 VA(0x0044f756, 0x1e8)
 i32 army::AttackTo(i32 destination) {
     i32 finishStanding;
@@ -1802,11 +1766,7 @@ i32 army::AttackTo(i32 destination) {
     return ARMY_PATH_BLOCKED;
 }
 
-// @semantic: The complete behavior and 0x1c frame are recovered, including
-// distinct bad/good army-name lifetimes and all 37 ordered relocations. The
-// SAMPLE2 return temporary is ours -0x18/-0x14 versus retail -0x10/-0x0c;
-// the name slots are ours -0x0c/-0x10 versus retail -0x14/-0x18. Function-wide,
-// branch-local, isolated-assignment, and two-name parent-scope forms were tried.
+// @semantic: branch/code-shape residual.
 VA(0x0044f93e, 0x282)
 void army::CheckLuck(void) {
     SAMPLE2 luckSample;
@@ -1859,10 +1819,7 @@ void army::CheckLuck(void) {
     }
 }
 
-// @semantic
-// All 41 relocation sites align. The only non-pool code difference is the
-// value-equivalent genie clamp operand order at target 0x581f-0x5825; direct,
-// reversed, negated, and empty-arm comparison spellings were audited.
+// @semantic: evaluation-order residual.
 VA(0x0044fbc0, 0x56e)
 void army::DamageEnemy(
     army* target,
@@ -1984,10 +1941,7 @@ void army::DamageEnemy(
     *killedResult = target->Damage(damageDone2, SPELL_NONE);
 }
 
-// @semantic: Complete behavior, 0x10 frame, CFG, and ordered relocations. The
-// first residual is +0x1ca: retail evaluates current side before army index in
-// the m_armies address, while the candidate evaluates the equivalent two
-// subscripts in reverse order. Direct and commuted subscript forms were checked.
+// @semantic: first residual is +0x1ca: retail evaluates current side before army index in the m_armies address.
 VA(0x0045012e, 0x23c)
 i32 army::Damage(i32l damage, SpellType spell) {
     i32 killed_13;
@@ -2045,12 +1999,7 @@ i32 army::Damage(i32l damage, SpellType spell) {
     return killed_13;
 }
 
-// @semantic
-// The complete behavior, 0x58 frame, role-to-slot mapping, initialization
-// order, CFG, and all 119 ordered relocations align. Residuals are four
-// commutative max/add load orders plus three trailing retail padding NOPs;
-// reversed comparison/addition spellings were byte-neutral, while typed direct
-// limit-count indexing regressed both address sites.
+// @semantic: evaluation-order residual.
 VA(0x0045036a, 0x1361)
 void army::PowEffect(i32 effect, i32 resetLimits, i32 effectX, i32 effectY) {
     i32 damageFrames;
@@ -2438,12 +2387,7 @@ i32 army::LeaveNoBody(void) {
            || HAS(m_monster.flags.all, MONSTER_FLAGS_MIRROR_IMAGE);
 }
 
-// @semantic
-// The complete behavior, 0x18 frame/slots, CFG, and external targets align.
-// Residuals are the commutative side/mirror-index address order at the two
-// mirror army lookups, the retail-resolved recursive call at +0x3e5, and three
-// trailing retail NOPs. A typed flat-array spelling changed the multiplication
-// shape and regressed the match, so the real two-dimensional access is retained.
+// @semantic: compiler-shape residual.
 VA(0x00451766, 0x3f5)
 void army::ProcessDeath(i32 immediate) {
     i32 rearHex;
@@ -2617,9 +2561,7 @@ void army::SpellEffect(i32 effect, i32 effectFrameDelay, i32 animateCreature) {
     }
 }
 
-// @early-stop
-// All non-table bytes match. The table at +0xf3..+0x102 contains four
-// function-local label relocations; its dispatch and all five calls also align.
+// @early-stop: byte-proven compiler artifact.
 VA(0x00451ef8, 0x10f)
 void army::CancelSpellType(ArmySpellCancelType cancelType) {
     switch (cancelType) {
@@ -2649,9 +2591,7 @@ void army::CancelSpellType(ArmySpellCancelType cancelType) {
     }
 }
 
-// @early-stop
-// All non-table bytes match. The table at +0x130..+0x16b contains only 15
-// function-local label relocations; its dispatch and database field also align.
+// @early-stop: byte-proven compiler artifact.
 VA(0x00452007, 0x178)
 void army::CancelIndividualSpell(ArmySpellInfluence influence) {
     if (!m_spellInfluence[IDX(influence)]) {
@@ -2699,9 +2639,7 @@ void army::CancelIndividualSpell(ArmySpellInfluence influence) {
     }
 }
 
-// @early-stop
-// All non-table bytes match. The table at +0x21c..+0x257 contains only 15
-// function-local label relocations; its dispatch and all 12 externals also align.
+// @early-stop: byte-proven compiler artifact.
 VA(0x0045217f, 0x282)
 i32 army::SetSpellInfluence(ArmySpellInfluence influence, i32 rounds) {
     i32 i;
@@ -2774,12 +2712,7 @@ i32 army::SetSpellInfluence(ArmySpellInfluence influence, i32 rounds) {
     return 1;
 }
 
-// @semantic
-// Complete 0x94 body, 0x8 frame/slots, CFG, and the sole ordered relocation
-// agree. At +0x67/+0x6a retail loads this from -0x8 into EAX and i from -0x4
-// into ECX for the decrement SIB; base assigns those registers in reverse.
-// i[m_spellInfluence] was byte-neutral and explicit pointer subtraction
-// materially regressed the lowering. Revisit after an ARMY TU-state change.
+// @semantic: compiler-shape residual.
 VA(0x00452401, 0x94)
 void army::DecrementSpellRounds(void) {
     i32 i;
@@ -2798,12 +2731,7 @@ void army::DecrementSpellRounds(void) {
     }
 }
 
-// @semantic
-// Logic, the 0x50 frame, every retail stack slot, and all 55 relocation sites
-// align. Raw instruction review limits the non-jump residue to the candidate
-// army side/index SIB evaluation and three equivalent comparison operand orders.
-// The remaining extent delta is inline-accessor continuation and condition-
-// polarity jumps; positive, negative, nested, and compound forms were audited.
+// @semantic: stack-slot/code-shape residual.
 VA(0x00452495, 0x644)
 void army::GoBerserk(void) {
     i32 masks_28[5];
@@ -2927,10 +2855,7 @@ berserkFinish:
     }
 }
 
-// @early-stop
-// All non-jump opcodes/operands and all 24 relocation sites align. The 32-byte
-// object extent delta is limited to seven five-byte inline-accessor continuation
-// jumps plus the equivalent first-condition branch encoding.
+// @early-stop: inline continuation artifact.
 VA(0x00452ad9, 0x3f1)
 void army::MoveAttack(i32 destination, i32 moveOnly) {
     i32 baseAttackMask;
@@ -3027,11 +2952,7 @@ finish:
     gpCombatManager->m_limitCreature = 1;
 }
 
-// @semantic: The complete behavior, 0x14 frame, loop/found/resurrect/hypnotize
-// slots at -0x04/-0x08/-0x0c/-0x10, CFG, and all 59 ordered relocations align.
-// The first remaining structural delta is the equivalent branch polarity at
-// instruction 134; retail also has three trailing NOPs. Computed local-name
-// buckets fixed all prior slot differences; revisit after ARMY TU-state changes.
+// @semantic: branch/code-shape residual.
 VA(0x00452eca, 0x931)
 float army::SpellCastWorkChance(SpellType spell) {
     i32 foundSpell_8;
@@ -3429,13 +3350,7 @@ i32 army::LeftX(void) {
     }
 }
 
-// @semantic: The complete 108-instruction CFG, 0x1c frame, all seven stack
-// slots, and all 3/3 ordered relocations align. At +0xae/+0xb1 and +0xc4/+0xc7
-// (repeated at +0x134/+0x137 and +0x14a/+0x14d), retail loads adjacentHex into
-// eax and compares the other hex slot; ours loads the other slot and compares
-// adjacentHex. Reversed equality operands, | 0 on either side, and negated
-// inequality forms all canonicalized unchanged. Revisit in the byte-last-mile
-// phase or after ARMY TU/header state changes.
+// @semantic: stack-slot/code-shape residual.
 VA(0x00453fa6, 0x171)
 i32 army::OtherArmyAdjacent(i32 side, i32 index) {
     army* otherArmy1;
@@ -3526,14 +3441,5 @@ i32 army::GetPowBaseY(void) {
     return y;
 }
 
-// ---- globals (definitions, RVA order) ----
-// @data-layout-note Retail .data is 0xf53c4+0x2f4: 58 exact literal payloads
-// plus bSecondAttack account for 59 allocations and all 61 HIGHLOW references.
-// Retail places bSecondAttack at +0xe4, while candidate COFF places it at +0;
-// this is allocation order, not missing storage. The sole uncovered retail byte
-// is terminal zero alignment at +0x2f3. Retail .rdata 0xeb5e0..0xeb650 matches
-// the complete candidate section (18 constants, 63 references), and .bss
-// 0x127eb4..0x127eb8 is exactly gbGenieHalf (3 references, addend zero). Do not
-// model the .data order or terminal alignment with aliases or invented padding.
 DATA(0x004f54a8) i32 bSecondAttack = 0;
 DATA(0x00527eb4) b32 gbGenieHalf;

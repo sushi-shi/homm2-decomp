@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_Re\X_CAMPGN.OBJ   from: (directly linked into exe)
-// functions: 36   data: 1
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <stdio.h>
 #include <string.h>
@@ -197,18 +192,6 @@ DATA(0x0051d740) static i8 expansionCampaignDifficulty[IDX(EXPANSION_CAMPAIGN_CO
                                                           {0, 1, 2, 2, -1, -1, -1, -1}
 };
 
-// @data-layout-note Retail X_CAMPGN initialized storage is
-// 0x51d450..0x51d9ca (0x57a bytes), followed by six alignment bytes before
-// SOURCE/tradpost. The whole candidate .data contribution is byte-exact:
-// campaign coordinates at +0, map counts at +0x100, xCampaignChoices at +0x110,
-// difficulty at +0x2f0, and compiler literals from +0x310. Retail's symbol pass
-// mistakes coordinate value 113 at +0 for the string "q" and exposes the Y
-// member at +4 as const_0011d454; code relocations prove both are one array
-// owner. UpdateInfo relocation ordinal 142 proves the choice-none text is "n/a"
-// at +0x508, not "None"; correcting it removed the four-byte tail displacement.
-// All 48 compiler literals have reviewed mappings: 26 by unique payload in the
-// previously exact prefix and the remaining 22 by exact section translation,
-// paired function relocation ordinal/type, and the absolute retail operand RVA.
 VA(0x004bb680, 0x23)
 ExpCampaign::ExpCampaign(void) {
     m_window = 0;
@@ -268,12 +251,7 @@ void ExpCampaign::InitNewCampaign(i32 campaignId) {
     ResetBonusChoices();
 }
 
-// @early-stop
-// The retail-sized 0x7cb raw body is identical after masking its 81 relocation
-// fields, and homm2 relocs reports 81/81 with no base-only external target. The
-// only objdiff residual is the 24 local DIR32 identities at +0x4fb..+0x527 and
-// +0x785..+0x7b1: retail delinks them as this function while our object uses $L
-// labels for the two jump tables.
+// @early-stop: delinker jump-table artifact.
 VA(0x004bb843, 0x7cb)
 void ExpCampaign::InitMap(void) {
     SCampaignChoice* campaignChoice =
@@ -546,19 +524,7 @@ void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
     }
 }
 
-// @semantic
-// All UI semantics, the
-// 0x84 frame and local slots, both selector maps/jump tables, CFG, and all 177
-// relocation targets are recovered. The first raw difference is the forward
-// branch displacement at +0x2a9; the first instruction divergence is +0x2b0,
-// where retail evaluates m_viewMap before m_campaignId for the flattened choice
-// index and this build uses the opposite register order. Retail code is 0x921
-// bytes versus 0x926 here. Tried direct multidimensional indexing, a stored
-// flattened offset, inline flattened terms in both orders, and a partially
-// indexed base; all retained the nonretail evaluation order. Qualifying either
-// m_viewMap or m_campaignId through OD_STEER(...) was also byte-neutral. Seven bounded
-// expression families are exhausted; revisit only after an earlier X_CAMPGN or
-// relevant layout/header change alters evaluation order.
+// @semantic: first residual is choice-index evaluation order at +0x2b0.
 VA(0x004bc34d, 0x921)
 void ExpCampaign::UpdateInfo(i32 redraw) {
     tag_message message;
@@ -771,10 +737,7 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
         m_window->DrawWindow();
 }
 
-// @early-stop
-// Equal-sized raw code is identical after masking the five
-// local jump-table DIR32 fields at +0xaa..+0xbd. Retail delinks them as this
-// function while our object uses $L labels; all external relocations match.
+// @early-stop: delinker jump-table artifact.
 VA(0x004bcc6e, 0x172)
 i32 ExpCampaign::HandleVictory(void) {
     i32 days = 0;
@@ -816,10 +779,7 @@ i32 ExpCampaign::HandleVictory(void) {
     return 0;
 }
 
-// @early-stop
-// Equal-sized raw code is identical after masking the ten
-// local jump-table DIR32 fields at +0x135..+0x15c. Retail delinks them as this
-// function while our object uses $L labels; all PlaySmacker relocations match.
+// @early-stop: delinker jump-table artifact.
 VA(0x004bcde0, 0x167)
 void ExpCampaign::HandleVictory1(void) {
     switch (m_currentMap + 1) {
@@ -871,10 +831,7 @@ void ExpCampaign::HandleVictory1(void) {
     }
 }
 
-// @early-stop
-// Equal-sized raw code is identical after masking the ten
-// local jump-table DIR32 fields at +0x119..+0x140. Retail delinks them as this
-// function while our object uses $L labels; all PlaySmacker relocations match.
+// @early-stop: delinker jump-table artifact.
 VA(0x004bcf47, 0x14b)
 void ExpCampaign::HandleVictory2(void) {
     switch (m_currentMap + 1) {
@@ -922,10 +879,7 @@ void ExpCampaign::HandleVictory2(void) {
     }
 }
 
-// @early-stop
-// Equal-sized raw code is identical after masking the six
-// local jump-table DIR32 fields at +0xac..+0xc3. Retail delinks them as this
-// function while our object uses $L labels; all PlaySmacker relocations match.
+// @early-stop: delinker jump-table artifact.
 VA(0x004bd092, 0xce)
 void ExpCampaign::HandleVictory3(void) {
     switch (m_currentMap + 1) {
@@ -954,10 +908,7 @@ void ExpCampaign::HandleVictory3(void) {
     }
 }
 
-// @early-stop
-// Equal-sized raw code is identical after masking the six
-// local jump-table DIR32 fields at +0x97..+0xae. Retail delinks them as this
-// function while our object uses $L labels; all PlaySmacker relocations match.
+// @early-stop: delinker jump-table artifact.
 VA(0x004bd160, 0xb9)
 void ExpCampaign::HandleVictory4(void) {
     switch (m_currentMap + 1) {
@@ -983,10 +934,7 @@ void ExpCampaign::HandleVictory4(void) {
     }
 }
 
-// @early-stop
-// Equal-sized raw code is identical after masking the five
-// local jump-table DIR32 fields at +0x62..+0x75. Retail delinks them as this
-// function while our object uses $L labels; all callees and the global match.
+// @early-stop: delinker jump-table artifact.
 VA(0x004bd219, 0x8c)
 void ExpCampaign::ReplaySmacker(void) {
     switch (m_campaignId) {
@@ -1006,10 +954,7 @@ void ExpCampaign::ReplaySmacker(void) {
     gpWindowManager->m_updateFlags = 1;
 }
 
-// @early-stop
-// Equal-sized raw code is identical after masking the nine
-// local jump-table DIR32 fields at +0xca..+0xed. Retail delinks them as this
-// function while our object uses $L labels; all PlaySmacker relocations match.
+// @early-stop: delinker jump-table artifact.
 VA(0x004bd2a5, 0xf8)
 void ExpCampaign::ReplaySmacker1(void) {
     switch (m_viewMap + 1) {
@@ -1043,10 +988,7 @@ void ExpCampaign::ReplaySmacker1(void) {
     }
 }
 
-// @early-stop
-// Equal-sized raw code is identical after masking the nine
-// local jump-table DIR32 fields at +0xab..+0xce. Retail delinks them as this
-// function while our object uses $L labels; all PlaySmacker relocations match.
+// @early-stop: delinker jump-table artifact.
 VA(0x004bd39d, 0xd9)
 void ExpCampaign::ReplaySmacker2(void) {
     switch (m_viewMap + 1) {
@@ -1077,10 +1019,7 @@ void ExpCampaign::ReplaySmacker2(void) {
     }
 }
 
-// @early-stop
-// Equal-sized raw code is identical after masking the five
-// local jump-table DIR32 fields at +0x8e..+0xa1. Retail delinks them as this
-// function while our object uses $L labels; all PlaySmacker relocations match.
+// @early-stop: delinker jump-table artifact.
 VA(0x004bd476, 0xac)
 void ExpCampaign::ReplaySmacker3(void) {
     switch (m_viewMap + 1) {
@@ -1102,10 +1041,7 @@ void ExpCampaign::ReplaySmacker3(void) {
     }
 }
 
-// @early-stop
-// Equal-sized raw code is identical after masking the five
-// local jump-table DIR32 fields at +0x6f..+0x82. Retail delinks them as this
-// function while our object uses $L labels; all PlaySmacker relocations match.
+// @early-stop: delinker jump-table artifact.
 VA(0x004bd522, 0x88)
 void ExpCampaign::ReplaySmacker4(void) {
     switch (m_viewMap + 1) {
@@ -1140,12 +1076,7 @@ i8 ExpCampaign::IsThisMapCompleted(void) {
     return 0;
 }
 
-// @early-stop
-// Equal-sized raw code is identical after masking local switch DIR32 fields at
-// +0x199..+0x19c and +0x1a0..+0x1af, plus four-byte xCampaign member fields at
-// +0xfa,+0x10d,+0x11d,+0x134,+0x140,+0x148,+0x161,+0x167,+0x203,+0x213,
-// +0x21f,+0x227,+0x234,+0x239. Retail names interior addresses; base uses
-// xCampaign plus the same addends. All external globals and callees resolve identically.
+// @early-stop: byte-proven compiler artifact.
 VA(0x004bd639, 0x32e)
 i32 ExpCampaign::MessageHandler(struct tag_message& message) {
     i32 map;
@@ -1278,11 +1209,7 @@ char* ExpCampaign::JosephName(void) {
 }
 
 // @early-stop
-// @early-stop-reloc-only
-// All 0x3a bytes match after masking two ordered relocation sites; all 18
-// instructions, the 0x4 frame/this slot, CFG, and effective targets align. The
-// second target is RVA 0xf2718 on both sides: base spells xStableText+0x18 while
-// retail spells the interior alias xJosephName+0x8. Revisit after alias normalization.
+// @early-stop-reloc-only: relocation naming only.
 VA(0x004bdab1, 0x3a)
 char* ExpCampaign::IvanName(void) {
     if (m_currentMap < EXPANSION_CAMPAIGN_FIRST_ALTERNATE_NAME_MAP)

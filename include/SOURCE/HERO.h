@@ -2,9 +2,6 @@
 #define HOMM2_HERO_H
 
 #include <Ints.h>
-// Declarations of the free functions DEFINED in HERO.cpp — the single home for these
-// symbols. Other TUs call them by including this header (no local externs).
-// forward declarations (was <_all.h>):
 struct tag_message;
 
 H2_ENUM_BEGIN(HeroUiConstant)
@@ -131,4 +128,4 @@ i32 HeroView(i32, i32, i32);
 void SetupHeroView(void);
 void DoHeroSplit(i32, i32);
 
-#endif // HOMM2_HERO_H
+#endif

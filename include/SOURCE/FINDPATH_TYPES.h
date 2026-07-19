@@ -17,4 +17,4 @@ struct SFindPathSourceLocation {
 };
 SIZE(SFindPathSourceLocation, 0x30);
 
-#endif // HOMM2_SOURCE_FINDPATH_TYPES_H
+#endif

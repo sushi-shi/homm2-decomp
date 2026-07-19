@@ -3,9 +3,6 @@
 
 #include <Ints.h>
 #include <SOURCE/KB_TYPES.h>
-// Declarations of the free functions DEFINED in ARMY.cpp — the single home for these
-// symbols. Other TUs call them by including this header (no local externs).
-// forward declarations (was <_all.h>):
 
 H2_ENUM_CLASS_BEGIN(ArmyAnimationSequence)
     ARMY_ANIMATION_WALK = 6,
@@ -209,22 +206,22 @@ struct SMonFrameInfo {
         i16 y;
     };
     char unknown00;
-    i16 spellEffectX;                                                               // +0x01
-    i16 spellEffectY;                                                               // +0x03
-    i8 animationXOffsets[IDX(ARMY_WALK_SEGMENT_COUNT)][ARMY_ANIMATION_FRAME_COUNT]; // +0x05
-    i8 walkXOffsets[ARMY_ANIMATION_FRAME_COUNT];                                    // +0x65
-    i8 standingAnimationCount;                                                      // +0x75
-    float standingAnimationChances[10];                                             // +0x76
-    i32 standStillDelay;                                                            // +0x9e
-    i32 walkDuration;                                                               // +0xa2
-    i32 attackDuration;                                                             // +0xa6
-    i32 flightSpeed;                                                                // +0xaa
-    struct MissileOffset missileOffsets[ARMY_MISSILE_OFFSET_COUNT];                 // +0xae
-    u8 projectileDirectionCount;                                                    // +0xba
-    float projectileAngles[ARMY_PROJECTILE_ANGLE_COUNT];                            // +0xbb
-    i32 quantityX[2];                                                               // +0xeb
-    i8 animationFrameCount[ARMY_ANIMATION_SEQUENCE_COUNT];                          // +0xf3
-    i8 animationFrames[ARMY_ANIMATION_SEQUENCE_COUNT][ARMY_ANIMATION_FRAME_COUNT];  // +0x115
+    i16 spellEffectX;
+    i16 spellEffectY;
+    i8 animationXOffsets[IDX(ARMY_WALK_SEGMENT_COUNT)][ARMY_ANIMATION_FRAME_COUNT];
+    i8 walkXOffsets[ARMY_ANIMATION_FRAME_COUNT];
+    i8 standingAnimationCount;
+    float standingAnimationChances[10];
+    i32 standStillDelay;
+    i32 walkDuration;
+    i32 attackDuration;
+    i32 flightSpeed;
+    struct MissileOffset missileOffsets[ARMY_MISSILE_OFFSET_COUNT];
+    u8 projectileDirectionCount;
+    float projectileAngles[ARMY_PROJECTILE_ANGLE_COUNT];
+    i32 quantityX[2];
+    i8 animationFrameCount[ARMY_ANIMATION_SEQUENCE_COUNT];
+    i8 animationFrames[ARMY_ANIMATION_SEQUENCE_COUNT][ARMY_ANIMATION_FRAME_COUNT];
 };
 SIZE(SMonFrameInfo, 0x335);
 #pragma pack(pop)
@@ -233,4 +230,4 @@ extern SMonFrameInfo sViewArmyMonFrameInfo;
 void BuildTempWalkSeq(struct SMonFrameInfo*, i32, i32);
 void ModifyFrameInfo(struct SMonFrameInfo*, CreatureType);
 
-#endif // HOMM2_ARMY_H
+#endif

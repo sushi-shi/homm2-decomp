@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_Re\EVENTS.OBJ   from: (directly linked into exe)
-// functions: 42   data: 1
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <ctype.h>
 #include <stdio.h>
@@ -54,25 +49,7 @@
 
 DATA(0x005190a4) static char s_twoStringFormat[] = "%s %s";
 
-// @semantic
-// Complete semantics/CFG with the retail 0x350 frame, all source slots, and the
-// main plus eight nested-switch spills at -0x330..-0x350. All 972 relocation
-// sites agree: gpGame is 62/62 and gpWindowManager is 34/34. The mine uses four
-// direct resource-type loads; Troll Bridge, City of the Dead, and Dragon City
-// put the guarded arm first and share each recruit call through a label. The
-// four base gSpellNames relocations use 0xff778+4*(n-1), while retail uses
-// 0xff774+4*n; raw instructions prove the same effective address. First
-// non-symbol divergence is the Sphinx resource loop: retail loads giCurPlayer
-// before eventValue, while base loads eventValue first. Reversed array indexing,
-// explicit pointer/additive forms, and inline giCurPlayer reads emitted the same
-// base order or regressed it; bounded TU-state probes did not improve the wall.
-// The repeated event-flag updates match retail load/op/store form via
-// static_cast<int>. Identifier/declaration ordering, the unused tag_message,
-// one-case switches/scopes, shared ClaimMine, resource sprintf calls, and
-// duplicate artifact CheckLevel were recovered. GetHero/GetTown now reproduce
-// the retail /Ob1 continuation jumps at +0x47bd and +0x483e. The retained
-// source-hash max is 97.9046%; revisit the Sphinx register-order wall only with
-// a new structural lead.
+// @semantic: First non-symbol divergence is the Sphinx resource loop: retail loads giCurPlayer before eventValue.
 VA(0x004a8530, 0x5adb)
 void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
     CreatureType secondUpgrade1;
@@ -3520,17 +3497,7 @@ void advManager::PasswordEvent(mapCell* cell, hero*) {
     gpCurPlayer->m_barrierTents |= 1 << color;
 }
 
-// @semantic
-// Complete 0x6fe body, 0x54 frame/slots, CFG, and all 75 ordered relocation
-// sites/effective targets align. OD_STEER(mapY9) restores retail's inner height compare
-// and closes the former one-byte body/shifted-relocation residual. The only
-// unmasked bytes left are +0x250/+0x253: retail loads primaryStat15 before
-// eventHero for the arena stat increment, while ours loads eventHero first.
-// Equivalent prefix/postfix/index spellings are byte-neutral in the identical
-// GenericSiteAIEvent shape. Revisit only if the hero primary-stat representation
-// or accessor changes, an earlier EVENTS source edit changes emitted evaluation
-// order, or comparison gains a proved commutative-load normalization. Ten bounded
-// TU-state declaration families produced no canonical exact closure.
+// @semantic: evaluation-order residual.
 VA(0x004aed38, 0x6fe)
 void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
     i32 currentSiteType;
@@ -3825,9 +3792,7 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
     }
 }
 
-// @early-stop
-// Relocation-masked: all 0x191 bytes match. Objdiff's residual is the delinked
-// switch-label identity and NULL_SAMPLE2's second-word symbol name.
+// @early-stop: delinker artifact.
 VA(0x004af436, 0x191)
 void advManager::RecruitSiteEvent(mapCell* cell, hero* eventHero) {
     SAMPLE2 eventSample = NULL_SAMPLE2;
@@ -3876,7 +3841,6 @@ void advManager::RecruitSiteEvent(mapCell* cell, hero* eventHero) {
 
 VA(0x004af5c7, 0x8b)
 void advManager::ExpansionRecruitEvent(hero* eventHero, i32 creatureType, i16* availableCount) {
-    // These unused dialog locals account for the retail /Od frame layout.
     tag_message dialogMessage2;
     baseManager* dialogManager = new recruitUnit(&eventHero->m_army, creatureType, availableCount);
     i32 dialogResult;
@@ -3886,14 +3850,7 @@ void advManager::ExpansionRecruitEvent(hero* eventHero, i32 creatureType, i16* a
     delete dialogManager;
 }
 
-// @semantic
-// Complete 0x22a body, frame/slots, CFG, and all 21 ordered relocation sites and
-// effective targets align. Only rel32 bytes +0x7e/+0xb4 differ: retail routes
-// the two dialog-complete arms through the final continuation, while ours targets
-// the epilogue directly. An explicit early-return family removed both retail
-// jumps and shifted the remainder by 10 bytes, so it was rejected. Revisit only
-// if an earlier EVENTS edit changes this function's branch-target lowering or
-// comparison normalizes proven continuation equivalence.
+// @semantic: branch/code-shape residual.
 VA(0x004af652, 0x22a)
 void advManager::JailEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     SAMPLE2 eventSample1 = NULL_SAMPLE2;
@@ -4019,11 +3976,7 @@ void advManager::TownEvent(mapCell* cell, i32 x, i32 y) {
     eventHero1->CheckLevel();
 }
 
-// @early-stop
-// Excluding address tables +0x1cb..+0x1e7, +0x235..+0x31d, and
-// +0x468..+0x484 plus byte tables +0x31d..+0x396 and +0x484..+0x4d9,
-// all 176 normalized instructions match. Residuals are delinked local-table
-// relocations and string symbol names; external relocation targets match.
+// @early-stop: delinker artifact.
 VA(0x004afa56, 0x516)
 void advManager::EventSound(i32 eventType, i32 eventData, struct SAMPLE2* outSample) {
     const i32 treasureSound_a = EVENT_SOUND_TREASURE;
@@ -4217,7 +4170,6 @@ void advManager::EventWindow(
     i32 value2,
     i32 type3
 ) {
-    // Unused retail locals retain the original /Od frame around the text buffer.
     i32 dialogState7;
     i32 eventWindowUnused12;
     i32 windowGap1;
@@ -4242,10 +4194,7 @@ void advManager::EventWindow(
 }
 
 // @early-stop
-// @early-stop-reloc-only
-// All 0xb6 relocation-masked bytes, 54 normalized instructions, frame/slots,
-// CFG, and three ordered relocation sites/effective targets match after removing
-// the empty loop else arm.
+// @early-stop-reloc-only: relocation naming only.
 VA(0x004b0033, 0xb6)
 i32 GiveArtifact(hero* eventHero, ArtifactType artifact, b32 checkEndGame, i8 artifactExtra) {
     i32 artifactSlot;
@@ -4283,7 +4232,6 @@ ArtifactType advManager::GiveRandomArtifact(hero* eventHero) {
 
 VA(0x004b0147, 0x67)
 i32 advManager::GiveExperience(hero* eventHero, i32 experience, i32 checkLevel) {
-    // These unused level locals account for the retail /Od stack slots.
     i32 oldLevel;
     i32 unusedLevel2;
     i32 unusedLevel1;
@@ -4677,11 +4625,7 @@ i32 advManager::GhostEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i3
     return 0;
 }
 
-// @early-stop
-// Relocation-masked raw bytes are identical across all 0x274 bytes, including
-// the address table at +0xc3..+0xf2 and byte table at +0xf3..+0x13d. The only
-// residuals are delinked local-label and three equivalent empty-string symbols;
-// all six external relocation targets agree.
+// @early-stop: delinker artifact.
 VA(0x004b0add, 0x274)
 void advManager::HouseEvent(hero* eventHero, mapCell* cell) {
     i32 siteIndex = IDX(HOUSE_RECRUIT_ARCHER);
@@ -4756,10 +4700,7 @@ void advManager::HouseEvent(hero* eventHero, mapCell* cell) {
     }
 }
 
-// @semantic
-// Shared enum declaration state reversed equivalent compare operand/polarity
-// pairs at +0x164, +0x2f6, and +0x367. Frame, slots, CFG, and all 29 external
-// relocation sites remain aligned; revisit during the byte-last-mile pass.
+// @semantic: compiler-shape residual.
 VA(0x004b0d51, 0x62f)
 i32 advManager::CombatMonsterEvent(
     hero* eventHero,
@@ -5229,15 +5170,7 @@ void GiveTakeArtifactStat(hero* targetHero, ArtifactType artifact, b32 take) {
     }
 }
 
-// @semantic
-// The 0xc frame/slots, CFG, and all 11 ordered relocation sites/effective targets
-// align. After relocation masking, only branch bytes +0x12/+0x13/+0x21 differ:
-// retail routes the sourceHero-null arm through the destinationHero-null jump,
-// while ours targets the same epilogue directly. Four bounded CFG families were
-// tried: nested empty arms, positive conjunction, early returns, and shared-label
-// variants; all alternatives added 5-10 bytes. Revisit only if an earlier EVENTS
-// source edit changes this function's emitted CFG or branch comparison normalizes
-// continuation targets. The remaining objdiff residual is pooled string identity.
+// @semantic: pooled-string identity residual.
 VA(0x004b1973, 0x1dd)
 void advManager::TransferArtifacts(hero* sourceHero, hero* destinationHero) {
     i32 targetSlot;
@@ -5304,10 +5237,7 @@ void advManager::TransferArtifacts(hero* sourceHero, hero* destinationHero) {
 }
 
 // @early-stop
-// @early-stop-reloc-only
-// All 0x7f relocation-masked bytes, 50 normalized instructions, the 0x4 frame,
-// slots, CFG, and six ordered relocation sites/effective targets match after an
-// explicit null early return. Retail carries one nop outside the declared span.
+// @early-stop-reloc-only: relocation naming only.
 VA(0x004b1b50, 0x7f)
 void advManager::HeroLoses(hero* lostHero) {
     if (lostHero == 0)
@@ -5323,11 +5253,7 @@ void advManager::HeroLoses(hero* lostHero) {
 }
 
 // @early-stop
-// @early-stop-reloc-only
-// All 0x132 relocation-masked bytes, 85 normalized instructions, frame/slots,
-// CFG, and four ordered relocation sites/effective targets match after explicit
-// early returns and restoring retail's weakest-value operand order. Objdiff only
-// names the same interior fight-value address differently.
+// @early-stop-reloc-only: relocation naming only.
 VA(0x004b1bcf, 0x132)
 void advManager::DoWhirlpool(hero* eventHero) {
     i32 armyValue;
@@ -5366,11 +5292,7 @@ void advManager::DoWhirlpool(hero* eventHero) {
 }
 
 // @early-stop
-// @early-stop-reloc-only
-// All 0x142 relocation-masked bytes, normalized instructions, the 0x1c frame,
-// retail slots, CFG, and 22 ordered relocation sites/effective targets match
-// after an explicit hidden-state early return and hash-derived local renaming.
-// Remaining objdiff noise is pooled literal/interior aggregate identity.
+// @early-stop-reloc-only: relocation naming only.
 VA(0x004b1d01, 0x142)
 void advManager::FizzleCenter(i32 fizzleType) {
     SAMPLE2 playedSample;
@@ -5414,18 +5336,7 @@ void advManager::FizzleCenter(i32 fizzleType) {
     }
 }
 
-// @semantic
-// Complete body and CFG with the retail 0x150 frame, four jump tables, and
-// 356/356 relocation sites. All event-flag updates match retail load/op/store
-// form via static_cast<int>, and the mine-owner and combat-result early breaks
-// now match retail polarity and block order. First non-table divergence is
-// +0x53c: for (metadata * 4 - 4) * 125 retail emits lea [4*eax-4] then
-// three multiply-by-five LEAs, while base emits shl eax,2, folds -20 into the
-// first LEA, then emits two more LEAs. Commuted/parenthesized AST spellings and
-// 30 bounded TU-state probes did not fix it. A 137-site member-access sweep only
-// improved the score by changing the proven frame to 0x154 and was rejected.
-// GetHero/GetTown now reproduce the retail /Ob1 continuation jumps at +0x1b26
-// and +0x1bb1. Revisit the multiply shape only with a new structural lead.
+// @semantic: first non-table residual is index arithmetic at +0x53c.
 VA(0x004b1e43, 0x2a40)
 void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     float battleStatValue_o;
@@ -6526,16 +6437,7 @@ void advManager::PasswordAIEvent(mapCell* cell, hero*) {
     gpCurPlayer->m_barrierTents |= (1 << color);
 }
 
-// @semantic
-// Complete 0x369 body, 0x44 frame/slots, CFG, and all 25 ordered relocation
-// sites/effective targets align. After masking those relocations, the only raw
-// differences are +0x197/+0x19a: retail loads primaryStat16 before eventHero for
-// the primary-stat increment, while ours loads eventHero first. Prefix/postfix,
-// OD_STEER(index), and commuted subscript spellings were byte-neutral; an explicit
-// read/add/write grew the body by 12 bytes. Revisit only if the hero primary-stat
-// representation/accessor changes, an earlier EVENTS source edit changes emitted
-// evaluation order, or comparison gains a proved commutative-load normalization.
-// Ten bounded TU-state declaration families produced no canonical exact closure.
+// @semantic: evaluation-order residual.
 VA(0x004b493b, 0x369)
 void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
     i32 unusedPair27[2];
@@ -6641,14 +6543,7 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
     }
 }
 
-// @semantic
-// Complete 0x18f body, 0x44 frame/slots, CFG, and all 12 ordered relocation
-// sites/effective targets align. The sole executable residual is +0x11f..+0x12e:
-// retail reads the cell word before shifting packedSite17 for the bitfield write,
-// while ours shifts first. Direct, `| 0`, and OD_STEER(packedSite17) assignments were
-// byte-neutral; an explicit m_objectData mask/write changed the body size/register
-// width. Ten bounded TU-state declaration families produced no canonical exact
-// closure; revisit after later EVENTS TU or mapCell accessor changes.
+// @semantic: sole residual is packed-site evaluation order at +0x11f..+0x12e.
 VA(0x004b4ca4, 0x18f)
 void advManager::RecruitSiteAIEvent(mapCell* cell, hero* eventHero) {
     i32 cost16[AI_EVENT_RESOURCE_COUNT];
@@ -6713,15 +6608,7 @@ void advManager::RecruitSiteAIEvent(mapCell* cell, hero* eventHero) {
     }
 }
 
-// @semantic
-// All 134 normalized instructions, frame/slots, CFG, and 12 ordered relocation
-// sites/effective targets match. The only raw differences are rel32 bytes +0x4e
-// and +0x65: retail's two early exits target the identical final five-byte
-// continuation while ours target its epilogue destination directly. Four bounded
-// CFG families were tried: nested empty arms, flattened positive guard, explicit
-// early returns, and a shared terminal label; alternatives added or removed 5-15
-// bytes. Revisit only if an earlier EVENTS source edit changes emitted branch
-// targets or comparison normalization learns continuation equivalence.
+// @semantic: branch/code-shape residual.
 VA(0x004b4e33, 0x1a2)
 void advManager::JailAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     i32 heroId9;
@@ -6763,9 +6650,7 @@ void advManager::JailAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
 }
 
 // @early-stop
-// @early-stop-reloc-only
-// All 0x82b bytes match after masking the 85 aligned relocation sites. The
-// remaining objdiff residual is limited to delinked symbol identities.
+// @early-stop-reloc-only: relocation naming only.
 VA(0x004b4fd5, 0x82b)
 void advManager::PlayerMonsterInteract(
     mapCell* cell,
@@ -7060,14 +6945,7 @@ fightMonsters:
         *handled = 1;
 }
 
-// @semantic
-// Complete semantics, 0x40-byte frame, slots, CFG, and all 36
-// relocation sites are recovered. Retail is 25 bytes larger solely because it
-// retains five five-byte continuation jumps; the remaining relocation names
-// are delinked aliases of the same monster fields and floating constants. No
-// additional variant was retained in this pass because the five exact jump sites
-// are already isolated; revisit only if earlier EVENTS source/header changes alter
-// inline continuation placement or comparison normalizes those destinations.
+// @semantic: compiler-shape residual.
 VA(0x004b5800, 0x440)
 void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* handled) {
     i32 joiningCount;
@@ -7194,7 +7072,7 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
 
 VA(0x004b5c40, 0x1d0)
 i32 advManager::DoNetCombat(char* packet) {
-    static i16 sourceLineBase = 0x1655; // retail /Gi __LINE__Var word
+    static i16 sourceLineBase = 0x1655;
     hero* secondHero9;
     i32 secondSide15;
     i32 combatX1;
@@ -7277,13 +7155,7 @@ i32 advManager::DoNetCombat(char* packet) {
     return 1;
 }
 
-// @early-stop
-// All 0x64e bytes match after masking the 109 aligned COFF relocations; frame
-// 0x78, every visible slot, CFG, and relocation offsets/targets agree. Objdiff's
-// 99.94% residual is delinked string/global-alias and switch-local identities.
-// The one-case packet switch supplies command spill -0x74; direct && omitted it.
-// Retail case order is 0, 1, -1, 3, and its final player test reloads giCurPlayer.
-// An int[2] padding probe was rejected because it grew the frame to 0x7c.
+// @early-stop: retail alignment artifact.
 VA(0x004b5e10, 0x64e)
 i32 advManager::DoCombat(
     i32 x,
@@ -7298,7 +7170,7 @@ i32 advManager::DoCombat(
     i32 randomSeed,
     i32 processLosses
 ) {
-    static i16 sourceLineBase = 0x16ba; // retail /Gi __LINE__Var word
+    static i16 sourceLineBase = 0x16ba;
     armyGroup* receivedSecondArmy2;
     hero* receivedSecondHero9;
     hero* receivedFirstHero1;
@@ -7505,7 +7377,7 @@ void advManager::SendHeroTownData(
     i32 retreatWin,
     i32 combatSurrender
 ) {
-    static i16 sourceLineBase = 0x17cc; // retail /Gi __LINE__Var word
+    static i16 sourceLineBase = 0x17cc;
     char* reply;
     i32 result;
     combatRemoteData* buffer = 0;
@@ -7645,7 +7517,7 @@ void advManager::ReceiveHeroTownData(
     i8* retreatWin,
     i8* combatSurrender
 ) {
-    static i16 sourceLineBase = 0x183d; // retail /Gi __LINE__Var word
+    static i16 sourceLineBase = 0x183d;
     i32 hasFirstHero7;
     i32 hasTown0;
     i32 hasSecondHero8;
@@ -7781,13 +7653,7 @@ void advManager::ReceiveHeroTownData(
     }
 }
 
-// @semantic
-// Complete semantics, frame, slots, CFG, and external relocation
-// targets. The retail body is exactly one five-byte continuation jump longer;
-// the apparent relocation excess is the delinked six-entry local switch table.
-// No additional variant was retained in this pass because the single jump site
-// is isolated; revisit only if earlier EVENTS source/header changes alter inline
-// continuation placement or comparison normalizes the proven destination.
+// @semantic: compiler-shape residual.
 VA(0x004b6c2f, 0x254)
 i32 advManager::AutoResolveCombat(
     i32 x,
@@ -7869,10 +7735,7 @@ i32 advManager::AutoResolveCombat(
 }
 
 // @early-stop
-// @early-stop-reloc-only
-// All 0xb8 relocation-masked bytes, frame/slots, and CFG match. All four ordered
-// relocation sites resolve identically; retail names the final CRT alias _strcmpi
-// while the reconstructed SDK declaration emits the equivalent _stricmp symbol.
+// @early-stop-reloc-only: relocation naming only.
 VA(0x004b6e83, 0xb8)
 i32 RiddleStringsEqual(char* answer, char* expected) {
     i32 index;
@@ -7892,18 +7755,6 @@ i32 RiddleStringsEqual(char* answer, char* expected) {
     return stricmp(expectedPrefix, answerPrefix) == 0;
 }
 
-// ---- globals (definitions, RVA order) ----
-// @data-layout-note Retail's initialized EVENTS contribution is 0x5700 bytes at
-// RVA 0x117620. The recovered candidate .data is 0x56ff bytes: 247 definitions
-// cover every nonzero retail byte, and the one-byte stream difference is terminal
-// zero padding rather than an allocation. s_twoStringFormat and gbNoShowCombat
-// are the two source DATA owners. The reviewed compiler-private group has 245
-// .data allocations: 147 unique payloads, 48 aligned relocation-addend proofs,
-// 11 bounded-section runs, one direct relocation bijection, three remaining-slot
-// bijections, and 35 members of four exact-payload equivalence classes. All seven
-// .rdata temporaries replay exactly over the 0x38-byte retail contribution. The
-// constrained group validator proves exact payloads, disjoint extents, complete
-// nonzero-byte coverage, and zero diagnostics for all 254 definitions.
 DATA(0x0051cc0c) b32 gbNoShowCombat = false;
 
 #undef RETAIL_FILE

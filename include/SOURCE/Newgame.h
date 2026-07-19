@@ -2,10 +2,7 @@
 #define HOMM2_NEWGAME_H
 
 #include <Ints.h>
-// Declarations of the free functions DEFINED in Newgame.cpp — the single home for these
-// symbols. Other TUs call them by including this header (no local externs).
 #include <SOURCE/REQUEST.h>
-// forward declarations (was <_all.h>):
 struct tag_message;
 
 H2_ENUM_BEGIN(NewGameConstant)
@@ -167,4 +164,4 @@ struct NewGameRemotePacket {
 
 i32 NewGameHandler(struct tag_message&);
 
-#endif // HOMM2_NEWGAME_H
+#endif

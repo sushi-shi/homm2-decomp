@@ -13,4 +13,4 @@ struct SSampleSourceFiles {
 };
 SIZE(SSampleSourceFiles, 0xa0);
 
-#endif // HOMM2_BASE_SAMPLE_TYPES_H
+#endif

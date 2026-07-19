@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_RE\icon2by.obj   from: .\basewin.lib
-// functions: 1   data: 0
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <BASE/icon2by.h>
 #include <BASE/icon.h>
@@ -12,7 +7,6 @@
 #include <BASE/IconShear.h>
 #include <SOURCE/dimPalette.h>
 #include <string.h>
-// Per-call decoder scratch.
 DATA(0x00538150) static i32 gYMClipB;
 DATA(0x00538154) static i32 gYMDimIdx;
 DATA(0x0053815c) static i32 gYMPitch;
@@ -30,41 +24,7 @@ DATA(0x00538184) static u8 gYMColor;
 DATA(0x00538188) static u32 gYMDimLen2;
 DATA(0x0053818c) static i32 gYMClipR;
 
-// @semantic
-// Complete /O2 decoder at 90.177666%: candidate 0x579 versus retail 0x588. Both are frame-free and
-// have the same 64 basic blocks, 99 directed CFG edges, and ordered successor topology (388 versus
-// 394 instructions). Relocation-union masking leaves 669 comparable bytes, 394 different, first
-// +0xb3 and last +0x577.
-// The first code divergence is the bottom-clip comparison: candidate loads ClipB into EAX and uses
-// `cmp Y,EAX; jg`, while retail preserves Y in EAX and uses `cmp ClipB,EAX; jl`. Relocations are
-// candidate 129 versus retail 130 with every external target agreeing. The sole occurrence deficit
-// is retail gYMX at target +0x48f (the absolute operand of the load at +0x48e) in the full literal-
-// copy destination. Candidate reuses gYMX held in ESI from +0x468 at `add ESI,EDI` +0x48d; do not
-// manufacture that reload. Setup also reverses Pitch/Y relocation order inside an otherwise
-// identical multiply. The separate canonical IconShearConstant typedef enum intentionally lowers
-// the prior macro state from 95.101524%, 0x584, 131/130 relocs to this state; correctness wins.
-// In the prior macro state, a branch-local current-X removed its different excess relocation but
-// fell to 94.42% and disrupted Src/Row/X order. Commuting the row multiply and using a typed row
-// pointer were byte-neutral.
-// Historical closed families: merged/four-arm copy/fill forms, combined/nested/goto clipping,
-// comparison polarities, per-arm dim destinations, semantic locals, inclusive bounds, and 129 AST
-// variants. Revisit only after a shared-header/TU-state change produces structural alignment at
-// 96%+; do not treat this broad scheduling residual as a proven wall.
-// The 2026-07-15 post-enum lifetime batch retained the retail-evidenced second-Y lifetime after
-// each shear test. Plain/register spellings are byte-identical and raise the direct score from
-// 88.477160% to 88.819790% without changing 0x578 size or 129/130 relocations. A 256-state
-// typedef/enum/record/member/prototype/include diagnostic sweep produced only a disposable
-// 88.883250% maximum (enum trial 62), not an exact closure; generated state was restored and must
-// not be committed or recorded as 100%. The remaining residual is still structural/compiler-state
-// work, not a proven wall.
-// A later consolidated-runner audit kept the 89.974620%, 0x57c, 129/130 baseline. Extracting only
-// the missing full-copy gYMX read into an inlined global accessor was identical for all 16 helper
-// names and fell to 88.718280%, 0x579, 128/130. All 21 atomic relational-order mutations were
-// either byte-neutral or worse. Branch-local X/ClipR snapshots raised the raw score to 90.266495%
-// in the literal block but over-CSE'd it to 0x559 and 123/130 relocations; coordinated dim/fill/copy
-// forms were worse. A second upper-Y local was byte-neutral in all eight block combinations. None
-// was retained. History proves the older ~95.1% state came from moving the same IconShearConstant
-// typedef enum between headers, so do not merge the correctly separated domains merely for score.
+// @semantic: first code divergence is the bottom-clip comparison: candidate loads ClipB into EAX and uses cmp Y,EAX.
 VA(0x004da270, 0x588)
 void IconToBitmapYModify(
     class icon* srcIcon,
@@ -100,7 +60,6 @@ void IconToBitmapYModify(
                 gYMX = gYMX + (gYMRun & ICON_RLE_COMMAND_RUN_MASK);
                 continue;
             }
-            // 0xc0 - 0xFF
             if ((gYMRun & ICON_RLE_COMMAND_RUN_MASK) != 0) {
                 if (gYMRun == ICON_RLE_LONG_SOLID_COMMAND) {
                     gYMRun = *gYMSrc;
@@ -181,7 +140,6 @@ void IconToBitmapYModify(
             gYMX = gYMX + gYMRun;
             continue;
         }
-        // ---- positive command : literal copy / newline ----
         if (gYMRun != 0) {
             i32 currentY;
             if (shear[gYMY] != ICON_SHEAR_SKIP_ROW && clipY <= (currentY = gYMY)
@@ -206,7 +164,6 @@ void IconToBitmapYModify(
             gYMSrc = gYMSrc + gYMRun;
             continue;
         }
-        // newline
         gYMX = shear[gYMY] + gYMX0;
         gYMY = gYMY + 1;
         gYMRow = gYMRow + gYMPitch;

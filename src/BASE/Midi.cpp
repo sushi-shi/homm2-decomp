@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_RE\Midi.obj   from: .\basewin.lib
-// functions: 7   data: 6
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <BASE/soundManager.h>
 #include <mss.h>
@@ -67,10 +62,7 @@ void soundManager::MIDIShutdown(void) {
     }
 }
 
-// @early-stop
-// Reloc/IAT-masked: 0x3aa of 0x3ab bytes are exact; only +0x167 differs (3b c3 vs 3b d8),
-// commuting the operands of the CMP immediately consumed by JE. All 66 relocation targets agree.
-// Equality/inequality, nested/early-return, subtraction, cast, local-copy, and |0 forms all emit c3.
+// @early-stop: byte-proven compiler artifact.
 VA(0x004d3ac0, 0x3ab)
 void soundManager::MIDIPlay(i32 midiTrack) {
     if (gbNoSound == 0 && m_midiReady != 0 && gConfig.musicVolume != 0) {
@@ -154,20 +146,5 @@ inline void soundManager::MIDISetVolume(void) {
 VA(0x004d4040, 0x1)
 void soundManager::MIDIPoll(void) {}
 
-// @data-layout-note
-// Midi has no candidate `.rdata`. Its ordinary initialized `.data` is byte-exact
-// over retail 0x11fec8..0x11ff10 (0x48 bytes), and its zero-fill contribution is
-// exactly two 0xf0-byte arrays over 0x134cf0..0x134ed0. All 89 relevant candidate
-// DIR32 sites are retail HIGHLOW sites. Global references use owner addend zero,
-// apart from the proven pMIDIWrap+0xf0 and hSequence+0xf0 end sentinels.
-//
-// Retail appends one 0x40 text bank to the ordinary initialized-data prefix.
-// Its nine owners begin at addends 0x48, 0x4c, 0x50, 0x58, 0x60, 0x64, 0x68,
-// 0x6c, and 0x74. In particular, startup and shutdown use independent MS1/MS2
-// copies; pooled compiler literals cannot represent those relocation addends.
-// The typed gMidiText bank reproduces the complete 0x88 contribution and keeps
-// every source use attached to its retail owner without synthetic identities or
-// padding allocations.
-// ---- globals (definitions, RVA order) ----
 DATA(0x00534cf0) class MIDIWrap* pMIDIWrap[MIDI_TRACK_COUNT];
 DATA(0x00534de0) struct _SEQUENCE* hSequence[MIDI_TRACK_COUNT];

@@ -1,9 +1,6 @@
 #ifndef HOMM2_SOURCE_BANKBOX_H
 #define HOMM2_SOURCE_BANKBOX_H
-// Reconstructed class (SOURCE) from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// 3 methods, 0 own-virtual, 0 static data.
 #include <va.h>
-// forward declarations:
 class heroWindow;
 class playerData;
 
@@ -16,19 +13,17 @@ H2_ENUM_BEGIN(BankBoxConstant)
     BANK_BOX_WINDOW_ACTIVE = 1
 H2_ENUM_END(BankBoxConstant)
 
-#pragma pack(push, 1) // recovered layout is byte-packed
+#pragma pack(push, 1)
 class bankBox {
 public:
-    playerData* m_player; // +0x00
-    i16 m_x;              // +0x04
-    i16 m_y;              // +0x06
-    heroWindow* m_window; // +0x08
-    // --- constructors ---
+    playerData* m_player;
+    i16 m_x;
+    i16 m_y;
+    heroWindow* m_window;
     bankBox(i32 x, i32 y, class playerData* player);
     ~bankBox();
-    // --- methods ---
     void Update(i32);
 };
 #pragma pack(pop)
 SIZE(bankBox, 0xc);
-#endif // HOMM2_SOURCE_BANKBOX_H
+#endif

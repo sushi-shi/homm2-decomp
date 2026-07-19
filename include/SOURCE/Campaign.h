@@ -3,9 +3,6 @@
 
 #include <Ints.h>
 #include <SOURCE/KB.h>
-// Declarations of the free functions DEFINED in Campaign.cpp — the single home for these
-// symbols. Other TUs call them by including this header (no local externs).
-// forward declarations (was <_all.h>):
 struct tag_message;
 
 H2_ENUM_CLASS_BEGIN(CampaignAward)
@@ -121,4 +118,4 @@ H2_ENUM_CLASS_END(CampaignMapDifficulty)
 
 i32 CampaignHandler(struct tag_message&);
 
-#endif // HOMM2_CAMPAIGN_H
+#endif

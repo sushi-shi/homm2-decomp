@@ -2,12 +2,9 @@
 #define HOMM2_DPNETWIN_H
 
 #include <Ints.h>
-// Declarations of the free functions DEFINED in dpnetwin.cpp — the single home for these
-// symbols. Other TUs call them by including this header (no local externs).
 #include <windows.h>
 #include <dplay.h>
 #include <SOURCE/REMOTE_TYPES.h>
-// forward declarations (was <_all.h>):
 
 H2_ENUM_BEGIN(DirectPlayTransportConstant)
     DP_TRANSPORT_BUFFER_COUNT = 200,
@@ -71,7 +68,6 @@ i32 dpWaitForExtraGuests(void);
 i32 dpWaitForHost(void);
 void DPSD(i32, char*, i32);
 
-// ---- globals (declarations, RVA order) ----
 extern struct IDirectPlay* lpIDC;
 extern DPID dcoID;
 extern struct _GUID* IPXGuid;
@@ -98,4 +94,4 @@ extern i32 giNetPosToDCOPos[6];
 extern i32 iSessionToTry;
 extern i32l lSessions[10];
 
-#endif // HOMM2_DPNETWIN_H
+#endif

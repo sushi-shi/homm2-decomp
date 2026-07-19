@@ -49,4 +49,4 @@ H2_ENUM_CLASS_BEGIN(RemoteNetworkProtocol)
     REMOTE_PROTOCOL_DIRECT_CONNECT = 4
 H2_ENUM_CLASS_END(RemoteNetworkProtocol)
 
-#endif // HOMM2_REMOTE_TYPES_H
+#endif

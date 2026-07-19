@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_RE\BITMAP.OBJ   from: .\basewin.lib
-// functions: 14   data: 1
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <BASE/bitmap.h>
 #include <BASE/bmap2.h>
@@ -12,7 +7,6 @@
 #include <SOURCE/KB.h>
 #include <string.h>
 
-// __FILE__ for the NWC memory/assert tracking (reloc-masked path string).
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\BITMAP.CPP"
 
 H2_ENUM_BEGIN(BitmapConstant)
@@ -61,13 +55,7 @@ inline bitmap::~bitmap() {
     m_pixels = 0;
 }
 
-// @semantic
-// /O2 residual begins at +0x0: retail starts `sub esp,8`; ours first loads x into DX. Both are
-// 0xFF bytes with the same frame, destinationY stack slot, CFG, and relocation sites/identities
-// (gpWindowManager +0x14/+0x4e/+0xad, PollSound +0x48/+0x6d, BlitBitmap +0x68/+0xf1).
-// Width/height/x/y declaration orders and an explicit screen-buffer local were tried after
-// replacing the old volatile array with the scalar evidenced by the single retail stack slot.
-// Revisit during the TU-state/last-mile pass after earlier BITMAP source shapes settle.
+// @semantic: residual begins at +0x0: retail starts sub esp,8; ours first loads x into DX.
 VA(0x004d0160, 0xFF)
 void bitmap::DrawToBufferCareful(i16 x, i16 y) {
     i32 width;
@@ -200,8 +188,6 @@ void bitmap::CopyTo(
     PollSound();
 }
 
-// CodeView accounts for all 13 bitmap methods, so these inlined accessors are TU-local helpers,
-// not additional class members. All three forms are used below and emit no standalone symbols.
 static inline i16 BitmapWidth(bitmap* value) {
     return value->m_width;
 }
@@ -214,13 +200,7 @@ static inline u8* BitmapPixels(bitmap* value, i32 offset) {
     return value->m_pixels + offset;
 }
 
-// @semantic
-// The 0x65-byte extent, frame, CFG, signed width/height guards, per-bitmap row strides,
-// inline memcpy, and zero-relocation set are complete. The first residual is +0x1:
-// retail keeps this/destination/row in EAX/EBX/EDX, while this TU state colors them
-// EDX/EAX/EBX. Alias/declaration order, direct owners, a combined guard, two addition
-// orders, two relational orders, and both pointer-declaration hoists were exhausted in
-// ten audited variants. Revisit after a material BITMAP predecessor/header-state change.
+// @semantic: first residual is +0x1: retail keeps this/destination/row in EAX/EBX/EDX, while this TU state colors them EDX/EAX/EBX.
 VA(0x004d0500, 0x65)
 void bitmap::CopyToCareful(
     class bitmap* destination,
@@ -250,10 +230,7 @@ void bitmap::CopyToCareful(
     }
 }
 
-// ===== vtable bitmap (root)  (1 slots) =====
-//  [ 0] VA(0x004cfff0, 0x41)  void * bitmap::scalar_dtor(unsigned int)   <- introduces virtual
 
-// ---- vtables (compiler-emitted; census) ----
 VTBL(bitmap, 0x004eba3c);
 
 #undef RETAIL_FILE

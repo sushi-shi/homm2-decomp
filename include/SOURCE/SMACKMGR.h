@@ -3,9 +3,6 @@
 #include <va.h>
 #include <smack.h>
 #include <mss.h>
-// Declarations of the free functions DEFINED in SMACKMGR.cpp — the single home for these
-// symbols. Other TUs call them by including this header (no local externs).
-// forward declarations (was <_all.h>):
 
 void ConvertSmackerPalette(u8*);
 class icon;
@@ -79,7 +76,6 @@ i32 ExpansionCampaignRect(i32, i32);
 i8 PointInRect(i32, i32, struct tag_rect*);
 void PrintSummaryInfo(SmackSum*);
 
-// ---- globals (declarations, RVA order) ----
 extern i32 bSmackSound;
 extern class icon* brotherIcon;
 extern class icon* backImage;
@@ -93,4 +89,4 @@ extern SmackSum smksum;
 extern b32 gbPlayedThrough;
 extern i8 bMainDone;
 
-#endif // HOMM2_SMACKMGR_H
+#endif

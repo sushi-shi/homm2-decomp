@@ -244,4 +244,4 @@ struct SMiscText {
 };
 SIZE(SMiscText, 0xc3c);
 
-#endif // HOMM2_BASE_MISC_TYPES_H
+#endif

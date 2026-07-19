@@ -1,10 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_RE\WINMGR.OBJ   from: .\basewin.lib
-// functions: 21   data: 9
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
-// These globals precede va.h to preserve the established VC4.2 BSS declaration order.
-// Their fixed-width types still need the lightweight alias header here.
 #include <Ints.h>
 
 #ifdef __clang__
@@ -26,7 +19,6 @@ static inline u32& FadeSavedUpdate(void) {
 #include <BASE/WINMGR.h>
 #include <BASE/WINMGR_TYPES.h>
 
-// __FILE__ for the NWC memory/assert tracking (reloc-masked path string).
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\WINMGR.CPP"
 
 DATA(0x0051ef28) i32 iCombatCycleFrame = 0;
@@ -52,31 +44,7 @@ DATA(0x0051ef40) static SWindowManagerText gWindowManagerText = {
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/KB.h>
 
-// @data-layout-note NB09 assigns WINMGR a 0xf0 initialized-data contribution
-// at 0x11ef28. Six public integers form its 0x18 prefix; gWindowManagerText
-// reproduces the remaining 0xd8 bytes and the seven owner addends used by Open,
-// ScreenShot, and FizzleForward. Its four source paths are distinct owners.
-// The loader-zero contribution at 0x134908 is gCyclePal, memSelector, two bytes
-// of natural alignment, then FadeSavedUpdate's function-local static.
-// The inline accessor reproduces that 0x68-byte BSS topology without a padding
-// symbol or an unretained external data identity.
-// @semantic
-// Complete /O2 checkpoint: both code streams end at the ret at +0x3a2 and contain
-// 261 instructions (retail's +0x3a3 nop is alignment outside the CodeView span).
-// Relocations are exact at 71/71 with no wrong target. Keeping the combat and
-// alternate copies in their source branches is the retail-evidenced structure:
-// VC42 merges those two copies at +0x346, but preserves the saved-color restore at
-// +0x29d and its direct jump, recovering the former missing gCyclePal+66 occurrence.
-// The first code residual is +0xda..+0x11c in the world-view loop: candidate
-// assigns ECX to colorIndex and ESI to the destination induction pointer, while
-// retail assigns ESI to colorIndex and ECX to the pointer. The later alternate-cycle
-// frame calculation also uses equivalent ECX/EDX/EAX scheduling. Earlier word/byte/RGB,
-// signed-byte, pointer-loop,
-// predicate, scope, switch, accessor, header, enum, and source-pointer/register
-// variants did not recover the separate restore and need not be repeated. A semantic
-// local rename and preincrement were byte-neutral, and a 60-iteration libclang AST
-// pass retained no mutation. This is not a permitted artifact wall; revisit on a real
-// declaration/TU-state change.
+// @semantic: first code residual is +0xda..+0x11c in the world-view loop.
 VA(0x004ca6d0, 0x3a3)
 void CycleColors(i32 forceUpdate) {
     i8 savedColor[WINDOW_PALETTE_COLOR_BYTES];
@@ -321,12 +289,7 @@ void heroWindowManager::Close(void) {
     }
 }
 
-// @semantic
-// Complete 0x2d-byte /O2 function with the same loop, return behavior, and sole
-// BroadcastMessage relocation target/addend. Candidate assigns the window cursor to
-// ESI and the message reference to EDI; retail swaps those register roles throughout.
-// A source-level message-reference alias was byte-neutral. Revisit after a genuine
-// declaration or combined-TU state change.
+// @semantic: optimized register-allocation residual.
 VA(0x004cac00, 0x2d)
 i32 heroWindowManager::Main(struct tag_message& msg) {
     i32 result = 0;
@@ -345,16 +308,7 @@ i32 heroWindowManager::ConvertToHover(struct tag_message& msg) {
     return Main(msg);
 }
 
-// @semantic
-// Structurally complete /O2 checkpoint: both code spans are 0x35, the 0x1c message
-// frame and every initialized message field agree, and there are no relocations.
-// Seven unmasked bytes differ from +0x24 solely because retail loads the vtable
-// before storing message.payload.widget.data.value while base performs those two
-// operations in reverse; both make the same slot-2 virtual call. A 30-trial
-// guarded TU-state sweep (seed 0x484f4d32) left the score unchanged. Moving the
-// final assignment into the return comma expression and calling through a
-// baseManager alias were byte-identical. Revisit after a genuine combined-TU
-// change; this is not a proven wall.
+// @semantic: optimized register-allocation residual.
 VA(0x004cac40, 0x35)
 i32 heroWindowManager::BroadcastMessage(MessageType type, BaseWidgetCommand p2, i32 p3, i32 p4) {
     tag_message msg;
@@ -365,16 +319,7 @@ i32 heroWindowManager::BroadcastMessage(MessageType type, BaseWidgetCommand p2, 
     return Main(msg);
 }
 
-// @semantic
-// Structurally complete /O2 checkpoint (live 98.97%): the Open call, ordered search,
-// and every head/tail/middle link agree; 1/1 relocation agrees. Base is 0xb9 bytes
-// versus retail 0xbc. The first residual is `xor ebp,ebp` versus retail
-// `mov ebp,0` after the z == -1 branch; the three-byte encoding delta accounts for
-// the size difference. The only other instruction diff is EAX versus ECX for the
-// saved head snapshot. Nested/comma z forms and direct/cached/duplicated head forms
-// were tried; reusing the zOrder parameter was byte-identical. Thirty guarded
-// TU-state trials and 80 clang-AST iterations found no gain. Revisit after a
-// genuine combined-TU change; this is not a proven wall.
+// @semantic: first residual is xor ebp,ebp versus retail mov ebp,0 after the z == -1 branch.
 VA(0x004cac80, 0xbc)
 void heroWindowManager::AddWindow(class heroWindow* w, i32 zOrder, i32 openFlags) {
     heroWindow* cur = m_windowListTail;
@@ -455,15 +400,6 @@ void heroWindowManager::RemoveWindow(class heroWindow* w) {
     }
 }
 
-// Structurally complete /O2 checkpoint (live 99.19%): base is 0x1ce bytes versus
-// retail 0x1cf with the exact 0x38 frame, identical ordered CFG, and 31/31 resolved
-// relocations. Reordering the independent dialog-result/done stores via the clang-AST
-// permuter removed the prior +0x152 residual. The sole code-shape difference is now
-// immediately after FadeIn: base emits `or edi,[gFadeSavedUpdate]`, while retail
-// emits `mov eax,[gFadeSavedUpdate]; or eax,edi`; both store the same flags. Direct,
-// swapped, local-accumulator, and two-store forms were tried. Guarded TU-state trials
-// reached disposable 99.78% candidates but rejected all that changed protected
-// siblings. Revisit after a genuine TU-state change; this is not a proven wall.
 VA(0x004cadd0, 0x1cf)
 i32 heroWindowManager::DoDialog(
     class heroWindow* window,
@@ -602,13 +538,7 @@ void heroWindowManager::ScreenShot(void) {
     gpInputManager->Flush();
 }
 
-// @semantic
-// Complete 0xc0-byte clipping/allocation/blit implementation with all five relocation
-// sites and owner/addends aligned. Retail assigns width/y/height to EDI/ESI/EBX;
-// candidate assigns the equivalent values to ESI/EBX/EDI, which changes only register
-// names and argument push scheduling. Explicit clipped-width/clipped-height locals kept
-// the score unchanged and worsened the prologue, so the direct-parameter form remains.
-// Revisit after a genuine declaration or combined-TU state change.
+// @semantic: compiler-shape residual.
 VA(0x004cb110, 0xc0)
 void heroWindowManager::SaveFizzleSource(i32 x, i32 y, i32 width, i32 height) {
     if (bShowIt != 0) {
@@ -634,35 +564,11 @@ void heroWindowManager::SaveFizzleSource(i32 x, i32 y, i32 width, i32 height) {
     }
 }
 
-// @early-stop: retail is the named one-byte `ret` at delinked object +0xaa8,
-// followed only by alignment NOPs and carrying no relocations.
+// @early-stop: named one-byte retail stub.
 VA(0x004cb1d0, 0x1)
 void CreateFizzleTables(void) {}
 
-// @semantic
-// Structurally complete /O2 checkpoint (current live 92.35%): declaring the three row
-// cursors in saved/work/screen order makes the prefix through row-pointer setup
-// byte-exact in the earlier TU state and reduces base to 0x404 bytes versus retail's
-// 0x402. In the current combined-TU state the first raw divergence occurs after clipping:
-// candidate keeps the manager in ECX while retail retains it in ESI. The pixel-loop
-// residual begins at +0x206: base loads screenOffset from [esp+24h] before x from
-// [esp+40h], while retail retains x in EDX and adds screenOffset afterward. At
-// +0x219 base reloads the row end into EDX and uses EDX for the 16-bit lookup;
-// retail loads the row end into EBX and uses EBX for that lookup. The row-backedge
-// compare polarity and three later palette-loop SIB encodings are equivalent.
-// Both retain the 0x2c frame and ordered CFG. Manual COFF review finds the same
-// 33 relocation identities in the same order: offsets agree through ReadBlock at
-// +0x1ab, then base's remaining 14 sites are +2 because of the pixel-block size
-// delta; homm2 relocs' base-only aliases are delinker duplicate-name failures.
-// The other five cursor declaration orders score 88.47-95.78%. Manager/source-row/
-// source-bitmap aliases, pointer-add and palette-index operand swaps, sequential
-// and split high/low lookup spellings, and loop-polarity swaps did not improve the
-// retained structure. An 80-iteration libclang AST pass pinned every sibling and
-// retained no mutation. This declaration state moves unchanged retained-exact
-// FadeScreen/DoDialog live output to 97.25/99.19%; fresh pinned AST passes on those
-// predecessors retained no mutation, so their exact-max 100 records carry this
-// TU-cumulative dip. Revisit after a genuine predecessor/header TU-state change;
-// this is not a proven wall.
+// @semantic: first raw divergence occurs after clipping: candidate keeps the manager in ECX while retail retains it in ESI.
 VA(0x004cb1e0, 0x402)
 void heroWindowManager::FizzleForward(
     i32 x,
@@ -771,22 +677,15 @@ void heroWindowManager::ReleaseFizzleSource(void) {
     m_fizzleSource = 0;
 }
 
-// @early-stop: retail is the named one-byte `ret` at delinked object +0xecc,
-// followed only by alignment NOPs and carrying no relocations.
+// @early-stop: named one-byte retail stub.
 VA(0x004cb610, 0x1)
 void CreateColorTables(void) {}
 
-// @early-stop: retail is the named one-byte `ret` at delinked object +0xed0,
-// followed only by alignment NOPs and carrying no relocations.
+// @early-stop: named one-byte retail stub.
 VA(0x004cb620, 0x1)
 void CreateColorLookupTables(void) {}
 
-// ===== vtable heroWindowManager : public baseManager  (3 slots) =====
-//  [ 0] VA(0x004caad0, 0xd6)  int heroWindowManager::Open(int)   <- override (implements baseManager pure virtual)
-//  [ 1] VA(0x004cabb0, 0x45)  void heroWindowManager::Close(void)   <- override (implements baseManager pure virtual)
-//  [ 2] VA(0x004cac00, 0x2d)  int heroWindowManager::Main(struct tag_message &)   <- override (implements baseManager pure virtual)
 
-// ---- vtables (compiler-emitted; census) ----
 VTBL(heroWindowManager, 0x004eba10);
 
 #undef RETAIL_FILE

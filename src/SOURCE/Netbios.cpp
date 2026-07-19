@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_Re\Netbios.obj   from: (directly linked into exe)
-// functions: 5   data: 6
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <stdio.h>
 #include <BASE/Misc.h>
@@ -12,11 +7,7 @@
 #include <SOURCE/kbwin.h>
 #include <SOURCE/netwin.h>
 
-// @early-stop
-// Raw function bytes differ only at +0x135..+0x136 and the four DIR32 entries
-// at +0x139,+0x13d,+0x141,+0x145: the dispatch/table self-relocations to
-// InitNetHost local labels. Every instruction byte and all 21 external
-// relocation targets agree; frame 0x34 and all referenced slots are exact.
+// @early-stop: byte-proven compiler artifact.
 VA(0x004132f0, 0x155)
 i8 InitNetHost(void) {
     char localName[NETBIOS_NAME_BUFFER_SIZE];
@@ -61,11 +52,7 @@ i8 InitNetHost(void) {
     return 0;
 }
 
-// @early-stop
-// Raw function bytes differ only at +0x187..+0x188 and the five DIR32 entries
-// at +0x18b,+0x18f,+0x193,+0x197,+0x19b: the dispatch/table self-relocations to
-// InitNetGuest local labels. Every instruction byte and all 32 external
-// relocation targets agree; frame 0x34 and all referenced slots are exact.
+// @early-stop: byte-proven compiler artifact.
 VA(0x00413445, 0x1ab)
 i8 InitNetGuest(void) {
     char localName[NETBIOS_NAME_BUFFER_SIZE];
@@ -206,15 +193,6 @@ i32 nbnet_init(void) {
     return 0;
 }
 
-// ---- globals (definitions, RVA order) ----
-// @data-layout-note Retail .data is 0xee5c8+0x188 and places these public
-// initialized zeros at +0/+4/+8/+0x4c/+0x90/+0x94 among 15 private literal
-// allocations. Candidate .data is 0x186 and groups the public identities at
-// +0/+4/+8/+0xc/+0x10/+0x14. Public and unique-payload anchors force the four
-// repeated literal spans to 0xee5d4, 0xee5f4, 0xee618, and 0xee638; each span
-// is byte-exact against retail. All later private owners have singleton
-// relocation proof. The final two retail bytes are zero alignment; do not add
-// a fake owner for them.
 DATA(0x004ee5c8) i8 iInitNetHostStatus = 0;
 DATA(0x004ee5cc) i8 iInitNetGuestStatus = 0;
 DATA(0x004ee5d0) i32 iNameRetryCount = 0;

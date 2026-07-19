@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_RE\INPUTMGR.OBJ   from: .\basewin.lib
-// functions: 15   data: 6
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <string.h>
 #include <windows.h>
@@ -25,19 +20,7 @@ DATA(0x0051f98c) i32 bInCheckChangeCursor = 0;
 DATA(0x0051f990) static SInputManagerText gInputManagerText =
     {"ReleaseCapture Failed", "ReleaseCapture Failed", "inputManager"};
 
-// @data-layout-note NB09 assigns INPUTMGR one 0x50 initialized-data
-// contribution at 0x11f980. Retail stores the four public integers first,
-// followed by two independent 0x18 ReleaseCapture diagnostic slots and one
-// 0x10 manager-name slot. The two mouse-button release paths reference owner
-// addends 0x10 and 0x28; Open references addend 0x40. Together the definitions
-// above reproduce the complete contribution. INPUTMGR separately owns the
-// four-byte loader-zero iLastBWOnScreenCheck contribution at 0x134bc8.
-// @early-stop
-// The explicit 0x308-byte range is raw-exact after relocation-union masking, proving
-// frame/slots and CFG. All 40 ordered sites/types and every nonlocal runtime address
-// agree. Residual identities/addends are 14 local dispatch/table $L symbols rewritten
-// by the delinker as this function plus local offsets, and gConfig+0x30, whose retail
-// interior label is the same VA 0x00528d50.
+// @early-stop: delinker artifact.
 VA(0x004cdb50, 0x308)
 i32 KeyboardMessageHandler(void*, u32 message, u32, i32l messageData) {
     if (gpInputManager == 0)
@@ -126,13 +109,7 @@ i32 KeyboardMessageHandler(void*, u32 message, u32, i32l messageData) {
     return event->type == MESSAGE_NONE;
 }
 
-// @early-stop
-// The complete 0x36c-byte code-and-switch-table range is raw-exact after relocation-
-// union masking, proving stack/CFG and payload accesses. Both objects now expose 55
-// ordered sites. The residual is limited to delinked local switch labels and the
-// compiler-local name of gInputManagerText; its two references retain owner addends
-// +0/+0x18. All nonlocal runtime addresses and owner-relative addends agree,
-// including gConfig +0x30/+0x34, SetCapture, and ReleaseCapture.
+// @early-stop: delinker artifact.
 VA(0x004cde60, 0x36c)
 i32 MouseMessageHandler(void*, u32 message, u32, i32l messageData) {
     if (gpInputManager == 0)
@@ -336,18 +313,7 @@ void inputManager::SetKeyCodeType(i32 keyCodeType) {
     m_readIndex = 0;
 }
 
-// @semantic
-// The authoritative 0x1cb-byte CodeView span and all 23 relocation occurrences align.
-// After relocation masking, exactly 12 bytes differ, all at +0x32..+0x51: retail keeps
-// the converted key in EAX and modifiers in ECX, while base stores the key first and
-// then uses EAX for modifiers and ECX for the key. The operations, predicates, values,
-// CFG, and every byte after +0x51 agree. Preloaded/split modifiers, converted-key
-// local/ternary forms, their combined saved-key/saved-modifier form, duplicated
-// branch-local loads/stores, and const/name variants regressed or were byte-neutral.
-// The libclang AST pass has no valid mutations; 80 guarded TU-state trials across the
-// prior and integrated declaration states produced no exact closure. Jump-table
-// identities are delinked $L labels versus this function. Revisit on a genuine
-// predecessor/header/TU-state change; register scheduling is not a permitted artifact.
+// @semantic: jump-table placement residual.
 VA(0x004ce480, 0x1cb)
 void inputManager::AsciiConvert(tag_message& event) {
     if ((event.payload.keyboard.keyCode >= INPUT_SCAN_F1
@@ -477,7 +443,6 @@ void inputManager::MakeScanCodeTable(void) {
     m_keyState[IDX(INPUT_SCAN_J)] = 'J';
     m_keyState[IDX(INPUT_SCAN_K)] = 'K';
     m_keyState[IDX(INPUT_SCAN_L)] = 'L';
-    // Retail deliberately maps both physical scan keys 0x27 and 0x28 to apostrophe.
     m_keyState[IDX(INPUT_SCAN_SEMICOLON)] = '\'';
     m_keyState[IDX(INPUT_SCAN_APOSTROPHE)] = '\'';
     m_keyState[IDX(INPUT_SCAN_GRAVE)] = INPUT_SCAN_GRAVE << 8;
@@ -530,15 +495,7 @@ void inputManager::MakeScanCodeTable(void) {
     m_keyState[IDX(INPUT_SCAN_F12)] = INPUT_SCAN_F12 << 8;
 }
 
-// @semantic
-// Complete 0xe4 retail CFG and all 18 relocation occurrences align. Candidate is
-// two bytes shorter because +0x82 loads/stores/tests gbColorMice through EAX rather
-// than retail ECX; at +0xb7 candidate then loads gbColorMice before
-// bLastOnscreenMouseColor, while retail loads the commutative operands oppositely.
-// Reversing that inequality and splitting the assignment through a scoped local are
-// code-neutral. Payload-independent cursor state and owner-relative gConfig +0x30/
-// +0x34 addends are confirmed; revisit only after a genuine predecessor/TU-state
-// change, since the residual is register coloring rather than missing behavior.
+// @semantic: residual is register coloring rather than missing behavior.
 VA(0x004ce990, 0xe4)
 void CheckChangeCursor(i32 x, i32 y, i32 force) {
     if (bInCheckChangeCursor != 0)
@@ -564,17 +521,7 @@ void CheckChangeCursor(i32 x, i32 y, i32 force) {
     bInCheckChangeCursor = 0;
 }
 
-// @semantic
-// Base is 0xe6 bytes versus retail's 0xe9. At +0x01 retail forms the mouse-active-field
-// pointer in ECX, loads it into EAX, and tests EAX; base forms it in EAX and folds the
-// load/test into a memory compare. From base +0x1d / retail +0x20 through RET, all 0xc9
-// remaining bytes are identical. All 11 relocation identities/addends agree: the first
-// gpInputManager operand is at +0x02/+0x03 and every later retail site is base +3.
-// Direct and positive-guard forms, pointer/value/reference combinations, manager-field
-// pointers, value-dependent stores, and their combined form were tried. The libclang
-// AST exposes no valid mutation, and 90 guarded TU-state trials across the prior and
-// integrated declaration states produced no exact closure. Revisit on a genuine
-// predecessor/header/TU-state change; load folding is not a permitted artifact.
+// @semantic: compiler-shape residual.
 VA(0x004cea80, 0xe9)
 void inputManager::ForceMouseMove(void) {
     i32 mouseMessageActive = gpInputManager->m_mouseMessageActive;
@@ -597,13 +544,7 @@ void inputManager::ForceMouseMove(void) {
     gpInputManager->m_mouseMessageActive = 0;
 }
 
-// ===== vtable inputManager : public baseManager  (3 slots) =====
-//  [ 0] VA(0x004ce230, 0x78)  int inputManager::Open(int)   <- override (implements baseManager pure virtual)
-//  [ 1] VA(0x004ce2b0, 0x20)  void inputManager::Close(void)   <- override (implements baseManager pure virtual)
-//  [ 2] VA(0x004ce2d0, 0x5)  int inputManager::Main(struct tag_message &)   <- override (implements baseManager pure virtual)
 
-// ---- vtables (compiler-emitted; census) ----
 VTBL(inputManager, 0x004eba30);
 
-// ---- globals (definitions, RVA order) ----
 DATA(0x00534bc8) i32 iLastBWOnScreenCheck;

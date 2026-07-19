@@ -20,4 +20,4 @@ union AdventureRemotePayload {
 
 SIZE(AdventureRemotePayload, ADVMGR_REMOTE_PAYLOAD_VIEW_SIZE);
 
-#endif // HOMM2_ADVMGR_TYPES_H
+#endif
