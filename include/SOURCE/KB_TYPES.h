@@ -580,13 +580,14 @@ struct tag_monsterInfo {
 SIZE(tag_monsterInfo, 0x1a);
 H2_ENUM_BEGIN(CombatHeroAnimationConstant)
     COMBAT_HERO_ANIMATION_COUNT       = 12,
-    COMBAT_HERO_ANIMATION_FRAME_COUNT = 9
+    COMBAT_HERO_ANIMATION_FRAME_COUNT = 9,
+    COMBAT_HERO_SIDE_COUNT            = 2
 H2_ENUM_END(CombatHeroAnimationConstant)
 
 #pragma pack(push, 1)
 struct SCmbtHero {
-    i16 x[2];
-    i16 y[2];
+    i16 x[COMBAT_HERO_SIDE_COUNT];
+    i16 y[COMBAT_HERO_SIDE_COUNT];
     u8 idleAnimationCount;
     i8 animationFrameCount[COMBAT_HERO_ANIMATION_COUNT];
     i8 animationFrames[COMBAT_HERO_ANIMATION_COUNT][COMBAT_HERO_ANIMATION_FRAME_COUNT];
@@ -601,14 +602,19 @@ H2_ENUM_CLASS_BEGIN_T(SpellInfoAttribute, u8)
 H2_ENUM_CLASS_END_T(SpellInfoAttribute, u8)
 H2_ENUM_FLAGS(SpellInfoAttribute)
 
+H2_ENUM_BEGIN(SpellInfoConstant)
+    SPELL_INFO_SOUND_NAME_SIZE = 9,
+    SPELL_INFO_RACE_COUNT      = IDX(FACTION_COUNT)
+H2_ENUM_END(SpellInfoConstant)
+
 struct SSpellInfo {
-    char soundName[9];
+    char soundName[SPELL_INFO_SOUND_NAME_SIZE];
     u8 level;
     u8 iconIndex;
     u8 combatEffect;
     i16 aiValue;
     u8 cost;
-    u8 raceChance[6];
+    u8 raceChance[SPELL_INFO_RACE_COUNT];
     SpellInfoAttribute attributes;
 };
 SIZE(SSpellInfo, 0x16);

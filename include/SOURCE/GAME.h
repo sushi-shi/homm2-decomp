@@ -6,20 +6,35 @@
 
 struct tag_message;
 
+H2_ENUM_BEGIN(GameSerializationConstant)
+    GAME_SOURCE_LINE             = 660,
+    GAME_LOAD_SOURCE_LINE        = 1103,
+    GAME_SAVE_BUFFER_SIZE        = 50000,
+    GAME_FILE_MARKER             = 1234,
+    GAME_UNUSED_FILE_MARKER      = 9999,
+    GAME_PLAYER_COUNT            = 6,
+    GAME_HERO_COUNT              = 54,
+    GAME_TOWN_COUNT              = 72,
+    GAME_MINE_COUNT              = 144,
+    GAME_BOAT_COUNT              = 48,
+    GAME_EVENT_RUNTIME_GAP_SIZE  = 4,
+    GAME_EVENT_MESSAGE_HEAD_SIZE = 1
+H2_ENUM_END(GameSerializationConstant)
+
 #pragma pack(push, 1)
 struct EventExtra {
     u8 unknown00;
-    i32 resources[7];
+    i32 resources[IDX(RES_COUNT)];
     i16 artifact;
     u8 applyToComputer;
     u8 cancelAfterVisit;
-    char unknown21[4];
+    char unknown21[GAME_EVENT_RUNTIME_GAP_SIZE];
     i8 active;
     u16 x;
     u16 y;
     u8 unknown2a;
-    u8 players[6];
-    char message[1];
+    u8 players[GAME_PLAYER_COUNT];
+    char message[GAME_EVENT_MESSAGE_HEAD_SIZE];
 };
 #pragma pack(pop)
 SIZE(EventExtra, 0x32);
@@ -28,19 +43,6 @@ struct RandomHeroArmyRange {
     i16 minimum;
     i16 maximum;
 };
-
-H2_ENUM_BEGIN(GameSerializationConstant)
-    GAME_SOURCE_LINE        = 660,
-    GAME_LOAD_SOURCE_LINE   = 1103,
-    GAME_SAVE_BUFFER_SIZE   = 50000,
-    GAME_FILE_MARKER        = 1234,
-    GAME_UNUSED_FILE_MARKER = 9999,
-    GAME_PLAYER_COUNT       = 6,
-    GAME_HERO_COUNT         = 54,
-    GAME_TOWN_COUNT         = 72,
-    GAME_MINE_COUNT         = 144,
-    GAME_BOAT_COUNT         = 48
-H2_ENUM_END(GameSerializationConstant)
 
 // Action trigger ids carried in mapCell::m_triggerType (non-action id | the
 // MAP_TRIGGER_ACTION_FLAG 0x80 bit). ProcessRandomObjects converts every
