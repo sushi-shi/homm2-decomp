@@ -42,8 +42,8 @@ H2_ENUM_BEGIN(AdventureManagerStorageConstant)
     ADVMGR_STEP_PIXEL_COUNT              = 6,
     ADVMGR_STEP_DELAY_COUNT              = 5,
     ADVMGR_VIEW_WORLD_SCALE_COUNT        = 3,
-    ADVMGR_VIEW_WORLD_TERRAIN_COUNT      = 6,
-    ADVMGR_VIEW_WORLD_HALF_COUNT         = 2,
+    ADVMGR_VIEW_WORLD_OFFSET_KIND_COUNT  = 6,
+    ADVMGR_VIEW_WORLD_AXIS_COUNT         = 2,
     ADVMGR_ARMY_SIZE_NAME_SIZE           = 12,
     ADVMGR_MONSTER_ANIMATION_TABLE_SIZE  = 18
 H2_ENUM_END(AdventureManagerStorageConstant)
@@ -369,8 +369,8 @@ extern struct _SAMPLE* hOldWalkSample;
 extern struct _SAMPLE* hNewWalkSample;
 extern i32 EveryOther;
 extern i32 startVals[ADVMGR_VIEW_WORLD_SCALE_COUNT];
-extern i8 iVWHalf[ADVMGR_VIEW_WORLD_SCALE_COUNT][ADVMGR_VIEW_WORLD_TERRAIN_COUNT]
-                     [ADVMGR_VIEW_WORLD_HALF_COUNT];
+extern i8 iVWHalf[ADVMGR_VIEW_WORLD_SCALE_COUNT][ADVMGR_VIEW_WORLD_OFFSET_KIND_COUNT]
+                     [ADVMGR_VIEW_WORLD_AXIS_COUNT];
 extern ViewWorldScale giViewWorldScale;
 extern i32 giViewWorldScaleLookup;
 extern b32 gbInViewWorld;
