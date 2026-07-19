@@ -2,7 +2,7 @@ path	status	notes
 include/BASE/BITS.h	reviewed	Public APIs use arithmetic bit indices; no literal values.
 include/BASE/BITSConstants.h	reviewed	Fixed-width bit storage aliases; no literal values.
 include/BASE/Blur.h	reviewed	The public blur operation names every parameter and exposes no private constants or storage records.
-include/BASE/Bzip.h	pending
+include/BASE/Bzip.h	reviewed	Shared model, frequency padding, CRC table, and program-name storage extents are named enums; declarations otherwise contain no numeric constants.
 include/BASE/DROPLIST_TYPES.h	pending
 include/BASE/EXEC_TYPES.h	reviewed	Every text-field extent is named; remaining literals are packed-layout SIZE evidence.
 include/BASE/INPUTMGR.h	pending
