@@ -37,7 +37,6 @@ H2_ENUM_BEGIN(DropListStorageConstant)
 H2_ENUM_END(DropListStorageConstant)
 
 H2_ENUM_BEGIN(DropListLayoutConstant)
-    DIMMED_TEXT_COLOR           = 3,
     MIN_VISIBLE_ITEM_COUNT      = 3,
     TEXT_LEFT_INSET             = 5,
     TEXT_HORIZONTAL_INSET_COUNT = 2,
@@ -109,7 +108,7 @@ void dropListWidget::Read(void) {
     m_normalColor = gpResourceManager->ReadWord();
     m_selColor = gpResourceManager->ReadWord();
     m_unusedColor = gpResourceManager->ReadWord();
-    m_textMode = gpResourceManager->ReadWord();
+    m_alignment = gpResourceManager->ReadWord();
     i16 id = gpResourceManager->ReadWord();
 
     m_closedContentFrame = IDX(FRAME_CLOSED_CONTENT);
@@ -304,9 +303,9 @@ void dropListWidget::Draw(void) {
         0
     );
     if (m_itemCount > 0 && m_selectedIndex >= 0) {
-        i32 color = DIMMED_TEXT_COLOR;
+        FontDrawMode color = FONT_DRAW_DARK_GRAY;
         if ((m_flags & WIDGET_FLAG_DIMMED) == 0)
-            color = m_normalColor;
+            color = FontDrawModeFromStorage(m_normalColor);
         m_font->DrawBoundedString(
             m_items[m_selectedIndex],
             m_contentX + m_owner->m_posX,
@@ -314,7 +313,7 @@ void dropListWidget::Draw(void) {
             m_contentWidth,
             m_contentHeight,
             color,
-            m_textMode
+            FontAlignmentFromStorage(m_alignment)
         );
     }
 }
@@ -323,7 +322,9 @@ VA(0x004dc6e0, 0x378)
 void dropListWidget::DrawDropStuff(void) {
     i32 y = m_owner->m_posY + m_listY;
     m_icon->DrawToBuffer(m_owner->m_posX + m_listX, y, m_firstRowFrame, 0);
-    i32 color = m_selectedIndex == m_topIndex ? m_selColor : m_normalColor;
+    FontDrawMode color = FontDrawModeFromStorage(
+        m_selectedIndex == m_topIndex ? m_selColor : m_normalColor
+    );
     m_font->DrawBoundedString(
         m_items[m_topIndex],
         m_owner->m_posX + m_listX + TEXT_LEFT_INSET,
@@ -331,14 +332,14 @@ void dropListWidget::DrawDropStuff(void) {
         m_listWidth - TEXT_HORIZONTAL_INSET_COUNT * TEXT_LEFT_INSET,
         m_font->m_height + 1,
         color,
-        m_textMode
+        FontAlignmentFromStorage(m_alignment)
     );
     i32 i = 1;
     y += m_firstRowHeight;
     while (i < m_visibleItemCount - 1 && m_topIndex + i < m_itemCount) {
         m_icon->DrawToBuffer(m_owner->m_posX + m_listX, y, m_middleRowFrame, 0);
         i32 item = m_topIndex + i;
-        color = m_selectedIndex == item ? m_selColor : m_normalColor;
+        color = FontDrawModeFromStorage(m_selectedIndex == item ? m_selColor : m_normalColor);
         m_font->DrawBoundedString(
             m_items[item],
             m_owner->m_posX + m_listX + TEXT_LEFT_INSET,
@@ -346,7 +347,7 @@ void dropListWidget::DrawDropStuff(void) {
             m_listWidth - TEXT_HORIZONTAL_INSET_COUNT * TEXT_LEFT_INSET,
             m_font->m_height + 1,
             color,
-            m_textMode
+            FontAlignmentFromStorage(m_alignment)
         );
         i++;
         y += m_middleRowHeight;
@@ -354,7 +355,7 @@ void dropListWidget::DrawDropStuff(void) {
     m_icon->DrawToBuffer(m_owner->m_posX + m_listX, y, m_lastRowFrame, 0);
     i32 item = m_topIndex + i;
     if (item < m_itemCount) {
-        color = m_selectedIndex == item ? m_selColor : m_normalColor;
+        color = FontDrawModeFromStorage(m_selectedIndex == item ? m_selColor : m_normalColor);
         m_font->DrawBoundedString(
             m_items[item],
             m_owner->m_posX + m_listX + TEXT_LEFT_INSET,
@@ -362,7 +363,7 @@ void dropListWidget::DrawDropStuff(void) {
             m_listWidth - TEXT_HORIZONTAL_INSET_COUNT * TEXT_LEFT_INSET,
             m_font->m_height + 1,
             color,
-            m_textMode
+            FontAlignmentFromStorage(m_alignment)
         );
     }
     if (m_scrollRange > 0) {

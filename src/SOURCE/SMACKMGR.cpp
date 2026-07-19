@@ -52,8 +52,6 @@ H2_ENUM_BEGIN(SmackManagerConstant)
     CONGRATS_TEXT_Y                = 98,
     CONGRATS_TEXT_WIDTH            = 134,
     CONGRATS_TEXT_HEIGHT           = 217,
-    CONGRATS_TEXT_MODE             = FONT_DRAW_SCENARIO_WIN,
-    CONGRATS_TEXT_ALIGNMENT        = FONT_ALIGN_CENTER_BOTH,
     CONGRATS_BLIT_WIDTH            = WINGRAPH_WIDTH - 1,
     CONGRATS_BLIT_HEIGHT           = WINGRAPH_HEIGHT - 1,
     MOVIE_PATH_SIZE                = 352,
@@ -109,8 +107,8 @@ void DoAdvance(Smack* smack, i32 drawFrame, i32 advanceFrame, i32 updatePalette,
                     CONGRATS_TEXT_Y,
                     CONGRATS_TEXT_WIDTH,
                     CONGRATS_TEXT_HEIGHT,
-                    CONGRATS_TEXT_MODE,
-                    CONGRATS_TEXT_ALIGNMENT
+                    FONT_DRAW_SCENARIO_WIN,
+                    FONT_ALIGN_CENTER_BOTH
                 );
                 if (smack->FrameNum == CONGRATS_FIRST_FRAME) {
                     BlitBitmapToScreen(

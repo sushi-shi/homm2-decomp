@@ -147,7 +147,7 @@ void listBoxWidget::Read(void) {
     m_maxVisibleItems = gpResourceManager->ReadWord();
     m_normalColor = gpResourceManager->ReadWord();
     m_selectedColor = gpResourceManager->ReadWord();
-    m_textMode = gpResourceManager->ReadWord();
+    m_alignment = gpResourceManager->ReadWord();
     m_id = gpResourceManager->ReadWord();
     m_firstRowFrame = FRAME_FIRST_ROW;
     m_middleRowFrame = FRAME_MIDDLE_ROW;
@@ -398,7 +398,9 @@ void listBoxWidget::DrawLBStuff(i32 doUpdate) {
         if (i == 0) {
             m_icon->DrawToBuffer(x, y, m_firstRowFrame, 0);
             if (i < m_visibleItemCount) {
-                i32 color = m_selectedIndex == m_topIndex ? m_selectedColor : m_normalColor;
+                FontDrawMode color = FontDrawModeFromStorage(
+                    m_selectedIndex == m_topIndex ? m_selectedColor : m_normalColor
+                );
                 m_font->DrawBoundedString(
                     m_items[m_topIndex],
                     x + TEXT_LEFT_INSET,
@@ -406,7 +408,7 @@ void listBoxWidget::DrawLBStuff(i32 doUpdate) {
                     m_listWidth - TEXT_HORIZONTAL_INSET_COUNT * TEXT_LEFT_INSET,
                     m_font->m_height + 1,
                     color,
-                    m_textMode
+                    FontAlignmentFromStorage(m_alignment)
                 );
             }
             y += m_firstRowHeight;
@@ -414,7 +416,9 @@ void listBoxWidget::DrawLBStuff(i32 doUpdate) {
             m_icon->DrawToBuffer(x, y, m_lastRowFrame, 0);
             if (m_visibleItemCount > i) {
                 i32 itemIndex = m_topIndex + i;
-                i32 color = m_selectedIndex == itemIndex ? m_selectedColor : m_normalColor;
+                FontDrawMode color = FontDrawModeFromStorage(
+                    m_selectedIndex == itemIndex ? m_selectedColor : m_normalColor
+                );
                 m_font->DrawBoundedString(
                     m_items[itemIndex],
                     x + TEXT_LEFT_INSET,
@@ -422,14 +426,16 @@ void listBoxWidget::DrawLBStuff(i32 doUpdate) {
                     m_listWidth - TEXT_HORIZONTAL_INSET_COUNT * TEXT_LEFT_INSET,
                     m_font->m_height + 1,
                     color,
-                    m_textMode
+                    FontAlignmentFromStorage(m_alignment)
                 );
             }
         } else {
             m_icon->DrawToBuffer(x, y, m_middleRowFrame, 0);
             if (i < m_visibleItemCount) {
                 i32 itemIndex = m_topIndex + i;
-                i32 color = m_selectedIndex == itemIndex ? m_selectedColor : m_normalColor;
+                FontDrawMode color = FontDrawModeFromStorage(
+                    m_selectedIndex == itemIndex ? m_selectedColor : m_normalColor
+                );
                 m_font->DrawBoundedString(
                     m_items[itemIndex],
                     x + TEXT_LEFT_INSET,
@@ -437,7 +443,7 @@ void listBoxWidget::DrawLBStuff(i32 doUpdate) {
                     m_listWidth - TEXT_HORIZONTAL_INSET_COUNT * TEXT_LEFT_INSET,
                     m_font->m_height + 1,
                     color,
-                    m_textMode
+                    FontAlignmentFromStorage(m_alignment)
                 );
             }
             y += m_rowHeight;
