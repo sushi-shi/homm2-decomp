@@ -6,7 +6,7 @@ include/BASE/Blur.h	pending
 include/BASE/BlurConstants.h	pending
 include/BASE/Bzip.h	pending
 include/BASE/DROPLIST_TYPES.h	pending
-include/BASE/EXEC_TYPES.h	pending
+include/BASE/EXEC_TYPES.h	reviewed	Every text-field extent is named; remaining literals are packed-layout SIZE evidence.
 include/BASE/INPUTMGR.h	pending
 include/BASE/INPUTMGR_TYPES.h	pending
 include/BASE/Icon2b.h	pending
@@ -40,7 +40,7 @@ include/BASE/border.h	pending
 include/BASE/button.h	pending
 include/BASE/dimmerWidget.h	pending
 include/BASE/dropListWidget.h	pending
-include/BASE/executive.h	pending
+include/BASE/executive.h	reviewed	The interface carries no numeric policy; the sole literal is proven class-layout SIZE evidence.
 include/BASE/font.h	pending
 include/BASE/heroWindow.h	pending
 include/BASE/heroWindowManager.h	pending
@@ -144,7 +144,7 @@ src/BASE/BUTTON.cpp	pending
 src/BASE/Blur.cpp	pending
 src/BASE/Bzip.cpp	pending
 src/BASE/DIMMER.cpp	pending
-src/BASE/EXEC.cpp	pending
+src/BASE/EXEC.cpp	reviewed	Manager results, dispatch states, priority, and capacity are private named constants; dialog storage derives from sizeof(executive), and executable selection uses the shared game/editor selectors. Non-debug section bytes and ordered relocations are unchanged.
 src/BASE/FONT.cpp	pending
 src/BASE/ICON.cpp	pending
 src/BASE/ICONWDGT.cpp	pending

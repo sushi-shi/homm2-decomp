@@ -57,7 +57,7 @@ i32 executive::InitSystem(void) {
         ShutDown(gExecutiveText.resourceInitError);
     if (gpInputManager->Open(MANAGER_DEFAULT_PRIORITY) != 0)
         ShutDown(gExecutiveText.inputInitError);
-    if (giCurExe == 1) {
+    if (giCurExe == IDX(CONFIG_EXECUTABLE_EDITOR)) {
         if (gpSoundManager->Open(MANAGER_DEFAULT_PRIORITY) != 0)
             ShutDown(gExecutiveText.soundInitError);
     }
@@ -93,7 +93,7 @@ i32 executive::DoDialog(class baseManager* manager) {
     baseManager* managerList[DIALOG_MANAGER_CAPACITY];
     baseManager* previousList[DIALOG_MANAGER_CAPACITY];
     baseManager* nextList[DIALOG_MANAGER_CAPACITY];
-    i32 dialogStorage[4];
+    i32 dialogStorage[sizeof(executive) / sizeof(i32)];
     executive* dialog = reinterpret_cast<executive*>(dialogStorage);
     baseManager* listManager;
     i32 managerIndex;
