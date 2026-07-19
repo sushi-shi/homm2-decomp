@@ -32,9 +32,14 @@ H2_ENUM_CLASS_BEGIN(ConfigExecutable)
 H2_ENUM_CLASS_END(ConfigExecutable)
 
 H2_ENUM_BEGIN(ConfigStorageConstant)
-    CONFIG_GRAPHICS_SIZE  = 0x1c,
-    CONFIG_PERSISTED_SIZE = 0x19d,
-    CONFIG_STRUCT_SIZE    = 0x1a0
+    CONFIG_GRAPHICS_SIZE             = 0x1c,
+    CONFIG_PERSISTED_SIZE            = 0x19d,
+    CONFIG_STRUCT_SIZE               = 0x1a0,
+    CONFIG_SAVE_NAME_SIZE            = 0xd,
+    CONFIG_AUTOSAVE_RESERVED_SIZE    = 0x12,
+    CONFIG_MODEM_INIT_STRING_SIZE    = 0x64,
+    CONFIG_UNIQUE_SYSTEM_ID_SIZE     = 4,
+    CONFIG_NETWORK_DEFAULT_NAME_SIZE = 0x18
 H2_ENUM_END(ConfigStorageConstant)
 
 H2_ENUM_CLASS_BEGIN(ConfigConnectionType)
@@ -62,28 +67,28 @@ struct configStruct {
     i32 combatShadeLevel;
     i32 combatArmyInfoLevel;
     i32 evilInterfaceUsage;
-    char autoLoadName[0xd];
-    char autoSaveName[0xd];
+    char autoLoadName[CONFIG_SAVE_NAME_SIZE];
+    char autoSaveName[CONFIG_SAVE_NAME_SIZE];
     char mciError;
     char needsDefaultInitialization;
-    char reservedAfterAutoSave[0x12];
+    char reservedAfterAutoSave[CONFIG_AUTOSAVE_RESERVED_SIZE];
     ConfigMusicSource musicSource;
-    char modemInitString[0x64];
+    char modemInitString[CONFIG_MODEM_INIT_STRING_SIZE];
     i32 comPort[IDX(CONFIG_CONNECTION_COUNT)];
     i32 baudRate[IDX(CONFIG_CONNECTION_COUNT)];
-    char uniqueSystemID[4];
+    char uniqueSystemID[CONFIG_UNIQUE_SYSTEM_ID_SIZE];
     i32 useOpera;
     i32 quickCombatLevel;
     i32 combatSpeed;
     i32 autoCombatUseSpells;
     i32 slowVideo;
-    char rmtRLName[0xd];
-    char rmtRCName[0xd];
-    char rmtRDName[0xd];
-    char rmtSLName[0xd];
-    char rmtSCName[0xd];
-    char rmtSDName[0xd];
-    char networkDefaultName[0x18];
+    char rmtRLName[CONFIG_SAVE_NAME_SIZE];
+    char rmtRCName[CONFIG_SAVE_NAME_SIZE];
+    char rmtRDName[CONFIG_SAVE_NAME_SIZE];
+    char rmtSLName[CONFIG_SAVE_NAME_SIZE];
+    char rmtSCName[CONFIG_SAVE_NAME_SIZE];
+    char rmtSDName[CONFIG_SAVE_NAME_SIZE];
+    char networkDefaultName[CONFIG_NETWORK_DEFAULT_NAME_SIZE];
 };
 #pragma pack(pop)
 SIZE(exeGfxConfig, CONFIG_GRAPHICS_SIZE);
