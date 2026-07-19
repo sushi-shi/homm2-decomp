@@ -69,11 +69,11 @@ public:
 };
 SIZE(mapCell, 12);
 
-// Legacy on-disk record sizes (fullMap::Read's convert path streams the old layout and
-// copies the leading bytes into the new packed records).
+// Legacy on-disk record sizes used by fullMap::Read's conversion path.
 struct oldMapCell {
     u8 raw[20];
 };
+
 struct oldMapCellExtra {
     u8 raw[15];
 };
