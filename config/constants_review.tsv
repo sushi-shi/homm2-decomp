@@ -29,8 +29,8 @@ include/BASE/SAMPLE_TYPES.h	reviewed	The source slots are symbolic; the sole lit
 include/BASE/TEXTWDGT_TYPES.h	reviewed	Named source-file slot extent and aggregate SIZE preserve the fixed packed storage layout.
 include/BASE/TILE.h	reviewed	The public packed tile-index and flip-bit domain is named and aligned; the blitter API otherwise exposes no numeric policy.
 include/BASE/TILESET_TYPES.h	reviewed	Named source-file storage extents plus SIZE evidence.
-include/BASE/WINMGR.h	pending
-include/BASE/WINMGR_TYPES.h	pending
+include/BASE/WINMGR.h	reviewed	The shared window color-cycle mode and cycle-buffer extent domains are explicit and aligned; function declarations expose no additional numeric policy.
+include/BASE/WINMGR_TYPES.h	reviewed	Every text-record slot extent is named; the remaining literal is packed-layout SIZE evidence.
 include/BASE/baseManager.h	reviewed	Named message-mask, priority, and capacity domains; zeroes are pure-virtual syntax.
 include/BASE/bitmap.h	reviewed	Serialized bitmap-type domain and all public method parameters are named; remaining literals are packing and SIZE layout evidence.
 include/BASE/bmap2.h	reviewed	All public bitmap-operation parameters are named; the interface contains no numeric literals or private domains.
@@ -41,7 +41,7 @@ include/BASE/dropListWidget.h	pending
 include/BASE/executive.h	reviewed	The interface carries no numeric policy; the sole literal is proven class-layout SIZE evidence.
 include/BASE/font.h	reviewed	Shared glyph, draw-mode, and horizontal/vertical alignment domains are named and aligned. The remaining literal is packed-layout SIZE evidence.
 include/BASE/heroWindow.h	reviewed	Shared fixed-layer, saved-background, ownership, update-mask, open-state, widget-range, and name-capacity domains are named and aligned. The interface otherwise contains no numeric storage policy.
-include/BASE/heroWindowManager.h	pending
+include/BASE/heroWindowManager.h	reviewed	Shared hover/dialog sentinels, cycle-palette extent, and fade-mode domain are named and aligned. The remaining literal is proven packed class-layout SIZE evidence.
 include/BASE/icon.h	reviewed	Limit bounds, typed frame-table access, and all public method parameters are named; remaining literals are packed-layout SIZE evidence.
 include/BASE/icon2bc.h	pending
 include/BASE/icon2bs.h	pending
@@ -167,7 +167,7 @@ src/BASE/TILESET.cpp	reviewed	Allocation/free operands 18 and 0x1c preserve reta
 src/BASE/Textntry.cpp	pending
 src/BASE/WIDGET.cpp	reviewed	The private default extent and shared dispatch results are enums; remaining zeros and -1 are initialization, boolean, draw-mode, or z-order sentinels.
 src/BASE/WINDOW.cpp	reviewed	Private constants name screen bounds and the open failure result; public window flag/state and text-entry read-mode domains cover every executable literal. Remaining zeros, ones, and -1 values are initialization, list/z-order sentinels, draw toggles, or inclusive-bound steps.
-src/BASE/WINMGR.cpp	pending
+src/BASE/WINMGR.cpp	reviewed	Private enums name screen, palette, cycle, fade, fizzle, screenshot, and lookup constants; shared window flags, fade modes, sentinels, and cycle-buffer extent use their public domains. World-cycle indices remain a narrowly suppressed retail local payload, while allocation/free operands preserve source-location evidence.
 src/BASE/bmap2.cpp	reviewed	The TU-private palette-level stride is named with a prefix-free enumerator. Remaining zeros and ones express row/column origins, positive-extent guards, loop initialization, or inclusive-to-exclusive rectangle-edge arithmetic; the obsolete semantic ratchet was removed.
 src/BASE/droplist.cpp	pending
 src/BASE/icon2bc.cpp	pending

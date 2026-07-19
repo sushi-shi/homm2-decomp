@@ -10,6 +10,10 @@ H2_ENUM_CLASS_BEGIN(WindowColorCycleMode)
     WINDOW_COLOR_CYCLE_COMBAT_ALTERNATE = 3
 H2_ENUM_CLASS_END(WindowColorCycleMode)
 
+H2_ENUM_BEGIN(WindowManagerConstant)
+    WINDOW_CYCLE_PALETTE_BYTES = 0x60
+H2_ENUM_END(WindowManagerConstant)
+
 void CycleColors(i32);
 void CreateFizzleTables(void);
 void CreateColorTables(void);
