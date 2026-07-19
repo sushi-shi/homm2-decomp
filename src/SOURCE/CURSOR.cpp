@@ -27,6 +27,18 @@
 #include <stdio.h>
 #include <string.h>
 
+H2_ENUM_CLASS_BEGIN(CursorHeroShadowFrame)
+    SPRITE_UP_STEP_1        = 0x2e,
+    SPRITE_UP_STEP_2        = 0x2f,
+    SPRITE_UP_STEP_3        = 0x31,
+    SPRITE_UP_STEP_4        = 0x32,
+    SPRITE_UP_STEP_5        = 0x33,
+    SPRITE_UP_SHADOW_WIDE   = 0x37,
+    SPRITE_UP_SHADOW_STEP_5 = 0x38,
+    SPRITE_UP_SHADOW_STEP_4 = 0x39,
+    SPRITE_UP_SHADOW_STEP_3 = 0x3a
+H2_ENUM_CLASS_END(CursorHeroShadowFrame)
+
 #define RETAIL_FILE const_cast<char*>("I:\\Projects\\Heroes\\Prog\\SOURCE\\CURSOR.CPP")
 
 // @early-stop: byte-proven compiler artifact.
@@ -339,16 +351,16 @@ void advManager::DrawCursorShadow(void) {
             );
         } else if (m_drawHeroShadows && m_cursorType != CURSOR_HERO_TYPE_BOAT) {
             shadowFrame = drawFrame_f;
-            if (shadowFrame == IDX(HERO_SPRITE_UP_STEP_5))
-                shadowFrame = IDX(HERO_SPRITE_UP_SHADOW_STEP_5);
-            if (shadowFrame == IDX(HERO_SPRITE_UP_STEP_4))
-                shadowFrame = IDX(HERO_SPRITE_UP_SHADOW_STEP_4);
-            if (shadowFrame == IDX(HERO_SPRITE_UP_STEP_3))
-                shadowFrame = IDX(HERO_SPRITE_UP_SHADOW_STEP_3);
-            if (shadowFrame == IDX(HERO_SPRITE_UP_STEP_2))
-                shadowFrame = IDX(HERO_SPRITE_UP_SHADOW_WIDE);
-            if (shadowFrame == IDX(HERO_SPRITE_UP_STEP_1))
-                shadowFrame = IDX(HERO_SPRITE_UP_SHADOW_WIDE);
+            if (shadowFrame == IDX(SPRITE_UP_STEP_5))
+                shadowFrame = IDX(SPRITE_UP_SHADOW_STEP_5);
+            if (shadowFrame == IDX(SPRITE_UP_STEP_4))
+                shadowFrame = IDX(SPRITE_UP_SHADOW_STEP_4);
+            if (shadowFrame == IDX(SPRITE_UP_STEP_3))
+                shadowFrame = IDX(SPRITE_UP_SHADOW_STEP_3);
+            if (shadowFrame == IDX(SPRITE_UP_STEP_2))
+                shadowFrame = IDX(SPRITE_UP_SHADOW_WIDE);
+            if (shadowFrame == IDX(SPRITE_UP_STEP_1))
+                shadowFrame = IDX(SPRITE_UP_SHADOW_WIDE);
             if (shadowFrame >= IDX(CURSOR_SHADOW_ANIM_FIRST)
                 && shadowFrame < IDX(CURSOR_SHADOW_ANIM_END))
                 shadowOffset = CURSOR_HORSE_SHADOW_OFFSET;

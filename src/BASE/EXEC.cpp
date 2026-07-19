@@ -13,6 +13,15 @@
 #include <SOURCE/kbwin.h>
 #include <SOURCE/X_GLOBAL.h>
 
+H2_ENUM_BEGIN(ExecutiveManagerConstant)
+    MANAGER_DEFAULT_PRIORITY         = -1,
+    MANAGER_SUCCESS                  = 0,
+    MANAGER_STOP_DISPATCH            = 1,
+    MANAGER_HANDLE_EXECUTIVE_MESSAGE = 2,
+    MANAGER_ERROR                    = 3,
+    DIALOG_MANAGER_CAPACITY          = 20
+H2_ENUM_END(ExecutiveManagerConstant)
+
 DATA(0x0051fb20) static SExecutiveText gExecutiveText = {
     "Unable to initialize resources - possible disk problem.",
     "Unable to initialize input devices - possible problem with mouse or keyboard.",
@@ -44,17 +53,17 @@ executive::executive(void) {
 
 VA(0x004d1620, 0x9e)
 i32 executive::InitSystem(void) {
-    if (gpResourceManager->Open(EXECUTIVE_MANAGER_DEFAULT_PRIORITY) != 0)
+    if (gpResourceManager->Open(MANAGER_DEFAULT_PRIORITY) != 0)
         ShutDown(gExecutiveText.resourceInitError);
-    if (gpInputManager->Open(EXECUTIVE_MANAGER_DEFAULT_PRIORITY) != 0)
+    if (gpInputManager->Open(MANAGER_DEFAULT_PRIORITY) != 0)
         ShutDown(gExecutiveText.inputInitError);
     if (giCurExe == 1) {
-        if (gpSoundManager->Open(EXECUTIVE_MANAGER_DEFAULT_PRIORITY) != 0)
+        if (gpSoundManager->Open(MANAGER_DEFAULT_PRIORITY) != 0)
             ShutDown(gExecutiveText.soundInitError);
     }
-    if (AddManager(gpMouseManager, EXECUTIVE_MANAGER_DEFAULT_PRIORITY) != 0)
+    if (AddManager(gpMouseManager, MANAGER_DEFAULT_PRIORITY) != 0)
         ShutDown(gExecutiveText.mouseInitError);
-    if (AddManager(gpWindowManager, EXECUTIVE_MANAGER_DEFAULT_PRIORITY) != 0)
+    if (AddManager(gpWindowManager, MANAGER_DEFAULT_PRIORITY) != 0)
         ShutDown(gExecutiveText.windowInitError);
     return 0;
 }
@@ -81,9 +90,9 @@ void executive::ShutDownSystem(void) {
 // @semantic: only structural residual is +0xce..+0xe9 in the manager restoration loop.
 VA(0x004d1750, 0xfb)
 i32 executive::DoDialog(class baseManager* manager) {
-    baseManager* managerList[EXECUTIVE_DIALOG_MANAGER_CAPACITY];
-    baseManager* previousList[EXECUTIVE_DIALOG_MANAGER_CAPACITY];
-    baseManager* nextList[EXECUTIVE_DIALOG_MANAGER_CAPACITY];
+    baseManager* managerList[DIALOG_MANAGER_CAPACITY];
+    baseManager* previousList[DIALOG_MANAGER_CAPACITY];
+    baseManager* nextList[DIALOG_MANAGER_CAPACITY];
     i32 dialogStorage[4];
     executive* dialog = reinterpret_cast<executive*>(dialogStorage);
     baseManager* listManager;
@@ -106,13 +115,13 @@ i32 executive::DoDialog(class baseManager* manager) {
             managerCount++;
         } while (listManager != 0);
     }
-    if (AddManager(manager, EXECUTIVE_MANAGER_DEFAULT_PRIORITY) != 0)
+    if (AddManager(manager, MANAGER_DEFAULT_PRIORITY) != 0)
         ShutDown(gExecutiveText.dialogManagerError1);
-    if (dialog->AddManager(gpMouseManager, EXECUTIVE_MANAGER_DEFAULT_PRIORITY) != 0)
+    if (dialog->AddManager(gpMouseManager, MANAGER_DEFAULT_PRIORITY) != 0)
         ShutDown(gExecutiveText.dialogManagerError2);
-    if (dialog->AddManager(gpWindowManager, EXECUTIVE_MANAGER_DEFAULT_PRIORITY) != 0)
+    if (dialog->AddManager(gpWindowManager, MANAGER_DEFAULT_PRIORITY) != 0)
         ShutDown(gExecutiveText.dialogManagerError3);
-    if (dialog->AddManager(manager, EXECUTIVE_MANAGER_DEFAULT_PRIORITY) != 0)
+    if (dialog->AddManager(manager, MANAGER_DEFAULT_PRIORITY) != 0)
         ShutDown(gExecutiveText.dialogManagerError4);
     dialog->MainLoop();
     RemoveManager(manager);
@@ -146,12 +155,12 @@ void executive::PrintManagerList(void) {
 VA(0x004d18e0, 0xce)
 i32 executive::AddManager(class baseManager* mgr, i32 priority) {
     if (mgr == 0)
-        return EXECUTIVE_MANAGER_ERROR;
-    if (priority == EXECUTIVE_MANAGER_DEFAULT_PRIORITY) {
+        return MANAGER_ERROR;
+    if (priority == MANAGER_DEFAULT_PRIORITY) {
         priority = m_managerListTail == 0 ? 0 : m_managerListTail->m_priority + 1;
     }
     if (!mgr->m_active && mgr->Open(priority) != 0)
-        return EXECUTIVE_MANAGER_ERROR;
+        return MANAGER_ERROR;
     baseManager* tail = m_managerListTail;
     baseManager* cur = m_managerListTail;
     if (cur != 0) {
@@ -180,7 +189,7 @@ i32 executive::AddManager(class baseManager* mgr, i32 priority) {
         cur->m_next->m_prev = mgr;
         cur->m_next = mgr;
     }
-    return EXECUTIVE_MANAGER_SUCCESS;
+    return MANAGER_SUCCESS;
 }
 
 VA(0x004d19b0, 0x76)
@@ -218,11 +227,11 @@ VA(0x004d1a30, 0x5a)
 void executive::CallManager(class baseManager* mgr) {
     baseManager* saved = m_activeManager;
     RemoveManager(saved);
-    if (AddManager(mgr, EXECUTIVE_MANAGER_DEFAULT_PRIORITY) != 0)
+    if (AddManager(mgr, MANAGER_DEFAULT_PRIORITY) != 0)
         ShutDown(gExecutiveText.callManagerError1);
     MainLoop();
     RemoveManager(mgr);
-    if (AddManager(saved, EXECUTIVE_MANAGER_DEFAULT_PRIORITY) != 0)
+    if (AddManager(saved, MANAGER_DEFAULT_PRIORITY) != 0)
         ShutDown(gExecutiveText.callManagerError2);
     m_activeManager = saved;
 }
@@ -253,10 +262,10 @@ void executive::MainLoop(void) {
                     && (message.type != MESSAGE_MOUSE_MOVE || gpWindowManager != manager)) {
                     result = manager->Main(message);
                     switch (result) {
-                        case EXECUTIVE_MANAGER_STOP_DISPATCH:
+                        case MANAGER_STOP_DISPATCH:
                             keepDispatching = 0;
                             break;
-                        case EXECUTIVE_MANAGER_HANDLE_EXECUTIVE_MESSAGE:
+                        case MANAGER_HANDLE_EXECUTIVE_MESSAGE:
                             if ((message.type & MESSAGE_EXECUTIVE) == 0)
                                 break;
                             switch (message.payload.executive.command) {

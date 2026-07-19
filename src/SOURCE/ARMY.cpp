@@ -26,6 +26,36 @@
 #include <SOURCE/SPELLS.h>
 #include <SOURCE/X_GLOBAL.h>
 
+H2_ENUM_BEGIN(ArmySpellStatConstant)
+    HASTE_SPEED_BONUS       = 2,
+    BLOODLUST_ATTACK_BONUS  = 3,
+    STONESKIN_DEFENSE_BONUS = 3,
+    STEELSKIN_DEFENSE_BONUS = 5
+H2_ENUM_END(ArmySpellStatConstant)
+
+H2_ENUM_BEGIN(ArmyDeathConstant)
+    CORPSE_LIMIT           = 14,
+    DEATH_RANDOM_MAX       = 100,
+    DEATH_PRIMARY_CHANCE   = 60,
+    DEATH_SECONDARY_CHANCE = 80
+H2_ENUM_END(ArmyDeathConstant)
+
+H2_ENUM_BEGIN(ArmySpellEffectConstant)
+    NO_EFFECT             = -1,
+    EFFECT_MINIMUM_Y      = 999,
+    DELAYED_MEDUSA_EFFECT = 101
+H2_ENUM_END(ArmySpellEffectConstant)
+
+H2_ENUM_BEGIN(ArmySpellChanceConstant)
+    RANDOM_SPELL_ROLL_MAX           = 99,
+    RESURRECT_POWER_PER_SPELL_POWER = 50,
+    HYPNOTIZE_HIT_POINTS_PER_POWER  = 25,
+    ARTIFACT_POWER_MULTIPLIER       = 2,
+    CURE_HIT_POINTS_PER_POWER       = 5,
+    WIDE_CREATURE_HALF_WIDTH        = 22,
+    CONTROL_EFFECT_Y_OFFSET         = 5
+H2_ENUM_END(ArmySpellChanceConstant)
+
 VA(0x0044a8c0, 0xcf)
 army::army(void) {
     i32 i;
@@ -2036,9 +2066,9 @@ void army::PowEffect(i32 effect, i32 resetLimits, i32 effectX, i32 effectY) {
     if (m_monsterType == CREATURE_DWARF || m_monsterType == CREATURE_BATTLE_DWARF) {
         overlapAdjustment_7 = 2;
     }
-    if (effectX != ARMY_NO_EFFECT) {
+    if (effectX != NO_EFFECT) {
         drawEffect_1 = 1;
-    } else if (effect != ARMY_NO_EFFECT) {
+    } else if (effect != NO_EFFECT) {
         for (side_4 = 0; side_4 < ARMY_COMBAT_SIDE_COUNT; side_4++) {
             for (index_10 = 0; index_10 < gpCombatManager->m_armyCount[side_4]; index_10++) {
                 if (gpCombatManager->m_armies[side_4][index_10].m_drawSpellEffect) {
@@ -2047,7 +2077,7 @@ void army::PowEffect(i32 effect, i32 resetLimits, i32 effectX, i32 effectY) {
             }
         }
     }
-    if (!gbNoShowCombat && effect != ARMY_NO_EFFECT && drawEffect_1
+    if (!gbNoShowCombat && effect != NO_EFFECT && drawEffect_1
         && IDX(gCurLoadedSpellEffect) != OD_STEER(effect)) {
         gpResourceManager->Dispose(gCurLoadedSpellIcon);
         gCurLoadedSpellIcon = gpResourceManager->GetIcon(gCombatFxNames[effect]);
@@ -2114,7 +2144,7 @@ void army::PowEffect(i32 effect, i32 resetLimits, i32 effectX, i32 effectY) {
         }
     }
     gpCombatManager->DrawFrame(0, 1, 0, 1, ARMY_COMBAT_FRAME_DELAY, 1, 1);
-    if (effectX != ARMY_NO_EFFECT) {
+    if (effectX != NO_EFFECT) {
         for (index_10 = 0; index_10 < gCurLoadedSpellIcon->m_frameCount; index_10++) {
             entry_1 = &gCurLoadedSpellIcon->Entries()[index_10];
             giMinExtentX =
@@ -2244,7 +2274,7 @@ void army::PowEffect(i32 effect, i32 resetLimits, i32 effectX, i32 effectY) {
             gCurSpellEffectFrame = frame;
         }
         gpCombatManager->DrawFrame(0, 1, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
-        if (effectX != ARMY_NO_EFFECT && frame < giNumPowFrames[IDX(gCurLoadedSpellEffect)]) {
+        if (effectX != NO_EFFECT && frame < giNumPowFrames[IDX(gCurLoadedSpellEffect)]) {
             gCurLoadedSpellIcon->CombatClipDrawToBuffer(
                 effectX,
                 m_spellEffectYOffset + effectY,
@@ -2269,15 +2299,15 @@ void army::PowEffect(i32 effect, i32 resetLimits, i32 effectX, i32 effectY) {
     for (side_4 = 0; side_4 < ARMY_COMBAT_SIDE_COUNT; side_4++) {
         for (index_10 = 0; index_10 < gpCombatManager->m_armyCount[side_4]; index_10++) {
             current = &gpCombatManager->m_armies[side_4][index_10];
-            if (current->m_damagePending && current->m_spellEffect != ARMY_NO_EFFECT
-                && current->m_spellEffect != ARMY_DELAYED_MEDUSA_EFFECT) {
+            if (current->m_damagePending && current->m_spellEffect != NO_EFFECT
+                && current->m_spellEffect != DELAYED_MEDUSA_EFFECT) {
                 gpCombatManager->CastSpell(
                     SpellType(current->m_spellEffect),
                     current->m_hex,
                     1,
-                    ARMY_NO_EFFECT
+                    NO_EFFECT
                 );
-                current->m_spellEffect = ARMY_NO_EFFECT;
+                current->m_spellEffect = NO_EFFECT;
             }
         }
     }
@@ -2350,14 +2380,14 @@ void army::PowEffect(i32 effect, i32 resetLimits, i32 effectX, i32 effectY) {
     for (side_4 = 0; side_4 < ARMY_COMBAT_SIDE_COUNT; side_4++) {
         for (index_10 = 0; index_10 < gpCombatManager->m_armyCount[side_4]; index_10++) {
             current = &gpCombatManager->m_armies[side_4][index_10];
-            if (current->m_damagePending && current->m_spellEffect == ARMY_DELAYED_MEDUSA_EFFECT) {
+            if (current->m_damagePending && current->m_spellEffect == DELAYED_MEDUSA_EFFECT) {
                 gpCombatManager->CastSpell(
                     SpellType(current->m_spellEffect),
                     current->m_hex,
                     1,
-                    ARMY_NO_EFFECT
+                    NO_EFFECT
                 );
-                current->m_spellEffect = ARMY_NO_EFFECT;
+                current->m_spellEffect = NO_EFFECT;
             }
             current->m_drawSpellEffect = 0;
             current->m_damagePending = 0;
@@ -2399,9 +2429,9 @@ void army::ProcessDeath(i32 immediate) {
     if (HAS(m_monster.flags.all, MONSTER_FLAGS_DEAD)) {
         return;
     }
-    if (Random(0, ARMY_DEATH_RANDOM_MAX) < ARMY_DEATH_PRIMARY_CHANCE) {
+    if (Random(0, DEATH_RANDOM_MAX) < DEATH_PRIMARY_CHANCE) {
         gpCombatManager->m_heroDeathPending[m_side] = 1;
-    } else if (Random(0, ARMY_DEATH_RANDOM_MAX) < ARMY_DEATH_SECONDARY_CHANCE) {
+    } else if (Random(0, DEATH_RANDOM_MAX) < DEATH_SECONDARY_CHANCE) {
         gpCombatManager->m_heroAlternateDeathPending[1 - m_side] = 1;
     }
     m_monster.attributes |= MONSTER_ATTRIBUTE_DEAD;
@@ -2426,8 +2456,8 @@ void army::ProcessDeath(i32 immediate) {
             frontCell_1->m_occupantIndex = -1;
         }
     }
-    if (frontCell_1->m_deadOccupantCount < ARMY_CORPSE_LIMIT && !LeaveNoBody()
-        && (!rearCell || rearCell->m_deadOccupantCount < ARMY_CORPSE_LIMIT)) {
+    if (frontCell_1->m_deadOccupantCount < CORPSE_LIMIT && !LeaveNoBody()
+        && (!rearCell || rearCell->m_deadOccupantCount < CORPSE_LIMIT)) {
         frontCell_1->m_deadOccupantSides[frontCell_1->m_deadOccupantCount] =
             gpCombatManager->m_hexCells[m_hex].m_occupantSide;
         frontCell_1->m_deadOccupantIndices[frontCell_1->m_deadOccupantCount] =
@@ -2491,7 +2521,7 @@ void army::SpellEffect(i32 effect, i32 effectFrameDelay, i32 animateCreature) {
     m_drawSpellEffect = 1;
     m_spellEffectYOffset = 0;
     if (!gbNoShowCombat) {
-        minimumYOffset_16 = ARMY_EFFECT_MINIMUM_Y;
+        minimumYOffset_16 = EFFECT_MINIMUM_Y;
         for (i_16 = 0; i_16 < gCurLoadedSpellIcon->m_frameCount; i_16++) {
             entry_8 = GetIconEntry(gCurLoadedSpellIcon, i_16);
             if (entry_8->y < minimumYOffset_16) {
@@ -2622,7 +2652,7 @@ void army::CancelIndividualSpell(ArmySpellInfluence influence) {
         case ARMY_SPELL_INFLUENCE_DRAGON_SLAYER:
             break;
         case ARMY_SPELL_INFLUENCE_BLOODLUST:
-            m_monster.attack -= ARMY_BLOODLUST_ATTACK_BONUS;
+            m_monster.attack -= BLOODLUST_ATTACK_BONUS;
             break;
         case ARMY_SPELL_INFLUENCE_SHIELD:
             break;
@@ -2631,10 +2661,10 @@ void army::CancelIndividualSpell(ArmySpellInfluence influence) {
         case ARMY_SPELL_INFLUENCE_ANTI_MAGIC:
             break;
         case ARMY_SPELL_INFLUENCE_STONESKIN:
-            m_monster.defense -= ARMY_STONESKIN_DEFENSE_BONUS;
+            m_monster.defense -= STONESKIN_DEFENSE_BONUS;
             break;
         case ARMY_SPELL_INFLUENCE_STEELSKIN:
-            m_monster.defense -= ARMY_STEELSKIN_DEFENSE_BONUS;
+            m_monster.defense -= STEELSKIN_DEFENSE_BONUS;
             break;
     }
 }
@@ -2653,7 +2683,7 @@ i32 army::SetSpellInfluence(ArmySpellInfluence influence, i32 rounds) {
     switch (influence) {
         case ARMY_SPELL_INFLUENCE_HASTE:
             CancelIndividualSpell(ARMY_SPELL_INFLUENCE_SLOW);
-            m_monster.speed += ARMY_HASTE_SPEED_BONUS;
+            m_monster.speed += HASTE_SPEED_BONUS;
             m_frameInfo.walkDuration =
                 static_cast<i32>(m_frameInfo.walkDuration * ARMY_HASTE_WALK_DURATION_SCALE);
             break;
@@ -2685,7 +2715,7 @@ i32 army::SetSpellInfluence(ArmySpellInfluence influence, i32 rounds) {
         case ARMY_SPELL_INFLUENCE_DRAGON_SLAYER:
             break;
         case ARMY_SPELL_INFLUENCE_BLOODLUST:
-            m_monster.attack += ARMY_BLOODLUST_ATTACK_BONUS;
+            m_monster.attack += BLOODLUST_ATTACK_BONUS;
             break;
         case ARMY_SPELL_INFLUENCE_SHIELD:
             break;
@@ -2700,11 +2730,11 @@ i32 army::SetSpellInfluence(ArmySpellInfluence influence, i32 rounds) {
             if (m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_STEELSKIN)]) {
                 return 0;
             }
-            m_monster.defense += ARMY_STONESKIN_DEFENSE_BONUS;
+            m_monster.defense += STONESKIN_DEFENSE_BONUS;
             break;
         case ARMY_SPELL_INFLUENCE_STEELSKIN:
             CancelIndividualSpell(ARMY_SPELL_INFLUENCE_STONESKIN);
-            m_monster.defense += ARMY_STEELSKIN_DEFENSE_BONUS;
+            m_monster.defense += STEELSKIN_DEFENSE_BONUS;
             break;
     }
     m_spellCount++;
@@ -3078,12 +3108,12 @@ float army::SpellCastWorkChance(SpellType spell) {
         && (spell == SPELL_RESURRECT || spell == SPELL_TRUE_RESURRECT
             || spell == SPELL_ANIMATE_DEAD)) {
         resurrectPower_5 = gpCombatManager->m_spellPower[gpCombatManager->m_currentSide]
-                           * ARMY_RESURRECT_POWER_PER_SPELL_POWER;
+                           * RESURRECT_POWER_PER_SPELL_POWER;
         if (gpCombatManager->m_heroes[gpCombatManager->m_currentSide]
             && gpCombatManager->m_heroes[gpCombatManager->m_currentSide]->HasArtifact(
                 ARTIFACT_ANKH
             )) {
-            resurrectPower_5 *= ARMY_ARTIFACT_POWER_MULTIPLIER;
+            resurrectPower_5 *= ARTIFACT_POWER_MULTIPLIER;
         }
         if (resurrectPower_5 < m_monster.hitPoints) {
             return ARMY_SPELL_CHANCE_NONE;
@@ -3103,11 +3133,11 @@ float army::SpellCastWorkChance(SpellType spell) {
         hypnotizeHitPoints_37 = gpCombatManager->m_heroes[gpCombatManager->m_currentSide]->Stats(
                                     HERO_PRIMARY_SPELL_POWER
                                 )
-                                * ARMY_HYPNOTIZE_HIT_POINTS_PER_POWER;
+                                * HYPNOTIZE_HIT_POINTS_PER_POWER;
         if (gpCombatManager->m_heroes[gpCombatManager->m_currentSide]->HasArtifact(
                 ARTIFACT_GOLD_WATCH
             )) {
-            hypnotizeHitPoints_37 *= ARMY_ARTIFACT_POWER_MULTIPLIER;
+            hypnotizeHitPoints_37 *= ARTIFACT_POWER_MULTIPLIER;
         }
         if (m_monster.hitPoints * m_quantity > hypnotizeHitPoints_37) {
             return ARMY_SPELL_CHANCE_NONE;
@@ -3130,7 +3160,7 @@ i32 army::SpellCastWorks(SpellType spell) {
     i32 chance;
 
     chance = static_cast<i32>(SpellCastWorkChance(spell) * ARMY_SPELL_CHANCE_PERCENT);
-    return SRandom(1, ARMY_RANDOM_SPELL_ROLL_MAX) <= chance;
+    return SRandom(1, RANDOM_SPELL_ROLL_MAX) <= chance;
 }
 
 VA(0x00453851, 0x39e)
@@ -3262,7 +3292,7 @@ void army::Cure(i32 amount) {
     CancelIndividualSpell(ARMY_SPELL_INFLUENCE_PARALYZE);
     CancelIndividualSpell(ARMY_SPELL_INFLUENCE_HYPNOTIZE);
     CancelIndividualSpell(ARMY_SPELL_INFLUENCE_PETRIFIED);
-    m_hitPointsLost -= amount * ARMY_CURE_HIT_POINTS_PER_POWER;
+    m_hitPointsLost -= amount * CURE_HIT_POINTS_PER_POWER;
     if (m_hitPointsLost < 0) {
         m_hitPointsLost = 0;
     }
@@ -3274,9 +3304,9 @@ i32 army::MidX(void) {
 
     if (HAS(m_monster.flags.all, MONSTER_FLAGS_WIDE)) {
         if (m_facing == 1) {
-            wideOffset = ARMY_WIDE_CREATURE_HALF_WIDTH;
+            wideOffset = WIDE_CREATURE_HALF_WIDTH;
         } else {
-            wideOffset = -ARMY_WIDE_CREATURE_HALF_WIDTH;
+            wideOffset = -WIDE_CREATURE_HALF_WIDTH;
         }
     } else {
         wideOffset = 0;
@@ -3436,7 +3466,7 @@ i32 army::GetPowBaseY(void) {
         y = TopY();
     }
     if (gCurLoadedSpellEffect == SPELL_PARALYZE || gCurLoadedSpellEffect == SPELL_HYPNOTIZE) {
-        y = gpCombatManager->m_hexCells[m_hex].m_y + ARMY_CONTROL_EFFECT_Y_OFFSET;
+        y = gpCombatManager->m_hexCells[m_hex].m_y + CONTROL_EFFECT_Y_OFFSET;
     }
     return y;
 }

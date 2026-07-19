@@ -4,8 +4,8 @@
 #include <va.h>
 
 H2_ENUM_BEGIN(MidiTextSlotSize)
-    MIDI_TEXT_SHORT_SLOT_SIZE = 0x4,
-    MIDI_TEXT_LOG_SLOT_SIZE = 0x8,
+    MIDI_TEXT_SHORT_SLOT_SIZE           = 0x4,
+    MIDI_TEXT_LOG_SLOT_SIZE             = 0x8,
     MIDI_TEXT_FILENAME_FORMAT_SLOT_SIZE = 0x14
 H2_ENUM_END(MidiTextSlotSize)
 

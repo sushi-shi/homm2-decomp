@@ -14,6 +14,25 @@
 #include <BASE/widget.h>
 #include <SOURCE/dpnetwin.h>
 
+H2_ENUM_CLASS_BEGIN(DirectPlaySessionOpenFlag)
+    SESSION_OPEN_JOIN   = 1,
+    SESSION_OPEN_CREATE = 2
+H2_ENUM_CLASS_END(DirectPlaySessionOpenFlag)
+
+H2_ENUM_CLASS_BEGIN(DirectPlayWaitType)
+    WAIT_FIRST_GUEST  = 8,
+    WAIT_EXTRA_GUESTS = 9,
+    WAIT_HOST         = 10
+H2_ENUM_CLASS_END(DirectPlayWaitType)
+
+H2_ENUM_CLASS_BEGIN(DirectPlayResult)
+    RESULT_OK               = 0,
+    RESULT_INVALID_ARGUMENT = static_cast<i32>(0x80070057),
+    RESULT_INVALID_PLAYER   = static_cast<i32>(0x88770096),
+    RESULT_NO_MESSAGES      = static_cast<i32>(0x887700be),
+    RESULT_NO_SESSIONS      = static_cast<i32>(0x887700dc)
+H2_ENUM_CLASS_END(DirectPlayResult)
+
 #define RETAIL_FILE const_cast<char*>("I:\\Projects\\Heroes\\Prog\\SOURCE\\dpnetwin.cpp")
 
 VA(0x0041eda0, 0x95)
@@ -84,18 +103,18 @@ i16 dpnet_init(void) {
                 break;
         }
         result = createFunction(g_lpGuid, &lpIDC, 0);
-        if (result != IDX(DP_RESULT_OK))
+        if (result != IDX(RESULT_OK))
             DPSD(result, RETAIL_FILE, 136);
 
         if (GameMode == IDX(REMOTE_GAME_NETWORK_HOST)) {
             gbRemoteGameOpen = true;
-            giWaitType = IDX(DP_WAIT_FIRST_GUEST);
+            giWaitType = IDX(WAIT_FIRST_GUEST);
             sprintf(gText, "Waiting On Guest.\n\n  Press 'CANCEL' to abort.");
             NormalDialog(gText, 6, -1, -1, -1, 0, -1, 0, -1, 0);
             if (gbFunctionComplete == 0)
                 ShutDown(0);
             iLastMsgNumHumanPlayers = giNumHumanPlayers;
-            giWaitType = IDX(DP_WAIT_EXTRA_GUESTS);
+            giWaitType = IDX(WAIT_EXTRA_GUESTS);
             sprintf(
                 gText,
                 "You have %d guest(s) now logged in.  Click 'OK' to move on, or wait for "
@@ -116,7 +135,7 @@ i16 dpnet_init(void) {
                 );
             }
         } else {
-            giWaitType = IDX(DP_WAIT_HOST);
+            giWaitType = IDX(WAIT_HOST);
             sprintf(gText, "Waiting for other remote player to set up game.");
             NormalDialog(gText, 6, -1, -1, -1, 0, -1, 0, -1, 0);
             if (gbFunctionComplete == 0)
@@ -184,8 +203,8 @@ void dpSendMessage(i32 destination, u8 type, u16 size, void* data) {
     if (size != 0)
         memcpy(message + 1, data, size);
     result = lpIDC->Send(dcoID, destination, 0, message, size + 1);
-    if (result != IDX(DP_RESULT_OK) && result != IDX(DP_RESULT_INVALID_PLAYER)
-        && result != IDX(DP_RESULT_INVALID_ARGUMENT)) {
+    if (result != IDX(RESULT_OK) && result != IDX(RESULT_INVALID_PLAYER)
+        && result != IDX(RESULT_INVALID_ARGUMENT)) {
         DPSD(result, RETAIL_FILE, 268);
     }
     H2_FREE(message, 270);
@@ -248,9 +267,9 @@ void dpProcessMessages(void) {
             rcvBufIn,
             packetSize
         );
-        if (receiveResult == IDX(DP_RESULT_NO_MESSAGES))
+        if (receiveResult == IDX(RESULT_NO_MESSAGES))
             return;
-        if (receiveResult != IDX(DP_RESULT_OK))
+        if (receiveResult != IDX(RESULT_OK))
             DPSD(receiveResult, RETAIL_FILE, 335);
         if (senderId == 0) {
         } else {
@@ -327,10 +346,10 @@ i32 dpWaitForFirstGuest(void) {
             session.dwSize = sizeof(session);
             session.dwMaxPlayers = DP_TRANSPORT_MAX_PLAYERS;
             session.guidSession = *g_lpGuid;
-            session.dwFlags = IDX(DP_SESSION_OPEN_CREATE);
+            session.dwFlags = IDX(SESSION_OPEN_CREATE);
             strcpy(session.szSessionName, "Heroes 2");
             result = lpIDC->Open(&session);
-            if (result != IDX(DP_RESULT_OK))
+            if (result != IDX(RESULT_OK))
                 DPSD(result, RETAIL_FILE, 442);
             iDPWaitForFirstGuestStatus++;
             break;
@@ -341,7 +360,7 @@ i32 dpWaitForFirstGuest(void) {
             break;
         case 2:
             result = lpIDC->CreatePlayer(&dcoID, "Dude", "Heroes Player", &dphEvent);
-            if (result != IDX(DP_RESULT_OK))
+            if (result != IDX(RESULT_OK))
                 DPSD(result, RETAIL_FILE, 472);
             giNetPosToDCOPos[0] = dcoID;
             iDPWaitForFirstGuestStatus++;
@@ -408,11 +427,11 @@ i32 dpWaitForHost(void) {
             playResult =
                 lpIDC->EnumSessions(&sessionDescription, enumerationTimeout, dpEnumSession, 0, 0);
             iEnumCount++;
-            if (playResult == IDX(DP_RESULT_NO_SESSIONS)) {
+            if (playResult == IDX(RESULT_NO_SESSIONS)) {
                 iWaitForHostWaitCount = DP_TRANSPORT_RETRY_WAIT_COUNT;
                 return 0;
             }
-            if (playResult != IDX(DP_RESULT_OK))
+            if (playResult != IDX(RESULT_OK))
                 DPSD(playResult, RETAIL_FILE, 548);
             if (iMaxSession > 0) {
                 iWaitForHostWaitCount = DP_TRANSPORT_RETRY_WAIT_COUNT;
@@ -424,17 +443,17 @@ i32 dpWaitForHost(void) {
             sessionDescription.dwSize = sizeof(sessionDescription);
             sessionDescription.dwMaxPlayers = DP_TRANSPORT_MAX_PLAYERS;
             sessionDescription.guidSession = *g_lpGuid;
-            sessionDescription.dwFlags = IDX(DP_SESSION_OPEN_JOIN);
+            sessionDescription.dwFlags = IDX(SESSION_OPEN_JOIN);
             sessionDescription.dwSession = lSessions[iSessionToTry];
             strcpy(sessionDescription.szSessionName, "Heroes 2");
             playResult = lpIDC->Open(&sessionDescription);
-            if (playResult != IDX(DP_RESULT_OK))
+            if (playResult != IDX(RESULT_OK))
                 DPSD(playResult, RETAIL_FILE, 567);
             iDPWaitForHostStatus++;
             break;
         case 2:
             playResult = lpIDC->CreatePlayer(&dcoID, "Dude", "Heroes Player", &dphEvent);
-            if (playResult != IDX(DP_RESULT_OK))
+            if (playResult != IDX(RESULT_OK))
                 DPSD(playResult, RETAIL_FILE, 577);
             iDPWaitForHostStatus++;
             break;
@@ -461,7 +480,7 @@ i32 dpWaitForHost(void) {
                     iSessionToTry++;
                 }
                 playResult = lpIDC->Close();
-                if (playResult != IDX(DP_RESULT_OK))
+                if (playResult != IDX(RESULT_OK))
                     DPSD(playResult, RETAIL_FILE, 603);
             } else if (iLastHereIAmTickCount + DP_TRANSPORT_ACCEPT_TIMEOUT < KBTickCount()) {
                 iDPWaitForHostStatus--;
@@ -486,7 +505,7 @@ void DPSD(i32 result, char* file, i32 line) {
     bInDPSD = 1;
     errorFlag = 0;
     switch (result) {
-        case IDX(DP_RESULT_OK):
+        case IDX(RESULT_OK):
             return;
         case DPERR_ALREADYINITIALIZED:
             strcpy(errorText, "DPERR_ALREADYINITIALIZED ");

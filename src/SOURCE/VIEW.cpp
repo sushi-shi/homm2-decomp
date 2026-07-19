@@ -9,6 +9,29 @@
 #include <SOURCE/combatManager.h>
 #include <SOURCE/game.h>
 #include <SOURCE/VIEW.h>
+H2_ENUM_BEGIN(ViewGeneralConstant)
+    GENERAL_WINDOW_X           = 179,
+    GENERAL_WINDOW_Y           = 60,
+    GENERAL_CLOSE              = 10,
+    GENERAL_RETREAT            = 11,
+    GENERAL_SURRENDER          = 12,
+    GENERAL_CAST_SPELL         = 0x7800,
+    GENERAL_TEXT_COLOR_COUNT   = 11,
+    GENERAL_MORALE_TEXT_OFFSET = 3,
+    GENERAL_LUCK_TEXT_OFFSET   = 3,
+    GENERAL_MANA_PER_KNOWLEDGE = 10,
+    ARMY_WIDTH                 = 488,
+    ARMY_HEIGHT                = 229,
+    ARMY_SCREEN_WIDTH          = 640,
+    ARMY_SCREEN_HEIGHT         = 460,
+    ARMY_LEFT_FACING_X_OFFSET  = 123,
+    ARMY_RIGHT_FACING_X_OFFSET = 80,
+    ARMY_FACING_OFFSET_DELTA   = 43,
+    ARMY_Y_OFFSET              = 164,
+    ARMY_RIGHT_CLAMP           = 151,
+    ARMY_BOTTOM_CLAMP          = 230
+H2_ENUM_END(ViewGeneralConstant)
+
 // @semantic: compiler-shape residual.
 VA(0x0040bd60, 0x6d3)
 i32 combatManager::ViewGeneral(i32 side, i32 allowActions, i32 quickView) {
@@ -54,7 +77,7 @@ i32 combatManager::ViewGeneral(i32 side, i32 allowActions, i32 quickView) {
         giCurGeneral = side;
 
         message.type = MESSAGE_WIDGET;
-        generalWindow = new heroWindow(VIEW_GENERAL_WINDOW_X, VIEW_GENERAL_WINDOW_Y, "vgenwin.bin");
+        generalWindow = new heroWindow(GENERAL_WINDOW_X, GENERAL_WINDOW_Y, "vgenwin.bin");
         if (generalWindow == 0)
             MemError();
         sprintf(gText, "port%04d.icn", m_heroes[side]->m_portrait);
@@ -114,12 +137,12 @@ i32 combatManager::ViewGeneral(i32 side, i32 allowActions, i32 quickView) {
             cViewGeneralLabels[3],
             m_heroes[side]->Stats(HeroPrimaryStat(3)),
             cViewGeneralLabels[4],
-            gMoraleText[morale + VIEW_GENERAL_MORALE_TEXT_OFFSET],
+            gMoraleText[morale + GENERAL_MORALE_TEXT_OFFSET],
             cViewGeneralLabels[5],
-            gLuckText[luck + VIEW_GENERAL_LUCK_TEXT_OFFSET],
+            gLuckText[luck + GENERAL_LUCK_TEXT_OFFSET],
             cViewGeneralLabels[6],
             m_heroes[side]->m_spellPoints,
-            m_heroes[side]->Stats(HeroPrimaryStat(3)) * VIEW_GENERAL_MANA_PER_KNOWLEDGE
+            m_heroes[side]->Stats(HeroPrimaryStat(3)) * GENERAL_MANA_PER_KNOWLEDGE
         );
         message.payload.widget.command = VIEW_GENERAL_SET_TEXT;
         message.payload.widget.id = 4;
@@ -130,7 +153,7 @@ i32 combatManager::ViewGeneral(i32 side, i32 allowActions, i32 quickView) {
             || m_heroes[side]->HasArtifact(ARTIFACT_MAGIC_BOOK) == 0 || m_heroCastSpell[side] != 0
             || m_currentSide != giCurGeneral) {
             message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-            message.payload.widget.id = VIEW_GENERAL_CLOSE;
+            message.payload.widget.id = GENERAL_CLOSE;
             message.payload.widget.data.value = WIDGET_FLAG_ENABLED;
             generalWindow->BroadcastMessage(message);
             message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
@@ -140,7 +163,7 @@ i32 combatManager::ViewGeneral(i32 side, i32 allowActions, i32 quickView) {
         if (allowActions == 0 || m_heroes[1 - m_currentSide] == 0 || m_currentSide != giCurGeneral
             || m_heroes[side]->m_isCaptain != 0) {
             message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-            message.payload.widget.id = VIEW_GENERAL_SURRENDER;
+            message.payload.widget.id = GENERAL_SURRENDER;
             message.payload.widget.data.value = WIDGET_FLAG_ENABLED;
             generalWindow->BroadcastMessage(message);
             message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
@@ -151,7 +174,7 @@ i32 combatManager::ViewGeneral(i32 side, i32 allowActions, i32 quickView) {
             || (giCurGeneral == 1 && m_heroes[0] != 0) || m_sideRetreated[0] != 0
             || m_sideRetreated[1] != 0 || m_heroes[side]->m_isCaptain != 0) {
             message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-            message.payload.widget.id = VIEW_GENERAL_RETREAT;
+            message.payload.widget.id = GENERAL_RETREAT;
             message.payload.widget.data.value = WIDGET_FLAG_ENABLED;
             generalWindow->BroadcastMessage(message);
             message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
@@ -217,16 +240,16 @@ i32 HandleViewGeneral(tag_message& message) {
                     && message.payload.widget.command != WIDGET_COMMAND_ALTERNATE_SELECT)
                     break;
                 switch (message.payload.widget.id) {
-                    case VIEW_GENERAL_CLOSE:
+                    case GENERAL_CLOSE:
                         helpIndex = 0;
                         break;
-                    case VIEW_GENERAL_RETREAT:
+                    case GENERAL_RETREAT:
                         helpIndex = 1;
                         break;
-                    case VIEW_GENERAL_SURRENDER:
+                    case GENERAL_SURRENDER:
                         helpIndex = 2;
                         break;
-                    case VIEW_GENERAL_CAST_SPELL:
+                    case GENERAL_CAST_SPELL:
                         helpIndex = 3;
                         break;
                 }
@@ -236,10 +259,10 @@ i32 HandleViewGeneral(tag_message& message) {
                 switch (message.payload.widget.command) {
                     case WIDGET_COMMAND_DESELECT:
                         switch (message.payload.widget.id) {
-                            case VIEW_GENERAL_CLOSE:
-                            case VIEW_GENERAL_RETREAT:
-                            case VIEW_GENERAL_SURRENDER:
-                            case VIEW_GENERAL_CAST_SPELL:
+                            case GENERAL_CLOSE:
+                            case GENERAL_RETREAT:
+                            case GENERAL_SURRENDER:
+                            case GENERAL_CAST_SPELL:
                                 gpWindowManager->m_dialogResult = message.payload.widget.id;
                                 handled = 1;
                                 break;
@@ -254,16 +277,16 @@ i32 HandleViewGeneral(tag_message& message) {
                 return 1;
             gpWindowManager->m_lastHoverId = message.payload.hover.id;
             switch (message.payload.hover.id) {
-                case VIEW_GENERAL_CLOSE:
+                case GENERAL_CLOSE:
                     helpIndex = 1;
                     break;
-                case VIEW_GENERAL_RETREAT:
+                case GENERAL_RETREAT:
                     helpIndex = 2;
                     break;
-                case VIEW_GENERAL_SURRENDER:
+                case GENERAL_SURRENDER:
                     helpIndex = 3;
                     break;
-                case VIEW_GENERAL_CAST_SPELL:
+                case GENERAL_CAST_SPELL:
                     helpIndex = 4;
                     break;
                 default:
@@ -276,7 +299,7 @@ i32 HandleViewGeneral(tag_message& message) {
             break;
     }
     if (handled) {
-        message.payload.widget.id = VIEW_GENERAL_CLOSE;
+        message.payload.widget.id = GENERAL_CLOSE;
         message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
         return 2;
     }
@@ -304,18 +327,18 @@ void combatManager::ViewArmy(army* viewedArmy, i32 quickView) {
         viewYOffsetConstant_1 = 164;
         windowX = m_hexCells[viewedArmy->m_hex].m_x;
         windowY_5 = m_hexCells[viewedArmy->m_hex].m_y;
-        xOffset_9 = (-(viewedArmy->m_facing == 0) & VIEW_ARMY_FACING_OFFSET_DELTA)
-                    + VIEW_ARMY_RIGHT_FACING_X_OFFSET;
+        xOffset_9 = (-(viewedArmy->m_facing == 0) & ARMY_FACING_OFFSET_DELTA)
+                    + ARMY_RIGHT_FACING_X_OFFSET;
         windowX -= xOffset_9;
         if (windowX < 0)
             windowX = 0;
-        if (windowX + VIEW_ARMY_WIDTH > VIEW_ARMY_SCREEN_WIDTH)
-            windowX = VIEW_ARMY_RIGHT_CLAMP;
-        windowY_5 -= VIEW_ARMY_Y_OFFSET;
+        if (windowX + ARMY_WIDTH > ARMY_SCREEN_WIDTH)
+            windowX = ARMY_RIGHT_CLAMP;
+        windowY_5 -= ARMY_Y_OFFSET;
         if (windowY_5 < 0)
             windowY_5 = 0;
-        if (windowY_5 + VIEW_ARMY_HEIGHT > VIEW_ARMY_SCREEN_HEIGHT)
-            windowY_5 = VIEW_ARMY_BOTTOM_CLAMP;
+        if (windowY_5 + ARMY_HEIGHT > ARMY_SCREEN_HEIGHT)
+            windowY_5 = ARMY_BOTTOM_CLAMP;
         side = viewedArmy->m_side;
         gpGame->ViewArmy(
             windowX,

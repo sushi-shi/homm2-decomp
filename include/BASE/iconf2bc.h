@@ -2,6 +2,7 @@
 #define HOMM2_ICONF2BC_H
 
 #include <Ints.h>
+
 class bitmap;
 class icon;
 

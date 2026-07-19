@@ -1,5 +1,6 @@
 #ifndef HOMM2_SOURCE_GAME_H
 #define HOMM2_SOURCE_GAME_H
+
 #include <va.h>
 #include <EDITOR/fullMap.h>
 #include <SOURCE/REQUEST.h>
@@ -9,6 +10,7 @@
 #include <SOURCE/Overview.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/GAME.h>
+
 class army;
 class armyGroup;
 class fullMap;

@@ -1,9 +1,11 @@
 #ifndef HOMM2_SOURCE_RECRUITUNIT_H
 #define HOMM2_SOURCE_RECRUITUNIT_H
+
 #include <va.h>
 #include <SOURCE/KB_TYPES.h>
 #include <windows.h>
-#include "../BASE/baseManager.h"
+#include <BASE/baseManager.h>
+
 class armyGroup;
 class town;
 class heroWindow;

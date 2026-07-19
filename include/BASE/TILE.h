@@ -2,6 +2,7 @@
 #define HOMM2_TILE_H
 
 #include <Ints.h>
+
 class bitmap;
 class tileset;
 

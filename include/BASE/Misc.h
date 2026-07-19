@@ -1,6 +1,8 @@
 #ifndef HOMM2_MISC_H
 #define HOMM2_MISC_H
+
 #include <va.h>
+
 class bitmap;
 class heroWindow;
 class icon;
@@ -65,8 +67,10 @@ void ProcessAssert(i32 condition, char* file, i32 line);
 // Allocation wrappers preserve explicit source-file and line operands.
 #define H2_ALLOC(size, originalLine) BaseAlloc(size, const_cast<char*>(RETAIL_FILE), originalLine)
 #define H2_FREE(ptr, originalLine) BaseFree(ptr, const_cast<char*>(RETAIL_FILE), originalLine)
-#define H2_ALLOC_AT(size, originalFile, originalLine) BaseAlloc(size, const_cast<char*>(originalFile), originalLine)
-#define H2_FREE_AT(ptr, originalFile, originalLine) BaseFree(ptr, const_cast<char*>(originalFile), originalLine)
+#define H2_ALLOC_AT(size, originalFile, originalLine)                                              \
+    BaseAlloc(size, const_cast<char*>(originalFile), originalLine)
+#define H2_FREE_AT(ptr, originalFile, originalLine)                                                \
+    BaseFree(ptr, const_cast<char*>(originalFile), originalLine)
 #define H2_ASSERT(condition, originalFile, originalLine)                                           \
     ProcessAssert(condition, originalFile, originalLine)
 char* FindStringInString(char* text, char* pattern);

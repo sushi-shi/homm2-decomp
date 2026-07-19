@@ -1,16 +1,9 @@
 #ifndef HOMM2_BASE_EXECUTIVE_H
 #define HOMM2_BASE_EXECUTIVE_H
-#include <va.h>
-class baseManager;
 
-H2_ENUM_BEGIN(ExecutiveManagerConstant)
-    EXECUTIVE_MANAGER_DEFAULT_PRIORITY = -1,
-    EXECUTIVE_MANAGER_SUCCESS = 0,
-    EXECUTIVE_MANAGER_STOP_DISPATCH = 1,
-    EXECUTIVE_MANAGER_HANDLE_EXECUTIVE_MESSAGE = 2,
-    EXECUTIVE_MANAGER_ERROR = 3,
-    EXECUTIVE_DIALOG_MANAGER_CAPACITY = 20
-H2_ENUM_END(ExecutiveManagerConstant)
+#include <va.h>
+
+class baseManager;
 
 #pragma pack(push, 1)
 class executive {

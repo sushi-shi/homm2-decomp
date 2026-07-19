@@ -1,16 +1,18 @@
 #ifndef HOMM2_SOURCE_ARMYGROUP_H
 #define HOMM2_SOURCE_ARMYGROUP_H
+
 #include <va.h>
+
 class hero;
 class town;
 
 H2_ENUM_BEGIN(ArmyGroupConstant)
-    ARMY_GROUP_EMPTY_SLOT = -1,
-    ARMY_GROUP_SLOT_COUNT = 5,
-    ARMY_GROUP_RACE_COUNT = 7,
+    ARMY_GROUP_EMPTY_SLOT         = -1,
+    ARMY_GROUP_SLOT_COUNT         = 5,
+    ARMY_GROUP_RACE_COUNT         = 7,
     ARMY_GROUP_RANDOM_PERCENT_MAX = 100,
-    ARMY_GROUP_MORALE_MIN = -3,
-    ARMY_GROUP_MORALE_MAX = 3
+    ARMY_GROUP_MORALE_MIN         = -3,
+    ARMY_GROUP_MORALE_MAX         = 3
 H2_ENUM_END(ArmyGroupConstant)
 
 #pragma pack(push, 1)

@@ -1,7 +1,9 @@
 #ifndef HOMM2_BASE_ICONWIDGET_H
 #define HOMM2_BASE_ICONWIDGET_H
+
 #include <va.h>
 #include "widget.h"
+
 struct tag_message;
 
 #pragma pack(push, 1)

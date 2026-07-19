@@ -5,7 +5,7 @@
 
 H2_ENUM_BEGIN(InputManagerTextSlotSize)
     INPUT_MANAGER_RELEASE_CAPTURE_SLOT_SIZE = 0x18,
-    INPUT_MANAGER_NAME_SLOT_SIZE = 0x10
+    INPUT_MANAGER_NAME_SLOT_SIZE            = 0x10
 H2_ENUM_END(InputManagerTextSlotSize)
 
 typedef struct SInputManagerText {

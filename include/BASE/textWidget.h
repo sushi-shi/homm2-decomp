@@ -1,7 +1,9 @@
 #ifndef HOMM2_BASE_TEXTWIDGET_H
 #define HOMM2_BASE_TEXTWIDGET_H
+
 #include <va.h>
 #include "widget.h"
+
 struct tag_message;
 
 class resource;

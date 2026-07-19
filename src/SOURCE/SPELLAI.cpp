@@ -5,6 +5,32 @@
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/combatManager.h>
 #include <SOURCE/hero.h>
+H2_ENUM_CLASS_BEGIN(CombatSpellAITargetMode)
+    SPELL_AI_GLOBAL       = 0,
+    SPELL_AI_SUM_FRIENDLY = 1,
+    SPELL_AI_SUM_ENEMY    = 2,
+    SPELL_AI_AREA         = 3,
+    SPELL_AI_FRIENDLY     = 4,
+    SPELL_AI_ENEMY        = 5,
+    SPELL_AI_RESURRECT    = 6,
+    SPELL_AI_ANY_ARMY     = 7
+H2_ENUM_CLASS_END(CombatSpellAITargetMode)
+
+H2_ENUM_BEGIN(CombatLayoutConstant)
+    SPELL_AI_FIRST_HEX                  = 1,
+    SPELL_AI_LAST_HEX                   = 0x73,
+    SPELL_AI_ANY_SIDE                   = 2,
+    SPELL_AI_MAX_DURATION               = 10,
+    SPELL_AI_MAX_MANA_RATIO             = 10,
+    SPELL_AI_EARTHQUAKE_WALL_FIRST      = 4,
+    SPELL_AI_EARTHQUAKE_WALL_COUNT      = 4,
+    SPELL_AI_WALL_DAMAGED               = 2,
+    SPELL_AI_WALL_DESTROYED             = 6,
+    SPELL_AI_EARTHQUAKE_NO_DAMAGE_SCORE = 29999,
+    SPELL_AI_EARTHQUAKE_WALL_SCORE      = 100,
+    SPELL_AI_CAST_ACTION                = 1
+H2_ENUM_END(CombatLayoutConstant)
+
 // @semantic: only raw residual is +0x21c/+0x21f/+0x221: ours loads effectScore then emits JGE.
 VA(0x004867c0, 0x279)
 i32 combatManager::DoSpellAI(i32 side, i32 restricted) {
@@ -47,8 +73,8 @@ i32 combatManager::DoSpellAI(i32 side, i32 restricted) {
 
             manaRatioResult =
                 m_heroes[side]->m_spellPoints / GetManaCost(SpellType(spellIndex), m_heroes[side]);
-            if (manaRatioResult > COMBAT_SPELL_AI_MAX_MANA_RATIO)
-                manaRatioResult = COMBAT_SPELL_AI_MAX_MANA_RATIO;
+            if (manaRatioResult > SPELL_AI_MAX_MANA_RATIO)
+                manaRatioResult = SPELL_AI_MAX_MANA_RATIO;
             effectScore = static_cast<i32>(effectScore * gfSpellCastableCombatMod[manaRatioResult]);
 
             if (effectScore > bestEffectWork) {
@@ -60,7 +86,7 @@ i32 combatManager::DoSpellAI(i32 side, i32 restricted) {
     }
 
     if (bestEffectWork > 0) {
-        giNextAction = COMBAT_SPELL_AI_CAST_ACTION;
+        giNextAction = SPELL_AI_CAST_ACTION;
         giNextActionExtra = bestSpellChoice;
         giNextActionGridIndex = bestHexWork;
         return 1;
@@ -89,7 +115,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
 
     doneResult = 0;
     side = 0;
-    hexIndex = COMBAT_SPELL_AI_FIRST_HEX;
+    hexIndex = SPELL_AI_FIRST_HEX;
     durationMod = COMBAT_SPELL_AI_FULL_EFFECT_IMMEDIATE;
     fullQuantityFlag = 1;
     totalEffect = 0;
@@ -110,28 +136,28 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
         case SPELL_SUMMON_FIRE_ELEMENTAL:
         case SPELL_SUMMON_WATER_ELEMENTAL:
         case SPELL_EARTHQUAKE:
-            targetModeBySide[0] = IDX(COMBAT_SPELL_AI_GLOBAL);
+            targetModeBySide[0] = IDX(SPELL_AI_GLOBAL);
             break;
         case SPELL_FIREBALL:
         case SPELL_FIREBLAST:
         case SPELL_METEOR_SHOWER:
         case SPELL_COLD_RING:
-            targetModeBySide[0] = IDX(COMBAT_SPELL_AI_AREA);
+            targetModeBySide[0] = IDX(SPELL_AI_AREA);
             break;
         case SPELL_MASS_HASTE:
         case SPELL_MASS_BLESS:
         case SPELL_MASS_SHIELD:
-            targetModeBySide[0] = IDX(COMBAT_SPELL_AI_SUM_FRIENDLY);
+            targetModeBySide[0] = IDX(SPELL_AI_SUM_FRIENDLY);
             side = m_currentSide;
             break;
         case SPELL_MASS_SLOW:
         case SPELL_MASS_CURSE:
-            targetModeBySide[0] = IDX(COMBAT_SPELL_AI_SUM_ENEMY);
+            targetModeBySide[0] = IDX(SPELL_AI_SUM_ENEMY);
             side = 1 - m_currentSide;
             break;
         case SPELL_DISPEL:
-            targetModeBySide[0] = IDX(COMBAT_SPELL_AI_ANY_ARMY);
-            side = COMBAT_SPELL_AI_ANY_SIDE;
+            targetModeBySide[0] = IDX(SPELL_AI_ANY_ARMY);
+            side = SPELL_AI_ANY_SIDE;
             break;
         case SPELL_TELEPORT:
         case SPELL_CURE:
@@ -144,13 +170,13 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
         case SPELL_BLOOD_LUST:
         case SPELL_MIRROR_IMAGE:
         case SPELL_SHIELD:
-            targetModeBySide[0] = IDX(COMBAT_SPELL_AI_FRIENDLY);
+            targetModeBySide[0] = IDX(SPELL_AI_FRIENDLY);
             side = m_currentSide;
             break;
         case SPELL_RESURRECT:
         case SPELL_TRUE_RESURRECT:
         case SPELL_ANIMATE_DEAD:
-            targetModeBySide[0] = IDX(COMBAT_SPELL_AI_RESURRECT);
+            targetModeBySide[0] = IDX(SPELL_AI_RESURRECT);
             side = m_currentSide;
             break;
         case SPELL_LIGHTNING_BOLT:
@@ -163,7 +189,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
         case SPELL_PARALYZE:
         case SPELL_HYPNOTIZE:
         case SPELL_DISRUPTING_RAY:
-            targetModeBySide[0] = IDX(COMBAT_SPELL_AI_ENEMY);
+            targetModeBySide[0] = IDX(SPELL_AI_ENEMY);
             side = 1 - m_currentSide;
             break;
         default:
@@ -171,14 +197,14 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
             return;
     }
 
-    if (targetModeBySide[0] == IDX(COMBAT_SPELL_AI_RESURRECT))
-        doneResult = FirstResurrectable(COMBAT_SPELL_AI_FIRST_HEX, &hexIndex, IDX(spell));
-    if (targetModeBySide[0] == IDX(COMBAT_SPELL_AI_FRIENDLY)
-        || targetModeBySide[0] == IDX(COMBAT_SPELL_AI_ENEMY)
-        || targetModeBySide[0] == IDX(COMBAT_SPELL_AI_SUM_ENEMY)
-        || targetModeBySide[0] == IDX(COMBAT_SPELL_AI_SUM_FRIENDLY)
-        || targetModeBySide[0] == IDX(COMBAT_SPELL_AI_ANY_ARMY))
-        doneResult = FirstArmy(COMBAT_SPELL_AI_FIRST_HEX, side, &hexIndex);
+    if (targetModeBySide[0] == IDX(SPELL_AI_RESURRECT))
+        doneResult = FirstResurrectable(SPELL_AI_FIRST_HEX, &hexIndex, IDX(spell));
+    if (targetModeBySide[0] == IDX(SPELL_AI_FRIENDLY)
+        || targetModeBySide[0] == IDX(SPELL_AI_ENEMY)
+        || targetModeBySide[0] == IDX(SPELL_AI_SUM_ENEMY)
+        || targetModeBySide[0] == IDX(SPELL_AI_SUM_FRIENDLY)
+        || targetModeBySide[0] == IDX(SPELL_AI_ANY_ARMY))
+        doneResult = FirstArmy(SPELL_AI_FIRST_HEX, side, &hexIndex);
 
     while (!doneResult) {
         hasMindEffect = 0;
@@ -201,8 +227,8 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
                 spellPowerWork += SPELL_WIZARD_HAT_POWER_BONUS;
 
             durationMod = gfDurationMods
-                [spellPowerWork - fullQuantityFlag >= COMBAT_SPELL_AI_MAX_DURATION
-                     ? COMBAT_SPELL_AI_MAX_DURATION
+                [spellPowerWork - fullQuantityFlag >= SPELL_AI_MAX_DURATION
+                     ? SPELL_AI_MAX_DURATION
                      : spellPowerWork - fullQuantityFlag];
 
             if (targetCreature->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_HYPNOTIZE)]
@@ -225,7 +251,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
                 EffectSpellCure(&effect, targetCreature->m_side, targetCreature->m_index, 0);
                 break;
             case SPELL_MASS_DISPEL:
-                EffectSpellCure(&effect, COMBAT_SPELL_AI_ANY_SIDE, -1, 0);
+                EffectSpellCure(&effect, SPELL_AI_ANY_SIDE, -1, 0);
                 break;
             case SPELL_RESURRECT:
             case SPELL_TRUE_RESURRECT:
@@ -289,8 +315,8 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
                                             [targetCreature->m_spellInfluence[IDX(
                                                  ARMY_SPELL_INFLUENCE_SLOW
                                              )] + fullQuantityFlag
-                                                     >= COMBAT_SPELL_AI_MAX_DURATION
-                                                 ? COMBAT_SPELL_AI_MAX_DURATION
+                                                     >= SPELL_AI_MAX_DURATION
+                                                 ? SPELL_AI_MAX_DURATION
                                                  : targetCreature->m_spellInfluence[IDX(
                                                        ARMY_SPELL_INFLUENCE_SLOW
                                                    )] + fullQuantityFlag]
@@ -326,8 +352,8 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
                                             [targetCreature->m_spellInfluence[IDX(
                                                  ARMY_SPELL_INFLUENCE_HYPNOTIZE
                                              )] + fullQuantityFlag
-                                                     >= COMBAT_SPELL_AI_MAX_DURATION
-                                                 ? COMBAT_SPELL_AI_MAX_DURATION
+                                                     >= SPELL_AI_MAX_DURATION
+                                                 ? SPELL_AI_MAX_DURATION
                                                  : targetCreature->m_spellInfluence[IDX(
                                                        ARMY_SPELL_INFLUENCE_HYPNOTIZE
                                                    )] + fullQuantityFlag]
@@ -363,8 +389,8 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
                                             [targetCreature->m_spellInfluence[IDX(
                                                  ARMY_SPELL_INFLUENCE_BERSERK
                                              )] + fullQuantityFlag
-                                                     >= COMBAT_SPELL_AI_MAX_DURATION
-                                                 ? COMBAT_SPELL_AI_MAX_DURATION
+                                                     >= SPELL_AI_MAX_DURATION
+                                                 ? SPELL_AI_MAX_DURATION
                                                  : targetCreature->m_spellInfluence[IDX(
                                                        ARMY_SPELL_INFLUENCE_BERSERK
                                                    )] + fullQuantityFlag]
@@ -400,8 +426,8 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
                                             [targetCreature->m_spellInfluence[IDX(
                                                  ARMY_SPELL_INFLUENCE_HASTE
                                              )] + fullQuantityFlag
-                                                     >= COMBAT_SPELL_AI_MAX_DURATION
-                                                 ? COMBAT_SPELL_AI_MAX_DURATION
+                                                     >= SPELL_AI_MAX_DURATION
+                                                 ? SPELL_AI_MAX_DURATION
                                                  : targetCreature->m_spellInfluence[IDX(
                                                        ARMY_SPELL_INFLUENCE_HASTE
                                                    )] + fullQuantityFlag]
@@ -437,8 +463,8 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
                                             [targetCreature->m_spellInfluence[IDX(
                                                  ARMY_SPELL_INFLUENCE_CURSE
                                              )] + fullQuantityFlag
-                                                     >= COMBAT_SPELL_AI_MAX_DURATION
-                                                 ? COMBAT_SPELL_AI_MAX_DURATION
+                                                     >= SPELL_AI_MAX_DURATION
+                                                 ? SPELL_AI_MAX_DURATION
                                                  : targetCreature->m_spellInfluence[IDX(
                                                        ARMY_SPELL_INFLUENCE_CURSE
                                                    )] + fullQuantityFlag]
@@ -474,8 +500,8 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
                                             [targetCreature->m_spellInfluence[IDX(
                                                  ARMY_SPELL_INFLUENCE_BLESS
                                              )] + fullQuantityFlag
-                                                     >= COMBAT_SPELL_AI_MAX_DURATION
-                                                 ? COMBAT_SPELL_AI_MAX_DURATION
+                                                     >= SPELL_AI_MAX_DURATION
+                                                 ? SPELL_AI_MAX_DURATION
                                                  : targetCreature->m_spellInfluence[IDX(
                                                        ARMY_SPELL_INFLUENCE_BLESS
                                                    )] + fullQuantityFlag]
@@ -667,19 +693,19 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
             case SPELL_EARTHQUAKE:
                 if (m_currentSide == COMBAT_ATTACKER_SIDE && m_inCastleCombat != 0) {
                     wallsDamagedTotal = 0;
-                    for (indexWork = 0; indexWork < COMBAT_SPELL_AI_EARTHQUAKE_WALL_COUNT;
+                    for (indexWork = 0; indexWork < SPELL_AI_EARTHQUAKE_WALL_COUNT;
                          indexWork++) {
-                        if (m_wallStates[indexWork + COMBAT_SPELL_AI_EARTHQUAKE_WALL_FIRST]
-                                == COMBAT_SPELL_AI_WALL_DAMAGED
-                            || m_wallStates[indexWork + COMBAT_SPELL_AI_EARTHQUAKE_WALL_FIRST]
-                                   == COMBAT_SPELL_AI_WALL_DESTROYED)
+                        if (m_wallStates[indexWork + SPELL_AI_EARTHQUAKE_WALL_FIRST]
+                                == SPELL_AI_WALL_DAMAGED
+                            || m_wallStates[indexWork + SPELL_AI_EARTHQUAKE_WALL_FIRST]
+                                   == SPELL_AI_WALL_DESTROYED)
                             wallsDamagedTotal++;
                     }
                     if (wallsDamagedTotal == 0)
-                        effect = COMBAT_SPELL_AI_EARTHQUAKE_NO_DAMAGE_SCORE;
-                    else if (wallsDamagedTotal < COMBAT_SPELL_AI_EARTHQUAKE_WALL_COUNT)
-                        effect = (COMBAT_SPELL_AI_EARTHQUAKE_WALL_COUNT - wallsDamagedTotal)
-                                 * COMBAT_SPELL_AI_EARTHQUAKE_WALL_SCORE;
+                        effect = SPELL_AI_EARTHQUAKE_NO_DAMAGE_SCORE;
+                    else if (wallsDamagedTotal < SPELL_AI_EARTHQUAKE_WALL_COUNT)
+                        effect = (SPELL_AI_EARTHQUAKE_WALL_COUNT - wallsDamagedTotal)
+                                 * SPELL_AI_EARTHQUAKE_WALL_SCORE;
                     else
                         effect = 0;
                 } else {
@@ -692,42 +718,42 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
         }
 
         switch (targetModeBySide[0]) {
-            case IDX(COMBAT_SPELL_AI_GLOBAL):
-            case IDX(COMBAT_SPELL_AI_AREA):
-            case IDX(COMBAT_SPELL_AI_FRIENDLY):
-            case IDX(COMBAT_SPELL_AI_ENEMY):
-            case IDX(COMBAT_SPELL_AI_RESURRECT):
-            case IDX(COMBAT_SPELL_AI_ANY_ARMY):
+            case IDX(SPELL_AI_GLOBAL):
+            case IDX(SPELL_AI_AREA):
+            case IDX(SPELL_AI_FRIENDLY):
+            case IDX(SPELL_AI_ENEMY):
+            case IDX(SPELL_AI_RESURRECT):
+            case IDX(SPELL_AI_ANY_ARMY):
                 totalEffect = effect;
                 break;
-            case IDX(COMBAT_SPELL_AI_SUM_FRIENDLY):
-            case IDX(COMBAT_SPELL_AI_SUM_ENEMY):
+            case IDX(SPELL_AI_SUM_FRIENDLY):
+            case IDX(SPELL_AI_SUM_ENEMY):
                 totalEffect += effect;
         }
 
-        if (targetModeBySide[0] == IDX(COMBAT_SPELL_AI_SUM_FRIENDLY)
-            || targetModeBySide[0] == IDX(COMBAT_SPELL_AI_SUM_ENEMY) || *bestEffect < totalEffect) {
+        if (targetModeBySide[0] == IDX(SPELL_AI_SUM_FRIENDLY)
+            || targetModeBySide[0] == IDX(SPELL_AI_SUM_ENEMY) || *bestEffect < totalEffect) {
             *bestEffect = totalEffect;
             *bestHex = hexIndex;
         }
 
         switch (targetModeBySide[0]) {
-            case IDX(COMBAT_SPELL_AI_GLOBAL):
+            case IDX(SPELL_AI_GLOBAL):
                 doneResult = 1;
                 break;
-            case IDX(COMBAT_SPELL_AI_SUM_FRIENDLY):
-            case IDX(COMBAT_SPELL_AI_SUM_ENEMY):
-            case IDX(COMBAT_SPELL_AI_FRIENDLY):
-            case IDX(COMBAT_SPELL_AI_ENEMY):
-            case IDX(COMBAT_SPELL_AI_ANY_ARMY):
+            case IDX(SPELL_AI_SUM_FRIENDLY):
+            case IDX(SPELL_AI_SUM_ENEMY):
+            case IDX(SPELL_AI_FRIENDLY):
+            case IDX(SPELL_AI_ENEMY):
+            case IDX(SPELL_AI_ANY_ARMY):
                 doneResult = FirstArmy(hexIndex + 1, side, &hexIndex);
                 break;
-            case IDX(COMBAT_SPELL_AI_AREA):
+            case IDX(SPELL_AI_AREA):
                 NextPos(&hexIndex);
-                if (hexIndex > COMBAT_SPELL_AI_LAST_HEX)
+                if (hexIndex > SPELL_AI_LAST_HEX)
                     doneResult = 1;
                 break;
-            case IDX(COMBAT_SPELL_AI_RESURRECT):
+            case IDX(SPELL_AI_RESURRECT):
                 doneResult = FirstResurrectable(hexIndex + 1, &hexIndex, IDX(spell));
         }
     }
@@ -961,9 +987,9 @@ void combatManager::NextPos(i32* hex) {
 
 VA(0x004886ad, 0xa1)
 i32 combatManager::FirstArmy(i32 startHex, i32 side, i32* hex) {
-    while (startHex <= COMBAT_SPELL_AI_LAST_HEX) {
+    while (startHex <= SPELL_AI_LAST_HEX) {
         if (m_hexCells[startHex].m_occupantSide == side
-            || (side == COMBAT_SPELL_AI_ANY_SIDE && m_hexCells[startHex].m_occupantSide >= 0)) {
+            || (side == SPELL_AI_ANY_SIDE && m_hexCells[startHex].m_occupantSide >= 0)) {
             *hex = startHex;
             return 0;
         }
@@ -975,7 +1001,7 @@ i32 combatManager::FirstArmy(i32 startHex, i32 side, i32* hex) {
 
 VA(0x0048874e, 0x73)
 i32 combatManager::FirstResurrectable(i32 startHex, i32* hex, i32 spell) {
-    while (startHex <= COMBAT_SPELL_AI_LAST_HEX) {
+    while (startHex <= SPELL_AI_LAST_HEX) {
         if (FindResurrectArmyIndex(m_currentSide, spell, startHex) != -1) {
             *hex = startHex;
             return 0;
@@ -1001,7 +1027,7 @@ void combatManager::EffectSpellCure(i32* effect, i32 targetSide, i32 targetIndex
     i32 positiveEffectResult;
     i32 index;
 
-    if (targetSide == COMBAT_SPELL_AI_ANY_SIDE)
+    if (targetSide == SPELL_AI_ANY_SIDE)
         sideWork = m_currentSide;
     else
         sideWork = targetSide;
@@ -1056,8 +1082,8 @@ void combatManager::EffectSpellCure(i32* effect, i32 targetSide, i32 targetIndex
                                       * gfCancelDurationMods
                                           [combatTarget->m_spellInfluence[influence]
                                                        + fullQuantityWork
-                                                   >= COMBAT_SPELL_AI_MAX_DURATION
-                                               ? COMBAT_SPELL_AI_MAX_DURATION
+                                                   >= SPELL_AI_MAX_DURATION
+                                               ? SPELL_AI_MAX_DURATION
                                                : combatTarget->m_spellInfluence[influence]
                                                      + fullQuantityWork]
                             );
@@ -1075,8 +1101,8 @@ void combatManager::EffectSpellCure(i32* effect, i32 targetSide, i32 targetIndex
                                       * gfCancelDurationMods
                                           [combatTarget->m_spellInfluence[influence]
                                                        + fullQuantityWork
-                                                   >= COMBAT_SPELL_AI_MAX_DURATION
-                                               ? COMBAT_SPELL_AI_MAX_DURATION
+                                                   >= SPELL_AI_MAX_DURATION
+                                               ? SPELL_AI_MAX_DURATION
                                                : combatTarget->m_spellInfluence[influence]
                                                      + fullQuantityWork]
                             );
@@ -1093,7 +1119,7 @@ void combatManager::EffectSpellCure(i32* effect, i32 targetSide, i32 targetIndex
             *effect += -negativeEffectResult - positiveEffectResult;
         else
             *effect += positiveEffectResult + negativeEffectResult;
-        if (targetSide == COMBAT_SPELL_AI_ANY_SIDE && m_currentSide == sideWork)
+        if (targetSide == SPELL_AI_ANY_SIDE && m_currentSide == sideWork)
             sideWork = 1 - m_currentSide;
         else
             done = 1;
@@ -1260,11 +1286,11 @@ void combatManager::EffectSpellDamage(i32* effect, SpellType spell, i32 targetHe
             case SPELL_DEATH_RIPPLE:
             case SPELL_DEATH_WAVE:
                 NextPos(&currentHex);
-                if (currentHex < COMBAT_SPELL_AI_LAST_HEX + 1)
+                if (currentHex < SPELL_AI_LAST_HEX + 1)
                     doneWork = 0;
                 else
                     doneWork = 1;
-                doneWork = currentHex >= COMBAT_SPELL_AI_LAST_HEX + 1;
+                doneWork = currentHex >= SPELL_AI_LAST_HEX + 1;
                 break;
             case SPELL_COLD_RING:
                 if (step == 0)
@@ -1307,7 +1333,7 @@ void combatManager::EffectSpellDamage(i32* effect, SpellType spell, i32 targetHe
                 }
         }
 
-        if (!doneWork && currentHex >= 0 && currentHex < COMBAT_SPELL_AI_LAST_HEX + 1
+        if (!doneWork && currentHex >= 0 && currentHex < SPELL_AI_LAST_HEX + 1
             && m_hexCells[currentHex].m_occupantIndex >= 0
             && m_hexCells[currentHex].m_occupantSide >= 0) {
             targetCreature = &m_armies[m_hexCells[currentHex].m_occupantSide]

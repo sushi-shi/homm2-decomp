@@ -10,8 +10,130 @@
 #include <BASE/font.h>
 #include <BASE/textEntryWidget.h>
 #include <BASE/Misc.h>
-#include <BASE/MiscConstants.h>
 #include <BASE/MISC_TYPES.h>
+H2_ENUM_BEGIN(DataEntryLayout)
+    ENTRY_WINDOW_X           = 0xb1,
+    ENTRY_WINDOW_Y           = 0x14,
+    ENTRY_INPUT_BOX_Y_OFFSET = 0x17
+H2_ENUM_END(DataEntryLayout)
+
+H2_ENUM_CLASS_BEGIN(DataEntryPhase)
+    ENTRY_PHASE_IMMEDIATE    = 0,
+    ENTRY_PHASE_POINTER_SENT = 1,
+    ENTRY_PHASE_READY        = 2
+H2_ENUM_CLASS_END(DataEntryPhase)
+
+H2_ENUM_BEGIN(DataEntryWidgetId)
+    ENTRY_PROMPT_WIDGET = 1,
+    ENTRY_TEXT_WIDGET   = 10,
+    ENTRY_BUTTON_ONE    = 0x7801,
+    ENTRY_CANCEL_BUTTON = 0x7802,
+    ENTRY_BUTTON_FIVE   = 0x7805,
+    ENTRY_BUTTON_SIX    = 0x7806,
+    ENTRY_BUTTON_SEVEN  = 0x7807,
+    ENTRY_BUTTON_EIGHT  = 0x7808
+H2_ENUM_END(DataEntryWidgetId)
+
+H2_ENUM_BEGIN(LogConstant)
+    FILE_DEBUG_LEVEL      = 2,
+    DEBUGGER_OUTPUT_LEVEL = 4,
+    UNUSED_VALUE          = -999,
+    FORMAT_BUFFER_SIZE    = 200,
+    TEXT_BUFFER_SIZE      = 500
+H2_ENUM_END(LogConstant)
+
+H2_ENUM_BEGIN(MiscGameDefaultConstant)
+    DEFAULT_WINDOW_ORIGIN        = 10,
+    DEFAULT_SMALL_WINDOW_WIDTH   = 0x1e0,
+    DEFAULT_SMALL_WINDOW_HEIGHT  = 0x168,
+    DEFAULT_WINDOW_WIDTH         = 0x280,
+    DEFAULT_WINDOW_HEIGHT        = 0x1e0,
+    DEFAULT_MAP_OFFSET_COUNT     = 32001,
+    UNIQUE_ID_RANDOM_MODULUS     = 999999,
+    UNIQUE_ID_ALPHANUMERIC_COUNT = 36,
+    UNIQUE_ID_ALPHA_COUNT        = 26
+H2_ENUM_END(MiscGameDefaultConstant)
+
+H2_ENUM_CLASS_BEGIN(MiscGraphicsFieldIndex)
+    GRAPHICS_SHOW_MENU_FROM_FULLSCREEN   = -5,
+    GRAPHICS_X_FROM_FULLSCREEN           = -4,
+    GRAPHICS_Y_FROM_FULLSCREEN           = -3,
+    GRAPHICS_WIDTH_FROM_FULLSCREEN       = -2,
+    GRAPHICS_HEIGHT_FROM_FULLSCREEN      = -1,
+    GRAPHICS_FULLSCREEN                  = 0,
+    GRAPHICS_COLOR_MOUSE_FROM_FULLSCREEN = 1
+H2_ENUM_CLASS_END(MiscGraphicsFieldIndex)
+
+H2_ENUM_BEGIN(MiscCDDriveConstant)
+    CD_FIRST_DRIVE_INDEX        = 2,
+    CD_DRIVE_SLOT_COUNT         = 26,
+    CD_PATH_BUFFER_SIZE         = 100,
+    CD_MCI_BUFFER_SIZE          = 256,
+    CD_MCI_RESULT_LENGTH        = 0xFF,
+    CD_PROBE_TRAILER_SIZE       = 100,
+    CD_RETRY_DELAY_MILLISECONDS = 3000,
+    CD_RETRY_LIMIT              = 2
+H2_ENUM_END(MiscCDDriveConstant)
+
+H2_ENUM_CLASS_BEGIN(MiscCDDriveResult)
+    CD_DRIVE_READY              = 0,
+    CD_DRIVE_NOT_FOUND          = 2,
+    CD_APP_PATH_UNAVAILABLE     = 3,
+    CD_DATA_ARCHIVE_UNAVAILABLE = 4
+H2_ENUM_CLASS_END(MiscCDDriveResult)
+
+H2_ENUM_BEGIN(PCXConstant)
+    MANUFACTURER_ZSOFT    = 10,
+    VERSION_3_0           = 5,
+    ENCODING_RLE          = 1,
+    BITS_PER_PIXEL        = 8,
+    PLANE_COUNT           = 1,
+    PALETTE_TYPE_COLOR    = 1,
+    RLE_RUN_MARKER        = 0xc0,
+    RLE_RUN_LIMIT         = 0x40,
+    VGA_PALETTE_MARKER    = 0x0c,
+    PALETTE_BYTE_COUNT    = 0x300,
+    COMPONENT_SCALE_SHIFT = 2
+H2_ENUM_END(PCXConstant)
+
+H2_ENUM_CLASS_BEGIN(MiscCycleColorRange)
+    CYCLE_RANGE_ONE_FIRST = 0xd6,
+    CYCLE_RANGE_ONE_LAST  = 0xdd,
+    CYCLE_RANGE_TWO_FIRST = 0xe7,
+    CYCLE_RANGE_TWO_LAST  = 0xed
+H2_ENUM_CLASS_END(MiscCycleColorRange)
+
+H2_ENUM_BEGIN(MiscFadeConstant)
+    FADE_LEVEL_COUNT        = 0x40,
+    FADE_LEVEL_LAST         = 0x3f,
+    WINDOW_POSITION_MARGIN  = 0xc8,
+    FADE_IN_FRAME_DELAY     = 0x14,
+    FADE_TO_INCREMENT_SHIFT = 2,
+    FADE_TO_START_LEVEL     = 0x30,
+    FADE_TO_FRAME_DELAY     = 0x32
+H2_ENUM_END(MiscFadeConstant)
+
+H2_ENUM_BEGIN(MiscBlitConstant)
+    BLIT_SCROLL_OFFSET = 0x10,
+    BLIT_SCROLL_EXTENT = 0x1c0,
+    BLIT_SCREEN_WIDTH  = 0x280,
+    BLIT_SCREEN_HEIGHT = 0x1e0
+H2_ENUM_END(MiscBlitConstant)
+
+H2_ENUM_BEGIN(SeededRandomConstant)
+    RANDOM_TERM_MULTIPLIER     = 13,
+    RANDOM_TERM_MASK           = 0xFF,
+    RANDOM_HIGH_TERM_SHIFT     = 5,
+    RANDOM_LOW_TERM_MULTIPLIER = 13233,
+    RANDOM_FEEDBACK_MASK       = 0x3f,
+    RANDOM_FEEDBACK_SHIFT      = 8,
+    RANDOM_SEED_MASK           = 0xfff,
+    RANDOM_MIX_MULTIPLIER      = 7,
+    RANDOM_MIX_MASK            = 0xff0,
+    RANDOM_MIX_SHIFT           = 4,
+    RANDOM_TOP_BIT             = 31
+H2_ENUM_END(SeededRandomConstant)
+
 #undef HOMM2_MISC_INLINE_ICONENTRY
 #include <BASE/miscwin.h>
 #include <SOURCE/KB.h>
@@ -194,11 +316,10 @@ DATA(0x0051dd10) static SMiscText gMiscText = {
     {{"advmice.mse"}, {""}, {"evntwin%d.bin"}, {""}, {"buybuild.icn"}, {"bigfont.fnt"}, {""}}
 };
 
-
 H2_ENUM_BEGIN(StatusBarLayout)
-    STATUS_BAR_Y = 460,
-    STATUS_BAR_HEIGHT = 20,
-    STATUS_TEXT_Y = 464,
+    STATUS_BAR_Y       = 460,
+    STATUS_BAR_HEIGHT  = 20,
+    STATUS_TEXT_Y      = 464,
     STATUS_TEXT_HEIGHT = 16
 H2_ENUM_END(StatusBarLayout)
 
@@ -491,7 +612,7 @@ void FadeIn(i32 increment) {
             }
             level = MISC_PALETTE_MAX_LEVEL;
         }
-        i32 delayUntil = KBTickCount() + MISC_FADE_IN_FRAME_DELAY;
+        i32 delayUntil = KBTickCount() + FADE_IN_FRAME_DELAY;
         PollSound();
         i8* colors;
         if (level == MISC_PALETTE_MAX_LEVEL) {
@@ -523,16 +644,16 @@ void FadeOut(i32 increment) {
     memcpy(fadePalette->m_data, gpBufferPalette->m_data, MISC_PALETTE_BYTE_COUNT);
     i32 level = 0;
     for (;;) {
-        if (level >= MISC_FADE_LEVEL_COUNT) {
+        if (level >= FADE_LEVEL_COUNT) {
             if (done) {
                 delete fadePalette;
                 return;
             }
-            level = MISC_FADE_LEVEL_LAST;
+            level = FADE_LEVEL_LAST;
         }
         i32 delayUntil = KBTickCount() + 20;
         PollSound();
-        if (level == MISC_FADE_LEVEL_LAST)
+        if (level == FADE_LEVEL_LAST)
             done = 1;
         for (i32 i = 0; i < PALETTE_DATA_SIZE; ++i) {
             if (fadePalette->m_data[i] > 0) {
@@ -621,9 +742,6 @@ void SetInstallDefaults(void) {
     strcpy(gConfig.autoSaveName, gMiscText.installDefaults.autoSaveName.text);
     gConfig.musicSource = CONFIG_MUSIC_SOURCE_CD;
 }
-
-#include <BASE/MiscConfigConstants.h>
-
 // @semantic: first residual is +0x1: after the common push ebx, base materializes gfx[0] (+0x1c) before saving ESI/EDI.
 VA(0x004c49a0, 0x1b5)
 void SetGameDefaults(void) {
@@ -633,18 +751,18 @@ void SetGameDefaults(void) {
     gConfig.autosave = 1;
     gConfig.showRoute = 1;
     do {
-        fullScreen[IDX(MISC_GRAPHICS_SHOW_MENU_FROM_FULLSCREEN)] = 1;
-        fullScreen[IDX(MISC_GRAPHICS_X_FROM_FULLSCREEN)] = MISC_DEFAULT_WINDOW_ORIGIN;
-        fullScreen[IDX(MISC_GRAPHICS_Y_FROM_FULLSCREEN)] = MISC_DEFAULT_WINDOW_ORIGIN;
-        fullScreen[IDX(MISC_GRAPHICS_COLOR_MOUSE_FROM_FULLSCREEN)] = 0;
-        fullScreen[IDX(MISC_GRAPHICS_FULLSCREEN)] = 1;
-        if (giMainVideoModeWidth <= MISC_DEFAULT_WINDOW_WIDTH) {
-            fullScreen[IDX(MISC_GRAPHICS_WIDTH_FROM_FULLSCREEN)] = MISC_DEFAULT_SMALL_WINDOW_WIDTH;
-            fullScreen[IDX(MISC_GRAPHICS_HEIGHT_FROM_FULLSCREEN)] =
-                MISC_DEFAULT_SMALL_WINDOW_HEIGHT;
+        fullScreen[IDX(GRAPHICS_SHOW_MENU_FROM_FULLSCREEN)] = 1;
+        fullScreen[IDX(GRAPHICS_X_FROM_FULLSCREEN)] = DEFAULT_WINDOW_ORIGIN;
+        fullScreen[IDX(GRAPHICS_Y_FROM_FULLSCREEN)] = DEFAULT_WINDOW_ORIGIN;
+        fullScreen[IDX(GRAPHICS_COLOR_MOUSE_FROM_FULLSCREEN)] = 0;
+        fullScreen[IDX(GRAPHICS_FULLSCREEN)] = 1;
+        if (giMainVideoModeWidth <= DEFAULT_WINDOW_WIDTH) {
+            fullScreen[IDX(GRAPHICS_WIDTH_FROM_FULLSCREEN)] = DEFAULT_SMALL_WINDOW_WIDTH;
+            fullScreen[IDX(GRAPHICS_HEIGHT_FROM_FULLSCREEN)] =
+                DEFAULT_SMALL_WINDOW_HEIGHT;
         } else {
-            fullScreen[IDX(MISC_GRAPHICS_WIDTH_FROM_FULLSCREEN)] = MISC_DEFAULT_WINDOW_WIDTH;
-            fullScreen[IDX(MISC_GRAPHICS_HEIGHT_FROM_FULLSCREEN)] = MISC_DEFAULT_WINDOW_HEIGHT;
+            fullScreen[IDX(GRAPHICS_WIDTH_FROM_FULLSCREEN)] = DEFAULT_WINDOW_WIDTH;
+            fullScreen[IDX(GRAPHICS_HEIGHT_FROM_FULLSCREEN)] = DEFAULT_WINDOW_HEIGHT;
         }
         fullScreen += CONFIG_GRAPHICS_SIZE / sizeof(*fullScreen);
     } while (fullScreen < &gConfig.showCombatGrid);
@@ -659,7 +777,7 @@ void SetGameDefaults(void) {
     gConfig.autoCombatUseSpells = 0;
     gConfig.blackoutComputer = 0;
     gConfig.currentMapOffset = 0;
-    gConfig.firstMapOffset = rand() % MISC_DEFAULT_MAP_OFFSET_COUNT;
+    gConfig.firstMapOffset = rand() % DEFAULT_MAP_OFFSET_COUNT;
     gConfig.showObjectBoxes = 0;
     gConfig.editorScreenAnimation = 0;
     gConfig.editorPaletteCycling = 0;
@@ -669,19 +787,19 @@ void SetGameDefaults(void) {
     gConfig.walkSpeed = 2;
     strcpy(gConfig.networkDefaultName, gMiscText.gameDefaults.unknownHeroName.text);
     *reinterpret_cast<i32*>(gConfig.uniqueSystemID) = 0;
-    i32 idSeed = rand() % MISC_UNIQUE_ID_RANDOM_MODULUS + 1;
+    i32 idSeed = rand() % UNIQUE_ID_RANDOM_MODULUS + 1;
     idSeed += KBTickCount();
     gConfig.uniqueSystemID[2] =
-        gMiscText.gameDefaults.uniqueIdAlphabet.text[idSeed % MISC_UNIQUE_ID_ALPHANUMERIC_COUNT];
-    i32 idAdd = rand() % MISC_UNIQUE_ID_RANDOM_MODULUS + 1;
+        gMiscText.gameDefaults.uniqueIdAlphabet.text[idSeed % UNIQUE_ID_ALPHANUMERIC_COUNT];
+    i32 idAdd = rand() % UNIQUE_ID_RANDOM_MODULUS + 1;
     idAdd += KBTickCount();
     idSeed += idAdd;
     gConfig.uniqueSystemID[1] =
-        gMiscText.gameDefaults.uniqueIdAlphabet.text[idSeed % MISC_UNIQUE_ID_ALPHANUMERIC_COUNT];
-    idAdd = rand() % MISC_UNIQUE_ID_RANDOM_MODULUS + 1;
+        gMiscText.gameDefaults.uniqueIdAlphabet.text[idSeed % UNIQUE_ID_ALPHANUMERIC_COUNT];
+    idAdd = rand() % UNIQUE_ID_RANDOM_MODULUS + 1;
     idAdd += KBTickCount();
     idSeed += idAdd;
-    gConfig.uniqueSystemID[0] = static_cast<char>(idSeed % MISC_UNIQUE_ID_ALPHA_COUNT + 'A');
+    gConfig.uniqueSystemID[0] = static_cast<char>(idSeed % UNIQUE_ID_ALPHA_COUNT + 'A');
     gConfig.needsDefaultInitialization = 0;
 }
 
@@ -713,8 +831,8 @@ skipDefaults:
 }
 
 H2_ENUM_BEGIN(RegistryValueSize)
-    MODEM_INIT_STRING_SIZE = 0x62,
-    UNIQUE_SYSTEM_ID_SIZE = 4,
+    MODEM_INIT_STRING_SIZE    = 0x62,
+    UNIQUE_SYSTEM_ID_SIZE     = 4,
     NETWORK_DEFAULT_NAME_SIZE = 0x1e
 H2_ENUM_END(RegistryValueSize)
 
@@ -1142,8 +1260,8 @@ void ReadPrefsFromRegistry(void) {
         gConfig.gfx[giCurExe].x = giMainVideoModeHeight - 200;
     if (gConfig.gfx[giCurExe].y < 0)
         gConfig.gfx[giCurExe].y = 0;
-    if (gConfig.gfx[giCurExe].y > giMainVideoModeWidth - MISC_WINDOW_POSITION_MARGIN)
-        gConfig.gfx[giCurExe].y = giMainVideoModeWidth - MISC_WINDOW_POSITION_MARGIN;
+    if (gConfig.gfx[giCurExe].y > giMainVideoModeWidth - WINDOW_POSITION_MARGIN)
+        gConfig.gfx[giCurExe].y = giMainVideoModeWidth - WINDOW_POSITION_MARGIN;
 }
 
 VA(0x004c5450, 0xa1)
@@ -1559,9 +1677,9 @@ i32 IsCDDrive(i32 driveIndex) {
 // @semantic: sole code-order residual is +0x19b: base loads mciSendStringA into ESI then wsprintfA into EBP.
 VA(0x004c5a60, 0x3ed)
 i32 SetupCDDrive(void) {
-    char registryPath[MISC_CD_PATH_BUFFER_SIZE];
-    char registryKey[MISC_CD_PATH_BUFFER_SIZE];
-    char cdDrives[MISC_CD_DRIVE_SLOT_COUNT];
+    char registryPath[CD_PATH_BUFFER_SIZE];
+    char registryKey[CD_PATH_BUFFER_SIZE];
+    char cdDrives[CD_DRIVE_SLOT_COUNT];
     char count;
     i32 attempts;
     HKEY key;
@@ -1570,17 +1688,17 @@ i32 SetupCDDrive(void) {
     i32 file = _open(gText, _O_BINARY);
     if (file == -1) {
         if (_chdir(gcRegAppPath) == -1)
-            return IDX(MISC_CD_APP_PATH_UNAVAILABLE);
+            return IDX(CD_APP_PATH_UNAVAILABLE);
         file = _open(gText, _O_BINARY);
         if (file == -1)
-            return IDX(MISC_CD_DATA_ARCHIVE_UNAVAILABLE);
+            return IDX(CD_DATA_ARCHIVE_UNAVAILABLE);
     }
     _close(file);
 
     u32l logicalDrives = GetLogicalDrives();
     i32 cdDriveCount = 0;
     memset(cdDrives, 0, sizeof(cdDrives));
-    for (i32 drive = MISC_CD_FIRST_DRIVE_INDEX; drive < MISC_CD_DRIVE_SLOT_COUNT; ++drive) {
+    for (i32 drive = CD_FIRST_DRIVE_INDEX; drive < CD_DRIVE_SLOT_COUNT; ++drive) {
         if (logicalDrives & (1 << drive)) {
             sprintf(gText, gMiscText.cd.rootDrive.text);
             gText[0] += static_cast<char>(drive);
@@ -1599,29 +1717,29 @@ i32 SetupCDDrive(void) {
             _close(file);
             sprintf(gText + 2, gMiscText.cd.stringFormat.text, gcAnimPath);
             strcpy(gcAnimPath, gText);
-            return IDX(MISC_CD_DRIVE_READY);
+            return IDX(CD_DRIVE_READY);
         }
     }
 
     attempts = 0;
     {
-        char resultBuffer[MISC_CD_MCI_BUFFER_SIZE];
-        char command[MISC_CD_MCI_BUFFER_SIZE];
+        char resultBuffer[CD_MCI_BUFFER_SIZE];
+        char command[CD_MCI_BUFFER_SIZE];
         for (;;) {
             for (i32 index = 0; index < count; ++index) {
                 wsprintfA(command, gMiscText.cd.openAudioCommand.text, cdDrives[index] + 'A');
-                if (mciSendStringA(command, resultBuffer, MISC_CD_MCI_RESULT_LENGTH, 0) == 0) {
+                if (mciSendStringA(command, resultBuffer, CD_MCI_RESULT_LENGTH, 0) == 0) {
                     wsprintfA(command, gMiscText.cd.audioInfoCommand.text);
-                    mciSendStringA(command, resultBuffer, MISC_CD_MCI_RESULT_LENGTH, 0);
+                    mciSendStringA(command, resultBuffer, CD_MCI_RESULT_LENGTH, 0);
                     wsprintfA(command, gMiscText.cd.closeAudioCommand.text);
-                    mciSendStringA(command, resultBuffer, MISC_CD_MCI_RESULT_LENGTH, 0);
+                    mciSendStringA(command, resultBuffer, CD_MCI_RESULT_LENGTH, 0);
                 }
                 sprintf(gText, gMiscText.cd.driveAnimationPath.text, cdDrives[index] + 'A');
                 file = _open(gText, _O_BINARY);
                 if (file != -1) {
                     if (_lseek(file, 0, SEEK_END) != -1
-                        && _lseek(file, -MISC_CD_PROBE_TRAILER_SIZE, SEEK_CUR) != -1)
-                        _read(file, resultBuffer, MISC_CD_PROBE_TRAILER_SIZE);
+                        && _lseek(file, -CD_PROBE_TRAILER_SIZE, SEEK_CUR) != -1)
+                        _read(file, resultBuffer, CD_PROBE_TRAILER_SIZE);
                     _close(file);
 
                     strcpy(registryKey, gMiscText.cd.registryKey.text);
@@ -1649,13 +1767,13 @@ i32 SetupCDDrive(void) {
                         gcAnimPath
                     );
                     strcpy(gcAnimPath, gText);
-                    return IDX(MISC_CD_DRIVE_READY);
+                    return IDX(CD_DRIVE_READY);
                 }
             }
-            Sleep(MISC_CD_RETRY_DELAY_MILLISECONDS);
+            Sleep(CD_RETRY_DELAY_MILLISECONDS);
             ++attempts;
-            if (attempts >= MISC_CD_RETRY_LIMIT)
-                return IDX(MISC_CD_DRIVE_NOT_FOUND);
+            if (attempts >= CD_RETRY_LIMIT)
+                return IDX(CD_DRIVE_NOT_FOUND);
         }
     }
 }
@@ -1668,7 +1786,7 @@ void BitmapToScreen(class bitmap* bmp) {
 VA(0x004c5e70, 0x3d)
 void SetPalette(i8* paletteData, i32 updateDisplay) {
     memcpy(gpBufferPalette->m_data, paletteData, MISC_PALETTE_BYTE_COUNT);
-    memcpy(gCyclePal, paletteData + IDX(MISC_CYCLE_RANGE_ONE_FIRST) * 3, sizeof(gCyclePal));
+    memcpy(gCyclePal, paletteData + IDX(CYCLE_RANGE_ONE_FIRST) * 3, sizeof(gCyclePal));
     if (updateDisplay != 0)
         UpdatePalette(gpBufferPalette->m_data);
 }
@@ -1711,10 +1829,10 @@ void BlitBitmapToScreen(
         return;
     }
     if (giScrollX != 0 || giScrollY != 0) {
-        blitSourceX = giScrollX + MISC_BLIT_SCROLL_OFFSET;
-        width = MISC_BLIT_SCROLL_EXTENT;
-        sourceY = giScrollY + MISC_BLIT_SCROLL_OFFSET;
-        height = MISC_BLIT_SCROLL_EXTENT;
+        blitSourceX = giScrollX + BLIT_SCROLL_OFFSET;
+        width = BLIT_SCROLL_EXTENT;
+        sourceY = giScrollY + BLIT_SCROLL_OFFSET;
+        height = BLIT_SCROLL_EXTENT;
     }
     gBlitRight = width + destinationX - 1;
     gBlitBottom = height + destinationY - 1;
@@ -1752,14 +1870,11 @@ void BlitBitmapToScreen(
     }
     BlitBitmapToScreenVesa(bmp, blitSourceX, sourceY, width, height, destinationX, destinationY);
 }
-
-#include <BASE/LogConstants.h>
-
 // @semantic: optimized register-allocation residual.
 VA(0x004c6070, 0xa6)
 void LogTruncate(void) {
-    char logText[LOG_TEXT_BUFFER_SIZE];
-    if (giDebugLevel >= LOG_FILE_DEBUG_LEVEL) {
+    char logText[TEXT_BUFFER_SIZE];
+    if (giDebugLevel >= FILE_DEBUG_LEVEL) {
         i32 fileHandle = _open(
             gMiscText.log.truncateFilename.text,
             _O_WRONLY | _O_CREAT | _O_TRUNC | _O_TEXT,
@@ -1779,8 +1894,8 @@ void LogTruncate(void) {
 // @semantic: optimized register-allocation residual.
 VA(0x004c6120, 0x9e)
 void LogStr(char* text) {
-    char logText[LOG_TEXT_BUFFER_SIZE];
-    if (giDebugLevel >= LOG_FILE_DEBUG_LEVEL) {
+    char logText[TEXT_BUFFER_SIZE];
+    if (giDebugLevel >= FILE_DEBUG_LEVEL) {
         FILE* logFile = fopen(gMiscText.log.appendFilename.text, gMiscText.log.appendMode.text);
         if (logFile != 0) {
             strcpy(logText, text);
@@ -1788,7 +1903,7 @@ void LogStr(char* text) {
                 *reinterpret_cast<const u16*>(gMiscText.log.appendNewline.text);
             fputs(logText, logFile);
             fclose(logFile);
-            if (giDebugLevel == LOG_DEBUGGER_OUTPUT_LEVEL)
+            if (giDebugLevel == DEBUGGER_OUTPUT_LEVEL)
                 OutputDebugStringA(logText);
         }
     }
@@ -1806,9 +1921,9 @@ void LogInt(
     i32 value6,
     i32 value7
 ) {
-    char text[LOG_FORMAT_BUFFER_SIZE];
-    char logText[LOG_TEXT_BUFFER_SIZE];
-    if (value7 != LOG_UNUSED_VALUE)
+    char text[FORMAT_BUFFER_SIZE];
+    char logText[TEXT_BUFFER_SIZE];
+    if (value7 != UNUSED_VALUE)
         sprintf(
             text,
             gMiscText.log.sevenValueFormat.text,
@@ -1821,7 +1936,7 @@ void LogInt(
             value6,
             value7
         );
-    else if (value6 != LOG_UNUSED_VALUE)
+    else if (value6 != UNUSED_VALUE)
         sprintf(
             text,
             gMiscText.log.sixValueFormat.text,
@@ -1833,7 +1948,7 @@ void LogInt(
             value5,
             value6
         );
-    else if (value5 != LOG_UNUSED_VALUE)
+    else if (value5 != UNUSED_VALUE)
         sprintf(
             text,
             gMiscText.log.fiveValueFormat.text,
@@ -1844,15 +1959,15 @@ void LogInt(
             value4,
             value5
         );
-    else if (value4 != LOG_UNUSED_VALUE)
+    else if (value4 != UNUSED_VALUE)
         sprintf(text, gMiscText.log.fourValueFormat.text, label, value1, value2, value3, value4);
-    else if (value3 != LOG_UNUSED_VALUE)
+    else if (value3 != UNUSED_VALUE)
         sprintf(text, gMiscText.log.threeValueFormat.text, label, value1, value2, value3);
-    else if (value2 != LOG_UNUSED_VALUE)
+    else if (value2 != UNUSED_VALUE)
         sprintf(text, gMiscText.log.twoValueFormat.text, label, value1, value2);
     else
         sprintf(text, gMiscText.log.oneValueFormat.text, label, value1);
-    if (giDebugLevel >= LOG_FILE_DEBUG_LEVEL) {
+    if (giDebugLevel >= FILE_DEBUG_LEVEL) {
         FILE* file = fopen(gMiscText.log.appendFilename.text, gMiscText.log.appendMode.text);
         if (file != 0) {
             strcpy(logText, text);
@@ -1860,7 +1975,7 @@ void LogInt(
                 *reinterpret_cast<const u16*>(gMiscText.log.appendNewline.text);
             fputs(logText, file);
             fclose(file);
-            if (giDebugLevel == LOG_DEBUGGER_OUTPUT_LEVEL)
+            if (giDebugLevel == DEBUGGER_OUTPUT_LEVEL)
                 OutputDebugStringA(logText);
         }
     }
@@ -1906,12 +2021,12 @@ VA(0x004c64e0, 0xf8)
 void FadeTo(u8* source, u8* destination, i32 increment) {
     u8 colors[MISC_PALETTE_BYTE_COUNT];
     memcpy(colors, source, sizeof(colors));
-    increment >>= MISC_FADE_TO_INCREMENT_SHIFT;
+    increment >>= FADE_TO_INCREMENT_SHIFT;
     if (increment < 1)
         increment = 1;
-    i32 level = MISC_FADE_TO_START_LEVEL;
+    i32 level = FADE_TO_START_LEVEL;
     do {
-        i32 delayUntil = KBTickCount() + MISC_FADE_TO_FRAME_DELAY;
+        i32 delayUntil = KBTickCount() + FADE_TO_FRAME_DELAY;
         PollSound();
         i32 thresholdIndex = MISC_PALETTE_LEVEL_COUNT - level - increment;
         if (thresholdIndex < 0)
@@ -1960,12 +2075,12 @@ void FadeToColorTable(u8* colorTable, i32 increment) {
         output[-2] = sourceColor[1];
         output[-1] = sourceColor[2];
     } while (output < translatedPalette + sizeof(translatedPalette));
-    i32 rows = MISC_BLIT_SCREEN_HEIGHT;
+    i32 rows = BLIT_SCREEN_HEIGHT;
     FadeTo(reinterpret_cast<u8*>(paletteData), translatedPalette, increment);
     i32 columns;
     u8* pixel = gpWindowManager->m_screen->m_pixels;
     do {
-        columns = MISC_BLIT_SCREEN_WIDTH;
+        columns = BLIT_SCREEN_WIDTH;
         do {
             u8 pixelValue = *pixel;
             *pixel = colorTable[pixelValue];
@@ -1981,8 +2096,8 @@ void FadeToColorTable(u8* colorTable, i32 increment) {
 
 VA(0x004c66a0, 0x29)
 i32 IsCycleColor(i32 color) {
-    if ((color >= IDX(MISC_CYCLE_RANGE_ONE_FIRST) && color <= IDX(MISC_CYCLE_RANGE_ONE_LAST))
-        || (color >= IDX(MISC_CYCLE_RANGE_TWO_FIRST) && color <= IDX(MISC_CYCLE_RANGE_TWO_LAST))) {
+    if ((color >= IDX(CYCLE_RANGE_ONE_FIRST) && color <= IDX(CYCLE_RANGE_ONE_LAST))
+        || (color >= IDX(CYCLE_RANGE_TWO_FIRST) && color <= IDX(CYCLE_RANGE_TWO_LAST))) {
         return 1;
     }
     return 0;
@@ -1993,15 +2108,15 @@ VA(0x004c66d0, 0x1ee)
 void CreatePCXFile(char* filename, u8* pixels, i32 width, i32 height, u8* paletteData) {
     PCXHeader header;
     memset(&header, 0, sizeof(header));
-    header.manufacturer = PCX_MANUFACTURER_ZSOFT;
-    header.version = PCX_VERSION_3_0;
-    header.encoding = PCX_ENCODING_RLE;
-    header.bitsPerPixel = PCX_BITS_PER_PIXEL;
+    header.manufacturer = MANUFACTURER_ZSOFT;
+    header.version = VERSION_3_0;
+    header.encoding = ENCODING_RLE;
+    header.bitsPerPixel = BITS_PER_PIXEL;
     header.xMax = static_cast<u16>(width - 1);
     header.yMax = static_cast<u16>(height - 1);
-    header.planes = PCX_PLANE_COUNT;
+    header.planes = PLANE_COUNT;
     header.bytesPerLine = static_cast<u16>(width);
-    header.paletteType = PCX_PALETTE_TYPE_COLOR;
+    header.paletteType = PALETTE_TYPE_COLOR;
     i32 fileHandle = _open(filename, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
     if (fileHandle == -1)
         return;
@@ -2015,14 +2130,14 @@ void CreatePCXFile(char* filename, u8* pixels, i32 width, i32 height, u8* palett
             u8 value = pixels[sourceIndex];
             i32 runEnd = sourceIndex;
             while (runEnd < width && pixels[runEnd] == value
-                   && runEnd - sourceIndex + 1 < PCX_RLE_RUN_LIMIT)
+                   && runEnd - sourceIndex + 1 < RLE_RUN_LIMIT)
                 ++runEnd;
             i32 runLength = runEnd - sourceIndex;
-            if (runLength <= 1 && (value & PCX_RLE_RUN_MARKER) != PCX_RLE_RUN_MARKER) {
+            if (runLength <= 1 && (value & RLE_RUN_MARKER) != RLE_RUN_MARKER) {
                 encodedRow[encodedSize++] = value;
                 ++sourceIndex;
             } else {
-                encodedRow[encodedSize++] = static_cast<u8>(runLength | PCX_RLE_RUN_MARKER);
+                encodedRow[encodedSize++] = static_cast<u8>(runLength | RLE_RUN_MARKER);
                 encodedRow[encodedSize++] = value;
                 sourceIndex += runLength;
             }
@@ -2031,14 +2146,14 @@ void CreatePCXFile(char* filename, u8* pixels, i32 width, i32 height, u8* palett
         pixels += width;
     }
     H2_FREE_AT(encodedRow, gMiscText.pcx.encodedRowDestruction.text, 0x5f0);
-    u8 paletteMarker = PCX_VGA_PALETTE_MARKER;
+    u8 paletteMarker = VGA_PALETTE_MARKER;
     _write(fileHandle, &paletteMarker, 1);
     u8* outputPalette = static_cast<u8*>(
-        H2_ALLOC_AT(PCX_PALETTE_BYTE_COUNT, gMiscText.pcx.outputPaletteAllocation.text, 1526)
+        H2_ALLOC_AT(PALETTE_BYTE_COUNT, gMiscText.pcx.outputPaletteAllocation.text, 1526)
     );
-    for (i32 i = 0; i < PCX_PALETTE_BYTE_COUNT; ++i)
-        outputPalette[i] = paletteData[i] << PCX_COMPONENT_SCALE_SHIFT;
-    _write(fileHandle, outputPalette, PCX_PALETTE_BYTE_COUNT);
+    for (i32 i = 0; i < PALETTE_BYTE_COUNT; ++i)
+        outputPalette[i] = paletteData[i] << COMPONENT_SCALE_SHIFT;
+    _write(fileHandle, outputPalette, PALETTE_BYTE_COUNT);
     H2_FREE_AT(outputPalette, gMiscText.pcx.outputPaletteDestruction.text, 0x5fb);
     _close(fileHandle);
 }
@@ -2060,9 +2175,6 @@ VA(0x004c6920, 0xc)
 struct IconEntry* GetIconEntry(class icon* iconPtr, i32 index) {
     return &iconPtr->Entries()[index];
 }
-
-#include <BASE/SeededRandomConstants.h>
-
 // @semantic: optimized register-allocation residual.
 VA(0x004c6930, 0xb8)
 i32 SRandom(i32 low, i32 high) {
@@ -2073,18 +2185,18 @@ i32 SRandom(i32 low, i32 high) {
         return low;
     }
 
-    i32 highTerm = (high * SEEDED_RANDOM_TERM_MULTIPLIER) & SEEDED_RANDOM_TERM_MASK;
-    i32 lowTerm = (low * SEEDED_RANDOM_TERM_MULTIPLIER) & SEEDED_RANDOM_TERM_MASK;
-    iLastSeed += highTerm << SEEDED_RANDOM_HIGH_TERM_SHIFT;
-    iLastSeed += lowTerm * SEEDED_RANDOM_LOW_TERM_MULTIPLIER;
+    i32 highTerm = (high * RANDOM_TERM_MULTIPLIER) & RANDOM_TERM_MASK;
+    i32 lowTerm = (low * RANDOM_TERM_MULTIPLIER) & RANDOM_TERM_MASK;
+    iLastSeed += highTerm << RANDOM_HIGH_TERM_SHIFT;
+    iLastSeed += lowTerm * RANDOM_LOW_TERM_MULTIPLIER;
     iLastSeed += highTerm;
-    iLastSeed += (iLastSeed & SEEDED_RANDOM_FEEDBACK_MASK) << SEEDED_RANDOM_FEEDBACK_SHIFT;
-    iLastSeed &= SEEDED_RANDOM_SEED_MASK;
+    iLastSeed += (iLastSeed & RANDOM_FEEDBACK_MASK) << RANDOM_FEEDBACK_SHIFT;
+    iLastSeed &= RANDOM_SEED_MASK;
 
     i32 result = 0;
-    i32 mix = iLastSeed * SEEDED_RANDOM_MIX_MULTIPLIER;
-    mix += (mix & SEEDED_RANDOM_MIX_MASK) >> SEEDED_RANDOM_MIX_SHIFT;
-    for (i32 i = SEEDED_RANDOM_TOP_BIT; i >= 0; --i) {
+    i32 mix = iLastSeed * RANDOM_MIX_MULTIPLIER;
+    mix += (mix & RANDOM_MIX_MASK) >> RANDOM_MIX_SHIFT;
+    for (i32 i = RANDOM_TOP_BIT; i >= 0; --i) {
         if (mix & (1 << i)) {
             result |= 1 << i;
         }
@@ -2100,14 +2212,14 @@ i32 SRandom(i32 low, i32 high) {
 // @semantic: optimized register-allocation residual.
 VA(0x004c69f0, 0x5c)
 void SIncRandomize(i32 x, i32 y) {
-    x *= SEEDED_RANDOM_TERM_MULTIPLIER;
-    x &= SEEDED_RANDOM_TERM_MASK;
-    y *= SEEDED_RANDOM_TERM_MULTIPLIER;
-    y &= SEEDED_RANDOM_TERM_MASK;
-    iLastSeed += y << SEEDED_RANDOM_HIGH_TERM_SHIFT;
-    iLastSeed += x * SEEDED_RANDOM_LOW_TERM_MULTIPLIER;
+    x *= RANDOM_TERM_MULTIPLIER;
+    x &= RANDOM_TERM_MASK;
+    y *= RANDOM_TERM_MULTIPLIER;
+    y &= RANDOM_TERM_MASK;
+    iLastSeed += y << RANDOM_HIGH_TERM_SHIFT;
+    iLastSeed += x * RANDOM_LOW_TERM_MULTIPLIER;
     iLastSeed += y;
-    iLastSeed += (iLastSeed & SEEDED_RANDOM_FEEDBACK_MASK) << SEEDED_RANDOM_FEEDBACK_SHIFT;
+    iLastSeed += (iLastSeed & RANDOM_FEEDBACK_MASK) << RANDOM_FEEDBACK_SHIFT;
 }
 
 VA(0x004c6a50, 0x10)
@@ -2120,10 +2232,10 @@ void SRand(i32 seed) {
 VA(0x004c6a60, 0x48)
 i32 SGenRand(void) {
     i32 result = 0;
-    iLastSeed &= SEEDED_RANDOM_SEED_MASK;
-    i32 mix = iLastSeed * SEEDED_RANDOM_MIX_MULTIPLIER;
-    mix += (mix & SEEDED_RANDOM_MIX_MASK) >> SEEDED_RANDOM_MIX_SHIFT;
-    i32 i = SEEDED_RANDOM_TOP_BIT;
+    iLastSeed &= RANDOM_SEED_MASK;
+    i32 mix = iLastSeed * RANDOM_MIX_MULTIPLIER;
+    mix += (mix & RANDOM_MIX_MASK) >> RANDOM_MIX_SHIFT;
+    i32 i = RANDOM_TOP_BIT;
     do {
         if (mix & (1 << i)) {
             result |= 1 << i;
@@ -2138,9 +2250,6 @@ VA(0x004c6ab0, 0x6)
 i32 MemSize(i32) {
     return 16034;
 }
-
-#include <BASE/DataEntryConstants.h>
-
 // @semantic: optimized register-allocation residual.
 VA(0x004c6ac0, 0x386)
 void GetDataEntry(
@@ -2171,14 +2280,14 @@ void GetDataEntry(
 
     char windowName[16];
     sprintf(windowName, gMiscText.dataEntry.windowFilenameFormat.text, rows);
-    DataEntryWin = new heroWindow(DATA_ENTRY_WINDOW_X, DATA_ENTRY_WINDOW_Y, windowName);
+    DataEntryWin = new heroWindow(ENTRY_WINDOW_X, ENTRY_WINDOW_Y, windowName);
     if (DataEntryWin == 0)
         MemError();
 
     tag_message message;
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-    message.payload.widget.id = DATA_ENTRY_PROMPT_WIDGET;
+    message.payload.widget.id = ENTRY_PROMPT_WIDGET;
     message.payload.widget.data.text = prompt;
     DataEntryWin->BroadcastMessage(message);
 
@@ -2186,26 +2295,26 @@ void GetDataEntry(
     if (initialText == 0)
         initialText = gMiscText.dataEntry.initialTextDefault.text;
     strcpy(entryText, initialText);
-    message.payload.widget.id = DATA_ENTRY_TEXT_WIDGET;
+    message.payload.widget.id = ENTRY_TEXT_WIDGET;
     message.payload.widget.data.text = entryText;
     DataEntryWin->BroadcastMessage(message);
     strcpy(destination, entryText);
 
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-    message.payload.widget.id = DATA_ENTRY_BUTTON_ONE;
+    message.payload.widget.id = ENTRY_BUTTON_ONE;
     message.payload.widget.data.value = WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW;
     DataEntryWin->BroadcastMessage(message);
-    message.payload.widget.id = DATA_ENTRY_BUTTON_SEVEN;
+    message.payload.widget.id = ENTRY_BUTTON_SEVEN;
     DataEntryWin->BroadcastMessage(message);
-    message.payload.widget.id = DATA_ENTRY_BUTTON_EIGHT;
+    message.payload.widget.id = ENTRY_BUTTON_EIGHT;
     DataEntryWin->BroadcastMessage(message);
-    message.payload.widget.id = DATA_ENTRY_BUTTON_FIVE;
+    message.payload.widget.id = ENTRY_BUTTON_FIVE;
     DataEntryWin->BroadcastMessage(message);
-    message.payload.widget.id = DATA_ENTRY_BUTTON_SIX;
+    message.payload.widget.id = ENTRY_BUTTON_SIX;
     DataEntryWin->BroadcastMessage(message);
     if (showCancel == 0) {
-        message.payload.widget.id = DATA_ENTRY_CANCEL_BUTTON;
+        message.payload.widget.id = ENTRY_CANCEL_BUTTON;
         DataEntryWin->BroadcastMessage(message);
     }
 
@@ -2228,15 +2337,15 @@ void GetDataEntry(
     );
     if (entry == 0)
         MemError();
-    inBoxY = entryY + DATA_ENTRY_INPUT_BOX_Y_OFFSET;
+    inBoxY = entryY + ENTRY_INPUT_BOX_Y_OFFSET;
     inBoxX = 213;
     DataEntryWin->AddWidget(entry, -1);
 
     if (useImmediateHandler != 0) {
-        bDataEntryTime = IDX(DATA_ENTRY_PHASE_IMMEDIATE);
+        bDataEntryTime = IDX(ENTRY_PHASE_IMMEDIATE);
         gbAllowTextEntryEscape = false;
     } else
-        bDataEntryTime = IDX(DATA_ENTRY_PHASE_READY);
+        bDataEntryTime = IDX(ENTRY_PHASE_READY);
     gpWindowManager->DoDialog(DataEntryWin, DataEntryWindowHandler, 0);
     delete DataEntryWin;
     gpMouseManager->SetPointer(
@@ -2250,7 +2359,7 @@ void GetDataEntry(
 // @early-stop: byte-proven compiler artifact.
 VA(0x004c6e50, 0x173)
 i32 DataEntryWindowHandler(struct tag_message& message) {
-    if (bDataEntryTime == IDX(DATA_ENTRY_PHASE_IMMEDIATE)) {
+    if (bDataEntryTime == IDX(ENTRY_PHASE_IMMEDIATE)) {
         ++bDataEntryTime;
         message.type = MESSAGE_LEFT_BUTTON_DOWN;
         message.payload.mouse.x = inBoxX;
@@ -2259,14 +2368,14 @@ i32 DataEntryWindowHandler(struct tag_message& message) {
         return EVENT_WINDOW_CONTINUE;
     }
 
-    if (bDataEntryTime == IDX(DATA_ENTRY_PHASE_POINTER_SENT))
+    if (bDataEntryTime == IDX(ENTRY_PHASE_POINTER_SENT))
         ++bDataEntryTime;
     else {
         if (message.type != MESSAGE_WIDGET)
             goto normalEvent;
         switch (message.payload.widget.command) {
             case WIDGET_COMMAND_SELECT:
-                if (message.payload.widget.id != DATA_ENTRY_TEXT_WIDGET)
+                if (message.payload.widget.id != ENTRY_TEXT_WIDGET)
                     goto normalEvent;
                 break;
             case WIDGET_COMMAND_DESELECT:
@@ -2277,7 +2386,7 @@ i32 DataEntryWindowHandler(struct tag_message& message) {
     }
 
     message.type = MESSAGE_WIDGET;
-    message.payload.widget.id = DATA_ENTRY_TEXT_WIDGET;
+    message.payload.widget.id = ENTRY_TEXT_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_GET_TEXT;
     DataEntryWin->BroadcastMessage(message);
     if (strlen(message.payload.widget.data.text) != 0) {
@@ -2285,22 +2394,22 @@ i32 DataEntryWindowHandler(struct tag_message& message) {
         strncpy(cDEDest, message.payload.widget.data.text, iDEMaxLen - 1);
         message.type = MESSAGE_WIDGET;
         message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-        message.payload.widget.id = DATA_ENTRY_TEXT_WIDGET;
+        message.payload.widget.id = ENTRY_TEXT_WIDGET;
         message.payload.widget.data.text = cDEDest;
         DataEntryWin->BroadcastMessage(message);
         DataEntryWin->DrawWindow(1, 10, 10);
         if (gbTextEntryEscaped == 0) {
             gpWindowManager->m_dialogResult = message.payload.widget.id;
-            message.payload.widget.id = DATA_ENTRY_TEXT_WIDGET;
+            message.payload.widget.id = ENTRY_TEXT_WIDGET;
             message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
             return EVENT_WINDOW_CLOSE;
         }
     }
 
 possibleCancelEvent:
-    if (message.payload.widget.id != DATA_ENTRY_CANCEL_BUTTON)
+    if (message.payload.widget.id != ENTRY_CANCEL_BUTTON)
         goto normalEvent;
-    message.payload.widget.id = DATA_ENTRY_TEXT_WIDGET;
+    message.payload.widget.id = ENTRY_TEXT_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
     return EVENT_WINDOW_CLOSE;
 

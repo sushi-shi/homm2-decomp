@@ -9,6 +9,17 @@
 #include <BASE/Misc.h>
 #include <stdio.h>
 
+H2_ENUM_CLASS_BEGIN(MidiSequenceStatus)
+    SEQUENCE_PLAYING = 4
+H2_ENUM_CLASS_END(MidiSequenceStatus)
+
+H2_ENUM_BEGIN(MidiVolumeConstant)
+    VOLUME_HIGH_RANGE = 6,
+    VOLUME_FADE_SPLIT = 10,
+    VOLUME_LOW_RANGE  = 11,
+    MAX_VOLUME        = 127
+H2_ENUM_END(MidiVolumeConstant)
+
 DATA(0x0051fec8) struct _MDI_DRIVER* hMDI = 0;
 DATA(0x0051fecc) i32 CurrentMidiFile = MIDI_NO_TRACK;
 DATA(0x0051fed0) u8 bGotMidi[MIDI_TRACK_COUNT] = {0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1,
@@ -122,7 +133,7 @@ VA(0x004d3f80, 0x46)
 inline i32 soundManager::MIDIIsPlaying(void) {
     if (gbNoSound == 0 && gConfig.musicVolume != 0 && m_midiReady != 0
         && CurrentMidiFile != MIDI_NO_TRACK && hSequence[CurrentMidiFile] != 0) {
-        return AIL_sequence_status(hSequence[CurrentMidiFile]) == IDX(MIDI_SEQUENCE_PLAYING);
+        return AIL_sequence_status(hSequence[CurrentMidiFile]) == IDX(SEQUENCE_PLAYING);
     }
     return 0;
 }
@@ -130,14 +141,14 @@ inline i32 soundManager::MIDIIsPlaying(void) {
 VA(0x004d3fd0, 0x68)
 inline void soundManager::MIDISetVolume(void) {
     if (gbNoSound == 0 && m_midiReady != 0) {
-        i32 volume = MIDI_MAX_VOLUME;
+        i32 volume = MAX_VOLUME;
         if (m_fadeSteps > 0) {
-            if (m_fadeSteps <= MIDI_VOLUME_FADE_SPLIT)
-                volume = ((MIDI_VOLUME_LOW_RANGE - m_fadeSteps) * MIDI_MAX_VOLUME)
-                         / MIDI_VOLUME_LOW_RANGE;
+            if (m_fadeSteps <= VOLUME_FADE_SPLIT)
+                volume = ((VOLUME_LOW_RANGE - m_fadeSteps) * MAX_VOLUME)
+                         / VOLUME_LOW_RANGE;
             else
-                volume = ((m_fadeSteps - MIDI_VOLUME_FADE_SPLIT) * MIDI_MAX_VOLUME)
-                         / MIDI_VOLUME_HIGH_RANGE;
+                volume = ((m_fadeSteps - VOLUME_FADE_SPLIT) * MAX_VOLUME)
+                         / VOLUME_HIGH_RANGE;
         }
         AIL_set_XMIDI_master_volume(hMDI, ConvertVolume(volume, SOUND_VOLUME_MUSIC));
     }
