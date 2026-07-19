@@ -190,7 +190,7 @@ src/SOURCE/Campaign.cpp	pending
 src/SOURCE/Castle.cpp	pending
 src/SOURCE/DRAWING.cpp	pending
 src/SOURCE/EVENTS.cpp	pending
-src/SOURCE/FINDPATH.cpp	pending
+src/SOURCE/FINDPATH.cpp	reviewed	Shared queue, direction, moat, and combat-hex extents replace raw bounds; private source-line, distance, drawbridge, and moat-cost constants are named, and repeated grid-distance arithmetic uses an inline helper.
 src/SOURCE/FLY.cpp	reviewed	Private flight direction, mask, and timing constants are aligned enums; the attack buffer uses the shared army API extent, and repeated branchless facing arithmetic uses inline direction/rear-offset helpers. Remaining zeros and ones are coordinates, booleans, frame and loop initialization, bounds, and occupant sentinels.
 src/SOURCE/GAME.cpp	pending
 src/SOURCE/HERO.cpp	pending
