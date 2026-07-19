@@ -34,6 +34,11 @@ H2_ENUM_BEGIN(CombatControlConstant)
     COMBAT_CONTROL_SIDE_COUNT = 2
 H2_ENUM_END(CombatControlConstant)
 
+H2_ENUM_BEGIN(DiffSendRecipient)
+    DIFF_SEND_FORCE_WHOLE = -2,
+    DIFF_SEND_NONE        = -1
+H2_ENUM_END(DiffSendRecipient)
+
 #pragma pack(push, 1)
 struct SCmbtObstacle {
     u32 terrainMask;
