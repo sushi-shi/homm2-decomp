@@ -20,6 +20,9 @@ H2_ENUM_BEGIN(MidiVolumeConstant)
     MAX_VOLUME        = 127
 H2_ENUM_END(MidiVolumeConstant)
 
+#define LOG_UNUSED_VALUE (-999)
+#define MIDI_FILENAME_CAPACITY 16
+
 DATA(0x0051fec8) struct _MDI_DRIVER* hMDI = NULL;
 DATA(0x0051fecc) i32 CurrentMidiFile = MIDI_NO_TRACK;
 DATA(0x0051fed0) u8 bGotMidi[MIDI_TRACK_COUNT] = {0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1,
@@ -43,7 +46,8 @@ void soundManager::MIDIStartup(void) {
         m_midiReady = 1;
         LogStr(gMidiText.startupOpen);
         i = AIL_midiOutOpen(&hMDI, NULL, MIDI_MAPPER);
-        LogInt(gMidiText.startupOpenResult, i, -999, -999, -999, -999, -999, -999);
+        LogInt(gMidiText.startupOpenResult, i, LOG_UNUSED_VALUE, LOG_UNUSED_VALUE,
+               LOG_UNUSED_VALUE, LOG_UNUSED_VALUE, LOG_UNUSED_VALUE, LOG_UNUSED_VALUE);
         if (i != 0)
             m_midiReady = 0;
     }
@@ -86,7 +90,7 @@ void soundManager::MIDIPlay(i32 midiTrack) {
         if (midiTrack != CurrentMidiFile) {
             MIDIStop();
 
-            char filename[16];
+            char filename[MIDI_FILENAME_CAPACITY];
             sprintf(filename, gMidiText.filenameFormat, midiTrack);
             if (hSequence[midiTrack] == NULL) {
                 hSequence[midiTrack] = AIL_allocate_sequence_handle(hMDI);
@@ -158,3 +162,6 @@ void soundManager::MIDIPoll(void) {}
 
 DATA(0x00534cf0) class MIDIWrap* pMIDIWrap[MIDI_TRACK_COUNT];
 DATA(0x00534de0) struct _SEQUENCE* hSequence[MIDI_TRACK_COUNT];
+
+#undef LOG_UNUSED_VALUE
+#undef MIDI_FILENAME_CAPACITY
