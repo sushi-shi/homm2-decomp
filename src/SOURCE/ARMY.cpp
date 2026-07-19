@@ -1715,7 +1715,7 @@ i32 army::WalkTo(i32 destination) {
             }
         }
     }
-    if (!FindPath(m_hex, destination, m_monster.speed, 1, 0)) {
+    if (!FindPath(m_hex, destination, m_monster.speed, 1, ARMY_PATH_ANY_TARGET_HEX)) {
         return ARMY_PATH_BLOCKED;
     }
 
@@ -1762,7 +1762,7 @@ i32 army::AttackTo(i32 destination) {
         DoAttack(0);
         return 0;
     }
-    if (FindPath(m_hex, destination, m_monster.speed, 1, 0)) {
+    if (FindPath(m_hex, destination, m_monster.speed, 1, ARMY_PATH_ANY_TARGET_HEX)) {
         if (gpSearchArray->m_pathLength == 1) {
             m_attackDirection = static_cast<u8>(gpSearchArray->m_storage.path.directions[1]);
             gpCombatManager->TestRaiseDoor();

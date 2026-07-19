@@ -27,7 +27,8 @@ i32 army::FindPath(i32 sourceHex, i32 targetHex, i32, i32 ignoreSpeed, i32 pathM
         m_monster.speed = PATH_IGNORE_SPEED;
 
     pathResult = gpSearchArray->FindCombatPath(sourceHex, targetHex, this, pathMode, 0);
-    if (!pathResult && HAS(m_monster.attributes, MONSTER_ATTRIBUTE_WIDE) && pathMode == 0) {
+    if (!pathResult && HAS(m_monster.attributes, MONSTER_ATTRIBUTE_WIDE)
+        && pathMode == ARMY_PATH_ANY_TARGET_HEX) {
         switch (m_facing) {
             case 0:
                 targetHex = GetAdjacentCellIndex(targetHex, COMBAT_DIRECTION_NORTHEAST);

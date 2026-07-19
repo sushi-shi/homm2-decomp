@@ -341,7 +341,7 @@ void searchArray::SeedCombatPosition(class army* unit) {
         }
     } else {
         for (hex = 0; hex < COMBAT_HEX_COUNT; hex++) {
-            if (unit->ValidPath(hex, 1))
+            if (unit->ValidPath(hex, ARMY_PATH_EXACT_TARGET_HEX))
                 gpCombatManager->m_hexCells[hex].m_pathReachable = 1;
         }
     }
@@ -355,7 +355,7 @@ void searchArray::SeedCombatPosition(class army* unit) {
         if (unit->m_monster.speed <= 0
             || unit->GetAttackMask(unit->m_hex, ARMY_ATTACK_TARGET_ENEMY, -1)
                 != ATTACK_MASK_SURROUNDED) {
-            if (unit->ValidPath(hex, 1) == 1)
+            if (unit->ValidPath(hex, ARMY_PATH_EXACT_TARGET_HEX) == 1)
                 gpCombatManager->m_hexCells[hex].m_pathReachable = 1;
         } else {
             gpCombatManager->m_hexCells[hex].m_pathReachable = 1;
@@ -369,7 +369,7 @@ void searchArray::SeedCombatPosition(class army* unit) {
             if ((unit->m_monster.speed > 0
                  && unit->GetAttackMask(unit->m_hex, ARMY_ATTACK_TARGET_ENEMY, -1)
                      == ATTACK_MASK_SURROUNDED)
-                || unit->ValidPath(hex, 1) == 1) {
+                || unit->ValidPath(hex, ARMY_PATH_EXACT_TARGET_HEX) == 1) {
                 gpCombatManager->m_hexCells[hex].m_pathReachable = 1;
             }
         }
