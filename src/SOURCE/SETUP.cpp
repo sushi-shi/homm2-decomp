@@ -18,30 +18,55 @@
 #include <windows.h>
 
 H2_ENUM_BEGIN(SetupConstant)
-    WINDOW_X                = 405,
-    WINDOW_Y                = 8,
-    DIALOG_CANCEL           = 0x7801,
-    DIALOG_YES              = 0x7805,
-    PLAYER_COUNT            = IDX(GAME_PLAYER_COUNT),
-    PLAYER_NAME_LENGTH      = 20,
-    MODEM_INIT_ENTRY_LENGTH = 40,
-    TELEPHONE_ENTRY_LENGTH  = 35,
-    DISABLED_WIDGET_ID      = 1,
-    LOG_UNUSED              = -999,
-    CAMPAIGN_INTRO          = 4,
-    CAMPAIGN_SELECTION      = 35,
-    HELP_DIALOG             = 4,
-    DIALOG_RESULT_MIN       = 1,
-    DIALOG_RESULT_MAX       = 1000,
-    HANDLER_CONTINUE        = 1,
-    HANDLER_CLOSE           = 2
+    WINDOW_X                     = 405,
+    WINDOW_Y                     = 8,
+    DIALOG_CANCEL                = NORMAL_DIALOG_BUTTON_ONE,
+    DIALOG_YES                   = NORMAL_DIALOG_BUTTON_FIVE,
+    PLAYER_COUNT                 = IDX(GAME_PLAYER_COUNT),
+    PLAYER_NAME_LENGTH           = GLOBAL_PLAYER_NAME_SIZE - 1,
+    DEFAULT_PLAYER_NAME_CAPACITY = 24,
+    MODEM_INIT_ENTRY_LENGTH      = 40,
+    TELEPHONE_ENTRY_LENGTH       = MODEM_NUMBER_BUFFER_SIZE - 1,
+    FILE_PATTERN_CAPACITY        = 12,
+    FILE_REQUESTER_X             = 200,
+    FILE_REQUESTER_Y             = 58,
+    DISABLED_WIDGET_ID           = 1,
+    CAMPAIGN_INTRO               = 4,
+    CAMPAIGN_SELECTION           = 35,
+    HELP_DIALOG                  = NORMAL_DIALOG_QUICK_VIEW,
+    DIALOG_RESULT_MIN            = 1,
+    DIALOG_RESULT_MAX            = 1000,
+    HANDLER_CONTINUE             = 1,
+    HANDLER_CLOSE                = 2
 H2_ENUM_END(SetupConstant)
 
+H2_ENUM_BEGIN(SetupDialogChoice)
+    CHOICE_ONE   = 1,
+    CHOICE_TWO   = 2,
+    CHOICE_THREE = 3,
+    CHOICE_FOUR  = 4,
+    CHOICE_FIVE  = 5
+H2_ENUM_END(SetupDialogChoice)
+
+H2_ENUM_BEGIN(SetupHelpIndex)
+    NO_HELP    = -1,
+    FIRST_HELP = 0
+H2_ENUM_END(SetupHelpIndex)
+
+H2_ENUM_BEGIN(HotSeatPlayerCount)
+    TWO_PLAYERS   = 2,
+    THREE_PLAYERS = 3,
+    FOUR_PLAYERS  = 4,
+    FIVE_PLAYERS  = 5,
+    SIX_PLAYERS   = 6
+H2_ENUM_END(HotSeatPlayerCount)
+
 H2_ENUM_BEGIN(SetupRemoteType)
-    REMOTE_NETWORK_HOST  = 1,
-    REMOTE_NETWORK_GUEST = 2,
-    REMOTE_MODEM_DIAL    = 3,
-    REMOTE_MODEM_ANSWER  = 4
+    REMOTE_NETWORK_HOST       = 1,
+    REMOTE_NETWORK_GUEST      = 2,
+    REMOTE_MODEM_DIAL         = 3,
+    REMOTE_MODEM_ANSWER       = 4,
+    REMOTE_TYPE_UNINITIALIZED = 10
 H2_ENUM_END(SetupRemoteType)
 
 H2_ENUM_CLASS_BEGIN(SetupBaudRate)
@@ -50,6 +75,14 @@ H2_ENUM_CLASS_BEGIN(SetupBaudRate)
     SETUP_BAUD_19200 = 19200,
     SETUP_BAUD_38400 = 38400
 H2_ENUM_CLASS_END(SetupBaudRate)
+
+static inline i32 GetSetupHelpIndex(i32 widgetId, i32 lastChoice) {
+    if (widgetId >= CHOICE_ONE && widgetId <= lastChoice)
+        return widgetId - CHOICE_ONE;
+    if (widgetId == DIALOG_CANCEL)
+        return lastChoice;
+    return NO_HELP;
+}
 
 VA(0x00410e90, 0x2f)
 i32 game::SetupCampaignGame(void) {
@@ -67,16 +100,16 @@ i32 game::SetupBaud(void) {
     delete window;
 
     switch (gpWindowManager->m_dialogResult) {
-        case 1:
+        case CHOICE_ONE:
             gConfig.baudRate[gbDirectConnect] = IDX(SETUP_BAUD_2400);
             break;
-        case 2:
+        case CHOICE_TWO:
             gConfig.baudRate[gbDirectConnect] = IDX(SETUP_BAUD_9600);
             break;
-        case 3:
+        case CHOICE_THREE:
             gConfig.baudRate[gbDirectConnect] = IDX(SETUP_BAUD_19200);
             break;
-        case 4:
+        case CHOICE_FOUR:
             gConfig.baudRate[gbDirectConnect] = IDX(SETUP_BAUD_38400);
             break;
         case DIALOG_CANCEL:
@@ -99,16 +132,16 @@ i32 game::SetupComPort(void) {
     LogStr("SCP 3");
 
     switch (gpWindowManager->m_dialogResult) {
-        case 1:
+        case CHOICE_ONE:
             gConfig.comPort[gbDirectConnect] = IDX(SETUP_COM_PORT_1);
             break;
-        case 2:
+        case CHOICE_TWO:
             gConfig.comPort[gbDirectConnect] = IDX(SETUP_COM_PORT_2);
             break;
-        case 3:
+        case CHOICE_THREE:
             gConfig.comPort[gbDirectConnect] = IDX(SETUP_COM_PORT_3);
             break;
-        case 4:
+        case CHOICE_FOUR:
             gConfig.comPort[gbDirectConnect] = IDX(SETUP_COM_PORT_4);
             break;
         case DIALOG_CANCEL:
@@ -139,7 +172,7 @@ i32 game::SetupComPort(void) {
 
 VA(0x00411200, 0x238)
 i32 game::SetupHotSeatGame(void) {
-    char defaultName[24];
+    char defaultName[DEFAULT_PLAYER_NAME_CAPACITY];
     i32 ix;
 
     heroWindow* window = new heroWindow(WINDOW_X, WINDOW_Y, "stphotst.bin");
@@ -149,20 +182,20 @@ i32 game::SetupHotSeatGame(void) {
     delete window;
 
     switch (gpWindowManager->m_dialogResult) {
-        case 1:
-            giNumHumanPlayers = 2;
+        case CHOICE_ONE:
+            giNumHumanPlayers = TWO_PLAYERS;
             break;
-        case 2:
-            giNumHumanPlayers = 3;
+        case CHOICE_TWO:
+            giNumHumanPlayers = THREE_PLAYERS;
             break;
-        case 3:
-            giNumHumanPlayers = 4;
+        case CHOICE_THREE:
+            giNumHumanPlayers = FOUR_PLAYERS;
             break;
-        case 4:
-            giNumHumanPlayers = 5;
+        case CHOICE_FOUR:
+            giNumHumanPlayers = FIVE_PLAYERS;
             break;
-        case 5:
-            giNumHumanPlayers = 6;
+        case CHOICE_FIVE:
+            giNumHumanPlayers = SIX_PLAYERS;
             break;
         case DIALOG_CANCEL:
             return 0;
@@ -173,7 +206,7 @@ i32 game::SetupHotSeatGame(void) {
 
     if (giSetupGameType == 0) {
         sprintf(gText, "Do you wish to enter each player's name?");
-        NormalDialog(gText, 2, -1, -1, -1, 0, -1, 0, -1, 0);
+        NormalDialog(gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0);
         if (gpWindowManager->m_dialogResult == DIALOG_YES) {
             for (ix = 0; ix < OD_STEER(giNumHumanPlayers); ix++) {
                 strcpy(defaultName, "");
@@ -204,10 +237,10 @@ i32 game::SetupNetworkGame(void) {
     delete window;
 
     switch (gpWindowManager->m_dialogResult) {
-        case 1:
+        case CHOICE_ONE:
             iMPExtendedType = REMOTE_NETWORK_HOST;
             break;
-        case 2:
+        case CHOICE_TWO:
             iMPExtendedType = REMOTE_NETWORK_GUEST;
             break;
         case DIALOG_CANCEL:
@@ -233,19 +266,19 @@ i32 game::SetupNetworkGame2(void) {
         "Version",
         result,
         osInfo.dwPlatformId,
-        LOG_UNUSED,
-        LOG_UNUSED,
-        LOG_UNUSED,
-        LOG_UNUSED,
-        LOG_UNUSED
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE
     );
     if (result != 0 && osInfo.dwPlatformId == VER_PLATFORM_WIN32_NT) {
         message.type = MESSAGE_WIDGET;
         message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
         message.payload.widget.data.value = WIDGET_COMMAND_DIMMED;
-        message.payload.widget.id = 1;
+        message.payload.widget.id = CHOICE_ONE;
         window->BroadcastMessage(message);
-        message.payload.widget.id = 3;
+        message.payload.widget.id = CHOICE_THREE;
         window->BroadcastMessage(message);
     }
 
@@ -253,16 +286,16 @@ i32 game::SetupNetworkGame2(void) {
     delete window;
 
     switch (gpWindowManager->m_dialogResult) {
-        case 1:
+        case CHOICE_ONE:
             iMPNetProtocol = REMOTE_PROTOCOL_DIRECT_PLAY;
             break;
-        case 2:
+        case CHOICE_TWO:
             iMPNetProtocol = REMOTE_PROTOCOL_WINSOCK;
             break;
-        case 3:
+        case CHOICE_THREE:
             iMPNetProtocol = REMOTE_PROTOCOL_MODEM;
             break;
-        case 4:
+        case CHOICE_FOUR:
             iMPNetProtocol = REMOTE_PROTOCOL_DIRECT_CONNECT;
             break;
         case DIALOG_CANCEL:
@@ -309,7 +342,7 @@ i32 game::SetupModemGame(void) {
     LogStr("SMC 5");
 
     switch (gpWindowManager->m_dialogResult) {
-        case 1:
+        case CHOICE_ONE:
             LogStr("SMC 6");
             iMPExtendedType = REMOTE_MODEM_DIAL;
             if (gConfig.comPort[gbDirectConnect] == IDX(SETUP_COM_PORT_UNCONFIGURED)) {
@@ -331,13 +364,13 @@ i32 game::SetupModemGame(void) {
             }
             LogStr("SMC a");
             break;
-        case 2:
+        case CHOICE_TWO:
             iMPExtendedType = REMOTE_MODEM_ANSWER;
             if (gConfig.comPort[gbDirectConnect] == IDX(SETUP_COM_PORT_UNCONFIGURED)
                 && !SetupComPort())
                 return 0;
             break;
-        case 3:
+        case CHOICE_THREE:
             gbDoModemConfig = true;
             break;
         case DIALOG_CANCEL:
@@ -367,20 +400,20 @@ i32 game::SetupMultiPlayerGame(void) {
 
     gbDirectConnect = false;
     switch (gpWindowManager->m_dialogResult) {
-        case 1:
+        case CHOICE_ONE:
             iMPBaseType = MULTIPLAYER_BASE_HOT_SEAT;
             if (!SetupHotSeatGame())
                 return 0;
             break;
-        case 2:
+        case CHOICE_TWO:
             iMPBaseType = MULTIPLAYER_BASE_NETWORK;
             if (!SetupNetworkGame2())
                 return 0;
             break;
-        case 4:
+        case CHOICE_FOUR:
             gbDirectConnect = true;
             goto setupModem;
-        case 3:
+        case CHOICE_THREE:
             gbDirectConnect = false;
         setupModem:
             iMPBaseType = MULTIPLAYER_BASE_MODEM;
@@ -421,7 +454,7 @@ i32 game::SetupGame(void) {
     xIsExpansionMap = 0;
     gbInCampaign = false;
     gbCampaignSideChoice = false;
-    iMPExtendedType = 10;
+    iMPExtendedType = REMOTE_TYPE_UNINITIALIZED;
     iMPBaseType = MULTIPLAYER_BASE_UNINITIALIZED;
     giNumHumanPlayers = 1;
     gbWaitForRemoteReceive = false;
@@ -436,17 +469,17 @@ i32 game::SetupGame(void) {
 
             case APP_MENU_RESTART_5:
             case APP_MENU_LOAD_2:
-                giNumHumanPlayers = 2;
+                giNumHumanPlayers = TWO_PLAYERS;
                 iMPBaseType = MULTIPLAYER_BASE_HOT_SEAT;
                 break;
             case APP_MENU_RESTART_6:
             case APP_MENU_LOAD_3:
-                giNumHumanPlayers = 3;
+                giNumHumanPlayers = THREE_PLAYERS;
                 iMPBaseType = MULTIPLAYER_BASE_HOT_SEAT;
                 break;
             case APP_MENU_RESTART_7:
             case APP_MENU_LOAD_4:
-                giNumHumanPlayers = 4;
+                giNumHumanPlayers = FOUR_PLAYERS;
                 iMPBaseType = MULTIPLAYER_BASE_HOT_SEAT;
                 break;
 
@@ -508,9 +541,9 @@ i32 game::SetupGame(void) {
         message.type = MESSAGE_WIDGET;
         message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
         message.payload.widget.data.value = WIDGET_COMMAND_DIMMED;
-        message.payload.widget.id = 1;
+        message.payload.widget.id = CHOICE_ONE;
         window->BroadcastMessage(message);
-        message.payload.widget.id = 2;
+        message.payload.widget.id = CHOICE_TWO;
         window->BroadcastMessage(message);
     }
 
@@ -518,10 +551,10 @@ i32 game::SetupGame(void) {
     delete window;
 
     switch (static_cast<i16>(gpWindowManager->m_dialogResult)) {
-        case 1:
+        case CHOICE_ONE:
             break;
 
-        case 2:
+        case CHOICE_TWO:
             if (giSetupGameType == OLD_MAIN_SETUP_LOAD) {
                 window = new heroWindow(WINDOW_X, WINDOW_Y, "x_loadcm.bin");
                 if (window == NULL)
@@ -530,10 +563,10 @@ i32 game::SetupGame(void) {
                 delete window;
 
                 switch (static_cast<i16>(gpWindowManager->m_dialogResult)) {
-                    case 1:
+                    case CHOICE_ONE:
                         gbInCampaign = true;
                         break;
-                    case 2:
+                    case CHOICE_TWO:
                         xIsPlayingExpansionCampaign = 1;
                         xIsExpansionMap = 1;
                         break;
@@ -549,14 +582,14 @@ i32 game::SetupGame(void) {
                 delete window;
 
                 switch (static_cast<i16>(gpWindowManager->m_dialogResult)) {
-                    case 1:
+                    case CHOICE_ONE:
                         gbInCampaign = true;
                         if (!SetupCampaignGame()) {
                             result = 0;
                             goto done;
                         }
                         break;
-                    case 2:
+                    case CHOICE_TWO:
                         xIsPlayingExpansionCampaign = 1;
                         xIsExpansionMap = 1;
                         xCampaign.InitNewCampaign(xCampaign.Choose());
@@ -568,7 +601,7 @@ i32 game::SetupGame(void) {
             }
             break;
 
-        case 3:
+        case CHOICE_THREE:
             if (!SetupMultiPlayerGame()) {
                 result = 0;
                 goto done;
@@ -597,7 +630,7 @@ done:
 
 VA(0x004123cc, 0x2aa)
 i32 game::PickLoadGame(void) {
-    char filePattern_4[12];
+    char filePattern_4[FILE_PATTERN_CAPACITY];
     i32 dialogResult_18;
     heroWindow* window_27;
     fileRequester* requester_11;
@@ -613,7 +646,7 @@ i32 game::PickLoadGame(void) {
         NormalDialog(
             "At least one player does not have the Heroes II Expansion set.  You will only be able "
             "to choose from original Heroes II games.",
-            1,
+            NORMAL_DIALOG_INFO,
             -1,
             -1,
             -1,
@@ -632,10 +665,10 @@ i32 game::PickLoadGame(void) {
         delete window_27;
 
         switch (static_cast<i16>(gpWindowManager->m_dialogResult)) {
-            case 1:
+            case CHOICE_ONE:
                 xIsExpansionMap = 0;
                 break;
-            case 2:
+            case CHOICE_TWO:
                 xIsExpansionMap = 1;
                 break;
             case DIALOG_CANCEL:
@@ -649,8 +682,8 @@ i32 game::PickLoadGame(void) {
     }
 
     requester_11 = new fileRequester(
-        200,
-        58,
+        FILE_REQUESTER_X,
+        FILE_REQUESTER_Y,
         FILE_REQUESTER_LOAD_GAME,
         filePattern_4,
         gcGamePath,
@@ -681,25 +714,8 @@ i32 SetupComPortHandler(struct tag_message& message) {
     if ((message.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) != 0
         && (message.payload.widget.command == WIDGET_COMMAND_SELECT
             || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT)) {
-        helpIndex = -1;
-        switch (message.payload.widget.id) {
-            case 1:
-                helpIndex = 0;
-                break;
-            case 2:
-                helpIndex = 1;
-                break;
-            case 3:
-                helpIndex = 2;
-                break;
-            case 4:
-                helpIndex = 3;
-                break;
-            case DIALOG_CANCEL:
-                helpIndex = 4;
-                break;
-        }
-        if (helpIndex >= 0) {
+        helpIndex = GetSetupHelpIndex(message.payload.widget.id, CHOICE_FOUR);
+        if (helpIndex >= FIRST_HELP) {
             if (gbDirectConnect != 0)
                 NormalDialog(
                     gSetupDCComPortHelp[helpIndex],
@@ -738,25 +754,8 @@ i32 SetupBaudHandler(struct tag_message& message) {
     if ((message.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) != 0
         && (message.payload.widget.command == WIDGET_COMMAND_SELECT
             || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT)) {
-        helpIndex = -1;
-        switch (message.payload.widget.id) {
-            case 1:
-                helpIndex = 0;
-                break;
-            case 2:
-                helpIndex = 1;
-                break;
-            case 3:
-                helpIndex = 2;
-                break;
-            case 4:
-                helpIndex = 3;
-                break;
-            case DIALOG_CANCEL:
-                helpIndex = 4;
-                break;
-        }
-        if (helpIndex >= 0) {
+        helpIndex = GetSetupHelpIndex(message.payload.widget.id, CHOICE_FOUR);
+        if (helpIndex >= FIRST_HELP) {
             if (gbDirectConnect != 0)
                 NormalDialog(
                     gSetupDCBaudHelp[helpIndex],
@@ -795,28 +794,8 @@ i32 SetupHotSeatGameHandler(struct tag_message& message) {
     if ((message.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) != 0
         && (message.payload.widget.command == WIDGET_COMMAND_SELECT
             || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT)) {
-        helpIndex = -1;
-        switch (message.payload.widget.id) {
-            case 1:
-                helpIndex = 0;
-                break;
-            case 2:
-                helpIndex = 1;
-                break;
-            case 3:
-                helpIndex = 2;
-                break;
-            case 4:
-                helpIndex = 3;
-                break;
-            case 5:
-                helpIndex = 4;
-                break;
-            case DIALOG_CANCEL:
-                helpIndex = 5;
-                break;
-        }
-        if (helpIndex >= 0)
+        helpIndex = GetSetupHelpIndex(message.payload.widget.id, CHOICE_FIVE);
+        if (helpIndex >= FIRST_HELP)
             NormalDialog(
                 gSetupHotSeatGameHelp[helpIndex],
                 HELP_DIALOG,
@@ -840,22 +819,8 @@ i32 SetupModemGameHandler(struct tag_message& message) {
     if ((message.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) != 0
         && (message.payload.widget.command == WIDGET_COMMAND_SELECT
             || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT)) {
-        helpIndex = -1;
-        switch (message.payload.widget.id) {
-            case 1:
-                helpIndex = 0;
-                break;
-            case 2:
-                helpIndex = 1;
-                break;
-            case 3:
-                helpIndex = 2;
-                break;
-            case DIALOG_CANCEL:
-                helpIndex = 3;
-                break;
-        }
-        if (helpIndex >= 0) {
+        helpIndex = GetSetupHelpIndex(message.payload.widget.id, CHOICE_THREE);
+        if (helpIndex >= FIRST_HELP) {
             if (gbDirectConnect != 0)
                 NormalDialog(
                     gSetupDCGameHelp[helpIndex],
@@ -894,25 +859,8 @@ i32 SetupMultiPlayerGameHandler(struct tag_message& message) {
     if ((message.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) != 0
         && (message.payload.widget.command == WIDGET_COMMAND_SELECT
             || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT)) {
-        helpIndex = -1;
-        switch (message.payload.widget.id) {
-            case 1:
-                helpIndex = 0;
-                break;
-            case 2:
-                helpIndex = 1;
-                break;
-            case 3:
-                helpIndex = 2;
-                break;
-            case 4:
-                helpIndex = 3;
-                break;
-            case DIALOG_CANCEL:
-                helpIndex = 4;
-                break;
-        }
-        if (helpIndex >= 0)
+        helpIndex = GetSetupHelpIndex(message.payload.widget.id, CHOICE_FOUR);
+        if (helpIndex >= FIRST_HELP)
             NormalDialog(
                 gSetupMultiPlayerGameHelp[helpIndex],
                 HELP_DIALOG,
@@ -936,19 +884,8 @@ i32 SetupNetworkGameHandler(struct tag_message& message) {
     if ((message.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) != 0
         && (message.payload.widget.command == WIDGET_COMMAND_SELECT
             || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT)) {
-        helpIndex = -1;
-        switch (message.payload.widget.id) {
-            case 1:
-                helpIndex = 0;
-                break;
-            case 2:
-                helpIndex = 1;
-                break;
-            case DIALOG_CANCEL:
-                helpIndex = 2;
-                break;
-        }
-        if (helpIndex >= 0)
+        helpIndex = GetSetupHelpIndex(message.payload.widget.id, CHOICE_TWO);
+        if (helpIndex >= FIRST_HELP)
             NormalDialog(
                 gSetupNetworkGameHelp[helpIndex],
                 HELP_DIALOG,
@@ -972,22 +909,8 @@ i32 SetupNetworkGame2Handler(struct tag_message& message) {
     if ((message.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) != 0
         && (message.payload.widget.command == WIDGET_COMMAND_SELECT
             || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT)) {
-        helpIndex = -1;
-        switch (message.payload.widget.id) {
-            case 1:
-                helpIndex = 0;
-                break;
-            case 2:
-                helpIndex = 1;
-                break;
-            case 3:
-                helpIndex = 2;
-                break;
-            case DIALOG_CANCEL:
-                helpIndex = 3;
-                break;
-        }
-        if (helpIndex >= 0)
+        helpIndex = GetSetupHelpIndex(message.payload.widget.id, CHOICE_THREE);
+        if (helpIndex >= FIRST_HELP)
             NormalDialog(
                 gSetupNetworkGame2Help[helpIndex],
                 HELP_DIALOG,
@@ -1011,22 +934,8 @@ i32 SetupGameHandler(struct tag_message& message) {
     if ((message.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) != 0) {
         if (message.payload.widget.command == WIDGET_COMMAND_SELECT
             || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT) {
-            helpIndex = -1;
-            switch (message.payload.widget.id) {
-                case 1:
-                    helpIndex = 0;
-                    break;
-                case 2:
-                    helpIndex = 1;
-                    break;
-                case 3:
-                    helpIndex = 2;
-                    break;
-                case DIALOG_CANCEL:
-                    helpIndex = 3;
-                    break;
-            }
-            if (helpIndex >= 0)
+            helpIndex = GetSetupHelpIndex(message.payload.widget.id, CHOICE_THREE);
+            if (helpIndex >= FIRST_HELP)
                 NormalDialog(
                     gSetupGameHelp[helpIndex],
                     HELP_DIALOG,
@@ -1044,9 +953,9 @@ i32 SetupGameHandler(struct tag_message& message) {
         switch (message.payload.widget.command) {
             case WIDGET_COMMAND_DESELECT:
                 switch (message.payload.widget.id) {
-                    case 1:
-                    case 2:
-                    case 3:
+                    case CHOICE_ONE:
+                    case CHOICE_TWO:
+                    case CHOICE_THREE:
                         break;
                 }
         }
@@ -1061,19 +970,8 @@ i32 ExpNewCampaignHandler(struct tag_message& message) {
     if ((message.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) != 0
         && (message.payload.widget.command == WIDGET_COMMAND_SELECT
             || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT)) {
-        helpIndex = -1;
-        switch (message.payload.widget.id) {
-            case 1:
-                helpIndex = 0;
-                break;
-            case 2:
-                helpIndex = 1;
-                break;
-            case DIALOG_CANCEL:
-                helpIndex = 2;
-                break;
-        }
-        if (helpIndex >= 0)
+        helpIndex = GetSetupHelpIndex(message.payload.widget.id, CHOICE_TWO);
+        if (helpIndex >= FIRST_HELP)
             NormalDialog(
                 xSetupCampaignGameHelp[helpIndex],
                 HELP_DIALOG,
@@ -1097,19 +995,8 @@ i32 ExpLoadCampaignHandler(struct tag_message& message) {
     if ((message.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) != 0
         && (message.payload.widget.command == WIDGET_COMMAND_SELECT
             || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT)) {
-        helpIndex = -1;
-        switch (message.payload.widget.id) {
-            case 1:
-                helpIndex = 0;
-                break;
-            case 2:
-                helpIndex = 1;
-                break;
-            case DIALOG_CANCEL:
-                helpIndex = 2;
-                break;
-        }
-        if (helpIndex >= 0)
+        helpIndex = GetSetupHelpIndex(message.payload.widget.id, CHOICE_TWO);
+        if (helpIndex >= FIRST_HELP)
             NormalDialog(
                 xSetupCampaignGameHelp[helpIndex],
                 HELP_DIALOG,
@@ -1133,19 +1020,8 @@ i32 ExpStdGameHandler(struct tag_message& message) {
     if ((message.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) != 0
         && (message.payload.widget.command == WIDGET_COMMAND_SELECT
             || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT)) {
-        helpIndex = -1;
-        switch (message.payload.widget.id) {
-            case 1:
-                helpIndex = 0;
-                break;
-            case 2:
-                helpIndex = 1;
-                break;
-            case DIALOG_CANCEL:
-                helpIndex = 2;
-                break;
-        }
-        if (helpIndex >= 0)
+        helpIndex = GetSetupHelpIndex(message.payload.widget.id, CHOICE_TWO);
+        if (helpIndex >= FIRST_HELP)
             NormalDialog(
                 xSetupStandardGameHelp[helpIndex],
                 HELP_DIALOG,
@@ -1170,7 +1046,7 @@ i32 BaseSetupHandler(struct tag_message& message) {
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
             case WIDGET_COMMAND_DESELECT:
-                if ((message.payload.widget.id > 0
+                if ((message.payload.widget.id >= DIALOG_RESULT_MIN
                      && message.payload.widget.id <= DIALOG_RESULT_MAX)
                     || message.payload.widget.id == DIALOG_CANCEL)
                     handled = 1;
