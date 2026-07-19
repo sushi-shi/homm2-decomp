@@ -213,7 +213,7 @@ src/SOURCE/SMACKMGR.cpp	pending
 src/SOURCE/SPELLAI.cpp	reviewed	Private combat-grid stepping and mirror-value constants are named; shared monster abilities, side counts, chain-lightning limits, combat directions, and fireblast topology are reused. Remaining findings are the two duration-modifier data payloads.
 src/SOURCE/SPELLS.cpp	pending
 src/SOURCE/STRIP.cpp	reviewed	Private bank-box storage/widget values plus shared strip layout, frames, resource, and slot domains cover policy literals; remaining zeros and ones are drawing origins/frames, loop initialization, booleans, and widget state. Redundant OD_STEER use was removed from the border id expression.
-src/SOURCE/SWAPMGR.cpp	pending
+src/SOURCE/SWAPMGR.cpp	reviewed	Private swap-window control ranges and constants are named. Inline helpers normalize interior control IDs to their range cases and broadcast the contiguous adventure controls, removing repeated numeric offsets; no actionable literals remain.
 src/SOURCE/TOWN.cpp	reviewed	Nontrivial decisions use named domains; remaining zero/one uses are initialization, indexing, arithmetic, or boolean transport.
 src/SOURCE/TOWNMGR.cpp	pending
 src/SOURCE/VIEW.cpp	pending
