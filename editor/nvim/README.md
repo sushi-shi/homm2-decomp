@@ -83,7 +83,10 @@ the current unit's `before → after` deltas for the functions that moved
 a few seconds. Extra args pass through to the build (forwarded to `ninja`), e.g.
 `:Homm2Build build/objdiff/base/SOURCE/GAME.obj` to limit it to one TU.
 
-> **Launch nvim from `nix develop .#build` for fast builds.** The build then runs
+> **Launch nvim from `nix develop .#build` for fast builds.** You may enter from
+> any directory inside the checkout. From elsewhere, use `HOMM2_DIR=/path/to/homm2
+> nix develop /path/to/homm2#build`; this gives the shell and editor an
+> unambiguous worktree root while preserving your current directory. The build then runs
 > `homm2 build` **directly** (the MSVC 4.2 + wine toolchain is already on the
 > env). Launched from the plain `nix develop` shell it still works, but each build
 > is wrapped in `nix develop .#build`, which adds shell-setup overhead *per
@@ -126,9 +129,8 @@ it.
 
 Off by default. When on, **saving a source file** under `src/` or `include/`
 (`*.c`/`*.cpp`/`*.cc`/`*.cxx`/`*.h`/`*.hpp`/`*.hh`) runs `clang-format` on **just
-that file** in place before it hits disk — using the root `.clang-format` (the
-same config the repo's `.githooks` pre-commit auto-format uses, so the same
-whitespace-only, matching-neutral result), scoped to the file you're editing.
+that file** in place before it hits disk — using the root `.clang-format` and
+the repository's per-enum assignment aligner, scoped to the file you're editing.
 It's a no-op on already-formatted files (the buffer and its undo history are left
 untouched), skips `src/_external/` and anything outside `src/`/`include/`, and
 preserves your cursor/scroll. Enable per session with `:Homm2 autoformat`, or by
@@ -142,7 +144,9 @@ across restarts; a remembered toggle wins over the `setup` default.
 ## Requirements
 
 `objdiff-cli` on `PATH` — launch nvim from the project dev shell (`nix
-develop`). A populated `build/` (run `homm2 build` once if it's a fresh
+develop`). The shell discovers the checkout from any subdirectory; from outside
+it, set `HOMM2_DIR` while referencing the flake by path, as shown above.
+A populated `build/` (run `homm2 build` once if it's a fresh
 checkout). The build command additionally needs the `.#build` shell (MSVC 4.2 +
 wine), which it enters itself.
 
@@ -156,7 +160,8 @@ auto-loads this plugin — when you `nix develop` (either shell) you'll see:
 ```
 
 The wrap is a small script on `PATH` (`build/nvim-shim/nvim`) that execs your own
-nvim with `--cmd "set rtp^=…/editor/nvim"` (so your config and plugins are
+nvim and prepends the checkout's `editor/nvim` through an environment-backed Lua
+command (so paths containing spaces are safe, your config and plugins are
 untouched, and plain `nvim` outside the shell is unchanged). Defined in
 `flake.nix` (`nvimShimHook`).
 
@@ -179,5 +184,7 @@ require("homm2").setup({
 })
 ```
 
-Outside a homm2 checkout (no `config/units.toml` above the buffer) the plugin
-stays inert.
+The plugin resolves the checkout from the opened file's absolute path, not
+Neovim's current directory. Thus `nvim /path/to/homm2/flake.nix` works from any
+folder. For unnamed buffers it falls back to a validated `$HOMM2_DIR`; outside a
+homm2 checkout it stays inert.

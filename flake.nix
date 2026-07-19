@@ -68,13 +68,44 @@
         exec python3 -m homm2 "$@"
       '';
 
+      # Resolve the checkout independently of the directory from which the shell
+      # command was invoked.  Nix does not expose the original local-flake path to
+      # shellHook, so callers outside the checkout provide HOMM2_DIR explicitly;
+      # callers anywhere inside a worktree are discovered through Git.
+      projectRootHook = ''
+        _homm2_root="$(git -C "$PWD" rev-parse --show-toplevel 2>/dev/null || true)"
+        if [ ! -f "$_homm2_root/config/units.toml" ]; then
+          _homm2_root="''${HOMM2_DIR:-}"
+        fi
+        if [ ! -f "$_homm2_root/config/units.toml" ]; then
+          echo "[homm2] checkout   : NOT FOUND" >&2
+          echo "[homm2] enter with : HOMM2_DIR=/path/to/homm2 nix develop /path/to/homm2#build" >&2
+          return 1 2>/dev/null || exit 1
+        fi
+        export HOMM2_DIR="$(cd "$_homm2_root" && pwd -P)"
+        unset _homm2_root
+      '';
+
       # nvim shim: auto-load editor/nvim (:Homm2) without touching the user's config.
       nvimShimHook = ''
-        if [ -z "''${HOMM2_NVIM_WRAPPED:-}" ] && command -v nvim >/dev/null 2>&1 && [ -d "$HOMM2_DIR/editor/nvim" ]; then
-          _real="$(command -v nvim)"; _bin="$HOMM2_DIR/build/nvim-shim"; mkdir -p "$_bin"
-          printf '#!/bin/sh\nexec "%s" --cmd "set rtp^=%s/editor/nvim" "$@"\n' "$_real" "$HOMM2_DIR" > "$_bin/nvim"
-          chmod +x "$_bin/nvim"; export PATH="$_bin:$PATH"; export HOMM2_NVIM_WRAPPED=1
-          echo "[homm2] nvim       : WRAPPED -> auto-loads editor/nvim (:Homm2)." >&2
+        if command -v nvim >/dev/null 2>&1 && [ -d "$HOMM2_DIR/editor/nvim" ]; then
+          if [ -z "''${HOMM2_NVIM_REAL:-}" ] || [ ! -x "$HOMM2_NVIM_REAL" ]; then
+            export HOMM2_NVIM_REAL="$(command -v nvim)"
+          fi
+          export HOMM2_NVIM_RTP="$HOMM2_DIR/editor/nvim"
+          _homm2_nvim_bin="$HOMM2_DIR/build/nvim-shim"
+          if mkdir -p "$_homm2_nvim_bin" \
+              && printf '%s\n' '#!/bin/sh' \
+                "exec \"\$HOMM2_NVIM_REAL\" --cmd 'lua vim.opt.runtimepath:prepend(vim.env.HOMM2_NVIM_RTP)' \"\$@\"" \
+                > "$_homm2_nvim_bin/nvim" \
+              && chmod +x "$_homm2_nvim_bin/nvim"; then
+            export PATH="$_homm2_nvim_bin:$PATH"
+            export HOMM2_NVIM_WRAPPED="$HOMM2_DIR"
+            echo "[homm2] nvim       : WRAPPED -> auto-loads editor/nvim (:Homm2)." >&2
+          else
+            echo "[homm2] nvim       : wrapper setup failed" >&2
+          fi
+          unset _homm2_nvim_bin
         fi
       '';
 
@@ -85,7 +116,7 @@
       # known names). Ghidra 12.0.4 + pyghidra + jdk21 pin-match gruntz (same nixpkgs
       # rev) so they're store cache hits, not a rebuild.
       commonTools = [ homm2-cli rust objdiff objdiff-cli vostok-delinker ] ++ (with pkgs; [
-        (python3.withPackages (ps: [ ps.pyghidra ps.libclang ]))  # pyghidra (headless Ghidra) + libclang (clang.cindex, for scripts/match_variants.py)
+        (python3.withPackages (ps: [ ps.pyghidra ps.libclang ])) # Ghidra + source DATA parsing
         ghidra jdk21                      # Ghidra 12.0.4 headless + JRE (homm2 sema xref)
         ninja
         llvm                              # llvm-pdbutil (synth_pdb yaml2pdb)
@@ -108,15 +139,11 @@
           name = "homm2-decomp";
           packages = commonTools;
           shellHook = ''
-            export HOMM2_DIR="$PWD"
+            ${projectRootHook}
             export HOMM2_EXE="$HOMM2_DIR/build/orig/HEROES2W.EXE"
             [ -f "$HOMM2_EXE" ] || echo "[homm2] target EXE : MISSING - copy your HEROES2W.EXE into build/orig/ (gitignored, never committed)" >&2
             export HOMM2_CLANG="${pkgs.llvmPackages.clang-unwrapped}/bin/clang"
             export PYTHONPATH="$HOMM2_DIR/scripts''${PYTHONPATH:+:$PYTHONPATH}"
-            if [ "$(git -C "$HOMM2_DIR" config --local core.hooksPath 2>/dev/null)" != ".githooks" ]; then
-              git -C "$HOMM2_DIR" config --local core.hooksPath .githooks 2>/dev/null \
-                && echo "[homm2] hooks      : pre-commit auto-format on (.githooks)" >&2
-            fi
             ${ghidraEnvHook}
             echo "[homm2] target EXE : $HOMM2_EXE (minimal CodeView NB09 - public names/RVAs only)" >&2
             echo "[homm2] tools      : vostok-delinker, objdiff(-cli), llvm-pdbutil, clang(d), ghidra" >&2
@@ -133,7 +160,7 @@
           name = "homm2-build";
           packages = commonTools ++ [ pkgs.wineWow64Packages.staging ];
           shellHook = ''
-            export HOMM2_DIR="$PWD"
+            ${projectRootHook}
             export HOMM2_EXE="$HOMM2_DIR/build/orig/HEROES2W.EXE"
             [ -f "$HOMM2_EXE" ] || echo "[homm2] target EXE : MISSING - copy your HEROES2W.EXE into build/orig/ (gitignored, never committed)" >&2
             export HOMM2_CLANG="${pkgs.llvmPackages.clang-unwrapped}/bin/clang"
@@ -147,7 +174,6 @@
             export WINEDEBUG="fixme-all,err-kerberos"
             export WINEDLLOVERRIDES="mscoree,mshtml="
             case "$-" in *i*) trap 'wineserver -k >/dev/null 2>&1 || true' EXIT ;; esac
-            git -C "$HOMM2_DIR" config --local core.hooksPath .githooks 2>/dev/null || true
             echo "[homm2] MSVC 4.2   : $MSVC_DIR/bin/CL.EXE (under wine)" >&2
             echo "[homm2] final LINK : ''${HOMM2_LINK_EXE:-$MSVC_DIR/bin/LINK.EXE}" >&2
             if [ ! -f "$MSVC_DIR/bin/CL.EXE" ] && [ ! -f "$MSVC_DIR/bin/cl.exe" ]; then
