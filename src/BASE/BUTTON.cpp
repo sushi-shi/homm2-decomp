@@ -79,9 +79,11 @@ button::button(
     m_hotkey = hotkey;
 }
 
+#define RESOURCE_NAME_CAPACITY 16
+
 VA(0x004dd5b0, 0xeb)
 void button::Read(void) {
-    char iconName[16];
+    char iconName[RESOURCE_NAME_CAPACITY];
     m_x = gpResourceManager->ReadWord();
     m_y = gpResourceManager->ReadWord();
     m_width = gpResourceManager->ReadWord();
@@ -99,10 +101,18 @@ void button::Read(void) {
     m_kind = gpResourceManager->ReadWord();
 }
 
+#undef RESOURCE_NAME_CAPACITY
+
 VA(0x004dd6a0, 0x21)
 inline button::~button() {
     gpResourceManager->Dispose(m_icon);
 }
+
+// Preserve the original statement stream; an inline function perturbs VC4.2 CSE in Main.
+#define SET_WIDGET_MESSAGE(messageValue, commandValue, idValue)                                  \
+    messageValue.payload.widget.command = commandValue;                                          \
+    messageValue.type = MESSAGE_WIDGET;                                                          \
+    messageValue.payload.widget.id = idValue
 
 // @semantic: first non-relocation byte divergence is +0x47: candidate loads the vptr after storing m_flags.
 VA(0x004dd6d0, 0x595)
@@ -110,23 +120,21 @@ i32 button::Main(tag_message& msg) {
     if (DecodeWidgetKind(m_kind) == WIDGET_KIND_AUTO_REPEAT && (m_flags & WIDGET_FLAG_SELECTED) != 0
         && KBTickCount() > glTimers[GLOBAL_BUTTON_REPEAT_TIMER_SLOT]) {
         if ((m_flags & WIDGET_FLAG_SELECTED) == 0)
-            return 0;
+            return WIDGET_DISPATCH_CONTINUE;
         m_flags &= ~WIDGET_FLAG_SELECTED;
         Draw();
         gpWindowManager
             ->UpdateScreenRegion(m_x + m_owner->m_posX, m_y + m_owner->m_posY, m_width, m_height);
-        msg.payload.widget.command = WIDGET_COMMAND_DESELECT;
-        msg.type = MESSAGE_WIDGET;
-        msg.payload.widget.id = m_id;
+        SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_DESELECT, m_id);
         msg.payload.widget.parameter = iLeftRightSave;
         iLeftRightSave = 0;
-        return 2;
+        return WIDGET_DISPATCH_FORWARD;
     }
 
     if ((m_flags & WIDGET_FLAG_ENABLED) == 0) {
         if (msg.type == MESSAGE_WIDGET)
             return widget::Main(msg);
-        return 0;
+        return WIDGET_DISPATCH_CONTINUE;
     }
 
     i32 eventType = msg.type;
@@ -136,7 +144,7 @@ i32 button::Main(tag_message& msg) {
                 && (m_flags & WIDGET_FLAG_DIMMED) == 0) {
                 if (m_hotkey != NO_HOTKEY && m_hotkey == msg.payload.keyboard.keyCode)
                     return Select(msg);
-                return 0;
+                return WIDGET_DISPATCH_CONTINUE;
             }
             break;
 
@@ -144,10 +152,10 @@ i32 button::Main(tag_message& msg) {
             if ((m_flags & WIDGET_FLAG_ENABLED) != 0 && (m_flags & WIDGET_FLAG_DRAW) != 0
                 && (m_flags & WIDGET_FLAG_DIMMED) == 0) {
                 if (m_hotkey == NO_HOTKEY || m_hotkey != msg.payload.keyboard.keyCode)
-                    return 0;
+                    return WIDGET_DISPATCH_CONTINUE;
                 i16 keyFlags = m_flags;
                 if ((keyFlags & WIDGET_FLAG_SELECTED) == 0)
-                    return 0;
+                    return WIDGET_DISPATCH_CONTINUE;
                 keyFlags &= ~WIDGET_FLAG_SELECTED;
                 m_flags = keyFlags;
                 Draw();
@@ -157,12 +165,10 @@ i32 button::Main(tag_message& msg) {
                     m_width,
                     m_height
                 );
-                msg.payload.widget.command = WIDGET_COMMAND_DESELECT;
-                msg.type = MESSAGE_WIDGET;
-                msg.payload.widget.id = m_id;
+                SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_DESELECT, m_id);
                 msg.payload.widget.parameter = iLeftRightSave;
                 iLeftRightSave = 0;
-                return 2;
+                return WIDGET_DISPATCH_FORWARD;
             }
             break;
 
@@ -178,13 +184,11 @@ i32 button::Main(tag_message& msg) {
             if (eventType == MESSAGE_RIGHT_BUTTON_DOWN) {
                 if (m_x <= relativeX && m_y <= relativeY && relativeX < m_x + m_width
                     && relativeY < m_y + m_height) {
-                    msg.payload.widget.command = WIDGET_COMMAND_ALTERNATE_SELECT;
-                    msg.type = MESSAGE_WIDGET;
-                    msg.payload.widget.id = m_id;
+                    SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_ALTERNATE_SELECT, m_id);
                     msg.payload.widget.parameter = MESSAGE_MODIFIER_RIGHT_BUTTON;
-                    return 2;
+                    return WIDGET_DISPATCH_FORWARD;
                 }
-                return 0;
+                return WIDGET_DISPATCH_CONTINUE;
             }
 
             if ((m_flags & WIDGET_FLAG_DIMMED) == 0 && m_x <= relativeX && m_y <= relativeY
@@ -211,9 +215,7 @@ i32 button::Main(tag_message& msg) {
                                     m_width,
                                     m_height
                                 );
-                                msg.payload.widget.command = WIDGET_COMMAND_DESELECT;
-                                msg.type = MESSAGE_WIDGET;
-                                msg.payload.widget.id = m_id;
+                                SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_DESELECT, m_id);
                                 msg.payload.widget.parameter = iLeftRightSave;
                                 iLeftRightSave = 0;
                             }
@@ -235,16 +237,14 @@ i32 button::Main(tag_message& msg) {
                         m_width,
                         m_height
                     );
-                    msg.payload.widget.command = WIDGET_COMMAND_DESELECT;
-                    msg.type = MESSAGE_WIDGET;
-                    msg.payload.widget.id = m_id;
+                    SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_DESELECT, m_id);
                     msg.payload.widget.parameter = iLeftRightSave;
                     iLeftRightSave = 0;
-                    return 2;
+                    return WIDGET_DISPATCH_FORWARD;
                 }
-                return 1;
+                return WIDGET_DISPATCH_CONSUME;
             }
-            return 0;
+            return WIDGET_DISPATCH_CONTINUE;
         }
 
         case MESSAGE_LEFT_BUTTON_UP: {
@@ -260,12 +260,10 @@ i32 button::Main(tag_message& msg) {
                     m_width,
                     m_height
                 );
-                msg.payload.widget.command = WIDGET_COMMAND_DESELECT;
-                msg.type = MESSAGE_WIDGET;
-                msg.payload.widget.id = m_id;
+                SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_DESELECT, m_id);
                 msg.payload.widget.parameter = iLeftRightSave;
                 iLeftRightSave = 0;
-                return 2;
+                return WIDGET_DISPATCH_FORWARD;
             }
             goto normalEvent;
         }
@@ -277,7 +275,7 @@ i32 button::Main(tag_message& msg) {
                     gpResourceManager->Dispose(m_icon);
                     m_icon = gpResourceManager->GetIcon(msg.payload.widget.data.value);
                 }
-                return 0;
+                return WIDGET_DISPATCH_CONTINUE;
             }
             goto normalEvent;
 
@@ -307,7 +305,7 @@ i16 button::Select(struct tag_message& msg) {
     }
     glTimers[GLOBAL_BUTTON_REPEAT_TIMER_SLOT] = KBTickCount() + REPEAT_DELAY_TICKS;
     iLeftRightSave = msg.payload.widget.parameter & MESSAGE_MODIFIER_BUTTON_MASK;
-    return 2;
+    return WIDGET_DISPATCH_FORWARD;
 }
 
 // @semantic: only residual is scheduling at +0x19/+0x1f: retail loads the vptr, stores m_flags, then sets ECX.
@@ -315,19 +313,19 @@ VA(0x004ddd10, 0x83)
 i16 button::Deselect(struct tag_message& msg) {
     i16 flags = m_flags;
     if ((flags & WIDGET_FLAG_SELECTED) == 0)
-        return 0;
+        return WIDGET_DISPATCH_CONTINUE;
     flags &= ~WIDGET_FLAG_SELECTED;
     m_flags = flags;
     Draw();
     gpWindowManager
         ->UpdateScreenRegion(m_x + m_owner->m_posX, m_y + m_owner->m_posY, m_width, m_height);
-    msg.payload.widget.command = WIDGET_COMMAND_DESELECT;
-    msg.type = MESSAGE_WIDGET;
-    msg.payload.widget.id = m_id;
+    SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_DESELECT, m_id);
     msg.payload.widget.parameter = iLeftRightSave;
     iLeftRightSave = 0;
-    return 2;
+    return WIDGET_DISPATCH_FORWARD;
 }
+
+#undef SET_WIDGET_MESSAGE
 
 VA(0x004ddda0, 0x55)
 void button::Draw(void) {
