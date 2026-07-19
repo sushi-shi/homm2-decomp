@@ -3,6 +3,7 @@
 
 #include <va.h>
 #include <BASE/message.h>
+#include <BASE/WINMGR.h>
 #include "baseManager.h"
 
 class heroWindow;
@@ -11,8 +12,14 @@ class bitmap;
 struct tag_message;
 
 H2_ENUM_BEGIN(HeroWindowManagerConstant)
-    HERO_WINDOW_NO_HOVER_WIDGET = -1
+    HERO_WINDOW_NO_HOVER_WIDGET  = -1,
+    HERO_WINDOW_NO_DIALOG_RESULT = -1
 H2_ENUM_END(HeroWindowManagerConstant)
+
+H2_ENUM_CLASS_BEGIN(WindowFadeMode)
+    FADE_IN  = 0,
+    FADE_OUT = 1
+H2_ENUM_CLASS_END(WindowFadeMode)
 
 #pragma pack(push, 1)
 class heroWindowManager : public baseManager {
@@ -54,7 +61,7 @@ extern i32 iCycle1Count;
 extern i32 iCycle2Count;
 extern i32 iCycle3Count;
 extern i32 iDialogNestCount;
-extern i8 gCyclePal[0x60];
+extern i8 gCyclePal[WINDOW_CYCLE_PALETTE_BYTES];
 extern i16 memSelector;
 
 #endif
