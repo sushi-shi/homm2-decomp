@@ -222,7 +222,7 @@ src/SOURCE/Wsnetwin.cpp	reviewed	Private constants name source-line addends, ent
 src/SOURCE/X_CAMPGN.cpp	pending
 src/SOURCE/X_GLOBAL.cpp	reviewed	The TU contains reviewed global data definitions only. Expansion text/name tables and alignment/resource-cost initializers are retail payload; the shrine cost row follows the canonical resource extent and its numeric entries remain data rather than policy constants.
 src/SOURCE/comwin.cpp	reviewed	Private enums name retained source-line bases, communications error text slots, baud values, and the two-word ReadFile result backing storage; shared baud selectors and serial byte width live in comwin.h.
-src/SOURCE/dpnetwin.cpp	pending
+src/SOURCE/dpnetwin.cpp	reviewed	Private DirectPlay wait-state, host-accept, receive-storage, status-text, and retained source-line offset domains are named; logging, dialog, error-buffer, and SDK timeout constants are reused. Startup messages use the packed shared record and all retained source-line call relocations match retail. No actionable literals remain.
 src/SOURCE/kbwin.cpp	reviewed	LogInt uses the shared unused-field sentinel; the timer polling threshold is private, menu resolution checks use the public width domain, and exported strings use their declared capacities.
 src/SOURCE/netwin.cpp	reviewed	Private enums model NetBIOS reset-field indices/capacities and retained source-line bases/offsets; reset capacities no longer borrow unrelated retry/result constants with coincident values.
 src/SOURCE/tradpost.cpp	reviewed	Widget construction, offer-side iteration, redraw geometry, and resource selector cases use named domains; retail exchange and rounding values remain payloads.
