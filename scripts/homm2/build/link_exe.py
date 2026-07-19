@@ -22,9 +22,13 @@ from pathlib import Path
 from homm2.build.annotated_data import source_definitions as annotated_source_definitions
 from homm2.build.extract_resources import read_pe_resources
 from homm2.build.build_libcmt_gfy import (
-    build_library as build_gfy_libcmt, expected_retail_literals,
+    archive_entries, build_library as build_gfy_libcmt, expected_retail_literals,
 )
 from homm2.build.gen_vendor_imports import LINK300_FORCED_VENDOR_IMPORTS
+from homm2.build.retopologize_data import (
+    RetailDataTopology,
+    rewrite_coff_data_topology,
+)
 
 # Retail resolved CRT members from the VC 4.0 LIB tree of the linker install;
 # its testfdiv.obj exposes the retail literal identities missing from VC 4.2.
@@ -35,6 +39,9 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 REPO = next((p for p in SCRIPT_DIR.parents if (p / "flake.nix").exists()), SCRIPT_DIR)
 RETAIL_EXE = REPO / "build/orig/HEROES2W.EXE"
 REQUIRED_INITIALIZED_STORAGE = REPO / "config/required_initialized_storage.tsv"
+DATA_MANIFEST = REPO / "build/gen/delink_data_manifest.tsv"
+DATA_SECTIONS = REPO / "build/gen/delink_data_sections.tsv"
+DATA_CONTRIBUTIONS = REPO / "build/gen/delink_contributions.tsv"
 IMAGE_BASE = 0x400000
 PE32_MAGIC = 0x10B
 COFF_SECTION_HEADER_SIZE = 40
@@ -136,16 +143,22 @@ def strip_coff_export_directives(source, destination):
     return changed
 
 
-def final_link_objects(objects, output_root):
-    """Return disposable COFF copies with source-only exports removed."""
+def final_link_objects(objects, units, output_root, topology):
+    """Return disposable COFF copies with retail writable topology."""
     root = Path(output_root)
     result = []
-    changed = 0
-    for index, source in enumerate(map(Path, objects)):
+    stripped = 0
+    rebuilt = 0
+    if len(objects) != len(units):
+        raise ValueError("final-link object/unit count differs")
+    for index, (source, unit) in enumerate(zip(map(Path, objects), units)):
         destination = root / ("%03d" % index) / source.name
-        changed += strip_coff_export_directives(source, destination)
+        stripped += strip_coff_export_directives(source, destination)
+        layouts = topology.layouts_for(unit)
+        if layouts:
+            rebuilt += rewrite_coff_data_topology(destination, destination, layouts)
         result.append(destination.resolve())
-    return result, changed
+    return result, stripped, rebuilt
 
 
 def write_module_definition(path):
@@ -327,6 +340,128 @@ def read_nb09_module_contributions(path, executable_only=True):
             stem = stem[:-4]
         modules[stem.lower()].append({"module": name, "contributions": contributions})
     return modules
+
+
+def build_retail_runtime_data_library(library, destination, retail_exe=RETAIL_EXE):
+    """Give pinned CRT writable sections their retail NB09 order."""
+    library = Path(library)
+    payload = library.read_bytes()
+    if hashlib.sha256(payload).hexdigest() != PINNED_VC40_LIBCMT_SHA256:
+        raise ValueError("runtime ordering requires the pinned VC 4.0 LIBCMT.LIB")
+    members = {}
+    for entry in archive_entries(payload):
+        basename = entry.name.replace("\\", "/").rsplit("/", 1)[-1].lower()
+        if not basename.endswith(".obj"):
+            continue
+        if basename in members:
+            raise ValueError("duplicate VC 4.0 LIBCMT member: %s" % basename)
+        members[basename] = entry
+
+    modules = read_nb09_module_contributions(retail_exe, executable_only=False)
+    runtime_rows = {}
+    for rows in modules.values():
+        for row in rows:
+            normalized = row["module"].replace("\\", "/")
+            if "build/intel/mt_obj/" not in normalized.lower():
+                continue
+            name = normalized.rsplit("/", 1)[-1].lower()
+            if name in runtime_rows:
+                raise ValueError("retail NB09 names a runtime member more than once")
+            runtime_rows[name] = row
+    missing = [name for name in runtime_rows if name not in members]
+    if missing:
+        raise ValueError("retail runtime members missing from VC 4.0 LIBCMT: %s" %
+                         ", ".join(missing))
+    retail = read_pe(retail_exe)
+    raw_size = retail["sections"][".data"]["raw_size"]
+
+    positioned = sorted(
+        (contribution["offset"], name, contribution)
+        for name, row in runtime_rows.items()
+        for contribution in row["contributions"]
+        if contribution["section_name"] == ".data"
+        and 0x40 <= contribution["offset"] < raw_size)
+    if len(positioned) > 256:
+        raise ValueError("too many runtime initialized sections for COFF subsection ranks")
+    contribution_ranks = {
+        (name, contribution["offset"]): rank
+        for rank, (_offset, name, contribution) in enumerate(positioned)
+    }
+    output = bytearray(payload)
+    changed_sections = 0
+    for name, row in runtime_rows.items():
+        entry = members[name]
+        member = bytearray(payload[entry.data_offset:entry.data_end])
+        if len(member) < COFF_FILE_HEADER_SIZE:
+            raise ValueError("short runtime COFF member: %s" % name)
+        section_count = struct.unpack_from("<H", member, 2)[0]
+        symbol_table, symbol_count = struct.unpack_from("<II", member, 8)
+        optional_size = struct.unpack_from("<H", member, 16)[0]
+        section_table = COFF_FILE_HEADER_SIZE + optional_size
+        renamed = {}
+        initialized_contributions = sorted(
+            (contribution for contribution in row["contributions"]
+             if contribution["section_name"] == ".data"
+             and 0x40 <= contribution["offset"] < raw_size),
+            key=lambda contribution: contribution["offset"])
+        data_sections = []
+        for index in range(section_count):
+            header = section_table + index * COFF_SECTION_HEADER_SIZE
+            old_name = bytes(member[header:header + 8]).rstrip(b"\0")
+            if old_name != b".data":
+                continue
+            size = struct.unpack_from("<I", member, header + 16)[0]
+            characteristics = struct.unpack_from("<I", member, header + 36)[0]
+            alignment_code = (characteristics & IMAGE_SCN_ALIGN_MASK) >> 20
+            alignment = 1 << (alignment_code - 1) if alignment_code else 1
+            data_sections.append((index + 1, header, size, alignment))
+
+        cursor = 0
+        paired = []
+        for contribution in initialized_contributions:
+            while (cursor < len(data_sections) and not (
+                    0 <= contribution["size"] - data_sections[cursor][2]
+                    <= data_sections[cursor][3] * 2)):
+                cursor += 1
+            if cursor == len(data_sections):
+                raise ValueError(
+                    "runtime initialized contribution shape differs in %s at 0x%x"
+                    % (name, contribution["offset"]))
+            paired.append((data_sections[cursor], contribution))
+            cursor += 1
+        for (section_number, header, _size, _alignment), contribution in paired:
+            rank = contribution_ranks[(name, contribution["offset"])]
+            new_name = (".data$%02x" % rank).encode("ascii")
+            member[header:header + 8] = new_name.ljust(8, b"\0")
+            renamed[section_number] = (b".data", new_name)
+            changed_sections += 1
+        index = 0
+        while index < symbol_count:
+            symbol = symbol_table + index * 18
+            section = struct.unpack_from("<h", member, symbol + 12)[0]
+            storage, auxiliary = struct.unpack_from("<BB", member, symbol + 16)
+            names = renamed.get(section)
+            if names is not None and storage == 3 and auxiliary:
+                old_name, new_name = names
+                if bytes(member[symbol:symbol + 8]).rstrip(b"\0") != old_name:
+                    raise ValueError("runtime section symbol name differs in %s" % name)
+                member[symbol:symbol + 8] = new_name.ljust(8, b"\0")
+            index += 1 + auxiliary
+        output[entry.data_offset:entry.data_end] = member
+
+    destination = Path(destination)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    destination.write_bytes(output)
+    return {
+        "source": str(library.resolve()),
+        "source_sha256": hashlib.sha256(payload).hexdigest(),
+        "output": str(destination.resolve()),
+        "output_sha256": hashlib.sha256(output).hexdigest(),
+        "order_evidence": "retail NB09 writable contribution offsets",
+        "member_count": len(runtime_rows),
+        "initialized_ranked_sections": len(contribution_ranks),
+        "renamed_sections": changed_sections,
+    }
 
 
 def decode_s_compile_banner(body):
@@ -1596,18 +1731,25 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
         raise RuntimeError("LIBCMT.LIB is missing from the VC4.2 toolchain")
     derived_crt_dir = output.parent / "crt"
     derived_libcmt = derived_crt_dir / "LIBCMT.LIB"
-    runtime_library = build_gfy_libcmt(
+    fallback_runtime_library = build_gfy_libcmt(
         original_libcmt, derived_libcmt,
         derived_crt_dir / "LIBCMT.gfy.json")
-    search_directories = [derived_crt_dir, toolchain / "lib"]
     vc40_lib_dir = link_exe.parent.parent / "lib"
     vc40_libcmt = find_ci(vc40_lib_dir, "LIBCMT.LIB") if vc40_lib_dir.is_dir() else None
-    if vc40_libcmt is not None and hashlib.sha256(
-            vc40_libcmt.read_bytes()).hexdigest() == PINNED_VC40_LIBCMT_SHA256:
-        search_directories.insert(0, vc40_lib_dir)
+    if vc40_libcmt is None or hashlib.sha256(
+            vc40_libcmt.read_bytes()).hexdigest() != PINNED_VC40_LIBCMT_SHA256:
+        raise RuntimeError("pinned VC 4.0 LIBCMT.LIB is missing beside LINK.EXE")
+    ordered_crt_dir = output.parent / "crt-retail-order"
+    runtime_data_order = build_retail_runtime_data_library(
+        vc40_libcmt, ordered_crt_dir / "LIBCMT.LIB")
+    search_directories = [
+        ordered_crt_dir, vc40_lib_dir, derived_crt_dir, toolchain / "lib"]
     library_path = ";".join(winepaths_w(search_directories))
-    link_objects, stripped_export_objects = final_link_objects(
-        response_objects, output.parent / "objects-noexport")
+    data_topology = RetailDataTopology(
+        DATA_MANIFEST, DATA_SECTIONS, DATA_CONTRIBUTIONS, RETAIL_EXE)
+    link_objects, stripped_export_objects, rebuilt_writable_sections = final_link_objects(
+        response_objects, [row["unit"] for row in order],
+        output.parent / "objects-final", data_topology)
     definition_path = write_module_definition(output.parent / "HEROES2W.def")
     command = build_link_command(
         link_exe,
@@ -1676,6 +1818,8 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
         "link_flags": list(RETAIL_LINK_FLAGS),
         "forced_vendor_imports": list(LINK300_FORCED_VENDOR_IMPORTS),
         "stripped_source_export_objects": stripped_export_objects,
+        "retopologized_writable_sections": rebuilt_writable_sections,
+        "runtime_data_order": runtime_data_order,
         "module_definition": str(definition_path),
         "link_input_order": {
             "system_libraries_before_vendor": list(SYSTEM_LIBS_BEFORE_VENDOR),
@@ -1685,7 +1829,10 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
             "resource": str(resource_path),
         },
         "library_search": {"mechanism": "LIB environment", "path": library_path},
-        "runtime_library": runtime_library,
+        "runtime_library": {
+            "selected": runtime_data_order,
+            "fallback_vc42_gfy": fallback_runtime_library,
+        },
         "runtime_literal_storage": runtime_literals,
         "resource_input": str(resource_path),
         "resources": resources,
@@ -1806,10 +1953,10 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
               (public_summary["storage_class_matches"],
                public_summary["storage_class_mismatches"],
                public_summary["constant_displacement_runs"]))
-        print("link audit: VC4.2 /Gf runtime literals %d/%d in initialized .data" %
+        print("link audit: selected CRT writable literals %d/%d in initialized .data" %
               (runtime_literals["verified"], runtime_literals["required"]))
         for failure in runtime_literals["failures"][:3]:
-            print("link audit: VC4.2 /Gf runtime literal FAIL %s: %s" %
+            print("link audit: selected CRT writable literal FAIL %s: %s" %
                   (failure.get("name", "<link>"), failure["reason"]))
         required_storage = storage["required_initialized"]
         print("link audit: required initialized storage %d/%d verified" %
