@@ -19,7 +19,8 @@ H2_ENUM_BEGIN(ButtonHotkeyConstant)
 H2_ENUM_END(ButtonHotkeyConstant)
 
 H2_ENUM_BEGIN(ButtonConstant)
-    REPEAT_DELAY_TICKS = 60
+    RESOURCE_NAME_CAPACITY = 16,
+    REPEAT_DELAY_TICKS     = 60
 H2_ENUM_END(ButtonConstant)
 
 VA(0x004dd440, 0x34)
@@ -79,8 +80,6 @@ button::button(
     m_hotkey = hotkey;
 }
 
-#define RESOURCE_NAME_CAPACITY 16
-
 VA(0x004dd5b0, 0xeb)
 void button::Read(void) {
     char iconName[RESOURCE_NAME_CAPACITY];
@@ -100,8 +99,6 @@ void button::Read(void) {
     m_id = gpResourceManager->ReadWord();
     m_kind = gpResourceManager->ReadWord();
 }
-
-#undef RESOURCE_NAME_CAPACITY
 
 VA(0x004dd6a0, 0x21)
 inline button::~button() {

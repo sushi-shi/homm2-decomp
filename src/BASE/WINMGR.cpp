@@ -97,6 +97,7 @@ DATA(0x0051ef40) static SWindowManagerText gWindowManagerText = {
 };
 
 #include <BASE/heroWindowManager.h>
+#include <BASE/widget.h>
 #include <BASE/palette.h>
 #include <string.h>
 #include <SOURCE/wingraph.h>
@@ -346,11 +347,6 @@ void heroWindowManager::Close(void) {
         m_active = false;
     }
 }
-
-// Keep these expansion-only mirrors local: including widget.h perturbs unrelated VC4.2 output.
-#define WIDGET_DISPATCH_CONTINUE 0
-#define WIDGET_DISPATCH_CONSUME 1
-#define WIDGET_DISPATCH_FORWARD 2
 
 VA(0x004cac00, 0x2d)
 i32 heroWindowManager::Main(struct tag_message& msg) {

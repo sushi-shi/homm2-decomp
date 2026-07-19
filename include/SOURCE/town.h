@@ -52,6 +52,9 @@ H2_ENUM_BEGIN(TownConstant)
     TOWN_MAGE_GUILD_FIRST_LEVEL        = 1,
     TOWN_MAGE_GUILD_WISDOM_LEVEL_BONUS = 2,
     TOWN_MAGE_GUILD_SPELLS_PER_LEVEL   = 4,
+    TOWN_SPELL_COUNT_OVERLAY_OFFSET    = 19,
+    TOWN_SPELL_COUNT_OVERLAY_SIZE      = 6,
+    TOWN_NAME_CAPACITY                 = 13,
     TOWN_CONVERT_SOURCE_FRAME          = 0x10,
     TOWN_CONVERT_ANY_FRAME             = 0xFF,
     TOWN_CONVERT_OBJECT_NONE           = 0,
@@ -62,10 +65,6 @@ H2_ENUM_BEGIN(TownConstant)
     TOWN_DISPOSE_PARTIAL               = 1,
     TOWN_DISPOSE_FULL                  = 2
 H2_ENUM_END(TownConstant)
-
-#define TOWN_SPELL_COUNT_OVERLAY_OFFSET 19
-#define TOWN_SPELL_COUNT_OVERLAY_SIZE 6
-#define TOWN_NAME_CAPACITY 13
 
 #pragma pack(push, 1)
 class town {

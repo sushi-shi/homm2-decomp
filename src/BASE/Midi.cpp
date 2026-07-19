@@ -20,8 +20,10 @@ H2_ENUM_BEGIN(MidiVolumeConstant)
     MAX_VOLUME        = 127
 H2_ENUM_END(MidiVolumeConstant)
 
-#define LOG_UNUSED_VALUE (-999)
-#define MIDI_FILENAME_CAPACITY 16
+H2_ENUM_BEGIN(MidiConstant)
+    LOG_UNUSED_VALUE       = -999,
+    MIDI_FILENAME_CAPACITY = 16
+H2_ENUM_END(MidiConstant)
 
 DATA(0x0051fec8) struct _MDI_DRIVER* hMDI = NULL;
 DATA(0x0051fecc) i32 CurrentMidiFile = MIDI_NO_TRACK;
@@ -162,6 +164,3 @@ void soundManager::MIDIPoll(void) {}
 
 DATA(0x00534cf0) class MIDIWrap* pMIDIWrap[MIDI_TRACK_COUNT];
 DATA(0x00534de0) struct _SEQUENCE* hSequence[MIDI_TRACK_COUNT];
-
-#undef LOG_UNUSED_VALUE
-#undef MIDI_FILENAME_CAPACITY

@@ -9,7 +9,13 @@
 #include <BASE/heroWindowManager.h>
 #include <SOURCE/KB.h>
 
-#define LARGE_FONT_HEIGHT_THRESHOLD 14
+H2_ENUM_BEGIN(FontConstant)
+    LARGE_FONT_HEIGHT_THRESHOLD = 14,
+    FONT_DRAW_SCREEN_WIDTH      = 640,
+    FONT_DRAW_SCREEN_HEIGHT     = 480,
+    CENTER_DIVISOR              = 2,
+    WRAP_HEIGHT_LINE_COUNT      = 2
+H2_ENUM_END(FontConstant)
 
 VA(0x004c6fd0, 0xc8)
 font::font(u32l id) : resource(RESOURCE_CATEGORY_FONT, id, RESOURCE_REFERENCE_INITIAL, NULL) {
@@ -26,8 +32,6 @@ font::font(u32l id) : resource(RESOURCE_CATEGORY_FONT, id, RESOURCE_REFERENCE_IN
     m_glyphIcon = gpResourceManager->GetIcon(fname);
     gbLoadingMonoIcon = false;
 }
-
-#undef LARGE_FONT_HEIGHT_THRESHOLD
 
 VA(0x004c70e0, 0x39)
 font::~font() {
@@ -136,17 +140,11 @@ void font::DrawStringExecute(
     }
 }
 
-#define FONT_DRAW_SCREEN_WIDTH 640
-#define FONT_DRAW_SCREEN_HEIGHT 480
-
 VA(0x004c7370, 0x48)
 void font::DrawString(char* s, i32 x, i32 y, i32 mode) {
     m_suppressDraw = 0;
     DrawStringExecute(s, x, y, mode, 0, 0, FONT_DRAW_SCREEN_WIDTH, FONT_DRAW_SCREEN_HEIGHT);
 }
-
-#undef FONT_DRAW_SCREEN_WIDTH
-#undef FONT_DRAW_SCREEN_HEIGHT
 
 VA(0x004c73c0, 0xaf)
 i32 font::GetCharacterWidth(u8 c) {
@@ -163,9 +161,6 @@ i32 font::GetCharacterWidth(u8 c) {
         return m_glyphIcon->Entries()[c].w + m_isLarge;
     }
 }
-
-#define CENTER_DIVISOR 2
-#define WRAP_HEIGHT_LINE_COUNT 2
 
 VA(0x004c7470, 0x313)
 void font::DrawBoundedString(char* str, i32 x, i32 y, i32 w, i32 h, i32 mode, i32 align) {

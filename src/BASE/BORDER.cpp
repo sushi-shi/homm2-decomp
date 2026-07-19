@@ -9,6 +9,11 @@
 #include <BASE/heroWindowManager.h>
 #include <SOURCE/KB.h>
 
+H2_ENUM_BEGIN(BorderConstant)
+    RESOURCE_NAME_CAPACITY = 16,
+    COLOR_INDEX_MASK       = 0xff
+H2_ENUM_END(BorderConstant)
+
 VA(0x004d20a0, 0x32)
 border::border(void) : widget(0, 0, 0, 0, 0, 0) {
     m_backgroundBitmap = NULL;
@@ -35,10 +40,6 @@ border::~border() {
     if (m_backgroundIcon != NULL)
         gpResourceManager->Dispose(m_backgroundIcon);
 }
-
-// Scoped expansion constants avoid perturbing VC4.2 register allocation in Main.
-#define RESOURCE_NAME_CAPACITY 16
-#define COLOR_INDEX_MASK 0xff
 
 VA(0x004d21e0, 0x10e)
 void border::Read(void) {
@@ -68,9 +69,6 @@ void border::Read(void) {
     }
     m_fillColor = gpResourceManager->ReadWord() & COLOR_INDEX_MASK;
 }
-
-#undef RESOURCE_NAME_CAPACITY
-#undef COLOR_INDEX_MASK
 
 VA(0x004d22f0, 0x181)
 i32 border::Main(struct tag_message& msg) {

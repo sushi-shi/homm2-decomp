@@ -14,18 +14,11 @@
 DATA(0x0051fa70) static STextWidgetSourceFiles gTextWidgetSourceFiles =
     {RETAIL_FILE, RETAIL_FILE, RETAIL_FILE, RETAIL_FILE};
 
-// Strict builds type-check these private values; production expansion keeps VC4.2 state neutral.
-#ifdef HOMM2_STRICT_ENUM_TYPES
 H2_ENUM_BEGIN(TextWidgetConstant)
     RESOURCE_NAME_CAPACITY = 16,
     DRAW_MODE_MASK         = 0xff,
     TEXT_BUFFER_GROWTH     = 5
 H2_ENUM_END(TextWidgetConstant)
-#else
-#define RESOURCE_NAME_CAPACITY 16
-#define DRAW_MODE_MASK 0xff
-#define TEXT_BUFFER_GROWTH 5
-#endif
 
 VA(0x004d1060, 0x3e)
 textWidget::textWidget(void) : widget(0, 0, 0, 0, 0, 0) {
@@ -216,11 +209,5 @@ void textWidget::SetText(char* text) {
 
 
 VTBL(textWidget, 0x004eba50);
-
-#ifndef HOMM2_STRICT_ENUM_TYPES
-#undef RESOURCE_NAME_CAPACITY
-#undef DRAW_MODE_MASK
-#undef TEXT_BUFFER_GROWTH
-#endif
 
 #undef RETAIL_FILE
