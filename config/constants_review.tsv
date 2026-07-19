@@ -182,7 +182,7 @@ src/EDITOR/mapcell.cpp	reviewed	The extra-record allocation step is a private en
 src/SOURCE/ADVMGR.cpp	pending
 src/SOURCE/AI.cpp	pending
 src/SOURCE/ARMY.cpp	pending
-src/SOURCE/ARMYGRP.cpp	pending
+src/SOURCE/ARMYGRP.cpp	reviewed	Private morale effects and alignment thresholds are named; the remaining 0.999 and 1.0 literals are the retail floating-point damage cutoffs and stay as payloads.
 src/SOURCE/CMBTMGR.cpp	pending
 src/SOURCE/COMMAND.cpp	pending
 src/SOURCE/CURSOR.cpp	pending
