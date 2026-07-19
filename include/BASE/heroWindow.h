@@ -8,12 +8,22 @@ class bitmap;
 struct tag_message;
 
 H2_ENUM_CLASS_BEGIN(WindowFlag)
-    WINDOW_FLAG_OWNS_WIDGETS    = 0x4000,    // Close/RemoveWidgetById delete the widgets
-    WINDOW_UPDATE_SUPPRESS_MASK = 0x7fff, // DrawWindow skips the screen update when == 1
-    WINDOW_ALL_WIDGETS_LOW      = -0xffff,     // DrawWindow id-range sentinel: no filter
+    WINDOW_FLAG_FIXED_LAYER     = 1,
+    WINDOW_FLAG_SAVE_BACKGROUND = 2,
+    WINDOW_FLAG_OWNS_WIDGETS    = 0x4000, // Close/RemoveWidgetById delete the widgets
+    WINDOW_UPDATE_SUPPRESS_MASK = 0x7fff, // DrawWindow skips the screen update when only fixed-layer is set
+    WINDOW_ALL_WIDGETS_LOW      = -0xffff, // DrawWindow id-range sentinel: no filter
     WINDOW_ALL_WIDGETS_HIGH     = 0xffff,
     WINDOW_DRAW_ID_LIMIT        = 0x7fff
 H2_ENUM_CLASS_END(WindowFlag)
+
+H2_ENUM_CLASS_BEGIN(WindowState)
+    WINDOW_STATE_OPEN = 1
+H2_ENUM_CLASS_END(WindowState)
+
+H2_ENUM_BEGIN(HeroWindowConstant)
+    HERO_WINDOW_NAME_CAPACITY = 0x14
+H2_ENUM_END(HeroWindowConstant)
 
 #pragma pack(push, 1)
 class heroWindow {
@@ -21,7 +31,7 @@ public:
     i32 m_zOrder;
     heroWindow* m_nextWindow;
     heroWindow* m_prevWindow;
-    char name[0x14];
+    char name[HERO_WINDOW_NAME_CAPACITY];
     i32 m_winFlags;
     i32 m_winState;
     i32 m_posX;

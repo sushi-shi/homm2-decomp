@@ -34,6 +34,12 @@ H2_ENUM_CLASS_BEGIN(WindowWidgetRecordType)
     WIDGET_RECORD_TEXT_ENTRY_INSET_FOUR = 0x206
 H2_ENUM_CLASS_END(WindowWidgetRecordType)
 
+H2_ENUM_BEGIN(WindowConstant)
+    SCREEN_WIDTH  = 640,
+    SCREEN_HEIGHT = 480,
+    OPEN_FAILURE  = 3
+H2_ENUM_END(WindowConstant)
+
 VA(0x004ceb70, 0xaa)
 heroWindow::heroWindow(void) {
     strcpy(name, "Default Construct");
@@ -42,9 +48,9 @@ heroWindow::heroWindow(void) {
     m_zOrder = -1;
     m_posY = 0;
     m_posX = m_posY;
-    m_winWidth = 640;
-    m_winHeight = 480;
-    m_winFlags = 1;
+    m_winWidth = SCREEN_WIDTH;
+    m_winHeight = SCREEN_HEIGHT;
+    m_winFlags = IDX(WINDOW_FLAG_FIXED_LAYER);
     m_winState = 0;
     m_widgetListHead = NULL;
     m_widgetListTail = m_widgetListHead;
@@ -134,27 +140,27 @@ heroWindow::heroWindow(i32 x, i32 y, char* resourceName) {
                 break;
             case IDX(WIDGET_RECORD_TEXT_ENTRY):
                 pte = new textEntryWidget();
-                pte->Read(1);
+                pte->Read(TEXT_ENTRY_READ_DEFAULT);
                 pwdg = pte;
                 break;
             case IDX(WIDGET_RECORD_TEXT_ENTRY_RECT):
                 pte = new textEntryWidget();
-                pte->Read(2);
+                pte->Read(TEXT_ENTRY_READ_RECT);
                 pwdg = pte;
                 break;
             case IDX(WIDGET_RECORD_TEXT_ENTRY_MULTILINE):
                 pte = new textEntryWidget();
-                pte->Read(3);
+                pte->Read(TEXT_ENTRY_READ_MULTILINE);
                 pwdg = pte;
                 break;
             case IDX(WIDGET_RECORD_TEXT_ENTRY_INSET_FIVE):
                 pte = new textEntryWidget();
-                pte->Read(4);
+                pte->Read(TEXT_ENTRY_READ_INSET_FIVE);
                 pwdg = pte;
                 break;
             case IDX(WIDGET_RECORD_TEXT_ENTRY_INSET_FOUR):
                 pte = new textEntryWidget();
-                pte->Read(5);
+                pte->Read(TEXT_ENTRY_READ_INSET_FOUR);
                 pwdg = pte;
                 break;
             case IDX(WIDGET_RECORD_DROP_LIST):
@@ -175,13 +181,13 @@ heroWindow::heroWindow(i32 x, i32 y, char* resourceName) {
 
 VA(0x004cf200, 0x73)
 i32 heroWindow::Open(i32 x, i32 flags) {
-    if (m_winState & 1)
-        return 3;
-    if ((m_winFlags & 2) != 0 && SaveBackground() != 0)
-        return 3;
+    if ((m_winState & IDX(WINDOW_STATE_OPEN)) != 0)
+        return OPEN_FAILURE;
+    if ((m_winFlags & IDX(WINDOW_FLAG_SAVE_BACKGROUND)) != 0 && SaveBackground() != 0)
+        return OPEN_FAILURE;
     m_zOrder = x;
     DrawWindow(flags);
-    m_winState |= 1;
+    m_winState |= IDX(WINDOW_STATE_OPEN);
     return 0;
 }
 
@@ -203,7 +209,8 @@ void heroWindow::RemoveAndDeleteWidget(i32 id) {
 VA(0x004cf310, 0xaa)
 void heroWindow::Close(void) {
     widget *w, *next;
-    if ((m_winFlags & 2) != 0 && (m_winState & 1) != 0)
+    if ((m_winFlags & IDX(WINDOW_FLAG_SAVE_BACKGROUND)) != 0
+        && (m_winState & IDX(WINDOW_STATE_OPEN)) != 0)
         RestoreBackground();
     w = m_widgetListHead;
     while (w != NULL) {
@@ -324,7 +331,8 @@ void heroWindow::DrawWindow(i32 update, i32 firstId, i32 lastId) {
         local_8 = local_8->m_prev;
     }
     PollSound();
-    if (update != 0 && (m_winFlags & IDX(WINDOW_UPDATE_SUPPRESS_MASK)) != 1) {
+    if (update != 0
+        && (m_winFlags & IDX(WINDOW_UPDATE_SUPPRESS_MASK)) != IDX(WINDOW_FLAG_FIXED_LAYER)) {
         gpWindowManager->UpdateScreenRegion(m_posX, m_posY, m_winWidth, m_winHeight);
         PollSound();
     }
@@ -362,10 +370,10 @@ void heroWindow::MoveWindow(i32 dx, i32 dy) {
         newX = 0;
     if (newY < 0)
         newY = 0;
-    if (640 < m_winWidth + newX)
-        newX = 640 - m_winWidth;
-    if (480 < m_winHeight + newY)
-        newY = 480 - m_winHeight;
+    if (SCREEN_WIDTH < m_winWidth + newX)
+        newX = SCREEN_WIDTH - m_winWidth;
+    if (SCREEN_HEIGHT < m_winHeight + newY)
+        newY = SCREEN_HEIGHT - m_winHeight;
     m_savedBackground->DrawToBuffer(m_posX, m_posY);
     m_posX = newX;
     m_posY = newY;

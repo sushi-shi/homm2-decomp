@@ -40,7 +40,7 @@ include/BASE/dimmerWidget.h	reviewed	Public constructor parameters are named; re
 include/BASE/dropListWidget.h	pending
 include/BASE/executive.h	reviewed	The interface carries no numeric policy; the sole literal is proven class-layout SIZE evidence.
 include/BASE/font.h	reviewed	Shared glyph, draw-mode, and horizontal/vertical alignment domains are named and aligned. The remaining literal is packed-layout SIZE evidence.
-include/BASE/heroWindow.h	pending
+include/BASE/heroWindow.h	reviewed	Shared fixed-layer, saved-background, ownership, update-mask, open-state, widget-range, and name-capacity domains are named and aligned. The interface otherwise contains no numeric storage policy.
 include/BASE/heroWindowManager.h	pending
 include/BASE/icon.h	reviewed	Limit bounds, typed frame-table access, and all public method parameters are named; remaining literals are packed-layout SIZE evidence.
 include/BASE/icon2bc.h	pending
@@ -166,7 +166,7 @@ src/BASE/TILE.cpp	reviewed	Private constants name the hand-written blitter's pro
 src/BASE/TILESET.cpp	reviewed	Allocation/free operands 18 and 0x1c preserve retail source-line evidence; other values are named or annotations.
 src/BASE/Textntry.cpp	pending
 src/BASE/WIDGET.cpp	reviewed	The private default extent and shared dispatch results are enums; remaining zeros and -1 are initialization, boolean, draw-mode, or z-order sentinels.
-src/BASE/WINDOW.cpp	pending
+src/BASE/WINDOW.cpp	reviewed	Private constants name screen bounds and the open failure result; public window flag/state and text-entry read-mode domains cover every executable literal. Remaining zeros, ones, and -1 values are initialization, list/z-order sentinels, draw toggles, or inclusive-bound steps.
 src/BASE/WINMGR.cpp	pending
 src/BASE/bmap2.cpp	reviewed	The TU-private palette-level stride is named with a prefix-free enumerator. Remaining zeros and ones express row/column origins, positive-extent guards, loop initialization, or inclusive-to-exclusive rectangle-edge arithmetic; the obsolete semantic ratchet was removed.
 src/BASE/droplist.cpp	pending
