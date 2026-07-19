@@ -456,7 +456,10 @@ void combatManager::SetCombatDirections(i32 targetHex) {
         for (direction_27 = 0; direction_27 < DIRECTION_COUNT; direction_27++) {
             if (standable_3[direction_27] != 0) {
                 if (directionHexes_4[direction_27] == currentArmy_3->m_hex
-                    || currentArmy_3->ValidPath(directionHexes_4[direction_27], 1) != 0)
+                    || currentArmy_3->ValidPath(
+                           directionHexes_4[direction_27], ARMY_PATH_EXACT_TARGET_HEX
+                       )
+                        != 0)
                     pathValid_1[direction_27] = 1;
                 else
                     pathValid_1[direction_27] = 0;
@@ -1175,14 +1178,16 @@ CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
                                     return COMBAT_MESSAGE_COMMAND_SHOOT_THROUGH_WALL;
                                 return COMBAT_MESSAGE_COMMAND_SHOOT;
                             }
-                            if (currentArmy->ValidPath(hexIndex, 0) == 1)
+                            if (currentArmy->ValidPath(hexIndex, ARMY_PATH_ANY_TARGET_HEX) == 1)
                                 return COMBAT_MESSAGE_COMMAND_ATTACK;
                             currentArmy->m_targetSide = -1;
                             currentArmy->m_targetIndex = -1;
                     }
                     command = COMBAT_MESSAGE_COMMAND_DEFAULT;
                 } else {
-                    if (m_armies[m_currentArmySide][m_currentArmyIndex].ValidPath(hexIndex, 0)
+                    if (m_armies[m_currentArmySide][m_currentArmyIndex].ValidPath(
+                            hexIndex, ARMY_PATH_ANY_TARGET_HEX
+                        )
                         == 1) {
                         command = CombatMessageCommand(
                             2

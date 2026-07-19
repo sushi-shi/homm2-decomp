@@ -825,7 +825,7 @@ i32 combatManager::AttemptAttack(class army* currentArmy, i32 side, i32 mask) {
         currentArmy->m_targetIndex = targetArmy;
         targetHex = OD_STEER(targetArmy)[m_armies[side]].m_hex;
         currentArmy->m_moveTargetHex = targetHex;
-        if (currentArmy->ValidPath(targetHex, 0)) {
+        if (currentArmy->ValidPath(targetHex, ARMY_PATH_ANY_TARGET_HEX)) {
             giNextAction = COMBAT_AI_ACTION_MOVE;
             giNextActionGridIndex = targetHex;
             return 1;
@@ -838,7 +838,7 @@ i32 combatManager::AttemptAttack(class army* currentArmy, i32 side, i32 mask) {
             else
                 targetHex++;
             currentArmy->m_moveTargetHex = targetHex;
-            if (currentArmy->ValidPath(targetHex, 0)) {
+            if (currentArmy->ValidPath(targetHex, ARMY_PATH_ANY_TARGET_HEX)) {
                 giNextAction = COMBAT_AI_ACTION_MOVE;
                 giNextActionGridIndex = targetHex;
                 return 1;

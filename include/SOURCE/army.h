@@ -12,6 +12,8 @@ class sample;
 #define ARMY_ATTACK_TARGET_ASSIGNED 0
 #define ARMY_ATTACK_TARGET_ENEMY 1
 #define ARMY_ATTACK_TARGET_OCCUPIED 2
+#define ARMY_PATH_ANY_TARGET_HEX 0
+#define ARMY_PATH_EXACT_TARGET_HEX 1
 
 #pragma pack(push, 1)
 class army {
