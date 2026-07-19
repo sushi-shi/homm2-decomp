@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """assert_no_fake_labels.py — soundness gate: every FUNCTION symbol a TU's object defines
 must actually exist in the original CodeView/PDB symbol set (build/gen/symbol_names.csv).
-Catches invented labels and wrong stub signatures that mangle to a name the retail binary
-never had. Complements verify_carcass.py (which checks completeness). Run from repo root
-after a build; exits 1 if any object defines a function symbol absent from CodeView.
+Catches invented labels and wrong signatures that mangle to a name the retail binary
+never had. Run from repo root after a build; exits 1 if any object defines a function
+symbol absent from CodeView.
 
 A defined, external, function-typed COFF symbol (llvm-objdump: sec>0, ty 20, scl 2) is a
 "label". FAKE = not in CodeView at all. MISATTRIBUTED = in CodeView but under a different

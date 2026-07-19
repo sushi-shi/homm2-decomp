@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""carcass_fill.py — turn `// signature;` placeholder comments into compilable stub
+"""Archived carcass_fill.py — turn `// signature;` placeholder comments into compilable stub
 definitions so every symbol is PRESENT in the object file (the "carcass" phase; real
 byte-matching is a later step). SURGICAL & SAFE: only rewrites a `// <sig>;` comment that
 sits *immediately* after a `VA(...)` line and contains `(` (a real demangled signature).
