@@ -12,7 +12,7 @@
 #define LARGE_FONT_HEIGHT_THRESHOLD 14
 
 VA(0x004c6fd0, 0xc8)
-font::font(u32l id) : resource(RESOURCE_CATEGORY_FONT, id, 1, NULL) {
+font::font(u32l id) : resource(RESOURCE_CATEGORY_FONT, id, RESOURCE_REFERENCE_INITIAL, NULL) {
     gpResourceManager->PointToFile(id);
     m_height = gpResourceManager->ReadWord();
     i32 h = gpResourceManager->ReadWord();

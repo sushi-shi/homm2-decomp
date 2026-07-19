@@ -41,7 +41,7 @@ H2_ENUM_END(IconDrawExtentConstant)
 
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\ICON.CPP"
 VA(0x004c7a20, 0x67)
-icon::icon(u32l id) : resource(RESOURCE_CATEGORY_ICON, id, 1, NULL) {
+icon::icon(u32l id) : resource(RESOURCE_CATEGORY_ICON, id, RESOURCE_REFERENCE_INITIAL, NULL) {
     DATA(0x0051e94c) static char allocationSourceFile[] = RETAIL_FILE;
     gpResourceManager->PointToFile(id);
     m_frameCount = gpResourceManager->ReadWord();

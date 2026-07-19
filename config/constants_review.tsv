@@ -57,7 +57,7 @@ include/BASE/message.h	pending
 include/BASE/miscwin.h	pending
 include/BASE/mouseManager.h	pending
 include/BASE/palette.h	pending
-include/BASE/resource.h	reviewed	Explicit ResourceCategory domain; zero is pure-virtual syntax.
+include/BASE/resource.h	reviewed	Explicit resource-category and reference-lifecycle domains; strict builds use enums while production uses expansion constants to keep VC4.2 declaration state neutral. Remaining zero is pure-virtual syntax.
 include/BASE/resourceManager.h	pending
 include/BASE/sample.h	reviewed	The declaration uses named types; the sole literal is packed-layout SIZE evidence.
 include/BASE/sampleData.h	reviewed	The record fields are named; the sole literal is packed-layout SIZE evidence.
@@ -160,7 +160,7 @@ src/BASE/Midi.cpp	pending
 src/BASE/Misc.cpp	pending
 src/BASE/PALETTE.cpp	pending
 src/BASE/RESMGR.cpp	pending
-src/BASE/RESOURCE.cpp	reviewed	Zero initializes the scalar resource id and reference count; pointer uses NULL.
+src/BASE/RESOURCE.cpp	reviewed	Constructor parameters and empty reference state are named; zero initializes the scalar resource id and pointer uses NULL. All seven direct consumer objects retain exact non-debug sections and relocations.
 src/BASE/Ripple.cpp	pending
 src/BASE/SAMPLE.cpp	reviewed	Private format, playback-rate, filename-capacity, and suffix-length domains are named; remaining allocation operands preserve retail source-line evidence. Text/data bytes and relocation topology are unchanged.
 src/BASE/TEXTWDGT.cpp	reviewed	Private resource-name capacity, draw-mode mask, buffer growth, shared font modes/alignment, and dispatch results are named. Strict builds use a private enum while production uses expansion constants; repeated message setup preserves the original statement stream. Remaining numeric allocation/free operands are retail source-line evidence, and other zeros/ones are initialization or booleans. Non-debug sections and relocations are A/B exact.
