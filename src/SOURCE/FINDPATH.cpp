@@ -16,10 +16,27 @@
 #include <stdlib.h>
 #include <string.h>
 
+namespace {
+
 H2_ENUM_BEGIN(FindPathConstant)
-    ATTACK_MASK_SURROUNDED = 0xff,
-    LENGTH_LIMIT           = 0xff
+    ATTACK_MASK_SURROUNDED         = 0xff,
+    LENGTH_LIMIT                   = 0xff,
+    ALLOCATION_SOURCE_LINE         = 20,
+    DESTRUCTION_SOURCE_LINE        = 26,
+    DISTANCE_MINOR_DIVISOR         = 2,
+    BINARY_SEARCH_MIDPOINT_DIVISOR = 2,
+    DRAWBRIDGE_MOAT_INDEX          = 4,
+    MOAT_MOVEMENT_PENALTY          = 2,
+    INITIAL_BEST_DISTANCE          = COMBAT_SCREEN_WIDTH
 H2_ENUM_END(FindPathConstant)
+
+inline i32 ApproximateGridDistance(i32 xDistance, i32 yDistance) {
+    if (xDistance >= yDistance)
+        return xDistance + yDistance / DISTANCE_MINOR_DIVISOR;
+    return yDistance + xDistance / DISTANCE_MINOR_DIVISOR;
+}
+
+}
 
 DATA(0x0052adc0) static i32 gSearchLow;
 DATA(0x0052adc4) static mapCell* gSearchNextCell;
@@ -35,11 +52,11 @@ DATA(0x0052ae60) static i32 gSearchMiddle;
 DATA(0x0052ae64) static i32 gSearchHigh;
 
 DATA(0x0051733c) static SFindPathSourceLocation gSearchAllocationSource = {
-    {20, 0},
+    {ALLOCATION_SOURCE_LINE, 0},
     FINDPATH_SOURCE_FILE
 };
 DATA(0x0051736c) static SFindPathSourceLocation gSearchDestructionSource = {
-    {26, 0},
+    {DESTRUCTION_SOURCE_LINE, 0},
     FINDPATH_SOURCE_FILE
 };
 
@@ -100,9 +117,7 @@ i32 searchArray::QuickDistance(i32 x1, i32 y1, i32 x2, i32 y2) {
     i32 xDistance = abs(x1 - x2);
     i32 yDistance = abs(y1 - y2);
 
-    if (xDistance >= yDistance)
-        return xDistance + yDistance / 2;
-    return yDistance + xDistance / 2;
+    return ApproximateGridDistance(xDistance, yDistance);
 }
 
 VA(0x004a4ba0, 0x80)
@@ -154,7 +169,8 @@ void searchArray::PushPoint(
 ) {
     if (cost > mobility && mobility > 0)
         return;
-    if (x >= 0 && x <= MAP_WIDTH - 1 && y >= 0 && y <= MAP_HEIGHT - 1 && m_queueCount < 1024) {
+    if (x >= 0 && x <= MAP_WIDTH - 1 && y >= 0 && y <= MAP_HEIGHT - 1
+        && m_queueCount < SEARCH_QUEUE_CAPACITY) {
         gSearchLow = 0;
         gSearchHigh = m_queueCount;
         gSearchCell = &GetNode(x, y);
@@ -378,7 +394,7 @@ i32 searchArray::FindCombatPath(
     i32 attackPath,
     i32 ignoreTargetMoat
 ) {
-    u8 savedMoatState[9];
+    u8 savedMoatState[KB_MOAT_CELL_COUNT];
     memset(bIsMoatSlowed, 0, sizeof(bIsMoatSlowed));
 
     if (gpCombatManager->m_drawbridgeBackgroundVisible != 0) {
@@ -391,10 +407,11 @@ i32 searchArray::FindCombatPath(
             targetWideHex = targetHex + offset;
         }
 
-        for (moatIndex = 0; moatIndex < 9; moatIndex++) {
+        for (moatIndex = 0; moatIndex < KB_MOAT_CELL_COUNT; moatIndex++) {
             i32 moatHex = moatCell[moatIndex];
             savedMoatState[moatIndex] = gpCombatManager->m_hexCells[moatHex].m_pathReachable;
-            if ((moatIndex != 4 || gpCombatManager->m_drawbridgeState == COMBAT_DRAWBRIDGE_RAISED)
+            if ((moatIndex != DRAWBRIDGE_MOAT_INDEX
+                 || gpCombatManager->m_drawbridgeState == COMBAT_DRAWBRIDGE_RAISED)
                 && ((targetHex != moatHex && targetWideHex != moatHex) || ignoreTargetMoat != 0)
                 && (unit->m_hex != moatHex && sourceWideHex != moatHex)) {
                 bIsMoatSlowed[moatHex] = 1;
@@ -402,7 +419,7 @@ i32 searchArray::FindCombatPath(
         }
     }
 
-    i32 bestDistance = 640;
+    i32 bestDistance = INITIAL_BEST_DISTANCE;
     i32 bestHex = -1;
     i32 attackTargetHex = targetHex;
     if (attackPath == 0)
@@ -437,11 +454,7 @@ i32 searchArray::FindCombatPath(
             i32 yDistance =
                 abs(gpCombatManager->m_hexCells[currentHex].m_y
                     - gpCombatManager->m_hexCells[targetHex].m_y);
-            i32 distance;
-            if (xDistance >= yDistance)
-                distance = xDistance + yDistance / 2;
-            else
-                distance = yDistance + xDistance / 2;
+            i32 distance = ApproximateGridDistance(xDistance, yDistance);
 
             if (unit->m_targetSide != -1) {
                 attackMask =
@@ -460,12 +473,12 @@ i32 searchArray::FindCombatPath(
             }
 
             u32 moveMask = unit->GetMoveMask(currentHex);
-            for (i32 direction = 0; direction < 8; direction++) {
+            for (i32 direction = 0; direction < SEARCH_DIRECTION_COUNT; direction++) {
                 if ((moveMask & (1U << direction)) == 0) {
                     i32 nextHex = unit->GetAdjacentCellIndex(currentHex, direction);
                     i32 moatCost = 0;
                     if (bIsMoatSlowed[nextHex])
-                        moatCost = unit->m_speed + 2;
+                        moatCost = unit->m_speed + MOAT_MOVEMENT_PENALTY;
                     PushCombatPoint(
                         nextHex,
                         direction,
@@ -486,7 +499,7 @@ i32 searchArray::FindCombatPath(
             goto searchComplete;
         }
         attackDirection++;
-        if (attackDirection < 8)
+        if (attackDirection < SEARCH_DIRECTION_COUNT)
             goto findAttackDirection;
         goto searchComplete;
 
@@ -504,7 +517,7 @@ restoreMoatFailure:
     attackTargetHex = 0;
 restoreMoat:
     if (gpCombatManager->m_drawbridgeBackgroundVisible != 0) {
-        for (i32 moatIndex = 0; moatIndex < 9; moatIndex++)
+        for (i32 moatIndex = 0; moatIndex < KB_MOAT_CELL_COUNT; moatIndex++)
             gpCombatManager->m_hexCells[moatCell[moatIndex]].m_pathReachable =
                 savedMoatState[moatIndex];
     }
@@ -533,12 +546,13 @@ void searchArray::PushCombatPoint(i32 hex, i32 direction, i32 distance, i32 spee
         searchNode* cell;
         if (speed <= 0 || distance <= speed) {
             cell = &m_storage.nodes[hex];
-            if ((!cell->visited || distance < cell->distance) && m_queueCount < 1024) {
+            if ((!cell->visited || distance < cell->distance)
+                && m_queueCount < SEARCH_QUEUE_CAPACITY) {
                 i32 middle;
                 searchNode* node;
 
                 for (;;) {
-                    middle = (low + high) / 2;
+                    middle = (low + high) / BINARY_SEARCH_MIDPOINT_DIVISOR;
                     node = &m_queue[middle];
                     if (high <= low)
                         break;
@@ -567,4 +581,4 @@ void searchArray::PushCombatPoint(i32 hex, i32 direction, i32 distance, i32 spee
     }
 }
 
-DATA(0x0052adc8) u8 bIsMoatSlowed[117];
+DATA(0x0052adc8) u8 bIsMoatSlowed[SEARCH_COMBAT_HEX_COUNT];
