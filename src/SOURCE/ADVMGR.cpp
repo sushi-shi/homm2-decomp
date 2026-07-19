@@ -7572,7 +7572,7 @@ void advManager::SetEnvironmentOrigin(i32 originX, i32 originY, i32 stopSounds) 
                 gpSoundManager->ModifySample(
                     m_loopingSamples[IDX(m_activeSounds[edgeOffset].soundId)]
                         ->m_playbackData.activeSample,
-                    IDX(SOUND_SAMPLE_OPERATION_EFFECT_VOLUME),
+                    SOUND_SAMPLE_OPERATION_EFFECT_VOLUME,
                     ADVMGR_ENVIRONMENT_VOLUME(m_activeSounds[edgeOffset].volume)
                 );
             }

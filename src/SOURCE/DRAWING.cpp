@@ -1530,8 +1530,8 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
             viewY2 + COMBAT_SMALL_VIEW_QUANTITY_Y,
             COMBAT_SMALL_VIEW_TEXT_WIDTH,
             COMBAT_SMALL_VIEW_TEXT_HEIGHT,
-            1,
-            1
+            FONT_DRAW_DEFAULT,
+            FONT_ALIGN_CENTER
         );
 
         if (gConfig.combatArmyInfoLevel == COMBAT_SMALL_VIEW_FULL_INFO) {
@@ -1542,8 +1542,8 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                     + COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * STAT_ROW_ATTACK,
                 COMBAT_SMALL_VIEW_TEXT_WIDTH,
                 COMBAT_SMALL_VIEW_TEXT_HEIGHT,
-                1,
-                0
+                FONT_DRAW_DEFAULT,
+                FONT_ALIGN_LEFT
             );
             smallFont->DrawBoundedString(
                 cMiniViewText[IDX(SMALL_VIEW_TEXT_DEFENSE)],
@@ -1552,8 +1552,8 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                     + COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * STAT_ROW_DEFENSE,
                 COMBAT_SMALL_VIEW_TEXT_WIDTH,
                 COMBAT_SMALL_VIEW_TEXT_HEIGHT,
-                1,
-                0
+                FONT_DRAW_DEFAULT,
+                FONT_ALIGN_LEFT
             );
             smallFont->DrawBoundedString(
                 cMiniViewText[IDX(SMALL_VIEW_TEXT_HIT_POINTS)],
@@ -1562,8 +1562,8 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                     + COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * STAT_ROW_HIT_POINTS,
                 COMBAT_SMALL_VIEW_TEXT_WIDTH,
                 COMBAT_SMALL_VIEW_TEXT_HEIGHT,
-                1,
-                0
+                FONT_DRAW_DEFAULT,
+                FONT_ALIGN_LEFT
             );
             smallFont->DrawBoundedString(
                 cMiniViewText[IDX(SMALL_VIEW_TEXT_DAMAGE)],
@@ -1572,8 +1572,8 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                     + COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * STAT_ROW_DAMAGE,
                 COMBAT_SMALL_VIEW_TEXT_WIDTH,
                 COMBAT_SMALL_VIEW_TEXT_HEIGHT,
-                1,
-                0
+                FONT_DRAW_DEFAULT,
+                FONT_ALIGN_LEFT
             );
             smallFont->DrawBoundedString(
                 cMiniViewText[IDX(SMALL_VIEW_TEXT_MORALE)],
@@ -1582,8 +1582,8 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                     + COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * STAT_ROW_MORALE,
                 COMBAT_SMALL_VIEW_TEXT_WIDTH,
                 COMBAT_SMALL_VIEW_TEXT_HEIGHT,
-                1,
-                0
+                FONT_DRAW_DEFAULT,
+                FONT_ALIGN_LEFT
             );
             smallFont->DrawBoundedString(
                 cMiniViewText[IDX(SMALL_VIEW_TEXT_LUCK)],
@@ -1592,8 +1592,8 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                     + COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * STAT_ROW_LUCK,
                 COMBAT_SMALL_VIEW_TEXT_WIDTH,
                 COMBAT_SMALL_VIEW_TEXT_HEIGHT,
-                1,
-                0
+                FONT_DRAW_DEFAULT,
+                FONT_ALIGN_LEFT
             );
             if (HAS(viewArmy1->m_monster.flags.all, COMBAT_ARMY_FLAG_SHOOTER))
                 smallFont->DrawBoundedString(
@@ -1602,8 +1602,8 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                     viewY2 + COMBAT_SMALL_VIEW_SHOTS_Y,
                     COMBAT_SMALL_VIEW_TEXT_WIDTH,
                     COMBAT_SMALL_VIEW_TEXT_HEIGHT,
-                    1,
-                    0
+                    FONT_DRAW_DEFAULT,
+                    FONT_ALIGN_LEFT
                 );
 
             sprintf(gText, "%d", static_cast<i32>(viewArmy1->m_monster.attack));
@@ -1614,7 +1614,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                     + COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * STAT_ROW_ATTACK,
                 COMBAT_SMALL_VIEW_TEXT_WIDTH,
                 COMBAT_SMALL_VIEW_TEXT_HEIGHT,
-                1,
+                FONT_DRAW_DEFAULT,
                 FONT_ALIGN_RIGHT
             );
             sprintf(gText, "%d", static_cast<i32>(viewArmy1->m_monster.defense));
@@ -1625,7 +1625,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                     + COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * STAT_ROW_DEFENSE,
                 COMBAT_SMALL_VIEW_TEXT_WIDTH,
                 COMBAT_SMALL_VIEW_TEXT_HEIGHT,
-                1,
+                FONT_DRAW_DEFAULT,
                 FONT_ALIGN_RIGHT
             );
             sprintf(gText, "%d", static_cast<u32>(viewArmy1->m_monster.hitPoints));
@@ -1636,7 +1636,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                     + COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * STAT_ROW_HIT_POINTS,
                 COMBAT_SMALL_VIEW_TEXT_WIDTH,
                 COMBAT_SMALL_VIEW_TEXT_HEIGHT,
-                1,
+                FONT_DRAW_DEFAULT,
                 FONT_ALIGN_RIGHT
             );
             sprintf(
@@ -1652,7 +1652,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                     + COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * STAT_ROW_DAMAGE,
                 COMBAT_SMALL_VIEW_TEXT_WIDTH,
                 COMBAT_SMALL_VIEW_TEXT_HEIGHT,
-                1,
+                FONT_DRAW_DEFAULT,
                 FONT_ALIGN_RIGHT
             );
 
@@ -1726,7 +1726,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                     viewY2 + COMBAT_SMALL_VIEW_SHOTS_Y,
                     COMBAT_SMALL_VIEW_TEXT_WIDTH,
                     COMBAT_SMALL_VIEW_TEXT_HEIGHT,
-                    1,
+                    FONT_DRAW_DEFAULT,
                     FONT_ALIGN_RIGHT
                 );
             }

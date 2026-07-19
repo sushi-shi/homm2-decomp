@@ -552,8 +552,8 @@ void army::DrawToBuffer(i32 x, i32 y, i32 effectsOnly) {
                 quantityY0 + QUANTITY_TEXT_Y_OFFSET,
                 QUANTITY_TEXT_WIDTH,
                 QUANTITY_TEXT_HEIGHT,
-                1,
-                1
+                FONT_DRAW_DEFAULT,
+                FONT_ALIGN_CENTER
             );
         }
     }

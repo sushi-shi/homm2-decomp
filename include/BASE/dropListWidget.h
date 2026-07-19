@@ -25,7 +25,7 @@ public:
     i16 m_normalColor;
     i16 m_selColor;
     i16 m_unusedColor;
-    i16 m_textMode;
+    i16 m_alignment;
     i16 m_itemCount;
     i16 m_selectedIndex;
     char** m_items;

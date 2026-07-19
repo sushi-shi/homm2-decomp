@@ -182,8 +182,8 @@ void strip::DrawIcons(i32 drawWindow) {
                 m_y + STRIP_QUANTITY_Y,
                 STRIP_QUANTITY_WIDTH,
                 STRIP_QUANTITY_HEIGHT,
-                STRIP_QUANTITY_COLOR,
-                STRIP_QUANTITY_BACKGROUND
+                FONT_DRAW_DEFAULT,
+                FONT_ALIGN_RIGHT
             );
         } else {
             m_stripIcon->DrawToBuffer(

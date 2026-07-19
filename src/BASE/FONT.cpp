@@ -43,7 +43,7 @@ void font::DrawStringExecute(
     char* str,
     i32 x,
     i32 y,
-    i32 mode,
+    FontDrawMode mode,
     i32 clipL,
     i32 clipT,
     i32 clipR,
@@ -141,7 +141,7 @@ void font::DrawStringExecute(
 }
 
 VA(0x004c7370, 0x48)
-void font::DrawString(char* s, i32 x, i32 y, i32 mode) {
+void font::DrawString(char* s, i32 x, i32 y, FontDrawMode mode) {
     m_suppressDraw = 0;
     DrawStringExecute(s, x, y, mode, 0, 0, FONT_DRAW_SCREEN_WIDTH, FONT_DRAW_SCREEN_HEIGHT);
 }
@@ -163,7 +163,15 @@ i32 font::GetCharacterWidth(u8 c) {
 }
 
 VA(0x004c7470, 0x313)
-void font::DrawBoundedString(char* str, i32 x, i32 y, i32 w, i32 h, i32 mode, i32 align) {
+void font::DrawBoundedString(
+    char* str,
+    i32 x,
+    i32 y,
+    i32 w,
+    i32 h,
+    FontDrawMode mode,
+    FontAlignment align
+) {
     i32 size = strlen(str);
     u8* glyphPos = m_glyphIcon->m_data;
     char space9 = ' ';
@@ -177,8 +185,8 @@ void font::DrawBoundedString(char* str, i32 x, i32 y, i32 w, i32 h, i32 mode, i3
     i32 lineWidth3 = 0;
     i32 wordBreak0 = 0;
     char* text2 = str;
-    i32 drawMode2 = mode;
-    if (align & FONT_ALIGN_VERTICAL_CENTER) {
+    FontDrawMode drawMode2 = mode;
+    if (HAS(align, FONT_ALIGN_VERTICAL_CENTER)) {
         align -= FONT_ALIGN_VERTICAL_CENTER;
         i32 lineCount = LineLength(str, w);
         i32 totalH = m_height * lineCount;

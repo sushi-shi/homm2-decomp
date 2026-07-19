@@ -29,9 +29,7 @@ H2_ENUM_BEGIN(StripConstant)
     STRIP_RACE_FRAME_OFFSET     = 4,
     STRIP_QUANTITY_Y            = 0x56,
     STRIP_QUANTITY_WIDTH        = 0x4d,
-    STRIP_QUANTITY_HEIGHT       = 0xd,
-    STRIP_QUANTITY_COLOR        = 1,
-    STRIP_QUANTITY_BACKGROUND   = 2
+    STRIP_QUANTITY_HEIGHT       = 0xd
 H2_ENUM_END(StripConstant)
 
 #pragma pack(push, 1)

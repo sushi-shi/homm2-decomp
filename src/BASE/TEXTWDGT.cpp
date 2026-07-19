@@ -22,8 +22,8 @@ H2_ENUM_END(TextWidgetConstant)
 
 VA(0x004d1060, 0x3e)
 textWidget::textWidget(void) : widget(0, 0, 0, 0, 0, 0) {
-    m_color = FONT_DRAW_DEFAULT;
-    m_alignment = FONT_ALIGN_CENTER;
+    m_color = static_cast<i16>(FONT_DRAW_DEFAULT);
+    m_alignment = static_cast<char>(FONT_ALIGN_CENTER);
     m_font = NULL;
     m_text = NULL;
     m_kind = EncodeWidgetKind(WIDGET_KIND_TEXT);
@@ -169,9 +169,9 @@ normalEvent:
 
 VA(0x004d1490, 0x49)
 void textWidget::Draw(void) {
-    i32 color = FONT_DRAW_DARK_GRAY;
+    FontDrawMode color = FONT_DRAW_DARK_GRAY;
     if ((m_flags & WIDGET_FLAG_DIMMED) == 0)
-        color = m_color;
+        color = FontDrawModeFromStorage(m_color);
     m_font->DrawBoundedString(
         m_text,
         m_x + m_owner->m_posX,
@@ -179,7 +179,7 @@ void textWidget::Draw(void) {
         m_width,
         m_height,
         color,
-        m_alignment
+        FontAlignmentFromStorage(m_alignment)
     );
 }
 

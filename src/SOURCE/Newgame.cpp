@@ -1533,8 +1533,8 @@ void game::DrawNGKPDisplayString(i32 updateScreen) {
         GAME_CHAT_DRAW_Y,
         GAME_CHAT_DRAW_WIDTH,
         GAME_CHAT_DRAW_HEIGHT,
-        2,
-        0
+        FONT_DRAW_YELLOW,
+        FONT_ALIGN_LEFT
     );
     if (updateScreen)
         gpWindowManager->UpdateScreenRegion(
