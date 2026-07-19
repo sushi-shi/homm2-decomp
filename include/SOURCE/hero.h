@@ -40,8 +40,6 @@ H2_ENUM_CLASS_BEGIN(HeroPrimaryStat)
     HERO_PRIMARY_KNOWLEDGE   = 3
 H2_ENUM_CLASS_END(HeroPrimaryStat)
 
-#define HERO_PRIMARY_STAT_COUNT 4
-#define HERO_ARTIFACT_SLOT_COUNT 14
 #define HERO_EXPERIENCE_GROWTH_FACTOR 1.2
 
 H2_ENUM_BEGIN(HeroConstant)
@@ -52,6 +50,10 @@ H2_ENUM_BEGIN(HeroConstant)
     HERO_LOCATION_TOWN                        = 0xa3,
     HERO_MAP_CHANGE_UNUSED                    = -999,
     HERO_MAP_CELL_PRESENT                     = 0x40,
+    HERO_NAME_SIZE                            = 13,
+    HERO_PRIMARY_STAT_COUNT                   = 4,
+    HERO_ARTIFACT_SLOT_COUNT                  = 14,
+    HERO_RUNTIME_ALIGNMENT_SIZE               = 1,
     HERO_STARTING_STAT_COUNT                  = 5,
     HERO_AVAILABLE_SLOT_COUNT                 = 2,
     HERO_AVAILABILITY_UNAVAILABLE             = -1,
@@ -131,7 +133,7 @@ public:
     i8 m_lastInteractionHeroId;
     i16 m_lastTownInteractionTurn;
     u8 m_visitedTownId;
-    char m_name[13];
+    char m_name[HERO_NAME_SIZE];
     u8 m_cursorType;
     u8 m_portrait;
     i32 m_x;
@@ -160,7 +162,7 @@ public:
     i8 m_primaryStats[IDX(HERO_STARTING_STAT_COUNT)];
     i8 m_morale;
     i8 m_luck;
-    char _pad_0x46[0x1];
+    char _pad_0x46[HERO_RUNTIME_ALIGNMENT_SIZE];
     u32 m_gazeboVisits;
     u32 m_fortVisits;
     u32 m_witchDoctorVisits;
@@ -171,15 +173,15 @@ public:
     u8 m_randomSeed;
     u8 m_enabled;
     class armyGroup m_army;
-    i8 m_secondarySkills[14];
-    u8 m_secondarySkillOrder[14];
+    i8 m_secondarySkills[IDX(HERO_SKILL_COUNT)];
+    u8 m_secondarySkillOrder[IDX(HERO_SKILL_COUNT)];
     i32 m_secondarySkillCount;
     i8 m_spells[IDX(SPELL_COUNT)];
     i8 m_artifacts[HERO_ARTIFACT_SLOT_COUNT];
     HeroEventFlag m_eventFlags;
     u8 m_isCaptain;
     float m_aiFightValue;
-    i8 m_artifactExtra[14];
+    i8 m_artifactExtra[HERO_ARTIFACT_SLOT_COUNT];
     i32 IsEmbarked(void) {
         return HAS(m_eventFlags, HERO_EVENT_EMBARKED);
     }

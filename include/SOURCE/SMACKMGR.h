@@ -8,6 +8,11 @@
 void ConvertSmackerPalette(u8*);
 class icon;
 
+H2_ENUM_BEGIN(SmackManagerStorageConstant)
+    SMACK_OPTION_FILENAME_SIZE = 9,
+    SMACK_MILES_RESERVED_SIZE  = 0x4c
+H2_ENUM_END(SmackManagerStorageConstant)
+
 #pragma pack(push, 1)
 struct tag_rect {
     i16 x;
@@ -17,10 +22,10 @@ struct tag_rect {
 };
 
 struct SSmackOptions {
-    char fileName[9];
-    char companionFileName[9];
-    char slowFileName[9];
-    char slowCompanionFileName[9];
+    char fileName[SMACK_OPTION_FILENAME_SIZE];
+    char companionFileName[SMACK_OPTION_FILENAME_SIZE];
+    char slowFileName[SMACK_OPTION_FILENAME_SIZE];
+    char slowCompanionFileName[SMACK_OPTION_FILENAME_SIZE];
     i8 fadeIn;
     i8 fadeOut;
     i8 preload;
@@ -31,7 +36,7 @@ struct SSmackOptions {
 };
 
 struct SmackMilesDigitalDriver {
-    char reserved[0x4c];
+    char reserved[SMACK_MILES_RESERVED_SIZE];
     void* directSound;
 };
 #pragma pack(pop)

@@ -4,6 +4,14 @@
 #include <va.h>
 #include <SOURCE/GAME.h>
 
+H2_ENUM_BEGIN(PlayerDataStorageConstant)
+    PLAYER_HERO_CAPACITY         = 8,
+    PLAYER_AVAILABLE_HERO_COUNT  = 2,
+    PLAYER_UNUSED_SAVE_DATA_SIZE = 0x2c,
+    PLAYER_BARRIER_STATE_SIZE    = 6,
+    PLAYER_RUNTIME_TAIL_GAP_SIZE = 0x1c
+H2_ENUM_END(PlayerDataStorageConstant)
+
 #pragma pack(push, 1)
 struct playerAttentionWeights {
     float gameWeightA;
@@ -21,12 +29,12 @@ public:
     i8 m_heroCount;
     i8 m_currentHero;
     i8 m_heroLocatorPage;
-    i8 m_heroIds[8];
-    i8 m_availableHeroIds[2];
+    i8 m_heroIds[PLAYER_HERO_CAPACITY];
+    i8 m_availableHeroIds[PLAYER_AVAILABLE_HERO_COUNT];
     i8 m_minimumHeroCount;
     i32 m_aiDifficulty;
     i8 m_cheatValue;
-    char m_unusedSaveData[0x2c];
+    char m_unusedSaveData[PLAYER_UNUSED_SAVE_DATA_SIZE];
     i8 m_ultimateArtifactHintChance;
     i8 m_ultimateArtifactHintX;
     i8 m_ultimateArtifactHintY;
@@ -38,9 +46,9 @@ public:
     i32 m_resources[IDX(RES_COUNT)];
     i8 m_evilInterface;
     i8 m_barrierTents;
-    char m_unknownad[6];
+    char m_unknownad[PLAYER_BARRIER_STATE_SIZE];
     playerAttentionWeights m_attentionWeights;
-    char m_unknownCb[0x1c];
+    char m_unknownCb[PLAYER_RUNTIME_TAIL_GAP_SIZE];
     i32 m_income[IDX(RES_COUNT)];
     i32 m_obeliskValue;
     i32 m_totalObeliskValue;

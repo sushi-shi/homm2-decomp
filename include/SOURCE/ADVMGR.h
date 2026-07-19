@@ -2,6 +2,7 @@
 #define HOMM2_ADVMGR_H
 
 #include <va.h>
+#include <SOURCE/GAME.h>
 #include <SOURCE/KB_TYPES.h>
 
 class mapCell;
@@ -132,6 +133,11 @@ H2_ENUM_BEGIN(AdventureSystemOptionsConstant)
     ADVMGR_SYSTEM_OPTIONS_DRAW_MASK               = 0x7fff
 H2_ENUM_END(AdventureSystemOptionsConstant)
 
+H2_ENUM_BEGIN(AdventureAIStorageConstant)
+    ADVMGR_PLACE_VISIT_COUNT      = 30,
+    ADVMGR_PLACE_COORDINATE_COUNT = 2
+H2_ENUM_END(AdventureAIStorageConstant)
+
 #ifdef HOMM2_STRICT_ENUM_TYPES
 inline i32 EncodeAdventureSystemOptionTextControl(AdventureSystemOption option) {
     return EncodeAdventureSystemOption(option) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
@@ -171,18 +177,18 @@ extern i32 giMaxHeroesForThisPlayer;
 extern float fReduceFactor;
 extern u8 giCurPlayerBit;
 extern i32 giBestShipyardDist;
-extern i16 gaiHeroLiveChance[54];
+extern i16 gaiHeroLiveChance[GAME_HERO_COUNT];
 extern i32 giHumanTownConquered;
-extern i32 costTemp[7];
+extern i32 costTemp[IDX(RES_COUNT)];
 extern b32 gbPossibleShipyardFound;
 extern i32 iCurPlaceToVisit;
 extern i32 giBestShipyardId;
 extern b32 gbActualBoatFound;
 extern u8 giCurWatchPlayerBit;
-extern float gfHeroInteractionBonus[54];
+extern float gfHeroInteractionBonus[GAME_HERO_COUNT];
 extern b32 gbBerserk;
 extern i32 giCurAIHeroMorale;
-extern i32 iPlacesVisited[30][2];
+extern i32 iPlacesVisited[ADVMGR_PLACE_VISIT_COUNT][ADVMGR_PLACE_COORDINATE_COUNT];
 extern b32 gbTroopReload;
 extern i32 giCurAIHeroLuck;
 extern b32 gbActualShipyardFound;
