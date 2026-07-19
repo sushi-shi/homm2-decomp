@@ -25,6 +25,19 @@ H2_ENUM_BEGIN(ArmyFacing)
     ARMY_FACING_RIGHT = 1
 H2_ENUM_END(ArmyFacing)
 
+inline ArmyFacing OppositeArmyFacing(ArmyFacing facing) {
+    return static_cast<ArmyFacing>(IDX(ARMY_FACING_RIGHT) - IDX(facing));
+}
+
+inline i32 ArmyFacingRearHexOffset(ArmyFacing facing) {
+    return facing == ARMY_FACING_RIGHT ? 1 : -1;
+}
+
+H2_ENUM_BEGIN(ArmyDamagePenalty)
+    ARMY_DAMAGE_PENALTY_NONE = 0,
+    ARMY_DAMAGE_PENALTY_HALF = 2
+H2_ENUM_END(ArmyDamagePenalty)
+
 H2_ENUM_BEGIN(ArmyHexConstant)
     ARMY_ATTACK_HEX_COUNT = 2,
     ARMY_HEX_INVALID      = -1
@@ -48,7 +61,7 @@ public:
     i32 m_showQuantity;
     i32 m_targetSide;
     i32 m_targetIndex;
-    i32 m_attackDirection;
+    CombatHexDirection m_attackDirection;
     i32 m_unknown5e;
     i32 m_moveTargetHex;
     i32 m_drawSpellEffect;
@@ -59,8 +72,8 @@ public:
     i32 m_hex;
     ArmyAnimationSequence m_animationSequence;
     i32 m_animationFrame;
-    i32 m_facing;
-    i32 m_walkDirection;
+    ArmyFacing m_facing;
+    CombatHexDirection m_walkDirection;
     i32 m_facingChanged;
     i32 m_initialQuantity;
     i32 m_quantity;
@@ -68,7 +81,7 @@ public:
     i32 m_temporaryResurrectionQuantity;
     i32 m_hitPointsLost;
     i32 m_armyGroupSlot;
-    i32 m_damagePenalty;
+    ArmyDamagePenalty m_damagePenalty;
     i32 m_speed;
     i32 m_walkDuration;
     i32 m_luckOutcome;
@@ -77,7 +90,7 @@ public:
     i32 m_damagePending;
     i32 m_killPending;
     i32 m_deathPending;
-    i32 m_spellEffect;
+    SpellType m_spellEffect;
     i32 m_side;
     i32 m_index;
     i32 m_lastAnimationTime;
@@ -104,9 +117,9 @@ public:
     void FreeResources(void);
     void DrawToBuffer(i32, i32, i32);
     void Wince(void);
-    void Walk(i32, i32, i32);
+    void Walk(CombatHexDirection, i32, i32);
     void SpecialAttack(void);
-    void DirDoAttack(i32);
+    void DirDoAttack(CombatHexDirection);
     void DoHydraAttack(i32);
     void DoAttack(i32);
     void ResetPath(void);
@@ -147,12 +160,12 @@ public:
     i32 ValidPath(i32, i32);
     i32 GetMoveMask(i32);
     i32 GetAttackMask(i32, i32, i32);
-    i32 ValidMove(i32);
-    i32 ValidMove(i32, i32);
-    i32 ValidAttack(i32, i32, i32, i32, i32*);
-    i32 GetAdjacentCellIndex(i32, i32);
+    i32 ValidMove(CombatHexDirection);
+    i32 ValidMove(i32, CombatHexDirection);
+    i32 ValidAttack(i32, CombatHexDirection, i32, i32, i32*);
+    i32 GetAdjacentCellIndex(i32, CombatHexDirection);
     i32 ValidRange(i32);
-    i32 GetBestDirection(i32, i32, i32);
+    CombatHexDirection GetBestDirection(i32, i32, i32);
     i32 IsAlive(void) {
         return m_monsterType >= CREATURE_PEASANT && m_quantity > 0;
     }

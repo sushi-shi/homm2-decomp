@@ -213,10 +213,6 @@ H2_ENUM_CLASS_BEGIN(CombatNearbyTileset)
     TILESET_AUTUMN_TREES      = 0x2c
 H2_ENUM_CLASS_END(CombatNearbyTileset)
 
-inline i32 FacingRearHexOffset(i32 facing) {
-    return facing == 1 ? 1 : -1;
-}
-
 }
 
 VA(0x0048fd50, 0x1ba)
@@ -1417,7 +1413,9 @@ void combatManager::CatAttack(i32 side) {
         for (frame18 = 0; frame18 < COMBAT_CATAPULT_DIRECTION_COUNT; frame18++) {
             i32 adjacentHex = GetAdjacentCellIndexNoArmy(
                 IDX(targetHex4),
-                (frame18 + startDirection) % COMBAT_CATAPULT_DIRECTION_COUNT
+                static_cast<CombatHexDirection>(
+                    (frame18 + startDirection) % COMBAT_CATAPULT_DIRECTION_COUNT
+                )
             );
             if (adjacentHex != -1 && m_hexCells[adjacentHex].m_occupantSide == COMBAT_OCCUPANT_NONE) {
                 for (index28 = 0; index28 < COMBAT_CATAPULT_MISS_HEX_COUNT; index28++) {
@@ -1967,10 +1965,10 @@ void combatManager::MakeCreaturesVanish(void) {
                 m_hexCells[removedArmy27->m_hex].m_occupantSide = -1;
                 m_hexCells[removedArmy27->m_hex].m_occupantIndex = -1;
                 if (HAS(removedArmy27->m_monster.flags.all, MONSTER_FLAGS_WIDE)) {
-                    m_hexCells[FacingRearHexOffset(removedArmy27->m_facing)
+                    m_hexCells[ArmyFacingRearHexOffset(removedArmy27->m_facing)
                                + removedArmy27->m_hex]
                             .m_occupantSide = -1;
-                    m_hexCells[FacingRearHexOffset(removedArmy27->m_facing)
+                    m_hexCells[ArmyFacingRearHexOffset(removedArmy27->m_facing)
                                + removedArmy27->m_hex]
                             .m_occupantIndex = -1;
                 }

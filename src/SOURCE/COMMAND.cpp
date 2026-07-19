@@ -486,7 +486,7 @@ void combatManager::SetCombatDirections(i32 targetHex) {
         if (direction_27 == COMBAT_DIRECTION_WIDE_WEST
             || direction_27 == COMBAT_DIRECTION_WIDE_EAST) {
             if (HAS(currentArmy_3->m_monster.flags.all, MONSTER_FLAGS_WIDE) != 0) {
-                if (currentArmy_3->m_facing == 1) {
+                if (currentArmy_3->m_facing == ARMY_FACING_RIGHT) {
                     if (direction_27 == COMBAT_DIRECTION_WIDE_WEST)
                         directionHexes_4[direction_27] = m_adjacency[targetHex][COMBAT_DIRECTION_NORTHWEST];
                     if (direction_27 == COMBAT_DIRECTION_WIDE_EAST)
@@ -507,7 +507,7 @@ void combatManager::SetCombatDirections(i32 targetHex) {
 
         if (HAS(currentArmy_3->m_monster.flags.all, MONSTER_FLAGS_WIDE) != 0
             && directionHexes_4[direction_27] != INVALID_HEX) {
-            if (currentArmy_3->m_facing == 1) {
+            if (currentArmy_3->m_facing == ARMY_FACING_RIGHT) {
                 if (direction_27 == COMBAT_DIRECTION_NORTHWEST
                     || direction_27 == COMBAT_DIRECTION_WEST
                     || direction_27 == COMBAT_DIRECTION_SOUTHWEST) {
@@ -726,21 +726,25 @@ void combatManager::CheckSetMouseDirection(i32 mouseX, i32 mouseY, i32 targetHex
         return;
 
     m_mouseDirection = m_directionMap[sector];
-    i32 directionResult = OppositeDirection(m_directionMap[sector]);
-    i32 direction = directionResult;
-    i32 alternateDirection = -1;
+    CombatHexDirection directionResult =
+        OppositeDirection(static_cast<CombatHexDirection>(m_directionMap[sector]));
+    CombatHexDirection direction = directionResult;
+    CombatHexDirection alternateDirection = COMBAT_DIRECTION_INVALID;
     army* currentArmy = &m_armies[m_currentArmySide][m_currentArmyIndex];
     army* targetArmy = &m_armies[currentArmy->m_targetSide][currentArmy->m_targetIndex];
 
     if (direction == COMBAT_DIRECTION_WIDE_WEST || direction == COMBAT_DIRECTION_WIDE_EAST) {
         if (HAS(currentArmy->m_monster.flags.all, MONSTER_FLAGS_WIDE) != 0) {
-            if (currentArmy->m_facing == 1 && direction == COMBAT_DIRECTION_WIDE_WEST) {
+            if (currentArmy->m_facing == ARMY_FACING_RIGHT
+                && direction == COMBAT_DIRECTION_WIDE_WEST) {
                 direction = COMBAT_DIRECTION_NORTHWEST;
                 alternateDirection = COMBAT_DIRECTION_NORTHEAST;
-            } else if (currentArmy->m_facing == 1 && direction == COMBAT_DIRECTION_WIDE_EAST) {
+            } else if (currentArmy->m_facing == ARMY_FACING_RIGHT
+                       && direction == COMBAT_DIRECTION_WIDE_EAST) {
                 direction = COMBAT_DIRECTION_SOUTHWEST;
                 alternateDirection = COMBAT_DIRECTION_SOUTHEAST;
-            } else if (currentArmy->m_facing == 0 && direction == COMBAT_DIRECTION_WIDE_WEST) {
+            } else if (currentArmy->m_facing == ARMY_FACING_LEFT
+                       && direction == COMBAT_DIRECTION_WIDE_WEST) {
                 direction = COMBAT_DIRECTION_NORTHEAST;
                 alternateDirection = COMBAT_DIRECTION_NORTHWEST;
             } else {
@@ -758,12 +762,12 @@ void combatManager::CheckSetMouseDirection(i32 mouseX, i32 mouseY, i32 targetHex
                 direction = COMBAT_DIRECTION_SOUTHEAST;
         }
     } else {
-        if (currentArmy->m_facing == 1
+        if (currentArmy->m_facing == ARMY_FACING_RIGHT
             && HAS(currentArmy->m_monster.flags.all, MONSTER_FLAGS_WIDE) != 0) {
             if (direction == COMBAT_DIRECTION_NORTHWEST || direction == COMBAT_DIRECTION_WEST
                 || direction == COMBAT_DIRECTION_SOUTHWEST)
                 targetHex--;
-        } else if (currentArmy->m_facing == 0
+        } else if (currentArmy->m_facing == ARMY_FACING_LEFT
                    && HAS(currentArmy->m_monster.flags.all, MONSTER_FLAGS_WIDE) != 0
                    && (direction == COMBAT_DIRECTION_NORTHEAST || direction == COMBAT_DIRECTION_EAST
                        || direction == COMBAT_DIRECTION_SOUTHEAST)) {
@@ -771,13 +775,13 @@ void combatManager::CheckSetMouseDirection(i32 mouseX, i32 mouseY, i32 targetHex
         }
     }
 
-    m_directionTargetHex = m_adjacency[targetHex][direction];
+    m_directionTargetHex = m_adjacency[targetHex][IDX(direction)];
     i32 rearHex = IGNORED_HEX;
-    if (currentArmy->m_facing == 0
+    if (currentArmy->m_facing == ARMY_FACING_LEFT
         && HAS(currentArmy->m_monster.flags.all, MONSTER_FLAGS_WIDE) != 0) {
         rearHex = m_directionTargetHex - 1;
     }
-    if (currentArmy->m_facing == 1
+    if (currentArmy->m_facing == ARMY_FACING_RIGHT
         && HAS(currentArmy->m_monster.flags.all, MONSTER_FLAGS_WIDE) != 0) {
         rearHex = m_directionTargetHex + 1;
     }
@@ -785,13 +789,13 @@ void combatManager::CheckSetMouseDirection(i32 mouseX, i32 mouseY, i32 targetHex
         if (HAS(currentArmy->m_monster.flags.all, MONSTER_FLAGS_WIDE) != 0
             && (direction == COMBAT_DIRECTION_WIDE_WEST
                 || direction == COMBAT_DIRECTION_WIDE_EAST)) {
-            if (currentArmy->m_facing == 1)
+            if (currentArmy->m_facing == ARMY_FACING_RIGHT)
                 m_directionTargetHex++;
             else
                 m_directionTargetHex--;
         } else {
-            if (alternateDirection != -1)
-                m_directionTargetHex = m_adjacency[targetHex][alternateDirection];
+            if (alternateDirection != COMBAT_DIRECTION_INVALID)
+                m_directionTargetHex = m_adjacency[targetHex][IDX(alternateDirection)];
         }
     }
     gpMouseManager->SetPointer(m_mouseDirection + POINTER_ATTACK_OFFSET);

@@ -727,7 +727,9 @@ void combatManager::CastSpell(
                     adjacentHex_q = teleportDestination;
                     if (teleportArmy_i->m_facing == ARMY_FACING_RIGHT) {
                         adjacentHex_q =
-                            teleportArmy_i->GetAdjacentCellIndex(teleportDestination, 1);
+                            teleportArmy_i->GetAdjacentCellIndex(
+                                teleportDestination, COMBAT_DIRECTION_EAST
+                            );
                         if (adjacentHex_q == COMBAT_HEX_EMPTY
                             || (m_hexCells[adjacentHex_q].m_occupantSide != COMBAT_HEX_EMPTY
                                 && (m_hexCells[adjacentHex_q].m_occupantSide != targetSide_i
@@ -737,7 +739,9 @@ void combatManager::CastSpell(
                         }
                     }
                     if (teleportArmy_i->m_facing == ARMY_FACING_LEFT) {
-                        adjacentHex_q = teleportArmy_i->GetAdjacentCellIndex(adjacentHex_q, 4);
+                        adjacentHex_q = teleportArmy_i->GetAdjacentCellIndex(
+                            adjacentHex_q, COMBAT_DIRECTION_WEST
+                        );
                         if (adjacentHex_q == COMBAT_HEX_EMPTY
                             || (m_hexCells[adjacentHex_q].m_occupantSide != COMBAT_HEX_EMPTY
                                 && (m_hexCells[adjacentHex_q].m_occupantSide != targetSide_i
@@ -1232,10 +1236,14 @@ void combatManager::Fireball(i32 targetHex, SpellType spell) {
 
     for (frame_i = 0; frame_i < SPELL_ADJACENT_DIRECTION_COUNT; ++frame_i) {
         affectedHexes_e[frame_i + 1] =
-            static_cast<i16>(GetAdjacentCellIndexNoArmy(targetHex, frame_i));
+            static_cast<i16>(GetAdjacentCellIndexNoArmy(
+                targetHex, static_cast<CombatHexDirection>(frame_i)
+            ));
         if (spell == SPELL_FIREBLAST) {
             affectedHexes_e[frame_i + SPELL_FIREBLAST_SECOND_RING_FIRST] = static_cast<i16>(
-                target_n->GetAdjacentCellIndex(affectedHexes_e[frame_i + 1], frame_i)
+                target_n->GetAdjacentCellIndex(
+                    affectedHexes_e[frame_i + 1], static_cast<CombatHexDirection>(frame_i)
+                )
             );
         }
     }
@@ -1249,13 +1257,21 @@ void combatManager::Fireball(i32 targetHex, SpellType spell) {
         if (affectedHexes_e[SPELL_FIREBLAST_AXIAL_SECOND] >= COMBAT_HEX_COUNT)
             affectedHexes_e[SPELL_FIREBLAST_AXIAL_SECOND] = COMBAT_HEX_EMPTY;
         affectedHexes_e[SPELL_FIREBLAST_CORNER_FIRST] =
-            static_cast<i16>(GetAdjacentCellIndexNoArmy(affectedHexes_e[2], 0));
+            static_cast<i16>(GetAdjacentCellIndexNoArmy(
+                affectedHexes_e[2], COMBAT_DIRECTION_NORTHEAST
+            ));
         affectedHexes_e[SPELL_FIREBLAST_CORNER_FIRST + 1] =
-            static_cast<i16>(GetAdjacentCellIndexNoArmy(affectedHexes_e[2], 2));
+            static_cast<i16>(GetAdjacentCellIndexNoArmy(
+                affectedHexes_e[2], COMBAT_DIRECTION_SOUTHEAST
+            ));
         affectedHexes_e[SPELL_FIREBLAST_CORNER_FIRST + 2] =
-            static_cast<i16>(GetAdjacentCellIndexNoArmy(affectedHexes_e[5], 5));
+            static_cast<i16>(GetAdjacentCellIndexNoArmy(
+                affectedHexes_e[5], COMBAT_DIRECTION_NORTHWEST
+            ));
         affectedHexes_e[SPELL_FIREBLAST_CORNER_FIRST + 3] =
-            static_cast<i16>(GetAdjacentCellIndexNoArmy(affectedHexes_e[5], 3));
+            static_cast<i16>(GetAdjacentCellIndexNoArmy(
+                affectedHexes_e[5], COMBAT_DIRECTION_SOUTHWEST
+            ));
     }
 
     baseDamage_w = m_spellPower[m_currentSide] * SPELL_FIREBALL_DAMAGE_PER_POWER;
@@ -1321,7 +1337,9 @@ void combatManager::MeteorShower(i32 targetHex) {
     i32 direction;
     i32 frame;
     for (direction = 0; direction < SPELL_ADJACENT_DIRECTION_COUNT; ++direction) {
-        affectedHexes_f[direction + 1] = GetAdjacentCellIndexNoArmy(targetHex, direction);
+        affectedHexes_f[direction + 1] = GetAdjacentCellIndexNoArmy(
+            targetHex, static_cast<CombatHexDirection>(direction)
+        );
     }
 
     if (!gbNoShowCombat) {
@@ -2858,9 +2876,11 @@ void combatManager::MirrorImage(i32 targetHex) {
 
             i32 direction;
             for (direction = 0; direction < SPELL_ADJACENT_DIRECTION_COUNT; ++direction) {
-                i32 searchDirection = source->m_facing == ARMY_FACING_RIGHT
-                                          ? direction
-                                          : SPELL_ADJACENT_DIRECTION_COUNT - 1 - direction;
+                CombatHexDirection searchDirection = static_cast<CombatHexDirection>(
+                    source->m_facing == ARMY_FACING_RIGHT
+                        ? direction
+                        : SPELL_ADJACENT_DIRECTION_COUNT - 1 - direction
+                );
                 i32 candidateHex = searchHex;
                 i32 step;
                 for (step = 0; step < distance; ++step) {
@@ -3248,7 +3268,9 @@ void combatManager::Resurrect(i32 spell, i32 targetHex, i32 spellPower) {
                 0
             );
             UpdateCombatArea();
-            target_i->m_facing = 1 - target_i->m_side;
+            target_i->m_facing = static_cast<ArmyFacing>(
+                IDX(ARMY_FACING_RIGHT) - target_i->m_side
+            );
             if (target_i->m_animationSequence == ARMY_ANIMATION_DEATH) {
                 if (index_o >= RESURRECT_DEATH_REVERSE_FRAME) {
                     target_i->m_animationSequence = ARMY_ANIMATION_STAND;

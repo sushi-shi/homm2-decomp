@@ -7,8 +7,6 @@
 #include <SOURCE/searchArray.h>
 
 H2_ENUM_BEGIN(CombatPathConstant)
-    DIRECTION_COUNT        = 6,
-    WIDE_DIRECTION_COUNT   = 8,
     SPECIAL_DIRECTION_MASK = 0xc0,
     IGNORE_SPEED           = 99,
     WIDE_HEX_OFFSET        = 1
@@ -69,11 +67,13 @@ i32 army::ValidPath(i32 targetHex, i32 pathMode) {
 
 VA(0x004bddd4, 0x6d)
 i32 army::GetMoveMask(i32 sourceHex) {
-    i32 directionResult;
+    CombatHexDirection directionResult;
     i32 blockedMaskValue = 0;
     i32 directionBitFlag = 1;
 
-    for (directionResult = 0; directionResult <= COMBAT_DIRECTION_NORTHWEST; directionResult++) {
+    for (directionResult = COMBAT_DIRECTION_NORTHEAST;
+         directionResult <= COMBAT_DIRECTION_NORTHWEST;
+         directionResult++) {
         if (!ValidMove(sourceHex, directionResult))
             blockedMaskValue |= directionBitFlag;
         directionBitFlag <<= 1;
@@ -83,7 +83,7 @@ i32 army::GetMoveMask(i32 sourceHex) {
 
 VA(0x004bde41, 0xb5)
 i32 army::GetAttackMask(i32 sourceHex, i32 targetMode, i32 targetHex) {
-    i32 directionResult;
+    CombatHexDirection directionResult;
     i32 directionCountNext;
     i32 blockedMaskValue;
     i32 directionBitFlag;
@@ -97,11 +97,13 @@ i32 army::GetAttackMask(i32 sourceHex, i32 targetMode, i32 targetHex) {
     directionBitFlag = 1;
 
     if HAS(m_monster.attributes, MONSTER_ATTRIBUTE_WIDE)
-        directionCountNext = WIDE_DIRECTION_COUNT;
+        directionCountNext = COMBAT_DIRECTION_COUNT;
     else
-        directionCountNext = DIRECTION_COUNT;
+        directionCountNext = COMBAT_DIRECTION_ADJACENT_COUNT;
 
-    for (directionResult = 0; directionResult < directionCountNext; directionResult++) {
+    for (directionResult = COMBAT_DIRECTION_NORTHEAST;
+         directionResult < directionCountNext;
+         directionResult++) {
         if (!ValidAttack(sourceHex, directionResult, targetMode, targetHex, &attackHexNext))
             blockedMaskValue |= directionBitFlag;
         directionBitFlag <<= 1;
@@ -110,12 +112,12 @@ i32 army::GetAttackMask(i32 sourceHex, i32 targetMode, i32 targetHex) {
 }
 
 VA(0x004bdef6, 0x2b)
-i32 army::ValidMove(i32 direction) {
+i32 army::ValidMove(CombatHexDirection direction) {
     return ValidMove(m_hex, direction);
 }
 
 VA(0x004bdf21, 0x2f6)
-i32 army::ValidMove(i32 sourceHex, i32 direction) {
+i32 army::ValidMove(i32 sourceHex, CombatHexDirection direction) {
     i32 destinationHexNext;
     i32 rearHex;
     i32 frontValid;
@@ -194,7 +196,7 @@ i32 army::ValidMove(i32 sourceHex, i32 direction) {
 VA(0x004be217, 0x273)
 i32 army::ValidAttack(
     i32 sourceHex,
-    i32 direction,
+    CombatHexDirection direction,
     i32 targetMode,
     i32 requiredTargetHex,
     i32* attackHex
@@ -266,7 +268,7 @@ i32 army::ValidAttack(
 }
 
 VA(0x004be48a, 0xa5)
-i32 army::GetAdjacentCellIndex(i32 sourceHex, i32 direction) {
+i32 army::GetAdjacentCellIndex(i32 sourceHex, CombatHexDirection direction) {
     if (sourceHex == ARMY_HEX_INVALID)
         return ARMY_HEX_INVALID;
 
@@ -287,7 +289,7 @@ i32 army::GetAdjacentCellIndex(i32 sourceHex, i32 direction) {
 }
 
 VA(0x004be52f, 0x6e)
-i32 GetAdjacentCellIndexNoArmy(i32 sourceHex, i32 direction) {
+i32 GetAdjacentCellIndexNoArmy(i32 sourceHex, CombatHexDirection direction) {
     if (sourceHex == ARMY_HEX_INVALID)
         return ARMY_HEX_INVALID;
 
@@ -301,7 +303,7 @@ i32 GetAdjacentCellIndexNoArmy(i32 sourceHex, i32 direction) {
 VA(0x004be59d, 0x44a)
 i32 army::ValidRange(i32 targetHex) {
     i32 adjacentHex;
-    i32 directionResult;
+    CombatHexDirection directionResult;
 
     if (!ValidHex(targetHex))
         return 0;
@@ -401,12 +403,13 @@ i32 army::ValidRange(i32 targetHex) {
     return 0;
 }
 
-#define OPPOSITE_DIRECTION_OFFSET (DIRECTION_COUNT / 2)
-
 VA(0x004be9e7, 0x58)
-i32 OppositeDirection(i32 direction) {
-    if (direction < DIRECTION_COUNT) {
-        return (direction + OPPOSITE_DIRECTION_OFFSET) % DIRECTION_COUNT;
+CombatHexDirection OppositeDirection(CombatHexDirection direction) {
+    if (direction < COMBAT_DIRECTION_ADJACENT_COUNT) {
+        return static_cast<CombatHexDirection>(
+            (IDX(direction) + COMBAT_DIRECTION_OPPOSITE_OFFSET)
+            % COMBAT_DIRECTION_ADJACENT_COUNT
+        );
     } else {
         if (direction == COMBAT_DIRECTION_WIDE_WEST)
             return COMBAT_DIRECTION_WIDE_EAST;
@@ -415,10 +418,8 @@ i32 OppositeDirection(i32 direction) {
     }
 }
 
-#undef OPPOSITE_DIRECTION_OFFSET
-
 VA(0x004bea3f, 0x8ff)
-i32 army::GetBestDirection(i32 sourceHex, i32 targetHex, i32 blockedMask) {
+CombatHexDirection army::GetBestDirection(i32 sourceHex, i32 targetHex, i32 blockedMask) {
     i32 sourceRow;
     i32 sourceColumnCheck;
     i32 targetRowValue;
@@ -429,7 +430,7 @@ i32 army::GetBestDirection(i32 sourceHex, i32 targetHex, i32 blockedMask) {
     i32 isMovingRight;
 
     if (!ValidHex(sourceHex) || !ValidHex(targetHex))
-        return ARMY_HEX_INVALID;
+        return COMBAT_DIRECTION_INVALID;
 
     sourceColumnCheck = sourceHex % ARMY_HEX_COLUMNS;
     sourceRow = sourceHex / ARMY_HEX_COLUMNS;
@@ -633,5 +634,5 @@ i32 army::GetBestDirection(i32 sourceHex, i32 targetHex, i32 blockedMask) {
                 return COMBAT_DIRECTION_WIDE_WEST;
         }
     }
-    return ARMY_HEX_INVALID;
+    return COMBAT_DIRECTION_INVALID;
 }
