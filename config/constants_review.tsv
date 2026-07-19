@@ -209,7 +209,7 @@ src/SOURCE/REMOTE.cpp	reviewed	Private CRC, local storage, direct-link, message-
 src/SOURCE/REQUEST.cpp	reviewed	Private constants name legacy basename bounds, requester geometry, list extents, pending state, widget construction, filename entry length, filter frames, and selection color; shared widget flags/kind are reused, and the swapped knob/gutter control labels now match their behavior.
 src/SOURCE/SEARCH.cpp	reviewed	Uses the modeled map-cell occupancy flag and road bitfield directly; remaining numeric literals are boolean values, loop origins, path sentinels, and expression-local arithmetic.
 src/SOURCE/SETUP.cpp	pending
-src/SOURCE/SMACKMGR.cpp	pending
+src/SOURCE/SMACKMGR.cpp	reviewed	Private constants name Smacker palette conversion, campaign-choice frames and redraw geometry, congratulations overlay layout, Miles preference, playback benchmark thresholds, and movie-table extent. Shared palette, WinGraph, Smacker, font, and dialog domains are reused; movie option rows and campaign hit rectangles remain reviewed retail data payload.
 src/SOURCE/SPELLAI.cpp	reviewed	Private combat-grid stepping and mirror-value constants are named; shared monster abilities, side counts, chain-lightning limits, combat directions, and fireblast topology are reused. Remaining findings are the two duration-modifier data payloads.
 src/SOURCE/SPELLS.cpp	pending
 src/SOURCE/STRIP.cpp	reviewed	Private bank-box storage/widget values plus shared strip layout, frames, resource, and slot domains cover policy literals; remaining zeros and ones are drawing origins/frames, loop initialization, booleans, and widget state. Redundant OD_STEER use was removed from the border id expression.
