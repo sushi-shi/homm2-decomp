@@ -25,7 +25,7 @@ DATA(0x00520df4) static SSampleSourceFiles gSampleSourceFiles =
 // @early-stop: retail alignment artifact.
 VA(0x004dad60, 0x181)
 sample::sample(char* name, i32l channelType, i32l volume, i32l loopCount)
-    : resource(RESOURCE_CATEGORY_SAMPLE, gpResourceManager->MakeId(name, 1), 1, 0) {
+    : resource(RESOURCE_CATEGORY_SAMPLE, gpResourceManager->MakeId(name, 1), 1, NULL) {
     i32 formatFlags;
     m_playbackData.channelType = channelType;
     m_playbackData.volume = volume;
@@ -75,13 +75,13 @@ VA(0x004daf40, 0x2c)
 inline sample::~sample() {
 #line 97
     H2_FREE_AT(m_playbackData.data, gSampleSourceFiles.sampleDestruction, 0x61);
-    m_playbackData.data = 0;
+    m_playbackData.data = NULL;
     m_playbackData.size = 0;
     m_playbackData.volume = 0;
 }
 
 VA(0x004daf70, 0x72)
-MIDIWrap::MIDIWrap(char* name) : resource(RESOURCE_CATEGORY_SAMPLE, gpResourceManager->MakeId(name, 1), 1, 0) {
+MIDIWrap::MIDIWrap(char* name) : resource(RESOURCE_CATEGORY_SAMPLE, gpResourceManager->MakeId(name, 1), 1, NULL) {
     u32l size = gpResourceManager->GetFileSize(m_id);
 #line 110
     m_data = static_cast<char*>(H2_ALLOC_AT(size, gSampleSourceFiles.midiAllocation, 110));
@@ -94,7 +94,7 @@ VA(0x004db030, 0x28)
 inline MIDIWrap::~MIDIWrap() {
 #line 118
     H2_FREE_AT(m_data, gSampleSourceFiles.midiDestruction, 0x76);
-    m_data = 0;
+    m_data = NULL;
 }
 
 

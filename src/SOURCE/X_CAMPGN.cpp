@@ -297,7 +297,7 @@ DATA(0x0051d740) static i8 expansionCampaignDifficulty[IDX(EXPANSION_CAMPAIGN_CO
 
 VA(0x004bb680, 0x23)
 ExpCampaign::ExpCampaign(void) {
-    m_window = 0;
+    m_window = NULL;
 }
 
 VA(0x004bb6a3, 0x16)
@@ -368,7 +368,7 @@ void ExpCampaign::InitMap(void) {
     strcpy(gMapName, gpGame->m_mapFilename);
     i32 mapHeaderResult = GetMapHeader(gpGame->m_mapFilename, &gpGame->m_mapHeader);
     gpGame->LoadGame("origdata.bin", 1, 0);
-    gpGame->InitNewGame(0);
+    gpGame->InitNewGame(NULL);
     gpGame->m_difficulty = expansionCampaignDifficulty[m_campaignId][m_currentMap];
     gpGame->m_playerCount = gpGame->m_mapHeader.playerCount;
     gpGame->NewMap(gMapName);
@@ -542,10 +542,10 @@ void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
     gbUseEvilInterface = true;
     m_viewMap = m_currentMap;
     m_window = new heroWindow(0, 0, "x_camp.bin");
-    if (m_window == 0)
+    if (m_window == NULL)
         MemError();
 
-    widget* trackWidget = 0;
+    widget* trackWidget = NULL;
     i32 map;
     for (map = 0; map < m_mapCount; ++map) {
         trackWidget = new iconWidget(
@@ -560,12 +560,12 @@ void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
             EXPANSION_CAMPAIGN_TRACK_ICON_COLOR,
             1
         );
-        if (trackWidget == 0)
+        if (trackWidget == NULL)
             MemError();
         m_window->AddWidget(trackWidget, -1);
     }
 
-    widget* campaignIcon = 0;
+    widget* campaignIcon = NULL;
     campaignIcon = new iconWidget(
         24,
         25,
@@ -578,7 +578,7 @@ void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
         EXPANSION_CAMPAIGN_TRACK_ICON_COLOR,
         1
     );
-    if (campaignIcon == 0)
+    if (campaignIcon == NULL)
         MemError();
     m_window->AddWidget(campaignIcon, -1);
 

@@ -19,8 +19,8 @@ VA(0x004d1060, 0x3e)
 textWidget::textWidget(void) : widget(0, 0, 0, 0, 0, 0) {
     m_color = 1;
     m_alignment = 1;
-    m_font = 0;
-    m_text = 0;
+    m_font = NULL;
+    m_text = NULL;
     m_kind = EncodeWidgetKind(WIDGET_KIND_TEXT);
 }
 

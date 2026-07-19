@@ -160,7 +160,7 @@ combatManager::combatManager(void) {
 
 VA(0x0048ff0a, 0x128)
 void combatManager::CombineGroups(armyGroup* sourceGroup, armyGroup* targetGroup) {
-    if (sourceGroup == 0 || targetGroup == 0)
+    if (sourceGroup == NULL || targetGroup == NULL)
         return;
 
     i32 sourceIndex;
@@ -213,22 +213,22 @@ void combatManager::SetupCombat(
     if (mapX >= 0 && mapY >= 0)
         m_battlefieldCell = gpAdvManager->GetCell(mapX, mapY);
     else
-        m_battlefieldCell = 0;
+        m_battlefieldCell = NULL;
 
     m_terrainType = giGroundToTerrain[m_battlefieldCell->m_terrainImageIndex];
     sprintf(m_battlefieldBackgroundName, GetBackgroundName());
 
-    if (attackerHero != 0) {
+    if (attackerHero != NULL) {
         m_playerId[COMBAT_ATTACKER_SIDE] = attackerHero->m_owner;
         attackerGroup = &attackerHero->m_army;
     } else {
         m_playerId[COMBAT_ATTACKER_SIDE] = -1;
     }
 
-    if (defenderHero != 0) {
+    if (defenderHero != NULL) {
         m_playerId[COMBAT_DEFENDER_SIDE] = defenderHero->m_owner;
         defenderGroup = &defenderHero->m_army;
-    } else if (defenderTown != 0) {
+    } else if (defenderTown != NULL) {
         m_playerId[COMBAT_DEFENDER_SIDE] = defenderTown->m_owner;
         defenderGroup = &defenderTown->m_army;
     } else {
@@ -247,7 +247,7 @@ void combatManager::SetupCombat(
         else
             m_heroes[side] = defenderHero;
 
-        if (m_heroes[side] != 0)
+        if (m_heroes[side] != NULL)
             m_heroes[side]->m_isCaptain = 0;
 
         if (side == COMBAT_ATTACKER_SIDE)
@@ -257,11 +257,11 @@ void combatManager::SetupCombat(
 
         m_catapultAttacksRemaining[side] = 1;
         m_catapultAttackCount[side] = m_catapultAttacksRemaining[side];
-        if (m_heroes[side] != 0 && m_heroes[side]->HasArtifact(ARTIFACT_BALLISTA)) {
+        if (m_heroes[side] != NULL && m_heroes[side]->HasArtifact(ARTIFACT_BALLISTA)) {
             m_catapultAttacksRemaining[side] = 2;
             m_catapultAttackCount[side] = m_catapultAttacksRemaining[side];
         }
-        if (m_heroes[side] != 0
+        if (m_heroes[side] != NULL
             && m_heroes[side]->m_secondarySkills[IDX(HERO_SKILL_BALLISTICS)]
                    >= IDX(HERO_SKILL_LEVEL_ADVANCED)) {
             m_catapultAttackCount[side]++;
@@ -273,7 +273,7 @@ void combatManager::SetupCombat(
     }
 
     m_drawbridgeBackgroundVisible = 0;
-    if (defenderTown != 0) {
+    if (defenderTown != NULL) {
         if (defenderTown->m_occupyingHeroId != -1) {
             m_armyGroups[COMBAT_DEFENDER_SIDE] = &m_heroes[COMBAT_DEFENDER_SIDE]->m_army;
             CombineGroups(&defenderTown->m_army, &m_heroes[COMBAT_DEFENDER_SIDE]->m_army);
@@ -298,7 +298,7 @@ void combatManager::SetupCombat(
         m_combatTowns[COMBAT_DEFENDER_SIDE] = defenderTown;
         m_originalCombatTown = m_combatTowns[COMBAT_DEFENDER_SIDE];
 
-        if (m_heroes[COMBAT_DEFENDER_SIDE] == 0
+        if (m_heroes[COMBAT_DEFENDER_SIDE] == NULL
             && (defenderTown->m_buildings & IDX(TOWN_BUILDING_CAPTAIN_QUARTERS))) {
             m_heroes[COMBAT_DEFENDER_SIDE] = &m_captain;
             memset(&m_captain, 0, sizeof(m_captain));
@@ -321,9 +321,9 @@ void combatManager::SetupCombat(
         }
     } else {
         m_inCastleCombat = false;
-        m_combatTowns[COMBAT_DEFENDER_SIDE] = 0;
+        m_combatTowns[COMBAT_DEFENDER_SIDE] = NULL;
     }
-    m_combatTowns[COMBAT_ATTACKER_SIDE] = 0;
+    m_combatTowns[COMBAT_ATTACKER_SIDE] = NULL;
 }
 
 VA(0x00490624, 0x279)
@@ -333,9 +333,9 @@ void combatManager::InitNonVisualVars(void) {
     i32 side;
     for (side = COMBAT_ATTACKER_SIDE; side < COMBAT_SIDE_COUNT_DRAWING; side++) {
         m_spellPower[side] = 0;
-        if (m_heroes[side] != 0)
+        if (m_heroes[side] != NULL)
             m_spellPower[side] = m_heroes[side]->Stats(HERO_PRIMARY_SPELL_POWER);
-        if (m_combatTowns[side] != 0 && m_combatTowns[side]->m_type == IDX(FACTION_NECROMANCER)
+        if (m_combatTowns[side] != NULL && m_combatTowns[side]->m_type == IDX(FACTION_NECROMANCER)
             && (m_combatTowns[side]->m_buildings & IDX(TOWN_BUILDING_SHRINE)))
             m_spellPower[side] += 2;
     }
@@ -443,7 +443,7 @@ i32 combatManager::Open(i32 openFlags) {
     m_combatBuffer =
         new bitmap(BITMAP_TYPE_NONE, COMBAT_BACKGROUND_COPY_WIDTH, COMBAT_BACKGROUND_COPY_HEIGHT);
     m_backgroundBuffer = new bitmap(BITMAP_TYPE_NONE, COMBAT_SCREEN_WIDTH, COMBAT_AREA_HEIGHT);
-    m_mouseGridBuffer = 0;
+    m_mouseGridBuffer = NULL;
     m_smallViewLastX[COMBAT_ATTACKER_SIDE] = -1;
     m_smallViewLastX[COMBAT_DEFENDER_SIDE] = -1;
     memset(m_gridState, 0, sizeof(m_gridState));
@@ -457,18 +457,18 @@ i32 combatManager::Open(i32 openFlags) {
     LogStr("Op2");
     SAMPLE2 preBattleSample = NULL_SAMPLE2;
     preBattleSample = LoadPlaySample("PREBATTL.82M");
-    gpWindowManager->FadeScreen(1, 8, 0);
+    gpWindowManager->FadeScreen(1, 8, NULL);
     giCycleType = m_colorCycleType;
     CycleColors(1);
     CycleColors(1);
-    gCurLoadedSpellIcon = 0;
+    gCurLoadedSpellIcon = NULL;
     gCurLoadedSpellEffect = SPELL_NONE;
     gpMouseManager->m_forcePointerUpdate = 0;
     gpMouseManager->SetPointer("cmbtmous.mse", 6, MOUSE_AUTO_CURSOR_TYPE);
     bMouseWasVis = gpMouseManager->IsVis();
     gpMouseManager->ShowColorPointer();
     m_combatWindow = new heroWindow(0, 0, "cmbtwin.bin");
-    if (m_combatWindow == 0)
+    if (m_combatWindow == NULL)
         MemError();
     gpWindowManager->AddWindow(m_combatWindow, -1, 1);
     m_combatWindowOpen = 1;
@@ -507,12 +507,12 @@ void combatManager::Close(void) {
         memcpy(gPalette->m_data, m_savedPalette, COMBAT_PALETTE_DATA_SIZE);
         memcpy(gpBufferPalette->m_data, m_savedPalette, COMBAT_PALETTE_DATA_SIZE);
     }
-    gpWindowManager->FadeScreen(1, 8, 0);
+    gpWindowManager->FadeScreen(1, 8, NULL);
     giCycleType = WINDOW_COLOR_CYCLE_DEFAULT;
     CycleColors(0);
     delete m_combatBuffer;
     delete m_backgroundBuffer;
-    if (m_mouseGridBuffer != 0)
+    if (m_mouseGridBuffer != NULL)
         delete m_mouseGridBuffer;
 
     i32 total;
@@ -771,10 +771,10 @@ void combatManager::LoadIcons(void) {
     i32 index;
     i32 heroColor;
     for (index = 0; index < COMBAT_FIXED_ICON_COUNT; index++)
-        m_combatIcons[index] = 0;
+        m_combatIcons[index] = NULL;
 
     for (index = 0; index < COMBAT_OBSTACLE_ICON_LOAD_COUNT; index++)
-        m_obstacleIcons[index] = 0;
+        m_obstacleIcons[index] = NULL;
 
     m_combatIcons[IDX(COMBAT_ICON_SPELLS)] = gpResourceManager->GetIcon("spells.icn");
     m_combatIcons[IDX(COMBAT_ICON_STATUS)] = gpResourceManager->GetIcon("textbar.icn");
@@ -801,8 +801,8 @@ void combatManager::LoadIcons(void) {
     }
 
     for (index = 0; index < COMBAT_MANAGER_SIDE_COUNT; index++) {
-        m_heroIcons[index] = 0;
-        m_heroOverlayIcons[index] = 0;
+        m_heroIcons[index] = NULL;
+        m_heroOverlayIcons[index] = NULL;
         m_heroAnimationState[index] = 0;
         m_heroAnimationFrame[index] = 0;
         m_heroSpriteIndex[index] = -1;
@@ -928,7 +928,7 @@ void combatManager::FreeArmies(void) {
 
     if (gCurLoadedSpellIcon)
         gpResourceManager->Dispose(gCurLoadedSpellIcon);
-    gCurLoadedSpellIcon = 0;
+    gCurLoadedSpellIcon = NULL;
     gCurLoadedSpellEffect = SPELL_NONE;
 }
 
@@ -1417,8 +1417,8 @@ void combatManager::CatAttack(i32 side) {
             &limits1,
             0,
             0,
-            0,
-            0
+            NULL,
+            NULL
         );
         gpWindowManager->UpdateScreenRegion(
             giMinExtentX,
@@ -1903,8 +1903,8 @@ void combatManager::MakeCreaturesVanish(void) {
         extentWidth8,
         extentHeight9,
         static_cast<i32>(gfCombatSpeedMod[gConfig.combatSpeed] * COMBAT_CREATURE_VANISH_DURATION),
-        0,
-        0
+        NULL,
+        NULL
     );
 }
 

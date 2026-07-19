@@ -172,7 +172,7 @@ hero::hero(void) {
     m_cursorType = 0;
     m_portrait = 0;
     m_name[0] = 0;
-    heroWin = 0;
+    heroWin = NULL;
     giHeroScreenSrcIndex = UI_ARMY_SELECTION_NONE;
 }
 
@@ -352,7 +352,7 @@ VA(0x0046cab1, 0x82)
 void HeroMessageUpdate(char* text) {
     tag_message message;
 
-    if (gheroWin == 0)
+    if (gheroWin == NULL)
         return;
 
     message.type = HERO_UI_MESSAGE;
@@ -550,7 +550,7 @@ void hero::Deallocate(i32 updateMap) {
 
     if (m_owner != giCurPlayer || gpGame->m_players[m_owner].m_currentHero != m_id
         || gpAdvManager->m_heroContextLocked == 0) {
-        gpGame->RestoreCell(m_x, m_y, m_locationType, m_occupiedTown, 0, 1);
+        gpGame->RestoreCell(m_x, m_y, m_locationType, m_occupiedTown, NULL, 1);
     }
 
     if (!gbCombatSurrender) {
@@ -950,9 +950,9 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
         case UI_MORALE_FIRST:
         case UI_MORALE_FIRST + 1:
         case UI_MORALE_LAST:
-            if (gpHVHero->m_army.GetMorale(gpHVHero, gpHVHero->GetOccupiedTown(), 0) > 0)
+            if (gpHVHero->m_army.GetMorale(gpHVHero, gpHVHero->GetOccupiedTown(), NULL) > 0)
                 sprintf(gText, cHeroScreen[IDX(TEXT_GOOD_MORALE)]);
-            else if (gpHVHero->m_army.GetMorale(gpHVHero, gpHVHero->GetOccupiedTown(), 0) == 0)
+            else if (gpHVHero->m_army.GetMorale(gpHVHero, gpHVHero->GetOccupiedTown(), NULL) == 0)
                 sprintf(gText, cHeroScreen[IDX(TEXT_NEUTRAL_MORALE)]);
             else
                 sprintf(gText, cHeroScreen[IDX(TEXT_BAD_MORALE)]);
@@ -961,9 +961,9 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
         case UI_LUCK_FIRST:
         case UI_LUCK_FIRST + 1:
         case UI_LUCK_LAST:
-            if (gpGame->GetLuck(gpHVHero, 0, gpHVHero->GetOccupiedTown()) > 0)
+            if (gpGame->GetLuck(gpHVHero, NULL, gpHVHero->GetOccupiedTown()) > 0)
                 sprintf(gText, cHeroScreen[IDX(TEXT_GOOD_LUCK)]);
-            else if (gpGame->GetLuck(gpHVHero, 0, gpHVHero->GetOccupiedTown()) == 0)
+            else if (gpGame->GetLuck(gpHVHero, NULL, gpHVHero->GetOccupiedTown()) == 0)
                 sprintf(gText, cHeroScreen[IDX(TEXT_NEUTRAL_LUCK)]);
             else
                 sprintf(gText, cHeroScreen[IDX(TEXT_BAD_LUCK)]);
@@ -1373,12 +1373,12 @@ i32 HeroHandler(struct tag_message& message) {
                                 UI_VIEW_ARMY_Y,
                                 gpHVHero->m_army.m_creatureTypes[armySlot7],
                                 gpHVHero->m_army.m_creatureCounts[armySlot7],
-                                0,
+                                NULL,
                                 canDismiss,
                                 1,
                                 quickView0,
                                 gpHVHero,
-                                0,
+                                NULL,
                                 &gpHVHero->m_army,
                                 armySlot7
                             );
@@ -1530,10 +1530,10 @@ i32 HeroView(i32 heroId, i32 noDismiss, i32 fadeAlreadyOut) {
     gpHVHero = gpGame->GetHero(heroId);
     gbHeroWindShowing = true;
     if (fadeAlreadyOut == 0)
-        gpWindowManager->FadeScreen(UI_FADE_OUT, UI_FADE_STEPS, 0);
+        gpWindowManager->FadeScreen(UI_FADE_OUT, UI_FADE_STEPS, NULL);
 
     heroWin = new heroWindow(0, 0, "herowind.bin");
-    if (heroWin == 0)
+    if (heroWin == NULL)
         MemError();
     SetWinText(heroWin, UI_WINDOW_TEXT_ID);
     gheroWin = heroWin;
@@ -1548,18 +1548,18 @@ i32 HeroView(i32 heroId, i32 noDismiss, i32 fadeAlreadyOut) {
 
     SetupHeroView();
     RedrawHeroScreen();
-    gpWindowManager->FadeScreen(UI_FADE_IN, UI_FADE_STEPS, 0);
+    gpWindowManager->FadeScreen(UI_FADE_IN, UI_FADE_STEPS, NULL);
     gpWindowManager->DoDialog(heroWin, HeroHandler, 0);
-    gpWindowManager->FadeScreen(UI_FADE_OUT, UI_FADE_STEPS, 0);
+    gpWindowManager->FadeScreen(UI_FADE_OUT, UI_FADE_STEPS, NULL);
     delete heroWin;
-    gheroWin = 0;
+    gheroWin = NULL;
 
     if (gpWindowManager->m_dialogResult == UI_DIALOG_DISMISS) {
         return UI_VIEW_DISMISSED;
     } else {
         gpHVHero->m_mobility = gpHVHero->CalcMobility();
         gbHeroWindShowing = false;
-        gpHVHero = 0;
+        gpHVHero = NULL;
         return UI_VIEW_CLOSED;
     }
 }
@@ -1636,7 +1636,7 @@ void SetupHeroView(void) {
         heroWin->BroadcastMessage(message);
     }
 
-    luck = gpGame->GetLuck(gpHVHero, 0, gpHVHero->GetOccupiedTown());
+    luck = gpGame->GetLuck(gpHVHero, NULL, gpHVHero->GetOccupiedTown());
     magnitude = abs(luck);
     if (magnitude <= UI_MIN_MODIFIER_ICONS)
         magnitude = UI_MIN_MODIFIER_ICONS;
@@ -1667,7 +1667,7 @@ void SetupHeroView(void) {
         heroWin->BroadcastMessage(message);
     }
 
-    morale = gpHVHero->m_army.GetMorale(gpHVHero, gpHVHero->GetOccupiedTown(), 0);
+    morale = gpHVHero->m_army.GetMorale(gpHVHero, gpHVHero->GetOccupiedTown(), NULL);
     magnitude = abs(morale);
     if (magnitude <= UI_MIN_MODIFIER_ICONS)
         magnitude = UI_MIN_MODIFIER_ICONS;
@@ -1828,7 +1828,7 @@ void DoHeroSplit(i32 destinationSlot, i32 sourceSlot) {
 
     gpTownManager->m_heroWindow1 =
         new heroWindow(UI_SPLIT_WINDOW_X, UI_SPLIT_WINDOW_Y, "splitwin.bin");
-    if (gpTownManager->m_heroWindow1 == 0)
+    if (gpTownManager->m_heroWindow1 == NULL)
         MemError();
     gpTownManager->m_splitAmount = 0;
     gpTownManager->m_splitMaximum = gpHVHero->m_army.m_creatureCounts[sourceSlot];
@@ -1960,7 +1960,7 @@ VA(0x0047052a, 0x51)
 class town* hero::GetOccupiedTown(void) {
     if (m_locationType == HERO_LOCATION_TOWN)
         return gpGame->GetTown(m_occupiedTown);
-    return 0;
+    return NULL;
 }
 
 VA(0x0047057b, 0x47)
@@ -2068,8 +2068,8 @@ void hero::CheckAnduranPieces(i32 showDialog) {
     }
 }
 
-DATA(0x004f6c88) class hero* gpHVHero = 0;
-DATA(0x004f6c8c) class heroWindow* gheroWin = 0;
+DATA(0x004f6c88) class hero* gpHVHero = NULL;
+DATA(0x004f6c8c) class heroWindow* gheroWin = NULL;
 DATA(0x004f6cd0) i16 gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT] =
     {0, 1000, 2000, 3200, 4500, 6000, 7700, 9000, 11000, 13200, 15500, 18500};
 DATA(0x005280dc) i32 iOrigHeroViewID;

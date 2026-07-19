@@ -51,7 +51,7 @@ i32 armyGroup::GetMorale(hero* armyHero, town* occupiedTown, armyGroup* enemyGro
         hasSomeUndead = 1;
 
     enemyHasBoneDragon = 0;
-    if (enemyGroup != 0) {
+    if (enemyGroup != NULL) {
         for (index = 0; index < ARMY_GROUP_SLOT_COUNT; ++index) {
             if (enemyGroup->m_creatureTypes[index] == IDX(CREATURE_BONE_DRAGON))
                 enemyHasBoneDragon = 1;
@@ -61,7 +61,7 @@ i32 armyGroup::GetMorale(hero* armyHero, town* occupiedTown, armyGroup* enemyGro
     if (enemyHasBoneDragon)
         --morale;
 
-    if (armyHero != 0) {
+    if (armyHero != NULL) {
         if (armyHero->HasArtifact(ARTIFACT_BATTLE_GARB))
             return ARMY_GROUP_MORALE_MAX;
 
@@ -90,10 +90,10 @@ i32 armyGroup::GetMorale(hero* armyHero, town* occupiedTown, armyGroup* enemyGro
         alignmentValue = 0;
     morale += alignmentValue;
 
-    if (occupiedTown != 0 && occupiedTown->m_type != IDX(FACTION_NECROMANCER)
+    if (occupiedTown != NULL && occupiedTown->m_type != IDX(FACTION_NECROMANCER)
         && (occupiedTown->m_buildings & IDX(TOWN_BUILDING_TAVERN)))
         ++morale;
-    if (occupiedTown != 0 && occupiedTown->m_type == IDX(FACTION_BARBARIAN)
+    if (occupiedTown != NULL && occupiedTown->m_type == IDX(FACTION_BARBARIAN)
         && (occupiedTown->m_buildings & IDX(TOWN_BUILDING_COLISEUM)))
         morale += 2;
 

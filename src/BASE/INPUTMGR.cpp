@@ -44,7 +44,7 @@ DATA(0x0051f990) static SInputManagerText gInputManagerText =
 // @early-stop: delinker artifact.
 VA(0x004cdb50, 0x308)
 i32 KeyboardMessageHandler(void*, u32 message, u32, i32l messageData) {
-    if (gpInputManager == 0)
+    if (gpInputManager == NULL)
         return 1;
     if (!gpInputManager->m_active)
         return 1;
@@ -133,7 +133,7 @@ i32 KeyboardMessageHandler(void*, u32 message, u32, i32l messageData) {
 // @early-stop: delinker artifact.
 VA(0x004cde60, 0x36c)
 i32 MouseMessageHandler(void*, u32 message, u32, i32l messageData) {
-    if (gpInputManager == 0)
+    if (gpInputManager == NULL)
         return 1;
     if (!gpInputManager->m_active)
         return 1;
@@ -200,7 +200,7 @@ i32 MouseMessageHandler(void*, u32 message, u32, i32l messageData) {
     }
 
 afterMouseCoordinates:
-    if (message == WM_MOUSEMOVE && gpMouseManager != 0) {
+    if (message == WM_MOUSEMOVE && gpMouseManager != NULL) {
         i32 y = event->payload.mouse.y;
         i32 x = event->payload.mouse.x;
         if (bInCheckChangeCursor == 0 && gConfig.gfx[giCurExe].fullScreen == 0

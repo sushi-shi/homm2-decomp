@@ -163,7 +163,7 @@ void game::GetMap(void) {
 
     requesterResult =
         new fileRequester(212, 9, FILE_REQUESTER_MAP_GAME, fileMask, gcMapPath, fileMask);
-    if (requesterResult == 0)
+    if (requesterResult == NULL)
         MemError();
     resultCode = gpExec->DoDialog(requesterResult);
     if (resultCode == FILE_REQUESTER_OK) {
@@ -171,7 +171,7 @@ void game::GetMap(void) {
         strcpy(gMapName, gLastFilename);
         if (_strcmpi(savedName, gMapName) != 0) {
             strcpy(m_mapFilename, gMapName);
-            ProcessNewMap(0);
+            ProcessNewMap(NULL);
         }
     } else {
         delete requesterResult;
@@ -184,7 +184,7 @@ VA(0x004b7115, 0x77)
 void game::ProcessNewMap(struct SMapHeader* header) {
     m_newGameInitialized = 0;
     m_newGameHumanCount = static_cast<i8>(giNumHumanPlayers);
-    if (m_newGameWindow == 0) {
+    if (m_newGameWindow == NULL) {
     } else {
         CleanUpNewGameWindow();
         InitNewGame(header);
@@ -218,7 +218,7 @@ void game::InitNewGame(struct SMapHeader* header) {
         }
     } else {
         m_newGameHumanCount = static_cast<i8>(giNumHumanPlayers);
-        if (header != 0)
+        if (header != NULL)
             m_mapHeader = *header;
         else
             GetMapHeader(m_mapFilename, &m_mapHeader);
@@ -317,11 +317,11 @@ i32 game::NewGame(void) {
     i32 transmitResult;
 
     result = 1;
-    m_newGameWindow = 0;
+    m_newGameWindow = NULL;
 
     if ((!gbRemoteOn || giThisNetPos == 0) && (!gbRemoteOn || !xNetHasOldPlayers)) {
         choiceWindow = new heroWindow(405, 8, "x_mapmnu.bin");
-        if (choiceWindow == 0)
+        if (choiceWindow == NULL)
             MemError();
         gpWindowManager->DoDialog(choiceWindow, ExpStdGameHandler, 0);
         delete choiceWindow;
@@ -359,7 +359,7 @@ i32 game::NewGame(void) {
                 do {
                     PollSound();
                     remoteBuffer = reinterpret_cast<NewGameRemotePacket*>(GetRemoteData(1));
-                } while (remoteBuffer == 0);
+                } while (remoteBuffer == NULL);
             } while (remoteBuffer->type != GAME_REMOTE_PACKET_TYPE);
 
             switch (remoteBuffer->command) {
@@ -419,7 +419,7 @@ i32 game::NewGame(void) {
         for (;;) {
             wrongExpansionType = 0;
             extension = FindLastToken(m_mapFilename, '.');
-            if (extension != 0) {
+            if (extension != NULL) {
                 if (StrEqNoCase(extension, ".MX2") && xIsExpansionMap)
                     wrongExpansionType = 1;
                 if (StrEqNoCase(extension, ".MP2") && !xIsExpansionMap)
@@ -459,7 +459,7 @@ i32 game::NewGame(void) {
                 GAME_NETWORK_PLAYER_NONE
             );
             if (!transmitResult)
-                ShutDown(0);
+                ShutDown(NULL);
             memcpy(netPlayerPacket, gsNetPlayerInfo, GAME_PLAYER_INFO_PACKET_SIZE);
             transmitResult = TransmitRemoteData(
                 netPlayerPacket,
@@ -471,7 +471,7 @@ i32 game::NewGame(void) {
                 GAME_NETWORK_PLAYER_NONE
             );
             if (!transmitResult)
-                ShutDown(0);
+                ShutDown(NULL);
         }
 
         LoadGame("origdata.bin", 1, 0);
@@ -483,10 +483,10 @@ i32 game::NewGame(void) {
         } else {
             m_newGameWindow = new heroWindow(190, 33, "ngsp.bin");
         }
-        if (m_newGameWindow == 0)
+        if (m_newGameWindow == NULL)
             MemError();
         SetWinText(m_newGameWindow, 7);
-        InitNewGame(0);
+        InitNewGame(NULL);
         InitNewGameWindow();
         UpdateNewGameWindow();
         gbNewGameShadowHidden = false;
@@ -542,8 +542,8 @@ void game::InitNewGameWindow(void) {
     i32 raceTextWidth;
     i32 singlePlayerYOffsetValue;
 
-    iconControlLocal = 0;
-    textControlLocal = 0;
+    iconControlLocal = NULL;
+    textControlLocal = NULL;
     availableWidthResult = 372 - m_mapHeader.playerCount * 62;
     playerGapValue = availableWidthResult / (m_mapHeader.playerCount + 1);
     firstPlayerXLocal = playerGapValue + 24;
@@ -567,7 +567,7 @@ void game::InitNewGameWindow(void) {
                 16,
                 1
             );
-            if (iconControlLocal == 0)
+            if (iconControlLocal == NULL)
                 MemError();
             m_newGameWindow->AddWidget(iconControlLocal, -1);
 
@@ -583,7 +583,7 @@ void game::InitNewGameWindow(void) {
                 16,
                 1
             );
-            if (iconControlLocal == 0)
+            if (iconControlLocal == NULL)
                 MemError();
             m_newGameWindow->AddWidget(iconControlLocal, -1);
         }
@@ -608,7 +608,7 @@ void game::InitNewGameWindow(void) {
             16,
             1
         );
-        if (iconControlLocal == 0)
+        if (iconControlLocal == NULL)
             MemError();
         m_newGameWindow->AddWidget(iconControlLocal, -1);
 
@@ -633,7 +633,7 @@ void game::InitNewGameWindow(void) {
             16,
             1
         );
-        if (iconControlLocal == 0)
+        if (iconControlLocal == NULL)
             MemError();
         m_newGameWindow->AddWidget(iconControlLocal, -1);
 
@@ -653,7 +653,7 @@ void game::InitNewGameWindow(void) {
             16,
             1
         );
-        if (iconControlLocal == 0)
+        if (iconControlLocal == NULL)
             MemError();
         m_newGameWindow->AddWidget(iconControlLocal, -1);
 
@@ -672,7 +672,7 @@ void game::InitNewGameWindow(void) {
                 MESSAGE_WIDGET,
                 1
             );
-            if (textControlLocal == 0)
+            if (textControlLocal == NULL)
                 MemError();
             m_newGameWindow->AddWidget(textControlLocal, -1);
         }
@@ -692,7 +692,7 @@ void game::InitNewGameWindow(void) {
             16,
             1
         );
-        if (iconControlLocal == 0)
+        if (iconControlLocal == NULL)
             MemError();
         m_newGameWindow->AddWidget(iconControlLocal, -1);
 
@@ -720,7 +720,7 @@ void game::InitNewGameWindow(void) {
             MESSAGE_WIDGET,
             1
         );
-        if (textControlLocal == 0)
+        if (textControlLocal == NULL)
             MemError();
         m_newGameWindow->AddWidget(textControlLocal, -1);
 
@@ -736,7 +736,7 @@ void game::InitNewGameWindow(void) {
             16,
             1
         );
-        if (iconControlLocal == 0)
+        if (iconControlLocal == NULL)
             MemError();
         m_newGameWindow->AddWidget(iconControlLocal, -1);
     }
@@ -919,7 +919,7 @@ i32 NewGameHandler(struct tag_message& message) {
 
     if (message.type == MESSAGE_NONE) {
         remotePacketResult = reinterpret_cast<NewGameRemotePacket*>(GetRemoteData(1));
-        if (remotePacketResult != 0
+        if (remotePacketResult != NULL
             && (remotePacketResult->type == GAME_REMOTE_PACKET_TYPE
                 || remotePacketResult->type == GAME_REMOTE_PACKET_TYPE_ALTERNATE)) {
             switch (remotePacketResult->command) {
@@ -933,7 +933,7 @@ i32 NewGameHandler(struct tag_message& message) {
 
                 case GAME_REMOTE_CANCEL:
                     NormalDialog("The host has canceled the game.", 1, -1, -1, -1, 0, -1, 0, -1, 0);
-                    ShutDown(0);
+                    ShutDown(NULL);
                     break;
 
                 case GAME_REMOTE_SETUP:
@@ -1012,7 +1012,7 @@ i32 NewGameHandler(struct tag_message& message) {
             GAME_NETWORK_PLAYER_NONE
         );
         if (!transmitResultTemp)
-            ShutDown(0);
+            ShutDown(NULL);
     }
 
     if (message.type != MESSAGE_WIDGET)
@@ -1093,7 +1093,7 @@ i32 NewGameHandler(struct tag_message& message) {
                 case GAME_DIALOG_OK:
                     if (gbRemoteOn) {
                         transmitResultTemp = TransmitRemoteData(
-                            0,
+                            NULL,
                             GAME_REMOTE_CHANNEL,
                             0,
                             GAME_REMOTE_START,
@@ -1111,7 +1111,7 @@ i32 NewGameHandler(struct tag_message& message) {
                 case GAME_DIALOG_CANCEL:
                     if (gbRemoteOn) {
                         transmitResultTemp = TransmitRemoteData(
-                            0,
+                            NULL,
                             GAME_REMOTE_CHANNEL,
                             0,
                             GAME_REMOTE_CANCEL,
@@ -1119,7 +1119,7 @@ i32 NewGameHandler(struct tag_message& message) {
                             1,
                             GAME_NETWORK_PLAYER_NONE
                         );
-                        ShutDown(0);
+                        ShutDown(NULL);
                     }
                     gpWindowManager->m_dialogResult = message.payload.widget.id;
                     message.payload.widget.id = GAME_DIALOG_CLOSE_MESSAGE;
@@ -1379,7 +1379,7 @@ finish:
             GAME_NETWORK_PLAYER_NONE
         );
         if (!transmitResultTemp)
-            ShutDown(0);
+            ShutDown(NULL);
     }
     return 1;
 }
@@ -1575,7 +1575,7 @@ void game::ShowScenInfo(void) {
 
     gpMouseManager->SetPointer("advmice.mse", 0, MOUSE_AUTO_CURSOR_TYPE);
     scenarioWindowValue = new heroWindow(90, 4, "sceninfo.bin");
-    if (scenarioWindowValue == 0)
+    if (scenarioWindowValue == NULL)
         MemError();
     SetWinText(scenarioWindowValue, GAME_SCENARIO_WINDOW_TEXT_ID);
 
@@ -1621,8 +1621,8 @@ void game::ShowScenInfo(void) {
     scenarioMessageTemp.payload.widget.data.text = gText;
     scenarioWindowValue->BroadcastMessage(scenarioMessageTemp);
 
-    iconControlLocal = 0;
-    textControlLocal = 0;
+    iconControlLocal = NULL;
+    textControlLocal = NULL;
     availableWidthResult = 372 - m_mapHeader.playerCount * 62;
     playerGapValue = availableWidthResult / (m_mapHeader.playerCount + 1);
     firstPlayerXLocal = playerGapValue + 24;
@@ -1645,7 +1645,7 @@ void game::ShowScenInfo(void) {
                 16,
                 1
             );
-            if (iconControlLocal == 0)
+            if (iconControlLocal == NULL)
                 MemError();
             scenarioWindowValue->AddWidget(iconControlLocal, -1);
 
@@ -1663,7 +1663,7 @@ void game::ShowScenInfo(void) {
                 16,
                 1
             );
-            if (iconControlLocal == 0)
+            if (iconControlLocal == NULL)
                 MemError();
             scenarioWindowValue->AddWidget(iconControlLocal, -1);
         }
@@ -1688,7 +1688,7 @@ void game::ShowScenInfo(void) {
             16,
             1
         );
-        if (iconControlLocal == 0)
+        if (iconControlLocal == NULL)
             MemError();
         scenarioWindowValue->AddWidget(iconControlLocal, -1);
 
@@ -1708,7 +1708,7 @@ void game::ShowScenInfo(void) {
             16,
             1
         );
-        if (iconControlLocal == 0)
+        if (iconControlLocal == NULL)
             MemError();
         scenarioWindowValue->AddWidget(iconControlLocal, -1);
 
@@ -1729,7 +1729,7 @@ void game::ShowScenInfo(void) {
                 MESSAGE_WIDGET,
                 1
             );
-            if (textControlLocal == 0)
+            if (textControlLocal == NULL)
                 MemError();
             scenarioWindowValue->AddWidget(textControlLocal, -1);
         }
@@ -1747,7 +1747,7 @@ void game::ShowScenInfo(void) {
             16,
             1
         );
-        if (iconControlLocal == 0)
+        if (iconControlLocal == NULL)
             MemError();
         scenarioWindowValue->AddWidget(iconControlLocal, -1);
 
@@ -1776,7 +1776,7 @@ void game::ShowScenInfo(void) {
             MESSAGE_WIDGET,
             1
         );
-        if (textControlLocal == 0)
+        if (textControlLocal == NULL)
             MemError();
         scenarioWindowValue->AddWidget(textControlLocal, -1);
 
@@ -1792,7 +1792,7 @@ void game::ShowScenInfo(void) {
             16,
             1
         );
-        if (iconControlLocal == 0)
+        if (iconControlLocal == NULL)
             MemError();
         scenarioWindowValue->AddWidget(iconControlLocal, -1);
     }

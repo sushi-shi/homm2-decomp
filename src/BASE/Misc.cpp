@@ -157,7 +157,7 @@ DATA(0x005331cc) static i32 gBlitRight;  // BlitBitmapToScreen computed blit-rec
 DATA(0x005331d0) static i32 gBlitBottom; // BlitBitmapToScreen computed blit-rect bottom edge
 
 DATA(0x0051dce8) i32 iMemEntries = 0;
-DATA(0x0051dcec) MemEntry* gpMemEntry = 0;
+DATA(0x0051dcec) MemEntry* gpMemEntry = NULL;
 DATA(0x0051dcf0) i32 giTotalMemAllocated = 0;
 DATA(0x0051dcf8) u8
     giChangeThreshold[16] = {0, 1, 2, 3, 4, 6, 8, 10, 13, 16, 19, 22, 26, 31, 37, 46};
@@ -337,8 +337,8 @@ void* BaseAlloc(u32 size, char* originalFile, i32 originalLine) {
     char text[200];
     char logText[500];
     if (size == 0)
-        return 0;
-    if (gpMemEntry == 0) {
+        return NULL;
+    if (gpMemEntry == NULL) {
         LogInt(gMemEntryTag, iMemEntries, -999, -999, -999, -999, -999, -999);
         gpMemEntry = static_cast<MemEntry*>(malloc(2000 * sizeof(MemEntry)));
         for (i32 initIndex = 0; initIndex < 2000; ++initIndex)
@@ -346,9 +346,9 @@ void* BaseAlloc(u32 size, char* originalFile, i32 originalLine) {
     }
     giTotalMemAllocated += size;
     void* ptr = malloc(size);
-    if (ptr == 0) {
+    if (ptr == NULL) {
         MemError();
-        return 0;
+        return NULL;
     }
     ++iMemEntries;
     i32 entryIndex;
@@ -373,7 +373,7 @@ void* BaseAlloc(u32 size, char* originalFile, i32 originalLine) {
         );
         if (giDebugLevel >= 2) {
             FILE* logFile = fopen(gMiscText.log.appendFilename.text, gMiscText.log.appendMode.text);
-            if (logFile != 0) {
+            if (logFile != NULL) {
                 strcpy(logText, text);
                 *reinterpret_cast<u16*>(logText + strlen(logText)) =
                     *reinterpret_cast<const u16*>(gMiscText.log.appendNewline.text);
@@ -392,7 +392,7 @@ VA(0x004c3f80, 0x386)
 void BaseFree(void* ptr, char* originalFile, i32 originalLine) {
     char logText[500];
     char text[200];
-    if (gpMemEntry == 0) {
+    if (gpMemEntry == NULL) {
         LogInt(gMemEntryTag, iMemEntries, -999, -999, -999, -999, -999, -999);
         gpMemEntry = static_cast<MemEntry*>(malloc(2000 * sizeof(MemEntry)));
         for (i32 initIndex = 0; initIndex < 2000; ++initIndex)
@@ -409,10 +409,10 @@ void BaseFree(void* ptr, char* originalFile, i32 originalLine) {
             -999,
             -999
         );
-    if (ptr == 0) {
+    if (ptr == NULL) {
         if (giDebugLevel >= 2) {
             FILE* logFile = fopen(gMiscText.log.appendFilename.text, gMiscText.log.appendMode.text);
-            if (logFile != 0) {
+            if (logFile != NULL) {
                 strcpy(logText, gMiscText.memory.nullPointer.text);
                 *reinterpret_cast<u16*>(logText + strlen(logText)) =
                     *reinterpret_cast<const u16*>(gMiscText.log.appendNewline.text);
@@ -451,7 +451,7 @@ void BaseFree(void* ptr, char* originalFile, i32 originalLine) {
                 if (giDebugLevel >= 2) {
                     FILE* logFile =
                         fopen(gMiscText.log.appendFilename.text, gMiscText.log.appendMode.text);
-                    if (logFile != 0) {
+                    if (logFile != NULL) {
                         strcpy(logText, text);
                         *reinterpret_cast<u16*>(logText + strlen(logText)) =
                             *reinterpret_cast<const u16*>(gMiscText.log.appendNewline.text);
@@ -471,7 +471,7 @@ void BaseFree(void* ptr, char* originalFile, i32 originalLine) {
         sprintf(gText, gMiscText.memory.badDeleteFormat.text, originalFile, originalLine, ptr);
         if (giDebugLevel >= 2) {
             FILE* logFile = fopen(gMiscText.log.appendFilename.text, gMiscText.log.appendMode.text);
-            if (logFile != 0) {
+            if (logFile != NULL) {
                 strcpy(logText, gText);
                 *reinterpret_cast<u16*>(logText + strlen(logText)) =
                     *reinterpret_cast<const u16*>(gMiscText.log.appendNewline.text);
@@ -490,7 +490,7 @@ void BaseFree(void* ptr, char* originalFile, i32 originalLine) {
 VA(0x004c4310, 0x134)
 void PrintMemoryLeaks(void) {
     char logText[500];
-    if (giDebugLevel >= 1 && gpMemEntry != 0) {
+    if (giDebugLevel >= 1 && gpMemEntry != NULL) {
         LogInt(
             gMiscText.memory.leakCountLabel.text,
             iMemEntries,
@@ -515,7 +515,7 @@ void PrintMemoryLeaks(void) {
                 if (giDebugLevel >= 2) {
                     FILE* logFile =
                         fopen(gMiscText.log.appendFilename.text, gMiscText.log.appendMode.text);
-                    if (logFile != 0) {
+                    if (logFile != NULL) {
                         strcpy(logText, gText);
                         *reinterpret_cast<u16*>(logText + strlen(logText)) =
                             *reinterpret_cast<const u16*>(gMiscText.log.appendNewline.text);
@@ -597,7 +597,7 @@ i32 FindIndex(struct indexArray* entries, i32 low, i32 high, i32 key) {
 VA(0x004c45e0, 0xea)
 void FadeIn(i32 increment) {
     palette* fadePalette = new palette;
-    if (fadePalette == 0)
+    if (fadePalette == NULL)
         MemError();
     i32 done = 0;
     if (gConfig.gfx[giCurExe].fullScreen == 0)
@@ -636,7 +636,7 @@ void FadeIn(i32 increment) {
 VA(0x004c46d0, 0xe6)
 void FadeOut(i32 increment) {
     palette* fadePalette = new palette;
-    if (fadePalette == 0)
+    if (fadePalette == NULL)
         MemError();
     i32 done = 0;
     if (gConfig.gfx[giCurExe].fullScreen == 0)
@@ -688,7 +688,7 @@ void ProcessAssert(i32 condition, char* file, i32 line) {
         sprintf(gText, gMiscText.memory.assertMessage.text, file, line);
         if (MessageBoxA(hwndApp, gText, gMiscText.memory.assertTitle.text, MB_YESNO | MB_ICONHAND)
             != IDNO) {
-            ShutDown(0);
+            ShutDown(NULL);
         }
     }
 }
@@ -707,7 +707,7 @@ char* FindStringInString(char* text, char* pattern) {
             ++i;
         } while (count > i);
     }
-    return 0;
+    return NULL;
 }
 
 // @semantic: optimized register-allocation residual.
@@ -722,7 +722,7 @@ char* FindToken(char* text, char token) {
             ++i;
         } while (len > i);
     }
-    return 0;
+    return NULL;
 }
 
 VA(0x004c4900, 0x2b)
@@ -732,7 +732,7 @@ char* FindLastToken(char* text, char token) {
             return text + i;
         }
     }
-    return 0;
+    return NULL;
 }
 
 VA(0x004c4930, 0x6c)
@@ -815,7 +815,7 @@ void ReadPrefsFromFile(void) {
         gConfig.musicSource = CONFIG_MUSIC_SOURCE_CD;
     } else {
         FILE* f = fopen(gText, gMiscText.readFile.binaryMode.text);
-        if (f == 0)
+        if (f == NULL)
             FileError(gText);
         fread(&gConfig, CONFIG_PERSISTED_SIZE, 1, f);
         fclose(f);
@@ -846,14 +846,14 @@ void ReadPrefsFromRegistry(void) {
 
     strcpy(szScratch, gMiscText.readRegistry.scratchDefault.text);
     strcpy(szKey, gMiscText.readRegistry.key.text);
-    hKey = 0;
+    hKey = NULL;
     if (RegCreateKeyA(HKEY_LOCAL_MACHINE, szKey, &hKey) != 0)
         return;
     dwSize = 4;
     if (RegQueryValueExA(
             hKey,
             gMiscText.readRegistry.musicVolumeProbe.text,
-            0,
+            NULL,
             &dwType,
             reinterpret_cast<u8*>(&gConfig.musicVolume),
             &dwSize
@@ -873,7 +873,7 @@ void ReadPrefsFromRegistry(void) {
     RegQueryValueExA(
         hKey,
         gMiscText.readRegistry.musicVolume.text,
-        0,
+        NULL,
         &dwType,
         reinterpret_cast<u8*>(&gConfig.musicVolume),
         &dwSize
@@ -881,7 +881,7 @@ void ReadPrefsFromRegistry(void) {
     RegQueryValueExA(
         hKey,
         gMiscText.readRegistry.soundVolume.text,
-        0,
+        NULL,
         &dwType,
         reinterpret_cast<u8*>(&gConfig.soundVolume),
         &dwSize
@@ -889,7 +889,7 @@ void ReadPrefsFromRegistry(void) {
     RegQueryValueExA(
         hKey,
         gMiscText.readRegistry.walkSpeed.text,
-        0,
+        NULL,
         &dwType,
         reinterpret_cast<u8*>(&gConfig.walkSpeed),
         &dwSize
@@ -897,7 +897,7 @@ void ReadPrefsFromRegistry(void) {
     RegQueryValueExA(
         hKey,
         gMiscText.readRegistry.computerWalkSpeed.text,
-        0,
+        NULL,
         &dwType,
         reinterpret_cast<u8*>(&gConfig.computerWalkSpeed),
         &dwSize
@@ -905,7 +905,7 @@ void ReadPrefsFromRegistry(void) {
     RegQueryValueExA(
         hKey,
         gMiscText.readRegistry.showRoute.text,
-        0,
+        NULL,
         &dwType,
         reinterpret_cast<u8*>(&gConfig.showRoute),
         &dwSize
@@ -913,7 +913,7 @@ void ReadPrefsFromRegistry(void) {
     RegQueryValueExA(
         hKey,
         gMiscText.readRegistry.blackoutComputer.text,
-        0,
+        NULL,
         &dwType,
         reinterpret_cast<u8*>(&gConfig.blackoutComputer),
         &dwSize
@@ -921,7 +921,7 @@ void ReadPrefsFromRegistry(void) {
     RegQueryValueExA(
         hKey,
         gMiscText.readRegistry.soundQuality.text,
-        0,
+        NULL,
         &dwType,
         reinterpret_cast<u8*>(&gConfig.musicSource),
         &dwSize
@@ -929,7 +929,7 @@ void ReadPrefsFromRegistry(void) {
     RegQueryValueExA(
         hKey,
         gMiscText.readRegistry.useOpera.text,
-        0,
+        NULL,
         &dwType,
         reinterpret_cast<u8*>(&gConfig.useOpera),
         &dwSize
@@ -937,7 +937,7 @@ void ReadPrefsFromRegistry(void) {
     RegQueryValueExA(
         hKey,
         gMiscText.readRegistry.directComPort.text,
-        0,
+        NULL,
         &dwType,
         reinterpret_cast<u8*>(&gConfig.comPort[IDX(CONFIG_CONNECTION_DIRECT)]),
         &dwSize
@@ -945,7 +945,7 @@ void ReadPrefsFromRegistry(void) {
     RegQueryValueExA(
         hKey,
         gMiscText.readRegistry.directBaudRate.text,
-        0,
+        NULL,
         &dwType,
         reinterpret_cast<u8*>(&gConfig.baudRate[IDX(CONFIG_CONNECTION_DIRECT)]),
         &dwSize
@@ -953,7 +953,7 @@ void ReadPrefsFromRegistry(void) {
     RegQueryValueExA(
         hKey,
         gMiscText.readRegistry.modemComPort.text,
-        0,
+        NULL,
         &dwType,
         reinterpret_cast<u8*>(&gConfig.comPort[IDX(CONFIG_CONNECTION_MODEM)]),
         &dwSize
@@ -961,7 +961,7 @@ void ReadPrefsFromRegistry(void) {
     RegQueryValueExA(
         hKey,
         gMiscText.readRegistry.modemBaudRate.text,
-        0,
+        NULL,
         &dwType,
         reinterpret_cast<u8*>(&gConfig.baudRate[IDX(CONFIG_CONNECTION_MODEM)]),
         &dwSize
@@ -970,7 +970,7 @@ void ReadPrefsFromRegistry(void) {
     RegQueryValueExA(
         hKey,
         gMiscText.readRegistry.modemInitString.text,
-        0,
+        NULL,
         &dwType,
         reinterpret_cast<u8*>(gConfig.modemInitString),
         &dwSize
@@ -979,7 +979,7 @@ void ReadPrefsFromRegistry(void) {
     RegQueryValueExA(
         hKey,
         gMiscText.readRegistry.uniqueSystemId.text,
-        0,
+        NULL,
         &dwType,
         reinterpret_cast<u8*>(gConfig.uniqueSystemID),
         &dwSize
@@ -989,7 +989,7 @@ void ReadPrefsFromRegistry(void) {
     RegQueryValueExA(
         hKey,
         gMiscText.readRegistry.networkDefaultName.text,
-        0,
+        NULL,
         &dwType,
         reinterpret_cast<u8*>(gConfig.networkDefaultName),
         &dwSize
@@ -998,7 +998,7 @@ void ReadPrefsFromRegistry(void) {
     RegQueryValueExA(
         hKey,
         gMiscText.readRegistry.autosave.text,
-        0,
+        NULL,
         &dwType,
         reinterpret_cast<u8*>(&gConfig.autosave),
         &dwSize
@@ -1006,7 +1006,7 @@ void ReadPrefsFromRegistry(void) {
     RegQueryValueExA(
         hKey,
         gMiscText.readRegistry.slowVideo.text,
-        0,
+        NULL,
         &dwType,
         reinterpret_cast<u8*>(&gConfig.slowVideo),
         &dwSize
@@ -1014,7 +1014,7 @@ void ReadPrefsFromRegistry(void) {
     RegQueryValueExA(
         hKey,
         gMiscText.readRegistry.showCombatGrid.text,
-        0,
+        NULL,
         &dwType,
         reinterpret_cast<u8*>(&gConfig.showCombatGrid),
         &dwSize
@@ -1022,7 +1022,7 @@ void ReadPrefsFromRegistry(void) {
     RegQueryValueExA(
         hKey,
         gMiscText.readRegistry.showCombatMouseHex.text,
-        0,
+        NULL,
         &dwType,
         reinterpret_cast<u8*>(&gConfig.showCombatMouseHex),
         &dwSize
@@ -1030,7 +1030,7 @@ void ReadPrefsFromRegistry(void) {
     RegQueryValueExA(
         hKey,
         gMiscText.readRegistry.combatShadeLevel.text,
-        0,
+        NULL,
         &dwType,
         reinterpret_cast<u8*>(&gConfig.combatShadeLevel),
         &dwSize
@@ -1038,7 +1038,7 @@ void ReadPrefsFromRegistry(void) {
     RegQueryValueExA(
         hKey,
         gMiscText.readRegistry.combatArmyInfoLevel.text,
-        0,
+        NULL,
         &dwType,
         reinterpret_cast<u8*>(&gConfig.combatArmyInfoLevel),
         &dwSize
@@ -1046,7 +1046,7 @@ void ReadPrefsFromRegistry(void) {
     RegQueryValueExA(
         hKey,
         gMiscText.readRegistry.evilInterfaceUsage.text,
-        0,
+        NULL,
         &dwType,
         reinterpret_cast<u8*>(&gConfig.evilInterfaceUsage),
         &dwSize
@@ -1054,7 +1054,7 @@ void ReadPrefsFromRegistry(void) {
     RegQueryValueExA(
         hKey,
         gMiscText.readRegistry.quickCombatLevel.text,
-        0,
+        NULL,
         &dwType,
         reinterpret_cast<u8*>(&gConfig.quickCombatLevel),
         &dwSize
@@ -1062,7 +1062,7 @@ void ReadPrefsFromRegistry(void) {
     RegQueryValueExA(
         hKey,
         gMiscText.readRegistry.combatSpeed.text,
-        0,
+        NULL,
         &dwType,
         reinterpret_cast<u8*>(&gConfig.combatSpeed),
         &dwSize
@@ -1070,7 +1070,7 @@ void ReadPrefsFromRegistry(void) {
     RegQueryValueExA(
         hKey,
         gMiscText.readRegistry.autoCombatUseSpells.text,
-        0,
+        NULL,
         &dwType,
         reinterpret_cast<u8*>(&gConfig.autoCombatUseSpells),
         &dwSize
@@ -1078,7 +1078,7 @@ void ReadPrefsFromRegistry(void) {
     RegQueryValueExA(
         hKey,
         gMiscText.readRegistry.firstMapOffset.text,
-        0,
+        NULL,
         &dwType,
         reinterpret_cast<u8*>(&gConfig.firstMapOffset),
         &dwSize
@@ -1086,7 +1086,7 @@ void ReadPrefsFromRegistry(void) {
     RegQueryValueExA(
         hKey,
         gMiscText.readRegistry.currentMapOffset.text,
-        0,
+        NULL,
         &dwType,
         reinterpret_cast<u8*>(&gConfig.currentMapOffset),
         &dwSize
@@ -1094,7 +1094,7 @@ void ReadPrefsFromRegistry(void) {
     RegQueryValueExA(
         hKey,
         gMiscText.readRegistry.showObjectBoxes.text,
-        0,
+        NULL,
         &dwType,
         reinterpret_cast<u8*>(&gConfig.showObjectBoxes),
         &dwSize
@@ -1102,7 +1102,7 @@ void ReadPrefsFromRegistry(void) {
     RegQueryValueExA(
         hKey,
         gMiscText.readRegistry.editorScreenAnimation.text,
-        0,
+        NULL,
         &dwType,
         reinterpret_cast<u8*>(&gConfig.editorScreenAnimation),
         &dwSize
@@ -1110,7 +1110,7 @@ void ReadPrefsFromRegistry(void) {
     RegQueryValueExA(
         hKey,
         gMiscText.readRegistry.editorPaletteCycling.text,
-        0,
+        NULL,
         &dwType,
         reinterpret_cast<u8*>(&gConfig.editorPaletteCycling),
         &dwSize
@@ -1118,7 +1118,7 @@ void ReadPrefsFromRegistry(void) {
     RegQueryValueExA(
         hKey,
         gMiscText.readRegistry.mainGameShowMenu.text,
-        0,
+        NULL,
         &dwType,
         reinterpret_cast<u8*>(&gConfig.gfx[0].showMenu),
         &dwSize
@@ -1126,7 +1126,7 @@ void ReadPrefsFromRegistry(void) {
     RegQueryValueExA(
         hKey,
         gMiscText.readRegistry.mainGameX.text,
-        0,
+        NULL,
         &dwType,
         reinterpret_cast<u8*>(&gConfig.gfx[0].x),
         &dwSize
@@ -1134,7 +1134,7 @@ void ReadPrefsFromRegistry(void) {
     RegQueryValueExA(
         hKey,
         gMiscText.readRegistry.mainGameY.text,
-        0,
+        NULL,
         &dwType,
         reinterpret_cast<u8*>(&gConfig.gfx[0].y),
         &dwSize
@@ -1142,7 +1142,7 @@ void ReadPrefsFromRegistry(void) {
     RegQueryValueExA(
         hKey,
         gMiscText.readRegistry.mainGameWidth.text,
-        0,
+        NULL,
         &dwType,
         reinterpret_cast<u8*>(&gConfig.gfx[0].width),
         &dwSize
@@ -1150,7 +1150,7 @@ void ReadPrefsFromRegistry(void) {
     RegQueryValueExA(
         hKey,
         gMiscText.readRegistry.mainGameHeight.text,
-        0,
+        NULL,
         &dwType,
         reinterpret_cast<u8*>(&gConfig.gfx[0].height),
         &dwSize
@@ -1158,7 +1158,7 @@ void ReadPrefsFromRegistry(void) {
     RegQueryValueExA(
         hKey,
         gMiscText.readRegistry.mainGameFullScreen.text,
-        0,
+        NULL,
         &dwType,
         reinterpret_cast<u8*>(&gConfig.gfx[0].fullScreen),
         &dwSize
@@ -1166,7 +1166,7 @@ void ReadPrefsFromRegistry(void) {
     RegQueryValueExA(
         hKey,
         gMiscText.readRegistry.mainGameColorMouseCursor.text,
-        0,
+        NULL,
         &dwType,
         reinterpret_cast<u8*>(&gConfig.gfx[0].colorMouseCursor),
         &dwSize
@@ -1174,7 +1174,7 @@ void ReadPrefsFromRegistry(void) {
     RegQueryValueExA(
         hKey,
         gMiscText.readRegistry.editorShowMenu.text,
-        0,
+        NULL,
         &dwType,
         reinterpret_cast<u8*>(&gConfig.gfx[1].showMenu),
         &dwSize
@@ -1182,7 +1182,7 @@ void ReadPrefsFromRegistry(void) {
     RegQueryValueExA(
         hKey,
         gMiscText.readRegistry.editorX.text,
-        0,
+        NULL,
         &dwType,
         reinterpret_cast<u8*>(&gConfig.gfx[1].x),
         &dwSize
@@ -1190,7 +1190,7 @@ void ReadPrefsFromRegistry(void) {
     RegQueryValueExA(
         hKey,
         gMiscText.readRegistry.editorY.text,
-        0,
+        NULL,
         &dwType,
         reinterpret_cast<u8*>(&gConfig.gfx[1].y),
         &dwSize
@@ -1198,7 +1198,7 @@ void ReadPrefsFromRegistry(void) {
     RegQueryValueExA(
         hKey,
         gMiscText.readRegistry.editorWidth.text,
-        0,
+        NULL,
         &dwType,
         reinterpret_cast<u8*>(&gConfig.gfx[1].width),
         &dwSize
@@ -1206,7 +1206,7 @@ void ReadPrefsFromRegistry(void) {
     RegQueryValueExA(
         hKey,
         gMiscText.readRegistry.editorHeight.text,
-        0,
+        NULL,
         &dwType,
         reinterpret_cast<u8*>(&gConfig.gfx[1].height),
         &dwSize
@@ -1214,7 +1214,7 @@ void ReadPrefsFromRegistry(void) {
     RegQueryValueExA(
         hKey,
         gMiscText.readRegistry.editorFullScreen.text,
-        0,
+        NULL,
         &dwType,
         reinterpret_cast<u8*>(&gConfig.gfx[1].fullScreen),
         &dwSize
@@ -1222,7 +1222,7 @@ void ReadPrefsFromRegistry(void) {
     RegQueryValueExA(
         hKey,
         gMiscText.readRegistry.editorColorMouseCursor.text,
-        0,
+        NULL,
         &dwType,
         reinterpret_cast<u8*>(&gConfig.gfx[1].colorMouseCursor),
         &dwSize
@@ -1231,7 +1231,7 @@ void ReadPrefsFromRegistry(void) {
     if (RegQueryValueExA(
             hKey,
             gMiscText.readRegistry.appPath.text,
-            0,
+            NULL,
             &dwType,
             reinterpret_cast<u8*>(gcRegAppPath),
             &dwSize
@@ -1241,7 +1241,7 @@ void ReadPrefsFromRegistry(void) {
     if (RegQueryValueExA(
             hKey,
             gMiscText.readRegistry.cdDrive.text,
-            0,
+            NULL,
             &dwType,
             reinterpret_cast<u8*>(gcRegCDRomPath),
             &dwSize
@@ -1303,7 +1303,7 @@ void WritePrefsToRegistry(void) {
 
     strcpy(szScratch, gMiscText.writeRegistry.scratchDefault.text);
     strcpy(szKey, gMiscText.writeRegistry.key.text);
-    hKey = 0;
+    hKey = NULL;
     if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, szKey, 0, KEY_ALL_ACCESS, &hKey) != 0)
         return;
     RegSetValueExA(
@@ -1728,11 +1728,11 @@ i32 SetupCDDrive(void) {
         for (;;) {
             for (i32 index = 0; index < count; ++index) {
                 wsprintfA(command, gMiscText.cd.openAudioCommand.text, cdDrives[index] + 'A');
-                if (mciSendStringA(command, resultBuffer, CD_MCI_RESULT_LENGTH, 0) == 0) {
+                if (mciSendStringA(command, resultBuffer, CD_MCI_RESULT_LENGTH, NULL) == 0) {
                     wsprintfA(command, gMiscText.cd.audioInfoCommand.text);
-                    mciSendStringA(command, resultBuffer, CD_MCI_RESULT_LENGTH, 0);
+                    mciSendStringA(command, resultBuffer, CD_MCI_RESULT_LENGTH, NULL);
                     wsprintfA(command, gMiscText.cd.closeAudioCommand.text);
-                    mciSendStringA(command, resultBuffer, CD_MCI_RESULT_LENGTH, 0);
+                    mciSendStringA(command, resultBuffer, CD_MCI_RESULT_LENGTH, NULL);
                 }
                 sprintf(gText, gMiscText.cd.driveAnimationPath.text, cdDrives[index] + 'A');
                 file = _open(gText, _O_BINARY);
@@ -1743,7 +1743,7 @@ i32 SetupCDDrive(void) {
                     _close(file);
 
                     strcpy(registryKey, gMiscText.cd.registryKey.text);
-                    key = 0;
+                    key = NULL;
                     if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, registryKey, 0, KEY_WRITE, &key) == 0) {
                         wsprintfA(
                             registryPath,
@@ -1897,7 +1897,7 @@ void LogStr(char* text) {
     char logText[TEXT_BUFFER_SIZE];
     if (giDebugLevel >= FILE_DEBUG_LEVEL) {
         FILE* logFile = fopen(gMiscText.log.appendFilename.text, gMiscText.log.appendMode.text);
-        if (logFile != 0) {
+        if (logFile != NULL) {
             strcpy(logText, text);
             *reinterpret_cast<u16*>(logText + strlen(logText)) =
                 *reinterpret_cast<const u16*>(gMiscText.log.appendNewline.text);
@@ -1969,7 +1969,7 @@ void LogInt(
         sprintf(text, gMiscText.log.oneValueFormat.text, label, value1);
     if (giDebugLevel >= FILE_DEBUG_LEVEL) {
         FILE* file = fopen(gMiscText.log.appendFilename.text, gMiscText.log.appendMode.text);
-        if (file != 0) {
+        if (file != NULL) {
             strcpy(logText, text);
             *reinterpret_cast<u16*>(logText + strlen(logText)) =
                 *reinterpret_cast<const u16*>(gMiscText.log.appendNewline.text);
@@ -2161,7 +2161,7 @@ void CreatePCXFile(char* filename, u8* pixels, i32 width, i32 height, u8* palett
 VA(0x004c68c0, 0x52)
 i32l FileSize(char* filename) {
     FILE* file = fopen(filename, gMiscText.file.readWriteBinaryMode.text);
-    if (file == 0) {
+    if (file == NULL) {
         FileError(filename);
     }
     fseek(file, 0, 2);
@@ -2281,7 +2281,7 @@ void GetDataEntry(
     char windowName[16];
     sprintf(windowName, gMiscText.dataEntry.windowFilenameFormat.text, rows);
     DataEntryWin = new heroWindow(ENTRY_WINDOW_X, ENTRY_WINDOW_Y, windowName);
-    if (DataEntryWin == 0)
+    if (DataEntryWin == NULL)
         MemError();
 
     tag_message message;
@@ -2292,7 +2292,7 @@ void GetDataEntry(
     DataEntryWin->BroadcastMessage(message);
 
     char entryText[100];
-    if (initialText == 0)
+    if (initialText == NULL)
         initialText = gMiscText.dataEntry.initialTextDefault.text;
     strcpy(entryText, initialText);
     message.payload.widget.id = ENTRY_TEXT_WIDGET;
@@ -2335,7 +2335,7 @@ void GetDataEntry(
         10,
         3
     );
-    if (entry == 0)
+    if (entry == NULL)
         MemError();
     inBoxY = entryY + ENTRY_INPUT_BOX_Y_OFFSET;
     inBoxX = 213;

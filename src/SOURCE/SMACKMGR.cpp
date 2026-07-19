@@ -168,12 +168,12 @@ void SmackManagerMain(void) {
     if (gbLowMemory && bSmackNum == LOW_MEMORY_MOVIE && !gConfig.slowVideo)
         preloadFlags26 = 0;
 
-    smk1 = 0;
+    smk1 = NULL;
     if (bSmackNum != EXPANSION_CAMPAIGN) {
         while (!smk1) {
             smk1 = SmackOpen(gText, preloadFlags26 + soundFlags4, SMACKAUTOEXTRA);
             if (!smk1) {
-                gpWindowManager->FadeScreen(0, NORMAL_FADE, 0);
+                gpWindowManager->FadeScreen(0, NORMAL_FADE, NULL);
                 NormalDialog(
                     "Error reading the Heroes 2 Expansion CD.  Retry?",
                     2,
@@ -232,7 +232,7 @@ void SmackManagerMain(void) {
         0
     );
     if (SmackOptions[bSmackNum].fadeIn)
-        gpWindowManager->FadeScreen(1, NORMAL_FADE, 0);
+        gpWindowManager->FadeScreen(1, NORMAL_FADE, NULL);
 
     playing16 = 1;
     primaryStarted9 = 0;
@@ -262,11 +262,11 @@ void SmackManagerMain(void) {
                 smk2 = SmackOpen(gText, 0, SMACKAUTOEXTRA);
                 memcpy(gPalette->m_data, smk2->Palette, PALETTE_SIZE);
                 SmackClose(smk2);
-                smk2 = 0;
+                smk2 = NULL;
                 ConvertSmackerPalette(reinterpret_cast<u8*>(gPalette->m_data));
                 UpdatePalette(gPalette->m_data);
                 memcpy(gpBufferPalette->m_data, gPalette->m_data, PALETTE_SIZE);
-                gpWindowManager->FadeScreen(0, FAST_FADE, 0);
+                gpWindowManager->FadeScreen(0, FAST_FADE, NULL);
                 primaryStarted9 = 1;
             }
         } else if (!SmackWait(smk1)) {
@@ -287,7 +287,7 @@ void SmackManagerMain(void) {
                     }
                     if (SmackOptions[bSmackNum].fadeIn) {
                         memcpy(gpBufferPalette->m_data, gPalette->m_data, PALETTE_SIZE);
-                        gpWindowManager->FadeScreen(0, FAST_FADE, 0);
+                        gpWindowManager->FadeScreen(0, FAST_FADE, NULL);
                     }
                     if (bSmackNum == SMACK_CREDITS)
                         gpSoundManager->PlayAmbientMusic(MAIN_MUSIC, 0, -1);
@@ -370,7 +370,7 @@ void SmackManagerMain(void) {
                         xLastChoice = expansionChoice1;
                         if (smk2) {
                             SmackClose(smk2);
-                            smk2 = 0;
+                            smk2 = NULL;
                         }
                         if (expansionChoice1 != -1) {
                             bExpansionSmackNum =
@@ -445,7 +445,7 @@ playbackDone:
 
     if (SmackOptions[bSmackNum].fadeOut) {
         memcpy(gpBufferPalette->m_data, gPalette->m_data, PALETTE_SIZE);
-        gpWindowManager->FadeScreen(1, SHORT_FADE, 0);
+        gpWindowManager->FadeScreen(1, SHORT_FADE, NULL);
         FillBitmapArea(
             gpWindowManager->m_screen,
             0,
@@ -465,7 +465,7 @@ playbackDone:
         );
     } else if (!gbPlayedThrough && bSmackNum != CONGRATS) {
         memcpy(gpBufferPalette->m_data, gPalette->m_data, PALETTE_SIZE);
-        gpWindowManager->FadeScreen(1, NORMAL_FADE, 0);
+        gpWindowManager->FadeScreen(1, NORMAL_FADE, NULL);
         FillBitmapArea(
             gpWindowManager->m_screen,
             0,
@@ -489,10 +489,10 @@ playbackDone:
         SmackSummary(smk1, &smksum);
     if (smk1)
         SmackClose(smk1);
-    smk1 = 0;
+    smk1 = NULL;
     if (smk2)
         SmackClose(smk2);
-    smk2 = 0;
+    smk2 = NULL;
     if (bSmackNum != CONGRATS) {
         memcpy(gPalette->m_data, savedPalette9, PALETTE_SIZE);
         UpdatePalette(gPalette->m_data);
@@ -500,20 +500,20 @@ playbackDone:
     gpMouseManager->ShowColorPointer();
     if (brotherIcon)
         gpResourceManager->Dispose(static_cast<resource*>(brotherIcon));
-    brotherIcon = 0;
+    brotherIcon = NULL;
     if (backImage)
         gpResourceManager->Dispose(static_cast<resource*>(backImage));
-    backImage = 0;
+    backImage = NULL;
 }
 
 VA(0x004023f9, 0x56)
 void ShutDownSmacker(void) {
     if (smk1)
         SmackClose(smk1);
-    smk1 = 0;
+    smk1 = NULL;
     if (smk2)
         SmackClose(smk2);
-    smk2 = 0;
+    smk2 = NULL;
 }
 
 VA(0x0040244f, 0x17f)
@@ -557,7 +557,7 @@ i32 PlaySmacker(i32 smackNumber) {
 }
 
 DATA(0x004ec040) i32 bSmackSound = 0;
-DATA(0x004ec044) icon* brotherIcon = 0;
+DATA(0x004ec044) icon* brotherIcon = NULL;
 DATA(0x004ec048) static tag_rect expansionCampaignRects[EXPANSION_RECT_COUNT] =
     {{215, 49, 230, 150}, {217, 275, 230, 150}, {475, 132, 120, 180}, {41, 132, 120, 180}};
 
@@ -658,7 +658,7 @@ void PrintSummaryInfo(SmackSum* summary) {
 #undef LOG_SUMMARY_VALUE
 }
 
-DATA(0x004ec068) icon* backImage = 0;
+DATA(0x004ec068) icon* backImage = NULL;
 DATA(0x004ec070) SSmackOptions SmackOptions[73] = {
     {"H2INTRO", "", "SH2INTRO", "", 1, 1, 0, 0, 0, 0, 0},
     {"NWCLOGO", "", "SNWCLOGO", "", 1, 1, 0, 0, 0, 0, 0},
@@ -735,8 +735,8 @@ DATA(0x004ec070) SSmackOptions SmackOptions[73] = {
     {"CYBCREDS", "", "SCYBCRED", "", 1, 0, 1, 1, 0, 0, 0}
 };
 DATA(0x004ecd48) i32 bTesting = 0;
-DATA(0x004ecd4c) Smack* smk1 = 0;
-DATA(0x004ecd50) Smack* smk2 = 0;
+DATA(0x004ecd4c) Smack* smk1 = NULL;
+DATA(0x004ecd50) Smack* smk2 = NULL;
 DATA(0x00522f20) i8 bSmackNum;
 DATA(0x00522f24) b32 gbLastFramePlayed;
 DATA(0x00522f28) SmackSum smksum;

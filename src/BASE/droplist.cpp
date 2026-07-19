@@ -47,8 +47,8 @@ DATA(0x00521078) static SDropListSourceFiles gDropListSourceFiles = {
 
 VA(0x004dbf00, 0x3b)
 dropListWidget::dropListWidget(void) : widget(0, 0, 0, 0, 0, 0) {
-    m_items = 0;
-    m_savedBackground = 0;
+    m_items = NULL;
+    m_savedBackground = NULL;
     m_itemCount = 0;
     m_selectedIndex = -1;
 }
@@ -58,7 +58,7 @@ VA(0x004dbf60, 0x7c)
 dropListWidget::~dropListWidget() {
     gpResourceManager->Dispose(m_font);
     gpResourceManager->Dispose(m_icon);
-    if (m_savedBackground != 0)
+    if (m_savedBackground != NULL)
         delete m_savedBackground;
     for (i32 itemIndex = 0; itemIndex < m_itemCount; itemIndex++)
         H2_FREE_AT(m_items[itemIndex], gDropListSourceFiles.itemDestruction.text, 25);
@@ -134,7 +134,7 @@ void dropListWidget::DeleteItem(i32 index) {
         if (m_itemCount == 1) {
             H2_FREE_AT(m_items[0], gDropListSourceFiles.finalItemDestruction.text, 111);
             H2_FREE_AT(m_items, gDropListSourceFiles.finalListDestruction.text, 112);
-            m_items = 0;
+            m_items = NULL;
         } else {
             char** newItems = static_cast<char**>(H2_ALLOC_AT(
                 m_itemCount * 4 - 4,
@@ -144,7 +144,7 @@ void dropListWidget::DeleteItem(i32 index) {
             memcpy(newItems, m_items, m_itemCount * 4 - 4);
             if (m_itemCount - index - 1 > 0)
                 memcpy(newItems + index, m_items + index + 1, (m_itemCount - index - 1) * 4);
-            if (m_items != 0)
+            if (m_items != NULL)
                 H2_FREE_AT(m_items, gDropListSourceFiles.oldListDestruction.text, 123);
             m_items = newItems;
         }
@@ -223,7 +223,7 @@ i32 dropListWidget::Main(tag_message& message) {
                         ));
                         strcpy(newItems[m_itemCount], text);
                         m_itemCount++;
-                        if (m_items != 0)
+                        if (m_items != NULL)
                             H2_FREE_AT(
                                 m_items,
                                 gDropListSourceFiles.appendedOldListDestruction.text,
@@ -407,9 +407,9 @@ void dropListWidget::RestoreDropBackground(void) {
         m_savedBackgroundWidth,
         m_savedBackgroundHeight
     );
-    if (m_savedBackground != 0)
+    if (m_savedBackground != NULL)
         delete m_savedBackground;
-    m_savedBackground = 0;
+    m_savedBackground = NULL;
 }
 
 // @semantic: branch/code-shape residual.
@@ -687,9 +687,9 @@ done:
         m_savedBackgroundWidth,
         m_savedBackgroundHeight
     );
-    if (m_savedBackground != 0)
+    if (m_savedBackground != NULL)
         delete m_savedBackground;
-    m_savedBackground = 0;
+    m_savedBackground = NULL;
     Draw();
     gpWindowManager
         ->UpdateScreenRegion(m_x + m_owner->m_posX, m_y + m_owner->m_posY, m_width, m_height);

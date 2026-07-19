@@ -108,7 +108,7 @@ VA(0x004ca6d0, 0x3a3)
 void CycleColors(i32 forceUpdate) {
     i8 savedColor[PALETTE_COLOR_BYTES];
     iCycle1Count++;
-    if (gpWindowManager == 0 || gpBufferPalette == 0 || !gpWindowManager->m_active)
+    if (gpWindowManager == NULL || gpBufferPalette == NULL || !gpWindowManager->m_active)
         return;
     if (gpWindowManager->m_updateFlags == 0 && forceUpdate == 0)
         return;
@@ -290,15 +290,15 @@ updatePalette:
 VA(0x004caa80, 0x41)
 heroWindowManager::heroWindowManager(void) : baseManager() {
     m_active = false;
-    m_activeWindow = 0;
-    m_focusWindow = 0;
-    m_windowListTail = 0;
-    m_windowListHead = 0;
-    m_screen = 0;
+    m_activeWindow = NULL;
+    m_focusWindow = NULL;
+    m_windowListTail = NULL;
+    m_windowListHead = NULL;
+    m_screen = NULL;
     m_updateFlags = 0;
-    m_fizzleSource = 0;
+    m_fizzleSource = NULL;
     m_screenshotIndex = 1;
-    m_fizzleWork = 0;
+    m_fizzleWork = NULL;
     m_lastHoverId = HERO_WINDOW_NO_HOVER_WIDGET;
     m_dialogResult = -1;
 }
@@ -314,7 +314,7 @@ i32 heroWindowManager::Open(i32 managerOrder) {
     }
     SetPalette(gpBufferPalette->m_data, 1);
     m_screen = new bitmap();
-    if (m_screen == 0)
+    if (m_screen == NULL)
         MemError();
     m_screen->m_bitmapType = BITMAP_TYPE_MEMORY;
     m_screen->m_width = SCREEN_WIDTH;
@@ -336,13 +336,13 @@ VA(0x004cabb0, 0x45)
 void heroWindowManager::Close(void) {
     if (m_active) {
         heroWindow* w = m_windowListTail;
-        while (w != 0) {
+        while (w != NULL) {
             heroWindow* prev = w->m_prevWindow;
             RemoveWindow(w);
             w = prev;
         }
-        m_screen->m_pixels = 0;
-        if (m_screen != 0)
+        m_screen->m_pixels = NULL;
+        if (m_screen != NULL)
             delete m_screen;
         m_active = false;
     }
@@ -353,7 +353,7 @@ VA(0x004cac00, 0x2d)
 i32 heroWindowManager::Main(struct tag_message& msg) {
     i32 result = 0;
     heroWindow* w = m_windowListTail;
-    while (w != 0) {
+    while (w != NULL) {
         result = w->BroadcastMessage(msg);
         if (result >= 1 && result <= 2)
             break;
@@ -389,30 +389,30 @@ void heroWindowManager::AddWindow(class heroWindow* w, i32 zOrder, i32 openFlags
         z = zOrder;
     if (z == -1) {
         z = 0;
-        if (cur != 0)
+        if (cur != NULL)
             z = cur->m_zOrder + 1;
     }
-    if (z != 0 && m_windowListHead == 0)
+    if (z != 0 && m_windowListHead == NULL)
         return;
     if (w->Open(z, openFlags) != 0)
         return;
-    if (cur != 0) {
+    if (cur != NULL) {
         do {
             if (cur->m_zOrder <= z)
                 break;
             cur = cur->m_prevWindow;
-        } while (cur != 0);
+        } while (cur != NULL);
     }
-    if (cur == 0) {
+    if (cur == NULL) {
         w->m_nextWindow = m_windowListHead;
-        w->m_prevWindow = 0;
+        w->m_prevWindow = NULL;
         heroWindow* oldHead = m_windowListHead;
         m_windowListHead = w;
-        if (oldHead == 0)
+        if (oldHead == NULL)
             m_windowListTail = w;
-    } else if (cur->m_nextWindow == 0) {
+    } else if (cur->m_nextWindow == NULL) {
         w->m_prevWindow = m_windowListTail;
-        w->m_nextWindow = 0;
+        w->m_nextWindow = NULL;
         m_windowListTail->m_nextWindow = w;
         m_windowListTail = w;
     } else {
@@ -427,31 +427,31 @@ void heroWindowManager::AddWindow(class heroWindow* w, i32 zOrder, i32 openFlags
 
 VA(0x004cad40, 0x87)
 void heroWindowManager::RemoveWindow(class heroWindow* w) {
-    if (w != 0) {
+    if (w != NULL) {
         w->Close();
         if (m_windowListHead == w) {
             heroWindow* next = w->m_nextWindow;
             m_windowListHead = next;
-            if (next == 0)
-                m_windowListTail = 0;
+            if (next == NULL)
+                m_windowListTail = NULL;
             else
-                next->m_prevWindow = 0;
+                next->m_prevWindow = NULL;
         } else {
             if (m_windowListTail == w) {
                 heroWindow* prev = w->m_prevWindow;
                 m_windowListTail = prev;
-                prev->m_nextWindow = 0;
+                prev->m_nextWindow = NULL;
             } else {
                 heroWindow* prev = w->m_prevWindow;
-                if (prev != 0)
+                if (prev != NULL)
                     prev->m_nextWindow = w->m_nextWindow;
-                if (w->m_nextWindow != 0)
+                if (w->m_nextWindow != NULL)
                     w->m_nextWindow->m_prevWindow = w->m_prevWindow;
             }
         }
         if (m_activeWindow == w)
-            m_activeWindow = 0;
-        if (m_activeWindow == 0) {
+            m_activeWindow = NULL;
+        if (m_activeWindow == NULL) {
             m_focusWindow = m_windowListTail;
             return;
         }
@@ -474,12 +474,12 @@ i32 heroWindowManager::DoDialog(
         SetNoDialogMenus(0);
     iDialogNestCount++;
     m_lastHoverId = HERO_WINDOW_NO_HOVER_WIDGET;
-    if (window != 0)
+    if (window != NULL)
         AddWindow(window, -1, 1);
     if (fade != 0) {
         palette* dialogPalette = gPalette;
         heroWindowManager* manager = gpWindowManager;
-        if (dialogPalette != 0)
+        if (dialogPalette != NULL)
             SetPalette(dialogPalette->m_data, 0);
         i32 fadeType = IDX(FADE_IN);
         switch (fadeType) {
@@ -510,7 +510,7 @@ i32 heroWindowManager::DoDialog(
         Process1WindowsMessage();
         message = gpInputManager->GetEvent();
         gpMouseManager->Main(message);
-        if (window != 0 && (message.type != MESSAGE_MOUSE_MOVE || gbSendMouseMoveMessages != 0)) {
+        if (window != NULL && (message.type != MESSAGE_MOUSE_MOVE || gbSendMouseMoveMessages != 0)) {
             result = window->BroadcastMessage(message);
             if (result == 2 && message.type == MESSAGE_WIDGET
                 && message.payload.widget.command == WIDGET_COMMAND_DIALOG_SELECT) {
@@ -523,7 +523,7 @@ i32 heroWindowManager::DoDialog(
             && message.payload.widget.command == WIDGET_COMMAND_DIALOG_SELECT)
             done = 1;
     } while (done == 0);
-    if (window != 0)
+    if (window != NULL)
         RemoveWindow(window);
     gpInputManager->Flush();
     gbInDialog = false;
@@ -551,13 +551,13 @@ void heroWindowManager::UpdateScreenRegion(i32 x, i32 y, i32 w, i32 h) {
 
 VA(0x004cb010, 0x18)
 void heroWindowManager::RedrawScreen(void) {
-    for (heroWindow* w = m_windowListHead; w != 0; w = w->m_nextWindow)
+    for (heroWindow* w = m_windowListHead; w != NULL; w = w->m_nextWindow)
         w->DrawWindow();
 }
 
 VA(0x004cb030, 0x80)
 void heroWindowManager::FadeScreen(i32 direction, i32 steps, class palette* pal) {
-    if (pal != 0)
+    if (pal != NULL)
         SetPalette(pal->m_data, 0);
     switch (direction) {
         case 0: {
@@ -614,7 +614,7 @@ void heroWindowManager::SaveFizzleSource(i32 x, i32 y, i32 width, i32 height) {
         if (y + height > SCREEN_HEIGHT)
             height = SCREEN_HEIGHT - y;
         if (width > 0 && height > 0) {
-            if (m_fizzleSource != 0)
+            if (m_fizzleSource != NULL)
                 delete m_fizzleSource;
             m_fizzleSource =
                 new bitmap(BITMAP_TYPE_NONE, static_cast<i16>(width), static_cast<i16>(height));
@@ -703,7 +703,7 @@ void heroWindowManager::FizzleForward(
                 DelayTilMilli(delay + tick);
                 tick = KBTickCount();
                 BlitBitmapToScreen(m_screen, x, y, width, height, x, y);
-                if (startPalette != 0) {
+                if (startPalette != NULL) {
                     memcpy(fadePalette, startPalette, PALETTE_BYTE_COUNT);
                     for (i32 i = 0; i < PALETTE_BYTE_COUNT; i++)
                         fadePalette[i] += (endPalette[i] - startPalette[i]) * (frame + 1)
@@ -717,12 +717,12 @@ void heroWindowManager::FizzleForward(
             BlitBitmapToScreen(m_screen, x, y, width, height, x, y);
             gbEnlargeScreenBlit = true;
             m_updateFlags = savedUpdate;
-            if (m_fizzleSource != 0)
+            if (m_fizzleSource != NULL)
                 delete m_fizzleSource;
-            m_fizzleSource = 0;
-            if (m_fizzleWork != 0)
+            m_fizzleSource = NULL;
+            if (m_fizzleWork != NULL)
                 delete m_fizzleWork;
-            m_fizzleWork = 0;
+            m_fizzleWork = NULL;
             H2_FREE_AT(cycleTable, gWindowManagerText.cycleTableFreeSource, 897);
             H2_FREE_AT(fadePalette, gWindowManagerText.fadePaletteFreeSource, 898);
         }
@@ -731,9 +731,9 @@ void heroWindowManager::FizzleForward(
 
 VA(0x004cb5f0, 0x19)
 void heroWindowManager::ReleaseFizzleSource(void) {
-    if (m_fizzleSource != 0)
+    if (m_fizzleSource != NULL)
         delete m_fizzleSource;
-    m_fizzleSource = 0;
+    m_fizzleSource = NULL;
 }
 
 // @early-stop: named one-byte retail stub.

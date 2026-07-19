@@ -239,7 +239,7 @@ void DoBlur(
     gpWindowManager
         ->FizzleForward(0, 0, SCREEN_WIDTH, height, FIZZLE_DELAY, newPalette, oldPalette);
     H2_FREE_AT(lookup, gBlurText.lookupFreeSource, 0xa8);
-    if (saved != 0) {
+    if (saved != NULL) {
         delete saved;
     }
     gpMouseManager->ShowColorPointer();

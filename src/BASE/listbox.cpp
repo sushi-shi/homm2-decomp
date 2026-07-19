@@ -69,8 +69,8 @@ H2_ENUM_END(ListBoxFrame)
 
 VA(0x004db060, 0x42)
 listBoxWidget::listBoxWidget(void) : widget(0, 0, 0, 0, 0, 0) {
-    m_items = 0;
-    m_scrollbar = 0;
+    m_items = NULL;
+    m_scrollbar = NULL;
     m_selectedIndex = -1;
     m_itemCount = 0;
     m_lastSelectedIndex = -1;
@@ -82,7 +82,7 @@ listBoxWidget::~listBoxWidget() {
     i32 i;
     gpResourceManager->Dispose(m_font);
     gpResourceManager->Dispose(m_icon);
-    if (m_scrollbar != 0)
+    if (m_scrollbar != NULL)
         delete m_scrollbar;
     for (i = 0; i < m_itemCount; i++)
 #line 25
@@ -203,7 +203,7 @@ void listBoxWidget::DeleteItem(i32 index) {
             LISTBOX_DELETE_SOURCE_FILES + DELETE_LIST_SOURCE_FILE_OFFSET,
             157
         );
-        m_items = 0;
+        m_items = NULL;
     } else {
 #line 162
         char** newItems = static_cast<char**>(H2_ALLOC_AT(
@@ -214,7 +214,7 @@ void listBoxWidget::DeleteItem(i32 index) {
         memcpy(newItems, m_items, (m_itemCount - 1) * 4);
         if (m_itemCount - index - 1 > 0)
             memcpy(&newItems[index], &m_items[index + 1], (m_itemCount - index - 1) * 4);
-        if (m_items != 0)
+        if (m_items != NULL)
 #line 169
             H2_FREE_AT(
                 m_items,
@@ -317,7 +317,7 @@ i32 listBoxWidget::Main(tag_message& message) {
                         ));
                         strcpy(newItems[m_itemCount], text);
                         m_itemCount++;
-                        if (m_items != 0)
+                        if (m_items != NULL)
 #line 240
                             H2_FREE_AT(
                                 m_items,

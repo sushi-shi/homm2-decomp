@@ -60,10 +60,10 @@ VA(0x0044a8c0, 0xcf)
 army::army(void) {
     i32 i;
 
-    m_creatureIcon = 0;
+    m_creatureIcon = NULL;
     m_hex = 0;
     for (i = 0; i < IDX(ARMY_SAMPLE_COUNT); i++) {
-        m_samples[i] = 0;
+        m_samples[i] = NULL;
     }
     m_drawEnabled = 1;
     m_targetSide = -1;
@@ -71,7 +71,7 @@ army::army(void) {
     m_attackDirection = -1;
     m_unknown5e = 0;
     m_moveTargetHex = 0;
-    m_palette = 0;
+    m_palette = NULL;
     m_showQuantity = 1;
     m_yOffset = 0;
     m_xOffset = 0;
@@ -87,14 +87,14 @@ void army::InitClean(void) {
     i32 i;
 
     for (i = 0; i < IDX(ARMY_SAMPLE_COUNT); i++) {
-        m_samples[i] = 0;
+        m_samples[i] = NULL;
     }
     m_roundCounter = -1;
     m_spellCount = 0;
     memset(m_spellInfluence, 0, sizeof(m_spellInfluence));
     m_lastAnimationTime = KBTickCount();
     m_drawEnabled = 1;
-    m_creatureIcon = 0;
+    m_creatureIcon = NULL;
     m_drawSpellEffect = 0;
     m_spellEffect = -1;
     m_mirrorSourceIndex = -1;
@@ -241,8 +241,8 @@ void army::LoadResources(void) {
         }
         m_missileIcon = gpResourceManager->GetIcon(gText);
     } else {
-        m_samples[IDX(ARMY_SAMPLE_SHOT)] = 0;
-        m_missileIcon = 0;
+        m_samples[IDX(ARMY_SAMPLE_SHOT)] = NULL;
+        m_missileIcon = NULL;
     }
 
     for (i = 0; i < ARMY_PRIMARY_SAMPLE_COUNT; i++) {
@@ -263,16 +263,16 @@ void army::FreeResources(void) {
     }
     if (m_missileIcon) {
         gpResourceManager->Dispose(m_missileIcon);
-        m_missileIcon = 0;
+        m_missileIcon = NULL;
     }
     if (m_creatureIcon) {
         gpResourceManager->Dispose(m_creatureIcon);
-        m_creatureIcon = 0;
+        m_creatureIcon = NULL;
     }
     for (i = 0; i < IDX(ARMY_SAMPLE_COUNT); i++) {
         if (m_samples[i]) {
             gpResourceManager->Dispose(m_samples[i]);
-            m_samples[i] = 0;
+            m_samples[i] = NULL;
         }
     }
 }
@@ -342,7 +342,7 @@ void army::DrawToBuffer(i32 x, i32 y, i32 effectsOnly) {
         color = 236;
     }
 
-    palette8 = 0;
+    palette8 = NULL;
     if (m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PETRIFIED)]) {
         palette8 = gColorTableGray;
     } else if (HAS(m_monster.flags.all, MONSTER_FLAGS_RED_PALETTE)) {
@@ -422,8 +422,8 @@ void army::DrawToBuffer(i32 x, i32 y, i32 effectsOnly) {
                     &m_creatureLimits,
                     0,
                     0,
-                    0,
-                    0
+                    NULL,
+                    NULL
                 );
         } else if (giSpellEffectShowType == 1) {
             drawn1 =
@@ -434,8 +434,8 @@ void army::DrawToBuffer(i32 x, i32 y, i32 effectsOnly) {
                     &m_creatureLimits,
                     0,
                     237,
-                    0,
-                    0
+                    NULL,
+                    NULL
                 );
         } else {
             statusFrame0 = 2;
@@ -454,8 +454,8 @@ void army::DrawToBuffer(i32 x, i32 y, i32 effectsOnly) {
                     &m_creatureLimits,
                     0,
                     0,
-                    0,
-                    0
+                    NULL,
+                    NULL
                 );
         }
         if (drawn1) {
@@ -500,8 +500,8 @@ void army::DrawToBuffer(i32 x, i32 y, i32 effectsOnly) {
             &m_spellLimits,
             1 - m_facing,
             0,
-            0,
-            0
+            NULL,
+            NULL
         );
     }
 }
@@ -825,7 +825,7 @@ void army::SpecialAttack(void) {
     damage = 0;
     killed_13 = 0;
     originalFacing_6 = m_facing;
-    m_palette = 0;
+    m_palette = NULL;
     target_1 = m_targetIndex + gpCombatManager->m_armies[m_targetSide];
     targetColumn_2 = target_1->m_hex % 13;
     targetRow_1 = target_1->m_hex / 13;
@@ -1340,8 +1340,8 @@ void army::DoAttack(i32 retaliation) {
     breathDamage = 0;
     breathKilled = 0;
     effectStopsRetaliation_4 = 0;
-    target_1 = 0;
-    breathTarget_6 = 0;
+    target_1 = NULL;
+    breathTarget_6 = NULL;
     originalFacing_6 = m_facing;
     if (retaliation) {
         gpCombatManager->m_currentSide = 1 - gpCombatManager->m_currentSide;
@@ -2282,8 +2282,8 @@ void army::PowEffect(i32 effect, i32 resetLimits, i32 effectX, i32 effectY) {
                 &m_spellLimits,
                 0,
                 0,
-                0,
-                0
+                NULL,
+                NULL
             );
         }
         gpWindowManager->UpdateScreenRegion(
@@ -2442,7 +2442,7 @@ void army::ProcessDeath(i32 immediate) {
         rearHex = (static_cast<u32>(m_facing - 1) < 1 ? 1 : -1) + m_hex;
         rearCell = &gpCombatManager->m_hexCells[rearHex];
     } else {
-        rearCell = 0;
+        rearCell = NULL;
     }
     if (LeaveNoBody()) {
         if (immediate

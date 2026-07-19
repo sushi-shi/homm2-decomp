@@ -351,7 +351,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
                     16,
                     1
                 );
-                if (backgroundWidget19 == 0)
+                if (backgroundWidget19 == NULL)
                     MemError();
                 casWin->AddWidget(backgroundWidget19, -1);
                 ++backgroundFrame6;
@@ -375,7 +375,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
                     16,
                     1
                 );
-                if (backgroundWidget19 == 0)
+                if (backgroundWidget19 == NULL)
                     MemError();
                 casWin->AddWidget(backgroundWidget19, -1);
                 ++backgroundFrame6;
@@ -383,7 +383,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
         }
         if (xIsExpansionMap == 0 && m_town->m_type == IDX(FACTION_NECROMANCER)) {
             backgroundWidget19 = new iconWidget(149, 157, 137, 72, "caslxtra.icn", 0, 0, -1, 16, 1);
-            if (backgroundWidget19 == 0)
+            if (backgroundWidget19 == NULL)
                 MemError();
             casWin->AddWidget(backgroundWidget19, -1);
         }
@@ -725,7 +725,7 @@ i32 CastleHandler(tag_message& message) {
                                     HeroView(gpCurPlayer->AvailableHeroId(heroChoiceIndex), 1, 0);
                                     casWin->DrawWindow();
                                     gpTownManager->m_bankBox->Update(1);
-                                    gpWindowManager->FadeScreen(0, 8, 0);
+                                    gpWindowManager->FadeScreen(0, 8, NULL);
                                 } else {
                                     cannotRecruitHero =
                                         gpTownManager->m_recruitResult != 0

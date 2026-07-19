@@ -145,7 +145,7 @@ void RemoteMain(i32 gameMode) {
     LogStr("RM 4");
     memset(sMapChangeQueue, 0, sizeof(sMapChangeQueue));
     for (player = 0; player < REMOTE_QUEUE_CAPACITY; player++)
-        rcvBuf[player] = 0;
+        rcvBuf[player] = NULL;
     LogStr("RM 5");
     memset(iLastIds, 0, REMOTE_RECENT_ID_COUNT);
     GameMode = static_cast<u8>(gameMode);
@@ -228,7 +228,7 @@ void RemoteMain(i32 gameMode) {
                 LogStr("RM 3");
                 incomingData = GetRemoteData(1);
                 LogStr("RM 4");
-                if (incomingData != 0
+                if (incomingData != NULL
                     && REMOTE_MESSAGE(incomingData)->type == IDX(REMOTE_MESSAGE_RELIABLE)) {
                     switch (REMOTE_MESSAGE(incomingData)->command) {
                         case IDX(SETUP_PLAYER_INFO):
@@ -261,10 +261,10 @@ void RemoteMain(i32 gameMode) {
             LogStr("RM 6");
         }
     }
-    remoteGameType = 0;
+    remoteGameType = NULL;
     if (giThisNetPos == 0) {
         TransmitRemoteData(
-            0,
+            NULL,
             REMOTE_BROADCAST_PLAYER,
             0,
             static_cast<i8>(
@@ -278,20 +278,20 @@ void RemoteMain(i32 gameMode) {
         while (bGotGameType == 0) {
             PollSound();
             remoteGameType = GetRemoteData(1);
-            if (remoteGameType != 0
+            if (remoteGameType != NULL
                 && REMOTE_MESSAGE(remoteGameType)->type == IDX(REMOTE_MESSAGE_RELIABLE)) {
                 setupCounter = 0;
                 setupCounter++;
                 setupCounter++;
                 setupCounter++;
             }
-            if (remoteGameType != 0
+            if (remoteGameType != NULL
                 && REMOTE_MESSAGE(remoteGameType)->type == IDX(REMOTE_MESSAGE_RELIABLE)
                 && REMOTE_MESSAGE(remoteGameType)->command == IDX(SETUP_CAMPAIGN_GAME)) {
                 bGotGameType = 1;
                 giSetupGameType = 1;
             }
-            if (remoteGameType != 0
+            if (remoteGameType != NULL
                 && REMOTE_MESSAGE(remoteGameType)->type == IDX(REMOTE_MESSAGE_RELIABLE)
                 && REMOTE_MESSAGE(remoteGameType)->command == IDX(SETUP_STANDARD_GAME)) {
                 bGotGameType = 1;
@@ -523,7 +523,7 @@ i32 TransmitRemoteData(
     while (result == 0 && attempt0 <= REMOTE_RETRY_COUNT) {
         result = SendRemoteData(
             reinterpret_cast<u8*>(&outgoing),
-            0,
+            NULL,
             destination,
             length + REMOTE_MESSAGE_HEADER_SIZE
         );
@@ -559,11 +559,11 @@ char* GetRemoteData(i8 remove) {
     i32 selected;
 
     if (gbRemoteOn == 0 || gbInNetSetup != 0)
-        return 0;
+        return NULL;
     oldestOrder = REMOTE_ORDER_SENTINEL;
     selected = -1;
     for (queueIndex = 0; queueIndex < REMOTE_QUEUE_CAPACITY; queueIndex++) {
-        if (rcvBuf[queueIndex] != 0 && iInOrder[queueIndex] < oldestOrder) {
+        if (rcvBuf[queueIndex] != NULL && iInOrder[queueIndex] < oldestOrder) {
             oldestOrder = iInOrder[queueIndex];
             selected = queueIndex;
         }
@@ -572,11 +572,11 @@ char* GetRemoteData(i8 remove) {
         memcpy(rcvBufOut, rcvBuf[selected], REMOTE_MESSAGE_SIZE);
         if (remove != 0) {
             H2_FREE(rcvBuf[selected], 741);
-            rcvBuf[selected] = 0;
+            rcvBuf[selected] = NULL;
         }
         return rcvBufOut;
     }
-    return 0;
+    return NULL;
 }
 
 // @semantic: first code residual is the host-loop queueIndex/giThisNetPos load order.
@@ -630,7 +630,7 @@ void PollRemote(void) {
                     destination = 0;
                 SendRemoteData(
                     reinterpret_cast<u8*>(sndBuf),
-                    0,
+                    NULL,
                     destination,
                     REMOTE_HEARTBEAT_MESSAGE_SIZE
                 );
@@ -715,7 +715,7 @@ void PollRemote(void) {
             }
 
             for (queueIndex = 0; queueIndex < REMOTE_QUEUE_CAPACITY; queueIndex++) {
-                if (rcvBuf[queueIndex] != 0)
+                if (rcvBuf[queueIndex] != NULL)
                     queueCount++;
             }
             if (queueCount == REMOTE_QUEUE_CAPACITY)
@@ -723,7 +723,7 @@ void PollRemote(void) {
             receiveResult = 1;
             while (receiveResult != 0) {
                 receiveResult =
-                    ReceiveRemoteData(0, reinterpret_cast<u8*>(rcvBufIn), REMOTE_BROADCAST_PLAYER);
+                    ReceiveRemoteData(NULL, reinterpret_cast<u8*>(rcvBufIn), REMOTE_BROADCAST_PLAYER);
                 if (receiveResult == 0 || REMOTE_MESSAGE(rcvBufIn)->sender == giThisNetPos)
                     continue;
                 if (REMOTE_MESSAGE(rcvBufIn)->type == IDX(REMOTE_MESSAGE_CONFIRM)) {
@@ -749,13 +749,13 @@ void PollRemote(void) {
                     REMOTE_MESSAGE(sndBuf)->payloadSize = 0;
                     SendRemoteData(
                         reinterpret_cast<u8*>(sndBuf),
-                        0,
+                        NULL,
                         REMOTE_MESSAGE(rcvBufIn)->sender,
                         REMOTE_MESSAGE_HEADER_SIZE
                     );
                 }
                 for (queueIndex = 0; queueIndex < REMOTE_QUEUE_CAPACITY; queueIndex++) {
-                    if (rcvBuf[queueIndex] != 0
+                    if (rcvBuf[queueIndex] != NULL
                         && REMOTE_MESSAGE(rcvBuf[queueIndex])->id == REMOTE_MESSAGE(rcvBufIn)->id) {
                         break;
                     }
@@ -769,7 +769,7 @@ void PollRemote(void) {
                 if (queueIndex < REMOTE_RECENT_ID_COUNT)
                     continue;
                 for (queueIndex = 0; queueIndex < REMOTE_QUEUE_CAPACITY; queueIndex++) {
-                    if (rcvBuf[queueIndex] == 0)
+                    if (rcvBuf[queueIndex] == NULL)
                         break;
                 }
                 if (queueIndex >= REMOTE_QUEUE_CAPACITY)
@@ -805,7 +805,7 @@ i32 TransmitAndWait(
 
     if (gbRemoteOn == 0 || gbInNetSetup != 0)
         return 1;
-    receivedData = 0;
+    receivedData = NULL;
     result = TransmitRemoteData(data, destination, length, command, 1, 1, -1);
     if (result == 0) {
     } else {
@@ -823,9 +823,9 @@ i32 TransmitAndWait(
             }
             ForcePollSound();
             receivedData = GetRemoteData(1);
-            if (receivedData != 0)
+            if (receivedData != NULL)
                 unusedResponseState = 0;
-            if (receivedData != 0
+            if (receivedData != NULL
                 && REMOTE_MESSAGE(receivedData)->type == IDX(REMOTE_MESSAGE_RELIABLE)
                 && REMOTE_MESSAGE(receivedData)->command == responseCommand) {
                 complete = 1;

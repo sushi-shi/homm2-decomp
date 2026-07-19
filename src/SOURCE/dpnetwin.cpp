@@ -40,9 +40,9 @@ BOOL WINAPI dpEnumServiceProvider(struct _GUID* guid, char* name, DWORD, DWORD, 
     LogStr("ServiceProvider:");
     _strupr(name);
     LogInt(name, reinterpret_cast<i32>(guid), -999, -999, -999, -999, -999, -999);
-    if (FindStringInString(name, "IPX") != 0)
+    if (FindStringInString(name, "IPX") != NULL)
         IPXGuid = guid;
-    else if (FindStringInString(name, "TCP") != 0)
+    else if (FindStringInString(name, "TCP") != NULL)
         TCPGuid = guid;
     return 1;
 }
@@ -70,7 +70,7 @@ i16 dpnet_init(void) {
     i32 guestIndex;
     i32 result;
 
-    if (lpIDC != 0)
+    if (lpIDC != NULL)
         return 0;
     {
         ppDPRcvBuffer = static_cast<u8**>(H2_ALLOC(DP_TRANSPORT_BUFFER_COUNT * sizeof(u8*), 102));
@@ -79,21 +79,21 @@ i16 dpnet_init(void) {
         memset(ppDPRcvBuffer, 0, DP_TRANSPORT_BUFFER_COUNT * sizeof(u8*));
         memset(piDPRcvBufferSize, 0, DP_TRANSPORT_BUFFER_COUNT * sizeof(i32));
         hinstDplayx = LoadLibraryA("DPLAYX.DLL");
-        if (hinstDplayx == 0)
+        if (hinstDplayx == NULL)
             ShutDown("Can't load 'DPLAYX.DLL'");
-        enumerateFunction = 0;
-        createFunction = 0;
+        enumerateFunction = NULL;
+        createFunction = NULL;
         createFunction = reinterpret_cast<DirectPlayCreateFunction>(
             GetProcAddress(hinstDplayx, "DirectPlayCreate")
         );
-        if (createFunction == 0)
+        if (createFunction == NULL)
             ShutDown("Can't load 'DPLAYX.DLL'");
         enumerateFunction = reinterpret_cast<DirectPlayEnumerateFunction>(
             GetProcAddress(hinstDplayx, "DirectPlayEnumerateA")
         );
-        if (enumerateFunction == 0)
+        if (enumerateFunction == NULL)
             ShutDown("Can't load 'DPLAYX.DLL'");
-        enumerateFunction(dpEnumServiceProvider, 0);
+        enumerateFunction(dpEnumServiceProvider, NULL);
         switch (iMPNetProtocol) {
             case DP_PROTOCOL_IPX:
                 g_lpGuid = IPXGuid;
@@ -102,7 +102,7 @@ i16 dpnet_init(void) {
                 g_lpGuid = TCPGuid;
                 break;
         }
-        result = createFunction(g_lpGuid, &lpIDC, 0);
+        result = createFunction(g_lpGuid, &lpIDC, NULL);
         if (result != IDX(RESULT_OK))
             DPSD(result, RETAIL_FILE, 136);
 
@@ -112,7 +112,7 @@ i16 dpnet_init(void) {
             sprintf(gText, "Waiting On Guest.\n\n  Press 'CANCEL' to abort.");
             NormalDialog(gText, 6, -1, -1, -1, 0, -1, 0, -1, 0);
             if (gbFunctionComplete == 0)
-                ShutDown(0);
+                ShutDown(NULL);
             iLastMsgNumHumanPlayers = giNumHumanPlayers;
             giWaitType = IDX(WAIT_EXTRA_GUESTS);
             sprintf(
@@ -139,7 +139,7 @@ i16 dpnet_init(void) {
             sprintf(gText, "Waiting for other remote player to set up game.");
             NormalDialog(gText, 6, -1, -1, -1, 0, -1, 0, -1, 0);
             if (gbFunctionComplete == 0)
-                ShutDown(0);
+                ShutDown(NULL);
         }
     }
     return 0;
@@ -147,17 +147,17 @@ i16 dpnet_init(void) {
 
 VA(0x0041f1c0, 0xce)
 void CleanupDPVars(void) {
-    lpIDC = 0;
+    lpIDC = NULL;
     dcoID = 0;
-    IPXGuid = 0;
-    TCPGuid = 0;
-    dphEvent = 0;
+    IPXGuid = NULL;
+    TCPGuid = NULL;
+    dphEvent = NULL;
     iDPRcvBufferHead = 0;
     iDPRcvBufferTail = 0;
-    ppDPRcvBuffer = 0;
-    piDPRcvBufferSize = 0;
+    ppDPRcvBuffer = NULL;
+    piDPRcvBufferSize = NULL;
     bStartUpInfoReceived = 0;
-    hinstDplayx = 0;
+    hinstDplayx = NULL;
     iDPWaitForFirstGuestStatus = 0;
     iDPWaitForHostStatus = 0;
     iWaitForHostWaitCount = 0;
@@ -178,18 +178,18 @@ void dpnet_term(void) {
         lpIDC->DestroyPlayer(dcoID);
     lpIDC->Close();
     lpIDC->Release();
-    lpIDC = 0;
+    lpIDC = NULL;
     while (dpnet_rcv(0, DP_TRANSPORT_TERM_DRAIN_READ_SIZE, drainBuffer) != 0) {
     }
-    if (ppDPRcvBuffer != 0)
+    if (ppDPRcvBuffer != NULL)
         H2_FREE(ppDPRcvBuffer, 233);
-    ppDPRcvBuffer = 0;
-    if (piDPRcvBufferSize != 0)
+    ppDPRcvBuffer = NULL;
+    if (piDPRcvBufferSize != NULL)
         H2_FREE(piDPRcvBufferSize, 237);
-    piDPRcvBufferSize = 0;
-    if (hinstDplayx != 0)
+    piDPRcvBufferSize = NULL;
+    if (hinstDplayx != NULL)
         FreeLibrary(hinstDplayx);
-    hinstDplayx = 0;
+    hinstDplayx = NULL;
     CleanupDPVars();
 }
 
@@ -256,7 +256,7 @@ void dpProcessMessages(void) {
     i32 senderId;
     i32 receiveResult;
 
-    if (lpIDC == 0)
+    if (lpIDC == NULL)
         return;
     while (1) {
         packetSize[0] = DP_TRANSPORT_RECEIVE_SIZE;
@@ -297,7 +297,7 @@ void dpEvaluateMessage(u32l size, i32 sender) {
             if (GameMode == IDX(REMOTE_GAME_NETWORK_HOST)) {
                 for (i = 1; i < giNumHumanPlayers; i++) {
                     if (giNetPosToDCOPos[i] == sender) {
-                        dpSendMessage(sender, IDX(NETWORK_PACKET_GUEST_ACCEPTED), 0, 0);
+                        dpSendMessage(sender, IDX(NETWORK_PACKET_GUEST_ACCEPTED), 0, NULL);
                         return;
                     }
                 }
@@ -306,10 +306,10 @@ void dpEvaluateMessage(u32l size, i32 sender) {
                     gsNetPlayerInfo[giNumHumanPlayers] = *reinterpret_cast<SNetPlayerInfo*>(ptr);
                     if (gsNetPlayerInfo[giNumHumanPlayers].reserved[0] == 0)
                         xNetHasOldPlayers = 1;
-                    dpSendMessage(sender, IDX(NETWORK_PACKET_GUEST_ACCEPTED), 0, 0);
+                    dpSendMessage(sender, IDX(NETWORK_PACKET_GUEST_ACCEPTED), 0, NULL);
                     giNumHumanPlayers++;
                 } else {
-                    dpSendMessage(sender, IDX(NETWORK_PACKET_GUEST_REJECTED), 0, 0);
+                    dpSendMessage(sender, IDX(NETWORK_PACKET_GUEST_REJECTED), 0, NULL);
                 }
             }
             break;
@@ -425,7 +425,7 @@ i32 dpWaitForHost(void) {
             else
                 enumerationTimeout = DP_TRANSPORT_ENUM_LONG_TIMEOUT;
             playResult =
-                lpIDC->EnumSessions(&sessionDescription, enumerationTimeout, dpEnumSession, 0, 0);
+                lpIDC->EnumSessions(&sessionDescription, enumerationTimeout, dpEnumSession, NULL, 0);
             iEnumCount++;
             if (playResult == IDX(RESULT_NO_SESSIONS)) {
                 iWaitForHostWaitCount = DP_TRANSPORT_RETRY_WAIT_COUNT;
@@ -603,17 +603,17 @@ void DPSD(i32 result, char* file, i32 line) {
     ShutDown(gText);
 }
 
-DATA(0x004ef7c8) struct IDirectPlay* lpIDC = 0;
+DATA(0x004ef7c8) struct IDirectPlay* lpIDC = NULL;
 DATA(0x004ef7cc) DPID dcoID = 0;
-DATA(0x004ef7d0) struct _GUID* IPXGuid = 0;
-DATA(0x004ef7d4) struct _GUID* TCPGuid = 0;
-DATA(0x004ef7d8) HANDLE dphEvent = 0;
+DATA(0x004ef7d0) struct _GUID* IPXGuid = NULL;
+DATA(0x004ef7d4) struct _GUID* TCPGuid = NULL;
+DATA(0x004ef7d8) HANDLE dphEvent = NULL;
 DATA(0x004ef7dc) i32 iDPRcvBufferHead = 0;
 DATA(0x004ef7e0) i32 iDPRcvBufferTail = 0;
-DATA(0x004ef7e4) u8** ppDPRcvBuffer = 0;
-DATA(0x004ef7e8) i32* piDPRcvBufferSize = 0;
+DATA(0x004ef7e4) u8** ppDPRcvBuffer = NULL;
+DATA(0x004ef7e8) i32* piDPRcvBufferSize = NULL;
 DATA(0x004ef7ec) i32 bStartUpInfoReceived = 0;
-DATA(0x004ef7f0) HMODULE hinstDplayx = 0;
+DATA(0x004ef7f0) HMODULE hinstDplayx = NULL;
 DATA(0x004ef7f4) i32 iDPWaitForFirstGuestStatus = 0;
 DATA(0x004ef7f8) i32 iDPWaitForHostStatus = 0;
 DATA(0x004ef7fc) i32 iWaitForHostWaitCount = 0;

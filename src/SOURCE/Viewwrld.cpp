@@ -84,7 +84,7 @@ void advManager::ViewWorld(ViewWorldMode whatToDraw, b32 drawAllObjects, b32 dra
 
     sprintf(gText, "viewlgnd.bin");
     viewWorldWindow = new heroWindow(WORLD_WINDOW_X, WORLD_WINDOW_Y, gText);
-    if (viewWorldWindow == 0)
+    if (viewWorldWindow == NULL)
         MemError();
 
     i32 legendMode;
@@ -311,10 +311,10 @@ void advManager::VWCompleteDraw(void) {
                 }
                 if (cell0->m_extraIndex == 0
                     || m_mapData->Extra(cell0->m_extraIndex)->objectIndex == WORLD_NO_SPRITE)
-                    extra15 = 0;
+                    extra15 = NULL;
                 else
                     extra15 = m_mapData->Extra(cell0->m_extraIndex);
-                while (extra15 != 0) {
+                while (extra15 != NULL) {
                     if (extra15->objectLayerBit0 && extra15->objectIndex != WORLD_NO_SPRITE
                         && drawTilesets0[extra15->objectTileset]) {
                         IconToBitmapScale(
@@ -334,7 +334,7 @@ void advManager::VWCompleteDraw(void) {
                     if (extra15->nextIndex == 0
                         || m_mapData->Extra(extra15->nextIndex)->objectIndex
                                == WORLD_NO_SPRITE)
-                        extra15 = 0;
+                        extra15 = NULL;
                     else
                         extra15 = m_mapData->Extra(extra15->nextIndex);
                 }
@@ -357,10 +357,10 @@ void advManager::VWCompleteDraw(void) {
                 }
                 if (cell0->m_extraIndex == 0
                     || m_mapData->Extra(cell0->m_extraIndex)->objectIndex == WORLD_NO_SPRITE)
-                    extra15 = 0;
+                    extra15 = NULL;
                 else
                     extra15 = m_mapData->Extra(cell0->m_extraIndex);
-                while (extra15 != 0) {
+                while (extra15 != NULL) {
                     if (!extra15->objectLayerBit0 && extra15->objectIndex != WORLD_NO_SPRITE
                         && drawTilesets0[extra15->objectTileset]) {
                         IconToBitmapScale(
@@ -380,7 +380,7 @@ void advManager::VWCompleteDraw(void) {
                     if (extra15->nextIndex == 0
                         || m_mapData->Extra(extra15->nextIndex)->objectIndex
                                == WORLD_NO_SPRITE)
-                        extra15 = 0;
+                        extra15 = NULL;
                     else
                         extra15 = m_mapData->Extra(extra15->nextIndex);
                 }
@@ -403,10 +403,10 @@ void advManager::VWCompleteDraw(void) {
                 }
                 if (cell0->m_extraIndex == 0
                     || m_mapData->Extra(cell0->m_extraIndex)->overlayIndex == WORLD_NO_SPRITE)
-                    extra15 = 0;
+                    extra15 = NULL;
                 else
                     extra15 = m_mapData->Extra(cell0->m_extraIndex);
-                while (extra15 != 0) {
+                while (extra15 != NULL) {
                     if (drawTilesets0[extra15->overlayTileset]) {
                         IconToBitmapScale(
                             m_objectIcons[extra15->overlayTileset],
@@ -425,7 +425,7 @@ void advManager::VWCompleteDraw(void) {
                     if (extra15->nextIndex == 0
                         || m_mapData->Extra(extra15->nextIndex)->overlayIndex
                                == WORLD_NO_SPRITE)
-                        extra15 = 0;
+                        extra15 = NULL;
                     else
                         extra15 = m_mapData->Extra(extra15->nextIndex);
                 }

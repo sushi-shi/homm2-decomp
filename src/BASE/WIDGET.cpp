@@ -9,9 +9,9 @@
 
 VA(0x004dde00, 0x5a)
 widget::widget(i16 x, i16 y, i16 width, i16 height, i16 id, i16 kind) {
-    m_owner = 0;
-    m_next = 0;
-    m_prev = 0;
+    m_owner = NULL;
+    m_next = NULL;
+    m_prev = NULL;
     m_x = x;
     m_y = y;
     m_width = width;
@@ -25,9 +25,9 @@ widget::widget(i16 x, i16 y, i16 width, i16 height, i16 id, i16 kind) {
 VA(0x004dde60, 0x3f)
 widget::widget(void) {
     m_id = 0;
-    m_owner = 0;
-    m_next = 0;
-    m_prev = 0;
+    m_owner = NULL;
+    m_next = NULL;
+    m_prev = NULL;
     m_flags = WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW;
     m_zOrder = -1;
     m_kind = EncodeWidgetKind(WIDGET_KIND_DEFAULT);
