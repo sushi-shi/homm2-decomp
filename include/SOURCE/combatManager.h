@@ -154,7 +154,7 @@ H2_ENUM_BEGIN(CombatCatapultConstant)
     COMBAT_CATAPULT_CLOUD_Y_OFFSET            = 25,
     COMBAT_CATAPULT_KEEP_IMPACT_X             = 600,
     COMBAT_CATAPULT_KEEP_IMPACT_Y             = 160,
-    COMBAT_KEEP_FACTION_COUNT                 = 6,
+    COMBAT_KEEP_FACTION_COUNT                 = IDX(FACTION_COUNT),
     COMBAT_KEEP_TOWER_COUNT                   = 3,
     COMBAT_KEEP_MISSILE_ANGLE_COUNT           = 9,
     COMBAT_KEEP_TOWER_DAMAGE_BONUS            = 2,
@@ -215,6 +215,7 @@ H2_ENUM_BEGIN(CombatGridConstant)
     COMBAT_CASTLE_GATE_CLOSED_FRAME         = 0x14,
     COMBAT_CASTLE_WALL_BASE_FRAME           = 0x11,
     COMBAT_SCREEN_WIDTH                     = 0x280,
+    COMBAT_SCREEN_HEIGHT                    = 480,
     COMBAT_AREA_HEIGHT                      = 0x1bb,
     COMBAT_MAX_EXTENT_X                     = 0x27f,
     COMBAT_MAX_EXTENT_Y                     = 0x1ba,
@@ -350,6 +351,11 @@ H2_ENUM_BEGIN(CombatGridConstant)
     COMBAT_CASTLE_BACKGROUND_DEFAULT_FRAME  = 3
 H2_ENUM_END(CombatGridConstant)
 
+H2_ENUM_BEGIN(CombatResultConstant)
+    COMBAT_RESULT_DRAW    = -1,
+    COMBAT_RESULT_PENDING = 3
+H2_ENUM_END(CombatResultConstant)
+
 H2_ENUM_CLASS_BEGIN(CombatIconIndex)
     COMBAT_ICON_STATUS                = 1,
     COMBAT_ICON_CATAPULT              = 3,
@@ -368,6 +374,9 @@ H2_ENUM_BEGIN(CombatRuntimeConstant)
     COMBAT_RANDOM_X_MULTIPLIER            = 100,
     COMBAT_CAPTAIN_SPELL_POINT_MULTIPLIER = 10,
     COMBAT_CAPTAIN_PORTRAIT_BASE          = 90,
+    COMBAT_CAPTAIN_SPRITE_OFFSET          = IDX(FACTION_COUNT),
+    COMBAT_NEUTRAL_HERO_COLOR             = IDX(FACTION_COUNT),
+    COMBAT_POINTER_DEFAULT                = 6,
     COMBAT_INITIAL_COMMAND                = 15,
     COMBAT_INVALID_HISTORY_INDEX          = -99
 H2_ENUM_END(CombatRuntimeConstant)

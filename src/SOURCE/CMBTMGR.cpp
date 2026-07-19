@@ -29,6 +29,8 @@
 #include <SOURCE/town.h>
 #include <SOURCE/X_GLOBAL.h>
 
+namespace {
+
 H2_ENUM_BEGIN(CombatSystemOptionWidget)
     SYSTEM_OPTION_SPEED_BUTTON      = 10,
     SYSTEM_OPTION_ARMY_INFO_BUTTON  = 11,
@@ -45,21 +47,103 @@ H2_ENUM_BEGIN(CombatSystemOptionWidget)
     SYSTEM_OPTION_CLOSE_BUTTON      = 0x7800
 H2_ENUM_END(CombatSystemOptionWidget)
 
-H2_ENUM_BEGIN(CombatConstant)
+H2_ENUM_BEGIN(CombatSystemOptionConstant)
     SYSTEM_OPTION_RIGHT_BUTTON            = 0x200,
     SYSTEM_OPTION_CYCLE_COUNT             = 3,
     SYSTEM_OPTION_HELP_DIALOG             = 4,
     SYSTEM_OPTION_HANDLER_CONTINUE        = 1,
     SYSTEM_OPTION_HANDLER_CLOSE           = 2,
-    SYSTEM_OPTION_STATE_OFFSET_STEP       = 2,
     SYSTEM_OPTION_SPEED_STATE_OFFSET      = 0,
     SYSTEM_OPTION_ARMY_INFO_STATE_OFFSET  = 3,
     SYSTEM_OPTION_AUTO_SPELL_STATE_OFFSET = 6,
     SYSTEM_OPTION_GRID_STATE_OFFSET       = 8,
     SYSTEM_OPTION_SHADE_STATE_OFFSET      = 10,
     SYSTEM_OPTION_MOUSE_HEX_STATE_OFFSET  = 12,
-    SYSTEM_OPTION_DRAW_MASK               = 0x7fff
-H2_ENUM_END(CombatConstant)
+    SYSTEM_OPTION_DRAW_MASK               = 0x7fff,
+    SYSTEM_OPTION_WINDOW_X                = 160,
+    SYSTEM_OPTION_WINDOW_Y                = 33
+H2_ENUM_END(CombatSystemOptionConstant)
+
+H2_ENUM_CLASS_BEGIN(CombatSystemOptionHelp)
+    HELP_CLOSE      = 0,
+    HELP_SPEED      = 1,
+    HELP_ARMY_INFO  = 2,
+    HELP_AUTO_SPELL = 3,
+    HELP_GRID       = 4,
+    HELP_SHADE      = 5,
+    HELP_MOUSE_HEX  = 6
+H2_ENUM_CLASS_END(CombatSystemOptionHelp)
+
+H2_ENUM_BEGIN(CombatSetupConstant)
+    BALLISTA_CATAPULT_ATTACK_COUNT      = 2,
+    NECROMANCER_SHRINE_POWER_BONUS      = 2,
+    DEFENDER_HERO_OVERLAY_INITIAL_FRAME = 3
+H2_ENUM_END(CombatSetupConstant)
+
+H2_ENUM_BEGIN(CombatPresentationConstant)
+    FADE_STEPS          = 8,
+    AMBIENT_MUSIC_FIRST = 2,
+    AMBIENT_MUSIC_LAST  = 4
+H2_ENUM_END(CombatPresentationConstant)
+
+H2_ENUM_BEGIN(CombatMapConstant)
+    MONSTER_COUNT_SAVE_LIMIT  = 4000,
+    MAP_RANDOM_OFFSET_MINIMUM = 8,
+    MAP_RANDOM_OFFSET_MAXIMUM = 15
+H2_ENUM_END(CombatMapConstant)
+
+H2_ENUM_BEGIN(CombatNearbyConstant)
+    NEARBY_RADIUS_COUNT = 3
+H2_ENUM_END(CombatNearbyConstant)
+
+H2_ENUM_BEGIN(CombatKeepStorageConstant)
+    KEEP_TOWER_SCRATCH_COUNT = 4
+H2_ENUM_END(CombatKeepStorageConstant)
+
+H2_ENUM_BEGIN(CombatObstacleConstant)
+    ELEVATION_OBSTACLE_WEIGHT_DIVISOR = 2
+H2_ENUM_END(CombatObstacleConstant)
+
+H2_ENUM_BEGIN(CombatMissileConstant)
+    MISSILE_DIAMETER_MULTIPLIER = 2
+H2_ENUM_END(CombatMissileConstant)
+
+H2_ENUM_CLASS_BEGIN(BattlefieldBackgroundIndex)
+    BACKGROUND_WATER       = 0,
+    BACKGROUND_GRASS_TREES = 2,
+    BACKGROUND_GRASS       = 3,
+    BACKGROUND_SNOW_TREES  = 4,
+    BACKGROUND_SNOW        = 5,
+    BACKGROUND_SWAMP       = 6,
+    BACKGROUND_LAVA        = 8,
+    BACKGROUND_DESERT      = 10,
+    BACKGROUND_DIRT_TREES  = 12,
+    BACKGROUND_DIRT        = 13,
+    BACKGROUND_WASTELAND   = 14,
+    BACKGROUND_BEACH       = 16
+H2_ENUM_CLASS_END(BattlefieldBackgroundIndex)
+
+H2_ENUM_CLASS_BEGIN(BattlefieldFringeFrame)
+    FRINGE_NONE        = -1,
+    FRINGE_BEACH       = 2,
+    FRINGE_WASTELAND   = 3,
+    FRINGE_DESERT      = 4,
+    FRINGE_LAVA        = 5,
+    FRINGE_SNOW_TREES  = 6,
+    FRINGE_SNOW        = 7,
+    FRINGE_SWAMP       = 8,
+    FRINGE_DIRT        = 9,
+    FRINGE_DIRT_TREES  = 10,
+    FRINGE_GRASS       = 11,
+    FRINGE_GRASS_TREES = 12,
+    FRINGE_WATER       = 13
+H2_ENUM_CLASS_END(BattlefieldFringeFrame)
+
+H2_ENUM_CLASS_BEGIN_T(NearbyFeature, i8)
+    NEARBY_UNKNOWN  = -1,
+    NEARBY_MOUNTAIN = 0,
+    NEARBY_TREE     = 1
+H2_ENUM_CLASS_END_T(NearbyFeature, i8)
 
 H2_ENUM_BEGIN(CombatCastleInteriorRange)
     CASTLE_INTERIOR_ROW_0_FIRST = 0,
@@ -134,6 +218,12 @@ H2_ENUM_CLASS_BEGIN(CombatNearbyTileset)
     TILESET_SUMMER_TREES      = 0x2b,
     TILESET_AUTUMN_TREES      = 0x2c
 H2_ENUM_CLASS_END(CombatNearbyTileset)
+
+inline i32 FacingRearHexOffset(i32 facing) {
+    return facing == 1 ? 1 : -1;
+}
+
+}
 
 VA(0x0048fd50, 0x1ba)
 combatManager::combatManager(void) {
@@ -258,7 +348,7 @@ void combatManager::SetupCombat(
         m_catapultAttacksRemaining[side] = 1;
         m_catapultAttackCount[side] = m_catapultAttacksRemaining[side];
         if (m_heroes[side] != NULL && m_heroes[side]->HasArtifact(ARTIFACT_BALLISTA)) {
-            m_catapultAttacksRemaining[side] = 2;
+            m_catapultAttacksRemaining[side] = BALLISTA_CATAPULT_ATTACK_COUNT;
             m_catapultAttackCount[side] = m_catapultAttacksRemaining[side];
         }
         if (m_heroes[side] != NULL
@@ -337,14 +427,14 @@ void combatManager::InitNonVisualVars(void) {
             m_spellPower[side] = m_heroes[side]->Stats(HERO_PRIMARY_SPELL_POWER);
         if (m_combatTowns[side] != NULL && m_combatTowns[side]->m_type == IDX(FACTION_NECROMANCER)
             && (m_combatTowns[side]->m_buildings & IDX(TOWN_BUILDING_SHRINE)))
-            m_spellPower[side] += 2;
+            m_spellPower[side] += NECROMANCER_SHRINE_POWER_BONUS;
     }
 
     m_heroOverlayFrame[COMBAT_ATTACKER_SIDE] = 0;
-    m_heroOverlayFrame[COMBAT_DEFENDER_SIDE] = 3;
+    m_heroOverlayFrame[COMBAT_DEFENDER_SIDE] = DEFENDER_HERO_OVERLAY_INITIAL_FRAME;
     m_sideRetreated[COMBAT_ATTACKER_SIDE] = 0;
     m_sideRetreated[COMBAT_DEFENDER_SIDE] = 0;
-    m_combatResult = 3;
+    m_combatResult = COMBAT_RESULT_PENDING;
     m_heroDeathAnimationPlayed[0] = m_heroDeathAnimationPlayed[1] = 0;
     m_heroAlternateDeathAnimationPlayed[0] = m_heroAlternateDeathAnimationPlayed[1] = 0;
     m_heroDeathPending[0] = m_heroDeathPending[1] = 0;
@@ -384,34 +474,34 @@ void combatManager::SetupAdjacencyArray(void) {
                 m_adjacency[sourceHex][direction] = -1;
             } else {
                 switch (direction) {
-                    case 0:
+                    case COMBAT_DIRECTION_NORTHEAST:
                         if (rowIndex & 1)
                             destinationHex = sourceHex - COMBAT_GRID_ROW_LENGTH;
                         else
                             destinationHex = sourceHex - (COMBAT_GRID_ROW_LENGTH - 1);
                         break;
-                    case 2:
+                    case COMBAT_DIRECTION_SOUTHEAST:
                         if (rowIndex & 1)
                             destinationHex = sourceHex + COMBAT_GRID_ROW_LENGTH;
                         else
                             destinationHex = sourceHex + COMBAT_GRID_ROW_LENGTH + 1;
                         break;
-                    case 3:
+                    case COMBAT_DIRECTION_SOUTHWEST:
                         if (rowIndex & 1)
                             destinationHex = sourceHex + COMBAT_GRID_ROW_LENGTH - 1;
                         else
                             destinationHex = sourceHex + COMBAT_GRID_ROW_LENGTH;
                         break;
-                    case 5:
+                    case COMBAT_DIRECTION_NORTHWEST:
                         if (rowIndex & 1)
                             destinationHex = sourceHex - COMBAT_GRID_ROW_LENGTH - 1;
                         else
                             destinationHex = sourceHex - COMBAT_GRID_ROW_LENGTH;
                         break;
-                    case 1:
+                    case COMBAT_DIRECTION_EAST:
                         destinationHex = sourceHex + 1;
                         break;
-                    case 4:
+                    case COMBAT_DIRECTION_WEST:
                         destinationHex = sourceHex - 1;
                         break;
                 }
@@ -456,14 +546,14 @@ i32 combatManager::Open(i32 openFlags) {
     LogStr("Op2");
     SAMPLE2 preBattleSample = NULL_SAMPLE2;
     preBattleSample = LoadPlaySample("PREBATTL.82M");
-    gpWindowManager->FadeScreen(1, 8, NULL);
+    gpWindowManager->FadeScreen(IDX(FADE_OUT), FADE_STEPS, NULL);
     giCycleType = m_colorCycleType;
     CycleColors(1);
     CycleColors(1);
     gCurLoadedSpellIcon = NULL;
     gCurLoadedSpellEffect = SPELL_NONE;
     gpMouseManager->m_forcePointerUpdate = 0;
-    gpMouseManager->SetPointer("cmbtmous.mse", 6, MOUSE_AUTO_CURSOR_TYPE);
+    gpMouseManager->SetPointer("cmbtmous.mse", COMBAT_POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
     bMouseWasVis = gpMouseManager->IsVis();
     gpMouseManager->ShowColorPointer();
     m_combatWindow = new heroWindow(0, 0, "cmbtwin.bin");
@@ -479,12 +569,12 @@ i32 combatManager::Open(i32 openFlags) {
     gConfig.showCombatMouseHex = savedShowMouseHex;
     if (m_combatPalette->m_data != gpBufferPalette->m_data)
         memmove(m_combatPalette->m_data, gpBufferPalette->m_data, COMBAT_PALETTE_DATA_SIZE);
-    gpWindowManager->FadeScreen(0, 8, m_combatPalette);
+    gpWindowManager->FadeScreen(IDX(FADE_IN), FADE_STEPS, m_combatPalette);
     gbLimitedCombatUpdatePalette = true;
     WaitEndSample(preBattleSample, -1);
 
     LogStr("Op3");
-    gpSoundManager->SwitchAmbientMusic(SRandom(2, 4));
+    gpSoundManager->SwitchAmbientMusic(SRandom(AMBIENT_MUSIC_FIRST, AMBIENT_MUSIC_LAST));
     glTimers[GLOBAL_COMBAT_CYCLE_TIMER_SLOT] = KBTickCount();
     ResetCycleTimers();
     LogStr("Op4");
@@ -506,7 +596,7 @@ void combatManager::Close(void) {
         memcpy(gPalette->m_data, m_savedPalette, COMBAT_PALETTE_DATA_SIZE);
         memcpy(gpBufferPalette->m_data, m_savedPalette, COMBAT_PALETTE_DATA_SIZE);
     }
-    gpWindowManager->FadeScreen(1, 8, NULL);
+    gpWindowManager->FadeScreen(IDX(FADE_OUT), FADE_STEPS, NULL);
     giCycleType = WINDOW_COLOR_CYCLE_DEFAULT;
     CycleColors(0);
     delete m_combatBuffer;
@@ -517,7 +607,7 @@ void combatManager::Close(void) {
     i32 total;
     i32 groupSide;
     i32 index;
-    for (index = 0; index < 2; index++)
+    for (index = 0; index < COMBAT_MANAGER_SIDE_COUNT; index++)
         UpdateArmyGroup(index);
 
     total = 0;
@@ -532,8 +622,8 @@ void combatManager::Close(void) {
     }
 
     if (m_battlefieldCell->m_triggerType == IDX(TRIGGER_MONSTER)) {
-        if (total > 4000)
-            total = 4000;
+        if (total > MONSTER_COUNT_SAVE_LIMIT)
+            total = MONSTER_COUNT_SAVE_LIMIT;
         m_battlefieldCell->m_objectMetadata = total & IDX(MAP_MONSTER_COUNT_MASK);
     }
 
@@ -630,75 +720,75 @@ void combatManager::GenerateMap(void) {
             m_hexCells[y * COMBAT_GRID_ROW_LENGTH + x].m_deadOccupantCount = 0;
         }
     }
-    randomOffset = SRandom(8, 15);
+    randomOffset = SRandom(MAP_RANDOM_OFFSET_MINIMUM, MAP_RANDOM_OFFSET_MAXIMUM);
 }
 
 VA(0x004919a6, 0x224)
 char* combatManager::GetBackgroundName(void) {
-    i32 backgroundIndex;
+    BattlefieldBackgroundIndex backgroundIndex;
     m_colorCycleType = WINDOW_COLOR_CYCLE_COMBAT;
-    m_battlefieldFringe = -1;
+    m_battlefieldFringe = IDX(FRINGE_NONE);
     switch (m_terrainType) {
         case IDX(TERRAIN_WATER):
-            backgroundIndex = 0;
-            m_battlefieldFringe = 13;
+            backgroundIndex = BACKGROUND_WATER;
+            m_battlefieldFringe = IDX(FRINGE_WATER);
             break;
         case IDX(TERRAIN_GRASS):
             if (MoreTreesNear()) {
-                backgroundIndex = 2;
-                m_battlefieldFringe = 12;
+                backgroundIndex = BACKGROUND_GRASS_TREES;
+                m_battlefieldFringe = IDX(FRINGE_GRASS_TREES);
             } else {
-                backgroundIndex = 3;
-                m_battlefieldFringe = 11;
+                backgroundIndex = BACKGROUND_GRASS;
+                m_battlefieldFringe = IDX(FRINGE_GRASS);
             }
             break;
         case IDX(TERRAIN_SNOW):
             m_colorCycleType = WINDOW_COLOR_CYCLE_COMBAT_ALTERNATE;
             if (MoreTreesNear()) {
-                backgroundIndex = 4;
-                m_battlefieldFringe = 6;
+                backgroundIndex = BACKGROUND_SNOW_TREES;
+                m_battlefieldFringe = IDX(FRINGE_SNOW_TREES);
             } else {
-                backgroundIndex = 5;
-                m_battlefieldFringe = 7;
+                backgroundIndex = BACKGROUND_SNOW;
+                m_battlefieldFringe = IDX(FRINGE_SNOW);
             }
             break;
         case IDX(TERRAIN_SWAMP):
-            backgroundIndex = 6;
-            m_battlefieldFringe = 8;
+            backgroundIndex = BACKGROUND_SWAMP;
+            m_battlefieldFringe = IDX(FRINGE_SWAMP);
             break;
         case IDX(TERRAIN_LAVA):
-            backgroundIndex = 8;
-            m_battlefieldFringe = 5;
+            backgroundIndex = BACKGROUND_LAVA;
+            m_battlefieldFringe = IDX(FRINGE_LAVA);
             break;
         case IDX(TERRAIN_DESERT):
             m_colorCycleType = WINDOW_COLOR_CYCLE_COMBAT_ALTERNATE;
-            backgroundIndex = 10;
-            m_battlefieldFringe = 4;
+            backgroundIndex = BACKGROUND_DESERT;
+            m_battlefieldFringe = IDX(FRINGE_DESERT);
             break;
         case IDX(TERRAIN_DIRT):
             if (MoreTreesNear()) {
-                backgroundIndex = 12;
-                m_battlefieldFringe = 10;
+                backgroundIndex = BACKGROUND_DIRT_TREES;
+                m_battlefieldFringe = IDX(FRINGE_DIRT_TREES);
             } else {
-                backgroundIndex = 13;
-                m_battlefieldFringe = 9;
+                backgroundIndex = BACKGROUND_DIRT;
+                m_battlefieldFringe = IDX(FRINGE_DIRT);
             }
             break;
         case IDX(TERRAIN_WASTELAND):
             m_colorCycleType = WINDOW_COLOR_CYCLE_COMBAT_ALTERNATE;
-            backgroundIndex = 14;
-            m_battlefieldFringe = 3;
+            backgroundIndex = BACKGROUND_WASTELAND;
+            m_battlefieldFringe = IDX(FRINGE_WASTELAND);
             break;
         case IDX(TERRAIN_BEACH):
             m_colorCycleType = WINDOW_COLOR_CYCLE_COMBAT_ALTERNATE;
-            backgroundIndex = 16;
-            m_battlefieldFringe = 2;
+            backgroundIndex = BACKGROUND_BEACH;
+            m_battlefieldFringe = IDX(FRINGE_BEACH);
             break;
         default:
-            backgroundIndex = 0;
+            backgroundIndex = BACKGROUND_WATER;
             break;
     }
-    return cCombatBkgNames[backgroundIndex];
+    return cCombatBkgNames[IDX(backgroundIndex)];
 }
 
 VA(0x00491bca, 0x210)
@@ -710,17 +800,17 @@ i32 combatManager::MoreTreesNear(void) {
     mapCell* combatCell;
     i32 radius;
     i32 combatOriginX;
-    i8 nearbyTypeTable[3][8];
+    NearbyFeature nearbyTypeTable[NEARBY_RADIUS_COUNT][NORMAL_DIRECTION_COUNT];
     u8 nearbyTileset;
     i32 nearbyDirection;
     i32 centerY;
 
-    memset(nearbyTypeTable, -1, sizeof(nearbyTypeTable));
+    memset(nearbyTypeTable, IDX(NEARBY_UNKNOWN), sizeof(nearbyTypeTable));
     combatOriginX = m_combatX;
     centerY = m_combatY;
 
-    for (radius = 0; radius < 3; radius++) {
-        for (nearbyDirection = 0; nearbyDirection < 8; nearbyDirection++) {
+    for (radius = 0; radius < NEARBY_RADIUS_COUNT; radius++) {
+        for (nearbyDirection = 0; nearbyDirection < NORMAL_DIRECTION_COUNT; nearbyDirection++) {
             x = normalDirTable[nearbyDirection].x * radius + combatOriginX;
             y = normalDirTable[nearbyDirection].y * radius + centerY;
             if (x >= 0 && x < MAP_WIDTH && y >= 0 && y < MAP_HEIGHT) {
@@ -735,14 +825,14 @@ i32 combatManager::MoreTreesNear(void) {
                     case IDX(TILESET_MIXED_MOUNTAINS):
                     case IDX(TILESET_CRACKED_MOUNTAINS):
                     case IDX(TILESET_GRASS_MOUNTAINS):
-                        nearbyTypeTable[radius][nearbyDirection] = 0;
+                        nearbyTypeTable[radius][nearbyDirection] = NEARBY_MOUNTAIN;
                         break;
                     case IDX(TILESET_JUNGLE_TREES):
                     case IDX(TILESET_EVIL_TREES):
                     case IDX(TILESET_SNOW_TREES):
                     case IDX(TILESET_SUMMER_TREES):
                     case IDX(TILESET_AUTUMN_TREES):
-                        nearbyTypeTable[radius][nearbyDirection] = 1;
+                        nearbyTypeTable[radius][nearbyDirection] = NEARBY_TREE;
                         break;
                 }
             }
@@ -751,11 +841,11 @@ i32 combatManager::MoreTreesNear(void) {
 
     treeCount = 0;
     mountainCounter = 0;
-    for (radius = 0; radius < 3; radius++) {
-        for (nearbyDirection = 0; nearbyDirection < 8; nearbyDirection++) {
-            if (nearbyTypeTable[radius][nearbyDirection] == 0)
+    for (radius = 0; radius < NEARBY_RADIUS_COUNT; radius++) {
+        for (nearbyDirection = 0; nearbyDirection < NORMAL_DIRECTION_COUNT; nearbyDirection++) {
+            if (nearbyTypeTable[radius][nearbyDirection] == NEARBY_MOUNTAIN)
                 mountainCounter++;
-            if (nearbyTypeTable[radius][nearbyDirection] == 1)
+            if (nearbyTypeTable[radius][nearbyDirection] == NEARBY_TREE)
                 treeCount++;
         }
     }
@@ -807,7 +897,8 @@ void combatManager::LoadIcons(void) {
             if (m_heroes[index]->m_isCaptain) {
                 sprintf(gText, "cmbtcap%c.icn", cHeroTypeInitial[m_heroes[index]->m_cursorType]);
                 m_heroIcons[index] = gpResourceManager->GetIcon(gText);
-                m_heroSpriteIndex[index] = m_heroes[index]->m_cursorType + 6;
+                m_heroSpriteIndex[index] =
+                    m_heroes[index]->m_cursorType + COMBAT_CAPTAIN_SPRITE_OFFSET;
             } else {
                 sprintf(gText, "cmbthro%c.icn", cHeroTypeInitial[m_heroes[index]->m_cursorType]);
                 m_heroIcons[index] = gpResourceManager->GetIcon(gText);
@@ -817,7 +908,7 @@ void combatManager::LoadIcons(void) {
 
         if (m_heroIcons[index]) {
             if (m_playerId[index] == -1)
-                heroColor = 6;
+                heroColor = COMBAT_NEUTRAL_HERO_COLOR;
             else
                 heroColor = gpGame->GetPlayerColor(static_cast<i8>(m_playerId[index]));
             sprintf(gText, "herofl%02d.icn", heroColor);
@@ -1322,8 +1413,11 @@ void combatManager::CatAttack(i32 side) {
     }
 
     if (missShot19) {
+        // Retail catapult miss-hex payload.
+        // NOLINTBEGIN(readability-magic-numbers)
         u8 validMissHexes[COMBAT_CATAPULT_MISS_HEX_COUNT] =
             {32, 46, 10, 23, 35, 48, 60, 74, 87, 101, 114};
+        // NOLINTEND(readability-magic-numbers)
         i32 startDirection =
             SRandom(COMBAT_CATAPULT_DIRECTION_ROLL_MIN, COMBAT_CATAPULT_DIRECTION_ROLL_MAX);
         for (frame18 = 0; frame18 < COMBAT_CATAPULT_DIRECTION_COUNT; frame18++) {
@@ -1605,6 +1699,8 @@ void combatManager::KeepAttack(i32 tower) {
     SAMPLE2 keepSample19 = NULL_SAMPLE2;
     keepSample19 = LoadPlaySample(gText);
 
+    // Retail keep-missile origins by faction and tower.
+    // NOLINTBEGIN(readability-magic-numbers)
     CombatTowerOrigin towerOrigins4[COMBAT_KEEP_FACTION_COUNT][COMBAT_KEEP_TOWER_COUNT] = {
         {{586, 177}, {428, 60}, {428, 314}},
         {{586, 177}, {428, 60}, {428, 314}},
@@ -1613,13 +1709,17 @@ void combatManager::KeepAttack(i32 tower) {
         {{586, 177}, {428, 60}, {428, 314}},
         {{586, 177}, {428, 60}, {428, 314}}
     };
-    i32 unknownTowerData6[4];
+    // NOLINTEND(readability-magic-numbers)
+    i32 unknownTowerData6[KEEP_TOWER_SCRATCH_COUNT];
     i32 sourceX9 = towerOrigins4[m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type][tower].x;
     i32 sourceY6 = towerOrigins4[m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type][tower].y;
     i32 targetX9 = target0->MidX();
     i32 targetY8 = target0->MidY();
+    // Retail keep-missile direction payload.
+    // NOLINTBEGIN(readability-magic-numbers)
     float missileAngles0[COMBAT_KEEP_MISSILE_ANGLE_COUNT] =
         {90.0f, 68.5f, 45.0f, 20.8f, 0.0f, -20.8f, -45.0f, -68.5f, -90.0f};
+    // NOLINTEND(readability-magic-numbers)
     ShootMissile(
         sourceX9,
         sourceY6,
@@ -1798,7 +1898,7 @@ void combatManager::SetupAndLoadObstacles(void) {
                 }
             }
         }
-        obstacleGoal7 -= elevationCells4 / 2;
+        obstacleGoal7 -= elevationCells4 / ELEVATION_OBSTACLE_WEIGHT_DIVISOR;
         tryCount28 = 0;
         memset(obstacleUsed, 0, sizeof(obstacleUsed));
         while (obstacleCells18 < obstacleGoal7 && tryCount28 < COMBAT_OBSTACLE_TRY_LIMIT) {
@@ -1873,13 +1973,11 @@ void combatManager::MakeCreaturesVanish(void) {
                 m_hexCells[removedArmy27->m_hex].m_occupantSide = -1;
                 m_hexCells[removedArmy27->m_hex].m_occupantIndex = -1;
                 if (HAS(removedArmy27->m_monster.flags.all, MONSTER_FLAGS_WIDE)) {
-                    m_hexCells
-                        [(((static_cast<u32>(removedArmy27->m_facing - 1) < 1 ? -1 : 0) & 2) - 1)
-                         + removedArmy27->m_hex]
+                    m_hexCells[FacingRearHexOffset(removedArmy27->m_facing)
+                               + removedArmy27->m_hex]
                             .m_occupantSide = -1;
-                    m_hexCells
-                        [(((static_cast<u32>(removedArmy27->m_facing - 1) < 1 ? -1 : 0) & 2) - 1)
-                         + removedArmy27->m_hex]
+                    m_hexCells[FacingRearHexOffset(removedArmy27->m_facing)
+                               + removedArmy27->m_hex]
                             .m_occupantIndex = -1;
                 }
             }
@@ -2086,8 +2184,11 @@ void combatManager::ShootMissile(
     i32 missileY7 = sourceY;
     i32 missileHalfWidth5 = COMBAT_MISSILE_HALF_WIDTH;
     i32 missileHalfHeight28 = COMBAT_MISSILE_HALF_HEIGHT;
-    bitmap* missileBackground9 =
-        new bitmap(COMBAT_MISSILE_BITMAP_TYPE, missileHalfWidth5 * 2, missileHalfHeight28 * 2);
+    bitmap* missileBackground9 = new bitmap(
+        COMBAT_MISSILE_BITMAP_TYPE,
+        missileHalfWidth5 * MISSILE_DIAMETER_MULTIPLIER,
+        missileHalfHeight28 * MISSILE_DIAMETER_MULTIPLIER
+    );
     missileBackground9->GrabBitmapCareful(
         gpWindowManager->m_screen,
         static_cast<i16>(missileX16 - missileHalfWidth5),
@@ -2098,7 +2199,7 @@ void combatManager::ShootMissile(
     i32 oldY5 = missileY7;
     i32 minX8 = COMBAT_MAX_EXTENT_X;
     i32 maxX9 = 0;
-    i32 minY5 = 480;
+    i32 minY5 = COMBAT_SCREEN_HEIGHT;
     i32 maxY6 = 0;
     for (frame16 = 0; missileSteps8 > frame16; frame16++) {
         if (oldX8 - missileHalfWidth5 < minX8)
@@ -2169,8 +2270,8 @@ void combatManager::ShootMissile(
     gpWindowManager->UpdateScreenRegion(
         oldX8 - missileHalfWidth5,
         oldY5 - missileHalfHeight28,
-        missileHalfWidth5 * 2,
-        missileHalfHeight28 * 2
+        missileHalfWidth5 * MISSILE_DIAMETER_MULTIPLIER,
+        missileHalfHeight28 * MISSILE_DIAMETER_MULTIPLIER
     );
     delete missileBackground9;
 }
@@ -2179,7 +2280,7 @@ VA(0x00495dcd, 0xf2)
 void combatManager::CombatSystemOptions(void) {
     tag_message message;
     bCPrefsChanged = 0;
-    CSPanel = new heroWindow(160, 33, "cspanel.bin");
+    CSPanel = new heroWindow(SYSTEM_OPTION_WINDOW_X, SYSTEM_OPTION_WINDOW_Y, "cspanel.bin");
     if (!CSPanel)
         MemError();
     SetWinText(CSPanel, 1);
@@ -2257,25 +2358,25 @@ i32 CombatSystemOptionsHandler(tag_message& message) {
                 i32 helpIndex = -1;
                 switch (message.payload.widget.id) {
                     case IDX(SYSTEM_OPTION_CLOSE_BUTTON):
-                        helpIndex = 0;
+                        helpIndex = IDX(HELP_CLOSE);
                         break;
                     case IDX(SYSTEM_OPTION_SPEED_BUTTON):
-                        helpIndex = 1;
+                        helpIndex = IDX(HELP_SPEED);
                         break;
                     case IDX(SYSTEM_OPTION_ARMY_INFO_BUTTON):
-                        helpIndex = 2;
+                        helpIndex = IDX(HELP_ARMY_INFO);
                         break;
                     case IDX(SYSTEM_OPTION_AUTO_SPELL_BUTTON):
-                        helpIndex = 3;
+                        helpIndex = IDX(HELP_AUTO_SPELL);
                         break;
                     case IDX(SYSTEM_OPTION_GRID_BUTTON):
-                        helpIndex = 4;
+                        helpIndex = IDX(HELP_GRID);
                         break;
                     case IDX(SYSTEM_OPTION_SHADE_BUTTON):
-                        helpIndex = 5;
+                        helpIndex = IDX(HELP_SHADE);
                         break;
                     case IDX(SYSTEM_OPTION_MOUSE_HEX_BUTTON):
-                        helpIndex = 6;
+                        helpIndex = IDX(HELP_MOUSE_HEX);
                         break;
                 }
                 if (helpIndex >= 0) {
@@ -2357,7 +2458,10 @@ VTBL(combatManager, 0x004eb898);
 
 DATA(0x004f8900) i32 bInHighMoraleBonus = 0;
 DATA(0x004f8904) i32 giSeed = 1;
-DATA(0x004f8c1c) u8 wallHex[4] = {9, 34, 86, 113};
+// Retail castle wall-hex payload.
+// NOLINTBEGIN(readability-magic-numbers)
+DATA(0x004f8c1c) u8 wallHex[COMBAT_WALL_SECTION_COUNT] = {9, 34, 86, 113};
+// NOLINTEND(readability-magic-numbers)
 DATA(0x00528588) i32 bMouseWasVis;
 DATA(0x0052858c) class heroWindow* CSPanel;
 DATA(0x00528590) i32 bCPrefsChanged;
