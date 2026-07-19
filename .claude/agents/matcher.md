@@ -12,8 +12,8 @@ description: Byte-matches one function / TU of HoMM2 against retail HEROES2W.EXE
 
 > **Batches are WHOLE-TU (20+ functions). Finish EVERY function in the batch — do NOT
 > bail out early.** You are handed a whole TU — or a 20+ function chunk of one — not a
-> single function. Reconstruct them ALL, to 100%, a proven `@early-stop`, or a fully audited
-> `@semantic`, in retail-RVA
+> single function. Reconstruct them ALL to correct semantics and structure, driving them to exact
+> comparison wherever retail evidence permits, in retail-RVA
 > order, in the one TU file; report each function's result. Sibling functions share
 > idioms/types, so do them together. **Never** stop with functions left un-attempted and
 > report them "not-done": batch SIZE is the orchestrator's call, not yours — once you're
@@ -68,8 +68,8 @@ line records.
    `HOMM2_DIR`/`WINEPREFIX`/`MSVC_DIR` are fixed at shell entry to `$PWD`, so a
    shell opened in main, or a `cd` *after* `nix develop`, builds/scores the WRONG
    tree. Use absolute paths; never touch the repo root.
-4. **Iterate** on the per-function objdiff residual until 100%, a byte-proven `@early-stop`,
-   or a fully audited `@semantic` checkpoint. **When a diff row is stuck, GREP
+4. **Iterate** on the per-function objdiff residual until exact or until the bounded last-mile
+   attempts are exhausted with semantics, structure, frame, CFG, and relocations audited. **When a diff row is stuck, GREP
    `docs/patterns/INDEX.md` FIRST**
    (by symptom/tag); most /Od idioms are cataloged. New idiom → add a
    `docs/patterns/<name>.md` + one INDEX line in the SAME change. **A pattern doc MUST
@@ -127,8 +127,8 @@ the per-call-site continuation jumps of **inlined in-class accessors**.
 - `/Ob1` (not `/Ob2`): retail still emits real `call`s to out-of-line methods.
 - Full writeup: **`docs/patterns/inline-accessors.md`**. This is NOT a wall — it is
   a known, reproducible pattern. (The only residual that resists source steering is
-  the exact LEADING-vs-TRAILING placement of an individual inline bracket — a thin
-  `@early-stop` reason, not a reason to leave logic wrong.)
+  the exact LEADING-vs-TRAILING placement of an individual inline bracket. Record that as an
+  ordinary comment only if it remains useful for understanding the reconstructed accessor.)
 
 ## Toolchain facts (verified — see docs/)
 
@@ -181,51 +181,17 @@ accessor `jmp $+0` fingerprint — most plateaus are one of these two, both fixa
    stack slots, CFG, inline-accessor structure, and external relocations must be accounted for.
 2. **At a wall, try a few obvious cases and move on.** Re-check `od_slots`, try the source
    polarity/operand/accessor spelling directly indicated by the diff, and consult the pattern
-   catalog. If the residual is byte-proven, document it as `@early-stop`. Otherwise, after the body
-   and all structural proof are complete, add `@semantic` immediately above `VA()`
-   with the first retail/ours instruction divergence or byte span, frame/slot/CFG and relocation
-   status, and the exact obvious spellings already tried. Use `@semantic` once
-   behavior, real types/layout, frame/slots, CFG,
-   inline structure, and external relocations are complete. Do not run extended permutation or
-   brute-force searches on an `@semantic` function.
-3. **During the exhaustive residual audit,** every live non-100% function is active work, including
-   `@semantic` and `@early-stop` functions. Treat recorded attempts as context only, reproduce all
-   claimed byte evidence from current objects, use the audited AST permuter where appropriate, and
-   push each residual to exactness or a newly verified artifact.
+   catalog. After semantics, types/layout, frame/slots, CFG, inline structure, and relocations are
+   credible, stop after the bounded last-mile attempts. Keep an ordinary source comment only when
+   it explains an enduring semantic or codegen fact; never record scores, retained maxima, queue
+   state, attempted-spelling ledgers, or a completion claim in source.
+3. **During the exhaustive residual audit,** every live non-100% function remains active work.
+   Reproduce all byte and relocation evidence from current objects and use the audited AST permuter
+   where appropriate.
 4. **Size is not a reason to defer.** Reconstruct large bodies leaf-first, in full.
-5. **Acceptable non-100% comes in exactly two `@early-stop` flavors — never a partial
-   that under-counts because you stopped guessing.** Mark it `// @early-stop` (marker
-   line above the `VA()`, the byte-level reason on the next line, no %):
-   - **(a) Permanent artifact** — code bytes proven byte-exact with `llvm-objdump -dr`
-     (base vs target) and the residual is a genuine delinker / reloc-naming / `/Od`
-     block-boundary artifact.
-   - **(b) Soft / TU-cumulative** — logic AND frame slots byte-exact, the only diff is a
-     commutative `/Od` operand load-order that is **not source-steerable** and resolves
-     as sibling TU functions land (see **`docs/patterns/tu-cumulative-eval-order.md`** —
-     confirm-then-park checklist there). Try the SIB `i[(T*)p]` / `val|0` escape hatches
-     FIRST; if they don't apply, park it and expect 100% for free once the TU fills.
-
-       // @early-stop
-       // @early-stop-reloc-only
-       // reloc-masked: code bytes identical (llvm-objdump -dr); only the operand's symbol name differs
-       VA(0x0040b396, 0x1d3)
-       mapCellExtra *fullMap::GetNewCellExtraOverlay(int x, int y) { /* complete body */ }
-
-Every integrated non-100 method carries exactly one durable marker:
-
-- `@early-stop` means the permitted residual is byte-proven. `rg '@early-stop' src` is the
-  proven-artifact set, never a "gave up" set.
-- `@early-stop-reloc-only` accompanies `@early-stop` when every non-relocation byte is claimed
-  identical. It is a hard-build assertion: actual COFF relocation fields are masked and no other
-  opcode, immediate, displacement, branch, padding, or operand byte may differ.
-- `@semantic` means the method is semantically and structurally complete but the residual is not
-  necessarily a valid early-stop proof. It must name the first assembly/byte divergence, confirmed
-  frame/slot/CFG and relocation state, obvious attempts already exhausted, and the revisit trigger.
-  It never removes the method from the exhaustive residual-audit queue. Remove it when the method
-  reaches 100% or replace it with a newly reproduced, proved early-stop.
 
 **Finish every function in your assigned batch** — never leave one un-attempted and never use a
-marker to excuse incomplete semantics, types/layout, frame/slots, CFG, inline-accessor recovery, or
+residual to excuse incomplete semantics, types/layout, frame/slots, CFG, inline-accessor recovery, or
 relocation review. Batch size is the orchestrator's decision; your job is to complete whatever you
 were handed.
 

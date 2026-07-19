@@ -107,7 +107,7 @@ using `OD_STEER(x)` in its three width comparisons made `LineLength` exact; and
 `maxW | 0`, and `OD_STEER(maxW)` were byte-neutral and did not solve the load order. This is a local steering
 step to try before any TU-state permutation or soft defer.
 
-## Confirm, steer, then optionally soft-defer
+## Confirm, steer, then keep the residual live
 
 1. Reproduce the integrated root/header state; a stale worker score is not evidence.
 2. Process all predecessors in source order and prove their raw bytes and relocations.
@@ -117,14 +117,9 @@ step to try before any TU-state permutation or soft defer.
    mutation; never use the regex permuter.
 6. Try exact-preserving AST variants in predecessors. Reject any variant that changes a
    predecessor byte or relocation, and retest every candidate on the combined root.
-7. If the residual still consists solely of operand/register order, document all of the
-   above and use a **soft revisit**, not a permanent compiler-wall claim:
-
-    // @early-stop
-    // ~9x%: logic + frame slots byte-exact; residual is TU-cumulative operand order.
-    // Combined-root local and exact-predecessor steering were exhausted; revisit after
-    // later <TU> source/header changes. Matched 100% standalone.
-    VA(0x........, 0x..)
+7. If the residual still consists solely of operand/register order, record the reproducible
+   combined-root evidence in the external search ledger and keep the function in the live queue.
+   Do not put scores, standalone maxima, attempted-spelling history, or revisit state in source comments.
 
 ## Soft-deferred cases to re-check after each material TU change
 

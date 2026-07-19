@@ -53,8 +53,9 @@ The `jmp $+0` are understood, not mysterious — use them as a checksum:
   position of a given inline bracket (e.g. a `cell = &Row(y)[x]` assignment brackets
   *after* the store in retail but *before* the body in our build). This is an opaque
   C2.EXE block-layout choice; it resisted every accessor/statement-shape variant
-  tried. If that is genuinely all that is left, it is a thin **`@early-stop`** reason
-  — but verify with displacements-on diffing first (see od-hash-slots.md): a wrong
+  tried. If that is genuinely all that is left, keep it as a live residual and record an ordinary
+  comment only when the accessor-continuation fact helps explain the source. Verify with
+  displacements-on diffing first (see od-hash-slots.md): a wrong
   slot can masquerade as "just jmps" behind the fuzzy.
 
 On mapcell this lifted `GetNewCellExtra{Object,Overlay}` from a structurally-capped

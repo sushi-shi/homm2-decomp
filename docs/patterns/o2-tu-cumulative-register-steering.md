@@ -146,8 +146,7 @@ the combined root before measuring it.
 
 This bookkeeping is what makes a negative result reusable: it prevents identical searches at an
 unchanged checkpoint while leaving an explicit, evidence-based trigger for a later combined-TU
-retest. It must not be converted into `@early-stop` unless the residual independently satisfies the
-project's byte-proven artifact rules.
+retest. Keep that search ledger outside source comments; it never removes the residual from the queue.
 
 ## Rejection criteria
 
