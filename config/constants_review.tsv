@@ -224,7 +224,7 @@ src/SOURCE/X_GLOBAL.cpp	reviewed	The TU contains reviewed global data definition
 src/SOURCE/comwin.cpp	reviewed	Private enums name retained source-line bases, communications error text slots, baud values, serial byte width, and the two-word ReadFile result backing storage.
 src/SOURCE/dpnetwin.cpp	pending
 src/SOURCE/kbwin.cpp	reviewed	LogInt uses the shared unused-field sentinel; the timer polling threshold is private, menu resolution checks use the public width domain, and exported strings use their declared capacities.
-src/SOURCE/netwin.cpp	pending
+src/SOURCE/netwin.cpp	reviewed	Private enums model NetBIOS reset-field indices/capacities and retained source-line bases/offsets; reset capacities no longer borrow unrelated retry/result constants with coincident values.
 src/SOURCE/tradpost.cpp	pending
 src/SOURCE/wingraph.cpp	pending
 src/SOURCE/x_arena.cpp	reviewed	Private aligned constants name the arena geometry, widget ids, styles, and choice count. The centering divisor and global skill-widget extent use the private domain; remaining zeros and ones are initialization, booleans, indices, or call flags.
