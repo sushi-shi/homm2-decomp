@@ -22,13 +22,13 @@ VA(0x004c7fa0, 0xdb)
 resourceManager::resourceManager(void) : baseManager() {
     i32 aggregateIndex;
     m_active = false;
-    m_resourceListHead = 0;
+    m_resourceListHead = NULL;
     m_expunging = 0;
     strcpy(m_lastFileName, "");
     m_lastFileId = 0;
     for (aggregateIndex = 0; aggregateIndex < RESOURCE_MANAGER_AGGREGATE_LIMIT; aggregateIndex++) {
         m_aggregateFd[aggregateIndex] = RESOURCE_MANAGER_INVALID_FILE;
-        m_aggregateDir[aggregateIndex] = 0;
+        m_aggregateDir[aggregateIndex] = NULL;
         m_aggregateEntryCount[aggregateIndex] = 0;
     }
     m_numAggregates = 0;
@@ -89,7 +89,7 @@ VA(0x004c8210, 0x97)
 class palette* resourceManager::GetPalette(char* name) {
     u32l id = MakeId(name, 1);
     resource* r = Query(id);
-    if (r != 0) {
+    if (r != NULL) {
         r->m_refCount++;
         return static_cast<palette*>(r);
     } else {
@@ -103,7 +103,7 @@ VA(0x004c82b0, 0x97)
 class bitmap* resourceManager::GetBitmap(char* name) {
     u32l id = MakeId(name, 1);
     resource* r = Query(id);
-    if (r != 0) {
+    if (r != NULL) {
         r->m_refCount++;
         return static_cast<bitmap*>(r);
     } else {
@@ -121,7 +121,7 @@ class icon* resourceManager::GetIcon(char* name) {
 VA(0x004c8380, 0x86)
 class icon* resourceManager::GetIcon(u32l resourceId) {
     icon* iconPointer = static_cast<icon*>(Query(resourceId));
-    if (iconPointer != 0) {
+    if (iconPointer != NULL) {
         iconPointer->m_refCount++;
         return iconPointer;
     } else {
@@ -135,7 +135,7 @@ VA(0x004c8410, 0x97)
 class tileset* resourceManager::GetTileset(char* name) {
     u32l id = MakeId(name, 1);
     resource* r = Query(id);
-    if (r != 0) {
+    if (r != NULL) {
         r->m_refCount++;
         return static_cast<tileset*>(r);
     } else {
@@ -147,14 +147,14 @@ class tileset* resourceManager::GetTileset(char* name) {
 
 VA(0x004c84b0, 0x1a)
 class mouse* resourceManager::GetMouse(char*) {
-    return 0;
+    return NULL;
 }
 
 VA(0x004c84d0, 0x97)
 class font* resourceManager::GetFont(char* name) {
     u32l resourceId = MakeId(name, 1);
     resource* fontEntry = Query(resourceId);
-    if (fontEntry != 0) {
+    if (fontEntry != NULL) {
         fontEntry->m_refCount++;
         return static_cast<font*>(fontEntry);
     } else {
@@ -168,7 +168,7 @@ VA(0x004c8570, 0x9d)
 class sample* resourceManager::GetSample(char* name) {
     u32l id = MakeId(name, 1);
     resource* r = Query(id);
-    if (r != 0) {
+    if (r != NULL) {
         r->m_refCount++;
         return static_cast<sample*>(r);
     } else {
@@ -182,7 +182,7 @@ VA(0x004c8610, 0x97)
 class MIDIWrap* resourceManager::GetMIDIWrap(char* name) {
     u32l id = MakeId(name, 1);
     resource* r = Query(id);
-    if (r != 0) {
+    if (r != NULL) {
         r->m_refCount++;
         return static_cast<MIDIWrap*>(r);
     } else {
@@ -196,7 +196,7 @@ VA(0x004c86b0, 0x87)
 void resourceManager::Dispose(class resource* resourceToDispose) {
     if (m_expunging != 0)
         return;
-    if (resourceToDispose != 0) {
+    if (resourceToDispose != NULL) {
         resourceToDispose->m_refCount--;
         if (resourceToDispose->m_refCount > 0) {
             return;
@@ -209,9 +209,9 @@ void resourceManager::Dispose(class resource* resourceToDispose) {
 
 VA(0x004c8740, 0x55)
 void resourceManager::AddResource(class resource* newResource) {
-    if (m_resourceListHead == 0) {
+    if (m_resourceListHead == NULL) {
         m_resourceListHead = newResource;
-        m_resourceListHead->m_next = 0;
+        m_resourceListHead->m_next = NULL;
     } else {
         newResource->m_next = m_resourceListHead;
         m_resourceListHead = newResource;
@@ -222,8 +222,8 @@ VA(0x004c87a0, 0x8b)
 void resourceManager::Expunge(void) {
     m_expunging = 1;
     resource* currentResource = m_resourceListHead;
-    resource* nextResource = 0;
-    while (currentResource != 0) {
+    resource* nextResource = NULL;
+    while (currentResource != NULL) {
         nextResource = currentResource->m_next;
         RemoveResource(currentResource);
         delete currentResource;
@@ -235,7 +235,7 @@ void resourceManager::Expunge(void) {
 VA(0x004c8830, 0x4b)
 class resource* resourceManager::Query(u32l resourceId) {
     resource* cursorResource = m_resourceListHead;
-    while (cursorResource != 0 && cursorResource->m_id != resourceId) {
+    while (cursorResource != NULL && cursorResource->m_id != resourceId) {
         cursorResource = cursorResource->m_next;
     }
     return cursorResource;
@@ -256,7 +256,7 @@ i32 resourceManager::Open(i32 priority) {
     m_priority = BaseManagerPriority(priority);
     m_active = true;
     strcpy(m_name, "resourceManager");
-    m_resourceListHead = 0;
+    m_resourceListHead = NULL;
     return RESOURCE_MANAGER_SUCCESS;
 }
 
@@ -267,10 +267,10 @@ void resourceManager::RemoveResource(class resource* resourceToRemove) {
         return;
     }
     resource* previousResource = m_resourceListHead;
-    while (previousResource != 0 && previousResource->m_next != resourceToRemove) {
+    while (previousResource != NULL && previousResource->m_next != resourceToRemove) {
         previousResource = previousResource->m_next;
     }
-    if (previousResource == 0) {
+    if (previousResource == NULL) {
         return;
     } else {
         previousResource->m_next = resourceToRemove->m_next;
@@ -284,9 +284,9 @@ void resourceManager::Close(void) {
     if (!m_active)
         return;
     Expunge();
-    m_resourceListHead = 0;
+    m_resourceListHead = NULL;
     for (aggregateIndex = 0; aggregateIndex < RESOURCE_MANAGER_AGGREGATE_LIMIT; aggregateIndex++) {
-        if (m_aggregateDir[aggregateIndex] != 0)
+        if (m_aggregateDir[aggregateIndex] != NULL)
             H2_FREE(m_aggregateDir[aggregateIndex], 0x1da);
         if (m_aggregateFd[aggregateIndex] != RESOURCE_MANAGER_INVALID_FILE) {
             close(m_aggregateFd[aggregateIndex]);
@@ -331,7 +331,7 @@ void resourceManager::PointToFile(u32l fileId) {
     i32 entryIndex;
     i32 aggregateIndex;
     for (aggregateIndex = 0; aggregateIndex < RESOURCE_MANAGER_AGGREGATE_LIMIT; aggregateIndex++) {
-        if (m_aggregateDir[aggregateIndex] != 0) {
+        if (m_aggregateDir[aggregateIndex] != NULL) {
             entryIndex = 0;
             while (entryIndex < m_aggregateEntryCount[aggregateIndex]) {
                 if (m_aggregateDir[aggregateIndex][entryIndex].id == fileId) {
@@ -366,7 +366,7 @@ u32l resourceManager::GetFileSize(u32l fileId) {
     i32 matchedAggregate;
     i32 fileIndex;
     for (fileIndex = 0; fileIndex < RESOURCE_MANAGER_AGGREGATE_LIMIT; fileIndex++) {
-        if (m_aggregateDir[fileIndex] != 0) {
+        if (m_aggregateDir[fileIndex] != NULL) {
             entryIndex = 0;
             while (entryIndex < m_aggregateEntryCount[fileIndex]) {
                 if (m_aggregateDir[fileIndex][entryIndex].id == fileId) {

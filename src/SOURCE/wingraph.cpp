@@ -35,7 +35,7 @@ VA(0x00435290, 0x55)
 void DDRestoreDisplayMode(void) {
     HRESULT result;
 
-    if (lpDD != 0) {
+    if (lpDD != NULL) {
         result = lpDD->RestoreDisplayMode();
         if (result != DD_OK)
             DDSD(result, RETAIL_FILE, 52);
@@ -58,12 +58,12 @@ void CreatePrimary(void) {
     HRESULT result;
 
     lpDDSPrimary = DDCreateSurface(WINGRAPH_WIDTH, WINGRAPH_HEIGHT, 1);
-    if (lpClipper != 0) {
-        result = lpDDSPrimary->SetClipper(0);
+    if (lpClipper != NULL) {
+        result = lpDDSPrimary->SetClipper(NULL);
         if (result != DD_OK && result != DDERR_NOCLIPPERATTACHED)
             DDSD(result, RETAIL_FILE, 77);
         lpClipper->Release();
-        lpClipper = 0;
+        lpClipper = NULL;
     }
 }
 
@@ -72,7 +72,7 @@ void SetupClipper(void) {
     HRESULT result;
 
     if (gConfig.gfx[giCurExe].fullScreen == 0) {
-        result = lpDD->CreateClipper(0, &lpClipper, 0);
+        result = lpDD->CreateClipper(0, &lpClipper, NULL);
         if (result != DD_OK)
             DDSD(result, RETAIL_FILE, 95);
         result = lpClipper->SetHWnd(0, hwndApp);
@@ -90,7 +90,7 @@ void DDInitGraphics(void) {
 
     if (gbWinGraphBusy != 0)
         return;
-    result = lpDirectDrawCreate(0, &lpDD, 0);
+    result = lpDirectDrawCreate(NULL, &lpDD, NULL);
     if (result != DD_OK)
         DDSD(result, RETAIL_FILE, 118);
     if (gConfig.gfx[giCurExe].fullScreen != 0) {
@@ -128,7 +128,7 @@ i32 DDAppPaint(void* window, void* paintDC) {
         return 1;
     if (gbMinimized != 0)
         return 1;
-    if (lpDD == 0)
+    if (lpDD == NULL)
         return 1;
     {
         gbWinGraphBusy = true;
@@ -165,7 +165,7 @@ i32 DDAppPaint(void* window, void* paintDC) {
         point0.x = point0.y;
         ClientToScreen(hwndApp, &point0);
         OffsetRect(&gDDDestinationRect, point0.x, point0.y);
-        gDDResult = lpDDSOne->Unlock(0);
+        gDDResult = lpDDSOne->Unlock(NULL);
         if (gDDResult != DD_OK)
             DDSD(gDDResult, RETAIL_FILE, 228);
 
@@ -181,7 +181,7 @@ i32 DDAppPaint(void* window, void* paintDC) {
         lPaintStart = KBTickCount();
         for (;;) {
             gDDResult =
-                lpDDSPrimary->Blt(&gDDDestinationRect, lpDDSOne, &gDDSourceRect, DDBLT_WAIT, 0);
+                lpDDSPrimary->Blt(&gDDDestinationRect, lpDDSOne, &gDDSourceRect, DDBLT_WAIT, NULL);
             if (gDDResult == DDERR_SURFACELOST) {
                 gDDResult = lpDDSPrimary->Restore();
                 if (gDDResult == DDERR_WRONGMODE) {
@@ -209,10 +209,10 @@ i32 DDAppPaint(void* window, void* paintDC) {
 
         memset(&gDDSurfaceDesc, 0, sizeof(gDDSurfaceDesc));
         gDDSurfaceDesc.dwSize = sizeof(gDDSurfaceDesc);
-        gDDResult = lpDDSOne->Lock(0, &gDDSurfaceDesc, DDLOCK_WAIT, 0);
+        gDDResult = lpDDSOne->Lock(NULL, &gDDSurfaceDesc, DDLOCK_WAIT, NULL);
         if (gDDResult != DD_OK)
             DDSD(gDDResult, RETAIL_FILE, 275);
-        if (gpWindowManager->m_screen != 0) {
+        if (gpWindowManager->m_screen != NULL) {
             gpWindowManager->m_screen->m_pixels = static_cast<u8*>(gDDSurfaceDesc.lpSurface);
             lpInitWin = gDDSurfaceDesc.lpSurface;
         } else {
@@ -235,7 +235,7 @@ void DDInitializePalette(void) {
     if (gbWinGraphBusy != 0)
         return;
     {
-        dc0 = GetDC(0);
+        dc0 = GetDC(NULL);
         GetSystemPaletteEntries(dc0, 0, WINGRAPH_SYSTEM_PALETTE_SIZE, LogicalPalette.entries);
         GetSystemPaletteEntries(
             dc0,
@@ -243,7 +243,7 @@ void DDInitializePalette(void) {
             WINGRAPH_SYSTEM_PALETTE_SIZE,
             &LogicalPalette.entries[WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE]
         );
-        ReleaseDC(0, dc0);
+        ReleaseDC(NULL, dc0);
         for (entry = 0; entry < WINGRAPH_SYSTEM_PALETTE_SIZE; entry++) {
             LogicalPalette.entries[entry].peFlags = 0;
             LogicalPalette.entries[WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE + entry]
@@ -257,7 +257,7 @@ void DDInitializePalette(void) {
             LogicalPalette.entries[entry].peBlue = 0;
             LogicalPalette.entries[entry].peFlags = PC_NOCOLLAPSE;
         }
-        result0 = lpDD->CreatePalette(DDPCAPS_8BIT, LogicalPalette.entries, &lpDDPal, 0);
+        result0 = lpDD->CreatePalette(DDPCAPS_8BIT, LogicalPalette.entries, &lpDDPal, NULL);
         if (result0 != DD_OK)
             DDSD(result0, RETAIL_FILE, 359);
         SetPalette();
@@ -272,7 +272,7 @@ i32 DDSetPalette(void) {
         return 1;
     if (gbForegroundApp == 0)
         return 1;
-    if (lpDDPal == 0 || lpDDSPrimary == 0 || lpDD == 0)
+    if (lpDDPal == NULL || lpDDSPrimary == NULL || lpDD == NULL)
         return 1;
     result = lpDDSPrimary->SetPalette(lpDDPal);
     if (result != DD_OK)
@@ -300,14 +300,14 @@ struct IDirectDrawSurface* DDCreateSurface(u32l width, u32l height, i32 primary)
         description.dwHeight = height;
         description.dwWidth = width;
     }
-    rv = lpDD->CreateSurface(&description, &surface, 0);
+    rv = lpDD->CreateSurface(&description, &surface, NULL);
     if (rv != DD_OK)
         DDSD(rv, RETAIL_FILE, 421);
     if (primary == 0) {
-        rv = surface->Lock(0, &description, DDLOCK_WAIT, 0);
+        rv = surface->Lock(NULL, &description, DDLOCK_WAIT, NULL);
         if (rv != DD_OK)
             DDSD(rv, RETAIL_FILE, 429);
-        if (gpWindowManager->m_screen != 0) {
+        if (gpWindowManager->m_screen != NULL) {
             gpWindowManager->m_screen->m_pixels = static_cast<u8*>(description.lpSurface);
             lpInitWin = description.lpSurface;
         } else {
@@ -467,34 +467,34 @@ void DDCleanUpWinGraphics(void) {
     HRESULT restoreResult;
     HRESULT result;
 
-    if (lpDD != 0) {
+    if (lpDD != NULL) {
         restoreResult = lpDD->RestoreDisplayMode();
-        if (lpClipper != 0) {
-            if (lpDDSPrimary != 0) {
-                result = lpDDSPrimary->SetClipper(0);
+        if (lpClipper != NULL) {
+            if (lpDDSPrimary != NULL) {
+                result = lpDDSPrimary->SetClipper(NULL);
                 if (result != DD_OK && result != DDERR_NOCLIPPERATTACHED)
                     DDSD(result, RETAIL_FILE, 540);
             }
             lpClipper->Release();
-            lpClipper = 0;
+            lpClipper = NULL;
         }
-        if (lpDDSPrimary != 0) {
+        if (lpDDSPrimary != NULL) {
             lpDDSPrimary->Release();
-            lpDDSPrimary = 0;
+            lpDDSPrimary = NULL;
         }
-        if (lpDDSOne != 0) {
+        if (lpDDSOne != NULL) {
             lpDDSOne->Release();
-            lpDDSOne = 0;
+            lpDDSOne = NULL;
         }
-        if (lpDDPal != 0) {
+        if (lpDDPal != NULL) {
             lpDDPal->Release();
-            lpDDPal = 0;
+            lpDDPal = NULL;
         }
         result = lpDD->SetCooperativeLevel(hwndApp, DDSCL_NORMAL);
         if (result != DD_OK)
             DDSD(result, RETAIL_FILE, 564);
         lpDD->Release();
-        lpDD = 0;
+        lpDD = NULL;
     }
 }
 
@@ -538,9 +538,9 @@ void DDSetFullScreenStatus(i32 fullScreen) {
             if (result0 != DD_OK)
                 DDSD(result0, RETAIL_FILE, 611);
         }
-        if (lpDDSPrimary != 0) {
+        if (lpDDSPrimary != NULL) {
             lpDDSPrimary->Release();
-            lpDDSPrimary = 0;
+            lpDDSPrimary = NULL;
         }
         CreatePrimary();
         result0 = lpDDSPrimary->SetPalette(lpDDPal);
@@ -567,12 +567,12 @@ i32 WGQueryNewPalette(void) {
     HDC hdc;
 
     hdc = GetDC(hwndApp);
-    if (hpalApp != 0)
+    if (hpalApp != NULL)
         SelectPalette(hdc, hpalApp, 0);
     paletteChanges = RealizePalette(hdc);
     ReleaseDC(hwndApp, hdc);
     if (paletteChanges > 0) {
-        InvalidateRect(hwndApp, 0, 1);
+        InvalidateRect(hwndApp, NULL, 1);
         return 1;
     } else {
         return 0;
@@ -583,7 +583,7 @@ VA(0x00436a3e, 0x151)
 void WGInitGraphics(void) {
     HBITMAP bitmap;
 
-    if (hdcImage != 0)
+    if (hdcImage != NULL)
         return;
     if (WinGRecommendDIBFormat(reinterpret_cast<BITMAPINFO*>(&screenImage)) != 0) {
         screenImage.header.biBitCount = WINGRAPH_COLOR_DEPTH;
@@ -641,15 +641,15 @@ void WGUpdatePalette(i8* paletteData) {
         WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE * 2,
         &screenImage.colors[WINGRAPH_SYSTEM_PALETTE_SIZE]
     );
-    if (hpalApp != 0)
+    if (hpalApp != NULL)
         DeleteObject(hpalApp);
     hpalApp = CreatePalette(reinterpret_cast<LOGPALETTE*>(&LogicalPalette));
     dc0 = GetDC(hwndApp);
-    if (hpalApp != 0)
+    if (hpalApp != NULL)
         SelectPalette(dc0, hpalApp, 0);
     result0 = RealizePalette(dc0);
     ReleaseDC(hwndApp, dc0);
-    if (giMainVideoModeColorDepth != WINGRAPH_COLOR_DEPTH && gpWindowManager->m_screen != 0) {
+    if (giMainVideoModeColorDepth != WINGRAPH_COLOR_DEPTH && gpWindowManager->m_screen != NULL) {
         if (gbLimitedCombatUpdatePalette != 0) {
             if (gbFullCombatScreenDrawn != 0)
                 BlitBitmapToScreen(
@@ -680,9 +680,9 @@ void WGInitializePalette(void) {
     HDC dc0;
     i32 entry;
 
-    if (hpalApp != 0)
+    if (hpalApp != NULL)
         return;
-    dc0 = GetDC(0);
+    dc0 = GetDC(NULL);
     GetSystemPaletteEntries(dc0, 0, WINGRAPH_SYSTEM_PALETTE_SIZE, LogicalPalette.entries);
     GetSystemPaletteEntries(
         dc0,
@@ -690,7 +690,7 @@ void WGInitializePalette(void) {
         WINGRAPH_SYSTEM_PALETTE_SIZE,
         &LogicalPalette.entries[WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE]
     );
-    ReleaseDC(0, dc0);
+    ReleaseDC(NULL, dc0);
     for (entry = 0; entry < WINGRAPH_SYSTEM_PALETTE_SIZE; entry++) {
         screenImage.colors[entry].rgbRed = LogicalPalette.entries[entry].peRed;
         screenImage.colors[entry].rgbGreen = LogicalPalette.entries[entry].peGreen;
@@ -740,7 +740,7 @@ i32 WGAppPaint(void* window, void* paintDC) {
     i32 sourceY7;
 
     unusedByte0 = 0;
-    if (screenImage.bits != 0) {
+    if (screenImage.bits != NULL) {
         paintDC = BeginPaint(reinterpret_cast<HWND>(window), &paint5);
         SelectPalette(static_cast<HDC>(paintDC), hpalApp, 0);
         RealizePalette(static_cast<HDC>(paintDC));
@@ -796,15 +796,15 @@ VA(0x0043710f, 0x78)
 void WGCleanUpWinGraphics(void) {
     HGDIOBJ bitmap;
 
-    if (hdcImage != 0) {
+    if (hdcImage != NULL) {
         bitmap = SelectObject(hdcImage, gbmOldMonoBitmap);
         DeleteObject(bitmap);
         DeleteDC(hdcImage);
-        hdcImage = 0;
+        hdcImage = NULL;
     }
-    if (hpalApp != 0) {
+    if (hpalApp != NULL) {
         DeleteObject(hpalApp);
-        hpalApp = 0;
+        hpalApp = NULL;
     }
 }
 
@@ -816,7 +816,7 @@ void ConnectToDLLs(void) {
             GetProcAddress(hDDrawLibrary, "DirectDrawCreate")
         );
     }
-    if (lpDirectDrawCreate != 0) {
+    if (lpDirectDrawCreate != NULL) {
         gbDDrawAttached = true;
     } else {
         gConfig.gfx[giCurExe].fullScreen = 0;
@@ -852,12 +852,12 @@ VA(0x0043728a, 0x7e)
 void GetGraphicsInfo(void) {
     HDC screenDC;
 
-    screenDC = GetDC(0);
-    if (screenDC != 0) {
+    screenDC = GetDC(NULL);
+    if (screenDC != NULL) {
         giMainVideoModeColorDepth = GetDeviceCaps(screenDC, BITSPIXEL);
         giMainVideoModeWidth = GetDeviceCaps(screenDC, HORZRES);
         giMainVideoModeHeight = GetDeviceCaps(screenDC, VERTRES);
-        ReleaseDC(0, screenDC);
+        ReleaseDC(NULL, screenDC);
         if (giMainVideoModeColorDepth < WINGRAPH_COLOR_DEPTH)
             ShutDown(
                 "Heroes II requires 256 color mode or higher.\n\n"
@@ -1002,23 +1002,23 @@ DATA(0x004f128c) b32 gbDDrawAttached = false;
 DATA(0x004f1290) WingraphGraphicsType giGraphicsType = WINGRAPH_GRAPHICS_WING;
 DATA(0x004f1294) i32l Orientation = 1;
 DATA(0x004f1298) struct _PALETTE LogicalPalette = {WINGRAPH_PALETTE_VERSION, WINGRAPH_PALETTE_SIZE};
-DATA(0x004f169c) void* lpInitWin = 0;
+DATA(0x004f169c) void* lpInitWin = NULL;
 DATA(0x004f16a0) i32 bPaletteInitialized = 0;
 DATA(0x004f16a4) i32 giTtlBlts = 0;
 DATA(0x004f16a8) b32 gbWinGraphBusy = false;
-DATA(0x004f16ac) DirectDrawCreateProc lpDirectDrawCreate = 0;
-DATA(0x004f16b0) struct IDirectDraw* lpDD = 0;
-DATA(0x004f16b4) struct IDirectDrawSurface* lpDDSPrimary = 0;
-DATA(0x004f16b8) struct IDirectDrawSurface* lpDDSOne = 0;
-DATA(0x004f16bc) struct IDirectDrawClipper* lpClipper = 0;
-DATA(0x004f16c0) struct IDirectDrawPalette* lpDDPal = 0;
+DATA(0x004f16ac) DirectDrawCreateProc lpDirectDrawCreate = NULL;
+DATA(0x004f16b0) struct IDirectDraw* lpDD = NULL;
+DATA(0x004f16b4) struct IDirectDrawSurface* lpDDSPrimary = NULL;
+DATA(0x004f16b8) struct IDirectDrawSurface* lpDDSOne = NULL;
+DATA(0x004f16bc) struct IDirectDrawClipper* lpClipper = NULL;
+DATA(0x004f16c0) struct IDirectDrawPalette* lpDDPal = NULL;
 DATA(0x004f17b0) i32 iBusyRetry = 0;
 DATA(0x004f1a14) i32 bInDDSD = 0;
-DATA(0x004f1e78) HDC hdcImage = 0;
-DATA(0x004f1e7c) HBITMAP gbmOldMonoBitmap = 0;
-DATA(0x004f1e80) HPALETTE hpalApp = 0;
-DATA(0x004f1f60) HINSTANCE hWinGLibrary = 0;
-DATA(0x004f1f64) HINSTANCE hDDrawLibrary = 0;
+DATA(0x004f1e78) HDC hdcImage = NULL;
+DATA(0x004f1e7c) HBITMAP gbmOldMonoBitmap = NULL;
+DATA(0x004f1e80) HPALETTE hpalApp = NULL;
+DATA(0x004f1f60) HINSTANCE hWinGLibrary = NULL;
+DATA(0x004f1f64) HINSTANCE hDDrawLibrary = NULL;
 DATA(0x004f2080) i32l lDelayRefresh = 0;
 DATA(0x00525168) i32l lPaintStart;
 DATA(0x00525180) struct _IMAGE screenImage;

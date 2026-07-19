@@ -112,11 +112,11 @@ DATA(0x0051ff50) UInt32 crc32Table[256] = {
     0x9e7d9662U, 0x933eb0bbU, 0x97ffad0cU, 0xafb010b1U, 0xab710d06U, 0xa6322bdfU, 0xa2f33668U,
     0xbcb4666dU, 0xb8757bdaU, 0xb5365d03U, 0xb1f740b4U
 };
-DATA(0x00520350) UInt32* words = 0;
-DATA(0x00520354) Int32* zptr = 0;
-DATA(0x00520358) Int32* ftab = 0;
-DATA(0x0052035c) UChar* block = 0;
-DATA(0x00520360) UChar* ll = 0;
+DATA(0x00520350) UInt32* words = NULL;
+DATA(0x00520354) Int32* zptr = NULL;
+DATA(0x00520358) Int32* ftab = NULL;
+DATA(0x0052035c) UChar* block = NULL;
+DATA(0x00520360) UChar* ll = NULL;
 DATA(0x00538068) Int32 last;
 DATA(0x0053805c) Int32 lastPP;
 DATA(0x00534ee0) Int32 origPtr;

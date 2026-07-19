@@ -12,6 +12,10 @@ typedef unsigned long u32l;
 typedef __int64 i64;
 typedef unsigned __int64 u64;
 
+#ifndef NULL
+#define NULL 0
+#endif
+
 // Boolean-int aliases for the pre-bool compiler.
 typedef i32 b32;
 typedef i8 b8;

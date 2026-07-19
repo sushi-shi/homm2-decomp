@@ -179,7 +179,7 @@ i8 WaitForGuest(void) {
             if (status) {
                 if (KBTickCount() > iLastBroadcastTime + BROADCAST_INTERVAL) {
                     iLastBroadcastTime = KBTickCount();
-                    nb_snd(HOST_SESSION, 0, 0);
+                    nb_snd(HOST_SESSION, 0, NULL);
                 }
             } else {
                 nb_sess(
@@ -206,14 +206,14 @@ i32 nbnet_init(void) {
             sprintf(gText, "Initializing network.\n\n  Press 'CANCEL' to abort.");
             NormalDialog(gText, OLD_MAIN_DIALOG_WAIT, -1, -1, -1, 0, -1, 0, -1, 0);
             if (gbFunctionComplete == 0)
-                ShutDown(0);
+                ShutDown(NULL);
             giWaitType = IDX(WAIT_FOR_GUEST);
             sprintf(gText, "Waiting On Guest.\n\n  Press 'CANCEL' to abort.");
             LogStr("GUON2");
             NormalDialog(gText, OLD_MAIN_DIALOG_WAIT, -1, -1, -1, 0, -1, 0, -1, 0);
             LogStr("GUON3");
             if (gbFunctionComplete == 0)
-                ShutDown(0);
+                ShutDown(NULL);
             LogStr("GUON4");
             break;
         case IDX(GAME_MODE_GUEST):
@@ -221,12 +221,12 @@ i32 nbnet_init(void) {
             sprintf(gText, "Initializing network.\n\n  Press 'CANCEL' to abort.");
             NormalDialog(gText, OLD_MAIN_DIALOG_WAIT, -1, -1, -1, 0, -1, 0, -1, 0);
             if (gbFunctionComplete == 0)
-                ShutDown(0);
+                ShutDown(NULL);
             giWaitType = IDX(WAIT_FOR_HOST);
             sprintf(gText, "Waiting On Host.\n\n  Press 'CANCEL' to abort.");
             NormalDialog(gText, OLD_MAIN_DIALOG_WAIT, -1, -1, -1, 0, -1, 0, -1, 0);
             if (gbFunctionComplete == 0)
-                ShutDown(0);
+                ShutDown(NULL);
             break;
     }
     LogStr("GUON5");

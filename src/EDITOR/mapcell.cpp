@@ -6,8 +6,8 @@
 
 VA(0x0040b070, 0x36)
 fullMap::fullMap(void) {
-    cells = 0;
-    extras = 0;
+    cells = NULL;
+    extras = NULL;
     extraCount = 0;
 }
 
@@ -20,10 +20,10 @@ VA(0x0040b0c4, 0x81)
 void fullMap::Close(void) {
     if (cells)
         delete cells;
-    cells = 0;
+    cells = NULL;
     if (extras)
         delete extras;
-    extras = 0;
+    extras = NULL;
     extraCount = 0;
 }
 
@@ -194,7 +194,7 @@ void fullMap::ChangeTilesetIndex(
     i32 t;
     i32 dummy;
 
-    ptr = 0;
+    ptr = NULL;
     if (index == IDX(MAPCELL_SPRITE_NONE))
         t = 0;
     else

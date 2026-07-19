@@ -35,7 +35,7 @@ H2_ENUM_END(ViewGeneralConstant)
 // @semantic: compiler-shape residual.
 VA(0x0040bd60, 0x6d3)
 i32 combatManager::ViewGeneral(i32 side, i32 allowActions, i32 quickView) {
-    if (m_heroes[side] == 0)
+    if (m_heroes[side] == NULL)
         return 0;
     {
         i16 messageConstant1;
@@ -78,7 +78,7 @@ i32 combatManager::ViewGeneral(i32 side, i32 allowActions, i32 quickView) {
 
         message.type = MESSAGE_WIDGET;
         generalWindow = new heroWindow(GENERAL_WINDOW_X, GENERAL_WINDOW_Y, "vgenwin.bin");
-        if (generalWindow == 0)
+        if (generalWindow == NULL)
             MemError();
         sprintf(gText, "port%04d.icn", m_heroes[side]->m_portrait);
         message.payload.widget.command = VIEW_GENERAL_SET_ICON;
@@ -124,7 +124,7 @@ i32 combatManager::ViewGeneral(i32 side, i32 allowActions, i32 quickView) {
             m_combatTowns[side],
             gpCombatManager->m_armyGroups[1 - side]
         );
-        luck = gpGame->GetLuck(m_heroes[side], 0, m_combatTowns[side]);
+        luck = gpGame->GetLuck(m_heroes[side], NULL, m_combatTowns[side]);
         sprintf(
             gText,
             "\n%s%d\n%s%d\n%s%d\n%s%d\n%s%s\n%s%s\n\n%s%d/%d",
@@ -149,7 +149,7 @@ i32 combatManager::ViewGeneral(i32 side, i32 allowActions, i32 quickView) {
         message.payload.widget.data.text = gText;
         generalWindow->BroadcastMessage(message);
 
-        if (m_heroes[side] == 0 || allowActions == 0
+        if (m_heroes[side] == NULL || allowActions == 0
             || m_heroes[side]->HasArtifact(ARTIFACT_MAGIC_BOOK) == 0 || m_heroCastSpell[side] != 0
             || m_currentSide != giCurGeneral) {
             message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
@@ -160,7 +160,7 @@ i32 combatManager::ViewGeneral(i32 side, i32 allowActions, i32 quickView) {
             message.payload.widget.data.value = WIDGET_COMMAND_DIMMED;
             generalWindow->BroadcastMessage(message);
         }
-        if (allowActions == 0 || m_heroes[1 - m_currentSide] == 0 || m_currentSide != giCurGeneral
+        if (allowActions == 0 || m_heroes[1 - m_currentSide] == NULL || m_currentSide != giCurGeneral
             || m_heroes[side]->m_isCaptain != 0) {
             message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
             message.payload.widget.id = GENERAL_SURRENDER;
@@ -171,7 +171,7 @@ i32 combatManager::ViewGeneral(i32 side, i32 allowActions, i32 quickView) {
             generalWindow->BroadcastMessage(message);
         }
         if (allowActions == 0 || m_currentSide != giCurGeneral
-            || (giCurGeneral == 1 && m_heroes[0] != 0) || m_sideRetreated[0] != 0
+            || (giCurGeneral == 1 && m_heroes[0] != NULL) || m_sideRetreated[0] != 0
             || m_sideRetreated[1] != 0 || m_heroes[side]->m_isCaptain != 0) {
             message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
             message.payload.widget.id = GENERAL_RETREAT;
@@ -309,7 +309,7 @@ i32 HandleViewGeneral(tag_message& message) {
 // @semantic: First non-branch residual is the branchless facing mask near +0x81.
 VA(0x0040c784, 0x165)
 void combatManager::ViewArmy(army* viewedArmy, i32 quickView) {
-    if (viewedArmy == 0)
+    if (viewedArmy == NULL)
         return;
     {
         i32 side;

@@ -9,13 +9,13 @@ DATA(0x004f2558) char* xSetupCampaignGameHelp[X_GLOBAL_SETUP_HELP_COUNT] = {
     "{Expansion Campaign}\n\nOne of the four new campaigns from the Price of Loyalty expansion "
     "set.",
     "{Cancel}\n\nCancel back to the main menu.",
-    0
+    NULL
 };
 DATA(0x004f2568) char* xSetupStandardGameHelp[X_GLOBAL_SETUP_HELP_COUNT] = {
     "{Original Map}\n\nSelects a game from the original Heroes of Might and Magic II.",
     "{Expansion Map}\n\nSelects a game from the Price of Loyalty expansion set.",
     "{Cancel}\n\nCancel back to main menu.",
-    0
+    NULL
 };
 DATA(0x004f2578) char* xCampaignAwards[X_GLOBAL_EXPANSION_CAMPAIGN_AWARD_COUNT] = {
     "Elven alliance",
@@ -29,7 +29,7 @@ DATA(0x004f2578) char* xCampaignAwards[X_GLOBAL_EXPANSION_CAMPAIGN_AWARD_COUNT] 
     "Legendary Sceptre",
     "Guardian Spell",
     "Sphere of Negation",
-    0
+    NULL
 };
 DATA(0x004f25a8) char*
     xScenarioName[X_GLOBAL_EXPANSION_CAMPAIGN_COUNT][X_GLOBAL_EXPANSION_CAMPAIGN_MAP_COUNT] = {
@@ -132,7 +132,7 @@ DATA(0x004f26c8) char* xRecruitEmpty[X_GLOBAL_RECRUIT_EMPTY_COUNT] = {
     "You enter the structure of white stone pillars, and find nothing.",
     "No Fire Elementals approach you from the lava pool.",
     "A face forms in the water for a moment, and then is gone.",
-    0
+    NULL
 };
 DATA(0x004f26e0) char* xRecruitBuy[X_GLOBAL_RECRUIT_BUY_COUNT] = {
     "Restless spirits of long dead warriors seeking their final resting place offer to join you in "
@@ -175,7 +175,7 @@ DATA(0x004f2710) char* xJosephName[X_GLOBAL_EXPANSION_HERO_NAME_COUNT] =
 DATA(0x004f2728) char* xUncleIvanName[X_GLOBAL_EXPANSION_HERO_NAME_COUNT] =
     {"Uncle Ivan", "Ivan II", "Ivan III", "Ivan IV", "Ivan V", "Ivan VI"};
 DATA(0x004f2740) char* xShortSSLevelNames[X_GLOBAL_SHORT_SKILL_LEVEL_COUNT] =
-    {"Bas.", "Adv.", "Exp.", 0};
+    {"Bas.", "Adv.", "Exp.", NULL};
 DATA(0x004f2750) char* xPasswordStrings[X_GLOBAL_PASSWORD_STRING_COUNT] = {
     "Advance",    "Advent",      "Adventure",  "Animate",     "Archer",     "Arena",
     "Armor",      "Army",        "Arrow",      "Artifact",    "Attraction", "Backstab",

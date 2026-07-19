@@ -87,21 +87,21 @@ DATA(0x0051ed60) static SMouseManagerStrings gMouseManagerStrings = {
 VA(0x004c9270, 0xd9)
 mouseManager::mouseManager(void) : baseManager() {
     i32 i;
-    m_savedUnderlying = 0;
+    m_savedUnderlying = NULL;
     m_active = false;
     m_cursorType = MOUSE_INVALID_CURSOR_TYPE;
     strcpy(m_name, gMouseManagerStrings.managerName.text);
     m_cursorFrame = 0;
     m_cursorReady = 1;
-    m_cursorIcon = 0;
+    m_cursorIcon = NULL;
     for (i = 0; i < MOUSE_CURSOR_COUNT; i++)
-        hbmpAndMask[i] = 0;
+        hbmpAndMask[i] = NULL;
     for (i = 0; i < MOUSE_CURSOR_COUNT; i++)
-        hMouseCursor[i] = 0;
+        hMouseCursor[i] = NULL;
     for (i = 0; i < MOUSE_CURSOR_COUNT; i++)
-        cColorBits[i] = 0;
+        cColorBits[i] = NULL;
     for (i = 0; i < MOUSE_CURSOR_COUNT; i++)
-        cAndBits[i] = 0;
+        cAndBits[i] = NULL;
     for (i = 0; i < MOUSE_CURSOR_COUNT; i++) {
         if (iHotSpot[i][0] == -1)
             iHotSpot[i][0] = iMouseSize[i][1] / 2;
@@ -141,35 +141,35 @@ void mouseManager::Close(void) {
     i32 cursorIndex;
     if (m_active) {
         m_active = false;
-        if (m_savedUnderlying != 0)
+        if (m_savedUnderlying != NULL)
             delete m_savedUnderlying;
-        m_savedUnderlying = 0;
-        SetCursor(LoadCursorA(0, IDC_ARROW));
+        m_savedUnderlying = NULL;
+        SetCursor(LoadCursorA(NULL, IDC_ARROW));
         for (cursorIndex = 0; cursorIndex < MOUSE_CURSOR_COUNT; cursorIndex++) {
-            if (hMouseCursor[cursorIndex] != 0)
+            if (hMouseCursor[cursorIndex] != NULL)
                 DestroyIcon(hMouseCursor[cursorIndex]);
-            hMouseCursor[cursorIndex] = 0;
-            if (cAndBits[cursorIndex] != 0)
+            hMouseCursor[cursorIndex] = NULL;
+            if (cAndBits[cursorIndex] != NULL)
                 H2_FREE_AT(
                     cAndBits[cursorIndex],
                     gMouseManagerStrings.andMaskDestruction.text,
                     330
                 );
-            cAndBits[cursorIndex] = 0;
-            if (cColorBits[cursorIndex] != 0)
+            cAndBits[cursorIndex] = NULL;
+            if (cColorBits[cursorIndex] != NULL)
                 H2_FREE_AT(
                     cColorBits[cursorIndex],
                     gMouseManagerStrings.colorBitsDestruction.text,
                     334
                 );
-            cColorBits[cursorIndex] = 0;
-            if (hbmpAndMask[cursorIndex] != 0)
+            cColorBits[cursorIndex] = NULL;
+            if (hbmpAndMask[cursorIndex] != NULL)
                 DeleteObject(hbmpAndMask[cursorIndex]);
-            hbmpAndMask[cursorIndex] = 0;
+            hbmpAndMask[cursorIndex] = NULL;
         }
-        if (m_cursorIcon != 0)
+        if (m_cursorIcon != NULL)
             gpResourceManager->Dispose(m_cursorIcon);
-        m_cursorIcon = 0;
+        m_cursorIcon = NULL;
     }
 }
 
@@ -194,7 +194,7 @@ void mouseManager::SetPointer(char* name, i32 frame, MouseCursorType cursorType)
         if (m_cursorType != cursorType && (m_cursorType = cursorType, gbColorMice != 0)) {
             i32 saved82 = m_cursorReady;
             m_cursorReady = 0;
-            if (m_cursorIcon != 0)
+            if (m_cursorIcon != NULL)
                 gpResourceManager->Dispose(m_cursorIcon);
             char local_10[16];
             if (m_cursorType == MOUSE_CURSOR_ADVENTURE)
@@ -244,7 +244,7 @@ void mouseManager::SetPointer(i32 frame) {
     if (gbColorMice != 0) {
         NewUpdate(1);
     } else {
-        if (hMouseCursor[m_cursorSizeIndex] == 0) {
+        if (hMouseCursor[m_cursorSizeIndex] == NULL) {
             cColorBits[m_cursorSizeIndex] = H2_ALLOC_AT(
                 MOUSE_CURSOR_COLOR_BYTES,
                 gMouseManagerStrings.colorBitsAllocation.text,
@@ -327,7 +327,7 @@ void mouseManager::SetPointer(i32 frame) {
                 IconInfo[m_cursorSizeIndex].yHotspot = iHotSpot[m_cursorSizeIndex][1];
             }
             IconInfo[m_cursorSizeIndex].hbmMask = hbmpAndMask[m_cursorSizeIndex];
-            IconInfo[m_cursorSizeIndex].hbmColor = 0;
+            IconInfo[m_cursorSizeIndex].hbmColor = NULL;
             hMouseCursor[m_cursorSizeIndex] = CreateIconIndirect(&IconInfo[m_cursorSizeIndex]);
             H2_ASSERT(
                 reinterpret_cast<i32>(hMouseCursor[m_cursorSizeIndex]),

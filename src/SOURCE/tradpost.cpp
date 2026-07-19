@@ -40,7 +40,7 @@ void DoTradingPost(i32 isMarketplace, float efficiency) {
     tpX = TRADING_POST_WINDOW_X;
     tpY = TRADING_POST_WINDOW_Y;
     tpWindow = new heroWindow(tpX, tpY, "tradpost.bin");
-    if (tpWindow == 0)
+    if (tpWindow == NULL)
         MemError();
     leftResource = -1;
     rightResource = -1;
@@ -57,7 +57,7 @@ void DoTradingPost(i32 isMarketplace, float efficiency) {
         16,
         1
     );
-    if (tradeKnob == 0)
+    if (tradeKnob == NULL)
         MemError();
     tpWindow->AddWidget(tradeKnob, -1);
     UpdateTradingPost(0);

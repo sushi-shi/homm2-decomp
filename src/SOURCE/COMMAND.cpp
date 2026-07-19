@@ -278,7 +278,7 @@ i32 combatManager::Main(tag_message& message) {
     if (gbNoShowCombat == 0) {
         CombatRemotePacket* packet =
             reinterpret_cast<CombatRemotePacket*>(GetRemoteData(REMOTE_PACKET_TYPE));
-        if (packet != 0 && packet->category == REMOTE_CATEGORY_ACTION) {
+        if (packet != NULL && packet->category == REMOTE_CATEGORY_ACTION) {
             switch (packet->command) {
                 case REMOTE_COMMAND_ACTION:
                     giNextAction = packet->nextAction;
@@ -296,7 +296,7 @@ i32 combatManager::Main(tag_message& message) {
             if (message.type == MESSAGE_KEY_DOWN) {
                 switch (message.payload.keyboard.keyCode) {
                     case IDX(KEY_CLOSE_NETWORK_BOX):
-                        PopNetBox(0, -1);
+                        PopNetBox(NULL, -1);
                         break;
                 }
             }
@@ -852,7 +852,7 @@ i32 combatManager::ProcessCombatMsg(tag_message& message) {
         case MESSAGE_KEY_DOWN:
             switch (message.payload.keyboard.keyCode) {
                 case IDX(KEY_CLOSE_NETWORK_BOX):
-                    PopNetBox(0, -1);
+                    PopNetBox(NULL, -1);
                     break;
                 case IDX(KEY_REDRAW_SCREEN):
                     gpWindowManager->UpdateScreenRegion(
@@ -915,7 +915,7 @@ i32 combatManager::ProcessCombatMsg(tag_message& message) {
                     break;
                 }
                 case IDX(KEY_VIEW_GENERAL):
-                    if (m_heroes[m_currentSide] != 0) {
+                    if (m_heroes[m_currentSide] != NULL) {
                         gpMouseManager->SetPointer(POINTER_DEFAULT);
                         ViewGeneral(m_currentSide, 1, 0);
                         ResetMouse();
@@ -927,7 +927,7 @@ i32 combatManager::ProcessCombatMsg(tag_message& message) {
                     ResetMouse();
                     break;
                 case IDX(KEY_CAST_SPELL):
-                    if (m_heroes[m_currentSide] == 0) {
+                    if (m_heroes[m_currentSide] == NULL) {
                         NormalDialog(
                             "You have no hero to cast a spell.",
                             NORMAL_DIALOG_INFO,
@@ -985,7 +985,7 @@ VA(0x0042c40a, 0x70)
 i32 combatManager::IsNegationSphereInEffect(void) {
     i32 side;
     for (side = 0; side < COMBAT_MANAGER_SIDE_COUNT; side++) {
-        if (m_heroes[side] != 0 && m_heroes[side]->HasArtifact(ARTIFACT_SPHERE_NEGATION) != 0)
+        if (m_heroes[side] != NULL && m_heroes[side]->HasArtifact(ARTIFACT_SPHERE_NEGATION) != 0)
             return 1;
     }
     return 0;
@@ -1092,7 +1092,7 @@ CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
     } else {
         switch (hexIndex) {
             case COMBAT_GRID_RIGHT_HERO_HEX:
-                if (m_heroes[1] != 0) {
+                if (m_heroes[1] != NULL) {
                     if (m_currentSide == 1)
                         command = COMBAT_MESSAGE_COMMAND_OPTIONS;
                     else
@@ -1102,7 +1102,7 @@ CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
                 }
                 break;
             case COMBAT_GRID_LEFT_SPECIAL_HEX:
-                if (m_heroes[0] != 0) {
+                if (m_heroes[0] != NULL) {
                     if (m_currentSide == 0)
                         command = COMBAT_MESSAGE_COMMAND_OPTIONS;
                     else
@@ -1217,13 +1217,13 @@ i32 combatManager::RightClick(i32 hexIndex) {
                 ViewBallista(1);
             return 0;
         case COMBAT_GRID_RIGHT_HERO_HEX:
-            if (m_heroes[1] != 0) {
+            if (m_heroes[1] != NULL) {
                 ViewGeneral(1, 0, 1);
                 ResetMouse();
             }
             return 0;
         case COMBAT_GRID_LEFT_SPECIAL_HEX:
-            if (m_heroes[0] != 0) {
+            if (m_heroes[0] != NULL) {
                 ViewGeneral(0, 0, 1);
                 ResetMouse();
             }
@@ -1530,16 +1530,16 @@ VA(0x0042d9ed, 0x110)
 void combatManager::ClearWinLoseBottom(class heroWindow* window) {
     i32 widgetIndex;
     for (widgetIndex = 0; widgetIndex < WIN_LOSE_WIDGET_COUNT; widgetIndex++) {
-        if (m_winLoseBottomWidgets[widgetIndex] != 0) {
+        if (m_winLoseBottomWidgets[widgetIndex] != NULL) {
             window->RemoveWidget(m_winLoseBottomWidgets[widgetIndex]);
             delete m_winLoseBottomWidgets[widgetIndex];
         }
-        if (m_winLoseBottomTextWidgets[widgetIndex] != 0) {
+        if (m_winLoseBottomTextWidgets[widgetIndex] != NULL) {
             window->RemoveWidget(m_winLoseBottomTextWidgets[widgetIndex]);
             delete m_winLoseBottomTextWidgets[widgetIndex];
         }
-        m_winLoseBottomWidgets[widgetIndex] = 0;
-        m_winLoseBottomTextWidgets[widgetIndex] = 0;
+        m_winLoseBottomWidgets[widgetIndex] = NULL;
+        m_winLoseBottomTextWidgets[widgetIndex] = NULL;
     }
 }
 
@@ -1571,7 +1571,7 @@ void combatManager::ShowWinLoseArtifact(class heroWindow* window, i32 artifact) 
         WIN_LOSE_ICON_FLAGS,
         1
     );
-    if (m_winLoseBottomWidgets[0] == 0)
+    if (m_winLoseBottomWidgets[0] == NULL)
         MemError();
     window->AddWidget(m_winLoseBottomWidgets[0], -1);
 
@@ -1587,7 +1587,7 @@ void combatManager::ShowWinLoseArtifact(class heroWindow* window, i32 artifact) 
         WIN_LOSE_ICON_FLAGS,
         1
     );
-    if (m_winLoseBottomWidgets[1] == 0)
+    if (m_winLoseBottomWidgets[1] == NULL)
         MemError();
     window->AddWidget(m_winLoseBottomWidgets[1], -1);
 
@@ -1605,7 +1605,7 @@ void combatManager::ShowWinLoseArtifact(class heroWindow* window, i32 artifact) 
         WIN_LOSE_TEXT_FLAGS,
         1
     );
-    if (m_winLoseBottomTextWidgets[0] == 0)
+    if (m_winLoseBottomTextWidgets[0] == NULL)
         MemError();
     window->AddWidget(m_winLoseBottomTextWidgets[0], -1);
 
@@ -1635,7 +1635,7 @@ void combatManager::ShowSkeletons(class heroWindow* window) {
         WIN_LOSE_ICON_FLAGS,
         1
     );
-    if (m_winLoseBottomWidgets[0] == 0)
+    if (m_winLoseBottomWidgets[0] == NULL)
         MemError();
 
     skeletonCount = static_cast<char*>(H2_ALLOC(9, 1755));
@@ -1652,7 +1652,7 @@ void combatManager::ShowSkeletons(class heroWindow* window) {
         WIN_LOSE_TEXT_FLAGS,
         1
     );
-    if (m_winLoseBottomTextWidgets[0] == 0)
+    if (m_winLoseBottomTextWidgets[0] == NULL)
         MemError();
 
     window->AddWidget(m_winLoseBottomWidgets[0], -1);
@@ -1708,7 +1708,7 @@ void combatManager::ShowEagleEyeSpell(class heroWindow* window) {
         WIN_LOSE_ICON_FLAGS,
         1
     );
-    if (m_winLoseBottomWidgets[0] == 0)
+    if (m_winLoseBottomWidgets[0] == NULL)
         MemError();
 
     m_winLoseBottomWidgets[1] = new iconWidget(
@@ -1723,7 +1723,7 @@ void combatManager::ShowEagleEyeSpell(class heroWindow* window) {
         WIN_LOSE_SPELL_ICON_FLAGS,
         1
     );
-    if (m_winLoseBottomWidgets[1] == 0)
+    if (m_winLoseBottomWidgets[1] == NULL)
         MemError();
 
     spellName = static_cast<char*>(H2_ALLOC(200, 1828));
@@ -1740,7 +1740,7 @@ void combatManager::ShowEagleEyeSpell(class heroWindow* window) {
         WIN_LOSE_TEXT_FLAGS,
         1
     );
-    if (m_winLoseBottomTextWidgets[0] == 0)
+    if (m_winLoseBottomTextWidgets[0] == NULL)
         MemError();
 
     window->AddWidget(m_winLoseBottomWidgets[0], -1);
@@ -1791,8 +1791,8 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
     i32 unusedCasualtyWord18;
 
     for (side_9 = 0; side_9 < WIN_LOSE_WIDGET_COUNT; ++side_9) {
-        m_winLoseBottomWidgets[side_9] = 0;
-        m_winLoseBottomTextWidgets[side_9] = 0;
+        m_winLoseBottomWidgets[side_9] = NULL;
+        m_winLoseBottomTextWidgets[side_9] = NULL;
     }
     for (side_9 = 0; side_9 < COMBAT_MANAGER_SIDE_COUNT; ++side_9) {
         casualtyQuantity_0[side_9] = 0;
@@ -1824,7 +1824,7 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
         WIN_LOSE_TEXT_FLAGS,
         1
     );
-    if (m_winLoseBottomTextWidgets[17] == 0)
+    if (m_winLoseBottomTextWidgets[17] == NULL)
         MemError();
     window->AddWidget(m_winLoseBottomTextWidgets[17], -1);
 
@@ -1847,7 +1847,7 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
             WIN_LOSE_TEXT_FLAGS,
             1
         );
-        if (m_winLoseBottomTextWidgets[15 + side_9] == 0)
+        if (m_winLoseBottomTextWidgets[15 + side_9] == NULL)
             MemError();
         window->AddWidget(m_winLoseBottomTextWidgets[15 + side_9], -1);
 
@@ -1866,7 +1866,7 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
                 WIN_LOSE_TEXT_FLAGS,
                 1
             );
-            if (m_winLoseBottomTextWidgets[side_9 * CASUALTY_WIDGETS_PER_SIDE] == 0)
+            if (m_winLoseBottomTextWidgets[side_9 * CASUALTY_WIDGETS_PER_SIDE] == NULL)
                 MemError();
             window->AddWidget(
                 m_winLoseBottomTextWidgets[side_9 * CASUALTY_WIDGETS_PER_SIDE],
@@ -1923,7 +1923,7 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
                     1
                 );
             if (m_winLoseBottomWidgets[side_9 * CASUALTY_WIDGETS_PER_SIDE + armyIndex_8]
-                == 0)
+                == NULL)
                 MemError();
 
             text_27 = static_cast<char*>(H2_ALLOC(9, 1986));
@@ -1947,7 +1947,7 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
                     1
                 );
             if (m_winLoseBottomTextWidgets[side_9 * CASUALTY_WIDGETS_PER_SIDE + armyIndex_8]
-                == 0)
+                == NULL)
                 MemError();
             window->AddWidget(
                 m_winLoseBottomWidgets[side_9 * CASUALTY_WIDGETS_PER_SIDE + armyIndex_8],
@@ -1980,8 +1980,8 @@ void combatManager::DoVictory(i32 winningSide) {
     i32 emptyArtifactSlots;
     tag_message message;
 
-    if (m_heroes[COMBAT_DEFENDER_SIDE] != 0 && m_heroes[COMBAT_DEFENDER_SIDE]->m_isCaptain != 0)
-        m_heroes[COMBAT_DEFENDER_SIDE] = 0;
+    if (m_heroes[COMBAT_DEFENDER_SIDE] != NULL && m_heroes[COMBAT_DEFENDER_SIDE]->m_isCaptain != 0)
+        m_heroes[COMBAT_DEFENDER_SIDE] = NULL;
     gbShowingLoseWindow = false;
     gbWhichAnimationPlaying = true;
     giWinCmbtFrame = 0;
@@ -2027,7 +2027,7 @@ void combatManager::DoVictory(i32 winningSide) {
 
     if (winningSide != RESULT_DRAW
         && eligibleWinnerStacks < VICTORY_NECROMANCY_STACK_LIMIT
-        && m_heroes[winningSide] != 0
+        && m_heroes[winningSide] != NULL
         && m_heroes[winningSide]->GetSSLevel(IDX(HERO_SKILL_NECROMANCY)) != 0) {
         giSkeletonsCreated = static_cast<i32>(
             deadCreatureCount
@@ -2070,7 +2070,7 @@ void combatManager::DoVictory(i32 winningSide) {
             break;
         case COMBAT_ATTACKER_SIDE:
         case COMBAT_DEFENDER_SIDE:
-            if (m_heroes[winningSide] != 0) {
+            if (m_heroes[winningSide] != NULL) {
                 if (m_eagleEyeSpell[winningSide] != IDX(SPELL_NONE)) {
                     m_heroes[winningSide]->m_spells[m_eagleEyeSpell[winningSide]] = 1;
                 }
@@ -2079,7 +2079,7 @@ void combatManager::DoVictory(i32 winningSide) {
                 if (gbRetreatWin != 0)
                     m_experienceValue[COMBAT_DEFENDER_SIDE - winningSide] -=
                         COMBAT_HERO_EXPERIENCE_VALUE;
-                if (m_combatTowns[COMBAT_DEFENDER_SIDE] != 0 && winningSide == COMBAT_ATTACKER_SIDE)
+                if (m_combatTowns[COMBAT_DEFENDER_SIDE] != NULL && winningSide == COMBAT_ATTACKER_SIDE)
                     m_experienceValue[COMBAT_DEFENDER_SIDE - winningSide] +=
                         COMBAT_HERO_EXPERIENCE_VALUE;
                 experienceLevels = gpAdvManager->GiveExperience(
@@ -2090,8 +2090,8 @@ void combatManager::DoVictory(i32 winningSide) {
 
                 if (gbRetreatWin == 0) {
                     emptyArtifactSlots = 0;
-                    if (m_heroes[COMBAT_ATTACKER_SIDE] != 0
-                        && m_heroes[COMBAT_DEFENDER_SIDE] != 0) {
+                    if (m_heroes[COMBAT_ATTACKER_SIDE] != NULL
+                        && m_heroes[COMBAT_DEFENDER_SIDE] != NULL) {
                         for (fadeIndex = 0; fadeIndex < HERO_ARTIFACT_SLOT_COUNT; ++fadeIndex) {
                             if (m_heroes[winningSide]->m_artifacts[fadeIndex]
                                 == IDX(ARTIFACT_NONE)) {
@@ -2131,10 +2131,10 @@ void combatManager::DoVictory(i32 winningSide) {
                 )) {
                 gpSoundManager->SwitchAmbientMusic(VICTORY_MUSIC);
                 m_winLoseWindow = new heroWindow(143, 10, "wincmbt.bin");
-                if (m_winLoseWindow == 0)
+                if (m_winLoseWindow == NULL)
                     MemError();
 
-                if (m_heroes[winningSide] != 0) {
+                if (m_heroes[winningSide] != NULL) {
                     if (gbCombatSurrender != 0) {
                         sprintf(gText, cBattleResults[IDX(RESULT_TEXT_ENEMY_SURRENDERED)]);
                     } else if (gbRetreatWin != 0) {
@@ -2181,12 +2181,12 @@ void combatManager::DoVictory(i32 winningSide) {
                 gpWindowManager->DoDialog(m_winLoseWindow, WinCombatHandler, 0);
                 giDialogTimeout = 0;
                 delete m_winLoseWindow;
-                if (m_heroes[COMBAT_DEFENDER_SIDE - winningSide] != 0)
+                if (m_heroes[COMBAT_DEFENDER_SIDE - winningSide] != NULL)
                     m_heroes[COMBAT_DEFENDER_SIDE - winningSide]->ApplyBattleLossTemps();
             } else {
-                if (m_heroes[winningSide] != 0)
+                if (m_heroes[winningSide] != NULL)
                     m_heroes[winningSide]->ApplyBattleWinTemps();
-                if (m_heroes[COMBAT_DEFENDER_SIDE - winningSide] != 0)
+                if (m_heroes[COMBAT_DEFENDER_SIDE - winningSide] != NULL)
                     m_heroes[COMBAT_DEFENDER_SIDE - winningSide]->ApplyBattleLossTemps();
                 gpSoundManager->SwitchAmbientMusic(LOSS_MUSIC);
                 DoLoseWindow();
@@ -2230,10 +2230,10 @@ void combatManager::DoLoseWindow(void) {
     }
 
     m_winLoseWindow = new heroWindow(143, 10, "wincmbt.bin");
-    if (m_winLoseWindow == 0)
+    if (m_winLoseWindow == NULL)
         MemError();
 
-    if (m_heroes[losingSide_h] != 0) {
+    if (m_heroes[losingSide_h] != NULL) {
         if (gbCombatSurrender != 0) {
             sprintf(
                 gText,
@@ -2282,7 +2282,7 @@ void combatManager::DoLoseWindow(void) {
     gpWindowManager->DoDialog(m_winLoseWindow, WinCombatHandler, 0);
     giDialogTimeout = 0;
     delete m_winLoseWindow;
-    m_winLoseWindow = 0;
+    m_winLoseWindow = NULL;
 }
 
 VA(0x0042fbf0, 0x43d)
@@ -2319,7 +2319,7 @@ i32 combatManager::DoSurrender(void) {
     dialogResult = SURRENDER_DIALOG_ACCEPT_RESULT;
     textWidth_t = SURRENDER_TEXT_WIDTH;
     window = new heroWindow(74, 80, "surrendr.bin");
-    if (window == 0)
+    if (window == NULL)
         MemError();
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = COMBAT_WIN_LOSE_RESOURCE_COMMAND;
@@ -2533,7 +2533,7 @@ i32 combatManager::ProcessNextAction(struct tag_message& message) {
         );
         LogStr("Post T");
         if (transmitResult == 0)
-            ShutDown(0);
+            ShutDown(NULL);
     }
 
     currentArmy = &m_armies[m_currentArmySide][m_currentArmyIndex];
@@ -2627,7 +2627,7 @@ Finished:
 // @early-stop: delinker jump-table artifact.
 VA(0x00430b91, 0x237)
 void combatManager::ResetCyclingCreatures(void) {
-    army* currentArmy_p = 0;
+    army* currentArmy_p = NULL;
     i32 cyclingCount = 0;
     i32 side;
     i32 index;
@@ -2711,13 +2711,13 @@ void combatManager::CycleCombatScreen(void) {
     float accumulatedChance;
 
     CheckUpdateCombatMessages();
-    currentArmy = 0;
+    currentArmy = NULL;
     nextHeroAnimation[COMBAT_MANAGER_SIDE_COUNT] = 0;
     gpCombatManager->ResetLimitCreature();
     for (side = 0; side < COMBAT_MANAGER_SIDE_COUNT; ++side) {
-        if (m_heroOverlayIcons[side] == 0) {
+        if (m_heroOverlayIcons[side] == NULL) {
         } else {
-            if (m_heroes[side] != 0)
+            if (m_heroes[side] != NULL)
                 m_heroOverlayFrame[side] = (m_heroOverlayFrame[side] + 1) % 5;
             ++m_drawHeroOverlay[side];
         }
@@ -2747,7 +2747,7 @@ void combatManager::CycleCombatScreen(void) {
 
     for (side = 0; side < COMBAT_MANAGER_SIDE_COUNT; ++side) {
         nextHeroAnimation[side] = -1;
-        if (m_heroIcons[side] == 0) {
+        if (m_heroIcons[side] == NULL) {
         } else {
             if (m_heroAnimationState[side] == HERO_ANIMATION_DEATH_FIRST
                 || m_heroAnimationState[side] == HERO_ANIMATION_DEATH_SECOND
@@ -2807,9 +2807,9 @@ void combatManager::CycleCombatScreen(void) {
             }
         }
     }
-    if (m_heroIcons[COMBAT_ATTACKER_SIDE] != 0)
+    if (m_heroIcons[COMBAT_ATTACKER_SIDE] != NULL)
         m_drawHero[COMBAT_ATTACKER_SIDE] = 1;
-    if (m_heroIcons[COMBAT_DEFENDER_SIDE] != 0)
+    if (m_heroIcons[COMBAT_DEFENDER_SIDE] != NULL)
         m_drawHero[COMBAT_DEFENDER_SIDE] = 1;
 
     if (nextHeroAnimation[COMBAT_MANAGER_SIDE_COUNT] != 0 || m_drawHero[COMBAT_ATTACKER_SIDE] != 0
@@ -2983,8 +2983,8 @@ void combatManager::AddArmy(
             giMaxExtentX - giMinExtentX + 1,
             giMaxExtentY - giMinExtentY + 1,
             COMMAND_FRAME_DELAY,
-            0,
-            0
+            NULL,
+            NULL
         );
     }
 }

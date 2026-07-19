@@ -41,7 +41,7 @@ H2_ENUM_END(IconDrawExtentConstant)
 
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\ICON.CPP"
 VA(0x004c7a20, 0x67)
-icon::icon(u32l id) : resource(RESOURCE_CATEGORY_ICON, id, 1, 0) {
+icon::icon(u32l id) : resource(RESOURCE_CATEGORY_ICON, id, 1, NULL) {
     DATA(0x0051e94c) static char allocationSourceFile[] = RETAIL_FILE;
     gpResourceManager->PointToFile(id);
     m_frameCount = gpResourceManager->ReadWord();
@@ -133,7 +133,7 @@ i32 icon::CombatClipDrawToBuffer(
             || limits->top > giMaxExtentY || limits->bottom < giMinExtentY))
         return IDX(DRAW_SKIPPED);
 
-    if (yModify != 0) {
+    if (yModify != NULL) {
         if (flip == IDX(DRAW_NORMAL))
             IconToBitmapYModify(
                 this,
@@ -164,7 +164,7 @@ i32 icon::CombatClipDrawToBuffer(
                 offset,
                 yModify
             );
-    } else if (colorTable != 0) {
+    } else if (colorTable != NULL) {
         if (flip == IDX(DRAW_NORMAL))
             IconToBitmapColorTable(
                 this,
@@ -302,7 +302,7 @@ void icon::FillToBuffer(i32 x, i32 y, i32 frame, i32 color, i32 flip, struct SLi
         );
         return;
     }
-    if (gbLimitToExtent != 0 && limits != 0) {
+    if (gbLimitToExtent != 0 && limits != NULL) {
         limits->left = Entries()[frame].x + x;
         limits->right = Entries()[frame].w + limits->left - 1;
         limits->top = Entries()[frame].y + y;

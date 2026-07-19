@@ -37,7 +37,7 @@ H2_ENUM_CLASS_END(WindowWidgetRecordType)
 VA(0x004ceb70, 0xaa)
 heroWindow::heroWindow(void) {
     strcpy(name, "Default Construct");
-    m_prevWindow = 0;
+    m_prevWindow = NULL;
     m_nextWindow = m_prevWindow;
     m_zOrder = -1;
     m_posY = 0;
@@ -46,15 +46,15 @@ heroWindow::heroWindow(void) {
     m_winHeight = 480;
     m_winFlags = 1;
     m_winState = 0;
-    m_widgetListHead = 0;
+    m_widgetListHead = NULL;
     m_widgetListTail = m_widgetListHead;
-    m_savedBackground = 0;
+    m_savedBackground = NULL;
 }
 
 VA(0x004cec20, 0xa5)
 heroWindow::heroWindow(i32 x, i32 y, i32 w, i32 h, i32 flags) {
     strcpy(name, "Dynamic Construct");
-    m_prevWindow = 0;
+    m_prevWindow = NULL;
     m_nextWindow = m_prevWindow;
     m_zOrder = -1;
     m_posX = x;
@@ -63,9 +63,9 @@ heroWindow::heroWindow(i32 x, i32 y, i32 w, i32 h, i32 flags) {
     m_winHeight = h;
     m_winFlags = flags;
     m_winState = 0;
-    m_widgetListHead = 0;
+    m_widgetListHead = NULL;
     m_widgetListTail = m_widgetListHead;
-    m_savedBackground = 0;
+    m_savedBackground = NULL;
 }
 
 VA(0x004cecd0, 0x521)
@@ -85,8 +85,8 @@ heroWindow::heroWindow(i32 x, i32 y, char* resourceName) {
     strcpy(name, resourceName);
     jb = gpResourceManager->MakeId(resourceName, 1);
     gpResourceManager->PointToFile(jb);
-    m_savedBackground = 0;
-    m_prevWindow = 0;
+    m_savedBackground = NULL;
+    m_prevWindow = NULL;
     m_nextWindow = m_prevWindow;
     m_winState = 0;
     m_zOrder = -1;
@@ -96,13 +96,13 @@ heroWindow::heroWindow(i32 x, i32 y, char* resourceName) {
     m_winHeight = gpResourceManager->ReadWord();
     m_winFlags = gpResourceManager->ReadWord();
     m_winFlags |= WIDGET_FLAG_UPDATE;
-    m_widgetListHead = 0;
+    m_widgetListHead = NULL;
     m_widgetListTail = m_widgetListHead;
     idx = 0;
     while (idx == 0) {
         PollSound();
         type = gpResourceManager->ReadWord();
-        pwdg = 0;
+        pwdg = NULL;
         switch (type) {
             case IDX(WIDGET_RECORD_END):
                 idx++;
@@ -168,7 +168,7 @@ heroWindow::heroWindow(i32 x, i32 y, char* resourceName) {
                 pwdg = plist;
                 break;
         }
-        if (idx == 0 && pwdg != 0)
+        if (idx == 0 && pwdg != NULL)
             AddWidget(pwdg, -1);
     }
 }
@@ -189,7 +189,7 @@ VA(0x004cf280, 0x90)
 void heroWindow::RemoveAndDeleteWidget(i32 id) {
     widget *w, *next;
     w = m_widgetListHead;
-    while (w != 0) {
+    while (w != NULL) {
         next = w->m_next;
         if (w->m_id == id) {
             RemoveWidget(w);
@@ -206,7 +206,7 @@ void heroWindow::Close(void) {
     if ((m_winFlags & 2) != 0 && (m_winState & 1) != 0)
         RestoreBackground();
     w = m_widgetListHead;
-    while (w != 0) {
+    while (w != NULL) {
         next = w->m_next;
         RemoveWidget(w);
         if ((m_winFlags & IDX(WINDOW_FLAG_OWNS_WIDGETS)) != 0) {
@@ -221,25 +221,25 @@ VA(0x004cf3c0, 0x13c)
 void heroWindow::AddWidget(class widget* newWidget, i32 zOrder) {
     widget* local_8 = m_widgetListHead;
     if (zOrder == -1) {
-        if (local_8 == 0)
+        if (local_8 == NULL)
             zOrder = 0;
         else
             zOrder = local_8->m_zOrder + 1;
     }
     if (newWidget->Open(zOrder, this) != 0)
         return;
-    while (local_8 != 0 && zOrder < local_8->m_zOrder) {
+    while (local_8 != NULL && zOrder < local_8->m_zOrder) {
         local_8 = local_8->m_next;
     }
-    if (local_8 == 0) {
+    if (local_8 == NULL) {
         newWidget->m_prev = m_widgetListTail;
-        newWidget->m_next = 0;
+        newWidget->m_next = NULL;
         m_widgetListTail = newWidget;
-        if (m_widgetListHead == 0)
+        if (m_widgetListHead == NULL)
             m_widgetListHead = newWidget;
-    } else if (local_8->m_prev == 0) {
+    } else if (local_8->m_prev == NULL) {
         newWidget->m_next = m_widgetListHead;
-        newWidget->m_prev = 0;
+        newWidget->m_prev = NULL;
         m_widgetListHead->m_prev = newWidget;
         m_widgetListHead = newWidget;
     } else {
@@ -252,29 +252,29 @@ void heroWindow::AddWidget(class widget* newWidget, i32 zOrder) {
 
 VA(0x004cf500, 0x116)
 void heroWindow::RemoveWidget(class widget* w) {
-    if (w == 0)
+    if (w == NULL)
         return;
     w->Close();
     if (m_widgetListTail == w) {
         m_widgetListTail = w->m_prev;
-        if (m_widgetListTail == 0)
-            m_widgetListHead = 0;
+        if (m_widgetListTail == NULL)
+            m_widgetListHead = NULL;
         else
-            m_widgetListTail->m_next = 0;
+            m_widgetListTail->m_next = NULL;
     } else if (m_widgetListHead == w) {
         m_widgetListHead = w->m_next;
-        m_widgetListHead->m_prev = 0;
+        m_widgetListHead->m_prev = NULL;
     } else {
         w->m_next->m_prev = w->m_prev;
         w->m_prev->m_next = w->m_next;
     }
     widget* nextWidget = w->m_next;
-    if (nextWidget == 0) {
-        m_widgetListHead = 0;
+    if (nextWidget == NULL) {
+        m_widgetListHead = NULL;
         m_widgetListTail = m_widgetListHead;
     } else {
         nextWidget->m_prev = w->m_prev;
-        if (nextWidget->m_prev != 0)
+        if (nextWidget->m_prev != NULL)
             nextWidget->m_prev->m_next = nextWidget;
     }
 }
@@ -283,7 +283,7 @@ VA(0x004cf620, 0x95)
 i32 heroWindow::BroadcastMessage(struct tag_message& message) {
     i32 local_8 = 0;
     widget* local_c = m_widgetListHead;
-    while (local_c != 0) {
+    while (local_c != NULL) {
         switch (local_8 = local_c->Main(message)) {
             case 0:
                 break;
@@ -314,7 +314,7 @@ void heroWindow::DrawWindow(i32 update, i32 firstId, i32 lastId) {
     local_8 = m_widgetListTail;
     local_24.type = MESSAGE_WIDGET;
     local_24.payload.widget.command = WIDGET_COMMAND_DRAW;
-    while (local_8 != 0) {
+    while (local_8 != NULL) {
         PollSound();
         if (firstId != IDX(WINDOW_ALL_WIDGETS_LOW) || lastId != IDX(WINDOW_ALL_WIDGETS_HIGH)) {
             if (firstId <= local_8->m_id && local_8->m_id <= lastId)
@@ -347,7 +347,7 @@ void heroWindow::RestoreBackground(void) {
         gpWindowManager->UpdateScreenRegion(m_posX, m_posY, m_winWidth, m_winHeight);
     }
     delete m_savedBackground;
-    m_savedBackground = 0;
+    m_savedBackground = NULL;
 }
 
 VA(0x004cf950, 0x186)

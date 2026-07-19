@@ -21,12 +21,12 @@ DATA(0x004f5188) struct sCDTest_Track_Data cdTestTrackData[43] = {
     {3927147, 3933148}, {3933147, 4011108}, {4011107, 4087106}
 };
 
-DATA(0x004f52e0) static HREDBOOK cdTestRedbook = 0;
+DATA(0x004f52e0) static HREDBOOK cdTestRedbook = NULL;
 
 VA(0x00449f80, 0x3b)
 i32 CDTest_Init(void) {
     cdTestRedbook = AIL_redbook_open(0);
-    if (cdTestRedbook != 0)
+    if (cdTestRedbook != NULL)
         return 1;
     else
         return 0;
@@ -34,9 +34,9 @@ i32 CDTest_Init(void) {
 
 VA(0x00449fbb, 0x33)
 void CDTest_Cleanup(void) {
-    if (cdTestRedbook != 0)
+    if (cdTestRedbook != NULL)
         AIL_redbook_close(cdTestRedbook);
-    cdTestRedbook = 0;
+    cdTestRedbook = NULL;
 }
 
 VA(0x00449fee, 0x26)
@@ -58,7 +58,7 @@ i32 CDTest_VerifyTrack(i32 track) {
     U32 first;
     U32 end;
 
-    if (cdTestRedbook == 0)
+    if (cdTestRedbook == NULL)
         return 0;
     if (track < 1 || track > 43)
         return 0;
@@ -78,7 +78,7 @@ i32 CDTest_GenerateTable(char* file) {
     i32 trackNumber;
     U32 finish;
 
-    if (cdTestRedbook == 0)
+    if (cdTestRedbook == NULL)
         return 0;
 
     count = AIL_redbook_tracks(cdTestRedbook);

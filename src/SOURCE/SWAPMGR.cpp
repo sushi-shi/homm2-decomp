@@ -93,15 +93,15 @@ H2_ENUM_END(SwapManagerConstant)
 
 VA(0x004543c0, 0x84)
 swapManager::swapManager(void) {
-    m_window = 0;
-    m_selectorIcon = 0;
+    m_window = NULL;
+    m_selectorIcon = NULL;
     m_selectedSide = SWAP_SIDE_NONE;
     m_targetSide = SWAP_SIDE_NONE;
     m_itemType = SWAP_ITEM_NONE;
     m_selectedSlot = SLOT_NONE;
     m_targetSlot = SLOT_NONE;
-    m_heroes[IDX(SWAP_SIDE_LEFT)] = 0;
-    m_heroes[IDX(SWAP_SIDE_RIGHT)] = 0;
+    m_heroes[IDX(SWAP_SIDE_LEFT)] = NULL;
+    m_heroes[IDX(SWAP_SIDE_RIGHT)] = NULL;
 }
 
 VA(0x00454444, 0x3e)
@@ -128,7 +128,7 @@ VA(0x00454502, 0x3bc)
 i32 swapManager::Open(i32 id) {
     Reset();
     m_window = new heroWindow(0, 0, "swapwin.bin");
-    if (m_window == 0)
+    if (m_window == NULL)
         MemError();
 
     SetWinText(m_window, WINDOW_TEXT_ID);
@@ -301,7 +301,7 @@ void swapManager::DrawSelector(void) {
             m_itemType == SWAP_ITEM_ARMY ? ARMY_SELECTOR_FRAME : ARTIFACT_SELECTOR_FRAME,
             selectorFrame_17,
             0,
-            0
+            NULL
         );
         gpWindowManager->UpdateScreenRegion(
             selectorX_2,
@@ -410,7 +410,7 @@ i32 swapManager::Main(tag_message& message) {
                             Update();
                             DrawSwapWin();
                             Reset();
-                            gpWindowManager->FadeScreen(0, FADE_STEPS, 0);
+                            gpWindowManager->FadeScreen(0, FADE_STEPS, NULL);
                             break;
 
                         case CONTROL_RIGHT_HERO:
@@ -421,7 +421,7 @@ i32 swapManager::Main(tag_message& message) {
                             Update();
                             DrawSwapWin();
                             Reset();
-                            gpWindowManager->FadeScreen(0, FADE_STEPS, 0);
+                            gpWindowManager->FadeScreen(0, FADE_STEPS, NULL);
                             break;
 
                         case CONTROL_LEFT_ARTIFACT_FIRST:
@@ -592,12 +592,12 @@ i32 swapManager::Main(tag_message& message) {
                                         m_heroes[IDX(SWAP_SIDE_LEFT)]->m_army.m_creatureCounts
                                             [message.payload.widget.id
                                              - CONTROL_LEFT_ARMY_FIRST],
-                                        0,
+                                        NULL,
                                         0,
                                         1,
                                         1,
                                         m_heroes[IDX(SWAP_SIDE_LEFT)],
-                                        0,
+                                        NULL,
                                         &m_heroes[IDX(SWAP_SIDE_LEFT)]->m_army,
                                         message.payload.widget.id - CONTROL_LEFT_ARMY_FIRST
                                     );
@@ -661,12 +661,12 @@ i32 swapManager::Main(tag_message& message) {
                                         m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_army.m_creatureCounts
                                             [message.payload.widget.id
                                              - CONTROL_RIGHT_ARMY_FIRST],
-                                        0,
+                                        NULL,
                                         0,
                                         1,
                                         1,
                                         m_heroes[IDX(SWAP_SIDE_RIGHT)],
-                                        0,
+                                        NULL,
                                         &m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_army,
                                         message.payload.widget.id - CONTROL_RIGHT_ARMY_FIRST
                                     );
@@ -747,12 +747,12 @@ void swapManager::ViewMon(void) {
         ARMY_VIEW_Y,
         m_heroes[IDX(m_selectedSide)]->m_army.m_creatureTypes[m_targetSlot],
         m_heroes[IDX(m_selectedSide)]->m_army.m_creatureCounts[m_targetSlot],
-        0,
+        NULL,
         m_heroes[IDX(m_selectedSide)]->m_army.GetNumArmies() == 1,
         1,
         0,
         m_heroes[IDX(m_selectedSide)],
-        0,
+        NULL,
         &m_heroes[IDX(m_selectedSide)]->m_army,
         m_targetSlot
     );
@@ -953,7 +953,7 @@ void swapManager::SplitMons(void) {
 
     gpTownManager->m_heroWindow1 =
         new heroWindow(SPLIT_WINDOW_X, SPLIT_WINDOW_Y, "splitwin.bin");
-    if (gpTownManager->m_heroWindow1 == 0)
+    if (gpTownManager->m_heroWindow1 == NULL)
         MemError();
     gpTownManager->m_splitAmount = 0;
     gpTownManager->m_splitMaximum = selectedArmy->m_creatureCounts[m_selectedSlot];

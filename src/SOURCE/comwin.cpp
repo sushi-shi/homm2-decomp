@@ -36,9 +36,9 @@ DATA(0x005284b8) static ComPortState s_comPorts[PORT_COUNT];
 
 VA(0x0048a640, 0x74)
 void add_node(struct tag_Anchor* anchor, struct tag_Node* node) {
-    node->next = 0;
+    node->next = NULL;
     node->prev = node->next;
-    if (anchor->tail != 0) {
+    if (anchor->tail != NULL) {
         anchor->tail->next = node;
         node->prev = anchor->tail;
         anchor->tail = node;
@@ -51,17 +51,17 @@ void add_node(struct tag_Anchor* anchor, struct tag_Node* node) {
 VA(0x0048a6b4, 0x4c)
 struct tag_Node* pop_node(struct tag_Anchor* anchor) {
     tag_Node* node = anchor->head;
-    if (node != 0)
+    if (node != NULL)
         anchor->head = node->next;
-    if (anchor->head == 0)
-        anchor->tail = 0;
+    if (anchor->head == NULL)
+        anchor->tail = NULL;
     return node;
 }
 
 VA(0x0048a700, 0x2e)
 void init_anchor(struct tag_Anchor* anchor, i32, i32) {
-    anchor->head = 0;
-    anchor->tail = 0;
+    anchor->head = NULL;
+    anchor->tail = NULL;
 }
 
 // @semantic: first residual is the embedded 0x4c-byte jump table at RVA 0x8a968.
@@ -160,7 +160,7 @@ i16 com_init(u8 portNumber, i32 baudRate, i32 useDtr) {
 
     wsprintfA(portName, "COM%d", portNumber);
     s_comPorts[portIndex].handle =
-        CreateFileA(portName, GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, 0, 0);
+        CreateFileA(portName, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
     if (s_comPorts[portIndex].handle == INVALID_HANDLE_VALUE) {
         sprintf(gText, "Opening COM%d", portNumber);
         ShutdownComError(gText);
@@ -240,9 +240,9 @@ void com_term(i16 portIndex) {
         CloseHandle(s_comPorts[portIndex].handle);
         s_comPorts[portIndex].handle = INVALID_HANDLE_VALUE;
 
-        while ((node = pop_node(&s_comPorts[portIndex].normalQueue)) != 0)
+        while ((node = pop_node(&s_comPorts[portIndex].normalQueue)) != NULL)
             H2_FREE(node, 212);
-        while ((node = pop_node(&s_comPorts[portIndex].priorityQueue)) != 0)
+        while ((node = pop_node(&s_comPorts[portIndex].priorityQueue)) != NULL)
             H2_FREE(node, 216);
     }
 }
@@ -269,7 +269,7 @@ i16 com_rcv(i16 portIndex, u16 requested, void* buffer) {
                 buffer,
                 count,
                 reinterpret_cast<LPDWORD>(bytesRead),
-                0
+                NULL
             );
             if (result == 0)
                 ShutdownComError("Read communications data");
@@ -296,7 +296,7 @@ i16 com_snd(i16 portIndex, u16, u16 length, void* data, i32 priority) {
             return 0;
         }
         sendNode = static_cast<tag_Node*>(H2_ALLOC(length + NODE_HEADER_SIZE, 263));
-        if (sendNode != 0) {
+        if (sendNode != NULL) {
             sendNode->len = length;
             memcpy(sendNode->comData, data, length);
             if (priority != 0)
@@ -337,9 +337,9 @@ void comm_wrt_task(void) {
 
     while (comPort->handle != INVALID_HANDLE_VALUE) {
         packetNode = pop_node(&comPort->priorityQueue);
-        if (packetNode == 0)
+        if (packetNode == NULL)
             packetNode = pop_node(&comPort->normalQueue);
-        if (packetNode == 0)
+        if (packetNode == NULL)
             break;
         writtenTotal = 0;
         while (comPort->handle != INVALID_HANDLE_VALUE && writtenTotal < packetNode->len) {
@@ -348,7 +348,7 @@ void comm_wrt_task(void) {
                 packetNode->comData + writtenTotal,
                 packetNode->len - writtenTotal,
                 &bytesWritten,
-                0
+                NULL
             );
             if (callResult == 0)
                 ShutdownComError("Write communications data");

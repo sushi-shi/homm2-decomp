@@ -46,32 +46,32 @@ DATA(0x0051736c) static SFindPathSourceLocation gSearchDestructionSource = {
 // @early-stop: retail alignment artifact.
 VA(0x004a4a50, 0x10)
 searchArray::searchArray(void) {
-    m_storage.cells = 0;
+    m_storage.cells = NULL;
     m_maxQueueCount = 0;
 }
 
 // @early-stop: retail alignment artifact.
 VA(0x004a4a60, 0x30)
 searchArray::~searchArray() {
-    if (m_storage.cells != 0)
+    if (m_storage.cells != NULL)
         H2_FREE_AT(
             m_storage.cells,
             gSearchDestructionSource.sourceFile,
             gSearchDestructionSource.line.value + 1
         );
-    m_storage.cells = 0;
+    m_storage.cells = NULL;
 }
 
 // @early-stop: retail alignment artifact.
 VA(0x004a4a90, 0x60)
 void searchArray::Init(void) {
-    if (m_storage.cells != 0)
+    if (m_storage.cells != NULL)
         H2_FREE_AT(
             m_storage.cells,
             gSearchDestructionSource.sourceFile,
             gSearchDestructionSource.line.value + 1
         );
-    m_storage.cells = 0;
+    m_storage.cells = NULL;
     m_storage.cells = static_cast<searchCell*>(H2_ALLOC_AT(
         MAP_WIDTH * MAP_HEIGHT * sizeof(searchCell),
         gSearchAllocationSource.sourceFile,
@@ -82,13 +82,13 @@ void searchArray::Init(void) {
 // @early-stop: retail alignment artifact.
 VA(0x004a4af0, 0x30)
 void searchArray::Close(void) {
-    if (m_storage.cells != 0)
+    if (m_storage.cells != NULL)
         H2_FREE_AT(
             m_storage.cells,
             gSearchDestructionSource.sourceFile,
             gSearchDestructionSource.line.value + 1
         );
-    m_storage.cells = 0;
+    m_storage.cells = NULL;
 }
 
 // @early-stop: retail alignment artifact.
@@ -336,7 +336,7 @@ void searchArray::SeedCombatPosition(class army* unit) {
 
     if (HAS(unit->m_monster.attributes, MONSTER_ATTRIBUTE_FLYING) != 0) {
         for (hex = 0; hex < COMBAT_HEX_COUNT; hex++) {
-            if (unit->CanFit(hex, 0, 0))
+            if (unit->CanFit(hex, 0, NULL))
                 gpCombatManager->m_hexCells[hex].m_pathReachable = 1;
         }
     } else {
@@ -420,7 +420,7 @@ i32 searchArray::FindCombatPath(
     m_pathLength = 0;
 
     i8* path;
-    if (ValidHex(sourceHex) && ValidHex(targetHex) && unit != 0) {
+    if (ValidHex(sourceHex) && ValidHex(targetHex) && unit != NULL) {
         path = m_storage.aiPath.directions;
         u32 attackMask;
         i32 attackDirection;

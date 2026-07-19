@@ -46,11 +46,11 @@ i32 combatManager::DoSpellAI(i32 side, i32 restricted) {
     bestSpellChoice = -1;
     bestHexWork = -1;
 
-    if (m_heroes[side] == 0)
+    if (m_heroes[side] == NULL)
         return 0;
 
     for (spellIndex = 0; spellIndex < COMBAT_SIDE_COUNT; spellIndex++) {
-        if (m_heroes[spellIndex] != 0
+        if (m_heroes[spellIndex] != NULL
             && m_heroes[spellIndex]->HasArtifact(ARTIFACT_SPHERE_NEGATION))
             return 0;
     }
@@ -119,7 +119,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
     durationMod = COMBAT_SPELL_AI_FULL_EFFECT_IMMEDIATE;
     fullQuantityFlag = 1;
     totalEffect = 0;
-    targetCreature = 0;
+    targetCreature = NULL;
     *bestEffect = 0;
 
     switch (spell) {
@@ -212,7 +212,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
         effect = 0;
 
         if (m_hexCells[hexIndex].m_occupantIndex < 0 || m_hexCells[hexIndex].m_occupantSide < 0) {
-            targetCreature = 0;
+            targetCreature = NULL;
         } else {
             targetCreature = &m_armies[m_hexCells[hexIndex].m_occupantSide]
                                       [m_hexCells[hexIndex].m_occupantIndex];
@@ -515,7 +515,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
             case SPELL_ANTI_MAGIC:
                 if (targetCreature->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_ANTI_MAGIC)]) {
                 } else {
-                    if (spell == SPELL_ANTI_MAGIC && m_heroes[1 - m_currentSide] == 0) {
+                    if (spell == SPELL_ANTI_MAGIC && m_heroes[1 - m_currentSide] == NULL) {
                         effect = 0;
                     } else {
                         effect = static_cast<i32>(
@@ -549,7 +549,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
                                 )
                                 * durationMod
                             );
-                            if (m_combatTowns[COMBAT_DEFENDER_SIDE] != 0
+                            if (m_combatTowns[COMBAT_DEFENDER_SIDE] != NULL
                                 && targetCreature->m_side == COMBAT_ATTACKER_SIDE
                                 && HAS(targetCreature->m_monster.flags.all, MONSTER_FLAGS_SHOOTER))
                                 effect = static_cast<i32>(
@@ -577,7 +577,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
                                 )
                                 * durationMod
                             );
-                            if (m_combatTowns[COMBAT_DEFENDER_SIDE] != 0
+                            if (m_combatTowns[COMBAT_DEFENDER_SIDE] != NULL
                                 && targetCreature->m_side == COMBAT_ATTACKER_SIDE
                                 && HAS(targetCreature->m_monster.flags.all, MONSTER_FLAGS_SHOOTER))
                                 effect = static_cast<i32>(
@@ -622,7 +622,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
                             )
                             * durationMod
                         );
-                        if (m_combatTowns[COMBAT_DEFENDER_SIDE] != 0
+                        if (m_combatTowns[COMBAT_DEFENDER_SIDE] != NULL
                             && targetCreature->m_side == COMBAT_ATTACKER_SIDE
                             && HAS(targetCreature->m_monster.flags.all, MONSTER_FLAGS_SHOOTER))
                             effect <<= 1;
@@ -767,7 +767,7 @@ i32 combatManager::EffectSpellCreateCreature(i32 hex, SpellType spell) {
 
     if ((spell == SPELL_SUMMON_EARTH_ELEMENTAL || spell == SPELL_SUMMON_AIR_ELEMENTAL
          || spell == SPELL_SUMMON_FIRE_ELEMENTAL || spell == SPELL_SUMMON_WATER_ELEMENTAL)
-        && m_heroes[m_currentSide] != 0
+        && m_heroes[m_currentSide] != NULL
         && m_heroes[m_currentSide]->HasArtifact(ARTIFACT_BOOK_ELEMENTS))
         spellPowerValue <<= 1;
 
@@ -822,7 +822,7 @@ i32 combatManager::EffectSpellCreateCreature(i32 hex, SpellType spell) {
 VA(0x00487eda, 0x72d)
 i32 combatManager::RawEffectSpellInfluence(army* target, i32 influence) {
     i32 effect = 0;
-    army* otherArmy = 0;
+    army* otherArmy = NULL;
     float workChance = target->SpellCastWorkChance(SpellType(giSpellInfluenceToSpell[influence]));
     if (workChance <= COMBAT_SPELL_AI_ZERO_EFFECT)
         return 0;
@@ -1134,7 +1134,7 @@ void combatManager::EffectSpellResurrect(i32* effect, i32 hex, SpellType spell) 
     i32 armyIndexWork;
 
     resurrectPowerWork = m_spellPower[m_currentSide] * COMBAT_SPELL_AI_RESURRECT_POINTS_PER_POWER;
-    if (m_heroes[m_currentSide] != 0 && m_heroes[m_currentSide]->HasArtifact(ARTIFACT_ANKH))
+    if (m_heroes[m_currentSide] != NULL && m_heroes[m_currentSide]->HasArtifact(ARTIFACT_ANKH))
         resurrectPowerWork <<= 1;
 
     armyIndexWork = FindResurrectArmyIndex(m_currentSide, IDX(spell), hex);

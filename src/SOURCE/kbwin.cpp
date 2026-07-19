@@ -18,11 +18,11 @@ WinMain(HINSTANCE instance, HINSTANCE previousInstance, char* commandLine, i32 s
     MSG message;
 
     hInstApp = instance;
-    gEventHandle = CreateEventA(0, 0, 0, "Heroes II");
+    gEventHandle = CreateEventA(NULL, 0, 0, "Heroes II");
     lastError = GetLastError();
-    if (gEventHandle == 0 || lastError == ERROR_ALREADY_EXISTS) {
+    if (gEventHandle == NULL || lastError == ERROR_ALREADY_EXISTS) {
         sprintf(gText, "Only one copy of %s may run at a time", "Heroes of Might and Magic II");
-        MessageBoxA(0, gText, "Startup Error", MB_ICONHAND);
+        MessageBoxA(NULL, gText, "Startup Error", MB_ICONHAND);
         return 0;
     }
 
@@ -34,7 +34,7 @@ WinMain(HINSTANCE instance, HINSTANCE previousInstance, char* commandLine, i32 s
         return 0;
 
     for (;;) {
-        if (PeekMessageA(&message, 0, 0, 0, PM_REMOVE) != 0) {
+        if (PeekMessageA(&message, NULL, 0, 0, PM_REMOVE) != 0) {
             if (message.message == WM_QUIT)
                 break;
             TranslateMessage(&message);
@@ -44,7 +44,7 @@ WinMain(HINSTANCE instance, HINSTANCE previousInstance, char* commandLine, i32 s
                 WaitMessage();
         }
     }
-    ShutDown(0);
+    ShutDown(NULL);
     return message.wParam;
 }
 
@@ -80,10 +80,10 @@ i32 AppInit(HINSTANCE instance, HINSTANCE previousInstance, i32 showCommand, cha
     bProcessMessage[WM_CLOSE] = 1;
     bProcessMessage[KBWIN_CUSTOM_CD_MESSAGE] = 1;
 
-    if (previousInstance == 0) {
-        appClass.hCursor = 0;
+    if (previousInstance == NULL) {
+        appClass.hCursor = NULL;
         appClass.hIcon = LoadIconA(instance, "Heroes II");
-        appClass.lpszMenuName = 0;
+        appClass.lpszMenuName = NULL;
         appClass.lpszClassName = szAppName;
         appClass.hbrBackground = reinterpret_cast<HBRUSH>(COLOR_WINDOW + 1);
         appClass.hInstance = instance;
@@ -106,7 +106,7 @@ i32 AppInit(HINSTANCE instance, HINSTANCE previousInstance, i32 showCommand, cha
     if (gConfig.gfx[giCurExe].showMenu != 0)
         windowMenu = reinterpret_cast<HMENU>(hmnuDflt);
     else
-        windowMenu = 0;
+        windowMenu = NULL;
     hwndApp = CreateWindowExA(
         0,
         szAppName,
@@ -116,12 +116,12 @@ i32 AppInit(HINSTANCE instance, HINSTANCE previousInstance, i32 showCommand, cha
         gConfig.gfx[giCurExe].y,
         windowRect.right - windowRect.left + 1,
         windowRect.bottom - windowRect.top + 1,
-        0,
+        NULL,
         windowMenu,
         instance,
-        0
+        NULL
     );
-    if (hwndApp != 0) {
+    if (hwndApp != NULL) {
         PostMessageA(
             hwndApp,
             WM_SETICON,
@@ -133,7 +133,7 @@ i32 AppInit(HINSTANCE instance, HINSTANCE previousInstance, i32 showCommand, cha
         if (gConfig.gfx[giCurExe].showMenu == 0)
             SetMenuStatus(0);
         InitGraphics();
-        SetCursor(LoadCursorA(0, IDC_ARROW));
+        SetCursor(LoadCursorA(NULL, IDC_ARROW));
         oldmain();
         return 1;
     } else {
@@ -160,7 +160,7 @@ LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPAR
     switch (message) {
         case WM_CREATE:
             srand(KBTickCount());
-            SetTimer(window, KBWIN_TIMER_ID, KBWIN_TIMER_INTERVAL, 0);
+            SetTimer(window, KBWIN_TIMER_ID, KBWIN_TIMER_INTERVAL, NULL);
             GdiSetBatchLimit(1);
             return 0;
         case WM_KEYDOWN:
@@ -197,7 +197,7 @@ LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPAR
         case WM_ERASEBKGND:
             return 1;
         case WM_MOVE:
-            if (hwndApp == 0)
+            if (hwndApp == NULL)
                 return 0;
             lTemp = GetWindowLongA(hwndApp, GWL_STYLE);
             if ((lTemp & (WS_MINIMIZE | WS_MAXIMIZE)) == 0 && gbClosingApp == 0
@@ -209,7 +209,7 @@ LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPAR
             }
             return 0;
         case WM_SIZE:
-            if (hwndApp != 0) {
+            if (hwndApp != NULL) {
                 lTemp = GetWindowLongA(hwndApp, GWL_STYLE);
                 gbMinimized = lTemp & WS_MINIMIZE;
                 if ((lTemp & WS_MINIMIZE) == 0)
@@ -231,7 +231,7 @@ LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPAR
                 iMainWinScreenWidth = 1;
             if (iMainWinScreenHeight < 1)
                 iMainWinScreenHeight = 1;
-            if (hwndApp != 0 && (lTemp & (WS_MINIMIZE | WS_MAXIMIZE)) == 0 && gbClosingApp == 0
+            if (hwndApp != NULL && (lTemp & (WS_MINIMIZE | WS_MAXIMIZE)) == 0 && gbClosingApp == 0
                 && gConfig.gfx[giCurExe].fullScreen == 0) {
                 gConfig.gfx[giCurExe].width = iMainWinScreenWidth;
                 gConfig.gfx[giCurExe].height = iMainWinScreenHeight;
@@ -246,7 +246,7 @@ LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPAR
         case WM_QUERYNEWPALETTE:
             return QueryNewPalette();
         case WM_PAINT:
-            AppPaint(window, 0);
+            AppPaint(window, NULL);
             return 0;
         case WM_CLOSE:
             if (hwndApp == window) {
@@ -272,7 +272,7 @@ LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPAR
             gbClosingApp = true;
             PostQuitMessage(0);
         case WM_QUIT:
-            ShutDown(0);
+            ShutDown(NULL);
             break;
     }
     return DefWindowProcA(window, message, messageParam, messageData);
@@ -310,7 +310,7 @@ void Process1WindowsMessage(void) {
     MSG message;
     i32l currentTick;
 
-    while (PeekMessageA(&message, 0, 0, 0, PM_REMOVE) != 0) {
+    while (PeekMessageA(&message, NULL, 0, 0, PM_REMOVE) != 0) {
         TranslateMessage(&message);
         DispatchMessageA(&message);
     }
@@ -322,7 +322,7 @@ void Process1WindowsMessage(void) {
     }
     if (currentTick - lLastGetMessage > KBWIN_GET_MESSAGE_INTERVAL) {
         lLastGetMessage = currentTick;
-        if (GetMessageA(&message, 0, 0, 0) != 0) {
+        if (GetMessageA(&message, NULL, 0, 0) != 0) {
             TranslateMessage(&message);
             DispatchMessageA(&message);
         }
@@ -424,17 +424,17 @@ void UpdateDfltMenu(HMENU menu) {
 // @semantic: compiler-shape residual.
 VA(0x0041cc35, 0xac)
 void KBChangeMenu(HMENU menu) {
-    if (menu == 0)
+    if (menu == NULL)
         menu = hmnuCurrent;
     hmnuCurrent = menu;
     hmnuApp = menu;
-    if (gConfig.gfx[giCurExe].showMenu && menu != 0) {
+    if (gConfig.gfx[giCurExe].showMenu && menu != NULL) {
         SetMenu(hwndApp, menu);
         UpdateDfltMenu(menu);
         UpdateAppSpecificMenus(menu);
         DrawMenuBar(hwndApp);
     } else {
-        SetMenu(hwndApp, 0);
+        SetMenu(hwndApp, NULL);
         DrawMenuBar(hwndApp);
     }
 }
@@ -452,7 +452,7 @@ void SetMenuStatus(i32 showMenu) {
         width = gConfig.gfx[giCurExe].width;
         height = gConfig.gfx[giCurExe].height;
         gConfig.gfx[giCurExe].showMenu = showMenu;
-        KBChangeMenu(0);
+        KBChangeMenu(NULL);
         gConfig.gfx[giCurExe].width = width;
         gConfig.gfx[giCurExe].height = height;
         WritePrefs();
@@ -532,9 +532,9 @@ void InitVideo(void) {
 
 DATA(0x004ef4c8) char szAppName[16] = "Heroes II";
 DATA(0x004ef4d8) char szTitle[32] = "Heroes of Might and Magic II";
-DATA(0x004ef4f8) HWND hwndApp = 0;
-DATA(0x004ef4fc) HMENU hmnuApp = 0;
-DATA(0x004ef500) HANDLE gEventHandle = 0;
+DATA(0x004ef4f8) HWND hwndApp = NULL;
+DATA(0x004ef4fc) HMENU hmnuApp = NULL;
+DATA(0x004ef500) HANDLE gEventHandle = NULL;
 DATA(0x004ef588) i32l lLastGTimerTickCount = 0;
 DATA(0x004ef58c) i32l lLastCycleColorsTickCount = 0;
 DATA(0x004ef590) i32 bRestartMusic = 0;

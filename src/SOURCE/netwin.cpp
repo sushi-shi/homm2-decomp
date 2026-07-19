@@ -97,7 +97,7 @@ extern "C" u16 __fastcall nb_init(u16 maxNames, u16 maxSessions) {
         init_anchor(&gNbSndQueue, 1, 0);
         init_anchor(&gNbFreeQueue, 1, 0);
         for (i = 0; i < NETBIOS_THREAD_EVENT_COUNT; i++)
-            gNbEvents.handles[i] = CreateEventA(0, 1, 0, 0);
+            gNbEvents.handles[i] = CreateEventA(NULL, 1, 0, NULL);
         memset(&localNcb, 0, sizeof(localNcb));
         statusBuffer = static_cast<u8*>(H2_ALLOC(NETBIOS_ADAPTER_STATUS_SIZE, 145));
         localNcb.command = IDX(NETBIOS_COMMAND_ADAPTER_STATUS);
@@ -143,20 +143,20 @@ extern "C" void __fastcall nb_term(void) {
         Netbios(&localNcb);
     }
     EnterCriticalSection(&gNbSndLock);
-    while ((node = pop_node(&gNbSndQueue)) != 0)
+    while ((node = pop_node(&gNbSndQueue)) != NULL)
         H2_FREE(node, 169 + (200 - 169));
-    while ((node = pop_node(&gNbFreeQueue)) != 0)
+    while ((node = pop_node(&gNbFreeQueue)) != NULL)
         H2_FREE(node, 169 + (204 - 169));
     LeaveCriticalSection(&gNbSndLock);
     DeleteCriticalSection(&gNbSndLock);
     for (i = 0; i < NETBIOS_THREAD_EVENT_COUNT; i++) {
         CloseHandle(gNbEvents.handles[i]);
-        gNbEvents.handles[i] = 0;
+        gNbEvents.handles[i] = NULL;
     }
     gNbShutdown |= 1;
     SetEvent(gNbEvents.handles[0]);
     EnterCriticalSection(&gNbRcvLock);
-    while ((node = pop_node(&gNbRcvQueue)) != 0)
+    while ((node = pop_node(&gNbRcvQueue)) != NULL)
         H2_FREE(node, 169 + (219 - 169));
     LeaveCriticalSection(&gNbRcvLock);
     DeleteCriticalSection(&gNbRcvLock);
@@ -261,7 +261,7 @@ extern "C" u16 __cdecl nb_sess(i16 operation, ...) {
 
         case IDX(NETBIOS_SESSION_LISTEN_ANY):
             destinationSession = va_arg(argList, i32);
-            nb_snd(gNbMaxSess, 0, 0);
+            nb_snd(gNbMaxSess, 0, NULL);
             returnCode = nb_listen(destinationSession, gNbListenName);
             break;
 
@@ -362,10 +362,10 @@ void nb_thr_ctl(void) {
         while (keepRunning) {
             EnterCriticalSection(&gNbSndLock);
             node = pop_node(&gNbFreeQueue);
-            if (node == 0)
+            if (node == NULL)
                 node = pop_node(&gNbSndQueue);
             LeaveCriticalSection(&gNbSndLock);
-            if (node == 0) {
+            if (node == NULL) {
                 keepRunning = 0;
             } else {
                 memset(&gNbCtlNcb, 0, sizeof(gNbCtlNcb));
@@ -618,7 +618,7 @@ static void __fastcall nb_recv_complete(i32 session) {
                     node = static_cast<tag_Node*>(
                         H2_ALLOC(gNbSessNcb[session].length + NETBIOS_PACKET_HEADER_SIZE, 796)
                     );
-                    if (node != 0) {
+                    if (node != NULL) {
                         node->len = gNbSessNcb[session].length;
                         node->sessionIndex = static_cast<u8>(session);
                         memcpy(node->data, gNbRcvData[session].bytes, node->len);

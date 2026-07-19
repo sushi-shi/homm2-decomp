@@ -404,8 +404,8 @@ townObject::townObject(i32 townType, i32 buildingId, char* iconBaseName) {
     i32 buildingId_h;
 
     m_animationFrame = 0;
-    m_icon = 0;
-    m_border = 0;
+    m_icon = NULL;
+    m_border = NULL;
     m_visible = 1;
     m_animationFrameCount = sBuildingInfo[townType][buildingId].animationFrameCount;
     x = sBuildingInfo[townType][buildingId].x;
@@ -425,16 +425,16 @@ townObject::townObject(i32 townType, i32 buildingId, char* iconBaseName) {
             static_cast<i16>(buildingId_h),
             TOWN_OBJECT_BORDER_Z_ORDER,
             0,
-            0
+            NULL
         );
-        if (m_border == 0)
+        if (m_border == NULL)
             MemError();
     }
 }
 
 VA(0x00413a6a, 0x60)
 townObject::~townObject() {
-    if (m_border != 0)
+    if (m_border != NULL)
         delete m_border;
     gpResourceManager->Dispose(m_icon);
 }
@@ -533,8 +533,8 @@ void townObject::Draw(i32 advanceAnimation) {
 
 VA(0x00413f01, 0x68)
 townManager::townManager(void) {
-    m_town = 0;
-    m_heroWindow0 = 0;
+    m_town = NULL;
+    m_heroWindow0 = NULL;
     m_unknownC6 = 0;
     m_selectedBuilding = TOWN_SELECTED_BUILDING_NONE;
     m_castleDialogActive = 0;
@@ -577,7 +577,7 @@ i32 townManager::Open(i32 id) {
         gpSoundManager->SwitchAmbientMusic(townTheme[m_town->m_type]);
     PollSound();
     m_townWindow = new heroWindow(0, 0, "townwind.bin");
-    if (m_townWindow == 0)
+    if (m_townWindow == NULL)
         MemError();
     glTimers[0] = KBTickCount() + TOWN_REDRAW_INTERVAL;
     m_lastTownType = TOWN_LAST_TYPE_UNINITIALIZED;
@@ -587,13 +587,13 @@ i32 townManager::Open(i32 id) {
     m_lastHoverSubId = 0;
     m_townObjectCount = 0;
     m_unknownC6 = 0;
-    m_garrisonStrip = 0;
-    m_heroStrip = 0;
-    m_selectedStrip = 0;
-    m_swapStrip = 0;
-    m_pendingStrip = 0;
-    m_bankBox = 0;
-    m_backgroundIcon = 0;
+    m_garrisonStrip = NULL;
+    m_heroStrip = NULL;
+    m_selectedStrip = NULL;
+    m_swapStrip = NULL;
+    m_pendingStrip = NULL;
+    m_bankBox = NULL;
+    m_backgroundIcon = NULL;
     SetupExtraStuff();
     SetupTown();
     KBChangeMenu(hmnuTown);
@@ -602,7 +602,7 @@ i32 townManager::Open(i32 id) {
     m_priority = BaseManagerPriority(id);
     m_active = true;
     strcpy(m_name, "townManager");
-    gpWindowManager->FadeScreen(0, TOWN_FADE_STEPS, 0);
+    gpWindowManager->FadeScreen(0, TOWN_FADE_STEPS, NULL);
     return 0;
 }
 
@@ -659,7 +659,7 @@ void townManager::SetupTown(void) {
         if (m_lastTownType != TOWN_LAST_TYPE_NONE)
             UnloadTown();
         m_bankBox = new bankBox(TOWN_BANK_BOX_X, TOWN_GARRISON_STRIP_Y, gpCurPlayer);
-        if (m_bankBox == 0)
+        if (m_bankBox == NULL)
             MemError();
         sprintf(gText, "townbkg%d.icn", m_town->m_type);
         m_backgroundIcon = gpResourceManager->GetIcon(gText);
@@ -669,9 +669,9 @@ void townManager::SetupTown(void) {
             if (objectId != TOWN_OBJECT_NONE) {
                 sprintf(gText, "%s%s", gTownPrefixNames[m_town->m_type], gTownObjNames[objectId]);
                 m_townObjects[m_townObjectCount] = new townObject(m_town->m_type, objectId, gText);
-                if (m_townObjects[m_townObjectCount] == 0)
+                if (m_townObjects[m_townObjectCount] == NULL)
                     MemError();
-                if (m_townObjects[m_townObjectCount]->m_border != 0) {
+                if (m_townObjects[m_townObjectCount]->m_border != NULL) {
                     if (!(m_town->m_buildings & (1L << objectId))) {
                         m_townObjects[m_townObjectCount]->m_border->m_flags &=
                             ~TOWN_OBJECT_BORDER_ENABLED;
@@ -691,7 +691,7 @@ void townManager::SetupTown(void) {
         for (objectOrder = 0; objectOrder < TOWN_BUILDING_COUNT; ++objectOrder) {
             i32 existingObjectId = gTownObjectOrder[m_town->m_type][objectOrder];
             if (existingObjectId != TOWN_OBJECT_NONE) {
-                if (m_townObjects[m_townObjectCount]->m_border != 0) {
+                if (m_townObjects[m_townObjectCount]->m_border != NULL) {
                     if (!(m_town->m_buildings & (1L << existingObjectId))) {
                         m_townObjects[m_townObjectCount]->m_border->m_flags &=
                             ~TOWN_OBJECT_BORDER_ENABLED;
@@ -705,12 +705,12 @@ void townManager::SetupTown(void) {
                 ++m_townObjectCount;
             }
         }
-        if (m_heroStrip != 0)
+        if (m_heroStrip != NULL)
             delete m_heroStrip;
-        m_heroStrip = 0;
-        if (m_garrisonStrip != 0)
+        m_heroStrip = NULL;
+        if (m_garrisonStrip != NULL)
             delete m_garrisonStrip;
-        m_garrisonStrip = 0;
+        m_garrisonStrip = NULL;
     }
 
     crestFrame = gpCurPlayer->m_color;
@@ -734,7 +734,7 @@ void townManager::SetupTown(void) {
         0,
         -1
     );
-    if (m_garrisonStrip == 0)
+    if (m_garrisonStrip == NULL)
         MemError();
 
     if (m_town->m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE) {
@@ -750,10 +750,10 @@ void townManager::SetupTown(void) {
             0,
             -1
         );
-        if (m_heroStrip == 0)
+        if (m_heroStrip == NULL)
             MemError();
         if (m_town->m_buildings & IDX(TOWN_BUILDING_MAGE_GUILD))
-            m_town->GiveSpells(0);
+            m_town->GiveSpells(NULL);
     } else if (m_town->m_buildings & IDX(TOWN_BUILDING_CAPTAIN_QUARTERS)) {
         sprintf(gText, "port%04d.icn", m_town->m_type + TOWN_PORTRAIT_FRAME_BASE);
         m_heroStrip = new strip(
@@ -762,12 +762,12 @@ void townManager::SetupTown(void) {
             TOWN_HERO_STRIP_FRAME_COUNT,
             gpResourceManager->MakeId(gText, TOWN_ICON_RESOURCE_TYPE),
             0,
-            0,
+            NULL,
             -1,
             0,
             gpCurPlayer->m_color
         );
-        if (m_heroStrip == 0)
+        if (m_heroStrip == NULL)
             MemError();
     } else {
         m_heroStrip = new strip(
@@ -776,17 +776,17 @@ void townManager::SetupTown(void) {
             TOWN_HERO_STRIP_FRAME_COUNT,
             gpResourceManager->MakeId("strip.icn", TOWN_ICON_RESOURCE_TYPE),
             TOWN_HERO_STRIP_FRAME_COUNT,
-            0,
+            NULL,
             -1,
             0,
             -1
         );
-        if (m_heroStrip == 0)
+        if (m_heroStrip == NULL)
             MemError();
     }
 
     m_lastTownType = m_town->m_type;
-    m_pendingStrip = 0;
+    m_pendingStrip = NULL;
     m_swapStrip = m_pendingStrip;
     m_selectedStrip = m_swapStrip;
     m_pendingArmySlot = TOWN_ARMY_SLOT_NONE;
@@ -800,38 +800,38 @@ VA(0x00414cc9, 0x1cf)
 void townManager::UnloadTown(void) {
     i32 index_i;
 
-    if (m_bankBox != 0)
+    if (m_bankBox != NULL)
         delete m_bankBox;
-    m_bankBox = 0;
-    if (m_heroStrip != 0)
+    m_bankBox = NULL;
+    if (m_heroStrip != NULL)
         delete m_heroStrip;
-    m_heroStrip = 0;
-    if (m_garrisonStrip != 0)
+    m_heroStrip = NULL;
+    if (m_garrisonStrip != NULL)
         delete m_garrisonStrip;
-    m_garrisonStrip = 0;
+    m_garrisonStrip = NULL;
     for (index_i = 0; index_i < m_townObjectCount; ++index_i) {
         m_townWindow->RemoveWidget(m_townObjects[index_i]->m_border);
         delete m_townObjects[index_i];
-        m_townObjects[index_i] = 0;
+        m_townObjects[index_i] = NULL;
     }
-    if (m_backgroundIcon != 0) {
+    if (m_backgroundIcon != NULL) {
         gpResourceManager->Dispose(m_backgroundIcon);
-        m_backgroundIcon = 0;
+        m_backgroundIcon = NULL;
     }
 }
 
 VA(0x00414e98, 0xca)
 void townManager::Close(void) {
     UnloadTown();
-    if (m_townWindow != 0) {
+    if (m_townWindow != NULL) {
         gpWindowManager->RemoveWindow(m_townWindow);
         delete m_townWindow;
     }
-    m_townWindow = 0;
+    m_townWindow = NULL;
     if (gConfig.useOpera != IDX(CONFIG_OPERA_DISABLED)
         || gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI)
         gpSoundManager->SwitchAmbientMusic(TOWN_MUSIC_STOP);
-    gpWindowManager->FadeScreen(TOWN_FADE_OUT, TOWN_FADE_STEPS, 0);
+    gpWindowManager->FadeScreen(TOWN_FADE_OUT, TOWN_FADE_STEPS, NULL);
     gpMouseManager->SetPointer(TOWN_POINTER_DEFAULT);
     m_active = false;
     m_town->m_buildings &= IDX(TOWN_CLOSE_DYNAMIC_CLEAR_MASK);
@@ -972,7 +972,7 @@ void townManager::SetCommandAndText(struct tag_message& message) {
             } else {
                 m_selectedStrip = m_heroStrip;
                 m_selectedArmySlot = objectId - TOWN_HERO_SLOT_FIRST;
-                if (m_selectedStrip->m_army == 0
+                if (m_selectedStrip->m_army == NULL
                     || m_selectedStrip->m_army->m_creatureTypes[m_selectedArmySlot]
                            == ARMY_GROUP_EMPTY_SLOT) {
                     strcpy(m_statusText, cTownCommand[IDX(TEXT_EMPTY_SLOT)]);
@@ -1141,7 +1141,7 @@ i32 townManager::Main(tag_message& message) {
                                     message.payload.widget.id - IDX(TOWN_COMMAND_FIRST_DWELLING),
                                     1
                                 );
-                                if (dialogManager_d == 0)
+                                if (dialogManager_d == NULL)
                                     MemError();
                                 gpExec->DoDialog(dialogManager_d);
                                 delete dialogManager_d;
@@ -1154,7 +1154,7 @@ i32 townManager::Main(tag_message& message) {
                             }
                             {
                                 m_heroWindow0 = new heroWindow(0, 0, "caslwind.bin");
-                                if (m_heroWindow0 == 0)
+                                if (m_heroWindow0 == NULL)
                                     MemError();
                                 SetupCastle(m_heroWindow0, 0);
                                 m_castleDialogActive = 1;
@@ -1179,7 +1179,7 @@ i32 townManager::Main(tag_message& message) {
                                         0,
                                         -1
                                     );
-                                    if (m_heroStrip == 0)
+                                    if (m_heroStrip == NULL)
                                         MemError();
                                     buildSample_m = NULL_SAMPLE2;
                                     buildSample_m = LoadPlaySample("buildtwn.82M");
@@ -1189,16 +1189,16 @@ i32 townManager::Main(tag_message& message) {
                                     m_garrisonStrip->DrawIcons(0);
                                     m_heroStrip->DrawIcons(0);
                                     gpWindowManager
-                                        ->FizzleForward(0, 256, fizzleWidth, 204, -1, 0, 0);
+                                        ->FizzleForward(0, 256, fizzleWidth, 204, -1, NULL, NULL);
                                     WaitEndSample(buildSample_m, -1);
                                     m_recruitResult = 0;
                                     gpWindowManager->ReleaseFizzleSource();
                                 } else {
                                     if (m_selectedBuilding == 15
                                         && m_town->m_occupyingHeroId == -1) {
-                                        if (m_heroStrip != 0)
+                                        if (m_heroStrip != NULL)
                                             delete m_heroStrip;
-                                        m_heroStrip = 0;
+                                        m_heroStrip = NULL;
                                         sprintf(
                                             gText,
                                             "port%04d.icn",
@@ -1210,12 +1210,12 @@ i32 townManager::Main(tag_message& message) {
                                             3,
                                             gpResourceManager->MakeId(gText, 1),
                                             0,
-                                            0,
+                                            NULL,
                                             -1,
                                             0,
                                             gpCurPlayer->m_color
                                         );
-                                        if (m_heroStrip == 0)
+                                        if (m_heroStrip == NULL)
                                             MemError();
                                     }
                                     RedrawTownScreen();
@@ -1291,19 +1291,19 @@ i32 townManager::Main(tag_message& message) {
                                                 TOWN_SPELL_BOOK_COST;
                                             m_bankBox->Update(1);
                                             m_townWindow->DrawWindow();
-                                            m_town->GiveSpells(0);
+                                            m_town->GiveSpells(NULL);
                                         }
                                     }
                                 } else {
                                     m_heroWindow0 = new heroWindow(0, 0, "magewind.bin");
-                                    if (m_heroWindow0 == 0)
+                                    if (m_heroWindow0 == NULL)
                                         MemError();
                                     SetWinText(m_heroWindow0, 17);
                                     SetupMage(m_heroWindow0);
                                     gpWindowManager->DoDialog(m_heroWindow0, MageGuildHandler, 0);
                                     delete m_heroWindow0;
                                 }
-                                m_town->GiveSpells(0);
+                                m_town->GiveSpells(NULL);
                                 RedrawTownScreen();
                             }
                             break;
@@ -1314,7 +1314,7 @@ i32 townManager::Main(tag_message& message) {
                             }
                             {
                                 m_heroWindow0 = new heroWindow(0, 0, "wellwind.bin");
-                                if (m_heroWindow0 == 0)
+                                if (m_heroWindow0 == NULL)
                                     MemError();
                                 SetupWell(m_heroWindow0);
                                 gpWindowManager->DoDialog(m_heroWindow0, TrueFalseDialogHandler, 0);
@@ -1329,7 +1329,7 @@ i32 townManager::Main(tag_message& message) {
                             }
                             {
                                 m_heroWindow0 = new heroWindow(0, 0, "thiefwin.bin");
-                                if (m_heroWindow0 == 0)
+                                if (m_heroWindow0 == NULL)
                                     MemError();
                                 SetWinText(m_heroWindow0, 14);
                                 SetupThievesGuild(m_heroWindow0, -1);
@@ -1419,7 +1419,7 @@ i32 townManager::Main(tag_message& message) {
                                                ->m_triggerType
                                            == 0) {
                                     m_heroWindow0 = new heroWindow(177, 20, "shipwind.bin");
-                                    if (m_heroWindow0 == 0)
+                                    if (m_heroWindow0 == NULL)
                                         MemError();
                                     SetWinText(m_heroWindow0, 12);
                                     if (gpGame->m_players[giCurPlayer].m_resources[IDX(RES_GOLD)]
@@ -1568,7 +1568,7 @@ i32 townManager::Main(tag_message& message) {
                                     if (m_selectedStrip == m_heroStrip)
                                         viewedHero = gpGame->GetHero(m_town->m_occupyingHeroId);
                                     else
-                                        viewedHero = 0;
+                                        viewedHero = NULL;
                                     gpGame->ViewArmy(
                                         TOWN_ARMY_VIEW_X,
                                         TOWN_ARMY_VIEW_Y,
@@ -1581,7 +1581,7 @@ i32 townManager::Main(tag_message& message) {
                                         1,
                                         1,
                                         viewedHero,
-                                        0,
+                                        NULL,
                                         m_selectedStrip->m_army,
                                         m_selectedArmySlot
                                     );
@@ -1689,7 +1689,7 @@ void townManager::DoCommand(i32 command) {
             if (m_selectedStrip == m_heroStrip)
                 viewedHero = gpGame->GetHero(m_town->m_occupyingHeroId);
             else
-                viewedHero = 0;
+                viewedHero = NULL;
             if (m_castleDialogActive == 1
                 || (m_selectedStrip == m_heroStrip && m_selectedStrip->m_army->GetNumArmies() == 1))
                 dismissAllowed = 1;
@@ -1705,7 +1705,7 @@ void townManager::DoCommand(i32 command) {
                 1,
                 0,
                 viewedHero,
-                0,
+                NULL,
                 m_selectedStrip->m_army,
                 m_selectedArmySlot
             );
@@ -1752,7 +1752,7 @@ void townManager::DoCommand(i32 command) {
         case IDX(ARMY_COMMAND_VIEW_HERO):
             HeroView(m_town->m_occupyingHeroId, 1, 0);
             RedrawTownScreen();
-            gpWindowManager->FadeScreen(0, 8, 0);
+            gpWindowManager->FadeScreen(0, 8, NULL);
             break;
 
         case IDX(ARMY_COMMAND_SPLIT):
@@ -1789,7 +1789,7 @@ void townManager::SplitArmy(void) {
     tag_message message;
 
     m_heroWindow1 = new heroWindow(177, 20, "splitwin.bin");
-    if (m_heroWindow1 == 0)
+    if (m_heroWindow1 == NULL)
         MemError();
     m_splitAmount = 0;
     m_splitMaximum = m_swapStrip->m_army->m_creatureCounts[m_swapArmySlot];
@@ -1838,13 +1838,13 @@ void townManager::ShiftQualChange(void) {
 
 VA(0x00417ab2, 0xb0)
 void townManager::ResetStrips(void) {
-    if (m_swapStrip != 0)
+    if (m_swapStrip != NULL)
         m_swapStrip->m_selectedSlot = -1;
-    if (m_pendingStrip != 0)
+    if (m_pendingStrip != NULL)
         m_pendingStrip->m_selectedSlot = -1;
     m_heroStrip->Draw();
     m_garrisonStrip->Draw();
-    m_swapStrip = m_pendingStrip = 0;
+    m_swapStrip = m_pendingStrip = NULL;
     m_swapArmySlot = m_pendingArmySlot = -1;
 }
 
@@ -2062,7 +2062,7 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
 
     sprintf(gText, "buybuil%d.bin", windowRows_b);
     window_a = new heroWindow(158, 16, gText);
-    if (window_a == 0)
+    if (window_a == NULL)
         MemError();
 
     message_m.type = MESSAGE_WIDGET;
@@ -2103,7 +2103,7 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
         8,
         1
     );
-    if (descriptionWidget_g == 0)
+    if (descriptionWidget_g == NULL)
         MemError();
     window_a->AddWidget(descriptionWidget_g, -1);
 
@@ -2151,7 +2151,7 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
                     8,
                     1
                 );
-                if (amountWidgets_b[widgetIndex_f] == 0)
+                if (amountWidgets_b[widgetIndex_f] == NULL)
                     MemError();
                 resourceWidgets_m[widgetIndex_f] = new iconWidget(
                     static_cast<i16>(
@@ -2168,7 +2168,7 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
                     16,
                     1
                 );
-                if (resourceWidgets_m[widgetIndex_f] == 0)
+                if (resourceWidgets_m[widgetIndex_f] == NULL)
                     MemError();
                 window_a->AddWidget(amountWidgets_b[widgetIndex_f], -1);
                 window_a->AddWidget(resourceWidgets_m[widgetIndex_f], -1);
@@ -2284,16 +2284,16 @@ void townManager::BuildObj(i32 building) {
             else
                 frame_g = gpTownManager->m_town->m_buildState - 1;
             m_townObjects[objectIndex_k]
-                ->m_icon->CombatClipDrawToBuffer(0, 0, frame_g, &limits_h, 0, 0, 0, 0);
+                ->m_icon->CombatClipDrawToBuffer(0, 0, frame_g, &limits_h, 0, 0, NULL, NULL);
             if (m_townObjects[objectIndex_k]->m_animationFrameCount != 0)
                 m_townObjects[objectIndex_k]
-                    ->m_icon->CombatClipDrawToBuffer(0, 0, frame_g + 1, &limits_h, 0, 0, 0, 0);
+                    ->m_icon->CombatClipDrawToBuffer(0, 0, frame_g + 1, &limits_h, 0, 0, NULL, NULL);
         } else {
             m_townObjects[objectIndex_k]
-                ->m_icon->CombatClipDrawToBuffer(0, 0, 0, &limits_h, 0, 0, 0, 0);
+                ->m_icon->CombatClipDrawToBuffer(0, 0, 0, &limits_h, 0, 0, NULL, NULL);
             if (m_townObjects[objectIndex_k]->m_animationFrameCount != 0)
                 m_townObjects[objectIndex_k]
-                    ->m_icon->CombatClipDrawToBuffer(0, 0, 1, &limits_h, 0, 0, 0, 0);
+                    ->m_icon->CombatClipDrawToBuffer(0, 0, 1, &limits_h, 0, 0, NULL, NULL);
         }
         gbComputeExtent = false;
         gbSaveBiggestExtent = false;
@@ -2314,8 +2314,8 @@ void townManager::BuildObj(i32 building) {
             giMaxExtentX - giMinExtentX + 1,
             giMaxExtentY - giMinExtentY + 1,
             -1,
-            0,
-            0
+            NULL,
+            NULL
         );
         WaitEndSample(buildSample_b, -1);
         PollSound();
@@ -2415,14 +2415,14 @@ void townManager::SetupMage(heroWindow* window) {
                         gText,
                         "%s\n[%d]",
                         gSpellNames[m_town->m_spells[level][slot_m]],
-                        GetManaCost(SpellType(m_town->m_spells[level][slot_m]), 0)
+                        GetManaCost(SpellType(m_town->m_spells[level][slot_m]), NULL)
                     );
                 else
                     sprintf(
                         gText,
                         "%s  [%d]",
                         gSpellNames[m_town->m_spells[level][slot_m]],
-                        GetManaCost(SpellType(m_town->m_spells[level][slot_m]), 0)
+                        GetManaCost(SpellType(m_town->m_spells[level][slot_m]), NULL)
                     );
                 message_b.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
                 message_b.payload.widget.id = level * TOWN_MAGE_SPELLS_PER_LEVEL + slot_m
@@ -2521,7 +2521,7 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
     i32 newHeroClassCount;
 
     m_heroWindow1 = new heroWindow(177, 16, "rcrthero.bin");
-    if (m_heroWindow1 == 0)
+    if (m_heroWindow1 == NULL)
         MemError();
     SetWinText(m_heroWindow1, 20);
     m_recruitHero = &gpGame->m_heroRecs[gpCurPlayer->AvailableHeroId(availableHeroIndex)];
@@ -2604,7 +2604,7 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
             static_cast<i8>(giCurPlayer);
         CheckValidAvailableHeroes();
         if (m_town->m_buildings & 1)
-            m_town->GiveSpells(0);
+            m_town->GiveSpells(NULL);
 
         newHeroClassCount = gpCurPlayer->m_availableHeroIds[1 - m_recruitState] / 9;
         newHeroClassCount = (Random(1, 5) + newHeroClassCount) % TOWN_FACTION_COUNT;
@@ -2678,7 +2678,7 @@ void townManager::DoTavern(void) {
     tag_message message;
 
     m_heroWindow0 = new heroWindow(162, 10, "tavwin.bin");
-    if (m_heroWindow0 == 0)
+    if (m_heroWindow0 == NULL)
         MemError();
     SetWinText(m_heroWindow0, 22);
     sprintf(
@@ -3017,7 +3017,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                     16,
                     1
                 );
-                if (iconControl_last == 0)
+                if (iconControl_last == NULL)
                     MemError();
                 window->AddWidget(iconControl_last, -1);
             }
@@ -3068,7 +3068,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                     16,
                     1
                 );
-                if (iconControl_last == 0)
+                if (iconControl_last == NULL)
                     MemError();
                 window->AddWidget(iconControl_last, -1);
                 iconControl_last = new iconWidget(
@@ -3083,7 +3083,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                     16,
                     1
                 );
-                if (iconControl_last == 0)
+                if (iconControl_last == NULL)
                     MemError();
                 window->AddWidget(iconControl_last, -1);
             }
@@ -3221,7 +3221,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                                 17,
                                 1
                             );
-                            if (iconControl_last == 0)
+                            if (iconControl_last == NULL)
                                 MemError();
                             window->AddWidget(iconControl_last, -1);
                         }
@@ -3326,7 +3326,7 @@ void GetCategoryStats(i32 category, i32l* const stats, i8* const order) {
                         playerTown = gpGame->GetPlayerTown(player, heroIndex_n);
                         if (playerTown->HasGarrison()) {
                             armyStrength +=
-                                gpPhilAI->FightValueOfStack(&playerTown->m_army, 0, 0, 0, 0, 0);
+                                gpPhilAI->FightValueOfStack(&playerTown->m_army, NULL, 0, 0, 0, 0);
                         }
                     }
                     stats[player] = armyStrength;
