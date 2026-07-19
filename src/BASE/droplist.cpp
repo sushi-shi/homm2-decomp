@@ -31,6 +31,27 @@ H2_ENUM_CLASS_BEGIN(DropListFrame)
     FRAME_SCROLL_THUMB        = 13
 H2_ENUM_CLASS_END(DropListFrame)
 
+H2_ENUM_BEGIN(DropListStorageConstant)
+    RESOURCE_NAME_CAPACITY   = 16,
+    SCROLL_METRIC_SLOT_COUNT = 2
+H2_ENUM_END(DropListStorageConstant)
+
+H2_ENUM_BEGIN(DropListLayoutConstant)
+    DIMMED_TEXT_COLOR           = 3,
+    MIN_VISIBLE_ITEM_COUNT      = 3,
+    TEXT_LEFT_INSET             = 5,
+    TEXT_HORIZONTAL_INSET_COUNT = 2,
+    FIRST_ROW_TEXT_TOP_INSET    = 4,
+    ROW_TEXT_TOP_INSET          = 2,
+    LIST_EDGE_ROW_COUNT         = 2,
+    SCROLL_TRACK_EDGE_ROW_COUNT = 2,
+    SCROLL_THUMB_X_INSET        = 5,
+    SCROLL_THUMB_Y_INSET        = 3,
+    SCROLL_THUMB_TRAVEL_PADDING = 7,
+    SCROLL_THUMB_CENTER_DIVISOR = 2,
+    SCROLL_DRAG_Y_ADJUSTMENT    = 4
+H2_ENUM_END(DropListLayoutConstant)
+
 DATA(0x00521078) static SDropListSourceFiles gDropListSourceFiles = {
     {DROPLIST_SOURCE_FILE},
     {DROPLIST_SOURCE_FILE},
@@ -66,7 +87,7 @@ dropListWidget::~dropListWidget() {
 
 VA(0x004dbfe0, 0x21d)
 void dropListWidget::Read(void) {
-    i8 name[16];
+    i8 name[RESOURCE_NAME_CAPACITY];
 
     m_x = gpResourceManager->ReadWord();
     m_y = gpResourceManager->ReadWord();
@@ -135,13 +156,17 @@ void dropListWidget::DeleteItem(i32 index) {
             m_items = NULL;
         } else {
             char** newItems = static_cast<char**>(H2_ALLOC_AT(
-                m_itemCount * 4 - 4,
+                (m_itemCount - 1) * sizeof(*m_items),
                 gDropListSourceFiles.resizedListAllocation.text,
                 117
             ));
-            memcpy(newItems, m_items, m_itemCount * 4 - 4);
+            memcpy(newItems, m_items, (m_itemCount - 1) * sizeof(*m_items));
             if (m_itemCount - index - 1 > 0)
-                memcpy(newItems + index, m_items + index + 1, (m_itemCount - index - 1) * 4);
+                memcpy(
+                    newItems + index,
+                    m_items + index + 1,
+                    (m_itemCount - index - 1) * sizeof(*m_items)
+                );
             if (m_items != NULL)
                 H2_FREE_AT(m_items, gDropListSourceFiles.oldListDestruction.text, 123);
             m_items = newItems;
@@ -172,7 +197,7 @@ i32 dropListWidget::Main(tag_message& message) {
                         message.type = MESSAGE_WIDGET;
                         message.payload.widget.id = m_id;
                         message.payload.widget.parameter = MESSAGE_MODIFIER_RIGHT_BUTTON;
-                        return 2;
+                        return WIDGET_DISPATCH_FORWARD;
                     }
                     return 0;
                 } else {
@@ -183,7 +208,7 @@ i32 dropListWidget::Main(tag_message& message) {
                         message.payload.widget.command = WIDGET_COMMAND_SELECT;
                         message.type = MESSAGE_WIDGET;
                         message.payload.widget.id = m_id;
-                        return 2;
+                        return WIDGET_DISPATCH_FORWARD;
                     }
                     return 0;
                 }
@@ -207,12 +232,12 @@ i32 dropListWidget::Main(tag_message& message) {
                     if (m_id == message.payload.widget.id) {
                         char* text = message.payload.widget.data.text;
                         char** newItems = static_cast<char**>(H2_ALLOC_AT(
-                            m_itemCount * 4 + 4,
+                            (m_itemCount + 1) * sizeof(*m_items),
                             gDropListSourceFiles.appendedListAllocation.text,
                             184
                         ));
                         if (m_itemCount != 0)
-                            memcpy(newItems, m_items, m_itemCount * 4);
+                            memcpy(newItems, m_items, m_itemCount * sizeof(*m_items));
                         newItems[m_itemCount] = static_cast<char*>(H2_ALLOC_AT(
                             strlen(text) + 1,
                             gDropListSourceFiles.appendedTextAllocation.text,
@@ -279,7 +304,7 @@ void dropListWidget::Draw(void) {
         0
     );
     if (m_itemCount > 0 && m_selectedIndex >= 0) {
-        i32 color = 3;
+        i32 color = DIMMED_TEXT_COLOR;
         if ((m_flags & WIDGET_FLAG_DIMMED) == 0)
             color = m_normalColor;
         m_font->DrawBoundedString(
@@ -301,9 +326,9 @@ void dropListWidget::DrawDropStuff(void) {
     i32 color = m_selectedIndex == m_topIndex ? m_selColor : m_normalColor;
     m_font->DrawBoundedString(
         m_items[m_topIndex],
-        m_owner->m_posX + m_listX + 5,
-        y + 4,
-        m_listWidth - 10,
+        m_owner->m_posX + m_listX + TEXT_LEFT_INSET,
+        y + FIRST_ROW_TEXT_TOP_INSET,
+        m_listWidth - TEXT_HORIZONTAL_INSET_COUNT * TEXT_LEFT_INSET,
         m_font->m_height + 1,
         color,
         m_textMode
@@ -316,9 +341,9 @@ void dropListWidget::DrawDropStuff(void) {
         color = m_selectedIndex == item ? m_selColor : m_normalColor;
         m_font->DrawBoundedString(
             m_items[item],
-            m_owner->m_posX + m_listX + 5,
-            y + 2,
-            m_listWidth - 10,
+            m_owner->m_posX + m_listX + TEXT_LEFT_INSET,
+            y + ROW_TEXT_TOP_INSET,
+            m_listWidth - TEXT_HORIZONTAL_INSET_COUNT * TEXT_LEFT_INSET,
             m_font->m_height + 1,
             color,
             m_textMode
@@ -332,9 +357,9 @@ void dropListWidget::DrawDropStuff(void) {
         color = m_selectedIndex == item ? m_selColor : m_normalColor;
         m_font->DrawBoundedString(
             m_items[item],
-            m_owner->m_posX + m_listX + 5,
-            y + 2,
-            m_listWidth - 10,
+            m_owner->m_posX + m_listX + TEXT_LEFT_INSET,
+            y + ROW_TEXT_TOP_INSET,
+            m_listWidth - TEXT_HORIZONTAL_INSET_COUNT * TEXT_LEFT_INSET,
             m_font->m_height + 1,
             color,
             m_textMode
@@ -354,8 +379,8 @@ void dropListWidget::DrawDropStuff(void) {
             m_scrollTrackFirstFrame,
             0
         );
-        i = 2;
-        while (i < m_visibleItemCount - 2) {
+        i = SCROLL_TRACK_EDGE_ROW_COUNT;
+        while (i < m_visibleItemCount - SCROLL_TRACK_EDGE_ROW_COUNT) {
             m_icon->DrawToBuffer(
                 m_owner->m_posX + m_scrollTrackX,
                 m_owner->m_posY + m_scrollTrackY + m_middleRowHeight * (i - 1),
@@ -380,9 +405,11 @@ void dropListWidget::DrawDropStuff(void) {
             frame,
             0
         );
-        m_scrollThumbX = static_cast<i16>(m_owner->m_posX) + m_scrollTrackX + 5;
+        m_scrollThumbX =
+            static_cast<i16>(m_owner->m_posX) + m_scrollTrackX + SCROLL_THUMB_X_INSET;
         m_scrollThumbY = static_cast<i16>(m_owner->m_posY)
-                         + (m_scrollThumbTravel * m_topIndex) / m_scrollRange + m_scrollTrackY + 3;
+                         + (m_scrollThumbTravel * m_topIndex) / m_scrollRange + m_scrollTrackY
+                         + SCROLL_THUMB_Y_INSET;
         m_icon->DrawToBuffer(m_scrollThumbX, m_scrollThumbY, m_scrollThumbFrame, 0);
     }
     gpWindowManager->UpdateScreenRegion(m_x, m_y, m_width, m_savedBackgroundHeight + m_height);
@@ -412,9 +439,9 @@ void dropListWidget::RestoreDropBackground(void) {
 VA(0x004dcb10, 0x81f)
 void dropListWidget::ProcessSelectDialog(void) {
     IconEntry* iconEntry;
-    i16 scrollWidth[2];
-    i16 scrollTopHeight[2];
-    i16 scrollBottomWidth[2];
+    i16 scrollWidth[SCROLL_METRIC_SLOT_COUNT];
+    i16 scrollTopHeight[SCROLL_METRIC_SLOT_COUNT];
+    i16 scrollBottomWidth[SCROLL_METRIC_SLOT_COUNT];
     i16 scrollBottomHeight;
     tag_message message;
     i32 firstRelease = 1;
@@ -439,8 +466,8 @@ void dropListWidget::ProcessSelectDialog(void) {
     if (m_scrollRange > 0) {
         m_visibleItemCount = m_maxVisibleItems;
     } else {
-        if (numItems <= 3)
-            numItems = 3;
+        if (numItems <= MIN_VISIBLE_ITEM_COUNT)
+            numItems = MIN_VISIBLE_ITEM_COUNT;
         m_visibleItemCount = numItems;
     }
 
@@ -454,7 +481,8 @@ void dropListWidget::ProcessSelectDialog(void) {
     m_listY = m_iconY + m_closedContentHeight;
     m_listWidth = m_icon->Entries()[m_firstRowFrame].w;
     m_listHeight =
-        (m_visibleItemCount - 2) * m_middleRowHeight + m_firstRowHeight + m_lastRowHeight;
+        (m_visibleItemCount - LIST_EDGE_ROW_COUNT) * m_middleRowHeight + m_firstRowHeight
+        + m_lastRowHeight;
     iconEntry = &m_icon->Entries()[m_scrollUpFrame];
     scrollWidth[0] = iconEntry->w;
     m_scrollUpWidth = scrollWidth[0];
@@ -483,7 +511,7 @@ void dropListWidget::ProcessSelectDialog(void) {
         m_scrollTrackWidth = scrollBottomWidth[0];
         bottomY -= topY;
         m_scrollTrackHeight = bottomY;
-        m_scrollThumbTravel = bottomY - m_scrollThumbHeight - 7;
+        m_scrollThumbTravel = bottomY - m_scrollThumbHeight - SCROLL_THUMB_TRAVEL_PADDING;
     }
 
     m_icon->DrawToBuffer(
@@ -581,7 +609,8 @@ void dropListWidget::ProcessSelectDialog(void) {
                     }
                 } else if (m_scrollThumbDragging != 0) {
                     i32 scrollRange = m_scrollRange;
-                    i32 top = ((mouseY - m_scrollThumbHeight / 2 - m_scrollTrackY - 4)
+                    i32 top = ((mouseY - m_scrollThumbHeight / SCROLL_THUMB_CENTER_DIVISOR
+                                - m_scrollTrackY - SCROLL_DRAG_Y_ADJUSTMENT)
                                * (scrollRange + 1))
                               / m_scrollThumbTravel;
                     if (top < 0)
@@ -630,7 +659,8 @@ void dropListWidget::ProcessSelectDialog(void) {
                             m_scrollThumbDragging = 1;
                         i16 scrollRange = m_scrollRange;
                         m_topIndex = static_cast<i16>(
-                            ((mouseY - m_scrollThumbHeight / 2 - m_scrollTrackY - 4)
+                            ((mouseY - m_scrollThumbHeight / SCROLL_THUMB_CENTER_DIVISOR
+                              - m_scrollTrackY - SCROLL_DRAG_Y_ADJUSTMENT)
                              * (scrollRange + 1))
                             / m_scrollThumbTravel
                         );
