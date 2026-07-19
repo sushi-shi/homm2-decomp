@@ -2,7 +2,7 @@ path	status	notes
 include/BASE/BITS.h	reviewed	Public APIs use arithmetic bit indices; no literal values.
 include/BASE/BITSConstants.h	reviewed	Fixed-width bit storage aliases; no literal values.
 include/BASE/Blur.h	reviewed	The public blur operation names every parameter and exposes no private constants or storage records.
-include/BASE/Bzip.h	reviewed	Shared model, frequency padding, CRC table, and program-name storage extents are named enums; declarations otherwise contain no numeric constants.
+include/BASE/Bzip.h	third-party	Imported bzip codec interface, retained with its original storage constants and local Heroes II integration declarations.
 include/BASE/DROPLIST_TYPES.h	reviewed	The source-file record union derives its storage from the retail string; remaining literals are packed SIZE evidence.
 include/BASE/EXEC_TYPES.h	reviewed	Every text-field extent is named; remaining literals are packed-layout SIZE evidence.
 include/BASE/INPUTMGR.h	reviewed	The header contains declarations only and no numeric literals.
