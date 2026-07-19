@@ -370,7 +370,7 @@ void searchArray::SeedCombatPosition(class army* unit) {
         if (HAS(enemy->m_monster.attributes, MONSTER_ATTRIBUTE_WIDE) != 0) {
             hex = enemy->GetAdjacentCellIndex(
                 hex,
-                enemy->m_facing == 1 ? COMBAT_DIRECTION_NORTHEAST : COMBAT_DIRECTION_SOUTHWEST
+                enemy->m_facing == 1 ? COMBAT_DIRECTION_EAST : COMBAT_DIRECTION_WEST
             );
             if ((unit->m_monster.speed > 0
                  && unit->GetAttackMask(
@@ -437,7 +437,7 @@ i32 searchArray::FindCombatPath(
         i32 currentHex;
         PushCombatPoint(
             sourceHex,
-            unit->m_facing == 0 ? COMBAT_DIRECTION_SOUTHWEST : COMBAT_DIRECTION_NORTHEAST,
+            unit->m_facing == 0 ? COMBAT_DIRECTION_WEST : COMBAT_DIRECTION_EAST,
             0,
             unit->m_monster.speed
         );
