@@ -104,17 +104,28 @@ and class also does not prove that all bytes or pointer relocations within the o
 match retail; those still require an initializer and relocation audit against the
 shipping PE.
 
-The current `.data` result illustrates the limit. Raw size is exact at `0x37000`,
-while virtual size is `0x4d49c` versus retail `0x4d4b0` (20 bytes short). All 1,447
-name-joined public static symbols have the same storage class, and every configured
-game candidate/target `.data` and `.bss` COFF section has the same size. The final
-20-byte difference is the net result of different BSS/common ordering and alignment,
-not evidence for a missing 20-byte source object. For example, DRAWING's candidate
-and fixed target `.data` are byte-identical `0x7f` sections, yet retail places its
-two public zero globals among its private literals while the reconstructed COFF puts
-them first. The retail PE operands and reviewed non-affine manifest preserve the
-real addresses even though the flattened delinked object cannot reproduce that
-original ordering.
+The final link now projects every fully reviewed game-owned writable section from
+candidate coordinates into its NB09 owner range. The projection covers both affine
+and non-affine sections, including DRAWING's public zero globals among its private
+literals and TILE's retail-evidenced raw-backed zero contribution. Game-owned
+initialized topology is exact through the final source contribution; no padding
+object or source-layout steering is involved.
+
+The pinned VC 4.0 `LIBCMT.LIB` is the selected runtime input. Its disposable link
+copy assigns each retained initialized section a sortable `.data$NN` subsection
+from the retail NB09 contribution offset. Section bytes, relocations, alignment,
+and archive extraction remain unchanged. NB09 extents may include linker-owned
+trailing alignment, so retained COFF sections are paired in object order by their
+raw extent plus bounded alignment padding. The resulting initialized topology is
+exact through the retail raw-data boundary, including `wincrt0`, `perror`, and the
+runtime literal members.
+
+The remaining writable drift starts in the loader-zero tail at `handler`'s
+`_pnhHeap`. Runtime `.bss` sections and linker common symbols share that tail, and
+their order still follows archive demand. Renaming `.bss` subsections matched only
+the aggregate size while displacing identities, so that experiment is deliberately
+not retained. Current section sizes and the first relative divergence are recorded
+in `build/link/HEROES2W.link.json` rather than copied into this durable document.
 
 The current exhaustive census covers all 1,499 unique functions and 21,664 retail
 data targets: 781 into `.rdata` and 20,883 into `.data`. Candidate code has 21,380

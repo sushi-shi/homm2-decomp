@@ -142,6 +142,9 @@ The explicit topology commands are:
   version control. The Clang DATA inventory is cached under `build/gen` per TU, keyed by source,
   recursively resolved project/vendor headers, candidate object, compile database, and parser
   implementation. Missing objects disable reuse; source or header changes reparse the affected TU.
+  Final linking consumes the same reviewed coordinates through a disposable projection described
+  in [`delinker-contribution-manifest.md`](delinker-contribution-manifest.md). This restores retail
+  allocation order without changing the candidate-shaped objects used for objdiff.
 - `homm2 data-topology propose` writes only structured candidate diagnostics and
   `build/gen/data_topology_review_queue.tsv`. The queue is deliberately not a Vostok manifest: its
   header adds evidence kind, proof count, group blockers, and group contradictions. It contains
