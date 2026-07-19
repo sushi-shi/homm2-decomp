@@ -742,10 +742,10 @@ void SetInstallDefaults(void) {
     strcpy(gConfig.autoSaveName, gMiscText.installDefaults.autoSaveName.text);
     gConfig.musicSource = CONFIG_MUSIC_SOURCE_CD;
 }
-// @semantic: first residual is +0x1: after the common push ebx, base materializes gfx[0] (+0x1c) before saving ESI/EDI.
+// Retail saves ESI/EDI before materializing the main-game graphics slot.
 VA(0x004c49a0, 0x1b5)
 void SetGameDefaults(void) {
-    i32* fullScreen = &gConfig.gfx[0].fullScreen;
+    i32* fullScreen = &gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].fullScreen;
     gConfig.musicVolume = 1;
     gConfig.soundVolume = 1;
     gConfig.autosave = 1;
@@ -1120,7 +1120,7 @@ void ReadPrefsFromRegistry(void) {
         gMiscText.readRegistry.mainGameShowMenu.text,
         NULL,
         &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[0].showMenu),
+        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].showMenu),
         &dwSize
     );
     RegQueryValueExA(
@@ -1128,7 +1128,7 @@ void ReadPrefsFromRegistry(void) {
         gMiscText.readRegistry.mainGameX.text,
         NULL,
         &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[0].x),
+        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].x),
         &dwSize
     );
     RegQueryValueExA(
@@ -1136,7 +1136,7 @@ void ReadPrefsFromRegistry(void) {
         gMiscText.readRegistry.mainGameY.text,
         NULL,
         &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[0].y),
+        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].y),
         &dwSize
     );
     RegQueryValueExA(
@@ -1144,7 +1144,7 @@ void ReadPrefsFromRegistry(void) {
         gMiscText.readRegistry.mainGameWidth.text,
         NULL,
         &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[0].width),
+        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].width),
         &dwSize
     );
     RegQueryValueExA(
@@ -1152,7 +1152,7 @@ void ReadPrefsFromRegistry(void) {
         gMiscText.readRegistry.mainGameHeight.text,
         NULL,
         &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[0].height),
+        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].height),
         &dwSize
     );
     RegQueryValueExA(
@@ -1160,7 +1160,7 @@ void ReadPrefsFromRegistry(void) {
         gMiscText.readRegistry.mainGameFullScreen.text,
         NULL,
         &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[0].fullScreen),
+        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].fullScreen),
         &dwSize
     );
     RegQueryValueExA(
@@ -1168,7 +1168,7 @@ void ReadPrefsFromRegistry(void) {
         gMiscText.readRegistry.mainGameColorMouseCursor.text,
         NULL,
         &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[0].colorMouseCursor),
+        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].colorMouseCursor),
         &dwSize
     );
     RegQueryValueExA(
@@ -1176,7 +1176,7 @@ void ReadPrefsFromRegistry(void) {
         gMiscText.readRegistry.editorShowMenu.text,
         NULL,
         &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[1].showMenu),
+        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].showMenu),
         &dwSize
     );
     RegQueryValueExA(
@@ -1184,7 +1184,7 @@ void ReadPrefsFromRegistry(void) {
         gMiscText.readRegistry.editorX.text,
         NULL,
         &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[1].x),
+        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].x),
         &dwSize
     );
     RegQueryValueExA(
@@ -1192,7 +1192,7 @@ void ReadPrefsFromRegistry(void) {
         gMiscText.readRegistry.editorY.text,
         NULL,
         &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[1].y),
+        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].y),
         &dwSize
     );
     RegQueryValueExA(
@@ -1200,7 +1200,7 @@ void ReadPrefsFromRegistry(void) {
         gMiscText.readRegistry.editorWidth.text,
         NULL,
         &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[1].width),
+        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].width),
         &dwSize
     );
     RegQueryValueExA(
@@ -1208,7 +1208,7 @@ void ReadPrefsFromRegistry(void) {
         gMiscText.readRegistry.editorHeight.text,
         NULL,
         &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[1].height),
+        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].height),
         &dwSize
     );
     RegQueryValueExA(
@@ -1216,7 +1216,7 @@ void ReadPrefsFromRegistry(void) {
         gMiscText.readRegistry.editorFullScreen.text,
         NULL,
         &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[1].fullScreen),
+        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].fullScreen),
         &dwSize
     );
     RegQueryValueExA(
@@ -1224,7 +1224,7 @@ void ReadPrefsFromRegistry(void) {
         gMiscText.readRegistry.editorColorMouseCursor.text,
         NULL,
         &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[1].colorMouseCursor),
+        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].colorMouseCursor),
         &dwSize
     );
     dwSize = MODEM_INIT_STRING_SIZE + 1;
@@ -1551,7 +1551,7 @@ void WritePrefsToRegistry(void) {
         gMiscText.writeRegistry.mainGameShowMenu.text,
         0,
         REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[0].showMenu),
+        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].showMenu),
         4
     );
     RegSetValueExA(
@@ -1559,7 +1559,7 @@ void WritePrefsToRegistry(void) {
         gMiscText.writeRegistry.mainGameX.text,
         0,
         REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[0].x),
+        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].x),
         4
     );
     RegSetValueExA(
@@ -1567,7 +1567,7 @@ void WritePrefsToRegistry(void) {
         gMiscText.writeRegistry.mainGameY.text,
         0,
         REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[0].y),
+        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].y),
         4
     );
     RegSetValueExA(
@@ -1575,7 +1575,7 @@ void WritePrefsToRegistry(void) {
         gMiscText.writeRegistry.mainGameWidth.text,
         0,
         REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[0].width),
+        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].width),
         4
     );
     RegSetValueExA(
@@ -1583,7 +1583,7 @@ void WritePrefsToRegistry(void) {
         gMiscText.writeRegistry.mainGameHeight.text,
         0,
         REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[0].height),
+        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].height),
         4
     );
     RegSetValueExA(
@@ -1591,7 +1591,7 @@ void WritePrefsToRegistry(void) {
         gMiscText.writeRegistry.mainGameFullScreen.text,
         0,
         REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[0].fullScreen),
+        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].fullScreen),
         4
     );
     RegSetValueExA(
@@ -1599,7 +1599,7 @@ void WritePrefsToRegistry(void) {
         gMiscText.writeRegistry.mainGameColorMouseCursor.text,
         0,
         REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[0].colorMouseCursor),
+        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].colorMouseCursor),
         4
     );
     RegSetValueExA(
@@ -1607,7 +1607,7 @@ void WritePrefsToRegistry(void) {
         gMiscText.writeRegistry.editorShowMenu.text,
         0,
         REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[1].showMenu),
+        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].showMenu),
         4
     );
     RegSetValueExA(
@@ -1615,7 +1615,7 @@ void WritePrefsToRegistry(void) {
         gMiscText.writeRegistry.editorX.text,
         0,
         REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[1].x),
+        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].x),
         4
     );
     RegSetValueExA(
@@ -1623,7 +1623,7 @@ void WritePrefsToRegistry(void) {
         gMiscText.writeRegistry.editorY.text,
         0,
         REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[1].y),
+        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].y),
         4
     );
     RegSetValueExA(
@@ -1631,7 +1631,7 @@ void WritePrefsToRegistry(void) {
         gMiscText.writeRegistry.editorWidth.text,
         0,
         REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[1].width),
+        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].width),
         4
     );
     RegSetValueExA(
@@ -1639,7 +1639,7 @@ void WritePrefsToRegistry(void) {
         gMiscText.writeRegistry.editorHeight.text,
         0,
         REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[1].height),
+        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].height),
         4
     );
     RegSetValueExA(
@@ -1647,7 +1647,7 @@ void WritePrefsToRegistry(void) {
         gMiscText.writeRegistry.editorFullScreen.text,
         0,
         REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[1].fullScreen),
+        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].fullScreen),
         4
     );
     RegSetValueExA(
@@ -1655,7 +1655,7 @@ void WritePrefsToRegistry(void) {
         gMiscText.writeRegistry.editorColorMouseCursor.text,
         0,
         REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[1].colorMouseCursor),
+        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].colorMouseCursor),
         4
     );
     RegCloseKey(hKey);

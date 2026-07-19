@@ -25,6 +25,10 @@ H2_ENUM_CLASS_BEGIN(ConfigOperaMode)
     CONFIG_OPERA_ENABLED  = 1
 H2_ENUM_CLASS_END(ConfigOperaMode)
 
+// Expansion-only storage selectors keep VC4.2's TU-wide enum state byte-neutral.
+#define CONFIG_EXECUTABLE_GAME 0
+#define CONFIG_EXECUTABLE_EDITOR 1
+
 H2_ENUM_BEGIN(ConfigStorageConstant)
     CONFIG_EXECUTABLE_COUNT = 2,
     CONFIG_GRAPHICS_SIZE    = 0x1c,
@@ -46,7 +50,7 @@ struct configStruct {
     i32 autosave;
     i32 showRoute;
     i32 blackoutComputer;
-    exeGfxConfig gfx[CONFIG_EXECUTABLE_COUNT];
+    exeGfxConfig gfx[IDX(CONFIG_EXECUTABLE_COUNT)];
     i32 firstMapOffset;
     i32 currentMapOffset;
     i32 showObjectBoxes;
