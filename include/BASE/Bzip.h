@@ -13,12 +13,7 @@ typedef u8 UChar;
 typedef i32 Bool;
 typedef i32 IntNative;
 
-H2_ENUM_BEGIN(BzipStorageConstant)
-    MAX_SYMBOLS                = 256,
-    MODEL_FREQUENCY_PADDING    = 2,
-    BZIP_CRC_TABLE_SIZE        = 256,
-    BZIP_PROGRAM_NAME_CAPACITY = 0x400
-H2_ENUM_END(BzipStorageConstant)
+#define MAX_SYMBOLS 256
 
 struct BitStream {
     FILE* handle;
@@ -34,7 +29,7 @@ struct Model {
     UInt32 incValue;
     UInt32 noExceed;
     Char* name;
-    UInt32 freq[MAX_SYMBOLS + MODEL_FREQUENCY_PADDING];
+    UInt32 freq[MAX_SYMBOLS + 2];
 };
 
 void initialiseCRC(void);
@@ -132,13 +127,13 @@ void uncompress(Char* name);
 i32l EncodeData(char* dst, char* src, u32l srcLen);
 i32l DecodeData(char* dst, char* src, u32l srcLen);
 
-extern UInt32 crc32Table[BZIP_CRC_TABLE_SIZE];
+extern UInt32 crc32Table[256];
 extern char inName[];
 extern char outName[];
 
 extern i32 longestFileName;
 extern i32 opMode;
-extern char progNameReally[BZIP_PROGRAM_NAME_CAPACITY];
+extern char progNameReally[0x400];
 extern i32 keepInputFiles;
 
 #endif
