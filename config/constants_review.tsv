@@ -59,8 +59,8 @@ include/BASE/resource.h	reviewed	Shared resource-category and reference-lifecycl
 include/BASE/resourceManager.h	reviewed	Only aggregate capacity, Read13 width, and filename capacity remain public because they define class layout or are consumed by FONT. Implementation policy moved to RESMGR.cpp; private save arrays use incomplete extern declarations.
 include/BASE/sample.h	reviewed	The declaration uses named types; the sole literal is packed-layout SIZE evidence.
 include/BASE/sampleData.h	reviewed	The record fields are named; the sole literal is packed-layout SIZE evidence.
-include/BASE/soundManager.h	pending
-include/BASE/soundmgr.h	pending
+include/BASE/soundManager.h	reviewed	Shared MIDI, volume, sample-operation, report-query, and storage extents are named enums; remaining literals are packed class-layout padding and SIZE evidence.
+include/BASE/soundmgr.h	reviewed	The header contains declarations only and no numeric literals.
 include/BASE/textEntryWidget.h	reviewed	Shared serialized read-mode and constructor-layout domains are named and aligned; the remaining literal is proven packed class-layout SIZE evidence.
 include/BASE/textWidget.h	reviewed	Public class interface contains only packed-layout SIZE evidence.
 include/BASE/tileset.h	reviewed	Only packed-layout SIZE evidence.
