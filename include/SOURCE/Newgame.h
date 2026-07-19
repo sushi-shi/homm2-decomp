@@ -48,14 +48,20 @@ inline i32 LastNewGameControl(NewGameControl first, i32 count) {
 #define LastNewGameControl(first, count) ((first) + (count) - 1)
 #endif
 
+H2_ENUM_BEGIN(NewGameRemotePacketConstant)
+    NEW_GAME_REMOTE_RESERVED_SIZE     = 4,
+    NEW_GAME_REMOTE_SEQUENCE_SIZE     = 2,
+    NEW_GAME_REMOTE_PAYLOAD_HEAD_SIZE = 1
+H2_ENUM_END(NewGameRemotePacketConstant)
+
 #pragma pack(push, 1)
 struct NewGameRemotePacket {
     i8 sender;
-    u8 reserved[4];
+    u8 reserved[NEW_GAME_REMOTE_RESERVED_SIZE];
     i8 type;
     i8 command;
-    u8 sequence[2];
-    char payload[1];
+    u8 sequence[NEW_GAME_REMOTE_SEQUENCE_SIZE];
+    char payload[NEW_GAME_REMOTE_PAYLOAD_HEAD_SIZE];
 };
 
 #pragma pack(pop)

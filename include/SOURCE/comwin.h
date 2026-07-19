@@ -4,16 +4,22 @@
 #include <windows.h>
 #include <va.h>
 
+H2_ENUM_BEGIN(ComPortConstant)
+    COM_PORT_FLEXIBLE_DATA_SIZE = 1,
+    COM_PORT_PREFIX_GAP_SIZE    = 4,
+    COM_PORT_RUNTIME_GAP_SIZE   = 0x18
+H2_ENUM_END(ComPortConstant)
+
 // Intrusive-list anchors store the tail before the head.
 struct tag_Node {
     struct tag_Node* prev;
     struct tag_Node* next;
     u16 len;
     union {
-        u8 comData[1];
+        u8 comData[COM_PORT_FLEXIBLE_DATA_SIZE];
         struct {
             u8 sessionIndex; // NetBIOS session table index
-            u8 data[1];      // NetBIOS payload (variable length)
+            u8 data[COM_PORT_FLEXIBLE_DATA_SIZE]; // NetBIOS payload (variable length)
         };
     };
 };
@@ -24,10 +30,10 @@ struct tag_Anchor {
 
 struct ComPortState {
     HANDLE handle;
-    u8 reserved04[4];
+    u8 reserved04[COM_PORT_PREFIX_GAP_SIZE];
     DCB savedState;
     COMMTIMEOUTS savedTimeouts;
-    u8 reserved38[0x18];
+    u8 reserved38[COM_PORT_RUNTIME_GAP_SIZE];
     tag_Anchor normalQueue;
     tag_Anchor priorityQueue;
 };
