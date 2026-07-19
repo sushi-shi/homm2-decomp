@@ -73,7 +73,6 @@ void soundManager::MIDIShutdown(void) {
     }
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x004d3ac0, 0x3ab)
 void soundManager::MIDIPlay(i32 midiTrack) {
     if (gbNoSound == 0 && m_midiReady != 0 && gConfig.musicVolume != 0) {

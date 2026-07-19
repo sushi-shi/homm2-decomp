@@ -205,7 +205,6 @@ extern "C" u16 __fastcall nb_snd(i16 session, i16 len, void* data) {
     return 0;
 }
 
-// @early-stop: delinker jump-table artifact.
 VA(0x004a726a, 0x4cd)
 extern "C" u16 __cdecl nb_sess(i16 operation, ...) {
     i32 oldSession;
@@ -335,7 +334,6 @@ extern "C" char __fastcall nb_stat(i16 session) {
     return gNetStatus[session];
 }
 
-// @early-stop: delinker artifact.
 VA(0x004a7758, 0xdd2)
 void nb_thr_ctl(void) {
     DATA(0x0051751c) static i16 gNbThreadSourceLineBase = 412;
@@ -422,7 +420,6 @@ static void nb_add_name(void) {
     }
 }
 
-// @early-stop: delinker artifact.
 VA(0x004a7a81, 0x1ca)
 static void __stdcall nb_add_name_done(NetbiosControlBlock* ncb) {
     DATA(0x00517578) static i16 gNbAddNameSourceLineBase = 534;
@@ -606,7 +603,6 @@ static void __fastcall nb_close_session(i32 session) {
     }
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x004a832a, 0x179)
 static void __fastcall nb_recv_complete(i32 session) {
     DATA(0x005175f0) static i16 gNbReceiveCompleteSourceLineBase = 780;

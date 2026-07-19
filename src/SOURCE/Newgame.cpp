@@ -129,8 +129,6 @@ H2_ENUM_CLASS_END(NewGameKeyCode)
 
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\Newgame.cpp"
 
-// @early-stop
-// @early-stop-reloc-only: relocation naming only.
 VA(0x004b6f40, 0x1d5)
 void game::GetMap(void) {
     fileRequester* requesterResult;
@@ -179,7 +177,6 @@ void game::GetMap(void) {
     }
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x004b7115, 0x77)
 void game::ProcessNewMap(struct SMapHeader* header) {
     m_newGameInitialized = 0;
@@ -194,7 +191,6 @@ void game::ProcessNewMap(struct SMapHeader* header) {
     }
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x004b718c, 0x491)
 void game::InitNewGame(struct SMapHeader* header) {
     i32 activePlayerCount;
@@ -298,7 +294,6 @@ void game::SetupNetPlayerNames(void) {
     }
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x004b769e, 0xaca)
 i32 game::NewGame(void) {
     DATA(0x0051cdd0) static i16 newGameSourceLineBase = 319;
@@ -742,8 +737,6 @@ void game::InitNewGameWindow(void) {
     }
 }
 
-// @early-stop
-// @early-stop-reloc-only: relocation naming only.
 VA(0x004b88d6, 0x59c)
 void game::UpdateNewGameWindow(void) {
     i32 playerLockedValue;
@@ -888,7 +881,6 @@ void game::UpdateNewGameWindow(void) {
     DrawNGKPDisplayString(0);
 }
 
-// @early-stop: delinker artifact.
 VA(0x004b8e72, 0xf46)
 i32 NewGameHandler(struct tag_message& message) {
     i32 transmitResultTemp;
@@ -1384,7 +1376,6 @@ finish:
     return 1;
 }
 
-// @semantic: branch/code-shape residual.
 VA(0x004b9db8, 0x418)
 i32 game::ProcessNGKeyPress(struct tag_message& message) {
     char workText[GAME_KEY_BUFFER_SIZE];
@@ -1887,8 +1878,6 @@ void game::ShowScenInfo(void) {
     delete scenarioWindowValue;
 }
 
-// @early-stop
-// @early-stop-reloc-only: relocation naming only.
 VA(0x004baf0d, 0x1c7)
 void game::GetLossConditionText(char* text) {
     i32 week2;

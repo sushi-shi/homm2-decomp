@@ -354,7 +354,6 @@ void ExpCampaign::InitNewCampaign(i32 campaignId) {
     ResetBonusChoices();
 }
 
-// @early-stop: delinker jump-table artifact.
 VA(0x004bb843, 0x7cb)
 void ExpCampaign::InitMap(void) {
     SCampaignChoice* campaignChoice =
@@ -627,7 +626,6 @@ void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
     }
 }
 
-// @semantic: first residual is choice-index evaluation order at +0x2b0.
 VA(0x004bc34d, 0x921)
 void ExpCampaign::UpdateInfo(i32 redraw) {
     tag_message message;
@@ -840,7 +838,6 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
         m_window->DrawWindow();
 }
 
-// @early-stop: delinker jump-table artifact.
 VA(0x004bcc6e, 0x172)
 i32 ExpCampaign::HandleVictory(void) {
     i32 days = 0;
@@ -882,7 +879,6 @@ i32 ExpCampaign::HandleVictory(void) {
     return 0;
 }
 
-// @early-stop: delinker jump-table artifact.
 VA(0x004bcde0, 0x167)
 void ExpCampaign::HandleVictory1(void) {
     switch (m_currentMap + 1) {
@@ -934,7 +930,6 @@ void ExpCampaign::HandleVictory1(void) {
     }
 }
 
-// @early-stop: delinker jump-table artifact.
 VA(0x004bcf47, 0x14b)
 void ExpCampaign::HandleVictory2(void) {
     switch (m_currentMap + 1) {
@@ -982,7 +977,6 @@ void ExpCampaign::HandleVictory2(void) {
     }
 }
 
-// @early-stop: delinker jump-table artifact.
 VA(0x004bd092, 0xce)
 void ExpCampaign::HandleVictory3(void) {
     switch (m_currentMap + 1) {
@@ -1011,7 +1005,6 @@ void ExpCampaign::HandleVictory3(void) {
     }
 }
 
-// @early-stop: delinker jump-table artifact.
 VA(0x004bd160, 0xb9)
 void ExpCampaign::HandleVictory4(void) {
     switch (m_currentMap + 1) {
@@ -1037,7 +1030,6 @@ void ExpCampaign::HandleVictory4(void) {
     }
 }
 
-// @early-stop: delinker jump-table artifact.
 VA(0x004bd219, 0x8c)
 void ExpCampaign::ReplaySmacker(void) {
     switch (m_campaignId) {
@@ -1057,7 +1049,6 @@ void ExpCampaign::ReplaySmacker(void) {
     gpWindowManager->m_updateFlags = 1;
 }
 
-// @early-stop: delinker jump-table artifact.
 VA(0x004bd2a5, 0xf8)
 void ExpCampaign::ReplaySmacker1(void) {
     switch (m_viewMap + 1) {
@@ -1091,7 +1082,6 @@ void ExpCampaign::ReplaySmacker1(void) {
     }
 }
 
-// @early-stop: delinker jump-table artifact.
 VA(0x004bd39d, 0xd9)
 void ExpCampaign::ReplaySmacker2(void) {
     switch (m_viewMap + 1) {
@@ -1122,7 +1112,6 @@ void ExpCampaign::ReplaySmacker2(void) {
     }
 }
 
-// @early-stop: delinker jump-table artifact.
 VA(0x004bd476, 0xac)
 void ExpCampaign::ReplaySmacker3(void) {
     switch (m_viewMap + 1) {
@@ -1144,7 +1133,6 @@ void ExpCampaign::ReplaySmacker3(void) {
     }
 }
 
-// @early-stop: delinker jump-table artifact.
 VA(0x004bd522, 0x88)
 void ExpCampaign::ReplaySmacker4(void) {
     switch (m_viewMap + 1) {
@@ -1179,7 +1167,6 @@ i8 ExpCampaign::IsThisMapCompleted(void) {
     return 0;
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x004bd639, 0x32e)
 i32 ExpCampaign::MessageHandler(struct tag_message& message) {
     i32 map;
@@ -1311,8 +1298,6 @@ char* ExpCampaign::JosephName(void) {
     return xStableText[m_currentMap];
 }
 
-// @early-stop
-// @early-stop-reloc-only: relocation naming only.
 VA(0x004bdab1, 0x3a)
 char* ExpCampaign::IvanName(void) {
     if (m_currentMap < EXPANSION_CAMPAIGN_FIRST_ALTERNATE_NAME_MAP)

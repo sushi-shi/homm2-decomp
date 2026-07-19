@@ -371,7 +371,6 @@ void combatManager::InitNonVisualVars(void) {
     LoadArmies();
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x0049089d, 0x203)
 void combatManager::SetupAdjacencyArray(void) {
     i32 destinationHex = 0;
@@ -634,7 +633,6 @@ void combatManager::GenerateMap(void) {
     randomOffset = SRandom(8, 15);
 }
 
-// @early-stop: delinker jump-table artifact.
 VA(0x004919a6, 0x224)
 char* combatManager::GetBackgroundName(void) {
     i32 backgroundIndex;
@@ -703,7 +701,6 @@ char* combatManager::GetBackgroundName(void) {
     return cCombatBkgNames[backgroundIndex];
 }
 
-// @early-stop: delinker jump-table artifact.
 VA(0x00491bca, 0x210)
 i32 combatManager::MoreTreesNear(void) {
     i32 treeCount;
@@ -765,7 +762,6 @@ i32 combatManager::MoreTreesNear(void) {
     return mountainCounter < treeCount;
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x00491dda, 0x3e7)
 void combatManager::LoadIcons(void) {
     i32 index;
@@ -1036,7 +1032,6 @@ void combatManager::CheckApplyGoodMorale(i32 side, i32 index) {
         WaitEndSample(moraleSample, -1);
 }
 
-// @semantic: first residual at +0x27 is equivalent m_armies indexing.
 VA(0x00492afa, 0x1cd)
 i32 combatManager::CheckApplyBadMorale(i32 side, i32 index) {
     if (side < 0 || index < 0)
@@ -1188,7 +1183,6 @@ i32 combatManager::IsWinner(i32 side) {
     return winner;
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x0049311f, 0x100e)
 void combatManager::CatAttack(i32 side) {
     if (!m_inCastleCombat)
@@ -1552,7 +1546,6 @@ void combatManager::CatAttack(i32 side) {
     LogStr("CA2");
 }
 
-// @semantic: first raw divergence is +0x2e0: the SAMPLE2 compiler temporary uses base -0xcc/-0xc8 versus retail -0xc8/-0xc4.
 VA(0x0049412d, 0x74f)
 void combatManager::KeepAttack(i32 tower) {
     if (!m_inCastleCombat)
@@ -1692,7 +1685,6 @@ void combatManager::KeepAttack(i32 tower) {
     LogStr("KA2");
 }
 
-// @semantic: stack-slot/code-shape residual.
 VA(0x0049487c, 0x17b)
 i32 combatManager::ExperienceValueOfStack(i32 side) {
     i32 experienceValue6 = 0;
@@ -1737,7 +1729,6 @@ void combatManager::DrawCombatBorder(void) {
     return;
 }
 
-// @semantic: branch/code-shape residual.
 VA(0x00494ae1, 0x4d8)
 void combatManager::SetupAndLoadObstacles(void) {
     u8 obstacleUsed[COMBAT_OBSTACLE_TYPE_COUNT];
@@ -1858,7 +1849,6 @@ void combatManager::SetupAndLoadObstacles(void) {
     }
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x00494fb9, 0x2a1)
 void combatManager::MakeCreaturesVanish(void) {
     ResetLimitCreature();
@@ -1970,7 +1960,6 @@ i32 combatManager::InCastle(i32 hex) {
                : 0;
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x00495559, 0x346)
 i32 combatManager::ShotIsThroughWall(i32 side, i32 sourceHex, i32 targetHex) {
     if (!m_inCastleCombat)
@@ -2036,7 +2025,6 @@ i32 combatManager::ShotIsThroughWall(i32 side, i32 sourceHex, i32 targetHex) {
     return 0;
 }
 
-// @semantic: compiler-shape residual.
 VA(0x0049589f, 0x52e)
 void combatManager::ShootMissile(
     i32 sourceX,
@@ -2257,7 +2245,6 @@ void UpdateCombatSystemOptions(i32 initialDraw) {
         CSPanel->DrawWindow(1, 0, SYSTEM_OPTION_DRAW_MASK);
 }
 
-// @early-stop: delinker jump-table artifact.
 VA(0x004960a9, 0x39a)
 i32 CombatSystemOptionsHandler(tag_message& message) {
     i32 bRedraw = 0;

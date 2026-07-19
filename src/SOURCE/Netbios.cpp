@@ -47,7 +47,6 @@ H2_ENUM_CLASS_BEGIN(NetbiosGameMode)
     GAME_MODE_GUEST = 2
 H2_ENUM_CLASS_END(NetbiosGameMode)
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x004132f0, 0x155)
 i8 InitNetHost(void) {
     char localName[NAME_BUFFER_SIZE];
@@ -92,7 +91,6 @@ i8 InitNetHost(void) {
     return 0;
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x00413445, 0x1ab)
 i8 InitNetGuest(void) {
     char localName[NAME_BUFFER_SIZE];

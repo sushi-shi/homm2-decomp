@@ -53,7 +53,6 @@ void resourceManager::GetBackdrop(char* name, class bitmap* backdrop, i32 useIco
     }
 }
 
-// @semantic: branch/code-shape residual.
 VA(0x004c8130, 0xd2)
 void resourceManager::GetBackdropAtLoc(
     char* filename,
@@ -277,7 +276,6 @@ void resourceManager::RemoveResource(class resource* resourceToRemove) {
     }
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x004c89e0, 0xc8)
 void resourceManager::Close(void) {
     i32 aggregateIndex;
@@ -297,7 +295,6 @@ void resourceManager::Close(void) {
     m_active = false;
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x004c8ab0, 0x143)
 i32 resourceManager::LoadAggregateHeader(char* aggregateName) {
     i16 fileCountBuffer[2];
@@ -469,7 +466,6 @@ void resourceManager::Read13(i8* destination) {
     ReadBlock(destination, RESOURCE_MANAGER_READ13_BYTES);
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x004c91b0, 0xbd)
 void resourceManager::ReadBlock(i8* destination, u32l size) {
     H2_ASSERT(m_aggregateFd[m_curAggregate] != RESOURCE_MANAGER_INVALID_FILE, RETAIL_FILE, 816);

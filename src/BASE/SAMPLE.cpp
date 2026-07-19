@@ -27,7 +27,6 @@ H2_ENUM_END(SampleConstant)
 DATA(0x00520df4) static SSampleSourceFiles gSampleSourceFiles =
     {SAMPLE_SOURCE_FILE, SAMPLE_SOURCE_FILE, SAMPLE_SOURCE_FILE, SAMPLE_SOURCE_FILE};
 
-// @early-stop: retail alignment artifact.
 VA(0x004dad60, 0x181)
 sample::sample(char* name, i32l channelType, i32l volume, i32l loopCount)
     : resource(
@@ -80,7 +79,6 @@ sample::sample(char* name, i32l channelType, i32l volume, i32l loopCount)
     gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_playbackData.data), size);
 }
 
-// @early-stop: delinker artifact.
 VA(0x004daf40, 0x2c)
 inline sample::~sample() {
 #line 97
@@ -105,7 +103,6 @@ MIDIWrap::MIDIWrap(char* name)
     gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_data), size);
 }
 
-// @early-stop: delinker artifact.
 VA(0x004db030, 0x28)
 inline MIDIWrap::~MIDIWrap() {
 #line 118

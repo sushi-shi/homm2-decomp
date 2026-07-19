@@ -52,8 +52,6 @@ H2_ENUM_CLASS_BEGIN(RequesterIconFrame)
     LOSS_FRAME_BASE         = 0x24
 H2_ENUM_CLASS_END(RequesterIconFrame)
 
-// @early-stop
-// @early-stop-reloc-only: relocation naming only.
 VA(0x0048c920, 0x80)
 i32 GetMapHeader(char* filename, struct SMapHeader* header) {
     sprintf(gText, "%s%s", gcMapPath, filename);
@@ -71,8 +69,6 @@ i32 CheckSumIsDemoOK(char*) {
     return 1;
 }
 
-// @early-stop
-// @early-stop-reloc-only: relocation naming only.
 VA(0x0048c9bb, 0xbb)
 i32 ShowThisMapGame(char* filename) {
     return 1;
@@ -97,7 +93,6 @@ i32 ShowThisMap(char*) {
     return 1;
 }
 
-// @semantic: first executable residual is the map-size comparison: base emits a local jne.
 VA(0x0048ca91, 0x7c1)
 i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly) {
     char fullPath[FILE_REQUESTER_PATH_SIZE];
@@ -315,8 +310,6 @@ void fileRequester::Close(void) {
     m_active = false;
 }
 
-// @early-stop
-// @early-stop-reloc-only: relocation naming only.
 VA(0x0048d5e1, 0x466)
 i32 fileRequester::Open(i32 id) {
     strcpy(gLastFilename, "");
@@ -439,7 +432,6 @@ void fileRequester::SetOK(i32 enabled) {
     m_window->BroadcastMessage(message);
 }
 
-// @semantic: first executable residual is the key-up selected/top comparison polarity.
 VA(0x0048daec, 0x11ae)
 i32 fileRequester::Main(struct tag_message& message) {
     i32 acceptStep = 0;
@@ -877,8 +869,6 @@ i32 fileRequester::Main(struct tag_message& message) {
     return FILE_REQUESTER_MAIN_CONTINUE;
 }
 
-// @early-stop
-// @early-stop-reloc-only: relocation naming only.
 VA(0x0048ec9a, 0x2e8)
 void fileRequester::DoKnob(void) {
     i32 oldTopIndex = m_topIndex;
@@ -932,7 +922,6 @@ void fileRequester::DoKnob(void) {
     Update(1);
 }
 
-// @semantic: First divergence is at +0x81: retail loads giMapSizeFilter then compares the loop index against EAX.
 VA(0x0048ef82, 0xc42)
 void fileRequester::Update(i32 drawWindow) {
     tag_message broadcastMessage;
@@ -1113,7 +1102,6 @@ void fileRequester::Update(i32 drawWindow) {
     }
 }
 
-// @semantic: compiler-shape residual.
 VA(0x0048fbc4, 0x15b)
 char* fileRequester::GetFilename(void) {
     if (m_mode != FILE_REQUESTER_SAVE_GAME

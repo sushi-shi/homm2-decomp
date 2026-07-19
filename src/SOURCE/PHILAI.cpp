@@ -180,7 +180,6 @@ DATA(0x004f2474) static i16 s_closeAIMapLineBase = 0x1b96;
 
 DATA(0x005256f0) searchArray SVSearchArray;
 
-// @semantic: compiler-shape residual.
 VA(0x0043781b, 0x1b5)
 void ResetHeroRVs(i32 resetAll, i32 x, i32 y) {
     i32 idx;
@@ -262,7 +261,6 @@ philAI::philAI(void) {
     }
 }
 
-// @semantic: compiler-shape residual.
 VA(0x00437bb5, 0xac)
 void philAI::DoAllHeroInteractions(void) {
     i32 i;
@@ -273,7 +271,6 @@ void philAI::DoAllHeroInteractions(void) {
     }
 }
 
-// @semantic: compiler-shape residual.
 VA(0x00437c61, 0x37e)
 void philAI::CheckForCreatureUpgrades(void) {
     i32 upgradeType = -1;
@@ -361,7 +358,6 @@ inline town* GetCastleSlot(i32 id) {
     return &gpGame->m_castleRecs[id];
 }
 
-// @semantic: compiler-shape residual.
 VA(0x00437fdf, 0x4be)
 void philAI::CheckBuyStuff(void) {
     i32 done = 0;
@@ -469,7 +465,6 @@ inline hero* GetHeroSlot(i32 id) {
     return &gpGame->m_heroRecs[id];
 }
 
-// @semantic: differs only at the two owned-current-turn exits.
 VA(0x0043849d, 0x2e8)
 i32 philAI::GoodAdjacent(i32* direction) {
     i32 ra;
@@ -536,7 +531,6 @@ i32 philAI::GoodAdjacent(i32* direction) {
     return 0;
 }
 
-// @semantic: first residual is /Od operand-memory choice at instruction 72.
 VA(0x00438785, 0x4b8)
 void philAI::CheckReload(void) {
     i32 p;
@@ -622,7 +616,6 @@ void philAI::CheckReload(void) {
     }
 }
 
-// @semantic: compiler-shape residual.
 VA(0x00438c3d, 0x302)
 void philAI::CheckBerserk(void) {
     i32 row17;
@@ -704,7 +697,6 @@ void philAI::DimensionDoorTo(i32 x, i32 y) {
     gpCurAIHero->UseSpell(SPELL_DIMENSION_DOOR);
 }
 
-// @semantic: compiler-shape residual.
 VA(0x00438fb0, 0x3f9)
 i32 philAI::DoAnywhereDDoorTownGate(i32 targetValue) {
     i32 bestY;
@@ -818,7 +810,6 @@ i32 philAI::DoAnywhereDDoorTownGate(i32 targetValue) {
     return 0;
 }
 
-// @semantic: first residual now only loads node before gpSearchArray where retail loads them in reverse.
 VA(0x004393a9, 0x158)
 i32 philAI::DoDimensionDoor(hero* pHero) {
     i32 node;
@@ -851,7 +842,6 @@ i32 philAI::DoDimensionDoor(hero* pHero) {
     return 1;
 }
 
-// @semantic: stack-slot/code-shape residual.
 VA(0x00439501, 0xb7)
 void philAI::SetupRelativeHeroStrengths(void) {
     hero* alpha;
@@ -884,7 +874,6 @@ void ValidateHero(hero* pHero) {
     }
 }
 
-// @semantic: evaluation-order residual.
 VA(0x00439631, 0xcad)
 void philAI::DoAI(i32 player) {
     i32 hiddenPointers7 = 0;
@@ -1202,7 +1191,6 @@ void philAI::GetGameAIVars(void) {
         GetGameAttentionValue(i);
 }
 
-// @semantic: evaluation-order residual.
 VA(0x0043a329, 0xe2b)
 void philAI::GetTurnAIVars(i32 player) {
     i32 ownedTownCount19;
@@ -1459,7 +1447,6 @@ firstWeekDone:
         giMaxHeroesForThisPlayer = gpCurPlayer->m_minimumHeroCount;
 }
 
-// @semantic: compiler-shape residual.
 VA(0x0043b154, 0x5f4)
 void philAI::GetBestBHC(i32 player, BHC& best) {
     i32 townStrength[72];
@@ -1558,7 +1545,6 @@ void philAI::GetBestBHC(i32 player, BHC& best) {
         best.type = -1;
 }
 
-// @semantic: compiler-shape residual.
 VA(0x0043b748, 0x11d)
 hero* philAI::DetermineHeroToMove(i32 player) {
     i32 val; // per-hero value
@@ -1582,7 +1568,6 @@ hero* philAI::DetermineHeroToMove(i32 player) {
     return NULL;
 }
 
-// @semantic: compiler-shape residual.
 VA(0x0043b865, 0xe7d)
 i32 philAI::DetermineTargetPosition(i32& targetX, i32& targetY, i32 mobility, i32& direction) {
     i32 boatTravelDistanceCounter;
@@ -1877,7 +1862,6 @@ i32 philAI::DetermineTargetPosition(i32& targetX, i32& targetY, i32 mobility, i3
     return bestValue;
 }
 
-// @semantic: compiler-shape residual.
 VA(0x0043c6e2, 0x791)
 void philAI::ProbableOutcomeOfBattle(
     armyGroup* attacker,
@@ -2080,8 +2064,6 @@ float philAI::GetOddsOfWinning(i32) {
     return 1.0f;
 }
 
-// @early-stop
-// @early-stop-reloc-only: relocation naming only.
 VA(0x0043ce91, 0x826)
 void philAI::ValueOfBuyingBuilding(
     town* townPtr,
@@ -2311,8 +2293,6 @@ void philAI::ValueOfBuyingBuilding(
     benefitCost = adjustedValue / RVConversion(costsByResource);
 }
 
-// @early-stop
-// @early-stop-reloc-only: relocation naming only.
 VA(0x0043d6b7, 0x19b)
 void philAI::GetBestBuilding(town* t, BHC& bhc, float& fOut) {
     float score;
@@ -2357,7 +2337,6 @@ void philAI::GetBestBuilding(town* t, BHC& bhc, float& fOut) {
     fOut = nb;
 }
 
-// @semantic: compiler-shape residual.
 VA(0x0043d852, 0x306)
 void philAI::ValueOfBuyingCreature(
     town* townPtr,
@@ -2454,7 +2433,6 @@ void philAI::ValueOfBuyingCreature(
     benefitCost = static_cast<float>(resourceValue) / purchaseCost;
 }
 
-// @semantic: compiler-shape residual.
 VA(0x0043db58, 0x35b)
 void philAI::GetBestCreature(town* townPtr, BHC& best, float& bestValue) {
     i32 bestDwelling;
@@ -2561,7 +2539,6 @@ i32 philAI::CreaturesToBuy(town* t, i32 level) {
     return CreaturesToBuy((i32)gDwellingType[t->m_type][level], nGarrison);
 }
 
-// @semantic: compiler-shape residual.
 VA(0x0043defb, 0x5f)
 i32 philAI::CreaturesToBuy(i32 a, i32 b) {
     i32 n = MaxBuyableCreatures(CreatureType(a));
@@ -2592,7 +2569,6 @@ i32 philAI::MaxBuyableCreatures(CreatureType level) {
     return res;
 }
 
-// @semantic: compiler-shape residual.
 VA(0x0043dff6, 0x2b2)
 void philAI::ValueOfBuyingHero(
     town* townPtr,
@@ -2648,7 +2624,6 @@ void philAI::ValueOfBuyingHero(
     resourceValue = value27;
 }
 
-// @semantic: evaluation-order residual.
 VA(0x0043e2a8, 0x1b1)
 void philAI::GetBestHero(town* townPtr, BHC& best, float& bestValue) {
     float benefitCost;
@@ -2722,8 +2697,6 @@ i32 philAI::MeanRVOfUnexploredTerritory(i32) {
     return 0;
 }
 
-// @early-stop
-// @early-stop-reloc-only: relocation naming only.
 VA(0x0043e4d8, 0x1d8)
 void philAI::GetGameAttentionValue(i32 player) {
     playerAttentionWeights* attention = &gpGame->m_players[player].m_attentionWeights;
@@ -2786,7 +2759,6 @@ i32 philAI::RVConversion(i32* const p) {
                  + (float)p[IDX(RES_CRYSTAL)] * gafAITurnCostResource[IDX(RES_CRYSTAL)]);
 }
 
-// @semantic: compiler-shape residual.
 VA(0x0043e848, 0xd0)
 float philAI::TurnsToBuy(i32* const p) {
     float maxT = 0;
@@ -2806,7 +2778,6 @@ float philAI::TurnsToBuy(i32* const p) {
     return maxT;
 }
 
-// @semantic: constant-pool/code-shape residual.
 VA(0x0043e918, 0x62d)
 i32 philAI::RVOfPosition(
     i32 x,
@@ -2977,7 +2948,6 @@ i32 philAI::RVOfPosition(
     return totalValue;
 }
 
-// @semantic: constant-pool/code-shape residual.
 VA(0x0043ef45, 0xaf9)
 i32 philAI::StrategicValueOfPosition(
     i32 targetX,
@@ -3185,7 +3155,6 @@ i32 philAI::StrategicValueOfPosition(
     return score4;
 }
 
-// @semantic: first code residual is the first castle-coordinate equality: ours loads the town byte before the game-header word.
 VA(0x0043fa3e, 0x14e)
 i32 philAI::ValueOfTown(town* t) {
     i32 sum = 0;
@@ -3211,7 +3180,6 @@ i32 philAI::ValueOfTown(town* t) {
     return sum;
 }
 
-// @semantic: compiler-shape residual.
 VA(0x0043fb8c, 0x180)
 void philAI::TurnCostResource(i32 player) {
     i32 nb;
@@ -3234,7 +3202,6 @@ void philAI::TurnCostResource(i32 player) {
     }
 }
 
-// @semantic: compiler-shape residual.
 VA(0x0043fd0c, 0x175)
 float philAI::TurnValueOfObelisk(i32 player) {
     i32 jb;         // artifact RV
@@ -3266,7 +3233,6 @@ float philAI::FutureDeflator(i32* const p) {
     return v;
 }
 
-// @early-stop: delinker artifact.
 VA(0x0043fed2, 0xbf8)
 i32 philAI::FightValueOfStack(
     armyGroup* group,
@@ -3515,7 +3481,6 @@ i32 philAI::FightValueOfStack(
     return armyValue;
 }
 
-// @semantic: stack-slot/code-shape residual.
 VA(0x00440aca, 0x1e7)
 void philAI::EvaluateOneTimeCreaturePurchase(
     CreatureType creature,
@@ -3788,7 +3753,6 @@ i32 philAI::QuickCombat(
     return attackerWon2;
 }
 
-// @semantic: compiler-shape residual.
 VA(0x00441419, 0x422)
 void philAI::HeroInteractionAtHero(
     hero* firstHero,
@@ -3923,7 +3887,6 @@ void philAI::HeroInteractionAtHero(
     }
 }
 
-// @semantic: evaluation-order residual.
 VA(0x0044183b, 0x882)
 void philAI::HeroInteractionAtTown(hero* heroPtr, town* townPtr, i32 doInteraction, i32* value) {
     i32 heroStrength;
@@ -4151,7 +4114,6 @@ void philAI::HeroInteractionAtTown(hero* heroPtr, town* townPtr, i32 doInteracti
     }
 }
 
-// @semantic: only masked residual is TU-cumulative comparison load order at +0x3b9, +0x3bc.
 VA(0x004420bd, 0x4ba)
 void philAI::RedistributeTroops(
     armyGroup* sourceArmy,
@@ -4467,7 +4429,6 @@ void philAI::BuildHero(town* townPtr, i32 availableHeroIndex) {
     ShowStatus();
 }
 
-// @semantic: first residual is an FPU operand-load swap at +0x1c4/+0x1c6 and +0x1c7/+0x1c9.
 VA(0x00442be0, 0x2cd)
 void philAI::BuildCreature(town* townPtr, i32 dwelling, i32 purchaseCount) {
     i32 canJoin6;
@@ -4599,7 +4560,6 @@ i32 philAI::CombatMonsterEvent(hero* h, i32 monType, i32* pCount, mapCell* cell)
     return 0;
 }
 
-// @early-stop: delinker artifact.
 VA(0x0044316b, 0x6d7)
 i32 philAI::FightEvent(hero* h, mapCell* cell, i32 evaluateOnly) {
     i32 eventType16;
@@ -4926,8 +4886,6 @@ i32 philAI::ComputeUpgradeValue(CreatureType a1, CreatureType a2) {
     return result;
 }
 
-// @early-stop
-// @early-stop-reloc-only: relocation naming only.
 VA(0x00443c54, 0x271)
 i32 philAI::ComputeValueOfSS(hero* h, i32 skill, i32 level) {
     i32 fightValue7;
@@ -4994,8 +4952,6 @@ i32 philAI::ComputeValueOfFreeSS(hero* h, i32 ss) {
         return ComputeValueOfSS(h, ss, 1);
 }
 
-// @early-stop
-// @early-stop-reloc-only: relocation naming only.
 VA(0x00443f1e, 0xa6)
 i32 philAI::ManaRefreshValue(hero* h, i32 level) {
     i32 v = 0;
@@ -5009,7 +4965,6 @@ i32 philAI::ManaRefreshValue(hero* h, i32 level) {
     return v;
 }
 
-// @semantic: compiler-shape residual.
 VA(0x00443fc4, 0x1ac5)
 i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance) {
     mapCell* cell_k;
@@ -5671,7 +5626,6 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
     return value_h;
 }
 
-// @early-stop: delinker jump-table artifact.
 VA(0x00445a89, 0x299)
 i32 philAI::EvaluateGenericSite(mapCell* cell) {
     i32 unusedValue29;
@@ -5771,7 +5725,6 @@ i32 philAI::EvaluatePassword(mapCell* cell) {
         return 0;
 }
 
-// @early-stop: delinker jump-table artifact.
 VA(0x00445dde, 0xf5)
 i32 philAI::EvaluateRecruitSite(mapCell* cell) {
     i32 val;  // result
@@ -5847,7 +5800,6 @@ void CloseAIMapVars(void) {
     SVSearchArray.Close();
 }
 
-// @semantic: compiler-shape residual.
 VA(0x004460f8, 0x26a)
 i32 OnMySide(i32 player) {
     if (player != SIDE_NO_PLAYER
@@ -5882,7 +5834,6 @@ i32 OnMySide(i32 player) {
         return 0;
 }
 
-// @early-stop: delinker jump-table artifact.
 VA(0x00446362, 0x2bc)
 i32 philAI::EvaluateArtifactEvent(ArtifactType artifact, i32 eventData) {
     i32 battleScratch46;
@@ -5989,7 +5940,6 @@ i32 philAI::EvaluateArtifactEvent(ArtifactType artifact, i32 eventData) {
     return result5;
 }
 
-// @semantic: compiler-shape residual.
 VA(0x0044661e, 0x30a)
 i32 philAI::EvaluateMineEvent(i32 mineIndex, i32 x, i32 y, i32* liveChance) {
     float winChance;
@@ -6070,7 +6020,6 @@ i32 philAI::EvaluateMineEvent(i32 mineIndex, i32 x, i32 y, i32* liveChance) {
     return result1;
 }
 
-// @semantic: compiler-shape residual.
 VA(0x00446928, 0x33e)
 i32 philAI::EvaluateMonsterEvent(CreatureType monsterType, i32 eventData, i32* liveChance) {
     i32 result5;
@@ -6172,7 +6121,6 @@ i32 philAI::EvaluateMonsterEvent(CreatureType monsterType, i32 eventData, i32* l
     return result5;
 }
 
-// @semantic: branch/code-shape residual.
 VA(0x00446c66, 0x5ab)
 i32 philAI::EvaluateHeroEvent(i32 heroId, i32 x, i32 y, i32 mode, i32* liveChance) {
     float attackBonus6;
@@ -6306,7 +6254,7 @@ i32 philAI::EvaluateHeroEvent(i32 heroId, i32 x, i32 y, i32 mode, i32* liveChanc
     return result5;
 }
 
-// @early-stop: inline continuation artifact.
+// Retail /Ob1 includes an inline-accessor continuation in this function.
 VA(0x00447211, 0x4fa)
 i32 philAI::EvaluateTownEvent(i32 townId, i32 x, i32 y, i32 mode, i32* liveChance) {
     float ra;     // attack bonus

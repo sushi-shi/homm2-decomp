@@ -23,7 +23,6 @@ H2_ENUM_BEGIN(ArmyFlightConstant)
     VAMPIRE_FLIGHT_SOUND_DELAY = 100
 H2_ENUM_END(ArmyFlightConstant)
 
-// @semantic: branch/code-shape residual.
 VA(0x004a5900, 0x295)
 i32 army::CanFit(i32 hex, i32 tryOtherSide, i32* fittingHex) {
     hexcell* cell_9;
@@ -81,7 +80,6 @@ i32 army::CanFit(i32 hex, i32 tryOtherSide, i32* fittingHex) {
     return 1;
 }
 
-// @semantic: First residual is +0x03..+0x05: retail frame 0x38, ours 0x30 (8 bytes short).
 VA(0x004a5b95, 0x405)
 i32 army::ValidFlight(i32 destination, i32 fromTargetHex) {
     army* target;
@@ -199,7 +197,6 @@ i32 army::FlyTo(void) {
     return FlyTo(m_moveTargetHex);
 }
 
-// @semantic: First residual is +0x03..+0x08: retail frame 0xc0, ours 0xb4 (12 bytes short); NB09 has no local records.
 VA(0x004a5fbf, 0xc1f)
 i32 army::FlyTo(i32 destination) {
     i32 sourceColumn;

@@ -124,8 +124,6 @@ i32 highScoreManager::Main(struct tag_message& message) {
     return HIGH_SCORE_MANAGER_CONTINUE;
 }
 
-// @early-stop
-// @early-stop-reloc-only: relocation naming only.
 VA(0x00489e6a, 0x7d3)
 void highScoreManager::Update(void) {
     i32 entry;

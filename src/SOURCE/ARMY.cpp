@@ -277,7 +277,6 @@ void army::FreeResources(void) {
     }
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x0044b456, 0x7d2)
 void army::DrawToBuffer(i32 x, i32 y, i32 effectsOnly) {
     i32 quantityY0;
@@ -512,7 +511,6 @@ void army::Wince(void) {
     m_animationFrame = 0;
 }
 
-// @semantic: evaluation-order residual.
 VA(0x0044bc55, 0xb90)
 void army::Walk(i32 direction, i32 finishStanding, i32 skipDrawing) {
     i32 oldMaxX_1;
@@ -768,7 +766,6 @@ void army::Walk(i32 direction, i32 finishStanding, i32 skipDrawing) {
     }
 }
 
-// @semantic: evaluation-order residual.
 VA(0x0044c7e5, 0x14aa)
 void army::SpecialAttack(void) {
     char combatText[ARMY_COMBAT_TEXT_SIZE];
@@ -1223,7 +1220,6 @@ void army::DirDoAttack(i32 direction) {
     DoAttack(0);
 }
 
-// @semantic: stack-slot/code-shape residual.
 VA(0x0044dcba, 0x4e7)
 void army::DoHydraAttack(i32) {
     i32 damage_8;
@@ -1316,7 +1312,6 @@ void army::DoHydraAttack(i32) {
     gpCombatManager->m_limitCreatureCount[m_side][m_index] = 1;
 }
 
-// @semantic: jump-table placement residual.
 VA(0x0044e1a1, 0x1267)
 void army::DoAttack(i32 retaliation) {
     i32 targetOriginalFacing_5;
@@ -1668,7 +1663,6 @@ i32 army::WalkTo(void) {
     return WalkTo(m_moveTargetHex);
 }
 
-// @semantic: compiler-shape residual.
 VA(0x0044f443, 0x2ee)
 i32 army::WalkTo(i32 destination) {
     i32 direction_3;
@@ -1748,7 +1742,6 @@ i32 army::AttackTo(void) {
     return AttackTo(m_moveTargetHex);
 }
 
-// @semantic: only raw residual is +0x5e..+0x63: retail evaluates m_moveTargetHex then m_hex.
 VA(0x0044f756, 0x1e8)
 i32 army::AttackTo(i32 destination) {
     i32 finishStanding;
@@ -1800,7 +1793,6 @@ i32 army::AttackTo(i32 destination) {
     return ARMY_PATH_BLOCKED;
 }
 
-// @semantic: branch/code-shape residual.
 VA(0x0044f93e, 0x282)
 void army::CheckLuck(void) {
     SAMPLE2 luckSample;
@@ -1853,7 +1845,6 @@ void army::CheckLuck(void) {
     }
 }
 
-// @semantic: evaluation-order residual.
 VA(0x0044fbc0, 0x56e)
 void army::DamageEnemy(
     army* target,
@@ -1975,7 +1966,6 @@ void army::DamageEnemy(
     *killedResult = target->Damage(damageDone2, SPELL_NONE);
 }
 
-// @semantic: first residual is +0x1ca: retail evaluates current side before army index in the m_armies address.
 VA(0x0045012e, 0x23c)
 i32 army::Damage(i32l damage, SpellType spell) {
     i32 killed_13;
@@ -2033,7 +2023,6 @@ i32 army::Damage(i32l damage, SpellType spell) {
     return killed_13;
 }
 
-// @semantic: evaluation-order residual.
 VA(0x0045036a, 0x1361)
 void army::PowEffect(i32 effect, i32 resetLimits, i32 effectX, i32 effectY) {
     i32 damageFrames;
@@ -2421,7 +2410,6 @@ i32 army::LeaveNoBody(void) {
            || HAS(m_monster.flags.all, MONSTER_FLAGS_MIRROR_IMAGE);
 }
 
-// @semantic: compiler-shape residual.
 VA(0x00451766, 0x3f5)
 void army::ProcessDeath(i32 immediate) {
     i32 rearHex;
@@ -2595,7 +2583,6 @@ void army::SpellEffect(i32 effect, i32 effectFrameDelay, i32 animateCreature) {
     }
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x00451ef8, 0x10f)
 void army::CancelSpellType(ArmySpellCancelType cancelType) {
     switch (cancelType) {
@@ -2625,7 +2612,6 @@ void army::CancelSpellType(ArmySpellCancelType cancelType) {
     }
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x00452007, 0x178)
 void army::CancelIndividualSpell(ArmySpellInfluence influence) {
     if (!m_spellInfluence[IDX(influence)]) {
@@ -2673,7 +2659,6 @@ void army::CancelIndividualSpell(ArmySpellInfluence influence) {
     }
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x0045217f, 0x282)
 i32 army::SetSpellInfluence(ArmySpellInfluence influence, i32 rounds) {
     i32 i;
@@ -2746,7 +2731,6 @@ i32 army::SetSpellInfluence(ArmySpellInfluence influence, i32 rounds) {
     return 1;
 }
 
-// @semantic: compiler-shape residual.
 VA(0x00452401, 0x94)
 void army::DecrementSpellRounds(void) {
     i32 i;
@@ -2765,7 +2749,6 @@ void army::DecrementSpellRounds(void) {
     }
 }
 
-// @semantic: stack-slot/code-shape residual.
 VA(0x00452495, 0x644)
 void army::GoBerserk(void) {
     i32 masks_28[5];
@@ -2895,7 +2878,7 @@ berserkFinish:
     }
 }
 
-// @early-stop: inline continuation artifact.
+// Retail /Ob1 includes an inline-accessor continuation in this function.
 VA(0x00452ad9, 0x3f1)
 void army::MoveAttack(i32 destination, i32 moveOnly) {
     i32 baseAttackMask;
@@ -2992,7 +2975,6 @@ finish:
     gpCombatManager->m_limitCreature = 1;
 }
 
-// @semantic: branch/code-shape residual.
 VA(0x00452eca, 0x931)
 float army::SpellCastWorkChance(SpellType spell) {
     i32 foundSpell_8;
@@ -3390,7 +3372,6 @@ i32 army::LeftX(void) {
     }
 }
 
-// @semantic: stack-slot/code-shape residual.
 VA(0x00453fa6, 0x171)
 i32 army::OtherArmyAdjacent(i32 side, i32 index) {
     army* otherArmy1;

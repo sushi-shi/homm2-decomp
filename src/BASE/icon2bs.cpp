@@ -10,7 +10,6 @@ H2_ENUM_BEGIN(IconScaleConstant)
     SCALE_WORK_BITMAP_SIZE = 0x40
 H2_ENUM_END(IconScaleConstant)
 
-// @semantic: first raw divergence is +0x0: candidate reserves 0x10 frame bytes while retail reserves 0x18.
 VA(0x004d2f90, 0x179)
 void IconToBitmapScale(
     class icon* srcIcon,

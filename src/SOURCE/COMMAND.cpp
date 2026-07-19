@@ -339,7 +339,6 @@ ProcessAction:
     return result;
 }
 
-// @semantic: first normalized residual evaluates the row modulo before MAP_WIDTH - 1.
 VA(0x0042aa3d, 0x181)
 i32 combatManager::ValidHexToStandOn(i32 hexIndex) {
     if (hexIndex == IGNORED_HEX)
@@ -368,7 +367,6 @@ i32 combatManager::ValidHexToStandOn(i32 hexIndex) {
     }
 }
 
-// @semantic: first residual is army-side/index load order at +0x26.
 VA(0x0042abbe, 0x8a1)
 void combatManager::SetCombatDirections(i32 targetHex) {
     if (m_gridSelectionDisabled != 0)
@@ -564,7 +562,6 @@ void combatManager::SetCombatDirections(i32 targetHex) {
     currentArmy_3->m_targetIndex = targetIndex_6;
 }
 
-// @semantic: compiler-shape residual.
 VA(0x0042b45f, 0x63c)
 void combatManager::CheckSetMouseDirection(i32 mouseX, i32 mouseY, i32 targetHex) {
     if (m_gridSelectionDisabled != 0)
@@ -717,7 +714,6 @@ i32 combatManager::GetPointer(CombatMessageCommand command, i32 hexIndex) {
     }
 }
 
-// @semantic: ten-byte switch-continuation residual.
 VA(0x0042bb26, 0x8e4)
 i32 combatManager::ProcessCombatMsg(tag_message& message) {
     i32 mouseX = message.payload.mouse.screenX;
@@ -1082,7 +1078,6 @@ i32 combatManager::CheckWin(struct tag_message* message) {
     return combatEnded;
 }
 
-// @semantic: first normalized residual is instruction 21 in the source-ordered special-hex switch.
 VA(0x0042c8ff, 0x51a)
 CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
     i32 column = hexIndex % COMBAT_GRID_ROW_LENGTH;
@@ -1212,7 +1207,6 @@ CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
     return command;
 }
 
-// @semantic: extra continuation jump at instruction 123.
 VA(0x0042ce19, 0x2a6)
 i32 combatManager::RightClick(i32 hexIndex) {
     i32 column = hexIndex % COMBAT_GRID_ROW_LENGTH;
@@ -1271,7 +1265,6 @@ i32 combatManager::RightClick(i32 hexIndex) {
     return 0;
 }
 
-// @semantic: first normalized residual is the initial current-side/current-index address multiplication order.
 VA(0x0042d0bf, 0x3b3)
 void combatManager::DoCommand(i32 command) {
     i32 unusedCommandWord2;
@@ -1384,7 +1377,6 @@ void combatManager::DoCommand(i32 command) {
     }
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x0042d472, 0x57b)
 i32 WinCombatHandler(struct tag_message& message) {
     char iconFile[40];
@@ -1534,7 +1526,6 @@ i32 WinCombatHandler(struct tag_message& message) {
     return IDX(MAIN_CONTINUE);
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x0042d9ed, 0x110)
 void combatManager::ClearWinLoseBottom(class heroWindow* window) {
     i32 widgetIndex;
@@ -1552,7 +1543,6 @@ void combatManager::ClearWinLoseBottom(class heroWindow* window) {
     }
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x0042dafd, 0x29a)
 void combatManager::ShowWinLoseArtifact(class heroWindow* window, i32 artifact) {
     DATA(0x004f09e8) static i16 artifactSourceLineBase = 0x680;
@@ -1625,7 +1615,6 @@ void combatManager::ShowWinLoseArtifact(class heroWindow* window, i32 artifact) 
     WaitEndSample(pickupSample, -1);
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x0042dd97, 0x232)
 void combatManager::ShowSkeletons(class heroWindow* window) {
     DATA(0x004f0a80) static i16 skeletonSourceLineBase = 0x6c8;
@@ -1695,7 +1684,6 @@ void combatManager::ShowSkeletons(class heroWindow* window) {
     WaitEndSample(pickupSample, -1);
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x0042dfc9, 0x2f6)
 void combatManager::ShowEagleEyeSpell(class heroWindow* window) {
     DATA(0x004f0be4) static i16 eagleEyeSourceLineBase = 0x702;
@@ -1775,7 +1763,6 @@ void combatManager::ShowEagleEyeSpell(class heroWindow* window) {
     WaitEndSample(playedSample, -1);
 }
 
-// @semantic: first non-relocation normalized residual is instruction 399, ours jle versus retail jge at the displayed-army loop.
 VA(0x0042e2bf, 0x9cc)
 void combatManager::ShowDeadArmies(class heroWindow* window) {
     DATA(0x004f0ca0) static i16 casualtySourceLineBase = 0x74b;
@@ -1971,7 +1958,6 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
     }
 }
 
-// @semantic: First residual is instruction 52 (armyIndex/side strength-reduction order), repeated at 131.
 VA(0x0042ec8b, 0xba9)
 void combatManager::DoVictory(i32 winningSide) {
     char experienceText[152];
@@ -2387,7 +2373,6 @@ void combatManager::CheckChangeSelector(void) {
     SetupSmallView();
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x00430109, 0xea)
 void combatManager::CheckCastleAttack(void) {
     if (m_inCastleCombat != 0 && m_currentSide == 0) {
@@ -2406,7 +2391,6 @@ void combatManager::CheckCastleAttack(void) {
     }
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x004301f3, 0xdd)
 void combatManager::CheckGetAIMove(void) {
     i32 retreat = AICheckRetreat();
@@ -2423,7 +2407,6 @@ void combatManager::CheckGetAIMove(void) {
         DoCompAI(m_currentSide);
 }
 
-// @early-stop: delinker jump-table artifact.
 VA(0x004302d0, 0x18f)
 void combatManager::GetControl(void) {
     m_selectedHex = INVALID_HEX;
@@ -2473,7 +2456,6 @@ void combatManager::ResetMouse(void) {
     }
 }
 
-// @semantic: first residual is +0x18; first normalized residual is instruction 33.
 VA(0x00430536, 0x65b)
 i32 combatManager::ProcessNextAction(struct tag_message& message) {
     i32 actionData[IDX(ACTION_DATA_COUNT)];
@@ -2633,7 +2615,6 @@ Finished:
     return IDX(result);
 }
 
-// @early-stop: delinker jump-table artifact.
 VA(0x00430b91, 0x237)
 void combatManager::ResetCyclingCreatures(void) {
     army* currentArmy_p = NULL;
@@ -2699,7 +2680,7 @@ void combatManager::ResetCycleTimers(void) {
     }
 }
 
-// @early-stop: inline continuation artifact.
+// Retail /Ob1 includes an inline-accessor continuation in this function.
 VA(0x00430ec1, 0x53)
 i32 InCombatArea(i32 x, i32 y) {
     if (x >= 0 && x < COMBAT_SCREEN_WIDTH && y >= 0 && y < COMBAT_AREA_HEIGHT)
@@ -2707,7 +2688,6 @@ i32 InCombatArea(i32 x, i32 y) {
     return 0;
 }
 
-// @semantic: first residual is +0x16; normalized instruction 66 first reverses side/ army strength reduction.
 VA(0x00430f14, 0x9d9)
 void combatManager::CycleCombatScreen(void) {
     army* currentArmy;
@@ -2903,7 +2883,6 @@ void combatManager::CycleCombatScreen(void) {
     );
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x004318ed, 0x3b)
 void combatManager::SetCombatViewArmySmallLevel(i32 level) {
     gConfig.combatArmyInfoLevel = level;
@@ -2928,7 +2907,6 @@ void combatManager::SetCombatGrid(i32 showGrid, i32 showMouseHex, i32 shadeLevel
     WritePrefs();
 }
 
-// @semantic: first normalized residual is side/index strength-reduction order in the initial army lookup.
 VA(0x00431a0b, 0x3ab)
 void combatManager::AddArmy(
     i32 side,
@@ -3029,7 +3007,6 @@ void combatManager::SetupSmallView(void) {
     }
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x00431f1f, 0x304)
 void combatManager::ViewBallista(i32 quickView) {
     i32 archerCount;

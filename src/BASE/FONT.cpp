@@ -148,7 +148,6 @@ void font::DrawString(char* s, i32 x, i32 y, i32 mode) {
 #undef FONT_DRAW_SCREEN_WIDTH
 #undef FONT_DRAW_SCREEN_HEIGHT
 
-// @semantic: residual is +0x82..+0x98: retail loads m_glyphIcon->m_data into EAX before forming the c*13 index in ECX.
 VA(0x004c73c0, 0xaf)
 i32 font::GetCharacterWidth(u8 c) {
     if (c == '{' || c == '}') {

@@ -317,7 +317,6 @@ struct IDirectDrawSurface* DDCreateSurface(u32l width, u32l height, i32 primary)
     return surface;
 }
 
-// @early-stop: delinker jump-table artifact.
 VA(0x00435e4f, 0x5d2)
 void DDSD(i32 error, char* file, i32 line) {
     HRESULT restoreResult;

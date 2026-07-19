@@ -36,7 +36,6 @@ void hexcell::DrawLowerDeadOccupants(void) {
     }
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x0044a4e2, 0xc8)
 void hexcell::DrawUpperDeadOccupant(void) {
     i32 currentFrame;

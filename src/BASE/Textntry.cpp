@@ -40,7 +40,6 @@ textEntryWidget::textEntryWidget(void) : textWidget() {
     m_displayOffset = 0;
 }
 
-// @semantic: only residual is store order at +0x7f..+0x93.
 VA(0x004d87b0, 0x134)
 textEntryWidget::textEntryWidget(
     i16 x,
@@ -93,7 +92,6 @@ textEntryWidget::~textEntryWidget() {
     gpResourceManager->Dispose(m_icon);
 }
 
-// @semantic: only raw residual is +0x18b..+0x191: retail compares type before loading m_height.
 VA(0x004d8920, 0x26c)
 void textEntryWidget::Read(i32 type) {
     char resourceName[13];

@@ -63,7 +63,6 @@ H2_ENUM_BEGIN(ViewWorldConstant)
     WORLD_RADAR_BOTTOM         = 0xa0
 H2_ENUM_END(ViewWorldConstant)
 
-// @semantic: compiler-shape residual.
 VA(0x004333c0, 0x267)
 void advManager::ViewWorld(ViewWorldMode whatToDraw, b32 drawAllObjects, b32 drawAllTerrains) {
     i8 paletteData[WORLD_PALETTE_SIZE];
@@ -168,7 +167,6 @@ void advManager::VWInit(i32 centerX, i32 centerY) {
     UpdateRadar(1, 0);
 }
 
-// @semantic: first residual at +0x65 is the Y-bound global load order; the first opcode-shape residual at +0xb3 is ours mov mapY.
 VA(0x004338d4, 0x1346)
 void advManager::VWCompleteDraw(void) {
     i32 mineHighlight18;
@@ -652,7 +650,6 @@ void advManager::VWCompleteDraw(void) {
     );
 }
 
-// @semantic: evaluation-order residual.
 VA(0x00434c1a, 0x5e2)
 i32 ViewWorldDialogHandler(struct tag_message& message) {
     float radarScale6;

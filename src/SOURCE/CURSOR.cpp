@@ -41,7 +41,6 @@ H2_ENUM_CLASS_END(CursorHeroShadowFrame)
 
 #define RETAIL_FILE const_cast<char*>("I:\\Projects\\Heroes\\Prog\\SOURCE\\CURSOR.CPP")
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x0040d5e0, 0x138)
 void advManager::StartCursor(i32 direction) {
     i32 directionX_a;
@@ -67,7 +66,6 @@ void advManager::StartCursor(i32 direction) {
     m_mapData->GetCell(cellX, cellY)->m_flags |= CURSOR_MAP_VISIBLE_FLAG;
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x0040d718, 0x11c)
 void advManager::StopCursor(i32 stopSound) {
     if (stopSound) {
@@ -501,7 +499,6 @@ i32 advManager::GetMoveShowIt(hero* movingHero, i32 direction) {
         return 0;
 }
 
-// @semantic: first non-relocation residual is one extra retail continuation jump after the hero embarked test.
 VA(0x0040e51f, 0x1234)
 mapCell* advManager::MoveHero(
     i32 direction,
@@ -1004,7 +1001,6 @@ i32 advManager::ValidMoveWithEvent(hero* movingHero, i32 direction) {
     }
 }
 
-// @early-stop: delinker artifact.
 VA(0x0040fa15, 0x4f2)
 i32 advManager::ValidMove(i32 direction, i32 eventMode) {
     i32 directionX_j;
@@ -1100,7 +1096,6 @@ i32 advManager::ValidMove(i32 direction, i32 eventMode) {
     return 1;
 }
 
-// @semantic: branch/code-shape residual.
 VA(0x0040ff07, 0x24b)
 void advManager::MoveOrigin(i32 directionX, i32 directionY) {
     i32 oldOriginX0;
@@ -1144,7 +1139,6 @@ void advManager::MoveOrigin(i32 directionX, i32 directionY) {
     m_forceCompleteDraw = 1;
 }
 
-// @semantic: jump-table placement residual.
 VA(0x00410152, 0x74f)
 void advManager::ProcessMapChange(SMapChange change) {
     hero* mapHero_n;
@@ -1449,7 +1443,6 @@ void advManager::PurgeMapChangeQueue(void) {
         sMapChangeLastFew[slot].type = 0;
 }
 
-// @semantic: first divergence is the maximumToUnwind comparison operand order.
 VA(0x00410b9e, 0x1d4)
 void advManager::UnwindMapChangeQueue(i32 maximumToUnwind, i32 processChanges) {
     i32 queuedChanges;

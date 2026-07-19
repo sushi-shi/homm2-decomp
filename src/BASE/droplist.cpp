@@ -53,7 +53,6 @@ dropListWidget::dropListWidget(void) : widget(0, 0, 0, 0, 0, 0) {
     m_selectedIndex = -1;
 }
 
-// @semantic: compiler-shape residual.
 VA(0x004dbf60, 0x7c)
 dropListWidget::~dropListWidget() {
     gpResourceManager->Dispose(m_font);
@@ -65,7 +64,6 @@ dropListWidget::~dropListWidget() {
     H2_FREE_AT(m_items, gDropListSourceFiles.listDestruction.text, 27);
 }
 
-// @semantic: sole raw residual begins after the frame-index stores.
 VA(0x004dbfe0, 0x21d)
 void dropListWidget::Read(void) {
     i8 name[16];
@@ -152,7 +150,6 @@ void dropListWidget::DeleteItem(i32 index) {
     }
 }
 
-// @early-stop: delinker artifact.
 VA(0x004dc2e0, 0x350)
 i32 dropListWidget::Main(tag_message& message) {
     if ((m_flags & WIDGET_FLAG_ENABLED) == 0) {
@@ -412,7 +409,6 @@ void dropListWidget::RestoreDropBackground(void) {
     m_savedBackground = NULL;
 }
 
-// @semantic: branch/code-shape residual.
 VA(0x004dcb10, 0x81f)
 void dropListWidget::ProcessSelectDialog(void) {
     IconEntry* iconEntry;

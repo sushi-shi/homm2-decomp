@@ -439,7 +439,6 @@ void game::ShowCampaignInfo(i32 viewOnly, i32) {
     }
 }
 
-// @semantic: First residual +0x2c: retail loads map before side for the enabled-grid index.
 VA(0x00448443, 0xa0f)
 void game::CampaignInfoUpdate(i32 redraw) {
     i32 map;
@@ -641,7 +640,6 @@ void game::CampaignInfoUpdate(i32 redraw) {
         campWin->DrawWindow();
 }
 
-// @semantic: First residual +0xa8 is a one-byte branch displacement caused by the later map/side index load order.
 VA(0x00448e52, 0x521)
 i32 CampaignHandler(struct tag_message& message) {
     i32 map;
@@ -768,7 +766,6 @@ void game::InitEntireCampaign(i32 side) {
     m_campaignScenario = CAMPAIGN_NO_SCENARIO;
 }
 
-// @semantic: First residual +0x0c: retail loads iCurViewMap before iCurViewSide.
 VA(0x004493ba, 0xbb7)
 void game::InitCampaignMap(void) {
     i32 selectedChoicePosition;

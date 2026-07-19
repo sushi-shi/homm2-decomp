@@ -24,7 +24,6 @@ DATA(0x00534ce0) static i32 gCTX0;
 DATA(0x00534ce4) static u8 gCTColor;
 DATA(0x00534ce8) static u32 gCTRun;
 
-// @semantic: first divergence is at +0x12.
 VA(0x004d32a0, 0x5af)
 void IconToBitmapColorTable(
     class icon* srcIcon,

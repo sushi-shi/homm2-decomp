@@ -76,7 +76,6 @@ void ModemSetup(i32 mode) {
     }
 }
 
-// @semantic: sole raw residual is the true-return branch displacement at +0x8e.
 VA(0x0040cb3e, 0x9e)
 i32l Dial(void) {
     char dialCommand[40];
@@ -88,7 +87,6 @@ i32l Dial(void) {
     return GUIModemResponse(gText, "CONNECT") != 0;
 }
 
-// @semantic: sole raw residual is the true-return branch displacement at +0x44.
 VA(0x0040cbdc, 0x54)
 i32l Wait(void) {
     GUIModemResponse("Waiting for ring...", "RING");
@@ -107,7 +105,6 @@ void GUIModemCommand(char* message, char* command) {
         ShutDown(NULL);
 }
 
-// @semantic: First residual +0x43: retail loads the local command length and compares the global position with jge.
 VA(0x0040cca9, 0x95)
 i8 GUIModemCommandExec(void) {
     i32 commandLength;
@@ -150,7 +147,6 @@ i8 GUIModemResponse(char* message, char* response) {
     return 0;
 }
 
-// @semantic: compiler-shape residual.
 VA(0x0040ce4e, 0xe2)
 i8 GUIModemResponseExec(void) {
     GUIMRc = read_byte();

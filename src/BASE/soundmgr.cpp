@@ -71,8 +71,6 @@ void soundManager::ValidatePreviousPosition(i32 track) {
         CDPreviousPosition[track][0] = 0;
 }
 
-// @early-stop
-// @early-stop-reloc-only: relocation naming only.
 VA(0x004cb770, 0x13c)
 void soundManager::CDStop(void) {
     char position[20];
@@ -95,8 +93,6 @@ void soundManager::CDStop(void) {
     CDPlaying = 0;
 }
 
-// @early-stop
-// @early-stop-reloc-only: relocation naming only.
 VA(0x004cb8b0, 0xb3)
 i32 soundManager::CDIsPlaying(void) {
     if (gbNoSound != 0)
@@ -178,8 +174,6 @@ void soundManager::CDSetVolume(i32 volume, i32 fadeScale) {
     auxSetVolume(m_auxDevice, local_8);
 }
 
-// @early-stop
-// @early-stop-reloc-only: relocation naming only.
 VA(0x004cbc40, 0x473)
 void soundManager::CDPlay(i32 track, i32 resume, i32 volume, i32 restart) {
     i32l t1;
@@ -609,7 +603,6 @@ void soundManager::StopSample(struct _SAMPLE* sample) {
     LogStr("Stop Sample 2");
 }
 
-// @early-stop: retail alignment artifact.
 VA(0x004ccc80, 0x202)
 void soundManager::ModifySample(struct _SAMPLE* sampleHandle, i16 operation, i32l value) {
     i32 foundChannel;

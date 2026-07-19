@@ -30,7 +30,6 @@ static inline i32 IconRowVisible(i8* shear, i32 clipTop) {
     return shear[gFYY] != ICON_SHEAR_SKIP_ROW && clipTop <= gFYY && gFYY <= gFYClipB;
 }
 
-// @semantic: First raw divergence is the setup lifetime at +0x5c: retail keeps shear in ESI and clipW in EBP.
 VA(0x004d9ce0, 0x58d)
 void FlipIconToBitmapYModify(
     class icon* srcIcon,
