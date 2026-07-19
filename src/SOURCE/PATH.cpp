@@ -246,16 +246,16 @@ i32 army::ValidAttack(
 
     occupantSide = gpCombatManager->m_hexCells[*attackHex].m_occupantSide;
     switch (targetMode) {
-        case 0:
+        case ARMY_ATTACK_TARGET_ASSIGNED:
             if (m_targetSide == occupantSide
                 && gpCombatManager->m_hexCells[*attackHex].m_occupantIndex == m_targetIndex)
                 return 1;
             break;
-        case 1:
+        case ARMY_ATTACK_TARGET_ENEMY:
             if (1 - gpCombatManager->m_currentSide == occupantSide)
                 return 1;
             break;
-        case 2:
+        case ARMY_ATTACK_TARGET_OCCUPIED:
             if (occupantSide != -1)
                 return 1;
             break;
@@ -400,10 +400,12 @@ i32 army::ValidRange(i32 targetHex) {
     return 0;
 }
 
+#define OPPOSITE_DIRECTION_OFFSET (PATH_DIRECTION_COUNT / 2)
+
 VA(0x004be9e7, 0x58)
 i32 OppositeDirection(i32 direction) {
     if (direction < PATH_DIRECTION_COUNT) {
-        return (direction + 3) % PATH_DIRECTION_COUNT;
+        return (direction + OPPOSITE_DIRECTION_OFFSET) % PATH_DIRECTION_COUNT;
     } else {
         if (direction == COMBAT_DIRECTION_WIDE_WEST)
             return COMBAT_DIRECTION_WIDE_EAST;
@@ -411,6 +413,8 @@ i32 OppositeDirection(i32 direction) {
             return COMBAT_DIRECTION_WIDE_WEST;
     }
 }
+
+#undef OPPOSITE_DIRECTION_OFFSET
 
 VA(0x004bea3f, 0x8ff)
 i32 army::GetBestDirection(i32 sourceHex, i32 targetHex, i32 blockedMask) {

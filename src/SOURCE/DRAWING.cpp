@@ -331,7 +331,7 @@ void combatManager::SetupGridForArmy(army* armyPtr) {
     if (gConfig.combatShadeLevel < 1)
         return;
 
-    attackMask = armyPtr->GetAttackMask(armyPtr->m_hex, 2, -1);
+    attackMask = armyPtr->GetAttackMask(armyPtr->m_hex, ARMY_ATTACK_TARGET_OCCUPIED, -1);
     memset(m_gridState, IDX(GRID_SHADE_NONE), sizeof(m_gridState));
     savedTargetSide = armyPtr->m_targetSide;
     targetIndexSave = armyPtr->m_targetIndex;

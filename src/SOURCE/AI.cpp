@@ -852,7 +852,8 @@ i32 combatManager::AttemptAttack(class army* currentArmy, i32 side, i32 mask) {
 // @early-stop: byte-proven compiler artifact.
 VA(0x004c3468, 0x182)
 i32 combatManager::AttemptAdjacentAttack(class army* currentArmy) {
-    u32 availableMask4 = ~currentArmy->GetAttackMask(currentArmy->m_hex, 1, -1);
+    u32 availableMask4 =
+        ~currentArmy->GetAttackMask(currentArmy->m_hex, ARMY_ATTACK_TARGET_ENEMY, -1);
     u32 bit0;
     u32 targetMask29;
     i32 direction36;
@@ -866,7 +867,13 @@ i32 combatManager::AttemptAdjacentAttack(class army* currentArmy) {
     targetMask29 = 0;
     for (direction36 = 0; direction36 < COMBAT_AI_ATTACK_DIRECTION_COUNT; direction36++) {
         if ((availableMask4 & bit0) != 0
-            && currentArmy->ValidAttack(currentArmy->m_hex, direction36, 1, -1, attackHexes5)
+            && currentArmy->ValidAttack(
+                currentArmy->m_hex,
+                direction36,
+                ARMY_ATTACK_TARGET_ENEMY,
+                -1,
+                attackHexes5
+            )
             && attackHexes5[0] >= 0)
             targetMask29 |= 1 << m_hexCells[attackHexes5[0]].m_occupantIndex;
         bit0 <<= 1;
@@ -964,7 +971,8 @@ i32 combatManager::WalkTowardArmy(class army* currentArmy, i32 side, i32 mask) {
     targetHex7 = targetPtr9->m_hex;
     currentArmy->m_targetSide = side;
     currentArmy->m_targetIndex = targetArmy6;
-    attackMask36 = currentArmy->GetAttackMask(currentArmy->m_hex, 0, -1);
+    attackMask36 =
+        currentArmy->GetAttackMask(currentArmy->m_hex, ARMY_ATTACK_TARGET_ASSIGNED, -1);
     if (attackMask36 != COMBAT_AI_ALL_ATTACK_DIRECTIONS) {
         giNextAction = COMBAT_AI_ACTION_WAIT;
         return 1;
