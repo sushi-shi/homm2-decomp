@@ -19,7 +19,7 @@ include/BASE/Iconf2b.h	pending
 include/BASE/Iconm2b.h	pending
 include/BASE/Iconmf2b.h	pending
 include/BASE/MIDIWrap.h	reviewed	Only the proven MIDIWrap SIZE annotation is numeric.
-include/BASE/MIDI_TYPES.h	pending
+include/BASE/MIDI_TYPES.h	reviewed	Shared text-record field extents are named and aligned; the remaining literal is packed-layout SIZE evidence.
 include/BASE/MISC_TYPES.h	pending
 include/BASE/MOUSEMGR_TYPES.h	pending
 include/BASE/Misc.h	pending
@@ -154,7 +154,7 @@ src/BASE/Iconf2b.cpp	pending
 src/BASE/Iconm2b.cpp	pending
 src/BASE/Iconmf2b.cpp	pending
 src/BASE/MOUSEMGR.cpp	pending
-src/BASE/Midi.cpp	pending
+src/BASE/Midi.cpp	reviewed	Private expansion constants name the unused LogInt field value and filename capacity without perturbing VC4.2 declaration state. Remaining numeric payloads are track-availability data, booleans, loop counts, format indices, and the named volume/status domains. Non-debug sections and ordered relocations remain exact.
 src/BASE/Misc.cpp	pending
 src/BASE/PALETTE.cpp	reviewed	Reference lifecycle and palette extents are named; allocation/free operands 8, 13, and 21 preserve retail source-line evidence, while zero is the empty resource id. Pointer state uses NULL.
 src/BASE/RESMGR.cpp	reviewed	Private aligned constants name file/status values, entry and row widths, open mode, translation count, sample volume, temporary-buffer width, and save-stack depth. The three expansion-only dimensions preserve VC4.2 declaration state; shared layout and Read13 values remain public, and source-line operands preserve retail allocation/assert evidence.
