@@ -24,7 +24,7 @@ include/BASE/MISC_TYPES.h	reviewed	Text-slot extents derive from their literal p
 include/BASE/MOUSEMGR_TYPES.h	pending
 include/BASE/Misc.h	reviewed	Shared packed-record array extents are named and aligned; remaining numeric literals are proven packing and SIZE evidence, and allocation macros are function-like source-location wrappers rather than constant definitions.
 include/BASE/MiscGraphicsConstants.h	reviewed	Shared palette component, byte, and level extents are named for Misc, PALETTE, and KB consumers.
-include/BASE/Ripple.h	pending
+include/BASE/Ripple.h	reviewed	The public ripple operation names every parameter and exposes no numeric policy or storage layout.
 include/BASE/SAMPLE_TYPES.h	reviewed	The source slots are symbolic; the sole literal is packed-layout SIZE evidence.
 include/BASE/TEXTWDGT_TYPES.h	reviewed	Named source-file slot extent and aggregate SIZE preserve the fixed packed storage layout.
 include/BASE/TILE.h	pending
@@ -155,11 +155,11 @@ src/BASE/Iconm2b.cpp	pending
 src/BASE/Iconmf2b.cpp	pending
 src/BASE/MOUSEMGR.cpp	pending
 src/BASE/Midi.cpp	reviewed	Private enums name the unused LogInt field value, filename capacity, volume calculation, and sequence status. Remaining numeric payloads are track-availability data, booleans, loop counts, and format indices.
-src/BASE/Misc.cpp	reviewed	Private enums name memory diagnostics, preferences, registry widths, hashes, file modes, palette extents, RNG mixing, and data-entry geometry. The fade threshold table and initial RNG seed remain literal retail data payload; other zeros and ones are booleans, origins, or index steps, while allocation operands preserve source-location evidence.
+src/BASE/Misc.cpp	reviewed	Private enums name memory diagnostics, preferences, registry widths, hashes, file modes, palette extents, RNG seed and mixing, and data-entry geometry. The fade threshold table remains literal retail data payload; other zeros and ones are booleans, origins, or index steps, while allocation operands preserve source-location evidence.
 src/BASE/PALETTE.cpp	reviewed	Reference lifecycle and palette extents are named; allocation/free operands 8, 13, and 21 preserve retail source-line evidence, while zero is the empty resource id. Pointer state uses NULL.
 src/BASE/RESMGR.cpp	reviewed	A private aligned enum names file/status values, entry and row widths, open mode, translation count, sample volume, temporary-buffer width, and save-stack depth. Shared layout and Read13 values remain public, and source-line operands preserve retail allocation/assert evidence.
 src/BASE/RESOURCE.cpp	reviewed	Constructor parameters and empty reference state are named; zero initializes the scalar resource id and pointer uses NULL. All seven direct consumer objects retain exact non-debug sections and relocations.
-src/BASE/Ripple.cpp	pending
+src/BASE/Ripple.cpp	reviewed	Private constants name screen and profile geometry, redraw bounds, and sweep progression. The symmetric profile samples remain a literal local data payload, while the combat-speed multiplier remains a direct expression literal because retail relocates to an anonymous compiler constant-pool entry; remaining zeros and ones are initialization, origins, or boundary steps.
 src/BASE/SAMPLE.cpp	reviewed	Private format, playback-rate, filename-capacity, and suffix-length domains are named; remaining allocation operands preserve retail source-line evidence. Text/data bytes and relocation topology are unchanged.
 src/BASE/TEXTWDGT.cpp	reviewed	Private resource-name capacity, draw-mode mask, and buffer growth are enums; font modes, alignment, and dispatch results use shared domains. The statement helper is not a constant domain. Remaining allocation/free operands are retail source-line evidence, and other zeros/ones are initialization or booleans.
 src/BASE/TILE.cpp	pending
