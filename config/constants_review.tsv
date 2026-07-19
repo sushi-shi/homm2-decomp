@@ -48,7 +48,7 @@ include/BASE/icon.h	pending
 include/BASE/icon2bc.h	pending
 include/BASE/icon2bs.h	pending
 include/BASE/icon2by.h	pending
-include/BASE/iconWidget.h	pending
+include/BASE/iconWidget.h	reviewed	Public constructor parameters are named; remaining literal is packed-layout SIZE evidence.
 include/BASE/iconf2bc.h	pending
 include/BASE/iconf2by.h	pending
 include/BASE/inputManager.h	pending
@@ -147,7 +147,7 @@ src/BASE/DIMMER.cpp	reviewed	The implementation contains no policy literals; con
 src/BASE/EXEC.cpp	reviewed	Manager results, dispatch states, priority, and capacity are private named constants; dialog storage derives from sizeof(executive), and executable selection uses the shared game/editor selectors. Non-debug section bytes and ordered relocations are unchanged.
 src/BASE/FONT.cpp	reviewed	Large-font threshold, resource-name extent, full-screen clip bounds, draw modes, and alignment cases are named. Remaining zeros, ones, and twos are state booleans, clipping origins, icon-call flags, sequence steps, or midpoint arithmetic. The proven fname local identity is retained because renaming it changes VC4.2 stack slots. Non-debug sections and relocations are A/B exact.
 src/BASE/ICON.cpp	pending
-src/BASE/ICONWDGT.cpp	pending
+src/BASE/ICONWDGT.cpp	reviewed	Private resource-name capacity, color mask, center shift, bottom padding, and dispatch results are named. Strict builds use a private enum while production uses expansion constants; repeated forwarded identity preserves the original statement stream. Remaining zeros/ones are initialization, booleans, frame origins, or resource lookup flags. Non-debug sections and relocations are A/B exact.
 src/BASE/INPUTMGR.cpp	pending
 src/BASE/Icon2b.cpp	pending
 src/BASE/Icond2b.cpp	pending
