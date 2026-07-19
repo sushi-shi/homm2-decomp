@@ -10,7 +10,7 @@ struct tag_message;
 class dimmerWidget : public widget {
 public:
     dimmerWidget(void);
-    dimmerWidget(i16, i16, i16, i16, i16, i16);
+    dimmerWidget(i16 x, i16 y, i16 width, i16 height, i16 id, i16 kind);
     virtual ~dimmerWidget() OVERRIDE {}
     virtual void Draw(void) OVERRIDE;
     virtual i32 Main(struct tag_message&) OVERRIDE;
