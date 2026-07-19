@@ -22,6 +22,7 @@ H2_ENUM_BEGIN(ArenaConstant)
     WINDOW_X                = 159,
     WINDOW_SCREEN_HEIGHT    = 480,
     WINDOW_MAX_Y            = 28,
+    WINDOW_CENTER_DIVISOR   = 2,
     WINDOW_NAME_SIZE        = 16,
     TEXT_WIDTH              = 244,
     TEXT_LINE_HEIGHT        = 16,
@@ -57,7 +58,7 @@ i32 DoArenaDialog(void) {
     i32 windowWidth_9 = WINDOW_WIDTH;
     i32 windowHeight = windowLines_7 * WINDOW_ROW_HEIGHT + WINDOW_BASE_HEIGHT;
     i32 windowX_9 = WINDOW_X;
-    i32 windowY_12 = (WINDOW_SCREEN_HEIGHT - windowHeight) / 2;
+    i32 windowY_12 = (WINDOW_SCREEN_HEIGHT - windowHeight) / WINDOW_CENTER_DIVISOR;
     char windowName_3[WINDOW_NAME_SIZE];
     i32 lineCount_3;
     i32 textHeight_11;
@@ -250,5 +251,5 @@ void UpdateArenaIcons(void) {
 }
 
 DATA(0x005331a8) i32 choice;
-DATA(0x005331b0) class iconWidget* skillWidget[3];
+DATA(0x005331b0) class iconWidget* skillWidget[CHOICE_COUNT];
 DATA(0x005331bc) class heroWindow* arenaWinPtr;
