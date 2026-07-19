@@ -41,15 +41,15 @@ See `docs/codeview-contents.md`, `docs/compiler-detection.md`, and
 
 ## Build
 
-Enter the worktree before the build shell because `HOMM2_DIR`, `MSVC_DIR`, and the
-Wine prefix are fixed when the shell starts:
+Enter the shell from anywhere inside the worktree; the flake resolves its Git root before
+setting `HOMM2_DIR`, `MSVC_DIR`, and the Wine prefix:
 
 ```sh
 cd /path/to/worktree
 nix develop .#build
 homm2 init                 # one-time target/config generation
 homm2 build                # configure, compile, compare, and run hard gates
-homm2 status               # current and retained-max metrics
+homm2 status               # current comparison metrics
 homm2 status --force-refresh
 ```
 
@@ -122,4 +122,4 @@ See `docs/data-symbol-normalization.md`, `docs/delinker-contribution-manifest.md
 - `docs/patterns/INDEX.md`: known MSVC lowering patterns.
 - `docs/od-stack-layout.md`: solved `/Od` local-slot model.
 - `docs/build-asserts.md`: enforced repository invariants.
-- `scripts/match_variants.py`: exact-only last-mile variant search.
+- `scripts/archive/`: retired experiment/search tools retained for historical reproduction.

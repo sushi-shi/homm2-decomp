@@ -18,7 +18,7 @@ across a reused worktree pool, and integrate their results one at a time.
   function batches** until that TU is fully matched, then takes the next simplest TU.
   Drain all `/Od` ("base") TUs before any `/O2` ("o2") TU (see Target selection).
 - **Serialize integration:** results land in **master one at a time**. Only ONE
-  integration (apply → build → bless → commit) at a time → master is a single linear
+  integration (apply → build → commit) at a time → master is a single linear
   line of `match:` commits, even though the work was fanned out.
 - **Refill immediately:** the instant a result is integrated, reset its worktree to
   the new master HEAD and launch the next target into that same slot.
@@ -26,7 +26,7 @@ across a reused worktree pool, and integrate their results one at a time.
 ```
    matcher-1 ─ fn A ─┐
    matcher-2 ─ fn B ─┼─► integration queue (SERIAL) ─► master: c1─c2─c3─…
-   matcher-3 ─ fn C ─┤        build → bless → commit
+   matcher-3 ─ fn C ─┤        build → commit
    matcher-4 ─ fn D ─┘   (as A lands, reset matcher-1 to master, launch fn E into it)
 ```
 
@@ -62,7 +62,7 @@ Better: open ONE `nix develop .#build` shell per slot.
    RVA for deterministic ties. This campaign intentionally starts with the smallest residuals.
 2. **Skip only live exact functions.** Source `VA()` macros carry **absolute VAs**
    (`RVA + 0x400000`), so normalise before comparing to report RVAs. Never skip a non-exact
-   function because it has `@early-stop`, `@semantic`, retained max 100%, or an old proof note.
+   function because it has `@early-stop`, `@semantic`, or an old proof note.
    Reproduce the proof from current objects or remove/downgrade it.
 3. **Match TU-by-TU, not function-by-function.** Hand a lane a **whole TU** (or a
    **20+ function chunk** of a large one) and keep that lane on that TU until it is
@@ -119,25 +119,20 @@ Process completed matchers **one at a time** (master has one `build/`, one HEAD)
 1. **Guard:** `git -C <master> status --porcelain` clean before you start. If a
    matcher leaked into master (relative-path bug), `git restore` the stray files first.
 2. **Apply** the matcher's TU file(s) to master (`cp <worktree>/<file> <master>/<file>`).
-   **Never copy the worktree's `README.md` or `config/match_baseline.tsv`** — those are
-   regenerated/blessed in master (you take master's, see below). Touch only that
+   **Never copy the worktree's `README.md`** — it is regenerated in master. Touch only that
    matcher's file(s).
 3. **Build + measure** in master: `nix develop .#build --command homm2 build`. This
    recompiles, re-objdiffs, **and regenerates master's `README.md` match block** (via
    `homm2 status --write-readme`). Confirm the target hit its reported %, read the
    before→after exact count.
-4. **Bless** the baseline: `homm2 status update`. Use `--accept-regressions` ONLY for a
-   trivial cross-function fuzzy drift (a neighbor in the same aggregate obj moving
-   <0.1% — pure objdiff noise). A real `best%` drop on an untouched function is NOT
-   acceptable — investigate. Keep the bless in the same commit.
-5. **Commit** atomically: `git add` this matcher's file(s) + `config/match_baseline.tsv`
-   + **`README.md`** (master's freshly-regenerated match block — ALWAYS stage it so the
+4. **Commit** atomically: `git add` this matcher's file(s) + **`README.md`** (master's
+   freshly-regenerated match block — ALWAYS stage it so the
    scoreboard never drifts from the commits), message `match: <fn> -> <result>`.
    One matcher = one commit. **Do NOT stage `config/match-queue.md`** (a transient
    regenerated worklist — `git checkout --` it if it's dirty). A clean `@early-stop` artifact or
    fully audited `@semantic` checkpoint is a legitimate commit; a mis-attributed / wrong-shape reconstruction is NOT
    — keep it stubbed.
-6. **Refill:** `git -C .claude/worktrees/matcher-N reset --hard master` (its `build/`
+5. **Refill:** `git -C .claude/worktrees/matcher-N reset --hard master` (its `build/`
    survives), pick the next target (cross-check skip), dispatch a new background matcher.
 
 Repeat until the queue is dry/parked. **Leave the `matcher-N` worktrees in place**;

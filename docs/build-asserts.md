@@ -110,8 +110,8 @@ equal. A permuted switch table does not: changing which case index reaches a cas
 gate fail even when all case-body bytes and relocation sites are otherwise identical.
 
 The tag is accepted only when the current compiled object passes this raw masked comparison. It is
-not deferred through the retained-maximum model: a later shared-header or TU-state change that
-invalidates the byte proof makes the hard gate red until the claim is restored or downgraded.
+rechecked against the current objects: a later shared-header or TU-state change that invalidates
+the byte proof makes the hard gate red until the claim is restored or downgraded.
 New relocation-only or instruction-identical proofs must use the tag; do not add untagged prose that
 makes the same claim.
 
@@ -174,6 +174,3 @@ it is a floating-point type.
 - `verify_carcass.py` — every CodeView **function** symbol is present in its object (carcass
   completeness). Was the carcass-phase acceptance check; run it manually
   (`python3 scripts/homm2/match/verify_carcass.py`).
-- `homm2 status check` — gates **match-percentage** regressions vs `config/match_baseline.tsv`
-  at integration (soft `tu-cumulative-eval-order` drift is blessed with
-  `status update --accept-regressions`; it is *not* one of the hard build gates).

@@ -1,5 +1,10 @@
 # Matcher experiment matrices
 
+> Historical evidence only. The retained-maximum baseline and its update/check
+> commands have been removed; live bytes, relocations, and the current report are
+> now authoritative. References below describe the recorded campaign state and
+> are not instructions for the current workflow.
+
 These TSV files are durable no-repeat sets for large exact-preserving searches. The original
 matrices contain:
 

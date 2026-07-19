@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Probe temporary parser-visible TU-state inputs before one MSVC 4.2 function.
+"""Archived parser-visible TU-state experiment engine.
 
 This remains the standalone diagnostic/record-max compatibility engine. New combined
 searches should use ``scripts/match_variants.py``, which imports these state families and

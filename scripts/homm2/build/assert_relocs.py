@@ -1403,20 +1403,10 @@ def review_counts(scope="BASE"):
     """List incomplete functions whose relocation occurrence counts still differ.
 
     This is a structural-work queue, not a wrong-target report: missing/excess counts usually mean
-    the source has not yet recovered retail's control flow or publication lifetimes. Retained fuzzy
-    maxima select incomplete functions so transient TU-state dips do not reopen finished work.
+    the source has not yet recovered retail's control flow or publication lifetimes. The current
+    objdiff report is the sole source of comparison state.
     """
     prefix = scope.rstrip("/") + "/"
-    maxima = {}
-    with open("config/match_baseline.tsv", encoding="utf-8") as f:
-        for row in csv.reader(f, delimiter="\t"):
-            if len(row) < 3 or row[0].startswith("#"):
-                continue
-            try:
-                maxima[(row[0], row[1])] = float(row[2])
-            except ValueError:
-                continue
-
     report = json.load(open("build/objdiff/report.json"))
     rows = []
     for unit in report["units"]:
@@ -1430,8 +1420,8 @@ def review_counts(scope="BASE"):
         base_functions, target_functions = parse_obj(base_obj), parse_obj(target_obj)
         for fn in unit.get("functions", []):
             name = fn["name"]
-            retained = maxima.get((unit_name, name), fn.get("fuzzy_match_percent", 0.0))
-            if retained >= 100.0 or name not in base_functions or name not in target_functions:
+            current = float(fn.get("fuzzy_match_percent", 0.0) or 0.0)
+            if current >= 100.0 or name not in base_functions or name not in target_functions:
                 continue
             base_count = len(base_functions[name])
             target_count = len(target_functions[name])
@@ -1440,18 +1430,18 @@ def review_counts(scope="BASE"):
             missing = max(target_count - base_count, 0)
             excess = max(base_count - target_count, 0)
             size = int(fn.get("size", 0))
-            unmatched = size * (100.0 - retained) / 100.0
+            unmatched = size * (100.0 - current) / 100.0
             demangled = fn.get("metadata", {}).get("demangled_name", name)
-            rows.append((missing + excess, unmatched, unit_name, retained, size,
+            rows.append((missing + excess, unmatched, unit_name, current, size,
                          base_count, target_count, missing, excess, demangled))
 
     # This is an input to the normal hardest-first campaign, so rank recovered byte potential
     # before raw relocation-count delta.
     rows.sort(key=lambda row: (-row[1], -row[0], row[2], row[9]))
-    print("unit\tretained_pct\tsize\tunmatched_bytes\tbase_relocs\tretail_relocs\tmissing\texcess\tfunction")
-    for _, unmatched, unit, retained, size, base_count, target_count, missing, excess, name in rows:
+    print("unit\tcurrent_pct\tsize\tunmatched_bytes\tbase_relocs\tretail_relocs\tmissing\texcess\tfunction")
+    for _, unmatched, unit, current, size, base_count, target_count, missing, excess, name in rows:
         print("%s\t%.4f\t%d\t%.2f\t%d\t%d\t%d\t%d\t%s" %
-              (unit, retained, size, unmatched, base_count, target_count, missing, excess, name))
+              (unit, current, size, unmatched, base_count, target_count, missing, excess, name))
     print("summary\tfunctions=%d\tmissing=%d\texcess=%d" %
           (len(rows), sum(row[7] for row in rows), sum(row[8] for row in rows)))
     return 0
