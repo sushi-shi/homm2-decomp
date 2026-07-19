@@ -7,7 +7,13 @@
 #include <stdio.h>
 #include <string.h>
 
-DATA(0x004f5188) struct sCDTest_Track_Data cdTestTrackData[43] = {
+H2_ENUM_BEGIN(CDTestConstant)
+    FIRST_TRACK      = 1,
+    TRACK_COUNT      = 43,
+    OUTPUT_LINE_SIZE = 100
+H2_ENUM_END(CDTestConstant)
+
+DATA(0x004f5188) struct sCDTest_Track_Data cdTestTrackData[TRACK_COUNT] = {
     {2001, 1318508},    {1318507, 1431161}, {1431161, 1549575}, {1549574, 1658748},
     {1658747, 1829388}, {1829387, 1986001}, {1986001, 2140628}, {2140627, 2286001},
     {2286001, 2438202}, {2438201, 2611988}, {2611987, 2730014}, {2730014, 2858321},
@@ -41,12 +47,12 @@ void CDTest_Cleanup(void) {
 
 VA(0x00449fee, 0x26)
 i32 CDTest_VerifyCDQuick(void) {
-    return CDTest_VerifyTrack(Random(1, 43));
+    return CDTest_VerifyTrack(Random(FIRST_TRACK, TRACK_COUNT));
 }
 
 VA(0x0044a014, 0x4d)
 i32 CDTest_VerifyCDThorough(void) {
-    for (i32 i = 1; i <= 43; ++i) {
+    for (i32 i = FIRST_TRACK; i <= TRACK_COUNT; ++i) {
         if (!CDTest_VerifyTrack(i))
             return 0;
     }
@@ -60,18 +66,19 @@ i32 CDTest_VerifyTrack(i32 track) {
 
     if (cdTestRedbook == NULL)
         return 0;
-    if (track < 1 || track > 43)
+    if (track < FIRST_TRACK || track > TRACK_COUNT)
         return 0;
 
     AIL_redbook_track_info(cdTestRedbook, track, &first, &end);
-    if (cdTestTrackData[track - 1].start != first || cdTestTrackData[track - 1].end != end)
+    if (cdTestTrackData[track - FIRST_TRACK].start != first
+        || cdTestTrackData[track - FIRST_TRACK].end != end)
         return 0;
     return 1;
 }
 
 VA(0x0044a0f0, 0x2ce)
 i32 CDTest_GenerateTable(char* file) {
-    char line[100];
+    char line[OUTPUT_LINE_SIZE];
     U32 first;
     i32 fileHandle;
     i32 count;

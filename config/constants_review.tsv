@@ -133,7 +133,7 @@ include/SOURCE/townObject.h	pending
 include/SOURCE/tradpost.h	pending
 include/SOURCE/wingraph.h	pending
 include/SOURCE/x_arena.h	reviewed	The legacy globals remain declared for VC4.2 declaration order, but the skill-widget extern is incomplete so its private extent stays in x_arena.cpp; the header contains no numeric policy.
-include/SOURCE/x_cdtest.h	pending
+include/SOURCE/x_cdtest.h	reviewed	The two-field generated-table record remains header-owned for declaration discipline; table storage and count are private to x_cdtest.cpp, and the header contains no numeric policy.
 src/BASE/BASEMGR.cpp	reviewed	Only VA/VTBL evidence; initialization uses named values and NULL.
 src/BASE/BITMAP.cpp	reviewed	TU-private full-screen copy stride is named with a prefix-free value; resource lifecycle and bitmap type are explicit. Remaining zeros/ones are clipping origins, bounds, booleans, or loop initialization; allocation/free operands 21, 37, and 51 preserve retail source-line evidence. Inline width/pixel helpers consolidate repeated row-copy access. Proven constructor-local identities and the functional enum conversion are retained because equivalent renamings/spellings perturb later VC4.2 code generation.
 src/BASE/BITS.cpp	reviewed	Private shift/mask domain; remaining zero and one are direct bit arithmetic and result values.
@@ -228,4 +228,4 @@ src/SOURCE/netwin.cpp	pending
 src/SOURCE/tradpost.cpp	pending
 src/SOURCE/wingraph.cpp	pending
 src/SOURCE/x_arena.cpp	reviewed	Private aligned constants name the arena geometry, widget ids, styles, and choice count. The centering divisor and global skill-widget extent use the private domain; remaining zeros and ones are initialization, booleans, indices, or call flags.
-src/SOURCE/x_cdtest.cpp	pending
+src/SOURCE/x_cdtest.cpp	reviewed	Private aligned constants name the first track, 43-entry retail table, and generator line capacity. The table payload is preserved verbatim; remaining zeros and ones are API sentinels, results, loop steps, or zero-based indexing.
