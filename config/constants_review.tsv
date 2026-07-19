@@ -206,7 +206,7 @@ src/SOURCE/PATH.cpp	reviewed	Private geometry constants are prefix-free and alig
 src/SOURCE/PHILAI.cpp	pending
 src/SOURCE/RECRUIT.cpp	reviewed	Private aligned domains name resource slots, source kinds, geometry, controls, dialog coordinates, and storage extents. Shared widget flags and dispatch results replace raw ABI values; remaining zeros and ones are initialization, booleans, indices, draw arguments, or update flags.
 src/SOURCE/REMOTE.cpp	pending
-src/SOURCE/REQUEST.cpp	pending
+src/SOURCE/REQUEST.cpp	reviewed	Private constants name legacy basename bounds, requester geometry, list extents, pending state, widget construction, filename entry length, filter frames, and selection color; shared widget flags/kind are reused, and the swapped knob/gutter control labels now match their behavior.
 src/SOURCE/SEARCH.cpp	reviewed	Uses the modeled map-cell occupancy flag and road bitfield directly; remaining numeric literals are boolean values, loop origins, path sentinels, and expression-local arithmetic.
 src/SOURCE/SETUP.cpp	pending
 src/SOURCE/SMACKMGR.cpp	pending
