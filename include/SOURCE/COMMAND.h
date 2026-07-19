@@ -21,13 +21,18 @@ struct tag_message;
 #define COMBAT_DIRECTION_SLOPE_SHALLOW 0.58
 #define COMBAT_DIRECTION_SLOPE_SHALLOWEST 0.27
 
+H2_ENUM_BEGIN(CombatRemotePacketConstant)
+    COMBAT_REMOTE_PACKET_PREFIX_RESERVED_SIZE = 4,
+    COMBAT_REMOTE_PACKET_BODY_RESERVED_SIZE   = 2
+H2_ENUM_END(CombatRemotePacketConstant)
+
 #pragma pack(push, 1)
 struct CombatRemotePacket {
     i8 messageLength;
-    char reserved1[4];
+    char reserved1[COMBAT_REMOTE_PACKET_PREFIX_RESERVED_SIZE];
     i8 category;
     i8 command;
-    char reserved7[2];
+    char reserved7[COMBAT_REMOTE_PACKET_BODY_RESERVED_SIZE];
     i32 nextAction;
     i32 nextActionExtra;
     i32 nextActionGridIndex;
