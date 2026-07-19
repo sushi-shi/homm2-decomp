@@ -8,6 +8,11 @@
 
 class sample;
 
+// Expansion-only interface constants keep VC4.2's TU-wide enum state byte-neutral.
+#define ARMY_ATTACK_TARGET_ASSIGNED 0
+#define ARMY_ATTACK_TARGET_ENEMY 1
+#define ARMY_ATTACK_TARGET_OCCUPIED 2
+
 #pragma pack(push, 1)
 class army {
 public:

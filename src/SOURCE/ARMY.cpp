@@ -1242,9 +1242,9 @@ void army::DoHydraAttack(i32) {
     totalDamage_1 = totalKilled_7;
     gpCombatManager->ResetHitByCreature();
     if (m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BERSERK)]) {
-        attackMask_7 = static_cast<i16>(GetAttackMask(m_hex, 2, -1));
+        attackMask_7 = static_cast<i16>(GetAttackMask(m_hex, ARMY_ATTACK_TARGET_OCCUPIED, -1));
     } else {
-        attackMask_7 = static_cast<i16>(GetAttackMask(m_hex, 1, -1));
+        attackMask_7 = static_cast<i16>(GetAttackMask(m_hex, ARMY_ATTACK_TARGET_ENEMY, -1));
     }
     CheckLuck();
     gpCombatManager->ResetLimitCreature();
@@ -2783,7 +2783,7 @@ void army::GoBerserk(void) {
     masks_28[0] = gpCombatManager->GetAllMask(0);
     masks_28[1] = gpCombatManager->GetAllMask(1);
     m_quantity = savedQuantity_10;
-    masks_28[2] = GetAttackMask(m_hex, 2, -1);
+    masks_28[2] = GetAttackMask(m_hex, ARMY_ATTACK_TARGET_OCCUPIED, -1);
     if (masks_28[2] != ARMY_ALL_ATTACK_DIRECTIONS) {
         do {
             if (!masks_28[4]) {
@@ -2793,7 +2793,7 @@ void army::GoBerserk(void) {
             }
         } while (masks_28[2] & (1 << direction_4));
         giNextAction = COMBAT_AI_ACTION_MOVE;
-        ValidAttack(m_hex, direction_4, 2, -1, &targetHex_9);
+        ValidAttack(m_hex, direction_4, ARMY_ATTACK_TARGET_OCCUPIED, -1, &targetHex_9);
         giNextActionGridIndex = targetHex_9;
         masks_28[4] = 1;
         goto berserkFinish;
@@ -2915,7 +2915,7 @@ void army::MoveAttack(i32 destination, i32 moveOnly) {
         m_targetSide = gpCombatManager->m_hexCells[destination].m_occupantSide;
         m_targetIndex = gpCombatManager->m_hexCells[destination].m_occupantIndex;
         m_moveTargetHex = destination;
-        baseAttackMask = GetAttackMask(m_hex, 0, -1);
+        baseAttackMask = GetAttackMask(m_hex, ARMY_ATTACK_TARGET_ASSIGNED, -1);
         if (HAS(m_monster.flags.all, MONSTER_FLAGS_FLYING)
             && baseAttackMask == ARMY_ALL_ATTACK_DIRECTIONS) {
             if (m_hex != m_moveTargetHex && !ValidFlight(m_moveTargetHex, 0)) {
@@ -2927,9 +2927,9 @@ void army::MoveAttack(i32 destination, i32 moveOnly) {
         break;
     }
     if (m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BERSERK)]) {
-        targetAttackMask = GetAttackMask(m_hex, 2, -1);
+        targetAttackMask = GetAttackMask(m_hex, ARMY_ATTACK_TARGET_OCCUPIED, -1);
     } else {
-        targetAttackMask = GetAttackMask(m_hex, 1, -1);
+        targetAttackMask = GetAttackMask(m_hex, ARMY_ATTACK_TARGET_ENEMY, -1);
     }
     if (targetAttackMask == ARMY_ALL_ATTACK_DIRECTIONS && m_monster.shots > 0) {
         SpecialAttack();
