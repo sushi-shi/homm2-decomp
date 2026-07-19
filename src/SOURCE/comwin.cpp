@@ -39,17 +39,8 @@ H2_ENUM_BEGIN(ComSerialConstant)
     BAUD_VALUE_9600        = 9600,
     BAUD_VALUE_19200       = 19200,
     BAUD_VALUE_38400       = 38400,
-    SERIAL_BYTE_SIZE       = 8,
     READ_RESULT_WORD_COUNT = 2
 H2_ENUM_END(ComSerialConstant)
-
-H2_ENUM_CLASS_BEGIN(ComBaudRate)
-    COM_BAUD_2400  = 1,
-    COM_BAUD_4800  = 2,
-    COM_BAUD_9600  = 3,
-    COM_BAUD_19200 = 4,
-    COM_BAUD_38400 = 5
-H2_ENUM_CLASS_END(ComBaudRate)
 
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\comwin.cpp"
 
@@ -228,7 +219,7 @@ i16 com_init(u8 portNumber, i32 baudRate, i32 useDtr) {
     state.fNull = 0;
     state.fRtsControl = RTS_CONTROL_HANDSHAKE;
     state.fAbortOnError = 1;
-    state.ByteSize = SERIAL_BYTE_SIZE;
+    state.ByteSize = COM_SERIAL_BYTE_SIZE;
     state.Parity = NOPARITY;
     state.StopBits = ONESTOPBIT;
 
