@@ -69,7 +69,6 @@ H2_ENUM_BEGIN(CampaignChoiceAmount)
 H2_ENUM_END(CampaignChoiceAmount)
 
 H2_ENUM_BEGIN(PlayerDeadConstant)
-    DEAD_MAP_CHANGE        = 0xa,
     DEAD_MAP_CHANGE_UNUSED = -999
 H2_ENUM_END(PlayerDeadConstant)
 
@@ -2011,7 +2010,7 @@ void PlayerDead(i32 player) {
             HandleRemoteDeadPlayerExit(player);
         else
             SendMapChange(
-                DEAD_MAP_CHANGE,
+                MAP_CHANGE_DEAD_PLAYER,
                 static_cast<i8>(player),
                 0,
                 0,

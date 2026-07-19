@@ -232,7 +232,6 @@ H2_ENUM_BEGIN(AdventureEnvironmentSoundConstant)
 H2_ENUM_END(AdventureEnvironmentSoundConstant)
 
 H2_ENUM_BEGIN(AdventureTeleportConstant)
-    TELEPORT_MAP_CHANGE               = 9,
     TELEPORT_MAP_CHANGE_VALUE         = -999,
     TELEPORT_CELL_OBJECT_FLAG         = 0x40,
     TELEPORT_RESTORE_MODE             = 99,
@@ -7789,7 +7788,7 @@ void advManager::TeleportTo(
     savedShow11 = bShowIt;
     if (skipMapChange == 0) {
         SendMapChange(
-            TELEPORT_MAP_CHANGE,
+            MAP_CHANGE_TELEPORT_HERO,
             mapHero->m_id,
             static_cast<u8>(destinationX),
             static_cast<u8>(destinationY),
@@ -8762,7 +8761,7 @@ void advManager::LoadRemote(void) {
     UpdateRadar(1, 0);
     UpdBottomView(1, 1, 1);
     gpAdvManager->ForceNewHover();
-    SendMapChange(ADVMGR_REMOTE_LOAD_MAP_CHANGE, 0, 0, 0, CURSOR_LOG_UNUSED, 0, 0);
+    SendMapChange(MAP_CHANGE_MY_TURN, 0, 0, 0, CURSOR_LOG_UNUSED, 0, 0);
     gpSoundManager->m_samplesReady = 1;
 }
 

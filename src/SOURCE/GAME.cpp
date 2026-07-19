@@ -516,7 +516,7 @@ i32 game::CreateBoat(i32 x, i32 y, i32 notify) {
     i32 boatIdx = Scan(m_boatSlots, 0, GAME_BOAT_COUNT);
     if (boatIdx != -1) {
         if (notify == 0)
-            SendMapChange(4, 0, x, y, -999, 0, 0);
+            SendMapChange(MAP_CHANGE_BUILD_BOAT, 0, x, y, -999, 0, 0);
         m_boatSlots[boatIdx] = static_cast<i8>(boatIdx);
         boatRecord* boat = &m_boats[boatIdx];
         boat->id = static_cast<i8>(boatIdx);
@@ -2271,7 +2271,15 @@ void game::ClaimTown(i32 townId, i32 player, i32 suppressVisibility) {
     mapCell* cell;
 
     if (!gbInNewGameSetup)
-        SendMapChange(7, static_cast<i8>(townId), 0, 0, player, 0, 0);
+        SendMapChange(
+            MAP_CHANGE_CLAIM_TOWN,
+            static_cast<i8>(townId),
+            0,
+            0,
+            player,
+            0,
+            0
+        );
     townRec = &m_castleRecs[townId];
     if (townRec->m_owner == player)
         return;
@@ -2321,7 +2329,15 @@ void game::ClaimMine(i32 mineId, i32 player) {
     u32 x;
     u32 y;
 
-    SendMapChange(8, static_cast<i8>(mineId), 0, 0, player, 0, 0);
+    SendMapChange(
+        MAP_CHANGE_CLAIM_MINE,
+        static_cast<i8>(mineId),
+        0,
+        0,
+        player,
+        0,
+        0
+    );
     m_mines[mineId].owner = static_cast<i8>(player);
     m_mineOwners[mineId] = static_cast<i8>(player);
     switch (m_mines[mineId].resourceType) {

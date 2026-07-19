@@ -547,7 +547,7 @@ void hero::Deallocate(i32 updateMap) {
 
     if (updateMap)
         SendMapChange(
-            IDX(MAP_CHANGE_DEAD_HERO),
+            MAP_CHANGE_DEAD_HERO,
             m_id,
             static_cast<u8>(m_x),
             static_cast<u8>(m_y),
