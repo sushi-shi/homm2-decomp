@@ -268,14 +268,14 @@ void executive::MainLoop(void) {
                             if ((message.type & MESSAGE_EXECUTIVE) == 0)
                                 break;
                             switch (message.payload.executive.command) {
-                                case IDX(EXECUTIVE_COMMAND_TERMINATE_LOOP):
+                                case EXECUTIVE_COMMAND_TERMINATE_LOOP:
                                     done++;
                                     break;
-                                case IDX(EXECUTIVE_COMMAND_REMOVE_MANAGER):
+                                case EXECUTIVE_COMMAND_REMOVE_MANAGER:
                                     RemoveManager(m_activeManager);
                                     m_activeManager = NULL;
                                     break;
-                                case IDX(EXECUTIVE_COMMAND_RETURN_RESULT):
+                                case EXECUTIVE_COMMAND_RETURN_RESULT:
                                     m_result = message.payload.executive.result;
                                     done++;
                                     break;
