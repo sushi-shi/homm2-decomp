@@ -1,4 +1,9 @@
-# Constant taxonomy — first-pass classification of every integer constant
+# Archived constant taxonomy — first-pass classification of every integer constant
+
+This records the completed heuristic census that preceded the current
+file-by-file constants audit. Its manifest and `homm2 enum-types` command were
+retired after `H2_ENUM_*` declarations and private TU ownership made the old
+source parser and provisional classification ratchet obsolete.
 
 State after the enum-domain unification campaign: the 21 cross-TU value domains
 (creature, artifact, spell, map object, building slot, faction, terrain,

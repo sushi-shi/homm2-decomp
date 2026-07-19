@@ -8,6 +8,11 @@ The archived `carcass_fill.py`, `gen_queue.py`, and `verify_carcass.py` belong t
 the completed placeholder/bootstrap phase. The live exhaustive residual queue is
 implemented separately and remains supported.
 
+The `enum_types/` package and archived constant-taxonomy document preserve the
+completed integer-domain census. They predate `H2_ENUM_*`, private TU domains,
+and the live file-by-file `homm2 constants` audit, so they are not supported CLI
+commands or build gates.
+
 Use the current `homm2` commands and build assertions for live evidence. Restore
 an archived script only when its experiment is deliberately being reproduced and
 its assumptions have first been updated for the current object/report schema.
