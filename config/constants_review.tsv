@@ -27,7 +27,7 @@ include/BASE/MiscGraphicsConstants.h	reviewed	Shared palette component, byte, an
 include/BASE/Ripple.h	reviewed	The public ripple operation names every parameter and exposes no numeric policy or storage layout.
 include/BASE/SAMPLE_TYPES.h	reviewed	The source slots are symbolic; the sole literal is packed-layout SIZE evidence.
 include/BASE/TEXTWDGT_TYPES.h	reviewed	Named source-file slot extent and aggregate SIZE preserve the fixed packed storage layout.
-include/BASE/TILE.h	pending
+include/BASE/TILE.h	reviewed	The public packed tile-index and flip-bit domain is named and aligned; the blitter API otherwise exposes no numeric policy.
 include/BASE/TILESET_TYPES.h	reviewed	Named source-file storage extents plus SIZE evidence.
 include/BASE/WINMGR.h	pending
 include/BASE/WINMGR_TYPES.h	pending
@@ -162,7 +162,7 @@ src/BASE/RESOURCE.cpp	reviewed	Constructor parameters and empty reference state 
 src/BASE/Ripple.cpp	reviewed	Private constants name screen and profile geometry, redraw bounds, and sweep progression. The symmetric profile samples remain a literal local data payload, while the combat-speed multiplier remains a direct expression literal because retail relocates to an anonymous compiler constant-pool entry; remaining zeros and ones are initialization, origins, or boundary steps.
 src/BASE/SAMPLE.cpp	reviewed	Private format, playback-rate, filename-capacity, and suffix-length domains are named; remaining allocation operands preserve retail source-line evidence. Text/data bytes and relocation topology are unchanged.
 src/BASE/TEXTWDGT.cpp	reviewed	Private resource-name capacity, draw-mode mask, and buffer growth are enums; font modes, alignment, and dispatch results use shared domains. The statement helper is not a constant domain. Remaining allocation/free operands are retail source-line evidence, and other zeros/ones are initialization or booleans.
-src/BASE/TILE.cpp	pending
+src/BASE/TILE.cpp	reviewed	Private constants name the hand-written blitter's proven field offsets, dword/copy-group shifts, and unrolled row batch; public index and flip bits use the shared tile domain. Repeated byte-copy instructions and zero-initialized static scratch state are algorithm structure rather than unnamed policy.
 src/BASE/TILESET.cpp	reviewed	Allocation/free operands 18 and 0x1c preserve retail source-line evidence; other values are named or annotations.
 src/BASE/Textntry.cpp	pending
 src/BASE/WIDGET.cpp	reviewed	The private default extent and shared dispatch results are enums; remaining zeros and -1 are initialization, boolean, draw-mode, or z-order sentinels.
