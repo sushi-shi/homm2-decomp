@@ -14,6 +14,8 @@ class sample;
 #define ARMY_ATTACK_TARGET_OCCUPIED 2
 #define ARMY_PATH_ANY_TARGET_HEX 0
 #define ARMY_PATH_EXACT_TARGET_HEX 1
+#define ARMY_FACING_LEFT 0
+#define ARMY_FACING_RIGHT 1
 
 #pragma pack(push, 1)
 class army {

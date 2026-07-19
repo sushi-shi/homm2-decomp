@@ -191,9 +191,9 @@ H2_ENUM_BEGIN(SpellCastConstant)
     EARTHQUAKE_CLOUD_Y_OFFSET                      = 25,
     EARTHQUAKE_EXTENT_MIN_X                        = 252,
     EARTHQUAKE_EXTENT_MAX_X                        = 575,
-    ARMY_FLAG_WIDE                                 = 1,
-    ARMY_FACING_LEFT                               = 0,
-    ARMY_FACING_RIGHT                              = 1
+    SPELL_SAMPLE_NAME_CAPACITY                     = 16,
+    SPELL_MISSILE_ANGLE_COUNT                      = 9,
+    SPELL_EAGLE_EYE_ROLL_MAX                       = 9
 H2_ENUM_END(SpellCastConstant)
 
 #define RIPPLE_MODE_ZERO_AMPLITUDE_BASE 0.3f
