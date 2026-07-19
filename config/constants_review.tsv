@@ -69,7 +69,7 @@ include/BASE/tileset.h	reviewed	Only packed-layout SIZE evidence.
 include/BASE/widget.h	pending
 include/BASE/widgetKind.h	pending
 include/EDITOR/fullMap.h	pending
-include/EDITOR/mapcell.h	pending
+include/EDITOR/mapcell.h	reviewed	Flags and sentinels are typed domains; remaining bit widths, SIZE claims, and legacy raw extents are packed/serialized layout evidence. Legacy record declarations remain shared to satisfy header discipline.
 include/SOURCE/ADVMGR.h	pending
 include/SOURCE/ADVMGR_TYPES.h	pending
 include/SOURCE/ARMY.h	pending
@@ -180,7 +180,7 @@ src/BASE/iconf2by.cpp	pending
 src/BASE/listbox.cpp	pending
 src/BASE/miscwin.cpp	pending
 src/BASE/soundmgr.cpp	pending
-src/EDITOR/mapcell.cpp	pending
+src/EDITOR/mapcell.cpp	reviewed	The extra-record allocation step is named with an expansion-only private constant; remaining zeroes and ones are initialization, list sentinels, booleans, or indexing. Non-debug section bytes and ordered relocations are unchanged.
 src/SOURCE/ADVMGR.cpp	pending
 src/SOURCE/AI.cpp	pending
 src/SOURCE/ARMY.cpp	pending
