@@ -61,15 +61,37 @@ end
 
 -- ------------------------------------------------------------------- project --
 
---- Walk up from the buffer's file to the checkout root (the dir with
---- config/units.toml). Sibling worktrees each resolve to their own build/.
+local function canonical(path)
+  if not path or path == "" then return nil end
+  return uv.fs_realpath(path) or vim.fs.normalize(path)
+end
+
+local function root_from(start)
+  if not start then return nil end
+  local markers = vim.fs.find(ROOT_MARKER, {
+    path = start,
+    upward = true,
+    type = "file",
+    limit = 1,
+  })
+  if not markers[1] then return nil end
+  local suffix = "/" .. ROOT_MARKER
+  return canonical(markers[1]:sub(1, -#suffix - 1))
+end
+
+--- Resolve the checkout from an absolute buffer path, regardless of Neovim's
+--- current directory. Sibling worktrees therefore keep separate build trees.
+--- HOMM2_DIR is a fallback for unnamed buffers and commands issued before a file
+--- is opened; it is accepted only when its checkout marker exists.
 local function project_root(bufnr)
   local file = vim.api.nvim_buf_get_name(bufnr or 0)
-  if file == "" then return nil end
-  for dir in vim.fs.parents(file) do
-    if uv.fs_stat(dir .. "/" .. ROOT_MARKER) then return dir end
-  end
+  local real_file = canonical(file)
+  local root = real_file and root_from(vim.fs.dirname(real_file)) or nil
+  if root then return root end
+  local env_root = canonical(vim.env.HOMM2_DIR)
+  if env_root and uv.fs_stat(env_root .. "/" .. ROOT_MARKER) then return env_root end
 end
+M._project_root = project_root
 
 -- --------------------------------------------------------------- database io --
 -- All reads are cached against the file's mtime: cheap, and a build bumps the
@@ -338,6 +360,9 @@ local function source_map(root, unit, cb)
     if map then source_cache[key] = { mtime = mt, map = map }; return cb(map) end
   end
   if source_pending[key] then return end
+  if vim.fn.executable("python3") == 0 then
+    return log("gen_lines skipped: python3 is not on PATH")
+  end
   source_pending[key] = true
   log("gen_lines " .. unit .. "  [" .. root .. "]")
   vim.system({ "python3", "scripts/gen_lines.py", unit }, { cwd = root, text = true },
@@ -960,6 +985,11 @@ local function do_build(root, args, quiet)
     vim.api.nvim_win_set_buf(0, buf)
     build_job = vim.fn.jobstart(cmd, { term = true, cwd = root, on_exit = on_exit })
   end
+  if build_job <= 0 then
+    if build_note then pcall(build_note); build_note = nil end
+    build_job = nil
+    notify("could not start homm2 build", vim.log.levels.ERROR)
+  end
 end
 
 --- :Homm2Build [ninja args] - manual recompile in a terminal split, then a
@@ -1090,6 +1120,11 @@ local function do_fast_build(root, unit, buf)
       finish_fast_build(root, unit, buf, before, (uv.hrtime() - t0) / 1e9)
     end)
   end })
+  if build_job <= 0 then
+    if build_note then pcall(build_note); build_note = nil end
+    build_job = nil
+    notify("could not start save-build", vim.log.levels.ERROR)
+  end
 end
 
 --- BufWritePost hook: when build-on-save is on, recompile the edited file's unit
@@ -1106,8 +1141,8 @@ end
 
 -- ------------------------------------------------------------- format on save --
 -- homm2 has no tree-wide `format` CLI command; on save we clang-format JUST the
--- file being worked on, with the root .clang-format (the same config the
--- pre-commit hook uses), scoped to src/ + include/ (never _external/), so it
+-- file being worked on, with the root .clang-format plus the enum assignment
+-- aligner, scoped to src/ + include/ (never _external/), so it
 -- stays whitespace-only / matching-neutral.
 
 --- Is `file` under src/ or include/ (not _external/)? Keeps the on-save formatter
@@ -1148,6 +1183,22 @@ function M.format_on_save(buf)
   if vim.v.shell_error ~= 0 then
     return notify("clang-format failed: " .. table.concat(out, " "),
       vim.log.levels.ERROR)
+  end
+
+  if file:match("%.h%w*$") then
+    out = vim.fn.systemlist(
+      { "python3", root .. "/scripts/format_headers.py", "-" },
+      table.concat(out, "\n"))
+    if vim.v.shell_error ~= 0 then
+      return notify("header formatting failed", vim.log.levels.ERROR)
+    end
+  end
+
+  out = vim.fn.systemlist(
+    { "python3", root .. "/scripts/format_enums.py", "-" },
+    table.concat(out, "\n"))
+  if vim.v.shell_error ~= 0 then
+    return notify("enum formatting failed", vim.log.levels.ERROR)
   end
 
   if #out == #cur then            -- no-op on already-formatted files: leave the
@@ -1193,13 +1244,16 @@ local function state_path(root) return root .. "/build/homm2-nvim.json" end
 local function save_state(root)
   if not root then return end
   vim.fn.mkdir(root .. "/build", "p")
-  local fd = io.open(state_path(root), "w")
+  local path = state_path(root)
+  local tmp = path .. ".tmp." .. tostring(uv.os_getpid())
+  local fd = io.open(tmp, "w")
   if not fd then return end
   fd:write(vim.json.encode({ hints = M.config.hints,
                              build_on_save = M.config.build_on_save,
                              format_on_save = M.config.format_on_save,
                              source_lines = M.config.source_lines }))
   fd:close()
+  if not uv.fs_rename(tmp, path) then uv.fs_unlink(tmp) end
 end
 
 --- Apply a checkout's persisted toggle state over the current config (a
