@@ -99,7 +99,7 @@ include/SOURCE/REMOTE_TYPES.h	reviewed	Network-player storage extents and curren
 include/SOURCE/REQUEST.h	reviewed	Map-header serialized extents, magic values, dimensions, victory/loss domains, and reserved storage are named shared domains; the remaining literal is packed SIZE evidence.
 include/SOURCE/SETUP.h	reviewed	The public COM-port domain is an explicitly valued aligned enum; the remaining setup API and extern declarations contain no numeric literals.
 include/SOURCE/SMACKMGR.h	reviewed	Smacker option filenames and the packed Miles-driver gap use named shared extents; remaining literals are packed SIZE evidence.
-include/SOURCE/SPELLS.h	reviewed	Combat influence, bolt modes, and the complete shared spell geometry, timing, damage, animation, and storage domains are named aligned enums. Named floating-point constants remain macros because they are scalar algorithm parameters rather than integral enum values.
+include/SOURCE/SPELLS.h	reviewed	Combat influence, bolt modes, and the complete shared spell geometry—including every fireblast ring and corner index—timing, damage, animation, and storage domains are named aligned enums. Named floating-point constants remain macros because they are scalar algorithm parameters rather than integral enum values.
 include/SOURCE/TOWNMGR.h	reviewed	Packed building layout plus shared town object ids, masks, commands, storage extents, controls, costs, geometry, and thieves-guild domains are named aligned enums; the only raw literal is SIZE evidence.
 include/SOURCE/VIEW.h	reviewed	The general-view interface contains declarations and one scalar extern only, with no numeric constants or storage extents.
 include/SOURCE/Viewwrld.h	reviewed	View-world modes, scales, and their map-size boundaries are explicit aligned enums; the handler declaration contains no other numeric policy.
@@ -210,7 +210,7 @@ src/SOURCE/REQUEST.cpp	reviewed	Private constants name legacy basename bounds, r
 src/SOURCE/SEARCH.cpp	reviewed	Uses the modeled map-cell occupancy flag and road bitfield directly; remaining numeric literals are boolean values, loop origins, path sentinels, and expression-local arithmetic.
 src/SOURCE/SETUP.cpp	pending
 src/SOURCE/SMACKMGR.cpp	pending
-src/SOURCE/SPELLAI.cpp	pending
+src/SOURCE/SPELLAI.cpp	reviewed	Private combat-grid stepping and mirror-value constants are named; shared monster abilities, side counts, chain-lightning limits, combat directions, and fireblast topology are reused. Remaining findings are the two duration-modifier data payloads.
 src/SOURCE/SPELLS.cpp	pending
 src/SOURCE/STRIP.cpp	reviewed	Private bank-box storage/widget values plus shared strip layout, frames, resource, and slot domains cover policy literals; remaining zeros and ones are drawing origins/frames, loop initialization, booleans, and widget state. Redundant OD_STEER use was removed from the border id expression.
 src/SOURCE/SWAPMGR.cpp	pending
