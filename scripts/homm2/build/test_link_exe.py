@@ -1,11 +1,14 @@
+import hashlib
 import struct
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 from homm2.build.link_exe import (
     LINK300_FORCED_VENDOR_IMPORTS, RETAIL_LINK_FLAGS, SYSTEM_LIBS_AFTER_VENDOR,
-    SYSTEM_LIBS_BEFORE_VENDOR, build_link_command, classify_missing_public_data,
+    SYSTEM_LIBS_BEFORE_VENDOR, build_link_command, build_retail_runtime_data_library,
+    classify_missing_public_data,
     classify_pe_storage, decode_map_symbol_name,
     compare_pe_section_bytes, decode_s_compile_banner, load_required_initialized_storage,
     load_retail_data_symbols, load_retail_order,
@@ -18,6 +21,49 @@ from homm2.build.link_exe import strip_coff_export_directives, write_module_defi
 
 
 class LinkExeTest(unittest.TestCase):
+    def test_runtime_library_ranks_retained_data_sections_from_nb09(self):
+        raw_offset = 60
+        symbol_offset = raw_offset + 4
+        coff = bytearray(symbol_offset + 2 * 18 + 4)
+        struct.pack_into("<HHIIIHH", coff, 0, 0x14C, 1, 0, symbol_offset, 2, 0, 0)
+        struct.pack_into(
+            "<8sIIIIIIHHI", coff, 20, b".data\0\0\0", 0, 0, 4,
+            raw_offset, 0, 0, 0, 0, 0xC0300040)
+        coff[raw_offset:raw_offset + 4] = b"data"
+        struct.pack_into("<8sIhHBB", coff, symbol_offset,
+                         b".data\0\0\0", 0, 1, 0, 3, 1)
+        struct.pack_into("<I", coff, symbol_offset + 18, 4)
+        struct.pack_into("<I", coff, symbol_offset + 36, 4)
+        archive_header = (
+            b"unit.obj/       " + b"0           " + b"0     " + b"0     " +
+            b"100644  " + str(len(coff)).encode("ascii").ljust(10) + b"`\n")
+        archive = b"!<arch>\n" + archive_header + bytes(coff)
+        if len(coff) & 1:
+            archive += b"\n"
+        modules = {"unit": [{
+            "module": r"build\intel\mt_obj\unit.obj",
+            "contributions": [{
+                "section_name": ".data", "offset": 0x40, "size": 4,
+            }],
+        }]}
+        with tempfile.TemporaryDirectory() as directory, mock.patch(
+                "homm2.build.link_exe.PINNED_VC40_LIBCMT_SHA256",
+                hashlib.sha256(archive).hexdigest()), mock.patch(
+                "homm2.build.link_exe.read_nb09_module_contributions",
+                return_value=modules), mock.patch(
+                "homm2.build.link_exe.read_pe",
+                return_value={"sections": {".data": {"raw_size": 0x100}}}):
+            source = Path(directory) / "LIBCMT.LIB"
+            output = Path(directory) / "ordered" / "LIBCMT.LIB"
+            source.write_bytes(archive)
+            report = build_retail_runtime_data_library(source, output)
+            result = output.read_bytes()
+        member = 8 + 60
+        self.assertEqual(result[member + 20:member + 28], b".data$00")
+        self.assertEqual(result[member + symbol_offset:member + symbol_offset + 8],
+                         b".data$00")
+        self.assertEqual(report["initialized_ranked_sections"], 1)
+
     def test_module_definition_has_retail_description_and_exports(self):
         with tempfile.TemporaryDirectory() as directory:
             path = write_module_definition(Path(directory) / "HEROES2W.def")

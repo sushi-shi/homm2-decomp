@@ -27,3 +27,17 @@ configuration. Its digest is part of
 explicit `homm2 data-topology regenerate` command replaces the target.
 The whole-image coverage gate loads and validates this exact generated manifest, so Vostok owner
 resolution and TU `.data`/`.rdata`/`.bss` coverage cannot silently use different storage classes.
+
+The comparison object and the final-link object have different jobs. Vostok preserves candidate
+section topology so function and data comparisons remain reproducible. Immediately before the
+final link, `retopologize_data.py` makes a disposable copy of each fully reviewed writable section
+and projects its allocations into the owning NB09 contribution. It updates section bytes, symbols,
+relocation source sites, section-symbol addends, alignment, and section-definition length together.
+Relocations naming a real allocation retain their owner-relative addend, including reviewed
+base-minus-N expressions.
+
+This projection accepts only the conflict-free reviewed manifest. Uncovered nonzero bytes,
+overlapping allocations, an allocation outside either section, or a relocation which cannot be
+mapped to one reviewed owner is a hard error. A loader-zero candidate section becomes raw-backed
+only where the retail contribution lies inside the proven initialized stream; it is not inferred
+from the PE raw-size boundary alone. The source and canonical comparison objects are never modified.
