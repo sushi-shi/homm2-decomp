@@ -10,6 +10,7 @@ H2_ENUM_BEGIN(RemoteConstant)
     REMOTE_QUEUE_CAPACITY                = 128,
     REMOTE_QUEUE_STORAGE_COUNT           = 138,
     REMOTE_RECENT_ID_COUNT               = 30,
+    REMOTE_NET_NAME_SIZE                 = 32,
     REMOTE_ENCODED_BUFFER_SIZE           = 268,
     REMOTE_RECEIVE_BUFFER_SIZE           = 266,
     REMOTE_TRANSPORT_BUFFER_SIZE         = 272,
@@ -109,7 +110,7 @@ extern i32 iLastIds[REMOTE_RECENT_ID_COUNT];
 extern char PacketSend[REMOTE_ENCODED_BUFFER_SIZE];
 extern i32 iInOrder[REMOTE_QUEUE_STORAGE_COUNT];
 extern char sndBuf[REMOTE_TRANSPORT_BUFFER_SIZE];
-extern char gcThisNetName[32];
+extern char gcThisNetName[REMOTE_NET_NAME_SIZE];
 extern i32l lLastHeartbeatReceive[REMOTE_PLAYER_COUNT];
 extern char packet[REMOTE_TRANSPORT_BUFFER_SIZE];
 extern char rcvBufIn[REMOTE_TRANSPORT_BUFFER_SIZE];

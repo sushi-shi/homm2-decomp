@@ -4,23 +4,24 @@
 #include <va.h>
 
 H2_ENUM_BEGIN(NetbiosConstant)
-    NETBIOS_SESSION_COUNT              = 7,
-    NETBIOS_STATUS_COUNT               = 10,
-    NETBIOS_THREAD_EVENT_COUNT         = 9,
-    NETBIOS_THREAD_EVENT_STORAGE_COUNT = 10,
-    NETBIOS_RECEIVE_EVENT_FIRST        = 2,
-    NETBIOS_RECEIVE_EVENT_COUNT        = 5,
-    NETBIOS_NAME_SIZE                  = 0x10,
-    NETBIOS_CONTROL_BLOCK_SIZE         = 0x40,
-    NETBIOS_THREAD_EVENTS_SIZE         = 0x24,
-    NETBIOS_PAYLOAD_SIZE               = 0x1000,
-    NETBIOS_ADAPTER_STATUS_SIZE        = 0x400,
-    NETBIOS_PACKET_HEADER_SIZE         = 0x0b,
-    NETBIOS_MAX_LANA                   = 0xfe,
-    NETBIOS_INVALID_ID                 = 0xFF,
-    NETBIOS_CALL_RETRY_LIMIT           = 0x14,
-    NETBIOS_CALL_RETRY_DELAY           = 100,
-    NETBIOS_RECEIVE_RETRY_DELAY        = 0x32
+    NETBIOS_SESSION_COUNT               = 7,
+    NETBIOS_STATUS_COUNT                = 10,
+    NETBIOS_THREAD_EVENT_COUNT          = 9,
+    NETBIOS_THREAD_EVENT_STORAGE_COUNT  = 10,
+    NETBIOS_RECEIVE_EVENT_FIRST         = 2,
+    NETBIOS_RECEIVE_EVENT_COUNT         = 5,
+    NETBIOS_NAME_SIZE                   = 0x10,
+    NETBIOS_CONTROL_BLOCK_SIZE          = 0x40,
+    NETBIOS_CONTROL_BLOCK_RESERVED_SIZE = 10,
+    NETBIOS_THREAD_EVENTS_SIZE          = 0x24,
+    NETBIOS_PAYLOAD_SIZE                = 0x1000,
+    NETBIOS_ADAPTER_STATUS_SIZE         = 0x400,
+    NETBIOS_PACKET_HEADER_SIZE          = 0x0b,
+    NETBIOS_MAX_LANA                    = 0xfe,
+    NETBIOS_INVALID_ID                  = 0xFF,
+    NETBIOS_CALL_RETRY_LIMIT            = 0x14,
+    NETBIOS_CALL_RETRY_DELAY            = 100,
+    NETBIOS_RECEIVE_RETRY_DELAY         = 0x32
 H2_ENUM_END(NetbiosConstant)
 
 H2_ENUM_CLASS_BEGIN(NetbiosCommand)
@@ -96,7 +97,7 @@ struct NetbiosControlBlock {
     NetbiosPostRoutine postRoutine;
     u8 adapterNumber;
     u8 commandComplete;
-    u8 reserved[10];
+    u8 reserved[NETBIOS_CONTROL_BLOCK_RESERVED_SIZE];
     void* event;
 };
 #pragma pack(pop)

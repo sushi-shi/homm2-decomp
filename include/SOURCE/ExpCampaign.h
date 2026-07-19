@@ -19,6 +19,7 @@ H2_ENUM_BEGIN(ExpansionCampaignConstant)
     EXPANSION_CAMPAIGN_MAX_MAP_COUNT            = 8,
     EXPANSION_CAMPAIGN_BONUS_CHOICE_COUNT       = 3,
     EXPANSION_CAMPAIGN_AWARD_COUNT              = 11,
+    EXPANSION_CAMPAIGN_RUNTIME_GAP_SIZE         = 4,
     EXPANSION_CAMPAIGN_PLAYER_SETUP_RESET_SIZE  = 0x41,
     EXPANSION_CAMPAIGN_ARMY_NAME_BUFFER_SIZE    = 52,
     EXPANSION_CAMPAIGN_HERO_COUNT               = 54,
@@ -51,7 +52,7 @@ public:
     i16 m_mapDays[EXPANSION_CAMPAIGN_MAX_MAP_COUNT];
     u8 m_awards[EXPANSION_CAMPAIGN_AWARD_COUNT];
     u8 m_bonusChoices[EXPANSION_CAMPAIGN_MAX_MAP_COUNT];
-    char m_pad_0x3f[4];
+    char m_pad_0x3f[EXPANSION_CAMPAIGN_RUNTIME_GAP_SIZE];
     i32 m_viewMap;
     class heroWindow* m_window;
     i32 m_viewOnly;
