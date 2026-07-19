@@ -106,7 +106,7 @@ include/SOURCE/Viewwrld.h	reviewed	View-world modes, scales, and their map-size 
 include/SOURCE/Wsnetwin.h	reviewed	Winsock buffer, address, player, port, retry, and timing values are a shared aligned enum used by the packed startup payload and extern storage; the remaining literal is SIZE evidence.
 include/SOURCE/X_GLOBAL.h	reviewed	Global serialized/runtime tables, text catalogs, graphics, paths, drivers, networking, players, music, and UI storage use named shared domains; integral password-index storage was folded into the enum and faction/color dimensions derive from canonical counts.
 include/SOURCE/advManager.h	reviewed	Adventure-manager public layout, locator and bottom-view unions, icons, bounds, sound/sample tables, movement/view-world tables, animation matrices, padding, and string storage use named shared domains; the prior integral animation-size macro was folded into the enum.
-include/SOURCE/army.h	reviewed	Cross-TU attack-target, path-target, facing, and invalid-hex domains are named enums; array extents are named and the remaining literal is proven class SIZE evidence.
+include/SOURCE/army.h	reviewed	Cross-TU attack-target, path-target, facing, attack-output extent, and invalid-hex domains are named enums; array extents are named and the remaining literal is proven class SIZE evidence.
 include/SOURCE/armyGroup.h	reviewed	Army slot/race extents, empty sentinel, random scale, and morale bounds are a shared aligned enum used throughout the packed public layout; the remaining literal is SIZE evidence.
 include/SOURCE/bankBox.h	reviewed	The bank-box public class contains named fields and methods only; its sole numeric literal is proven packed class-layout SIZE evidence.
 include/SOURCE/combatManager.h	reviewed	Combat castle, grid, AI, spell, catapult, runtime, UI, side/army, message, padding, transfer, and serialized layout domains are named; repeated side and army dimensions derive from shared counts, integral macros were converted to aligned enums, and floating-point algorithm parameters remain named macros or typed constants.
@@ -180,7 +180,7 @@ src/BASE/miscwin.cpp	reviewed	Private enums name the VESA logical screen, enlarg
 src/BASE/soundmgr.cpp	reviewed	Private enums name volume and fade scales, MCI limits, PCM defaults, timers, polling, sample waits, and the one-past channel sentinel; shared header domains cover storage extents, MIDI tracks, operations, and reports. Retail track-policy assignments are narrowly suppressed content payload, SCS initializer values remain reviewed data payload, and zeros/ones are state, booleans, indices, or API flags.
 src/EDITOR/mapcell.cpp	reviewed	The extra-record allocation step is a private enum; remaining zeroes and ones are initialization, list sentinels, booleans, or indexing.
 src/SOURCE/ADVMGR.cpp	pending
-src/SOURCE/AI.cpp	pending
+src/SOURCE/AI.cpp	reviewed	The shared two-hex attack output and private creature-front offsets are named; castle-boundary subscripts are narrowly suppressed as sequential local-table indices.
 src/SOURCE/ARMY.cpp	pending
 src/SOURCE/ARMYGRP.cpp	reviewed	Private morale effects and alignment thresholds are named; the remaining 0.999 and 1.0 literals are the retail floating-point damage cutoffs and stay as payloads.
 src/SOURCE/CMBTMGR.cpp	pending
@@ -191,7 +191,7 @@ src/SOURCE/Castle.cpp	pending
 src/SOURCE/DRAWING.cpp	pending
 src/SOURCE/EVENTS.cpp	pending
 src/SOURCE/FINDPATH.cpp	pending
-src/SOURCE/FLY.cpp	reviewed	Private flight direction, mask, timing, and attack-buffer constants are aligned enums; repeated branchless facing arithmetic was replaced by inline direction/rear-offset helpers. Remaining zeros and ones are coordinates, booleans, frame and loop initialization, bounds, and occupant sentinels.
+src/SOURCE/FLY.cpp	reviewed	Private flight direction, mask, and timing constants are aligned enums; the attack buffer uses the shared army API extent, and repeated branchless facing arithmetic uses inline direction/rear-offset helpers. Remaining zeros and ones are coordinates, booleans, frame and loop initialization, bounds, and occupant sentinels.
 src/SOURCE/GAME.cpp	pending
 src/SOURCE/HERO.cpp	pending
 src/SOURCE/HEXCELL.cpp	pending
