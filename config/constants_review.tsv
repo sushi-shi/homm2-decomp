@@ -37,7 +37,7 @@ include/BASE/baseManager.h	reviewed	Named message-mask, priority, and capacity d
 include/BASE/bitmap.h	pending
 include/BASE/bmap2.h	pending
 include/BASE/border.h	reviewed	Public class interface contains only pure-virtual overrides and packed-layout SIZE evidence.
-include/BASE/button.h	pending
+include/BASE/button.h	reviewed	Public class interface contains only packed-layout SIZE evidence; dispatch-return storage widths are proven by the retail ABI.
 include/BASE/dimmerWidget.h	pending
 include/BASE/dropListWidget.h	pending
 include/BASE/executive.h	reviewed	The interface carries no numeric policy; the sole literal is proven class-layout SIZE evidence.
@@ -140,7 +140,7 @@ src/BASE/BASEMGR.cpp	reviewed	Only VA/VTBL evidence; initialization uses named v
 src/BASE/BITMAP.cpp	pending
 src/BASE/BITS.cpp	reviewed	Private shift/mask domain; remaining zero and one are direct bit arithmetic and result values.
 src/BASE/BORDER.cpp	reviewed	Resource-name capacity, color mask, and dispatch results are named; remaining zeros are initialization or drawing origins. Private enum form perturbed VC4.2 register allocation, so the two read constants are scoped expansion macros. Non-debug sections and relocations are A/B exact.
-src/BASE/BUTTON.cpp	pending
+src/BASE/BUTTON.cpp	reviewed	Private select-mode, hotkey, repeat-delay, and resource-capacity values are named; dispatch results use the shared ABI names. Repeated message setup uses a scoped expansion helper because an inline function perturbs VC4.2 CSE. Remaining zeros and ones are initialization, frame origins, booleans, or message-state resets. Non-debug sections and relocations are A/B exact.
 src/BASE/Blur.cpp	pending
 src/BASE/Bzip.cpp	pending
 src/BASE/DIMMER.cpp	pending
