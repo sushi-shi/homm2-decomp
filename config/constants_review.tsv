@@ -73,7 +73,7 @@ include/SOURCE/ADVMGR_TYPES.h	reviewed	The packed remote payload uses the shared
 include/SOURCE/ARMY.h	reviewed	Shared combat animation, audio, timing, geometry, spell, attack, frame, standing-chance, and side domains are named; floating-point algorithm parameters remain named macros and packed arrays use named extents.
 include/SOURCE/CMBTMGR.h	reviewed	The combat-manager public helper declarations and tower-origin record contain no numeric constants or storage extents.
 include/SOURCE/COMMAND.h	reviewed	Combat timing, probability, and direction floating-point parameters remain named macros; packed remote-packet gaps use explicit named extents and the remaining literal is SIZE evidence.
-include/SOURCE/CONFIG_TYPES.h	pending
+include/SOURCE/CONFIG_TYPES.h	reviewed	Configuration modes, executable/connection domains, serialized sizes, save names, modem string, system id, and network-name extents are named shared constants; packed arrays use those extents and remaining literals are SIZE evidence.
 include/SOURCE/CURSOR.h	reviewed	Shared hero-cursor geometry, animation, masks, map-change queue, remote-message, resource, and sentinel domains are explicit aligned enums. The map-change record uses named fields and its remaining literal is packed SIZE evidence.
 include/SOURCE/Campaign.h	reviewed	Shared campaign awards, commands, widget ids and frames, display geometry, music ids, and hero portraits are explicitly valued aligned enums; declarations otherwise contain no numeric literals.
 include/SOURCE/Castle.h	reviewed	The shared castle slot extent and upgrade offset are a named enum consumed by both public arrays; the remaining declarations contain no numeric literals.
@@ -92,7 +92,7 @@ include/SOURCE/Netbios.h	reviewed	The NetBIOS interface contains declarations an
 include/SOURCE/Newgame.h	reviewed	New-game controls and packed remote-packet reserved, sequence, and payload-head extents are named shared domains; the remaining one is control-range arithmetic.
 include/SOURCE/Overview.h	reviewed	Shared overview mode, row geometry, widget strides, troop, dwelling, skill, and artifact extents are named aligned enums and drive the public row typedefs.
 include/SOURCE/PATH.h	reviewed	The public combat-hex direction domain has explicit aligned values; no unexplained literals remain.
-include/SOURCE/PHILAI.h	pending
+include/SOURCE/PHILAI.h	reviewed	AI public resource, player, and mine-table extents are named domains and extern arrays use them; the extensive named scalar algorithm parameters remain macros or typed float constants because floating values cannot be enum members.
 include/SOURCE/RECRUIT.h	reviewed	The public setup and quick-view functions expose no numeric policy.
 include/SOURCE/REMOTE.h	reviewed	Remote modes, message types, queue and buffer extents, framing, timing, retry, heartbeat, and sentinel values are named shared domains; the network-name extern uses its named extent.
 include/SOURCE/REMOTE_TYPES.h	reviewed	Network-player storage extents, packet types, multiplayer bases, and remote transport protocols are explicit aligned domains; the remaining literal is packed SIZE evidence.

@@ -18,7 +18,9 @@ struct BHC {
 };
 
 H2_ENUM_BEGIN(AIPurchaseConstant)
-    AI_PURCHASE_RESOURCE_COUNT     = 7,
+    AI_PURCHASE_RESOURCE_COUNT     = IDX(RES_COUNT),
+    AI_PLAYER_COUNT                = 6,
+    AI_RANDOM_MINE_TYPE_COUNT      = 8,
     AI_PURCHASE_DEBUG_LEVEL        = 3,
     AI_PURCHASE_DEBUG_DELAY        = 1500,
     AI_HERO_BUILD_COORDINATE_UNSET = -99,
@@ -284,16 +286,16 @@ void CloseAIMapVars(void);
 i32 OnMySide(i32);
 
 extern i32 bHeroBuiltThisTurn;
-extern float gafAITurnCostResource[7];
+extern float gafAITurnCostResource[AI_PURCHASE_RESOURCE_COUNT];
 extern i8* gaiEnemyHeroReachable;
 extern i16* gaiHeroEventStratRVOfPos;
 extern i16* gaiHeroStrategicRVOfPos;
 extern i16* gaiLiveChanceOfPos;
 extern i8* gaiTurnValueOfMine;
 extern b32 gbReduceByReload;
-extern i8 giBuildBoat[6];
-extern i8 giBuildBoatStuffTurn[6];
-extern i8 giBuildShipyard[6];
+extern i8 giBuildBoat[AI_PLAYER_COUNT];
+extern i8 giBuildBoatStuffTurn[AI_PLAYER_COUNT];
+extern i8 giBuildShipyard[AI_PLAYER_COUNT];
 extern i32 giCurPlayer;
 extern u8 giCurPlayerBit;
 extern i32 giCurTurn;
@@ -319,7 +321,7 @@ extern b32 gbAllowUpgrade;
 extern i32 iViewArmyType;
 extern class hero* viewSpellsHero;
 extern b32 gbUpgradeArmy;
-extern i16 RandMineQty[8];
+extern i16 RandMineQty[AI_RANDOM_MINE_TYPE_COUNT];
 extern i8* gbNGDifficulty;
 extern CreatureType iViewArmyUpgradeToType;
 extern i32 viewArmyBaseX;
