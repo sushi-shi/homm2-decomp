@@ -1,5 +1,6 @@
 #ifndef HOMM2_SOURCE_TOWNOBJECT_H
 #define HOMM2_SOURCE_TOWNOBJECT_H
+
 #include <va.h>
 
 class border;

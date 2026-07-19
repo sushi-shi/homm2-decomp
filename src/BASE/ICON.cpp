@@ -18,6 +18,27 @@
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
 
+H2_ENUM_CLASS_BEGIN(IconDrawOrientation)
+    DRAW_NORMAL  = 0,
+    DRAW_FLIPPED = 1
+H2_ENUM_CLASS_END(IconDrawOrientation)
+
+H2_ENUM_CLASS_BEGIN(IconDrawResult)
+    DRAW_SKIPPED   = 0,
+    DRAW_COMPLETED = 1
+H2_ENUM_CLASS_END(IconDrawResult)
+
+H2_ENUM_CLASS_BEGIN(IconColorTableMode)
+    COLOR_TABLE_SKIP_DIM  = 0,
+    COLOR_TABLE_APPLY_DIM = 1
+H2_ENUM_CLASS_END(IconColorTableMode)
+
+H2_ENUM_BEGIN(IconDrawExtentConstant)
+    DRAW_SCREEN_WIDTH  = 640,
+    DRAW_SCREEN_HEIGHT = 480,
+    DRAW_COMBAT_HEIGHT = 444
+H2_ENUM_END(IconDrawExtentConstant)
+
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\ICON.CPP"
 VA(0x004c7a20, 0x67)
 icon::icon(u32l id) : resource(RESOURCE_CATEGORY_ICON, id, 1, 0) {
@@ -38,7 +59,7 @@ icon::~icon() {
 
 VA(0x004c7b00, 0x44)
 void icon::DrawToBuffer(i32 x, i32 y, i32 frame, i32 flip) {
-    if (flip == IDX(ICON_DRAW_NORMAL)) {
+    if (flip == IDX(DRAW_NORMAL)) {
         IconToBitmap(
             this,
             gpWindowManager->m_screen,
@@ -48,8 +69,8 @@ void icon::DrawToBuffer(i32 x, i32 y, i32 frame, i32 flip) {
             IDX(ICON_DRAW_NO_CLIP),
             0,
             0,
-            ICON_DRAW_SCREEN_WIDTH,
-            ICON_DRAW_SCREEN_HEIGHT,
+            DRAW_SCREEN_WIDTH,
+            DRAW_SCREEN_HEIGHT,
             0
         );
         return;
@@ -63,8 +84,8 @@ void icon::DrawToBuffer(i32 x, i32 y, i32 frame, i32 flip) {
         IDX(ICON_DRAW_NO_CLIP),
         0,
         0,
-        ICON_DRAW_SCREEN_WIDTH,
-        ICON_DRAW_SCREEN_HEIGHT,
+        DRAW_SCREEN_WIDTH,
+        DRAW_SCREEN_HEIGHT,
         0
     );
 }
@@ -104,16 +125,16 @@ i32 icon::CombatClipDrawToBuffer(
                 giMaxExtentY = limits->bottom;
         }
         if (gbReturnAfterComputeExtent != 0)
-            return IDX(ICON_DRAW_SKIPPED);
+            return IDX(DRAW_SKIPPED);
     }
 
     if (gbLimitToExtent != 0
         && (gbCurrArmyDrawn == 0 || limits->left > giMaxExtentX || limits->right < giMinExtentX
             || limits->top > giMaxExtentY || limits->bottom < giMinExtentY))
-        return IDX(ICON_DRAW_SKIPPED);
+        return IDX(DRAW_SKIPPED);
 
     if (yModify != 0) {
-        if (flip == IDX(ICON_DRAW_NORMAL))
+        if (flip == IDX(DRAW_NORMAL))
             IconToBitmapYModify(
                 this,
                 gpWindowManager->m_screen,
@@ -123,8 +144,8 @@ i32 icon::CombatClipDrawToBuffer(
                 IDX(ICON_DRAW_CLIP),
                 0,
                 0,
-                ICON_DRAW_SCREEN_WIDTH,
-                ICON_DRAW_COMBAT_HEIGHT,
+                DRAW_SCREEN_WIDTH,
+                DRAW_COMBAT_HEIGHT,
                 offset,
                 yModify
             );
@@ -138,13 +159,13 @@ i32 icon::CombatClipDrawToBuffer(
                 IDX(ICON_DRAW_CLIP),
                 0,
                 0,
-                ICON_DRAW_SCREEN_WIDTH,
-                ICON_DRAW_COMBAT_HEIGHT,
+                DRAW_SCREEN_WIDTH,
+                DRAW_COMBAT_HEIGHT,
                 offset,
                 yModify
             );
     } else if (colorTable != 0) {
-        if (flip == IDX(ICON_DRAW_NORMAL))
+        if (flip == IDX(DRAW_NORMAL))
             IconToBitmapColorTable(
                 this,
                 gpWindowManager->m_screen,
@@ -154,11 +175,11 @@ i32 icon::CombatClipDrawToBuffer(
                 IDX(ICON_DRAW_CLIP),
                 0,
                 0,
-                ICON_DRAW_SCREEN_WIDTH,
-                ICON_DRAW_COMBAT_HEIGHT,
+                DRAW_SCREEN_WIDTH,
+                DRAW_COMBAT_HEIGHT,
                 offset,
                 colorTable,
-                IDX(ICON_COLOR_TABLE_APPLY_DIM)
+                IDX(COLOR_TABLE_APPLY_DIM)
             );
         else
             FlipIconToBitmapColorTable(
@@ -170,13 +191,13 @@ i32 icon::CombatClipDrawToBuffer(
                 IDX(ICON_DRAW_CLIP),
                 0,
                 0,
-                ICON_DRAW_SCREEN_WIDTH,
-                ICON_DRAW_COMBAT_HEIGHT,
+                DRAW_SCREEN_WIDTH,
+                DRAW_COMBAT_HEIGHT,
                 offset,
                 colorTable
             );
     } else if (gbLimitToExtent != 0) {
-        if (flip == IDX(ICON_DRAW_NORMAL))
+        if (flip == IDX(DRAW_NORMAL))
             IconToBitmap(
                 this,
                 gpWindowManager->m_screen,
@@ -204,7 +225,7 @@ i32 icon::CombatClipDrawToBuffer(
                 giMaxExtentY - giMinExtentY + 1,
                 offset
             );
-    } else if (flip == IDX(ICON_DRAW_NORMAL)) {
+    } else if (flip == IDX(DRAW_NORMAL)) {
         IconToBitmap(
             this,
             gpWindowManager->m_screen,
@@ -214,8 +235,8 @@ i32 icon::CombatClipDrawToBuffer(
             IDX(ICON_DRAW_CLIP),
             0,
             0,
-            ICON_DRAW_SCREEN_WIDTH,
-            ICON_DRAW_COMBAT_HEIGHT,
+            DRAW_SCREEN_WIDTH,
+            DRAW_COMBAT_HEIGHT,
             offset
         );
     } else {
@@ -228,12 +249,12 @@ i32 icon::CombatClipDrawToBuffer(
             IDX(ICON_DRAW_CLIP),
             0,
             0,
-            ICON_DRAW_SCREEN_WIDTH,
-            ICON_DRAW_COMBAT_HEIGHT,
+            DRAW_SCREEN_WIDTH,
+            DRAW_COMBAT_HEIGHT,
             offset
         );
     }
-    return IDX(ICON_DRAW_COMPLETED);
+    return IDX(DRAW_COMPLETED);
 }
 
 VA(0x004c7e10, 0x3d)
@@ -265,7 +286,7 @@ void icon::ClipFillToBuffer(
 
 VA(0x004c7e50, 0x103)
 void icon::FillToBuffer(i32 x, i32 y, i32 frame, i32 color, i32 flip, struct SLimitData* limits) {
-    if (flip != IDX(ICON_DRAW_NORMAL)) {
+    if (flip != IDX(DRAW_NORMAL)) {
         FlipMonoIconToBitmap(
             this,
             gpWindowManager->m_screen,
@@ -307,7 +328,7 @@ void icon::FillToBuffer(i32 x, i32 y, i32 frame, i32 color, i32 flip, struct SLi
 
 VA(0x004c7f60, 0x3e)
 void icon::DimToBuffer(i32 x, i32 y, i32 frame, i32 flip) {
-    if (flip == IDX(ICON_DRAW_NORMAL)) {
+    if (flip == IDX(DRAW_NORMAL)) {
         DimIconToBitmap(
             this,
             gpWindowManager->m_screen,

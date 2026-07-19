@@ -26,6 +26,65 @@
 #include <stdio.h>
 #include <string.h>
 
+H2_ENUM_BEGIN(OverviewUiConstant)
+    DYNAMIC_ARRAY_BYTES      = 0x2bc0,
+    HERO_TAB_WIDGET          = 100,
+    TOWN_TAB_WIDGET          = 0x65,
+    TITLE_WIDGET             = 0x66,
+    SCROLL_TRACK_WIDGET      = 0x6e,
+    SCROLL_KNOB_WIDGET       = 0x6f,
+    SCROLL_UP_WIDGET         = 10,
+    SCROLL_DOWN_WIDGET       = 11,
+    CLOSE_WIDGET             = 14,
+    TITLE_COUNT              = 3,
+    RESOURCE_COUNT           = 7,
+    RESOURCE_LAST            = 6,
+    RESOURCE_FIRST_WIDGET    = 30,
+    MINE_FIRST_WIDGET        = 20,
+    TOWN_TITLE_WIDGET        = 20,
+    HERO_TITLE_WIDGET        = 35,
+    DAILY_GOLD_WIDGET        = 40,
+    MINE_COUNT               = 144,
+    SAWMILL_RESOURCE         = 100,
+    FADE_STEPS               = 8,
+    SCROLL_MIN_Y             = 18,
+    SCROLL_RANGE             = 304,
+    SCROLL_KNOB_OFFSET       = 9,
+    SCROLL_LAST_PIXEL_ADJUST = 1,
+    SCROLL_TRACK_Y           = 27,
+    SCROLL_SCALE             = 100,
+    DIALOG_CONTINUE          = 1,
+    DIALOG_CLOSE             = 2,
+    RETURN_NONE              = -1,
+    RETURN_HERO              = 1,
+    RETURN_TOWN              = 2,
+    ICON_ROW_BASE            = 200,
+    ICON_ROW_LIMIT           = 1000,
+    HERO_SELECT_FIRST        = 100,
+    HERO_SELECT_LAST         = 103,
+    HERO_ARMY_FIRST          = 104,
+    HERO_ARMY_LAST           = 108,
+    HERO_ARMY_ALT_FIRST      = 109,
+    HERO_ARMY_ALT_LAST       = 113,
+    HERO_ARTIFACT_FIRST      = 114,
+    HERO_ARTIFACT_LAST       = 127,
+    HERO_SKILL_FIRST         = 146,
+    HERO_SKILL_LAST          = 153,
+    HERO_STAT_FIRST          = 170,
+    HERO_STAT_LAST           = 173,
+    TOWN_SELECT_WIDGET       = 4,
+    TOWN_ARMY_FIRST          = 5,
+    TOWN_ARMY_LAST           = 9,
+    TOWN_ARMY_ALT_FIRST      = 10,
+    TOWN_ARMY_ALT_LAST       = 14,
+    TOWN_RECRUIT_FIRST       = 15,
+    TOWN_RECRUIT_LAST        = 26,
+    TOWN_RECRUIT_ALT_FIRST   = 27,
+    TOWN_RECRUIT_ALT_LAST    = 38,
+    TOWN_HERO_FIRST          = 39,
+    TOWN_HERO_LAST           = 43
+H2_ENUM_END(OverviewUiConstant)
+
 #define RETAIL_FILE const_cast<char*>("I:\\Projects\\Heroes\\Prog\\SOURCE\\Overview.cpp")
 
 #define OVERVIEW_TEXT_WIDGET_ROWS (reinterpret_cast<OverviewTextWidgetRow*>(textWidgetDynamic))
@@ -80,7 +139,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
     for (row = 0; row < OVERVIEW_VISIBLE_ROWS; row++) {
         textItemCount = 0;
         iconCount = textItemCount;
-        rowWidgetId6 = row * OVERVIEW_ROW_ID_STRIDE + OVERVIEW_ICON_ROW_BASE;
+        rowWidgetId6 = row * OVERVIEW_ROW_ID_STRIDE + ICON_ROW_BASE;
 
         if (giOverviewTop[IDX(giOverviewType)] + row >= giOverviewItems[IDX(giOverviewType)]) {
             break;
@@ -702,15 +761,15 @@ void game::SetupNewOverviewType(OverviewType overviewType, i32 redrawFrom) {
 
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = OVERVIEW_WIDGET_SET_FRAME;
-    message.payload.widget.id = OVERVIEW_TITLE_WIDGET;
+    message.payload.widget.id = TITLE_WIDGET;
     message.payload.widget.data.value = IDX(giOverviewType) + 6;
     overWin->BroadcastMessage(message);
     message.payload.widget.command = OVERVIEW_WIDGET_SET_FRAME;
-    message.payload.widget.id = OVERVIEW_HERO_TAB_WIDGET;
+    message.payload.widget.id = HERO_TAB_WIDGET;
     message.payload.widget.data.value = giOverviewType == OVERVIEW_HEROES;
     overWin->BroadcastMessage(message);
     message.payload.widget.command = OVERVIEW_WIDGET_SET_FRAME;
-    message.payload.widget.id = OVERVIEW_TOWN_TAB_WIDGET;
+    message.payload.widget.id = TOWN_TAB_WIDGET;
     if (giOverviewType == OVERVIEW_TOWNS) {
         message.payload.widget.data.value = 3;
     } else {
@@ -718,22 +777,22 @@ void game::SetupNewOverviewType(OverviewType overviewType, i32 redrawFrom) {
     }
     overWin->BroadcastMessage(message);
 
-    i16 titleLefts[2][OVERVIEW_TITLE_COUNT] = {{35, 232, 377}, {35, 177, 379}};
-    i16 titleWidth[2][OVERVIEW_TITLE_COUNT] = {{194, 142, 241}, {140, 199, 239}};
+    i16 titleLefts[2][TITLE_COUNT] = {{35, 232, 377}, {35, 177, 379}};
+    i16 titleWidth[2][TITLE_COUNT] = {{194, 142, 241}, {140, 199, 239}};
 
-    for (title = 0; title < OVERVIEW_TITLE_COUNT; title++) {
+    for (title = 0; title < TITLE_COUNT; title++) {
         if (textWidgetTitle[title] != 0) {
             overWin->RemoveWidget(textWidgetTitle[title]);
             delete textWidgetTitle[title];
             textWidgetTitle[title] = 0;
         }
     }
-    for (title = 0; title < OVERVIEW_TITLE_COUNT; title++) {
+    for (title = 0; title < TITLE_COUNT; title++) {
         titleCopy = static_cast<char*>(H2_ALLOC(
-            strlen(cOverviewText[IDX(giOverviewType) * IDX(OVERVIEW_TITLE_COUNT) + title]) + 1,
+            strlen(cOverviewText[IDX(giOverviewType) * IDX(TITLE_COUNT) + title]) + 1,
             740
         ));
-        strcpy(titleCopy, cOverviewText[IDX(giOverviewType) * IDX(OVERVIEW_TITLE_COUNT) + title]);
+        strcpy(titleCopy, cOverviewText[IDX(giOverviewType) * IDX(TITLE_COUNT) + title]);
         textWidgetTitle[title] = new textWidget(
             titleLefts[IDX(giOverviewType)][OD_STEER(title)],
             3,
@@ -750,7 +809,7 @@ void game::SetupNewOverviewType(OverviewType overviewType, i32 redrawFrom) {
     }
     SetupDynamicStuff(0, 1, 0);
     if (redrawFrom != 0) {
-        overWin->DrawWindow(redrawFrom, OVERVIEW_HERO_TAB_WIDGET, 999);
+        overWin->DrawWindow(redrawFrom, HERO_TAB_WIDGET, 999);
     }
 }
 
@@ -760,11 +819,11 @@ void game::SetupResources(void) {
     tag_message message;
 
     message.type = MESSAGE_WIDGET;
-    for (resourceIdx = 0; resourceIdx < OVERVIEW_RESOURCE_COUNT; resourceIdx++) {
+    for (resourceIdx = 0; resourceIdx < RESOURCE_COUNT; resourceIdx++) {
         message.payload.widget.command = OVERVIEW_WIDGET_SET_TEXT;
         message.payload.widget.data.text = gText;
         sprintf(gText, "%d", gpCurPlayer->m_resources[resourceIdx]);
-        message.payload.widget.id = resourceIdx + OVERVIEW_RESOURCE_FIRST_WIDGET;
+        message.payload.widget.id = resourceIdx + RESOURCE_FIRST_WIDGET;
         overWin->BroadcastMessage(message);
     }
 }
@@ -778,17 +837,17 @@ void game::Overview(void) {
     tag_message message8;
     i32 row0;
 
-    giOverviewReturnAction = OVERVIEW_RETURN_NONE;
-    giOverviewReturnActionExtra = OVERVIEW_RETURN_NONE;
+    giOverviewReturnAction = RETURN_NONE;
+    giOverviewReturnActionExtra = RETURN_NONE;
     message8.type = MESSAGE_WIDGET;
     gpAdvManager->TrimLoopingSounds(4);
-    gpWindowManager->FadeScreen(1, OVERVIEW_FADE_STEPS, 0);
-    for (mine4 = 0; mine4 < OVERVIEW_TITLE_COUNT; mine4++) {
+    gpWindowManager->FadeScreen(1, FADE_STEPS, 0);
+    for (mine4 = 0; mine4 < TITLE_COUNT; mine4++) {
         textWidgetTitle[mine4] = 0;
     }
 
-    textWidgetDynamic = static_cast<textWidget**>(H2_ALLOC(OVERVIEW_DYNAMIC_ARRAY_BYTES, 795));
-    iconWidgetDynamic = static_cast<iconWidget**>(H2_ALLOC(OVERVIEW_DYNAMIC_ARRAY_BYTES, 796));
+    textWidgetDynamic = static_cast<textWidget**>(H2_ALLOC(DYNAMIC_ARRAY_BYTES, 795));
+    iconWidgetDynamic = static_cast<iconWidget**>(H2_ALLOC(DYNAMIC_ARRAY_BYTES, 796));
     for (row0 = 0; row0 < OVERVIEW_VISIBLE_ROWS; row0++) {
         for (mine4 = 0; mine4 < OVERVIEW_DYNAMIC_WIDGETS_PER_ROW; mine4++) {
             OVERVIEW_TEXT_WIDGET_ROWS[row0][mine4] = 0;
@@ -815,7 +874,7 @@ void game::Overview(void) {
         const_cast<char*>("scrollcn.icn"),
         4,
         0,
-        OVERVIEW_SCROLL_KNOB_WIDGET,
+        SCROLL_KNOB_WIDGET,
         16,
         1
     );
@@ -825,22 +884,22 @@ void game::Overview(void) {
     overWin->AddWidget(OVScrollKnob, -1);
 
     SetupResources();
-    memset(mineCounts4, 0, OVERVIEW_RESOURCE_COUNT);
+    memset(mineCounts4, 0, RESOURCE_COUNT);
     sawmills4 = 0;
-    for (mine4 = 0; mine4 < OVERVIEW_MINE_COUNT; mine4++) {
+    for (mine4 = 0; mine4 < MINE_COUNT; mine4++) {
         if (m_mineOwners[mine4] == giCurPlayer) {
-            if (m_mines[mine4].resourceType <= OVERVIEW_RESOURCE_LAST) {
+            if (m_mines[mine4].resourceType <= RESOURCE_LAST) {
                 mineCounts4[m_mines[mine4].resourceType]++;
-            } else if (m_mines[mine4].resourceType == OVERVIEW_SAWMILL_RESOURCE) {
+            } else if (m_mines[mine4].resourceType == SAWMILL_RESOURCE) {
                 sawmills4++;
             }
         }
     }
-    for (mine4 = 0; mine4 < OVERVIEW_RESOURCE_COUNT; mine4++) {
+    for (mine4 = 0; mine4 < RESOURCE_COUNT; mine4++) {
         message8.payload.widget.command = OVERVIEW_WIDGET_SET_TEXT;
         message8.payload.widget.data.text = gText;
         sprintf(gText, "%d", static_cast<i32>(mineCounts4[mine4]));
-        message8.payload.widget.id = mine4 + OVERVIEW_MINE_FIRST_WIDGET;
+        message8.payload.widget.id = mine4 + MINE_FIRST_WIDGET;
         overWin->BroadcastMessage(message8);
     }
     for (mine4 = OVERVIEW_VISIBLE_ROWS; mine4 > 0; mine4--) {
@@ -854,13 +913,13 @@ void game::Overview(void) {
 
     SetupResources();
     message8.payload.widget.command = OVERVIEW_WIDGET_SET_TEXT;
-    message8.payload.widget.id = OVERVIEW_DAILY_GOLD_WIDGET;
+    message8.payload.widget.id = DAILY_GOLD_WIDGET;
     message8.payload.widget.data.text = gText;
     sprintf(gText, "%d", ComputeDailyGold(giCurPlayer));
     overWin->BroadcastMessage(message8);
     SetupNewOverviewType(giOverviewType, 0);
     gpWindowManager->DoDialog(overWin, OverviewHandler, 1);
-    gpWindowManager->FadeScreen(1, OVERVIEW_FADE_STEPS, 0);
+    gpWindowManager->FadeScreen(1, FADE_STEPS, 0);
     delete overWin;
     overWin = 0;
     H2_FREE(textWidgetDynamic, 882);
@@ -887,8 +946,8 @@ void game::DoKnob(void) {
     }
 
     {
-        scrollRange13 = static_cast<float>(OVERVIEW_SCROLL_RANGE);
-        scrollTop11 = static_cast<float>(OVERVIEW_SCROLL_MIN_Y);
+        scrollRange13 = static_cast<float>(SCROLL_RANGE);
+        scrollTop11 = static_cast<float>(SCROLL_MIN_Y);
         previousTop6 = giOverviewTop[IDX(giOverviewType)];
         pixelsPerItem13 =
             scrollRange13 / (giOverviewItems[IDX(giOverviewType)] - (OVERVIEW_VISIBLE_ROWS - 1));
@@ -901,15 +960,15 @@ void game::DoKnob(void) {
                 if (static_cast<float>(message9.payload.mouse.y) < scrollTop11) {
                     message9.payload.mouse.y = static_cast<i32>(scrollTop11);
                 }
-                if (scrollRange13 + scrollTop11 - IDX(OVERVIEW_SCROLL_LAST_PIXEL_ADJUST)
+                if (scrollRange13 + scrollTop11 - IDX(SCROLL_LAST_PIXEL_ADJUST)
                     < static_cast<float>(message9.payload.mouse.y)) {
                     message9.payload.mouse.y = static_cast<i32>(
-                        scrollRange13 + scrollTop11 - IDX(OVERVIEW_SCROLL_LAST_PIXEL_ADJUST)
+                        scrollRange13 + scrollTop11 - IDX(SCROLL_LAST_PIXEL_ADJUST)
                     );
                 }
                 gpMouseManager->Main(message9);
                 OVScrollKnob->m_y =
-                    static_cast<i16>(message9.payload.mouse.y - OVERVIEW_SCROLL_KNOB_OFFSET);
+                    static_cast<i16>(message9.payload.mouse.y - SCROLL_KNOB_OFFSET);
                 newTop8 = static_cast<i32>((OVScrollKnob->m_y - scrollTop11) / pixelsPerItem13);
                 if (OD_STEER(previousTop6) != newTop8) {
                     if (newTop8 > giOverviewItems[IDX(giOverviewType)] - OVERVIEW_VISIBLE_ROWS) {
@@ -920,7 +979,7 @@ void game::DoKnob(void) {
                     }
                     giOverviewTop[IDX(giOverviewType)] = newTop8;
                     OVScrollKnob->m_y =
-                        static_cast<i16>(message9.payload.mouse.y - OVERVIEW_SCROLL_KNOB_OFFSET);
+                        static_cast<i16>(message9.payload.mouse.y - SCROLL_KNOB_OFFSET);
                     SetupDynamicStuff(1, 0, 0);
                     previousTop6 = newTop8;
                 } else {
@@ -969,13 +1028,13 @@ i32 OverviewHandler(struct tag_message& message) {
                     quickView15 = 1;
                 }
                 switch (message.payload.widget.id) {
-                    case OVERVIEW_SCROLL_KNOB_WIDGET:
+                    case SCROLL_KNOB_WIDGET:
                         if (quickView15 != 0) {
                             break;
                         }
                         gpGame->DoKnob();
                         break;
-                    case OVERVIEW_SCROLL_TRACK_WIDGET:
+                    case SCROLL_TRACK_WIDGET:
                         if (quickView15 != 0) {
                             break;
                         }
@@ -986,9 +1045,9 @@ i32 OverviewHandler(struct tag_message& message) {
                             giOverviewItems[IDX(giOverviewType)] - (OVERVIEW_VISIBLE_ROWS - 1);
                         scrollDivisor3 = 32100 / scrollItemCount0;
                         scrollY7 = message.payload.mouse.screenY;
-                        scrollY7 -= OVERVIEW_SCROLL_MIN_Y;
-                        scrollY7 -= OVERVIEW_SCROLL_KNOB_OFFSET;
-                        newTop8 = scrollY7 * OVERVIEW_SCROLL_SCALE / scrollDivisor3;
+                        scrollY7 -= SCROLL_MIN_Y;
+                        scrollY7 -= SCROLL_KNOB_OFFSET;
+                        newTop8 = scrollY7 * SCROLL_SCALE / scrollDivisor3;
                         giOverviewTop[IDX(giOverviewType)] = newTop8;
                         if (giOverviewTop[IDX(giOverviewType)] + (OVERVIEW_VISIBLE_ROWS - 1)
                             >= giOverviewItems[IDX(giOverviewType)]) {
@@ -1000,7 +1059,7 @@ i32 OverviewHandler(struct tag_message& message) {
                         }
                         gpGame->SetupDynamicStuff(1, 1, 0);
                         break;
-                    case OVERVIEW_HERO_TAB_WIDGET:
+                    case HERO_TAB_WIDGET:
                         if (quickView15 != 0) {
                             break;
                         }
@@ -1009,7 +1068,7 @@ i32 OverviewHandler(struct tag_message& message) {
                             gpGame->SetupNewOverviewType(OVERVIEW_HEROES, 1);
                         }
                         break;
-                    case OVERVIEW_TOWN_TAB_WIDGET:
+                    case TOWN_TAB_WIDGET:
                         if (quickView15 != 0) {
                             break;
                         }
@@ -1026,24 +1085,24 @@ i32 OverviewHandler(struct tag_message& message) {
                 break;
             case WIDGET_COMMAND_DESELECT:
                 switch (message.payload.widget.id) {
-                    case OVERVIEW_HERO_TITLE_WIDGET:
+                    case HERO_TITLE_WIDGET:
                         goto selectHeroes;
-                    case OVERVIEW_TOWN_TITLE_WIDGET:
+                    case TOWN_TITLE_WIDGET:
                         goto selectTowns;
-                    case OVERVIEW_SCROLL_UP_WIDGET:
+                    case SCROLL_UP_WIDGET:
                         if (giOverviewTop[IDX(giOverviewType)] > 0) {
                             giOverviewTop[IDX(giOverviewType)]--;
                             gpGame->SetupDynamicStuff(1, 1, 0);
                         }
                         break;
-                    case OVERVIEW_SCROLL_DOWN_WIDGET:
+                    case SCROLL_DOWN_WIDGET:
                         if (giOverviewTop[IDX(giOverviewType)]
                             < giOverviewItems[IDX(giOverviewType)] - OVERVIEW_VISIBLE_ROWS) {
                             giOverviewTop[IDX(giOverviewType)]++;
                             gpGame->SetupDynamicStuff(1, 1, 0);
                         }
                         break;
-                    case OVERVIEW_CLOSE_WIDGET:
+                    case CLOSE_WIDGET:
                         gpWindowManager->m_dialogResult = message.payload.widget.id;
                         closeDialog5 = 1;
                         break;
@@ -1082,11 +1141,11 @@ i32 OverviewHandler(struct tag_message& message) {
         }
     }
     if (closeDialog5 == 1) {
-        message.payload.widget.id = OVERVIEW_SCROLL_UP_WIDGET;
+        message.payload.widget.id = SCROLL_UP_WIDGET;
         message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
-        return OVERVIEW_DIALOG_CLOSE;
+        return DIALOG_CLOSE;
     }
-    return OVERVIEW_DIALOG_CONTINUE;
+    return DIALOG_CONTINUE;
 }
 
 VA(0x0040ab6c, 0x4fa)
@@ -1096,29 +1155,29 @@ i32 game::ProcessIconSelect(i32 widgetId, i32 quickView) {
     hero* selectedHero13;
     town* selectedTown3;
 
-    if (widgetId >= OVERVIEW_ICON_ROW_BASE && widgetId <= OVERVIEW_ICON_ROW_LIMIT - 1) {
-        row0 = (widgetId - OVERVIEW_ICON_ROW_BASE) / OVERVIEW_ROW_ID_STRIDE;
+    if (widgetId >= ICON_ROW_BASE && widgetId <= ICON_ROW_LIMIT - 1) {
+        row0 = (widgetId - ICON_ROW_BASE) / OVERVIEW_ROW_ID_STRIDE;
         if (giOverviewTop[IDX(giOverviewType)] + row0 > giOverviewItems[IDX(giOverviewType)]) {
             return 0;
         }
-        widgetId -= OVERVIEW_ICON_ROW_BASE;
+        widgetId -= ICON_ROW_BASE;
         widgetId %= OVERVIEW_ROW_ID_STRIDE;
 
         if (giOverviewType == OVERVIEW_HEROES) {
             selectedHero13 =
                 GetHero(gpCurPlayer->m_heroIds[giOverviewTop[IDX(giOverviewType)] + row0]);
-            if (widgetId >= OVERVIEW_HERO_SELECT_FIRST && widgetId <= OVERVIEW_HERO_SELECT_LAST) {
-                giOverviewReturnAction = OVERVIEW_RETURN_HERO;
+            if (widgetId >= HERO_SELECT_FIRST && widgetId <= HERO_SELECT_LAST) {
+                giOverviewReturnAction = RETURN_HERO;
                 giOverviewReturnActionExtra =
                     gpCurPlayer->m_heroIds[giOverviewTop[IDX(giOverviewType)] + row0];
                 return 1;
             }
-            if (widgetId >= OVERVIEW_HERO_ARMY_ALT_FIRST
-                && widgetId <= OVERVIEW_HERO_ARMY_ALT_LAST) {
+            if (widgetId >= HERO_ARMY_ALT_FIRST
+                && widgetId <= HERO_ARMY_ALT_LAST) {
                 widgetId -= OVERVIEW_TROOP_SLOTS;
             }
-            if (widgetId >= OVERVIEW_HERO_ARMY_FIRST && widgetId <= OVERVIEW_HERO_ARMY_LAST) {
-                selectionIndex2 = widgetId - OVERVIEW_HERO_ARMY_FIRST;
+            if (widgetId >= HERO_ARMY_FIRST && widgetId <= HERO_ARMY_LAST) {
+                selectionIndex2 = widgetId - HERO_ARMY_FIRST;
                 gpGame->ViewArmy(
                     119,
                     20,
@@ -1137,14 +1196,14 @@ i32 game::ProcessIconSelect(i32 widgetId, i32 quickView) {
                     SetupDynamicStuff(1, 1, 1);
                 }
             }
-            if (widgetId >= OVERVIEW_HERO_SKILL_FIRST && widgetId <= OVERVIEW_HERO_SKILL_LAST) {
-                selectionIndex2 = selectedHero13->GetNthSS(widgetId - OVERVIEW_HERO_SKILL_FIRST);
+            if (widgetId >= HERO_SKILL_FIRST && widgetId <= HERO_SKILL_LAST) {
+                selectionIndex2 = selectedHero13->GetNthSS(widgetId - HERO_SKILL_FIRST);
                 selectedHero13->DoSSLevelDialog(selectionIndex2, quickView);
             }
-            if (widgetId >= OVERVIEW_HERO_ARTIFACT_FIRST
-                && widgetId <= OVERVIEW_HERO_ARTIFACT_LAST) {
+            if (widgetId >= HERO_ARTIFACT_FIRST
+                && widgetId <= HERO_ARTIFACT_LAST) {
                 selectionIndex2 =
-                    selectedHero13->m_artifacts[widgetId - OVERVIEW_HERO_ARTIFACT_FIRST];
+                    selectedHero13->m_artifacts[widgetId - HERO_ARTIFACT_FIRST];
                 if (selectionIndex2 == IDX(ARTIFACT_MAGIC_BOOK)) {
                     gpGame->ViewSpells(selectedHero13, 2, ViewSpecialHandler, 1);
                 } else {
@@ -1162,8 +1221,8 @@ i32 game::ProcessIconSelect(i32 widgetId, i32 quickView) {
                     );
                 }
             }
-            if (widgetId >= OVERVIEW_HERO_STAT_FIRST && widgetId <= OVERVIEW_HERO_STAT_LAST) {
-                selectionIndex2 = widgetId - OVERVIEW_HERO_STAT_FIRST;
+            if (widgetId >= HERO_STAT_FIRST && widgetId <= HERO_STAT_LAST) {
+                selectionIndex2 = widgetId - HERO_STAT_FIRST;
                 NormalDialog(
                     gStatDesc[selectionIndex2],
                     quickView == 0 ? 1 : 4,
@@ -1181,24 +1240,24 @@ i32 game::ProcessIconSelect(i32 widgetId, i32 quickView) {
         if (giOverviewType == OVERVIEW_TOWNS) {
             selectedTown3 =
                 GetTown(gpCurPlayer->m_townIds[giOverviewTop[IDX(giOverviewType)] + row0]);
-            if (widgetId == OVERVIEW_TOWN_SELECT_WIDGET) {
-                giOverviewReturnAction = OVERVIEW_RETURN_TOWN;
+            if (widgetId == TOWN_SELECT_WIDGET) {
+                giOverviewReturnAction = RETURN_TOWN;
                 giOverviewReturnActionExtra =
                     gpCurPlayer->m_townIds[giOverviewTop[IDX(giOverviewType)] + row0];
                 return 1;
             }
-            if (widgetId >= OVERVIEW_TOWN_HERO_FIRST && widgetId <= OVERVIEW_TOWN_HERO_LAST
+            if (widgetId >= TOWN_HERO_FIRST && widgetId <= TOWN_HERO_LAST
                 && selectedTown3->m_occupyingHeroId != -1) {
-                giOverviewReturnAction = OVERVIEW_RETURN_HERO;
+                giOverviewReturnAction = RETURN_HERO;
                 giOverviewReturnActionExtra = selectedTown3->m_occupyingHeroId;
                 return 1;
             }
-            if (widgetId >= OVERVIEW_TOWN_ARMY_ALT_FIRST
-                && widgetId <= OVERVIEW_TOWN_ARMY_ALT_LAST) {
+            if (widgetId >= TOWN_ARMY_ALT_FIRST
+                && widgetId <= TOWN_ARMY_ALT_LAST) {
                 widgetId -= OVERVIEW_TROOP_SLOTS;
             }
-            if (widgetId >= OVERVIEW_TOWN_ARMY_FIRST && widgetId <= OVERVIEW_TOWN_ARMY_LAST) {
-                selectionIndex2 = widgetId - OVERVIEW_TOWN_ARMY_FIRST;
+            if (widgetId >= TOWN_ARMY_FIRST && widgetId <= TOWN_ARMY_LAST) {
+                selectionIndex2 = widgetId - TOWN_ARMY_FIRST;
                 gpGame->ViewArmy(
                     119,
                     20,
@@ -1217,12 +1276,12 @@ i32 game::ProcessIconSelect(i32 widgetId, i32 quickView) {
                     SetupDynamicStuff(1, 1, 1);
                 }
             }
-            if (widgetId >= OVERVIEW_TOWN_RECRUIT_ALT_FIRST
-                && widgetId <= OVERVIEW_TOWN_RECRUIT_ALT_LAST) {
+            if (widgetId >= TOWN_RECRUIT_ALT_FIRST
+                && widgetId <= TOWN_RECRUIT_ALT_LAST) {
                 widgetId -= OVERVIEW_DWELLING_SLOTS;
             }
-            if (widgetId >= OVERVIEW_TOWN_RECRUIT_FIRST && widgetId <= OVERVIEW_TOWN_RECRUIT_LAST) {
-                selectionIndex2 = widgetId - OVERVIEW_TOWN_RECRUIT_FIRST;
+            if (widgetId >= TOWN_RECRUIT_FIRST && widgetId <= TOWN_RECRUIT_LAST) {
+                selectionIndex2 = widgetId - TOWN_RECRUIT_FIRST;
                 if (quickView != 0) {
                     QuickViewRecruit(selectedTown3, selectionIndex2);
                 } else {

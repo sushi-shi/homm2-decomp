@@ -7,12 +7,31 @@
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/comwin.h>
 
+H2_ENUM_BEGIN(ComConstant)
+    PORT_COUNT           = 2,
+    PORT_NAME_SIZE       = 12,
+    ERROR_NAME_SIZE      = 100,
+    ERROR_MESSAGE_SIZE   = 500,
+    RECEIVE_BUFFER_SIZE  = 0x2000,
+    TRANSMIT_BUFFER_SIZE = 0x1000,
+    BREAK_DELAY          = 500,
+    NODE_HEADER_SIZE     = 10
+H2_ENUM_END(ComConstant)
+
+H2_ENUM_CLASS_BEGIN(ComBaudRate)
+    COM_BAUD_2400  = 1,
+    COM_BAUD_4800  = 2,
+    COM_BAUD_9600  = 3,
+    COM_BAUD_19200 = 4,
+    COM_BAUD_38400 = 5
+H2_ENUM_CLASS_END(ComBaudRate)
+
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\comwin.cpp"
 
 DATA(0x004f843c) static i16 s_comTermSourceLineBase = 199;
 DATA(0x004f84d8) static i16 s_comSendSourceLineBase = 247;
 DATA(0x004f8540) static i16 s_comWriteSourceLineBase = 310;
-DATA(0x005284b8) static ComPortState s_comPorts[COM_PORT_COUNT];
+DATA(0x005284b8) static ComPortState s_comPorts[PORT_COUNT];
 
 
 VA(0x0048a640, 0x74)
@@ -48,8 +67,8 @@ void init_anchor(struct tag_Anchor* anchor, i32, i32) {
 // @semantic: first residual is the embedded 0x4c-byte jump table at RVA 0x8a968.
 VA(0x0048a72e, 0x3e5)
 void ShutdownComError(char* function) {
-    char errorName[COM_ERROR_NAME_SIZE];
-    char message[COM_ERROR_MESSAGE_SIZE];
+    char errorName[ERROR_NAME_SIZE];
+    char message[ERROR_MESSAGE_SIZE];
     DWORD error = GetLastError();
 
     switch (error) {
@@ -124,19 +143,19 @@ void ShutdownComError(char* function) {
 // @semantic: first residual is the embedded 0x14-byte baud-rate jump table at RVA 0x8ace2.
 VA(0x0048ab13, 0x34a)
 i16 com_init(u8 portNumber, i32 baudRate, i32 useDtr) {
-    char portName[COM_PORT_NAME_SIZE];
+    char portName[PORT_NAME_SIZE];
     BOOL result;
     DCB state;
     i32 portIndex;
     COMMTIMEOUTS timeouts;
 
-    for (portIndex = 0; portIndex < COM_PORT_COUNT; ++portIndex)
+    for (portIndex = 0; portIndex < PORT_COUNT; ++portIndex)
         s_comPorts[portIndex].handle = INVALID_HANDLE_VALUE;
-    for (portIndex = 0; portIndex < COM_PORT_COUNT; ++portIndex) {
+    for (portIndex = 0; portIndex < PORT_COUNT; ++portIndex) {
         if (s_comPorts[portIndex].handle == INVALID_HANDLE_VALUE)
             break;
     }
-    if (portIndex >= COM_PORT_COUNT)
+    if (portIndex >= PORT_COUNT)
         return -1;
 
     wsprintfA(portName, "COM%d", portNumber);
@@ -191,7 +210,7 @@ i16 com_init(u8 portNumber, i32 baudRate, i32 useDtr) {
     state.StopBits = ONESTOPBIT;
 
     result =
-        SetupComm(s_comPorts[portIndex].handle, COM_RECEIVE_BUFFER_SIZE, COM_TRANSMIT_BUFFER_SIZE);
+        SetupComm(s_comPorts[portIndex].handle, RECEIVE_BUFFER_SIZE, TRANSMIT_BUFFER_SIZE);
     if (result == 0)
         ShutdownComError("Initialize communications paramaters");
     result = SetCommState(s_comPorts[portIndex].handle, &state);
@@ -270,13 +289,13 @@ i16 com_snd(i16 portIndex, u16, u16 length, void* data, i32 priority) {
             result = SetCommBreak(s_comPorts[portIndex].handle);
             if (result == 0)
                 ShutdownComError("Set communications break");
-            Sleep(COM_BREAK_DELAY);
+            Sleep(BREAK_DELAY);
             result = ClearCommBreak(s_comPorts[portIndex].handle);
             if (result == 0)
                 ShutdownComError("Clear communications break");
             return 0;
         }
-        sendNode = static_cast<tag_Node*>(H2_ALLOC(length + COM_NODE_HEADER_SIZE, 263));
+        sendNode = static_cast<tag_Node*>(H2_ALLOC(length + NODE_HEADER_SIZE, 263));
         if (sendNode != 0) {
             sendNode->len = length;
             memcpy(sendNode->comData, data, length);

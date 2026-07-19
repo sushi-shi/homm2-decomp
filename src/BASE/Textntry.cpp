@@ -1,6 +1,5 @@
 #include <va.h>
 #include <BASE/textEntryWidget.h>
-#include <BASE/TEXTNTRY_TYPES.h>
 #include <BASE/widgetKind.h>
 #include <BASE/resourceManager.h>
 #include <BASE/font.h>
@@ -15,9 +14,21 @@
 #include <BASE/icon.h>
 #include <string.h>
 
+H2_ENUM_BEGIN(TextEntryKeyConstant)
+    ENTRY_KEY_DELETE = 0x7f
+H2_ENUM_END(TextEntryKeyConstant)
+
+H2_ENUM_BEGIN(TextEntrySourceFileConstant)
+    ENTRY_SOURCE_FILE_SLOT_SIZE = 0x2c
+H2_ENUM_END(TextEntrySourceFileConstant)
+
+H2_ENUM_CLASS_BEGIN(InputManagerExtendedKey)
+    EXTENDED_KEY_BASE = 0x100
+// extended keys arrive as scan code << 8
+H2_ENUM_CLASS_END(InputManagerExtendedKey)
+
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\Textntry.cpp"
 #define TEXT_ENTRY_MAIN_SOURCE_FILES RETAIL_FILE "\0\0\0" RETAIL_FILE
-
 
 VA(0x004d8740, 0x2d)
 textEntryWidget::textEntryWidget(void) : textWidget() {
@@ -239,7 +250,7 @@ i32 textEntryWidget::Main(struct tag_message& message) {
                                     gbTextEntryEscaped = false;
                                     done++;
                                 } else if (event.payload.keyboard.keyCode
-                                           == TEXT_ENTRY_KEY_DELETE) {
+                                           == ENTRY_KEY_DELETE) {
                                     if (m_cursorPosition != 0) {
                                         strcpy(scratch, edit + m_cursorPosition);
                                         strcpy(edit + m_cursorPosition - 1, scratch);
@@ -251,7 +262,7 @@ i32 textEntryWidget::Main(struct tag_message& message) {
                                            && event.payload.keyboard.keyCode != 0) {
                                     strcpy(backup, edit);
                                     char typed = 0;
-                                    if (event.payload.keyboard.keyCode >= IDX(INPUT_EXTENDED_KEY_BASE)) {
+                                    if (event.payload.keyboard.keyCode >= IDX(EXTENDED_KEY_BASE)) {
                                         switch ((event.payload.keyboard.keyCode >> 8) & 0xFF) {
                                             case INPUT_SCAN_NUMPAD_7:
                                                 typed = '7';
@@ -297,7 +308,7 @@ i32 textEntryWidget::Main(struct tag_message& message) {
                                         m_text = static_cast<char*>(H2_ALLOC_AT(
                                             strlen(edit) + 6,
                                             TEXT_ENTRY_MAIN_SOURCE_FILES
-                                                + TEXT_ENTRY_SOURCE_FILE_SLOT_SIZE,
+                                                + ENTRY_SOURCE_FILE_SLOT_SIZE,
                                             389
                                         ));
                                         strcpy(scratch, edit);

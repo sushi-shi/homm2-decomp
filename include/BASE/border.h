@@ -1,7 +1,9 @@
 #ifndef HOMM2_BASE_BORDER_H
 #define HOMM2_BASE_BORDER_H
+
 #include <va.h>
 #include "widget.h"
+
 class bitmap;
 class icon;
 struct tag_message;

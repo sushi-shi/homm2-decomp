@@ -1,16 +1,18 @@
 #ifndef HOMM2_BASE_WIDGET_H
 #define HOMM2_BASE_WIDGET_H
+
 #include <va.h>
+
 class heroWindow;
 struct tag_message;
 
 H2_ENUM_BEGIN(WidgetFlag)
     WIDGET_FLAG_SELECTED = 1,
-    WIDGET_FLAG_ENABLED = 2,
-    WIDGET_FLAG_DRAW = 4,
-    WIDGET_FLAG_DIMMED = 8,
-    WIDGET_FLAG_GRAYED = 0x1000,
-    WIDGET_FLAG_UPDATE = 0x4000
+    WIDGET_FLAG_ENABLED  = 2,
+    WIDGET_FLAG_DRAW     = 4,
+    WIDGET_FLAG_DIMMED   = 8,
+    WIDGET_FLAG_GRAYED   = 0x1000,
+    WIDGET_FLAG_UPDATE   = 0x4000
 H2_ENUM_END(WidgetFlag)
 
 H2_ENUM_BEGIN(WidgetCommandArgument)
@@ -18,7 +20,7 @@ H2_ENUM_BEGIN(WidgetCommandArgument)
 H2_ENUM_END(WidgetCommandArgument)
 
 #pragma pack(push, 1)
-class widget   {
+class widget {
 public:
     heroWindow* m_owner;
     widget* m_next;

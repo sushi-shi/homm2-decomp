@@ -3,6 +3,10 @@
 #include <BASE/bitmap.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <string.h>
+H2_ENUM_BEGIN(BitmapDimConstant)
+    DIM_PALETTE_LEVEL_STRIDE = 256
+H2_ENUM_END(BitmapDimConstant)
+
 DATA(0x005348f0) static i32 gFillRow;
 DATA(0x005348f8) static u8* gFillPtr;
 DATA(0x005348e8) static i32 gDimRow;
@@ -97,7 +101,7 @@ void DimBitmapArea(class bitmap* bmp, i32 x, i32 y, i32 w, i32 h, i32 level) {
     for (gDimRow = 0; gDimRow < h; gDimRow++) {
         gDimNext = gDimPtr + bmp->m_width;
         for (gDimCol = 0; gDimCol < w; gDimCol++) {
-            *gDimPtr = uDimPal[0][0][level * BITMAP_DIM_PALETTE_LEVEL_STRIDE + *gDimPtr];
+            *gDimPtr = uDimPal[0][0][level * DIM_PALETTE_LEVEL_STRIDE + *gDimPtr];
             gDimPtr++;
         }
         gDimPtr = gDimNext;

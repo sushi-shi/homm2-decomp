@@ -1,5 +1,6 @@
 #ifndef HOMM2_BASE_BZIP_H
 #define HOMM2_BASE_BZIP_H
+
 #include <va.h>
 #include <stdio.h>
 

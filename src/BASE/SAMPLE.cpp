@@ -7,6 +7,18 @@
 #include <SOURCE/KB.h>
 #include <string.h>
 
+H2_ENUM_CLASS_BEGIN(sampleAudioFormat)
+    FORMAT_8_BIT  = 0,
+    FORMAT_16_BIT = 1,
+    FORMAT_STEREO = 2
+H2_ENUM_CLASS_END(sampleAudioFormat)
+
+H2_ENUM_CLASS_BEGIN(samplePlaybackRate)
+    RATE_11025 = 11025,
+    RATE_22050 = 22050,
+    RATE_44100 = 44100
+H2_ENUM_CLASS_END(samplePlaybackRate)
+
 DATA(0x00520df4) static SSampleSourceFiles gSampleSourceFiles =
     {SAMPLE_SOURCE_FILE, SAMPLE_SOURCE_FILE, SAMPLE_SOURCE_FILE, SAMPLE_SOURCE_FILE};
 
@@ -18,7 +30,7 @@ sample::sample(char* name, i32l channelType, i32l volume, i32l loopCount)
     m_playbackData.channelType = channelType;
     m_playbackData.volume = volume;
     m_playbackData.loopCount = loopCount;
-    formatFlags = IDX(SAMPLE_FORMAT_STEREO);
+    formatFlags = IDX(FORMAT_STEREO);
 
     char filename[32];
     strcpy(filename, name);
@@ -27,19 +39,19 @@ sample::sample(char* name, i32l channelType, i32l volume, i32l loopCount)
     for (i32 i = 0; i < 3; i++) {
         switch (filename[i]) {
             case '1':
-                m_playbackData.sampleRate = IDX(SAMPLE_RATE_11025);
+                m_playbackData.sampleRate = IDX(RATE_11025);
                 break;
             case '2':
-                m_playbackData.sampleRate = IDX(SAMPLE_RATE_22050);
+                m_playbackData.sampleRate = IDX(RATE_22050);
                 break;
             case '4':
-                m_playbackData.sampleRate = IDX(SAMPLE_RATE_44100);
+                m_playbackData.sampleRate = IDX(RATE_44100);
                 break;
             case '6':
-                m_playbackData.format = IDX(SAMPLE_FORMAT_16_BIT);
+                m_playbackData.format = IDX(FORMAT_16_BIT);
                 break;
             case '8':
-                m_playbackData.format = IDX(SAMPLE_FORMAT_8_BIT);
+                m_playbackData.format = IDX(FORMAT_8_BIT);
                 break;
             case 'M':
             case 'm':

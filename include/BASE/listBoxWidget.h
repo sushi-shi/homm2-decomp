@@ -1,25 +1,13 @@
 #ifndef HOMM2_BASE_LISTBOXWIDGET_H
 #define HOMM2_BASE_LISTBOXWIDGET_H
+
 #include <va.h>
 #include "widget.h"
+
 struct tag_message;
 
 // Frame layout of the list-box ICN resource; the m_*Frame members are
 // initialized from these in Read and the entry table is indexed with them.
-H2_ENUM_BEGIN(ListBoxFrame)
-    LISTBOX_FRAME_FIRST_ROW = 0,
-    LISTBOX_FRAME_MIDDLE_ROW = 1,
-    LISTBOX_FRAME_LAST_ROW = 2,
-    LISTBOX_FRAME_SCROLL_UP = 3,
-    LISTBOX_FRAME_SCROLL_UP_PRESSED = 4,
-    LISTBOX_FRAME_SCROLL_DOWN = 5,
-    LISTBOX_FRAME_SCROLL_DOWN_PRESSED = 6,
-    LISTBOX_FRAME_SCROLL_TRACK_FIRST = 7,
-    LISTBOX_FRAME_SCROLL_TRACK_MIDDLE = 8,
-    LISTBOX_FRAME_SCROLL_TRACK_LAST = 9,
-    LISTBOX_FRAME_SCROLL_THUMB = 10
-H2_ENUM_END(ListBoxFrame)
-
 #pragma pack(push, 1)
 class font;
 class icon;

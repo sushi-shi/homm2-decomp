@@ -1,7 +1,9 @@
 #ifndef HOMM2_EDITOR_FULLMAP_H
 #define HOMM2_EDITOR_FULLMAP_H
+
 #include <va.h>
 #include "mapcell.h"
+
 class mapCell;
 struct mapCellExtra;
 

@@ -57,6 +57,258 @@
 #include <BASE/textWidget.h>
 #include <BASE/border.h>
 
+H2_ENUM_BEGIN(CampaignChoiceValue)
+    CHOICE_VALUE_NONE = -1
+H2_ENUM_END(CampaignChoiceValue)
+
+H2_ENUM_BEGIN(CampaignChoiceAmount)
+    CHOICE_NO_AMOUNT      = -1,
+    CHOICE_BASIC_SKILL    = 1,
+    CHOICE_RESOURCE_BONUS = 20,
+    CHOICE_GOLD_BONUS     = 2000
+H2_ENUM_END(CampaignChoiceAmount)
+
+H2_ENUM_BEGIN(PlayerDeadConstant)
+    DEAD_MAP_CHANGE        = 0xa,
+    DEAD_MAP_CHANGE_UNUSED = -999
+H2_ENUM_END(PlayerDeadConstant)
+
+H2_ENUM_CLASS_BEGIN(KbMonsterResourceType)
+    MONSTER_NEEDS_CRYSTAL        = 19,
+    MONSTER_NEEDS_MERCURY        = 28,
+    MONSTER_NEEDS_SULFUR_FIRST   = 35,
+    MONSTER_NEEDS_SULFUR_SECOND  = 36,
+    MONSTER_NEEDS_TWO_SULFUR     = 37,
+    MONSTER_NEEDS_GEMS           = 45,
+    MONSTER_NEEDS_TWO_GEMS       = 46,
+    MONSTER_NEEDS_GEMS_EXPANSION = 60
+H2_ENUM_CLASS_END(KbMonsterResourceType)
+
+H2_ENUM_BEGIN(CheckEndGameConstants)
+    END_GAME_NO_PLAYER          = -1,
+    END_GAME_EMPTY_ARMY         = -1,
+    END_GAME_PLAYER_COUNT       = 6,
+    END_GAME_HERO_COUNT         = 54,
+    END_GAME_ARMY_SLOTS         = 5,
+    END_GAME_GOLD_RESOURCE      = 6,
+    END_GAME_GRACE_DAYS         = 7,
+    END_GAME_DAYS_PER_WEEK      = 7,
+    END_GAME_DAYS_PER_MONTH     = 28,
+    END_GAME_TEXT_BUFFER_SIZE   = 100,
+    END_GAME_GOLD_SCALE         = 1000,
+    END_GAME_ULTIMATE_ARTIFACT  = 0,
+    END_GAME_LAST_ULTIMATE_PART = 7,
+    END_GAME_SIDE_SPECIAL_VALUE = 99,
+    END_GAME_PLAYER_DIALOG_ICON = 9,
+    END_GAME_REMOTE_DIALOG_TIME = 5000,
+    END_GAME_DWARF_TOWN         = 2,
+    END_GAME_ROLAND_HERO        = 54
+H2_ENUM_END(CheckEndGameConstants)
+
+H2_ENUM_CLASS_BEGIN(CheckEndGameCampaignConstants)
+    END_GAME_ROLAND_CAMPAIGN         = 0,
+    END_GAME_ARCHIBALD_CAMPAIGN      = 1,
+    END_GAME_SCENARIO_OFFSET         = 1,
+    END_GAME_DWARF_SCENARIO          = 3,
+    END_GAME_SIDE_SCENARIO           = 7,
+    END_GAME_ROLAND_CAPTURE_SCENARIO = 9,
+    END_GAME_FIRST_NO_SAVE_SCENARIO  = 10,
+    END_GAME_LAST_SCENARIO           = 11,
+    END_GAME_ROLAND_COLOR            = 0,
+    END_GAME_ALLY_COLOR              = 3
+H2_ENUM_CLASS_END(CheckEndGameCampaignConstants)
+
+H2_ENUM_CLASS_BEGIN(CheckEndGameForcedResult)
+    END_GAME_FORCE_NONE    = 0,
+    END_GAME_FORCE_VICTORY = 1,
+    END_GAME_FORCE_DEFEAT  = 2
+H2_ENUM_CLASS_END(CheckEndGameForcedResult)
+
+H2_ENUM_CLASS_BEGIN(MoraleInfoTextIndex)
+    MORALE_INFO_GOOD          = 0,
+    MORALE_INFO_NEUTRAL       = 1,
+    MORALE_INFO_BAD           = 2,
+    MORALE_INFO_HEADER        = 3,
+    INFO_SAME_ALIGNMENT       = 5,
+    INFO_THREE_ALIGNMENTS     = 6,
+    INFO_FOUR_ALIGNMENTS      = 7,
+    INFO_MEDAL_OF_VALOR       = 8,
+    INFO_MEDAL_OF_COURAGE     = 9,
+    INFO_MEDAL_OF_HONOR       = 10,
+    INFO_MEDAL_OF_DISTINCTION = 11,
+    INFO_FIZBIN               = 12,
+    INFO_BUOY                 = 13,
+    INFO_OASIS                = 14,
+    INFO_TEMPLE               = 15,
+    INFO_GRAVEYARD            = 16,
+    INFO_SHIPWRECK            = 17,
+    MORALE_INFO_NONE          = 19,
+    INFO_FIVE_ALIGNMENTS      = 20,
+    INFO_ALL_UNDEAD           = 21,
+    INFO_SOME_UNDEAD          = 22,
+    INFO_WATERING_HOLE        = 23,
+    INFO_DERELICT_SHIP        = 24,
+    INFO_COLISEUM             = 25,
+    INFO_TAVERN               = 26,
+    INFO_BASIC_LEADERSHIP     = 27,
+    INFO_ADVANCED_LEADERSHIP  = 28,
+    INFO_EXPERT_LEADERSHIP    = 29,
+    MORALE_INFO_MASTHEAD      = 30,
+    MORALE_INFO_BATTLE_GARB   = 31
+H2_ENUM_CLASS_END(MoraleInfoTextIndex)
+
+H2_ENUM_CLASS_BEGIN(LuckInfoTextIndex)
+    LUCK_INFO_GOOD        = 0,
+    LUCK_INFO_NEUTRAL     = 1,
+    LUCK_INFO_BAD         = 2,
+    LUCK_INFO_HEADER      = 3,
+    INFO_RABBIT_FOOT      = 4,
+    INFO_HORSESHOE        = 5,
+    INFO_LUCKY_COIN       = 6,
+    INFO_CLOVER           = 7,
+    INFO_FAERIE_RING      = 8,
+    INFO_FOUNTAIN         = 9,
+    LUCK_INFO_NONE        = 10,
+    INFO_RAINBOW          = 12,
+    INFO_IDOL             = 13,
+    INFO_PYRAMID          = 14,
+    INFO_BASIC_SKILL      = 15,
+    INFO_ADVANCED_SKILL   = 16,
+    INFO_EXPERT_SKILL     = 17,
+    LUCK_INFO_MASTHEAD    = 18,
+    INFO_MERMAID          = 19,
+    LUCK_INFO_BATTLE_GARB = 20
+H2_ENUM_CLASS_END(LuckInfoTextIndex)
+
+H2_ENUM_BEGIN(NetBoxConstant)
+    BOX_WINDOW_Y             = 0x19b,
+    BOX_HEIGHT               = 0x44,
+    BOX_WIDTH                = 0x27f,
+    BOX_INPUT_Y              = 0x1d1,
+    BOX_INPUT_HEIGHT         = 0xc,
+    BOX_TEXT_LENGTH          = 150,
+    BOX_LINE_COUNT           = 4,
+    BOX_LINE_TEXT_LIMIT      = 120,
+    BOX_TEXT_X               = 20,
+    BOX_TEXT_Y               = 54,
+    BOX_MAX_INPUT            = 0x5d,
+    BOX_DEFAULT_COLOR        = 6,
+    BOX_CURSOR_DELAY         = 0x168,
+    BOX_CURSOR_WIDTH_PADDING = 0x32,
+    BOX_CURSOR_WIDTH_LIMIT   = 0x25a,
+    BOX_MESSAGE_TIMEOUT      = 6000,
+    BOX_EXIT_DELAY_STEPS     = 20,
+    BOX_EXIT_DELAY           = 75,
+    BOX_FIRST_LINE_ID        = 1,
+    BOX_FIRST_COLOR_ID       = 0x14,
+    BOX_SECOND_COLOR_ID      = 0x15,
+    BOX_THIRD_COLOR_ID       = 0x16,
+    BOX_FOURTH_COLOR_ID      = 0x17,
+    BOX_INPUT_ID             = 5,
+    BOX_THIS_PLAYER_COLOR_ID = 0x18,
+    BOX_KEY_ESCAPE           = 0x1b,
+    BOX_KEY_ENTER            = 10,
+    BOX_KEY_BACKSPACE        = 0x7f,
+    BOX_KEY_F1               = 0x3b00,
+    BOX_CURSOR_GLYPH         = 0x1f,
+    BOX_PACKET_BUFFER_SIZE   = 0x7f,
+    BOX_FIRST_PRINTABLE      = 0x20,
+    BOX_LAST_PRINTABLE       = 0x7f,
+    BOX_REMOTE_MAP_CHANGE    = 0x29,
+    BOX_REMOTE_SETUP         = 0x20,
+    BOX_REMOTE_SAVE          = 1,
+    BOX_REMOTE_CHAT          = 0xb,
+    BOX_REMOTE_GROUP         = 3,
+    BOX_REMOTE_CONTROL       = 2
+H2_ENUM_END(NetBoxConstant)
+
+H2_ENUM_BEGIN(CongratsConstant)
+    PALETTE_SIZE        = 0x300,
+    PALETTE_BUFFER_SIZE = 0x304,
+    TEXT_SIZE           = 500,
+    RATING_LENGTH       = 32,
+    CAMPAIGN            = 0,
+    STANDARD            = 1,
+    EXPANSION_CAMPAIGN  = 2,
+    MUSIC_SILENT        = -1,
+    SMACKER             = 2,
+    DIFFICULTY_SCALE    = 100
+H2_ENUM_END(CongratsConstant)
+
+H2_ENUM_BEGIN(CommandLineConstant)
+    LINE_TCP_TEXT_LENGTH    = 20,
+    LINE_HELP_LINE_COUNT    = 14,
+    LINE_HUMAN_PLAYER_SLOTS = 4,
+    LINE_TCP_MIN_PLAYERS    = 2,
+    LINE_TCP_MAX_PLAYERS    = 6,
+    LINE_FRAME_STEP         = 6,
+    LINE_TCP_TYPE_DEFAULT   = 0,
+    LINE_TCP_TYPE_L         = 1,
+    LINE_TCP_CLIENT         = 0,
+    LINE_TCP_HOST           = 1,
+    LINE_SINGLE_PLAYER      = 1
+H2_ENUM_END(CommandLineConstant)
+
+H2_ENUM_BEGIN(InitMenuConstant)
+    MENU_HOTSPOT_COUNT     = 5,
+    MENU_FIRST_COMMAND     = 0x65,
+    MENU_NEW_GAME          = 0x65,
+    MENU_LOAD_GAME         = 0x66,
+    MENU_HIGH_SCORES       = 0x67,
+    MENU_CREDITS           = 0x68,
+    MENU_EXIT              = 0x69,
+    MENU_LAST_ACTION       = 0x6b,
+    MENU_MOVIE             = 0x6b,
+    MENU_FIRST_WIDGET      = 11,
+    MENU_LAST_WIDGET       = 15,
+    MENU_WIDGET_OFFSET     = 11,
+    MENU_KEY_EXIT          = 0x10,
+    MENU_KEY_HIGH_SCORES   = 0x23,
+    MENU_KEY_LOAD          = 0x26,
+    MENU_KEY_CREDITS       = 0x2e,
+    MENU_KEY_NEW           = 0x31,
+    MENU_DISABLE_MASK      = 0x200,
+    MENU_CLOSE_COMMAND     = 10,
+    MENU_HANDLER_CLOSE     = 2,
+    MENU_HANDLER_CONTINUE  = 1,
+    MENU_HANDLER_IGNORE    = 0,
+    MENU_HELP_DIALOG       = 4,
+    MENU_MOVIE_SMACKER     = 0x26,
+    MENU_MAIN_MUSIC        = 0x2a,
+    MENU_SCREEN_WIDTH      = 640,
+    MENU_SCREEN_HEIGHT     = 480,
+    MENU_FRAME_STRIDE      = 4,
+    MENU_HOVER_FRAME       = 3,
+    MENU_IDLE_FRAME        = 1,
+    MENU_ACTIVE_FRAME      = 2,
+    MENU_WIDGET_FRAME_BASE = 44,
+    MENU_REDRAW_LEFT       = 0,
+    MENU_REDRAW_TOP        = 105,
+    MENU_REDRAW_WIDTH      = 565,
+    MENU_REDRAW_HEIGHT     = 375
+H2_ENUM_END(InitMenuConstant)
+
+H2_ENUM_BEGIN(DynamicWindowConstant)
+    TILE_SIZE          = 48,
+    WINDOW_PADDING     = 48,
+    CONTENT_LEFT       = 32,
+    CONTENT_TOP        = 16,
+    CORNER_SIZE        = 72,
+    CORNER_LEFT        = 40,
+    CORNER_RIGHT       = 23,
+    EDGE_OFFSET        = 24,
+    WINDOW_FLAGS       = 0x4002,
+    BACKGROUND_FRAME   = 12,
+    TOP_FRAME_FIRST    = 4,
+    TOP_FRAME_LAST     = 5,
+    RIGHT_FRAME_FIRST  = 6,
+    RIGHT_FRAME_LAST   = 7,
+    BOTTOM_FRAME_FIRST = 8,
+    BOTTOM_FRAME_LAST  = 9,
+    LEFT_FRAME_FIRST   = 10,
+    LEFT_FRAME_LAST    = 11,
+    WIDGET_COLOR       = 0x10
+H2_ENUM_END(DynamicWindowConstant)
 
 #define RETAIL_FILE const_cast<char*>("I:\\Projects\\Heroes\\Prog\\SOURCE\\KB.CPP")
 
@@ -723,12 +975,12 @@ i32 oldmain(void) {
                     && gpGame->m_campaignScenarioCompleted[OLD_MAIN_ROLAND_CAMPAIGN]
                                                           [OLD_MAIN_ROLAND_FINAL_SCENARIO])) {
                 gbShowHighScore = true;
-                ShowCongrats(CONGRATS_CAMPAIGN);
+                ShowCongrats(CAMPAIGN);
                 AddScoreToHighScore(
                     gpGame->m_campaignScore,
                     gpGame->m_campaignScore,
                     0,
-                    CONGRATS_CAMPAIGN,
+                    CAMPAIGN,
                     const_cast<char*>(gpGame->m_campaignType ? "Archibald" : "Roland")
                 );
             }
@@ -744,12 +996,12 @@ i32 oldmain(void) {
             result_i = xCampaign.HandleVictory();
             if (xCampaign.IsCompleted()) {
                 gbShowHighScore = true;
-                ShowCongrats(CONGRATS_EXPANSION_CAMPAIGN);
+                ShowCongrats(EXPANSION_CAMPAIGN);
                 AddScoreToHighScore(
                     xCampaign.Days(),
                     xCampaign.Days(),
                     0,
-                    CONGRATS_EXPANSION_CAMPAIGN,
+                    EXPANSION_CAMPAIGN,
                     xHSCampaignNames[xCampaign.CampaignID()]
                 );
             }
@@ -762,7 +1014,7 @@ i32 oldmain(void) {
                 goto initialize_game;
             }
         } else {
-            ShowCongrats(CONGRATS_STANDARD);
+            ShowCongrats(STANDARD);
             if (!gbShowHighScore) {
                 gpWindowManager->FadeScreen(1, OLD_MAIN_FADE_SPEED, gPalette);
                 gpResourceManager->GetBackdrop("heroes.icn", gpWindowManager->m_screen, 1);
@@ -892,24 +1144,24 @@ i32 InterpretCommandLine(void) {
                         switch (toupper(gcCommandLine[i + 2])) {
                             case 'T':
                                 if (i + 3 < len && toupper(gcCommandLine[i + 3]) == 'L') {
-                                    giTCPType = COMMAND_LINE_TCP_TYPE_L;
+                                    giTCPType = LINE_TCP_TYPE_L;
                                 } else {
-                                    giTCPType = COMMAND_LINE_TCP_TYPE_DEFAULT;
+                                    giTCPType = LINE_TCP_TYPE_DEFAULT;
                                 }
                                 break;
                             case 'S':
                                 if (i + 3 < len && toupper(gcCommandLine[i + 3]) == 'H') {
-                                    giTCPHostStatus = COMMAND_LINE_TCP_HOST;
+                                    giTCPHostStatus = LINE_TCP_HOST;
                                 } else {
-                                    giTCPHostStatus = COMMAND_LINE_TCP_CLIENT;
+                                    giTCPHostStatus = LINE_TCP_CLIENT;
                                 }
                                 break;
                             case 'P': {
                                 i32 count = 0;
                                 if (i + 3 < len)
                                     count = gcCommandLine[i + 3] - '0';
-                                if (count >= COMMAND_LINE_TCP_MIN_PLAYERS
-                                    && count <= COMMAND_LINE_TCP_MAX_PLAYERS) {
+                                if (count >= LINE_TCP_MIN_PLAYERS
+                                    && count <= LINE_TCP_MAX_PLAYERS) {
                                     giTCPNumPlayers = count;
                                 }
                                 break;
@@ -918,7 +1170,7 @@ i32 InterpretCommandLine(void) {
                                 if (i + 3 < len) {
                                     i32 dst = 0;
                                     i32 src = i + 3;
-                                    while (dst < COMMAND_LINE_TCP_TEXT_LENGTH && gcCommandLine[src]
+                                    while (dst < LINE_TCP_TEXT_LENGTH && gcCommandLine[src]
                                            && gcCommandLine[src] != ' ') {
                                         gcTCPAddress[dst] = gcCommandLine[src];
                                         src++;
@@ -932,7 +1184,7 @@ i32 InterpretCommandLine(void) {
                                 if (i + 3 < len) {
                                     i32 dst = 0;
                                     i32 src = i + 3;
-                                    while (dst < COMMAND_LINE_TCP_TEXT_LENGTH && gcCommandLine[src]
+                                    while (dst < LINE_TCP_TEXT_LENGTH && gcCommandLine[src]
                                            && gcCommandLine[src] != ' ') {
                                         gcTCPName[dst] = gcCommandLine[src];
                                         src++;
@@ -951,7 +1203,7 @@ i32 InterpretCommandLine(void) {
 
     if (helpRequested) {
         sprintf(gText, "");
-        for (i = 0; i < COMMAND_LINE_HELP_LINE_COUNT; i++)
+        for (i = 0; i < LINE_HELP_LINE_COUNT; i++)
             strcat(gText, gcCommandLineHelp[i]);
         ShutDown(gText);
     }
@@ -960,20 +1212,20 @@ i32 InterpretCommandLine(void) {
     DEFAULT_AGGREGATE_NAME = cAggPathName;
     sprintf(cExpAggPathName, "%s%s", ".\\DATA\\", "heroes2x.agg");
     EXPANSION_AGGREGATE_NAME = cExpAggPathName;
-    giFrameStep = COMMAND_LINE_FRAME_STEP;
+    giFrameStep = LINE_FRAME_STEP;
 
-    for (i = 0; i < COMMAND_LINE_HUMAN_PLAYER_SLOTS; i++) {
+    for (i = 0; i < LINE_HUMAN_PLAYER_SLOTS; i++) {
         if (giNumHumanPlayers > i)
             gbHumanPlayer[i] = 1;
         else
             gbHumanPlayer[i] = 0;
     }
-    if (giNumHumanPlayers == COMMAND_LINE_SINGLE_PLAYER)
+    if (giNumHumanPlayers == LINE_SINGLE_PLAYER)
         gbBlackoutPlayer = false;
 
     if (giTCPHostStatus != -1) {
         if (giTCPType == -1 || giTCPNumPlayers == -1
-            || (giTCPHostStatus == COMMAND_LINE_TCP_CLIENT && strlen(gcTCPAddress) < 1)) {
+            || (giTCPHostStatus == LINE_TCP_CLIENT && strlen(gcTCPAddress) < 1)) {
             ShutDown("Incomplete TCP/IP command line information");
         }
         giShowIntro = 0;
@@ -991,31 +1243,31 @@ i32 InitMenuHandler(struct tag_message& msg) {
     i32 hoverIndex;
 
     PollSound();
-    if (msg.payload.widget.parameter & INIT_MENU_DISABLE_MASK) {
+    if (msg.payload.widget.parameter & MENU_DISABLE_MASK) {
         if (msg.payload.widget.command == INIT_MENU_HOVER_COMMAND
             || msg.payload.widget.command == INIT_MENU_HELP_COMMAND) {
             helpIndex = -1;
             switch (msg.payload.widget.id) {
-                case INIT_MENU_NEW_GAME:
+                case MENU_NEW_GAME:
                     helpIndex = 0;
                     break;
-                case INIT_MENU_LOAD_GAME:
+                case MENU_LOAD_GAME:
                     helpIndex = 1;
                     break;
-                case INIT_MENU_HIGH_SCORES:
+                case MENU_HIGH_SCORES:
                     helpIndex = 2;
                     break;
-                case INIT_MENU_CREDITS:
+                case MENU_CREDITS:
                     helpIndex = 3;
                     break;
-                case INIT_MENU_EXIT:
+                case MENU_EXIT:
                     helpIndex = 4;
                     break;
             }
             if (helpIndex >= 0) {
                 NormalDialog(
                     gInitMenuHelp[helpIndex],
-                    INIT_MENU_HELP_DIALOG,
+                    MENU_HELP_DIALOG,
                     -1,
                     -1,
                     -1,
@@ -1030,43 +1282,43 @@ i32 InitMenuHandler(struct tag_message& msg) {
     } else {
         if (msg.type == INIT_MENU_KEY_PRESS) {
             switch (msg.payload.keyboard.keyCode) {
-                case INIT_MENU_KEY_NEW:
-                    gpWindowManager->m_dialogResult = INIT_MENU_NEW_GAME;
+                case MENU_KEY_NEW:
+                    gpWindowManager->m_dialogResult = MENU_NEW_GAME;
                     handled = 1;
                     break;
-                case INIT_MENU_KEY_LOAD:
-                    gpWindowManager->m_dialogResult = INIT_MENU_LOAD_GAME;
+                case MENU_KEY_LOAD:
+                    gpWindowManager->m_dialogResult = MENU_LOAD_GAME;
                     handled = 1;
                     break;
-                case INIT_MENU_KEY_CREDITS:
-                    gpWindowManager->m_dialogResult = INIT_MENU_CREDITS;
+                case MENU_KEY_CREDITS:
+                    gpWindowManager->m_dialogResult = MENU_CREDITS;
                     handled = 1;
                     break;
-                case INIT_MENU_KEY_HIGH_SCORES:
-                    gpWindowManager->m_dialogResult = INIT_MENU_HIGH_SCORES;
+                case MENU_KEY_HIGH_SCORES:
+                    gpWindowManager->m_dialogResult = MENU_HIGH_SCORES;
                     handled = 1;
                     break;
-                case INIT_MENU_KEY_EXIT:
-                    gpWindowManager->m_dialogResult = INIT_MENU_EXIT;
+                case MENU_KEY_EXIT:
+                    gpWindowManager->m_dialogResult = MENU_EXIT;
                     handled = 1;
                     break;
             }
         } else if (msg.type == INIT_MENU_MESSAGE) {
-            if (msg.payload.widget.id < INIT_MENU_FIRST_COMMAND
-                || msg.payload.widget.id > INIT_MENU_LAST_ACTION) {
-                return INIT_MENU_HANDLER_IGNORE;
+            if (msg.payload.widget.id < MENU_FIRST_COMMAND
+                || msg.payload.widget.id > MENU_LAST_ACTION) {
+                return MENU_HANDLER_IGNORE;
             }
             switch (msg.payload.widget.command) {
                 case INIT_MENU_HOVER_COMMAND:
-                    if (msg.payload.widget.id == INIT_MENU_MOVIE)
+                    if (msg.payload.widget.id == MENU_MOVIE)
                         break;
-                    menu = msg.payload.widget.id - INIT_MENU_FIRST_COMMAND;
-                    idx = menu + INIT_MENU_WIDGET_OFFSET;
+                    menu = msg.payload.widget.id - MENU_FIRST_COMMAND;
+                    idx = menu + MENU_WIDGET_OFFSET;
                     msg.type = INIT_MENU_MESSAGE;
                     msg.payload.widget.id = idx;
                     msg.payload.widget.command = INIT_MENU_SET_WIDGET_COMMAND;
                     msg.payload.widget.data.value =
-                        menu * INIT_MENU_FRAME_STRIDE + INIT_MENU_HOVER_FRAME;
+                        menu * MENU_FRAME_STRIDE + MENU_HOVER_FRAME;
                     gpInitWin->BroadcastMessage(msg);
                     gpInitWin->DrawWindow(0, idx, idx);
                     gpWindowManager->UpdateScreenRegion(
@@ -1077,34 +1329,34 @@ i32 InitMenuHandler(struct tag_message& msg) {
                     );
                     break;
                 case INIT_MENU_CLICK_COMMAND:
-                    if (msg.payload.widget.id == INIT_MENU_MOVIE) {
-                        PlaySmacker(INIT_MENU_MOVIE_SMACKER);
+                    if (msg.payload.widget.id == MENU_MOVIE) {
+                        PlaySmacker(MENU_MOVIE_SMACKER);
                         gpResourceManager->GetBackdrop("heroes.icn", gpWindowManager->m_screen, 1);
                         gpInitWin->DrawWindow(0);
                         gpWindowManager->UpdateScreenRegion(
                             0,
                             0,
-                            INIT_MENU_SCREEN_WIDTH,
-                            INIT_MENU_SCREEN_HEIGHT
+                            MENU_SCREEN_WIDTH,
+                            MENU_SCREEN_HEIGHT
                         );
-                        gpSoundManager->PlayAmbientMusic(INIT_MENU_MAIN_MUSIC, 0, -1);
+                        gpSoundManager->PlayAmbientMusic(MENU_MAIN_MUSIC, 0, -1);
                         break;
                     } else {
                         gpWindowManager->m_dialogResult = msg.payload.widget.id;
-                        for (idx = INIT_MENU_FIRST_WIDGET; idx <= INIT_MENU_LAST_WIDGET; idx++) {
+                        for (idx = MENU_FIRST_WIDGET; idx <= MENU_LAST_WIDGET; idx++) {
                             msg.type = INIT_MENU_MESSAGE;
                             msg.payload.widget.id = idx;
                             msg.payload.widget.command = INIT_MENU_SET_WIDGET_COMMAND;
                             msg.payload.widget.data.value =
-                                idx * INIT_MENU_FRAME_STRIDE - INIT_MENU_WIDGET_FRAME_BASE;
+                                idx * MENU_FRAME_STRIDE - MENU_WIDGET_FRAME_BASE;
                             gpInitWin->BroadcastMessage(msg);
                         }
-                        gpInitWin->DrawWindow(0, INIT_MENU_FIRST_WIDGET, INIT_MENU_LAST_WIDGET);
+                        gpInitWin->DrawWindow(0, MENU_FIRST_WIDGET, MENU_LAST_WIDGET);
                         gpWindowManager->UpdateScreenRegion(
-                            INIT_MENU_REDRAW_LEFT,
-                            INIT_MENU_REDRAW_TOP,
-                            INIT_MENU_REDRAW_WIDTH,
-                            INIT_MENU_REDRAW_HEIGHT
+                            MENU_REDRAW_LEFT,
+                            MENU_REDRAW_TOP,
+                            MENU_REDRAW_WIDTH,
+                            MENU_REDRAW_HEIGHT
                         );
                         handled = 1;
                     }
@@ -1112,7 +1364,7 @@ i32 InitMenuHandler(struct tag_message& msg) {
             }
         } else if (msg.type == INIT_MENU_MOUSE_MOVE) {
             hoverIndex = -1;
-            for (idx = 0; idx < INIT_MENU_HOTSPOT_COUNT; idx++) {
+            for (idx = 0; idx < MENU_HOTSPOT_COUNT; idx++) {
                 if (IMHotSpots[idx][IDX(INIT_MENU_HOTSPOT_X)] <= msg.payload.mouse.screenX
                     && IMHotSpots[idx][IDX(INIT_MENU_HOTSPOT_Y)] <= msg.payload.mouse.screenY
                     && msg.payload.mouse.screenX
@@ -1127,15 +1379,15 @@ i32 InitMenuHandler(struct tag_message& msg) {
             if (lastIMHoverID != hoverIndex) {
                 if (lastIMHoverID != -1) {
                     msg.type = INIT_MENU_MESSAGE;
-                    msg.payload.widget.id = lastIMHoverID + INIT_MENU_WIDGET_OFFSET;
+                    msg.payload.widget.id = lastIMHoverID + MENU_WIDGET_OFFSET;
                     msg.payload.widget.command = INIT_MENU_SET_WIDGET_COMMAND;
                     msg.payload.widget.data.value =
-                        lastIMHoverID * INIT_MENU_FRAME_STRIDE + INIT_MENU_IDLE_FRAME;
+                        lastIMHoverID * MENU_FRAME_STRIDE + MENU_IDLE_FRAME;
                     gpInitWin->BroadcastMessage(msg);
                     gpInitWin->DrawWindow(
                         0,
-                        lastIMHoverID + INIT_MENU_WIDGET_OFFSET,
-                        lastIMHoverID + INIT_MENU_WIDGET_OFFSET
+                        lastIMHoverID + MENU_WIDGET_OFFSET,
+                        lastIMHoverID + MENU_WIDGET_OFFSET
                     );
                     gpWindowManager->UpdateScreenRegion(
                         IMHotSpots[lastIMHoverID][IDX(INIT_MENU_HOTSPOT_X)],
@@ -1146,15 +1398,15 @@ i32 InitMenuHandler(struct tag_message& msg) {
                 }
                 if (hoverIndex != -1) {
                     msg.type = INIT_MENU_MESSAGE;
-                    msg.payload.widget.id = hoverIndex + INIT_MENU_WIDGET_OFFSET;
+                    msg.payload.widget.id = hoverIndex + MENU_WIDGET_OFFSET;
                     msg.payload.widget.command = INIT_MENU_SET_WIDGET_COMMAND;
                     msg.payload.widget.data.value =
-                        hoverIndex * INIT_MENU_FRAME_STRIDE + INIT_MENU_ACTIVE_FRAME;
+                        hoverIndex * MENU_FRAME_STRIDE + MENU_ACTIVE_FRAME;
                     gpInitWin->BroadcastMessage(msg);
                     gpInitWin->DrawWindow(
                         0,
-                        hoverIndex + INIT_MENU_WIDGET_OFFSET,
-                        hoverIndex + INIT_MENU_WIDGET_OFFSET
+                        hoverIndex + MENU_WIDGET_OFFSET,
+                        hoverIndex + MENU_WIDGET_OFFSET
                     );
                     gpWindowManager->UpdateScreenRegion(
                         IMHotSpots[hoverIndex][IDX(INIT_MENU_HOTSPOT_X)],
@@ -1170,12 +1422,12 @@ i32 InitMenuHandler(struct tag_message& msg) {
 
     if (handled || giMenuCommand != -1) {
         msg.type = INIT_MENU_MESSAGE;
-        msg.payload.widget.id = INIT_MENU_CLOSE_COMMAND;
+        msg.payload.widget.id = MENU_CLOSE_COMMAND;
         msg.payload.widget.command = BaseWidgetCommand(msg.payload.widget.id);
-        return INIT_MENU_HANDLER_CLOSE;
+        return MENU_HANDLER_CLOSE;
     }
     CheckShingleUpdate();
-    return INIT_MENU_HANDLER_CONTINUE;
+    return MENU_HANDLER_CONTINUE;
 }
 
 VA(0x004993c5, 0x1b)
@@ -1319,26 +1571,26 @@ void GetMonsterCost(i32 monster, i32* const cost) {
         cost[idx] = 0;
     cost[IDX(RES_GOLD)] = gMonsterDatabase[monster].cost;
     switch (monster) {
-        case IDX(KB_MONSTER_NEEDS_GEMS_EXPANSION):
+        case IDX(MONSTER_NEEDS_GEMS_EXPANSION):
             cost[IDX(RES_GEMS)] = 1;
             break;
-        case IDX(KB_MONSTER_NEEDS_MERCURY):
+        case IDX(MONSTER_NEEDS_MERCURY):
             cost[IDX(RES_MERCURY)] = 1;
             break;
-        case IDX(KB_MONSTER_NEEDS_CRYSTAL):
+        case IDX(MONSTER_NEEDS_CRYSTAL):
             cost[IDX(RES_CRYSTAL)] = 1;
             break;
-        case IDX(KB_MONSTER_NEEDS_SULFUR_FIRST):
-        case IDX(KB_MONSTER_NEEDS_SULFUR_SECOND):
+        case IDX(MONSTER_NEEDS_SULFUR_FIRST):
+        case IDX(MONSTER_NEEDS_SULFUR_SECOND):
             cost[IDX(RES_SULFUR)] = 1;
             break;
-        case IDX(KB_MONSTER_NEEDS_TWO_SULFUR):
+        case IDX(MONSTER_NEEDS_TWO_SULFUR):
             cost[IDX(RES_SULFUR)] = 2;
             break;
-        case IDX(KB_MONSTER_NEEDS_GEMS):
+        case IDX(MONSTER_NEEDS_GEMS):
             cost[IDX(RES_GEMS)] = 1;
             break;
-        case IDX(KB_MONSTER_NEEDS_TWO_GEMS):
+        case IDX(MONSTER_NEEDS_TWO_GEMS):
             cost[IDX(RES_GEMS)] = 2;
             break;
     }
@@ -1774,11 +2026,11 @@ void PlayerDead(i32 player) {
             HandleRemoteDeadPlayerExit(player);
         else
             SendMapChange(
-                PLAYER_DEAD_MAP_CHANGE,
+                DEAD_MAP_CHANGE,
                 static_cast<i8>(player),
                 0,
                 0,
-                PLAYER_DEAD_MAP_CHANGE_UNUSED,
+                DEAD_MAP_CHANGE_UNUSED,
                 0,
                 0
             );
@@ -1801,8 +2053,8 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
     playerData* rec;
     i32 savedRemoteOn;
     i32 numAlive;
-    char unusedTextA_c[IDX(CHECK_END_GAME_TEXT_BUFFER_SIZE)];
-    char unusedTextB_c[IDX(CHECK_END_GAME_TEXT_BUFFER_SIZE)];
+    char unusedTextA_c[IDX(END_GAME_TEXT_BUFFER_SIZE)];
+    char unusedTextB_c[IDX(END_GAME_TEXT_BUFFER_SIZE)];
     i32 sideBelow_i;
     i32 sideAbove;
     i32 bestGold;
@@ -1812,7 +2064,7 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
     i32 enemyRemaining;
     i32 hasRoland_j;
     i32 hasDwarfTown;
-    char artifactName[IDX(CHECK_END_GAME_TEXT_BUFFER_SIZE)];
+    char artifactName[IDX(END_GAME_TEXT_BUFFER_SIZE)];
     hero* artifactHeroPtr;
     i32 artifactWinnerPerson;
     hero* lossHero;
@@ -1852,12 +2104,12 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
                         1,
                         -1,
                         -1,
-                        IDX(CHECK_END_GAME_PLAYER_DIALOG_ICON),
+                        IDX(END_GAME_PLAYER_DIALOG_ICON),
                         gpGame->GetPlayerColor(static_cast<i8>(player)),
                         -1,
                         -1,
                         -1,
-                        IDX(CHECK_END_GAME_REMOTE_DIALOG_TIME)
+                        IDX(END_GAME_REMOTE_DIALOG_TIME)
                     );
                 }
             } else if (rec->m_townCount == 0) {
@@ -1874,7 +2126,7 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
                             1,
                             -1,
                             -1,
-                            IDX(CHECK_END_GAME_PLAYER_DIALOG_ICON),
+                            IDX(END_GAME_PLAYER_DIALOG_ICON),
                             gpGame->GetPlayerColor(static_cast<i8>(player)),
                             -1,
                             0,
@@ -1882,7 +2134,7 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
                             0
                         );
                     }
-                    rec->m_daysLeft = IDX(CHECK_END_GAME_GRACE_DAYS);
+                    rec->m_daysLeft = IDX(END_GAME_GRACE_DAYS);
                 } else if (rec->m_daysLeft == 0) {
                     PlayerDead(player);
                     if (gbThisNetHumanPlayer[player] && giCurPlayer == player) {
@@ -1908,7 +2160,7 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
                         1,
                         -1,
                         -1,
-                        IDX(CHECK_END_GAME_PLAYER_DIALOG_ICON),
+                        IDX(END_GAME_PLAYER_DIALOG_ICON),
                         gpGame->GetPlayerColor(static_cast<i8>(player)),
                         -1,
                         0,
@@ -1946,17 +2198,17 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
     allowNormalVictory = 1;
     if ((gpGame->m_mapHeader.victoryCondition != IDX(MAP_VICTORY_DEFEAT_ALL)
          && !gpGame->m_mapHeader.allowNormalVictory)
-        || (gbInCampaign && gpGame->m_campaignType == IDX(CHECK_END_GAME_ARCHIBALD_CAMPAIGN)
-            && gpGame->m_campaignScenario + IDX(CHECK_END_GAME_SCENARIO_OFFSET)
-                   == IDX(CHECK_END_GAME_SIDE_SCENARIO))) {
+        || (gbInCampaign && gpGame->m_campaignType == IDX(END_GAME_ARCHIBALD_CAMPAIGN)
+            && gpGame->m_campaignScenario + IDX(END_GAME_SCENARIO_OFFSET)
+                   == IDX(END_GAME_SIDE_SCENARIO))) {
         allowNormalVictory = 0;
     }
 
     if (gpGame->m_mapHeader.victoryCondition == IDX(MAP_VICTORY_DEFEAT_SIDE)
-        && gpGame->m_mapHeader.victoryConditionValue != IDX(CHECK_END_GAME_SIDE_SPECIAL_VALUE)
-        && (!gbInCampaign || gpGame->m_campaignType != IDX(CHECK_END_GAME_ARCHIBALD_CAMPAIGN)
-            || gpGame->m_campaignScenario + IDX(CHECK_END_GAME_SCENARIO_OFFSET)
-                   != IDX(CHECK_END_GAME_SIDE_SCENARIO))) {
+        && gpGame->m_mapHeader.victoryConditionValue != IDX(END_GAME_SIDE_SPECIAL_VALUE)
+        && (!gbInCampaign || gpGame->m_campaignType != IDX(END_GAME_ARCHIBALD_CAMPAIGN)
+            || gpGame->m_campaignScenario + IDX(END_GAME_SCENARIO_OFFSET)
+                   != IDX(END_GAME_SIDE_SCENARIO))) {
         sideBelow_i = 0;
         sideAbove = 0;
         for (player = 0; player < gpGame->m_playerCount; player++) {
@@ -2002,7 +2254,7 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
             gpGame->m_mapHeader.victoryConditionValue,
             gpGame->m_mapHeader.victoryTownY
         ));
-        if (victoryTownData->m_owner != IDX(CHECK_END_GAME_NO_PLAYER)
+        if (victoryTownData->m_owner != IDX(END_GAME_NO_PLAYER)
             && (gbHumanPlayer[victoryTownData->m_owner] || gpGame->m_mapHeader.computerAlsoWins)) {
             if (gbThisNetHumanPlayer[victoryTownData->m_owner]) {
                 winFlag = 1;
@@ -2033,7 +2285,7 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
         lossTown = gpGame->GetTown(
             gpGame->GetTownId(gpGame->m_mapHeader.lossConditionValue, gpGame->m_mapHeader.lossTownY)
         );
-        if (lossTown->m_owner == IDX(CHECK_END_GAME_NO_PLAYER)
+        if (lossTown->m_owner == IDX(END_GAME_NO_PLAYER)
             || !gbHumanPlayer[lossTown->m_owner]) {
             defeated = 1;
             if (!showedDialog) {
@@ -2046,17 +2298,17 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
 
     if (gpGame->m_mapHeader.victoryCondition == IDX(MAP_VICTORY_ACCUMULATE_GOLD)) {
         bestGold = 0;
-        winnerPlayer = CHECK_END_GAME_NO_PLAYER;
+        winnerPlayer = END_GAME_NO_PLAYER;
         for (player = 0; player < gpGame->m_playerCount; player++) {
             if ((gbHumanPlayer[player] || gpGame->m_mapHeader.computerAlsoWins)
-                && gpGame->m_players[player].m_resources[IDX(CHECK_END_GAME_GOLD_RESOURCE)]
-                       >= gpGame->m_mapHeader.victoryConditionValue * IDX(CHECK_END_GAME_GOLD_SCALE)
-                && gpGame->m_players[player].m_resources[IDX(CHECK_END_GAME_GOLD_RESOURCE)]
+                && gpGame->m_players[player].m_resources[IDX(END_GAME_GOLD_RESOURCE)]
+                       >= gpGame->m_mapHeader.victoryConditionValue * IDX(END_GAME_GOLD_SCALE)
+                && gpGame->m_players[player].m_resources[IDX(END_GAME_GOLD_RESOURCE)]
                        >= bestGold) {
-                bestGold = gpGame->m_players[player].m_resources[IDX(CHECK_END_GAME_GOLD_RESOURCE)];
+                bestGold = gpGame->m_players[player].m_resources[IDX(END_GAME_GOLD_RESOURCE)];
                 winnerPlayer = player;
             }
-            if (winnerPlayer != CHECK_END_GAME_NO_PLAYER) {
+            if (winnerPlayer != END_GAME_NO_PLAYER) {
                 if (gbThisNetHumanPlayer[IDX(winnerPlayer)]) {
                     winFlag = 1;
                 } else {
@@ -2088,7 +2340,7 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
     if (gpGame->m_mapHeader.victoryCondition == IDX(MAP_VICTORY_DEFEAT_HERO)) {
         winningHeroEntry = GetHeroSlot(gpGame->m_mapHeader.victoryConditionValue);
         if (winningHeroEntry->m_owner < 0
-            || winningHeroEntry->m_owner >= IDX(CHECK_END_GAME_PLAYER_COUNT)
+            || winningHeroEntry->m_owner >= IDX(END_GAME_PLAYER_COUNT)
             || gbHumanPlayer[winningHeroEntry->m_owner]) {
             winFlag = 1;
             if (!showedDialog) {
@@ -2105,7 +2357,7 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
 
     if (gpGame->m_mapHeader.lossCondition == IDX(MAP_LOSS_HERO)) {
         lossHero = GetHeroSlot(gpGame->m_mapHeader.lossConditionValue);
-        if (lossHero->m_owner < 0 || lossHero->m_owner >= IDX(CHECK_END_GAME_PLAYER_COUNT)
+        if (lossHero->m_owner < 0 || lossHero->m_owner >= IDX(END_GAME_PLAYER_COUNT)
             || !gbHumanPlayer[lossHero->m_owner]) {
             defeated = 1;
             if (!showedDialog) {
@@ -2118,8 +2370,8 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
 
     if (gpGame->m_mapHeader.lossCondition == IDX(MAP_LOSS_TIME)) {
         if (gpGame->m_mapHeader.lossConditionValue
-            < (gpGame->m_week - 1) * IDX(CHECK_END_GAME_DAYS_PER_WEEK)
-                  + (gpGame->m_month - 1) * IDX(CHECK_END_GAME_DAYS_PER_MONTH) + gpGame->m_day) {
+            < (gpGame->m_week - 1) * IDX(END_GAME_DAYS_PER_WEEK)
+                  + (gpGame->m_month - 1) * IDX(END_GAME_DAYS_PER_MONTH) + gpGame->m_day) {
             defeated = 1;
             if (!showedDialog) {
                 showedDialog = 1;
@@ -2130,14 +2382,14 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
     }
 
     if (gpGame->m_mapHeader.victoryCondition == IDX(MAP_VICTORY_FIND_ARTIFACT)) {
-        artifactWinnerPerson = CHECK_END_GAME_NO_PLAYER;
+        artifactWinnerPerson = END_GAME_NO_PLAYER;
         for (player = 0; player < gpGame->m_playerCount; player++) {
             if (!gpGame->m_playerDead[player]) {
                 for (heroIndex = 0; heroIndex < gpGame->m_players[player].m_heroCount;
                      heroIndex++) {
                     artifactHeroPtr = gpGame->GetPlayerHero(player, heroIndex);
                     if (gpGame->m_mapHeader.victoryConditionValue
-                        > IDX(CHECK_END_GAME_ULTIMATE_ARTIFACT)) {
+                        > IDX(END_GAME_ULTIMATE_ARTIFACT)) {
                         if (artifactHeroPtr->HasArtifact(
                                 ArtifactType(gpGame->m_mapHeader.victoryConditionValue - 1)
                             )) {
@@ -2158,7 +2410,7 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
                 }
             }
         }
-        if (artifactWinnerPerson != CHECK_END_GAME_NO_PLAYER) {
+        if (artifactWinnerPerson != END_GAME_NO_PLAYER) {
             if (gbThisNetHumanPlayer[artifactWinnerPerson]) {
                 winFlag = 1;
             } else {
@@ -2167,7 +2419,7 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
             if (!showedDialog) {
                 showedDialog = 1;
                 if (gpGame->m_mapHeader.victoryConditionValue
-                    == IDX(CHECK_END_GAME_ULTIMATE_ARTIFACT)) {
+                    == IDX(END_GAME_ULTIMATE_ARTIFACT)) {
                     sprintf(artifactName, "Ultimate Artifact");
                 } else {
                     sprintf(
@@ -2189,13 +2441,13 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
         }
     }
 
-    if (gbInCampaign && gpGame->m_campaignType == IDX(CHECK_END_GAME_ROLAND_CAMPAIGN)
-        && gpGame->m_campaignScenario + IDX(CHECK_END_GAME_SCENARIO_OFFSET)
-               == IDX(CHECK_END_GAME_DWARF_SCENARIO)) {
+    if (gbInCampaign && gpGame->m_campaignType == IDX(END_GAME_ROLAND_CAMPAIGN)
+        && gpGame->m_campaignScenario + IDX(END_GAME_SCENARIO_OFFSET)
+               == IDX(END_GAME_DWARF_SCENARIO)) {
         hasDwarfTown = 0;
         for (player = 0; player < gpGame->m_players[0].m_townCount; player++) {
             if (gpGame->GetTown(gpGame->m_players[0].m_townIds[player])->m_type
-                == IDX(CHECK_END_GAME_DWARF_TOWN)) {
+                == IDX(END_GAME_DWARF_TOWN)) {
                 hasDwarfTown = 1;
             }
         }
@@ -2213,9 +2465,9 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
         }
     }
 
-    if (gbInCampaign && gpGame->m_campaignType == IDX(CHECK_END_GAME_ARCHIBALD_CAMPAIGN)
-        && gpGame->m_campaignScenario + IDX(CHECK_END_GAME_SCENARIO_OFFSET)
-               == IDX(CHECK_END_GAME_SIDE_SCENARIO)
+    if (gbInCampaign && gpGame->m_campaignType == IDX(END_GAME_ARCHIBALD_CAMPAIGN)
+        && gpGame->m_campaignScenario + IDX(END_GAME_SCENARIO_OFFSET)
+               == IDX(END_GAME_SIDE_SCENARIO)
         && dragonCityCaptured) {
         winFlag = 1;
         if (!showedDialog) {
@@ -2225,14 +2477,14 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
         }
     }
 
-    if (gbInCampaign && gpGame->m_campaignType == IDX(CHECK_END_GAME_ROLAND_CAMPAIGN)
-        && gpGame->m_campaignScenario + IDX(CHECK_END_GAME_SCENARIO_OFFSET)
-               == IDX(CHECK_END_GAME_ROLAND_CAPTURE_SCENARIO)) {
+    if (gbInCampaign && gpGame->m_campaignType == IDX(END_GAME_ROLAND_CAMPAIGN)
+        && gpGame->m_campaignScenario + IDX(END_GAME_SCENARIO_OFFSET)
+               == IDX(END_GAME_ROLAND_CAPTURE_SCENARIO)) {
         hasRoland_j = 0;
-        for (player = 0; player < IDX(CHECK_END_GAME_HERO_COUNT); player++) {
-            if (gpGame->m_heroRecs[player].m_portrait == IDX(CHECK_END_GAME_ROLAND_HERO)
+        for (player = 0; player < IDX(END_GAME_HERO_COUNT); player++) {
+            if (gpGame->m_heroRecs[player].m_portrait == IDX(END_GAME_ROLAND_HERO)
                 && gpGame->m_heroRecs[player].m_owner >= 0
-                && gpGame->m_heroRecs[player].m_owner <= CHECK_END_GAME_PLAYER_COUNT - 1) {
+                && gpGame->m_heroRecs[player].m_owner <= END_GAME_PLAYER_COUNT - 1) {
                 hasRoland_j = 1;
             }
         }
@@ -2246,14 +2498,14 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
         }
     }
 
-    if (gbInCampaign && gpGame->m_campaignType == IDX(CHECK_END_GAME_ROLAND_CAMPAIGN)
-        && gpGame->m_campaignScenario + IDX(CHECK_END_GAME_SCENARIO_OFFSET)
-               == IDX(CHECK_END_GAME_ROLAND_CAPTURE_SCENARIO)) {
+    if (gbInCampaign && gpGame->m_campaignType == IDX(END_GAME_ROLAND_CAMPAIGN)
+        && gpGame->m_campaignScenario + IDX(END_GAME_SCENARIO_OFFSET)
+               == IDX(END_GAME_ROLAND_CAPTURE_SCENARIO)) {
         enemyRemaining = 0;
         for (player = 0; player < gpGame->m_playerCount; player++) {
             if (!gpGame->m_playerDead[player]
-                && gpGame->m_players[player].m_color != IDX(CHECK_END_GAME_ROLAND_COLOR)
-                && gpGame->m_players[player].m_color != IDX(CHECK_END_GAME_ALLY_COLOR)) {
+                && gpGame->m_players[player].m_color != IDX(END_GAME_ROLAND_COLOR)
+                && gpGame->m_players[player].m_color != IDX(END_GAME_ALLY_COLOR)) {
                 enemyRemaining = 1;
             }
         }
@@ -2293,12 +2545,12 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
         gbGameOver = true;
         giEndSequence = 0;
     }
-    if (forcedResult == IDX(CHECK_END_GAME_FORCE_VICTORY)) {
+    if (forcedResult == IDX(END_GAME_FORCE_VICTORY)) {
         winFlag = 1;
         gbGameOver = true;
         giEndSequence = 1;
     }
-    if (forcedResult == IDX(CHECK_END_GAME_FORCE_DEFEAT)) {
+    if (forcedResult == IDX(END_GAME_FORCE_DEFEAT)) {
         defeated = 1;
         gbGameOver = true;
         giEndSequence = 0;
@@ -2312,8 +2564,8 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
     }
 
     if (gbInCampaign && winFlag) {
-        currentDayIndex = (gpGame->m_week - 1) * IDX(CHECK_END_GAME_DAYS_PER_WEEK)
-                          + (gpGame->m_month - 1) * IDX(CHECK_END_GAME_DAYS_PER_MONTH)
+        currentDayIndex = (gpGame->m_week - 1) * IDX(END_GAME_DAYS_PER_WEEK)
+                          + (gpGame->m_month - 1) * IDX(END_GAME_DAYS_PER_MONTH)
                           + gpGame->m_day;
         gpGame->m_campaignScenarioWon = 1;
         gpGame->m_campaignScenarioCompleted[gpGame->m_campaignType][gpGame->m_campaignScenario] = 1;
@@ -2323,26 +2575,26 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
             gpGame->m_campaignScenarioDays[gpGame->m_campaignType][gpGame->m_campaignScenario]
             + gpGame->m_campaignScenarioBonus[gpGame->m_campaignType][gpGame->m_campaignScenario];
 
-        carryoverHeroId = IDX(CHECK_END_GAME_NO_PLAYER);
-        if (gpGame->m_campaignType == IDX(CHECK_END_GAME_ROLAND_CAMPAIGN)
-            && gpGame->m_campaignScenario + IDX(CHECK_END_GAME_SCENARIO_OFFSET)
-                   == IDX(CHECK_END_GAME_SIDE_SCENARIO)) {
-            carryoverHeroId = IDX(CHECK_END_GAME_SIDE_SPECIAL_VALUE);
+        carryoverHeroId = IDX(END_GAME_NO_PLAYER);
+        if (gpGame->m_campaignType == IDX(END_GAME_ROLAND_CAMPAIGN)
+            && gpGame->m_campaignScenario + IDX(END_GAME_SCENARIO_OFFSET)
+                   == IDX(END_GAME_SIDE_SCENARIO)) {
+            carryoverHeroId = IDX(END_GAME_SIDE_SPECIAL_VALUE);
         }
-        if (gpGame->m_campaignType == IDX(CHECK_END_GAME_ARCHIBALD_CAMPAIGN)
-            && gpGame->m_campaignScenario + IDX(CHECK_END_GAME_SCENARIO_OFFSET)
-                   == IDX(CHECK_END_GAME_FIRST_NO_SAVE_SCENARIO)) {
-            carryoverHeroId = IDX(CHECK_END_GAME_SIDE_SPECIAL_VALUE);
+        if (gpGame->m_campaignType == IDX(END_GAME_ARCHIBALD_CAMPAIGN)
+            && gpGame->m_campaignScenario + IDX(END_GAME_SCENARIO_OFFSET)
+                   == IDX(END_GAME_FIRST_NO_SAVE_SCENARIO)) {
+            carryoverHeroId = IDX(END_GAME_SIDE_SPECIAL_VALUE);
         }
 
-        if (carryoverHeroId != IDX(CHECK_END_GAME_NO_PLAYER)) {
-            for (player = 0; player < IDX(CHECK_END_GAME_ARMY_SLOTS); player++) {
-                gpGame->m_campaignCarryoverCreatureTypes[player] = IDX(CHECK_END_GAME_EMPTY_ARMY);
+        if (carryoverHeroId != IDX(END_GAME_NO_PLAYER)) {
+            for (player = 0; player < IDX(END_GAME_ARMY_SLOTS); player++) {
+                gpGame->m_campaignCarryoverCreatureTypes[player] = IDX(END_GAME_EMPTY_ARMY);
                 gpGame->m_campaignCarryoverCreatureCounts[player] = 0;
             }
             for (campaignHeroIndex = 0; campaignHeroIndex < gpGame->m_players[0].m_heroCount;
                  campaignHeroIndex++) {
-                if (carryoverHeroId == IDX(CHECK_END_GAME_SIDE_SPECIAL_VALUE)
+                if (carryoverHeroId == IDX(END_GAME_SIDE_SPECIAL_VALUE)
                     || gpGame->m_heroRecs[gpGame->m_players[0].m_heroIds[campaignHeroIndex]]
                                .m_portrait
                            == carryoverHeroId) {
@@ -2353,7 +2605,7 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
                 gpGame->m_campaignCarryoverCreatureTypes[0] = 0;
                 gpGame->m_campaignCarryoverCreatureCounts[0] = 1;
             } else {
-                for (player = 0; player < IDX(CHECK_END_GAME_ARMY_SLOTS); player++) {
+                for (player = 0; player < IDX(END_GAME_ARMY_SLOTS); player++) {
                     gpGame->m_campaignCarryoverCreatureTypes[player] =
                         gpGame->m_heroRecs[gpGame->m_players[0].m_heroIds[campaignHeroIndex]]
                             .m_army.m_creatureTypes[player];
@@ -2364,16 +2616,16 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
             }
         }
 
-        if (gpGame->m_campaignScenario + IDX(CHECK_END_GAME_SCENARIO_OFFSET)
-                != IDX(CHECK_END_GAME_LAST_SCENARIO)
-            && (gpGame->m_campaignScenario + IDX(CHECK_END_GAME_SCENARIO_OFFSET)
-                    != IDX(CHECK_END_GAME_FIRST_NO_SAVE_SCENARIO)
-                || gpGame->m_campaignType != IDX(CHECK_END_GAME_ROLAND_CAMPAIGN))) {
+        if (gpGame->m_campaignScenario + IDX(END_GAME_SCENARIO_OFFSET)
+                != IDX(END_GAME_LAST_SCENARIO)
+            && (gpGame->m_campaignScenario + IDX(END_GAME_SCENARIO_OFFSET)
+                    != IDX(END_GAME_FIRST_NO_SAVE_SCENARIO)
+                || gpGame->m_campaignType != IDX(END_GAME_ROLAND_CAMPAIGN))) {
             sprintf(
                 campaignSaveName,
                 "%s%c_%02d",
                 "WIN_",
-                gpGame->m_campaignType == IDX(CHECK_END_GAME_ROLAND_CAMPAIGN) ? 'G' : 'E',
+                gpGame->m_campaignType == IDX(END_GAME_ROLAND_CAMPAIGN) ? 'G' : 'E',
                 gpGame->m_campaignScenario + 1
             );
             gpGame->SaveGame(campaignSaveName, 1, 0);
@@ -2467,10 +2719,10 @@ void game::ShowMoraleInfo(hero* h, i32 dialogType) {
     sprintf(gText, cMoraleInfo[IDX(MORALE_INFO_HEADER)], description);
     modifierStart = strlen(gText);
     if (h->m_army.HasAllUndead()) {
-        strcat(gText, cMoraleInfo[IDX(MORALE_INFO_ALL_UNDEAD)]);
+        strcat(gText, cMoraleInfo[IDX(INFO_ALL_UNDEAD)]);
     } else {
         if (h->m_army.HasSomeUndead() || h->HasArtifact(ARTIFACT_ARM_OF_MARTYR)) {
-            strcat(gText, cMoraleInfo[IDX(MORALE_INFO_SOME_UNDEAD)]);
+            strcat(gText, cMoraleInfo[IDX(INFO_SOME_UNDEAD)]);
             mixedUndead4 = 1;
         }
 
@@ -2487,77 +2739,77 @@ void game::ShowMoraleInfo(hero* h, i32 dialogType) {
             }
             sprintf(
                 description,
-                cMoraleInfo[IDX(MORALE_INFO_SAME_ALIGNMENT)],
+                cMoraleInfo[IDX(INFO_SAME_ALIGNMENT)],
                 gAlignmentNames[alignment_e]
             );
             strcat(gText, description);
         }
         if (homogeneous3 == -1) {
-            sprintf(description, cMoraleInfo[IDX(MORALE_INFO_THREE_ALIGNMENTS)]);
+            sprintf(description, cMoraleInfo[IDX(INFO_THREE_ALIGNMENTS)]);
             strcat(gText, description);
         }
         if (homogeneous3 == -2) {
-            sprintf(description, cMoraleInfo[IDX(MORALE_INFO_FOUR_ALIGNMENTS)]);
+            sprintf(description, cMoraleInfo[IDX(INFO_FOUR_ALIGNMENTS)]);
             strcat(gText, description);
         }
         if (homogeneous3 == -3) {
-            sprintf(description, cMoraleInfo[IDX(MORALE_INFO_FIVE_ALIGNMENTS)]);
+            sprintf(description, cMoraleInfo[IDX(INFO_FIVE_ALIGNMENTS)]);
             strcat(gText, description);
         }
 
         if (h->GetOccupiedTown() != 0 && h->GetOccupiedTown()->m_type == IDX(FACTION_BARBARIAN)
             && (h->GetOccupiedTown()->m_buildings & IDX(TOWN_BUILDING_COLISEUM))) {
-            strcat(gText, cMoraleInfo[IDX(MORALE_INFO_COLISEUM)]);
+            strcat(gText, cMoraleInfo[IDX(INFO_COLISEUM)]);
         }
         if (h->GetOccupiedTown() != 0
             && (h->GetOccupiedTown()->m_buildings & IDX(TOWN_BUILDING_TAVERN))) {
-            strcat(gText, cMoraleInfo[IDX(MORALE_INFO_TAVERN)]);
+            strcat(gText, cMoraleInfo[IDX(INFO_TAVERN)]);
         }
 
         if (h->HasArtifact(ARTIFACT_MEDAL_OF_VALOR)) {
-            strcat(gText, cMoraleInfo[IDX(MORALE_INFO_MEDAL_OF_VALOR)]);
+            strcat(gText, cMoraleInfo[IDX(INFO_MEDAL_OF_VALOR)]);
         }
         if (h->HasArtifact(ARTIFACT_MEDAL_OF_COURAGE)) {
-            strcat(gText, cMoraleInfo[IDX(MORALE_INFO_MEDAL_OF_COURAGE)]);
+            strcat(gText, cMoraleInfo[IDX(INFO_MEDAL_OF_COURAGE)]);
         }
         if (h->HasArtifact(ARTIFACT_MEDAL_OF_HONOR)) {
-            strcat(gText, cMoraleInfo[IDX(MORALE_INFO_MEDAL_OF_HONOR)]);
+            strcat(gText, cMoraleInfo[IDX(INFO_MEDAL_OF_HONOR)]);
         }
         if (h->HasArtifact(ARTIFACT_MEDAL_OF_DISTINCTION)) {
-            strcat(gText, cMoraleInfo[IDX(MORALE_INFO_MEDAL_OF_DISTINCTION)]);
+            strcat(gText, cMoraleInfo[IDX(INFO_MEDAL_OF_DISTINCTION)]);
         }
         if (h->HasArtifact(ARTIFACT_FIZBIN_OF_MISFORTUNE)) {
-            strcat(gText, cMoraleInfo[IDX(MORALE_INFO_FIZBIN)]);
+            strcat(gText, cMoraleInfo[IDX(INFO_FIZBIN)]);
         }
         if (HAS(h->m_eventFlags, HERO_EVENT_BUOY)) {
-            strcat(gText, cMoraleInfo[IDX(MORALE_INFO_BUOY)]);
+            strcat(gText, cMoraleInfo[IDX(INFO_BUOY)]);
         }
         if (HAS(h->m_eventFlags, HERO_EVENT_OASIS)) {
-            strcat(gText, cMoraleInfo[IDX(MORALE_INFO_OASIS)]);
+            strcat(gText, cMoraleInfo[IDX(INFO_OASIS)]);
         }
         if (HAS(h->m_eventFlags, HERO_EVENT_TEMPLE)) {
-            strcat(gText, cMoraleInfo[IDX(MORALE_INFO_TEMPLE)]);
+            strcat(gText, cMoraleInfo[IDX(INFO_TEMPLE)]);
         }
         if (HAS(h->m_eventFlags, HERO_EVENT_GRAVEYARD)) {
-            strcat(gText, cMoraleInfo[IDX(MORALE_INFO_GRAVEYARD)]);
+            strcat(gText, cMoraleInfo[IDX(INFO_GRAVEYARD)]);
         }
         if (HAS(h->m_eventFlags, HERO_EVENT_SHIPWRECK)) {
-            strcat(gText, cMoraleInfo[IDX(MORALE_INFO_SHIPWRECK)]);
+            strcat(gText, cMoraleInfo[IDX(INFO_SHIPWRECK)]);
         }
         if (HAS(h->m_eventFlags, HERO_EVENT_WATERING_HOLE)) {
-            strcat(gText, cMoraleInfo[IDX(MORALE_INFO_WATERING_HOLE)]);
+            strcat(gText, cMoraleInfo[IDX(INFO_WATERING_HOLE)]);
         }
         if (HAS(h->m_eventFlags, HERO_EVENT_DERELICT_SHIP)) {
-            strcat(gText, cMoraleInfo[IDX(MORALE_INFO_DERELICT_SHIP)]);
+            strcat(gText, cMoraleInfo[IDX(INFO_DERELICT_SHIP)]);
         }
         if (h->m_secondarySkills[IDX(HERO_SKILL_LEADERSHIP)] == IDX(HERO_SKILL_LEVEL_BASIC)) {
-            strcat(gText, cMoraleInfo[IDX(MORALE_INFO_BASIC_LEADERSHIP)]);
+            strcat(gText, cMoraleInfo[IDX(INFO_BASIC_LEADERSHIP)]);
         }
         if (h->m_secondarySkills[IDX(HERO_SKILL_LEADERSHIP)] == IDX(HERO_SKILL_LEVEL_ADVANCED)) {
-            strcat(gText, cMoraleInfo[IDX(MORALE_INFO_ADVANCED_LEADERSHIP)]);
+            strcat(gText, cMoraleInfo[IDX(INFO_ADVANCED_LEADERSHIP)]);
         }
         if (h->m_secondarySkills[IDX(HERO_SKILL_LEADERSHIP)] == IDX(HERO_SKILL_LEVEL_EXPERT)) {
-            strcat(gText, cMoraleInfo[IDX(MORALE_INFO_EXPERT_LEADERSHIP)]);
+            strcat(gText, cMoraleInfo[IDX(INFO_EXPERT_LEADERSHIP)]);
         }
         if (h->HasArtifact(ARTIFACT_MASTHEAD) && HAS(h->m_eventFlags, HERO_EVENT_EMBARKED)) {
             strcat(gText, cMoraleInfo[IDX(MORALE_INFO_MASTHEAD)]);
@@ -2592,33 +2844,33 @@ void game::ShowLuckInfo(hero* h, i32 dialogType) {
     modifierStart = strlen(gText);
     if (h->GetOccupiedTown() != 0 && h->GetOccupiedTown()->m_type == IDX(FACTION_SORCERESS)
         && (h->GetOccupiedTown()->m_buildings & IDX(TOWN_BUILDING_RAINBOW)))
-        strcat(gText, cLuckInfo[IDX(LUCK_INFO_RAINBOW)]);
+        strcat(gText, cLuckInfo[IDX(INFO_RAINBOW)]);
     if (h->HasArtifact(ARTIFACT_RABBIT_FOOT))
-        strcat(gText, cLuckInfo[IDX(LUCK_INFO_RABBIT_FOOT)]);
+        strcat(gText, cLuckInfo[IDX(INFO_RABBIT_FOOT)]);
     if (h->HasArtifact(ARTIFACT_GOLDEN_HORSESHOE))
-        strcat(gText, cLuckInfo[IDX(LUCK_INFO_HORSESHOE)]);
+        strcat(gText, cLuckInfo[IDX(INFO_HORSESHOE)]);
     if (h->HasArtifact(ARTIFACT_GAMBLERS_COIN))
-        strcat(gText, cLuckInfo[IDX(LUCK_INFO_LUCKY_COIN)]);
+        strcat(gText, cLuckInfo[IDX(INFO_LUCKY_COIN)]);
     if (h->HasArtifact(ARTIFACT_FOUR_LEAF_CLOVER))
-        strcat(gText, cLuckInfo[IDX(LUCK_INFO_CLOVER)]);
+        strcat(gText, cLuckInfo[IDX(INFO_CLOVER)]);
     if (HAS(h->m_eventFlags, HERO_EVENT_FAERIE_RING))
-        strcat(gText, cLuckInfo[IDX(LUCK_INFO_FAERIE_RING)]);
+        strcat(gText, cLuckInfo[IDX(INFO_FAERIE_RING)]);
     if (HAS(h->m_eventFlags, HERO_EVENT_IDOL))
-        strcat(gText, cLuckInfo[IDX(LUCK_INFO_IDOL)]);
+        strcat(gText, cLuckInfo[IDX(INFO_IDOL)]);
     if (HAS(h->m_eventFlags, HERO_EVENT_FOUNTAIN))
-        strcat(gText, cLuckInfo[IDX(LUCK_INFO_FOUNTAIN)]);
+        strcat(gText, cLuckInfo[IDX(INFO_FOUNTAIN)]);
     if (HAS(h->m_eventFlags, HERO_EVENT_PYRAMID))
-        strcat(gText, cLuckInfo[IDX(LUCK_INFO_PYRAMID)]);
+        strcat(gText, cLuckInfo[IDX(INFO_PYRAMID)]);
     if (h->m_secondarySkills[IDX(HERO_SKILL_LUCK)] == IDX(HERO_SKILL_LEVEL_BASIC))
-        strcat(gText, cLuckInfo[IDX(LUCK_INFO_BASIC_SKILL)]);
+        strcat(gText, cLuckInfo[IDX(INFO_BASIC_SKILL)]);
     if (h->m_secondarySkills[IDX(HERO_SKILL_LUCK)] == IDX(HERO_SKILL_LEVEL_ADVANCED))
-        strcat(gText, cLuckInfo[IDX(LUCK_INFO_ADVANCED_SKILL)]);
+        strcat(gText, cLuckInfo[IDX(INFO_ADVANCED_SKILL)]);
     if (h->m_secondarySkills[IDX(HERO_SKILL_LUCK)] == IDX(HERO_SKILL_LEVEL_EXPERT))
-        strcat(gText, cLuckInfo[IDX(LUCK_INFO_EXPERT_SKILL)]);
+        strcat(gText, cLuckInfo[IDX(INFO_EXPERT_SKILL)]);
     if (h->HasArtifact(ARTIFACT_MASTHEAD) && HAS(h->m_eventFlags, HERO_EVENT_EMBARKED))
         strcat(gText, cLuckInfo[IDX(LUCK_INFO_MASTHEAD)]);
     if (HAS(h->m_eventFlags, HERO_EVENT_MERMAID))
-        strcat(gText, cLuckInfo[IDX(LUCK_INFO_MERMAID)]);
+        strcat(gText, cLuckInfo[IDX(INFO_MERMAID)]);
     if (h->HasArtifact(ARTIFACT_BATTLE_GARB))
         strcat(gText, cLuckInfo[IDX(LUCK_INFO_BATTLE_GARB)]);
     if (static_cast<i32>(strlen(gText)) == modifierStart)
@@ -2768,9 +3020,9 @@ i32 WaitForOtherPlayer(void) {
     KbRemotePacket* data;
     PollSound();
     data = reinterpret_cast<KbRemotePacket*>(GetRemoteData(1));
-    if (data && data->group == NET_BOX_REMOTE_CONTROL) {
+    if (data && data->group == BOX_REMOTE_CONTROL) {
         switch (data->command) {
-            case NET_BOX_REMOTE_SETUP:
+            case BOX_REMOTE_SETUP:
                 memcpy(
                     gbGamePosToNetPos,
                     data->payload.setup.gamePosToNetPos,
@@ -2785,7 +3037,7 @@ i32 WaitForOtherPlayer(void) {
                 );
                 giThisGamePos = NetPosToGamePos(giThisNetPos);
                 break;
-            case NET_BOX_REMOTE_SAVE:
+            case BOX_REMOTE_SAVE:
                 result = gpGame->ReceiveSaveGame(
                     data->payload.save.saveId,
                     data->payload.save.saveOffset,
@@ -2810,7 +3062,7 @@ void PopNetBox(char* text, i32 netPlayer) {
     i32 savedShowIt_a;
     i32 updateInput_a;
     i32 inputLength_a;
-    char inputText_c[NET_BOX_TEXT_LENGTH];
+    char inputText_c[BOX_TEXT_LENGTH];
     i32 exitForIncomingData_i;
     i32 sendText_e;
     tag_message event_a;
@@ -2828,20 +3080,20 @@ void PopNetBox(char* text, i32 netPlayer) {
     if (!gbRemoteOn)
         return;
 
-    lineTextLimit_p = NET_BOX_LINE_TEXT_LIMIT;
-    firstLineId_a = NET_BOX_FIRST_LINE_ID;
-    textX_d = NET_BOX_TEXT_X;
-    textY_d = NET_BOX_TEXT_Y;
+    lineTextLimit_p = BOX_LINE_TEXT_LIMIT;
+    firstLineId_a = BOX_FIRST_LINE_ID;
+    textX_d = BOX_TEXT_X;
+    textY_d = BOX_TEXT_Y;
     messageTime_b = 0;
     if (text != 0) {
         if (netPlayer >= 0) {
             sprintf(gText, "%s:  %s", gsNetPlayerInfo[netPlayer].name, text);
-            gText[NET_BOX_LINE_TEXT_LIMIT] = 0;
+            gText[BOX_LINE_TEXT_LIMIT] = 0;
             AddNetBoxLine(gText, gpGame->m_players[NetPosToGamePos(netPlayer)].m_color);
         } else {
             sprintf(gText, text);
-            gText[NET_BOX_LINE_TEXT_LIMIT] = 0;
-            AddNetBoxLine(gText, NET_BOX_DEFAULT_COLOR);
+            gText[BOX_LINE_TEXT_LIMIT] = 0;
+            AddNetBoxLine(gText, BOX_DEFAULT_COLOR);
         }
         messageTime_b = KBTickCount();
     }
@@ -2850,7 +3102,7 @@ void PopNetBox(char* text, i32 netPlayer) {
     savedShowIt_a = bShowIt;
     bShowIt = 1;
     gbMoveShown = false;
-    netWindow_j = new heroWindow(0, NET_BOX_WINDOW_Y, "netbox.bin");
+    netWindow_j = new heroWindow(0, BOX_WINDOW_Y, "netbox.bin");
     if (netWindow_j == 0)
         MemError();
 
@@ -2869,19 +3121,19 @@ void PopNetBox(char* text, i32 netPlayer) {
     updateMessage_f.payload.widget.data.text = cNetBoxLine[3];
     netWindow_j->BroadcastMessage(updateMessage_f);
     updateMessage_f.payload.widget.command = NET_BOX_COLOR_COMMAND;
-    updateMessage_f.payload.widget.id = NET_BOX_FIRST_COLOR_ID;
+    updateMessage_f.payload.widget.id = BOX_FIRST_COLOR_ID;
     updateMessage_f.payload.widget.data.value = cNetBoxColor[0] + 1;
     netWindow_j->BroadcastMessage(updateMessage_f);
-    updateMessage_f.payload.widget.id = NET_BOX_SECOND_COLOR_ID;
+    updateMessage_f.payload.widget.id = BOX_SECOND_COLOR_ID;
     updateMessage_f.payload.widget.data.value = cNetBoxColor[1] + 1;
     netWindow_j->BroadcastMessage(updateMessage_f);
-    updateMessage_f.payload.widget.id = NET_BOX_THIRD_COLOR_ID;
+    updateMessage_f.payload.widget.id = BOX_THIRD_COLOR_ID;
     updateMessage_f.payload.widget.data.value = cNetBoxColor[2] + 1;
     netWindow_j->BroadcastMessage(updateMessage_f);
-    updateMessage_f.payload.widget.id = NET_BOX_FOURTH_COLOR_ID;
+    updateMessage_f.payload.widget.id = BOX_FOURTH_COLOR_ID;
     updateMessage_f.payload.widget.data.value = cNetBoxColor[3] + 1;
     netWindow_j->BroadcastMessage(updateMessage_f);
-    updateMessage_f.payload.widget.id = NET_BOX_THIS_PLAYER_COLOR_ID;
+    updateMessage_f.payload.widget.id = BOX_THIS_PLAYER_COLOR_ID;
     updateMessage_f.payload.widget.data.value =
         gpGame->m_players[NetPosToGamePos(giThisNetPos)].m_color + 1;
     netWindow_j->BroadcastMessage(updateMessage_f);
@@ -2901,10 +3153,10 @@ void PopNetBox(char* text, i32 netPlayer) {
         PollSound();
         remoteData_g = reinterpret_cast<KbRemotePacket*>(GetRemoteData(0));
         if (remoteData_g != 0) {
-            if (remoteData_g->group == NET_BOX_REMOTE_GROUP) {
+            if (remoteData_g->group == BOX_REMOTE_GROUP) {
                 remoteData_g = reinterpret_cast<KbRemotePacket*>(GetRemoteData(1));
                 switch (remoteData_g->command) {
-                    case NET_BOX_REMOTE_MAP_CHANGE:
+                    case BOX_REMOTE_MAP_CHANGE:
                         gbLeaveNetBoxAlone = true;
                         if (gpAdvManager->m_active) {
                             bShowIt = savedShowIt_a;
@@ -2916,11 +3168,11 @@ void PopNetBox(char* text, i32 netPlayer) {
                         updateInput_a = 1;
                         break;
                 }
-            } else if (remoteData_g->group != NET_BOX_REMOTE_CONTROL) {
+            } else if (remoteData_g->group != BOX_REMOTE_CONTROL) {
                 remoteData_g = reinterpret_cast<KbRemotePacket*>(GetRemoteData(1));
             } else {
                 switch (remoteData_g->command) {
-                    case NET_BOX_REMOTE_CHAT:
+                    case BOX_REMOTE_CHAT:
                         remoteData_g = reinterpret_cast<KbRemotePacket*>(GetRemoteData(1));
                         sprintf(
                             gText,
@@ -2937,7 +3189,7 @@ void PopNetBox(char* text, i32 netPlayer) {
                             messageTime_b = KBTickCount();
                         break;
                     default:
-                        AddNetBoxLine("[ Incoming data, must exit... ]", NET_BOX_DEFAULT_COLOR);
+                        AddNetBoxLine("[ Incoming data, must exit... ]", BOX_DEFAULT_COLOR);
                         redrawLines_f = 1;
                         exitForIncomingData_i = 1;
                         break;
@@ -2951,29 +3203,29 @@ void PopNetBox(char* text, i32 netPlayer) {
             case MESSAGE_KEY_DOWN:
                 messageTime_b = 0;
                 switch (event_a.payload.keyboard.keyCode) {
-                    case NET_BOX_KEY_ESCAPE:
-                    case NET_BOX_KEY_F1:
+                    case BOX_KEY_ESCAPE:
+                    case BOX_KEY_F1:
                         done_i = 1;
                         break;
-                    case NET_BOX_KEY_BACKSPACE:
+                    case BOX_KEY_BACKSPACE:
                         if (inputLength_a > 0)
                             inputLength_a--;
                         updateInput_a = 1;
                         cursorState = 1;
                         break;
-                    case NET_BOX_KEY_ENTER:
+                    case BOX_KEY_ENTER:
                         sendText_e = 1;
                         break;
                     default:
-                        if (event_a.payload.keyboard.keyByte < NET_BOX_FIRST_PRINTABLE
-                            || event_a.payload.keyboard.keyByte > NET_BOX_LAST_PRINTABLE)
+                        if (event_a.payload.keyboard.keyByte < BOX_FIRST_PRINTABLE
+                            || event_a.payload.keyboard.keyByte > BOX_LAST_PRINTABLE)
                             break;
-                        if (inputLength_a < NET_BOX_MAX_INPUT
+                        if (inputLength_a < BOX_MAX_INPUT
                             && event_a.payload.keyboard.keyCode != 0) {
                             inputText_c[inputLength_a] = 0;
                             textWidth_b = smallFont->LineWidth(inputText_c);
-                            if (textWidth_b + NET_BOX_CURSOR_WIDTH_PADDING
-                                < NET_BOX_CURSOR_WIDTH_LIMIT) {
+                            if (textWidth_b + BOX_CURSOR_WIDTH_PADDING
+                                < BOX_CURSOR_WIDTH_LIMIT) {
                                 inputText_c[inputLength_a] =
                                     static_cast<char>(event_a.payload.keyboard.keyCode);
                                 inputLength_a++;
@@ -2994,9 +3246,9 @@ void PopNetBox(char* text, i32 netPlayer) {
             AddNetBoxLine(inputText_c, gpGame->m_players[NetPosToGamePos(giThisNetPos)].m_color);
             result_a = TransmitRemoteData(
                 inputText_c,
-                NET_BOX_PACKET_BUFFER_SIZE,
+                BOX_PACKET_BUFFER_SIZE,
                 strlen(inputText_c) + 1,
-                NET_BOX_REMOTE_CHAT,
+                BOX_REMOTE_CHAT,
                 1,
                 1,
                 -1
@@ -3026,46 +3278,46 @@ void PopNetBox(char* text, i32 netPlayer) {
             updateMessage_f.payload.widget.data.text = cNetBoxLine[3];
             netWindow_j->BroadcastMessage(updateMessage_f);
             updateMessage_f.payload.widget.command = NET_BOX_COLOR_COMMAND;
-            updateMessage_f.payload.widget.id = NET_BOX_FIRST_COLOR_ID;
+            updateMessage_f.payload.widget.id = BOX_FIRST_COLOR_ID;
             updateMessage_f.payload.widget.data.value = cNetBoxColor[0] + 1;
             netWindow_j->BroadcastMessage(updateMessage_f);
-            updateMessage_f.payload.widget.id = NET_BOX_SECOND_COLOR_ID;
+            updateMessage_f.payload.widget.id = BOX_SECOND_COLOR_ID;
             updateMessage_f.payload.widget.data.value = cNetBoxColor[1] + 1;
             netWindow_j->BroadcastMessage(updateMessage_f);
-            updateMessage_f.payload.widget.id = NET_BOX_THIRD_COLOR_ID;
+            updateMessage_f.payload.widget.id = BOX_THIRD_COLOR_ID;
             updateMessage_f.payload.widget.data.value = cNetBoxColor[2] + 1;
             netWindow_j->BroadcastMessage(updateMessage_f);
-            updateMessage_f.payload.widget.id = NET_BOX_FOURTH_COLOR_ID;
+            updateMessage_f.payload.widget.id = BOX_FOURTH_COLOR_ID;
             updateMessage_f.payload.widget.data.value = cNetBoxColor[3] + 1;
             netWindow_j->BroadcastMessage(updateMessage_f);
             netWindow_j->DrawWindow();
-            gpWindowManager->UpdateScreenRegion(0, NET_BOX_WINDOW_Y, NET_BOX_WIDTH, NET_BOX_HEIGHT);
+            gpWindowManager->UpdateScreenRegion(0, BOX_WINDOW_Y, BOX_WIDTH, BOX_HEIGHT);
         }
 
         if (updateInput_a) {
             updateInput_a = 0;
-            glTimers[0] = KBTickCount() + NET_BOX_CURSOR_DELAY;
+            glTimers[0] = KBTickCount() + BOX_CURSOR_DELAY;
             if (cursorState)
                 inputText_c[inputLength_a] = '_';
             else
-                inputText_c[inputLength_a] = NET_BOX_CURSOR_GLYPH;
+                inputText_c[inputLength_a] = BOX_CURSOR_GLYPH;
             inputText_c[inputLength_a + 1] = 0;
             updateMessage_f.type = NET_BOX_UPDATE_MESSAGE;
             updateMessage_f.payload.widget.command = NET_BOX_TEXT_COMMAND;
-            updateMessage_f.payload.widget.id = NET_BOX_INPUT_ID;
+            updateMessage_f.payload.widget.id = BOX_INPUT_ID;
             updateMessage_f.payload.widget.data.text = inputText_c;
             netWindow_j->BroadcastMessage(updateMessage_f);
             netWindow_j->DrawWindow();
             gpWindowManager
-                ->UpdateScreenRegion(0, NET_BOX_INPUT_Y, NET_BOX_WIDTH, NET_BOX_INPUT_HEIGHT);
+                ->UpdateScreenRegion(0, BOX_INPUT_Y, BOX_WIDTH, BOX_INPUT_HEIGHT);
         }
 
-        if (messageTime_b != 0 && messageTime_b + NET_BOX_MESSAGE_TIMEOUT < KBTickCount())
+        if (messageTime_b != 0 && messageTime_b + BOX_MESSAGE_TIMEOUT < KBTickCount())
             done_i = 1;
         if (exitForIncomingData_i) {
-            for (delay_h = 0; delay_h < NET_BOX_EXIT_DELAY_STEPS; delay_h++) {
+            for (delay_h = 0; delay_h < BOX_EXIT_DELAY_STEPS; delay_h++) {
                 PollSound();
-                DelayMilli(NET_BOX_EXIT_DELAY);
+                DelayMilli(BOX_EXIT_DELAY);
             }
             done_i = 1;
         }
@@ -3219,22 +3471,22 @@ void SmackFade(u8* src, u8* dst) {
 VA(0x0049e5fd, 0x303)
 void ShowCongrats(i32 highScoreType) {
     DATA(0x0051670c) static i16 congratsSourceLineBase = 0x0f97;
-    u8 savedPalette[CONGRATS_PALETTE_BUFFER_SIZE];
+    u8 savedPalette[PALETTE_BUFFER_SIZE];
     i32 baseScore;
     i32 score_e;
-    char rating[CONGRATS_RATING_LENGTH];
+    char rating[RATING_LENGTH];
 
     gpMouseManager->HideColorPointer();
-    memcpy(savedPalette, gpBufferPalette->m_data, CONGRATS_PALETTE_SIZE);
+    memcpy(savedPalette, gpBufferPalette->m_data, PALETTE_SIZE);
     gpWindowManager->m_updateFlags = 0;
-    congratsText = static_cast<char*>(H2_ALLOC(CONGRATS_TEXT_SIZE, 4000));
+    congratsText = static_cast<char*>(H2_ALLOC(TEXT_SIZE, 4000));
     baseScore = CalcBaseScore(giCurTurn);
-    score_e = gpGame->m_difficultyRating * baseScore / CONGRATS_DIFFICULTY_SCALE;
-    gpSoundManager->PlayAmbientMusic(CONGRATS_MUSIC_SILENT, 0, CONGRATS_MUSIC_SILENT);
+    score_e = gpGame->m_difficultyRating * baseScore / DIFFICULTY_SCALE;
+    gpSoundManager->PlayAmbientMusic(MUSIC_SILENT, 0, MUSIC_SILENT);
 
-    if (highScoreType == CONGRATS_STANDARD) {
+    if (highScoreType == STANDARD) {
         sprintf(rating, gArmyNames[GetMonType(score_e, highScoreType)]);
-    } else if (highScoreType == CONGRATS_EXPANSION_CAMPAIGN) {
+    } else if (highScoreType == EXPANSION_CAMPAIGN) {
         sprintf(rating, gArmyNames[GetMonType(xCampaign.Days(), highScoreType)]);
     } else {
         sprintf(rating, gArmyNames[GetMonType(gpGame->m_campaignScore, highScoreType)]);
@@ -3243,7 +3495,7 @@ void ShowCongrats(i32 highScoreType) {
     if (static_cast<i8>(gpGame->m_cheated))
         sprintf(rating, "Cheater!!!");
 
-    if (highScoreType == CONGRATS_STANDARD) {
+    if (highScoreType == STANDARD) {
         sprintf(
             congratsText,
             "Congratulations!\n\nDays: %d\nBase Score: %d\nDifficulty: %d\n\nScore: "
@@ -3254,7 +3506,7 @@ void ShowCongrats(i32 highScoreType) {
             score_e,
             rating
         );
-    } else if (highScoreType == CONGRATS_EXPANSION_CAMPAIGN) {
+    } else if (highScoreType == EXPANSION_CAMPAIGN) {
         sprintf(
             congratsText,
             "Congratulations!\n\nDays: %d\n\nRating:\n%s\n",
@@ -3270,23 +3522,23 @@ void ShowCongrats(i32 highScoreType) {
         );
     }
 
-    PlaySmacker(CONGRATS_SMACKER);
-    memcpy(gpBufferPalette->m_data, gPalette->m_data, CONGRATS_PALETTE_SIZE);
+    PlaySmacker(SMACKER);
+    memcpy(gpBufferPalette->m_data, gPalette->m_data, PALETTE_SIZE);
     SmackFade(reinterpret_cast<u8*>(gpBufferPalette->m_data), savedPalette);
-    memcpy(gPalette->m_data, savedPalette, CONGRATS_PALETTE_SIZE);
-    memcpy(gpBufferPalette->m_data, gPalette->m_data, CONGRATS_PALETTE_SIZE);
+    memcpy(gPalette->m_data, savedPalette, PALETTE_SIZE);
+    memcpy(gpBufferPalette->m_data, gPalette->m_data, PALETTE_SIZE);
     gpMouseManager->ShowColorPointer();
     AddScoreToHighScore(
         score_e,
         giCurTurn,
         gpGame->m_difficultyRating,
-        CONGRATS_STANDARD,
+        STANDARD,
         gpGame->m_mapHeader.name
     );
     H2_FREE(congratsText, 4069);
     congratsText = 0;
     gpWindowManager->m_updateFlags = 1;
-    memcpy(gpBufferPalette->m_data, gPalette->m_data, CONGRATS_PALETTE_SIZE);
+    memcpy(gpBufferPalette->m_data, gPalette->m_data, PALETTE_SIZE);
 }
 
 VA(0x0049e900, 0x99)
@@ -3827,37 +4079,37 @@ void SetupDynamicWindow(
     i32 tileHeight;
     i32 topEdgeInset;
 
-    tileWidth = DYNAMIC_TILE_SIZE;
-    tileHeight = DYNAMIC_TILE_SIZE;
-    topEdgeInset = -DYNAMIC_EDGE_OFFSET;
-    bottomEdgeOffset = -DYNAMIC_EDGE_OFFSET;
-    contentXPaddingCount = DYNAMIC_CONTENT_LEFT;
-    contentYPadding = DYNAMIC_CONTENT_TOP;
-    topCornerPaddingCount = DYNAMIC_CONTENT_TOP;
-    bottomCornerPaddingNum = DYNAMIC_CONTENT_TOP;
-    leftCornerPaddingLocal = DYNAMIC_CONTENT_TOP;
-    rightCornerPaddingValue = DYNAMIC_CONTENT_TOP;
-    centeredPadding = DYNAMIC_CONTENT_LEFT;
-    stoneWidgetColorSize = DYNAMIC_WIDGET_COLOR;
+    tileWidth = TILE_SIZE;
+    tileHeight = TILE_SIZE;
+    topEdgeInset = -EDGE_OFFSET;
+    bottomEdgeOffset = -EDGE_OFFSET;
+    contentXPaddingCount = CONTENT_LEFT;
+    contentYPadding = CONTENT_TOP;
+    topCornerPaddingCount = CONTENT_TOP;
+    bottomCornerPaddingNum = CONTENT_TOP;
+    leftCornerPaddingLocal = CONTENT_TOP;
+    rightCornerPaddingValue = CONTENT_TOP;
+    centeredPadding = CONTENT_LEFT;
+    stoneWidgetColorSize = WIDGET_COLOR;
     newWidgetTemp = 0;
-    columnsSize = (contentWidth - 1) / DYNAMIC_TILE_SIZE + 1;
-    numRows = (contentHeight - 1) / DYNAMIC_TILE_SIZE + 1;
-    *windowWidth = columnsSize * DYNAMIC_TILE_SIZE + DYNAMIC_WINDOW_PADDING;
-    *windowHeight = numRows * DYNAMIC_TILE_SIZE + DYNAMIC_WINDOW_PADDING;
-    centeredWidthValue = columnsSize * DYNAMIC_TILE_SIZE + DYNAMIC_CONTENT_LEFT;
-    centeredHeightCount = numRows * DYNAMIC_TILE_SIZE + DYNAMIC_CONTENT_LEFT;
+    columnsSize = (contentWidth - 1) / TILE_SIZE + 1;
+    numRows = (contentHeight - 1) / TILE_SIZE + 1;
+    *windowWidth = columnsSize * TILE_SIZE + WINDOW_PADDING;
+    *windowHeight = numRows * TILE_SIZE + WINDOW_PADDING;
+    centeredWidthValue = columnsSize * TILE_SIZE + CONTENT_LEFT;
+    centeredHeightCount = numRows * TILE_SIZE + CONTENT_LEFT;
     if (centered) {
-        x += ((boundsWidth - centeredWidthValue) >> 1) - DYNAMIC_CONTENT_TOP;
+        x += ((boundsWidth - centeredWidthValue) >> 1) - CONTENT_TOP;
         y += (boundsHeight - centeredHeightCount) >> 1;
     }
-    *contentLeft = x + DYNAMIC_CONTENT_LEFT;
-    *contentTop = y + DYNAMIC_CONTENT_TOP;
-    *contentRight = columnsSize * DYNAMIC_TILE_SIZE + *contentLeft - 1;
-    *contentBottom = numRows * DYNAMIC_TILE_SIZE + *contentTop - 1;
+    *contentLeft = x + CONTENT_LEFT;
+    *contentTop = y + CONTENT_TOP;
+    *contentRight = columnsSize * TILE_SIZE + *contentLeft - 1;
+    *contentBottom = numRows * TILE_SIZE + *contentTop - 1;
 
     if (windowType != 0)
         return;
-    *window = new heroWindow(x, y, *windowWidth, *windowHeight, DYNAMIC_WINDOW_FLAGS);
+    *window = new heroWindow(x, y, *windowWidth, *windowHeight, WINDOW_FLAGS);
     leftOffset = *contentLeft - x;
     topOffsetNum = *contentTop - y;
     rightOffset = *contentRight - x;
@@ -3866,15 +4118,15 @@ void SetupDynamicWindow(
     for (tileRowPos = 0; OD_STEER(tileRowPos) < numRows; tileRowPos++) {
         for (columnIndex = 0; OD_STEER(columnIndex) < columnsSize; columnIndex++) {
             newWidgetTemp = new iconWidget(
-                columnIndex * DYNAMIC_TILE_SIZE + leftOffset,
-                tileRowPos * DYNAMIC_TILE_SIZE + topOffsetNum,
-                DYNAMIC_TILE_SIZE,
-                DYNAMIC_TILE_SIZE,
+                columnIndex * TILE_SIZE + leftOffset,
+                tileRowPos * TILE_SIZE + topOffsetNum,
+                TILE_SIZE,
+                TILE_SIZE,
                 "stonebk2.icn",
-                DYNAMIC_BACKGROUND_FRAME,
+                BACKGROUND_FRAME,
                 0,
                 -1,
-                DYNAMIC_WIDGET_COLOR,
+                WIDGET_COLOR,
                 1
             );
             if (newWidgetTemp == 0)
@@ -3884,15 +4136,15 @@ void SetupDynamicWindow(
     }
 
     newWidgetTemp = new iconWidget(
-        leftOffset - DYNAMIC_CORNER_LEFT,
-        topOffsetNum - DYNAMIC_CORNER_LEFT,
-        DYNAMIC_CORNER_SIZE,
-        DYNAMIC_CORNER_SIZE,
+        leftOffset - CORNER_LEFT,
+        topOffsetNum - CORNER_LEFT,
+        CORNER_SIZE,
+        CORNER_SIZE,
         "stonebk2.icn",
         0,
         0,
         -1,
-        DYNAMIC_WIDGET_COLOR,
+        WIDGET_COLOR,
         1
     );
     if (newWidgetTemp == 0)
@@ -3900,15 +4152,15 @@ void SetupDynamicWindow(
     (*window)->AddWidget(newWidgetTemp, -1);
 
     newWidgetTemp = new iconWidget(
-        rightOffset - DYNAMIC_CORNER_RIGHT,
-        topOffsetNum - DYNAMIC_CORNER_LEFT,
-        DYNAMIC_CORNER_SIZE,
-        DYNAMIC_CORNER_SIZE,
+        rightOffset - CORNER_RIGHT,
+        topOffsetNum - CORNER_LEFT,
+        CORNER_SIZE,
+        CORNER_SIZE,
         "stonebk2.icn",
         1,
         0,
         -1,
-        DYNAMIC_WIDGET_COLOR,
+        WIDGET_COLOR,
         1
     );
     if (newWidgetTemp == 0)
@@ -3916,15 +4168,15 @@ void SetupDynamicWindow(
     (*window)->AddWidget(newWidgetTemp, -1);
 
     newWidgetTemp = new iconWidget(
-        rightOffset - DYNAMIC_CORNER_RIGHT,
-        bottomOffsetLocal - DYNAMIC_CORNER_RIGHT,
-        DYNAMIC_CORNER_SIZE,
-        DYNAMIC_CORNER_SIZE,
+        rightOffset - CORNER_RIGHT,
+        bottomOffsetLocal - CORNER_RIGHT,
+        CORNER_SIZE,
+        CORNER_SIZE,
         "stonebk2.icn",
         2,
         0,
         -1,
-        DYNAMIC_WIDGET_COLOR,
+        WIDGET_COLOR,
         1
     );
     if (newWidgetTemp == 0)
@@ -3932,15 +4184,15 @@ void SetupDynamicWindow(
     (*window)->AddWidget(newWidgetTemp, -1);
 
     newWidgetTemp = new iconWidget(
-        leftOffset - DYNAMIC_CORNER_LEFT,
-        bottomOffsetLocal - DYNAMIC_CORNER_RIGHT,
-        DYNAMIC_CORNER_SIZE,
-        DYNAMIC_CORNER_SIZE,
+        leftOffset - CORNER_LEFT,
+        bottomOffsetLocal - CORNER_RIGHT,
+        CORNER_SIZE,
+        CORNER_SIZE,
         "stonebk2.icn",
         3,
         0,
         -1,
-        DYNAMIC_WIDGET_COLOR,
+        WIDGET_COLOR,
         1
     );
     if (newWidgetTemp == 0)
@@ -3949,15 +4201,15 @@ void SetupDynamicWindow(
 
     for (edge = 0; columnsSize > OD_STEER(edge); edge++) {
         newWidgetTemp = new iconWidget(
-            edge * DYNAMIC_TILE_SIZE + leftOffset - DYNAMIC_EDGE_OFFSET,
-            topOffsetNum - DYNAMIC_CORNER_LEFT,
-            DYNAMIC_CORNER_SIZE,
-            DYNAMIC_CORNER_SIZE,
+            edge * TILE_SIZE + leftOffset - EDGE_OFFSET,
+            topOffsetNum - CORNER_LEFT,
+            CORNER_SIZE,
+            CORNER_SIZE,
             "stonebk2.icn",
-            Random(DYNAMIC_TOP_FRAME_FIRST, DYNAMIC_TOP_FRAME_LAST),
+            Random(TOP_FRAME_FIRST, TOP_FRAME_LAST),
             0,
             -1,
-            DYNAMIC_WIDGET_COLOR,
+            WIDGET_COLOR,
             1
         );
         if (newWidgetTemp == 0)
@@ -3965,15 +4217,15 @@ void SetupDynamicWindow(
         (*window)->AddWidget(newWidgetTemp, -1);
 
         newWidgetTemp = new iconWidget(
-            edge * DYNAMIC_TILE_SIZE + leftOffset - DYNAMIC_EDGE_OFFSET,
-            bottomOffsetLocal - DYNAMIC_CORNER_RIGHT,
-            DYNAMIC_CORNER_SIZE,
-            DYNAMIC_CORNER_SIZE,
+            edge * TILE_SIZE + leftOffset - EDGE_OFFSET,
+            bottomOffsetLocal - CORNER_RIGHT,
+            CORNER_SIZE,
+            CORNER_SIZE,
             "stonebk2.icn",
-            Random(DYNAMIC_BOTTOM_FRAME_FIRST, DYNAMIC_BOTTOM_FRAME_LAST),
+            Random(BOTTOM_FRAME_FIRST, BOTTOM_FRAME_LAST),
             0,
             -1,
-            DYNAMIC_WIDGET_COLOR,
+            WIDGET_COLOR,
             1
         );
         if (newWidgetTemp == 0)
@@ -3983,15 +4235,15 @@ void SetupDynamicWindow(
 
     for (edge = 0; OD_STEER(edge) < numRows; edge++) {
         newWidgetTemp = new iconWidget(
-            leftOffset - DYNAMIC_CORNER_LEFT,
-            edge * DYNAMIC_TILE_SIZE + topOffsetNum - DYNAMIC_EDGE_OFFSET,
-            DYNAMIC_CORNER_SIZE,
-            DYNAMIC_CORNER_SIZE,
+            leftOffset - CORNER_LEFT,
+            edge * TILE_SIZE + topOffsetNum - EDGE_OFFSET,
+            CORNER_SIZE,
+            CORNER_SIZE,
             "stonebk2.icn",
-            Random(DYNAMIC_LEFT_FRAME_FIRST, DYNAMIC_LEFT_FRAME_LAST),
+            Random(LEFT_FRAME_FIRST, LEFT_FRAME_LAST),
             0,
             -1,
-            DYNAMIC_WIDGET_COLOR,
+            WIDGET_COLOR,
             1
         );
         if (newWidgetTemp == 0)
@@ -3999,15 +4251,15 @@ void SetupDynamicWindow(
         (*window)->AddWidget(newWidgetTemp, -1);
 
         newWidgetTemp = new iconWidget(
-            rightOffset - DYNAMIC_CORNER_RIGHT,
-            edge * DYNAMIC_TILE_SIZE + topOffsetNum - DYNAMIC_EDGE_OFFSET,
-            DYNAMIC_CORNER_SIZE,
-            DYNAMIC_CORNER_SIZE,
+            rightOffset - CORNER_RIGHT,
+            edge * TILE_SIZE + topOffsetNum - EDGE_OFFSET,
+            CORNER_SIZE,
+            CORNER_SIZE,
             "stonebk2.icn",
-            Random(DYNAMIC_RIGHT_FRAME_FIRST, DYNAMIC_RIGHT_FRAME_LAST),
+            Random(RIGHT_FRAME_FIRST, RIGHT_FRAME_LAST),
             0,
             -1,
-            DYNAMIC_WIDGET_COLOR,
+            WIDGET_COLOR,
             1
         );
         if (newWidgetTemp == 0)
@@ -7208,78 +7460,78 @@ DATA(0x004fe130) u8 moatCell[KB_MOAT_CELL_COUNT] = {8, 21, 33, 46, 58, 72, 85, 9
 DATA(0x004fe140) SCampaignChoice campaignChoices[IDX(
     CAMPAIGN_SIDE_COUNT
 )][CAMPAIGN_MAP_COUNT][CAMPAIGN_BONUS_CHOICE_COUNT] = {
-    {{{CAMPAIGN_CHOICE_RESOURCE, IDX(RES_GOLD), CAMPAIGN_CHOICE_GOLD_BONUS},
-      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_THUNDER_MACE), CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_ARMORED_GAUNTLETS), CAMPAIGN_CHOICE_NO_AMOUNT}},
-     {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WIZARD), CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_SORCERESS), CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_KNIGHT), CAMPAIGN_CHOICE_NO_AMOUNT}},
-     {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WIZARD), CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_SORCERESS), CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_KNIGHT), CAMPAIGN_CHOICE_NO_AMOUNT}},
-     {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WIZARD), CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_SORCERESS), CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_KNIGHT), CAMPAIGN_CHOICE_NO_AMOUNT}},
-     {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WIZARD), CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_SORCERESS), CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_KNIGHT), CAMPAIGN_CHOICE_NO_AMOUNT}},
-     {{CAMPAIGN_CHOICE_SPELL, IDX(SPELL_MIRROR_IMAGE), CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_SPELL, IDX(SPELL_SUMMON_EARTH_ELEMENTAL), CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_SPELL, IDX(SPELL_RESURRECT), CAMPAIGN_CHOICE_NO_AMOUNT}},
-     {{CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_BLACK_PEARL), CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_DRAGON_SWORD), CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_DIVINE_BREASTPLATE), CAMPAIGN_CHOICE_NO_AMOUNT}},
-     {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WIZARD), CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_SORCERESS), CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_KNIGHT), CAMPAIGN_CHOICE_NO_AMOUNT}},
-     {{CAMPAIGN_CHOICE_RESOURCE, IDX(RES_CRYSTAL), CAMPAIGN_CHOICE_RESOURCE_BONUS},
-      {CAMPAIGN_CHOICE_RESOURCE, IDX(RES_GEMS), CAMPAIGN_CHOICE_RESOURCE_BONUS},
-      {CAMPAIGN_CHOICE_RESOURCE, IDX(RES_MERCURY), CAMPAIGN_CHOICE_RESOURCE_BONUS}},
-     {{CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_TAX_LIEN), CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_HIDEOUS_MASK), CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_FIZBIN_OF_MISFORTUNE), CAMPAIGN_CHOICE_NO_AMOUNT}},
-     {{CAMPAIGN_CHOICE_NONE, CAMPAIGN_CHOICE_VALUE_NONE, CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_NONE, CAMPAIGN_CHOICE_VALUE_NONE, CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_NONE, CAMPAIGN_CHOICE_VALUE_NONE, CAMPAIGN_CHOICE_NO_AMOUNT}},
-     {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WIZARD), CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_SORCERESS), CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_KNIGHT), CAMPAIGN_CHOICE_NO_AMOUNT}}},
-    {{{CAMPAIGN_CHOICE_RESOURCE, IDX(RES_GOLD), CAMPAIGN_CHOICE_GOLD_BONUS},
-      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_MAGE_RING), CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_MINOR_SCROLL), CAMPAIGN_CHOICE_NO_AMOUNT}},
-     {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_NECROMANCER), CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WARLOCK), CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_BARBARIAN), CAMPAIGN_CHOICE_NO_AMOUNT}},
-     {{CAMPAIGN_CHOICE_RESOURCE, IDX(RES_GOLD), CAMPAIGN_CHOICE_GOLD_BONUS},
-      {CAMPAIGN_CHOICE_SPELL, IDX(SPELL_MASS_CURSE), CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_DEFENDER_HELM), CAMPAIGN_CHOICE_NO_AMOUNT}},
-     {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_NECROMANCER), CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WARLOCK), CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_BARBARIAN), CAMPAIGN_CHOICE_NO_AMOUNT}},
-     {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_NECROMANCER), CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WARLOCK), CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_BARBARIAN), CAMPAIGN_CHOICE_NO_AMOUNT}},
-     {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_NECROMANCER), CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WARLOCK), CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_BARBARIAN), CAMPAIGN_CHOICE_NO_AMOUNT}},
-     {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_NECROMANCER), CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WARLOCK), CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_BARBARIAN), CAMPAIGN_CHOICE_NO_AMOUNT}},
-     {{CAMPAIGN_CHOICE_SECONDARY_SKILL, IDX(HERO_SKILL_LOGISTICS), CAMPAIGN_CHOICE_BASIC_SKILL},
-      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_POWER_AXE), CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_WHITE_PEARL), CAMPAIGN_CHOICE_NO_AMOUNT}},
-     {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_NECROMANCER), CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WARLOCK), CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_BARBARIAN), CAMPAIGN_CHOICE_NO_AMOUNT}},
-     {{CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_BLACK_PEARL), CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_DRAGON_SWORD), CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_DIVINE_BREASTPLATE), CAMPAIGN_CHOICE_NO_AMOUNT}},
-     {{CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_TAX_LIEN), CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_HIDEOUS_MASK), CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_FIZBIN_OF_MISFORTUNE), CAMPAIGN_CHOICE_NO_AMOUNT}},
-     {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_NECROMANCER), CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WARLOCK), CAMPAIGN_CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_BARBARIAN), CAMPAIGN_CHOICE_NO_AMOUNT}}}
+    {{{CAMPAIGN_CHOICE_RESOURCE, IDX(RES_GOLD), CHOICE_GOLD_BONUS},
+      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_THUNDER_MACE), CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_ARMORED_GAUNTLETS), CHOICE_NO_AMOUNT}},
+     {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WIZARD), CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_SORCERESS), CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_KNIGHT), CHOICE_NO_AMOUNT}},
+     {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WIZARD), CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_SORCERESS), CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_KNIGHT), CHOICE_NO_AMOUNT}},
+     {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WIZARD), CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_SORCERESS), CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_KNIGHT), CHOICE_NO_AMOUNT}},
+     {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WIZARD), CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_SORCERESS), CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_KNIGHT), CHOICE_NO_AMOUNT}},
+     {{CAMPAIGN_CHOICE_SPELL, IDX(SPELL_MIRROR_IMAGE), CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_SPELL, IDX(SPELL_SUMMON_EARTH_ELEMENTAL), CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_SPELL, IDX(SPELL_RESURRECT), CHOICE_NO_AMOUNT}},
+     {{CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_BLACK_PEARL), CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_DRAGON_SWORD), CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_DIVINE_BREASTPLATE), CHOICE_NO_AMOUNT}},
+     {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WIZARD), CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_SORCERESS), CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_KNIGHT), CHOICE_NO_AMOUNT}},
+     {{CAMPAIGN_CHOICE_RESOURCE, IDX(RES_CRYSTAL), CHOICE_RESOURCE_BONUS},
+      {CAMPAIGN_CHOICE_RESOURCE, IDX(RES_GEMS), CHOICE_RESOURCE_BONUS},
+      {CAMPAIGN_CHOICE_RESOURCE, IDX(RES_MERCURY), CHOICE_RESOURCE_BONUS}},
+     {{CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_TAX_LIEN), CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_HIDEOUS_MASK), CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_FIZBIN_OF_MISFORTUNE), CHOICE_NO_AMOUNT}},
+     {{CAMPAIGN_CHOICE_NONE, CHOICE_VALUE_NONE, CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_NONE, CHOICE_VALUE_NONE, CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_NONE, CHOICE_VALUE_NONE, CHOICE_NO_AMOUNT}},
+     {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WIZARD), CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_SORCERESS), CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_KNIGHT), CHOICE_NO_AMOUNT}}},
+    {{{CAMPAIGN_CHOICE_RESOURCE, IDX(RES_GOLD), CHOICE_GOLD_BONUS},
+      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_MAGE_RING), CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_MINOR_SCROLL), CHOICE_NO_AMOUNT}},
+     {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_NECROMANCER), CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WARLOCK), CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_BARBARIAN), CHOICE_NO_AMOUNT}},
+     {{CAMPAIGN_CHOICE_RESOURCE, IDX(RES_GOLD), CHOICE_GOLD_BONUS},
+      {CAMPAIGN_CHOICE_SPELL, IDX(SPELL_MASS_CURSE), CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_DEFENDER_HELM), CHOICE_NO_AMOUNT}},
+     {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_NECROMANCER), CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WARLOCK), CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_BARBARIAN), CHOICE_NO_AMOUNT}},
+     {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_NECROMANCER), CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WARLOCK), CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_BARBARIAN), CHOICE_NO_AMOUNT}},
+     {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_NECROMANCER), CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WARLOCK), CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_BARBARIAN), CHOICE_NO_AMOUNT}},
+     {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_NECROMANCER), CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WARLOCK), CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_BARBARIAN), CHOICE_NO_AMOUNT}},
+     {{CAMPAIGN_CHOICE_SECONDARY_SKILL, IDX(HERO_SKILL_LOGISTICS), CHOICE_BASIC_SKILL},
+      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_POWER_AXE), CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_WHITE_PEARL), CHOICE_NO_AMOUNT}},
+     {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_NECROMANCER), CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WARLOCK), CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_BARBARIAN), CHOICE_NO_AMOUNT}},
+     {{CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_BLACK_PEARL), CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_DRAGON_SWORD), CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_DIVINE_BREASTPLATE), CHOICE_NO_AMOUNT}},
+     {{CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_TAX_LIEN), CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_HIDEOUS_MASK), CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_FIZBIN_OF_MISFORTUNE), CHOICE_NO_AMOUNT}},
+     {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_NECROMANCER), CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WARLOCK), CHOICE_NO_AMOUNT},
+      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_BARBARIAN), CHOICE_NO_AMOUNT}}}
 };
 DATA(0x004fe2a8) char* congratsText = 0;
 DATA(0x004fe2b0) char* gArtifactNames[KB_ARTIFACT_LEVEL_COUNT] = {

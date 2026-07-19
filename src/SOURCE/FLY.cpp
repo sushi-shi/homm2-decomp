@@ -12,6 +12,17 @@
 #include <SOURCE/NOOPT.h>
 #include <SOURCE/PATH.h>
 #include <SOURCE/X_GLOBAL.h>
+H2_ENUM_CLASS_BEGIN(ArmyCombatDirection)
+    DIRECTION_LEFT  = 1,
+    DIRECTION_RIGHT = 4
+H2_ENUM_CLASS_END(ArmyCombatDirection)
+
+H2_ENUM_BEGIN(ArmyFlightConstant)
+    ALL_ADJACENT_DIRECTIONS    = 0x3f,
+    FLIGHT_SOUND_FRAME         = 1,
+    VAMPIRE_FLIGHT_SOUND_DELAY = 100
+H2_ENUM_END(ArmyFlightConstant)
+
 // @semantic: branch/code-shape residual.
 VA(0x004a5900, 0x295)
 i32 army::CanFit(i32 hex, i32 tryOtherSide, i32* fittingHex) {
@@ -125,12 +136,12 @@ i32 army::ValidFlight(i32 destination, i32 fromTargetHex) {
             targetHex--;
         }
         if (target->m_facing == 1) {
-            directionMask = 1 << IDX(ARMY_DIRECTION_RIGHT);
+            directionMask = 1 << IDX(DIRECTION_RIGHT);
         } else {
-            directionMask = 1 << IDX(ARMY_DIRECTION_LEFT);
+            directionMask = 1 << IDX(DIRECTION_LEFT);
         }
     }
-    while (directionMask != ARMY_ALL_ADJACENT_DIRECTIONS) {
+    while (directionMask != ALL_ADJACENT_DIRECTIONS) {
         direction = GetBestDirection(targetHex, m_hex, directionMask);
         adjacentHex = GetAdjacentCellIndex(targetHex, direction);
         if (ValidHex(adjacentHex) && CanFit(adjacentHex, 1 - fromTargetHex, &fittingHex)) {
@@ -157,11 +168,11 @@ i32 army::ValidFlight(i32 destination, i32 fromTargetHex) {
             targetHex++;
         }
         if (target->m_facing == 1) {
-            directionMask = 1 << IDX(ARMY_DIRECTION_LEFT);
+            directionMask = 1 << IDX(DIRECTION_LEFT);
         } else {
-            directionMask = 1 << IDX(ARMY_DIRECTION_RIGHT);
+            directionMask = 1 << IDX(DIRECTION_RIGHT);
         }
-        while (directionMask != ARMY_ALL_ADJACENT_DIRECTIONS) {
+        while (directionMask != ALL_ADJACENT_DIRECTIONS) {
             direction = GetBestDirection(targetHex, m_hex, directionMask);
             adjacentHex = GetAdjacentCellIndex(targetHex, direction);
             if (ValidHex(adjacentHex) && CanFit(adjacentHex, 0, 0)) {
@@ -315,12 +326,12 @@ i32 army::FlyTo(i32 destination) {
                     y += yStep / flightFrameCount;
                 }
                 if (m_animationFrame % m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WALK)]
-                    == ARMY_FLIGHT_SOUND_FRAME) {
+                    == FLIGHT_SOUND_FRAME) {
                     if ((m_monsterType == CREATURE_VAMPIRE
                          || m_monsterType == CREATURE_VAMPIRE_LORD)
                         && flightSegment == 0) {
                         gpSoundManager->MemorySample(m_samples[IDX(ARMY_SAMPLE_EXTRA_ONE)]);
-                        DelayMilli(ARMY_VAMPIRE_FLIGHT_SOUND_DELAY);
+                        DelayMilli(VAMPIRE_FLIGHT_SOUND_DELAY);
                     } else if ((m_monsterType == CREATURE_VAMPIRE
                                 || m_monsterType == CREATURE_VAMPIRE_LORD)
                                && flightSegmentCount - 1 == flightSegment) {

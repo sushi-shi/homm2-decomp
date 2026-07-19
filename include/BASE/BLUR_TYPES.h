@@ -4,7 +4,7 @@
 #include <va.h>
 
 H2_ENUM_BEGIN(BlurTextSlotSize)
-    BLUR_SOURCE_FILE_SLOT_SIZE = 0x28,
+    BLUR_SOURCE_FILE_SLOT_SIZE     = 0x28,
     BLUR_LOOKUP_FILENAME_SLOT_SIZE = 0x10
 H2_ENUM_END(BlurTextSlotSize)
 

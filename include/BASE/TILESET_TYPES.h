@@ -5,7 +5,7 @@
 
 H2_ENUM_BEGIN(TilesetSourceFileSize)
     TILESET_SOURCE_FILE_SLOT_SIZE = 0x2c,
-    TILESET_SOURCE_FILE_SIZE = 0x29
+    TILESET_SOURCE_FILE_SIZE      = 0x29
 H2_ENUM_END(TilesetSourceFileSize)
 
 typedef struct STilesetSourceFiles {

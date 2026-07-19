@@ -1,5 +1,6 @@
 #ifndef HOMM2_BASE_MIDIWRAP_H
 #define HOMM2_BASE_MIDIWRAP_H
+
 #include <va.h>
 #include <BASE/resource.h>
 

@@ -1,5 +1,6 @@
 #ifndef HOMM2_SOURCE_HEXCELL_H
 #define HOMM2_SOURCE_HEXCELL_H
+
 #include <va.h>
 #include <BASE/icon.h>
 

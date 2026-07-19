@@ -16,6 +16,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+H2_ENUM_BEGIN(FindPathConstant)
+    ATTACK_MASK_SURROUNDED = 0xff,
+    LENGTH_LIMIT           = 0xff
+H2_ENUM_END(FindPathConstant)
+
 DATA(0x0052adc0) static i32 gSearchLow;
 DATA(0x0052adc4) static mapCell* gSearchNextCell;
 DATA(0x0052ae40) static searchNode* gSearchCell;
@@ -348,7 +353,7 @@ void searchArray::SeedCombatPosition(class army* unit) {
         hex = enemy->m_hex;
 
         if (unit->m_monster.speed <= 0
-            || unit->GetAttackMask(unit->m_hex, 1, -1) != PATH_ATTACK_MASK_SURROUNDED) {
+            || unit->GetAttackMask(unit->m_hex, 1, -1) != ATTACK_MASK_SURROUNDED) {
             if (unit->ValidPath(hex, 1) == 1)
                 gpCombatManager->m_hexCells[hex].m_pathReachable = 1;
         } else {
@@ -361,7 +366,7 @@ void searchArray::SeedCombatPosition(class army* unit) {
                 enemy->m_facing == 1 ? COMBAT_DIRECTION_NORTHEAST : COMBAT_DIRECTION_SOUTHWEST
             );
             if ((unit->m_monster.speed > 0
-                 && unit->GetAttackMask(unit->m_hex, 1, -1) == PATH_ATTACK_MASK_SURROUNDED)
+                 && unit->GetAttackMask(unit->m_hex, 1, -1) == ATTACK_MASK_SURROUNDED)
                 || unit->ValidPath(hex, 1) == 1) {
                 gpCombatManager->m_hexCells[hex].m_pathReachable = 1;
             }
@@ -447,7 +452,7 @@ i32 searchArray::FindCombatPath(
 
             if (unit->m_targetSide != -1) {
                 attackMask = unit->GetAttackMask(currentHex, 0, attackTargetHex);
-                if (attackMask != PATH_ATTACK_MASK_SURROUNDED) {
+                if (attackMask != ATTACK_MASK_SURROUNDED) {
                     attackDirection = 0;
                     goto findAttackDirection;
                 }
@@ -517,7 +522,7 @@ reconstructPath:
         searchNode& cell = m_storage.nodes[bestHex];
         *path++ = static_cast<i8>(cell.direction);
         m_pathLength++;
-        if (m_pathLength > PATH_LENGTH_LIMIT)
+        if (m_pathLength > LENGTH_LIMIT)
             break;
         i32 opposite = OppositeDirection(cell.direction);
         bestHex = unit->GetAdjacentCellIndex(bestHex, opposite);

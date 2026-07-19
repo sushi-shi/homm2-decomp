@@ -1,5 +1,6 @@
 #ifndef HOMM2_SOURCE_ARMY_H
 #define HOMM2_SOURCE_ARMY_H
+
 #include <va.h>
 #include <SOURCE/KB_TYPES.h>
 #include <BASE/icon.h>

@@ -17,16 +17,39 @@
 #include <SOURCE/kbwin.h>
 #include <SOURCE/REQUEST.h>
 
+H2_ENUM_CLASS_BEGIN(FileRequesterKey)
+    REQUESTER_KEY_CYCLE_FILTER = 0x40
+H2_ENUM_CLASS_END(FileRequesterKey)
+
+H2_ENUM_CLASS_BEGIN(FileRequesterHelpIndex)
+    REQUESTER_HELP_NONE          = -1,
+    REQUESTER_HELP_FILTER_SMALL  = 0,
+    REQUESTER_HELP_FILTER_MEDIUM = 1,
+    REQUESTER_HELP_FILTER_LARGE  = 2,
+    REQUESTER_HELP_FILTER_XLARGE = 3,
+    REQUESTER_HELP_FILTER_ALL    = 4,
+    REQUESTER_HELP_FILENAME      = 5,
+    REQUESTER_HELP_OK            = 6,
+    REQUESTER_HELP_CANCEL        = 7,
+    REQUESTER_HELP_MAP_SIZE      = 8,
+    REQUESTER_HELP_PLAYER_COUNT  = 9,
+    REQUESTER_HELP_VICTORY       = 10,
+    REQUESTER_HELP_LOSS          = 11,
+    REQUESTER_HELP_MAP_NAME      = 12,
+    REQUESTER_HELP_DESCRIPTION   = 13,
+    REQUESTER_HELP_DIFFICULTY    = 14
+H2_ENUM_CLASS_END(FileRequesterHelpIndex)
+
 // Frames of the requester's map-info icons: the map-size frames are selected
 // directly; player-count, victory, and loss frames are base + header value.
 H2_ENUM_CLASS_BEGIN(RequesterIconFrame)
     PLAYER_COUNT_FRAME_BASE = 0x13,
-    MAP_SIZE_FRAME_SMALL = 0x1a,
-    MAP_SIZE_FRAME_MEDIUM = 0x1b,
-    MAP_SIZE_FRAME_LARGE = 0x1c,
-    MAP_SIZE_FRAME_XLARGE = 0x1d,
-    VICTORY_FRAME_BASE = 0x1e,
-    LOSS_FRAME_BASE = 0x24
+    MAP_SIZE_FRAME_SMALL    = 0x1a,
+    MAP_SIZE_FRAME_MEDIUM   = 0x1b,
+    MAP_SIZE_FRAME_LARGE    = 0x1c,
+    MAP_SIZE_FRAME_XLARGE   = 0x1d,
+    VICTORY_FRAME_BASE      = 0x1e,
+    LOSS_FRAME_BASE         = 0x24
 H2_ENUM_CLASS_END(RequesterIconFrame)
 
 // @early-stop
@@ -436,7 +459,7 @@ i32 fileRequester::Main(struct tag_message& message) {
     switch (message.type) {
         case MESSAGE_KEY_DOWN:
             switch (message.payload.keyboard.keyCode) {
-                case IDX(FILE_REQUESTER_KEY_CYCLE_FILTER): {
+                case IDX(REQUESTER_KEY_CYCLE_FILTER): {
                     if (m_selectedIndex != FILE_REQUESTER_SELECTION_NONE) {
                         strcpy(cycleNameBuffer, m_fileNames[m_selectedIndex].text);
                     } else {
@@ -520,78 +543,78 @@ i32 fileRequester::Main(struct tag_message& message) {
                 case WIDGET_COMMAND_SELECT:
                 case WIDGET_COMMAND_ALTERNATE_SELECT:
                     if ((message.payload.widget.parameter & FILE_REQUESTER_HELP_MODIFIER) != 0) {
-                        helpIndexMouse = FILE_REQUESTER_HELP_NONE;
+                        helpIndexMouse = REQUESTER_HELP_NONE;
                         switch (message.payload.widget.id) {
                             case FILE_REQUESTER_FILENAME_ENTRY:
-                                helpIndexMouse = FILE_REQUESTER_HELP_FILENAME;
+                                helpIndexMouse = REQUESTER_HELP_FILENAME;
                                 break;
                             case FILE_REQUESTER_MAP_NAME:
-                                helpIndexMouse = FILE_REQUESTER_HELP_MAP_NAME;
+                                helpIndexMouse = REQUESTER_HELP_MAP_NAME;
                                 break;
                             case FILE_REQUESTER_MAP_PLAYER_COUNT:
-                                helpIndexMouse = FILE_REQUESTER_HELP_PLAYER_COUNT;
+                                helpIndexMouse = REQUESTER_HELP_PLAYER_COUNT;
                                 break;
                             case FILE_REQUESTER_MAP_SIZE:
-                                helpIndexMouse = FILE_REQUESTER_HELP_MAP_SIZE;
+                                helpIndexMouse = REQUESTER_HELP_MAP_SIZE;
                                 break;
                             case FILE_REQUESTER_MAP_DIFFICULTY_ICON:
                             case FILE_REQUESTER_MAP_DIFFICULTY_TEXT:
-                                helpIndexMouse = FILE_REQUESTER_HELP_DIFFICULTY;
+                                helpIndexMouse = REQUESTER_HELP_DIFFICULTY;
                                 break;
                             case FILE_REQUESTER_MAP_DESCRIPTION:
-                                helpIndexMouse = FILE_REQUESTER_HELP_DESCRIPTION;
+                                helpIndexMouse = REQUESTER_HELP_DESCRIPTION;
                                 break;
                             case FILE_REQUESTER_MAP_VICTORY:
-                                helpIndexMouse = FILE_REQUESTER_HELP_VICTORY;
+                                helpIndexMouse = REQUESTER_HELP_VICTORY;
                                 break;
                             case FILE_REQUESTER_MAP_LOSS:
-                                helpIndexMouse = FILE_REQUESTER_HELP_LOSS;
+                                helpIndexMouse = REQUESTER_HELP_LOSS;
                                 break;
                             case FILE_REQUESTER_FILTER_SMALL:
-                                helpIndexMouse = FILE_REQUESTER_HELP_FILTER_SMALL;
+                                helpIndexMouse = REQUESTER_HELP_FILTER_SMALL;
                                 break;
                             case FILE_REQUESTER_FILTER_MEDIUM:
-                                helpIndexMouse = FILE_REQUESTER_HELP_FILTER_MEDIUM;
+                                helpIndexMouse = REQUESTER_HELP_FILTER_MEDIUM;
                                 break;
                             case FILE_REQUESTER_FILTER_LARGE:
-                                helpIndexMouse = FILE_REQUESTER_HELP_FILTER_LARGE;
+                                helpIndexMouse = REQUESTER_HELP_FILTER_LARGE;
                                 break;
                             case FILE_REQUESTER_FILTER_XLARGE:
-                                helpIndexMouse = FILE_REQUESTER_HELP_FILTER_XLARGE;
+                                helpIndexMouse = REQUESTER_HELP_FILTER_XLARGE;
                                 break;
                             case FILE_REQUESTER_FILTER_ALL:
-                                helpIndexMouse = FILE_REQUESTER_HELP_FILTER_ALL;
+                                helpIndexMouse = REQUESTER_HELP_FILTER_ALL;
                                 break;
                             case FILE_REQUESTER_CANCEL:
-                                helpIndexMouse = FILE_REQUESTER_HELP_CANCEL;
+                                helpIndexMouse = REQUESTER_HELP_CANCEL;
                                 break;
                             case FILE_REQUESTER_OK:
-                                helpIndexMouse = FILE_REQUESTER_HELP_OK;
+                                helpIndexMouse = REQUESTER_HELP_OK;
                                 break;
                             default:
                                 if (message.payload.widget.id >= FILE_REQUESTER_MAP_SIZE_ICON_FIRST
                                     && message.payload.widget.id
                                            < FILE_REQUESTER_MAP_SIZE_ICON_FIRST
                                                  + FILE_REQUESTER_LIST_RANGE_SIZE) {
-                                    helpIndexMouse = FILE_REQUESTER_HELP_MAP_SIZE;
+                                    helpIndexMouse = REQUESTER_HELP_MAP_SIZE;
                                 } else if (message.payload.widget.id
                                                >= FILE_REQUESTER_MAP_PLAYER_ICON_FIRST
                                            && message.payload.widget.id
                                                   < FILE_REQUESTER_MAP_PLAYER_ICON_FIRST
                                                         + FILE_REQUESTER_LIST_RANGE_SIZE) {
-                                    helpIndexMouse = FILE_REQUESTER_HELP_PLAYER_COUNT;
+                                    helpIndexMouse = REQUESTER_HELP_PLAYER_COUNT;
                                 } else if (message.payload.widget.id
                                                >= FILE_REQUESTER_MAP_VICTORY_ICON_FIRST
                                            && message.payload.widget.id
                                                   < FILE_REQUESTER_MAP_VICTORY_ICON_FIRST
                                                         + FILE_REQUESTER_LIST_RANGE_SIZE) {
-                                    helpIndexMouse = FILE_REQUESTER_HELP_VICTORY;
+                                    helpIndexMouse = REQUESTER_HELP_VICTORY;
                                 } else if (message.payload.widget.id
                                                >= FILE_REQUESTER_MAP_LOSS_ICON_FIRST
                                            && message.payload.widget.id
                                                   < FILE_REQUESTER_MAP_LOSS_ICON_FIRST
                                                         + FILE_REQUESTER_LIST_RANGE_SIZE) {
-                                    helpIndexMouse = FILE_REQUESTER_HELP_LOSS;
+                                    helpIndexMouse = REQUESTER_HELP_LOSS;
                                 }
                                 break;
                         }
