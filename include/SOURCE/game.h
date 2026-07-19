@@ -3,6 +3,7 @@
 
 #include <va.h>
 #include <EDITOR/fullMap.h>
+#include <SOURCE/KB.h>
 #include <SOURCE/REQUEST.h>
 #include <SOURCE/hero.h>
 #include <SOURCE/playerData.h>
@@ -43,6 +44,26 @@ struct boatRecord {
 #pragma pack(pop)
 SIZE(boatRecord, 8);
 
+H2_ENUM_BEGIN(GameStateStorageConstant)
+    GAME_CAMPAIGN_STATE_PAD_SIZE         = 0x78,
+    GAME_SAVE_NAME_SIZE                  = 0x15f,
+    GAME_MAP_FILENAME_SIZE               = 13,
+    GAME_SETUP_STATE_PAD_SIZE            = 0x12,
+    GAME_DAILY_EVENT_FLAG_COUNT          = GAME_TOWN_COUNT / 8,
+    GAME_OBELISK_VISITOR_COUNT           = 48,
+    GAME_DEFAULT_PLAYER_NAME_SIZE        = 4,
+    GAME_DEFAULT_PLAYER_NAMES_SIZE       = GAME_PLAYER_COUNT * GAME_DEFAULT_PLAYER_NAME_SIZE,
+    GAME_RUNTIME_PAD_SIZE                = 0xc,
+    GAME_RUMOUR_TEXT_SIZE                = 0x12d,
+    GAME_RUMOUR_EVENT_CAPACITY           = 30,
+    GAME_TIME_EVENT_CAPACITY             = 50,
+    GAME_MAP_EVENT_CAPACITY              = 50,
+    GAME_VIEW_SPELLS_SIDE_COUNT          = 2,
+    GAME_CURRENT_MAP_NAME_SIZE           = 16,
+    GAME_CAMPAIGN_TRACK_COORDINATE_COUNT = 2,
+    GAME_RECEIVED_TEXT_BUFFER_COUNT      = 3
+H2_ENUM_END(GameStateStorageConstant)
+
 #pragma pack(push, 1)
 class game {
 public:
@@ -50,32 +71,32 @@ public:
     u8 m_campaignType;
     u8 m_campaignStartingSide;
     i8 m_campaignScenario;
-    u8 m_campaignScenarioCompleted[2][12];
-    i16 m_campaignScenarioBonus[2][12];
-    i16 m_campaignScenarioDays[2][12];
+    u8 m_campaignScenarioCompleted[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
+    i16 m_campaignScenarioBonus[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
+    i16 m_campaignScenarioDays[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
     char m_unknown7d;
-    u8 m_campaignAwards[12];
-    u8 m_campaignChoice[2][12];
-    u8 m_campaignMapEnabled[2][12];
+    u8 m_campaignAwards[CAMPAIGN_AWARD_COUNT];
+    u8 m_campaignChoice[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
+    u8 m_campaignMapEnabled[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
     i16 m_campaignScore;
-    i16 m_campaignCarryoverCreatureTypes[5];
-    i16 m_campaignCarryoverCreatureCounts[5];
+    i16 m_campaignCarryoverCreatureTypes[CAMPAIGN_ARMY_SLOT_COUNT];
+    i16 m_campaignCarryoverCreatureCounts[CAMPAIGN_ARMY_SLOT_COUNT];
     u8 m_campaignScenarioWon;
     u8 m_campaignCheated;
-    char _pad_0xd2[0x78];
-    char m_saveName[0x15f];
+    char _pad_0xd2[GAME_CAMPAIGN_STATE_PAD_SIZE];
+    char m_saveName[GAME_SAVE_NAME_SIZE];
     SMapHeader m_mapHeader;
     i8 m_setupPlayerColor[MAP_HEADER_PLAYER_COUNT];
     i8 m_playerHandicap[MAP_HEADER_PLAYER_COUNT];
     i8 m_setupPlayerRace[MAP_HEADER_PLAYER_COUNT];
     i8 m_setupPlayerNetworkId[MAP_HEADER_PLAYER_COUNT];
     i8 m_difficulty;
-    char m_mapFilename[13];
+    char m_mapFilename[GAME_MAP_FILENAME_SIZE];
     i8 m_setupPlayerType[MAP_HEADER_PLAYER_COUNT];
     i8 m_selectedSetupPlayer;
     i8 m_newGameInitialized;
     i8 m_newGameHumanCount;
-    char _pad_0x47c[0x12];
+    char _pad_0x47c[GAME_SETUP_STATE_PAD_SIZE];
     i8 m_playerCount;
     i8 m_deadPlayerCount;
     i8 m_playerDead[IDX(GAME_PLAYER_COUNT)];
@@ -91,8 +112,8 @@ public:
         i8 m_townOwners[IDX(GAME_TOWN_COUNT)];
     };
     union {
-        char m_dailyEventFlags[9];
-        u8 m_knownTowns[9];
+        char m_dailyEventFlags[GAME_DAILY_EVENT_FLAG_COUNT];
+        u8 m_knownTowns[GAME_DAILY_EVENT_FLAG_COUNT];
     };
     hero m_heroRecs[IDX(GAME_HERO_COUNT)];
     i8 m_availableHeroes[IDX(GAME_HERO_COUNT)];
@@ -101,29 +122,29 @@ public:
     char m_randomArtifacts[IDX(ARTIFACT_COUNT)];
     boatRecord m_boats[IDX(GAME_BOAT_COUNT)];
     i8 m_boatSlots[IDX(GAME_BOAT_COUNT)];
-    i8 m_obeliskVisitors[48];
-    char m_defaultPlayerNames[24];
+    i8 m_obeliskVisitors[GAME_OBELISK_VISITOR_COUNT];
+    char m_defaultPlayerNames[GAME_DEFAULT_PLAYER_NAMES_SIZE];
     i8 m_ultimateArtifactX;
     i8 m_ultimateArtifactY;
     i8 m_ultimateArtifactId;
     class heroWindow* m_newGameWindow;
     char m_pad_0x639c;
     u8 m_cheated;
-    char m_pad_0x639e[0xc];
-    char m_rumour[0x12d];
+    char m_pad_0x639e[GAME_RUNTIME_PAD_SIZE];
+    char m_rumour[GAME_RUMOUR_TEXT_SIZE];
     u16 m_rumourEventCount;
-    u16 m_rumourEventIndices[30];
+    u16 m_rumourEventIndices[GAME_RUMOUR_EVENT_CAPACITY];
     u16 m_timeEventCount;
-    u16 m_timeEventIndices[50];
+    u16 m_timeEventIndices[GAME_TIME_EVENT_CAPACITY];
     u16 m_mapEventCount;
-    u16 m_mapEventIndices[50];
+    u16 m_mapEventIndices[GAME_MAP_EVENT_CAPACITY];
     class heroWindow* m_viewArmyWindow;
     i32 m_viewArmyResult;
     class heroWindow* m_viewSpellsWindow;
     class hero* m_viewSpellsHero;
     i32 m_viewSpellsType;
-    i32 m_viewSpellsTop[2];
-    i32 m_viewSpellsCount[2];
+    i32 m_viewSpellsTop[GAME_VIEW_SPELLS_SIDE_COUNT];
+    i32 m_viewSpellsCount[GAME_VIEW_SPELLS_SIDE_COUNT];
     SpellType m_viewSpell;
     i32 (*m_viewSpellsCallback)(struct tag_message&);
     i8 m_viewSpellsReadOnly;
@@ -274,22 +295,23 @@ public:
 #pragma pack(pop)
 SIZE(game, 0x660f);
 extern class heroWindow* overWin;
-extern char gcCurMapName[16];
+extern char gcCurMapName[GAME_CURRENT_MAP_NAME_SIZE];
 extern class textWidget** textWidgetDynamic;
 extern class iconWidget** iconWidgetDynamic;
 extern OverviewType giOverviewType;
-extern i32 giOverviewTop[2];
+extern i32 giOverviewTop[IDX(OVERVIEW_TYPE_COUNT)];
 extern class iconWidget* OVScrollKnob;
 extern b32 gbDoModemConfig;
-extern i16 trackXY[2][13][2];
+extern i16 trackXY[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_TRACK_POINT_COUNT]
+                  [GAME_CAMPAIGN_TRACK_COORDINATE_COUNT];
 extern class heroWindow* campWin;
 extern b32 gbNewGameDialogOver;
 extern i32 NGKPcursorFlashOn;
 extern OverviewType iLastDynamicType;
 extern i32 iLastDynamicTop;
 extern i32 iOverviewItems;
-extern i32 giOverviewItems[2];
-extern class textWidget* textWidgetTitle[4];
+extern i32 giOverviewItems[IDX(OVERVIEW_TYPE_COUNT)];
+extern class textWidget* textWidgetTitle[OVERVIEW_VISIBLE_ROWS];
 extern i32 iCurViewSide;
 extern i32 iCampaignTrackType;
 extern i32 bCampaignViewOnly;
@@ -298,7 +320,7 @@ extern char* cNGKPDisplay;
 extern b32 gbNewGameShadowHidden;
 extern char* cNGKPCore;
 extern i32 NGKPcursorIndex;
-extern char* cTextReceivedBuffer[3];
+extern char* cTextReceivedBuffer[GAME_RECEIVED_TEXT_BUFFER_COUNT];
 extern class icon* NGKPBkg;
 
 #endif
