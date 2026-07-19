@@ -109,7 +109,7 @@ void searchArray::SeedPosition(
         }
 
         s_targetCell = gpAdvManager->GetCell(targetColumn, targetY);
-        if (s_targetCell->m_flags & 8)
+        if (s_targetCell->m_flags & IDX(MAP_CELL_OCCUPIED))
             return;
 
         if (giGroundToTerrain[s_targetCell->m_terrainImageIndex] == 0) {
@@ -126,7 +126,7 @@ void searchArray::SeedPosition(
         }
 
         s_hasTarget = 1;
-        s_targetWater = (s_targetCell->m_objTypeBits & 2) >> 1;
+        s_targetWater = s_targetCell->m_isRoad;
         s_bestTargetCost = SEARCH_MAX_COST;
     } else {
         s_hasTarget = 0;
@@ -234,8 +234,7 @@ seed_loop:
             );
             s_terrain = giGroundToTerrain[gpAdvManager->GetCell(s_currentNode.x, s_currentNode.y)
                                               ->m_terrainImageIndex];
-            s_currentWater =
-                (gpAdvManager->GetCell(s_currentNode.x, s_currentNode.y)->m_objTypeBits & 2) >> 1;
+            s_currentWater = gpAdvManager->GetCell(s_currentNode.x, s_currentNode.y)->m_isRoad;
             s_direction = 0;
             s_remainingMobility = giCurTempMobility - s_currentNode.distance;
             do {
@@ -270,9 +269,7 @@ seed_loop:
                                     s_remainingMobility,
                                     pathfindingSkill,
                                     s_currentWater,
-                                    (gpAdvManager->GetCell(s_neighborX, s_neighborY)->m_objTypeBits
-                                     & 2)
-                                        >> 1
+                                    gpAdvManager->GetCell(s_neighborX, s_neighborY)->m_isRoad
                                 ),
                             maximumCost,
                             static_cast<i8>(s_directionCosts[s_direction]),
@@ -292,7 +289,7 @@ seed_loop:
                                 s_direction,
                                 giCurTempMobility - s_currentNode.distance,
                                 pathfindingSkill,
-                                (neighborCell->m_objTypeBits & 2) >> 1,
+                                neighborCell->m_isRoad,
                                 s_targetWater
                             );
                             i32 targetCost = s_currentNode.distance + s_targetStepCost;
@@ -356,8 +353,8 @@ seed_loop:
                                                     s_direction,
                                                     giCurTempMobility - s_adjacentCost,
                                                     pathfindingSkill,
-                                                    (s_neighborCell->m_objTypeBits & 2) >> 1,
-                                                    (s_targetCell->m_objTypeBits & 2) >> 1
+                                                    s_neighborCell->m_isRoad,
+                                                    s_targetCell->m_isRoad
                                                 ),
                                             maximumCost,
                                             1,
