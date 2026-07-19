@@ -124,7 +124,7 @@ include/SOURCE/netwin_private.h	reviewed	Internal network-window declarations co
 include/SOURCE/philAI.h	reviewed	The AI interface contains declarations only and no numeric literals or storage extents.
 include/SOURCE/playerData.h	reviewed	Player hero capacities, serialized save gap, barrier state, and runtime tail gap are named layout constants; town and resource arrays derive from canonical shared counts and remaining literals are SIZE evidence.
 include/SOURCE/recruitUnit.h	reviewed	The manager interface exposes no numeric policy; three four-byte opaque gaps and SIZE are proven packed-layout evidence.
-include/SOURCE/searchArray.h	pending
+include/SOURCE/searchArray.h	reviewed	Search directions, queue/path capacities, bit widths, packed headers, costs, terrain/object masks, sentinels, and combat-hex extent are named shared constants; redundant bitwise-or-zero compiler steering was removed from inline row accessors.
 include/SOURCE/strip.h	reviewed	Strip storage extents, runtime gap, geometry, flags, frames, and palette values are named shared domains; the remaining literal is packed class SIZE evidence.
 include/SOURCE/swapManager.h	reviewed	Shared side count and item domains are named aligned enums; the public side array uses the named extent and the remaining literal is SIZE evidence.
 include/SOURCE/town.h	reviewed	Named building/value domains and named public layout dimensions; SIZE is layout evidence.
