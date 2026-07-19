@@ -53,10 +53,17 @@ H2_ENUM_BEGIN(MiscGameDefaultConstant)
     DEFAULT_SMALL_WINDOW_HEIGHT  = 0x168,
     DEFAULT_WINDOW_WIDTH         = 0x280,
     DEFAULT_WINDOW_HEIGHT        = 0x1e0,
+    DEFAULT_SLOW_VIDEO           = 3,
+    DEFAULT_COMPUTER_WALK_SPEED  = 3,
+    DEFAULT_WALK_SPEED           = 2,
     DEFAULT_MAP_OFFSET_COUNT     = 32001,
     UNIQUE_ID_RANDOM_MODULUS     = 999999,
     UNIQUE_ID_ALPHANUMERIC_COUNT = 36,
-    UNIQUE_ID_ALPHA_COUNT        = 26
+    UNIQUE_ID_ALPHA_COUNT        = 26,
+    UNIQUE_ID_LEADING_INDEX      = 0,
+    UNIQUE_ID_MIDDLE_INDEX       = 1,
+    UNIQUE_ID_TRAILING_INDEX     = 2,
+    UNIQUE_ID_TERMINATOR_INDEX   = 3
 H2_ENUM_END(MiscGameDefaultConstant)
 
 H2_ENUM_CLASS_BEGIN(MiscGraphicsFieldIndex)
@@ -111,12 +118,17 @@ H2_ENUM_CLASS_END(MiscCycleColorRange)
 H2_ENUM_BEGIN(MiscFadeConstant)
     FADE_LEVEL_COUNT        = 0x40,
     FADE_LEVEL_LAST         = 0x3f,
-    WINDOW_POSITION_MARGIN  = 0xc8,
     FADE_IN_FRAME_DELAY     = 0x14,
     FADE_TO_INCREMENT_SHIFT = 2,
     FADE_TO_START_LEVEL     = 0x30,
     FADE_TO_FRAME_DELAY     = 0x32
 H2_ENUM_END(MiscFadeConstant)
+
+H2_ENUM_BEGIN(MiscWindowConstant)
+    MINIMUM_WINDOW_WIDTH   = 320,
+    MINIMUM_WINDOW_HEIGHT  = 240,
+    WINDOW_POSITION_MARGIN = 200
+H2_ENUM_END(MiscWindowConstant)
 
 H2_ENUM_BEGIN(MiscBlitConstant)
     BLIT_SCROLL_OFFSET = 0x10,
@@ -790,24 +802,25 @@ void SetGameDefaults(void) {
     gConfig.editorScreenAnimation = 0;
     gConfig.editorPaletteCycling = 0;
     gbFirstTimeThrough = true;
-    gConfig.slowVideo = 3;
-    gConfig.computerWalkSpeed = 3;
-    gConfig.walkSpeed = 2;
+    gConfig.slowVideo = DEFAULT_SLOW_VIDEO;
+    gConfig.computerWalkSpeed = DEFAULT_COMPUTER_WALK_SPEED;
+    gConfig.walkSpeed = DEFAULT_WALK_SPEED;
     strcpy(gConfig.networkDefaultName, gMiscText.gameDefaults.unknownHeroName.text);
     *reinterpret_cast<i32*>(gConfig.uniqueSystemID) = 0;
     i32 idSeed = rand() % UNIQUE_ID_RANDOM_MODULUS + 1;
     idSeed += KBTickCount();
-    gConfig.uniqueSystemID[2] =
+    gConfig.uniqueSystemID[UNIQUE_ID_TRAILING_INDEX] =
         gMiscText.gameDefaults.uniqueIdAlphabet.text[idSeed % UNIQUE_ID_ALPHANUMERIC_COUNT];
     i32 idAdd = rand() % UNIQUE_ID_RANDOM_MODULUS + 1;
     idAdd += KBTickCount();
     idSeed += idAdd;
-    gConfig.uniqueSystemID[1] =
+    gConfig.uniqueSystemID[UNIQUE_ID_MIDDLE_INDEX] =
         gMiscText.gameDefaults.uniqueIdAlphabet.text[idSeed % UNIQUE_ID_ALPHANUMERIC_COUNT];
     idAdd = rand() % UNIQUE_ID_RANDOM_MODULUS + 1;
     idAdd += KBTickCount();
     idSeed += idAdd;
-    gConfig.uniqueSystemID[0] = static_cast<char>(idSeed % UNIQUE_ID_ALPHA_COUNT + 'A');
+    gConfig.uniqueSystemID[UNIQUE_ID_LEADING_INDEX] =
+        static_cast<char>(idSeed % UNIQUE_ID_ALPHA_COUNT + 'A');
     gConfig.needsDefaultInitialization = 0;
 }
 
@@ -837,6 +850,9 @@ skipDefaults:
 }
 
 H2_ENUM_BEGIN(RegistryValueSize)
+    REGISTRY_TEXT_BUFFER_SIZE = 100,
+    REGISTRY_DWORD_BYTES      = 4,
+    CONFIG_ZERO_BUFFER_WORDS  = 25,
     MODEM_INIT_STRING_SIZE    = 0x62,
     UNIQUE_SYSTEM_ID_SIZE     = 4,
     NETWORK_DEFAULT_NAME_SIZE = 0x1e
@@ -847,15 +863,15 @@ void ReadPrefsFromRegistry(void) {
     HKEY hKey;
     DWORD dwType;
     DWORD dwSize;
-    char szKey[100];
-    char szScratch[100];
+    char szKey[REGISTRY_TEXT_BUFFER_SIZE];
+    char szScratch[REGISTRY_TEXT_BUFFER_SIZE];
 
     strcpy(szScratch, gMiscText.readRegistry.scratchDefault.text);
     strcpy(szKey, gMiscText.readRegistry.key.text);
     hKey = NULL;
     if (RegCreateKeyA(HKEY_LOCAL_MACHINE, szKey, &hKey) != 0)
         return;
-    dwSize = 4;
+    dwSize = REGISTRY_DWORD_BYTES;
     if (RegQueryValueExA(
             hKey,
             gMiscText.readRegistry.musicVolumeProbe.text,
@@ -981,7 +997,7 @@ void ReadPrefsFromRegistry(void) {
         reinterpret_cast<u8*>(gConfig.modemInitString),
         &dwSize
     );
-    dwSize = 4;
+    dwSize = REGISTRY_DWORD_BYTES;
     RegQueryValueExA(
         hKey,
         gMiscText.readRegistry.uniqueSystemId.text,
@@ -990,7 +1006,7 @@ void ReadPrefsFromRegistry(void) {
         reinterpret_cast<u8*>(gConfig.uniqueSystemID),
         &dwSize
     );
-    gConfig.uniqueSystemID[3] = 0;
+    gConfig.uniqueSystemID[UNIQUE_ID_TERMINATOR_INDEX] = 0;
     dwSize = NETWORK_DEFAULT_NAME_SIZE + 1;
     RegQueryValueExA(
         hKey,
@@ -1000,7 +1016,7 @@ void ReadPrefsFromRegistry(void) {
         reinterpret_cast<u8*>(gConfig.networkDefaultName),
         &dwSize
     );
-    dwSize = 4;
+    dwSize = REGISTRY_DWORD_BYTES;
     RegQueryValueExA(
         hKey,
         gMiscText.readRegistry.autosave.text,
@@ -1257,13 +1273,13 @@ void ReadPrefsFromRegistry(void) {
     RegCloseKey(hKey);
     // Clamp the saved window geometry to sane defaults / on-screen bounds.
     if (gConfig.gfx[giCurExe].width <= 0)
-        gConfig.gfx[giCurExe].width = 320;
+        gConfig.gfx[giCurExe].width = MINIMUM_WINDOW_WIDTH;
     if (gConfig.gfx[giCurExe].height <= 0)
-        gConfig.gfx[giCurExe].height = 240;
+        gConfig.gfx[giCurExe].height = MINIMUM_WINDOW_HEIGHT;
     if (gConfig.gfx[giCurExe].x < 0)
         gConfig.gfx[giCurExe].x = 0;
-    if (gConfig.gfx[giCurExe].x > giMainVideoModeHeight - 200)
-        gConfig.gfx[giCurExe].x = giMainVideoModeHeight - 200;
+    if (gConfig.gfx[giCurExe].x > giMainVideoModeHeight - WINDOW_POSITION_MARGIN)
+        gConfig.gfx[giCurExe].x = giMainVideoModeHeight - WINDOW_POSITION_MARGIN;
     if (gConfig.gfx[giCurExe].y < 0)
         gConfig.gfx[giCurExe].y = 0;
     if (gConfig.gfx[giCurExe].y > giMainVideoModeWidth - WINDOW_POSITION_MARGIN)
@@ -1284,10 +1300,10 @@ void ReadPrefs(void) {
 
 VA(0x004c5500, 0x6a)
 void WritePrefsToFile(void) {
-    i32 zeroBuffer[25];
+    i32 zeroBuffer[CONFIG_ZERO_BUFFER_WORDS];
     i32 i;
     i32* p = zeroBuffer;
-    for (i = 25; i != 0; i--) {
+    for (i = CONFIG_ZERO_BUFFER_WORDS; i != 0; i--) {
         *p = 0;
         p++;
     }
@@ -1302,8 +1318,8 @@ void WritePrefsToFile(void) {
 VA(0x004c5570, 0x491)
 void WritePrefsToRegistry(void) {
     HKEY hKey;
-    char szKey[100];
-    char szScratch[100];
+    char szKey[REGISTRY_TEXT_BUFFER_SIZE];
+    char szScratch[REGISTRY_TEXT_BUFFER_SIZE];
 
     strcpy(szScratch, gMiscText.writeRegistry.scratchDefault.text);
     strcpy(szKey, gMiscText.writeRegistry.key.text);
@@ -1316,7 +1332,7 @@ void WritePrefsToRegistry(void) {
         0,
         REG_DWORD,
         reinterpret_cast<u8*>(&gConfig.musicVolume),
-        4
+        REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
         hKey,
@@ -1324,7 +1340,7 @@ void WritePrefsToRegistry(void) {
         0,
         REG_DWORD,
         reinterpret_cast<u8*>(&gConfig.soundVolume),
-        4
+        REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
         hKey,
@@ -1332,7 +1348,7 @@ void WritePrefsToRegistry(void) {
         0,
         REG_DWORD,
         reinterpret_cast<u8*>(&gConfig.walkSpeed),
-        4
+        REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
         hKey,
@@ -1340,7 +1356,7 @@ void WritePrefsToRegistry(void) {
         0,
         REG_DWORD,
         reinterpret_cast<u8*>(&gConfig.computerWalkSpeed),
-        4
+        REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
         hKey,
@@ -1348,7 +1364,7 @@ void WritePrefsToRegistry(void) {
         0,
         REG_DWORD,
         reinterpret_cast<u8*>(&gConfig.showRoute),
-        4
+        REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
         hKey,
@@ -1356,7 +1372,7 @@ void WritePrefsToRegistry(void) {
         0,
         REG_DWORD,
         reinterpret_cast<u8*>(&gConfig.blackoutComputer),
-        4
+        REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
         hKey,
@@ -1364,7 +1380,7 @@ void WritePrefsToRegistry(void) {
         0,
         REG_DWORD,
         reinterpret_cast<u8*>(&gConfig.musicSource),
-        4
+        REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
         hKey,
@@ -1372,7 +1388,7 @@ void WritePrefsToRegistry(void) {
         0,
         REG_DWORD,
         reinterpret_cast<u8*>(&gConfig.useOpera),
-        4
+        REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
         hKey,
@@ -1380,7 +1396,7 @@ void WritePrefsToRegistry(void) {
         0,
         REG_DWORD,
         reinterpret_cast<u8*>(&gConfig.comPort[IDX(CONFIG_CONNECTION_DIRECT)]),
-        4
+        REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
         hKey,
@@ -1388,7 +1404,7 @@ void WritePrefsToRegistry(void) {
         0,
         REG_DWORD,
         reinterpret_cast<u8*>(&gConfig.baudRate[IDX(CONFIG_CONNECTION_DIRECT)]),
-        4
+        REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
         hKey,
@@ -1396,7 +1412,7 @@ void WritePrefsToRegistry(void) {
         0,
         REG_DWORD,
         reinterpret_cast<u8*>(&gConfig.comPort[IDX(CONFIG_CONNECTION_MODEM)]),
-        4
+        REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
         hKey,
@@ -1404,7 +1420,7 @@ void WritePrefsToRegistry(void) {
         0,
         REG_DWORD,
         reinterpret_cast<u8*>(&gConfig.baudRate[IDX(CONFIG_CONNECTION_MODEM)]),
-        4
+        REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
         hKey,
@@ -1436,7 +1452,7 @@ void WritePrefsToRegistry(void) {
         0,
         REG_DWORD,
         reinterpret_cast<u8*>(&gConfig.autosave),
-        4
+        REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
         hKey,
@@ -1444,7 +1460,7 @@ void WritePrefsToRegistry(void) {
         0,
         REG_DWORD,
         reinterpret_cast<u8*>(&gConfig.slowVideo),
-        4
+        REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
         hKey,
@@ -1452,7 +1468,7 @@ void WritePrefsToRegistry(void) {
         0,
         REG_DWORD,
         reinterpret_cast<u8*>(&gConfig.showCombatGrid),
-        4
+        REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
         hKey,
@@ -1460,7 +1476,7 @@ void WritePrefsToRegistry(void) {
         0,
         REG_DWORD,
         reinterpret_cast<u8*>(&gConfig.showCombatMouseHex),
-        4
+        REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
         hKey,
@@ -1468,7 +1484,7 @@ void WritePrefsToRegistry(void) {
         0,
         REG_DWORD,
         reinterpret_cast<u8*>(&gConfig.combatShadeLevel),
-        4
+        REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
         hKey,
@@ -1476,7 +1492,7 @@ void WritePrefsToRegistry(void) {
         0,
         REG_DWORD,
         reinterpret_cast<u8*>(&gConfig.combatArmyInfoLevel),
-        4
+        REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
         hKey,
@@ -1484,7 +1500,7 @@ void WritePrefsToRegistry(void) {
         0,
         REG_DWORD,
         reinterpret_cast<u8*>(&gConfig.evilInterfaceUsage),
-        4
+        REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
         hKey,
@@ -1492,7 +1508,7 @@ void WritePrefsToRegistry(void) {
         0,
         REG_DWORD,
         reinterpret_cast<u8*>(&gConfig.quickCombatLevel),
-        4
+        REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
         hKey,
@@ -1500,7 +1516,7 @@ void WritePrefsToRegistry(void) {
         0,
         REG_DWORD,
         reinterpret_cast<u8*>(&gConfig.combatSpeed),
-        4
+        REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
         hKey,
@@ -1508,7 +1524,7 @@ void WritePrefsToRegistry(void) {
         0,
         REG_DWORD,
         reinterpret_cast<u8*>(&gConfig.autoCombatUseSpells),
-        4
+        REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
         hKey,
@@ -1516,7 +1532,7 @@ void WritePrefsToRegistry(void) {
         0,
         REG_DWORD,
         reinterpret_cast<u8*>(&gConfig.firstMapOffset),
-        4
+        REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
         hKey,
@@ -1524,7 +1540,7 @@ void WritePrefsToRegistry(void) {
         0,
         REG_DWORD,
         reinterpret_cast<u8*>(&gConfig.currentMapOffset),
-        4
+        REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
         hKey,
@@ -1532,7 +1548,7 @@ void WritePrefsToRegistry(void) {
         0,
         REG_DWORD,
         reinterpret_cast<u8*>(&gConfig.showObjectBoxes),
-        4
+        REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
         hKey,
@@ -1540,7 +1556,7 @@ void WritePrefsToRegistry(void) {
         0,
         REG_DWORD,
         reinterpret_cast<u8*>(&gConfig.editorScreenAnimation),
-        4
+        REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
         hKey,
@@ -1548,7 +1564,7 @@ void WritePrefsToRegistry(void) {
         0,
         REG_DWORD,
         reinterpret_cast<u8*>(&gConfig.editorPaletteCycling),
-        4
+        REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
         hKey,
@@ -1556,7 +1572,7 @@ void WritePrefsToRegistry(void) {
         0,
         REG_DWORD,
         reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].showMenu),
-        4
+        REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
         hKey,
@@ -1564,7 +1580,7 @@ void WritePrefsToRegistry(void) {
         0,
         REG_DWORD,
         reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].x),
-        4
+        REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
         hKey,
@@ -1572,7 +1588,7 @@ void WritePrefsToRegistry(void) {
         0,
         REG_DWORD,
         reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].y),
-        4
+        REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
         hKey,
@@ -1580,7 +1596,7 @@ void WritePrefsToRegistry(void) {
         0,
         REG_DWORD,
         reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].width),
-        4
+        REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
         hKey,
@@ -1588,7 +1604,7 @@ void WritePrefsToRegistry(void) {
         0,
         REG_DWORD,
         reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].height),
-        4
+        REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
         hKey,
@@ -1596,7 +1612,7 @@ void WritePrefsToRegistry(void) {
         0,
         REG_DWORD,
         reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].fullScreen),
-        4
+        REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
         hKey,
@@ -1604,7 +1620,7 @@ void WritePrefsToRegistry(void) {
         0,
         REG_DWORD,
         reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].colorMouseCursor),
-        4
+        REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
         hKey,
@@ -1612,7 +1628,7 @@ void WritePrefsToRegistry(void) {
         0,
         REG_DWORD,
         reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].showMenu),
-        4
+        REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
         hKey,
@@ -1620,7 +1636,7 @@ void WritePrefsToRegistry(void) {
         0,
         REG_DWORD,
         reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].x),
-        4
+        REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
         hKey,
@@ -1628,7 +1644,7 @@ void WritePrefsToRegistry(void) {
         0,
         REG_DWORD,
         reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].y),
-        4
+        REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
         hKey,
@@ -1636,7 +1652,7 @@ void WritePrefsToRegistry(void) {
         0,
         REG_DWORD,
         reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].width),
-        4
+        REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
         hKey,
@@ -1644,7 +1660,7 @@ void WritePrefsToRegistry(void) {
         0,
         REG_DWORD,
         reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].height),
-        4
+        REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
         hKey,
@@ -1652,7 +1668,7 @@ void WritePrefsToRegistry(void) {
         0,
         REG_DWORD,
         reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].fullScreen),
-        4
+        REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
         hKey,
@@ -1660,7 +1676,7 @@ void WritePrefsToRegistry(void) {
         0,
         REG_DWORD,
         reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].colorMouseCursor),
-        4
+        REGISTRY_DWORD_BYTES
     );
     RegCloseKey(hKey);
 }
