@@ -19,21 +19,22 @@
 #include <SOURCE/townManager.h>
 
 H2_ENUM_BEGIN(RecruitConstant)
-    RESOURCE_COUNT  = 6,
-    GOLD_RESOURCE   = 6,
-    SOURCE_EVENT    = -1,
-    SOURCE_TOWN     = 0x23,
-    WINDOW_X        = 0x8f,
-    WINDOW_Y        = 0x10,
-    QUICK_WINDOW_X  = 0xa0,
-    QUICK_WINDOW_Y  = 0x10,
-    NAME_SIZE       = 20,
-    LABEL_SIZE      = 40,
-    MANAGER_MASK    = 0x4000,
-    BROADCAST_FLAGS = 0x4008,
-    DRAW_DEPTH      = 0x7fff,
-    VIEW_ARMY_X     = 0x77,
-    VIEW_ARMY_Y     = 0x20
+    RESOURCE_COUNT   = 6,
+    GOLD_RESOURCE    = 6,
+    SOURCE_EVENT     = -1,
+    SOURCE_TOWN      = 0x23,
+    WINDOW_X         = 0x8f,
+    WINDOW_Y         = 0x10,
+    QUICK_WINDOW_X   = 0xa0,
+    QUICK_WINDOW_Y   = 0x10,
+    NAME_SIZE        = 20,
+    LABEL_SIZE       = 40,
+    BROADCAST_FLAGS  = 0x4008,
+    DRAW_DEPTH       = 0x7fff,
+    VIEW_ARMY_X      = 0x77,
+    VIEW_ARMY_Y      = 0x20,
+    NO_ROOM_DIALOG_X = 177,
+    NO_ROOM_DIALOG_Y = 100
 H2_ENUM_END(RecruitConstant)
 
 H2_ENUM_BEGIN(RecruitControl)
@@ -156,7 +157,7 @@ i32 recruitUnit::Open(i32 priority) {
             MESSAGE_WIDGET,
             WIDGET_COMMAND_CLEAR_FLAGS,
             IDX(CONFIRM_CONTROL),
-            2
+            WIDGET_FLAG_ENABLED
         );
         gpWindowManager->BroadcastMessage(
             MESSAGE_WIDGET,
@@ -182,8 +183,8 @@ void recruitUnit::Close(void) {
         NormalDialog(
             "There is no room in the garrison for this army.",
             NORMAL_DIALOG_INFO,
-            177,
-            100,
+            NO_ROOM_DIALOG_X,
+            NO_ROOM_DIALOG_Y,
             NORMAL_DIALOG_NO_RESOURCE,
             0,
             NORMAL_DIALOG_NO_RESOURCE,
@@ -334,10 +335,10 @@ i32 recruitUnit::Main(struct tag_message& message) {
         if (close == 1) {
             message.type = MESSAGE_EXECUTIVE;
             message.payload.executive.command = EXECUTIVE_COMMAND_RETURN_RESULT;
-            return 2;
+            return WIDGET_DISPATCH_FORWARD;
         }
     }
-    return 1;
+    return WIDGET_DISPATCH_CONSUME;
 }
 
 VA(0x0048bd0b, 0xdf)
