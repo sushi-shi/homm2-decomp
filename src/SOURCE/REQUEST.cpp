@@ -10,6 +10,7 @@
 #include <BASE/iconWidget.h>
 #include <BASE/inputManager.h>
 #include <BASE/mouseManager.h>
+#include <BASE/widgetKind.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/fileRequester.h>
@@ -52,6 +53,27 @@ H2_ENUM_CLASS_BEGIN(RequesterIconFrame)
     LOSS_FRAME_BASE         = 0x24
 H2_ENUM_CLASS_END(RequesterIconFrame)
 
+H2_ENUM_BEGIN(FileRequesterPrivateConstant)
+    LEGACY_MAP_BASENAME_SIZE    = 8,
+    MAP_LIST_GUTTER_TRAVEL      = 123,
+    STANDARD_LIST_GUTTER_TRAVEL = 163,
+    GUTTER_MIN_Y                = 73,
+    MAP_LIST_VISIBLE_COUNT      = 9,
+    STANDARD_LIST_VISIBLE_COUNT = 11,
+    RESULT_PENDING              = -2,
+    SCROLL_KNOB_X               = 346,
+    SCROLL_KNOB_WIDTH           = 8,
+    SCROLL_KNOB_HEIGHT          = 17,
+    SCROLL_KNOB_FRAME           = 4,
+    CURRENT_MAP_NAME_CAPACITY   = 12,
+    CURRENT_MAP_NAME_CLEAR_SIZE = LEGACY_MAP_BASENAME_SIZE + 1,
+    FILENAME_ENTRY_LIMIT        = 201,
+    FILTER_FRAME_STEP           = 2,
+    FILTER_FRAME_BASE           = 9,
+    SELECTED_FILL_COLOR         = 2,
+    SCROLL_CENTER_DIVISOR       = 2
+H2_ENUM_END(FileRequesterPrivateConstant)
+
 VA(0x0048c920, 0x80)
 i32 GetMapHeader(char* filename, struct SMapHeader* header) {
     sprintf(gText, "%s%s", gcMapPath, filename);
@@ -73,11 +95,11 @@ VA(0x0048c9bb, 0xbb)
 i32 ShowThisMapGame(char* filename) {
     return 1;
 
-    char mapName[300];
+    char mapName[FILE_REQUESTER_PATH_SIZE];
     i32 ix;
     strcpy(mapName, filename);
-    mapName[8] = 0;
-    for (ix = 0; ix < 8; ++ix) {
+    mapName[LEGACY_MAP_BASENAME_SIZE] = 0;
+    for (ix = 0; ix < LEGACY_MAP_BASENAME_SIZE; ++ix) {
         if (mapName[ix] == '.') {
             mapName[ix] = 0;
         }
@@ -247,19 +269,19 @@ fileRequester::fileRequester(
     m_mode = mode;
     strcpy(m_defaultExtension, defaultExtension);
     if (mode == FILE_REQUESTER_MAP_GAME || mode == FILE_REQUESTER_MAP) {
-        fGutterTravelLength = 123.0f;
-        fGutterMinY = 73.0f;
-        iMaxListSize = 9;
+        fGutterTravelLength = MAP_LIST_GUTTER_TRAVEL;
+        fGutterMinY = GUTTER_MIN_Y;
+        iMaxListSize = MAP_LIST_VISIBLE_COUNT;
     } else {
-        fGutterTravelLength = 163.0f;
-        fGutterMinY = 73.0f;
-        iMaxListSize = 11;
+        fGutterTravelLength = STANDARD_LIST_GUTTER_TRAVEL;
+        fGutterMinY = GUTTER_MIN_Y;
+        iMaxListSize = STANDARD_LIST_VISIBLE_COUNT;
     }
     if (!MapExistsForFilter(giMapSizeFilter)) {
         giMapSizeFilter = FILE_REQUESTER_MAP_SIZE_ALL;
     }
     InitializeFiles(m_directory, m_filePattern, 0);
-    m_result = -2;
+    m_result = RESULT_PENDING;
 }
 
 VA(0x0048d3c0, 0x63)
@@ -276,7 +298,7 @@ void fileRequester::SetupFiles(void) {
     CleanUpData();
     m_fileCount = 0;
     m_topIndex = 0;
-    m_result = -2;
+    m_result = RESULT_PENDING;
     m_selectedIndex = FILE_REQUESTER_SELECTION_NONE;
     InitializeFiles(m_directory, m_filePattern, 0);
 }
@@ -328,8 +350,18 @@ i32 fileRequester::Open(i32 id) {
         MemError();
     }
 
-    m_scrollKnob =
-        new iconWidget(346, static_cast<i16>(fGutterMinY), 8, 17, "scrollcn.icn", 4, 0, 14, 16, 1);
+    m_scrollKnob = new iconWidget(
+        SCROLL_KNOB_X,
+        static_cast<i16>(fGutterMinY),
+        SCROLL_KNOB_WIDTH,
+        SCROLL_KNOB_HEIGHT,
+        "scrollcn.icn",
+        SCROLL_KNOB_FRAME,
+        0,
+        FILE_REQUESTER_SCROLL_KNOB,
+        WIDGET_KIND_ICON_DIRECT,
+        1
+    );
     if (m_scrollKnob == NULL) {
         MemError();
     }
@@ -362,10 +394,11 @@ i32 fileRequester::Open(i32 id) {
     } else {
         okEnabled3 = 0;
         if (m_mode == FILE_REQUESTER_MAP_GAME) {
-            char mapName[12];
+            char mapName[CURRENT_MAP_NAME_CAPACITY];
             fileIndex = 0;
-            memset(mapName, 0, 9);
-            while (fileIndex < 8 && gMapName[fileIndex] != 0 && gMapName[fileIndex] != '.') {
+            memset(mapName, 0, CURRENT_MAP_NAME_CLEAR_SIZE);
+            while (fileIndex < LEGACY_MAP_BASENAME_SIZE && gMapName[fileIndex] != 0
+                   && gMapName[fileIndex] != '.') {
                 mapName[fileIndex] = gMapName[fileIndex];
                 ++fileIndex;
             }
@@ -385,7 +418,7 @@ i32 fileRequester::Open(i32 id) {
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_SET_MAX_LENGTH;
     message.payload.widget.id = FILE_REQUESTER_FILENAME_ENTRY;
-    message.payload.widget.data.value = 201;
+    message.payload.widget.data.value = FILENAME_ENTRY_LIMIT;
     m_window->BroadcastMessage(message);
     Update(0);
     if (m_selectedIndex != FILE_REQUESTER_SELECTION_NONE) {
@@ -418,7 +451,7 @@ void fileRequester::SetOK(i32 enabled) {
     }
     message.payload.widget.id = FILE_REQUESTER_OK;
     if (m_active) {
-        message.payload.widget.data.value = 8;
+        message.payload.widget.data.value = WIDGET_FLAG_DIMMED;
     } else {
         message.payload.widget.data.value = WIDGET_FLAG_GRAYED;
     }
@@ -428,7 +461,7 @@ void fileRequester::SetOK(i32 enabled) {
     } else {
         message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
     }
-    message.payload.widget.data.value = 2;
+    message.payload.widget.data.value = WIDGET_FLAG_ENABLED;
     m_window->BroadcastMessage(message);
 }
 
@@ -918,7 +951,7 @@ void fileRequester::DoKnob(void) {
         Process1WindowsMessage();
         dragMessage = gpInputManager->GetEvent();
     }
-    m_scrollKnob->m_flags &= ~1;
+    m_scrollKnob->m_flags &= ~WIDGET_FLAG_SELECTED;
     Update(1);
 }
 
@@ -937,7 +970,8 @@ void fileRequester::Update(i32 drawWindow) {
         for (i = 0; i < IDX(FILE_REQUESTER_MAP_SIZE_COUNT); ++i) {
             broadcastMessage.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
             broadcastMessage.payload.widget.id = FILE_REQUESTER_FILTER_SMALL + i;
-            broadcastMessage.payload.widget.data.value = (IDX(giMapSizeFilter) == i) + i * 2 + 9;
+            broadcastMessage.payload.widget.data.value =
+                (IDX(giMapSizeFilter) == i) + i * FILTER_FRAME_STEP + FILTER_FRAME_BASE;
             m_window->BroadcastMessage(broadcastMessage);
         }
         if (m_selectedIndex == FILE_REQUESTER_SELECTION_NONE && m_fileCount > 0) {
@@ -991,7 +1025,7 @@ void fileRequester::Update(i32 drawWindow) {
     for (i = 0; iMaxListSize > i; ++i) {
         if (m_topIndex + i >= m_fileCount) {
             broadcastMessage.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-            broadcastMessage.payload.widget.data.value = 4;
+            broadcastMessage.payload.widget.data.value = WIDGET_FLAG_DRAW;
             broadcastMessage.payload.widget.id = i + FILE_REQUESTER_LIST_TEXT_FIRST;
             m_window->BroadcastMessage(broadcastMessage);
             if (m_mode == FILE_REQUESTER_MAP || m_mode == FILE_REQUESTER_MAP_GAME) {
@@ -1007,7 +1041,7 @@ void fileRequester::Update(i32 drawWindow) {
         } else {
             broadcastMessage.payload.widget.id = i + FILE_REQUESTER_LIST_TEXT_FIRST;
             broadcastMessage.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-            broadcastMessage.payload.widget.data.value = 4;
+            broadcastMessage.payload.widget.data.value = WIDGET_FLAG_DRAW;
             m_window->BroadcastMessage(broadcastMessage);
 
             if (m_mode == FILE_REQUESTER_MAP || m_mode == FILE_REQUESTER_MAP_GAME) {
@@ -1063,7 +1097,7 @@ void fileRequester::Update(i32 drawWindow) {
         broadcastMessage.payload.widget.id = i + FILE_REQUESTER_LIST_TEXT_FIRST;
         broadcastMessage.payload.widget.command = WIDGET_COMMAND_SET_FILL_COLOR;
         if (m_topIndex + i == m_selectedIndex) {
-            broadcastMessage.payload.widget.data.value = 2;
+            broadcastMessage.payload.widget.data.value = SELECTED_FILL_COLOR;
         } else {
             broadcastMessage.payload.widget.data.value = 1;
         }
@@ -1072,7 +1106,7 @@ void fileRequester::Update(i32 drawWindow) {
 
     broadcastMessage.payload.widget.id = FILE_REQUESTER_FILENAME_ENTRY;
     broadcastMessage.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-    broadcastMessage.payload.widget.data.value = 2;
+    broadcastMessage.payload.widget.data.value = WIDGET_FLAG_ENABLED;
     m_window->BroadcastMessage(broadcastMessage);
     if (m_selectedIndex != FILE_REQUESTER_SELECTION_NONE) {
         broadcastMessage.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
@@ -1087,12 +1121,13 @@ void fileRequester::Update(i32 drawWindow) {
     if (m_mode == FILE_REQUESTER_MAP_GAME || m_mode == FILE_REQUESTER_LOAD_GAME
         || m_mode == FILE_REQUESTER_MAP) {
         broadcastMessage.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-        broadcastMessage.payload.widget.data.value = 2;
+        broadcastMessage.payload.widget.data.value = WIDGET_FLAG_ENABLED;
         m_window->BroadcastMessage(broadcastMessage);
     }
 
     if (m_fileCount <= iMaxListSize) {
-        m_scrollKnob->m_y = static_cast<i16>(fGutterTravelLength / 2.0f + fGutterMinY);
+        m_scrollKnob->m_y =
+            static_cast<i16>(fGutterTravelLength / SCROLL_CENTER_DIVISOR + fGutterMinY);
     } else {
         gutterStepCount = fGutterTravelLength / (m_fileCount - iMaxListSize);
         m_scrollKnob->m_y = static_cast<i16>(m_topIndex * gutterStepCount + fGutterMinY);
