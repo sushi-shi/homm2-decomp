@@ -28,7 +28,10 @@ H2_ENUM_BEGIN(CombatLayoutConstant)
     SPELL_AI_WALL_DESTROYED             = 6,
     SPELL_AI_EARTHQUAKE_NO_DAMAGE_SCORE = 29999,
     SPELL_AI_EARTHQUAKE_WALL_SCORE      = 100,
-    SPELL_AI_CAST_ACTION                = 1
+    SPELL_AI_CAST_ACTION                = 1,
+    SPELL_AI_HEX_ROW_END_OFFSET         = 2,
+    SPELL_AI_HEX_ROW_SKIP               = 3,
+    SPELL_AI_MIRROR_VALUE_DIVISOR       = 2
 H2_ENUM_END(CombatLayoutConstant)
 
 VA(0x004867c0, 0x279)
@@ -808,7 +811,10 @@ i32 combatManager::EffectSpellCreateCreature(i32 hex, SpellType spell) {
         else
             mirrorMod = COMBAT_SPELL_AI_MIRROR_DEFAULT_MODIFIER;
         creatureEffect = static_cast<i32>(creatureEffect * mirrorMod);
-        if (gMonsterDatabase[IDX(creatureType)].flags.bytes.abilities & 4)
+        if (HAS(
+                gMonsterDatabase[IDX(creatureType)].flags.abilityFlags,
+                MONSTER_ABILITY_FLAG_SHOOTER
+            ))
             creatureEffect =
                 static_cast<i32>(creatureEffect * COMBAT_SPELL_AI_MIRROR_SHOOTER_MODIFIER);
     }
@@ -978,8 +984,8 @@ void combatManager::ClearEffects(void) {
 
 VA(0x0048866d, 0x40)
 void combatManager::NextPos(i32* hex) {
-    if ((*hex + 2) % 13 == 0)
-        *hex += 3;
+    if ((*hex + SPELL_AI_HEX_ROW_END_OFFSET) % COMBAT_GRID_ROW_LENGTH == 0)
+        *hex += SPELL_AI_HEX_ROW_SKIP;
     else
         (*hex)++;
 }
@@ -1148,14 +1154,14 @@ void combatManager::EffectSpellResurrect(i32* effect, i32 hex, SpellType spell) 
 
 VA(0x00488d58, 0xcc9)
 void combatManager::EffectSpellDamage(i32* effect, SpellType spell, i32 targetHex) {
-    i32 fightValueKilledAI[2];
+    i32 fightValueKilledAI[COMBAT_SIDE_COUNT];
     i32 creaturesKilledResult;
     i32 remainderResult;
     i32 damagePerPowerResult;
-    i32 stacksKilledCandidate[2];
+    i32 stacksKilledCandidate[COMBAT_SIDE_COUNT];
     i32 doneWork;
     army* targetCreature;
-    i32 killedCombatValue[2];
+    i32 killedCombatValue[COMBAT_SIDE_COUNT];
     i32 side;
     i32 damage;
     i32 currentHex;
@@ -1250,7 +1256,7 @@ void combatManager::EffectSpellDamage(i32* effect, SpellType spell, i32 targetHe
                     currentHex = GetNextChainLightningTarget(targetCreature, 0);
                 }
                 step++;
-                if (step > 4 || currentHex == -1)
+                if (step > CHAIN_LIGHTNING_MAX_TARGETS || currentHex == COMBAT_HEX_EMPTY)
                     doneWork = 1;
                 break;
             case SPELL_TELEPORT:
@@ -1295,34 +1301,56 @@ void combatManager::EffectSpellDamage(i32* effect, SpellType spell, i32 targetHe
             case SPELL_FIREBALL:
             case SPELL_FIREBLAST:
             case SPELL_METEOR_SHOWER:
-                if (((step < 7) || spell == SPELL_FIREBLAST) && step < 19) {
+                if (((step < SPELL_FIREBLAST_SECOND_RING_FIRST) || spell == SPELL_FIREBLAST)
+                    && step < SPELL_FIREBALL_AFFECTED_HEX_COUNT) {
                     if (step == 0)
                         currentHex = targetHex;
-                    if (step > 0 && step < 7)
+                    if (step > 0 && step < SPELL_FIREBLAST_SECOND_RING_FIRST)
                         currentHex = GetAdjacentCellIndexNoArmy(targetHex, step - 1);
-                    if (step > 6 && step < 13) {
-                        currentHex = GetAdjacentCellIndexNoArmy(targetHex, step - 7);
-                        currentHex = GetAdjacentCellIndexNoArmy(currentHex, step - 7);
+                    if (step >= SPELL_FIREBLAST_SECOND_RING_FIRST
+                        && step < SPELL_FIREBLAST_AXIAL_FIRST) {
+                        currentHex = GetAdjacentCellIndexNoArmy(
+                            targetHex, step - SPELL_FIREBLAST_SECOND_RING_FIRST
+                        );
+                        currentHex = GetAdjacentCellIndexNoArmy(
+                            currentHex, step - SPELL_FIREBLAST_SECOND_RING_FIRST
+                        );
                     }
-                    if (step == 13)
-                        currentHex = targetHex - 26;
-                    if (step == 14)
-                        currentHex = targetHex + 26;
-                    if (step == 15) {
-                        currentHex = GetAdjacentCellIndexNoArmy(targetHex, 1);
-                        currentHex = GetAdjacentCellIndexNoArmy(currentHex, 0);
+                    if (step == SPELL_FIREBLAST_AXIAL_FIRST)
+                        currentHex = targetHex - SPELL_FIREBLAST_HEX_ROW_STRIDE;
+                    if (step == SPELL_FIREBLAST_AXIAL_SECOND)
+                        currentHex = targetHex + SPELL_FIREBLAST_HEX_ROW_STRIDE;
+                    if (step == SPELL_FIREBLAST_CORNER_FIRST) {
+                        currentHex = GetAdjacentCellIndexNoArmy(
+                            targetHex, COMBAT_DIRECTION_NORTHEAST
+                        );
+                        currentHex = GetAdjacentCellIndexNoArmy(
+                            currentHex, COMBAT_DIRECTION_NORTHWEST
+                        );
                     }
-                    if (step == 16) {
-                        currentHex = GetAdjacentCellIndexNoArmy(targetHex, 1);
-                        currentHex = GetAdjacentCellIndexNoArmy(currentHex, 2);
+                    if (step == SPELL_FIREBLAST_CORNER_SECOND) {
+                        currentHex = GetAdjacentCellIndexNoArmy(
+                            targetHex, COMBAT_DIRECTION_NORTHEAST
+                        );
+                        currentHex = GetAdjacentCellIndexNoArmy(
+                            currentHex, COMBAT_DIRECTION_EAST
+                        );
                     }
-                    if (step == 17) {
-                        currentHex = GetAdjacentCellIndexNoArmy(targetHex, 4);
-                        currentHex = GetAdjacentCellIndexNoArmy(currentHex, 5);
+                    if (step == SPELL_FIREBLAST_CORNER_THIRD) {
+                        currentHex = GetAdjacentCellIndexNoArmy(
+                            targetHex, COMBAT_DIRECTION_SOUTHWEST
+                        );
+                        currentHex = GetAdjacentCellIndexNoArmy(
+                            currentHex, COMBAT_DIRECTION_WEST
+                        );
                     }
-                    if (step == 18) {
-                        currentHex = GetAdjacentCellIndexNoArmy(targetHex, 4);
-                        currentHex = GetAdjacentCellIndexNoArmy(currentHex, 3);
+                    if (step == SPELL_FIREBLAST_CORNER_FOURTH) {
+                        currentHex = GetAdjacentCellIndexNoArmy(
+                            targetHex, COMBAT_DIRECTION_SOUTHWEST
+                        );
+                        currentHex = GetAdjacentCellIndexNoArmy(
+                            currentHex, COMBAT_DIRECTION_SOUTHEAST
+                        );
                     }
                     step++;
                 } else {
@@ -1430,8 +1458,10 @@ void combatManager::EffectSpellDamage(i32* effect, SpellType spell, i32 targetHe
                         * targetCreature->m_monster.hitPoints * creaturesKilledResult
                         / targetCreature->m_monster.hitPoints;
                     if (HAS(targetCreature->m_monster.flags.all, MONSTER_FLAGS_MIRROR_IMAGE)) {
-                        killedCombatValue[m_hexCells[currentHex].m_occupantSide] /= 2;
-                        fightValueKilledAI[m_hexCells[currentHex].m_occupantSide] /= 2;
+                        killedCombatValue[m_hexCells[currentHex].m_occupantSide] /=
+                            SPELL_AI_MIRROR_VALUE_DIVISOR;
+                        fightValueKilledAI[m_hexCells[currentHex].m_occupantSide] /=
+                            SPELL_AI_MIRROR_VALUE_DIVISOR;
                     }
 
                     if (spell == SPELL_DISRUPTING_RAY) {
@@ -1466,8 +1496,8 @@ void combatManager::EffectSpellDamage(i32* effect, SpellType spell, i32 targetHe
         *effect = static_cast<i32>(*effect * COMBAT_SPELL_AI_CASTLE_EFFECT_MODIFIER);
 }
 
-DATA(0x004f80b8) float gfDurationMods[12] =
+DATA(0x004f80b8) float gfDurationMods[COMBAT_DURATION_MOD_COUNT] =
     {0.0f, 0.33f, 0.55f, 0.72f, 0.85f, 0.95f, 1.03f, 1.08f, 1.12f, 1.15f, 1.18f, 0.0f};
-DATA(0x004f80e8) float gfCancelDurationMods[11] =
+DATA(0x004f80e8) float gfCancelDurationMods[COMBAT_CANCEL_DURATION_MOD_COUNT] =
     {0.0f, 0.5f, 0.65f, 0.78f, 0.85f, 0.95f, 1.03f, 1.08f, 1.12f, 1.15f, 1.18f};
 DATA(0x005284b4) i32 giCurrSpellGroup;
