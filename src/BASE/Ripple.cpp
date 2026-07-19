@@ -9,29 +9,40 @@
 #include <SOURCE/kbwin.h>
 #include <SOURCE/NOOPT.h>
 #include <string.h>
+
+H2_ENUM_BEGIN(RippleConstant)
+    SCREEN_WIDTH   = 640,
+    PROFILE_RADIUS = 25,
+    PROFILE_SIZE   = PROFILE_RADIUS * 2 + 1,
+    REDRAW_RADIUS  = 22,
+    REDRAW_WIDTH   = 41,
+    SWEEP_STEP     = 4,
+    SWEEP_END      = SCREEN_WIDTH + PROFILE_RADIUS
+H2_ENUM_END(RippleConstant)
+
 VA(0x004d26a0, 0x23f)
 void DoRipple(bitmap* source, bitmap* destination, i32 height, i32 strength) {
     i32 profileIndex;
-    const i32 screenWidth = 640;
-    const i32 profileRadius = 25;
-    const i32 redrawRadius = 22;
-    const i32 redrawWidth = 41;
 
     gpMouseManager->HideColorPointer();
 
-    u8 profile[51] = {0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 4, 5, 6, 6, 6, 7, 7, 7,
-                      7, 7, 6, 6, 6, 5, 4, 3, 3, 2, 2, 2, 2, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0};
-    u8 previous[screenWidth];
+    // Retail stack-local displacement samples are data, not symbolic domains.
+    // NOLINTBEGIN(readability-magic-numbers)
+    u8 profile[PROFILE_SIZE] = {0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 4, 5, 6, 6, 6, 7, 7, 7,
+                                7, 7, 6, 6, 6, 5, 4, 3, 3, 2, 2, 2, 2, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0};
+    // NOLINTEND(readability-magic-numbers)
+    u8 previous[SCREEN_WIDTH];
     memset(previous, 0, sizeof(previous));
-    i32 position = -profileRadius;
+    i32 position = -PROFILE_RADIUS;
 
     do {
         PollSound();
-        i32 deadline = KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * 9.0f;
+        // Keep the retail anonymous constant-pool relocation.
+        i32 deadline = KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * 9.0f; // NOLINT(readability-magic-numbers)
 
-        for (profileIndex = 0; profileIndex <= 50; ++profileIndex) {
-            i32 column = profileIndex + position - profileRadius;
-            if (column < 0 || column >= screenWidth)
+        for (profileIndex = 0; profileIndex <= PROFILE_SIZE - 1; ++profileIndex) {
+            i32 column = profileIndex + position - PROFILE_RADIUS;
+            if (column < 0 || column >= SCREEN_WIDTH)
                 continue;
 
             if (previous[column] == profile[profileIndex])
@@ -39,35 +50,35 @@ void DoRipple(bitmap* source, bitmap* destination, i32 height, i32 strength) {
 
             u8* destinationPixel = destination->m_pixels + column;
             i32 sourceRow = profile[profileIndex] * strength;
-            u8* sourcePixel = source->m_pixels + sourceRow * screenWidth + column;
+            u8* sourcePixel = source->m_pixels + sourceRow * SCREEN_WIDTH + column;
 
             if (height > sourceRow) {
                 do {
                     *destinationPixel = *sourcePixel;
                     if (sourceRow - height == -1)
                         break;
-                    destinationPixel += screenWidth;
-                    sourcePixel += screenWidth;
+                    destinationPixel += SCREEN_WIDTH;
+                    sourcePixel += SCREEN_WIDTH;
                     ++sourceRow;
                 } while (height > sourceRow);
             }
             previous[column] = profile[profileIndex];
         }
 
-        i32 redrawX = position - redrawRadius;
-        i32 width = redrawWidth;
+        i32 redrawX = position - REDRAW_RADIUS;
+        i32 width = REDRAW_WIDTH;
         if (redrawX < 0) {
             width += redrawX;
             redrawX = 0;
         }
-        if (redrawX + width > screenWidth)
-            width = screenWidth - redrawX;
+        if (redrawX + width > SCREEN_WIDTH)
+            width = SCREEN_WIDTH - redrawX;
         if (width >= 1) {
             BlitBitmapToScreen(gpWindowManager->m_screen, redrawX, 0, width, height, redrawX, 0);
             DelayTil(&deadline);
         }
-        position += 4;
-    } while (position < 665);
+        position += SWEEP_STEP;
+    } while (position < SWEEP_END);
 
     gpMouseManager->ShowColorPointer();
 }
