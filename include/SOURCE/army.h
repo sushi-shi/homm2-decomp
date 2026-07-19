@@ -25,7 +25,8 @@ H2_ENUM_BEGIN(ArmyFacing)
 H2_ENUM_END(ArmyFacing)
 
 H2_ENUM_BEGIN(ArmyHexConstant)
-    ARMY_HEX_INVALID = -1
+    ARMY_ATTACK_HEX_COUNT = 2,
+    ARMY_HEX_INVALID      = -1
 H2_ENUM_END(ArmyHexConstant)
 
 #pragma pack(push, 1)
