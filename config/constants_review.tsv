@@ -22,7 +22,7 @@ include/BASE/MIDIWrap.h	reviewed	Only the proven MIDIWrap SIZE annotation is num
 include/BASE/MIDI_TYPES.h	reviewed	Shared text-record field extents are named and aligned; the remaining literal is packed-layout SIZE evidence.
 include/BASE/MISC_TYPES.h	reviewed	Text-slot extents derive from their literal payloads and remaining SIZE values are packed-layout evidence; the registry key and source path are shared textual identities rather than numeric constant fallbacks.
 include/BASE/MOUSEMGR_TYPES.h	reviewed	Text-record extents derive from their literal payloads, including the empty default-cursor slot; remaining literals are packed-layout SIZE evidence and shared string identities.
-include/BASE/Misc.h	reviewed	Shared packed-record array extents are named and aligned; remaining numeric literals are proven packing and SIZE evidence, and allocation macros are function-like source-location wrappers rather than constant definitions.
+include/BASE/Misc.h	reviewed	Shared packed-record array extents and the LogInt unused-field sentinel are named and aligned; remaining numeric literals are proven packing and SIZE evidence, and allocation macros are function-like source-location wrappers rather than constant definitions.
 include/BASE/MiscGraphicsConstants.h	reviewed	Shared palette component, byte, and level extents are named for Misc, PALETTE, and KB consumers.
 include/BASE/Ripple.h	reviewed	The public ripple operation names every parameter and exposes no numeric policy or storage layout.
 include/BASE/SAMPLE_TYPES.h	reviewed	The source slots are symbolic; the sole literal is packed-layout SIZE evidence.
@@ -154,7 +154,7 @@ src/BASE/Iconf2b.cpp	reviewed	Serialized color/dim RLE commands, masks, flags, a
 src/BASE/Iconm2b.cpp	reviewed	Serialized monochrome RLE run masks are shared enums; remaining zeros and ones are run sentinels, clipping booleans, inclusive-bound arithmetic, or scanline steps. DATA and VA values are annotations.
 src/BASE/Iconmf2b.cpp	reviewed	Serialized monochrome RLE run masks are shared enums; remaining zeros and ones are run sentinels, clipping booleans, inclusive-bound arithmetic, or scanline steps. DATA and VA values are annotations.
 src/BASE/MOUSEMGR.cpp	reviewed	Shared cursor extents and axis names cover every table declaration and access; private constants name resource buffers and hotspot centering. Cursor sizes, offsets, and hotspot pairs remain retail data payloads, while allocation/assert operands preserve source-location evidence. The retail default horizontal hotspot deliberately derives from cursor height as emitted.
-src/BASE/Midi.cpp	reviewed	Private enums name the unused LogInt field value, filename capacity, volume calculation, and sequence status. Remaining numeric payloads are track-availability data, booleans, loop counts, and format indices.
+src/BASE/Midi.cpp	reviewed	Private enums name filename capacity, volume calculation, and sequence status, while LogInt uses its shared unused-field sentinel. Remaining numeric payloads are track-availability data, booleans, loop counts, and format indices.
 src/BASE/Misc.cpp	reviewed	Private enums name memory diagnostics, preferences, registry widths, hashes, file modes, palette extents, RNG seed and mixing, and data-entry geometry. The fade threshold table remains literal retail data payload; other zeros and ones are booleans, origins, or index steps, while allocation operands preserve source-location evidence.
 src/BASE/PALETTE.cpp	reviewed	Reference lifecycle and palette extents are named; allocation/free operands 8, 13, and 21 preserve retail source-line evidence, while zero is the empty resource id. Pointer state uses NULL.
 src/BASE/RESMGR.cpp	reviewed	A private aligned enum names file/status values, entry and row widths, open mode, translation count, sample volume, temporary-buffer width, and save-stack depth. Shared layout and Read13 values remain public, and source-line operands preserve retail allocation/assert evidence.
@@ -223,7 +223,7 @@ src/SOURCE/X_CAMPGN.cpp	pending
 src/SOURCE/X_GLOBAL.cpp	reviewed	The TU contains reviewed global data definitions only. Expansion text/name tables and alignment/resource-cost initializers are retail payload; the shrine cost row follows the canonical resource extent and its numeric entries remain data rather than policy constants.
 src/SOURCE/comwin.cpp	pending
 src/SOURCE/dpnetwin.cpp	pending
-src/SOURCE/kbwin.cpp	pending
+src/SOURCE/kbwin.cpp	reviewed	LogInt uses the shared unused-field sentinel; the timer polling threshold is private, menu resolution checks use the public width domain, and exported strings use their declared capacities.
 src/SOURCE/netwin.cpp	pending
 src/SOURCE/tradpost.cpp	pending
 src/SOURCE/wingraph.cpp	pending
