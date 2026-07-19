@@ -79,6 +79,7 @@ H2_ENUM_CLASS_END(MiscGraphicsFieldIndex)
 H2_ENUM_BEGIN(MiscCDDriveConstant)
     CD_FIRST_DRIVE_INDEX        = 2,
     CD_DRIVE_SLOT_COUNT         = 26,
+    CD_PATH_PREFIX_BYTES        = 2,
     CD_PATH_BUFFER_SIZE         = 100,
     CD_MCI_BUFFER_SIZE          = 256,
     CD_MCI_RESULT_LENGTH        = 0xFF,
@@ -116,13 +117,25 @@ H2_ENUM_CLASS_BEGIN(MiscCycleColorRange)
 H2_ENUM_CLASS_END(MiscCycleColorRange)
 
 H2_ENUM_BEGIN(MiscFadeConstant)
-    FADE_LEVEL_COUNT        = 0x40,
-    FADE_LEVEL_LAST         = 0x3f,
-    FADE_IN_FRAME_DELAY     = 0x14,
-    FADE_TO_INCREMENT_SHIFT = 2,
-    FADE_TO_START_LEVEL     = 0x30,
-    FADE_TO_FRAME_DELAY     = 0x32
+    FADE_LEVEL_COUNT              = 0x40,
+    FADE_LEVEL_LAST               = 0x3f,
+    FADE_CHANGE_THRESHOLD_COUNT   = 16,
+    FADE_FRAME_DELAY              = 0x14,
+    WINDOWED_FADE_INCREMENT_SCALE = 2,
+    FADE_TO_INCREMENT_SHIFT       = 2,
+    FADE_TO_START_LEVEL           = 0x30,
+    FADE_TO_FRAME_DELAY           = 0x32
 H2_ENUM_END(MiscFadeConstant)
+
+H2_ENUM_BEGIN(MiscPaletteComponent)
+    PALETTE_COMPONENT_COUNT     = 3,
+    PALETTE_RED_INDEX           = 0,
+    PALETTE_GREEN_INDEX         = 1,
+    PALETTE_BLUE_INDEX          = 2,
+    PALETTE_RED_OUTPUT_OFFSET   = -3,
+    PALETTE_GREEN_OUTPUT_OFFSET = -2,
+    PALETTE_BLUE_OUTPUT_OFFSET  = -1
+H2_ENUM_END(MiscPaletteComponent)
 
 H2_ENUM_BEGIN(MiscWindowConstant)
     MINIMUM_WINDOW_WIDTH   = 320,
@@ -148,8 +161,15 @@ H2_ENUM_BEGIN(SeededRandomConstant)
     RANDOM_MIX_MULTIPLIER      = 7,
     RANDOM_MIX_MASK            = 0xff0,
     RANDOM_MIX_SHIFT           = 4,
-    RANDOM_TOP_BIT             = 31
+    RANDOM_TOP_BIT             = 31,
+    RANDOM_HIGH_MIX_MULTIPLIER = 8
 H2_ENUM_END(SeededRandomConstant)
+
+H2_ENUM_BEGIN(FileIdHashConstant)
+    HASH_LEFT_SHIFT  = 5,
+    HASH_RIGHT_SHIFT = 25,
+    INDEX_NOT_FOUND  = 0xffff
+H2_ENUM_END(FileIdHashConstant)
 
 #undef HOMM2_MISC_INLINE_ICONENTRY
 #include <BASE/miscwin.h>
@@ -177,7 +197,8 @@ DATA(0x0051dce8) i32 iMemEntries = 0;
 DATA(0x0051dcec) MemEntry* gpMemEntry = NULL;
 DATA(0x0051dcf0) i32 giTotalMemAllocated = 0;
 DATA(0x0051dcf8) u8
-    giChangeThreshold[16] = {0, 1, 2, 3, 4, 6, 8, 10, 13, 16, 19, 22, 26, 31, 37, 46};
+    giChangeThreshold[FADE_CHANGE_THRESHOLD_COUNT] =
+        {0, 1, 2, 3, 4, 6, 8, 10, 13, 16, 19, 22, 26, 31, 37, 46};
 DATA(0x0051dd08) i32 iLastSeed = 0x08156a03;
 DATA(0x0051dd0c) static char gMemEntryTag[sizeof("IME")] = "IME";
 
@@ -582,8 +603,8 @@ u32l MAKEFILEID(char* text) {
         if (text[i] >= 'a' && text[i] <= 'z') {
             text[i] &= ~('a' - 'A');
         }
-        u32 shiftedHash = hash << 5;
-        hash >>= 25;
+        u32 shiftedHash = hash << HASH_LEFT_SHIFT;
+        hash >>= HASH_RIGHT_SHIFT;
         hash += shiftedHash;
         sum += text[i];
         hash += text[i] + sum;
@@ -611,7 +632,7 @@ i32 FindIndex(struct indexArray* entries, i32 low, i32 high, i32 key) {
     if (entries[high].key == key) {
         return entries[high].value;
     }
-    return 0xFFFF;
+    return INDEX_NOT_FOUND;
 }
 
 #include <BASE/MiscGraphicsConstants.h>
@@ -623,7 +644,7 @@ void FadeIn(i32 increment) {
         MemError();
     i32 done = 0;
     if (gConfig.gfx[giCurExe].fullScreen == 0)
-        increment *= 2;
+        increment *= WINDOWED_FADE_INCREMENT_SCALE;
     memset(fadePalette->m_data, 0, MISC_PALETTE_BYTE_COUNT);
     i32 level = 0;
     for (;;) {
@@ -634,7 +655,7 @@ void FadeIn(i32 increment) {
             }
             level = MISC_PALETTE_MAX_LEVEL;
         }
-        i32 delayUntil = KBTickCount() + FADE_IN_FRAME_DELAY;
+        i32 delayUntil = KBTickCount() + FADE_FRAME_DELAY;
         PollSound();
         i8* colors;
         if (level == MISC_PALETTE_MAX_LEVEL) {
@@ -662,7 +683,7 @@ void FadeOut(i32 increment) {
         MemError();
     i32 done = 0;
     if (gConfig.gfx[giCurExe].fullScreen == 0)
-        increment *= 2;
+        increment *= WINDOWED_FADE_INCREMENT_SCALE;
     memcpy(fadePalette->m_data, gpBufferPalette->m_data, MISC_PALETTE_BYTE_COUNT);
     i32 level = 0;
     for (;;) {
@@ -673,7 +694,7 @@ void FadeOut(i32 increment) {
             }
             level = FADE_LEVEL_LAST;
         }
-        i32 delayUntil = KBTickCount() + 20;
+        i32 delayUntil = KBTickCount() + FADE_FRAME_DELAY;
         PollSound();
         if (level == FADE_LEVEL_LAST)
             done = 1;
@@ -1734,7 +1755,7 @@ i32 SetupCDDrive(void) {
         file = _open(gText, _O_BINARY);
         if (file != -1) {
             _close(file);
-            sprintf(gText + 2, gMiscText.cd.stringFormat.text, gcAnimPath);
+            sprintf(gText + CD_PATH_PREFIX_BYTES, gMiscText.cd.stringFormat.text, gcAnimPath);
             strcpy(gcAnimPath, gText);
             return IDX(CD_DRIVE_READY);
         }
@@ -1805,7 +1826,11 @@ void BitmapToScreen(class bitmap* bmp) {
 VA(0x004c5e70, 0x3d)
 void SetPalette(i8* paletteData, i32 updateDisplay) {
     memcpy(gpBufferPalette->m_data, paletteData, MISC_PALETTE_BYTE_COUNT);
-    memcpy(gCyclePal, paletteData + IDX(CYCLE_RANGE_ONE_FIRST) * 3, sizeof(gCyclePal));
+    memcpy(
+        gCyclePal,
+        paletteData + IDX(CYCLE_RANGE_ONE_FIRST) * PALETTE_COMPONENT_COUNT,
+        sizeof(gCyclePal)
+    );
     if (updateDisplay != 0)
         UpdatePalette(gpBufferPalette->m_data);
 }
@@ -1998,14 +2023,18 @@ void LogInt(
 
 VA(0x004c63f0, 0x6c)
 void AiPrint(char* text) {
-    if (giDebugLevel >= 2) {
-        FillBitmapArea(gpWindowManager->m_screen, 0, STATUS_BAR_Y, 640, STATUS_BAR_HEIGHT, 0);
-        smallFont->DrawBoundedString(text, 0, STATUS_TEXT_Y, 640, STATUS_TEXT_HEIGHT, 1, 0);
+    if (giDebugLevel >= FILE_DEBUG_LEVEL) {
+        FillBitmapArea(
+            gpWindowManager->m_screen, 0, STATUS_BAR_Y, STATUS_BAR_WIDTH, STATUS_BAR_HEIGHT, 0
+        );
+        smallFont->DrawBoundedString(
+            text, 0, STATUS_TEXT_Y, STATUS_BAR_WIDTH, STATUS_TEXT_HEIGHT, 1, 0
+        );
         BlitBitmapToScreen(
             gpWindowManager->m_screen,
             0,
             STATUS_BAR_Y,
-            640,
+            STATUS_BAR_WIDTH,
             STATUS_BAR_HEIGHT,
             0,
             STATUS_BAR_Y
@@ -2016,14 +2045,18 @@ void AiPrint(char* text) {
 VA(0x004c6460, 0x7a)
 void AbsAiPrint(char* text) {
     i32 saved = giDebugLevel;
-    giDebugLevel = 9;
-    FillBitmapArea(gpWindowManager->m_screen, 0, STATUS_BAR_Y, 640, STATUS_BAR_HEIGHT, 0);
-    smallFont->DrawBoundedString(text, 0, STATUS_TEXT_Y, 640, STATUS_TEXT_HEIGHT, 1, 0);
+    giDebugLevel = FORCED_DEBUG_LEVEL;
+    FillBitmapArea(
+        gpWindowManager->m_screen, 0, STATUS_BAR_Y, STATUS_BAR_WIDTH, STATUS_BAR_HEIGHT, 0
+    );
+    smallFont->DrawBoundedString(
+        text, 0, STATUS_TEXT_Y, STATUS_BAR_WIDTH, STATUS_TEXT_HEIGHT, 1, 0
+    );
     BlitBitmapToScreen(
         gpWindowManager->m_screen,
         0,
         STATUS_BAR_Y,
-        640,
+        STATUS_BAR_WIDTH,
         STATUS_BAR_HEIGHT,
         0,
         STATUS_BAR_Y
@@ -2084,9 +2117,9 @@ void FadeToColorTable(u8* colorTable, i32 increment) {
         output += MISC_PALETTE_COMPONENT_BYTES;
         ++index;
         u8* sourceColor = reinterpret_cast<u8*>(paletteData) + paletteIndex;
-        output[-3] = sourceColor[0];
-        output[-2] = sourceColor[1];
-        output[-1] = sourceColor[2];
+        output[PALETTE_RED_OUTPUT_OFFSET] = sourceColor[PALETTE_RED_INDEX];
+        output[PALETTE_GREEN_OUTPUT_OFFSET] = sourceColor[PALETTE_GREEN_INDEX];
+        output[PALETTE_BLUE_OUTPUT_OFFSET] = sourceColor[PALETTE_BLUE_INDEX];
     } while (output < translatedPalette + sizeof(translatedPalette));
     i32 rows = BLIT_SCREEN_HEIGHT;
     FadeTo(reinterpret_cast<u8*>(paletteData), translatedPalette, increment);
@@ -2176,9 +2209,9 @@ i32l FileSize(char* filename) {
     if (file == NULL) {
         FileError(filename);
     }
-    fseek(file, 0, 2);
+    fseek(file, 0, SEEK_END);
     i32l size = ftell(file);
-    fseek(file, 0, 0);
+    fseek(file, 0, SEEK_SET);
     fclose(file);
     return size;
 }
@@ -2214,7 +2247,7 @@ i32 SRandom(i32 low, i32 high) {
     }
     mix += low;
     i32 range = high - low;
-    mix += high * 8;
+    mix += high * RANDOM_HIGH_MIX_MULTIPLIER;
     i32 rangedResult = low + result % (range + 1);
     iLastSeed = mix;
     return rangedResult;
