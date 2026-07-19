@@ -840,7 +840,7 @@ void game::Overview(void) {
     giOverviewReturnActionExtra = RETURN_NONE;
     message8.type = MESSAGE_WIDGET;
     gpAdvManager->TrimLoopingSounds(4);
-    gpWindowManager->FadeScreen(1, FADE_STEPS, NULL);
+    gpWindowManager->FadeScreen(FADE_OUT, FADE_STEPS, NULL);
     for (mine4 = 0; mine4 < TITLE_COUNT; mine4++) {
         textWidgetTitle[mine4] = NULL;
     }
@@ -918,7 +918,7 @@ void game::Overview(void) {
     overWin->BroadcastMessage(message8);
     SetupNewOverviewType(giOverviewType, 0);
     gpWindowManager->DoDialog(overWin, OverviewHandler, 1);
-    gpWindowManager->FadeScreen(1, FADE_STEPS, NULL);
+    gpWindowManager->FadeScreen(FADE_OUT, FADE_STEPS, NULL);
     delete overWin;
     overWin = NULL;
     H2_FREE(textWidgetDynamic, 882);

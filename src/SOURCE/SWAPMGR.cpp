@@ -393,7 +393,7 @@ i32 swapManager::Main(tag_message& message) {
                             Update();
                             DrawSwapWin();
                             Reset();
-                            gpWindowManager->FadeScreen(0, FADE_STEPS, NULL);
+                            gpWindowManager->FadeScreen(FADE_IN, FADE_STEPS, NULL);
                             break;
 
                         case CONTROL_RIGHT_HERO:
@@ -404,7 +404,7 @@ i32 swapManager::Main(tag_message& message) {
                             Update();
                             DrawSwapWin();
                             Reset();
-                            gpWindowManager->FadeScreen(0, FADE_STEPS, NULL);
+                            gpWindowManager->FadeScreen(FADE_IN, FADE_STEPS, NULL);
                             break;
 
                         case CONTROL_LEFT_ARTIFACT_FIRST:

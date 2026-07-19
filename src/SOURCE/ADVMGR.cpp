@@ -1039,7 +1039,7 @@ i32 advManager::Open(i32 id) {
     }
     KBChangeMenu(hmnuAdv);
     ForceNewHover();
-    gpWindowManager->FadeScreen(0, 8, gPalette);
+    gpWindowManager->FadeScreen(FADE_IN, 8, gPalette);
     giBottomViewOverride = 0;
     gConfig.soundVolume = oldSampleVolumeState;
     gpSoundManager->AdjustSoundVolumes();
@@ -1286,7 +1286,7 @@ class mapCell* advManager::DoAdvCommand(void) {
                 SetEnvironmentOrigin(m_mapOriginX + 7, m_mapOriginY + 7, 1);
             }
             RedrawAdvScreen(1, 0);
-            gpWindowManager->FadeScreen(0, 8, NULL);
+            gpWindowManager->FadeScreen(FADE_IN, 8, NULL);
             break;
 
         case ADVMGR_COMMAND_SELECT_HERO:
@@ -2244,7 +2244,7 @@ i32 advManager::ProcessDeSelect(
             }
             RedrawAdvScreen(1, 0);
             if (fadeAfter) {
-                gpWindowManager->FadeScreen(0, 8, NULL);
+                gpWindowManager->FadeScreen(FADE_IN, 8, NULL);
             }
             break;
         }

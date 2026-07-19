@@ -485,9 +485,9 @@ i32 heroWindowManager::DoDialog(
         heroWindowManager* manager = gpWindowManager;
         if (dialogPalette != NULL)
             SetPalette(dialogPalette->m_data, 0);
-        i32 fadeType = IDX(FADE_IN);
+        WindowFadeMode fadeType = FADE_IN;
         switch (fadeType) {
-            case IDX(FADE_IN): {
+            case FADE_IN: {
                 u32 savedUpdate = manager->m_updateFlags;
                 manager->m_updateFlags = 0;
                 PollSound();
@@ -495,7 +495,7 @@ i32 heroWindowManager::DoDialog(
                 manager->m_updateFlags = FadeSavedUpdate() | savedUpdate;
                 break;
             }
-            case IDX(FADE_OUT):
+            case FADE_OUT:
                 FadeSavedUpdate() = manager->m_updateFlags;
                 manager->m_updateFlags = 0;
                 PollSound();
@@ -564,11 +564,11 @@ void heroWindowManager::RedrawScreen(void) {
 }
 
 VA(0x004cb030, 0x80)
-void heroWindowManager::FadeScreen(i32 direction, i32 steps, class palette* pal) {
+void heroWindowManager::FadeScreen(WindowFadeMode direction, i32 steps, class palette* pal) {
     if (pal != NULL)
         SetPalette(pal->m_data, 0);
     switch (direction) {
-        case IDX(FADE_IN): {
+        case FADE_IN: {
             u32 saved = m_updateFlags;
             m_updateFlags = 0;
             PollSound();
@@ -577,7 +577,7 @@ void heroWindowManager::FadeScreen(i32 direction, i32 steps, class palette* pal)
             PollSound();
             break;
         }
-        case IDX(FADE_OUT):
+        case FADE_OUT:
             FadeSavedUpdate() = m_updateFlags;
             m_updateFlags = 0;
             PollSound();

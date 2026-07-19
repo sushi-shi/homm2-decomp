@@ -747,7 +747,7 @@ i32 CastleHandler(tag_message& message) {
                                     casWin->DrawWindow();
                                     gpTownManager->m_bankBox->Update(1);
                                     gpWindowManager
-                                        ->FadeScreen(TOWN_FADE_IN, TOWN_FADE_STEPS, NULL);
+                                        ->FadeScreen(FADE_IN, TOWN_FADE_STEPS, NULL);
                                 } else {
                                     cannotRecruitHero =
                                         gpTownManager->m_recruitResult != 0

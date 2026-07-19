@@ -99,8 +99,6 @@ H2_ENUM_BEGIN(TownManagerConstant)
     TOWN_WIDGET_INSERT_DEFAULT               = -1,
     TOWN_MUSIC_STOP                          = -1,
     TOWN_POINTER_DEFAULT                     = -1,
-    TOWN_FADE_IN                             = 0,
-    TOWN_FADE_OUT                            = 1,
     TOWN_WINDOW_TEXT_CONTROL                 = 0x89,
     TOWN_WIDGET_DISABLED_VALUE               = 0x1000,
     TOWN_WIDGET_ENABLED_VALUE                = 2,

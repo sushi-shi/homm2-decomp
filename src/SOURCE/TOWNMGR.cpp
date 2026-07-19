@@ -593,7 +593,7 @@ i32 townManager::Open(i32 id) {
     m_priority = BaseManagerPriority(id);
     m_active = true;
     strcpy(m_name, "townManager");
-    gpWindowManager->FadeScreen(0, TOWN_FADE_STEPS, NULL);
+    gpWindowManager->FadeScreen(FADE_IN, TOWN_FADE_STEPS, NULL);
     return 0;
 }
 
@@ -822,7 +822,7 @@ void townManager::Close(void) {
     if (gConfig.useOpera != IDX(CONFIG_OPERA_DISABLED)
         || gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI)
         gpSoundManager->SwitchAmbientMusic(TOWN_MUSIC_STOP);
-    gpWindowManager->FadeScreen(TOWN_FADE_OUT, TOWN_FADE_STEPS, NULL);
+    gpWindowManager->FadeScreen(FADE_OUT, TOWN_FADE_STEPS, NULL);
     gpMouseManager->SetPointer(TOWN_POINTER_DEFAULT);
     m_active = false;
     m_town->m_buildings &= IDX(TOWN_CLOSE_DYNAMIC_CLEAR_MASK);
@@ -1740,7 +1740,7 @@ void townManager::DoCommand(TownManagerArmyCommand command) {
         case ARMY_COMMAND_VIEW_HERO:
             HeroView(m_town->m_occupyingHeroId, 1, 0);
             RedrawTownScreen();
-            gpWindowManager->FadeScreen(0, 8, NULL);
+            gpWindowManager->FadeScreen(FADE_IN, 8, NULL);
             break;
 
         case ARMY_COMMAND_SPLIT:

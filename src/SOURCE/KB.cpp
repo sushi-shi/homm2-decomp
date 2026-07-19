@@ -596,7 +596,7 @@ i32 oldmain(void) {
                 if (firstMainScreen_c)
                     SetPalette(gPalette->m_data, 1);
                 else
-                    gpWindowManager->FadeScreen(0, OLD_MAIN_FADE_SPEED, gPalette);
+                    gpWindowManager->FadeScreen(FADE_IN, OLD_MAIN_FADE_SPEED, gPalette);
                 firstMainScreen_c = 0;
             }
             gpMouseManager->SetPointer("advmice.mse", 0, MOUSE_AUTO_CURSOR_TYPE);
@@ -705,7 +705,7 @@ i32 oldmain(void) {
                                 gpGame->InitCampaignMap();
                                 goto initialize_game;
                             } else {
-                                gpWindowManager->FadeScreen(1, OLD_MAIN_FADE_SPEED, gPalette);
+                                gpWindowManager->FadeScreen(FADE_OUT, OLD_MAIN_FADE_SPEED, gPalette);
                                 mainScreenLoaded_b = 0;
                                 goto main_menu;
                             }
@@ -715,7 +715,7 @@ i32 oldmain(void) {
                                     xCampaign.InitMap();
                                     goto initialize_game;
                                 } else {
-                                    gpWindowManager->FadeScreen(1, OLD_MAIN_FADE_SPEED, gPalette);
+                                    gpWindowManager->FadeScreen(FADE_OUT, OLD_MAIN_FADE_SPEED, gPalette);
                                     mainScreenLoaded_b = 0;
                                     goto main_menu;
                                 }
@@ -743,11 +743,11 @@ i32 oldmain(void) {
                 mainScreenLoaded_b = 0;
                 goto main_menu;
             case OLD_MAIN_CREDITS:
-                gpWindowManager->FadeScreen(1, OLD_MAIN_FADE_SPEED, gPalette);
+                gpWindowManager->FadeScreen(FADE_OUT, OLD_MAIN_FADE_SPEED, gPalette);
                 PlaySmacker(OLD_MAIN_CREDITS_FIRST_VIDEO);
                 PlaySmacker(OLD_MAIN_CREDITS_SECOND_VIDEO);
                 mainScreenLoaded_b = 0;
-                gpWindowManager->FadeScreen(1, OLD_MAIN_LONG_FADE_SPEED, gPalette);
+                gpWindowManager->FadeScreen(FADE_OUT, OLD_MAIN_LONG_FADE_SPEED, gPalette);
                 goto main_menu;
             case OLD_MAIN_EXIT:
                 quit_g = 1;
@@ -896,7 +896,7 @@ i32 oldmain(void) {
         gbGameInitialized = true;
         mainScreenLoaded_b = 0;
         gpSoundManager->StopAllSamples(1);
-        gpWindowManager->FadeScreen(1, OLD_MAIN_FADE_SPEED, NULL);
+        gpWindowManager->FadeScreen(FADE_OUT, OLD_MAIN_FADE_SPEED, NULL);
         gMapX = 0;
         gMapY = 0;
         for (giCurWatchPlayer = giCurPlayer; !gbThisNetHumanPlayer[giCurWatchPlayer];
@@ -922,7 +922,7 @@ i32 oldmain(void) {
             gMapX = gpAdvManager->m_mapOriginX;
             gMapY = gpAdvManager->m_mapOriginY;
             gpExec->RemoveManager(gpAdvManager);
-            gpWindowManager->FadeScreen(1, OLD_MAIN_FADE_SPEED, gPalette);
+            gpWindowManager->FadeScreen(FADE_OUT, OLD_MAIN_FADE_SPEED, gPalette);
             if (!gbGameOver)
                 goto game_finished;
         }
@@ -944,11 +944,11 @@ i32 oldmain(void) {
                 PlaySmacker(OLD_MAIN_STANDARD_VICTORY_VIDEO);
             else
                 PlaySmacker(OLD_MAIN_EXPANSION_VICTORY_VIDEO);
-            gpWindowManager->FadeScreen(1, OLD_MAIN_LONG_FADE_SPEED, gPalette);
+            gpWindowManager->FadeScreen(FADE_OUT, OLD_MAIN_LONG_FADE_SPEED, gPalette);
             gpResourceManager->GetBackdrop("heroes.icn", gpWindowManager->m_screen, 1);
             gpWindowManager
                 ->UpdateScreenRegion(0, 0, OLD_MAIN_SCREEN_WIDTH, OLD_MAIN_SCREEN_HEIGHT);
-            gpWindowManager->FadeScreen(0, OLD_MAIN_FADE_SPEED, gPalette);
+            gpWindowManager->FadeScreen(FADE_IN, OLD_MAIN_FADE_SPEED, gPalette);
             gpWindowManager->m_updateFlags = 1;
             mainScreenLoaded_b = 1;
             gpSoundManager->PlayAmbientMusic(OLD_MAIN_MAIN_MUSIC, 0, -1);
@@ -1003,11 +1003,11 @@ i32 oldmain(void) {
         } else {
             ShowCongrats(STANDARD);
             if (!gbShowHighScore) {
-                gpWindowManager->FadeScreen(1, OLD_MAIN_FADE_SPEED, gPalette);
+                gpWindowManager->FadeScreen(FADE_OUT, OLD_MAIN_FADE_SPEED, gPalette);
                 gpResourceManager->GetBackdrop("heroes.icn", gpWindowManager->m_screen, 1);
                 gpWindowManager
                     ->UpdateScreenRegion(0, 0, OLD_MAIN_SCREEN_WIDTH, OLD_MAIN_SCREEN_HEIGHT);
-                gpWindowManager->FadeScreen(0, OLD_MAIN_FADE_SPEED, gPalette);
+                gpWindowManager->FadeScreen(FADE_IN, OLD_MAIN_FADE_SPEED, gPalette);
                 gpWindowManager->m_updateFlags = 1;
                 mainScreenLoaded_b = 1;
                 gpSoundManager->PlayAmbientMusic(OLD_MAIN_MAIN_MUSIC, 0, -1);
@@ -1028,7 +1028,7 @@ i32 oldmain(void) {
             gpResourceManager->GetBackdrop("heroes.icn", gpWindowManager->m_screen, 1);
             gpWindowManager
                 ->UpdateScreenRegion(0, 0, OLD_MAIN_SCREEN_WIDTH, OLD_MAIN_SCREEN_HEIGHT);
-            gpWindowManager->FadeScreen(0, OLD_MAIN_FADE_SPEED, gPalette);
+            gpWindowManager->FadeScreen(FADE_IN, OLD_MAIN_FADE_SPEED, gPalette);
             mainScreenLoaded_b = 1;
         }
 
@@ -1435,7 +1435,7 @@ i32 RecruitHeroHandler(tag_message& msg) {
                         gpTownManager->RedrawTownScreen();
                         gpTownManager->m_heroWindow0->DrawWindow();
                         gpTownManager->m_heroWindow1->DrawWindow();
-                        gpWindowManager->FadeScreen(0, 8, NULL);
+                        gpWindowManager->FadeScreen(FADE_IN, 8, NULL);
                         break;
                     default:
                         break;

@@ -279,7 +279,7 @@ void combatManager::SetupCombat(
     else
         m_battlefieldCell = NULL;
 
-    m_terrainType = giGroundToTerrain[m_battlefieldCell->m_terrainImageIndex];
+    m_terrainType = TerrainType(giGroundToTerrain[m_battlefieldCell->m_terrainImageIndex]);
     sprintf(m_battlefieldBackgroundName, GetBackgroundName());
 
     if (attackerHero != NULL) {
@@ -520,7 +520,7 @@ i32 combatManager::Open(i32 openFlags) {
     LogStr("Op2");
     SAMPLE2 preBattleSample = NULL_SAMPLE2;
     preBattleSample = LoadPlaySample("PREBATTL.82M");
-    gpWindowManager->FadeScreen(IDX(FADE_OUT), FADE_STEPS, NULL);
+    gpWindowManager->FadeScreen(FADE_OUT, FADE_STEPS, NULL);
     giCycleType = m_colorCycleType;
     CycleColors(1);
     CycleColors(1);
@@ -543,7 +543,7 @@ i32 combatManager::Open(i32 openFlags) {
     gConfig.showCombatMouseHex = savedShowMouseHex;
     if (m_combatPalette->m_data != gpBufferPalette->m_data)
         memmove(m_combatPalette->m_data, gpBufferPalette->m_data, COMBAT_PALETTE_DATA_SIZE);
-    gpWindowManager->FadeScreen(IDX(FADE_IN), FADE_STEPS, m_combatPalette);
+    gpWindowManager->FadeScreen(FADE_IN, FADE_STEPS, m_combatPalette);
     gbLimitedCombatUpdatePalette = true;
     WaitEndSample(preBattleSample, -1);
 
@@ -570,7 +570,7 @@ void combatManager::Close(void) {
         memcpy(gPalette->m_data, m_savedPalette, COMBAT_PALETTE_DATA_SIZE);
         memcpy(gpBufferPalette->m_data, m_savedPalette, COMBAT_PALETTE_DATA_SIZE);
     }
-    gpWindowManager->FadeScreen(IDX(FADE_OUT), FADE_STEPS, NULL);
+    gpWindowManager->FadeScreen(FADE_OUT, FADE_STEPS, NULL);
     giCycleType = WINDOW_COLOR_CYCLE_DEFAULT;
     CycleColors(0);
     delete m_combatBuffer;
@@ -703,11 +703,11 @@ char* combatManager::GetBackgroundName(void) {
     m_colorCycleType = WINDOW_COLOR_CYCLE_COMBAT;
     m_battlefieldFringe = FRINGE_NONE;
     switch (m_terrainType) {
-        case IDX(TERRAIN_WATER):
+        case TERRAIN_WATER:
             backgroundIndex = BACKGROUND_WATER;
             m_battlefieldFringe = FRINGE_WATER;
             break;
-        case IDX(TERRAIN_GRASS):
+        case TERRAIN_GRASS:
             if (MoreTreesNear()) {
                 backgroundIndex = BACKGROUND_GRASS_TREES;
                 m_battlefieldFringe = FRINGE_GRASS_TREES;
@@ -716,7 +716,7 @@ char* combatManager::GetBackgroundName(void) {
                 m_battlefieldFringe = FRINGE_GRASS;
             }
             break;
-        case IDX(TERRAIN_SNOW):
+        case TERRAIN_SNOW:
             m_colorCycleType = WINDOW_COLOR_CYCLE_COMBAT_ALTERNATE;
             if (MoreTreesNear()) {
                 backgroundIndex = BACKGROUND_SNOW_TREES;
@@ -726,20 +726,20 @@ char* combatManager::GetBackgroundName(void) {
                 m_battlefieldFringe = FRINGE_SNOW;
             }
             break;
-        case IDX(TERRAIN_SWAMP):
+        case TERRAIN_SWAMP:
             backgroundIndex = BACKGROUND_SWAMP;
             m_battlefieldFringe = FRINGE_SWAMP;
             break;
-        case IDX(TERRAIN_LAVA):
+        case TERRAIN_LAVA:
             backgroundIndex = BACKGROUND_LAVA;
             m_battlefieldFringe = FRINGE_LAVA;
             break;
-        case IDX(TERRAIN_DESERT):
+        case TERRAIN_DESERT:
             m_colorCycleType = WINDOW_COLOR_CYCLE_COMBAT_ALTERNATE;
             backgroundIndex = BACKGROUND_DESERT;
             m_battlefieldFringe = FRINGE_DESERT;
             break;
-        case IDX(TERRAIN_DIRT):
+        case TERRAIN_DIRT:
             if (MoreTreesNear()) {
                 backgroundIndex = BACKGROUND_DIRT_TREES;
                 m_battlefieldFringe = FRINGE_DIRT_TREES;
@@ -748,12 +748,12 @@ char* combatManager::GetBackgroundName(void) {
                 m_battlefieldFringe = FRINGE_DIRT;
             }
             break;
-        case IDX(TERRAIN_WASTELAND):
+        case TERRAIN_WASTELAND:
             m_colorCycleType = WINDOW_COLOR_CYCLE_COMBAT_ALTERNATE;
             backgroundIndex = BACKGROUND_WASTELAND;
             m_battlefieldFringe = FRINGE_WASTELAND;
             break;
-        case IDX(TERRAIN_BEACH):
+        case TERRAIN_BEACH:
             m_colorCycleType = WINDOW_COLOR_CYCLE_COMBAT_ALTERNATE;
             backgroundIndex = BACKGROUND_BEACH;
             m_battlefieldFringe = FRINGE_BEACH;
@@ -1854,7 +1854,7 @@ void combatManager::SetupAndLoadObstacles(void) {
     } else {
         obstacleGoal7 = SRandom(COMBAT_RANDOM_OBSTACLE_MIN, COMBAT_RANDOM_OBSTACLE_MAX);
         obstacleCells18 = 0;
-        terrainMask9 = 1 << m_terrainType;
+        terrainMask9 = 1 << IDX(m_terrainType);
         tryCount28 = 0;
         elevationCells4 = 0;
         if (SRandom(0, COMBAT_RANDOM_PERCENT_MAX) < COMBAT_ELEVATION_OVERLAY_CHANCE) {

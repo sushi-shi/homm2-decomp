@@ -210,7 +210,7 @@ void SmackManagerMain(void) {
         while (!smk1) {
             smk1 = SmackOpen(gText, preloadFlags26 + soundFlags4, SMACKAUTOEXTRA);
             if (!smk1) {
-                gpWindowManager->FadeScreen(0, NORMAL_FADE, NULL);
+                gpWindowManager->FadeScreen(FADE_IN, NORMAL_FADE, NULL);
                 NormalDialog(
                     "Error reading the Heroes 2 Expansion CD.  Retry?",
                     NORMAL_DIALOG_CONFIRM,
@@ -269,7 +269,7 @@ void SmackManagerMain(void) {
         0
     );
     if (SmackOptions[bSmackNum].fadeIn)
-        gpWindowManager->FadeScreen(1, NORMAL_FADE, NULL);
+        gpWindowManager->FadeScreen(FADE_OUT, NORMAL_FADE, NULL);
 
     playing16 = 1;
     primaryStarted9 = 0;
@@ -303,7 +303,7 @@ void SmackManagerMain(void) {
                 ConvertSmackerPalette(reinterpret_cast<u8*>(gPalette->m_data));
                 UpdatePalette(gPalette->m_data);
                 memcpy(gpBufferPalette->m_data, gPalette->m_data, PALETTE_DATA_SIZE);
-                gpWindowManager->FadeScreen(0, FAST_FADE, NULL);
+                gpWindowManager->FadeScreen(FADE_IN, FAST_FADE, NULL);
                 primaryStarted9 = 1;
             }
         } else if (!SmackWait(smk1)) {
@@ -324,7 +324,7 @@ void SmackManagerMain(void) {
                     }
                     if (SmackOptions[bSmackNum].fadeIn) {
                         memcpy(gpBufferPalette->m_data, gPalette->m_data, PALETTE_DATA_SIZE);
-                        gpWindowManager->FadeScreen(0, FAST_FADE, NULL);
+                        gpWindowManager->FadeScreen(FADE_IN, FAST_FADE, NULL);
                     }
                     if (bSmackNum == SMACK_CREDITS)
                         gpSoundManager->PlayAmbientMusic(MAIN_MUSIC, 0, -1);
@@ -490,7 +490,7 @@ playbackDone:
 
     if (SmackOptions[bSmackNum].fadeOut) {
         memcpy(gpBufferPalette->m_data, gPalette->m_data, PALETTE_DATA_SIZE);
-        gpWindowManager->FadeScreen(1, SHORT_FADE, NULL);
+        gpWindowManager->FadeScreen(FADE_OUT, SHORT_FADE, NULL);
         FillBitmapArea(
             gpWindowManager->m_screen,
             0,
@@ -510,7 +510,7 @@ playbackDone:
         );
     } else if (!gbPlayedThrough && bSmackNum != CONGRATS) {
         memcpy(gpBufferPalette->m_data, gPalette->m_data, PALETTE_DATA_SIZE);
-        gpWindowManager->FadeScreen(1, NORMAL_FADE, NULL);
+        gpWindowManager->FadeScreen(FADE_OUT, NORMAL_FADE, NULL);
         FillBitmapArea(
             gpWindowManager->m_screen,
             0,
