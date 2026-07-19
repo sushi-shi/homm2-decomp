@@ -130,7 +130,7 @@ include/SOURCE/swapManager.h	reviewed	Shared side count and item domains are nam
 include/SOURCE/town.h	reviewed	Named building/value domains and named public layout dimensions; SIZE is layout evidence.
 include/SOURCE/townManager.h	reviewed	Town-manager object storage and status-text extents are named shared layout constants; the remaining literal is packed class SIZE evidence.
 include/SOURCE/townObject.h	reviewed	The town-object class contains named fields and methods; its sole numeric literal is proven class-layout SIZE evidence.
-include/SOURCE/tradpost.h	reviewed	Shared resource, geometry, and control domains are named aligned enums; the public ratio array uses the named resource extent.
+include/SOURCE/tradpost.h	reviewed	Shared geometry and control domains are named aligned enums; the public ratio array derives its extent from ResourceType.
 include/SOURCE/wingraph.h	reviewed	Shared graphics dimensions, palette sizes, scrolling, timing, storage, and type domains are named aligned enums; packed layout arrays use the named palette extent and remaining literals are SIZE evidence.
 include/SOURCE/x_arena.h	reviewed	The legacy globals remain declared for VC4.2 declaration order, but the skill-widget extern is incomplete so its private extent stays in x_arena.cpp; the header contains no numeric policy.
 include/SOURCE/x_cdtest.h	reviewed	The two-field generated-table record remains header-owned for declaration discipline; table storage and count are private to x_cdtest.cpp, and the header contains no numeric policy.
@@ -225,7 +225,7 @@ src/SOURCE/comwin.cpp	reviewed	Private enums name retained source-line bases, co
 src/SOURCE/dpnetwin.cpp	pending
 src/SOURCE/kbwin.cpp	reviewed	LogInt uses the shared unused-field sentinel; the timer polling threshold is private, menu resolution checks use the public width domain, and exported strings use their declared capacities.
 src/SOURCE/netwin.cpp	reviewed	Private enums model NetBIOS reset-field indices/capacities and retained source-line bases/offsets; reset capacities no longer borrow unrelated retry/result constants with coincident values.
-src/SOURCE/tradpost.cpp	pending
+src/SOURCE/tradpost.cpp	reviewed	Widget construction, offer-side iteration, redraw geometry, and resource selector cases use named domains; retail exchange and rounding values remain payloads.
 src/SOURCE/wingraph.cpp	pending
 src/SOURCE/x_arena.cpp	reviewed	Private aligned constants name the arena geometry, widget ids, styles, and choice count. The centering divisor and global skill-widget extent use the private domain; remaining zeros and ones are initialization, booleans, indices, or call flags.
 src/SOURCE/x_cdtest.cpp	reviewed	Private aligned constants name the first track, 43-entry retail table, and generator line capacity. The table payload is preserved verbatim; remaining zeros and ones are API sentinels, results, loop steps, or zero-based indexing.

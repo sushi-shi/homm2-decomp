@@ -6,6 +6,7 @@
 #include <BASE/inputManager.h>
 #include <BASE/mouseManager.h>
 #include <BASE/widget.h>
+#include <BASE/widgetKind.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/PHILAI.h>
 #include <SOURCE/X_GLOBAL.h>
@@ -30,6 +31,16 @@ H2_ENUM_CLASS_BEGIN(TradingPostHandlerResult)
     POST_HANDLER_EXIT     = 2
 H2_ENUM_CLASS_END(TradingPostHandlerResult)
 
+H2_ENUM_BEGIN(TradingPostPrivateConstant)
+    KNOB_WIDTH       = 17,
+    KNOB_HEIGHT      = 8,
+    KNOB_FRAME       = 2,
+    OFFER_SIDE_COUNT = 2,
+    REDRAW_X_OFFSET  = 32,
+    REDRAW_WIDTH     = 258,
+    REDRAW_HEIGHT    = 418
+H2_ENUM_END(TradingPostPrivateConstant)
+
 VA(0x004bf340, 0x165)
 void DoTradingPost(i32 isMarketplace, float efficiency) {
     tag_message messageTemp;
@@ -48,13 +59,13 @@ void DoTradingPost(i32 isMarketplace, float efficiency) {
     tradeKnob = new iconWidget(
         TRADING_POST_KNOB_X,
         TRADING_POST_KNOB_Y,
-        17,
-        8,
+        KNOB_WIDTH,
+        KNOB_HEIGHT,
         "tradpost.icn",
-        2,
+        KNOB_FRAME,
         0,
         TRADING_POST_KNOB_ID,
-        16,
+        WIDGET_KIND_ICON_DIRECT,
         1
     );
     if (tradeKnob == NULL)
@@ -127,7 +138,7 @@ void UpdateTradingPost(i32 draw) {
         tpWindow->BroadcastMessage(messageTemp);
     }
 
-    for (sideCurrent = 0; sideCurrent < 2; sideCurrent++) {
+    for (sideCurrent = 0; sideCurrent < OFFER_SIDE_COUNT; sideCurrent++) {
         if (leftResource != -1 && rightResource != -1 && leftResource != rightResource) {
             messageTemp.payload.widget.command = TRADING_POST_SET_ICON;
             if (sideCurrent == 0) {
@@ -209,7 +220,12 @@ void UpdateTradingPost(i32 draw) {
         tradeKnob->m_x = TRADING_POST_KNOB_X;
     if (draw != 0) {
         tpWindow->DrawWindow(0);
-        gpWindowManager->UpdateScreenRegion(tpX + 32, tpY, 258, 418);
+        gpWindowManager->UpdateScreenRegion(
+            tpX + REDRAW_X_OFFSET,
+            tpY,
+            REDRAW_WIDTH,
+            REDRAW_HEIGHT
+        );
     }
 }
 
@@ -227,7 +243,7 @@ void ComputeTradeRatios(
 
     if (tradeRatio >= 1.0f) {
         *leftDenominated = 0;
-        *ratio = static_cast<i32>(tradeRatio + 0.999);
+        *ratio = static_cast<i32>(tradeRatio + 0.999); // NOLINT(readability-magic-numbers)
         *maxTrade = gpCurPlayer->m_resources[sourceResource] / *ratio;
     } else {
         *leftDenominated = 1;
@@ -305,13 +321,13 @@ i32 TradingPostHandler(struct tag_message& message) {
                     case TRADING_POST_KNOB_ID:
                         DoTradeKnob(message);
                         break;
-                    case TRADING_POST_LEFT_SELECT_FIRST:
-                    case TRADING_POST_LEFT_SELECT_FIRST + 1:
-                    case TRADING_POST_LEFT_SELECT_FIRST + 2:
-                    case TRADING_POST_LEFT_SELECT_FIRST + 3:
-                    case TRADING_POST_LEFT_SELECT_FIRST + 4:
-                    case TRADING_POST_LEFT_SELECT_FIRST + 5:
-                    case TRADING_POST_LEFT_SELECT_FIRST + 6:
+                    case TRADING_POST_LEFT_SELECT_FIRST + IDX(RES_WOOD):
+                    case TRADING_POST_LEFT_SELECT_FIRST + IDX(RES_MERCURY):
+                    case TRADING_POST_LEFT_SELECT_FIRST + IDX(RES_ORE):
+                    case TRADING_POST_LEFT_SELECT_FIRST + IDX(RES_SULFUR):
+                    case TRADING_POST_LEFT_SELECT_FIRST + IDX(RES_CRYSTAL):
+                    case TRADING_POST_LEFT_SELECT_FIRST + IDX(RES_GEMS):
+                    case TRADING_POST_LEFT_SELECT_FIRST + IDX(RES_GOLD):
                         resourceData = message.payload.widget.id - TRADING_POST_LEFT_SELECT_FIRST;
                         if (leftResource != resourceData) {
                             leftResource = resourceData;
@@ -319,13 +335,13 @@ i32 TradingPostHandler(struct tag_message& message) {
                             SetupNewTrade();
                         }
                         break;
-                    case TRADING_POST_RIGHT_SELECT_FIRST:
-                    case TRADING_POST_RIGHT_SELECT_FIRST + 1:
-                    case TRADING_POST_RIGHT_SELECT_FIRST + 2:
-                    case TRADING_POST_RIGHT_SELECT_FIRST + 3:
-                    case TRADING_POST_RIGHT_SELECT_FIRST + 4:
-                    case TRADING_POST_RIGHT_SELECT_FIRST + 5:
-                    case TRADING_POST_RIGHT_SELECT_FIRST + 6:
+                    case TRADING_POST_RIGHT_SELECT_FIRST + IDX(RES_WOOD):
+                    case TRADING_POST_RIGHT_SELECT_FIRST + IDX(RES_MERCURY):
+                    case TRADING_POST_RIGHT_SELECT_FIRST + IDX(RES_ORE):
+                    case TRADING_POST_RIGHT_SELECT_FIRST + IDX(RES_SULFUR):
+                    case TRADING_POST_RIGHT_SELECT_FIRST + IDX(RES_CRYSTAL):
+                    case TRADING_POST_RIGHT_SELECT_FIRST + IDX(RES_GEMS):
+                    case TRADING_POST_RIGHT_SELECT_FIRST + IDX(RES_GOLD):
                         resourceData = message.payload.widget.id - TRADING_POST_RIGHT_SELECT_FIRST;
                         if (rightResource != resourceData) {
                             rightResource = resourceData;

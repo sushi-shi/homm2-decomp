@@ -2,11 +2,12 @@
 #define HOMM2_TRADPOST_H
 
 #include <Ints.h>
+#include <SOURCE/KB_TYPES.h>
 
 struct tag_message;
 
 H2_ENUM_BEGIN(TradingPostConstant)
-    TRADING_POST_RESOURCE_COUNT     = 7,
+    TRADING_POST_RESOURCE_COUNT     = IDX(RES_COUNT),
     TRADING_POST_WINDOW_X           = 0x9f,
     TRADING_POST_WINDOW_Y           = 0x17,
     TRADING_POST_KNOB_X             = 0x43,
