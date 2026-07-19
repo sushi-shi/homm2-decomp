@@ -11,6 +11,7 @@ class icon;
 H2_ENUM_BEGIN(StripConstant)
     STRIP_ARMY_SLOT_COUNT       = 5,
     STRIP_BORDER_COUNT          = 6,
+    STRIP_RUNTIME_GAP_SIZE      = 0x18,
     STRIP_WINDOW_WIDTH          = 0x228,
     STRIP_WINDOW_HEIGHT         = 0x69,
     STRIP_WINDOW_FLAGS          = 8,
@@ -37,7 +38,7 @@ H2_ENUM_END(StripConstant)
 class strip {
 public:
     heroWindow* m_window;
-    char m_unused04[0x18];
+    char m_unused04[STRIP_RUNTIME_GAP_SIZE];
     i32 m_x;
     i32 m_y;
     i32 m_stripType;

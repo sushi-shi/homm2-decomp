@@ -24,6 +24,7 @@ H2_ENUM_BEGIN(FileRequesterControlId)
     FILE_REQUESTER_LOCAL_EXTENSION_SIZE        = 208,
     FILE_REQUESTER_UPDATE_STORAGE_SIZE         = 380,
     FILE_REQUESTER_FILENAME_INITIAL_CLEAR_SIZE = 9,
+    FILE_REQUESTER_LIST_STATE_SIZE             = 9,
     FILE_REQUESTER_LIST_RANGE_SIZE             = 20,
     FILE_REQUESTER_SCROLL_KNOB_HALF_HEIGHT     = 9,
     FILE_REQUESTER_GUTTER_SCALE                = 100,
@@ -97,7 +98,7 @@ public:
     i32 m_topIndex;
     i32 m_selectedIndex;
     i32 m_result;
-    char m_listState[9];
+    char m_listState[FILE_REQUESTER_LIST_STATE_SIZE];
     iconWidget* m_scrollKnob;
     fileRequester(i32, i32, FileRequesterMode, char*, char*, char*);
     virtual i32 Open(i32) OVERRIDE;
