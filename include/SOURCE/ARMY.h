@@ -135,7 +135,9 @@ H2_ENUM_BEGIN(ArmyFrameConstant)
     ARMY_MISSILE_OFFSET_COUNT     = 3,
     ARMY_PROJECTILE_ANGLE_COUNT   = 12,
     ARMY_ANIMATION_SEQUENCE_COUNT = 34,
-    ARMY_ANIMATION_FRAME_COUNT    = 16
+    ARMY_ANIMATION_FRAME_COUNT    = 16,
+    ARMY_STANDING_CHANCE_COUNT    = 10,
+    ARMY_QUANTITY_SIDE_COUNT      = 2
 H2_ENUM_END(ArmyFrameConstant)
 
 H2_ENUM_CLASS_BEGIN(ArmyWalkSegment)
@@ -170,7 +172,7 @@ struct SMonFrameInfo {
     i8 animationXOffsets[IDX(ARMY_WALK_SEGMENT_COUNT)][ARMY_ANIMATION_FRAME_COUNT];
     i8 walkXOffsets[ARMY_ANIMATION_FRAME_COUNT];
     i8 standingAnimationCount;
-    float standingAnimationChances[10];
+    float standingAnimationChances[ARMY_STANDING_CHANCE_COUNT];
     i32 standStillDelay;
     i32 walkDuration;
     i32 attackDuration;
@@ -178,7 +180,7 @@ struct SMonFrameInfo {
     struct MissileOffset missileOffsets[ARMY_MISSILE_OFFSET_COUNT];
     u8 projectileDirectionCount;
     float projectileAngles[ARMY_PROJECTILE_ANGLE_COUNT];
-    i32 quantityX[2];
+    i32 quantityX[ARMY_QUANTITY_SIDE_COUNT];
     i8 animationFrameCount[ARMY_ANIMATION_SEQUENCE_COUNT];
     i8 animationFrames[ARMY_ANIMATION_SEQUENCE_COUNT][ARMY_ANIMATION_FRAME_COUNT];
 };

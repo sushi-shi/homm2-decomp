@@ -11,6 +11,7 @@ H2_ENUM_BEGIN(DirectPlayTransportConstant)
     DP_TRANSPORT_RECEIVE_SIZE          = 0x100,
     DP_TRANSPORT_BROADCAST_POSITION    = 0x7f,
     DP_TRANSPORT_STARTUP_MAPPING_COUNT = 6,
+    DP_TRANSPORT_SESSION_COUNT         = 10,
     DP_TRANSPORT_TERM_DRAIN_READ_SIZE  = 100,
     DP_TRANSPORT_SESSION_DESC_SIZE     = 0x7c,
     DP_TRANSPORT_MAX_PLAYERS           = 6,
@@ -71,8 +72,8 @@ extern i32 iLastMsgNumHumanPlayers;
 extern i32 iMaxSession;
 extern i32 giHostAcceptStatus;
 extern struct _GUID* g_lpGuid;
-extern i32 giNetPosToDCOPos[6];
+extern i32 giNetPosToDCOPos[DP_TRANSPORT_STARTUP_MAPPING_COUNT];
 extern i32 iSessionToTry;
-extern i32l lSessions[10];
+extern i32l lSessions[DP_TRANSPORT_SESSION_COUNT];
 
 #endif
