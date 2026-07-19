@@ -21,6 +21,8 @@ H2_ENUM_BEGIN(KbWinConstant)
     KBWIN_CLASS_STYLE             = 0x100b,
     KBWIN_CUSTOM_CD_MESSAGE       = 0x3b9,
     KBWIN_MENU_ENTRY_COUNT        = MENU_ENABLE_STATUS_COUNT,
+    KBWIN_APP_NAME_SIZE           = 16,
+    KBWIN_WINDOW_TITLE_SIZE       = 32,
     KBWIN_WIDTH_640               = 640,
     KBWIN_HEIGHT_480              = 480,
     KBWIN_WIDTH_800               = 800,
@@ -63,8 +65,8 @@ extern HINSTANCE hInstApp;
 extern HMENU hmnuApp;
 extern HWND hwndApp;
 
-extern char szAppName[16];
-extern char szTitle[32];
+extern char szAppName[KBWIN_APP_NAME_SIZE];
+extern char szTitle[KBWIN_WINDOW_TITLE_SIZE];
 extern i32l lLastGTimerTickCount;
 extern i32l lLastCycleColorsTickCount;
 extern i32 bRestartMusic;
