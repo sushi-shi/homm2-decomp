@@ -1,9 +1,7 @@
 path	status	notes
 include/BASE/BITS.h	reviewed	Public APIs use arithmetic bit indices; no literal values.
 include/BASE/BITSConstants.h	reviewed	Fixed-width bit storage aliases; no literal values.
-include/BASE/BLUR_TYPES.h	pending
-include/BASE/Blur.h	pending
-include/BASE/BlurConstants.h	pending
+include/BASE/Blur.h	reviewed	The public blur operation names every parameter and exposes no private constants or storage records.
 include/BASE/Bzip.h	pending
 include/BASE/DROPLIST_TYPES.h	pending
 include/BASE/EXEC_TYPES.h	reviewed	Every text-field extent is named; remaining literals are packed-layout SIZE evidence.
@@ -141,7 +139,7 @@ src/BASE/BITMAP.cpp	reviewed	TU-private full-screen copy stride is named with a 
 src/BASE/BITS.cpp	reviewed	Private shift/mask domain; remaining zero and one are direct bit arithmetic and result values.
 src/BASE/BORDER.cpp	reviewed	Resource-name capacity, color mask, and dispatch results are named; remaining zeros are initialization or drawing origins. Private enum form perturbed VC4.2 register allocation, so the two read constants are scoped expansion macros. Non-debug sections and relocations are A/B exact.
 src/BASE/BUTTON.cpp	reviewed	Private select-mode, hotkey, repeat-delay, and resource-capacity values are named; dispatch results use the shared ABI names. Repeated message setup uses a scoped expansion helper because an inline function perturbs VC4.2 CSE. Remaining zeros and ones are initialization, frame origins, booleans, or message-state resets. Non-debug sections and relocations are A/B exact.
-src/BASE/Blur.cpp	pending
+src/BASE/Blur.cpp	reviewed	Palette, lookup-table, kernel geometry, sample positions, transition timing, and text-slot extents are named in aligned TU-private domains. The two implementation-only headers and obsolete semantic ratchet were removed; remaining zeros/ones are coordinates, channel bounds, loop termination, or boolean resource translation. Allocation/free operands preserve retail source-line evidence. Private placement improves the retail code shape while preserving relocation targets.
 src/BASE/Bzip.cpp	pending
 src/BASE/DIMMER.cpp	reviewed	The implementation contains no policy literals; constructor zeros are empty-widget initialization and all other numerics are address/size annotations.
 src/BASE/EXEC.cpp	reviewed	Manager results, dispatch states, priority, and capacity are private named constants; dialog storage derives from sizeof(executive), and executable selection uses the shared game/editor selectors. Non-debug section bytes and ordered relocations are unchanged.
