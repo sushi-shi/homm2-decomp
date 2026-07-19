@@ -73,17 +73,6 @@ H2_ENUM_BEGIN(PlayerDeadConstant)
     DEAD_MAP_CHANGE_UNUSED = -999
 H2_ENUM_END(PlayerDeadConstant)
 
-H2_ENUM_CLASS_BEGIN(KbMonsterResourceType)
-    MONSTER_NEEDS_CRYSTAL        = 19,
-    MONSTER_NEEDS_MERCURY        = 28,
-    MONSTER_NEEDS_SULFUR_FIRST   = 35,
-    MONSTER_NEEDS_SULFUR_SECOND  = 36,
-    MONSTER_NEEDS_TWO_SULFUR     = 37,
-    MONSTER_NEEDS_GEMS           = 45,
-    MONSTER_NEEDS_TWO_GEMS       = 46,
-    MONSTER_NEEDS_GEMS_EXPANSION = 60
-H2_ENUM_CLASS_END(KbMonsterResourceType)
-
 H2_ENUM_BEGIN(CheckEndGameConstants)
     END_GAME_NO_PLAYER          = -1,
     END_GAME_EMPTY_ARMY         = -1,
@@ -1561,32 +1550,32 @@ char* GetMonsterName(i32 m) {
 }
 
 VA(0x0049992c, 0x140)
-void GetMonsterCost(i32 monster, i32* const cost) {
+void GetMonsterCost(CreatureType monster, i32* const cost) {
     i32 idx;
     for (idx = 0; idx < KB_BUILDING_RESOURCE_COUNT; idx++)
         cost[idx] = 0;
-    cost[IDX(RES_GOLD)] = gMonsterDatabase[monster].cost;
+    cost[IDX(RES_GOLD)] = gMonsterDatabase[IDX(monster)].cost;
     switch (monster) {
-        case IDX(MONSTER_NEEDS_GEMS_EXPANSION):
+        case CREATURE_GENIE:
             cost[IDX(RES_GEMS)] = 1;
             break;
-        case IDX(MONSTER_NEEDS_MERCURY):
+        case CREATURE_PHOENIX:
             cost[IDX(RES_MERCURY)] = 1;
             break;
-        case IDX(MONSTER_NEEDS_CRYSTAL):
+        case CREATURE_CYCLOPS:
             cost[IDX(RES_CRYSTAL)] = 1;
             break;
-        case IDX(MONSTER_NEEDS_SULFUR_FIRST):
-        case IDX(MONSTER_NEEDS_SULFUR_SECOND):
+        case CREATURE_GREEN_DRAGON:
+        case CREATURE_RED_DRAGON:
             cost[IDX(RES_SULFUR)] = 1;
             break;
-        case IDX(MONSTER_NEEDS_TWO_SULFUR):
+        case CREATURE_BLACK_DRAGON:
             cost[IDX(RES_SULFUR)] = 2;
             break;
-        case IDX(MONSTER_NEEDS_GEMS):
+        case CREATURE_GIANT:
             cost[IDX(RES_GEMS)] = 1;
             break;
-        case IDX(MONSTER_NEEDS_TWO_GEMS):
+        case CREATURE_TITAN:
             cost[IDX(RES_GEMS)] = 2;
             break;
     }

@@ -822,19 +822,20 @@ i32 combatManager::EffectSpellCreateCreature(i32 hex, SpellType spell) {
 }
 
 VA(0x00487eda, 0x72d)
-i32 combatManager::RawEffectSpellInfluence(army* target, i32 influence) {
+i32 combatManager::RawEffectSpellInfluence(army* target, ArmySpellInfluence influence) {
     i32 effect = 0;
     army* otherArmy = NULL;
-    float workChance = target->SpellCastWorkChance(SpellType(giSpellInfluenceToSpell[influence]));
+    float workChance =
+        target->SpellCastWorkChance(SpellType(giSpellInfluenceToSpell[IDX(influence)]));
     if (workChance <= COMBAT_SPELL_AI_ZERO_EFFECT)
         return 0;
 
     i32 armyValue = target->m_monster.fightValue * target->m_quantity;
     switch (influence) {
-        case IDX(ARMY_SPELL_INFLUENCE_HASTE):
-        case IDX(ARMY_SPELL_INFLUENCE_SLOW): {
+        case ARMY_SPELL_INFLUENCE_HASTE:
+        case ARMY_SPELL_INFLUENCE_SLOW: {
             i32 newSpeed;
-            if (influence == IDX(ARMY_SPELL_INFLUENCE_SLOW)) {
+            if (influence == ARMY_SPELL_INFLUENCE_SLOW) {
                 newSpeed = (target->m_monster.speed + 1) >> 1;
             } else {
                 newSpeed = target->m_monster.speed + COMBAT_SPELL_AI_HASTE_SPEED_BONUS;
@@ -878,8 +879,8 @@ i32 combatManager::RawEffectSpellInfluence(army* target, i32 influence) {
                 static_cast<i32>((oldTurns - newTurns) / COMBAT_SPELL_AI_TURN_DIVISOR * armyValue);
             break;
         }
-        case IDX(ARMY_SPELL_INFLUENCE_BLESS):
-        case IDX(ARMY_SPELL_INFLUENCE_CURSE): {
+        case ARMY_SPELL_INFLUENCE_BLESS:
+        case ARMY_SPELL_INFLUENCE_CURSE: {
             float averageDamage = (static_cast<float>(target->m_monster.damageMin)
                                    + static_cast<float>(target->m_monster.damageMax))
                                   * COMBAT_SPELL_AI_AVERAGE_DAMAGE_MODIFIER;
@@ -888,38 +889,38 @@ i32 combatManager::RawEffectSpellInfluence(army* target, i32 influence) {
                 * COMBAT_SPELL_AI_BLESS_CURSE_MODIFIER
             );
             effect = static_cast<i32>(
-                influence == IDX(ARMY_SPELL_INFLUENCE_BLESS) ? damageEffect : -damageEffect
+                influence == ARMY_SPELL_INFLUENCE_BLESS ? damageEffect : -damageEffect
             );
             break;
         }
-        case IDX(ARMY_SPELL_INFLUENCE_BLIND):
+        case ARMY_SPELL_INFLUENCE_BLIND:
             effect = static_cast<i32>(armyValue * COMBAT_SPELL_AI_BLIND_MODIFIER);
             break;
-        case IDX(ARMY_SPELL_INFLUENCE_BERSERK):
+        case ARMY_SPELL_INFLUENCE_BERSERK:
             effect = static_cast<i32>(armyValue * COMBAT_SPELL_AI_BERSERK_MODIFIER);
             break;
-        case IDX(ARMY_SPELL_INFLUENCE_PARALYZE):
+        case ARMY_SPELL_INFLUENCE_PARALYZE:
             effect = static_cast<i32>(armyValue * COMBAT_SPELL_AI_PARALYZE_MODIFIER);
             break;
-        case IDX(ARMY_SPELL_INFLUENCE_HYPNOTIZE):
+        case ARMY_SPELL_INFLUENCE_HYPNOTIZE:
             effect = static_cast<i32>(armyValue * COMBAT_SPELL_AI_HYPNOTIZE_MODIFIER);
             break;
-        case IDX(ARMY_SPELL_INFLUENCE_BLOODLUST):
+        case ARMY_SPELL_INFLUENCE_BLOODLUST:
             effect = static_cast<i32>(armyValue * COMBAT_SPELL_AI_BLOODLUST_MODIFIER);
             break;
-        case IDX(ARMY_SPELL_INFLUENCE_PETRIFIED):
+        case ARMY_SPELL_INFLUENCE_PETRIFIED:
             effect = static_cast<i32>(armyValue * COMBAT_SPELL_AI_PETRIFIED_MODIFIER);
             break;
-        case IDX(ARMY_SPELL_INFLUENCE_ANTI_MAGIC):
+        case ARMY_SPELL_INFLUENCE_ANTI_MAGIC:
             effect = static_cast<i32>(armyValue * COMBAT_SPELL_AI_ANTI_MAGIC_MODIFIER);
             break;
-        case IDX(ARMY_SPELL_INFLUENCE_STONESKIN):
+        case ARMY_SPELL_INFLUENCE_STONESKIN:
             effect = static_cast<i32>(armyValue * COMBAT_SPELL_AI_STONE_SKIN_MODIFIER);
             break;
-        case IDX(ARMY_SPELL_INFLUENCE_STEELSKIN):
+        case ARMY_SPELL_INFLUENCE_STEELSKIN:
             effect = static_cast<i32>(armyValue * COMBAT_SPELL_AI_STEEL_SKIN_MODIFIER);
             break;
-        case IDX(ARMY_SPELL_INFLUENCE_DRAGON_SLAYER): {
+        case ARMY_SPELL_INFLUENCE_DRAGON_SLAYER: {
             i32 adjacent = 0;
             i32 dragonCount = adjacent;
             i32 i;
@@ -942,7 +943,7 @@ i32 combatManager::RawEffectSpellInfluence(army* target, i32 influence) {
             effect = static_cast<i32>(COMBAT_SPELL_AI_DRAGON_SLAYER_MODIFIER * dragonMod);
             break;
         }
-        case IDX(ARMY_SPELL_INFLUENCE_SHIELD): {
+        case ARMY_SPELL_INFLUENCE_SHIELD: {
             i32 shooterCount = 0;
             i32 i;
             for (i = 0; i < m_armyCount[1 - target->m_side]; i++) {
@@ -967,7 +968,7 @@ i32 combatManager::RawEffectSpellInfluence(army* target, i32 influence) {
     effect = static_cast<i32>(effect * workChance);
     if ((target->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BERSERK)]
          || target->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_HYPNOTIZE)])
-        && influence != IDX(ARMY_SPELL_INFLUENCE_ANTI_MAGIC))
+        && influence != ARMY_SPELL_INFLUENCE_ANTI_MAGIC)
         effect = 0;
     return effect;
 }

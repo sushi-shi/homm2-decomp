@@ -47,7 +47,7 @@ i32 army::FindPath(i32 sourceHex, i32 targetHex, i32, i32 ignoreSpeed, i32 pathM
 }
 
 VA(0x004bdd3a, 0x9a)
-i32 army::ValidPath(i32 targetHex, i32 pathMode) {
+i32 army::ValidPath(i32 targetHex, ArmyPathTarget pathMode) {
     i32 pathResult;
     i32 reserved;
 
@@ -82,7 +82,7 @@ i32 army::GetMoveMask(i32 sourceHex) {
 }
 
 VA(0x004bde41, 0xb5)
-i32 army::GetAttackMask(i32 sourceHex, i32 targetMode, i32 targetHex) {
+i32 army::GetAttackMask(i32 sourceHex, ArmyAttackTarget targetMode, i32 targetHex) {
     CombatHexDirection directionResult;
     i32 directionCountNext;
     i32 blockedMaskValue;
@@ -197,7 +197,7 @@ VA(0x004be217, 0x273)
 i32 army::ValidAttack(
     i32 sourceHex,
     CombatHexDirection direction,
-    i32 targetMode,
+    ArmyAttackTarget targetMode,
     i32 requiredTargetHex,
     i32* attackHex
 ) {
