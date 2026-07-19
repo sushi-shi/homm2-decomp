@@ -40,6 +40,7 @@ H2_ENUM_BEGIN(RemoteConstant)
 H2_ENUM_END(RemoteConstant)
 
 H2_ENUM_CLASS_BEGIN(RemoteGameMode)
+    REMOTE_GAME_NONE          = 0,
     REMOTE_GAME_NETWORK_HOST  = 1,
     REMOTE_GAME_NETWORK_GUEST = 2,
     REMOTE_GAME_MODEM_HOST    = 3,
@@ -75,7 +76,7 @@ SIZE(RemotePacketHeader, REMOTE_PACKET_HEADER_SIZE);
 SIZE(RemoteMessage, REMOTE_MESSAGE_SIZE);
 
 void RemoteCleanup(void);
-void RemoteMain(i32);
+void RemoteMain(RemoteGameMode);
 void UnloadRemoteDriver(i16);
 i32 calc_crc_long(u8*, i32);
 void calc_crc(u16*, u8*, i32);
