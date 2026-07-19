@@ -5,6 +5,7 @@
 #include <SOURCE/KB_TYPES.h>
 #include <BASE/icon.h>
 #include <SOURCE/ARMY.h>
+#include <SOURCE/combatTypes.h>
 
 class sample;
 
@@ -38,7 +39,7 @@ public:
     i8 m_effectAnimationStart;
     i8 m_effectAnimationEnd;
     i8 m_effectAnimationLength;
-    i32 m_drawState;
+    ArmyDrawState m_drawState;
     struct SLimitData m_creatureLimits;
     struct SLimitData m_quantityLimits;
     struct SLimitData m_spriteLimits;

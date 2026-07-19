@@ -60,10 +60,10 @@ void hexcell::DrawUpperDeadOccupant(void) {
 }
 
 VA(0x0044a5aa, 0x165)
-void hexcell::DrawOccupant(i32 creature, i32 frame) {
+void hexcell::DrawOccupant(ArmyDrawState drawState, i32 frame) {
     if (m_occupantSide != COMBAT_OCCUPANT_NONE) {
-        if (creature != COMBAT_DRAW_ALL_OCCUPANTS) {
-            if (gpCombatManager->m_armies[m_occupantSide][m_occupantIndex].m_drawState != creature)
+        if (drawState != ARMY_DRAW_ALL) {
+            if (gpCombatManager->m_armies[m_occupantSide][m_occupantIndex].m_drawState != drawState)
                 return;
         }
         if (gbLimitToExtent && m_occupantSide == gpCombatManager->m_currentArmySide
