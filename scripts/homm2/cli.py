@@ -62,7 +62,6 @@ def main(argv=None):
         if sh("python3", "-m", "homm2.build.assert_globals_defined"): return 1
         if sh("python3", "-m", "homm2.build.assert_vtables"): return 1
         if sh("python3", "-m", "homm2.build.assert_relocs", "--fields"): return 1
-        if sh("python3", "-m", "homm2.build.assert_early_stop_bytes"): return 1
         if sh("python3", "-m", "homm2.build.assert_fixed_width_ints"): return 1
         from homm2.match.status import load_report, main as st
         report = load_report()

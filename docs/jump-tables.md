@@ -2,7 +2,8 @@
 
 **Symptom.** A function with a `switch` that MSVC lowered to a jump table (message dispatchers
 `*::Main`, `*Handler`, ctors with a widget-type switch, …) reconstructs **byte-for-byte correct** yet
-objdiff caps it a hair below 100% — the matcher parks it `@early-stop` with a "jump-table" reason.
+objdiff caps it a hair below 100%. Keep the function in the live queue and verify the table's ordered
+destinations directly; do not encode the artifact as source-marker state.
 Two matchers hit this independently on `heroWindow::heroWindow(int,int,char*)` (99.92%) and
 `listBoxWidget::Main` (95.57%). It is **not** a reconstruction defect; it is how the delinked *target*
 represents the table.

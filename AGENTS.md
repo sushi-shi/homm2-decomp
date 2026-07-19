@@ -20,8 +20,8 @@ do not add current assignments, queue snapshots, percentages, or next actions.
   retail order. Recover all predecessors that can affect cumulative compiler state.
 - During the exhaustive residual campaign, queue every live non-100% function by fuzzy
   percentage descending, then RVA.
-- A prior `@semantic` or `@early-stop` does not remove a live residual from an exhaustive
-  queue. Reproduce its evidence from current objects.
+- Source comments never remove a live residual from an exhaustive queue. Reproduce all
+  evidence from current objects.
 - Do not spend unlimited time on compiler shape. Once semantics, frame, CFG, slots, and
   relocations are credible, try the obvious spellings or at most ten non-improving
   last-mile attempts, record the residual, and continue.
@@ -55,9 +55,8 @@ do not add current assignments, queue snapshots, percentages, or next actions.
   accessor and expression context before considering it a wall.
 - TU-wide compiler state can perturb unchanged siblings. Only current raw bytes and
   relocations decide correctness.
-- `@early-stop` requires the exact byte span and a permitted, reproducible artifact.
-  `@semantic` requires complete semantics plus the first residual, relocation state, and
-  attempted spellings. Neither marker may conceal incomplete structure.
+- Keep an ordinary source comment only when it records an enduring semantic or codegen fact.
+  Do not encode queue state, scores, retained maxima, or completion claims in source comments.
 - Never invent source objects, labels, globals, aliases, padding, or fake code solely to
   improve a metric.
 

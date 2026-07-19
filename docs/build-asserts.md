@@ -91,31 +91,7 @@ On the captured `DDInitGraphics` regression, masked behavior is `100.0%` while `
 `99.947914%`. This stricter score is still not a substitute for the gate: equal-valued BSS fields can
 compare alike, and objdiff has no project-specific public-owner extent map.
 
-### 8. `assert_early_stop_bytes` — prove relocation-only early stops
-
-An `@early-stop` comment that claims complete instruction or non-relocation byte identity must carry
-the explicit `@early-stop-reloc-only` tag. That tag is an executable assertion, not documentation by
-convention; untagged legacy prose is not parsed as a machine contract. For each tagged claim, the
-gate locates the decorated function in the candidate and delinked retail COFF objects, uses the declared retail
-span from `report.json`, masks the actual-width i386 relocation fields present on either side, and
-requires every remaining byte to agree. It does not normalize ordinary immediates, member/stack
-displacements, branch bytes, padding, or operands. The historical `army::LoadResources` bug therefore
-fails at its unrelocated `this+0xd2` byte when retail uses `this+0xd0`, even though both instructions
-have the same opcode and both test bit four.
-
-Before masking, every same-function `DIR32` relocation is resolved to an ordered
-`(function-relative site, function-relative destination)` pair. Candidate `$L` labels and Vostok's
-undefined containing-function aliases are different spellings of the same destination and compare
-equal. A permuted switch table does not: changing which case index reaches a case body makes the
-gate fail even when all case-body bytes and relocation sites are otherwise identical.
-
-The tag is accepted only when the current compiled object passes this raw masked comparison. It is
-rechecked against the current objects: a later shared-header or TU-state change that invalidates
-the byte proof makes the hard gate red until the claim is restored or downgraded.
-New relocation-only or instruction-identical proofs must use the tag; do not add untagged prose that
-makes the same claim.
-
-### 9. `assert_fixed_width_ints` — explicit game integer widths
+### 8. `assert_fixed_width_ints` — explicit game integer widths
 
 Reconstructed code under `src/{SOURCE,BASE,EDITOR}` and
 `include/{SOURCE,BASE,EDITOR}` uses `i8`/`u8` through `i64`/`u64` from `Ints.h`

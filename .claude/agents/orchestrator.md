@@ -61,9 +61,8 @@ Better: open ONE `nix develop .#build` shell per slot.
    percentage is below exactly 100%. Sort globally by fuzzy percentage descending, then retail
    RVA for deterministic ties. This campaign intentionally starts with the smallest residuals.
 2. **Skip only live exact functions.** Source `VA()` macros carry **absolute VAs**
-   (`RVA + 0x400000`), so normalise before comparing to report RVAs. Never skip a non-exact
-   function because it has `@early-stop`, `@semantic`, or an old proof note.
-   Reproduce the proof from current objects or remove/downgrade it.
+   (`RVA + 0x400000`), so normalise before comparing to report RVAs. Source comments and old proof
+   notes never remove a non-exact function from the queue; reproduce evidence from current objects.
 3. **Match TU-by-TU, not function-by-function.** Hand a lane a **whole TU** (or a
    **20+ function chunk** of a large one) and keep that lane on that TU until it is
    **fully audited for its assigned residuals**, then give the lane the next highest-priority TU.
@@ -87,8 +86,8 @@ Spawn a **matcher** (`subagent_type: matcher`), **`run_in_background: true`**, *
    TU name, the 8-digit ABSOLUTE-VA convention (`VA(RVA+0x400000, size)`; placeholders in
    the scaffold already show it), the **`scripts/od_slots.py` stack-naming workflow**, and
    a requirement to account for every residual ordinary byte and every external relocation,
-   pushing to 100% or a newly reproduced byte-proven `@early-stop` (marker line + byte reason,
-   no %). An `@semantic` marker does not complete or remove a function from this campaign.
+   pushing to exactness where retail evidence permits and otherwise keeping the residual live.
+   Do not put scores, retained maxima, or queue/completion state in source comments.
    Tell the matcher to do the functions in retail-RVA order and to report each one's
    result. **Batch SIZING is YOUR job — the matcher finishes every function it's handed
    and does NOT bail, so size the batch to be completable in one matcher run:** ~20+ for
@@ -129,9 +128,8 @@ Process completed matchers **one at a time** (master has one `build/`, one HEAD)
    freshly-regenerated match block — ALWAYS stage it so the
    scoreboard never drifts from the commits), message `match: <fn> -> <result>`.
    One matcher = one commit. **Do NOT stage `config/match-queue.md`** (a transient
-   regenerated worklist — `git checkout --` it if it's dirty). A clean `@early-stop` artifact or
-   fully audited `@semantic` checkpoint is a legitimate commit; a mis-attributed / wrong-shape reconstruction is NOT
-   — keep it stubbed.
+   regenerated worklist — `git checkout --` it if it's dirty). Integrate only correct modeled
+   structure and semantics with current byte/relocation evidence; a wrong-shape reconstruction is not acceptable.
 5. **Refill:** `git -C .claude/worktrees/matcher-N reset --hard master` (its `build/`
    survives), pick the next target (cross-check skip), dispatch a new background matcher.
 
