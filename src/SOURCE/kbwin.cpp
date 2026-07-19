@@ -141,7 +141,6 @@ i32 AppInit(HINSTANCE instance, HINSTANCE previousInstance, i32 showCommand, cha
     }
 }
 
-// @semantic: first residual is retail's mov eax, 0 in the false arm versus this compiler state's xor eax, eax.
 VA(0x0041c15f, 0x31)
 i32 AppIdle(void) {
     if (gbForegroundApp != 0)
@@ -150,7 +149,6 @@ i32 AppIdle(void) {
         return 0;
 }
 
-// @semantic: first residual is the embedded 0x14-byte jump table at RVA 0x1c61b.
 VA(0x0041c190, 0x57e)
 LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPARAM messageData) {
     if (message > KBWIN_PROCESS_MESSAGE_MAX || bProcessMessage[message] == 0) {
@@ -366,7 +364,6 @@ void ResizeWindow(i32 x, i32 y, i32 width, i32 height) {
     WritePrefs();
 }
 
-// @early-stop: delinker jump-table artifact.
 VA(0x0041c9c7, 0x197)
 LRESULT AppCommand(HWND window, UINT message, WPARAM messageParam, LPARAM messageData) {
     i32 command;
@@ -421,7 +418,6 @@ void UpdateDfltMenu(HMENU menu) {
         EnableMenuItem(menu, IDX(KBWIN_MENU_FULLSCREEN), MF_GRAYED);
 }
 
-// @semantic: compiler-shape residual.
 VA(0x0041cc35, 0xac)
 void KBChangeMenu(HMENU menu) {
     if (menu == NULL)
@@ -479,7 +475,6 @@ void SetNoDialogMenus(i32 menusEnabled) {
     SetMenus(hmnuApp, menusEnabled);
 }
 
-// @semantic: First residual +0x2b: retail loads the loop index and compares count with jle.
 VA(0x0041ceb8, 0x159)
 void SetMenus(HMENU menu, i32 enabled) {
     i32 count;

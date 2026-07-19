@@ -58,7 +58,6 @@ i32 game::SetupCampaignGame(void) {
     return 1;
 }
 
-// @early-stop: delinker artifact.
 VA(0x00410ebf, 0x141)
 i32 game::SetupBaud(void) {
     heroWindow* window = new heroWindow(WINDOW_X, WINDOW_Y, "stpbaud.bin");
@@ -86,7 +85,6 @@ i32 game::SetupBaud(void) {
     return 1;
 }
 
-// @early-stop: delinker jump-table artifact.
 VA(0x00411000, 0x200)
 i32 game::SetupComPort(void) {
     char initString[MODEM_INIT_ENTRY_LENGTH];
@@ -218,7 +216,6 @@ i32 game::SetupNetworkGame(void) {
     return 1;
 }
 
-// @early-stop: delinker jump-table artifact.
 VA(0x0041155f, 0x236)
 i32 game::SetupNetworkGame2(void) {
     tag_message message;
@@ -349,7 +346,6 @@ i32 game::SetupModemGame(void) {
     return 1;
 }
 
-// @early-stop: delinker jump-table artifact.
 VA(0x00411aac, 0x257)
 i32 game::SetupMultiPlayerGame(void) {
     tag_message message;

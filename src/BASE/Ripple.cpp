@@ -9,7 +9,6 @@
 #include <SOURCE/kbwin.h>
 #include <SOURCE/NOOPT.h>
 #include <string.h>
-// @semantic: first remaining code divergence is +0x196, where retail cmp esi,eax; jle and ours cmp eax,esi.
 VA(0x004d26a0, 0x23f)
 void DoRipple(bitmap* source, bitmap* destination, i32 height, i32 strength) {
     i32 profileIndex;

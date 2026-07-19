@@ -331,7 +331,6 @@ void InitMemEntry(void) {
         gpMemEntry[i].used = 0;
 }
 
-// @semantic: first divergence is the frame immediate at +0x2, followed at +0xc by base keeping size in EBP while retail uses EBX.
 VA(0x004c3d70, 0x20f)
 void* BaseAlloc(u32 size, char* originalFile, i32 originalLine) {
     char text[200];
@@ -387,7 +386,6 @@ void* BaseAlloc(u32 size, char* originalFile, i32 originalLine) {
     return ptr;
 }
 
-// @semantic: first residual is the first newline append: base preloads the word then derives buf+strlen.
 VA(0x004c3f80, 0x386)
 void BaseFree(void* ptr, char* originalFile, i32 originalLine) {
     char logText[500];
@@ -486,7 +484,6 @@ void BaseFree(void* ptr, char* originalFile, i32 originalLine) {
     }
 }
 
-// @semantic: optimized register-allocation residual.
 VA(0x004c4310, 0x134)
 void PrintMemoryLeaks(void) {
     char logText[500];
@@ -567,7 +564,6 @@ u32l MAKEFILEID(char* text) {
     return hash;
 }
 
-// @semantic: first divergence is +0x2a: base emits cmp edi,eax; jge, retail cmp eax,edi.
 VA(0x004c4540, 0x95)
 i32 FindIndex(struct indexArray* entries, i32 low, i32 high, i32 key) {
     giFindMid = (low + high) >> 1;
@@ -593,7 +589,6 @@ i32 FindIndex(struct indexArray* entries, i32 low, i32 high, i32 key) {
 
 #include <BASE/MiscGraphicsConstants.h>
 
-// @semantic: first divergence remains base testing ECX after allocation while retail tests EAX before construction.
 VA(0x004c45e0, 0xea)
 void FadeIn(i32 increment) {
     palette* fadePalette = new palette;
@@ -693,7 +688,6 @@ void ProcessAssert(i32 condition, char* file, i32 line) {
     }
 }
 
-// @semantic: optimized register-allocation residual.
 VA(0x004c4850, 0x66)
 char* FindStringInString(char* text, char* pattern) {
     i32 text_len = strlen(text);
@@ -710,7 +704,6 @@ char* FindStringInString(char* text, char* pattern) {
     return NULL;
 }
 
-// @semantic: optimized register-allocation residual.
 VA(0x004c48c0, 0x31)
 char* FindToken(char* text, char token) {
     i32 len = strlen(text);
@@ -803,8 +796,6 @@ void SetGameDefaults(void) {
     gConfig.needsDefaultInitialization = 0;
 }
 
-// @early-stop
-// @early-stop-reloc-only: relocation naming only.
 VA(0x004c4b60, 0x13f)
 void ReadPrefsFromFile(void) {
     sprintf(gText, gMiscText.readFile.stringFormat.text, gMiscText.readFile.configFilename.text);
@@ -1276,8 +1267,6 @@ void ReadPrefs(void) {
     sprintf(gConfig.rmtSDName, gMiscText.remoteNames.serverRight.text, gConfig.uniqueSystemID);
 }
 
-// @early-stop
-// @early-stop-reloc-only: relocation naming only.
 VA(0x004c5500, 0x6a)
 void WritePrefsToFile(void) {
     i32 zeroBuffer[25];
@@ -1674,7 +1663,6 @@ i32 IsCDDrive(i32 driveIndex) {
     return GetDriveTypeA(gText) == DRIVE_CDROM;
 }
 
-// @semantic: sole code-order residual is +0x19b: base loads mciSendStringA into ESI then wsprintfA into EBP.
 VA(0x004c5a60, 0x3ed)
 i32 SetupCDDrive(void) {
     char registryPath[CD_PATH_BUFFER_SIZE];
@@ -1804,7 +1792,6 @@ void BlitBitmapToScreenNoMouseCheck(
     BlitBitmapToScreenVesa(bmp, sourceX, sourceY, width, height, destinationX, destinationY);
 }
 
-// @semantic: optimized register-allocation residual.
 VA(0x004c5ee0, 0x18b)
 void BlitBitmapToScreen(
     class bitmap* bmp,
@@ -1870,7 +1857,6 @@ void BlitBitmapToScreen(
     }
     BlitBitmapToScreenVesa(bmp, blitSourceX, sourceY, width, height, destinationX, destinationY);
 }
-// @semantic: optimized register-allocation residual.
 VA(0x004c6070, 0xa6)
 void LogTruncate(void) {
     char logText[TEXT_BUFFER_SIZE];
@@ -1891,7 +1877,6 @@ void LogTruncate(void) {
 }
 
 
-// @semantic: optimized register-allocation residual.
 VA(0x004c6120, 0x9e)
 void LogStr(char* text) {
     char logText[TEXT_BUFFER_SIZE];
@@ -1909,7 +1894,6 @@ void LogStr(char* text) {
     }
 }
 
-// @semantic: optimized register-allocation residual.
 VA(0x004c61c0, 0x224)
 void LogInt(
     char* label,
@@ -2016,7 +2000,6 @@ void AbsAiPrint(char* text) {
     giDebugLevel = saved;
 }
 
-// @semantic: residual begins with threshold/cursor scheduling and then exchanges ECX/EBX roles in the byte adjustment.
 VA(0x004c64e0, 0xf8)
 void FadeTo(u8* source, u8* destination, i32 increment) {
     u8 colors[MISC_PALETTE_BYTE_COUNT];
@@ -2057,7 +2040,6 @@ void FadeTo(u8* source, u8* destination, i32 increment) {
     UpdatePalette(reinterpret_cast<i8*>(destination));
 }
 
-// @semantic: optimized register-allocation residual.
 VA(0x004c65e0, 0xb8)
 void FadeToColorTable(u8* colorTable, i32 increment) {
     u8 translatedPalette[MISC_PALETTE_BYTE_COUNT];
@@ -2103,7 +2085,6 @@ i32 IsCycleColor(i32 color) {
     return 0;
 }
 
-// @semantic: optimized register-allocation residual.
 VA(0x004c66d0, 0x1ee)
 void CreatePCXFile(char* filename, u8* pixels, i32 width, i32 height, u8* paletteData) {
     PCXHeader header;
@@ -2175,7 +2156,6 @@ VA(0x004c6920, 0xc)
 struct IconEntry* GetIconEntry(class icon* iconPtr, i32 index) {
     return &iconPtr->Entries()[index];
 }
-// @semantic: optimized register-allocation residual.
 VA(0x004c6930, 0xb8)
 i32 SRandom(i32 low, i32 high) {
     if (high == low) {
@@ -2209,7 +2189,6 @@ i32 SRandom(i32 low, i32 high) {
     return rangedResult;
 }
 
-// @semantic: optimized register-allocation residual.
 VA(0x004c69f0, 0x5c)
 void SIncRandomize(i32 x, i32 y) {
     x *= RANDOM_TERM_MULTIPLIER;
@@ -2228,7 +2207,6 @@ void SRand(i32 seed) {
     srand(seed);
 }
 
-// @semantic: optimized register-allocation residual.
 VA(0x004c6a60, 0x48)
 i32 SGenRand(void) {
     i32 result = 0;
@@ -2250,7 +2228,6 @@ VA(0x004c6ab0, 0x6)
 i32 MemSize(i32) {
     return 16034;
 }
-// @semantic: optimized register-allocation residual.
 VA(0x004c6ac0, 0x386)
 void GetDataEntry(
     char* prompt,
@@ -2356,7 +2333,6 @@ void GetDataEntry(
     gbAllowTextEntryEscape = true;
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x004c6e50, 0x173)
 i32 DataEntryWindowHandler(struct tag_message& message) {
     if (bDataEntryTime == IDX(ENTRY_PHASE_IMMEDIATE)) {

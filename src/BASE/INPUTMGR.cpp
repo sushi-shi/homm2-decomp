@@ -41,7 +41,6 @@ DATA(0x0051f98c) i32 bInCheckChangeCursor = 0;
 DATA(0x0051f990) static SInputManagerText gInputManagerText =
     {"ReleaseCapture Failed", "ReleaseCapture Failed", "inputManager"};
 
-// @early-stop: delinker artifact.
 VA(0x004cdb50, 0x308)
 i32 KeyboardMessageHandler(void*, u32 message, u32, i32l messageData) {
     if (gpInputManager == NULL)
@@ -130,7 +129,6 @@ i32 KeyboardMessageHandler(void*, u32 message, u32, i32l messageData) {
     return event->type == MESSAGE_NONE;
 }
 
-// @early-stop: delinker artifact.
 VA(0x004cde60, 0x36c)
 i32 MouseMessageHandler(void*, u32 message, u32, i32l messageData) {
     if (gpInputManager == NULL)
@@ -334,7 +332,6 @@ void inputManager::SetKeyCodeType(i32 keyCodeType) {
     ResetEventQueue(this);
 }
 
-// @semantic: jump-table placement residual.
 VA(0x004ce480, 0x1cb)
 void inputManager::AsciiConvert(tag_message& event) {
     if ((event.payload.keyboard.keyCode >= INPUT_SCAN_F1
@@ -516,7 +513,6 @@ void inputManager::MakeScanCodeTable(void) {
     m_keyState[IDX(INPUT_SCAN_F12)] = INPUT_SCAN_F12 << 8;
 }
 
-// @semantic: residual is register coloring rather than missing behavior.
 VA(0x004ce990, 0xe4)
 void CheckChangeCursor(i32 x, i32 y, i32 force) {
     if (bInCheckChangeCursor != 0)
@@ -542,7 +538,6 @@ void CheckChangeCursor(i32 x, i32 y, i32 force) {
     bInCheckChangeCursor = 0;
 }
 
-// @semantic: compiler-shape residual.
 VA(0x004cea80, 0xe9)
 void inputManager::ForceMouseMove(void) {
     i32 mouseMessageActive = gpInputManager->m_mouseMessageActive;

@@ -23,7 +23,6 @@ DATA(0x00534c54) static i32 gIcX;
 DATA(0x00534c58) static IconEntry* gIcEntry;
 DATA(0x00534c5c) static u32 gIcCnt2;
 
-// @semantic: First divergence is +0x11: ours hoists x before the indexed entry fields.
 VA(0x004d0570, 0x4ed)
 void IconToBitmap(
     class icon* srcIcon,

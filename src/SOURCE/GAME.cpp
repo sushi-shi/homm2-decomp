@@ -386,7 +386,6 @@ i32 game::MineTypesOwned(i32 owner, i32 resourceType) {
     return num;
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x004710f3, 0x40d)
 void ComputeUALoc(i32 player) {
     i32 result = gpGame->SetupPuzzlePieces(player, 1);
@@ -441,8 +440,6 @@ saveLocation:
     gpGame->m_players[player].m_ultimateArtifactHintY = static_cast<i8>(y);
 }
 
-// @early-stop
-// @early-stop-reloc-only: relocation naming only.
 VA(0x00471500, 0x2ac)
 i32 game::SetupPuzzlePieces(i32 player, i32 justCount) {
     i32 pieceCountTotal = GetNumObelisks(player);
@@ -514,7 +511,6 @@ fullMap* game::GetWorldMapData(void) {
     return &m_worldMap;
 }
 
-// @semantic: compiler-shape residual.
 VA(0x0047187f, 0x11e)
 i32 game::CreateBoat(i32 x, i32 y, i32 notify) {
     i32 boatIdx = Scan(m_boatSlots, 0, GAME_BOAT_COUNT);
@@ -638,7 +634,6 @@ void GenerateStandardFileName(char* source, char* destination) {
     strcpy(destination + indexOut, extension);
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x00471eb7, 0xbc4)
 i32 game::SaveGame(char* filename, i32 generateName, i8 expansionFormat) {
     void* emptyPayload = H2_ALLOC(GAME_SAVE_BUFFER_SIZE, 670);
@@ -795,7 +790,6 @@ i32 game::SaveGame(char* filename, i32 generateName, i8 expansionFormat) {
     return 1;
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x00472a7b, 0xb44)
 void game::SetupOrigData(void) {
     ClearMapExtra();
@@ -1239,7 +1233,6 @@ void game::GiveTroopsToNeutralTowns(void) {
     }
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x00474678, 0x1dd0)
 void game::NewMap(char* filename) {
     char* extension0;
@@ -1606,7 +1599,6 @@ inline town* GetCastleSlot(game* instance, i32 index) {
     return &instance->m_castleRecs[index];
 }
 
-// @semantic: three commutative MAP_WIDTH/xPos2 compare encodings remain.
 VA(0x00476448, 0x2601)
 void game::RandomizeEvents(void) {
     i32 shrineId8 = 1;
@@ -2271,7 +2263,6 @@ i32 game::LoadMap(char* filename) {
     return 0;
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x00478fea, 0x3aa)
 void game::ClaimTown(i32 townId, i32 player, i32 suppressVisibility) {
     i32 i;
@@ -2322,7 +2313,6 @@ void game::ClaimTown(i32 townId, i32 player, i32 suppressVisibility) {
     CheckEndGame(0, 0);
 }
 
-// @early-stop: delinker artifact.
 VA(0x00479394, 0x4c2)
 void game::ClaimMine(i32 mineId, i32 player) {
     mapCell* acc;
@@ -2397,7 +2387,6 @@ void game::ClaimMine(i32 mineId, i32 player) {
     }
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x00479856, 0x1e2)
 SpellType
 game::ViewSpells(hero* spellHero, i32 spellType, i32 (*callback)(tag_message&), i32 readOnly) {
@@ -2439,7 +2428,6 @@ game::ViewSpells(hero* spellHero, i32 spellType, i32 (*callback)(tag_message&), 
     return m_viewSpell;
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x00479a38, 0x403)
 void game::UpdateSpellWidgets(void) {
     tag_message message9;
@@ -2539,7 +2527,6 @@ void game::UpdateSpellWidgets(void) {
     }
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x00479e3b, 0x692)
 i32 ViewSpellsHandler(tag_message& msg) {
     SpellType spell;
@@ -2718,7 +2705,6 @@ i32 ViewSpellsHandler(tag_message& msg) {
     return 1;
 }
 
-// @semantic: jump-table placement residual.
 VA(0x0047a4cd, 0x17c)
 i32 ViewSpecialHandler(tag_message& msg) {
     if (msg.type == MESSAGE_MOUSE_MOVE) {
@@ -3026,8 +3012,6 @@ void game::ViewArmy(
     delete m_viewArmyWindow;
 }
 
-// @early-stop
-// @early-stop-reloc-only: relocation naming only.
 VA(0x0047b2cf, 0x3f5)
 i32 ViewArmyHandler(tag_message& msg) {
     i32 goldCost6;
@@ -3159,7 +3143,6 @@ i32 ViewArmyHandler(tag_message& msg) {
     return 1;
 }
 
-// @early-stop: delinker artifact.
 VA(0x0047b6c4, 0x671)
 i32 game::GetRandomNumTroops(i32 monsterType) {
     switch (monsterType) {
@@ -3312,7 +3295,6 @@ void game::TurnOffAIMusic(void) {
     gpSoundManager->m_samplesReady = 1;
 }
 
-// @semantic: compiler-shape residual.
 VA(0x0047bd99, 0x596)
 void game::NextPlayer(void) {
     i32 humanCount;
@@ -3413,7 +3395,6 @@ void game::NextPlayer(void) {
         gpAdvManager->ForceNewHover();
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x0047c32f, 0x432)
 i32 game::ComputeDailyGold(i32 player) {
     i32 heroIndex;
@@ -3474,7 +3455,6 @@ i32 game::ComputeDailyGold(i32 player) {
     return gold;
 }
 
-// @semantic: only residual is the commutative handicap sum at 0x47ce94..0x47cec2.
 VA(0x0047c761, 0x9aa)
 void game::PerDay(void) {
     i32 maxSpellPoints9;
@@ -3619,7 +3599,6 @@ void game::PerDay(void) {
     }
 }
 
-// @semantic: differs only in compare operand order; both are the documented TU-cumulative /Od operand-order pattern.
 VA(0x0047d10b, 0x199d)
 void game::PerWeek(void) {
     i32 heroClass18 = 0;
@@ -3866,7 +3845,6 @@ void game::PerWeek(void) {
     GiveTroopsToNeutralTowns();
 }
 
-// @early-stop: delinker jump-table artifact.
 VA(0x0047eaa8, 0x12d)
 void game::WeeklyRecruitSite(mapCell* cell) {
     i32 type = cell->m_objectMetadata;
@@ -3899,7 +3877,6 @@ void game::WeeklyRecruitSite(mapCell* cell) {
     cell->m_objectMetadata = packed | 0;
 }
 
-// @semantic: evaluation-order residual.
 VA(0x0047ebd5, 0x6f)
 void game::WeeklyGenericSite(mapCell* cell) {
     i32 type = cell->m_objectMetadata;
@@ -3911,7 +3888,6 @@ void game::WeeklyGenericSite(mapCell* cell) {
     }
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x0047ec44, 0x375)
 void game::PerMonth(void) {
     mapCell* cell0;
@@ -3992,7 +3968,6 @@ void game::PerMonth(void) {
     gpAdvManager->CompleteDraw(0);
 }
 
-// @semantic: compiler-shape residual.
 VA(0x0047efb9, 0x476)
 void game::ConvertObject(
     i32 left,
@@ -4151,7 +4126,6 @@ void game::RandomizeTown(i32 x, i32 y, i32) {
     m_castleRecs[townId0].m_type = static_cast<i8>(race0);
 }
 
-// @semantic: residual is TU-cumulative compiler state, not a behavioral difference.
 VA(0x0047f5f1, 0x619)
 void game::RandomizeMine(i32 x, i32 y) {
     u8 objectFrame1;
@@ -4284,7 +4258,6 @@ void game::RandomizeMine(i32 x, i32 y) {
     m_mines[mineId].resourceType = static_cast<i8>(mineType29);
 }
 
-// @semantic: only structural residual is the outer width guard: retail loads x then compares MAP_WIDTH with jle.
 VA(0x0047fc0a, 0xc6)
 void game::InitRandomArtifacts(void) {
     i32 xx;
@@ -4372,7 +4345,6 @@ void game::RandomizeHeroPool(void) {
     }
 }
 
-// @semantic: compiler-shape residual.
 VA(0x004800a6, 0x378)
 void game::SetRandomHeroArmies(i32 heroId, i32 strongArmy) {
     armyGroup* army2 = &m_heroRecs[heroId].m_army;
@@ -4429,7 +4401,6 @@ void game::SetRandomHeroArmies(i32 heroId, i32 strongArmy) {
     }
 }
 
-// @semantic: compiler-shape residual.
 VA(0x0048041e, 0x746)
 void game::ProcessRandomObjects(void) {
     i32 maxValue17;
@@ -4687,7 +4658,6 @@ void game::ProcessRandomObjects(void) {
     }
 }
 
-// @semantic: only residual is the TU-cumulative /Od polarity/load order of cutoff <= visibility: retail emits cmp cutoff,visibility.
 VA(0x00480b64, 0x230)
 void game::SetVisibility(i32 x, i32 y, i32 player, i32 radius) {
     i32 col;
@@ -4736,7 +4706,6 @@ void game::SetVisibility(i32 x, i32 y, i32 player, i32 radius) {
     }
 }
 
-// @semantic: three commutative load-order residuals remain.
 VA(0x00480d94, 0xd8)
 void game::MakeAllWaterVisible(i32 player) {
     char mask = static_cast<char>(1 << player);
@@ -4778,7 +4747,6 @@ void game::GiveArmy(armyGroup* group, i32 type, i32 count, i32 slot) {
     group->m_creatureCounts[i] += count;
 }
 
-// @semantic: compiler-shape residual.
 VA(0x00480f68, 0x91)
 i32 game::ExperienceValueOfStack(armyGroup* group, hero* h) {
     i32 exp = 0;
@@ -4825,7 +4793,6 @@ i32 game::GetLuck(hero* h, class army*, town* castle) {
     return luck;
 }
 
-// @semantic: TU-cumulative /Od evaluation-order residual.
 VA(0x0048111f, 0xf1)
 void game::SetupAdjacentMons(void) {
     i32 col;
@@ -4927,7 +4894,7 @@ void game::WaitForPlayer(char* text, i32 player) {
     }
 }
 
-// @early-stop: inline continuation artifact.
+// Retail /Ob1 includes an inline-accessor continuation in this function.
 VA(0x00481541, 0x104)
 i32 game::HasLateOverlay(i32 col, i32 row) {
     mapCell* cell = WORLDMAP->Row(row) + col;
@@ -4942,7 +4909,7 @@ i32 game::HasLateOverlay(i32 col, i32 row) {
     return 0;
 }
 
-// @early-stop: inline continuation artifact.
+// Retail /Ob1 includes an inline-accessor continuation in this function.
 VA(0x00481645, 0x120)
 void game::ConvertFlagToLateOverlay(i32 col, i32 row) {
     mapCell* cell = WORLDMAP->Row(row) + col;
@@ -4956,7 +4923,7 @@ void game::ConvertFlagToLateOverlay(i32 col, i32 row) {
     }
 }
 
-// @early-stop: inline continuation artifact.
+// Retail /Ob1 includes an inline-accessor continuation in this function.
 VA(0x00481765, 0x13b)
 i32 game::HasObjectTilesetIndex(i32 col, i32 row, i32 tileset, i32 index) {
     mapCell* cell = WORLDMAP->Row(row) + col;
@@ -4971,7 +4938,7 @@ i32 game::HasObjectTilesetIndex(i32 col, i32 row, i32 tileset, i32 index) {
     return 0;
 }
 
-// @early-stop: inline continuation artifact.
+// Retail /Ob1 includes an inline-accessor continuation in this function.
 VA(0x004818a0, 0x112)
 void game::ConvertAllToLateOverlay(i32 col, i32 row) {
     mapCell* cell = WORLDMAP->Row(row) + col;
@@ -4985,7 +4952,6 @@ void game::ConvertAllToLateOverlay(i32 col, i32 row) {
     }
 }
 
-// @semantic: residual is one coupled TU-cumulative /Od lowering choice.
 VA(0x004819b2, 0x295)
 void game::ProcessMapExtra(void) {
     i32 row;
@@ -5032,7 +4998,6 @@ void game::ProcessMapExtra(void) {
     }
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x00481c47, 0x900)
 void game::SetupTowns(void) {
     DATA(0x004f756c) static i16 setupTownsSourceLineBase = 0x17f9;
@@ -5234,7 +5199,6 @@ void game::SetupTowns(void) {
     }
 }
 
-// @semantic: compiler-shape residual.
 VA(0x00482547, 0x774)
 void game::ProcessOnMapHeroes(void) {
     DATA(0x004f7598) static i16 processOnMapHeroesSourceLineBase = 0x18ef;
@@ -5417,7 +5381,6 @@ void game::ProcessOnMapHeroes(void) {
     }
 }
 
-// @semantic: inline-continuation and packed-record load-order residual.
 VA(0x00482cbb, 0x55e)
 void game::CheckHeroConsistency(void) {
     hero* mapHero3;
@@ -5530,7 +5493,6 @@ void game::CheckHeroConsistency(void) {
 #define samplesReady samplesReady1
 #define success success14
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x00483219, 0x71e)
 i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
     i32 success;
@@ -5760,7 +5722,6 @@ transmitCleanup:
 #define samplesReady samplesReady0
 #define success success15
 
-// @semantic: compiler-shape residual.
 VA(0x00483937, 0x68d)
 i32 game::ReceiveSaveGame(
     i32 dataSize,
@@ -6078,7 +6039,6 @@ i32 game::GetBoatsBuilt(void) {
     return count;
 }
 
-// @semantic: compiler-shape residual.
 VA(0x00484471, 0x9c)
 i32 game::GetNumThievesGuilds(i32 color) {
     i32 num = 0;
@@ -6116,7 +6076,6 @@ i32 game::CalcDifficultyRating(void) {
     return rating;
 }
 
-// @early-stop: delinker jump-table artifact.
 VA(0x00484620, 0x1ea)
 i32 CalcBaseScore(i32 days) {
     i32 score = SCORE_BASE;
@@ -6151,7 +6110,6 @@ i32 CalcBaseScore(i32 days) {
     return score;
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x0048480a, 0xb5)
 void game::RestoreCell(i32 x, i32 y, i32 obj, i32 barrier, mapCell* passedCell, i32 p6) {
     mapCell* cell;
@@ -6169,7 +6127,6 @@ void game::RestoreCell(i32 x, i32 y, i32 obj, i32 barrier, mapCell* passedCell, 
     }
 }
 
-// @semantic: first divergence is the height equality's commutative load order.
 VA(0x004848bf, 0xe3)
 void game::SetMapSize(i32 w, i32 h) {
     DATA(0x004f7a0c) static i16 setMapSizeSourceLineBase = 0x1d0d;
@@ -6186,7 +6143,6 @@ void game::SetMapSize(i32 w, i32 h) {
     memset(mapExtra, 0, MAP_WIDTH * MAP_HEIGHT);
 }
 
-// @semantic: residual is the operand-eval order of the two flags |= <extracted len bits> ORs.
 VA(0x004849a2, 0x100)
 void WriteDiffHeaderInfo(u8 cmd, i32 len, u8* buf, i32* pos) {
     u8 flags = 0;
@@ -6233,7 +6189,6 @@ i32 GetSkipCopyLen(u8* buf, i32* pos) {
     return len;
 }
 
-// @early-stop: delinker artifact.
 VA(0x00484b4d, 0x5ba)
 void CreateDiffFile(
     char* oldName,
@@ -6382,7 +6337,6 @@ void CreateDiffFile(
     return;
 }
 
-// @semantic: branch/code-shape residual.
 VA(0x00485107, 0x3ce)
 void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
     DATA(0x004f7bc4) static i16 createJoinFileSourceLineBase = 0x1e0f;
@@ -6621,7 +6575,6 @@ EventExtra* GetMapEvent(i32 x, i32 y) {
     return NULL;
 }
 
-// @semantic: compiler-shape residual.
 VA(0x00485e07, 0x34c)
 void game::CheckForTimeEvent(void) {
     i32 dayNumber6;
@@ -6694,7 +6647,6 @@ void game::CheckForTimeEvent(void) {
     }
 }
 
-// @semantic: compiler-shape residual.
 VA(0x00486153, 0x143)
 void CheckValidAvailableHeroes(void) {
     i32 candidatePlayer0;
@@ -6735,7 +6687,6 @@ i32 CalcFileCRC(char* filename) {
     return crc;
 }
 
-// @semantic: evaluation-order residual.
 VA(0x00486341, 0x153)
 void CompressTest2(void) {
     i32 dataSize2;
@@ -6824,7 +6775,6 @@ void CompressTest3(void) {
     }
 }
 
-// @semantic: compiler-shape residual.
 VA(0x004866a5, 0x119)
 i32 game::CountShrines(i32 player) {
     if (xIsExpansionMap == 0)

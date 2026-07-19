@@ -9,7 +9,6 @@
 #include <windows.h>
 #include <string.h>
 
-// @semantic: First divergence is the destination-address association in the row copy: base adds the row offset before destinationX.
 VA(0x004d8540, 0x1e2)
 extern "C" void __fastcall BlitBitmapToScreenVesa(
     bitmap* sourceBitmap,

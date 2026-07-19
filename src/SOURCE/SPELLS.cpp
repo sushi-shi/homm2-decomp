@@ -78,7 +78,6 @@ i32 combatManager::HasValidSpellTarget(SpellType spell) {
     return 0;
 }
 
-// @semantic: branch/code-shape residual.
 VA(0x00420546, 0x44a)
 i32 combatManager::ViewSpells(i32) {
     CreatureType elementalType;
@@ -262,7 +261,6 @@ i32 combatManager::ViewSpells(i32) {
     return m_selectedSpell != SPELL_NONE;
 }
 
-// @semantic: First residual is after the switch dispatch at +0x31.
 VA(0x00420990, 0x15c)
 i32 CombatSpecialHandler(tag_message& message) {
     if (message.type == SPELL_MESSAGE_HOVER) {
@@ -295,7 +293,6 @@ i32 CombatSpecialHandler(tag_message& message) {
     return HANDLER_CONTINUE;
 }
 
-// @semantic: first residual at +0x35 is load order: retail loads hex then compares indexToCastOn.
 VA(0x00420aec, 0x2aa)
 i32 HandleCastSpell(tag_message& message) {
     i32 hex;
@@ -362,7 +359,6 @@ i32 HandleCastSpell(tag_message& message) {
     return HANDLER_CONTINUE;
 }
 
-// @semantic: First code residual is the corpse/hex index formation near +0x124: retail forms corpse + 0x61*hex.
 VA(0x00420d96, 0x2e5)
 i32 combatManager::FindResurrectArmyIndex(i32 side, i32 spell, i32 hex) {
     army* target_j;
@@ -393,7 +389,6 @@ i32 combatManager::FindResurrectArmyIndex(i32 side, i32 spell, i32 hex) {
     return NO_SELECTION;
 }
 
-// @semantic: first executable residual is equivalent occupant side/index multiplication order.
 VA(0x0042107b, 0x521)
 i32 combatManager::ValidSpellTarget(SpellType spell, i32 hex) {
     army* target_j = NULL;
@@ -505,7 +500,6 @@ i32 combatManager::ValidSpellTarget(SpellType spell, i32 hex) {
     return 1;
 }
 
-// @semantic: residual is the occupied-target army address: retail evaluates occupantIndex before occupantSide.
 VA(0x0042159c, 0x222)
 void combatManager::SpellMessage(i32 spell, i32 hex) {
     army* target_i;
@@ -547,7 +541,6 @@ void combatManager::SpellMessage(i32 spell, i32 hex) {
     CombatMessage(gText, 1, 0, 0);
 }
 
-// @semantic: first normalized residual is the typed gsSpellInfo field relocation versus retail's interior label.
 VA(0x004217be, 0x1eca)
 void combatManager::CastSpell(
     SpellType spell,
@@ -1144,7 +1137,6 @@ void combatManager::CastSpell(
     CheckChangeSelector();
 }
 
-// @semantic: only raw residual is the branch byte at +0x18.
 VA(0x00423688, 0xda)
 void combatManager::DefaultSpell(i32 targetHex) {
     if (ValidHex(targetHex)) {
@@ -1156,7 +1148,6 @@ void combatManager::DefaultSpell(i32 targetHex) {
     }
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x00423762, 0x623)
 void combatManager::Fireball(i32 targetHex, SpellType spell) {
     if (!ValidHex(targetHex))
@@ -1463,7 +1454,6 @@ void combatManager::ElementalStorm(void) {
     }
 }
 
-// @semantic: First non-relocation stream divergence is retail +0x6d4 in source-buffer address evaluation.
 VA(0x00424449, 0x9ff)
 void combatManager::Armageddon(void) {
     i32 baseDamage2 = m_spellPower[m_currentSide] * SPELL_ARMAGEDDON_DAMAGE_PER_POWER;
@@ -1658,7 +1648,6 @@ void combatManager::Armageddon(void) {
     gpMouseManager->ShowColorPointer();
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x00424e48, 0x101)
 void combatManager::TurnToStone(army* target) {
     ResetLimitCreature();
@@ -1760,7 +1749,6 @@ void combatManager::Blur(i32 redAdjust, i32 greenAdjust, i32 blueAdjust) {
     m_backgroundDrawn = 0;
 }
 
-// @semantic: first opcode/CFG divergence is retail +0x21c jne +0x5 versus ours je +0xf2 for the second zero-angle guard.
 VA(0x004251cd, 0x320)
 void combatManager::ResetBoltAngle(SBolt* bolt) {
     i32 unusedBoltAngleWord1;
@@ -1820,7 +1808,6 @@ void combatManager::ResetBoltAngle(SBolt* bolt) {
     }
 }
 
-// @semantic: first normalized instruction divergence is retail +0x6a fld dword ptr [eax+0x38].
 VA(0x004254ed, 0x4f0)
 void combatManager::DrawBolt(SBolt* bolt, i32 stepCount) {
     i32 oldX = static_cast<i32>(bolt->currentX);
@@ -2016,7 +2003,6 @@ void combatManager::AddBolt(
     ResetBoltAngle(bolt);
 }
 
-// @semantic: first normalized instruction divergence is retail +0x1a1 mov eax,[ebp+0x28] versus ours +0x1a4 mov eax,[ebp+0x24].
 VA(0x00425c4c, 0xa82)
 void combatManager::DoBolt(
     i32 managePointer,
@@ -2248,7 +2234,6 @@ void combatManager::DoBolt(
     gpWindowManager->m_updateFlags = 1;
 }
 
-// @semantic: branch/code-shape residual.
 VA(0x004266ce, 0x18c)
 i32 combatManager::GetNextChainLightningTarget(army* source, i32 requireWorks) {
     army* candidate_p;
@@ -2288,7 +2273,6 @@ i32 combatManager::GetNextChainLightningTarget(army* source, i32 requireWorks) {
     return closestHex_f;
 }
 
-// @semantic: only executable residual is the branch-distance clamp.
 VA(0x0042685a, 0x361)
 void combatManager::ChainLightning(i32 targetHex, i32 spellPower) {
     i32 firstBolt = 1;
@@ -2372,7 +2356,6 @@ void combatManager::ChainLightning(i32 targetHex, i32 spellPower) {
     gpMouseManager->ShowColorPointer();
 }
 
-// @semantic: first normalized residual is stripe address evaluation order.
 VA(0x00426bbb, 0x292)
 void combatManager::VaporizeCreature(i32 side, i32 armyIndex) {
     DATA(0x004f04e4) static i16 vaporizeSourceLineBase = 2524;
@@ -2427,7 +2410,6 @@ void combatManager::VaporizeCreature(i32 side, i32 armyIndex) {
     gpCombatManager->DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
 }
 
-// @semantic: first normalized residual is side/index multiplication order.
 VA(0x00426e4d, 0x592)
 void combatManager::RippleCreature(i32 side, i32 armyIndex, i32 mode) {
     DATA(0x004f0540) static i16 rippleSourceLineBase = 2587;
@@ -2551,7 +2533,6 @@ void combatManager::RippleCreature(i32 side, i32 armyIndex, i32 mode) {
         gpCombatManager->DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
 }
 
-// @semantic: first normalized divergence is affected[side][armyIndex] address multiplication order.
 VA(0x004273df, 0x6b2)
 void combatManager::ShowMassSpell(i8 (*const affected)[20], i32 effect, i32 animateCreatures) {
     u32l effectFile = MAKEFILEID(gCombatFxNames[effect]);
@@ -2677,7 +2658,6 @@ void combatManager::ShowMassSpell(i8 (*const affected)[20], i32 effect, i32 anim
         MakeCreaturesVanish();
 }
 
-// @semantic: first normalized residual is gsSpellInfo's typed field relocation versus retail's interior constant label.
 VA(0x00427a91, 0x8f8)
 void combatManager::CastMassSpell(SpellType spell, i32 spellPower) {
     army* target_i = NULL;
@@ -2849,7 +2829,6 @@ void combatManager::CastMassSpell(SpellType spell, i32 spellPower) {
     gpWindowManager->m_updateFlags = 1;
 }
 
-// @semantic: first residual is search-loop initialization and trampoline order.
 VA(0x00428389, 0x5c8)
 void combatManager::MirrorImage(i32 targetHex) {
     army* source =
@@ -3058,8 +3037,6 @@ void combatManager::DoLuck(i32 side, i32 armyIndex) {
     );
 }
 
-// @early-stop
-// @early-stop-reloc-only: relocation naming only.
 VA(0x00428d4f, 0x33a)
 void combatManager::DoBlast(i32 targetHex, i32 spell) {
     float stepY_e;
@@ -3148,7 +3125,6 @@ void combatManager::DoBlast(i32 targetHex, i32 spell) {
     gpResourceManager->Dispose(blastIcon_h);
 }
 
-// @semantic: first executable residual is corpse address evaluation.
 VA(0x00429089, 0x655)
 void combatManager::Resurrect(i32 spell, i32 targetHex, i32 spellPower) {
     i32 armyIndex_f;
@@ -3301,7 +3277,6 @@ i32 combatManager::SpaceForElementalExists(void) {
         return 1;
 }
 
-// @semantic: residual is stack layout: retail stores the aggregate return temporary at -0x10/-0x0c and armyName at -0x14.
 VA(0x00429797, 0xd9)
 void combatManager::ShowSpellCastFailure(army* target, i32) {
     SAMPLE2 sample = NULL_SAMPLE2;
@@ -3364,7 +3339,6 @@ void combatManager::ModifyDamageForArtifacts(
     }
 }
 
-// @semantic: first code divergence is the screen-copy row loop branch (jge versus retail jle).
 VA(0x00429ae0, 0x931)
 void combatManager::Earthquake(void) {
     i32 shakeOffsets[30];

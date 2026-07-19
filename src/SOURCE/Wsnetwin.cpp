@@ -32,7 +32,6 @@ DATA(0x004ed830) static i16 s_wsReceiveSourceLineBase = 359;
 DATA(0x004ed860) static i16 s_wsEvaluateSourceLineBase = 413;
 
 
-// @semantic: First raw residual is +0x478: retail loads player then compares giNumHumanPlayers (9 bytes).
 VA(0x004068b0, 0x5b5)
 i16 wsnet_init(void) {
     WinsockStartupMessage startup;
@@ -203,7 +202,6 @@ void wsnet_term(void) {
     CleanupDPVars();
 }
 
-// @semantic: First raw residual is +0x8e: retail loads netPlayer then compares giNumHumanPlayers (9 bytes).
 VA(0x00406f37, 0x1f5)
 void wsSendMessage(i32 destination, u8 type, u16 size, void* data) {
     u8* packetBuffer = static_cast<u8*>(H2_ALLOC(size + 1, 281));
@@ -292,7 +290,6 @@ i16 wsnet_rcv(i16, u16, void* data) {
     return static_cast<i16>(size);
 }
 
-// @semantic: stack-slot/code-shape residual.
 VA(0x00407234, 0xaf)
 void wsProcessMessages(void) {
     struct sockaddr_in remote;
@@ -323,7 +320,6 @@ void wsProcessMessages(void) {
     }
 }
 
-// @semantic: first residual is the embedded 0x14-byte jump table at RVA 0x7642.
 VA(0x004072e3, 0x37d)
 void wsEvaluateMessage(u32l size, i32 sender) {
     char* message = rcvBufIn + 1;
@@ -407,7 +403,6 @@ void wsEvaluateMessage(u32l size, i32 sender) {
     }
 }
 
-// @semantic: branch/code-shape residual.
 VA(0x00407660, 0x2e)
 i32 wsWaitForFirstGuest(void) {
     wsProcessMessages();

@@ -222,7 +222,6 @@ i32 ArenaWindowHandler(struct tag_message& message_1) {
     return EVENT_WINDOW_CONTINUE;
 }
 
-// @semantic: compiler-shape residual.
 VA(0x004c063b, 0x150)
 void UpdateArenaIcons(void) {
     i32 widgetIndex;

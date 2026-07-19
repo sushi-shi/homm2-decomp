@@ -31,7 +31,6 @@ H2_ENUM_BEGIN(CombatLayoutConstant)
     SPELL_AI_CAST_ACTION                = 1
 H2_ENUM_END(CombatLayoutConstant)
 
-// @semantic: only raw residual is +0x21c/+0x21f/+0x221: ours loads effectScore then emits JGE.
 VA(0x004867c0, 0x279)
 i32 combatManager::DoSpellAI(i32 side, i32 restricted) {
     i32 bestSpellChoice;
@@ -94,7 +93,6 @@ i32 combatManager::DoSpellAI(i32 side, i32 restricted) {
     return 0;
 }
 
-// @semantic: compiler-shape residual.
 VA(0x00486a39, 0x1155)
 void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32* bestHex) {
     i32 doneResult;
@@ -759,7 +757,6 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
     }
 }
 
-// @semantic: residual begins in local branch/table layout at +0xcb.
 VA(0x00487b8e, 0x34c)
 i32 combatManager::EffectSpellCreateCreature(i32 hex, SpellType spell) {
     float workChance = COMBAT_SPELL_AI_FULL_EFFECT_IMMEDIATE;
@@ -818,7 +815,6 @@ i32 combatManager::EffectSpellCreateCreature(i32 hex, SpellType spell) {
     return static_cast<i32>(creatureEffect * workChance);
 }
 
-// @semantic: first normalized residual is pooled 0.0 identity ($T4772 versus const_000eb7f0).
 VA(0x00487eda, 0x72d)
 i32 combatManager::RawEffectSpellInfluence(army* target, i32 influence) {
     i32 effect = 0;
@@ -1015,7 +1011,6 @@ i32 combatManager::FirstResurrectable(i32 startHex, i32* hex, i32 spell) {
     return 1;
 }
 
-// @semantic: first CFG residual after target validation is three retail-only continuation jumps, followed by pooled-double identity.
 VA(0x004887c1, 0x421)
 void combatManager::EffectSpellCure(i32* effect, i32 targetSide, i32 targetIndex, i32 cure) {
     i32 sideWork;
@@ -1151,7 +1146,6 @@ void combatManager::EffectSpellResurrect(i32* effect, i32 hex, SpellType spell) 
         *effect = static_cast<i32>(*effect * COMBAT_SPELL_AI_RESURRECT_VALUE_MODIFIER);
 }
 
-// @semantic: jump-table placement residual.
 VA(0x00488d58, 0xcc9)
 void combatManager::EffectSpellDamage(i32* effect, SpellType spell, i32 targetHex) {
     i32 fightValueKilledAI[2];

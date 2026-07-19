@@ -43,14 +43,12 @@ DATA(0x0051736c) static SFindPathSourceLocation gSearchDestructionSource = {
     FINDPATH_SOURCE_FILE
 };
 
-// @early-stop: retail alignment artifact.
 VA(0x004a4a50, 0x10)
 searchArray::searchArray(void) {
     m_storage.cells = NULL;
     m_maxQueueCount = 0;
 }
 
-// @early-stop: retail alignment artifact.
 VA(0x004a4a60, 0x30)
 searchArray::~searchArray() {
     if (m_storage.cells != NULL)
@@ -62,7 +60,6 @@ searchArray::~searchArray() {
     m_storage.cells = NULL;
 }
 
-// @early-stop: retail alignment artifact.
 VA(0x004a4a90, 0x60)
 void searchArray::Init(void) {
     if (m_storage.cells != NULL)
@@ -79,7 +76,6 @@ void searchArray::Init(void) {
     ));
 }
 
-// @early-stop: retail alignment artifact.
 VA(0x004a4af0, 0x30)
 void searchArray::Close(void) {
     if (m_storage.cells != NULL)
@@ -91,7 +87,6 @@ void searchArray::Close(void) {
     m_storage.cells = NULL;
 }
 
-// @early-stop: retail alignment artifact.
 VA(0x004a4b20, 0x40)
 void searchArray::Clear(void) {
     memset(m_queue, 0, sizeof(m_queue));
@@ -100,7 +95,6 @@ void searchArray::Clear(void) {
     m_queueCount = 0;
 }
 
-// @semantic: First residual is the compare at +0x1f: retail emits CMP ESI,EAX/JL, while candidate emits CMP EAX,ESI/JG.
 VA(0x004a4b60, 0x40)
 i32 searchArray::QuickDistance(i32 x1, i32 y1, i32 x2, i32 y2) {
     i32 xDistance = abs(x1 - x2);
@@ -111,7 +105,6 @@ i32 searchArray::QuickDistance(i32 x1, i32 y1, i32 x2, i32 y2) {
     return yDistance + xDistance / 2;
 }
 
-// @semantic: first divergence is retail keeping mobility in EBX and saving EBP for roadCost while ours uses EDI/EBX.
 VA(0x004a4ba0, 0x80)
 i32 CalcTerrainCost(
     i32 terrain,
@@ -144,7 +137,6 @@ terrainCost:
     return giTerrainCost[terrain][direction][diagonal & SEARCH_DIAGONAL_COST_MASK];
 }
 
-// @semantic: first divergence is scratch-register assignment at queue setup.
 VA(0x004a4c20, 0x270)
 void searchArray::PushPoint(
     i32 x,
@@ -213,7 +205,6 @@ void searchArray::PushPoint(
     }
 }
 
-// @semantic: First divergence is EBX/EDI ownership in occupied-array initialization.
 VA(0x004a4e90, 0x36f)
 void searchArray::TestPossibleDirections(
     i32 x,
@@ -326,7 +317,6 @@ void searchArray::TestPossibleDirections(
     } while (gSearchDirection < SEARCH_DIRECTION_COUNT);
 }
 
-// @early-stop: retail alignment artifact.
 VA(0x004a5200, 0x1f0)
 void searchArray::SeedCombatPosition(class army* unit) {
     i32 hex;
@@ -380,7 +370,6 @@ void searchArray::SeedCombatPosition(class army* unit) {
     unit->m_targetSide = -1;
 }
 
-// @semantic: First divergence is EAX versus ECX for the moat-cell byte.
 VA(0x004a53f0, 0x410)
 i32 searchArray::FindCombatPath(
     i32 sourceHex,
@@ -536,7 +525,6 @@ reconstructPath:
     goto restoreMoat;
 }
 
-// @semantic: First divergence is ESI/EDI ownership in the prologue.
 VA(0x004a5800, 0x100)
 void searchArray::PushCombatPoint(i32 hex, i32 direction, i32 distance, i32 speed) {
     if (ValidHex(hex)) {

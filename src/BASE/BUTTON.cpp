@@ -114,7 +114,6 @@ inline button::~button() {
     messageValue.type = MESSAGE_WIDGET;                                                          \
     messageValue.payload.widget.id = idValue
 
-// @semantic: first non-relocation byte divergence is +0x47: candidate loads the vptr after storing m_flags.
 VA(0x004dd6d0, 0x595)
 i32 button::Main(tag_message& msg) {
     if (DecodeWidgetKind(m_kind) == WIDGET_KIND_AUTO_REPEAT && (m_flags & WIDGET_FLAG_SELECTED) != 0
@@ -287,7 +286,6 @@ normalEvent:
     return widget::Main(msg);
 }
 
-// @semantic: first non-relocation divergence is +0x0a: candidate loads both owner coordinates first.
 VA(0x004ddc70, 0x96)
 i16 button::Select(struct tag_message& msg) {
     heroWindow* window = m_owner;
@@ -308,7 +306,6 @@ i16 button::Select(struct tag_message& msg) {
     return WIDGET_DISPATCH_FORWARD;
 }
 
-// @semantic: only residual is scheduling at +0x19/+0x1f: retail loads the vptr, stores m_flags, then sets ECX.
 VA(0x004ddd10, 0x83)
 i16 button::Deselect(struct tag_message& msg) {
     i16 flags = m_flags;

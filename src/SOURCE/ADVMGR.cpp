@@ -1140,7 +1140,6 @@ void advManager::GetCursorSampleSet(i32 sampleSet) {
     }
 }
 
-// @semantic: evaluation-order residual.
 VA(0x0045751b, 0x6c0)
 class mapCell* advManager::DoAdvCommand(void) {
     mapCell* eventCellState = NULL;
@@ -1319,7 +1318,6 @@ class mapCell* advManager::DoAdvCommand(void) {
     return eventCellState;
 }
 
-// @semantic: compiler-shape residual.
 VA(0x00457bdb, 0x191)
 void advManager::CheckSetEvilInterface(i32 redraw, i32 player) {
     if (player == -1) {
@@ -1363,7 +1361,6 @@ void advManager::CheckSetEvilInterface(i32 redraw, i32 player) {
     }
 }
 
-// @semantic: differs only at +0xd0c: base selects +0x48e and retail +0x83e.
 VA(0x00457d6c, 0xfda)
 i32 advManager::Main(struct tag_message& message) {
     if (KBTickCount() > glTimers[0] && ComboDraw(1)) {
@@ -1813,7 +1810,6 @@ void advManager::Reseed(i32, i32) {
     giSeedingValid = 0;
 }
 
-// @semantic: first code residual is commutative load order at +0x73b.
 VA(0x00458d68, 0xeb1)
 i32 advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell) {
     i32 mouseX;
@@ -2151,7 +2147,6 @@ i32 advManager::ProcessSelect(struct tag_message* message, class mapCell** event
     return 1;
 }
 
-// @early-stop: delinker artifact.
 VA(0x00459c19, 0x463)
 i32 advManager::ProcessDeSelect(
     struct tag_message* message,
@@ -2281,7 +2276,6 @@ i32 advManager::ProcessDeSelect(
     return 1;
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x0045a07c, 0x5c8)
 i32 advManager::ProcessSearch(i32 x, i32 y) {
     mapCell* currentCell;
@@ -2454,7 +2448,6 @@ search_end:
     return 1;
 }
 
-// @semantic: first normalized divergence reassociates the same search-cell address.
 VA(0x0045a644, 0xa50)
 i32 advManager::ProcessHover(i32 mouseX, i32 mouseY) {
     i32 heroXHero;
@@ -2765,7 +2758,6 @@ void advManager::UpdateScreen(i32, i32 forceUpdate) {
     Process1WindowsMessage();
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x0045b2ae, 0x4eb)
 void advManager::CompleteDraw(i32 originX, i32 originY, i32 forceDraw, i32 updateBottomView) {
     i32 drawY;
@@ -2919,7 +2911,6 @@ void advManager::CompleteDraw(i32 update) {
     CompleteDraw(m_mapOriginX, m_mapOriginY, update, 1);
 }
 
-// @semantic: evaluation-order residual.
 VA(0x0045b7d3, 0x3a9)
 i32 advManager::GetCloudLookup(i32 x, i32 y) {
     u32 cloudMask = 0;
@@ -2998,7 +2989,6 @@ i32 advManager::GetCloudLookup(i32 x, i32 y) {
     return giCloudType[cloudMask];
 }
 
-// @semantic: first real code divergence is the MAP_WIDTH boundary compare at +0x74.
 VA(0x0045bb7c, 0x24cb)
 void advManager::DrawCell(
     i32 mapX,
@@ -4017,7 +4007,6 @@ void advManager::DrawCell(
     }
 }
 
-// @semantic: only residual is the width guard: retail loads x, compares MAP_WIDTH, and uses jle.
 VA(0x0045e047, 0x93)
 class mapCell* advManager::GetCell(i32 x, i32 y) {
     if (x < 0 || y < 0 || x >= MAP_WIDTH || MAP_HEIGHT <= y) {
@@ -4027,7 +4016,6 @@ class mapCell* advManager::GetCell(i32 x, i32 y) {
     }
 }
 
-// @semantic: first divergence is commutative operand order at +0x141.
 VA(0x0045e0da, 0x104d)
 void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
     i32 maxXLocal;
@@ -4439,7 +4427,6 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
     }
 }
 
-// @early-stop: retail alignment artifact.
 VA(0x0045f127, 0x133e)
 void advManager::QuickInfo(i32 cellX, i32 cellY) {
     i32 quickInfoShowFlag = 1;
@@ -4893,7 +4880,6 @@ quick_info_ready:
     delete windowLocal;
 }
 
-// @semantic: missing /Ob1 continuations at +0x3b and +0x1c5.
 VA(0x00460465, 0x348)
 void advManager::UpdateHeroLocator(i32 locatorSlot, i32 drawWindow, i32 updateScreen) {
     hero* locatorHero8;
@@ -4999,8 +4985,6 @@ void advManager::UpdateHeroLocator(i32 locatorSlot, i32 drawWindow, i32 updateSc
     }
 }
 
-// @early-stop
-// @early-stop-reloc-only: relocation naming only.
 VA(0x004607ad, 0x102)
 void advManager::UpdateHeroLocators(i32 drawWindow, i32 updateScreen) {
     i32 locatorSlot;
@@ -5028,8 +5012,6 @@ void advManager::UpdateHeroLocators(i32 drawWindow, i32 updateScreen) {
     }
 }
 
-// @early-stop
-// @early-stop-reloc-only: relocation naming only.
 VA(0x004608af, 0x2e8)
 void advManager::UpdateTownLocators(i32 drawWindow, i32 updateScreen) {
     i32 locatorSlot;
@@ -5105,7 +5087,6 @@ void advManager::UpdateTownLocators(i32 drawWindow, i32 updateScreen) {
     }
 }
 
-// @semantic: first and only instruction divergence is the missing retail jmp $+0 at +0x12d after UpdBottomViewEnemyTurn.
 VA(0x00460b97, 0x1cc)
 void advManager::UpdBottomView(i32 forceUpdate, i32 drawWindow, i32 updateScreen) {
     i32 updated;
@@ -5188,7 +5169,6 @@ void advManager::ClearBottomView(void) {
     iLastAnimFrame = BOTTOM_VIEW_NO_ANIMATION;
 }
 
-// @semantic: first divergence is commutative global comparison order at +0x29e..+0x2c6.
 VA(0x00460e95, 0x51b)
 i32 advManager::UpdBottomViewEnemyTurn(void) {
     i32 updated;
@@ -5343,7 +5323,6 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
     return updated;
 }
 
-// @semantic: first byte divergence is the frame allocation at +0x03: retail uses 0x24, ours 0x20.
 VA(0x004613b0, 0x366)
 i32 advManager::UpdBottomViewNewTurn(void) {
     DATA(0x004f6134) static i16 s_newTurnLineBase = 4560;
@@ -5671,7 +5650,6 @@ i32 advManager::UpdBottomViewKingdom(void) {
     return 1;
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x00461dd8, 0x583)
 i32 advManager::UpdBottomViewHero(void) {
     DATA(0x004f6300) static i16 s_bottomHeroLineBase = 4835;
@@ -5830,7 +5808,6 @@ i32 advManager::UpdBottomViewHero(void) {
     return 1;
 }
 
-// @semantic: first code divergence is the commutative loop comparison at +0x409.
 VA(0x0046235b, 0xd32)
 void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 windowY) {
     DATA(0x004f6370) static i16 s_quickViewLineBase = 4982;
@@ -6179,7 +6156,6 @@ char* advManager::GetArmySizeName(i32 armySize, i32 grammar) {
     return gArmySizeNames[8][grammar];
 }
 
-// @semantic: compiler-shape residual.
 VA(0x004631ad, 0xc29)
 void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 windowY) {
     DATA(0x004f6488) static i16 s_townViewLineBase = 5346;
@@ -6570,7 +6546,6 @@ void advManager::MobilizeCurrHero(i32 update) {
     SetHeroContext(gpCurPlayer->m_currentHero, update);
 }
 
-// @semantic: First residual at +0xd9: retail loads m_eventFlags, ORs EAX with 0x80, then stores it.
 VA(0x00463f95, 0x16c)
 void advManager::DemobilizeCurrHero(void) {
     if (gpCurPlayer->m_currentHero == INVALID_HERO) {
@@ -6723,7 +6698,6 @@ void advManager::SetHeroContext(i32 heroId, i32 update) {
     }
 }
 
-// @semantic: First residual bytes are +0xcc/+0xd0: retail uses cmp eax,[message.y]; jle, ours uses cmp [message.y],eax; jge.
 VA(0x004646aa, 0x22f)
 void advManager::DoHeroKnob(void) {
     i32 previousPageSlot = gpCurPlayer->m_heroLocatorPage;
@@ -6772,7 +6746,6 @@ void advManager::DoHeroKnob(void) {
     UpdateHeroLocators(1, 1);
 }
 
-// @semantic: First residual bytes are +0xcc/+0xd0: retail uses cmp eax,[message.y]; jle, ours uses cmp [message.y],eax; jge.
 VA(0x004648d9, 0x22f)
 void advManager::DoTownKnob(void) {
     i32 previousPageSlot = gpCurPlayer->m_townLocatorPage;
@@ -6821,7 +6794,6 @@ void advManager::DoTownKnob(void) {
     UpdateTownLocators(1, 1);
 }
 
-// @early-stop: delinker jump-table artifact.
 VA(0x00464b08, 0x397)
 void advManager::CastSpell(SpellType spell) {
     hero* currentHeroSlot;
@@ -7017,7 +6989,6 @@ void advManager::CheckCastSpell(void) {
     }
 }
 
-// @semantic: branch/code-shape residual.
 VA(0x00465191, 0x31c)
 i32 DimensionDoorHandler(tag_message& message) {
     if (glTimers[0] < KBTickCount()) {
@@ -7107,7 +7078,6 @@ i32 DimensionDoorHandler(tag_message& message) {
     return DIMENSION_DOOR_UNHANDLED;
 }
 
-// @semantic: evaluation-order residual.
 VA(0x004654ad, 0x11a9)
 i32 advManager::ComboDraw(i32 originX, i32 originY, i32 animate) {
     i32 updateCount;
@@ -7500,7 +7470,6 @@ i32 advManager::ComboDraw(i32 update) {
     return ComboDraw(m_mapOriginX, m_mapOriginY, update);
 }
 
-// @semantic: evaluation-order residual.
 VA(0x0046668e, 0x338)
 void advManager::SetEnvironmentOrigin(i32 originX, i32 originY, i32 stopSounds) {
     i32 soundLayer;
@@ -7618,7 +7587,6 @@ void advManager::CheckLoadSample(i32 index) {
     }
 }
 
-// @early-stop: delinker artifact.
 VA(0x00466a2f, 0x4c1)
 AdventureEnvironmentSoundId advManager::GetSoundId(i32 x, i32 y) {
     mapCell* currentCell = &m_mapData->Row(y)[x];
@@ -7741,7 +7709,6 @@ AdventureEnvironmentSoundId advManager::GetSoundId(i32 x, i32 y) {
     return ADVMGR_ENVIRONMENT_SOUND_NONE;
 }
 
-// @semantic: compiler-shape residual.
 VA(0x00466ef0, 0x23a)
 void advManager::InsertSound(i32 x, i32 mapY, i32 distance, i32 soundLayer) {
     i32 soundSlot;
@@ -7800,7 +7767,6 @@ void advManager::InsertSound(i32 x, i32 mapY, i32 distance, i32 soundLayer) {
     }
 }
 
-// @semantic: evaluation-order residual.
 VA(0x0046712a, 0x40f)
 void advManager::TeleportTo(
     hero* mapHero,
@@ -7940,7 +7906,6 @@ void advManager::TeleportTo(
     ForceNewHover();
 }
 
-// @early-stop: delinker artifact.
 VA(0x00467539, 0x1fb)
 void advManager::DimensionDoor(void) {
     hero* targetHero;
@@ -8025,7 +7990,6 @@ i32 TownPortalHandler(tag_message& message) {
     return TOWN_PORTAL_UNHANDLED;
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x0046785d, 0x43e)
 void advManager::TownGate(SpellType spellId) {
     i32 distance0;
@@ -8149,7 +8113,6 @@ void advManager::TownGate(SpellType spellId) {
     gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[m_currentTerrain]);
 }
 
-// @semantic: first code residual is the CurrentHero /Ob1 continuation at +0x174 versus retail +0x180.
 VA(0x00467c9b, 0x5ac)
 void advManager::SummonBoat(void) {
     i32 boatIndex9;
@@ -8314,8 +8277,6 @@ void advManager::SummonBoat(void) {
     }
 }
 
-// @early-stop
-// @early-stop-reloc-only: relocation naming only.
 VA(0x00468247, 0x4d9)
 void advManager::ShowRoute(i32 redraw, i32, i32 updateButton) {
     i32 routeReachable8;
@@ -8579,7 +8540,6 @@ void advManager::ForceNewHover(void) {
     ProcessHover(x, y);
 }
 
-// @early-stop: delinker jump-table artifact.
 VA(0x00468ab6, 0x1a6)
 void advManager::ScreenScroll(AdventureScrollDirection direction, i32 updatePointer) {
     i32 originX;
@@ -8804,7 +8764,6 @@ void advManager::LoadRemote(void) {
     gpSoundManager->m_samplesReady = 1;
 }
 
-// @early-stop: delinker artifact.
 VA(0x0046931e, 0x20c)
 char* advManager::CheckHandleNet(void) {
     RemoteMessage* packet9;
@@ -8904,7 +8863,6 @@ i32 advManager::CheckHandleNetPlayerWait(struct tag_message& message, i32 doMain
     return 0;
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x004695f7, 0x1d5)
 void advManager::TrimLoopingSounds(i32 maxSamples) {
     if (giHighMemBuffer > 0) {
@@ -9073,7 +9031,6 @@ void advManager::DrawAdventureBorder(void) {
     }
 }
 
-// @semantic: compiler-shape residual.
 VA(0x00469bef, 0x3d3)
 i32 advManager::FindAdjacentMonster(
     i32 originX,
@@ -9161,7 +9118,6 @@ foundAdjacentMonster:
     return 1;
 }
 
-// @semantic: compiler-shape residual.
 VA(0x00469fc2, 0x125)
 void ComputeAdvNetControl(void) {
     if (!gbRemoteOn) {
@@ -9191,7 +9147,6 @@ void ComputeAdvNetControl(void) {
     }
 }
 
-// @semantic: branch/code-shape residual.
 VA(0x0046a0e7, 0xf6)
 i32 MapExtraPosAndAdjacentsSet(i32 x, i32 y, u8 mask) {
     if (mapExtra[MAP_WIDTH * y + x] & mask) {
@@ -9215,7 +9170,6 @@ i32 MapExtraPosAndAdjacentsSet(i32 x, i32 y, u8 mask) {
     return 0;
 }
 
-// @semantic: compiler-shape residual.
 VA(0x0046a1dd, 0x4c6)
 void advManager::ViewPuzzle(void) {
     gpGame->SetupPuzzlePieces(giCurPlayer, 0);
@@ -9331,7 +9285,6 @@ void advManager::ViewPuzzle(void) {
     gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[m_currentTerrain]);
 }
 
-// @semantic: compiler-shape residual.
 VA(0x0046a6a3, 0x81)
 void advManager::PuzzleDraw(i32 left, i32 top, i32 right, i32 bottom) {
     gbDrawingPuzzle = true;
@@ -9352,7 +9305,6 @@ void advManager::PuzzleDraw(i32 left, i32 top, i32 right, i32 bottom) {
     );
 }
 
-// @early-stop: delinker jump-table artifact.
 VA(0x0046a724, 0x2ac)
 void advManager::AdvPanel(void) {
     heroWindow* adventurePanel;
@@ -9424,7 +9376,6 @@ void advManager::AdvPanel(void) {
     }
 }
 
-// @semantic: compiler-shape residual.
 VA(0x0046a9d0, 0x1ca)
 i32 APanelHandler(tag_message& message) {
     i32 handled = 0;
@@ -9480,7 +9431,6 @@ i32 APanelHandler(tag_message& message) {
     return DIMENSION_DOOR_UNHANDLED;
 }
 
-// @semantic: compiler-shape residual.
 VA(0x0046ab9a, 0x1e4)
 i32 advManager::ControlPanel(void) {
     TrimLoopingSounds(LOOPING_SOUND_LIMIT);
@@ -9534,7 +9484,6 @@ i32 advManager::ControlPanel(void) {
     return selectedCommand != PANEL_NO_HELP;
 }
 
-// @semantic: compiler-shape residual.
 VA(0x0046ad7e, 0x304)
 i32 CPanelHandler(tag_message& message) {
     i32 handled = 0;
@@ -9619,7 +9568,6 @@ i32 CPanelHandler(tag_message& message) {
     return DIMENSION_DOOR_UNHANDLED;
 }
 
-// @semantic: compiler-shape residual.
 VA(0x0046b082, 0x197)
 void advManager::SystemOptions(void) {
     TrimLoopingSounds(LOOPING_SOUND_LIMIT);
@@ -9661,7 +9609,6 @@ void advManager::SystemOptions(void) {
     }
 }
 
-// @semantic: branch/code-shape residual.
 VA(0x0046b219, 0x35f)
 void UpdateSystemOptions(i32 initialDraw) {
     tag_message message;
@@ -9766,7 +9713,6 @@ void UpdateSystemOptions(i32 initialDraw) {
     }
 }
 
-// @early-stop: delinker jump-table artifact.
 VA(0x0046b578, 0x672)
 i32 SystemOptionsHandler(struct tag_message& message) {
     i32 preferencesChanged = 0;
@@ -10050,7 +9996,6 @@ i32 GetManaFrame(i32 mana) {
     return frame;
 }
 
-// @semantic: only unmasked code residual is the nearest monster comparison at +0xfc, +0x102.
 VA(0x0046bce8, 0x559)
 i32 advManager::DoVisions(hero* visionHero) {
     char visionMessageResult[VISIONS_MESSAGE_BUFFER_SIZE];
@@ -10184,7 +10129,6 @@ showVision:
     return 1;
 }
 
-// @semantic: first byte-level divergence is one extra retail continuation jump after the loop guard.
 VA(0x0046c241, 0xd7)
 i32 advManager::IsCrystalBallInEffect(i32 x, i32 y, i32 radius) {
     i32 heroIndex;

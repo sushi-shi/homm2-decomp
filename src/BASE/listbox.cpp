@@ -76,7 +76,6 @@ listBoxWidget::listBoxWidget(void) : widget(0, 0, 0, 0, 0, 0) {
     m_lastSelectedIndex = -1;
 }
 
-// @semantic: only raw-code residual is the item loop: retail uses EBX for the four-byte item offset and EDI for the item index.
 VA(0x004db0d0, 0x86)
 listBoxWidget::~listBoxWidget() {
     i32 i;
@@ -230,7 +229,6 @@ void listBoxWidget::DeleteItem(i32 index) {
         m_visibleItemCount = m_itemCount;
 }
 
-// @semantic: compiler-shape residual.
 VA(0x004db520, 0x368)
 i32 listBoxWidget::Main(tag_message& message) {
     if (!(m_flags & WIDGET_FLAG_ENABLED)) {

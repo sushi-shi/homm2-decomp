@@ -90,7 +90,6 @@ H2_ENUM_END(OverviewUiConstant)
 #define OVERVIEW_TEXT_WIDGET_ROWS (reinterpret_cast<OverviewTextWidgetRow*>(textWidgetDynamic))
 #define OVERVIEW_ICON_WIDGET_ROWS (reinterpret_cast<OverviewIconWidgetRow*>(iconWidgetDynamic))
 
-// @semantic: first real residual is the cached-type equality at +0xc6/+0xcc.
 VA(0x00407870, 0x223e)
 void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
     DATA(0x004eda04) static i16 overviewDynamicSourceLine = 116;
@@ -928,7 +927,6 @@ void game::Overview(void) {
     iconWidgetDynamic = NULL;
 }
 
-// @semantic: first non-relocation residual is at +0xfc and +0x124: retail loads the -0x30 float before adding -0x3c.
 VA(0x0040a350, 0x31f)
 void game::DoKnob(void) {
     tag_message pendingMessage4;
@@ -1007,7 +1005,6 @@ void game::DoKnob(void) {
     }
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x0040a66f, 0x4fd)
 i32 OverviewHandler(struct tag_message& message) {
     i32 closeDialog5;

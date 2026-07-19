@@ -120,7 +120,6 @@ i32 armyGroup::IsMember(i32 creatureType) {
     return 0;
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x0048c44b, 0x14e)
 i32 armyGroup::IsHomogeneous(i32 countRaces) {
     i32 numCreatureTypes = 0;

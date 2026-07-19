@@ -126,8 +126,8 @@ During body/type recovery, integrate a function when all of these are credible a
 3. frame and `/Od` slots, including `od_slots.py` evidence;
 4. inline accessor boundaries when retail shows them;
 5. external relocation target sequence and count;
-6. a durable `@match-note` for the first remaining compiler-shape divergence and the few obvious
-   spellings already tried.
+6. an external ledger entry for any remaining compiler-shape divergence and the few obvious
+   spellings already tried; do not encode this transient state in source comments.
 
 Do not exhaust permutations just because fuzzy is 96-99%. The experiments above show that later
 header/type/accessor/predecessor recovery can move that residual without editing the function.

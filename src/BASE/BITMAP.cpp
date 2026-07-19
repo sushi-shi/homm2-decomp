@@ -58,7 +58,6 @@ inline bitmap::~bitmap() {
     m_pixels = NULL;
 }
 
-// @semantic: residual begins at +0x0: retail starts sub esp,8; ours first loads x into DX.
 VA(0x004d0160, 0xFF)
 void bitmap::DrawToBufferCareful(i16 x, i16 y) {
     i32 width;
@@ -203,7 +202,6 @@ static inline u8* BitmapPixels(bitmap* value, i32 offset) {
     return value->m_pixels + offset;
 }
 
-// @semantic: first residual is +0x1: retail keeps this/destination/row in EAX/EBX/EDX, while this TU state colors them EDX/EAX/EBX.
 VA(0x004d0500, 0x65)
 void bitmap::CopyToCareful(
     class bitmap* destination,

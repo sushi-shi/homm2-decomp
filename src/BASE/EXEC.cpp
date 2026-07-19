@@ -87,7 +87,6 @@ void executive::ShutDownSystem(void) {
     gpResourceManager->Close();
 }
 
-// @semantic: only structural residual is +0xce..+0xe9 in the manager restoration loop.
 VA(0x004d1750, 0xfb)
 i32 executive::DoDialog(class baseManager* manager) {
     baseManager* managerList[DIALOG_MANAGER_CAPACITY];

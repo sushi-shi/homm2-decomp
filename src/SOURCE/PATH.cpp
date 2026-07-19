@@ -81,7 +81,6 @@ i32 army::GetMoveMask(i32 sourceHex) {
     return blockedMaskValue | SPECIAL_DIRECTION_MASK;
 }
 
-// @semantic: compiler-shape residual.
 VA(0x004bde41, 0xb5)
 i32 army::GetAttackMask(i32 sourceHex, i32 targetMode, i32 targetHex) {
     i32 directionResult;
@@ -266,7 +265,6 @@ i32 army::ValidAttack(
     return 0;
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x004be48a, 0xa5)
 i32 army::GetAdjacentCellIndex(i32 sourceHex, i32 direction) {
     if (sourceHex == ARMY_HEX_INVALID)

@@ -190,7 +190,6 @@ void combatManager::CombatMessage(char* message, i32 updateScreen, i32 retainPre
     gbLimitToExtent = savedLimitToExtent;
 }
 
-// @semantic: First residual is instruction 15 (+0x33): retail evaluates m_currentArmySide before m_currentArmyIndex.
 VA(0x00402e80, 0x3fe)
 void combatManager::CombatMessage(i32 messageType) {
     army* currentArmyPtr;
@@ -360,7 +359,6 @@ void combatManager::SetupGridForArmy(army* armyPtr) {
     }
 }
 
-// @semantic: compiler-shape residual.
 VA(0x00403621, 0x5fb)
 i32 combatManager::UpdateGrid(i32 resetGridDisplay, i32 rebuildGrid) {
     i32 retval;
@@ -503,8 +501,6 @@ CopyGridState:
     return retval;
 }
 
-// @early-stop
-// @early-stop-reloc-only: relocation naming only.
 VA(0x00403c1c, 0x364)
 void combatManager::DrawBackground(void) {
     icon* backgroundIcon;
@@ -802,7 +798,6 @@ void combatManager::UpdateMouseGrid(i32 hexIndex, i32 forceUpdate) {
     m_mouseGridHex = hexIndex;
 }
 
-// @semantic: first opcode-order residual is instruction 156: fixed-side hero frames evaluate sprite/frame/state.
 VA(0x004045cc, 0x173f)
 void combatManager::DrawFrame(
     i32 updateScreen,
@@ -1303,7 +1298,6 @@ finish:
     PollSound();
 }
 
-// @semantic: first non-local residual is instruction 778 (+0xa50): base loads spellSlot and emits cmp visibleSpellCount5,eax.
 VA(0x00405d0b, 0xb99)
 void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
     i32 iconX;

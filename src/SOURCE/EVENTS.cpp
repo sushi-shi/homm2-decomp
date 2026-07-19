@@ -270,7 +270,6 @@ H2_ENUM_END(CombatMonsterEventConstant)
 
 DATA(0x005190a4) static char s_twoStringFormat[] = "%s %s";
 
-// @semantic: First non-symbol divergence is the Sphinx resource loop: retail loads giCurPlayer before eventValue.
 VA(0x004a8530, 0x5adb)
 void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
     CreatureType secondUpgrade1;
@@ -3718,7 +3717,6 @@ void advManager::PasswordEvent(mapCell* cell, hero*) {
     gpCurPlayer->m_barrierTents |= 1 << color;
 }
 
-// @semantic: evaluation-order residual.
 VA(0x004aed38, 0x6fe)
 void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
     i32 currentSiteType;
@@ -4013,7 +4011,6 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
     }
 }
 
-// @early-stop: delinker artifact.
 VA(0x004af436, 0x191)
 void advManager::RecruitSiteEvent(mapCell* cell, hero* eventHero) {
     SAMPLE2 eventSample = NULL_SAMPLE2;
@@ -4071,7 +4068,6 @@ void advManager::ExpansionRecruitEvent(hero* eventHero, i32 creatureType, i16* a
     delete dialogManager;
 }
 
-// @semantic: branch/code-shape residual.
 VA(0x004af652, 0x22a)
 void advManager::JailEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     SAMPLE2 eventSample1 = NULL_SAMPLE2;
@@ -4197,7 +4193,6 @@ void advManager::TownEvent(mapCell* cell, i32 x, i32 y) {
     eventHero1->CheckLevel();
 }
 
-// @early-stop: delinker artifact.
 VA(0x004afa56, 0x516)
 void advManager::EventSound(i32 eventType, i32 eventData, struct SAMPLE2* outSample) {
     const i32 treasureSound_a = SOUND_TREASURE;
@@ -4414,8 +4409,6 @@ void advManager::EventWindow(
     NormalDialog(eventText, buttons, -1, -1, IDX(type1), value1, type2, value2, type3, 0);
 }
 
-// @early-stop
-// @early-stop-reloc-only: relocation naming only.
 VA(0x004b0033, 0xb6)
 i32 GiveArtifact(hero* eventHero, ArtifactType artifact, b32 checkEndGame, i8 artifactExtra) {
     i32 artifactSlot;
@@ -4846,7 +4839,6 @@ i32 advManager::GhostEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i3
     return 0;
 }
 
-// @early-stop: delinker artifact.
 VA(0x004b0add, 0x274)
 void advManager::HouseEvent(hero* eventHero, mapCell* cell) {
     i32 siteIndex = IDX(RECRUIT_ARCHER);
@@ -4921,7 +4913,6 @@ void advManager::HouseEvent(hero* eventHero, mapCell* cell) {
     }
 }
 
-// @semantic: compiler-shape residual.
 VA(0x004b0d51, 0x62f)
 i32 advManager::CombatMonsterEvent(
     hero* eventHero,
@@ -5391,7 +5382,6 @@ void GiveTakeArtifactStat(hero* targetHero, ArtifactType artifact, b32 take) {
     }
 }
 
-// @semantic: pooled-string identity residual.
 VA(0x004b1973, 0x1dd)
 void advManager::TransferArtifacts(hero* sourceHero, hero* destinationHero) {
     i32 targetSlot;
@@ -5457,8 +5447,6 @@ void advManager::TransferArtifacts(hero* sourceHero, hero* destinationHero) {
     }
 }
 
-// @early-stop
-// @early-stop-reloc-only: relocation naming only.
 VA(0x004b1b50, 0x7f)
 void advManager::HeroLoses(hero* lostHero) {
     if (lostHero == NULL)
@@ -5473,8 +5461,6 @@ void advManager::HeroLoses(hero* lostHero) {
     }
 }
 
-// @early-stop
-// @early-stop-reloc-only: relocation naming only.
 VA(0x004b1bcf, 0x132)
 void advManager::DoWhirlpool(hero* eventHero) {
     i32 armyValue;
@@ -5512,8 +5498,6 @@ void advManager::DoWhirlpool(hero* eventHero) {
     }
 }
 
-// @early-stop
-// @early-stop-reloc-only: relocation naming only.
 VA(0x004b1d01, 0x142)
 void advManager::FizzleCenter(i32 fizzleType) {
     SAMPLE2 playedSample;
@@ -5557,7 +5541,6 @@ void advManager::FizzleCenter(i32 fizzleType) {
     }
 }
 
-// @semantic: first non-table residual is index arithmetic at +0x53c.
 VA(0x004b1e43, 0x2a40)
 void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     float battleStatValue_o;
@@ -6658,7 +6641,6 @@ void advManager::PasswordAIEvent(mapCell* cell, hero*) {
     gpCurPlayer->m_barrierTents |= (1 << color);
 }
 
-// @semantic: evaluation-order residual.
 VA(0x004b493b, 0x369)
 void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
     i32 unusedPair27[2];
@@ -6764,7 +6746,6 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
     }
 }
 
-// @semantic: sole residual is packed-site evaluation order at +0x11f..+0x12e.
 VA(0x004b4ca4, 0x18f)
 void advManager::RecruitSiteAIEvent(mapCell* cell, hero* eventHero) {
     i32 cost16[EVENT_RESOURCE_COUNT];
@@ -6829,7 +6810,6 @@ void advManager::RecruitSiteAIEvent(mapCell* cell, hero* eventHero) {
     }
 }
 
-// @semantic: branch/code-shape residual.
 VA(0x004b4e33, 0x1a2)
 void advManager::JailAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     i32 heroId9;
@@ -6870,8 +6850,6 @@ void advManager::JailAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     }
 }
 
-// @early-stop
-// @early-stop-reloc-only: relocation naming only.
 VA(0x004b4fd5, 0x82b)
 void advManager::PlayerMonsterInteract(
     mapCell* cell,
@@ -7166,7 +7144,6 @@ fightMonsters:
         *handled = 1;
 }
 
-// @semantic: compiler-shape residual.
 VA(0x004b5800, 0x440)
 void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* handled) {
     i32 joiningCount;
@@ -7376,7 +7353,6 @@ i32 advManager::DoNetCombat(char* packet) {
     return 1;
 }
 
-// @early-stop: retail alignment artifact.
 VA(0x004b5e10, 0x64e)
 i32 advManager::DoCombat(
     i32 x,
@@ -7874,7 +7850,6 @@ void advManager::ReceiveHeroTownData(
     }
 }
 
-// @semantic: compiler-shape residual.
 VA(0x004b6c2f, 0x254)
 i32 advManager::AutoResolveCombat(
     i32 x,
@@ -7955,8 +7930,6 @@ i32 advManager::AutoResolveCombat(
     return gpCombatManager->m_combatResult;
 }
 
-// @early-stop
-// @early-stop-reloc-only: relocation naming only.
 VA(0x004b6e83, 0xb8)
 i32 RiddleStringsEqual(char* answer, char* expected) {
     i32 index;

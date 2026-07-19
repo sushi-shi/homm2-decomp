@@ -21,7 +21,6 @@ DATA(0x005381e0) static i32 gFDY;
 DATA(0x005381e4) static IconEntry* gFDEntry;
 DATA(0x005381e8) static u32 gFDRun;
 
-// @semantic: First divergence is +0x1d: retail schedules the formal-x load before publishing gFDEntry.
 VA(0x004daa20, 0x23b)
 void FlipDimIconToBitmap(
     class icon* srcIcon,

@@ -65,8 +65,8 @@ The important structural recovery is `FadeIn`: naming the repeated `0x3f - level
 explicit `int threshold` changes MSVC 4.2's allocation and reassociation to retail, raising the
 function from 92.96% to 97.41%. Candidate and retail are both 0xea bytes, all 11 relocation targets
 agree, and all bytes after +0x1f align. The remaining raw difference is only the six-byte new-
-expression null-check ordering at +0x1a..+0x1f; three local allocation spellings leave it unchanged,
-so it remains an `@match-note`, not a proven wall.
+expression null-check ordering at +0x1a..+0x1f; three local allocation spellings leave it unchanged.
+This matrix keeps that live evidence outside source; it is not a proven wall.
 
 The BaseAlloc append spellings also demonstrate why a local `/O2` search cannot certify a wall:
 changing only the append and a value-neutral size alias moves later functions substantially, making
@@ -102,7 +102,7 @@ buffer. That permits VC4.2 to reuse the finished drive-count slot and places the
 offsets `+0x38`, `+0x138`, `+0x19c`, and `+0x29c`. All `0x3ed` code bytes and 51/51 relocation
 targets are exact; the three following retail NOPs are alignment outside the function symbol.
 
-`SetGameDefaults` remains a structural `@match-note`, not a certified wall. Its source writes the
+`SetGameDefaults` remains a live structural residual, not a certified wall. Its source writes the
 same two graphics records and has the same CFG/calls, but base induces from the record start while
 retail induces from `fullScreen`. The matrix lists every rejected local loop/anchor spelling.
 Resume only from a new exact-preserving predecessor or shared-header TU state; do not replay the
@@ -229,7 +229,7 @@ relocations, and `MIDIWrap` is `0x3d`, 5/5. These four unscored CodeView aliases
 delinker/symbol-identity artifacts, not incomplete functions.
 
 `sample::sample` is semantically and structurally complete but remains an unresolved compiler-shape
-residual, so its source marker is `@match-note`, not `@early-stop`. Candidate and retail are both
+residual recorded only in this external ledger. Candidate and retail are both
 FPO, size `0x181`, with the exact `0x20` filename area, callee-save set, stack accesses, CFG, switch
 tables, load tail, and 23/23 relocations. Relocation-masked raw comparison differs in 27 scheduling
 bytes at `+0x24..+0x25`, `+0x29..+0x39`, `+0x43..+0x48`, and `+0x4b..+0x4c`; every byte from
@@ -312,7 +312,7 @@ The other six residuals are not relocation-only walls. The TSV records every unm
 `CDStartup`, `CDPoll`, and `PlayAmbientMusic` retain one local-branch displacement each;
 `CDSetVolume` swaps adjacent 0x0b/0x0c immediates; `StopAllSamples` retains ten stack-slot
 displacements; and `SwitchAmbientMusic` retains two branch displacements and one immediate. Their
-old `@early-stop` claims were removed. Do not treat `homm2 sema disasm --diff --lite` showing only
+old source completion claims were removed. Do not treat `homm2 sema disasm --diff --lite` showing only
 relocation-name differences as raw proof: lite normalization also hides branch destinations,
 stack displacements, and immediates. Re-run the full relocation-union raw comparator after any
 future predecessor, header, or combined-TU state change.
@@ -543,7 +543,7 @@ The successful form is the scalar-lvalue SIB identity, now spelled `OD_STEER(loc
 other comparison operand first without changing semantics, slots, instruction count, CFG, or
 relocations. Applying it to the two index/start comparisons in `DrawBoundedString`, the three
 width/argument comparisons in `LineLength`, and the length/index comparison in `LineWidth` makes
-all three functions raw-exact. The prior stale `@early-stop` markers on the first two are removed.
+all three functions raw-exact. The prior stale source completion claims on the first two are removed.
 The reusable byte-level before/after form is documented in
 [`tu-cumulative-eval-order.md`](../patterns/tu-cumulative-eval-order.md).
 

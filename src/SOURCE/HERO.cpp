@@ -280,7 +280,6 @@ i32 hero::HasSpell(SpellType spell) {
     return 0;
 }
 
-// @semantic: first non-relocation residual is +0x9b: retail loads the count and compares the second argument.
 VA(0x0046c86c, 0xc5)
 SpellType hero::GetNthSpell(i32 type, i32 spellNumber) {
     i32 spell;
@@ -302,7 +301,6 @@ SpellType hero::GetNthSpell(i32 type, i32 spellNumber) {
     return SPELL_NONE;
 }
 
-// @early-stop: delinker artifact.
 VA(0x0046c931, 0xd0)
 i32 hero::GetNumSpells(i32 type) {
     i32 numAdventureSpells;
@@ -504,7 +502,6 @@ i32 hero::Dismiss(void) {
     return 0;
 }
 
-// @semantic: First divergence is +0x122: retail has a five-byte inline continuation before the occupied-town lookup.
 VA(0x0046cee8, 0x587)
 void hero::Deallocate(i32 updateMap) {
     i32 availableHeroSlotCurrent;
@@ -646,7 +643,6 @@ i32 hero::GetExperience(i32 level) {
     return experience;
 }
 
-// @semantic: compiler-shape residual.
 VA(0x0046d50d, 0xc0)
 i32 hero::GetLevel(i32 experienceValue) {
     i32 experience;
@@ -673,7 +669,6 @@ i32 hero::GetLevel(i32 experienceValue) {
     return levelCounter - 1;
 }
 
-// @semantic: First divergence is +0x37: retail reads m_eventFlags, subtracts 0x20 in EAX.
 VA(0x0046d5cd, 0x254)
 void hero::ApplyBattleWinTemps(void) {
     m_lastTownInteractionTurn = HERO_INTERACTION_TURN_NONE;
@@ -734,7 +729,6 @@ void hero::ApplyBattleLossTemps(void) {
     ApplyBattleWinTemps();
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x0046d83f, 0x828)
 void hero::CheckLevel(void) {
     i32 statBonuses[HERO_PRIMARY_STAT_COUNT];
@@ -925,7 +919,6 @@ i32 hero::NumArtifacts(void) {
     return cnt;
 }
 
-// @semantic: first residual is army-type equality load order at +0x390.
 VA(0x0046e0be, 0x758)
 void UpdateHeroScreenStatusBar(struct tag_message& message) {
     i32 armySlot;
@@ -1123,7 +1116,6 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
     HeroMessageUpdate(gText);
 }
 
-// @semantic: differs only by retail's two extra gpHVHero loads in the formation assignments.
 VA(0x0046e816, 0xaef)
 i32 HeroHandler(struct tag_message& message) {
     i32 handlerValue16;
@@ -1519,7 +1511,6 @@ void RedrawHeroScreen(void) {
     gpWindowManager->UpdateScreenRegion(0, 0, UI_SCREEN_WIDTH, UI_SCREEN_HEIGHT);
 }
 
-// @semantic: compiler-shape residual.
 VA(0x0046f354, 0x218)
 i32 HeroView(i32 heroId, i32 noDismiss, i32 fadeAlreadyOut) {
     mapCell* heroCell;
@@ -1564,7 +1555,6 @@ i32 HeroView(i32 heroId, i32 noDismiss, i32 fadeAlreadyOut) {
     }
 }
 
-// @semantic: evaluation-order residual.
 VA(0x0046f56c, 0x9c5)
 void SetupHeroView(void) {
     i32 cannotDismiss;
@@ -1819,7 +1809,6 @@ void SetupHeroView(void) {
     UpdateHeroScreenStatusBar(statusMessage);
 }
 
-// @semantic: differs only in local string-literal identities.
 VA(0x0046ff31, 0x2b0)
 void DoHeroSplit(i32 destinationSlot, i32 sourceSlot) {
     i16 splitTextSlot = UI_SPLIT_TEXT;
@@ -1876,7 +1865,6 @@ void hero::SetSS(i32 skill, i32 level) {
         GiveSS(skill, level);
 }
 
-// @semantic: compiler-shape residual.
 VA(0x0047024b, 0xfa)
 i32 hero::TakeSS(i32 skill, i32 levels) {
     i32 oldLevel;
@@ -1993,8 +1981,6 @@ i8 hero::GetSSLevel(i32 skill) {
     return level;
 }
 
-// @early-stop
-// @early-stop-reloc-only: relocation naming only.
 VA(0x00470685, 0xf4)
 void hero::DoSSLevelDialog(i32 skill, i32 quickView) {
     i32 skillBonusValue;

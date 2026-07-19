@@ -17,7 +17,6 @@ DATA(0x005381ac) static i32 gFMY;
 DATA(0x005381b0) static i32 gFMClipR;
 DATA(0x005381b4) static i32 gFMXEnd;
 
-// @semantic: First relocation-masked raw divergence is now +0x1c.
 VA(0x004da800, 0x212)
 void FlipMonoIconToBitmap(
     class icon* srcIcon,
