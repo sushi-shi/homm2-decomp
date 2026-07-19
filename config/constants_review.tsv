@@ -114,7 +114,7 @@ include/SOURCE/comwin.h	reviewed	COM-port flexible payload heads and packed runt
 include/SOURCE/dimPalette.h	reviewed	Shared dim-palette set, level, and color extents are named and drive the public lookup-table declaration.
 include/SOURCE/dpnetwin.h	reviewed	DirectPlay buffer, mapping, session, player, timeout, retry, and transport extents are named shared constants; extern arrays use their named extents and the remaining literal is packed SIZE evidence.
 include/SOURCE/fileRequester.h	reviewed	Requester modes, storage extents, geometry, controls, filters, results, and sentinels are named shared domains; the packed list-state extent is explicit and the remaining literal is SIZE evidence.
-include/SOURCE/game.h	pending
+include/SOURCE/game.h	reviewed	The game state layout derives campaign, player, town, hero, mine, boat, artifact, overview, and track dimensions from shared domains; serialized gaps, names, event indices, rumours, obelisk state, spell views, and received-text storage have named extents.
 include/SOURCE/hero.h	reviewed	Hero skills, stats, events, sentinels, progression, storage, and layout domains are named enums; integral count macros were folded into the shared enum, arrays derive from their public domains, and only the floating growth factor remains a macro.
 include/SOURCE/hexcell.h	reviewed	The empty-occupant sentinel and record capacities are named enums; the remaining literal is proven class SIZE evidence.
 include/SOURCE/highScoreManager.h	reviewed	Shared entry counts, animation and timing values, widget ids, geometry, storage extents, and manager results are named aligned enums; public arrays use the named display extent and remaining literals are SIZE evidence.
