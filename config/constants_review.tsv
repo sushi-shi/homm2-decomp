@@ -147,12 +147,12 @@ src/BASE/FONT.cpp	reviewed	Private large-font threshold, full-screen clip bounds
 src/BASE/ICON.cpp	reviewed	TU-private orientation, result, color-table, and draw-extent enums are aligned and use prefix-free value names. Remaining zeros/ones are clipping origins, inclusive-bound adjustments, booleans, or low-level draw flags; allocation/free operands 18 and 0x1a preserve retail source-line evidence. Resource lifecycle is named and non-debug sections/relocations remain exact.
 src/BASE/ICONWDGT.cpp	reviewed	Private resource-name capacity, color mask, center shift, and bottom padding are enums; dispatch results use the shared ABI domain. Remaining zeros/ones are initialization, booleans, frame origins, or resource lookup flags.
 src/BASE/INPUTMGR.cpp	pending
-src/BASE/Icon2b.cpp	pending
-src/BASE/Icond2b.cpp	pending
-src/BASE/Icondf2b.cpp	pending
-src/BASE/Iconf2b.cpp	pending
-src/BASE/Iconm2b.cpp	pending
-src/BASE/Iconmf2b.cpp	pending
+src/BASE/Icon2b.cpp	reviewed	Serialized color/dim RLE commands, masks, flags, and palette stride use shared enums; remaining zeros and ones are run sentinels, clipping booleans, inclusive-bound arithmetic, consumed-byte indexing, or loop structure. DATA and VA values are annotations.
+src/BASE/Icond2b.cpp	reviewed	Serialized monochrome RLE masks and sentinels use shared enums; remaining zeros and ones are run sentinels, clipping booleans, inclusive-bound arithmetic, consumed-byte indexing, or loop structure. DATA and VA values are annotations.
+src/BASE/Icondf2b.cpp	reviewed	Serialized monochrome RLE commands and clipping modes use shared enums; remaining zeros and ones are run sentinels, inclusive-bound arithmetic, consumed-byte indexing, or loop structure. DATA and VA values are annotations.
+src/BASE/Iconf2b.cpp	reviewed	Serialized color/dim RLE commands, masks, flags, and palette stride use shared enums; remaining zeros and ones are run sentinels, clipping booleans, inclusive-bound arithmetic, consumed-byte indexing, or loop structure. DATA and VA values are annotations.
+src/BASE/Iconm2b.cpp	reviewed	Serialized monochrome RLE run masks are shared enums; remaining zeros and ones are run sentinels, clipping booleans, inclusive-bound arithmetic, or scanline steps. DATA and VA values are annotations.
+src/BASE/Iconmf2b.cpp	reviewed	Serialized monochrome RLE run masks are shared enums; remaining zeros and ones are run sentinels, clipping booleans, inclusive-bound arithmetic, or scanline steps. DATA and VA values are annotations.
 src/BASE/MOUSEMGR.cpp	reviewed	Shared cursor extents and axis names cover every table declaration and access; private constants name resource buffers and hotspot centering. Cursor sizes, offsets, and hotspot pairs remain retail data payloads, while allocation/assert operands preserve source-location evidence. The retail default horizontal hotspot deliberately derives from cursor height as emitted.
 src/BASE/Midi.cpp	reviewed	Private enums name the unused LogInt field value, filename capacity, volume calculation, and sequence status. Remaining numeric payloads are track-availability data, booleans, loop counts, and format indices.
 src/BASE/Misc.cpp	reviewed	Private enums name memory diagnostics, preferences, registry widths, hashes, file modes, palette extents, RNG seed and mixing, and data-entry geometry. The fade threshold table remains literal retail data payload; other zeros and ones are booleans, origins, or index steps, while allocation operands preserve source-location evidence.
@@ -170,11 +170,11 @@ src/BASE/WINDOW.cpp	reviewed	Private constants name screen bounds and the open f
 src/BASE/WINMGR.cpp	reviewed	Private enums name screen, palette, cycle, fade, fizzle, screenshot, and lookup constants; shared window flags, fade modes, sentinels, and cycle-buffer extent use their public domains. World-cycle indices remain a narrowly suppressed retail local payload, while allocation/free operands preserve source-location evidence.
 src/BASE/bmap2.cpp	reviewed	The TU-private palette-level stride is named with a prefix-free enumerator. Remaining zeros and ones express row/column origins, positive-extent guards, loop initialization, or inclusive-to-exclusive rectangle-edge arithmetic; the obsolete semantic ratchet was removed.
 src/BASE/droplist.cpp	pending
-src/BASE/icon2bc.cpp	pending
-src/BASE/icon2bs.cpp	pending
-src/BASE/icon2by.cpp	pending
-src/BASE/iconf2bc.cpp	pending
-src/BASE/iconf2by.cpp	pending
+src/BASE/icon2bc.cpp	reviewed	Serialized color/dim RLE commands, masks, flags, and palette stride use shared enums; remaining zeros and ones are run sentinels, clipping booleans, inclusive-bound arithmetic, consumed-byte indexing, or loop structure. DATA and VA values are annotations.
+src/BASE/icon2bs.cpp	reviewed	Native and work-bitmap scale extents are private enums; remaining zeros and ones are transparency, origins, clipping arguments, or unit pixel/loop steps.
+src/BASE/icon2by.cpp	reviewed	Serialized color/dim RLE commands and shear sentinel use shared enums; remaining zeros and ones are run sentinels, inclusive-bound arithmetic, consumed-byte indexing, or scanline steps. DATA and VA values are annotations.
+src/BASE/iconf2bc.cpp	reviewed	Serialized color/dim RLE commands, masks, flags, and palette stride use shared enums; remaining zeros and ones are run sentinels, clipping booleans, inclusive-bound arithmetic, consumed-byte indexing, or loop structure. DATA and VA values are annotations.
+src/BASE/iconf2by.cpp	reviewed	Serialized color/dim RLE commands and shear sentinel use shared enums; remaining zeros and ones are run sentinels, inclusive-bound arithmetic, consumed-byte indexing, or scanline steps. DATA and VA values are annotations.
 src/BASE/listbox.cpp	pending
 src/BASE/miscwin.cpp	pending
 src/BASE/soundmgr.cpp	reviewed	Private enums name volume and fade scales, MCI limits, PCM defaults, timers, polling, sample waits, and the one-past channel sentinel; shared header domains cover storage extents, MIDI tracks, operations, and reports. Retail track-policy assignments are narrowly suppressed content payload, SCS initializer values remain reviewed data payload, and zeros/ones are state, booleans, indices, or API flags.
