@@ -308,14 +308,11 @@ H2_ENUM_BEGIN(AdventureSystemOptionsMessage)
 H2_ENUM_END(AdventureSystemOptionsMessage)
 
 H2_ENUM_BEGIN(AdventureSystemOptionConstant)
-    OPTION_VOLUME_LEVELS          = 11,
-    OPTION_HERO_SPEED_LEVELS      = 5,
-    OPTION_COMPUTER_SPEED_MAX     = 4,
-    OPTION_COMPUTER_SPEED_DEFAULT = 2,
-    OPTION_INTERFACE_COUNT        = 3,
-    OPTION_DIALOG_MESSAGE         = 1,
-    OPTION_DIALOG_HELP            = 4,
-    OPTION_DIALOG_NONE            = -1
+    OPTION_VOLUME_LEVELS   = 11,
+    OPTION_INTERFACE_COUNT = 3,
+    OPTION_DIALOG_MESSAGE  = 1,
+    OPTION_DIALOG_HELP     = 4,
+    OPTION_DIALOG_NONE     = -1
 H2_ENUM_END(AdventureSystemOptionConstant)
 
 H2_ENUM_BEGIN(AdventureSummonBoatConstant)
@@ -9835,7 +9832,7 @@ i32 SystemOptionsHandler(struct tag_message& message) {
 
                         case ADVMGR_SYSTEM_OPTION_HERO_SPEED:
                             ++gConfig.walkSpeed;
-                            gConfig.walkSpeed %= OPTION_HERO_SPEED_LEVELS;
+                            gConfig.walkSpeed %= IDX(CONFIG_WALK_SPEED_COUNT);
                             preferencesChanged = 1;
                             bPrefsChanged = 1;
                             break;
@@ -9843,9 +9840,9 @@ i32 SystemOptionsHandler(struct tag_message& message) {
                         case ADVMGR_SYSTEM_OPTION_COMPUTER_SPEED:
                             if (gConfig.blackoutComputer) {
                                 gConfig.blackoutComputer = 0;
-                                gConfig.computerWalkSpeed = OPTION_COMPUTER_SPEED_DEFAULT;
+                                gConfig.computerWalkSpeed = IDX(CONFIG_WALK_SPEED_NORMAL);
                             } else if (gConfig.computerWalkSpeed
-                                       < OPTION_COMPUTER_SPEED_MAX) {
+                                       < IDX(CONFIG_WALK_SPEED_INSTANT)) {
                                 ++gConfig.computerWalkSpeed;
                             } else {
                                 gConfig.blackoutComputer = 1;

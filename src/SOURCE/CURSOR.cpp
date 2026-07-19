@@ -39,6 +39,22 @@ H2_ENUM_CLASS_BEGIN(CursorHeroShadowFrame)
     SPRITE_UP_SHADOW_STEP_3 = 0x3a
 H2_ENUM_CLASS_END(CursorHeroShadowFrame)
 
+H2_ENUM_BEGIN(CursorPrivateConstant)
+    SLOW_CURSOR_CYCLE_START  = 2,
+    SKIPPED_ANIMATION_FRAME  = 4,
+    FOOTSTEP_ANIMATION_FRAME = 3,
+    DIRECTION_HALF_COUNT     = CURSOR_DIRECTION_COUNT / 2,
+    BOAT_DIRECTION_FIRST     = 5,
+    BOAT_DIRECTION_SECOND    = 6,
+    BOAT_DIRECTION_THIRD     = 7,
+    TURN_FRAME_MULTIPLIER    = 2,
+    MOVE_TILE_HALF_COUNT     = 2,
+    GROUP_ALLOC_LINE_OFFSET  = 7,
+    GROUP_FREE_LINE_OFFSET   = 25
+H2_ENUM_END(CursorPrivateConstant)
+
+#define SLOW_TURN_DELAY_SCALE 1.5
+
 #define RETAIL_FILE const_cast<char*>("I:\\Projects\\Heroes\\Prog\\SOURCE\\CURSOR.CPP")
 
 VA(0x0040d5e0, 0x138)
@@ -50,10 +66,11 @@ void advManager::StartCursor(i32 direction) {
 
     m_cursorDirection = direction;
     m_cursorFrame = GetCursorBaseFrame(direction) + 1;
-    if ((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]] > 0)
+    if ((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]]
+        > IDX(CONFIG_WALK_SPEED_SLOWEST))
         m_cursorCycle = 1;
     else
-        m_cursorCycle = 2;
+        m_cursorCycle = SLOW_CURSOR_CYCLE_START;
 
     directionX_a = normalDirTable[direction].x;
     directionY_a1 = normalDirTable[direction].y;
@@ -261,12 +278,16 @@ void advManager::DrawCursor(void) {
         }
     }
 
-    if (m_cursorCycle && (&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]] != 4) {
+    if (m_cursorCycle
+        && (&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]]
+               != IDX(CONFIG_WALK_SPEED_INSTANT)) {
         ++m_cursorFrameCount;
-        if ((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]] == 3
-            && (m_cursorFrameCount == 4 || m_cursorFrameCount == 1))
+        if ((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]]
+                == IDX(CONFIG_WALK_SPEED_FAST)
+            && (m_cursorFrameCount == SKIPPED_ANIMATION_FRAME || m_cursorFrameCount == 1))
             ++m_cursorFrameCount;
-        if ((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]] == 0
+        if ((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]]
+                == IDX(CONFIG_WALK_SPEED_SLOWEST)
             && (EveryOther = 1 - EveryOther) != 0)
             --m_cursorFrameCount;
     }
@@ -276,8 +297,9 @@ void advManager::DrawCursor(void) {
     if (!m_cursorTurning) {
         if (m_cursorFrameCount == 0)
             hOldWalkSample = hNewWalkSample;
-        if (m_cursorFrameCount == 3
-            || ((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]] == 4
+        if (m_cursorFrameCount == FOOTSTEP_ANIMATION_FRAME
+            || ((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]]
+                    == IDX(CONFIG_WALK_SPEED_INSTANT)
                 && !bMoveSoundMade)) {
             bMoveSoundMade = 1;
             if (EveryOther == 0) {
@@ -422,13 +444,13 @@ void advManager::DrawCursorShadow(void) {
 
 VA(0x0040e198, 0x85)
 i32 advManager::GetCursorBaseFrame(i32 direction) {
-    if (direction > 4) {
+    if (direction > DIRECTION_HALF_COUNT) {
         switch (direction) {
-            case 5:
+            case BOAT_DIRECTION_FIRST:
                 return CURSOR_BOAT_BASE_FRAME_5;
-            case 6:
+            case BOAT_DIRECTION_SECOND:
                 return CURSOR_BOAT_BASE_FRAME_6;
-            case 7:
+            case BOAT_DIRECTION_THIRD:
                 return CURSOR_BOAT_BASE_FRAME_7;
             default:
                 return 0;
@@ -444,16 +466,18 @@ void advManager::TurnTo(i32 direction) {
     i32 directionDifference = direction - m_cursorDirection;
     if (directionDifference == 0)
         return;
-    if ((directionDifference < 0 && directionDifference >= -4)
-        || (directionDifference > 0 && directionDifference > 4))
+    if ((directionDifference < 0 && directionDifference >= -DIRECTION_HALF_COUNT)
+        || (directionDifference > 0 && directionDifference > DIRECTION_HALF_COUNT))
         turnStep_c = -1;
     m_cursorTurning = 1;
-    i32 frameIndex_i = m_cursorDirection * 2;
+    i32 frameIndex_i = m_cursorDirection * TURN_FRAME_MULTIPLIER;
     i32 delay_f = giStepDelay[(&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]]];
-    if ((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]] == 0)
+    if ((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]]
+        == IDX(CONFIG_WALK_SPEED_SLOWEST))
         delay_f *= CURSOR_SLOW_TURN_MULTIPLIER;
-    if ((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]] == 1)
-        delay_f = static_cast<i32>(delay_f * 1.5);
+    if ((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]]
+        == IDX(CONFIG_WALK_SPEED_SLOW))
+        delay_f = static_cast<i32>(delay_f * SLOW_TURN_DELAY_SCALE);
 
     do {
         m_cursorCycle = 1;
@@ -463,7 +487,8 @@ void advManager::TurnTo(i32 direction) {
             m_cursorFrame = horseFrameFlip[frameIndex_i];
         m_cursorFrameCount = 0;
         glTimers[1] = delay_f + KBTickCount();
-        if ((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]] != 4) {
+        if ((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]]
+            != IDX(CONFIG_WALK_SPEED_INSTANT)) {
             if (ComboDraw(m_mapOriginX, m_mapOriginY, 0))
                 UpdateScreen(0, 0);
             if (bShowIt)
@@ -473,7 +498,7 @@ void advManager::TurnTo(i32 direction) {
         if (frameIndex_i < 0)
             frameIndex_i = CURSOR_TURN_FRAME_COUNT - 1;
         frameIndex_i %= CURSOR_TURN_FRAME_COUNT;
-    } while (direction * 2 != frameIndex_i);
+    } while (direction * TURN_FRAME_MULTIPLIER != frameIndex_i);
 
     m_cursorDirection = direction;
     StopCursor(1);
@@ -711,7 +736,8 @@ mapCell* advManager::MoveHero(
         giPixelsPerStep[(&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]]];
     stepDelay_d = giStepDelay[(&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]]];
     StartCursor(direction);
-    if ((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]] == 4) {
+    if ((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]]
+        == IDX(CONFIG_WALK_SPEED_INSTANT)) {
         if (EveryOther)
             --m_cursorFrame;
         bMoveSoundMade = 0;
@@ -739,7 +765,7 @@ mapCell* advManager::MoveHero(
         gbEnlargeScreenBlit = false;
         gbNoBorder = true;
         halfSteps_o = CURSOR_MOVE_HALF_TILE_PIXELS / pixelsPerStep_o;
-        for (step_a = 0; step_a < halfSteps_o * 2; ++step_a) {
+        for (step_a = 0; step_a < halfSteps_o * MOVE_TILE_HALF_COUNT; ++step_a) {
             if (step_a == halfSteps_o) {
                 MoveOrigin(directionX_b, directionY_b);
                 movingHero_f->m_x += directionX_b;
@@ -748,7 +774,7 @@ mapCell* advManager::MoveHero(
                 m_updateMinY = startVals[directionY_b + 1];
             }
             i32l tick = KBTickCount();
-            if (OD_STEER(step_a) + 1 == halfSteps_o * 2) {
+            if (OD_STEER(step_a) + 1 == halfSteps_o * MOVE_TILE_HALF_COUNT) {
                 m_updateMinX = 0;
                 m_updateMinY = 0;
             } else {
@@ -1412,7 +1438,7 @@ void advManager::ProcessIncomingSingleMapChange(SMapChange* incoming) {
 
 VA(0x00410a5b, 0xce)
 void advManager::ProcessIncomingGroupMapChange(char* incomingData) {
-    DATA(0x004ee1dc) static i16 s_groupLineBase = 1505;
+    DATA(0x004ee1dc) static i16 s_groupLineBase = 1505; // NOLINT(readability-magic-numbers)
     SMapChange* ptr;
     i32 size;
     SMapChange* buf;
@@ -1420,7 +1446,7 @@ void advManager::ProcessIncomingGroupMapChange(char* incomingData) {
     i32 processed;
 
     size = sizeof(sMapChangeLastFew);
-    buf = static_cast<SMapChange*>(H2_ALLOC(size, 1512));
+    buf = static_cast<SMapChange*>(H2_ALLOC(size, s_groupLineBase + GROUP_ALLOC_LINE_OFFSET));
     memcpy(buf, incomingData, size);
     for (i = CURSOR_MAP_CHANGE_RECENT_COUNT - 1; i >= 0; --i) {
         ptr = &buf[i];
@@ -1430,7 +1456,7 @@ void advManager::ProcessIncomingGroupMapChange(char* incomingData) {
             processed = 0;
         }
     }
-    H2_FREE(buf, 1530);
+    H2_FREE(buf, s_groupLineBase + GROUP_FREE_LINE_OFFSET);
 }
 
 VA(0x00410b29, 0x75)
@@ -1539,12 +1565,12 @@ void SendMapChange(i32 type, i8 id, u8 x, u8 y, i32 player, u8 stopAfterMove, u8
 }
 
 DATA(0x004ee020) i32 bMoveSoundMade = 1;
-DATA(0x004ee028) i32 giPixelsPerStep[6] = {2, 4, 6, 8, 16, 0};
-DATA(0x004ee040) i32 giStepDelay[5] = {20, 25, 20, 15, 15};
+DATA(0x004ee028) i32 giPixelsPerStep[ADVMGR_STEP_PIXEL_COUNT] = {2, 4, 6, 8, 16, 0};
+DATA(0x004ee040) i32 giStepDelay[ADVMGR_STEP_DELAY_COUNT] = {20, 25, 20, 15, 15};
 DATA(0x004ee054) struct _SAMPLE* hOldWalkSample = NULL;
 DATA(0x004ee058) struct _SAMPLE* hNewWalkSample = NULL;
 DATA(0x004ee05c) i32 EveryOther = 0;
-DATA(0x004ee060) i32 startVals[3] = {16, 0, -16};
+DATA(0x004ee060) i32 startVals[ADVMGR_VIEW_WORLD_SCALE_COUNT] = {16, 0, -16};
 DATA(0x00524bc0) i32 S1cursorCycle;
 DATA(0x00524bc4) i32 S1cursorFrameCount;
 DATA(0x00524bc8) i32 S1cursorTurning;
@@ -1552,4 +1578,5 @@ DATA(0x00524bcc) i32 S1cursorBaseFrame;
 DATA(0x00524bd0) i32 S1cursorDirection;
 DATA(0x00524bd8) SMapChange sMapChangeLastFew[CURSOR_MAP_CHANGE_RECENT_COUNT];
 
+#undef SLOW_TURN_DELAY_SCALE
 #undef RETAIL_FILE
