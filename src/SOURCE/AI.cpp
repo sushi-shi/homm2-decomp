@@ -6,6 +6,7 @@
 #include <SOURCE/PHILAI.h>
 #include <SOURCE/SPELLS.h>
 #include <SOURCE/X_GLOBAL.h>
+#include <SOURCE/army.h>
 #include <SOURCE/armyGroup.h>
 #include <SOURCE/combatManager.h>
 #include <SOURCE/game.h>
@@ -13,6 +14,11 @@
 #include <SOURCE/philAI.h>
 #include <SOURCE/searchArray.h>
 #include <SOURCE/town.h>
+
+H2_ENUM_BEGIN(ArmyFrontOffset)
+    SINGLE_HEX_FRONT_OFFSET    = 1,
+    WIDE_CREATURE_FRONT_OFFSET = 2
+H2_ENUM_END(ArmyFrontOffset)
 
 VA(0x004c0790, 0x8d7)
 i32 combatManager::AICheckRetreat(void) {
@@ -428,6 +434,7 @@ void combatManager::DoCompAI(i32) {
             if (WalkTowardArmy(currentArmy9, enemySide12, traitorMasks13[enemySide12]))
                 goto finish;
 
+            // NOLINTBEGIN(readability-magic-numbers)
             castleBoundary27[0] = COMBAT_AI_CASTLE_BOUNDARY_ROW_0;
             castleBoundary27[1] = COMBAT_AI_CASTLE_BOUNDARY_ROW_1;
             castleBoundary27[2] = COMBAT_AI_CASTLE_BOUNDARY_ROW_2;
@@ -437,6 +444,7 @@ void combatManager::DoCompAI(i32) {
             castleBoundary27[6] = COMBAT_AI_CASTLE_BOUNDARY_ROW_6;
             castleBoundary27[7] = COMBAT_AI_CASTLE_BOUNDARY_ROW_7;
             castleBoundary27[8] = COMBAT_AI_CASTLE_BOUNDARY_ROW_8;
+            // NOLINTEND(readability-magic-numbers)
             castleRow29 = currentArmy9->m_hex / ARMY_HEX_COLUMNS;
             if (m_currentSide == COMBAT_ATTACKER_SIDE && m_inCastleCombat != 0
                 && currentArmy9->m_hex < castleBoundary27[castleRow29]) {
@@ -855,7 +863,7 @@ i32 combatManager::AttemptAdjacentAttack(class army* currentArmy) {
     u32 bit0;
     u32 targetMask29;
     i32 direction36;
-    i32 attackHexes5[2];
+    i32 attackHexes5[ARMY_ATTACK_HEX_COUNT];
     i32 targetArmy15;
 
     if (availableMask4 == 0)
@@ -904,12 +912,12 @@ i32 combatManager::WalkTowardArmyFront(class army* currentArmy, i32 side, i32 ma
     if (targetArmy6 == COMBAT_AI_NO_ARMY)
         return 0;
 
-    frontOffset13 = 1;
+    frontOffset13 = SINGLE_HEX_FRONT_OFFSET;
     targetHex7 = OD_STEER(targetArmy6)[m_armies[side]].m_hex;
     if (HAS(OD_STEER(targetArmy6)[m_armies[side]].m_monster.flags.abilityFlags,
             MONSTER_ABILITY_FLAG_WIDE)
         != 0)
-        frontOffset13 = 2;
+        frontOffset13 = WIDE_CREATURE_FRONT_OFFSET;
     if (currentArmy->m_facing == 1)
         targetHex7 += frontOffset13;
     else

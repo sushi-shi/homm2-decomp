@@ -23,8 +23,7 @@ H2_ENUM_CLASS_END(ArmyCombatDirection)
 H2_ENUM_BEGIN(ArmyFlightConstant)
     ALL_ADJACENT_DIRECTIONS    = 0x3f,
     FLIGHT_SOUND_FRAME         = 1,
-    VAMPIRE_FLIGHT_SOUND_DELAY = 100,
-    FLIGHT_ATTACK_HEX_COUNT    = 2
+    VAMPIRE_FLIGHT_SOUND_DELAY = 100
 H2_ENUM_END(ArmyFlightConstant)
 
 inline i32 FacingRearDirection(i32 facing) {
@@ -104,7 +103,7 @@ i32 army::ValidFlight(i32 destination, i32 fromTargetHex) {
     i32 attackMask;
     i32 initialDirection;
     i32 direction;
-    i32 attackHex[FLIGHT_ATTACK_HEX_COUNT];
+    i32 attackHex[ARMY_ATTACK_HEX_COUNT];
     u32 directionMask;
     i32 adjacentHex;
     i32 fittingHex;
