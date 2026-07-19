@@ -2,7 +2,7 @@
 # Target: IconToBitmapColorTable, RVA 0xd32a0, retail size 0x5af, target relocations 91.
 # Scope: new whole-function command-loop ownership and branch-body order derived from retail before consulting the canonical body. No recorded setup/include/predicate/count/byte-offset/SSA/pointer-view family was replayed.
 # Retail lifetime proof: gCTDst is loaded into EBX at +0xe5 before loop header +0xeb and is never reloaded on a backedge; EBX is published on skip, then becomes the dim/literal destination cursor. Newline publishes X0, increments Y, loads pitch, advances row, then stores Y at +0x587..+0x5a0.
-# No regex/AST permutation tool was used. The retained threshold is the campaign maximum 72.479%, not the lower live canonical score.
+# No regex/AST permutation tool was used. Current raw bytes and relocations decide acceptance.
 # Restored canonical verification: normalized source hash d70464fd672d, .text SHA-256 54b5211334240ba1749c8c53f253abd40b8fd28039b7b55fb15985bf99ffb157, size 0x57e, 91/91 relocations.
 source_sha256_or_state	match_percent	base_target_relocs	result	new_model_and_byte_evidence
 c77ac4e79dcbb18022abdcce5b146f78562f4556a3ae531ce5691b1a3f6f3933	69.95	91/91	canonical-input	Checkpoint canonical: reloads gCTDst at the command-loop header; retained campaign maximum remains 72.479%.

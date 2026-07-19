@@ -19,7 +19,7 @@
 # relocation_audit	No base-only external target. All scratch relocation counts agree except gFlipY, candidate 9 versus retail 8. The delinked target gives local-owner aliases garbage string-symbol names, so identities require the documented DATA addresses/manual object audit.
 # first_divergence	At +0x1d candidate loads entry Y into EBP before entry pointer formation; retail forms EDI, loads entry X into EBX, subtracts it, then loads entry Y. Decoder starts candidate +0xe9 versus retail +0xe3.
 # retest_trigger	A retained shared-header, declaration-order, compiler-state, or newly retail-proven lifetime change. Do not repeat rows while this checkpoint and hashes agree.
-# permutation_policy	No permutation tool used. AST is premature at 85.63%; regex permuter is forbidden.
+# permutation_policy	No permutation tool used. AST was premature before structural alignment; regex permutation was not used.
 state	source_sha256	object_sha256	text_sha256	include_state	score_pct	candidate_size	base_relocs	target_relocs	target_only	disposition	axis
 canonical_a0b17fb	7388a30d32705858be3c1f59648c7ff637ce535d4c76d8e51b2fe7f46b2864e8	432327c63be4e5ae1002f0fd006601c99d8c990abd6c67f78139bd47cc19ff1c	d5026c339039175f0e81d637f85c73cbac32e6562393b454d9d8b39dee6c65de	owner+icon+bitmap+x_global+IconEntry	85.63395	0x4e5	82	81	0	retained	Combined-root baseline after X_GLOBAL/shared-state changes; structural residual, not a wall.
 delayed_entry_y_after_x	NA	NA	NA	canonical	85.63395	0x4e5	82	81	0	rejected_byte_identical	Move entryY initialization after entry-X subtraction.

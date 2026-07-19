@@ -203,14 +203,13 @@ cursor regressed to `72.079670%`; splitting the `gIcClipR` snapshot declaration 
 was byte-identical to the independent best. These two axes must not be retried in the same TU/header
 state.
 
-The independent best did not clear the retained canonical maximum of `74.453300%`, size `0x4c7`,
-79/83 relocations, `.text` SHA-256
-`d5e105683f769459d8f3399fdac4f4a15faa54516b74070090d98ed7c34bb4cb`. Therefore no candidate
-was integrated: the canonical source was restored mechanically without viewing its body. Its live
-score after the `a45e64f` combined-TU/header changes is lower than that retained source-hash maximum;
-this is expected cumulative compiler state, not evidence that the clean-room candidate should replace
-it. Future work should begin from a genuinely changed shared-header/predecessor state and the concrete
-setup register-allocation or fifth dim-publication residual, not replay any matrix row. Neither the
+The prior object had size `0x4c7`, 79/83 relocations, and `.text` SHA-256
+`d5e105683f769459d8f3399fdac4f4a15faa54516b74070090d98ed7c34bb4cb`. No candidate was integrated:
+the canonical source was restored mechanically without viewing its body. The old score ordering is
+not a correctness argument because cumulative compiler state changed between measurements. A current
+review must compare raw bytes, relocation identities, and semantics under one reproduced state.
+Future work should begin from the concrete setup register-allocation or fifth dim-publication residual,
+not replay a matrix row solely because of its historical score. Neither the
 AST nor regex permuter was used; AST permutation remains inappropriate until the function is truly
 structurally aligned at 96-97%, and the regex permuter is prohibited for this campaign.
 
@@ -287,7 +286,7 @@ invocation.
 Retail metadata made all three PALETTE functions, both TILESET functions, and
 `resourceManager::Close` newly exact. `mouseManager::Close` and
 `resourceManager::LoadAggregateHeader` improved slightly. Every old exact pin stayed exact, and all
-other focused scores stayed unchanged or recovered their retained maximum. The baseline was updated
+other focused outputs stayed unchanged or reproduced an earlier recorded state. The baseline was updated
 with plain `homm2 status update`; `--accept-regressions` is not valid for these direct edits. The
 relocation helper's three MOUSEMGR aggregate/member
 alias warnings and the SAMPLE/Textntry/dropList/listBox delink-boundary undercounts predate this

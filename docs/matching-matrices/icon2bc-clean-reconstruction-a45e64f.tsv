@@ -1,14 +1,14 @@
 # BASE/icon2bc clean reconstruction, compiler/header checkpoint a45e64f
 # Target: IconToBitmapColorTable, RVA 0xd32a0, retail end/size 0x5af, target relocations 91
 # Canonical source SHA-256 f060c410fd0e8bd0140d2ce4e83c70236ef3d936fe5b52366003b82e563a4ba0; current icon.h SHA-256 809577ac8c7a091878b5ff40de5d96d37fe2074f480d45207ba6d7ccd3ef4e22.
-# Canonical object SHA-256 6993dc10a359ffec1925db73a048c6463b0a4edf9f1d2c138ed6fd1e80b9da6a; locally measured 72.22%, end 0x566, 88/91 relocations.
-# The campaign retained maximum is 72.479%; it is the acceptance threshold even when the live score is lower.
+# Canonical object SHA-256 6993dc10a359ffec1925db73a048c6463b0a4edf9f1d2c138ed6fd1e80b9da6a; end 0x566, 88/91 relocations.
+# Current raw bytes and relocations decide acceptance; recorded scores are historical measurements.
 # The canonical body was not inspected or copied. The clean candidate was reconstructed from retail semantic/disassembly/relocation evidence and allowed headers.
 # Temporary states below retain the eight-character SHA-256 prefix logged at measurement time; the full best/canonical hashes are preserved. Descriptions plus score/size/relocations distinguish every state.
-# Prior checkpoint 04f798c best: a85e86cd9700713b19c05cb706acf6ef1ee38703f5ddca1a0aaae7d07650212a at 62.85%, documented in icon2bc-clean-reconstruction-04f798c.tsv.
-# No permutation tool was used. In particular, the regex permuter was not used; AST permutation is inappropriate below the 96-97% last-mile threshold.
+# Prior checkpoint 04f798c best: a85e86cd9700713b19c05cb706acf6ef1ee38703f5ddca1a0aaae7d07650212a, documented in icon2bc-clean-reconstruction-04f798c.tsv.
+# No permutation tool was used. In particular, the regex permuter was not used; AST permutation was inappropriate before structural alignment.
 source_sha256_or_logged_prefix	match_percent	base_end	base_target_relocs	result	change_and_byte_evidence
-f060c410fd0e8bd0140d2ce4e83c70236ef3d936fe5b52366003b82e563a4ba0	72.22	0x566	88/91	canonical-restored	Untouched checkpoint-a45e64f source; retained campaign maximum 72.479. This remains the acceptance baseline.
+f060c410fd0e8bd0140d2ce4e83c70236ef3d936fe5b52366003b82e563a4ba0	72.22	0x566	88/91	canonical-restored	Untouched checkpoint-a45e64f source; this row records historical compiler-state evidence only.
 eab7f403...	60.68	0x4e6	78/91	rejected	First complete clean decoder rebuilt for current icon::m_data char-pointer header state.
 b1df2819...	60.68	0x4e6	78/91	byte-identical	Renamed file statics to retail-evidenced gCT names; naming alone was byte-neutral.
 13f24753...	66.65	0x581	86/91	improved	Recovered long-lived destination cursor with selective publication at decoder branch checkpoints.
