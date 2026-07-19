@@ -913,7 +913,7 @@ void combatManager::CastSpell(
                     100,
                     9,
                     2,
-                    301,
+                    BOLT_COLOR_LIGHTNING,
                     -40,
                     40,
                     30,
@@ -1889,7 +1889,7 @@ void combatManager::DrawBolt(SBolt* bolt, i32 stepCount) {
                     else
                         edgeDistance = widthLast - widthIndex;
                     switch (bolt->colorMode) {
-                        case IDX(BOLT_COLOR_RED_TABLE):
+                        case BOLT_COLOR_RED_TABLE:
                             gpWindowManager->m_screen
                                 ->m_pixels[drawY * COMBAT_SCREEN_WIDTH + drawX] =
                                 gColorTableRed[static_cast<i8>(
@@ -1897,22 +1897,22 @@ void combatManager::DrawBolt(SBolt* bolt, i32 stepCount) {
                                         ->m_pixels[drawY * COMBAT_SCREEN_WIDTH + drawX]
                                 )];
                             break;
-                        case IDX(BOLT_COLOR_RED_BEAM):
+                        case BOLT_COLOR_RED_BEAM:
                             gpWindowManager->m_screen
                                 ->m_pixels[drawY * COMBAT_SCREEN_WIDTH + drawX] =
                                 uRedBeam[edgeDistance];
                             break;
-                        case IDX(BOLT_COLOR_RAINBOW_FORWARD):
+                        case BOLT_COLOR_RAINBOW_FORWARD:
                             gpWindowManager->m_screen
                                 ->m_pixels[drawY * COMBAT_SCREEN_WIDTH + drawX] =
                                 uRainbow[widthIndex - widthFirst];
                             break;
-                        case IDX(BOLT_COLOR_RAINBOW_REVERSE):
+                        case BOLT_COLOR_RAINBOW_REVERSE:
                             gpWindowManager->m_screen
                                 ->m_pixels[drawY * COMBAT_SCREEN_WIDTH + drawX] =
                                 uRainbow[BOLT_RAINBOW_LAST_INDEX - (widthIndex - widthFirst)];
                             break;
-                        case IDX(BOLT_COLOR_LIGHTNING): {
+                        case BOLT_COLOR_LIGHTNING: {
                             u8 color;
                             if (edgeDistance == 0)
                                 color = BOLT_LIGHTNING_SHADE_0;
@@ -1965,7 +1965,7 @@ void combatManager::AddBolt(
     i32 branchDistance,
     i32 startWidth,
     i32 endWidth,
-    i32 colorMode,
+    BoltColorMode colorMode,
     i32 minAngle,
     i32 maxAngle,
     i32 angleDistance,
@@ -2011,8 +2011,7 @@ void combatManager::AddBolt(
     bolt->distanceRatio = 0;
     bolt->forceAngle = forceAngle;
 
-    if (colorMode == IDX(BOLT_COLOR_RAINBOW_FORWARD)
-        || colorMode == IDX(BOLT_COLOR_RAINBOW_REVERSE)) {
+    if (colorMode == BOLT_COLOR_RAINBOW_FORWARD || colorMode == BOLT_COLOR_RAINBOW_REVERSE) {
         if (startX <= 0 || startX >= COMBAT_SCREEN_WIDTH - 1)
             bolt->drawVertically = 1;
         else
@@ -2040,7 +2039,7 @@ void combatManager::DoBolt(
     i32 branchLength,
     i32 startWidth,
     i32 endWidth,
-    i32 colorMode,
+    BoltColorMode colorMode,
     i32 minAngle,
     i32 maxAngle,
     i32 angleDistance,
@@ -2352,7 +2351,7 @@ void combatManager::ChainLightning(i32 targetHex, i32 spellPower) {
             CHAIN_LIGHTNING_BOLT_LENGTH,
             CHAIN_LIGHTNING_START_WIDTH,
             CHAIN_LIGHTNING_END_WIDTH,
-            CHAIN_LIGHTNING_COLOR_MODE,
+            BOLT_COLOR_LIGHTNING,
             CHAIN_LIGHTNING_MIN_ANGLE,
             CHAIN_LIGHTNING_MAX_ANGLE,
             branchDistance,
@@ -3052,9 +3051,7 @@ void combatManager::DoLuck(i32 side, i32 armyIndex) {
         0,
         LUCK_BOLT_WIDTH,
         LUCK_BOLT_WIDTH,
-        IDX(BOLT_COLOR_RAINBOW_REVERSE)
-            + ((((targetX_k | 0) >= startX_b) - 1)
-               & (IDX(BOLT_COLOR_RAINBOW_FORWARD) - IDX(BOLT_COLOR_RAINBOW_REVERSE))),
+        targetX_k >= startX_b ? BOLT_COLOR_RAINBOW_FORWARD : BOLT_COLOR_RAINBOW_REVERSE,
         LUCK_BOLT_ANGLE,
         LUCK_BOLT_ANGLE,
         LUCK_BOLT_DISTANCE,

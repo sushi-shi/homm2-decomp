@@ -8,6 +8,7 @@
 #include "army.h"
 #include "hero.h"
 #include "hexcell.h"
+#include "SPELLS.h"
 
 class armyGroup;
 class hero;
@@ -23,7 +24,7 @@ struct SBolt {
     i32 endY;
     i32 branchDistance;
     i32 width;
-    i32 colorMode;
+    BoltColorMode colorMode;
     i32 unused1C;
     i32 angleDistance;
     float currentX;
@@ -720,9 +721,40 @@ public:
     void Blur(i32, i32, i32);
     void ResetBoltAngle(struct SBolt*);
     void DrawBolt(struct SBolt*, i32);
-    void AddBolt(struct SBolt*, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32);
-    void
-        DoBolt(i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32);
+    void AddBolt(
+        struct SBolt*,
+        i32,
+        i32,
+        i32,
+        i32,
+        i32,
+        i32,
+        i32,
+        BoltColorMode,
+        i32,
+        i32,
+        i32,
+        i32
+    );
+    void DoBolt(
+        i32,
+        i32,
+        i32,
+        i32,
+        i32,
+        i32,
+        i32,
+        i32,
+        i32,
+        BoltColorMode,
+        i32,
+        i32,
+        i32,
+        i32,
+        i32,
+        i32,
+        i32
+    );
     i32 GetNextChainLightningTarget(class army*, i32);
     void ChainLightning(i32, i32);
     void VaporizeCreature(i32, i32);
