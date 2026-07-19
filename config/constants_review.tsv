@@ -77,7 +77,7 @@ include/SOURCE/CONFIG_TYPES.h	reviewed	Configuration modes, executable/connectio
 include/SOURCE/CURSOR.h	reviewed	Shared hero-cursor geometry, animation, masks, map-change queue, remote-message, resource, and sentinel domains are explicit aligned enums. The map-change record uses named fields and its remaining literal is packed SIZE evidence.
 include/SOURCE/Campaign.h	reviewed	Shared campaign awards, commands, widget ids and frames, display geometry, music ids, and hero portraits are explicitly valued aligned enums; declarations otherwise contain no numeric literals.
 include/SOURCE/Castle.h	reviewed	The shared castle slot extent and upgrade offset are a named enum consumed by both public arrays; the remaining declarations contain no numeric literals.
-include/SOURCE/EVENTS.h	pending
+include/SOURCE/EVENTS.h	reviewed	Combat transport, serialized event-record topology, map interactions, artifacts, monsters, and visual effects are named shared domains; resource arrays derive from the canonical resource count and all packed gaps, fixed strings, variable-text heads, army, skill, artifact, and player extents are explicit.
 include/SOURCE/EVENTS_TYPES.h	reviewed	Packed remote-combat payloads derive their extents from shared event constants; remaining numeric expressions are SIZE layout evidence.
 include/SOURCE/ExpCampaign.h	reviewed	Expansion campaign ids, map/award/storage extents, progression values, resource geometry, and special-event coordinates are named shared domains; the packed runtime gap has a named extent and remaining literals are SIZE evidence.
 include/SOURCE/FINDPATH.h	reviewed	The pathfinding interface contains one fully named function declaration and no numeric constants or storage layout.

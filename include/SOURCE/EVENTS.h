@@ -17,52 +17,69 @@ H2_ENUM_BEGIN(EventConstant)
     COMBAT_REMOTE_TIMEOUT                 = 90000
 H2_ENUM_END(EventConstant)
 
+H2_ENUM_BEGIN(EventRecordConstant)
+    EVENT_RECORD_RESOURCE_COUNT          = IDX(RES_COUNT),
+    EVENT_RECORD_PLAYER_COUNT            = 6,
+    EVENT_RECORD_ARMY_SLOT_COUNT         = 5,
+    EVENT_RECORD_SKILL_CAPACITY          = 8,
+    EVENT_RECORD_MAP_ANSWER_COUNT        = 8,
+    EVENT_RECORD_MAP_ANSWER_SIZE         = 13,
+    EVENT_RECORD_VARIABLE_TEXT_HEAD_SIZE = 1,
+    EVENT_RECORD_SIGN_HEADER_SIZE        = 9,
+    EVENT_RECORD_RUMOUR_HEADER_SIZE      = 8,
+    EVENT_RECORD_TIME_GAP_FIRST_SIZE     = 2,
+    EVENT_RECORD_TIME_GAP_SECOND_SIZE    = 5,
+    EVENT_RECORD_HERO_ARTIFACT_COUNT     = 3,
+    EVENT_RECORD_HERO_NAME_SIZE          = 13,
+    EVENT_RECORD_TOWN_NAME_SIZE          = 15
+H2_ENUM_END(EventRecordConstant)
+
 #pragma pack(push, 1)
 struct mapEventExtra {
     u8 active;
-    i32 resources[7];
+    i32 resources[EVENT_RECORD_RESOURCE_COUNT];
     i16 artifact;
     u8 answerCount;
-    char answers[8][13];
-    char riddle[1];
+    char answers[EVENT_RECORD_MAP_ANSWER_COUNT][EVENT_RECORD_MAP_ANSWER_SIZE];
+    char riddle[EVENT_RECORD_VARIABLE_TEXT_HEAD_SIZE];
 };
 struct signEventExtra {
-    char pad[9];
-    char text[1];
+    char pad[EVENT_RECORD_SIGN_HEADER_SIZE];
+    char text[EVENT_RECORD_VARIABLE_TEXT_HEAD_SIZE];
 };
 struct rumourEventExtra {
-    char pad[8];
-    char text[1];
+    char pad[EVENT_RECORD_RUMOUR_HEADER_SIZE];
+    char text[EVENT_RECORD_VARIABLE_TEXT_HEAD_SIZE];
 };
 struct timeEventExtra {
     char unknown00;
-    i32 resources[7];
-    char unknown1d[2];
+    i32 resources[EVENT_RECORD_RESOURCE_COUNT];
+    char unknown1d[EVENT_RECORD_TIME_GAP_FIRST_SIZE];
     u8 appliesToComputer;
     char unknown20;
     u16 firstDay;
     u16 repeatInterval;
-    char unknown25[5];
+    char unknown25[EVENT_RECORD_TIME_GAP_SECOND_SIZE];
     u8 appliesToHuman;
-    u8 players[6];
-    char message[1];
+    u8 players[EVENT_RECORD_PLAYER_COUNT];
+    char message[EVENT_RECORD_VARIABLE_TEXT_HEAD_SIZE];
 };
 struct mapHeroExtra {
     i8 owner;
     u8 hasCustomArmy;
-    i8 troopTypes[5];
-    u16 troopCounts[5];
+    i8 troopTypes[EVENT_RECORD_ARMY_SLOT_COUNT];
+    u16 troopCounts[EVENT_RECORD_ARMY_SLOT_COUNT];
     u8 hasCustomHero;
     i8 heroId;
-    i8 artifacts[3];
+    i8 artifacts[EVENT_RECORD_HERO_ARTIFACT_COUNT];
     char unknown16;
     i32 experience;
     u8 hasCustomSkills;
-    i8 skillTypes[8];
-    i8 skillLevels[8];
+    i8 skillTypes[EVENT_RECORD_SKILL_CAPACITY];
+    i8 skillLevels[EVENT_RECORD_SKILL_CAPACITY];
     char unknown2c;
     u8 hasCustomName;
-    char name[13];
+    char name[EVENT_RECORD_HERO_NAME_SIZE];
     u8 hasPatrol;
     union {
         i8 patrolRadius;
@@ -76,11 +93,11 @@ struct mapTownExtra {
     u32 buildings;
     i8 mageGuildLevel;
     i8 hasCustomArmy;
-    i8 troopTypes[5];
-    u16 troopCounts[5];
+    i8 troopTypes[EVENT_RECORD_ARMY_SLOT_COUNT];
+    u16 troopCounts[EVENT_RECORD_ARMY_SLOT_COUNT];
     u8 hasShrine;
     char unused18;
-    char name[15];
+    char name[EVENT_RECORD_TOWN_NAME_SIZE];
     i8 unknown28;
 };
 #pragma pack(pop)
