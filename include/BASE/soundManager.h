@@ -10,6 +10,17 @@ H2_ENUM_BEGIN(MidiTrackConstant)
     MIDI_TRACK_COUNT = 60
 H2_ENUM_END(MidiTrackConstant)
 
+H2_ENUM_BEGIN(SoundStorageConstant)
+    SOUND_SAMPLE_HANDLE_CAPACITY  = 14,
+    SOUND_CHANNEL_VOLUME_CAPACITY = 0x14,
+    DIGITAL_DRIVER_NAME_COUNT     = 14,
+    SOUND_CHANNEL_TYPE_COUNT      = 4,
+    CD_POSITION_CAPACITY          = 15,
+    MCI_RESULT_CAPACITY           = 0x100,
+    SAVED_SAMPLE_VOLUME_CAPACITY  = 0x20,
+    MCI_COMMAND_CAPACITY          = 0x100
+H2_ENUM_END(SoundStorageConstant)
+
 H2_ENUM_CLASS_BEGIN(SoundVolumeConversionMode)
     SOUND_VOLUME_EFFECT = 100,
     SOUND_VOLUME_MUSIC  = 101
@@ -46,16 +57,16 @@ public:
     i32 m_ready;
     char _pad_0x42[0xe];
     FILE* m_midiFile;
-    struct _SAMPLE* m_sampleHandles[14];
+    struct _SAMPLE* m_sampleHandles[SOUND_SAMPLE_HANDLE_CAPACITY];
     char _pad_0x8c[0x8];
     i32 m_numSampleHandles;
     char _pad_0x98[0x40];
-    char m_channelVolumes[0x14];
-    struct _SAMPLE* m_channelSamples[14];
+    char m_channelVolumes[SOUND_CHANNEL_VOLUME_CAPACITY];
+    struct _SAMPLE* m_channelSamples[SOUND_SAMPLE_HANDLE_CAPACITY];
     char _pad_0x124[0x8];
-    void* m_channelSampleData[14];
+    void* m_channelSampleData[SOUND_SAMPLE_HANDLE_CAPACITY];
     char _pad_0x164[0x8];
-    u32l m_channelSampleSizes[14];
+    u32l m_channelSampleSizes[SOUND_SAMPLE_HANDLE_CAPACITY];
     char _pad_0x1a4[0x3c8];
     i32 field_0x56c;
     char _pad_0x570[0x4];
@@ -118,9 +129,9 @@ public:
 };
 #pragma pack(pop)
 SIZE(soundManager, 0x6ae);
-extern char* digitalDriverNames[14];
-extern SampleChannelStruct SCS[4];
-extern char CDPreviousPosition[60][15];
+extern char* digitalDriverNames[DIGITAL_DRIVER_NAME_COUNT];
+extern SampleChannelStruct SCS[SOUND_CHANNEL_TYPE_COUNT];
+extern char CDPreviousPosition[MIDI_TRACK_COUNT][CD_POSITION_CAPACITY];
 extern i32 CDWaiting;
 extern i32 CDPlaying;
 extern i32 iCalibrateLoop;
@@ -128,10 +139,10 @@ extern struct _MDI_DRIVER* hMDI;
 extern i32 CurrentMidiFile;
 extern u8 bGotMidi[MIDI_TRACK_COUNT];
 extern i32l lLastMIDIPollTickCount;
-extern char lpszReturnString[0x100];
+extern char lpszReturnString[MCI_RESULT_CAPACITY];
 extern u32l nMCIError;
-extern i16 iLastVolume[0x20];
-extern char CommandString[0x100];
+extern i16 iLastVolume[SAVED_SAMPLE_VOLUME_CAPACITY];
+extern char CommandString[MCI_COMMAND_CAPACITY];
 extern class MIDIWrap* pMIDIWrap[MIDI_TRACK_COUNT];
 extern struct _SEQUENCE* hSequence[MIDI_TRACK_COUNT];
 
