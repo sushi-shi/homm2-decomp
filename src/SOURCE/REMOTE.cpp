@@ -75,13 +75,13 @@ void RemoteCleanup(void) {
             } else {
                 gbInRemoteCleanup = true;
                 LogStr("RC3");
-                switch (GameMode) {
-                    case IDX(REMOTE_GAME_NETWORK_HOST):
-                    case IDX(REMOTE_GAME_NETWORK_GUEST):
+                switch (static_cast<RemoteGameMode>(GameMode)) {
+        case REMOTE_GAME_NETWORK_HOST:
+        case REMOTE_GAME_NETWORK_GUEST:
                         UnloadRemoteDriver(1);
                         break;
-                    case IDX(REMOTE_GAME_MODEM_HOST):
-                    case IDX(REMOTE_GAME_MODEM_GUEST):
+        case REMOTE_GAME_MODEM_HOST:
+        case REMOTE_GAME_MODEM_GUEST:
                         UnloadRemoteDriver(0);
                         break;
                 }
@@ -90,7 +90,7 @@ void RemoteCleanup(void) {
                 iInOrderCtr = 0;
                 iCurLastID = 0;
                 giLastConfirm = -1;
-                GameMode = 0;
+                GameMode = static_cast<u8>(REMOTE_GAME_NONE);
                 lLastHeartbeatSend = 0;
                 gbInRemoteMain = false;
                 iIDCtr = 0;
@@ -111,7 +111,7 @@ void RemoteCleanup(void) {
 }
 
 VA(0x004a3208, 0x6da)
-void RemoteMain(i32 gameMode) {
+void RemoteMain(RemoteGameMode gameMode) {
     u8 receivedPlayers[REMOTE_PLAYER_COUNT];
     i32 playerState;
     char* incomingData;
@@ -184,11 +184,11 @@ void RemoteMain(i32 gameMode) {
     xNetHasOldPlayers = 0;
 
     switch (gameMode) {
-        case IDX(REMOTE_GAME_NETWORK_HOST):
+                    case REMOTE_GAME_NETWORK_HOST:
             gsNetPlayerInfo[0] = gsThisNetPlayerInfo;
             giThisNetPos = 0;
             goto initializeNetwork;
-        case IDX(REMOTE_GAME_NETWORK_GUEST):
+                    case REMOTE_GAME_NETWORK_GUEST:
             giThisNetPos = 1;
         initializeNetwork:
             if (bUseDirectPlay == 0) {
@@ -204,18 +204,18 @@ void RemoteMain(i32 gameMode) {
                 dpnet_init();
             }
             break;
-        case IDX(REMOTE_GAME_MODEM_HOST):
+                    case REMOTE_GAME_MODEM_HOST:
             LogStr("MH1");
             gbRemoteOn = true;
             gsNetPlayerInfo[0] = gsThisNetPlayerInfo;
             giThisNetPos = 0;
-            ModemSetup(gameMode);
+            ModemSetup(IDX(gameMode));
             LogStr("MH2");
             break;
-        case IDX(REMOTE_GAME_MODEM_GUEST):
+                    case REMOTE_GAME_MODEM_GUEST:
             gbRemoteOn = true;
             giThisNetPos = 1;
-            ModemSetup(gameMode);
+            ModemSetup(IDX(gameMode));
             break;
     }
     if (bUseDirectPlay == 0 && bUseWinsock == 0)
@@ -236,8 +236,8 @@ void RemoteMain(i32 gameMode) {
                 LogStr("RM 4");
                 if (incomingData != NULL
                     && REMOTE_MESSAGE(incomingData)->type == IDX(REMOTE_MESSAGE_RELIABLE)) {
-                    switch (REMOTE_MESSAGE(incomingData)->command) {
-                        case IDX(SETUP_PLAYER_INFO):
+                    switch (static_cast<RemoteSetupCommand>(REMOTE_MESSAGE(incomingData)->command)) {
+                        case SETUP_PLAYER_INFO:
                             netPlayer = REMOTE_MESSAGE(incomingData)->sender;
                             gsNetPlayerInfo[netPlayer] =
                                 *REMOTE_PLAYER_INFO(REMOTE_MESSAGE(incomingData));
@@ -415,9 +415,9 @@ i32 SendRemoteData(u8* dataToSend, u8*, i32 destination, i32 length) {
         static_cast<char>(destination),
         length
     );
-    switch (GameMode) {
-        case IDX(REMOTE_GAME_NETWORK_HOST):
-        case IDX(REMOTE_GAME_NETWORK_GUEST):
+    switch (static_cast<RemoteGameMode>(GameMode)) {
+        case REMOTE_GAME_NETWORK_HOST:
+        case REMOTE_GAME_NETWORK_GUEST:
             if (bUseDirectPlay != 0) {
                 sendStatus = dpnet_snd(destination, size, PacketSend);
             } else if (bUseWinsock != 0) {
@@ -441,8 +441,8 @@ i32 SendRemoteData(u8* dataToSend, u8*, i32 destination, i32 length) {
                 }
             }
             break;
-        case IDX(REMOTE_GAME_MODEM_HOST):
-        case IDX(REMOTE_GAME_MODEM_GUEST):
+        case REMOTE_GAME_MODEM_HOST:
+        case REMOTE_GAME_MODEM_GUEST:
             WriteModemPacket(PacketSend, size);
             out = 1;
             break;
@@ -456,9 +456,9 @@ i32 ReceiveRemoteData(u8*, u8* data, i32 decodeType) {
     i32 receiveResult;
 
     result = 1;
-    switch (GameMode) {
-        case IDX(REMOTE_GAME_NETWORK_HOST):
-        case IDX(REMOTE_GAME_NETWORK_GUEST):
+    switch (static_cast<RemoteGameMode>(GameMode)) {
+        case REMOTE_GAME_NETWORK_HOST:
+        case REMOTE_GAME_NETWORK_GUEST:
             if (bUseDirectPlay != 0) {
                 receiveResult = dpnet_rcv(0, REMOTE_RECEIVE_BUFFER_SIZE, packet);
                 if (receiveResult == 0)
@@ -476,8 +476,8 @@ i32 ReceiveRemoteData(u8*, u8* data, i32 decodeType) {
                 result = DecodePacket(data, decodeType);
             }
             break;
-        case IDX(REMOTE_GAME_MODEM_HOST):
-        case IDX(REMOTE_GAME_MODEM_GUEST):
+        case REMOTE_GAME_MODEM_HOST:
+        case REMOTE_GAME_MODEM_GUEST:
             receiveResult = ReadPacket();
             if (receiveResult == 0)
                 return 0;
