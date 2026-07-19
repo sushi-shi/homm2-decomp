@@ -177,7 +177,7 @@ src/BASE/iconf2bc.cpp	pending
 src/BASE/iconf2by.cpp	pending
 src/BASE/listbox.cpp	pending
 src/BASE/miscwin.cpp	pending
-src/BASE/soundmgr.cpp	pending
+src/BASE/soundmgr.cpp	reviewed	Private enums name volume and fade scales, MCI limits, PCM defaults, timers, polling, sample waits, and the one-past channel sentinel; shared header domains cover storage extents, MIDI tracks, operations, and reports. Retail track-policy assignments are narrowly suppressed content payload, SCS initializer values remain reviewed data payload, and zeros/ones are state, booleans, indices, or API flags.
 src/EDITOR/mapcell.cpp	reviewed	The extra-record allocation step is a private enum; remaining zeroes and ones are initialization, list sentinels, booleans, or indexing.
 src/SOURCE/ADVMGR.cpp	pending
 src/SOURCE/AI.cpp	pending
