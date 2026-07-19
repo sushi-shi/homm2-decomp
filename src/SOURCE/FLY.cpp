@@ -12,6 +12,9 @@
 #include <SOURCE/NOOPT.h>
 #include <SOURCE/PATH.h>
 #include <SOURCE/X_GLOBAL.h>
+
+namespace {
+
 H2_ENUM_CLASS_BEGIN(ArmyCombatDirection)
     DIRECTION_LEFT  = 1,
     DIRECTION_RIGHT = 4
@@ -20,8 +23,23 @@ H2_ENUM_CLASS_END(ArmyCombatDirection)
 H2_ENUM_BEGIN(ArmyFlightConstant)
     ALL_ADJACENT_DIRECTIONS    = 0x3f,
     FLIGHT_SOUND_FRAME         = 1,
-    VAMPIRE_FLIGHT_SOUND_DELAY = 100
+    VAMPIRE_FLIGHT_SOUND_DELAY = 100,
+    FLIGHT_ATTACK_HEX_COUNT    = 2
 H2_ENUM_END(ArmyFlightConstant)
+
+inline i32 FacingRearDirection(i32 facing) {
+    return facing == 1 ? IDX(DIRECTION_LEFT) : IDX(DIRECTION_RIGHT);
+}
+
+inline i32 FacingFrontDirection(i32 facing) {
+    return facing == 1 ? IDX(DIRECTION_RIGHT) : IDX(DIRECTION_LEFT);
+}
+
+inline i32 FacingRearHexOffset(i32 facing) {
+    return facing == 1 ? 1 : -1;
+}
+
+}
 
 VA(0x004a5900, 0x295)
 i32 army::CanFit(i32 hex, i32 tryOtherSide, i32* fittingHex) {
@@ -42,7 +60,7 @@ i32 army::CanFit(i32 hex, i32 tryOtherSide, i32* fittingHex) {
         return 0;
     }
     if (HAS(m_monster.flags.all, MONSTER_FLAGS_WIDE)) {
-        candidateHex = GetAdjacentCellIndex(hex, (-(static_cast<u32>(m_facing - 1) < 1) & -3) + 4);
+        candidateHex = GetAdjacentCellIndex(hex, FacingRearDirection(m_facing));
         if (ValidHex(candidateHex)) {
             cell_9 = &gpCombatManager->m_hexCells[candidateHex];
         }
@@ -57,8 +75,7 @@ i32 army::CanFit(i32 hex, i32 tryOtherSide, i32* fittingHex) {
                 return 0;
             }
 
-            candidateHex =
-                GetAdjacentCellIndex(hex, (-(static_cast<u32>(m_facing - 1) < 1) & 3) + 1);
+            candidateHex = GetAdjacentCellIndex(hex, FacingFrontDirection(m_facing));
             if (ValidHex(candidateHex)) {
                 cell_9 = &gpCombatManager->m_hexCells[candidateHex];
             } else {
@@ -87,7 +104,7 @@ i32 army::ValidFlight(i32 destination, i32 fromTargetHex) {
     i32 attackMask;
     i32 initialDirection;
     i32 direction;
-    i32 attackHex[2];
+    i32 attackHex[FLIGHT_ATTACK_HEX_COUNT];
     u32 directionMask;
     i32 adjacentHex;
     i32 fittingHex;
@@ -276,7 +293,7 @@ i32 army::FlyTo(i32 destination) {
     gpCombatManager->m_hexCells[m_hex].m_occupantSide = -1;
     gpCombatManager->m_hexCells[m_hex].m_occupantFrame = -1;
     if (HAS(m_monster.flags.all, MONSTER_FLAGS_WIDE)) {
-        sourceRearHex = ((-(static_cast<u32>(m_facing - 1) < 1) & 2) - 1) + m_hex;
+        sourceRearHex = FacingRearHexOffset(m_facing) + m_hex;
         gpCombatManager->m_hexCells[sourceRearHex].m_occupantIndex = -1;
         gpCombatManager->m_hexCells[sourceRearHex].m_occupantSide = -1;
         gpCombatManager->m_hexCells[sourceRearHex].m_occupantFrame = -1;
@@ -431,7 +448,7 @@ i32 army::FlyTo(i32 destination) {
         static_cast<i8>(gpCombatManager->m_currentArmyIndex);
     gpCombatManager->m_hexCells[destination].m_occupantFrame = -1;
     if (HAS(m_monster.flags.all, MONSTER_FLAGS_WIDE)) {
-        destinationRearHex = ((-(static_cast<u32>(m_facing - 1) < 1) & 2) - 1) + destination;
+        destinationRearHex = FacingRearHexOffset(m_facing) + destination;
         gpCombatManager->m_hexCells[destinationRearHex].m_occupantSide =
             static_cast<i8>(gpCombatManager->m_currentArmySide);
         gpCombatManager->m_hexCells[destinationRearHex].m_occupantIndex =
