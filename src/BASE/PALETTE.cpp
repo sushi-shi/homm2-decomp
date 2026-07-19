@@ -7,7 +7,6 @@
 
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\PALETTE.CPP"
 
-
 VA(0x004d2580, 0x2e)
 palette::palette(void) : resource(RESOURCE_CATEGORY_PALETTE, 0, RESOURCE_REFERENCE_INITIAL, NULL) {
     m_data = static_cast<i8*>(H2_ALLOC(PALETTE_DATA_SIZE, 8));
@@ -32,7 +31,6 @@ VA(0x004d2690, 0x4)
 i8* palette::Data(void) {
     return m_data;
 }
-
 
 VTBL(palette, 0x004eba7c);
 
