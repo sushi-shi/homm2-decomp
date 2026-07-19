@@ -11,7 +11,7 @@ include/BASE/INPUTMGR.h	pending
 include/BASE/INPUTMGR_TYPES.h	pending
 include/BASE/Icon2b.h	pending
 include/BASE/IconDraw.h	pending
-include/BASE/IconEntry.h	pending
+include/BASE/IconEntry.h	reviewed	Serialized frame-entry fields are named; remaining literals are packing and SIZE layout evidence.
 include/BASE/IconMonoRle.h	pending
 include/BASE/IconRle.h	pending
 include/BASE/IconShear.h	pending
@@ -44,7 +44,7 @@ include/BASE/executive.h	reviewed	The interface carries no numeric policy; the s
 include/BASE/font.h	reviewed	Glyph behavior, draw modes, and horizontal/vertical alignment domains are named and aligned; strict builds use enums while production uses expansion constants to keep VC4.2 declaration state neutral. Remaining literal is packed-layout SIZE evidence.
 include/BASE/heroWindow.h	pending
 include/BASE/heroWindowManager.h	pending
-include/BASE/icon.h	pending
+include/BASE/icon.h	reviewed	Limit bounds, typed frame-table access, and all public method parameters are named; remaining literals are packed-layout SIZE evidence.
 include/BASE/icon2bc.h	pending
 include/BASE/icon2bs.h	pending
 include/BASE/icon2by.h	pending
@@ -146,7 +146,7 @@ src/BASE/Bzip.cpp	pending
 src/BASE/DIMMER.cpp	reviewed	The implementation contains no policy literals; constructor zeros are empty-widget initialization and all other numerics are address/size annotations.
 src/BASE/EXEC.cpp	reviewed	Manager results, dispatch states, priority, and capacity are private named constants; dialog storage derives from sizeof(executive), and executable selection uses the shared game/editor selectors. Non-debug section bytes and ordered relocations are unchanged.
 src/BASE/FONT.cpp	reviewed	Large-font threshold, resource-name extent, full-screen clip bounds, draw modes, and alignment cases are named. Remaining zeros, ones, and twos are state booleans, clipping origins, icon-call flags, sequence steps, or midpoint arithmetic. The proven fname local identity is retained because renaming it changes VC4.2 stack slots. Non-debug sections and relocations are A/B exact.
-src/BASE/ICON.cpp	pending
+src/BASE/ICON.cpp	reviewed	TU-private orientation, result, color-table, and draw-extent enums are aligned and use prefix-free value names. Remaining zeros/ones are clipping origins, inclusive-bound adjustments, booleans, or low-level draw flags; allocation/free operands 18 and 0x1a preserve retail source-line evidence. Resource lifecycle is named and non-debug sections/relocations remain exact.
 src/BASE/ICONWDGT.cpp	reviewed	Private resource-name capacity, color mask, center shift, bottom padding, and dispatch results are named. Strict builds use a private enum while production uses expansion constants; repeated forwarded identity preserves the original statement stream. Remaining zeros/ones are initialization, booleans, frame origins, or resource lookup flags. Non-debug sections and relocations are A/B exact.
 src/BASE/INPUTMGR.cpp	pending
 src/BASE/Icon2b.cpp	pending
