@@ -355,11 +355,11 @@ i32 combatManager::ValidHexToStandOn(i32 hexIndex) {
                       && (gpCombatManager->m_currentSide != COMBAT_DEFENDER_SIDE
                           || gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX]
                                      .m_occupantSide
-                                 != -1
+                                 != COMBAT_OCCUPANT_NONE
                           || gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX]
                                      .m_deadOccupantCount
                                  != 0))))
-          || (m_hexCells[hexIndex].m_occupantSide != -1
+          || (m_hexCells[hexIndex].m_occupantSide != COMBAT_OCCUPANT_NONE
               && (m_hexCells[hexIndex].m_occupantSide != m_currentArmySide
                   || m_hexCells[hexIndex].m_occupantIndex != m_currentArmyIndex)))) {
         return 1;
@@ -1140,7 +1140,7 @@ CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
                             && (gpCombatManager->m_currentSide != COMBAT_DEFENDER_SIDE
                                 || gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX]
                                            .m_occupantSide
-                                       != -1
+                                       != COMBAT_OCCUPANT_NONE
                                 || gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX]
                                            .m_deadOccupantCount
                                        != 0)))) {
@@ -1166,7 +1166,9 @@ CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
                             currentArmy->m_targetIndex = targetIndex;
                             if (currentArmy->m_monster.shots > 0
                                 && currentArmy->GetAttackMask(
-                                    currentArmy->m_hex, ARMY_ATTACK_TARGET_ENEMY, -1
+                                    currentArmy->m_hex,
+                                    ARMY_ATTACK_TARGET_ENEMY,
+                                    ARMY_HEX_INVALID
                                 )
                                        == ARMY_ALL_ATTACK_DIRECTIONS) {
                                 if (ShotIsThroughWall(
@@ -1249,7 +1251,7 @@ i32 combatManager::RightClick(i32 hexIndex) {
                         && (gpCombatManager->m_currentSide != COMBAT_DEFENDER_SIDE
                             || gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX]
                                        .m_occupantSide
-                                   != -1
+                                   != COMBAT_OCCUPANT_NONE
                             || gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX]
                                        .m_deadOccupantCount
                                    != 0))))

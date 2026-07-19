@@ -1337,7 +1337,7 @@ void combatManager::CatAttack(i32 side) {
                 IDX(targetHex4),
                 (frame18 + startDirection) % COMBAT_CATAPULT_DIRECTION_COUNT
             );
-            if (adjacentHex != -1 && m_hexCells[adjacentHex].m_occupantSide == -1) {
+            if (adjacentHex != -1 && m_hexCells[adjacentHex].m_occupantSide == COMBAT_OCCUPANT_NONE) {
                 for (index28 = 0; index28 < COMBAT_CATAPULT_MISS_HEX_COUNT; index28++) {
                     if (validMissHexes[index28] == adjacentHex) {
                         impactX5 = m_hexCells[adjacentHex].m_x;
@@ -1946,9 +1946,9 @@ void combatManager::RaiseDoor(void) {
 VA(0x004953fd, 0x84)
 void combatManager::TestRaiseDoor(void) {
     if (m_inCastleCombat && m_drawbridgeState == COMBAT_DRAWBRIDGE_LOWERED
-        && m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX].m_occupantSide == -1
+        && m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX].m_occupantSide == COMBAT_OCCUPANT_NONE
         && m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX].m_deadOccupantCount == 0
-        && m_hexCells[IDX(COMBAT_CASTLE_HEX_GATE)].m_occupantSide == -1
+        && m_hexCells[IDX(COMBAT_CASTLE_HEX_GATE)].m_occupantSide == COMBAT_OCCUPANT_NONE
         && m_hexCells[IDX(COMBAT_CASTLE_HEX_GATE)].m_deadOccupantCount == 0) {
         RaiseDoor();
     }
