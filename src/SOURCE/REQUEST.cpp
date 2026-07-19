@@ -999,12 +999,12 @@ void fileRequester::Update(i32 drawWindow) {
 
         broadcastMessage.payload.widget.id = FILE_REQUESTER_MAP_VICTORY;
         broadcastMessage.payload.widget.data.value =
-            m_mapHeaders[m_selectedIndex].victoryCondition + IDX(VICTORY_FRAME_BASE);
+            IDX(m_mapHeaders[m_selectedIndex].victoryCondition) + IDX(VICTORY_FRAME_BASE);
         m_window->BroadcastMessage(broadcastMessage);
 
         broadcastMessage.payload.widget.id = FILE_REQUESTER_MAP_LOSS;
         broadcastMessage.payload.widget.data.value =
-            m_mapHeaders[m_selectedIndex].lossCondition + IDX(LOSS_FRAME_BASE);
+            IDX(m_mapHeaders[m_selectedIndex].lossCondition) + IDX(LOSS_FRAME_BASE);
         m_window->BroadcastMessage(broadcastMessage);
 
         broadcastMessage.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
@@ -1074,12 +1074,12 @@ void fileRequester::Update(i32 drawWindow) {
 
                 broadcastMessage.payload.widget.id = i + FILE_REQUESTER_MAP_VICTORY_ICON_FIRST;
                 broadcastMessage.payload.widget.data.value =
-                    m_mapHeaders[m_topIndex + i].victoryCondition + IDX(VICTORY_FRAME_BASE);
+                    IDX(m_mapHeaders[m_topIndex + i].victoryCondition) + IDX(VICTORY_FRAME_BASE);
                 m_window->BroadcastMessage(broadcastMessage);
 
                 broadcastMessage.payload.widget.id = i + FILE_REQUESTER_MAP_LOSS_ICON_FIRST;
                 broadcastMessage.payload.widget.data.value =
-                    m_mapHeaders[m_topIndex + i].lossCondition + IDX(LOSS_FRAME_BASE);
+                    IDX(m_mapHeaders[m_topIndex + i].lossCondition) + IDX(LOSS_FRAME_BASE);
                 m_window->BroadcastMessage(broadcastMessage);
             }
 

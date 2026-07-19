@@ -116,7 +116,6 @@ H2_ENUM_BEGIN(AISideConstant)
     SIDE_CAMPAIGN_SCENARIO_NINE   = 9,
     SIDE_CAMPAIGN_SCENARIO_TEN    = 10,
     SIDE_CAMPAIGN_SCENARIO_ELEVEN = 11,
-    SIDE_VICTORY_CONDITION        = 4,
     SIDE_VICTORY_SPECIAL_VALUE    = 99,
     SIDE_FIRST_COLOR              = 0,
     SIDE_FOURTH_COLOR             = 3
@@ -1991,7 +1990,7 @@ void philAI::ProbableOutcomeOfBattle(
                 && attackerHero->m_artifacts[artifactIndex15] < AI_BATTLE_BASE_ARTIFACT_LIMIT)
                 attackerArtifacts7 += gArtifactBaseRV[attackerHero->m_artifacts[artifactIndex15]];
         }
-        if (gpGame->m_mapHeader.victoryCondition == AI_BATTLE_SPECIAL_ARTIFACT_STATE
+        if (gpGame->m_mapHeader.victoryCondition == MAP_VICTORY_DEFEAT_HERO
             && static_cast<u8>(attackerHero->m_id) == gpGame->m_mapHeader.victoryConditionValue)
             attackerArtifacts7 += AI_BATTLE_SPECIAL_ARTIFACT_VALUE;
 
@@ -2015,7 +2014,7 @@ void philAI::ProbableOutcomeOfBattle(
                 && defenderHero->m_artifacts[artifactIndex15] < AI_BATTLE_BASE_ARTIFACT_LIMIT)
                 defenderArtifacts18 += gArtifactBaseRV[defenderHero->m_artifacts[artifactIndex15]];
         }
-        if (gpGame->m_mapHeader.lossCondition == AI_BATTLE_SPECIAL_ARTIFACT_STATE
+        if (gpGame->m_mapHeader.lossCondition == MAP_LOSS_HERO
             && static_cast<u8>(defenderHero->m_id) == gpGame->m_mapHeader.lossConditionValue)
             defenderArtifacts18 += AI_BATTLE_SPECIAL_ARTIFACT_VALUE;
 
@@ -3163,11 +3162,11 @@ i32 philAI::ValueOfTown(town* t) {
     }
     sum = (i32)(gafAITurnCostResource[IDX(RES_GOLD)] * 1250.0f * 1.5 + sum);
     sum += 750;
-    if (gpGame->m_mapHeader.lossCondition == IDX(MAP_LOSS_TOWN)
+    if (gpGame->m_mapHeader.lossCondition == MAP_LOSS_TOWN
         && t->m_x == gpGame->m_mapHeader.lossConditionValue
         && gpGame->m_mapHeader.lossTownY == t->m_y)
         sum += 50000;
-    if (gpGame->m_mapHeader.victoryCondition == IDX(MAP_VICTORY_CAPTURE_TOWN)
+    if (gpGame->m_mapHeader.victoryCondition == MAP_VICTORY_CAPTURE_TOWN
         && t->m_x == gpGame->m_mapHeader.victoryConditionValue
         && gpGame->m_mapHeader.victoryTownY == t->m_y)
         sum += 50000;
@@ -3203,7 +3202,7 @@ float philAI::TurnValueOfObelisk(i32 player) {
     playerData* ta;
     ta = &gpGame->m_players[player];
     jb = gArtifactBaseRV[gpGame->m_ultimateArtifactId];
-    if (gpGame->m_mapHeader.victoryCondition == 3)
+    if (gpGame->m_mapHeader.victoryCondition == MAP_VICTORY_FIND_ARTIFACT)
         jb <<= 1;
     idx = jb / 110;
     if (gpGame->m_ultimateArtifactId == IDX(ARTIFACT_NONE))
@@ -4010,7 +4009,7 @@ void philAI::HeroInteractionAtTown(hero* heroPtr, town* townPtr, i32 doInteracti
             static_cast<float>(desiredShare0 * AI_THIRD_WEEK_TOWN_SHARE_FACTOR);
     if (static_cast<u8>(heroPtr->m_id) == iAlphaMale)
         desiredShare0 = static_cast<float>(desiredShare0 * 0.5);
-    if (gpGame->m_mapHeader.victoryCondition == IDX(MAP_VICTORY_CAPTURE_TOWN)
+    if (gpGame->m_mapHeader.victoryCondition == MAP_VICTORY_CAPTURE_TOWN
         && townPtr->m_x == gpGame->m_mapHeader.victoryConditionValue
         && (gpGame->m_mapHeader.victoryTownY | 0) == townPtr->m_y) {
         desiredShare0 = 0.8f;
@@ -5806,7 +5805,7 @@ i32 OnMySide(i32 player) {
                 && gpGame->m_campaignScenario + SIDE_CAMPAIGN_SCENARIO_OFFSET
                        == SIDE_CAMPAIGN_SCENARIO_ELEVEN
                 && player != SIDE_PRIMARY_PLAYER)
-            || (gpGame->m_mapHeader.victoryCondition == SIDE_VICTORY_CONDITION
+            || (gpGame->m_mapHeader.victoryCondition == MAP_VICTORY_DEFEAT_SIDE
                 && ((gpGame->m_mapHeader.victoryConditionValue == SIDE_VICTORY_SPECIAL_VALUE
                      && player != SIDE_PRIMARY_PLAYER)
                     || (gpGame->m_mapHeader.victoryConditionValue != SIDE_VICTORY_SPECIAL_VALUE

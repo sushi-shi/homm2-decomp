@@ -2179,7 +2179,7 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
     winFlag = 0;
     defeated = 0;
     allowNormalVictory = 1;
-    if ((gpGame->m_mapHeader.victoryCondition != IDX(MAP_VICTORY_DEFEAT_ALL)
+    if ((gpGame->m_mapHeader.victoryCondition != MAP_VICTORY_DEFEAT_ALL
          && !gpGame->m_mapHeader.allowNormalVictory)
         || (gbInCampaign && gpGame->m_campaignType == IDX(END_GAME_ARCHIBALD_CAMPAIGN)
             && gpGame->m_campaignScenario + IDX(END_GAME_SCENARIO_OFFSET)
@@ -2187,7 +2187,7 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
         allowNormalVictory = 0;
     }
 
-    if (gpGame->m_mapHeader.victoryCondition == IDX(MAP_VICTORY_DEFEAT_SIDE)
+    if (gpGame->m_mapHeader.victoryCondition == MAP_VICTORY_DEFEAT_SIDE
         && gpGame->m_mapHeader.victoryConditionValue != IDX(END_GAME_SIDE_SPECIAL_VALUE)
         && (!gbInCampaign || gpGame->m_campaignType != IDX(END_GAME_ARCHIBALD_CAMPAIGN)
             || gpGame->m_campaignScenario + IDX(END_GAME_SCENARIO_OFFSET)
@@ -2232,7 +2232,7 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
         }
     }
 
-    if (gpGame->m_mapHeader.victoryCondition == IDX(MAP_VICTORY_CAPTURE_TOWN)) {
+    if (gpGame->m_mapHeader.victoryCondition == MAP_VICTORY_CAPTURE_TOWN) {
         victoryTownData = gpGame->GetTown(gpGame->GetTownId(
             gpGame->m_mapHeader.victoryConditionValue,
             gpGame->m_mapHeader.victoryTownY
@@ -2264,7 +2264,7 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
         }
     }
 
-    if (gpGame->m_mapHeader.lossCondition == IDX(MAP_LOSS_TOWN)) {
+    if (gpGame->m_mapHeader.lossCondition == MAP_LOSS_TOWN) {
         lossTown = gpGame->GetTown(
             gpGame->GetTownId(gpGame->m_mapHeader.lossConditionValue, gpGame->m_mapHeader.lossTownY)
         );
@@ -2279,7 +2279,7 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
         }
     }
 
-    if (gpGame->m_mapHeader.victoryCondition == IDX(MAP_VICTORY_ACCUMULATE_GOLD)) {
+    if (gpGame->m_mapHeader.victoryCondition == MAP_VICTORY_ACCUMULATE_GOLD) {
         bestGold = 0;
         winnerPlayer = END_GAME_NO_PLAYER;
         for (player = 0; player < gpGame->m_playerCount; player++) {
@@ -2320,7 +2320,7 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
         }
     }
 
-    if (gpGame->m_mapHeader.victoryCondition == IDX(MAP_VICTORY_DEFEAT_HERO)) {
+    if (gpGame->m_mapHeader.victoryCondition == MAP_VICTORY_DEFEAT_HERO) {
         winningHeroEntry = GetHeroSlot(gpGame->m_mapHeader.victoryConditionValue);
         if (winningHeroEntry->m_owner < 0
             || winningHeroEntry->m_owner >= IDX(END_GAME_PLAYER_COUNT)
@@ -2338,7 +2338,7 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
         }
     }
 
-    if (gpGame->m_mapHeader.lossCondition == IDX(MAP_LOSS_HERO)) {
+    if (gpGame->m_mapHeader.lossCondition == MAP_LOSS_HERO) {
         lossHero = GetHeroSlot(gpGame->m_mapHeader.lossConditionValue);
         if (lossHero->m_owner < 0 || lossHero->m_owner >= IDX(END_GAME_PLAYER_COUNT)
             || !gbHumanPlayer[lossHero->m_owner]) {
@@ -2351,7 +2351,7 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
         }
     }
 
-    if (gpGame->m_mapHeader.lossCondition == IDX(MAP_LOSS_TIME)) {
+    if (gpGame->m_mapHeader.lossCondition == MAP_LOSS_TIME) {
         if (gpGame->m_mapHeader.lossConditionValue
             < (gpGame->m_week - 1) * IDX(END_GAME_DAYS_PER_WEEK)
                   + (gpGame->m_month - 1) * IDX(END_GAME_DAYS_PER_MONTH) + gpGame->m_day) {
@@ -2364,7 +2364,7 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
         }
     }
 
-    if (gpGame->m_mapHeader.victoryCondition == IDX(MAP_VICTORY_FIND_ARTIFACT)) {
+    if (gpGame->m_mapHeader.victoryCondition == MAP_VICTORY_FIND_ARTIFACT) {
         artifactWinnerPerson = END_GAME_NO_PLAYER;
         for (player = 0; player < gpGame->m_playerCount; player++) {
             if (!gpGame->m_playerDead[player]) {
