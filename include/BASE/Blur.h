@@ -5,6 +5,13 @@
 
 class bitmap;
 
-void DoBlur(class bitmap*, class bitmap*, i32, i32, i32, i32);
+void DoBlur(
+    class bitmap* destination,
+    class bitmap* source,
+    i32 height,
+    i32 redAdjust,
+    i32 greenAdjust,
+    i32 blueAdjust
+);
 
 #endif
