@@ -1,12 +1,9 @@
 #ifndef HOMM2_SOURCE_ADVMANAGER_H
 #define HOMM2_SOURCE_ADVMANAGER_H
-// Reconstructed class (SOURCE) from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// 139 methods, 3 own-virtual, 0 static data.
 #include <va.h>
 #include "../BASE/baseManager.h"
 #include <SOURCE/ADVMGR.h>
 #include <SOURCE/Viewwrld.h>
-// forward declarations:
 class armyGroup;
 class hero;
 class mapCell;
@@ -30,100 +27,94 @@ struct adventureSoundCell {
     i32 volume;
 };
 
-#pragma pack(push, 1) // recovered layout is byte-packed
+#pragma pack(push, 1)
 class advManager : public baseManager {
 public:
-    // --- members (offsets from Ghidra this+off access-analysis; widths are
-    // access-widths, NOT confirmed types; refine during byte-matching) ---
-    // (derived: base baseManager = 0x36 bytes at 0x00 via ': public baseManager'; own fields below)
-    AdventureCommand m_selectedCell; // +0x36
+    AdventureCommand m_selectedCell;
     union {
-        i32 m_heroLocatorState[12]; // +0x3a
+        i32 m_heroLocatorState[12];
         class widget* m_bottomViewPrimaryWidgets[12];
         struct {
-            class iconWidget* m_bottomViewBackground;          // +0x3a
-            class iconWidget* m_bottomViewHourglassBackground; // +0x3e
-            class iconWidget* m_bottomViewIcons[5];            // +0x42
-            char m_bottomViewIconPadding[0x14];                // +0x56
+            class iconWidget* m_bottomViewBackground;
+            class iconWidget* m_bottomViewHourglassBackground;
+            class iconWidget* m_bottomViewIcons[5];
+            char m_bottomViewIconPadding[0x14];
         };
     };
     union {
-        i32 m_townLocatorState[12]; // +0x6a
+        i32 m_townLocatorState[12];
         class widget* m_bottomViewSecondaryWidgets[12];
         class textWidget* m_bottomViewAllTexts[12];
         struct {
-            i32 m_bottomViewTextReserved;           // +0x6a
-            class textWidget* m_bottomViewTexts[5]; // +0x6e
-            char m_bottomViewTextPadding[0x18];     // +0x82
+            i32 m_bottomViewTextReserved;
+            class textWidget* m_bottomViewTexts[5];
+            char m_bottomViewTextPadding[0x18];
         };
     };
-    class heroWindow* m_adventureWindow; // +0x9a
-    u16* m_visibilityMap;                // +0x9e, packed route display cells
-    i32 m_visibilityMapValid;            // +0xa2
-    i32 m_currentTerrain;                // +0xa6, index into giTerrainToMusicTrack
+    class heroWindow* m_adventureWindow;
+    u16* m_visibilityMap;
+    i32 m_visibilityMapValid;
+    i32 m_currentTerrain;
     char _pad_0xaa[0x4];
-    class fullMap* m_mapData;              // +0xae
-    class iconWidget* m_scrollLeftButton;  // +0xb2
-    class iconWidget* m_scrollRightButton; // +0xb6
-    u8* m_adventureBorder;                 // +0xba
+    class fullMap* m_mapData;
+    class iconWidget* m_scrollLeftButton;
+    class iconWidget* m_scrollRightButton;
+    u8* m_adventureBorder;
     char _pad_0xbe[0x4];
-    class tileset* m_groundTiles;   // +0xc2
-    class tileset* m_cloudTiles;    // +0xc6
-    class tileset* m_stoneTiles;    // +0xca
-    class icon* m_objectIcons[64];  // +0xce
-    class icon* m_puzzleIcon;       // +0x1ce
-    class icon* m_cloudOverlayIcon; // +0x1d2
-    i32 m_mapOriginX;               // +0x1d6
-    i32 m_mapOriginY;               // +0x1da
-    i32 m_previousOriginX;          // +0x1de
-    i32 m_previousOriginY;          // +0x1e2
-    i32 m_lastHoverCell;            // +0x1e6
-    i32 m_hoverCellY;               // +0x1ea
-    i32 m_commandTargetX;           // +0x1ee
-    i32 m_commandTargetY;           // +0x1f2
-    i32 m_updateMinX;               // +0x1f6
-    i32 m_updateMinY;               // +0x1fa
-    i32 m_updateMaxX;               // +0x1fe
-    i32 m_updateMaxY;               // +0x202
-    i32 m_updatePending;            // +0x206
-    i32 m_viewBounds[4];            // +0x20a
-    class icon* m_heroIcons[8];     // +0x21a
-    class icon* m_shadowIcon;       // +0x23a
-    class icon* m_boatShadowIcon;   // +0x23e
-    class icon* m_flagIcons[6];     // +0x242
-    class icon* m_boatFlagIcons[6]; // +0x25a
-    i32 m_cursorActive;             // +0x272
-    i32 m_drawHeroShadows;          // +0x276
-    i32 m_cursorType;               // +0x27a
-    i32 m_cursorDirection;          // +0x27e  !union: conflicting widths
-    i32 m_cursorFrame;              // +0x282
-    i32 m_cursorFrameCount;         // +0x286
-    i32 m_cursorCycle;              // +0x28a
-    i32 m_cursorTurning;            // +0x28e
-    i32 m_cursorMapX;               // +0x292
-    i32 m_previousCursorMapX;       // +0x296
-    i32 m_cursorMapY;               // +0x29a
-    i32 m_previousCursorMapY;       // +0x29e
-    i32 m_comboHeroDrawn;           // +0x2a2
-    i32 m_heroContextLocked;        // +0x2a6
-    i32 m_townContextLocked;        // +0x2aa
-    i32 m_forceCompleteDraw;        // +0x2ae
-    i32 m_lastQuickViewX;           // +0x2b2
-    i32 m_lastQuickViewY;           // +0x2b6
-    i32 m_mineGuardianFacingLeft; // +0x2ba  set when the hero attacks a mine guardian from its left; picks the mirrored guardian frame
-    i32 m_activeSoundMask;        // +0x2be
-    adventureSoundCell m_activeSounds[4]; // +0x2c2
-    class sample* m_loopingSamples[28];   // +0x2e2
-    class sample* m_cursorSamples[9];     // +0x352
-    i32 m_identifyHeroActive;             // +0x376
-    i32 m_openState;                      // +0x37a
-    // --- constructors ---
+    class tileset* m_groundTiles;
+    class tileset* m_cloudTiles;
+    class tileset* m_stoneTiles;
+    class icon* m_objectIcons[64];
+    class icon* m_puzzleIcon;
+    class icon* m_cloudOverlayIcon;
+    i32 m_mapOriginX;
+    i32 m_mapOriginY;
+    i32 m_previousOriginX;
+    i32 m_previousOriginY;
+    i32 m_lastHoverCell;
+    i32 m_hoverCellY;
+    i32 m_commandTargetX;
+    i32 m_commandTargetY;
+    i32 m_updateMinX;
+    i32 m_updateMinY;
+    i32 m_updateMaxX;
+    i32 m_updateMaxY;
+    i32 m_updatePending;
+    i32 m_viewBounds[4];
+    class icon* m_heroIcons[8];
+    class icon* m_shadowIcon;
+    class icon* m_boatShadowIcon;
+    class icon* m_flagIcons[6];
+    class icon* m_boatFlagIcons[6];
+    i32 m_cursorActive;
+    i32 m_drawHeroShadows;
+    i32 m_cursorType;
+    i32 m_cursorDirection;
+    i32 m_cursorFrame;
+    i32 m_cursorFrameCount;
+    i32 m_cursorCycle;
+    i32 m_cursorTurning;
+    i32 m_cursorMapX;
+    i32 m_previousCursorMapX;
+    i32 m_cursorMapY;
+    i32 m_previousCursorMapY;
+    i32 m_comboHeroDrawn;
+    i32 m_heroContextLocked;
+    i32 m_townContextLocked;
+    i32 m_forceCompleteDraw;
+    i32 m_lastQuickViewX;
+    i32 m_lastQuickViewY;
+    i32 m_mineGuardianFacingLeft;
+    i32 m_activeSoundMask;
+    adventureSoundCell m_activeSounds[4];
+    class sample* m_loopingSamples[28];
+    class sample* m_cursorSamples[9];
+    i32 m_identifyHeroActive;
+    i32 m_openState;
     advManager(void);
-    // --- virtual methods (vtable order) ---
     virtual i32 Open(i32) OVERRIDE;
     virtual void Close(void) OVERRIDE;
     virtual i32 Main(struct tag_message&) OVERRIDE;
-    // --- methods ---
     void StartCursor(i32);
     void StopCursor(i32);
     void DrawCursor(void);
@@ -349,7 +340,6 @@ public:
 };
 #pragma pack(pop)
 SIZE(advManager, 0x37e);
-// ---- globals (declarations, RVA order) ----
 extern i32 bMoveSoundMade;
 extern i32 giPixelsPerStep[6];
 extern i32 giStepDelay[5];
@@ -413,4 +403,4 @@ extern struct tag_message CDMsg;
 extern i8 bComboDraw[18][18];
 extern i32 iLastAnimFrame;
 
-#endif // HOMM2_SOURCE_ADVMANAGER_H
+#endif

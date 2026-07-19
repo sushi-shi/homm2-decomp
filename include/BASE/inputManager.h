@@ -1,11 +1,8 @@
 #ifndef HOMM2_BASE_INPUTMANAGER_H
 #define HOMM2_BASE_INPUTMANAGER_H
-// Reconstructed class (BASE) from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// 12 methods, 3 own-virtual, 0 static data.
 #include <va.h>
 #include "baseManager.h"
 #include <BASE/message.h>
-// forward declarations:
 struct tag_message;
 
 H2_ENUM_CLASS_BEGIN(InputManagerKeyCodeType)
@@ -13,9 +10,6 @@ H2_ENUM_CLASS_BEGIN(InputManagerKeyCodeType)
     INPUT_KEY_CODE_SCAN = 1
 H2_ENUM_CLASS_END(InputManagerKeyCodeType)
 
-// IBM PC set-1 scan codes carried in bits 16..23 of the Win32 key-message data.
-// MakeScanCodeTable proves the complete 0x00..0x58 domain used by the retail input
-// manager, including the extended key values returned as scan-code << 8.
 H2_ENUM_BEGIN(InputManagerScanCode)
     INPUT_SCAN_NONE = 0x00,
     INPUT_SCAN_ESCAPE = 0x01,
@@ -138,34 +132,28 @@ H2_ENUM_CLASS_BEGIN(InputManagerModifierClearMask)
     INPUT_CLEAR_ALT_MASK = 0xffdf
 H2_ENUM_CLASS_END(InputManagerModifierClearMask)
 
-#pragma pack(push, 1) // recovered layout is byte-packed
+#pragma pack(push, 1)
 class inputManager : public baseManager {
 public:
-    // --- members (offsets from Ghidra this+off access-analysis; widths are
-    // access-widths, NOT confirmed types; refine during byte-matching) ---
-    // (derived: base baseManager = 0x36 bytes at 0x00 via ': public baseManager'; own fields below)
-    tag_message m_eventRing[IDX(INPUT_EVENT_RING_CAPACITY)]; // +0x36  event ring (64 x 0x1c)
-    i32 m_readIndex;                                         // +0x736
-    i32 m_writeIndex;                                        // +0x73a
-    i32 m_mouseMessageActive; // +0x73e  reentrancy guard shared by mouse event producers
-    i32 field_0x742;          // +0x742  constructor-initialized only; no retail reader
-    i32 field_0x746;          // +0x746  constructor-initialized only; no retail reader
-    i32 field_0x74a;          // +0x74a  constructor-initialized only; no retail reader
-    i16 m_keyState[IDX(INPUT_SCAN_CODE_CAPACITY)]; // +0x74e  scan-code to ASCII/extended-key table
-    i32 field_0x84e;         // +0x84e  constructor-initialized only; no retail reader
-    i32 m_requestedPriority; // +0x852  Open's priority argument; cleared on Close; never read
-    InputManagerKeyCodeType m_keyCodeType; // +0x856  zero converts scan codes to ASCII on dequeue
-    i32 m_field_0x85a; // +0x85a  cleared on every event enqueue; no retail reader
-    i32 m_modifiers;   // +0x85e  current keyboard modifier mask
-    i32 field_0x862;   // +0x862  constructor-initialized only; no retail reader
-    i32 field_0x866;   // +0x866  constructor-initialized only; no retail reader
-    // --- constructors ---
+    tag_message m_eventRing[IDX(INPUT_EVENT_RING_CAPACITY)];
+    i32 m_readIndex;
+    i32 m_writeIndex;
+    i32 m_mouseMessageActive;
+    i32 field_0x742;
+    i32 field_0x746;
+    i32 field_0x74a;
+    i16 m_keyState[IDX(INPUT_SCAN_CODE_CAPACITY)];
+    i32 field_0x84e;
+    i32 m_requestedPriority;
+    InputManagerKeyCodeType m_keyCodeType;
+    i32 m_field_0x85a;
+    i32 m_modifiers;
+    i32 field_0x862;
+    i32 field_0x866;
     inputManager(void);
-    // --- virtual methods (vtable order) ---
     virtual i32 Open(i32) OVERRIDE;
     virtual void Close(void) OVERRIDE;
     virtual i32 Main(struct tag_message&) OVERRIDE;
-    // --- methods ---
     void Flush(void);
     struct tag_message GetEvent(void);
     struct tag_message PeekEvent(void);
@@ -177,11 +165,10 @@ public:
 };
 #pragma pack(pop)
 SIZE(inputManager, 0x86a);
-// ---- globals (declarations, RVA order) ----
 extern i32 iCurSwapPalette;
 extern i32 bLastMouseOffscreen;
 extern i32 bLastOnscreenMouseColor;
 extern i32 bInCheckChangeCursor;
 extern i32 iLastBWOnScreenCheck;
 
-#endif // HOMM2_BASE_INPUTMANAGER_H
+#endif

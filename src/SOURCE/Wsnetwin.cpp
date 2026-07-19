@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_Re\Wsnetwin.obj   from: (directly linked into exe)
-// functions: 10   data: 14
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <windows.h>
 #include <winsock.h>
@@ -30,24 +25,8 @@ DATA(0x004ed78c) static i16 s_wsSendSourceLineBase = 279;
 DATA(0x004ed830) static i16 s_wsReceiveSourceLineBase = 359;
 DATA(0x004ed860) static i16 s_wsEvaluateSourceLineBase = 413;
 
-// @data-layout-note Retail initialized storage is 0xed2ac+0x73c. Candidate
-// .data is 0x737 across 11 source DATA definitions and 32 private literals;
-// every payload matches retail after mapping the candidate permutation. All 67
-// initialized-data references pair at the same function-relative sites with
-// addend zero. Five source-line shorts leave ten alignment bytes, and the final
-// literal leaves five terminal zero bytes; neither is a separate owner.
-// Retail loader-zero storage is 0x122f88+0x2d0 across eight public definitions.
-// All 72 candidate BSS references pair: saddr_loc uses addends 0/2/4 and every
-// other reference uses addend zero. iAddrLen and saddr_remote have no code
-// references, but their public RVAs and exact candidate identities/types prove
-// ownership. The 18 uncovered BSS bytes are alignment only; no .rdata is owned.
 
-// @semantic
-// Complete 0x128 frame/slots and 164/164 relocation targets. First raw residual is +0x478:
-// retail loads player then compares giNumHumanPlayers (9 bytes), while the conventional
-// source loads the global then compares player (8 bytes). The later invalid-address test is
-// ours JE+JMP versus retail JNE. Structured while/do-while and both condition polarities were
-// tested; exact pointer-index and retry-label steering was rejected as less source-faithful.
+// @semantic: First raw residual is +0x478: retail loads player then compares giNumHumanPlayers (9 bytes).
 VA(0x004068b0, 0x5b5)
 i16 wsnet_init(void) {
     WinsockStartupMessage startup;
@@ -218,13 +197,7 @@ void wsnet_term(void) {
     CleanupDPVars();
 }
 
-// @semantic
-// Complete 0x28 frame/slots and 32/32 relocation targets. First raw residual is +0x8e:
-// retail loads netPlayer then compares giNumHumanPlayers (9 bytes), while the conventional
-// source loads the global then compares netPlayer (8 bytes). After DelayMilli, ours has two
-// five-byte loop continuations and retries at sendto; retail has one and repeats the idempotent
-// peer-address assignment. Direct, commuted, nested, do/while, and assignment-condition forms
-// were tested; the exact label/pointer-index form was rejected as less source-faithful.
+// @semantic: First raw residual is +0x8e: retail loads netPlayer then compares giNumHumanPlayers (9 bytes).
 VA(0x00406f37, 0x1f5)
 void wsSendMessage(i32 destination, u8 type, u16 size, void* data) {
     u8* packetBuffer = static_cast<u8*>(H2_ALLOC(size + 1, 281));
@@ -313,10 +286,7 @@ i16 wsnet_rcv(i16, u16, void* data) {
     return static_cast<i16>(size);
 }
 
-// @semantic
-// Complete 0x18 frame, stack slots, CFG instruction stream, and 13/13 ordered relocations.
-// Only local branch destination bytes +0x62 and +0x74 differ. Continue, positive-call, and
-// explicit empty self-packet arms were tried; revisit after later Wsnetwin TU-state changes.
+// @semantic: stack-slot/code-shape residual.
 VA(0x00407234, 0xaf)
 void wsProcessMessages(void) {
     struct sockaddr_in remote;
@@ -347,10 +317,7 @@ void wsProcessMessages(void) {
     }
 }
 
-// @semantic: complete message switch, frame, CFG, and all 77 ordered relocation
-// identities/addends agree. The first residual is the embedded 0x14-byte jump
-// table at RVA 0x7642; the candidate's next public begins one byte earlier, so
-// the old full-span raw-identity claim was invalid.
+// @semantic: first residual is the embedded 0x14-byte jump table at RVA 0x7642.
 VA(0x004072e3, 0x37d)
 void wsEvaluateMessage(u32l size, i32 sender) {
     char* message = rcvBufIn + 1;
@@ -434,9 +401,7 @@ void wsEvaluateMessage(u32l size, i32 sender) {
     }
 }
 
-// @semantic: all non-branch bytes and both ordered relocations agree; only the
-// +0x1e local JMP displacement differs, with retail targeting the epilogue and
-// this form its equivalent trailing JMP. Explicit if/else scored 94.12%.
+// @semantic: branch/code-shape residual.
 VA(0x00407660, 0x2e)
 i32 wsWaitForFirstGuest(void) {
     wsProcessMessages();
@@ -505,7 +470,6 @@ i32 wsWaitForHost(void) {
     return 0;
 }
 
-// ---- globals (definitions, RVA order) ----
 DATA(0x004ed2ac) i32 bHostFound = 0;
 DATA(0x004ed2b0) u32 sd_dg = 0xffffffffU;
 DATA(0x004ed2b4) i32 iWSLastMsgNumHumanPlayers = 1;

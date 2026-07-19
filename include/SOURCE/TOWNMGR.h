@@ -3,9 +3,6 @@
 #include <va.h>
 #include <SOURCE/GAME.h>
 #include <SOURCE/KB_TYPES.h>
-// Declarations of the free functions DEFINED in TOWNMGR.cpp — the single home for these
-// symbols. Other TUs call them by including this header (no local externs).
-// forward declarations (was <_all.h>):
 struct tag_message;
 
 #pragma pack(push, 1)
@@ -294,4 +291,4 @@ i32 SplitArmyHandler(struct tag_message&);
 void GetCategoryStats(i32, i32l* const, i8* const);
 void SortStats(i32l* const, i8* const);
 
-#endif // HOMM2_TOWNMGR_H
+#endif

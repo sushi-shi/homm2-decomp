@@ -56,4 +56,4 @@ struct SMouseManagerStrings {
 };
 SIZE(SMouseManagerStrings, 0x1c8);
 
-#endif // HOMM2_BASE_MOUSEMGR_TYPES_H
+#endif

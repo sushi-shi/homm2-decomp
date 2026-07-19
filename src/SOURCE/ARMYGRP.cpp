@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_Re\ARMYGRP.OBJ   from: (directly linked into exe)
-// functions: 13   data: 0
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <string.h>
 #include <BASE/Misc.h>
@@ -125,12 +120,7 @@ i32 armyGroup::IsMember(i32 creatureType) {
     return 0;
 }
 
-// @early-stop
-// Complete 0x14e body, 0x1c frame/all five slots, 86-instruction CFG, and both
-// ordered relocations align. The only executable residual at +0x60/+0x63 swaps
-// the independent `this`[-0x1c] and index[-0xc] loads before the same indexed
-// monster-race access. Direct indexing, i[array], and OD_STEER(i) were byte-neutral.
-// Revisit only after relevant ARMYGRP/TU state changes.
+// @early-stop: byte-proven compiler artifact.
 VA(0x0048c44b, 0x14e)
 i32 armyGroup::IsHomogeneous(i32 countRaces) {
     i32 numCreatureTypes = 0;

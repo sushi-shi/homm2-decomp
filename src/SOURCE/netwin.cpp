@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_Re\netwin.obj   from: (directly linked into exe)
-// functions: 8   data: 0
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #define NCB_INCLUDED
 #include <windows.h>
@@ -15,10 +10,8 @@
 #include <BASE/Misc.h>
 #include <stdio.h>
 
-// __FILE__ for the NWC memory/assert tracking (reloc-masked path string).
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\netwin.cpp"
 
-// ---- module-private globals (retail xref: single-module) ----
 DATA(0x0051739c) static u8 gNbCallRetries = 0; // nb_call_done retry counter
 DATA(0x005173a0) static u8 gNetbiosAvail = 0;
 DATA(0x005173a4) static u8 gNetbiosLana = 0;
@@ -29,17 +22,7 @@ DATA(0x005173b4) static u8 gNetStatus[NETBIOS_STATUS_COUNT] = {0};
 DATA(0x005173c0) static char* gNbGroupName = "Empire Too ";
 DATA(0x005173c4) static char* gNbListenName = "*";
 
-// @data-layout-note Retail initialized storage is 0x11739c..0x117620.
-// Source DATA owners recover the nine module globals and eight function-local
-// line bases. Fifteen private literals cover the remaining payload. The two
-// otherwise unreferenced source-path strings are byte-exact immediately after
-// 534 and gNbReceiveCompleteSourceLineBase, at 0x11757c
-// and 0x1175f4. All other private owners have singleton relocation or unique
-// payload proof. The candidate payload ends at 0x11761e; retail's final two
-// bytes are zero alignment. Loader-zero storage is the exact 0x82e8-byte BSS
-// group below; do not add a padding owner for the initialized tail.
 
-// Semantic suffixes retain the retail MSVC BSS allocation order; audit with section replay.
 DATA(0x0052ae68) static tag_Anchor gNbFreeQueueRuntime;
 DATA(0x0052ae70) static u8 gNbSessionNumbersEntry[NETBIOS_SESSION_COUNT];
 DATA(0x0052ae78) static NetbiosPayload gNbReceiveDataLocal[NETBIOS_SESSION_COUNT];
@@ -86,7 +69,6 @@ i32 is_netbios_avail(void) {
 
 VA(0x004a6c88, 0x244)
 extern "C" u16 __fastcall nb_init(u16 maxNames, u16 maxSessions) {
-    // Retail interleaves each line base with this function's literals; this compiler groups them.
     DATA(0x005173d8) static i16 gNbInitSourceLineBase = 105;
     NetbiosControlBlock localNcb;
     i32 i;
@@ -223,9 +205,7 @@ extern "C" u16 __fastcall nb_snd(i16 session, i16 len, void* data) {
     return 0;
 }
 
-// @early-stop
-// reloc-masked: all 0x4cd bytes match; 99.84% is delinked jump-table
-// local-label identity only; external relocations agree.
+// @early-stop: delinker jump-table artifact.
 VA(0x004a726a, 0x4cd)
 extern "C" u16 __cdecl nb_sess(i16 operation, ...) {
     i32 oldSession;
@@ -355,15 +335,7 @@ extern "C" char __fastcall nb_stat(i16 session) {
     return gNetStatus[session];
 }
 
-// nb_thr_ctl — the receiver-thread pump: drain completed per-session receives into the rcv queue,
-// then drain the send/free queues, issuing a synchronous NCBSEND for each queued packet.
-// @early-stop
-// Byte-proven delinker wall: the explicit 0xdd2-byte CodeView span, including
-// 11 folded static helpers, has 124 raw differences and all are inside the
-// union of 242 base and 226 retail relocation fields; zero bytes remain.
-// The 49 shared external relocations have identical targets. The 16 base-only
-// sites are 11 IAT calls and five calls to folded helpers whose retail rel32
-// bytes resolve to the same entries. The 6.73% score is local identity only.
+// @early-stop: delinker artifact.
 VA(0x004a7758, 0xdd2)
 void nb_thr_ctl(void) {
     DATA(0x0051751c) static i16 gNbThreadSourceLineBase = 412;
@@ -430,8 +402,6 @@ void nb_thr_ctl(void) {
     }
 }
 
-// The remaining file-static routines occupy the rest of nb_thr_ctl's CodeView
-// span. Their source order is fixed by the retail entry addresses.
 
 VA(0x004a79c6, 0xbb)
 static void nb_add_name(void) {
@@ -452,12 +422,7 @@ static void nb_add_name(void) {
     }
 }
 
-// @early-stop
-// All 0x1ca bytes match after masking 35 aligned relocations.  The 0x08 frame,
-// j at -0x04, switch value at -0x08, CFG, 0x20-byte case-pointer table, and
-// adjacent 0x31-byte selector table agree.  The 99.70% residual is delinked
-// private-global, string, interior-array, and local-label symbol identity only;
-// every resolved external relocation target agrees.
+// @early-stop: delinker artifact.
 VA(0x004a7a81, 0x1ca)
 static void __stdcall nb_add_name_done(NetbiosControlBlock* ncb) {
     DATA(0x00517578) static i16 gNbAddNameSourceLineBase = 534;
@@ -641,13 +606,7 @@ static void __fastcall nb_close_session(i32 session) {
     }
 }
 
-// @early-stop
-// The complete 0x179-byte instruction stream, 0x10 frame (node -0x04,
-// session -0x08, outer/inner switch values -0x0c/-0x10), CFG, 0x14-byte
-// case-pointer table, and adjacent 0x19-byte selector table agree.  The 24/24
-// resolved targets match.  Retail uses interior aliases for
-// gNbSessNcb.returnCode/length and fixed IAT operands for Enter/LeaveCriticalSection;
-// base retains the owner-relative field addends and two corresponding COFF relocs.
+// @early-stop: byte-proven compiler artifact.
 VA(0x004a832a, 0x179)
 static void __fastcall nb_recv_complete(i32 session) {
     DATA(0x005175f0) static i16 gNbReceiveCompleteSourceLineBase = 780;

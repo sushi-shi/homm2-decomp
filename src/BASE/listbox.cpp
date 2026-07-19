@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_RE\listbox.obj   from: .\basewin.lib
-// functions: 10   data: 1
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <BASE/listBoxWidget.h>
 #include <BASE/LISTBOX_TYPES.h>
@@ -30,21 +25,6 @@
         RETAIL_FILE LISTBOX_SOURCE_FILE_SEPARATOR RETAIL_FILE LISTBOX_SOURCE_FILE_SEPARATOR        \
             RETAIL_FILE
 
-// @data-layout-note Retail's initialized listbox contribution is
-// RVA 0x120e94..0x121078 (0x1e4), with eleven identical source-path views at
-// 0x2c-byte intervals. Destructor item/list frees, DeleteItem item/list frees,
-// allocation/old-list free, and Main replace free/allocation plus append
-// list-allocation/item-allocation/old-list free use those addresses in that
-// order. The only rdata owner is the reviewed 0xc listBoxWidget vtable at
-// RVA 0x0ebac0; its 0x10 retail contribution includes four bytes of natural
-// tail alignment. This TU has no loader-zero contribution. The former source
-// pooled all eleven uses into one 0x29 COMDAT. A typed 0x1e4 aggregate
-// reproduced every byte and addend but emitted an align-eight writable section
-// at the align-four-only retail start, so it cannot represent the retail object.
-// The retained align-four COMDAT banks contain 2, 4, and 5 views and have
-// logical sizes 0x55, 0xad, and 0xd9. Their natural three-byte alignment tails
-// exactly cover the retail interval. Do not pool the paths or add padding
-// symbols, aliases, fake owners, section pragmas, or per-TU flag exceptions.
 
 VA(0x004db060, 0x42)
 listBoxWidget::listBoxWidget(void) : widget(0, 0, 0, 0, 0, 0) {
@@ -55,13 +35,7 @@ listBoxWidget::listBoxWidget(void) : widget(0, 0, 0, 0, 0, 0) {
     m_lastSelectedIndex = -1;
 }
 
-// @semantic
-// Complete 0x86-byte destructor with all 11 relocation sites and owner/addends aligned.
-// The only raw-code residual is the item loop: retail uses EBX for the four-byte item
-// offset and EDI for the item index, while candidate assigns those equivalent induction
-// values to EDI and EBX. Semantic item naming, a source-level item temporary, and an
-// explicit preincrement loop did not improve the retained form; the latter two worsened
-// scheduling. Revisit only after a genuine declaration or combined-TU state change.
+// @semantic: only raw-code residual is the item loop: retail uses EBX for the four-byte item offset and EDI for the item index.
 VA(0x004db0d0, 0x86)
 listBoxWidget::~listBoxWidget() {
     i32 i;
@@ -215,16 +189,7 @@ void listBoxWidget::DeleteItem(i32 index) {
         m_visibleItemCount = m_itemCount;
 }
 
-// @semantic
-// Semantics, types, 0x8 frame, CFG, and the 0x368 CodeView span are complete. All 23
-// ordered relocation sites/types and semantic targets align: 16 external identities/addends
-// are exact, while the dispatch at +0x12a and six tail-table entries at +0x350..+0x364
-// differ only by compiler-local label versus delinked containing-function identity.
-// Relocation-masked raw comparison leaves 23 bytes, all in +0x8a..+0xb7: retail and
-// candidate assign owner-relative mouse X/Y and list left/top to different registers and use
-// equivalent signed compare polarity for the same half-open bounds. Mouse and widget-message
-// dispatch, ID gates, set/get/replace/append/delete/clear behavior, and fallback Main call agree.
-// A bounded 512-trial exact-only TU-state diagnostic found no closure; no probe was retained.
+// @semantic: compiler-shape residual.
 VA(0x004db520, 0x368)
 i32 listBoxWidget::Main(tag_message& message) {
     if (!(m_flags & WIDGET_FLAG_ENABLED)) {
@@ -561,12 +526,7 @@ done:
     return 1;
 }
 
-// ===== vtable listBoxWidget : public widget  (3 slots) =====
-//  [ 0] VA(0x004db890, 0x8)  void listBoxWidget::Draw(void)   <- override (implements widget pure virtual)
-//  [ 1] VA(0x004db0b0, 0x1f)  void * listBoxWidget::scalar_dtor(unsigned int)   <- override (implements widget pure virtual)
-//  [ 2] VA(0x004db520, 0x368)  int listBoxWidget::Main(struct tag_message &)   <- override (implements widget pure virtual)
 
-// ---- vtables (compiler-emitted; census) ----
 VTBL(listBoxWidget, 0x004ebac0);
 
 #undef RETAIL_FILE

@@ -32,4 +32,4 @@ inline i16 EncodeWidgetKind(WidgetKind value) {
 #define EncodeWidgetKind(value) (value)
 #endif
 
-#endif // HOMM2_BASE_WIDGET_KIND_H
+#endif

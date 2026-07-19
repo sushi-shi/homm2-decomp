@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_Re\SPELLAI.OBJ   from: (directly linked into exe)
-// functions: 11   data: 3
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/PATH.h>
@@ -10,12 +5,7 @@
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/combatManager.h>
 #include <SOURCE/hero.h>
-// @semantic
-// Exact 0x24 frame/live slots and 11/11 external relocations. The only raw
-// residual is +0x21c/+0x21f/+0x221: ours loads effectScore then emits JGE,
-// while retail loads bestEffectWork then emits JLE. Direct, commuted,
-// negated, empty-if/else, continue, and both bestEffectWork OD_STEER(...) spellings
-// were tried; revisit after later SPELLAI TU-state changes.
+// @semantic: only raw residual is +0x21c/+0x21f/+0x221: ours loads effectScore then emits JGE.
 VA(0x004867c0, 0x279)
 i32 combatManager::DoSpellAI(i32 side, i32 restricted) {
     i32 bestSpellChoice;
@@ -78,15 +68,7 @@ i32 combatManager::DoSpellAI(i32 side, i32 restricted) {
     return 0;
 }
 
-// @semantic
-// Exact 0xd4 frame and all source roles are recovered; the exhaustive data-target
-// multiset agrees. Named local allocation order still differs
-// (for example, ours -0x4/-0x24/-0x28 map to retail
-// -0x34/-0x4/-0x18). The immediate 1.0f spelling now matches the opening
-// initializer. The first normalized report boundary is the local first switch
-// label after 17 instructions, with retail-only continuation/table output
-// thereafter. Revisit slot naming and the local-table residual in the
-// byte-last-mile phase.
+// @semantic: compiler-shape residual.
 VA(0x00486a39, 0x1155)
 void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32* bestHex) {
     i32 doneResult;
@@ -751,14 +733,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
     }
 }
 
-// @semantic
-// Exact 0x28 frame, named local slots, and exact data-target multiset after
-// restoring the immediate 1.0f initializer and semantic local names. The
-// first 52 normalized instructions agree, then objdump stops ours at a local
-// switch label; the explicit-range residual begins in local branch/table
-// layout at +0xcb. The fight-value/power versus retail
-// fight-value/creature-type expressions were tried; revisit with
-// local-table-aware comparison in the byte-last-mile phase.
+// @semantic: residual begins in local branch/table layout at +0xcb.
 VA(0x00487b8e, 0x34c)
 i32 combatManager::EffectSpellCreateCreature(i32 hex, SpellType spell) {
     float workChance = COMBAT_SPELL_AI_FULL_EFFECT_IMMEDIATE;
@@ -817,15 +792,7 @@ i32 combatManager::EffectSpellCreateCreature(i32 hex, SpellType spell) {
     return static_cast<i32>(creatureEffect * workChance);
 }
 
-// @semantic
-// All source roles and external targets are accounted; named local allocation
-// order differs, and retail's 0xb0 frame has one compiler-only word beyond
-// ours' 0xac frame. The first normalized residual is pooled 0.0 identity
-// ($T4772 versus const_000eb7f0), followed by the first local switch boundary;
-// The remaining COFF count deficit is structural; the complete candidate
-// `.rdata`/`.data` target multiset is a subset of retail with no substitution.
-// Float and double zero spellings were tried; revisit slot naming and the
-// local-table residual in the byte-last-mile phase.
+// @semantic: first normalized residual is pooled 0.0 identity ($T4772 versus const_000eb7f0).
 VA(0x00487eda, 0x72d)
 i32 combatManager::RawEffectSpellInfluence(army* target, i32 influence) {
     i32 effect = 0;
@@ -1019,13 +986,7 @@ i32 combatManager::FirstResurrectable(i32 startHex, i32* hex, i32 spell) {
     return 1;
 }
 
-// @semantic
-// All ten live retail slots align; retail's 0x54 frame has one unreferenced
-// compiler word at -0x2c beyond ours' 0x50 frame. All 23/23 external
-// relocations agree. The first CFG residual after target validation is three
-// retail-only continuation jumps, followed by pooled-double identity. Compound
-// versus early-continue filters and split versus grouped negative influences
-// were tried; revisit in the byte-last-mile phase.
+// @semantic: first CFG residual after target validation is three retail-only continuation jumps, followed by pooled-double identity.
 VA(0x004887c1, 0x421)
 void combatManager::EffectSpellCure(i32* effect, i32 targetSide, i32 targetIndex, i32 cure) {
     i32 sideWork;
@@ -1161,13 +1122,7 @@ void combatManager::EffectSpellResurrect(i32* effect, i32 hex, SpellType spell) 
         *effect = static_cast<i32>(*effect * COMBAT_SPELL_AI_RESURRECT_VALUE_MODIFIER);
 }
 
-// @semantic
-// Exact 0x98 frame and all live slots after recovering the three independent
-// two-side result arrays and the post-loop finalization CFG. The first report
-// boundary is the opening local switch table after eight instructions; 86/82
-// COFF sites have no candidate-only external target. Overlapping-array and
-// do/finalize forms were exhausted; revisit with jump-table-aware explicit
-// ranges in the byte-last-mile phase.
+// @semantic: jump-table placement residual.
 VA(0x00488d58, 0xcc9)
 void combatManager::EffectSpellDamage(i32* effect, SpellType spell, i32 targetHex) {
     i32 fightValueKilledAI[2];
@@ -1488,7 +1443,6 @@ void combatManager::EffectSpellDamage(i32* effect, SpellType spell, i32 targetHe
         *effect = static_cast<i32>(*effect * COMBAT_SPELL_AI_CASTLE_EFFECT_MODIFIER);
 }
 
-// ---- globals (definitions, RVA order) ----
 DATA(0x004f80b8) float gfDurationMods[12] =
     {0.0f, 0.33f, 0.55f, 0.72f, 0.85f, 0.95f, 1.03f, 1.08f, 1.12f, 1.15f, 1.18f, 0.0f};
 DATA(0x004f80e8) float gfCancelDurationMods[11] =

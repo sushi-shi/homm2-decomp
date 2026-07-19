@@ -1,15 +1,11 @@
 #ifndef HOMM2_MISC_H
 #define HOMM2_MISC_H
 #include <va.h>
-// Declarations of the free functions DEFINED in Misc.cpp — the single home for these
-// symbols. Other TUs call them by including this header (no local externs).
-// forward declarations (was <_all.h>):
 class bitmap;
 class heroWindow;
 class icon;
 struct tag_message;
 
-// Misc-private record structs (params of the functions above).
 struct indexArray {
     u16 key;
     u16 value;
@@ -18,11 +14,11 @@ struct indexArray {
 // Leak-tracking allocation record (BaseAlloc/BaseFree). Packed: ptr sits at +1 (unaligned).
 #pragma pack(push, 1)
 struct MemEntry {
-    char used;       // +0x00  in-use flag
-    void* ptr;       // +0x01  allocated block
-    u32 size;        // +0x05  block size
-    char file[0x3d]; // +0x09  original source path supplied by the call site
-    i32 line;        // +0x46  original source line supplied by the call site
+    char used;
+    void* ptr;
+    u32 size;
+    char file[0x3d];
+    i32 line;
 };
 #pragma pack(pop)
 SIZE(MemEntry, 0x4a);
@@ -66,10 +62,7 @@ void FadeIn(i32);
 void FadeOut(i32);
 i32 Random(i32 low, i32 high);
 void ProcessAssert(i32 condition, char* file, i32 line);
-// Retail source locations are explicit operands. Never substitute this build's __FILE__/__LINE__.
-// H2_ALLOC/H2_FREE take the retail line and read the file operand from the TU's RETAIL_FILE
-// define. The _AT forms keep an explicit file operand for TUs whose retail relocations
-// reference per-site source-file slot data instead of one pooled path string.
+// Allocation wrappers preserve explicit source-file and line operands.
 #define H2_ALLOC(size, originalLine) BaseAlloc(size, const_cast<char*>(RETAIL_FILE), originalLine)
 #define H2_FREE(ptr, originalLine) BaseFree(ptr, const_cast<char*>(RETAIL_FILE), originalLine)
 #define H2_ALLOC_AT(size, originalFile, originalLine) BaseAlloc(size, const_cast<char*>(originalFile), originalLine)
@@ -112,7 +105,6 @@ i32 MemSize(i32);
 void GetDataEntry(char*, char*, i32, char*, i32, i32);
 i32 DataEntryWindowHandler(struct tag_message& message);
 
-// --- globals owned by this TU (moved from _globals.h; CodeView-attributed) ---
 extern i32 bDataEntryTime;
 extern char* cDEDest;
 extern class heroWindow* DataEntryWin;
@@ -123,4 +115,4 @@ extern i32 iMemEntries;
 extern i32 inBoxX;
 extern i32 inBoxY;
 
-#endif // HOMM2_MISC_H
+#endif

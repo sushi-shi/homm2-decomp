@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_Re\Overview.obj   from: (directly linked into exe)
-// functions: 7   data: 11
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <BASE/BITS.h>
 #include <BASE/Misc.h>
@@ -36,25 +31,7 @@
 #define OVERVIEW_TEXT_WIDGET_ROWS (reinterpret_cast<OverviewTextWidgetRow*>(textWidgetDynamic))
 #define OVERVIEW_ICON_WIDGET_ROWS (reinterpret_cast<OverviewIconWidgetRow*>(iconWidgetDynamic))
 
-// @semantic: With the schema-4 delink target, the complete behavior is recovered.
-// Recovered flat row-major cleanup indexing, the
-// GetTown/GetHero inline accessors and both retail continuation jumps, the two
-// distinct final icon-count increments, cached row widget-ID base, captain CFG,
-// and shared skill/artifact locals. Frame 0xe8, this -0xdc, primary slots, CFG,
-// and semantics agree. All 340 relocation offsets are present; the first real
-// residual is the cached-type equality at +0xc6/+0xcc, where ours names
-// giOverviewType then iLastDynamicType and retail names them in reverse. MSVC
-// canonicalizes both commuted equality spellings identically. Knob scale/divisor
-// remain ours -0x1c/-0x20 versus retail -0x20/-0x24, and later detail locals have
-// different slot identities. The next aligned symbol is now only one byte early
-// (ours +0x223f, retail +0x2240). Rejected: row-pointer globals (wrong ABI),
-// iconCounts[2] (96.44%), separate text locals plus function-wide hero (0xf0),
-// hoisted captainMana, top-level padding dword, coordinate-pair splits, and slot
-// suffix variants. The named row-view macros compile byte-for-byte identically
-// to the previous repeated casts. Retail's PAPAV data decorations prove that
-// both globals remain flat double pointers; typed row-pointer globals changed
-// their public ABI and are not a valid reconstruction. Revisit for slot/equality
-// steering; do not repeat these forms.
+// @semantic: first real residual is the cached-type equality at +0xc6/+0xcc.
 VA(0x00407870, 0x223e)
 void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
     DATA(0x004eda04) static i16 overviewDynamicSourceLine = 116;
@@ -892,11 +869,7 @@ void game::Overview(void) {
     iconWidgetDynamic = 0;
 }
 
-// @semantic
-// Complete 0xe0 frame/slots and CFG; all 49/49 relocation owners/addends agree.
-// The first non-relocation residual is at +0xfc and +0x124: retail loads the
-// -0x30 float before adding -0x3c, while candidate loads -0x3c before adding
-// -0x30. The two commutative x87 operand orders are behaviorally equivalent.
+// @semantic: first non-relocation residual is at +0xfc and +0x124: retail loads the -0x30 float before adding -0x3c.
 VA(0x0040a350, 0x31f)
 void game::DoKnob(void) {
     tag_message pendingMessage4;
@@ -975,10 +948,7 @@ void game::DoKnob(void) {
     }
 }
 
-// @early-stop
-// reloc-masked: all declared 0x4fd bytes are identical; all 97 relocation
-// positions and external targets agree. Residual is only folded local
-// identities/addends for the three mid-function jump/selector tables.
+// @early-stop: byte-proven compiler artifact.
 VA(0x0040a66f, 0x4fd)
 i32 OverviewHandler(struct tag_message& message) {
     i32 closeDialog5;
@@ -1277,41 +1247,6 @@ i32 game::ProcessIconSelect(i32 widgetId, i32 quickView) {
     return 0;
 }
 
-// @data-layout-note
-// Retail `.rdata` and the candidate are byte-exact over 0xeb058..0xeb078
-// (0x20 bytes; SHA-256
-// 5056c5fe34ffbea2975bf20e2b32cc504bc21c8028dc3fc1680313e0adb5d1c9).
-// The five reviewed candidate allocations are `$T36552`,
-// `$T36553`, `$T36554`, `$T36584`, and `$T36585`; the three direct owners and
-// `$T36552 + 4` agree at all seven function-relative relocation sites.
-//
-// Retail initialized storage spans 0xed9e8..0xeddf4 (0x40c bytes), including
-// three trailing zero alignment bytes. All 51 compiler-private allocations are
-// reviewed at their exact retail extents. Three relocation-anchored literal
-// intervals are byte-exact: candidate +0x2c..+0x2cc maps to 0xeda08 (SHA-256
-// 8ceded7abee16abf3915178f5f256981322b8ddfeb580c1f95c1b7ba34668d62),
-// +0x2cc..+0x30c maps to 0xedcac (ae253ea11ca33d3278868c1c3f44e15766730e74bf34d1e95a6f88d0b9f59b97),
-// and +0x30c..+0x40d maps to 0xedcf0
-// (f12678b2bfae3df500cd50473146f5808ff36aed3f56616cf39b9943b02779a4).
-// Exact extent boundaries resolve repeated payloads without payload guessing.
-// Retail interleaves the dynamic, setup, and dialog source-line words at
-// 0xeda04, 0xedca8, and 0xedcec; VC 4.2 groups their candidate allocations at
-// +0x0, +0x4, and +0x8 and inserts a four-byte zero alignment hole before
-// giOverviewTop. All 276 candidate DIR32 sites exist at the same retail
-// function-relative offsets. Of 218 sites targeting Overview-owned storage,
-// 216 resolve to the exact owner/addend. The two residuals are the documented
-// SetupDynamicStuff equality swap at +0xc6/+0xcc between giOverviewType and
-// iLastDynamicType. Do not restore a synthetic owner, add padding, or alias
-// these allocations to hide compiler allocation order.
-//
-// Retail zero-fill spans 0x123258..0x123280 (0x28 bytes) and includes a
-// four-byte alignment hole before giOverviewItems. The candidate `.bss` is
-// 0x24 bytes and contains the same 36 logical bytes in COMMON order:
-// giOverviewItems, iLastDynamicTop, iLastDynamicType, textWidgetTitle,
-// iOverviewItems. All five public extents are exact; every BSS relocation uses
-// owner +0 except one proven giOverviewItems +4 reference. Preserve the natural
-// linker hole rather than inventing storage or placement controls.
-// ---- globals (definitions, RVA order) ----
 DATA(0x004ed9e8) class heroWindow* overWin = 0;
 DATA(0x004ed9ec) class textWidget** textWidgetDynamic = 0;
 DATA(0x004ed9f0) class iconWidget** iconWidgetDynamic = 0;

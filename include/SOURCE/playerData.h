@@ -1,57 +1,54 @@
 #ifndef HOMM2_SOURCE_PLAYERDATA_H
 #define HOMM2_SOURCE_PLAYERDATA_H
-// Reconstructed class (SOURCE) from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// 6 methods, 0 own-virtual, 0 static data.
 #include <va.h>
 #include <SOURCE/GAME.h>
 
-#pragma pack(push, 1) // recovered layout is byte-packed
+#pragma pack(push, 1)
 struct playerAttentionWeights {
-    float gameWeightA;   // +0x00
-    float gameRemainder; // +0x04
-    float gameWeightB;   // +0x08
-    float buildingValue; // +0x0c
-    float upgradeBase;   // +0x10
-    float heroValue;     // +0x14
+    float gameWeightA;
+    float gameRemainder;
+    float gameWeightB;
+    float buildingValue;
+    float upgradeBase;
+    float heroValue;
 };
 SIZE(playerAttentionWeights, 0x18);
 
 class playerData {
 public:
-    i8 m_color;                      // +0x00
-    i8 m_heroCount;                  // +0x01
-    i8 m_currentHero;                // +0x02
-    i8 m_heroLocatorPage;            // +0x03
-    i8 m_heroIds[8];                 // +0x04
-    i8 m_availableHeroIds[2];        // +0x0c
-    i8 m_minimumHeroCount;           // +0x0e
-    i32 m_aiDifficulty;              // +0x0f
-    i8 m_cheatValue;                 // +0x13
-    char m_unusedSaveData[0x2c];     // +0x14
-    i8 m_ultimateArtifactHintChance; // +0x40
-    i8 m_ultimateArtifactHintX;      // +0x41
-    i8 m_ultimateArtifactHintY;      // +0x42
-    i8 m_daysLeft;                   // +0x43
-    i8 m_townCount;                  // +0x44
-    i8 m_currentTown;                // +0x45
-    i8 m_townLocatorPage;            // +0x46
-    i8 m_townIds[IDX(GAME_TOWN_COUNT)];                // +0x47
-    i32 m_resources[IDX(RES_COUNT)];              // +0x8f
-    i8 m_evilInterface;              // +0xab
-    i8 m_barrierTents;               // +0xac
+    i8 m_color;
+    i8 m_heroCount;
+    i8 m_currentHero;
+    i8 m_heroLocatorPage;
+    i8 m_heroIds[8];
+    i8 m_availableHeroIds[2];
+    i8 m_minimumHeroCount;
+    i32 m_aiDifficulty;
+    i8 m_cheatValue;
+    char m_unusedSaveData[0x2c];
+    i8 m_ultimateArtifactHintChance;
+    i8 m_ultimateArtifactHintX;
+    i8 m_ultimateArtifactHintY;
+    i8 m_daysLeft;
+    i8 m_townCount;
+    i8 m_currentTown;
+    i8 m_townLocatorPage;
+    i8 m_townIds[IDX(GAME_TOWN_COUNT)];
+    i32 m_resources[IDX(RES_COUNT)];
+    i8 m_evilInterface;
+    i8 m_barrierTents;
     char m_unknownad
-        [6]; // +0xad save-serialized in playerData::Write/Read but never otherwise read
-    playerAttentionWeights m_attentionWeights; // +0xb3
+        [6];
+    playerAttentionWeights m_attentionWeights;
     char m_unknownCb
-        [0x1c]; // +0xcb never referenced; sits after the AI attention weights
-    i32 m_income[IDX(RES_COUNT)];            // +0xe7
-    i32 m_obeliskValue;         // +0x103
-    i32 m_totalObeliskValue;    // +0x107
-    i32 m_unexploredValue;      // +0x10b
-    float m_upgradeValueWeight; // +0x10f
-    float m_artifactValue;      // +0x113
-    float m_artifactPoolShare;  // +0x117
-    // --- methods ---
+        [0x1c];
+    i32 m_income[IDX(RES_COUNT)];
+    i32 m_obeliskValue;
+    i32 m_totalObeliskValue;
+    i32 m_unexploredValue;
+    float m_upgradeValueWeight;
+    float m_artifactValue;
+    float m_artifactPoolShare;
     void Write(i32);
     void Read(i32);
     i32 NextHero(i32);
@@ -86,4 +83,4 @@ public:
 #pragma pack(pop)
 SIZE(playerData, 0x11b);
 extern playerData* gpCurPlayer;
-#endif // HOMM2_SOURCE_PLAYERDATA_H
+#endif

@@ -2,8 +2,6 @@
 #define HOMM2_PATH_H
 
 #include <Ints.h>
-// Declarations of the free functions DEFINED in PATH.cpp — the single home for these
-// symbols. Other TUs call them by including this header (no local externs).
 
 i32 GetAdjacentCellIndexNoArmy(i32, i32);
 i32 OppositeDirection(i32);
@@ -27,4 +25,4 @@ H2_ENUM_BEGIN(CombatPathConstant)
     COMBAT_PATH_INVALID_HEX = -1
 H2_ENUM_END(CombatPathConstant)
 
-#endif // HOMM2_PATH_H
+#endif

@@ -1,10 +1,7 @@
 #ifndef HOMM2_BASE_RESOURCEMANAGER_H
 #define HOMM2_BASE_RESOURCEMANAGER_H
-// Reconstructed class (BASE) from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// 31 methods, 3 own-virtual, 0 static data.
 #include <va.h>
 #include "baseManager.h"
-// forward declarations:
 class MIDIWrap;
 class bitmap;
 class font;
@@ -16,7 +13,7 @@ class sample;
 class tileset;
 struct tag_message;
 
-#pragma pack(push, 1) // recovered layout is byte-packed
+#pragma pack(push, 1)
 struct aggEntry {     // one .agg directory record (0xc bytes)
     u32l id;
     i32l offset;
@@ -38,26 +35,20 @@ H2_ENUM_END(ResourceManagerConstant)
 
 class resourceManager : public baseManager {
 public:
-    // --- members (offsets from Ghidra this+off access-analysis; widths are
-    // access-widths, NOT confirmed types; refine during byte-matching) ---
-    // (derived: base baseManager = 0x36 bytes at 0x00 via ': public baseManager'; own fields below)
-    resource* m_resourceListHead;                        // +0x36  resource-list head
-    i32 m_numAggregates;                                 // +0x3a
-    i32 m_curAggregate;                                  // +0x3e
-    i32 m_aggregateFd[RESOURCE_MANAGER_AGGREGATE_LIMIT]; // +0x42  per-aggregate file descriptors
-    aggEntry* m_aggregateDir[RESOURCE_MANAGER_AGGREGATE_LIMIT];  // +0x4a  per-aggregate directory
-    i32 m_aggregateEntryCount[RESOURCE_MANAGER_AGGREGATE_LIMIT]; // +0x52
-    i32 m_expunging;                                             // +0x5a
-    i32 m_reserved;            // +0x5e  unreferenced/reserved state
-    char m_lastFileName[0x3c]; // +0x62
-    i32 m_lastFileId;          // +0x9e
-    // --- constructors ---
+    resource* m_resourceListHead;
+    i32 m_numAggregates;
+    i32 m_curAggregate;
+    i32 m_aggregateFd[RESOURCE_MANAGER_AGGREGATE_LIMIT];
+    aggEntry* m_aggregateDir[RESOURCE_MANAGER_AGGREGATE_LIMIT];
+    i32 m_aggregateEntryCount[RESOURCE_MANAGER_AGGREGATE_LIMIT];
+    i32 m_expunging;
+    i32 m_reserved;
+    char m_lastFileName[0x3c];
+    i32 m_lastFileId;
     resourceManager(void);
-    // --- virtual methods (vtable order) ---
     virtual i32 Open(i32) OVERRIDE;
     virtual void Close(void) OVERRIDE;
     virtual i32 Main(struct tag_message&) OVERRIDE;
-    // --- methods ---
     void GetBackdrop(char*, class bitmap*, i32);
     void GetBackdropAtLoc(char*, class bitmap*, i32, i32, i32);
     class palette* GetPalette(char*);
@@ -88,9 +79,8 @@ public:
 };
 #pragma pack(pop)
 SIZE(resourceManager, 0xa2);
-// ---- globals (declarations, RVA order) ----
 extern i32 iSaveCtr;
 extern i32 lastAggZ[10];
 extern i32l lastPositionZ[10];
 
-#endif // HOMM2_BASE_RESOURCEMANAGER_H
+#endif

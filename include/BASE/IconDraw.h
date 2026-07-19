@@ -1,9 +1,6 @@
 #ifndef HOMM2_BASE_ICONDRAW_H
 #define HOMM2_BASE_ICONDRAW_H
 
-// Rendering modes and fixed framebuffer extents used by the icon dispatch layer.
-// Keep this implementation-only domain out of icon.h: most icon consumers do not
-// compile the dispatch body, and VC4.2 allocation is sensitive to unused types.
 H2_ENUM_CLASS_BEGIN(IconDrawClipMode)
     ICON_DRAW_NO_CLIP = 0,
     ICON_DRAW_CLIP = 1
@@ -30,4 +27,4 @@ H2_ENUM_BEGIN(IconDrawExtentConstant)
     ICON_DRAW_COMBAT_HEIGHT = 444
 H2_ENUM_END(IconDrawExtentConstant)
 
-#endif // HOMM2_BASE_ICONDRAW_H
+#endif

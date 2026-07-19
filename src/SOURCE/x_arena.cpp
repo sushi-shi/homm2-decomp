@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_Re\x_arena.obj   from: (directly linked into exe)
-// functions: 3   data: 3
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <stdio.h>
 #include <string.h>
@@ -192,12 +187,7 @@ i32 ArenaWindowHandler(struct tag_message& message_1) {
     return EVENT_WINDOW_CONTINUE;
 }
 
-// @semantic
-// Complete body, 0x8 frame/slots, CFG, and all 18 ordered relocation targets
-// agree. At +0x8d retail loads global choice with the five-byte absolute EAX
-// form before comparing widgetIndex; base loads the local first, making the body
-// one byte longer and shifting later relocation sites. Operand swap and
-// widgetIndex == OD_STEER(choice) were byte-neutral.
+// @semantic: compiler-shape residual.
 VA(0x004c063b, 0x150)
 void UpdateArenaIcons(void) {
     i32 widgetIndex;
@@ -225,7 +215,6 @@ void UpdateArenaIcons(void) {
     arenaWinPtr->DrawWindow(ARENA_DRAW_MODE, ARENA_WIDGET_FIRST_ID, ARENA_WIDGET_LAST_ID);
 }
 
-// ---- globals (definitions, RVA order) ----
 DATA(0x005331a8) i32 choice;
 DATA(0x005331b0) class iconWidget* skillWidget[3];
 DATA(0x005331bc) class heroWindow* arenaWinPtr;

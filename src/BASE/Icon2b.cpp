@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_RE\Icon2b.obj   from: .\basewin.lib
-// functions: 1   data: 0
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <BASE/Icon2b.h>
 #include <BASE/icon.h>
@@ -11,7 +6,6 @@
 #include <BASE/IconRle.h>
 #include <SOURCE/dimPalette.h>
 #include <string.h>
-// Per-call decoder scratch — its own 0x534c20+ file-static block.
 DATA(0x00534c20) static u8* gIcRow;
 DATA(0x00534c24) static i32 gIcPitch;
 DATA(0x00534c28) static u8 gIcColor;
@@ -29,51 +23,7 @@ DATA(0x00534c54) static i32 gIcX;
 DATA(0x00534c58) static IconEntry* gIcEntry;
 DATA(0x00534c5c) static u32 gIcCnt2;
 
-// @semantic
-// Macro-neutral structural checkpoint: complete no-frame CFG and correct relocation targets.
-// First divergence is +0x11: ours hoists x before the indexed entry fields; retail retains the
-// 13-byte frame offset in EBX, reads entry.x/srcOffset, forms EDI, then publishes entry/source/X0.
-// Counts are 80/83: only X0 2/3, Y 7/8, and Cnt2 4/5 differ. Retail reloads X0 at +0x5a
-// (reloc +0x5c), Y for clipping at +0x78 (reloc +0x7a), and Y for the row at +0xcf
-// (reloc +0xd1); ours forwards the live X/Y values. Retail's fifth Cnt2 store is +0x387
-// (reloc +0x389), in the right-clipped dim arm after the ClipR load and before its comparison;
-// the corresponding source publication is removed as redundant. Scoped X/Y snapshots collapse
-// byte-identically, while direct scratch ownership overshoots (X0 5/3, Y 10/8). Making Cnt2 feed
-// the arm emits six occurrences with a non-retail global reload; reversed/separate assignments
-// collapse to four. A typed IconEntry array root also remains 80/83 and worsens the setup shape.
-// Declaration-state audit on 6c2fa39: omitting the unused self-header scored 73.60165; splitting
-// the serialized constants into command/dim/palette typedef-enum domains and moving the palette
-// scale to its storage-owner header each scored 73.53571 with the same 80/83 total. Retail
-// first-relocation scratch order scored 75.16758, but fell to 79/83 by deleting another Y access;
-// the ascending-address owner order is retained because it preserves the better relocation shape.
-// NB09 has no per-compiland language/source record beyond `.\Win32_RE\Icon2b.obj`, so filename,
-// `#line`, or C/C++ mode steering is not evidence-backed.
-// A 180-variant exact-span batch retested shared forward-decoder setup and byte-fetch lifetimes.
-// The highest fuzzy setup declared `entry` before its fields, but moved the first structural
-// divergence backward from +0x11 to +0x8, so it was rejected. A command lifetime outside the
-// loop preserves the complete state machine. Explicit labeled backedges are byte-identical and
-// omitted. A later family audit retained increment-then-previous command/payload reads: retail
-// emits that order here and the same source idiom is shared by Icond2b, Iconm2b, and icon2bc.
-// Final raw audit: candidate 0x4c8 versus retail 0x4ed. Both are FPO with EBX/ESI/EDI/EBP saves
-// and ret 0x24; excluding three retail tail-padding NOPs they are 361/364 instructions and 60/61
-// branch sites, with the same complete decoder state-machine coverage.
-// This is an unresolved compiler-state residual, not a proven wall. Revisit after a real reachable
-// type/header change. The 2026-07-15 libclang generator compiled 256 shallow AST/helper candidates
-// in 240.33s and 256 depth-2/3 combinations in 246.24s. Both disposable maxima were 74.565930%,
-// 0x4c9 candidate bytes versus 0x4ed retail and 80/83 relocations, from extracting the entry-offset
-// multiply into an inline helper. Nested and bundled helpers did not raise that maximum; no generated
-// source was retained because neither batch reached exact closure.
-// A later unified-runner audit used 229 valid disposable declaration states. State alone reached
-// 75.980770%; a 36-shape related-version-corroborated setup/payload batch reached 75.241760%; their
-// cross reached 76.530220%, candidate 0x4cc versus retail 0x4ed, with 79/83 relocations. The useful
-// source lever was splitting each payload read into cursor increment followed by `gIcSrc[-1]`; the
-// typed repeated-index setup did not improve the canonical setup. The winning predecessor was a
-// prototype/include-equivalent state. A repeat over 229 declaration states with the best local
-// setup/payload combination did not exceed 75.62637% or change 79/83 relocations. Generated
-// declarations remain disposable; the family-consistent read lifetime is retained below.
-// The split `gIcSrc++; gIcSrc[-1]` form was an inlined helper trace, not intended source. Restoring
-// the shared advance-and-read helper raises live matching to 75.60989% with 80/83 relocations; the
-// only occurrence deficits are gIcX0, gIcY, and gIcCnt2, with no excess cursor reference.
+// @semantic: First divergence is +0x11: ours hoists x before the indexed entry fields.
 VA(0x004d0570, 0x4ed)
 void IconToBitmap(
     class icon* srcIcon,
@@ -115,7 +65,6 @@ void IconToBitmap(
     for (;;) {
         cmd = ReadIconRleByte(gIcSrc);
         if (static_cast<i8>(cmd) < 0) {
-            // ---- negative command ----
             if ((cmd & ICON_RLE_COMMAND_SOLID_FLAG) == 0) {
                 // skip run / end-of-sprite
                 gIcX = X;
@@ -126,7 +75,6 @@ void IconToBitmap(
                 X = X + (cmd & ICON_RLE_COMMAND_RUN_MASK);
                 continue;
             }
-            // 0xc0 - 0xFF
             gIcRun = cmd;
             u32 count = cmd & ICON_RLE_COMMAND_RUN_MASK;
             i32 flags;
@@ -239,7 +187,6 @@ void IconToBitmap(
             X = X + gIcDimLen;
             continue;
         }
-        // ---- positive command : literal copy / newline ----
         gIcX = X;
         gIcRun = cmd;
         if (cmd != 0) {
@@ -284,7 +231,6 @@ void IconToBitmap(
             gIcRun = cmd;
             continue;
         }
-        // newline
         X = gIcX0;
         gIcY = gIcY + 1;
         row = row + gIcPitch;

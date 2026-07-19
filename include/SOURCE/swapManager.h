@@ -1,10 +1,7 @@
 #ifndef HOMM2_SOURCE_SWAPMANAGER_H
 #define HOMM2_SOURCE_SWAPMANAGER_H
-// Reconstructed class (SOURCE) from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// 13 methods, 3 own-virtual, 0 static data.
 #include <va.h>
 #include "../BASE/baseManager.h"
-// forward declarations:
 class hero;
 class heroWindow;
 class icon;
@@ -93,26 +90,22 @@ H2_ENUM_BEGIN(SwapManagerConstant)
     SWAP_SPLIT_CONFIRM = 0x7802
 H2_ENUM_END(SwapManagerConstant)
 
-#pragma pack(push, 1) // recovered layout is byte-packed
+#pragma pack(push, 1)
 class swapManager : public baseManager {
 public:
-    // (derived: base baseManager = 0x36 bytes at 0x00 via ': public baseManager'; own fields below)
-    heroWindow* m_window;                 // +0x36
-    icon* m_selectorIcon;                 // +0x3a
-    hero* m_heroes[IDX(SWAP_SIDE_COUNT)]; // +0x3e
-    SwapManagerSide m_selectedSide;       // +0x46
-    SwapManagerSide m_targetSide;         // +0x4a
-    i32 m_selectedSlot;                   // +0x4e
-    i32 m_targetSlot;                     // +0x52
-    SwapManagerItemType m_itemType;       // +0x56
-    // --- constructors ---
+    heroWindow* m_window;
+    icon* m_selectorIcon;
+    hero* m_heroes[IDX(SWAP_SIDE_COUNT)];
+    SwapManagerSide m_selectedSide;
+    SwapManagerSide m_targetSide;
+    i32 m_selectedSlot;
+    i32 m_targetSlot;
+    SwapManagerItemType m_itemType;
     swapManager(void);
     swapManager(class hero*, class hero*);
-    // --- virtual methods (vtable order) ---
     virtual i32 Open(i32) OVERRIDE;
     virtual void Close(void) OVERRIDE;
     virtual i32 Main(struct tag_message&) OVERRIDE;
-    // --- methods ---
     void Reset(void);
     i32 DrawSwapWin(void);
     void DrawSelector(void);
@@ -124,4 +117,4 @@ public:
 };
 #pragma pack(pop)
 SIZE(swapManager, 0x5a);
-#endif // HOMM2_SOURCE_SWAPMANAGER_H
+#endif

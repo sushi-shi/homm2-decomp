@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_Re\FLY.OBJ   from: (directly linked into exe)
-// functions: 4   data: 0
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <math.h>
 #include <BASE/bitmap.h>
@@ -17,10 +12,7 @@
 #include <SOURCE/NOOPT.h>
 #include <SOURCE/PATH.h>
 #include <SOURCE/X_GLOBAL.h>
-// @semantic: Complete 0x0c frame, CFG, and all 14 ordered relocations. The
-// deterministic cell_9 suffix now gives retail's cell/candidateHex slots. The
-// first remaining branch span begins at +0x64 in the wide-creature path; direct
-// and cached cell access, wide-branch polarity, and both direction forms were tried.
+// @semantic: branch/code-shape residual.
 VA(0x004a5900, 0x295)
 i32 army::CanFit(i32 hex, i32 tryOtherSide, i32* fittingHex) {
     hexcell* cell_9;
@@ -78,10 +70,7 @@ i32 army::CanFit(i32 hex, i32 tryOtherSide, i32* fittingHex) {
     return 1;
 }
 
-// @semantic: Semantic CFG is complete and all 18 relocations agree. First
-// residual is +0x03..+0x05: retail frame 0x38, ours 0x30 (8 bytes short); NB09
-// has no local records for slot recovery. Local names/order/scope, attackHex forms,
-// cached/direct target access, if/ternary forms, and direction-loop polarity were tried.
+// @semantic: First residual is +0x03..+0x05: retail frame 0x38, ours 0x30 (8 bytes short).
 VA(0x004a5b95, 0x405)
 i32 army::ValidFlight(i32 destination, i32 fromTargetHex) {
     army* target;
@@ -191,12 +180,7 @@ i32 army::FlyTo(void) {
     return FlyTo(m_moveTargetHex);
 }
 
-// @semantic: Semantic CFG is complete and all 119 relocations agree. First
-// residual is +0x03..+0x08: retail frame 0xc0, ours 0xb4 (12 bytes short); NB09
-// has no local records. Local names/order/scope, scalar/aggregate temporary forms,
-// initialization grouping, condition polarity, and for/while spellings were tried.
-// The dead retail segment-count==0 fallback and the BEGIN_STANDING frame count
-// overwritten by the MIDDLE assignment were audited and intentionally retained.
+// @semantic: First residual is +0x03..+0x08: retail frame 0xc0, ours 0xb4 (12 bytes short); NB09 has no local records.
 VA(0x004a5fbf, 0xc1f)
 i32 army::FlyTo(i32 destination) {
     i32 sourceColumn;
@@ -304,13 +288,11 @@ i32 army::FlyTo(i32 destination) {
                 flightSegment + 1 == flightSegmentCount,
                 flightSegment > 0
             );
-            // Retail retains this fallback after clamping the segment count to one.
             if (flightSegmentCount == 0) {
                 flightFrameCount = m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WALK)];
                 frameStart = 0;
             } else {
                 if (flightSegment > 0) {
-                    // This transition count is overwritten by the retail MIDDLE assignment.
                     flightFrameCount +=
                         m_frameInfo.animationFrameCount[IDX(ARMY_WALK_SEGMENT_BEGIN_STANDING)];
                     frameStart = 0;

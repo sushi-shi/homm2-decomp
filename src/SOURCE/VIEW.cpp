@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_Re\VIEW.OBJ   from: (directly linked into exe)
-// functions: 3   data: 1
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <stdio.h>
 #include <BASE/heroWindow.h>
@@ -14,11 +9,7 @@
 #include <SOURCE/combatManager.h>
 #include <SOURCE/game.h>
 #include <SOURCE/VIEW.h>
-// @semantic
-// Complete dialog behavior/CFG and all 71 ordered relocations. Recovering the
-// individually allocated compiler locals and explicit null return raised the live
-// match to 99.46%; candidate frame 0x74 remains one word below retail 0x78.
-// Cached/repeated hero loads, packed locals, and both quick-view arm orders were tried.
+// @semantic: compiler-shape residual.
 VA(0x0040bd60, 0x6d3)
 i32 combatManager::ViewGeneral(i32 side, i32 allowActions, i32 quickView) {
     if (m_heroes[side] == 0)
@@ -183,11 +174,7 @@ i32 combatManager::ViewGeneral(i32 side, i32 allowActions, i32 quickView) {
     return 0;
 }
 
-// @semantic
-// Complete widget/help/hover behavior and all 12 ordered relocations. Retail's
-// message+0x0d mask proves right-button help; the prior Left Shift spelling was a
-// runtime bug. Individual compiler locals restored the frame to 0x58 versus retail
-// 0x5c. Mouse-first conditions and the retained retail-order switches were tried.
+// @semantic: compiler-shape residual.
 VA(0x0040c433, 0x351)
 i32 HandleViewGeneral(tag_message& message) {
     i16 messageConstant1;
@@ -296,11 +283,7 @@ i32 HandleViewGeneral(tag_message& message) {
     return 1;
 }
 
-// @semantic
-// Exact 0x24 frame and all local slots after restoring the separate compiler locals;
-// geometry, clamps, call arguments, and both relocations agree. First non-branch
-// residual is the branchless facing mask near +0x81. Signed/unsigned equality and
-// less-than mask spellings plus direct ternary geometry were tried.
+// @semantic: First non-branch residual is the branchless facing mask near +0x81.
 VA(0x0040c784, 0x165)
 void combatManager::ViewArmy(army* viewedArmy, i32 quickView) {
     if (viewedArmy == 0)
@@ -351,5 +334,4 @@ void combatManager::ViewArmy(army* viewedArmy, i32 quickView) {
     }
 }
 
-// ---- globals (definitions, RVA order) ----
 DATA(0x004eddf4) i32 iViewGeneralWhichSide = 0;

@@ -25,4 +25,4 @@ H2_ENUM_BEGIN(DataEntryWidgetId)
     DATA_ENTRY_BUTTON_EIGHT = 0x7808
 H2_ENUM_END(DataEntryWidgetId)
 
-#endif // HOMM2_BASE_DATA_ENTRY_CONSTANTS_H
+#endif

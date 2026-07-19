@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_RE\TEXTWDGT.OBJ   from: .\basewin.lib
-// functions: 10   data: 1
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <BASE/textWidget.h>
 #include <BASE/TEXTWDGT_TYPES.h>
@@ -14,29 +9,12 @@
 #include <SOURCE/KB.h>
 #include <string.h>
 
-// __FILE__ for the NWC memory/assert tracking (reloc-masked path string).
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\TEXTWDGT.CPP"
 
 DATA(0x0051fa70) static STextWidgetSourceFiles gTextWidgetSourceFiles =
     {RETAIL_FILE, RETAIL_FILE, RETAIL_FILE, RETAIL_FILE};
 
-// @data-layout-note NB09 assigns TEXTWDGT one 0xb0 initialized-data
-// contribution at 0x11fa70. Retail stores four identical source paths in 0x2c
-// slots at owner addends 0, 0x2c, 0x58, and 0x84. Read and destruction use the
-// first two owners; both resize frees use the third, and both resize allocations
-// use the fourth. This typed aggregate reproduces the complete contribution and
-// all six relocation addends. The existing 0xc textWidget
-// vtable is the only rdata contribution, and this TU has no loader-zero data.
-// Do not pool the paths or split them with padding symbols or section pragmas.
-// @semantic
-// /O2 register-allocation checkpoint: base and retail are both 0x3e bytes and both
-// relocation targets agree. Instruction selection, ordering, and immediates are
-// identical; only the retained this register differs (ESI in base, EDI in retail),
-// producing raw differences at +0x00,+0x04,+0x1a,+0x21,+0x24,+0x27,+0x2e,
-// +0x36,+0x3b,+0x3c. Direct stores, a cached self pointer,
-// and chained versus separate initialization of the two value-1 fields were tried.
-// Four sibling-pinned AST variants and 60 guarded TU-state trials found no exact
-// closure. Revisit only after a real predecessor/header state change.
+// @semantic: optimized register-allocation residual.
 VA(0x004d1060, 0x3e)
 textWidget::textWidget(void) : widget(0, 0, 0, 0, 0, 0) {
     m_color = 1;
@@ -46,14 +24,7 @@ textWidget::textWidget(void) : widget(0, 0, 0, 0, 0, 0) {
     m_kind = EncodeWidgetKind(WIDGET_KIND_TEXT);
 }
 
-// @early-stop
-// Compiler COMDAT-folding artifact: retail carries two strong, byte-identical 0x45
-// ??_E/??_G deleting-destructor sections with 14 relocations apiece. Preserving the
-// exact standalone 0x30 destructor below makes VC4.2 emit a 0x1d ??_G wrapper with
-// only 2 relocations and a weak ??_E alias with no section; inlining the destructor
-// would trade away the separately mapped exact ??1 body.
-// VA(0x004d10a0, 0x45) ??_E/??_G textWidget deleting-destructor aliases
-
+// @early-stop: byte-proven compiler artifact.
 VA(0x004d10f0, 0x64)
 textWidget::textWidget(
     i16 x,
@@ -103,15 +74,7 @@ textWidget::~textWidget() {
     H2_FREE_AT(m_text, gTextWidgetSourceFiles.destruction, 0x55);
 }
 
-// @semantic
-// Both sides are 0x210 bytes with the same frame, CFG, selection transitions, text
-// ownership, and 6/6 ordered relocations. The first executable-code divergence is
-// +0x88: candidate emits `cmp m_y, relativeY; jg`, while retail emits the signed-
-// equivalent `cmp relativeY, m_y; jl`. Spelling the test as `m_y > relativeY` or
-// `(m_y <= relativeY) == 0` did not change the candidate. The two later raw symbol-
-// name differences are the same typed source-file owner, with resize-free at +0x58
-// and resize-allocation at +0x84. Revisit after a real predecessor/header TU-state
-// change.
+// @semantic: first executable-code divergence is +0x88: candidate emits cmp m_y, relativeY.
 VA(0x004d1280, 0x210)
 i32 textWidget::Main(tag_message& msg) {
     u16 flags = m_flags;
@@ -230,12 +193,7 @@ void textWidget::SetText(char* text) {
     strcpy(m_text, text);
 }
 
-// ===== vtable textWidget : public widget  (3 slots) =====
-//  [ 0] VA(0x004d1490, 0x49)  void textWidget::Draw(void)   <- override (implements widget pure virtual)
-//  [ 1] VA(0x004d10a0, 0x45)  void * textWidget::scalar_dtor(unsigned int)   <- override (implements widget pure virtual)
-//  [ 2] VA(0x004d1280, 0x210)  int textWidget::Main(struct tag_message &)   <- override (implements widget pure virtual)
 
-// ---- vtables (compiler-emitted; census) ----
 VTBL(textWidget, 0x004eba50);
 
 #undef RETAIL_FILE

@@ -1,35 +1,8 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\winextra\TILE.obj   from: .\basewin.lib
-// functions: 1   data: 0
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <BASE/TILE.h>
 
-// Hand-written inline-asm tile blitter — the map renderer's hottest inner loop (one call per
-// visible tile per frame), so New World Computing wrote it in assembly instead of leaving it to
-// the /Od compiler. Pseudocode:
-//
-//   d = dst->pixels + y*dst->width + x                     // top-left of the destination
-//   gTileMode = flags
-//   s = src->pixels + src->width*src->height*(flags&0xFFF) // start of the selected frame
-//   stride = dst->width - src->width                       // dest advance after each tile row
-//   switch (flags & 0xC000) {
-//     case 0x0000:  // straight copy, 16 rows unrolled, a row per `rep movsd` (width/4 dwords)
-//       for (row = src->height; row; row -= 16) { copy_row_dwords(); d += stride; } * 16
-//     case 0x4000:  // vertical flip: read rows bottom-to-top (s -= 2*width after each row)
-//     case 0x8000:  // horizontal flip: write each row right-to-left, byte by byte (lodsb)
-//     case 0xC000:  // 180-degree: both flips, source read backward with the direction flag (std)
-//   }
-// Byte-identical via __declspec(naked). The retail hand-asm clobbers ebx WITHOUT saving it (a
-// calling-convention violation NWC got away with), but MSVC 4.2's auto-prologue always emits
-// `push ebx` when an __asm writes ebx and appends a dead auto-epilogue — which capped the match at
-// 94%. naked lets us write the frame ourselves: prologue pushes esi/edi only (no ebx), and the sole
-// epilogue is the manual one at `epi`. The four `xchg ebx,ebx`/`nop` fillers before the loop/branch
-// entries (fwd, path_v, path_h, path_hv) are NWC's own loop-alignment pads — MSVC's inline assembler
-// won't synthesize them, so they must be emitted explicitly to reproduce retail's exact byte layout.
+// Hand-written tile blitter supporting normal, vertical, horizontal, and combined flips.
 
-// ---- module-private synthetic globals (retail xref: single-module) ----
 DATA(0x0051fec0) static u32 gTileMode;
 DATA(0x0051fec4) static i32 gTileRowCtr;
 

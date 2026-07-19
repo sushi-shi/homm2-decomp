@@ -2,12 +2,8 @@
 #define HOMM2_GAME_H
 #include <va.h>
 #include <SOURCE/KB_TYPES.h>
-// Declarations of the free functions DEFINED in GAME.cpp — the single home for these
-// symbols. Other TUs call them by including this header (no local externs).
-// forward declarations (was <_all.h>):
 struct tag_message;
 
-// GAME-private types.
 #pragma pack(push, 1)
 struct EventExtra {
     u8 unknown00;
@@ -288,7 +284,6 @@ void CompressTest2(void);
 void CompressTest(void);
 void CompressTest3(void);
 
-// --- globals owned by this TU (moved from _globals.h; CodeView-attributed) ---
 extern char bMapInitialized;
 
-#endif // HOMM2_GAME_H
+#endif

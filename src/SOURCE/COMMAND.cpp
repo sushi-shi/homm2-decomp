@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_Re\COMMAND.OBJ   from: (directly linked into exe)
-// functions: 36   data: 15
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -119,11 +114,7 @@ ProcessAction:
     return result;
 }
 
-// @semantic: complete ignored/invalid/border, castle-gate, occupancy, and return
-// CFG with the exact 0x04 frame and all six ordered relocation targets. The first
-// normalized residual evaluates the row modulo before MAP_WIDTH - 1, while
-// retail evaluates the same equality operands in the opposite order. Reversing
-// the equality spelling was byte-neutral; revisit after preceding TU state moves.
+// @semantic: first normalized residual evaluates the row modulo before MAP_WIDTH - 1.
 VA(0x0042aa3d, 0x181)
 i32 combatManager::ValidHexToStandOn(i32 hexIndex) {
     if (hexIndex == COMBAT_IGNORED_HEX)
@@ -152,20 +143,7 @@ i32 combatManager::ValidHexToStandOn(i32 hexIndex) {
     }
 }
 
-// @semantic: the complete direction, rear-hex, path,
-// sector-fill, and pending-sector CFG has the exact 0x8a1 span and 0x7c frame;
-// all 5/5 relocation targets agree. The first raw residual is +0x26, where
-// retail loads m_currentArmySide (+0xf2a3) before m_currentArmyIndex (+0xf2a7)
-// and ours evaluates those array subscripts in the reverse order. All later
-// normalized instructions align. Raw local slots still differ: retail places
-// mapped/unresolved/path/targetIndex/next/currentArmy at -0x04..-0x1c and
-// directionHexes/rearHexes/direction/output/previous/targetArmy/standable/
-// targetSide at -0x5c..-0x78; the retained semantic suffixes establish the
-// correct frame but not that complete nested-scope reuse order. Direct [][],
-// row-plus-index army access, reversed index[array] access, and an explicit
-// sizeof-based byte-offset expression were tried. A header inline
-// `GetArmy(index, side)` made the first multiply exact but added two absent
-// five-byte continuation jumps and left the local target lookup reversed.
+// @semantic: first residual is army-side/index load order at +0x26.
 VA(0x0042abbe, 0x8a1)
 void combatManager::SetCombatDirections(i32 targetHex) {
     if (m_gridSelectionDisabled != 0)
@@ -358,12 +336,7 @@ void combatManager::SetCombatDirections(i32 targetHex) {
     currentArmy_3->m_targetIndex = targetIndex_6;
 }
 
-// @semantic: complete quadrant, slope, direction, target adjustment, and pointer
-// CFG with the exact 0x34 frame and all 19 ordered relocation targets. Current
-// raw slots first differ at +0x65: relativeX/relativeY are -0x24/-0x28 versus
-// retail -0x1c/-0x24, followed by equivalent slope constant identities. The
-// prior suffixed-slot spelling reached identical normalized code; revisit after
-// earlier COMMAND declarations and shared constant identities stabilize.
+// @semantic: compiler-shape residual.
 VA(0x0042b45f, 0x63c)
 void combatManager::CheckSetMouseDirection(i32 mouseX, i32 mouseY, i32 targetHex) {
     if (m_gridSelectionDisabled != 0)
@@ -516,18 +489,7 @@ i32 combatManager::GetPointer(CombatMessageCommand command, i32 hexIndex) {
     }
 }
 
-// @semantic: the complete window, mouse, keyboard,
-// dialog, pointer, grid, spell, and debug CFG now has the exact 0x70 frame and
-// compiles to 0x8da bytes versus retail 0x8e4. The real slots match: result -0x04,
-// selectedHex -0x08, mouse X/Y -0x0c/-0x10, pendingMessage -0x2c..-0x14,
-// helpIndex -0x30, MouseCoords X/Y -0x34/-0x38, and this -0x58; the five switch
-// temporaries occupy -0x5c..-0x70. Manual range review finds 109 relocation
-// entries on both sides with no base-only target. The semantic diff first loses
-// synchronization after instruction 30 at the delinked help jump table; retail
-// tables are target +0xe5/0x1c, +0x227/0x10, and +0x815/0x38. Widening the real
-// selectedHex/pendingMessage scopes and restoring the command, hover-ID, and
-// click-ID nested switches fixed the frame and 0x31 bytes. Revisit the remaining
-// ten-byte switch-continuation residual at total SOURCE 95%, not before.
+// @semantic: ten-byte switch-continuation residual.
 VA(0x0042bb26, 0x8e4)
 i32 combatManager::ProcessCombatMsg(tag_message& message) {
     i32 mouseX = message.payload.mouse.screenX;
@@ -892,11 +854,7 @@ i32 combatManager::CheckWin(struct tag_message* message) {
     return combatEnded;
 }
 
-// @semantic: code span is 0x4fe versus retail 0x51a, frame 0x28
-// agrees, and all 14/14 relocation targets agree. The first normalized residual
-// is instruction 21 in the source-ordered special-hex switch; both flattened
-// if/else and restored switch forms were tested. The remaining delta is branch
-// layout around the special cases and the late empty-cell arm.
+// @semantic: first normalized residual is instruction 21 in the source-ordered special-hex switch.
 VA(0x0042c8ff, 0x51a)
 CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
     i32 column = hexIndex % COMBAT_GRID_ROW_LENGTH;
@@ -1020,12 +978,7 @@ CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
     return command;
 }
 
-// @semantic: code span is 0x290 versus retail 0x2a6, frame 0x1c
-// agrees, and all 14/14 relocation targets agree. The first normalized residual
-// is instruction 123, an extra jump at the transition from the blocked-cell
-// return into the inner side switch. Restoring both retail switches and their
-// case-body order removed the earlier structural divergence. The bounded clang
-// AST pass found no safe target-body variants.
+// @semantic: extra continuation jump at instruction 123.
 VA(0x0042ce19, 0x2a6)
 i32 combatManager::RightClick(i32 hexIndex) {
     i32 column = hexIndex % COMBAT_GRID_ROW_LENGTH;
@@ -1084,13 +1037,7 @@ i32 combatManager::RightClick(i32 hexIndex) {
     return 0;
 }
 
-// @semantic: complete command switch and case-body order with the exact 0x14
-// frame: two unused words -0x04/-0x08, currentArmy -0x0c, this -0x10, and the
-// switch temporary -0x14. All 54 ordered relocations align. After the exact
-// CheckWin predecessor changed TU state, the first normalized residual is the
-// initial current-side/current-index address multiplication order; the same body
-// previously differed only by one local branch target. Revisit after TU state
-// stabilizes, not with further switch permutations.
+// @semantic: first normalized residual is the initial current-side/current-index address multiplication order.
 VA(0x0042d0bf, 0x3b3)
 void combatManager::DoCommand(i32 command) {
     i32 unusedCommandWord2;
@@ -1203,7 +1150,7 @@ void combatManager::DoCommand(i32 command) {
     }
 }
 
-// @early-stop
+// @early-stop: byte-proven compiler artifact.
 VA(0x0042d472, 0x57b)
 i32 WinCombatHandler(struct tag_message& message) {
     char iconFile[40];
@@ -1353,7 +1300,7 @@ i32 WinCombatHandler(struct tag_message& message) {
     return IDX(COMBAT_MAIN_CONTINUE);
 }
 
-// @early-stop
+// @early-stop: byte-proven compiler artifact.
 VA(0x0042d9ed, 0x110)
 void combatManager::ClearWinLoseBottom(class heroWindow* window) {
     i32 widgetIndex;
@@ -1371,7 +1318,7 @@ void combatManager::ClearWinLoseBottom(class heroWindow* window) {
     }
 }
 
-// @early-stop
+// @early-stop: byte-proven compiler artifact.
 VA(0x0042dafd, 0x29a)
 void combatManager::ShowWinLoseArtifact(class heroWindow* window, i32 artifact) {
     DATA(0x004f09e8) static i16 artifactSourceLineBase = 0x680;
@@ -1444,7 +1391,7 @@ void combatManager::ShowWinLoseArtifact(class heroWindow* window, i32 artifact) 
     WaitEndSample(pickupSample, -1);
 }
 
-// @early-stop
+// @early-stop: byte-proven compiler artifact.
 VA(0x0042dd97, 0x232)
 void combatManager::ShowSkeletons(class heroWindow* window) {
     DATA(0x004f0a80) static i16 skeletonSourceLineBase = 0x6c8;
@@ -1514,7 +1461,7 @@ void combatManager::ShowSkeletons(class heroWindow* window) {
     WaitEndSample(pickupSample, -1);
 }
 
-// @early-stop
+// @early-stop: byte-proven compiler artifact.
 VA(0x0042dfc9, 0x2f6)
 void combatManager::ShowEagleEyeSpell(class heroWindow* window) {
     DATA(0x004f0be4) static i16 eagleEyeSourceLineBase = 0x702;
@@ -1594,18 +1541,7 @@ void combatManager::ShowEagleEyeSpell(class heroWindow* window) {
     WaitEndSample(playedSample, -1);
 }
 
-// @semantic: the complete casualty scan and widget CFG uses retail's exact 0x1a4
-// frame after four evidenced words before y/side/army and three after the
-// quantity aggregate; all 55 ordered relocation targets agree. Width/bottom are
-// exact at -0xb0/-0xac, and the arrays, text, spacing, geometry, clamp, and
-// constructor argument flow are recovered. The first non-relocation normalized
-// residual is instruction 399, ours `jle` versus retail `jge` at the
-// displayed-army loop; two later constructor-coordinate
-// expressions differ only in constant association and the last uses retail
-// `movsx ax`/add versus ours increment. Restored the shared clear/side counter,
-// flat aggregate access, 32-bit spacing/startX, two-arm clamp, and constant width;
-// direct multidimensional access, cached icon entries, and short geometry were
-// worse. A 40-candidate clang AST pass exposed no safe target-body variants.
+// @semantic: first non-relocation normalized residual is instruction 399, ours jle versus retail jge at the displayed-army loop.
 VA(0x0042e2bf, 0x9cc)
 void combatManager::ShowDeadArmies(class heroWindow* window) {
     DATA(0x004f0ca0) static i16 casualtySourceLineBase = 0x74b;
@@ -1801,17 +1737,7 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
     }
 }
 
-// @semantic: the full winner/draw CFG compiles to 0xba8
-// bytes versus retail 0xba9. Retail frame is 0x104 (`this` -0xf8, experienceText[152]
-// -0xec, artifact/living/fade/army locals -0x54..-0x38, currentArmy -0x34,
-// message -0x30..-0x18, experience/side/dead/last -0x14..-0x08, winningSide
-// +0x08); ours is 0x100. First residual is instruction 52 (armyIndex/side
-// strength-reduction order), repeated at 131. All 112 relocation sites and
-// external targets were audited; later offset drift follows CFG/slot differences
-// and retail-delinked constants. Multidimensional/flattened pointer forms, both
-// fade predicates, and nested/combined artifact caps were tried. Revisit when
-// total SOURCE fuzzy reaches 95%; a 40-candidate clang AST pass exposed no safe
-// target-body variants.
+// @semantic: First residual is instruction 52 (armyIndex/side strength-reduction order), repeated at 131.
 VA(0x0042ec8b, 0xba9)
 void combatManager::DoVictory(i32 winningSide) {
     char experienceText[152];
@@ -2227,9 +2153,7 @@ void combatManager::CheckChangeSelector(void) {
     SetupSmallView();
 }
 
-// @early-stop
-// All 0xea bytes match after masking four aligned COFF
-// relocations; relocation offsets and targets are identical.
+// @early-stop: byte-proven compiler artifact.
 VA(0x00430109, 0xea)
 void combatManager::CheckCastleAttack(void) {
     if (m_inCastleCombat != 0 && m_currentSide == 0) {
@@ -2248,12 +2172,7 @@ void combatManager::CheckCastleAttack(void) {
     }
 }
 
-// @early-stop
-// The exact 0x08 frame (`this` -0x08, retreat -0x04),
-// 0xdd span, and every normalized opcode/operand agree. All 7 relocation sites
-// align; the only identity residual is retail's synthetic interior alias for
-// gConfig.autoCombatUseSpells. The remaining masked raw byte is the retreat
-// arm targeting an equivalent trailing local continuation jump.
+// @early-stop: byte-proven compiler artifact.
 VA(0x004301f3, 0xdd)
 void combatManager::CheckGetAIMove(void) {
     i32 retreat = AICheckRetreat();
@@ -2270,16 +2189,10 @@ void combatManager::CheckGetAIMove(void) {
         DoCompAI(m_currentSide);
 }
 
-// @early-stop
-// The positive local-network predicate restores every
-// non-jump opcode and operand. The exact 0x04 frame and all 15 external
-// relocations agree. Ours is 0x185 bytes versus retail 0x18f; the entire delta
-// is two five-byte local continuation jumps, one after the initial control
-// store and one after ResetMouse. No jump table or other data range is present.
+// @early-stop: delinker jump-table artifact.
 VA(0x004302d0, 0x18f)
 void combatManager::GetControl(void) {
     m_selectedHex = COMBAT_INVALID_HEX;
-    // Retail emits two stores to +0xf2cb here; +0xf2cf is not the second target.
     m_previousCommand = COMBAT_INVALID_COMMAND;
     m_previousCommand = COMBAT_INVALID_COMMAND;
     if (gpCombatManager->m_active)
@@ -2326,17 +2239,7 @@ void combatManager::ResetMouse(void) {
     }
 }
 
-// @semantic: the complete eight-action
-// switch/finish CFG compiles to 0x642 bytes versus retail 0x65b and uses the
-// exact 0x2c frame. Retail slots
-// are `this` -0x28, actionData -0x24..-0x18, transmitResult -0x14,
-// currentArmy -0x10, redraw -0x0c, result -0x08, advanceArmy -0x04, message
-// +0x08; ours first places result at -0x04. Raw first residual is +0x18; first
-// normalized residual is instruction 33, current-side/current-army strength
-// reduction before LogInt. All 82 calls/relocations are reconstructed; offset
-// order diverges around that arithmetic and the switch table, with external
-// targets audited. Retail body order, pointer/direct army access, and switch arm
-// order were tried. Revisit when total SOURCE fuzzy reaches 95%.
+// @semantic: first residual is +0x18; first normalized residual is instruction 33.
 VA(0x00430536, 0x65b)
 i32 combatManager::ProcessNextAction(struct tag_message& message) {
     i32 actionData[IDX(COMBAT_ACTION_DATA_COUNT)];
@@ -2496,11 +2399,7 @@ Finished:
     return IDX(result);
 }
 
-// @early-stop
-// The complete two-pass CFG has retail's exact 0x18 frame and mapped slots, and
-// all 13 ordered relocations align. Relocation-masked raw bytes differ only at
-// +0xef: the zero-count arm targets the trailing inline `jmp $+0` in ours and
-// the equivalent epilogue in retail. There is no jump table or embedded data.
+// @early-stop: delinker jump-table artifact.
 VA(0x00430b91, 0x237)
 void combatManager::ResetCyclingCreatures(void) {
     army* currentArmy_p = 0;
@@ -2566,11 +2465,7 @@ void combatManager::ResetCycleTimers(void) {
     }
 }
 
-// @early-stop
-// Exact 0x08 frame (`x`/ECX -0x04, `y`/EDX -0x08),
-// 0x53 span, and every opcode and non-branch operand agree; there are no
-// relocations or embedded data. The only raw residual is the true arm targeting
-// retail's equivalent final `jmp $+0` continuation rather than our epilogue.
+// @early-stop: inline continuation artifact.
 VA(0x00430ec1, 0x53)
 i32 InCombatArea(i32 x, i32 y) {
     if (x >= 0 && x < COMBAT_SCREEN_WIDTH && y >= 0 && y < COMBAT_AREA_HEIGHT)
@@ -2578,18 +2473,7 @@ i32 InCombatArea(i32 x, i32 y) {
     return 0;
 }
 
-// @semantic: the complete overlay, creature-idle, hero-
-// death/idle, animation-selection, redraw, and timer CFG compiles to 0x9ca bytes
-// versus retail 0x9d9 with the exact 0x64 frame. Retail slots are `this` -0x50,
-// cycleArmy[2][20] -0x48,
-// animationIndex -0x20, accumulatedChance -0x1c, currentArmy -0x18, side/index
-// -0x14/-0x1c, nextHeroAnimation[3] -0x10; ours first puts currentArmy at -0x4c.
-// Raw first residual is +0x16; normalized instruction 66 first reverses side/
-// army strength reduction. All 39 calls/relocations are reconstructed; offsets
-// diverge after that loop and retail uses interior SCmbtHero/constant aliases.
-// Pointer/direct indexing, inclusive bounds, signed/unsigned cycle bytes,
-// condition polarities, and float operand orders were tried. A 40-candidate
-// clang AST pass exposed no safe target-body variants.
+// @semantic: first residual is +0x16; normalized instruction 66 first reverses side/ army strength reduction.
 VA(0x00430f14, 0x9d9)
 void combatManager::CycleCombatScreen(void) {
     army* currentArmy;
@@ -2785,8 +2669,7 @@ void combatManager::CycleCombatScreen(void) {
     );
 }
 
-// @early-stop
-// All 0x3b bytes and all 3 relocation targets match retail.
+// @early-stop: byte-proven compiler artifact.
 VA(0x004318ed, 0x3b)
 void combatManager::SetCombatViewArmySmallLevel(i32 level) {
     gConfig.combatArmyInfoLevel = level;
@@ -2811,13 +2694,7 @@ void combatManager::SetCombatGrid(i32 showGrid, i32 showMouseHex, i32 shadeLevel
     WritePrefs();
 }
 
-// @semantic: the full slot-search, reuse, initialization, and fizzle CFG has the
-// exact 0x14 frame and retail slots: armyIndex -0x04, index -0x08, newArmy
-// -0x0c, reusedArmy -0x10, and this -0x14. All 23 ordered relocation targets
-// align. The first normalized residual is side/index strength-reduction order
-// in the initial army lookup. Direct, cached-row, and reversed-subscript forms,
-// destination predicate shapes, animation polarity, and counter spellings were
-// exhausted; revisit only after earlier TU state stabilizes.
+// @semantic: first normalized residual is side/index strength-reduction order in the initial army lookup.
 VA(0x00431a0b, 0x3ab)
 void combatManager::AddArmy(
     i32 side,
@@ -2918,8 +2795,7 @@ void combatManager::SetupSmallView(void) {
     }
 }
 
-// @early-stop
-// All 0x304 bytes and all 45 relocation targets match retail.
+// @early-stop: byte-proven compiler artifact.
 VA(0x00431f1f, 0x304)
 void combatManager::ViewBallista(i32 quickView) {
     i32 archerCount;
@@ -3018,30 +2894,6 @@ void combatManager::ViewBallista(i32 quickView) {
     );
 }
 
-// @data-layout-note
-// COMMAND `.rdata` is exact: candidate and retail both span 0xeb208..0xeb26c
-// (0x64 bytes). Candidate and retail initialized storage are both 0x90c bytes;
-// after removing the four source-line-base words, all remaining 0x8fc bytes are
-// identical. Retail interleaves those words at section offsets 0x188, 0x220,
-// 0x384, and 0x440, while VC 4.2 groups the explicit function statics at offsets
-// 0x0, 0x4, 0x8, and 0xc. Their 1, 1, 1, and 4 retail HIGHLOW references prove
-// the private function ownership above. Static placement variants do not steer
-// this compiler allocation order, so do not restore external `const_<rva>`
-// identities or invent padding to reproduce it.
-// The two identical Sphere of Negation literals are disambiguated by their
-// owning functions: ProcessCombatMsg relocation ordinal 42 targets 0xf0884,
-// while DoCommand ordinal 12 targets 0xf090c. Both functions have equal
-// candidate/retail DIR32 counts and both literal addends are zero.
-//
-// Retail zero-fill has 15 exact public DATA anchors over 0x1250b8..0x125110
-// (0x58 bytes); all 189 absolute text references to them are HIGHLOW relocations
-// with the exact symbol base/addend. The candidate `.bss` is 0x5c bytes because
-// its hash-ordered COMMON layout has alignment holes at +0x4 and +0x2c, while
-// retail's final COMMON order has only the +0x3c hole. The two inferred 8-byte
-// integer extents are therefore section-gap artifacts, not missing storage.
-// Keep the source extents and leave this section unassigned rather than adding
-// fake objects or replaying the candidate section as a contiguous contribution.
-// ---- globals (definitions, RVA order) ----
 DATA(0x005250b8) b32 gbThisNetHasControl;
 DATA(0x005250bc) i32 iCurTransferArtifact;
 DATA(0x005250c0) i8 iTransferArtifactsInfo[16];

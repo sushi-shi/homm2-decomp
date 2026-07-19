@@ -1,7 +1,5 @@
 #ifndef HOMM2_BASE_BITMAP_H
 #define HOMM2_BASE_BITMAP_H
-// Reconstructed class (BASE) from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// 13 methods, 0 own-virtual, 0 static data.
 #include <va.h>
 #include <BASE/resource.h>
 
@@ -13,22 +11,17 @@ H2_ENUM_CLASS_BEGIN_T(BitmapType, i16)
     COMBAT_MISSILE_BITMAP_TYPE = BITMAP_TYPE_MEMORY
 H2_ENUM_CLASS_END_T(BitmapType, i16)
 
-#pragma pack(push, 1) // recovered layout is byte-packed
+#pragma pack(push, 1)
 class bitmap : public resource {
 public:
-    // --- members (offsets from Ghidra this+off access-analysis; widths are
-    // access-widths, NOT confirmed types; refine during byte-matching) ---
-    // (vptr auto-emitted at 0x00; own data starts at 0x04)
-    BitmapType m_bitmapType; // +0x10  bitmap storage/drawing type
-    i16 m_width;             // +0x12
-    i16 m_height;            // +0x14
-    u8* m_pixels;            // +0x16  pixel data
-    // --- constructors ---
+    BitmapType m_bitmapType;
+    i16 m_width;
+    i16 m_height;
+    u8* m_pixels;
     bitmap(void);
     bitmap(BitmapType, i16, i16);
     bitmap(u32l);
     __declspec(dllexport) virtual inline ~bitmap();
-    // --- methods ---
     void DrawToBufferCareful(i16, i16);
     __declspec(dllexport) inline void DrawToBuffer(i16, i16);
     void DrawToScreen(i16, i16);
@@ -40,4 +33,4 @@ public:
 };
 #pragma pack(pop)
 SIZE(bitmap, 0x1a);
-#endif // HOMM2_BASE_BITMAP_H
+#endif

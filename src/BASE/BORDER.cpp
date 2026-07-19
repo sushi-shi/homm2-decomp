@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_RE\BORDER.OBJ   from: .\basewin.lib
-// functions: 8   data: 1
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <BASE/border.h>
 #include <BASE/widgetKind.h>
@@ -20,12 +15,6 @@ border::border(void) : widget(0, 0, 0, 0, 0, 0) {
     m_fillColor = 0;
 }
 
-// Generated-alias checkpoint: candidate emits a 0x1f ??_G with 2 relocations that
-// calls the exact standalone destructor; each retail ??_E is 0x4d with 7 relocations
-// and inlines both resource disposals plus widget::~widget. Inlining border::~border
-// recovers that alias body but removes the mapped standalone ??1. This is a real
-// emission tradeoff, not a relocation artifact; preserve the exact standalone body.
-// VA(0x004d20e0, 0x4d) ??_E/??_G border deleting-destructor aliases
 
 VA(0x004d2130, 0x64)
 border::border(i16 x, i16 y, i16 w, i16 h, i16 e, i16 f, i16 fillColor, char* name)
@@ -75,13 +64,7 @@ void border::Read(void) {
     m_fillColor = gpResourceManager->ReadWord() & 0xFF;
 }
 
-// @semantic
-// The shared WidgetKind header invalidates the former raw-exact TU state. Both
-// sections remain 0x181 bytes with 9/9 relocations and matching external calls;
-// explicit-range comparison differs only at +0x78 and +0x7b, where the equivalent
-// signed comparison uses the opposite CMP/branch orientation. Enum tag, include
-// position, semantic enumerator-name variants, and a retail-shaped negative hit-test
-// rejection did not change these bytes.
+// @semantic: differs only at +0x78 and +0x7b, where the equivalent signed comparison uses the opposite CMP/branch orientation.
 VA(0x004d22f0, 0x181)
 i32 border::Main(struct tag_message& msg) {
     i16 flags = m_flags;
@@ -167,10 +150,5 @@ void border::Draw(void) {
     }
 }
 
-// ===== vtable border : public widget  (3 slots) =====
-//  [ 0] VA(0x004d2480, 0xab)  void border::Draw(void)   <- override (implements widget pure virtual)
-//  [ 1] VA(0x004d20e0, 0x4d)  void * border::scalar_dtor(unsigned int)   <- override (implements widget pure virtual)
-//  [ 2] VA(0x004d22f0, 0x181)  int border::Main(struct tag_message &)   <- override (implements widget pure virtual)
 
-// ---- vtables (compiler-emitted; census) ----
 VTBL(border, 0x004eba60);

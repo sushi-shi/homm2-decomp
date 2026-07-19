@@ -2,8 +2,6 @@
 #define HOMM2_NETBIOS_H
 
 #include <Ints.h>
-// Declarations of the free functions DEFINED in Netbios.cpp — the single home for these
-// symbols. Other TUs call them by including this header (no local externs).
 
 H2_ENUM_BEGIN(NetbiosSetupConstant)
     NETBIOS_INIT_UNAVAILABLE = 1,
@@ -51,7 +49,6 @@ i8 WaitForHost(void);
 i8 WaitForGuest(void);
 i32 nbnet_init(void);
 
-// ---- globals (declarations, RVA order) ----
 extern i8 iInitNetHostStatus;
 extern i8 iInitNetGuestStatus;
 extern i32 iNameRetryCount;
@@ -59,4 +56,4 @@ extern i8 iWaitForHostStatus;
 extern i8 iWaitForGuestStatus;
 extern i32 iLastBroadcastTime;
 
-#endif // HOMM2_NETBIOS_H
+#endif

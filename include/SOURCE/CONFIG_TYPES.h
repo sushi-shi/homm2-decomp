@@ -3,8 +3,6 @@
 
 #include <va.h>
 
-// gConfig - game/editor preferences persisted to the registry. Field names are the
-// retail registry value names recovered from ReadPrefsFromRegistry/WritePrefsToRegistry.
 #pragma pack(push, 1)
 struct exeGfxConfig {
     i32 showMenu;
@@ -86,4 +84,4 @@ struct configStruct {
 SIZE(exeGfxConfig, CONFIG_GRAPHICS_SIZE);
 SIZE(configStruct, CONFIG_STRUCT_SIZE);
 
-#endif // HOMM2_SOURCE_CONFIG_TYPES_H
+#endif

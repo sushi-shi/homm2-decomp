@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_Re\SWAPMGR.OBJ   from: (directly linked into exe)
-// functions: 13   data: 1
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <BASE/message.h>
 #include <BASE/widget.h>
@@ -247,18 +242,7 @@ void swapManager::DrawSelector(void) {
     }
 }
 
-// @semantic
-// Complete 0xaf0 body, 0x28 frame/slots, source CFG, and all 71 ordered relocation
-// sites/effective targets align. Fifty-six identities agree literally; two are
-// equivalent string owners and thirteen are delinked local table labels. The
-// embedded pointer/index tables and their eleven resolved body offsets agree.
-// Outside table data, twelve branch bytes differ at +0x29a/+0x29b, +0x2f9/+0x2fa,
-// +0x43c/+0x43d, +0x49b/+0x49c, +0x60b/+0x60c, and +0x7d9/+0x7da: retail's six
-// completed dialog/view arms jump directly to the shared post-command block,
-// while ours first reaches the matching case-local tail. An explicit shared goto
-// grew the case layout and shifted later relocations, so it was rejected. Ten
-// bounded TU-state trials also failed to close the residual. Revisit after an
-// earlier SWAPMGR/header change or new evidence for case-exit lowering.
+// @semantic: branch/code-shape residual.
 VA(0x00454be3, 0xaf0)
 i32 swapManager::Main(tag_message& message) {
     i32 closeRequested_5 = 0;
@@ -953,10 +937,5 @@ void swapManager::SplitMons(void) {
     }
 }
 
-// ===== vtable swapManager : public baseManager  (3 slots) =====
-//  [ 0] VA(0x00454502, 0x3bc)  int swapManager::Open(int)   <- override (implements baseManager pure virtual)
-//  [ 1] VA(0x004548be, 0x12d)  void swapManager::Close(void)   <- override (implements baseManager pure virtual)
-//  [ 2] VA(0x00454be3, 0xaf0)  int swapManager::Main(struct tag_message &)   <- override (implements baseManager pure virtual)
 
-// ---- vtables (compiler-emitted; census) ----
 VTBL(swapManager, 0x004eb650);

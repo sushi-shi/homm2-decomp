@@ -2,18 +2,14 @@
 #define HOMM2_COMWIN_H
 #include <windows.h>
 #include <va.h>
-// Declarations of the free functions DEFINED in comwin.cpp — the single home for these
-// symbols. Other TUs call them by including this header (no local externs).
 
-// The intrusive linked-list node + its anchor. init_anchor zeroes anchor[+0] and anchor[+4]
-// (reversed from its disassembly), so the anchor is two node pointers (head/tail). The node's
-// link pointers occupy +0/+4; nb_rcv reads a payload length at +8 and the payload bytes at +0xb.
+// Intrusive-list anchors store the tail before the head.
 struct tag_Node {
-    struct tag_Node* prev; // +0x00
-    struct tag_Node* next; // +0x04
-    u16 len;               // +0x08  payload length
+    struct tag_Node* prev;
+    struct tag_Node* next;
+    u16 len;
     union {
-        u8 comData[1]; // +0x0a COM payload (variable length)
+        u8 comData[1];
         struct {
             u8 sessionIndex; // NetBIOS session table index
             u8 data[1];      // NetBIOS payload (variable length)
@@ -45,13 +41,13 @@ H2_ENUM_CLASS_BEGIN(ComBaudRate)
 H2_ENUM_CLASS_END(ComBaudRate)
 
 struct ComPortState {
-    HANDLE handle;              // +0x00
-    u8 reserved04[4];           // +0x04
-    DCB savedState;             // +0x08
-    COMMTIMEOUTS savedTimeouts; // +0x24
-    u8 reserved38[0x18];        // +0x38
-    tag_Anchor normalQueue;     // +0x50
-    tag_Anchor priorityQueue;   // +0x58
+    HANDLE handle;
+    u8 reserved04[4];
+    DCB savedState;
+    COMMTIMEOUTS savedTimeouts;
+    u8 reserved38[0x18];
+    tag_Anchor normalQueue;
+    tag_Anchor priorityQueue;
 };
 SIZE(ComPortState, 0x60);
 
@@ -67,4 +63,4 @@ i16 __cdecl com_sess(i32, i32, ...);
 u8 com_stat(i16, u16);
 void comm_wrt_task(void);
 
-#endif // HOMM2_COMWIN_H
+#endif

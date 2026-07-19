@@ -1,9 +1,6 @@
 #ifndef HOMM2_SOURCE_ARMYGROUP_H
 #define HOMM2_SOURCE_ARMYGROUP_H
-// Reconstructed class (SOURCE) from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// 13 methods, 0 own-virtual, 0 static data.
 #include <va.h>
-// forward declarations:
 class hero;
 class town;
 
@@ -16,24 +13,19 @@ H2_ENUM_BEGIN(ArmyGroupConstant)
     ARMY_GROUP_MORALE_MAX = 3
 H2_ENUM_END(ArmyGroupConstant)
 
-#pragma pack(push, 1) // recovered layout is byte-packed
+#pragma pack(push, 1)
 class armyGroup {
 public:
-    // --- members (offsets from Ghidra this+off access-analysis; widths are
-    // access-widths, NOT confirmed types; refine during byte-matching) ---
-    // NOTE: sparse this-access recovery (few/no this-relative probes).
     union {
-        i8 m_creatureTypes[ARMY_GROUP_SLOT_COUNT]; // +0x00
+        i8 m_creatureTypes[ARMY_GROUP_SLOT_COUNT];
         i8 m_troopTypes[ARMY_GROUP_SLOT_COUNT];
     };
     union {
-        i16 m_creatureCounts[ARMY_GROUP_SLOT_COUNT]; // +0x05
+        i16 m_creatureCounts[ARMY_GROUP_SLOT_COUNT];
         u16 m_troopCounts[ARMY_GROUP_SLOT_COUNT];
         i16 m_quantities[ARMY_GROUP_SLOT_COUNT];
     };
-    // --- constructors ---
     armyGroup(void);
-    // --- methods ---
     void View(i32);
     i32 HasAllUndead(void);
     i32 HasSomeUndead(void);
@@ -49,4 +41,4 @@ public:
 };
 #pragma pack(pop)
 SIZE(armyGroup, 0xf);
-#endif // HOMM2_SOURCE_ARMYGROUP_H
+#endif

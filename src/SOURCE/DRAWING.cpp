@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_Re\DRAWING.OBJ   from: (directly linked into exe)
-// functions: 13   data: 2
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -54,15 +49,6 @@ void combatManager::CheckUpdateCombatMessages(void) {
         CombatMessage("", 1, 0, 1);
 }
 
-// @match-note
-// Complete semantics and CFG; frame matches retail at 0x1bc and all 38
-// relocations align. After three compiler-local literal identities, the first
-// code difference is instruction 121: ours loads message and emits
-// cmp [newlinePtr],eax/jbe, while retail loads newlinePtr and emits
-// cmp [message],eax/jae. Spelling the test as message < newlinePtr compiled
-// identically; the De Morgan polarity regressed to 99.418500%, and an explicit
-// shared-branch form regressed to 95.872246%. Revisit only after relevant
-// DRAWING source, TU/header, or comparison-state changes.
 VA(0x00402a88, 0x3f8)
 void combatManager::CombatMessage(char* message, i32 updateScreen, i32 retainPrevious, i32 clear) {
     char* newlinePtr;
@@ -152,14 +138,7 @@ void combatManager::CombatMessage(char* message, i32 updateScreen, i32 retainPre
     gbLimitToExtent = savedLimitToExtent;
 }
 
-// @semantic: Current DRAWING.cpp/header epoch: complete semantics, case order,
-// 0x18 frame/slots, 0x3fe extent, CFG, and all 58 ordered external relocations.
-// First residual is instruction 15 (+0x33): retail evaluates m_currentArmySide
-// before m_currentArmyIndex, while base evaluates the equivalent array expression
-// index first; later disassembly loses sync only at the embedded switch table.
-// Direct indexing, typed row-base-plus-index, and array-decay-plus-index spellings
-// compile identically. This body was raw-byte exact before the corrected monster
-// flag view changed TU-cumulative state; do not restore that invalid alias.
+// @semantic: First residual is instruction 15 (+0x33): retail evaluates m_currentArmySide before m_currentArmyIndex.
 VA(0x00402e80, 0x3fe)
 void combatManager::CombatMessage(i32 messageType) {
     army* currentArmyPtr;
@@ -328,11 +307,7 @@ void combatManager::SetupGridForArmy(army* armyPtr) {
     }
 }
 
-// @semantic
-// Complete 0x5fb body, frame/slots, CFG, and all 15 ordered relocations agree.
-// The outer army-side qualification fixes the address arithmetic. Remaining
-// +0x17d/+0x18c and +0x242/+0x251 bytes reverse m_gridState and
-// m_previousGridState loads; qualifying the current-state lvalues was neutral.
+// @semantic: compiler-shape residual.
 VA(0x00403621, 0x5fb)
 i32 combatManager::UpdateGrid(i32 resetGridDisplay, i32 rebuildGrid) {
     i32 retval;
@@ -476,10 +451,7 @@ CopyGridState:
 }
 
 // @early-stop
-// @early-stop-reloc-only: Current DRAWING.cpp/header epoch: all 0x364 bytes match
-// after masking 42 ordered relocation sites. The only raw-object residuals are
-// three compiler-local string identities ($SG35159/$SG35161/$SG35165 versus
-// retail $SG35157/$SG35159/$SG35163); frame, slots, operands, and CFG are exact.
+// @early-stop-reloc-only: relocation naming only.
 VA(0x00403c1c, 0x364)
 void combatManager::DrawBackground(void) {
     icon* backgroundIcon;
@@ -777,24 +749,7 @@ void combatManager::UpdateMouseGrid(i32 hexIndex, i32 forceUpdate) {
     m_mouseGridHex = hexIndex;
 }
 
-// @semantic: Current DRAWING.cpp/header epoch: complete draw order, castle switch,
-// and moat early-exit CFG.
-// The 0xdc frame, every named/compiler slot and EBP reference count, and all 164
-// external relocations match.  After excluding the 0x91-byte switch tables, both
-// streams contain 1230 instructions; ours has 5379 code bytes versus retail's 5376.
-// The first opcode-order residual is instruction 156: fixed-side hero frames
-// evaluate sprite/frame/state, while retail uses sprite/state/frame;
-// enum-indexed direct arrays compile the same.
-// Flat-pointer and flat-index hero forms regressed to 98.22%/97.93% before the last
-// shared TU-state change. At instruction 984 ours emits jl plus two immediate scope
-// thunks, while retail emits jle and places two thunks after the first moat arm.
-// Ten distinct attempts are exhausted: direct enum-indexed hero arrays; flat-pointer
-// and flat-index hero forms; structured and goto forms for each of walkingFrom >,
-// walkingFrom <=, and walkingTo < walkingFrom; and the final fingerprinted
-// match_variants relational commute `giWalkingTo >= giWalkingFrom`, which was
-// byte-neutral at 99.347140%, size 5954, and 164/164 relocations. Delinked gConfig
-// fields and jump-table locals resolve to the same retail addresses. Revisit only
-// after relevant DRAWING source, TU/header, or comparison-state changes.
+// @semantic: first opcode-order residual is instruction 156: fixed-side hero frames evaluate sprite/frame/state.
 VA(0x004045cc, 0x173f)
 void combatManager::DrawFrame(
     i32 updateScreen,
@@ -1295,14 +1250,7 @@ finish:
     PollSound();
 }
 
-// @semantic: Current DRAWING.cpp/header epoch: complete semantics/CFG, exact 0x7c
-// frame and live stack slots, and all 100 ordered relocations. Proven unused words
-// at -0x6c and -0x74 restore retail's frame without changing behavior. The first
-// non-local residual is instruction 778 (+0xa50): base loads spellSlot and emits
-// `cmp visibleSpellCount5,eax; jle`, while retail loads the count and emits the
-// equivalent `cmp spellSlot,eax; jge`; the streams then realign. Direct `<`,
-// commuted `>`, negated `>=`, explicit-break, and slot-neutral index/count names
-// were tried. Five earlier residual rows are compiler-local string identities.
+// @semantic: first non-local residual is instruction 778 (+0xa50): base loads spellSlot and emits cmp visibleSpellCount5,eax.
 VA(0x00405d0b, 0xb99)
 void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
     i32 iconX;
@@ -1689,12 +1637,5 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
     gbInDrawSmallView = false;
 }
 
-// @data-layout-note Retail initialized storage is 0xed22c+0x80. Candidate
-// .data is 0x7f: its 19 private literals and these two public zero definitions
-// form a relocation-proved permutation whose payloads all match retail. All 26
-// retail HIGHLOW references into the contribution are owned, every candidate
-// data reference pairs at the same function-relative site, and every reference
-// uses addend zero. The sole uncovered extent is one terminal zero alignment
-// byte at +0x7f; do not model it as invented storage.
 DATA(0x004ed25c) i32 bGridWasShowing = 0;
 DATA(0x004ed290) b32 gbInDrawSmallView = false;

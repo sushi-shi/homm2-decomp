@@ -1,10 +1,7 @@
 #ifndef HOMM2_SOURCE_HIGHSCOREMANAGER_H
 #define HOMM2_SOURCE_HIGHSCOREMANAGER_H
-// Reconstructed class (SOURCE) from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// 5 methods, 3 own-virtual, 0 static data.
 #include <va.h>
 #include "../BASE/baseManager.h"
-// forward declarations:
 struct tag_message;
 class heroWindow;
 
@@ -50,25 +47,19 @@ H2_ENUM_BEGIN(HighScoreManagerConstant)
     HIGH_SCORE_MANAGER_CLOSE = 2
 H2_ENUM_END(HighScoreManagerConstant)
 
-#pragma pack(push, 1) // recovered layout is byte-packed
+#pragma pack(push, 1)
 class highScoreManager : public baseManager {
 public:
-    // --- members (offsets from Ghidra this+off access-analysis; widths are
-    // access-widths, NOT confirmed types; refine during byte-matching) ---
-    // (derived: base baseManager = 0x36 bytes at 0x00 via ': public baseManager'; own fields below)
-    i16 m_animationFrames[HIGH_SCORE_DISPLAY_ENTRY_COUNT]; // +0x36
-    i16 m_monsterTypes[HIGH_SCORE_DISPLAY_ENTRY_COUNT];    // +0x4a
-    char m_showCampaignScores;                             // +0x5e
-    heroWindow* m_window;                                  // +0x5f
-    // --- constructors ---
+    i16 m_animationFrames[HIGH_SCORE_DISPLAY_ENTRY_COUNT];
+    i16 m_monsterTypes[HIGH_SCORE_DISPLAY_ENTRY_COUNT];
+    char m_showCampaignScores;
+    heroWindow* m_window;
     highScoreManager(void);
-    // --- virtual methods (vtable order) ---
     virtual i32 Open(i32) OVERRIDE;
     virtual void Close(void) OVERRIDE;
     virtual i32 Main(struct tag_message&) OVERRIDE;
-    // --- methods ---
     void Update(void);
 };
 #pragma pack(pop)
 SIZE(highScoreManager, 0x63);
-#endif // HOMM2_SOURCE_HIGHSCOREMANAGER_H
+#endif

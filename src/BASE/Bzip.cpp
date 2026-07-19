@@ -1,25 +1,17 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_RE\Bzip.obj   from: .\basewin.lib
-// functions: 88   data: 32
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
-#include <BASE/Bzip.h> // bzip types/records + this TU's free-function decls
-#include <BASE/Misc.h> // LogStr, BaseAlloc, BaseFree, Random
-#include <SOURCE/KB.h> // FileError
+#include <BASE/Bzip.h>
+#include <BASE/Misc.h>
+#include <SOURCE/KB.h>
 #include <io.h>
 #include <fcntl.h>
-#include <sys/stat.h>        // _open, _write, _close
+#include <sys/stat.h>
 #include <stdio.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 
-// Bzip has the string ops inlined (retail endsInBz/compress use repne scasb +
-// rep movs, not calls), so intrinsics are on for this TU.
 #pragma intrinsic(strcpy, strcat, strlen, memcpy)
 
-// bzip-0.21 types/records live in BASE/Bzip.h (included above). Body-only macros stay here.
 #define True 1
 #define False 0
 #define ERROR_IF_EOF(i)                                                                            \
@@ -38,8 +30,6 @@
             ioError();                                                                             \
     }
 
-// The #define constants below keep their spellings from the ancestral bzip
-// sources this TU derives from; do not convert them to the enum-domain style.
 #define TWO_TO_THE(n) (1 << (n))
 #define MAX_BITS_OUTSTANDING 500000000
 #define smallB 26
@@ -151,12 +141,6 @@ DATA(0x00537024) FILE* outputHandleJustInCase;
 #define GETFIRST16(a) ((UInt32)(words[a] >> 16))
 #define GETREST16(a) (words[a] & 0x0000ffff)
 
-// (Bzip's own free-function declarations are in BASE/Bzip.h; the externs they used —
-// gText, LogStr, BaseAlloc, BaseFree, FileError, Random — come from Misc.h/KB.h/_globals.h;
-// _open/_write/_close from <io.h>.)
-// NWC wraps malloc/free in BaseAlloc/H2_FREE_AT(ptr, __FILE__, __LINE__). __FILE__ is
-// the original build path (reloc-masked); __LINE__ immediates are hardcoded from the
-// retail disasm since our line layout differs.
 #define RETAIL_FILE const_cast<char*>("I:\\Projects\\Heroes\\Prog\\BASE\\Bzip.cpp")
 
 VA(0x004d4050, 0x1a)
@@ -328,7 +312,7 @@ void arithCodeStartDecoding(BitStream* bs) {
 
 VA(0x004d4600, 0x16)
 void arithCodeDoneDecoding(BitStream* bs) {
-    /*--- No action necessary. ---*/
+
 }
 
 VA(0x004d4620, 0x98)
@@ -348,9 +332,7 @@ void arithCodeRenormalise_Encode(BitStream* bs) {
     }
 }
 
-// @early-stop
-// Relocation-masked instructions are byte-identical and all eight effective targets agree;
-// the sole residual is the delinked panic-string symbol identity ($SG3428 vs $SG3417).
+// @early-stop: delinker artifact.
 VA(0x004d46c0, 0xd7)
 void arithCodeSymbol(BitStream* bs, Model* m, Int32 symbol) {
     UInt32 cumulativeLow8, cumulativeHigh2, totalFrequency14, rangeWidth29, rangeProduct8;
@@ -378,9 +360,7 @@ void arithCodeSymbol(BitStream* bs, Model* m, Int32 symbol) {
         panic(const_cast<char*>("arithCodeSymbol: too many bits outstanding"));
 }
 
-// @early-stop
-// All 85 instructions agree and both objects contain the same 11 relocation targets;
-// the remaining report residual is delinked local-label/padding identity metadata.
+// @early-stop: retail alignment artifact.
 VA(0x004d47a0, 0xfe)
 Int32 arithDecodeSymbol(BitStream* bs, Model* m) {
     UInt32 cumulativeLow7, scaledTarget1, cumulativeHigh1, totalFrequency13, rangeWidth28,
@@ -560,11 +540,7 @@ void dumpAllModelStats(void) {
     dumpModelStats(&models[MODEL_128_255]);
 }
 
-// @early-stop
-// The explicit 0x153-byte range is raw-byte exact after masking the union of the 28
-// aligned relocation fields.  The only identity differences are models interior aliases
-// and the embedded 0x2c-byte jump table's local labels; effective targets/addends agree.
-// Retail's next-public row has one alignment NOP at +0x153, outside this function range.
+// @early-stop: delinker jump-table artifact.
 VA(0x004d4e90, 0x153)
 Int32 getMTFVal(BitStream* bs) {
     Int32 retVal;
@@ -772,17 +748,13 @@ Int32 NORMALISE(Int32 p) {
     );
 }
 
-// @early-stop
-// All 22 instructions and both lastPP+0 relocations agree; the retained residual is
-// local-label/padding identity outside the executable instruction stream.
+// @early-stop: retail alignment artifact.
 VA(0x004d57d0, 0x36)
 Int32 NORMALISEHI(Int32 p) {
     return IF_THEN_ELSE(((p) >= OD_STEER(lastPP)), ((p)-lastPP), (p));
 }
 
-// @early-stop
-// All 20 instructions and the lastPP+0 relocation agree; the retained residual is
-// local-label/padding identity outside the executable instruction stream.
+// @early-stop: retail alignment artifact.
 VA(0x004d5810, 0x31)
 Int32 NORMALISELO(Int32 p) {
     return IF_THEN_ELSE(((p) < 0), (((p) | 0) + lastPP), (p));
@@ -824,9 +796,7 @@ void sendZeroes(BitStream* outStream, Int32 zeroesPending) {
     }
 }
 
-// @early-stop
-// All 106 instructions, the 0x120 frame, and all 13 effective relocation targets/addends
-// agree; the retained residual is delinked local-label identity metadata.
+// @early-stop: delinker artifact.
 VA(0x004d5930, 0x189)
 void moveToFrontCodeAndSend(BitStream* outStream, Bool thisIsTheLastBlock) {
     UChar yy[256];
@@ -966,9 +936,7 @@ void copyOffsetWords(void) {
         words[lastPP + i] = words[i];
 }
 
-// @early-stop
-// All 113 instructions and all ten effective relocation targets/addends agree; the
-// retained residual is delinked local-label identity metadata.
+// @early-stop: delinker artifact.
 VA(0x004d5e80, 0x172)
 Bool fullGt(Int32 i1, Int32 i2) {
     Int32 i1orig = i1;
@@ -1026,11 +994,7 @@ Bool fullGt(Int32 i1, Int32 i2) {
         zptr[RC(zr)] = zt;                                                                         \
     }
 
-// @semantic
-// The recovered 0x1b0 frame, sorting CFG, and all 44 effective relocations agree.  The
-// first structural residual is +0x18: candidate initializes [ebp-8], retail [ebp-0xc0];
-// the resulting local/macro-temporary slots remain a compiler-shape wall. No speculative
-// slot renaming was retained; revisit only with a complete retail role-to-slot map.
+// @semantic: first structural residual is +0x18: candidate initializes [ebp-8], retail [ebp-0xc0].
 VA(0x004d6000, 0x548)
 void qsortFull(Int32 left, Int32 right) {
     Int32 pivot, v;
@@ -1132,9 +1096,7 @@ Bool trivialGt(Int32 i1, Int32 i2) {
     return False;
 }
 
-// @early-stop
-// All 88 instructions, the 0x1c frame, and all seven effective relocation targets/addends
-// agree; the retained residual is delinked local-label identity metadata.
+// @early-stop: delinker artifact.
 VA(0x004d6610, 0x10f)
 void shellTrivial(void) {
     Int32 i, j, h, bigN;
@@ -1164,11 +1126,7 @@ void shellTrivial(void) {
     } while (h != 1);
 }
 
-// @semantic
-// The trivial/graded BWT paths, 0x3c frame, five grade ranges, CFG, and all 68 effective
-// relocations agree. Three global/local loop comparisons were steered exactly with OD_STEER(i).
-// The first remaining raw-code divergence is +0xdf: candidate i is [ebp-8], retail
-// [ebp-0xc]; nested-scope slots and the 0x14-byte grade jump table remain compiler shape.
+// @semantic: first remaining raw-code divergence is +0xdf: candidate i is [ebp-8], retail [ebp-0xc].
 VA(0x004d6720, 0x434)
 void sortIt(void) {
     lastPP = last + 1;
@@ -1507,9 +1465,7 @@ Bool loadAndRLEsource(FILE* src) {
     return (currentChar == MY_EOF);
 }
 
-// @early-stop
-// All 125 instructions, the 0x28 frame, and all 15 effective relocation targets/addends
-// agree; the retained residual is delinked local-label identity metadata.
+// @early-stop: delinker artifact.
 VA(0x004d7290, 0x18d)
 void unRLEandDump(FILE* dst, Bool thisIsTheLastBlock) {
     IntNative retVal;
@@ -1558,10 +1514,7 @@ void unRLEandDump(FILE* dst, Bool thisIsTheLastBlock) {
         unblockError();
 }
 
-// @early-stop
-// Relocation-masked instructions, the 0x34 frame, CFG, and all 79 effective targets agree.
-// Residuals are local string/constant identities and the __adjust_fdiv alias for retail's
-// ?iLeftRightSave+0x10; the resolved addresses and owner-relative values are identical.
+// @early-stop: byte-proven compiler artifact.
 VA(0x004d7420, 0x2e6)
 void compressStream(FILE* stream, FILE* zStream) {
     IntNative retVal;
@@ -1642,9 +1595,7 @@ void compressStream(FILE* stream, FILE* zStream) {
     }
 }
 
-// @early-stop
-// Relocation-masked instructions, the 0x30 frame, CFG, and all 56 effective targets/addends
-// agree; the retained residual is seven delinked local-string identities.
+// @early-stop: delinker artifact.
 VA(0x004d7710, 0x26e)
 Bool uncompressStream(FILE* zStream, FILE* stream) {
     Bool thisIsTheLastBlock;
@@ -1871,9 +1822,7 @@ void compressOutOfMemory(Int32 draw, Int32 blockSize) {
     cleanUpAndFail();
 }
 
-// @early-stop
-// The explicit 0x83-byte range is raw-byte exact and has no relocations.  Retail's
-// next-public row contributes one alignment NOP at +0x83, outside this function range.
+// @early-stop: retail alignment artifact.
 VA(0x004d7cd0, 0x83)
 Bool endsInBz(Char* name) {
     Int32 n = strlen(name);
@@ -1882,9 +1831,7 @@ Bool endsInBz(Char* name) {
     return (name[n - 3] == '.' && name[n - 2] == 'n' && name[n - 1] == 'w');
 }
 
-// @early-stop
-// Relocation-masked instructions, the 0x14 frame, file CFG, and all 16 effective targets
-// agree; the retained residual is the delinked .nw/rb/wb literal identities.
+// @early-stop: delinker artifact.
 VA(0x004d7d60, 0xe2)
 void compress(Char* name) {
     FILE* inStr;
@@ -1906,9 +1853,7 @@ void compress(Char* name) {
     retVal = remove(inName);
 }
 
-// @early-stop
-// Relocation-masked instructions, the 0x1c frame, file CFG, and all 19 effective targets
-// agree; only local literal identities and the equivalent outName-3 alias remain.
+// @early-stop: byte-proven compiler artifact.
 VA(0x004d7e50, 0x110)
 void uncompress(Char* name) {
     FILE* inStr;
@@ -1933,10 +1878,7 @@ void uncompress(Char* name) {
     ERROR_IF_NOT_ZERO(retVal);
 }
 
-// @early-stop
-// Relocation-masked instructions, the 0x1f0 frame, file CFG, and all 28 effective targets
-// agree. Residuals are local literals and _open/_write/_close import-name aliases that
-// resolve to the same retail addresses with zero addends.
+// @early-stop: byte-proven compiler artifact.
 VA(0x004d7f60, 0x2d5)
 i32l EncodeData(char* dst, char* src, u32l srcLen) {
     char fname[450] = {0};
@@ -1979,10 +1921,7 @@ i32l EncodeData(char* dst, char* src, u32l srcLen) {
     return flen;
 }
 
-// @early-stop
-// Relocation-masked instructions, the 0x1f4 frame, file CFG, and all 26 effective targets
-// agree. Residuals are local literals and _open/_write/_close import-name aliases that
-// resolve to the same retail addresses with zero addends.
+// @early-stop: byte-proven compiler artifact.
 VA(0x004d8240, 0x2f3)
 i32l DecodeData(char* dst, char* src, u32l srcLen) {
     char fname[450] = {0};
@@ -2025,27 +1964,6 @@ i32l DecodeData(char* dst, char* src, u32l srcLen) {
     return flen;
 }
 
-// @data-layout-note
-// Retail `.rdata` and candidate ordinal 5 are byte-exact at 0xeba88+0x18.
-// Retail initialized storage is 0x11ff50+0xd70; candidate ordinal 2 is a
-// byte-exact 0xd6f-byte prefix followed by one retail zero padding byte. Its
-// six DATA definitions and 77 private allocations therefore have exact
-// owner RVAs, extents, payloads, and section offsets.
-//
-// Retail loader-zero storage is 0x134ed0+0x31b0, while the hash-ordered
-// candidate COMMON contribution is 0x2da8. All 26 real definitions have
-// exact public/source anchors. The retail-only gaps are 0x134eec+0x4,
-// 0x13742c+0x4, 0x137c5c+0x3fc, and the terminal 0x13807c+0x4. The only
-// HIGHLOW target inside a gap is uncompress+0x87: candidate and retail both
-// encode outName-3, yielding 0x13742d. It is not a separate allocation. The
-// unreferenced 0x3fc interval remains unresolved; do not add padding, aliases,
-// guessed buffers, or section pragmas for any of these gaps.
-//
-// Ordered Bzip-owned relocation targets are exact in 67 of 69 referencing
-// functions (414 references). getMTFVal has 1 candidate versus 8 retail model
-// references and sortIt has 23 versus 35; those residuals belong to their
-// incomplete function structure, not to data ownership or layout.
-// ---- globals (definitions, RVA order) ----
 DATA(0x00534ee4) i32 longestFileName;
 DATA(0x00534ee8) i32 opMode;
 DATA(0x00537028) char inName[1024];

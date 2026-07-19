@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_Re\tradpost.obj   from: (directly linked into exe)
-// functions: 6   data: 15
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <stdio.h>
 #include <BASE/heroWindow.h>
@@ -54,17 +49,7 @@ void DoTradingPost(i32 isMarketplace, float efficiency) {
     delete tpWindow;
 }
 
-// @semantic
-// Complete text, control-state, offer-icon, ratio, and knob CFG;
-// the 0x3c frame and all recovered local slots agree. Candidate span is 0x597
-// versus 0x596 retail code, with 312/312 non-jump instructions and 23/23 jumps.
-// The visible residual is the selected-resource compare loading the loop local
-// before the global instead of after it. All 112 relocations agree as a multiset;
-// ordered review has five commutative swapped pairs (three left/right validity
-// tests and two qty/ratio products). Reversing those expressions was byte-identical;
-// the De Morgan selection predicate worsened block order. Ten reviewed depth-one
-// commutative/relational AST variants did not improve the raw match. Revisit after TU-state
-// changes or a new structural discovery.
+// @semantic: residual is the selected-resource compare loading the loop local before the global instead of after it.
 VA(0x004bf4a5, 0x596)
 void UpdateTradingPost(i32 draw) {
     tag_message messageTemp;
@@ -236,13 +221,7 @@ void ComputeTradeRatios(
     }
 }
 
-// @semantic
-// Exact 0x90 frame, stack slots, 0x148 extent, CFG/semantics, and 22/22 external
-// relocations. The sole residual starts at +0x67: ours loads iMaxUnitsToTrade,
-// compares qtyToTrade, and uses jle; retail loads qtyToTrade, compares
-// iMaxUnitsToTrade, and uses jge. Reversing the comparison, an explicit empty
-// positive arm, `qtyToTrade | 0`, and the zero-index SIB spelling compiled the
-// same or added a jump. Revisit only after TU-state changes.
+// @semantic: sole residual starts at +0x67: ours loads iMaxUnitsToTrade, compares qtyToTrade, and uses jle.
 VA(0x004bfb39, 0x148)
 void DoTradeKnob(struct tag_message message) {
     tag_message nextMessage;
@@ -284,16 +263,7 @@ void SetupNewTrade(void) {
     );
 }
 
-// @semantic
-// Complete nested select/deselect switches, case-body order,
-// 0x20 frame, stack slots, and embedded pointer/index tables. Both object spans
-// are 0x3b8 (retail code 0x3b6); excluding table data leaves 154/154 non-jump
-// instructions and 25/25 jumps. The four residual sites are commuted comparisons:
-// the upper clamp, left and right resource selection, and increment bound.
-// All 51 relocations agree as a multiset; ordered review has four swapped external
-// pairs (clamp, two qty/ratio products, increment), while local-table spellings are
-// delinker aliases. Direct commuted spellings and ten reviewed depth-one
-// commutative/relational AST variants compiled byte-identically. Revisit after TU-state changes.
+// @semantic: stack-slot/code-shape residual.
 VA(0x004bfcbb, 0x3b6)
 i32 TradingPostHandler(struct tag_message& message) {
     i32 exitFlag = 0;
@@ -399,7 +369,6 @@ i32 TradingPostHandler(struct tag_message& message) {
     return IDX(TRADING_POST_HANDLER_CONTINUE);
 }
 
-// ---- globals (definitions, RVA order) ----
 DATA(0x0051d9d0) u16 coreRatio[TRADING_POST_RESOURCE_COUNT] = {250, 500, 250, 500, 500, 500, 1};
 DATA(0x00533170) class iconWidget* tradeKnob;
 DATA(0x00533174) i32 qtyToTrade;

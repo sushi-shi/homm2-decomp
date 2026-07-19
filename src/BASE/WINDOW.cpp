@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_RE\WINDOW.OBJ   from: .\basewin.lib
-// functions: 15   data: 0
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
@@ -243,8 +238,6 @@ VA(0x004cf500, 0x116)
 void heroWindow::RemoveWidget(class widget* w) {
     if (w == 0)
         return;
-    // Retail call VA 0x004cf51e resolves to CodeView widget::Close at 0x004dded0;
-    // both retail and candidate Close bodies are the same lone C3.
     w->Close();
     if (m_widgetListTail == w) {
         m_widgetListTail = w->m_prev;

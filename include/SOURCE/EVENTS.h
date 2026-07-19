@@ -3,9 +3,6 @@
 
 #include <Ints.h>
 #include <SOURCE/KB_TYPES.h>
-// Declarations of the free functions DEFINED in EVENTS.cpp — the single home for these
-// symbols. Other TUs call them by including this header (no local externs).
-// forward declarations (was <_all.h>):
 class hero;
 
 H2_ENUM_BEGIN(EventConstant)
@@ -467,4 +464,4 @@ i32 GiveArtifact(class hero*, ArtifactType, b32, i8);
 void GiveTakeArtifactStat(class hero*, ArtifactType, b32);
 i32 RiddleStringsEqual(char*, char*);
 
-#endif // HOMM2_EVENTS_H
+#endif

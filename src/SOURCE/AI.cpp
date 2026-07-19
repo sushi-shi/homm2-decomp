@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_Re\AI.OBJ   from: (directly linked into exe)
-// functions: 19   data: 0
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <string.h>
 #include <SOURCE/CMBTMGR.h>
@@ -19,14 +14,7 @@
 #include <SOURCE/searchArray.h>
 #include <SOURCE/town.h>
 
-// @semantic: semantics, CFG, the 0x168 frame/local slots, and all 29/29
-// effective relocation targets agree. The first code difference is at +0x8ad:
-// ours emits `fcom retreatChance; fstp retreatThreshold`, while retail emits
-// `fst retreatThreshold; fcomp retreatChance`. Assignment-in-condition, split
-// assignment, reversed relation, scalar-SIB lvalues, and four bounded TU-state
-// probes did not improve it. Anonymous floating constants differ only in
-// compiler-counter names; retail also delinks __adjust_fdiv as an interior
-// iLeftRightSave alias. Revisit after a material AI TU/header-state change.
+// @semantic: compiler-shape residual.
 VA(0x004c0790, 0x8d7)
 i32 combatManager::AICheckRetreat(void) {
     if (m_combatTowns[m_currentSide] != 0)
@@ -174,14 +162,7 @@ i32 combatManager::AICheckRetreat(void) {
     return 0;
 }
 
-// @semantic: the complete 0xb4 frame, local slots, behavior, and all 92/92
-// ordered relocation targets agree. Both sides have 923 non-jump instructions;
-// remaining non-jump differences are operand order at +0x25c in the five-mask
-// OR and +0x5bf in a strength comparison. Retail has 27 additional five-byte
-// /Ob1 continuation jumps. Right-nesting the OR was best; left association and
-// OR-chaining the independent AttemptAttack guards regressed. Typed flattened
-// army indexing fixed six address blocks. Four bounded TU-state probes did not
-// improve the canonical score. Revisit after a material AI TU/header change.
+// @semantic: evaluation-order residual.
 VA(0x004c1067, 0x129c)
 void combatManager::DoCompAI(i32) {
     u32l shooterStrengths37[COMBAT_AI_SIDE_COUNT];
@@ -491,10 +472,7 @@ finish:
     }
 }
 
-// @semantic
-// Shared enum declaration state changed the x87 compare/store order at +0x37:
-// ours uses fst/fcomp where retail uses fcom/fstp. Frame, CFG, operands, and
-// external relocations remain aligned; revisit during the byte-last-mile pass.
+// @semantic: compiler-shape residual.
 VA(0x004c2303, 0xc9)
 float combatManager::GetModLichDamage(class army* target, float damage) {
     float modifiedDamage = damage;
@@ -871,11 +849,7 @@ i32 combatManager::AttemptAttack(class army* currentArmy, i32 side, i32 mask) {
     return 0;
 }
 
-// @early-stop
-// All 99 non-jump opcodes/operands, the 0x20 frame/local slots, CFG, and all
-// 6/6 ordered external relocations agree. Retail is exactly five bytes larger:
-// its sole residual is one /Ob1 continuation `jmp` at +0x16f before false return;
-// four bounded TU-state probes produced no exact closure.
+// @early-stop: byte-proven compiler artifact.
 VA(0x004c3468, 0x182)
 i32 combatManager::AttemptAdjacentAttack(class army* currentArmy) {
     u32 availableMask4 = ~currentArmy->GetAttackMask(currentArmy->m_hex, 1, -1);
@@ -968,10 +942,7 @@ i32 combatManager::WalkTowardArmyFront(class army* currentArmy, i32 side, i32 ma
     return WalkTowardArmy(currentArmy, side, mask);
 }
 
-// @semantic: Complete 0x2c frame, slots, path/CFG behavior, and ordered external
-// relocations. The first residual at +0x34 is equivalent two-dimensional army
-// indexing: retail scales targetArmy before side, candidate scales side first.
-// Direct indexing, cached target pointer, and commuted address forms were tried.
+// @semantic: first residual at +0x34 is equivalent two-dimensional army indexing: retail scales targetArmy before side.
 VA(0x004c382a, 0x244)
 i32 combatManager::WalkTowardArmy(class army* currentArmy, i32 side, i32 mask) {
     i32 targetArmy6;

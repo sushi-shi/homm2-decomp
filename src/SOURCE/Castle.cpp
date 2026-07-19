@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE - NOT original source.
-// compiland: .\Win32_Re\Castle.obj   from: (directly linked into exe)
-// functions: 2   data: 3
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <BASE/message.h>
 #include <BASE/BITS.h>
@@ -332,16 +327,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
     }
 }
 
-// @semantic: Semantics/CFG complete; frame 0x38 and all named/compiler slots match.
-// First divergence at +0x16e: retail loads gpTownManager before message.id for the
-// m_lastHoverId comparison; swapping operands and a gpTownManager pointer barrier
-// emit the same base order. All 165 external relocation identities agree. Retail
-// jump tables are +5c9/10, +60a/24, +aef/10, +b2b/24; base tables are +5c7/10,
-// +603/24, +af4/10, +b30/24. Reordering Grouped before Spread aligns the second
-// table's case-body identities; all four tables now preserve the same normalized
-// case multiplicities/destinations under accumulated code-size shifts. Early-goto
-// command CFG was also tried and regressed layout. Revisit after a material Castle
-// predecessor/header or comparison-tool change.
+// @semantic: First divergence at +0x16e: retail loads gpTownManager before message.id for the m_lastHoverId comparison.
 VA(0x0041e0fb, 0xca3)
 i32 CastleHandler(tag_message& message) {
     i32 result;
@@ -706,7 +692,6 @@ selection_done:
     return 2;
 }
 
-// ---- globals (definitions, RVA order) ----
 DATA(0x004ef5e0) u8 castleSlotsBase[CASTLE_SLOT_COUNT] =
     {19, 20, 21, 22, 23, 24, 0, 2, 1, 3, 7, 10, 4, 11, 13, 8, 9, 12};
 DATA(0x00525040) heroWindow* casWin;

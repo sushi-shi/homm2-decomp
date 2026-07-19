@@ -1,9 +1,6 @@
 #ifndef HOMM2_SOURCE_STRIP_H
 #define HOMM2_SOURCE_STRIP_H
-// Reconstructed class (SOURCE) from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// 5 methods, 0 own-virtual, 0 static data.
 #include <va.h>
-// forward declarations:
 class armyGroup;
 class border;
 class heroWindow;
@@ -34,25 +31,24 @@ H2_ENUM_BEGIN(StripConstant)
     STRIP_QUANTITY_BACKGROUND = 2
 H2_ENUM_END(StripConstant)
 
-#pragma pack(push, 1) // recovered layout is byte-packed
+#pragma pack(push, 1)
 class strip {
 public:
-    heroWindow* m_window; // +0x00
+    heroWindow* m_window;
     char m_unused04[0x18];
-    i32 m_x;                                          // +0x1c
-    i32 m_y;                                          // +0x20
-    i32 m_stripType;                                  // +0x24
-    i32 m_selectedSlot;                               // +0x28
-    border* m_borders[STRIP_BORDER_COUNT];            // +0x2c
-    icon* m_stripIcon;                                // +0x44
-    icon* m_creatureIcons[STRIP_ARMY_SLOT_COUNT];     // +0x48
-    i32 m_cachedCreatureTypes[STRIP_ARMY_SLOT_COUNT]; // +0x5c
-    icon* m_portraitIcon;                             // +0x70
-    icon* m_flagIcon;                                 // +0x74
-    i32 m_portraitFrame;                              // +0x78
-    i32 m_flagFrame;                                  // +0x7c
-    armyGroup* m_army;                                // +0x80
-    // --- constructors ---
+    i32 m_x;
+    i32 m_y;
+    i32 m_stripType;
+    i32 m_selectedSlot;
+    border* m_borders[STRIP_BORDER_COUNT];
+    icon* m_stripIcon;
+    icon* m_creatureIcons[STRIP_ARMY_SLOT_COUNT];
+    i32 m_cachedCreatureTypes[STRIP_ARMY_SLOT_COUNT];
+    icon* m_portraitIcon;
+    icon* m_flagIcon;
+    i32 m_portraitFrame;
+    i32 m_flagFrame;
+    armyGroup* m_army;
     strip(
         i32 x,
         i32 y,
@@ -65,11 +61,10 @@ public:
         i32 flagFrame
     );
     ~strip();
-    // --- methods ---
     void Draw(void);
     void DrawIcons(i32);
     void DrawFrame(void);
 };
 #pragma pack(pop)
 SIZE(strip, 0x84);
-#endif // HOMM2_SOURCE_STRIP_H
+#endif

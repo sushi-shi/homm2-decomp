@@ -2,9 +2,6 @@
 #define HOMM2_OVERVIEW_H
 
 #include <Ints.h>
-// Declarations of the free functions DEFINED in Overview.cpp — the single home for these
-// symbols. Other TUs call them by including this header (no local externs).
-// forward declarations (was <_all.h>):
 struct tag_message;
 class iconWidget;
 class textWidget;
@@ -92,4 +89,4 @@ H2_ENUM_END(OverviewUiConstant)
 
 i32 OverviewHandler(struct tag_message&);
 
-#endif // HOMM2_OVERVIEW_H
+#endif

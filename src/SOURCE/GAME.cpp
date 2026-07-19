@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_Re\GAME.OBJ   from: (directly linked into exe)
-// functions: 99   data: 26
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <SOURCE/PHILAI.h>
 #include <SOURCE/philAI.h>
@@ -51,31 +46,9 @@
 #include <SOURCE/ARMY.h>
 #include <SOURCE/kbwin.h>
 
-// EventExtra/SThievesData live in SOURCE/GAME.h.
 
-// GAME's BaseAlloc/BaseFree pass __FILE__ + a source line number. The retail
-// encodes the base line as a 2-byte string read via movswl, then adds a per-call
-// delta; reproduce byte-exactly. __FILE__ is the original build path (reloc-masked).
-// @data-layout-note Retail's initialized GAME contribution is
-// 0xf70e0..0xf80b8 (0xfd8); candidate .data is 0xfd6. Its 204 definitions are
-// closed one-to-one as 17 source DATA owners plus 187 private allocations. Every
-// private payload is byte-exact, has one candidate code reference, and maps to a
-// disjoint retail extent. Fourteen typed short line-base owners leave their
-// natural two-byte alignment halves unowned; bMapInitialized leaves three bytes,
-// and retail has a six-byte terminal zero tail. Those 0x25 bytes are the complete
-// initialized-storage residual. ViewArmy and CreateJoinFile require distinct
-// local bases at 0xf7388 and 0xf7bc4; sharing the save/diff bases incorrectly hid
-// two referenced retail owners. The 0xb8 rdata group and all 23 BSS owners are
-// also closed. Do not add padding, aliases, synthetic owners, or section pragmas
-// to force physical allocation order.
 DATA(0x004f70e0) b32 gbGameOver = false;
-// PROVEN /Gi artifact: the retail TU was built with MSVC 4.2 incremental
-// compilation, under which __LINE__ is not an immediate - the compiler emits a
-// per-function static i16 __LINE__Var (movsx + add offset at each use) so
-// incremental rebuilds can patch line numbers in data. The original source was
-// plain __LINE__; these statics pin retail's anchor values because our file's
-// physical line numbers differ. Do not fold the base+offset sums into literals -
-// the memory reference is part of the byte proof. (Probe: CL /Od /Gi vs /Od.)
+// Fixed source-file and line anchors preserve allocation diagnostics.
 DATA(0x004f70e4) static i16 gSaveSourceLine = 0x294;
 DATA(0x004f71a8) static i16 gLoadSourceLine = 0x44f;
 DATA(0x004f7274) static i16 gMapSourceLine = 0xaf4;
@@ -87,7 +60,6 @@ DATA(0x004f7f84) static i16 gCompressTestSourceLine = 0x1f95;
 
 #define RETAIL_FILE const_cast<char*>("I:\\Projects\\Heroes\\Prog\\SOURCE\\GAME.CPP")
 
-// GAME-private tuning and encoding constants.
 H2_ENUM_BEGIN(GameTuningConstant)
     RANDOM_SCAN_RETRY_LIMIT = 10000,
     EXPERIENCE_HERO_PRESENCE_BONUS = 500,
@@ -109,17 +81,8 @@ H2_ENUM_BEGIN(ViewArmyControlId)
     VIEW_ARMY_UPGRADE_ID = 0x7803
 H2_ENUM_END(ViewArmyControlId)
 
-// Retail's original source passed plain __FILE__/__LINE__ here: under /Od /Gi,
-// MSVC 4.2 lowers __LINE__ to a compiler-synthesized per-function static i16
-// anchor (?__LINE__Var@...) loaded with movsx and offset with add — that is the
-// entire origin of the retail "line base" words. The DATA statics above stand
-// in for that synthesized storage; call sites pass the resulting retail line
-// numbers as literals.
-// Retail folds the embedded member offset into Row/Extra accesses after inlining.
 #define WORLDMAP (&m_worldMap)
 
-// Inline accessors that reference gpGame directly (the retail emits `add [gpGame]`
-// + a per-call `jmp $+0`), so they are free inline helpers, not game methods.
 inline town* GetCastle(i32 idx) {
     return gpGame->GetTown(idx);
 }
@@ -280,12 +243,7 @@ i32 game::MineTypesOwned(i32 owner, i32 resourceType) {
     return num;
 }
 
-// @early-stop
-// Complete semantics, CFG, frame/slots, and all 36 ordered relocation
-// sites/targets agree. The only unmasked bytes are branch displacements +0xa0
-// and +0x181: retail's early exits route through the +0x3fe return trampoline,
-// while base branches directly to the +0x408 epilogue. Revisit after a relevant
-// GAME predecessor/header change alters this local trampoline placement.
+// @early-stop: byte-proven compiler artifact.
 VA(0x004710f3, 0x40d)
 void ComputeUALoc(i32 player) {
     i32 result = gpGame->SetupPuzzlePieces(player, 1);
@@ -341,10 +299,7 @@ saveLocation:
 }
 
 // @early-stop
-// @early-stop-reloc-only
-// All 0x2ac relocation-masked bytes, the frame/slots/CFG, and all 25 ordered
-// relocation sites/effective targets agree. Objdiff spells retail's
-// __adjust_fdiv address as iLeftRightSave+0x10; both resolve to RVA 0x12126c.
+// @early-stop-reloc-only: relocation naming only.
 VA(0x00471500, 0x2ac)
 i32 game::SetupPuzzlePieces(i32 player, i32 justCount) {
     i32 pieceCountTotal = GetNumObelisks(player);
@@ -416,11 +371,7 @@ fullMap* game::GetWorldMapData(void) {
     return &m_worldMap;
 }
 
-// @semantic
-// The 0x11e frame, CFG, and all three ordered relocations match. Only 12 bytes at
-// +0xf5..+0x104 differ: retail preserves the packed cell word before shifting boatIdx,
-// while MSVC emits the equivalent RHS-first order here. Whole-word, cast, and |0 variants
-// did not steer it; revisit only after GAME's cumulative declaration state changes.
+// @semantic: compiler-shape residual.
 VA(0x0047187f, 0x11e)
 i32 game::CreateBoat(i32 x, i32 y, i32 notify) {
     i32 boatIdx = Scan(m_boatSlots, 0, GAME_BOAT_COUNT);
@@ -544,8 +495,7 @@ void GenerateStandardFileName(char* source, char* destination) {
     strcpy(destination + indexOut, extension);
 }
 
-// @early-stop
-// reloc-masked: identical 0xbc4-byte code/frame; 135/135 targets agree, only compiler literal/constant symbol identities differ
+// @early-stop: byte-proven compiler artifact.
 VA(0x00471eb7, 0xbc4)
 i32 game::SaveGame(char* filename, i32 generateName, i8 expansionFormat) {
     void* emptyPayload = H2_ALLOC(GAME_SAVE_BUFFER_SIZE, 670);
@@ -702,12 +652,7 @@ i32 game::SaveGame(char* filename, i32 generateName, i8 expansionFormat) {
     return 1;
 }
 
-// @early-stop
-// Complete semantics, frame, CFG, and all 75 external relocations agree after fixing
-// Sorceress Navigation and Warlock Scouting initialization. The only residual is six
-// instructions in the starting-stat loop: retail loads j before scaling i*100, while
-// this TU scales i before adding j. Split 4+1 fields, the contiguous five-byte array,
-// and `j[m_primaryStats]` all emit the same sequence; revisit on cumulative TU changes.
+// @early-stop: byte-proven compiler artifact.
 VA(0x00472a7b, 0xb44)
 void game::SetupOrigData(void) {
     ClearMapExtra();
@@ -1151,8 +1096,7 @@ void game::GiveTroopsToNeutralTowns(void) {
     }
 }
 
-// @early-stop
-// reloc-masked: identical 0x1dd0-byte instruction stream; 126/126 relocations, residual is compiler literal/global symbol identity
+// @early-stop: byte-proven compiler artifact.
 VA(0x00474678, 0x1dd0)
 void game::NewMap(char* filename) {
     char* extension0;
@@ -1519,8 +1463,7 @@ inline town* GetCastleSlot(game* instance, i32 index) {
     return &instance->m_castleRecs[index];
 }
 
-// @semantic
-// soft/TU-cumulative: frame 0x1d8 exact; base 0x25fe vs retail 0x2601. Residual is three MAP_WIDTH/xPos2 commutative compare encodings (+0x9d, +0x1db7, +0x1ee4; one byte each) and equal-length packed-m_objectMetadata RHS/cell-word evaluation order at +0x2e1; val|0, setter, union, cast, and bitfield-type spellings do not steer MSVC 4.2.
+// @semantic: three commutative MAP_WIDTH/xPos2 compare encodings remain.
 VA(0x00476448, 0x2601)
 void game::RandomizeEvents(void) {
     i32 shrineId8 = 1;
@@ -2185,8 +2128,7 @@ i32 game::LoadMap(char* filename) {
     return 0;
 }
 
-// @early-stop
-// reloc-masked: only two retail /Ob1 GetCell continuation jmps differ (5 bytes each)
+// @early-stop: byte-proven compiler artifact.
 VA(0x00478fea, 0x3aa)
 void game::ClaimTown(i32 townId, i32 player, i32 suppressVisibility) {
     i32 i;
@@ -2237,8 +2179,7 @@ void game::ClaimTown(i32 townId, i32 player, i32 suppressVisibility) {
     CheckEndGame(0, 0);
 }
 
-// @early-stop
-// reloc-masked: residual is the /Ob1 Row continuation plus delinked switch local-label identity
+// @early-stop: delinker artifact.
 VA(0x00479394, 0x4c2)
 void game::ClaimMine(i32 mineId, i32 player) {
     mapCell* acc;
@@ -2313,9 +2254,7 @@ void game::ClaimMine(i32 mineId, i32 player) {
     }
 }
 
-// @early-stop
-// Relocation-masked comparison is identical for the full 0x1e2-byte span;
-// both objects contain the same 16 relocation sites and objdiff reports 100%.
+// @early-stop: byte-proven compiler artifact.
 VA(0x00479856, 0x1e2)
 SpellType
 game::ViewSpells(hero* spellHero, i32 spellType, i32 (*callback)(tag_message&), i32 readOnly) {
@@ -2357,9 +2296,7 @@ game::ViewSpells(hero* spellHero, i32 spellType, i32 (*callback)(tag_message&), 
     return m_viewSpell;
 }
 
-// @early-stop
-// Relocation-masked comparison is identical for the full 0x403-byte span;
-// both objects contain the same 42 relocation sites and objdiff reports 100%.
+// @early-stop: byte-proven compiler artifact.
 VA(0x00479a38, 0x403)
 void game::UpdateSpellWidgets(void) {
     tag_message message9;
@@ -2459,14 +2396,7 @@ void game::UpdateSpellWidgets(void) {
     }
 }
 
-// @early-stop
-// Complete semantics, 0x18 frame/slots, CFG, and all 101 relocation
-// identities/counts/effective targets agree. At +0x27 retail uses the five-byte
-// absolute-EAX load for gpWindowManager before loading the hover id; base loads
-// the hover id first and needs a six-byte absolute-ECX load, making its body one
-// byte longer and shifting later relocation sites/local switch-table addends.
-// Reversing the source equality is byte-neutral. Revisit after a relevant GAME
-// predecessor/header change alters this TU-cumulative commutative load order.
+// @early-stop: byte-proven compiler artifact.
 VA(0x00479e3b, 0x692)
 i32 ViewSpellsHandler(tag_message& msg) {
     SpellType spell;
@@ -2645,11 +2575,7 @@ i32 ViewSpellsHandler(tag_message& msg) {
     return 1;
 }
 
-// @semantic
-// Manual relocation audit finds 35 sites in both objects. This body is 0x17d versus
-// retail's 0x17c solely because the commutative hover equality loads msg first into eax
-// (15 bytes) instead of the window manager first into eax (14 bytes); all later blocks
-// and the jump table realign. Both operand orders and exhaustive AST variants emit alike.
+// @semantic: jump-table placement residual.
 VA(0x0047a4cd, 0x17c)
 i32 ViewSpecialHandler(tag_message& msg) {
     if (msg.type == MESSAGE_MOUSE_MOVE) {
@@ -2958,8 +2884,7 @@ void game::ViewArmy(
 }
 
 // @early-stop
-// @early-stop-reloc-only: retail spells __adjust_fdiv as iLeftRightSave+0x10;
-// both resolve to RVA 0x12126c.
+// @early-stop-reloc-only: relocation naming only.
 VA(0x0047b2cf, 0x3f5)
 i32 ViewArmyHandler(tag_message& msg) {
     i32 goldCost6;
@@ -2968,7 +2893,6 @@ i32 ViewArmyHandler(tag_message& msg) {
 
     gbDismissArmy = false;
     gbUpgradeArmy = false;
-    // Retail reserves a second short word before the aligned upgrade-cost locals.
     i16 frameDelay0 = 5;
     i16 frameOffset1;
 
@@ -3092,9 +3016,7 @@ i32 ViewArmyHandler(tag_message& msg) {
     return 1;
 }
 
-// @early-stop
-// Relocation-masked comparison is identical for all 0x671 bytes (133 relocation
-// sites in both objects). The objdiff residual is delinked local-label identity.
+// @early-stop: delinker artifact.
 VA(0x0047b6c4, 0x671)
 i32 game::GetRandomNumTroops(i32 monsterType) {
     switch (monsterType) {
@@ -3247,11 +3169,7 @@ void game::TurnOffAIMusic(void) {
     gpSoundManager->m_samplesReady = 1;
 }
 
-// @semantic
-// The reconstructed body realigns after each of the first two flag clears and thereafter
-// matches instruction-for-instruction. Retail expands each clear into a 0x1e-byte longer
-// address/load/and/address/store sequence (114 relocations versus 112); direct, bitfield,
-// accessor, and volatile spellings either collapse it or over-expand it under this /Od TU.
+// @semantic: compiler-shape residual.
 VA(0x0047bd99, 0x596)
 void game::NextPlayer(void) {
     i32 humanCount;
@@ -3352,11 +3270,7 @@ void game::NextPlayer(void) {
         gpAdvManager->ForceNewHover();
 }
 
-// @early-stop
-// Logic, frame, slots, CFG, and all 25 relocations match. At +0x2b9 retail forms the
-// commutative hero-record address as `add eax,this; mov ecx,heroIndex`; this TU swaps
-// those two loads. `heroIndex[m_heroIds]` produced the same bytes; revisit only after
-// a cumulative GAME/header-state change.
+// @early-stop: byte-proven compiler artifact.
 VA(0x0047c32f, 0x432)
 i32 game::ComputeDailyGold(i32 player) {
     i32 heroIndex;
@@ -3417,10 +3331,7 @@ i32 game::ComputeDailyGold(i32 player) {
     return gold;
 }
 
-// @semantic
-// Frame/slots and 30 relocations are exact. The only residual is target 0x47ce94..0x47cec2:
-// the commutative handicap sum loads gpGame secondary income before this->primary income;
-// this partial /Od TU loads the same two operands in the opposite order, then realigns at fild.
+// @semantic: only residual is the commutative handicap sum at 0x47ce94..0x47cec2.
 VA(0x0047c761, 0x9aa)
 void game::PerDay(void) {
     i32 maxSpellPoints9;
@@ -3565,12 +3476,7 @@ void game::PerDay(void) {
     }
 }
 
-// @semantic
-// 99.09%: frame and control flow are byte-exact. The six hero-slot index residuals
-// differ only in when a commutative subtraction is issued, and the map-height loop
-// differs only in compare operand order; both are the documented TU-cumulative /Od
-// operand-order pattern. The other residuals are delinked switch labels/constants;
-// the full function has the retail 95 relocations and matching external targets.
+// @semantic: differs only in compare operand order; both are the documented TU-cumulative /Od operand-order pattern.
 VA(0x0047d10b, 0x199d)
 void game::PerWeek(void) {
     i32 heroClass18 = 0;
@@ -3817,10 +3723,7 @@ void game::PerWeek(void) {
     GiveTroopsToNeutralTowns();
 }
 
-// @early-stop
-// Relocation-masked raw bytes are exact across the 0x12d-byte body. All five
-// Random relocations agree; objdiff's 99.77% is only the six jump-table entries,
-// whose retail local labels are delinked as the containing function.
+// @early-stop: delinker jump-table artifact.
 VA(0x0047eaa8, 0x12d)
 void game::WeeklyRecruitSite(mapCell* cell) {
     i32 type = cell->m_objectMetadata;
@@ -3853,10 +3756,7 @@ void game::WeeklyRecruitSite(mapCell* cell) {
     cell->m_objectMetadata = packed | 0;
 }
 
-// @semantic
-// The complete 0x6f frame/CFG matches and neither side has relocations. The 12 bytes at
-// +0x30..+0x3f only reverse the equivalent packed-word/type evaluation order in case 4.
-// Whole-word, cast, and |0 variants did not steer it; revisit with new GAME TU state.
+// @semantic: evaluation-order residual.
 VA(0x0047ebd5, 0x6f)
 void game::WeeklyGenericSite(mapCell* cell) {
     i32 type = cell->m_objectMetadata;
@@ -3868,9 +3768,7 @@ void game::WeeklyGenericSite(mapCell* cell) {
     }
 }
 
-// @early-stop
-// Exact 0x375-byte body and 30 relocation sites. The typed dwelling/monster
-// references resolve to retail's folded 0x4fca35 and 0x4faeb7 local symbols.
+// @early-stop: byte-proven compiler artifact.
 VA(0x0047ec44, 0x375)
 void game::PerMonth(void) {
     mapCell* cell0;
@@ -3951,10 +3849,7 @@ void game::PerMonth(void) {
     gpAdvManager->CompleteDraw(0);
 }
 
-// @semantic
-// The complete control flow and both relocations align. The AST-permuted bounds spelling
-// improves the match to 99.19%: this 0x472-byte body materializes y + 1 with a one-byte inc,
-// while retail's 0x476-byte body compares y directly and retains a five-byte continuation.
+// @semantic: compiler-shape residual.
 VA(0x0047efb9, 0x476)
 void game::ConvertObject(
     i32 left,
@@ -4045,7 +3940,7 @@ void game::ConvertObject(
 
 VA(0x0047f42f, 0x1c2)
 void game::RandomizeTown(i32 x, i32 y, i32) {
-    i32 unused6[2]; // Two unaddressed words are present in the retail /Od frame.
+    i32 unused6[2];
     i32 townId0 = GetTownId(x, y);
     town* castle0 = GetTown(townId0);
     mapTownExtra* extra =
@@ -4113,11 +4008,7 @@ void game::RandomizeTown(i32 x, i32 y, i32) {
     m_castleRecs[townId0].m_type = static_cast<i8>(race0);
 }
 
-// @semantic
-// Exact 0x619-byte span and 22 relocation sites. The remaining /Od differences
-// are operand evaluation in the inlined GetCell(x + 1, ...) accessors and the
-// columnOffset + x expressions. Both operand spellings were tested unchanged;
-// the residual is TU-cumulative compiler state, not a behavioral difference.
+// @semantic: residual is TU-cumulative compiler state, not a behavioral difference.
 VA(0x0047f5f1, 0x619)
 void game::RandomizeMine(i32 x, i32 y) {
     u8 objectFrame1;
@@ -4250,12 +4141,7 @@ void game::RandomizeMine(i32 x, i32 y) {
     m_mines[mineId].resourceType = static_cast<i8>(mineType29);
 }
 
-// @semantic: Complete semantics/frame/CFG and all three external relocation
-// identities agree. The only structural residual is the outer width guard:
-// retail loads x then compares MAP_WIDTH with jle; base loads MAP_WIDTH then
-// compares x with jge. Reversed relational and OD_STEER(x) barrier forms were neutral,
-// and ten bounded TU-state probes did not close it. Revisit after a material
-// GAME predecessor/header or comparison-tool change.
+// @semantic: only structural residual is the outer width guard: retail loads x then compares MAP_WIDTH with jle.
 VA(0x0047fc0a, 0xc6)
 void game::InitRandomArtifacts(void) {
     i32 xx;
@@ -4343,12 +4229,7 @@ void game::RandomizeHeroPool(void) {
     }
 }
 
-// @semantic: Complete army-table semantics, frame/slots, CFG, and all three
-// external relocation identities agree. At +0x111 retail computes the strong-army
-// threshold before Random and compares threshold<=roll; base calls Random first
-// and emits the equivalent roll>=threshold. Reversing the source comparison was
-// byte-neutral; ten bounded TU-state probes found only disposable closures.
-// Revisit after a material GAME predecessor/header or comparison-tool change.
+// @semantic: compiler-shape residual.
 VA(0x004800a6, 0x378)
 void game::SetRandomHeroArmies(i32 heroId, i32 strongArmy) {
     armyGroup* army2 = &m_heroRecs[heroId].m_army;
@@ -4405,11 +4286,7 @@ void game::SetRandomHeroArmies(i32 heroId, i32 strongArmy) {
     }
 }
 
-// @semantic
-// The recovered 0x40 frame, switch bodies, CFG, and all 56 relocation semantics match.
-// Retail's MAP_HEIGHT and MAP_WIDTH loop tests are each one byte shorter: mov global;
-// cmp local; jge at +0x61/+0x7e, versus mov local; cmp global; jle here, making this body
-// 0x748 bytes. Reversed comparisons and |0 bounds did not steer either test.
+// @semantic: compiler-shape residual.
 VA(0x0048041e, 0x746)
 void game::ProcessRandomObjects(void) {
     i32 maxValue17;
@@ -4667,12 +4544,7 @@ void game::ProcessRandomObjects(void) {
     }
 }
 
-// @semantic
-// Logic and frame slots are byte-exact. The only residual is the TU-cumulative /Od
-// polarity/load order of cutoff <= visibility: retail emits cmp cutoff,visibility; jg,
-// while this partial TU emits the relationally equivalent cmp visibility,cutoff; jl.
-// Relational swaps, negation, an empty else arm, |0 steering, and the fixed AST permuter
-// do not alter it; the other loop/index order differences disappeared as header state landed.
+// @semantic: only residual is the TU-cumulative /Od polarity/load order of cutoff <= visibility: retail emits cmp cutoff,visibility.
 VA(0x00480b64, 0x230)
 void game::SetVisibility(i32 x, i32 y, i32 player, i32 radius) {
     i32 col;
@@ -4721,12 +4593,7 @@ void game::SetVisibility(i32 x, i32 y, i32 player, i32 radius) {
     }
 }
 
-// @semantic
-// Logic and frame slots are byte-exact; residual is three commutative operand-load swaps (the
-// inner-loop test y<MAP_HEIGHT and the two y*MAP_WIDTH index multiplies load the OTHER
-// operand into eax first). Not source-steerable (operand order / reversed compare /
-// extra temp all tested with no effect). Revisit after later GAME/header reconstruction
-// changes cumulative compiler state; do not retry those spellings before 95% total fuzzy.
+// @semantic: three commutative load-order residuals remain.
 VA(0x00480d94, 0xd8)
 void game::MakeAllWaterVisible(i32 player) {
     char mask = static_cast<char>(1 << player);
@@ -4768,10 +4635,7 @@ void game::GiveArmy(armyGroup* group, i32 type, i32 count, i32 slot) {
     group->m_creatureCounts[i] += count;
 }
 
-// @semantic
-// The 0x91 frame/CFG and gMonsterDatabase relocation match. Only the two ModRM bytes at
-// +0x41/+0x44 differ because retail loads i before group for the creature-type subscript.
-// Direct, commuted i[array], and earlier-expression steering did not hold in canonical TU state.
+// @semantic: compiler-shape residual.
 VA(0x00480f68, 0x91)
 i32 game::ExperienceValueOfStack(armyGroup* group, hero* h) {
     i32 exp = 0;
@@ -4818,11 +4682,7 @@ i32 game::GetLuck(hero* h, class army*, town* castle) {
     return luck;
 }
 
-// @semantic
-// Logic + frame slots byte-exact (col/row/mask + nested x/y land on retail's -0x4..-0x14
-// via the {} block); residual is the same TU-cumulative /Od eval-order parity as
-// MakeAllWaterVisible - the inner-loop test and the y*MAP_WIDTH multiplies load the other
-// operand first. Aligns when GAME is fuller.
+// @semantic: TU-cumulative /Od evaluation-order residual.
 VA(0x0048111f, 0xf1)
 void game::SetupAdjacentMons(void) {
     i32 col;
@@ -4924,11 +4784,7 @@ void game::WaitForPlayer(char* text, i32 player) {
     }
 }
 
-// @early-stop
-// Computation byte-exact; residual is 2 inline-accessor jmp$+0 brackets the /Ob1
-// expander places leading (after the ternary test) where retail places them trailing
-// (after the Extra() body) - the documented /Od /Ob1 block-boundary artifact, identical
-// in kind to EDITOR/mapcell GetNewCellExtra*. See docs/patterns/inline-accessors.md.
+// @early-stop: inline continuation artifact.
 VA(0x00481541, 0x104)
 i32 game::HasLateOverlay(i32 col, i32 row) {
     mapCell* cell = WORLDMAP->Row(row) + col;
@@ -4943,10 +4799,7 @@ i32 game::HasLateOverlay(i32 col, i32 row) {
     return 0;
 }
 
-// @early-stop
-// Instruction stream, frame slots, and traversal are byte-exact after excluding two
-// five-byte Extra() inline continuation jumps. Both jumps exist on each side, but C2
-// places ours trailing and retail's leading; there are no relocations in either function.
+// @early-stop: inline continuation artifact.
 VA(0x00481645, 0x120)
 void game::ConvertFlagToLateOverlay(i32 col, i32 row) {
     mapCell* cell = WORLDMAP->Row(row) + col;
@@ -4960,10 +4813,7 @@ void game::ConvertFlagToLateOverlay(i32 col, i32 row) {
     }
 }
 
-// @early-stop
-// Instruction stream, frame slots, and traversal are byte-exact after excluding two
-// five-byte Extra() inline continuation jumps. Both jumps exist on each side, but C2
-// places ours trailing and retail's leading; there are no relocations in either function.
+// @early-stop: inline continuation artifact.
 VA(0x00481765, 0x13b)
 i32 game::HasObjectTilesetIndex(i32 col, i32 row, i32 tileset, i32 index) {
     mapCell* cell = WORLDMAP->Row(row) + col;
@@ -4978,10 +4828,7 @@ i32 game::HasObjectTilesetIndex(i32 col, i32 row, i32 tileset, i32 index) {
     return 0;
 }
 
-// @early-stop
-// Twin of HasLateOverlay: computation byte-exact; only the 2 inline-accessor jmp$+0
-// brackets (Extra()) are placed leading vs retail's trailing - the same /Od /Ob1
-// block-boundary artifact. See docs/patterns/inline-accessors.md.
+// @early-stop: inline continuation artifact.
 VA(0x004818a0, 0x112)
 void game::ConvertAllToLateOverlay(i32 col, i32 row) {
     mapCell* cell = WORLDMAP->Row(row) + col;
@@ -4995,13 +4842,7 @@ void game::ConvertAllToLateOverlay(i32 col, i32 row) {
     }
 }
 
-// @semantic
-// Logic is complete. The residual is one coupled TU-cumulative /Od lowering choice:
-// retail evaluates the packed m_objectMetadata lvalue first and reserves two hidden temporary words;
-// this partial TU evaluates townId first and omits them. The same parity flips the three
-// inner MAP_WIDTH comparisons. Direct packed-word spellings, |0 steering, relational
-// swaps, and the fixed AST permuter did not reproduce the retail field-first lowering;
-// anonymous source padding would conceal rather than reconstruct this compiler state.
+// @semantic: residual is one coupled TU-cumulative /Od lowering choice.
 VA(0x004819b2, 0x295)
 void game::ProcessMapExtra(void) {
     i32 row;
@@ -5048,10 +4889,7 @@ void game::ProcessMapExtra(void) {
     }
 }
 
-// @early-stop
-// reloc-masked: identical frame/instruction stream and all 39 relocation sites align.
-// Retail folds gDwellingType, gMonsterDatabase, gSpellLimits, and gsSpellInfo to
-// field/addend aliases; their effective addresses are identical.
+// @early-stop: byte-proven compiler artifact.
 VA(0x00481c47, 0x900)
 void game::SetupTowns(void) {
     DATA(0x004f756c) static i16 setupTownsSourceLineBase = 0x17f9;
@@ -5253,11 +5091,7 @@ void game::SetupTowns(void) {
     }
 }
 
-// @semantic
-// The recovered mapHeroExtra offsets, 0x7c frame, CFG, and all 23 relocation semantics
-// match. Retail's MAP_HEIGHT/MAP_WIDTH tests load each global first at +0x44/+0x61;
-// this TU loads each local first, making the body 0x776 versus retail's 0x774. Reversed
-// comparisons and |0 bounds did not steer them; the remaining $SG spelling is compiler-local.
+// @semantic: compiler-shape residual.
 VA(0x00482547, 0x774)
 void game::ProcessOnMapHeroes(void) {
     DATA(0x004f7598) static i16 processOnMapHeroesSourceLineBase = 0x18ef;
@@ -5440,10 +5274,7 @@ void game::ProcessOnMapHeroes(void) {
     }
 }
 
-// @semantic
-// Frame layout and all seven relocations are exact. The 0x8-byte size residual is one
-// five-byte inlined hero-bounds continuation plus three bytes of equivalent commutative
-// packed-record index arithmetic; every ownership, repair, and army check realigns.
+// @semantic: inline-continuation and packed-record load-order residual.
 VA(0x00482cbb, 0x55e)
 void game::CheckHeroConsistency(void) {
     hero* mapHero3;
@@ -5556,13 +5387,7 @@ void game::CheckHeroConsistency(void) {
 #define samplesReady samplesReady1
 #define success success14
 
-// @early-stop
-// Complete 0x71e body, 0x208 frame/slots, CFG, semantics, and all 94 ordered
-// relocation sites/targets agree. Five operand bytes differ:
-// +0x524/+0x527/+0x529 reverse packet/batch-bound loads, and +0x640/+0x643
-// reverse fileData/transmitData equality loads. Both source operand orders emit
-// identically. Revisit after a relevant GAME predecessor/header change alters
-// these TU-cumulative commutative choices.
+// @early-stop: byte-proven compiler artifact.
 VA(0x00483219, 0x71e)
 i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
     i32 success;
@@ -5792,12 +5617,7 @@ transmitCleanup:
 #define samplesReady samplesReady0
 #define success success15
 
-// @semantic: Complete receive/decompress/write/cleanup semantics, 0x1e4 frame,
-// CFG, and all 102 ordered relocation sites/effective targets agree. The only
-// unmasked bytes are +0x5bc/+0x5bf: decodedData/incomingData equality loads use
-// opposite stack operands. Reversing the source equality was byte-neutral; ten
-// bounded TU-state probes found only sibling-rejected disposable closures.
-// Revisit after a material GAME predecessor/header or comparison-tool change.
+// @semantic: compiler-shape residual.
 VA(0x00483937, 0x68d)
 i32 game::ReceiveSaveGame(
     i32 dataSize,
@@ -6115,10 +5935,7 @@ i32 game::GetBoatsBuilt(void) {
     return count;
 }
 
-// @semantic
-// Complete logic and frame; the sole relocation agrees. The canonical player layout
-// leaves an operand-order residual: retail forms i + color * sizeof(playerData), while
-// this TU forms color * sizeof(playerData) + i. Keep the retained maximum.
+// @semantic: compiler-shape residual.
 VA(0x00484471, 0x9c)
 i32 game::GetNumThievesGuilds(i32 color) {
     i32 num = 0;
@@ -6156,9 +5973,7 @@ i32 game::CalcDifficultyRating(void) {
     return rating;
 }
 
-// @early-stop
-// The frame and every non-jump instruction/operand match. Retail is exactly 45 bytes
-// longer: nine five-byte local continuation/trampoline jumps; no jump table is present.
+// @early-stop: delinker jump-table artifact.
 VA(0x00484620, 0x1ea)
 i32 CalcBaseScore(i32 days) {
     i32 score = GAME_SCORE_BASE;
@@ -6193,12 +6008,7 @@ i32 CalcBaseScore(i32 days) {
     return score;
 }
 
-// @early-stop
-// Complete semantics, 0x8 frame/slots, CFG, and all four ordered relocation
-// sites/targets agree. The only unmasked byte is +0x80: base's empty-town arm
-// jumps directly to the epilogue at +0xa9, while retail routes through its
-// trailing +0xa9 jump at +0xae. Revisit after a relevant GAME predecessor/header
-// change alters this local trampoline placement.
+// @early-stop: byte-proven compiler artifact.
 VA(0x0048480a, 0xb5)
 void game::RestoreCell(i32 x, i32 y, i32 obj, i32 barrier, mapCell* passedCell, i32 p6) {
     mapCell* cell;
@@ -6216,12 +6026,7 @@ void game::RestoreCell(i32 x, i32 y, i32 obj, i32 barrier, mapCell* passedCell, 
     }
 }
 
-// @semantic
-// Frame, reinit, realloc, and all 23 relocations agree. The first divergence is the
-// height equality's commutative load order; retail also retains two redundant jumps
-// for the empty then-branch: an end-of-function trampoline and a dead `jmp realloc`
-// while this build collapses to one direct jump. Both equality operand orders and named
-// source-line offsets were tried; revisit for inline/jump placement after 95%.
+// @semantic: first divergence is the height equality's commutative load order.
 VA(0x004848bf, 0xe3)
 void game::SetMapSize(i32 w, i32 h) {
     DATA(0x004f7a0c) static i16 setMapSizeSourceLineBase = 0x1d0d;
@@ -6238,12 +6043,7 @@ void game::SetMapSize(i32 w, i32 h) {
     memset(mapExtra, 0, MAP_WIDTH * MAP_HEIGHT);
 }
 
-// @semantic
-// Logic + frame slots byte-exact; residual is the operand-eval order of the two
-// `flags |= <extracted len bits>` ORs: retail loads `flags` into al first (then keeps
-// len in ecx and pulls the shifted byte via ch), my build evaluates the value first and
-// ORs flags from memory. Same TU-cumulative /Od eval-order parity as MakeAllWaterVisible;
-// not source-steerable. Aligns when GAME is fuller.
+// @semantic: residual is the operand-eval order of the two flags |= <extracted len bits> ORs.
 VA(0x004849a2, 0x100)
 void WriteDiffHeaderInfo(u8 cmd, i32 len, u8* buf, i32* pos) {
     u8 flags = 0;
@@ -6290,11 +6090,7 @@ i32 GetSkipCopyLen(u8* buf, i32* pos) {
     return len;
 }
 
-// @early-stop
-// The 0x44-byte frame and all 83 relocations are exact. Retail retains one additional
-// five-byte local jump at +0x5ae (0x5ba versus 0x5b5); explicit return and continue
-// spellings are folded by this /Od TU, while all allocation, CRC, diff, write, and cleanup
-// paths realign around the delinked local-label placement.
+// @early-stop: delinker artifact.
 VA(0x00484b4d, 0x5ba)
 void CreateDiffFile(
     char* oldName,
@@ -6304,7 +6100,6 @@ void CreateDiffFile(
     i32 forceWhole
 ) {
     u8* diffData6;
-    // Retail's debug frame contains two otherwise unused words before joinData29.
     i32 unusedFirst0;
     i32 unusedSecond4;
     u8* joinData29;
@@ -6444,12 +6239,7 @@ void CreateDiffFile(
     return;
 }
 
-// @semantic: Complete join-file semantics, frame/slots, CFG, and all 77 ordered
-// relocation sites/effective targets agree. The only unmasked bytes are
-// +0x1ea/+0x1ed/+0x1ef: the diffSize/position loop comparison uses reversed
-// operands and branch polarity. Reversed relational and OD_STEER(position) forms were
-// neutral; ten bounded TU-state probes did not produce an admissible closure.
-// Revisit after a material GAME predecessor/header or comparison-tool change.
+// @semantic: branch/code-shape residual.
 VA(0x00485107, 0x3ce)
 void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
     DATA(0x004f7bc4) static i16 createJoinFileSourceLineBase = 0x1e0f;
@@ -6628,7 +6418,6 @@ void game::SetupNewRumour(void) {
         ultimateRumour:
             category10 = Random(0, 100);
             if (category10 < 33) {
-                // Retail uses the X coordinate for both threshold axes.
                 if (!(m_mapHeader.width * 0.33 <= m_ultimateArtifactX
                       || m_mapHeader.height * 0.33 <= m_ultimateArtifactX)) {
                     direction9 = 7;
@@ -6689,9 +6478,7 @@ EventExtra* GetMapEvent(i32 x, i32 y) {
     return 0;
 }
 
-// @semantic
-// Frame/CFG/logic match. Only +0xc..+0x37 (calendar term register order) and
-// +0x19d..+0x286 (four equivalent player-resource address orders) are TU-cumulative.
+// @semantic: compiler-shape residual.
 VA(0x00485e07, 0x34c)
 void game::CheckForTimeEvent(void) {
     i32 dayNumber6;
@@ -6764,10 +6551,7 @@ void game::CheckForTimeEvent(void) {
     }
 }
 
-// @semantic
-// The 0x143 frame/loops and all eight ordered relocations match; 17 raw bytes at
-// +0xc5..+0xe8 are only the equivalent packed expression heroIndex + player * 283.
-// Direct, commuted, accessor, and AST variants did not steer it.
+// @semantic: compiler-shape residual.
 VA(0x00486153, 0x143)
 void CheckValidAvailableHeroes(void) {
     i32 candidatePlayer0;
@@ -6808,9 +6592,7 @@ i32 CalcFileCRC(char* filename) {
     return crc;
 }
 
-// @semantic
-// All bytes except +0x8d..+0x99 match; /Od reverses the equivalent index/size
-// loop-test load order and branch polarity. Relational and AST variants did not steer it.
+// @semantic: evaluation-order residual.
 VA(0x00486341, 0x153)
 void CompressTest2(void) {
     i32 dataSize2;
@@ -6899,11 +6681,7 @@ void CompressTest3(void) {
     }
 }
 
-// @semantic: Complete shrine-count semantics, frame/slots, CFG, and all four
-// relocation identities agree. Base retains one extra local continuation jump
-// before the building-mask load; later relocation sites shift accordingly and
-// then realign. Ten bounded TU-state probes were neutral. Revisit after a
-// material GAME predecessor/header or comparison-tool change.
+// @semantic: compiler-shape residual.
 VA(0x004866a5, 0x119)
 i32 game::CountShrines(i32 player) {
     if (xIsExpansionMap == 0)
@@ -6930,7 +6708,6 @@ i32 game::CountShrines(i32 player) {
     return count;
 }
 
-// ---- remaining globals (retail RVA order) ----
 DATA(0x004f7550) i8 giMonType[] = {
     IDX(CREATURE_PEASANT),
     IDX(CREATURE_TROLL),
@@ -6946,18 +6723,6 @@ DATA(0x004f7550) i8 giMonType[] = {
     IDX(CREATURE_LICH)
 };
 DATA(0x004f7a08) char bMapInitialized = 0;
-// @data-layout-note Retail's loader-zero GAME contribution is
-// 0x1280e8..0x1284b4 (0x3cc); candidate .bss is 0x3b4. All 23 public
-// definitions have recovered types, logical extents, and S_PUB32 RVAs. Retail
-// lays them out in RVA order, while VC4.2 emits the candidate in identifier-hash
-// order; the same objects occupy 0x18 fewer bytes only because their natural
-// alignment holes differ. In particular, retail ViewArmy references prove
-// sViewArmyMonFrameInfo +0x65 and +0x175, replacing the former fake initialized
-// byte arrays. Reordering definitions, first extern declarations, and owner
-// headers leaves the candidate BSS order unchanged. No retail reference proves
-// missing storage in the residual holes. Revisit only with evidence for the
-// original common/section topology; do not introduce padding variables,
-// compatibility aliases, or section pragmas to force the retail order.
 DATA(0x005280e8) i32 iViewArmyNumTroops;
 DATA(0x005280ec) i8* gbNGHeroType;
 DATA(0x005280f8) SMonFrameInfo sViewArmyMonFrameInfo;

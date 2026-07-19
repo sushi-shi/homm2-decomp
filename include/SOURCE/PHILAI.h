@@ -2,8 +2,6 @@
 #define HOMM2_PHILAI_TU_H
 #include <va.h>
 #include <SOURCE/KB_TYPES.h>
-// AI view/record structs + free functions DEFINED in PHILAI.cpp — single home.
-// forward declarations (was <_all.h>):
 class army;
 class hero;
 class playerData;
@@ -11,10 +9,10 @@ class searchArray;
 class town;
 
 struct BHC {
-    town* pTown; // 0x00
-    i32 type;    // 0x04  (0=building, 1=hero, 2=creature)
-    i32 what;    // 0x08
-    i32 num;     // 0x0c
+    town* pTown;
+    i32 type;
+    i32 what;
+    i32 num;
 };
 
 H2_ENUM_BEGIN(AIResourceValue)
@@ -422,8 +420,6 @@ H2_ENUM_END(AITownEvaluationConstant)
 #define AI_SEA_CHEST_MINIMUM_VALUE 150
 #define AI_WATER_WHEEL_GOLD_AMOUNT 500
 
-// Declarations of the free functions DEFINED in PHILAI.cpp — the single home for these
-// symbols. Other TUs call them by including this header (no local externs).
 void ResetHeroRVs(i32, i32, i32);
 void CheckDoMain(i32 a1, i32 doMain);
 void ShowStatus(void);
@@ -432,7 +428,6 @@ void InitAIMapVars(void);
 void CloseAIMapVars(void);
 i32 OnMySide(i32);
 
-// --- globals owned by this TU (moved from _globals.h; CodeView-attributed) ---
 extern i32 bHeroBuiltThisTurn;
 extern float gafAITurnCostResource[7];
 extern i8* gaiEnemyHeroReachable;
@@ -455,7 +450,6 @@ extern i32 iDummy;
 extern i32 iLastFrameRateTimer;
 extern searchArray SVSearchArray;
 
-// ---- globals (declarations, RVA order) ----
 extern b32 gbGameOver;
 extern i8 giMonType[];
 extern i32 iViewArmyNumTroops;
@@ -480,4 +474,4 @@ extern i16 giUARadius;
 extern i8* gbNGPlayerPos;
 extern i32 viewArmyFacingWIPXMod;
 
-#endif // HOMM2_PHILAI_TU_H
+#endif

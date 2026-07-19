@@ -1,10 +1,7 @@
 #ifndef HOMM2_SOURCE_FILEREQUESTER_H
 #define HOMM2_SOURCE_FILEREQUESTER_H
-// Reconstructed class (SOURCE) from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// 12 methods, 3 own-virtual, 0 static data.
 #include <va.h>
 #include "../BASE/baseManager.h"
-// forward declarations:
 struct tag_message;
 class heroWindow;
 class iconWidget;
@@ -102,34 +99,31 @@ struct FileRequesterExtension {
     char text[FILE_REQUESTER_EXTENSION_SIZE];
 };
 
-#pragma pack(push, 1) // recovered layout is byte-packed
+#pragma pack(push, 1)
 class fileRequester : public baseManager {
 public:
-    heroWindow* m_window;                                   // +0x036
-    i32 m_x;                                                // +0x03a
-    i32 m_y;                                                // +0x03e
-    FileRequesterMode m_mode;                               // +0x042
-    char m_filePattern[FILE_REQUESTER_PATH_SIZE];           // +0x046
-    char m_directory[FILE_REQUESTER_PATH_SIZE];             // +0x172
-    FileRequesterName* m_fileNames;                         // +0x29e
-    FileRequesterExtension* m_extensions;                   // +0x2a2
-    SMapHeader* m_mapHeaders;                               // +0x2a6
-    void* m_previousMenu;                                   // +0x2aa
-    char m_defaultExtension[FILE_REQUESTER_EXTENSION_SIZE]; // +0x2ae
-    char m_filename[FILE_REQUESTER_NAME_SIZE];              // +0x2b3
-    i32 m_fileCount;                                        // +0x412
-    i32 m_topIndex;                                         // +0x416
-    i32 m_selectedIndex;                                    // +0x41a
-    i32 m_result;                                           // +0x41e
-    char m_listState[9];                                    // +0x422
-    iconWidget* m_scrollKnob;                               // +0x42b
-    // --- constructors ---
+    heroWindow* m_window;
+    i32 m_x;
+    i32 m_y;
+    FileRequesterMode m_mode;
+    char m_filePattern[FILE_REQUESTER_PATH_SIZE];
+    char m_directory[FILE_REQUESTER_PATH_SIZE];
+    FileRequesterName* m_fileNames;
+    FileRequesterExtension* m_extensions;
+    SMapHeader* m_mapHeaders;
+    void* m_previousMenu;
+    char m_defaultExtension[FILE_REQUESTER_EXTENSION_SIZE];
+    char m_filename[FILE_REQUESTER_NAME_SIZE];
+    i32 m_fileCount;
+    i32 m_topIndex;
+    i32 m_selectedIndex;
+    i32 m_result;
+    char m_listState[9];
+    iconWidget* m_scrollKnob;
     fileRequester(i32, i32, FileRequesterMode, char*, char*, char*);
-    // --- virtual methods (vtable order) ---
     virtual i32 Open(i32) OVERRIDE;
     virtual void Close(void) OVERRIDE;
     virtual i32 Main(struct tag_message&) OVERRIDE;
-    // --- methods ---
     i32 InitializeFiles(char*, char*, i32);
     i32 MapExistsForFilter(FileRequesterMapSizeFilter);
     void SetupFiles(void);
@@ -141,11 +135,10 @@ public:
 };
 #pragma pack(pop)
 SIZE(fileRequester, 0x42f);
-// ---- globals (declarations, RVA order) ----
 extern FileRequesterMapSizeFilter giMapSizeFilter;
 extern char* cFRDummy;
 extern float fGutterMinY;
 extern float fGutterTravelLength;
 extern i32 iMaxListSize;
 
-#endif // HOMM2_SOURCE_FILEREQUESTER_H
+#endif

@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_RE\FONT.OBJ   from: .\basewin.lib
-// functions: 10   data: 1
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <string.h>
 #include <BASE/font.h>
@@ -24,8 +19,6 @@ font::font(u32l id) : resource(RESOURCE_CATEGORY_FONT, id, 1, 0) {
     else
         m_isLarge = 0;
     char fname[13];
-    // Read13 takes signed char*, GetIcon char* — one filename buffer feeds both, so bridge the
-    // API signedness once (codegen-identical: both are byte pointers).
     gpResourceManager->Read13(reinterpret_cast<i8*>(fname));
     gbLoadingMonoIcon = true;
     m_glyphIcon = gpResourceManager->GetIcon(fname);
@@ -36,9 +29,6 @@ VA(0x004c70e0, 0x39)
 font::~font() {
     gpResourceManager->Dispose(m_glyphIcon);
 }
-// The generated 0x39-byte ??_G COMDAT is raw-identical to both delinked retail ??_E copies;
-// its two relocations target ~font and operator delete. MSVC emits ??_E as a weak ??_G alias,
-// and the vtable relocation resolves through that alias, so the duplicate report rows are unscored.
 
 VA(0x004c7120, 0x24a)
 void font::DrawStringExecute(
@@ -147,14 +137,7 @@ void font::DrawString(char* s, i32 x, i32 y, i32 mode) {
     DrawStringExecute(s, x, y, mode, 0, 0, 640, 480);
 }
 
-// @semantic
-// /Od residual is +0x82..+0x98: retail loads m_glyphIcon->m_data into EAX before forming
-// the c*13 index in ECX; ours forms the index first and loads the base into ECX. The 0xaf-byte
-// function, EBP frame/this slot, CFG, and zero-relocation stream otherwise agree. This body
-// reached 100% in 5491423 before the required icon.h SLimitData layout correction.
-// Ordinary/commuted subscripts and raw byte-offset spelling were byte-neutral; exact predecessor
-// cast cleanups and the DrawString mode rename did not move it. Revisit after material FONT/icon
-// header state changes; current 86.93% is below the audited AST-permuter threshold.
+// @semantic: residual is +0x82..+0x98: retail loads m_glyphIcon->m_data into EAX before forming the c*13 index in ECX.
 VA(0x004c73c0, 0xaf)
 i32 font::GetCharacterWidth(u8 c) {
     if (c == '{' || c == '}') {
@@ -173,8 +156,6 @@ i32 font::GetCharacterWidth(u8 c) {
 
 VA(0x004c7470, 0x313)
 void font::DrawBoundedString(char* str, i32 x, i32 y, i32 w, i32 h, i32 mode, i32 align) {
-    // Semantic suffixes preserve the retail /Od slot buckets. glyphPos, space9, and v1 are
-    // vestigial locals present in the retail frame.
     i32 size = strlen(str);
     u8* glyphPos = m_glyphIcon->m_data;
     char space9 = ' ';
@@ -206,7 +187,6 @@ void font::DrawBoundedString(char* str, i32 x, i32 y, i32 w, i32 h, i32 mode, i3
         if (w < lineWidth3) {
             idx--;
             wordBreak0 = 0;
-            // The SIB-equivalent lvalue makes VC4.2 load the other comparison operand first.
             while (text2[idx] != ' ' && OD_STEER(idx) >= lineStartD) {
                 lineWidth3 -= GetCharacterWidth(text2[idx]);
                 if (m_height * 2 + yOffC > h && lineWidth3 < w)
@@ -247,16 +227,11 @@ void font::DrawBoundedString(char* str, i32 x, i32 y, i32 w, i32 h, i32 mode, i3
 
 VA(0x004c7790, 0x1b3)
 i32 font::LineLength(char* str, i32 maxW) {
-    // Word-wrap: count how many lines `str` needs at width maxW, breaking at spaces.
-    // 13 locals (frame 0x38); names carry the /Od slot hashes (od_slots). q/v declared-unused;
-    // aa/t/u are set-or-zeroed-but-unused (vestigial). Init order matches the retail.
-    i32 s = strlen(str); // len   @ -0x10
-    char aa = ' ';       //       @ -0x30 (vestigial)
+    i32 s = strlen(str);
+    char aa = ' ';
     i32 z = 0, t = 0, r = 0, y = 0, p = 0, u = 0, x = 0, gap = 0;
-    // z=lineCount(-0x2c) t=vestigial(-0x14) r=wordStart(-0xc) y=(-0x28) p=i(-0x4)
-    // u=vestigial(-0x18) x=width(-0x24) gap=breakPt(-0x34)
-    char* w = str; // ptr   @ -0x20
-    i32 q, v;      // unused @ -0x8, -0x1c
+    char* w = str;
+    i32 q, v;
     while (p < s && w[p] != 0) {
         while (w[p] != 0 && w[p] != '\n' && OD_STEER(x) <= maxW) {
             x += GetCharacterWidth(w[p]);
@@ -287,13 +262,11 @@ i32 font::LineLength(char* str, i32 maxW) {
 
 VA(0x004c7950, 0xc4)
 i32 font::LineWidth(char* str) {
-    // 10 locals (frame 0x2c): local names carry the /Od slot hashes (od_slots); `q`/`u` are
-    // declared-but-unused (reserved, not zeroed) — vestigial, as in the sibling string routines.
-    i32 s = strlen(str); // len @ -0x10
-    i32 q, u;            // unused @ -0x8, -0x18
+    i32 s = strlen(str);
+    i32 q, u;
     i32 y = 0, t = 0, r = 0, x = 0, p = 0,
-        w = 0;     // zeroed in this order: -0x28,-0x14,-0xc,-0x24,-0x4(i),-0x20(width)
-    char* v = str; // @ -0x1c
+        w = 0;
+    char* v = str;
     while (OD_STEER(p) < s && v[p] != 0) {
         while (v[p] != 0 && v[p] != '\n') {
             w += GetCharacterWidth(v[p]);
@@ -303,8 +276,5 @@ i32 font::LineWidth(char* str) {
     return w;
 }
 
-// ===== vtable font (root)  (1 slots) =====
-//  [ 0] VA(0x004c70a0, 0x39)  void * font::scalar_dtor(unsigned int)   <- introduces virtual
 
-// ---- vtables (compiler-emitted; census) ----
 VTBL(font, 0x004eb9e4);

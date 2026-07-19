@@ -1,7 +1,5 @@
 #ifndef HOMM2_SOURCE_GAME_H
 #define HOMM2_SOURCE_GAME_H
-// Reconstructed class (SOURCE) from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// 114 methods, 0 own-virtual, 0 static data.
 #include <va.h>
 #include <EDITOR/fullMap.h>
 #include <SOURCE/REQUEST.h>
@@ -11,7 +9,6 @@
 #include <SOURCE/Overview.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/GAME.h>
-// forward declarations:
 class army;
 class armyGroup;
 class fullMap;
@@ -44,94 +41,91 @@ struct boatRecord {
 #pragma pack(pop)
 SIZE(boatRecord, 8);
 
-#pragma pack(push, 1) // recovered layout is byte-packed
+#pragma pack(push, 1)
 class game {
 public:
-    // --- members (offsets from Ghidra this+off access-analysis; widths are
-    // access-widths, NOT confirmed types; refine during byte-matching) ---
-    i16 m_difficultyRating;                   // +0x00
-    u8 m_campaignType;                        // +0x02
-    u8 m_campaignStartingSide;                // +0x03
-    i8 m_campaignScenario;                    // +0x04
-    u8 m_campaignScenarioCompleted[2][12];    // +0x05
-    i16 m_campaignScenarioBonus[2][12];       // +0x1d
-    i16 m_campaignScenarioDays[2][12];        // +0x4d
-    char m_unknown7d;                         // +0x7d never referenced
-    u8 m_campaignAwards[12];                  // +0x7e
-    u8 m_campaignChoice[2][12];               // +0x8a
-    u8 m_campaignMapEnabled[2][12];           // +0xa2
-    i16 m_campaignScore;                      // +0xba
-    i16 m_campaignCarryoverCreatureTypes[5];  // +0xbc
-    i16 m_campaignCarryoverCreatureCounts[5]; // +0xc6
-    u8 m_campaignScenarioWon;                 // +0xd0
-    u8 m_campaignCheated;                     // +0xd1
+    i16 m_difficultyRating;
+    u8 m_campaignType;
+    u8 m_campaignStartingSide;
+    i8 m_campaignScenario;
+    u8 m_campaignScenarioCompleted[2][12];
+    i16 m_campaignScenarioBonus[2][12];
+    i16 m_campaignScenarioDays[2][12];
+    char m_unknown7d;
+    u8 m_campaignAwards[12];
+    u8 m_campaignChoice[2][12];
+    u8 m_campaignMapEnabled[2][12];
+    i16 m_campaignScore;
+    i16 m_campaignCarryoverCreatureTypes[5];
+    i16 m_campaignCarryoverCreatureCounts[5];
+    u8 m_campaignScenarioWon;
+    u8 m_campaignCheated;
     char _pad_0xd2[0x78];
-    char m_saveName[0x15f];                             // +0x14a
-    SMapHeader m_mapHeader;                             // +0x2a9
-    i8 m_setupPlayerColor[MAP_HEADER_PLAYER_COUNT];     // +0x44d
-    i8 m_playerHandicap[MAP_HEADER_PLAYER_COUNT];       // +0x453
-    i8 m_setupPlayerRace[MAP_HEADER_PLAYER_COUNT];      // +0x459
-    i8 m_setupPlayerNetworkId[MAP_HEADER_PLAYER_COUNT]; // +0x45f
-    i8 m_difficulty;                                    // +0x465
-    char m_mapFilename[13];                             // +0x466
-    i8 m_setupPlayerType[MAP_HEADER_PLAYER_COUNT];      // +0x473
-    i8 m_selectedSetupPlayer;                           // +0x479
-    i8 m_newGameInitialized;                            // +0x47a
-    i8 m_newGameHumanCount;                             // +0x47b
+    char m_saveName[0x15f];
+    SMapHeader m_mapHeader;
+    i8 m_setupPlayerColor[MAP_HEADER_PLAYER_COUNT];
+    i8 m_playerHandicap[MAP_HEADER_PLAYER_COUNT];
+    i8 m_setupPlayerRace[MAP_HEADER_PLAYER_COUNT];
+    i8 m_setupPlayerNetworkId[MAP_HEADER_PLAYER_COUNT];
+    i8 m_difficulty;
+    char m_mapFilename[13];
+    i8 m_setupPlayerType[MAP_HEADER_PLAYER_COUNT];
+    i8 m_selectedSetupPlayer;
+    i8 m_newGameInitialized;
+    i8 m_newGameHumanCount;
     char _pad_0x47c[0x12];
-    i8 m_playerCount;                                   // +0x48e
-    i8 m_deadPlayerCount;                               // +0x48f
-    i8 m_playerDead[IDX(GAME_PLAYER_COUNT)];            // +0x490
-    u16 m_day;                                          // +0x496
-    u16 m_week;                                         // +0x498
-    u16 m_month;                                        // +0x49a
-    class playerData m_players[IDX(GAME_PLAYER_COUNT)]; // +0x49c
-    class fullMap m_worldMap;                           // +0xb3e
-    i8 m_obeliskCount;                                  // +0xb52
-    town m_castleRecs[IDX(GAME_TOWN_COUNT)];            // 0xb53
+    i8 m_playerCount;
+    i8 m_deadPlayerCount;
+    i8 m_playerDead[IDX(GAME_PLAYER_COUNT)];
+    u16 m_day;
+    u16 m_week;
+    u16 m_month;
+    class playerData m_players[IDX(GAME_PLAYER_COUNT)];
+    class fullMap m_worldMap;
+    i8 m_obeliskCount;
+    town m_castleRecs[IDX(GAME_TOWN_COUNT)];
     union {
-        i8 m_castleOwners[IDX(GAME_TOWN_COUNT)]; // +0x2773
+        i8 m_castleOwners[IDX(GAME_TOWN_COUNT)];
         i8 m_townOwners[IDX(GAME_TOWN_COUNT)];
     };
     union {
-        char m_dailyEventFlags[9]; // +0x27bb
+        char m_dailyEventFlags[9];
         u8 m_knownTowns[9];
     };
-    hero m_heroRecs[IDX(GAME_HERO_COUNT)];       // 0x27c4  hero record slots (GetHeroSlot)
-    i8 m_availableHeroes[IDX(GAME_HERO_COUNT)];  // +0x5c80
-    mineRecord m_mines[IDX(GAME_MINE_COUNT)];    // 0x5cb6
-    i8 m_mineOwners[IDX(GAME_MINE_COUNT)];       // 0x60a6
-    char m_randomArtifacts[IDX(ARTIFACT_COUNT)]; // 0x6136
-    boatRecord m_boats[IDX(GAME_BOAT_COUNT)];    // 0x619d
-    i8 m_boatSlots[IDX(GAME_BOAT_COUNT)];        // 0x631d, active boat record indices
-    i8 m_obeliskVisitors[48];                    // 0x634d
-    char m_defaultPlayerNames[24];               // +0x637d
-    i8 m_ultimateArtifactX;                      // +0x6395
-    i8 m_ultimateArtifactY;                      // +0x6396
-    i8 m_ultimateArtifactId;                     // +0x6397
-    class heroWindow* m_newGameWindow;           // +0x6398
+    hero m_heroRecs[IDX(GAME_HERO_COUNT)];
+    i8 m_availableHeroes[IDX(GAME_HERO_COUNT)];
+    mineRecord m_mines[IDX(GAME_MINE_COUNT)];
+    i8 m_mineOwners[IDX(GAME_MINE_COUNT)];
+    char m_randomArtifacts[IDX(ARTIFACT_COUNT)];
+    boatRecord m_boats[IDX(GAME_BOAT_COUNT)];
+    i8 m_boatSlots[IDX(GAME_BOAT_COUNT)];
+    i8 m_obeliskVisitors[48];
+    char m_defaultPlayerNames[24];
+    i8 m_ultimateArtifactX;
+    i8 m_ultimateArtifactY;
+    i8 m_ultimateArtifactId;
+    class heroWindow* m_newGameWindow;
     char m_pad_0x639c;
-    u8 m_cheated; // +0x639d
+    u8 m_cheated;
     char m_pad_0x639e[0xc];
-    char m_rumour[0x12d];                             // +0x63aa
-    u16 m_rumourEventCount;                           // +0x64d7
-    u16 m_rumourEventIndices[30];                     // +0x64d9
-    u16 m_timeEventCount;                             // +0x6515
-    u16 m_timeEventIndices[50];                       // +0x6517
-    u16 m_mapEventCount;                              // +0x657b
-    u16 m_mapEventIndices[50];                        // +0x657d
-    class heroWindow* m_viewArmyWindow;               // +0x65e1
-    i32 m_viewArmyResult;                             // +0x65e5
-    class heroWindow* m_viewSpellsWindow;             // +0x65e9
-    class hero* m_viewSpellsHero;                     // +0x65ed
-    i32 m_viewSpellsType;                             // +0x65f1
-    i32 m_viewSpellsTop[2];                           // +0x65f5
-    i32 m_viewSpellsCount[2];                         // +0x65fd
-    SpellType m_viewSpell;                            // +0x6605
-    i32 (*m_viewSpellsCallback)(struct tag_message&); // +0x6609
-    i8 m_viewSpellsReadOnly;                          // +0x660d
-    u8 m_gameLoaded;                                  // +0x660e
-    // --- methods ---
+    char m_rumour[0x12d];
+    u16 m_rumourEventCount;
+    u16 m_rumourEventIndices[30];
+    u16 m_timeEventCount;
+    u16 m_timeEventIndices[50];
+    u16 m_mapEventCount;
+    u16 m_mapEventIndices[50];
+    class heroWindow* m_viewArmyWindow;
+    i32 m_viewArmyResult;
+    class heroWindow* m_viewSpellsWindow;
+    class hero* m_viewSpellsHero;
+    i32 m_viewSpellsType;
+    i32 m_viewSpellsTop[2];
+    i32 m_viewSpellsCount[2];
+    SpellType m_viewSpell;
+    i32 (*m_viewSpellsCallback)(struct tag_message&);
+    i8 m_viewSpellsReadOnly;
+    u8 m_gameLoaded;
     void SetupDynamicStuff(i32, i32, i32);
     void SetupNewOverviewType(OverviewType, i32);
     void SetupResources(void);
@@ -277,7 +271,6 @@ public:
 };
 #pragma pack(pop)
 SIZE(game, 0x660f);
-// ---- globals (declarations, RVA order) ----
 extern class heroWindow* overWin;
 extern char gcCurMapName[16];
 extern class textWidget** textWidgetDynamic;
@@ -306,4 +299,4 @@ extern i32 NGKPcursorIndex;
 extern char* cTextReceivedBuffer[3];
 extern class icon* NGKPBkg;
 
-#endif // HOMM2_SOURCE_GAME_H
+#endif

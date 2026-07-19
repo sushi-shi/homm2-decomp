@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_Re\TOWN.OBJ   from: (directly linked into exe)
-// functions: 9   data: 1
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <BASE/BITS.h>
 #include <BASE/executive.h>
@@ -142,14 +137,7 @@ void town::Deallocate(void) {
     m_owner = TOWN_OWNER_NONE;
 }
 
-// @semantic: Current TOWN.cpp/header epoch: the 0x8 frame, CFG, all 155
-// instructions, and all nine ordered external relocations align. Raw bytes
-// differ only at +0xb7 and +0xba: the two MOV stack displacements swap eax/ecx
-// for the discarded-result spell-count increment. The retained prefix form is
-// clearest; ten non-improving variants exhausted symmetric-subscript, postfix,
-// commutative_order, and seven identifier_rename spellings. The retained
-// source-hash maximum is 100%; revisit only after a relevant TOWN source/TU/header
-// or comparison epoch alters MSVC register selection.
+// @semantic: compiler-shape residual.
 VA(0x004330a1, 0x23e)
 void town::BuildBuilding(i32 building) {
     i32 level;
@@ -225,5 +213,4 @@ void town::CalcNumLevelArchers(i32* numArchers, i32* mageGuildLevel) {
     }
 }
 
-// ---- globals (definitions, RVA order) ----
 DATA(0x004f11b0) i32 bEnteringTown = 0;

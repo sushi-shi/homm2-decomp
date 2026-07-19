@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_Re\CURSOR.OBJ   from: (directly linked into exe)
-// functions: 18   data: 13
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <BASE/bitmap.h>
 #include <BASE/heroWindowManager.h>
@@ -34,14 +29,7 @@
 
 #define RETAIL_FILE const_cast<char*>("I:\\Projects\\Heroes\\Prog\\SOURCE\\CURSOR.CPP")
 
-// @early-stop
-// All 88 normalized instructions, the 0x18 frame/slots, CFG, and six ordered
-// relocation sites/effective targets align. The only unmasked bytes are
-// +0xd9/+0xda/+0xe2/+0xe3: the cellY sum loads cursor Y before origin Y, while
-// retail loads the commutative terms in reverse order. Five bounded candidates
-// across direct reversal, both OD_STEER(term) escapes, and both OR-zero forms were
-// byte-neutral. Revisit after an earlier CURSOR source edit or relevant
-// advManager layout/header change perturbs TU-cumulative operand evaluation.
+// @early-stop: byte-proven compiler artifact.
 VA(0x0040d5e0, 0x138)
 void advManager::StartCursor(i32 direction) {
     i32 directionX_a;
@@ -67,15 +55,7 @@ void advManager::StartCursor(i32 direction) {
     m_mapData->GetCell(cellX, cellY)->m_flags |= CURSOR_MAP_VISIBLE_FLAG;
 }
 
-// @early-stop
-// All 72 normalized instructions, the 0x8 frame/slots, CFG, and five ordered
-// relocation sites/effective targets align. The only unmasked bytes are
-// +0xaa/+0xab/+0xb2/+0xb3: the previous-cursor cell offset adds origin X before
-// cursor X, while retail loads the commutative terms in reverse order. Nine
-// bounded candidates across direct term reversal, both OD_STEER(term) escapes, both
-// OR-zero forms, zero grouping, and three depth-one commutative_order AST edits
-// were byte-neutral. Revisit after an earlier CURSOR source edit or relevant
-// advManager layout/header change perturbs TU-cumulative operand evaluation.
+// @early-stop: byte-proven compiler artifact.
 VA(0x0040d718, 0x11c)
 void advManager::StopCursor(i32 stopSound) {
     if (stopSound) {
@@ -509,16 +489,7 @@ i32 advManager::GetMoveShowIt(hero* movingHero, i32 direction) {
         return 0;
 }
 
-// @semantic
-// Complete semantics, 0x84 frame, named/temporary slots, case-body order,
-// jump-table data ranges, and 158/158 ordered effective relocations are
-// accounted for. Scalar-lvalue escapes fixed the packed object-metadata write
-// and step/halfSteps operand order. The first non-relocation residual is one
-// extra retail continuation jump after the hero embarked test; later residuals
-// are local-scope trampoline counts and compiler-local tables. Explicit nested
-// hero arms, equality operand orders, pointer-form resource access, and the
-// positive eventCell arm were already rejected. Revisit if CURSOR TU state,
-// relevant hero/map layout, or continuation-target normalization changes.
+// @semantic: first non-relocation residual is one extra retail continuation jump after the hero embarked test.
 VA(0x0040e51f, 0x1234)
 mapCell* advManager::MoveHero(
     i32 direction,
@@ -1021,15 +992,7 @@ i32 advManager::ValidMoveWithEvent(hero* movingHero, i32 direction) {
     }
 }
 
-// @early-stop
-// All 352 normalized instructions, the 0x3c frame/slots, CFG, and nine ordered
-// relocation sites/effective targets align. Retained second-term OR-zero removed
-// the +0x211/+0x214 centerY/directionY span; only +0x442/+0x443/+0x44b/+0x44c
-// remains, where the cursor/origin Y addends load in reverse order. Nine bounded
-// candidates covered direct reversal, both OD_STEER(term) escapes, both OR-zero forms,
-// regroupings, and a targeted depth-one commutative_order AST edit. Revisit after
-// an earlier CURSOR source edit or relevant advManager layout/header change
-// perturbs TU-cumulative operand evaluation. Retail also delinks normalDirTable.y.
+// @early-stop: delinker artifact.
 VA(0x0040fa15, 0x4f2)
 i32 advManager::ValidMove(i32 direction, i32 eventMode) {
     i32 directionX_j;
@@ -1125,14 +1088,7 @@ i32 advManager::ValidMove(i32 direction, i32 eventMode) {
     return 1;
 }
 
-// @semantic
-// Complete 0x24b body, 0x24 frame/slots, CFG, and zero relocations. Every
-// non-jump opcode/operand matches, but four GetCell continuation jumps are real
-// branch-byte residuals: ours lead at +0x6e/+0x105/+0x158/+0x1ef and retail
-// trails at +0xad/+0x132/+0x197/+0x21c. One m_mapData object-lvalue family
-// changed the accessor operands and was rejected. Revisit only if fullMap's
-// GetCell accessor/source changes, an earlier CURSOR edit moves inline tails, or
-// comparison gains proved continuation-target normalization.
+// @semantic: branch/code-shape residual.
 VA(0x0040ff07, 0x24b)
 void advManager::MoveOrigin(i32 directionX, i32 directionY) {
     i32 oldOriginX0;
@@ -1176,15 +1132,7 @@ void advManager::MoveOrigin(i32 directionX, i32 directionY) {
     m_forceCompleteDraw = 1;
 }
 
-// @semantic
-// After excluding the +0x717..+0x743 jump table, executable extent,
-// 0x2c frame, all eight stack roles, every non-jump opcode/operand, and 98/98
-// relocation targets agree. Two fullMap::GetCell continuations are leading in
-// base at +0x5bc/+0x5fa and trailing in retail at +0x5ee/+0x62c. Retail also
-// carries one trailing NOP at +0x74f. No source variant was retained because the
-// two branch sites are isolated; revisit only if fullMap::GetCell changes, an
-// earlier CURSOR edit moves inline tails, or comparison gains proved continuation
-// normalization.
+// @semantic: jump-table placement residual.
 VA(0x00410152, 0x74f)
 void advManager::ProcessMapChange(SMapChange change) {
     hero* mapHero_n;
@@ -1489,16 +1437,7 @@ void advManager::PurgeMapChangeQueue(void) {
         sMapChangeLastFew[slot].type = 0;
 }
 
-// @semantic
-// Complete 0x1d4 body, 0x1c frame/slots, CFG, and 12/12 ordered relocation
-// sites/effective targets align. First executable divergence is +0xe: retail
-// loads maximumToUnwind before comparing unwoundChanges (`cmp local,eax; jge`),
-// while ours loads the local first and emits the reversed equivalent compare.
-// Four bounded condition families (commuted relation, OD_STEER(parameter), explicit
-// break, and negated relation) were byte-neutral or added a jump. Revisit only
-// if the parameter/local representation or an earlier CURSOR edit changes operand
-// evaluation, or comparison gains proved relational-swap normalization. Retail
-// also delinks three sMapChangeQueue+7 references as a string identity.
+// @semantic: first divergence is the maximumToUnwind comparison operand order.
 VA(0x00410b9e, 0x1d4)
 void advManager::UnwindMapChangeQueue(i32 maximumToUnwind, i32 processChanges) {
     i32 queuedChanges;
@@ -1594,32 +1533,6 @@ void SendMapChange(i32 type, i8 id, u8 x, u8 y, i32 player, u8 stopAfterMove, u8
     );
 }
 
-// ---- globals (definitions, RVA order) ----
-// @data-layout-note Retail initialized storage is 0xee020+0x228; candidate is
-// 0x224. All public initializers and private literals are byte-exact. Candidate
-// groups ProcessIncomingGroupMapChange's 1505 line-base word at +0 and
-// bMoveSoundMade at +4, while retail places bMoveSoundMade at +0, a zero word
-// at +4, and the line base at +0x1bc. Candidate +8..+0x1bc equals retail at the
-// same offsets; candidate +0x1bc..+0x224 equals retail +0x1c0..+0x228. The two
-// retail references from ProcessIncomingGroupMapChange load the word owner with
-// addend zero, then add 7 and 25; candidate emits the same instructions and
-// addends. The opt-in relocation helper calls the recovered private identity
-// fake because the delinked target synthesizes const_000ee1dc; this is the same
-// publics-only representational limitation as COMMAND, not a fallback identity.
-// Candidate and retail .rdata are byte-exact at 0xeb078+0x8, with SHA-256
-// e163f8cb0f7067a7fc78ca859a77f849aea3214f38fb75b884e4a16be725c905.
-//
-// Retail zero-fill is 0x124bc0+0x48; candidate is 0x40. Retail orders cycle,
-// frame-count, turning, base-frame, and direction at +0..+0x14, leaves four
-// bytes before sMapChangeLastFew at +0x18, and has four owner-tail bytes.
-// Candidate COMMON order is frame-count +0, base-frame +4,
-// sMapChangeLastFew +8, direction +0x34, cycle +0x38, turning +0x3c. All six
-// public allocations have their proven types and extents. Focused audits for
-// DrawCursor, DrawCursorShadow, MoveHero, ProcessIncomingGroupMapChange,
-// PurgeMapChangeQueue, and SendMapChange cover 61/61, 22/22, 158/158, 9/9,
-// 2/2, and 14/14 ordered relocations with only-base=0. Revisit only with a
-// natural compiler allocation-order change; do not add padding, aliases,
-// synthetic identities, or unattached literals.
 DATA(0x004ee020) i32 bMoveSoundMade = 1;
 DATA(0x004ee028) i32 giPixelsPerStep[6] = {2, 4, 6, 8, 16, 0};
 DATA(0x004ee040) i32 giStepDelay[5] = {20, 25, 20, 15, 15};

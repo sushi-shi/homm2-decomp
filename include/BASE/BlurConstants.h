@@ -50,4 +50,4 @@ H2_ENUM_END(BlurTransitionConstant)
 typedef i32 BlurComponentTable[BLUR_PALETTE_COLOR_COUNT];
 typedef u8 BlurLookupRow[BLUR_LOOKUP_ROW_BYTE_COUNT];
 
-#endif // HOMM2_BASE_BLURCONSTANTS_H
+#endif

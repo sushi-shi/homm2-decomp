@@ -1,33 +1,8 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_Re\X_GLOBAL.OBJ   from: (directly linked into exe)
-// functions: 0   data: 25
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <SOURCE/ExpCampaign.h>
 #include <SOURCE/X_GLOBAL.h>
 
-// @data-layout-note Retail initialized storage is 0xf2558..0xf4f28. The
-// candidate .data prefix is 0x29cb bytes and is byte-exact after masking its
-// 331 DIR32 fields (SHA-256
-// 271789a2a256fa493dda73417dde2b0aa97f452a1ce6f1d3940ab3c3ef029f20);
-// retail ends with five additional zero alignment bytes. All 331 relocation
-// sites occur at the same contribution-relative offsets, target the candidate
-// owner translated from 0xf2558, and use addend zero. The 331 compiler-private
-// string allocations are reviewed individually; every complete candidate
-// extent is byte-exact at that translated retail RVA, including repeated empty
-// strings. The separate four-byte .CRT$XCU contribution at 0xec008 relocates
-// with addend zero to the _$E4 initializer thunk at 0x476a0.
-//
-// Retail BSS is 0x127e20..0x127ea4 (0x84 bytes); candidate BSS is 0x88.
-// Both contain the same six DATA-proved logical owners. Candidate COMMON order
-// starts with xIsExpansionMap, while retail starts with
-// xIsPlayingExpansionCampaign and retains only natural alignment gaps. The two
-// candidate xCampaign references align exactly to retail at owner +0. Preserve
-// this as compiler/link allocation order; do not add aliases, padding owners,
-// placement controls, or synthetic identities.
 
-// ---- globals (definitions, RVA order) ----
 DATA(0x004f2558) char* xSetupCampaignGameHelp[X_GLOBAL_SETUP_HELP_COUNT] = {
     "{Original Campaign}\n\nEither Roland's or Archibald's campaign from the original Heroes of "
     "Might and Magic II.",

@@ -1,9 +1,7 @@
 #ifndef HOMM2_BASE_BZIP_H
 #define HOMM2_BASE_BZIP_H
 #include <va.h>
-// bzip-0.21 (Julian Seward, 1996) types + records for BASE/Bzip, plus the free functions
-// DEFINED in Bzip.cpp — their single declaration home. Callers include this header.
-#include <stdio.h> // FILE (BitStream::handle)
+#include <stdio.h>
 
 typedef i32 Int32;
 typedef u32 UInt32;
@@ -127,15 +125,13 @@ void uncompress(Char* name);
 i32l EncodeData(char* dst, char* src, u32l srcLen);
 i32l DecodeData(char* dst, char* src, u32l srcLen);
 
-// --- globals owned by this TU (moved from _globals.h; CodeView-attributed) ---
 extern UInt32 crc32Table[256];
 extern char inName[];
 extern char outName[];
 
-// ---- globals (declarations, RVA order) ----
 extern i32 longestFileName;
 extern i32 opMode;
 extern char progNameReally[0x400];
 extern i32 keepInputFiles;
 
-#endif // HOMM2_BASE_BZIP_H
+#endif

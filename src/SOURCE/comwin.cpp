@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_Re\comwin.obj   from: (directly linked into exe)
-// functions: 11   data: 0
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <stdio.h>
 #include <string.h>
 #include <windows.h>
@@ -19,15 +14,6 @@ DATA(0x004f84d8) static i16 s_comSendSourceLineBase = 247;
 DATA(0x004f8540) static i16 s_comWriteSourceLineBase = 310;
 DATA(0x005284b8) static ComPortState s_comPorts[COM_PORT_COUNT];
 
-// @data-layout-note Retail initialized storage is 0xf81ac..0xf858a. The
-// candidate section contains the same 0x3de bytes across three aligned DATA
-// line-base slots and 33 private literals; the compiler places the line bases
-// first in the candidate section but interleaves them with retail literals.
-// Comparing every owner after translation covers the entire section and gives
-// the identical SHA-256
-// e8b9ae94105e402d824e047a766565d6dee5a9a9598e638799051ceb973fdbcd.
-// The single 0xc0-byte s_comPorts loader-zero allocation is exact. Do not add
-// aliases or padding owners to reproduce the compiler's allocation order.
 
 VA(0x0048a640, 0x74)
 void add_node(struct tag_Anchor* anchor, struct tag_Node* node) {
@@ -59,11 +45,7 @@ void init_anchor(struct tag_Anchor* anchor, i32, i32) {
     anchor->tail = 0;
 }
 
-// @semantic: complete 0x260 frame, Win32 error switch, message assembly, and
-// shutdown CFG; all 72/72 ordered relocation identities and addends agree. The
-// first residual is the embedded 0x4c-byte jump table at RVA 0x8a968; the diff
-// helper stops there and decodes table bytes as instructions. Literal and named
-// Win32 error case values compiled identically, so do not retry that spelling.
+// @semantic: first residual is the embedded 0x4c-byte jump table at RVA 0x8a968.
 VA(0x0048a72e, 0x3e5)
 void ShutdownComError(char* function) {
     char errorName[COM_ERROR_NAME_SIZE];
@@ -139,11 +121,7 @@ void ShutdownComError(char* function) {
     ShutDown(message);
 }
 
-// @semantic: complete 0x54 frame, two-pass port selection, 0x60 saved-state
-// layout, DCB flags, timeout setup, and both queue initializers; all 33/33 ordered
-// relocation identities and addends agree. The first residual is the embedded
-// 0x14-byte baud-rate jump table at RVA 0x8ace2. An initial BaudRate assignment
-// scored 95.64%; the explicit default arm is retained.
+// @semantic: first residual is the embedded 0x14-byte baud-rate jump table at RVA 0x8ace2.
 VA(0x0048ab13, 0x34a)
 i16 com_init(u8 portNumber, i32 baudRate, i32 useDtr) {
     char portName[COM_PORT_NAME_SIZE];
@@ -327,10 +305,7 @@ u8 com_stat(i16 portIndex, u16) {
     return 0;
 }
 
-// @semantic: complete 0x14 frame, priority/normal queue and partial-write CFG,
-// and all 8 ordered relocation identities/addends agree. After correcting every
-// local slot, the sole raw residual is the exit jump displacement at +0x4d:
-// retail reaches the epilogue directly while this form enters the trailing join.
+// @semantic: sole raw residual is the exit jump displacement at +0x4d.
 VA(0x0048b21d, 0xe8)
 void comm_wrt_task(void) {
     DWORD bytesWritten;

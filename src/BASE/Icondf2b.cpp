@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_RE\Icondf2b.obj   from: .\basewin.lib
-// functions: 1   data: 0
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <BASE/Icondf2b.h>
 #include <BASE/IconDraw.h>
@@ -12,7 +7,6 @@
 #include <BASE/icon.h>
 #include <BASE/bitmap.h>
 #include <SOURCE/dimPalette.h>
-// Per-call decoder scratch — its own contiguous file-static block (0x5381b8+).
 DATA(0x005381b8) static i32 gFDX0;
 DATA(0x005381bc) static i32 gFDXEnd;
 DATA(0x005381c0) static u32 gFDCnt;
@@ -27,26 +21,7 @@ DATA(0x005381e0) static i32 gFDY;
 DATA(0x005381e4) static IconEntry* gFDEntry;
 DATA(0x005381e8) static u32 gFDRun;
 
-// @semantic
-// Complete /O2 decoder: candidate/retail have 166/167 instructions, both have 25 branches, both
-// reserve the same four-byte pitch home and save EBX/ESI/EDI/EBP, and all 37 ordered external
-// relocations resolve to the same scratch owners and uDimPal. Candidate ends at +0x235 versus
-// retail +0x23b. First divergence is +0x1d: retail schedules the formal-x load before publishing
-// gFDEntry, while this TU publishes the entry first and carries the left edge in EDI. The remaining
-// differences are register allocation/scheduling over the same command-loop and clipping
-// successors. gFDRow is a byte pointer and gFDY is ordinary scratch; the former integer row model
-// and volatile reload coercion were removed. Retail tests clipX <= left both before the clipped run
-// and before choosing its full arm, leaving the emitted partial-left arm unreachable; preserve that
-// shipped CFG. Moving the x0 declaration ahead of entry selection is byte-identical. Adding the
-// shared IconDraw mode enum and completing the existing monochrome-RLE opcode enum changed VC4.2's
-// TU state and improved the canonical schedule without changing the recovered body. Revisit after
-// a genuine shared-header/TU-state change or in the gated last-mile phase; do not restore qualifiers
-// or integer pointer arithmetic. No permutation or generated TU-state probe was run in this pass.
-// A 2026-07-15 real-header audit tested MIDIWrap, tileset, palette, font, button, and the historical
-// resource tail; every state regressed from the 78.433740% direct baseline. No header is retained.
-// Replacing the split cursor publication/`src[-1]` residue with the shared inline reader preserves
-// the complete 37/37 per-owner relocation multiset. The 79.06626% live score is TU-state-sensitive;
-// the semantic helper is retained rather than restoring compiler-shaped source for a higher score.
+// @semantic: First divergence is +0x1d: retail schedules the formal-x load before publishing gFDEntry.
 VA(0x004daa20, 0x23b)
 void FlipDimIconToBitmap(
     class icon* srcIcon,
@@ -150,7 +125,6 @@ void FlipDimIconToBitmap(
             gFDRun = cmd;
             continue;
         }
-        // newline
         X = gFDXEnd;
         gFDY = gFDY + 1;
         gFDRow = gFDRow + pitch;

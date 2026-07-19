@@ -1,8 +1,6 @@
 #ifndef HOMM2_NETWIN_H
 #define HOMM2_NETWIN_H
 #include <va.h>
-// Declarations of the free functions DEFINED in netwin.cpp — the single home for these
-// symbols. Other TUs call them by including this header (no local externs).
 
 H2_ENUM_BEGIN(NetbiosConstant)
     NETBIOS_SESSION_COUNT = 7,
@@ -133,4 +131,4 @@ extern "C" u16 __cdecl nb_sess(i16, ...);
 extern "C" char __fastcall nb_stat(i16);
 void nb_thr_ctl(void);
 
-#endif // HOMM2_NETWIN_H
+#endif

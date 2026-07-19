@@ -1,8 +1,3 @@
-// Reconstructed from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// compiland: .\Win32_Re\Modem.obj   from: (directly linked into exe)
-// functions: 15   data: 22
-// VA(addr,size)=function (size = span to next .text symbol - 0xCC/0x90 pad); DATA(addr)=global/vtable.
-
 #include <va.h>
 #include <stdio.h>
 #include <string.h>
@@ -81,10 +76,7 @@ void ModemSetup(i32 mode) {
     }
 }
 
-// @semantic: complete 0x9e-byte instruction stream, frame, CFG, and all 19
-// ordered relocations agree. The sole raw residual is the true-return branch
-// displacement at +0x8e: this form enters the trailing join jump while retail
-// reaches the epilogue directly. An explicit if/else return scored 97.67%.
+// @semantic: sole raw residual is the true-return branch displacement at +0x8e.
 VA(0x0040cb3e, 0x9e)
 i32l Dial(void) {
     char dialCommand[40];
@@ -96,10 +88,7 @@ i32l Dial(void) {
     return GUIModemResponse(gText, "CONNECT") != 0;
 }
 
-// @semantic: complete 0x54-byte instruction stream, frame, CFG, and all 9
-// ordered relocations agree. The sole raw residual is the true-return branch
-// displacement at +0x44: this form enters the trailing join jump while retail
-// reaches the epilogue directly. An explicit if/else return scored 96.15%.
+// @semantic: sole raw residual is the true-return branch displacement at +0x44.
 VA(0x0040cbdc, 0x54)
 i32l Wait(void) {
     GUIModemResponse("Waiting for ring...", "RING");
@@ -118,13 +107,7 @@ void GUIModemCommand(char* message, char* command) {
         ShutDown(0);
 }
 
-// @semantic: The command pacing and byte-at-a-time transmit semantics, 0x04
-// frame, CFG, and all 13 ordered external relocations match retail. First
-// residual +0x43: retail loads the local command length and compares the global
-// position with `jge`; this build loads the global first and compares the local
-// with the equivalent `jle`. Symmetric relational, pointer-index, value-or-zero,
-// direct guard, and goto-guard forms were non-improving. Revisit only after a
-// Modem TU/header change alters compiler state.
+// @semantic: First residual +0x43: retail loads the local command length and compares the global position with jge.
 VA(0x0040cca9, 0x95)
 i8 GUIModemCommandExec(void) {
     i32 commandLength;
@@ -167,10 +150,7 @@ i8 GUIModemResponse(char* message, char* response) {
     return 0;
 }
 
-// @semantic: complete semantics, frame, CFG, and all 20 ordered relocations
-// agree. Raw bytes differ only at +0x53 and +0x5f, where retail places the
-// inlined TruncateModemResponse continuation at the trailing join jump. Adding
-// an inner else/return changed the CFG and scored 93.94%.
+// @semantic: compiler-shape residual.
 VA(0x0040ce4e, 0xe2)
 i8 GUIModemResponseExec(void) {
     GUIMRc = read_byte();
@@ -225,7 +205,6 @@ VA(0x0040cfec, 0x1bb)
 void Connect(void) {
     char idMessage[20];
     u32 idSeed = KBTickCount();
-    // The retail /Od frame retains this unused word between idMessage and idSeed.
     i32 packetResult;
     idSeed %= MODEM_ID_MODULUS;
     sprintf(idstr, "%06d", idSeed);
@@ -251,7 +230,6 @@ void Connect(void) {
         }
 
         stime = KBTickCount();
-        // Scalar-lvalue steering preserves oldsec but emits the retail relocation order.
         if (OD_STEER(oldsec) / 1000 != stime / 1000) {
             oldsec = stime;
             sprintf(idMessage, "ID%s_%i", idstr, localstage);
@@ -295,7 +273,6 @@ i32 WaitForDirectConnect(void) {
                 oldsec = -1;
             }
             stime = KBTickCount();
-            // Scalar-lvalue steering preserves oldsec but emits the retail relocation order.
             if (OD_STEER(oldsec) / 1000 != stime / 1000) {
                 oldsec = stime;
                 sprintf(idMessage, "ID%s_%i", idstr, localstage);
@@ -386,7 +363,6 @@ void WriteModemPacket(char* buffer, i32 length) {
         ForcePollSound();
 }
 
-// ---- globals (definitions, RVA order) ----
 DATA(0x004ede50) i32 iBaudBits = 8;
 DATA(0x004ede54) i32 inescape = 0;
 DATA(0x004ede58) i32 newpacket = 0;

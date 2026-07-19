@@ -1,11 +1,8 @@
 #ifndef HOMM2_SOURCE_TOWN_H
 #define HOMM2_SOURCE_TOWN_H
-// Reconstructed class (SOURCE) from CodeView NB09 of HEROES2W.EXE — NOT original source.
-// 9 methods, 0 own-virtual, 0 static data.
 #include <va.h>
 #include <SOURCE/armyGroup.h>
 #include <SOURCE/KB_TYPES.h>
-// forward declarations:
 class hero;
 
 H2_ENUM_CLASS_BEGIN(TownBuilding)
@@ -64,44 +61,39 @@ H2_ENUM_BEGIN(TownConstant)
     TOWN_DISPOSE_FULL = 2
 H2_ENUM_END(TownConstant)
 
-#pragma pack(push, 1) // recovered layout is byte-packed
+#pragma pack(push, 1)
 class town {
 public:
-    // --- members (offsets from Ghidra this+off access-analysis; widths are
-    // access-widths, NOT confirmed types; refine during byte-matching) ---
-    char m_id;                                     // +0x00
-    char m_owner;                                  // +0x01
-    i8 m_threat;                                   // +0x02
-    char m_type;                                   // +0x03
-    u8 m_x;                                        // +0x04
-    u8 m_y;                                        // +0x05
-    u8 m_boatX;                                    // +0x06
-    u8 m_boatY;                                    // +0x07
-    armyGroup m_army;                              // +0x08
-    char m_occupyingHeroId;                        // +0x17
-    u32l m_buildings;                              // +0x18
-    i8 m_buildState;                               // +0x1c
-    char m_unknown1d;                              // +0x1d zero-initialized only, never read
-    i16 m_garrison[IDX(TOWN_GARRISON_SLOT_COUNT)]; // +0x1e
-    u8 m_onMap;                                    // +0x36
-    i8 m_mayNotUpgradeToCastle;                    // +0x37
-    i8 m_formation;                                // +0x38
-    i8 m_originalOwner;                            // +0x39
-    u16 m_extraIndex;                              // +0x3a
+    char m_id;
+    char m_owner;
+    i8 m_threat;
+    char m_type;
+    u8 m_x;
+    u8 m_y;
+    u8 m_boatX;
+    u8 m_boatY;
+    armyGroup m_army;
+    char m_occupyingHeroId;
+    u32l m_buildings;
+    i8 m_buildState;
+    char m_unknown1d;
+    i16 m_garrison[IDX(TOWN_GARRISON_SLOT_COUNT)];
+    u8 m_onMap;
+    i8 m_mayNotUpgradeToCastle;
+    i8 m_formation;
+    i8 m_originalOwner;
+    u16 m_extraIndex;
     union {
-        i8 m_spells[TOWN_MAGE_GUILD_LEVEL_COUNT][TOWN_MAGE_GUILD_SPELLS_PER_LEVEL]; // +0x3c
+        i8 m_spells[TOWN_MAGE_GUILD_LEVEL_COUNT][TOWN_MAGE_GUILD_SPELLS_PER_LEVEL];
         i8 m_spellSlots[TOWN_MAGE_GUILD_LEVEL_COUNT * TOWN_MAGE_GUILD_SPELLS_PER_LEVEL];
         struct {
             char m_spellPad[19];
             i8 m_spellCounts[6];
         };
     };
-    u16 m_turnsOwned; // +0x55
-    char m_name[13];  // +0x57
-    // Packed retail stride is 0x64 bytes.
-    // --- constructors ---
+    u16 m_turnsOwned;
+    char m_name[13];
     town(void);
-    // --- methods ---
     i32 HasGarrison(void);
     void GiveSpells(class hero*);
     void XformToCastle(void);
@@ -113,7 +105,6 @@ public:
 };
 #pragma pack(pop)
 SIZE(town, 100);
-// ---- globals (declarations, RVA order) ----
 extern i32 bEnteringTown;
 
-#endif // HOMM2_SOURCE_TOWN_H
+#endif

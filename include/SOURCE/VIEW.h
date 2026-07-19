@@ -2,9 +2,6 @@
 #define HOMM2_VIEW_H
 
 #include <Ints.h>
-// Declarations of the free functions DEFINED in VIEW.cpp — the single home for these
-// symbols. Other TUs call them by including this header (no local externs).
-// forward declarations (was <_all.h>):
 struct tag_message;
 
 H2_ENUM_BEGIN(ViewGeneralConstant)
@@ -33,4 +30,4 @@ H2_ENUM_END(ViewGeneralConstant)
 i32 HandleViewGeneral(struct tag_message&);
 extern i32 iViewGeneralWhichSide;
 
-#endif // HOMM2_VIEW_H
+#endif

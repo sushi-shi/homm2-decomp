@@ -2,9 +2,6 @@
 #define HOMM2_TRADPOST_H
 
 #include <Ints.h>
-// Declarations of the free functions DEFINED in tradpost.cpp — the single home for these
-// symbols. Other TUs call them by including this header (no local externs).
-// forward declarations (was <_all.h>):
 struct tag_message;
 
 H2_ENUM_BEGIN(TradingPostConstant)
@@ -53,7 +50,6 @@ void DoTradeKnob(struct tag_message);
 void SetupNewTrade(void);
 i32 TradingPostHandler(struct tag_message&);
 
-// ---- globals (declarations, RVA order) ----
 extern u16 coreRatio[TRADING_POST_RESOURCE_COUNT];
 extern class iconWidget* tradeKnob;
 extern i32 qtyToTrade;
@@ -70,4 +66,4 @@ extern i32 rightResource;
 extern i32 iMaxUnitsToTrade;
 extern i32 maxUnitsToTrade;
 
-#endif // HOMM2_TRADPOST_H
+#endif

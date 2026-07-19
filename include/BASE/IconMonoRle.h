@@ -9,4 +9,4 @@ H2_ENUM_BEGIN(IconMonoRleCommandConstant)
     ICON_RLE_MONO_RUN_MASK = 0x7f
 H2_ENUM_END(IconMonoRleCommandConstant)
 
-#endif // HOMM2_BASE_ICONMONORLE_H
+#endif

@@ -1,7 +1,5 @@
 #ifndef HOMM2_WSNETWIN_H
 #define HOMM2_WSNETWIN_H
-// Declarations of the free functions DEFINED in Wsnetwin.cpp — the single home for these
-// symbols. Other TUs call them by including this header (no local externs).
 #include <va.h>
 #include <SOURCE/GAME.h>
 #include <winsock.h>
@@ -45,7 +43,6 @@ i32 wsWaitForFirstGuest(void);
 i32 wsWaitForExtraGuests(void);
 i32 wsWaitForHost(void);
 
-// ---- globals (declarations, RVA order) ----
 extern i32 bHostFound;
 extern u32 sd_dg;
 extern i32 iWSLastMsgNumHumanPlayers;
@@ -61,4 +58,4 @@ extern struct in_addr gIn_addrIP;
 extern struct sockaddr_in saddr_remote;
 extern i32 iAddrLen;
 
-#endif // HOMM2_WSNETWIN_H
+#endif

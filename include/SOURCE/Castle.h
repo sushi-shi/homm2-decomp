@@ -2,9 +2,6 @@
 #define HOMM2_CASTLE_H
 
 #include <Ints.h>
-// Declarations of the free functions DEFINED in Castle.cpp — the single home for these
-// symbols. Other TUs call them by including this header (no local externs).
-// forward declarations (was <_all.h>):
 class heroWindow;
 struct tag_message;
 
@@ -85,4 +82,4 @@ extern u8 castleSlotsBase[CASTLE_SLOT_COUNT];
 extern class heroWindow* casWin;
 extern u8 castleSlotsUse[CASTLE_SLOT_COUNT];
 
-#endif // HOMM2_CASTLE_H
+#endif

@@ -2,9 +2,6 @@
 #define HOMM2_ADVMGR_H
 #include <va.h>
 #include <SOURCE/KB_TYPES.h>
-// Declarations of the free functions DEFINED in ADVMGR.cpp — the single home for these
-// symbols. Other TUs call them by including this header (no local externs).
-// forward declarations (was <_all.h>):
 class mapCell;
 struct tag_message;
 
@@ -847,7 +844,6 @@ i32 GetMobilityFrame(i32);
 i32 GetManaFrame(i32);
 u8 StopOnTrigger(class mapCell*);
 
-// ---- globals (declarations, RVA order) ----
 extern float fFirstWeekTownFV;
 extern i32 iVepCacheHits;
 extern i32 iTotalVepHits;
@@ -881,4 +877,4 @@ extern b32 gbTroopReload;
 extern i32 giCurAIHeroLuck;
 extern b32 gbActualShipyardFound;
 
-#endif // HOMM2_ADVMGR_H
+#endif
