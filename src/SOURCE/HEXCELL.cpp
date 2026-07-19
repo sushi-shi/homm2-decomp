@@ -5,6 +5,13 @@
 #include <SOURCE/combatManager.h>
 #include <SOURCE/hexcell.h>
 
+H2_ENUM_BEGIN(TowerDrawConstant)
+    TOWER_X_OFFSET      = 28,
+    TOWER_ROW_Y_ORIGIN  = 139,
+    TOWER_EXCLUDED_ROW  = 4,
+    TOWER_OVERLAY_FRAME = 9
+H2_ENUM_END(TowerDrawConstant)
+
 VA(0x0044a3c0, 0x46)
 hexcell::hexcell(void) {
     m_obstacleIndex = -1;
@@ -55,7 +62,7 @@ void hexcell::DrawUpperDeadOccupant(void) {
 VA(0x0044a5aa, 0x165)
 void hexcell::DrawOccupant(i32 creature, i32 frame) {
     if (m_occupantSide != COMBAT_OCCUPANT_NONE) {
-        if (creature != 100) {
+        if (creature != COMBAT_DRAW_ALL_OCCUPANTS) {
             if (gpCombatManager->m_armies[m_occupantSide][m_occupantIndex].m_drawState != creature)
                 return;
         }
@@ -79,27 +86,31 @@ void hexcell::DrawTower(i32 frame) {
     if (level)
         drawX = m_x;
     else
-        drawX = m_x + 28;
+        drawX = m_x + TOWER_X_OFFSET;
     gpCombatManager->m_combatIcons[IDX(COMBAT_ICON_TOWER)]
         ->CombatClipDrawToBuffer(drawX, m_y, frame, m_limits, 1, 0, NULL, NULL);
 
-    row = (m_y - 139) / 42;
-    if (row == 4)
+    row = (m_y - TOWER_ROW_Y_ORIGIN) / COMBAT_HEX_VERTICAL_STEP;
+    if (row == TOWER_EXCLUDED_ROW)
         return;
     if (row & 1) {
         if (level)
             rightX = m_x;
         else
-            rightX = m_x + 28;
+            rightX = m_x + TOWER_X_OFFSET;
         gpCombatManager->m_combatIcons[IDX(COMBAT_ICON_TOWER)]
-            ->CombatClipDrawToBuffer(rightX, m_y, 9, m_limits, 1, 0, NULL, NULL);
+            ->CombatClipDrawToBuffer(
+                rightX, m_y, TOWER_OVERLAY_FRAME, m_limits, 1, 0, NULL, NULL
+            );
     } else {
         if (level)
-            temp = m_x - 28;
+            temp = m_x - TOWER_X_OFFSET;
         else
             temp = m_x;
         gpCombatManager->m_combatIcons[IDX(COMBAT_ICON_TOWER)]
-            ->CombatClipDrawToBuffer(temp, m_y, 9, m_limits, 0, 0, NULL, NULL);
+            ->CombatClipDrawToBuffer(
+                temp, m_y, TOWER_OVERLAY_FRAME, m_limits, 0, 0, NULL, NULL
+            );
     }
 }
 

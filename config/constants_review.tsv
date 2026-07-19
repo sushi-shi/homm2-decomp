@@ -194,7 +194,7 @@ src/SOURCE/FINDPATH.cpp	pending
 src/SOURCE/FLY.cpp	reviewed	Private flight direction, mask, and timing constants are aligned enums; the attack buffer uses the shared army API extent, and repeated branchless facing arithmetic uses inline direction/rear-offset helpers. Remaining zeros and ones are coordinates, booleans, frame and loop initialization, bounds, and occupant sentinels.
 src/SOURCE/GAME.cpp	pending
 src/SOURCE/HERO.cpp	pending
-src/SOURCE/HEXCELL.cpp	pending
+src/SOURCE/HEXCELL.cpp	reviewed	Draw-all uses the shared combat sentinel; private tower geometry, excluded row, and overlay frame are named, with the vertical step shared from the combat grid model.
 src/SOURCE/HISCORE.cpp	reviewed	High-score animation, widget, file, geometry, timing, and manager results use named shared constants; remaining zeros and ones are initialization, booleans, empty strings, loop arithmetic, and status tests. Redundant bitwise-or-zero steering was removed from rank selection.
 src/SOURCE/KB.cpp	pending
 src/SOURCE/Modem.cpp	pending
