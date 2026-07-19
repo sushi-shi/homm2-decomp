@@ -15,6 +15,4 @@ i32 CDTest_VerifyCDThorough(void);
 i32 CDTest_VerifyTrack(i32);
 i32 CDTest_GenerateTable(char*);
 
-extern struct sCDTest_Track_Data cdTestTrackData[43];
-
 #endif
