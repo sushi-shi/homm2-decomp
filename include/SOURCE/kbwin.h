@@ -73,7 +73,7 @@ extern i32l lLastGetMessage;
 extern i32l lLastAilServe;
 extern b32 gbNoDialogMenusOn;
 extern i32 giTotalMemAllocated;
-extern u8 giChangeThreshold[16];
+extern u8 giChangeThreshold[];
 extern RECT rcTemp;
 extern i32 iMainWinScreenHeight;
 extern HMENU hmnuCurrent;
