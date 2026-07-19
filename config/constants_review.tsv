@@ -216,7 +216,7 @@ src/SOURCE/STRIP.cpp	reviewed	Private bank-box storage/widget values plus shared
 src/SOURCE/SWAPMGR.cpp	reviewed	Private swap-window control ranges and constants are named. Inline helpers normalize interior control IDs to their range cases and broadcast the contiguous adventure controls, removing repeated numeric offsets; no actionable literals remain.
 src/SOURCE/TOWN.cpp	reviewed	Nontrivial decisions use named domains; remaining zero/one uses are initialization, indexing, arithmetic, or boolean transport.
 src/SOURCE/TOWNMGR.cpp	pending
-src/SOURCE/VIEW.cpp	pending
+src/SOURCE/VIEW.cpp	reviewed	Private general-view control, label, long-help, hover-help, captain, and army-placement domains are named. Shared hero primary stats, widget flags/results, dialog type, and combat redraw timing are reused; no actionable literals remain.
 src/SOURCE/Viewwrld.cpp	pending
 src/SOURCE/Wsnetwin.cpp	reviewed	Private constants name source-line addends, entry/retry limits, and the extra-guest threshold; retained source-line data supplies retail allocation relocations, shared wait/dialog/log domains are reused, startup addressing derives from its packed record, and the socket sentinel uses INVALID_SOCKET.
 src/SOURCE/X_CAMPGN.cpp	pending
