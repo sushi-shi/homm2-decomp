@@ -10,7 +10,7 @@ i32 ArenaWindowHandler(struct tag_message&);
 void UpdateArenaIcons(void);
 
 extern i32 choice;
-extern class iconWidget* skillWidget[3];
+extern class iconWidget* skillWidget[];
 extern class heroWindow* arenaWinPtr;
 
 #endif
