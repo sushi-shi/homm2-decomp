@@ -195,11 +195,11 @@ src/SOURCE/FLY.cpp	pending
 src/SOURCE/GAME.cpp	pending
 src/SOURCE/HERO.cpp	pending
 src/SOURCE/HEXCELL.cpp	pending
-src/SOURCE/HISCORE.cpp	pending
+src/SOURCE/HISCORE.cpp	reviewed	High-score animation, widget, file, geometry, timing, and manager results use named shared constants; remaining zeros and ones are initialization, booleans, empty strings, loop arithmetic, and status tests. Redundant bitwise-or-zero steering was removed from rank selection.
 src/SOURCE/KB.cpp	pending
 src/SOURCE/Modem.cpp	pending
 src/SOURCE/NOOPT.cpp	reviewed	Only VA evidence; delay values are caller-provided.
-src/SOURCE/Netbios.cpp	pending
+src/SOURCE/Netbios.cpp	reviewed	Private setup, session, wait, game-mode, name-buffer, retry, and timing values are aligned enums; remaining zeros and ones are state initialization, boolean/status returns, dialog defaults, and null payload arguments.
 src/SOURCE/Newgame.cpp	pending
 src/SOURCE/Overview.cpp	pending
 src/SOURCE/PATH.cpp	reviewed	Private geometry constants are prefix-free and aligned; shared attack/path/facing/hex/occupant domains are named. Remaining zeroes and ones are results, booleans, loops, bit construction, or parity. Non-debug section bytes and ordered relocations are unchanged.
@@ -212,7 +212,7 @@ src/SOURCE/SETUP.cpp	pending
 src/SOURCE/SMACKMGR.cpp	pending
 src/SOURCE/SPELLAI.cpp	pending
 src/SOURCE/SPELLS.cpp	pending
-src/SOURCE/STRIP.cpp	pending
+src/SOURCE/STRIP.cpp	reviewed	Private bank-box storage/widget values plus shared strip layout, frames, resource, and slot domains cover policy literals; remaining zeros and ones are drawing origins/frames, loop initialization, booleans, and widget state. Redundant OD_STEER use was removed from the border id expression.
 src/SOURCE/SWAPMGR.cpp	pending
 src/SOURCE/TOWN.cpp	reviewed	Nontrivial decisions use named domains; remaining zero/one uses are initialization, indexing, arithmetic, or boolean transport.
 src/SOURCE/TOWNMGR.cpp	pending

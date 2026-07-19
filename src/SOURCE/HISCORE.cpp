@@ -269,7 +269,7 @@ void highScoreManager::Update(void) {
             messageValue.payload.widget.data.value = HIGH_SCORE_STANDARD_RATING_RESIZE;
         m_window->BroadcastMessage(messageValue);
 
-        if ((entry | 0) == giHighScoreRank) {
+        if (entry == giHighScoreRank) {
             if (!((!m_showCampaignScores || giHighScoreType == HIGH_SCORE_STANDARD)
                   && (m_showCampaignScores || giHighScoreType != HIGH_SCORE_STANDARD))) {
                 messageValue.payload.widget.command = HIGH_SCORE_WIDGET_SELECT;

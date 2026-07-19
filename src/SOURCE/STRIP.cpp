@@ -75,7 +75,7 @@ strip::strip(
                 STRIP_CONTENT_Y,
                 STRIP_ARMY_BORDER_WIDTH,
                 STRIP_BORDER_HEIGHT,
-                OD_STEER(slot) + firstBorderId + 1,
+                slot + firstBorderId + 1,
                 STRIP_BORDER_FILL_COLOR,
                 0,
                 NULL
