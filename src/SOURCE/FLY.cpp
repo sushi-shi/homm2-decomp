@@ -15,11 +15,6 @@
 
 namespace {
 
-H2_ENUM_CLASS_BEGIN(ArmyCombatDirection)
-    DIRECTION_LEFT  = 1,
-    DIRECTION_RIGHT = 4
-H2_ENUM_CLASS_END(ArmyCombatDirection)
-
 H2_ENUM_BEGIN(ArmyFlightConstant)
     ALL_ADJACENT_DIRECTIONS    = 0x3f,
     FLIGHT_SOUND_FRAME         = 1,
@@ -27,11 +22,11 @@ H2_ENUM_BEGIN(ArmyFlightConstant)
 H2_ENUM_END(ArmyFlightConstant)
 
 inline i32 FacingRearDirection(i32 facing) {
-    return facing == 1 ? IDX(DIRECTION_LEFT) : IDX(DIRECTION_RIGHT);
+    return facing == 1 ? COMBAT_DIRECTION_EAST : COMBAT_DIRECTION_WEST;
 }
 
 inline i32 FacingFrontDirection(i32 facing) {
-    return facing == 1 ? IDX(DIRECTION_RIGHT) : IDX(DIRECTION_LEFT);
+    return facing == 1 ? COMBAT_DIRECTION_WEST : COMBAT_DIRECTION_EAST;
 }
 
 inline i32 FacingRearHexOffset(i32 facing) {
@@ -156,9 +151,9 @@ i32 army::ValidFlight(i32 destination, i32 fromTargetHex) {
             targetHex--;
         }
         if (target->m_facing == 1) {
-            directionMask = 1 << IDX(DIRECTION_RIGHT);
+            directionMask = 1 << COMBAT_DIRECTION_WEST;
         } else {
-            directionMask = 1 << IDX(DIRECTION_LEFT);
+            directionMask = 1 << COMBAT_DIRECTION_EAST;
         }
     }
     while (directionMask != ALL_ADJACENT_DIRECTIONS) {
@@ -190,9 +185,9 @@ i32 army::ValidFlight(i32 destination, i32 fromTargetHex) {
             targetHex++;
         }
         if (target->m_facing == 1) {
-            directionMask = 1 << IDX(DIRECTION_LEFT);
+            directionMask = 1 << COMBAT_DIRECTION_EAST;
         } else {
-            directionMask = 1 << IDX(DIRECTION_RIGHT);
+            directionMask = 1 << COMBAT_DIRECTION_WEST;
         }
         while (directionMask != ALL_ADJACENT_DIRECTIONS) {
             direction = GetBestDirection(targetHex, m_hex, directionMask);

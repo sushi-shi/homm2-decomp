@@ -1322,34 +1322,34 @@ void combatManager::EffectSpellDamage(i32* effect, SpellType spell, i32 targetHe
                         currentHex = targetHex + SPELL_FIREBLAST_HEX_ROW_STRIDE;
                     if (step == SPELL_FIREBLAST_CORNER_FIRST) {
                         currentHex = GetAdjacentCellIndexNoArmy(
-                            targetHex, COMBAT_DIRECTION_NORTHEAST
+                            targetHex, COMBAT_DIRECTION_EAST
+                        );
+                        currentHex = GetAdjacentCellIndexNoArmy(
+                            currentHex, COMBAT_DIRECTION_NORTHEAST
+                        );
+                    }
+                    if (step == SPELL_FIREBLAST_CORNER_SECOND) {
+                        currentHex = GetAdjacentCellIndexNoArmy(
+                            targetHex, COMBAT_DIRECTION_EAST
+                        );
+                        currentHex = GetAdjacentCellIndexNoArmy(
+                            currentHex, COMBAT_DIRECTION_SOUTHEAST
+                        );
+                    }
+                    if (step == SPELL_FIREBLAST_CORNER_THIRD) {
+                        currentHex = GetAdjacentCellIndexNoArmy(
+                            targetHex, COMBAT_DIRECTION_WEST
                         );
                         currentHex = GetAdjacentCellIndexNoArmy(
                             currentHex, COMBAT_DIRECTION_NORTHWEST
                         );
                     }
-                    if (step == SPELL_FIREBLAST_CORNER_SECOND) {
-                        currentHex = GetAdjacentCellIndexNoArmy(
-                            targetHex, COMBAT_DIRECTION_NORTHEAST
-                        );
-                        currentHex = GetAdjacentCellIndexNoArmy(
-                            currentHex, COMBAT_DIRECTION_EAST
-                        );
-                    }
-                    if (step == SPELL_FIREBLAST_CORNER_THIRD) {
-                        currentHex = GetAdjacentCellIndexNoArmy(
-                            targetHex, COMBAT_DIRECTION_SOUTHWEST
-                        );
-                        currentHex = GetAdjacentCellIndexNoArmy(
-                            currentHex, COMBAT_DIRECTION_WEST
-                        );
-                    }
                     if (step == SPELL_FIREBLAST_CORNER_FOURTH) {
                         currentHex = GetAdjacentCellIndexNoArmy(
-                            targetHex, COMBAT_DIRECTION_SOUTHWEST
+                            targetHex, COMBAT_DIRECTION_WEST
                         );
                         currentHex = GetAdjacentCellIndexNoArmy(
-                            currentHex, COMBAT_DIRECTION_SOUTHEAST
+                            currentHex, COMBAT_DIRECTION_SOUTHWEST
                         );
                     }
                     step++;
