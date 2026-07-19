@@ -444,7 +444,7 @@ void combatManager::DoCompAI(i32) {
                 && currentArmy9->m_hex < castleBoundary27[castleRow29]) {
                 castleTargetHex2 = castleBoundary27[castleRow29];
                 castleCell5 = &gpCombatManager->m_hexCells[castleTargetHex2];
-                if (ValidHex(castleTargetHex2) && castleCell5->m_occupantSide == -1
+                if (ValidHex(castleTargetHex2) && castleCell5->m_occupantSide == COMBAT_OCCUPANT_NONE
                     && castleCell5->m_blocked == 0) {
                     giNextAction = COMBAT_AI_ACTION_MOVE;
                     giNextActionGridIndex = castleTargetHex2;
@@ -458,7 +458,7 @@ void combatManager::DoCompAI(i32) {
 finish:
     if (giNextAction == COMBAT_AI_ACTION_MOVE && giNextActionGridIndex > 0
         && giNextActionGridIndex < COMBAT_HEX_COUNT
-        && gpCombatManager->m_hexCells[giNextActionGridIndex].m_occupantSide == -1) {
+        && gpCombatManager->m_hexCells[giNextActionGridIndex].m_occupantSide == COMBAT_OCCUPANT_NONE) {
         for (adjacentDirection6 = 0; adjacentDirection6 < COMBAT_AI_ADJACENT_DIRECTION_COUNT;
              adjacentDirection6++) {
             adjacentHex8 =
@@ -522,7 +522,7 @@ void combatManager::DoLichShot(class army* lich) {
         for (direction37 = 0; direction37 < COMBAT_AI_ADJACENT_DIRECTION_COUNT; direction37++) {
             adjacentHex13 = GetAdjacentCellIndexNoArmy(targetHex36, direction37);
             if (adjacentHex13 >= 0 && adjacentHex13 < COMBAT_HEX_COUNT
-                && m_hexCells[adjacentHex13].m_occupantSide != -1
+                && m_hexCells[adjacentHex13].m_occupantSide != COMBAT_OCCUPANT_NONE
                 && m_hexCells[adjacentHex13].m_occupantIndex != -1
                 && damaged19
                            [m_hexCells[adjacentHex13].m_occupantSide * COMBAT_AI_ARMY_SLOT_COUNT
@@ -853,7 +853,9 @@ i32 combatManager::AttemptAttack(class army* currentArmy, i32 side, i32 mask) {
 VA(0x004c3468, 0x182)
 i32 combatManager::AttemptAdjacentAttack(class army* currentArmy) {
     u32 availableMask4 =
-        ~currentArmy->GetAttackMask(currentArmy->m_hex, ARMY_ATTACK_TARGET_ENEMY, -1);
+        ~currentArmy->GetAttackMask(
+            currentArmy->m_hex, ARMY_ATTACK_TARGET_ENEMY, ARMY_HEX_INVALID
+        );
     u32 bit0;
     u32 targetMask29;
     i32 direction36;
@@ -871,7 +873,7 @@ i32 combatManager::AttemptAdjacentAttack(class army* currentArmy) {
                 currentArmy->m_hex,
                 direction36,
                 ARMY_ATTACK_TARGET_ENEMY,
-                -1,
+                ARMY_HEX_INVALID,
                 attackHexes5
             )
             && attackHexes5[0] >= 0)
@@ -972,7 +974,9 @@ i32 combatManager::WalkTowardArmy(class army* currentArmy, i32 side, i32 mask) {
     currentArmy->m_targetSide = side;
     currentArmy->m_targetIndex = targetArmy6;
     attackMask36 =
-        currentArmy->GetAttackMask(currentArmy->m_hex, ARMY_ATTACK_TARGET_ASSIGNED, -1);
+        currentArmy->GetAttackMask(
+            currentArmy->m_hex, ARMY_ATTACK_TARGET_ASSIGNED, ARMY_HEX_INVALID
+        );
     if (attackMask36 != COMBAT_AI_ALL_ATTACK_DIRECTIONS) {
         giNextAction = COMBAT_AI_ACTION_WAIT;
         return 1;

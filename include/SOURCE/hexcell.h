@@ -4,6 +4,10 @@
 #include <va.h>
 #include <BASE/icon.h>
 
+#define COMBAT_OCCUPANT_NONE (-1)
+#define COMBAT_DEAD_OCCUPANT_CAPACITY 14
+#define HEXCELL_LIMIT_COUNT 2
+
 #pragma pack(push, 1)
 class hexcell {
 public:
@@ -20,11 +24,11 @@ public:
     i8 m_occupantIndex;
     i8 m_occupantFrame;
     i32 m_deadOccupantCount;
-    i8 m_deadOccupantSides[14];
-    i8 m_deadOccupantIndices[14];
-    i8 m_deadOccupantFrames[14];
+    i8 m_deadOccupantSides[COMBAT_DEAD_OCCUPANT_CAPACITY];
+    i8 m_deadOccupantIndices[COMBAT_DEAD_OCCUPANT_CAPACITY];
+    i8 m_deadOccupantFrames[COMBAT_DEAD_OCCUPANT_CAPACITY];
     u8 m_pathReachable;
-    struct SLimitData m_limits[2];
+    struct SLimitData m_limits[HEXCELL_LIMIT_COUNT];
     hexcell(void);
     void DrawGround(void);
     void DrawLowerDeadOccupants(void);

@@ -93,7 +93,7 @@ include/SOURCE/NOOPT.h	reviewed	No literal values.
 include/SOURCE/Netbios.h	pending
 include/SOURCE/Newgame.h	pending
 include/SOURCE/Overview.h	pending
-include/SOURCE/PATH.h	pending
+include/SOURCE/PATH.h	reviewed	The public combat-hex direction domain has explicit aligned values; no unexplained literals remain.
 include/SOURCE/PHILAI.h	pending
 include/SOURCE/RECRUIT.h	pending
 include/SOURCE/REMOTE.h	pending
@@ -108,7 +108,7 @@ include/SOURCE/Viewwrld.h	pending
 include/SOURCE/Wsnetwin.h	pending
 include/SOURCE/X_GLOBAL.h	pending
 include/SOURCE/advManager.h	pending
-include/SOURCE/army.h	pending
+include/SOURCE/army.h	reviewed	Cross-TU attack target, path target, facing, and invalid-hex values are named expansion-only interface constants; array extents are named and the remaining literal is proven class SIZE evidence.
 include/SOURCE/armyGroup.h	pending
 include/SOURCE/bankBox.h	pending
 include/SOURCE/combatManager.h	pending
@@ -118,7 +118,7 @@ include/SOURCE/dpnetwin.h	pending
 include/SOURCE/fileRequester.h	pending
 include/SOURCE/game.h	pending
 include/SOURCE/hero.h	pending
-include/SOURCE/hexcell.h	pending
+include/SOURCE/hexcell.h	reviewed	The empty-occupant sentinel and record capacities are named expansion-only layout constants; the remaining literal is proven class SIZE evidence.
 include/SOURCE/highScoreManager.h	pending
 include/SOURCE/kbwin.h	pending
 include/SOURCE/netwin.h	pending
@@ -204,7 +204,7 @@ src/SOURCE/NOOPT.cpp	reviewed	Only VA evidence; delay values are caller-provided
 src/SOURCE/Netbios.cpp	pending
 src/SOURCE/Newgame.cpp	pending
 src/SOURCE/Overview.cpp	pending
-src/SOURCE/PATH.cpp	pending
+src/SOURCE/PATH.cpp	reviewed	Private geometry constants are prefix-free and aligned; shared attack/path/facing/hex/occupant domains are named. Remaining zeroes and ones are results, booleans, loops, bit construction, or parity. Non-debug section bytes and ordered relocations are unchanged.
 src/SOURCE/PHILAI.cpp	pending
 src/SOURCE/RECRUIT.cpp	pending
 src/SOURCE/REMOTE.cpp	pending

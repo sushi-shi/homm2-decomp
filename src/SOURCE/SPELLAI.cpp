@@ -844,7 +844,9 @@ i32 combatManager::RawEffectSpellInfluence(army* target, i32 influence) {
             if (HAS(target->m_monster.flags.all, MONSTER_FLAGS_SHOOTER))
                 return 0;
             i32 attackMask =
-                target->GetAttackMask(target->m_hex, ARMY_ATTACK_TARGET_ENEMY, -1);
+                target->GetAttackMask(
+                    target->m_hex, ARMY_ATTACK_TARGET_ENEMY, ARMY_HEX_INVALID
+                );
             if (attackMask != COMBAT_SPELL_AI_ALL_ATTACK_DIRECTIONS)
                 return 0;
 

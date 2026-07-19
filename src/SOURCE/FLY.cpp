@@ -38,7 +38,7 @@ i32 army::CanFit(i32 hex, i32 tryOtherSide, i32* fittingHex) {
         || candidateHex % ARMY_HEX_COLUMNS == ARMY_HEX_COLUMNS - 1) {
         return 0;
     }
-    if (gpCombatManager->m_hexCells[candidateHex].m_occupantSide != -1
+    if (gpCombatManager->m_hexCells[candidateHex].m_occupantSide != COMBAT_OCCUPANT_NONE
         || gpCombatManager->m_hexCells[candidateHex].m_blocked) {
         return 0;
     }
@@ -48,7 +48,7 @@ i32 army::CanFit(i32 hex, i32 tryOtherSide, i32* fittingHex) {
             cell_9 = &gpCombatManager->m_hexCells[candidateHex];
         }
         if (ValidHex(candidateHex)
-            && (cell_9->m_occupantSide == -1
+            && (cell_9->m_occupantSide == COMBAT_OCCUPANT_NONE
                 || (cell_9->m_occupantSide == gpCombatManager->m_currentArmySide
                     && cell_9->m_occupantIndex == gpCombatManager->m_currentArmyIndex))
             && !cell_9->m_blocked) {
@@ -65,7 +65,7 @@ i32 army::CanFit(i32 hex, i32 tryOtherSide, i32* fittingHex) {
             } else {
                 return 0;
             }
-            if ((cell_9->m_occupantSide == -1
+            if ((cell_9->m_occupantSide == COMBAT_OCCUPANT_NONE
                  || (cell_9->m_occupantSide == gpCombatManager->m_currentArmySide
                      && cell_9->m_occupantIndex == gpCombatManager->m_currentArmyIndex))
                 && !cell_9->m_blocked) {
@@ -117,10 +117,16 @@ i32 army::ValidFlight(i32 destination, i32 fromTargetHex) {
         return 0;
     }
 
-    attackMask = GetAttackMask(m_hex, ARMY_ATTACK_TARGET_ASSIGNED, -1);
+    attackMask = GetAttackMask(m_hex, ARMY_ATTACK_TARGET_ASSIGNED, ARMY_HEX_INVALID);
     while (attackMask != ARMY_ALL_ATTACK_DIRECTIONS) {
         initialDirection = GetBestDirection(m_hex, targetHex, attackMask);
-        if (ValidAttack(m_hex, initialDirection, ARMY_ATTACK_TARGET_ASSIGNED, -1, attackHex)) {
+        if (ValidAttack(
+                m_hex,
+                initialDirection,
+                ARMY_ATTACK_TARGET_ASSIGNED,
+                ARMY_HEX_INVALID,
+                attackHex
+            )) {
             m_attackDirection = initialDirection;
             m_moveTargetHex = m_hex;
             return 1;
@@ -149,7 +155,9 @@ i32 army::ValidFlight(i32 destination, i32 fromTargetHex) {
             if (!HAS(m_monster.flags.all, MONSTER_FLAGS_WIDE)) {
                 m_attackDirection = OppositeDirection(direction);
             } else {
-                attackMask = ~GetAttackMask(m_moveTargetHex, ARMY_ATTACK_TARGET_ASSIGNED, -1);
+                attackMask = ~GetAttackMask(
+                    m_moveTargetHex, ARMY_ATTACK_TARGET_ASSIGNED, ARMY_HEX_INVALID
+                );
                 for (i = 0; i < ARMY_COMBAT_DIRECTION_COUNT; i++) {
                     if (attackMask & (1 << i)) {
                         m_attackDirection = i;

@@ -383,7 +383,7 @@ void army::DrawToBuffer(i32 x, i32 y, i32 effectsOnly) {
             quantityX5 = x - 29;
             neighboringHex = m_hex - 1;
         }
-        neighborOccupied14 = gpCombatManager->m_hexCells[neighboringHex].m_occupantSide != -1;
+        neighborOccupied14 = gpCombatManager->m_hexCells[neighboringHex].m_occupantSide != COMBAT_OCCUPANT_NONE;
         quantityOffset0 = m_frameInfo.quantityX[1 - m_facing];
         if (neighborOccupied14 && quantityOffset0 > 0) {
             quantityOffset0 = 0;
@@ -1127,7 +1127,7 @@ void army::SpecialAttack(void) {
             if (adjacentHex == -1) {
                 continue;
             }
-            if (gpCombatManager->m_hexCells[adjacentHex].m_occupantSide != -1) {
+            if (gpCombatManager->m_hexCells[adjacentHex].m_occupantSide != COMBAT_OCCUPANT_NONE) {
                 splashTarget =
                     &gpCombatManager
                          ->m_armies[gpCombatManager->m_hexCells[adjacentHex].m_occupantSide]
@@ -1242,9 +1242,13 @@ void army::DoHydraAttack(i32) {
     totalDamage_1 = totalKilled_7;
     gpCombatManager->ResetHitByCreature();
     if (m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BERSERK)]) {
-        attackMask_7 = static_cast<i16>(GetAttackMask(m_hex, ARMY_ATTACK_TARGET_OCCUPIED, -1));
+        attackMask_7 = static_cast<i16>(
+            GetAttackMask(m_hex, ARMY_ATTACK_TARGET_OCCUPIED, ARMY_HEX_INVALID)
+        );
     } else {
-        attackMask_7 = static_cast<i16>(GetAttackMask(m_hex, ARMY_ATTACK_TARGET_ENEMY, -1));
+        attackMask_7 = static_cast<i16>(
+            GetAttackMask(m_hex, ARMY_ATTACK_TARGET_ENEMY, ARMY_HEX_INVALID)
+        );
     }
     CheckLuck();
     gpCombatManager->ResetLimitCreature();
@@ -2783,7 +2787,7 @@ void army::GoBerserk(void) {
     masks_28[0] = gpCombatManager->GetAllMask(0);
     masks_28[1] = gpCombatManager->GetAllMask(1);
     m_quantity = savedQuantity_10;
-    masks_28[2] = GetAttackMask(m_hex, ARMY_ATTACK_TARGET_OCCUPIED, -1);
+    masks_28[2] = GetAttackMask(m_hex, ARMY_ATTACK_TARGET_OCCUPIED, ARMY_HEX_INVALID);
     if (masks_28[2] != ARMY_ALL_ATTACK_DIRECTIONS) {
         do {
             if (!masks_28[4]) {
@@ -2793,7 +2797,13 @@ void army::GoBerserk(void) {
             }
         } while (masks_28[2] & (1 << direction_4));
         giNextAction = COMBAT_AI_ACTION_MOVE;
-        ValidAttack(m_hex, direction_4, ARMY_ATTACK_TARGET_OCCUPIED, -1, &targetHex_9);
+        ValidAttack(
+            m_hex,
+            direction_4,
+            ARMY_ATTACK_TARGET_OCCUPIED,
+            ARMY_HEX_INVALID,
+            &targetHex_9
+        );
         giNextActionGridIndex = targetHex_9;
         masks_28[4] = 1;
         goto berserkFinish;
@@ -2902,7 +2912,7 @@ void army::MoveAttack(i32 destination, i32 moveOnly) {
         if (!ValidHex(destination)) {
             return;
         }
-        if (gpCombatManager->m_hexCells[destination].m_occupantSide == -1
+        if (gpCombatManager->m_hexCells[destination].m_occupantSide == COMBAT_OCCUPANT_NONE
             || (gpCombatManager->m_hexCells[destination].m_occupantSide
                     == gpCombatManager->m_currentArmySide
                 && gpCombatManager->m_hexCells[destination].m_occupantIndex
@@ -2915,7 +2925,7 @@ void army::MoveAttack(i32 destination, i32 moveOnly) {
         m_targetSide = gpCombatManager->m_hexCells[destination].m_occupantSide;
         m_targetIndex = gpCombatManager->m_hexCells[destination].m_occupantIndex;
         m_moveTargetHex = destination;
-        baseAttackMask = GetAttackMask(m_hex, ARMY_ATTACK_TARGET_ASSIGNED, -1);
+        baseAttackMask = GetAttackMask(m_hex, ARMY_ATTACK_TARGET_ASSIGNED, ARMY_HEX_INVALID);
         if (HAS(m_monster.flags.all, MONSTER_FLAGS_FLYING)
             && baseAttackMask == ARMY_ALL_ATTACK_DIRECTIONS) {
             if (m_hex != m_moveTargetHex && !ValidFlight(m_moveTargetHex, 0)) {
@@ -2927,9 +2937,9 @@ void army::MoveAttack(i32 destination, i32 moveOnly) {
         break;
     }
     if (m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BERSERK)]) {
-        targetAttackMask = GetAttackMask(m_hex, ARMY_ATTACK_TARGET_OCCUPIED, -1);
+        targetAttackMask = GetAttackMask(m_hex, ARMY_ATTACK_TARGET_OCCUPIED, ARMY_HEX_INVALID);
     } else {
-        targetAttackMask = GetAttackMask(m_hex, ARMY_ATTACK_TARGET_ENEMY, -1);
+        targetAttackMask = GetAttackMask(m_hex, ARMY_ATTACK_TARGET_ENEMY, ARMY_HEX_INVALID);
     }
     if (targetAttackMask == ARMY_ALL_ATTACK_DIRECTIONS && m_monster.shots > 0) {
         SpecialAttack();
