@@ -135,8 +135,9 @@ H2_ENUM_BEGIN(BaseWidgetCommand)
     HERO_UI_INPUT_ALTERNATE_SELECT            = WIDGET_COMMAND_ALTERNATE_SELECT,
     INIT_MENU_HELP_COMMAND                    = WIDGET_COMMAND_ALTERNATE_SELECT,
     NEW_GAME_EVENT_ALTERNATE_PRESS            = WIDGET_COMMAND_ALTERNATE_SELECT,
-    ADVMGR_REMOTE_WAIT_EXIT_COMMAND           =
-        16, // custom remote-wait exit; no canonical widget command at 16
+    // Remote-wait extension outside the canonical widget command sequence.
+    WIDGET_COMMAND_REMOTE_WAIT_EXIT           = 16,
+    ADVMGR_REMOTE_WAIT_EXIT_COMMAND           = WIDGET_COMMAND_REMOTE_WAIT_EXIT,
     HERO_UI_WIDGET_ICON_FILE                  = WIDGET_COMMAND_SET_ICON,
     COMBAT_WIN_LOSE_RESOURCE_COMMAND          = WIDGET_COMMAND_SET_ICON,
     CASTLE_WIDGET_ICON_FILE                   = WIDGET_COMMAND_SET_ICON,
