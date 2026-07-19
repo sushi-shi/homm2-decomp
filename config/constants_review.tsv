@@ -3,21 +3,21 @@ include/BASE/BITS.h	reviewed	Public APIs use arithmetic bit indices; no literal 
 include/BASE/BITSConstants.h	reviewed	Fixed-width bit storage aliases; no literal values.
 include/BASE/Blur.h	reviewed	The public blur operation names every parameter and exposes no private constants or storage records.
 include/BASE/Bzip.h	reviewed	Shared model, frequency padding, CRC table, and program-name storage extents are named enums; declarations otherwise contain no numeric constants.
-include/BASE/DROPLIST_TYPES.h	pending
+include/BASE/DROPLIST_TYPES.h	reviewed	The source-file record union derives its storage from the retail string; remaining literals are packed SIZE evidence.
 include/BASE/EXEC_TYPES.h	reviewed	Every text-field extent is named; remaining literals are packed-layout SIZE evidence.
-include/BASE/INPUTMGR.h	pending
-include/BASE/INPUTMGR_TYPES.h	pending
-include/BASE/Icon2b.h	pending
-include/BASE/IconDraw.h	pending
+include/BASE/INPUTMGR.h	reviewed	The header contains declarations only and no numeric literals.
+include/BASE/INPUTMGR_TYPES.h	reviewed	Shared source-text slot extents are named enums; the remaining literal is packed SIZE evidence.
+include/BASE/Icon2b.h	reviewed	The header contains declarations only and no numeric literals.
+include/BASE/IconDraw.h	reviewed	The shared clipping mode is an explicitly valued enum.
 include/BASE/IconEntry.h	reviewed	Serialized frame-entry fields are named; remaining literals are packing and SIZE layout evidence.
-include/BASE/IconMonoRle.h	pending
-include/BASE/IconRle.h	pending
-include/BASE/IconShear.h	pending
-include/BASE/Icond2b.h	pending
-include/BASE/Icondf2b.h	pending
-include/BASE/Iconf2b.h	pending
-include/BASE/Iconm2b.h	pending
-include/BASE/Iconmf2b.h	pending
+include/BASE/IconMonoRle.h	reviewed	The serialized monochrome RLE command, sentinel, flag, and mask domain is an explicitly valued enum.
+include/BASE/IconRle.h	reviewed	The serialized RLE command, flag, mask, and palette-stride domain is an explicitly valued enum; cursor minus one returns the byte consumed by the preceding increment.
+include/BASE/IconShear.h	reviewed	The serialized skipped-row sentinel is an explicitly valued enum.
+include/BASE/Icond2b.h	reviewed	The header contains declarations only and no numeric literals.
+include/BASE/Icondf2b.h	reviewed	The header contains declarations only and no numeric literals.
+include/BASE/Iconf2b.h	reviewed	The header contains declarations only and no numeric literals.
+include/BASE/Iconm2b.h	reviewed	The header contains declarations only and no numeric literals.
+include/BASE/Iconmf2b.h	reviewed	The header contains declarations only and no numeric literals.
 include/BASE/MIDIWrap.h	reviewed	Only the proven MIDIWrap SIZE annotation is numeric.
 include/BASE/MIDI_TYPES.h	reviewed	Shared text-record field extents are named and aligned; the remaining literal is packed-layout SIZE evidence.
 include/BASE/MISC_TYPES.h	reviewed	Text-slot extents derive from their literal payloads and remaining SIZE values are packed-layout evidence; the registry key and source path are shared textual identities rather than numeric constant fallbacks.
@@ -37,22 +37,22 @@ include/BASE/bmap2.h	reviewed	All public bitmap-operation parameters are named; 
 include/BASE/border.h	reviewed	Public class interface contains only pure-virtual overrides and packed-layout SIZE evidence.
 include/BASE/button.h	reviewed	Public class interface contains only packed-layout SIZE evidence; dispatch-return storage widths are proven by the retail ABI.
 include/BASE/dimmerWidget.h	reviewed	Public constructor parameters are named; remaining literals are language-level pure override and packed-layout SIZE evidence.
-include/BASE/dropListWidget.h	pending
+include/BASE/dropListWidget.h	reviewed	The declaration contains only packed class-layout SIZE evidence; frame semantics are represented by named fields.
 include/BASE/executive.h	reviewed	The interface carries no numeric policy; the sole literal is proven class-layout SIZE evidence.
 include/BASE/font.h	reviewed	Shared glyph, draw-mode, and horizontal/vertical alignment domains are named and aligned. The remaining literal is packed-layout SIZE evidence.
 include/BASE/heroWindow.h	reviewed	Shared fixed-layer, saved-background, ownership, update-mask, open-state, widget-range, and name-capacity domains are named and aligned. The interface otherwise contains no numeric storage policy.
 include/BASE/heroWindowManager.h	reviewed	Shared hover/dialog sentinels, cycle-palette extent, and fade-mode domain are named and aligned. The remaining literal is proven packed class-layout SIZE evidence.
 include/BASE/icon.h	reviewed	Limit bounds, typed frame-table access, and all public method parameters are named; remaining literals are packed-layout SIZE evidence.
-include/BASE/icon2bc.h	pending
-include/BASE/icon2bs.h	pending
-include/BASE/icon2by.h	pending
+include/BASE/icon2bc.h	reviewed	The header contains declarations only and no numeric literals.
+include/BASE/icon2bs.h	reviewed	The header contains declarations only and no numeric literals.
+include/BASE/icon2by.h	reviewed	The header contains declarations only and no numeric literals.
 include/BASE/iconWidget.h	reviewed	Public constructor parameters are named; remaining literal is packed-layout SIZE evidence.
-include/BASE/iconf2bc.h	pending
-include/BASE/iconf2by.h	pending
-include/BASE/inputManager.h	pending
-include/BASE/listBoxWidget.h	pending
-include/BASE/message.h	pending
-include/BASE/miscwin.h	pending
+include/BASE/iconf2bc.h	reviewed	The header contains declarations only and no numeric literals.
+include/BASE/iconf2by.h	reviewed	The header contains declarations only and no numeric literals.
+include/BASE/inputManager.h	reviewed	Shared key-code mode, complete scan-code domain, and ring/table capacities are explicitly valued enums; the remaining literal is packed class-layout SIZE evidence.
+include/BASE/listBoxWidget.h	reviewed	The declaration contains only packed class-layout SIZE evidence; frame semantics are represented by named fields.
+include/BASE/message.h	reviewed	Shared message, widget-command, modifier, and executive-command ABI domains are explicitly valued enums with semantic aliases; remaining literals are packed payload SIZE evidence.
+include/BASE/miscwin.h	reviewed	The header contains declarations only and no numeric literals.
 include/BASE/mouseManager.h	reviewed	Shared cursor type, axis, array extent, screen geometry, bitmap/mask layout, hotspot, message, and frame-sentinel domains are named and aligned. The remaining pad extent and SIZE value are proven packed-layout evidence.
 include/BASE/palette.h	reviewed	Palette storage extent and public constructor parameter are named; remaining literal is packed-layout SIZE evidence.
 include/BASE/resource.h	reviewed	Shared resource-category and reference-lifecycle domains are explicit enums. The remaining zero is pure-virtual syntax.
