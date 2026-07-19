@@ -6,6 +6,22 @@
 #include <BASE/Misc.h>
 #include <BASE/resourceManager.h>
 #include <SOURCE/KB.h>
+
+// Strict builds type-check these private values; production expansion keeps VC4.2 state neutral.
+#ifdef HOMM2_STRICT_ENUM_TYPES
+H2_ENUM_BEGIN(IconWidgetConstant)
+    RESOURCE_NAME_CAPACITY = 16,
+    COLOR_INDEX_MASK       = 0xff,
+    CENTER_SHIFT           = 1,
+    BOTTOM_PADDING         = 2
+H2_ENUM_END(IconWidgetConstant)
+#else
+#define RESOURCE_NAME_CAPACITY 16
+#define COLOR_INDEX_MASK 0xff
+#define CENTER_SHIFT 1
+#define BOTTOM_PADDING 2
+#endif
+
 VA(0x004d0a60, 0x2d)
 iconWidget::iconWidget(void) : widget(0, 0, 0, 0, 0, 0) {
     m_frame = 0;
@@ -62,7 +78,7 @@ iconWidget::iconWidget(
 
 VA(0x004d0bc0, 0xdf)
 void iconWidget::Read(void) {
-    char iconName[16];
+    char iconName[RESOURCE_NAME_CAPACITY];
     m_x = gpResourceManager->ReadWord();
     m_y = gpResourceManager->ReadWord();
     m_width = gpResourceManager->ReadWord();
@@ -76,13 +92,18 @@ void iconWidget::Read(void) {
     m_flip = static_cast<i8>(gpResourceManager->ReadWord());
     m_id = gpResourceManager->ReadWord();
     m_kind = gpResourceManager->ReadWord();
-    m_fillColor = gpResourceManager->ReadWord() & 0xFF;
+    m_fillColor = gpResourceManager->ReadWord() & COLOR_INDEX_MASK;
 }
 
 VA(0x004d0ca0, 0x21)
 iconWidget::~iconWidget() {
     gpResourceManager->Dispose(m_icon);
 }
+
+// Preserve the original statement stream while consolidating forwarded widget identity.
+#define SET_WIDGET_MESSAGE_TYPE_AND_ID(messageValue, idValue)                                    \
+    messageValue.type = MESSAGE_WIDGET;                                                          \
+    messageValue.payload.widget.id = idValue
 
 // @semantic: jump-table placement residual.
 VA(0x004d0cd0, 0x291)
@@ -93,7 +114,7 @@ i32 iconWidget::Main(tag_message& msg) {
             || msg.payload.widget.command != WIDGET_COMMAND_REPLACE_ICON)) {
         if (msg.type == MESSAGE_WIDGET)
             return widget::Main(msg);
-        return 0;
+        return WIDGET_DISPATCH_CONTINUE;
     }
 
     i32 eventType = msg.type;
@@ -114,11 +135,10 @@ i32 iconWidget::Main(tag_message& msg) {
                     m_flags = flags | WIDGET_FLAG_SELECTED;
                     msg.payload.widget.command = WIDGET_COMMAND_SELECT;
                 }
-                msg.type = MESSAGE_WIDGET;
-                msg.payload.widget.id = m_id;
-                return 2;
+                SET_WIDGET_MESSAGE_TYPE_AND_ID(msg, m_id);
+                return WIDGET_DISPATCH_FORWARD;
             }
-            return 0;
+            return WIDGET_DISPATCH_CONTINUE;
         }
 
         case MESSAGE_LEFT_BUTTON_UP:
@@ -126,11 +146,10 @@ i32 iconWidget::Main(tag_message& msg) {
             if ((flags & WIDGET_FLAG_SELECTED) != 0) {
                 m_flags = flags & ~WIDGET_FLAG_SELECTED;
                 msg.payload.widget.command = WIDGET_COMMAND_DESELECT;
-                msg.type = MESSAGE_WIDGET;
-                msg.payload.widget.id = m_id;
-                return 2;
+                SET_WIDGET_MESSAGE_TYPE_AND_ID(msg, m_id);
+                return WIDGET_DISPATCH_FORWARD;
             }
-            return 0;
+            return WIDGET_DISPATCH_CONTINUE;
 
         case MESSAGE_WIDGET:
             switch (msg.payload.widget.command) {
@@ -138,13 +157,13 @@ i32 iconWidget::Main(tag_message& msg) {
                     if (m_id != msg.payload.widget.id)
                         goto normalEvent;
                     m_frame = msg.payload.widget.data.value;
-                    return 1;
+                    return WIDGET_DISPATCH_CONSUME;
 
                 case WIDGET_COMMAND_SET_FILL_COLOR:
                     if (m_id != msg.payload.widget.id)
                         goto normalEvent;
-                    m_fillColor = msg.payload.widget.data.value & 0xFF;
-                    return 1;
+                    m_fillColor = msg.payload.widget.data.value & COLOR_INDEX_MASK;
+                    return WIDGET_DISPATCH_CONSUME;
 
                 case WIDGET_COMMAND_SET_ICON:
                     if (m_id != msg.payload.widget.id)
@@ -153,7 +172,7 @@ i32 iconWidget::Main(tag_message& msg) {
                         gpResourceManager->Dispose(m_icon);
                         m_icon = gpResourceManager->GetIcon(msg.payload.widget.data.text);
                     }
-                    return 1;
+                    return WIDGET_DISPATCH_CONSUME;
 
                 case WIDGET_COMMAND_REPLACE_ICON:
                     if (m_iconId == msg.payload.widget.id) {
@@ -163,7 +182,7 @@ i32 iconWidget::Main(tag_message& msg) {
                             static_cast<u32l>(msg.payload.widget.data.value)
                         );
                     }
-                    return 0;
+                    return WIDGET_DISPATCH_CONTINUE;
 
                 default:
                     goto normalEvent;
@@ -176,6 +195,8 @@ i32 iconWidget::Main(tag_message& msg) {
 normalEvent:
     return widget::Main(msg);
 }
+
+#undef SET_WIDGET_MESSAGE_TYPE_AND_ID
 
 // @semantic: compiler-shape residual.
 VA(0x004d0f70, 0xe5)
@@ -201,9 +222,9 @@ void iconWidget::Draw(void) {
             widgetWidth = m_width;
             x -= entry->x;
             if (iconWidth < widgetWidth)
-                x += (widgetWidth - iconWidth) >> 1;
-            if (entry->h + 2 < m_height)
-                y += m_height - entry->h - 2;
+                x += (widgetWidth - iconWidth) >> CENTER_SHIFT;
+            if (entry->h + BOTTOM_PADDING < m_height)
+                y += m_height - entry->h - BOTTOM_PADDING;
             m_icon->DrawToBuffer(x, y, m_frame, m_flip);
             return;
         }
@@ -216,3 +237,10 @@ void iconWidget::Draw(void) {
 
 
 VTBL(iconWidget, 0x004eba40);
+
+#ifndef HOMM2_STRICT_ENUM_TYPES
+#undef RESOURCE_NAME_CAPACITY
+#undef COLOR_INDEX_MASK
+#undef CENTER_SHIFT
+#undef BOTTOM_PADDING
+#endif
