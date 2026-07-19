@@ -19,6 +19,16 @@ H2_ENUM_BEGIN(TownManagerConstant)
     TOWN_MANAGER_STATUS_TEXT_SIZE = 0x50
 H2_ENUM_END(TownManagerConstant)
 
+H2_ENUM_BEGIN(TownManagerArmyCommand)
+    ARMY_COMMAND_NONE      = -1,
+    ARMY_COMMAND_SELECT    = 0,
+    ARMY_COMMAND_VIEW      = 1,
+    ARMY_COMMAND_MERGE     = 2,
+    ARMY_COMMAND_SWAP      = 3,
+    ARMY_COMMAND_VIEW_HERO = 4,
+    ARMY_COMMAND_SPLIT     = 5
+H2_ENUM_END(TownManagerArmyCommand)
+
 #pragma pack(push, 1)
 class townManager : public baseManager {
 public:
@@ -41,7 +51,7 @@ public:
     char m_statusText[TOWN_MANAGER_STATUS_TEXT_SIZE];
     i32 m_lastHoverId;
     i32 m_lastHoverSubId;
-    i32 m_command;
+    TownManagerArmyCommand m_command;
     i32 m_recruitResult;
     u32l m_affordableBuildings;
     u32l m_buildableBuildings;
@@ -67,7 +77,7 @@ public:
     void SetArmyCommand(i32);
     void SetCommandAndText(struct tag_message&);
     void ShowText(char*);
-    void DoCommand(i32);
+    void DoCommand(TownManagerArmyCommand);
     void RedrawTownScreen(void);
     void SplitArmy(void);
     void ShiftQualChange(void);

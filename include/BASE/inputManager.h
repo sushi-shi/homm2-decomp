@@ -124,7 +124,7 @@ public:
     i32 m_requestedPriority;
     InputManagerKeyCodeType m_keyCodeType;
     i32 m_field_0x85a;
-    i32 m_modifiers;
+    MessageModifier m_modifiers;
     i32 field_0x862;
     i32 field_0x866;
     inputManager(void);
