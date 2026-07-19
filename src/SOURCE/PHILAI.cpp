@@ -4402,7 +4402,7 @@ void philAI::BuildHero(town* townPtr, i32 availableHeroIndex) {
 
     CheckValidAvailableHeroes();
     SendMapChange(
-        AI_HERO_BUILD_MAP_CHANGE,
+        MAP_CHANGE_RECRUIT_HERO,
         newHero6->m_id,
         static_cast<u8>(newHero6->m_x),
         static_cast<u8>(newHero6->m_y),

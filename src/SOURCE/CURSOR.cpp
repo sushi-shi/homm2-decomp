@@ -598,7 +598,7 @@ mapCell* advManager::MoveHero(
     }
 
     SendMapChange(
-        1,
+        MAP_CHANGE_MOVE_HERO,
         movingHero_f->m_id,
         static_cast<u8>(movingHero_f->m_x),
         static_cast<u8>(movingHero_f->m_y),
@@ -1188,7 +1188,7 @@ void advManager::ProcessMapChange(SMapChange change) {
     }
 
     switch (change.type) {
-        case IDX(MAP_CHANGE_MOVE_HERO):
+        case MAP_CHANGE_MOVE_HERO:
             LogInt(
                 "MC Move Hero",
                 change.id,
@@ -1235,7 +1235,7 @@ void advManager::ProcessMapChange(SMapChange change) {
             }
             break;
 
-        case IDX(MAP_CHANGE_MY_TURN):
+        case MAP_CHANGE_MY_TURN:
             LogInt(
                 "MC My Turn",
                 change.x,
@@ -1248,7 +1248,7 @@ void advManager::ProcessMapChange(SMapChange change) {
             );
             break;
 
-        case IDX(MAP_CHANGE_TELEPORT_HERO):
+        case MAP_CHANGE_TELEPORT_HERO:
             LogInt(
                 "MC Teleport Hero",
                 change.x,
@@ -1263,7 +1263,7 @@ void advManager::ProcessMapChange(SMapChange change) {
             TeleportTo(mapHero_n, change.x, change.y, 0, 1);
             break;
 
-        case IDX(MAP_CHANGE_CLAIM_MINE):
+        case MAP_CHANGE_CLAIM_MINE:
             LogInt(
                 "MC ClaimMine",
                 CURSOR_LOG_UNUSED,
@@ -1279,7 +1279,7 @@ void advManager::ProcessMapChange(SMapChange change) {
             UpdateScreen(0, 0);
             break;
 
-        case IDX(MAP_CHANGE_CLAIM_TOWN):
+        case MAP_CHANGE_CLAIM_TOWN:
             LogInt(
                 "MC ClaimTown",
                 CURSOR_LOG_UNUSED,
@@ -1295,7 +1295,7 @@ void advManager::ProcessMapChange(SMapChange change) {
             UpdateScreen(0, 0);
             break;
 
-        case IDX(MAP_CHANGE_BUILD_BOAT):
+        case MAP_CHANGE_BUILD_BOAT:
             LogInt(
                 "MC BuildBoat",
                 CURSOR_LOG_UNUSED,
@@ -1311,7 +1311,7 @@ void advManager::ProcessMapChange(SMapChange change) {
             UpdateScreen(0, 0);
             break;
 
-        case IDX(MAP_CHANGE_ERASE_OBJECT):
+        case MAP_CHANGE_ERASE_OBJECT:
             LogInt(
                 "MC Erase Object",
                 change.x,
@@ -1328,7 +1328,7 @@ void advManager::ProcessMapChange(SMapChange change) {
             UpdateScreen(0, 0);
             break;
 
-        case IDX(MAP_CHANGE_DEAD_HERO):
+        case MAP_CHANGE_DEAD_HERO:
             LogStr("MC DeadHero");
             mapHero_n = gpGame->GetHero(change.id);
             if (change.x != mapHero_n->m_x || change.y != mapHero_n->m_y)
@@ -1338,7 +1338,7 @@ void advManager::ProcessMapChange(SMapChange change) {
             UpdateScreen(0, 0);
             break;
 
-        case IDX(MAP_CHANGE_RECRUIT_HERO):
+        case MAP_CHANGE_RECRUIT_HERO:
             LogStr("MC RecruitHero");
             mapHero_n = gpGame->GetHero(change.id);
             mapHero_n->m_x = change.x;
@@ -1359,7 +1359,7 @@ void advManager::ProcessMapChange(SMapChange change) {
             UpdateScreen(0, 0);
             break;
 
-        case IDX(MAP_CHANGE_DEAD_PLAYER):
+        case MAP_CHANGE_DEAD_PLAYER:
             LogStr("Dead Player");
             sprintf(gText, "%s has been vanquished!", cPlayerNames[change.id]);
             NormalDialog(
@@ -1376,7 +1376,7 @@ void advManager::ProcessMapChange(SMapChange change) {
             );
             break;
 
-        case IDX(MAP_CHANGE_UNUSED):
+        case MAP_CHANGE_UNUSED:
         default:
             break;
     }
@@ -1394,7 +1394,7 @@ void advManager::ProcessIncomingSingleMapChange(SMapChange* incoming) {
     } else {
     retryInsert:
         for (slot = 0; slot < CURSOR_MAP_CHANGE_QUEUE_COUNT; ++slot) {
-            if (sMapChangeQueue[slot].type != 0
+            if (sMapChangeQueue[slot].type != MAP_CHANGE_NONE
                 && sMapChangeQueue[slot].sequence == incoming->sequence) {
                 LogInt(
                     "OQ",
@@ -1411,7 +1411,7 @@ void advManager::ProcessIncomingSingleMapChange(SMapChange* incoming) {
         }
 
         for (slot = 0; slot < CURSOR_MAP_CHANGE_QUEUE_COUNT; ++slot) {
-            if (sMapChangeQueue[slot].type == 0) {
+            if (sMapChangeQueue[slot].type == MAP_CHANGE_NONE) {
                 LogInt(
                     "SQ",
                     incoming->sequence,
@@ -1450,7 +1450,7 @@ void advManager::ProcessIncomingGroupMapChange(char* incomingData) {
     memcpy(buf, incomingData, size);
     for (i = CURSOR_MAP_CHANGE_RECENT_COUNT - 1; i >= 0; --i) {
         ptr = &buf[i];
-        if (ptr->type != 0 && ptr->sequence >= giMapChangeCtr) {
+        if (ptr->type != MAP_CHANGE_NONE && ptr->sequence >= giMapChangeCtr) {
             ProcessIncomingSingleMapChange(ptr);
         } else {
             processed = 0;
@@ -1464,9 +1464,9 @@ void advManager::PurgeMapChangeQueue(void) {
     i32 slot;
 
     for (slot = 0; slot < CURSOR_MAP_CHANGE_QUEUE_COUNT; ++slot)
-        sMapChangeQueue[slot].type = 0;
+        sMapChangeQueue[slot].type = MAP_CHANGE_NONE;
     for (slot = 0; slot < CURSOR_MAP_CHANGE_RECENT_COUNT; ++slot)
-        sMapChangeLastFew[slot].type = 0;
+        sMapChangeLastFew[slot].type = MAP_CHANGE_NONE;
 }
 
 VA(0x00410b9e, 0x1d4)
@@ -1485,7 +1485,7 @@ void advManager::UnwindMapChangeQueue(i32 maximumToUnwind, i32 processChanges) {
         lowestSequence = CURSOR_MAP_CHANGE_SEQUENCE_SENTINEL;
         queuedChanges = 0;
         for (slot = 0; slot < CURSOR_MAP_CHANGE_QUEUE_COUNT; ++slot) {
-            if (sMapChangeQueue[slot].type != 0) {
+            if (sMapChangeQueue[slot].type != MAP_CHANGE_NONE) {
                 ++queuedChanges;
                 if (sMapChangeQueue[slot].sequence < lowestSequence) {
                     lowestSequence = sMapChangeQueue[slot].sequence;
@@ -1497,7 +1497,7 @@ void advManager::UnwindMapChangeQueue(i32 maximumToUnwind, i32 processChanges) {
             --queuedChanges;
             if (processChanges)
                 ProcessMapChange(sMapChangeQueue[lowestSlot]);
-            sMapChangeQueue[lowestSlot].type = 0;
+            sMapChangeQueue[lowestSlot].type = MAP_CHANGE_NONE;
             ++unwoundChanges;
         }
     }
@@ -1506,11 +1506,11 @@ void advManager::UnwindMapChangeQueue(i32 maximumToUnwind, i32 processChanges) {
     while (continueUnwinding) {
         continueUnwinding = 0;
         for (slot = 0; slot < CURSOR_MAP_CHANGE_QUEUE_COUNT; ++slot) {
-            if (sMapChangeQueue[slot].type != 0
+            if (sMapChangeQueue[slot].type != MAP_CHANGE_NONE
                 && sMapChangeQueue[slot].sequence == giMapChangeCtr) {
                 if (processChanges)
                     ProcessMapChange(sMapChangeQueue[slot]);
-                sMapChangeQueue[slot].type = 0;
+                sMapChangeQueue[slot].type = MAP_CHANGE_NONE;
                 continueUnwinding = 1;
             }
         }
@@ -1518,7 +1518,15 @@ void advManager::UnwindMapChangeQueue(i32 maximumToUnwind, i32 processChanges) {
 }
 
 VA(0x00410d72, 0x11a)
-void SendMapChange(i32 type, i8 id, u8 x, u8 y, i32 player, u8 stopAfterMove, u8 direction) {
+void SendMapChange(
+    MapChangeType type,
+    i8 id,
+    u8 x,
+    u8 y,
+    i32 player,
+    u8 stopAfterMove,
+    u8 direction
+) {
     SMapChange change;
 
     if (!gbThisNetGotAdventureControl)
@@ -1538,7 +1546,7 @@ void SendMapChange(i32 type, i8 id, u8 x, u8 y, i32 player, u8 stopAfterMove, u8
         CURSOR_LOG_UNUSED
     );
     memset(&change, 0, sizeof(change));
-    change.type = static_cast<u8>(type);
+    change.type = type;
     change.id = id;
     change.x = x;
     change.y = y;

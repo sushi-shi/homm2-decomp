@@ -131,7 +131,6 @@ H2_ENUM_BEGIN(AIEventConstant)
     EVENT_HERO_LIMIT                     = 8,
     EVENT_JAILED_HERO                    = 0x41,
     EVENT_HERO_DIRECTION                 = 2,
-    EVENT_HERO_MAP_CHANGE                = 3,
     EVENT_HERO_MAP_CHANGE_VALUE          = -999
 H2_ENUM_END(AIEventConstant)
 
@@ -237,7 +236,6 @@ H2_ENUM_BEGIN(EraseObjectConstant)
     NO_FRAME           = -1,
     EMPTY_INDEX        = 0xFF,
     CLEARED_TILESET    = 47,
-    MAP_CHANGE_OBJECT  = 5,
     MAP_CHANGE_VALUE   = -999,
     ENVIRONMENT_BORDER = 7
 H2_ENUM_END(EraseObjectConstant)
@@ -3612,7 +3610,7 @@ void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
         changed_i = 0;
     }
 
-    SendMapChange(MAP_CHANGE_OBJECT, 0, x, y, MAP_CHANGE_VALUE, 0, 0);
+    SendMapChange(MAP_CHANGE_ERASE_OBJECT, 0, x, y, MAP_CHANGE_VALUE, 0, 0);
     SetEnvironmentOrigin(
         m_mapOriginX + ENVIRONMENT_BORDER,
         m_mapOriginY + ENVIRONMENT_BORDER,
@@ -4136,7 +4134,7 @@ void advManager::JailEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
         cell->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION;
         cell->m_objectMetadata = heroId9;
         SendMapChange(
-            EVENT_HERO_MAP_CHANGE,
+            MAP_CHANGE_RECRUIT_HERO,
             static_cast<i8>(heroId9),
             x,
             y,
@@ -6838,7 +6836,7 @@ void advManager::JailAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             cell->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION;
             cell->m_objectMetadata = heroId9;
             SendMapChange(
-                EVENT_HERO_MAP_CHANGE,
+                MAP_CHANGE_RECRUIT_HERO,
                 static_cast<i8>(heroId9),
                 x,
                 y,
