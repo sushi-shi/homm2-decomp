@@ -18,6 +18,31 @@ H2_ENUM_BEGIN(ComConstant)
     NODE_HEADER_SIZE     = 10
 H2_ENUM_END(ComConstant)
 
+H2_ENUM_BEGIN(ComSourceLine)
+    TERM_SOURCE_LINE_BASE  = 199,
+    SEND_SOURCE_LINE_BASE  = 247,
+    WRITE_SOURCE_LINE_BASE = 310
+H2_ENUM_END(ComSourceLine)
+
+H2_ENUM_BEGIN(ComErrorText)
+    ERROR_TEXT_HEADER          = 0,
+    ERROR_TEXT_SUGGESTIONS     = 1,
+    ERROR_TEXT_CHECK_CABLES    = 2,
+    ERROR_TEXT_REBOOT          = 3,
+    ERROR_TEXT_CHECK_PORT      = 4,
+    ERROR_TEXT_LOWER_BAUD_RATE = 5
+H2_ENUM_END(ComErrorText)
+
+H2_ENUM_BEGIN(ComSerialConstant)
+    BAUD_VALUE_2400        = 2400,
+    BAUD_VALUE_4800        = 4800,
+    BAUD_VALUE_9600        = 9600,
+    BAUD_VALUE_19200       = 19200,
+    BAUD_VALUE_38400       = 38400,
+    SERIAL_BYTE_SIZE       = 8,
+    READ_RESULT_WORD_COUNT = 2
+H2_ENUM_END(ComSerialConstant)
+
 H2_ENUM_CLASS_BEGIN(ComBaudRate)
     COM_BAUD_2400  = 1,
     COM_BAUD_4800  = 2,
@@ -28,9 +53,9 @@ H2_ENUM_CLASS_END(ComBaudRate)
 
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\comwin.cpp"
 
-DATA(0x004f843c) static i16 s_comTermSourceLineBase = 199;
-DATA(0x004f84d8) static i16 s_comSendSourceLineBase = 247;
-DATA(0x004f8540) static i16 s_comWriteSourceLineBase = 310;
+DATA(0x004f843c) static i16 s_comTermSourceLineBase = TERM_SOURCE_LINE_BASE;
+DATA(0x004f84d8) static i16 s_comSendSourceLineBase = SEND_SOURCE_LINE_BASE;
+DATA(0x004f8540) static i16 s_comWriteSourceLineBase = WRITE_SOURCE_LINE_BASE;
 DATA(0x005284b8) static ComPortState s_comPorts[PORT_COUNT];
 
 
@@ -130,12 +155,12 @@ void ShutdownComError(char* function) {
             break;
     }
 
-    sprintf(message, cWinComError[0], function, error, errorName);
-    strcat(message, cWinComError[1]);
-    strcat(message, cWinComError[2]);
-    strcat(message, cWinComError[3]);
-    strcat(message, cWinComError[4]);
-    strcat(message, cWinComError[5]);
+    sprintf(message, cWinComError[ERROR_TEXT_HEADER], function, error, errorName);
+    strcat(message, cWinComError[ERROR_TEXT_SUGGESTIONS]);
+    strcat(message, cWinComError[ERROR_TEXT_CHECK_CABLES]);
+    strcat(message, cWinComError[ERROR_TEXT_REBOOT]);
+    strcat(message, cWinComError[ERROR_TEXT_CHECK_PORT]);
+    strcat(message, cWinComError[ERROR_TEXT_LOWER_BAUD_RATE]);
     ShutDown(message);
 }
 
@@ -172,19 +197,19 @@ i16 com_init(u8 portNumber, i32 baudRate, i32 useDtr) {
 
     switch (baudRate) {
         case IDX(COM_BAUD_2400):
-            state.BaudRate = 2400;
+            state.BaudRate = BAUD_VALUE_2400;
             break;
         case IDX(COM_BAUD_4800):
-            state.BaudRate = 4800;
+            state.BaudRate = BAUD_VALUE_4800;
             break;
         case IDX(COM_BAUD_9600):
-            state.BaudRate = 9600;
+            state.BaudRate = BAUD_VALUE_9600;
             break;
         case IDX(COM_BAUD_19200):
-            state.BaudRate = 19200;
+            state.BaudRate = BAUD_VALUE_19200;
             break;
         case IDX(COM_BAUD_38400):
-            state.BaudRate = 38400;
+            state.BaudRate = BAUD_VALUE_38400;
             break;
         default:
             state.BaudRate = baudRate;
@@ -203,7 +228,7 @@ i16 com_init(u8 portNumber, i32 baudRate, i32 useDtr) {
     state.fNull = 0;
     state.fRtsControl = RTS_CONTROL_HANDSHAKE;
     state.fAbortOnError = 1;
-    state.ByteSize = 8;
+    state.ByteSize = SERIAL_BYTE_SIZE;
     state.Parity = NOPARITY;
     state.StopBits = ONESTOPBIT;
 
@@ -250,7 +275,7 @@ i16 com_rcv(i16 portIndex, u16 requested, void* buffer) {
     COMSTAT status;
     DWORD commErrors;
     u32 count;
-    i16 bytesRead[2];
+    i16 bytesRead[READ_RESULT_WORD_COUNT];
     BOOL result;
 
     if (s_comPorts[portIndex].handle != INVALID_HANDLE_VALUE) {
