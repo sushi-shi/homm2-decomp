@@ -20,14 +20,14 @@ include/BASE/Icondf2b.h	pending
 include/BASE/Iconf2b.h	pending
 include/BASE/Iconm2b.h	pending
 include/BASE/Iconmf2b.h	pending
-include/BASE/MIDIWrap.h	pending
+include/BASE/MIDIWrap.h	reviewed	Only the proven MIDIWrap SIZE annotation is numeric.
 include/BASE/MIDI_TYPES.h	pending
 include/BASE/MISC_TYPES.h	pending
 include/BASE/MOUSEMGR_TYPES.h	pending
 include/BASE/Misc.h	pending
 include/BASE/MiscGraphicsConstants.h	pending
 include/BASE/Ripple.h	pending
-include/BASE/SAMPLE_TYPES.h	pending
+include/BASE/SAMPLE_TYPES.h	reviewed	The source slots are symbolic; the sole literal is packed-layout SIZE evidence.
 include/BASE/TEXTWDGT_TYPES.h	pending
 include/BASE/TILE.h	pending
 include/BASE/TILESET_TYPES.h	reviewed	Named source-file storage extents plus SIZE evidence.
@@ -59,8 +59,8 @@ include/BASE/mouseManager.h	pending
 include/BASE/palette.h	pending
 include/BASE/resource.h	reviewed	Explicit ResourceCategory domain; zero is pure-virtual syntax.
 include/BASE/resourceManager.h	pending
-include/BASE/sample.h	pending
-include/BASE/sampleData.h	pending
+include/BASE/sample.h	reviewed	The declaration uses named types; the sole literal is packed-layout SIZE evidence.
+include/BASE/sampleData.h	reviewed	The record fields are named; the sole literal is packed-layout SIZE evidence.
 include/BASE/soundManager.h	pending
 include/BASE/soundmgr.h	pending
 include/BASE/textEntryWidget.h	pending
@@ -162,7 +162,7 @@ src/BASE/PALETTE.cpp	pending
 src/BASE/RESMGR.cpp	pending
 src/BASE/RESOURCE.cpp	reviewed	Zero initializes the scalar resource id and reference count; pointer uses NULL.
 src/BASE/Ripple.cpp	pending
-src/BASE/SAMPLE.cpp	pending
+src/BASE/SAMPLE.cpp	reviewed	Private format, playback-rate, filename-capacity, and suffix-length domains are named; remaining allocation operands preserve retail source-line evidence. Text/data bytes and relocation topology are unchanged.
 src/BASE/TEXTWDGT.cpp	pending
 src/BASE/TILE.cpp	pending
 src/BASE/TILESET.cpp	reviewed	Allocation/free operands 18 and 0x1c preserve retail source-line evidence; other values are named or annotations.
