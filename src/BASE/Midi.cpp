@@ -21,7 +21,6 @@ H2_ENUM_BEGIN(MidiVolumeConstant)
 H2_ENUM_END(MidiVolumeConstant)
 
 H2_ENUM_BEGIN(MidiConstant)
-    LOG_UNUSED_VALUE       = -999,
     MIDI_FILENAME_CAPACITY = 16
 H2_ENUM_END(MidiConstant)
 
