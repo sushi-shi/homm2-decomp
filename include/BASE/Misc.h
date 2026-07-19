@@ -14,6 +14,10 @@ H2_ENUM_BEGIN(MiscRecordConstant)
     PCX_HEADER_FILLER_BYTES    = 54
 H2_ENUM_END(MiscRecordConstant)
 
+H2_ENUM_BEGIN(LogConstant)
+    LOG_UNUSED_VALUE = -999
+H2_ENUM_END(LogConstant)
+
 struct indexArray {
     u16 key;
     u16 value;

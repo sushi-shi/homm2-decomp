@@ -11,6 +11,11 @@
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/wingraph.h>
+
+H2_ENUM_BEGIN(KbWinPrivateConstant)
+    TIMER_UPDATE_MIN_INTERVAL = 5
+H2_ENUM_END(KbWinPrivateConstant)
+
 VA(0x0041bce0, 0x146)
 extern "C" i32 __stdcall
 WinMain(HINSTANCE instance, HINSTANCE previousInstance, char* commandLine, i32 showCommand) {
@@ -54,7 +59,16 @@ i32 AppInit(HINSTANCE instance, HINSTANCE previousInstance, i32 showCommand, cha
     RECT windowRect;
     WNDCLASSA appClass;
 
-    LogInt("hInstApp", reinterpret_cast<i32>(hInstApp), -999, -999, -999, -999, -999, -999);
+    LogInt(
+        "hInstApp",
+        reinterpret_cast<i32>(hInstApp),
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE
+    );
     memset(bProcessMessage, 0, sizeof(bProcessMessage));
     bProcessMessage[WM_CREATE] = 1;
     bProcessMessage[WM_KEYDOWN] = 1;
@@ -178,7 +192,7 @@ LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPAR
             break;
         case WM_TIMER:
             lTemp = KBTickCount();
-            if (lLastGTimerTickCount + 5 < lTemp) {
+            if (lLastGTimerTickCount + TIMER_UPDATE_MIN_INTERVAL < lTemp) {
                 lLastGTimerTickCount = lTemp;
                 UpdateTimers(0);
             }
@@ -406,13 +420,13 @@ void UpdateDfltMenu(HMENU menu) {
 
     if (gConfig.gfx[giCurExe].showMenu == 0)
         return;
-    if (giMainVideoModeWidth <= 640)
+    if (giMainVideoModeWidth <= KBWIN_WIDTH_640)
         EnableMenuItem(menu, IDX(KBWIN_MENU_SIZE_640_480), MF_GRAYED);
-    if (giMainVideoModeWidth <= 800)
+    if (giMainVideoModeWidth <= KBWIN_WIDTH_800)
         EnableMenuItem(menu, IDX(KBWIN_MENU_SIZE_800_600), MF_GRAYED);
-    if (giMainVideoModeWidth <= 1024)
+    if (giMainVideoModeWidth <= KBWIN_WIDTH_1024)
         EnableMenuItem(menu, IDX(KBWIN_MENU_SIZE_1024_768), MF_GRAYED);
-    if (giMainVideoModeWidth <= 1280)
+    if (giMainVideoModeWidth <= KBWIN_WIDTH_1280)
         EnableMenuItem(menu, IDX(KBWIN_MENU_SIZE_1280_1024), MF_GRAYED);
     if (gbDDrawAttached == 0)
         EnableMenuItem(menu, IDX(KBWIN_MENU_FULLSCREEN), MF_GRAYED);
@@ -525,8 +539,8 @@ void InitVideo(void) {
     return;
 }
 
-DATA(0x004ef4c8) char szAppName[16] = "Heroes II";
-DATA(0x004ef4d8) char szTitle[32] = "Heroes of Might and Magic II";
+DATA(0x004ef4c8) char szAppName[KBWIN_APP_NAME_SIZE] = "Heroes II";
+DATA(0x004ef4d8) char szTitle[KBWIN_WINDOW_TITLE_SIZE] = "Heroes of Might and Magic II";
 DATA(0x004ef4f8) HWND hwndApp = NULL;
 DATA(0x004ef4fc) HMENU hmnuApp = NULL;
 DATA(0x004ef500) HANDLE gEventHandle = NULL;
