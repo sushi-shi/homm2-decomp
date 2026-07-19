@@ -8,6 +8,12 @@ class heroWindow;
 class icon;
 struct tag_message;
 
+H2_ENUM_BEGIN(MiscRecordConstant)
+    MEM_ENTRY_FILE_CAPACITY    = 0x3d,
+    PCX_HEADER_PALETTE16_BYTES = 48,
+    PCX_HEADER_FILLER_BYTES    = 54
+H2_ENUM_END(MiscRecordConstant)
+
 struct indexArray {
     u16 key;
     u16 value;
@@ -19,7 +25,7 @@ struct MemEntry {
     char used;
     void* ptr;
     u32 size;
-    char file[0x3d];
+    char file[MEM_ENTRY_FILE_CAPACITY];
     i32 line;
 };
 #pragma pack(pop)
@@ -45,10 +51,10 @@ struct PCXHeader {
     u8 manufacturer, version, encoding, bitsPerPixel;
     u16 xMin, yMin, xMax, yMax;
     u16 horizontalDpi, verticalDpi;
-    u8 palette16[48];
+    u8 palette16[PCX_HEADER_PALETTE16_BYTES];
     u8 reserved, planes;
     u16 bytesPerLine, paletteType, horizontalScreenSize, verticalScreenSize;
-    u8 filler[54];
+    u8 filler[PCX_HEADER_FILLER_BYTES];
 };
 #pragma pack(pop)
 SIZE(PCXHeader, 0x80);

@@ -20,10 +20,10 @@ include/BASE/Iconm2b.h	pending
 include/BASE/Iconmf2b.h	pending
 include/BASE/MIDIWrap.h	reviewed	Only the proven MIDIWrap SIZE annotation is numeric.
 include/BASE/MIDI_TYPES.h	reviewed	Shared text-record field extents are named and aligned; the remaining literal is packed-layout SIZE evidence.
-include/BASE/MISC_TYPES.h	pending
+include/BASE/MISC_TYPES.h	reviewed	Text-slot extents derive from their literal payloads and remaining SIZE values are packed-layout evidence; the registry key and source path are shared textual identities rather than numeric constant fallbacks.
 include/BASE/MOUSEMGR_TYPES.h	pending
-include/BASE/Misc.h	pending
-include/BASE/MiscGraphicsConstants.h	pending
+include/BASE/Misc.h	reviewed	Shared packed-record array extents are named and aligned; remaining numeric literals are proven packing and SIZE evidence, and allocation macros are function-like source-location wrappers rather than constant definitions.
+include/BASE/MiscGraphicsConstants.h	reviewed	Shared palette component, byte, and level extents are named for Misc, PALETTE, and KB consumers.
 include/BASE/Ripple.h	pending
 include/BASE/SAMPLE_TYPES.h	reviewed	The source slots are symbolic; the sole literal is packed-layout SIZE evidence.
 include/BASE/TEXTWDGT_TYPES.h	reviewed	Named source-file slot extent and aggregate SIZE preserve the fixed packed storage layout.
@@ -155,7 +155,7 @@ src/BASE/Iconm2b.cpp	pending
 src/BASE/Iconmf2b.cpp	pending
 src/BASE/MOUSEMGR.cpp	pending
 src/BASE/Midi.cpp	reviewed	Private enums name the unused LogInt field value, filename capacity, volume calculation, and sequence status. Remaining numeric payloads are track-availability data, booleans, loop counts, and format indices.
-src/BASE/Misc.cpp	pending
+src/BASE/Misc.cpp	reviewed	Private enums name memory diagnostics, preferences, registry widths, hashes, file modes, palette extents, RNG mixing, and data-entry geometry. The fade threshold table and initial RNG seed remain literal retail data payload; other zeros and ones are booleans, origins, or index steps, while allocation operands preserve source-location evidence.
 src/BASE/PALETTE.cpp	reviewed	Reference lifecycle and palette extents are named; allocation/free operands 8, 13, and 21 preserve retail source-line evidence, while zero is the empty resource id. Pointer state uses NULL.
 src/BASE/RESMGR.cpp	reviewed	A private aligned enum names file/status values, entry and row widths, open mode, translation count, sample volume, temporary-buffer width, and save-stack depth. Shared layout and Read13 values remain public, and source-line operands preserve retail allocation/assert evidence.
 src/BASE/RESOURCE.cpp	reviewed	Constructor parameters and empty reference state are named; zero initializes the scalar resource id and pointer uses NULL. All seven direct consumer objects retain exact non-debug sections and relocations.
