@@ -455,7 +455,7 @@ char* GetBuildingInfo(i32 race, i32 building, i32 mode);
 char* GetBuildingName(FactionType race, BuildingSlotType building);
 void GetBuildingCost(FactionType race, BuildingSlotType building, i32* const dest, i32 mageLevel);
 char* GetMonsterName(i32 m);
-void GetMonsterCost(i32 monster, i32* const cost);
+void GetMonsterCost(CreatureType monster, i32* const cost);
 i32 CanBuild(town* t, BuildingSlotType building);
 i32 CanBuy(town* t, BuildingSlotType type);
 i32 GetBuildingBaseResourceValue(FactionType race, BuildingSlotType building, i32 level);

@@ -6071,7 +6071,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                         (cell->m_objectMetadata - eventResults[2]) * 8 | (cell->m_objectData & 7)
                     );
                     if (creatureFlag_l == 0) {
-                        GetMonsterCost(IDX(creatureType_i), creatureCosts_a);
+                        GetMonsterCost(creatureType_i, creatureCosts_a);
                         for (index_h = 0; index_h < EVENT_RESOURCE_COUNT; ++index_h)
                             gpCurPlayer->m_resources[index_h] -=
                                 creatureCosts_a[index_h] * eventResults[2];
@@ -6800,7 +6800,7 @@ void advManager::RecruitSiteAIEvent(mapCell* cell, hero* eventHero) {
             availableCount1 = static_cast<i16>(availableCount1 - purchaseCount17);
             packedSite17 = (availableCount1 << EVENT_RECRUIT_COUNT_SHIFT) | siteType3;
             cell->m_objectMetadata = packedSite17;
-            GetMonsterCost(IDX(creatureType13), cost16);
+            GetMonsterCost(creatureType13, cost16);
             for (resourceIndex27 = 0; resourceIndex27 < EVENT_RESOURCE_COUNT;
                  resourceIndex27++) {
                 gpCurPlayer->m_resources[resourceIndex27] -=

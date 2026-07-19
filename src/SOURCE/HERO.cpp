@@ -103,7 +103,6 @@ H2_ENUM_BEGIN(HeroUiConstant)
     UI_HANDLER_CLOSE               = 2,
     UI_VIEW_ARMY_X                 = 0x77,
     UI_VIEW_ARMY_Y                 = 0x14,
-    UI_VIEW_SPELLS_ALL             = 2,
     UI_VIEW_SPELLS_SPECIAL         = 1,
     UI_CASTLE_DIALOG_ACTIVE        = 1,
     UI_ARMY_EMPTY_FRAME            = 2,
@@ -170,12 +169,6 @@ H2_ENUM_CLASS_BEGIN(HeroScreenText)
     TEXT_SPREAD_FORMATION  = 23,
     TEXT_GROUPED_FORMATION = 24
 H2_ENUM_CLASS_END(HeroScreenText)
-
-H2_ENUM_CLASS_BEGIN(HeroSpellType)
-    SPELL_TYPE_COMBAT    = 0,
-    SPELL_TYPE_ADVENTURE = 1,
-    SPELL_TYPE_ALL       = 2
-H2_ENUM_CLASS_END(HeroSpellType)
 
 H2_ENUM_BEGIN(HeroMobilityConstant)
     BASE_RECORD_SIZE              = 0xec,
@@ -320,16 +313,16 @@ i32 hero::HasSpell(SpellType spell) {
 }
 
 VA(0x0046c86c, 0xc5)
-SpellType hero::GetNthSpell(i32 type, i32 spellNumber) {
+SpellType hero::GetNthSpell(HeroSpellType type, i32 spellNumber) {
     i32 spell;
     i32 spellOrdinalCount = 0;
 
     for (spell = 0; spell < IDX(SPELL_COUNT); spell++) {
         if (HasSpell(SpellType(spell))) {
-            if (type == IDX(SPELL_TYPE_ALL)
-                || (type == IDX(SPELL_TYPE_COMBAT)
+            if (type == SPELL_TYPE_ALL
+                || (type == SPELL_TYPE_COMBAT
                     && HAS(gsSpellInfo[spell].attributes, SPELL_INFO_ATTRIBUTE_COMBAT))
-                || (type == IDX(SPELL_TYPE_ADVENTURE)
+                || (type == SPELL_TYPE_ADVENTURE
                     && !HAS(gsSpellInfo[spell].attributes, SPELL_INFO_ATTRIBUTE_COMBAT))) {
                 spellOrdinalCount++;
             }
@@ -341,7 +334,7 @@ SpellType hero::GetNthSpell(i32 type, i32 spellNumber) {
 }
 
 VA(0x0046c931, 0xd0)
-i32 hero::GetNumSpells(i32 type) {
+i32 hero::GetNumSpells(HeroSpellType type) {
     i32 numAdventureSpells;
     i32 numCombatSpells;
     i32 spellIndexCurrent;
@@ -358,11 +351,11 @@ i32 hero::GetNumSpells(i32 type) {
     }
 
     switch (type) {
-        case IDX(SPELL_TYPE_COMBAT):
+        case SPELL_TYPE_COMBAT:
             return numCombatSpells;
-        case IDX(SPELL_TYPE_ADVENTURE):
+        case SPELL_TYPE_ADVENTURE:
             return numAdventureSpells;
-        case IDX(SPELL_TYPE_ALL):
+        case SPELL_TYPE_ALL:
             return numCombatSpells + numAdventureSpells;
     }
     return 0;
@@ -1492,7 +1485,7 @@ i32 HeroHandler(struct tag_message& message) {
                                        == IDX(ARTIFACT_MAGIC_BOOK)) {
                                 gpGame->ViewSpells(
                                     gpHVHero,
-                                    UI_VIEW_SPELLS_ALL,
+                                    SPELL_TYPE_ALL,
                                     ViewSpecialHandler,
                                     UI_VIEW_SPELLS_SPECIAL
                                 );

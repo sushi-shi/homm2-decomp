@@ -7,6 +7,12 @@
 
 class town;
 
+H2_ENUM_CLASS_BEGIN(HeroSpellType)
+    SPELL_TYPE_COMBAT    = 0,
+    SPELL_TYPE_ADVENTURE = 1,
+    SPELL_TYPE_ALL       = 2
+H2_ENUM_CLASS_END(HeroSpellType)
+
 H2_ENUM_CLASS_BEGIN(HeroSecondarySkill)
     HERO_SKILL_PATHFINDING = 0,
     HERO_SKILL_ARCHERY     = 1,
@@ -192,8 +198,8 @@ public:
     i32 HasArtifact(ArtifactType);
     i32 CalcMobility(void);
     i32 HasSpell(SpellType);
-    SpellType GetNthSpell(i32, i32);
-    i32 GetNumSpells(i32);
+    SpellType GetNthSpell(HeroSpellType, i32);
+    i32 GetNumSpells(HeroSpellType);
     void UseSpell(SpellType);
     void AddSpell(i32, i32);
     void HeroScreenUpdate(void);

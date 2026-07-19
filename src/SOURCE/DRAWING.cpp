@@ -226,7 +226,7 @@ void combatManager::CombatMessage(char* message, i32 updateScreen, i32 retainPre
 }
 
 VA(0x00402e80, 0x3fe)
-void combatManager::CombatMessage(i32 messageType) {
+void combatManager::CombatMessage(CombatMessageCommand messageType) {
     army* currentArmyPtr;
     army* targetArmy;
     CreatureType actingMonsterType;
@@ -247,35 +247,35 @@ void combatManager::CombatMessage(i32 messageType) {
     }
 
     switch (messageType) {
-        case IDX(COMBAT_MESSAGE_COMMAND_DEFAULT):
+        case COMBAT_MESSAGE_COMMAND_DEFAULT:
             if (HAS(currentArmyPtr->m_monster.flags.all, COMBAT_ARMY_FLAG_SHOOTER) != 0
                 && currentArmyPtr->m_monster.shots == 0 && targetArmy != NULL)
                 strcpy(gText, cCombatMessage[IDX(MESSAGE_TEXT_NO_SHOTS)]);
             else
                 strcpy(gText, cCombatMessage[IDX(MESSAGE_TEXT_DEFAULT)]);
             break;
-        case IDX(COMBAT_MESSAGE_COMMAND_MOVE):
+        case COMBAT_MESSAGE_COMMAND_MOVE:
             sprintf(
                 gText,
                 cCombatMessage[IDX(MESSAGE_TEXT_MOVE)],
                 gArmyNames[IDX(actingMonsterType)]
             );
             break;
-        case IDX(COMBAT_MESSAGE_COMMAND_FLY):
+        case COMBAT_MESSAGE_COMMAND_FLY:
             sprintf(
                 gText,
                 cCombatMessage[IDX(MESSAGE_TEXT_FLY)],
                 gArmyNames[IDX(actingMonsterType)]
             );
             break;
-        case IDX(COMBAT_MESSAGE_COMMAND_ATTACK):
+        case COMBAT_MESSAGE_COMMAND_ATTACK:
             sprintf(
                 gText,
                 cCombatMessage[IDX(MESSAGE_TEXT_ATTACK)],
                 gArmyNames[IDX(targetMonsterType)]
             );
             break;
-        case IDX(COMBAT_MESSAGE_COMMAND_SHOOT):
+        case COMBAT_MESSAGE_COMMAND_SHOOT:
             sprintf(
                 gText,
                 cCombatMessage[IDX(MESSAGE_TEXT_SHOOT)],
@@ -283,19 +283,19 @@ void combatManager::CombatMessage(i32 messageType) {
                 static_cast<i32>(currentArmyPtr->m_monster.shots)
             );
             break;
-        case IDX(COMBAT_MESSAGE_COMMAND_OPTIONS):
+        case COMBAT_MESSAGE_COMMAND_OPTIONS:
             if (m_heroes[m_currentSide] != NULL && m_heroes[m_currentSide]->m_isCaptain != 0)
                 strcpy(gText, cCombatMessage[IDX(MESSAGE_TEXT_CAPTAIN_OPTIONS)]);
             else
                 strcpy(gText, cCombatMessage[IDX(MESSAGE_TEXT_HERO_OPTIONS)]);
             break;
-        case IDX(COMBAT_MESSAGE_COMMAND_OPPOSING_OPTIONS):
+        case COMBAT_MESSAGE_COMMAND_OPPOSING_OPTIONS:
             if (m_heroes[1 - m_currentSide] != NULL && m_heroes[1 - m_currentSide]->m_isCaptain != 0)
                 strcpy(gText, cCombatMessage[IDX(MESSAGE_TEXT_OPPOSING_CAPTAIN)]);
             else
                 strcpy(gText, cCombatMessage[IDX(MESSAGE_TEXT_OPPOSING_HERO)]);
             break;
-        case IDX(COMBAT_MESSAGE_COMMAND_VIEW_INFO):
+        case COMBAT_MESSAGE_COMMAND_VIEW_INFO:
             if (m_selectedHex == COMBAT_BALLISTA_HEX) {
                 sprintf(gText, cCombatMessage[IDX(MESSAGE_TEXT_BALLISTA)]);
             } else {

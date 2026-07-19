@@ -6981,7 +6981,12 @@ void advManager::CheckCastSpell(void) {
         UpdateScreen(0, 0);
         gpMouseManager->SetPointer("advmice.mse", POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
         CastSpell(SpellType(
-            gpGame->ViewSpells(gpGame->GetHero(gpCurPlayer->m_currentHero), 1, NullHandler, 0)
+            gpGame->ViewSpells(
+                gpGame->GetHero(gpCurPlayer->m_currentHero),
+                SPELL_TYPE_ADVENTURE,
+                NullHandler,
+                0
+            )
         ));
     }
 }

@@ -372,7 +372,7 @@ recruitUnit::recruitUnit(class town* townData, i32 dwelling, i32 refreshTown) {
     m_refreshTown = refreshTown;
     m_sourceType = RECRUIT_SOURCE_TOWN;
     m_army = &townData->m_army;
-    m_creatureType = gDwellingType[townData->m_type][dwelling];
+    m_creatureType = CreatureType(gDwellingType[townData->m_type][dwelling]);
     m_available = &townData->m_garrison[dwelling];
     GetMonsterCost(m_creatureType, costs);
     m_goldCost = costs[GOLD_RESOURCE];
@@ -394,13 +394,13 @@ void QuickViewRecruit(class town* townData, i32 dwelling) {
     i32 costs[RESOURCE_COUNT + 1];
     i32 goldCost;
     ResourceType resourceType;
-    i32 creatureType;
+    CreatureType creatureType;
     i32 resourceCost;
     heroWindow* window;
     i32 available;
     i32 resource;
 
-    creatureType = gDwellingType[townData->m_type][dwelling];
+    creatureType = CreatureType(gDwellingType[townData->m_type][dwelling]);
     available = townData->m_garrison[dwelling];
     GetMonsterCost(creatureType, costs);
     goldCost = costs[GOLD_RESOURCE];
