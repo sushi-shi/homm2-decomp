@@ -22,6 +22,8 @@ widget::widget(i16 x, i16 y, i16 width, i16 height, i16 id, i16 kind) {
     m_kind = kind;
 }
 
+#define DEFAULT_EXTENT 16
+
 VA(0x004dde60, 0x3f)
 widget::widget(void) {
     m_id = 0;
@@ -33,9 +35,11 @@ widget::widget(void) {
     m_kind = EncodeWidgetKind(WIDGET_KIND_DEFAULT);
     m_y = 0;
     m_x = 0;
-    m_width = 16;
-    m_height = 16;
+    m_width = DEFAULT_EXTENT;
+    m_height = DEFAULT_EXTENT;
 }
+
+#undef DEFAULT_EXTENT
 
 VA(0x004ddea0, 0x7)
 widget::~widget() {}
@@ -65,7 +69,7 @@ i32 widget::Main(tag_message& message) {
             if (left > x || m_y > y || left + m_width <= x || m_y + m_height <= y)
                 break;
             message.payload.hover.id = m_id;
-            return 2;
+            return WIDGET_DISPATCH_FORWARD;
         }
 
         case MESSAGE_WIDGET:
@@ -79,7 +83,7 @@ i32 widget::Main(tag_message& message) {
                         i16 x = m_x + static_cast<i16>(m_owner->m_posX);
                         i16 y = m_y + static_cast<i16>(m_owner->m_posY);
                         DimBitmapArea(gpWindowManager->m_screen, x, y, m_width, m_height, 0);
-                        return 0;
+                        return WIDGET_DISPATCH_CONTINUE;
                     }
                     break;
 
@@ -87,7 +91,7 @@ i32 widget::Main(tag_message& message) {
                     if (m_id == message.payload.widget.id) {
                         if (message.payload.widget.data.value == WIDGET_COMMAND_DIMMED) {
                             m_flags |= WIDGET_FLAG_DIMMED;
-                            return 1;
+                            return WIDGET_DISPATCH_CONSUME;
                         }
                         u16 flags = m_flags | static_cast<u16>(message.payload.widget.data.value);
                         m_flags = flags;
@@ -116,7 +120,7 @@ i32 widget::Main(tag_message& message) {
                             );
                             m_flags &= ~WIDGET_FLAG_UPDATE;
                         }
-                        return 1;
+                        return WIDGET_DISPATCH_CONSUME;
                     }
                     break;
 
@@ -125,7 +129,7 @@ i32 widget::Main(tag_message& message) {
                         u32 flags = message.payload.widget.data.value;
                         if (flags == IDX(WIDGET_COMMAND_DIMMED)) {
                             m_flags &= ~WIDGET_FLAG_DIMMED;
-                            return 1;
+                            return WIDGET_DISPATCH_CONSUME;
                         }
                         m_flags &= ~static_cast<u16>(flags);
                         if ((static_cast<u16>(flags) & WIDGET_FLAG_DIMMED) != 0)
@@ -137,34 +141,34 @@ i32 widget::Main(tag_message& message) {
                                 m_width,
                                 m_height
                             );
-                        return 1;
+                        return WIDGET_DISPATCH_CONSUME;
                     }
                     break;
 
                 case WIDGET_COMMAND_SET_X:
                     if (m_id == message.payload.widget.id) {
                         m_x = static_cast<i16>(message.payload.widget.data.value);
-                        return 1;
+                        return WIDGET_DISPATCH_CONSUME;
                     }
                     break;
 
                 case WIDGET_COMMAND_SET_Y:
                     if (m_id == message.payload.widget.id) {
                         m_y = static_cast<i16>(message.payload.widget.data.value);
-                        return 1;
+                        return WIDGET_DISPATCH_CONSUME;
                     }
                     break;
 
                 case WIDGET_COMMAND_SET_WIDTH:
                     if (m_id == message.payload.widget.id) {
                         m_width = static_cast<i16>(message.payload.widget.data.value);
-                        return 1;
+                        return WIDGET_DISPATCH_CONSUME;
                     }
                     break;
             }
             break;
     }
-    return 0;
+    return WIDGET_DISPATCH_CONTINUE;
 }
 
 VA(0x004de1e0, 0x47)

@@ -348,14 +348,19 @@ void heroWindowManager::Close(void) {
     }
 }
 
+// Keep these expansion-only mirrors local: including widget.h perturbs unrelated VC4.2 output.
+#define WIDGET_DISPATCH_CONTINUE 0
+#define WIDGET_DISPATCH_CONSUME 1
+#define WIDGET_DISPATCH_FORWARD 2
+
 // @semantic: optimized register-allocation residual.
 VA(0x004cac00, 0x2d)
 i32 heroWindowManager::Main(struct tag_message& msg) {
-    i32 result = 0;
+    i32 result = WIDGET_DISPATCH_CONTINUE;
     heroWindow* w = m_windowListTail;
     while (w != NULL) {
         result = w->BroadcastMessage(msg);
-        if (result >= 1 && result <= 2)
+        if (result >= WIDGET_DISPATCH_CONSUME && result <= WIDGET_DISPATCH_FORWARD)
             break;
         w = w->m_prevWindow;
     }
@@ -512,14 +517,14 @@ i32 heroWindowManager::DoDialog(
         gpMouseManager->Main(message);
         if (window != NULL && (message.type != MESSAGE_MOUSE_MOVE || gbSendMouseMoveMessages != 0)) {
             result = window->BroadcastMessage(message);
-            if (result == 2 && message.type == MESSAGE_WIDGET
+            if (result == WIDGET_DISPATCH_FORWARD && message.type == MESSAGE_WIDGET
                 && message.payload.widget.command == WIDGET_COMMAND_DIALOG_SELECT) {
                 m_dialogResult = message.payload.widget.id;
                 done = 1;
             }
         }
         result = handler(message);
-        if (result == 2 && message.type == MESSAGE_WIDGET
+        if (result == WIDGET_DISPATCH_FORWARD && message.type == MESSAGE_WIDGET
             && message.payload.widget.command == WIDGET_COMMAND_DIALOG_SELECT)
             done = 1;
     } while (done == 0);
@@ -532,6 +537,10 @@ i32 heroWindowManager::DoDialog(
         SetNoDialogMenus(1);
     return 0;
 }
+
+#undef WIDGET_DISPATCH_CONTINUE
+#undef WIDGET_DISPATCH_CONSUME
+#undef WIDGET_DISPATCH_FORWARD
 
 VA(0x004cafa0, 0x17)
 void heroWindowManager::UpdateScreen(void) {

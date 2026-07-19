@@ -6,6 +6,11 @@
 class heroWindow;
 struct tag_message;
 
+// Expansion-only dispatch ABI constants keep VC4.2's enum state byte-neutral.
+#define WIDGET_DISPATCH_CONTINUE 0
+#define WIDGET_DISPATCH_CONSUME 1
+#define WIDGET_DISPATCH_FORWARD 2
+
 H2_ENUM_BEGIN(WidgetFlag)
     WIDGET_FLAG_SELECTED = 1,
     WIDGET_FLAG_ENABLED  = 2,

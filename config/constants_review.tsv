@@ -66,8 +66,8 @@ include/BASE/soundmgr.h	pending
 include/BASE/textEntryWidget.h	pending
 include/BASE/textWidget.h	pending
 include/BASE/tileset.h	reviewed	Only packed-layout SIZE evidence.
-include/BASE/widget.h	pending
-include/BASE/widgetKind.h	pending
+include/BASE/widget.h	reviewed	Public widget flags, command argument, and dispatch ABI values are named; packed SIZE and pure-virtual zeros are layout/language evidence.
+include/BASE/widgetKind.h	reviewed	Open serialized widget-kind domain is public and explicitly valued; conversion helpers preserve the packed i16 field.
 include/EDITOR/fullMap.h	pending
 include/EDITOR/mapcell.h	reviewed	Flags and sentinels are typed domains; remaining bit widths, SIZE claims, and legacy raw extents are packed/serialized layout evidence. Legacy record declarations remain shared to satisfy header discipline.
 include/SOURCE/ADVMGR.h	pending
@@ -167,7 +167,7 @@ src/BASE/TEXTWDGT.cpp	pending
 src/BASE/TILE.cpp	pending
 src/BASE/TILESET.cpp	reviewed	Allocation/free operands 18 and 0x1c preserve retail source-line evidence; other values are named or annotations.
 src/BASE/Textntry.cpp	pending
-src/BASE/WIDGET.cpp	pending
+src/BASE/WIDGET.cpp	reviewed	Default extent and dispatch results are named; remaining zeros and -1 are initialization, boolean, draw-mode, or z-order sentinels. VC4.2 non-debug sections and relocations are A/B exact.
 src/BASE/WINDOW.cpp	pending
 src/BASE/WINMGR.cpp	pending
 src/BASE/bmap2.cpp	pending
