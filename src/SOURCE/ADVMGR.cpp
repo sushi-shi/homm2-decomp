@@ -9715,7 +9715,8 @@ void UpdateSystemOptions(i32 initialDraw) {
     cPanel->BroadcastMessage(message);
     message.payload.widget.id = EncodeAdventureSystemOption(ADVMGR_SYSTEM_OPTION_COLOR_CURSOR);
     message.payload.widget.data.value =
-        gConfig.gfx[0].colorMouseCursor + ADVMGR_SYSTEM_OPTIONS_CURSOR_FRAME_BASE;
+        gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].colorMouseCursor
+        + ADVMGR_SYSTEM_OPTIONS_CURSOR_FRAME_BASE;
     cPanel->BroadcastMessage(message);
 
     message.payload.widget.command = ADVMGR_SYSTEM_OPTIONS_SET_TEXT;
@@ -9756,7 +9757,8 @@ void UpdateSystemOptions(i32 initialDraw) {
     cPanel->BroadcastMessage(message);
     message.payload.widget.id =
         EncodeAdventureSystemOptionTextControl(ADVMGR_SYSTEM_OPTION_COLOR_CURSOR);
-    message.payload.widget.data.text = cBWMouseText[gConfig.gfx[0].colorMouseCursor];
+    message.payload.widget.data.text =
+        cBWMouseText[gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].colorMouseCursor];
     cPanel->BroadcastMessage(message);
 
     if (initialDraw == 0) {
@@ -9985,10 +9987,13 @@ i32 SystemOptionsHandler(struct tag_message& message) {
                             break;
 
                         case ADVMGR_SYSTEM_OPTION_COLOR_CURSOR:
-                            gConfig.gfx[0].colorMouseCursor = 1 - gConfig.gfx[0].colorMouseCursor;
+                            gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].colorMouseCursor =
+                                1 - gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].colorMouseCursor;
                             preferencesChanged = 1;
                             bPrefsChanged = 1;
-                            gpMouseManager->SetColorMice(gConfig.gfx[0].colorMouseCursor);
+                            gpMouseManager->SetColorMice(
+                                gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].colorMouseCursor
+                            );
                             break;
 #ifdef HOMM2_STRICT_ENUM_TYPES
                         case ADVMGR_SYSTEM_OPTION_COUNT:
