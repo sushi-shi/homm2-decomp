@@ -4,6 +4,10 @@
 #include <string.h>
 #include <io.h>
 
+H2_ENUM_BEGIN(MapCellExtraConstant)
+    EXTRA_ALLOCATION_STEP = 100
+H2_ENUM_END(MapCellExtraConstant)
+
 VA(0x0040b070, 0x36)
 fullMap::fullMap(void) {
     cells = NULL;
@@ -51,9 +55,6 @@ void fullMap::ClearCellExtra(i32 index) {
     extras[index].nextIndex = 0;
 }
 
-// Expansion-only to avoid perturbing VC4.2's later code generation in this TU.
-#define EXTRA_ALLOCATION_STEP 100
-
 VA(0x0040b266, 0x130)
 i32 fullMap::GetNewCellExtraIndex(void) {
     i32 nb;
@@ -78,8 +79,6 @@ i32 fullMap::GetNewCellExtraIndex(void) {
     ClearCellExtra(extraCount - EXTRA_ALLOCATION_STEP);
     return extraCount - EXTRA_ALLOCATION_STEP;
 }
-
-#undef EXTRA_ALLOCATION_STEP
 
 VA(0x0040b73c, 0x9e)
 void fullMap::Write(i32 handle) {

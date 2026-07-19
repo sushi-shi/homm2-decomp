@@ -25,15 +25,16 @@ H2_ENUM_CLASS_BEGIN(ConfigOperaMode)
     CONFIG_OPERA_ENABLED  = 1
 H2_ENUM_CLASS_END(ConfigOperaMode)
 
-// Expansion-only storage selectors keep VC4.2's TU-wide enum state byte-neutral.
-#define CONFIG_EXECUTABLE_GAME 0
-#define CONFIG_EXECUTABLE_EDITOR 1
+H2_ENUM_CLASS_BEGIN(ConfigExecutable)
+    CONFIG_EXECUTABLE_GAME   = 0,
+    CONFIG_EXECUTABLE_EDITOR = 1,
+    CONFIG_EXECUTABLE_COUNT  = 2
+H2_ENUM_CLASS_END(ConfigExecutable)
 
 H2_ENUM_BEGIN(ConfigStorageConstant)
-    CONFIG_EXECUTABLE_COUNT = 2,
-    CONFIG_GRAPHICS_SIZE    = 0x1c,
-    CONFIG_PERSISTED_SIZE   = 0x19d,
-    CONFIG_STRUCT_SIZE      = 0x1a0
+    CONFIG_GRAPHICS_SIZE  = 0x1c,
+    CONFIG_PERSISTED_SIZE = 0x19d,
+    CONFIG_STRUCT_SIZE    = 0x1a0
 H2_ENUM_END(ConfigStorageConstant)
 
 H2_ENUM_CLASS_BEGIN(ConfigConnectionType)

@@ -39,7 +39,7 @@ include/BASE/button.h	reviewed	Public class interface contains only packed-layou
 include/BASE/dimmerWidget.h	reviewed	Public constructor parameters are named; remaining literals are language-level pure override and packed-layout SIZE evidence.
 include/BASE/dropListWidget.h	pending
 include/BASE/executive.h	reviewed	The interface carries no numeric policy; the sole literal is proven class-layout SIZE evidence.
-include/BASE/font.h	reviewed	Glyph behavior, draw modes, and horizontal/vertical alignment domains are named and aligned; strict builds use enums while production uses expansion constants to keep VC4.2 declaration state neutral. Remaining literal is packed-layout SIZE evidence.
+include/BASE/font.h	reviewed	Shared glyph, draw-mode, and horizontal/vertical alignment domains are named and aligned. The remaining literal is packed-layout SIZE evidence.
 include/BASE/heroWindow.h	pending
 include/BASE/heroWindowManager.h	pending
 include/BASE/icon.h	reviewed	Limit bounds, typed frame-table access, and all public method parameters are named; remaining literals are packed-layout SIZE evidence.
@@ -55,7 +55,7 @@ include/BASE/message.h	pending
 include/BASE/miscwin.h	pending
 include/BASE/mouseManager.h	pending
 include/BASE/palette.h	reviewed	Palette storage extent and public constructor parameter are named; remaining literal is packed-layout SIZE evidence.
-include/BASE/resource.h	reviewed	Explicit resource-category and reference-lifecycle domains; strict builds use enums while production uses expansion constants to keep VC4.2 declaration state neutral. Remaining zero is pure-virtual syntax.
+include/BASE/resource.h	reviewed	Shared resource-category and reference-lifecycle domains are explicit enums. The remaining zero is pure-virtual syntax.
 include/BASE/resourceManager.h	reviewed	Only aggregate capacity, Read13 width, and filename capacity remain public because they define class layout or are consumed by FONT. Implementation policy moved to RESMGR.cpp; private save arrays use incomplete extern declarations.
 include/BASE/sample.h	reviewed	The declaration uses named types; the sole literal is packed-layout SIZE evidence.
 include/BASE/sampleData.h	reviewed	The record fields are named; the sole literal is packed-layout SIZE evidence.
@@ -106,7 +106,7 @@ include/SOURCE/Viewwrld.h	pending
 include/SOURCE/Wsnetwin.h	pending
 include/SOURCE/X_GLOBAL.h	pending
 include/SOURCE/advManager.h	pending
-include/SOURCE/army.h	reviewed	Cross-TU attack target, path target, facing, and invalid-hex values are named expansion-only interface constants; array extents are named and the remaining literal is proven class SIZE evidence.
+include/SOURCE/army.h	reviewed	Cross-TU attack-target, path-target, facing, and invalid-hex domains are named enums; array extents are named and the remaining literal is proven class SIZE evidence.
 include/SOURCE/armyGroup.h	pending
 include/SOURCE/bankBox.h	pending
 include/SOURCE/combatManager.h	pending
@@ -116,7 +116,7 @@ include/SOURCE/dpnetwin.h	pending
 include/SOURCE/fileRequester.h	pending
 include/SOURCE/game.h	pending
 include/SOURCE/hero.h	pending
-include/SOURCE/hexcell.h	reviewed	The empty-occupant sentinel and record capacities are named expansion-only layout constants; the remaining literal is proven class SIZE evidence.
+include/SOURCE/hexcell.h	reviewed	The empty-occupant sentinel and record capacities are named enums; the remaining literal is proven class SIZE evidence.
 include/SOURCE/highScoreManager.h	pending
 include/SOURCE/kbwin.h	pending
 include/SOURCE/netwin.h	pending
@@ -137,15 +137,15 @@ include/SOURCE/x_cdtest.h	reviewed	The two-field generated-table record remains 
 src/BASE/BASEMGR.cpp	reviewed	Only VA/VTBL evidence; initialization uses named values and NULL.
 src/BASE/BITMAP.cpp	reviewed	TU-private full-screen copy stride is named with a prefix-free value; resource lifecycle and bitmap type are explicit. Remaining zeros/ones are clipping origins, bounds, booleans, or loop initialization; allocation/free operands 21, 37, and 51 preserve retail source-line evidence. Inline width/pixel helpers consolidate repeated row-copy access. Proven constructor-local identities and the functional enum conversion are retained because equivalent renamings/spellings perturb later VC4.2 code generation.
 src/BASE/BITS.cpp	reviewed	Private shift/mask domain; remaining zero and one are direct bit arithmetic and result values.
-src/BASE/BORDER.cpp	reviewed	Resource-name capacity, color mask, and dispatch results are named; remaining zeros are initialization or drawing origins. Private enum form perturbed VC4.2 register allocation, so the two read constants are scoped expansion macros. Non-debug sections and relocations are A/B exact.
-src/BASE/BUTTON.cpp	reviewed	Private select-mode, hotkey, repeat-delay, and resource-capacity values are named; dispatch results use the shared ABI names. Repeated message setup uses a scoped expansion helper because an inline function perturbs VC4.2 CSE. Remaining zeros and ones are initialization, frame origins, booleans, or message-state resets. Non-debug sections and relocations are A/B exact.
+src/BASE/BORDER.cpp	reviewed	Private resource-name capacity and color mask plus shared dispatch results are named enums; remaining zeros are initialization or drawing origins.
+src/BASE/BUTTON.cpp	reviewed	Private select-mode, hotkey, repeat-delay, and resource-capacity values are enums; dispatch results use the shared ABI domain. The statement helper is not a constant domain. Remaining zeros and ones are initialization, frame origins, booleans, or message-state resets.
 src/BASE/Blur.cpp	reviewed	Palette, lookup-table, kernel geometry, sample positions, transition timing, and text-slot extents are named in aligned TU-private domains. The two implementation-only headers and obsolete semantic ratchet were removed; remaining zeros/ones are coordinates, channel bounds, loop termination, or boolean resource translation. Allocation/free operands preserve retail source-line evidence. Private placement improves the retail code shape while preserving relocation targets.
 src/BASE/Bzip.cpp	pending
 src/BASE/DIMMER.cpp	reviewed	The implementation contains no policy literals; constructor zeros are empty-widget initialization and all other numerics are address/size annotations.
 src/BASE/EXEC.cpp	reviewed	Manager results, dispatch states, priority, and capacity are private named constants; dialog storage derives from sizeof(executive), and executable selection uses the shared game/editor selectors. Non-debug section bytes and ordered relocations are unchanged.
-src/BASE/FONT.cpp	reviewed	Large-font threshold, resource-name extent, full-screen clip bounds, draw modes, and alignment cases are named. Remaining zeros, ones, and twos are state booleans, clipping origins, icon-call flags, sequence steps, or midpoint arithmetic. The proven fname local identity is retained because renaming it changes VC4.2 stack slots. Non-debug sections and relocations are A/B exact.
+src/BASE/FONT.cpp	reviewed	Private large-font threshold, full-screen clip bounds, centering divisor, and wrap-height count are enums; resource-name extent, draw modes, and alignment domains are shared. Remaining zeros, ones, and twos are state booleans, clipping origins, icon-call flags, and sequence steps.
 src/BASE/ICON.cpp	reviewed	TU-private orientation, result, color-table, and draw-extent enums are aligned and use prefix-free value names. Remaining zeros/ones are clipping origins, inclusive-bound adjustments, booleans, or low-level draw flags; allocation/free operands 18 and 0x1a preserve retail source-line evidence. Resource lifecycle is named and non-debug sections/relocations remain exact.
-src/BASE/ICONWDGT.cpp	reviewed	Private resource-name capacity, color mask, center shift, bottom padding, and dispatch results are named. Strict builds use a private enum while production uses expansion constants; repeated forwarded identity preserves the original statement stream. Remaining zeros/ones are initialization, booleans, frame origins, or resource lookup flags. Non-debug sections and relocations are A/B exact.
+src/BASE/ICONWDGT.cpp	reviewed	Private resource-name capacity, color mask, center shift, and bottom padding are enums; dispatch results use the shared ABI domain. Remaining zeros/ones are initialization, booleans, frame origins, or resource lookup flags.
 src/BASE/INPUTMGR.cpp	pending
 src/BASE/Icon2b.cpp	pending
 src/BASE/Icond2b.cpp	pending
@@ -154,18 +154,18 @@ src/BASE/Iconf2b.cpp	pending
 src/BASE/Iconm2b.cpp	pending
 src/BASE/Iconmf2b.cpp	pending
 src/BASE/MOUSEMGR.cpp	pending
-src/BASE/Midi.cpp	reviewed	Private expansion constants name the unused LogInt field value and filename capacity without perturbing VC4.2 declaration state. Remaining numeric payloads are track-availability data, booleans, loop counts, format indices, and the named volume/status domains. Non-debug sections and ordered relocations remain exact.
+src/BASE/Midi.cpp	reviewed	Private enums name the unused LogInt field value, filename capacity, volume calculation, and sequence status. Remaining numeric payloads are track-availability data, booleans, loop counts, and format indices.
 src/BASE/Misc.cpp	pending
 src/BASE/PALETTE.cpp	reviewed	Reference lifecycle and palette extents are named; allocation/free operands 8, 13, and 21 preserve retail source-line evidence, while zero is the empty resource id. Pointer state uses NULL.
-src/BASE/RESMGR.cpp	reviewed	Private aligned constants name file/status values, entry and row widths, open mode, translation count, sample volume, temporary-buffer width, and save-stack depth. The three expansion-only dimensions preserve VC4.2 declaration state; shared layout and Read13 values remain public, and source-line operands preserve retail allocation/assert evidence.
+src/BASE/RESMGR.cpp	reviewed	A private aligned enum names file/status values, entry and row widths, open mode, translation count, sample volume, temporary-buffer width, and save-stack depth. Shared layout and Read13 values remain public, and source-line operands preserve retail allocation/assert evidence.
 src/BASE/RESOURCE.cpp	reviewed	Constructor parameters and empty reference state are named; zero initializes the scalar resource id and pointer uses NULL. All seven direct consumer objects retain exact non-debug sections and relocations.
 src/BASE/Ripple.cpp	pending
 src/BASE/SAMPLE.cpp	reviewed	Private format, playback-rate, filename-capacity, and suffix-length domains are named; remaining allocation operands preserve retail source-line evidence. Text/data bytes and relocation topology are unchanged.
-src/BASE/TEXTWDGT.cpp	reviewed	Private resource-name capacity, draw-mode mask, buffer growth, shared font modes/alignment, and dispatch results are named. Strict builds use a private enum while production uses expansion constants; repeated message setup preserves the original statement stream. Remaining numeric allocation/free operands are retail source-line evidence, and other zeros/ones are initialization or booleans. Non-debug sections and relocations are A/B exact.
+src/BASE/TEXTWDGT.cpp	reviewed	Private resource-name capacity, draw-mode mask, and buffer growth are enums; font modes, alignment, and dispatch results use shared domains. The statement helper is not a constant domain. Remaining allocation/free operands are retail source-line evidence, and other zeros/ones are initialization or booleans.
 src/BASE/TILE.cpp	pending
 src/BASE/TILESET.cpp	reviewed	Allocation/free operands 18 and 0x1c preserve retail source-line evidence; other values are named or annotations.
 src/BASE/Textntry.cpp	pending
-src/BASE/WIDGET.cpp	reviewed	Default extent and dispatch results are named; remaining zeros and -1 are initialization, boolean, draw-mode, or z-order sentinels. VC4.2 non-debug sections and relocations are A/B exact.
+src/BASE/WIDGET.cpp	reviewed	The private default extent and shared dispatch results are enums; remaining zeros and -1 are initialization, boolean, draw-mode, or z-order sentinels.
 src/BASE/WINDOW.cpp	pending
 src/BASE/WINMGR.cpp	pending
 src/BASE/bmap2.cpp	reviewed	The TU-private palette-level stride is named with a prefix-free enumerator. Remaining zeros and ones express row/column origins, positive-extent guards, loop initialization, or inclusive-to-exclusive rectangle-edge arithmetic; the obsolete semantic ratchet was removed.
@@ -178,7 +178,7 @@ src/BASE/iconf2by.cpp	pending
 src/BASE/listbox.cpp	pending
 src/BASE/miscwin.cpp	pending
 src/BASE/soundmgr.cpp	pending
-src/EDITOR/mapcell.cpp	reviewed	The extra-record allocation step is named with an expansion-only private constant; remaining zeroes and ones are initialization, list sentinels, booleans, or indexing. Non-debug section bytes and ordered relocations are unchanged.
+src/EDITOR/mapcell.cpp	reviewed	The extra-record allocation step is a private enum; remaining zeroes and ones are initialization, list sentinels, booleans, or indexing.
 src/SOURCE/ADVMGR.cpp	pending
 src/SOURCE/AI.cpp	pending
 src/SOURCE/ARMY.cpp	pending

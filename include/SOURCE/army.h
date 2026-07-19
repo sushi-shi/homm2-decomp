@@ -8,15 +8,25 @@
 
 class sample;
 
-// Expansion-only interface constants keep VC4.2's TU-wide enum state byte-neutral.
-#define ARMY_ATTACK_TARGET_ASSIGNED 0
-#define ARMY_ATTACK_TARGET_ENEMY 1
-#define ARMY_ATTACK_TARGET_OCCUPIED 2
-#define ARMY_PATH_ANY_TARGET_HEX 0
-#define ARMY_PATH_EXACT_TARGET_HEX 1
-#define ARMY_FACING_LEFT 0
-#define ARMY_FACING_RIGHT 1
-#define ARMY_HEX_INVALID (-1)
+H2_ENUM_BEGIN(ArmyAttackTarget)
+    ARMY_ATTACK_TARGET_ASSIGNED = 0,
+    ARMY_ATTACK_TARGET_ENEMY    = 1,
+    ARMY_ATTACK_TARGET_OCCUPIED = 2
+H2_ENUM_END(ArmyAttackTarget)
+
+H2_ENUM_BEGIN(ArmyPathTarget)
+    ARMY_PATH_ANY_TARGET_HEX   = 0,
+    ARMY_PATH_EXACT_TARGET_HEX = 1
+H2_ENUM_END(ArmyPathTarget)
+
+H2_ENUM_BEGIN(ArmyFacing)
+    ARMY_FACING_LEFT  = 0,
+    ARMY_FACING_RIGHT = 1
+H2_ENUM_END(ArmyFacing)
+
+H2_ENUM_BEGIN(ArmyHexConstant)
+    ARMY_HEX_INVALID = -1
+H2_ENUM_END(ArmyHexConstant)
 
 #pragma pack(push, 1)
 class army {

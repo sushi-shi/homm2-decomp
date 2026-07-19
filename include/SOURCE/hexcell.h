@@ -4,9 +4,14 @@
 #include <va.h>
 #include <BASE/icon.h>
 
-#define COMBAT_OCCUPANT_NONE (-1)
-#define COMBAT_DEAD_OCCUPANT_CAPACITY 14
-#define HEXCELL_LIMIT_COUNT 2
+H2_ENUM_BEGIN(CombatOccupant)
+    COMBAT_OCCUPANT_NONE = -1
+H2_ENUM_END(CombatOccupant)
+
+H2_ENUM_BEGIN(HexcellConstant)
+    COMBAT_DEAD_OCCUPANT_CAPACITY = 14,
+    HEXCELL_LIMIT_COUNT           = 2
+H2_ENUM_END(HexcellConstant)
 
 #pragma pack(push, 1)
 class hexcell {
