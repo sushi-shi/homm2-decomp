@@ -186,7 +186,7 @@ src/SOURCE/ARMYGRP.cpp	reviewed	Private morale effects and alignment thresholds 
 src/SOURCE/CMBTMGR.cpp	pending
 src/SOURCE/COMMAND.cpp	pending
 src/SOURCE/CURSOR.cpp	reviewed	Private constants name cursor-cycle, animation, direction, turn-frame, full-tile, and retained source-line addends; persisted walk-speed values use the shared config domain, movement tables retain literal data payloads with named public extents, and the group-change allocator restores its retail data relocations.
-src/SOURCE/Campaign.cpp	pending
+src/SOURCE/Campaign.cpp	reviewed	Private aligned enums separate zero-based map indices, one-based scenario numbers, campaign-track variants, coordinate axes, selected-frame offsets, smacker ids, difficulty, and scenario army counts. Shared campaign dimensions, widget ids, message/display domains, awards, and choice types replace policy literals; the track-coordinate table remains a narrowly suppressed retail data payload.
 src/SOURCE/Castle.cpp	reviewed	Private aligned enums name castle controls, widget frames, information-text slots, interface/background geometry, and local buffer storage. Shared building slots and masks, widget flags/kinds, hero capacities, stat/mage-guild limits, dialog results, modifiers, fade policy, and handler results replace raw policy values; the castle slot-order table remains a narrowly suppressed retail data payload.
 src/SOURCE/DRAWING.cpp	reviewed	Private drawing geometry, wall-coordinate, tower-frame, drawbridge-clip, spell-axis, and small-view stat-row domains are named; shared wall slots/states, faction count, font alignment, and combat dimensions replace raw policy values. Remaining findings are the retail castle wall-coordinate and frame-offset local table payloads.
 src/SOURCE/EVENTS.cpp	pending
