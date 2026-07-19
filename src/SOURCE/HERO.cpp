@@ -114,8 +114,6 @@ H2_ENUM_BEGIN(HeroUiConstant)
     UI_STATUS_REGION_Y             = 459,
     UI_STATUS_REGION_HEIGHT        = 20,
     UI_FADE_STEPS                  = 8,
-    UI_FADE_IN                     = 0,
-    UI_FADE_OUT                    = 1,
     UI_LOOPING_SOUND_KEEP_COUNT    = 4,
     UI_VIEW_CLOSED                 = 0,
     UI_VIEW_DISMISSED              = 1,
@@ -1558,7 +1556,7 @@ i32 HeroView(i32 heroId, i32 noDismiss, i32 fadeAlreadyOut) {
     gpHVHero = gpGame->GetHero(heroId);
     gbHeroWindShowing = true;
     if (fadeAlreadyOut == 0)
-        gpWindowManager->FadeScreen(UI_FADE_OUT, UI_FADE_STEPS, NULL);
+        gpWindowManager->FadeScreen(FADE_OUT, UI_FADE_STEPS, NULL);
 
     heroWin = new heroWindow(0, 0, "herowind.bin");
     if (heroWin == NULL)
@@ -1576,9 +1574,9 @@ i32 HeroView(i32 heroId, i32 noDismiss, i32 fadeAlreadyOut) {
 
     SetupHeroView();
     RedrawHeroScreen();
-    gpWindowManager->FadeScreen(UI_FADE_IN, UI_FADE_STEPS, NULL);
+    gpWindowManager->FadeScreen(FADE_IN, UI_FADE_STEPS, NULL);
     gpWindowManager->DoDialog(heroWin, HeroHandler, 0);
-    gpWindowManager->FadeScreen(UI_FADE_OUT, UI_FADE_STEPS, NULL);
+    gpWindowManager->FadeScreen(FADE_OUT, UI_FADE_STEPS, NULL);
     delete heroWin;
     gheroWin = NULL;
 
