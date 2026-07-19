@@ -35,7 +35,6 @@ H2_ENUM_BEGIN(TextEntryConstant)
     EDIT_BUFFER_CAPACITY        = 600,
     DISPLAY_BUFFER_CAPACITY     = 300,
     CURSOR_BLINK_TICKS          = 360,
-    DIMMED_COLOR                = 3,
     TEXT_ALLOCATION_PADDING     = 5,
     EDIT_ALLOCATION_PADDING     = 6,
     PRESERVE_TEXT_FLAG          = 1
@@ -92,7 +91,7 @@ textEntryWidget::textEntryWidget(
     m_maxLength = maxLength;
     m_maxLines = 1;
     m_preserveTextOnFocus = 0;
-    m_color = 1;
+    m_color = static_cast<i16>(FONT_DRAW_DEFAULT);
     m_rectH = m_height;
 #line 61 RETAIL_FILE
     m_text = static_cast<char*>(
@@ -415,14 +414,14 @@ void textEntryWidget::Draw(void) {
             m_innerY + m_owner->m_posY,
             m_innerW,
             m_innerH,
-            m_color,
-            m_alignment
+            FontDrawModeFromStorage(m_color),
+            FontAlignmentFromStorage(m_alignment)
         );
     } else {
         m_icon->DrawToBuffer(m_rectX + m_owner->m_posX, m_rectY + m_owner->m_posY, m_iconFrame, 0);
-        i32 color = DIMMED_COLOR;
+        FontDrawMode color = FONT_DRAW_DARK_GRAY;
         if ((m_flags & WIDGET_FLAG_DIMMED) == 0)
-            color = m_color;
+            color = FontDrawModeFromStorage(m_color);
         m_font->DrawBoundedString(
             m_text,
             m_innerX + m_owner->m_posX,
@@ -430,7 +429,7 @@ void textEntryWidget::Draw(void) {
             m_innerW,
             m_innerH,
             color,
-            m_alignment
+            FontAlignmentFromStorage(m_alignment)
         );
     }
 }

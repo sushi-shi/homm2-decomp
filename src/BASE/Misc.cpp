@@ -605,7 +605,13 @@ void ShowMemoryStatus(void) {
         gpWindowManager->m_screen, 0, STATUS_BAR_Y, STATUS_BAR_WIDTH, STATUS_BAR_HEIGHT, 0
     );
     smallFont->DrawBoundedString(
-        gText, 0, STATUS_TEXT_Y, STATUS_BAR_WIDTH, STATUS_TEXT_HEIGHT, 1, 0
+        gText,
+        0,
+        STATUS_TEXT_Y,
+        STATUS_BAR_WIDTH,
+        STATUS_TEXT_HEIGHT,
+        FONT_DRAW_DEFAULT,
+        FONT_ALIGN_LEFT
     );
     BlitBitmapToScreen(
         gpWindowManager->m_screen,
@@ -2052,7 +2058,13 @@ void AiPrint(char* text) {
             gpWindowManager->m_screen, 0, STATUS_BAR_Y, STATUS_BAR_WIDTH, STATUS_BAR_HEIGHT, 0
         );
         smallFont->DrawBoundedString(
-            text, 0, STATUS_TEXT_Y, STATUS_BAR_WIDTH, STATUS_TEXT_HEIGHT, 1, 0
+            text,
+            0,
+            STATUS_TEXT_Y,
+            STATUS_BAR_WIDTH,
+            STATUS_TEXT_HEIGHT,
+            FONT_DRAW_DEFAULT,
+            FONT_ALIGN_LEFT
         );
         BlitBitmapToScreen(
             gpWindowManager->m_screen,
@@ -2074,7 +2086,13 @@ void AbsAiPrint(char* text) {
         gpWindowManager->m_screen, 0, STATUS_BAR_Y, STATUS_BAR_WIDTH, STATUS_BAR_HEIGHT, 0
     );
     smallFont->DrawBoundedString(
-        text, 0, STATUS_TEXT_Y, STATUS_BAR_WIDTH, STATUS_TEXT_HEIGHT, 1, 0
+        text,
+        0,
+        STATUS_TEXT_Y,
+        STATUS_BAR_WIDTH,
+        STATUS_TEXT_HEIGHT,
+        FONT_DRAW_DEFAULT,
+        FONT_ALIGN_LEFT
     );
     BlitBitmapToScreen(
         gpWindowManager->m_screen,

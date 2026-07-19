@@ -26,17 +26,17 @@ H2_ENUM_CLASS_BEGIN(SoundVolumeConversionMode)
     SOUND_VOLUME_MUSIC  = 101
 H2_ENUM_CLASS_END(SoundVolumeConversionMode)
 
-H2_ENUM_CLASS_BEGIN(SoundSampleOperation)
+H2_ENUM_CLASS_BEGIN_T(SoundSampleOperation, i16)
     SOUND_SAMPLE_OPERATION_VOLUME        = 1,
     SOUND_SAMPLE_OPERATION_START         = 5,
     SOUND_SAMPLE_OPERATION_EFFECT_VOLUME = 100,
     SOUND_SAMPLE_OPERATION_MUSIC_VOLUME  = 101
-H2_ENUM_CLASS_END(SoundSampleOperation)
+H2_ENUM_CLASS_END_T(SoundSampleOperation, i16)
 
-H2_ENUM_CLASS_BEGIN(SoundDigitalReportQuery)
+H2_ENUM_CLASS_BEGIN_T(SoundDigitalReportQuery, i16)
     SOUND_DIGITAL_REPORT_VOLUME  = 1,
     SOUND_DIGITAL_REPORT_PLAYING = 4
-H2_ENUM_CLASS_END(SoundDigitalReportQuery)
+H2_ENUM_CLASS_END_T(SoundDigitalReportQuery, i16)
 
 class sample;
 struct _SAMPLE;
@@ -106,8 +106,8 @@ public:
     struct _SAMPLE* StartSample(char*, char**, i16, i16, i32, i32, i32l);
     void StopAllSamples(i32);
     void StopSample(struct _SAMPLE*);
-    void ModifySample(struct _SAMPLE*, i16, i32l);
-    i32l DigitalReport(struct _SAMPLE*, i16);
+    void ModifySample(struct _SAMPLE*, SoundSampleOperation, i32l);
+    i32l DigitalReport(struct _SAMPLE*, SoundDigitalReportQuery);
     void AdjustSoundVolumes(void);
     void AdjustMusicVolumes(void);
     void ForcePollSound(void);

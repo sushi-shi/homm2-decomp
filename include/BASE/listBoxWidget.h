@@ -20,7 +20,7 @@ public:
     i16 m_visibleItemCount;
     i16 m_normalColor;
     i16 m_selectedColor;
-    i16 m_textMode;
+    i16 m_alignment;
     i16 m_itemCount;
     i16 m_selectedIndex;
     i16 m_lastSelectedIndex;
