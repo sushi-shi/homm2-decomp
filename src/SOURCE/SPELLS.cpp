@@ -76,7 +76,8 @@ VA(0x00420546, 0x44a)
 i32 combatManager::ViewSpells(i32) {
     CreatureType elementalType;
 
-    m_selectedSpell = gpGame->ViewSpells(m_heroes[giCurGeneral], 0, CombatSpecialHandler, 0);
+    m_selectedSpell =
+        gpGame->ViewSpells(m_heroes[giCurGeneral], SPELL_TYPE_COMBAT, CombatSpecialHandler, 0);
     if (m_selectedSpell != SPELL_NONE) {
         switch (m_selectedSpell) {
             case SPELL_EARTHQUAKE:
@@ -308,7 +309,7 @@ i32 HandleCastSpell(tag_message& message) {
                     gpMouseManager->SetPointer(
                         gsSpellInfo[IDX(gpCombatManager->m_selectedSpell)].iconIndex
                     );
-                    gpCombatManager->SpellMessage(IDX(gpCombatManager->m_selectedSpell), hex);
+                    gpCombatManager->SpellMessage(gpCombatManager->m_selectedSpell, hex);
                 }
             }
             break;
@@ -495,7 +496,7 @@ i32 combatManager::ValidSpellTarget(SpellType spell, i32 hex) {
 }
 
 VA(0x0042159c, 0x222)
-void combatManager::SpellMessage(i32 spell, i32 hex) {
+void combatManager::SpellMessage(SpellType spell, i32 hex) {
     army* target_i;
     char* armyName;
 
@@ -503,22 +504,23 @@ void combatManager::SpellMessage(i32 spell, i32 hex) {
         return;
 
     switch (spell) {
-        case IDX(SPELL_FIREBALL):
-        case IDX(SPELL_FIREBLAST):
-        case IDX(SPELL_METEOR_SHOWER):
-        case IDX(SPELL_COLD_RING):
-            sprintf(gText, "Cast %s", gSpellNames[spell]);
+        case SPELL_FIREBALL:
+        case SPELL_FIREBLAST:
+        case SPELL_METEOR_SHOWER:
+        case SPELL_COLD_RING:
+            sprintf(gText, "Cast %s", gSpellNames[IDX(spell)]);
             break;
-        case IDX(SPELL_TELEPORT):
+        case SPELL_TELEPORT:
             if (bInTeleportGetDest) {
                 sprintf(gText, "Teleport Here");
                 break;
             }
             goto occupied_target;
-        case IDX(SPELL_RESURRECT):
-        case IDX(SPELL_TRUE_RESURRECT):
-        case IDX(SPELL_ANIMATE_DEAD):
-            target_i = &m_armies[m_currentSide][FindResurrectArmyIndex(m_currentSide, spell, hex)];
+        case SPELL_RESURRECT:
+        case SPELL_TRUE_RESURRECT:
+        case SPELL_ANIMATE_DEAD:
+            target_i =
+                &m_armies[m_currentSide][FindResurrectArmyIndex(m_currentSide, IDX(spell), hex)];
             goto format_target;
         default:
         occupied_target:
@@ -705,7 +707,7 @@ void combatManager::CastSpell(
                 RippleCreature(
                     teleportArmy_i->m_side,
                     teleportArmy_i->m_index,
-                    IDX(COMBAT_RIPPLE_DEATH_RIPPLE)
+                    COMBAT_RIPPLE_DEATH_RIPPLE
                 );
                 m_hexCells[teleportArmy_i->m_hex].m_occupantSide = COMBAT_HEX_EMPTY;
                 m_hexCells[teleportArmy_i->m_hex].m_occupantIndex = COMBAT_HEX_EMPTY;
@@ -769,7 +771,7 @@ void combatManager::CastSpell(
                     RippleCreature(
                         teleportArmy_i->m_side,
                         teleportArmy_i->m_index,
-                        IDX(COMBAT_RIPPLE_DEATH_WAVE)
+                        COMBAT_RIPPLE_DEATH_WAVE
                     );
                 } else {
                     teleportArmy_i->m_hex = teleportDestination;
@@ -781,7 +783,7 @@ void combatManager::CastSpell(
                     RippleCreature(
                         teleportArmy_i->m_side,
                         teleportArmy_i->m_index,
-                        IDX(COMBAT_RIPPLE_DEATH_WAVE)
+                        COMBAT_RIPPLE_DEATH_WAVE
                     );
                 }
                 break;
@@ -797,7 +799,7 @@ void combatManager::CastSpell(
                 );
                 CombatMessage(gText, 1, 1, 0);
                 DoBlast(targetHex, IDX(spell));
-                RippleCreature(target_i->m_side, target_i->m_index, IDX(COMBAT_RIPPLE_WAVE));
+                RippleCreature(target_i->m_side, target_i->m_index, COMBAT_RIPPLE_WAVE);
                 break;
             case SPELL_COLD_RAY:
                 DelayMilli(
@@ -2435,7 +2437,7 @@ void combatManager::VaporizeCreature(i32 side, i32 armyIndex) {
 }
 
 VA(0x00426e4d, 0x592)
-void combatManager::RippleCreature(i32 side, i32 armyIndex, i32 mode) {
+void combatManager::RippleCreature(i32 side, i32 armyIndex, CombatRippleMode mode) {
     DATA(0x004f0540) static i16 rippleSourceLineBase = 2587;
     army* target = &m_armies[side][armyIndex];
     i32 phaseStep;
@@ -2443,13 +2445,13 @@ void combatManager::RippleCreature(i32 side, i32 armyIndex, i32 mode) {
     float amplitudeBase;
     float amplitudeStep;
     switch (mode) {
-        case IDX(COMBAT_RIPPLE_WAVE):
+        case COMBAT_RIPPLE_WAVE:
             phaseStep = 2;
             frameDelay = 20;
             amplitudeBase = RIPPLE_MODE_ZERO_AMPLITUDE_BASE;
             amplitudeStep = RIPPLE_MODE_ZERO_AMPLITUDE_STEP;
             break;
-        case IDX(COMBAT_RIPPLE_DEATH_RIPPLE):
+        case COMBAT_RIPPLE_DEATH_RIPPLE:
             phaseStep = 1;
             frameDelay = 30;
             amplitudeBase = RIPPLE_OTHER_AMPLITUDE_BASE;
@@ -2465,7 +2467,7 @@ void combatManager::RippleCreature(i32 side, i32 armyIndex, i32 mode) {
 
     ResetLimitCreature();
     ++m_limitCreatureCount[side][armyIndex];
-    if (mode == IDX(COMBAT_RIPPLE_DEATH_WAVE))
+    if (mode == COMBAT_RIPPLE_DEATH_WAVE)
         gpCombatManager->DrawFrame(0, 1, 1, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
     else
         gpCombatManager->DrawFrame(1, 1, 1, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
@@ -2503,9 +2505,9 @@ void combatManager::RippleCreature(i32 side, i32 armyIndex, i32 mode) {
         i32 skipDistance =
             abs(RIPPLE_PHASE_CENTER - phase % RIPPLE_PHASE_PERIOD) - RIPPLE_SKIP_CENTER_OFFSET;
         i32 amplitudeIndex = (phase - RIPPLE_PHASE_START) / RIPPLE_AMPLITUDE_INDEX_DIVISOR + 1;
-        if (mode == IDX(COMBAT_RIPPLE_DEATH_WAVE))
+        if (mode == COMBAT_RIPPLE_DEATH_WAVE)
             amplitudeIndex = RIPPLE_MODE_TWO_AMPLITUDE_START - amplitudeIndex;
-        else if (mode == IDX(COMBAT_RIPPLE_WAVE)) {
+        else if (mode == COMBAT_RIPPLE_WAVE) {
             if (amplitudeIndex == 0)
                 amplitudeIndex = RIPPLE_MODE_ZERO_CENTER_AMPLITUDE;
             else
@@ -2519,7 +2521,7 @@ void combatManager::RippleCreature(i32 side, i32 armyIndex, i32 mode) {
             memset(gyModify + giMinExtentY, 0, extentHeight);
             for (row = giMinExtentY; row < giMaxExtentY; ++row) {
                 i32 waveIndex;
-                if (mode == IDX(COMBAT_RIPPLE_DEATH_WAVE))
+                if (mode == COMBAT_RIPPLE_DEATH_WAVE)
                     waveIndex = -RIPPLE_PHASE_CENTER - giMaxExtentY + phase * 2 + row;
                 else
                     waveIndex = phase * 2 - RIPPLE_PHASE_CENTER - row + giMinExtentY;
@@ -2527,7 +2529,7 @@ void combatManager::RippleCreature(i32 side, i32 armyIndex, i32 mode) {
                 if (waveIndex >= 0 && waveIndex < SPELL_MODIFIER_ROW_COUNT)
                     gyModify[row] = static_cast<i8>(wave[waveIndex] * amplitude);
             }
-            if (mode == IDX(COMBAT_RIPPLE_DEATH_RIPPLE)
+            if (mode == COMBAT_RIPPLE_DEATH_RIPPLE
                 && phase >= RIPPLE_DEATH_RIPPLE_FADE_START) {
                 i32 start = giMinExtentY - 1;
                 i32 end = giMinExtentY
@@ -2536,7 +2538,7 @@ void combatManager::RippleCreature(i32 side, i32 armyIndex, i32 mode) {
                           + 1;
                 memset(gyModify + start, VAPORIZE_MASKED, end - start + 1);
             }
-            if (mode == IDX(COMBAT_RIPPLE_DEATH_WAVE) && phase < RIPPLE_DEATH_WAVE_FADE_END) {
+            if (mode == COMBAT_RIPPLE_DEATH_WAVE && phase < RIPPLE_DEATH_WAVE_FADE_END) {
                 i32 start = giMinExtentY - 1;
                 i32 end =
                     giMaxExtentY - 1
@@ -2553,7 +2555,7 @@ void combatManager::RippleCreature(i32 side, i32 armyIndex, i32 mode) {
     H2_FREE(gyModify, 2587 + RIPPLE_MODIFIER_FREE_LINE_OFFSET);
     H2_FREE(wave, 2587 + RIPPLE_WAVE_FREE_LINE_OFFSET);
     gyModify = NULL;
-    if (mode != IDX(COMBAT_RIPPLE_DEATH_RIPPLE))
+    if (mode != COMBAT_RIPPLE_DEATH_RIPPLE)
         gpCombatManager->DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
 }
 

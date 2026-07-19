@@ -2389,7 +2389,9 @@ void game::ClaimMine(i32 mineId, i32 player) {
 
 VA(0x00479856, 0x1e2)
 SpellType
-game::ViewSpells(hero* spellHero, i32 spellType, i32 (*callback)(tag_message&), i32 readOnly) {
+game::ViewSpells(
+    hero* spellHero, HeroSpellType spellType, i32 (*callback)(tag_message&), i32 readOnly
+) {
     tag_message message;
 
     viewSpellsHero = spellHero;
@@ -2400,21 +2402,21 @@ game::ViewSpells(hero* spellHero, i32 spellType, i32 (*callback)(tag_message&), 
         m_viewSpellsCallback = callback;
         m_viewSpellsReadOnly = static_cast<i8>(readOnly);
         m_viewSpellsHero = spellHero;
-        if (spellType == 2)
-            m_viewSpellsType = 1;
+        if (spellType == SPELL_TYPE_ALL)
+            m_viewSpellsType = IDX(SPELL_TYPE_ADVENTURE);
         else
-            m_viewSpellsType = spellType;
+            m_viewSpellsType = IDX(spellType);
         m_viewSpellsTop[0] = 0;
-        m_viewSpellsCount[0] = spellHero->GetNumSpells(0);
+        m_viewSpellsCount[0] = spellHero->GetNumSpells(SPELL_TYPE_COMBAT);
         m_viewSpellsTop[1] = 0;
-        m_viewSpellsCount[1] = spellHero->GetNumSpells(1);
+        m_viewSpellsCount[1] = spellHero->GetNumSpells(SPELL_TYPE_ADVENTURE);
         m_viewSpellsWindow = new heroWindow(86, 87, const_cast<char*>("spellwin.bin"));
         if (m_viewSpellsWindow == NULL)
             MemError();
-        if (spellType != 2) {
+        if (spellType != SPELL_TYPE_ALL) {
             message.type = MESSAGE_WIDGET;
             message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-            if (spellType == 0)
+            if (spellType == SPELL_TYPE_COMBAT)
                 message.payload.widget.id = 4;
             else
                 message.payload.widget.id = 5;
@@ -2480,7 +2482,7 @@ void game::UpdateSpellWidgets(void) {
             m_viewSpellsWindow->BroadcastMessage(message9);
         } else {
             spell2 = m_viewSpellsHero->GetNthSpell(
-                m_viewSpellsType,
+                static_cast<HeroSpellType>(m_viewSpellsType),
                 m_viewSpellsTop[m_viewSpellsType] + spellSlot6 + 1
             );
             message9.payload.widget.command = WIDGET_COMMAND_SET_FILL_COLOR;
@@ -2604,7 +2606,7 @@ i32 ViewSpellsHandler(tag_message& msg) {
                         case 110:
                         case 111:
                             spell = gpGame->m_viewSpellsHero->GetNthSpell(
-                                gpGame->m_viewSpellsType,
+                                static_cast<HeroSpellType>(gpGame->m_viewSpellsType),
                                 gpGame->m_viewSpellsTop[gpGame->m_viewSpellsType]
                                     + (msg.payload.widget.id - 100) + 1
                             );
@@ -2656,7 +2658,7 @@ i32 ViewSpellsHandler(tag_message& msg) {
                         case 110:
                         case 111:
                             spell = gpGame->m_viewSpellsHero->GetNthSpell(
-                                gpGame->m_viewSpellsType,
+                                static_cast<HeroSpellType>(gpGame->m_viewSpellsType),
                                 gpGame->m_viewSpellsTop[gpGame->m_viewSpellsType]
                                     + (msg.payload.widget.id - 100) + 1
                             );

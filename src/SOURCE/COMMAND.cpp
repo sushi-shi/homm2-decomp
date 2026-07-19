@@ -879,7 +879,7 @@ i32 combatManager::ProcessCombatMsg(tag_message& message) {
                     case IDX(WINDOW_HOVER):
                         switch (message.payload.widget.id) {
                             case IDX(WINDOW_MAIN_BUTTON):
-                                DoCommand(IDX(m_currentCommand));
+                                DoCommand(m_currentCommand);
                                 break;
                         }
                         break;
@@ -935,7 +935,7 @@ i32 combatManager::ProcessCombatMsg(tag_message& message) {
                         }
                         if (m_previousCommand != m_currentCommand) {
                             m_previousCommand = m_currentCommand;
-                            CombatMessage(IDX(m_currentCommand));
+                            CombatMessage(m_currentCommand);
                         }
                     } else {
                         if (mouseX >= CONTROL_RIGHT_MIN_X) {
@@ -1006,10 +1006,10 @@ i32 combatManager::ProcessCombatMsg(tag_message& message) {
                     } else if ((message.payload.keyboard.modifiers
                                 & DEBUG_DOUBLE_RIPPLE_MASK)
                                != 0) {
-                        RippleCreature(1, 1, IDX(COMBAT_RIPPLE_DEATH_RIPPLE));
-                        RippleCreature(1, 1, IDX(COMBAT_RIPPLE_DEATH_WAVE));
+                        RippleCreature(1, 1, COMBAT_RIPPLE_DEATH_RIPPLE);
+                        RippleCreature(1, 1, COMBAT_RIPPLE_DEATH_WAVE);
                     } else {
-                        RippleCreature(1, 1, IDX(COMBAT_RIPPLE_WAVE));
+                        RippleCreature(1, 1, COMBAT_RIPPLE_WAVE);
                     }
                     break;
                 case IDX(KEY_WAIT):
@@ -1374,22 +1374,22 @@ i32 combatManager::RightClick(i32 hexIndex) {
 }
 
 VA(0x0042d0bf, 0x3b3)
-void combatManager::DoCommand(i32 command) {
+void combatManager::DoCommand(CombatMessageCommand command) {
     i32 unusedCommandWord2;
     i32 unusedCommandWord5;
     army* currentArmy = &m_armies[m_currentArmySide][m_currentArmyIndex];
     switch (command) {
-        case IDX(COMBAT_MESSAGE_COMMAND_DEFAULT):
+        case COMBAT_MESSAGE_COMMAND_DEFAULT:
             break;
-        case IDX(COMBAT_MESSAGE_COMMAND_MOVE):
-        case IDX(COMBAT_MESSAGE_COMMAND_FLY):
-        case IDX(COMBAT_MESSAGE_COMMAND_SHOOT):
-        case IDX(COMBAT_MESSAGE_COMMAND_SHOOT_THROUGH_WALL):
+        case COMBAT_MESSAGE_COMMAND_MOVE:
+        case COMBAT_MESSAGE_COMMAND_FLY:
+        case COMBAT_MESSAGE_COMMAND_SHOOT:
+        case COMBAT_MESSAGE_COMMAND_SHOOT_THROUGH_WALL:
             giNextAction = COMBAT_AI_ACTION_MOVE;
             giNextActionGridIndex = m_selectedHex;
             giNextActionExtra = -1;
             break;
-        case IDX(COMBAT_MESSAGE_COMMAND_ATTACK):
+        case COMBAT_MESSAGE_COMMAND_ATTACK:
             giNextActionGridIndex = m_selectedHex;
             if (m_playerId[m_currentSide] == -1 || gbHumanPlayer[m_playerId[m_currentSide]] == 0
                 || m_gridSelectionDisabled != 0) {
@@ -1400,17 +1400,17 @@ void combatManager::DoCommand(i32 command) {
                 giNextActionExtra = m_directionTargetHex;
             }
             break;
-        case IDX(COMBAT_MESSAGE_COMMAND_OPTIONS):
+        case COMBAT_MESSAGE_COMMAND_OPTIONS:
             gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
             ViewGeneral(m_currentSide, 1, 0);
             ResetMouse();
             break;
-        case IDX(COMBAT_MESSAGE_COMMAND_OPPOSING_OPTIONS):
+        case COMBAT_MESSAGE_COMMAND_OPPOSING_OPTIONS:
             gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
             ViewGeneral(1 - m_currentSide, 1, 0);
             ResetMouse();
             break;
-        case IDX(COMBAT_MESSAGE_COMMAND_VIEW_INFO):
+        case COMBAT_MESSAGE_COMMAND_VIEW_INFO:
             gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
             if (m_selectedHex == COMBAT_BALLISTA_HEX)
                 ViewBallista(0);
@@ -1422,7 +1422,7 @@ void combatManager::DoCommand(i32 command) {
                 );
             ResetMouse();
             break;
-        case IDX(COMBAT_MESSAGE_COMMAND_CAST_SPELL):
+        case COMBAT_MESSAGE_COMMAND_CAST_SPELL:
             if (IsNegationSphereInEffect() != 0) {
                 NormalDialog(
                     "The Sphere of Negation artifact is in effect for this battle, disabling all "
@@ -1442,7 +1442,7 @@ void combatManager::DoCommand(i32 command) {
                 ResetMouse();
             }
             break;
-        case IDX(COMBAT_MESSAGE_COMMAND_RETREAT):
+        case COMBAT_MESSAGE_COMMAND_RETREAT:
             NormalDialog(
                 "Are you sure you want to retreat?",
                 NORMAL_DIALOG_CONFIRM,
@@ -1459,7 +1459,7 @@ void combatManager::DoCommand(i32 command) {
                 giNextAction = COMBAT_AI_ACTION_RETREAT;
             ResetMouse();
             break;
-        case IDX(COMBAT_MESSAGE_COMMAND_SURRENDER):
+        case COMBAT_MESSAGE_COMMAND_SURRENDER:
             if (DoSurrender() == 1) {
                 if (gpGame->m_players[m_playerId[m_currentSide]].m_resources[IDX(RES_GOLD)]
                     < giSurrenderCost) {

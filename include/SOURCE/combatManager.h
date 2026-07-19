@@ -692,7 +692,7 @@ public:
     void ClearCombatMessages(i32);
     void CheckUpdateCombatMessages(void);
     void CombatMessage(char*, i32, i32, i32);
-    void CombatMessage(i32);
+    void CombatMessage(CombatMessageCommand);
     void ResetLimitCreature(void);
     void UpdateCombatArea(void);
     void SetupGridForArmy(class army*);
@@ -707,7 +707,7 @@ public:
     i32 ViewSpells(i32);
     i32 FindResurrectArmyIndex(i32, i32, i32);
     i32 ValidSpellTarget(SpellType, i32);
-    void SpellMessage(i32, i32);
+    void SpellMessage(SpellType, i32);
     void CastSpell(SpellType, i32, i32, i32);
     void DefaultSpell(i32);
     void Fireball(i32, SpellType);
@@ -726,7 +726,7 @@ public:
     i32 GetNextChainLightningTarget(class army*, i32);
     void ChainLightning(i32, i32);
     void VaporizeCreature(i32, i32);
-    void RippleCreature(i32, i32, i32);
+    void RippleCreature(i32, i32, CombatRippleMode);
     void ShowMassSpell(i8 (*const)[COMBAT_ARMY_SLOT_COUNT], i32, i32);
     void CastMassSpell(SpellType, i32);
     void MirrorImage(i32);
@@ -749,7 +749,7 @@ public:
     i32 CheckWin(struct tag_message*);
     CombatMessageCommand GetCommand(i32);
     i32 RightClick(i32);
-    void DoCommand(i32);
+    void DoCommand(CombatMessageCommand);
     void ClearWinLoseBottom(class heroWindow*);
     void ShowWinLoseArtifact(class heroWindow*, i32);
     void ShowSkeletons(class heroWindow*);
@@ -775,7 +775,7 @@ public:
     i32 DoSpellAI(i32, i32);
     void DetermineEffectOfSpell(SpellType, i32*, i32*);
     i32 EffectSpellCreateCreature(i32, SpellType);
-    i32 RawEffectSpellInfluence(class army*, i32);
+    i32 RawEffectSpellInfluence(class army*, ArmySpellInfluence);
     void ClearEffects(void);
     void NextPos(i32*);
     i32 FirstArmy(i32, i32, i32*);

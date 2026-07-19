@@ -2355,7 +2355,7 @@ void philAI::ValueOfBuyingCreature(
     i32 visitingArmySlot;
 
     missileStacks = 0;
-    GetMonsterCost(IDX(creature), creatureCosts);
+    GetMonsterCost(creature, creatureCosts);
     purchaseCost = RVConversion(creatureCosts) * purchaseCount;
     creatureValue = static_cast<i32>(
         gMonsterDatabase[IDX(creature)].fightValue * purchaseCount
@@ -2551,7 +2551,7 @@ i32 philAI::MaxBuyableCreatures(CreatureType level) {
     i32 cost7[7];
     i32 res;
     i32 i;
-    GetMonsterCost(IDX(level), cost7);
+    GetMonsterCost(level, cost7);
     for (i = 0; i < 7; i++) {
         if (cost7[i] == 0)
             res = 9999;
@@ -3526,7 +3526,7 @@ void philAI::EvaluateOneTimeCreaturePurchase(
             purchaseFightValue15 * gpGame->m_players[gpCurAIHero->m_owner].m_upgradeValueWeight
         );
         if (useAvailableCount == 0) {
-            GetMonsterCost(IDX(creature), costTemp);
+            GetMonsterCost(creature, costTemp);
             purchaseValue -= RVConversion(costTemp) * purchaseCount;
         }
         if (purchaseValue < 0) {
@@ -4488,7 +4488,7 @@ void philAI::BuildCreature(town* townPtr, i32 dwelling, i32 purchaseCount) {
         townPtr->m_army.m_quantities[weakestSlot8] = 0;
     }
 
-    GetMonsterCost(creatureType13, monsterCosts10);
+    GetMonsterCost(CreatureType(creatureType13), monsterCosts10);
     for (armyIndex4 = 0; armyIndex4 < AI_PURCHASE_RESOURCE_COUNT; armyIndex4++) {
         gpCurPlayer->m_resources[armyIndex4] -= monsterCosts10[armyIndex4] * purchaseCount;
     }
@@ -4516,7 +4516,7 @@ i32 philAI::CanBuyBHC(BHC& bhc) {
             jb = gDwellingType[bhc.pTown->m_type][bhc.what];
             if (bhc.pTown->m_garrison[bhc.what] < bhc.num)
                 return 0;
-            GetMonsterCost(jb, cost);
+            GetMonsterCost(CreatureType(jb), cost);
             for (idx = 0; idx < 7; idx++)
                 if (cost[idx] * bhc.num > gpCurPlayer->m_resources[idx])
                     return 0;

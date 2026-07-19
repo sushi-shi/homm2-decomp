@@ -157,12 +157,12 @@ public:
     i32 FlyTo(void);
     i32 FlyTo(i32);
     i32 FindPath(i32, i32, i32, i32, i32);
-    i32 ValidPath(i32, i32);
+    i32 ValidPath(i32, ArmyPathTarget);
     i32 GetMoveMask(i32);
-    i32 GetAttackMask(i32, i32, i32);
+    i32 GetAttackMask(i32, ArmyAttackTarget, i32);
     i32 ValidMove(CombatHexDirection);
     i32 ValidMove(i32, CombatHexDirection);
-    i32 ValidAttack(i32, CombatHexDirection, i32, i32, i32*);
+    i32 ValidAttack(i32, CombatHexDirection, ArmyAttackTarget, i32, i32*);
     i32 GetAdjacentCellIndex(i32, CombatHexDirection);
     i32 ValidRange(i32);
     CombatHexDirection GetBestDirection(i32, i32, i32);

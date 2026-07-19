@@ -209,7 +209,7 @@ public:
     i32 LoadMap(char*);
     void ClaimTown(i32, i32, i32);
     void ClaimMine(i32, i32);
-    SpellType ViewSpells(class hero*, i32, i32 (*)(struct tag_message&), i32);
+    SpellType ViewSpells(class hero*, HeroSpellType, i32 (*)(struct tag_message&), i32);
     void UpdateSpellWidgets(void);
     void ViewArmy(
         i32,
