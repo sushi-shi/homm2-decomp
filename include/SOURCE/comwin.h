@@ -7,8 +7,17 @@
 H2_ENUM_BEGIN(ComPortConstant)
     COM_PORT_FLEXIBLE_DATA_SIZE = 1,
     COM_PORT_PREFIX_GAP_SIZE    = 4,
-    COM_PORT_RUNTIME_GAP_SIZE   = 0x18
+    COM_PORT_RUNTIME_GAP_SIZE   = 0x18,
+    COM_SERIAL_BYTE_SIZE        = 8
 H2_ENUM_END(ComPortConstant)
+
+H2_ENUM_CLASS_BEGIN(ComBaudRate)
+    COM_BAUD_2400  = 1,
+    COM_BAUD_4800  = 2,
+    COM_BAUD_9600  = 3,
+    COM_BAUD_19200 = 4,
+    COM_BAUD_38400 = 5
+H2_ENUM_CLASS_END(ComBaudRate)
 
 // Intrusive-list anchors store the tail before the head.
 struct tag_Node {

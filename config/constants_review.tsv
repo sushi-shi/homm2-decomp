@@ -110,7 +110,7 @@ include/SOURCE/army.h	reviewed	Cross-TU attack-target, path-target, facing, atta
 include/SOURCE/armyGroup.h	reviewed	Army slot/race extents, empty sentinel, random scale, and morale bounds are a shared aligned enum used throughout the packed public layout; the remaining literal is SIZE evidence.
 include/SOURCE/bankBox.h	reviewed	The bank-box public class contains named fields and methods only; its sole numeric literal is proven packed class-layout SIZE evidence.
 include/SOURCE/combatManager.h	reviewed	Combat castle, grid, AI, spell, catapult, runtime, UI, side/army, message, padding, transfer, and serialized layout domains are named; repeated side and army dimensions derive from shared counts, integral macros were converted to aligned enums, and floating-point algorithm parameters remain named macros or typed constants.
-include/SOURCE/comwin.h	reviewed	COM-port flexible payload heads and packed runtime gaps use named extents; the remaining literal is packed state SIZE evidence.
+include/SOURCE/comwin.h	reviewed	COM-port flexible payload heads, packed runtime gaps, shared baud selectors, and serial byte width use named domains; the remaining literal is packed state SIZE evidence.
 include/SOURCE/dimPalette.h	reviewed	Shared dim-palette set, level, and color extents are named and drive the public lookup-table declaration.
 include/SOURCE/dpnetwin.h	reviewed	DirectPlay buffer, mapping, session, player, timeout, retry, and transport extents are named shared constants; extern arrays use their named extents and the remaining literal is packed SIZE evidence.
 include/SOURCE/fileRequester.h	reviewed	Requester modes, storage extents, geometry, controls, filters, results, and sentinels are named shared domains; the packed list-state extent is explicit and the remaining literal is SIZE evidence.
@@ -197,7 +197,7 @@ src/SOURCE/HERO.cpp	pending
 src/SOURCE/HEXCELL.cpp	reviewed	Draw-all uses the shared combat sentinel; private tower geometry, excluded row, and overlay frame are named, with the vertical step shared from the combat grid model.
 src/SOURCE/HISCORE.cpp	reviewed	High-score animation, widget, file, geometry, timing, and manager results use named shared constants; remaining zeros and ones are initialization, booleans, empty strings, loop arithmetic, and status tests. Redundant bitwise-or-zero steering was removed from rank selection.
 src/SOURCE/KB.cpp	pending
-src/SOURCE/Modem.cpp	pending
+src/SOURCE/Modem.cpp	reviewed	Private constants name setup storage, reset attempts, printable input, read storage, handshake layout, timing, and queue guard; shared serial baud/byte and dialog domains replace raw values, while zero/one values remain protocol states, booleans, indices, and byte counts.
 src/SOURCE/NOOPT.cpp	reviewed	Only VA evidence; delay values are caller-provided.
 src/SOURCE/Netbios.cpp	reviewed	Private setup, session, wait, game-mode, name-buffer, retry, and timing values are aligned enums; remaining zeros and ones are state initialization, boolean/status returns, dialog defaults, and null payload arguments.
 src/SOURCE/Newgame.cpp	pending
@@ -221,7 +221,7 @@ src/SOURCE/Viewwrld.cpp	pending
 src/SOURCE/Wsnetwin.cpp	reviewed	Private constants name source-line addends, entry/retry limits, and the extra-guest threshold; retained source-line data supplies retail allocation relocations, shared wait/dialog/log domains are reused, startup addressing derives from its packed record, and the socket sentinel uses INVALID_SOCKET.
 src/SOURCE/X_CAMPGN.cpp	pending
 src/SOURCE/X_GLOBAL.cpp	reviewed	The TU contains reviewed global data definitions only. Expansion text/name tables and alignment/resource-cost initializers are retail payload; the shrine cost row follows the canonical resource extent and its numeric entries remain data rather than policy constants.
-src/SOURCE/comwin.cpp	reviewed	Private enums name retained source-line bases, communications error text slots, baud values, serial byte width, and the two-word ReadFile result backing storage.
+src/SOURCE/comwin.cpp	reviewed	Private enums name retained source-line bases, communications error text slots, baud values, and the two-word ReadFile result backing storage; shared baud selectors and serial byte width live in comwin.h.
 src/SOURCE/dpnetwin.cpp	pending
 src/SOURCE/kbwin.cpp	reviewed	LogInt uses the shared unused-field sentinel; the timer polling threshold is private, menu resolution checks use the public width domain, and exported strings use their declared capacities.
 src/SOURCE/netwin.cpp	reviewed	Private enums model NetBIOS reset-field indices/capacities and retained source-line bases/offsets; reset capacities no longer borrow unrelated retry/result constants with coincident values.
