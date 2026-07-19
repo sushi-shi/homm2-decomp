@@ -61,13 +61,9 @@ H2_ENUM_BEGIN(HotSeatPlayerCount)
     SIX_PLAYERS   = 6
 H2_ENUM_END(HotSeatPlayerCount)
 
-H2_ENUM_BEGIN(SetupRemoteType)
-    REMOTE_NETWORK_HOST       = 1,
-    REMOTE_NETWORK_GUEST      = 2,
-    REMOTE_MODEM_DIAL         = 3,
-    REMOTE_MODEM_ANSWER       = 4,
+H2_ENUM_BEGIN(SetupRemoteConstant)
     REMOTE_TYPE_UNINITIALIZED = 10
-H2_ENUM_END(SetupRemoteType)
+H2_ENUM_END(SetupRemoteConstant)
 
 H2_ENUM_CLASS_BEGIN(SetupBaudRate)
     SETUP_BAUD_2400  = 2400,
@@ -238,10 +234,10 @@ i32 game::SetupNetworkGame(void) {
 
     switch (gpWindowManager->m_dialogResult) {
         case CHOICE_ONE:
-            iMPExtendedType = REMOTE_NETWORK_HOST;
+            iMPExtendedType = IDX(REMOTE_GAME_NETWORK_HOST);
             break;
         case CHOICE_TWO:
-            iMPExtendedType = REMOTE_NETWORK_GUEST;
+            iMPExtendedType = IDX(REMOTE_GAME_NETWORK_GUEST);
             break;
         case DIALOG_CANCEL:
             return 0;
@@ -344,7 +340,7 @@ i32 game::SetupModemGame(void) {
     switch (gpWindowManager->m_dialogResult) {
         case CHOICE_ONE:
             LogStr("SMC 6");
-            iMPExtendedType = REMOTE_MODEM_DIAL;
+            iMPExtendedType = IDX(REMOTE_GAME_MODEM_HOST);
             if (gConfig.comPort[gbDirectConnect] == IDX(SETUP_COM_PORT_UNCONFIGURED)) {
                 LogStr("SMC 7");
                 if (!SetupComPort())
@@ -365,7 +361,7 @@ i32 game::SetupModemGame(void) {
             LogStr("SMC a");
             break;
         case CHOICE_TWO:
-            iMPExtendedType = REMOTE_MODEM_ANSWER;
+            iMPExtendedType = IDX(REMOTE_GAME_MODEM_GUEST);
             if (gConfig.comPort[gbDirectConnect] == IDX(SETUP_COM_PORT_UNCONFIGURED)
                 && !SetupComPort())
                 return 0;
@@ -486,41 +482,41 @@ i32 game::SetupGame(void) {
             case APP_MENU_RESTART_8:
             case APP_MENU_LOAD_5:
                 iMPBaseType = MULTIPLAYER_BASE_NETWORK;
-                iMPExtendedType = REMOTE_NETWORK_HOST;
+                iMPExtendedType = IDX(REMOTE_GAME_NETWORK_HOST);
                 goto remoteSetup;
             case APP_MENU_RESTART_9:
             case APP_MENU_LOAD_6:
                 iMPBaseType = MULTIPLAYER_BASE_NETWORK;
-                iMPExtendedType = REMOTE_NETWORK_GUEST;
+                iMPExtendedType = IDX(REMOTE_GAME_NETWORK_GUEST);
                 goto remoteSetup;
             case APP_MENU_RESTART_10:
             case APP_MENU_LOAD_7:
                 iMPBaseType = MULTIPLAYER_BASE_MODEM;
-                iMPExtendedType = REMOTE_MODEM_DIAL;
+                iMPExtendedType = IDX(REMOTE_GAME_MODEM_HOST);
                 goto remoteSetup;
             case APP_MENU_RESTART_11:
             case APP_MENU_LOAD_8:
                 iMPBaseType = MULTIPLAYER_BASE_MODEM;
-                iMPExtendedType = REMOTE_MODEM_ANSWER;
+                iMPExtendedType = IDX(REMOTE_GAME_MODEM_GUEST);
                 goto remoteSetup;
             case APP_MENU_RESTART_12:
             case APP_MENU_LOAD_9:
                 iMPBaseType = MULTIPLAYER_BASE_MODEM;
-                iMPExtendedType = REMOTE_MODEM_DIAL;
+                iMPExtendedType = IDX(REMOTE_GAME_MODEM_HOST);
                 gbDirectConnect = true;
                 goto remoteSetup;
             case APP_MENU_RESTART_13:
             case APP_MENU_LOAD_10:
                 iMPBaseType = MULTIPLAYER_BASE_MODEM;
-                iMPExtendedType = REMOTE_MODEM_ANSWER;
+                iMPExtendedType = IDX(REMOTE_GAME_MODEM_GUEST);
                 gbDirectConnect = true;
                 goto remoteSetup;
 
             remoteSetup:
                 LogStr("Setup 0a");
-                RemoteMain(iMPExtendedType);
-                if (iMPExtendedType == IDX(REMOTE_NETWORK_GUEST)
-                    || iMPExtendedType == IDX(REMOTE_MODEM_ANSWER))
+                RemoteMain(static_cast<RemoteGameMode>(iMPExtendedType));
+                if (iMPExtendedType == IDX(REMOTE_GAME_NETWORK_GUEST)
+                    || iMPExtendedType == IDX(REMOTE_GAME_MODEM_GUEST))
                     gbWaitForRemoteReceive = true;
                 break;
             default:;
@@ -616,10 +612,10 @@ i32 game::SetupGame(void) {
     LogStr(" Setup 1");
     if (iMPBaseType == MULTIPLAYER_BASE_NETWORK || iMPBaseType == MULTIPLAYER_BASE_MODEM) {
         LogStr(" Setup 2");
-        RemoteMain(iMPExtendedType);
+        RemoteMain(static_cast<RemoteGameMode>(iMPExtendedType));
         LogStr(" Setup 3");
-        if (iMPExtendedType == IDX(REMOTE_NETWORK_GUEST)
-            || iMPExtendedType == IDX(REMOTE_MODEM_ANSWER))
+        if (iMPExtendedType == IDX(REMOTE_GAME_NETWORK_GUEST)
+            || iMPExtendedType == IDX(REMOTE_GAME_MODEM_GUEST))
             gbWaitForRemoteReceive = true;
     }
 

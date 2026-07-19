@@ -610,10 +610,11 @@ i32 oldmain(void) {
             giNumHumanPlayers = 1;
             iMPBaseType = MULTIPLAYER_BASE_NETWORK;
             iMPNetProtocol = OLD_MAIN_NETWORK_PROTOCOL;
-            iMPExtendedType = giTCPHostStatus ? OLD_MAIN_REMOTE_HOST : OLD_MAIN_REMOTE_CLIENT;
+            iMPExtendedType = giTCPHostStatus ? IDX(REMOTE_GAME_NETWORK_HOST)
+                                              : IDX(REMOTE_GAME_NETWORK_GUEST);
             giSetupGameType = static_cast<u8>(giTCPType);
-            RemoteMain(iMPExtendedType);
-            gbWaitForRemoteReceive = iMPExtendedType == OLD_MAIN_REMOTE_CLIENT;
+            RemoteMain(static_cast<RemoteGameMode>(iMPExtendedType));
+            gbWaitForRemoteReceive = iMPExtendedType == IDX(REMOTE_GAME_NETWORK_GUEST);
             giTCPHostStatus = -1;
             switch (giSetupGameType) {
                 case OLD_MAIN_SETUP_NEW:
