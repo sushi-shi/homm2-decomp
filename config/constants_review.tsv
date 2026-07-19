@@ -56,7 +56,7 @@ include/BASE/miscwin.h	pending
 include/BASE/mouseManager.h	pending
 include/BASE/palette.h	reviewed	Palette storage extent and public constructor parameter are named; remaining literal is packed-layout SIZE evidence.
 include/BASE/resource.h	reviewed	Explicit resource-category and reference-lifecycle domains; strict builds use enums while production uses expansion constants to keep VC4.2 declaration state neutral. Remaining zero is pure-virtual syntax.
-include/BASE/resourceManager.h	pending
+include/BASE/resourceManager.h	reviewed	Only aggregate capacity, Read13 width, and filename capacity remain public because they define class layout or are consumed by FONT. Implementation policy moved to RESMGR.cpp; private save arrays use incomplete extern declarations.
 include/BASE/sample.h	reviewed	The declaration uses named types; the sole literal is packed-layout SIZE evidence.
 include/BASE/sampleData.h	reviewed	The record fields are named; the sole literal is packed-layout SIZE evidence.
 include/BASE/soundManager.h	pending
@@ -157,7 +157,7 @@ src/BASE/MOUSEMGR.cpp	pending
 src/BASE/Midi.cpp	pending
 src/BASE/Misc.cpp	pending
 src/BASE/PALETTE.cpp	reviewed	Reference lifecycle and palette extents are named; allocation/free operands 8, 13, and 21 preserve retail source-line evidence, while zero is the empty resource id. Pointer state uses NULL.
-src/BASE/RESMGR.cpp	pending
+src/BASE/RESMGR.cpp	reviewed	Private aligned constants name file/status values, entry and row widths, open mode, translation count, sample volume, temporary-buffer width, and save-stack depth. The three expansion-only dimensions preserve VC4.2 declaration state; shared layout and Read13 values remain public, and source-line operands preserve retail allocation/assert evidence.
 src/BASE/RESOURCE.cpp	reviewed	Constructor parameters and empty reference state are named; zero initializes the scalar resource id and pointer uses NULL. All seven direct consumer objects retain exact non-debug sections and relocations.
 src/BASE/Ripple.cpp	pending
 src/BASE/SAMPLE.cpp	reviewed	Private format, playback-rate, filename-capacity, and suffix-length domains are named; remaining allocation operands preserve retail source-line evidence. Text/data bytes and relocation topology are unchanged.
