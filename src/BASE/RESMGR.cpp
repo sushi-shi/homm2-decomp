@@ -17,6 +17,20 @@
 #include <BASE/bitmap.h>
 #include <BASE/palette.h>
 
+H2_ENUM_BEGIN(ResourceConstant)
+    INVALID_FILE            = -1,
+    LOAD_SUCCESS            = 0,
+    LOAD_ERROR              = 3,
+    ENTRY_BYTES             = 0xc,
+    EVIL_TRANSLATION_COUNT  = 37,
+    BACKDROP_ROW_BYTES      = 640,
+    BINARY_OPEN_MODE        = 0x8000
+H2_ENUM_END(ResourceConstant)
+
+#define SAMPLE_VOLUME 127
+#define FILE_COUNT_BUFFER_WORDS 2
+#define POSITION_STACK_DEPTH 10
+
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\RESMGR.CPP"
 VA(0x004c7fa0, 0xdb)
 resourceManager::resourceManager(void) : baseManager() {
@@ -27,7 +41,7 @@ resourceManager::resourceManager(void) : baseManager() {
     strcpy(m_lastFileName, "");
     m_lastFileId = 0;
     for (aggregateIndex = 0; aggregateIndex < RESOURCE_MANAGER_AGGREGATE_LIMIT; aggregateIndex++) {
-        m_aggregateFd[aggregateIndex] = RESOURCE_MANAGER_INVALID_FILE;
+        m_aggregateFd[aggregateIndex] = INVALID_FILE;
         m_aggregateDir[aggregateIndex] = NULL;
         m_aggregateEntryCount[aggregateIndex] = 0;
     }
@@ -74,10 +88,10 @@ void resourceManager::GetBackdropAtLoc(
         ReadWord();
         dataWidth = ReadWord();
         imageHeight = ReadWord();
-        for (row = destinationY; row < destinationY + imageHeight; row++) {
+        for (row = destinationY; row < OD_STEER(imageHeight) + destinationY; row++) {
             ReadBlock(
-                reinterpret_cast<i8*>(destination->m_pixels)
-                    + (row * RESOURCE_MANAGER_BACKDROP_ROW_BYTES) + destinationX,
+                (OD_STEER(row) * BACKDROP_ROW_BYTES)
+                    + reinterpret_cast<i8*>(destination->m_pixels) + destinationX,
                 dataWidth
             );
         }
@@ -171,7 +185,7 @@ class sample* resourceManager::GetSample(char* name) {
         r->m_refCount++;
         return static_cast<sample*>(r);
     } else {
-        r = new sample(name, 0, 127, 1);
+        r = new sample(name, 0, SAMPLE_VOLUME, 1);
         AddResource(r);
         return static_cast<sample*>(r);
     }
@@ -242,21 +256,21 @@ class resource* resourceManager::Query(u32l resourceId) {
 
 VA(0x004c8880, 0x1a)
 i32 resourceManager::Main(struct tag_message&) {
-    return RESOURCE_MANAGER_SUCCESS;
+    return LOAD_SUCCESS;
 }
 
 VA(0x004c88a0, 0xab)
 i32 resourceManager::Open(i32 priority) {
-    if (LoadAggregateHeader(EXPANSION_AGGREGATE_NAME) != RESOURCE_MANAGER_SUCCESS)
-        return RESOURCE_MANAGER_ERROR;
-    if (LoadAggregateHeader(DEFAULT_AGGREGATE_NAME) != RESOURCE_MANAGER_SUCCESS)
-        return RESOURCE_MANAGER_ERROR;
+    if (LoadAggregateHeader(EXPANSION_AGGREGATE_NAME) != LOAD_SUCCESS)
+        return LOAD_ERROR;
+    if (LoadAggregateHeader(DEFAULT_AGGREGATE_NAME) != LOAD_SUCCESS)
+        return LOAD_ERROR;
     m_messageMask = BASE_MANAGER_ACCEPT_RESOURCE;
     m_priority = BaseManagerPriority(priority);
     m_active = true;
     strcpy(m_name, "resourceManager");
     m_resourceListHead = NULL;
-    return RESOURCE_MANAGER_SUCCESS;
+    return LOAD_SUCCESS;
 }
 
 VA(0x004c8950, 0x88)
@@ -286,9 +300,9 @@ void resourceManager::Close(void) {
     for (aggregateIndex = 0; aggregateIndex < RESOURCE_MANAGER_AGGREGATE_LIMIT; aggregateIndex++) {
         if (m_aggregateDir[aggregateIndex] != NULL)
             H2_FREE(m_aggregateDir[aggregateIndex], 0x1da);
-        if (m_aggregateFd[aggregateIndex] != RESOURCE_MANAGER_INVALID_FILE) {
+        if (m_aggregateFd[aggregateIndex] != INVALID_FILE) {
             close(m_aggregateFd[aggregateIndex]);
-            m_aggregateFd[aggregateIndex] = RESOURCE_MANAGER_INVALID_FILE;
+            m_aggregateFd[aggregateIndex] = INVALID_FILE;
         }
     }
     m_numAggregates = 0;
@@ -297,29 +311,29 @@ void resourceManager::Close(void) {
 
 VA(0x004c8ab0, 0x143)
 i32 resourceManager::LoadAggregateHeader(char* aggregateName) {
-    i16 fileCountBuffer[2];
+    i16 fileCountBuffer[FILE_COUNT_BUFFER_WORDS];
     i32 aggregateFile;
     u32 directoryBytes;
     if (m_numAggregates >= RESOURCE_MANAGER_AGGREGATE_LIMIT) {
         sprintf(gText, "Only %d .AGG files can be used at once.", RESOURCE_MANAGER_AGGREGATE_LIMIT);
         ShutDown(gText);
-        return RESOURCE_MANAGER_ERROR;
+        return LOAD_ERROR;
     }
-    aggregateFile = open(aggregateName, RESOURCE_MANAGER_BINARY_OPEN_MODE);
-    if (aggregateFile == RESOURCE_MANAGER_INVALID_FILE) {
+    aggregateFile = open(aggregateName, BINARY_OPEN_MODE);
+    if (aggregateFile == INVALID_FILE) {
         sprintf(gText, "Can't open file: %s", aggregateName);
         ShutDown(gText);
-        return RESOURCE_MANAGER_ERROR;
+        return LOAD_ERROR;
     }
     m_curAggregate = m_numAggregates;
     m_numAggregates = m_numAggregates + 1;
     m_aggregateFd[m_curAggregate] = aggregateFile;
     read(m_aggregateFd[m_curAggregate], fileCountBuffer, sizeof(i16));
     m_aggregateEntryCount[m_curAggregate] = fileCountBuffer[0];
-    directoryBytes = m_aggregateEntryCount[m_curAggregate] * RESOURCE_MANAGER_ENTRY_BYTES;
+    directoryBytes = m_aggregateEntryCount[m_curAggregate] * ENTRY_BYTES;
     m_aggregateDir[m_curAggregate] = static_cast<aggEntry*>(H2_ALLOC(directoryBytes, 542));
     read(m_aggregateFd[m_curAggregate], m_aggregateDir[m_curAggregate], directoryBytes);
-    return RESOURCE_MANAGER_SUCCESS;
+    return LOAD_SUCCESS;
 }
 
 VA(0x004c8c00, 0x11c)
@@ -406,7 +420,7 @@ void resourceManager::RestorePosition(void) {
 
 VA(0x004c8ee0, 0x81)
 i8 resourceManager::ReadByte(void) {
-    H2_ASSERT(m_aggregateFd[m_curAggregate] != RESOURCE_MANAGER_INVALID_FILE, RETAIL_FILE, 703);
+    H2_ASSERT(m_aggregateFd[m_curAggregate] != INVALID_FILE, RETAIL_FILE, 703);
     i8 value = 0;
     i32 bytesRead = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
     if (bytesRead == 0) {
@@ -420,7 +434,7 @@ i8 resourceManager::ReadByte(void) {
 
 VA(0x004c8f70, 0x84)
 i16 resourceManager::ReadWord(void) {
-    H2_ASSERT(m_aggregateFd[m_curAggregate] != RESOURCE_MANAGER_INVALID_FILE, RETAIL_FILE, 732);
+    H2_ASSERT(m_aggregateFd[m_curAggregate] != INVALID_FILE, RETAIL_FILE, 732);
     i16 value = 0;
     i32 bytesRead = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
     if (bytesRead == 0) {
@@ -434,7 +448,7 @@ i16 resourceManager::ReadWord(void) {
 
 VA(0x004c9000, 0x84)
 i32l resourceManager::ReadLong(void) {
-    H2_ASSERT(m_aggregateFd[m_curAggregate] != RESOURCE_MANAGER_INVALID_FILE, RETAIL_FILE, 760);
+    H2_ASSERT(m_aggregateFd[m_curAggregate] != INVALID_FILE, RETAIL_FILE, 760);
     i32l value = 0;
     i32 bytesRead = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
     if (bytesRead == 0) {
@@ -450,7 +464,7 @@ VA(0x004c9090, 0xe3)
 u32l resourceManager::MakeId(char* name, i32 translate) {
     strcpy(m_lastFileName, name);
     if (gbUseEvilInterface != 0 && translate != 0) {
-        for (i32 translatedIndex = 0; translatedIndex < RESOURCE_MANAGER_EVIL_TRANSLATION_COUNT;
+        for (i32 translatedIndex = 0; translatedIndex < EVIL_TRANSLATION_COUNT;
              translatedIndex++) {
             if (strcmpi(m_lastFileName, cEvilTranslate[translatedIndex][0]) == 0)
                 strcpy(m_lastFileName, cEvilTranslate[translatedIndex][1]);
@@ -468,7 +482,7 @@ void resourceManager::Read13(i8* destination) {
 
 VA(0x004c91b0, 0xbd)
 void resourceManager::ReadBlock(i8* destination, u32l size) {
-    H2_ASSERT(m_aggregateFd[m_curAggregate] != RESOURCE_MANAGER_INVALID_FILE, RETAIL_FILE, 816);
+    H2_ASSERT(m_aggregateFd[m_curAggregate] != INVALID_FILE, RETAIL_FILE, 816);
     PollSound();
     i32 bytesRead = read(m_aggregateFd[m_curAggregate], destination, size);
     if (bytesRead != size) {
@@ -494,7 +508,10 @@ VTBL(resourceManager, 0x004eb9f0);
 
 
 DATA(0x0051e99c) i32 iSaveCtr = 0;
-DATA(0x005331e8) i32 lastAggZ[10];
-DATA(0x00533210) i32l lastPositionZ[10];
+DATA(0x005331e8) i32 lastAggZ[POSITION_STACK_DEPTH];
+DATA(0x00533210) i32l lastPositionZ[POSITION_STACK_DEPTH];
 
 #undef RETAIL_FILE
+#undef POSITION_STACK_DEPTH
+#undef FILE_COUNT_BUFFER_WORDS
+#undef SAMPLE_VOLUME

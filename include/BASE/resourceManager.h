@@ -22,18 +22,11 @@ struct aggEntry { // one .agg directory record (0xc bytes)
     u32l size;
 };
 
-H2_ENUM_BEGIN(ResourceManagerConstant)
-    RESOURCE_MANAGER_INVALID_FILE           = -1,
-    RESOURCE_MANAGER_SUCCESS                = 0,
-    RESOURCE_MANAGER_ERROR                  = 3,
-    RESOURCE_MANAGER_AGGREGATE_LIMIT        = 2,
-    RESOURCE_MANAGER_ENTRY_BYTES            = 0xc,
-    RESOURCE_MANAGER_READ13_BYTES           = 0xd,
-    RESOURCE_MANAGER_EVIL_TRANSLATION_COUNT = 37,
-    RESOURCE_MANAGER_MESSAGE_MASK           = 0x80,
-    RESOURCE_MANAGER_BACKDROP_ROW_BYTES     = 640,
-    RESOURCE_MANAGER_BINARY_OPEN_MODE       = 0x8000
-H2_ENUM_END(ResourceManagerConstant)
+H2_ENUM_BEGIN(ResourceManagerLayoutConstant)
+    RESOURCE_MANAGER_AGGREGATE_LIMIT   = 2,
+    RESOURCE_MANAGER_READ13_BYTES      = 0xd,
+    RESOURCE_MANAGER_FILENAME_CAPACITY = 0x3c
+H2_ENUM_END(ResourceManagerLayoutConstant)
 
 class resourceManager : public baseManager {
 public:
@@ -45,7 +38,7 @@ public:
     i32 m_aggregateEntryCount[RESOURCE_MANAGER_AGGREGATE_LIMIT];
     i32 m_expunging;
     i32 m_reserved;
-    char m_lastFileName[0x3c];
+    char m_lastFileName[RESOURCE_MANAGER_FILENAME_CAPACITY];
     i32 m_lastFileId;
     resourceManager(void);
     virtual i32 Open(i32) OVERRIDE;
@@ -82,7 +75,7 @@ public:
 #pragma pack(pop)
 SIZE(resourceManager, 0xa2);
 extern i32 iSaveCtr;
-extern i32 lastAggZ[10];
-extern i32l lastPositionZ[10];
+extern i32 lastAggZ[];
+extern i32l lastPositionZ[];
 
 #endif
