@@ -10,7 +10,8 @@
 DATA(0x00520d9c) static STilesetSourceFiles gTilesetSourceFiles = {RETAIL_FILE, RETAIL_FILE};
 
 VA(0x004dac60, 0x8f)
-tileset::tileset(u32l id) : resource(RESOURCE_CATEGORY_TILESET, id, 1, NULL) {
+tileset::tileset(u32l id)
+    : resource(RESOURCE_CATEGORY_TILESET, id, RESOURCE_REFERENCE_INITIAL, NULL) {
     gpResourceManager->PointToFile(id);
     m_tileWidth = gpResourceManager->ReadWord();
     m_tileHeight = gpResourceManager->ReadWord();
