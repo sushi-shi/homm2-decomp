@@ -218,7 +218,7 @@ src/SOURCE/TOWN.cpp	reviewed	Nontrivial decisions use named domains; remaining z
 src/SOURCE/TOWNMGR.cpp	pending
 src/SOURCE/VIEW.cpp	pending
 src/SOURCE/Viewwrld.cpp	pending
-src/SOURCE/Wsnetwin.cpp	pending
+src/SOURCE/Wsnetwin.cpp	reviewed	Private constants name source-line addends, entry/retry limits, and the extra-guest threshold; retained source-line data supplies retail allocation relocations, shared wait/dialog/log domains are reused, startup addressing derives from its packed record, and the socket sentinel uses INVALID_SOCKET.
 src/SOURCE/X_CAMPGN.cpp	pending
 src/SOURCE/X_GLOBAL.cpp	reviewed	The TU contains reviewed global data definitions only. Expansion text/name tables and alignment/resource-cost initializers are retail payload; the shrine cost row follows the canonical resource extent and its numeric entries remain data rather than policy constants.
 src/SOURCE/comwin.cpp	reviewed	Private enums name retained source-line bases, communications error text slots, baud values, serial byte width, and the two-word ReadFile result backing storage.
