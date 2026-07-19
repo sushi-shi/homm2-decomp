@@ -195,8 +195,6 @@ H2_ENUM_BEGIN(CombatGridConstant)
     COMBAT_DURATION_MOD_COUNT               = 12,
     COMBAT_CANCEL_DURATION_MOD_COUNT        = 11,
     COMBAT_TRANSFER_ARTIFACT_COUNT          = 16,
-    COMBAT_DRAW_PHASE_COUNT                 = 4,
-    COMBAT_DRAW_ALL_OCCUPANTS               = 100,
     COMBAT_CASTLE_REVERSE_ROW               = 5,
     COMBAT_CASTLE_GATE_ROW                  = 4,
     COMBAT_CASTLE_GATE_APPROACH_HEX         = 58,

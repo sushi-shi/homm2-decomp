@@ -1120,7 +1120,7 @@ void combatManager::CastSpell(
             combatArmy.m_killPending = 0;
             combatArmy.m_deathPending = combatArmy.m_killPending;
             combatArmy.m_damagePending = combatArmy.m_deathPending;
-            combatArmy.m_drawState = 1;
+            combatArmy.m_drawState = ARMY_DRAW_NORMAL;
             combatArmy.m_animationState = 0;
             combatArmy.m_lastTargetHex = COMBAT_HEX_EMPTY;
         }

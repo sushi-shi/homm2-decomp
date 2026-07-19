@@ -1116,9 +1116,15 @@ void combatManager::DrawFrame(
             && m_wallStates[IDX(COMBAT_WALL_SLOT_SECTION_FOURTH)]
                    != IDX(COMBAT_WALL_STATE_SECTION_DESTROYED)) {
             skipSpecialOccupants6 = 1;
-            for (side5 = 0; side5 < COMBAT_DRAW_PHASE_COUNT; side5++) {
-                m_hexCells[IDX(COMBAT_CASTLE_SPECIAL_HEX_FIRST)].DrawOccupant(side5, 0);
-                m_hexCells[IDX(COMBAT_CASTLE_SPECIAL_HEX_SECOND)].DrawOccupant(side5, 0);
+            for (side5 = 0; side5 < ARMY_DRAW_PHASE_COUNT; side5++) {
+                m_hexCells[IDX(COMBAT_CASTLE_SPECIAL_HEX_FIRST)].DrawOccupant(
+                    static_cast<ArmyDrawState>(side5),
+                    0
+                );
+                m_hexCells[IDX(COMBAT_CASTLE_SPECIAL_HEX_SECOND)].DrawOccupant(
+                    static_cast<ArmyDrawState>(side5),
+                    0
+                );
             }
         }
 
@@ -1128,7 +1134,7 @@ void combatManager::DrawFrame(
         for (column1 = firstColumn; endColumn != column1; column1 += columnStep3)
             m_hexCells[row * COMBAT_GRID_ROW_LENGTH + column1].DrawUpperDeadOccupant();
 
-        for (side5 = 0; side5 < COMBAT_DRAW_PHASE_COUNT; side5++) {
+        for (side5 = 0; side5 < ARMY_DRAW_PHASE_COUNT; side5++) {
             if (side5 == 1) {
                 for (column1 = firstColumn; endColumn != column1; column1 += columnStep3) {
                     if (m_hexCells[row * COMBAT_GRID_ROW_LENGTH + column1].m_obstacleIndex != -1) {
@@ -1245,7 +1251,10 @@ void combatManager::DrawFrame(
                             != IDX(COMBAT_CASTLE_SPECIAL_HEX_FIRST)
                         && row * COMBAT_GRID_ROW_LENGTH + column1
                                != IDX(COMBAT_CASTLE_SPECIAL_HEX_SECOND))) {
-                    m_hexCells[row * COMBAT_GRID_ROW_LENGTH + column1].DrawOccupant(side5, 0);
+                    m_hexCells[row * COMBAT_GRID_ROW_LENGTH + column1].DrawOccupant(
+                        static_cast<ArmyDrawState>(side5),
+                        0
+                    );
                 }
             }
         }
@@ -1315,9 +1324,9 @@ void combatManager::DrawFrame(
         drawMoat:
             m_combatIcons[IDX(COMBAT_ICON_MOAT)]
                 ->CombatClipDrawToBuffer(0, 0, row, &m_moatLimits[row], 0, 0, NULL, NULL);
-            m_hexCells[moatCell[row] - 1].DrawOccupant(COMBAT_DRAW_ALL_OCCUPANTS, 1);
-            m_hexCells[moatCell[row]].DrawOccupant(COMBAT_DRAW_ALL_OCCUPANTS, 1);
-            m_hexCells[moatCell[row] + 1].DrawOccupant(COMBAT_DRAW_ALL_OCCUPANTS, 1);
+            m_hexCells[moatCell[row] - 1].DrawOccupant(ARMY_DRAW_ALL, 1);
+            m_hexCells[moatCell[row]].DrawOccupant(ARMY_DRAW_ALL, 1);
+            m_hexCells[moatCell[row] + 1].DrawOccupant(ARMY_DRAW_ALL, 1);
         }
     endRow:
         gridWasShowing1 = 0;
