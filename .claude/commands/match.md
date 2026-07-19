@@ -43,8 +43,7 @@ In short (full rules in the two agent docs):
    it is not a byte-wall claim.
 4. **Integrate SERIALLY:** one at a time — guard master clean → apply only that matcher's
    file(s) → `homm2 build` (recompiles + regenerates README's match block) → confirm % →
-   `homm2 status update` (`--accept-regressions` only for trivial cross-fn fuzzy drift) →
-   commit those files + `config/match_baseline.tsv` + **`README.md`** (ALWAYS stage the
+   commit those files + **`README.md`** (ALWAYS stage the
    regenerated README so the scoreboard never drifts; do NOT stage `config/match-queue.md`)
    as `match: <fn> -> <result>`. One matcher = one commit.
    **Refill immediately:** reset the slot to master, pick next, dispatch.

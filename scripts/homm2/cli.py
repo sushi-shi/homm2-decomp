@@ -72,12 +72,10 @@ def main(argv=None):
         return sh("python3", "-m", "homm2.build.assert_relocs", *rest)
     if cmd == "status":
         from homm2.match.status import main as st; return st(rest)
-    if cmd == "breadth-audit":
-        from homm2.match.breadth_audit import main as m; return m(rest)
     if cmd == "sema":
         from homm2.analysis.sema import main as m; return m(rest)
     if cmd == "ghidra":
         from homm2.ghidra.driver import cli_main as m; return m(rest)
-    print("usage: homm2 {init|configure|build|link|link-layout|clangd|enum-types|strict-allocations|data-relocs|data-topology|status|breadth-audit|relocs|sema|ghidra}",
+    print("usage: homm2 {init|configure|build|link|link-layout|clangd|enum-types|strict-allocations|data-relocs|data-topology|status|relocs|sema|ghidra}",
           file=sys.stderr)
     return 0 if cmd in ("help", "-h", "--help") else 1

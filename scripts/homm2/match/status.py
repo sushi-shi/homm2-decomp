@@ -1,25 +1,13 @@
-"""homm2 status - run objdiff over the base<->target objs and report match %.
+"""Run objdiff and report the live base-to-target comparison.
 
-  homm2 status                 print per-unit + overall match %
-  homm2 status update          refresh the baseline (per-function max% keyed by source hash)
-  homm2 status check           gate: fail only if an EDITED function lost ground vs its own max
+  homm2 status                 print per-unit and overall live metrics
   homm2 status --force-refresh regenerate report.json even when its inputs are unchanged
-  homm2 status --write-readme  refresh the <!-- match-score --> block in README.md
-
-Max-% model: each function's SOURCE block is hashed. The baseline stores, per source-backed
-function, the best fuzzy% ever seen *for that source hash* (max%) plus the hash. When a sibling
-changes and perturbs a function (tu-cumulative eval-order), its live fuzzy% (current) dips but its
-source hash is unchanged, so max% is preserved — no need to chase it; a later pass recovers current.
-When the function's OWN source changes, its hash changes and max% resets to the new current.
-Compiler-generated functions without their own source block remain in live objdiff/exact counts,
-but have no meaningful retained source-hash maximum and are not written to the baseline.
+  homm2 status --write-readme  refresh the generated match block in README.md
 """
-import csv, hashlib, json, os, re, shutil, struct, subprocess, sys, tempfile
+import hashlib, json, os, shutil, struct, subprocess, sys, tempfile
 from pathlib import Path
 REPO = Path(os.environ.get("HOMM2_DIR", Path(__file__).resolve().parents[3]))
 RM_START, RM_END = "<!-- match-score:start -->", "<!-- match-score:end -->"
-RVA_BASE = 0x400000
-EXACT_MATCH_PERCENT = 100.0
 REPORT_CACHE_SCHEMA = 1
 REPORT_STAMP = "report.stamp.json"
 
@@ -309,324 +297,6 @@ def unit_pct(u):
     return float((u.get("measures", {}) or {}).get("matched_code_percent", 0) or 0)
 
 
-# ---------------------------------------------------------------- source hashes ---
-def _rva_to_sym():
-    """rva -> (unit, mangled_name) for .text functions, from the generated CSV."""
-    out = {}
-    csvp = REPO / "build/gen/symbol_names.csv"
-    if not csvp.exists():
-        return out
-    with csvp.open() as stream:
-        for row in csv.reader(stream):
-            if len(row) < 5 or row[4] != "func":
-                continue
-            try:
-                out[int(row[0], 16)] = (row[2], row[1])
-            except ValueError:
-                pass
-    return out
-
-
-def _class_members():
-    """{class: (base|None, {member_name: 'off'})} parsed from include/ headers. Members carry a
-    `// +0xNN` offset comment; the class line may say `: public Base`. Used to map member names to
-    their OFFSET so a rename (field_0x4 -> width) is invisible to the hash (offset unchanged)."""
-    cls = {}
-    memre = re.compile(r"^\s*[A-Za-z_][\w\s\*]*?\b([A-Za-z_]\w*)\s*(?:\[[^\]]*\])?\s*;\s*//\s*\+0x([0-9a-fA-F]+)")
-    clsre = re.compile(r"^class\s+(\w+)\b(?:\s*:\s*public\s+(\w+))?")
-    for h in sorted((REPO / "include").rglob("*.h")):
-        cur = None
-        for ln in h.read_text(errors="replace").splitlines():
-            m = clsre.match(ln)
-            if m and "{" in ln:
-                cur = m.group(1); cls.setdefault(cur, [m.group(2), {}])
-                continue
-            if cur:
-                mm = memre.match(ln)
-                if mm:
-                    cls[cur][1][mm.group(1)] = mm.group(2).lower()
-    return cls
-
-
-def _members_of(clsname, cmap, _seen=None):
-    """member_name -> off for a class and all its bases (flattened)."""
-    _seen = _seen or set()
-    if clsname in _seen or clsname not in cmap:
-        return {}
-    _seen.add(clsname)
-    base, mem = cmap[clsname]
-    out = dict(_members_of(base, cmap, _seen)) if base else {}
-    out.update(mem)
-    return out
-
-
-def _normalize(block, cmap):
-    """Make the hash independent of codegen-NEUTRAL renames: arg names -> a0,a1,... (position) and
-    member names -> m<off> (offset). LOCAL names are kept — they drive the /Od stack slot, so a
-    local rename that shifts a slot legitimately changes codegen (and must reset max%)."""
-    # arg names from the `Class::method(args)` signature
-    args = []
-    sig = re.search(r"::[~\w]+\s*\(([^)]*)\)", block)
-    if sig:
-        for a in sig.group(1).split(","):
-            nm = re.search(r"([A-Za-z_]\w*)\s*$", a.strip())
-            if nm:
-                args.append(nm.group(1))
-    # owner class from `ret Class::method(`  (map its + base members)
-    mem = {}
-    cm = re.search(r"\b(\w+)::[~\w]+\s*\(", block)
-    if cm:
-        mem = _members_of(cm.group(1), cmap)
-    n = re.sub(r"\bfield_0x([0-9a-fA-F]+)\b", lambda m: "m0x" + m.group(1).lower(), block)
-    for name, off in mem.items():
-        n = re.sub(r"\b" + re.escape(name) + r"\b", "m0x" + off, n)
-    for i, a in enumerate(args):
-        n = re.sub(r"\b" + re.escape(a) + r"\b", "a%d" % i, n)
-    return n
-
-
-_VA_MARKER_RE = re.compile(r"VA\(0x([0-9a-fA-F]+)\s*,")
-_TOP_LEVEL_BOUNDARY_RE = re.compile(
-    r"[ \t]*(?:DATA\(|VTBL\(|// ===|#endif\b)")
-
-
-def _source_function_blocks(text):
-    """Yield ``(absolute_va, block)`` using lexical top-level boundaries.
-
-    Keep the historical hash surface: each block starts immediately after the
-    comma in its column-zero ``VA(...)`` marker. Its semantic extent ends at the
-    matched closing brace of the function body; only the contiguous legacy
-    whitespace after that brace is retained. Comments, directives, and audit
-    markers between neighboring functions therefore belong to neither hash.
-    The top-level boundary scan remains as the historical whitespace cap, while
-    a second lexical pass keeps function-local ``DATA(...)`` definitions,
-    preprocessor lines, nested blocks, and marker-like text inside literals or
-    comments in the owning function.
-    """
-    markers = []
-    depth = 0
-    state = "code"
-    at_line_start = True
-    index = 0
-    length = len(text)
-
-    while index < length:
-        if at_line_start and state == "code" and depth == 0:
-            va = _VA_MARKER_RE.match(text, index)
-            if va is not None:
-                markers.append((index, va.end(), int(va.group(1), 16)))
-            elif _TOP_LEVEL_BOUNDARY_RE.match(text, index) is not None:
-                # The historical ``^\s*BOUNDARY`` regex consumed blank lines
-                # before a file-scope boundary. Preserve that hash surface.
-                boundary_start = index
-                while boundary_start > 0:
-                    previous_end = boundary_start - 1
-                    previous_start = text.rfind("\n", 0, previous_end) + 1
-                    if text[previous_start:previous_end].strip():
-                        break
-                    boundary_start = previous_start
-                markers.append((boundary_start, None, None))
-
-        char = text[index]
-        following = text[index + 1] if index + 1 < length else ""
-
-        if state == "line-comment":
-            if char == "\n":
-                state = "code"
-                at_line_start = True
-            else:
-                at_line_start = False
-            index += 1
-            continue
-        if state == "block-comment":
-            if char == "*" and following == "/":
-                state = "code"
-                index += 2
-                at_line_start = False
-            else:
-                at_line_start = char == "\n"
-                index += 1
-            continue
-        if state in ("string", "character"):
-            delimiter = '"' if state == "string" else "'"
-            if char == "\\" and following:
-                at_line_start = following == "\n"
-                index += 2
-            else:
-                if char == delimiter:
-                    state = "code"
-                at_line_start = char == "\n"
-                index += 1
-            continue
-        if state == "preprocessor":
-            if char == "\\" and following == "\n":
-                index += 2
-                at_line_start = True
-            elif char == "\n":
-                state = "code"
-                at_line_start = True
-                index += 1
-            else:
-                at_line_start = False
-                index += 1
-            continue
-
-        if at_line_start:
-            line_end = text.find("\n", index)
-            if line_end < 0:
-                line_end = length
-            first = index
-            while first < line_end and text[first] in " \t":
-                first += 1
-            if first < line_end and text[first] == "#":
-                state = "preprocessor"
-                index = first + 1
-                at_line_start = False
-                continue
-        if char == "/" and following == "/":
-            state = "line-comment"
-            index += 2
-            at_line_start = False
-            continue
-        if char == "/" and following == "*":
-            state = "block-comment"
-            index += 2
-            at_line_start = False
-            continue
-        if char == '"':
-            state = "string"
-        elif char == "'":
-            state = "character"
-        elif char == "{":
-            depth += 1
-        elif char == "}" and depth:
-            depth -= 1
-        at_line_start = char == "\n"
-        index += 1
-
-    for position, marker in enumerate(markers):
-        marker_start, block_start, absolute_va = marker
-        if block_start is None:
-            continue
-        legacy_end = markers[position + 1][0] if position + 1 < len(markers) else length
-        block_end = _matched_function_end(text, block_start, legacy_end)
-        if block_end is None:
-            raise ValueError("VA(0x%x) has no lexically matched function body" % absolute_va)
-        yield absolute_va, text[block_start:block_end]
-
-
-def _matched_function_end(text, block_start, legacy_end):
-    """Return the matched body end plus contiguous legacy trailing whitespace."""
-    depth = 0
-    body_started = False
-    state = "code"
-    at_line_start = False
-    index = block_start
-
-    while index < legacy_end:
-        char = text[index]
-        following = text[index + 1] if index + 1 < legacy_end else ""
-
-        if state == "line-comment":
-            if char == "\n":
-                state = "code"
-                at_line_start = True
-            index += 1
-            continue
-        if state == "block-comment":
-            if char == "*" and following == "/":
-                state = "code"
-                index += 2
-                at_line_start = False
-            else:
-                at_line_start = char == "\n"
-                index += 1
-            continue
-        if state in ("string", "character"):
-            delimiter = '"' if state == "string" else "'"
-            if char == "\\" and following:
-                at_line_start = following == "\n"
-                index += 2
-            else:
-                if char == delimiter:
-                    state = "code"
-                at_line_start = char == "\n"
-                index += 1
-            continue
-        if state == "preprocessor":
-            if char == "\\" and following == "\n":
-                index += 2
-                at_line_start = True
-            elif char == "\n":
-                state = "code"
-                at_line_start = True
-                index += 1
-            else:
-                index += 1
-            continue
-
-        if at_line_start:
-            line_end = text.find("\n", index, legacy_end)
-            if line_end < 0:
-                line_end = legacy_end
-            first = index
-            while first < line_end and text[first] in " \t":
-                first += 1
-            if first < line_end and text[first] == "#":
-                state = "preprocessor"
-                index = first + 1
-                at_line_start = False
-                continue
-        if char == "/" and following == "/":
-            state = "line-comment"
-            index += 2
-            at_line_start = False
-            continue
-        if char == "/" and following == "*":
-            state = "block-comment"
-            index += 2
-            at_line_start = False
-            continue
-        if char == '"':
-            state = "string"
-        elif char == "'":
-            state = "character"
-        elif char == "{":
-            body_started = True
-            depth += 1
-        elif char == "}" and body_started:
-            depth -= 1
-            if depth == 0:
-                end = index + 1
-                while end < legacy_end and text[end].isspace():
-                    end += 1
-                return end
-        at_line_start = char == "\n"
-        index += 1
-    return None
-
-
-def source_hashes():
-    """{(unit, function): 12-hex sha1 of its normalized, brace-bounded source body}.
-
-    Blocks begin inside ``VA(...)`` for historical compatibility and end after
-    the matched function brace plus legacy trailing whitespace. Names are
-    normalized by :func:`_normalize`, so codegen-neutral argument/member renames
-    do not perturb the hash.
-    """
-    sym = _rva_to_sym(); cmap = _class_members()
-    out = {}
-    for cpp in sorted((REPO / "src").rglob("*.cpp")):
-        text = cpp.read_text(errors="replace")
-        for absolute_va, block in _source_function_blocks(text):
-            rva = absolute_va - RVA_BASE
-            key = sym.get(rva)
-            if key:
-                norm = _normalize(block, cmap)
-                out[key] = hashlib.sha1(norm.encode("utf-8", "replace")).hexdigest()[:12]
-    return out
-
-
 def _md_table(headers, aligns, rows):
     widths = [len(h) for h in headers]
     for r in rows:
@@ -644,15 +314,14 @@ def _md_table(headers, aligns, rows):
     return [row(headers), "| " + " | ".join(sep) + " |", *(row(r) for r in rows)]
 
 
-def readme_block(data, base):
-    """per-tier match table. base = {(unit,fn): (max_pct, hash)}; shows current AND max fuzzy."""
+def readme_block(data):
+    """Render the live per-tier comparison table."""
     tiers = {}
     for u in data.get("units", []):
         tier = u.get("name", "?").split("/")[0]
-        un = u.get("name", "?")
         m = u.get("measures", {}) or {}
-        t = tiers.setdefault(tier, {"units": 0, "fe": 0, "fem": 0, "ft": 0,
-                                    "fz": 0.0, "fzt": 0, "mx": 0.0,
+        t = tiers.setdefault(tier, {"units": 0, "fe": 0, "ft": 0,
+                                    "fz": 0.0, "fzt": 0,
                                     "dm": 0, "dt": 0, "de": 0, "du": 0})
         t["units"] += 1
         t["fe"] += _i(m.get("matched_functions")); t["ft"] += _i(m.get("total_functions"))
@@ -663,140 +332,39 @@ def readme_block(data, base):
             t["de"] += matched_data == total_data
         for f in u.get("functions", []) or []:
             sz = _i(f.get("size")); cur = f.get("fuzzy_match_percent") or 0.0
-            mx = base.get((un, f.get("name", "?")), (cur, None))[0]
-            mx = max(mx, cur)  # live current can only raise the displayed max
-            if mx >= EXACT_MATCH_PERCENT:
-                t["fem"] += 1
-            t["fz"] += sz * cur / 100.0; t["fzt"] += sz; t["mx"] += sz * mx / 100.0
+            t["fz"] += sz * cur / 100.0; t["fzt"] += sz
     rows = []
-    TE = TEM = TT = DM = DT = DE = DU = 0; FZ = MX = 0.0; FZT = 0
+    TE = TT = DM = DT = DE = DU = 0; FZ = 0.0; FZT = 0
     for tier in sorted(tiers, key=lambda k: -tiers[k]["ft"]):
         d = tiers[tier]
         if d["ft"] == 0:
             continue
-        TE += d["fe"]; TEM += d["fem"]; TT += d["ft"]
+        TE += d["fe"]; TT += d["ft"]
         DM += d["dm"]; DT += d["dt"]; DE += d["de"]; DU += d["du"]
-        FZ += d["fz"]; FZT += d["fzt"]; MX += d["mx"]
+        FZ += d["fz"]; FZT += d["fzt"]
         fp = 100 * d["fe"] / d["ft"]
-        fmp = 100 * d["fem"] / d["ft"]
         zp = 100 * d["fz"] / d["fzt"] if d["fzt"] else 0
-        mp = 100 * d["mx"] / d["fzt"] if d["fzt"] else 0
         dp = 100 * d["dm"] / d["dt"] if d["dt"] else 0
         rows.append([f"`{tier}`", str(d["units"]),
                      f"{d['fe']} / {d['ft']} ({fp:.1f}%)",
-                     f"{d['fem']} / {d['ft']} ({fmp:.1f}%)",
-                     f"{zp:.1f}%", f"{mp:.1f}%",
+                     f"{zp:.1f}%",
                      f"{d['de']} / {d['du']}",
                      f"{d['dm']:,} / {d['dt']:,} ({dp:.2f}%)"])
     overall_f = 100 * TE / TT if TT else 0
-    overall_fm = 100 * TEM / TT if TT else 0
     overall_z = 100 * FZ / FZT if FZT else 0
-    overall_m = 100 * MX / FZT if FZT else 0
     overall_d = 100 * DM / DT if DT else 0
     out = [RM_START, "## Match status", "",
            "_Auto-generated by `homm2 status --write-readme` (refreshed by `homm2 build`); do not hand-edit._", "",
            f"**Overall: {TE} / {TT} functions exact ({overall_f:.2f}%) &middot; "
-           f"{TEM} / {TT} functions exact-max ({overall_fm:.2f}%) &middot; "
-           f"{overall_z:.2f}% fuzzy &middot; {overall_m:.2f}% fuzzy-max &middot; "
+           f"{overall_z:.2f}% fuzzy &middot; "
            f"{DM:,} / {DT:,} data bytes ({overall_d:.3f}%) &middot; "
            f"{DE} / {DU} data-bearing units exact.**", "",
-           "_**Functions exact** = byte-identical now. **Functions exact-max** = byte-identical "
-           "at least once for the current source hash. **Fuzzy** = live size-weighted instruction match. "
-           "**Fuzzy-max** = best fuzzy ever reached per function for its current source (tu-cumulative "
-           "dips don't lower it); **fuzzy-max 100% ⇒ essentially done.**_", "",
-           *_md_table(["Module", "Units", "Functions exact", "Functions exact-max", "Fuzzy",
-                       "Fuzzy-max", "Data exact", "Data bytes"], "lrrrrrrr", rows),
+           "_**Functions exact** = byte-identical now. **Fuzzy** = the live size-weighted "
+           "instruction match; neither metric replaces raw-byte and relocation review._", "",
+           *_md_table(["Module", "Units", "Functions exact", "Fuzzy", "Data exact", "Data bytes"],
+                      "lrrrrr", rows),
            "", RM_END]
     return "\n".join(out)
-
-
-BASELINE = REPO / "config/match_baseline.tsv"
-
-
-def _fn_fuzzy(data):
-    out = {}
-    for u in data.get("units", []):
-        un = u.get("name", "?")
-        for f in u.get("functions", []) or []:
-            out[(un, f.get("name", "?"))] = float(f.get("fuzzy_match_percent") or 0.0)
-    return out
-
-
-def load_baseline():
-    """{(unit, function): (max_pct, src_hash|None)}. Tolerates the old 3-column format."""
-    base = {}
-    if BASELINE.exists():
-        for line in BASELINE.read_text().splitlines():
-            if not line or line.startswith("#"):
-                continue
-            p = line.split("\t")
-            if len(p) >= 4 and p[3]:
-                base[(p[0], p[1])] = (float(p[2]), p[3])
-            elif len(p) == 3:
-                base[(p[0], p[1])] = (float(p[2]), None)
-    return base
-
-
-def write_baseline(base):
-    lines = ["# homm2 match baseline - per-function max fuzzy% keyed by source hash.",
-             "# Generated by `homm2 status update`; do not hand-edit.  unit<TAB>fn<TAB>max_fuzzy<TAB>src_hash"]
-    for (un, fn), (mx, h) in sorted(base.items()):
-        if h:
-            lines.append(f"{un}\t{fn}\t{mx:.4f}\t{h}")
-    BASELINE.write_text("\n".join(lines) + "\n")
-
-
-def _updated_baseline(cur, base, sh, accept_regressions=False):
-    """Merge live scores into the retained ledger, omitting functions without a source hash."""
-    out = {}
-    for k, c in cur.items():
-        h = sh.get(k)
-        if not h:
-            continue
-        old_mx, old_h = base.get(k, (0.0, None))
-        # reset only when a KNOWN hash actually changed (the function's own source was edited);
-        # on first-time migration (old_h None) or an unchanged hash, keep the accumulated max.
-        if old_h and h != old_h:
-            mx = max(old_mx, c) if accept_regressions else c
-        else:
-            mx = max(old_mx, c)
-        out[k] = (mx, h)
-    return out
-
-
-def cmd_update(data, accept_regressions=False):
-    """max% keyed by source hash: same hash -> max(old, current); changed hash -> reset to current.
-    With --accept-regressions, intentional shared-layout edits adopt the new hash without discarding
-    the retained maximum. No blessing is needed for tu-cumulative dips (same hash keeps its max)."""
-    cur = _fn_fuzzy(data); base = load_baseline(); sh = source_hashes()
-    out = _updated_baseline(cur, base, sh, accept_regressions)
-    write_baseline(out)
-    at100 = sum(1 for (mx, _) in out.values() if mx >= EXACT_MATCH_PERCENT)
-    print(f"[status] baseline updated: {len(out)} source-backed functions -> "
-          f"{BASELINE.relative_to(REPO)} "
-          f"({at100} at max 100%)")
-    return 0
-
-
-def cmd_check(data, eps=0.05):
-    """Regression = a function whose SOURCE changed and whose current is now below its former max
-    (an edit that lost ground). tu-cumulative dips (same hash, lower current) are NOT flagged —
-    their max is preserved, so they recover in a later pass."""
-    cur = _fn_fuzzy(data); base = load_baseline(); sh = source_hashes()
-    if not base:
-        print("[status] no baseline yet - seed it: homm2 status update"); return 0
-    regr = []
-    for k, (old_mx, old_h) in base.items():
-        c = cur.get(k, 0.0); h = sh.get(k)
-        if h is not None and h != old_h and c + eps < old_mx:
-            regr.append((k, old_mx, c))
-    if regr:
-        print(f"[status] {len(regr)} REGRESSION(S) — edited function now below its former max%:")
-        for (un, fn), b, c in sorted(regr)[:30]:
-            print(f"   {c:6.2f}% < max {b:6.2f}%  {un}::{fn}")
-        print("  intended? re-baseline (resets these to current): homm2 status update")
-        return 1
-    print("[status] no regressions (tu-cumulative dips ignored; max% preserved)."); return 0
 
 
 def main(argv=None, data=None):
@@ -807,12 +375,8 @@ def main(argv=None, data=None):
         data = load_report(force_refresh=force_refresh)
     if data is None:
         print("[status] no report (run 'homm2 build' first)"); return 1
-    if argv and argv[0] == "update":
-        return cmd_update(data, "--accept-regressions" in argv)
-    if argv and argv[0] == "check":
-        return cmd_check(data)
     if "--write-readme" in argv:
-        block = readme_block(data, load_baseline()); rm = REPO / "README.md"
+        block = readme_block(data); rm = REPO / "README.md"
         text = rm.read_text() if rm.exists() else "# homm2-decomp\n\n" + RM_START + "\n" + RM_END + "\n"
         if RM_START in text and RM_END in text:
             pre = text[:text.index(RM_START)]; post = text[text.index(RM_END) + len(RM_END):]
@@ -821,22 +385,26 @@ def main(argv=None, data=None):
             rm.write_text(text.rstrip() + "\n\n" + block + "\n")
         print("[status] refreshed README.md match block")
         return 0
-    base = load_baseline(); sh = source_hashes(); cur = _fn_fuzzy(data)
+    if argv:
+        print("usage: homm2 status [--force-refresh] [--write-readme]", file=sys.stderr)
+        return 1
     started = sorted((u for u in data["units"] if unit_pct(u) > 0 and
                       _i((u.get("measures", {}) or {}).get("total_functions"))), key=unit_pct, reverse=True)
     if started:
         print("[status] highest objdiff matched-code byte percentages by unit:")
     for u in started[:25]:
         print(f"  {unit_pct(u):6.2f}%  {u.get('name')}")
-    atmax = sum(1 for k, (mx, _) in base.items() if mx >= EXACT_MATCH_PERCENT)
     measures = data.get("measures", {}) or {}
     matched_code_percent = float(measures.get("matched_code_percent", 0) or 0)
     fuzzy_match_percent = float(measures.get("fuzzy_match_percent", 0) or 0)
     matched_data = _i(measures.get("matched_data"))
     total_data = _i(measures.get("total_data"))
     data_percent = float(measures.get("matched_data_percent", 0) or 0)
+    matched_functions = _i(measures.get("matched_functions"))
+    total_functions = _i(measures.get("total_functions"))
     print(f"[status] units: {len(data['units'])}  with-progress: {len(started)}  "
           f"matched-code-bytes: {matched_code_percent:.2f}%  "
-          f"fuzzy: {fuzzy_match_percent:.2f}%  functions-at-max-100%: {atmax}  "
+          f"fuzzy: {fuzzy_match_percent:.2f}%  "
+          f"functions-exact: {matched_functions}/{total_functions}  "
           f"data: {matched_data}/{total_data} ({data_percent:.3f}%)")
     return 0

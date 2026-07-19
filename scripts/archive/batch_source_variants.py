@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compile and directly score explicit source-shape variants in one batch.
+"""Archived source-shape experiment runner.
 
 This is not a source permuter.  It performs only byte-exact substitutions declared in
 a JSON manifest, so every option is authored or AST-generated and semantically reviewed

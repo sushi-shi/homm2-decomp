@@ -18,7 +18,7 @@ the source. The raw evidence is in
 [msvc42-tu-declaration-state.tsv](msvc42-tu-declaration-state.tsv). Reproduce the metrics with:
 
 ```sh
-PYTHONPATH=scripts python3 scripts/tu_state_metrics.py \
+PYTHONPATH=scripts/archive python3 scripts/archive/tu_state_metrics.py \
   build/objdiff/base/BASE/FONT.obj --unit BASE/FONT
 ```
 
@@ -148,12 +148,8 @@ Do not reopen a matrix for comments, formatting, or an unrelated file with no in
 path. A trigger justifies one fresh combined-state measurement; it does not justify replaying all
 local predicate synonyms.
 
-For retained maxima: an unchanged normalized function hash automatically keeps its old maximum
-through `homm2 status update`, even if a header or exact predecessor lowers its live score. A direct
-function edit normally uses plain `homm2 status update` and establishes the new hash's current
-maximum. Use `homm2 status update --accept-regressions` only for an intentional shared semantic or
-layout refactor that also changes affected function source hashes and should carry their prior
-verified maxima forward. Always run raw-byte and relocation review before blessing.
+Reproduce every result from the current objects after a header, predecessor, or compiler-state
+change. Historical scores are not a correctness ledger; raw bytes and relocations remain decisive.
 
 Related: [tu-cumulative-eval-order.md](tu-cumulative-eval-order.md),
 [o2-tu-cumulative-register-steering.md](o2-tu-cumulative-register-steering.md),

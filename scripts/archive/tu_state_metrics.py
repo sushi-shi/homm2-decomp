@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Print stable per-function COFF code metrics for TU-state experiments.
+"""Archived COFF metric helper for TU-state experiments.
 
 This deliberately hashes raw ``.text`` bytes and the ordered relocation target
 stream separately.  It handles both one-COMDAT-per-function `/O2` objects and

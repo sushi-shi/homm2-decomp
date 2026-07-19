@@ -2,7 +2,7 @@
 
 Current structural state is based on integrated tip `a18cc69`, source SHA-256
 `1dff1e69857039210c855dda122d6340c5ebda3edcc9a6cff804f7925e84427d`, live 85.27%
-(retained maximum 86.2544%), function end `0x53f`, frame `sub esp,8`, and 84/83 relocations.
+(historical result 86.2544%), function end `0x53f`, frame `sub esp,8`, and 84/83 relocations.
 It adopts the newly integrated shared IconRle enum domain, the canonical dim-palette owner header,
 the function owner header, and byte-pointer row storage. The complete normalized CFG and every
 relocation target are closed; gFCY 9/8 is the only occurrence excess. This is a structural
@@ -198,7 +198,7 @@ fuzzy search. No regex or AST permutation tool was used.
 | shared IconRle enum with broad X_GLOBAL owner surface | 82.37% | not retained | 86/83 | rejected header ownership; enum declaration is real but the broad umbrella perturbs allocation and adds two occurrences |
 | shared IconRle enum plus canonical dimPalette/function owners | 85.53% | `0x53f`, `sub esp,8` | 84/83 | structurally retained; candidate text SHA-256 `c12480c014b478e6a41c68f91ead90a140b7fc8a116c04ca1c2c049376e4263e` |
 | preceding owner state plus byte-pointer gFCRow | 85.32% | `0x53f`, `sub esp,8` | 84/83 | final semantic state; removes integer-address casts, candidate text SHA-256 `a896f8fdb728691c8719bf0ec35c3dc8128d686b0c0c207981cee05c465fd9c9` |
-| combined state after adding `ICON_RLE_MONO_RUN_MASK` | 85.27% | `0x53f`, `sub esp,8` | 84/83 | same source/CFG/frame/relocations; the unused enum member perturbs this directly reachable TU, so the retained maximum remains authoritative |
+| combined state after adding `ICON_RLE_MONO_RUN_MASK` | 85.27% | `0x53f`, `sub esp,8` | 84/83 | same source/CFG/frame/relocations; the unused enum member perturbs this directly reachable TU |
 
 Final occurrence distribution is Entry1, X0=1, XEnd2, Y9, ClipR8, ClipB4, Row12, Run6, X2,
 Src1, Color5, DimLen2, Cnt2=5, DimPal3, Cnt8, DimDst4, Dst6, Skip4, and uDimPal1. Retail is

@@ -27,11 +27,8 @@ one-run progress summaries belong under `build/`, not here.
 
 - `build-asserts.md`, `od-stack-layout.md`, `jump-tables.md`, and `patterns/` are reusable
   matching references.
-- `breadth-audit-tracker.md` documents the active machine-readable audit state in
-  `config/breadth_audit.json`.
-- `base-wall-ledger.md`, `matching-soft-defer-ledger.md`, `iconf2bc-experiment-matrix.md`, and
-  `matching-matrices/` are no-repeat evidence. Keep them while their affected functions remain
-  non-exact; do not turn them into general instructions or live assignment queues.
+- `iconf2bc-experiment-matrix.md` and `matching-matrices/` retain negative experiment evidence.
+- `archive/` contains contracts for retired experiment tools; it is not active workflow guidance.
 
 ## Retention rule
 

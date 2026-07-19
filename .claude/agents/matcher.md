@@ -29,7 +29,7 @@ verified with **objdiff**. You write `src/<TIER>/<TU>.cpp` (+ shared headers und
 `VA(0x........, 0x..)` / `DATA(0x........)` above each, and **leave the working
 tree** for the orchestrator to build / measure / commit. **Write every address
 zero-padded to 8 hex digits**; leave the size arg unpadded. You do NOT
-`git add`/commit, bless the baseline, or edit other TUs.
+`git add`/commit or edit other TUs.
 
 ## What's authoritative
 
@@ -161,8 +161,7 @@ the per-call-site continuation jumps of **inlined in-class accessors**.
   Include the SPECIFIC headers you use (no `_all.h`). Put NO local
   `class/struct/enum`/`extern`/forward-decl in a .cpp — `homm2 build`'s header-discipline gates
   reject them; declare your TU's free fns in its owner header.
-- **Define functions in retail-RVA order** within the TU (the link order the
-  baseline expects).
+- **Define functions in retail-RVA order** within the TU.
 
 ## Recover every body first; grind walls after 95% total fuzzy
 
