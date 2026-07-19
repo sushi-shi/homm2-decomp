@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""verify_carcass.py — end-to-end check that every CodeView function symbol for each unit
+"""Archived verify_carcass.py — check that every CodeView function symbol for each unit
 is PRESENT in its generated object file (build/objdiff/base/<unit>.obj). Run from repo root
 after a build. Reports per-unit missing symbols (the carcass is complete when 0 missing)."""
 import csv, subprocess, os

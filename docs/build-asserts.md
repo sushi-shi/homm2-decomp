@@ -171,6 +171,3 @@ it is a floating-point type.
   structural residuals, with candidate over-publications and identities absent
   from the corresponding retail function reported separately. This prevents a
   shape mismatch from suppressing a private-owner mapping error.
-- `verify_carcass.py` — every CodeView **function** symbol is present in its object (carcass
-  completeness). Was the carcass-phase acceptance check; run it manually
-  (`python3 scripts/homm2/match/verify_carcass.py`).

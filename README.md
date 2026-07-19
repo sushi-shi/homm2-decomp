@@ -2,9 +2,11 @@
 
 Binary-matching decompilation of **Heroes of Might and Magic II — The Price of Loyalty**
 (`HEROES2W.EXE`, New World Computing, 1997), the only HoMM2 build that ships a **CodeView
-NB09** debug stream. The goal is C++ sources that, compiled with the original **MSVC 4.2**
-toolchain, produce object files matching the retail `.text`, verified with
-[objdiff](https://github.com/encounter/objdiff).
+NB09** debug stream. The goal is to recover the C++ structure and behavior and, where retail
+evidence permits, reproduce the original code, data, and relocations with the **MSVC 4.2**
+toolchain. Retail executable bytes, relocations, and public RVAs are authoritative.
+[objdiff](https://github.com/encounter/objdiff) is a useful comparison and navigation surface,
+not proof of correctness.
 
 The embedded minimal CodeView stream proves retained public names and start RVAs only. Function
 sizes, private helpers, types, classes, and vtables are reconstructed from executable bytes,
@@ -48,9 +50,10 @@ The documentation map and retention policy are in [`docs/README.md`](docs/README
 ```sh
 nix develop .#build            # MSVC 4.2 under wine + the tools
 homm2 init                     # ONE-TIME: CodeView -> manifest -> ??_C@ names -> PDB -> delink -> configure
-homm2 build                    # compile src (wine cl) -> objdiff vs target -> refresh % below
+homm2 build                    # compile src (wine cl) -> comparisons + hard gates -> refresh status
 homm2 link                     # strict final link + section/RVA audit in build/link/
 homm2 status                   # per-unit + overall match %
+homm2 format --check           # verify header and enum formatting
 ```
 
 The final link is opt-in, so object matching stays fast. Its Ninja graph exposes `link-order`

@@ -12,7 +12,7 @@ Before starting, check the function's `@match-note` and target-specific matrix s
 state tuple is not searched twice.
 
 ```sh
-python3 scripts/tu_state_noise.py \
+python3 scripts/archive/tu_state_noise.py \
   --source src/BASE/WINMGR.cpp --rva 0xca6d0 --trials 40 --seed 0x484f4d32
 ```
 
@@ -129,6 +129,6 @@ not cite them as a retained maximum or commit them as durable evidence; compiled
 at clean exit. Preserve the successful exact-100 manifest as the reproducible closure audit; it
 contains the seed and complete probe body regardless of whether `--record-max` was requested.
 
-Related: [msvc42-tu-declaration-state.md](msvc42-tu-declaration-state.md),
-[o2-tu-cumulative-register-steering.md](o2-tu-cumulative-register-steering.md), and
-[tu-cumulative-eval-order.md](tu-cumulative-eval-order.md).
+Related: [msvc42-tu-declaration-state.md](../patterns/msvc42-tu-declaration-state.md),
+[o2-tu-cumulative-register-steering.md](../patterns/o2-tu-cumulative-register-steering.md), and
+[tu-cumulative-eval-order.md](../patterns/tu-cumulative-eval-order.md).
