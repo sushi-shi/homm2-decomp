@@ -27,6 +27,8 @@ one-run progress summaries belong under `build/`, not here.
 
 - `build-asserts.md`, `od-stack-layout.md`, `jump-tables.md`, and `patterns/` are reusable
   matching references.
+- `constants-audit.md` defines the whole-tree numeric-literal inventory and per-file review
+  contract.
 - `iconf2bc-experiment-matrix.md` and `matching-matrices/` retain negative experiment evidence.
 - `archive/` contains contracts for retired experiment tools; it is not active workflow guidance.
 
