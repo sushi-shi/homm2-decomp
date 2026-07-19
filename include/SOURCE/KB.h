@@ -246,22 +246,12 @@ H2_ENUM_BEGIN(NormalDialogConstant)
     NORMAL_DIALOG_WIDGET_FLAGS             = 0x200
 H2_ENUM_END(NormalDialogConstant)
 
-#pragma pack(push, 1)
-struct HighScoreEntry {
-    char playerName[17];
-    char scenarioName[41];
-    i32 score;
-    i32 days;
-    i32 scenario;
-    char cheated;
-    char reserved[29];
-};
-#pragma pack(pop)
-SIZE(HighScoreEntry, 100);
-
 H2_ENUM_BEGIN(HighScoreConstant)
     HIGH_SCORE_ENTRY_COUNT        = 10,
     HIGH_SCORE_NAME_LENGTH        = 16,
+    HIGH_SCORE_PLAYER_NAME_SIZE   = HIGH_SCORE_NAME_LENGTH + 1,
+    HIGH_SCORE_SCENARIO_NAME_SIZE = 41,
+    HIGH_SCORE_RESERVED_SIZE      = 29,
     HIGH_SCORE_STANDARD           = 1,
     HIGH_SCORE_CAMPAIGN           = 0,
     HIGH_SCORE_EXPANSION_CAMPAIGN = 2,
@@ -270,6 +260,19 @@ H2_ENUM_BEGIN(HighScoreConstant)
     HIGH_SCORE_FILE_WRITE_FLAGS   = 0x8301,
     HIGH_SCORE_FILE_PERMISSIONS   = 0x80
 H2_ENUM_END(HighScoreConstant)
+
+#pragma pack(push, 1)
+struct HighScoreEntry {
+    char playerName[HIGH_SCORE_PLAYER_NAME_SIZE];
+    char scenarioName[HIGH_SCORE_SCENARIO_NAME_SIZE];
+    i32 score;
+    i32 days;
+    i32 scenario;
+    char cheated;
+    char reserved[HIGH_SCORE_RESERVED_SIZE];
+};
+#pragma pack(pop)
+SIZE(HighScoreEntry, 100);
 
 H2_ENUM_BEGIN(AppMenuCommand)
     APP_MENU_NONE            = 0,
@@ -362,7 +365,10 @@ H2_ENUM_BEGIN(OldMainConstant)
     OLD_MAIN_WAIT_DP_HOST                     = 0xa,
     OLD_MAIN_WAIT_WS_FIRST_GUEST              = 0xb,
     OLD_MAIN_WAIT_WS_EXTRA_GUESTS             = 0xc,
-    OLD_MAIN_WAIT_WS_HOST                     = 0xd
+    OLD_MAIN_WAIT_WS_HOST                     = 0xd,
+    OLD_MAIN_REMOTE_PREFIX_RESERVED_SIZE      = 4,
+    OLD_MAIN_REMOTE_BODY_RESERVED_SIZE        = 2,
+    OLD_MAIN_REMOTE_PAYLOAD_HEAD_SIZE         = 1
 H2_ENUM_END(OldMainConstant)
 
 #pragma pack(push, 1)
@@ -384,10 +390,10 @@ SIZE(OldMainNetBuffer, OLD_MAIN_NET_BUFFER_SIZE);
 #pragma pack(push, 1)
 struct KbRemotePacket {
     i8 sender;
-    char reserved1[4];
+    char reserved1[OLD_MAIN_REMOTE_PREFIX_RESERVED_SIZE];
     i8 group;
     i8 command;
-    char reserved2[2];
+    char reserved2[OLD_MAIN_REMOTE_BODY_RESERVED_SIZE];
     union {
         OldMainNetSetup setup;
         struct {
@@ -395,7 +401,7 @@ struct KbRemotePacket {
             i32 saveOffset;
             i32 saveSize;
         } save;
-        char data[1];
+        char data[OLD_MAIN_REMOTE_PAYLOAD_HEAD_SIZE];
     } payload;
 };
 #pragma pack(pop)
@@ -427,6 +433,10 @@ H2_ENUM_BEGIN(AppMenuConstant)
     APP_MENU_COMBAT_HEX_COUNT    = 117,
     APP_MENU_FORMATION_HEX_COUNT = 15
 H2_ENUM_END(AppMenuConstant)
+
+H2_ENUM_BEGIN(NetBoxConstant)
+    NET_BOX_LINE_SIZE = 140
+H2_ENUM_END(NetBoxConstant)
 
 extern "C" void PollSound(void);
 void ForcePollSound(void);
@@ -523,7 +533,7 @@ extern i32 bShowIt;
 extern i32 bSpecialHideCursor;
 extern char* cBuildingInfoNeutral[];
 extern char cNetBoxColor[];
-extern char cNetBoxLine[][140];
+extern char cNetBoxLine[][NET_BOX_LINE_SIZE];
 extern char* cOutOfMemory;
 extern char* gArmyNames[IDX(CREATURE_COUNT)];
 extern char* gArmyNamesPlural[IDX(CREATURE_COUNT)];
