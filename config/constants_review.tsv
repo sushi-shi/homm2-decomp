@@ -36,7 +36,7 @@ include/BASE/WINMGR_TYPES.h	pending
 include/BASE/baseManager.h	reviewed	Named message-mask, priority, and capacity domains; zeroes are pure-virtual syntax.
 include/BASE/bitmap.h	pending
 include/BASE/bmap2.h	pending
-include/BASE/border.h	pending
+include/BASE/border.h	reviewed	Public class interface contains only pure-virtual overrides and packed-layout SIZE evidence.
 include/BASE/button.h	pending
 include/BASE/dimmerWidget.h	pending
 include/BASE/dropListWidget.h	pending
@@ -139,7 +139,7 @@ include/SOURCE/x_cdtest.h	pending
 src/BASE/BASEMGR.cpp	reviewed	Only VA/VTBL evidence; initialization uses named values and NULL.
 src/BASE/BITMAP.cpp	pending
 src/BASE/BITS.cpp	reviewed	Private shift/mask domain; remaining zero and one are direct bit arithmetic and result values.
-src/BASE/BORDER.cpp	pending
+src/BASE/BORDER.cpp	reviewed	Resource-name capacity, color mask, and dispatch results are named; remaining zeros are initialization or drawing origins. Private enum form perturbed VC4.2 register allocation, so the two read constants are scoped expansion macros. Non-debug sections and relocations are A/B exact.
 src/BASE/BUTTON.cpp	pending
 src/BASE/Blur.cpp	pending
 src/BASE/Bzip.cpp	pending
