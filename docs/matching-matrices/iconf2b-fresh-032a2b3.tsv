@@ -13,7 +13,7 @@
 # relocation_audit	Retained base/target counts remain 82/81 with no base-only external target; gFlipY remains the sole occurrence-count excess at 9/8.
 # right_skip_proof	Retail +0x44f loads cn=clipW into EDX, then writes cmd, cmd-X, and cmd-X-clipW through [esp+0x10] before loading gFlipClipR and adding that stack value. The retained source has the same semantic stages but VC4.2 folds them into ECX.
 # conclusion	The bounded family below did not improve the retained score. Volatile diagnostics prove that forced memory ownership is not sufficient and broadly regress; they are not source evidence and were discarded. This remains an unresolved residual, not a wall or permitted stop.
-# permutation_policy	No regex or AST permuter used; AST remains premature at 86.5756%.
+# permutation_policy	No regex or AST permuter used; AST remains premature before structural alignment.
 state	score_pct	candidate_size	base_relocs	target_relocs	disposition	new_axis_and_byte_evidence
 canonical_032a2b3	86.5756	0x4e5	82	81	retained	214bd52 split right-skip baseline before the new family.
 whole_entry_reference	86.5756	0x4e5	82	81	rejected_byte_identical	Use IconEntry reference ownership and publish its address; optimized instructions were unchanged.

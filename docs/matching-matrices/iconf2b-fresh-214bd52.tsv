@@ -18,7 +18,7 @@
 # first_divergence	At +0x1d candidate loads entry Y into EBP before entry pointer formation; retail forms EDI, loads/subtracts entry X, then loads entry Y.
 # retained_structure	Real scratch declaration state follows retail publication plus adjacent flipped-decoder lifetimes. Literal nonzero-skip arms share one publication; the right arm stages cmd-X-clipW before adding gFlipClipR.
 # retest_trigger	A newly retail-proven setup Y/X lifetime, real shared-header/compiler-state change, or predecessor-equivalent state mechanism. Do not add dummy TU steering and do not replay this or the two older matrices while hashes agree.
-# permutation_policy	No permutation tool used. AST is premature at 86.58%; regex permutation is forbidden.
+# permutation_policy	No permutation tool used. AST was premature before structural alignment; regex permutation was not used.
 state	source_sha256	object_sha256	text_sha256	score_pct	candidate_size	base_relocs	target_relocs	disposition	axis
 canonical_a0b17fb	7388a30d32705858be3c1f59648c7ff637ce535d4c76d8e51b2fe7f46b2864e8	432327c63be4e5ae1002f0fd006601c99d8c990abd6c67f78139bd47cc19ff1c	d5026c339039175f0e81d637f85c73cbac32e6562393b454d9d8b39dee6c65de	85.63395	0x4e5	82	81	superseded	Combined-root baseline from iconf2b-tu-state-a0b17fb.tsv.
 old_style_cursor_sequence	NA	NA	NA	86.27	0x4e5	82	81	rejected_byte_identical	Split source-base advance and delayed entry-Y assignment under the new declaration state.

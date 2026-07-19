@@ -1,7 +1,7 @@
 # BASE/icon2bc real owner-header/declaration-context pass, checkpoint a0a8646
 # Target: IconToBitmapColorTable, RVA 0xd32a0, retail size 0x5af, target relocations 91.
 # Scope: preserve the canonical semantic body and transfer only existing declaration/include surfaces justified by the sibling Icon2b and iconf2bc compilands. No local expression, predicate, record, enum, command wrapper, regex permutation, or AST permutation was tested.
-# Canonical target: 73.1690%, .text 0x566, .text SHA-256 6e7102ac86ce318118835de5be00b34e5cd1d008c8da3040e47464c998381e2e, 88/91 relocations.
+# Canonical target: .text 0x566, .text SHA-256 6e7102ac86ce318118835de5be00b34e5cd1d008c8da3040e47464c998381e2e, 88/91 relocations.
 state	match_percent	base_target_relocs	result	real_header_or_declaration_context_and_evidence
 canonical_narrow_palette_misc	73.1690	88/91	retained	Owner header, icon, bitmap, narrow dimPalette owner, Misc, and string; unchanged semantic body.
 iconf2bc_direct_iconentry_broad_globals	73.1690	88/91	byte-identical-rejected	Transfer iconf2bc's direct IconEntry/icon/bitmap/X_GLOBAL/string surface and omit unused Misc. Candidate .text SHA-256 remains 6e7102ac86ce318118835de5be00b34e5cd1d008c8da3040e47464c998381e2e, so the very different declaration suffix state does not steer code.
