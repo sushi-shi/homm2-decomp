@@ -91,7 +91,7 @@ include/SOURCE/NOOPT.h	reviewed	No literal values.
 include/SOURCE/Netbios.h	reviewed	The NetBIOS interface contains declarations and scalar externs only, with no numeric constants or storage extents.
 include/SOURCE/Newgame.h	reviewed	New-game controls and packed remote-packet reserved, sequence, and payload-head extents are named shared domains; the remaining one is control-range arithmetic.
 include/SOURCE/Overview.h	reviewed	Shared overview mode, row geometry, widget strides, troop, dwelling, skill, and artifact extents are named aligned enums and drive the public row typedefs.
-include/SOURCE/PATH.h	reviewed	The public combat-hex direction domain has explicit aligned values; no unexplained literals remain.
+include/SOURCE/PATH.h	reviewed	The public combat-hex direction domain has explicit aligned values whose names follow the reconstructed northeast-through-northwest adjacency topology; no unexplained literals remain.
 include/SOURCE/PHILAI.h	reviewed	AI public resource, player, and mine-table extents are named domains and extern arrays use them; the extensive named scalar algorithm parameters remain macros or typed float constants because floating values cannot be enum members.
 include/SOURCE/RECRUIT.h	reviewed	The public setup and quick-view functions expose no numeric policy.
 include/SOURCE/REMOTE.h	reviewed	Remote modes, message types, queue and buffer extents, framing, timing, retry, heartbeat layout, error text storage, and sentinel values are named shared domains; the network-name extern uses its named extent.
@@ -191,7 +191,7 @@ src/SOURCE/Castle.cpp	reviewed	Private aligned enums name castle controls, widge
 src/SOURCE/DRAWING.cpp	reviewed	Private drawing geometry, wall-coordinate, tower-frame, drawbridge-clip, spell-axis, and small-view stat-row domains are named; shared wall slots/states, faction count, font alignment, and combat dimensions replace raw policy values. Remaining findings are the retail castle wall-coordinate and frame-offset local table payloads.
 src/SOURCE/EVENTS.cpp	pending
 src/SOURCE/FINDPATH.cpp	reviewed	Shared queue, direction, moat, and combat-hex extents replace raw bounds; private source-line, distance, drawbridge, and moat-cost constants are named, and repeated grid-distance arithmetic uses an inline helper.
-src/SOURCE/FLY.cpp	reviewed	Private flight direction, mask, and timing constants are aligned enums; the attack buffer uses the shared army API extent, and repeated branchless facing arithmetic uses inline direction/rear-offset helpers. Remaining zeros and ones are coordinates, booleans, frame and loop initialization, bounds, and occupant sentinels.
+src/SOURCE/FLY.cpp	reviewed	Shared combat-hex directions and private flight mask and timing constants replace raw values; the attack buffer uses the shared army API extent, and repeated branchless facing arithmetic uses inline direction/rear-offset helpers. Remaining zeros and ones are coordinates, booleans, frame and loop initialization, bounds, and occupant sentinels.
 src/SOURCE/GAME.cpp	pending
 src/SOURCE/HERO.cpp	reviewed	Private enums name hero-screen widget slots, update geometry, mobility thresholds, experience indexing, and temporary morale/luck effects. Shared player/screen domains are reused; the land-mobility and experience curves remain reviewed retail data payload.
 src/SOURCE/HEXCELL.cpp	reviewed	Draw-all uses the shared combat sentinel; private tower geometry, excluded row, and overlay frame are named, with the vertical step shared from the combat grid model.
