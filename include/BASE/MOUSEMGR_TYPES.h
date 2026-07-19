@@ -52,7 +52,7 @@ struct SMouseManagerStrings {
     SMouseManagerBitmapName combatBitmap;
     SMouseManagerSourceFile bitmapAssertion;
     SMouseManagerSourceFile cursorAssertion;
-    char defaultCursorName[1];
+    char defaultCursorName[sizeof("")];
 };
 SIZE(SMouseManagerStrings, 0x1c8);
 
