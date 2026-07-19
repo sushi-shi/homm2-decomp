@@ -2581,7 +2581,15 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
             (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION);
         gpGame->m_worldMap.GetCell(townXh, townYWork)->m_objectMetadata =
             gpCurPlayer->m_availableHeroIds[m_recruitState];
-        SendMapChange(3, m_recruitHero->m_id, townXh, townYWork, CURSOR_LOG_UNUSED, 0, 0);
+        SendMapChange(
+            MAP_CHANGE_RECRUIT_HERO,
+            m_recruitHero->m_id,
+            townXh,
+            townYWork,
+            CURSOR_LOG_UNUSED,
+            0,
+            0
+        );
         m_recruitResult = 1;
         m_town->m_occupyingHeroId = m_recruitHero->m_id;
         gpGame->m_availableHeroes[gpCurPlayer->m_availableHeroIds[m_recruitState]] =

@@ -64,7 +64,8 @@ H2_ENUM_BEGIN(CursorConstant)
     CURSOR_REMOTE_NO_TIMEOUT            = -1
 H2_ENUM_END(CursorConstant)
 
-H2_ENUM_CLASS_BEGIN(MapChangeType)
+H2_ENUM_BEGIN(MapChangeType)
+    MAP_CHANGE_NONE          = 0,
     MAP_CHANGE_MOVE_HERO     = 1,
     MAP_CHANGE_UNUSED        = 2,
     MAP_CHANGE_RECRUIT_HERO  = 3,
@@ -76,7 +77,7 @@ H2_ENUM_CLASS_BEGIN(MapChangeType)
     MAP_CHANGE_TELEPORT_HERO = 9,
     MAP_CHANGE_DEAD_PLAYER   = 10,
     MAP_CHANGE_MY_TURN       = 11
-H2_ENUM_CLASS_END(MapChangeType)
+H2_ENUM_END(MapChangeType)
 
 #pragma pack(push, 1)
 struct SMapChange {
@@ -94,6 +95,6 @@ SIZE(SMapChange, 11);
 
 extern SMapChange sMapChangeLastFew[CURSOR_MAP_CHANGE_RECENT_COUNT];
 
-void SendMapChange(i32, i8, u8, u8, i32, u8, u8);
+void SendMapChange(MapChangeType, i8, u8, u8, i32, u8, u8);
 
 #endif
