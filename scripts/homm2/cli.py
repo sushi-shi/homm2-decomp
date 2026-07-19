@@ -26,6 +26,8 @@ def main(argv=None):
         enum_status = sh(
             "python3", "scripts/format_enums.py", *rest, *headers, *sources)
         return int(bool(header_status or enum_status))
+    if cmd == "constants":
+        from homm2.constants_audit import main as m; return m(rest)
     if cmd == "enum-types":
         from homm2.enum_types import main as m; return m(rest)
     if cmd == "strict-allocations":
@@ -87,6 +89,6 @@ def main(argv=None):
         from homm2.analysis.sema import main as m; return m(rest)
     if cmd == "ghidra":
         from homm2.ghidra.driver import cli_main as m; return m(rest)
-    print("usage: homm2 {init|configure|build|link|link-layout|clangd|format|enum-types|strict-allocations|data-relocs|data-topology|status|relocs|sema|ghidra}",
+    print("usage: homm2 {init|configure|build|link|link-layout|clangd|format|constants|enum-types|strict-allocations|data-relocs|data-topology|status|relocs|sema|ghidra}",
           file=sys.stderr)
     return 0 if cmd in ("help", "-h", "--help") else 1
