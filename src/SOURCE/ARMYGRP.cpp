@@ -5,6 +5,17 @@
 #include <SOURCE/hero.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/town.h>
+
+H2_ENUM_BEGIN(MoraleConstant)
+    FIZBIN_MORALE_PENALTY  = 2,
+    COLISEUM_MORALE_BONUS  = 2,
+    THREE_ALIGNMENT_COUNT  = 3,
+    FOUR_ALIGNMENT_COUNT   = 4,
+    FIVE_ALIGNMENT_COUNT   = 5,
+    THREE_ALIGNMENT_MORALE = -1,
+    FOUR_ALIGNMENT_MORALE  = -2
+H2_ENUM_END(MoraleConstant)
+
 VA(0x0048c040, 0x3c)
 armyGroup::armyGroup(void) {
     memset(m_creatureTypes, ARMY_GROUP_EMPTY_SLOT, sizeof(m_creatureTypes));
@@ -76,7 +87,7 @@ i32 armyGroup::GetMorale(hero* armyHero, town* occupiedTown, armyGroup* enemyGro
         if (armyHero->HasArtifact(ARTIFACT_MEDAL_OF_DISTINCTION))
             ++morale;
         if (armyHero->HasArtifact(ARTIFACT_FIZBIN_OF_MISFORTUNE))
-            morale -= 2;
+            morale -= FIZBIN_MORALE_PENALTY;
         if (armyHero->HasArtifact(ARTIFACT_ARM_OF_MARTYR))
             hasSomeUndead = 1;
         if (armyHero->HasArtifact(ARTIFACT_MASTHEAD)
@@ -95,7 +106,7 @@ i32 armyGroup::GetMorale(hero* armyHero, town* occupiedTown, armyGroup* enemyGro
         ++morale;
     if (occupiedTown != NULL && occupiedTown->m_type == IDX(FACTION_BARBARIAN)
         && (occupiedTown->m_buildings & IDX(TOWN_BUILDING_COLISEUM)))
-        morale += 2;
+        morale += COLISEUM_MORALE_BONUS;
 
     if (morale < ARMY_GROUP_MORALE_MIN)
         morale = ARMY_GROUP_MORALE_MIN;
@@ -150,12 +161,12 @@ i32 armyGroup::IsHomogeneous(i32 countRaces) {
 
     if (nRaces == 1)
         return 1;
-    if (nRaces == 3)
-        return -1;
-    if (nRaces == 4)
-        return -2;
-    if (nRaces >= 5)
-        return -3;
+    if (nRaces == THREE_ALIGNMENT_COUNT)
+        return THREE_ALIGNMENT_MORALE;
+    if (nRaces == FOUR_ALIGNMENT_COUNT)
+        return FOUR_ALIGNMENT_MORALE;
+    if (nRaces >= FIVE_ALIGNMENT_COUNT)
+        return ARMY_GROUP_MORALE_MIN;
     return 0;
 }
 
@@ -234,7 +245,8 @@ void armyGroup::DamageGroup(float damagePercent) {
                 if (SRandom(0, ARMY_GROUP_RANDOM_PERCENT_MAX) < percentChance)
                     ++numKilled;
             }
-            if (isFirstTroop && m_creatureCounts[i] == numKilled && damagePercent < 0.999)
+            if (isFirstTroop && m_creatureCounts[i] == numKilled
+                && damagePercent < 0.999) // NOLINT(readability-magic-numbers)
                 --numKilled;
             m_creatureCounts[i] -= numKilled;
             if (m_creatureCounts[i] <= 0 || damagePercent >= 1.0) {
