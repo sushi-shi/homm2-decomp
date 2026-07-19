@@ -68,7 +68,7 @@ include/BASE/widget.h	reviewed	Public widget flags, command argument, and dispat
 include/BASE/widgetKind.h	reviewed	Open serialized widget-kind domain is public and explicitly valued; conversion helpers preserve the packed i16 field.
 include/EDITOR/fullMap.h	reviewed	The public map container exposes no numeric policy or storage extent; its sole literal is the proven packed class-layout SIZE annotation.
 include/EDITOR/mapcell.h	reviewed	Flags and sentinels are typed domains; remaining bit widths, SIZE claims, and legacy raw extents are packed/serialized layout evidence. Legacy record declarations remain shared to satisfy header discipline.
-include/SOURCE/ADVMGR.h	pending
+include/SOURCE/ADVMGR.h	reviewed	Adventure commands, scrolling, drawing, remote messages, sounds, system options, and AI visit topology are named shared domains; hero and resource arrays derive from canonical counts.
 include/SOURCE/ADVMGR_TYPES.h	reviewed	The packed remote payload uses the shared adventure payload extent; its only numeric expression is SIZE evidence derived from that named layout.
 include/SOURCE/ARMY.h	reviewed	Shared combat animation, audio, timing, geometry, spell, attack, frame, standing-chance, and side domains are named; floating-point algorithm parameters remain named macros and packed arrays use named extents.
 include/SOURCE/CMBTMGR.h	reviewed	The combat-manager public helper declarations and tower-origin record contain no numeric constants or storage extents.
@@ -98,7 +98,7 @@ include/SOURCE/REMOTE.h	reviewed	Remote modes, message types, queue and buffer e
 include/SOURCE/REMOTE_TYPES.h	reviewed	Network-player storage extents, packet types, multiplayer bases, and remote transport protocols are explicit aligned domains; the remaining literal is packed SIZE evidence.
 include/SOURCE/REQUEST.h	reviewed	Map-header serialized extents, magic values, dimensions, victory/loss domains, and reserved storage are named shared domains; the remaining literal is packed SIZE evidence.
 include/SOURCE/SETUP.h	reviewed	The public COM-port domain is an explicitly valued aligned enum; the remaining setup API and extern declarations contain no numeric literals.
-include/SOURCE/SMACKMGR.h	pending
+include/SOURCE/SMACKMGR.h	reviewed	Smacker option filenames and the packed Miles-driver gap use named shared extents; remaining literals are packed SIZE evidence.
 include/SOURCE/SPELLS.h	reviewed	Combat influence, bolt modes, and the complete shared spell geometry, timing, damage, animation, and storage domains are named aligned enums. Named floating-point constants remain macros because they are scalar algorithm parameters rather than integral enum values.
 include/SOURCE/TOWNMGR.h	reviewed	Packed building layout plus shared town object ids, masks, commands, storage extents, controls, costs, geometry, and thieves-guild domains are named aligned enums; the only raw literal is SIZE evidence.
 include/SOURCE/VIEW.h	reviewed	The general-view interface contains declarations and one scalar extern only, with no numeric constants or storage extents.
@@ -115,14 +115,14 @@ include/SOURCE/dimPalette.h	reviewed	Shared dim-palette set, level, and color ex
 include/SOURCE/dpnetwin.h	reviewed	DirectPlay buffer, mapping, session, player, timeout, retry, and transport extents are named shared constants; extern arrays use their named extents and the remaining literal is packed SIZE evidence.
 include/SOURCE/fileRequester.h	reviewed	Requester modes, storage extents, geometry, controls, filters, results, and sentinels are named shared domains; the packed list-state extent is explicit and the remaining literal is SIZE evidence.
 include/SOURCE/game.h	pending
-include/SOURCE/hero.h	pending
+include/SOURCE/hero.h	reviewed	Hero skills, stats, events, sentinels, progression, storage, and layout domains are named enums; integral count macros were folded into the shared enum, arrays derive from their public domains, and only the floating growth factor remains a macro.
 include/SOURCE/hexcell.h	reviewed	The empty-occupant sentinel and record capacities are named enums; the remaining literal is proven class SIZE evidence.
 include/SOURCE/highScoreManager.h	reviewed	Shared entry counts, animation and timing values, widget ids, geometry, storage extents, and manager results are named aligned enums; public arrays use the named display extent and remaining literals are SIZE evidence.
 include/SOURCE/kbwin.h	reviewed	Windows message, timing, menu, style, resolution, application-name, and title values are named shared domains; public buffers use named extents.
 include/SOURCE/netwin.h	reviewed	NetBIOS commands, results, session states, limits, delays, payload and packed control-block extents are named shared domains; pointer-derived word and handle counts use sizeof and remaining literals are SIZE evidence.
 include/SOURCE/netwin_private.h	reviewed	Internal network-window declarations contain no numeric literals or storage extents.
 include/SOURCE/philAI.h	reviewed	The AI interface contains declarations only and no numeric literals or storage extents.
-include/SOURCE/playerData.h	pending
+include/SOURCE/playerData.h	reviewed	Player hero capacities, serialized save gap, barrier state, and runtime tail gap are named layout constants; town and resource arrays derive from canonical shared counts and remaining literals are SIZE evidence.
 include/SOURCE/recruitUnit.h	reviewed	The manager interface exposes no numeric policy; three four-byte opaque gaps and SIZE are proven packed-layout evidence.
 include/SOURCE/searchArray.h	pending
 include/SOURCE/strip.h	reviewed	Strip storage extents, runtime gap, geometry, flags, frames, and palette values are named shared domains; the remaining literal is packed class SIZE evidence.
