@@ -47,7 +47,7 @@ public:
     void UpdateScreen(void);
     void UpdateScreenRegion(i32, i32, i32, i32);
     void RedrawScreen(void);
-    void FadeScreen(i32, i32, class palette*);
+    void FadeScreen(WindowFadeMode, i32, class palette*);
     void ScreenShot(void);
     void SaveFizzleSource(i32, i32, i32, i32);
     void FizzleForward(i32, i32, i32, i32, i32, i8*, i8*);

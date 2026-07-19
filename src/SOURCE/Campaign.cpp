@@ -486,10 +486,10 @@ void game::ShowCampaignInfo(i32 viewOnly, i32) {
             InitCampaignMap();
             gpAdvManager->m_visibilityMapValid = 0;
             giBottomViewOverride = 0;
-            gpWindowManager->FadeScreen(1, CAMPAIGN_DIALOG_FADE_STEPS, gPalette);
+            gpWindowManager->FadeScreen(FADE_OUT, CAMPAIGN_DIALOG_FADE_STEPS, gPalette);
             gpAdvManager->SetInitialMapOrigin();
             gpAdvManager->RedrawAdvScreen(1, 0);
-            gpWindowManager->FadeScreen(0, CAMPAIGN_DIALOG_FADE_STEPS, gPalette);
+            gpWindowManager->FadeScreen(FADE_IN, CAMPAIGN_DIALOG_FADE_STEPS, gPalette);
         }
     }
 }

@@ -573,7 +573,7 @@ public:
     u8 m_previousGridState[COMBAT_HEX_COUNT];
     u8 m_gridState[COMBAT_HEX_COUNT];
     hexcell m_hexCells[COMBAT_HEX_COUNT];
-    i32 m_terrainType;
+    TerrainType m_terrainType;
     BattlefieldFringeFrame m_battlefieldFringe;
     class town* m_originalCombatTown;
     WindowColorCycleMode m_colorCycleType;

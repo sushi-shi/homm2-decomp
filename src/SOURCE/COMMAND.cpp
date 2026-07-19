@@ -298,8 +298,7 @@ H2_ENUM_END(CombatCycleConstant)
 H2_ENUM_BEGIN(CombatVictoryConstant)
     VICTORY_NECROMANCY_STACK_LIMIT   = 5,
     VICTORY_FADE_STEPS               = 8,
-    VICTORY_WATER_FADE_STEPS         = 5,
-    VICTORY_WATER_TERRAIN            = 7,
+    VICTORY_WASTELAND_FADE_STEPS     = 5,
     VICTORY_FADE_DELAY               = 60,
     VICTORY_MUSIC                    = 29,
     LOSS_MUSIC                       = 30,
@@ -2146,8 +2145,8 @@ void combatManager::DoVictory(i32 winningSide) {
     CombatMessage("", 1, 1, 0);
     gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
     fadeCount = VICTORY_FADE_STEPS;
-    if (m_terrainType == VICTORY_WATER_TERRAIN)
-        fadeCount = VICTORY_WATER_FADE_STEPS;
+    if (m_terrainType == TERRAIN_WASTELAND)
+        fadeCount = VICTORY_WASTELAND_FADE_STEPS;
     fadeTimer = KBTickCount();
     for (fadeIndex = 0; fadeCount > fadeIndex; ++fadeIndex) {
         PollSound();
