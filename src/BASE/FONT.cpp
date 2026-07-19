@@ -9,21 +9,25 @@
 #include <BASE/heroWindowManager.h>
 #include <SOURCE/KB.h>
 
+#define LARGE_FONT_HEIGHT_THRESHOLD 14
+
 VA(0x004c6fd0, 0xc8)
 font::font(u32l id) : resource(RESOURCE_CATEGORY_FONT, id, 1, NULL) {
     gpResourceManager->PointToFile(id);
     m_height = gpResourceManager->ReadWord();
     i32 h = gpResourceManager->ReadWord();
-    if (m_height >= 14)
+    if (m_height >= LARGE_FONT_HEIGHT_THRESHOLD)
         m_isLarge = 1;
     else
         m_isLarge = 0;
-    char fname[13];
+    char fname[RESOURCE_MANAGER_READ13_BYTES];
     gpResourceManager->Read13(reinterpret_cast<i8*>(fname));
     gbLoadingMonoIcon = true;
     m_glyphIcon = gpResourceManager->GetIcon(fname);
     gbLoadingMonoIcon = false;
 }
+
+#undef LARGE_FONT_HEIGHT_THRESHOLD
 
 VA(0x004c70e0, 0x39)
 font::~font() {
@@ -62,7 +66,7 @@ void font::DrawStringExecute(
         if (c < 0 || c > FONT_GLYPH_FALLBACK)
             c = FONT_GLYPH_FALLBACK;
         if (c != 0) {
-            if (mode == 1 && m_suppressDraw == 0)
+            if (mode == FONT_DRAW_DEFAULT && m_suppressDraw == 0)
                 IconToBitmap(
                     m_glyphIcon,
                     gpWindowManager->m_screen,
@@ -76,7 +80,8 @@ void font::DrawStringExecute(
                     clipB,
                     0
                 );
-            else if (mode == 2 || (mode == 1 && m_suppressDraw != 0))
+            else if (mode == FONT_DRAW_YELLOW
+                     || (mode == FONT_DRAW_DEFAULT && m_suppressDraw != 0))
                 IconToBitmapColorTable(
                     m_glyphIcon,
                     gpWindowManager->m_screen,
@@ -92,7 +97,7 @@ void font::DrawStringExecute(
                     gColorTableYellow,
                     1
                 );
-            else if (mode == 4)
+            else if (mode == FONT_DRAW_SCENARIO_WIN)
                 IconToBitmapColorTable(
                     m_glyphIcon,
                     gpWindowManager->m_screen,
@@ -131,11 +136,17 @@ void font::DrawStringExecute(
     }
 }
 
+#define FONT_DRAW_SCREEN_WIDTH 640
+#define FONT_DRAW_SCREEN_HEIGHT 480
+
 VA(0x004c7370, 0x48)
 void font::DrawString(char* s, i32 x, i32 y, i32 mode) {
     m_suppressDraw = 0;
-    DrawStringExecute(s, x, y, mode, 0, 0, 640, 480);
+    DrawStringExecute(s, x, y, mode, 0, 0, FONT_DRAW_SCREEN_WIDTH, FONT_DRAW_SCREEN_HEIGHT);
 }
+
+#undef FONT_DRAW_SCREEN_WIDTH
+#undef FONT_DRAW_SCREEN_HEIGHT
 
 // @semantic: residual is +0x82..+0x98: retail loads m_glyphIcon->m_data into EAX before forming the c*13 index in ECX.
 VA(0x004c73c0, 0xaf)
@@ -154,6 +165,9 @@ i32 font::GetCharacterWidth(u8 c) {
     }
 }
 
+#define CENTER_DIVISOR 2
+#define WRAP_HEIGHT_LINE_COUNT 2
+
 VA(0x004c7470, 0x313)
 void font::DrawBoundedString(char* str, i32 x, i32 y, i32 w, i32 h, i32 mode, i32 align) {
     i32 size = strlen(str);
@@ -170,12 +184,12 @@ void font::DrawBoundedString(char* str, i32 x, i32 y, i32 w, i32 h, i32 mode, i3
     i32 wordBreak0 = 0;
     char* text2 = str;
     i32 drawMode2 = mode;
-    if (align & 4) {
-        align -= 4;
+    if (align & FONT_ALIGN_VERTICAL_CENTER) {
+        align -= FONT_ALIGN_VERTICAL_CENTER;
         i32 lineCount = LineLength(str, w);
         i32 totalH = m_height * lineCount;
         if (totalH < h)
-            yOffC = (h - totalH) / 2;
+            yOffC = (h - totalH) / CENTER_DIVISOR;
     }
     m_suppressDraw = 0;
     while (size > idx && text2[idx] != 0 && (m_height + yOffC <= h || yOffC == 0)) {
@@ -189,7 +203,7 @@ void font::DrawBoundedString(char* str, i32 x, i32 y, i32 w, i32 h, i32 mode, i3
             wordBreak0 = 0;
             while (text2[idx] != ' ' && OD_STEER(idx) >= lineStartD) {
                 lineWidth3 -= GetCharacterWidth(text2[idx]);
-                if (m_height * 2 + yOffC > h && lineWidth3 < w)
+                if (m_height * WRAP_HEIGHT_LINE_COUNT + yOffC > h && lineWidth3 < w)
                     break;
                 if (wordBreak0 == 0 && lineWidth3 < w)
                     wordBreak0 = idx;
@@ -206,13 +220,13 @@ void font::DrawBoundedString(char* str, i32 x, i32 y, i32 w, i32 h, i32 mode, i3
         savedChar = text2[lineEnd1];
         text2[lineEnd1] = 0;
         switch (align) {
-            case 0:
+            case FONT_ALIGN_LEFT:
                 xPosition = 0;
                 break;
-            case 1:
-                xPosition = (w - lineWidth3) / 2;
+            case FONT_ALIGN_CENTER:
+                xPosition = (w - lineWidth3) / CENTER_DIVISOR;
                 break;
-            case 2:
+            case FONT_ALIGN_RIGHT:
                 xPosition = w - lineWidth3;
                 break;
         }
@@ -224,6 +238,9 @@ void font::DrawBoundedString(char* str, i32 x, i32 y, i32 w, i32 h, i32 mode, i3
         lineWidth3 = 0;
     }
 }
+
+#undef CENTER_DIVISOR
+#undef WRAP_HEIGHT_LINE_COUNT
 
 VA(0x004c7790, 0x1b3)
 i32 font::LineLength(char* str, i32 maxW) {
