@@ -16,6 +16,7 @@ class sample;
 #define ARMY_PATH_EXACT_TARGET_HEX 1
 #define ARMY_FACING_LEFT 0
 #define ARMY_FACING_RIGHT 1
+#define ARMY_HEX_INVALID (-1)
 
 #pragma pack(push, 1)
 class army {

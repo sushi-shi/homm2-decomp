@@ -353,7 +353,7 @@ void searchArray::SeedCombatPosition(class army* unit) {
         hex = enemy->m_hex;
 
         if (unit->m_monster.speed <= 0
-            || unit->GetAttackMask(unit->m_hex, ARMY_ATTACK_TARGET_ENEMY, -1)
+            || unit->GetAttackMask(unit->m_hex, ARMY_ATTACK_TARGET_ENEMY, ARMY_HEX_INVALID)
                 != ATTACK_MASK_SURROUNDED) {
             if (unit->ValidPath(hex, ARMY_PATH_EXACT_TARGET_HEX) == 1)
                 gpCombatManager->m_hexCells[hex].m_pathReachable = 1;
@@ -367,7 +367,9 @@ void searchArray::SeedCombatPosition(class army* unit) {
                 enemy->m_facing == 1 ? COMBAT_DIRECTION_NORTHEAST : COMBAT_DIRECTION_SOUTHWEST
             );
             if ((unit->m_monster.speed > 0
-                 && unit->GetAttackMask(unit->m_hex, ARMY_ATTACK_TARGET_ENEMY, -1)
+                 && unit->GetAttackMask(
+                        unit->m_hex, ARMY_ATTACK_TARGET_ENEMY, ARMY_HEX_INVALID
+                    )
                      == ATTACK_MASK_SURROUNDED)
                 || unit->ValidPath(hex, ARMY_PATH_EXACT_TARGET_HEX) == 1) {
                 gpCombatManager->m_hexCells[hex].m_pathReachable = 1;

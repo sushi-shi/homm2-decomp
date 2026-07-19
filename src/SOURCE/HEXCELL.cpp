@@ -55,7 +55,7 @@ void hexcell::DrawUpperDeadOccupant(void) {
 
 VA(0x0044a5aa, 0x165)
 void hexcell::DrawOccupant(i32 creature, i32 frame) {
-    if (m_occupantSide != -1) {
+    if (m_occupantSide != COMBAT_OCCUPANT_NONE) {
         if (creature != 100) {
             if (gpCombatManager->m_armies[m_occupantSide][m_occupantIndex].m_drawState != creature)
                 return;

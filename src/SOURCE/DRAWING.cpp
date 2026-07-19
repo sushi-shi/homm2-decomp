@@ -331,7 +331,8 @@ void combatManager::SetupGridForArmy(army* armyPtr) {
     if (gConfig.combatShadeLevel < 1)
         return;
 
-    attackMask = armyPtr->GetAttackMask(armyPtr->m_hex, ARMY_ATTACK_TARGET_OCCUPIED, -1);
+    attackMask =
+        armyPtr->GetAttackMask(armyPtr->m_hex, ARMY_ATTACK_TARGET_OCCUPIED, ARMY_HEX_INVALID);
     memset(m_gridState, IDX(GRID_SHADE_NONE), sizeof(m_gridState));
     savedTargetSide = armyPtr->m_targetSide;
     targetIndexSave = armyPtr->m_targetIndex;
@@ -345,13 +346,13 @@ void combatManager::SetupGridForArmy(army* armyPtr) {
         if (armyPtr->m_hex == hexIndex) {
             m_gridState[hexIndex] = IDX(GRID_SHADE_REACHABLE);
         } else if (m_hexCells[hexIndex].m_pathReachable != 0) {
-            if (m_hexCells[hexIndex].m_occupantSide != -1) {
+            if (m_hexCells[hexIndex].m_occupantSide != COMBAT_OCCUPANT_NONE) {
                 if (m_hexCells[hexIndex].m_occupantSide != armyPtr->m_side)
                     m_gridState[hexIndex] = IDX(GRID_SHADE_REACHABLE);
             } else {
                 m_gridState[hexIndex] = IDX(GRID_SHADE_EMPTY_BLOCKED);
             }
-        } else if (m_hexCells[hexIndex].m_occupantSide != -1
+        } else if (m_hexCells[hexIndex].m_occupantSide != COMBAT_OCCUPANT_NONE
                    && m_hexCells[hexIndex].m_occupantSide != 1 - m_currentSide
                    && (attackMask & (1 << m_hexCells[hexIndex].m_occupantIndex)) != 0) {
             m_gridState[hexIndex] = IDX(GRID_SHADE_REACHABLE);
@@ -1247,7 +1248,7 @@ void combatManager::DrawFrame(
                 goto endRow;
             }
         } else {
-            if (m_hexCells[moatCell[row]].m_occupantSide == -1)
+            if (m_hexCells[moatCell[row]].m_occupantSide == COMBAT_OCCUPANT_NONE)
                 goto endRow;
         drawMoat:
             m_combatIcons[IDX(COMBAT_ICON_MOAT)]
