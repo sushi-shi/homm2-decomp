@@ -63,6 +63,10 @@ H2_ENUM_BEGIN(TownConstant)
     TOWN_DISPOSE_FULL                  = 2
 H2_ENUM_END(TownConstant)
 
+#define TOWN_SPELL_COUNT_OVERLAY_OFFSET 19
+#define TOWN_SPELL_COUNT_OVERLAY_SIZE 6
+#define TOWN_NAME_CAPACITY 13
+
 #pragma pack(push, 1)
 class town {
 public:
@@ -89,12 +93,12 @@ public:
         i8 m_spells[TOWN_MAGE_GUILD_LEVEL_COUNT][TOWN_MAGE_GUILD_SPELLS_PER_LEVEL];
         i8 m_spellSlots[TOWN_MAGE_GUILD_LEVEL_COUNT * TOWN_MAGE_GUILD_SPELLS_PER_LEVEL];
         struct {
-            char m_spellPad[19];
-            i8 m_spellCounts[6];
+            char m_spellPad[TOWN_SPELL_COUNT_OVERLAY_OFFSET];
+            i8 m_spellCounts[TOWN_SPELL_COUNT_OVERLAY_SIZE];
         };
     };
     u16 m_turnsOwned;
-    char m_name[13];
+    char m_name[TOWN_NAME_CAPACITY];
     town(void);
     i32 HasGarrison(void);
     void GiveSpells(class hero*);
