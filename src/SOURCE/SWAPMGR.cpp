@@ -91,6 +91,36 @@ H2_ENUM_BEGIN(SwapManagerConstant)
     SPLIT_CONFIRM                = 0x7802
 H2_ENUM_END(SwapManagerConstant)
 
+inline i32 NormalizeControlRange(i32 control, i32 first, i32 last) {
+    return control > first && control < last ? first : control;
+}
+
+inline i32 NormalizeSwapControl(i32 control) {
+    control = NormalizeControlRange(control, CONTROL_LEFT_SKILL_FIRST, CONTROL_LEFT_SKILL_LAST);
+    control = NormalizeControlRange(
+        control, CONTROL_LEFT_SKILL_LEVEL_FIRST, CONTROL_LEFT_SKILL_LEVEL_LAST
+    );
+    control = NormalizeControlRange(control, CONTROL_RIGHT_SKILL_FIRST, CONTROL_RIGHT_SKILL_LAST);
+    control = NormalizeControlRange(
+        control, CONTROL_RIGHT_SKILL_LEVEL_FIRST, CONTROL_RIGHT_SKILL_LEVEL_LAST
+    );
+    control = NormalizeControlRange(
+        control, CONTROL_LEFT_ARTIFACT_FIRST, CONTROL_LEFT_ARTIFACT_LAST
+    );
+    control = NormalizeControlRange(
+        control, CONTROL_RIGHT_ARTIFACT_FIRST, CONTROL_RIGHT_ARTIFACT_LAST
+    );
+    control = NormalizeControlRange(control, CONTROL_LEFT_ARMY_FIRST, CONTROL_LEFT_ARMY_LAST);
+    return NormalizeControlRange(control, CONTROL_RIGHT_ARMY_FIRST, CONTROL_RIGHT_ARMY_LAST);
+}
+
+inline void BroadcastAdventureControls(tag_message& message) {
+    for (i32 control = ADVENTURE_WIDGET_FIRST; control <= ADVENTURE_WIDGET_LAST; ++control) {
+        message.payload.widget.id = control;
+        gpAdvManager->m_adventureWindow->BroadcastMessage(message);
+    }
+}
+
 VA(0x004543c0, 0x84)
 swapManager::swapManager(void) {
     m_window = NULL;
@@ -188,18 +218,7 @@ i32 swapManager::Open(i32 id) {
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
     message.payload.widget.data.value = ADVENTURE_DISABLE_VALUE;
-    message.payload.widget.id = ADVENTURE_WIDGET_FIRST;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.payload.widget.id = ADVENTURE_WIDGET_FIRST + 1;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.payload.widget.id = ADVENTURE_WIDGET_FIRST + 2;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.payload.widget.id = ADVENTURE_WIDGET_FIRST + 3;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.payload.widget.id = ADVENTURE_WIDGET_FIRST + 4;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.payload.widget.id = ADVENTURE_WIDGET_LAST;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
+    BroadcastAdventureControls(message);
 
     Update();
     gpWindowManager->AddWindow(m_window, -1, 1);
@@ -227,18 +246,7 @@ void swapManager::Close(void) {
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
     message.payload.widget.data.value = ADVENTURE_DISABLE_VALUE;
-    message.payload.widget.id = ADVENTURE_WIDGET_FIRST;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.payload.widget.id = ADVENTURE_WIDGET_FIRST + 1;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.payload.widget.id = ADVENTURE_WIDGET_FIRST + 2;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.payload.widget.id = ADVENTURE_WIDGET_FIRST + 3;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.payload.widget.id = ADVENTURE_WIDGET_FIRST + 4;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    message.payload.widget.id = ADVENTURE_WIDGET_LAST;
-    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
+    BroadcastAdventureControls(message);
 }
 
 VA(0x004549eb, 0x1f8)
@@ -341,14 +349,8 @@ i32 swapManager::Main(tag_message& message) {
 
                 case IDX(COMMAND_HOVER):
                 case IDX(COMMAND_HELP):
-                    switch (message.payload.widget.id) {
+                    switch (NormalizeSwapControl(message.payload.widget.id)) {
                         case CONTROL_LEFT_SKILL_FIRST:
-                        case CONTROL_LEFT_SKILL_FIRST + 1:
-                        case CONTROL_LEFT_SKILL_FIRST + 2:
-                        case CONTROL_LEFT_SKILL_FIRST + 3:
-                        case CONTROL_LEFT_SKILL_FIRST + 4:
-                        case CONTROL_LEFT_SKILL_FIRST + 5:
-                        case CONTROL_LEFT_SKILL_FIRST + 6:
                         case CONTROL_LEFT_SKILL_LAST:
                             side = SWAP_SIDE_LEFT;
                             slotIndex_8 = message.payload.widget.id - CONTROL_LEFT_SKILL_FIRST;
@@ -356,12 +358,6 @@ i32 swapManager::Main(tag_message& message) {
                             break;
 
                         case CONTROL_LEFT_SKILL_LEVEL_FIRST:
-                        case CONTROL_LEFT_SKILL_LEVEL_FIRST + 1:
-                        case CONTROL_LEFT_SKILL_LEVEL_FIRST + 2:
-                        case CONTROL_LEFT_SKILL_LEVEL_FIRST + 3:
-                        case CONTROL_LEFT_SKILL_LEVEL_FIRST + 4:
-                        case CONTROL_LEFT_SKILL_LEVEL_FIRST + 5:
-                        case CONTROL_LEFT_SKILL_LEVEL_FIRST + 6:
                         case CONTROL_LEFT_SKILL_LEVEL_LAST:
                             side = SWAP_SIDE_LEFT;
                             slotIndex_8 =
@@ -370,12 +366,6 @@ i32 swapManager::Main(tag_message& message) {
                             break;
 
                         case CONTROL_RIGHT_SKILL_FIRST:
-                        case CONTROL_RIGHT_SKILL_FIRST + 1:
-                        case CONTROL_RIGHT_SKILL_FIRST + 2:
-                        case CONTROL_RIGHT_SKILL_FIRST + 3:
-                        case CONTROL_RIGHT_SKILL_FIRST + 4:
-                        case CONTROL_RIGHT_SKILL_FIRST + 5:
-                        case CONTROL_RIGHT_SKILL_FIRST + 6:
                         case CONTROL_RIGHT_SKILL_LAST:
                             side = SWAP_SIDE_RIGHT;
                             slotIndex_8 =
@@ -384,12 +374,6 @@ i32 swapManager::Main(tag_message& message) {
                             break;
 
                         case CONTROL_RIGHT_SKILL_LEVEL_FIRST:
-                        case CONTROL_RIGHT_SKILL_LEVEL_FIRST + 1:
-                        case CONTROL_RIGHT_SKILL_LEVEL_FIRST + 2:
-                        case CONTROL_RIGHT_SKILL_LEVEL_FIRST + 3:
-                        case CONTROL_RIGHT_SKILL_LEVEL_FIRST + 4:
-                        case CONTROL_RIGHT_SKILL_LEVEL_FIRST + 5:
-                        case CONTROL_RIGHT_SKILL_LEVEL_FIRST + 6:
                         case CONTROL_RIGHT_SKILL_LEVEL_LAST:
                             side = SWAP_SIDE_RIGHT;
                             slotIndex_8 =
@@ -424,18 +408,6 @@ i32 swapManager::Main(tag_message& message) {
                             break;
 
                         case CONTROL_LEFT_ARTIFACT_FIRST:
-                        case CONTROL_LEFT_ARTIFACT_FIRST + 1:
-                        case CONTROL_LEFT_ARTIFACT_FIRST + 2:
-                        case CONTROL_LEFT_ARTIFACT_FIRST + 3:
-                        case CONTROL_LEFT_ARTIFACT_FIRST + 4:
-                        case CONTROL_LEFT_ARTIFACT_FIRST + 5:
-                        case CONTROL_LEFT_ARTIFACT_FIRST + 6:
-                        case CONTROL_LEFT_ARTIFACT_FIRST + 7:
-                        case CONTROL_LEFT_ARTIFACT_FIRST + 8:
-                        case CONTROL_LEFT_ARTIFACT_FIRST + 9:
-                        case CONTROL_LEFT_ARTIFACT_FIRST + 10:
-                        case CONTROL_LEFT_ARTIFACT_FIRST + 11:
-                        case CONTROL_LEFT_ARTIFACT_FIRST + 12:
                         case CONTROL_LEFT_ARTIFACT_LAST:
                             artifactSlot_2 =
                                 message.payload.widget.id - CONTROL_LEFT_ARTIFACT_FIRST;
@@ -499,18 +471,6 @@ i32 swapManager::Main(tag_message& message) {
                             break;
 
                         case CONTROL_RIGHT_ARTIFACT_FIRST:
-                        case CONTROL_RIGHT_ARTIFACT_FIRST + 1:
-                        case CONTROL_RIGHT_ARTIFACT_FIRST + 2:
-                        case CONTROL_RIGHT_ARTIFACT_FIRST + 3:
-                        case CONTROL_RIGHT_ARTIFACT_FIRST + 4:
-                        case CONTROL_RIGHT_ARTIFACT_FIRST + 5:
-                        case CONTROL_RIGHT_ARTIFACT_FIRST + 6:
-                        case CONTROL_RIGHT_ARTIFACT_FIRST + 7:
-                        case CONTROL_RIGHT_ARTIFACT_FIRST + 8:
-                        case CONTROL_RIGHT_ARTIFACT_FIRST + 9:
-                        case CONTROL_RIGHT_ARTIFACT_FIRST + 10:
-                        case CONTROL_RIGHT_ARTIFACT_FIRST + 11:
-                        case CONTROL_RIGHT_ARTIFACT_FIRST + 12:
                         case CONTROL_RIGHT_ARTIFACT_LAST:
                             artifactSlot_2 =
                                 message.payload.widget.id - CONTROL_RIGHT_ARTIFACT_FIRST;
@@ -574,9 +534,6 @@ i32 swapManager::Main(tag_message& message) {
                             break;
 
                         case CONTROL_LEFT_ARMY_FIRST:
-                        case CONTROL_LEFT_ARMY_FIRST + 1:
-                        case CONTROL_LEFT_ARMY_FIRST + 2:
-                        case CONTROL_LEFT_ARMY_FIRST + 3:
                         case CONTROL_LEFT_ARMY_LAST:
                             if (quickView) {
                                 if (m_heroes[IDX(SWAP_SIDE_LEFT)]->m_army.m_creatureTypes
@@ -643,9 +600,6 @@ i32 swapManager::Main(tag_message& message) {
                             break;
 
                         case CONTROL_RIGHT_ARMY_FIRST:
-                        case CONTROL_RIGHT_ARMY_FIRST + 1:
-                        case CONTROL_RIGHT_ARMY_FIRST + 2:
-                        case CONTROL_RIGHT_ARMY_FIRST + 3:
                         case CONTROL_RIGHT_ARMY_LAST:
                             if (quickView) {
                                 if (m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_army.m_creatureTypes
