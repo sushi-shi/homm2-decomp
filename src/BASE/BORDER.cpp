@@ -8,6 +8,7 @@
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
 #include <SOURCE/KB.h>
+
 VA(0x004d20a0, 0x32)
 border::border(void) : widget(0, 0, 0, 0, 0, 0) {
     m_backgroundBitmap = NULL;
@@ -35,6 +36,10 @@ border::~border() {
         gpResourceManager->Dispose(m_backgroundIcon);
 }
 
+// Scoped expansion constants avoid perturbing VC4.2 register allocation in Main.
+#define RESOURCE_NAME_CAPACITY 16
+#define COLOR_INDEX_MASK 0xff
+
 VA(0x004d21e0, 0x10e)
 void border::Read(void) {
     m_x = gpResourceManager->ReadWord();
@@ -46,23 +51,26 @@ void border::Read(void) {
     m_backgroundBitmap = NULL;
     m_backgroundIcon = NULL;
     m_kind = kind;
-    char name[16];
+    char resourceName[RESOURCE_NAME_CAPACITY];
     if (DecodeWidgetKind(kind) == WIDGET_KIND_BITMAP) {
-        gpResourceManager->Read13(reinterpret_cast<i8*>(name));
+        gpResourceManager->Read13(reinterpret_cast<i8*>(resourceName));
         gpResourceManager->SavePosition();
-        m_backgroundBitmap = gpResourceManager->GetBitmap(name);
+        m_backgroundBitmap = gpResourceManager->GetBitmap(resourceName);
         gpResourceManager->RestorePosition();
         return;
     }
     if (DecodeWidgetKind(kind) == WIDGET_KIND_ICON) {
-        gpResourceManager->Read13(reinterpret_cast<i8*>(name));
+        gpResourceManager->Read13(reinterpret_cast<i8*>(resourceName));
         gpResourceManager->SavePosition();
-        m_backgroundIcon = gpResourceManager->GetIcon(name);
+        m_backgroundIcon = gpResourceManager->GetIcon(resourceName);
         gpResourceManager->RestorePosition();
         return;
     }
-    m_fillColor = gpResourceManager->ReadWord() & 0xFF;
+    m_fillColor = gpResourceManager->ReadWord() & COLOR_INDEX_MASK;
 }
+
+#undef RESOURCE_NAME_CAPACITY
+#undef COLOR_INDEX_MASK
 
 // @semantic: differs only at +0x78 and +0x7b, where the equivalent signed comparison uses the opposite CMP/branch orientation.
 VA(0x004d22f0, 0x181)
@@ -71,7 +79,7 @@ i32 border::Main(struct tag_message& msg) {
     if ((flags & WIDGET_FLAG_ENABLED) == 0) {
         if (msg.type == MESSAGE_WIDGET)
             return widget::Main(msg);
-        return 0;
+        return WIDGET_DISPATCH_CONTINUE;
     }
     i32 type = msg.type;
     switch (type) {
@@ -103,9 +111,9 @@ hoverEvent: {
         }
         msg.type = MESSAGE_WIDGET;
         msg.payload.widget.id = m_id;
-        return 2;
+        return WIDGET_DISPATCH_FORWARD;
     }
-    return 0;
+    return WIDGET_DISPATCH_CONTINUE;
 }
 
 leaveEvent:
@@ -114,9 +122,9 @@ leaveEvent:
         msg.type = MESSAGE_WIDGET;
         msg.payload.widget.command = WIDGET_COMMAND_DESELECT;
         msg.payload.widget.id = m_id;
-        return 2;
+        return WIDGET_DISPATCH_FORWARD;
     }
-    return 0;
+    return WIDGET_DISPATCH_CONTINUE;
 }
 
 VA(0x004d2480, 0xab)
