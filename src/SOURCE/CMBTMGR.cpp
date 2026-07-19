@@ -166,12 +166,6 @@ H2_ENUM_BEGIN(CombatCastleInteriorRange)
     CASTLE_INTERIOR_ROW_8_LAST  = 112
 H2_ENUM_END(CombatCastleInteriorRange)
 
-H2_ENUM_CLASS_BEGIN(CombatTowerSelector)
-    TOWER_SELECTOR_GARRISON = 0,
-    TOWER_SELECTOR_TOP      = 1,
-    TOWER_SELECTOR_BOTTOM   = 2
-H2_ENUM_CLASS_END(CombatTowerSelector)
-
 H2_ENUM_CLASS_BEGIN(CombatCatapultDamage)
     CATAPULT_DAMAGE_NONE   = 0,
     CATAPULT_DAMAGE_NORMAL = 1,
@@ -1644,12 +1638,12 @@ VA(0x0049412d, 0x74f)
 void combatManager::KeepAttack(i32 tower) {
     if (!m_inCastleCombat)
         return;
-    if ((tower == IDX(TOWER_SELECTOR_GARRISON)
+    if ((tower == IDX(COMBAT_TOWER_GARRISON)
          && m_wallStates[IDX(COMBAT_WALL_SLOT_KEEP)] != IDX(COMBAT_WALL_STATE_KEEP_STANDING))
-        || (tower == IDX(TOWER_SELECTOR_TOP)
+        || (tower == IDX(COMBAT_TOWER_TOP)
             && m_wallStates[IDX(COMBAT_WALL_SLOT_TOP_TOWER)]
                    != IDX(COMBAT_WALL_STATE_TOWER_STANDING))
-        || (tower == IDX(TOWER_SELECTOR_BOTTOM)
+        || (tower == IDX(COMBAT_TOWER_BOTTOM)
             && m_wallStates[IDX(COMBAT_WALL_SLOT_BOTTOM_TOWER)]
                    != IDX(COMBAT_WALL_STATE_TOWER_STANDING)))
         return;
@@ -1740,7 +1734,7 @@ void combatManager::KeepAttack(i32 tower) {
         attackBonus4 = COMBAT_KEEP_ATTACK_STAT_LIMIT;
     if (attackBonus4 < -COMBAT_KEEP_ATTACK_STAT_LIMIT)
         attackBonus4 = -COMBAT_KEEP_ATTACK_STAT_LIMIT;
-    if (tower != IDX(TOWER_SELECTOR_GARRISON))
+    if (tower != IDX(COMBAT_TOWER_GARRISON))
         shotCount28 /= COMBAT_KEEP_SIDE_TOWER_SHOT_DIVISOR;
 
     i32 damage8 = 0;
@@ -1762,7 +1756,7 @@ void combatManager::KeepAttack(i32 tower) {
         sprintf(
             gText,
             "%s %d %s.\n%d %s %s.",
-            tower == IDX(TOWER_SELECTOR_GARRISON) ? "Garrison does" : "Tower does",
+            tower == IDX(COMBAT_TOWER_GARRISON) ? "Garrison does" : "Tower does",
             damage8,
             "damage",
             killed29,
@@ -1773,7 +1767,7 @@ void combatManager::KeepAttack(i32 tower) {
         sprintf(
             gText,
             "%s %d %s.",
-            tower == IDX(TOWER_SELECTOR_GARRISON) ? "Garrison does" : "Tower does",
+            tower == IDX(COMBAT_TOWER_GARRISON) ? "Garrison does" : "Tower does",
             damage8,
             "damage"
         );
