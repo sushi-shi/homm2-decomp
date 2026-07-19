@@ -28,7 +28,7 @@ include/BASE/Misc.h	pending
 include/BASE/MiscGraphicsConstants.h	pending
 include/BASE/Ripple.h	pending
 include/BASE/SAMPLE_TYPES.h	reviewed	The source slots are symbolic; the sole literal is packed-layout SIZE evidence.
-include/BASE/TEXTWDGT_TYPES.h	pending
+include/BASE/TEXTWDGT_TYPES.h	reviewed	Named source-file slot extent and aggregate SIZE preserve the fixed packed storage layout.
 include/BASE/TILE.h	pending
 include/BASE/TILESET_TYPES.h	reviewed	Named source-file storage extents plus SIZE evidence.
 include/BASE/WINMGR.h	pending
@@ -64,7 +64,7 @@ include/BASE/sampleData.h	reviewed	The record fields are named; the sole literal
 include/BASE/soundManager.h	pending
 include/BASE/soundmgr.h	pending
 include/BASE/textEntryWidget.h	pending
-include/BASE/textWidget.h	pending
+include/BASE/textWidget.h	reviewed	Public class interface contains only packed-layout SIZE evidence.
 include/BASE/tileset.h	reviewed	Only packed-layout SIZE evidence.
 include/BASE/widget.h	reviewed	Public widget flags, command argument, and dispatch ABI values are named; packed SIZE and pure-virtual zeros are layout/language evidence.
 include/BASE/widgetKind.h	reviewed	Open serialized widget-kind domain is public and explicitly valued; conversion helpers preserve the packed i16 field.
@@ -163,7 +163,7 @@ src/BASE/RESMGR.cpp	pending
 src/BASE/RESOURCE.cpp	reviewed	Zero initializes the scalar resource id and reference count; pointer uses NULL.
 src/BASE/Ripple.cpp	pending
 src/BASE/SAMPLE.cpp	reviewed	Private format, playback-rate, filename-capacity, and suffix-length domains are named; remaining allocation operands preserve retail source-line evidence. Text/data bytes and relocation topology are unchanged.
-src/BASE/TEXTWDGT.cpp	pending
+src/BASE/TEXTWDGT.cpp	reviewed	Private resource-name capacity, draw-mode mask, buffer growth, shared font modes/alignment, and dispatch results are named. Strict builds use a private enum while production uses expansion constants; repeated message setup preserves the original statement stream. Remaining numeric allocation/free operands are retail source-line evidence, and other zeros/ones are initialization or booleans. Non-debug sections and relocations are A/B exact.
 src/BASE/TILE.cpp	pending
 src/BASE/TILESET.cpp	reviewed	Allocation/free operands 18 and 0x1c preserve retail source-line evidence; other values are named or annotations.
 src/BASE/Textntry.cpp	pending
