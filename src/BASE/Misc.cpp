@@ -12,9 +12,32 @@
 #include <BASE/Misc.h>
 #include <BASE/MISC_TYPES.h>
 H2_ENUM_BEGIN(DataEntryLayout)
-    ENTRY_WINDOW_X           = 0xb1,
-    ENTRY_WINDOW_Y           = 0x14,
-    ENTRY_INPUT_BOX_Y_OFFSET = 0x17
+    WINDOW_X                    = 0xb1,
+    WINDOW_Y                    = 0x14,
+    INPUT_BOX_Y_OFFSET          = 0x17,
+    PROMPT_WIDTH                = 240,
+    PROMPT_LINE_HEIGHT          = 16,
+    CANCEL_PROMPT_HEIGHT        = 39,
+    ROW_ROUNDING_BIAS           = 15,
+    ROW_HEIGHT                  = 45,
+    MAX_ROW_COUNT               = 6,
+    CANCEL_Y_OFFSET             = 30,
+    ENTRY_BASE_Y                = 95,
+    WINDOW_NAME_CAPACITY        = 16,
+    TEXT_BUFFER_CAPACITY        = 100,
+    TEXT_FIELD_X                = 35,
+    TEXT_FIELD_WIDTH            = 251,
+    TEXT_FIELD_HEIGHT           = 20,
+    TEXT_FIELD_COLOR            = 0,
+    TEXT_FIELD_ICON_FRAME       = 3,
+    TEXT_FIELD_KIND             = 0,
+    TEXT_FIELD_LAYOUT           = 4,
+    TEXT_FIELD_HORIZONTAL_INSET = 10,
+    TEXT_FIELD_VERTICAL_INSET   = 3,
+    INPUT_BOX_X                 = 213,
+    REDRAW_OFFSET               = 10,
+    DRAW_MODE                   = 1,
+    WIDGET_Z_ORDER              = -1
 H2_ENUM_END(DataEntryLayout)
 
 H2_ENUM_CLASS_BEGIN(DataEntryPhase)
@@ -2311,17 +2334,17 @@ void GetDataEntry(
     iDEMaxLen = maximumLength;
     strcpy(destination, gMiscText.dataEntry.destinationDefault.text);
 
-    i32 rows = bigFont->LineLength(prompt, 240) * 16;
+    i32 rows = bigFont->LineLength(prompt, PROMPT_WIDTH) * PROMPT_LINE_HEIGHT;
     if (showCancel != 0)
-        rows += 39;
-    rows = (rows + 15) / 45;
-    if (rows > 6)
-        rows = 6;
-    i32 entryY = rows * 45 - (showCancel != 0 ? 30 : 0) + 95;
+        rows += CANCEL_PROMPT_HEIGHT;
+    rows = (rows + ROW_ROUNDING_BIAS) / ROW_HEIGHT;
+    if (rows > MAX_ROW_COUNT)
+        rows = MAX_ROW_COUNT;
+    i32 entryY = rows * ROW_HEIGHT - (showCancel != 0 ? CANCEL_Y_OFFSET : 0) + ENTRY_BASE_Y;
 
-    char windowName[16];
+    char windowName[WINDOW_NAME_CAPACITY];
     sprintf(windowName, gMiscText.dataEntry.windowFilenameFormat.text, rows);
-    DataEntryWin = new heroWindow(ENTRY_WINDOW_X, ENTRY_WINDOW_Y, windowName);
+    DataEntryWin = new heroWindow(WINDOW_X, WINDOW_Y, windowName);
     if (DataEntryWin == NULL)
         MemError();
 
@@ -2332,7 +2355,7 @@ void GetDataEntry(
     message.payload.widget.data.text = prompt;
     DataEntryWin->BroadcastMessage(message);
 
-    char entryText[100];
+    char entryText[TEXT_BUFFER_CAPACITY];
     if (initialText == NULL)
         initialText = gMiscText.dataEntry.initialTextDefault.text;
     strcpy(entryText, initialText);
@@ -2360,27 +2383,27 @@ void GetDataEntry(
     }
 
     textEntryWidget* entry = new textEntryWidget(
-        35,
+        TEXT_FIELD_X,
         static_cast<i16>(entryY),
-        251,
-        20,
+        TEXT_FIELD_WIDTH,
+        TEXT_FIELD_HEIGHT,
         static_cast<i16>(maximumLength),
         destination,
         gMiscText.dataEntry.fontFilename.text,
-        0,
+        TEXT_FIELD_COLOR,
         gMiscText.dataEntry.iconFilename.text,
-        3,
-        10,
-        0,
-        4,
-        10,
-        3
+        TEXT_FIELD_ICON_FRAME,
+        ENTRY_TEXT_WIDGET,
+        TEXT_FIELD_KIND,
+        TEXT_FIELD_LAYOUT,
+        TEXT_FIELD_HORIZONTAL_INSET,
+        TEXT_FIELD_VERTICAL_INSET
     );
     if (entry == NULL)
         MemError();
-    inBoxY = entryY + ENTRY_INPUT_BOX_Y_OFFSET;
-    inBoxX = 213;
-    DataEntryWin->AddWidget(entry, -1);
+    inBoxY = entryY + INPUT_BOX_Y_OFFSET;
+    inBoxX = INPUT_BOX_X;
+    DataEntryWin->AddWidget(entry, WIDGET_Z_ORDER);
 
     if (useImmediateHandler != 0) {
         bDataEntryTime = IDX(ENTRY_PHASE_IMMEDIATE);
@@ -2437,7 +2460,7 @@ i32 DataEntryWindowHandler(struct tag_message& message) {
         message.payload.widget.id = ENTRY_TEXT_WIDGET;
         message.payload.widget.data.text = cDEDest;
         DataEntryWin->BroadcastMessage(message);
-        DataEntryWin->DrawWindow(1, 10, 10);
+        DataEntryWin->DrawWindow(DRAW_MODE, REDRAW_OFFSET, REDRAW_OFFSET);
         if (gbTextEntryEscaped == 0) {
             gpWindowManager->m_dialogResult = message.payload.widget.id;
             message.payload.widget.id = ENTRY_TEXT_WIDGET;
