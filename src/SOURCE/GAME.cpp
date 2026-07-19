@@ -1321,11 +1321,12 @@ void game::NewMap(char* filename) {
     for (player2 = m_playerCount; player2 < GAME_PLAYER_COUNT; player2++)
         m_playerDead[player2] = 1;
 
-    if (m_mapHeader.victoryCondition == 4 || m_mapHeader.victoryCondition == 2) {
+    if (m_mapHeader.victoryCondition == MAP_VICTORY_DEFEAT_SIDE
+        || m_mapHeader.victoryCondition == MAP_VICTORY_DEFEAT_HERO) {
         m_mapHeader.computerAlsoWins = 1;
         m_mapHeader.allowNormalVictory = 0;
     }
-    if (m_mapHeader.victoryCondition == 4) {
+    if (m_mapHeader.victoryCondition == MAP_VICTORY_DEFEAT_SIDE) {
         townIndex9 = 0;
         for (player2 = 0; player2 < GAME_PLAYER_COUNT; player2++) {
             if (m_mapHeader.playerEnabled[player2] != 0)
@@ -1336,7 +1337,7 @@ void game::NewMap(char* filename) {
             }
         }
     }
-    if (m_mapHeader.victoryCondition == 3)
+    if (m_mapHeader.victoryCondition == MAP_VICTORY_FIND_ARTIFACT)
         m_mapHeader.computerAlsoWins = 1;
 
     for (player2 = 0; player2 < m_playerCount; player2++) {
@@ -1535,7 +1536,7 @@ void game::NewMap(char* filename) {
         }
     }
     SetupAdjacentMons();
-    if (m_mapHeader.lossCondition == 2) {
+    if (m_mapHeader.lossCondition == MAP_LOSS_HERO) {
         ultimateDistance5 = m_mapHeader.lossConditionValue;
         ultimateTries4 = m_mapHeader.lossTownY;
         m_mapHeader.lossConditionValue = 0;
@@ -1549,10 +1550,10 @@ void game::NewMap(char* filename) {
                 m_mapHeader.lossConditionValue =
                     m_worldMap.GetCell(ultimateDistance5, ultimateTries4 - 1)->m_objectMetadata;
             else
-                m_mapHeader.lossCondition = 0;
+                m_mapHeader.lossCondition = MAP_LOSS_STANDARD;
         }
     }
-    if (m_mapHeader.victoryCondition == 2) {
+    if (m_mapHeader.victoryCondition == MAP_VICTORY_DEFEAT_HERO) {
         ultimateDistance5 = m_mapHeader.victoryConditionValue;
         ultimateTries4 = m_mapHeader.victoryTownY;
         m_mapHeader.victoryConditionValue = 0;
@@ -1566,7 +1567,7 @@ void game::NewMap(char* filename) {
                 m_mapHeader.victoryConditionValue =
                     m_worldMap.GetCell(ultimateDistance5, ultimateTries4 - 1)->m_objectMetadata;
             else
-                m_mapHeader.victoryCondition = 0;
+                m_mapHeader.victoryCondition = MAP_VICTORY_DEFEAT_ALL;
         }
     }
     for (player2 = 0; player2 < m_playerCount; player2++) {
@@ -4304,7 +4305,7 @@ i32 game::GetRandomArtifactId(i32 levelMask, i32 allowCursed) {
                 < ARTIFACT_CURSED_REJECT_CHANCE)
                 continue;
         }
-        if (m_mapHeader.victoryCondition != IDX(MAP_VICTORY_FIND_ARTIFACT)
+        if (m_mapHeader.victoryCondition != MAP_VICTORY_FIND_ARTIFACT
             || m_mapHeader.victoryConditionValue - ARTIFACT_ID_OFFSET != artifact)
             break;
     }
