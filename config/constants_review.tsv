@@ -188,7 +188,7 @@ src/SOURCE/COMMAND.cpp	pending
 src/SOURCE/CURSOR.cpp	reviewed	Private constants name cursor-cycle, animation, direction, turn-frame, full-tile, and retained source-line addends; persisted walk-speed values use the shared config domain, movement tables retain literal data payloads with named public extents, and the group-change allocator restores its retail data relocations.
 src/SOURCE/Campaign.cpp	pending
 src/SOURCE/Castle.cpp	pending
-src/SOURCE/DRAWING.cpp	pending
+src/SOURCE/DRAWING.cpp	reviewed	Private drawing geometry, wall-coordinate, tower-frame, drawbridge-clip, spell-axis, and small-view stat-row domains are named; shared wall slots/states, faction count, font alignment, and combat dimensions replace raw policy values. Remaining findings are the retail castle wall-coordinate and frame-offset local table payloads.
 src/SOURCE/EVENTS.cpp	pending
 src/SOURCE/FINDPATH.cpp	reviewed	Shared queue, direction, moat, and combat-hex extents replace raw bounds; private source-line, distance, drawbridge, and moat-cost constants are named, and repeated grid-distance arithmetic uses an inline helper.
 src/SOURCE/FLY.cpp	reviewed	Private flight direction, mask, and timing constants are aligned enums; the attack buffer uses the shared army API extent, and repeated branchless facing arithmetic uses inline direction/rear-offset helpers. Remaining zeros and ones are coordinates, booleans, frame and loop initialization, bounds, and occupant sentinels.
