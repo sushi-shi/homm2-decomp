@@ -106,7 +106,6 @@ H2_ENUM_BEGIN(ProjectileConstant)
     LICH_MISSILE_HALF_HEIGHT         = 10,
     MAGE_BOLT_START_WIDTH            = 5,
     MAGE_BOLT_END_WIDTH              = 4,
-    MAGE_BOLT_COLOR_MODE             = 302,
     MAGE_BOLT_ANGLE_DISTANCE_DIVISOR = 15,
     MAGE_BOLT_ANGLE_DISTANCE_BASE    = 15,
     MAGE_BOLT_FRAME_DELAY            = 10,
@@ -483,15 +482,15 @@ void army::DrawToBuffer(i32 x, i32 y, i32 effectsOnly) {
         badEffects0 = 0;
         for (effect6 = 0; effect6 < ARMY_SPELL_INFLUENCE_COUNT; effect6++) {
             if (m_spellInfluence[effect6]) {
-                switch (effect6) {
-                    case IDX(ARMY_SPELL_INFLUENCE_HASTE):
-                    case IDX(ARMY_SPELL_INFLUENCE_BLESS):
-                    case IDX(ARMY_SPELL_INFLUENCE_DRAGON_SLAYER):
-                    case IDX(ARMY_SPELL_INFLUENCE_BLOODLUST):
-                    case IDX(ARMY_SPELL_INFLUENCE_SHIELD):
-                    case IDX(ARMY_SPELL_INFLUENCE_ANTI_MAGIC):
-                    case IDX(ARMY_SPELL_INFLUENCE_STONESKIN):
-                    case IDX(ARMY_SPELL_INFLUENCE_STEELSKIN):
+                switch (static_cast<ArmySpellInfluence>(effect6)) {
+                    case ARMY_SPELL_INFLUENCE_HASTE:
+                    case ARMY_SPELL_INFLUENCE_BLESS:
+                    case ARMY_SPELL_INFLUENCE_DRAGON_SLAYER:
+                    case ARMY_SPELL_INFLUENCE_BLOODLUST:
+                    case ARMY_SPELL_INFLUENCE_SHIELD:
+                    case ARMY_SPELL_INFLUENCE_ANTI_MAGIC:
+                    case ARMY_SPELL_INFLUENCE_STONESKIN:
+                    case ARMY_SPELL_INFLUENCE_STEELSKIN:
                         goodEffects0++;
                         break;
                     default:
@@ -1082,7 +1081,7 @@ void army::SpecialAttack(void) {
             0,
             MAGE_BOLT_START_WIDTH,
             MAGE_BOLT_END_WIDTH,
-            MAGE_BOLT_COLOR_MODE,
+            BOLT_COLOR_RED_BEAM,
             0,
             0,
             distance_6 / MAGE_BOLT_ANGLE_DISTANCE_DIVISOR + MAGE_BOLT_ANGLE_DISTANCE_BASE,
