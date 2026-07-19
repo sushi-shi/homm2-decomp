@@ -21,8 +21,6 @@
 H2_ENUM_BEGIN(RecruitConstant)
     RESOURCE_COUNT   = 6,
     GOLD_RESOURCE    = 6,
-    SOURCE_EVENT     = -1,
-    SOURCE_TOWN      = 0x23,
     WINDOW_X         = 0x8f,
     WINDOW_Y         = 0x10,
     QUICK_WINDOW_X   = 0xa0,
@@ -199,7 +197,7 @@ void recruitUnit::Close(void) {
         IDX(CLOSE_CONTROL),
         BROADCAST_FLAGS
     );
-    if (m_sourceType == SOURCE_TOWN && m_recruited != 0 && m_refreshTown != 0) {
+    if (m_sourceType == RECRUIT_SOURCE_TOWN && m_recruited != 0 && m_refreshTown != 0) {
         gpTownManager->ResetStrips();
         gpTownManager->m_bankBox->Update(1);
     }
@@ -342,11 +340,11 @@ i32 recruitUnit::Main(struct tag_message& message) {
 }
 
 VA(0x0048bd0b, 0xdf)
-recruitUnit::recruitUnit(class armyGroup* army, i32 creatureType, i16* available) {
+recruitUnit::recruitUnit(class armyGroup* army, CreatureType creatureType, i16* available) {
     i32 costs[RESOURCE_COUNT + 1];
     i32 resource;
 
-    m_sourceType = SOURCE_EVENT;
+    m_sourceType = RECRUIT_SOURCE_EVENT;
     m_refreshTown = 0;
     m_army = army;
     m_creatureType = creatureType;
@@ -372,7 +370,7 @@ recruitUnit::recruitUnit(class town* townData, i32 dwelling, i32 refreshTown) {
     i32 resource;
 
     m_refreshTown = refreshTown;
-    m_sourceType = SOURCE_TOWN;
+    m_sourceType = RECRUIT_SOURCE_TOWN;
     m_army = &townData->m_army;
     m_creatureType = gDwellingType[townData->m_type][dwelling];
     m_available = &townData->m_garrison[dwelling];

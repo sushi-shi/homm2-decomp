@@ -15,6 +15,34 @@ H2_ENUM_CLASS_BEGIN(ExpansionCampaignId)
     EXPANSION_CAMPAIGN_COUNT            = 4
 H2_ENUM_CLASS_END(ExpansionCampaignId)
 
+H2_ENUM_BEGIN(ExpansionCampaignMap)
+    MAP_NONE                  = -1,
+    MAP_POL_UPRISING          = 0,
+    MAP_POL_ISLAND_OF_CHAOS   = 1,
+    MAP_POL_ARROWS_FLIGHT     = 2,
+    MAP_POL_ABYSS             = 3,
+    MAP_POL_GIANTS_PASS       = 4,
+    MAP_POL_AURORA_BOREALIS   = 5,
+    MAP_POL_BETRAYALS_END     = 6,
+    MAP_POL_CORRUPTIONS_HEART = 7,
+    MAP_DES_CONQUER_AND_UNIFY = 0,
+    MAP_DES_BORDER_TOWNS      = 1,
+    MAP_DES_WAYWARD_SON       = 2,
+    MAP_DES_UNCLE_IVAN        = 3,
+    MAP_DES_SOUTHERN_WAR      = 4,
+    MAP_DES_IVORY_GATES       = 5,
+    MAP_DES_ELVEN_LANDS       = 6,
+    MAP_DES_EPIC_BATTLE       = 7,
+    MAP_WIZ_SHROUDED_ISLES    = 0,
+    MAP_WIZ_ETERNAL_SCROLLS   = 1,
+    MAP_WIZ_POWERS_END        = 2,
+    MAP_WIZ_FOUNT_OF_WIZARDRY = 3,
+    MAP_VOY_STRANDED          = 0,
+    MAP_VOY_PIRATE_ISLES      = 1,
+    MAP_VOY_KING_AND_COUNTRY  = 2,
+    MAP_VOY_BLOOD_IS_THICKER  = 3
+H2_ENUM_END(ExpansionCampaignMap)
+
 H2_ENUM_BEGIN(ExpansionCampaignConstant)
     EXPANSION_CAMPAIGN_MAX_MAP_COUNT            = 8,
     EXPANSION_CAMPAIGN_BONUS_CHOICE_COUNT       = 3,
@@ -44,8 +72,8 @@ H2_ENUM_END(ExpansionCampaignConstant)
 #pragma pack(push, 1)
 class ExpCampaign {
 public:
-    i32 m_campaignId;
-    i32 m_currentMap;
+    ExpansionCampaignId m_campaignId;
+    ExpansionCampaignMap m_currentMap;
     i32 m_mapCount;
     u8 m_mapChoices[EXPANSION_CAMPAIGN_MAX_MAP_COUNT];
     u8 m_mapsPlayed[EXPANSION_CAMPAIGN_MAX_MAP_COUNT];
@@ -53,7 +81,7 @@ public:
     u8 m_awards[EXPANSION_CAMPAIGN_AWARD_COUNT];
     u8 m_bonusChoices[EXPANSION_CAMPAIGN_MAX_MAP_COUNT];
     char m_pad_0x3f[EXPANSION_CAMPAIGN_RUNTIME_GAP_SIZE];
-    i32 m_viewMap;
+    ExpansionCampaignMap m_viewMap;
     class heroWindow* m_window;
     i32 m_viewOnly;
     char m_pad_0x4f;
@@ -67,7 +95,7 @@ public:
     void RemoveAward(i32);
     i8 HasAward(i32);
     void SetMapWasPlayed(void);
-    void InitNewCampaign(i32);
+    void InitNewCampaign(ExpansionCampaignId);
     void InitMap(void);
     void ShowInfo(i32, i32);
     void UpdateInfo(i32);

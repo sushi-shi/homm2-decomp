@@ -50,8 +50,8 @@ heroWindow::heroWindow(void) {
     m_posX = m_posY;
     m_winWidth = SCREEN_WIDTH;
     m_winHeight = SCREEN_HEIGHT;
-    m_winFlags = IDX(WINDOW_FLAG_FIXED_LAYER);
-    m_winState = 0;
+    m_winFlags = WINDOW_FLAG_FIXED_LAYER;
+    m_winState = WINDOW_STATE_CLOSED;
     m_widgetListHead = NULL;
     m_widgetListTail = m_widgetListHead;
     m_savedBackground = NULL;
@@ -67,8 +67,8 @@ heroWindow::heroWindow(i32 x, i32 y, i32 w, i32 h, i32 flags) {
     m_posY = y;
     m_winWidth = w;
     m_winHeight = h;
-    m_winFlags = flags;
-    m_winState = 0;
+    m_winFlags = static_cast<WindowFlag>(flags);
+    m_winState = WINDOW_STATE_CLOSED;
     m_widgetListHead = NULL;
     m_widgetListTail = m_widgetListHead;
     m_savedBackground = NULL;
@@ -94,14 +94,14 @@ heroWindow::heroWindow(i32 x, i32 y, char* resourceName) {
     m_savedBackground = NULL;
     m_prevWindow = NULL;
     m_nextWindow = m_prevWindow;
-    m_winState = 0;
+    m_winState = WINDOW_STATE_CLOSED;
     m_zOrder = -1;
     m_posX = x;
     m_posY = y;
     m_winWidth = gpResourceManager->ReadWord();
     m_winHeight = gpResourceManager->ReadWord();
-    m_winFlags = gpResourceManager->ReadWord();
-    m_winFlags |= WIDGET_FLAG_UPDATE;
+    m_winFlags = static_cast<WindowFlag>(gpResourceManager->ReadWord());
+    m_winFlags = static_cast<WindowFlag>(IDX(m_winFlags) | IDX(WIDGET_FLAG_UPDATE));
     m_widgetListHead = NULL;
     m_widgetListTail = m_widgetListHead;
     idx = 0;
@@ -181,13 +181,13 @@ heroWindow::heroWindow(i32 x, i32 y, char* resourceName) {
 
 VA(0x004cf200, 0x73)
 i32 heroWindow::Open(i32 x, i32 flags) {
-    if ((m_winState & IDX(WINDOW_STATE_OPEN)) != 0)
+    if (HAS(m_winState, WINDOW_STATE_OPEN) != 0)
         return OPEN_FAILURE;
-    if ((m_winFlags & IDX(WINDOW_FLAG_SAVE_BACKGROUND)) != 0 && SaveBackground() != 0)
+    if (HAS(m_winFlags, WINDOW_FLAG_SAVE_BACKGROUND) != 0 && SaveBackground() != 0)
         return OPEN_FAILURE;
     m_zOrder = x;
     DrawWindow(flags);
-    m_winState |= IDX(WINDOW_STATE_OPEN);
+    m_winState |= WINDOW_STATE_OPEN;
     return 0;
 }
 
@@ -199,7 +199,7 @@ void heroWindow::RemoveAndDeleteWidget(i32 id) {
         next = w->m_next;
         if (w->m_id == id) {
             RemoveWidget(w);
-            if ((m_winFlags & IDX(WINDOW_FLAG_OWNS_WIDGETS)) != 0)
+            if (HAS(m_winFlags, WINDOW_FLAG_OWNS_WIDGETS) != 0)
                 delete w;
         }
         w = next;
@@ -209,19 +209,19 @@ void heroWindow::RemoveAndDeleteWidget(i32 id) {
 VA(0x004cf310, 0xaa)
 void heroWindow::Close(void) {
     widget *w, *next;
-    if ((m_winFlags & IDX(WINDOW_FLAG_SAVE_BACKGROUND)) != 0
-        && (m_winState & IDX(WINDOW_STATE_OPEN)) != 0)
+    if (HAS(m_winFlags, WINDOW_FLAG_SAVE_BACKGROUND) != 0
+        && HAS(m_winState, WINDOW_STATE_OPEN) != 0)
         RestoreBackground();
     w = m_widgetListHead;
     while (w != NULL) {
         next = w->m_next;
         RemoveWidget(w);
-        if ((m_winFlags & IDX(WINDOW_FLAG_OWNS_WIDGETS)) != 0) {
+        if (HAS(m_winFlags, WINDOW_FLAG_OWNS_WIDGETS) != 0) {
             delete w;
         }
         w = next;
     }
-    m_winState = 0;
+    m_winState = WINDOW_STATE_CLOSED;
 }
 
 VA(0x004cf3c0, 0x13c)
@@ -332,7 +332,7 @@ void heroWindow::DrawWindow(i32 update, i32 firstId, i32 lastId) {
     }
     PollSound();
     if (update != 0
-        && (m_winFlags & IDX(WINDOW_UPDATE_SUPPRESS_MASK)) != IDX(WINDOW_FLAG_FIXED_LAYER)) {
+        && (m_winFlags & WINDOW_UPDATE_SUPPRESS_MASK) != WINDOW_FLAG_FIXED_LAYER) {
         gpWindowManager->UpdateScreenRegion(m_posX, m_posY, m_winWidth, m_winHeight);
         PollSound();
     }

@@ -164,6 +164,7 @@ H2_ENUM_BEGIN(BaseWidgetCommand)
 H2_ENUM_END(BaseWidgetCommand)
 
 H2_ENUM_BEGIN(MessageModifier)
+    MESSAGE_MODIFIER_NONE         = 0,
     MESSAGE_MODIFIER_RIGHT_SHIFT  = 1,
     MESSAGE_MODIFIER_LEFT_SHIFT   = 2,
     MESSAGE_MODIFIER_CONTROL      = 4,
@@ -173,6 +174,7 @@ H2_ENUM_BEGIN(MessageModifier)
     MESSAGE_MODIFIER_RIGHT_BUTTON = 0x200,
     MESSAGE_MODIFIER_BUTTON_MASK  = 0x300
 H2_ENUM_END(MessageModifier)
+H2_ENUM_FLAGS(MessageModifier)
 
 struct tag_messageKeyboardPayload {
     union {

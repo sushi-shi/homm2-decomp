@@ -11,11 +11,16 @@ class town;
 class heroWindow;
 struct tag_message;
 
+H2_ENUM_BEGIN(RecruitSourceType)
+    RECRUIT_SOURCE_EVENT = -1,
+    RECRUIT_SOURCE_TOWN  = 0x23
+H2_ENUM_END(RecruitSourceType)
+
 #pragma pack(push, 1)
 class recruitUnit : public baseManager {
 public:
-    i32 m_sourceType;
-    i32 m_creatureType;
+    RecruitSourceType m_sourceType;
+    CreatureType m_creatureType;
     char m_padding3e[4];
     i32 m_goldCost;
     ResourceType m_resourceType;
@@ -32,7 +37,7 @@ public:
     i32 m_goldTotal;
     i32 m_resourceTotal;
     i32 m_quantity;
-    recruitUnit(class armyGroup*, i32, i16*);
+    recruitUnit(class armyGroup*, CreatureType, i16*);
     recruitUnit(class town*, i32, i32);
     virtual i32 Open(i32) OVERRIDE;
     virtual void Close(void) OVERRIDE;

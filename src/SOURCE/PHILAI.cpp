@@ -88,12 +88,6 @@ H2_ENUM_BEGIN(AIShipwreckSurvivorConstant)
     SHIPWRECK_SURVIVOR_ARTIFACT_METADATA_OFFSET = 2
 H2_ENUM_END(AIShipwreckSurvivorConstant)
 
-H2_ENUM_CLASS_BEGIN(AIPurchaseType)
-    PURCHASE_BUILDING = 0,
-    PURCHASE_HERO     = 1,
-    PURCHASE_CREATURE = 2
-H2_ENUM_CLASS_END(AIPurchaseType)
-
 H2_ENUM_BEGIN(AIHeroInteractionConstant)
     HERO_INTERACTION_HERO_COUNT         = 2,
     HERO_INTERACTION_PRIMARY_STAT_COUNT = 4,
@@ -423,15 +417,15 @@ void philAI::CheckBuyStuff(void) {
         DoAllHeroInteractions();
         while (!done) {
             GetBestBHC(giCurPlayer, best);
-            if (best.type >= 0 && CanBuyBHC(best)) {
+            if (best.type != PURCHASE_NONE && CanBuyBHC(best)) {
                 switch (best.type) {
-                    case IDX(PURCHASE_BUILDING):
+                    case PURCHASE_BUILDING:
                         BuildBuilding(best.pTown, best.what);
                         break;
-                    case IDX(PURCHASE_HERO):
+                    case PURCHASE_HERO:
                         BuildHero(best.pTown, best.what);
                         break;
-                    case IDX(PURCHASE_CREATURE):
+                    case PURCHASE_CREATURE:
                         BuildCreature(best.pTown, best.what, best.num);
                         break;
                 }
@@ -1533,7 +1527,7 @@ void philAI::GetBestBHC(i32 player, BHC& best) {
     }
     LogInt(
         "BestBHC ",
-        best.type,
+        IDX(best.type),
         static_cast<i32>(bestValue * 100.0f),
         best.what,
         0,
@@ -1542,7 +1536,7 @@ void philAI::GetBestBHC(i32 player, BHC& best) {
         -999
     );
     if (bestValue < AI_MINIMUM_PURCHASE_VALUE)
-        best.type = -1;
+        best.type = PURCHASE_NONE;
 }
 
 VA(0x0043b748, 0x11d)
@@ -2332,7 +2326,7 @@ void philAI::GetBestBuilding(town* t, BHC& bhc, float& fOut) {
         }
     }
     bhc.pTown = t;
-    bhc.type = 0;
+    bhc.type = PURCHASE_BUILDING;
     bhc.what = jb;
     fOut = nb;
 }
@@ -2527,7 +2521,7 @@ void philAI::GetBestCreature(town* townPtr, BHC& best, float& bestValue) {
         }
     }
     best.pTown = townPtr;
-    best.type = IDX(PURCHASE_CREATURE);
+    best.type = PURCHASE_CREATURE;
     best.what = bestDwelling;
     best.num = purchaseCount;
     bestValue = bestRaw;
@@ -2663,7 +2657,7 @@ void philAI::GetBestHero(town* townPtr, BHC& best, float& bestValue) {
         }
     }
     best.pTown = townPtr;
-    best.type = IDX(PURCHASE_HERO);
+    best.type = PURCHASE_HERO;
     best.what = bestHeroIndex;
     bestValue = bestRawLocal;
     if (gpGame->m_worldMap.cells[gpGame->m_worldMap.width * townPtr->m_y + townPtr->m_x]
@@ -4509,16 +4503,16 @@ i32 philAI::CanBuyBHC(BHC& bhc) {
     i32 idx;
     i32 cost[7];
     switch (bhc.type) {
-        case 0:
+        case PURCHASE_BUILDING:
             if (CanBuy(bhc.pTown, BuildingSlotType(bhc.what)))
                 return 1;
             break;
-        case 1:
+        case PURCHASE_HERO:
             if (gpCurPlayer->m_resources[6] >= gHeroGoldCost && bhc.pTown->m_occupyingHeroId == -1
                 && bHeroBuiltThisTurn == 0)
                 return 1;
             break;
-        case 2:
+        case PURCHASE_CREATURE:
             jb = gDwellingType[bhc.pTown->m_type][bhc.what];
             if (bhc.pTown->m_garrison[bhc.what] < bhc.num)
                 return 0;

@@ -354,6 +354,22 @@ H2_ENUM_BEGIN(CombatResultConstant)
     COMBAT_RESULT_PENDING = 3
 H2_ENUM_END(CombatResultConstant)
 
+H2_ENUM_CLASS_BEGIN(BattlefieldFringeFrame)
+    FRINGE_NONE        = -1,
+    FRINGE_BEACH       = 2,
+    FRINGE_WASTELAND   = 3,
+    FRINGE_DESERT      = 4,
+    FRINGE_LAVA        = 5,
+    FRINGE_SNOW_TREES  = 6,
+    FRINGE_SNOW        = 7,
+    FRINGE_SWAMP       = 8,
+    FRINGE_DIRT        = 9,
+    FRINGE_DIRT_TREES  = 10,
+    FRINGE_GRASS       = 11,
+    FRINGE_GRASS_TREES = 12,
+    FRINGE_WATER       = 13
+H2_ENUM_CLASS_END(BattlefieldFringeFrame)
+
 H2_ENUM_CLASS_BEGIN(CombatTowerSelector)
     COMBAT_TOWER_GARRISON = 0,
     COMBAT_TOWER_TOP      = 1,
@@ -558,7 +574,7 @@ public:
     u8 m_gridState[COMBAT_HEX_COUNT];
     hexcell m_hexCells[COMBAT_HEX_COUNT];
     i32 m_terrainType;
-    i32 m_battlefieldFringe;
+    BattlefieldFringeFrame m_battlefieldFringe;
     class town* m_originalCombatTown;
     WindowColorCycleMode m_colorCycleType;
     char _pad_0x31ee[COMBAT_RUNTIME_ALIGNMENT_SIZE];
