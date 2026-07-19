@@ -1,11 +1,12 @@
-# Controlled MSVC 4.2 TU-state noise search
+# Archived controlled MSVC 4.2 TU-state noise search
 
 MSVC 4.2 can change a later function's allocation/evaluation choices after parsing an
 otherwise irrelevant earlier source surface. This makes a bounded TU-state probe useful
 after a function is semantically and structurally complete but remains at a compiler-shape
 wall. It does **not** make arbitrary dummy C++ declarations acceptable reconstructed source.
 
-Use `scripts/tu_state_noise.py` only in the last-mile phase, after the target's semantics,
+The retired implementation is preserved as `scripts/archive/tu_state_noise.py` for historical
+reproduction. It was used only after the target's semantics,
 types/layout, frame/slots, CFG, inline boundaries, and external relocations have been audited.
 Before starting, check the function's `@match-note` and target-specific matrix so an unchanged
 state tuple is not searched twice.

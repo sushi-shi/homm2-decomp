@@ -133,7 +133,7 @@ reference count do not prove a retail reload pattern.
 4. Repair real CFG, type, expression ownership, and lifetime structure. Rebuild and check the
    surrounding instructions—not just the new count.
 5. Reject dummy reads, `volatile` steering, aliases, inert expressions, and artificial calls.
-6. At 96-97% or better, use `scripts/match_variants.py` for audited exact-only last-mile variants.
+6. At a compiler-shape wall, record the current raw-byte and relocation evidence and continue.
 7. Retest on the combined root. If local structure is already correct, try only audited
    exact-preserving predecessor/header/TU-state variants.
 

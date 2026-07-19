@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate reviewable libclang source variants for batch_source_variants.py.
+"""Archived libclang source-variant generator.
 
 The generator never compiles or modifies the source file.  It locates one reconstructed
 function by its ``VA(...)`` marker, derives conservative AST mutations, combines only
