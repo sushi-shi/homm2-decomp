@@ -30,10 +30,10 @@ i32 army::FindPath(i32 sourceHex, i32 targetHex, i32, i32 ignoreSpeed, i32 pathM
     if (!pathResult && HAS(m_monster.attributes, MONSTER_ATTRIBUTE_WIDE)
         && pathMode == ARMY_PATH_ANY_TARGET_HEX) {
         switch (m_facing) {
-            case 0:
+            case ARMY_FACING_LEFT:
                 targetHex = GetAdjacentCellIndex(targetHex, COMBAT_DIRECTION_NORTHEAST);
                 break;
-            case 1:
+            case ARMY_FACING_RIGHT:
                 targetHex = GetAdjacentCellIndex(targetHex, COMBAT_DIRECTION_SOUTHWEST);
                 break;
         }
@@ -149,13 +149,13 @@ i32 army::ValidMove(i32 sourceHex, i32 direction) {
     if HAS(m_monster.attributes, MONSTER_ATTRIBUTE_WIDE) {
         rearHex = PATH_INVALID_HEX;
         switch (m_facing) {
-            case 0:
+            case ARMY_FACING_LEFT:
                 if (direction == COMBAT_DIRECTION_NORTHEAST)
                     return frontValid;
                 else
                     rearHex = GetAdjacentCellIndex(destinationHexNext, COMBAT_DIRECTION_SOUTHWEST);
                 break;
-            case 1:
+            case ARMY_FACING_RIGHT:
                 if (direction == COMBAT_DIRECTION_SOUTHWEST)
                     return frontValid;
                 else
@@ -211,21 +211,23 @@ i32 army::ValidAttack(
         if (direction == COMBAT_DIRECTION_WIDE_WEST) {
             *attackHex = GetAdjacentCellIndex(
                 sourceHex,
-                static_cast<u32>(m_facing) < 1 ? COMBAT_DIRECTION_WEST : COMBAT_DIRECTION_NORTHWEST
+                static_cast<u32>(m_facing) < ARMY_FACING_RIGHT ? COMBAT_DIRECTION_WEST
+                                                               : COMBAT_DIRECTION_NORTHWEST
             );
         } else if (direction == COMBAT_DIRECTION_WIDE_EAST) {
             *attackHex = GetAdjacentCellIndex(
                 sourceHex,
-                static_cast<u32>(m_facing) < 1 ? COMBAT_DIRECTION_SOUTHEAST : COMBAT_DIRECTION_EAST
+                static_cast<u32>(m_facing) < ARMY_FACING_RIGHT ? COMBAT_DIRECTION_SOUTHEAST
+                                                               : COMBAT_DIRECTION_EAST
             );
         } else {
             switch (m_facing) {
-                case 0:
+                case ARMY_FACING_LEFT:
                     if (direction >= COMBAT_DIRECTION_SOUTHEAST)
                         adjacentSourceHex =
                             GetAdjacentCellIndex(sourceHex, COMBAT_DIRECTION_SOUTHWEST);
                     break;
-                case 1:
+                case ARMY_FACING_RIGHT:
                     if (direction <= COMBAT_DIRECTION_EAST)
                         adjacentSourceHex =
                             GetAdjacentCellIndex(sourceHex, COMBAT_DIRECTION_NORTHEAST);
@@ -271,12 +273,12 @@ i32 army::GetAdjacentCellIndex(i32 sourceHex, i32 direction) {
         return PATH_INVALID_HEX;
 
     if (direction == COMBAT_DIRECTION_WIDE_WEST) {
-        if (m_facing == 1)
+        if (m_facing == ARMY_FACING_RIGHT)
             direction = COMBAT_DIRECTION_WEST;
         else
             direction = COMBAT_DIRECTION_NORTHWEST;
     } else if (direction == COMBAT_DIRECTION_WIDE_EAST) {
-        if (m_facing == 1)
+        if (m_facing == ARMY_FACING_RIGHT)
             direction = COMBAT_DIRECTION_SOUTHEAST;
         else
             direction = COMBAT_DIRECTION_EAST;
@@ -317,7 +319,7 @@ i32 army::ValidRange(i32 targetHex) {
             return 1;
     } else {
         switch (m_facing) {
-            case 1:
+            case ARMY_FACING_RIGHT:
                 directionResult =
                     GetBestDirection(m_hex, targetHex, PATH_SPECIAL_DIRECTION_MASK);
                 if (directionResult > COMBAT_DIRECTION_EAST) {
@@ -356,7 +358,7 @@ i32 army::ValidRange(i32 targetHex) {
                     return 1;
                 break;
 
-            case 0:
+            case ARMY_FACING_LEFT:
                 directionResult =
                     GetBestDirection(m_hex, targetHex, PATH_SPECIAL_DIRECTION_MASK);
                 if (directionResult < COMBAT_DIRECTION_SOUTHEAST) {
