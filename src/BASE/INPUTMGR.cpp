@@ -251,11 +251,15 @@ inputManager::inputManager(void) : baseManager() {
     field_0x862 = -1;
 }
 
+static inline void ResetEventQueue(inputManager* manager) {
+    manager->m_writeIndex = 0;
+    manager->m_readIndex = 0;
+}
+
 VA(0x004ce230, 0x78)
 i32 inputManager::Open(i32 priority) {
     memset(m_eventRing, 0, sizeof(m_eventRing));
-    m_writeIndex = 0;
-    m_readIndex = 0;
+    ResetEventQueue(this);
     m_requestedPriority = priority;
     m_modifiers = 0;
     MakeScanCodeTable();
@@ -269,8 +273,7 @@ i32 inputManager::Open(i32 priority) {
 VA(0x004ce2b0, 0x20)
 void inputManager::Close(void) {
     if (m_active) {
-        m_writeIndex = 0;
-        m_readIndex = 0;
+        ResetEventQueue(this);
         m_requestedPriority = 0;
         m_active = false;
     }
@@ -283,8 +286,14 @@ i32 inputManager::Main(struct tag_message&) {
 
 VA(0x004ce2e0, 0xf)
 void inputManager::Flush(void) {
-    m_writeIndex = 0;
-    m_readIndex = 0;
+    ResetEventQueue(this);
+}
+
+static inline void InitializeEmptyEvent(tag_message& event) {
+    event.type = MESSAGE_NONE;
+    event.payload.unknown.unknown0x08 = 0;
+    event.payload.unknown.unknown0x04 = 0;
+    event.payload.unknown.unknown0x0c = 0;
 }
 
 VA(0x004ce2f0, 0xa8)
@@ -297,12 +306,8 @@ tag_message inputManager::GetEvent(void) {
         m_readIndex %= IDX(INPUT_EVENT_RING_CAPACITY);
         if (event.type == MESSAGE_KEY_DOWN && m_keyCodeType == INPUT_KEY_CODE_ASCII)
             AsciiConvert(event);
-    } else {
-        event.type = MESSAGE_NONE;
-        event.payload.unknown.unknown0x08 = 0;
-        event.payload.unknown.unknown0x04 = 0;
-        event.payload.unknown.unknown0x0c = 0;
-    }
+    } else
+        InitializeEmptyEvent(event);
     return event;
 }
 
@@ -315,12 +320,8 @@ tag_message inputManager::PeekEvent(void) {
         m_readIndex = m_readIndex % IDX(INPUT_EVENT_RING_CAPACITY);
         if (event.type == MESSAGE_KEY_DOWN && m_keyCodeType == INPUT_KEY_CODE_ASCII)
             AsciiConvert(event);
-    } else {
-        event.type = MESSAGE_NONE;
-        event.payload.unknown.unknown0x08 = 0;
-        event.payload.unknown.unknown0x04 = 0;
-        event.payload.unknown.unknown0x0c = 0;
-    }
+    } else
+        InitializeEmptyEvent(event);
     return event;
 }
 
@@ -330,8 +331,7 @@ void inputManager::SetMouseCoords(i32, i32) {}
 VA(0x004ce460, 0x1b)
 void inputManager::SetKeyCodeType(i32 keyCodeType) {
     m_keyCodeType = static_cast<InputManagerKeyCodeType>(keyCodeType);
-    m_writeIndex = 0;
-    m_readIndex = 0;
+    ResetEventQueue(this);
 }
 
 // @semantic: jump-table placement residual.
