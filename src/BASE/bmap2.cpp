@@ -30,7 +30,6 @@ void FillBitmapArea(class bitmap* bmp, i32 x, i32 y, i32 w, i32 h, i32 color) {
     }
 }
 
-// @semantic: compiler-shape residual.
 VA(0x004ca450, 0x114)
 void FillBitmapAreaClip(
     class bitmap* bmp,
