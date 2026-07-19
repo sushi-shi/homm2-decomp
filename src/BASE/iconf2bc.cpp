@@ -25,7 +25,6 @@ DATA(0x005380cc) static u8 gFCColor;
 DATA(0x005380c8) static i32 gFCClipR;
 DATA(0x005380c0) static u8* gFCDst;
 
-// @semantic: First raw divergence is now +0x11: candidate forms the final frame offset before loading formal X.
 VA(0x004d9790, 0x54d)
 void FlipIconToBitmapColorTable(
     class icon* srcIcon,

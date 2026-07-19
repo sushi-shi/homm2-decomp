@@ -32,7 +32,6 @@ H2_ENUM_BEGIN(ViewGeneralConstant)
     ARMY_BOTTOM_CLAMP          = 230
 H2_ENUM_END(ViewGeneralConstant)
 
-// @semantic: compiler-shape residual.
 VA(0x0040bd60, 0x6d3)
 i32 combatManager::ViewGeneral(i32 side, i32 allowActions, i32 quickView) {
     if (m_heroes[side] == NULL)
@@ -197,7 +196,6 @@ i32 combatManager::ViewGeneral(i32 side, i32 allowActions, i32 quickView) {
     return 0;
 }
 
-// @semantic: compiler-shape residual.
 VA(0x0040c433, 0x351)
 i32 HandleViewGeneral(tag_message& message) {
     i16 messageConstant1;
@@ -306,7 +304,6 @@ i32 HandleViewGeneral(tag_message& message) {
     return 1;
 }
 
-// @semantic: First non-branch residual is the branchless facing mask near +0x81.
 VA(0x0040c784, 0x165)
 void combatManager::ViewArmy(army* viewedArmy, i32 quickView) {
     if (viewedArmy == NULL)

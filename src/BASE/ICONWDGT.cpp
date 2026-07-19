@@ -31,7 +31,7 @@ iconWidget::iconWidget(void) : widget(0, 0, 0, 0, 0, 0) {
     m_iconId = 0;
 }
 
-// @early-stop: inline continuation artifact.
+// Retail /Ob1 includes an inline-accessor continuation in this function.
 VA(0x004d0ad0, 0x6a)
 iconWidget::iconWidget(
     i16 x,
@@ -105,7 +105,6 @@ iconWidget::~iconWidget() {
     messageValue.type = MESSAGE_WIDGET;                                                          \
     messageValue.payload.widget.id = idValue
 
-// @semantic: jump-table placement residual.
 VA(0x004d0cd0, 0x291)
 i32 iconWidget::Main(tag_message& msg) {
     u16 flags = m_flags;
@@ -198,7 +197,6 @@ normalEvent:
 
 #undef SET_WIDGET_MESSAGE_TYPE_AND_ID
 
-// @semantic: compiler-shape residual.
 VA(0x004d0f70, 0xe5)
 void iconWidget::Draw(void) {
     heroWindow* window = m_owner;

@@ -72,7 +72,6 @@ void border::Read(void) {
 #undef RESOURCE_NAME_CAPACITY
 #undef COLOR_INDEX_MASK
 
-// @semantic: differs only at +0x78 and +0x7b, where the equivalent signed comparison uses the opposite CMP/branch orientation.
 VA(0x004d22f0, 0x181)
 i32 border::Main(struct tag_message& msg) {
     i16 flags = m_flags;

@@ -64,7 +64,6 @@ void init_anchor(struct tag_Anchor* anchor, i32, i32) {
     anchor->tail = NULL;
 }
 
-// @semantic: first residual is the embedded 0x4c-byte jump table at RVA 0x8a968.
 VA(0x0048a72e, 0x3e5)
 void ShutdownComError(char* function) {
     char errorName[ERROR_NAME_SIZE];
@@ -140,7 +139,6 @@ void ShutdownComError(char* function) {
     ShutDown(message);
 }
 
-// @semantic: first residual is the embedded 0x14-byte baud-rate jump table at RVA 0x8ace2.
 VA(0x0048ab13, 0x34a)
 i16 com_init(u8 portNumber, i32 baudRate, i32 useDtr) {
     char portName[PORT_NAME_SIZE];
@@ -324,7 +322,6 @@ u8 com_stat(i16 portIndex, u16) {
     return 0;
 }
 
-// @semantic: sole raw residual is the exit jump displacement at +0x4d.
 VA(0x0048b21d, 0xe8)
 void comm_wrt_task(void) {
     DWORD bytesWritten;

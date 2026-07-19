@@ -65,7 +65,6 @@ void DoTradingPost(i32 isMarketplace, float efficiency) {
     delete tpWindow;
 }
 
-// @semantic: residual is the selected-resource compare loading the loop local before the global instead of after it.
 VA(0x004bf4a5, 0x596)
 void UpdateTradingPost(i32 draw) {
     tag_message messageTemp;
@@ -237,7 +236,6 @@ void ComputeTradeRatios(
     }
 }
 
-// @semantic: sole residual starts at +0x67: ours loads iMaxUnitsToTrade, compares qtyToTrade, and uses jle.
 VA(0x004bfb39, 0x148)
 void DoTradeKnob(struct tag_message message) {
     tag_message nextMessage;
@@ -279,7 +277,6 @@ void SetupNewTrade(void) {
     );
 }
 
-// @semantic: stack-slot/code-shape residual.
 VA(0x004bfcbb, 0x3b6)
 i32 TradingPostHandler(struct tag_message& message) {
     i32 exitFlag = 0;

@@ -27,7 +27,6 @@ H2_ENUM_END(TextWidgetConstant)
 #define TEXT_BUFFER_GROWTH 5
 #endif
 
-// @semantic: optimized register-allocation residual.
 VA(0x004d1060, 0x3e)
 textWidget::textWidget(void) : widget(0, 0, 0, 0, 0, 0) {
     m_color = FONT_DRAW_DEFAULT;
@@ -37,7 +36,6 @@ textWidget::textWidget(void) : widget(0, 0, 0, 0, 0, 0) {
     m_kind = EncodeWidgetKind(WIDGET_KIND_TEXT);
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x004d10f0, 0x64)
 textWidget::textWidget(
     i16 x,
@@ -93,7 +91,6 @@ textWidget::~textWidget() {
     messageValue.payload.widget.command = commandValue;                                          \
     messageValue.payload.widget.id = idValue
 
-// @semantic: first executable-code divergence is +0x88: candidate emits cmp m_y, relativeY.
 VA(0x004d1280, 0x210)
 i32 textWidget::Main(tag_message& msg) {
     u16 flags = m_flags;

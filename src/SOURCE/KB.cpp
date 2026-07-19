@@ -362,7 +362,6 @@ void ForcePollSound(void) {
     PollSound();
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x004965be, 0x39e)
 void InitMainClasses(void) {
     gpExec = new executive;
@@ -514,7 +513,6 @@ i32 EarlySetup(void) {
     return 1;
 }
 
-// @semantic: first residual is retail's local continuation jump at +0x533.
 VA(0x00496e98, 0x16c0)
 i32 oldmain(void) {
     i32 command_a;
@@ -1233,7 +1231,6 @@ i32 InterpretCommandLine(void) {
     return 1;
 }
 
-// @semantic: first opcode divergence at +0x354: ours emits a five-byte continuation jmp where retail enters the next body.
 VA(0x00498d2d, 0x698)
 i32 InitMenuHandler(struct tag_message& msg) {
     i32 handled = 0;
@@ -1563,7 +1560,6 @@ char* GetMonsterName(i32 m) {
     return gArmyNames[m];
 }
 
-// @early-stop: delinker artifact.
 VA(0x0049992c, 0x140)
 void GetMonsterCost(i32 monster, i32* const cost) {
     i32 idx;
@@ -1596,7 +1592,6 @@ void GetMonsterCost(i32 monster, i32* const cost) {
     }
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x00499a6c, 0x2b5)
 i32 CanBuild(town* t, BuildingSlotType building) {
     i32 reqMask;
@@ -2037,7 +2032,6 @@ void PlayerDead(i32 player) {
     }
 }
 
-// @semantic: compiler-shape residual.
 VA(0x0049a6c1, 0x19bb)
 void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
     i32 showedDialog;
@@ -2656,7 +2650,6 @@ void QuickViewWait(void) {
     gpMouseManager->ReallyShowPointer();
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x0049c111, 0x201)
 void InitVars(void) {
     i32 i;
@@ -2696,7 +2689,6 @@ void InitVars(void) {
     }
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x0049c312, 0x61b)
 void game::ShowMoraleInfo(hero* h, i32 dialogType) {
     i32 mixedUndead4;
@@ -3050,7 +3042,6 @@ i32 WaitForOtherPlayer(void) {
     return result;
 }
 
-// @semantic: printable-key guard uses a different unsigned-byte comparison encoding.
 VA(0x0049d4a6, 0xb85)
 void PopNetBox(char* text, i32 netPlayer) {
     i32 textY_d;
@@ -3625,7 +3616,6 @@ i32 GameUnsaved(void) {
         return 0;
 }
 
-// @early-stop: delinker artifact.
 VA(0x0049ec05, 0xa18)
 i32 HandleAppSpecificMenuCommands(i32 command) {
     i32 menuChanged;
@@ -4016,7 +4006,6 @@ void CleanUpMenus(void) {
     hmnuApp = NULL;
 }
 
-// @semantic: compiler-shape residual.
 VA(0x0049f9c6, 0x2a)
 void UpdateAppSpecificMenus(void* hMenu) {
     if (hmnuAdv == hMenu)
@@ -4034,8 +4023,6 @@ i32 InMapArea(i32 x, i32 y) {
     return (x >= 16 && x < 448 && y >= 16 && y < 448);
 }
 
-// @early-stop
-// @early-stop-reloc-only: relocation naming only.
 VA(0x0049fa70, 0x6bc)
 void SetupDynamicWindow(
     i32 x,
@@ -4290,7 +4277,6 @@ void TestDynamicWindow(i32 p1, i32 p2) {
     delete p;
 }
 
-// @semantic: evaluation-order residual.
 VA(0x004a0234, 0x91)
 void HandleRemoteDeadPlayerExit(i32 pos) {
     SPlayerExit pe;
@@ -4332,7 +4318,6 @@ void HandleRemoteSuddenExit(void) {
     DelayMilli(500);
 }
 
-// @semantic: compiler-shape residual.
 VA(0x004a036f, 0x62)
 void DropDownToOnePlayer(void) {
     RemoteCleanup();
@@ -4452,7 +4437,6 @@ void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, i32
         );
 }
 
-// @semantic: branch/code-shape residual.
 VA(0x004a07e3, 0x361)
 void ReceiveRemotePlayerExit(SPlayerExit exitInfo) {
     i32 localPlayerLost;
@@ -4622,7 +4606,6 @@ void CheckShingleUpdate(void) {
     }
 }
 
-// @semantic: first residual at +0x1f7 is equivalent no-value arithmetic (sete/dec versus retail inc/cmp/adc).
 VA(0x004a0d9f, 0x17c6)
 void NormalDialog(
     char* text,

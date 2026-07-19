@@ -58,7 +58,6 @@ BOOL WINAPI dpEnumSession(DPSESSIONDESC* session, void*, LPDWORD, DWORD flags) {
     return 1;
 }
 
-// @semantic: remaining loop residual loads giNumHumanPlayers before guestIndex and emits JGE.
 VA(0x0041eeaf, 0x311)
 i16 dpnet_init(void) {
     DATA(0x004ef83c) static i16 initSourceLineBase = 95;
@@ -279,7 +278,7 @@ void dpProcessMessages(void) {
     }
 }
 
-// @early-stop: named one-byte retail stub.
+// Named one-byte retail stub.
 VA(0x0041f681, 0x274)
 void dpEvaluateMessage(u32l size, i32 sender) {
     DATA(0x004efb44) static i16 evaluateSourceLineBase = 355;
@@ -333,7 +332,6 @@ void dpEvaluateMessage(u32l size, i32 sender) {
     }
 }
 
-// @semantic: jump-table placement residual.
 VA(0x0041f8f5, 0x182)
 i32 dpWaitForFirstGuest(void) {
     DATA(0x004efb9c) static i16 firstGuestSourceLineBase = 426;
@@ -397,7 +395,6 @@ i32 dpWaitForExtraGuests(void) {
     return 0;
 }
 
-// @early-stop: delinker artifact.
 VA(0x0041fafb, 0x3d2)
 i32 dpWaitForHost(void) {
     DATA(0x004efc78) static i16 hostSourceLineBase = 510;

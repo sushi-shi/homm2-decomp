@@ -111,7 +111,6 @@ mouseManager::mouseManager(void) : baseManager() {
     m_hideCount = 1;
 }
 
-// @semantic: first code divergence is base +0x52: MSVC keeps 0xf0 in ECX and shares it across the two stores.
 VA(0x004c9350, 0x94)
 i32 mouseManager::Open(i32 priority) {
     m_forcePointerUpdate = 0;
@@ -135,7 +134,6 @@ i32 mouseManager::Open(i32 priority) {
     return 0;
 }
 
-// @semantic: first divergence is the loop setup at +0x2b: base uses EBX as the byte offset and EBP for DeleteObject.
 VA(0x004c93f0, 0xed)
 void mouseManager::Close(void) {
     i32 cursorIndex;
@@ -218,7 +216,6 @@ void mouseManager::SetPointer(char* name, i32 frame, MouseCursorType cursorType)
     }
 }
 
-// @semantic: first divergence is the prologue: retail spills this at [esp] before saving EBX/ESI/EDI/EBP.
 VA(0x004c9630, 0x405)
 void mouseManager::SetPointer(i32 frame) {
     if (m_forcePointerUpdate != 0 || frame < 0 || !m_active || m_cursorFrame == frame
@@ -342,7 +339,6 @@ void mouseManager::SetPointer(i32 frame) {
     gbPutzingWithMouseCtr--;
 }
 
-// @semantic: branch/code-shape residual.
 VA(0x004c9a40, 0x47a)
 void mouseManager::NewUpdate(i32 force) {
     i32 width;

@@ -14,7 +14,6 @@
 #include <SOURCE/searchArray.h>
 #include <SOURCE/town.h>
 
-// @semantic: compiler-shape residual.
 VA(0x004c0790, 0x8d7)
 i32 combatManager::AICheckRetreat(void) {
     if (m_combatTowns[m_currentSide] != NULL)
@@ -162,7 +161,6 @@ i32 combatManager::AICheckRetreat(void) {
     return 0;
 }
 
-// @semantic: evaluation-order residual.
 VA(0x004c1067, 0x129c)
 void combatManager::DoCompAI(i32) {
     u32l shooterStrengths37[COMBAT_AI_SIDE_COUNT];
@@ -472,7 +470,6 @@ finish:
     }
 }
 
-// @semantic: compiler-shape residual.
 VA(0x004c2303, 0xc9)
 float combatManager::GetModLichDamage(class army* target, float damage) {
     float modifiedDamage = damage;
@@ -849,7 +846,6 @@ i32 combatManager::AttemptAttack(class army* currentArmy, i32 side, i32 mask) {
     return 0;
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x004c3468, 0x182)
 i32 combatManager::AttemptAdjacentAttack(class army* currentArmy) {
     u32 availableMask4 =
@@ -951,7 +947,6 @@ i32 combatManager::WalkTowardArmyFront(class army* currentArmy, i32 side, i32 ma
     return WalkTowardArmy(currentArmy, side, mask);
 }
 
-// @semantic: first residual at +0x34 is equivalent two-dimensional army indexing: retail scales targetArmy before side.
 VA(0x004c382a, 0x244)
 i32 combatManager::WalkTowardArmy(class army* currentArmy, i32 side, i32 mask) {
     i32 targetArmy6;

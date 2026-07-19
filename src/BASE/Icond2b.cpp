@@ -19,7 +19,6 @@ DATA(0x00534c14) static i32 gDimX;
 DATA(0x00534c18) static i32 gDimClipR;
 DATA(0x00534c1c) static i32 gDimX0;
 
-// @semantic: first divergence is +0x1f: retail adds the icon-data base to the encoded source offset before publishing gDimEntry.
 VA(0x004cfd50, 0x26e)
 void DimIconToBitmap(
     class icon* srcIcon,

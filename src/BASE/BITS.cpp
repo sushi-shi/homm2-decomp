@@ -7,7 +7,6 @@ H2_ENUM_BEGIN(BitIndexConstant)
     INDEX_WITHIN_BYTE_MASK = 7
 H2_ENUM_END(BitIndexConstant)
 
-// @semantic: First divergence is +0x1: base zeroes EAX before mov ebp,esp, then uses indexed test/setne.
 VA(0x004d1594, 0x2e)
 extern "C" i32 __cdecl BitTest(const void* bits, BitIndex bitIndex) {
     const BitByte* bytes = static_cast<const BitByte*>(bits);
@@ -21,7 +20,6 @@ extern "C" i32 __cdecl BitTest(const void* bits, BitIndex bitIndex) {
     return 0;
 }
 
-// @semantic: first divergence is at +0x1.
 VA(0x004d15c2, 0x20)
 extern "C" void __cdecl BitSet(void* bits, BitIndex bitIndex) {
     BitByte* bytes = static_cast<BitByte*>(bits);
@@ -33,7 +31,6 @@ extern "C" void __cdecl BitSet(void* bits, BitIndex bitIndex) {
     *word |= mask;
 }
 
-// @semantic: first divergence is at +0x1.
 VA(0x004d15e2, 0x22)
 extern "C" void __cdecl BitClear(void* bits, BitIndex bitIndex) {
     BitByte* bytes = static_cast<BitByte*>(bits);

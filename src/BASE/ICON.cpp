@@ -50,7 +50,7 @@ icon::icon(u32l id) : resource(RESOURCE_CATEGORY_ICON, id, RESOURCE_REFERENCE_IN
     gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_data), len);
 }
 
-// @early-stop: inline continuation artifact.
+// Retail /Ob1 includes an inline-accessor continuation in this function.
 VA(0x004c7ad0, 0x21)
 icon::~icon() {
     DATA(0x0051e974) static char destructionSourceFile[] = RETAIL_FILE;
@@ -90,7 +90,6 @@ void icon::DrawToBuffer(i32 x, i32 y, i32 frame, i32 flip) {
     );
 }
 
-// @semantic: residual begins at +0xb: base is 0x2b3 bytes and retail is 0x2bb.
 VA(0x004c7b50, 0x2bb)
 i32 icon::CombatClipDrawToBuffer(
     i32 x,

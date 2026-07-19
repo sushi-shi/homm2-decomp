@@ -620,7 +620,7 @@ void townManager::ChangeTown(void) {
     SetCommandAndText(message);
 }
 
-// @early-stop: inline continuation artifact.
+// Retail /Ob1 includes an inline-accessor continuation in this function.
 VA(0x0041436f, 0x95a)
 void townManager::SetupTown(void) {
     tag_message message;
@@ -916,7 +916,6 @@ void townManager::SetArmyCommand(i32 qualifier) {
     }
 }
 
-// @early-stop: delinker jump-table artifact.
 VA(0x0041531b, 0x5c5)
 void townManager::SetCommandAndText(struct tag_message& message) {
     i32 objectId = message.payload.widget.id;
@@ -1076,7 +1075,6 @@ void townManager::ShowText(char*) {
     );
 }
 
-// @semantic: jump-table placement residual.
 VA(0x0041595d, 0x1830)
 i32 townManager::Main(tag_message& message) {
     char description_b[400];
@@ -1669,7 +1667,6 @@ i32 townManager::Main(tag_message& message) {
     return 1;
 }
 
-// @semantic: compiler-shape residual.
 VA(0x0041718d, 0x4e3)
 void townManager::DoCommand(i32 command) {
     hero* viewedHero;
@@ -1780,7 +1777,6 @@ void townManager::RedrawTownScreen(void) {
     gpWindowManager->UpdateScreenRegion(0, 0, 640, 480);
 }
 
-// @early-stop: delinker artifact.
 VA(0x0041771d, 0x374)
 void townManager::SplitArmy(void) {
     i16 unusedValue = 1;
@@ -1878,7 +1874,6 @@ void townManager::DrawTown(i32 updateScreen, i32 drawFlags) {
     PollSound();
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x00417c9d, 0xf35)
 i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
     static i16 sourceLineBase = 0x0948;
@@ -2330,7 +2325,6 @@ void townManager::BuildObj(i32 building) {
     }
 }
 
-// @semantic: First raw divergence is the frame byte at +0x5: base 0x5c versus retail 0x60.
 VA(0x00418fbb, 0x3d8)
 void townManager::SetupMage(heroWindow* window) {
     i16 unusedZero_f = 0;
@@ -2445,7 +2439,6 @@ void townManager::SetupMage(heroWindow* window) {
     window->BroadcastMessage(message_b);
 }
 
-// @semantic: first raw divergence is the spell-table address: candidate code folds slot_p into the town base before loading level.
 VA(0x00419393, 0x190)
 i32 MageGuildHandler(tag_message& message) {
     i16 unusedFirstSpell = TOWN_MAGE_FIRST_SPELL_CONTROL;
@@ -2695,7 +2688,6 @@ void townManager::DoTavern(void) {
     delete m_heroWindow0;
 }
 
-// @semantic: branch/code-shape residual.
 VA(0x00419e8c, 0x328)
 i32 SplitArmyHandler(tag_message& message) {
     i16 plusButton = TOWN_SPLIT_INCREASE_CONTROL;
@@ -2904,7 +2896,6 @@ void townManager::SetupWell(heroWindow* window) {
     }
 }
 
-// @semantic: first raw divergence at +0x249 loads the loop counter before the bound and uses cmp/jle.
 VA(0x0041a783, 0xf0f)
 void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
     static i16 sourceLineBase = 0x0e0e;
@@ -3233,7 +3224,6 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
     }
 }
 
-// @semantic: jump-table placement residual.
 VA(0x0041b692, 0x56a)
 void GetCategoryStats(i32 category, i32l* const stats, i8* const order) {
     i32 player;

@@ -55,7 +55,6 @@ DATA(0x00516fb8) i32 iIRQ[REMOTE_IRQ_COUNT] = {1, 2, 3, 4, 5, 7, 9};
 DATA(0x00517118) static i16 gGetRemoteDataLineBase = 716;
 DATA(0x00517148) static i16 gPollRemoteLineBase = 757;
 
-// @semantic: first residual is the delinked switch continuation/local-label trampoline.
 VA(0x004a3080, 0x188)
 void RemoteCleanup(void) {
     LogStr("RC1");
@@ -103,7 +102,6 @@ void RemoteCleanup(void) {
     }
 }
 
-// @semantic: compiler-shape residual.
 VA(0x004a3208, 0x6da)
 void RemoteMain(i32 gameMode) {
     u8 receivedPlayers[REMOTE_PLAYER_COUNT];
@@ -365,7 +363,6 @@ i32 EncodePacket(u8* data, char source, char destination, i32 length) {
     return length + REMOTE_PACKET_HEADER_SIZE;
 }
 
-// @semantic: stack-slot/code-shape residual.
 VA(0x004a3aa7, 0x13a)
 i32 DecodePacket(u8* data, i32) {
     u16 receivedCRC;
@@ -393,7 +390,6 @@ i32 DecodePacket(u8* data, i32) {
     return 1;
 }
 
-// @semantic: compiler-shape residual.
 VA(0x004a3be1, 0x18e)
 i32 SendRemoteData(u8* dataToSend, u8*, i32 destination, i32 length) {
     i32 sendStatus;
@@ -446,7 +442,6 @@ i32 SendRemoteData(u8* dataToSend, u8*, i32 destination, i32 length) {
     return out;
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x004a3d6f, 0x158)
 i32 ReceiveRemoteData(u8*, u8* data, i32 decodeType) {
     i32 result;
@@ -484,7 +479,6 @@ i32 ReceiveRemoteData(u8*, u8* data, i32 decodeType) {
     return result;
 }
 
-// @semantic: first residual is a retail five-byte continuation after the unreliable-success return.
 VA(0x004a3ec7, 0x21a)
 i32 TransmitRemoteData(
     char* data,
@@ -579,7 +573,6 @@ char* GetRemoteData(i8 remove) {
     return NULL;
 }
 
-// @semantic: first code residual is the host-loop queueIndex/giThisNetPos load order.
 VA(0x004a41ec, 0x6f4)
 void PollRemote(void) {
     i32 savedInPollSound;
@@ -787,7 +780,6 @@ void PollRemote(void) {
     }
 }
 
-// @semantic: first residual is one retail five-byte continuation after successful transmit.
 VA(0x004a48e0, 0x163)
 i32 TransmitAndWait(
     char* data,

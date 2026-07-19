@@ -390,7 +390,6 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
     }
 }
 
-// @semantic: First divergence at +0x16e: retail loads gpTownManager before message.id for the m_lastHoverId comparison.
 VA(0x0041e0fb, 0xca3)
 i32 CastleHandler(tag_message& message) {
     i32 result;

@@ -137,7 +137,6 @@ void town::Deallocate(void) {
     m_owner = TOWN_OWNER_NONE;
 }
 
-// @semantic: compiler-shape residual.
 VA(0x004330a1, 0x23e)
 void town::BuildBuilding(i32 building) {
     i32 level;

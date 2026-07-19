@@ -25,7 +25,6 @@ DATA(0x00534c88) static u8* gFlipDimDst;
 DATA(0x00534ca0) static u8* gFlipDst;
 DATA(0x00534c60) static i32 gFlipSkip;
 
-// @semantic: first unmasked divergence remains +0x1d: candidate loads entry Y before forming the entry pointer.
 VA(0x004d1ba0, 0x4f1)
 void FlipIconToBitmap(
     class icon* srcIcon,

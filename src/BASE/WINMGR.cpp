@@ -103,7 +103,6 @@ DATA(0x0051ef40) static SWindowManagerText gWindowManagerText = {
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/KB.h>
 
-// @semantic: first code residual is +0xda..+0x11c in the world-view loop.
 VA(0x004ca6d0, 0x3a3)
 void CycleColors(i32 forceUpdate) {
     i8 savedColor[PALETTE_COLOR_BYTES];
@@ -353,7 +352,6 @@ void heroWindowManager::Close(void) {
 #define WIDGET_DISPATCH_CONSUME 1
 #define WIDGET_DISPATCH_FORWARD 2
 
-// @semantic: optimized register-allocation residual.
 VA(0x004cac00, 0x2d)
 i32 heroWindowManager::Main(struct tag_message& msg) {
     i32 result = WIDGET_DISPATCH_CONTINUE;
@@ -372,7 +370,6 @@ i32 heroWindowManager::ConvertToHover(struct tag_message& msg) {
     return Main(msg);
 }
 
-// @semantic: optimized register-allocation residual.
 VA(0x004cac40, 0x35)
 i32 heroWindowManager::BroadcastMessage(MessageType type, BaseWidgetCommand p2, i32 p3, i32 p4) {
     tag_message msg;
@@ -383,7 +380,6 @@ i32 heroWindowManager::BroadcastMessage(MessageType type, BaseWidgetCommand p2, 
     return Main(msg);
 }
 
-// @semantic: first residual is xor ebp,ebp versus retail mov ebp,0 after the z == -1 branch.
 VA(0x004cac80, 0xbc)
 void heroWindowManager::AddWindow(class heroWindow* w, i32 zOrder, i32 openFlags) {
     heroWindow* cur = m_windowListTail;
@@ -606,7 +602,6 @@ void heroWindowManager::ScreenShot(void) {
     gpInputManager->Flush();
 }
 
-// @semantic: compiler-shape residual.
 VA(0x004cb110, 0xc0)
 void heroWindowManager::SaveFizzleSource(i32 x, i32 y, i32 width, i32 height) {
     if (bShowIt != 0) {
@@ -632,11 +627,10 @@ void heroWindowManager::SaveFizzleSource(i32 x, i32 y, i32 width, i32 height) {
     }
 }
 
-// @early-stop: named one-byte retail stub.
+// Named one-byte retail stub.
 VA(0x004cb1d0, 0x1)
 void CreateFizzleTables(void) {}
 
-// @semantic: first raw divergence occurs after clipping: candidate keeps the manager in ECX while retail retains it in ESI.
 VA(0x004cb1e0, 0x402)
 void heroWindowManager::FizzleForward(
     i32 x,
@@ -745,11 +739,11 @@ void heroWindowManager::ReleaseFizzleSource(void) {
     m_fizzleSource = NULL;
 }
 
-// @early-stop: named one-byte retail stub.
+// Named one-byte retail stub.
 VA(0x004cb610, 0x1)
 void CreateColorTables(void) {}
 
-// @early-stop: named one-byte retail stub.
+// Named one-byte retail stub.
 VA(0x004cb620, 0x1)
 void CreateColorLookupTables(void) {}
 

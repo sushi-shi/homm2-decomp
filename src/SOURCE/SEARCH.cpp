@@ -41,7 +41,6 @@ DATA(0x0052a254) static i32 s_hasTarget;
 DATA(0x0052a258) static i8 s_directionCosts[SEARCH_DIRECTION_COUNT];
 DATA(0x0052a260) static hero* s_currentHero;
 
-// @semantic: First divergence is +0x0: base loads destination X into EAX before saving EBX.
 VA(0x004a25e0, 0xc0)
 i32 searchArray::BuildPath(
     i32 startX,
@@ -74,7 +73,6 @@ i32 searchArray::BuildPath(
     return m_pathLength;
 }
 
-// @semantic: first code divergence is target visibility indexing: base adds mapExtra before target X and tests [EAX+EDI].
 VA(0x004a26a0, 0x9df)
 void searchArray::SeedPosition(
     i32 seedX,

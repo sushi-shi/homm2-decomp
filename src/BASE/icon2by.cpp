@@ -24,7 +24,6 @@ DATA(0x00538184) static u8 gYMColor;
 DATA(0x00538188) static u32 gYMDimLen2;
 DATA(0x0053818c) static i32 gYMClipR;
 
-// @semantic: first code divergence is the bottom-clip comparison: candidate loads ClipB into EAX and uses cmp Y,EAX.
 VA(0x004da270, 0x588)
 void IconToBitmapYModify(
     class icon* srcIcon,

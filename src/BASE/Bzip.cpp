@@ -332,7 +332,6 @@ void arithCodeRenormalise_Encode(BitStream* bs) {
     }
 }
 
-// @early-stop: delinker artifact.
 VA(0x004d46c0, 0xd7)
 void arithCodeSymbol(BitStream* bs, Model* m, Int32 symbol) {
     UInt32 cumulativeLow8, cumulativeHigh2, totalFrequency14, rangeWidth29, rangeProduct8;
@@ -360,7 +359,6 @@ void arithCodeSymbol(BitStream* bs, Model* m, Int32 symbol) {
         panic(const_cast<char*>("arithCodeSymbol: too many bits outstanding"));
 }
 
-// @early-stop: retail alignment artifact.
 VA(0x004d47a0, 0xfe)
 Int32 arithDecodeSymbol(BitStream* bs, Model* m) {
     UInt32 cumulativeLow7, scaledTarget1, cumulativeHigh1, totalFrequency13, rangeWidth28,
@@ -540,7 +538,6 @@ void dumpAllModelStats(void) {
     dumpModelStats(&models[MODEL_128_255]);
 }
 
-// @early-stop: delinker jump-table artifact.
 VA(0x004d4e90, 0x153)
 Int32 getMTFVal(BitStream* bs) {
     Int32 retVal;
@@ -748,13 +745,11 @@ Int32 NORMALISE(Int32 p) {
     );
 }
 
-// @early-stop: retail alignment artifact.
 VA(0x004d57d0, 0x36)
 Int32 NORMALISEHI(Int32 p) {
     return IF_THEN_ELSE(((p) >= OD_STEER(lastPP)), ((p)-lastPP), (p));
 }
 
-// @early-stop: retail alignment artifact.
 VA(0x004d5810, 0x31)
 Int32 NORMALISELO(Int32 p) {
     return IF_THEN_ELSE(((p) < 0), (((p) | 0) + lastPP), (p));
@@ -796,7 +791,6 @@ void sendZeroes(BitStream* outStream, Int32 zeroesPending) {
     }
 }
 
-// @early-stop: delinker artifact.
 VA(0x004d5930, 0x189)
 void moveToFrontCodeAndSend(BitStream* outStream, Bool thisIsTheLastBlock) {
     UChar yy[256];
@@ -936,7 +930,6 @@ void copyOffsetWords(void) {
         words[lastPP + i] = words[i];
 }
 
-// @early-stop: delinker artifact.
 VA(0x004d5e80, 0x172)
 Bool fullGt(Int32 i1, Int32 i2) {
     Int32 i1orig = i1;
@@ -994,7 +987,6 @@ Bool fullGt(Int32 i1, Int32 i2) {
         zptr[RC(zr)] = zt;                                                                         \
     }
 
-// @semantic: first structural residual is +0x18: candidate initializes [ebp-8], retail [ebp-0xc0].
 VA(0x004d6000, 0x548)
 void qsortFull(Int32 left, Int32 right) {
     Int32 pivot, v;
@@ -1096,7 +1088,6 @@ Bool trivialGt(Int32 i1, Int32 i2) {
     return False;
 }
 
-// @early-stop: delinker artifact.
 VA(0x004d6610, 0x10f)
 void shellTrivial(void) {
     Int32 i, j, h, bigN;
@@ -1126,7 +1117,6 @@ void shellTrivial(void) {
     } while (h != 1);
 }
 
-// @semantic: first remaining raw-code divergence is +0xdf: candidate i is [ebp-8], retail [ebp-0xc].
 VA(0x004d6720, 0x434)
 void sortIt(void) {
     lastPP = last + 1;
@@ -1465,7 +1455,6 @@ Bool loadAndRLEsource(FILE* src) {
     return (currentChar == MY_EOF);
 }
 
-// @early-stop: delinker artifact.
 VA(0x004d7290, 0x18d)
 void unRLEandDump(FILE* dst, Bool thisIsTheLastBlock) {
     IntNative retVal;
@@ -1514,7 +1503,6 @@ void unRLEandDump(FILE* dst, Bool thisIsTheLastBlock) {
         unblockError();
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x004d7420, 0x2e6)
 void compressStream(FILE* stream, FILE* zStream) {
     IntNative retVal;
@@ -1595,7 +1583,6 @@ void compressStream(FILE* stream, FILE* zStream) {
     }
 }
 
-// @early-stop: delinker artifact.
 VA(0x004d7710, 0x26e)
 Bool uncompressStream(FILE* zStream, FILE* stream) {
     Bool thisIsTheLastBlock;
@@ -1822,7 +1809,6 @@ void compressOutOfMemory(Int32 draw, Int32 blockSize) {
     cleanUpAndFail();
 }
 
-// @early-stop: retail alignment artifact.
 VA(0x004d7cd0, 0x83)
 Bool endsInBz(Char* name) {
     Int32 n = strlen(name);
@@ -1831,7 +1817,6 @@ Bool endsInBz(Char* name) {
     return (name[n - 3] == '.' && name[n - 2] == 'n' && name[n - 1] == 'w');
 }
 
-// @early-stop: delinker artifact.
 VA(0x004d7d60, 0xe2)
 void compress(Char* name) {
     FILE* inStr;
@@ -1853,7 +1838,6 @@ void compress(Char* name) {
     retVal = remove(inName);
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x004d7e50, 0x110)
 void uncompress(Char* name) {
     FILE* inStr;
@@ -1878,7 +1862,6 @@ void uncompress(Char* name) {
     ERROR_IF_NOT_ZERO(retVal);
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x004d7f60, 0x2d5)
 i32l EncodeData(char* dst, char* src, u32l srcLen) {
     char fname[450] = {0};
@@ -1921,7 +1904,6 @@ i32l EncodeData(char* dst, char* src, u32l srcLen) {
     return flen;
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x004d8240, 0x2f3)
 i32l DecodeData(char* dst, char* src, u32l srcLen) {
     char fname[450] = {0};

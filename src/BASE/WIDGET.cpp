@@ -51,11 +51,9 @@ i32 widget::Open(i32 zOrder, class heroWindow* owner) {
     return 0;
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x004dded0, 0x1)
 void widget::Close(void) {}
 
-// @semantic: differs only at +0x23,+0x38,+0x46,+0x4a,+0x4f.
 VA(0x004ddee0, 0x2f4)
 i32 widget::Main(tag_message& message) {
     switch (message.type) {

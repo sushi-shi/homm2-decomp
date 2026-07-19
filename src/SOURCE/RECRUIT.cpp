@@ -55,7 +55,6 @@ H2_ENUM_BEGIN(RecruitControl)
     CONFIRM_CONTROL        = 0x7802
 H2_ENUM_END(RecruitControl)
 
-// @early-stop: delinker artifact.
 VA(0x0048b310, 0x18c)
 void SetupRecruitWin(
     class heroWindow* window,
@@ -109,7 +108,6 @@ void SetupRecruitWin(
     }
 }
 
-// @early-stop: delinker artifact.
 VA(0x0048b49c, 0x24b)
 i32 recruitUnit::Open(i32 priority) {
     i32 goldMaximum;
@@ -208,7 +206,6 @@ void recruitUnit::Close(void) {
     KBChangeMenu(hmnuRecruitSave);
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x0048b7ce, 0x122)
 void recruitUnit::Update(void) {
     tag_message message;
@@ -234,7 +231,6 @@ void recruitUnit::Update(void) {
     }
 }
 
-// @early-stop: delinker jump-table artifact.
 VA(0x0048b8f0, 0x41b)
 i32 recruitUnit::Main(struct tag_message& message) {
     i32 close = 0;
@@ -394,7 +390,6 @@ recruitUnit::recruitUnit(class town* townData, i32 dwelling, i32 refreshTown) {
     }
 }
 
-// @early-stop: byte-proven compiler artifact.
 VA(0x0048bee5, 0x14f)
 void QuickViewRecruit(class town* townData, i32 dwelling) {
     i32 costs[RESOURCE_COUNT + 1];

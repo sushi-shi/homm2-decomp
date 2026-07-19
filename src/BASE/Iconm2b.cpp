@@ -17,7 +17,6 @@ DATA(0x00534be4) static i32 gMonoY;
 DATA(0x00534be8) static i32 gMonoClipB;
 DATA(0x00534bec) static i32 gMonoX;
 
-// @semantic: First divergence is setup +0x14: retail adds the data base to ECX, publishes the entry, and only then loads x.
 VA(0x004cfae0, 0x266)
 void MonoIconToBitmap(
     class icon* srcIcon,

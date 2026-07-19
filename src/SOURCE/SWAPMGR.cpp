@@ -312,7 +312,6 @@ void swapManager::DrawSelector(void) {
     }
 }
 
-// @semantic: branch/code-shape residual.
 VA(0x00454be3, 0xaf0)
 i32 swapManager::Main(tag_message& message) {
     i32 closeRequested_5 = 0;
