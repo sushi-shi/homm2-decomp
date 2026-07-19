@@ -21,7 +21,7 @@ include/BASE/Iconmf2b.h	pending
 include/BASE/MIDIWrap.h	reviewed	Only the proven MIDIWrap SIZE annotation is numeric.
 include/BASE/MIDI_TYPES.h	reviewed	Shared text-record field extents are named and aligned; the remaining literal is packed-layout SIZE evidence.
 include/BASE/MISC_TYPES.h	reviewed	Text-slot extents derive from their literal payloads and remaining SIZE values are packed-layout evidence; the registry key and source path are shared textual identities rather than numeric constant fallbacks.
-include/BASE/MOUSEMGR_TYPES.h	pending
+include/BASE/MOUSEMGR_TYPES.h	reviewed	Text-record extents derive from their literal payloads, including the empty default-cursor slot; remaining literals are packed-layout SIZE evidence and shared string identities.
 include/BASE/Misc.h	reviewed	Shared packed-record array extents are named and aligned; remaining numeric literals are proven packing and SIZE evidence, and allocation macros are function-like source-location wrappers rather than constant definitions.
 include/BASE/MiscGraphicsConstants.h	reviewed	Shared palette component, byte, and level extents are named for Misc, PALETTE, and KB consumers.
 include/BASE/Ripple.h	reviewed	The public ripple operation names every parameter and exposes no numeric policy or storage layout.
@@ -53,7 +53,7 @@ include/BASE/inputManager.h	pending
 include/BASE/listBoxWidget.h	pending
 include/BASE/message.h	pending
 include/BASE/miscwin.h	pending
-include/BASE/mouseManager.h	pending
+include/BASE/mouseManager.h	reviewed	Shared cursor type, axis, array extent, screen geometry, bitmap/mask layout, hotspot, message, and frame-sentinel domains are named and aligned. The remaining pad extent and SIZE value are proven packed-layout evidence.
 include/BASE/palette.h	reviewed	Palette storage extent and public constructor parameter are named; remaining literal is packed-layout SIZE evidence.
 include/BASE/resource.h	reviewed	Shared resource-category and reference-lifecycle domains are explicit enums. The remaining zero is pure-virtual syntax.
 include/BASE/resourceManager.h	reviewed	Only aggregate capacity, Read13 width, and filename capacity remain public because they define class layout or are consumed by FONT. Implementation policy moved to RESMGR.cpp; private save arrays use incomplete extern declarations.
@@ -153,7 +153,7 @@ src/BASE/Icondf2b.cpp	pending
 src/BASE/Iconf2b.cpp	pending
 src/BASE/Iconm2b.cpp	pending
 src/BASE/Iconmf2b.cpp	pending
-src/BASE/MOUSEMGR.cpp	pending
+src/BASE/MOUSEMGR.cpp	reviewed	Shared cursor extents and axis names cover every table declaration and access; private constants name resource buffers and hotspot centering. Cursor sizes, offsets, and hotspot pairs remain retail data payloads, while allocation/assert operands preserve source-location evidence. The retail default horizontal hotspot deliberately derives from cursor height as emitted.
 src/BASE/Midi.cpp	reviewed	Private enums name the unused LogInt field value, filename capacity, volume calculation, and sequence status. Remaining numeric payloads are track-availability data, booleans, loop counts, and format indices.
 src/BASE/Misc.cpp	reviewed	Private enums name memory diagnostics, preferences, registry widths, hashes, file modes, palette extents, RNG seed and mixing, and data-entry geometry. The fade threshold table remains literal retail data payload; other zeros and ones are booleans, origins, or index steps, while allocation operands preserve source-location evidence.
 src/BASE/PALETTE.cpp	reviewed	Reference lifecycle and palette extents are named; allocation/free operands 8, 13, and 21 preserve retail source-line evidence, while zero is the empty resource id. Pointer state uses NULL.

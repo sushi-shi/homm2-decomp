@@ -63,6 +63,10 @@ public:
 SIZE(mouseManager, 0x8a);
 H2_ENUM_BEGIN(MouseManagerConstant)
     MOUSE_CURSOR_COUNT                 = 96,
+    MOUSE_CURSOR_TYPE_SLOT_COUNT       = 4,
+    MOUSE_CURSOR_HORIZONTAL            = 0,
+    MOUSE_CURSOR_VERTICAL              = 1,
+    MOUSE_CURSOR_AXIS_COUNT            = 2,
     MOUSE_SCREEN_WIDTH                 = 640,
     MOUSE_SCREEN_HEIGHT                = 480,
     MOUSE_SCREEN_CENTER_X              = 320,
@@ -78,16 +82,18 @@ H2_ENUM_BEGIN(MouseManagerConstant)
     MOUSE_CURSOR_BITMAP_HEADER_BYTES   = 6,
     MOUSE_CURSOR_BITMAP_PLANES         = 1,
     MOUSE_CURSOR_BITMAP_BITS_PER_PIXEL = 1,
-    MOUSE_CURSOR_MASK_HIGH_BIT         = 7,
+    MOUSE_CURSOR_MASK_BITS_PER_BYTE    = 8,
+    MOUSE_CURSOR_MASK_HIGH_BIT         = MOUSE_CURSOR_MASK_BITS_PER_BYTE - 1,
     MOUSE_SPELL_CURSOR_HOTSPOT         = 15,
     MOUSE_MANAGER_MESSAGE_MASK         = 0x40,
     MOUSE_INVALID_CURSOR_FRAME         = -1,
+    MOUSE_DEFAULT_HOTSPOT              = -1,
     MOUSE_RELOAD_CURSOR_FRAME          = -99,
     MOUSE_KEEP_CURRENT_FRAME           = 1000
 H2_ENUM_END(MouseManagerConstant)
-extern i32 iMouseOffset[4];
-extern i8 iMouseSize[MOUSE_CURSOR_COUNT][2];
-extern i8 iHotSpot[MOUSE_CURSOR_COUNT][2];
+extern i32 iMouseOffset[MOUSE_CURSOR_TYPE_SLOT_COUNT];
+extern i8 iMouseSize[MOUSE_CURSOR_COUNT][MOUSE_CURSOR_AXIS_COUNT];
+extern i8 iHotSpot[MOUSE_CURSOR_COUNT][MOUSE_CURSOR_AXIS_COUNT];
 extern b32 gbInSetPointer;
 extern i32 bInNewMouseUpdate;
 extern BITMAP bmpAndMask[MOUSE_CURSOR_COUNT];
