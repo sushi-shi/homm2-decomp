@@ -1306,14 +1306,22 @@ void combatManager::EffectSpellDamage(i32* effect, SpellType spell, i32 targetHe
                     if (step == 0)
                         currentHex = targetHex;
                     if (step > 0 && step < SPELL_FIREBLAST_SECOND_RING_FIRST)
-                        currentHex = GetAdjacentCellIndexNoArmy(targetHex, step - 1);
+                        currentHex = GetAdjacentCellIndexNoArmy(
+                            targetHex, static_cast<CombatHexDirection>(step - 1)
+                        );
                     if (step >= SPELL_FIREBLAST_SECOND_RING_FIRST
                         && step < SPELL_FIREBLAST_AXIAL_FIRST) {
                         currentHex = GetAdjacentCellIndexNoArmy(
-                            targetHex, step - SPELL_FIREBLAST_SECOND_RING_FIRST
+                            targetHex,
+                            static_cast<CombatHexDirection>(
+                                step - SPELL_FIREBLAST_SECOND_RING_FIRST
+                            )
                         );
                         currentHex = GetAdjacentCellIndexNoArmy(
-                            currentHex, step - SPELL_FIREBLAST_SECOND_RING_FIRST
+                            currentHex,
+                            static_cast<CombatHexDirection>(
+                                step - SPELL_FIREBLAST_SECOND_RING_FIRST
+                            )
                         );
                     }
                     if (step == SPELL_FIREBLAST_AXIAL_FIRST)

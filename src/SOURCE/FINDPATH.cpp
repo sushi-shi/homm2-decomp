@@ -370,7 +370,8 @@ void searchArray::SeedCombatPosition(class army* unit) {
         if (HAS(enemy->m_monster.attributes, MONSTER_ATTRIBUTE_WIDE) != 0) {
             hex = enemy->GetAdjacentCellIndex(
                 hex,
-                enemy->m_facing == 1 ? COMBAT_DIRECTION_EAST : COMBAT_DIRECTION_WEST
+                enemy->m_facing == ARMY_FACING_RIGHT ? COMBAT_DIRECTION_EAST
+                                                      : COMBAT_DIRECTION_WEST
             );
             if ((unit->m_monster.speed > 0
                  && unit->GetAttackMask(
@@ -402,7 +403,7 @@ i32 searchArray::FindCombatPath(
         i32 sourceWideHex = -1;
         i32 targetWideHex = -1;
         if (HAS(unit->m_monster.attributes, MONSTER_ATTRIBUTE_WIDE) != 0) {
-            i32 offset = unit->m_facing == 1 ? 1 : -1;
+            i32 offset = unit->m_facing == ARMY_FACING_RIGHT ? 1 : -1;
             sourceWideHex = unit->m_hex + offset;
             targetWideHex = targetHex + offset;
         }
@@ -437,7 +438,7 @@ i32 searchArray::FindCombatPath(
         i32 currentHex;
         PushCombatPoint(
             sourceHex,
-            unit->m_facing == 0 ? COMBAT_DIRECTION_WEST : COMBAT_DIRECTION_EAST,
+            unit->m_facing == ARMY_FACING_LEFT ? COMBAT_DIRECTION_WEST : COMBAT_DIRECTION_EAST,
             0,
             unit->m_monster.speed
         );
@@ -475,7 +476,9 @@ i32 searchArray::FindCombatPath(
             u32 moveMask = unit->GetMoveMask(currentHex);
             for (i32 direction = 0; direction < SEARCH_DIRECTION_COUNT; direction++) {
                 if ((moveMask & (1U << direction)) == 0) {
-                    i32 nextHex = unit->GetAdjacentCellIndex(currentHex, direction);
+                    i32 nextHex = unit->GetAdjacentCellIndex(
+                        currentHex, static_cast<CombatHexDirection>(direction)
+                    );
                     i32 moatCost = 0;
                     if (bIsMoatSlowed[nextHex])
                         moatCost = unit->m_speed + MOAT_MOVEMENT_PENALTY;
@@ -531,7 +534,8 @@ reconstructPath:
         m_pathLength++;
         if (m_pathLength > LENGTH_LIMIT)
             break;
-        i32 opposite = OppositeDirection(cell.direction);
+        CombatHexDirection opposite =
+            OppositeDirection(static_cast<CombatHexDirection>(cell.direction));
         bestHex = unit->GetAdjacentCellIndex(bestHex, opposite);
     }
     attackTargetHex = m_pathLength;

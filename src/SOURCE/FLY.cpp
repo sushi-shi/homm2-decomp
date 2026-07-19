@@ -21,16 +21,12 @@ H2_ENUM_BEGIN(ArmyFlightConstant)
     VAMPIRE_FLIGHT_SOUND_DELAY = 100
 H2_ENUM_END(ArmyFlightConstant)
 
-inline i32 FacingRearDirection(i32 facing) {
-    return facing == 1 ? COMBAT_DIRECTION_EAST : COMBAT_DIRECTION_WEST;
+inline CombatHexDirection FacingRearDirection(ArmyFacing facing) {
+    return facing == ARMY_FACING_RIGHT ? COMBAT_DIRECTION_EAST : COMBAT_DIRECTION_WEST;
 }
 
-inline i32 FacingFrontDirection(i32 facing) {
-    return facing == 1 ? COMBAT_DIRECTION_WEST : COMBAT_DIRECTION_EAST;
-}
-
-inline i32 FacingRearHexOffset(i32 facing) {
-    return facing == 1 ? 1 : -1;
+inline CombatHexDirection FacingFrontDirection(ArmyFacing facing) {
+    return facing == ARMY_FACING_RIGHT ? COMBAT_DIRECTION_WEST : COMBAT_DIRECTION_EAST;
 }
 
 }
@@ -96,8 +92,8 @@ i32 army::ValidFlight(i32 destination, i32 fromTargetHex) {
     army* target;
     i32 targetHex;
     i32 attackMask;
-    i32 initialDirection;
-    i32 direction;
+    CombatHexDirection initialDirection;
+    CombatHexDirection direction;
     i32 attackHex[ARMY_ATTACK_HEX_COUNT];
     u32 directionMask;
     i32 adjacentHex;
@@ -140,17 +136,17 @@ i32 army::ValidFlight(i32 destination, i32 fromTargetHex) {
             m_moveTargetHex = m_hex;
             return 1;
         }
-        attackMask |= 1 << initialDirection;
+        attackMask |= 1 << IDX(initialDirection);
     }
 
     directionMask = 0;
     if (HAS(target->m_monster.flags.all, MONSTER_FLAGS_WIDE) && !fromTargetHex) {
-        if (target->m_facing == 1) {
+        if (target->m_facing == ARMY_FACING_RIGHT) {
             targetHex++;
         } else {
             targetHex--;
         }
-        if (target->m_facing == 1) {
+        if (target->m_facing == ARMY_FACING_RIGHT) {
             directionMask = 1 << COMBAT_DIRECTION_WEST;
         } else {
             directionMask = 1 << COMBAT_DIRECTION_EAST;
@@ -169,22 +165,22 @@ i32 army::ValidFlight(i32 destination, i32 fromTargetHex) {
                 );
                 for (i = 0; i < ARMY_COMBAT_DIRECTION_COUNT; i++) {
                     if (attackMask & (1 << i)) {
-                        m_attackDirection = i;
+                        m_attackDirection = static_cast<CombatHexDirection>(i);
                     }
                 }
             }
             return 1;
         }
-        directionMask |= 1 << direction;
+        directionMask |= 1 << IDX(direction);
     }
 
     if (HAS(target->m_monster.flags.all, MONSTER_FLAGS_WIDE) && !fromTargetHex) {
-        if (target->m_facing == 1) {
+        if (target->m_facing == ARMY_FACING_RIGHT) {
             targetHex--;
         } else {
             targetHex++;
         }
-        if (target->m_facing == 1) {
+        if (target->m_facing == ARMY_FACING_RIGHT) {
             directionMask = 1 << COMBAT_DIRECTION_EAST;
         } else {
             directionMask = 1 << COMBAT_DIRECTION_WEST;
@@ -197,7 +193,7 @@ i32 army::ValidFlight(i32 destination, i32 fromTargetHex) {
                 m_attackDirection = GetBestDirection(m_moveTargetHex, targetHex, 0);
                 return 1;
             }
-            directionMask |= 1 << direction;
+            directionMask |= 1 << IDX(direction);
         }
     }
     return 0;
@@ -244,16 +240,16 @@ i32 army::FlyTo(i32 destination) {
     destinationColumn = destination % ARMY_HEX_COLUMNS;
     columnDifference = destinationColumn - sourceColumn;
     m_facingChanged = 0;
-    if (columnDifference > 0 && m_facing == 0) {
+    if (columnDifference > 0 && m_facing == ARMY_FACING_LEFT) {
         m_facingChanged = 1;
-        m_facing = 1 - m_facing;
+        m_facing = OppositeArmyFacing(m_facing);
         if (HAS(m_monster.flags.all, MONSTER_FLAGS_WIDE)) {
             m_hex--;
             destination--;
         }
-    } else if (columnDifference < 0 && m_facing == 1) {
+    } else if (columnDifference < 0 && m_facing == ARMY_FACING_RIGHT) {
         m_facingChanged = 1;
-        m_facing = 1 - m_facing;
+        m_facing = OppositeArmyFacing(m_facing);
         if (HAS(m_monster.flags.all, MONSTER_FLAGS_WIDE)) {
             m_hex++;
             destination++;
@@ -287,7 +283,7 @@ i32 army::FlyTo(i32 destination) {
     gpCombatManager->m_hexCells[m_hex].m_occupantSide = -1;
     gpCombatManager->m_hexCells[m_hex].m_occupantFrame = -1;
     if (HAS(m_monster.flags.all, MONSTER_FLAGS_WIDE)) {
-        sourceRearHex = FacingRearHexOffset(m_facing) + m_hex;
+        sourceRearHex = ArmyFacingRearHexOffset(m_facing) + m_hex;
         gpCombatManager->m_hexCells[sourceRearHex].m_occupantIndex = -1;
         gpCombatManager->m_hexCells[sourceRearHex].m_occupantSide = -1;
         gpCombatManager->m_hexCells[sourceRearHex].m_occupantFrame = -1;
@@ -442,7 +438,7 @@ i32 army::FlyTo(i32 destination) {
         static_cast<i8>(gpCombatManager->m_currentArmyIndex);
     gpCombatManager->m_hexCells[destination].m_occupantFrame = -1;
     if (HAS(m_monster.flags.all, MONSTER_FLAGS_WIDE)) {
-        destinationRearHex = FacingRearHexOffset(m_facing) + destination;
+        destinationRearHex = ArmyFacingRearHexOffset(m_facing) + destination;
         gpCombatManager->m_hexCells[destinationRearHex].m_occupantSide =
             static_cast<i8>(gpCombatManager->m_currentArmySide);
         gpCombatManager->m_hexCells[destinationRearHex].m_occupantIndex =
@@ -462,9 +458,9 @@ i32 army::FlyTo(i32 destination) {
     m_animationSequence = ARMY_ANIMATION_STAND;
     m_animationFrame = 0;
     if (m_facingChanged) {
-        m_facing = 1 - m_facing;
+        m_facing = OppositeArmyFacing(m_facing);
         if (HAS(m_monster.flags.all, MONSTER_FLAGS_WIDE)) {
-            if (m_facing == 0) {
+            if (m_facing == ARMY_FACING_LEFT) {
                 m_hex++;
                 destination++;
             } else {

@@ -467,8 +467,9 @@ finish:
         && gpCombatManager->m_hexCells[giNextActionGridIndex].m_occupantSide == COMBAT_OCCUPANT_NONE) {
         for (adjacentDirection6 = 0; adjacentDirection6 < COMBAT_AI_ADJACENT_DIRECTION_COUNT;
              adjacentDirection6++) {
-            adjacentHex8 =
-                currentArmy9->GetAdjacentCellIndex(giNextActionGridIndex, adjacentDirection6);
+            adjacentHex8 = currentArmy9->GetAdjacentCellIndex(
+                giNextActionGridIndex, static_cast<CombatHexDirection>(adjacentDirection6)
+            );
             if (adjacentHex8 > 0 && adjacentHex8 < COMBAT_HEX_COUNT
                 && gpCombatManager->m_hexCells[adjacentHex8].m_occupantSide
                        == COMBAT_DEFENDER_SIDE - m_currentSide)
@@ -525,7 +526,9 @@ void combatManager::DoLichShot(class army* lich) {
         damaged19[target17->m_side * COMBAT_AI_ARMY_SLOT_COUNT + target17->m_index] = 1;
         targetHex36 = target17->m_hex;
         for (direction37 = 0; direction37 < COMBAT_AI_ADJACENT_DIRECTION_COUNT; direction37++) {
-            adjacentHex13 = GetAdjacentCellIndexNoArmy(targetHex36, direction37);
+            adjacentHex13 = GetAdjacentCellIndexNoArmy(
+                targetHex36, static_cast<CombatHexDirection>(direction37)
+            );
             if (adjacentHex13 >= 0 && adjacentHex13 < COMBAT_HEX_COUNT
                 && m_hexCells[adjacentHex13].m_occupantSide != COMBAT_OCCUPANT_NONE
                 && m_hexCells[adjacentHex13].m_occupantIndex != -1
@@ -838,7 +841,7 @@ i32 combatManager::AttemptAttack(class army* currentArmy, i32 side, i32 mask) {
         if (HAS(OD_STEER(targetArmy)[m_armies[side]].m_monster.flags.abilityFlags,
                 MONSTER_ABILITY_FLAG_WIDE)
             != 0) {
-            if (OD_STEER(targetArmy)[m_armies[side]].m_facing == 0)
+            if (OD_STEER(targetArmy)[m_armies[side]].m_facing == ARMY_FACING_LEFT)
                 targetHex--;
             else
                 targetHex++;
@@ -875,7 +878,7 @@ i32 combatManager::AttemptAdjacentAttack(class army* currentArmy) {
         if ((availableMask4 & bit0) != 0
             && currentArmy->ValidAttack(
                 currentArmy->m_hex,
-                direction36,
+                static_cast<CombatHexDirection>(direction36),
                 ARMY_ATTACK_TARGET_ENEMY,
                 ARMY_HEX_INVALID,
                 attackHexes5
@@ -918,7 +921,7 @@ i32 combatManager::WalkTowardArmyFront(class army* currentArmy, i32 side, i32 ma
             MONSTER_ABILITY_FLAG_WIDE)
         != 0)
         frontOffset13 = WIDE_CREATURE_FRONT_OFFSET;
-    if (currentArmy->m_facing == 1)
+    if (currentArmy->m_facing == ARMY_FACING_RIGHT)
         targetHex7 += frontOffset13;
     else
         targetHex7 += -frontOffset13;
@@ -943,7 +946,9 @@ i32 combatManager::WalkTowardArmyFront(class army* currentArmy, i32 side, i32 ma
         while (pathIndex12 >= 0 && movement3 != 0) {
             giNextActionGridIndex = currentArmy->GetAdjacentCellIndex(
                 giNextActionGridIndex,
-                static_cast<u8>(gpSearchArray->m_storage.aiPath.directions[pathIndex12])
+                static_cast<CombatHexDirection>(
+                    gpSearchArray->m_storage.aiPath.directions[pathIndex12]
+                )
             );
             pathIndex12--;
             movement3--;
@@ -1022,7 +1027,9 @@ i32 combatManager::WalkTowardArmy(class army* currentArmy, i32 side, i32 mask) {
         while (pathIndex14 >= 1 && movement27 != 0) {
             giNextActionGridIndex = currentArmy->GetAdjacentCellIndex(
                 giNextActionGridIndex,
-                static_cast<u8>(gpSearchArray->m_storage.aiPath.directions[pathIndex14])
+                static_cast<CombatHexDirection>(
+                    gpSearchArray->m_storage.aiPath.directions[pathIndex14]
+                )
             );
             pathIndex14--;
             movement27--;
