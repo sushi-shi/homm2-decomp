@@ -7,20 +7,12 @@
 #include <BASE/resourceManager.h>
 #include <SOURCE/KB.h>
 
-// Strict builds type-check these private values; production expansion keeps VC4.2 state neutral.
-#ifdef HOMM2_STRICT_ENUM_TYPES
 H2_ENUM_BEGIN(IconWidgetConstant)
     RESOURCE_NAME_CAPACITY = 16,
     COLOR_INDEX_MASK       = 0xff,
     CENTER_SHIFT           = 1,
     BOTTOM_PADDING         = 2
 H2_ENUM_END(IconWidgetConstant)
-#else
-#define RESOURCE_NAME_CAPACITY 16
-#define COLOR_INDEX_MASK 0xff
-#define CENTER_SHIFT 1
-#define BOTTOM_PADDING 2
-#endif
 
 VA(0x004d0a60, 0x2d)
 iconWidget::iconWidget(void) : widget(0, 0, 0, 0, 0, 0) {
@@ -235,10 +227,3 @@ void iconWidget::Draw(void) {
 
 
 VTBL(iconWidget, 0x004eba40);
-
-#ifndef HOMM2_STRICT_ENUM_TYPES
-#undef RESOURCE_NAME_CAPACITY
-#undef COLOR_INDEX_MASK
-#undef CENTER_SHIFT
-#undef BOTTOM_PADDING
-#endif

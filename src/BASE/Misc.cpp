@@ -35,11 +35,16 @@ H2_ENUM_BEGIN(DataEntryWidgetId)
 H2_ENUM_END(DataEntryWidgetId)
 
 H2_ENUM_BEGIN(LogConstant)
-    FILE_DEBUG_LEVEL      = 2,
-    DEBUGGER_OUTPUT_LEVEL = 4,
-    UNUSED_VALUE          = -999,
-    FORMAT_BUFFER_SIZE    = 200,
-    TEXT_BUFFER_SIZE      = 500
+    MEMORY_LEAK_DEBUG_LEVEL   = 1,
+    FILE_DEBUG_LEVEL          = 2,
+    DEBUGGER_OUTPUT_LEVEL     = 4,
+    FORCED_DEBUG_LEVEL        = 9,
+    UNUSED_VALUE              = -999,
+    FORMAT_BUFFER_SIZE        = 200,
+    TEXT_BUFFER_SIZE          = 500,
+    MEMORY_ENTRY_CAPACITY     = 2000,
+    REPORTED_MEMORY_KILOBYTES = 16034,
+    ENTRY_SEARCH_COMPLETE     = 99999
 H2_ENUM_END(LogConstant)
 
 H2_ENUM_BEGIN(MiscGameDefaultConstant)
@@ -317,6 +322,7 @@ DATA(0x0051dd10) static SMiscText gMiscText = {
 };
 
 H2_ENUM_BEGIN(StatusBarLayout)
+    STATUS_BAR_WIDTH   = 640,
     STATUS_BAR_Y       = 460,
     STATUS_BAR_HEIGHT  = 20,
     STATUS_TEXT_Y      = 464,
@@ -325,22 +331,25 @@ H2_ENUM_END(StatusBarLayout)
 
 VA(0x004c3d10, 0x58)
 void InitMemEntry(void) {
-    LogInt(gMemEntryTag, iMemEntries, -999, -999, -999, -999, -999, -999);
-    gpMemEntry = static_cast<MemEntry*>(malloc(2000 * sizeof(MemEntry)));
-    for (i32 i = 0; i < 2000; ++i)
+    LogInt(gMemEntryTag, iMemEntries, UNUSED_VALUE, UNUSED_VALUE, UNUSED_VALUE, UNUSED_VALUE,
+           UNUSED_VALUE, UNUSED_VALUE);
+    gpMemEntry = static_cast<MemEntry*>(malloc(MEMORY_ENTRY_CAPACITY * sizeof(MemEntry)));
+    for (i32 i = 0; i < MEMORY_ENTRY_CAPACITY; ++i)
         gpMemEntry[i].used = 0;
 }
 
 VA(0x004c3d70, 0x20f)
 void* BaseAlloc(u32 size, char* originalFile, i32 originalLine) {
-    char text[200];
-    char logText[500];
+    char text[FORMAT_BUFFER_SIZE];
+    char logText[TEXT_BUFFER_SIZE];
     if (size == 0)
         return NULL;
     if (gpMemEntry == NULL) {
-        LogInt(gMemEntryTag, iMemEntries, -999, -999, -999, -999, -999, -999);
-        gpMemEntry = static_cast<MemEntry*>(malloc(2000 * sizeof(MemEntry)));
-        for (i32 initIndex = 0; initIndex < 2000; ++initIndex)
+        LogInt(gMemEntryTag, iMemEntries, UNUSED_VALUE, UNUSED_VALUE, UNUSED_VALUE,
+               UNUSED_VALUE, UNUSED_VALUE, UNUSED_VALUE);
+        gpMemEntry =
+            static_cast<MemEntry*>(malloc(MEMORY_ENTRY_CAPACITY * sizeof(MemEntry)));
+        for (i32 initIndex = 0; initIndex < MEMORY_ENTRY_CAPACITY; ++initIndex)
             gpMemEntry[initIndex].used = 0;
     }
     giTotalMemAllocated += size;
@@ -351,17 +360,17 @@ void* BaseAlloc(u32 size, char* originalFile, i32 originalLine) {
     }
     ++iMemEntries;
     i32 entryIndex;
-    for (entryIndex = 0; entryIndex < 2000; ++entryIndex) {
+    for (entryIndex = 0; entryIndex < MEMORY_ENTRY_CAPACITY; ++entryIndex) {
         if (!gpMemEntry[entryIndex].used) {
             gpMemEntry[entryIndex].used = 1;
             gpMemEntry[entryIndex].ptr = ptr;
             gpMemEntry[entryIndex].size = size;
             strcpy(gpMemEntry[entryIndex].file, originalFile);
             gpMemEntry[entryIndex].line = originalLine;
-            entryIndex = 99999;
+            entryIndex = ENTRY_SEARCH_COMPLETE;
         }
     }
-    if (giDebugLevel == 4) {
+    if (giDebugLevel == DEBUGGER_OUTPUT_LEVEL) {
         sprintf(
             text,
             gMiscText.memory.allocationFormat.text,
@@ -370,7 +379,7 @@ void* BaseAlloc(u32 size, char* originalFile, i32 originalLine) {
             originalFile,
             originalLine
         );
-        if (giDebugLevel >= 2) {
+        if (giDebugLevel >= FILE_DEBUG_LEVEL) {
             FILE* logFile = fopen(gMiscText.log.appendFilename.text, gMiscText.log.appendMode.text);
             if (logFile != NULL) {
                 strcpy(logText, text);
@@ -378,7 +387,7 @@ void* BaseAlloc(u32 size, char* originalFile, i32 originalLine) {
                     *reinterpret_cast<const u16*>(gMiscText.log.appendNewline.text);
                 fputs(logText, logFile);
                 fclose(logFile);
-                if (giDebugLevel == 4)
+                if (giDebugLevel == DEBUGGER_OUTPUT_LEVEL)
                     OutputDebugStringA(logText);
             }
         }
@@ -388,27 +397,29 @@ void* BaseAlloc(u32 size, char* originalFile, i32 originalLine) {
 
 VA(0x004c3f80, 0x386)
 void BaseFree(void* ptr, char* originalFile, i32 originalLine) {
-    char logText[500];
-    char text[200];
+    char logText[TEXT_BUFFER_SIZE];
+    char text[FORMAT_BUFFER_SIZE];
     if (gpMemEntry == NULL) {
-        LogInt(gMemEntryTag, iMemEntries, -999, -999, -999, -999, -999, -999);
-        gpMemEntry = static_cast<MemEntry*>(malloc(2000 * sizeof(MemEntry)));
-        for (i32 initIndex = 0; initIndex < 2000; ++initIndex)
+        LogInt(gMemEntryTag, iMemEntries, UNUSED_VALUE, UNUSED_VALUE, UNUSED_VALUE,
+               UNUSED_VALUE, UNUSED_VALUE, UNUSED_VALUE);
+        gpMemEntry =
+            static_cast<MemEntry*>(malloc(MEMORY_ENTRY_CAPACITY * sizeof(MemEntry)));
+        for (i32 initIndex = 0; initIndex < MEMORY_ENTRY_CAPACITY; ++initIndex)
             gpMemEntry[initIndex].used = 0;
     }
-    if (giDebugLevel == 4)
+    if (giDebugLevel == DEBUGGER_OUTPUT_LEVEL)
         LogInt(
             gMiscText.memory.freeLabel.text,
             reinterpret_cast<i32>(ptr),
-            -999,
-            -999,
-            -999,
-            -999,
-            -999,
-            -999
+            UNUSED_VALUE,
+            UNUSED_VALUE,
+            UNUSED_VALUE,
+            UNUSED_VALUE,
+            UNUSED_VALUE,
+            UNUSED_VALUE
         );
     if (ptr == NULL) {
-        if (giDebugLevel >= 2) {
+        if (giDebugLevel >= FILE_DEBUG_LEVEL) {
             FILE* logFile = fopen(gMiscText.log.appendFilename.text, gMiscText.log.appendMode.text);
             if (logFile != NULL) {
                 strcpy(logText, gMiscText.memory.nullPointer.text);
@@ -416,7 +427,7 @@ void BaseFree(void* ptr, char* originalFile, i32 originalLine) {
                     *reinterpret_cast<const u16*>(gMiscText.log.appendNewline.text);
                 fputs(logText, logFile);
                 fclose(logFile);
-                if (giDebugLevel == 4)
+                if (giDebugLevel == DEBUGGER_OUTPUT_LEVEL)
                     OutputDebugStringA(logText);
             }
         }
@@ -427,17 +438,17 @@ void BaseFree(void* ptr, char* originalFile, i32 originalLine) {
         LogInt(
             gMiscText.memory.entryUnderflow.text,
             iMemEntries,
-            -999,
-            -999,
-            -999,
-            -999,
-            -999,
-            -999
+            UNUSED_VALUE,
+            UNUSED_VALUE,
+            UNUSED_VALUE,
+            UNUSED_VALUE,
+            UNUSED_VALUE,
+            UNUSED_VALUE
         );
     i32 entryIndex;
-    for (entryIndex = 0; entryIndex < 2000; ++entryIndex) {
+    for (entryIndex = 0; entryIndex < MEMORY_ENTRY_CAPACITY; ++entryIndex) {
         if (gpMemEntry[entryIndex].ptr == ptr) {
-            if (giDebugLevel == 4) {
+            if (giDebugLevel == DEBUGGER_OUTPUT_LEVEL) {
                 sprintf(
                     text,
                     gMiscText.memory.freeFormat.text,
@@ -446,7 +457,7 @@ void BaseFree(void* ptr, char* originalFile, i32 originalLine) {
                     gpMemEntry[entryIndex].file,
                     gpMemEntry[entryIndex].line
                 );
-                if (giDebugLevel >= 2) {
+                if (giDebugLevel >= FILE_DEBUG_LEVEL) {
                     FILE* logFile =
                         fopen(gMiscText.log.appendFilename.text, gMiscText.log.appendMode.text);
                     if (logFile != NULL) {
@@ -455,19 +466,19 @@ void BaseFree(void* ptr, char* originalFile, i32 originalLine) {
                             *reinterpret_cast<const u16*>(gMiscText.log.appendNewline.text);
                         fputs(logText, logFile);
                         fclose(logFile);
-                        if (giDebugLevel == 4)
+                        if (giDebugLevel == DEBUGGER_OUTPUT_LEVEL)
                             OutputDebugStringA(logText);
                     }
                 }
             }
             gpMemEntry[entryIndex].used = 0;
             giTotalMemAllocated -= gpMemEntry[entryIndex].size;
-            entryIndex = 99999;
+            entryIndex = ENTRY_SEARCH_COMPLETE;
         }
     }
-    if (entryIndex < 99999) {
+    if (entryIndex < ENTRY_SEARCH_COMPLETE) {
         sprintf(gText, gMiscText.memory.badDeleteFormat.text, originalFile, originalLine, ptr);
-        if (giDebugLevel >= 2) {
+        if (giDebugLevel >= FILE_DEBUG_LEVEL) {
             FILE* logFile = fopen(gMiscText.log.appendFilename.text, gMiscText.log.appendMode.text);
             if (logFile != NULL) {
                 strcpy(logText, gText);
@@ -475,7 +486,7 @@ void BaseFree(void* ptr, char* originalFile, i32 originalLine) {
                     *reinterpret_cast<const u16*>(gMiscText.log.appendNewline.text);
                 fputs(logText, logFile);
                 fclose(logFile);
-                if (giDebugLevel == 4)
+                if (giDebugLevel == DEBUGGER_OUTPUT_LEVEL)
                     OutputDebugStringA(logText);
             }
         }
@@ -486,17 +497,17 @@ void BaseFree(void* ptr, char* originalFile, i32 originalLine) {
 
 VA(0x004c4310, 0x134)
 void PrintMemoryLeaks(void) {
-    char logText[500];
-    if (giDebugLevel >= 1 && gpMemEntry != NULL) {
+    char logText[TEXT_BUFFER_SIZE];
+    if (giDebugLevel >= MEMORY_LEAK_DEBUG_LEVEL && gpMemEntry != NULL) {
         LogInt(
             gMiscText.memory.leakCountLabel.text,
             iMemEntries,
-            -999,
-            -999,
-            -999,
-            -999,
-            -999,
-            -999
+            UNUSED_VALUE,
+            UNUSED_VALUE,
+            UNUSED_VALUE,
+            UNUSED_VALUE,
+            UNUSED_VALUE,
+            UNUSED_VALUE
         );
         i32 entryIndex = 0;
         do {
@@ -509,7 +520,7 @@ void PrintMemoryLeaks(void) {
                     reinterpret_cast<i32>(gpMemEntry[entryIndex].ptr),
                     gpMemEntry[entryIndex].size
                 );
-                if (giDebugLevel >= 2) {
+                if (giDebugLevel >= FILE_DEBUG_LEVEL) {
                     FILE* logFile =
                         fopen(gMiscText.log.appendFilename.text, gMiscText.log.appendMode.text);
                     if (logFile != NULL) {
@@ -518,28 +529,32 @@ void PrintMemoryLeaks(void) {
                             *reinterpret_cast<const u16*>(gMiscText.log.appendNewline.text);
                         fputs(logText, logFile);
                         fclose(logFile);
-                        if (giDebugLevel == 4)
+                        if (giDebugLevel == DEBUGGER_OUTPUT_LEVEL)
                             OutputDebugStringA(logText);
                     }
                 }
             }
             entryIndex = entryIndex + 1;
-        } while (entryIndex < 2000);
+        } while (entryIndex < MEMORY_ENTRY_CAPACITY);
     }
 }
 
 VA(0x004c4450, 0x91)
 void ShowMemoryStatus(void) {
-    sprintf(gText, gMiscText.memory.memoryStatusFormat.text, 16034);
+    sprintf(gText, gMiscText.memory.memoryStatusFormat.text, REPORTED_MEMORY_KILOBYTES);
     i32 savedDebugLevel = giDebugLevel;
-    giDebugLevel = 9;
-    FillBitmapArea(gpWindowManager->m_screen, 0, STATUS_BAR_Y, 640, STATUS_BAR_HEIGHT, 0);
-    smallFont->DrawBoundedString(gText, 0, STATUS_TEXT_Y, 640, STATUS_TEXT_HEIGHT, 1, 0);
+    giDebugLevel = FORCED_DEBUG_LEVEL;
+    FillBitmapArea(
+        gpWindowManager->m_screen, 0, STATUS_BAR_Y, STATUS_BAR_WIDTH, STATUS_BAR_HEIGHT, 0
+    );
+    smallFont->DrawBoundedString(
+        gText, 0, STATUS_TEXT_Y, STATUS_BAR_WIDTH, STATUS_TEXT_HEIGHT, 1, 0
+    );
     BlitBitmapToScreen(
         gpWindowManager->m_screen,
         0,
         STATUS_BAR_Y,
-        640,
+        STATUS_BAR_WIDTH,
         STATUS_BAR_HEIGHT,
         0,
         STATUS_BAR_Y
@@ -2226,7 +2241,7 @@ i32 SGenRand(void) {
 
 VA(0x004c6ab0, 0x6)
 i32 MemSize(i32) {
-    return 16034;
+    return REPORTED_MEMORY_KILOBYTES;
 }
 VA(0x004c6ac0, 0x386)
 void GetDataEntry(

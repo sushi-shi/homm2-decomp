@@ -7,6 +7,10 @@
 #include <BASE/bmap2.h>
 #include <SOURCE/KB.h>
 
+H2_ENUM_BEGIN(WidgetConstant)
+    DEFAULT_EXTENT = 16
+H2_ENUM_END(WidgetConstant)
+
 VA(0x004dde00, 0x5a)
 widget::widget(i16 x, i16 y, i16 width, i16 height, i16 id, i16 kind) {
     m_owner = NULL;
@@ -22,8 +26,6 @@ widget::widget(i16 x, i16 y, i16 width, i16 height, i16 id, i16 kind) {
     m_kind = kind;
 }
 
-#define DEFAULT_EXTENT 16
-
 VA(0x004dde60, 0x3f)
 widget::widget(void) {
     m_id = 0;
@@ -38,8 +40,6 @@ widget::widget(void) {
     m_width = DEFAULT_EXTENT;
     m_height = DEFAULT_EXTENT;
 }
-
-#undef DEFAULT_EXTENT
 
 VA(0x004ddea0, 0x7)
 widget::~widget() {}
