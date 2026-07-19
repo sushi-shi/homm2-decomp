@@ -84,7 +84,7 @@ include/SOURCE/FINDPATH.h	reviewed	The pathfinding interface contains one fully 
 include/SOURCE/FINDPATH_TYPES.h	reviewed	Source-location storage derives from the retail source string; remaining literals are packed SIZE evidence for the source-line and aggregate records.
 include/SOURCE/GAME.h	reviewed	Game serialization capacities, object metadata, weekly generation, random-town/hero rules, waits, score scales, and packed event extents are named shared domains; event resources and players derive from their public counts.
 include/SOURCE/HERO.h	reviewed	The hero-screen interface contains declarations only and no numeric constants or storage extents.
-include/SOURCE/KB.h	pending
+include/SOURCE/KB.h	reviewed	Shared global timers, campaign, dialogs, high scores, menus, startup networking, packets, building tables, and net-box domains are named enums; packed names, gaps, and payload heads use named extents and public tables derive from their domains.
 include/SOURCE/KB_TYPES.h	reviewed	Shared serialized and runtime type domains are explicit enums; combat-hero side coordinates and spell-info sound/race arrays use named extents derived from their domains, with remaining literals limited to SIZE evidence.
 include/SOURCE/Modem.h	reviewed	Modem stages, serial parameters, timing, framing bytes, and all shared buffer extents are named aligned enums; the remaining zero writes a string terminator in the inline response helper.
 include/SOURCE/NOOPT.h	reviewed	No literal values.
