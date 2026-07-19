@@ -14,8 +14,8 @@ local-table literal.
 
 - `annotation` covers `VA`, `VAU`, `DATA`, `VTBL`, `SIZE`, and symbol metadata. These values are
   evidence, not gameplay constants.
-- `enum` is an already declared numeric domain. Its declaration and public/private placement are
-  governed by `config/integer_domains.toml` and `homm2 enum-types`.
+- `enum` is an already declared numeric domain. Shared domains live in their owning header;
+  domains used by one translation unit live in that `.cpp` and use prefix-free names where clear.
 - `data-payload` is an element of a global initialized object. Review the table's identity, type,
   dimensions, and storage as a unit; do not invent a name for every payload byte.
 - `local-table` is an initialized table inside a function. Prefer a named private table and named

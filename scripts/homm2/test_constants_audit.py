@@ -10,6 +10,9 @@ class ConstantsAuditTest(unittest.TestCase):
         source = """\
 DATA(0x401000) i32 values[3] = {4, 5, 6};
 enum { VALUE_SEVEN = 7 };
+H2_ENUM_BEGIN(SampleValue)
+    VALUE_ELEVEN = 11
+H2_ENUM_END(SampleValue)
 VA(0x402000, 0x20)
 i32 Function(i32 value) {
     i32 table[2] = {8, 9};
@@ -24,9 +27,10 @@ i32 Function(i32 value) {
         self.assertEqual(categories[("0x401000", 1)], "annotation")
         self.assertEqual(categories[("5", 1)], "data-payload")
         self.assertEqual(categories[("7", 2)], "enum")
-        self.assertEqual(categories[("0x402000", 3)], "annotation")
-        self.assertEqual(categories[("9", 5)], "local-table")
-        self.assertEqual(categories[("10", 6)], "code")
+        self.assertEqual(categories[("11", 4)], "enum")
+        self.assertEqual(categories[("0x402000", 6)], "annotation")
+        self.assertEqual(categories[("9", 8)], "local-table")
+        self.assertEqual(categories[("10", 9)], "code")
 
     def test_diagnostics_use_source_literal_and_deduplicate(self):
         source = "void Test() {\n    return 12;\n}\n"
