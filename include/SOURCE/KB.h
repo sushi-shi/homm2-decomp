@@ -64,7 +64,7 @@ H2_ENUM_CLASS_BEGIN(MonsterScoreField)
     MONSTER_SCORE_FIELD_COUNT = 2
 H2_ENUM_CLASS_END(MonsterScoreField)
 
-H2_ENUM_BEGIN(CampaignChoiceType)
+H2_ENUM_CLASS_BEGIN_T(CampaignChoiceType, u8)
     CAMPAIGN_CHOICE_RESOURCE        = 0,
     CAMPAIGN_CHOICE_ARTIFACT        = 1,
     CAMPAIGN_CHOICE_SPELL           = 2,
@@ -77,7 +77,7 @@ H2_ENUM_BEGIN(CampaignChoiceType)
     CAMPAIGN_CHOICE_PRIMARY_SKILL   = 9,
     CAMPAIGN_CHOICE_SPELL_SCROLL    = 10,
     CAMPAIGN_CHOICE_INVALID         = 255
-H2_ENUM_END(CampaignChoiceType)
+H2_ENUM_CLASS_END_T(CampaignChoiceType, u8)
 
 H2_ENUM_BEGIN(CampaignConstant)
     CAMPAIGN_MAP_COUNT                = 12,
@@ -108,7 +108,7 @@ H2_ENUM_END(CampaignConstant)
 
 #pragma pack(push, 1)
 struct SCampaignChoice {
-    u8 type;
+    CampaignChoiceType type;
     i16 value;
     i16 amount;
 };
