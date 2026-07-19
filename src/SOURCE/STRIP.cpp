@@ -12,6 +12,15 @@
 #include <SOURCE/playerData.h>
 #include <SOURCE/strip.h>
 
+H2_ENUM_BEGIN(BankBoxConstant)
+    BOX_TEXT_SIZE               = 12,
+    BOX_NON_GOLD_RESOURCE_COUNT = 6,
+    BOX_FIRST_RESOURCE_WIDGET   = 0x7ee,
+    BOX_GOLD_WIDGET             = 0x7f4,
+    BOX_WINDOW_Z_ORDER          = -1,
+    BOX_WINDOW_ACTIVE           = 1
+H2_ENUM_END(BankBoxConstant)
+
 VA(0x00432230, 0x27e)
 strip::strip(
     i32 x,
@@ -209,7 +218,7 @@ bankBox::bankBox(i32 x, i32 y, class playerData* player) {
     m_window = new heroWindow(m_x, m_y, "bankbox.bin");
     if (m_window == 0)
         MemError();
-    gpWindowManager->AddWindow(m_window, BANK_BOX_WINDOW_Z_ORDER, BANK_BOX_WINDOW_ACTIVE);
+    gpWindowManager->AddWindow(m_window, BOX_WINDOW_Z_ORDER, BOX_WINDOW_ACTIVE);
     Update(1);
 }
 
@@ -221,20 +230,20 @@ bankBox::~bankBox() {
 
 VA(0x00432b2d, 0xcd)
 void bankBox::Update(i32 drawWindow) {
-    char text[BANK_BOX_TEXT_SIZE];
+    char text[BOX_TEXT_SIZE];
     tag_message message;
     i32 resource_1;
 
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = BANK_BOX_SET_TEXT_COMMAND;
-    for (resource_1 = 0; resource_1 < BANK_BOX_NON_GOLD_RESOURCE_COUNT; resource_1++) {
+    for (resource_1 = 0; resource_1 < BOX_NON_GOLD_RESOURCE_COUNT; resource_1++) {
         sprintf(text, "%d", m_player->m_resources[resource_1]);
-        message.payload.widget.id = BANK_BOX_FIRST_RESOURCE_WIDGET + resource_1;
+        message.payload.widget.id = BOX_FIRST_RESOURCE_WIDGET + resource_1;
         message.payload.widget.data.text = text;
         m_window->BroadcastMessage(message);
     }
     sprintf(text, "%d", m_player->m_resources[IDX(RES_GOLD)]);
-    message.payload.widget.id = BANK_BOX_GOLD_WIDGET;
+    message.payload.widget.id = BOX_GOLD_WIDGET;
     message.payload.widget.data.text = text;
     m_window->BroadcastMessage(message);
     m_window->DrawWindow(drawWindow);

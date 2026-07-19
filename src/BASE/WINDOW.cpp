@@ -18,6 +18,22 @@
 #include <SOURCE/KB.h>
 #include <stdlib.h>
 #include <string.h>
+H2_ENUM_CLASS_BEGIN(WindowWidgetRecordType)
+    WIDGET_RECORD_END                   = 0,
+    WIDGET_RECORD_BORDER                = 1,
+    WIDGET_RECORD_BUTTON                = 2,
+    WIDGET_RECORD_TEXT                  = 8,
+    WIDGET_RECORD_ICON                  = 0x10,
+    WIDGET_RECORD_DIMMER                = 0x40,
+    WIDGET_RECORD_TEXT_ENTRY            = 0x100,
+    WIDGET_RECORD_TEXT_ENTRY_RECT       = 0x201,
+    WIDGET_RECORD_TEXT_ENTRY_MULTILINE  = 0x202,
+    WIDGET_RECORD_DROP_LIST             = 0x203,
+    WIDGET_RECORD_TEXT_ENTRY_INSET_FIVE = 0x204,
+    WIDGET_RECORD_LIST_BOX              = 0x205,
+    WIDGET_RECORD_TEXT_ENTRY_INSET_FOUR = 0x206
+H2_ENUM_CLASS_END(WindowWidgetRecordType)
+
 VA(0x004ceb70, 0xaa)
 heroWindow::heroWindow(void) {
     strcpy(name, "Default Construct");
@@ -88,65 +104,65 @@ heroWindow::heroWindow(i32 x, i32 y, char* resourceName) {
         type = gpResourceManager->ReadWord();
         pwdg = 0;
         switch (type) {
-            case IDX(WINDOW_WIDGET_RECORD_END):
+            case IDX(WIDGET_RECORD_END):
                 idx++;
                 break;
-            case IDX(WINDOW_WIDGET_RECORD_BORDER):
+            case IDX(WIDGET_RECORD_BORDER):
                 pbd = new border();
                 pbd->Read();
                 pwdg = pbd;
                 break;
-            case IDX(WINDOW_WIDGET_RECORD_BUTTON):
+            case IDX(WIDGET_RECORD_BUTTON):
                 pbtn = new button();
                 pbtn->Read();
                 pwdg = pbtn;
                 break;
-            case IDX(WINDOW_WIDGET_RECORD_ICON):
+            case IDX(WIDGET_RECORD_ICON):
                 picn = new iconWidget();
                 picn->Read();
                 pwdg = picn;
                 break;
-            case IDX(WINDOW_WIDGET_RECORD_DIMMER):
+            case IDX(WIDGET_RECORD_DIMMER):
                 pdim = new dimmerWidget();
                 pdim->Read();
                 pwdg = pdim;
                 break;
-            case IDX(WINDOW_WIDGET_RECORD_TEXT):
+            case IDX(WIDGET_RECORD_TEXT):
                 ptw = new textWidget();
                 ptw->Read();
                 pwdg = ptw;
                 break;
-            case IDX(WINDOW_WIDGET_RECORD_TEXT_ENTRY):
+            case IDX(WIDGET_RECORD_TEXT_ENTRY):
                 pte = new textEntryWidget();
                 pte->Read(1);
                 pwdg = pte;
                 break;
-            case IDX(WINDOW_WIDGET_RECORD_TEXT_ENTRY_RECT):
+            case IDX(WIDGET_RECORD_TEXT_ENTRY_RECT):
                 pte = new textEntryWidget();
                 pte->Read(2);
                 pwdg = pte;
                 break;
-            case IDX(WINDOW_WIDGET_RECORD_TEXT_ENTRY_MULTILINE):
+            case IDX(WIDGET_RECORD_TEXT_ENTRY_MULTILINE):
                 pte = new textEntryWidget();
                 pte->Read(3);
                 pwdg = pte;
                 break;
-            case IDX(WINDOW_WIDGET_RECORD_TEXT_ENTRY_INSET_FIVE):
+            case IDX(WIDGET_RECORD_TEXT_ENTRY_INSET_FIVE):
                 pte = new textEntryWidget();
                 pte->Read(4);
                 pwdg = pte;
                 break;
-            case IDX(WINDOW_WIDGET_RECORD_TEXT_ENTRY_INSET_FOUR):
+            case IDX(WIDGET_RECORD_TEXT_ENTRY_INSET_FOUR):
                 pte = new textEntryWidget();
                 pte->Read(5);
                 pwdg = pte;
                 break;
-            case IDX(WINDOW_WIDGET_RECORD_DROP_LIST):
+            case IDX(WIDGET_RECORD_DROP_LIST):
                 pdl = new dropListWidget();
                 pdl->Read();
                 pwdg = pdl;
                 break;
-            case IDX(WINDOW_WIDGET_RECORD_LIST_BOX):
+            case IDX(WIDGET_RECORD_LIST_BOX):
                 plist = new listBoxWidget();
                 plist->Read();
                 pwdg = plist;

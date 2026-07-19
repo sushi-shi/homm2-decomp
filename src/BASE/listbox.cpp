@@ -1,6 +1,5 @@
 #include <va.h>
 #include <BASE/listBoxWidget.h>
-#include <BASE/LISTBOX_TYPES.h>
 #include <BASE/bitmap.h>
 #include <BASE/resourceManager.h>
 #include <BASE/icon.h>
@@ -13,6 +12,48 @@
 #include <SOURCE/kbwin.h>
 #include <string.h>
 #include <SOURCE/X_GLOBAL.h>
+
+H2_ENUM_BEGIN(ListBoxSourceFileConstant)
+    SOURCE_FILE_SLOT_SIZE = 0x2c
+H2_ENUM_END(ListBoxSourceFileConstant)
+
+H2_ENUM_CLASS_BEGIN(ListBoxTiming)
+    DOUBLE_CLICK_TICKS = 0x190
+H2_ENUM_CLASS_END(ListBoxTiming)
+
+H2_ENUM_BEGIN(ListBoxDestructorSourceFileOffset)
+    DESTRUCTOR_ITEM_SOURCE_FILE_OFFSET = 0,
+    DESTRUCTOR_LIST_SOURCE_FILE_OFFSET = SOURCE_FILE_SLOT_SIZE
+H2_ENUM_END(ListBoxDestructorSourceFileOffset)
+
+H2_ENUM_BEGIN(ListBoxDeleteSourceFileOffset)
+    DELETE_ITEM_SOURCE_FILE_OFFSET       = 0,
+    DELETE_LIST_SOURCE_FILE_OFFSET       = SOURCE_FILE_SLOT_SIZE,
+    DELETE_ALLOCATION_SOURCE_FILE_OFFSET = 2 * SOURCE_FILE_SLOT_SIZE,
+    DELETE_OLD_LIST_SOURCE_FILE_OFFSET   = 3 * SOURCE_FILE_SLOT_SIZE
+H2_ENUM_END(ListBoxDeleteSourceFileOffset)
+
+H2_ENUM_BEGIN(ListBoxMainSourceFileOffset)
+    REPLACE_ITEM_SOURCE_FILE_OFFSET           = 0,
+    REPLACE_ALLOCATION_SOURCE_FILE_OFFSET     = SOURCE_FILE_SLOT_SIZE,
+    APPEND_LIST_ALLOCATION_SOURCE_FILE_OFFSET = 2 * SOURCE_FILE_SLOT_SIZE,
+    APPEND_ITEM_ALLOCATION_SOURCE_FILE_OFFSET = 3 * SOURCE_FILE_SLOT_SIZE,
+    APPEND_OLD_LIST_SOURCE_FILE_OFFSET        = 4 * SOURCE_FILE_SLOT_SIZE
+H2_ENUM_END(ListBoxMainSourceFileOffset)
+
+H2_ENUM_BEGIN(ListBoxFrame)
+    FRAME_FIRST_ROW           = 0,
+    FRAME_MIDDLE_ROW          = 1,
+    FRAME_LAST_ROW            = 2,
+    FRAME_SCROLL_UP           = 3,
+    FRAME_SCROLL_UP_PRESSED   = 4,
+    FRAME_SCROLL_DOWN         = 5,
+    FRAME_SCROLL_DOWN_PRESSED = 6,
+    FRAME_SCROLL_TRACK_FIRST  = 7,
+    FRAME_SCROLL_TRACK_MIDDLE = 8,
+    FRAME_SCROLL_TRACK_LAST   = 9,
+    FRAME_SCROLL_THUMB        = 10
+H2_ENUM_END(ListBoxFrame)
 
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\listbox.cpp"
 #define LISTBOX_SOURCE_FILE_SEPARATOR "\0\0\0\0"
@@ -49,7 +90,7 @@ listBoxWidget::~listBoxWidget() {
 #line 27
     H2_FREE_AT(
         m_items,
-        LISTBOX_DESTRUCTOR_SOURCE_FILES + LISTBOX_DESTRUCTOR_LIST_SOURCE_FILE_OFFSET,
+        LISTBOX_DESTRUCTOR_SOURCE_FILES + DESTRUCTOR_LIST_SOURCE_FILE_OFFSET,
         27
     );
     gbSendMouseMoveMessages = false;
@@ -85,37 +126,37 @@ void listBoxWidget::Read(void) {
     m_selectedColor = gpResourceManager->ReadWord();
     m_textMode = gpResourceManager->ReadWord();
     m_id = gpResourceManager->ReadWord();
-    m_firstRowFrame = LISTBOX_FRAME_FIRST_ROW;
-    m_middleRowFrame = LISTBOX_FRAME_MIDDLE_ROW;
-    m_lastRowFrame = LISTBOX_FRAME_LAST_ROW;
-    m_scrollUpFrame = LISTBOX_FRAME_SCROLL_UP;
-    m_scrollUpPressedFrame = LISTBOX_FRAME_SCROLL_UP_PRESSED;
-    m_scrollDownFrame = LISTBOX_FRAME_SCROLL_DOWN;
-    m_scrollDownPressedFrame = LISTBOX_FRAME_SCROLL_DOWN_PRESSED;
-    m_scrollTrackFirstFrame = LISTBOX_FRAME_SCROLL_TRACK_FIRST;
-    m_scrollTrackMiddleFrame = LISTBOX_FRAME_SCROLL_TRACK_MIDDLE;
-    m_scrollTrackLastFrame = LISTBOX_FRAME_SCROLL_TRACK_LAST;
-    m_scrollThumbFrame = LISTBOX_FRAME_SCROLL_THUMB;
-    iconEntry = &m_icon->Entries()[IDX(LISTBOX_FRAME_SCROLL_THUMB)];
+    m_firstRowFrame = FRAME_FIRST_ROW;
+    m_middleRowFrame = FRAME_MIDDLE_ROW;
+    m_lastRowFrame = FRAME_LAST_ROW;
+    m_scrollUpFrame = FRAME_SCROLL_UP;
+    m_scrollUpPressedFrame = FRAME_SCROLL_UP_PRESSED;
+    m_scrollDownFrame = FRAME_SCROLL_DOWN;
+    m_scrollDownPressedFrame = FRAME_SCROLL_DOWN_PRESSED;
+    m_scrollTrackFirstFrame = FRAME_SCROLL_TRACK_FIRST;
+    m_scrollTrackMiddleFrame = FRAME_SCROLL_TRACK_MIDDLE;
+    m_scrollTrackLastFrame = FRAME_SCROLL_TRACK_LAST;
+    m_scrollThumbFrame = FRAME_SCROLL_THUMB;
+    iconEntry = &m_icon->Entries()[IDX(FRAME_SCROLL_THUMB)];
     m_scrollThumbWidth = iconEntry->w;
     frameHeight[0] = iconEntry->h;
     m_scrollThumbHeight = frameHeight[0];
-    firstRowHeight = m_icon->Entries()[IDX(LISTBOX_FRAME_FIRST_ROW)].h;
+    firstRowHeight = m_icon->Entries()[IDX(FRAME_FIRST_ROW)].h;
     m_firstRowHeight = firstRowHeight;
     listX = m_x;
-    rowHeight = m_icon->Entries()[IDX(LISTBOX_FRAME_MIDDLE_ROW)].h;
+    rowHeight = m_icon->Entries()[IDX(FRAME_MIDDLE_ROW)].h;
     listY = m_y;
     m_rowHeight = rowHeight;
-    lastRowHeight = m_icon->Entries()[IDX(LISTBOX_FRAME_LAST_ROW)].h;
+    lastRowHeight = m_icon->Entries()[IDX(FRAME_LAST_ROW)].h;
     m_lastRowHeight = lastRowHeight;
     m_listX = listX;
     m_listY = listY;
-    m_listWidth = m_icon->Entries()[IDX(LISTBOX_FRAME_FIRST_ROW)].w;
+    m_listWidth = m_icon->Entries()[IDX(FRAME_FIRST_ROW)].w;
     m_listHeight = (m_maxVisibleItems - 2) * m_rowHeight + m_firstRowHeight + m_lastRowHeight;
-    iconEntry = &m_icon->Entries()[IDX(LISTBOX_FRAME_SCROLL_UP)];
+    iconEntry = &m_icon->Entries()[IDX(FRAME_SCROLL_UP)];
     m_scrollUpWidth = iconEntry->w;
     m_scrollUpHeight = iconEntry->h;
-    iconEntry = &m_icon->Entries()[IDX(LISTBOX_FRAME_SCROLL_DOWN)];
+    iconEntry = &m_icon->Entries()[IDX(FRAME_SCROLL_DOWN)];
     m_scrollDownWidth = iconEntry->w;
     m_scrollDownHeight = iconEntry->h;
     rightX = m_width - m_scrollUpWidth + m_x;
@@ -159,7 +200,7 @@ void listBoxWidget::DeleteItem(i32 index) {
         H2_FREE_AT(m_items[0], LISTBOX_DELETE_SOURCE_FILES, 0x9c);
         H2_FREE_AT(
             m_items,
-            LISTBOX_DELETE_SOURCE_FILES + LISTBOX_DELETE_LIST_SOURCE_FILE_OFFSET,
+            LISTBOX_DELETE_SOURCE_FILES + DELETE_LIST_SOURCE_FILE_OFFSET,
             157
         );
         m_items = 0;
@@ -167,7 +208,7 @@ void listBoxWidget::DeleteItem(i32 index) {
 #line 162
         char** newItems = static_cast<char**>(H2_ALLOC_AT(
             (m_itemCount - 1) * 4,
-            LISTBOX_DELETE_SOURCE_FILES + LISTBOX_DELETE_ALLOCATION_SOURCE_FILE_OFFSET,
+            LISTBOX_DELETE_SOURCE_FILES + DELETE_ALLOCATION_SOURCE_FILE_OFFSET,
             162
         ));
         memcpy(newItems, m_items, (m_itemCount - 1) * 4);
@@ -177,7 +218,7 @@ void listBoxWidget::DeleteItem(i32 index) {
 #line 169
             H2_FREE_AT(
                 m_items,
-                LISTBOX_DELETE_SOURCE_FILES + LISTBOX_DELETE_OLD_LIST_SOURCE_FILE_OFFSET,
+                LISTBOX_DELETE_SOURCE_FILES + DELETE_OLD_LIST_SOURCE_FILE_OFFSET,
                 169
             );
         m_items = newItems;
@@ -249,7 +290,7 @@ i32 listBoxWidget::Main(tag_message& message) {
                         m_items[message.payload.widget.parameter] = static_cast<char*>(H2_ALLOC_AT(
                             strlen(text) + 1,
                             LISTBOX_MAIN_SOURCE_FILES
-                                + LISTBOX_REPLACE_ALLOCATION_SOURCE_FILE_OFFSET,
+                                + REPLACE_ALLOCATION_SOURCE_FILE_OFFSET,
                             223
                         ));
                         strcpy(m_items[message.payload.widget.parameter], text);
@@ -262,7 +303,7 @@ i32 listBoxWidget::Main(tag_message& message) {
                         char** newItems = static_cast<char**>(H2_ALLOC_AT(
                             (m_itemCount + 1) * 4,
                             LISTBOX_MAIN_SOURCE_FILES
-                                + LISTBOX_APPEND_LIST_ALLOCATION_SOURCE_FILE_OFFSET,
+                                + APPEND_LIST_ALLOCATION_SOURCE_FILE_OFFSET,
                             233
                         ));
                         if (m_itemCount != 0)
@@ -271,7 +312,7 @@ i32 listBoxWidget::Main(tag_message& message) {
                         newItems[m_itemCount] = static_cast<char*>(H2_ALLOC_AT(
                             strlen(text) + 1,
                             LISTBOX_MAIN_SOURCE_FILES
-                                + LISTBOX_APPEND_ITEM_ALLOCATION_SOURCE_FILE_OFFSET,
+                                + APPEND_ITEM_ALLOCATION_SOURCE_FILE_OFFSET,
                             236
                         ));
                         strcpy(newItems[m_itemCount], text);
@@ -281,7 +322,7 @@ i32 listBoxWidget::Main(tag_message& message) {
                             H2_FREE_AT(
                                 m_items,
                                 LISTBOX_MAIN_SOURCE_FILES
-                                    + LISTBOX_APPEND_OLD_LIST_SOURCE_FILE_OFFSET,
+                                    + APPEND_OLD_LIST_SOURCE_FILE_OFFSET,
                                 240
                             );
                         m_items = newItems;
@@ -510,7 +551,7 @@ i32 listBoxWidget::ProcessMouseMessage(tag_message& message) {
                 if (m_lastSelectedIndex == m_selectedIndex) {
                     i32 lastTick = m_lastClickTime;
                     i32 currentTick = KBTickCount();
-                    if (lastTick + IDX(LISTBOX_DOUBLE_CLICK_TICKS) > currentTick)
+                    if (lastTick + IDX(DOUBLE_CLICK_TICKS) > currentTick)
                         message.payload.widget.parameter = 2;
                 }
                 m_lastSelectedIndex = m_selectedIndex;

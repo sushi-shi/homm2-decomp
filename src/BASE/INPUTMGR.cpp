@@ -13,6 +13,27 @@
 #include <BASE/INPUTMGR_TYPES.h>
 #include <BASE/message.h>
 
+H2_ENUM_CLASS_BEGIN(InputManagerScanCodeEncoding)
+    SCAN_CODE_MASK = 0xFF
+H2_ENUM_CLASS_END(InputManagerScanCodeEncoding)
+
+H2_ENUM_CLASS_BEGIN(InputManagerCursorBounds)
+    CURSOR_INTERIOR_MIN_EXCLUSIVE   = 3,
+    CURSOR_INTERIOR_MAX_X_EXCLUSIVE = 636,
+    CURSOR_INTERIOR_MAX_Y_EXCLUSIVE = 476
+H2_ENUM_CLASS_END(InputManagerCursorBounds)
+
+H2_ENUM_CLASS_BEGIN(InputManagerTiming)
+    CURSOR_CHECK_DELAY = 500
+H2_ENUM_CLASS_END(InputManagerTiming)
+
+H2_ENUM_CLASS_BEGIN(InputManagerModifierClearMask)
+    CLEAR_CONTROL_MASK     = 0xfffb,
+    CLEAR_LEFT_SHIFT_MASK  = 0xfffd,
+    CLEAR_RIGHT_SHIFT_MASK = 0xfffe,
+    CLEAR_ALT_MASK         = 0xffdf
+H2_ENUM_CLASS_END(InputManagerModifierClearMask)
+
 DATA(0x0051f980) i32 iCurSwapPalette = 0;
 DATA(0x0051f984) i32 bLastMouseOffscreen = 0;
 DATA(0x0051f988) i32 bLastOnscreenMouseColor = 0;
@@ -40,7 +61,7 @@ i32 KeyboardMessageHandler(void*, u32 message, u32, i32l messageData) {
         case WM_KEYDOWN:
             event->type = MESSAGE_KEY_DOWN;
             event->payload.keyboard.keyCode =
-                static_cast<u16>(static_cast<u32l>(messageData) >> 16) & IDX(INPUT_SCAN_CODE_MASK);
+                static_cast<u16>(static_cast<u32l>(messageData) >> 16) & IDX(SCAN_CODE_MASK);
             event->payload.keyboard.unknown0x08 = 0;
             event->payload.keyboard.modifiers = 0;
             switch (event->payload.keyboard.keyCode) {
@@ -61,21 +82,21 @@ i32 KeyboardMessageHandler(void*, u32 message, u32, i32l messageData) {
         case WM_KEYUP:
             event->type = MESSAGE_KEY_UP;
             event->payload.keyboard.keyCode =
-                static_cast<u16>(static_cast<u32l>(messageData) >> 16) & IDX(INPUT_SCAN_CODE_MASK);
+                static_cast<u16>(static_cast<u32l>(messageData) >> 16) & IDX(SCAN_CODE_MASK);
             event->payload.keyboard.unknown0x08 = 0;
             event->payload.keyboard.modifiers = 0;
             switch (event->payload.keyboard.keyCode) {
                 case INPUT_SCAN_CONTROL:
-                    gpInputManager->m_modifiers &= IDX(INPUT_CLEAR_CONTROL_MASK);
+                    gpInputManager->m_modifiers &= IDX(CLEAR_CONTROL_MASK);
                     break;
                 case INPUT_SCAN_LEFT_SHIFT:
-                    gpInputManager->m_modifiers &= IDX(INPUT_CLEAR_LEFT_SHIFT_MASK);
+                    gpInputManager->m_modifiers &= IDX(CLEAR_LEFT_SHIFT_MASK);
                     break;
                 case INPUT_SCAN_RIGHT_SHIFT:
-                    gpInputManager->m_modifiers &= IDX(INPUT_CLEAR_RIGHT_SHIFT_MASK);
+                    gpInputManager->m_modifiers &= IDX(CLEAR_RIGHT_SHIFT_MASK);
                     break;
                 case INPUT_SCAN_ALT:
-                    gpInputManager->m_modifiers &= IDX(INPUT_CLEAR_ALT_MASK);
+                    gpInputManager->m_modifiers &= IDX(CLEAR_ALT_MASK);
                     break;
             }
             break;
@@ -170,11 +191,11 @@ i32 MouseMessageHandler(void*, u32 message, u32, i32l messageData) {
 
     if (gConfig.gfx[giCurExe].fullScreen == 0 && gConfig.gfx[giCurExe].colorMouseCursor == 0
         && KBTickCount() > iLastBWOnScreenCheck
-        && event->payload.mouse.x > IDX(INPUT_CURSOR_INTERIOR_MIN_EXCLUSIVE)
-        && event->payload.mouse.x < IDX(INPUT_CURSOR_INTERIOR_MAX_X_EXCLUSIVE)
-        && event->payload.mouse.y > IDX(INPUT_CURSOR_INTERIOR_MIN_EXCLUSIVE)
-        && event->payload.mouse.y < IDX(INPUT_CURSOR_INTERIOR_MAX_Y_EXCLUSIVE)) {
-        iLastBWOnScreenCheck = KBTickCount() + IDX(INPUT_CURSOR_CHECK_DELAY);
+        && event->payload.mouse.x > IDX(CURSOR_INTERIOR_MIN_EXCLUSIVE)
+        && event->payload.mouse.x < IDX(CURSOR_INTERIOR_MAX_X_EXCLUSIVE)
+        && event->payload.mouse.y > IDX(CURSOR_INTERIOR_MIN_EXCLUSIVE)
+        && event->payload.mouse.y < IDX(CURSOR_INTERIOR_MAX_Y_EXCLUSIVE)) {
+        iLastBWOnScreenCheck = KBTickCount() + IDX(CURSOR_CHECK_DELAY);
         gpMouseManager->SetPointer(MOUSE_KEEP_CURRENT_FRAME);
     }
 

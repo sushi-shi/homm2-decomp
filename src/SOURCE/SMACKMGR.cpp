@@ -19,20 +19,49 @@
 #include <stdio.h>
 #include <string.h>
 
+H2_ENUM_BEGIN(SmackManagerConstant)
+    SCREEN_WIDTH          = 640,
+    SCREEN_HEIGHT         = 480,
+    PALETTE_SIZE          = 768,
+    AUDIO_OPEN_FLAGS      = 0xfe000,
+    PRELOAD_OPEN_FLAG     = 0x200,
+    NORMAL_FADE           = 0x80,
+    SHORT_FADE            = 8,
+    FAST_FADE             = 4,
+    DIALOG_RETRY          = 0x7806,
+    CHOOSE_CAMPAIGN       = 35,
+    SMACK_CREDITS         = 36,
+    SMACK_EARTH           = 37,
+    FIRST_NETWORK         = 39,
+    EXPANSION_CAMPAIGN    = 67,
+    EXPANSION_FIRST_MOVIE = 68,
+    SPECIAL_MUSIC         = 72,
+    CONGRATS              = 2,
+    INTRO_MUSIC           = 3,
+    LOW_MEMORY_MOVIE      = 30,
+    BACKGROUND_COLOR      = 36,
+    MAIN_MUSIC            = 42,
+    LOSE_MUSIC            = 43,
+    INTRO_SECOND_MUSIC    = 19,
+    POINTER_ID            = 40,
+    POINTER_DEFAULT       = 0,
+    EXPANSION_RECT_COUNT  = 4
+H2_ENUM_END(SmackManagerConstant)
+
 DATA(0x00522f7c) static i8 bExpansionSmackNum;
 
 VA(0x00401000, 0x4e)
 void ConvertSmackerPalette(u8* paletteData) {
     i32 i;
 
-    for (i = 0; i < SMACK_PALETTE_SIZE; ++i)
+    for (i = 0; i < PALETTE_SIZE; ++i)
         paletteData[i] = static_cast<u8>(static_cast<i32>(paletteData[i]) >> 2);
 }
 
 VA(0x0040104e, 0x21f)
 void DoAdvance(Smack* smack, i32 drawFrame, i32 advanceFrame, i32 updatePalette, i32 skipPalette) {
     if (drawFrame && smack->NewPalette && !skipPalette) {
-        memcpy(gPalette->m_data, smack->Palette, SMACK_PALETTE_SIZE);
+        memcpy(gPalette->m_data, smack->Palette, PALETTE_SIZE);
         ConvertSmackerPalette(reinterpret_cast<u8*>(gPalette->m_data));
         if (updatePalette)
             UpdatePalette(gPalette->m_data);
@@ -41,7 +70,7 @@ void DoAdvance(Smack* smack, i32 drawFrame, i32 advanceFrame, i32 updatePalette,
     SmackDoFrame(smack);
     if (drawFrame) {
         while (SmackToBufferRect(smack, SMACKSURFACESLOW)) {
-            if (bSmackNum == SMACK_CHOOSE_CAMPAIGN) {
+            if (bSmackNum == CHOOSE_CAMPAIGN) {
                 if (gbCampaignSideChoice == 1) {
                     brotherIcon->DrawToBuffer(0, 0, 0, 0);
                     brotherIcon->DrawToBuffer(0, 0, 3, 0);
@@ -50,9 +79,9 @@ void DoAdvance(Smack* smack, i32 drawFrame, i32 advanceFrame, i32 updatePalette,
                     brotherIcon->DrawToBuffer(0, 0, 2, 0);
                 }
             }
-            if (bSmackNum == SMACK_EXPANSION_CAMPAIGN && xLastChoice != -1)
+            if (bSmackNum == EXPANSION_CAMPAIGN && xLastChoice != -1)
                 backImage->DrawToBuffer(0, 0, 1, 0);
-            if (bSmackNum == SMACK_CONGRATS && smack->FrameNum >= 36) {
+            if (bSmackNum == CONGRATS && smack->FrameNum >= 36) {
                 smallFont->DrawBoundedString(congratsText, 409, 98, 134, 217, 4, 5);
                 if (smack->FrameNum == 36) {
                     BlitBitmapToScreen(gpWindowManager->m_screen, 0, 0, 639, 479, 0, 0);
@@ -86,25 +115,25 @@ void SmackManagerMain(void) {
     i32 primaryStarted9;
     i32 unusedOne1 = 1;
     char path7[352];
-    i8 savedPalette9[SMACK_PALETTE_SIZE];
+    i8 savedPalette9[PALETTE_SIZE];
     i32 unusedFrameHead36;
 
     gbLastFramePlayed = false;
     musicStarted36 = 0;
-    if (bSmackNum == SMACK_CHOOSE_CAMPAIGN) {
+    if (bSmackNum == CHOOSE_CAMPAIGN) {
         i32 initialMouseY29;
         i32 initialMouseX3;
         i32 unusedInitialMouseState11;
 
         brotherIcon = gpResourceManager->GetIcon("brothers.icn");
         gpMouseManager->MouseCoords(initialMouseX3, initialMouseY29);
-        gbCampaignSideChoice = initialMouseX3 < SMACK_SCREEN_WIDTH / 2;
+        gbCampaignSideChoice = initialMouseX3 < SCREEN_WIDTH / 2;
     }
 
     KBChangeMenu(hmnuDflt);
     gpMouseManager->HideColorPointer();
     bMainDone = 1;
-    memcpy(savedPalette9, gPalette->m_data, SMACK_PALETTE_SIZE);
+    memcpy(savedPalette9, gPalette->m_data, PALETTE_SIZE);
 
     if (gbNoSound || !gpSoundManager->m_digitalDriver || !gConfig.soundVolume
         || bSmackNum == SMACK_CREDITS) {
@@ -123,9 +152,9 @@ void SmackManagerMain(void) {
         }
     }
 
-    if (xSmackFromNetwork && bSmackNum > SMACK_FIRST_NETWORK - 1)
+    if (xSmackFromNetwork && bSmackNum > FIRST_NETWORK - 1)
         strcpy(path7, "i:\\projects\\heroes\\art\\fin3d\\");
-    else if (bSmackNum == SMACK_EXPANSION_CAMPAIGN)
+    else if (bSmackNum == EXPANSION_CAMPAIGN)
         strcpy(path7, ".\\DATA\\");
     else
         strcpy(path7, gcAnimPath);
@@ -134,17 +163,17 @@ void SmackManagerMain(void) {
         sprintf(gText, "%s%s.SMK", path7, SmackOptions[bSmackNum].slowFileName);
     else
         sprintf(gText, "%s%s.SMK", path7, SmackOptions[bSmackNum].fileName);
-    soundFlags4 = bSmackSound ? SMACK_AUDIO_OPEN_FLAGS : 0;
-    preloadFlags26 = SmackOptions[bSmackNum].preload ? SMACK_PRELOAD_OPEN_FLAG : 0;
-    if (gbLowMemory && bSmackNum == SMACK_LOW_MEMORY_MOVIE && !gConfig.slowVideo)
+    soundFlags4 = bSmackSound ? AUDIO_OPEN_FLAGS : 0;
+    preloadFlags26 = SmackOptions[bSmackNum].preload ? PRELOAD_OPEN_FLAG : 0;
+    if (gbLowMemory && bSmackNum == LOW_MEMORY_MOVIE && !gConfig.slowVideo)
         preloadFlags26 = 0;
 
     smk1 = 0;
-    if (bSmackNum != SMACK_EXPANSION_CAMPAIGN) {
+    if (bSmackNum != EXPANSION_CAMPAIGN) {
         while (!smk1) {
             smk1 = SmackOpen(gText, preloadFlags26 + soundFlags4, SMACKAUTOEXTRA);
             if (!smk1) {
-                gpWindowManager->FadeScreen(0, SMACK_NORMAL_FADE, 0);
+                gpWindowManager->FadeScreen(0, NORMAL_FADE, 0);
                 NormalDialog(
                     "Error reading the Heroes 2 Expansion CD.  Retry?",
                     2,
@@ -157,7 +186,7 @@ void SmackManagerMain(void) {
                     -1,
                     0
                 );
-                if (gpWindowManager->m_dialogResult == SMACK_DIALOG_RETRY)
+                if (gpWindowManager->m_dialogResult == DIALOG_RETRY)
                     ShutDown("CDROM drive error.  Exiting.");
             }
         }
@@ -165,8 +194,8 @@ void SmackManagerMain(void) {
             smk1,
             0,
             0,
-            SMACK_SCREEN_WIDTH,
-            SMACK_SCREEN_HEIGHT,
+            SCREEN_WIDTH,
+            SCREEN_HEIGHT,
             gpWindowManager->m_screen->m_pixels,
             0
         );
@@ -177,39 +206,39 @@ void SmackManagerMain(void) {
             sprintf(gText, "%s%s.SMK", path7, SmackOptions[bSmackNum].slowCompanionFileName);
         else
             sprintf(gText, "%s%s.SMK", path7, SmackOptions[bSmackNum].companionFileName);
-        smk2 = SmackOpen(gText, bSmackSound ? SMACK_AUDIO_OPEN_FLAGS : 0, SMACKAUTOEXTRA);
+        smk2 = SmackOpen(gText, bSmackSound ? AUDIO_OPEN_FLAGS : 0, SMACKAUTOEXTRA);
         if (SmackOptions[bSmackNum].drawCompanion && !gConfig.slowVideo
-            && bSmackNum != SMACK_EXPANSION_CAMPAIGN) {
+            && bSmackNum != EXPANSION_CAMPAIGN) {
             SmackToBuffer(
                 smk2,
                 SmackOptions[bSmackNum].companionX,
                 SmackOptions[bSmackNum].companionY,
-                SMACK_SCREEN_WIDTH,
-                SMACK_SCREEN_HEIGHT,
+                SCREEN_WIDTH,
+                SCREEN_HEIGHT,
                 gpWindowManager->m_screen->m_pixels,
                 0
             );
         }
     }
 
-    FillBitmapArea(gpWindowManager->m_screen, 0, 0, SMACK_SCREEN_WIDTH, SMACK_SCREEN_HEIGHT, 0);
+    FillBitmapArea(gpWindowManager->m_screen, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
     BlitBitmapToScreen(
         gpWindowManager->m_screen,
         0,
         0,
-        SMACK_SCREEN_WIDTH,
-        SMACK_SCREEN_HEIGHT,
+        SCREEN_WIDTH,
+        SCREEN_HEIGHT,
         0,
         0
     );
     if (SmackOptions[bSmackNum].fadeIn)
-        gpWindowManager->FadeScreen(1, SMACK_NORMAL_FADE, 0);
+        gpWindowManager->FadeScreen(1, NORMAL_FADE, 0);
 
     playing16 = 1;
     primaryStarted9 = 0;
     companionStarted1 = 0;
 
-    if (bSmackNum == SMACK_CHOOSE_CAMPAIGN) {
+    if (bSmackNum == CHOOSE_CAMPAIGN) {
         i32 eventSink;
 
         Process1WindowsMessage();
@@ -219,11 +248,11 @@ void SmackManagerMain(void) {
     }
 
     while (playing16) {
-        if (bSmackNum == SMACK_EXPANSION_CAMPAIGN) {
+        if (bSmackNum == EXPANSION_CAMPAIGN) {
             if (!primaryStarted9) {
-                gpMouseManager->SetPointer("advmice.mse", SMACK_POINTER_ID, MOUSE_AUTO_CURSOR_TYPE);
+                gpMouseManager->SetPointer("advmice.mse", POINTER_ID, MOUSE_AUTO_CURSOR_TYPE);
                 gpMouseManager->ReallyShowPointer();
-                gpSoundManager->PlayAmbientMusic(SMACK_MAIN_MUSIC, 0, -1);
+                gpSoundManager->PlayAmbientMusic(MAIN_MUSIC, 0, -1);
                 backImage = gpResourceManager->GetIcon("x_ivy.icn");
                 if (!backImage)
                     MemError();
@@ -231,39 +260,39 @@ void SmackManagerMain(void) {
                 backImage->DrawToBuffer(0, 0, 1, 0);
                 sprintf(gText, "%s%s.SMK", path7, "IVYPOL");
                 smk2 = SmackOpen(gText, 0, SMACKAUTOEXTRA);
-                memcpy(gPalette->m_data, smk2->Palette, SMACK_PALETTE_SIZE);
+                memcpy(gPalette->m_data, smk2->Palette, PALETTE_SIZE);
                 SmackClose(smk2);
                 smk2 = 0;
                 ConvertSmackerPalette(reinterpret_cast<u8*>(gPalette->m_data));
                 UpdatePalette(gPalette->m_data);
-                memcpy(gpBufferPalette->m_data, gPalette->m_data, SMACK_PALETTE_SIZE);
-                gpWindowManager->FadeScreen(0, SMACK_FAST_FADE, 0);
+                memcpy(gpBufferPalette->m_data, gPalette->m_data, PALETTE_SIZE);
+                gpWindowManager->FadeScreen(0, FAST_FADE, 0);
                 primaryStarted9 = 1;
             }
         } else if (!SmackWait(smk1)) {
-            if (bSmackNum == SMACK_INTRO_MUSIC && !musicStarted36) {
+            if (bSmackNum == INTRO_MUSIC && !musicStarted36) {
                 musicStarted36 = 1;
-                gpSoundManager->PlayAmbientMusic(SMACK_INTRO_SECOND_MUSIC, 0, -1);
+                gpSoundManager->PlayAmbientMusic(INTRO_SECOND_MUSIC, 0, -1);
             }
             if ((!primaryStarted9 || smk1->Frames > 1)
-                && (bSmackNum != SMACK_CONGRATS || smk1->Frames - 1 != smk1->FrameNum)) {
+                && (bSmackNum != CONGRATS || smk1->Frames - 1 != smk1->FrameNum)) {
                 DoAdvance(smk1, 1, 1, primaryStarted9 || !SmackOptions[bSmackNum].fadeIn, 0);
             }
             if (smk1->FrameNum > 0 || smk1->Frames <= 1) {
                 if (!primaryStarted9) {
-                    if (bSmackNum == SMACK_CHOOSE_CAMPAIGN) {
+                    if (bSmackNum == CHOOSE_CAMPAIGN) {
                         gpMouseManager
-                            ->SetPointer("advmice.mse", SMACK_POINTER_ID, MOUSE_AUTO_CURSOR_TYPE);
+                            ->SetPointer("advmice.mse", POINTER_ID, MOUSE_AUTO_CURSOR_TYPE);
                         gpMouseManager->ReallyShowPointer();
                     }
                     if (SmackOptions[bSmackNum].fadeIn) {
-                        memcpy(gpBufferPalette->m_data, gPalette->m_data, SMACK_PALETTE_SIZE);
-                        gpWindowManager->FadeScreen(0, SMACK_FAST_FADE, 0);
+                        memcpy(gpBufferPalette->m_data, gPalette->m_data, PALETTE_SIZE);
+                        gpWindowManager->FadeScreen(0, FAST_FADE, 0);
                     }
                     if (bSmackNum == SMACK_CREDITS)
-                        gpSoundManager->PlayAmbientMusic(SMACK_MAIN_MUSIC, 0, -1);
-                    if (bSmackNum == SMACK_SPECIAL_MUSIC)
-                        gpSoundManager->PlayAmbientMusic(SMACK_MAIN_MUSIC, 0, -1);
+                        gpSoundManager->PlayAmbientMusic(MAIN_MUSIC, 0, -1);
+                    if (bSmackNum == SPECIAL_MUSIC)
+                        gpSoundManager->PlayAmbientMusic(MAIN_MUSIC, 0, -1);
                 }
                 primaryStarted9 = 1;
             }
@@ -277,7 +306,7 @@ void SmackManagerMain(void) {
                 advanceLastFrame = 0;
                 if (SmackOptions[bSmackNum].drawCompanion && !gConfig.slowVideo) {
                     drawLastFrame = 1;
-                } else if (bSmackNum == SMACK_EXPANSION_CAMPAIGN) {
+                } else if (bSmackNum == EXPANSION_CAMPAIGN) {
                     drawLastFrame = 1;
                     advanceLastFrame = 1;
                 } else {
@@ -288,7 +317,7 @@ void SmackManagerMain(void) {
                 while (SmackWait(smk2))
                     Process1WindowsMessage();
             } else {
-                if (bSmackNum == SMACK_EXPANSION_CAMPAIGN)
+                if (bSmackNum == EXPANSION_CAMPAIGN)
                     DoAdvance(smk2, 1, 1, 0, 1);
                 else
                     DoAdvance(smk2, SmackOptions[bSmackNum].drawCompanion, 1, 0, 1);
@@ -302,13 +331,13 @@ void SmackManagerMain(void) {
         message = gpInputManager->GetEvent();
         switch (message.type) {
             case MESSAGE_MOUSE_MOVE:
-                if (bSmackNum == SMACK_CHOOSE_CAMPAIGN) {
+                if (bSmackNum == CHOOSE_CAMPAIGN) {
                     i32 campaignMouseX5;
                     i32 campaignMouseY3;
                     i32 campaignChoice4;
 
                     gpMouseManager->MouseCoords(campaignMouseX5, campaignMouseY3);
-                    campaignChoice4 = campaignMouseX5 < SMACK_SCREEN_WIDTH / 2;
+                    campaignChoice4 = campaignMouseX5 < SCREEN_WIDTH / 2;
                     if (campaignChoice4 == gbCampaignSideChoice)
                         break;
                     gbCampaignSideChoice = campaignChoice4;
@@ -320,7 +349,7 @@ void SmackManagerMain(void) {
                         brotherIcon->DrawToBuffer(0, 0, 2, 0);
                     }
                     BlitBitmapToScreen(gpWindowManager->m_screen, 49, 78, 538, 258, 49, 78);
-                } else if (bSmackNum == SMACK_EXPANSION_CAMPAIGN) {
+                } else if (bSmackNum == EXPANSION_CAMPAIGN) {
                     i32 expansionMouseX6;
                     i32 expansionMouseY4;
                     i32 expansionChoice1;
@@ -333,8 +362,8 @@ void SmackManagerMain(void) {
                             gpWindowManager->m_screen,
                             0,
                             0,
-                            SMACK_SCREEN_WIDTH,
-                            SMACK_SCREEN_HEIGHT,
+                            SCREEN_WIDTH,
+                            SCREEN_HEIGHT,
                             0,
                             0
                         );
@@ -345,7 +374,7 @@ void SmackManagerMain(void) {
                         }
                         if (expansionChoice1 != -1) {
                             bExpansionSmackNum =
-                                static_cast<i8>(expansionChoice1 + SMACK_EXPANSION_FIRST_MOVIE);
+                                static_cast<i8>(expansionChoice1 + EXPANSION_FIRST_MOVIE);
                             sprintf(
                                 gText,
                                 "%s%s.SMK",
@@ -354,15 +383,15 @@ void SmackManagerMain(void) {
                             );
                             smk2 = SmackOpen(
                                 gText,
-                                bSmackSound ? SMACK_AUDIO_OPEN_FLAGS : 0,
+                                bSmackSound ? AUDIO_OPEN_FLAGS : 0,
                                 SMACKAUTOEXTRA
                             );
                             SmackToBuffer(
                                 smk2,
                                 SmackOptions[bExpansionSmackNum].companionX,
                                 SmackOptions[bExpansionSmackNum].companionY,
-                                SMACK_SCREEN_WIDTH,
-                                SMACK_SCREEN_HEIGHT,
+                                SCREEN_WIDTH,
+                                SCREEN_HEIGHT,
                                 gpWindowManager->m_screen->m_pixels,
                                 0
                             );
@@ -375,14 +404,14 @@ void SmackManagerMain(void) {
                 if (message.payload.keyboard.keyCode == INPUT_SCAN_F4)
                     break;
             case MESSAGE_RIGHT_BUTTON_DOWN:
-                if (bSmackNum == SMACK_CHOOSE_CAMPAIGN)
+                if (bSmackNum == CHOOSE_CAMPAIGN)
                     break;
-                if (bSmackNum == SMACK_EXPANSION_CAMPAIGN)
+                if (bSmackNum == EXPANSION_CAMPAIGN)
                     break;
             case MESSAGE_LEFT_BUTTON_DOWN:
                 if (bSmackNum == SMACK_EARTH)
                     break;
-                if (bSmackNum == SMACK_EXPANSION_CAMPAIGN && xLastChoice == -1)
+                if (bSmackNum == EXPANSION_CAMPAIGN && xLastChoice == -1)
                     break;
                 goto playbackDone;
                 break;
@@ -390,9 +419,9 @@ void SmackManagerMain(void) {
                 break;
         }
 
-        if (bSmackNum == SMACK_CONGRATS && smk1->FrameNum + 1 == smk1->Frames && !musicStarted36) {
+        if (bSmackNum == CONGRATS && smk1->FrameNum + 1 == smk1->Frames && !musicStarted36) {
             musicStarted36 = 1;
-            gpSoundManager->PlayAmbientMusic(SMACK_LOSE_MUSIC, 0, -1);
+            gpSoundManager->PlayAmbientMusic(LOSE_MUSIC, 0, -1);
         }
 
         if (!SmackOptions[bSmackNum].waitForInput
@@ -409,48 +438,48 @@ void SmackManagerMain(void) {
     }
 
 playbackDone:
-    if (bSmackNum == SMACK_CHOOSE_CAMPAIGN) {
+    if (bSmackNum == CHOOSE_CAMPAIGN) {
         gpMouseManager->HideColorPointer();
-        gpMouseManager->SetPointer("advmice.mse", SMACK_POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
+        gpMouseManager->SetPointer("advmice.mse", POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
     }
 
     if (SmackOptions[bSmackNum].fadeOut) {
-        memcpy(gpBufferPalette->m_data, gPalette->m_data, SMACK_PALETTE_SIZE);
-        gpWindowManager->FadeScreen(1, SMACK_SHORT_FADE, 0);
+        memcpy(gpBufferPalette->m_data, gPalette->m_data, PALETTE_SIZE);
+        gpWindowManager->FadeScreen(1, SHORT_FADE, 0);
         FillBitmapArea(
             gpWindowManager->m_screen,
             0,
             0,
-            SMACK_SCREEN_WIDTH,
-            SMACK_SCREEN_HEIGHT,
-            SMACK_BACKGROUND_COLOR
+            SCREEN_WIDTH,
+            SCREEN_HEIGHT,
+            BACKGROUND_COLOR
         );
         BlitBitmapToScreen(
             gpWindowManager->m_screen,
             0,
             0,
-            SMACK_SCREEN_WIDTH,
-            SMACK_SCREEN_HEIGHT,
+            SCREEN_WIDTH,
+            SCREEN_HEIGHT,
             0,
             0
         );
-    } else if (!gbPlayedThrough && bSmackNum != SMACK_CONGRATS) {
-        memcpy(gpBufferPalette->m_data, gPalette->m_data, SMACK_PALETTE_SIZE);
-        gpWindowManager->FadeScreen(1, SMACK_NORMAL_FADE, 0);
+    } else if (!gbPlayedThrough && bSmackNum != CONGRATS) {
+        memcpy(gpBufferPalette->m_data, gPalette->m_data, PALETTE_SIZE);
+        gpWindowManager->FadeScreen(1, NORMAL_FADE, 0);
         FillBitmapArea(
             gpWindowManager->m_screen,
             0,
             0,
-            SMACK_SCREEN_WIDTH,
-            SMACK_SCREEN_HEIGHT,
-            SMACK_BACKGROUND_COLOR
+            SCREEN_WIDTH,
+            SCREEN_HEIGHT,
+            BACKGROUND_COLOR
         );
         BlitBitmapToScreen(
             gpWindowManager->m_screen,
             0,
             0,
-            SMACK_SCREEN_WIDTH,
-            SMACK_SCREEN_HEIGHT,
+            SCREEN_WIDTH,
+            SCREEN_HEIGHT,
             0,
             0
         );
@@ -464,8 +493,8 @@ playbackDone:
     if (smk2)
         SmackClose(smk2);
     smk2 = 0;
-    if (bSmackNum != SMACK_CONGRATS) {
-        memcpy(gPalette->m_data, savedPalette9, SMACK_PALETTE_SIZE);
+    if (bSmackNum != CONGRATS) {
+        memcpy(gPalette->m_data, savedPalette9, PALETTE_SIZE);
         UpdatePalette(gPalette->m_data);
     }
     gpMouseManager->ShowColorPointer();
@@ -489,7 +518,7 @@ void ShutDownSmacker(void) {
 
 VA(0x0040244f, 0x17f)
 i32 PlaySmacker(i32 smackNumber) {
-    i8 savedPalette[SMACK_PALETTE_SIZE];
+    i8 savedPalette[PALETTE_SIZE];
     i32 oldUpdateFlags;
 
     xLastChoice = -1;
@@ -498,10 +527,10 @@ i32 PlaySmacker(i32 smackNumber) {
 
     gbInSmackMgr = true;
     gbPlayedThrough = false;
-    memcpy(savedPalette, gpBufferPalette->m_data, SMACK_PALETTE_SIZE);
+    memcpy(savedPalette, gpBufferPalette->m_data, PALETTE_SIZE);
     oldUpdateFlags = gpWindowManager->m_updateFlags;
     gpWindowManager->m_updateFlags = 0;
-    if (smackNumber != SMACK_EXPANSION_CAMPAIGN) {
+    if (smackNumber != EXPANSION_CAMPAIGN) {
         gpSoundManager->m_samplesReady = 1;
         gpSoundManager->PlayAmbientMusic(-1, 0, -1);
     }
@@ -521,7 +550,7 @@ i32 PlaySmacker(i32 smackNumber) {
     }
     bSmackNum = static_cast<i8>(smackNumber);
     SmackManagerMain();
-    memcpy(gpBufferPalette->m_data, savedPalette, SMACK_PALETTE_SIZE);
+    memcpy(gpBufferPalette->m_data, savedPalette, PALETTE_SIZE);
     gpWindowManager->m_updateFlags = oldUpdateFlags;
     gbInSmackMgr = false;
     return gbPlayedThrough;
@@ -529,13 +558,13 @@ i32 PlaySmacker(i32 smackNumber) {
 
 DATA(0x004ec040) i32 bSmackSound = 0;
 DATA(0x004ec044) icon* brotherIcon = 0;
-DATA(0x004ec048) static tag_rect expansionCampaignRects[SMACK_EXPANSION_RECT_COUNT] =
+DATA(0x004ec048) static tag_rect expansionCampaignRects[EXPANSION_RECT_COUNT] =
     {{215, 49, 230, 150}, {217, 275, 230, 150}, {475, 132, 120, 180}, {41, 132, 120, 180}};
 
 VA(0x004025ce, 0x65)
 i32 ExpansionCampaignRect(i32 x, i32 y) {
     i32 i;
-    for (i = 0; i < SMACK_EXPANSION_RECT_COUNT; ++i) {
+    for (i = 0; i < EXPANSION_RECT_COUNT; ++i) {
         if (PointInRect(x, y, &expansionCampaignRects[i]))
             return i;
     }

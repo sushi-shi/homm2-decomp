@@ -14,6 +14,23 @@
 #include <SOURCE/kbwin.h>
 #include <string.h>
 
+H2_ENUM_CLASS_BEGIN(DropListFrame)
+    FRAME_CLOSED_CONTENT      = 0,
+    FRAME_DROP_BUTTON         = 1,
+    FRAME_DROP_BUTTON_PRESSED = 2,
+    FRAME_FIRST_ROW           = 3,
+    FRAME_MIDDLE_ROW          = 4,
+    FRAME_LAST_ROW            = 5,
+    FRAME_SCROLL_UP           = 6,
+    FRAME_SCROLL_UP_PRESSED   = 7,
+    FRAME_SCROLL_DOWN         = 8,
+    FRAME_SCROLL_DOWN_PRESSED = 9,
+    FRAME_SCROLL_TRACK_FIRST  = 10,
+    FRAME_SCROLL_TRACK_MIDDLE = 11,
+    FRAME_SCROLL_TRACK_LAST   = 12,
+    FRAME_SCROLL_THUMB        = 13
+H2_ENUM_CLASS_END(DropListFrame)
+
 DATA(0x00521078) static SDropListSourceFiles gDropListSourceFiles = {
     {DROPLIST_SOURCE_FILE},
     {DROPLIST_SOURCE_FILE},
@@ -76,35 +93,35 @@ void dropListWidget::Read(void) {
     m_textMode = gpResourceManager->ReadWord();
     i16 id = gpResourceManager->ReadWord();
 
-    m_closedContentFrame = IDX(DROPLIST_FRAME_CLOSED_CONTENT);
-    m_dropButtonFrame = IDX(DROPLIST_FRAME_DROP_BUTTON);
-    m_dropButtonPressedFrame = IDX(DROPLIST_FRAME_DROP_BUTTON_PRESSED);
-    m_firstRowFrame = IDX(DROPLIST_FRAME_FIRST_ROW);
-    m_middleRowFrame = IDX(DROPLIST_FRAME_MIDDLE_ROW);
-    m_lastRowFrame = IDX(DROPLIST_FRAME_LAST_ROW);
-    m_scrollUpFrame = IDX(DROPLIST_FRAME_SCROLL_UP);
-    m_scrollUpPressedFrame = IDX(DROPLIST_FRAME_SCROLL_UP_PRESSED);
-    m_scrollDownFrame = IDX(DROPLIST_FRAME_SCROLL_DOWN);
-    m_scrollDownPressedFrame = IDX(DROPLIST_FRAME_SCROLL_DOWN_PRESSED);
-    m_scrollTrackFirstFrame = IDX(DROPLIST_FRAME_SCROLL_TRACK_FIRST);
-    m_scrollTrackMiddleFrame = IDX(DROPLIST_FRAME_SCROLL_TRACK_MIDDLE);
-    m_scrollTrackLastFrame = IDX(DROPLIST_FRAME_SCROLL_TRACK_LAST);
-    m_scrollThumbFrame = IDX(DROPLIST_FRAME_SCROLL_THUMB);
+    m_closedContentFrame = IDX(FRAME_CLOSED_CONTENT);
+    m_dropButtonFrame = IDX(FRAME_DROP_BUTTON);
+    m_dropButtonPressedFrame = IDX(FRAME_DROP_BUTTON_PRESSED);
+    m_firstRowFrame = IDX(FRAME_FIRST_ROW);
+    m_middleRowFrame = IDX(FRAME_MIDDLE_ROW);
+    m_lastRowFrame = IDX(FRAME_LAST_ROW);
+    m_scrollUpFrame = IDX(FRAME_SCROLL_UP);
+    m_scrollUpPressedFrame = IDX(FRAME_SCROLL_UP_PRESSED);
+    m_scrollDownFrame = IDX(FRAME_SCROLL_DOWN);
+    m_scrollDownPressedFrame = IDX(FRAME_SCROLL_DOWN_PRESSED);
+    m_scrollTrackFirstFrame = IDX(FRAME_SCROLL_TRACK_FIRST);
+    m_scrollTrackMiddleFrame = IDX(FRAME_SCROLL_TRACK_MIDDLE);
+    m_scrollTrackLastFrame = IDX(FRAME_SCROLL_TRACK_LAST);
+    m_scrollThumbFrame = IDX(FRAME_SCROLL_THUMB);
     m_id = id;
     IconEntry* iconEntries = m_icon->Entries();
     i16 iconX = m_x;
     i16 iconY = m_y;
-    IconEntry* closedContentEntry = &iconEntries[IDX(DROPLIST_FRAME_CLOSED_CONTENT)];
+    IconEntry* closedContentEntry = &iconEntries[IDX(FRAME_CLOSED_CONTENT)];
     m_iconX = iconX;
     m_iconY = iconY;
     m_closedContentWidth = closedContentEntry->w;
     m_closedContentHeight = closedContentEntry->h;
-    IconEntry* dropButtonEntry = &iconEntries[IDX(DROPLIST_FRAME_DROP_BUTTON)];
+    IconEntry* dropButtonEntry = &iconEntries[IDX(FRAME_DROP_BUTTON)];
     m_dropButtonX = iconX + m_closedContentWidth;
     m_dropButtonY = iconY;
     m_dropButtonWidth = dropButtonEntry->w;
     m_dropButtonHeight = dropButtonEntry->h;
-    IconEntry* scrollThumbEntry = &iconEntries[IDX(DROPLIST_FRAME_SCROLL_THUMB)];
+    IconEntry* scrollThumbEntry = &iconEntries[IDX(FRAME_SCROLL_THUMB)];
     m_scrollThumbWidth = scrollThumbEntry->w;
     m_scrollThumbHeight = scrollThumbEntry->h;
 }

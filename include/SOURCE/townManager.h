@@ -1,7 +1,9 @@
 #ifndef HOMM2_SOURCE_TOWNMANAGER_H
 #define HOMM2_SOURCE_TOWNMANAGER_H
+
 #include <va.h>
-#include "../BASE/baseManager.h"
+#include <BASE/baseManager.h>
+
 class heroWindow;
 class icon;
 class town;

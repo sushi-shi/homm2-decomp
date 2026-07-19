@@ -1,7 +1,9 @@
 #ifndef HOMM2_BASE_RESOURCEMANAGER_H
 #define HOMM2_BASE_RESOURCEMANAGER_H
+
 #include <va.h>
 #include "baseManager.h"
+
 class MIDIWrap;
 class bitmap;
 class font;
@@ -14,23 +16,23 @@ class tileset;
 struct tag_message;
 
 #pragma pack(push, 1)
-struct aggEntry {     // one .agg directory record (0xc bytes)
+struct aggEntry { // one .agg directory record (0xc bytes)
     u32l id;
     i32l offset;
     u32l size;
 };
 
 H2_ENUM_BEGIN(ResourceManagerConstant)
-    RESOURCE_MANAGER_INVALID_FILE = -1,
-    RESOURCE_MANAGER_SUCCESS = 0,
-    RESOURCE_MANAGER_ERROR = 3,
-    RESOURCE_MANAGER_AGGREGATE_LIMIT = 2,
-    RESOURCE_MANAGER_ENTRY_BYTES = 0xc,
-    RESOURCE_MANAGER_READ13_BYTES = 0xd,
+    RESOURCE_MANAGER_INVALID_FILE           = -1,
+    RESOURCE_MANAGER_SUCCESS                = 0,
+    RESOURCE_MANAGER_ERROR                  = 3,
+    RESOURCE_MANAGER_AGGREGATE_LIMIT        = 2,
+    RESOURCE_MANAGER_ENTRY_BYTES            = 0xc,
+    RESOURCE_MANAGER_READ13_BYTES           = 0xd,
     RESOURCE_MANAGER_EVIL_TRANSLATION_COUNT = 37,
-    RESOURCE_MANAGER_MESSAGE_MASK = 0x80,
-    RESOURCE_MANAGER_BACKDROP_ROW_BYTES = 640,
-    RESOURCE_MANAGER_BINARY_OPEN_MODE = 0x8000
+    RESOURCE_MANAGER_MESSAGE_MASK           = 0x80,
+    RESOURCE_MANAGER_BACKDROP_ROW_BYTES     = 640,
+    RESOURCE_MANAGER_BINARY_OPEN_MODE       = 0x8000
 H2_ENUM_END(ResourceManagerConstant)
 
 class resourceManager : public baseManager {

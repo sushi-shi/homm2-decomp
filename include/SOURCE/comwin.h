@@ -1,5 +1,6 @@
 #ifndef HOMM2_COMWIN_H
 #define HOMM2_COMWIN_H
+
 #include <windows.h>
 #include <va.h>
 
@@ -20,25 +21,6 @@ struct tag_Anchor {
     struct tag_Node* head;
     struct tag_Node* tail;
 };
-
-H2_ENUM_BEGIN(ComConstant)
-    COM_PORT_COUNT = 2,
-    COM_PORT_NAME_SIZE = 12,
-    COM_ERROR_NAME_SIZE = 100,
-    COM_ERROR_MESSAGE_SIZE = 500,
-    COM_RECEIVE_BUFFER_SIZE = 0x2000,
-    COM_TRANSMIT_BUFFER_SIZE = 0x1000,
-    COM_BREAK_DELAY = 500,
-    COM_NODE_HEADER_SIZE = 10
-H2_ENUM_END(ComConstant)
-
-H2_ENUM_CLASS_BEGIN(ComBaudRate)
-    COM_BAUD_2400 = 1,
-    COM_BAUD_4800 = 2,
-    COM_BAUD_9600 = 3,
-    COM_BAUD_19200 = 4,
-    COM_BAUD_38400 = 5
-H2_ENUM_CLASS_END(ComBaudRate)
 
 struct ComPortState {
     HANDLE handle;

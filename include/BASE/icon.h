@@ -1,7 +1,9 @@
 #ifndef HOMM2_BASE_ICON_H
 #define HOMM2_BASE_ICON_H
+
 #include <va.h>
 #include <BASE/resource.h>
+
 struct SLimitData {
     i32 left;
     i32 right;

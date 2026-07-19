@@ -21,6 +21,16 @@
 #include <SOURCE/Wsnetwin.h>
 #include <SOURCE/X_GLOBAL.h>
 
+H2_ENUM_BEGIN(RemoteCrcConstant)
+    CRC_FEEDBACK_BIT = 0x08000000
+H2_ENUM_END(RemoteCrcConstant)
+
+H2_ENUM_CLASS_BEGIN(RemoteSetupCommand)
+    SETUP_PLAYER_INFO   = 0x22,
+    SETUP_STANDARD_GAME = 0x3d,
+    SETUP_CAMPAIGN_GAME = 0x3e
+H2_ENUM_CLASS_END(RemoteSetupCommand)
+
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\REMOTE.CPP"
 #define REMOTE_PACKET(buffer) (reinterpret_cast<RemotePacketHeader*>(buffer))
 #define REMOTE_MESSAGE(buffer) (reinterpret_cast<RemoteMessage*>(buffer))
@@ -221,7 +231,7 @@ void RemoteMain(i32 gameMode) {
                 if (incomingData != 0
                     && REMOTE_MESSAGE(incomingData)->type == IDX(REMOTE_MESSAGE_RELIABLE)) {
                     switch (REMOTE_MESSAGE(incomingData)->command) {
-                        case IDX(REMOTE_SETUP_PLAYER_INFO):
+                        case IDX(SETUP_PLAYER_INFO):
                             netPlayer = REMOTE_MESSAGE(incomingData)->sender;
                             gsNetPlayerInfo[netPlayer] =
                                 *REMOTE_PLAYER_INFO(REMOTE_MESSAGE(incomingData));
@@ -243,7 +253,7 @@ void RemoteMain(i32 gameMode) {
                 reinterpret_cast<char*>(&gsThisNetPlayerInfo),
                 0,
                 sizeof(SNetPlayerInfo),
-                IDX(REMOTE_SETUP_PLAYER_INFO),
+                IDX(SETUP_PLAYER_INFO),
                 1,
                 1,
                 -1
@@ -258,7 +268,7 @@ void RemoteMain(i32 gameMode) {
             REMOTE_BROADCAST_PLAYER,
             0,
             static_cast<i8>(
-                giSetupGameType == 1 ? REMOTE_SETUP_CAMPAIGN_GAME : REMOTE_SETUP_STANDARD_GAME
+                giSetupGameType == 1 ? SETUP_CAMPAIGN_GAME : SETUP_STANDARD_GAME
             ),
             1,
             1,
@@ -277,13 +287,13 @@ void RemoteMain(i32 gameMode) {
             }
             if (remoteGameType != 0
                 && REMOTE_MESSAGE(remoteGameType)->type == IDX(REMOTE_MESSAGE_RELIABLE)
-                && REMOTE_MESSAGE(remoteGameType)->command == IDX(REMOTE_SETUP_CAMPAIGN_GAME)) {
+                && REMOTE_MESSAGE(remoteGameType)->command == IDX(SETUP_CAMPAIGN_GAME)) {
                 bGotGameType = 1;
                 giSetupGameType = 1;
             }
             if (remoteGameType != 0
                 && REMOTE_MESSAGE(remoteGameType)->type == IDX(REMOTE_MESSAGE_RELIABLE)
-                && REMOTE_MESSAGE(remoteGameType)->command == IDX(REMOTE_SETUP_STANDARD_GAME)) {
+                && REMOTE_MESSAGE(remoteGameType)->command == IDX(SETUP_STANDARD_GAME)) {
                 bGotGameType = 1;
                 giSetupGameType = 0;
             }
@@ -321,7 +331,7 @@ i32 calc_crc_long(u8* data, i32 length) {
     sum = 0;
     unused = 0;
     while (length-- != 0) {
-        shifted = crc & REMOTE_CRC_FEEDBACK_BIT;
+        shifted = crc & CRC_FEEDBACK_BIT;
         crc <<= 1;
         crc += *data;
         sum += *data;

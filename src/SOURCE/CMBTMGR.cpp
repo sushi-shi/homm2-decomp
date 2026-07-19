@@ -29,6 +29,112 @@
 #include <SOURCE/town.h>
 #include <SOURCE/X_GLOBAL.h>
 
+H2_ENUM_BEGIN(CombatSystemOptionWidget)
+    SYSTEM_OPTION_SPEED_BUTTON      = 10,
+    SYSTEM_OPTION_ARMY_INFO_BUTTON  = 11,
+    SYSTEM_OPTION_AUTO_SPELL_BUTTON = 12,
+    SYSTEM_OPTION_GRID_BUTTON       = 13,
+    SYSTEM_OPTION_SHADE_BUTTON      = 14,
+    SYSTEM_OPTION_MOUSE_HEX_BUTTON  = 15,
+    SYSTEM_OPTION_SPEED_TEXT        = 20,
+    SYSTEM_OPTION_ARMY_INFO_TEXT    = 21,
+    SYSTEM_OPTION_AUTO_SPELL_TEXT   = 22,
+    SYSTEM_OPTION_GRID_TEXT         = 23,
+    SYSTEM_OPTION_SHADE_TEXT        = 24,
+    SYSTEM_OPTION_MOUSE_HEX_TEXT    = 25,
+    SYSTEM_OPTION_CLOSE_BUTTON      = 0x7800
+H2_ENUM_END(CombatSystemOptionWidget)
+
+H2_ENUM_BEGIN(CombatConstant)
+    SYSTEM_OPTION_RIGHT_BUTTON            = 0x200,
+    SYSTEM_OPTION_CYCLE_COUNT             = 3,
+    SYSTEM_OPTION_HELP_DIALOG             = 4,
+    SYSTEM_OPTION_HANDLER_CONTINUE        = 1,
+    SYSTEM_OPTION_HANDLER_CLOSE           = 2,
+    SYSTEM_OPTION_STATE_OFFSET_STEP       = 2,
+    SYSTEM_OPTION_SPEED_STATE_OFFSET      = 0,
+    SYSTEM_OPTION_ARMY_INFO_STATE_OFFSET  = 3,
+    SYSTEM_OPTION_AUTO_SPELL_STATE_OFFSET = 6,
+    SYSTEM_OPTION_GRID_STATE_OFFSET       = 8,
+    SYSTEM_OPTION_SHADE_STATE_OFFSET      = 10,
+    SYSTEM_OPTION_MOUSE_HEX_STATE_OFFSET  = 12,
+    SYSTEM_OPTION_DRAW_MASK               = 0x7fff
+H2_ENUM_END(CombatConstant)
+
+H2_ENUM_BEGIN(CombatCastleInteriorRange)
+    CASTLE_INTERIOR_ROW_0_FIRST = 0,
+    CASTLE_INTERIOR_ROW_0_LAST  = 8,
+    CASTLE_INTERIOR_ROW_1_FIRST = 13,
+    CASTLE_INTERIOR_ROW_1_LAST  = 21,
+    CASTLE_INTERIOR_ROW_2_FIRST = 26,
+    CASTLE_INTERIOR_ROW_2_LAST  = 33,
+    CASTLE_INTERIOR_ROW_3_FIRST = 39,
+    CASTLE_INTERIOR_ROW_3_LAST  = 46,
+    CASTLE_INTERIOR_ROW_4_FIRST = 52,
+    CASTLE_INTERIOR_ROW_4_LAST  = 58,
+    CASTLE_INTERIOR_ROW_5_FIRST = 65,
+    CASTLE_INTERIOR_ROW_5_LAST  = 72,
+    CASTLE_INTERIOR_ROW_6_FIRST = 78,
+    CASTLE_INTERIOR_ROW_6_LAST  = 85,
+    CASTLE_INTERIOR_ROW_7_FIRST = 91,
+    CASTLE_INTERIOR_ROW_7_LAST  = 99,
+    CASTLE_INTERIOR_ROW_8_FIRST = 104,
+    CASTLE_INTERIOR_ROW_8_LAST  = 112
+H2_ENUM_END(CombatCastleInteriorRange)
+
+H2_ENUM_CLASS_BEGIN(CombatTowerSelector)
+    TOWER_SELECTOR_GARRISON = 0,
+    TOWER_SELECTOR_TOP      = 1,
+    TOWER_SELECTOR_BOTTOM   = 2
+H2_ENUM_CLASS_END(CombatTowerSelector)
+
+H2_ENUM_CLASS_BEGIN(CombatCatapultDamage)
+    CATAPULT_DAMAGE_NONE   = 0,
+    CATAPULT_DAMAGE_NORMAL = 1,
+    CATAPULT_DAMAGE_DOUBLE = 2
+H2_ENUM_CLASS_END(CombatCatapultDamage)
+
+H2_ENUM_CLASS_BEGIN(CombatKeepTargetPriority)
+    KEEP_PRIORITY_NONE     = -1,
+    KEEP_PRIORITY_DISABLED = 0,
+    KEEP_PRIORITY_WALKER   = 1,
+    KEEP_PRIORITY_FLYER    = 2,
+    KEEP_PRIORITY_SHOOTER  = 3
+H2_ENUM_CLASS_END(CombatKeepTargetPriority)
+
+H2_ENUM_BEGIN(CombatMoraleConstant)
+    MORALE_ROLL_MIN              = 1,
+    GOOD_MORALE_ROLL_MAX         = 24,
+    BAD_MORALE_ROLL_MAX          = 12,
+    BAD_MORALE_NETWORK_ROLL_MAX  = 4,
+    BAD_MORALE_NETWORK_SKIP_ROLL = 1,
+    GOOD_MORALE_EFFECT           = 11,
+    BAD_MORALE_EFFECT            = 12,
+    MORALE_EFFECT_DURATION       = 180
+H2_ENUM_END(CombatMoraleConstant)
+
+H2_ENUM_CLASS_BEGIN(CombatMapTrigger)
+    TRIGGER_MINE    = 0x97,
+    TRIGGER_MONSTER = 0x98,
+    TRIGGER_HERO    = 0xaa
+H2_ENUM_CLASS_END(CombatMapTrigger)
+
+H2_ENUM_CLASS_BEGIN(CombatNearbyTileset)
+    TILESET_SNOW_MOUNTAINS    = 0x16,
+    TILESET_SWAMP_MOUNTAINS   = 0x17,
+    TILESET_LAVA_MOUNTAINS    = 0x18,
+    TILESET_DESERT_MOUNTAINS  = 0x19,
+    TILESET_DIRT_MOUNTAINS    = 0x1a,
+    TILESET_MIXED_MOUNTAINS   = 0x1b,
+    TILESET_CRACKED_MOUNTAINS = 0x1f,
+    TILESET_GRASS_MOUNTAINS   = 0x20,
+    TILESET_JUNGLE_TREES      = 0x21,
+    TILESET_EVIL_TREES        = 0x22,
+    TILESET_SNOW_TREES        = 0x2a,
+    TILESET_SUMMER_TREES      = 0x2b,
+    TILESET_AUTUMN_TREES      = 0x2c
+H2_ENUM_CLASS_END(CombatNearbyTileset)
+
 VA(0x0048fd50, 0x1ba)
 combatManager::combatManager(void) {
     m_unknownF373 = -1;
@@ -426,19 +532,19 @@ void combatManager::Close(void) {
             total += m_armyGroups[groupSide]->m_creatureCounts[index];
     }
 
-    if (m_battlefieldCell->m_triggerType == IDX(COMBAT_TRIGGER_MONSTER)) {
+    if (m_battlefieldCell->m_triggerType == IDX(TRIGGER_MONSTER)) {
         if (total > 4000)
             total = 4000;
         m_battlefieldCell->m_objectMetadata = total & IDX(MAP_MONSTER_COUNT_MASK);
     }
 
-    if (m_battlefieldCell->m_triggerType == IDX(COMBAT_TRIGGER_MINE)
+    if (m_battlefieldCell->m_triggerType == IDX(TRIGGER_MINE)
         && gpGame->m_mines[m_battlefieldCell->m_objectMetadata].guardianType != -1)
         gpGame->m_mines[m_battlefieldCell->m_objectMetadata].guardianCount = static_cast<u8>(total);
 
-    if (m_battlefieldCell->m_triggerType == IDX(COMBAT_TRIGGER_HERO)) {
+    if (m_battlefieldCell->m_triggerType == IDX(TRIGGER_HERO)) {
         hero* combatHero = gpGame->GetHero(m_battlefieldCell->m_objectMetadata);
-        if (combatHero->m_locationType == IDX(COMBAT_TRIGGER_MINE)
+        if (combatHero->m_locationType == IDX(TRIGGER_MINE)
             && gpGame->m_mines[combatHero->m_occupiedTown].guardianType != -1)
             gpGame->m_mines[combatHero->m_occupiedTown].guardianCount = static_cast<u8>(total);
     }
@@ -624,21 +730,21 @@ i32 combatManager::MoreTreesNear(void) {
                 combatCell = gpAdvManager->GetCell(x, y);
                 nearbyTileset = combatCell->m_objectTileset;
                 switch (nearbyTileset) {
-                    case IDX(COMBAT_TILESET_SNOW_MOUNTAINS):
-                    case IDX(COMBAT_TILESET_SWAMP_MOUNTAINS):
-                    case IDX(COMBAT_TILESET_LAVA_MOUNTAINS):
-                    case IDX(COMBAT_TILESET_DESERT_MOUNTAINS):
-                    case IDX(COMBAT_TILESET_DIRT_MOUNTAINS):
-                    case IDX(COMBAT_TILESET_MIXED_MOUNTAINS):
-                    case IDX(COMBAT_TILESET_CRACKED_MOUNTAINS):
-                    case IDX(COMBAT_TILESET_GRASS_MOUNTAINS):
+                    case IDX(TILESET_SNOW_MOUNTAINS):
+                    case IDX(TILESET_SWAMP_MOUNTAINS):
+                    case IDX(TILESET_LAVA_MOUNTAINS):
+                    case IDX(TILESET_DESERT_MOUNTAINS):
+                    case IDX(TILESET_DIRT_MOUNTAINS):
+                    case IDX(TILESET_MIXED_MOUNTAINS):
+                    case IDX(TILESET_CRACKED_MOUNTAINS):
+                    case IDX(TILESET_GRASS_MOUNTAINS):
                         nearbyTypeTable[radius][nearbyDirection] = 0;
                         break;
-                    case IDX(COMBAT_TILESET_JUNGLE_TREES):
-                    case IDX(COMBAT_TILESET_EVIL_TREES):
-                    case IDX(COMBAT_TILESET_SNOW_TREES):
-                    case IDX(COMBAT_TILESET_SUMMER_TREES):
-                    case IDX(COMBAT_TILESET_AUTUMN_TREES):
+                    case IDX(TILESET_JUNGLE_TREES):
+                    case IDX(TILESET_EVIL_TREES):
+                    case IDX(TILESET_SNOW_TREES):
+                    case IDX(TILESET_SUMMER_TREES):
+                    case IDX(TILESET_AUTUMN_TREES):
                         nearbyTypeTable[radius][nearbyDirection] = 1;
                         break;
                 }
@@ -898,7 +1004,7 @@ void combatManager::CheckApplyGoodMorale(i32 side, i32 index) {
     if (activeArmy->m_quantity == 0)
         return;
     if (activeArmy->m_morale <= 0
-        || SRandom(COMBAT_MORALE_ROLL_MIN, COMBAT_GOOD_MORALE_ROLL_MAX) > activeArmy->m_morale)
+        || SRandom(MORALE_ROLL_MIN, GOOD_MORALE_ROLL_MAX) > activeArmy->m_morale)
         return;
 
     bInHighMoraleBonus = 1;
@@ -921,7 +1027,7 @@ void combatManager::CheckApplyGoodMorale(i32 side, i32 index) {
         CombatMessage(gText, 1, 1, 0);
     }
 
-    activeArmy->SpellEffect(COMBAT_GOOD_MORALE_EFFECT, COMBAT_MORALE_EFFECT_DURATION, 0);
+    activeArmy->SpellEffect(GOOD_MORALE_EFFECT, MORALE_EFFECT_DURATION, 0);
     if HAS (activeArmy->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_BAD_MORALE)
         activeArmy->m_monster.flags.abilityFlags -= MONSTER_ABILITY_FLAG_BAD_MORALE;
     activeArmy->m_monster.flags.abilityFlags |= MONSTER_ABILITY_FLAG_HIGH_MORALE;
@@ -940,11 +1046,11 @@ i32 combatManager::CheckApplyBadMorale(i32 side, i32 index) {
     if (HAS(activeArmy->m_monster.flags.all, MONSTER_FLAGS_NO_MORALE))
         return 0;
     if (activeArmy->m_morale >= 0
-        || SRandom(COMBAT_MORALE_ROLL_MIN, COMBAT_BAD_MORALE_ROLL_MAX) > -activeArmy->m_morale)
+        || SRandom(MORALE_ROLL_MIN, BAD_MORALE_ROLL_MAX) > -activeArmy->m_morale)
         return 0;
     if (!m_networkArmyPresent[side]
-        && SRandom(COMBAT_MORALE_ROLL_MIN, COMBAT_BAD_MORALE_NETWORK_ROLL_MAX)
-               == COMBAT_BAD_MORALE_NETWORK_SKIP_ROLL)
+        && SRandom(MORALE_ROLL_MIN, BAD_MORALE_NETWORK_ROLL_MAX)
+               == BAD_MORALE_NETWORK_SKIP_ROLL)
         return 0;
 
     SAMPLE2 moraleSample;
@@ -966,7 +1072,7 @@ i32 combatManager::CheckApplyBadMorale(i32 side, i32 index) {
         CombatMessage(gText, 1, 1, 0);
     }
 
-    activeArmy->SpellEffect(COMBAT_BAD_MORALE_EFFECT, COMBAT_MORALE_EFFECT_DURATION, 1);
+    activeArmy->SpellEffect(BAD_MORALE_EFFECT, MORALE_EFFECT_DURATION, 1);
     activeArmy->m_monster.flags.abilityFlags |= MONSTER_ABILITY_FLAG_BAD_MORALE;
     if (!gbNoShowCombat)
         WaitEndSample(moraleSample, -1);
@@ -1105,7 +1211,7 @@ void combatManager::CatAttack(i32 side) {
     i32 keepIndex6 = -1;
     CombatCastleHex targetHex4 = COMBAT_CASTLE_HEX_NONE;
     i32 missShot19 = 0;
-    CombatCatapultDamage damageLevel13 = COMBAT_CATAPULT_DAMAGE_NORMAL;
+    CombatCatapultDamage damageLevel13 = CATAPULT_DAMAGE_NORMAL;
     i32 firstRoll7;
     i32 advancedRoll5;
     i32 index28;
@@ -1203,10 +1309,10 @@ void combatManager::CatAttack(i32 side) {
         if (!gbHumanPlayer[m_heroes[COMBAT_ATTACKER_SIDE]->m_owner])
             firstRoll7 -= COMBAT_CATAPULT_AI_ROLL_PENALTY;
         if (firstRoll7 < COMBAT_CATAPULT_NO_SKILL_DOUBLE_THRESHOLD)
-            damageLevel13 = COMBAT_CATAPULT_DAMAGE_DOUBLE;
+            damageLevel13 = CATAPULT_DAMAGE_DOUBLE;
         else if (firstRoll7 > COMBAT_CATAPULT_NO_SKILL_MISS_THRESHOLD) {
             missShot19 = 1;
-            damageLevel13 = COMBAT_CATAPULT_DAMAGE_NONE;
+            damageLevel13 = CATAPULT_DAMAGE_NONE;
         }
     } else if (m_heroes[COMBAT_ATTACKER_SIDE]->m_secondarySkills[IDX(HERO_SKILL_BALLISTICS)]
                <= IDX(HERO_SKILL_LEVEL_ADVANCED)) {
@@ -1215,10 +1321,10 @@ void combatManager::CatAttack(i32 side) {
         if (!gbHumanPlayer[m_heroes[COMBAT_ATTACKER_SIDE]->m_owner])
             advancedRoll5 -= COMBAT_CATAPULT_AI_ROLL_PENALTY;
         if (advancedRoll5 < COMBAT_CATAPULT_ADVANCED_DOUBLE_THRESHOLD)
-            damageLevel13 = COMBAT_CATAPULT_DAMAGE_DOUBLE;
+            damageLevel13 = CATAPULT_DAMAGE_DOUBLE;
     } else if (m_heroes[COMBAT_ATTACKER_SIDE]->m_secondarySkills[IDX(HERO_SKILL_BALLISTICS)]
                == IDX(HERO_SKILL_LEVEL_EXPERT)) {
-        damageLevel13 = COMBAT_CATAPULT_DAMAGE_DOUBLE;
+        damageLevel13 = CATAPULT_DAMAGE_DOUBLE;
     }
 
     if (missShot19) {
@@ -1242,7 +1348,7 @@ void combatManager::CatAttack(i32 side) {
             }
         }
         missShot19 = 0;
-        damageLevel13 = COMBAT_CATAPULT_DAMAGE_NORMAL;
+        damageLevel13 = CATAPULT_DAMAGE_NORMAL;
     foundMissHex:
         frame18++;
     }
@@ -1414,7 +1520,7 @@ void combatManager::CatAttack(i32 side) {
                         m_wallStates[wallIndex17 + COMBAT_WALL_SLOT_SECTION_FIRST] =
                             IDX(COMBAT_WALL_STATE_SECTION_DESTROYED);
                 } else {
-                    if (damageLevel13 > COMBAT_CATAPULT_DAMAGE_NORMAL)
+                    if (damageLevel13 > CATAPULT_DAMAGE_NORMAL)
                         m_wallStates[wallIndex17 + COMBAT_WALL_SLOT_SECTION_FIRST] =
                             IDX(COMBAT_WALL_STATE_DESTROYED);
                     else
@@ -1451,19 +1557,19 @@ VA(0x0049412d, 0x74f)
 void combatManager::KeepAttack(i32 tower) {
     if (!m_inCastleCombat)
         return;
-    if ((tower == IDX(COMBAT_TOWER_SELECTOR_GARRISON)
+    if ((tower == IDX(TOWER_SELECTOR_GARRISON)
          && m_wallStates[IDX(COMBAT_WALL_SLOT_KEEP)] != IDX(COMBAT_WALL_STATE_KEEP_STANDING))
-        || (tower == IDX(COMBAT_TOWER_SELECTOR_TOP)
+        || (tower == IDX(TOWER_SELECTOR_TOP)
             && m_wallStates[IDX(COMBAT_WALL_SLOT_TOP_TOWER)]
                    != IDX(COMBAT_WALL_STATE_TOWER_STANDING))
-        || (tower == IDX(COMBAT_TOWER_SELECTOR_BOTTOM)
+        || (tower == IDX(TOWER_SELECTOR_BOTTOM)
             && m_wallStates[IDX(COMBAT_WALL_SLOT_BOTTOM_TOWER)]
                    != IDX(COMBAT_WALL_STATE_TOWER_STANDING)))
         return;
 
     LogStr("KA1");
 
-    CombatKeepTargetPriority bestPriority0 = COMBAT_KEEP_PRIORITY_NONE;
+    CombatKeepTargetPriority bestPriority0 = KEEP_PRIORITY_NONE;
     i32 bestValue10 = 0;
     i32 bestArmyIndex5 = -1;
     i32 armyIndex3;
@@ -1478,13 +1584,13 @@ void combatManager::KeepAttack(i32 tower) {
                 || target0->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PETRIFIED)]
                 || target0->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BERSERK)]
                 || target0->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_HYPNOTIZE)]) {
-                priority = COMBAT_KEEP_PRIORITY_DISABLED;
+                priority = KEEP_PRIORITY_DISABLED;
             } else if (HAS(target0->m_monster.flags.all, MONSTER_FLAGS_SHOOTER)) {
-                priority = COMBAT_KEEP_PRIORITY_SHOOTER;
+                priority = KEEP_PRIORITY_SHOOTER;
             } else if (HAS(target0->m_monster.flags.all, MONSTER_FLAGS_FLYING)) {
-                priority = COMBAT_KEEP_PRIORITY_FLYER;
+                priority = KEEP_PRIORITY_FLYER;
             } else {
-                priority = COMBAT_KEEP_PRIORITY_WALKER;
+                priority = KEEP_PRIORITY_WALKER;
             }
 
             value26 =
@@ -1541,7 +1647,7 @@ void combatManager::KeepAttack(i32 tower) {
         attackBonus4 = COMBAT_KEEP_ATTACK_STAT_LIMIT;
     if (attackBonus4 < -COMBAT_KEEP_ATTACK_STAT_LIMIT)
         attackBonus4 = -COMBAT_KEEP_ATTACK_STAT_LIMIT;
-    if (tower != IDX(COMBAT_TOWER_SELECTOR_GARRISON))
+    if (tower != IDX(TOWER_SELECTOR_GARRISON))
         shotCount28 /= COMBAT_KEEP_SIDE_TOWER_SHOT_DIVISOR;
 
     i32 damage8 = 0;
@@ -1563,7 +1669,7 @@ void combatManager::KeepAttack(i32 tower) {
         sprintf(
             gText,
             "%s %d %s.\n%d %s %s.",
-            tower == IDX(COMBAT_TOWER_SELECTOR_GARRISON) ? "Garrison does" : "Tower does",
+            tower == IDX(TOWER_SELECTOR_GARRISON) ? "Garrison does" : "Tower does",
             damage8,
             "damage",
             killed29,
@@ -1574,7 +1680,7 @@ void combatManager::KeepAttack(i32 tower) {
         sprintf(
             gText,
             "%s %d %s.",
-            tower == IDX(COMBAT_TOWER_SELECTOR_GARRISON) ? "Garrison does" : "Tower does",
+            tower == IDX(TOWER_SELECTOR_GARRISON) ? "Garrison does" : "Tower does",
             damage8,
             "damage"
         );
@@ -1850,16 +1956,16 @@ void combatManager::TestRaiseDoor(void) {
 
 VA(0x00495481, 0xd8)
 i32 combatManager::InCastle(i32 hex) {
-    return ((hex < COMBAT_CASTLE_INTERIOR_ROW_0_FIRST || hex > COMBAT_CASTLE_INTERIOR_ROW_0_LAST)
-            && (hex < COMBAT_CASTLE_INTERIOR_ROW_1_FIRST || hex > COMBAT_CASTLE_INTERIOR_ROW_1_LAST)
-            && (hex < COMBAT_CASTLE_INTERIOR_ROW_2_FIRST || hex > COMBAT_CASTLE_INTERIOR_ROW_2_LAST)
-            && (hex < COMBAT_CASTLE_INTERIOR_ROW_3_FIRST || hex > COMBAT_CASTLE_INTERIOR_ROW_3_LAST)
-            && (hex < COMBAT_CASTLE_INTERIOR_ROW_4_FIRST || hex > COMBAT_CASTLE_INTERIOR_ROW_4_LAST)
-            && (hex < COMBAT_CASTLE_INTERIOR_ROW_5_FIRST || hex > COMBAT_CASTLE_INTERIOR_ROW_5_LAST)
-            && (hex < COMBAT_CASTLE_INTERIOR_ROW_6_FIRST || hex > COMBAT_CASTLE_INTERIOR_ROW_6_LAST)
-            && (hex < COMBAT_CASTLE_INTERIOR_ROW_7_FIRST || hex > COMBAT_CASTLE_INTERIOR_ROW_7_LAST)
-            && (hex < COMBAT_CASTLE_INTERIOR_ROW_8_FIRST
-                || hex > COMBAT_CASTLE_INTERIOR_ROW_8_LAST))
+    return ((hex < CASTLE_INTERIOR_ROW_0_FIRST || hex > CASTLE_INTERIOR_ROW_0_LAST)
+            && (hex < CASTLE_INTERIOR_ROW_1_FIRST || hex > CASTLE_INTERIOR_ROW_1_LAST)
+            && (hex < CASTLE_INTERIOR_ROW_2_FIRST || hex > CASTLE_INTERIOR_ROW_2_LAST)
+            && (hex < CASTLE_INTERIOR_ROW_3_FIRST || hex > CASTLE_INTERIOR_ROW_3_LAST)
+            && (hex < CASTLE_INTERIOR_ROW_4_FIRST || hex > CASTLE_INTERIOR_ROW_4_LAST)
+            && (hex < CASTLE_INTERIOR_ROW_5_FIRST || hex > CASTLE_INTERIOR_ROW_5_LAST)
+            && (hex < CASTLE_INTERIOR_ROW_6_FIRST || hex > CASTLE_INTERIOR_ROW_6_LAST)
+            && (hex < CASTLE_INTERIOR_ROW_7_FIRST || hex > CASTLE_INTERIOR_ROW_7_LAST)
+            && (hex < CASTLE_INTERIOR_ROW_8_FIRST
+                || hex > CASTLE_INTERIOR_ROW_8_LAST))
                ? 1
                : 0;
 }
@@ -2103,52 +2209,52 @@ void UpdateCombatSystemOptions(i32 initialDraw) {
     tag_message message;
     message.type = COMBAT_SYSTEM_OPTION_EVENT;
     message.payload.widget.command = COMBAT_SYSTEM_OPTION_BUTTON_MESSAGE;
-    message.payload.widget.id = COMBAT_SYSTEM_OPTION_SPEED_BUTTON;
+    message.payload.widget.id = SYSTEM_OPTION_SPEED_BUTTON;
     message.payload.widget.data.value =
-        gConfig.combatSpeed + COMBAT_SYSTEM_OPTION_SPEED_STATE_OFFSET;
+        gConfig.combatSpeed + SYSTEM_OPTION_SPEED_STATE_OFFSET;
     CSPanel->BroadcastMessage(message);
-    message.payload.widget.id = COMBAT_SYSTEM_OPTION_ARMY_INFO_BUTTON;
+    message.payload.widget.id = SYSTEM_OPTION_ARMY_INFO_BUTTON;
     message.payload.widget.data.value =
-        gConfig.combatArmyInfoLevel + COMBAT_SYSTEM_OPTION_ARMY_INFO_STATE_OFFSET;
+        gConfig.combatArmyInfoLevel + SYSTEM_OPTION_ARMY_INFO_STATE_OFFSET;
     CSPanel->BroadcastMessage(message);
-    message.payload.widget.id = COMBAT_SYSTEM_OPTION_AUTO_SPELL_BUTTON;
+    message.payload.widget.id = SYSTEM_OPTION_AUTO_SPELL_BUTTON;
     message.payload.widget.data.value =
-        gConfig.autoCombatUseSpells + COMBAT_SYSTEM_OPTION_AUTO_SPELL_STATE_OFFSET;
+        gConfig.autoCombatUseSpells + SYSTEM_OPTION_AUTO_SPELL_STATE_OFFSET;
     CSPanel->BroadcastMessage(message);
-    message.payload.widget.id = COMBAT_SYSTEM_OPTION_GRID_BUTTON;
+    message.payload.widget.id = SYSTEM_OPTION_GRID_BUTTON;
     message.payload.widget.data.value =
-        gConfig.showCombatGrid + COMBAT_SYSTEM_OPTION_GRID_STATE_OFFSET;
+        gConfig.showCombatGrid + SYSTEM_OPTION_GRID_STATE_OFFSET;
     CSPanel->BroadcastMessage(message);
-    message.payload.widget.id = COMBAT_SYSTEM_OPTION_SHADE_BUTTON;
+    message.payload.widget.id = SYSTEM_OPTION_SHADE_BUTTON;
     message.payload.widget.data.value =
-        gConfig.combatShadeLevel + COMBAT_SYSTEM_OPTION_SHADE_STATE_OFFSET;
+        gConfig.combatShadeLevel + SYSTEM_OPTION_SHADE_STATE_OFFSET;
     CSPanel->BroadcastMessage(message);
-    message.payload.widget.id = COMBAT_SYSTEM_OPTION_MOUSE_HEX_BUTTON;
+    message.payload.widget.id = SYSTEM_OPTION_MOUSE_HEX_BUTTON;
     message.payload.widget.data.value =
-        gConfig.showCombatMouseHex + COMBAT_SYSTEM_OPTION_MOUSE_HEX_STATE_OFFSET;
+        gConfig.showCombatMouseHex + SYSTEM_OPTION_MOUSE_HEX_STATE_OFFSET;
     CSPanel->BroadcastMessage(message);
 
     message.payload.widget.command = COMBAT_SYSTEM_OPTION_TEXT_MESSAGE;
-    message.payload.widget.id = COMBAT_SYSTEM_OPTION_SPEED_TEXT;
+    message.payload.widget.id = SYSTEM_OPTION_SPEED_TEXT;
     message.payload.widget.data.text = combatSpeedText[gConfig.combatSpeed];
     CSPanel->BroadcastMessage(message);
-    message.payload.widget.id = COMBAT_SYSTEM_OPTION_ARMY_INFO_TEXT;
+    message.payload.widget.id = SYSTEM_OPTION_ARMY_INFO_TEXT;
     message.payload.widget.data.text = combatMiniInfoText[gConfig.combatArmyInfoLevel];
     CSPanel->BroadcastMessage(message);
-    message.payload.widget.id = COMBAT_SYSTEM_OPTION_AUTO_SPELL_TEXT;
+    message.payload.widget.id = SYSTEM_OPTION_AUTO_SPELL_TEXT;
     message.payload.widget.data.text = onOffText[gConfig.autoCombatUseSpells];
     CSPanel->BroadcastMessage(message);
-    message.payload.widget.id = COMBAT_SYSTEM_OPTION_GRID_TEXT;
+    message.payload.widget.id = SYSTEM_OPTION_GRID_TEXT;
     message.payload.widget.data.text = onOffText[gConfig.showCombatGrid];
     CSPanel->BroadcastMessage(message);
-    message.payload.widget.id = COMBAT_SYSTEM_OPTION_SHADE_TEXT;
+    message.payload.widget.id = SYSTEM_OPTION_SHADE_TEXT;
     message.payload.widget.data.text = onOffText[gConfig.combatShadeLevel];
     CSPanel->BroadcastMessage(message);
-    message.payload.widget.id = COMBAT_SYSTEM_OPTION_MOUSE_HEX_TEXT;
+    message.payload.widget.id = SYSTEM_OPTION_MOUSE_HEX_TEXT;
     message.payload.widget.data.text = onOffText[gConfig.showCombatMouseHex];
     CSPanel->BroadcastMessage(message);
     if (!initialDraw)
-        CSPanel->DrawWindow(1, 0, COMBAT_SYSTEM_OPTION_DRAW_MASK);
+        CSPanel->DrawWindow(1, 0, SYSTEM_OPTION_DRAW_MASK);
 }
 
 // @early-stop: delinker jump-table artifact.
@@ -2158,37 +2264,37 @@ i32 CombatSystemOptionsHandler(tag_message& message) {
     i32 bDone = 0;
     char optionText[COMBAT_MESSAGE_LINE_SIZE];
     if (message.type == COMBAT_SYSTEM_OPTION_EVENT) {
-        if (message.payload.widget.parameter & COMBAT_SYSTEM_OPTION_RIGHT_BUTTON) {
+        if (message.payload.widget.parameter & SYSTEM_OPTION_RIGHT_BUTTON) {
             if (message.payload.widget.command == COMBAT_SYSTEM_OPTION_BUTTON_EVENT
                 || message.payload.widget.command == COMBAT_SYSTEM_OPTION_HOVER_EVENT) {
                 i32 helpIndex = -1;
                 switch (message.payload.widget.id) {
-                    case IDX(COMBAT_SYSTEM_OPTION_CLOSE_BUTTON):
+                    case IDX(SYSTEM_OPTION_CLOSE_BUTTON):
                         helpIndex = 0;
                         break;
-                    case IDX(COMBAT_SYSTEM_OPTION_SPEED_BUTTON):
+                    case IDX(SYSTEM_OPTION_SPEED_BUTTON):
                         helpIndex = 1;
                         break;
-                    case IDX(COMBAT_SYSTEM_OPTION_ARMY_INFO_BUTTON):
+                    case IDX(SYSTEM_OPTION_ARMY_INFO_BUTTON):
                         helpIndex = 2;
                         break;
-                    case IDX(COMBAT_SYSTEM_OPTION_AUTO_SPELL_BUTTON):
+                    case IDX(SYSTEM_OPTION_AUTO_SPELL_BUTTON):
                         helpIndex = 3;
                         break;
-                    case IDX(COMBAT_SYSTEM_OPTION_GRID_BUTTON):
+                    case IDX(SYSTEM_OPTION_GRID_BUTTON):
                         helpIndex = 4;
                         break;
-                    case IDX(COMBAT_SYSTEM_OPTION_SHADE_BUTTON):
+                    case IDX(SYSTEM_OPTION_SHADE_BUTTON):
                         helpIndex = 5;
                         break;
-                    case IDX(COMBAT_SYSTEM_OPTION_MOUSE_HEX_BUTTON):
+                    case IDX(SYSTEM_OPTION_MOUSE_HEX_BUTTON):
                         helpIndex = 6;
                         break;
                 }
                 if (helpIndex >= 0) {
                     NormalDialog(
                         gCSPanelHelp[helpIndex],
-                        COMBAT_SYSTEM_OPTION_HELP_DIALOG,
+                        SYSTEM_OPTION_HELP_DIALOG,
                         -1,
                         -1,
                         -1,
@@ -2204,41 +2310,41 @@ i32 CombatSystemOptionsHandler(tag_message& message) {
             switch (message.payload.widget.command) {
                 case COMBAT_SYSTEM_OPTION_CLOSE_EVENT:
                     switch (message.payload.widget.id) {
-                        case IDX(COMBAT_SYSTEM_OPTION_CLOSE_BUTTON):
+                        case IDX(SYSTEM_OPTION_CLOSE_BUTTON):
                             bDone = 1;
                             break;
                     }
                     break;
                 case COMBAT_SYSTEM_OPTION_BUTTON_EVENT:
                     switch (message.payload.widget.id) {
-                        case IDX(COMBAT_SYSTEM_OPTION_SPEED_BUTTON):
+                        case IDX(SYSTEM_OPTION_SPEED_BUTTON):
                             gConfig.combatSpeed =
-                                (gConfig.combatSpeed + 1) % COMBAT_SYSTEM_OPTION_CYCLE_COUNT;
+                                (gConfig.combatSpeed + 1) % SYSTEM_OPTION_CYCLE_COUNT;
                             bRedraw = 1;
                             bCPrefsChanged = 1;
                             break;
-                        case IDX(COMBAT_SYSTEM_OPTION_ARMY_INFO_BUTTON):
+                        case IDX(SYSTEM_OPTION_ARMY_INFO_BUTTON):
                             gConfig.combatArmyInfoLevel = (gConfig.combatArmyInfoLevel + 1)
-                                                          % COMBAT_SYSTEM_OPTION_CYCLE_COUNT;
+                                                          % SYSTEM_OPTION_CYCLE_COUNT;
                             bRedraw = 1;
                             bCPrefsChanged = 1;
                             break;
-                        case IDX(COMBAT_SYSTEM_OPTION_AUTO_SPELL_BUTTON):
+                        case IDX(SYSTEM_OPTION_AUTO_SPELL_BUTTON):
                             gConfig.autoCombatUseSpells = 1 - gConfig.autoCombatUseSpells;
                             bRedraw = 1;
                             bCPrefsChanged = 1;
                             break;
-                        case IDX(COMBAT_SYSTEM_OPTION_GRID_BUTTON):
+                        case IDX(SYSTEM_OPTION_GRID_BUTTON):
                             gConfig.showCombatGrid = 1 - gConfig.showCombatGrid;
                             bRedraw = 1;
                             bCPrefsChanged = 1;
                             break;
-                        case IDX(COMBAT_SYSTEM_OPTION_SHADE_BUTTON):
+                        case IDX(SYSTEM_OPTION_SHADE_BUTTON):
                             gConfig.combatShadeLevel = 1 - gConfig.combatShadeLevel;
                             bRedraw = 1;
                             bCPrefsChanged = 1;
                             break;
-                        case IDX(COMBAT_SYSTEM_OPTION_MOUSE_HEX_BUTTON):
+                        case IDX(SYSTEM_OPTION_MOUSE_HEX_BUTTON):
                             gConfig.showCombatMouseHex = 1 - gConfig.showCombatMouseHex;
                             bRedraw = 1;
                             bCPrefsChanged = 1;
@@ -2252,11 +2358,11 @@ i32 CombatSystemOptionsHandler(tag_message& message) {
         UpdateCombatSystemOptions(0);
     if (bDone) {
         gpWindowManager->m_dialogResult = message.payload.widget.id;
-        message.payload.widget.id = COMBAT_SYSTEM_OPTION_SPEED_BUTTON;
+        message.payload.widget.id = SYSTEM_OPTION_SPEED_BUTTON;
         message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
-        return COMBAT_SYSTEM_OPTION_HANDLER_CLOSE;
+        return SYSTEM_OPTION_HANDLER_CLOSE;
     }
-    return COMBAT_SYSTEM_OPTION_HANDLER_CONTINUE;
+    return SYSTEM_OPTION_HANDLER_CONTINUE;
 }
 
 

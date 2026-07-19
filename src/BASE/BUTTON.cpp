@@ -10,13 +10,25 @@
 #include <BASE/inputManager.h>
 #include <SOURCE/KB.h>
 
+H2_ENUM_CLASS_BEGIN(ButtonSelectMode)
+    SELECT_DIALOG_RESULT = 1
+H2_ENUM_CLASS_END(ButtonSelectMode)
+
+H2_ENUM_BEGIN(ButtonHotkeyConstant)
+    NO_HOTKEY = -1
+H2_ENUM_END(ButtonHotkeyConstant)
+
+H2_ENUM_BEGIN(ButtonConstant)
+    REPEAT_DELAY_TICKS = 60
+H2_ENUM_END(ButtonConstant)
+
 VA(0x004dd440, 0x34)
 button::button(void) : widget(0, 0, 0, 0, 0, 0) {
     m_normalFrame = 0;
     m_pressedFrame = 0;
     m_iconId = 0;
     m_selectMode = 0;
-    m_hotkey = BUTTON_NO_HOTKEY;
+    m_hotkey = NO_HOTKEY;
     m_icon = 0;
 }
 
@@ -122,7 +134,7 @@ i32 button::Main(tag_message& msg) {
         case MESSAGE_KEY_DOWN:
             if ((m_flags & WIDGET_FLAG_ENABLED) != 0 && (m_flags & WIDGET_FLAG_DRAW) != 0
                 && (m_flags & WIDGET_FLAG_DIMMED) == 0) {
-                if (m_hotkey != BUTTON_NO_HOTKEY && m_hotkey == msg.payload.keyboard.keyCode)
+                if (m_hotkey != NO_HOTKEY && m_hotkey == msg.payload.keyboard.keyCode)
                     return Select(msg);
                 return 0;
             }
@@ -131,7 +143,7 @@ i32 button::Main(tag_message& msg) {
         case MESSAGE_KEY_UP:
             if ((m_flags & WIDGET_FLAG_ENABLED) != 0 && (m_flags & WIDGET_FLAG_DRAW) != 0
                 && (m_flags & WIDGET_FLAG_DIMMED) == 0) {
-                if (m_hotkey == BUTTON_NO_HOTKEY || m_hotkey != msg.payload.keyboard.keyCode)
+                if (m_hotkey == NO_HOTKEY || m_hotkey != msg.payload.keyboard.keyCode)
                     return 0;
                 i16 keyFlags = m_flags;
                 if ((keyFlags & WIDGET_FLAG_SELECTED) == 0)
@@ -288,12 +300,12 @@ i16 button::Select(struct tag_message& msg) {
     m_flags |= WIDGET_FLAG_SELECTED;
     msg.type = MESSAGE_WIDGET;
     msg.payload.widget.id = m_id;
-    if (m_selectMode == IDX(BUTTON_SELECT_DIALOG_RESULT)) {
+    if (m_selectMode == IDX(SELECT_DIALOG_RESULT)) {
         msg.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
     } else {
         msg.payload.widget.command = WIDGET_COMMAND_SELECT;
     }
-    glTimers[GLOBAL_BUTTON_REPEAT_TIMER_SLOT] = KBTickCount() + BUTTON_REPEAT_DELAY_TICKS;
+    glTimers[GLOBAL_BUTTON_REPEAT_TIMER_SLOT] = KBTickCount() + REPEAT_DELAY_TICKS;
     iLeftRightSave = msg.payload.widget.parameter & MESSAGE_MODIFIER_BUTTON_MASK;
     return 2;
 }

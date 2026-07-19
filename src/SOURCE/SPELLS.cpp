@@ -27,14 +27,50 @@
 #include <SOURCE/SPELLS.h>
 #include <SOURCE/X_GLOBAL.h>
 
+H2_ENUM_CLASS_BEGIN(SpellRippleMode)
+    RIPPLE_MODE_WAVE         = 0,
+    RIPPLE_MODE_DEATH_RIPPLE = 1,
+    RIPPLE_MODE_DEATH_WAVE   = 2
+H2_ENUM_CLASS_END(SpellRippleMode)
+
+H2_ENUM_BEGIN(SpellSourceLine)
+    VAPORIZE_ALLOC_LINE_OFFSET        = 0x09,
+    VAPORIZE_FREE_LINE_OFFSET         = 0x38,
+    RIPPLE_MODIFIER_ALLOC_LINE_OFFSET = 0x2c,
+    RIPPLE_WAVE_ALLOC_LINE_OFFSET     = 0x2d,
+    RIPPLE_MODIFIER_FREE_LINE_OFFSET  = 0x8e,
+    RIPPLE_WAVE_FREE_LINE_OFFSET      = 0x8f
+H2_ENUM_END(SpellSourceLine)
+
+H2_ENUM_BEGIN(CombatSpellUiConstant)
+    COMMAND_CANCEL        = 1,
+    CONTROL_PREVIOUS_PAGE = 2,
+    CONTROL_NEXT_PAGE     = 3,
+    CONTROL_FIRST_MANA    = 6,
+    CONTROL_LAST_MANA     = 9,
+    CONTROL_CLOSE         = 0x7800,
+    HELP_PREVIOUS_PAGE    = 0,
+    HELP_NEXT_PAGE        = 1,
+    HELP_CLOSE            = 4,
+    HELP_MANA             = 6,
+    HELP_DEFAULT          = 7,
+    HANDLER_CONTINUE      = 1,
+    HANDLER_CLOSE         = 2,
+    ACTION_CAST           = 1,
+    NO_SELECTION          = -1,
+    HEX_COLUMN_COUNT      = 13,
+    HEX_RIGHT_BORDER      = 12,
+    ELEMENTAL_ARMY_LIMIT  = 20
+H2_ENUM_END(CombatSpellUiConstant)
+
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\SPELLS.CPP"
 VA(0x004204c0, 0x86)
 i32 combatManager::HasValidSpellTarget(SpellType spell) {
     i32 hex;
 
     for (hex = 0; hex < COMBAT_HEX_COUNT; ++hex) {
-        if (hex % SPELL_HEX_COLUMN_COUNT == 0
-            || hex % SPELL_HEX_COLUMN_COUNT == SPELL_HEX_RIGHT_BORDER)
+        if (hex % HEX_COLUMN_COUNT == 0
+            || hex % HEX_COLUMN_COUNT == HEX_RIGHT_BORDER)
             continue;
         if (ValidSpellTarget(spell, hex))
             return 1;
@@ -97,7 +133,7 @@ i32 combatManager::ViewSpells(i32) {
                     );
                     return 0;
                 }
-                if (m_armyCount[m_currentSide] >= SPELL_ELEMENTAL_ARMY_LIMIT) {
+                if (m_armyCount[m_currentSide] >= ELEMENTAL_ARMY_LIMIT) {
                     sprintf(
                         gText,
                         "You already have %d creatures groups in combat and cannot add any more.",
@@ -167,12 +203,12 @@ i32 combatManager::ViewSpells(i32) {
                     return 0;
                 }
             set_action:
-                giNextAction = SPELL_ACTION_CAST;
+                giNextAction = ACTION_CAST;
                 giNextActionExtra = IDX(m_selectedSpell);
                 break;
 
             case SPELL_MIRROR_IMAGE:
-                if (m_armyCount[m_currentSide] >= SPELL_ELEMENTAL_ARMY_LIMIT) {
+                if (m_armyCount[m_currentSide] >= ELEMENTAL_ARMY_LIMIT) {
                     sprintf(
                         gText,
                         "You already have %d creatures groups in combat and cannot add any more.",
@@ -209,7 +245,7 @@ i32 combatManager::ViewSpells(i32) {
                     );
                     return 0;
                 }
-                giNextAction = SPELL_ACTION_CAST;
+                giNextAction = ACTION_CAST;
                 giNextActionExtra = IDX(m_selectedSpell);
                 gpMouseManager->SetPointer(
                     "spelmous.mse",
@@ -232,31 +268,31 @@ i32 CombatSpecialHandler(tag_message& message) {
     if (message.type == SPELL_MESSAGE_HOVER) {
         gpWindowManager->ConvertToHover(message);
         if (gpWindowManager->m_lastHoverId == message.payload.hover.id)
-            return SPELL_HANDLER_CONTINUE;
+            return HANDLER_CONTINUE;
         gpWindowManager->m_lastHoverId = message.payload.hover.id;
 
         switch (message.payload.hover.id) {
-            case SPELL_CONTROL_PREVIOUS_PAGE:
-                gpCombatManager->CombatMessage(cSpellHelp[SPELL_HELP_PREVIOUS_PAGE], 1, 0, 0);
+            case CONTROL_PREVIOUS_PAGE:
+                gpCombatManager->CombatMessage(cSpellHelp[HELP_PREVIOUS_PAGE], 1, 0, 0);
                 break;
-            case SPELL_CONTROL_NEXT_PAGE:
-                gpCombatManager->CombatMessage(cSpellHelp[SPELL_HELP_NEXT_PAGE], 1, 0, 0);
+            case CONTROL_NEXT_PAGE:
+                gpCombatManager->CombatMessage(cSpellHelp[HELP_NEXT_PAGE], 1, 0, 0);
                 break;
-            case SPELL_CONTROL_CLOSE:
-                gpCombatManager->CombatMessage(cSpellHelp[SPELL_HELP_CLOSE], 1, 0, 0);
+            case CONTROL_CLOSE:
+                gpCombatManager->CombatMessage(cSpellHelp[HELP_CLOSE], 1, 0, 0);
                 break;
-            case SPELL_CONTROL_FIRST_MANA:
-            case SPELL_CONTROL_FIRST_MANA + 1:
-            case SPELL_CONTROL_FIRST_MANA + 2:
-            case SPELL_CONTROL_LAST_MANA:
-                gpCombatManager->CombatMessage(cSpellHelp[SPELL_HELP_MANA], 1, 0, 0);
+            case CONTROL_FIRST_MANA:
+            case CONTROL_FIRST_MANA + 1:
+            case CONTROL_FIRST_MANA + 2:
+            case CONTROL_LAST_MANA:
+                gpCombatManager->CombatMessage(cSpellHelp[HELP_MANA], 1, 0, 0);
                 break;
             default:
-                gpCombatManager->CombatMessage(cSpellHelp[SPELL_HELP_DEFAULT], 1, 0, 0);
+                gpCombatManager->CombatMessage(cSpellHelp[HELP_DEFAULT], 1, 0, 0);
                 break;
         }
     }
-    return SPELL_HANDLER_CONTINUE;
+    return HANDLER_CONTINUE;
 }
 
 // @semantic: first residual at +0x35 is load order: retail loads hex then compares indexToCastOn.
@@ -269,7 +305,7 @@ i32 HandleCastSpell(tag_message& message) {
             hex = gpCombatManager->GetGridIndex(message.payload.mouse.x, message.payload.mouse.y);
             if (indexToCastOn != hex) {
                 if (!gpCombatManager->ValidSpellTarget(gpCombatManager->m_selectedSpell, hex)) {
-                    indexToCastOn = SPELL_NO_SELECTION;
+                    indexToCastOn = NO_SELECTION;
                     gpMouseManager->SetPointer(0);
                     if (gpCombatManager->m_selectedSpell == SPELL_TELEPORT && bInTeleportGetDest) {
                         gpCombatManager->CombatMessage("Invalid Teleport Destination", 1, 0, 0);
@@ -287,31 +323,31 @@ i32 HandleCastSpell(tag_message& message) {
             break;
 
         case SPELL_MESSAGE_SELECT:
-            if (indexToCastOn != SPELL_NO_SELECTION) {
+            if (indexToCastOn != NO_SELECTION) {
                 if (bInTeleportGetDest) {
                     giNextActionGridIndex2 = indexToCastOn;
                 } else {
                     giNextActionGridIndex = indexToCastOn;
                     if (gpCombatManager->m_selectedSpell == SPELL_TELEPORT) {
                         bInTeleportGetDest = 1;
-                        indexToCastOn = SPELL_NO_SELECTION;
+                        indexToCastOn = NO_SELECTION;
                         message.type = SPELL_MESSAGE_HOVER;
                         message.payload.mouse.x = message.payload.mouse.screenX;
                         message.payload.mouse.y = message.payload.mouse.screenY;
                         HandleCastSpell(message);
                         gpCombatManager->CombatMessage("Select teleport destination.", 1, 0, 0);
-                        return SPELL_HANDLER_CONTINUE;
+                        return HANDLER_CONTINUE;
                     }
                 }
                 bInTeleportGetDest = 0;
                 message.type = SPELL_MESSAGE_DIALOG;
                 message.payload.widget.command = SPELL_COMMAND_CLOSE;
-                return SPELL_HANDLER_CLOSE;
+                return HANDLER_CLOSE;
             }
             break;
 
         case SPELL_MESSAGE_MOUSE_DOWN:
-            if (message.payload.keyboard.keyCode != SPELL_COMMAND_CANCEL)
+            if (message.payload.keyboard.keyCode != COMMAND_CANCEL)
                 break;
             // fall through
 
@@ -321,9 +357,9 @@ i32 HandleCastSpell(tag_message& message) {
             message.type = SPELL_MESSAGE_DIALOG;
             message.payload.widget.command = SPELL_COMMAND_CLOSE;
             bInTeleportGetDest = 0;
-            return SPELL_HANDLER_CLOSE;
+            return HANDLER_CLOSE;
     }
-    return SPELL_HANDLER_CONTINUE;
+    return HANDLER_CONTINUE;
 }
 
 // @semantic: First code residual is the corpse/hex index formation near +0x124: retail forms corpse + 0x61*hex.
@@ -338,7 +374,7 @@ i32 combatManager::FindResurrectArmyIndex(i32 side, i32 spell, i32 hex) {
             if (target_j->SpellCastWorkChance(SpellType(spell)) > 0.0f)
                 return m_hexCells[hex].m_occupantIndex;
         }
-        return SPELL_NO_SELECTION;
+        return NO_SELECTION;
     }
 
     for (corpse = m_hexCells[hex].m_deadOccupantCount - 1; corpse >= 0; --corpse) {
@@ -354,7 +390,7 @@ i32 combatManager::FindResurrectArmyIndex(i32 side, i32 spell, i32 hex) {
                 return m_hexCells[hex].m_deadOccupantIndices[corpse];
         }
     }
-    return SPELL_NO_SELECTION;
+    return NO_SELECTION;
 }
 
 // @semantic: first executable residual is equivalent occupant side/index multiplication order.
@@ -394,7 +430,7 @@ i32 combatManager::ValidSpellTarget(SpellType spell, i32 hex) {
         case SPELL_RESURRECT:
         case SPELL_TRUE_RESURRECT:
         case SPELL_ANIMATE_DEAD:
-            return FindResurrectArmyIndex(m_currentSide, IDX(spell), hex) != SPELL_NO_SELECTION;
+            return FindResurrectArmyIndex(m_currentSide, IDX(spell), hex) != NO_SELECTION;
 
         case SPELL_CURE:
         case SPELL_MASS_CURE:
@@ -418,10 +454,10 @@ i32 combatManager::ValidSpellTarget(SpellType spell, i32 hex) {
                 return 0;
             if (m_armies[m_hexCells[hex].m_occupantSide][m_hexCells[hex].m_occupantIndex]
                         .m_mirrorImageIndex
-                    != SPELL_NO_SELECTION
+                    != NO_SELECTION
                 || m_armies[m_hexCells[hex].m_occupantSide][m_hexCells[hex].m_occupantIndex]
                            .m_mirrorSourceIndex
-                       != SPELL_NO_SELECTION)
+                       != NO_SELECTION)
                 return 0;
             break;
 
@@ -461,8 +497,8 @@ i32 combatManager::ValidSpellTarget(SpellType spell, i32 hex) {
         case SPELL_FIREBLAST:
         case SPELL_METEOR_SHOWER:
         case SPELL_COLD_RING:
-            if (hex == COMBAT_HEX_EMPTY || hex % SPELL_HEX_COLUMN_COUNT == 0
-                || hex % SPELL_HEX_COLUMN_COUNT == SPELL_HEX_RIGHT_BORDER)
+            if (hex == COMBAT_HEX_EMPTY || hex % HEX_COLUMN_COUNT == 0
+                || hex % HEX_COLUMN_COUNT == HEX_RIGHT_BORDER)
                 return 0;
             break;
     }
@@ -2345,7 +2381,7 @@ void combatManager::VaporizeCreature(i32 side, i32 armyIndex) {
     ++m_limitCreatureCount[side][armyIndex];
     gpCombatManager->DrawFrame(1, 1, 1, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
     gyModify = static_cast<i8*>(
-        H2_ALLOC(SPELL_MODIFIER_ROW_COUNT, 2524 + SPELL_VAPORIZE_ALLOC_LINE_OFFSET)
+        H2_ALLOC(SPELL_MODIFIER_ROW_COUNT, 2524 + VAPORIZE_ALLOC_LINE_OFFSET)
     );
     memset(gyModify, 0, SPELL_MODIFIER_ROW_COUNT);
     i32 rowCount = giMaxExtentY - giMinExtentY + 1;
@@ -2386,7 +2422,7 @@ void combatManager::VaporizeCreature(i32 side, i32 armyIndex) {
     DelayMilli(static_cast<i32l>(gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_VANISH_END_DELAY));
     target->m_palette = 0;
     target->m_drawEnabled = 1;
-    H2_FREE(gyModify, 2524 + SPELL_VAPORIZE_FREE_LINE_OFFSET);
+    H2_FREE(gyModify, 2524 + VAPORIZE_FREE_LINE_OFFSET);
     gyModify = 0;
     gpCombatManager->DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
 }
@@ -2401,13 +2437,13 @@ void combatManager::RippleCreature(i32 side, i32 armyIndex, i32 mode) {
     float amplitudeBase;
     float amplitudeStep;
     switch (mode) {
-        case IDX(SPELL_RIPPLE_MODE_WAVE):
+        case IDX(RIPPLE_MODE_WAVE):
             phaseStep = 2;
             frameDelay = 20;
             amplitudeBase = RIPPLE_MODE_ZERO_AMPLITUDE_BASE;
             amplitudeStep = RIPPLE_MODE_ZERO_AMPLITUDE_STEP;
             break;
-        case IDX(SPELL_RIPPLE_MODE_DEATH_RIPPLE):
+        case IDX(RIPPLE_MODE_DEATH_RIPPLE):
             phaseStep = 1;
             frameDelay = 30;
             amplitudeBase = RIPPLE_OTHER_AMPLITUDE_BASE;
@@ -2423,18 +2459,18 @@ void combatManager::RippleCreature(i32 side, i32 armyIndex, i32 mode) {
 
     ResetLimitCreature();
     ++m_limitCreatureCount[side][armyIndex];
-    if (mode == IDX(SPELL_RIPPLE_MODE_DEATH_WAVE))
+    if (mode == IDX(RIPPLE_MODE_DEATH_WAVE))
         gpCombatManager->DrawFrame(0, 1, 1, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
     else
         gpCombatManager->DrawFrame(1, 1, 1, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
 
     i32 extentHeight = giMaxExtentY - giMinExtentY + 1;
     gyModify = static_cast<i8*>(
-        H2_ALLOC(SPELL_MODIFIER_ROW_COUNT, 2587 + SPELL_RIPPLE_MODIFIER_ALLOC_LINE_OFFSET)
+        H2_ALLOC(SPELL_MODIFIER_ROW_COUNT, 2587 + RIPPLE_MODIFIER_ALLOC_LINE_OFFSET)
     );
     float* wave = static_cast<float*>(H2_ALLOC(
         sizeof(float) * SPELL_MODIFIER_ROW_COUNT,
-        2587 + SPELL_RIPPLE_WAVE_ALLOC_LINE_OFFSET
+        2587 + RIPPLE_WAVE_ALLOC_LINE_OFFSET
     ));
     memset(gyModify, 0, SPELL_MODIFIER_ROW_COUNT);
     i32 row;
@@ -2461,9 +2497,9 @@ void combatManager::RippleCreature(i32 side, i32 armyIndex, i32 mode) {
         i32 skipDistance =
             abs(RIPPLE_PHASE_CENTER - phase % RIPPLE_PHASE_PERIOD) - RIPPLE_SKIP_CENTER_OFFSET;
         i32 amplitudeIndex = (phase - RIPPLE_PHASE_START) / RIPPLE_AMPLITUDE_INDEX_DIVISOR + 1;
-        if (mode == IDX(SPELL_RIPPLE_MODE_DEATH_WAVE))
+        if (mode == IDX(RIPPLE_MODE_DEATH_WAVE))
             amplitudeIndex = RIPPLE_MODE_TWO_AMPLITUDE_START - amplitudeIndex;
-        else if (mode == IDX(SPELL_RIPPLE_MODE_WAVE)) {
+        else if (mode == IDX(RIPPLE_MODE_WAVE)) {
             if (amplitudeIndex == 0)
                 amplitudeIndex = RIPPLE_MODE_ZERO_CENTER_AMPLITUDE;
             else
@@ -2477,7 +2513,7 @@ void combatManager::RippleCreature(i32 side, i32 armyIndex, i32 mode) {
             memset(gyModify + giMinExtentY, 0, extentHeight);
             for (row = giMinExtentY; row < giMaxExtentY; ++row) {
                 i32 waveIndex;
-                if (mode == IDX(SPELL_RIPPLE_MODE_DEATH_WAVE))
+                if (mode == IDX(RIPPLE_MODE_DEATH_WAVE))
                     waveIndex = -RIPPLE_PHASE_CENTER - giMaxExtentY + phase * 2 + row;
                 else
                     waveIndex = phase * 2 - RIPPLE_PHASE_CENTER - row + giMinExtentY;
@@ -2485,7 +2521,7 @@ void combatManager::RippleCreature(i32 side, i32 armyIndex, i32 mode) {
                 if (waveIndex >= 0 && waveIndex < SPELL_MODIFIER_ROW_COUNT)
                     gyModify[row] = static_cast<i8>(wave[waveIndex] * amplitude);
             }
-            if (mode == IDX(SPELL_RIPPLE_MODE_DEATH_RIPPLE)
+            if (mode == IDX(RIPPLE_MODE_DEATH_RIPPLE)
                 && phase >= RIPPLE_DEATH_RIPPLE_FADE_START) {
                 i32 start = giMinExtentY - 1;
                 i32 end = giMinExtentY
@@ -2494,7 +2530,7 @@ void combatManager::RippleCreature(i32 side, i32 armyIndex, i32 mode) {
                           + 1;
                 memset(gyModify + start, VAPORIZE_MASKED, end - start + 1);
             }
-            if (mode == IDX(SPELL_RIPPLE_MODE_DEATH_WAVE) && phase < RIPPLE_DEATH_WAVE_FADE_END) {
+            if (mode == IDX(RIPPLE_MODE_DEATH_WAVE) && phase < RIPPLE_DEATH_WAVE_FADE_END) {
                 i32 start = giMinExtentY - 1;
                 i32 end =
                     giMaxExtentY - 1
@@ -2508,10 +2544,10 @@ void combatManager::RippleCreature(i32 side, i32 armyIndex, i32 mode) {
     DelayMilli(static_cast<i32l>(gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_VANISH_END_DELAY));
     target->m_palette = 0;
     target->m_drawEnabled = 1;
-    H2_FREE(gyModify, 2587 + SPELL_RIPPLE_MODIFIER_FREE_LINE_OFFSET);
-    H2_FREE(wave, 2587 + SPELL_RIPPLE_WAVE_FREE_LINE_OFFSET);
+    H2_FREE(gyModify, 2587 + RIPPLE_MODIFIER_FREE_LINE_OFFSET);
+    H2_FREE(wave, 2587 + RIPPLE_WAVE_FREE_LINE_OFFSET);
     gyModify = 0;
-    if (mode != IDX(SPELL_RIPPLE_MODE_DEATH_RIPPLE))
+    if (mode != IDX(RIPPLE_MODE_DEATH_RIPPLE))
         gpCombatManager->DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
 }
 
@@ -2845,8 +2881,8 @@ void combatManager::MirrorImage(i32 targetHex) {
                 for (step = 0; step < distance; ++step) {
                     candidateHex = GetAdjacentCellIndexNoArmy(candidateHex, searchDirection);
                     if (candidateHex >= 0 && candidateHex < COMBAT_HEX_COUNT
-                        && candidateHex % SPELL_HEX_COLUMN_COUNT != 0
-                        && candidateHex % SPELL_HEX_COLUMN_COUNT != SPELL_HEX_RIGHT_BORDER
+                        && candidateHex % HEX_COLUMN_COUNT != 0
+                        && candidateHex % HEX_COLUMN_COUNT != HEX_RIGHT_BORDER
                         && source->CanFit(candidateHex, 0, 0)) {
                         mirrorHex = candidateHex;
                         goto mirror_found;

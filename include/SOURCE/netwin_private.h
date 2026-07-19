@@ -5,7 +5,6 @@
 
 #include <SOURCE/netwin.h>
 
-
 static void nb_add_name(void);
 static void __stdcall nb_add_name_done(NetbiosControlBlock* controlBlock);
 static u16 __fastcall nb_recv_any(i32 session);

@@ -1,21 +1,11 @@
 #ifndef HOMM2_BASE_BUTTON_H
 #define HOMM2_BASE_BUTTON_H
+
 #include <va.h>
 #include "widget.h"
+
 class icon;
 struct tag_message;
-
-H2_ENUM_CLASS_BEGIN(ButtonSelectMode)
-    BUTTON_SELECT_DIALOG_RESULT = 1
-H2_ENUM_CLASS_END(ButtonSelectMode)
-
-H2_ENUM_BEGIN(ButtonHotkeyConstant)
-    BUTTON_NO_HOTKEY = -1
-H2_ENUM_END(ButtonHotkeyConstant)
-
-H2_ENUM_BEGIN(ButtonConstant)
-    BUTTON_REPEAT_DELAY_TICKS = 60
-H2_ENUM_END(ButtonConstant)
 
 #pragma pack(push, 1)
 class button : public widget {

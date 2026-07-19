@@ -1,9 +1,11 @@
 #ifndef HOMM2_SOURCE_ADVMANAGER_H
 #define HOMM2_SOURCE_ADVMANAGER_H
+
 #include <va.h>
-#include "../BASE/baseManager.h"
+#include <BASE/baseManager.h>
 #include <SOURCE/ADVMGR.h>
 #include <SOURCE/Viewwrld.h>
+
 class armyGroup;
 class hero;
 class mapCell;
@@ -340,6 +342,7 @@ public:
 };
 #pragma pack(pop)
 SIZE(advManager, 0x37e);
+
 extern i32 bMoveSoundMade;
 extern i32 giPixelsPerStep[6];
 extern i32 giStepDelay[5];

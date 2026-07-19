@@ -14,6 +14,22 @@
 #include <SOURCE/tradpost.h>
 #include <BASE/message.h>
 
+H2_ENUM_CLASS_BEGIN(TradingPostWidgetId)
+    POST_LEFT_OFFER_ICON  = 0x14,
+    POST_RIGHT_OFFER_ICON = 0x15,
+    POST_LEFT_OFFER_TEXT  = 0x17,
+    POST_RIGHT_OFFER_TEXT = 0x18,
+    POST_DECREMENT        = 0x19,
+    POST_INCREMENT        = 0x1a,
+    POST_TRACK            = 0x1b,
+    POST_EXECUTE          = 0x1d
+H2_ENUM_CLASS_END(TradingPostWidgetId)
+
+H2_ENUM_CLASS_BEGIN(TradingPostHandlerResult)
+    POST_HANDLER_CONTINUE = 1,
+    POST_HANDLER_EXIT     = 2
+H2_ENUM_CLASS_END(TradingPostHandlerResult)
+
 VA(0x004bf340, 0x165)
 void DoTradingPost(i32 isMarketplace, float efficiency) {
     tag_message messageTemp;
@@ -116,9 +132,9 @@ void UpdateTradingPost(i32 draw) {
         if (leftResource != -1 && rightResource != -1 && leftResource != rightResource) {
             messageTemp.payload.widget.command = TRADING_POST_SET_ICON;
             if (sideCurrent == 0) {
-                messageTemp.payload.widget.id = IDX(TRADING_POST_LEFT_OFFER_ICON);
+                messageTemp.payload.widget.id = IDX(POST_LEFT_OFFER_ICON);
             } else {
-                messageTemp.payload.widget.id = IDX(TRADING_POST_RIGHT_OFFER_ICON);
+                messageTemp.payload.widget.id = IDX(POST_RIGHT_OFFER_ICON);
             }
             if (sideCurrent == 0) {
                 messageTemp.payload.widget.data.value = leftResource;
@@ -129,13 +145,13 @@ void UpdateTradingPost(i32 draw) {
             messageTemp.payload.widget.command = TRADING_POST_SET_TEXT;
             messageTemp.payload.widget.data.text = gText;
             if (sideCurrent == 0) {
-                messageTemp.payload.widget.id = IDX(TRADING_POST_LEFT_OFFER_TEXT);
+                messageTemp.payload.widget.id = IDX(POST_LEFT_OFFER_TEXT);
                 if (bLeftDenominated != 0)
                     sprintf(gText, "%d", qtyToTrade);
                 else
                     sprintf(gText, "%d", qtyToTrade * iTradeRatio);
             } else {
-                messageTemp.payload.widget.id = IDX(TRADING_POST_RIGHT_OFFER_TEXT);
+                messageTemp.payload.widget.id = IDX(POST_RIGHT_OFFER_TEXT);
                 if (bLeftDenominated != 0)
                     sprintf(gText, "%d", qtyToTrade * iTradeRatio);
                 else
@@ -275,7 +291,7 @@ i32 TradingPostHandler(struct tag_message& message) {
         switch (message.payload.widget.command) {
             case WIDGET_COMMAND_SELECT:
                 switch (message.payload.widget.id) {
-                    case IDX(TRADING_POST_TRACK):
+                    case IDX(POST_TRACK):
                         if (iMaxUnitsToTrade == 0) {
                         } else {
                             knobPositionValue = message.payload.widget.screenX - tpX
@@ -328,7 +344,7 @@ i32 TradingPostHandler(struct tag_message& message) {
                     case NORMAL_DIALOG_BUTTON_TWO:
                         exitFlag = 1;
                         break;
-                    case IDX(TRADING_POST_EXECUTE):
+                    case IDX(POST_EXECUTE):
                         if (qtyToTrade == 0)
                             break;
                         if (bLeftDenominated != 0) {
@@ -343,13 +359,13 @@ i32 TradingPostHandler(struct tag_message& message) {
                         leftResource = rightResource;
                         updateDisplay = 1;
                         break;
-                    case IDX(TRADING_POST_DECREMENT):
+                    case IDX(POST_DECREMENT):
                         if (qtyToTrade > 0) {
                             --qtyToTrade;
                             updateDisplay = 1;
                         }
                         break;
-                    case IDX(TRADING_POST_INCREMENT):
+                    case IDX(POST_INCREMENT):
                         if (iMaxUnitsToTrade > qtyToTrade) {
                             ++qtyToTrade;
                             updateDisplay = 1;
@@ -364,9 +380,9 @@ i32 TradingPostHandler(struct tag_message& message) {
     if (exitFlag) {
         message.payload.widget.id = WIDGET_COMMAND_DIALOG_SELECT;
         message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
-        return IDX(TRADING_POST_HANDLER_EXIT);
+        return IDX(POST_HANDLER_EXIT);
     }
-    return IDX(TRADING_POST_HANDLER_CONTINUE);
+    return IDX(POST_HANDLER_CONTINUE);
 }
 
 DATA(0x0051d9d0) u16 coreRatio[TRADING_POST_RESOURCE_COUNT] = {250, 500, 250, 500, 500, 500, 1};

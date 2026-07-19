@@ -1,5 +1,6 @@
 #ifndef HOMM2_SOURCE_PLAYERDATA_H
 #define HOMM2_SOURCE_PLAYERDATA_H
+
 #include <va.h>
 #include <SOURCE/GAME.h>
 
@@ -37,11 +38,9 @@ public:
     i32 m_resources[IDX(RES_COUNT)];
     i8 m_evilInterface;
     i8 m_barrierTents;
-    char m_unknownad
-        [6];
+    char m_unknownad[6];
     playerAttentionWeights m_attentionWeights;
-    char m_unknownCb
-        [0x1c];
+    char m_unknownCb[0x1c];
     i32 m_income[IDX(RES_COUNT)];
     i32 m_obeliskValue;
     i32 m_totalObeliskValue;

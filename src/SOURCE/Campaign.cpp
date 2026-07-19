@@ -18,6 +18,56 @@
 #include <SOURCE/game.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/Campaign.h>
+H2_ENUM_BEGIN(CampaignScenarioArmyCount)
+    BARBARIAN_ORC_CHIEF_COUNT  = 12,
+    BARBARIAN_OGRE_COUNT       = 18,
+    BARBARIAN_GOBLIN_COUNT     = 40,
+    WARLOCK_CENTAUR_COUNT      = 40,
+    WARLOCK_GARGOYLE_COUNT     = 24,
+    WARLOCK_GRIFFIN_COUNT      = 18,
+    NECROMANCER_SKELETON_COUNT = 50,
+    NECROMANCER_MUMMY_COUNT    = 18,
+    NECROMANCER_VAMPIRE_COUNT  = 8
+H2_ENUM_END(CampaignScenarioArmyCount)
+
+H2_ENUM_BEGIN(CampaignSmacker)
+    SMACKER_ROLAND_INTRO    = 5,
+    SMACKER_ROLAND_1        = 6,
+    SMACKER_ROLAND_2        = 7,
+    SMACKER_ROLAND_3A       = 8,
+    SMACKER_ROLAND_3B       = 9,
+    SMACKER_ROLAND_4        = 10,
+    SMACKER_ROLAND_5A       = 11,
+    SMACKER_ROLAND_5B       = 12,
+    SMACKER_ROLAND_6        = 13,
+    SMACKER_ROLAND_7        = 14,
+    SMACKER_ROLAND_8        = 15,
+    SMACKER_ROLAND_9        = 16,
+    SMACKER_ROLAND_END      = 18,
+    SMACKER_ARCHIBALD_INTRO = 19,
+    SMACKER_ARCHIBALD_1     = 20,
+    SMACKER_ARCHIBALD_2     = 21,
+    SMACKER_ARCHIBALD_3     = 22,
+    SMACKER_ARCHIBALD_4A    = 23,
+    SMACKER_ARCHIBALD_4B    = 24,
+    SMACKER_ARCHIBALD_4_END = 25,
+    SMACKER_ARCHIBALD_5A    = 26,
+    SMACKER_ARCHIBALD_5B    = 27,
+    SMACKER_ARCHIBALD_6     = 28,
+    SMACKER_ARCHIBALD_7A    = 29,
+    SMACKER_ARCHIBALD_7B    = 30,
+    SMACKER_ARCHIBALD_8     = 31,
+    SMACKER_ARCHIBALD_9     = 32,
+    SMACKER_ARCHIBALD_10    = 33,
+    SMACKER_ARCHIBALD_END   = 34
+H2_ENUM_END(CampaignSmacker)
+
+H2_ENUM_CLASS_BEGIN(CampaignMapDifficulty)
+    DIFFICULTY_EASY   = 0,
+    DIFFICULTY_NORMAL = 1,
+    DIFFICULTY_HARD   = 2
+H2_ENUM_CLASS_END(CampaignMapDifficulty)
+
 VA(0x00447710, 0x563)
 i32 game::HandleCampaignWin(void) {
     i32 sideIndex;
@@ -27,84 +77,84 @@ i32 game::HandleCampaignWin(void) {
     if (m_campaignType == IDX(CAMPAIGN_ROLAND)) {
         switch (m_campaignScenario + 1) {
             case 0:
-                PlaySmacker(CAMPAIGN_SMACKER_ROLAND_INTRO);
+                PlaySmacker(SMACKER_ROLAND_INTRO);
                 m_campaignMapEnabled[IDX(CAMPAIGN_ROLAND)][0] = 1;
                 break;
             case 1:
-                PlaySmacker(CAMPAIGN_SMACKER_ROLAND_1);
+                PlaySmacker(SMACKER_ROLAND_1);
                 m_campaignMapEnabled[IDX(CAMPAIGN_ROLAND)][1] = 1;
                 break;
             case 2:
-                PlaySmacker(CAMPAIGN_SMACKER_ROLAND_2);
+                PlaySmacker(SMACKER_ROLAND_2);
                 m_campaignMapEnabled[IDX(CAMPAIGN_ROLAND)][2] = 1;
                 m_campaignMapEnabled[IDX(CAMPAIGN_ROLAND)][3] = 1;
                 break;
             case 3:
-                PlaySmacker(CAMPAIGN_SMACKER_ROLAND_3B);
+                PlaySmacker(SMACKER_ROLAND_3B);
                 m_campaignMapEnabled[IDX(CAMPAIGN_ROLAND)][3] = 1;
                 m_campaignAwards[IDX(CAMPAIGN_AWARD_DWARVEN_ALLIANCE)] = 1;
                 break;
             case 4:
-                PlaySmacker(CAMPAIGN_SMACKER_ROLAND_4);
+                PlaySmacker(SMACKER_ROLAND_4);
                 m_campaignMapEnabled[IDX(CAMPAIGN_ROLAND)][4] = 1;
                 m_campaignMapEnabled[IDX(CAMPAIGN_ROLAND)][11] = 1;
                 break;
             case 5:
                 if (m_campaignStartingSide == IDX(CAMPAIGN_ROLAND))
-                    PlaySmacker(CAMPAIGN_SMACKER_ROLAND_5A);
+                    PlaySmacker(SMACKER_ROLAND_5A);
                 else
-                    PlaySmacker(CAMPAIGN_SMACKER_ROLAND_5B);
+                    PlaySmacker(SMACKER_ROLAND_5B);
                 m_campaignMapEnabled[IDX(CAMPAIGN_ROLAND)][5] = 1;
                 break;
             case 6:
-                PlaySmacker(CAMPAIGN_SMACKER_ROLAND_6);
+                PlaySmacker(SMACKER_ROLAND_6);
                 m_campaignMapEnabled[IDX(CAMPAIGN_ROLAND)][6] = 1;
                 m_campaignMapEnabled[IDX(CAMPAIGN_ROLAND)][7] = 1;
                 m_campaignAwards[IDX(CAMPAIGN_AWARD_SORCERESS_GUILD)] = 1;
                 break;
             case 7:
-                PlaySmacker(CAMPAIGN_SMACKER_ROLAND_8);
+                PlaySmacker(SMACKER_ROLAND_8);
                 m_campaignMapEnabled[IDX(CAMPAIGN_ROLAND)][8] = 1;
                 m_campaignAwards[IDX(CAMPAIGN_AWARD_ROLAND_CARRYOVER_FORCES)] = 1;
                 break;
             case 8:
-                PlaySmacker(CAMPAIGN_SMACKER_ROLAND_8);
+                PlaySmacker(SMACKER_ROLAND_8);
                 m_campaignMapEnabled[IDX(CAMPAIGN_ROLAND)][8] = 1;
                 m_campaignAwards[IDX(CAMPAIGN_AWARD_ROLAND_ULTIMATE_CROWN)] = 1;
                 break;
             case 9:
-                PlaySmacker(CAMPAIGN_SMACKER_ROLAND_9);
+                PlaySmacker(SMACKER_ROLAND_9);
                 m_campaignMapEnabled[IDX(CAMPAIGN_ROLAND)][9] = 1;
                 break;
             case 10:
-                PlaySmacker(CAMPAIGN_SMACKER_ROLAND_END);
+                PlaySmacker(SMACKER_ROLAND_END);
                 break;
         }
     } else {
         switch (m_campaignScenario + 1) {
             case 0:
-                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_INTRO);
+                PlaySmacker(SMACKER_ARCHIBALD_INTRO);
                 m_campaignMapEnabled[IDX(CAMPAIGN_ARCHIBALD)][0] = 1;
                 break;
             case 1:
-                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_1);
+                PlaySmacker(SMACKER_ARCHIBALD_1);
                 m_campaignMapEnabled[IDX(CAMPAIGN_ARCHIBALD)][1] = 1;
                 break;
             case 2:
-                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_2);
+                PlaySmacker(SMACKER_ARCHIBALD_2);
                 m_campaignMapEnabled[IDX(CAMPAIGN_ARCHIBALD)][2] = 1;
                 m_campaignMapEnabled[IDX(CAMPAIGN_ARCHIBALD)][3] = 1;
                 break;
             case 3:
-                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_4A);
-                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_4_END);
+                PlaySmacker(SMACKER_ARCHIBALD_4A);
+                PlaySmacker(SMACKER_ARCHIBALD_4_END);
                 m_campaignMapEnabled[IDX(CAMPAIGN_ARCHIBALD)][4] = 1;
                 m_campaignMapEnabled[IDX(CAMPAIGN_ARCHIBALD)][11] = 1;
                 m_campaignAwards[IDX(CAMPAIGN_AWARD_NECROMANCER_GUILD)] = 1;
                 break;
             case 4:
-                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_4B);
-                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_4_END);
+                PlaySmacker(SMACKER_ARCHIBALD_4B);
+                PlaySmacker(SMACKER_ARCHIBALD_4_END);
                 m_campaignMapEnabled[IDX(CAMPAIGN_ARCHIBALD)][4] = 1;
                 m_campaignMapEnabled[IDX(CAMPAIGN_ARCHIBALD)][11] = 1;
                 m_campaignAwards[IDX(CAMPAIGN_AWARD_DWARFBANE)] = 1;
@@ -112,38 +162,38 @@ i32 game::HandleCampaignWin(void) {
                 break;
             case 5:
                 if (m_campaignStartingSide == IDX(CAMPAIGN_ARCHIBALD))
-                    PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_5A);
+                    PlaySmacker(SMACKER_ARCHIBALD_5A);
                 else
-                    PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_5B);
+                    PlaySmacker(SMACKER_ARCHIBALD_5B);
                 m_campaignMapEnabled[IDX(CAMPAIGN_ARCHIBALD)][5] = 1;
                 break;
             case 6:
-                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_6);
+                PlaySmacker(SMACKER_ARCHIBALD_6);
                 m_campaignMapEnabled[IDX(CAMPAIGN_ARCHIBALD)][6] = 1;
                 m_campaignMapEnabled[IDX(CAMPAIGN_ARCHIBALD)][7] = 1;
                 break;
             case 7:
-                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_7B);
+                PlaySmacker(SMACKER_ARCHIBALD_7B);
                 m_campaignMapEnabled[IDX(CAMPAIGN_ARCHIBALD)][7] = 1;
                 m_campaignAwards[IDX(CAMPAIGN_AWARD_DRAGON_ALLIANCE)] = 1;
                 break;
             case 8:
-                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_8);
+                PlaySmacker(SMACKER_ARCHIBALD_8);
                 m_campaignMapEnabled[IDX(CAMPAIGN_ARCHIBALD)][8] = 1;
                 m_campaignMapEnabled[IDX(CAMPAIGN_ARCHIBALD)][9] = 1;
                 break;
             case 9:
-                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_10);
+                PlaySmacker(SMACKER_ARCHIBALD_10);
                 m_campaignMapEnabled[IDX(CAMPAIGN_ARCHIBALD)][10] = 1;
                 m_campaignAwards[IDX(CAMPAIGN_AWARD_ARCHIBALD_ULTIMATE_CROWN)] = 1;
                 break;
             case 10:
-                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_10);
+                PlaySmacker(SMACKER_ARCHIBALD_10);
                 m_campaignMapEnabled[IDX(CAMPAIGN_ARCHIBALD)][10] = 1;
                 m_campaignAwards[IDX(CAMPAIGN_AWARD_ARCHIBALD_CARRYOVER_FORCES)] = 1;
                 break;
             case 11:
-                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_END);
+                PlaySmacker(SMACKER_ARCHIBALD_END);
                 m_campaignAwards[IDX(CAMPAIGN_AWARD_ARCHIBALD_ULTIMATE_CROWN)] = 0;
                 m_campaignAwards[IDX(CAMPAIGN_AWARD_ARCHIBALD_CARRYOVER_FORCES)] = 0;
                 break;
@@ -182,98 +232,98 @@ void game::PlayPreScenarioSmacker(i32 side, i32 map) {
     if (side == IDX(CAMPAIGN_ROLAND)) {
         switch (map + 1) {
             case 1:
-                PlaySmacker(CAMPAIGN_SMACKER_ROLAND_INTRO);
+                PlaySmacker(SMACKER_ROLAND_INTRO);
                 break;
             case 2:
-                PlaySmacker(CAMPAIGN_SMACKER_ROLAND_1);
+                PlaySmacker(SMACKER_ROLAND_1);
                 break;
             case 3:
-                PlaySmacker(CAMPAIGN_SMACKER_ROLAND_2);
+                PlaySmacker(SMACKER_ROLAND_2);
                 break;
             case 4:
                 if (m_campaignScenarioCompleted[m_campaignStartingSide][2])
-                    PlaySmacker(CAMPAIGN_SMACKER_ROLAND_3B);
+                    PlaySmacker(SMACKER_ROLAND_3B);
                 else
-                    PlaySmacker(CAMPAIGN_SMACKER_ROLAND_3A);
+                    PlaySmacker(SMACKER_ROLAND_3A);
                 break;
             case 5:
-                PlaySmacker(CAMPAIGN_SMACKER_ROLAND_4);
+                PlaySmacker(SMACKER_ROLAND_4);
                 break;
             case 6:
                 if (m_campaignStartingSide == IDX(CAMPAIGN_ROLAND))
-                    PlaySmacker(CAMPAIGN_SMACKER_ROLAND_5A);
+                    PlaySmacker(SMACKER_ROLAND_5A);
                 else
-                    PlaySmacker(CAMPAIGN_SMACKER_ROLAND_5B);
+                    PlaySmacker(SMACKER_ROLAND_5B);
                 break;
             case 7:
-                PlaySmacker(CAMPAIGN_SMACKER_ROLAND_6);
+                PlaySmacker(SMACKER_ROLAND_6);
                 break;
             case 8:
-                PlaySmacker(CAMPAIGN_SMACKER_ROLAND_7);
+                PlaySmacker(SMACKER_ROLAND_7);
                 break;
             case 9:
-                PlaySmacker(CAMPAIGN_SMACKER_ROLAND_8);
+                PlaySmacker(SMACKER_ROLAND_8);
                 break;
             case 10:
-                PlaySmacker(CAMPAIGN_SMACKER_ROLAND_9);
+                PlaySmacker(SMACKER_ROLAND_9);
                 break;
             case 12:
             case 13:
-                PlaySmacker(CAMPAIGN_SMACKER_ROLAND_4);
+                PlaySmacker(SMACKER_ROLAND_4);
                 break;
         }
     } else {
         switch (map + 1) {
             case 1:
-                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_INTRO);
+                PlaySmacker(SMACKER_ARCHIBALD_INTRO);
                 break;
             case 2:
-                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_1);
+                PlaySmacker(SMACKER_ARCHIBALD_1);
                 break;
             case 3:
-                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_2);
+                PlaySmacker(SMACKER_ARCHIBALD_2);
                 break;
             case 4:
-                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_3);
+                PlaySmacker(SMACKER_ARCHIBALD_3);
                 break;
             case 5:
                 if (m_campaignScenarioCompleted[m_campaignStartingSide][3])
-                    PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_4B);
+                    PlaySmacker(SMACKER_ARCHIBALD_4B);
                 else
-                    PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_4A);
-                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_4_END);
+                    PlaySmacker(SMACKER_ARCHIBALD_4A);
+                PlaySmacker(SMACKER_ARCHIBALD_4_END);
                 break;
             case 6:
                 if (m_campaignStartingSide == IDX(CAMPAIGN_ARCHIBALD))
-                    PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_5A);
+                    PlaySmacker(SMACKER_ARCHIBALD_5A);
                 else
-                    PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_5B);
+                    PlaySmacker(SMACKER_ARCHIBALD_5B);
                 break;
             case 7:
-                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_6);
+                PlaySmacker(SMACKER_ARCHIBALD_6);
                 break;
             case 8:
                 if (m_campaignScenarioCompleted[m_campaignType][6])
-                    PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_7B);
+                    PlaySmacker(SMACKER_ARCHIBALD_7B);
                 else
-                    PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_7A);
+                    PlaySmacker(SMACKER_ARCHIBALD_7A);
                 break;
             case 9:
-                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_8);
+                PlaySmacker(SMACKER_ARCHIBALD_8);
                 break;
             case 10:
-                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_9);
+                PlaySmacker(SMACKER_ARCHIBALD_9);
                 break;
             case 11:
-                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_10);
+                PlaySmacker(SMACKER_ARCHIBALD_10);
                 break;
             case 12:
             case 13:
                 if (m_campaignScenarioCompleted[m_campaignStartingSide][3])
-                    PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_4B);
+                    PlaySmacker(SMACKER_ARCHIBALD_4B);
                 else
-                    PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_4A);
-                PlaySmacker(CAMPAIGN_SMACKER_ARCHIBALD_4_END);
+                    PlaySmacker(SMACKER_ARCHIBALD_4A);
+                PlaySmacker(SMACKER_ARCHIBALD_4_END);
                 break;
         }
     }
@@ -779,11 +829,11 @@ void game::InitCampaignMap(void) {
     }
 
     if (m_campaignScenario + 1 <= CAMPAIGN_EASY_SCENARIO_LIMIT)
-        gpGame->m_difficulty = IDX(CAMPAIGN_DIFFICULTY_EASY);
+        gpGame->m_difficulty = IDX(DIFFICULTY_EASY);
     else if (m_campaignScenario + 1 <= CAMPAIGN_NORMAL_SCENARIO_LIMIT)
-        gpGame->m_difficulty = IDX(CAMPAIGN_DIFFICULTY_NORMAL);
+        gpGame->m_difficulty = IDX(DIFFICULTY_NORMAL);
     else
-        gpGame->m_difficulty = IDX(CAMPAIGN_DIFFICULTY_HARD);
+        gpGame->m_difficulty = IDX(DIFFICULTY_HARD);
     m_playerCount = m_mapHeader.playerCount;
     NewMap(gMapName);
 
@@ -914,22 +964,22 @@ void game::InitCampaignMap(void) {
         switch (armyHero->m_cursorType) {
             case IDX(FACTION_BARBARIAN):
                 armyHero->m_army
-                    .Add(IDX(CREATURE_ORC_CHIEF), CAMPAIGN_BARBARIAN_ORC_CHIEF_COUNT, -1);
-                armyHero->m_army.Add(IDX(CREATURE_OGRE), CAMPAIGN_BARBARIAN_OGRE_COUNT, -1);
-                armyHero->m_army.Add(IDX(CREATURE_GOBLIN), CAMPAIGN_BARBARIAN_GOBLIN_COUNT, -1);
+                    .Add(IDX(CREATURE_ORC_CHIEF), BARBARIAN_ORC_CHIEF_COUNT, -1);
+                armyHero->m_army.Add(IDX(CREATURE_OGRE), BARBARIAN_OGRE_COUNT, -1);
+                armyHero->m_army.Add(IDX(CREATURE_GOBLIN), BARBARIAN_GOBLIN_COUNT, -1);
                 break;
             case IDX(FACTION_WARLOCK):
-                armyHero->m_army.Add(IDX(CREATURE_CENTAUR), CAMPAIGN_WARLOCK_CENTAUR_COUNT, -1);
-                armyHero->m_army.Add(IDX(CREATURE_GARGOYLE), CAMPAIGN_WARLOCK_GARGOYLE_COUNT, -1);
-                armyHero->m_army.Add(IDX(CREATURE_GRIFFIN), CAMPAIGN_WARLOCK_GRIFFIN_COUNT, -1);
+                armyHero->m_army.Add(IDX(CREATURE_CENTAUR), WARLOCK_CENTAUR_COUNT, -1);
+                armyHero->m_army.Add(IDX(CREATURE_GARGOYLE), WARLOCK_GARGOYLE_COUNT, -1);
+                armyHero->m_army.Add(IDX(CREATURE_GRIFFIN), WARLOCK_GRIFFIN_COUNT, -1);
                 break;
             case IDX(FACTION_NECROMANCER):
                 armyHero->m_army
-                    .Add(IDX(CREATURE_SKELETON), CAMPAIGN_NECROMANCER_SKELETON_COUNT, -1);
+                    .Add(IDX(CREATURE_SKELETON), NECROMANCER_SKELETON_COUNT, -1);
                 armyHero->m_army
-                    .Add(IDX(CREATURE_ROYAL_MUMMY), CAMPAIGN_NECROMANCER_MUMMY_COUNT, -1);
+                    .Add(IDX(CREATURE_ROYAL_MUMMY), NECROMANCER_MUMMY_COUNT, -1);
                 armyHero->m_army
-                    .Add(IDX(CREATURE_VAMPIRE_LORD), CAMPAIGN_NECROMANCER_VAMPIRE_COUNT, -1);
+                    .Add(IDX(CREATURE_VAMPIRE_LORD), NECROMANCER_VAMPIRE_COUNT, -1);
                 break;
         }
         gpGame->GetHero(m_players[0].m_heroIds[0])->m_experience += CAMPAIGN_EXPERIENCE_BONUS;

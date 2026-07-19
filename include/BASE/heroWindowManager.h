@@ -1,8 +1,10 @@
 #ifndef HOMM2_BASE_HEROWINDOWMANAGER_H
 #define HOMM2_BASE_HEROWINDOWMANAGER_H
+
 #include <va.h>
 #include <BASE/message.h>
 #include "baseManager.h"
+
 class heroWindow;
 class palette;
 class bitmap;

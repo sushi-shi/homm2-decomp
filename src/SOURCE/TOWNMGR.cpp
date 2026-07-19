@@ -43,6 +43,89 @@
 #include <stdlib.h>
 #include <string.h>
 
+H2_ENUM_BEGIN(TownManagerInputCode)
+    INPUT_SELECT           = 12,
+    INPUT_DESELECT         = 13,
+    INPUT_ALTERNATE_SELECT = 14,
+    CONTROL_PREVIOUS_TOWN  = 0x387,
+    CONTROL_NEXT_TOWN      = 0x388,
+    CONTROL_CLOSE          = 0x7800,
+    DIALOG_BUILD_BOAT      = 0x7802,
+    DIALOG_BUY_SPELL_BOOK  = 0x7805
+H2_ENUM_END(TownManagerInputCode)
+
+H2_ENUM_CLASS_BEGIN(TownObjectRenderMask)
+    RENDER_KNIGHT_LEFT_GATE           = 0x4,
+    RENDER_KNIGHT_LEFT_FIRST_OPTION   = 0x1,
+    RENDER_KNIGHT_LEFT_SECOND_OPTION  = 0x1000000,
+    RENDER_KNIGHT_LEFT_THIRD_OPTION   = 0x20000000,
+    RENDER_KNIGHT_RIGHT_GATE          = 0x1,
+    RENDER_KNIGHT_RIGHT_FIRST_OPTION  = 0x1000000,
+    RENDER_KNIGHT_RIGHT_SECOND_OPTION = 0x20000000,
+    RENDER_BARBARIAN_RIGHT_GATE       = 0x1,
+    RENDER_BARBARIAN_RIGHT_OPTION     = 0x2000,
+    RENDER_BARBARIAN_OVERLAY_GATE     = 0x2,
+    RENDER_BARBARIAN_OVERLAY_OPTION   = 0x200000,
+    RENDER_SORCERESS_LEFT_GATE        = 0x80,
+    RENDER_SORCERESS_LEFT_OPTION      = 0x800,
+    RENDER_RACE_OVERLAY_FIRST_OPTION  = 0x4000,
+    RENDER_RACE_OVERLAY_SECOND_OPTION = 0x8,
+    RENDER_DOCK_GATE                  = 0x4000
+H2_ENUM_CLASS_END(TownObjectRenderMask)
+
+H2_ENUM_BEGIN(TownManagerArmyCommand)
+    ARMY_COMMAND_SELECT    = 0,
+    ARMY_COMMAND_VIEW      = 1,
+    ARMY_COMMAND_MERGE     = 2,
+    ARMY_COMMAND_SWAP      = 3,
+    ARMY_COMMAND_VIEW_HERO = 4,
+    ARMY_COMMAND_SPLIT     = 5
+H2_ENUM_END(TownManagerArmyCommand)
+
+H2_ENUM_CLASS_BEGIN(TownCommandTextId)
+    TEXT_REDISTRIBUTE_ARMY          = 0,
+    TEXT_CANNOT_COMBINE_LAST_ARMY   = 1,
+    TEXT_COMBINE_ARMIES             = 2,
+    TEXT_REDISTRIBUTE_TO_EMPTY_SLOT = 3,
+    TEXT_VIEW_ARMY                  = 4,
+    TEXT_CANNOT_MOVE_LAST_ARMY      = 5,
+    TEXT_MOVE_ARMY                  = 6,
+    TEXT_EXCHANGE_ARMIES            = 7,
+    TEXT_EXIT                       = 8,
+    TEXT_EMPTY_STATUS               = 9,
+    TEXT_KINGDOM_OVERVIEW           = 10,
+    TEXT_EMPTY_SLOT                 = 11,
+    TEXT_SELECT_ARMY                = 12,
+    TEXT_VIEW_HERO                  = 13,
+    TEXT_MAGE_GUILD                 = 14,
+    TEXT_THIEVES_GUILD              = 15,
+    TEXT_TAVERN                     = 16,
+    TEXT_DOCK                       = 17,
+    TEXT_WELL                       = 18,
+    TEXT_TENT                       = 19,
+    TEXT_CASTLE                     = 20,
+    TEXT_RECRUIT                    = 21,
+    TEXT_STATUE                     = 22,
+    TEXT_LEFT_TURRET                = 23,
+    TEXT_RIGHT_TURRET               = 24,
+    TEXT_MOAT                       = 25,
+    TEXT_MARKETPLACE                = 26,
+    TEXT_CAPTAIN_QUARTERS           = 27
+H2_ENUM_CLASS_END(TownCommandTextId)
+
+H2_ENUM_CLASS_BEGIN(TownThievesGuildCategory)
+    THIEVES_CATEGORY_TOWNS          = 0,
+    THIEVES_CATEGORY_CASTLES        = 1,
+    THIEVES_CATEGORY_HEROES         = 2,
+    THIEVES_CATEGORY_GOLD           = 3,
+    THIEVES_CATEGORY_WOOD_AND_ORE   = 4,
+    THIEVES_CATEGORY_RARE_RESOURCES = 5,
+    THIEVES_CATEGORY_OBELISKS       = 6,
+    THIEVES_CATEGORY_ARTIFACTS      = 7,
+    THIEVES_CATEGORY_ARMY_STRENGTH  = 8,
+    THIEVES_CATEGORY_INCOME         = 9
+H2_ENUM_CLASS_END(TownThievesGuildCategory)
+
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\TOWNMGR.CPP"
 
 DATA(0x004eb080) static const i8 gTownObjectOrder[IDX(FACTION_COUNT)][TOWN_BUILDING_COUNT] = {
@@ -366,54 +449,54 @@ void townObject::Draw(i32 advanceAnimation) {
         return;
     if (m_buildingId == TOWN_OBJECT_KNIGHT_LEFT_OVERLAY
         && gpTownManager->m_town->m_type == IDX(FACTION_KNIGHT)
-        && (!(gpTownManager->m_town->m_buildings & IDX(TOWN_RENDER_KNIGHT_LEFT_GATE))
-            || (!(gpTownManager->m_town->m_buildings & IDX(TOWN_RENDER_KNIGHT_LEFT_FIRST_OPTION))
+        && (!(gpTownManager->m_town->m_buildings & IDX(RENDER_KNIGHT_LEFT_GATE))
+            || (!(gpTownManager->m_town->m_buildings & IDX(RENDER_KNIGHT_LEFT_FIRST_OPTION))
                 && !(
-                    gpTownManager->m_town->m_buildings & IDX(TOWN_RENDER_KNIGHT_LEFT_SECOND_OPTION)
+                    gpTownManager->m_town->m_buildings & IDX(RENDER_KNIGHT_LEFT_SECOND_OPTION)
                 )
                 && !(
-                    gpTownManager->m_town->m_buildings & IDX(TOWN_RENDER_KNIGHT_LEFT_THIRD_OPTION)
+                    gpTownManager->m_town->m_buildings & IDX(RENDER_KNIGHT_LEFT_THIRD_OPTION)
                 ))))
         return;
     if (m_buildingId == TOWN_OBJECT_KNIGHT_RIGHT_OVERLAY
         && gpTownManager->m_town->m_type == IDX(FACTION_KNIGHT)
-        && (!(gpTownManager->m_town->m_buildings & IDX(TOWN_RENDER_KNIGHT_RIGHT_GATE))
-            || (!(gpTownManager->m_town->m_buildings & IDX(TOWN_RENDER_KNIGHT_RIGHT_FIRST_OPTION))
+        && (!(gpTownManager->m_town->m_buildings & IDX(RENDER_KNIGHT_RIGHT_GATE))
+            || (!(gpTownManager->m_town->m_buildings & IDX(RENDER_KNIGHT_RIGHT_FIRST_OPTION))
                 && !(
-                    gpTownManager->m_town->m_buildings & IDX(TOWN_RENDER_KNIGHT_RIGHT_SECOND_OPTION)
+                    gpTownManager->m_town->m_buildings & IDX(RENDER_KNIGHT_RIGHT_SECOND_OPTION)
                 ))))
         return;
     if (m_buildingId == TOWN_OBJECT_KNIGHT_RIGHT_OVERLAY
         && gpTownManager->m_town->m_type == IDX(FACTION_BARBARIAN)
-        && (!(gpTownManager->m_town->m_buildings & IDX(TOWN_RENDER_BARBARIAN_RIGHT_GATE))
-            || !(gpTownManager->m_town->m_buildings & IDX(TOWN_RENDER_BARBARIAN_RIGHT_OPTION))))
+        && (!(gpTownManager->m_town->m_buildings & IDX(RENDER_BARBARIAN_RIGHT_GATE))
+            || !(gpTownManager->m_town->m_buildings & IDX(RENDER_BARBARIAN_RIGHT_OPTION))))
         return;
     if (m_buildingId == TOWN_OBJECT_BARBARIAN_OVERLAY
         && gpTownManager->m_town->m_type == IDX(FACTION_BARBARIAN)
-        && (!(gpTownManager->m_town->m_buildings & IDX(TOWN_RENDER_BARBARIAN_OVERLAY_GATE))
-            || !(gpTownManager->m_town->m_buildings & IDX(TOWN_RENDER_BARBARIAN_OVERLAY_OPTION))))
+        && (!(gpTownManager->m_town->m_buildings & IDX(RENDER_BARBARIAN_OVERLAY_GATE))
+            || !(gpTownManager->m_town->m_buildings & IDX(RENDER_BARBARIAN_OVERLAY_OPTION))))
         return;
     if (gpTownManager->m_town->m_type == IDX(FACTION_SORCERESS)
         && m_buildingId == TOWN_OBJECT_KNIGHT_LEFT_OVERLAY
-        && (!(gpTownManager->m_town->m_buildings & IDX(TOWN_RENDER_SORCERESS_LEFT_GATE))
-            || !(gpTownManager->m_town->m_buildings & IDX(TOWN_RENDER_SORCERESS_LEFT_OPTION))))
+        && (!(gpTownManager->m_town->m_buildings & IDX(RENDER_SORCERESS_LEFT_GATE))
+            || !(gpTownManager->m_town->m_buildings & IDX(RENDER_SORCERESS_LEFT_OPTION))))
         return;
     if (gpTownManager->m_town->m_type == IDX(FACTION_SORCERESS)
         && (m_buildingId == TOWN_OBJECT_SORCERESS_LEFT_OVERLAY
             || m_buildingId == TOWN_OBJECT_SORCERESS_RIGHT_OVERLAY)
-        && (gpTownManager->m_town->m_buildings & IDX(TOWN_RENDER_SORCERESS_LEFT_GATE))
-        && (gpTownManager->m_town->m_buildings & IDX(TOWN_RENDER_SORCERESS_LEFT_OPTION)))
+        && (gpTownManager->m_town->m_buildings & IDX(RENDER_SORCERESS_LEFT_GATE))
+        && (gpTownManager->m_town->m_buildings & IDX(RENDER_SORCERESS_LEFT_OPTION)))
         return;
     if (m_buildingId == TOWN_OBJECT_RACE_OVERLAY
         && (gpTownManager->m_town->m_type == IDX(FACTION_NECROMANCER)
             || gpTownManager->m_town->m_type == IDX(FACTION_WARLOCK)
             || gpTownManager->m_town->m_type == IDX(FACTION_SORCERESS)
             || gpTownManager->m_town->m_type == IDX(FACTION_KNIGHT))
-        && ((gpTownManager->m_town->m_buildings & IDX(TOWN_RENDER_RACE_OVERLAY_FIRST_OPTION))
-            || (gpTownManager->m_town->m_buildings & IDX(TOWN_RENDER_RACE_OVERLAY_SECOND_OPTION))))
+        && ((gpTownManager->m_town->m_buildings & IDX(RENDER_RACE_OVERLAY_FIRST_OPTION))
+            || (gpTownManager->m_town->m_buildings & IDX(RENDER_RACE_OVERLAY_SECOND_OPTION))))
         return;
     if (m_buildingId == TOWN_OBJECT_DOCK
-        && (gpTownManager->m_town->m_buildings & IDX(TOWN_RENDER_DOCK_GATE)))
+        && (gpTownManager->m_town->m_buildings & IDX(RENDER_DOCK_GATE)))
         return;
 
     if (m_buildingId == TOWN_OBJECT_PRIMARY_ANIMATION) {
@@ -560,15 +643,15 @@ void townManager::SetupTown(void) {
     if (gpCurPlayer->m_townCount == 1) {
         message.payload.widget.command = TOWN_WIDGET_DISABLE;
         message.payload.widget.data.value = TOWN_WIDGET_DISABLED_VALUE;
-        message.payload.widget.id = TOWN_CONTROL_PREVIOUS_TOWN;
+        message.payload.widget.id = CONTROL_PREVIOUS_TOWN;
         m_townWindow->BroadcastMessage(message);
-        message.payload.widget.id = TOWN_CONTROL_NEXT_TOWN;
+        message.payload.widget.id = CONTROL_NEXT_TOWN;
         m_townWindow->BroadcastMessage(message);
         message.payload.widget.command = TOWN_WIDGET_ENABLE;
         message.payload.widget.data.value = TOWN_WIDGET_ENABLED_VALUE;
-        message.payload.widget.id = TOWN_CONTROL_PREVIOUS_TOWN;
+        message.payload.widget.id = CONTROL_PREVIOUS_TOWN;
         m_townWindow->BroadcastMessage(message);
-        message.payload.widget.id = TOWN_CONTROL_NEXT_TOWN;
+        message.payload.widget.id = CONTROL_NEXT_TOWN;
         m_townWindow->BroadcastMessage(message);
     }
 
@@ -768,10 +851,10 @@ void townManager::SetArmyCommand(i32 qualifier) {
     if (m_pendingStrip == m_swapStrip && m_swapArmySlot == m_pendingArmySlot) {
         sprintf(
             m_statusText,
-            cTownCommand[IDX(TOWN_TEXT_VIEW_ARMY)],
+            cTownCommand[IDX(TEXT_VIEW_ARMY)],
             gArmyNames[m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot]]
         );
-        m_command = TOWN_ARMY_COMMAND_VIEW;
+        m_command = ARMY_COMMAND_VIEW;
     } else {
         sameType = 0;
         if ((m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot] | 0)
@@ -781,30 +864,30 @@ void townManager::SetArmyCommand(i32 qualifier) {
             if (qualifier != 0) {
                 sprintf(
                     m_statusText,
-                    cTownCommand[IDX(TOWN_TEXT_REDISTRIBUTE_ARMY)],
+                    cTownCommand[IDX(TEXT_REDISTRIBUTE_ARMY)],
                     gArmyNames[m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot]]
                 );
-                m_command = TOWN_ARMY_COMMAND_SPLIT;
+                m_command = ARMY_COMMAND_SPLIT;
             } else if (cantMoveLastArmy) {
-                strcpy(m_statusText, cTownCommand[IDX(TOWN_TEXT_CANNOT_COMBINE_LAST_ARMY)]);
+                strcpy(m_statusText, cTownCommand[IDX(TEXT_CANNOT_COMBINE_LAST_ARMY)]);
                 return;
             } else {
                 sprintf(
                     m_statusText,
-                    cTownCommand[IDX(TOWN_TEXT_COMBINE_ARMIES)],
+                    cTownCommand[IDX(TEXT_COMBINE_ARMIES)],
                     gArmyNames[m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot]]
                 );
-                m_command = TOWN_ARMY_COMMAND_MERGE;
+                m_command = ARMY_COMMAND_MERGE;
             }
         } else if (qualifier != 0
                    && m_pendingStrip->m_army->m_creatureTypes[m_pendingArmySlot]
                           == ARMY_GROUP_EMPTY_SLOT) {
             sprintf(
                 m_statusText,
-                cTownCommand[IDX(TOWN_TEXT_REDISTRIBUTE_TO_EMPTY_SLOT)],
+                cTownCommand[IDX(TEXT_REDISTRIBUTE_TO_EMPTY_SLOT)],
                 gArmyNames[m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot]]
             );
-            m_command = TOWN_ARMY_COMMAND_SPLIT;
+            m_command = ARMY_COMMAND_SPLIT;
         }
     }
 
@@ -812,24 +895,24 @@ void townManager::SetArmyCommand(i32 qualifier) {
         return;
     if (m_pendingStrip->m_army->m_creatureTypes[m_pendingArmySlot] == ARMY_GROUP_EMPTY_SLOT) {
         if (cantMoveLastArmy) {
-            strcpy(m_statusText, cTownCommand[IDX(TOWN_TEXT_CANNOT_MOVE_LAST_ARMY)]);
+            strcpy(m_statusText, cTownCommand[IDX(TEXT_CANNOT_MOVE_LAST_ARMY)]);
             return;
         } else {
             sprintf(
                 m_statusText,
-                cTownCommand[IDX(TOWN_TEXT_MOVE_ARMY)],
+                cTownCommand[IDX(TEXT_MOVE_ARMY)],
                 gArmyNames[m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot]]
             );
-            m_command = TOWN_ARMY_COMMAND_SWAP;
+            m_command = ARMY_COMMAND_SWAP;
         }
     } else {
         sprintf(
             m_statusText,
-            cTownCommand[IDX(TOWN_TEXT_EXCHANGE_ARMIES)],
+            cTownCommand[IDX(TEXT_EXCHANGE_ARMIES)],
             gArmyNames[m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot]],
             gArmyNames[m_pendingStrip->m_army->m_creatureTypes[m_pendingArmySlot]]
         );
-        m_command = TOWN_ARMY_COMMAND_SWAP;
+        m_command = ARMY_COMMAND_SWAP;
     }
 }
 
@@ -840,13 +923,13 @@ void townManager::SetCommandAndText(struct tag_message& message) {
 
     m_command = TOWN_WIDGET_ID_NONE;
     switch (objectId) {
-        case IDX(TOWN_CONTROL_CLOSE):
-            strcpy(m_statusText, cTownCommand[IDX(TOWN_TEXT_EXIT)]);
+        case IDX(CONTROL_CLOSE):
+            strcpy(m_statusText, cTownCommand[IDX(TEXT_EXIT)]);
             break;
         case TOWN_WIDGET_ID_NONE:
         case TOWN_EMPTY_STATUS_CONTROL_FIRST:
         case TOWN_EMPTY_STATUS_CONTROL_LAST:
-            strcpy(m_statusText, cTownCommand[IDX(TOWN_TEXT_EMPTY_STATUS)]);
+            strcpy(m_statusText, cTownCommand[IDX(TEXT_EMPTY_STATUS)]);
             break;
         case TOWN_GARRISON_SLOT_FIRST:
         case TOWN_GARRISON_SLOT_FIRST + 1:
@@ -862,20 +945,20 @@ void townManager::SetCommandAndText(struct tag_message& message) {
                 m_selectedArmySlot = objectId - TOWN_GARRISON_SLOT_FIRST;
                 if (m_selectedStrip->m_army->m_creatureTypes[m_selectedArmySlot]
                     == ARMY_GROUP_EMPTY_SLOT) {
-                    strcpy(m_statusText, cTownCommand[IDX(TOWN_TEXT_EMPTY_SLOT)]);
+                    strcpy(m_statusText, cTownCommand[IDX(TEXT_EMPTY_SLOT)]);
                 } else {
                     sprintf(
                         m_statusText,
-                        cTownCommand[IDX(TOWN_TEXT_SELECT_ARMY)],
+                        cTownCommand[IDX(TEXT_SELECT_ARMY)],
                         gArmyNames[m_selectedStrip->m_army->m_creatureTypes[m_selectedArmySlot]]
                     );
-                    m_command = TOWN_ARMY_COMMAND_SELECT;
+                    m_command = ARMY_COMMAND_SELECT;
                 }
             }
             break;
         case TOWN_HERO_FIRST_CONTROL:
-            strcpy(m_statusText, cTownCommand[IDX(TOWN_TEXT_VIEW_HERO)]);
-            m_command = TOWN_ARMY_COMMAND_VIEW_HERO;
+            strcpy(m_statusText, cTownCommand[IDX(TEXT_VIEW_HERO)]);
+            m_command = ARMY_COMMAND_VIEW_HERO;
             break;
         case TOWN_HERO_SLOT_FIRST:
         case TOWN_HERO_SLOT_FIRST + 1:
@@ -892,60 +975,60 @@ void townManager::SetCommandAndText(struct tag_message& message) {
                 if (m_selectedStrip->m_army == 0
                     || m_selectedStrip->m_army->m_creatureTypes[m_selectedArmySlot]
                            == ARMY_GROUP_EMPTY_SLOT) {
-                    strcpy(m_statusText, cTownCommand[IDX(TOWN_TEXT_EMPTY_SLOT)]);
+                    strcpy(m_statusText, cTownCommand[IDX(TEXT_EMPTY_SLOT)]);
                     m_command = TOWN_WIDGET_ID_NONE;
                 } else {
                     sprintf(
                         m_statusText,
-                        cTownCommand[IDX(TOWN_TEXT_SELECT_ARMY)],
+                        cTownCommand[IDX(TEXT_SELECT_ARMY)],
                         gArmyNames[m_selectedStrip->m_army->m_creatureTypes[m_selectedArmySlot]]
                     );
-                    m_command = TOWN_ARMY_COMMAND_SELECT;
+                    m_command = ARMY_COMMAND_SELECT;
                 }
             }
             break;
         case TOWN_OBJECT_MAGE_GUILD:
-            strcpy(m_statusText, cTownCommand[IDX(TOWN_TEXT_MAGE_GUILD)]);
+            strcpy(m_statusText, cTownCommand[IDX(TEXT_MAGE_GUILD)]);
             break;
         case TOWN_OBJECT_THIEVES_GUILD:
-            strcpy(m_statusText, cTownCommand[IDX(TOWN_TEXT_THIEVES_GUILD)]);
+            strcpy(m_statusText, cTownCommand[IDX(TEXT_THIEVES_GUILD)]);
             break;
         case TOWN_OBJECT_TAVERN:
             if (m_town->m_type == IDX(FACTION_NECROMANCER))
                 strcpy(m_statusText, xNecromancerShrine);
             else
-                strcpy(m_statusText, cTownCommand[IDX(TOWN_TEXT_TAVERN)]);
+                strcpy(m_statusText, cTownCommand[IDX(TEXT_TAVERN)]);
             break;
         case TOWN_OBJECT_DOCK:
         case TOWN_OBJECT_BOAT:
-            strcpy(m_statusText, cTownCommand[IDX(TOWN_TEXT_DOCK)]);
+            strcpy(m_statusText, cTownCommand[IDX(TEXT_DOCK)]);
             break;
         case TOWN_OBJECT_WELL:
-            strcpy(m_statusText, cTownCommand[IDX(TOWN_TEXT_WELL)]);
+            strcpy(m_statusText, cTownCommand[IDX(TEXT_WELL)]);
             break;
         case TOWN_OBJECT_TENT:
-            strcpy(m_statusText, cTownCommand[IDX(TOWN_TEXT_TENT)]);
+            strcpy(m_statusText, cTownCommand[IDX(TEXT_TENT)]);
             break;
         case TOWN_OBJECT_CASTLE:
-            strcpy(m_statusText, cTownCommand[IDX(TOWN_TEXT_CASTLE)]);
+            strcpy(m_statusText, cTownCommand[IDX(TEXT_CASTLE)]);
             break;
         case TOWN_OBJECT_STATUE:
-            strcpy(m_statusText, cTownCommand[IDX(TOWN_TEXT_STATUE)]);
+            strcpy(m_statusText, cTownCommand[IDX(TEXT_STATUE)]);
             break;
         case TOWN_OBJECT_LEFT_TURRET:
-            strcpy(m_statusText, cTownCommand[IDX(TOWN_TEXT_LEFT_TURRET)]);
+            strcpy(m_statusText, cTownCommand[IDX(TEXT_LEFT_TURRET)]);
             break;
         case TOWN_OBJECT_RIGHT_TURRET:
-            strcpy(m_statusText, cTownCommand[IDX(TOWN_TEXT_RIGHT_TURRET)]);
+            strcpy(m_statusText, cTownCommand[IDX(TEXT_RIGHT_TURRET)]);
             break;
         case TOWN_OBJECT_MOAT:
-            strcpy(m_statusText, cTownCommand[IDX(TOWN_TEXT_MOAT)]);
+            strcpy(m_statusText, cTownCommand[IDX(TEXT_MOAT)]);
             break;
         case TOWN_OBJECT_MARKETPLACE:
-            strcpy(m_statusText, cTownCommand[IDX(TOWN_TEXT_MARKETPLACE)]);
+            strcpy(m_statusText, cTownCommand[IDX(TEXT_MARKETPLACE)]);
             break;
         case TOWN_OBJECT_CAPTAIN_QUARTERS:
-            strcpy(m_statusText, cTownCommand[IDX(TOWN_TEXT_CAPTAIN_QUARTERS)]);
+            strcpy(m_statusText, cTownCommand[IDX(TEXT_CAPTAIN_QUARTERS)]);
             break;
         case TOWN_OBJECT_SPECIAL_BUILDING:
             strcpy(m_statusText, gSpecialBuildingNames[m_town->m_type]);
@@ -967,7 +1050,7 @@ void townManager::SetCommandAndText(struct tag_message& message) {
         case TOWN_OBJECT_ALTERNATE_UPGRADED_DWELLING_6:
             sprintf(
                 m_statusText,
-                cTownCommand[IDX(TOWN_TEXT_RECRUIT)],
+                cTownCommand[IDX(TEXT_RECRUIT)],
                 gArmyNames[gDwellingType[m_town->m_type][objectId - TOWN_OBJECT_DWELLING_1]]
             );
             break;
@@ -1031,8 +1114,8 @@ i32 townManager::Main(tag_message& message) {
     switch (message.type) {
         case MESSAGE_WIDGET:
             switch (message.payload.widget.command) {
-                case IDX(TOWN_INPUT_SELECT):
-                case IDX(TOWN_INPUT_ALTERNATE_SELECT):
+                case IDX(INPUT_SELECT):
+                case IDX(INPUT_ALTERNATE_SELECT):
                     switch (message.payload.widget.id) {
                         case 19:
                         case 20:
@@ -1197,7 +1280,7 @@ i32 townManager::Main(tag_message& message) {
                                             0
                                         );
                                         if (gpWindowManager->m_dialogResult
-                                            == IDX(TOWN_DIALOG_BUY_SPELL_BOOK)) {
+                                            == IDX(DIALOG_BUY_SPELL_BOOK)) {
                                             GiveArtifact(
                                                 gpGame->GetHero(m_town->m_occupyingHeroId),
                                                 ARTIFACT_MAGIC_BOOK,
@@ -1328,7 +1411,7 @@ i32 townManager::Main(tag_message& message) {
                                 gpWindowManager->BroadcastMessage(
                                     MESSAGE_WIDGET,
                                     WIDGET_COMMAND_SET_FLAGS,
-                                    IDX(TOWN_CONTROL_CLOSE),
+                                    IDX(CONTROL_CLOSE),
                                     TOWN_INTERFACE_BROADCAST_FLAGS
                                 );
                                 if (gpGame->GetBoatsBuilt() < TOWN_MAX_BOATS
@@ -1345,7 +1428,7 @@ i32 townManager::Main(tag_message& message) {
                                                < TOWN_BOAT_WOOD_COST) {
                                         message.type = MESSAGE_WIDGET;
                                         message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-                                        message.payload.widget.id = TOWN_DIALOG_BUILD_BOAT;
+                                        message.payload.widget.id = DIALOG_BUILD_BOAT;
                                         message.payload.widget.data.value = WIDGET_FLAG_GRAYED;
                                         m_heroWindow0->BroadcastMessage(message);
                                         message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
@@ -1356,7 +1439,7 @@ i32 townManager::Main(tag_message& message) {
                                         ->DoDialog(m_heroWindow0, TrueFalseDialogHandler, 0);
                                     delete m_heroWindow0;
                                     if (gpWindowManager->m_dialogResult
-                                        == IDX(TOWN_DIALOG_BUILD_BOAT)) {
+                                        == IDX(DIALOG_BUILD_BOAT)) {
                                         if (gpGame->CreateBoat(m_town->m_boatX, m_town->m_boatY, 0)
                                             != -1) {
                                             BuildObj(14);
@@ -1387,7 +1470,7 @@ i32 townManager::Main(tag_message& message) {
                                 gpWindowManager->BroadcastMessage(
                                     MESSAGE_WIDGET,
                                     WIDGET_COMMAND_CLEAR_FLAGS,
-                                    IDX(TOWN_CONTROL_CLOSE),
+                                    IDX(CONTROL_CLOSE),
                                     TOWN_INTERFACE_BROADCAST_FLAGS
                                 );
                             }
@@ -1456,7 +1539,7 @@ i32 townManager::Main(tag_message& message) {
                             }
                             break;
 
-                        case IDX(TOWN_CONTROL_CLOSE):
+                        case IDX(CONTROL_CLOSE):
                             if (!quickView_k)
                                 SetCommandAndText(message);
                             break;
@@ -1512,16 +1595,16 @@ i32 townManager::Main(tag_message& message) {
                     }
                     break;
 
-                case IDX(TOWN_INPUT_DESELECT):
+                case IDX(INPUT_DESELECT):
                     switch (message.payload.widget.id) {
-                        case IDX(TOWN_CONTROL_CLOSE):
+                        case IDX(CONTROL_CLOSE):
                             if (quickView_k)
                                 break;
                             ++exitTown_i;
                             break;
 
-                        case IDX(TOWN_CONTROL_PREVIOUS_TOWN):
-                        case IDX(TOWN_CONTROL_NEXT_TOWN):
+                        case IDX(CONTROL_PREVIOUS_TOWN):
+                        case IDX(CONTROL_NEXT_TOWN):
                             if (m_town->m_owner != giCurPlayer)
                                 break;
                             if (gpCurPlayer->m_townCount <= 1)
@@ -1531,7 +1614,7 @@ i32 townManager::Main(tag_message& message) {
                                     gpGame->TownIDToTownPos(gpCurPlayer, m_town->m_id);
                                 townPosition =
                                     (townPosition
-                                     + (message.payload.widget.id == IDX(TOWN_CONTROL_PREVIOUS_TOWN)
+                                     + (message.payload.widget.id == IDX(CONTROL_PREVIOUS_TOWN)
                                             ? -1
                                             : 1)
                                      + gpCurPlayer->m_townCount)
@@ -1595,14 +1678,14 @@ void townManager::DoCommand(i32 command) {
     i32 oldValue;
 
     switch (command) {
-        case IDX(TOWN_ARMY_COMMAND_SELECT):
+        case IDX(ARMY_COMMAND_SELECT):
             m_swapStrip = m_selectedStrip;
             m_swapArmySlot = m_selectedArmySlot;
             m_swapStrip->m_selectedSlot = m_swapArmySlot;
             m_swapStrip->Draw();
             break;
 
-        case IDX(TOWN_ARMY_COMMAND_VIEW):
+        case IDX(ARMY_COMMAND_VIEW):
             if (m_selectedStrip == m_heroStrip)
                 viewedHero = gpGame->GetHero(m_town->m_occupyingHeroId);
             else
@@ -1634,7 +1717,7 @@ void townManager::DoCommand(i32 command) {
             ResetStrips();
             break;
 
-        case IDX(TOWN_ARMY_COMMAND_MERGE):
+        case IDX(ARMY_COMMAND_MERGE):
             if (m_pendingStrip != m_swapStrip
                 && m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot]
                        != m_pendingStrip->m_army->m_creatureTypes[m_pendingArmySlot]) {
@@ -1654,7 +1737,7 @@ void townManager::DoCommand(i32 command) {
             ResetStrips();
             break;
 
-        case IDX(TOWN_ARMY_COMMAND_SWAP):
+        case IDX(ARMY_COMMAND_SWAP):
             oldValue = m_pendingStrip->m_army->m_creatureCounts[m_pendingArmySlot];
             m_pendingStrip->m_army->m_creatureCounts[m_pendingArmySlot] =
                 m_swapStrip->m_army->m_creatureCounts[m_swapArmySlot];
@@ -1666,13 +1749,13 @@ void townManager::DoCommand(i32 command) {
             ResetStrips();
             break;
 
-        case IDX(TOWN_ARMY_COMMAND_VIEW_HERO):
+        case IDX(ARMY_COMMAND_VIEW_HERO):
             HeroView(m_town->m_occupyingHeroId, 1, 0);
             RedrawTownScreen();
             gpWindowManager->FadeScreen(0, 8, 0);
             break;
 
-        case IDX(TOWN_ARMY_COMMAND_SPLIT):
+        case IDX(ARMY_COMMAND_SPLIT):
             SplitArmy();
             ResetStrips();
             break;
@@ -2100,7 +2183,7 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
         gpWindowManager->BroadcastMessage(
             MESSAGE_WIDGET,
             WIDGET_COMMAND_SET_FLAGS,
-            IDX(TOWN_CONTROL_CLOSE),
+            IDX(CONTROL_CLOSE),
             TOWN_INTERFACE_BROADCAST_FLAGS
         );
     m_selectedBuilding = -1;
@@ -2142,7 +2225,7 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
         gpWindowManager->BroadcastMessage(
             MESSAGE_WIDGET,
             WIDGET_COMMAND_CLEAR_FLAGS,
-            IDX(TOWN_CONTROL_CLOSE),
+            IDX(CONTROL_CLOSE),
             TOWN_INTERFACE_BROADCAST_FLAGS
         );
     delete window_a;
@@ -2240,7 +2323,7 @@ void townManager::BuildObj(i32 building) {
         gpWindowManager->BroadcastMessage(
             MESSAGE_WIDGET,
             WIDGET_COMMAND_CLEAR_FLAGS,
-            IDX(TOWN_CONTROL_CLOSE),
+            IDX(CONTROL_CLOSE),
             TOWN_INTERFACE_BROADCAST_FLAGS
         );
         RedrawTownScreen();
@@ -2376,8 +2459,8 @@ i32 MageGuildHandler(tag_message& message) {
 
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
-            case IDX(TOWN_INPUT_SELECT):
-            case IDX(TOWN_INPUT_ALTERNATE_SELECT):
+            case IDX(INPUT_SELECT):
+            case IDX(INPUT_ALTERNATE_SELECT):
                 quickView_f = message.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON;
                 spellSlot = -1;
                 if (message.payload.widget.id >= TOWN_MAGE_FIRST_SPELL_CONTROL
@@ -2540,7 +2623,7 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
     gpWindowManager->BroadcastMessage(
         MESSAGE_WIDGET,
         WIDGET_COMMAND_CLEAR_FLAGS,
-        IDX(TOWN_CONTROL_CLOSE),
+        IDX(CONTROL_CLOSE),
         TOWN_INTERFACE_BROADCAST_FLAGS
     );
     m_recruitHero->m_owner = -1;
@@ -2556,7 +2639,7 @@ i32 TavernHandler(tag_message& message) {
 
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
-            case IDX(TOWN_INPUT_DESELECT):
+            case IDX(INPUT_DESELECT):
                 switch (message.payload.widget.id) {
                     case EVENT_WINDOW_FIRST_BUTTON:
                     case EVENT_WINDOW_SECOND_BUTTON:
@@ -2623,7 +2706,7 @@ i32 SplitArmyHandler(tag_message& message) {
 
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
-            case IDX(TOWN_INPUT_SELECT):
+            case IDX(INPUT_SELECT):
                 switch (message.payload.widget.id) {
                     case TOWN_SPLIT_AMOUNT_CONTROL:
                         message.payload.widget.command = WIDGET_COMMAND_GET_TEXT;
@@ -2636,7 +2719,7 @@ i32 SplitArmyHandler(tag_message& message) {
                         goto update_amount;
                 }
                 break;
-            case IDX(TOWN_INPUT_DESELECT):
+            case IDX(INPUT_DESELECT):
                 switch (message.payload.widget.id) {
                     case TOWN_SPLIT_INCREASE_CONTROL:
                         ++gpTownManager->m_splitAmount;
@@ -3170,7 +3253,7 @@ void GetCategoryStats(i32 category, i32l* const stats, i8* const order) {
             stats[player] = TOWN_THIEVES_DEAD_PLAYER_STAT;
         } else {
             switch (category) {
-                case IDX(TOWN_THIEVES_CATEGORY_TOWNS):
+                case IDX(THIEVES_CATEGORY_TOWNS):
                     for (townIndex_c = 0; townIndex_c < GAME_TOWN_COUNT; ++townIndex_c) {
                         if (gpGame->m_castleRecs[townIndex_c].m_owner == player
                             && (gpGame->m_castleRecs[townIndex_c].m_buildings
@@ -3180,7 +3263,7 @@ void GetCategoryStats(i32 category, i32l* const stats, i8* const order) {
                     }
                     stats[player] = townCount_k;
                     break;
-                case IDX(TOWN_THIEVES_CATEGORY_CASTLES):
+                case IDX(THIEVES_CATEGORY_CASTLES):
                     for (townIndex_c = 0; townIndex_c < GAME_TOWN_COUNT; ++townIndex_c) {
                         if (gpGame->m_castleRecs[townIndex_c].m_owner == player
                             && (gpGame->m_castleRecs[townIndex_c].m_buildings
@@ -3190,26 +3273,26 @@ void GetCategoryStats(i32 category, i32l* const stats, i8* const order) {
                     }
                     stats[player] = castleCount_p;
                     break;
-                case IDX(TOWN_THIEVES_CATEGORY_HEROES):
+                case IDX(THIEVES_CATEGORY_HEROES):
                     stats[player] = gpGame->m_players[player].m_heroCount;
                     break;
-                case IDX(TOWN_THIEVES_CATEGORY_GOLD):
+                case IDX(THIEVES_CATEGORY_GOLD):
                     stats[player] = gpGame->m_players[player].m_resources[IDX(RES_GOLD)];
                     break;
-                case IDX(TOWN_THIEVES_CATEGORY_WOOD_AND_ORE):
+                case IDX(THIEVES_CATEGORY_WOOD_AND_ORE):
                     stats[player] = gpGame->m_players[player].m_resources[IDX(RES_WOOD)]
                                     + gpGame->m_players[player].m_resources[IDX(RES_ORE)];
                     break;
-                case IDX(TOWN_THIEVES_CATEGORY_RARE_RESOURCES):
+                case IDX(THIEVES_CATEGORY_RARE_RESOURCES):
                     stats[player] = gpGame->m_players[player].m_resources[IDX(RES_MERCURY)]
                                     + gpGame->m_players[player].m_resources[IDX(RES_SULFUR)]
                                     + gpGame->m_players[player].m_resources[IDX(RES_CRYSTAL)]
                                     + gpGame->m_players[player].m_resources[IDX(RES_GEMS)];
                     break;
-                case IDX(TOWN_THIEVES_CATEGORY_OBELISKS):
+                case IDX(THIEVES_CATEGORY_OBELISKS):
                     stats[player] = GetNumObelisks(player);
                     break;
-                case IDX(TOWN_THIEVES_CATEGORY_ARTIFACTS):
+                case IDX(THIEVES_CATEGORY_ARTIFACTS):
                     stats[player] = 0;
                     for (townIndex_c = 0; townIndex_c < gpGame->m_players[player].m_heroCount;
                          ++townIndex_c) {
@@ -3224,7 +3307,7 @@ void GetCategoryStats(i32 category, i32l* const stats, i8* const order) {
                         }
                     }
                     break;
-                case IDX(TOWN_THIEVES_CATEGORY_ARMY_STRENGTH):
+                case IDX(THIEVES_CATEGORY_ARMY_STRENGTH):
                     armyStrength = 0;
                     for (heroIndex_n = 0; heroIndex_n < gpGame->m_players[player].m_heroCount;
                          ++heroIndex_n) {
@@ -3248,7 +3331,7 @@ void GetCategoryStats(i32 category, i32l* const stats, i8* const order) {
                     }
                     stats[player] = armyStrength;
                     break;
-                case IDX(TOWN_THIEVES_CATEGORY_INCOME):
+                case IDX(THIEVES_CATEGORY_INCOME):
                     stats[player] = gpGame->ComputeDailyGold(player);
                     break;
             }

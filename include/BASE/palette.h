@@ -1,5 +1,6 @@
 #ifndef HOMM2_BASE_PALETTE_H
 #define HOMM2_BASE_PALETTE_H
+
 #include <va.h>
 #include <BASE/resource.h>
 

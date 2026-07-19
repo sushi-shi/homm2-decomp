@@ -1,22 +1,19 @@
 #ifndef HOMM2_EDITOR_MAPCELL_H
 #define HOMM2_EDITOR_MAPCELL_H
+
 #include <va.h>
 #include <Ints.h>
 
 // Occupancy is ignored when every object-stack entry is shadow-only or erased.
 H2_ENUM_CLASS_BEGIN(MapCellFlag)
     MAP_CELL_OBJECT_SHADOW_ONLY = 0x80,
-    MAP_CELL_OCCUPIED = 0x08
+    MAP_CELL_OCCUPIED           = 0x08
 H2_ENUM_CLASS_END(MapCellFlag)
 
 H2_ENUM_CLASS_BEGIN(MapCellSentinel)
     MAPCELL_SPRITE_NONE = 0xff,
-    MAPCELL_EXTRA_FREE = 0xffff
+    MAPCELL_EXTRA_FREE  = 0xffff
 H2_ENUM_CLASS_END(MapCellSentinel)
-
-H2_ENUM_BEGIN(MapTilesetConstant)
-    MAP_TILESET_FLAG = 14
-H2_ENUM_END(MapTilesetConstant)
 
 #pragma pack(push, 1)
 struct mapCellExtra {

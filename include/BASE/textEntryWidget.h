@@ -1,8 +1,10 @@
 #ifndef HOMM2_BASE_TEXTENTRYWIDGET_H
 #define HOMM2_BASE_TEXTENTRYWIDGET_H
+
 #include <va.h>
 #include <BASE/textWidget.h>
 #include "widget.h"
+
 struct tag_message;
 
 #pragma pack(push, 1)

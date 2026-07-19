@@ -1,34 +1,36 @@
 #ifndef HOMM2_SOURCE_STRIP_H
 #define HOMM2_SOURCE_STRIP_H
+
 #include <va.h>
+
 class armyGroup;
 class border;
 class heroWindow;
 class icon;
 
 H2_ENUM_BEGIN(StripConstant)
-    STRIP_ARMY_SLOT_COUNT = 5,
-    STRIP_BORDER_COUNT = 6,
-    STRIP_WINDOW_WIDTH = 0x228,
-    STRIP_WINDOW_HEIGHT = 0x69,
-    STRIP_WINDOW_FLAGS = 8,
-    STRIP_PORTRAIT_X = 5,
-    STRIP_CONTENT_Y = 6,
-    STRIP_ARMY_FIRST_X = 0x70,
-    STRIP_ARMY_X_STEP = 0x58,
-    STRIP_ARMY_BORDER_WIDTH = 0x52,
-    STRIP_BORDER_HEIGHT = 0x5d,
+    STRIP_ARMY_SLOT_COUNT       = 5,
+    STRIP_BORDER_COUNT          = 6,
+    STRIP_WINDOW_WIDTH          = 0x228,
+    STRIP_WINDOW_HEIGHT         = 0x69,
+    STRIP_WINDOW_FLAGS          = 8,
+    STRIP_PORTRAIT_X            = 5,
+    STRIP_CONTENT_Y             = 6,
+    STRIP_ARMY_FIRST_X          = 0x70,
+    STRIP_ARMY_X_STEP           = 0x58,
+    STRIP_ARMY_BORDER_WIDTH     = 0x52,
+    STRIP_BORDER_HEIGHT         = 0x5d,
     STRIP_PORTRAIT_BORDER_WIDTH = 0x65,
-    STRIP_BORDER_FILL_COLOR = 1,
-    STRIP_EMPTY_FRAME = 2,
-    STRIP_NO_ARMY_FRAME = 0xb,
-    STRIP_SELECTED_FRAME = 1,
-    STRIP_RACE_FRAME_OFFSET = 4,
-    STRIP_QUANTITY_Y = 0x56,
-    STRIP_QUANTITY_WIDTH = 0x4d,
-    STRIP_QUANTITY_HEIGHT = 0xd,
-    STRIP_QUANTITY_COLOR = 1,
-    STRIP_QUANTITY_BACKGROUND = 2
+    STRIP_BORDER_FILL_COLOR     = 1,
+    STRIP_EMPTY_FRAME           = 2,
+    STRIP_NO_ARMY_FRAME         = 0xb,
+    STRIP_SELECTED_FRAME        = 1,
+    STRIP_RACE_FRAME_OFFSET     = 4,
+    STRIP_QUANTITY_Y            = 0x56,
+    STRIP_QUANTITY_WIDTH        = 0x4d,
+    STRIP_QUANTITY_HEIGHT       = 0xd,
+    STRIP_QUANTITY_COLOR        = 1,
+    STRIP_QUANTITY_BACKGROUND   = 2
 H2_ENUM_END(StripConstant)
 
 #pragma pack(push, 1)
