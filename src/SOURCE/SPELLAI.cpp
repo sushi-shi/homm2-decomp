@@ -102,7 +102,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
     i32 fullQuantityFlag;
     i32 hexIndex;
     i32 indexWork;
-    i32 targetModeBySide[COMBAT_SIDE_COUNT];
+    CombatSpellAITargetMode targetModeBySide[COMBAT_SIDE_COUNT];
     float durationMod;
     i32 totalEffect;
     i32 hasMindEffect;
@@ -137,27 +137,27 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
         case SPELL_SUMMON_FIRE_ELEMENTAL:
         case SPELL_SUMMON_WATER_ELEMENTAL:
         case SPELL_EARTHQUAKE:
-            targetModeBySide[0] = IDX(SPELL_AI_GLOBAL);
+            targetModeBySide[0] = SPELL_AI_GLOBAL;
             break;
         case SPELL_FIREBALL:
         case SPELL_FIREBLAST:
         case SPELL_METEOR_SHOWER:
         case SPELL_COLD_RING:
-            targetModeBySide[0] = IDX(SPELL_AI_AREA);
+            targetModeBySide[0] = SPELL_AI_AREA;
             break;
         case SPELL_MASS_HASTE:
         case SPELL_MASS_BLESS:
         case SPELL_MASS_SHIELD:
-            targetModeBySide[0] = IDX(SPELL_AI_SUM_FRIENDLY);
+            targetModeBySide[0] = SPELL_AI_SUM_FRIENDLY;
             side = m_currentSide;
             break;
         case SPELL_MASS_SLOW:
         case SPELL_MASS_CURSE:
-            targetModeBySide[0] = IDX(SPELL_AI_SUM_ENEMY);
+            targetModeBySide[0] = SPELL_AI_SUM_ENEMY;
             side = 1 - m_currentSide;
             break;
         case SPELL_DISPEL:
-            targetModeBySide[0] = IDX(SPELL_AI_ANY_ARMY);
+            targetModeBySide[0] = SPELL_AI_ANY_ARMY;
             side = SPELL_AI_ANY_SIDE;
             break;
         case SPELL_TELEPORT:
@@ -171,13 +171,13 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
         case SPELL_BLOOD_LUST:
         case SPELL_MIRROR_IMAGE:
         case SPELL_SHIELD:
-            targetModeBySide[0] = IDX(SPELL_AI_FRIENDLY);
+            targetModeBySide[0] = SPELL_AI_FRIENDLY;
             side = m_currentSide;
             break;
         case SPELL_RESURRECT:
         case SPELL_TRUE_RESURRECT:
         case SPELL_ANIMATE_DEAD:
-            targetModeBySide[0] = IDX(SPELL_AI_RESURRECT);
+            targetModeBySide[0] = SPELL_AI_RESURRECT;
             side = m_currentSide;
             break;
         case SPELL_LIGHTNING_BOLT:
@@ -190,7 +190,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
         case SPELL_PARALYZE:
         case SPELL_HYPNOTIZE:
         case SPELL_DISRUPTING_RAY:
-            targetModeBySide[0] = IDX(SPELL_AI_ENEMY);
+            targetModeBySide[0] = SPELL_AI_ENEMY;
             side = 1 - m_currentSide;
             break;
         default:
@@ -198,13 +198,12 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
             return;
     }
 
-    if (targetModeBySide[0] == IDX(SPELL_AI_RESURRECT))
+    if (targetModeBySide[0] == SPELL_AI_RESURRECT)
         doneResult = FirstResurrectable(SPELL_AI_FIRST_HEX, &hexIndex, IDX(spell));
-    if (targetModeBySide[0] == IDX(SPELL_AI_FRIENDLY)
-        || targetModeBySide[0] == IDX(SPELL_AI_ENEMY)
-        || targetModeBySide[0] == IDX(SPELL_AI_SUM_ENEMY)
-        || targetModeBySide[0] == IDX(SPELL_AI_SUM_FRIENDLY)
-        || targetModeBySide[0] == IDX(SPELL_AI_ANY_ARMY))
+    if (targetModeBySide[0] == SPELL_AI_FRIENDLY || targetModeBySide[0] == SPELL_AI_ENEMY
+        || targetModeBySide[0] == SPELL_AI_SUM_ENEMY
+        || targetModeBySide[0] == SPELL_AI_SUM_FRIENDLY
+        || targetModeBySide[0] == SPELL_AI_ANY_ARMY)
         doneResult = FirstArmy(SPELL_AI_FIRST_HEX, side, &hexIndex);
 
     while (!doneResult) {
@@ -302,7 +301,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
                             effect = static_cast<i32>(
                                 RawEffectSpellInfluence(
                                     targetCreature,
-                                    IDX(ARMY_SPELL_INFLUENCE_HASTE)
+                                    ARMY_SPELL_INFLUENCE_HASTE
                                 )
                                 * durationMod
                             );
@@ -310,7 +309,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
                                 effect = static_cast<i32>(
                                     RawEffectSpellInfluence(
                                         targetCreature,
-                                        IDX(ARMY_SPELL_INFLUENCE_SLOW)
+                                        ARMY_SPELL_INFLUENCE_SLOW
                                     )
                                         * gfCancelDurationMods
                                             [targetCreature->m_spellInfluence[IDX(
@@ -338,7 +337,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
                             effect = static_cast<i32>(
                                 RawEffectSpellInfluence(
                                     targetCreature,
-                                    IDX(ARMY_SPELL_INFLUENCE_BERSERK)
+                                    ARMY_SPELL_INFLUENCE_BERSERK
                                 )
                                 * durationMod
                             );
@@ -347,7 +346,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
                                 effect = static_cast<i32>(
                                     RawEffectSpellInfluence(
                                         targetCreature,
-                                        IDX(ARMY_SPELL_INFLUENCE_HYPNOTIZE)
+                                        ARMY_SPELL_INFLUENCE_HYPNOTIZE
                                     )
                                         * gfCancelDurationMods
                                             [targetCreature->m_spellInfluence[IDX(
@@ -375,7 +374,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
                             effect = static_cast<i32>(
                                 RawEffectSpellInfluence(
                                     targetCreature,
-                                    IDX(ARMY_SPELL_INFLUENCE_HYPNOTIZE)
+                                    ARMY_SPELL_INFLUENCE_HYPNOTIZE
                                 )
                                 * durationMod
                             );
@@ -384,7 +383,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
                                 effect = static_cast<i32>(
                                     RawEffectSpellInfluence(
                                         targetCreature,
-                                        IDX(ARMY_SPELL_INFLUENCE_BERSERK)
+                                        ARMY_SPELL_INFLUENCE_BERSERK
                                     )
                                         * gfCancelDurationMods
                                             [targetCreature->m_spellInfluence[IDX(
@@ -413,7 +412,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
                             effect = static_cast<i32>(
                                 RawEffectSpellInfluence(
                                     targetCreature,
-                                    IDX(ARMY_SPELL_INFLUENCE_SLOW)
+                                    ARMY_SPELL_INFLUENCE_SLOW
                                 )
                                 * durationMod
                             );
@@ -421,7 +420,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
                                 effect = static_cast<i32>(
                                     RawEffectSpellInfluence(
                                         targetCreature,
-                                        IDX(ARMY_SPELL_INFLUENCE_HASTE)
+                                        ARMY_SPELL_INFLUENCE_HASTE
                                     )
                                         * gfCancelDurationMods
                                             [targetCreature->m_spellInfluence[IDX(
@@ -450,7 +449,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
                             effect = static_cast<i32>(
                                 RawEffectSpellInfluence(
                                     targetCreature,
-                                    IDX(ARMY_SPELL_INFLUENCE_BLESS)
+                                    ARMY_SPELL_INFLUENCE_BLESS
                                 )
                                 * durationMod
                             );
@@ -458,7 +457,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
                                 effect = static_cast<i32>(
                                     RawEffectSpellInfluence(
                                         targetCreature,
-                                        IDX(ARMY_SPELL_INFLUENCE_CURSE)
+                                        ARMY_SPELL_INFLUENCE_CURSE
                                     )
                                         * gfCancelDurationMods
                                             [targetCreature->m_spellInfluence[IDX(
@@ -487,7 +486,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
                             effect = static_cast<i32>(
                                 -RawEffectSpellInfluence(
                                     targetCreature,
-                                    IDX(ARMY_SPELL_INFLUENCE_CURSE)
+                                    ARMY_SPELL_INFLUENCE_CURSE
                                 )
                                 * durationMod
                             );
@@ -495,7 +494,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
                                 effect = static_cast<i32>(
                                     RawEffectSpellInfluence(
                                         targetCreature,
-                                        IDX(ARMY_SPELL_INFLUENCE_BLESS)
+                                        ARMY_SPELL_INFLUENCE_BLESS
                                     )
                                         * gfCancelDurationMods
                                             [targetCreature->m_spellInfluence[IDX(
@@ -522,7 +521,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
                         effect = static_cast<i32>(
                             RawEffectSpellInfluence(
                                 targetCreature,
-                                IDX(ARMY_SPELL_INFLUENCE_ANTI_MAGIC)
+                                ARMY_SPELL_INFLUENCE_ANTI_MAGIC
                             )
                             * durationMod
                         );
@@ -546,7 +545,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
                             effect = static_cast<i32>(
                                 RawEffectSpellInfluence(
                                     targetCreature,
-                                    IDX(ARMY_SPELL_INFLUENCE_STONESKIN)
+                                    ARMY_SPELL_INFLUENCE_STONESKIN
                                 )
                                 * durationMod
                             );
@@ -574,7 +573,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
                             effect = static_cast<i32>(
                                 RawEffectSpellInfluence(
                                     targetCreature,
-                                    IDX(ARMY_SPELL_INFLUENCE_STEELSKIN)
+                                    ARMY_SPELL_INFLUENCE_STEELSKIN
                                 )
                                 * durationMod
                             );
@@ -602,7 +601,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
                             effect = static_cast<i32>(
                                 RawEffectSpellInfluence(
                                     targetCreature,
-                                    IDX(ARMY_SPELL_INFLUENCE_BLOODLUST)
+                                    ARMY_SPELL_INFLUENCE_BLOODLUST
                                 )
                                 * durationMod
                             );
@@ -619,7 +618,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
                         effect = static_cast<i32>(
                             RawEffectSpellInfluence(
                                 targetCreature,
-                                IDX(ARMY_SPELL_INFLUENCE_SHIELD)
+                                ARMY_SPELL_INFLUENCE_SHIELD
                             )
                             * durationMod
                         );
@@ -643,7 +642,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
                             effect = static_cast<i32>(
                                 RawEffectSpellInfluence(
                                     targetCreature,
-                                    IDX(ARMY_SPELL_INFLUENCE_BLIND)
+                                    ARMY_SPELL_INFLUENCE_BLIND
                                 )
                                 * durationMod
                             );
@@ -661,7 +660,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
                             effect = static_cast<i32>(
                                 RawEffectSpellInfluence(
                                     targetCreature,
-                                    IDX(ARMY_SPELL_INFLUENCE_PARALYZE)
+                                    ARMY_SPELL_INFLUENCE_PARALYZE
                                 )
                                 * durationMod
                             );
@@ -680,7 +679,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
                             effect = static_cast<i32>(
                                 RawEffectSpellInfluence(
                                     targetCreature,
-                                    IDX(ARMY_SPELL_INFLUENCE_DRAGON_SLAYER)
+                                    ARMY_SPELL_INFLUENCE_DRAGON_SLAYER
                                 )
                                 * durationMod
                             );
@@ -719,42 +718,42 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
         }
 
         switch (targetModeBySide[0]) {
-            case IDX(SPELL_AI_GLOBAL):
-            case IDX(SPELL_AI_AREA):
-            case IDX(SPELL_AI_FRIENDLY):
-            case IDX(SPELL_AI_ENEMY):
-            case IDX(SPELL_AI_RESURRECT):
-            case IDX(SPELL_AI_ANY_ARMY):
+            case SPELL_AI_GLOBAL:
+            case SPELL_AI_AREA:
+            case SPELL_AI_FRIENDLY:
+            case SPELL_AI_ENEMY:
+            case SPELL_AI_RESURRECT:
+            case SPELL_AI_ANY_ARMY:
                 totalEffect = effect;
                 break;
-            case IDX(SPELL_AI_SUM_FRIENDLY):
-            case IDX(SPELL_AI_SUM_ENEMY):
+            case SPELL_AI_SUM_FRIENDLY:
+            case SPELL_AI_SUM_ENEMY:
                 totalEffect += effect;
         }
 
-        if (targetModeBySide[0] == IDX(SPELL_AI_SUM_FRIENDLY)
-            || targetModeBySide[0] == IDX(SPELL_AI_SUM_ENEMY) || *bestEffect < totalEffect) {
+        if (targetModeBySide[0] == SPELL_AI_SUM_FRIENDLY
+            || targetModeBySide[0] == SPELL_AI_SUM_ENEMY || *bestEffect < totalEffect) {
             *bestEffect = totalEffect;
             *bestHex = hexIndex;
         }
 
         switch (targetModeBySide[0]) {
-            case IDX(SPELL_AI_GLOBAL):
+            case SPELL_AI_GLOBAL:
                 doneResult = 1;
                 break;
-            case IDX(SPELL_AI_SUM_FRIENDLY):
-            case IDX(SPELL_AI_SUM_ENEMY):
-            case IDX(SPELL_AI_FRIENDLY):
-            case IDX(SPELL_AI_ENEMY):
-            case IDX(SPELL_AI_ANY_ARMY):
+            case SPELL_AI_SUM_FRIENDLY:
+            case SPELL_AI_SUM_ENEMY:
+            case SPELL_AI_FRIENDLY:
+            case SPELL_AI_ENEMY:
+            case SPELL_AI_ANY_ARMY:
                 doneResult = FirstArmy(hexIndex + 1, side, &hexIndex);
                 break;
-            case IDX(SPELL_AI_AREA):
+            case SPELL_AI_AREA:
                 NextPos(&hexIndex);
                 if (hexIndex > SPELL_AI_LAST_HEX)
                     doneResult = 1;
                 break;
-            case IDX(SPELL_AI_RESURRECT):
+            case SPELL_AI_RESURRECT:
                 doneResult = FirstResurrectable(hexIndex + 1, &hexIndex, IDX(spell));
         }
     }
@@ -1073,17 +1072,20 @@ void combatManager::EffectSpellCure(i32* effect, i32 targetSide, i32 targetIndex
                 for (influence = 0; influence < ARMY_SPELL_INFLUENCE_COUNT; influence++) {
                     if (!combatTarget->m_spellInfluence[influence])
                         continue;
-                    switch (influence) {
-                        case IDX(ARMY_SPELL_INFLUENCE_HASTE):
-                        case IDX(ARMY_SPELL_INFLUENCE_BLESS):
-                        case IDX(ARMY_SPELL_INFLUENCE_DRAGON_SLAYER):
-                        case IDX(ARMY_SPELL_INFLUENCE_BLOODLUST):
-                        case IDX(ARMY_SPELL_INFLUENCE_SHIELD):
-                        case IDX(ARMY_SPELL_INFLUENCE_STONESKIN):
-                        case IDX(ARMY_SPELL_INFLUENCE_STEELSKIN):
+                    switch (static_cast<ArmySpellInfluence>(influence)) {
+                        case ARMY_SPELL_INFLUENCE_HASTE:
+                        case ARMY_SPELL_INFLUENCE_BLESS:
+                        case ARMY_SPELL_INFLUENCE_DRAGON_SLAYER:
+                        case ARMY_SPELL_INFLUENCE_BLOODLUST:
+                        case ARMY_SPELL_INFLUENCE_SHIELD:
+                        case ARMY_SPELL_INFLUENCE_STONESKIN:
+                        case ARMY_SPELL_INFLUENCE_STEELSKIN:
                             positiveEffectResult = static_cast<i32>(
                                 positiveEffectResult
-                                + RawEffectSpellInfluence(combatTarget, influence)
+                                + RawEffectSpellInfluence(
+                                      combatTarget,
+                                      static_cast<ArmySpellInfluence>(influence)
+                                  )
                                       * gfCancelDurationMods
                                           [combatTarget->m_spellInfluence[influence]
                                                        + fullQuantityWork
@@ -1093,16 +1095,19 @@ void combatManager::EffectSpellCure(i32* effect, i32 targetSide, i32 targetIndex
                                                      + fullQuantityWork]
                             );
                             break;
-                        case IDX(ARMY_SPELL_INFLUENCE_SLOW):
-                        case IDX(ARMY_SPELL_INFLUENCE_CURSE):
-                        case IDX(ARMY_SPELL_INFLUENCE_BLIND):
-                        case IDX(ARMY_SPELL_INFLUENCE_BERSERK):
-                        case IDX(ARMY_SPELL_INFLUENCE_PARALYZE):
-                        case IDX(ARMY_SPELL_INFLUENCE_HYPNOTIZE):
-                        case IDX(ARMY_SPELL_INFLUENCE_PETRIFIED):
+                        case ARMY_SPELL_INFLUENCE_SLOW:
+                        case ARMY_SPELL_INFLUENCE_CURSE:
+                        case ARMY_SPELL_INFLUENCE_BLIND:
+                        case ARMY_SPELL_INFLUENCE_BERSERK:
+                        case ARMY_SPELL_INFLUENCE_PARALYZE:
+                        case ARMY_SPELL_INFLUENCE_HYPNOTIZE:
+                        case ARMY_SPELL_INFLUENCE_PETRIFIED:
                             negativeEffectResult = static_cast<i32>(
                                 negativeEffectResult
-                                + RawEffectSpellInfluence(combatTarget, influence)
+                                + RawEffectSpellInfluence(
+                                      combatTarget,
+                                      static_cast<ArmySpellInfluence>(influence)
+                                  )
                                       * gfCancelDurationMods
                                           [combatTarget->m_spellInfluence[influence]
                                                        + fullQuantityWork
@@ -1112,7 +1117,7 @@ void combatManager::EffectSpellCure(i32* effect, i32 targetSide, i32 targetIndex
                                                      + fullQuantityWork]
                             );
                             break;
-                        case IDX(ARMY_SPELL_INFLUENCE_ANTI_MAGIC):
+                        case ARMY_SPELL_INFLUENCE_ANTI_MAGIC:
                             break;
                     }
                 }

@@ -21,14 +21,6 @@
 #include <SOURCE/kbwin.h>
 #include <SOURCE/swapManager.h>
 #include <SOURCE/townManager.h>
-H2_ENUM_CLASS_BEGIN(SwapManagerMessage)
-    COMMAND_HOVER       = 0xc,
-    COMMAND_SELECT      = 0xd,
-    COMMAND_HELP        = 0xe,
-    CONTROL_CLOSE       = 0x7800,
-    SPLIT_MODIFIER_MASK = 3
-H2_ENUM_CLASS_END(SwapManagerMessage)
-
 H2_ENUM_BEGIN(SwapManagerControl)
     CONTROL_LEFT_HERO               = 0x41,
     CONTROL_RIGHT_HERO              = 0x42,
@@ -53,6 +45,8 @@ H2_ENUM_END(SwapManagerControl)
 H2_ENUM_BEGIN(SwapManagerConstant)
     SECONDARY_SKILL_WIDGET_COUNT = 8,
     WINDOW_TEXT_ID               = 0x15,
+    CONTROL_CLOSE                = 0x7800,
+    SPLIT_MODIFIER_MASK          = 3,
     LEFT_PORTRAIT_WIDGET         = 0x41,
     RIGHT_PORTRAIT_WIDGET        = 0x42,
     TITLE_WIDGET                 = 0x4d,
@@ -340,15 +334,15 @@ i32 swapManager::Main(tag_message& message) {
 
         case MESSAGE_WIDGET:
             switch (message.payload.widget.command) {
-                case IDX(COMMAND_SELECT):
+                case WIDGET_COMMAND_DESELECT:
                     if (quickView)
                         break;
                     if (message.payload.widget.id == IDX(CONTROL_CLOSE))
                         closeRequested_5 = 1;
                     break;
 
-                case IDX(COMMAND_HOVER):
-                case IDX(COMMAND_HELP):
+                case WIDGET_COMMAND_SELECT:
+                case WIDGET_COMMAND_ALTERNATE_SELECT:
                     switch (NormalizeSwapControl(message.payload.widget.id)) {
                         case CONTROL_LEFT_SKILL_FIRST:
                         case CONTROL_LEFT_SKILL_LAST:
