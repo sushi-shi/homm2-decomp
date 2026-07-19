@@ -15,8 +15,9 @@ H2_ENUM_BEGIN(SecondarySkillValueTableConstant)
 H2_ENUM_END(SecondarySkillValueTableConstant)
 
 H2_ENUM_BEGIN(ElevationOverlayConstant)
-    ELEVATION_OVERLAY_COUNT      = 25,
-    ELEVATION_OVERLAY_CELL_COUNT = 15
+    ELEVATION_OVERLAY_COUNT           = 25,
+    ELEVATION_OVERLAY_CELL_COUNT      = 15,
+    COMBAT_OBSTACLE_CELL_OFFSET_COUNT = 8
 H2_ENUM_END(ElevationOverlayConstant)
 
 H2_ENUM_BEGIN(TownEligibleBuildMaskConstant)
@@ -38,7 +39,7 @@ struct SCmbtObstacle {
     u32 terrainMask;
     u8 minimumColumn;
     u8 cellCount;
-    i8 cellOffsets[8];
+    i8 cellOffsets[COMBAT_OBSTACLE_CELL_OFFSET_COUNT];
 };
 
 struct SElevationOverlay {
@@ -64,13 +65,20 @@ H2_ENUM_BEGIN(GlobalConstant)
     X_GLOBAL_EXPANSION_HERO_NAME_COUNT      = 6,
     X_GLOBAL_SHORT_SKILL_LEVEL_COUNT        = 4,
     X_GLOBAL_NEW_HERO_ALIGNMENT_COUNT       = 16,
+    X_GLOBAL_PASSWORD_STRING_INDEX_COUNT    = 8,
+    X_GLOBAL_PLAYER_COUNT                   = 6,
     GLOBAL_MAP_NAME_SIZE                    = 0x18,
     GLOBAL_TCP_TEXT_SIZE                    = 0x18,
     GLOBAL_AGGREGATE_PATH_SIZE              = 0x160,
-    GLOBAL_COMMAND_LINE_SIZE                = 0x40
+    GLOBAL_COMMAND_LINE_SIZE                = 0x40,
+    GLOBAL_GAME_PATH_SIZE                   = 0x18,
+    GLOBAL_MAP_PATH_SIZE                    = 0x14,
+    GLOBAL_DRIVER_NAME_SIZE                 = 0x10,
+    GLOBAL_BOTTOM_VIEW_TEXT_SIZE            = 0x98,
+    GLOBAL_SHORT_MAP_NAME_SIZE              = 16,
+    GLOBAL_PLAYER_NAME_SIZE                 = 21,
+    GLOBAL_WINDOW_TEXT_SIZE                 = 0x12c
 H2_ENUM_END(GlobalConstant)
-
-#define X_GLOBAL_PASSWORD_STRING_INDEX_COUNT 8
 
 extern i8 xIsExpansionMap;
 extern i32 xLastChoice;
@@ -132,6 +140,10 @@ H2_ENUM_BEGIN(KbGameTableConstant)
     KB_INTERFACE_VARIANT_COUNT          = 2,
     KB_COMBAT_SPEED_COUNT               = 3,
     KB_COMBAT_FX_COUNT                  = 32,
+    KB_TOWN_COMMAND_COUNT               = 28,
+    KB_HERO_DEFAULT_NAME_COUNT          = 54,
+    KB_ARMY_EFFECT_COUNT                = 20,
+    KB_MUSIC_TRACK_COUNT                = 0x3c,
     KB_ARTIFACT_LEVEL_COUNT             = IDX(ARTIFACT_COUNT) + 1,
     KB_ARTIFACT_BASE_VALUE_COUNT        = IDX(ARTIFACT_COUNT),
     KB_STAT_POWER_COUNT                 = 42,
@@ -321,10 +333,11 @@ H2_ENUM_CLASS_BEGIN(TilesetId)
     ABANDONED_MINE_TILESET_BOTTOM_B = TILESET_MTNGRAS,
     RANDOM_TOWN_OBJECT_TILESET      = TILESET_OBJNTOWN,
     RANDOM_TOWN_OVERLAY_TILESET     = TILESET_OBJNTWSH,
-    RANDOM_TOWN_SOURCE_TILESET      = TILESET_OBJNTWRD
+    RANDOM_TOWN_SOURCE_TILESET      = TILESET_OBJNTWRD,
+    TILESET_COUNT                   = 64
 H2_ENUM_CLASS_END(TilesetId)
 
-extern char* gTilesetFiles[64];
+extern char* gTilesetFiles[IDX(TILESET_COUNT)];
 extern u8 bPuzzleDraw[PUZZLE_DRAW_TABLE_COUNT];
 extern u8 gColorTableLighten[DIM_PALETTE_COLOR_COUNT];
 extern u8 gColorTableNoCycle[DIM_PALETTE_COLOR_COUNT];
@@ -338,9 +351,9 @@ extern u32l gTownEligibleBuildMask[TOWN_ELIGIBLE_BUILD_MASK_COUNT];
 extern u8 giMapSizes[KB_MAP_SIZE_COUNT];
 extern b32 gbUseEvilInterface;
 extern char* cEvilTranslate[KB_INTERFACE_TYPE_COUNT][KB_INTERFACE_VARIANT_COUNT];
-extern char gcAnimPath[0x160];
-extern char gcGamePath[0x18];
-extern char gcMapPath[0x14];
+extern char gcAnimPath[GLOBAL_AGGREGATE_PATH_SIZE];
+extern char gcGamePath[GLOBAL_GAME_PATH_SIZE];
+extern char gcMapPath[GLOBAL_MAP_PATH_SIZE];
 extern b32 gbDontTryRedbook;
 extern b32 gbDontTryMIDI;
 extern b32 gbDontTryDigital;
@@ -481,8 +494,8 @@ extern char* cCombatMessage[KB_COMBAT_MESSAGE_COUNT];
 extern char* cHeroLevel[KB_HERO_LEVEL_TEXT_COUNT];
 extern char* cCombatHelp[KB_COMBAT_HELP_COUNT];
 extern char* cLongCombatHelp[KB_LONG_COMBAT_HELP_COUNT];
-extern char* cTownCommand[28];
-extern char* gHeroDefaultNames[54];
+extern char* cTownCommand[KB_TOWN_COMMAND_COUNT];
+extern char* gHeroDefaultNames[KB_HERO_DEFAULT_NAME_COUNT];
 extern char* gNewGameHelp[KB_NEW_GAME_HELP_COUNT];
 extern char* gSetupBaudHelp[KB_SETUP_BAUD_HELP_COUNT];
 extern char* gSetupComPortHelp[KB_SETUP_COM_PORT_HELP_COUNT];
@@ -564,16 +577,16 @@ extern b32 gbHitEvent;
 extern i32 giMaxExtentX;
 extern i32 giMaxExtentY;
 extern i32 giRandomClouds;
-extern char cOverrideDigitalDriver[0x10];
-extern i8 gArmyEffected[2][20];
+extern char cOverrideDigitalDriver[GLOBAL_DRIVER_NAME_SIZE];
+extern i8 gArmyEffected[COMBAT_CONTROL_SIDE_COUNT][KB_ARMY_EFFECT_COUNT];
 extern b32 gbInCampaign;
 extern i32 giResExtra1;
 extern i32 giResExtra2;
-extern i8 puzzlePiecesRemoved[6];
+extern i8 puzzlePiecesRemoved[IDX(FACTION_COUNT)];
 extern i32 giSeedingValid;
 extern i32 giLimitPlayer;
 extern i32 giShowClouds;
-extern char gcBotViewText[0x98];
+extern char gcBotViewText[GLOBAL_BOTTOM_VIEW_TEXT_SIZE];
 extern i32 giResType1;
 extern b32 gbBlackoutPlayer;
 extern i32 giResType2;
@@ -583,8 +596,8 @@ extern i32 giTCPType;
 extern SpellType gCurLoadedSpellEffect;
 extern i32 giCurTempMobility;
 extern i32 giOverviewReturnAction;
-extern char cOverrideMIDIDriver[0x10];
-extern char gMapName[16];
+extern char cOverrideMIDIDriver[GLOBAL_DRIVER_NAME_SIZE];
+extern char gMapName[GLOBAL_SHORT_MAP_NAME_SIZE];
 extern i32 giMinExtentX;
 extern i32 giMinExtentY;
 extern MultiplayerBaseType iMPBaseType;
@@ -595,18 +608,18 @@ extern class palette* gpBufferPalette;
 extern b32 gbCampaignSideChoice;
 extern i32 giMonthTypeExtra;
 extern i32 iMPExtendedType;
-extern i8 gcColorToSetupPos[8];
+extern i8 gcColorToSetupPos[RADAR_OWNER_COLOR_COUNT];
 extern char gFullMapName[GLOBAL_MAP_NAME_SIZE];
 extern char gcTCPName[GLOBAL_TCP_TEXT_SIZE];
 extern i32 giShowIntro;
 extern i32 giScore;
-extern char gcRegAppPath[0x160];
+extern char gcRegAppPath[GLOBAL_AGGREGATE_PATH_SIZE];
 extern u32l gTimeMark;
 extern char* EXPANSION_AGGREGATE_NAME;
 extern i8 xNetHasOldPlayers;
-extern char cPlayerNames[6][21];
+extern char cPlayerNames[X_GLOBAL_PLAYER_COUNT][GLOBAL_PLAYER_NAME_SIZE];
 extern class icon* gCurLoadedSpellIcon;
-extern u8 bSaveMusicPosition[0x3c];
+extern u8 bSaveMusicPosition[KB_MUSIC_TRACK_COUNT];
 extern char gcTCPAddress[GLOBAL_TCP_TEXT_SIZE];
 extern u8 giSetupGameType;
 extern char gLastFilename[GLOBAL_AGGREGATE_PATH_SIZE];
@@ -614,8 +627,8 @@ extern i32 giFullySeeded;
 extern i32 iCombatControlNetPos[COMBAT_CONTROL_SIDE_COUNT];
 extern char cExpAggPathName[GLOBAL_AGGREGATE_PATH_SIZE];
 extern b32 gbMoveShown;
-extern b8 gbSetupGamePosToRealGamePos[8];
-extern char gcRegCDRomPath[0x160];
+extern b8 gbSetupGamePosToRealGamePos[RADAR_OWNER_COLOR_COUNT];
+extern char gcRegCDRomPath[GLOBAL_AGGREGATE_PATH_SIZE];
 extern class heroWindow* heroWin;
 extern i32 giOverviewReturnActionExtra;
 extern i32 giCurGeneral;
@@ -632,7 +645,7 @@ extern class highScoreManager* gpHighScoreManager;
 extern b32 gbIAmGreatest;
 extern i32 gMapX;
 extern i32 gMapY;
-extern char gcWinText[0x12c];
+extern char gcWinText[GLOBAL_WINDOW_TEXT_SIZE];
 extern i32 bFreshSave;
 extern i32 gLowPageScreenSelector;
 extern i32 giCurWatchPlayer;
@@ -640,6 +653,6 @@ extern char gcCommandLine[GLOBAL_COMMAND_LINE_SIZE];
 extern i32 giMapChangeCtr;
 extern SMapChange sMapChangeQueue[CURSOR_MAP_CHANGE_QUEUE_COUNT];
 extern b32 gbWaitForRemoteReceive;
-extern u8 bMusicIsLooping[0x3c];
+extern u8 bMusicIsLooping[KB_MUSIC_TRACK_COUNT];
 
 #endif
