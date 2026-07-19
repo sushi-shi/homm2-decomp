@@ -9,6 +9,14 @@
 #include <windows.h>
 #include <string.h>
 
+H2_ENUM_BEGIN(VesaBlitConstant)
+    VESA_SCREEN_WIDTH    = 640,
+    VESA_SCREEN_HEIGHT   = 480,
+    ENLARGE_EXTENT_LIMIT = VESA_SCREEN_WIDTH - 3,
+    ENLARGE_PIXEL_GROWTH = 4,
+    NET_BOX_TOP          = 411
+H2_ENUM_END(VesaBlitConstant)
+
 VA(0x004d8540, 0x1e2)
 extern "C" void __fastcall BlitBitmapToScreenVesa(
     bitmap* sourceBitmap,
@@ -22,49 +30,52 @@ extern "C" void __fastcall BlitBitmapToScreenVesa(
     if (gpWindowManager->m_screen != sourceBitmap) {
         i32 row = 0;
         if (height > row) {
-            i32 destinationOffset = destinationY * 640;
+            i32 destinationOffset = destinationY * VESA_SCREEN_WIDTH;
             do {
                 memcpy(
                     gpWindowManager->m_screen->m_pixels + destinationX + destinationOffset,
                     sourceBitmap->m_pixels + sourceX + (sourceY + row) * sourceBitmap->m_width,
                     width
                 );
-                destinationOffset += 640;
+                destinationOffset += VESA_SCREEN_WIDTH;
                 ++row;
             } while (row < height);
         }
     }
 
     if (gbEnlargeScreenBlit != 0 && gConfig.gfx[giCurExe].fullScreen == 0) {
-        if (iMainWinScreenWidth == 640 && iMainWinScreenHeight == 480) {
-            if (width < 640)
+        if (iMainWinScreenWidth == VESA_SCREEN_WIDTH
+            && iMainWinScreenHeight == VESA_SCREEN_HEIGHT) {
+            if (width < VESA_SCREEN_WIDTH)
                 ++width;
-            if (height < 640)
+            if (height < VESA_SCREEN_WIDTH)
                 ++height;
         } else {
             if (destinationX > 0)
                 --destinationX;
             if (destinationY > 0)
                 --destinationY;
-            if (width < 637)
-                width += 4;
-            if (height < 637)
-                height += 4;
+            if (width < ENLARGE_EXTENT_LIMIT)
+                width += ENLARGE_PIXEL_GROWTH;
+            if (height < ENLARGE_EXTENT_LIMIT)
+                height += ENLARGE_PIXEL_GROWTH;
         }
     }
 
     if (gbLeaveNetBoxAlone != 0) {
-        if (destinationY >= 411)
+        if (destinationY >= NET_BOX_TOP)
             return;
-        if (destinationY + height >= 411)
-            height = 411 - destinationY;
+        if (destinationY + height >= NET_BOX_TOP)
+            height = NET_BOX_TOP - destinationY;
     }
 
     RECT invalidRect;
-    invalidRect.left = destinationX * iMainWinScreenWidth / 640;
-    invalidRect.top = destinationY * iMainWinScreenHeight / 480;
-    invalidRect.right = (destinationX + width) * iMainWinScreenWidth / 640 - 1;
-    invalidRect.bottom = (destinationY + height) * iMainWinScreenHeight / 480 - 1;
+    invalidRect.left = destinationX * iMainWinScreenWidth / VESA_SCREEN_WIDTH;
+    invalidRect.top = destinationY * iMainWinScreenHeight / VESA_SCREEN_HEIGHT;
+    invalidRect.right =
+        (destinationX + width) * iMainWinScreenWidth / VESA_SCREEN_WIDTH - 1;
+    invalidRect.bottom =
+        (destinationY + height) * iMainWinScreenHeight / VESA_SCREEN_HEIGHT - 1;
 
     if (InvalidateRect(hwndApp, &invalidRect, 0) == 0)
         LogStr("InvalidateRect Failed");
