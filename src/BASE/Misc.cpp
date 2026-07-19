@@ -174,6 +174,7 @@ H2_ENUM_BEGIN(MiscBlitConstant)
 H2_ENUM_END(MiscBlitConstant)
 
 H2_ENUM_BEGIN(SeededRandomConstant)
+    INITIAL_SEED               = 0x08156a03,
     RANDOM_TERM_MULTIPLIER     = 13,
     RANDOM_TERM_MASK           = 0xFF,
     RANDOM_HIGH_TERM_SHIFT     = 5,
@@ -222,7 +223,7 @@ DATA(0x0051dcf0) i32 giTotalMemAllocated = 0;
 DATA(0x0051dcf8) u8
     giChangeThreshold[FADE_CHANGE_THRESHOLD_COUNT] =
         {0, 1, 2, 3, 4, 6, 8, 10, 13, 16, 19, 22, 26, 31, 37, 46};
-DATA(0x0051dd08) i32 iLastSeed = 0x08156a03;
+DATA(0x0051dd08) i32 iLastSeed = INITIAL_SEED;
 DATA(0x0051dd0c) static char gMemEntryTag[sizeof("IME")] = "IME";
 
 DATA(0x0051dd10) static SMiscText gMiscText = {
