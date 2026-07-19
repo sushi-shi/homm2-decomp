@@ -221,7 +221,7 @@ def _review_rows(magic: list[dict]) -> list[dict]:
     missing = sorted(expected - set(actual))
     extra = sorted(set(actual) - expected)
     invalid = sorted((row.get("path", ""), row.get("status", "")) for row in rows
-                     if row.get("status") not in ("pending", "reviewed"))
+                     if row.get("status") not in ("pending", "reviewed", "third-party"))
     if duplicates or missing or extra or invalid:
         raise RuntimeError(
             "invalid constants review manifest: "
@@ -240,8 +240,12 @@ def _summary(lexical: list[Literal], magic: list[dict], null_zero: list[dict],
              review: list[dict]) -> str:
     lexical_categories = Counter(item.category for item in lexical)
     magic_categories = Counter(item["category"] for item in magic)
+    pending = {row["path"] for row in review if row["status"] == "pending"}
     by_file = Counter(item["path"] for item in magic
-                      if item["category"] in ("code", "local-table", "declaration"))
+                      if item["path"] in pending
+                      and item["category"] in ("code", "local-table", "declaration"))
+    reviewed = sum(row["status"] == "reviewed" for row in review)
+    third_party = sum(row["status"] == "third-party" for row in review)
     lines = [
         "# Constants audit",
         "",
@@ -252,7 +256,9 @@ def _summary(lexical: list[Literal], magic: list[dict], null_zero: list[dict],
         f"- Numeric tokens: {len(lexical)}",
         f"- Semantic magic-number findings: {len(magic)}",
         f"- Remaining numeric null-pointer spellings: {len(null_zero)}",
-        f"- Files reviewed: {sum(row['status'] == 'reviewed' for row in review)}/{len(review)}",
+        f"- Files resolved: {reviewed + third_party}/{len(review)}",
+        f"- Reconstructed files reviewed: {reviewed}",
+        f"- Third-party files retained: {third_party}",
         "",
         "## Numeric tokens by context",
         "",

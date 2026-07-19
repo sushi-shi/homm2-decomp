@@ -52,6 +52,25 @@ i32 Function(i32 value) {
             "context": "return 12;",
         }])
 
+    def test_summary_resolves_third_party_without_queuing_its_literals(self):
+        magic = [
+            {"path": "src/pending.cpp", "category": "code"},
+            {"path": "src/imported.cpp", "category": "code"},
+        ]
+        review = [
+            {"path": "src/reviewed.cpp", "status": "reviewed"},
+            {"path": "src/pending.cpp", "status": "pending"},
+            {"path": "src/imported.cpp", "status": "third-party"},
+        ]
+
+        summary = constants_audit._summary([], magic, [], review)
+
+        self.assertIn("Files resolved: 2/3", summary)
+        self.assertIn("Reconstructed files reviewed: 1", summary)
+        self.assertIn("Third-party files retained: 1", summary)
+        self.assertIn("`src/pending.cpp`", summary)
+        self.assertNotIn("`src/imported.cpp`", summary)
+
 
 if __name__ == "__main__":
     unittest.main()
