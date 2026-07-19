@@ -10,9 +10,16 @@ class playerData;
 class searchArray;
 class town;
 
+H2_ENUM_CLASS_BEGIN(AIPurchaseType)
+    PURCHASE_NONE     = -1,
+    PURCHASE_BUILDING = 0,
+    PURCHASE_HERO     = 1,
+    PURCHASE_CREATURE = 2
+H2_ENUM_CLASS_END(AIPurchaseType)
+
 struct BHC {
     town* pTown;
-    i32 type;
+    AIPurchaseType type;
     i32 what;
     i32 num;
 };

@@ -7,18 +7,6 @@
 #include <SOURCE/KB.h>
 #include <string.h>
 
-H2_ENUM_CLASS_BEGIN(SampleAudioFormat)
-    FORMAT_8_BIT  = 0,
-    FORMAT_16_BIT = 1,
-    FORMAT_STEREO = 2
-H2_ENUM_CLASS_END(SampleAudioFormat)
-
-H2_ENUM_CLASS_BEGIN(SamplePlaybackRate)
-    RATE_11025 = 11025,
-    RATE_22050 = 22050,
-    RATE_44100 = 44100
-H2_ENUM_CLASS_END(SamplePlaybackRate)
-
 H2_ENUM_BEGIN(SampleConstant)
     FILENAME_CAPACITY    = 32,
     FORMAT_SUFFIX_LENGTH = 3
@@ -35,11 +23,11 @@ sample::sample(char* name, i32l channelType, i32l volume, i32l loopCount)
         RESOURCE_REFERENCE_INITIAL,
         NULL
     ) {
-    i32 formatFlags;
+    SampleAudioFormat formatFlags;
     m_playbackData.channelType = channelType;
     m_playbackData.volume = volume;
     m_playbackData.loopCount = loopCount;
-    formatFlags = IDX(FORMAT_STEREO);
+    formatFlags = FORMAT_STEREO;
 
     char filename[FILENAME_CAPACITY];
     strcpy(filename, name);
@@ -48,27 +36,27 @@ sample::sample(char* name, i32l channelType, i32l volume, i32l loopCount)
     for (i32 i = 0; i < FORMAT_SUFFIX_LENGTH; i++) {
         switch (filename[i]) {
             case '1':
-                m_playbackData.sampleRate = IDX(RATE_11025);
+                m_playbackData.sampleRate = RATE_11025;
                 break;
             case '2':
-                m_playbackData.sampleRate = IDX(RATE_22050);
+                m_playbackData.sampleRate = RATE_22050;
                 break;
             case '4':
-                m_playbackData.sampleRate = IDX(RATE_44100);
+                m_playbackData.sampleRate = RATE_44100;
                 break;
             case '6':
-                m_playbackData.format = IDX(FORMAT_16_BIT);
+                m_playbackData.format = FORMAT_16_BIT;
                 break;
             case '8':
-                m_playbackData.format = IDX(FORMAT_8_BIT);
+                m_playbackData.format = FORMAT_8_BIT;
                 break;
             case 'M':
             case 'm':
-                formatFlags = 0;
+                formatFlags = FORMAT_MONO;
                 break;
         }
     }
-    m_playbackData.format += formatFlags;
+    m_playbackData.format |= formatFlags;
 
     u32l size = gpResourceManager->GetFileSize(m_id);
 #line 57

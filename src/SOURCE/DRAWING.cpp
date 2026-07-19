@@ -581,8 +581,8 @@ void combatManager::DrawBackground(void) {
         );
         gpResourceManager->Dispose(backgroundIcon);
     }
-    if (m_battlefieldFringe != -1) {
-        sprintf(gText, "frng%04d.icn", m_battlefieldFringe);
+    if (m_battlefieldFringe != FRINGE_NONE) {
+        sprintf(gText, "frng%04d.icn", IDX(m_battlefieldFringe));
         backgroundIcon = gpResourceManager->GetIcon(gText);
         if (m_inCastleCombat != 0)
             IconToBitmap(

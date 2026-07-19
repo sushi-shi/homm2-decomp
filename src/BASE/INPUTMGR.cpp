@@ -95,23 +95,27 @@ i32 KeyboardMessageHandler(void*, u32 message, u32, i32l messageData) {
             event->payload.keyboard.modifiers = 0;
             switch (event->payload.keyboard.keyCode) {
                 case INPUT_SCAN_CONTROL:
-                    gpInputManager->m_modifiers &= IDX(CLEAR_CONTROL_MASK);
+                    gpInputManager->m_modifiers &=
+                        static_cast<MessageModifier>(IDX(CLEAR_CONTROL_MASK));
                     break;
                 case INPUT_SCAN_LEFT_SHIFT:
-                    gpInputManager->m_modifiers &= IDX(CLEAR_LEFT_SHIFT_MASK);
+                    gpInputManager->m_modifiers &=
+                        static_cast<MessageModifier>(IDX(CLEAR_LEFT_SHIFT_MASK));
                     break;
                 case INPUT_SCAN_RIGHT_SHIFT:
-                    gpInputManager->m_modifiers &= IDX(CLEAR_RIGHT_SHIFT_MASK);
+                    gpInputManager->m_modifiers &=
+                        static_cast<MessageModifier>(IDX(CLEAR_RIGHT_SHIFT_MASK));
                     break;
                 case INPUT_SCAN_ALT:
-                    gpInputManager->m_modifiers &= IDX(CLEAR_ALT_MASK);
+                    gpInputManager->m_modifiers &=
+                        static_cast<MessageModifier>(IDX(CLEAR_ALT_MASK));
                     break;
             }
             break;
     }
 
     if (event->type != MESSAGE_NONE) {
-        event->payload.keyboard.modifiers = gpInputManager->m_modifiers;
+        event->payload.keyboard.modifiers = IDX(gpInputManager->m_modifiers);
         gpInputManager->m_writeIndex++;
         gpInputManager->m_writeIndex %= IDX(INPUT_EVENT_RING_CAPACITY);
         if (gpInputManager->m_writeIndex == gpInputManager->m_readIndex) {
@@ -232,7 +236,7 @@ afterMouseCoordinates:
     }
 
     if (event->type != MESSAGE_NONE) {
-        event->payload.mouse.modifiers = gpInputManager->m_modifiers;
+        event->payload.mouse.modifiers = IDX(gpInputManager->m_modifiers);
         gpInputManager->m_writeIndex++;
         gpInputManager->m_writeIndex %= IDX(INPUT_EVENT_RING_CAPACITY);
         i32 readIndex = gpInputManager->m_readIndex;
@@ -269,7 +273,7 @@ i32 inputManager::Open(i32 priority) {
     memset(m_eventRing, 0, sizeof(m_eventRing));
     ResetEventQueue(this);
     m_requestedPriority = priority;
-    m_modifiers = 0;
+    m_modifiers = MESSAGE_MODIFIER_NONE;
     MakeScanCodeTable();
     m_messageMask = BASE_MANAGER_ACCEPT_MOUSE_MOVE;
     m_priority = INPUT_MANAGER_PRIORITY;
@@ -561,7 +565,7 @@ void inputManager::ForceMouseMove(void) {
     gpMouseManager->MouseCoords(event->payload.mouse.x, event->payload.mouse.y);
     event->payload.mouse.screenX = event->payload.mouse.x;
     event->payload.mouse.screenY = event->payload.mouse.y;
-    event->payload.mouse.modifiers = gpInputManager->m_modifiers;
+    event->payload.mouse.modifiers = IDX(gpInputManager->m_modifiers);
     gpInputManager->m_writeIndex++;
     gpInputManager->m_writeIndex %= IDX(INPUT_EVENT_RING_CAPACITY);
     if (gpInputManager->m_writeIndex == gpInputManager->m_readIndex) {

@@ -33,6 +33,7 @@ H2_ENUM_CLASS_BEGIN(ConfigWalkSpeed)
     CONFIG_WALK_SPEED_INSTANT = 4,
     CONFIG_WALK_SPEED_COUNT   = 5
 H2_ENUM_CLASS_END(ConfigWalkSpeed)
+H2_ENUM_STEPPED(ConfigWalkSpeed)
 
 H2_ENUM_CLASS_BEGIN(ConfigExecutable)
     CONFIG_EXECUTABLE_GAME   = 0,
@@ -58,8 +59,8 @@ H2_ENUM_CLASS_BEGIN(ConfigConnectionType)
 H2_ENUM_CLASS_END(ConfigConnectionType)
 
 struct configStruct {
-    i32 computerWalkSpeed;
-    i32 walkSpeed;
+    ConfigWalkSpeed computerWalkSpeed;
+    ConfigWalkSpeed walkSpeed;
     i32 musicVolume;
     i32 soundVolume;
     i32 autosave;
@@ -86,7 +87,7 @@ struct configStruct {
     i32 comPort[IDX(CONFIG_CONNECTION_COUNT)];
     i32 baudRate[IDX(CONFIG_CONNECTION_COUNT)];
     char uniqueSystemID[CONFIG_UNIQUE_SYSTEM_ID_SIZE];
-    i32 useOpera;
+    ConfigOperaMode useOpera;
     i32 quickCombatLevel;
     i32 combatSpeed;
     i32 autoCombatUseSpells;

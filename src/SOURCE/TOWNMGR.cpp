@@ -73,15 +73,6 @@ H2_ENUM_CLASS_BEGIN(TownObjectRenderMask)
     RENDER_DOCK_GATE                  = 0x4000
 H2_ENUM_CLASS_END(TownObjectRenderMask)
 
-H2_ENUM_BEGIN(TownManagerArmyCommand)
-    ARMY_COMMAND_SELECT    = 0,
-    ARMY_COMMAND_VIEW      = 1,
-    ARMY_COMMAND_MERGE     = 2,
-    ARMY_COMMAND_SWAP      = 3,
-    ARMY_COMMAND_VIEW_HERO = 4,
-    ARMY_COMMAND_SPLIT     = 5
-H2_ENUM_END(TownManagerArmyCommand)
-
 H2_ENUM_CLASS_BEGIN(TownCommandTextId)
     TEXT_REDISTRIBUTE_ARMY          = 0,
     TEXT_CANNOT_COMBINE_LAST_ARMY   = 1,
@@ -842,7 +833,7 @@ void townManager::SetArmyCommand(i32 qualifier) {
     i32 cantMoveLastArmy;
     i32 sameType;
 
-    m_command = TOWN_WIDGET_ID_NONE;
+    m_command = ARMY_COMMAND_NONE;
     cantMoveLastArmy = 0;
     if (m_swapStrip->m_army->GetNumArmies() == 1 && &m_swapStrip[0] == m_heroStrip
         && m_pendingStrip != m_swapStrip)
@@ -891,7 +882,7 @@ void townManager::SetArmyCommand(i32 qualifier) {
         }
     }
 
-    if (m_command != TOWN_WIDGET_ID_NONE)
+    if (m_command != ARMY_COMMAND_NONE)
         return;
     if (m_pendingStrip->m_army->m_creatureTypes[m_pendingArmySlot] == ARMY_GROUP_EMPTY_SLOT) {
         if (cantMoveLastArmy) {
@@ -920,7 +911,7 @@ VA(0x0041531b, 0x5c5)
 void townManager::SetCommandAndText(struct tag_message& message) {
     i32 objectId = message.payload.widget.id;
 
-    m_command = TOWN_WIDGET_ID_NONE;
+    m_command = ARMY_COMMAND_NONE;
     switch (objectId) {
         case IDX(CONTROL_CLOSE):
             strcpy(m_statusText, cTownCommand[IDX(TEXT_EXIT)]);
@@ -975,7 +966,7 @@ void townManager::SetCommandAndText(struct tag_message& message) {
                     || m_selectedStrip->m_army->m_creatureTypes[m_selectedArmySlot]
                            == ARMY_GROUP_EMPTY_SLOT) {
                     strcpy(m_statusText, cTownCommand[IDX(TEXT_EMPTY_SLOT)]);
-                    m_command = TOWN_WIDGET_ID_NONE;
+                    m_command = ARMY_COMMAND_NONE;
                 } else {
                     sprintf(
                         m_statusText,
@@ -1668,21 +1659,21 @@ i32 townManager::Main(tag_message& message) {
 }
 
 VA(0x0041718d, 0x4e3)
-void townManager::DoCommand(i32 command) {
+void townManager::DoCommand(TownManagerArmyCommand command) {
     hero* viewedHero;
     i32 dismissAllowed;
     i32 slot;
     i32 oldValue;
 
     switch (command) {
-        case IDX(ARMY_COMMAND_SELECT):
+        case ARMY_COMMAND_SELECT:
             m_swapStrip = m_selectedStrip;
             m_swapArmySlot = m_selectedArmySlot;
             m_swapStrip->m_selectedSlot = m_swapArmySlot;
             m_swapStrip->Draw();
             break;
 
-        case IDX(ARMY_COMMAND_VIEW):
+        case ARMY_COMMAND_VIEW:
             if (m_selectedStrip == m_heroStrip)
                 viewedHero = gpGame->GetHero(m_town->m_occupyingHeroId);
             else
@@ -1714,7 +1705,7 @@ void townManager::DoCommand(i32 command) {
             ResetStrips();
             break;
 
-        case IDX(ARMY_COMMAND_MERGE):
+        case ARMY_COMMAND_MERGE:
             if (m_pendingStrip != m_swapStrip
                 && m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot]
                        != m_pendingStrip->m_army->m_creatureTypes[m_pendingArmySlot]) {
@@ -1734,7 +1725,7 @@ void townManager::DoCommand(i32 command) {
             ResetStrips();
             break;
 
-        case IDX(ARMY_COMMAND_SWAP):
+        case ARMY_COMMAND_SWAP:
             oldValue = m_pendingStrip->m_army->m_creatureCounts[m_pendingArmySlot];
             m_pendingStrip->m_army->m_creatureCounts[m_pendingArmySlot] =
                 m_swapStrip->m_army->m_creatureCounts[m_swapArmySlot];
@@ -1746,13 +1737,13 @@ void townManager::DoCommand(i32 command) {
             ResetStrips();
             break;
 
-        case IDX(ARMY_COMMAND_VIEW_HERO):
+        case ARMY_COMMAND_VIEW_HERO:
             HeroView(m_town->m_occupyingHeroId, 1, 0);
             RedrawTownScreen();
             gpWindowManager->FadeScreen(0, 8, NULL);
             break;
 
-        case IDX(ARMY_COMMAND_SPLIT):
+        case ARMY_COMMAND_SPLIT:
             SplitArmy();
             ResetStrips();
             break;

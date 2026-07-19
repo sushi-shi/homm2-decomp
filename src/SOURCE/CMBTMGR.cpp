@@ -123,22 +123,6 @@ H2_ENUM_CLASS_BEGIN(BattlefieldBackgroundIndex)
     BACKGROUND_BEACH       = 16
 H2_ENUM_CLASS_END(BattlefieldBackgroundIndex)
 
-H2_ENUM_CLASS_BEGIN(BattlefieldFringeFrame)
-    FRINGE_NONE        = -1,
-    FRINGE_BEACH       = 2,
-    FRINGE_WASTELAND   = 3,
-    FRINGE_DESERT      = 4,
-    FRINGE_LAVA        = 5,
-    FRINGE_SNOW_TREES  = 6,
-    FRINGE_SNOW        = 7,
-    FRINGE_SWAMP       = 8,
-    FRINGE_DIRT        = 9,
-    FRINGE_DIRT_TREES  = 10,
-    FRINGE_GRASS       = 11,
-    FRINGE_GRASS_TREES = 12,
-    FRINGE_WATER       = 13
-H2_ENUM_CLASS_END(BattlefieldFringeFrame)
-
 H2_ENUM_CLASS_BEGIN_T(NearbyFeature, i8)
     NEARBY_UNKNOWN  = -1,
     NEARBY_MOUNTAIN = 0,
@@ -717,62 +701,62 @@ VA(0x004919a6, 0x224)
 char* combatManager::GetBackgroundName(void) {
     BattlefieldBackgroundIndex backgroundIndex;
     m_colorCycleType = WINDOW_COLOR_CYCLE_COMBAT;
-    m_battlefieldFringe = IDX(FRINGE_NONE);
+    m_battlefieldFringe = FRINGE_NONE;
     switch (m_terrainType) {
         case IDX(TERRAIN_WATER):
             backgroundIndex = BACKGROUND_WATER;
-            m_battlefieldFringe = IDX(FRINGE_WATER);
+            m_battlefieldFringe = FRINGE_WATER;
             break;
         case IDX(TERRAIN_GRASS):
             if (MoreTreesNear()) {
                 backgroundIndex = BACKGROUND_GRASS_TREES;
-                m_battlefieldFringe = IDX(FRINGE_GRASS_TREES);
+                m_battlefieldFringe = FRINGE_GRASS_TREES;
             } else {
                 backgroundIndex = BACKGROUND_GRASS;
-                m_battlefieldFringe = IDX(FRINGE_GRASS);
+                m_battlefieldFringe = FRINGE_GRASS;
             }
             break;
         case IDX(TERRAIN_SNOW):
             m_colorCycleType = WINDOW_COLOR_CYCLE_COMBAT_ALTERNATE;
             if (MoreTreesNear()) {
                 backgroundIndex = BACKGROUND_SNOW_TREES;
-                m_battlefieldFringe = IDX(FRINGE_SNOW_TREES);
+                m_battlefieldFringe = FRINGE_SNOW_TREES;
             } else {
                 backgroundIndex = BACKGROUND_SNOW;
-                m_battlefieldFringe = IDX(FRINGE_SNOW);
+                m_battlefieldFringe = FRINGE_SNOW;
             }
             break;
         case IDX(TERRAIN_SWAMP):
             backgroundIndex = BACKGROUND_SWAMP;
-            m_battlefieldFringe = IDX(FRINGE_SWAMP);
+            m_battlefieldFringe = FRINGE_SWAMP;
             break;
         case IDX(TERRAIN_LAVA):
             backgroundIndex = BACKGROUND_LAVA;
-            m_battlefieldFringe = IDX(FRINGE_LAVA);
+            m_battlefieldFringe = FRINGE_LAVA;
             break;
         case IDX(TERRAIN_DESERT):
             m_colorCycleType = WINDOW_COLOR_CYCLE_COMBAT_ALTERNATE;
             backgroundIndex = BACKGROUND_DESERT;
-            m_battlefieldFringe = IDX(FRINGE_DESERT);
+            m_battlefieldFringe = FRINGE_DESERT;
             break;
         case IDX(TERRAIN_DIRT):
             if (MoreTreesNear()) {
                 backgroundIndex = BACKGROUND_DIRT_TREES;
-                m_battlefieldFringe = IDX(FRINGE_DIRT_TREES);
+                m_battlefieldFringe = FRINGE_DIRT_TREES;
             } else {
                 backgroundIndex = BACKGROUND_DIRT;
-                m_battlefieldFringe = IDX(FRINGE_DIRT);
+                m_battlefieldFringe = FRINGE_DIRT;
             }
             break;
         case IDX(TERRAIN_WASTELAND):
             m_colorCycleType = WINDOW_COLOR_CYCLE_COMBAT_ALTERNATE;
             backgroundIndex = BACKGROUND_WASTELAND;
-            m_battlefieldFringe = IDX(FRINGE_WASTELAND);
+            m_battlefieldFringe = FRINGE_WASTELAND;
             break;
         case IDX(TERRAIN_BEACH):
             m_colorCycleType = WINDOW_COLOR_CYCLE_COMBAT_ALTERNATE;
             backgroundIndex = BACKGROUND_BEACH;
-            m_battlefieldFringe = IDX(FRINGE_BEACH);
+            m_battlefieldFringe = FRINGE_BEACH;
             break;
         default:
             backgroundIndex = BACKGROUND_WATER;

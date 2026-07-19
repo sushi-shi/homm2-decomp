@@ -40,34 +40,6 @@ H2_ENUM_CLASS_BEGIN(ExpansionCampaignAward)
     AWARD_SPHERE_NEGATION     = 10
 H2_ENUM_CLASS_END(ExpansionCampaignAward)
 
-H2_ENUM_BEGIN(ExpansionCampaignMap)
-    MAP_NONE                  = -1,
-    MAP_POL_UPRISING          = 0,
-    MAP_POL_ISLAND_OF_CHAOS   = 1,
-    MAP_POL_ARROWS_FLIGHT     = 2,
-    MAP_POL_ABYSS             = 3,
-    MAP_POL_GIANTS_PASS       = 4,
-    MAP_POL_AURORA_BOREALIS   = 5,
-    MAP_POL_BETRAYALS_END     = 6,
-    MAP_POL_CORRUPTIONS_HEART = 7,
-    MAP_DES_CONQUER_AND_UNIFY = 0,
-    MAP_DES_BORDER_TOWNS      = 1,
-    MAP_DES_WAYWARD_SON       = 2,
-    MAP_DES_UNCLE_IVAN        = 3,
-    MAP_DES_SOUTHERN_WAR      = 4,
-    MAP_DES_IVORY_GATES       = 5,
-    MAP_DES_ELVEN_LANDS       = 6,
-    MAP_DES_EPIC_BATTLE       = 7,
-    MAP_WIZ_SHROUDED_ISLES    = 0,
-    MAP_WIZ_ETERNAL_SCROLLS   = 1,
-    MAP_WIZ_POWERS_END        = 2,
-    MAP_WIZ_FOUNT_OF_WIZARDRY = 3,
-    MAP_VOY_STRANDED          = 0,
-    MAP_VOY_PIRATE_ISLES      = 1,
-    MAP_VOY_KING_AND_COUNTRY  = 2,
-    MAP_VOY_BLOOD_IS_THICKER  = 3
-H2_ENUM_END(ExpansionCampaignMap)
-
 H2_ENUM_BEGIN(ExpansionCampaignSmacker)
     SMACKER_POL_INTRO             = 0x27,
     SMACKER_POL_UPRISING          = 0x28,
@@ -359,7 +331,7 @@ void ExpCampaign::SetMapWasPlayed(void) {
 }
 
 VA(0x004bb7e9, 0x5a)
-void ExpCampaign::InitNewCampaign(i32 campaignId) {
+void ExpCampaign::InitNewCampaign(ExpansionCampaignId campaignId) {
     m_campaignId = campaignId;
     m_currentMap = -1;
     m_mapCount = expansionCampaignMapCounts[campaignId];
