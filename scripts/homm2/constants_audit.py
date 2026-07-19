@@ -12,10 +12,10 @@ from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
 
-from homm2.enum_types.census import ROOT as REPO
-from homm2.enum_types.census import _lex, parse_declarations
+from homm2.constants_syntax import lex, parse_enum_declarations
 
 
+REPO = next(path for path in Path(__file__).resolve().parents if (path / "flake.nix").exists())
 OUTPUT = REPO / "build" / "constants"
 DATABASE = REPO / "build" / "clangd" / "compile_commands.json"
 REVIEW_MANIFEST = REPO / "config" / "constants_review.tsv"
@@ -78,9 +78,9 @@ def _context_category(stack: list[str]) -> str:
 def lexical_inventory(path: Path) -> list[Literal]:
     text = path.read_text(errors="replace")
     lines = text.splitlines()
-    tokens = _lex(text)
+    tokens = lex(text)
     enum_lines = set()
-    for declaration in parse_declarations(path, text):
+    for declaration in parse_enum_declarations(path, text):
         enum_lines.update(range(declaration.line, declaration.end_line + 1))
 
     relative = str(path.relative_to(REPO))
