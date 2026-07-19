@@ -109,7 +109,7 @@ include/SOURCE/advManager.h	reviewed	Adventure-manager public layout, locator an
 include/SOURCE/army.h	reviewed	Cross-TU attack-target, path-target, facing, and invalid-hex domains are named enums; array extents are named and the remaining literal is proven class SIZE evidence.
 include/SOURCE/armyGroup.h	reviewed	Army slot/race extents, empty sentinel, random scale, and morale bounds are a shared aligned enum used throughout the packed public layout; the remaining literal is SIZE evidence.
 include/SOURCE/bankBox.h	reviewed	The bank-box public class contains named fields and methods only; its sole numeric literal is proven packed class-layout SIZE evidence.
-include/SOURCE/combatManager.h	pending
+include/SOURCE/combatManager.h	reviewed	Combat castle, grid, AI, spell, catapult, runtime, UI, side/army, message, padding, transfer, and serialized layout domains are named; repeated side and army dimensions derive from shared counts, integral macros were converted to aligned enums, and floating-point algorithm parameters remain named macros or typed constants.
 include/SOURCE/comwin.h	reviewed	COM-port flexible payload heads and packed runtime gaps use named extents; the remaining literal is packed state SIZE evidence.
 include/SOURCE/dimPalette.h	reviewed	Shared dim-palette set, level, and color extents are named and drive the public lookup-table declaration.
 include/SOURCE/dpnetwin.h	reviewed	DirectPlay buffer, mapping, session, player, timeout, retry, and transport extents are named shared constants; extern arrays use their named extents and the remaining literal is packed SIZE evidence.
