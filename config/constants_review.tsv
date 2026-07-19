@@ -105,7 +105,7 @@ include/SOURCE/VIEW.h	reviewed	The general-view interface contains declarations 
 include/SOURCE/Viewwrld.h	reviewed	View-world modes, scales, and their map-size boundaries are explicit aligned enums; the handler declaration contains no other numeric policy.
 include/SOURCE/Wsnetwin.h	reviewed	Winsock buffer, address, player, port, retry, and timing values are a shared aligned enum used by the packed startup payload and extern storage; the remaining literal is SIZE evidence.
 include/SOURCE/X_GLOBAL.h	reviewed	Global serialized/runtime tables, text catalogs, graphics, paths, drivers, networking, players, music, and UI storage use named shared domains; integral password-index storage was folded into the enum and faction/color dimensions derive from canonical counts.
-include/SOURCE/advManager.h	pending
+include/SOURCE/advManager.h	reviewed	Adventure-manager public layout, locator and bottom-view unions, icons, bounds, sound/sample tables, movement/view-world tables, animation matrices, padding, and string storage use named shared domains; the prior integral animation-size macro was folded into the enum.
 include/SOURCE/army.h	reviewed	Cross-TU attack-target, path-target, facing, and invalid-hex domains are named enums; array extents are named and the remaining literal is proven class SIZE evidence.
 include/SOURCE/armyGroup.h	reviewed	Army slot/race extents, empty sentinel, random scale, and morale bounds are a shared aligned enum used throughout the packed public layout; the remaining literal is SIZE evidence.
 include/SOURCE/bankBox.h	reviewed	The bank-box public class contains named fields and methods only; its sole numeric literal is proven packed class-layout SIZE evidence.

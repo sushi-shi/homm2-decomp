@@ -22,51 +22,70 @@ struct SAMPLE2;
 struct SMapChange;
 struct tag_message;
 
-#define ADVMGR_MONSTER_ANIMATION_TABLE_SIZE 18
-
 struct adventureSoundCell {
     AdventureEnvironmentSoundId soundId;
     i32 volume;
 };
+
+H2_ENUM_BEGIN(AdventureManagerStorageConstant)
+    ADVMGR_LOCATOR_STATE_COUNT           = 12,
+    ADVMGR_BOTTOM_VIEW_ITEM_COUNT        = 5,
+    ADVMGR_BOTTOM_VIEW_ICON_PADDING_SIZE = 0x14,
+    ADVMGR_BOTTOM_VIEW_TEXT_PADDING_SIZE = 0x18,
+    ADVMGR_RUNTIME_ALIGNMENT_SIZE        = 4,
+    ADVMGR_OBJECT_ICON_COUNT             = 64,
+    ADVMGR_VIEW_BOUND_COUNT              = 4,
+    ADVMGR_HERO_ICON_COUNT               = 8,
+    ADVMGR_PLAYER_FLAG_ICON_COUNT        = 6,
+    ADVMGR_ACTIVE_SOUND_COUNT            = 4,
+    ADVMGR_CURSOR_SAMPLE_COUNT           = 9,
+    ADVMGR_STEP_PIXEL_COUNT              = 6,
+    ADVMGR_STEP_DELAY_COUNT              = 5,
+    ADVMGR_VIEW_WORLD_SCALE_COUNT        = 3,
+    ADVMGR_VIEW_WORLD_TERRAIN_COUNT      = 6,
+    ADVMGR_VIEW_WORLD_HALF_COUNT         = 2,
+    ADVMGR_ARMY_SIZE_NAME_SIZE           = 12,
+    ADVMGR_MONSTER_ANIMATION_TABLE_SIZE  = 18
+H2_ENUM_END(AdventureManagerStorageConstant)
 
 #pragma pack(push, 1)
 class advManager : public baseManager {
 public:
     AdventureCommand m_selectedCell;
     union {
-        i32 m_heroLocatorState[12];
-        class widget* m_bottomViewPrimaryWidgets[12];
+        i32 m_heroLocatorState[ADVMGR_LOCATOR_STATE_COUNT];
+        class widget* m_bottomViewPrimaryWidgets[ADVMGR_LOCATOR_STATE_COUNT];
         struct {
             class iconWidget* m_bottomViewBackground;
             class iconWidget* m_bottomViewHourglassBackground;
-            class iconWidget* m_bottomViewIcons[5];
-            char m_bottomViewIconPadding[0x14];
+            class iconWidget* m_bottomViewIcons[ADVMGR_BOTTOM_VIEW_ITEM_COUNT];
+            char m_bottomViewIconPadding[ADVMGR_BOTTOM_VIEW_ICON_PADDING_SIZE];
         };
     };
     union {
-        i32 m_townLocatorState[12];
-        class widget* m_bottomViewSecondaryWidgets[12];
-        class textWidget* m_bottomViewAllTexts[12];
+        i32 m_townLocatorState[ADVMGR_LOCATOR_STATE_COUNT];
+        class widget* m_bottomViewSecondaryWidgets[ADVMGR_LOCATOR_STATE_COUNT];
+        class textWidget* m_bottomViewAllTexts[ADVMGR_LOCATOR_STATE_COUNT];
         struct {
             i32 m_bottomViewTextReserved;
-            class textWidget* m_bottomViewTexts[5];
-            char m_bottomViewTextPadding[0x18];
+            class textWidget* m_bottomViewTexts[ADVMGR_BOTTOM_VIEW_ITEM_COUNT];
+            char m_bottomViewTextPadding[ADVMGR_BOTTOM_VIEW_TEXT_PADDING_SIZE];
         };
     };
     class heroWindow* m_adventureWindow;
     u16* m_visibilityMap;
     i32 m_visibilityMapValid;
     i32 m_currentTerrain;
-    char _pad_0xaa[0x4];
+    char _pad_0xaa[ADVMGR_RUNTIME_ALIGNMENT_SIZE];
     class fullMap* m_mapData;
     class iconWidget* m_scrollLeftButton;
     class iconWidget* m_scrollRightButton;
     u8* m_adventureBorder;
-    char _pad_0xbe[0x4];
+    char _pad_0xbe[ADVMGR_RUNTIME_ALIGNMENT_SIZE];
     class tileset* m_groundTiles;
     class tileset* m_cloudTiles;
     class tileset* m_stoneTiles;
-    class icon* m_objectIcons[64];
+    class icon* m_objectIcons[ADVMGR_OBJECT_ICON_COUNT];
     class icon* m_puzzleIcon;
     class icon* m_cloudOverlayIcon;
     i32 m_mapOriginX;
@@ -82,12 +101,12 @@ public:
     i32 m_updateMaxX;
     i32 m_updateMaxY;
     i32 m_updatePending;
-    i32 m_viewBounds[4];
-    class icon* m_heroIcons[8];
+    i32 m_viewBounds[ADVMGR_VIEW_BOUND_COUNT];
+    class icon* m_heroIcons[ADVMGR_HERO_ICON_COUNT];
     class icon* m_shadowIcon;
     class icon* m_boatShadowIcon;
-    class icon* m_flagIcons[6];
-    class icon* m_boatFlagIcons[6];
+    class icon* m_flagIcons[ADVMGR_PLAYER_FLAG_ICON_COUNT];
+    class icon* m_boatFlagIcons[ADVMGR_PLAYER_FLAG_ICON_COUNT];
     i32 m_cursorActive;
     i32 m_drawHeroShadows;
     i32 m_cursorType;
@@ -108,9 +127,9 @@ public:
     i32 m_lastQuickViewY;
     i32 m_mineGuardianFacingLeft;
     i32 m_activeSoundMask;
-    adventureSoundCell m_activeSounds[4];
-    class sample* m_loopingSamples[28];
-    class sample* m_cursorSamples[9];
+    adventureSoundCell m_activeSounds[ADVMGR_ACTIVE_SOUND_COUNT];
+    class sample* m_loopingSamples[IDX(ADVMGR_ENVIRONMENT_SOUND_COUNT)];
+    class sample* m_cursorSamples[ADVMGR_CURSOR_SAMPLE_COUNT];
     i32 m_identifyHeroActive;
     i32 m_openState;
     advManager(void);
@@ -344,13 +363,14 @@ public:
 SIZE(advManager, 0x37e);
 
 extern i32 bMoveSoundMade;
-extern i32 giPixelsPerStep[6];
-extern i32 giStepDelay[5];
+extern i32 giPixelsPerStep[ADVMGR_STEP_PIXEL_COUNT];
+extern i32 giStepDelay[ADVMGR_STEP_DELAY_COUNT];
 extern struct _SAMPLE* hOldWalkSample;
 extern struct _SAMPLE* hNewWalkSample;
 extern i32 EveryOther;
-extern i32 startVals[3];
-extern i8 iVWHalf[3][6][2];
+extern i32 startVals[ADVMGR_VIEW_WORLD_SCALE_COUNT];
+extern i8 iVWHalf[ADVMGR_VIEW_WORLD_SCALE_COUNT][ADVMGR_VIEW_WORLD_TERRAIN_COUNT]
+                     [ADVMGR_VIEW_WORLD_HALF_COUNT];
 extern ViewWorldScale giViewWorldScale;
 extern i32 giViewWorldScaleLookup;
 extern b32 gbInViewWorld;
@@ -397,13 +417,14 @@ extern i32 giTownPortalChoice;
 extern i32 iThisMinY;
 extern class heroWindow* townPortalWin;
 extern i32 giFrameStep;
-extern char cArmySizeName[12];
+extern char cArmySizeName[ADVMGR_ARMY_SIZE_NAME_SIZE];
 extern i32 giLimitUpdMaxX;
 extern i32 giLimitUpdMaxY;
 extern i32 bPrefsChanged;
 extern i32 giLimitUpdMinY;
 extern struct tag_message CDMsg;
-extern i8 bComboDraw[18][18];
+extern i8 bComboDraw[ADVMGR_MONSTER_ANIMATION_TABLE_SIZE]
+                    [ADVMGR_MONSTER_ANIMATION_TABLE_SIZE];
 extern i32 iLastAnimFrame;
 
 #endif
