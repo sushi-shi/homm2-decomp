@@ -13,6 +13,19 @@ H2_ENUM_CLASS_BEGIN_T(ResourceCategory, i16)
     RESOURCE_CATEGORY_SAMPLE  = 6
 H2_ENUM_CLASS_END_T(ResourceCategory, i16)
 
+// Strict builds type-check lifecycle states; production expansion keeps VC4.2 enum state neutral.
+#ifdef HOMM2_STRICT_ENUM_TYPES
+H2_ENUM_BEGIN(ResourceReferenceCount)
+    RESOURCE_REFERENCE_UNMANAGED = -1,
+    RESOURCE_REFERENCE_EMPTY     = 0,
+    RESOURCE_REFERENCE_INITIAL   = 1
+H2_ENUM_END(ResourceReferenceCount)
+#else
+#define RESOURCE_REFERENCE_UNMANAGED (-1)
+#define RESOURCE_REFERENCE_EMPTY 0
+#define RESOURCE_REFERENCE_INITIAL 1
+#endif
+
 class resource {
 public:
     ResourceCategory m_resourceType;
@@ -20,7 +33,7 @@ public:
     i32 m_id;
     resource* m_next;
     resource(void);
-    resource(ResourceCategory, u32l, i16, class resource*);
+    resource(ResourceCategory category, u32l id, i16 refCount, class resource* next);
     virtual ~resource(void) = 0;
 };
 #pragma pack(pop)
