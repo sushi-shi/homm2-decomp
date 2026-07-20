@@ -65,13 +65,6 @@ H2_ENUM_BEGIN(SetupRemoteConstant)
     REMOTE_TYPE_UNINITIALIZED = 10
 H2_ENUM_END(SetupRemoteConstant)
 
-H2_ENUM_CLASS_BEGIN(SetupBaudRate)
-    SETUP_BAUD_2400  = 2400,
-    SETUP_BAUD_9600  = 9600,
-    SETUP_BAUD_19200 = 19200,
-    SETUP_BAUD_38400 = 38400
-H2_ENUM_CLASS_END(SetupBaudRate)
-
 static inline i32 GetSetupHelpIndex(i32 widgetId, i32 lastChoice) {
     if (widgetId >= CHOICE_ONE && widgetId <= lastChoice)
         return widgetId - CHOICE_ONE;
@@ -97,16 +90,16 @@ i32 game::SetupBaud(void) {
 
     switch (gpWindowManager->m_dialogResult) {
         case CHOICE_ONE:
-            gConfig.baudRate[gbDirectConnect] = IDX(SETUP_BAUD_2400);
+            gConfig.baudRate[gbDirectConnect] = CONFIG_BAUD_2400;
             break;
         case CHOICE_TWO:
-            gConfig.baudRate[gbDirectConnect] = IDX(SETUP_BAUD_9600);
+            gConfig.baudRate[gbDirectConnect] = CONFIG_BAUD_9600;
             break;
         case CHOICE_THREE:
-            gConfig.baudRate[gbDirectConnect] = IDX(SETUP_BAUD_19200);
+            gConfig.baudRate[gbDirectConnect] = CONFIG_BAUD_19200;
             break;
         case CHOICE_FOUR:
-            gConfig.baudRate[gbDirectConnect] = IDX(SETUP_BAUD_38400);
+            gConfig.baudRate[gbDirectConnect] = CONFIG_BAUD_38400;
             break;
         case DIALOG_CANCEL:
             return 0;
@@ -129,16 +122,16 @@ i32 game::SetupComPort(void) {
 
     switch (gpWindowManager->m_dialogResult) {
         case CHOICE_ONE:
-            gConfig.comPort[gbDirectConnect] = IDX(SETUP_COM_PORT_1);
+            gConfig.comPort[gbDirectConnect] = CONFIG_COM_PORT_1;
             break;
         case CHOICE_TWO:
-            gConfig.comPort[gbDirectConnect] = IDX(SETUP_COM_PORT_2);
+            gConfig.comPort[gbDirectConnect] = CONFIG_COM_PORT_2;
             break;
         case CHOICE_THREE:
-            gConfig.comPort[gbDirectConnect] = IDX(SETUP_COM_PORT_3);
+            gConfig.comPort[gbDirectConnect] = CONFIG_COM_PORT_3;
             break;
         case CHOICE_FOUR:
-            gConfig.comPort[gbDirectConnect] = IDX(SETUP_COM_PORT_4);
+            gConfig.comPort[gbDirectConnect] = CONFIG_COM_PORT_4;
             break;
         case DIALOG_CANCEL:
             return 0;
@@ -310,12 +303,12 @@ i32 game::SetupModemGame(void) {
 
     LogStr("SMC 1");
     if (gbDirectConnect != 0) {
-        if (gConfig.comPort[gbDirectConnect] == IDX(SETUP_COM_PORT_UNCONFIGURED))
+        if (gConfig.comPort[gbDirectConnect] == CONFIG_COM_PORT_UNCONFIGURED)
             window = new heroWindow(WINDOW_X, WINDOW_Y, "stpdc.bin");
         else
             window = new heroWindow(WINDOW_X, WINDOW_Y, "stpdccfg.bin");
     } else {
-        if (gConfig.comPort[gbDirectConnect] == IDX(SETUP_COM_PORT_UNCONFIGURED))
+        if (gConfig.comPort[gbDirectConnect] == CONFIG_COM_PORT_UNCONFIGURED)
             window = new heroWindow(WINDOW_X, WINDOW_Y, "stpmodem.bin");
         else
             window = new heroWindow(WINDOW_X, WINDOW_Y, "stpmcfg.bin");
@@ -341,7 +334,7 @@ i32 game::SetupModemGame(void) {
         case CHOICE_ONE:
             LogStr("SMC 6");
             iMPExtendedType = IDX(REMOTE_GAME_MODEM_HOST);
-            if (gConfig.comPort[gbDirectConnect] == IDX(SETUP_COM_PORT_UNCONFIGURED)) {
+            if (gConfig.comPort[gbDirectConnect] == CONFIG_COM_PORT_UNCONFIGURED) {
                 LogStr("SMC 7");
                 if (!SetupComPort())
                     return 0;
@@ -362,7 +355,7 @@ i32 game::SetupModemGame(void) {
             break;
         case CHOICE_TWO:
             iMPExtendedType = IDX(REMOTE_GAME_MODEM_GUEST);
-            if (gConfig.comPort[gbDirectConnect] == IDX(SETUP_COM_PORT_UNCONFIGURED)
+            if (gConfig.comPort[gbDirectConnect] == CONFIG_COM_PORT_UNCONFIGURED
                 && !SetupComPort())
                 return 0;
             break;

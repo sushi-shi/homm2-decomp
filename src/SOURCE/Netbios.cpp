@@ -22,24 +22,6 @@ H2_ENUM_BEGIN(NetbiosSetupConstant)
     DETACH_SOURCE_SESSION    = 1
 H2_ENUM_END(NetbiosSetupConstant)
 
-H2_ENUM_CLASS_BEGIN(NetbiosSetupState)
-    SETUP_INITIALIZE          = 0,
-    SETUP_CHECK_LOCAL_NAME    = 1,
-    SETUP_REGISTER_LOCAL_NAME = 2,
-    SETUP_WAIT_FOR_LOCAL_NAME = 3,
-    SETUP_START_RECEIVE       = 4
-H2_ENUM_CLASS_END(NetbiosSetupState)
-
-H2_ENUM_CLASS_BEGIN(NetbiosWaitState)
-    WAIT_START = 0,
-    WAIT_POLL  = 1
-H2_ENUM_CLASS_END(NetbiosWaitState)
-
-H2_ENUM_CLASS_BEGIN(NetbiosGameMode)
-    GAME_MODE_HOST  = 1,
-    GAME_MODE_GUEST = 2
-H2_ENUM_CLASS_END(NetbiosGameMode)
-
 VA(0x004132f0, 0x155)
 i8 InitNetHost(void) {
     char localName[NAME_BUFFER_SIZE];
@@ -47,7 +29,7 @@ i8 InitNetHost(void) {
     i32 status;
 
     switch (iInitNetHostStatus) {
-        case IDX(SETUP_INITIALIZE):
+        case SETUP_INITIALIZE:
             if (static_cast<i16>(nb_init(SETUP_SESSION_COUNT, HOST_SESSION))
                 == INIT_UNAVAILABLE)
                 ShutDown("NETBIOS is not loaded.");
@@ -56,7 +38,7 @@ i8 InitNetHost(void) {
                 gbRemoteOn = true;
             }
             break;
-        case IDX(SETUP_CHECK_LOCAL_NAME):
+        case SETUP_CHECK_LOCAL_NAME:
             status =
                 !(static_cast<u8>(nb_stat(HOST_SESSION))
                   & IDX(NETBIOS_SESSION_NAME_REGISTERED));
@@ -65,7 +47,7 @@ i8 InitNetHost(void) {
             else
                 return 1;
             break;
-        case IDX(SETUP_REGISTER_LOCAL_NAME):
+        case SETUP_REGISTER_LOCAL_NAME:
             sprintf(localName, "H2H%d", Random(RANDOM_NAME_MIN, RANDOM_NAME_MAX));
             if (static_cast<i16>(nb_sess(IDX(NETBIOS_SESSION_REGISTER), localName))
                 == IDX(NETBIOS_RESULT_SUCCESS))
@@ -73,7 +55,7 @@ i8 InitNetHost(void) {
             else
                 ShutDown("Network initialization failed");
             break;
-        case IDX(SETUP_WAIT_FOR_LOCAL_NAME):
+        case SETUP_WAIT_FOR_LOCAL_NAME:
             status = static_cast<u8>(nb_stat(HOST_SESSION));
             if (status & IDX(NETBIOS_SESSION_NAME_REGISTERED))
                 return 1;
@@ -89,7 +71,7 @@ i8 InitNetGuest(void) {
     char localName[NAME_BUFFER_SIZE];
 
     switch (iInitNetGuestStatus) {
-        case IDX(SETUP_INITIALIZE):
+        case SETUP_INITIALIZE:
             if (static_cast<i16>(nb_init(SETUP_SESSION_COUNT, GUEST_SESSION))
                 == INIT_UNAVAILABLE)
                 ShutDown("NETBIOS is not loaded.");
@@ -98,14 +80,14 @@ i8 InitNetGuest(void) {
                 iInitNetGuestStatus++;
             }
             break;
-        case IDX(SETUP_CHECK_LOCAL_NAME):
+        case SETUP_CHECK_LOCAL_NAME:
             if (static_cast<u8>(nb_stat(GUEST_SESSION))
                 & IDX(NETBIOS_SESSION_NAME_REGISTERED))
                 iInitNetGuestStatus += REGISTERED_STATE_ADVANCE;
             else
                 iInitNetGuestStatus++;
             break;
-        case IDX(SETUP_REGISTER_LOCAL_NAME):
+        case SETUP_REGISTER_LOCAL_NAME:
             sprintf(localName, "H2G%d", Random(RANDOM_NAME_MIN, RANDOM_NAME_MAX));
             if (static_cast<i16>(nb_sess(IDX(NETBIOS_SESSION_REGISTER), localName))
                 == IDX(NETBIOS_RESULT_SUCCESS))
@@ -113,12 +95,13 @@ i8 InitNetGuest(void) {
             else
                 iNameRetryCount++;
             break;
-        case IDX(SETUP_WAIT_FOR_LOCAL_NAME): {
+        case SETUP_WAIT_FOR_LOCAL_NAME: {
             i32 status = static_cast<u8>(nb_stat(GUEST_SESSION));
             i32 namePending = !(status & IDX(NETBIOS_SESSION_NAME_REGISTERED));
             if (namePending) {
                 if (status & IDX(NETBIOS_SESSION_ERROR)) {
                     iNameRetryCount++;
+                    // Retry registration after SETUP_WAIT_FOR_LOCAL_NAME fails.
                     iInitNetGuestStatus--;
                 }
             } else {
@@ -126,7 +109,7 @@ i8 InitNetGuest(void) {
             }
             break;
         }
-        case IDX(SETUP_START_RECEIVE):
+        case SETUP_START_RECEIVE:
             if (static_cast<i16>(nb_sess(IDX(NETBIOS_SESSION_RECEIVE_ANY), HOST_SESSION))
                 != IDX(NETBIOS_RESULT_SUCCESS)) {
                 sprintf(gText, "Network initialization failed");
@@ -143,7 +126,7 @@ i8 WaitForHost(void) {
     i32 status;
 
     switch (iWaitForHostStatus) {
-        case IDX(WAIT_START):
+        case WAIT_START:
             status = static_cast<u8>(nb_stat(HOST_SESSION)) & IDX(NETBIOS_SESSION_ACTIVE);
             if (status != 0)
                 return 1;
@@ -158,13 +141,13 @@ i8 WaitForGuest(void) {
     i32 status;
 
     switch (iWaitForGuestStatus) {
-        case IDX(WAIT_START):
+        case WAIT_START:
             status =
                 static_cast<i16>(nb_sess(IDX(NETBIOS_SESSION_LISTEN_ANY), GUEST_SESSION));
             if (status == IDX(NETBIOS_RESULT_SUCCESS))
                 iWaitForGuestStatus++;
             return 0;
-        case IDX(WAIT_POLL):
+        case WAIT_POLL:
             status =
                 !(static_cast<u8>(nb_stat(GUEST_SESSION)) & IDX(NETBIOS_SESSION_ACTIVE));
             if (status) {
@@ -192,7 +175,7 @@ i32 nbnet_init(void) {
 
     LogStr("GUON1");
     switch (GameMode) {
-        case IDX(GAME_MODE_HOST):
+        case REMOTE_GAME_NETWORK_HOST:
             giWaitType = DIALOG_WAIT_NETBIOS_INIT_HOST;
             sprintf(gText, "Initializing network.\n\n  Press 'CANCEL' to abort.");
             NormalDialog(gText, OLD_MAIN_DIALOG_WAIT, -1, -1, -1, 0, -1, 0, -1, 0);
@@ -207,7 +190,7 @@ i32 nbnet_init(void) {
                 ShutDown(NULL);
             LogStr("GUON4");
             break;
-        case IDX(GAME_MODE_GUEST):
+        case REMOTE_GAME_NETWORK_GUEST:
             giWaitType = DIALOG_WAIT_NETBIOS_INIT_GUEST;
             sprintf(gText, "Initializing network.\n\n  Press 'CANCEL' to abort.");
             NormalDialog(gText, OLD_MAIN_DIALOG_WAIT, -1, -1, -1, 0, -1, 0, -1, 0);
@@ -224,9 +207,13 @@ i32 nbnet_init(void) {
     return 0;
 }
 
-DATA(0x004ee5c8) i8 iInitNetHostStatus = 0;
-DATA(0x004ee5cc) i8 iInitNetGuestStatus = 0;
+DATA(0x004ee5c8)
+H2_ENUM_STORAGE_STEPPED(NetbiosSetupState, i8) iInitNetHostStatus = SETUP_INITIALIZE;
+DATA(0x004ee5cc)
+H2_ENUM_STORAGE_STEPPED(NetbiosSetupState, i8) iInitNetGuestStatus = SETUP_INITIALIZE;
 DATA(0x004ee5d0) i32 iNameRetryCount = 0;
-DATA(0x004ee614) i8 iWaitForHostStatus = 0;
-DATA(0x004ee658) i8 iWaitForGuestStatus = 0;
+DATA(0x004ee614)
+H2_ENUM_STORAGE_STEPPED(NetbiosWaitState, i8) iWaitForHostStatus = WAIT_START;
+DATA(0x004ee658)
+H2_ENUM_STORAGE_STEPPED(NetbiosWaitState, i8) iWaitForGuestStatus = WAIT_START;
 DATA(0x004ee65c) i32 iLastBroadcastTime = 0;

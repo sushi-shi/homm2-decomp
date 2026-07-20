@@ -96,7 +96,7 @@ extern SNetPlayerInfo gsNetPlayerInfo[REMOTE_PLAYER_COUNT];
 extern i32 iInOrderCtr;
 extern i32 iCurLastID;
 extern i32 giLastConfirm;
-extern u8 GameMode;
+extern H2_ENUM_STORAGE(RemoteGameMode, u8) GameMode;
 extern i32l lLastHeartbeatSend;
 extern b32 gbInRemoteMain;
 extern b32 gbInRemoteCleanup;

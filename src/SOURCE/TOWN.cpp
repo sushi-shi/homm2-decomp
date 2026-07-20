@@ -138,9 +138,9 @@ void town::Deallocate(void) {
 }
 
 VA(0x004330a1, 0x23e)
-void town::BuildBuilding(i32 building) {
+void town::BuildBuilding(H2_ENUM_PARAM(BuildingSlotType, i32) building) {
     i32 level;
-    if (building == TOWN_OBJECT_MAGE_GUILD) {
+    if (building == BUILDING_SLOT_MAGE_GUILD) {
         ++m_buildState;
         m_spellCounts[m_buildState] = gSpellLimits[m_buildState - TOWN_MAGE_GUILD_FIRST_LEVEL];
         if (m_type == FACTION_WIZARD && (m_buildings & IDX(TOWN_BUILDING_LIBRARY)))
@@ -148,41 +148,43 @@ void town::BuildBuilding(i32 building) {
         if (m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE)
             GiveSpells(NULL);
     }
-    if (building == TOWN_OBJECT_SPECIAL_BUILDING && m_type == FACTION_WIZARD) {
+    if (building == BUILDING_SLOT_SPECIAL && m_type == FACTION_WIZARD) {
         for (level = 0; level < m_buildState; ++level)
             ++m_spellCounts[level + TOWN_MAGE_GUILD_FIRST_LEVEL];
         if (m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE)
             GiveSpells(NULL);
     }
 
-    m_buildings |= 1L << building;
-    if (building == TOWN_OBJECT_UPGRADED_DWELLING_2)
+    m_buildings |= BIT(building);
+    if (building == BUILDING_SLOT_UPGRADE_FIRST)
         m_buildings &= ~IDX(TOWN_BUILDING_DWELLING_2);
-    if (building == TOWN_OBJECT_UPGRADED_DWELLING_3)
+    if (building == BUILDING_SLOT_UPGRADE_SECOND)
         m_buildings &= ~IDX(TOWN_BUILDING_DWELLING_3);
-    if (building == TOWN_OBJECT_UPGRADED_DWELLING_4)
+    if (building == BUILDING_SLOT_UPGRADE_THIRD)
         m_buildings &= ~IDX(TOWN_BUILDING_DWELLING_4);
-    if (building == TOWN_OBJECT_UPGRADED_DWELLING_5)
+    if (building == BUILDING_SLOT_NECROMANCER_MAGE_PREREQUISITE)
         m_buildings &= ~IDX(TOWN_BUILDING_DWELLING_5);
-    if (building == TOWN_OBJECT_UPGRADED_DWELLING_6)
+    if (building == BUILDING_SLOT_SPECIAL_TWENTY_NINE)
         m_buildings &= ~IDX(TOWN_BUILDING_DWELLING_6);
-    if (building == TOWN_OBJECT_ALTERNATE_UPGRADED_DWELLING_6)
+    if (building == BUILDING_SLOT_SPECIAL_THIRTY)
         m_buildings &= ~(IDX(TOWN_BUILDING_DWELLING_6) | IDX(TOWN_BUILDING_UPGRADED_DWELLING_6));
 
-    if (building >= TOWN_OBJECT_DWELLING_1 && building <= TOWN_OBJECT_DWELLING_6) {
-        m_garrison[building - TOWN_OBJECT_DWELLING_1] =
-            gMonsterDatabase[gDwellingType[IDX(m_type)][building - TOWN_OBJECT_DWELLING_1]].growth;
+    if (building >= BUILDING_SLOT_DWELLING_FIRST && building <= BUILDING_SLOT_DWELLING_SIXTH) {
+        m_garrison[IDX(building) - TOWN_OBJECT_DWELLING_1] =
+            gMonsterDatabase
+                [gDwellingType[IDX(m_type)][IDX(building) - TOWN_OBJECT_DWELLING_1]]
+                    .growth;
     }
-    if (building >= TOWN_OBJECT_UPGRADED_DWELLING_2
-        && building <= TOWN_OBJECT_UPGRADED_DWELLING_6) {
-        m_garrison[building - TOWN_OBJECT_DWELLING_1] =
-            m_garrison[building - TOWN_OBJECT_DWELLING_6];
+    if (building >= BUILDING_SLOT_UPGRADE_FIRST
+        && building <= BUILDING_SLOT_SPECIAL_TWENTY_NINE) {
+        m_garrison[IDX(building) - TOWN_OBJECT_DWELLING_1] =
+            m_garrison[IDX(building) - TOWN_OBJECT_DWELLING_6];
     }
-    if (building == TOWN_OBJECT_ALTERNATE_UPGRADED_DWELLING_6) {
-        m_garrison[building - TOWN_OBJECT_DWELLING_1] =
-            m_garrison[building - TOWN_OBJECT_DWELLING_2];
+    if (building == BUILDING_SLOT_SPECIAL_THIRTY) {
+        m_garrison[IDX(building) - TOWN_OBJECT_DWELLING_1] =
+            m_garrison[IDX(building) - TOWN_OBJECT_DWELLING_2];
     }
-    if (building == TOWN_OBJECT_CASTLE) {
+    if (building == BUILDING_SLOT_CASTLE) {
         m_buildings &= ~IDX(TOWN_BUILDING_TENT);
         XformToCastle();
     }
@@ -199,15 +201,15 @@ VA(0x00433315, 0x9f)
 void town::CalcNumLevelArchers(i32* numArchers, i32* mageGuildLevel) {
     *mageGuildLevel = m_buildState;
     *numArchers = 0;
-    i32 building;
-    for (building = TOWN_OBJECT_DWELLING_1; building <= TOWN_OBJECT_ALTERNATE_UPGRADED_DWELLING_6;
+    BuildingSlotType building;
+    for (building = BUILDING_SLOT_DWELLING_FIRST; building <= BUILDING_SLOT_SPECIAL_THIRTY;
          ++building) {
-        if (m_buildings & (1L << building))
+        if (m_buildings & BIT(building))
             ++*numArchers;
     }
-    for (building = TOWN_OBJECT_MAGE_GUILD; building <= IDX(TOWN_COMMAND_LAST_NEUTRAL_BUILDING);
+    for (building = BUILDING_SLOT_MAGE_GUILD; building <= BUILDING_SLOT_NEUTRAL_LAST;
          ++building) {
-        if (m_buildings & (1L << building))
+        if (m_buildings & BIT(building))
             ++*numArchers;
     }
 }

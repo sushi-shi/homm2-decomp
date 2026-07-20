@@ -101,7 +101,7 @@ public:
     void XformToCastle(void);
     void View(i32);
     void Deallocate(void);
-    void BuildBuilding(i32);
+    void BuildBuilding(H2_ENUM_PARAM(BuildingSlotType, i32));
     i32 CanBuildDock(void);
     void CalcNumLevelArchers(i32*, i32*);
 };

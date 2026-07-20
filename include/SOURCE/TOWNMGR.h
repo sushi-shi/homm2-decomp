@@ -69,22 +69,6 @@ H2_ENUM_CLASS_BEGIN_T(TownExtraBuildingMask, u32)
 H2_ENUM_CLASS_END_T(TownExtraBuildingMask, u32)
 H2_ENUM_FLAGS(TownExtraBuildingMask)
 
-H2_ENUM_CLASS_BEGIN(TownManagerCommand)
-    TOWN_COMMAND_MAGE_GUILD                          = 0,
-    TOWN_COMMAND_THIEVES_GUILD                       = 1,
-    TOWN_COMMAND_TAVERN                              = 2,
-    TOWN_COMMAND_DOCK                                = 3,
-    TOWN_COMMAND_WELL                                = 4,
-    TOWN_COMMAND_UPGRADE_CASTLE                      = 5,
-    TOWN_COMMAND_CASTLE                              = 6,
-    TOWN_COMMAND_TRADING_POST                        = 10,
-    TOWN_COMMAND_SPECIAL_BUILDING                    = 13,
-    TOWN_COMMAND_LAST_NEUTRAL_BUILDING               = 15,
-    TOWN_COMMAND_FIRST_DWELLING                      = 19,
-    TOWN_COMMAND_NECROMANCER_MAGE_GUILD_PREREQUISITE = 28,
-    TOWN_COMMAND_LAST_DWELLING                       = 30
-H2_ENUM_CLASS_END(TownManagerCommand)
-
 H2_ENUM_BEGIN(TownManagerConstant)
     TOWN_DEBUG_BUILD_ALL                     = 100,
     TOWN_BUILDING_COUNT                      = 32,

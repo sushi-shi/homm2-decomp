@@ -6,14 +6,6 @@
 
 struct tag_message;
 
-H2_ENUM_CLASS_BEGIN(SetupComPort)
-    SETUP_COM_PORT_UNCONFIGURED = 0,
-    SETUP_COM_PORT_1            = 1,
-    SETUP_COM_PORT_2            = 2,
-    SETUP_COM_PORT_3            = 3,
-    SETUP_COM_PORT_4            = 4
-H2_ENUM_CLASS_END(SetupComPort)
-
 i32 SetupCampaignGameHandler(struct tag_message&);
 i32 SetupComPortHandler(struct tag_message&);
 i32 SetupBaudHandler(struct tag_message&);

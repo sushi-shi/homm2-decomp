@@ -2488,9 +2488,9 @@ void combatManager::CheckCastleAttack(void) {
     }
     if (m_inCastleCombat != 0 && m_currentSide == 1) {
         while (m_keepAttacksRemaining[m_currentSide] > 0) {
-            KeepAttack(IDX(COMBAT_TOWER_GARRISON));
-            KeepAttack(IDX(COMBAT_TOWER_TOP));
-            KeepAttack(IDX(COMBAT_TOWER_BOTTOM));
+            KeepAttack(COMBAT_TOWER_GARRISON);
+            KeepAttack(COMBAT_TOWER_TOP);
+            KeepAttack(COMBAT_TOWER_BOTTOM);
             --m_keepAttacksRemaining[m_currentSide];
         }
     }

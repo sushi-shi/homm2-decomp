@@ -470,18 +470,23 @@ H2_ENUM_CLASS_BEGIN(TerrainType)
 H2_ENUM_CLASS_END(TerrainType)
 
 H2_ENUM_CLASS_BEGIN(BuildingSlotType)
+    BUILDING_SLOT_NONE                          = -1,
     BUILDING_SLOT_MAGE_GUILD                    = 0,
     CASTLE_MAGE_GUILD                           = BUILDING_SLOT_MAGE_GUILD,
     BUILDING_SLOT_SPECIAL_ONE                   = 1,
+    BUILDING_SLOT_THIEVES_GUILD                 = BUILDING_SLOT_SPECIAL_ONE,
     BUILDING_SLOT_NECROMANCER_SHRINE            = 2,
+    BUILDING_SLOT_TAVERN                        = BUILDING_SLOT_NECROMANCER_SHRINE,
     BUILDING_SLOT_DOCK                          = 3,
     BUILDING_SLOT_SPECIAL_FOUR                  = 4,
+    BUILDING_SLOT_WELL                          = BUILDING_SLOT_SPECIAL_FOUR,
     BUILDING_SLOT_UPGRADE_CASTLE                = 5,
     BUILDING_SLOT_CASTLE                        = 6,
     BUILDING_SLOT_SPECIAL_SEVEN                 = 7,
     BUILDING_SLOT_SPECIAL_EIGHT                 = 8,
     BUILDING_SLOT_SPECIAL_NINE                  = 9,
     BUILDING_SLOT_SPECIAL_TEN                   = 10,
+    BUILDING_SLOT_TRADING_POST                  = BUILDING_SLOT_SPECIAL_TEN,
     BUILDING_SLOT_WELL_EXTRA                    = 11,
     BUILDING_SLOT_SPECIAL_TWELVE                = 12,
     BUILDING_SLOT_SPECIAL                       = 13,
@@ -507,6 +512,7 @@ H2_ENUM_CLASS_BEGIN(BuildingSlotType)
     BUILDING_SLOT_DWELLING_LAST                 = 30,
     BUILDING_SLOT_DISABLED_LAST                 = 31
 H2_ENUM_CLASS_END(BuildingSlotType)
+H2_ENUM_STEPPED(BuildingSlotType)
 
 H2_ENUM_CLASS_BEGIN(MonsterFlags)
     MONSTER_FLAGS_WIDE                = 0x00000001,
