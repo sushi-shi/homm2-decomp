@@ -1099,7 +1099,7 @@ void combatManager::ResetRound(void) {
             army* currentArmy = m_armies[side] + armyIndex;
             if (currentArmy->m_quantity > 0) {
                 currentArmy->m_monster.flags.abilityFlags &=
-                    MonsterAbilityFlags(IDX(ROUND_ABILITY_FLAGS));
+                    static_cast<MonsterAbilityFlags>(ROUND_ABILITY_FLAGS);
                 if (currentArmy->m_monsterType == CREATURE_TROLL
                     || currentArmy->m_monsterType == CREATURE_WAR_TROLL)
                     currentArmy->m_hitPointsLost = 0;
@@ -1271,13 +1271,13 @@ CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
                             hexIndex, ARMY_PATH_ANY_TARGET_HEX
                         )
                         == 1) {
-                        command = CombatMessageCommand(
-                            IDX(COMBAT_MESSAGE_COMMAND_FLY)
-                            - (HAS(m_armies[m_currentArmySide][m_currentArmyIndex]
-                                       .m_monster.flags.all,
-                                   MONSTER_FLAGS_FLYING)
-                               == 0)
-                        );
+                        command = HAS(
+                                      m_armies[m_currentArmySide][m_currentArmyIndex]
+                                          .m_monster.flags.all,
+                                      MONSTER_FLAGS_FLYING
+                                  )
+                                      ? COMBAT_MESSAGE_COMMAND_FLY
+                                      : COMBAT_MESSAGE_COMMAND_MOVE;
                     }
                 }
                 break;
@@ -2409,7 +2409,7 @@ i32 combatManager::DoSurrender(void) {
     sprintf(
         gText,
         "port%04d.icn",
-        static_cast<u32>(IDX(m_heroes[COMBAT_DEFENDER_SIDE - m_currentSide]->m_portrait))
+        static_cast<i32>(m_heroes[COMBAT_DEFENDER_SIDE - m_currentSide]->m_portrait)
     );
     message.payload.widget.data.text = gText;
     window->BroadcastMessage(message);

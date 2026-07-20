@@ -348,8 +348,8 @@ void combatManager::SetupCombat(
                 m_captain.Stats(HERO_PRIMARY_KNOWLEDGE) * COMBAT_CAPTAIN_SPELL_POINT_MULTIPLIER;
             m_captain.m_cursorType = m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type;
             m_captain.m_portrait = static_cast<HeroPortrait>(
-                IDX(m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type)
-                + IDX(HERO_CAPTAIN_PORTRAIT_FIRST)
+                static_cast<i32>(m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type)
+                + static_cast<i32>(HERO_CAPTAIN_PORTRAIT_FIRST)
             );
             strcpy(m_captain.m_name, "Captain");
             for (side = 0; side < ARMY_GROUP_SLOT_COUNT; side++)
@@ -393,8 +393,8 @@ void combatManager::InitNonVisualVars(void) {
     m_eagleEyeSpell[COMBAT_ATTACKER_SIDE] = SPELL_NONE;
     m_eagleEyeSpell[COMBAT_DEFENDER_SIDE] = SPELL_NONE;
     giNextAction = ACTION_NONE;
-    m_summonedCreatureType[0] = 0;
-    m_summonedCreatureType[1] = 0;
+    m_summonedCreatureType[0] = SUMMONED_ELEMENTAL_NONE;
+    m_summonedCreatureType[1] = SUMMONED_ELEMENTAL_NONE;
     m_selectedHex = -1;
     m_limitCreatureHex = -1;
     m_previousCommand = COMBAT_INVALID_COMMAND;
