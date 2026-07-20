@@ -239,6 +239,12 @@ H2_ENUM_BEGIN(NormalDialogConstant)
     NORMAL_DIALOG_WIDGET_FLAGS             = 0x200
 H2_ENUM_END(NormalDialogConstant)
 
+H2_ENUM_CLASS_BEGIN(CheckEndGameForcedResult)
+    END_GAME_FORCE_NONE    = 0,
+    END_GAME_FORCE_VICTORY = 1,
+    END_GAME_FORCE_DEFEAT  = 2
+H2_ENUM_CLASS_END(CheckEndGameForcedResult)
+
 H2_ENUM_BEGIN(HighScoreType)
     HIGH_SCORE_CAMPAIGN           = 0,
     HIGH_SCORE_STANDARD           = 1,
@@ -469,7 +475,7 @@ i32 WaitHandler(tag_message& msg);
 i32 EventWindowHandler(struct tag_message&);
 i32 TrueFalseDialogHandler(struct tag_message& msg);
 void PlayerDead(i32 player);
-void CheckEndGame(i32, i32);
+void CheckEndGame(H2_ENUM_PARAM(CheckEndGameForcedResult, i32), b32);
 void QuickViewWait(void);
 void InitVars(void);
 void ClearMapExtra(void);

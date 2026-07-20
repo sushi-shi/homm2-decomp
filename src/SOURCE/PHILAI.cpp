@@ -499,7 +499,7 @@ inline hero* GetHeroSlot(i32 id) {
 // Adjacent-event acceptance thresholds are retail AI decision payload.
 // NOLINTBEGIN(readability-magic-numbers)
 VA(0x0043849d, 0x2e8)
-i32 philAI::GoodAdjacent(i32* direction) {
+i32 philAI::GoodAdjacent(H2_ENUM_PARAM(MapDirection, i32)* direction) {
     i32 ra;
     float py;
     i32 p;
@@ -508,11 +508,11 @@ i32 philAI::GoodAdjacent(i32* direction) {
     float node;
     i32 nb;
     i32 kn;
-    i32 jb;
-    i32 idx;
+    i32 directionIndex;
+    MapDirection bestDirection;
     i32 heroId;
 
-    idx = -1;
+    bestDirection = MAP_DIRECTION_NONE;
     py = fReduceFactor;
     node = fBerserkFactor;
     fReduceFactor = 1.0f;
@@ -522,10 +522,11 @@ i32 philAI::GoodAdjacent(i32* direction) {
          & MAP_TRIGGER_TYPE_MASK)
         == MAP_OBJECT_MONSTER)
         return 0;
-    for (jb = 0; jb < NORMAL_DIRECTION_COUNT; jb++) {
-        if (gpAdvManager->ValidMoveWithEvent(gpCurAIHero, jb)) {
-            kn = normalDirTable[jb].x + gpCurAIHero->m_x;
-            nb = normalDirTable[jb].y + gpCurAIHero->m_y;
+    for (directionIndex = 0; directionIndex < NORMAL_DIRECTION_COUNT; directionIndex++) {
+        MapDirection candidateDirection = static_cast<MapDirection>(directionIndex);
+        if (gpAdvManager->ValidMoveWithEvent(gpCurAIHero, candidateDirection)) {
+            kn = normalDirTable[directionIndex].x + gpCurAIHero->m_x;
+            nb = normalDirTable[directionIndex].y + gpCurAIHero->m_y;
             if ((gpAdvManager->GetCell(kn, nb)->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
                 && !(mapExtra[kn + (MAP_WIDTH | 0) * nb] & IDX(MAP_EXTRA_ADJACENT_MONSTER))
                 && ((gpAdvManager->GetCell(kn, nb)->m_triggerType & MAP_TRIGGER_TYPE_MASK)
@@ -550,15 +551,15 @@ i32 philAI::GoodAdjacent(i32* direction) {
                 if (p > 80)
                     if (bestValue < val) {
                         bestValue = val;
-                        idx = jb;
+                        bestDirection = candidateDirection;
                     }
             }
         }
     }
     fReduceFactor = py;
     fBerserkFactor = node;
-    if (idx != -1) {
-        *direction = idx;
+    if (bestDirection != MAP_DIRECTION_NONE) {
+        *direction = bestDirection;
         return 1;
     }
     return 0;
@@ -944,9 +945,9 @@ void philAI::DoAI(i32 player) {
     town* townPtr9;
     i32 targetValue11;
     i32 townId3;
-    u32 direction26;
-    i32 specialDirection6;
-    i32 adjacentDirection3;
+    MapDirection direction26;
+    MapDirection specialDirection6;
+    MapDirection adjacentDirection3;
     i32 savedShow10;
 
     LogInt(
@@ -1086,12 +1087,12 @@ void philAI::DoAI(i32 player) {
                                 gpCurAIHero->m_remainingMobility = 0;
                             }
                         }
-                        if (specialDirection6 != -1) {
+                        if (specialDirection6 != MAP_DIRECTION_NONE) {
                             direction26 = specialDirection6;
                             steps14 = 99;
                             goto aiMoveDirection;
                         }
-                    } while (targetValue11 < 1000 && specialDirection6 == -1
+                    } while (targetValue11 < 1000 && specialDirection6 == MAP_DIRECTION_NONE
                              && DoAnywhereDDoorTownGate(targetValue11));
 
                     if (targetValue11 < 75 && gpGame->m_day == 7
@@ -1160,8 +1161,9 @@ void philAI::DoAI(i32 player) {
                             stopAfterStep0[0] = 1;
                         }
                     }
-                    direction26 =
-                        static_cast<u8>(gpSearchArray->m_storage.aiPath.directions[pathIndex3[0]]);
+                    direction26 = static_cast<MapDirection>(
+                        gpSearchArray->m_storage.aiPath.directions[pathIndex3[0]]
+                    );
                 aiMoveDirection:
                     if (gpAdvManager->GetMoveShowIt(gpCurAIHero, direction26)) {
                         savedShow10 = bShowIt;
@@ -1668,11 +1670,16 @@ hero* philAI::DetermineHeroToMove(i32 player) {
 // Terrain scaling, scan radii, score jitter, and shipyard cutoffs are retail AI target-policy payload.
 // NOLINTBEGIN(readability-magic-numbers)
 VA(0x0043b865, 0xe7d)
-i32 philAI::DetermineTargetPosition(i32& targetX, i32& targetY, i32 mobility, i32& direction) {
+i32 philAI::DetermineTargetPosition(
+    i32& targetX,
+    i32& targetY,
+    i32 mobility,
+    H2_ENUM_PARAM(MapDirection, i32)& direction
+) {
     i32 boatTravelDistanceCounter;
     i32 bestValue;
     i32 scanMinXValue;
-    i32 adjacentDirection;
+    MapDirection adjacentDirection;
     i32 searchPassIndex;
     i32 columnCounter;
     i32 targetScoreLocal;
@@ -1695,13 +1702,13 @@ i32 philAI::DetermineTargetPosition(i32& targetX, i32& targetY, i32 mobility, i3
     i32 scanSpacingStep;
 
     if (GoodAdjacent(&adjacentDirection)) {
-        targetX = normalDirTable[adjacentDirection].x + gpCurAIHero->m_x;
-        targetY = normalDirTable[adjacentDirection].y + gpCurAIHero->m_y;
+        targetX = normalDirTable[IDX(adjacentDirection)].x + gpCurAIHero->m_x;
+        targetY = normalDirTable[IDX(adjacentDirection)].y + gpCurAIHero->m_y;
         direction = adjacentDirection;
         return 1000;
     }
 
-    direction = -1;
+    direction = MAP_DIRECTION_NONE;
     targetBestXRange = -1;
     targetBestYLocal = -1;
     bestValue = -999999;

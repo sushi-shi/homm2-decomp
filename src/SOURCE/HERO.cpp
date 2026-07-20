@@ -647,7 +647,7 @@ void hero::Deallocate(i32 updateMap) {
     }
 
     if (updateMap)
-        CheckEndGame(0, 0);
+        CheckEndGame(END_GAME_FORCE_NONE, false);
 }
 
 VA(0x0046d46f, 0x9e)
