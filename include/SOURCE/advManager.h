@@ -81,7 +81,7 @@ public:
     class heroWindow* m_adventureWindow;
     u16* m_visibilityMap;
     i32 m_visibilityMapValid;
-    i32 m_currentTerrain;
+    H2_ENUM_STORAGE(TerrainType, i32) m_currentTerrain;
     char _pad_0xaa[ADVMGR_RUNTIME_ALIGNMENT_SIZE];
     class fullMap* m_mapData;
     class iconWidget* m_scrollLeftButton;

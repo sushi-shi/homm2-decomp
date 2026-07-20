@@ -1471,7 +1471,7 @@ class mapCell* advManager::DoAdvCommand(void) {
                 while (gpMouseManager->m_hideCount != 0) {
                     gpMouseManager->ShowColorPointer();
                 }
-                gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[m_currentTerrain]);
+                gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[IDX(m_currentTerrain)]);
                 UpdBottomView(1, 1, 1);
                 if (eventCellState != NULL) {
                     StopCursor(1);
@@ -1620,7 +1620,7 @@ i32 advManager::Main(struct tag_message& message) {
         && KBTickCount() - giForceSwitchMusic > FORCED_MUSIC_DELAY) {
         giForceSwitchMusic = -1;
         if (gpSoundManager->m_currentTrack == WAIT_AMBIENT_MUSIC) {
-            gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[m_currentTerrain]);
+            gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[IDX(m_currentTerrain)]);
         }
         SetEnvironmentOrigin(
             m_mapOriginX + VIEW_CENTER_OFFSET,
@@ -1973,7 +1973,7 @@ i32 advManager::Main(struct tag_message& message) {
                             );
                             RedrawAdvScreen(1, 0);
                             gpSoundManager->SwitchAmbientMusic(
-                                giTerrainToMusicTrack[m_currentTerrain]
+                                giTerrainToMusicTrack[IDX(m_currentTerrain)]
                             );
                         } else if (xIsPlayingExpansionCampaign) {
                             SetEnvironmentOrigin(-1, -1, 1);
@@ -1985,7 +1985,7 @@ i32 advManager::Main(struct tag_message& message) {
                             );
                             RedrawAdvScreen(1, 0);
                             gpSoundManager->SwitchAmbientMusic(
-                                giTerrainToMusicTrack[m_currentTerrain]
+                                giTerrainToMusicTrack[IDX(m_currentTerrain)]
                             );
                         } else {
                             gpGame->ShowScenInfo();
@@ -2050,7 +2050,9 @@ i32 advManager::Main(struct tag_message& message) {
                     while (gpMouseManager->m_hideCount != 0) {
                         gpMouseManager->ShowColorPointer();
                     }
-                    gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[m_currentTerrain]);
+                    gpSoundManager->SwitchAmbientMusic(
+                        giTerrainToMusicTrack[IDX(m_currentTerrain)]
+                    );
                     if (eventCellsResult[0] != NULL) {
                         StopCursor(1);
                         DoEvent(eventCellsResult[0], TrigX, TrigY);
@@ -2644,7 +2646,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
         NormalDialog("Try searching on clear ground.", 1, -1, -1, -1, 0, -1, 0, -1, 0);
         return 1;
     }
-    if (!giGroundToTerrain[currentCell->m_terrainImageIndex]) {
+    if (giGroundToTerrain[currentCell->m_terrainImageIndex] == TERRAIN_WATER) {
         if (!gbHumanPlayer[giCurPlayer]) {
             goto search_end;
         }
@@ -2713,7 +2715,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
                 } else {
                     searchingHeroState->ViewArtifact(gpGame->m_ultimateArtifactId, 0, -1);
                 }
-                gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[m_currentTerrain]);
+                gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[IDX(m_currentTerrain)]);
             }
             if (specialArtifactValue) {
                 GiveArtifact(searchingHeroState, ARTIFACT_SPHERE_NEGATION, 1, -1);
@@ -2841,7 +2843,7 @@ i32 advManager::ProcessHover(i32 mouseX, i32 mouseY) {
                 }
 
                 if (!((m_cursorType == HERO_TYPE_BOAT
-                       || giGroundToTerrain[hoverCellLocal->m_terrainImageIndex]
+                       || giGroundToTerrain[hoverCellLocal->m_terrainImageIndex] != TERRAIN_WATER
                        || hoverCellLocal->m_triggerType
                               == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION)
                        || hoverCellLocal->m_triggerType
@@ -2849,7 +2851,8 @@ i32 advManager::ProcessHover(i32 mouseX, i32 mouseY) {
                        || hoverCellLocal->m_triggerType
                               == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SHIPWRECK))
                       && (m_cursorType != HERO_TYPE_BOAT
-                          || !giGroundToTerrain[hoverCellLocal->m_terrainImageIndex]
+                          || giGroundToTerrain[hoverCellLocal->m_terrainImageIndex]
+                                 == TERRAIN_WATER
                           || hoverCellLocal->m_triggerType == MAP_OBJECT_COAST))) {
                     gpSearchArray->m_pathLength = 0;
                     gpMouseManager->SetPointer(POINTER_DEFAULT);
@@ -2940,7 +2943,8 @@ i32 advManager::ProcessHover(i32 mouseX, i32 mouseY) {
                                 if (hoverCellLocal->m_triggerType & MAP_TRIGGER_ACTION_FLAG) {
                                     if (m_cursorType != HERO_TYPE_BOAT) {
                                         if (giGroundToTerrain[hoverCellLocal
-                                                                  ->m_terrainImageIndex]) {
+                                                                  ->m_terrainImageIndex]
+                                            != TERRAIN_WATER) {
                                             gpMouseManager->SetPointer(
                                                 pointerBaseCursor + POINTER_ACTION
                                             );
@@ -2957,8 +2961,9 @@ i32 advManager::ProcessHover(i32 mouseX, i32 mouseY) {
                                             break;
                                         }
                                     } else {
-                                        if (!giGroundToTerrain[hoverCellLocal
-                                                                   ->m_terrainImageIndex]) {
+                                        if (giGroundToTerrain[hoverCellLocal
+                                                                  ->m_terrainImageIndex]
+                                            == TERRAIN_WATER) {
                                             gpMouseManager->SetPointer(
                                                 routeDaysCount + POINTER_WATER_ACTION
                                             );
@@ -4496,7 +4501,8 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                         if (objectTilesetLocal == TILESET_X_LOC2
                             && cellValue->m_triggerType == MAP_OBJECT_ROCK) {
                             radarColorValue =
-                                gMapColors[giGroundToTerrain[cellValue->m_terrainImageIndex]]
+                                gMapColors[IDX(giGroundToTerrain
+                                                   [cellValue->m_terrainImageIndex])]
                                 + RADAR_TERRAIN_SHADE;
                         } else {
                             switch (objectTilesetLocal) {
@@ -4557,8 +4563,9 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                                         }
                                         default:
                                             radarColorValue =
-                                                gMapColors[giGroundToTerrain
-                                                               [cellValue->m_terrainImageIndex]]
+                                                gMapColors[IDX(giGroundToTerrain
+                                                                   [cellValue
+                                                                        ->m_terrainImageIndex])]
                                                 + RADAR_TERRAIN_SHADE;
                                             break;
                                     }
@@ -4586,7 +4593,8 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                                         }
                                         default:
                                             radarColorValue = gMapColors
-                                                [giGroundToTerrain[cellValue->m_terrainImageIndex]];
+                                                [IDX(giGroundToTerrain
+                                                         [cellValue->m_terrainImageIndex])];
                                             break;
                                     }
                                     break;
@@ -4981,7 +4989,8 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     sprintf(
                         gText,
                         "%s",
-                        gTerrainNames[giGroundToTerrain[currentCell->m_terrainImageIndex]]
+                        gTerrainNames[IDX(giGroundToTerrain
+                                              [currentCell->m_terrainImageIndex])]
                     );
                     break;
                 case MAP_OBJECT_ABANDONED_MINE:
@@ -7037,11 +7046,12 @@ void advManager::SetTownContext(i32 townId) {
         1
     );
 
-    selectedIndex7 = giGroundToTerrain[GetCell(currentTownValue->m_x, currentTownValue->m_y)
-                                           ->m_terrainImageIndex];
-    if (m_currentTerrain != selectedIndex7) {
-        m_currentTerrain = selectedIndex7;
-        gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[m_currentTerrain]);
+    H2_ENUM_STORAGE(TerrainType, i32) terrain =
+        giGroundToTerrain[GetCell(currentTownValue->m_x, currentTownValue->m_y)
+                              ->m_terrainImageIndex];
+    if (m_currentTerrain != terrain) {
+        m_currentTerrain = terrain;
+        gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[IDX(m_currentTerrain)]);
     }
     gpInputManager->ForceMouseMove();
     m_lastHoverCell = 0;
@@ -7118,10 +7128,11 @@ void advManager::SetHeroContext(i32 heroId, i32 update) {
         1
     );
 
-    selectedIndex7 = giGroundToTerrain[currentCell->m_terrainImageIndex];
-    if (m_currentTerrain != selectedIndex7) {
-        m_currentTerrain = selectedIndex7;
-        gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[m_currentTerrain]);
+    H2_ENUM_STORAGE(TerrainType, i32) terrain =
+        giGroundToTerrain[currentCell->m_terrainImageIndex];
+    if (m_currentTerrain != terrain) {
+        m_currentTerrain = terrain;
+        gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[IDX(m_currentTerrain)]);
     }
     if (!gbHeroMoving) {
         gpInputManager->ForceMouseMove();
@@ -8032,7 +8043,7 @@ AdventureEnvironmentSoundId advManager::GetSoundId(i32 x, i32 y) {
     mapCell* currentCell = &m_mapData->Row(y)[x];
     AdventureEnvironmentSoundId soundId = ADVMGR_ENVIRONMENT_SOUND_NONE;
 
-    if (!giGroundToTerrain[currentCell->m_terrainImageIndex]
+    if (giGroundToTerrain[currentCell->m_terrainImageIndex] == TERRAIN_WATER
         && (giGroundShape[currentCell->m_terrainImageIndex] & SOUND_GROUND_SHAPE_MASK)) {
         return ADVMGR_SOUND_COASTLINE;
     }
@@ -8216,7 +8227,7 @@ void advManager::TeleportTo(
     i32 skipMapChange
 ) {
     i32 savedShow11;
-    i32 terrain5;
+    H2_ENUM_STORAGE(TerrainType, i32) terrain5;
     mapCell* oldCell2;
     i32 oldCellFlag26;
     i32 unused47;
@@ -8338,7 +8349,7 @@ void advManager::TeleportTo(
     terrain5 = giGroundToTerrain[destinationCell29->m_terrainImageIndex];
     if (m_currentTerrain != terrain5) {
         m_currentTerrain = terrain5;
-        gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[m_currentTerrain]);
+        gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[IDX(m_currentTerrain)]);
     }
     Reseed(0, 0);
     UpdateRadar(1, 0);
@@ -8367,9 +8378,9 @@ void advManager::DimensionDoor(void) {
         y = m_hoverCellY + m_mapOriginY;
         targetCell = GetCell(x, y);
         if ((HAS(targetHero->m_eventFlags, HERO_EVENT_EMBARKED)
-             && giGroundToTerrain[targetCell->m_terrainImageIndex])
+             && giGroundToTerrain[targetCell->m_terrainImageIndex] != TERRAIN_WATER)
             || (!HAS(targetHero->m_eventFlags, HERO_EVENT_EMBARKED)
-                && !giGroundToTerrain[targetCell->m_terrainImageIndex])) {
+                && giGroundToTerrain[targetCell->m_terrainImageIndex] == TERRAIN_WATER)) {
             NormalDialog(
                 "Dimension Door failed!!!",
                 OPTION_DIALOG_MESSAGE,
@@ -8386,7 +8397,7 @@ void advManager::DimensionDoor(void) {
         } else {
             gpSoundManager->SwitchAmbientMusic(TRAVEL_MUSIC);
             TeleportTo(targetHero, x, y, 0, 0);
-            gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[m_currentTerrain]);
+            gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[IDX(m_currentTerrain)]);
         }
         gpGame->GetHero(gpCurPlayer->m_currentHero)->UseSpell(SPELL_DIMENSION_DOOR);
     } else {
@@ -8399,7 +8410,9 @@ i32 TownPortalHandler(tag_message& message) {
     tag_message choiceMessage;
 
     if (!gpSoundManager->MusicPlaying() && gpAdvManager->m_active) {
-        gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[gpAdvManager->m_currentTerrain]);
+        gpSoundManager->SwitchAmbientMusic(
+            giTerrainToMusicTrack[IDX(gpAdvManager->m_currentTerrain)]
+        );
     }
 
     if (message.type == ADVMGR_TOWN_PORTAL_MESSAGE) {
@@ -8549,7 +8562,7 @@ void advManager::TownGate(SpellType spellId) {
     gpGame->m_castleRecs[gpCurPlayer->m_townIds[selectedTownIndex]].GiveSpells(NULL);
     targetHero->m_locationType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE;
     targetHero->m_occupiedTown = gpCurPlayer->m_townIds[selectedTownIndex];
-    gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[m_currentTerrain]);
+    gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[IDX(m_currentTerrain)]);
 }
 
 VA(0x00467c9b, 0x5ac)
@@ -8577,7 +8590,7 @@ void advManager::SummonBoat(void) {
         m_mapOriginX + SUMMON_CENTER_OFFSET,
         m_mapOriginY + SUMMON_CENTER_OFFSET
     );
-    if (!giGroundToTerrain[destinationCell->m_terrainImageIndex]) {
+    if (giGroundToTerrain[destinationCell->m_terrainImageIndex] == TERRAIN_WATER) {
         return;
     } else {
 
@@ -8594,7 +8607,7 @@ void advManager::SummonBoat(void) {
             destinationCell = GetCell(destinationX10, destinationY15);
             if (destinationCell->m_objectIndex == MAPCELL_SPRITE_NONE
                 && destinationCell->m_triggerType == MAP_OBJECT_NONE
-                && !giGroundToTerrain[destinationCell->m_terrainImageIndex]) {
+                && giGroundToTerrain[destinationCell->m_terrainImageIndex] == TERRAIN_WATER) {
                 foundDestination9 = 1;
                 break;
             }
@@ -8729,7 +8742,7 @@ void advManager::ShowRoute(i32 redraw, i32, i32 updateButton) {
     i32 terrainCost;
     i32 remainingMobility2;
     i32 pathIndex;
-    i32 currentTerrain0;
+    H2_ENUM_STORAGE(TerrainType, i32) currentTerrain0;
     mapCell* currentCell2;
     i32 routeFrame;
     i32 buttonFrame;
@@ -9158,7 +9171,7 @@ void advManager::SetInitialMapOrigin(void) {
     m_currentTerrain = giGroundToTerrain
         [GetCell(m_mapOriginX + VIEW_CENTER_OFFSET, m_mapOriginY + VIEW_CENTER_OFFSET)
              ->m_terrainImageIndex];
-    gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[m_currentTerrain]);
+    gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[IDX(m_currentTerrain)]);
     SetEnvironmentOrigin(
         m_mapOriginX + VIEW_CENTER_OFFSET,
         m_mapOriginY + VIEW_CENTER_OFFSET,
@@ -9728,7 +9741,7 @@ void advManager::ViewPuzzle(void) {
     CompleteDraw(m_mapOriginX, m_mapOriginY, 0, 1);
     UpdateScreen(0, 0);
     UpdateRadar(1, 0);
-    gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[m_currentTerrain]);
+    gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[IDX(m_currentTerrain)]);
 }
 
 VA(0x0046a6a3, 0x81)
@@ -9790,7 +9803,9 @@ void advManager::AdvPanel(void) {
                         1
                     );
                     RedrawAdvScreen(1, 0);
-                    gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[m_currentTerrain]);
+                    gpSoundManager->SwitchAmbientMusic(
+                        giTerrainToMusicTrack[IDX(m_currentTerrain)]
+                    );
                 } else if (xIsPlayingExpansionCampaign) {
                     SetEnvironmentOrigin(-1, -1, 1);
                     xCampaign.ShowInfo(1, 0);
@@ -9800,7 +9815,9 @@ void advManager::AdvPanel(void) {
                         1
                     );
                     RedrawAdvScreen(1, 0);
-                    gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[m_currentTerrain]);
+                    gpSoundManager->SwitchAmbientMusic(
+                        giTerrainToMusicTrack[IDX(m_currentTerrain)]
+                    );
                 } else {
                     gpGame->ShowScenInfo();
                 }

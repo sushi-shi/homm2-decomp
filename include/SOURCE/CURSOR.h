@@ -33,7 +33,6 @@ H2_ENUM_BEGIN(CursorConstant)
     CURSOR_CELL_UNCOVERED_FLAG          = 0x04,
     CURSOR_CELL_BLOCKED_FLAG            = 0x08,
     CURSOR_OBJECT_PASSABLE_FLAG         = 0x80,
-    CURSOR_WATER_TERRAIN                = 0,
     CURSOR_BOAT_COUNT                   = 48,
     CURSOR_MOVE_HALF_TILE_PIXELS        = 16,
     CURSOR_ARTIFACT_CAPACITY            = 14,

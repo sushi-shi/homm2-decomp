@@ -150,7 +150,9 @@ i32 ArenaWindowHandler(struct tag_message& message_1) {
     i32 extra_18;
 
     if (!gpSoundManager->MusicPlaying() && gpAdvManager->m_active)
-        gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[gpAdvManager->m_currentTerrain]);
+        gpSoundManager->SwitchAmbientMusic(
+            giTerrainToMusicTrack[IDX(gpAdvManager->m_currentTerrain)]
+        );
     if (giDialogTimeout != 0 && KBTickCount() > giDialogTimeout) {
         message_1.type = MESSAGE_WIDGET;
         gpWindowManager->m_dialogResult = message_1.payload.widget.id;

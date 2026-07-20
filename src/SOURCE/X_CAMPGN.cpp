@@ -1152,7 +1152,9 @@ i32 ExpCampaign::MessageHandler(struct tag_message& message) {
     i32 map;
 
     if (!gpSoundManager->MusicPlaying() && gpAdvManager->m_active)
-        gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[gpAdvManager->m_currentTerrain]);
+        gpSoundManager->SwitchAmbientMusic(
+            giTerrainToMusicTrack[IDX(gpAdvManager->m_currentTerrain)]
+        );
     if (giDialogTimeout != 0 && giDialogTimeout < KBTickCount()) {
         message.type = MESSAGE_WIDGET;
         gpWindowManager->m_dialogResult = message.payload.widget.id;

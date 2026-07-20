@@ -122,7 +122,7 @@ i32 searchArray::QuickDistance(i32 x1, i32 y1, i32 x2, i32 y2) {
 
 VA(0x004a4ba0, 0x80)
 i32 CalcTerrainCost(
-    i32 terrain,
+    H2_ENUM_PARAM(TerrainType, i32) terrain,
     i32 diagonal,
     i32 mobility,
     i32 direction,
@@ -131,25 +131,25 @@ i32 CalcTerrainCost(
 ) {
     i32 roadCost;
 
-    if (mobility < giTerrainCost[terrain][direction][1]) {
-        i32 baseCost = giTerrainCost[terrain][direction][0];
+    if (mobility < giTerrainCost[IDX(terrain)][direction][1]) {
+        i32 baseCost = giTerrainCost[IDX(terrain)][direction][0];
         if (mobility < baseCost) {
             if (useRoad == 0)
                 goto terrainCost;
-            roadCost = giTerrainCost[SEARCH_TERRAIN_ROAD][direction][0];
+            roadCost = giTerrainCost[IDX(TERRAIN_ROAD)][direction][0];
             if (mobility < roadCost)
                 goto pathfindingCost;
         }
         if (useRoad != 0)
-            return giTerrainCost[SEARCH_TERRAIN_ROAD][direction][0];
+            return giTerrainCost[IDX(TERRAIN_ROAD)][direction][0];
     } else {
     pathfindingCost:
         if (useRoad != 0 && usePathfinding != 0)
-            terrain = SEARCH_TERRAIN_ROAD;
+            terrain = TERRAIN_ROAD;
     }
 
 terrainCost:
-    return giTerrainCost[terrain][direction][diagonal & SEARCH_DIAGONAL_COST_MASK];
+    return giTerrainCost[IDX(terrain)][direction][diagonal & SEARCH_DIAGONAL_COST_MASK];
 }
 
 VA(0x004a4c20, 0x270)
@@ -258,26 +258,26 @@ void searchArray::TestPossibleDirections(
             }
         }
 
-        gSearchTerrain = giGroundToTerrain[gSearchNextCell->m_terrainImageIndex];
-        if (gSearchTerrain == SEARCH_TERRAIN_WATER) {
+        gSearchTerrain = IDX(giGroundToTerrain[gSearchNextCell->m_terrainImageIndex]);
+        if (gSearchTerrain == IDX(TERRAIN_WATER)) {
             if (waterMode != 0) {
                 if (gSearchNextCell->m_triggerType
                     == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_BOAT))
                     goto invalidDirection;
                 if (giGroundToTerrain[gSearchCurrentCell->m_terrainImageIndex]
-                        == SEARCH_TERRAIN_WATER
+                        == TERRAIN_WATER
                     && normalDirTable[gSearchDirection].x != 0
                     && normalDirTable[gSearchDirection].y != 0) {
                     if (giGroundToTerrain
                             [gpAdvManager
                                  ->GetCell(x + normalDirTable[gSearchDirection].x, y)
                                  ->m_terrainImageIndex]
-                            != SEARCH_TERRAIN_WATER
+                            != TERRAIN_WATER
                         || giGroundToTerrain
                                [gpAdvManager
                                     ->GetCell(x, y + normalDirTable[gSearchDirection].y)
                                     ->m_terrainImageIndex]
-                               != SEARCH_TERRAIN_WATER)
+                               != TERRAIN_WATER)
                         goto invalidDirection;
                 }
             } else {

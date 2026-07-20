@@ -35,7 +35,7 @@ DATA(0x0052a230) static i32 s_direction;
 DATA(0x0052a234) static i32 s_targetStepCost;
 DATA(0x0052a238) static i32 s_candidateY;
 DATA(0x0052a23c) static searchNode* s_neighborNode;
-DATA(0x0052a240) static i32 s_terrain;
+DATA(0x0052a240) static H2_ENUM_STORAGE(TerrainType, i32) s_terrain;
 DATA(0x0052a248) static searchNode s_currentNode;
 DATA(0x0052a254) static i32 s_hasTarget;
 DATA(0x0052a258) static i8 s_directionCosts[SEARCH_DIRECTION_COUNT];
@@ -112,7 +112,7 @@ void searchArray::SeedPosition(
         if (s_targetCell->m_flags & IDX(MAP_CELL_OCCUPIED))
             return;
 
-        if (giGroundToTerrain[s_targetCell->m_terrainImageIndex] == 0) {
+        if (giGroundToTerrain[s_targetCell->m_terrainImageIndex] == TERRAIN_WATER) {
             if (waterMode) {
                 if (s_targetCell->m_triggerType
                     == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_BOAT))
@@ -287,7 +287,9 @@ seed_loop:
                             && !s_currentNode.rvFlag1) {
                             mapCell* neighborCell = gpAdvManager->GetCell(s_neighborX, s_neighborY);
                             s_targetStepCost = CalcTerrainCost(
-                                static_cast<i8>(s_possibleDirections[s_direction]),
+                                static_cast<TerrainType>(
+                                    static_cast<i8>(s_possibleDirections[s_direction])
+                                ),
                                 s_direction,
                                 giCurTempMobility - s_currentNode.distance,
                                 pathfindingSkill,

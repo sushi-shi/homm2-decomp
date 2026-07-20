@@ -473,7 +473,8 @@ H2_ENUM_CLASS_BEGIN(TerrainType)
     TERRAIN_DIRT      = 6,
     TERRAIN_WASTELAND = 7,
     TERRAIN_BEACH     = 8,
-    TERRAIN_COUNT     = 9
+    TERRAIN_COUNT     = 9,
+    TERRAIN_ROAD      = TERRAIN_COUNT
 H2_ENUM_CLASS_END(TerrainType)
 
 H2_ENUM_CLASS_BEGIN(BuildingSlotType)
