@@ -205,8 +205,18 @@ H2_ENUM_BEGIN(WeeklyRuntimeConstant)
     CASTLE_GROWTH_SPECIAL_BONUS   = 2,
     CASTLE_GROWTH_WELL_BONUS      = 8,
     NEUTRAL_CASTLE_GROWTH_DIVISOR = 2,
-    CREATURE_WEEK_GROWTH_BONUS    = 5
+    CREATURE_WEEK_GROWTH_BONUS    = 5,
+    CREATURE_MONTH_MULTIPLIER     = 2
 H2_ENUM_END(WeeklyRuntimeConstant)
+
+H2_ENUM_BEGIN(RandomMapConstant)
+    RANDOM_TOWN_SCRATCH_WIDTH    = 2,
+    RANDOM_MINE_RETRY_LIMIT      = 30,
+    RANDOM_MINE_FOOTPRINT_WIDTH  = 2,
+    RANDOM_MINE_RESOURCE_COUNT   = IDX(MINE_TYPE_GOLD) + 1,
+    RANDOM_HERO_SECOND_SELECTION = 2,
+    RANDOM_HERO_AVERAGE_DIVISOR  = 2
+H2_ENUM_END(RandomMapConstant)
 
 H2_ENUM_BEGIN(GamePlayerTurnConstant)
     GAME_AI_MUSIC_TRACK            = 28,
@@ -4619,6 +4629,9 @@ void game::WeeklyRecruitSite(mapCell* cell) {
     recruitCount >>= WEEKLY_RECRUIT_COUNT_SHIFT;
     i32 packed;
 
+    // The low metadata bits are serialized expansion-site subtype ids. Retail
+    // defines five subtypes here, all with the same weekly growth rule.
+    // NOLINTBEGIN(readability-magic-numbers)
     switch (type) {
         case 0:
             recruitCount += Random(WEEKLY_RECRUIT_MIN_GROWTH, WEEKLY_RECRUIT_MAX_GROWTH);
@@ -4636,6 +4649,7 @@ void game::WeeklyRecruitSite(mapCell* cell) {
             recruitCount += Random(WEEKLY_RECRUIT_MIN_GROWTH, WEEKLY_RECRUIT_MAX_GROWTH);
             break;
     }
+    // NOLINTEND(readability-magic-numbers)
 
     if (recruitCount > WEEKLY_RECRUIT_LIMIT)
         recruitCount = WEEKLY_RECRUIT_LIMIT;
@@ -4647,11 +4661,14 @@ VA(0x0047ebd5, 0x6f)
 void game::WeeklyGenericSite(mapCell* cell) {
     i32 type = cell->m_objectMetadata;
     type &= WEEKLY_SITE_TYPE_MASK;
+    // Expansion-object subtype 4 is the only generic site with weekly state.
+    // NOLINTBEGIN(readability-magic-numbers)
     switch (type) {
         case 4:
             cell->m_objectMetadata = type;
             break;
     }
+    // NOLINTEND(readability-magic-numbers)
 }
 
 VA(0x0047ec44, 0x375)
@@ -4694,7 +4711,8 @@ void game::PerMonth(void) {
                 if (giMonthType == TYPE_CREATURE
                     && gDwellingType[IDX(castle10->m_type)][building4 - WEEKLY_FIRST_DWELLING]
                            == giMonthTypeExtra)
-                    castle10->m_garrison[building4 - WEEKLY_FIRST_DWELLING] *= 2;
+                    castle10->m_garrison[building4 - WEEKLY_FIRST_DWELLING] *=
+                        CREATURE_MONTH_MULTIPLIER;
 
                 if (giMonthType == TYPE_PLAGUE) {
                     castle10->m_garrison[building4 - WEEKLY_FIRST_DWELLING] -= growth9;
@@ -4828,7 +4846,7 @@ void game::ConvertObject(
 
 VA(0x0047f42f, 0x1c2)
 void game::RandomizeTown(i32 x, i32 y, i32) {
-    i32 unused6[2];
+    i32 unused6[RANDOM_TOWN_SCRATCH_WIDTH];
     i32 townId0 = GetTownId(x, y);
     town* castle0 = GetTown(townId0);
     mapTownExtra* extra =
@@ -4901,28 +4919,29 @@ void game::RandomizeMine(i32 x, i32 y) {
     u8 objectFrame1;
     i32 mineId;
     MineType mineType29;
-    i32 terrain3 = giGroundToTerrain[WORLDMAP->GetCell(x, y)->m_terrainImageIndex];
+    H2_ENUM_STORAGE(TerrainType, i32) terrain3;
     i32 columnOffset4;
     i32 retry4;
     i32 rowOffset0;
     u8 mineFrame36;
     i32 triggerType19;
 
-    for (retry4 = 0; retry4 < 30; retry4++) {
+    terrain3 = giGroundToTerrain[WORLDMAP->GetCell(x, y)->m_terrainImageIndex];
+    for (retry4 = 0; retry4 < RANDOM_MINE_RETRY_LIMIT; retry4++) {
         switch (terrain3) {
-            case 1:
-            case 6:
+            case TERRAIN_GRASS:
+            case TERRAIN_DIRT:
                 mineType29 = RandomMineType(MINE_TYPE_MERCURY, MINE_TYPE_GOLD);
                 if (mineType29 == MINE_TYPE_MERCURY)
                     mineType29 = MINE_TYPE_WOOD;
                 break;
-            case 2:
+            case TERRAIN_SNOW:
                 mineType29 = RandomMineType(MINE_TYPE_ORE, MINE_TYPE_GOLD);
                 break;
-            case 3:
+            case TERRAIN_SWAMP:
                 mineType29 = RandomMineType(MINE_TYPE_WOOD, MINE_TYPE_GOLD);
                 break;
-            case 4:
+            case TERRAIN_LAVA:
                 mineType29 = MINE_TYPE_MERCURY;
                 break;
             default:
@@ -4930,10 +4949,13 @@ void game::RandomizeMine(i32 x, i32 y) {
                 break;
         }
         if (RandMineQty[IDX(mineType29)] == 0)
-            retry4 = 30;
+            retry4 = RANDOM_MINE_RETRY_LIMIT;
     }
     RandMineQty[IDX(mineType29)]++;
 
+    // Mine overlays and object bodies use terrain-specific sprite-frame
+    // payload from the original map tilesets.
+    // NOLINTBEGIN(readability-magic-numbers)
     switch (mineType29) {
         case MINE_TYPE_WOOD:
             mineFrame36 = 5;
@@ -4943,10 +4965,10 @@ void game::RandomizeMine(i32 x, i32 y) {
             break;
         default:
             switch (terrain3) {
-                case 1:
+                case TERRAIN_GRASS:
                     mineFrame36 = 15;
                     break;
-                case 2:
+                case TERRAIN_SNOW:
                     mineFrame36 = 19;
                     break;
                 default:
@@ -4962,10 +4984,10 @@ void game::RandomizeMine(i32 x, i32 y) {
             break;
         case MINE_TYPE_MERCURY:
             switch (terrain3) {
-                case 3:
+                case TERRAIN_SWAMP:
                     objectFrame1 = 43;
                     break;
-                case 4:
+                case TERRAIN_LAVA:
                     objectFrame1 = 35;
                     break;
                 default:
@@ -4975,16 +4997,16 @@ void game::RandomizeMine(i32 x, i32 y) {
             break;
         default:
             switch (terrain3) {
-                case 1:
+                case TERRAIN_GRASS:
                     objectFrame1 = 17;
                     break;
-                case 2:
+                case TERRAIN_SNOW:
                     objectFrame1 = 21;
                     break;
-                case 3:
+                case TERRAIN_SWAMP:
                     objectFrame1 = 23;
                     break;
-                case 5:
+                case TERRAIN_DESERT:
                     objectFrame1 = 13;
                     break;
                 default:
@@ -4993,6 +5015,7 @@ void game::RandomizeMine(i32 x, i32 y) {
             }
             break;
     }
+    // NOLINTEND(readability-magic-numbers)
 
     WORLDMAP->GetCell(x, y)->m_objectIndex = objectFrame1;
     WORLDMAP->GetCell(x + 1, y)->m_objectIndex = objectFrame1 + 1;
@@ -5003,7 +5026,7 @@ void game::RandomizeMine(i32 x, i32 y) {
         WORLDMAP->GetCell(x + 1, y)->m_objType |= 1;
         triggerType19 = 1;
     } else if (mineType29 == MINE_TYPE_WOOD) {
-        triggerType19 = 29;
+        triggerType19 = MAP_OBJECT_SAWMILL;
     } else {
         m_worldMap.ChangeTilesetIndex(
             WORLDMAP->GetCell(x + 1, y),
@@ -5014,12 +5037,12 @@ void game::RandomizeMine(i32 x, i32 y) {
             0,
             -1
         );
-        triggerType19 = 23;
+        triggerType19 = MAP_OBJECT_MINE;
     }
 
     mineId = GetMineId(x, y);
-    for (rowOffset0 = 0; rowOffset0 < 2; rowOffset0++) {
-        for (columnOffset4 = 0; columnOffset4 < 2; columnOffset4++) {
+    for (rowOffset0 = 0; rowOffset0 < RANDOM_MINE_FOOTPRINT_WIDTH; rowOffset0++) {
+        for (columnOffset4 = 0; columnOffset4 < RANDOM_MINE_FOOTPRINT_WIDTH; columnOffset4++) {
             if ((WORLDMAP->GetCell(columnOffset4 + x, y - rowOffset0)->m_triggerType
                  & MAP_TRIGGER_TYPE_MASK)
                 > 0)
@@ -5129,6 +5152,8 @@ VA(0x004800a6, 0x378)
 void game::SetRandomHeroArmies(i32 heroId, i32 strongArmy) {
     armyGroup* army2 = &m_heroRecs[heroId].m_army;
     i32 armySlot7 = 0;
+    // Starting-army count ranges are retail faction-balance payload.
+    // NOLINTBEGIN(readability-magic-numbers)
     RandomHeroArmyRange armyTable7[IDX(FACTION_COUNT)][RANDOM_HERO_ARMY_OPTION_COUNT] = {
         {{IDX(CREATURE_PEASANT), 30, 50},
          {IDX(CREATURE_ARCHER), 3, 5},
@@ -5143,7 +5168,8 @@ void game::SetRandomHeroArmies(i32 heroId, i32 strongArmy) {
          {IDX(CREATURE_IRON_GOLEM), 1, 2}},
         {{IDX(CREATURE_SKELETON), 6, 10}, {IDX(CREATURE_ZOMBIE), 2, 4}, {IDX(CREATURE_MUMMY), 1, 2}}
     };
-    i32 selected9[3];
+    // NOLINTEND(readability-magic-numbers)
+    i32 selected9[RANDOM_HERO_ARMY_OPTION_COUNT];
     i32 index9;
     i32 minimum5;
     i32 maximum5;
@@ -5152,10 +5178,11 @@ void game::SetRandomHeroArmies(i32 heroId, i32 strongArmy) {
     selected9[1] =
         RANDOM_HERO_FIRST_STACK_CHANCE + (strongArmy ? RANDOM_HERO_FIRST_STACK_BONUS_CHANCE : 0)
         > Random(RANDOM_HERO_PERCENT_MIN, RANDOM_HERO_PERCENT_MAX);
-    selected9[2] = Random(RANDOM_HERO_PERCENT_MIN, RANDOM_HERO_PERCENT_MAX)
-                   < RANDOM_HERO_SECOND_STACK_CHANCE
-                         + (strongArmy ? RANDOM_HERO_SECOND_STACK_BONUS_CHANCE : 0);
-    if (!selected9[2])
+    selected9[RANDOM_HERO_SECOND_SELECTION] =
+        Random(RANDOM_HERO_PERCENT_MIN, RANDOM_HERO_PERCENT_MAX)
+        < RANDOM_HERO_SECOND_STACK_CHANCE
+              + (strongArmy ? RANDOM_HERO_SECOND_STACK_BONUS_CHANCE : 0);
+    if (!selected9[RANDOM_HERO_SECOND_SELECTION])
         selected9[1] = RANDOM_HERO_STACK_SELECTED;
 
     for (index9 = 0; index9 < RANDOM_HERO_ARMY_SLOT_COUNT; index9++) {
@@ -5173,7 +5200,8 @@ void game::SetRandomHeroArmies(i32 heroId, i32 strongArmy) {
                            * RANDOM_HERO_COUNT_SCALE
                        + RANDOM_HERO_COUNT_ROUNDING;
             if (strongArmy)
-                minimum5 = ((minimum5 | 0) + maximum5) / 2;
+                minimum5 =
+                    ((minimum5 | 0) + maximum5) / RANDOM_HERO_AVERAGE_DIVISOR;
             army2->m_creatureCounts[armySlot7] =
                 static_cast<i16>(Random(minimum5, maximum5) / RANDOM_HERO_COUNT_SCALE);
             armySlot7++;
@@ -5196,7 +5224,7 @@ void game::ProcessRandomObjects(void) {
     giUABaseX = -1;
     giUABaseY = -1;
     giUARadius = 0;
-    for (mineIndex8 = 0; mineIndex8 < 7; mineIndex8++)
+    for (mineIndex8 = 0; mineIndex8 < RANDOM_MINE_RESOURCE_COUNT; mineIndex8++)
         RandMineQty[mineIndex8] = 0;
 
     for (y8 = 0; MAP_HEIGHT > y8; y8++) {
@@ -5217,6 +5245,9 @@ void game::ProcessRandomObjects(void) {
                 case IDX(TRIGGER_RANDOM_CASTLE):
                     RandomizeTown(x10, y8, 1);
                     break;
+                // Random-object value bands, quantity ranges, and paired source
+                // frames are serialized map-editor balance and tileset payload.
+                // NOLINTBEGIN(readability-magic-numbers)
                 case IDX(TRIGGER_RANDOM_MONSTER):
                     minValue7 = 80;
                     maxValue17 = 2000;
@@ -5430,6 +5461,7 @@ void game::ProcessRandomObjects(void) {
                         -1
                     );
                     break;
+                // NOLINTEND(readability-magic-numbers)
                 case IDX(TRIGGER_RANDOM_MINE):
                     RandomizeMine(x10, y8);
                     break;
