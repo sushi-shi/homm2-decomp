@@ -574,7 +574,7 @@ void hero::Deallocate(i32 updateMap) {
         }
     }
 
-    if (m_locationType == HERO_LOCATION_TOWN) {
+    if (m_locationType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)) {
         occupiedTownValue = &gpGame->m_castleRecs[m_occupiedTown];
         occupiedTownValue->m_occupyingHeroId = -1;
     }
@@ -1618,7 +1618,7 @@ void SetupHeroView(void) {
     tag_message statusMessage;
 
     cannotDismiss = gbNoDismiss;
-    if (gpHVHero->m_locationType == HERO_LOCATION_TOWN)
+    if (gpHVHero->m_locationType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE))
         cannotDismiss = 1;
 
     message.type = HERO_UI_MESSAGE;
@@ -2003,7 +2003,7 @@ HeroSecondarySkill hero::GetNthSS(i32 ordinal) {
 
 VA(0x0047052a, 0x51)
 class town* hero::GetOccupiedTown(void) {
-    if (m_locationType == HERO_LOCATION_TOWN)
+    if (m_locationType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE))
         return gpGame->GetTown(m_occupiedTown);
     return NULL;
 }

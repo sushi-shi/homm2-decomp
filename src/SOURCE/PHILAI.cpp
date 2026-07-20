@@ -441,7 +441,8 @@ void philAI::CheckBuyStuff(void) {
                 && gpCurPlayer->m_resources[IDX(RES_GOLD)] >= TOWN_BOAT_GOLD_COST
                 && gpCurPlayer->m_resources[IDX(RES_WOOD)] >= TOWN_BOAT_WOOD_COST) {
                 if (gpGame->GetBoatsBuilt() < IDX(GAME_BOAT_COUNT)
-                    && gpAdvManager->GetCell(idx->m_boatX, idx->m_boatY)->m_triggerType == 0
+                    && gpAdvManager->GetCell(idx->m_boatX, idx->m_boatY)->m_triggerType
+                           == MAP_OBJECT_NONE
                     && gpGame->CreateBoat(idx->m_boatX, idx->m_boatY, 0) != -1) {
                     gpCurPlayer->m_resources[IDX(RES_GOLD)] -= TOWN_BOAT_GOLD_COST;
                     gpCurPlayer->m_resources[IDX(RES_WOOD)] -= TOWN_BOAT_WOOD_COST;
@@ -605,7 +606,7 @@ void philAI::CheckReload(void) {
         for (p = 0; p < MAP_HEIGHT; p++) {
             if (gpSearchArray->GetRow(MAP_WIDTH, p)[node].visited) {
                 nb = gpAdvManager->GetCell(node, p);
-                switch (nb->m_triggerType) {
+                switch (IDX(nb->m_triggerType)) {
                     case (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE):
                         jb = FightValueOfStack(
                             &GetCastleSlot(nb->m_objectMetadata)->m_army,
@@ -681,7 +682,7 @@ void philAI::CheckBerserk(void) {
         for (column1 = 0; column1 < MAP_WIDTH; column1++) {
             for (row17 = 0; row17 < MAP_HEIGHT; row17++) {
                 kn = gpAdvManager->GetCell(column1, row17);
-                switch (kn->m_triggerType) {
+                switch (IDX(kn->m_triggerType)) {
                     case (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE):
                         if (gpGame->m_castleOwners[kn->m_objectMetadata] != gpCurAIHero->m_owner) {
                             if (gpGame->m_castleOwners[kn->m_objectMetadata] != -1) {
@@ -5224,7 +5225,7 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
         && gpCurPlayer->m_ultimateArtifactHintY == y) {
         value_h = (gpCurPlayer->m_ultimateArtifactHintChance - 15) * gUltArtifactAvgValue / 100;
     } else if (cell_k->m_triggerType & MAP_TRIGGER_ACTION_FLAG) {
-        switch (cell_k->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
+        switch (IDX(cell_k->m_triggerType & MAP_TRIGGER_TYPE_MASK)) {
             case MAP_OBJECT_MONSTER:
                 value_h = EvaluateMonsterEvent(
                     CreatureType(cell_k->m_objectIndex),

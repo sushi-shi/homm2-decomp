@@ -2242,7 +2242,7 @@ void game::RandomizeEvents(void) {
     for (yPos19 = 0; yPos19 < MAP_HEIGHT; yPos19++) {
         for (xPos2 = 0; (xPos2 | 0) < MAP_WIDTH; xPos2++) {
             cell2 = m_worldMap.Row(yPos19) + xPos2;
-            switch (cell2->m_triggerType) {
+            switch (IDX(cell2->m_triggerType)) {
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_WITCH_HUT:
                     cell2->m_objectMetadata = IDX(HERO_SKILL_NECROMANCY);
                     while (cell2->m_objectMetadata == IDX(HERO_SKILL_NECROMANCY)
@@ -4585,7 +4585,7 @@ void game::PerWeek(void) {
             // Retail's per-site refresh values and growth ranges are encoded map-object
             // balance payload. The surrounding case labels provide their semantic owners.
             // NOLINTBEGIN(readability-magic-numbers)
-            switch (WORLDMAP->Row(mapY5)[mapX8].m_triggerType) {
+            switch (IDX(WORLDMAP->Row(mapY5)[mapX8].m_triggerType)) {
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MONSTER: {
                     monsterCount36 = WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata
                                      & IDX(MAP_MONSTER_COUNT_MASK);
@@ -5148,8 +5148,8 @@ void game::RandomizeMine(i32 x, i32 y) {
             if ((WORLDMAP->GetCell(columnOffset4 + x, y - rowOffset0)->m_triggerType
                  & MAP_TRIGGER_TYPE_MASK)
                 > 0)
-                if ((WORLDMAP->GetCell(columnOffset4 + x, y - rowOffset0)->m_triggerType
-                     & MAP_TRIGGER_TYPE_MASK)
+                if (IDX(WORLDMAP->GetCell(columnOffset4 + x, y - rowOffset0)->m_triggerType
+                        & MAP_TRIGGER_TYPE_MASK)
                     <= MINE_FLAG_OVERWRITE_LIMIT)
                     continue;
             WORLDMAP->GetCell(columnOffset4 + x, y - rowOffset0)->m_objectMetadata = mineId;
@@ -5332,7 +5332,7 @@ void game::ProcessRandomObjects(void) {
     for (y8 = 0; MAP_HEIGHT > y8; y8++) {
         for (x10 = 0; x10 < MAP_WIDTH; x10++) {
             cell6 = WORLDMAP->GetCell(x10, y8);
-            switch (static_cast<GameMapTrigger>(cell6->m_triggerType)) {
+            switch (static_cast<GameMapTrigger>(IDX(cell6->m_triggerType))) {
                 case TRIGGER_RANDOM_ULTIMATE_ARTIFACT:
                     giUABaseX = static_cast<i16>(x10);
                     giUABaseY = static_cast<i16>(y8);
@@ -5904,7 +5904,7 @@ void game::ProcessMapExtra(void) {
     for (row = 0; row < MAP_HEIGHT; row++) {
         for (col = 0; MAP_WIDTH > col; col++) {
             cell = WORLDMAP->Row(row) + col;
-            switch (cell->m_triggerType) {
+            switch (IDX(cell->m_triggerType)) {
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE:
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_TOWN:
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_CASTLE:

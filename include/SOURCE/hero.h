@@ -55,7 +55,6 @@ H2_ENUM_BEGIN(HeroConstant)
     HERO_BOAT_NONE                            = 0xff,
     HERO_DESTINATION_NONE                     = -1,
     HERO_INTERACTION_TURN_NONE                = -99,
-    HERO_LOCATION_TOWN                        = 0xa3,
     HERO_MAP_CELL_PRESENT                     = 0x40,
     HERO_NAME_SIZE                            = 13,
     HERO_PRIMARY_STAT_COUNT                   = 4,
@@ -160,7 +159,7 @@ public:
         };
     };
     H2_ENUM_STORAGE(MapDirection, u8) m_direction;
-    i16 m_locationType;
+    H2_ENUM_STORAGE(MapObjectType, i16) m_locationType;
     i16 m_occupiedTown;
     i32 m_mobility;
     i32 m_remainingMobility;

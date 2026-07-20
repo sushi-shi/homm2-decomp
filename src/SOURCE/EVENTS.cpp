@@ -109,7 +109,6 @@ namespace {
         EVENT_WINDMILL_EMPTY = 99,
         EVENT_RANDOM_EVENT_SUCCESS = 40,
         EVENT_RANDOM_PERCENT_MAX = 100,
-        EVENT_HERO_TOWN_LOCATION = 0xa3,
         EVENT_BOAT_RESTORE_MODE = 3,
         EVENT_SITE_TYPE_MASK = 0x3f,
         EVENT_SITE_LEVEL_SHIFT = 6,
@@ -3039,7 +3038,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 HeroSwap(eventHero2, otherHero6);
             } else {
                 occupiedTown4 = NULL;
-                if (otherHero6->m_locationType == HERO_TOWN_LOCATION) {
+                if (otherHero6->m_locationType
+                    == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)) {
                     occupiedTown4 = gpGame->GetTown(otherHero6->m_occupiedTown);
                     occupiedTown4->m_occupyingHeroId = otherHero6->m_id;
                 }
@@ -3816,7 +3816,7 @@ void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
         }
     }
 
-    cell->m_triggerType = 0;
+    cell->m_triggerType = MAP_OBJECT_NONE;
     cell->m_objectIndex = 0;
     cell->m_objectTileset = TILESET_DUMMY;
     cell->m_animatedObject = 0;
@@ -5236,7 +5236,7 @@ void advManager::HouseEvent(hero* eventHero, mapCell* cell) {
     i32 siteIndex = RECRUIT_ARCHER;
     CreatureType creatureTypes[RECRUIT_SITE_COUNT];
 
-    switch (cell->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
+    switch (IDX(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK)) {
         case MAP_OBJECT_ARCHER_HOUSE:
             siteIndex = RECRUIT_ARCHER;
             break;
@@ -6723,7 +6723,8 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 gpPhilAI->HeroInteractionAtHero(eventHero, otherHero_e, 0, &heroInteractionResult);
                 return;
             }
-            if (otherHero_e->m_locationType == EVENT_HERO_TOWN_LOCATION)
+            if (otherHero_e->m_locationType
+                == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE))
                 occupiedTown_b = gpGame->GetTown(otherHero_e->m_occupiedTown);
 
             if (gbHumanPlayer[otherHero_e->m_owner] == 0) {

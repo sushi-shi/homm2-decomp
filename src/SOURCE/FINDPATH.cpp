@@ -44,7 +44,7 @@ DATA(0x0052ae40) static searchNode* gSearchCell;
 DATA(0x0052ae44) static i32 gSearchNextY;
 DATA(0x0052ae48) static mapCell* gSearchCurrentCell;
 DATA(0x0052ae4c) static i32 gSearchDirection;
-DATA(0x0052ae50) static i32 gSearchTriggerType;
+DATA(0x0052ae50) static H2_ENUM_STORAGE(MapObjectType, i32) gSearchTriggerType;
 DATA(0x0052ae54) static i32 gSearchNextX;
 DATA(0x0052ae58) static i32 gSearchTerrain;
 DATA(0x0052ae5c) static searchNode* gSearchQueueNode;
@@ -249,7 +249,7 @@ void searchArray::TestPossibleDirections(
                 && (giCurPlayerBit & mapExtra[gSearchNextY * MAP_WIDTH + gSearchNextX]) == 0))
             goto invalidDirection;
 
-        if ((gSearchNextCell->m_triggerType & SEARCH_TRIGGER_PRESENT) != 0) {
+        if ((gSearchNextCell->m_triggerType & MAP_TRIGGER_ACTION_FLAG) != 0) {
             if (!allowOccupied) {
                 if (m_specialTargetX != gSearchNextX || m_specialTargetY != gSearchNextY)
                     goto invalidDirection;
@@ -261,7 +261,8 @@ void searchArray::TestPossibleDirections(
         gSearchTerrain = giGroundToTerrain[gSearchNextCell->m_terrainImageIndex];
         if (gSearchTerrain == SEARCH_TERRAIN_WATER) {
             if (waterMode != 0) {
-                if (gSearchNextCell->m_triggerType == SEARCH_WATER_ENTRY_SECOND)
+                if (gSearchNextCell->m_triggerType
+                    == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_BOAT))
                     goto invalidDirection;
                 if (giGroundToTerrain[gSearchCurrentCell->m_terrainImageIndex]
                         == SEARCH_TERRAIN_WATER
@@ -280,12 +281,15 @@ void searchArray::TestPossibleDirections(
                         goto invalidDirection;
                 }
             } else {
-                if (gSearchNextCell->m_triggerType != SEARCH_WATER_ENTRY_FIRST
-                    && gSearchNextCell->m_triggerType != SEARCH_WATER_ENTRY_SECOND
-                    && gSearchNextCell->m_triggerType != SEARCH_WATER_ENTRY_THIRD)
+                if (gSearchNextCell->m_triggerType
+                        != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION)
+                    && gSearchNextCell->m_triggerType
+                           != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_BOAT)
+                    && gSearchNextCell->m_triggerType
+                           != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SHIPWRECK))
                     goto invalidDirection;
             }
-        } else if (waterMode != 0 && gSearchNextCell->m_triggerType != SEARCH_TRIGGER_BOAT) {
+        } else if (waterMode != 0 && gSearchNextCell->m_triggerType != MAP_OBJECT_COAST) {
             goto invalidDirection;
         }
 
@@ -309,8 +313,9 @@ void searchArray::TestPossibleDirections(
                 || (gSearchNextCell->m_objTypeBits & SEARCH_OBJECT_TYPE_MASK)
                        == SEARCH_BLOCKING_OBJECT_TYPE
                 || (gSearchNextCell->m_flags & SEARCH_CELL_BLOCKED) != 0
-                || ((gSearchNextCell->m_triggerType & SEARCH_TRIGGER_PRESENT) != 0
-                    && (gSearchTriggerType = gSearchNextCell->m_triggerType & SEARCH_TRIGGER_MASK,
+                || ((gSearchNextCell->m_triggerType & MAP_TRIGGER_ACTION_FLAG) != 0
+                    && (gSearchTriggerType =
+                            gSearchNextCell->m_triggerType & MAP_TRIGGER_TYPE_MASK,
                         StopOnTrigger(gSearchNextCell) != 0))) {
                 if (gSearchCurrentCell->m_overlayIndex == SEARCH_NO_OBJECT)
                     goto storeDirection;

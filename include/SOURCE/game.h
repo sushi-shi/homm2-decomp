@@ -43,7 +43,7 @@ struct boatRecord {
     i8 x;
     i8 y;
     H2_ENUM_STORAGE(MapDirection, i8) direction;
-    u8 savedTriggerType;
+    H2_ENUM_STORAGE(MapObjectType, u8) savedTriggerType;
     u8 savedEventData;
     i8 heroId;
     i8 owner;

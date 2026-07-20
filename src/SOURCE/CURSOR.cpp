@@ -637,7 +637,7 @@ mapCell* advManager::MoveHero(
 
     if ((destinationCell_j->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
         && gpAdvManager->ValidMoveWithEvent(movingHero_f, direction)) {
-        switch (destinationCell_j->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
+        switch (IDX(destinationCell_j->m_triggerType & MAP_TRIGGER_TYPE_MASK)) {
             case MAP_OBJECT_BOAT:
                 if (HAS(movingHero_f->m_eventFlags, HERO_EVENT_EMBARKED))
                     goto movementDone;
@@ -713,7 +713,7 @@ mapCell* advManager::MoveHero(
     if (!ValidMove(direction, 0))
         goto movementDone;
 
-    if (movingHero_f->m_locationType == HERO_TOWN_LOCATION) {
+    if (movingHero_f->m_locationType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)) {
         town* occupiedTown = gpGame->GetTown(movingHero_f->m_occupiedTown);
         occupiedTown->m_occupyingHeroId = -1;
     }
@@ -828,7 +828,7 @@ mapCell* advManager::MoveHero(
         || (HAS(movingHero_f->m_eventFlags, HERO_EVENT_EMBARKED)
             && cursorCell_m->m_triggerType == MAP_OBJECT_COAST)) {
         eventCell_g = cursorCell_m;
-        switch (cursorCell_m->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
+        switch (IDX(cursorCell_m->m_triggerType & MAP_TRIGGER_TYPE_MASK)) {
             case MAP_OBJECT_NOTHING_SPECIAL:
             case MAP_OBJECT_MOSSY_ROCK:
             case MAP_OBJECT_REEFS:
@@ -1015,7 +1015,7 @@ i32 advManager::ValidMoveWithEvent(
         return 0;
 
     destinationCell0 = m_mapData->GetCell(destinationX0, destinationY0);
-    switch (destinationCell0->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
+    switch (IDX(destinationCell0->m_triggerType & MAP_TRIGGER_TYPE_MASK)) {
         case MAP_OBJECT_HERO_INTERACTION:
             if (HAS(movingHero->m_eventFlags, HERO_EVENT_EMBARKED)) {
                 if (HAS(gpGame->GetHero(destinationCell0->m_objectMetadata)->m_eventFlags,
@@ -1229,7 +1229,7 @@ void advManager::ProcessMapChange(SMapChange change) {
                 1
             );
             if (eventCell_n != NULL) {
-                switch (eventCell_n->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
+                switch (IDX(eventCell_n->m_triggerType & MAP_TRIGGER_TYPE_MASK)) {
                     case MAP_OBJECT_COAST:
                     case MAP_OBJECT_BOAT:
                         DoAIEvent(eventCell_n, mapHero_n, eventX_b, eventY_c);
