@@ -259,6 +259,9 @@ constexpr i32 H2EnumIndex(Value value) {
 // defines the increment; production sees plain integer arithmetic.
 #ifdef HOMM2_STRICT_ENUM_TYPES
 #define H2_ENUM_STEPPED(name)                                                                      \
+    inline constexpr name operator+(name a, i32 amount) {                                          \
+        return static_cast<name>(static_cast<i64>(a) + amount);                                    \
+    }                                                                                              \
     inline name& operator++(name& a) {                                                             \
         return a = static_cast<name>(static_cast<i64>(a) + 1);                                     \
     }                                                                                              \

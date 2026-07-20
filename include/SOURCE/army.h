@@ -48,9 +48,9 @@ class army {
 public:
     char m_animationState;
     char m_animationCycle;
-    char m_pendingAnimationSequence;
-    i8 m_effectAnimationStart;
-    i8 m_effectAnimationEnd;
+    H2_ENUM_STORAGE_STEPPED(ArmyAnimationSequence, char) m_pendingAnimationSequence;
+    H2_ENUM_STORAGE(ArmyAnimationSequence, i8) m_effectAnimationStart;
+    H2_ENUM_STORAGE(ArmyAnimationSequence, i8) m_effectAnimationEnd;
     i8 m_effectAnimationLength;
     ArmyDrawState m_drawState;
     struct SLimitData m_creatureLimits;
