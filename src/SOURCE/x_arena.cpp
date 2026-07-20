@@ -97,7 +97,7 @@ i32 DoArenaDialog(void) {
             "xprimary.icn",
             widgetIndex_12 == choice ? widgetIndex_12 + SELECTED_FRAME_OFFSET
                                      : widgetIndex_12,
-            0,
+            ICON_DRAW_NORMAL,
             widgetIndex_12 + WIDGET_FIRST_ID,
             ICON_FILL_COLOR,
             1
@@ -237,7 +237,7 @@ void UpdateArenaIcons(void) {
             ICON_HEIGHT,
             "xprimary.icn",
             widgetIndex == choice ? widgetIndex + SELECTED_FRAME_OFFSET : widgetIndex,
-            0,
+            ICON_DRAW_NORMAL,
             widgetIndex + WIDGET_FIRST_ID,
             ICON_FILL_COLOR,
             1

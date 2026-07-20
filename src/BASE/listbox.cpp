@@ -396,7 +396,7 @@ void listBoxWidget::DrawLBStuff(i32 doUpdate) {
     y = m_listY + m_owner->m_posY;
     for (i32 i = 0; i < m_maxVisibleItems; i++) {
         if (i == 0) {
-            m_icon->DrawToBuffer(x, y, m_firstRowFrame, 0);
+            m_icon->DrawToBuffer(x, y, m_firstRowFrame, ICON_DRAW_NORMAL);
             if (i < m_visibleItemCount) {
                 FontDrawMode color =
                     m_selectedIndex == m_topIndex ? m_selectedColor : m_normalColor;
@@ -412,7 +412,7 @@ void listBoxWidget::DrawLBStuff(i32 doUpdate) {
             }
             y += m_firstRowHeight;
         } else if (1 == m_maxVisibleItems - i) {
-            m_icon->DrawToBuffer(x, y, m_lastRowFrame, 0);
+            m_icon->DrawToBuffer(x, y, m_lastRowFrame, ICON_DRAW_NORMAL);
             if (m_visibleItemCount > i) {
                 i32 itemIndex = m_topIndex + i;
                 FontDrawMode color =
@@ -428,7 +428,7 @@ void listBoxWidget::DrawLBStuff(i32 doUpdate) {
                 );
             }
         } else {
-            m_icon->DrawToBuffer(x, y, m_middleRowFrame, 0);
+            m_icon->DrawToBuffer(x, y, m_middleRowFrame, ICON_DRAW_NORMAL);
             if (i < m_visibleItemCount) {
                 i32 itemIndex = m_topIndex + i;
                 FontDrawMode color =
@@ -447,12 +447,12 @@ void listBoxWidget::DrawLBStuff(i32 doUpdate) {
         }
     }
     i32 upFrame = m_scrollUpPressed ? m_scrollUpPressedFrame : m_scrollUpFrame;
-    m_icon->DrawToBuffer(m_scrollUpX + m_owner->m_posX, m_scrollUpY + m_owner->m_posY, upFrame, 0);
+    m_icon->DrawToBuffer(m_scrollUpX + m_owner->m_posX, m_scrollUpY + m_owner->m_posY, upFrame, ICON_DRAW_NORMAL);
     m_icon->DrawToBuffer(
         m_scrollTrackX + m_owner->m_posX,
         m_scrollTrackY + m_owner->m_posY,
         m_scrollTrackFirstFrame,
-        0
+        ICON_DRAW_NORMAL
     );
     i32 j;
     for (j = SCROLL_TRACK_EDGE_ROW_COUNT;
@@ -462,20 +462,20 @@ void listBoxWidget::DrawLBStuff(i32 doUpdate) {
             m_scrollTrackX + m_owner->m_posX,
             (j - 1) * m_rowHeight + m_scrollTrackY + m_owner->m_posY,
             m_scrollTrackMiddleFrame,
-            0
+            ICON_DRAW_NORMAL
         );
     m_icon->DrawToBuffer(
         m_scrollTrackX + m_owner->m_posX,
         (j - 1) * m_rowHeight + m_scrollTrackY + m_owner->m_posY,
         m_scrollTrackLastFrame,
-        0
+        ICON_DRAW_NORMAL
     );
     i32 downFrame = m_scrollDownPressed ? m_scrollDownPressedFrame : m_scrollDownFrame;
     m_icon->DrawToBuffer(
         m_scrollDownX + m_owner->m_posX,
         m_scrollDownY + m_owner->m_posY,
         downFrame,
-        0
+        ICON_DRAW_NORMAL
     );
     i16 thumbX = m_owner->m_posX + m_scrollTrackX + SCROLL_THUMB_X_INSET;
     m_scrollThumbX = thumbX;
@@ -486,7 +486,7 @@ void listBoxWidget::DrawLBStuff(i32 doUpdate) {
         offset = m_scrollThumbTravel / SCROLL_THUMB_CENTER_DIVISOR;
     i16 thumbY = offset + m_owner->m_posY + m_scrollTrackY + SCROLL_THUMB_Y_INSET;
     m_scrollThumbY = thumbY;
-    m_icon->DrawToBuffer(thumbX, thumbY, m_scrollThumbFrame, 0);
+    m_icon->DrawToBuffer(thumbX, thumbY, m_scrollThumbFrame, ICON_DRAW_NORMAL);
     if (doUpdate)
         gpWindowManager
             ->UpdateScreenRegion(m_x + m_owner->m_posX, m_y + m_owner->m_posY, m_width, m_height);

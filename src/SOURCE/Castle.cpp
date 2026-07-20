@@ -362,7 +362,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
                     BACKGROUND_TILE_SIZE,
                     "objntwba.icn",
                     static_cast<i16>(OD_STEER(terrainIconFrame27) + backgroundFrame6),
-                    0,
+                    ICON_DRAW_NORMAL,
                     TOWN_WIDGET_ID_NONE,
                     WIDGET_KIND_ICON_DIRECT,
                     BACKGROUND_FILL_COLOR
@@ -388,7 +388,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
                     BACKGROUND_TILE_SIZE,
                     "objntown.icn",
                     static_cast<i16>(OD_STEER(raceIconFrame) + backgroundFrame6),
-                    0,
+                    ICON_DRAW_NORMAL,
                     TOWN_WIDGET_ID_NONE,
                     WIDGET_KIND_ICON_DIRECT,
                     BACKGROUND_FILL_COLOR
@@ -407,7 +407,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
                 EXPANSION_OVERLAY_HEIGHT,
                 "caslxtra.icn",
                 0,
-                0,
+                ICON_DRAW_NORMAL,
                 TOWN_WIDGET_ID_NONE,
                 WIDGET_KIND_ICON_DIRECT,
                 BACKGROUND_FILL_COLOR

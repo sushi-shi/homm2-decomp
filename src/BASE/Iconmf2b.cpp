@@ -25,7 +25,7 @@ void FlipMonoIconToBitmap(
     i32 y,
     i32 frame,
     i32 color,
-    i32 clip,
+    H2_ENUM_PARAM(IconDrawClipMode, i32) clip,
     i32 clipX,
     i32 clipY,
     i32 clipW,
@@ -48,14 +48,14 @@ void FlipMonoIconToBitmap(
     i32 X = right - 1;
     gFMXEnd = X;
     gFMY = y + entryY;
-    if (clip != 0) {
+    if (clip != ICON_DRAW_NO_CLIP) {
         if (x0 < clipX || clipX + clipW < right || gFMY < clipY
             || entry->h + gFMY > clipY + clipH) {
-            clip = 1;
+            clip = ICON_DRAW_CLIP;
             gFMClipR = clipX + clipW - 1;
             gFMClipB = clipY + clipH - 1;
         } else {
-            clip = 0;
+            clip = ICON_DRAW_NO_CLIP;
         }
     }
     i16 pitch = dest->m_width;
@@ -73,7 +73,7 @@ void FlipMonoIconToBitmap(
         }
         gFMRun = cmd;
         if (cmd != 0) {
-            if (clip == 0) {
+            if (clip == ICON_DRAW_NO_CLIP) {
                 memset((gFMRow - cmd) + 1 + X, color, cmd);
             } else {
                 i32 left;

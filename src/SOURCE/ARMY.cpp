@@ -373,7 +373,7 @@ void army::DrawToBuffer(i32 x, i32 y, i32 effectsOnly) {
     i32 color;
     i32 quantityX5;
     i32 goodEffects0;
-    i32 drawn1;
+    IconDrawResult drawn1;
     i32 neighborOccupied14;
     i32 badEffects0;
     i32 quantityOffset0;
@@ -445,7 +445,7 @@ void army::DrawToBuffer(i32 x, i32 y, i32 effectsOnly) {
             y,
             m_frameInfo.animationFrames[IDX(m_animationSequence)][m_animationFrame],
             &m_spriteLimits,
-            m_facing == ARMY_FACING_LEFT,
+            m_facing == ARMY_FACING_LEFT ? ICON_DRAW_FLIPPED : ICON_DRAW_NORMAL,
             color,
             palette8,
             m_palette
@@ -507,7 +507,7 @@ void army::DrawToBuffer(i32 x, i32 y, i32 effectsOnly) {
                     quantityY0,
                     QUANTITY_STATUS_FRAME,
                     &m_creatureLimits,
-                    0,
+                    ICON_DRAW_NORMAL,
                     0,
                     NULL,
                     NULL
@@ -519,7 +519,7 @@ void army::DrawToBuffer(i32 x, i32 y, i32 effectsOnly) {
                     quantityY0,
                     SPELL_STATUS_FRAME,
                     &m_creatureLimits,
-                    0,
+                    ICON_DRAW_NORMAL,
                     SPELL_EFFECT_COLOR,
                     NULL,
                     NULL
@@ -539,13 +539,13 @@ void army::DrawToBuffer(i32 x, i32 y, i32 effectsOnly) {
                     quantityY0,
                     statusFrame0 + EFFECT_STATUS_FRAME_OFFSET,
                     &m_creatureLimits,
-                    0,
+                    ICON_DRAW_NORMAL,
                     0,
                     NULL,
                     NULL
                 );
         }
-        if (drawn1) {
+        if (drawn1 == ICON_DRAW_COMPLETED) {
             sprintf(quantityText3, "%d", m_lastTargetHex == -1 ? m_quantity : m_lastTargetHex);
             smallFont->DrawBoundedString(
                 quantityText3,
@@ -596,7 +596,7 @@ void army::DrawToBuffer(i32 x, i32 y, i32 effectsOnly) {
             m_spellEffectYOffset + spellY,
             gCurSpellEffectFrame,
             &m_spellLimits,
-            IDX(OppositeArmyFacing(m_facing)),
+            m_facing == ARMY_FACING_LEFT ? ICON_DRAW_FLIPPED : ICON_DRAW_NORMAL,
             0,
             NULL,
             NULL
@@ -893,7 +893,7 @@ void army::SpecialAttack(void) {
     i32 oldY_9;
     i32 effectX_2;
     char targetRow_1;
-    char reverseMissile;
+    H2_ENUM_STORAGE(IconDrawOrientation, char) reverseMissile;
     i32 distance_6;
     ArmyFacing originalFacing_6;
     i32 initialYDistance_8;
@@ -969,9 +969,9 @@ void army::SpecialAttack(void) {
     }
     sourceY_1 = gpCombatManager->m_hexCells[m_hex].m_y + m_frameInfo.missileOffsets[1].y;
     initialXDistance_6 = targetX_1 - sourceX_1;
-    reverseMissile = 0;
+    reverseMissile = ICON_DRAW_NORMAL;
     if (initialXDistance_6 < 0) {
-        reverseMissile = 1;
+        reverseMissile = ICON_DRAW_FLIPPED;
         initialXDistance_6 = -initialXDistance_6;
     }
     initialYDistance_8 = targetY_1 - sourceY_1;
@@ -2415,7 +2415,7 @@ void army::PowEffect(i32 effect, i32 resetLimits, i32 effectX, i32 effectY) {
                 m_spellEffectYOffset + effectY,
                 gCurSpellEffectFrame,
                 &m_spellLimits,
-                0,
+                ICON_DRAW_NORMAL,
                 0,
                 NULL,
                 NULL

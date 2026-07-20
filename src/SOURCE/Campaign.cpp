@@ -437,7 +437,7 @@ void game::ShowCampaignInfo(i32 viewOnly, i32) {
                 CAMPAIGN_TRACK_ICON_SIZE,
                 "campxtrg.icn",
                 CAMPAIGN_TRACK_ICON_FRAME,
-                0,
+                ICON_DRAW_NORMAL,
                 trackMapIndex + CAMPAIGN_TRACK_WIDGET_FIRST,
                 CAMPAIGN_TRACK_ICON_COLOR,
                 TRACK_ICON_FILL_COLOR

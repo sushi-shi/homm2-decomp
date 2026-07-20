@@ -30,7 +30,7 @@ void IconToBitmap(
     i32 x,
     i32 y,
     i32 frame,
-    i32 clip,
+    H2_ENUM_PARAM(IconDrawClipMode, i32) clip,
     i32 clipX,
     i32 clipY,
     i32 clipW,
@@ -49,14 +49,14 @@ void IconToBitmap(
     gIcX0 = X;
     gIcPitch = dest->m_width;
     gIcY = Y;
-    if (clip != 0) {
+    if (clip != ICON_DRAW_NO_CLIP) {
         if (gIcX0 < clipX || clipW + clipX < entry->w + gIcX0 || gIcY < clipY
             || clipY + clipH < entry->h + gIcY) {
-            clip = 1;
+            clip = ICON_DRAW_CLIP;
             gIcClipR = clipX + clipW - 1;
             gIcClipB = clipY + clipH - 1;
         } else {
-            clip = 0;
+            clip = ICON_DRAW_NO_CLIP;
         }
     }
     u8* row = dest->m_pixels + gIcPitch * gIcY;
@@ -102,7 +102,7 @@ void IconToBitmap(
             }
             goto do_dim;
         do_fill:
-            if (clip == 0) {
+            if (clip == ICON_DRAW_NO_CLIP) {
                 memset(row + X, gIcColor, count);
             } else {
                 i32 right;
@@ -130,7 +130,7 @@ void IconToBitmap(
             if (flags & ICON_RLE_DIM_APPLY_FLAG) {
                 u32 lvl = (flags & ICON_RLE_DIM_LEVEL_MASK) * ICON_RLE_DIM_PALETTE_LEVEL_STRIDE;
                 u8* palette = &uDimPal[0][0][0] + lvl;
-                if (clip == 0) {
+                if (clip == ICON_DRAW_NO_CLIP) {
                     u8* dp = row + X;
                     gIcDimPal = palette;
                     gIcDimDst = dp;
@@ -194,7 +194,7 @@ void IconToBitmap(
             u8* copyDst;
             u8* copySrc;
             do {
-                if (clip == 0) {
+                if (clip == ICON_DRAW_NO_CLIP) {
                     copyCount = cmd;
                     copyDst = row + X;
                     copySrc = gIcSrc;

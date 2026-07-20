@@ -88,7 +88,7 @@ void hexcell::DrawTower(i32 frame) {
     else
         drawX = m_x + TOWER_X_OFFSET;
     gpCombatManager->m_combatIcons[IDX(COMBAT_ICON_TOWER)]
-        ->CombatClipDrawToBuffer(drawX, m_y, frame, m_limits, 1, 0, NULL, NULL);
+        ->CombatClipDrawToBuffer(drawX, m_y, frame, m_limits, ICON_DRAW_FLIPPED, 0, NULL, NULL);
 
     row = (m_y - TOWER_ROW_Y_ORIGIN) / COMBAT_HEX_VERTICAL_STEP;
     if (row == TOWER_EXCLUDED_ROW)
@@ -100,7 +100,7 @@ void hexcell::DrawTower(i32 frame) {
             rightX = m_x + TOWER_X_OFFSET;
         gpCombatManager->m_combatIcons[IDX(COMBAT_ICON_TOWER)]
             ->CombatClipDrawToBuffer(
-                rightX, m_y, TOWER_OVERLAY_FRAME, m_limits, 1, 0, NULL, NULL
+                rightX, m_y, TOWER_OVERLAY_FRAME, m_limits, ICON_DRAW_FLIPPED, 0, NULL, NULL
             );
     } else {
         if (level)
@@ -109,7 +109,7 @@ void hexcell::DrawTower(i32 frame) {
             temp = m_x;
         gpCombatManager->m_combatIcons[IDX(COMBAT_ICON_TOWER)]
             ->CombatClipDrawToBuffer(
-                temp, m_y, TOWER_OVERLAY_FRAME, m_limits, 0, 0, NULL, NULL
+                temp, m_y, TOWER_OVERLAY_FRAME, m_limits, ICON_DRAW_NORMAL, 0, NULL, NULL
             );
     }
 }
@@ -122,5 +122,5 @@ void hexcell::DrawClouds(void) {
 VA(0x0044a86e, 0x4f)
 void hexcell::DrawObstacle(void) {
     gpCombatManager->m_obstacleIcons[m_obstacleIndex]
-        ->CombatClipDrawToBuffer(m_x, m_y, 0, m_limits, 0, 0, NULL, NULL);
+        ->CombatClipDrawToBuffer(m_x, m_y, 0, m_limits, ICON_DRAW_NORMAL, 0, NULL, NULL);
 }

@@ -32,7 +32,7 @@ void FlipIconToBitmapColorTable(
     i32 x,
     i32 y,
     i32 frame,
-    i32 clip,
+    H2_ENUM_PARAM(IconDrawClipMode, i32) clip,
     i32 clipX,
     i32 clipY,
     i32 clipW,
@@ -57,15 +57,15 @@ void FlipIconToBitmapColorTable(
     i32 X = (gFCXEnd = w - 1);
     i32 Y = y + entry->y;
     gFCY = Y;
-    if (clip != 0) {
+    if (clip != ICON_DRAW_NO_CLIP) {
         i32 currentY = gFCY;
         if (x0 < clipX || clipW + clipX < x0 + entry->w || currentY < clipY
             || clipY + clipH < entry->h + currentY) {
-            clip = 1;
+            clip = ICON_DRAW_CLIP;
             gFCClipR = clipX + clipW - 1;
             gFCClipB = clipY + clipH - 1;
         } else {
-            clip = 0;
+            clip = ICON_DRAW_NO_CLIP;
         }
     }
     pitch = dest->m_width;
@@ -111,7 +111,7 @@ void FlipIconToBitmapColorTable(
             }
             goto do_dim;
         do_fill:
-            if (clip == 0) {
+            if (clip == ICON_DRAW_NO_CLIP) {
                 memset((gFCRow - count) + 1 + X, gFCColor, count);
             } else {
                 i32 currentY = gFCY;
@@ -136,7 +136,7 @@ void FlipIconToBitmapColorTable(
                     &uDimPal[0][0][0]
                     + (flags & ICON_RLE_DIM_LEVEL_MASK) * ICON_RLE_DIM_PALETTE_LEVEL_STRIDE;
                 gFCDimPal = palette;
-                if (clip == 0) {
+                if (clip == ICON_DRAW_NO_CLIP) {
                     u8* dp = (gFCRow - count) + 1 + X;
                     gFCCnt = 0;
                     i32 dimCount = count;
@@ -189,7 +189,7 @@ void FlipIconToBitmapColorTable(
         gFCRun = cmd;
         gFCX = X;
         if (cmd != 0) {
-            if (clip == 0) {
+            if (clip == ICON_DRAW_NO_CLIP) {
                 gFCCnt = 0;
                 u8* dst = gFCRow + X;
                 gFCDst = dst;

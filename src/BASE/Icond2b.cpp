@@ -27,7 +27,7 @@ void DimIconToBitmap(
     i32 y,
     i32 frame,
     i32 color,
-    i32 clip,
+    H2_ENUM_PARAM(IconDrawClipMode, i32) clip,
     i32 clipX,
     i32 clipY,
     i32 clipW,
@@ -45,14 +45,14 @@ void DimIconToBitmap(
     gDimY = y + entryY;
     i32 right;
     u32 cnt;
-    if (clip != 0) {
+    if (clip != ICON_DRAW_NO_CLIP) {
         if (clipX > gDimX0 || gDimX0 + entry->w > clipX + clipW || gDimY < clipY
             || gDimY + entry->h > clipY + clipH) {
-            clip = 1;
+            clip = ICON_DRAW_CLIP;
             gDimClipR = clipX + clipW - 1;
             gDimClipB = clipY + clipH - 1;
         } else {
-            clip = 0;
+            clip = ICON_DRAW_NO_CLIP;
         }
     }
     i32 rowOffset = gDimY;
@@ -74,7 +74,7 @@ void DimIconToBitmap(
         }
         gDimRun = cmd;
         if (cmd != 0) {
-            if (clip == 0) {
+            if (clip == ICON_DRAW_NO_CLIP) {
                 u8* dst = row + X;
                 u32 paletteOffset;
                 gDimCnt = 0;

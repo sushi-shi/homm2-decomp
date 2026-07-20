@@ -302,7 +302,7 @@ void swapManager::DrawSelector(void) {
             selectorY_11,
             m_itemType == SWAP_ITEM_ARMY ? ARMY_SELECTOR_FRAME : ARTIFACT_SELECTOR_FRAME,
             selectorFrame_17,
-            0,
+            ICON_DRAW_NORMAL,
             NULL
         );
         gpWindowManager->UpdateScreenRegion(

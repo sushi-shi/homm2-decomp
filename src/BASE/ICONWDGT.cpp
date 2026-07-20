@@ -19,7 +19,7 @@ iconWidget::iconWidget(void) : widget(0, 0, 0, 0, 0, 0) {
     m_frame = 0;
     m_fillColor = 0;
     m_icon = NULL;
-    m_flip = 0;
+    m_orientation = ICON_DRAW_NORMAL;
     m_iconId = 0;
 }
 
@@ -32,7 +32,7 @@ iconWidget::iconWidget(
     i16 height,
     u32l iconId,
     i16 frame,
-    i8 flip,
+    H2_ENUM_PARAM(IconDrawOrientation, i8) orientation,
     i16 id,
     i16 kind,
     i16 fillColor
@@ -42,7 +42,7 @@ iconWidget::iconWidget(
     m_icon = gpResourceManager->GetIcon(iconId);
     m_frame = frame;
     m_fillColor = fillColor;
-    m_flip = flip;
+    m_orientation = orientation;
     m_kind = kind;
 }
 
@@ -54,7 +54,7 @@ iconWidget::iconWidget(
     i16 height,
     char* iconName,
     i16 frame,
-    i8 flip,
+    H2_ENUM_PARAM(IconDrawOrientation, i8) orientation,
     i16 id,
     i16 kind,
     i16 fillColor
@@ -64,7 +64,7 @@ iconWidget::iconWidget(
     m_icon = gpResourceManager->GetIcon(m_iconId);
     m_frame = frame;
     m_fillColor = fillColor;
-    m_flip = flip;
+    m_orientation = orientation;
     m_kind = kind;
 }
 
@@ -81,7 +81,7 @@ void iconWidget::Read(void) {
     m_icon = gpResourceManager->GetIcon(m_iconId);
     gpResourceManager->RestorePosition();
     m_frame = gpResourceManager->ReadWord();
-    m_flip = static_cast<i8>(gpResourceManager->ReadWord());
+    m_orientation = static_cast<IconDrawOrientation>(gpResourceManager->ReadWord());
     m_id = gpResourceManager->ReadWord();
     m_kind = gpResourceManager->ReadWord();
     m_fillColor = gpResourceManager->ReadWord() & COLOR_INDEX_MASK;
@@ -200,7 +200,7 @@ void iconWidget::Draw(void) {
 
     switch (DecodeWidgetKind(kind)) {
         case WIDGET_KIND_ICON_DIRECT:
-            m_icon->DrawToBuffer(x, y, m_frame, m_flip);
+            m_icon->DrawToBuffer(x, y, m_frame, m_orientation);
             return;
 
         case WIDGET_KIND_ICON_CENTERED: {
@@ -215,12 +215,12 @@ void iconWidget::Draw(void) {
                 x += (widgetWidth - iconWidth) >> CENTER_SHIFT;
             if (entry->h + BOTTOM_PADDING < m_height)
                 y += m_height - entry->h - BOTTOM_PADDING;
-            m_icon->DrawToBuffer(x, y, m_frame, m_flip);
+            m_icon->DrawToBuffer(x, y, m_frame, m_orientation);
             return;
         }
 
         case WIDGET_KIND_ICON_FILL:
-            m_icon->FillToBuffer(x, y, m_frame, m_fillColor, m_flip, NULL);
+            m_icon->FillToBuffer(x, y, m_frame, m_fillColor, m_orientation, NULL);
             return;
     }
 }

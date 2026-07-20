@@ -52,7 +52,7 @@ VA(0x004c8080, 0xa2)
 void resourceManager::GetBackdrop(char* name, class bitmap* backdrop, i32 useIcon) {
     if (useIcon) {
         icon* backdropIcon = GetIcon(name);
-        backdropIcon->DrawToBuffer(0, 0, 0, 0);
+        backdropIcon->DrawToBuffer(0, 0, 0, ICON_DRAW_NORMAL);
         Dispose(backdropIcon);
     } else {
         PointToFile(MakeId(name, 1));
@@ -80,7 +80,7 @@ void resourceManager::GetBackdropAtLoc(
     i32 row;
     if (useIcon != 0) {
         backdropIcon = GetIcon(filename);
-        backdropIcon->DrawToBuffer(destinationX, destinationY, 0, 0);
+        backdropIcon->DrawToBuffer(destinationX, destinationY, 0, ICON_DRAW_NORMAL);
         Dispose(backdropIcon);
     } else {
         PointToFile(MakeId(filename, 1));
