@@ -126,7 +126,13 @@ i32 MemSize(i32);
 void GetDataEntry(char*, char*, i32, char*, i32, i32);
 i32 DataEntryWindowHandler(struct tag_message& message);
 
-extern i32 bDataEntryTime;
+H2_ENUM_CLASS_BEGIN(DataEntryPhase)
+    ENTRY_PHASE_IMMEDIATE    = 0,
+    ENTRY_PHASE_POINTER_SENT = 1,
+    ENTRY_PHASE_READY        = 2
+H2_ENUM_CLASS_END(DataEntryPhase)
+
+extern H2_ENUM_STORAGE_STEPPED(DataEntryPhase, i32) bDataEntryTime;
 extern char* cDEDest;
 extern class heroWindow* DataEntryWin;
 extern MemEntry* gpMemEntry;
