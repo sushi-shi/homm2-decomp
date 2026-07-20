@@ -318,10 +318,6 @@ H2_ENUM_CLASS_BEGIN(CombatLongHelpIndex)
     LONG_HELP_CONTROLS          = 4
 H2_ENUM_CLASS_END(CombatLongHelpIndex)
 
-H2_ENUM_BEGIN(HeroArtifactConstant)
-    ARTIFACT_TRANSFERABLE_FIRST = IDX(ARTIFACT_ARCANE_NECKLACE)
-H2_ENUM_END(HeroArtifactConstant)
-
 H2_ENUM_BEGIN(CombatStorageConstant)
     SELECTOR_INITIAL_FRAME = 7,
     VIEW_DESCRIPTION_SIZE  = 300
@@ -1634,7 +1630,9 @@ void combatManager::ClearWinLoseBottom(class heroWindow* window) {
 }
 
 VA(0x0042dafd, 0x29a)
-void combatManager::ShowWinLoseArtifact(class heroWindow* window, i32 artifact) {
+void combatManager::ShowWinLoseArtifact(
+    class heroWindow* window, H2_ENUM_PARAM(ArtifactType, i32) artifact
+) {
     DATA(0x004f09e8) static i16 artifactSourceLineBase = 0x680; // NOLINT(readability-magic-numbers)
     i16 w = CASUALTY_WINDOW_WIDTH;
     i16 winBottom = CASUALTY_WINDOW_BOTTOM;
@@ -1670,7 +1668,7 @@ void combatManager::ShowWinLoseArtifact(class heroWindow* window, i32 artifact) 
         ARTIFACT_ICON_SIZE,
         ARTIFACT_ICON_SIZE,
         "artifact.icn",
-        artifact + 1,
+        IDX(artifact) + 1,
         ICON_DRAW_NORMAL,
         WIN_LOSE_ARTIFACT_IMAGE_ID,
         WIN_LOSE_ICON_FLAGS,
@@ -1681,7 +1679,7 @@ void combatManager::ShowWinLoseArtifact(class heroWindow* window, i32 artifact) 
     window->AddWidget(m_winLoseBottomWidgets[1], -1);
 
     capturedArtifactName = static_cast<char*>(H2_ALLOC(ARTIFACT_NAME_CAPACITY, 1707));
-    sprintf(capturedArtifactName, gArtifactNames[artifact]);
+    sprintf(capturedArtifactName, gArtifactNames[IDX(artifact)]);
     m_winLoseBottomTextWidgets[0] = new textWidget(
         ARTIFACT_TEXT_X,
         ARTIFACT_TEXT_Y,
@@ -2179,16 +2177,16 @@ void combatManager::DoVictory(i32 winningSide) {
                         && m_heroes[COMBAT_DEFENDER_SIDE] != NULL) {
                         for (fadeIndex = 0; fadeIndex < HERO_ARTIFACT_SLOT_COUNT; ++fadeIndex) {
                             if (m_heroes[winningSide]->m_artifacts[fadeIndex]
-                                == IDX(ARTIFACT_NONE)) {
+                                == ARTIFACT_NONE) {
                                 ++emptyArtifactSlots;
                             }
                         }
                         for (fadeIndex = 0; fadeIndex < HERO_ARTIFACT_SLOT_COUNT; ++fadeIndex) {
                             if (m_heroes[COMBAT_DEFENDER_SIDE - winningSide]->m_artifacts[fadeIndex]
-                                    >= ARTIFACT_TRANSFERABLE_FIRST
+                                    >= ARTIFACT_ARCANE_NECKLACE
                                 && m_heroes[COMBAT_DEFENDER_SIDE - winningSide]
                                            ->m_artifacts[fadeIndex]
-                                       != IDX(ARTIFACT_MAGIC_BOOK)
+                                       != ARTIFACT_MAGIC_BOOK
                                 && emptyArtifactSlots > iMaxTransferArtifacts) {
                                 iTransferArtifacts[iMaxTransferArtifacts] =
                                     m_heroes[COMBAT_DEFENDER_SIDE - winningSide]
@@ -3207,6 +3205,7 @@ DATA(0x005250e4) i32 giWinCmbtFrame;
 DATA(0x005250e8) i32 giNextActionGridIndex;
 DATA(0x005250ec) i32 giSurrenderCost;
 DATA(0x005250f0) i32 giSkeletonsCreated;
-DATA(0x005250f8) i8 iTransferArtifacts[COMBAT_TRANSFER_ARTIFACT_COUNT];
+DATA(0x005250f8)
+H2_ENUM_STORAGE(ArtifactType, i8) iTransferArtifacts[COMBAT_TRANSFER_ARTIFACT_COUNT];
 DATA(0x00525108) H2_ENUM_STORAGE(CombatAction, i32) giNextAction;
 DATA(0x0052510c) i32 giNextActionGridIndex2;

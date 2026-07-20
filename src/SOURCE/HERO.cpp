@@ -227,7 +227,7 @@ i32 hero::HasArtifact(ArtifactType artifact) {
     i32 artifactIndex;
 
     for (artifactIndex = 0; artifactIndex < HERO_ARTIFACT_SLOT_COUNT; artifactIndex++) {
-        if (m_artifacts[artifactIndex] == IDX(artifact))
+        if (m_artifacts[artifactIndex] == artifact)
             return 1;
     }
     return 0;
@@ -301,7 +301,7 @@ i32 hero::HasSpell(SpellType spell) {
     if (m_spells[IDX(spell)])
         return 1;
     for (artifactIndex = 0; artifactIndex < HERO_ARTIFACT_SLOT_COUNT; artifactIndex++) {
-        if (m_artifacts[artifactIndex] == IDX(ARTIFACT_SPELL_SCROLL)
+        if (m_artifacts[artifactIndex] == ARTIFACT_SPELL_SCROLL
             && m_artifactExtra[artifactIndex] == IDX(spell)) {
             return 1;
         }
@@ -957,7 +957,7 @@ i32 hero::NumArtifacts(void) {
     i32 i;
 
     for (i = 0; i < HERO_ARTIFACT_SLOT_COUNT; i++) {
-        if (m_artifacts[i] >= 0)
+        if (m_artifacts[i] != ARTIFACT_NONE)
             cnt++;
     }
     return cnt;
@@ -1101,17 +1101,18 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
         case UI_ARTIFACT_SLOT_12:
         case UI_ARTIFACT_SLOT_13:
             if (gpHVHero->m_artifacts[message.payload.widget.id - UI_ARTIFACT_FIRST]
-                == IDX(ARTIFACT_NONE))
+                == ARTIFACT_NONE)
                 sprintf(gText, cHeroScreen[IDX(TEXT_EMPTY)]);
             else if (gpHVHero->m_artifacts[message.payload.widget.id - UI_ARTIFACT_FIRST]
-                     == IDX(ARTIFACT_MAGIC_BOOK))
+                     == ARTIFACT_MAGIC_BOOK)
                 strcpy(gText, cHeroScreen[IDX(TEXT_VIEW_SPELLS)]);
             else
                 sprintf(
                     gText,
                     cHeroScreen[IDX(TEXT_ARTIFACT)],
                     gArtifactNames
-                        [gpHVHero->m_artifacts[message.payload.widget.id - UI_ARTIFACT_FIRST]]
+                        [IDX(gpHVHero->m_artifacts
+                                 [message.payload.widget.id - UI_ARTIFACT_FIRST])]
                 );
             break;
 
@@ -1491,11 +1492,11 @@ i32 HeroHandler(struct tag_message& message) {
                     case UI_ARTIFACT_SLOT_13:
                         if (gpHVHero
                                 ->m_artifacts[message.payload.widget.id - UI_ARTIFACT_FIRST]
-                            != IDX(ARTIFACT_NONE)) {
+                            != ARTIFACT_NONE) {
                             if (quickView0 == 0
                                 && gpHVHero->m_artifacts
-                                           [message.payload.widget.id - UI_ARTIFACT_FIRST]
-                                       == IDX(ARTIFACT_MAGIC_BOOK)) {
+                                       [message.payload.widget.id - UI_ARTIFACT_FIRST]
+                                       == ARTIFACT_MAGIC_BOOK) {
                                 gpGame->ViewSpells(
                                     gpHVHero,
                                     SPELL_TYPE_ALL,
@@ -1504,10 +1505,8 @@ i32 HeroHandler(struct tag_message& message) {
                                 );
                             } else {
                                 gpHVHero->ViewArtifact(
-                                    ArtifactType(
-                                        gpHVHero->m_artifacts
-                                            [message.payload.widget.id - UI_ARTIFACT_FIRST]
-                                    ),
+                                    gpHVHero->m_artifacts
+                                        [message.payload.widget.id - UI_ARTIFACT_FIRST],
                                     quickView0,
                                     gpHVHero->m_artifactExtra
                                         [message.payload.widget.id - UI_ARTIFACT_FIRST]
@@ -1839,12 +1838,12 @@ void SetupHeroView(void) {
 
     for (index = 0; index < HERO_ARTIFACT_SLOT_COUNT; index++) {
         message.payload.widget.id = UI_ARTIFACT_FIRST + index;
-        if (gpHVHero->m_artifacts[index] != IDX(ARTIFACT_NONE)) {
+        if (gpHVHero->m_artifacts[index] != ARTIFACT_NONE) {
             message.payload.widget.command = HERO_UI_WIDGET_ENABLE;
             message.payload.widget.data.value = UI_ARTIFACT_CONTROL_VALUE;
             heroWin->BroadcastMessage(message);
             message.payload.widget.command = HERO_UI_WIDGET_FRAME;
-            message.payload.widget.data.value = gpHVHero->m_artifacts[index] + 1;
+            message.payload.widget.data.value = IDX(gpHVHero->m_artifacts[index]) + 1;
             heroWin->BroadcastMessage(message);
         } else {
             message.payload.widget.command = HERO_UI_WIDGET_FRAME;
@@ -2088,15 +2087,15 @@ void hero::CheckAnduranPieces(i32 showDialog) {
     if (HasArtifact(ARTIFACT_BREASTPLATE_ANDURAN) && HasArtifact(ARTIFACT_HELMET_ANDURAN)
         && HasArtifact(ARTIFACT_SWORD_ANDURAN)) {
         for (artifactSlot = 0; artifactSlot < HERO_ARTIFACT_SLOT_COUNT; artifactSlot++) {
-            if (m_artifacts[artifactSlot] == IDX(ARTIFACT_BREASTPLATE_ANDURAN)
-                || m_artifacts[artifactSlot] == IDX(ARTIFACT_HELMET_ANDURAN)
-                || m_artifacts[artifactSlot] == IDX(ARTIFACT_SWORD_ANDURAN)) {
+            if (m_artifacts[artifactSlot] == ARTIFACT_BREASTPLATE_ANDURAN
+                || m_artifacts[artifactSlot] == ARTIFACT_HELMET_ANDURAN
+                || m_artifacts[artifactSlot] == ARTIFACT_SWORD_ANDURAN) {
                 GiveTakeArtifactStat(
                     this,
-                    ArtifactType(m_artifacts[artifactSlot]),
+                    m_artifacts[artifactSlot],
                     EVENT_ARTIFACT_TAKE
                 );
-                m_artifacts[artifactSlot] = IDX(ARTIFACT_NONE);
+                m_artifacts[artifactSlot] = ARTIFACT_NONE;
             }
         }
         GiveArtifact(this, ARTIFACT_BATTLE_GARB, showDialog, IDX(ARTIFACT_NONE));

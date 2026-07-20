@@ -951,7 +951,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
 
             i32 displayedArtifacts = 0;
             for (item = 0; item < OVERVIEW_ARTIFACT_SLOTS; item++) {
-                if (heroData0->m_artifacts[item] != IDX(ARTIFACT_NONE)) {
+                if (heroData0->m_artifacts[item] != ARTIFACT_NONE) {
                     detailRow = displayedArtifacts / OVERVIEW_ARTIFACT_COLUMNS;
                     detailColumn = displayedArtifacts % OVERVIEW_ARTIFACT_COLUMNS;
                     OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] = new iconWidget(
@@ -987,7 +987,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                         DETAIL_ICON_WIDTH,
                         DETAIL_ICON_HEIGHT,
                         const_cast<char*>("artfx.icn"),
-                        static_cast<i16>(heroData0->m_artifacts[item]),
+                        static_cast<i16>(IDX(heroData0->m_artifacts[item])),
                         ICON_DRAW_NORMAL,
                         static_cast<i16>(rowWidgetId6 + item + HERO_ARTIFACT_FIRST),
                         WIDGET_KIND_ICON_DIRECT,
@@ -1513,13 +1513,13 @@ i32 game::ProcessIconSelect(i32 widgetId, i32 quickView) {
             }
             if (widgetId >= HERO_ARTIFACT_FIRST
                 && widgetId <= HERO_ARTIFACT_LAST) {
-                selectionIndex2 =
+                ArtifactType selectedArtifact =
                     selectedHero13->m_artifacts[widgetId - HERO_ARTIFACT_FIRST];
-                if (selectionIndex2 == IDX(ARTIFACT_MAGIC_BOOK)) {
+                if (selectedArtifact == ARTIFACT_MAGIC_BOOK) {
                     gpGame->ViewSpells(selectedHero13, SPELL_TYPE_ALL, ViewSpecialHandler, 1);
                 } else {
                     NormalDialog(
-                        gArtifactDesc[selectionIndex2],
+                        gArtifactDesc[IDX(selectedArtifact)],
                         quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW,
                         NORMAL_DIALOG_NO_VALUE,
                         NORMAL_DIALOG_MAX_TOP,

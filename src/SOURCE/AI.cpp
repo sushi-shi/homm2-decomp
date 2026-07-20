@@ -105,9 +105,11 @@ i32 combatManager::AICheckRetreat(void) {
         artifactValues[side9] = 0;
         if (heroPtr9 != NULL) {
             for (armyIndex36 = 0; armyIndex36 < AI_BATTLE_ARTIFACT_SLOT_COUNT; armyIndex36++) {
-                if (heroPtr9->m_artifacts[armyIndex36] >= 0
-                    && heroPtr9->m_artifacts[armyIndex36] < AI_BATTLE_BASE_ARTIFACT_LIMIT) {
-                    artifactValues[side9] += gArtifactBaseRV[heroPtr9->m_artifacts[armyIndex36]];
+                if (heroPtr9->m_artifacts[armyIndex36] != ARTIFACT_NONE
+                    && IDX(heroPtr9->m_artifacts[armyIndex36])
+                           < AI_BATTLE_BASE_ARTIFACT_LIMIT) {
+                    artifactValues[side9] +=
+                        gArtifactBaseRV[IDX(heroPtr9->m_artifacts[armyIndex36])];
                 }
             }
         }

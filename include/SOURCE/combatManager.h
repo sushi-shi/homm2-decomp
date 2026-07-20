@@ -783,7 +783,7 @@ public:
     i32 RightClick(i32);
     void DoCommand(CombatMessageCommand);
     void ClearWinLoseBottom(class heroWindow*);
-    void ShowWinLoseArtifact(class heroWindow*, i32);
+    void ShowWinLoseArtifact(class heroWindow*, H2_ENUM_PARAM(ArtifactType, i32));
     void ShowSkeletons(class heroWindow*);
     void ShowEagleEyeSpell(class heroWindow*);
     void ShowDeadArmies(class heroWindow*);
@@ -907,7 +907,7 @@ extern i32 giWinCmbtFrame;
 extern i32 giNextActionGridIndex;
 extern i32 giSurrenderCost;
 extern i32 giSkeletonsCreated;
-extern i8 iTransferArtifacts[COMBAT_TRANSFER_ARTIFACT_COUNT];
+extern H2_ENUM_STORAGE(ArtifactType, i8) iTransferArtifacts[COMBAT_TRANSFER_ARTIFACT_COUNT];
 extern H2_ENUM_STORAGE(CombatAction, i32) giNextAction;
 extern i32 giNextActionGridIndex2;
 extern i32 giCurrSpellGroup;
