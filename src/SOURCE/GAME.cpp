@@ -73,14 +73,12 @@ H2_ENUM_BEGIN(GameSaveFormatConstant)
 H2_ENUM_END(GameSaveFormatConstant)
 
 H2_ENUM_BEGIN(GameHeroSelectionConstant)
-    HERO_SELECTION_RETRY_LIMIT             = 2000,
-    HERO_SELECTION_REUSE_RETRY_LIMIT       = 1500,
-    HERO_SELECTION_FACTION_RETRY_LIMIT     = 100,
-    HERO_SELECTION_EXPERIENCE_RETRY_LIMIT  = 40,
-    HERO_SELECTION_MINIMUM_EXPERIENCE      = 1000,
-    HERO_SELECTION_CAMPAIGN_RETRY_LIMIT    = 500,
-    HERO_SELECTION_CAMPAIGN_PORTRAIT_FIRST = IDX(CAMPAIGN_HERO_ROLAND),
-    HERO_SELECTION_CAMPAIGN_PORTRAIT_LAST  = IDX(CAMPAIGN_HERO_BRAX)
+    HERO_SELECTION_RETRY_LIMIT            = 2000,
+    HERO_SELECTION_REUSE_RETRY_LIMIT      = 1500,
+    HERO_SELECTION_FACTION_RETRY_LIMIT    = 100,
+    HERO_SELECTION_EXPERIENCE_RETRY_LIMIT = 40,
+    HERO_SELECTION_MINIMUM_EXPERIENCE     = 1000,
+    HERO_SELECTION_CAMPAIGN_RETRY_LIMIT   = 500
 H2_ENUM_END(GameHeroSelectionConstant)
 
 H2_ENUM_BEGIN(GameInitialStateConstant)
@@ -128,8 +126,6 @@ H2_ENUM_BEGIN(NewMapConstant)
     STARTING_HERO_TOWN_PASS_COUNT              = 2,
     STARTING_HERO_ALLOW_NON_CASTLE_PASS        = 1,
     NECROMANCER_SHRINE_BUILD_MASK              = 1 << IDX(BUILDING_SLOT_NECROMANCER_SHRINE),
-    EXPANSION_HERO_IVAN_PORTRAIT               = 63,
-    EXPANSION_HERO_JOSEPH_PORTRAIT             = 64,
     CAMPAIGN_SCENARIO_NUMBER_OFFSET            = 1,
     CAMPAIGN_ROLAND_ULTIMATE_CROWN_SCENARIO    = 8,
     CAMPAIGN_ARCHIBALD_ULTIMATE_CROWN_SCENARIO = 9,
@@ -1094,8 +1090,8 @@ i32 game::GetNewHeroId(i32, FactionType heroClass, i32 requireExperienced) {
                 || m_heroRecs[heroId].m_artifacts[1] == ARTIFACT_MAGIC_BOOK))
             continue;
         if (gbInCampaign && attempts < HERO_SELECTION_CAMPAIGN_RETRY_LIMIT
-            && m_heroRecs[heroId].m_portrait >= HERO_SELECTION_CAMPAIGN_PORTRAIT_FIRST
-            && m_heroRecs[heroId].m_portrait <= HERO_SELECTION_CAMPAIGN_PORTRAIT_LAST)
+            && m_heroRecs[heroId].m_portrait >= CAMPAIGN_HERO_ROLAND
+            && m_heroRecs[heroId].m_portrait <= CAMPAIGN_HERO_BRAX)
             continue;
         break;
     }
@@ -1783,7 +1779,7 @@ void game::NewMap(char* filename) {
     i32 heroY16;
     i8 setupClass12;
     FactionType specialFaction6;
-    i32 specialPortrait6;
+    HeroPortrait specialPortrait6;
     char* specialName3;
     FactionType specialClass6;
     i32 resource13;
@@ -1939,12 +1935,12 @@ void game::NewMap(char* filename) {
                     m_heroRecs[campaignHero15].m_experience += CAMPAIGN_EXPERIENCE_BONUS;
                     m_heroRecs[campaignHero15].CheckLevel();
                     strcpy(m_heroRecs[campaignHero15].m_name, "Sister Eliza");
-                    m_heroRecs[campaignHero15].m_portrait = IDX(CAMPAIGN_HERO_ELIZA);
+                    m_heroRecs[campaignHero15].m_portrait = CAMPAIGN_HERO_ELIZA;
                 } else {
                     m_heroRecs[campaignHero15].m_experience += CAMPAIGN_EXPERIENCE_BONUS;
                     m_heroRecs[campaignHero15].CheckLevel();
                     strcpy(m_heroRecs[campaignHero15].m_name, "Brother Brax");
-                    m_heroRecs[campaignHero15].m_portrait = IDX(CAMPAIGN_HERO_BRAX);
+                    m_heroRecs[campaignHero15].m_portrait = CAMPAIGN_HERO_BRAX;
                 }
                 m_players[player2].m_availableHeroIds[0] = static_cast<char>(campaignHero15);
                 m_availableHeroes[m_players[player2].m_availableHeroIds[0]] =

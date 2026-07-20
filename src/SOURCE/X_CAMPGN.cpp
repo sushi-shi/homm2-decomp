@@ -20,12 +20,6 @@
 #include <SOURCE/hero.h>
 #include <SOURCE/kbwin.h>
 
-H2_ENUM_CLASS_BEGIN(ExpansionCampaignHeroPortrait)
-    HERO_DAINWIN   = 0x3d,
-    HERO_GALLAVANT = 0x41,
-    HERO_CEALLACH  = 0x43
-H2_ENUM_CLASS_END(ExpansionCampaignHeroPortrait)
-
 H2_ENUM_BEGIN(ExpansionCampaignSmacker)
     SMACKER_POL_INTRO             = 0x27,
     SMACKER_POL_UPRISING          = 0x28,
@@ -371,12 +365,12 @@ void ExpCampaign::InitMap(void) {
                     choiceHero = gpGame->GetHero(player->m_heroIds[heroPosition]);
                     if (m_campaignId == EXPANSION_CAMPAIGN_VOYAGE_HOME
                         && m_currentMap == MAP_VOY_BLOOD_IS_THICKER) {
-                        if (choiceHero->m_portrait == IDX(HERO_GALLAVANT))
+                        if (choiceHero->m_portrait == HERO_GALLAVANT)
                             break;
                     } else {
                         if (m_campaignId == EXPANSION_CAMPAIGN_VOYAGE_HOME
                             && m_currentMap == MAP_VOY_KING_AND_COUNTRY) {
-                            if (choiceHero->m_portrait == IDX(HERO_CEALLACH))
+                            if (choiceHero->m_portrait == HERO_CEALLACH)
                                 break;
                         } else {
                             break;
@@ -415,7 +409,7 @@ void ExpCampaign::InitMap(void) {
                     choiceHero = gpGame->GetHero(player->m_heroIds[heroPosition]);
                     if (m_campaignId == EXPANSION_CAMPAIGN_VOYAGE_HOME
                         && m_currentMap == MAP_VOY_KING_AND_COUNTRY) {
-                        if (choiceHero->m_portrait == IDX(HERO_CEALLACH))
+                        if (choiceHero->m_portrait == HERO_CEALLACH)
                             break;
                     } else {
                         break;
@@ -464,8 +458,7 @@ void ExpCampaign::InitMap(void) {
                 case AWARD_DEFEAT_KRAEGER:
                     for (heroPosition = 0; heroPosition < EXPANSION_CAMPAIGN_HERO_COUNT;
                          ++heroPosition) {
-                        if (gpGame->m_heroRecs[heroPosition].m_portrait
-                            == IDX(HERO_DAINWIN))
+                        if (gpGame->m_heroRecs[heroPosition].m_portrait == HERO_DAINWIN)
                             gpGame->m_heroRecs[heroPosition].Deallocate(0);
                     }
                     break;

@@ -642,7 +642,7 @@ void hero::Deallocate(i32 updateMap) {
     if (!gbCombatSurrender)
         gpGame->SetRandomHeroArmies(m_id, RANDOM_HERO_NORMAL_ARMY);
 
-    if (gbInCampaign && m_portrait == IDX(CAMPAIGN_HERO_CORLAGON)
+    if (gbInCampaign && m_portrait == CAMPAIGN_HERO_CORLAGON
         && gpGame->m_campaignType == CAMPAIGN_ROLAND
         && gpGame->m_campaignScenario + 1 == CAMPAIGN_ROLAND_FINAL_SCENARIO && !gbRetreatWin
         && !gbCombatSurrender) {
@@ -1661,7 +1661,7 @@ void SetupHeroView(void) {
     message.payload.widget.data.value = UI_CONTROL_VALUE_DEFAULT;
     heroWin->BroadcastMessage(message);
 
-    sprintf(gText, "port%04d.icn", gpHVHero->m_portrait);
+    sprintf(gText, "port%04d.icn", IDX(gpHVHero->m_portrait));
     message.payload.widget.command = HERO_UI_WIDGET_ICON_FILE;
     message.payload.widget.id = UI_HERO_PORTRAIT;
     message.payload.widget.data.text = gText;

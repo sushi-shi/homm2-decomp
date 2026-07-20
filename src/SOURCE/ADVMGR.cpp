@@ -5319,7 +5319,7 @@ void advManager::UpdateHeroLocator(i32 locatorSlot, i32 drawWindow, i32 updateSc
 
         locatorMessage15.payload.widget.id = widgetBase7 + LOCATOR_HERO_PORTRAIT_OFFSET;
         locatorMessage15.payload.widget.command = ADVMGR_LOCATOR_COMMAND_SET_FRAME;
-        locatorMessage15.payload.widget.data.value = locatorHero8->m_portrait;
+        locatorMessage15.payload.widget.data.value = IDX(locatorHero8->m_portrait);
         m_adventureWindow->BroadcastMessage(locatorMessage15);
     }
 
@@ -6231,7 +6231,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
 
     quickViewMessageState.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
     quickViewMessageState.payload.widget.id = HERO_QUICK_PORTRAIT_WIDGET;
-    quickViewMessageState.payload.widget.data.value = targetHero->m_portrait;
+    quickViewMessageState.payload.widget.data.value = IDX(targetHero->m_portrait);
     quickWindowSlot->BroadcastMessage(quickViewMessageState);
     quickViewMessageState.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
     quickViewMessageState.payload.widget.id = HERO_QUICK_PLAYER_COLOR_WIDGET;

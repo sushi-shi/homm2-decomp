@@ -160,12 +160,12 @@ i32 swapManager::Open(i32 id) {
     tag_message message;
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_SET_ICON;
-    sprintf(gText, "port%04d.icn", m_heroes[IDX(SWAP_SIDE_LEFT)]->m_portrait);
+    sprintf(gText, "port%04d.icn", IDX(m_heroes[IDX(SWAP_SIDE_LEFT)]->m_portrait));
     message.payload.widget.id = LEFT_PORTRAIT_WIDGET;
     message.payload.widget.data.text = gText;
     m_window->BroadcastMessage(message);
 
-    sprintf(gText, "port%04d.icn", m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_portrait);
+    sprintf(gText, "port%04d.icn", IDX(m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_portrait));
     message.payload.widget.id = RIGHT_PORTRAIT_WIDGET;
     m_window->BroadcastMessage(message);
 

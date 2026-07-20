@@ -913,16 +913,16 @@ void game::InitCampaignMap(void) {
              scanPositionId < campaignPlayerCurrent->m_heroCount;
              ++scanPositionId) {
             if (gpGame->m_heroRecs[campaignPlayerCurrent->m_heroIds[scanPositionId]].m_portrait
-                    == IDX(CAMPAIGN_HERO_ROLAND)
+                    == CAMPAIGN_HERO_ROLAND
                 || gpGame->m_heroRecs[campaignPlayerCurrent->m_heroIds[scanPositionId]].m_portrait
-                       == IDX(CAMPAIGN_HERO_ARCHIBALD)) {
+                       == CAMPAIGN_HERO_ARCHIBALD) {
                 heroPriorityBest = CAMPAIGN_HERO_PRIORITY_HIGH;
             } else if (gpGame->m_heroRecs[campaignPlayerCurrent->m_heroIds[scanPositionId]]
                                .m_portrait
-                           == IDX(CAMPAIGN_HERO_CORLAGON)
+                           == CAMPAIGN_HERO_CORLAGON
                        || gpGame->m_heroRecs[campaignPlayerCurrent->m_heroIds[scanPositionId]]
                                   .m_portrait
-                              == IDX(CAMPAIGN_HERO_HALTON)) {
+                              == CAMPAIGN_HERO_HALTON) {
                 heroPriorityBest = CAMPAIGN_HERO_PRIORITY_NORMAL;
             } else {
                 heroPriorityBest = 0;
@@ -1009,7 +1009,7 @@ void game::InitCampaignMap(void) {
 
     if (m_campaignAwards[IDX(CAMPAIGN_AWARD_CORLAGON_DEFEATED)]) {
         for (heroPositionValue = 0; heroPositionValue < CAMPAIGN_HERO_COUNT; ++heroPositionValue) {
-            if (gpGame->m_heroRecs[heroPositionValue].m_portrait == IDX(CAMPAIGN_HERO_CORLAGON))
+            if (gpGame->m_heroRecs[heroPositionValue].m_portrait == CAMPAIGN_HERO_CORLAGON)
                 gpGame->m_heroRecs[heroPositionValue].Deallocate(0);
         }
     }
