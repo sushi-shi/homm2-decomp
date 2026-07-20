@@ -777,7 +777,7 @@ SOURCE/GAME	?CancelComputerScreen@game@@QAEXXZ	100.0000	6d40937cf8fb
 SOURCE/GAME	?CheckForTimeEvent@game@@QAEXXZ	100.0000	85b7f64886a5
 SOURCE/GAME	?CheckHeroConsistency@game@@QAEXXZ	98.9444	0bba3cc54870
 SOURCE/GAME	?CheckValidAvailableHeroes@@YIXXZ	100.0000	b0e96768cc13
-SOURCE/GAME	?ClaimMine@game@@QAEXHH@Z	99.1489	c7fecb4ee7e5
+SOURCE/GAME	?ClaimMine@game@@QAEXHH@Z	99.1489	17c6bcbcf63c
 SOURCE/GAME	?ClaimTown@game@@QAEXHHH@Z	98.8540	e4e1e59a8fbd
 SOURCE/GAME	?CompressTest2@@YIXXZ	87.0526	983bdd0ebed7
 SOURCE/GAME	?CompressTest3@@YIXXZ	100.0000	65b2dec64919
@@ -858,8 +858,8 @@ SOURCE/GAME	?TransmitSaveGame@game@@QAEHHHH@Z	95.8301	c8b3119f0daf
 SOURCE/GAME	?TurnOffAIMusic@game@@QAEXXZ	100.0000	20396e6e87b5
 SOURCE/GAME	?TurnOnAIMusic@game@@QAEXXZ	100.0000	8914fecfa9da
 SOURCE/GAME	?UpdateSpellWidgets@game@@QAEXXZ	100.0000	bc28146d2809
-SOURCE/GAME	?ViewArmy@game@@QAEXHHHHPAVtown@@HHHPAVhero@@PAVarmy@@PAVarmyGroup@@H@Z	99.1233	c5eda587a404
-SOURCE/GAME	?ViewArmyHandler@@YIHAAUtag_message@@@Z	99.9795	999e994d1d3b
+SOURCE/GAME	?ViewArmy@game@@QAEXHHHHPAVtown@@HHHPAVhero@@PAVarmy@@PAVarmyGroup@@H@Z	99.1233	e2f3c2a00c29
+SOURCE/GAME	?ViewArmyHandler@@YIHAAUtag_message@@@Z	99.9795	158daed32c78
 SOURCE/GAME	?ViewSpecialHandler@@YIHAAUtag_message@@@Z	98.6198	6b561ed7384c
 SOURCE/GAME	?ViewSpells@game@@QAEHPAVhero@@HP6IHAAUtag_message@@@ZH@Z	100.0000	90815b756ac4
 SOURCE/GAME	?ViewSpellsHandler@@YIHAAUtag_message@@@Z	99.7841	a92356d948b9
