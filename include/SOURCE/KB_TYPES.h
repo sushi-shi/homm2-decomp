@@ -105,6 +105,15 @@ H2_ENUM_CLASS_BEGIN(CreatureType)
     CREATURE_COUNT               = 66
 H2_ENUM_CLASS_END(CreatureType)
 
+H2_ENUM_CLASS_BEGIN(ArtifactLevelMask)
+    ARTIFACT_LEVEL_ULTIMATE = 0x01,
+    ARTIFACT_LEVEL_MAJOR    = 0x02,
+    ARTIFACT_LEVEL_MINOR    = 0x04,
+    ARTIFACT_LEVEL_TREASURE = 0x08,
+    ARTIFACT_LEVEL_RANDOM   = 0x0e
+H2_ENUM_CLASS_END(ArtifactLevelMask)
+H2_ENUM_FLAGS(ArtifactLevelMask)
+
 H2_ENUM_CLASS_BEGIN(ArtifactType)
     ARTIFACT_NONE                  = -1,
     ARTIFACT_ULTIMATE_BOOK         = 0,

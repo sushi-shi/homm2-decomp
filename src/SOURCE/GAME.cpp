@@ -242,6 +242,30 @@ H2_ENUM_BEGIN(GameRandomArtifactConstant)
     ARTIFACT_ID_OFFSET            = 1
 H2_ENUM_END(GameRandomArtifactConstant)
 
+H2_ENUM_BEGIN(LayerScanConstant)
+    LAYER_SCAN_CAPACITY = 5
+H2_ENUM_END(LayerScanConstant)
+
+H2_ENUM_BEGIN(ArtifactGuardianConstant)
+    ARTIFACT_GUARDIAN_CHOICE_COUNT = 10,
+    MAJOR_GUARDIAN_CHOICE_FIRST    = 0,
+    MAJOR_GUARDIAN_CHOICE_COUNT    = 6,
+    MINOR_GUARDIAN_CHOICE_FIRST    = 6,
+    MINOR_GUARDIAN_CHOICE_COUNT    = 4
+H2_ENUM_END(ArtifactGuardianConstant)
+
+H2_ENUM_BEGIN(WitchHutConstant)
+    WITCH_HUT_SKILL_FIRST = IDX(HERO_SKILL_PATHFINDING),
+    WITCH_HUT_SKILL_LAST  = IDX(HERO_SKILL_ESTATES)
+H2_ENUM_END(WitchHutConstant)
+
+H2_ENUM_BEGIN(SkeletonEventConstant)
+    SKELETON_DESERT_FRAME      = 84,
+    SKELETON_ROLL_MIN          = 0,
+    SKELETON_ROLL_MAX          = 9,
+    SKELETON_ARTIFACT_ROLL_MAX = 2
+H2_ENUM_END(SkeletonEventConstant)
+
 H2_ENUM_BEGIN(GameVisibilityConstant)
     EARLY_TURN_LAST        = 20,
     MIDDLE_TURN_LAST       = 40,
@@ -1812,11 +1836,11 @@ void game::RandomizeEvents(void) {
     i32 column1;
     i32 upperCount;
     i32 lowerCount16;
-    i32 upperTilesets29[5];
-    i32 upperIndexes1[5];
-    i32 lowerTilesets4[5];
-    i32 lowerIndexes7[5];
-    i32 artifactChoices17[10];
+    i32 upperTilesets29[LAYER_SCAN_CAPACITY];
+    i32 upperIndexes1[LAYER_SCAN_CAPACITY];
+    i32 lowerTilesets4[LAYER_SCAN_CAPACITY];
+    i32 lowerIndexes7[LAYER_SCAN_CAPACITY];
+    CreatureType artifactGuardianChoices[ARTIFACT_GUARDIAN_CHOICE_COUNT];
     EventExtra* mapEvent1;
     mapCell* townEntrance;
     mapCell* cell2;
@@ -1833,9 +1857,12 @@ void game::RandomizeEvents(void) {
             cell2 = m_worldMap.Row(yPos19) + xPos2;
             switch (cell2->m_triggerType) {
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_WITCH_HUT:
-                    cell2->m_objectMetadata = 12;
-                    while (cell2->m_objectMetadata == 12 || cell2->m_objectMetadata == 6)
-                        cell2->m_objectMetadata = Random(0, 13);
+                    cell2->m_objectMetadata = IDX(HERO_SKILL_NECROMANCY);
+                    while (cell2->m_objectMetadata == IDX(HERO_SKILL_NECROMANCY)
+                           || cell2->m_objectMetadata == IDX(HERO_SKILL_LEADERSHIP)) {
+                        cell2->m_objectMetadata =
+                            Random(WITCH_HUT_SKILL_FIRST, WITCH_HUT_SKILL_LAST);
+                    }
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_BOAT:
                     cell2->m_objectTileset = 0;
@@ -1896,15 +1923,23 @@ void game::RandomizeEvents(void) {
                     cell2->m_objectMetadata = shrineId8++;
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_FLOTSAM:
-                    cell2->m_objectMetadata = Random(0, 3);
+                    cell2->m_objectMetadata = Random(FLOTSAM_EMPTY, FLOTSAM_LARGE_TREASURE);
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SKELETON:
-                    if (!HasObjectTilesetIndex(xPos2, yPos19, IDX(TILESET_OBJNDSRT), 84)) {
+                    if (!HasObjectTilesetIndex(
+                            xPos2,
+                            yPos19,
+                            IDX(TILESET_OBJNDSRT),
+                            SKELETON_DESERT_FRAME
+                        )) {
                         cell2->m_triggerType &= MAP_TRIGGER_TYPE_MASK;
-                    } else if (Random(0, 9) > 2) {
-                        cell2->m_objectMetadata = 1;
+                    } else if (Random(SKELETON_ROLL_MIN, SKELETON_ROLL_MAX)
+                               > SKELETON_ARTIFACT_ROLL_MAX) {
+                        cell2->m_objectMetadata = SKELETON_EMPTY;
                     } else {
-                        cell2->m_objectMetadata = GetRandomArtifactId(14, 1) + 2;
+                        cell2->m_objectMetadata =
+                            GetRandomArtifactId(ARTIFACT_LEVEL_RANDOM, true)
+                            + SKELETON_ARTIFACT_OFFSET;
                     }
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_WAGON:
@@ -1913,7 +1948,11 @@ void game::RandomizeEvents(void) {
                         cell2->m_objectMetadata = 0;
                     else if (randomValue7 < 50)
                         cell2->m_objectMetadata =
-                            GetRandomArtifactId(12, 1) | MAP_EVENT_ARTIFACT_CONDITION_FLAG;
+                            GetRandomArtifactId(
+                                ARTIFACT_LEVEL_MINOR | ARTIFACT_LEVEL_TREASURE,
+                                true
+                            )
+                            | MAP_EVENT_ARTIFACT_CONDITION_FLAG;
                     else
                         cell2->m_objectMetadata = Random(0, 5) + (Random(2, 5) << 4) + 1;
                     break;
@@ -1952,7 +1991,8 @@ void game::RandomizeEvents(void) {
                             cell2->m_objectMetadata = 1;
                         else
                             cell2->m_objectMetadata =
-                                GetRandomArtifactId(8, 1) | MAP_EVENT_ARTIFACT_GUARD_FLAG;
+                                GetRandomArtifactId(ARTIFACT_LEVEL_TREASURE, true)
+                                | MAP_EVENT_ARTIFACT_GUARD_FLAG;
                     } else {
                         randomValue7 = Random(0, 100);
                         if (randomValue7 < 32)
@@ -1963,7 +2003,8 @@ void game::RandomizeEvents(void) {
                             cell2->m_objectMetadata = 4;
                         else
                             cell2->m_objectMetadata =
-                                GetRandomArtifactId(8, 1) | MAP_EVENT_ARTIFACT_GUARD_FLAG;
+                                GetRandomArtifactId(ARTIFACT_LEVEL_TREASURE, true)
+                                | MAP_EVENT_ARTIFACT_GUARD_FLAG;
                     }
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CAMPFIRE:
@@ -1976,11 +2017,12 @@ void game::RandomizeEvents(void) {
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SHIPWRECK_SURVIVOR:
                     randomValue7 = Random(0, 100);
                     if (randomValue7 < 60)
-                        cell2->m_objectMetadata = GetRandomArtifactId(8, 1);
+                        cell2->m_objectMetadata =
+                            GetRandomArtifactId(ARTIFACT_LEVEL_TREASURE, true);
                     else if (randomValue7 < 80)
-                        cell2->m_objectMetadata = GetRandomArtifactId(4, 1);
+                        cell2->m_objectMetadata = GetRandomArtifactId(ARTIFACT_LEVEL_MINOR, true);
                     else
-                        cell2->m_objectMetadata = GetRandomArtifactId(2, 1);
+                        cell2->m_objectMetadata = GetRandomArtifactId(ARTIFACT_LEVEL_MAJOR, true);
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_GRAVEYARD:
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SHIPWRECK:
@@ -2137,30 +2179,39 @@ void game::RandomizeEvents(void) {
                             else
                                 cell2->m_objectMetadata = 1;
                         } else if (randomValue7 < 80) {
-                            if (gArtifactLevel[value26] == 8)
+                            if (gArtifactLevel[value26] == IDX(ARTIFACT_LEVEL_TREASURE))
                                 cell2->m_objectMetadata = 3;
-                            else if (gArtifactLevel[value26] == 4)
+                            else if (gArtifactLevel[value26] == IDX(ARTIFACT_LEVEL_MINOR))
                                 cell2->m_objectMetadata = (Random(0, 5) << 4) | 6;
-                            else if (gArtifactLevel[value26] == 2)
+                            else if (gArtifactLevel[value26] == IDX(ARTIFACT_LEVEL_MAJOR))
                                 cell2->m_objectMetadata = (Random(0, 5) << 4) | 7;
                         } else {
-                            artifactChoices17[6] = IDX(CREATURE_PALADIN);
-                            artifactChoices17[7] = IDX(CREATURE_CRUSADER);
-                            artifactChoices17[8] = IDX(CREATURE_CYCLOPS);
-                            artifactChoices17[9] = IDX(CREATURE_GENIE);
-                            artifactChoices17[0] = IDX(CREATURE_GREEN_DRAGON);
-                            artifactChoices17[1] = IDX(CREATURE_RED_DRAGON);
-                            artifactChoices17[2] = IDX(CREATURE_BLACK_DRAGON);
-                            artifactChoices17[3] = IDX(CREATURE_BONE_DRAGON);
-                            artifactChoices17[4] = IDX(CREATURE_GIANT);
-                            artifactChoices17[5] = IDX(CREATURE_TITAN);
+                            // Retail artifact-tier guardian choice payload.
+                            // NOLINTBEGIN(readability-magic-numbers)
+                            artifactGuardianChoices[6] = CREATURE_PALADIN;
+                            artifactGuardianChoices[7] = CREATURE_CRUSADER;
+                            artifactGuardianChoices[8] = CREATURE_CYCLOPS;
+                            artifactGuardianChoices[9] = CREATURE_GENIE;
+                            artifactGuardianChoices[0] = CREATURE_GREEN_DRAGON;
+                            artifactGuardianChoices[1] = CREATURE_RED_DRAGON;
+                            artifactGuardianChoices[2] = CREATURE_BLACK_DRAGON;
+                            artifactGuardianChoices[3] = CREATURE_BONE_DRAGON;
+                            artifactGuardianChoices[4] = CREATURE_GIANT;
+                            artifactGuardianChoices[5] = CREATURE_TITAN;
+                            // NOLINTEND(readability-magic-numbers)
                             cell2->m_objectMetadata = 1;
-                            if (gArtifactLevel[value26] == 8)
+                            if (gArtifactLevel[value26] == IDX(ARTIFACT_LEVEL_TREASURE))
                                 cell2->m_objectMetadata |= IDX(CREATURE_ROGUE);
-                            else if (gArtifactLevel[value26] == 4)
-                                cell2->m_objectMetadata |= artifactChoices17[Random(0, 3) + 6];
+                            else if (gArtifactLevel[value26] == IDX(ARTIFACT_LEVEL_MINOR))
+                                cell2->m_objectMetadata |= IDX(artifactGuardianChoices[Random(
+                                    0,
+                                    MINOR_GUARDIAN_CHOICE_COUNT - 1
+                                ) + MINOR_GUARDIAN_CHOICE_FIRST]);
                             else
-                                cell2->m_objectMetadata |= artifactChoices17[Random(0, 5)];
+                                cell2->m_objectMetadata |= IDX(artifactGuardianChoices[Random(
+                                    0,
+                                    MAJOR_GUARDIAN_CHOICE_COUNT - 1
+                                ) + MAJOR_GUARDIAN_CHOICE_FIRST]);
                         }
                     }
                     break;
@@ -4498,7 +4549,10 @@ void game::InitRandomArtifacts(void) {
 }
 
 VA(0x0047fcd0, 0x17f)
-i32 game::GetRandomArtifactId(i32 levelMask, i32 allowCursed) {
+i32 game::GetRandomArtifactId(
+    H2_ENUM_PARAM(ArtifactLevelMask, i32) levelMask,
+    b32 allowCursed
+) {
     i32 attempts = 0;
     i32 artifact;
 
@@ -4508,7 +4562,7 @@ i32 game::GetRandomArtifactId(i32 levelMask, i32 allowCursed) {
         else
             artifact = Random(ARTIFACT_FIRST, ARTIFACT_BASE_LAST);
 
-        if (!(levelMask & gArtifactLevel[artifact]))
+        if (!(IDX(levelMask) & gArtifactLevel[artifact]))
             continue;
         if (artifact == IDX(ARTIFACT_EDITOR_ANY_ULTIMATE)
             || artifact == IDX(ARTIFACT_EDITOR_UNUSED_84)
@@ -4756,7 +4810,7 @@ void game::ProcessRandomObjects(void) {
                     }
                     break;
                 case IDX(TRIGGER_RANDOM_ARTIFACT):
-                    artifactId18 = GetRandomArtifactId(14, 0);
+                    artifactId18 = GetRandomArtifactId(ARTIFACT_LEVEL_RANDOM, false);
                     cell6->m_triggerType = IDX(TRIGGER_ARTIFACT);
                     ConvertObject(
                         x10 - 1,
@@ -4786,7 +4840,7 @@ void game::ProcessRandomObjects(void) {
                     );
                     break;
                 case IDX(TRIGGER_RANDOM_ARTIFACT_LEVEL_1):
-                    artifactId18 = GetRandomArtifactId(8, 0);
+                    artifactId18 = GetRandomArtifactId(ARTIFACT_LEVEL_TREASURE, false);
                     cell6->m_triggerType = IDX(TRIGGER_ARTIFACT);
                     ConvertObject(
                         x10 - 1,
@@ -4816,7 +4870,7 @@ void game::ProcessRandomObjects(void) {
                     );
                     break;
                 case IDX(TRIGGER_RANDOM_ARTIFACT_LEVEL_2):
-                    artifactId18 = GetRandomArtifactId(4, 0);
+                    artifactId18 = GetRandomArtifactId(ARTIFACT_LEVEL_MINOR, false);
                     cell6->m_triggerType = IDX(TRIGGER_ARTIFACT);
                     ConvertObject(
                         x10 - 1,
@@ -4846,7 +4900,7 @@ void game::ProcessRandomObjects(void) {
                     );
                     break;
                 case IDX(TRIGGER_RANDOM_ARTIFACT_LEVEL_3):
-                    artifactId18 = GetRandomArtifactId(2, 0);
+                    artifactId18 = GetRandomArtifactId(ARTIFACT_LEVEL_MAJOR, false);
                     cell6->m_triggerType = IDX(TRIGGER_ARTIFACT);
                     ConvertObject(
                         x10 - 1,

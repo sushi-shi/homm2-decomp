@@ -137,7 +137,6 @@ H2_ENUM_BEGIN(MapEventConstant)
     DAEMON_SERVANT_SHIFT                 = 4,
     DAEMON_EXPERIENCE                    = 1000,
     DAEMON_GOLD                          = 2500,
-    EVENT_RANDOM_ARTIFACT_ANY            = 14,
     EVENT_RANDOM_ARTIFACT_GOLD           = 1000,
     GAZEBO_EXPERIENCE                    = 1000,
     MINE_GOLD_INCOME                     = 1000,
@@ -239,6 +238,13 @@ H2_ENUM_BEGIN(MapEventConstant)
     COAST_FIZZLE_WIDTH                   = 96,
     COAST_FIZZLE_HEIGHT                  = 96
 H2_ENUM_END(MapEventConstant)
+
+H2_ENUM_BEGIN(FlotsamReward)
+    FLOTSAM_EMPTY          = 0,
+    FLOTSAM_WOOD           = 1,
+    FLOTSAM_WOOD_AND_GOLD  = 2,
+    FLOTSAM_LARGE_TREASURE = 3
+H2_ENUM_END(FlotsamReward)
 
 #define GENERIC_SITE_SIREN_ARMY_REMAINDER 0.7
 

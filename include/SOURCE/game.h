@@ -239,7 +239,7 @@ public:
     void RandomizeTown(i32, i32, i32);
     void RandomizeMine(i32, i32);
     void InitRandomArtifacts(void);
-    i32 GetRandomArtifactId(i32, i32);
+    i32 GetRandomArtifactId(H2_ENUM_PARAM(ArtifactLevelMask, i32), b32);
     void RandomizeHeroPool(void);
     void SetRandomHeroArmies(i32, i32);
     void ProcessRandomObjects(void);
