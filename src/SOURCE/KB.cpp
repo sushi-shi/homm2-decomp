@@ -89,7 +89,6 @@ H2_ENUM_BEGIN(CheckEndGameConstants)
     END_GAME_SIDE_SPECIAL_VALUE = 99,
     END_GAME_PLAYER_DIALOG_ICON = 9,
     END_GAME_REMOTE_DIALOG_TIME = 5000,
-    END_GAME_DWARF_TOWN         = 2,
     END_GAME_ROLAND_HERO        = 54
 H2_ENUM_END(CheckEndGameConstants)
 
@@ -1590,7 +1589,7 @@ i32 CanBuild(town* t, BuildingSlotType building) {
     if (building != BUILDING_SLOT_CASTLE && !(t->m_buildings & IDX(TOWN_BUILDING_CASTLE)))
         return 0;
     if (!xIsExpansionMap && building == BUILDING_SLOT_NECROMANCER_SHRINE
-        && t->m_type == IDX(FACTION_NECROMANCER))
+        && t->m_type == FACTION_NECROMANCER)
         return 0;
     if (building == BUILDING_SLOT_DOCK) {
         if (t->CanBuildDock())
@@ -1620,7 +1619,7 @@ i32 CanBuild(town* t, BuildingSlotType building) {
         || (building == BUILDING_SLOT_UPGRADE_LAST
             && (t->m_buildings & IDX(KB_DWELLING_UPGRADE_SIXTH_FLAG))))
         return 0;
-    reqMask = gHierarchyMask[t->m_type][IDX(building) - IDX(BUILDING_SLOT_DWELLING_FIRST)];
+    reqMask = gHierarchyMask[IDX(t->m_type)][IDX(building) - IDX(BUILDING_SLOT_DWELLING_FIRST)];
     haveMask = t->m_buildings;
     if (haveMask & IDX(KB_DWELLING_UPGRADE_FIRST_FLAG))
         haveMask |= IDX(KB_DWELLING_FIRST_FLAG);
@@ -1635,7 +1634,7 @@ i32 CanBuild(town* t, BuildingSlotType building) {
     if (haveMask & IDX(KB_DWELLING_UPGRADE_FIFTH_FLAG))
         haveMask |= IDX(KB_DWELLING_FIFTH_FLAG);
     if ((reqMask & haveMask) == reqMask) {
-        if (t->m_type == IDX(FACTION_NECROMANCER)
+        if (t->m_type == FACTION_NECROMANCER
             && building == BUILDING_SLOT_NECROMANCER_MAGE_PREREQUISITE && t->m_buildState <= 1)
             return 0;
         return 1;
@@ -1648,7 +1647,7 @@ i32 CanBuy(town* t, BuildingSlotType type) {
     i32 buf[KB_BUILDING_RESOURCE_COUNT];
     playerData* ptr;
     i32 idx;
-    GetBuildingCost(FactionType(t->m_type), BuildingSlotType(type), buf, t->m_buildState);
+    GetBuildingCost(t->m_type, BuildingSlotType(type), buf, t->m_buildState);
     ptr = &gpGame->m_players[giCurPlayer];
     for (idx = 0; idx < KB_BUILDING_RESOURCE_COUNT; idx++)
         if (ptr->m_resources[idx] < buf[idx])
@@ -2430,7 +2429,7 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
         hasDwarfTown = 0;
         for (player = 0; player < gpGame->m_players[0].m_townCount; player++) {
             if (gpGame->GetTown(gpGame->m_players[0].m_townIds[player])->m_type
-                == IDX(END_GAME_DWARF_TOWN)) {
+                == FACTION_SORCERESS) {
                 hasDwarfTown = 1;
             }
         }
@@ -2715,7 +2714,7 @@ void game::ShowMoraleInfo(hero* h, i32 dialogType) {
             alignment_e = 0;
             for (slot8 = 0; slot8 < 5; slot8++) {
                 if (h->m_army.m_creatureTypes[slot8] != -1) {
-                    alignment_e = gMonsterDatabase[h->m_army.m_creatureTypes[slot8]].race;
+                    alignment_e = IDX(gMonsterDatabase[h->m_army.m_creatureTypes[slot8]].race);
                 }
             }
             sprintf(
@@ -2738,7 +2737,7 @@ void game::ShowMoraleInfo(hero* h, i32 dialogType) {
             strcat(gText, description);
         }
 
-        if (h->GetOccupiedTown() != NULL && h->GetOccupiedTown()->m_type == IDX(FACTION_BARBARIAN)
+        if (h->GetOccupiedTown() != NULL && h->GetOccupiedTown()->m_type == FACTION_BARBARIAN
             && (h->GetOccupiedTown()->m_buildings & IDX(TOWN_BUILDING_COLISEUM))) {
             strcat(gText, cMoraleInfo[IDX(INFO_COLISEUM)]);
         }
@@ -2823,7 +2822,7 @@ void game::ShowLuckInfo(hero* h, i32 dialogType) {
 
     sprintf(gText, cLuckInfo[IDX(LUCK_INFO_HEADER)], description);
     modifierStart = strlen(gText);
-    if (h->GetOccupiedTown() != NULL && h->GetOccupiedTown()->m_type == IDX(FACTION_SORCERESS)
+    if (h->GetOccupiedTown() != NULL && h->GetOccupiedTown()->m_type == FACTION_SORCERESS
         && (h->GetOccupiedTown()->m_buildings & IDX(TOWN_BUILDING_RAINBOW)))
         strcat(gText, cLuckInfo[IDX(INFO_RAINBOW)]);
     if (h->HasArtifact(ARTIFACT_RABBIT_FOOT))
@@ -5021,7 +5020,7 @@ void NormalDialog(
                 82,
                 93,
                 "strip.icn",
-                gMonsterDatabase[resourceValue_l[resourceSlot_n]].race + 4,
+                IDX(gMonsterDatabase[resourceValue_l[resourceSlot_n]].race) + 4,
                 0,
                 -1,
                 NORMAL_DIALOG_WIDGET_COLOR,
@@ -5979,39 +5978,39 @@ DATA(0x004faea4) i32 gUltArtifactAvgValue = 16500;
 DATA(0x004faea8) i32 giDebugLevel = 0;
 DATA(0x004faeac) i8 giVisRangeTown = 5;
 DATA(0x004faeb0) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
-    {{20, 33}, 17, 12, 1, 0, 2, 1, 1, 1, 1, 0, "psnt", MonsterAttribute(0)},
-    {{150, 312}, 21, 8, 10, 0, 2, 5, 3, 2, 3, 12, "arch", MONSTER_ATTRIBUTE_RANGED},
-    {{200, 463}, 23, 8, 10, 0, 4, 5, 3, 2, 3, 24, "arch", MONSTER_ATTRIBUTE_RANGED},
-    {{200, 639}, 32, 5, 15, 0, 4, 5, 9, 3, 4, 0, "pike", MonsterAttribute(0)},
-    {{250, 824}, 33, 5, 20, 0, 5, 5, 9, 3, 4, 0, "pike", MonsterAttribute(0)},
-    {{250, 1130}, 45, 4, 25, 0, 4, 7, 9, 4, 6, 0, "swdm", MonsterAttribute(0)},
-    {{300, 1350}, 45, 4, 30, 0, 5, 7, 9, 4, 6, 0, "swdm", MonsterAttribute(0)},
-    {{300, 1830}, 61, 3, 30, 0, 6, 10, 9, 5, 10, 0, "cavl", MONSTER_ATTRIBUTE_WIDE},
-    {{375, 2273}, 61, 3, 40, 0, 7, 10, 9, 5, 10, 0, "cavl", MONSTER_ATTRIBUTE_WIDE},
-    {{600, 4704}, 78, 2, 50, 0, 5, 11, 12, 10, 20, 0, "pldn", MonsterAttribute(0)},
-    {{1000, 5822}, 58, 2, 65, 0, 6, 11, 12, 10, 20, 0, "pldn", MonsterAttribute(0)},
-    {{40, 109}, 27, 10, 3, 1, 4, 3, 1, 1, 2, 0, "gbln", MonsterAttribute(0)},
-    {{140, 299}, 21, 8, 10, 1, 2, 3, 4, 2, 3, 8, "elf_", MONSTER_ATTRIBUTE_RANGED},
-    {{175, 512}, 29, 8, 15, 1, 3, 3, 4, 3, 4, 16, "elf_", MONSTER_ATTRIBUTE_RANGED},
-    {{200, 865}, 43, 5, 20, 1, 6, 6, 2, 3, 5, 0, "wolf", MONSTER_ATTRIBUTE_WIDE},
-    {{300, 1065}, 36, 4, 40, 1, 2, 9, 5, 4, 6, 0, "ogre", MonsterAttribute(0)},
-    {{500, 2070}, 41, 4, 60, 1, 4, 9, 5, 5, 7, 0, "ogre", MonsterAttribute(0)},
-    {{600, 1921}, 32, 3, 40, 1, 4, 10, 5, 5, 7, 8, "trll", MONSTER_ATTRIBUTE_RANGED},
-    {{700, 2337}, 33, 3, 40, 1, 5, 10, 5, 7, 9, 16, "trll", MONSTER_ATTRIBUTE_RANGED},
-    {{750, 6074}, 58, 2, 80, 1, 5, 12, 9, 12, 24, 0, "cycl", MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER},
-    {{50, 129}, 26, 8, 2, 2, 4, 4, 2, 1, 2, 0, "sprt", MONSTER_ATTRIBUTE_FLYING},
-    {{200, 500}, 25, 6, 20, 2, 2, 6, 5, 2, 4, 0, "dwrf", MonsterAttribute(0)},
-    {{250, 716}, 29, 6, 20, 2, 4, 6, 6, 2, 4, 0, "dwrf", MonsterAttribute(0)},
-    {{250, 554}, 22, 4, 15, 2, 4, 4, 3, 2, 3, 24, "elf_", MONSTER_ATTRIBUTE_RANGED},
-    {{300, 658}, 22, 4, 15, 2, 6, 5, 5, 2, 3, 24, "elf_", MONSTER_ATTRIBUTE_RANGED},
-    {{350, 1290}, 37, 3, 25, 2, 5, 7, 5, 5, 8, 8, "drui", MONSTER_ATTRIBUTE_RANGED},
-    {{400, 1428}, 36, 3, 25, 2, 6, 7, 7, 5, 8, 16, "drui", MONSTER_ATTRIBUTE_RANGED},
-    {{500, 2702}, 54, 2, 40, 2, 5, 10, 9, 7, 14, 0, "unic", MONSTER_ATTRIBUTE_WIDE},
+    {{20, 33}, 17, 12, 1, FACTION_KNIGHT, 2, 1, 1, 1, 1, 0, "psnt", MonsterAttribute(0)},
+    {{150, 312}, 21, 8, 10, FACTION_KNIGHT, 2, 5, 3, 2, 3, 12, "arch", MONSTER_ATTRIBUTE_RANGED},
+    {{200, 463}, 23, 8, 10, FACTION_KNIGHT, 4, 5, 3, 2, 3, 24, "arch", MONSTER_ATTRIBUTE_RANGED},
+    {{200, 639}, 32, 5, 15, FACTION_KNIGHT, 4, 5, 9, 3, 4, 0, "pike", MonsterAttribute(0)},
+    {{250, 824}, 33, 5, 20, FACTION_KNIGHT, 5, 5, 9, 3, 4, 0, "pike", MonsterAttribute(0)},
+    {{250, 1130}, 45, 4, 25, FACTION_KNIGHT, 4, 7, 9, 4, 6, 0, "swdm", MonsterAttribute(0)},
+    {{300, 1350}, 45, 4, 30, FACTION_KNIGHT, 5, 7, 9, 4, 6, 0, "swdm", MonsterAttribute(0)},
+    {{300, 1830}, 61, 3, 30, FACTION_KNIGHT, 6, 10, 9, 5, 10, 0, "cavl", MONSTER_ATTRIBUTE_WIDE},
+    {{375, 2273}, 61, 3, 40, FACTION_KNIGHT, 7, 10, 9, 5, 10, 0, "cavl", MONSTER_ATTRIBUTE_WIDE},
+    {{600, 4704}, 78, 2, 50, FACTION_KNIGHT, 5, 11, 12, 10, 20, 0, "pldn", MonsterAttribute(0)},
+    {{1000, 5822}, 58, 2, 65, FACTION_KNIGHT, 6, 11, 12, 10, 20, 0, "pldn", MonsterAttribute(0)},
+    {{40, 109}, 27, 10, 3, FACTION_BARBARIAN, 4, 3, 1, 1, 2, 0, "gbln", MonsterAttribute(0)},
+    {{140, 299}, 21, 8, 10, FACTION_BARBARIAN, 2, 3, 4, 2, 3, 8, "elf_", MONSTER_ATTRIBUTE_RANGED},
+    {{175, 512}, 29, 8, 15, FACTION_BARBARIAN, 3, 3, 4, 3, 4, 16, "elf_", MONSTER_ATTRIBUTE_RANGED},
+    {{200, 865}, 43, 5, 20, FACTION_BARBARIAN, 6, 6, 2, 3, 5, 0, "wolf", MONSTER_ATTRIBUTE_WIDE},
+    {{300, 1065}, 36, 4, 40, FACTION_BARBARIAN, 2, 9, 5, 4, 6, 0, "ogre", MonsterAttribute(0)},
+    {{500, 2070}, 41, 4, 60, FACTION_BARBARIAN, 4, 9, 5, 5, 7, 0, "ogre", MonsterAttribute(0)},
+    {{600, 1921}, 32, 3, 40, FACTION_BARBARIAN, 4, 10, 5, 5, 7, 8, "trll", MONSTER_ATTRIBUTE_RANGED},
+    {{700, 2337}, 33, 3, 40, FACTION_BARBARIAN, 5, 10, 5, 7, 9, 16, "trll", MONSTER_ATTRIBUTE_RANGED},
+    {{750, 6074}, 58, 2, 80, FACTION_BARBARIAN, 5, 12, 9, 12, 24, 0, "cycl", MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER},
+    {{50, 129}, 26, 8, 2, FACTION_SORCERESS, 4, 4, 2, 1, 2, 0, "sprt", MONSTER_ATTRIBUTE_FLYING},
+    {{200, 500}, 25, 6, 20, FACTION_SORCERESS, 2, 6, 5, 2, 4, 0, "dwrf", MonsterAttribute(0)},
+    {{250, 716}, 29, 6, 20, FACTION_SORCERESS, 4, 6, 6, 2, 4, 0, "dwrf", MonsterAttribute(0)},
+    {{250, 554}, 22, 4, 15, FACTION_SORCERESS, 4, 4, 3, 2, 3, 24, "elf_", MONSTER_ATTRIBUTE_RANGED},
+    {{300, 658}, 22, 4, 15, FACTION_SORCERESS, 6, 5, 5, 2, 3, 24, "elf_", MONSTER_ATTRIBUTE_RANGED},
+    {{350, 1290}, 37, 3, 25, FACTION_SORCERESS, 5, 7, 5, 5, 8, 8, "drui", MONSTER_ATTRIBUTE_RANGED},
+    {{400, 1428}, 36, 3, 25, FACTION_SORCERESS, 6, 7, 7, 5, 8, 16, "drui", MONSTER_ATTRIBUTE_RANGED},
+    {{500, 2702}, 54, 2, 40, FACTION_SORCERESS, 5, 10, 9, 7, 14, 0, "unic", MONSTER_ATTRIBUTE_WIDE},
     {{1500, 10114},
      56,
      1,
      100,
-     2,
+     FACTION_SORCERESS,
      7,
      12,
      10,
@@ -6024,7 +6023,7 @@ DATA(0x004faeb0) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      26,
      8,
      5,
-     3,
+     FACTION_WARLOCK,
      4,
      3,
      1,
@@ -6033,12 +6032,12 @@ DATA(0x004faeb0) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      8,
      "cntr",
      MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_RANGED},
-    {{200, 579}, 29, 6, 15, 3, 6, 4, 7, 2, 3, 0, "garg", MONSTER_ATTRIBUTE_FLYING},
+    {{200, 579}, 29, 6, 15, FACTION_WARLOCK, 6, 4, 7, 2, 3, 0, "garg", MONSTER_ATTRIBUTE_FLYING},
     {{300, 1101},
      37,
      4,
      25,
-     3,
+     FACTION_WARLOCK,
      4,
      6,
      6,
@@ -6047,14 +6046,14 @@ DATA(0x004faeb0) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      0,
      "grif",
      MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING},
-    {{400, 1751}, 44, 3, 35, 3, 4, 9, 8, 5, 10, 0, "mino", MonsterAttribute(0)},
-    {{500, 2252}, 45, 3, 45, 3, 6, 9, 8, 5, 10, 0, "mino", MonsterAttribute(0)},
-    {{800, 2878}, 36, 2, 75, 3, 2, 8, 9, 6, 12, 0, "hydr", MONSTER_ATTRIBUTE_WIDE},
+    {{400, 1751}, 44, 3, 35, FACTION_WARLOCK, 4, 9, 8, 5, 10, 0, "mino", MonsterAttribute(0)},
+    {{500, 2252}, 45, 3, 45, FACTION_WARLOCK, 6, 9, 8, 5, 10, 0, "mino", MonsterAttribute(0)},
+    {{800, 2878}, 36, 2, 75, FACTION_WARLOCK, 2, 8, 9, 6, 12, 0, "hydr", MONSTER_ATTRIBUTE_WIDE},
     {{3000, 18153},
      55,
      1,
      200,
-     3,
+     FACTION_WARLOCK,
      4,
      12,
      12,
@@ -6067,7 +6066,7 @@ DATA(0x004faeb0) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      68,
      1,
      250,
-     3,
+     FACTION_WARLOCK,
      5,
      13,
      13,
@@ -6080,7 +6079,7 @@ DATA(0x004faeb0) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      74,
      1,
      300,
-     3,
+     FACTION_WARLOCK,
      6,
      14,
      14,
@@ -6089,15 +6088,15 @@ DATA(0x004faeb0) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      0,
      "drgn",
      MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER},
-    {{50, 134}, 27, 8, 3, 4, 3, 2, 1, 1, 3, 12, "half", MONSTER_ATTRIBUTE_RANGED},
-    {{150, 493}, 33, 6, 15, 4, 6, 5, 4, 2, 3, 0, "boar", MONSTER_ATTRIBUTE_WIDE},
-    {{300, 951}, 19, 4, 30, 4, 2, 5, 10, 4, 5, 0, "golm", MonsterAttribute(0)},
-    {{350, 1324}, 24, 4, 35, 4, 3, 7, 10, 4, 5, 0, "golm", MonsterAttribute(0)},
+    {{50, 134}, 27, 8, 3, FACTION_WIZARD, 3, 2, 1, 1, 3, 12, "half", MONSTER_ATTRIBUTE_RANGED},
+    {{150, 493}, 33, 6, 15, FACTION_WIZARD, 6, 5, 4, 2, 3, 0, "boar", MONSTER_ATTRIBUTE_WIDE},
+    {{300, 951}, 19, 4, 30, FACTION_WIZARD, 2, 5, 10, 4, 5, 0, "golm", MonsterAttribute(0)},
+    {{350, 1324}, 24, 4, 35, FACTION_WIZARD, 3, 7, 10, 4, 5, 0, "golm", MonsterAttribute(0)},
     {{400, 1739},
      43,
      3,
      40,
-     4,
+     FACTION_WIZARD,
      4,
      7,
      7,
@@ -6106,20 +6105,20 @@ DATA(0x004faeb0) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      0,
      "roc_",
      MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING},
-    {{600, 1935}, 32, 2, 30, 4, 5, 11, 7, 7, 9, 12, "mage", MONSTER_ATTRIBUTE_RANGED},
-    {{700, 2469}, 35, 2, 35, 4, 6, 12, 8, 7, 9, 24, "mage", MONSTER_ATTRIBUTE_RANGED},
-    {{2000, 9589}, 42, 1, 150, 4, 4, 13, 10, 20, 30, 0, "titn", MonsterAttribute(0)},
-    {{5000, 22933}, 79, 1, 300, 4, 6, 15, 15, 20, 30, 24, "titn", MONSTER_ATTRIBUTE_RANGED},
-    {{75, 203}, 27, 8, 4, 5, 4, 4, 3, 2, 3, 0, "skel", MONSTER_ATTRIBUTE_UNDEAD},
-    {{150, 310}, 21, 6, 15, 5, 2, 5, 2, 2, 3, 0, "zomb", MONSTER_ATTRIBUTE_UNDEAD},
-    {{200, 506}, 25, 6, 20, 5, 4, 5, 2, 2, 3, 0, "zomb", MONSTER_ATTRIBUTE_UNDEAD},
-    {{250, 868}, 35, 4, 25, 5, 4, 6, 6, 3, 4, 0, "mumy", MONSTER_ATTRIBUTE_UNDEAD},
-    {{300, 1056}, 35, 4, 30, 5, 5, 6, 6, 3, 4, 0, "mumy", MONSTER_ATTRIBUTE_UNDEAD},
+    {{600, 1935}, 32, 2, 30, FACTION_WIZARD, 5, 11, 7, 7, 9, 12, "mage", MONSTER_ATTRIBUTE_RANGED},
+    {{700, 2469}, 35, 2, 35, FACTION_WIZARD, 6, 12, 8, 7, 9, 24, "mage", MONSTER_ATTRIBUTE_RANGED},
+    {{2000, 9589}, 42, 1, 150, FACTION_WIZARD, 4, 13, 10, 20, 30, 0, "titn", MonsterAttribute(0)},
+    {{5000, 22933}, 79, 1, 300, FACTION_WIZARD, 6, 15, 15, 20, 30, 24, "titn", MONSTER_ATTRIBUTE_RANGED},
+    {{75, 203}, 27, 8, 4, FACTION_NECROMANCER, 4, 4, 3, 2, 3, 0, "skel", MONSTER_ATTRIBUTE_UNDEAD},
+    {{150, 310}, 21, 6, 15, FACTION_NECROMANCER, 2, 5, 2, 2, 3, 0, "zomb", MONSTER_ATTRIBUTE_UNDEAD},
+    {{200, 506}, 25, 6, 20, FACTION_NECROMANCER, 4, 5, 2, 2, 3, 0, "zomb", MONSTER_ATTRIBUTE_UNDEAD},
+    {{250, 868}, 35, 4, 25, FACTION_NECROMANCER, 4, 6, 6, 3, 4, 0, "mumy", MONSTER_ATTRIBUTE_UNDEAD},
+    {{300, 1056}, 35, 4, 30, FACTION_NECROMANCER, 5, 6, 6, 3, 4, 0, "mumy", MONSTER_ATTRIBUTE_UNDEAD},
     {{500, 1685},
      42,
      3,
      30,
-     5,
+     FACTION_NECROMANCER,
      4,
      8,
      6,
@@ -6132,7 +6131,7 @@ DATA(0x004faeb0) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      45,
      3,
      40,
-     5,
+     FACTION_NECROMANCER,
      5,
      8,
      6,
@@ -6145,7 +6144,7 @@ DATA(0x004faeb0) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      28,
      2,
      25,
-     5,
+     FACTION_NECROMANCER,
      5,
      7,
      12,
@@ -6158,7 +6157,7 @@ DATA(0x004faeb0) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      29,
      2,
      35,
-     5,
+     FACTION_NECROMANCER,
      6,
      7,
      13,
@@ -6171,7 +6170,7 @@ DATA(0x004faeb0) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      78,
      1,
      150,
-     5,
+     FACTION_NECROMANCER,
      4,
      11,
      9,
@@ -6180,13 +6179,13 @@ DATA(0x004faeb0) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      0,
      "drgn",
      MONSTER_ATTRIBUTE_WIDE | MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_UNDEAD},
-    {{50, 177}, 35, 12, 4, 6, 5, 6, 1, 1, 2, 0, "rogu", MonsterAttribute(0)},
-    {{200, 805}, 40, 4, 20, 6, 6, 7, 6, 2, 5, 0, "nmad", MONSTER_ATTRIBUTE_WIDE},
+    {{50, 177}, 35, 12, 4, FACTION_NEUTRAL, 5, 6, 1, 1, 2, 0, "rogu", MonsterAttribute(0)},
+    {{200, 805}, 40, 4, 20, FACTION_NEUTRAL, 6, 7, 6, 2, 5, 0, "nmad", MONSTER_ATTRIBUTE_WIDE},
     {{1000, 1545},
      62,
      3,
      20,
-     6,
+     FACTION_NEUTRAL,
      5,
      8,
      7,
@@ -6195,12 +6194,12 @@ DATA(0x004faeb0) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      0,
      "ghst",
      MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_UNDEAD},
-    {{650, 5692}, 60, 2, 50, 6, 6, 10, 9, 20, 30, 0, "geni", MONSTER_ATTRIBUTE_FLYING},
-    {{500, 1979}, 40, 5, 35, 6, 4, 8, 9, 6, 10, 0, "meds", MONSTER_ATTRIBUTE_WIDE},
-    {{500, 1732}, 35, 3, 50, 6, 3, 8, 8, 4, 5, 0, "eelm", MonsterAttribute(0)},
-    {{500, 1412}, 28, 3, 35, 6, 6, 7, 7, 2, 8, 0, "aelm", MonsterAttribute(0)},
-    {{500, 1501}, 30, 3, 40, 6, 5, 8, 6, 4, 6, 0, "felm", MonsterAttribute(0)},
-    {{500, 1690}, 34, 3, 45, 6, 4, 6, 8, 3, 7, 0, "welm", MonsterAttribute(0)}
+    {{650, 5692}, 60, 2, 50, FACTION_NEUTRAL, 6, 10, 9, 20, 30, 0, "geni", MONSTER_ATTRIBUTE_FLYING},
+    {{500, 1979}, 40, 5, 35, FACTION_NEUTRAL, 4, 8, 9, 6, 10, 0, "meds", MONSTER_ATTRIBUTE_WIDE},
+    {{500, 1732}, 35, 3, 50, FACTION_NEUTRAL, 3, 8, 8, 4, 5, 0, "eelm", MonsterAttribute(0)},
+    {{500, 1412}, 28, 3, 35, FACTION_NEUTRAL, 6, 7, 7, 2, 8, 0, "aelm", MonsterAttribute(0)},
+    {{500, 1501}, 30, 3, 40, FACTION_NEUTRAL, 5, 8, 6, 4, 6, 0, "felm", MonsterAttribute(0)},
+    {{500, 1690}, 34, 3, 45, FACTION_NEUTRAL, 4, 6, 8, 3, 7, 0, "welm", MonsterAttribute(0)}
 };
 DATA(0x004fb568) float gfStatPower[KB_STAT_POWER_COUNT] = {
     0.5f,  0.5f,  0.5f,  0.5f,  0.52f, 0.54f, 0.56f, 0.58f, 0.6f,  0.62f, 0.64f,

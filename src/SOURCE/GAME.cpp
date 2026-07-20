@@ -146,7 +146,6 @@ H2_ENUM_END(GameMonthlyConstant)
 
 H2_ENUM_BEGIN(GameRandomArtifactConstant)
     ARTIFACT_BASE_TABLE_SIZE      = IDX(ARTIFACT_MAGIC_BOOK) + 1,
-    SPECIAL_HERO_CLASS_NONE       = -1,
     ARTIFACT_FIRST                = IDX(ARTIFACT_ULTIMATE_BOOK),
     ARTIFACT_BASE_LAST            = IDX(ARTIFACT_MAGIC_BOOK),
     ARTIFACT_EXPANSION_LAST       = IDX(ARTIFACT_SPADE_NECROMANCY),
@@ -341,7 +340,7 @@ i32 GetNumObelisks(i32 color) {
 }
 
 VA(0x00470f10, 0xca)
-i32 playerData::BuildingsOwned(i32 townType, BuildingSlotType buildingIndex, i32 buildState) {
+i32 playerData::BuildingsOwned(FactionType townType, BuildingSlotType buildingIndex, i32 buildState) {
     i32 count = 0;
     i32 i;
     for (i = 0; i < m_townCount; i++) {
@@ -556,7 +555,7 @@ i32 game::RandomScan(i8* array, i32 start, i32 range, i32 unused, i8 target) {
 }
 
 VA(0x00471a6d, 0x213)
-i32 game::GetNewHeroId(i32, i32 heroClass, i32 requireExperienced) {
+i32 game::GetNewHeroId(i32, FactionType heroClass, i32 requireExperienced) {
     i32 result = -1;
     i32 previousHero;
     i32 heroId = -1;
@@ -569,7 +568,7 @@ i32 game::GetNewHeroId(i32, i32 heroClass, i32 requireExperienced) {
             continue;
         if (m_availableHeroes[heroId] == 64 && attempts < 1500)
             continue;
-        if (heroClass >= 0 && heroClass <= 5 && attempts < 100
+        if (heroClass != FACTION_ANY && attempts < 100
             && m_heroRecs[heroId].m_cursorType != heroClass)
             continue;
         if (requireExperienced && attempts < 40 && m_heroRecs[heroId].m_experience < 1000
@@ -850,9 +849,10 @@ void game::SetupOrigData(void) {
         m_heroRecs[i].m_owner = -1;
         m_heroRecs[i].m_direction = 2;
         strcpy(m_heroRecs[i].m_name, gHeroDefaultNames[i]);
-        m_heroRecs[i].m_cursorType = static_cast<u8>(i / 9);
+        m_heroRecs[i].m_cursorType = static_cast<FactionType>(i / 9);
         for (j = 0; j < HERO_STARTING_STAT_COUNT; j++)
-            m_heroRecs[i].m_primaryStats[j] = gStartingHeroStats[m_heroRecs[i].m_cursorType][j];
+            m_heroRecs[i].m_primaryStats[j] =
+                gStartingHeroStats[IDX(m_heroRecs[i].m_cursorType)][j];
         for (j = 0; j < ARMY_GROUP_SLOT_COUNT; j++)
             m_heroRecs[i].m_army.m_creatureTypes[j] = ARMY_GROUP_EMPTY_SLOT;
         m_heroRecs[i].m_destinationY = -1;
@@ -864,27 +864,27 @@ void game::SetupOrigData(void) {
             m_heroRecs[i].m_secondarySkills[j] = 0;
             m_heroRecs[i].m_secondarySkillOrder[j] = 0;
         }
-        if (m_heroRecs[i].m_cursorType == 0) {
+        if (m_heroRecs[i].m_cursorType == FACTION_KNIGHT) {
             m_heroRecs[i].GiveSS(IDX(HERO_SKILL_LEADERSHIP), 1);
             m_heroRecs[i].GiveSS(IDX(HERO_SKILL_BALLISTICS), 1);
         }
-        if (m_heroRecs[i].m_cursorType == 2) {
+        if (m_heroRecs[i].m_cursorType == FACTION_SORCERESS) {
             m_heroRecs[i].m_artifacts[0] = IDX(ARTIFACT_MAGIC_BOOK);
             m_heroRecs[i].GiveSS(IDX(HERO_SKILL_NAVIGATION), 2);
             m_heroRecs[i].GiveSS(IDX(HERO_SKILL_WISDOM), 1);
         }
-        if (m_heroRecs[i].m_cursorType == 1)
+        if (m_heroRecs[i].m_cursorType == FACTION_BARBARIAN)
             m_heroRecs[i].GiveSS(IDX(HERO_SKILL_PATHFINDING), 2);
-        if (m_heroRecs[i].m_cursorType == 3) {
+        if (m_heroRecs[i].m_cursorType == FACTION_WARLOCK) {
             m_heroRecs[i].m_artifacts[0] = IDX(ARTIFACT_MAGIC_BOOK);
             m_heroRecs[i].GiveSS(IDX(HERO_SKILL_SCOUTING), 2);
             m_heroRecs[i].GiveSS(IDX(HERO_SKILL_WISDOM), 1);
         }
-        if (m_heroRecs[i].m_cursorType == 4) {
+        if (m_heroRecs[i].m_cursorType == FACTION_WIZARD) {
             m_heroRecs[i].m_artifacts[0] = IDX(ARTIFACT_MAGIC_BOOK);
             m_heroRecs[i].GiveSS(IDX(HERO_SKILL_WISDOM), 2);
         }
-        if (m_heroRecs[i].m_cursorType == 5) {
+        if (m_heroRecs[i].m_cursorType == FACTION_NECROMANCER) {
             m_heroRecs[i].m_artifacts[0] = IDX(ARTIFACT_MAGIC_BOOK);
             m_heroRecs[i].GiveSS(IDX(HERO_SKILL_WISDOM), 1);
             m_heroRecs[i].GiveSS(IDX(HERO_SKILL_NECROMANCY), 1);
@@ -897,7 +897,7 @@ void game::SetupOrigData(void) {
         m_castleRecs[i].m_onMap = 0;
         m_castleRecs[i].m_id = static_cast<u8>(i);
         m_castleRecs[i].m_owner = TOWN_OWNER_NONE;
-        m_castleRecs[i].m_type = static_cast<u8>(i / 9);
+        m_castleRecs[i].m_type = static_cast<FactionType>(i / 9);
         m_castleRecs[i].m_occupyingHeroId = TOWN_OCCUPYING_HERO_NONE;
         for (j = 0; j < ARMY_GROUP_SLOT_COUNT; j++)
             m_castleRecs[i].m_army.m_creatureTypes[j] = ARMY_GROUP_EMPTY_SLOT;
@@ -1121,7 +1121,7 @@ void game::GiveTroopsToNeutralTown(i32 townId) {
         }
 
         cnt += giCurTurn / 20;
-        switch (m_castleRecs[townId].m_type + jb) {
+        switch (IDX(m_castleRecs[townId].m_type) + jb) {
             case 10:
                 idx = 0;
                 break;
@@ -1246,13 +1246,14 @@ void game::NewMap(char* filename) {
     i32 ultimateDistance5;
     i32 ultimateTries4;
     i32 campaignHero15;
-    i32 heroClass5;
+    FactionType heroClass5;
     i32 heroX6;
     i32 heroY16;
     i8 setupClass12;
+    FactionType specialFaction6;
     i32 specialPortrait6;
     char* specialName3;
-    i32 specialClass6;
+    FactionType specialClass6;
     i32 resource13;
 
     extension0 = FindLastToken(gMapName, '.');
@@ -1394,11 +1395,11 @@ void game::NewMap(char* filename) {
             && (m_campaignAwards[IDX(CAMPAIGN_AWARD_SORCERESS_GUILD)] != 0
                 || m_campaignAwards[IDX(CAMPAIGN_AWARD_DWARFBANE)] != 0)) {
             if (m_campaignAwards[IDX(CAMPAIGN_AWARD_SORCERESS_GUILD)] != 0)
-                specialPortrait6 = 2;
+                specialFaction6 = FACTION_SORCERESS;
             else
-                specialPortrait6 = 5;
+                specialFaction6 = FACTION_NECROMANCER;
             for (campaignHero15 = 0; campaignHero15 < GAME_HERO_COUNT; campaignHero15++) {
-                if (m_heroRecs[campaignHero15].m_cursorType == specialPortrait6
+                if (m_heroRecs[campaignHero15].m_cursorType == specialFaction6
                     && m_availableHeroes[campaignHero15] == -1)
                     break;
             }
@@ -1422,17 +1423,17 @@ void game::NewMap(char* filename) {
         }
         {
             if (xIsPlayingExpansionCampaign && player2 == 0) {
-                specialClass6 = SPECIAL_HERO_CLASS_NONE;
+                specialClass6 = FACTION_ANY;
                 if (xCampaign.HasAward(6)) {
-                    specialClass6 = 4;
+                    specialClass6 = FACTION_WIZARD;
                     specialName3 = xCampaign.JosephName();
                     specialPortrait6 = 64;
                 } else if (xCampaign.HasAward(7)) {
-                    specialClass6 = 1;
+                    specialClass6 = FACTION_BARBARIAN;
                     specialName3 = xCampaign.IvanName();
                     specialPortrait6 = 63;
                 }
-                if (specialClass6 != static_cast<u32>(SPECIAL_HERO_CLASS_NONE)) {
+                if (specialClass6 != FACTION_ANY) {
                     for (campaignHero15 = 0; campaignHero15 < GAME_HERO_COUNT; campaignHero15++) {
                         if (m_heroRecs[campaignHero15].m_cursorType == specialClass6
                             && m_availableHeroes[campaignHero15] == -1)
@@ -1451,15 +1452,19 @@ void game::NewMap(char* filename) {
                     }
                 }
             }
-            heroClass5 = Random(0, 5);
+            heroClass5 = static_cast<FactionType>(Random(0, IDX(FACTION_COUNT) - 1));
             if (m_setupPlayerRace[gcColorToSetupPos[m_players[player2].m_color]] < 6)
-                heroClass5 = m_setupPlayerRace[gcColorToSetupPos[m_players[player2].m_color]];
+                heroClass5 = static_cast<FactionType>(
+                    m_setupPlayerRace[gcColorToSetupPos[m_players[player2].m_color]]
+                );
             m_players[player2].m_availableHeroIds[0] =
                 static_cast<char>(GetNewHeroId(player2, heroClass5, 0));
             m_availableHeroes[m_players[player2].m_availableHeroIds[0]] = 64;
         }
     secondHero:
-        heroClass5 = (Random(1, 5) + heroClass5) % 6;
+        heroClass5 = static_cast<FactionType>(
+            (Random(1, IDX(FACTION_COUNT) - 1) + IDX(heroClass5)) % IDX(FACTION_COUNT)
+        );
         m_players[player2].m_availableHeroIds[1] =
             static_cast<char>(GetNewHeroId(player2, heroClass5, 0));
         m_availableHeroes[m_players[player2].m_availableHeroIds[1]] = 64;
@@ -1571,10 +1576,12 @@ void game::NewMap(char* filename) {
         }
     }
     for (player2 = 0; player2 < m_playerCount; player2++) {
-        heroClass5 = 0;
+        heroClass5 = FACTION_KNIGHT;
         if (m_setupPlayerRace[gcColorToSetupPos[m_players[player2].m_color]] >= 0
             && m_setupPlayerRace[gcColorToSetupPos[m_players[player2].m_color]] < 6) {
-            heroClass5 = m_setupPlayerRace[gcColorToSetupPos[m_players[player2].m_color]];
+            heroClass5 = static_cast<FactionType>(
+                m_setupPlayerRace[gcColorToSetupPos[m_players[player2].m_color]]
+            );
         } else {
             if (!!m_players[player2].m_townCount) {
                 heroClass5 = gpGame->m_castleRecs[m_players[player2].TownId(0)].m_type;
@@ -1582,7 +1589,9 @@ void game::NewMap(char* filename) {
                 heroClass5 = gpGame->m_heroRecs[m_players[player2].HeroId(0)].m_cursorType;
             }
         }
-        m_players[player2].m_evilInterface = heroClass5 == 1 || heroClass5 == 3 || heroClass5 == 5;
+        m_players[player2].m_evilInterface = heroClass5 == FACTION_BARBARIAN
+                                             || heroClass5 == FACTION_WARLOCK
+                                             || heroClass5 == FACTION_NECROMANCER;
         if (gbInCampaign && player2 == 0)
             m_players[player2].m_evilInterface = m_campaignType == 1;
         for (townIndex9 = 0; townIndex9 < gpGame->m_players[player2].m_townCount; townIndex9++)
@@ -2217,7 +2226,8 @@ i32 game::LoadMap(char* filename) {
             m_castleRecs[i37].m_onMap = 1;
             m_castleRecs[i37].m_x = static_cast<u8>(column5[0]);
             m_castleRecs[i37].m_y = static_cast<u8>(row9[0]);
-            m_castleRecs[i37].m_type = static_cast<i8>(type5[0] & TOWN_RECORD_TYPE_MASK);
+            m_castleRecs[i37].m_type =
+                static_cast<FactionType>(type5[0] & TOWN_RECORD_TYPE_MASK);
             if (type5[0] < 0)
                 m_castleRecs[i37].m_buildings |= IDX(TOWN_BUILDING_CASTLE);
             else
@@ -2796,7 +2806,7 @@ void game::ViewArmy(
 
     if (castle && (gpAdvManager->m_active || gpTownManager->m_active)) {
         for (loopIndex0 = 20; loopIndex0 <= 24; loopIndex0++) {
-            if (gDwellingType[static_cast<i8>(castle->m_type)][loopIndex0 - 19] == monsterType
+            if (gDwellingType[IDX(castle->m_type)][loopIndex0 - 19] == monsterType
                 && (castle->m_buildings & (1 << (loopIndex0 + 5)))) {
                 gbAllowUpgrade = true;
                 iViewArmyUpgradeToType = static_cast<CreatureType>(IDX(monsterType) + 1);
@@ -3437,7 +3447,7 @@ i32 game::ComputeDailyGold(i32 player) {
                 gold += 1000;
             if (m_castleRecs[index].m_buildings & BIT(BUILDING_SLOT_SPECIAL_SEVEN))
                 gold += 250;
-            if (m_castleRecs[index].m_type == 3
+            if (m_castleRecs[index].m_type == FACTION_WARLOCK
                 && (m_castleRecs[index].m_buildings & BIT(BUILDING_SLOT_SPECIAL)))
                 gold += 500;
         }
@@ -3620,14 +3630,14 @@ void game::PerDay(void) {
 
 VA(0x0047d10b, 0x199d)
 void game::PerWeek(void) {
-    i32 heroClass18 = 0;
+    FactionType heroClass18 = FACTION_KNIGHT;
     i32 outerIndex5;
     i32 innerIndex3;
     i32 mapY5;
     i32 mapX8;
     town* castle37;
     i32 growth13;
-    i32 desiredClass1;
+    FactionType desiredClass1;
     i32 monsterIncrease16;
     i32 monsterCount36;
     hero* weeklyHero4;
@@ -3647,7 +3657,7 @@ void game::PerWeek(void) {
         for (innerIndex3 = WEEKLY_FIRST_DWELLING; innerIndex3 <= WEEKLY_LAST_DWELLING;
              innerIndex3++) {
             if (castle37->m_buildings & (1 << innerIndex3)) {
-                growth13 = gMonsterDatabase[gDwellingType[castle37->m_type]
+                growth13 = gMonsterDatabase[gDwellingType[IDX(castle37->m_type)]
                                                          [innerIndex3 - WEEKLY_FIRST_DWELLING]]
                                .growth;
                 if (castle37->m_buildings & BIT(BUILDING_SLOT_SPECIAL_FOUR))
@@ -3668,7 +3678,7 @@ void game::PerWeek(void) {
                         growth13 = static_cast<i32>(growth13 * 1.44);
                 }
                 if (giWeekType == 1
-                    && gDwellingType[castle37->m_type][innerIndex3 - WEEKLY_FIRST_DWELLING]
+                    && gDwellingType[IDX(castle37->m_type)][innerIndex3 - WEEKLY_FIRST_DWELLING]
                            == giWeekTypeExtra)
                     growth13 += 5;
                 castle37->m_garrison[innerIndex3 - WEEKLY_FIRST_DWELLING] += growth13;
@@ -3682,13 +3692,16 @@ void game::PerWeek(void) {
                 heroClass18 =
                     m_heroRecs[gpGame->m_players[outerIndex5].m_availableHeroIds[0]].m_cursorType;
             }
-            heroClass18 = (Random(1, 5) + heroClass18) % 6;
+            heroClass18 = static_cast<FactionType>(
+                (Random(1, IDX(FACTION_COUNT) - 1) + IDX(heroClass18)) % IDX(FACTION_COUNT)
+            );
             desiredClass1 = heroClass18;
             if (innerIndex3 == 0
                 && m_setupPlayerRace[gcColorToSetupPos[m_players[outerIndex5].m_color]]
                        < GAME_PLAYER_COUNT) {
-                desiredClass1 =
-                    m_setupPlayerRace[gcColorToSetupPos[m_players[outerIndex5].m_color]];
+                desiredClass1 = static_cast<FactionType>(
+                    m_setupPlayerRace[gcColorToSetupPos[m_players[outerIndex5].m_color]]
+                );
             }
 
             if (gpGame->m_availableHeroes[(
@@ -3712,7 +3725,7 @@ void game::PerWeek(void) {
                         innerIndex3 - outerIndex5 + outerIndex5 * (sizeof(playerData) + 1)
                     )[gpGame->m_players[0].m_availableHeroIds]] = -1;
                 if (innerIndex3 == 1 && !gbHumanPlayer[outerIndex5])
-                    desiredClass1 = -1;
+                    desiredClass1 = FACTION_ANY;
                 i32 useDifficultyBonus3 = !gbHumanPlayer[outerIndex5] && gpGame->m_difficulty > 0;
                 (
                     innerIndex3 - outerIndex5 + outerIndex5 * (sizeof(playerData) + 1)
@@ -3935,7 +3948,7 @@ void game::PerMonth(void) {
         for (building4 = WEEKLY_FIRST_DWELLING; building4 <= WEEKLY_LAST_DWELLING; building4++) {
             castle10 = GetTown(townIndex0);
             if (castle10->m_buildings & (1 << building4)) {
-                growth9 = gMonsterDatabase[gDwellingType[castle10->m_type]
+                growth9 = gMonsterDatabase[gDwellingType[IDX(castle10->m_type)]
                                                         [building4 - WEEKLY_FIRST_DWELLING]]
                               .growth;
                 if (castle10->m_buildings & WELL_BUILDING)
@@ -3945,7 +3958,7 @@ void game::PerMonth(void) {
                     growth9 += FIRST_DWELLING_GROWTH;
 
                 if (giMonthType == TYPE_CREATURE
-                    && gDwellingType[castle10->m_type][building4 - WEEKLY_FIRST_DWELLING]
+                    && gDwellingType[IDX(castle10->m_type)][building4 - WEEKLY_FIRST_DWELLING]
                            == giMonthTypeExtra)
                     castle10->m_garrison[building4 - WEEKLY_FIRST_DWELLING] *= 2;
 
@@ -4142,7 +4155,7 @@ void game::RandomizeTown(i32 x, i32 y, i32) {
         RANDOM_TOWN_SECOND_TRIGGER,
         RANDOM_TOWN_TRIGGER
     );
-    m_castleRecs[townId0].m_type = static_cast<i8>(race0);
+    m_castleRecs[townId0].m_type = static_cast<FactionType>(race0);
 }
 
 VA(0x0047f5f1, 0x619)
@@ -4353,13 +4366,13 @@ void game::RandomizeHeroPool(void) {
             static_cast<u8>(Random(RANDOM_HERO_SEED_MIN, RANDOM_HERO_SEED_MAX));
         m_heroRecs[heroId].m_enabled = RANDOM_HERO_ENABLED;
 
-        if (m_heroRecs[heroId].m_cursorType == IDX(FACTION_SORCERESS))
+        if (m_heroRecs[heroId].m_cursorType == FACTION_SORCERESS)
             m_heroRecs[heroId].m_spells[IDX(SPELL_BLESS)] = RANDOM_HERO_STARTING_SPELL_KNOWN;
-        else if (m_heroRecs[heroId].m_cursorType == IDX(FACTION_WARLOCK))
+        else if (m_heroRecs[heroId].m_cursorType == FACTION_WARLOCK)
             m_heroRecs[heroId].m_spells[IDX(SPELL_CURSE)] = RANDOM_HERO_STARTING_SPELL_KNOWN;
-        else if (m_heroRecs[heroId].m_cursorType == IDX(FACTION_NECROMANCER))
+        else if (m_heroRecs[heroId].m_cursorType == FACTION_NECROMANCER)
             m_heroRecs[heroId].m_spells[IDX(SPELL_HASTE)] = RANDOM_HERO_STARTING_SPELL_KNOWN;
-        else if (m_heroRecs[heroId].m_cursorType == IDX(FACTION_WIZARD))
+        else if (m_heroRecs[heroId].m_cursorType == FACTION_WIZARD)
             m_heroRecs[heroId].m_spells[IDX(SPELL_STONE_SKIN)] = RANDOM_HERO_STARTING_SPELL_KNOWN;
     }
 }
@@ -4405,10 +4418,10 @@ void game::SetRandomHeroArmies(i32 heroId, i32 strongArmy) {
     for (index9 = 0; index9 < RANDOM_HERO_ARMY_SELECTION_COUNT; index9++) {
         if (selected9[index9]) {
             army2->m_creatureTypes[armySlot7] =
-                static_cast<i8>(armyTable7[m_heroRecs[heroId].m_cursorType][index9].creature);
-            minimum5 = armyTable7[m_heroRecs[heroId].m_cursorType][index9].minimum
+                static_cast<i8>(armyTable7[IDX(m_heroRecs[heroId].m_cursorType)][index9].creature);
+            minimum5 = armyTable7[IDX(m_heroRecs[heroId].m_cursorType)][index9].minimum
                        * RANDOM_HERO_COUNT_SCALE;
-            maximum5 = armyTable7[m_heroRecs[heroId].m_cursorType][index9].maximum
+            maximum5 = armyTable7[IDX(m_heroRecs[heroId].m_cursorType)][index9].maximum
                            * RANDOM_HERO_COUNT_SCALE
                        + RANDOM_HERO_COUNT_ROUNDING;
             if (strongArmy)
@@ -4805,7 +4818,7 @@ i32 game::GetLuck(hero* h, class army*, town* castle) {
         luck = MAXIMUM;
     if (h->HasArtifact(ARTIFACT_BATTLE_GARB))
         luck = MAXIMUM;
-    if (castle != NULL && castle->m_type == IDX(FACTION_SORCERESS)
+    if (castle != NULL && castle->m_type == FACTION_SORCERESS
         && (castle->m_buildings & IDX(TOWN_BUILDING_RAINBOW))) {
         luck += RAINBOW_BONUS;
     }
@@ -5074,7 +5087,7 @@ void game::SetupTowns(void) {
 
         if (extra->hasCustomBuildings) {
             castle->m_buildings =
-                (gTownEligibleBuildMask[castle->m_type] & extra->buildings)
+                (gTownEligibleBuildMask[IDX(castle->m_type)] & extra->buildings)
                 | (castle->m_buildings & (IDX(TOWN_BUILDING_CASTLE) | IDX(TOWN_BUILDING_TENT)));
             castle->m_buildState = extra->mageGuildLevel;
         } else {
@@ -5109,13 +5122,14 @@ void game::SetupTowns(void) {
         for (building = 19; building <= 30; building++) {
             if (castle->m_buildings & (1 << building)) {
                 castle->m_garrison[building - 19] =
-                    gMonsterDatabase[gDwellingType[castle->m_type][building - 19]].growth;
+                    gMonsterDatabase[gDwellingType[IDX(castle->m_type)][building - 19]].growth;
             }
         }
         if (castle->m_buildings & 1) {
             for (slot = 1; slot <= castle->m_buildState; slot++) {
                 castle->m_spellCounts[slot] = gSpellLimits[slot - 1];
-                if (castle->m_type == 4 && (castle->m_buildings & BIT(BUILDING_SLOT_SPECIAL)))
+                if (castle->m_type == FACTION_WIZARD
+                    && (castle->m_buildings & BIT(BUILDING_SLOT_SPECIAL)))
                     castle->m_spellCounts[slot]++;
             }
         }
@@ -5132,7 +5146,8 @@ void game::SetupTowns(void) {
                     IDX(SPELL_NONE);
         }
 
-        if (castle->m_type == 5 && castle->m_owner != -1 && !gbHumanPlayer[castle->m_owner]) {
+        if (castle->m_type == FACTION_NECROMANCER && castle->m_owner != -1
+            && !gbHumanPlayer[castle->m_owner]) {
             if (Random(0, 100) < 50)
                 spell = SPELL_DEATH_RIPPLE;
             else
@@ -5200,7 +5215,7 @@ void game::SetupTowns(void) {
                     } while (
                         (combatSpells == 1
                          && HAS(gsSpellInfo[IDX(spell)].attributes, SPELL_INFO_ATTRIBUTE_ADVENTURE))
-                        || gsSpellInfo[IDX(spell)].raceChance[castle->m_type] < Random(0, 10)
+                        || gsSpellInfo[IDX(spell)].raceChance[IDX(castle->m_type)] < Random(0, 10)
                         || attempts++ > 500 || usedSpells[IDX(spell)]
                         || spellValue < Random(1, 1500)
                     );
@@ -5284,7 +5299,7 @@ void game::ProcessOnMapHeroes(void) {
 
                         if (extra0->hasAssignedHero) {
                             mapHero0 = GetHero(extra0->heroId);
-                            mapHero0->m_cursorType = static_cast<u8>(heroClass6);
+                            mapHero0->m_cursorType = static_cast<FactionType>(heroClass6);
                         } else {
                             heroId1 = RandomScan(usedHeroes4, heroClass6 * 9, 9, 1000, 0);
                             if (heroId1 == -1) {
@@ -5293,7 +5308,7 @@ void game::ProcessOnMapHeroes(void) {
                             }
                             usedHeroes4[heroId1] = 1;
                             mapHero0 = GetHero(heroId1);
-                            mapHero0->m_cursorType = static_cast<u8>(heroClass6);
+                            mapHero0->m_cursorType = static_cast<FactionType>(heroClass6);
                             if (extra0->hasCustomHero && extra0->heroId >= GAME_HERO_COUNT)
                                 mapHero0->m_portrait = extra0->heroId;
                             extra0->heroId = static_cast<i8>(heroId1);
@@ -5430,7 +5445,7 @@ void game::CheckHeroConsistency(void) {
                     || (total26 < 40
                         && m_availableHeroes[m_players[player3].m_availableHeroIds[slot1]] == -1)) {
                     m_players[player3].m_availableHeroIds[slot1] =
-                        static_cast<i8>(GetNewHeroId(player3, -1, 0));
+                        static_cast<i8>(GetNewHeroId(player3, FACTION_ANY, 0));
                     m_availableHeroes[m_players[player3].m_availableHeroIds[slot1]] = 64;
                 }
             }
@@ -6683,7 +6698,7 @@ void CheckValidAvailableHeroes(void) {
                     if (gpGame->m_players[candidatePlayer0].m_availableHeroIds[availableSlot13]
                         == gpGame->m_players[heroPlayer26].m_heroIds[heroIndex5]) {
                         gpGame->m_players[candidatePlayer0].m_availableHeroIds[availableSlot13] =
-                            static_cast<i8>(gpGame->GetNewHeroId(heroPlayer26, -1, 0));
+                            static_cast<i8>(gpGame->GetNewHeroId(heroPlayer26, FACTION_ANY, 0));
                     }
                 }
             }
@@ -6811,7 +6826,7 @@ i32 game::CountShrines(i32 player) {
                     castle = GetCastle(cell->m_objectMetadata);
                     if (castle->m_owner == player
                         && (castle->m_buildings & IDX(TOWN_BUILDING_TAVERN))
-                        && castle->m_type == IDX(FACTION_NECROMANCER))
+                        && castle->m_type == FACTION_NECROMANCER)
                         count++;
                 }
             }

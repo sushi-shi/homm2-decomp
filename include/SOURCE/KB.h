@@ -449,7 +449,7 @@ i32 InterpretCommandLine(void);
 i32 InitMenuHandler(struct tag_message&);
 i32 NullHandler(struct tag_message& msg);
 i32 RecruitHeroHandler(tag_message& msg);
-char* GetBuildingInfo(i32 race, i32 building, i32 mode);
+char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 mode);
 char* GetBuildingName(FactionType race, BuildingSlotType building);
 void GetBuildingCost(FactionType race, BuildingSlotType building, i32* const dest, i32 mageLevel);
 char* GetMonsterName(i32 m);

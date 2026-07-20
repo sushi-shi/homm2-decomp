@@ -90,8 +90,6 @@ H2_ENUM_BEGIN(TownManagerConstant)
     TOWN_BUILDING_COUNT                      = 32,
     TOWN_OBJECT_FILENAME_SIZE                = 16,
     TOWN_MANAGER_EVENT_MASK                  = 0x800,
-    TOWN_LAST_TYPE_NONE                      = -1,
-    TOWN_LAST_TYPE_UNINITIALIZED             = -2,
     TOWN_SELECTED_BUILDING_NONE              = -1,
     TOWN_HOVER_NONE                          = -1,
     TOWN_ARMY_SLOT_NONE                      = -1,

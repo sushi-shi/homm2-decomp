@@ -295,7 +295,7 @@ void philAI::CheckForCreatureUpgrades(void) {
                     continue;
                 canUpgrade = 0;
                 for (dwelling = 20; dwelling <= 24; dwelling++) {
-                    if (gDwellingType[townPtr->m_type][dwelling - IDX(BUILDING_SLOT_DWELLING_FIRST)]
+                    if (gDwellingType[IDX(townPtr->m_type)][dwelling - IDX(BUILDING_SLOT_DWELLING_FIRST)]
                             == armyPtr->m_creatureTypes[creatureIndex]
                         && (townPtr->m_buildings & (1 << (dwelling + 5)))) {
                         canUpgrade = 1;
@@ -2081,7 +2081,7 @@ void philAI::ValueOfBuyingBuilding(
     i32 projectedAttackValue;
     i32 estimatedAttackWeeks;
     float dangerRating;
-    currentTownRace = FactionType(townPtr->m_type);
+    currentTownRace = townPtr->m_type;
     dwellingTotal = 0;
     highestDwellingId = -1;
     for (indexBuilding = IDX(BUILDING_SLOT_DWELLING_FIRST);
@@ -2128,7 +2128,7 @@ void philAI::ValueOfBuyingBuilding(
                 adjustedValue = -99.0f;
             break;
         case BUILDING_SLOT_MAGE_GUILD:
-            if (townPtr->m_type == 0 || townPtr->m_type == 1) {
+            if (townPtr->m_type == FACTION_KNIGHT || townPtr->m_type == FACTION_BARBARIAN) {
                 if ((townPtr->m_buildState >= 4 && giCurTurn < 40)
                     || (townPtr->m_buildState >= 3 && giCurTurn < 30)
                     || (townPtr->m_buildState >= 2 && giCurTurn < 20))
@@ -2144,7 +2144,8 @@ void philAI::ValueOfBuyingBuilding(
             }
             break;
         case BUILDING_SLOT_SPECIAL_ONE:
-            if (townPtr->m_type == 5 && (townPtr->m_buildings & BIT(BUILDING_SLOT_DWELLING_THIRD)))
+            if (townPtr->m_type == FACTION_NECROMANCER
+                && (townPtr->m_buildings & BIT(BUILDING_SLOT_DWELLING_THIRD)))
                 adjustedValue = 1500.0f;
             else if (giCurTurn < 21)
                 adjustedValue = 0.0f;
@@ -2170,8 +2171,9 @@ void philAI::ValueOfBuyingBuilding(
                 adjustedValue = 0.0f;
             break;
         case BUILDING_SLOT_SPECIAL:
-            if (townPtr->m_type == 0 || townPtr->m_type == 2 || townPtr->m_type == 1
-                || townPtr->m_type == 5) {
+            if (townPtr->m_type == FACTION_KNIGHT || townPtr->m_type == FACTION_SORCERESS
+                || townPtr->m_type == FACTION_BARBARIAN
+                || townPtr->m_type == FACTION_NECROMANCER) {
                 goto deferEarlyBuilding;
             }
             break;
@@ -2188,16 +2190,17 @@ void philAI::ValueOfBuyingBuilding(
                 (gpCurPlayer->m_attentionWeights.upgradeBase * 2.0f + 0.33) * adjustedValue
             );
             adjustedValue = static_cast<float>((dwellingTotal * 0.33 + 0.66) * adjustedValue);
-            if ((townPtr->m_type != 0
+            if ((townPtr->m_type != FACTION_KNIGHT
                  || !(townPtr->m_buildings & BIT(BUILDING_SLOT_DWELLING_SECOND)))
                 && gpGame->m_day < 6)
                 adjustedValue = 0.0f;
             break;
         case BUILDING_SLOT_NECROMANCER_SHRINE:
-            if (townPtr->m_type == 5)
+            if (townPtr->m_type == FACTION_NECROMANCER)
                 break;
-            if ((townPtr->m_type == 0 && (townPtr->m_buildings & BIT(BUILDING_SLOT_DWELLING_THIRD)))
-                || (townPtr->m_type == 2
+            if ((townPtr->m_type == FACTION_KNIGHT
+                 && (townPtr->m_buildings & BIT(BUILDING_SLOT_DWELLING_THIRD)))
+                || (townPtr->m_type == FACTION_SORCERESS
                     && (townPtr->m_buildings & BIT(BUILDING_SLOT_DWELLING_THIRD)))) {
                 adjustedValue = 1000.0f;
             } else {
@@ -2219,7 +2222,7 @@ void philAI::ValueOfBuyingBuilding(
             if (currentOccupiedSlots == AI_TOWN_ARMY_SLOTS) {
                 creatureLocated = 0;
                 for (indexBuilding = 0; indexBuilding < IDX(AI_TOWN_ARMY_SLOTS); indexBuilding++) {
-                    if (gDwellingType[townPtr->m_type]
+                    if (gDwellingType[IDX(townPtr->m_type)]
                                      [IDX(building) - IDX(BUILDING_SLOT_DWELLING_FIRST)]
                         == townPtr->m_army.m_creatureTypes[indexBuilding]) {
                         creatureLocated = 1;
@@ -2236,7 +2239,7 @@ void philAI::ValueOfBuyingBuilding(
             );
             adjustedValue = static_cast<float>(
                 (1.0
-                 - gpCurPlayer->BuildingsOwned(IDX(currentTownRace), BuildingSlotType(building), 0)
+                 - gpCurPlayer->BuildingsOwned(currentTownRace, BuildingSlotType(building), 0)
                        * 0.05)
                 * adjustedValue
             );
@@ -2245,10 +2248,10 @@ void philAI::ValueOfBuyingBuilding(
             if (townPtr->m_buildings & BIT(BUILDING_SLOT_SPECIAL_FOUR))
                 adjustedValue = static_cast<float>(adjustedValue * 1.1);
             for (buildingLevel = 0; buildingLevel < AI_DWELLING_LEVELS; buildingLevel++) {
-                currentCreatureType = gDwellingType[townPtr->m_type][buildingLevel];
+                currentCreatureType = gDwellingType[IDX(townPtr->m_type)][buildingLevel];
                 if ((townPtr->m_buildings & BIT(buildingLevel + IDX(BUILDING_SLOT_DWELLING_FIRST)))
                     && townPtr->m_garrison[buildingLevel] > 0
-                    && gMonsterDatabase[gDwellingType[townPtr->m_type]
+                    && gMonsterDatabase[gDwellingType[IDX(townPtr->m_type)]
                                                      [IDX(building)
                                                       - IDX(BUILDING_SLOT_DWELLING_FIRST)]]
                                .iconIndex
@@ -2315,7 +2318,7 @@ void philAI::GetBestBuilding(town* t, BHC& bhc, float& fOut) {
                         gText,
                         "Town:%2d  Building: % 18s   Raw BC = %8.2f,  RandBC = %8.2f.",
                         t->m_id,
-                        GetBuildingName(FactionType(t->m_type), BuildingSlotType(node)),
+                        GetBuildingName(t->m_type, BuildingSlotType(node)),
                         idx,
                         score
                     );
@@ -2447,7 +2450,7 @@ void philAI::GetBestCreature(town* townPtr, BHC& best, float& bestValue) {
     bestRaw = AI_PURCHASE_INITIAL_VALUE;
     bestRandomized = AI_PURCHASE_INITIAL_VALUE;
     for (dwelling = 0; dwelling < CREATURE_PURCHASE_DWELLING_COUNT; dwelling++) {
-        creature = static_cast<CreatureType>(gDwellingType[townPtr->m_type][dwelling]);
+        creature = static_cast<CreatureType>(gDwellingType[IDX(townPtr->m_type)][dwelling]);
         leastArmyValue = CREATURE_PURCHASE_VALUE_LIMIT;
         if ((townPtr->m_buildings & BIT(dwelling + IDX(BUILDING_SLOT_DWELLING_FIRST)))
             && townPtr->m_garrison[dwelling] > 0) {
@@ -2529,7 +2532,7 @@ void philAI::GetBestCreature(town* townPtr, BHC& best, float& bestValue) {
 VA(0x0043deb3, 0x48)
 i32 philAI::CreaturesToBuy(town* t, i32 level) {
     i32 nGarrison = t->m_garrison[level];
-    return CreaturesToBuy((i32)gDwellingType[t->m_type][level], nGarrison);
+    return CreaturesToBuy((i32)gDwellingType[IDX(t->m_type)][level], nGarrison);
 }
 
 VA(0x0043defb, 0x5f)
@@ -2598,10 +2601,10 @@ void philAI::ValueOfBuyingHero(
          - gpCurPlayer->m_attentionWeights.upgradeBase)
         * value27
     );
-    magicHero6 = heroPtr->m_cursorType == IDX(FACTION_SORCERESS)
-                 || heroPtr->m_cursorType == IDX(FACTION_WARLOCK)
-                 || heroPtr->m_cursorType == IDX(FACTION_WIZARD)
-                 || heroPtr->m_cursorType == IDX(FACTION_NECROMANCER);
+    magicHero6 = heroPtr->m_cursorType == FACTION_SORCERESS
+                 || heroPtr->m_cursorType == FACTION_WARLOCK
+                 || heroPtr->m_cursorType == FACTION_WIZARD
+                 || heroPtr->m_cursorType == FACTION_NECROMANCER;
     if (townPtr->m_type == heroPtr->m_cursorType) {
         value27 *= AI_HERO_PURCHASE_SAME_RACE_FACTOR + AI_HERO_PURCHASE_IDENTITY;
     } else if ((townPtr->m_buildState >= 2 && magicHero6)
@@ -3155,7 +3158,7 @@ i32 philAI::ValueOfTown(town* t) {
     for (idx = 0; idx <= 24; idx++) {
         if (t->m_buildings & (1 << idx))
             sum += GetBuildingBaseResourceValue(
-                FactionType(t->m_type),
+                t->m_type,
                 BuildingSlotType(idx),
                 t->m_buildState
             );
@@ -4345,7 +4348,7 @@ void philAI::BuildBuilding(town* t, i32 building) {
         gText,
         "Player %d built %s in town %d.\n",
         giCurPlayer,
-        GetBuildingName(FactionType(t->m_type), BuildingSlotType(building)),
+        GetBuildingName(t->m_type, BuildingSlotType(building)),
         t->m_id
     );
     LogStr(gText);
@@ -4353,7 +4356,7 @@ void philAI::BuildBuilding(town* t, i32 building) {
         AiPrint(gText);
         DelayMilli(1500);
     }
-    GetBuildingCost(FactionType(t->m_type), BuildingSlotType(building), cost, t->m_buildState);
+    GetBuildingCost(t->m_type, BuildingSlotType(building), cost, t->m_buildState);
     for (i = 0; i < 7; i++)
         gpCurPlayer->m_resources[i] -= cost[i];
     t->BuildBuilding(building);
@@ -4414,7 +4417,7 @@ void philAI::BuildHero(town* townPtr, i32 availableHeroIndex) {
     townPtr->GiveSpells(NULL);
 
     gpCurPlayer->m_availableHeroIds[availableHeroIndex] =
-        static_cast<i8>(gpGame->GetNewHeroId(giCurPlayer, AI_TROOP_EMPTY_SLOT, 1));
+        static_cast<i8>(gpGame->GetNewHeroId(giCurPlayer, FACTION_ANY, 1));
     gpGame->m_availableHeroes[gpCurPlayer->m_availableHeroIds[availableHeroIndex]] =
         AI_HERO_AVAILABLE_FLAG;
     bHeroBuiltThisTurn = 1;
@@ -4437,7 +4440,7 @@ void philAI::BuildCreature(town* townPtr, i32 dwelling, i32 purchaseCount) {
         "Player %d built %d %s in town %d.\n",
         giCurPlayer,
         purchaseCount,
-        GetMonsterName(gDwellingType[townPtr->m_type][dwelling]),
+        GetMonsterName(gDwellingType[IDX(townPtr->m_type)][dwelling]),
         townPtr->m_id
     );
     LogStr(gText);
@@ -4446,7 +4449,7 @@ void philAI::BuildCreature(town* townPtr, i32 dwelling, i32 purchaseCount) {
         DelayMilli(AI_PURCHASE_DEBUG_DELAY);
     }
 
-    creatureType13 = gDwellingType[townPtr->m_type][dwelling];
+    creatureType13 = gDwellingType[IDX(townPtr->m_type)][dwelling];
     canJoin6 = 0;
     for (armyIndex4 = 0; armyIndex4 < AI_TOWN_ARMY_SLOTS; armyIndex4++) {
         if (townPtr->m_army.m_creatureTypes[armyIndex4] == AI_TROOP_EMPTY_SLOT
@@ -4512,7 +4515,7 @@ i32 philAI::CanBuyBHC(BHC& bhc) {
                 return 1;
             break;
         case PURCHASE_CREATURE:
-            jb = gDwellingType[bhc.pTown->m_type][bhc.what];
+            jb = gDwellingType[IDX(bhc.pTown->m_type)][bhc.what];
             if (bhc.pTown->m_garrison[bhc.what] < bhc.num)
                 return 0;
             GetMonsterCost(CreatureType(jb), cost);

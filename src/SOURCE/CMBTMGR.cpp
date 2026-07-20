@@ -368,12 +368,12 @@ void combatManager::SetupCombat(
             memset(&m_captain, 0, sizeof(m_captain));
             for (side = 0; side < HERO_PRIMARY_STAT_COUNT; side++)
                 m_captain.m_primaryStats[side] =
-                    captainStats[m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type][side];
+                    captainStats[IDX(m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type)][side];
             m_captain.m_spellPoints =
                 m_captain.Stats(HERO_PRIMARY_KNOWLEDGE) * COMBAT_CAPTAIN_SPELL_POINT_MULTIPLIER;
             m_captain.m_cursorType = m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type;
             m_captain.m_portrait =
-                m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type + COMBAT_CAPTAIN_PORTRAIT_BASE;
+                IDX(m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type) + COMBAT_CAPTAIN_PORTRAIT_BASE;
             strcpy(m_captain.m_name, "Captain");
             for (side = 0; side < ARMY_GROUP_SLOT_COUNT; side++)
                 m_captain.m_army.m_creatureTypes[side] = ARMY_GROUP_EMPTY_SLOT;
@@ -399,7 +399,7 @@ void combatManager::InitNonVisualVars(void) {
         m_spellPower[side] = 0;
         if (m_heroes[side] != NULL)
             m_spellPower[side] = m_heroes[side]->Stats(HERO_PRIMARY_SPELL_POWER);
-        if (m_combatTowns[side] != NULL && m_combatTowns[side]->m_type == IDX(FACTION_NECROMANCER)
+        if (m_combatTowns[side] != NULL && m_combatTowns[side]->m_type == FACTION_NECROMANCER
             && (m_combatTowns[side]->m_buildings & IDX(TOWN_BUILDING_SHRINE)))
             m_spellPower[side] += NECROMANCER_SHRINE_POWER_BONUS;
     }
@@ -854,7 +854,7 @@ void combatManager::LoadIcons(void) {
         sprintf(
             gText,
             "castle%c.icn",
-            cHeroTypeInitial[m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type]
+            cHeroTypeInitial[IDX(m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type)]
         );
         m_combatIcons[IDX(COMBAT_ICON_TOWER)] = gpResourceManager->GetIcon(gText);
         m_combatIcons[IDX(COMBAT_ICON_KEEP)] = gpResourceManager->GetIcon("keep.icn");
@@ -869,14 +869,14 @@ void combatManager::LoadIcons(void) {
 
         if (m_heroes[index]) {
             if (m_heroes[index]->m_isCaptain) {
-                sprintf(gText, "cmbtcap%c.icn", cHeroTypeInitial[m_heroes[index]->m_cursorType]);
+                sprintf(gText, "cmbtcap%c.icn", cHeroTypeInitial[IDX(m_heroes[index]->m_cursorType)]);
                 m_heroIcons[index] = gpResourceManager->GetIcon(gText);
                 m_heroSpriteIndex[index] =
-                    m_heroes[index]->m_cursorType + COMBAT_CAPTAIN_SPRITE_OFFSET;
+                    IDX(m_heroes[index]->m_cursorType) + COMBAT_CAPTAIN_SPRITE_OFFSET;
             } else {
-                sprintf(gText, "cmbthro%c.icn", cHeroTypeInitial[m_heroes[index]->m_cursorType]);
+                sprintf(gText, "cmbthro%c.icn", cHeroTypeInitial[IDX(m_heroes[index]->m_cursorType)]);
                 m_heroIcons[index] = gpResourceManager->GetIcon(gText);
-                m_heroSpriteIndex[index] = m_heroes[index]->m_cursorType;
+                m_heroSpriteIndex[index] = IDX(m_heroes[index]->m_cursorType);
             }
         }
 
@@ -1687,8 +1687,8 @@ void combatManager::KeepAttack(i32 tower) {
     };
     // NOLINTEND(readability-magic-numbers)
     i32 unknownTowerData6[KEEP_TOWER_SCRATCH_COUNT];
-    i32 sourceX9 = towerOrigins4[m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type][tower].x;
-    i32 sourceY6 = towerOrigins4[m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type][tower].y;
+    i32 sourceX9 = towerOrigins4[IDX(m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type)][tower].x;
+    i32 sourceY6 = towerOrigins4[IDX(m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type)][tower].y;
     i32 targetX9 = target0->MidX();
     i32 targetY8 = target0->MidY();
     // Retail keep-missile direction payload.
@@ -1827,7 +1827,7 @@ void combatManager::SetupAndLoadObstacles(void) {
         for (cellIndex1 = 0; cellIndex1 < COMBAT_CASTLE_STRUCTURE_COUNT; cellIndex1++) {
             m_wallStates[cellIndex1 + COMBAT_WALL_SLOT_SECTION_FIRST] =
                 IDX(COMBAT_WALL_STATE_KEEP_STANDING);
-            if (m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type == IDX(FACTION_KNIGHT)
+            if (m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type == FACTION_KNIGHT
                 && (m_combatTowns[COMBAT_DEFENDER_SIDE]->m_buildings
                     & IDX(TOWN_BUILDING_FORTIFICATIONS))) {
                 m_wallStates[cellIndex1 + COMBAT_WALL_SLOT_SECTION_FIRST] =

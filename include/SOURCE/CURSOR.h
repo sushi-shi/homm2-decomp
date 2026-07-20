@@ -64,7 +64,7 @@ H2_ENUM_BEGIN(CursorConstant)
     CURSOR_REMOTE_NO_TIMEOUT            = -1
 H2_ENUM_END(CursorConstant)
 
-H2_ENUM_BEGIN(MapChangeType)
+H2_ENUM_CLASS_BEGIN_SPLIT(MapChangeType, u8)
     MAP_CHANGE_NONE          = 0,
     MAP_CHANGE_MOVE_HERO     = 1,
     MAP_CHANGE_UNUSED        = 2,
@@ -77,11 +77,11 @@ H2_ENUM_BEGIN(MapChangeType)
     MAP_CHANGE_TELEPORT_HERO = 9,
     MAP_CHANGE_DEAD_PLAYER   = 10,
     MAP_CHANGE_MY_TURN       = 11
-H2_ENUM_END(MapChangeType)
+H2_ENUM_CLASS_END_SPLIT(MapChangeType, u8)
 
 #pragma pack(push, 1)
 struct SMapChange {
-    u8 type;
+    H2_ENUM_STORAGE(MapChangeType, u8) type;
     i8 id;
     u8 x;
     u8 y;

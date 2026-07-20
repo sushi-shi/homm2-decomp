@@ -57,6 +57,21 @@ H2_ENUM_END(Item)
 """
         self.assertEqual(format_text(source), expected)
 
+    def test_aligns_split_storage_enum(self):
+        source = """\
+H2_ENUM_CLASS_BEGIN_SPLIT(FactionType, i8)
+    FACTION_UNINITIALIZED = -2,
+    FACTION_ANY = -1
+H2_ENUM_CLASS_END_SPLIT(FactionType, i8)
+"""
+        expected = """\
+H2_ENUM_CLASS_BEGIN_SPLIT(FactionType, i8)
+    FACTION_UNINITIALIZED = -2,
+    FACTION_ANY           = -1
+H2_ENUM_CLASS_END_SPLIT(FactionType, i8)
+"""
+        self.assertEqual(format_text(source), expected)
+
 
 if __name__ == "__main__":
     unittest.main()

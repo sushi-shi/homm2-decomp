@@ -9,8 +9,8 @@ import sys
 from pathlib import Path
 
 
-BEGIN_RE = re.compile(r"^H2_ENUM_(?:CLASS_)?BEGIN(?:_T)?\(")
-END_RE = re.compile(r"^H2_ENUM_(?:CLASS_)?END(?:_T)?\(")
+BEGIN_RE = re.compile(r"^H2_ENUM_(?:CLASS_)?BEGIN(?:_T|_SPLIT)?\(")
+END_RE = re.compile(r"^H2_ENUM_(?:CLASS_)?END(?:_T|_SPLIT)?\(")
 ASSIGN_RE = re.compile(r"^(\s*)([A-Za-z_][A-Za-z0-9_]*)(?:\s*)=(?:\s*)(.*)$")
 
 

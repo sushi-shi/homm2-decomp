@@ -402,15 +402,19 @@ H2_ENUM_BEGIN(MapObjectType)
     MAP_OBJECT_JAIL                       = 123
 H2_ENUM_END(MapObjectType)
 
-H2_ENUM_CLASS_BEGIN(FactionType)
-    FACTION_KNIGHT      = 0,
-    FACTION_BARBARIAN   = 1,
-    FACTION_SORCERESS   = 2,
-    FACTION_WARLOCK     = 3,
-    FACTION_WIZARD      = 4,
-    FACTION_NECROMANCER = 5,
-    FACTION_COUNT       = 6
-H2_ENUM_CLASS_END(FactionType)
+H2_ENUM_CLASS_BEGIN_SPLIT(FactionType, i8)
+    FACTION_UNINITIALIZED = -2,
+    FACTION_ANY           = -1,
+    FACTION_NONE          = -1,
+    FACTION_KNIGHT        = 0,
+    FACTION_BARBARIAN     = 1,
+    FACTION_SORCERESS     = 2,
+    FACTION_WARLOCK       = 3,
+    FACTION_WIZARD        = 4,
+    FACTION_NECROMANCER   = 5,
+    FACTION_NEUTRAL       = 6,
+    FACTION_COUNT         = 6
+H2_ENUM_CLASS_END_SPLIT(FactionType, i8)
 
 H2_ENUM_CLASS_BEGIN(TerrainType)
     TERRAIN_WATER     = 0,
@@ -556,7 +560,7 @@ struct tag_monsterInfo {
     i8 iconIndex;
     i8 growth;
     u16 hitPoints;
-    i8 race;
+    H2_ENUM_STORAGE(FactionType, i8) race;
     i8 speed;
     i8 attack;
     i8 defense;

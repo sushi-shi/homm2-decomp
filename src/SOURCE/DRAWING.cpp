@@ -618,7 +618,7 @@ void combatManager::DrawBackground(void) {
         sprintf(
             gText,
             "castbkg%c.icn",
-            cHeroTypeInitial[m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type]
+            cHeroTypeInitial[IDX(m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type)]
         );
         backgroundIcon = gpResourceManager->GetIcon(gText);
         IconToBitmap(
@@ -648,7 +648,7 @@ void combatManager::DrawBackground(void) {
                 COMBAT_AREA_HEIGHT,
                 0
             );
-        if (m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type == IDX(FACTION_KNIGHT)
+        if (m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type == FACTION_KNIGHT
             && (m_combatTowns[COMBAT_DEFENDER_SIDE]->m_buildings & IDX(TOWN_BUILDING_RAINBOW)) != 0)
             IconToBitmap(
                 backgroundIcon,
@@ -1191,40 +1191,40 @@ void combatManager::DrawFrame(
                             wallFrame1 = m_wallStates[COMBAT_WALL_SLOT_TOP_TOWER]
                                          + COMBAT_CASTLE_WALL_BASE_FRAME;
                             wallX7 =
-                                wallCoordinates1[m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type]
+                                wallCoordinates1[IDX(m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type)]
                                                 [WALL_TOP_X];
                             wallY =
-                                wallCoordinates1[m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type]
+                                wallCoordinates1[IDX(m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type)]
                                                 [WALL_TOP_Y];
                             break;
                         case COMBAT_CASTLE_HEX_SECOND_WALL:
                             wallFrame1 = m_wallStates[COMBAT_WALL_SLOT_SECOND_TOWER]
                                          + COMBAT_CASTLE_WALL_BASE_FRAME;
                             wallX7 =
-                                wallCoordinates1[m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type]
+                                wallCoordinates1[IDX(m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type)]
                                                 [WALL_SECOND_X];
                             wallY =
-                                wallCoordinates1[m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type]
+                                wallCoordinates1[IDX(m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type)]
                                                 [WALL_SECOND_Y];
                             break;
                         case COMBAT_CASTLE_HEX_THIRD_WALL:
                             wallFrame1 = m_wallStates[COMBAT_WALL_SLOT_THIRD_TOWER]
                                          + COMBAT_CASTLE_WALL_BASE_FRAME;
                             wallX7 =
-                                wallCoordinates1[m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type]
+                                wallCoordinates1[IDX(m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type)]
                                                 [WALL_THIRD_X];
                             wallY =
-                                wallCoordinates1[m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type]
+                                wallCoordinates1[IDX(m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type)]
                                                 [WALL_THIRD_Y];
                             break;
                         case COMBAT_CASTLE_HEX_BOTTOM_WALL:
                             wallFrame1 = m_wallStates[COMBAT_WALL_SLOT_BOTTOM_TOWER]
                                          + COMBAT_CASTLE_WALL_BASE_FRAME;
                             wallX7 =
-                                wallCoordinates1[m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type]
+                                wallCoordinates1[IDX(m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type)]
                                                 [WALL_BOTTOM_X];
                             wallY =
-                                wallCoordinates1[m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type]
+                                wallCoordinates1[IDX(m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type)]
                                                 [WALL_BOTTOM_Y];
                             break;
                         case COMBAT_CASTLE_HEX_GATE:
