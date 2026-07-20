@@ -46,23 +46,6 @@ H2_ENUM_BEGIN(OverviewPresentationConstant)
     OVERVIEW_POINTER_FRAME            = 0
 H2_ENUM_END(OverviewPresentationConstant)
 
-H2_ENUM_BEGIN(OverviewSourceLine)
-    DYNAMIC_SOURCE_LINE_BASE      = 116,
-    DYNAMIC_TOWN_NAME_LINE_OFFSET = 79,
-    DYNAMIC_TOWN_ARMY_LINE_OFFSET = 238,
-    DYNAMIC_DWELLING_LINE_OFFSET  = 298,
-    DYNAMIC_PRIMARY_LINE_OFFSET   = 386,
-    DYNAMIC_HERO_ARMY_LINE_OFFSET = 445,
-    DYNAMIC_SKILL_LINE_OFFSET     = 507,
-    SETUP_SOURCE_LINE_BASE        = 698,
-    SETUP_TITLE_LINE_OFFSET       = 42,
-    DIALOG_SOURCE_LINE_BASE       = 778,
-    DIALOG_TEXT_ARRAY_LINE_OFFSET = 17,
-    DIALOG_ICON_ARRAY_LINE_OFFSET = 18,
-    DIALOG_TEXT_ARRAY_FREE_OFFSET = 104,
-    DIALOG_ICON_ARRAY_FREE_OFFSET = 105
-H2_ENUM_END(OverviewSourceLine)
-
 H2_ENUM_BEGIN(OverviewControlId)
     HERO_TAB_WIDGET             = 100,
     TOWN_TAB_WIDGET             = 101,
@@ -298,7 +281,7 @@ H2_ENUM_END(OverviewDialogConstant)
 
 VA(0x00407870, 0x223e)
 void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
-    DATA(0x004eda04) static i16 overviewDynamicSourceLine = DYNAMIC_SOURCE_LINE_BASE;
+    DATA(0x004eda04) static i16 overviewDynamicSourceLine = 116;
     i32 row;
     i32 item;
     i32 textItemCount;
@@ -377,7 +360,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
             {
                 valueText0 = static_cast<char*>(H2_ALLOC(
                     strlen(record->m_name) + 1,
-                    overviewDynamicSourceLine + DYNAMIC_TOWN_NAME_LINE_OFFSET
+                    overviewDynamicSourceLine + 79
                 ));
                 strcpy(valueText0, record->m_name);
 
@@ -563,7 +546,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
 
                         valueText0 = static_cast<char*>(H2_ALLOC(
                             OVERVIEW_TROOP_TEXT_CAPACITY,
-                            overviewDynamicSourceLine + DYNAMIC_TOWN_ARMY_LINE_OFFSET
+                            overviewDynamicSourceLine + 238
                         ));
                         sprintf(
                             valueText0,
@@ -666,7 +649,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
 
                         valueText0 = static_cast<char*>(H2_ALLOC(
                             OVERVIEW_TROOP_TEXT_CAPACITY,
-                            overviewDynamicSourceLine + DYNAMIC_DWELLING_LINE_OFFSET
+                            overviewDynamicSourceLine + 298
                         ));
                         sprintf(
                             valueText0,
@@ -779,7 +762,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
             for (item = 0; item < HERO_PRIMARY_STAT_COUNT; item++) {
                 valueText0 = static_cast<char*>(H2_ALLOC(
                     OVERVIEW_PRIMARY_TEXT_CAPACITY,
-                    overviewDynamicSourceLine + DYNAMIC_PRIMARY_LINE_OFFSET
+                    overviewDynamicSourceLine + 386
                 ));
                 sprintf(
                     valueText0,
@@ -859,7 +842,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
 
                         valueText0 = static_cast<char*>(H2_ALLOC(
                             OVERVIEW_TROOP_TEXT_CAPACITY,
-                            overviewDynamicSourceLine + DYNAMIC_HERO_ARMY_LINE_OFFSET
+                            overviewDynamicSourceLine + 445
                         ));
                         sprintf(
                             valueText0,
@@ -941,7 +924,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
 
                     valueText0 = static_cast<char*>(H2_ALLOC(
                         OVERVIEW_SKILL_LEVEL_CAPACITY,
-                        overviewDynamicSourceLine + DYNAMIC_SKILL_LINE_OFFSET
+                        overviewDynamicSourceLine + 507
                     ));
                     sprintf(valueText0, "%d", static_cast<i32>(heroData0->GetSSLevel(detailIndex)));
                     OVERVIEW_TEXT_WIDGET_ROWS[row][textItemCount] = new textWidget(
@@ -1023,7 +1006,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
 
     if (redraw) {
         overWin->DrawWindow(
-            WINDOW_FLAG_NONE,
+            false,
             OVERVIEW_DYNAMIC_DRAW_FIRST,
             ICON_ROW_LIMIT - 1
         );
@@ -1038,7 +1021,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
 
 VA(0x00409aae, 0x357)
 void game::SetupNewOverviewType(OverviewType overviewType, i32 redrawFrom) {
-    DATA(0x004edca8) static i16 overviewSetupSourceLine = SETUP_SOURCE_LINE_BASE;
+    DATA(0x004edca8) static i16 overviewSetupSourceLine = 698;
     i32 title;
     tag_message message;
     char* titleCopy;
@@ -1094,7 +1077,7 @@ void game::SetupNewOverviewType(OverviewType overviewType, i32 redrawFrom) {
     for (title = 0; title < OVERVIEW_TITLE_COUNT; title++) {
         titleCopy = static_cast<char*>(H2_ALLOC(
             strlen(cOverviewText[IDX(giOverviewType) * OVERVIEW_TITLE_COUNT + title]) + 1,
-            overviewSetupSourceLine + SETUP_TITLE_LINE_OFFSET
+            overviewSetupSourceLine + 42
         ));
         strcpy(titleCopy, cOverviewText[IDX(giOverviewType) * OVERVIEW_TITLE_COUNT + title]);
         textWidgetTitle[title] = new textWidget(
@@ -1134,7 +1117,7 @@ void game::SetupResources(void) {
 
 VA(0x00409e89, 0x4c7)
 void game::Overview(void) {
-    DATA(0x004edcec) static i16 overviewDialogSourceLine = DIALOG_SOURCE_LINE_BASE;
+    DATA(0x004edcec) static i16 overviewDialogSourceLine = 778;
     char mineCounts4[OVERVIEW_MINE_COUNT_CAPACITY];
     i32 lighthouseCount4;
     i32 mine4;
@@ -1152,11 +1135,11 @@ void game::Overview(void) {
 
     textWidgetDynamic = static_cast<textWidget**>(H2_ALLOC(
         DYNAMIC_ARRAY_BYTES,
-        overviewDialogSourceLine + DIALOG_TEXT_ARRAY_LINE_OFFSET
+        overviewDialogSourceLine + 17
     ));
     iconWidgetDynamic = static_cast<iconWidget**>(H2_ALLOC(
         DYNAMIC_ARRAY_BYTES,
-        overviewDialogSourceLine + DIALOG_ICON_ARRAY_LINE_OFFSET
+        overviewDialogSourceLine + 18
     ));
     for (row0 = 0; row0 < OVERVIEW_VISIBLE_ROWS; row0++) {
         for (mine4 = 0; mine4 < OVERVIEW_DYNAMIC_WIDGETS_PER_ROW; mine4++) {
@@ -1238,11 +1221,11 @@ void game::Overview(void) {
     overWin = NULL;
     H2_FREE(
         textWidgetDynamic,
-        overviewDialogSourceLine + DIALOG_TEXT_ARRAY_FREE_OFFSET
+        overviewDialogSourceLine + 104
     );
     H2_FREE(
         iconWidgetDynamic,
-        overviewDialogSourceLine + DIALOG_ICON_ARRAY_FREE_OFFSET
+        overviewDialogSourceLine + 105
     );
     textWidgetDynamic = NULL;
     iconWidgetDynamic = NULL;
@@ -1322,7 +1305,7 @@ void game::DoKnob(void) {
         OVScrollKnob->m_flags &= ~WIDGET_FLAG_SELECTED;
         SetupDynamicStuff(0, 1, 0);
         overWin->DrawWindow(
-            WINDOW_FLAG_NONE,
+            false,
             OVERVIEW_DYNAMIC_DRAW_FIRST,
             OVERVIEW_SCROLL_DRAW_LAST
         );
