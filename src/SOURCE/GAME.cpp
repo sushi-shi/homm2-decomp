@@ -167,10 +167,36 @@ H2_ENUM_CLASS_BEGIN(GameMapTrigger)
 H2_ENUM_CLASS_END(GameMapTrigger)
 
 H2_ENUM_BEGIN(GameDifficultyConstant)
+    DIFFICULTY_EASY       = 0,
+    DIFFICULTY_NORMAL     = 1,
     DIFFICULTY_HARD       = 2,
     DIFFICULTY_EXPERT     = 3,
     DIFFICULTY_IMPOSSIBLE = 4
 H2_ENUM_END(GameDifficultyConstant)
+
+H2_ENUM_BEGIN(GameDailyEconomyConstant)
+    DAILY_GOLD_MINE_INCOME          = 1000,
+    DAILY_GOLD_TOWN_INCOME          = 1000,
+    DAILY_GOLD_VILLAGE_INCOME       = 250,
+    DAILY_GOLD_STATUE_INCOME        = 250,
+    DAILY_GOLD_DUNGEON_INCOME       = 500,
+    DAILY_GOLD_ENDLESS_SACK_INCOME  = 1000,
+    DAILY_GOLD_ENDLESS_BAG_INCOME   = 750,
+    DAILY_GOLD_ENDLESS_PURSE_INCOME = 500,
+    DAILY_GOLD_GOLDEN_GOOSE_INCOME  = 10000,
+    DAILY_GOLD_TAX_LIEN_INCOME      = -250,
+    DAILY_MINE_BULK_RESOURCE_INCOME = 2,
+    DAILY_CAMPAIGN_WOOD_BONUS       = 2,
+    DAILY_RESOURCE_BONUS_FIRST_DAY  = 1,
+    DAILY_RESOURCE_BONUS_LAST_DAY   = IDX(RES_GOLD),
+    GAME_WEEKS_PER_MONTH            = 4,
+    POWER_RING_DAILY_MANA_BONUS     = 2
+H2_ENUM_END(GameDailyEconomyConstant)
+
+H2_ENUM_BEGIN(GamePlayerTurnConstant)
+    GAME_AI_MUSIC_TRACK            = 28,
+    ENVIRONMENT_ORIGIN_TILE_OFFSET = 7
+H2_ENUM_END(GamePlayerTurnConstant)
 
 H2_ENUM_BEGIN(GameScoreConstant)
     SCORE_MAP_SMALL       = 36,
@@ -541,6 +567,12 @@ H2_ENUM_END(GameArmyDetailText)
 
 #define GAME_HANDICAP_MODERATE_RESOURCE_FACTOR 0.85
 #define GAME_HANDICAP_SEVERE_RESOURCE_FACTOR 0.7
+#define GAME_HANDICAP_MODERATE_DAILY_PENALTY 0.15
+#define GAME_HANDICAP_SEVERE_DAILY_PENALTY 0.30
+#define GAME_DIFFICULTY_EASY_GOLD_FACTOR 0.75
+#define GAME_DIFFICULTY_HARD_GOLD_FACTOR 1.29
+#define GAME_DIFFICULTY_EXPERT_GOLD_FACTOR 1.45
+#define GAME_DIFFICULTY_IMPOSSIBLE_GOLD_FACTOR 1.6
 
 H2_ENUM_BEGIN(ViewArmyControlId)
     VIEW_ARMY_QUICK_VIEW_ID = 0x7800,
@@ -1950,10 +1982,10 @@ void game::NewMap(char* filename) {
                 gInitResourcesHuman[m_difficulty],
                 sizeof(m_players[player2].m_resources)
             );
-            if (m_playerHandicap[player2] != 0) {
+            if (m_playerHandicap[player2] != PLAYER_HANDICAP_NONE) {
                 for (townIndex9 = 0; townIndex9 < IDX(RES_COUNT); townIndex9++) {
                     double resourceScale;
-                    if (m_playerHandicap[player2] == 1)
+                    if (m_playerHandicap[player2] == PLAYER_HANDICAP_MODERATE)
                         resourceScale = GAME_HANDICAP_MODERATE_RESOURCE_FACTOR;
                     else
                         resourceScale = GAME_HANDICAP_SEVERE_RESOURCE_FACTOR;
@@ -3980,7 +4012,7 @@ i32 game::GetRandomNumTroops(H2_ENUM_PARAM(CreatureType, i32) monsterType) {
 VA(0x0047bd35, 0x3f)
 void game::TurnOnAIMusic(void) {
     gpSoundManager->StopAllSamples(1);
-    gpSoundManager->SwitchAmbientMusic(28);
+    gpSoundManager->SwitchAmbientMusic(GAME_AI_MUSIC_TRACK);
     gpSoundManager->m_samplesReady = 0;
 }
 
@@ -4002,7 +4034,7 @@ void game::NextPlayer(void) {
 
     if (gbThisNetHumanPlayer[giCurPlayer] && gConfig.autosave) {
         humanCount = 0;
-        for (index = 0; index < 6; index++) {
+        for (index = 0; index < GAME_PLAYER_COUNT; index++) {
             if (m_playerDead[index] == 0 && gbHumanPlayer[index])
                 humanCount++;
         }
@@ -4038,7 +4070,7 @@ void game::NextPlayer(void) {
         gpAdvManager->CheckDimNextHeroBut();
         TurnOnAIMusic();
         SetNoDialogMenus(0);
-        giBottomViewOverride = 6;
+        giBottomViewOverride = BOTTOM_VIEW_OVERRIDE_DISABLED;
         ShowComputerScreen();
         bShowIt = 0;
         if (gbRemoteOn && gbHumanPlayer[giCurPlayer]) {
@@ -4047,7 +4079,7 @@ void game::NextPlayer(void) {
             if (!gpGame->TransmitSaveGame(remotePlayer, 0, 0))
                 ShutDown(NULL);
         }
-        if (giBottomViewOverride == 6)
+        if (giBottomViewOverride == BOTTOM_VIEW_OVERRIDE_DISABLED)
             giBottomViewOverride = 0;
     } else {
         SetNoDialogMenus(1);
@@ -4066,7 +4098,7 @@ void game::NextPlayer(void) {
     }
 
     if (gbThisNetHumanPlayer[giCurPlayer] && gbRemoteOn && m_day != 1 && giForceSwitchMusic == -1) {
-        gpSoundManager->SwitchAmbientMusic(21);
+        gpSoundManager->SwitchAmbientMusic(WAIT_AMBIENT_MUSIC);
         giForceSwitchMusic = KBTickCount();
         gpSoundManager->m_samplesReady = 0;
     }
@@ -4080,8 +4112,8 @@ void game::NextPlayer(void) {
         gpSoundManager->m_samplesReady = 1;
         gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[gpAdvManager->m_currentTerrain]);
         gpAdvManager->SetEnvironmentOrigin(
-            gpAdvManager->m_mapOriginX + 7,
-            gpAdvManager->m_mapOriginY + 7,
+            gpAdvManager->m_mapOriginX + ENVIRONMENT_ORIGIN_TILE_OFFSET,
+            gpAdvManager->m_mapOriginY + ENVIRONMENT_ORIGIN_TILE_OFFSET,
             1
         );
     }
@@ -4095,34 +4127,39 @@ i32 game::ComputeDailyGold(i32 player) {
     i32 gold = 0;
     i32 index;
 
-    for (index = 0; index < 144; index++) {
+    for (index = 0; index < GAME_MINE_COUNT; index++) {
         if (m_mines[index].owner == player) {
-            if (m_mines[index].resourceType == 6)
-                gold += 1000;
-            if (m_mines[index].resourceType == 101)
-                gold += 1000;
+            if (m_mines[index].resourceType == MINE_TYPE_GOLD)
+                gold += DAILY_GOLD_MINE_INCOME;
+            if (m_mines[index].resourceType == MINE_TYPE_ALCHEMIST_LAB)
+                gold += DAILY_GOLD_MINE_INCOME;
         }
     }
 
-    for (index = 0; index < 72; index++) {
+    for (index = 0; index < GAME_TOWN_COUNT; index++) {
         if (m_castleRecs[index].m_owner == player) {
             if (m_castleRecs[index].m_buildings & BIT(BUILDING_SLOT_UPGRADE_CASTLE))
-                gold += 250;
+                gold += DAILY_GOLD_VILLAGE_INCOME;
             else
-                gold += 1000;
+                gold += DAILY_GOLD_TOWN_INCOME;
             if (m_castleRecs[index].m_buildings & BIT(BUILDING_SLOT_SPECIAL_SEVEN))
-                gold += 250;
+                gold += DAILY_GOLD_STATUE_INCOME;
             if (m_castleRecs[index].m_type == FACTION_WARLOCK
                 && (m_castleRecs[index].m_buildings & BIT(BUILDING_SLOT_SPECIAL)))
-                gold += 500;
+                gold += DAILY_GOLD_DUNGEON_INCOME;
         }
     }
 
-    gold += m_players[player].NumOfGivenArtifact(ArtifactType(30)) * 1000;
-    gold += m_players[player].NumOfGivenArtifact(ArtifactType(31)) * 750;
-    gold += m_players[player].NumOfGivenArtifact(ArtifactType(32)) * 500;
-    gold += m_players[player].NumOfGivenArtifact(ArtifactType(7)) * 10000;
-    gold += m_players[player].NumOfGivenArtifact(ArtifactType(69)) * -250;
+    gold += m_players[player].NumOfGivenArtifact(ARTIFACT_ENDLESS_SACK_GOLD)
+            * DAILY_GOLD_ENDLESS_SACK_INCOME;
+    gold += m_players[player].NumOfGivenArtifact(ARTIFACT_ENDLESS_BAG_GOLD)
+            * DAILY_GOLD_ENDLESS_BAG_INCOME;
+    gold += m_players[player].NumOfGivenArtifact(ARTIFACT_ENDLESS_PURSE_GOLD)
+            * DAILY_GOLD_ENDLESS_PURSE_INCOME;
+    gold += m_players[player].NumOfGivenArtifact(ARTIFACT_GOLDEN_GOOSE)
+            * DAILY_GOLD_GOLDEN_GOOSE_INCOME;
+    gold += m_players[player].NumOfGivenArtifact(ARTIFACT_TAX_LIEN)
+            * DAILY_GOLD_TAX_LIEN_INCOME;
 
     for (heroIndex = 0; heroIndex < m_players[player].m_heroCount; heroIndex++) {
         gold += gEstatesGoldLevel[gpGame->m_heroRecs[m_players[player].m_heroIds[heroIndex]]
@@ -4130,21 +4167,21 @@ i32 game::ComputeDailyGold(i32 player) {
     }
 
     if (!gbHumanPlayer[player]) {
-        if (gpGame->m_difficulty == 0)
-            gold = static_cast<i32>(gold * 0.75);
-        if (gpGame->m_difficulty == 1) {
+        if (gpGame->m_difficulty == DIFFICULTY_EASY)
+            gold = static_cast<i32>(gold * GAME_DIFFICULTY_EASY_GOLD_FACTOR);
+        if (gpGame->m_difficulty == DIFFICULTY_NORMAL) {
         }
-        if (gpGame->m_difficulty == 2)
-            gold = static_cast<i32>(gold * 1.29);
-        if (gpGame->m_difficulty == 3)
-            gold = static_cast<i32>(gold * 1.45);
-        if (gpGame->m_difficulty == 4)
-            gold = static_cast<i32>(gold * 1.6);
+        if (gpGame->m_difficulty == DIFFICULTY_HARD)
+            gold = static_cast<i32>(gold * GAME_DIFFICULTY_HARD_GOLD_FACTOR);
+        if (gpGame->m_difficulty == DIFFICULTY_EXPERT)
+            gold = static_cast<i32>(gold * GAME_DIFFICULTY_EXPERT_GOLD_FACTOR);
+        if (gpGame->m_difficulty == DIFFICULTY_IMPOSSIBLE)
+            gold = static_cast<i32>(gold * GAME_DIFFICULTY_IMPOSSIBLE_GOLD_FACTOR);
     }
 
-    if (m_playerHandicap[player] == 1)
+    if (m_playerHandicap[player] == PLAYER_HANDICAP_MODERATE)
         gold = static_cast<i32>(gold * GAME_HANDICAP_MODERATE_RESOURCE_FACTOR);
-    else if (m_playerHandicap[player] == 2)
+    else if (m_playerHandicap[player] == PLAYER_HANDICAP_SEVERE)
         gold = static_cast<i32>(gold * GAME_HANDICAP_SEVERE_RESOURCE_FACTOR);
     return gold;
 }
@@ -4156,7 +4193,7 @@ void game::PerDay(void) {
     i32 resource8;
     i32 income13;
     i32 dailyIncome0;
-    i32 resourceType1;
+    MineType resourceType1;
     hero* currentHero6;
     i32 restoredSpellPoints13;
     hero* townHero12;
@@ -4164,7 +4201,7 @@ void game::PerDay(void) {
     double penaltyRate9;
 
     for (player = 0; player < gpGame->m_playerCount; player++) {
-        for (resource8 = 0; resource8 < 7; resource8++) {
+        for (resource8 = 0; resource8 < IDX(RES_COUNT); resource8++) {
             gpGame->m_players[player].m_income[resource8] =
                 -m_players[player].m_resources[resource8];
         }
@@ -4176,15 +4213,15 @@ void game::PerDay(void) {
         if (m_mines[player].owner != -1) {
             resourceType1 = m_mines[player].resourceType;
             dailyIncome0 = 0;
-            if (resourceType1 == IDX(RES_ORE))
-                dailyIncome0 = 2;
-            else if (resourceType1 == IDX(RES_WOOD))
-                dailyIncome0 = 2;
-            else if (resourceType1 != IDX(RES_GOLD))
+            if (resourceType1 == MINE_TYPE_ORE)
+                dailyIncome0 = DAILY_MINE_BULK_RESOURCE_INCOME;
+            else if (resourceType1 == MINE_TYPE_WOOD)
+                dailyIncome0 = DAILY_MINE_BULK_RESOURCE_INCOME;
+            else if (resourceType1 != MINE_TYPE_GOLD)
                 dailyIncome0 = 1;
 
-            if (resourceType1 != IDX(RES_GOLD) && resourceType1 <= IDX(RES_GOLD))
-                m_players[m_mines[player].owner].m_resources[resourceType1] += dailyIncome0;
+            if (resourceType1 != MINE_TYPE_GOLD && resourceType1 <= MINE_TYPE_GOLD)
+                m_players[m_mines[player].owner].m_resources[IDX(resourceType1)] += dailyIncome0;
         }
     }
 
@@ -4208,7 +4245,7 @@ void game::PerDay(void) {
     }
 
     if (xIsPlayingExpansionCampaign && xCampaign.HasAward(AWARD_WOOD_BONUS))
-        m_players[0].m_resources[IDX(RES_WOOD)] += 2;
+        m_players[0].m_resources[IDX(RES_WOOD)] += DAILY_CAMPAIGN_WOOD_BONUS;
 
     for (player = 0; player < m_playerCount; player++) {
         if (!gbHumanPlayer[player]) {
@@ -4216,24 +4253,30 @@ void game::PerDay(void) {
                 m_players[player].m_resources[IDX(RES_WOOD)]++;
                 m_players[player].m_resources[IDX(RES_ORE)]++;
             }
-            if (gpGame->m_difficulty >= DIFFICULTY_EXPERT && m_day >= 1 && m_day <= 6)
+            if (gpGame->m_difficulty >= DIFFICULTY_EXPERT
+                && m_day >= DAILY_RESOURCE_BONUS_FIRST_DAY
+                && m_day <= DAILY_RESOURCE_BONUS_LAST_DAY)
                 m_players[player].m_resources[m_day - 1]++;
-            if (gpGame->m_difficulty >= DIFFICULTY_IMPOSSIBLE && m_day >= 1 && m_day <= 6)
+            if (gpGame->m_difficulty >= DIFFICULTY_IMPOSSIBLE
+                && m_day >= DAILY_RESOURCE_BONUS_FIRST_DAY
+                && m_day <= DAILY_RESOURCE_BONUS_LAST_DAY)
                 m_players[player].m_resources[m_day - 1]++;
             if (gpGame->m_players[player].m_aiDifficulty == PLAYER_PERSONALITY_BUILDER
-                && m_day >= 1 && m_day <= 6)
+                && m_day >= DAILY_RESOURCE_BONUS_FIRST_DAY
+                && m_day <= DAILY_RESOURCE_BONUS_LAST_DAY)
                 m_players[player].m_resources[m_day - 1]++;
         }
     }
 
     m_day++;
-    giCurTurn = (m_week - 1) * 7 + (m_month - 1) * 28 + m_day;
+    giCurTurn = (m_week - 1) * EVENT_DAYS_PER_WEEK + (m_month - 1) * EVENT_DAYS_PER_MONTH
+                + m_day;
     if (!gbGameOver) {
-        if (m_day > 7) {
+        if (m_day > EVENT_DAYS_PER_WEEK) {
             m_day = 1;
             PerWeek();
         }
-        if (m_week > 4) {
+        if (m_week > GAME_WEEKS_PER_MONTH) {
             m_week = 1;
             PerMonth();
         }
@@ -4244,12 +4287,12 @@ void game::PerDay(void) {
             m_heroRecs[player].m_eventFlags & ~WEEKLY_HERO_RESERVED_FLAG;
 
     for (player = 0; player < gpGame->m_playerCount; player++) {
-        for (resource8 = 0; resource8 < 6; resource8++) {
-            if (m_playerHandicap[player]) {
-                if (m_playerHandicap[player] == 1)
-                    penaltyRate9 = 0.15;
+        for (resource8 = 0; resource8 < IDX(RES_GOLD); resource8++) {
+            if (m_playerHandicap[player] != PLAYER_HANDICAP_NONE) {
+                if (m_playerHandicap[player] == PLAYER_HANDICAP_MODERATE)
+                    penaltyRate9 = GAME_HANDICAP_MODERATE_DAILY_PENALTY;
                 else
-                    penaltyRate9 = 0.30;
+                    penaltyRate9 = GAME_HANDICAP_SEVERE_DAILY_PENALTY;
                 m_players[player].m_resources[resource8] -= static_cast<i32>(
                     (gpGame->m_players[player].m_income[resource8]
                      + m_players[player].m_resources[resource8])
@@ -4260,7 +4303,7 @@ void game::PerDay(void) {
     }
 
     for (player = 0; player < gpGame->m_playerCount; player++) {
-        for (resource8 = 0; resource8 < 7; resource8++) {
+        for (resource8 = 0; resource8 < IDX(RES_COUNT); resource8++) {
             gpGame->m_players[player].m_income[resource8] +=
                 m_players[player].m_resources[resource8];
         }
@@ -4269,10 +4312,11 @@ void game::PerDay(void) {
     for (player = 0; player < GAME_HERO_COUNT; player++) {
         currentHero6 = &m_heroRecs[player];
         restoredSpellPoints13 = currentHero6->m_spellPoints;
-        maxSpellPoints9 = currentHero6->Stats(HeroPrimaryStat(3)) * 10;
-        restoredSpellPoints13 += currentHero6->m_secondarySkills[8] + 1;
+        maxSpellPoints9 =
+            currentHero6->Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE;
+        restoredSpellPoints13 += currentHero6->m_secondarySkills[IDX(HERO_SKILL_MYSTICISM)] + 1;
         if (currentHero6->HasArtifact(ARTIFACT_POWER_RING))
-            restoredSpellPoints13 += 2;
+            restoredSpellPoints13 += POWER_RING_DAILY_MANA_BONUS;
         if (restoredSpellPoints13 > maxSpellPoints9)
             restoredSpellPoints13 = maxSpellPoints9;
         if (currentHero6->m_spellPoints < restoredSpellPoints13)
@@ -4283,11 +4327,12 @@ void game::PerDay(void) {
 
     for (player = 0; player < GAME_TOWN_COUNT; player++) {
         currentTown4 = GetTown(player);
-        if (!(currentTown4->m_buildings & 1))
+        if (!(currentTown4->m_buildings & BIT(BUILDING_SLOT_MAGE_GUILD)))
             continue;
         if (currentTown4->m_occupyingHeroId != -1) {
             townHero12 = GetHero(currentTown4->m_occupyingHeroId);
-            maxSpellPoints9 = townHero12->Stats(HeroPrimaryStat(3)) * 10;
+            maxSpellPoints9 =
+                townHero12->Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE;
             if (townHero12->m_spellPoints < maxSpellPoints9)
                 townHero12->m_spellPoints = static_cast<i16>(maxSpellPoints9);
         }
