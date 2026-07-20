@@ -49,7 +49,8 @@ cd /path/to/worktree
 nix develop .#build
 homm2 init                 # one-time target/config generation
 homm2 build                # configure, compile, compare, and run hard gates
-homm2 status               # current comparison metrics
+homm2 status               # current metrics plus observation-only retained maxima
+homm2 status update        # explicitly record maxima for current function hashes
 homm2 status --force-refresh
 ```
 
@@ -98,6 +99,9 @@ when ordinary disassembly is unclear. `homm2 ghidra` creates the optional projec
   for linking, disassembly, and hard gates.
 - Reviewed static-data topology is described by source `DATA(...)` definitions plus
   `config/delink_data_supplemental.tsv`. Generated manifests belong in `build/gen`.
+- `config/match_baseline.tsv` retains each function's best observed fuzzy score for its
+  current normalized source hash. A changed hash starts a new current-score epoch. It is
+  queue evidence only: no build or command rejects a regression against an older maximum.
 
 See `docs/data-symbol-normalization.md`, `docs/delinker-contribution-manifest.md`,
 `docs/reviewed-data-objdiff.md`, and `docs/static-storage-link-audit.md`.

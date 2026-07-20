@@ -1,9 +1,10 @@
 # Matcher experiment matrices
 
-> Historical evidence only. The retained-maximum baseline and its update/check
-> commands have been removed; live bytes, relocations, and the current report are
-> now authoritative. References below describe the recorded campaign state and
-> are not instructions for the current workflow.
+> Historical evidence only. The old source-hash regression check has been removed;
+> `homm2 status update` remains as an observation-only storage operation. Per-function
+> fuzzy maxima remain scoped to the current normalized source hash for reporting and
+> queueing, but never reject regressions or establish correctness. References below describe
+> the recorded campaign state and are not current workflow instructions.
 
 These TSV files are durable no-repeat sets for large exact-preserving searches. The original
 matrices contain:
