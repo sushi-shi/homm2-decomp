@@ -9333,8 +9333,8 @@ void advManager::TrimLoopingSounds(i32 maxSamples) {
 
     i32 soundIndex;
     for (soundIndex = 0; soundIndex < SOUND_CELL_COUNT; ++soundIndex) {
-        if (IDX(m_activeSounds[soundIndex].soundId) >= 0
-            && IDX(m_activeSounds[soundIndex].soundId) < IDX(LOOPING_SAMPLE_COUNT)) {
+        if (m_activeSounds[soundIndex].soundId >= ADVMGR_SOUND_BUOY
+            && m_activeSounds[soundIndex].soundId < ADVMGR_ENVIRONMENT_SOUND_COUNT) {
             ++retainedSamples[IDX(m_activeSounds[soundIndex].soundId)];
         }
     }

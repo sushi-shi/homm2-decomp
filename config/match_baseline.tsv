@@ -506,7 +506,7 @@ SOURCE/ADVMGR	?TeleportTo@advManager@@QAEXPAVhero@@HHHH@Z	98.7456	ea9c75061ae8
 SOURCE/ADVMGR	?TownGate@advManager@@QAEXH@Z	99.9855	0004f43e43eb
 SOURCE/ADVMGR	?TownPortalHandler@@YIHAAUtag_message@@@Z	94.7808	1ecb174f2a52
 SOURCE/ADVMGR	?TownQuickView@advManager@@QAEXHHHH@Z	99.1583	a02f06b31c06
-SOURCE/ADVMGR	?TrimLoopingSounds@advManager@@QAEXH@Z	97.8829	ac5bc7c33723
+SOURCE/ADVMGR	?TrimLoopingSounds@advManager@@QAEXH@Z	97.8829	44697e428ed6
 SOURCE/ADVMGR	?UpdBottomView@advManager@@QAEXHHH@Z	99.0654	e2d6caefa05c
 SOURCE/ADVMGR	?UpdBottomViewEnemyTurn@advManager@@QAEHXZ	99.2903	d4fc6a5e6b26
 SOURCE/ADVMGR	?UpdBottomViewHero@advManager@@QAEHXZ	99.1644	6849a65da968
