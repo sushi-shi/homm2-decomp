@@ -655,7 +655,7 @@ void combatManager::CastSpell(
     char* coldRayArmyName_f;
     float missileAngles[SPELL_MISSILE_ANGLE_COUNT];
 
-    if (castByCreature == 0 && m_eagleEyeSpell[1 - m_currentSide] == -1
+    if (castByCreature == 0 && m_eagleEyeSpell[1 - m_currentSide] == SPELL_NONE
         && m_heroes[1 - m_currentSide] != NULL && !m_heroes[1 - m_currentSide]->HasSpell(spell)
         && m_heroes[1 - m_currentSide]->m_secondarySkills[IDX(HERO_SKILL_EAGLE_EYE)]
                != HERO_SKILL_LEVEL_NONE
@@ -664,7 +664,7 @@ void combatManager::CastSpell(
         if (SRandom(0, SPELL_EAGLE_EYE_ROLL_MAX)
             <= IDX(m_heroes[1 - m_currentSide]
                        ->m_secondarySkills[IDX(HERO_SKILL_EAGLE_EYE)])) {
-            m_eagleEyeSpell[1 - m_currentSide] = static_cast<i16>(spell);
+            m_eagleEyeSpell[1 - m_currentSide] = spell;
         }
     }
 
