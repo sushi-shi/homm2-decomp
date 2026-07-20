@@ -1,18 +1,9 @@
 #ifndef HOMM2_VIEWWRLD_H
 #define HOMM2_VIEWWRLD_H
 
-#include <Ints.h>
+#include <SOURCE/KB_TYPES.h>
 
 struct tag_message;
-
-H2_ENUM_CLASS_BEGIN(ViewWorldMode)
-    VIEW_WORLD_MINES     = 0x30,
-    VIEW_WORLD_RESOURCES = 0x31,
-    VIEW_WORLD_ARTIFACTS = 0x32,
-    VIEW_WORLD_TOWNS     = 0x33,
-    VIEW_WORLD_HEROES    = 0x34,
-    VIEW_WORLD_ALL       = 0x35
-H2_ENUM_CLASS_END(ViewWorldMode)
 
 H2_ENUM_CLASS_BEGIN(ViewWorldScale)
     VIEW_WORLD_SCALE_FAR    = 4,

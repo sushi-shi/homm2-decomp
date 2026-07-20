@@ -200,7 +200,6 @@ H2_ENUM_BEGIN(KbGameTableConstant)
     KB_CASTLE_WALL_SEGMENT_COUNT        = 4,
     KB_CASTLE_TOWER_COUNT               = 4,
     KB_CASTLE_DOOR_POSITION_COUNT       = 2,
-    KB_COMBAT_COORDINATE_COUNT          = 2,
     KB_TRADING_POST_EFFICIENCY_COUNT    = 11,
     KB_MOAT_CELL_COUNT                  = 9,
     KB_ALIGNMENT_NAME_COUNT             = IDX(FACTION_COUNT) + 2,
@@ -415,9 +414,9 @@ extern i32 giDeferObjDrawY;
 extern class heroWindow* gpInitWin;
 extern u8 iWallToHexCell[KB_CASTLE_WALL_SEGMENT_COUNT];
 extern u8 iTowerToHexCell[KB_CASTLE_TOWER_COUNT];
-extern u16 wallPos[KB_CASTLE_WALL_SEGMENT_COUNT][KB_COMBAT_COORDINATE_COUNT];
-extern u16 towerPos[KB_CASTLE_TOWER_COUNT][KB_COMBAT_COORDINATE_COUNT];
-extern u16 doorPos[KB_CASTLE_DOOR_POSITION_COUNT][KB_COMBAT_COORDINATE_COUNT];
+extern u16 wallPos[KB_CASTLE_WALL_SEGMENT_COUNT][IDX(COORDINATE_AXIS_COUNT)];
+extern u16 towerPos[KB_CASTLE_TOWER_COUNT][IDX(COORDINATE_AXIS_COUNT)];
+extern u16 doorPos[KB_CASTLE_DOOR_POSITION_COUNT][IDX(COORDINATE_AXIS_COUNT)];
 extern float fTradingPostEfficency[KB_TRADING_POST_EFFICIENCY_COUNT];
 extern struct SElevationOverlay sElevationOverlay[ELEVATION_OVERLAY_COUNT];
 extern b32 gbDrawingPuzzle;

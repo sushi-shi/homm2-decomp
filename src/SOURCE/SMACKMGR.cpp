@@ -170,7 +170,7 @@ void SmackManagerMain(void) {
     bMainDone = 1;
     memcpy(savedPalette9, gPalette->m_data, PALETTE_DATA_SIZE);
 
-    if (gbNoSound || !gpSoundManager->m_digitalDriver || !gConfig.soundVolume
+    if (gbNoSound || !gpSoundManager->m_digitalDriver || gConfig.soundVolume == CONFIG_VOLUME_MUTED
         || bSmackNum == SMACK_CREDITS) {
         bSmackSound = 0;
     } else {

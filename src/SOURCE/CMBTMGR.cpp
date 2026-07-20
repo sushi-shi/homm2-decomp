@@ -402,8 +402,8 @@ void combatManager::InitNonVisualVars(void) {
     m_eagleEyeSpell[COMBAT_ATTACKER_SIDE] = SPELL_NONE;
     m_eagleEyeSpell[COMBAT_DEFENDER_SIDE] = SPELL_NONE;
     giNextAction = ACTION_NONE;
-    m_summonedCreatureType[0] = SUMMONED_ELEMENTAL_NONE;
-    m_summonedCreatureType[1] = SUMMONED_ELEMENTAL_NONE;
+    m_summonedCreatureType[0] = CREATURE_SUMMONED_NONE;
+    m_summonedCreatureType[1] = CREATURE_SUMMONED_NONE;
     m_selectedHex = -1;
     m_limitCreatureHex = -1;
     m_previousCommand = COMBAT_INVALID_COMMAND;
@@ -675,7 +675,7 @@ void combatManager::GenerateMap(void) {
                 m_hexCells[y * COMBAT_GRID_ROW_LENGTH + x].m_gridTop + COMBAT_MOUSE_HEX_HEIGHT;
             m_hexCells[y * COMBAT_GRID_ROW_LENGTH + x].m_occupantSide = -1;
             m_hexCells[y * COMBAT_GRID_ROW_LENGTH + x].m_occupantIndex = -1;
-            m_hexCells[y * COMBAT_GRID_ROW_LENGTH + x].m_occupantFrame = -1;
+            m_hexCells[y * COMBAT_GRID_ROW_LENGTH + x].m_occupantFrame = ARMY_FACING_NONE;
             m_hexCells[y * COMBAT_GRID_ROW_LENGTH + x].m_obstacleIndex = -1;
             m_hexCells[y * COMBAT_GRID_ROW_LENGTH + x].m_blocked = 0;
             m_hexCells[y * COMBAT_GRID_ROW_LENGTH + x].m_deadOccupantCount = 0;
@@ -1324,18 +1324,18 @@ void combatManager::CatAttack(i32 side) {
     i32 impactX5 = -1;
     i32 impactY0 = -1;
     if (wallIndex17 != -1) {
-        impactX5 = wallPos[wallIndex17][IDX(COMBAT_COORDINATE_X)];
-        impactY0 = wallPos[wallIndex17][IDX(COMBAT_COORDINATE_Y)];
+        impactX5 = wallPos[wallIndex17][IDX(COORDINATE_AXIS_X)];
+        impactY0 = wallPos[wallIndex17][IDX(COORDINATE_AXIS_Y)];
         targetHex4 = CombatCastleHex(iWallToHexCell[wallIndex17]);
     }
     if (towerIndex27 != COMBAT_WALL_SLOT_NONE) {
-        impactX5 = towerPos[IDX(towerIndex27)][IDX(COMBAT_COORDINATE_X)];
-        impactY0 = towerPos[IDX(towerIndex27)][IDX(COMBAT_COORDINATE_Y)];
+        impactX5 = towerPos[IDX(towerIndex27)][IDX(COORDINATE_AXIS_X)];
+        impactY0 = towerPos[IDX(towerIndex27)][IDX(COORDINATE_AXIS_Y)];
         targetHex4 = CombatCastleHex(iTowerToHexCell[IDX(towerIndex27)]);
     }
     if (gateIndex2 != -1) {
-        impactX5 = doorPos[0][IDX(COMBAT_COORDINATE_X)];
-        impactY0 = doorPos[0][IDX(COMBAT_COORDINATE_Y)];
+        impactX5 = doorPos[0][IDX(COORDINATE_AXIS_X)];
+        impactY0 = doorPos[0][IDX(COORDINATE_AXIS_Y)];
         targetHex4 = COMBAT_CASTLE_HEX_GATE;
     }
     if (keepIndex6 != -1) {

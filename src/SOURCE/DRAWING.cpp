@@ -845,6 +845,7 @@ void combatManager::DrawFrame(
     i32 unusedDrawState11;
     i32 unusedDrawState05;
     i32 side5;
+    H2_ENUM_STORAGE_STEPPED(ArmyDrawState, i32) drawState5;
     CombatDrawLayer row;
     i32 unusedDrawState213;
     i32 unusedDrawState3;
@@ -1114,15 +1115,9 @@ void combatManager::DrawFrame(
             && m_wallStates[IDX(COMBAT_WALL_SLOT_SECTION_FOURTH)]
                    != COMBAT_WALL_STATE_SECTION_DESTROYED) {
             skipSpecialOccupants6 = 1;
-            for (side5 = 0; side5 < ARMY_DRAW_PHASE_COUNT; side5++) {
-                m_hexCells[IDX(COMBAT_CASTLE_SPECIAL_HEX_FIRST)].DrawOccupant(
-                    static_cast<ArmyDrawState>(side5),
-                    0
-                );
-                m_hexCells[IDX(COMBAT_CASTLE_SPECIAL_HEX_SECOND)].DrawOccupant(
-                    static_cast<ArmyDrawState>(side5),
-                    0
-                );
+            for (drawState5 = ARMY_DRAW_BEHIND; drawState5 < ARMY_DRAW_PHASE_COUNT; drawState5++) {
+                m_hexCells[IDX(COMBAT_CASTLE_SPECIAL_HEX_FIRST)].DrawOccupant(drawState5, 0);
+                m_hexCells[IDX(COMBAT_CASTLE_SPECIAL_HEX_SECOND)].DrawOccupant(drawState5, 0);
             }
         }
 
@@ -1132,8 +1127,8 @@ void combatManager::DrawFrame(
         for (column1 = firstColumn; endColumn != column1; column1 += columnStep3)
             m_hexCells[IDX(row) * COMBAT_GRID_ROW_LENGTH + column1].DrawUpperDeadOccupant();
 
-        for (side5 = 0; side5 < ARMY_DRAW_PHASE_COUNT; side5++) {
-            if (side5 == 1) {
+        for (drawState5 = ARMY_DRAW_BEHIND; drawState5 < ARMY_DRAW_PHASE_COUNT; drawState5++) {
+            if (drawState5 == ARMY_DRAW_NORMAL) {
                 for (column1 = firstColumn; endColumn != column1; column1 += columnStep3) {
                     if (m_hexCells[IDX(row) * COMBAT_GRID_ROW_LENGTH + column1].m_obstacleIndex
                         != -1) {
@@ -1160,7 +1155,7 @@ void combatManager::DrawFrame(
                 i32 wallY;
                 CombatCastleHex hexIndex6;
 
-                if (m_inCastleCombat != 0 && side5 == 0) {
+                if (m_inCastleCombat != 0 && drawState5 == ARMY_DRAW_BEHIND) {
                     hexIndex6 = static_cast<CombatCastleHex>(
                         static_cast<i32>(row) * COMBAT_GRID_ROW_LENGTH + column1
                     );
@@ -1265,7 +1260,7 @@ void combatManager::DrawFrame(
                            )
                                != COMBAT_CASTLE_SPECIAL_HEX_SECOND)) {
                     m_hexCells[IDX(row) * COMBAT_GRID_ROW_LENGTH + column1].DrawOccupant(
-                        static_cast<ArmyDrawState>(side5),
+                        drawState5,
                         0
                     );
                 }

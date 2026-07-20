@@ -114,11 +114,9 @@ namespace {
         EVENT_RANDOM_EVENT_SUCCESS = 40,
         EVENT_RANDOM_PERCENT_MAX = 100,
         EVENT_BOAT_RESTORE_MODE = 3,
-        EVENT_SITE_TYPE_MASK = 0x3f,
-        EVENT_SITE_LEVEL_SHIFT = 6,
         EVENT_CURSED_ARTIFACT_COST = 750,
         EVENT_CURSED_ARTIFACT_GOLD_THRESHOLD = 1500,
-        EVENT_GRAVEYARD_ARMY_REMAINDER = 1,
+        EVENT_SIRENS_MIN_ARMY_QUANTITY = 1,
         EVENT_CREATURE_UPGRADE_MOBILITY = 400,
         EVENT_HERO_LIMIT = 8,
         EVENT_JAILED_HERO = 0x41
@@ -161,19 +159,7 @@ namespace {
         INPUT_BUFFER_SIZE = 16
     H2_ENUM_END(BarrierEventConstant)
 
-    H2_ENUM_BEGIN(GenericSiteType)
-        SITE_ALCHEMIST_TOWER = 0,
-        SITE_ARENA = 1,
-        SITE_HUT_OF_MAGI = 2,
-        SITE_EYE_OF_MAGI = 3,
-        SITE_STABLES = 4,
-        SITE_MERMAIDS = 5,
-        SITE_SIRENS = 6
-    H2_ENUM_END(GenericSiteType)
-
     H2_ENUM_BEGIN(GenericSiteConstant)
-        SITE_TYPE_MASK = 0x3f,
-        SITE_LEVEL_SHIFT = 6,
         SITE_ALCHEMIST_COST = 750,
         SITE_VISIBILITY_RADIUS = 10,
         SITE_HUT_COLOR = 3,
@@ -4010,7 +3996,7 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
     i32 index3;
     i32 siteLevel6;
     i32 primaryStat15;
-    i32 siteType2;
+    H2_ENUM_STORAGE(GenericSiteType, i32) siteType2;
     i32 mapY9;
     i32 mapX37;
     i32 unusedSite;
@@ -4025,19 +4011,20 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
 
     cursedArtifactCount9 = 0;
     eventSample5 = NULL_SAMPLE2;
-    siteType2 = cell->m_objectMetadata;
-    siteType2 &= SITE_TYPE_MASK;
+    siteType2 = cell->m_objectMetadata & GENERIC_SITE_TYPE_MASK;
     siteLevel6 = cell->m_objectMetadata;
-    siteLevel6 >>= SITE_LEVEL_SHIFT;
+    siteLevel6 >>= GENERIC_SITE_LEVEL_SHIFT;
 
     switch (siteType2) {
-        case SITE_ALCHEMIST_TOWER:
+        case GENERIC_SITE_ALCHEMIST_TOWER:
             for (index3 = 0; index3 < HERO_ARTIFACT_SLOT_COUNT; index3++) {
                 if (IsCursedItem(eventHero->m_artifacts[index3]))
                     cursedArtifactCount9++;
             }
             if (cursedArtifactCount9 != 0) {
-                EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, siteType2, &eventSample5);
+                EventSound(
+                    cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, IDX(siteType2), &eventSample5
+                );
                 if (cursedArtifactCount9 == 1) {
                     sprintf(
                         gText,
@@ -4097,7 +4084,7 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
             }
             break;
 
-        case SITE_ARENA:
+        case GENERIC_SITE_ARENA:
             if (HAS(eventHero->m_eventFlags, HERO_EVENT_ARENA)) {
                 NormalDialog(
                     "The Arena guards turn you away.",
@@ -4112,14 +4099,16 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
                     0
                 );
             } else {
-                EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, siteType2, &eventSample5);
+                EventSound(
+                    cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, IDX(siteType2), &eventSample5
+                );
                 eventHero->m_eventFlags = eventHero->m_eventFlags | HERO_EVENT_ARENA;
                 primaryStat15 = DoArenaDialog();
                 eventHero->m_primaryStats[primaryStat15]++;
             }
             break;
 
-        case SITE_MERMAIDS:
+        case GENERIC_SITE_MERMAID:
             if (HAS(eventHero->m_eventFlags, HERO_EVENT_MERMAID)) {
                 NormalDialog(
                     "The mermaids silently entice you to return later and be "
@@ -4135,7 +4124,9 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
                     0
                 );
             } else {
-                EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, siteType2, &eventSample5);
+                EventSound(
+                    cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, IDX(siteType2), &eventSample5
+                );
                 eventHero->m_eventFlags = eventHero->m_eventFlags | HERO_EVENT_MERMAID;
                 eventHero->m_luck = eventHero->m_luck + 1;
                 EventWindow(
@@ -4154,8 +4145,8 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
             }
             break;
 
-        case SITE_HUT_OF_MAGI:
-            EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, siteType2, &eventSample5);
+        case GENERIC_SITE_HUT_OF_MAGI:
+            EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, IDX(siteType2), &eventSample5);
             NormalDialog(
                 "You enter a rickety hut and talk to the magician who lives there.  "
                 "He tells you of places near and far which may aid you in your "
@@ -4186,7 +4177,7 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
             }
             break;
 
-        case SITE_EYE_OF_MAGI:
+        case GENERIC_SITE_EYE_OF_MAGI:
             NormalDialog(
                 "This eye seems to be intently studying its surroundings.",
                 NORMAL_DIALOG_INFO,
@@ -4201,7 +4192,7 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
             );
             break;
 
-        case SITE_SIRENS:
+        case GENERIC_SITE_SIRENS:
             if (HAS(eventHero->m_eventFlags, HERO_EVENT_SIRENS)) {
                 NormalDialog(
                     "You have your crew stop up their ears with wax before the "
@@ -4234,7 +4225,7 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
                 if (experience11 != 0) {
                     EventSound(
                         cell->m_triggerType & MAP_TRIGGER_TYPE_MASK,
-                        siteType2,
+                        IDX(siteType2),
                         &eventSample5
                     );
                     sprintf(
@@ -4267,7 +4258,7 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
             }
             break;
 
-        case SITE_STABLES:
+        case GENERIC_SITE_STABLES:
             unusedOne18 = STABLE_VISIT_MOBILITY;
             unusedTwo6 = STABLE_VISIT_UPGRADE;
             stableResult26 = STABLE_VISIT_NONE;
@@ -4282,7 +4273,9 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
                 stableResult26 |= STABLE_VISIT_UPGRADE;
             }
             if (stableResult26 != STABLE_VISIT_NONE) {
-                EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, siteType2, &eventSample5);
+                EventSound(
+                    cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, IDX(siteType2), &eventSample5
+                );
             }
             sprintf(gText, xStableText[stableResult26]);
             if (stableResult26 & STABLE_VISIT_UPGRADE) {
@@ -4306,36 +4299,35 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
 VA(0x004af436, 0x191)
 void advManager::RecruitSiteEvent(mapCell* cell, hero* eventHero) {
     SAMPLE2 eventSample = NULL_SAMPLE2;
-    u32 siteType2;
+    H2_ENUM_STORAGE(RecruitSiteType, u32) siteType2;
     i16 availableCount;
     CreatureType creatureType1;
     u32 siteIndex;
     u32 packedSite1;
 
-    siteType2 = cell->m_objectMetadata;
-    siteType2 &= EVENT_RECRUIT_TYPE_MASK;
+    siteType2 = cell->m_objectMetadata & EVENT_RECRUIT_TYPE_MASK;
     availableCount = static_cast<i16>(cell->m_objectMetadata);
     availableCount >>= EVENT_RECRUIT_COUNT_SHIFT;
 
     switch (siteType2) {
-        case SITE_GHOST:
+        case RECRUITMENT_SITE_BARROW_MOUNDS:
             creatureType1 = CREATURE_GHOST;
             break;
-        case SITE_EARTH_ELEMENTAL:
+        case RECRUITMENT_SITE_EARTH_ALTAR:
             creatureType1 = CREATURE_EARTH_ELEMENTAL;
             break;
-        case SITE_AIR_ELEMENTAL:
+        case RECRUITMENT_SITE_AIR_ALTAR:
             creatureType1 = CREATURE_AIR_ELEMENTAL;
             break;
-        case SITE_FIRE_ELEMENTAL:
+        case RECRUITMENT_SITE_FIRE_ALTAR:
             creatureType1 = CREATURE_FIRE_ELEMENTAL;
             break;
-        case SITE_WATER_ELEMENTAL:
+        case RECRUITMENT_SITE_WATER_ALTAR:
             creatureType1 = CREATURE_WATER_ELEMENTAL;
             break;
     }
 
-    siteIndex = siteType2;
+    siteIndex = IDX(siteType2);
     if (availableCount == 0) {
         EventWindow(-1, NORMAL_DIALOG_INFO, xRecruitEmpty[siteIndex], -1, 0, -1, 0, -1);
     } else {
@@ -4343,7 +4335,7 @@ void advManager::RecruitSiteEvent(mapCell* cell, hero* eventHero) {
         EventWindow(-1, NORMAL_DIALOG_CONFIRM, xRecruitBuy[siteIndex], -1, 0, -1, 0, -1);
         if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
             ExpansionRecruitEvent(eventHero, creatureType1, &availableCount);
-            packedSite1 = (availableCount << EVENT_RECRUIT_COUNT_SHIFT) | siteType2;
+            packedSite1 = (availableCount << EVENT_RECRUIT_COUNT_SHIFT) | IDX(siteType2);
             cell->m_objectMetadata = packedSite1;
         }
     }
@@ -7124,7 +7116,7 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
     i32 artifactIndex1;
     i32 siteLevel5;
     HeroPrimaryStat primaryStat16;
-    i32 siteType3;
+    H2_ENUM_STORAGE(GenericSiteType, i32) siteType3;
     i32 unusedTriple26[3]; // NOLINT(readability-magic-numbers)
     i32 cursedArtifactCount5;
     CreatureType creatureType3;
@@ -7132,13 +7124,12 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
     i32 armyValue7;
 
     cursedArtifactCount5 = 0;
-    siteType3 = cell->m_objectMetadata;
-    siteType3 &= EVENT_SITE_TYPE_MASK;
+    siteType3 = cell->m_objectMetadata & GENERIC_SITE_TYPE_MASK;
     siteLevel5 = cell->m_objectMetadata;
-    siteLevel5 >>= EVENT_SITE_LEVEL_SHIFT;
+    siteLevel5 >>= GENERIC_SITE_LEVEL_SHIFT;
 
     switch (siteType3) {
-        case AI_GENERIC_SITE_CURSED_ARTIFACTS:
+        case GENERIC_SITE_ALCHEMIST_TOWER:
             for (artifactIndex1 = 0; artifactIndex1 < HERO_ARTIFACT_SLOT_COUNT; artifactIndex1++) {
                 if (IsCursedItem(eventHero->m_artifacts[artifactIndex1]))
                     cursedArtifactCount5++;
@@ -7154,9 +7145,9 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
                 gpCurPlayer->m_resources[IDX(RES_GOLD)] -= EVENT_CURSED_ARTIFACT_COST;
             }
             break;
-        case AI_GENERIC_SITE_SHIPWRECK:
-            if (!(eventHero->m_eventFlags & AI_GENERIC_SITE_SHIPWRECK_FLAG)) {
-                eventHero->m_eventFlags = eventHero->m_eventFlags | AI_GENERIC_SITE_SHIPWRECK_FLAG;
+        case GENERIC_SITE_ARENA:
+            if (!(eventHero->m_eventFlags & HERO_EVENT_ARENA)) {
+                eventHero->m_eventFlags = eventHero->m_eventFlags | HERO_EVENT_ARENA;
                 switch (eventHero->m_cursorType) {
                     case FACTION_SORCERESS:
                     case FACTION_WARLOCK:
@@ -7176,18 +7167,18 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
                 eventHero->m_primaryStats[IDX(primaryStat16)]++;
             }
             break;
-        case AI_GENERIC_SITE_FAERIE_RING:
-            if (!(eventHero->m_eventFlags & AI_GENERIC_SITE_FAERIE_RING_FLAG)) {
+        case GENERIC_SITE_MERMAID:
+            if (!(eventHero->m_eventFlags & HERO_EVENT_MERMAID)) {
                 eventHero->m_eventFlags =
-                    eventHero->m_eventFlags | AI_GENERIC_SITE_FAERIE_RING_FLAG;
+                    eventHero->m_eventFlags | HERO_EVENT_MERMAID;
                 eventHero->m_luck = eventHero->m_luck + 1;
             }
             break;
-        case AI_GENERIC_SITE_UNUSED_2:
-        case AI_GENERIC_SITE_UNUSED_3:
+        case GENERIC_SITE_HUT_OF_MAGI:
+        case GENERIC_SITE_EYE_OF_MAGI:
             break;
-        case AI_GENERIC_SITE_GRAVEYARD:
-            if (!(eventHero->m_eventFlags & AI_GENERIC_SITE_GRAVEYARD_FLAG)) {
+        case GENERIC_SITE_SIRENS:
+            if (!(eventHero->m_eventFlags & HERO_EVENT_SIRENS)) {
                 armyValue7 = 0;
                 for (artifactIndex1 = 0; artifactIndex1 < ARMY_GROUP_SLOT_COUNT; artifactIndex1++) {
                     creatureType3 = static_cast<CreatureType>(
@@ -7195,9 +7186,9 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
                     );
                     if (creatureType3 != CREATURE_NONE) {
                         quantity6 = eventHero->m_army.m_quantities[artifactIndex1];
-                        if (quantity6 > EVENT_GRAVEYARD_ARMY_REMAINDER) {
+                        if (quantity6 > EVENT_SIRENS_MIN_ARMY_QUANTITY) {
                             eventHero->m_army.m_quantities[artifactIndex1] =
-                                static_cast<i16>(quantity6 * AI_GENERIC_SITE_GRAVEYARD_REMAINING);
+                                static_cast<i16>(quantity6 * AI_GENERIC_SITE_SIRENS_ARMY_REMAINDER);
                             armyValue7 +=
                                 (quantity6 - eventHero->m_army.m_quantities[artifactIndex1])
                                 * gMonsterDatabase[IDX(creatureType3)].hitPoints;
@@ -7206,13 +7197,13 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
                 }
                 if (armyValue7 != 0)
                     GiveExperience(eventHero, armyValue7, 1);
-                eventHero->m_eventFlags = eventHero->m_eventFlags | AI_GENERIC_SITE_GRAVEYARD_FLAG;
+                eventHero->m_eventFlags = eventHero->m_eventFlags | HERO_EVENT_SIRENS;
             }
             break;
-        case AI_GENERIC_SITE_CREATURE_UPGRADE:
-            if (!(eventHero->m_eventFlags & AI_GENERIC_SITE_CREATURE_UPGRADE_FLAG)) {
+        case GENERIC_SITE_STABLES:
+            if (!(eventHero->m_eventFlags & HERO_EVENT_STABLES)) {
                 eventHero->m_eventFlags =
-                    eventHero->m_eventFlags | AI_GENERIC_SITE_CREATURE_UPGRADE_FLAG;
+                    eventHero->m_eventFlags | HERO_EVENT_STABLES;
                 eventHero->m_mobility += EVENT_CREATURE_UPGRADE_MOBILITY;
                 eventHero->m_remainingMobility += EVENT_CREATURE_UPGRADE_MOBILITY;
             }
@@ -7228,31 +7219,30 @@ void advManager::RecruitSiteAIEvent(mapCell* cell, hero* eventHero) {
     i32 purchaseCount17;
     u32 packedSite17;
     i16 availableCount1;
-    u32 siteType3;
+    H2_ENUM_STORAGE(RecruitSiteType, u32) siteType3;
     CreatureType creatureType13;
     H2_ENUM_STORAGE_STEPPED(ResourceType, i32) resource27;
     i32 purchaseValue5;
     i32 replacementSlot26;
 
-    siteType3 = cell->m_objectMetadata;
-    siteType3 &= EVENT_RECRUIT_TYPE_MASK;
+    siteType3 = cell->m_objectMetadata & EVENT_RECRUIT_TYPE_MASK;
     availableCount1 = static_cast<i16>(cell->m_objectMetadata);
     availableCount1 >>= EVENT_RECRUIT_COUNT_SHIFT;
 
     switch (siteType3) {
-        case SITE_GHOST:
+        case RECRUITMENT_SITE_BARROW_MOUNDS:
             creatureType13 = CREATURE_GHOST;
             break;
-        case SITE_EARTH_ELEMENTAL:
+        case RECRUITMENT_SITE_EARTH_ALTAR:
             creatureType13 = CREATURE_EARTH_ELEMENTAL;
             break;
-        case SITE_AIR_ELEMENTAL:
+        case RECRUITMENT_SITE_AIR_ALTAR:
             creatureType13 = CREATURE_AIR_ELEMENTAL;
             break;
-        case SITE_FIRE_ELEMENTAL:
+        case RECRUITMENT_SITE_FIRE_ALTAR:
             creatureType13 = CREATURE_FIRE_ELEMENTAL;
             break;
-        case SITE_WATER_ELEMENTAL:
+        case RECRUITMENT_SITE_WATER_ALTAR:
             creatureType13 = CREATURE_WATER_ELEMENTAL;
             break;
     }
@@ -7274,7 +7264,7 @@ void advManager::RecruitSiteAIEvent(mapCell* cell, hero* eventHero) {
                 replacementSlot26
             );
             availableCount1 = static_cast<i16>(availableCount1 - purchaseCount17);
-            packedSite17 = (availableCount1 << EVENT_RECRUIT_COUNT_SHIFT) | siteType3;
+            packedSite17 = (availableCount1 << EVENT_RECRUIT_COUNT_SHIFT) | IDX(siteType3);
             cell->m_objectMetadata = packedSite17;
             GetMonsterCost(creatureType13, cost16);
             for (resource27 = 0; resource27 < RES_COUNT; resource27++) {

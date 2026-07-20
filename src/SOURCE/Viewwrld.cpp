@@ -97,11 +97,6 @@ H2_ENUM_BEGIN(ViewWorldOffsetKind)
     OFFSET_LETTER   = 5
 H2_ENUM_END(ViewWorldOffsetKind)
 
-H2_ENUM_BEGIN(ViewWorldCoordinateAxis)
-    AXIS_X = 0,
-    AXIS_Y = 1
-H2_ENUM_END(ViewWorldCoordinateAxis)
-
 H2_ENUM_BEGIN(ViewWorldGroundFrame)
     GROUND_FRAME_ZERO  = 0,
     GROUND_FRAME_ONE   = 1,
@@ -115,7 +110,7 @@ H2_ENUM_BEGIN(ViewWorldGroundFrame)
 H2_ENUM_END(ViewWorldGroundFrame)
 
 VA(0x004333c0, 0x267)
-void advManager::ViewWorld(ViewWorldMode whatToDraw, b32 drawAllObjects, b32 drawAllTerrains) {
+void advManager::ViewWorld(SpellType whatToDraw, b32 drawAllObjects, b32 drawAllTerrains) {
     i8 paletteData[WORLD_PALETTE_SIZE];
     char* viewIconNames[LEGEND_COUNT];
     tag_message dialogMessage;
@@ -145,10 +140,10 @@ void advManager::ViewWorld(ViewWorldMode whatToDraw, b32 drawAllObjects, b32 dra
     viewIconNames[LEGEND_HEROES] = "HROS";
     viewIconNames[LEGEND_ALL] = "_ALL";
     viewIconNames[LEGEND_WORLD] = "WRLD";
-    if (whatToDraw == VIEW_WORLD_ALL && drawAllObjects == 0 && drawAllTerrains == 0)
+    if (whatToDraw == SPELL_VIEW_ALL && drawAllObjects == 0 && drawAllTerrains == 0)
         legendMode = LEGEND_WORLD;
     else
-        legendMode = IDX(whatToDraw) - IDX(VIEW_WORLD_MINES);
+        legendMode = IDX(whatToDraw) - IDX(SPELL_VIEW_MINES);
     sprintf(gText, "view%s.icn", viewIconNames[legendMode]);
     dialogMessage.type = VIEW_WORLD_MESSAGE;
     dialogMessage.payload.widget.command = VIEW_WORLD_ICON_MESSAGE;
@@ -264,7 +259,7 @@ void advManager::VWCompleteDraw(void) {
         for (mapX7 = iVWMapOriginX; mapX7 < iVWMapOriginX + iVWViewableCells; mapX7++) {
             cell0 = GetCell(mapX7, mapY3);
             if ((giCurPlayerBit & mapExtra[MAP_WIDTH * mapY3 + mapX7]) || iVWDrawAllTerrains
-                || (iVWWhatToDraw == VIEW_WORLD_TOWNS
+                || (iVWWhatToDraw == SPELL_VIEW_TOWNS
                     && (((cell0->m_triggerType & MAP_TRIGGER_TYPE_MASK) == MAP_OBJECT_CASTLE)
                         || (cell0->m_triggerType
                                 == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION)
@@ -503,14 +498,14 @@ void advManager::VWCompleteDraw(void) {
 
             if (cell0->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ARTIFACT)
                 && (iVWDrawAllObjs || (giCurPlayerBit & mapExtra[MAP_WIDTH * mapY3 + mapX7])
-                    || iVWWhatToDraw == VIEW_WORLD_ARTIFACTS)) {
+                    || iVWWhatToDraw == SPELL_VIEW_ARTIFACTS)) {
                 artifactHighlight2 =
-                    iVWWhatToDraw == VIEW_WORLD_ARTIFACTS ? WORLD_ARTIFACT_HIGHLIGHT : 0;
+                    iVWWhatToDraw == SPELL_VIEW_ARTIFACTS ? WORLD_ARTIFACT_HIGHLIGHT : 0;
                 IconToBitmap(
                     pVWMisc,
                     gpWindowManager->m_screen,
-                    pixelX6 - iVWHalf[giViewWorldScaleLookup][OFFSET_ARTIFACT][AXIS_X],
-                    pixelY2 - iVWHalf[giViewWorldScaleLookup][OFFSET_ARTIFACT][AXIS_Y],
+                    pixelX6 - iVWHalf[giViewWorldScaleLookup][OFFSET_ARTIFACT][IDX(COORDINATE_AXIS_X)],
+                    pixelY2 - iVWHalf[giViewWorldScaleLookup][OFFSET_ARTIFACT][IDX(COORDINATE_AXIS_Y)],
                     ARTIFACT_ICON_FRAME,
                     ICON_DRAW_CLIP,
                     WORLD_LEFT,
@@ -526,7 +521,7 @@ void advManager::VWCompleteDraw(void) {
                      && gpGame->m_heroRecs[cell0->m_objectMetadata].m_locationType
                             == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)))
                 && (iVWDrawAllObjs || (giCurPlayerBit & mapExtra[MAP_WIDTH * mapY3 + mapX7])
-                    || iVWWhatToDraw == VIEW_WORLD_TOWNS)) {
+                    || iVWWhatToDraw == SPELL_VIEW_TOWNS)) {
                 if (cell0->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE))
                     playerColor26 = gpGame->m_castleOwners[cell0->m_objectMetadata];
                 else
@@ -546,7 +541,7 @@ void advManager::VWCompleteDraw(void) {
                 townIconX2[SCALE_INDEX_MIDDLE] = 7;
                 townIconX2[SCALE_INDEX_NEAR] = 10;
                 // NOLINTEND(readability-magic-numbers)
-                if (iVWWhatToDraw == VIEW_WORLD_TOWNS)
+                if (iVWWhatToDraw == SPELL_VIEW_TOWNS)
                     townFlagHighlight3 = playerColor26 + WORLD_HIGHLIGHT_BASE;
                 else
                     townFlagHighlight3 = 0;
@@ -554,8 +549,8 @@ void advManager::VWCompleteDraw(void) {
                     pVWFlags,
                     gpWindowManager->m_screen,
                     townFlagX15[giViewWorldScaleLookup] + pixelX6
-                        - iVWHalf[giViewWorldScaleLookup][OFFSET_TOWN][AXIS_X],
-                    pixelY2 - iVWHalf[giViewWorldScaleLookup][OFFSET_TOWN][AXIS_Y],
+                        - iVWHalf[giViewWorldScaleLookup][OFFSET_TOWN][IDX(COORDINATE_AXIS_X)],
+                    pixelY2 - iVWHalf[giViewWorldScaleLookup][OFFSET_TOWN][IDX(COORDINATE_AXIS_Y)],
                     playerColor26,
                     ICON_DRAW_CLIP,
                     WORLD_LEFT,
@@ -564,7 +559,7 @@ void advManager::VWCompleteDraw(void) {
                     WORLD_DRAW_SIZE,
                     townFlagHighlight3
                 );
-                if (iVWWhatToDraw == VIEW_WORLD_TOWNS)
+                if (iVWWhatToDraw == SPELL_VIEW_TOWNS)
                     townIconHighlight1 = playerColor26 + WORLD_HIGHLIGHT_BASE;
                 else
                     townIconHighlight1 = 0;
@@ -572,8 +567,8 @@ void advManager::VWCompleteDraw(void) {
                     pVWFlags,
                     gpWindowManager->m_screen,
                     townIconX2[giViewWorldScaleLookup] + pixelX6
-                        - iVWHalf[giViewWorldScaleLookup][OFFSET_TOWN][AXIS_X],
-                    pixelY2 - iVWHalf[giViewWorldScaleLookup][OFFSET_TOWN][AXIS_Y],
+                        - iVWHalf[giViewWorldScaleLookup][OFFSET_TOWN][IDX(COORDINATE_AXIS_X)],
+                    pixelY2 - iVWHalf[giViewWorldScaleLookup][OFFSET_TOWN][IDX(COORDINATE_AXIS_Y)],
                     playerColor26,
                     ICON_DRAW_CLIP,
                     WORLD_LEFT,
@@ -593,22 +588,22 @@ void advManager::VWCompleteDraw(void) {
             if ((cell0->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION)
                  || currentHeroHere)
                 && (iVWDrawAllObjs || (giCurPlayerBit & mapExtra[MAP_WIDTH * mapY3 + mapX7])
-                    || iVWWhatToDraw == VIEW_WORLD_HEROES)) {
+                    || iVWWhatToDraw == SPELL_VIEW_HEROES)) {
                 if (!currentHeroHere)
                     playerColor26 = gpGame->m_availableHeroes[cell0->m_objectMetadata];
                 else
                     playerColor26 = gpGame->m_availableHeroes[gpCurPlayer->m_currentHero];
                 if (playerColor26 >= 0) {
                     groundFrame29 = gpGame->m_players[playerColor26].m_color;
-                    if (iVWWhatToDraw == VIEW_WORLD_HEROES)
+                    if (iVWWhatToDraw == SPELL_VIEW_HEROES)
                         heroHighlight8 = groundFrame29 + WORLD_HIGHLIGHT_BASE;
                     else
                         heroHighlight8 = 0;
                     IconToBitmap(
                         pVWMisc,
                         gpWindowManager->m_screen,
-                        pixelX6 - iVWHalf[giViewWorldScaleLookup][OFFSET_HERO][AXIS_X],
-                        pixelY2 - iVWHalf[giViewWorldScaleLookup][OFFSET_HERO][AXIS_Y],
+                        pixelX6 - iVWHalf[giViewWorldScaleLookup][OFFSET_HERO][IDX(COORDINATE_AXIS_X)],
+                        pixelY2 - iVWHalf[giViewWorldScaleLookup][OFFSET_HERO][IDX(COORDINATE_AXIS_Y)],
                         groundFrame29 + HERO_ICON_FRAME_BASE,
                         ICON_DRAW_CLIP,
                         WORLD_LEFT,
@@ -622,26 +617,26 @@ void advManager::VWCompleteDraw(void) {
 
             if (cell0->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RESOURCE)
                 && (iVWDrawAllObjs || (giCurPlayerBit & mapExtra[MAP_WIDTH * mapY3 + mapX7])
-                    || iVWWhatToDraw == VIEW_WORLD_RESOURCES)) {
+                    || iVWWhatToDraw == SPELL_VIEW_RESOURCES)) {
                 groundFrame29 = cell0->m_objectIndex >> 1;
                 IconToBitmap(
                     pVWMisc,
                     gpWindowManager->m_screen,
-                    pixelX6 - iVWHalf[giViewWorldScaleLookup][OFFSET_RESOURCE][AXIS_X],
-                    pixelY2 - iVWHalf[giViewWorldScaleLookup][OFFSET_RESOURCE][AXIS_Y],
+                    pixelX6 - iVWHalf[giViewWorldScaleLookup][OFFSET_RESOURCE][IDX(COORDINATE_AXIS_X)],
+                    pixelY2 - iVWHalf[giViewWorldScaleLookup][OFFSET_RESOURCE][IDX(COORDINATE_AXIS_Y)],
                     RESOURCE_ICON_FRAME,
                     ICON_DRAW_CLIP,
                     WORLD_LEFT,
                     WORLD_TOP,
                     WORLD_DRAW_SIZE,
                     WORLD_DRAW_SIZE,
-                    iVWWhatToDraw == VIEW_WORLD_RESOURCES ? WORLD_RESOURCE_HIGHLIGHT : 0
+                    iVWWhatToDraw == SPELL_VIEW_RESOURCES ? WORLD_RESOURCE_HIGHLIGHT : 0
                 );
                 IconToBitmap(
                     pVWLetters,
                     gpWindowManager->m_screen,
-                    pixelX6 - iVWHalf[giViewWorldScaleLookup][OFFSET_LETTER][AXIS_X],
-                    pixelY2 - iVWHalf[giViewWorldScaleLookup][OFFSET_LETTER][AXIS_Y],
+                    pixelX6 - iVWHalf[giViewWorldScaleLookup][OFFSET_LETTER][IDX(COORDINATE_AXIS_X)],
+                    pixelY2 - iVWHalf[giViewWorldScaleLookup][OFFSET_LETTER][IDX(COORDINATE_AXIS_Y)],
                     groundFrame29,
                     ICON_DRAW_CLIP,
                     WORLD_LEFT,
@@ -656,21 +651,21 @@ void advManager::VWCompleteDraw(void) {
                  || cell0->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SAWMILL)
                  || cell0->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ALCHEMIST_LAB))
                 && (iVWDrawAllObjs || (giCurPlayerBit & mapExtra[MAP_WIDTH * mapY3 + mapX7])
-                    || iVWWhatToDraw == VIEW_WORLD_MINES)) {
+                    || iVWWhatToDraw == SPELL_VIEW_MINES)) {
                 playerColor26 = gpGame->m_mineOwners[cell0->m_objectMetadata];
                 if (playerColor26 < 0)
                     groundFrame29 = WORLD_NO_OWNER_COLOR;
                 else
                     groundFrame29 = gpGame->m_players[playerColor26].m_color;
-                if (iVWWhatToDraw == VIEW_WORLD_MINES)
+                if (iVWWhatToDraw == SPELL_VIEW_MINES)
                     mineHighlight18 = groundFrame29 + WORLD_HIGHLIGHT_BASE;
                 else
                     mineHighlight18 = 0;
                 IconToBitmap(
                     pVWMisc,
                     gpWindowManager->m_screen,
-                    pixelX6 - iVWHalf[giViewWorldScaleLookup][OFFSET_MINE][AXIS_X],
-                    pixelY2 - iVWHalf[giViewWorldScaleLookup][OFFSET_MINE][AXIS_Y],
+                    pixelX6 - iVWHalf[giViewWorldScaleLookup][OFFSET_MINE][IDX(COORDINATE_AXIS_X)],
+                    pixelY2 - iVWHalf[giViewWorldScaleLookup][OFFSET_MINE][IDX(COORDINATE_AXIS_Y)],
                     groundFrame29,
                     ICON_DRAW_CLIP,
                     WORLD_LEFT,
@@ -689,9 +684,9 @@ void advManager::VWCompleteDraw(void) {
                 IconToBitmap(
                     pVWLetters,
                     gpWindowManager->m_screen,
-                    pixelX6 - iVWHalf[giViewWorldScaleLookup][OFFSET_LETTER][AXIS_X],
+                    pixelX6 - iVWHalf[giViewWorldScaleLookup][OFFSET_LETTER][IDX(COORDINATE_AXIS_X)],
                     mineLetterY0[giViewWorldScaleLookup] + pixelY2
-                        - iVWHalf[giViewWorldScaleLookup][OFFSET_LETTER][AXIS_Y],
+                        - iVWHalf[giViewWorldScaleLookup][OFFSET_LETTER][IDX(COORDINATE_AXIS_Y)],
                     resourceType9,
                     ICON_DRAW_CLIP,
                     WORLD_LEFT,
@@ -859,7 +854,7 @@ i32 ViewWorldDialogHandler(struct tag_message& message) {
 // NOLINTBEGIN(readability-magic-numbers)
 DATA(0x004f11b8)
 i8 iVWHalf[ADVMGR_VIEW_WORLD_SCALE_COUNT][ADVMGR_VIEW_WORLD_OFFSET_KIND_COUNT]
-            [ADVMGR_VIEW_WORLD_AXIS_COUNT] = {3,  3, 5, 5, 6, 6, 8, 5, 2, 3, 2,  2,
+            [IDX(COORDINATE_AXIS_COUNT)] = {3,  3, 5, 5, 6, 6, 8, 5, 2, 3, 2,  2,
                                               4,  5, 6, 6, 8, 8, 11, 7, 3, 4, 3, 3,
                                               7,  7, 8, 8, 10, 10, 14, 8, 3, 6, 4, 4};
 // NOLINTEND(readability-magic-numbers)
@@ -873,7 +868,7 @@ DATA(0x0052511c) class icon* pVWGround;
 DATA(0x00525120) i32 iVWViewableCells;
 DATA(0x00525124) class icon* pVWFlags;
 DATA(0x00525128) i32 iVWDrawAllTerrains;
-DATA(0x0052512c) ViewWorldMode iVWWhatToDraw;
+DATA(0x0052512c) SpellType iVWWhatToDraw;
 DATA(0x00525130) i32 iVWDrawAllObjs;
 DATA(0x00525134) i32 iVWMapOriginX;
 DATA(0x00525138) i32 iVWMapOriginY;

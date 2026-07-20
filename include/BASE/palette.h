@@ -8,6 +8,13 @@ H2_ENUM_BEGIN(PaletteConstant)
     PALETTE_DATA_SIZE = 0x300
 H2_ENUM_END(PaletteConstant)
 
+H2_ENUM_CLASS_BEGIN(PaletteChannel)
+    PALETTE_CHANNEL_RED   = 0,
+    PALETTE_CHANNEL_GREEN = 1,
+    PALETTE_CHANNEL_BLUE  = 2,
+    PALETTE_CHANNEL_COUNT = 3
+H2_ENUM_CLASS_END(PaletteChannel)
+
 #pragma pack(push, 1)
 class palette : public resource {
 public:

@@ -46,15 +46,6 @@ H2_ENUM_BEGIN(AIBattleConstant)
 H2_ENUM_END(AIBattleConstant)
 
 H2_ENUM_BEGIN(AIGenericSiteConstant)
-    AI_GENERIC_SITE_CURSED_ARTIFACTS      = 0,
-    AI_GENERIC_SITE_SHIPWRECK             = 1,
-    AI_GENERIC_SITE_UNUSED_2              = 2,
-    AI_GENERIC_SITE_UNUSED_3              = 3,
-    AI_GENERIC_SITE_CREATURE_UPGRADE      = 4,
-    AI_GENERIC_SITE_FAERIE_RING           = 5,
-    AI_GENERIC_SITE_GRAVEYARD             = 6,
-    AI_GENERIC_SITE_TYPE_MASK             = 0x3f,
-    AI_GENERIC_SITE_LEVEL_SHIFT           = 6,
     AI_GENERIC_SITE_GOLD_THRESHOLD        = 1500,
     AI_GENERIC_SITE_CURSED_ARTIFACT_VALUE = 500,
     AI_GENERIC_SITE_MAX_LUCK              = 3,
@@ -62,7 +53,7 @@ H2_ENUM_BEGIN(AIGenericSiteConstant)
     AI_GENERIC_SITE_WEEK_END              = 8
 H2_ENUM_END(AIGenericSiteConstant)
 
-#define AI_GENERIC_SITE_GRAVEYARD_REMAINING 0.7
+#define AI_GENERIC_SITE_SIRENS_ARMY_REMAINDER 0.7
 
 void ResetHeroRVs(i32, i32, i32);
 void CheckDoMain(i32 a1, i32 doMain);

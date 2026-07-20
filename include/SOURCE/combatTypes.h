@@ -3,14 +3,29 @@
 
 #include <va.h>
 
-H2_ENUM_BEGIN(ArmyDrawState)
+H2_ENUM_CLASS_BEGIN(ArmyFacing)
+    ARMY_FACING_NONE  = -1,
+    ARMY_FACING_LEFT  = 0,
+    ARMY_FACING_RIGHT = 1
+H2_ENUM_CLASS_END(ArmyFacing)
+
+inline ArmyFacing OppositeArmyFacing(ArmyFacing facing) {
+    return facing == ARMY_FACING_RIGHT ? ARMY_FACING_LEFT : ARMY_FACING_RIGHT;
+}
+
+inline i32 ArmyFacingRearHexOffset(ArmyFacing facing) {
+    return facing == ARMY_FACING_RIGHT ? 1 : -1;
+}
+
+H2_ENUM_CLASS_BEGIN(ArmyDrawState)
     ARMY_DRAW_BEHIND      = 0,
     ARMY_DRAW_NORMAL      = 1,
     ARMY_DRAW_EFFECT      = 2,
     ARMY_DRAW_IN_FRONT    = 3,
     ARMY_DRAW_PHASE_COUNT = 4,
     ARMY_DRAW_ALL         = 100
-H2_ENUM_END(ArmyDrawState)
+H2_ENUM_CLASS_END(ArmyDrawState)
+H2_ENUM_STEPPED(ArmyDrawState)
 
 H2_ENUM_BEGIN(CombatHexDirection)
     COMBAT_DIRECTION_INVALID         = -1,
