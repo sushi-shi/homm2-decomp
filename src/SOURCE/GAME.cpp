@@ -414,6 +414,74 @@ H2_ENUM_BEGIN(GameTuningConstant)
     COMPRESS_TEST_ITERATIONS         = 100
 H2_ENUM_END(GameTuningConstant)
 
+H2_ENUM_BEGIN(GamePasswordConstant)
+    PASSWORD_INDEX_COUNT = X_GLOBAL_PASSWORD_STRING_INDEX_COUNT,
+    PASSWORD_INDEX_MASK  = PASSWORD_INDEX_COUNT - 1,
+    PASSWORD_COLOR_SHIFT = 3
+H2_ENUM_END(GamePasswordConstant)
+
+H2_ENUM_BEGIN(GameLoadMapConstant)
+    LOAD_MAP_COORDINATE_SCRATCH_SIZE = 4,
+    LOAD_MAP_RECORD_SCRATCH_SIZE     = 8
+H2_ENUM_END(GameLoadMapConstant)
+
+H2_ENUM_BEGIN(GameOwnershipConstant)
+    TOWN_FLAG_FRAME_STRIDE      = 2,
+    TOWN_FLAG_RIGHT_FRAME       = 1,
+    TOWN_NEW_OWNER_TURN_COUNT   = 2,
+    MINE_FLAG_COMMON_OFFSET     = 14,
+    MINE_FLAG_MERCURY_OFFSET    = 21,
+    MINE_FLAG_WOOD_OFFSET       = 28,
+    MINE_FLAG_ALCHEMIST_OFFSET  = 35,
+    MINE_FLAG_LIGHTHOUSE_OFFSET = 42
+H2_ENUM_END(GameOwnershipConstant)
+
+H2_ENUM_BEGIN(GameViewSpellsConstant)
+    VIEW_SPELLS_WINDOW_X               = 86,
+    VIEW_SPELLS_WINDOW_Y               = 87,
+    VIEW_SPELL_PREVIOUS_ID             = 2,
+    VIEW_SPELL_NEXT_ID                 = 3,
+    VIEW_SPELL_COMBAT_TAB_ID           = 4,
+    VIEW_SPELL_ADVENTURE_TAB_ID        = 5,
+    VIEW_SPELL_MANA_LABEL_ID           = 6,
+    VIEW_SPELL_MANA_HUNDREDS_ID        = 7,
+    VIEW_SPELL_MANA_TENS_ID            = 8,
+    VIEW_SPELL_MANA_ONES_ID            = 9,
+    VIEW_SPELL_CLOSE_ID                = 10,
+    VIEW_SPELL_PAGE_SIZE               = 12,
+    VIEW_SPELL_TEXT_ID_BASE            = 30,
+    VIEW_SPELL_ICON_ID_0               = 100,
+    VIEW_SPELL_ICON_ID_1               = 101,
+    VIEW_SPELL_ICON_ID_2               = 102,
+    VIEW_SPELL_ICON_ID_3               = 103,
+    VIEW_SPELL_ICON_ID_4               = 104,
+    VIEW_SPELL_ICON_ID_5               = 105,
+    VIEW_SPELL_ICON_ID_6               = 106,
+    VIEW_SPELL_ICON_ID_7               = 107,
+    VIEW_SPELL_ICON_ID_8               = 108,
+    VIEW_SPELL_ICON_ID_9               = 109,
+    VIEW_SPELL_ICON_ID_10              = 110,
+    VIEW_SPELL_ICON_ID_11              = 111,
+    VIEW_SPELL_ICON_ID_BASE            = VIEW_SPELL_ICON_ID_0,
+    VIEW_SPELL_WIDGET_VISIBLE_FLAGS    = WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW,
+    VIEW_SPELL_WIDGET_READ_ONLY_FLAGS  = WIDGET_FLAG_ENABLED,
+    VIEW_SPELL_UNAVAILABLE_COLOR       = 3,
+    VIEW_SPELL_NAME_WIDTH              = 78,
+    VIEW_SPELL_MANA_MAX                = 999,
+    VIEW_SPELL_MANA_HUNDREDS_THRESHOLD = 99,
+    VIEW_SPELL_MANA_TENS_THRESHOLD     = 9,
+    VIEW_SPELL_MANA_HUNDREDS_DIVISOR   = 100,
+    VIEW_SPELL_MANA_TENS_DIVISOR       = 10,
+    VIEW_SPELL_MANA_DIGIT_BASE         = 10,
+    VIEW_SPELL_HELP_PREVIOUS           = 0,
+    VIEW_SPELL_HELP_NEXT               = 1,
+    VIEW_SPELL_HELP_COMBAT             = 2,
+    VIEW_SPELL_HELP_ADVENTURE          = 3,
+    VIEW_SPELL_HELP_CLOSE              = 4,
+    VIEW_SPELL_HELP_OTHER              = 5,
+    VIEW_SPELL_HELP_MANA               = 8
+H2_ENUM_END(GameViewSpellsConstant)
+
 #define GAME_HANDICAP_MODERATE_RESOURCE_FACTOR 0.85
 #define GAME_HANDICAP_SEVERE_RESOURCE_FACTOR 0.7
 
@@ -2573,10 +2641,10 @@ void game::InitializePasswords(void) {
     char flag;
     i32 i;
     i32 j;
-    for (i = 0; i < 8; i++) {
+    for (i = 0; i < PASSWORD_INDEX_COUNT; i++) {
         flag = 0;
         while (flag == 0) {
-            xPasswordStringsIndex[i] = Random(0, 210);
+            xPasswordStringsIndex[i] = Random(0, X_GLOBAL_PASSWORD_STRING_COUNT - 1);
             flag = 1;
             for (j = 0; j < i; j++) {
                 if (xPasswordStringsIndex[j] == xPasswordStringsIndex[i])
@@ -2589,9 +2657,9 @@ void game::InitializePasswords(void) {
 VA(0x00478aea, 0x64)
 void game::RandomizeBarrier(mapCell* cell) {
     i32 idx = cell->m_objectMetadata;
-    idx &= 7;
+    idx &= PASSWORD_INDEX_MASK;
     i32 pass = xPasswordStringsIndex[idx];
-    i32 color = (pass << 3) | idx;
+    i32 color = (pass << PASSWORD_COLOR_SHIFT) | idx;
     cell->m_objectMetadata = color | 0;
 }
 
@@ -2602,12 +2670,12 @@ void game::RandomizePassword(mapCell* cell) {
 
 VA(0x00478b72, 0x478)
 i32 game::LoadMap(char* filename) {
-    char column5[4];
+    char column5[LOAD_MAP_COORDINATE_SCRATCH_SIZE];
     i32 i37;
     i32 file2;
-    char row9[4];
-    char type5[8];
-    char trailer15[8];
+    char row9[LOAD_MAP_COORDINATE_SCRATCH_SIZE];
+    char type5[LOAD_MAP_RECORD_SCRATCH_SIZE];
+    char trailer15[LOAD_MAP_RECORD_SCRATCH_SIZE];
 
     sprintf(gText, "%s%s", gcMapPath, filename);
     file2 = open(gText, _O_BINARY);
@@ -2618,9 +2686,9 @@ i32 game::LoadMap(char* filename) {
     SetMapSize(m_worldMap.width, m_worldMap.height);
 
     for (i37 = 0; i37 < GAME_TOWN_COUNT; i37++) {
-        read(file2, column5, 1);
-        read(file2, row9, 1);
-        read(file2, type5, 1);
+        read(file2, column5, sizeof(column5[0]));
+        read(file2, row9, sizeof(row9[0]));
+        read(file2, type5, sizeof(type5[0]));
         if (static_cast<u8>(column5[0]) != IDX(SAVED_TOWN_OFF_MAP)) {
             m_castleRecs[i37].m_onMap = 1;
             m_castleRecs[i37].m_x = static_cast<u8>(column5[0]);
@@ -2640,9 +2708,9 @@ i32 game::LoadMap(char* filename) {
             row9[0] = -1;
             type5[0] = -1;
         } else {
-            read(file2, column5, 1);
-            read(file2, row9, 1);
-            read(file2, type5, 1);
+            read(file2, column5, sizeof(column5[0]));
+            read(file2, row9, sizeof(row9[0]));
+            read(file2, type5, sizeof(type5[0]));
         }
         if (static_cast<u8>(column5[0]) != IDX(SAVED_TOWN_OFF_MAP)) {
             m_mines[i37].guardianType = CREATURE_NONE;
@@ -2653,22 +2721,33 @@ i32 game::LoadMap(char* filename) {
     }
 
     m_mapHeader.magic = MAP_HEADER_MAGIC_EXPANSION_GAME;
-    read(file2, &m_obeliskCount, 1);
-    read(file2, m_rumourEventIndices, m_mapHeader.rumourCount * 2);
+    read(file2, &m_obeliskCount, sizeof(m_obeliskCount));
+    read(
+        file2,
+        m_rumourEventIndices,
+        m_mapHeader.rumourCount * sizeof(m_rumourEventIndices[0])
+    );
     m_rumourEventCount = m_mapHeader.rumourCount;
-    read(file2, m_timeEventIndices, m_mapHeader.timeEventCount * 2);
+    read(
+        file2,
+        m_timeEventIndices,
+        m_mapHeader.timeEventCount * sizeof(m_timeEventIndices[0])
+    );
     m_timeEventCount = m_mapHeader.timeEventCount;
-    read(file2, &iMaxMapExtra, 4);
-    ppMapExtra = reinterpret_cast<void**>(H2_ALLOC(iMaxMapExtra * 4, 2893));
-    pwSizeOfMapExtra = reinterpret_cast<i16*>(H2_ALLOC(iMaxMapExtra * 2, 2894));
-    memset(ppMapExtra, 0, iMaxMapExtra * 4);
-    memset(pwSizeOfMapExtra, 0, iMaxMapExtra * 2);
+    read(file2, &iMaxMapExtra, sizeof(iMaxMapExtra));
+    ppMapExtra =
+        reinterpret_cast<void**>(H2_ALLOC(iMaxMapExtra * sizeof(ppMapExtra[0]), 2893));
+    pwSizeOfMapExtra = reinterpret_cast<i16*>(
+        H2_ALLOC(iMaxMapExtra * sizeof(pwSizeOfMapExtra[0]), 2894)
+    );
+    memset(ppMapExtra, 0, iMaxMapExtra * sizeof(ppMapExtra[0]));
+    memset(pwSizeOfMapExtra, 0, iMaxMapExtra * sizeof(pwSizeOfMapExtra[0]));
     for (i37 = 1; (&i37)[0] < iMaxMapExtra; i37++) {
-        read(file2, pwSizeOfMapExtra + i37, 2);
+        read(file2, pwSizeOfMapExtra + i37, sizeof(pwSizeOfMapExtra[0]));
         ppMapExtra[i37] = H2_ALLOC(pwSizeOfMapExtra[i37], 2902);
         read(file2, ppMapExtra[i37], pwSizeOfMapExtra[i37]);
     }
-    read(file2, trailer15, 2);
+    read(file2, trailer15, sizeof(u16));
     close(file2);
     return 0;
 }
@@ -2695,11 +2774,12 @@ void game::ClaimTown(i32 townId, i32 player, i32 suppressVisibility) {
     townRec->m_formation = 0;
     if (m_castleOwners[townId] != -1)
         GetCastle(townId)->Deallocate();
-    for (i = 0; i < 5; i++) {
+    for (i = 0; i < ARMY_GROUP_SLOT_COUNT; i++) {
         townRec->m_army.m_creatureTypes[i] = -1;
         townRec->m_army.m_creatureCounts[i] = 0;
     }
-    m_castleRecs[townId].m_turnsOwned = m_castleRecs[townId].m_owner == -1 ? 2 : 0;
+    m_castleRecs[townId].m_turnsOwned =
+        m_castleRecs[townId].m_owner == -1 ? TOWN_NEW_OWNER_TURN_COUNT : 0;
     m_castleRecs[townId].m_owner = static_cast<i8>(player);
     m_castleOwners[townId] = static_cast<i8>(player);
     m_players[player].m_townIds[m_players[player].m_townCount] = static_cast<i8>(townId);
@@ -2711,7 +2791,7 @@ void game::ClaimTown(i32 townId, i32 player, i32 suppressVisibility) {
         m_castleRecs[townId].m_x - 1,
         m_castleRecs[townId].m_y,
         TILESET_FLAG32,
-        m_players[static_cast<i8>(player)].m_color * 2,
+        m_players[static_cast<i8>(player)].m_color * TOWN_FLAG_FRAME_STRIDE,
         1,
         -1
     );
@@ -2721,7 +2801,8 @@ void game::ClaimTown(i32 townId, i32 player, i32 suppressVisibility) {
         m_castleRecs[townId].m_x + 1,
         m_castleRecs[townId].m_y,
         TILESET_FLAG32,
-        m_players[static_cast<i8>(player)].m_color * 2 + 1,
+        m_players[static_cast<i8>(player)].m_color * TOWN_FLAG_FRAME_STRIDE
+            + TOWN_FLAG_RIGHT_FRAME,
         1,
         -1
     );
@@ -2750,36 +2831,36 @@ void game::ClaimMine(i32 mineId, i32 player) {
     m_mines[mineId].owner = static_cast<i8>(player);
     m_mineOwners[mineId] = static_cast<i8>(player);
     switch (m_mines[mineId].resourceType) {
-        case 101:
-            flag = 35;
+        case MINE_TYPE_ALCHEMIST_LAB:
+            flag = MINE_FLAG_ALCHEMIST_OFFSET;
             break;
-        case 100:
-            flag = 42;
+        case MINE_TYPE_LIGHTHOUSE:
+            flag = MINE_FLAG_LIGHTHOUSE_OFFSET;
             break;
-        case 0:
-            flag = 28;
+        case MINE_TYPE_WOOD:
+            flag = MINE_FLAG_WOOD_OFFSET;
             break;
-        case 1:
-            flag = 21;
+        case MINE_TYPE_MERCURY:
+            flag = MINE_FLAG_MERCURY_OFFSET;
             break;
         default:
-            flag = 14;
+            flag = MINE_FLAG_COMMON_OFFSET;
             break;
     }
     switch (m_mines[mineId].resourceType) {
-        case 1:
+        case MINE_TYPE_MERCURY:
             x = m_mines[mineId].x;
             y = m_mines[mineId].y - 1;
             break;
-        case 0:
+        case MINE_TYPE_WOOD:
             x = m_mines[mineId].x + 1;
             y = m_mines[mineId].y - 1;
             break;
-        case 101:
+        case MINE_TYPE_ALCHEMIST_LAB:
             x = m_mines[mineId].x - 1;
             y = m_mines[mineId].y - 3;
             break;
-        case 100:
+        case MINE_TYPE_LIGHTHOUSE:
             x = m_mines[mineId].x;
             y = m_mines[mineId].y;
             break;
@@ -2790,7 +2871,9 @@ void game::ClaimMine(i32 mineId, i32 player) {
     }
     acc = m_worldMap.Row(y) + x;
     if (player == -1) {
-        m_worldMap.ChangeTilesetIndex(acc, x, y, TILESET_FLAG32, 255, 1, -1);
+        m_worldMap.ChangeTilesetIndex(
+            acc, x, y, TILESET_FLAG32, IDX(MAPCELL_SPRITE_NONE), 1, -1
+        );
     } else {
         m_worldMap.ChangeTilesetIndex(
             acc,
@@ -2801,12 +2884,14 @@ void game::ClaimMine(i32 mineId, i32 player) {
             1,
             -1
         );
-        if (m_mines[mineId].resourceType == 1) {
+        if (m_mines[mineId].resourceType == MINE_TYPE_MERCURY) {
             ConvertFlagToLateOverlay(x, y);
         } else if (y > 0
-                   && (m_mines[mineId].resourceType == 2 || m_mines[mineId].resourceType == 6
-                       || m_mines[mineId].resourceType == 5 || m_mines[mineId].resourceType == 3
-                       || m_mines[mineId].resourceType == 4)
+                   && (m_mines[mineId].resourceType == MINE_TYPE_ORE
+                       || m_mines[mineId].resourceType == MINE_TYPE_GOLD
+                       || m_mines[mineId].resourceType == MINE_TYPE_GEMS
+                       || m_mines[mineId].resourceType == MINE_TYPE_SULFUR
+                       || m_mines[mineId].resourceType == MINE_TYPE_CRYSTAL)
                    && HasLateOverlay(x, y - 1)) {
             ConvertFlagToLateOverlay(x, y);
         }
@@ -2836,17 +2921,19 @@ game::ViewSpells(
         m_viewSpellsCount[0] = spellHero->GetNumSpells(SPELL_TYPE_COMBAT);
         m_viewSpellsTop[1] = 0;
         m_viewSpellsCount[1] = spellHero->GetNumSpells(SPELL_TYPE_ADVENTURE);
-        m_viewSpellsWindow = new heroWindow(86, 87, const_cast<char*>("spellwin.bin"));
+        m_viewSpellsWindow = new heroWindow(
+            VIEW_SPELLS_WINDOW_X, VIEW_SPELLS_WINDOW_Y, const_cast<char*>("spellwin.bin")
+        );
         if (m_viewSpellsWindow == NULL)
             MemError();
         if (spellType != SPELL_TYPE_ALL) {
             message.type = MESSAGE_WIDGET;
             message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
             if (spellType == SPELL_TYPE_COMBAT)
-                message.payload.widget.id = 4;
+                message.payload.widget.id = VIEW_SPELL_COMBAT_TAB_ID;
             else
-                message.payload.widget.id = 5;
-            message.payload.widget.data.value = 6;
+                message.payload.widget.id = VIEW_SPELL_ADVENTURE_TAB_ID;
+            message.payload.widget.data.value = VIEW_SPELL_WIDGET_VISIBLE_FLAGS;
             m_viewSpellsWindow->BroadcastMessage(message);
         }
         UpdateSpellWidgets();
@@ -2866,45 +2953,53 @@ void game::UpdateSpellWidgets(void) {
 
     message9.type = MESSAGE_WIDGET;
     spellPoints0 = m_viewSpellsHero->m_spellPoints;
-    if (spellPoints0 > 999)
-        spellPoints0 = 999;
-    message9.payload.widget.data.value = 6;
-    if (spellPoints0 > 99)
+    if (spellPoints0 > VIEW_SPELL_MANA_MAX)
+        spellPoints0 = VIEW_SPELL_MANA_MAX;
+    message9.payload.widget.data.value = VIEW_SPELL_WIDGET_VISIBLE_FLAGS;
+    if (spellPoints0 > VIEW_SPELL_MANA_HUNDREDS_THRESHOLD)
         message9.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
     else
         message9.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-    message9.payload.widget.id = 7;
+    message9.payload.widget.id = VIEW_SPELL_MANA_HUNDREDS_ID;
     m_viewSpellsWindow->BroadcastMessage(message9);
-    if (spellPoints0 > 9)
+    if (spellPoints0 > VIEW_SPELL_MANA_TENS_THRESHOLD)
         message9.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
     else
         message9.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-    message9.payload.widget.id = 8;
+    message9.payload.widget.id = VIEW_SPELL_MANA_TENS_ID;
     m_viewSpellsWindow->BroadcastMessage(message9);
 
-    sprintf(gText, "%d", (spellPoints0 / 100) % 10);
+    sprintf(
+        gText,
+        "%d",
+        (spellPoints0 / VIEW_SPELL_MANA_HUNDREDS_DIVISOR) % VIEW_SPELL_MANA_DIGIT_BASE
+    );
     message9.payload.widget.data.text = gText;
     message9.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-    message9.payload.widget.id = 7;
+    message9.payload.widget.id = VIEW_SPELL_MANA_HUNDREDS_ID;
     m_viewSpellsWindow->BroadcastMessage(message9);
-    sprintf(gText, "%d", (spellPoints0 / 10) % 10);
+    sprintf(
+        gText,
+        "%d",
+        (spellPoints0 / VIEW_SPELL_MANA_TENS_DIVISOR) % VIEW_SPELL_MANA_DIGIT_BASE
+    );
     message9.payload.widget.data.text = gText;
     message9.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-    message9.payload.widget.id = 8;
+    message9.payload.widget.id = VIEW_SPELL_MANA_TENS_ID;
     m_viewSpellsWindow->BroadcastMessage(message9);
-    sprintf(gText, "%d", spellPoints0 % 10);
+    sprintf(gText, "%d", spellPoints0 % VIEW_SPELL_MANA_DIGIT_BASE);
     message9.payload.widget.data.text = gText;
     message9.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-    message9.payload.widget.id = 9;
+    message9.payload.widget.id = VIEW_SPELL_MANA_ONES_ID;
     m_viewSpellsWindow->BroadcastMessage(message9);
 
-    for (spellSlot6 = 0; spellSlot6 < 12; spellSlot6++) {
+    for (spellSlot6 = 0; spellSlot6 < VIEW_SPELL_PAGE_SIZE; spellSlot6++) {
         if (m_viewSpellsTop[m_viewSpellsType] + spellSlot6 >= m_viewSpellsCount[m_viewSpellsType]) {
             message9.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-            message9.payload.widget.id = spellSlot6 + 100;
-            message9.payload.widget.data.value = 6;
+            message9.payload.widget.id = spellSlot6 + VIEW_SPELL_ICON_ID_BASE;
+            message9.payload.widget.data.value = VIEW_SPELL_WIDGET_VISIBLE_FLAGS;
             m_viewSpellsWindow->BroadcastMessage(message9);
-            message9.payload.widget.id = spellSlot6 + 30;
+            message9.payload.widget.id = spellSlot6 + VIEW_SPELL_TEXT_ID_BASE;
             m_viewSpellsWindow->BroadcastMessage(message9);
         } else {
             spell2 = m_viewSpellsHero->GetNthSpell(
@@ -2912,26 +3007,26 @@ void game::UpdateSpellWidgets(void) {
                 m_viewSpellsTop[m_viewSpellsType] + spellSlot6 + 1
             );
             message9.payload.widget.command = WIDGET_COMMAND_SET_FILL_COLOR;
-            message9.payload.widget.id = spellSlot6 + 30;
+            message9.payload.widget.id = spellSlot6 + VIEW_SPELL_TEXT_ID_BASE;
             if (GetManaCost(SpellType(spell2), m_viewSpellsHero) > m_viewSpellsHero->m_spellPoints)
-                message9.payload.widget.data.value = 3;
+                message9.payload.widget.data.value = VIEW_SPELL_UNAVAILABLE_COLOR;
             else
                 message9.payload.executive.command = EXECUTIVE_COMMAND_TERMINATE_LOOP;
             m_viewSpellsWindow->BroadcastMessage(message9);
             message9.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-            message9.payload.widget.data.value = 6;
+            message9.payload.widget.data.value = VIEW_SPELL_WIDGET_VISIBLE_FLAGS;
             m_viewSpellsWindow->BroadcastMessage(message9);
-            message9.payload.widget.id = spellSlot6 + 100;
+            message9.payload.widget.id = spellSlot6 + VIEW_SPELL_ICON_ID_BASE;
             m_viewSpellsWindow->BroadcastMessage(message9);
             if (m_viewSpellsReadOnly) {
                 message9.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-                message9.payload.widget.data.value = 2;
+                message9.payload.widget.data.value = VIEW_SPELL_WIDGET_READ_ONLY_FLAGS;
                 m_viewSpellsWindow->BroadcastMessage(message9);
             }
             message9.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
             message9.payload.widget.data.value = gsSpellInfo[IDX(spell2)].iconIndex;
             m_viewSpellsWindow->BroadcastMessage(message9);
-            lineLength0 = smallFont->LineLength(gSpellNames[IDX(spell2)], 78);
+            lineLength0 = smallFont->LineLength(gSpellNames[IDX(spell2)], VIEW_SPELL_NAME_WIDTH);
             if (lineLength0 == 1) {
                 sprintf(
                     gText,
@@ -2948,7 +3043,7 @@ void game::UpdateSpellWidgets(void) {
                 );
             }
             message9.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-            message9.payload.widget.id = spellSlot6 + 30;
+            message9.payload.widget.id = spellSlot6 + VIEW_SPELL_TEXT_ID_BASE;
             message9.payload.widget.data.text = gText;
             m_viewSpellsWindow->BroadcastMessage(message9);
         }
@@ -2962,7 +3057,7 @@ i32 ViewSpellsHandler(tag_message& msg) {
     if (msg.type == MESSAGE_MOUSE_MOVE) {
         gpWindowManager->ConvertToHover(msg);
         if (msg.payload.hover.id == gpWindowManager->m_lastHoverId) {
-            return 1;
+            return WIDGET_DISPATCH_CONSUME;
         } else {
             return gpGame->m_viewSpellsCallback(msg);
         }
@@ -2975,41 +3070,50 @@ i32 ViewSpellsHandler(tag_message& msg) {
                     break;
                 {
                     switch (msg.payload.widget.id) {
-                        case 6:
-                        case 7:
-                        case 8:
-                        case 9:
-                            sprintf(gText, cSpellHelp[8], viewSpellsHero->m_spellPoints);
-                            NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                        case VIEW_SPELL_MANA_LABEL_ID:
+                        case VIEW_SPELL_MANA_HUNDREDS_ID:
+                        case VIEW_SPELL_MANA_TENS_ID:
+                        case VIEW_SPELL_MANA_ONES_ID:
+                            sprintf(
+                                gText,
+                                cSpellHelp[VIEW_SPELL_HELP_MANA],
+                                viewSpellsHero->m_spellPoints
+                            );
+                            NormalDialog(
+                                gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0
+                            );
                             break;
-                        case 2:
+                        case VIEW_SPELL_PREVIOUS_ID:
                             if (gpGame->m_viewSpellsTop[gpGame->m_viewSpellsType] == 0)
                                 break;
-                            gpGame->m_viewSpellsTop[gpGame->m_viewSpellsType] -= 12;
+                            gpGame->m_viewSpellsTop[gpGame->m_viewSpellsType] -=
+                                VIEW_SPELL_PAGE_SIZE;
                             if (gpGame->m_viewSpellsTop[gpGame->m_viewSpellsType] < 0)
                                 gpGame->m_viewSpellsTop[gpGame->m_viewSpellsType] = 0;
                             gpGame->UpdateSpellWidgets();
                             gpGame->m_viewSpellsWindow->MoveWindow(0, 0);
                             break;
-                        case 3:
-                            if (gpGame->m_viewSpellsTop[gpGame->m_viewSpellsType] + 12
+                        case VIEW_SPELL_NEXT_ID:
+                            if (gpGame->m_viewSpellsTop[gpGame->m_viewSpellsType]
+                                    + VIEW_SPELL_PAGE_SIZE
                                 < gpGame->m_viewSpellsCount[gpGame->m_viewSpellsType])
-                                gpGame->m_viewSpellsTop[gpGame->m_viewSpellsType] += 12;
+                                gpGame->m_viewSpellsTop[gpGame->m_viewSpellsType] +=
+                                    VIEW_SPELL_PAGE_SIZE;
                             gpGame->UpdateSpellWidgets();
                             gpGame->m_viewSpellsWindow->MoveWindow(0, 0);
                             break;
-                        case 4:
-                            gpGame->m_viewSpellsType = 1;
+                        case VIEW_SPELL_COMBAT_TAB_ID:
+                            gpGame->m_viewSpellsType = IDX(SPELL_TYPE_ADVENTURE);
                             gpGame->UpdateSpellWidgets();
                             gpGame->m_viewSpellsWindow->MoveWindow(0, 0);
                             break;
-                        case 5:
-                            gpGame->m_viewSpellsType = 0;
+                        case VIEW_SPELL_ADVENTURE_TAB_ID:
+                            gpGame->m_viewSpellsType = IDX(SPELL_TYPE_COMBAT);
                             gpGame->UpdateSpellWidgets();
                             gpGame->m_viewSpellsWindow->MoveWindow(0, 0);
                             break;
                         case EVENT_WINDOW_FIRST_BUTTON:
-                            msg.payload.widget.id = 10;
+                            msg.payload.widget.id = VIEW_SPELL_CLOSE_ID;
                             break;
                     }
                 }
@@ -3019,29 +3123,29 @@ i32 ViewSpellsHandler(tag_message& msg) {
                 if (msg.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT
                     || (msg.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) != 0) {
                     switch (msg.payload.widget.id) {
-                        case 100:
-                        case 101:
-                        case 102:
-                        case 103:
-                        case 104:
-                        case 105:
-                        case 106:
-                        case 107:
-                        case 108:
-                        case 109:
-                        case 110:
-                        case 111:
+                        case VIEW_SPELL_ICON_ID_0:
+                        case VIEW_SPELL_ICON_ID_1:
+                        case VIEW_SPELL_ICON_ID_2:
+                        case VIEW_SPELL_ICON_ID_3:
+                        case VIEW_SPELL_ICON_ID_4:
+                        case VIEW_SPELL_ICON_ID_5:
+                        case VIEW_SPELL_ICON_ID_6:
+                        case VIEW_SPELL_ICON_ID_7:
+                        case VIEW_SPELL_ICON_ID_8:
+                        case VIEW_SPELL_ICON_ID_9:
+                        case VIEW_SPELL_ICON_ID_10:
+                        case VIEW_SPELL_ICON_ID_11:
                             spell = gpGame->m_viewSpellsHero->GetNthSpell(
                                 static_cast<HeroSpellType>(gpGame->m_viewSpellsType),
                                 gpGame->m_viewSpellsTop[gpGame->m_viewSpellsType]
-                                    + (msg.payload.widget.id - 100) + 1
+                                    + (msg.payload.widget.id - VIEW_SPELL_ICON_ID_BASE) + 1
                             );
                             NormalDialog(
                                 gSpellDesc[IDX(spell)],
-                                4,
+                                NORMAL_DIALOG_QUICK_VIEW,
                                 -1,
                                 -1,
-                                8,
+                                NORMAL_DIALOG_SPELL,
                                 IDX(spell),
                                 -1,
                                 0,
@@ -3049,59 +3153,109 @@ i32 ViewSpellsHandler(tag_message& msg) {
                                 0
                             );
                             break;
-                        case 2:
-                            NormalDialog(cSpellHelp[0], 4, -1, -1, -1, 0, -1, 0, -1, 0);
+                        case VIEW_SPELL_PREVIOUS_ID:
+                            NormalDialog(
+                                cSpellHelp[VIEW_SPELL_HELP_PREVIOUS],
+                                NORMAL_DIALOG_QUICK_VIEW,
+                                -1,
+                                -1,
+                                -1,
+                                0,
+                                -1,
+                                0,
+                                -1,
+                                0
+                            );
                             break;
-                        case 3:
-                            NormalDialog(cSpellHelp[1], 4, -1, -1, -1, 0, -1, 0, -1, 0);
+                        case VIEW_SPELL_NEXT_ID:
+                            NormalDialog(
+                                cSpellHelp[VIEW_SPELL_HELP_NEXT],
+                                NORMAL_DIALOG_QUICK_VIEW,
+                                -1,
+                                -1,
+                                -1,
+                                0,
+                                -1,
+                                0,
+                                -1,
+                                0
+                            );
                             break;
-                        case 4:
-                            NormalDialog(cSpellHelp[2], 4, -1, -1, -1, 0, -1, 0, -1, 0);
+                        case VIEW_SPELL_COMBAT_TAB_ID:
+                            NormalDialog(
+                                cSpellHelp[VIEW_SPELL_HELP_COMBAT],
+                                NORMAL_DIALOG_QUICK_VIEW,
+                                -1,
+                                -1,
+                                -1,
+                                0,
+                                -1,
+                                0,
+                                -1,
+                                0
+                            );
                             break;
-                        case 5:
-                            NormalDialog(cSpellHelp[3], 4, -1, -1, -1, 0, -1, 0, -1, 0);
+                        case VIEW_SPELL_ADVENTURE_TAB_ID:
+                            NormalDialog(
+                                cSpellHelp[VIEW_SPELL_HELP_ADVENTURE],
+                                NORMAL_DIALOG_QUICK_VIEW,
+                                -1,
+                                -1,
+                                -1,
+                                0,
+                                -1,
+                                0,
+                                -1,
+                                0
+                            );
                             break;
-                        case 6:
-                        case 7:
-                        case 8:
-                        case 9:
-                            sprintf(gText, cSpellHelp[8], viewSpellsHero->m_spellPoints);
-                            NormalDialog(gText, 4, -1, -1, -1, 0, -1, 0, -1, 0);
+                        case VIEW_SPELL_MANA_LABEL_ID:
+                        case VIEW_SPELL_MANA_HUNDREDS_ID:
+                        case VIEW_SPELL_MANA_TENS_ID:
+                        case VIEW_SPELL_MANA_ONES_ID:
+                            sprintf(
+                                gText,
+                                cSpellHelp[VIEW_SPELL_HELP_MANA],
+                                viewSpellsHero->m_spellPoints
+                            );
+                            NormalDialog(
+                                gText, NORMAL_DIALOG_QUICK_VIEW, -1, -1, -1, 0, -1, 0, -1, 0
+                            );
                             break;
                     }
                 } else {
                     switch (msg.payload.widget.id) {
-                        case 100:
-                        case 101:
-                        case 102:
-                        case 103:
-                        case 104:
-                        case 105:
-                        case 106:
-                        case 107:
-                        case 108:
-                        case 109:
-                        case 110:
-                        case 111:
+                        case VIEW_SPELL_ICON_ID_0:
+                        case VIEW_SPELL_ICON_ID_1:
+                        case VIEW_SPELL_ICON_ID_2:
+                        case VIEW_SPELL_ICON_ID_3:
+                        case VIEW_SPELL_ICON_ID_4:
+                        case VIEW_SPELL_ICON_ID_5:
+                        case VIEW_SPELL_ICON_ID_6:
+                        case VIEW_SPELL_ICON_ID_7:
+                        case VIEW_SPELL_ICON_ID_8:
+                        case VIEW_SPELL_ICON_ID_9:
+                        case VIEW_SPELL_ICON_ID_10:
+                        case VIEW_SPELL_ICON_ID_11:
                             spell = gpGame->m_viewSpellsHero->GetNthSpell(
                                 static_cast<HeroSpellType>(gpGame->m_viewSpellsType),
                                 gpGame->m_viewSpellsTop[gpGame->m_viewSpellsType]
-                                    + (msg.payload.widget.id - 100) + 1
+                                    + (msg.payload.widget.id - VIEW_SPELL_ICON_ID_BASE) + 1
                             );
                             if (gpGame->m_viewSpellsReadOnly) {
                                 NormalDialog(
                                     gSpellDesc[IDX(spell)],
-                                    1,
+                                    NORMAL_DIALOG_INFO,
                                     -1,
                                     -1,
-                                    8,
+                                    NORMAL_DIALOG_SPELL,
                                     IDX(spell),
                                     -1,
                                     0,
                                     -1,
                                     0
                                 );
-                                return 1;
+                                return WIDGET_DISPATCH_CONSUME;
                             }
                             if (GetManaCost(spell, viewSpellsHero)
                                 > viewSpellsHero->m_spellPoints) {
@@ -3112,12 +3266,14 @@ i32 ViewSpellsHandler(tag_message& msg) {
                                     GetManaCost(spell, viewSpellsHero),
                                     viewSpellsHero->m_spellPoints
                                 );
-                                NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
-                                return 0;
+                                NormalDialog(
+                                    gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0
+                                );
+                                return WIDGET_DISPATCH_CONTINUE;
                             }
                             gpGame->m_viewSpell = spell;
                             msg.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
-                            return 2;
+                            return WIDGET_DISPATCH_FORWARD;
                     }
                 }
                 break;
@@ -3125,48 +3281,52 @@ i32 ViewSpellsHandler(tag_message& msg) {
                 break;
         }
 
-        if (msg.payload.widget.id == 10) {
+        if (msg.payload.widget.id == VIEW_SPELL_CLOSE_ID) {
             msg.payload.widget.command = BaseWidgetCommand(msg.payload.widget.id);
-            return 2;
+            return WIDGET_DISPATCH_FORWARD;
         }
     }
-    return 1;
+    return WIDGET_DISPATCH_CONSUME;
 }
 
 VA(0x0047a4cd, 0x17c)
 i32 ViewSpecialHandler(tag_message& msg) {
     if (msg.type == MESSAGE_MOUSE_MOVE) {
         if (gpWindowManager->m_lastHoverId == msg.payload.hover.id)
-            return 1;
+            return WIDGET_DISPATCH_CONSUME;
         gpWindowManager->m_lastHoverId = msg.payload.hover.id;
         switch (msg.payload.hover.id) {
-            case 2:
-                strcpy(gText, cSpellHelp[0]);
+            case VIEW_SPELL_PREVIOUS_ID:
+                strcpy(gText, cSpellHelp[VIEW_SPELL_HELP_PREVIOUS]);
                 break;
-            case 3:
-                strcpy(gText, cSpellHelp[1]);
+            case VIEW_SPELL_NEXT_ID:
+                strcpy(gText, cSpellHelp[VIEW_SPELL_HELP_NEXT]);
                 break;
-            case 4:
-                strcpy(gText, cSpellHelp[2]);
+            case VIEW_SPELL_COMBAT_TAB_ID:
+                strcpy(gText, cSpellHelp[VIEW_SPELL_HELP_COMBAT]);
                 break;
-            case 5:
-                strcpy(gText, cSpellHelp[3]);
+            case VIEW_SPELL_ADVENTURE_TAB_ID:
+                strcpy(gText, cSpellHelp[VIEW_SPELL_HELP_ADVENTURE]);
                 break;
             case EVENT_WINDOW_FIRST_BUTTON:
-                strcpy(gText, cSpellHelp[4]);
+                strcpy(gText, cSpellHelp[VIEW_SPELL_HELP_CLOSE]);
                 break;
-            case 6:
-            case 7:
-            case 8:
-            case 9:
-                sprintf(gText, cSpellHelp[8], viewSpellsHero->m_spellPoints);
+            case VIEW_SPELL_MANA_LABEL_ID:
+            case VIEW_SPELL_MANA_HUNDREDS_ID:
+            case VIEW_SPELL_MANA_TENS_ID:
+            case VIEW_SPELL_MANA_ONES_ID:
+                sprintf(
+                    gText,
+                    cSpellHelp[VIEW_SPELL_HELP_MANA],
+                    viewSpellsHero->m_spellPoints
+                );
                 break;
             default:
-                strcpy(gText, cSpellHelp[5]);
+                strcpy(gText, cSpellHelp[VIEW_SPELL_HELP_OTHER]);
                 break;
         }
         HeroMessageUpdate(gText);
-        return 1;
+        return WIDGET_DISPATCH_CONSUME;
     }
     return 1;
 }
