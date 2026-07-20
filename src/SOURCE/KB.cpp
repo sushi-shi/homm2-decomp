@@ -1952,13 +1952,13 @@ i32 EventWindowHandler(struct tag_message& msg) {
                                 0
                             );
                             break;
-                        case IDX(RES_WOOD):
-                        case IDX(RES_MERCURY):
-                        case IDX(RES_ORE):
-                        case IDX(RES_SULFUR):
-                        case IDX(RES_CRYSTAL):
-                        case IDX(RES_GEMS):
-                        case IDX(RES_GOLD):
+                        case NORMAL_DIALOG_RESOURCE_WOOD:
+                        case NORMAL_DIALOG_RESOURCE_MERCURY:
+                        case NORMAL_DIALOG_RESOURCE_ORE:
+                        case NORMAL_DIALOG_RESOURCE_SULFUR:
+                        case NORMAL_DIALOG_RESOURCE_CRYSTAL:
+                        case NORMAL_DIALOG_RESOURCE_GEMS:
+                        case NORMAL_DIALOG_RESOURCE_GOLD:
                             NormalDialog(
                                 "{Resources}\n\nThere are seven resources in Heroes 2, used to "
                                 "build and improves castles, purchase troops and recruit heroes.  "
@@ -4835,15 +4835,15 @@ void NormalDialog(
             case NORMAL_DIALOG_HERO:
                 sizingIconHeight_l = NORMAL_DIALOG_HERO_LAYOUT_HEIGHT;
                 break;
-            case IDX(RES_GOLD):
+            case NORMAL_DIALOG_RESOURCE_GOLD:
                 sizingIconHeight_l = NORMAL_DIALOG_GOLD_LAYOUT_HEIGHT;
                 break;
-            case IDX(RES_WOOD):
-            case IDX(RES_MERCURY):
-            case IDX(RES_ORE):
-            case IDX(RES_SULFUR):
-            case IDX(RES_CRYSTAL):
-            case IDX(RES_GEMS):
+            case NORMAL_DIALOG_RESOURCE_WOOD:
+            case NORMAL_DIALOG_RESOURCE_MERCURY:
+            case NORMAL_DIALOG_RESOURCE_ORE:
+            case NORMAL_DIALOG_RESOURCE_SULFUR:
+            case NORMAL_DIALOG_RESOURCE_CRYSTAL:
+            case NORMAL_DIALOG_RESOURCE_GEMS:
                 sizingIconHeight_l = NORMAL_DIALOG_RESOURCE_LAYOUT_HEIGHT;
                 break;
             case NORMAL_DIALOG_SPELL:
@@ -4999,16 +4999,16 @@ void NormalDialog(
         }
 
         switch (resourceType_l[resourceSlot_n]) {
-            case IDX(RES_WOOD):
-            case IDX(RES_MERCURY):
-            case IDX(RES_ORE):
-            case IDX(RES_SULFUR):
-            case IDX(RES_CRYSTAL):
-            case IDX(RES_GEMS):
+            case NORMAL_DIALOG_RESOURCE_WOOD:
+            case NORMAL_DIALOG_RESOURCE_MERCURY:
+            case NORMAL_DIALOG_RESOURCE_ORE:
+            case NORMAL_DIALOG_RESOURCE_SULFUR:
+            case NORMAL_DIALOG_RESOURCE_CRYSTAL:
+            case NORMAL_DIALOG_RESOURCE_GEMS:
                 resourceImageWidth_g = NORMAL_DIALOG_RESOURCE_ICON_WIDTH;
                 sizingIconHeight_l = NORMAL_DIALOG_RESOURCE_ICON_HEIGHT;
                 break;
-            case IDX(RES_GOLD):
+            case NORMAL_DIALOG_RESOURCE_GOLD:
                 resourceImageWidth_g = NORMAL_DIALOG_LARGE_ICON_WIDTH;
                 sizingIconHeight_l = NORMAL_DIALOG_GOLD_LAYOUT_HEIGHT;
                 break;

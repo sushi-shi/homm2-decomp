@@ -15,7 +15,7 @@
 #include <SOURCE/tradpost.h>
 #include <BASE/message.h>
 
-H2_ENUM_CLASS_BEGIN(TradingPostWidgetId)
+H2_ENUM_BEGIN(TradingPostWidgetId)
     POST_LEFT_OFFER_ICON  = 0x14,
     POST_RIGHT_OFFER_ICON = 0x15,
     POST_LEFT_OFFER_TEXT  = 0x17,
@@ -24,7 +24,7 @@ H2_ENUM_CLASS_BEGIN(TradingPostWidgetId)
     POST_INCREMENT        = 0x1a,
     POST_TRACK            = 0x1b,
     POST_EXECUTE          = 0x1d
-H2_ENUM_CLASS_END(TradingPostWidgetId)
+H2_ENUM_END(TradingPostWidgetId)
 
 H2_ENUM_CLASS_BEGIN(TradingPostHandlerResult)
     POST_HANDLER_CONTINUE = 1,
@@ -142,9 +142,9 @@ void UpdateTradingPost(i32 draw) {
         if (leftResource != -1 && rightResource != -1 && leftResource != rightResource) {
             messageTemp.payload.widget.command = TRADING_POST_SET_ICON;
             if (sideCurrent == 0) {
-                messageTemp.payload.widget.id = IDX(POST_LEFT_OFFER_ICON);
+                messageTemp.payload.widget.id = POST_LEFT_OFFER_ICON;
             } else {
-                messageTemp.payload.widget.id = IDX(POST_RIGHT_OFFER_ICON);
+                messageTemp.payload.widget.id = POST_RIGHT_OFFER_ICON;
             }
             if (sideCurrent == 0) {
                 messageTemp.payload.widget.data.value = leftResource;
@@ -155,13 +155,13 @@ void UpdateTradingPost(i32 draw) {
             messageTemp.payload.widget.command = TRADING_POST_SET_TEXT;
             messageTemp.payload.widget.data.text = gText;
             if (sideCurrent == 0) {
-                messageTemp.payload.widget.id = IDX(POST_LEFT_OFFER_TEXT);
+                messageTemp.payload.widget.id = POST_LEFT_OFFER_TEXT;
                 if (bLeftDenominated != 0)
                     sprintf(gText, "%d", qtyToTrade);
                 else
                     sprintf(gText, "%d", qtyToTrade * iTradeRatio);
             } else {
-                messageTemp.payload.widget.id = IDX(POST_RIGHT_OFFER_TEXT);
+                messageTemp.payload.widget.id = POST_RIGHT_OFFER_TEXT;
                 if (bLeftDenominated != 0)
                     sprintf(gText, "%d", qtyToTrade * iTradeRatio);
                 else
@@ -304,7 +304,7 @@ i32 TradingPostHandler(struct tag_message& message) {
         switch (message.payload.widget.command) {
             case WIDGET_COMMAND_SELECT:
                 switch (message.payload.widget.id) {
-                    case IDX(POST_TRACK):
+                    case POST_TRACK:
                         if (iMaxUnitsToTrade == 0) {
                         } else {
                             knobPositionValue = message.payload.widget.screenX - tpX
@@ -357,7 +357,7 @@ i32 TradingPostHandler(struct tag_message& message) {
                     case NORMAL_DIALOG_BUTTON_TWO:
                         exitFlag = 1;
                         break;
-                    case IDX(POST_EXECUTE):
+                    case POST_EXECUTE:
                         if (qtyToTrade == 0)
                             break;
                         if (bLeftDenominated != 0) {
@@ -372,13 +372,13 @@ i32 TradingPostHandler(struct tag_message& message) {
                         leftResource = rightResource;
                         updateDisplay = 1;
                         break;
-                    case IDX(POST_DECREMENT):
+                    case POST_DECREMENT:
                         if (qtyToTrade > 0) {
                             --qtyToTrade;
                             updateDisplay = 1;
                         }
                         break;
-                    case IDX(POST_INCREMENT):
+                    case POST_INCREMENT:
                         if (iMaxUnitsToTrade > qtyToTrade) {
                             ++qtyToTrade;
                             updateDisplay = 1;

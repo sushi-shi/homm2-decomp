@@ -49,14 +49,6 @@ H2_ENUM_CLASS_BEGIN(CombatKeyCommand)
     KEY_DEBUG_CREATURE_EFFECT = 0x57
 H2_ENUM_CLASS_END(CombatKeyCommand)
 
-H2_ENUM_CLASS_BEGIN(CombatWindowCommand)
-    WINDOW_HOVER       = 12,
-    WINDOW_CLICK       = 13,
-    WINDOW_HELP        = 14,
-    WINDOW_MAIN_BUTTON = 0x40,
-    WINDOW_HELP_FLAG   = 0x200
-H2_ENUM_CLASS_END(CombatWindowCommand)
-
 H2_ENUM_BEGIN(CombatWinLoseConstant)
     WIN_LOSE_WIDGET_COUNT               = 25,
     WIN_LOSE_NEXT_CONTROL               = 0x7800,
@@ -120,7 +112,8 @@ H2_ENUM_CLASS_BEGIN(CombatControlId)
     CONTROL_HELP_FIRST        = 10,
     CONTROL_HELP_SECOND       = 11,
     CONTROL_HELP_THIRD        = 12,
-    CONTROL_HELP_FOURTH       = 13
+    CONTROL_HELP_FOURTH       = 13,
+    CONTROL_MAIN_BUTTON       = 0x40
 H2_ENUM_CLASS_END(CombatControlId)
 
 H2_ENUM_BEGIN(CombatRemoteConstant)
@@ -379,8 +372,8 @@ i32 combatManager::Main(tag_message& message) {
 
         if (gbThisNetHasControl == 0) {
             if (message.type == MESSAGE_KEY_DOWN) {
-                switch (message.payload.keyboard.keyCode) {
-                    case IDX(KEY_CLOSE_NETWORK_BOX):
+                switch (static_cast<CombatKeyCommand>(message.payload.keyboard.keyCode)) {
+                    case KEY_CLOSE_NETWORK_BOX:
                         PopNetBox(NULL, -1);
                         break;
                 }
@@ -819,30 +812,33 @@ i32 combatManager::ProcessCombatMsg(tag_message& message) {
 
     switch (message.type) {
         case MESSAGE_WIDGET:
-            if ((message.payload.widget.parameter & IDX(WINDOW_HELP_FLAG)) != 0) {
-                if (message.payload.widget.command == IDX(WINDOW_HOVER)
-                    || message.payload.widget.command == IDX(WINDOW_HELP)) {
+            if (HAS(
+                    static_cast<MessageModifier>(message.payload.widget.parameter),
+                    MESSAGE_MODIFIER_RIGHT_BUTTON
+                )) {
+                if (message.payload.widget.command == WIDGET_COMMAND_SELECT
+                    || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT) {
                     i32 helpIndex = -1;
-                    switch (message.payload.widget.id) {
-                        case IDX(CONTROL_ATTACK):
+                    switch (static_cast<CombatControlId>(message.payload.widget.id)) {
+                        case CONTROL_ATTACK:
                             helpIndex = IDX(LONG_HELP_ATTACK);
                             break;
-                        case IDX(CONTROL_WAIT):
+                        case CONTROL_WAIT:
                             helpIndex = IDX(LONG_HELP_WAIT);
                             break;
-                        case IDX(CONTROL_DISABLE_SELECTION):
+                        case CONTROL_DISABLE_SELECTION:
                             helpIndex = IDX(LONG_HELP_DISABLE_SELECTION);
                             break;
-                        case IDX(CONTROL_SYSTEM_OPTIONS):
+                        case CONTROL_SYSTEM_OPTIONS:
                             helpIndex = IDX(LONG_HELP_SYSTEM_OPTIONS);
                             break;
-                        case IDX(CONTROL_HELP_FIRST):
-                        case IDX(CONTROL_HELP_SECOND):
-                        case IDX(CONTROL_HELP_THIRD):
-                        case IDX(CONTROL_HELP_FOURTH):
+                        case CONTROL_HELP_FIRST:
+                        case CONTROL_HELP_SECOND:
+                        case CONTROL_HELP_THIRD:
+                        case CONTROL_HELP_FOURTH:
                             helpIndex = IDX(LONG_HELP_CONTROLS);
                             break;
-                        case IDX(WINDOW_MAIN_BUTTON):
+                        case CONTROL_MAIN_BUTTON:
                             RightClick(m_selectedHex);
                             break;
                     }
@@ -863,25 +859,25 @@ i32 combatManager::ProcessCombatMsg(tag_message& message) {
                 }
             } else {
                 switch (message.payload.widget.command) {
-                    case IDX(WINDOW_HOVER):
-                        switch (message.payload.widget.id) {
-                            case IDX(WINDOW_MAIN_BUTTON):
+                    case WIDGET_COMMAND_SELECT:
+                        switch (static_cast<CombatControlId>(message.payload.widget.id)) {
+                            case CONTROL_MAIN_BUTTON:
                                 DoCommand(m_currentCommand);
                                 break;
                         }
                         break;
-                    case IDX(WINDOW_CLICK):
-                        switch (message.payload.widget.id) {
-                            case IDX(CONTROL_ATTACK):
+                    case WIDGET_COMMAND_DESELECT:
+                        switch (static_cast<CombatControlId>(message.payload.widget.id)) {
+                            case CONTROL_ATTACK:
                                 giNextAction = ACTION_DEFEND;
                                 break;
-                            case IDX(CONTROL_WAIT):
+                            case CONTROL_WAIT:
                                 giNextAction = ACTION_WAIT;
                                 break;
-                            case IDX(CONTROL_DISABLE_SELECTION):
+                            case CONTROL_DISABLE_SELECTION:
                                 m_gridSelectionDisabled = 1;
                                 break;
-                            case IDX(CONTROL_SYSTEM_OPTIONS):
+                            case CONTROL_SYSTEM_OPTIONS:
                                 CombatSystemOptions();
                                 break;
                         }
@@ -944,11 +940,11 @@ i32 combatManager::ProcessCombatMsg(tag_message& message) {
             return IDX(MAIN_CONTINUE);
 
         case MESSAGE_KEY_DOWN:
-            switch (message.payload.keyboard.keyCode) {
-                case IDX(KEY_CLOSE_NETWORK_BOX):
+            switch (static_cast<CombatKeyCommand>(message.payload.keyboard.keyCode)) {
+                case KEY_CLOSE_NETWORK_BOX:
                     PopNetBox(NULL, -1);
                     break;
-                case IDX(KEY_REDRAW_SCREEN):
+                case KEY_REDRAW_SCREEN:
                     gpWindowManager->UpdateScreenRegion(
                         0,
                         0,
@@ -956,37 +952,37 @@ i32 combatManager::ProcessCombatMsg(tag_message& message) {
                         COMBAT_SCREEN_HEIGHT - 1
                     );
                     break;
-                case IDX(KEY_CYCLE_ARMY_VIEW):
+                case KEY_CYCLE_ARMY_VIEW:
                     SetCombatViewArmySmallLevel(
                         (gConfig.combatArmyInfoLevel + 1) % ARMY_VIEW_LEVEL_COUNT
                     );
                     break;
-                case IDX(KEY_TOGGLE_GRID):
+                case KEY_TOGGLE_GRID:
                     SetCombatGrid(
                         1 - gConfig.showCombatGrid,
                         gConfig.showCombatMouseHex,
                         gConfig.combatShadeLevel
                     );
                     break;
-                case IDX(KEY_TOGGLE_MOUSE_HEX):
+                case KEY_TOGGLE_MOUSE_HEX:
                     SetCombatGrid(
                         gConfig.showCombatGrid,
                         1 - gConfig.showCombatMouseHex,
                         gConfig.combatShadeLevel
                     );
                     break;
-                case IDX(KEY_CYCLE_SHADE):
+                case KEY_CYCLE_SHADE:
                     SetCombatGrid(
                         gConfig.showCombatGrid,
                         gConfig.showCombatMouseHex,
                         1 - gConfig.combatShadeLevel
                     );
                     break;
-                case IDX(KEY_CYCLE_SPELL_EFFECT):
+                case KEY_CYCLE_SPELL_EFFECT:
                     giSpellEffectShowType = NextSpellEffectDisplayType(giSpellEffectShowType);
                     DrawFrame(1, 0, 0, 0, COMMAND_FRAME_DELAY, 1, 1);
                     break;
-                case IDX(KEY_DEBUG_CREATURE_EFFECT):
+                case KEY_DEBUG_CREATURE_EFFECT:
                     if ((message.payload.keyboard.modifiers & DEBUG_VAPORIZE_MASK) != 0) {
                         VaporizeCreature(1, 1);
                     } else if ((message.payload.keyboard.modifiers
@@ -998,28 +994,28 @@ i32 combatManager::ProcessCombatMsg(tag_message& message) {
                         RippleCreature(1, 1, COMBAT_RIPPLE_WAVE);
                     }
                     break;
-                case IDX(KEY_WAIT):
+                case KEY_WAIT:
                     giNextAction = ACTION_WAIT;
                     break;
-                case IDX(KEY_MOUSE_COORDS): {
+                case KEY_MOUSE_COORDS: {
                     i32 currentMouseX_18;
                     i32 currentMouseY_18;
                     gpMouseManager->MouseCoords(currentMouseX_18, currentMouseY_18);
                     break;
                 }
-                case IDX(KEY_VIEW_GENERAL):
+                case KEY_VIEW_GENERAL:
                     if (m_heroes[m_currentSide] != NULL) {
                         gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
                         ViewGeneral(m_currentSide, 1, 0);
                         ResetMouse();
                     }
                     break;
-                case IDX(KEY_VIEW_ARMY):
+                case KEY_VIEW_ARMY:
                     gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
                     ViewArmy(&m_armies[m_currentArmySide][m_currentArmyIndex], 0);
                     ResetMouse();
                     break;
-                case IDX(KEY_CAST_SPELL):
+                case KEY_CAST_SPELL:
                     if (m_heroes[m_currentSide] == NULL) {
                         NormalDialog(
                             "You have no hero to cast a spell.",
@@ -1490,7 +1486,7 @@ i32 WinCombatHandler(struct tag_message& message) {
 
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
-            case IDX(WINDOW_CLICK):
+            case WIDGET_COMMAND_DESELECT:
                 switch (message.payload.widget.id) {
                     case WIN_LOSE_NEXT_CONTROL:
                         if (gbShowingLoseWindow != 0)
