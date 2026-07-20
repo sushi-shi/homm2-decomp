@@ -197,7 +197,7 @@ BASE/MOUSEMGR	?SetColorMice@mouseManager@@QAEXH@Z	100.0000	5ef3116d3d98
 BASE/MOUSEMGR	?SetPointer@mouseManager@@QAEXH@Z	74.4587	8329f7cf4e22
 BASE/MOUSEMGR	?SetPointer@mouseManager@@QAEXPADHH@Z	100.0000	a8111d35d5ac
 BASE/MOUSEMGR	?ShowColorPointer@mouseManager@@QAEXXZ	100.0000	622257a0ad7f
-BASE/Midi	?MIDIIsPlaying@soundManager@@QAEHXZ	100.0000	8d095541e037
+BASE/Midi	?MIDIIsPlaying@soundManager@@QAEHXZ	100.0000	520446182777
 BASE/Midi	?MIDIPlay@soundManager@@QAEXH@Z	100.0000	6a473c761d28
 BASE/Midi	?MIDIPoll@soundManager@@QAEXXZ	100.0000	07e1f8738703
 BASE/Midi	?MIDISetVolume@soundManager@@QAEXXZ	100.0000	26beb5aa0e70
@@ -396,12 +396,12 @@ BASE/soundmgr	?CDStartup@soundManager@@QAEXXZ	100.0000	c93c4e1b701a
 BASE/soundmgr	?CDStop@soundManager@@QAEXXZ	99.9351	3a2f4237e370
 BASE/soundmgr	?Close@soundManager@@UAEXXZ	98.3947	d74b66cf8d0c
 BASE/soundmgr	?ConvertVolume@soundManager@@QAEHHH@Z	100.0000	bc7b82f335b8
-BASE/soundmgr	?DigitalReport@soundManager@@QAEJPAU_SAMPLE@@F@Z	100.0000	61bfa318e11d
+BASE/soundmgr	?DigitalReport@soundManager@@QAEJPAU_SAMPLE@@F@Z	100.0000	fc8d72b8c192
 BASE/soundmgr	?ForcePollSound@soundManager@@QAEXXZ	100.0000	19cb8a8d1fc2
 BASE/soundmgr	?GetNumberCDDrives@soundManager@@QAEXXZ	100.0000	fde24968c623
 BASE/soundmgr	?HandleMCIError@@YIXHPAD@Z	100.0000	98609c248acf
 BASE/soundmgr	?Main@soundManager@@UAEHAAUtag_message@@@Z	100.0000	c77cc4bc2f04
-BASE/soundmgr	?MemorySample@soundManager@@QAEPAU_SAMPLE@@PAVsample@@@Z	100.0000	4a589c09efad
+BASE/soundmgr	?MemorySample@soundManager@@QAEPAU_SAMPLE@@PAVsample@@@Z	100.0000	8ad1d6932e64
 BASE/soundmgr	?ModifySample@soundManager@@QAEXPAU_SAMPLE@@FJ@Z	100.0000	bde455b0b098
 BASE/soundmgr	?MusicPlaying@soundManager@@QAEHXZ	100.0000	22ab9ab50b54
 BASE/soundmgr	?Open@soundManager@@UAEHH@Z	100.0000	8b4d9d47b769
@@ -411,7 +411,7 @@ BASE/soundmgr	?ServiceSound@soundManager@@QAEXXZ	100.0000	5c5533d80356
 BASE/soundmgr	?SetMusicQuality@soundManager@@QAEXH@Z	100.0000	fd47550b3d53
 BASE/soundmgr	?SetReady2Poll@@YGXK@Z	100.0000	ac22a3eb3093
 BASE/soundmgr	?StartSample@soundManager@@QAEPAU_SAMPLE@@PADPAPADFFHHJ@Z	100.0000	aed80b16474e
-BASE/soundmgr	?StopAllSamples@soundManager@@QAEXH@Z	100.0000	930969775cda
+BASE/soundmgr	?StopAllSamples@soundManager@@QAEXH@Z	100.0000	87e49ae96fa6
 BASE/soundmgr	?StopSample@soundManager@@QAEXPAU_SAMPLE@@@Z	100.0000	311edf8d86b4
 BASE/soundmgr	?SwitchAmbientMusic@soundManager@@QAEXH@Z	100.0000	bc6a38590c7b
 BASE/soundmgr	?UpdateTimers@@YGXK@Z	100.0000	d4ca54ed70af
@@ -1027,7 +1027,7 @@ SOURCE/Newgame	?InitNewGameWindow@game@@QAEXXZ	100.0000	825a1008220f
 SOURCE/Newgame	?NGKPSetupDisplayString@game@@QAEXPADG@Z	100.0000	49a796d8bafa
 SOURCE/Newgame	?NewGame@game@@QAEHXZ	98.3392	71a7a26c83ed
 SOURCE/Newgame	?NewGameHandler@@YIHAAUtag_message@@@Z	97.3212	7bb2575edee4
-SOURCE/Newgame	?ProcessNGKeyPress@game@@QAEHAAUtag_message@@@Z	99.9868	5e42628ca4b1
+SOURCE/Newgame	?ProcessNGKeyPress@game@@QAEHAAUtag_message@@@Z	99.9868	7820ad68cbdc
 SOURCE/Newgame	?ProcessNewMap@game@@QAEXPAUSMapHeader@@@Z	99.8571	6f616e09157a
 SOURCE/Newgame	?SetupNetPlayerNames@game@@QAEXXZ	100.0000	7913d1c9fc43
 SOURCE/Newgame	?ShowScenInfo@game@@QAEXXZ	100.0000	40a0fd38080e

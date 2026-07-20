@@ -107,7 +107,7 @@ H2_ENUM_BEGIN(NewGameConstant)
     GAME_SCENARIO_LOSS                    = 206
 H2_ENUM_END(NewGameConstant)
 
-H2_ENUM_CLASS_BEGIN(NewGameKeyCode)
+H2_ENUM_BEGIN(NewGameKeyCode)
     GAME_KEY_ENTER          = 10,
     GAME_KEY_BACKSPACE      = 0x7f,
     GAME_KEY_FIRST_EXTENDED = 0x100,
@@ -121,7 +121,7 @@ H2_ENUM_CLASS_BEGIN(NewGameKeyCode)
     GAME_KEYPAD_DOWN        = 0x50,
     GAME_KEYPAD_PAGE_DOWN   = 0x51,
     GAME_KEYPAD_INSERT      = 0x52
-H2_ENUM_CLASS_END(NewGameKeyCode)
+H2_ENUM_END(NewGameKeyCode)
 
 H2_ENUM_BEGIN(NewGameStorageConstant)
     FILE_MASK_CAPACITY      = 16,
@@ -1586,10 +1586,10 @@ i32 game::ProcessNGKeyPress(struct tag_message& message) {
 
         default:
             gpInputManager->AsciiConvert(message);
-            if (message.payload.keyboard.keyCode == IDX(GAME_KEY_ENTER))
+            if (message.payload.keyboard.keyCode == GAME_KEY_ENTER)
                 return 1;
 
-            if (message.payload.keyboard.keyCode == IDX(GAME_KEY_BACKSPACE)) {
+            if (message.payload.keyboard.keyCode == GAME_KEY_BACKSPACE) {
                 if (NGKPcursorIndex > 0) {
                     strcpy(gText, cNGKPCore + NGKPcursorIndex);
                     strcpy(cNGKPCore + (NGKPcursorIndex - 1), gText);
@@ -1599,7 +1599,7 @@ i32 game::ProcessNGKeyPress(struct tag_message& message) {
                        && message.payload.keyboard.keyCode != 0) {
                 strcpy(workText, cNGKPCore);
                 keyChar = 0;
-                if (message.payload.keyboard.keyCode >= IDX(GAME_KEY_FIRST_EXTENDED)) {
+                if (message.payload.keyboard.keyCode >= GAME_KEY_FIRST_EXTENDED) {
                     scanCode =
                         static_cast<u8>(static_cast<u32>(message.payload.keyboard.keyCode)
                                         >> KEY_SCAN_CODE_SHIFT);
