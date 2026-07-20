@@ -18,12 +18,6 @@ H2_ENUM_BEGIN(ComConstant)
     NODE_HEADER_SIZE     = 10
 H2_ENUM_END(ComConstant)
 
-H2_ENUM_BEGIN(ComSourceLine)
-    TERM_SOURCE_LINE_BASE  = 199,
-    SEND_SOURCE_LINE_BASE  = 247,
-    WRITE_SOURCE_LINE_BASE = 310
-H2_ENUM_END(ComSourceLine)
-
 H2_ENUM_BEGIN(ComErrorText)
     ERROR_TEXT_HEADER          = 0,
     ERROR_TEXT_SUGGESTIONS     = 1,
@@ -44,9 +38,9 @@ H2_ENUM_END(ComSerialConstant)
 
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\comwin.cpp"
 
-DATA(0x004f843c) static i16 s_comTermSourceLineBase = TERM_SOURCE_LINE_BASE;
-DATA(0x004f84d8) static i16 s_comSendSourceLineBase = SEND_SOURCE_LINE_BASE;
-DATA(0x004f8540) static i16 s_comWriteSourceLineBase = WRITE_SOURCE_LINE_BASE;
+DATA(0x004f843c) static i16 s_comTermSourceLineBase = 199;
+DATA(0x004f84d8) static i16 s_comSendSourceLineBase = 247;
+DATA(0x004f8540) static i16 s_comWriteSourceLineBase = 310;
 DATA(0x005284b8) static ComPortState s_comPorts[PORT_COUNT];
 
 
@@ -255,9 +249,9 @@ void com_term(i16 portIndex) {
         s_comPorts[portIndex].handle = INVALID_HANDLE_VALUE;
 
         while ((node = pop_node(&s_comPorts[portIndex].normalQueue)) != NULL)
-            H2_FREE(node, 212);
+            H2_FREE(node, s_comTermSourceLineBase + 13);
         while ((node = pop_node(&s_comPorts[portIndex].priorityQueue)) != NULL)
-            H2_FREE(node, 216);
+            H2_FREE(node, s_comTermSourceLineBase + 17);
     }
 }
 
@@ -309,7 +303,9 @@ i16 com_snd(i16 portIndex, u16, u16 length, void* data, i32 priority) {
                 ShutdownComError("Clear communications break");
             return 0;
         }
-        sendNode = static_cast<tag_Node*>(H2_ALLOC(length + NODE_HEADER_SIZE, 263));
+        sendNode = static_cast<tag_Node*>(
+            H2_ALLOC(length + NODE_HEADER_SIZE, s_comSendSourceLineBase + 16)
+        );
         if (sendNode != NULL) {
             sendNode->len = length;
             memcpy(sendNode->comData, data, length);
@@ -367,7 +363,7 @@ void comm_wrt_task(void) {
                 ShutdownComError("Write communications data");
             writtenTotal += bytesWritten;
         }
-        H2_FREE(packetNode, 338);
+        H2_FREE(packetNode, s_comWriteSourceLineBase + 28);
     }
 }
 
