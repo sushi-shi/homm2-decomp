@@ -17,9 +17,9 @@ H2_ENUM_BEGIN(ListBoxSourceFileConstant)
     SOURCE_FILE_SLOT_SIZE = 0x2c
 H2_ENUM_END(ListBoxSourceFileConstant)
 
-H2_ENUM_CLASS_BEGIN(ListBoxTiming)
+H2_ENUM_BEGIN(ListBoxTiming)
     DOUBLE_CLICK_TICKS = 0x190
-H2_ENUM_CLASS_END(ListBoxTiming)
+H2_ENUM_END(ListBoxTiming)
 
 H2_ENUM_BEGIN(ListBoxDestructorSourceFileOffset)
     DESTRUCTOR_ITEM_SOURCE_FILE_OFFSET = 0,
@@ -586,7 +586,7 @@ i32 listBoxWidget::ProcessMouseMessage(tag_message& message) {
                 if (m_lastSelectedIndex == m_selectedIndex) {
                     i32 lastTick = m_lastClickTime;
                     i32 currentTick = KBTickCount();
-                    if (lastTick + IDX(DOUBLE_CLICK_TICKS) > currentTick)
+                    if (lastTick + DOUBLE_CLICK_TICKS > currentTick)
                         message.payload.widget.parameter = SELECTION_DOUBLE_CLICK;
                 }
                 m_lastSelectedIndex = m_selectedIndex;

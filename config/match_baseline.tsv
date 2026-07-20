@@ -168,8 +168,8 @@ BASE/INPUTMGR	?ForceMouseMove@inputManager@@QAEXXZ	97.4265	27dafc6c2cc3
 BASE/INPUTMGR	?GetEvent@inputManager@@QAE?AUtag_message@@XZ	97.8182	9b67f9e4a512
 BASE/INPUTMGR	?KeyboardMessageHandler@@YIHPAXIIJ@Z	98.3401	83652682d4fd
 BASE/INPUTMGR	?Main@inputManager@@UAEHAAUtag_message@@@Z	100.0000	19f3fe7af550
-BASE/INPUTMGR	?MakeScanCodeTable@inputManager@@QAEXXZ	100.0000	9bc0e7fcd36a
-BASE/INPUTMGR	?MouseMessageHandler@@YIHPAXIIJ@Z	99.0890	458f1673d31e
+BASE/INPUTMGR	?MakeScanCodeTable@inputManager@@QAEXXZ	100.0000	108e793b6a91
+BASE/INPUTMGR	?MouseMessageHandler@@YIHPAXIIJ@Z	99.0466	d989f04c8574
 BASE/INPUTMGR	?Open@inputManager@@UAEHH@Z	100.0000	65cb9a46a3b2
 BASE/INPUTMGR	?PeekEvent@inputManager@@QAE?AUtag_message@@XZ	97.7358	755f5f164145
 BASE/INPUTMGR	?SetKeyCodeType@inputManager@@QAEXH@Z	100.0000	95db455fa316
@@ -226,7 +226,7 @@ BASE/Misc	?GetDataEntry@@YIXPAD0H0HH@Z	99.1020	a1c98244f4de
 BASE/Misc	?GetIconEntry@@YIPAUIconEntry@@PAVicon@@H@Z	100.0000	b037247edc8b
 BASE/Misc	?InitMemEntry@@YIXXZ	100.0000	0a4141774d22
 BASE/Misc	?IsCDDrive@@YIHH@Z	100.0000	af3039a3900c
-BASE/Misc	?IsCycleColor@@YIHH@Z	100.0000	c18546a8b40c
+BASE/Misc	?IsCycleColor@@YIHH@Z	100.0000	34a152a2f1da
 BASE/Misc	?LogInt@@YIXPADHHHHHHH@Z	96.6000	d89fe924d621
 BASE/Misc	?LogStr@@YIXPAD@Z	88.5000	fa3d23354a3e
 BASE/Misc	?LogTruncate@@YIXXZ	92.2321	a233eddd021b
@@ -308,7 +308,7 @@ BASE/Textntry	??0textEntryWidget@@QAE@FFFFFPAD0F0FFFFHH@Z	98.6522	f7314fed822c
 BASE/Textntry	??0textEntryWidget@@QAE@XZ	100.0000	4615409aa0bd
 BASE/Textntry	??1textEntryWidget@@UAE@XZ	100.0000	b69d22a3f592
 BASE/Textntry	?Draw@textEntryWidget@@UAEXXZ	100.0000	508f934cf1ce
-BASE/Textntry	?Main@textEntryWidget@@UAEHAAUtag_message@@@Z	100.0000	45f27e7cb0e9
+BASE/Textntry	?Main@textEntryWidget@@UAEHAAUtag_message@@@Z	100.0000	03b340c4ed72
 BASE/Textntry	?Read@textEntryWidget@@QAEXH@Z	98.6755	38f1f2738c0e
 BASE/Textntry	?SetupDisplayString@textEntryWidget@@QAEXPADG@Z	100.0000	7e8c231abf9b
 BASE/WIDGET	??0widget@@QAE@FFFFFF@Z	100.0000	edb0310595ba
@@ -379,7 +379,7 @@ BASE/listbox	?DeleteItem@listBoxWidget@@QAEXH@Z	100.0000	0c7ef3a9e420
 BASE/listbox	?Draw@listBoxWidget@@UAEXXZ	100.0000	0628dc7098ba
 BASE/listbox	?DrawLBStuff@listBoxWidget@@QAEXH@Z	100.0000	81919949cfc2
 BASE/listbox	?Main@listBoxWidget@@UAEHAAUtag_message@@@Z	100.0000	cb389be39c89
-BASE/listbox	?ProcessMouseMessage@listBoxWidget@@QAEHAAUtag_message@@@Z	100.0000	1cb4a844eba9
+BASE/listbox	?ProcessMouseMessage@listBoxWidget@@QAEHAAUtag_message@@@Z	98.8430	37bb8b92f751
 BASE/listbox	?Read@listBoxWidget@@QAEXXZ	100.0000	8c338153991b
 BASE/miscwin	?AutoInitSVGA@@YIFXZ	100.0000	97733f0d7f3c
 BASE/miscwin	@BlitBitmapToScreenVesa@28	100.0000	c0d9cfd16ce8
@@ -803,7 +803,7 @@ SOURCE/GAME	?GetNumObelisks@@YIHH@Z	100.0000	5ad0fac382ed
 SOURCE/GAME	?GetNumThievesGuilds@game@@QAEHH@Z	99.9787	940f79353169
 SOURCE/GAME	?GetRandomArtifactId@game@@QAEHHH@Z	100.0000	70d213c66681
 SOURCE/GAME	?GetRandomNumTroops@game@@QAEHH@Z	100.0000	8b2d89a00ede
-SOURCE/GAME	?GetSkipCopyLen@@YIHPAEPAH@Z	100.0000	3a89b874aae9
+SOURCE/GAME	?GetSkipCopyLen@@YIHPAEPAH@Z	100.0000	367adebf067d
 SOURCE/GAME	?GetTownId@game@@QAEHHH@Z	100.0000	98429a47e7b3
 SOURCE/GAME	?GetWorldMapData@game@@QAEPAVfullMap@@XZ	100.0000	06f64fb66733
 SOURCE/GAME	?GiveArmy@game@@QAEXPAVarmyGroup@@HHH@Z	98.2353	8e7352c2ef59
@@ -867,7 +867,7 @@ SOURCE/GAME	?WaitForPlayer@game@@QAEXPADH@Z	100.0000	6bebb867e88f
 SOURCE/GAME	?WeeklyGenericSite@game@@QAEXPAVmapCell@@@Z	100.0000	6c2375b0c0dc
 SOURCE/GAME	?WeeklyRecruitSite@game@@QAEXPAVmapCell@@@Z	100.0000	b94d82816e52
 SOURCE/GAME	?Write@playerData@@QAEXH@Z	100.0000	4ea8e2764b8a
-SOURCE/GAME	?WriteDiffHeaderInfo@@YIXEHPAEPAH@Z	94.1839	7631c4e05f97
+SOURCE/GAME	?WriteDiffHeaderInfo@@YIXEHPAEPAH@Z	94.1609	2a17bfe717ba
 SOURCE/HERO	??0hero@@QAE@XZ	100.0000	6d7f4c2db935
 SOURCE/HERO	?AddSpell@hero@@QAEXHH@Z	100.0000	d3a1a3595c82
 SOURCE/HERO	?ApplyBattleLossTemps@hero@@QAEXXZ	100.0000	6c64104e3fb0

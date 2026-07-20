@@ -104,10 +104,10 @@ H2_ENUM_BEGIN(InputManagerScanCode)
     INPUT_SCAN_F12             = 0x58
 H2_ENUM_END(InputManagerScanCode)
 
-H2_ENUM_CLASS_BEGIN(InputManagerCapacity)
+H2_ENUM_BEGIN(InputManagerCapacity)
     INPUT_EVENT_RING_CAPACITY = 64,
     INPUT_SCAN_CODE_CAPACITY  = 128
-H2_ENUM_CLASS_END(InputManagerCapacity)
+H2_ENUM_END(InputManagerCapacity)
 
 #pragma pack(push, 1)
 class inputManager : public baseManager {
