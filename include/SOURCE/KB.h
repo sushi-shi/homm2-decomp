@@ -110,7 +110,14 @@ H2_ENUM_END(CampaignConstant)
 #pragma pack(push, 1)
 struct SCampaignChoice {
     CampaignChoiceType type;
-    i16 value;
+    union {
+        i16 value;
+        H2_ENUM_STORAGE(ResourceType, i16) resource;
+        H2_ENUM_STORAGE(ArtifactType, i16) artifact;
+        H2_ENUM_STORAGE(SpellType, i16) spell;
+        H2_ENUM_STORAGE(CreatureType, i16) creature;
+        H2_ENUM_STORAGE(FactionType, i16) faction;
+    };
     i16 amount;
 };
 #pragma pack(pop)
