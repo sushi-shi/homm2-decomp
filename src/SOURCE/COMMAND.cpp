@@ -2577,7 +2577,7 @@ i32 combatManager::ProcessNextAction(struct tag_message& message) {
     }
     gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
     UpdateMouseGrid(-1, 1);
-    memset(m_gridState, 0, sizeof(m_gridState));
+    memset(m_gridState, IDX(GRID_SHADE_NONE), sizeof(m_gridState));
     if (UpdateGrid(0, 0) != 0)
         redraw = 1;
     if (redraw != 0)

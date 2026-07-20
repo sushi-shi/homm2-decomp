@@ -486,11 +486,11 @@ i32 combatManager::Open(i32 openFlags) {
     m_mouseGridBuffer = NULL;
     m_smallViewLastX[COMBAT_ATTACKER_SIDE] = -1;
     m_smallViewLastX[COMBAT_DEFENDER_SIDE] = -1;
-    memset(m_gridState, 0, sizeof(m_gridState));
+    memset(m_gridState, IDX(GRID_SHADE_NONE), sizeof(m_gridState));
     LoadIcons();
     InitNonVisualVars();
     SetupAndLoadObstacles();
-    memset(m_previousGridState, 0, sizeof(m_previousGridState));
+    memset(m_previousGridState, IDX(GRID_SHADE_NONE), sizeof(m_previousGridState));
     GetNextArmy(COMBAT_ATTACKER_SIDE);
     m_backgroundDrawn = 0;
 
