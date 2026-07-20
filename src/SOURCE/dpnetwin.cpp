@@ -172,7 +172,7 @@ i16 dpnet_init(void) {
                 startup.netPosition = static_cast<u8>(guestIndex);
                 dpSendMessage(
                     giNetPosToDCOPos[guestIndex],
-                    IDX(NETWORK_PACKET_STARTUP),
+                    NETWORK_PACKET_STARTUP,
                     sizeof(startup),
                     &startup
                 );
@@ -237,12 +237,17 @@ void dpnet_term(void) {
 }
 
 VA(0x0041f3a4, 0xee)
-void dpSendMessage(i32 destination, u8 type, u16 size, void* data) {
+void dpSendMessage(
+    i32 destination,
+    H2_ENUM_PARAM(NetworkPacketType, u8) type,
+    u16 size,
+    void* data
+) {
     DATA(0x004efa5c) static i16 sendSourceLineBase = 254; // NOLINT(readability-magic-numbers)
     u8* message = static_cast<u8*>(H2_ALLOC(size + 1, sendSourceLineBase + 2));
     i32 result;
 
-    message[0] = type;
+    message[0] = static_cast<u8>(type);
     if (size != 0)
         memcpy(message + 1, data, size);
     result = lpIDC->Send(dcoID, destination, 0, message, size + 1);
@@ -262,7 +267,7 @@ i32 dpnet_snd(i32 position, i32 size, void* data) {
         destination = 0;
     else
         destination = giNetPosToDCOPos[position];
-    dpSendMessage(destination, IDX(NETWORK_PACKET_DATA), static_cast<u16>(size), data);
+    dpSendMessage(destination, NETWORK_PACKET_DATA, static_cast<u16>(size), data);
     return 0;
 }
 
@@ -332,8 +337,8 @@ void dpEvaluateMessage(u32l size, i32 sender) {
     DirectPlayStartupMessage* startup;
     i32 i;
 
-    switch (rcvBufIn[0]) {
-        case IDX(NETWORK_PACKET_DATA):
+    switch (static_cast<NetworkPacketType>(static_cast<u8>(rcvBufIn[0]))) {
+        case NETWORK_PACKET_DATA:
             ppDPRcvBuffer[iDPRcvBufferHead] = static_cast<u8*>(H2_ALLOC(
                 size - 1, evaluateSourceLineBase + 8
             ));
@@ -341,11 +346,11 @@ void dpEvaluateMessage(u32l size, i32 sender) {
             piDPRcvBufferSize[iDPRcvBufferHead] = size;
             iDPRcvBufferHead = (iDPRcvBufferHead + 1) % DP_TRANSPORT_BUFFER_COUNT;
             break;
-        case IDX(NETWORK_PACKET_GUEST_ARRIVED):
+        case NETWORK_PACKET_GUEST_ARRIVED:
             if (GameMode == REMOTE_GAME_NETWORK_HOST) {
                 for (i = 1; i < giNumHumanPlayers; i++) {
                     if (giNetPosToDCOPos[i] == sender) {
-                        dpSendMessage(sender, IDX(NETWORK_PACKET_GUEST_ACCEPTED), 0, NULL);
+                        dpSendMessage(sender, NETWORK_PACKET_GUEST_ACCEPTED, 0, NULL);
                         return;
                     }
                 }
@@ -354,20 +359,20 @@ void dpEvaluateMessage(u32l size, i32 sender) {
                     gsNetPlayerInfo[giNumHumanPlayers] = *reinterpret_cast<SNetPlayerInfo*>(ptr);
                     if (gsNetPlayerInfo[giNumHumanPlayers].reserved[0] == 0)
                         xNetHasOldPlayers = 1;
-                    dpSendMessage(sender, IDX(NETWORK_PACKET_GUEST_ACCEPTED), 0, NULL);
+                    dpSendMessage(sender, NETWORK_PACKET_GUEST_ACCEPTED, 0, NULL);
                     giNumHumanPlayers++;
                 } else {
-                    dpSendMessage(sender, IDX(NETWORK_PACKET_GUEST_REJECTED), 0, NULL);
+                    dpSendMessage(sender, NETWORK_PACKET_GUEST_REJECTED, 0, NULL);
                 }
             }
             break;
-        case IDX(NETWORK_PACKET_GUEST_ACCEPTED):
+        case NETWORK_PACKET_GUEST_ACCEPTED:
             giHostAcceptStatus = HOST_ACCEPT_ACCEPTED;
             break;
-        case IDX(NETWORK_PACKET_GUEST_REJECTED):
+        case NETWORK_PACKET_GUEST_REJECTED:
             giHostAcceptStatus = HOST_ACCEPT_REJECTED;
             break;
-        case IDX(NETWORK_PACKET_STARTUP):
+        case NETWORK_PACKET_STARTUP:
             startup = reinterpret_cast<DirectPlayStartupMessage*>(ptr);
             giNumHumanPlayers = startup->playerCount;
             giThisNetPos = startup->netPosition;
@@ -518,7 +523,7 @@ i32 dpWaitForHost(void) {
             giHostAcceptStatus = HOST_ACCEPT_PENDING;
             dpSendMessage(
                 0,
-                IDX(NETWORK_PACKET_GUEST_ARRIVED),
+                NETWORK_PACKET_GUEST_ARRIVED,
                 sizeof(SNetPlayerInfo),
                 &gsThisNetPlayerInfo
             );

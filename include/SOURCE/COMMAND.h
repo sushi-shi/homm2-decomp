@@ -26,6 +26,17 @@ H2_ENUM_BEGIN(CombatRemotePacketConstant)
     COMBAT_REMOTE_PACKET_BODY_RESERVED_SIZE   = 2
 H2_ENUM_END(CombatRemotePacketConstant)
 
+H2_ENUM_CLASS_BEGIN(CombatAction)
+    ACTION_NONE       = 0,
+    ACTION_CAST_SPELL = 1,
+    ACTION_MOVE       = 2,
+    ACTION_WAIT       = 3,
+    ACTION_RETREAT    = 4,
+    ACTION_SURRENDER  = 5,
+    ACTION_ATTACK     = 6,
+    ACTION_DEFEND     = 7
+H2_ENUM_CLASS_END(CombatAction)
+
 #pragma pack(push, 1)
 struct CombatRemotePacket {
     i8 messageLength;
@@ -33,7 +44,7 @@ struct CombatRemotePacket {
     i8 category;
     i8 command;
     char reserved7[COMBAT_REMOTE_PACKET_BODY_RESERVED_SIZE];
-    i32 nextAction;
+    H2_ENUM_STORAGE(CombatAction, i32) nextAction;
     i32 nextActionExtra;
     i32 nextActionGridIndex;
     i32 nextActionGridIndex2;

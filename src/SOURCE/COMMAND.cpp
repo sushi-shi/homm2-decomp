@@ -130,17 +130,6 @@ H2_ENUM_BEGIN(CombatRemoteConstant)
     REMOTE_COMMAND_ACTION  = 23
 H2_ENUM_END(CombatRemoteConstant)
 
-H2_ENUM_CLASS_BEGIN(CombatAction)
-    ACTION_NONE       = 0,
-    ACTION_CAST_SPELL = 1,
-    ACTION_MOVE       = 2,
-    ACTION_WAIT       = 3,
-    ACTION_RETREAT    = 4,
-    ACTION_SURRENDER  = 5,
-    ACTION_ATTACK     = 6,
-    ACTION_DEFEND     = 7
-H2_ENUM_CLASS_END(CombatAction)
-
 H2_ENUM_CLASS_BEGIN(CombatActionDataIndex)
     ACTION_DATA_ACTION      = 0,
     ACTION_DATA_EXTRA       = 1,
@@ -422,7 +411,7 @@ i32 combatManager::Main(tag_message& message) {
     }
 
 ProcessAction:
-    if (giNextAction == 0) {
+    if (giNextAction == ACTION_NONE) {
         if (m_playerId[m_currentSide] == -1 || gbThisNetHumanPlayer[m_playerId[m_currentSide]] == 0
             || m_gridSelectionDisabled != 0) {
             CheckGetAIMove();
@@ -430,7 +419,7 @@ ProcessAction:
             result = ProcessCombatMsg(message);
         }
     }
-    if (giNextAction != 0)
+    if (giNextAction != ACTION_NONE)
         result = ProcessNextAction(message);
     return result;
 }
@@ -884,10 +873,10 @@ i32 combatManager::ProcessCombatMsg(tag_message& message) {
                     case IDX(WINDOW_CLICK):
                         switch (message.payload.widget.id) {
                             case IDX(CONTROL_ATTACK):
-                                giNextAction = IDX(COMBAT_MESSAGE_COMMAND_ATTACK);
+                                giNextAction = ACTION_DEFEND;
                                 break;
                             case IDX(CONTROL_WAIT):
-                                giNextAction = COMBAT_AI_ACTION_WAIT;
+                                giNextAction = ACTION_WAIT;
                                 break;
                             case IDX(CONTROL_DISABLE_SELECTION):
                                 m_gridSelectionDisabled = 1;
@@ -1010,7 +999,7 @@ i32 combatManager::ProcessCombatMsg(tag_message& message) {
                     }
                     break;
                 case IDX(KEY_WAIT):
-                    giNextAction = COMBAT_AI_ACTION_WAIT;
+                    giNextAction = ACTION_WAIT;
                     break;
                 case IDX(KEY_MOUSE_COORDS): {
                     i32 currentMouseX_18;
@@ -1248,7 +1237,7 @@ CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
                 } else if (targetSide != -1) {
                     if (m_currentArmySide != targetSide || m_currentArmyIndex != targetIndex) {
                         showSmallView = 1;
-                        if (gbProcessingCombatAction == 0 && giNextAction == 0) {
+                        if (gbProcessingCombatAction == 0 && giNextAction == ACTION_NONE) {
                             m_smallViewSide[1] = targetSide;
                             m_smallViewArmyIndex[1] = targetIndex;
                             DrawSmallView(1, 1);
@@ -1382,7 +1371,7 @@ void combatManager::DoCommand(CombatMessageCommand command) {
         case COMBAT_MESSAGE_COMMAND_FLY:
         case COMBAT_MESSAGE_COMMAND_SHOOT:
         case COMBAT_MESSAGE_COMMAND_SHOOT_THROUGH_WALL:
-            giNextAction = COMBAT_AI_ACTION_MOVE;
+            giNextAction = ACTION_MOVE;
             giNextActionGridIndex = m_selectedHex;
             giNextActionExtra = -1;
             break;
@@ -1390,10 +1379,10 @@ void combatManager::DoCommand(CombatMessageCommand command) {
             giNextActionGridIndex = m_selectedHex;
             if (m_playerId[m_currentSide] == -1 || gbHumanPlayer[m_playerId[m_currentSide]] == 0
                 || m_gridSelectionDisabled != 0) {
-                giNextAction = COMBAT_AI_ACTION_MOVE;
+                giNextAction = ACTION_MOVE;
                 giNextActionExtra = -1;
             } else {
-                giNextAction = COMBAT_AI_ACTION_ATTACK;
+                giNextAction = ACTION_ATTACK;
                 giNextActionExtra = m_directionTargetHex;
             }
             break;
@@ -1453,7 +1442,7 @@ void combatManager::DoCommand(CombatMessageCommand command) {
                 0
             );
             if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE)
-                giNextAction = COMBAT_AI_ACTION_RETREAT;
+                giNextAction = ACTION_RETREAT;
             ResetMouse();
             break;
         case COMBAT_MESSAGE_COMMAND_SURRENDER:
@@ -1473,7 +1462,7 @@ void combatManager::DoCommand(CombatMessageCommand command) {
                         0
                     );
                 } else {
-                    giNextAction = COMBAT_AI_ACTION_SURRENDER;
+                    giNextAction = ACTION_SURRENDER;
                     giNextActionExtra = giSurrenderCost;
                 }
             }
@@ -2507,7 +2496,7 @@ void combatManager::CheckGetAIMove(void) {
     }
     retreat = AICheckRetreat();
     if (retreat != 0)
-        giNextAction = IDX(ACTION_RETREAT);
+        giNextAction = ACTION_RETREAT;
     else
         DoCompAI(m_currentSide);
 }
@@ -2580,10 +2569,10 @@ i32 combatManager::ProcessNextAction(struct tag_message& message) {
         m_smallViewSide[COMBAT_ATTACKER_SIDE] = m_smallViewSide[COMBAT_DEFENDER_SIDE];
         redraw = 1;
     }
-    if (giNextAction != IDX(ACTION_NONE)) {
+    if (giNextAction != ACTION_NONE) {
         LogInt(
             "Process Act",
-            giNextAction,
+            IDX(giNextAction),
             giNextActionGridIndex,
             giNextActionGridIndex2,
             giNextActionExtra,
@@ -2604,7 +2593,7 @@ i32 combatManager::ProcessNextAction(struct tag_message& message) {
         && m_playerId[COMBAT_DEFENDER_SIDE] >= 0
         && gbHumanPlayer[m_playerId[COMBAT_DEFENDER_SIDE]] != 0
         && gbHumanPlayer[m_playerId[COMBAT_ATTACKER_SIDE]] != 0) {
-        actionData[IDX(ACTION_DATA_ACTION)] = giNextAction;
+        actionData[IDX(ACTION_DATA_ACTION)] = IDX(giNextAction);
         actionData[IDX(ACTION_DATA_EXTRA)] = giNextActionExtra;
         actionData[IDX(ACTION_DATA_GRID)] = giNextActionGridIndex;
         actionData[IDX(ACTION_DATA_SECOND_GRID)] = giNextActionGridIndex2;
@@ -2636,9 +2625,9 @@ i32 combatManager::ProcessNextAction(struct tag_message& message) {
     advanceArmy = 0;
     if (CheckWin(&message) == 0) {
         switch (giNextAction) {
-            case IDX(ACTION_NONE):
+            case ACTION_NONE:
                 break;
-            case IDX(ACTION_CAST_SPELL):
+            case ACTION_CAST_SPELL:
                 ResetCyclingCreatures();
                 CastSpell(
                     SpellType(giNextActionExtra),
@@ -2650,7 +2639,7 @@ i32 combatManager::ProcessNextAction(struct tag_message& message) {
                     advanceArmy = 1;
                 ResetCycleTimers();
                 break;
-            case IDX(ACTION_MOVE):
+            case ACTION_MOVE:
                 ResetCyclingCreatures();
                 currentArmy->MoveAttack(giNextActionGridIndex, 0);
                 currentArmy->m_monster.flags.abilityFlags |= MONSTER_ABILITY_FLAG_BAD_MORALE;
@@ -2662,7 +2651,7 @@ i32 combatManager::ProcessNextAction(struct tag_message& message) {
                 advanceArmy = 1;
                 ResetCycleTimers();
                 break;
-            case IDX(ACTION_ATTACK):
+            case ACTION_ATTACK:
                 ResetCyclingCreatures();
                 if (giNextActionExtra != -1 && currentArmy->m_hex != giNextActionExtra) {
                     currentArmy->MoveAttack(giNextActionExtra, 1);
@@ -2677,12 +2666,12 @@ i32 combatManager::ProcessNextAction(struct tag_message& message) {
                 advanceArmy = 1;
                 ResetCycleTimers();
                 break;
-            case IDX(ACTION_RETREAT):
+            case ACTION_RETREAT:
                 m_sideRetreated[m_currentSide] = 1;
                 gbRetreatWin = true;
                 ResetCycleTimers();
                 break;
-            case IDX(ACTION_SURRENDER):
+            case ACTION_SURRENDER:
                 gbCombatSurrender = true;
                 gbRetreatWin = true;
                 m_sideDefeated[m_currentSide] = 1;
@@ -2692,16 +2681,16 @@ i32 combatManager::ProcessNextAction(struct tag_message& message) {
                     .m_resources[IDX(RES_GOLD)] += giNextActionExtra;
                 ResetCycleTimers();
                 break;
-            case IDX(ACTION_WAIT):
+            case ACTION_WAIT:
                 currentArmy->m_monster.flags.abilityFlags |= MONSTER_ABILITY_FLAG_BAD_MORALE;
                 advanceArmy = 1;
                 break;
-            case IDX(ACTION_DEFEND):
+            case ACTION_DEFEND:
                 currentArmy->m_monster.flags.abilityFlags |= MONSTER_ABILITY_FLAG_DEFERRED_TURN;
                 advanceArmy = 1;
                 break;
         }
-        giNextAction = IDX(ACTION_NONE);
+        giNextAction = ACTION_NONE;
         if (CheckWin(&message) == 0) {
             TestRaiseDoor();
             if (advanceArmy != 0 && GetNextArmy(1) == 0) {
@@ -3223,5 +3212,5 @@ DATA(0x005250e8) i32 giNextActionGridIndex;
 DATA(0x005250ec) i32 giSurrenderCost;
 DATA(0x005250f0) i32 giSkeletonsCreated;
 DATA(0x005250f8) i8 iTransferArtifacts[COMBAT_TRANSFER_ARTIFACT_COUNT];
-DATA(0x00525108) i32 giNextAction;
+DATA(0x00525108) H2_ENUM_STORAGE(CombatAction, i32) giNextAction;
 DATA(0x0052510c) i32 giNextActionGridIndex2;

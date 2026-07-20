@@ -38,7 +38,7 @@ BOOL WINAPI dpEnumSession(DPSESSIONDESC*, void*, LPDWORD, DWORD);
 i16 dpnet_init(void);
 void CleanupDPVars(void);
 void dpnet_term(void);
-void dpSendMessage(i32, u8, u16, void*);
+void dpSendMessage(i32, H2_ENUM_PARAM(NetworkPacketType, u8), u16, void*);
 i32 dpnet_snd(i32, i32, void*);
 i16 dpnet_rcv(i16, u16, void*);
 u8 dpnet_stat(i16, u16);
