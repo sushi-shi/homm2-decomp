@@ -275,6 +275,7 @@ H2_ENUM_BEGIN(AdventureRemoteWaitConstant)
 H2_ENUM_END(AdventureRemoteWaitConstant)
 
 H2_ENUM_BEGIN(AdventureEnvironmentSoundConstant)
+    ENVIRONMENT_ORIGIN_NONE          = -1,
     ENVIRONMENT_SOUND_LOG_UNUSED     = -999,
     ENVIRONMENT_SOUND_DEFAULT_VOLUME = 127,
     ENVIRONMENT_SOUND_MAX_DISTANCE   = 5,
@@ -1507,7 +1508,7 @@ class mapCell* advManager::DoAdvCommand(void) {
             }
             gpMouseManager->SetPointer(0);
             if (gbLowMemory) {
-                SetEnvironmentOrigin(-1, -1, 1);
+                SetEnvironmentOrigin(ENVIRONMENT_ORIGIN_NONE, ENVIRONMENT_ORIGIN_NONE, 1);
             }
             TrimLoopingSounds(0);
             HeroView(gpCurPlayer->CurrentHero(), 0, 0);
@@ -1962,7 +1963,9 @@ i32 advManager::Main(struct tag_message& message) {
                         break;
                     case INPUT_SCAN_I:
                         if (gbInCampaign) {
-                            SetEnvironmentOrigin(-1, -1, 1);
+                            SetEnvironmentOrigin(
+                                ENVIRONMENT_ORIGIN_NONE, ENVIRONMENT_ORIGIN_NONE, 1
+                            );
                             gpGame->ShowCampaignInfo(1, 0);
                             SetEnvironmentOrigin(
                                 m_mapOriginX + VIEW_CENTER_OFFSET,
@@ -1974,7 +1977,9 @@ i32 advManager::Main(struct tag_message& message) {
                                 giTerrainToMusicTrack[IDX(m_currentTerrain)]
                             );
                         } else if (xIsPlayingExpansionCampaign) {
-                            SetEnvironmentOrigin(-1, -1, 1);
+                            SetEnvironmentOrigin(
+                                ENVIRONMENT_ORIGIN_NONE, ENVIRONMENT_ORIGIN_NONE, 1
+                            );
                             xCampaign.ShowInfo(1, 0);
                             SetEnvironmentOrigin(
                                 m_mapOriginX + VIEW_CENTER_OFFSET,
@@ -2508,7 +2513,7 @@ i32 advManager::ProcessDeSelect(
             break;
         case PANEL_OVERVIEW: {
             if (gbLowMemory) {
-                SetEnvironmentOrigin(-1, -1, 1);
+                SetEnvironmentOrigin(ENVIRONMENT_ORIGIN_NONE, ENVIRONMENT_ORIGIN_NONE, 1);
             }
             TrimLoopingSounds(0);
             gpGame->Overview();
@@ -2516,7 +2521,7 @@ i32 advManager::ProcessDeSelect(
             if (giOverviewReturnAction == OVERVIEW_RETURN_HERO) {
                 gpMouseManager->SetPointer(0);
                 if (gbLowMemory) {
-                    SetEnvironmentOrigin(-1, -1, 1);
+                    SetEnvironmentOrigin(ENVIRONMENT_ORIGIN_NONE, ENVIRONMENT_ORIGIN_NONE, 1);
                 }
                 TrimLoopingSounds(0);
                 HeroView(
@@ -2634,7 +2639,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
         x = m_mapOriginX + VIEW_CENTER_OFFSET;
         y = m_mapOriginY + VIEW_CENTER_OFFSET;
     }
-    currentCell = GetCell(x, IDX(y));
+    currentCell = GetCell(x, y);
     if (!((currentCell->m_objectIndex == MAPCELL_SPRITE_NONE
            || currentCell->m_objectTileset == TILESET_DUMMY)
           && currentCell->m_overlayIndex == MAPCELL_SPRITE_NONE)) {
@@ -2666,7 +2671,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
     CompleteDraw(0);
     UpdateScreen(0, 0);
 
-    if (gpGame->m_ultimateArtifactX == x && gpGame->m_ultimateArtifactY == IDX(y)
+    if (gpGame->m_ultimateArtifactX == x && gpGame->m_ultimateArtifactY == y
         && gpGame->m_ultimateArtifactId != ARTIFACT_NONE) {
         if (searchingHeroState->NumArtifacts() >= ARTIFACT_CAPACITY) {
             if (gbHumanPlayer[giCurPlayer]) {
@@ -7963,7 +7968,7 @@ void advManager::SetEnvironmentOrigin(i32 originX, i32 originY, i32 stopSounds) 
         }
     }
 
-    if (originX == IDX(ADVMGR_ENVIRONMENT_SOUND_NONE)) {
+    if (originX == ENVIRONMENT_ORIGIN_NONE) {
         return;
     }
 
@@ -8318,7 +8323,7 @@ void advManager::TeleportTo(
             UPDATE_VIEWPORT_ORIGIN,
             UPDATE_VIEWPORT_SIZE,
             UPDATE_VIEWPORT_SIZE,
-            IDX(ADVMGR_ENVIRONMENT_SOUND_NONE),
+            -1,
             NULL,
             NULL
         );
@@ -9793,7 +9798,7 @@ void advManager::AdvPanel(void) {
         switch (gpWindowManager->m_dialogResult) {
             case PANEL_SCENARIO_INFO:
                 if (gbInCampaign) {
-                    SetEnvironmentOrigin(-1, -1, 1);
+                    SetEnvironmentOrigin(ENVIRONMENT_ORIGIN_NONE, ENVIRONMENT_ORIGIN_NONE, 1);
                     gpGame->ShowCampaignInfo(1, 0);
                     SetEnvironmentOrigin(
                         m_mapOriginX + VIEW_CENTER_OFFSET,
@@ -9805,7 +9810,7 @@ void advManager::AdvPanel(void) {
                         giTerrainToMusicTrack[IDX(m_currentTerrain)]
                     );
                 } else if (xIsPlayingExpansionCampaign) {
-                    SetEnvironmentOrigin(-1, -1, 1);
+                    SetEnvironmentOrigin(ENVIRONMENT_ORIGIN_NONE, ENVIRONMENT_ORIGIN_NONE, 1);
                     xCampaign.ShowInfo(1, 0);
                     SetEnvironmentOrigin(
                         m_mapOriginX + VIEW_CENTER_OFFSET,
