@@ -76,17 +76,17 @@ H2_ENUM_BEGIN(CheckEndGameConstants)
     END_GAME_ULTIMATE_ARTIFACT       = 0,
     END_GAME_PLAYER_DIALOG_ICON      = 9,
     END_GAME_REMOTE_DIALOG_TIME      = 5000,
-    END_GAME_CAMPAIGN_SAVE_NAME_SIZE = 20
+    END_GAME_CAMPAIGN_SAVE_NAME_SIZE = 20,
+    END_GAME_SCENARIO_OFFSET         = 1
 H2_ENUM_END(CheckEndGameConstants)
 
-H2_ENUM_CLASS_BEGIN(CheckEndGameCampaignConstants)
-    END_GAME_SCENARIO_OFFSET         = 1,
+H2_ENUM_BEGIN(CheckEndGameCampaignScenario)
     END_GAME_DWARF_SCENARIO          = 3,
     END_GAME_SIDE_SCENARIO           = 7,
     END_GAME_ROLAND_CAPTURE_SCENARIO = 9,
     END_GAME_FIRST_NO_SAVE_SCENARIO  = 10,
     END_GAME_LAST_SCENARIO           = 11
-H2_ENUM_CLASS_END(CheckEndGameCampaignConstants)
+H2_ENUM_END(CheckEndGameCampaignScenario)
 
 H2_ENUM_CLASS_BEGIN(MoraleInfoTextIndex)
     MORALE_INFO_GOOD          = 0,
@@ -2201,16 +2201,16 @@ void CheckEndGame(
     if ((gpGame->m_mapHeader.victoryCondition != MAP_VICTORY_DEFEAT_ALL
          && !gpGame->m_mapHeader.allowNormalVictory)
         || (gbInCampaign && gpGame->m_campaignType == CAMPAIGN_ARCHIBALD
-            && gpGame->m_campaignScenario + IDX(END_GAME_SCENARIO_OFFSET)
-                   == IDX(END_GAME_SIDE_SCENARIO))) {
+            && gpGame->m_campaignScenario + END_GAME_SCENARIO_OFFSET
+                   == END_GAME_SIDE_SCENARIO)) {
         allowNormalVictory = 0;
     }
 
     if (gpGame->m_mapHeader.victoryCondition == MAP_VICTORY_DEFEAT_SIDE
         && gpGame->m_mapHeader.victoryConditionValue != CAMPAIGN_SWITCH_VICTORY_VALUE
         && (!gbInCampaign || gpGame->m_campaignType != CAMPAIGN_ARCHIBALD
-            || gpGame->m_campaignScenario + IDX(END_GAME_SCENARIO_OFFSET)
-                   != IDX(END_GAME_SIDE_SCENARIO))) {
+            || gpGame->m_campaignScenario + END_GAME_SCENARIO_OFFSET
+                   != END_GAME_SIDE_SCENARIO)) {
         sideBelow_i = 0;
         sideAbove = 0;
         for (player = 0; player < gpGame->m_playerCount; player++) {
@@ -2444,8 +2444,8 @@ void CheckEndGame(
     }
 
     if (gbInCampaign && gpGame->m_campaignType == CAMPAIGN_ROLAND
-        && gpGame->m_campaignScenario + IDX(END_GAME_SCENARIO_OFFSET)
-               == IDX(END_GAME_DWARF_SCENARIO)) {
+        && gpGame->m_campaignScenario + END_GAME_SCENARIO_OFFSET
+               == END_GAME_DWARF_SCENARIO) {
         hasDwarfTown = 0;
         for (player = 0; player < gpGame->m_players[0].m_townCount; player++) {
             if (gpGame->GetTown(gpGame->m_players[0].m_townIds[player])->m_type
@@ -2468,8 +2468,7 @@ void CheckEndGame(
     }
 
     if (gbInCampaign && gpGame->m_campaignType == CAMPAIGN_ARCHIBALD
-        && gpGame->m_campaignScenario + IDX(END_GAME_SCENARIO_OFFSET)
-               == IDX(END_GAME_SIDE_SCENARIO)
+        && gpGame->m_campaignScenario + END_GAME_SCENARIO_OFFSET == END_GAME_SIDE_SCENARIO
         && dragonCityCaptured) {
         winFlag = 1;
         if (!showedDialog) {
@@ -2480,8 +2479,8 @@ void CheckEndGame(
     }
 
     if (gbInCampaign && gpGame->m_campaignType == CAMPAIGN_ROLAND
-        && gpGame->m_campaignScenario + IDX(END_GAME_SCENARIO_OFFSET)
-               == IDX(END_GAME_ROLAND_CAPTURE_SCENARIO)) {
+        && gpGame->m_campaignScenario + END_GAME_SCENARIO_OFFSET
+               == END_GAME_ROLAND_CAPTURE_SCENARIO) {
         hasRoland_j = 0;
         for (player = 0; player < GAME_HERO_COUNT; player++) {
             if (gpGame->m_heroRecs[player].m_portrait == CAMPAIGN_HERO_ROLAND
@@ -2501,8 +2500,8 @@ void CheckEndGame(
     }
 
     if (gbInCampaign && gpGame->m_campaignType == CAMPAIGN_ROLAND
-        && gpGame->m_campaignScenario + IDX(END_GAME_SCENARIO_OFFSET)
-               == IDX(END_GAME_ROLAND_CAPTURE_SCENARIO)) {
+        && gpGame->m_campaignScenario + END_GAME_SCENARIO_OFFSET
+               == END_GAME_ROLAND_CAPTURE_SCENARIO) {
         enemyRemaining = 0;
         for (player = 0; player < gpGame->m_playerCount; player++) {
             if (!gpGame->m_playerDead[player]
@@ -2583,13 +2582,13 @@ void CheckEndGame(
 
         carryoverHeroId = END_GAME_NO_PLAYER;
         if (gpGame->m_campaignType == CAMPAIGN_ROLAND
-            && gpGame->m_campaignScenario + IDX(END_GAME_SCENARIO_OFFSET)
-                   == IDX(END_GAME_SIDE_SCENARIO)) {
+            && gpGame->m_campaignScenario + END_GAME_SCENARIO_OFFSET
+                   == END_GAME_SIDE_SCENARIO) {
             carryoverHeroId = CAMPAIGN_SWITCH_VICTORY_VALUE;
         }
         if (gpGame->m_campaignType == CAMPAIGN_ARCHIBALD
-            && gpGame->m_campaignScenario + IDX(END_GAME_SCENARIO_OFFSET)
-                   == IDX(END_GAME_FIRST_NO_SAVE_SCENARIO)) {
+            && gpGame->m_campaignScenario + END_GAME_SCENARIO_OFFSET
+                   == END_GAME_FIRST_NO_SAVE_SCENARIO) {
             carryoverHeroId = CAMPAIGN_SWITCH_VICTORY_VALUE;
         }
 
@@ -2623,10 +2622,9 @@ void CheckEndGame(
             }
         }
 
-        if (gpGame->m_campaignScenario + IDX(END_GAME_SCENARIO_OFFSET)
-                != IDX(END_GAME_LAST_SCENARIO)
-            && (gpGame->m_campaignScenario + IDX(END_GAME_SCENARIO_OFFSET)
-                    != IDX(END_GAME_FIRST_NO_SAVE_SCENARIO)
+        if (gpGame->m_campaignScenario + END_GAME_SCENARIO_OFFSET != END_GAME_LAST_SCENARIO
+            && (gpGame->m_campaignScenario + END_GAME_SCENARIO_OFFSET
+                    != END_GAME_FIRST_NO_SAVE_SCENARIO
                 || gpGame->m_campaignType != CAMPAIGN_ROLAND)) {
             sprintf(
                 campaignSaveName,
