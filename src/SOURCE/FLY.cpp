@@ -13,6 +13,8 @@
 #include <SOURCE/PATH.h>
 #include <SOURCE/X_GLOBAL.h>
 
+#define ARMY_VAMPIRE_FLIGHT_DURATION_SCALE 1.3
+
 namespace {
 
 H2_ENUM_BEGIN(ArmyFlightConstant)
