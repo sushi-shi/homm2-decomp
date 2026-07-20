@@ -7,13 +7,18 @@
 class icon;
 struct tag_message;
 
+H2_ENUM_CLASS_BEGIN_T(ButtonSelectMode, i16)
+    BUTTON_SELECT_STANDARD      = 0,
+    BUTTON_SELECT_DIALOG_RESULT = 1
+H2_ENUM_CLASS_END_T(ButtonSelectMode, i16)
+
 #pragma pack(push, 1)
 class button : public widget {
 public:
     icon* m_icon;
     i16 m_normalFrame;
     i16 m_pressedFrame;
-    i16 m_selectMode;
+    H2_ENUM_STORAGE(ButtonSelectMode, i16) m_selectMode;
     i16 m_hotkey;
     u32l m_iconId;
     button(void);
@@ -25,7 +30,7 @@ public:
         u32l iconId,
         i16 normalFrame,
         i16 pressedFrame,
-        i16 selectMode,
+        H2_ENUM_PARAM(ButtonSelectMode, i16) selectMode,
         i16 hotkey,
         i16 id,
         i16 kind
@@ -38,7 +43,7 @@ public:
         char* iconName,
         i16 normalFrame,
         i16 pressedFrame,
-        i16 selectMode,
+        H2_ENUM_PARAM(ButtonSelectMode, i16) selectMode,
         i16 hotkey,
         i16 id,
         i16 kind
