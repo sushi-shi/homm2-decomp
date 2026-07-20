@@ -301,11 +301,12 @@ void advManager::DrawCursor(void) {
             bMoveSoundMade = 1;
             if (EveryOther == 0) {
                 hNewWalkSample = gpSoundManager->MemorySample(
-                    m_cursorSamples[giGroundToTerrain[GetCell(
-                                                          m_mapOriginX + CURSOR_MAP_DRAW_OFFSET,
-                                                          m_mapOriginY + CURSOR_MAP_DRAW_OFFSET
-                    )
-                                                          ->m_terrainImageIndex]]
+                    m_cursorSamples[IDX(giGroundToTerrain
+                                            [GetCell(
+                                                 m_mapOriginX + CURSOR_MAP_DRAW_OFFSET,
+                                                 m_mapOriginY + CURSOR_MAP_DRAW_OFFSET
+                                             )
+                                                 ->m_terrainImageIndex])]
                 );
             }
         }
@@ -571,7 +572,8 @@ mapCell* advManager::MoveHero(
         gbMoveShown = true;
 
     currentCell_f = GetCell(movingHero_f->m_x, movingHero_f->m_y);
-    i32 currentTerrain_b = giGroundToTerrain[currentCell_f->m_terrainImageIndex];
+    H2_ENUM_STORAGE(TerrainType, i32) currentTerrain_b =
+        giGroundToTerrain[currentCell_f->m_terrainImageIndex];
     destinationCell_j = GetCell(movingHero_f->m_x + directionX_b, movingHero_f->m_y + directionY_b);
     terrainCost_e = CalcTerrainCost(
         currentTerrain_b,
@@ -816,7 +818,7 @@ mapCell* advManager::MoveHero(
     if (giGroundToTerrain[step_a] != m_currentTerrain) {
         m_currentTerrain = giGroundToTerrain[step_a];
         if (gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI)
-            gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[m_currentTerrain]);
+            gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[IDX(m_currentTerrain)]);
     }
     m_updateMinY = 0;
     m_updateMinX = m_updateMinY;
@@ -1068,19 +1070,19 @@ i32 advManager::ValidMove(H2_ENUM_PARAM(MapDirection, i32) direction, i32 eventM
     if (destinationCell_g->m_flags & CURSOR_CELL_BLOCKED_FLAG)
         return 0;
 
-    if (giGroundToTerrain[destinationCell_g->m_terrainImageIndex] == CURSOR_WATER_TERRAIN) {
+    if (giGroundToTerrain[destinationCell_g->m_terrainImageIndex] == TERRAIN_WATER) {
         if (m_cursorType != HERO_TYPE_BOAT
             && destinationCell_g->m_triggerType != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_BOAT)
             && destinationCell_g->m_triggerType != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SHIPWRECK))
             return 0;
-        if (giGroundToTerrain[currentCell_c->m_terrainImageIndex] == CURSOR_WATER_TERRAIN
+        if (giGroundToTerrain[currentCell_c->m_terrainImageIndex] == TERRAIN_WATER
             && directionX_j != 0 && directionY_h != 0) {
             if (giGroundToTerrain[m_mapData->GetCell(centerX_p + directionX_j, centerY_n)
                                       ->m_terrainImageIndex]
-                    != CURSOR_WATER_TERRAIN
+                    != TERRAIN_WATER
                 || giGroundToTerrain[m_mapData->GetCell(centerX_p, centerY_n + (directionY_h | 0))
                                          ->m_terrainImageIndex]
-                       != CURSOR_WATER_TERRAIN)
+                       != TERRAIN_WATER)
                 return 0;
         }
     } else if (m_cursorType == HERO_TYPE_BOAT

@@ -21,8 +21,6 @@ H2_ENUM_BEGIN(SearchConstant)
     SEARCH_MAX_COST                   = 999999,
     SEARCH_TARGET_COST_WINDOW         = 75,
     SEARCH_MONSTER_RESEED_WINDOW      = 300,
-    SEARCH_TERRAIN_WATER              = 0,
-    SEARCH_TERRAIN_ROAD               = 9,
     SEARCH_DIAGONAL_COST_MASK         = 1,
     SEARCH_CELL_UNREACHABLE           = 0x08,
     SEARCH_MAP_BLOCKED                = 0x80,

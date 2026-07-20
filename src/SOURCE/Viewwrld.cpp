@@ -331,8 +331,8 @@ void advManager::VWCompleteDraw(void) {
                         (mapY3 * GROUND_RANDOM_X_MULTIPLIER + mapX7) & GROUND_RANDOM_FRAME_MASK;
                 else
                     groundFrame29 += GROUND_FRAME_OFFSET;
-                groundFrame29 +=
-                    giGroundToTerrain[cell0->m_terrainImageIndex] * WORLD_TERRAIN_FRAME_STRIDE;
+                groundFrame29 += IDX(giGroundToTerrain[cell0->m_terrainImageIndex])
+                                 * WORLD_TERRAIN_FRAME_STRIDE;
                 if ((giCurPlayerBit & mapExtra[MAP_WIDTH * mapY3 + mapX7]) || iVWDrawAllTerrains) {
                     if (flipped5 == ICON_DRAW_FLIPPED)
                         townIconHighlight1 = IDX(giViewWorldScale) - 1;
@@ -720,7 +720,9 @@ i32 ViewWorldDialogHandler(struct tag_message& message) {
     tag_message currentMessage7;
 
     if (!gpSoundManager->MusicPlaying())
-        gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[gpAdvManager->m_currentTerrain]);
+        gpSoundManager->SwitchAmbientMusic(
+            giTerrainToMusicTrack[IDX(gpAdvManager->m_currentTerrain)]
+        );
 
     if (message.type == VIEW_WORLD_MESSAGE) {
         switch (message.payload.widget.command) {
