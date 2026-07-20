@@ -26,11 +26,8 @@
 #include <BASE/mouseManager.h>
 
 H2_ENUM_BEGIN(AIResourceValue)
-    RV_UNSET        = -32001,
-    NEARBY_RADIUS   = 10,
-    MAP_SIZE_SMALL  = 36,
-    MAP_SIZE_LARGE  = 108,
-    MAP_SIZE_XLARGE = 144
+    RV_UNSET      = -32001,
+    NEARBY_RADIUS = 10
 H2_ENUM_END(AIResourceValue)
 
 H2_ENUM_CLASS_BEGIN(AIArtifactEventMode)
@@ -1502,9 +1499,9 @@ firstWeekDone:
         giMaxHeroesForThisPlayer++;
     if (ownedTownCount19 >= 9)
         giMaxHeroesForThisPlayer++;
-    if (gpGame->m_mapHeader.width == MAP_SIZE_SMALL)
+    if (gpGame->m_mapHeader.width == MAP_DIMENSION_SMALL)
         giMaxHeroesForThisPlayer--;
-    if (gpGame->m_mapHeader.width >= MAP_SIZE_LARGE)
+    if (gpGame->m_mapHeader.width >= MAP_DIMENSION_LARGE)
         giMaxHeroesForThisPlayer++;
 
     earlyTurn21 = 16;
@@ -1722,11 +1719,11 @@ i32 philAI::DetermineTargetPosition(i32& targetX, i32& targetY, i32 mobility, i3
             mobility = static_cast<i32>(mobility * 1.35);
         if (mapTerrain == IDX(TERRAIN_WASTELAND))
             mobility = static_cast<i32>(mobility * 1.25);
-    } else if (gpGame->m_mapHeader.width == MAP_SIZE_SMALL) {
+    } else if (gpGame->m_mapHeader.width == MAP_DIMENSION_SMALL) {
         mobility = static_cast<i32>(mobility * 0.9);
-    } else if (gpGame->m_mapHeader.width == MAP_SIZE_LARGE) {
+    } else if (gpGame->m_mapHeader.width == MAP_DIMENSION_LARGE) {
         mobility = static_cast<i32>(mobility * 1.05);
-    } else if (gpGame->m_mapHeader.width == MAP_SIZE_XLARGE) {
+    } else if (gpGame->m_mapHeader.width == MAP_DIMENSION_XLARGE) {
         mobility = static_cast<i32>(mobility * 1.1);
     }
     if (gpCurPlayer->m_aiDifficulty == PLAYER_PERSONALITY_EXPLORER)
