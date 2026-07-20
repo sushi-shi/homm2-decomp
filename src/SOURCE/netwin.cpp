@@ -344,7 +344,7 @@ nb_sess(H2_ENUM_PARAM(NetbiosSessionOperation, i16) operation, ...) {
 
 VA(0x004a7737, 0x21)
 extern "C" char __fastcall nb_stat(i16 session) {
-    return static_cast<char>(IDX(gNetStatus[session]));
+    return static_cast<char>(gNetStatus[session]);
 }
 
 VA(0x004a7758, 0xdd2)

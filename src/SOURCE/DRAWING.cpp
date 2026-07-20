@@ -1162,7 +1162,7 @@ void combatManager::DrawFrame(
 
                 if (m_inCastleCombat != 0 && side5 == 0) {
                     hexIndex6 = static_cast<CombatCastleHex>(
-                        IDX(row) * COMBAT_GRID_ROW_LENGTH + column1
+                        static_cast<i32>(row) * COMBAT_GRID_ROW_LENGTH + column1
                     );
                     wallFrame1 = 0;
                     wallX7 = 0;
@@ -1257,11 +1257,11 @@ void combatManager::DrawFrame(
 
                 if (skipSpecialOccupants6 == 0
                     || (static_cast<CombatCastleHex>(
-                            IDX(row) * COMBAT_GRID_ROW_LENGTH + column1
+                            static_cast<i32>(row) * COMBAT_GRID_ROW_LENGTH + column1
                         )
                             != COMBAT_CASTLE_SPECIAL_HEX_FIRST
                         && static_cast<CombatCastleHex>(
-                               IDX(row) * COMBAT_GRID_ROW_LENGTH + column1
+                               static_cast<i32>(row) * COMBAT_GRID_ROW_LENGTH + column1
                            )
                                != COMBAT_CASTLE_SPECIAL_HEX_SECOND)) {
                     m_hexCells[IDX(row) * COMBAT_GRID_ROW_LENGTH + column1].DrawOccupant(

@@ -62,6 +62,12 @@ public:
 
     constexpr operator Enum() const { return static_cast<Enum>(m_value); }
 
+    template <typename Integer>
+        requires(__is_integral(Integer))
+    explicit constexpr operator Integer() const {
+        return static_cast<Integer>(static_cast<Enum>(m_value));
+    }
+
     H2EnumStorage& operator=(Enum value) {
         m_value = static_cast<Storage>(value);
         return *this;
@@ -104,6 +110,12 @@ public:
     constexpr H2SteppedEnumStorage(Enum value) : m_value(static_cast<Storage>(value)) {}
 
     constexpr operator Enum() const { return static_cast<Enum>(m_value); }
+
+    template <typename Integer>
+        requires(__is_integral(Integer))
+    explicit constexpr operator Integer() const {
+        return static_cast<Integer>(static_cast<Enum>(m_value));
+    }
 
     H2SteppedEnumStorage& operator=(Enum value) {
         m_value = static_cast<Storage>(value);

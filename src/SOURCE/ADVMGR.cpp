@@ -7303,7 +7303,11 @@ void advManager::CastSpell(SpellType spell) {
         case SPELL_VIEW_TOWNS:
         case SPELL_VIEW_HEROES:
         case SPELL_VIEW_ALL:
-            ViewWorld(ViewWorldMode(IDX(spell)), spell == SPELL_VIEW_ALL, spell == SPELL_VIEW_ALL);
+            ViewWorld(
+                static_cast<ViewWorldMode>(static_cast<i32>(spell)),
+                spell == SPELL_VIEW_ALL,
+                spell == SPELL_VIEW_ALL
+            );
             break;
         case SPELL_IDENTIFY_HERO:
             m_identifyHeroActive = 1;

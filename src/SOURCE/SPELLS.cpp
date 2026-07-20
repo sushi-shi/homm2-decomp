@@ -159,7 +159,7 @@ i32 combatManager::HasValidSpellTarget(SpellType spell) {
 
 VA(0x00420546, 0x44a)
 i32 combatManager::ViewSpells(i32) {
-    CreatureType elementalType;
+    SummonedElementalType elementalType;
 
     m_selectedSpell =
         gpGame->ViewSpells(m_heroes[giCurGeneral], SPELL_TYPE_COMBAT, CombatSpecialHandler, 0);
@@ -184,19 +184,19 @@ i32 combatManager::ViewSpells(i32) {
                     goto set_action;
 
             case SPELL_SUMMON_EARTH_ELEMENTAL:
-                elementalType = CREATURE_EARTH_ELEMENTAL;
+                elementalType = SUMMONED_ELEMENTAL_EARTH;
                 goto check_elemental;
             case SPELL_SUMMON_AIR_ELEMENTAL:
-                elementalType = CREATURE_AIR_ELEMENTAL;
+                elementalType = SUMMONED_ELEMENTAL_AIR;
                 goto check_elemental;
             case SPELL_SUMMON_FIRE_ELEMENTAL:
-                elementalType = CREATURE_FIRE_ELEMENTAL;
+                elementalType = SUMMONED_ELEMENTAL_FIRE;
                 goto check_elemental;
             case SPELL_SUMMON_WATER_ELEMENTAL:
-                elementalType = CREATURE_WATER_ELEMENTAL;
+                elementalType = SUMMONED_ELEMENTAL_WATER;
                 goto check_elemental;
             check_elemental:
-                if (IDX(m_summonedCreatureType[m_currentSide]) != 0
+                if (m_summonedCreatureType[m_currentSide] != SUMMONED_ELEMENTAL_NONE
                     && m_summonedCreatureType[m_currentSide] != elementalType) {
                     NormalDialog(
                         "You may only summon one type of elemental per combat.",
@@ -1170,7 +1170,7 @@ void combatManager::CastSpell(
                 break;
             case SPELL_BLOOD_LUST:
                 ShowSpellMessage(castByCreature, spell, target_i);
-                BloodLustEffect(target_i, SPELL_BLOOD_LUST_EFFECT);
+                BloodLustEffect(target_i, MONSTER_ABILITY_FLAG_BLOOD_LUST);
                 target_i->SetSpellInfluence(
                     ARMY_SPELL_INFLUENCE_BLOODLUST,
                     SPELL_BLOOD_LUST_DURATION
@@ -1817,7 +1817,9 @@ void combatManager::TurnToStone(army* target) {
 }
 
 VA(0x00424f49, 0x192)
-void combatManager::BloodLustEffect(army* target, i32 effect) {
+void combatManager::BloodLustEffect(
+    army* target, H2_ENUM_PARAM(MonsterAbilityFlags, i32) effect
+) {
     ResetLimitCreature();
     ++m_limitCreatureCount[target->m_side][target->m_index];
     gpCombatManager->DrawFrame(0, 1, 0, 1, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
@@ -1828,7 +1830,7 @@ void combatManager::BloodLustEffect(army* target, i32 effect) {
         giMaxExtentY - giMinExtentY + 1
     );
     DrawFrame(0, 1, 0, 1, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
-    target->m_monster.flags.abilityFlags |= MonsterAbilityFlags(IDX(effect));
+    target->m_monster.flags.abilityFlags |= effect;
     gpCombatManager->DrawFrame(0, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
     gpWindowManager->FizzleForward(
         giMinExtentX,
@@ -1845,8 +1847,7 @@ void combatManager::BloodLustEffect(army* target, i32 effect) {
         giMaxExtentX - giMinExtentX + 1,
         giMaxExtentY - giMinExtentY + 1
     );
-    target->m_monster.flags.abilityFlags =
-        MonsterAbilityFlags(IDX(target->m_monster.flags.abilityFlags) - IDX(effect));
+    target->m_monster.flags.abilityFlags &= ~effect;
     gpCombatManager->DrawFrame(0, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
     gpWindowManager->FizzleForward(
         giMinExtentX,
@@ -3074,7 +3075,7 @@ mirror_found:
     );
     army* image =
         &m_armies[m_hexCells[mirrorHex].m_occupantSide][m_hexCells[mirrorHex].m_occupantIndex];
-    image->m_monster.flags.abilityFlags |= MonsterAbilityFlags(IDX(MIRROR_MONSTER_ABILITY));
+    image->m_monster.flags.abilityFlags |= MONSTER_ABILITY_FLAG_SUMMONED;
     i32 duration = m_spellPower[m_currentSide];
     if (m_heroes[m_currentSide]->HasArtifact(ARTIFACT_ENCHANTED_HOURGLASS))
         duration += SPELL_HOURGLASS_POWER_BONUS;
@@ -3146,7 +3147,7 @@ void combatManager::SummonElemental(
                                       + ((randomOffset_a | 0) + offset)
                                             % SUMMON_HEXES_PER_SIDE];
     }
-    m_summonedCreatureType[m_currentSide] = monsterType;
+    m_summonedCreatureType[m_currentSide] = static_cast<SummonedElementalType>(monsterType);
     AddArmy(
         m_currentSide,
         monsterType,
@@ -3157,7 +3158,7 @@ void combatManager::SummonElemental(
     );
     army* elementals =
         &m_armies[m_hexCells[summonHex].m_occupantSide][m_hexCells[summonHex].m_occupantIndex];
-    elementals->m_monster.flags.abilityFlags |= MonsterAbilityFlags(IDX(MIRROR_MONSTER_ABILITY));
+    elementals->m_monster.flags.abilityFlags |= MONSTER_ABILITY_FLAG_SUMMONED;
     spellPower = m_spellPower[m_currentSide];
     if (m_heroes[m_currentSide]->HasArtifact(ARTIFACT_ENCHANTED_HOURGLASS))
         spellPower += SPELL_HOURGLASS_POWER_BONUS;
@@ -3430,7 +3431,7 @@ void combatManager::Resurrect(
             );
             UpdateCombatArea();
             target_i->m_facing = static_cast<ArmyFacing>(
-                IDX(ARMY_FACING_RIGHT) - target_i->m_side
+                static_cast<i32>(ARMY_FACING_RIGHT) - target_i->m_side
             );
             if (target_i->m_animationSequence == ARMY_ANIMATION_DEATH) {
                 if (index_o >= RESURRECT_DEATH_REVERSE_FRAME) {
@@ -3450,7 +3451,7 @@ void combatManager::Resurrect(
         gpResourceManager->Dispose(resurrectIcon);
     }
     DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
-    target_i->m_monster.flags.abilityFlags &= ~MonsterAbilityFlags(IDX(RESURRECT_MONSTER_ABILITY));
+    target_i->m_monster.flags.abilityFlags &= ~MONSTER_ABILITY_FLAG_AI_EXCLUDED;
 }
 
 VA(0x004296de, 0xb9)

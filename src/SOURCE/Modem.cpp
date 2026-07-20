@@ -38,7 +38,7 @@ void ModemSetup(i32 mode) {
     outque.readPosition = 0;
     iBaudBits = MODEM_BAUD_CLOCK / IDX(gConfig.baudRate[gbDirectConnect]);
     com_init(
-        static_cast<u8>(IDX(gConfig.comPort[gbDirectConnect])),
+        static_cast<u8>(gConfig.comPort[gbDirectConnect]),
         IDX(COM_BAUD_19200),
         0
     );

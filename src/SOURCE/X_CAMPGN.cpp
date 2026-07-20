@@ -425,7 +425,7 @@ void ExpCampaign::InitMap(void) {
                     gpGame->GetHero(player->m_heroIds[0]),
                     ARTIFACT_SPELL_SCROLL,
                     0,
-                    static_cast<i8>(IDX(campaignChoice->spell))
+                    static_cast<i8>(campaignChoice->spell)
                 );
             break;
     }
