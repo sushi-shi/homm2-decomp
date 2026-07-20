@@ -579,7 +579,7 @@ extern i32 giWeekType;
 extern class palette* gpBufferPalette;
 extern b32 gbCampaignSideChoice;
 extern i32 giMonthTypeExtra;
-extern i32 iMPExtendedType;
+extern H2_ENUM_STORAGE(RemoteGameMode, i32) iMPExtendedType;
 extern i8 gcColorToSetupPos[RADAR_OWNER_COLOR_COUNT];
 extern char gFullMapName[GLOBAL_MAP_NAME_SIZE];
 extern char gcTCPName[GLOBAL_TCP_TEXT_SIZE];
