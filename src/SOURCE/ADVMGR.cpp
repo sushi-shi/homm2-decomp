@@ -681,8 +681,6 @@ H2_ENUM_BEGIN(AdventurePanelCommand)
     PANEL_HERO_PAGE_NEXT      = 21,
     PANEL_TOWN_PAGE_PREVIOUS  = 23,
     PANEL_TOWN_PAGE_NEXT      = 24,
-    OVERVIEW_HERO             = 1,
-    OVERVIEW_TOWN             = 2,
     DIALOG_OK                 = 0x7806,
     BOTTOM_VIEW_FIRST_MESSAGE = 2000,
     BOTTOM_VIEW_LAST_MESSAGE  = 2200,
@@ -2215,7 +2213,7 @@ i32 advManager::ProcessDeSelect(
             TrimLoopingSounds(0);
             gpGame->Overview();
             i32 fadeAfter = 1;
-            if (giOverviewReturnAction == OVERVIEW_HERO) {
+            if (giOverviewReturnAction == OVERVIEW_RETURN_HERO) {
                 gpMouseManager->SetPointer(0);
                 if (gbLowMemory) {
                     SetEnvironmentOrigin(-1, -1, 1);
@@ -2231,7 +2229,7 @@ i32 advManager::ProcessDeSelect(
                 if (gbLowMemory) {
                     SetEnvironmentOrigin(m_mapOriginX + 7, m_mapOriginY + 7, 1);
                 }
-            } else if (giOverviewReturnAction == OVERVIEW_TOWN) {
+            } else if (giOverviewReturnAction == OVERVIEW_RETURN_TOWN) {
                 DemobilizeCurrHero();
                 gpMouseManager->SetPointer(0);
                 gpGame->GetTown(giOverviewReturnActionExtra)->View(1);
