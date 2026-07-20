@@ -314,9 +314,9 @@ H2_ENUM_BEGIN(GameDiffEncoding)
     LEN_WORD_MAX       = 0x1fff
 H2_ENUM_END(GameDiffEncoding)
 
-H2_ENUM_CLASS_BEGIN(GameSaveSentinel)
+H2_ENUM_BEGIN(GameSaveSentinel)
     SAVED_TOWN_OFF_MAP = 0xff
-H2_ENUM_CLASS_END(GameSaveSentinel)
+H2_ENUM_END(GameSaveSentinel)
 
 H2_ENUM_BEGIN(GameMonthlyConstant)
     TYPE_NORMAL                   = 0,
@@ -2873,7 +2873,7 @@ i32 game::LoadMap(char* filename) {
         read(file2, column5, sizeof(column5[0]));
         read(file2, row9, sizeof(row9[0]));
         read(file2, type5, sizeof(type5[0]));
-        if (static_cast<u8>(column5[0]) != IDX(SAVED_TOWN_OFF_MAP)) {
+        if (static_cast<u8>(column5[0]) != SAVED_TOWN_OFF_MAP) {
             m_castleRecs[i37].m_onMap = 1;
             m_castleRecs[i37].m_x = static_cast<u8>(column5[0]);
             m_castleRecs[i37].m_y = static_cast<u8>(row9[0]);
@@ -2896,7 +2896,7 @@ i32 game::LoadMap(char* filename) {
             read(file2, row9, sizeof(row9[0]));
             read(file2, type5, sizeof(type5[0]));
         }
-        if (static_cast<u8>(column5[0]) != IDX(SAVED_TOWN_OFF_MAP)) {
+        if (static_cast<u8>(column5[0]) != SAVED_TOWN_OFF_MAP) {
             m_mines[i37].guardianType = CREATURE_NONE;
             m_mines[i37].x = static_cast<u8>(column5[0]);
             m_mines[i37].y = static_cast<u8>(row9[0]);
@@ -7170,7 +7170,7 @@ void game::RestoreCell(i32 x, i32 y, i32 obj, i32 barrier, mapCell* passedCell, 
         cell = passedCell;
     else
         cell = gpAdvManager->GetCell(x, y);
-    if (y > 0 && obj == IDX(MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)
+    if (y > 0 && obj == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)
         && gpAdvManager->GetCell(x, y - 1)->m_triggerType != MAP_OBJECT_CASTLE) {
         cell->m_triggerType = 0;
         cell->m_objectMetadata = 0;
