@@ -47,7 +47,6 @@
 #include <SOURCE/kbwin.h>
 
 H2_ENUM_BEGIN(MapTilesetConstant)
-    TILESET_FLAG             = 14,
     WAGON_CAMP_ACTIVE_FRAME = 129
 H2_ENUM_END(MapTilesetConstant)
 
@@ -224,7 +223,6 @@ H2_ENUM_BEGIN(GameMonthlyConstant)
     FIRST_DWELLING_BONUS_BUILDING = 0x800,
     FIRST_DWELLING_GROWTH         = 8,
     MONSTER_TRIGGER               = 0x98,
-    MONSTER_TILESET               = 12,
     MONSTER_SPAWN_MIN             = 0,
     MONSTER_SPAWN_MAX             = 360,
     MONSTER_SPAWN_ROLL            = 10
@@ -244,6 +242,32 @@ H2_ENUM_END(GameRandomArtifactConstant)
 H2_ENUM_BEGIN(LayerScanConstant)
     LAYER_SCAN_CAPACITY = 5
 H2_ENUM_END(LayerScanConstant)
+
+H2_ENUM_BEGIN(RandomMapObjectFootprintConstant)
+    CASTLE_METADATA_X_RADIUS      = 2,
+    CASTLE_METADATA_TOP_OFFSET    = 2,
+    CASTLE_METADATA_BOTTOM_OFFSET = 1,
+    CASTLE_BOAT_X_OFFSET          = 1,
+    CASTLE_BOAT_Y_OFFSET          = 2,
+    MINE_METADATA_LEFT_OFFSET     = 2,
+    MINE_METADATA_RIGHT_OFFSET    = 1,
+    MINE_METADATA_TOP_OFFSET      = 1
+H2_ENUM_END(RandomMapObjectFootprintConstant)
+
+H2_ENUM_BEGIN(RandomMineConstant)
+    ABANDONED_MINE_GUARDIAN_COUNT_MIN = 30,
+    ABANDONED_MINE_GUARDIAN_COUNT_MAX = 60,
+    WINDMILL_RESOURCE_AMOUNT_MIN      = 1,
+    WINDMILL_RESOURCE_AMOUNT_MAX      = 5
+H2_ENUM_END(RandomMineConstant)
+
+inline i32 IsTownObjectTileset(TilesetId tileset) {
+    return tileset >= TILESET_OBJNTOWN && tileset <= TILESET_OBJNTWRD;
+}
+
+inline MineType RandomMineType(MineType first, MineType last) {
+    return static_cast<MineType>(Random(IDX(first), IDX(last)));
+}
 
 H2_ENUM_BEGIN(ArtifactGuardianConstant)
     ARTIFACT_GUARDIAN_CHOICE_COUNT = 10,
@@ -281,14 +305,14 @@ H2_ENUM_BEGIN(EventGenerationRollConstant)
 H2_ENUM_END(EventGenerationRollConstant)
 
 H2_ENUM_BEGIN(PackedResourceGenerationConstant)
-    WAGON_EMPTY_CUTOFF     = 40,
-    WAGON_ARTIFACT_CUTOFF  = 50,
-    WAGON_AMOUNT_MIN       = 2,
-    WAGON_AMOUNT_MAX       = 5,
-    LEAN_TO_AMOUNT_MIN     = 1,
-    LEAN_TO_AMOUNT_MAX     = 4,
-    CAMPFIRE_AMOUNT_MIN    = 4,
-    CAMPFIRE_AMOUNT_MAX    = 6
+    WAGON_EMPTY_CUTOFF    = 40,
+    WAGON_ARTIFACT_CUTOFF = 50,
+    WAGON_AMOUNT_MIN      = 2,
+    WAGON_AMOUNT_MAX      = 5,
+    LEAN_TO_AMOUNT_MIN    = 1,
+    LEAN_TO_AMOUNT_MAX    = 4,
+    CAMPFIRE_AMOUNT_MIN   = 4,
+    CAMPFIRE_AMOUNT_MAX   = 6
 H2_ENUM_END(PackedResourceGenerationConstant)
 
 H2_ENUM_BEGIN(TreasureChestGenerationConstant)
@@ -1916,9 +1940,9 @@ void game::RandomizeEvents(void) {
     i32 column1;
     i32 upperCount;
     i32 lowerCount16;
-    i32 upperTilesets29[LAYER_SCAN_CAPACITY];
+    TilesetId upperTilesets29[LAYER_SCAN_CAPACITY];
     i32 upperIndexes1[LAYER_SCAN_CAPACITY];
-    i32 lowerTilesets4[LAYER_SCAN_CAPACITY];
+    TilesetId lowerTilesets4[LAYER_SCAN_CAPACITY];
     i32 lowerIndexes7[LAYER_SCAN_CAPACITY];
     CreatureType artifactGuardianChoices[ARTIFACT_GUARDIAN_CHOICE_COUNT];
     EventExtra* mapEvent1;
@@ -1945,7 +1969,7 @@ void game::RandomizeEvents(void) {
                     }
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_BOAT:
-                    cell2->m_objectTileset = 0;
+                    cell2->m_objectTileset = TILESET_NONE;
                     cell2->m_objectIndex = IDX(MAPCELL_SPRITE_NONE);
                     cell2->m_objectMetadata = 0;
                     cell2->m_triggerType = 0;
@@ -1968,7 +1992,7 @@ void game::RandomizeEvents(void) {
                     cell2->m_objectMetadata = 0;
                     cell2->m_triggerType = 0;
                     cell2->m_objectIndex = IDX(MAPCELL_SPRITE_NONE);
-                    cell2->m_objectTileset = 0;
+                    cell2->m_objectTileset = TILESET_NONE;
                     m_mapEventCount++;
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_GAZEBO:
@@ -2009,7 +2033,7 @@ void game::RandomizeEvents(void) {
                     if (!HasObjectTilesetIndex(
                             xPos2,
                             yPos19,
-                            IDX(TILESET_OBJNDSRT),
+                            TILESET_OBJNDSRT,
                             SKELETON_DESERT_FRAME
                         )) {
                         cell2->m_triggerType &= MAP_TRIGGER_TYPE_MASK;
@@ -2270,7 +2294,7 @@ void game::RandomizeEvents(void) {
                     if (!HasObjectTilesetIndex(
                             xPos2,
                             yPos19,
-                            IDX(TILESET_OBJNMUL2),
+                            TILESET_OBJNMUL2,
                             WAGON_CAMP_ACTIVE_FRAME
                         ))
                         cell2->m_triggerType &= MAP_TRIGGER_TYPE_MASK;
@@ -2336,8 +2360,12 @@ void game::RandomizeEvents(void) {
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE:
                     mineId2 = GetTownId(xPos2, yPos19);
-                    for (row18 = yPos19 - 2; row18 <= yPos19 + 1; row18++) {
-                        for (column1 = xPos2 - 2; column1 <= xPos2 + 2; column1++) {
+                    for (row18 = yPos19 - CASTLE_METADATA_TOP_OFFSET;
+                         row18 <= yPos19 + CASTLE_METADATA_BOTTOM_OFFSET;
+                         row18++) {
+                        for (column1 = xPos2 - CASTLE_METADATA_X_RADIUS;
+                             column1 <= xPos2 + CASTLE_METADATA_X_RADIUS;
+                             column1++) {
                             if (m_worldMap.GetCell(column1, row18)->m_objectMetadata != 0)
                                 continue;
                             m_worldMap.GetCell(column1, row18)->m_objectMetadata = mineId2;
@@ -2346,16 +2374,24 @@ void game::RandomizeEvents(void) {
                     townRec4 = GetCastleSlot(this, mineId2);
                     townRec4->m_boatY = -1;
                     townRec4->m_boatX = townRec4->m_boatY;
-                    if (yPos19 <= MAP_HEIGHT - 3) {
-                        townEntrance = gpAdvManager->GetCell(xPos2 - 1, yPos19 + 2);
+                    if (yPos19 <= MAP_HEIGHT - CASTLE_BOAT_Y_OFFSET - 1) {
+                        townEntrance = gpAdvManager->GetCell(
+                            xPos2 - CASTLE_BOAT_X_OFFSET,
+                            yPos19 + CASTLE_BOAT_Y_OFFSET
+                        );
                         if (giGroundToTerrain[townEntrance->m_terrainImageIndex] == 0) {
-                            townRec4->m_boatX = static_cast<i8>(xPos2 - 1);
-                            townRec4->m_boatY = static_cast<i8>(yPos19 + 2);
+                            townRec4->m_boatX = static_cast<i8>(xPos2 - CASTLE_BOAT_X_OFFSET);
+                            townRec4->m_boatY = static_cast<i8>(yPos19 + CASTLE_BOAT_Y_OFFSET);
                         } else {
-                            townEntrance = gpAdvManager->GetCell(xPos2 + 1, yPos19 + 2);
+                            townEntrance = gpAdvManager->GetCell(
+                                xPos2 + CASTLE_BOAT_X_OFFSET,
+                                yPos19 + CASTLE_BOAT_Y_OFFSET
+                            );
                             if (giGroundToTerrain[townEntrance->m_terrainImageIndex] == 0) {
-                                townRec4->m_boatX = static_cast<i8>(xPos2 + 1);
-                                townRec4->m_boatY = static_cast<i8>(yPos19 + 2);
+                                townRec4->m_boatX =
+                                    static_cast<i8>(xPos2 + CASTLE_BOAT_X_OFFSET);
+                                townRec4->m_boatY =
+                                    static_cast<i8>(yPos19 + CASTLE_BOAT_Y_OFFSET);
                             }
                         }
                     }
@@ -2366,15 +2402,21 @@ void game::RandomizeEvents(void) {
                 }
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ABANDONED_MINE:
                     mineId2 = GetMineId(xPos2, yPos19);
-                    m_mines[mineId2].guardianType = 59;
-                    m_mines[mineId2].guardianCount = static_cast<u8>(Random(30, 60));
+                    m_mines[mineId2].guardianType = CREATURE_GHOST;
+                    m_mines[mineId2].guardianCount = static_cast<u8>(Random(
+                        ABANDONED_MINE_GUARDIAN_COUNT_MIN,
+                        ABANDONED_MINE_GUARDIAN_COUNT_MAX
+                    ));
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ALCHEMIST_LAB:
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MINE:
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SAWMILL:
                     mineId2 = GetMineId(xPos2, yPos19);
-                    for (row18 = yPos19 - 1; row18 <= yPos19; row18++) {
-                        for (column1 = xPos2 - 2; column1 <= xPos2 + 1; column1++) {
-                            if (column1 == xPos2 - 2
+                    for (row18 = yPos19 - MINE_METADATA_TOP_OFFSET; row18 <= yPos19;
+                         row18++) {
+                        for (column1 = xPos2 - MINE_METADATA_LEFT_OFFSET;
+                             column1 <= xPos2 + MINE_METADATA_RIGHT_OFFSET;
+                             column1++) {
+                            if (column1 == xPos2 - MINE_METADATA_LEFT_OFFSET
                                 && cell2->m_triggerType
                                        != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ALCHEMIST_LAB))
                                 continue;
@@ -2387,7 +2429,8 @@ void game::RandomizeEvents(void) {
                     }
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_WINDMILL:
-                    cell2->m_objectMetadata = Random(1, 5);
+                    cell2->m_objectMetadata =
+                        Random(WINDMILL_RESOURCE_AMOUNT_MIN, WINDMILL_RESOURCE_AMOUNT_MAX);
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_BARRIER:
                     RandomizeBarrier(cell2);
@@ -2428,16 +2471,16 @@ void game::RandomizeEvents(void) {
         for (xPos2 = 0; (xPos2 | 0) < MAP_WIDTH; xPos2++) {
             cell2 = m_worldMap.Row(yPos19) + xPos2;
             if ((cell2->m_triggerType & MAP_TRIGGER_TYPE_MASK) == MAP_OBJECT_ROCK
-                && cell2->m_objectTileset == IDX(TILESET_X_LOC2))
-                cell2->m_flags |= 8;
+                && cell2->m_objectTileset == TILESET_X_LOC2)
+                cell2->m_flags |= IDX(MAP_CELL_OCCUPIED);
             if (cell2->m_objectIndex != IDX(MAPCELL_SPRITE_NONE)
                 && !(cell2->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
                 && !(cell2->m_flags & IDX(MAP_CELL_OBJECT_SHADOW_ONLY))
                 && cell2->m_overlayIndex != IDX(MAPCELL_SPRITE_NONE))
-                cell2->m_flags |= 8;
+                cell2->m_flags |= IDX(MAP_CELL_OCCUPIED);
             upperCount = 0;
             lowerCount16 = 0;
-            if (!(cell2->m_flags & 8) && yPos19 < MAP_HEIGHT - 1
+            if (!(cell2->m_flags & IDX(MAP_CELL_OCCUPIED)) && yPos19 < MAP_HEIGHT - 1
                 && cell2->m_objectIndex != IDX(MAPCELL_SPRITE_NONE)
                 && !(cell2->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
                 && !(cell2->m_flags & IDX(MAP_CELL_OBJECT_SHADOW_ONLY))) {
@@ -2460,7 +2503,7 @@ void game::RandomizeEvents(void) {
                         extra15 = m_worldMap.Extra(cell2->m_extraIndex);
                     else
                         extra15 = NULL;
-                    while (upperCount < 5 && extra15 != NULL) {
+                    while (upperCount < LAYER_SCAN_CAPACITY && extra15 != NULL) {
                         if (extra15->objectIndex != IDX(MAPCELL_SPRITE_NONE)
                             && !extra15->objectLayerBit1) {
                             upperTilesets29[upperCount] = extra15->objectTileset;
@@ -2482,7 +2525,7 @@ void game::RandomizeEvents(void) {
                         extra15 = m_worldMap.Extra(below0->m_extraIndex);
                     else
                         extra15 = NULL;
-                    while (lowerCount16 < 5 && extra15 != NULL) {
+                    while (lowerCount16 < LAYER_SCAN_CAPACITY && extra15 != NULL) {
                         if (extra15->objectIndex != IDX(MAPCELL_SPRITE_NONE)
                             && !extra15->objectLayerBit1) {
                             lowerTilesets4[lowerCount16] = extra15->objectTileset;
@@ -2497,10 +2540,9 @@ void game::RandomizeEvents(void) {
                     for (randomValue7 = 0; randomValue7 < upperCount; randomValue7++) {
                         for (j9 = 0; lowerCount16 > j9; j9++) {
                             if (lowerTilesets4[j9] == upperTilesets29[randomValue7]
-                                || (upperTilesets29[randomValue7] >= 35
-                                    && upperTilesets29[randomValue7] <= 38
-                                    && lowerTilesets4[j9] >= 35 && lowerTilesets4[j9] <= 38))
-                                cell2->m_flags |= 8;
+                                || (IsTownObjectTileset(upperTilesets29[randomValue7])
+                                    && IsTownObjectTileset(lowerTilesets4[j9])))
+                                cell2->m_flags |= IDX(MAP_CELL_OCCUPIED);
                         }
                     }
                 }
@@ -2512,13 +2554,16 @@ void game::RandomizeEvents(void) {
                            == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_TOWN)
                     || m_worldMap.GetCell(xPos2, yPos19 + 1)->m_triggerType
                            == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_CASTLE))
-                    cell2->m_flags |= 8;
+                    cell2->m_flags |= IDX(MAP_CELL_OCCUPIED);
             }
             if (cell2->m_objectIndex != IDX(MAPCELL_SPRITE_NONE)
                 && !(cell2->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
                 && !(cell2->m_flags & IDX(MAP_CELL_OBJECT_SHADOW_ONLY))
+                // Bit 2 is authored map data used by retail's occupancy pass. Its broader
+                // semantics remain unproven, so do not give it a speculative shared name.
+                // NOLINTNEXTLINE(readability-magic-numbers)
                 && (yPos19 == MAP_HEIGHT - 1 || (m_worldMap.Row(yPos19 + 1)[xPos2].m_flags & 4)))
-                cell2->m_flags |= 8;
+                cell2->m_flags |= IDX(MAP_CELL_OCCUPIED);
         }
     }
 }
@@ -2600,10 +2645,10 @@ i32 game::LoadMap(char* filename) {
             read(file2, type5, 1);
         }
         if (static_cast<u8>(column5[0]) != IDX(SAVED_TOWN_OFF_MAP)) {
-            m_mines[i37].guardianType = -1;
+            m_mines[i37].guardianType = CREATURE_NONE;
             m_mines[i37].x = static_cast<u8>(column5[0]);
             m_mines[i37].y = static_cast<u8>(row9[0]);
-            m_mines[i37].resourceType = type5[0];
+            m_mines[i37].resourceType = static_cast<MineType>(type5[0]);
         }
     }
 
@@ -2665,7 +2710,7 @@ void game::ClaimTown(i32 townId, i32 player, i32 suppressVisibility) {
         cell,
         m_castleRecs[townId].m_x - 1,
         m_castleRecs[townId].m_y,
-        14,
+        TILESET_FLAG32,
         m_players[static_cast<i8>(player)].m_color * 2,
         1,
         -1
@@ -2675,7 +2720,7 @@ void game::ClaimTown(i32 townId, i32 player, i32 suppressVisibility) {
         cell,
         m_castleRecs[townId].m_x + 1,
         m_castleRecs[townId].m_y,
-        14,
+        TILESET_FLAG32,
         m_players[static_cast<i8>(player)].m_color * 2 + 1,
         1,
         -1
@@ -2745,13 +2790,13 @@ void game::ClaimMine(i32 mineId, i32 player) {
     }
     acc = m_worldMap.Row(y) + x;
     if (player == -1) {
-        m_worldMap.ChangeTilesetIndex(acc, x, y, 14, 255, 1, -1);
+        m_worldMap.ChangeTilesetIndex(acc, x, y, TILESET_FLAG32, 255, 1, -1);
     } else {
         m_worldMap.ChangeTilesetIndex(
             acc,
             x,
             y,
-            14,
+            TILESET_FLAG32,
             m_players[static_cast<i8>(player)].m_color + flag,
             1,
             -1
@@ -4342,7 +4387,7 @@ void game::PerMonth(void) {
                     if (Random(MONSTER_SPAWN_MIN, MONSTER_SPAWN_MAX)
                         == MONSTER_SPAWN_ROLL) {
                         cell0->m_triggerType = MONSTER_TRIGGER;
-                        cell0->m_objectTileset = MONSTER_TILESET;
+                        cell0->m_objectTileset = TILESET_MONS32;
                         cell0->m_objectIndex = static_cast<u8>(giMonthTypeExtra);
                         firstCount5 = GetRandomNumTroops(
                             static_cast<CreatureType>(giMonthTypeExtra)
@@ -4387,10 +4432,10 @@ void game::ConvertObject(
             if (x >= 0 && x < MAP_WIDTH && y >= 0 && MAP_HEIGHT >= y + 1) {
                 cell = WORLDMAP->GetCell(x, y);
                 if (cell->m_objectIndex != static_cast<u8>(-1)
-                    && cell->m_objectTileset == IDX(oldTileset)
+                    && cell->m_objectTileset == oldTileset
                     && cell->m_objectIndex >= oldFirstIndex
                     && cell->m_objectIndex <= oldLastIndex) {
-                    cell->m_objectTileset = static_cast<u8>(IDX(newTileset));
+                    cell->m_objectTileset = newTileset;
                     cell->m_objectIndex =
                         static_cast<u8>(cell->m_objectIndex - oldFirstIndex + newFirstIndex);
                 }
@@ -4405,10 +4450,10 @@ void game::ConvertObject(
                 else
                     extra = NULL;
                 while (extra != NULL) {
-                    if (extra->objectTileset == IDX(oldTileset)
+                    if (extra->objectTileset == oldTileset
                         && extra->objectIndex >= oldFirstIndex
                         && extra->objectIndex <= oldLastIndex) {
-                        extra->objectTileset = static_cast<u8>(IDX(newTileset));
+                        extra->objectTileset = newTileset;
                         extra->objectIndex =
                             static_cast<u8>(extra->objectIndex - oldFirstIndex + newFirstIndex);
                     }
@@ -4420,10 +4465,10 @@ void game::ConvertObject(
                 }
 
                 if (cell->m_overlayIndex != static_cast<u8>(-1)
-                    && cell->m_overlayTileset == IDX(oldTileset)
+                    && cell->m_overlayTileset == oldTileset
                     && cell->m_overlayIndex >= oldFirstIndex
                     && cell->m_overlayIndex <= oldLastIndex) {
-                    cell->m_overlayTileset = static_cast<u8>(IDX(newTileset));
+                    cell->m_overlayTileset = newTileset;
                     cell->m_overlayIndex =
                         static_cast<u8>(cell->m_overlayIndex - oldFirstIndex + newFirstIndex);
                 }
@@ -4433,10 +4478,10 @@ void game::ConvertObject(
                 else
                     extra = NULL;
                 while (extra != NULL) {
-                    if (extra->overlayTileset == IDX(oldTileset)
+                    if (extra->overlayTileset == oldTileset
                         && extra->overlayIndex >= oldFirstIndex
                         && extra->overlayIndex <= oldLastIndex) {
-                        extra->overlayTileset = static_cast<u8>(IDX(newTileset));
+                        extra->overlayTileset = newTileset;
                         extra->overlayIndex =
                             static_cast<u8>(extra->overlayIndex - oldFirstIndex + newFirstIndex);
                     }
@@ -4525,7 +4570,7 @@ VA(0x0047f5f1, 0x619)
 void game::RandomizeMine(i32 x, i32 y) {
     u8 objectFrame1;
     i32 mineId;
-    i32 mineType29;
+    MineType mineType29;
     i32 terrain3 = giGroundToTerrain[WORLDMAP->GetCell(x, y)->m_terrainImageIndex];
     i32 columnOffset4;
     i32 retry4;
@@ -4537,33 +4582,33 @@ void game::RandomizeMine(i32 x, i32 y) {
         switch (terrain3) {
             case 1:
             case 6:
-                mineType29 = Random(1, 6);
-                if (mineType29 == 1)
-                    mineType29 = 0;
+                mineType29 = RandomMineType(MINE_TYPE_MERCURY, MINE_TYPE_GOLD);
+                if (mineType29 == MINE_TYPE_MERCURY)
+                    mineType29 = MINE_TYPE_WOOD;
                 break;
             case 2:
-                mineType29 = Random(2, 6);
+                mineType29 = RandomMineType(MINE_TYPE_ORE, MINE_TYPE_GOLD);
                 break;
             case 3:
-                mineType29 = Random(0, 6);
+                mineType29 = RandomMineType(MINE_TYPE_WOOD, MINE_TYPE_GOLD);
                 break;
             case 4:
-                mineType29 = 1;
+                mineType29 = MINE_TYPE_MERCURY;
                 break;
             default:
-                mineType29 = Random(1, 6);
+                mineType29 = RandomMineType(MINE_TYPE_MERCURY, MINE_TYPE_GOLD);
                 break;
         }
-        if (RandMineQty[mineType29] == 0)
+        if (RandMineQty[IDX(mineType29)] == 0)
             retry4 = 30;
     }
-    RandMineQty[mineType29]++;
+    RandMineQty[IDX(mineType29)]++;
 
     switch (mineType29) {
-        case 0:
+        case MINE_TYPE_WOOD:
             mineFrame36 = 5;
             break;
-        case 1:
+        case MINE_TYPE_MERCURY:
             mineFrame36 = 25;
             break;
         default:
@@ -4582,10 +4627,10 @@ void game::RandomizeMine(i32 x, i32 y) {
     }
 
     switch (mineType29) {
-        case 0:
+        case MINE_TYPE_WOOD:
             objectFrame1 = 7;
             break;
-        case 1:
+        case MINE_TYPE_MERCURY:
             switch (terrain3) {
                 case 3:
                     objectFrame1 = 43;
@@ -4624,14 +4669,21 @@ void game::RandomizeMine(i32 x, i32 y) {
     WORLDMAP->GetCell(x, y - 1)->m_overlayIndex = mineFrame36;
     WORLDMAP->GetCell(x + 1, y - 1)->m_overlayIndex = mineFrame36 + 1;
 
-    if (mineType29 == 1) {
+    if (mineType29 == MINE_TYPE_MERCURY) {
         WORLDMAP->GetCell(x + 1, y)->m_objType |= 1;
         triggerType19 = 1;
-    } else if (mineType29 == 0) {
+    } else if (mineType29 == MINE_TYPE_WOOD) {
         triggerType19 = 29;
     } else {
-        m_worldMap
-            .ChangeTilesetIndex(WORLDMAP->GetCell(x + 1, y), x + 1, y, 29, mineType29 - 2, 0, -1);
+        m_worldMap.ChangeTilesetIndex(
+            WORLDMAP->GetCell(x + 1, y),
+            x + 1,
+            y,
+            TILESET_EXTRAOVR,
+            IDX(mineType29) - IDX(MINE_TYPE_ORE),
+            0,
+            -1
+        );
         triggerType19 = 23;
     }
 
@@ -4650,7 +4702,7 @@ void game::RandomizeMine(i32 x, i32 y) {
         }
     }
     WORLDMAP->GetCell(x, y)->m_triggerType |= MAP_TRIGGER_ACTION_FLAG;
-    m_mines[mineId].resourceType = static_cast<i8>(mineType29);
+    m_mines[mineId].resourceType = mineType29;
 }
 
 VA(0x0047fc0a, 0xc6)
@@ -4826,7 +4878,7 @@ void game::ProcessRandomObjects(void) {
                     giUABaseY = static_cast<i16>(y8);
                     giUARadius = static_cast<i16>(cell6->m_objectMetadata);
                     cell6->m_triggerType = 0;
-                    cell6->m_objectTileset = 0;
+                    cell6->m_objectTileset = TILESET_NONE;
                     cell6->m_objectIndex = -1;
                     break;
                 case IDX(TRIGGER_RANDOM_TOWN):
@@ -4856,7 +4908,7 @@ void game::ProcessRandomObjects(void) {
                     maxValue17 = 100000;
                     goto randomMonster;
                 randomMonster:
-                    if (cell6->m_objectTileset == IDX(TILESET_MONS32)
+                    if (cell6->m_objectTileset == TILESET_MONS32
                         && cell6->m_objectIndex >= RANDOM_MONSTER_SPRITE_FIRST
                         && cell6->m_objectIndex <= RANDOM_MONSTER_SPRITE_LAST) {
                         randomObjectType3 = cell6->m_objectIndex + RANDOM_MONSTER_SPRITE_TO_TRIGGER;
@@ -4936,10 +4988,10 @@ void game::ProcessRandomObjects(void) {
                         y8,
                         x10 - 1,
                         y8,
-                        TilesetId(11),
+                        TILESET_OBJNARTI,
                         162,
                         162,
-                        TilesetId(11),
+                        TILESET_OBJNARTI,
                         artifactId18 * 2,
                         -1,
                         -1
@@ -4949,10 +5001,10 @@ void game::ProcessRandomObjects(void) {
                         y8,
                         x10,
                         y8,
-                        TilesetId(11),
+                        TILESET_OBJNARTI,
                         163,
                         163,
-                        TilesetId(11),
+                        TILESET_OBJNARTI,
                         artifactId18 * 2 + 1,
                         -1,
                         -1
@@ -4966,10 +5018,10 @@ void game::ProcessRandomObjects(void) {
                         y8,
                         x10 - 1,
                         y8,
-                        TilesetId(11),
+                        TILESET_OBJNARTI,
                         166,
                         166,
-                        TilesetId(11),
+                        TILESET_OBJNARTI,
                         artifactId18 * 2,
                         -1,
                         -1
@@ -4979,10 +5031,10 @@ void game::ProcessRandomObjects(void) {
                         y8,
                         x10,
                         y8,
-                        TilesetId(11),
+                        TILESET_OBJNARTI,
                         167,
                         167,
-                        TilesetId(11),
+                        TILESET_OBJNARTI,
                         artifactId18 * 2 + 1,
                         -1,
                         -1
@@ -4996,10 +5048,10 @@ void game::ProcessRandomObjects(void) {
                         y8,
                         x10 - 1,
                         y8,
-                        TilesetId(11),
+                        TILESET_OBJNARTI,
                         168,
                         168,
-                        TilesetId(11),
+                        TILESET_OBJNARTI,
                         artifactId18 * 2,
                         -1,
                         -1
@@ -5009,10 +5061,10 @@ void game::ProcessRandomObjects(void) {
                         y8,
                         x10,
                         y8,
-                        TilesetId(11),
+                        TILESET_OBJNARTI,
                         169,
                         169,
-                        TilesetId(11),
+                        TILESET_OBJNARTI,
                         artifactId18 * 2 + 1,
                         -1,
                         -1
@@ -5026,10 +5078,10 @@ void game::ProcessRandomObjects(void) {
                         y8,
                         x10 - 1,
                         y8,
-                        TilesetId(11),
+                        TILESET_OBJNARTI,
                         170,
                         170,
-                        TilesetId(11),
+                        TILESET_OBJNARTI,
                         artifactId18 * 2,
                         -1,
                         -1
@@ -5039,10 +5091,10 @@ void game::ProcessRandomObjects(void) {
                         y8,
                         x10,
                         y8,
-                        TilesetId(11),
+                        TILESET_OBJNARTI,
                         171,
                         171,
-                        TilesetId(11),
+                        TILESET_OBJNARTI,
                         artifactId18 * 2 + 1,
                         -1,
                         -1
@@ -5316,11 +5368,11 @@ i32 game::HasLateOverlay(i32 col, i32 row) {
 VA(0x00481645, 0x120)
 void game::ConvertFlagToLateOverlay(i32 col, i32 row) {
     mapCell* cell = WORLDMAP->Row(row) + col;
-    if (cell->m_overlayTileset == TILESET_FLAG)
+    if (cell->m_overlayTileset == TILESET_FLAG32)
         cell->m_drawOverlayOnTop = 1;
     mapCellExtra* extra = cell->m_extraIndex ? WORLDMAP->Extra(cell->m_extraIndex) : NULL;
     while (extra) {
-        if (extra->overlayTileset == TILESET_FLAG)
+        if (extra->overlayTileset == TILESET_FLAG32)
             extra->drawOverlayOnTop = 1;
         extra = extra->nextIndex ? WORLDMAP->Extra(extra->nextIndex) : NULL;
     }
@@ -5328,7 +5380,12 @@ void game::ConvertFlagToLateOverlay(i32 col, i32 row) {
 
 // Retail /Ob1 includes an inline-accessor continuation in this function.
 VA(0x00481765, 0x13b)
-i32 game::HasObjectTilesetIndex(i32 col, i32 row, i32 tileset, i32 index) {
+i32 game::HasObjectTilesetIndex(
+    i32 col,
+    i32 row,
+    H2_ENUM_PARAM(TilesetId, i32) tileset,
+    i32 index
+) {
     mapCell* cell = WORLDMAP->Row(row) + col;
     if (cell->m_objectTileset == tileset && cell->m_objectIndex == index)
         return 1;
@@ -5748,7 +5805,7 @@ void game::ProcessOnMapHeroes(void) {
                         if (isJail6) {
                             cell5->m_objectMetadata = extra0->heroId;
                         } else {
-                            cell5->m_objectTileset = 0;
+                            cell5->m_objectTileset = TILESET_NONE;
                             cell5->m_objectIndex = IDX(MAPCELL_SPRITE_NONE);
                             cell5->m_objectMetadata = 0;
                             cell5->m_triggerType = 0;

@@ -1089,21 +1089,21 @@ i32 advManager::ValidMove(i32 direction, i32 eventMode) {
     southDirection_e = (1 << direction) & CURSOR_SOUTH_DIRECTION_MASK;
     if (northDirection_b) {
         if (currentCell_c->m_objectIndex != CURSOR_EMPTY_OBJECT_INDEX
-            && currentCell_c->m_objectTileset != CURSOR_PASSABLE_OBJECT_TILESET
+            && currentCell_c->m_objectTileset != TILESET_DUMMY
             && !(currentCell_c->m_flags & CURSOR_OBJECT_PASSABLE_FLAG)
             && currentCell_c->m_triggerType != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_WHIRLPOOL))
             return 0;
         if (destinationCell_g->m_overlayIndex != CURSOR_EMPTY_OBJECT_INDEX) {
             northNeighborCell_b = m_mapData->GetCell(destinationCellX_h, destinationCellY_e + 1);
             if (northNeighborCell_b->m_objectIndex != CURSOR_EMPTY_OBJECT_INDEX
-                && northNeighborCell_b->m_objectTileset != CURSOR_PASSABLE_OBJECT_TILESET
+                && northNeighborCell_b->m_objectTileset != TILESET_DUMMY
                 && !(northNeighborCell_b->m_flags & CURSOR_OBJECT_PASSABLE_FLAG))
                 return 0;
         }
     }
     if (southDirection_e) {
         if (destinationCell_g->m_objectIndex != CURSOR_EMPTY_OBJECT_INDEX
-            && destinationCell_g->m_objectTileset != CURSOR_PASSABLE_OBJECT_TILESET
+            && destinationCell_g->m_objectTileset != TILESET_DUMMY
             && !(destinationCell_g->m_flags & CURSOR_OBJECT_PASSABLE_FLAG)
             && destinationCell_g->m_triggerType != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_WHIRLPOOL)
             && (!eventMode || !(destinationCell_g->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
@@ -1113,7 +1113,7 @@ i32 advManager::ValidMove(i32 direction, i32 eventMode) {
             southNeighborCell_g =
                 m_mapData->GetCell(m_cursorMapX + m_mapOriginX, m_cursorMapY + m_mapOriginY + 1);
             if (southNeighborCell_g->m_objectIndex != CURSOR_EMPTY_OBJECT_INDEX
-                && southNeighborCell_g->m_objectTileset != CURSOR_PASSABLE_OBJECT_TILESET
+                && southNeighborCell_g->m_objectTileset != TILESET_DUMMY
                 && !(southNeighborCell_g->m_flags & CURSOR_OBJECT_PASSABLE_FLAG)
                 && !(southNeighborCell_g->m_triggerType & MAP_TRIGGER_ACTION_FLAG))
                 return 0;

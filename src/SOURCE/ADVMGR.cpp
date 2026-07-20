@@ -75,7 +75,6 @@ H2_ENUM_BEGIN(AdventureDrawConstant)
     HERO_SHADOW_FRAME_END      = 36,
     MINE_GUARDIAN_ICON_SLOT    = 10,
     TILESET_MONSTER            = 20,
-    TILESET_MINE               = 12,
     TILESET_BOAT               = 39
 H2_ENUM_END(AdventureDrawConstant)
 
@@ -265,16 +264,11 @@ H2_ENUM_BEGIN(AdventureTownPortalMessage)
 H2_ENUM_END(AdventureTownPortalMessage)
 
 H2_ENUM_BEGIN(AdventureSoundTilesetConstant)
-    SOUND_GROUND_SHAPE_MASK         = 0x0f,
-    SOUND_TILESET_WATER             = 0x28,
-    SOUND_TILESET_STREAM            = 0x2d,
-    SOUND_TILESET_WATER_LAKE_UNUSED = 0x34,
-    SOUND_TILESET_SMALL_VOLCANO     = 0x3a,
-    SOUND_TILESET_LARGE_VOLCANO     = 0x3c,
-    SOUND_SEAGULL_FRAME_FIRST       = 0xb6,
-    SOUND_SEAGULL_FRAME_LAST        = 0xb7,
-    SOUND_ALCHEMIST_FRAME_FIRST     = 0x27,
-    SOUND_ALCHEMIST_FRAME_LAST      = 0x2c
+    SOUND_GROUND_SHAPE_MASK     = 0x0f,
+    SOUND_SEAGULL_FRAME_FIRST   = 0xb6,
+    SOUND_SEAGULL_FRAME_LAST    = 0xb7,
+    SOUND_ALCHEMIST_FRAME_FIRST = 0x27,
+    SOUND_ALCHEMIST_FRAME_LAST  = 0x2c
 H2_ENUM_END(AdventureSoundTilesetConstant)
 
 H2_ENUM_BEGIN(AdventureOpenConstant)
@@ -353,8 +347,6 @@ H2_ENUM_END(AdventureRouteConstant)
 
 H2_ENUM_BEGIN(AdventureSearchConstant)
     ARTIFACT_CAPACITY       = 14,
-    CLEAR_GROUND_TILESET    = 47,
-    DIG_HOLE_TILESET        = 56,
     DIG_HOLE_FRAME          = 140,
     ULTIMATE_ARTIFACT_MUSIC = 41
 H2_ENUM_END(AdventureSearchConstant)
@@ -643,9 +635,6 @@ H2_ENUM_BEGIN(AdventureQuickInfoObject)
 H2_ENUM_END(AdventureQuickInfoObject)
 
 H2_ENUM_BEGIN(AdventureSiteConstant)
-    SITE_TILESET_1       = 0x3d,
-    SITE_TILESET_2       = 0x3e,
-    SITE_TILESET_3       = 0x3f,
     GENERIC_SITE_1_END   = 4,
     GENERIC_SITE_2_END   = 0x48,
     GENERIC_ALTAR_END    = 5,
@@ -2321,7 +2310,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
     }
     currentCell = GetCell(x, IDX(y));
     if (!((currentCell->m_objectIndex == IDX(MAPCELL_SPRITE_NONE)
-           || currentCell->m_objectTileset == CLEAR_GROUND_TILESET)
+           || currentCell->m_objectTileset == TILESET_DUMMY)
           && currentCell->m_overlayIndex == IDX(MAPCELL_SPRITE_NONE))) {
         if (!gbHumanPlayer[giCurPlayer]) {
             goto search_end;
@@ -2341,8 +2330,8 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
         digSampleState = LoadPlaySample("DIGSOUND.82M");
     }
     if (currentCell->m_objectIndex == IDX(MAPCELL_SPRITE_NONE)
-        || currentCell->m_objectTileset == CLEAR_GROUND_TILESET) {
-        currentCell->m_objectTileset = DIG_HOLE_TILESET;
+        || currentCell->m_objectTileset == TILESET_DUMMY) {
+        currentCell->m_objectTileset = TILESET_OBJNDIRT;
         currentCell->m_objectIndex = DIG_HOLE_FRAME;
         currentCell->m_objectLayerBit0 = 1;
         currentCell->m_objectLayerBit1 = 1;
@@ -3151,11 +3140,11 @@ void advManager::DrawCell(
                 );
 
                 if (s_drawCell->m_objectLayerBit0
-                    && (gbDrawingPuzzle == 0 || s_drawCell->m_objectTileset != 56
+                    && (gbDrawingPuzzle == 0 || s_drawCell->m_objectTileset != TILESET_OBJNDIRT
                         || s_drawCell->m_objectIndex != 140)
-                    && (gbDrawingPuzzle == 0 || bPuzzleDraw[s_drawCell->m_objectTileset])) {
+                    && (gbDrawingPuzzle == 0 || bPuzzleDraw[IDX(s_drawCell->m_objectTileset)])) {
                     IconToBitmap(
-                        m_objectIcons[s_drawCell->m_objectTileset],
+                        m_objectIcons[IDX(s_drawCell->m_objectTileset)],
                         gpWindowManager->m_screen,
                         s_drawPixelX,
                         s_drawPixelY,
@@ -3169,12 +3158,12 @@ void advManager::DrawCell(
                     );
                     if (s_drawCell->m_animatedObject) {
                         s_drawAnimationLength = GetIconEntry(
-                                                    m_objectIcons[s_drawCell->m_objectTileset],
+                                                    m_objectIcons[IDX(s_drawCell->m_objectTileset)],
                                                     s_drawCell->m_objectIndex
                         )
                                                     ->flags;
                         IconToBitmap(
-                            m_objectIcons[s_drawCell->m_objectTileset],
+                            m_objectIcons[IDX(s_drawCell->m_objectTileset)],
                             gpWindowManager->m_screen,
                             s_drawPixelX,
                             s_drawPixelY,
@@ -3198,9 +3187,9 @@ void advManager::DrawCell(
                 }
                 while (s_drawExtra != NULL) {
                     if (s_drawExtra->objectLayerBit0
-                        && (gbDrawingPuzzle == 0 || bPuzzleDraw[s_drawExtra->objectTileset])) {
+                        && (gbDrawingPuzzle == 0 || bPuzzleDraw[IDX(s_drawExtra->objectTileset)])) {
                         IconToBitmap(
-                            m_objectIcons[s_drawExtra->objectTileset],
+                            m_objectIcons[IDX(s_drawExtra->objectTileset)],
                             gpWindowManager->m_screen,
                             s_drawPixelX,
                             s_drawPixelY,
@@ -3214,12 +3203,12 @@ void advManager::DrawCell(
                         );
                         if (s_drawExtra->animatedObject) {
                             s_drawAnimationLength = GetIconEntry(
-                                                        m_objectIcons[s_drawExtra->objectTileset],
+                                                        m_objectIcons[IDX(s_drawExtra->objectTileset)],
                                                         s_drawExtra->objectIndex
                             )
                                                         ->flags;
                             IconToBitmap(
-                                m_objectIcons[s_drawExtra->objectTileset],
+                                m_objectIcons[IDX(s_drawExtra->objectTileset)],
                                 gpWindowManager->m_screen,
                                 s_drawPixelX,
                                 s_drawPixelY,
@@ -3243,9 +3232,9 @@ void advManager::DrawCell(
                 }
 
                 if (s_drawCell->m_objectLayerBit1 && !s_drawCell->m_objectLayerBit0
-                    && (gbDrawingPuzzle == 0 || bPuzzleDraw[s_drawCell->m_objectTileset])) {
+                    && (gbDrawingPuzzle == 0 || bPuzzleDraw[IDX(s_drawCell->m_objectTileset)])) {
                     IconToBitmap(
-                        m_objectIcons[s_drawCell->m_objectTileset],
+                        m_objectIcons[IDX(s_drawCell->m_objectTileset)],
                         gpWindowManager->m_screen,
                         s_drawPixelX,
                         s_drawPixelY,
@@ -3259,12 +3248,12 @@ void advManager::DrawCell(
                     );
                     if (s_drawCell->m_animatedObject) {
                         s_drawAnimationLength = GetIconEntry(
-                                                    m_objectIcons[s_drawCell->m_objectTileset],
+                                                    m_objectIcons[IDX(s_drawCell->m_objectTileset)],
                                                     s_drawCell->m_objectIndex
                         )
                                                     ->flags;
                         IconToBitmap(
-                            m_objectIcons[s_drawCell->m_objectTileset],
+                            m_objectIcons[IDX(s_drawCell->m_objectTileset)],
                             gpWindowManager->m_screen,
                             s_drawPixelX,
                             s_drawPixelY,
@@ -3288,9 +3277,9 @@ void advManager::DrawCell(
                 }
                 while (s_drawExtra != NULL) {
                     if (s_drawExtra->objectLayerBit1 && !s_drawExtra->objectLayerBit0
-                        && (gbDrawingPuzzle == 0 || bPuzzleDraw[s_drawExtra->objectTileset])) {
+                        && (gbDrawingPuzzle == 0 || bPuzzleDraw[IDX(s_drawExtra->objectTileset)])) {
                         IconToBitmap(
-                            m_objectIcons[s_drawExtra->objectTileset],
+                            m_objectIcons[IDX(s_drawExtra->objectTileset)],
                             gpWindowManager->m_screen,
                             s_drawPixelX,
                             s_drawPixelY,
@@ -3304,12 +3293,12 @@ void advManager::DrawCell(
                         );
                         if (s_drawExtra->animatedObject) {
                             s_drawAnimationLength = GetIconEntry(
-                                                        m_objectIcons[s_drawExtra->objectTileset],
+                                                        m_objectIcons[IDX(s_drawExtra->objectTileset)],
                                                         s_drawExtra->objectIndex
                             )
                                                         ->flags;
                             IconToBitmap(
-                                m_objectIcons[s_drawExtra->objectTileset],
+                                m_objectIcons[IDX(s_drawExtra->objectTileset)],
                                 gpWindowManager->m_screen,
                                 s_drawPixelX,
                                 s_drawPixelY,
@@ -3337,10 +3326,10 @@ void advManager::DrawCell(
                 if (s_drawCell->m_objectIndex != IDX(MAPCELL_SPRITE_NONE)
                     && !s_drawCell->m_objectLayerBit0 && !s_drawCell->m_objectLayerBit1
                     && !s_drawCell->m_objectDrawnAsOverlay
-                    && s_drawCell->m_objectTileset != TILESET_MINE
-                    && (gbDrawingPuzzle == 0 || bPuzzleDraw[s_drawCell->m_objectTileset])) {
+                    && s_drawCell->m_objectTileset != TILESET_MONS32
+                    && (gbDrawingPuzzle == 0 || bPuzzleDraw[IDX(s_drawCell->m_objectTileset)])) {
                     IconToBitmap(
-                        m_objectIcons[s_drawCell->m_objectTileset],
+                        m_objectIcons[IDX(s_drawCell->m_objectTileset)],
                         gpWindowManager->m_screen,
                         s_drawPixelX,
                         s_drawPixelY,
@@ -3354,7 +3343,7 @@ void advManager::DrawCell(
                     );
                     if (s_drawCell->m_animatedObject) {
                         s_drawAnimationLength = GetIconEntry(
-                                                    m_objectIcons[s_drawCell->m_objectTileset],
+                                                    m_objectIcons[IDX(s_drawCell->m_objectTileset)],
                                                     s_drawCell->m_objectIndex
                         )
                                                     ->flags;
@@ -3368,7 +3357,7 @@ void advManager::DrawCell(
                             }
                         }
                         IconToBitmap(
-                            m_objectIcons[s_drawCell->m_objectTileset],
+                            m_objectIcons[IDX(s_drawCell->m_objectTileset)],
                             gpWindowManager->m_screen,
                             s_drawPixelX,
                             s_drawPixelY,
@@ -3393,10 +3382,10 @@ void advManager::DrawCell(
                 while (s_drawExtra != NULL) {
                     if (!s_drawExtra->objectLayerBit0 && !s_drawExtra->objectLayerBit1
                         && !s_drawExtra->objectDrawnAsOverlay
-                        && s_drawExtra->objectTileset != TILESET_MINE
-                        && (gbDrawingPuzzle == 0 || bPuzzleDraw[s_drawExtra->objectTileset])) {
+                        && s_drawExtra->objectTileset != TILESET_MONS32
+                        && (gbDrawingPuzzle == 0 || bPuzzleDraw[IDX(s_drawExtra->objectTileset)])) {
                         IconToBitmap(
-                            m_objectIcons[s_drawExtra->objectTileset],
+                            m_objectIcons[IDX(s_drawExtra->objectTileset)],
                             gpWindowManager->m_screen,
                             s_drawPixelX,
                             s_drawPixelY,
@@ -3410,12 +3399,12 @@ void advManager::DrawCell(
                         );
                         if (s_drawExtra->animatedObject) {
                             s_drawAnimationLength = GetIconEntry(
-                                                        m_objectIcons[s_drawExtra->objectTileset],
+                                                        m_objectIcons[IDX(s_drawExtra->objectTileset)],
                                                         s_drawExtra->objectIndex
                             )
                                                         ->flags;
                             IconToBitmap(
-                                m_objectIcons[s_drawExtra->objectTileset],
+                                m_objectIcons[IDX(s_drawExtra->objectTileset)],
                                 gpWindowManager->m_screen,
                                 s_drawPixelX,
                                 s_drawPixelY,
@@ -3449,7 +3438,7 @@ void advManager::DrawCell(
                         if (s_drawAdjacentCell->m_triggerType
                             == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MINE)) {
                             s_drawMine = &gpGame->m_mines[s_drawAdjacentCell->m_objectMetadata];
-                            if (s_drawMine->guardianType == 59) {
+                            if (s_drawMine->guardianType == CREATURE_GHOST) {
                                 IconToBitmap(
                                     m_objectIcons[MINE_GUARDIAN_ICON_SLOT],
                                     gpWindowManager->m_screen,
@@ -3463,13 +3452,13 @@ void advManager::DrawCell(
                                     DRAW_CLIP_HEIGHT,
                                     0
                                 );
-                            } else if (s_drawMine->guardianType != -1) {
+                            } else if (s_drawMine->guardianType != CREATURE_NONE) {
                                 IconToBitmap(
                                     m_objectIcons[TILESET_BOAT],
                                     gpWindowManager->m_screen,
                                     s_drawPixelX - 32,
                                     s_drawPixelY,
-                                    s_drawMine->guardianType - 62,
+                                    IDX(s_drawMine->guardianType) - IDX(CREATURE_EARTH_ELEMENTAL),
                                     1,
                                     0,
                                     0,
@@ -3481,7 +3470,7 @@ void advManager::DrawCell(
                         }
                     }
 
-                    if (s_drawCell->m_objectTileset == TILESET_MINE) {
+                    if (s_drawCell->m_objectTileset == TILESET_MONS32) {
                         if (m_lastQuickViewX == mapX && m_lastQuickViewY == mapY) {
                             IconToBitmap(
                                 m_objectIcons[TILESET_MONSTER],
@@ -3801,9 +3790,9 @@ void advManager::DrawCell(
                 if (HAS(drawMask, ADVMGR_DRAW_OVERLAY)
                     && s_drawCell->m_objectIndex != IDX(MAPCELL_SPRITE_NONE)
                     && s_drawCell->m_objectDrawnAsOverlay
-                    && (gbDrawingPuzzle == 0 || bPuzzleDraw[s_drawCell->m_objectTileset])) {
+                    && (gbDrawingPuzzle == 0 || bPuzzleDraw[IDX(s_drawCell->m_objectTileset)])) {
                     IconToBitmap(
-                        m_objectIcons[s_drawCell->m_objectTileset],
+                        m_objectIcons[IDX(s_drawCell->m_objectTileset)],
                         gpWindowManager->m_screen,
                         s_drawPixelX,
                         s_drawPixelY,
@@ -3817,12 +3806,12 @@ void advManager::DrawCell(
                     );
                     if (s_drawCell->m_animatedObject) {
                         s_drawAnimationLength = GetIconEntry(
-                                                    m_objectIcons[s_drawCell->m_objectTileset],
+                                                    m_objectIcons[IDX(s_drawCell->m_objectTileset)],
                                                     s_drawCell->m_objectIndex
                         )
                                                     ->flags;
                         IconToBitmap(
-                            m_objectIcons[s_drawCell->m_objectTileset],
+                            m_objectIcons[IDX(s_drawCell->m_objectTileset)],
                             gpWindowManager->m_screen,
                             s_drawPixelX,
                             s_drawPixelY,
@@ -3846,9 +3835,9 @@ void advManager::DrawCell(
                 }
                 while (s_drawExtra != NULL) {
                     if (s_drawExtra->objectDrawnAsOverlay
-                        && (gbDrawingPuzzle == 0 || bPuzzleDraw[s_drawExtra->objectTileset])) {
+                        && (gbDrawingPuzzle == 0 || bPuzzleDraw[IDX(s_drawExtra->objectTileset)])) {
                         IconToBitmap(
-                            m_objectIcons[s_drawExtra->objectTileset],
+                            m_objectIcons[IDX(s_drawExtra->objectTileset)],
                             gpWindowManager->m_screen,
                             s_drawPixelX,
                             s_drawPixelY,
@@ -3862,12 +3851,12 @@ void advManager::DrawCell(
                         );
                         if (s_drawExtra->animatedObject) {
                             s_drawAnimationLength = GetIconEntry(
-                                                        m_objectIcons[s_drawExtra->objectTileset],
+                                                        m_objectIcons[IDX(s_drawExtra->objectTileset)],
                                                         s_drawExtra->objectIndex
                             )
                                                         ->flags;
                             IconToBitmap(
-                                m_objectIcons[s_drawExtra->objectTileset],
+                                m_objectIcons[IDX(s_drawExtra->objectTileset)],
                                 gpWindowManager->m_screen,
                                 s_drawPixelX,
                                 s_drawPixelY,
@@ -3894,14 +3883,14 @@ void advManager::DrawCell(
                     && ((HAS(drawMask, ADVMGR_DRAW_OVERLAY) && !s_drawCell->m_drawOverlayOnTop)
                         || (HAS(drawMask, ADVMGR_DRAW_OVERLAY_TOP)
                             && s_drawCell->m_drawOverlayOnTop))
-                    && (gbDrawingPuzzle == 0 || bPuzzleDraw[s_drawCell->m_overlayTileset])) {
+                    && (gbDrawingPuzzle == 0 || bPuzzleDraw[IDX(s_drawCell->m_overlayTileset)])) {
                     IconToBitmap(
-                        m_objectIcons[s_drawCell->m_overlayTileset],
+                        m_objectIcons[IDX(s_drawCell->m_overlayTileset)],
                         gpWindowManager->m_screen,
                         s_drawPixelX,
                         s_drawPixelY,
                         s_drawCell->m_overlayIndex,
-                        s_drawCell->m_overlayTileset == 14,
+                        s_drawCell->m_overlayTileset == TILESET_FLAG32,
                         0,
                         0,
                         DRAW_CLIP_WIDTH,
@@ -3910,12 +3899,12 @@ void advManager::DrawCell(
                     );
                     if (s_drawCell->m_animatedOverlay) {
                         s_drawAnimationLength = GetIconEntry(
-                                                    m_objectIcons[s_drawCell->m_overlayTileset],
+                                                    m_objectIcons[IDX(s_drawCell->m_overlayTileset)],
                                                     s_drawCell->m_overlayIndex
                         )
                                                     ->flags;
                         IconToBitmap(
-                            m_objectIcons[s_drawCell->m_overlayTileset],
+                            m_objectIcons[IDX(s_drawCell->m_overlayTileset)],
                             gpWindowManager->m_screen,
                             s_drawPixelX,
                             s_drawPixelY,
@@ -3941,14 +3930,14 @@ void advManager::DrawCell(
                     if ((HAS(drawMask, ADVMGR_DRAW_OVERLAY) && !s_drawExtra->drawOverlayOnTop)
                         || (HAS(drawMask, ADVMGR_DRAW_OVERLAY_TOP)
                             && s_drawExtra->drawOverlayOnTop)) {
-                        if (gbDrawingPuzzle == 0 || bPuzzleDraw[s_drawExtra->overlayTileset]) {
+                        if (gbDrawingPuzzle == 0 || bPuzzleDraw[IDX(s_drawExtra->overlayTileset)]) {
                             IconToBitmap(
-                                m_objectIcons[s_drawExtra->overlayTileset],
+                                m_objectIcons[IDX(s_drawExtra->overlayTileset)],
                                 gpWindowManager->m_screen,
                                 s_drawPixelX,
                                 s_drawPixelY,
                                 s_drawExtra->overlayIndex,
-                                s_drawExtra->overlayTileset == 14,
+                                s_drawExtra->overlayTileset == TILESET_FLAG32,
                                 0,
                                 0,
                                 DRAW_CLIP_WIDTH,
@@ -3958,12 +3947,12 @@ void advManager::DrawCell(
                             if (s_drawExtra->animatedOverlay) {
                                 s_drawAnimationLength =
                                     GetIconEntry(
-                                        m_objectIcons[s_drawExtra->overlayTileset],
+                                        m_objectIcons[IDX(s_drawExtra->overlayTileset)],
                                         s_drawExtra->overlayIndex
                                     )
                                         ->flags;
                                 IconToBitmap(
-                                    m_objectIcons[s_drawExtra->overlayTileset],
+                                    m_objectIcons[IDX(s_drawExtra->overlayTileset)],
                                     gpWindowManager->m_screen,
                                     s_drawPixelX,
                                     s_drawPixelY,
@@ -4143,13 +4132,13 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                     } else {
                         objectTilesetLocal = static_cast<u32>(-1);
                         if (cellValue->m_objectIndex != IDX(MAPCELL_SPRITE_NONE)) {
-                            objectTilesetLocal = cellValue->m_objectTileset;
+                            objectTilesetLocal = IDX(cellValue->m_objectTileset);
                         } else if (cellValue->m_overlayIndex != IDX(MAPCELL_SPRITE_NONE)) {
-                            objectTilesetLocal = cellValue->m_overlayTileset;
+                            objectTilesetLocal = IDX(cellValue->m_overlayTileset);
                         }
 
                         if (cellValue->m_triggerType == RADAR_TOWN_TILESET_1
-                            || (objectTilesetLocal == 14 && mapColumnLimit > 0
+                            || (objectTilesetLocal == IDX(TILESET_FLAG32) && mapColumnLimit > 0
                                 && mapColumnLimit < MAP_WIDTH - 1
                                 && m_mapData->Row(mapRow)[mapColumnLimit - 1].m_triggerType
                                        == RADAR_NEIGHBOR_TRIGGER)
@@ -4425,7 +4414,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
     char guardCaption[200];
     i32 siteIndexName;
     i32 siteFrameLocal[2];
-    i32 objectTilesetLocal;
+    TilesetId objectTilesetLocal;
     char uppercaseResult;
     char mapObjectKindValue;
     tag_message message;
@@ -4636,7 +4625,8 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     );
                     goto quick_info_guarded;
                 case MAP_OBJECT_MINE:
-                    if (gpGame->m_mines[currentCell->m_objectMetadata].guardianType != -1) {
+                    if (gpGame->m_mines[currentCell->m_objectMetadata].guardianType
+                        != CREATURE_NONE) {
                         sprintf(
                             gText,
                             "%s %s",
@@ -4652,8 +4642,9 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                                 gpGame->m_mines[currentCell->m_objectMetadata].guardianCount,
                                 2
                             ),
-                            gArmyNamesPlural[gpGame->m_mines[currentCell->m_objectMetadata]
-                                                 .guardianType]
+                            gArmyNamesPlural[IDX(
+                                gpGame->m_mines[currentCell->m_objectMetadata].guardianType
+                            )]
                         );
                         strcat(gText, guardCaption);
                     } else {
@@ -4716,7 +4707,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     }
                     siteIndexName = -1;
                     switch (objectTilesetLocal) {
-                        case SITE_TILESET_1:
+                        case TILESET_X_LOC1:
                             if (siteFrameLocal[0] < 0) {
                                 break;
                             } else {
@@ -4728,7 +4719,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                                 }
                             }
                             break;
-                        case SITE_TILESET_2:
+                        case TILESET_X_LOC2:
                             if (siteFrameLocal[0] < 0) {
                                 break;
                             } else {
@@ -4746,7 +4737,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                                 }
                             }
                             break;
-                        case SITE_TILESET_3:
+                        case TILESET_X_LOC3:
                             if (siteFrameLocal[0] < 0) {
                                 break;
                             } else {
@@ -4783,7 +4774,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     }
                     siteIndexName = -1;
                     switch (objectTilesetLocal) {
-                        case SITE_TILESET_1:
+                        case TILESET_X_LOC1:
                             if (siteFrameLocal[0] < RECRUITMENT_START) {
                                 break;
                             } else {
@@ -4809,7 +4800,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     break;
                 }
                 case MAP_OBJECT_ROCK:
-                    if (currentCell->m_objectTileset == SITE_TILESET_2) {
+                    if (currentCell->m_objectTileset == TILESET_X_LOC2) {
                         sprintf(gText, "Reefs");
                     } else {
                         goto quick_info_default;
@@ -6788,24 +6779,24 @@ void advManager::CastSpell(SpellType spell) {
         currentHeroSlot = NULL;
     }
 
-    i32 guardianTypes1[MINE_GUARDIAN_VALUE_COUNT];
+    CreatureType guardianTypes1[MINE_GUARDIAN_VALUE_COUNT];
     mapCell* currentCell;
     i32 spellPowerValue;
     switch (spell) {
         case SPELL_SET_EARTH_GUARDIAN:
-            guardianTypes1[MINE_GUARDIAN_TYPE_INDEX] = IDX(CREATURE_EARTH_ELEMENTAL);
+            guardianTypes1[MINE_GUARDIAN_TYPE_INDEX] = CREATURE_EARTH_ELEMENTAL;
             goto setMineGuardian;
         case SPELL_SET_AIR_GUARDIAN:
-            guardianTypes1[MINE_GUARDIAN_TYPE_INDEX] = IDX(CREATURE_AIR_ELEMENTAL);
+            guardianTypes1[MINE_GUARDIAN_TYPE_INDEX] = CREATURE_AIR_ELEMENTAL;
             goto setMineGuardian;
         case SPELL_SET_FIRE_GUARDIAN:
-            guardianTypes1[MINE_GUARDIAN_TYPE_INDEX] = IDX(CREATURE_FIRE_ELEMENTAL);
+            guardianTypes1[MINE_GUARDIAN_TYPE_INDEX] = CREATURE_FIRE_ELEMENTAL;
             goto setMineGuardian;
         case SPELL_SET_WATER_GUARDIAN:
-            guardianTypes1[MINE_GUARDIAN_TYPE_INDEX] = IDX(CREATURE_WATER_ELEMENTAL);
+            guardianTypes1[MINE_GUARDIAN_TYPE_INDEX] = CREATURE_WATER_ELEMENTAL;
             goto setMineGuardian;
         case SPELL_HAUNT:
-            guardianTypes1[MINE_GUARDIAN_TYPE_INDEX] = IDX(CREATURE_GHOST);
+            guardianTypes1[MINE_GUARDIAN_TYPE_INDEX] = CREATURE_GHOST;
             goto setMineGuardian;
         setMineGuardian:
             currentCell = gpAdvManager->GetCell(currentHeroSlot->m_x, currentHeroSlot->m_y);
@@ -6826,7 +6817,7 @@ void advManager::CastSpell(SpellType spell) {
                 return;
             }
             gpGame->m_mines[currentCell->m_objectMetadata].guardianType =
-                static_cast<i8>(guardianTypes1[MINE_GUARDIAN_TYPE_INDEX]);
+                guardianTypes1[MINE_GUARDIAN_TYPE_INDEX];
             spellPowerValue = currentHeroSlot->Stats(HERO_PRIMARY_SPELL_POWER);
             if (spellPowerValue > MINE_GUARDIAN_MAX_POWER) {
                 spellPowerValue = MINE_GUARDIAN_MAX_POWER;
@@ -7219,7 +7210,7 @@ i32 advManager::ComboDraw(i32 originX, i32 originY, i32 animate) {
         for (mapRow = 0; mapRow < COMBO_VIEW_CELLS; ++mapRow) {
             cell = GetCell(column + originX, mapRow + originY);
             if (cell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MINE)) {
-                if (gpGame->m_mines[cell->m_objectMetadata].guardianType == IDX(CREATURE_GHOST)) {
+                if (gpGame->m_mines[cell->m_objectMetadata].guardianType == CREATURE_GHOST) {
                     ++bComboDraw[column][mapRow];
                     ++bComboDraw[column + 1][mapRow];
                     if (column < COMBO_VIEW_CELLS) {
@@ -7671,23 +7662,23 @@ AdventureEnvironmentSoundId advManager::GetSoundId(i32 x, i32 y) {
                     return ADVMGR_SOUND_LAVA_POOL;
                 }
             case MAP_OBJECT_VOLCANO:
-                if (currentCell->m_objectTileset == SOUND_TILESET_SMALL_VOLCANO
-                    || currentCell->m_objectTileset == SOUND_TILESET_LARGE_VOLCANO) {
+                if (currentCell->m_objectTileset == TILESET_OBJNLAV3
+                    || currentCell->m_objectTileset == TILESET_OBJNLAV2) {
                     return ADVMGR_SOUND_LARGE_VOLCANO;
                 } else {
                     return ADVMGR_SOUND_SMALL_VOLCANO;
                 }
             case MAP_OBJECT_WATER_LAKE:
-                if (currentCell->m_objectTileset == SOUND_TILESET_WATER_LAKE_UNUSED) {
+                if (currentCell->m_objectTileset == TILESET_OBJNSNOW) {
                     break;
                 }
                 return ADVMGR_SOUND_WATERING_HOLE;
         }
 
         switch (currentCell->m_objectTileset) {
-            case SOUND_TILESET_STREAM:
+            case TILESET_STREAM:
                 return ADVMGR_SOUND_STREAM;
-            case SOUND_TILESET_WATER:
+            case TILESET_OBJNWAT2:
                 if (currentCell->m_objectIndex == SOUND_SEAGULL_FRAME_FIRST
                     || currentCell->m_objectIndex == SOUND_SEAGULL_FRAME_LAST) {
                     return ADVMGR_SOUND_SEAGULLS;
@@ -9046,7 +9037,7 @@ i32 advManager::FindAdjacentMonster(
                         if ((GetCell(originX, originY)->m_objectIndex
                                  == ADJACENT_OBJECT_INDEX_NONE
                              || GetCell(originX, originY)->m_objectTileset
-                                    == CLEAR_GROUND_TILESET
+                                    == TILESET_DUMMY
                              || (GetCell(originX, originY)->m_flags & HOVER_UNREACHABLE))
                             && (s_adjacentMonsterX != excludedX
                                 || excludedY != s_adjacentMonsterY)) {
@@ -9087,7 +9078,7 @@ i32 advManager::FindAdjacentMonster(
                         if ((GetCell(originX, originY)->m_objectIndex
                                  == ADJACENT_OBJECT_INDEX_NONE
                              || GetCell(originX, originY)->m_objectTileset
-                                    == CLEAR_GROUND_TILESET
+                                    == TILESET_DUMMY
                              || (GetCell(originX, originY)->m_flags & HOVER_UNREACHABLE))
                             && (s_adjacentMonsterX != excludedX
                                 || excludedY != s_adjacentMonsterY)) {

@@ -25,8 +25,8 @@ struct tag_message;
 struct mineRecord {
     i8 id;
     i8 owner;
-    i8 resourceType;
-    i8 guardianType;
+    H2_ENUM_STORAGE(MineType, i8) resourceType;
+    H2_ENUM_STORAGE(CreatureType, i8) guardianType;
     u8 guardianCount;
     u8 x;
     u8 y;
@@ -255,7 +255,7 @@ public:
     void WaitForPlayer(char*, i32);
     i32 HasLateOverlay(i32, i32);
     void ConvertFlagToLateOverlay(i32, i32);
-    i32 HasObjectTilesetIndex(i32, i32, i32, i32);
+    i32 HasObjectTilesetIndex(i32, i32, H2_ENUM_PARAM(TilesetId, i32), i32);
     void ConvertAllToLateOverlay(i32, i32);
     void ProcessMapExtra(void);
     void SetupTowns(void);

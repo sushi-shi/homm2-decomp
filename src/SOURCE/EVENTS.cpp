@@ -265,7 +265,6 @@ namespace {
         ERASE_COORDINATE_COUNT = 2,
         NO_FRAME = -1,
         EMPTY_INDEX = 0xFF,
-        CLEARED_TILESET = IDX(TILESET_DUMMY),
         MAP_CHANGE_VALUE = -999,
         ENVIRONMENT_BORDER = 7
     H2_ENUM_END(EraseObjectConstant)
@@ -1174,10 +1173,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
 
         case MAP_OBJECT_MINE:
             if (gpGame->m_mineOwners[cell->m_objectMetadata] != giCurPlayer) {
-                if (gpGame->m_mines[cell->m_objectMetadata].guardianType != -1) {
+                if (gpGame->m_mines[cell->m_objectMetadata].guardianType != CREATURE_NONE) {
                     mineCombatResult7 = CombatMonsterEvent(
                         eventHero2,
-                        CreatureType(gpGame->m_mines[cell->m_objectMetadata].guardianType),
+                        gpGame->m_mines[cell->m_objectMetadata].guardianType,
                         gpGame->m_mines[cell->m_objectMetadata].guardianCount,
                         cell,
                         x,
@@ -1194,7 +1193,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     );
                     if (mineCombatResult7 != 0)
                         break;
-                    gpGame->m_mines[cell->m_objectMetadata].guardianType = -1;
+                    gpGame->m_mines[cell->m_objectMetadata].guardianType = CREATURE_NONE;
                     eventHero2->CheckLevel();
                 }
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
@@ -3554,7 +3553,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                 if (CombatMonsterEvent(
                         eventHero2,
-                        CreatureType(gpGame->m_mines[cell->m_objectMetadata].guardianType),
+                        gpGame->m_mines[cell->m_objectMetadata].guardianType,
                         gpGame->m_mines[cell->m_objectMetadata].guardianCount,
                         cell,
                         x,
@@ -3648,7 +3647,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         ABANDONED_MINE_EVENT
                     );
                     gpGame->m_mines[cell->m_objectMetadata].resourceType = IDX(RES_GOLD);
-                    gpGame->m_mines[cell->m_objectMetadata].guardianType = -1;
+                    gpGame->m_mines[cell->m_objectMetadata].guardianType = CREATURE_NONE;
                     gpGame->m_mines[cell->m_objectMetadata].guardianCount = 0;
                     gpGame->ClaimMine(cell->m_objectMetadata, giCurPlayer);
                 }
@@ -3715,23 +3714,23 @@ void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
     // Retail object-to-footprint frame topology. The frame ids are payloads from the
     // corresponding ICN tilesets, not independent gameplay constants.
     // NOLINTBEGIN(readability-magic-numbers)
-    if (cell->m_objectTileset == IDX(TILESET_OBJNARTI))
+    if (cell->m_objectTileset == TILESET_OBJNARTI)
         frame_k = cell->m_objectIndex - 1;
-    if (cell->m_objectTileset == IDX(TILESET_X_LOC3))
+    if (cell->m_objectTileset == TILESET_X_LOC3)
         frame_k = cell->m_objectIndex - 1;
-    if (cell->m_objectTileset == IDX(TILESET_X_LOC2) && cell->m_objectIndex == 9) {
+    if (cell->m_objectTileset == TILESET_X_LOC2 && cell->m_objectIndex == 9) {
         frame_k = 9;
         isWide_d = 1;
     }
-    if (cell->m_objectTileset == IDX(TILESET_OBJNMULT) && cell->m_objectIndex == 131)
+    if (cell->m_objectTileset == TILESET_OBJNMULT && cell->m_objectIndex == 131)
         frame_k = 124;
-    if (cell->m_objectTileset == IDX(TILESET_OBJNDSRT) && cell->m_objectIndex == 61)
+    if (cell->m_objectTileset == TILESET_OBJNDSRT && cell->m_objectIndex == 61)
         frame_k = 54;
-    if (cell->m_objectTileset == IDX(TILESET_OBJNWATR) && cell->m_objectIndex == 45)
+    if (cell->m_objectTileset == TILESET_OBJNWATR && cell->m_objectIndex == 45)
         frame_k = 38;
-    if (cell->m_objectTileset == IDX(TILESET_OBJNWATR) && cell->m_objectIndex == 19)
+    if (cell->m_objectTileset == TILESET_OBJNWATR && cell->m_objectIndex == 19)
         frame_k = 12;
-    if (cell->m_objectTileset == IDX(TILESET_OBJNRSRC)) {
+    if (cell->m_objectTileset == TILESET_OBJNRSRC) {
         switch (cell->m_objectIndex) {
             case 1:
                 frame_k = 0;
@@ -3789,13 +3788,13 @@ void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
                 if (cellY_e[0] >= 0) {
                     cells_h[i_e] = gpGame->m_worldMap.Row(cellY_e[0]) + cellX_b[0];
                     if (i_e > 1) {
-                        cells_h[i_e]->m_overlayTileset = 0;
+                        cells_h[i_e]->m_overlayTileset = TILESET_NONE;
                         cells_h[i_e]->m_overlayIndex = EMPTY_INDEX;
                     } else if (cells_h[i_e]->m_objectIndex != EMPTY_INDEX) {
                         if (cells_h[i_e]->m_objectIndex == frame_k
                             && cells_h[i_e]->m_objectTileset == cell->m_objectTileset) {
                             cells_h[i_e]->m_objectIndex = 0;
-                            cells_h[i_e]->m_objectTileset = CLEARED_TILESET;
+                            cells_h[i_e]->m_objectTileset = TILESET_DUMMY;
                             cells_h[i_e]->m_animatedObject = 0;
                         }
 
@@ -3810,7 +3809,7 @@ void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
                             if (extras_b[i_e]->objectIndex == frame_k
                                 && extras_b[i_e]->objectTileset == cell->m_objectTileset) {
                                 extras_b[i_e]->objectIndex = 0;
-                                extras_b[i_e]->objectTileset = CLEARED_TILESET;
+                                extras_b[i_e]->objectTileset = TILESET_DUMMY;
                                 extras_b[i_e]->animatedObject = 0;
                             }
 
@@ -3829,14 +3828,14 @@ void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
 
     cell->m_triggerType = 0;
     cell->m_objectIndex = 0;
-    cell->m_objectTileset = CLEARED_TILESET;
+    cell->m_objectTileset = TILESET_DUMMY;
     cell->m_animatedObject = 0;
 
     for (i_e = 0; i_e < CELL_COUNT; i_e++) {
         currentCell_k = i_e == 0 ? cell : cells_h[i_e - 1];
         if (!currentCell_k)
             continue;
-        if (currentCell_k->m_objectTileset != CLEARED_TILESET)
+        if (currentCell_k->m_objectTileset != TILESET_DUMMY)
             continue;
 
         if (currentCell_k->m_extraIndex
@@ -3845,7 +3844,7 @@ void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
         else
             continue;
 
-        if (extra_i->objectTileset == CLEARED_TILESET || extra_i->objectIndex == EMPTY_INDEX)
+        if (extra_i->objectTileset == TILESET_DUMMY || extra_i->objectIndex == EMPTY_INDEX)
             continue;
 
         currentCell_k->m_objectIndex = extra_i->objectIndex;
@@ -3854,7 +3853,7 @@ void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
         currentCell_k->m_objectLayerBit0 = extra_i->objectLayerBit0;
         currentCell_k->m_objectLayerBit1 = extra_i->objectLayerBit1;
         extra_i->objectIndex = 0;
-        extra_i->objectTileset = CLEARED_TILESET;
+        extra_i->objectTileset = TILESET_DUMMY;
         extra_i->animatedObject = 0;
     }
 
@@ -3863,7 +3862,7 @@ void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
         if (!currentCell_k)
             continue;
 
-        if (currentCell_k->m_objectTileset != CLEARED_TILESET
+        if (currentCell_k->m_objectTileset != TILESET_DUMMY
             && currentCell_k->m_objectIndex != EMPTY_INDEX && !currentCell_k->m_objectLayerBit1)
             goto cellDone;
 
@@ -3874,7 +3873,7 @@ void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
             extra_i = NULL;
 
         while (extra_i) {
-            if (extra_i->objectTileset != CLEARED_TILESET && extra_i->objectIndex != EMPTY_INDEX
+            if (extra_i->objectTileset != TILESET_DUMMY && extra_i->objectIndex != EMPTY_INDEX
                 && !extra_i->objectLayerBit1)
                 goto cellDone;
 
@@ -6073,17 +6072,17 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
         case MAP_OBJECT_SAWMILL:
             if (gpGame->m_mineOwners[cell->m_objectMetadata] == giCurPlayer)
                 break;
-            if (gpGame->m_mines[cell->m_objectMetadata].guardianType != IDX(CREATURE_NONE)) {
+            if (gpGame->m_mines[cell->m_objectMetadata].guardianType != CREATURE_NONE) {
                 index_h = gpGame->m_mines[cell->m_objectMetadata].guardianCount;
                 combatResult_d = gpPhilAI->CombatMonsterEvent(
                     eventHero,
-                    gpGame->m_mines[cell->m_objectMetadata].guardianType,
+                    IDX(gpGame->m_mines[cell->m_objectMetadata].guardianType),
                     &index_h,
                     cell
                 );
                 if (combatResult_d == 0)
                     break;
-                gpGame->m_mines[cell->m_objectMetadata].guardianType = IDX(CREATURE_NONE);
+                gpGame->m_mines[cell->m_objectMetadata].guardianType = CREATURE_NONE;
                 gpGame->m_mines[cell->m_objectMetadata].guardianCount = 0;
                 eventHero->CheckLevel();
             }
@@ -6098,7 +6097,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                             eventHero->m_spellPoints - GetManaCost(SpellType(index_h), eventHero)
                         );
                         gpGame->m_mines[cell->m_objectMetadata].guardianType =
-                            static_cast<i8>(index_h + 1);
+                            static_cast<CreatureType>(index_h + 1);
                         spellPower_j = eventHero->Stats(HERO_PRIMARY_SPELL_POWER);
                         if (spellPower_j > EVENT_MINE_SPELL_POWER_MAX)
                             spellPower_j = EVENT_MINE_SPELL_POWER_MAX;
@@ -6872,7 +6871,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
         case MAP_OBJECT_ABANDONED_MINE:
             for (index_h = 0; index_h < ARMY_GROUP_SLOT_COUNT; ++index_h) {
                 gpMonGroup->m_creatureTypes[index_h] =
-                    gpGame->m_mines[cell->m_objectMetadata].guardianType;
+                    static_cast<i8>(IDX(gpGame->m_mines[cell->m_objectMetadata].guardianType));
                 gpMonGroup->m_creatureCounts[index_h] = static_cast<i16>(
                     gpGame->m_mines[cell->m_objectMetadata].guardianCount
                     / EVENT_ABANDONED_MINE_ARMY_DIVISOR
@@ -6897,7 +6896,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 survivingCount_a = gpGame->m_mines[cell->m_objectMetadata].guardianCount;
                 combatResult_d = gpPhilAI->CombatMonsterEvent(
                     eventHero,
-                    gpGame->m_mines[cell->m_objectMetadata].guardianType,
+                    IDX(gpGame->m_mines[cell->m_objectMetadata].guardianType),
                     &survivingCount_a,
                     cell
                 );
@@ -6974,8 +6973,8 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                         ABANDONED_MINE_OBJECT,
                         ABANDONED_MINE_EVENT
                     );
-                    gpGame->m_mines[cell->m_objectMetadata].resourceType = IDX(RES_GOLD);
-                    gpGame->m_mines[cell->m_objectMetadata].guardianType = IDX(CREATURE_NONE);
+                    gpGame->m_mines[cell->m_objectMetadata].resourceType = MINE_TYPE_GOLD;
+                    gpGame->m_mines[cell->m_objectMetadata].guardianType = CREATURE_NONE;
                     gpGame->m_mines[cell->m_objectMetadata].guardianCount = 0;
                     gpGame->ClaimMine(cell->m_objectMetadata, giCurPlayer);
                 }

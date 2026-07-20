@@ -25,7 +25,15 @@ public:
     struct mapCellExtra* GetNewCellExtraObject(i32, i32);
     void Write(i32);
     void Read(i32, i32);
-    void ChangeTilesetIndex(class mapCell*, i32, i32, i32, i32, i32, i32);
+    void ChangeTilesetIndex(
+        class mapCell*,
+        i32,
+        i32,
+        H2_ENUM_PARAM(TilesetId, i32),
+        i32,
+        i32,
+        i32
+    );
 
     mapCell* Cells(void) {
         return cells;
