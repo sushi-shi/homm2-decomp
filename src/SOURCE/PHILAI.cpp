@@ -140,7 +140,8 @@ H2_ENUM_BEGIN(AIRuntimeConstant)
     SHIPYARD_GOLD_COST                        = 2000,
     SHIPYARD_WOOD_COST                        = 20,
     DIMENSION_DOOR_LANDING_CANDIDATE_COUNT    = 3,
-    INTERACTION_TURN_UNSET                    = -99
+    INTERACTION_TURN_UNSET                    = -99,
+    CREATURE_PURCHASE_UNLIMITED               = 9999
 H2_ENUM_END(AIRuntimeConstant)
 
 H2_ENUM_BEGIN(AIPositionValueConstant)
@@ -1649,6 +1650,8 @@ hero* philAI::DetermineHeroToMove(i32 player) {
     return NULL;
 }
 
+// Terrain scaling, scan radii, score jitter, and shipyard cutoffs are retail AI target-policy payload.
+// NOLINTBEGIN(readability-magic-numbers)
 VA(0x0043b865, 0xe7d)
 i32 philAI::DetermineTargetPosition(i32& targetX, i32& targetY, i32 mobility, i32& direction) {
     i32 boatTravelDistanceCounter;
@@ -1695,11 +1698,11 @@ i32 philAI::DetermineTargetPosition(i32& targetX, i32& targetY, i32 mobility, i3
     candidateCell = gpAdvManager->GetCell(gpCurAIHero->m_x, gpCurAIHero->m_y);
     mapTerrain = giGroundToTerrain[candidateCell->m_terrainImageIndex];
     if (gpCurAIHero->m_secondarySkills[0] <= IDX(HERO_SKILL_LEVEL_BASIC)) {
-        if (mapTerrain == 2 || mapTerrain == 3)
+        if (mapTerrain == IDX(TERRAIN_SNOW) || mapTerrain == IDX(TERRAIN_SWAMP))
             mobility = static_cast<i32>(mobility * 1.15);
-        if (mapTerrain == 5)
+        if (mapTerrain == IDX(TERRAIN_DESERT))
             mobility = static_cast<i32>(mobility * 1.35);
-        if (mapTerrain == 7)
+        if (mapTerrain == IDX(TERRAIN_WASTELAND))
             mobility = static_cast<i32>(mobility * 1.25);
     } else if (gpGame->m_mapHeader.width == MAP_SIZE_SMALL) {
         mobility = static_cast<i32>(mobility * 0.9);
@@ -1937,11 +1940,12 @@ i32 philAI::DetermineTargetPosition(i32& targetX, i32& targetY, i32 mobility, i3
         targetY,
         gpCurAIHero->m_x,
         gpCurAIHero->m_y,
-        -999
+        LOG_UNUSED_VALUE
     );
     LogStr("\n\n****");
     return bestValue;
 }
+// NOLINTEND(readability-magic-numbers)
 
 VA(0x0043c6e2, 0x791)
 void philAI::ProbableOutcomeOfBattle(
@@ -2145,6 +2149,8 @@ float philAI::GetOddsOfWinning(i32) {
     return 1.0f;
 }
 
+// Building timing gates and benefit multipliers are retail AI purchase-policy payload.
+// NOLINTBEGIN(readability-magic-numbers)
 VA(0x0043ce91, 0x826)
 void philAI::ValueOfBuyingBuilding(
     town* townPtr,
@@ -2162,7 +2168,7 @@ void philAI::ValueOfBuyingBuilding(
     i32 indexBuilding;
     i32 buildingLevel;
     i32 currentCreatureType;
-    i32 costsByResource[7];
+    i32 costsByResource[AI_PURCHASE_RESOURCE_COUNT];
     float estimatedAttackChance;
     float enemyStrengthLocal;
     i32 currentAttackTurns;
@@ -2194,7 +2200,11 @@ void philAI::ValueOfBuyingBuilding(
     );
     if (building >= BUILDING_SLOT_UPGRADE_FIRST && building <= BUILDING_SLOT_UPGRADE_LAST) {
         adjustedValue -= static_cast<float>(
-            GetBuildingBaseResourceValue(currentTownRace, BuildingSlotType(IDX(building) - 5), 1)
+            GetBuildingBaseResourceValue(
+                currentTownRace,
+                BuildingSlotType(IDX(building) - CREATURE_UPGRADE_BUILDING_OFFSET),
+                1
+            )
         );
     }
     if (building == BUILDING_SLOT_DWELLING_LAST) {
@@ -2376,7 +2386,10 @@ void philAI::ValueOfBuyingBuilding(
     resourceValue = static_cast<i32>(adjustedValue);
     benefitCost = adjustedValue / RVConversion(costsByResource);
 }
+// NOLINTEND(readability-magic-numbers)
 
+// Building choice jitter and personality weighting are retail AI purchase-policy payload.
+// NOLINTBEGIN(readability-magic-numbers)
 VA(0x0043d6b7, 0x19b)
 void philAI::GetBestBuilding(town* t, BHC& bhc, float& fOut) {
     float score;
@@ -2389,8 +2402,10 @@ void philAI::GetBestBuilding(town* t, BHC& bhc, float& fOut) {
     nb = -99.0f;
     kn = -99.0f;
     jb = -1;
-    for (node = 0; node < 32; node++) {
-        if (!(t->m_buildings & (1 << node)) || (node == 0 && t->m_buildState < 5)) {
+    for (node = 0; node < TOWN_BUILDING_COUNT; node++) {
+        if (!(t->m_buildings & (1 << node))
+            || (node == IDX(BUILDING_SLOT_MAGE_GUILD)
+                && t->m_buildState < AI_MAX_MAGE_GUILD_LEVEL)) {
             if (CanBuild(t, BuildingSlotType(node))) {
                 ValueOfBuyingBuilding(t, BuildingSlotType(node), cost, idx);
                 if (gpCurPlayer->m_aiDifficulty == PLAYER_PERSONALITY_BUILDER)
@@ -2401,7 +2416,7 @@ void philAI::GetBestBuilding(town* t, BHC& bhc, float& fOut) {
                     nb = idx;
                     kn = score;
                 }
-                if (giDebugLevel >= 5) {
+                if (giDebugLevel >= AI_PURCHASE_VALUE_DEBUG_LEVEL) {
                     sprintf(
                         gText,
                         "Town:%2d  Building: % 18s   Raw BC = %8.2f,  RandBC = %8.2f.",
@@ -2420,6 +2435,7 @@ void philAI::GetBestBuilding(town* t, BHC& bhc, float& fOut) {
     bhc.what = jb;
     fOut = nb;
 }
+// NOLINTEND(readability-magic-numbers)
 
 VA(0x0043d852, 0x306)
 void philAI::ValueOfBuyingCreature(
@@ -2638,13 +2654,13 @@ i32 philAI::CreaturesToBuy(i32 a, i32 b) {
 
 VA(0x0043df5a, 0x9c)
 i32 philAI::MaxBuyableCreatures(CreatureType level) {
-    i32 cost7[7];
+    i32 cost7[AI_PURCHASE_RESOURCE_COUNT];
     i32 res;
     i32 i;
     GetMonsterCost(level, cost7);
-    for (i = 0; i < 7; i++) {
+    for (i = 0; i < AI_PURCHASE_RESOURCE_COUNT; i++) {
         if (cost7[i] == 0)
-            res = 9999;
+            res = CREATURE_PURCHASE_UNLIMITED;
         else if (gpCurPlayer->m_resources[i] > 0)
             res = gpCurPlayer->m_resources[i] / cost7[i];
         else
@@ -2653,6 +2669,8 @@ i32 philAI::MaxBuyableCreatures(CreatureType level) {
     return res;
 }
 
+// Experience, artifact, race, and class weights are retail AI hero-purchase payload.
+// NOLINTBEGIN(readability-magic-numbers)
 VA(0x0043dff6, 0x2b2)
 void philAI::ValueOfBuyingHero(
     town* townPtr,
@@ -2667,13 +2685,13 @@ void philAI::ValueOfBuyingHero(
     i32 purchaseScratch10;
     i32 value27;
 
-    costs2[0] = 0;
-    costs2[1] = 0;
-    costs2[2] = 0;
-    costs2[3] = 0;
-    costs2[4] = 0;
-    costs2[5] = 0;
-    costs2[6] = AI_HERO_PURCHASE_GOLD_COST;
+    costs2[IDX(RES_WOOD)] = 0;
+    costs2[IDX(RES_MERCURY)] = 0;
+    costs2[IDX(RES_ORE)] = 0;
+    costs2[IDX(RES_SULFUR)] = 0;
+    costs2[IDX(RES_CRYSTAL)] = 0;
+    costs2[IDX(RES_GEMS)] = 0;
+    costs2[IDX(RES_GOLD)] = AI_HERO_PURCHASE_GOLD_COST;
     costValue6 = RVConversion(costs2);
     value27 = heroPtr->m_experience + AI_HERO_PURCHASE_EXPERIENCE_BASE;
     for (artifactIndex10 = 0; artifactIndex10 < AI_BATTLE_ARTIFACT_SLOT_COUNT; artifactIndex10++) {
@@ -2707,6 +2725,7 @@ void philAI::ValueOfBuyingHero(
     benefitCost = static_cast<float>(value27) / costValue6;
     resourceValue = value27;
 }
+// NOLINTEND(readability-magic-numbers)
 
 VA(0x0043e2a8, 0x1b1)
 void philAI::GetBestHero(town* townPtr, BHC& best, float& bestValue) {
@@ -2757,6 +2776,8 @@ void philAI::GetBestHero(town* townPtr, BHC& best, float& bestValue) {
     }
 }
 
+// Baseline attack chance, value, and horizon are retail AI forecasting payload.
+// NOLINTBEGIN(readability-magic-numbers)
 VA(0x0043e459, 0x65)
 void philAI::LikelihoodOfEnemyAttacking(
     town*,
@@ -2775,12 +2796,15 @@ void philAI::LikelihoodOfEnemyAttacking(
     nWeeks = 6;
     fOut = chanceB * chanceA;
 }
+// NOLINTEND(readability-magic-numbers)
 
 VA(0x0043e4be, 0x1a)
 i32 philAI::MeanRVOfUnexploredTerritory(i32) {
     return 0;
 }
 
+// Attention randomization and player-count weighting are retail AI strategy payload.
+// NOLINTBEGIN(readability-magic-numbers)
 VA(0x0043e4d8, 0x1d8)
 void philAI::GetGameAttentionValue(i32 player) {
     playerAttentionWeights* attention = &gpGame->m_players[player].m_attentionWeights;
@@ -2808,7 +2832,10 @@ void philAI::GetGameAttentionValue(i32 player) {
         (1.0f - attention->gameWeightB) - attention->gameWeightA
     );
 }
+// NOLINTEND(readability-magic-numbers)
 
+// Turn-phase attention curves are retail AI strategy payload.
+// NOLINTBEGIN(readability-magic-numbers)
 VA(0x0043e6b0, 0xf2)
 void philAI::GetTurnAttentionValue(i32 player) {
     playerAttentionWeights* ptr = &gpGame->m_players[player].m_attentionWeights;
@@ -2831,6 +2858,7 @@ void philAI::GetTurnAttentionValue(i32 player) {
         factor = 0.8f;
     ptr->heroValue = ptr->heroValue * factor;
 }
+// NOLINTEND(readability-magic-numbers)
 
 VA(0x0043e7a2, 0xa6)
 i32 philAI::RVConversion(i32* const p) {
@@ -2843,12 +2871,14 @@ i32 philAI::RVConversion(i32* const p) {
                  + (float)p[IDX(RES_CRYSTAL)] * gafAITurnCostResource[IDX(RES_CRYSTAL)]);
 }
 
+// The no-income horizon sentinel is retail AI purchase-policy payload.
+// NOLINTBEGIN(readability-magic-numbers)
 VA(0x0043e848, 0xd0)
 float philAI::TurnsToBuy(i32* const p) {
     float maxT = 0;
     i32 i;
     float turns;
-    for (i = 0; i < 7; i++) {
+    for (i = 0; i < AI_PURCHASE_RESOURCE_COUNT; i++) {
         if (gpCurPlayer->m_resources[i] < p[i]) {
             if (gpCurPlayer->m_income[i] > 0)
                 turns = static_cast<float>(
@@ -2861,6 +2891,7 @@ float philAI::TurnsToBuy(i32* const p) {
     }
     return maxT;
 }
+// NOLINTEND(readability-magic-numbers)
 
 VA(0x0043e918, 0x62d)
 i32 philAI::RVOfPosition(
