@@ -93,6 +93,7 @@ def parse_enum_declarations(path: Path, text: str | None = None) -> list[EnumDec
         "H2_ENUM_BEGIN": "H2_ENUM_END",
         "H2_ENUM_CLASS_BEGIN": "H2_ENUM_CLASS_END",
         "H2_ENUM_CLASS_BEGIN_T": "H2_ENUM_CLASS_END_T",
+        "H2_ENUM_CLASS_BEGIN_SPLIT": "H2_ENUM_CLASS_END_SPLIT",
     }
     index = 0
     while index < len(tokens):
