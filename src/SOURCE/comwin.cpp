@@ -180,20 +180,20 @@ i16 com_init(u8 portNumber, i32 baudRate, i32 useDtr) {
     s_comPorts[portIndex].savedState = state;
     GetCommTimeouts(s_comPorts[portIndex].handle, &s_comPorts[portIndex].savedTimeouts);
 
-    switch (baudRate) {
-        case IDX(COM_BAUD_2400):
+    switch (static_cast<ComBaudRate>(baudRate)) {
+        case COM_BAUD_2400:
             state.BaudRate = BAUD_VALUE_2400;
             break;
-        case IDX(COM_BAUD_4800):
+        case COM_BAUD_4800:
             state.BaudRate = BAUD_VALUE_4800;
             break;
-        case IDX(COM_BAUD_9600):
+        case COM_BAUD_9600:
             state.BaudRate = BAUD_VALUE_9600;
             break;
-        case IDX(COM_BAUD_19200):
+        case COM_BAUD_19200:
             state.BaudRate = BAUD_VALUE_19200;
             break;
-        case IDX(COM_BAUD_38400):
+        case COM_BAUD_38400:
             state.BaudRate = BAUD_VALUE_38400;
             break;
         default:

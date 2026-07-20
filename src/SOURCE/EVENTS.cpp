@@ -231,7 +231,7 @@ namespace {
         SOUND_SAMPLE_NAME_EMPTY_LIMIT = 1
     H2_ENUM_END(EventSoundConstant)
 
-    H2_ENUM_BEGIN(EventSoundVariant)
+    H2_ENUM_CLASS_BEGIN(EventSoundVariant)
         SOUND_VARIANT_0 = 0,
         SOUND_VARIANT_1 = 1,
         SOUND_VARIANT_2 = 2,
@@ -239,7 +239,7 @@ namespace {
         SOUND_VARIANT_4 = 4,
         SOUND_VARIANT_5 = 5,
         SOUND_VARIANT_6 = 6
-    H2_ENUM_END(EventSoundVariant)
+    H2_ENUM_CLASS_END(EventSoundVariant)
 
     H2_ENUM_BEGIN(EraseObjectConstant)
         NEIGHBOR_COUNT = 4,
@@ -4504,7 +4504,7 @@ void advManager::EventSound(i32 eventType, i32 eventData, struct SAMPLE2* outSam
             musicTrack_e = treasureSound_a;
             break;
         case MAP_OBJECT_BOAT:
-            if (eventData == IDX(SOUND_VARIANT_1))
+            if (static_cast<EventSoundVariant>(eventData) == SOUND_VARIANT_1)
                 musicTrack_e = treasureSound_a;
             break;
         case MAP_OBJECT_SKELETON:
@@ -4582,25 +4582,25 @@ void advManager::EventSound(i32 eventType, i32 eventData, struct SAMPLE2* outSam
             musicTrack_e = experienceSound_o;
             break;
         case MAP_OBJECT_EXPANSION_OBJECT:
-            switch (eventData) {
-                case IDX(SOUND_VARIANT_0):
+            switch (static_cast<EventSoundVariant>(eventData)) {
+                case SOUND_VARIANT_0:
                     musicTrack_e = experienceSound_o;
                     break;
-                case IDX(SOUND_VARIANT_1):
+                case SOUND_VARIANT_1:
                     musicTrack_e = experienceSound_o;
                     break;
-                case IDX(SOUND_VARIANT_5):
+                case SOUND_VARIANT_5:
                     musicTrack_e = luckSound_g;
                     break;
-                case IDX(SOUND_VARIANT_2):
+                case SOUND_VARIANT_2:
                     musicTrack_e = experienceSound_o;
                     break;
-                case IDX(SOUND_VARIANT_3):
+                case SOUND_VARIANT_3:
                     break;
-                case IDX(SOUND_VARIANT_6):
+                case SOUND_VARIANT_6:
                     musicTrack_e = experienceSound_o;
                     break;
-                case IDX(SOUND_VARIANT_4):
+                case SOUND_VARIANT_4:
                     musicTrack_e = experienceSound_o;
                     break;
                 default:;
