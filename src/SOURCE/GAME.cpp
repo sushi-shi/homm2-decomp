@@ -47,7 +47,8 @@
 #include <SOURCE/kbwin.h>
 
 H2_ENUM_BEGIN(MapTilesetConstant)
-    TILESET_FLAG = 14
+    TILESET_FLAG             = 14,
+    WAGON_CAMP_ACTIVE_FRAME = 129
 H2_ENUM_END(MapTilesetConstant)
 
 H2_ENUM_BEGIN(ExpansionCampaignSaveConstant)
@@ -251,6 +252,13 @@ H2_ENUM_BEGIN(ArtifactGuardianConstant)
     MINOR_GUARDIAN_CHOICE_FIRST    = 6,
     MINOR_GUARDIAN_CHOICE_COUNT    = 4
 H2_ENUM_END(ArtifactGuardianConstant)
+
+H2_ENUM_BEGIN(ArtifactEventGenerationConstant)
+    ARTIFACT_EVENT_UNCONDITIONAL_CUTOFF = 60,
+    ARTIFACT_EVENT_GUARD_CUTOFF         = 80,
+    ARTIFACT_EVENT_WISDOM_BUCKET        = 1,
+    ARTIFACT_EVENT_LEADERSHIP_BUCKET    = 2
+H2_ENUM_END(ArtifactEventGenerationConstant)
 
 H2_ENUM_BEGIN(WitchHutConstant)
     WITCH_HUT_SKILL_FIRST = IDX(HERO_SKILL_PATHFINDING),
@@ -2221,6 +2229,8 @@ void game::RandomizeEvents(void) {
                     cell2->m_objectMetadata = GetRandomEventSpell(PYRAMID_SPELL_LEVEL);
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_TREE_HOUSE:
+                    // Retail recruit-site and guarded-bank quantities are balance payload.
+                    // NOLINTBEGIN(readability-magic-numbers)
                     cell2->m_objectMetadata = Random(15, 25);
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SIRENS:
@@ -2257,29 +2267,43 @@ void game::RandomizeEvents(void) {
                     cell2->m_objectMetadata = Random(10, 20);
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_WAGON_CAMP:
-                    if (!HasObjectTilesetIndex(xPos2, yPos19, IDX(TILESET_OBJNMUL2), 129))
+                    if (!HasObjectTilesetIndex(
+                            xPos2,
+                            yPos19,
+                            IDX(TILESET_OBJNMUL2),
+                            WAGON_CAMP_ACTIVE_FRAME
+                        ))
                         cell2->m_triggerType &= MAP_TRIGGER_TYPE_MASK;
                     else
                         cell2->m_objectMetadata = Random(30, 50);
+                    // NOLINTEND(readability-magic-numbers)
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ARTIFACT:
-                    randomValue7 = Random(0, 99);
+                    randomValue7 = Random(EVENT_ROLL_MIN, EVENT_BUCKET_ROLL_MAX);
                     value26 = cell2->m_objectIndex >> 1;
                     if (value26 != IDX(ARTIFACT_SPELL_SCROLL)) {
-                        if (randomValue7 < 60) {
-                            if (randomValue7 % 10 == 1)
-                                cell2->m_objectMetadata = 4;
-                            else if (randomValue7 % 10 == 2)
-                                cell2->m_objectMetadata = 5;
+                        if (randomValue7 < ARTIFACT_EVENT_UNCONDITIONAL_CUTOFF) {
+                            if (randomValue7 % EVENT_BUCKET_COUNT
+                                == ARTIFACT_EVENT_WISDOM_BUCKET)
+                                cell2->m_objectMetadata = ARTIFACT_EVENT_MODE_WISDOM;
+                            else if (randomValue7 % EVENT_BUCKET_COUNT
+                                     == ARTIFACT_EVENT_LEADERSHIP_BUCKET)
+                                cell2->m_objectMetadata = ARTIFACT_EVENT_MODE_LEADERSHIP;
                             else
-                                cell2->m_objectMetadata = 1;
-                        } else if (randomValue7 < 80) {
+                                cell2->m_objectMetadata = ARTIFACT_EVENT_MODE_PICKUP;
+                        } else if (randomValue7 < ARTIFACT_EVENT_GUARD_CUTOFF) {
                             if (gArtifactLevel[value26] == IDX(ARTIFACT_LEVEL_TREASURE))
-                                cell2->m_objectMetadata = 3;
+                                cell2->m_objectMetadata = ARTIFACT_EVENT_MODE_GOLD;
                             else if (gArtifactLevel[value26] == IDX(ARTIFACT_LEVEL_MINOR))
-                                cell2->m_objectMetadata = (Random(0, 5) << 4) | 6;
+                                cell2->m_objectMetadata =
+                                    (Random(IDX(RES_WOOD), IDX(RES_GEMS))
+                                     << ARTIFACT_EVENT_RESOURCE_SHIFT)
+                                    | ARTIFACT_EVENT_MODE_RESOURCE_3;
                             else if (gArtifactLevel[value26] == IDX(ARTIFACT_LEVEL_MAJOR))
-                                cell2->m_objectMetadata = (Random(0, 5) << 4) | 7;
+                                cell2->m_objectMetadata =
+                                    (Random(IDX(RES_WOOD), IDX(RES_GEMS))
+                                     << ARTIFACT_EVENT_RESOURCE_SHIFT)
+                                    | ARTIFACT_EVENT_MODE_RESOURCE_5;
                         } else {
                             // Retail artifact-tier guardian choice payload.
                             // NOLINTBEGIN(readability-magic-numbers)
@@ -2294,17 +2318,17 @@ void game::RandomizeEvents(void) {
                             artifactGuardianChoices[4] = CREATURE_GIANT;
                             artifactGuardianChoices[5] = CREATURE_TITAN;
                             // NOLINTEND(readability-magic-numbers)
-                            cell2->m_objectMetadata = 1;
+                            cell2->m_objectMetadata = ARTIFACT_EVENT_GUARDED_FLAG;
                             if (gArtifactLevel[value26] == IDX(ARTIFACT_LEVEL_TREASURE))
                                 cell2->m_objectMetadata |= IDX(CREATURE_ROGUE);
                             else if (gArtifactLevel[value26] == IDX(ARTIFACT_LEVEL_MINOR))
                                 cell2->m_objectMetadata |= IDX(artifactGuardianChoices[Random(
-                                    0,
+                                    EVENT_ROLL_MIN,
                                     MINOR_GUARDIAN_CHOICE_COUNT - 1
                                 ) + MINOR_GUARDIAN_CHOICE_FIRST]);
                             else
                                 cell2->m_objectMetadata |= IDX(artifactGuardianChoices[Random(
-                                    0,
+                                    EVENT_ROLL_MIN,
                                     MAJOR_GUARDIAN_CHOICE_COUNT - 1
                                 ) + MAJOR_GUARDIAN_CHOICE_FIRST]);
                         }
