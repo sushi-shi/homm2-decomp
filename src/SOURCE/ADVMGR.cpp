@@ -708,7 +708,6 @@ H2_ENUM_BEGIN(AdventureResourceViewConstant)
     RESOURCE_VIEW_MULTILINE_HEIGHT          = 32,
     RESOURCE_VIEW_LINE_HEIGHT               = 6,
     RESOURCE_VIEW_TEXT_HEIGHT               = 36,
-    RESOURCE_VIEW_GOLD                      = 6,
     RESOURCE_VIEW_GOLD_WIDTH                = 76,
     RESOURCE_VIEW_GOLD_HEIGHT               = 26,
     RESOURCE_VIEW_ICON_WIDTH                = 38,
@@ -5823,7 +5822,7 @@ i32 advManager::UpdBottomViewResMsg(void) {
     m_adventureWindow->AddWidget(m_bottomViewBackground, -1);
 
     textY19 = 0;
-    if (giBottomViewResource < 0) {
+    if (giBottomViewResource == RES_NONE) {
         textY19 = RESOURCE_VIEW_MULTILINE_HEIGHT;
         lineCount10 = smallFont->LineLength(gcBottomViewText, BOTTOM_VIEW_PANEL_WIDTH);
         textY19 -= lineCount10 * RESOURCE_VIEW_LINE_HEIGHT;
@@ -5850,8 +5849,8 @@ i32 advManager::UpdBottomViewResMsg(void) {
     }
     m_adventureWindow->AddWidget(m_bottomViewAllTexts[0], -1);
 
-    if (giBottomViewResource >= 0) {
-        if (giBottomViewResource == RESOURCE_VIEW_GOLD) {
+    if (giBottomViewResource != RES_NONE) {
+        if (giBottomViewResource == RES_GOLD) {
             iconWidth6 = RESOURCE_VIEW_GOLD_WIDTH;
             iconHeight11 = RESOURCE_VIEW_GOLD_HEIGHT;
         } else {
@@ -5866,7 +5865,7 @@ i32 advManager::UpdBottomViewResMsg(void) {
             iconWidth6,
             iconHeight11,
             "resource.icn",
-            giBottomViewResource,
+            IDX(giBottomViewResource),
             ICON_DRAW_NORMAL,
             BOTTOM_VIEW_FOREGROUND_ID,
             BOTTOM_VIEW_WIDGET_FLAGS,

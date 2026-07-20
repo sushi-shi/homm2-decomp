@@ -462,7 +462,7 @@ SOURCE/ADVMGR	?DoVisions@advManager@@QAEHPAVhero@@@Z	99.9848	ca4d44f9f434
 SOURCE/ADVMGR	?DrawAdventureBorder@advManager@@QAEXXZ	100.0000	c35bd8b79a65
 SOURCE/ADVMGR	?DrawCell@advManager@@QAEXHHHHHH@Z	97.7181	a6e137929a8b
 SOURCE/ADVMGR	?EnableButtons@advManager@@QAEXXZ	98.9107	a28d68bbf7f8
-SOURCE/ADVMGR	?FindAdjacentMonster@advManager@@QAEHHHPAH0HH@Z	95.0617	85133aaed632
+SOURCE/ADVMGR	?FindAdjacentMonster@advManager@@QAEHHHPAH0HH@Z	95.5556	85133aaed632
 SOURCE/ADVMGR	?ForceNewHover@advManager@@QAEXXZ	100.0000	009fdde9fbd9
 SOURCE/ADVMGR	?GetArmySizeName@advManager@@QAEPADHH@Z	100.0000	3a6716a9b9f9
 SOURCE/ADVMGR	?GetCell@advManager@@QAEPAVmapCell@@HH@Z	100.0000	b584d66179f2
@@ -512,7 +512,7 @@ SOURCE/ADVMGR	?UpdBottomViewEnemyTurn@advManager@@QAEHXZ	99.2903	d4fc6a5e6b26
 SOURCE/ADVMGR	?UpdBottomViewHero@advManager@@QAEHXZ	99.1644	6849a65da968
 SOURCE/ADVMGR	?UpdBottomViewKingdom@advManager@@QAEHXZ	99.0929	d5c32dba720e
 SOURCE/ADVMGR	?UpdBottomViewNewTurn@advManager@@QAEHXZ	97.9912	ae2a21b81ffa
-SOURCE/ADVMGR	?UpdBottomViewResMsg@advManager@@QAEHXZ	98.2096	832caf339f2f
+SOURCE/ADVMGR	?UpdBottomViewResMsg@advManager@@QAEHXZ	97.6769	50955edd4ef7
 SOURCE/ADVMGR	?UpdateHeroLocator@advManager@@QAEXHHH@Z	99.0610	187230b07a67
 SOURCE/ADVMGR	?UpdateHeroLocators@advManager@@QAEXHH@Z	99.9265	c9fe2a838f11
 SOURCE/ADVMGR	?UpdateRadar@advManager@@QAEXHH@Z	98.7734	7ec61fada3ee
@@ -716,9 +716,9 @@ SOURCE/EVENTS	?BarrierAIEvent@advManager@@QAEHPAVmapCell@@PAVhero@@@Z	100.0000	8
 SOURCE/EVENTS	?BarrierEvent@advManager@@QAEHPAVmapCell@@PAVhero@@@Z	100.0000	a6747cb7ab84
 SOURCE/EVENTS	?CombatMonsterEvent@advManager@@QAEHPAVhero@@HHPAVmapCell@@HHHHHHHHHHH@Z	99.0581	d001b3e4bb81
 SOURCE/EVENTS	?ComputerMonsterInteract@advManager@@QAEXPAVmapCell@@PAVhero@@PAH@Z	98.1456	9afdaff41bdd
-SOURCE/EVENTS	?DoAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@HH@Z	97.2040	d1d02209e010
+SOURCE/EVENTS	?DoAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@HH@Z	97.1846	39608c2c395c
 SOURCE/EVENTS	?DoCombat@advManager@@QAEHHHPAVhero@@PAVarmyGroup@@PAVtown@@01HHHH@Z	97.9523	96fd9411a588
-SOURCE/EVENTS	?DoEvent@advManager@@QAEXPAVmapCell@@HH@Z	96.1091	bee22de170a8
+SOURCE/EVENTS	?DoEvent@advManager@@QAEXPAVmapCell@@HH@Z	96.0522	5428ddf64c6f
 SOURCE/EVENTS	?DoNetCombat@advManager@@QAEHPAD@Z	92.7800	b6cf6f8bb437
 SOURCE/EVENTS	?DoWhirlpool@advManager@@QAEXPAVhero@@@Z	100.0000	4ad2728af490
 SOURCE/EVENTS	?EraseObj@advManager@@QAEXPAVmapCell@@HH@Z	100.0000	c535299c2379
@@ -839,7 +839,7 @@ SOURCE/GAME	?RandomizeMine@game@@QAEXHH@Z	99.1548	b6d3baf1fbb3
 SOURCE/GAME	?RandomizePassword@game@@QAEXPAVmapCell@@@Z	100.0000	3a5de17df20b
 SOURCE/GAME	?RandomizeTown@game@@QAEXHHH@Z	100.0000	aec8e13f1861
 SOURCE/GAME	?Read@playerData@@QAEXH@Z	100.0000	f6e1f03e9221
-SOURCE/GAME	?ReceiveSaveGame@game@@QAEHHHHH@Z	95.1575	c9682c4bffae
+SOURCE/GAME	?ReceiveSaveGame@game@@QAEHHHHH@Z	95.1575	f40488af408a
 SOURCE/GAME	?RestoreCell@game@@QAEXHHHHPAVmapCell@@H@Z	99.9107	d94a645e5f93
 SOURCE/GAME	?SaveGame@game@@QAEHPADHC@Z	99.8678	a49a327137f5
 SOURCE/GAME	?Scan@game@@QAEHPACHH@Z	100.0000	b58d9e8a330a
@@ -854,7 +854,7 @@ SOURCE/GAME	?SetupTowns@game@@QAEXXZ	99.2266	0d484ebebe59
 SOURCE/GAME	?ShowComputerScreen@game@@QAEXXZ	100.0000	2cd8548ab948
 SOURCE/GAME	?ShowHeroesLogo@game@@QAEXXZ	100.0000	42c0f9145ce3
 SOURCE/GAME	?TownIDToTownPos@game@@QAEHPAVplayerData@@H@Z	100.0000	56c7a1afc85e
-SOURCE/GAME	?TransmitSaveGame@game@@QAEHHHH@Z	95.6968	15e3885842f4
+SOURCE/GAME	?TransmitSaveGame@game@@QAEHHHH@Z	95.6968	947291d39e36
 SOURCE/GAME	?TurnOffAIMusic@game@@QAEXXZ	100.0000	20396e6e87b5
 SOURCE/GAME	?TurnOnAIMusic@game@@QAEXXZ	100.0000	e6507acb5725
 SOURCE/GAME	?UpdateSpellWidgets@game@@QAEXXZ	100.0000	bc28146d2809
@@ -924,7 +924,7 @@ SOURCE/HISCORE	?Open@highScoreManager@@UAEHH@Z	100.0000	9daeed1e7da0
 SOURCE/HISCORE	?Update@highScoreManager@@QAEXXZ	99.9631	bb93055c5cb5
 SOURCE/KB	?AddNetBoxLine@@YIXPADD@Z	48.1207	ff74a54502ed
 SOURCE/KB	?AddScoreToHighScore@@YIHHHHHPAD@Z	100.0000	382d33aebcc0
-SOURCE/KB	?BVResMsg@@YIXPADHH@Z	100.0000	4cf86644a978
+SOURCE/KB	?BVResMsg@@YIXPADHH@Z	100.0000	b03e594da20e
 SOURCE/KB	?CanBuild@@YIHPAVtown@@H@Z	100.0000	6c00cc05a3ba
 SOURCE/KB	?CanBuy@@YIHPAVtown@@H@Z	100.0000	c36b2281e0e3
 SOURCE/KB	?CheckEndGame@@YIXHH@Z	99.7617	48401c7f7efc
@@ -1033,7 +1033,7 @@ SOURCE/Newgame	?SetupNetPlayerNames@game@@QAEXXZ	100.0000	7913d1c9fc43
 SOURCE/Newgame	?ShowScenInfo@game@@QAEXXZ	100.0000	40a0fd38080e
 SOURCE/Newgame	?UpdateNewGameWindow@game@@QAEXXZ	100.0000	cdd8d56e7644
 SOURCE/Overview	?DoKnob@game@@QAEXXZ	99.9492	13500b6ab083
-SOURCE/Overview	?Overview@game@@QAEXXZ	100.0000	86018fa60b5f
+SOURCE/Overview	?Overview@game@@QAEXXZ	100.0000	f438f62453bc
 SOURCE/Overview	?OverviewHandler@@YIHAAUtag_message@@@Z	100.0000	86d82ab8be2f
 SOURCE/Overview	?ProcessIconSelect@game@@QAEHHH@Z	98.1373	6e285957978c
 SOURCE/Overview	?SetupDynamicStuff@game@@QAEXHHH@Z	98.9162	140ebd671baf
