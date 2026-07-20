@@ -122,7 +122,7 @@ H2_ENUM_END(CampaignTrackConstant)
 
 VA(0x00447710, 0x563)
 i32 game::HandleCampaignWin(void) {
-    i32 sideIndex;
+    H2_ENUM_STORAGE_STEPPED(CampaignSide, i32) sideIndex;
     i32 mapIndex;
 
     memset(m_campaignMapEnabled, 0, sizeof(m_campaignMapEnabled));
@@ -256,13 +256,13 @@ i32 game::HandleCampaignWin(void) {
         && (gpGame->m_campaignScenario + 1 != CAMPAIGN_ROLAND_FINAL_SCENARIO + 1
             || gpGame->m_campaignType != CAMPAIGN_ROLAND)) {
         m_campaignScenario = CAMPAIGN_NO_SCENARIO;
-        for (sideIndex = 0; sideIndex < IDX(CAMPAIGN_SIDE_COUNT); ++sideIndex) {
+        for (sideIndex = CAMPAIGN_ROLAND; sideIndex < CAMPAIGN_SIDE_COUNT; ++sideIndex) {
             for (mapIndex = 0; mapIndex < CAMPAIGN_REGULAR_MAP_COUNT; ++mapIndex) {
-                if (m_campaignMapEnabled[sideIndex][OD_STEER(mapIndex)]) {
-                    gpGame->m_campaignScenarioBonus[sideIndex][OD_STEER(mapIndex)] =
+                if (m_campaignMapEnabled[IDX(sideIndex)][OD_STEER(mapIndex)]) {
+                    gpGame->m_campaignScenarioBonus[IDX(sideIndex)][OD_STEER(mapIndex)] =
                         m_campaignScore;
                     if (m_campaignScenario == CAMPAIGN_NO_SCENARIO) {
-                        m_campaignType = static_cast<CampaignSide>(sideIndex);
+                        m_campaignType = sideIndex;
                         m_campaignScenario = static_cast<i8>(mapIndex);
                     }
                 }
