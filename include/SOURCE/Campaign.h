@@ -78,8 +78,10 @@ H2_ENUM_END(CampaignDisplayConstant)
 H2_ENUM_CLASS_BEGIN(CampaignHeroPortrait)
     CAMPAIGN_HERO_ROLAND    = 54,
     CAMPAIGN_HERO_CORLAGON  = 55,
+    CAMPAIGN_HERO_ELIZA     = 56,
     CAMPAIGN_HERO_ARCHIBALD = 57,
-    CAMPAIGN_HERO_HALTON    = 58
+    CAMPAIGN_HERO_HALTON    = 58,
+    CAMPAIGN_HERO_BRAX      = 59
 H2_ENUM_CLASS_END(CampaignHeroPortrait)
 
 i32 CampaignHandler(struct tag_message&);

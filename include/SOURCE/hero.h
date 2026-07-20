@@ -67,6 +67,7 @@ H2_ENUM_BEGIN(HeroConstant)
     HERO_AVAILABILITY_JAILED                  = 0x41,
     HERO_EXPERIENCE_LEVEL_TABLE_COUNT         = 12,
     HERO_EXPERIENCE_EXTRAPOLATION_FIRST_LEVEL = 13,
+    HERO_INITIAL_LEVEL                        = 1,
     HERO_LEVEL_HIGH_THRESHOLD                 = 9,
     HERO_LEVEL_RANDOM_SEED_FACTOR             = 30,
     HERO_LEVEL_RANDOM_MAX                     = 100,

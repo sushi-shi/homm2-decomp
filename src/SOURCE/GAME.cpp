@@ -60,6 +60,7 @@ H2_ENUM_BEGIN(GameSaveFormatConstant)
     SAVE_LEGACY_CLEAR_SIZE             = 40,
     SAVE_LEGACY_SERIALIZED_SIZE        = 36,
     SAVE_STANDARD_FILENAME_SIZE        = 14,
+    STANDARD_FILENAME_BASENAME_SIZE    = 8,
     SAVE_CURRENT_PLAYER_SCRATCH_SIZE   = 4,
     SAVE_PLAYER_FLAGS_SCRATCH_SIZE     = 8,
     SAVE_MARKER_SCRATCH_COUNT          = 3,
@@ -70,6 +71,30 @@ H2_ENUM_BEGIN(GameSaveFormatConstant)
     SAVE_EVENT_HEADER_SIZE             = sizeof(u16) * 2,
     SAVE_EXPANSION_CAMPAIGN_FORMAT_TAG = 2
 H2_ENUM_END(GameSaveFormatConstant)
+
+H2_ENUM_BEGIN(GameHeroSelectionConstant)
+    HERO_SELECTION_RETRY_LIMIT             = 2000,
+    HERO_SELECTION_REUSE_RETRY_LIMIT       = 1500,
+    HERO_SELECTION_FACTION_RETRY_LIMIT     = 100,
+    HERO_SELECTION_EXPERIENCE_RETRY_LIMIT  = 40,
+    HERO_SELECTION_MINIMUM_EXPERIENCE      = 1000,
+    HERO_SELECTION_CAMPAIGN_RETRY_LIMIT    = 500,
+    HERO_SELECTION_CAMPAIGN_PORTRAIT_FIRST = IDX(CAMPAIGN_HERO_ROLAND),
+    HERO_SELECTION_CAMPAIGN_PORTRAIT_LAST  = IDX(CAMPAIGN_HERO_BRAX)
+H2_ENUM_END(GameHeroSelectionConstant)
+
+H2_ENUM_BEGIN(GameInitialStateConstant)
+    INITIAL_DIFFICULTY_RATING    = 1,
+    INITIAL_PLAYER_COUNT         = 4,
+    INITIAL_CALENDAR_VALUE       = 1,
+    INITIAL_MAP_CHANGE_SEQUENCE  = 1,
+    INITIAL_MAP_SPRITE_DIRECTION = 2,
+    // Retail seeds both hero and town record types in nine-record groups
+    // before map data is applied.
+    INITIAL_RECORD_TYPE_STRIDE   = IDX(GAME_HERO_COUNT) / IDX(FACTION_COUNT),
+    BOAT_HERO_NONE               = -1,
+    BOAT_SLOT_EMPTY              = -1
+H2_ENUM_END(GameInitialStateConstant)
 
 H2_ENUM_CLASS_BEGIN(GameMapTrigger)
     TRIGGER_TOWN_BASE                = 0x23,
@@ -620,24 +645,28 @@ i32 game::GetNewHeroId(i32, FactionType heroClass, i32 requireExperienced) {
     i32 heroId = -1;
     i32 attempts = 0;
     i32 oldHeroId;
-    while (attempts < 2000) {
+    while (attempts < HERO_SELECTION_RETRY_LIMIT) {
         attempts++;
-        heroId = Random(0, 53);
-        if (m_availableHeroes[heroId] != -1 && m_availableHeroes[heroId] != 64)
+        heroId = Random(0, IDX(GAME_HERO_COUNT) - 1);
+        if (m_availableHeroes[heroId] != HERO_AVAILABILITY_UNAVAILABLE
+            && m_availableHeroes[heroId] != WEEKLY_AVAILABLE_HERO)
             continue;
-        if (m_availableHeroes[heroId] == 64 && attempts < 1500)
+        if (m_availableHeroes[heroId] == WEEKLY_AVAILABLE_HERO
+            && attempts < HERO_SELECTION_REUSE_RETRY_LIMIT)
             continue;
-        if (heroClass != FACTION_ANY && attempts < 100
+        if (heroClass != FACTION_ANY && attempts < HERO_SELECTION_FACTION_RETRY_LIMIT
             && m_heroRecs[heroId].m_cursorType != heroClass)
             continue;
-        if (requireExperienced && attempts < 40 && m_heroRecs[heroId].m_experience < 1000
+        if (requireExperienced && attempts < HERO_SELECTION_EXPERIENCE_RETRY_LIMIT
+            && m_heroRecs[heroId].m_experience < HERO_SELECTION_MINIMUM_EXPERIENCE
             && (m_heroRecs[heroId].m_artifacts[0] == IDX(ARTIFACT_NONE)
                 || m_heroRecs[heroId].m_artifacts[0] == IDX(ARTIFACT_MAGIC_BOOK))
             && (m_heroRecs[heroId].m_artifacts[1] == IDX(ARTIFACT_NONE)
                 || m_heroRecs[heroId].m_artifacts[1] == IDX(ARTIFACT_MAGIC_BOOK)))
             continue;
-        if (gbInCampaign && attempts < 500 && m_heroRecs[heroId].m_portrait >= 54
-            && m_heroRecs[heroId].m_portrait <= 59)
+        if (gbInCampaign && attempts < HERO_SELECTION_CAMPAIGN_RETRY_LIMIT
+            && m_heroRecs[heroId].m_portrait >= HERO_SELECTION_CAMPAIGN_PORTRAIT_FIRST
+            && m_heroRecs[heroId].m_portrait <= HERO_SELECTION_CAMPAIGN_PORTRAIT_LAST)
             continue;
         break;
     }
@@ -672,7 +701,7 @@ void GenerateStandardFileName(char* source, char* destination) {
         return;
     }
 
-    *extension = 0;
+    *extension = '\0';
     i32 indexOut = 0;
     i32 sourceLength = strlen(source);
     i32 i;
@@ -685,8 +714,8 @@ void GenerateStandardFileName(char* source, char* destination) {
             destination[indexOut] = c;
             indexOut++;
         }
-        if (indexOut >= 8)
-            i = 999;
+        if (indexOut >= STANDARD_FILENAME_BASENAME_SIZE)
+            break;
     }
     *extension = '.';
     strcpy(destination + indexOut, extension);
@@ -857,27 +886,27 @@ VA(0x00472a7b, 0xb44)
 void game::SetupOrigData(void) {
     ClearMapExtra();
     gbIAmGreatest = false;
-    m_difficultyRating = 1;
+    m_difficultyRating = INITIAL_DIFFICULTY_RATING;
     giMonthType = 0;
     giMonthTypeExtra = 0;
     giWeekType = 0;
     giWeekTypeExtra = 0;
     m_cheated = 0;
     gpAdvManager->PurgeMapChangeQueue();
-    giMapChangeCtr = 1;
+    giMapChangeCtr = INITIAL_MAP_CHANGE_SEQUENCE;
     strcpy(m_saveName, "NEWGAME");
-    m_playerCount = 4;
+    m_playerCount = INITIAL_PLAYER_COUNT;
     m_deadPlayerCount = 0;
-    memset(m_playerDead, 0, GAME_PLAYER_COUNT);
-    m_month = 1;
+    memset(m_playerDead, 0, sizeof(m_playerDead));
+    m_month = INITIAL_CALENDAR_VALUE;
     m_week = m_month;
     m_day = m_week;
-    giCurTurn = 1;
+    giCurTurn = INITIAL_CALENDAR_VALUE;
 
     i32 i;
     i32 j;
     for (i = 0; i < GAME_PLAYER_COUNT; i++) {
-        strcpy(m_defaultPlayerNames + i * 4, "");
+        strcpy(m_defaultPlayerNames + i * GAME_DEFAULT_PLAYER_NAME_SIZE, "");
         if (i < (&giNumHumanPlayers)[0]) {
             if (i == 0 || iMPBaseType == MULTIPLAYER_BASE_HOT_SEAT)
                 gbThisNetHumanPlayer[i] = 1;
@@ -894,64 +923,65 @@ void game::SetupOrigData(void) {
         m_players[i].m_townCount = 0;
         m_players[i].m_daysLeft = -1;
         m_players[i].m_cheatValue = 0;
-        memset(m_players[i].m_availableHeroIds, -1, 2);
-        memset(m_players[i].m_heroIds, -1, 8);
-        memset(m_players[i].m_townIds, -1, GAME_TOWN_COUNT);
+        memset(m_players[i].m_availableHeroIds, -1, sizeof(m_players[i].m_availableHeroIds));
+        memset(m_players[i].m_heroIds, -1, sizeof(m_players[i].m_heroIds));
+        memset(m_players[i].m_townIds, -1, sizeof(m_players[i].m_townIds));
     }
 
     m_obeliskCount = 0;
     gpAdvManager->m_heroContextLocked = 0;
-    memset(m_availableHeroes, -1, GAME_HERO_COUNT);
+    memset(m_availableHeroes, HERO_AVAILABILITY_UNAVAILABLE, sizeof(m_availableHeroes));
     for (i = 0; i < GAME_HERO_COUNT; i++) {
         memset(&m_heroRecs[i], 0, sizeof(m_heroRecs[i]));
         memset(m_heroRecs[i].m_spells, 0, sizeof(m_heroRecs[i].m_spells));
         memset(m_heroRecs[i].m_artifacts, IDX(ARTIFACT_NONE), sizeof(m_heroRecs[i].m_artifacts));
-        m_heroRecs[i].m_patrolY = -1;
+        m_heroRecs[i].m_patrolY = HERO_DESTINATION_NONE;
         m_heroRecs[i].m_patrolX = m_heroRecs[i].m_patrolY;
         m_heroRecs[i].m_id = static_cast<i8>(i);
         m_heroRecs[i].m_portrait = static_cast<u8>(i);
-        m_heroRecs[i].m_owner = -1;
-        m_heroRecs[i].m_direction = 2;
+        m_heroRecs[i].m_owner = HERO_OWNER_NONE;
+        m_heroRecs[i].m_direction = INITIAL_MAP_SPRITE_DIRECTION;
         strcpy(m_heroRecs[i].m_name, gHeroDefaultNames[i]);
-        m_heroRecs[i].m_cursorType = static_cast<FactionType>(i / 9);
+        m_heroRecs[i].m_cursorType = static_cast<FactionType>(i / INITIAL_RECORD_TYPE_STRIDE);
         for (j = 0; j < HERO_STARTING_STAT_COUNT; j++)
             m_heroRecs[i].m_primaryStats[j] =
                 gStartingHeroStats[IDX(m_heroRecs[i].m_cursorType)][j];
         for (j = 0; j < ARMY_GROUP_SLOT_COUNT; j++)
             m_heroRecs[i].m_army.m_creatureTypes[j] = ARMY_GROUP_EMPTY_SLOT;
-        m_heroRecs[i].m_destinationY = -1;
+        m_heroRecs[i].m_destinationY = HERO_DESTINATION_NONE;
         m_heroRecs[i].m_destinationX = m_heroRecs[i].m_destinationY;
-        m_heroRecs[i].m_level = 1;
-        m_heroRecs[i].m_spellPoints = m_heroRecs[i].Stats(HeroPrimaryStat(3)) * 10;
+        m_heroRecs[i].m_level = HERO_INITIAL_LEVEL;
+        m_heroRecs[i].m_spellPoints =
+            m_heroRecs[i].Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE;
         m_heroRecs[i].m_secondarySkillCount = 0;
-        for (j = 0; j < 14; j++) {
+        for (j = 0; j < IDX(HERO_SKILL_COUNT); j++) {
             m_heroRecs[i].m_secondarySkills[j] = 0;
             m_heroRecs[i].m_secondarySkillOrder[j] = 0;
         }
         if (m_heroRecs[i].m_cursorType == FACTION_KNIGHT) {
-            m_heroRecs[i].GiveSS(IDX(HERO_SKILL_LEADERSHIP), 1);
-            m_heroRecs[i].GiveSS(IDX(HERO_SKILL_BALLISTICS), 1);
+            m_heroRecs[i].GiveSS(IDX(HERO_SKILL_LEADERSHIP), IDX(HERO_SKILL_LEVEL_BASIC));
+            m_heroRecs[i].GiveSS(IDX(HERO_SKILL_BALLISTICS), IDX(HERO_SKILL_LEVEL_BASIC));
         }
         if (m_heroRecs[i].m_cursorType == FACTION_SORCERESS) {
             m_heroRecs[i].m_artifacts[0] = IDX(ARTIFACT_MAGIC_BOOK);
-            m_heroRecs[i].GiveSS(IDX(HERO_SKILL_NAVIGATION), 2);
-            m_heroRecs[i].GiveSS(IDX(HERO_SKILL_WISDOM), 1);
+            m_heroRecs[i].GiveSS(IDX(HERO_SKILL_NAVIGATION), IDX(HERO_SKILL_LEVEL_ADVANCED));
+            m_heroRecs[i].GiveSS(IDX(HERO_SKILL_WISDOM), IDX(HERO_SKILL_LEVEL_BASIC));
         }
         if (m_heroRecs[i].m_cursorType == FACTION_BARBARIAN)
-            m_heroRecs[i].GiveSS(IDX(HERO_SKILL_PATHFINDING), 2);
+            m_heroRecs[i].GiveSS(IDX(HERO_SKILL_PATHFINDING), IDX(HERO_SKILL_LEVEL_ADVANCED));
         if (m_heroRecs[i].m_cursorType == FACTION_WARLOCK) {
             m_heroRecs[i].m_artifacts[0] = IDX(ARTIFACT_MAGIC_BOOK);
-            m_heroRecs[i].GiveSS(IDX(HERO_SKILL_SCOUTING), 2);
-            m_heroRecs[i].GiveSS(IDX(HERO_SKILL_WISDOM), 1);
+            m_heroRecs[i].GiveSS(IDX(HERO_SKILL_SCOUTING), IDX(HERO_SKILL_LEVEL_ADVANCED));
+            m_heroRecs[i].GiveSS(IDX(HERO_SKILL_WISDOM), IDX(HERO_SKILL_LEVEL_BASIC));
         }
         if (m_heroRecs[i].m_cursorType == FACTION_WIZARD) {
             m_heroRecs[i].m_artifacts[0] = IDX(ARTIFACT_MAGIC_BOOK);
-            m_heroRecs[i].GiveSS(IDX(HERO_SKILL_WISDOM), 2);
+            m_heroRecs[i].GiveSS(IDX(HERO_SKILL_WISDOM), IDX(HERO_SKILL_LEVEL_ADVANCED));
         }
         if (m_heroRecs[i].m_cursorType == FACTION_NECROMANCER) {
             m_heroRecs[i].m_artifacts[0] = IDX(ARTIFACT_MAGIC_BOOK);
-            m_heroRecs[i].GiveSS(IDX(HERO_SKILL_WISDOM), 1);
-            m_heroRecs[i].GiveSS(IDX(HERO_SKILL_NECROMANCY), 1);
+            m_heroRecs[i].GiveSS(IDX(HERO_SKILL_WISDOM), IDX(HERO_SKILL_LEVEL_BASIC));
+            m_heroRecs[i].GiveSS(IDX(HERO_SKILL_NECROMANCY), IDX(HERO_SKILL_LEVEL_BASIC));
         }
     }
 
@@ -961,24 +991,24 @@ void game::SetupOrigData(void) {
         m_castleRecs[i].m_onMap = 0;
         m_castleRecs[i].m_id = static_cast<u8>(i);
         m_castleRecs[i].m_owner = TOWN_OWNER_NONE;
-        m_castleRecs[i].m_type = static_cast<FactionType>(i / 9);
+        m_castleRecs[i].m_type = static_cast<FactionType>(i / INITIAL_RECORD_TYPE_STRIDE);
         m_castleRecs[i].m_occupyingHeroId = TOWN_OCCUPYING_HERO_NONE;
         for (j = 0; j < ARMY_GROUP_SLOT_COUNT; j++)
             m_castleRecs[i].m_army.m_creatureTypes[j] = ARMY_GROUP_EMPTY_SLOT;
     }
     for (i = 0; i < GAME_MINE_COUNT; i++)
         memset(&m_mines[i], -1, sizeof(m_mines[i]));
-    memset(m_mineOwners, -1, GAME_MINE_COUNT);
+    memset(m_mineOwners, -1, sizeof(m_mineOwners));
     for (i = 0; i < GAME_BOAT_COUNT; i++) {
         memset(&m_boats[i], 0, sizeof(m_boats[i]));
         m_boats[i].id = static_cast<i8>(i);
-        m_boats[i].heroId = -1;
+        m_boats[i].heroId = BOAT_HERO_NONE;
     }
     memset(m_dailyEventFlags, 0, sizeof(m_dailyEventFlags));
-    memset(m_boatSlots, -1, sizeof(m_boatSlots));
-    m_ultimateArtifactY = -1;
+    memset(m_boatSlots, BOAT_SLOT_EMPTY, sizeof(m_boatSlots));
+    m_ultimateArtifactY = HINT_COORDINATE_UNKNOWN;
     m_ultimateArtifactX = m_ultimateArtifactY;
-    memset(m_obeliskVisitors, 0, 48);
+    memset(m_obeliskVisitors, 0, sizeof(m_obeliskVisitors));
     strcpy(gpGame->m_saveName, "NEWGAME");
     giCurPlayer = 0;
     gpCurPlayer = &gpGame->m_players[giCurPlayer];
@@ -1480,12 +1510,12 @@ void game::NewMap(char* filename) {
                     m_heroRecs[campaignHero15].m_experience += 5000;
                     m_heroRecs[campaignHero15].CheckLevel();
                     strcpy(m_heroRecs[campaignHero15].m_name, "Sister Eliza");
-                    m_heroRecs[campaignHero15].m_portrait = 56;
+                    m_heroRecs[campaignHero15].m_portrait = IDX(CAMPAIGN_HERO_ELIZA);
                 } else {
                     m_heroRecs[campaignHero15].m_experience += 5000;
                     m_heroRecs[campaignHero15].CheckLevel();
                     strcpy(m_heroRecs[campaignHero15].m_name, "Brother Brax");
-                    m_heroRecs[campaignHero15].m_portrait = 59;
+                    m_heroRecs[campaignHero15].m_portrait = IDX(CAMPAIGN_HERO_BRAX);
                 }
                 m_players[player2].m_availableHeroIds[0] = static_cast<char>(campaignHero15);
                 m_availableHeroes[m_players[player2].m_availableHeroIds[0]] = 64;
