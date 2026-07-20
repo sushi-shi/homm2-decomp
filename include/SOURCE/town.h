@@ -86,8 +86,10 @@ public:
     i8 m_originalOwner;
     u16 m_extraIndex;
     union {
-        i8 m_spells[TOWN_MAGE_GUILD_LEVEL_COUNT][TOWN_MAGE_GUILD_SPELLS_PER_LEVEL];
-        i8 m_spellSlots[TOWN_MAGE_GUILD_LEVEL_COUNT * TOWN_MAGE_GUILD_SPELLS_PER_LEVEL];
+        H2_ENUM_STORAGE(SpellType, i8)
+            m_spells[TOWN_MAGE_GUILD_LEVEL_COUNT][TOWN_MAGE_GUILD_SPELLS_PER_LEVEL];
+        H2_ENUM_STORAGE(SpellType, i8)
+            m_spellSlots[TOWN_MAGE_GUILD_LEVEL_COUNT * TOWN_MAGE_GUILD_SPELLS_PER_LEVEL];
         struct {
             char m_spellPad[TOWN_SPELL_COUNT_OVERLAY_OFFSET];
             i8 m_spellCounts[TOWN_SPELL_COUNT_OVERLAY_SIZE];
