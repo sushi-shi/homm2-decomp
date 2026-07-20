@@ -1373,10 +1373,10 @@ SOURCE/comwin	?add_node@@YIXPAUtag_Anchor@@PAUtag_Node@@@Z	100.0000	f23b4e9b39c0
 SOURCE/comwin	?com_init@@YIFEHH@Z	98.9419	129e5993bb17
 SOURCE/comwin	?com_rcv@@YIFFGPAX@Z	100.0000	73dd64db48fc
 SOURCE/comwin	?com_sess@@YAFHHZZ	100.0000	feb4b7abd747
-SOURCE/comwin	?com_snd@@YIFFGGPAXH@Z	97.5595	2e4b7d659570
+SOURCE/comwin	?com_snd@@YIFFGGPAXH@Z	100.0000	15983804e0fb
 SOURCE/comwin	?com_stat@@YIEFG@Z	100.0000	2b9d847c69ac
-SOURCE/comwin	?com_term@@YIXF@Z	94.5333	6d320835b99f
-SOURCE/comwin	?comm_wrt_task@@YIXXZ	96.9565	575006f5ffe2
+SOURCE/comwin	?com_term@@YIXF@Z	100.0000	9b68a6d13f43
+SOURCE/comwin	?comm_wrt_task@@YIXXZ	99.9275	56b089c76a08
 SOURCE/comwin	?init_anchor@@YIXPAUtag_Anchor@@HH@Z	100.0000	2700f88bbd71
 SOURCE/comwin	?pop_node@@YIPAUtag_Node@@PAUtag_Anchor@@@Z	100.0000	ca42897db25b
 SOURCE/dpnetwin	?CleanupDPVars@@YIXXZ	100.0000	7832ca98a276
