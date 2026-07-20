@@ -104,11 +104,13 @@ struct mapTownExtra {
 
 H2_ENUM_BEGIN(MapEventConstant)
     MAP_EVENT_DATA_EMPTY                 = 0,
+    MAP_EVENT_DATA_AVAILABLE             = 1,
     MAP_EVENT_ARTIFACT_GUARD_FLAG        = 0x100,
     MAP_EVENT_ARTIFACT_CONDITION_FLAG    = 0x80,
     MAP_EVENT_ARTIFACT_CONDITION_ID_MASK = 0x7f,
     MAP_EVENT_ARTIFACT_ID_MASK           = 0xff,
     MAP_EVENT_DATA_SHIFT                 = 3,
+    MAP_EVENT_SPELL_OFFSET               = 1,
     MAP_EVENT_RESOURCE_OFFSET            = 1,
     MAP_EVENT_RESOURCE_AMOUNT            = 5,
     MAP_EVENT_GOLD_AMOUNT                = 500,
