@@ -81,7 +81,6 @@ H2_ENUM_BEGIN(AdventureSystemOption)
 H2_ENUM_END(AdventureSystemOption)
 
 H2_ENUM_CLASS_BEGIN(AdventureCommand)
-    ADVMGR_INVALID_CELL               = -1,
     ADVMGR_COMMAND_NONE               = -1,
     ADVMGR_COMMAND_MOVE_TO            = 1,
     ADVMGR_COMMAND_HERO_VIEW          = 2,
