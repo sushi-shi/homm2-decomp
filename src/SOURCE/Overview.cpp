@@ -1183,7 +1183,7 @@ void game::Overview(void) {
     SetupResources();
     memset(mineCounts4, 0, IDX(RES_COUNT));
     lighthouseCount4 = 0;
-    for (mine4 = 0; mine4 < IDX(GAME_MINE_COUNT); mine4++) {
+    for (mine4 = 0; mine4 < GAME_MINE_COUNT; mine4++) {
         if (m_mineOwners[mine4] == giCurPlayer) {
             if (m_mines[mine4].resourceType <= MINE_TYPE_GOLD) {
                 mineCounts4[IDX(m_mines[mine4].resourceType)]++;
