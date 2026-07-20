@@ -53,12 +53,6 @@ namespace {
         REMOTE_SECOND_HERO_SECOND = 4
     H2_ENUM_END(CombatRemoteFragment)
 
-    H2_ENUM_BEGIN(UndeadEventLevel)
-        EVENT_LEVEL_SMALL = 2,
-        EVENT_LEVEL_MEDIUM = 3,
-        EVENT_LEVEL_LARGE = 4
-    H2_ENUM_END(UndeadEventLevel)
-
     H2_ENUM_BEGIN(UndeadEventConstant)
         SKELETON_EVENT_SMALL_COUNT = 25,
         SKELETON_EVENT_MEDIUM_COUNT = 50,
@@ -772,7 +766,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_SEA_CHEST:
             if (!(cell->m_objectMetadata & CHEST_ARTIFACT_FLAG)
                 || eventHero2->NumArtifacts() >= EVENT_ARTIFACT_CAPACITY) {
-                if (!cell->m_objectMetadata) {
+                if (cell->m_objectMetadata == SEA_CHEST_OUTCOME_EMPTY) {
                     NormalDialog(
                         "{Chest}\n\nAfter spending hours trying to fish the chest out of the sea, "
                         "you open it, only to find it empty.",
@@ -1310,7 +1304,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     );
             } else {
                 if (eventHero2->NumArtifacts() >= EVENT_ARTIFACT_CAPACITY) {
-                    cell->m_objectMetadata = CHEST_GOLD_ONLY;
+                    cell->m_objectMetadata = CHEST_REWARD_SMALL;
                     goto chestGold;
                 }
                 eventValue1 = cell->m_objectMetadata & CHEST_ARTIFACT_MASK;
@@ -4786,7 +4780,7 @@ i32 advManager::SkeletonEvent(hero* eventHero, mapCell* cell, char* text, i32 x,
     ArtifactType artifactId;
 
     switch (cell->m_objectMetadata) {
-        case IDX(EVENT_LEVEL_SMALL):
+        case EVENT_LEVEL_SMALL:
             if (CombatMonsterEvent(
                     eventHero,
                     CREATURE_SKELETON,
@@ -4820,7 +4814,7 @@ i32 advManager::SkeletonEvent(hero* eventHero, mapCell* cell, char* text, i32 x,
                 return 1;
             }
             break;
-        case IDX(EVENT_LEVEL_MEDIUM):
+        case EVENT_LEVEL_MEDIUM:
             if (CombatMonsterEvent(
                     eventHero,
                     CREATURE_SKELETON,
@@ -4854,7 +4848,7 @@ i32 advManager::SkeletonEvent(hero* eventHero, mapCell* cell, char* text, i32 x,
                 return 1;
             }
             break;
-        case IDX(EVENT_LEVEL_LARGE):
+        case EVENT_LEVEL_LARGE:
             if (CombatMonsterEvent(
                     eventHero,
                     CREATURE_SKELETON,
@@ -4930,7 +4924,7 @@ VA(0x004b054a, 0x29b)
 i32 advManager::ZombieEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i32 y) {
     ArtifactType artifactId;
     switch (cell->m_objectMetadata) {
-        case IDX(EVENT_LEVEL_SMALL):
+        case EVENT_LEVEL_SMALL:
             if (CombatMonsterEvent(
                     eventHero,
                     CREATURE_ZOMBIE,
@@ -4964,7 +4958,7 @@ i32 advManager::ZombieEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i
                 return 1;
             }
             break;
-        case IDX(EVENT_LEVEL_MEDIUM):
+        case EVENT_LEVEL_MEDIUM:
             if (CombatMonsterEvent(
                     eventHero,
                     CREATURE_MUTANT_ZOMBIE,
@@ -4998,7 +4992,7 @@ i32 advManager::ZombieEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i
                 return 1;
             }
             break;
-        case IDX(EVENT_LEVEL_LARGE):
+        case EVENT_LEVEL_LARGE:
             if (CombatMonsterEvent(
                     eventHero,
                     CREATURE_MUTANT_ZOMBIE,
@@ -5087,7 +5081,7 @@ VA(0x004b07e5, 0x2f8)
 i32 advManager::GhostEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i32 y) {
     ArtifactType artifactId;
     switch (cell->m_objectMetadata) {
-        case IDX(EVENT_LEVEL_SMALL):
+        case EVENT_LEVEL_SMALL:
             if (CombatMonsterEvent(
                     eventHero,
                     CREATURE_GHOST,
@@ -5122,7 +5116,7 @@ i32 advManager::GhostEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i3
                 return 1;
             }
             break;
-        case IDX(EVENT_LEVEL_MEDIUM):
+        case EVENT_LEVEL_MEDIUM:
             if (CombatMonsterEvent(
                     eventHero,
                     CREATURE_GHOST,
@@ -5157,7 +5151,7 @@ i32 advManager::GhostEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i3
                 return 1;
             }
             break;
-        case IDX(EVENT_LEVEL_LARGE):
+        case EVENT_LEVEL_LARGE:
             if (CombatMonsterEvent(
                     eventHero,
                     CREATURE_GHOST,
@@ -6126,7 +6120,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
         case MAP_OBJECT_TREASURE_CHEST:
             if (cell->m_objectMetadata & CHEST_ARTIFACT_FLAG) {
                 if (eventHero->NumArtifacts() >= HERO_ARTIFACT_SLOT_COUNT) {
-                    cell->m_objectMetadata = CHEST_GOLD_ONLY;
+                    cell->m_objectMetadata = CHEST_REWARD_SMALL;
                     goto chestGoldOrExperience;
                 }
                 GiveArtifact(

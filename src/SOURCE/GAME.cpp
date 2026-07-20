@@ -266,6 +266,43 @@ H2_ENUM_BEGIN(SkeletonEventConstant)
     SKELETON_ARTIFACT_ROLL_MAX = 2
 H2_ENUM_END(SkeletonEventConstant)
 
+H2_ENUM_BEGIN(EventGenerationRollConstant)
+    EVENT_ROLL_MIN        = 0,
+    EVENT_ROLL_MAX        = 100,
+    EVENT_BUCKET_ROLL_MAX = 99,
+    EVENT_BUCKET_COUNT    = 10
+H2_ENUM_END(EventGenerationRollConstant)
+
+H2_ENUM_BEGIN(PackedResourceGenerationConstant)
+    WAGON_EMPTY_CUTOFF     = 40,
+    WAGON_ARTIFACT_CUTOFF  = 50,
+    WAGON_AMOUNT_MIN       = 2,
+    WAGON_AMOUNT_MAX       = 5,
+    LEAN_TO_AMOUNT_MIN     = 1,
+    LEAN_TO_AMOUNT_MAX     = 4,
+    CAMPFIRE_AMOUNT_MIN    = 4,
+    CAMPFIRE_AMOUNT_MAX    = 6
+H2_ENUM_END(PackedResourceGenerationConstant)
+
+H2_ENUM_BEGIN(TreasureChestGenerationConstant)
+    SEA_CHEST_EMPTY_CUTOFF   = 20,
+    SEA_CHEST_GOLD_CUTOFF    = 90,
+    LAND_CHEST_SMALL_CUTOFF  = 32,
+    LAND_CHEST_MEDIUM_CUTOFF = 64,
+    LAND_CHEST_LARGE_CUTOFF  = 95
+H2_ENUM_END(TreasureChestGenerationConstant)
+
+H2_ENUM_BEGIN(AncientLampGenerationConstant)
+    ANCIENT_LAMP_ROLL_MIN     = 0,
+    ANCIENT_LAMP_ROLL_MAX     = 2,
+    ANCIENT_LAMP_COUNT_OFFSET = 2
+H2_ENUM_END(AncientLampGenerationConstant)
+
+H2_ENUM_BEGIN(ShipwreckSurvivorGenerationConstant)
+    SHIPWRECK_SURVIVOR_TREASURE_CUTOFF = 60,
+    SHIPWRECK_SURVIVOR_MINOR_CUTOFF    = 80
+H2_ENUM_END(ShipwreckSurvivorGenerationConstant)
+
 H2_ENUM_BEGIN(GameVisibilityConstant)
     EARLY_TURN_LAST        = 20,
     MIDDLE_TURN_LAST       = 40,
@@ -1943,83 +1980,97 @@ void game::RandomizeEvents(void) {
                     }
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_WAGON:
-                    randomValue7 = Random(0, 100);
-                    if (randomValue7 < 40)
-                        cell2->m_objectMetadata = 0;
-                    else if (randomValue7 < 50)
+                    randomValue7 = Random(EVENT_ROLL_MIN, EVENT_ROLL_MAX);
+                    if (randomValue7 < WAGON_EMPTY_CUTOFF)
+                        cell2->m_objectMetadata = MAP_EVENT_DATA_EMPTY;
+                    else if (randomValue7 < WAGON_ARTIFACT_CUTOFF)
                         cell2->m_objectMetadata =
                             GetRandomArtifactId(
                                 ARTIFACT_LEVEL_MINOR | ARTIFACT_LEVEL_TREASURE,
                                 true
                             )
-                            | MAP_EVENT_ARTIFACT_CONDITION_FLAG;
+                            | WAGON_ARTIFACT_FLAG;
                     else
-                        cell2->m_objectMetadata = Random(0, 5) + (Random(2, 5) << 4) + 1;
+                        cell2->m_objectMetadata =
+                            Random(IDX(RES_WOOD), IDX(RES_GEMS))
+                            + (Random(WAGON_AMOUNT_MIN, WAGON_AMOUNT_MAX)
+                               << CAMPFIRE_AMOUNT_SHIFT)
+                            + MAP_EVENT_RESOURCE_OFFSET;
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_LEAN_TO:
-                    cell2->m_objectMetadata = Random(0, 5) + (Random(1, 4) << 4) + 1;
+                    cell2->m_objectMetadata =
+                        Random(IDX(RES_WOOD), IDX(RES_GEMS))
+                        + (Random(LEAN_TO_AMOUNT_MIN, LEAN_TO_AMOUNT_MAX)
+                           << CAMPFIRE_AMOUNT_SHIFT)
+                        + MAP_EVENT_RESOURCE_OFFSET;
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_DAEMON_CAVE:
-                    switch (Random(0, 99) % 10) {
+                    // Decimal buckets are balance payload; the stored values are event outcomes.
+                    // NOLINTBEGIN(readability-magic-numbers)
+                    switch (Random(EVENT_ROLL_MIN, EVENT_BUCKET_ROLL_MAX) % EVENT_BUCKET_COUNT) {
                         case 0:
                         case 1:
                         case 2:
-                            cell2->m_objectMetadata = 2;
+                            cell2->m_objectMetadata = DAEMON_REWARD_EXPERIENCE;
                             break;
                         case 3:
-                            cell2->m_objectMetadata = 3;
+                            cell2->m_objectMetadata = DAEMON_REWARD_ARTIFACT;
                             break;
                         case 4:
                         case 5:
                         case 6:
-                            cell2->m_objectMetadata = 4;
+                            cell2->m_objectMetadata = DAEMON_REWARD_EXPERIENCE_GOLD;
                             break;
                         case 7:
                         case 8:
                         case 9:
-                            cell2->m_objectMetadata = 5;
+                            cell2->m_objectMetadata = DAEMON_REWARD_RANSOM;
                             break;
                     }
+                    // NOLINTEND(readability-magic-numbers)
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_TREASURE_CHEST:
-                    if (giGroundToTerrain[cell2->m_terrainImageIndex] == 0) {
+                    if (giGroundToTerrain[cell2->m_terrainImageIndex] == IDX(TERRAIN_WATER)) {
                         cell2->m_triggerType = IDX(TRIGGER_SEA_CHEST);
-                        randomValue7 = Random(0, 100);
-                        if (randomValue7 < 20)
-                            cell2->m_objectMetadata = 0;
-                        else if (randomValue7 < 90)
-                            cell2->m_objectMetadata = 1;
+                        randomValue7 = Random(EVENT_ROLL_MIN, EVENT_ROLL_MAX);
+                        if (randomValue7 < SEA_CHEST_EMPTY_CUTOFF)
+                            cell2->m_objectMetadata = SEA_CHEST_OUTCOME_EMPTY;
+                        else if (randomValue7 < SEA_CHEST_GOLD_CUTOFF)
+                            cell2->m_objectMetadata = SEA_CHEST_OUTCOME_GOLD;
                         else
                             cell2->m_objectMetadata =
                                 GetRandomArtifactId(ARTIFACT_LEVEL_TREASURE, true)
-                                | MAP_EVENT_ARTIFACT_GUARD_FLAG;
+                                | CHEST_ARTIFACT_FLAG;
                     } else {
-                        randomValue7 = Random(0, 100);
-                        if (randomValue7 < 32)
-                            cell2->m_objectMetadata = 2;
-                        else if (randomValue7 < 64)
-                            cell2->m_objectMetadata = 3;
-                        else if (randomValue7 < 95)
-                            cell2->m_objectMetadata = 4;
+                        randomValue7 = Random(EVENT_ROLL_MIN, EVENT_ROLL_MAX);
+                        if (randomValue7 < LAND_CHEST_SMALL_CUTOFF)
+                            cell2->m_objectMetadata = CHEST_REWARD_SMALL;
+                        else if (randomValue7 < LAND_CHEST_MEDIUM_CUTOFF)
+                            cell2->m_objectMetadata = CHEST_REWARD_MEDIUM;
+                        else if (randomValue7 < LAND_CHEST_LARGE_CUTOFF)
+                            cell2->m_objectMetadata = CHEST_REWARD_LARGE;
                         else
                             cell2->m_objectMetadata =
                                 GetRandomArtifactId(ARTIFACT_LEVEL_TREASURE, true)
-                                | MAP_EVENT_ARTIFACT_GUARD_FLAG;
+                                | CHEST_ARTIFACT_FLAG;
                     }
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CAMPFIRE:
-                    cell2->m_objectMetadata = Random(4, 6) << 4;
-                    cell2->m_objectMetadata |= Random(0, 5);
+                    cell2->m_objectMetadata =
+                        Random(CAMPFIRE_AMOUNT_MIN, CAMPFIRE_AMOUNT_MAX) << CAMPFIRE_AMOUNT_SHIFT;
+                    cell2->m_objectMetadata |= Random(IDX(RES_WOOD), IDX(RES_GEMS));
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ANCIENT_LAMP:
-                    cell2->m_objectMetadata = Random(0, 2) + 2;
+                    cell2->m_objectMetadata =
+                        Random(ANCIENT_LAMP_ROLL_MIN, ANCIENT_LAMP_ROLL_MAX)
+                        + ANCIENT_LAMP_COUNT_OFFSET;
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SHIPWRECK_SURVIVOR:
-                    randomValue7 = Random(0, 100);
-                    if (randomValue7 < 60)
+                    randomValue7 = Random(EVENT_ROLL_MIN, EVENT_ROLL_MAX);
+                    if (randomValue7 < SHIPWRECK_SURVIVOR_TREASURE_CUTOFF)
                         cell2->m_objectMetadata =
                             GetRandomArtifactId(ARTIFACT_LEVEL_TREASURE, true);
-                    else if (randomValue7 < 80)
+                    else if (randomValue7 < SHIPWRECK_SURVIVOR_MINOR_CUTOFF)
                         cell2->m_objectMetadata = GetRandomArtifactId(ARTIFACT_LEVEL_MINOR, true);
                     else
                         cell2->m_objectMetadata = GetRandomArtifactId(ARTIFACT_LEVEL_MAJOR, true);
@@ -2027,26 +2078,29 @@ void game::RandomizeEvents(void) {
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_GRAVEYARD:
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SHIPWRECK:
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_DERELICT_SHIP:
-                    switch (Random(0, 99) % 10) {
+                    // Decimal buckets are balance payload; the stored value selects encounter size.
+                    // NOLINTBEGIN(readability-magic-numbers)
+                    switch (Random(EVENT_ROLL_MIN, EVENT_BUCKET_ROLL_MAX) % EVENT_BUCKET_COUNT) {
                         case 0:
                         case 1:
                         case 2:
-                            cell2->m_objectMetadata = 2;
+                            cell2->m_objectMetadata = EVENT_LEVEL_SMALL;
                             break;
                         case 3:
                         case 4:
                         case 5:
-                            cell2->m_objectMetadata = 3;
+                            cell2->m_objectMetadata = EVENT_LEVEL_MEDIUM;
                             break;
                         case 6:
                         case 7:
                         case 8:
-                            cell2->m_objectMetadata = 4;
+                            cell2->m_objectMetadata = EVENT_LEVEL_LARGE;
                             break;
                         case 9:
-                            cell2->m_objectMetadata = 5;
+                            cell2->m_objectMetadata = EVENT_LEVEL_HUGE;
                             break;
                     }
+                    // NOLINTEND(readability-magic-numbers)
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ARCHER_HOUSE:
                     cell2->m_objectMetadata = Random(10, 25);
