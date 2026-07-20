@@ -1605,35 +1605,35 @@ i32 game::ProcessNGKeyPress(struct tag_message& message) {
                     scanCode =
                         static_cast<u8>(static_cast<u32>(message.payload.keyboard.keyCode)
                                         >> KEY_SCAN_CODE_SHIFT);
-                    switch (scanCode) {
-                        case IDX(GAME_KEYPAD_INSERT):
+                    switch (static_cast<NewGameKeyCode>(scanCode)) {
+                        case GAME_KEYPAD_INSERT:
                             keyChar = '0';
                             break;
-                        case IDX(GAME_KEYPAD_END):
+                        case GAME_KEYPAD_END:
                             keyChar = '1';
                             break;
-                        case IDX(GAME_KEYPAD_DOWN):
+                        case GAME_KEYPAD_DOWN:
                             keyChar = '2';
                             break;
-                        case IDX(GAME_KEYPAD_PAGE_DOWN):
+                        case GAME_KEYPAD_PAGE_DOWN:
                             keyChar = '3';
                             break;
-                        case IDX(GAME_KEYPAD_LEFT):
+                        case GAME_KEYPAD_LEFT:
                             keyChar = '4';
                             break;
-                        case IDX(GAME_KEYPAD_CENTER):
+                        case GAME_KEYPAD_CENTER:
                             keyChar = '5';
                             break;
-                        case IDX(GAME_KEYPAD_RIGHT):
+                        case GAME_KEYPAD_RIGHT:
                             keyChar = '6';
                             break;
-                        case IDX(GAME_KEYPAD_HOME):
+                        case GAME_KEYPAD_HOME:
                             keyChar = '7';
                             break;
-                        case IDX(GAME_KEYPAD_UP):
+                        case GAME_KEYPAD_UP:
                             keyChar = '8';
                             break;
-                        case IDX(GAME_KEYPAD_PAGE_UP):
+                        case GAME_KEYPAD_PAGE_UP:
                             keyChar = '9';
                             break;
                     }

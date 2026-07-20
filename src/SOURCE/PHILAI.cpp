@@ -31,7 +31,6 @@ H2_ENUM_BEGIN(AIResourceValue)
 H2_ENUM_END(AIResourceValue)
 
 H2_ENUM_CLASS_BEGIN(AIArtifactEventMode)
-    AI_ARTIFACT_EVENT_MODE_MASK           = 0xf,
     AI_ARTIFACT_EVENT_VALUE               = 1,
     AI_ARTIFACT_EVENT_NO_VALUE            = 2,
     AI_ARTIFACT_EVENT_PAY_GOLD            = 3,
@@ -41,7 +40,8 @@ H2_ENUM_CLASS_BEGIN(AIArtifactEventMode)
     AI_ARTIFACT_EVENT_PAY_RESOURCE_FIVE   = 7
 H2_ENUM_CLASS_END(AIArtifactEventMode)
 
-H2_ENUM_CLASS_BEGIN(AIArtifactEventValue)
+H2_ENUM_BEGIN(AIArtifactEventConstant)
+    AI_ARTIFACT_EVENT_MODE_MASK             = 0xf,
     AI_EVENT_RESOURCE_TYPE_MASK             = 0xf,
     AI_ARTIFACT_EVENT_RESOURCE_MASK         = 0xf0,
     AI_ARTIFACT_EVENT_RESOURCE_SHIFT        = 4,
@@ -51,7 +51,7 @@ H2_ENUM_CLASS_BEGIN(AIArtifactEventValue)
     AI_ARTIFACT_EVENT_GOLD_COST             = 2000,
     AI_ARTIFACT_EVENT_RESOURCE_THREE_COST   = 2500,
     AI_ARTIFACT_EVENT_RESOURCE_FIVE_COST    = 3000
-H2_ENUM_CLASS_END(AIArtifactEventValue)
+H2_ENUM_END(AIArtifactEventConstant)
 
 H2_ENUM_BEGIN(AIFightEventConstant)
     FIGHT_EVENT_EMPTY             = 1,
@@ -5072,7 +5072,11 @@ i32 philAI::ComputeUpgradeValue(CreatureType a1, CreatureType a2) {
 }
 
 VA(0x00443c54, 0x271)
-i32 philAI::ComputeValueOfSS(hero* h, i32 skill, i32 level) {
+i32 philAI::ComputeValueOfSS(
+    hero* h,
+    H2_ENUM_PARAM(HeroSecondarySkill, i32) skill,
+    H2_ENUM_PARAM(HeroSkillLevel, i32) level
+) {
     i32 fightValue7;
     i32 value28;
     i32 armyIndex4;
@@ -5081,9 +5085,9 @@ i32 philAI::ComputeValueOfSS(hero* h, i32 skill, i32 level) {
     i32 rangedArmyValue28;
     i32 stackValue7;
 
-    value28 = gSSValues[skill][level - SECONDARY_SKILL_LEVEL_OFFSET];
+    value28 = gSSValues[IDX(skill)][IDX(level) - SECONDARY_SKILL_LEVEL_OFFSET];
     fightValue7 = FightValueOfStack(&h->m_army, h, 1, 0, 0, 0);
-    if (skill != IDX(HERO_SKILL_ESTATES)) {
+    if (skill != HERO_SKILL_ESTATES) {
         value28 = static_cast<i32>(
             (static_cast<float>(fightValue7) / gpCurPlayer->m_upgradeValueWeight
                  / AI_SECONDARY_SKILL_FIGHT_SCALE
@@ -5093,11 +5097,11 @@ i32 philAI::ComputeValueOfSS(hero* h, i32 skill, i32 level) {
     }
 
     switch (skill) {
-        case IDX(HERO_SKILL_NAVIGATION):
+        case HERO_SKILL_NAVIGATION:
             if (HAS(h->m_eventFlags, HERO_EVENT_EMBARKED))
                 value28 = static_cast<i32>(value28 * AI_SECONDARY_SKILL_NAVIGATION_FACTOR);
             break;
-        case IDX(HERO_SKILL_ARCHERY):
+        case HERO_SKILL_ARCHERY:
             rangedArmyValue28 = 0;
             totalArmyValue2 = rangedArmyValue28;
             for (armyIndex4 = 0; armyIndex4 < SECONDARY_SKILL_ARMY_SLOTS; armyIndex4++) {
@@ -5118,8 +5122,8 @@ i32 philAI::ComputeValueOfSS(hero* h, i32 skill, i32 level) {
                 * value28
             );
             break;
-        case IDX(HERO_SKILL_WISDOM):
-        case IDX(HERO_SKILL_MYSTICISM):
+        case HERO_SKILL_WISDOM:
+        case HERO_SKILL_MYSTICISM:
             if (!h->HasArtifact(ARTIFACT_MAGIC_BOOK)
                 || h->Stats(HERO_PRIMARY_KNOWLEDGE) < SECONDARY_SKILL_MINIMUM_KNOWLEDGE) {
                 value28 = static_cast<i32>(value28 * AI_SECONDARY_SKILL_BASE_FACTOR);
@@ -5130,12 +5134,14 @@ i32 philAI::ComputeValueOfSS(hero* h, i32 skill, i32 level) {
 }
 
 VA(0x00443ec5, 0x59)
-i32 philAI::ComputeValueOfFreeSS(hero* h, i32 ss) {
-    if (h->m_secondarySkills[ss] != 0
+i32 philAI::ComputeValueOfFreeSS(
+    hero* h, H2_ENUM_PARAM(HeroSecondarySkill, i32) skill
+) {
+    if (h->m_secondarySkills[IDX(skill)] != 0
         || h->m_secondarySkillCount >= HERO_SECONDARY_SKILL_CAPACITY)
         return 0;
     else
-        return ComputeValueOfSS(h, ss, 1);
+        return ComputeValueOfSS(h, skill, HERO_SKILL_LEVEL_BASIC);
 }
 
 VA(0x00443f1e, 0xa6)
@@ -5161,7 +5167,7 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
     i32 creatureFlag_k;
     i32 purchaseCost_j;
     i32 creaturePurchaseState[9];
-    i32 resource;
+    H2_ENUM_STORAGE(ResourceType, i32) resource;
     i32 resourceState_a[3];
     i32 purchaseValue_n;
     i32 index_k;
@@ -5211,15 +5217,15 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
             case MAP_OBJECT_RESOURCE:
                 resource = cell_k->m_objectIndex >> 1;
                 switch (resource) {
-                    case IDX(RES_GOLD):
+                    case RES_GOLD:
                         value_h = static_cast<i32>(
-                            gafAITurnCostResource[resource]
+                            gafAITurnCostResource[IDX(resource)]
                             * (cell_k->m_objectMetadata * AI_GOLD_RESOURCE_MULTIPLIER)
                         );
                         break;
                     default:
                         value_h = static_cast<i32>(
-                            gafAITurnCostResource[resource] * cell_k->m_objectMetadata
+                            gafAITurnCostResource[IDX(resource)] * cell_k->m_objectMetadata
                         );
                         break;
                 }
@@ -5426,11 +5432,11 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                     value_h = gArtifactBaseRV
                         [cell_k->m_objectMetadata & MAP_EVENT_ARTIFACT_CONDITION_ID_MASK];
                 } else {
-                    resource = (cell_k->m_objectMetadata & IDX(AI_EVENT_RESOURCE_TYPE_MASK)) - 1;
+                    resource = (cell_k->m_objectMetadata & AI_EVENT_RESOURCE_TYPE_MASK) - 1;
                     amount_j =
-                        (cell_k->m_objectMetadata & IDX(AI_ARTIFACT_EVENT_RESOURCE_MASK))
-                        >> IDX(AI_ARTIFACT_EVENT_RESOURCE_SHIFT);
-                    value_h = static_cast<i32>(gafAITurnCostResource[resource] * amount_j);
+                        (cell_k->m_objectMetadata & AI_ARTIFACT_EVENT_RESOURCE_MASK)
+                        >> AI_ARTIFACT_EVENT_RESOURCE_SHIFT;
+                    value_h = static_cast<i32>(gafAITurnCostResource[IDX(resource)] * amount_j);
                 }
                 break;
             case MAP_OBJECT_ANCIENT_LAMP:
@@ -5760,7 +5766,10 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                     value_h = ManaRefreshValue(gpCurAIHero, 2);
                 break;
             case MAP_OBJECT_WITCH_HUT:
-                value_h = ComputeValueOfFreeSS(gpCurAIHero, cell_k->m_objectMetadata);
+                value_h = ComputeValueOfFreeSS(
+                    gpCurAIHero,
+                    static_cast<HeroSecondarySkill>(cell_k->m_objectMetadata)
+                );
                 break;
             case MAP_OBJECT_SIGN:
             case MAP_OBJECT_ORACLE:
@@ -6067,7 +6076,7 @@ i32 philAI::EvaluateArtifactEvent(ArtifactType artifact, i32 eventData) {
         for (stackIndex29 = 0; stackIndex29 < ARMY_GROUP_SLOT_COUNT; stackIndex29++) {
             gpMonGroup->m_creatureTypes[stackIndex29] = static_cast<i8>(eventData);
             if (gpMonGroup->m_creatureTypes[stackIndex29] == IDX(CREATURE_ROGUE))
-                gpMonGroup->m_quantities[stackIndex29] = IDX(AI_ARTIFACT_EVENT_GUARD_ROGUE_COUNT);
+                gpMonGroup->m_quantities[stackIndex29] = AI_ARTIFACT_EVENT_GUARD_ROGUE_COUNT;
             else if (stackIndex29 == 0)
                 gpMonGroup->m_quantities[stackIndex29] = 1;
             else
@@ -6095,43 +6104,43 @@ i32 philAI::EvaluateArtifactEvent(ArtifactType artifact, i32 eventData) {
             guardedValue2 = 0;
         result5 = guardedValue2;
     } else {
-        switch (eventData & IDX(AI_ARTIFACT_EVENT_MODE_MASK)) {
-            case IDX(AI_ARTIFACT_EVENT_VALUE):
+        switch (static_cast<AIArtifactEventMode>(eventData & AI_ARTIFACT_EVENT_MODE_MASK)) {
+            case AI_ARTIFACT_EVENT_VALUE:
                 result5 = defaultValue37;
                 break;
-            case IDX(AI_ARTIFACT_EVENT_REQUIRES_WISDOM):
+            case AI_ARTIFACT_EVENT_REQUIRES_WISDOM:
                 if (gpCurAIHero->m_secondarySkills[IDX(HERO_SKILL_WISDOM)] != 0)
                     result5 = defaultValue37;
                 else
                     result5 = 0;
                 break;
-            case IDX(AI_ARTIFACT_EVENT_REQUIRES_LEADERSHIP):
+            case AI_ARTIFACT_EVENT_REQUIRES_LEADERSHIP:
                 if (gpCurAIHero->m_secondarySkills[IDX(HERO_SKILL_LEADERSHIP)] != 0)
                     result5 = defaultValue37;
                 else
                     result5 = 0;
                 break;
-            case IDX(AI_ARTIFACT_EVENT_NO_VALUE):
+            case AI_ARTIFACT_EVENT_NO_VALUE:
                 break;
-            case IDX(AI_ARTIFACT_EVENT_PAY_GOLD):
-                result5 = NetValueOfArtifact(IDX(artifact), IDX(AI_ARTIFACT_EVENT_GOLD_COST), 0, 0);
+            case AI_ARTIFACT_EVENT_PAY_GOLD:
+                result5 = NetValueOfArtifact(IDX(artifact), AI_ARTIFACT_EVENT_GOLD_COST, 0, 0);
                 break;
-            case IDX(AI_ARTIFACT_EVENT_PAY_RESOURCE_THREE):
+            case AI_ARTIFACT_EVENT_PAY_RESOURCE_THREE:
                 result5 = NetValueOfArtifact(
                     IDX(artifact),
-                    IDX(AI_ARTIFACT_EVENT_RESOURCE_THREE_COST),
-                    (eventData & IDX(AI_ARTIFACT_EVENT_RESOURCE_MASK))
-                        >> IDX(AI_ARTIFACT_EVENT_RESOURCE_SHIFT),
-                    IDX(AI_ARTIFACT_EVENT_RESOURCE_THREE_AMOUNT)
+                    AI_ARTIFACT_EVENT_RESOURCE_THREE_COST,
+                    (eventData & AI_ARTIFACT_EVENT_RESOURCE_MASK)
+                        >> AI_ARTIFACT_EVENT_RESOURCE_SHIFT,
+                    AI_ARTIFACT_EVENT_RESOURCE_THREE_AMOUNT
                 );
                 break;
-            case IDX(AI_ARTIFACT_EVENT_PAY_RESOURCE_FIVE):
+            case AI_ARTIFACT_EVENT_PAY_RESOURCE_FIVE:
                 result5 = NetValueOfArtifact(
                     IDX(artifact),
-                    IDX(AI_ARTIFACT_EVENT_RESOURCE_FIVE_COST),
-                    (eventData & IDX(AI_ARTIFACT_EVENT_RESOURCE_MASK))
-                        >> IDX(AI_ARTIFACT_EVENT_RESOURCE_SHIFT),
-                    IDX(AI_ARTIFACT_EVENT_RESOURCE_FIVE_AMOUNT)
+                    AI_ARTIFACT_EVENT_RESOURCE_FIVE_COST,
+                    (eventData & AI_ARTIFACT_EVENT_RESOURCE_MASK)
+                        >> AI_ARTIFACT_EVENT_RESOURCE_SHIFT,
+                    AI_ARTIFACT_EVENT_RESOURCE_FIVE_AMOUNT
                 );
                 break;
         }

@@ -46,14 +46,11 @@
 namespace {
 
 H2_ENUM_BEGIN(TownManagerInputCode)
-    INPUT_SELECT           = 12,
-    INPUT_DESELECT         = 13,
-    INPUT_ALTERNATE_SELECT = 14,
-    CONTROL_PREVIOUS_TOWN  = 0x387,
-    CONTROL_NEXT_TOWN      = 0x388,
-    CONTROL_CLOSE          = 0x7800,
-    DIALOG_BUILD_BOAT      = 0x7802,
-    DIALOG_BUY_SPELL_BOOK  = 0x7805
+    CONTROL_PREVIOUS_TOWN = 0x387,
+    CONTROL_NEXT_TOWN     = 0x388,
+    CONTROL_CLOSE         = 0x7800,
+    DIALOG_BUILD_BOAT     = 0x7802,
+    DIALOG_BUY_SPELL_BOOK = 0x7805
 H2_ENUM_END(TownManagerInputCode)
 
 H2_ENUM_CLASS_BEGIN(TownObjectRenderMask)
@@ -105,19 +102,6 @@ H2_ENUM_CLASS_BEGIN(TownCommandTextId)
     TEXT_MARKETPLACE                = 26,
     TEXT_CAPTAIN_QUARTERS           = 27
 H2_ENUM_CLASS_END(TownCommandTextId)
-
-H2_ENUM_CLASS_BEGIN(TownThievesGuildCategory)
-    THIEVES_CATEGORY_TOWNS          = 0,
-    THIEVES_CATEGORY_CASTLES        = 1,
-    THIEVES_CATEGORY_HEROES         = 2,
-    THIEVES_CATEGORY_GOLD           = 3,
-    THIEVES_CATEGORY_WOOD_AND_ORE   = 4,
-    THIEVES_CATEGORY_RARE_RESOURCES = 5,
-    THIEVES_CATEGORY_OBELISKS       = 6,
-    THIEVES_CATEGORY_ARTIFACTS      = 7,
-    THIEVES_CATEGORY_ARMY_STRENGTH  = 8,
-    THIEVES_CATEGORY_INCOME         = 9
-H2_ENUM_CLASS_END(TownThievesGuildCategory)
 
 H2_ENUM_CLASS_BEGIN(TownDialogResult)
     DIALOG_CANCEL_ID = 0x7801
@@ -1043,7 +1027,7 @@ void townManager::SetCommandAndText(struct tag_message& message) {
 
     m_command = ARMY_COMMAND_NONE;
     switch (objectId) {
-        case IDX(CONTROL_CLOSE):
+        case CONTROL_CLOSE:
             strcpy(m_statusText, cTownCommand[IDX(TEXT_EXIT)]);
             break;
         case TOWN_WIDGET_ID_NONE:
@@ -1240,8 +1224,8 @@ i32 townManager::Main(tag_message& message) {
     switch (message.type) {
         case MESSAGE_WIDGET:
             switch (message.payload.widget.command) {
-                case IDX(INPUT_SELECT):
-                case IDX(INPUT_ALTERNATE_SELECT):
+                case WIDGET_COMMAND_SELECT:
+                case WIDGET_COMMAND_ALTERNATE_SELECT:
                     switch (message.payload.widget.id) {
                         case TOWN_OBJECT_DWELLING_1:
                         case TOWN_OBJECT_DWELLING_2:
@@ -1421,7 +1405,7 @@ i32 townManager::Main(tag_message& message) {
                                             0
                                         );
                                         if (gpWindowManager->m_dialogResult
-                                            == IDX(DIALOG_BUY_SPELL_BOOK)) {
+                                            == DIALOG_BUY_SPELL_BOOK) {
                                             GiveArtifact(
                                                 gpGame->GetHero(m_town->m_occupyingHeroId),
                                                 ARTIFACT_MAGIC_BOOK,
@@ -1549,7 +1533,7 @@ i32 townManager::Main(tag_message& message) {
                                 gpWindowManager->BroadcastMessage(
                                     MESSAGE_WIDGET,
                                     WIDGET_COMMAND_SET_FLAGS,
-                                    IDX(CONTROL_CLOSE),
+                                    CONTROL_CLOSE,
                                     TOWN_INTERFACE_BROADCAST_FLAGS
                                 );
                                 if (gpGame->GetBoatsBuilt() < TOWN_MAX_BOATS
@@ -1581,7 +1565,7 @@ i32 townManager::Main(tag_message& message) {
                                         ->DoDialog(m_heroWindow0, TrueFalseDialogHandler, 0);
                                     delete m_heroWindow0;
                                     if (gpWindowManager->m_dialogResult
-                                        == IDX(DIALOG_BUILD_BOAT)) {
+                                        == DIALOG_BUILD_BOAT) {
                                         if (gpGame->CreateBoat(m_town->m_boatX, m_town->m_boatY, 0)
                                             != -1) {
                                             BuildObj(BUILDING_SLOT_DISABLED_FIRST);
@@ -1612,7 +1596,7 @@ i32 townManager::Main(tag_message& message) {
                                 gpWindowManager->BroadcastMessage(
                                     MESSAGE_WIDGET,
                                     WIDGET_COMMAND_CLEAR_FLAGS,
-                                    IDX(CONTROL_CLOSE),
+                                    CONTROL_CLOSE,
                                     TOWN_INTERFACE_BROADCAST_FLAGS
                                 );
                             }
@@ -1689,7 +1673,7 @@ i32 townManager::Main(tag_message& message) {
                             }
                             break;
 
-                        case IDX(CONTROL_CLOSE):
+                        case CONTROL_CLOSE:
                             if (!quickView_k)
                                 SetCommandAndText(message);
                             break;
@@ -1745,16 +1729,16 @@ i32 townManager::Main(tag_message& message) {
                     }
                     break;
 
-                case IDX(INPUT_DESELECT):
+                case WIDGET_COMMAND_DESELECT:
                     switch (message.payload.widget.id) {
-                        case IDX(CONTROL_CLOSE):
+                        case CONTROL_CLOSE:
                             if (quickView_k)
                                 break;
                             ++exitTown_i;
                             break;
 
-                        case IDX(CONTROL_PREVIOUS_TOWN):
-                        case IDX(CONTROL_NEXT_TOWN):
+                        case CONTROL_PREVIOUS_TOWN:
+                        case CONTROL_NEXT_TOWN:
                             if (m_town->m_owner != giCurPlayer)
                                 break;
                             if (gpCurPlayer->m_townCount <= 1)
@@ -1764,7 +1748,7 @@ i32 townManager::Main(tag_message& message) {
                                     gpGame->TownIDToTownPos(gpCurPlayer, m_town->m_id);
                                 townPosition =
                                     (townPosition
-                                     + (message.payload.widget.id == IDX(CONTROL_PREVIOUS_TOWN)
+                                     + (message.payload.widget.id == CONTROL_PREVIOUS_TOWN
                                             ? -1
                                             : 1)
                                      + gpCurPlayer->m_townCount)
@@ -2366,7 +2350,7 @@ i32 townManager::BuyBuild(
         gpWindowManager->BroadcastMessage(
             MESSAGE_WIDGET,
             WIDGET_COMMAND_SET_FLAGS,
-            IDX(CONTROL_CLOSE),
+            CONTROL_CLOSE,
             TOWN_INTERFACE_BROADCAST_FLAGS
         );
     m_selectedBuilding = BUILDING_SLOT_NONE;
@@ -2408,7 +2392,7 @@ i32 townManager::BuyBuild(
         gpWindowManager->BroadcastMessage(
             MESSAGE_WIDGET,
             WIDGET_COMMAND_CLEAR_FLAGS,
-            IDX(CONTROL_CLOSE),
+            CONTROL_CLOSE,
             TOWN_INTERFACE_BROADCAST_FLAGS
         );
     delete window_a;
@@ -2507,7 +2491,7 @@ void townManager::BuildObj(H2_ENUM_PARAM(BuildingSlotType, i32) building) {
         gpWindowManager->BroadcastMessage(
             MESSAGE_WIDGET,
             WIDGET_COMMAND_CLEAR_FLAGS,
-            IDX(CONTROL_CLOSE),
+            CONTROL_CLOSE,
             TOWN_INTERFACE_BROADCAST_FLAGS
         );
         RedrawTownScreen();
@@ -2645,8 +2629,8 @@ i32 MageGuildHandler(tag_message& message) {
 
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
-            case IDX(INPUT_SELECT):
-            case IDX(INPUT_ALTERNATE_SELECT):
+            case WIDGET_COMMAND_SELECT:
+            case WIDGET_COMMAND_ALTERNATE_SELECT:
                 quickView_f = message.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON;
                 spellSlot = -1;
                 if (message.payload.widget.id >= TOWN_MAGE_FIRST_SPELL_CONTROL
@@ -2826,7 +2810,7 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
     gpWindowManager->BroadcastMessage(
         MESSAGE_WIDGET,
         WIDGET_COMMAND_CLEAR_FLAGS,
-        IDX(CONTROL_CLOSE),
+        CONTROL_CLOSE,
         TOWN_INTERFACE_BROADCAST_FLAGS
     );
     m_recruitHero->m_owner = -1;
@@ -2842,7 +2826,7 @@ i32 TavernHandler(tag_message& message) {
 
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
-            case IDX(INPUT_DESELECT):
+            case WIDGET_COMMAND_DESELECT:
                 switch (message.payload.widget.id) {
                     case EVENT_WINDOW_FIRST_BUTTON:
                     case EVENT_WINDOW_SECOND_BUTTON:
@@ -2908,7 +2892,7 @@ i32 SplitArmyHandler(tag_message& message) {
 
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
-            case IDX(INPUT_SELECT):
+            case WIDGET_COMMAND_SELECT:
                 switch (message.payload.widget.id) {
                     case TOWN_SPLIT_AMOUNT_CONTROL:
                         message.payload.widget.command = WIDGET_COMMAND_GET_TEXT;
@@ -2921,7 +2905,7 @@ i32 SplitArmyHandler(tag_message& message) {
                         goto update_amount;
                 }
                 break;
-            case IDX(INPUT_DESELECT):
+            case WIDGET_COMMAND_DESELECT:
                 switch (message.payload.widget.id) {
                     case TOWN_SPLIT_INCREASE_CONTROL:
                         ++gpTownManager->m_splitAmount;
@@ -3191,7 +3175,11 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
     }
 
     for (category_stat = 0; !(category_stat >= maxCategories_hero); ++category_stat) {
-        GetCategoryStats(category_stat, categoryStats_m, categoryOrder_x);
+        GetCategoryStats(
+            static_cast<TownThievesGuildCategory>(category_stat),
+            categoryStats_m,
+            categoryOrder_x
+        );
         SortStats(categoryStats_m, categoryOrder_x);
         firstAtRank_rank = 0;
         lastAtRank_j = 0;
@@ -3471,7 +3459,11 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
 }
 
 VA(0x0041b692, 0x56a)
-void GetCategoryStats(i32 category, i32l* const stats, i8* const order) {
+void GetCategoryStats(
+    H2_ENUM_PARAM(TownThievesGuildCategory, i32) category,
+    i32l* const stats,
+    i8* const order
+) {
     i32 player;
     i32 townIndex_c;
     hero* playerHero_h;
@@ -3489,7 +3481,7 @@ void GetCategoryStats(i32 category, i32l* const stats, i8* const order) {
             stats[player] = TOWN_THIEVES_DEAD_PLAYER_STAT;
         } else {
             switch (category) {
-                case IDX(THIEVES_CATEGORY_TOWNS):
+                case THIEVES_CATEGORY_TOWNS:
                     for (townIndex_c = 0; townIndex_c < GAME_TOWN_COUNT; ++townIndex_c) {
                         if (gpGame->m_castleRecs[townIndex_c].m_owner == player
                             && (gpGame->m_castleRecs[townIndex_c].m_buildings
@@ -3499,7 +3491,7 @@ void GetCategoryStats(i32 category, i32l* const stats, i8* const order) {
                     }
                     stats[player] = townCount_k;
                     break;
-                case IDX(THIEVES_CATEGORY_CASTLES):
+                case THIEVES_CATEGORY_CASTLES:
                     for (townIndex_c = 0; townIndex_c < GAME_TOWN_COUNT; ++townIndex_c) {
                         if (gpGame->m_castleRecs[townIndex_c].m_owner == player
                             && (gpGame->m_castleRecs[townIndex_c].m_buildings
@@ -3509,26 +3501,26 @@ void GetCategoryStats(i32 category, i32l* const stats, i8* const order) {
                     }
                     stats[player] = castleCount_p;
                     break;
-                case IDX(THIEVES_CATEGORY_HEROES):
+                case THIEVES_CATEGORY_HEROES:
                     stats[player] = gpGame->m_players[player].m_heroCount;
                     break;
-                case IDX(THIEVES_CATEGORY_GOLD):
+                case THIEVES_CATEGORY_GOLD:
                     stats[player] = gpGame->m_players[player].m_resources[IDX(RES_GOLD)];
                     break;
-                case IDX(THIEVES_CATEGORY_WOOD_AND_ORE):
+                case THIEVES_CATEGORY_WOOD_AND_ORE:
                     stats[player] = gpGame->m_players[player].m_resources[IDX(RES_WOOD)]
                                     + gpGame->m_players[player].m_resources[IDX(RES_ORE)];
                     break;
-                case IDX(THIEVES_CATEGORY_RARE_RESOURCES):
+                case THIEVES_CATEGORY_RARE_RESOURCES:
                     stats[player] = gpGame->m_players[player].m_resources[IDX(RES_MERCURY)]
                                     + gpGame->m_players[player].m_resources[IDX(RES_SULFUR)]
                                     + gpGame->m_players[player].m_resources[IDX(RES_CRYSTAL)]
                                     + gpGame->m_players[player].m_resources[IDX(RES_GEMS)];
                     break;
-                case IDX(THIEVES_CATEGORY_OBELISKS):
+                case THIEVES_CATEGORY_OBELISKS:
                     stats[player] = GetNumObelisks(player);
                     break;
-                case IDX(THIEVES_CATEGORY_ARTIFACTS):
+                case THIEVES_CATEGORY_ARTIFACTS:
                     stats[player] = 0;
                     for (townIndex_c = 0; townIndex_c < gpGame->m_players[player].m_heroCount;
                          ++townIndex_c) {
@@ -3543,7 +3535,7 @@ void GetCategoryStats(i32 category, i32l* const stats, i8* const order) {
                         }
                     }
                     break;
-                case IDX(THIEVES_CATEGORY_ARMY_STRENGTH):
+                case THIEVES_CATEGORY_ARMY_STRENGTH:
                     armyStrength = 0;
                     for (heroIndex_n = 0; heroIndex_n < gpGame->m_players[player].m_heroCount;
                          ++heroIndex_n) {
@@ -3567,7 +3559,7 @@ void GetCategoryStats(i32 category, i32l* const stats, i8* const order) {
                     }
                     stats[player] = armyStrength;
                     break;
-                case IDX(THIEVES_CATEGORY_INCOME):
+                case THIEVES_CATEGORY_INCOME:
                     stats[player] = gpGame->ComputeDailyGold(player);
                     break;
             }
