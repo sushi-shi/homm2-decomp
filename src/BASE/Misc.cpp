@@ -50,18 +50,17 @@ H2_ENUM_BEGIN(DataEntryWidgetId)
     ENTRY_BUTTON_EIGHT  = 0x7808
 H2_ENUM_END(DataEntryWidgetId)
 
-H2_ENUM_BEGIN(LogConstant)
+H2_ENUM_BEGIN(MiscLogPrivateConstant)
     MEMORY_LEAK_DEBUG_LEVEL   = 1,
     FILE_DEBUG_LEVEL          = 2,
     DEBUGGER_OUTPUT_LEVEL     = 4,
     FORCED_DEBUG_LEVEL        = 9,
-    UNUSED_VALUE              = -999,
     FORMAT_BUFFER_SIZE        = 200,
     TEXT_BUFFER_SIZE          = 500,
     MEMORY_ENTRY_CAPACITY     = 2000,
     REPORTED_MEMORY_KILOBYTES = 16034,
     ENTRY_SEARCH_COMPLETE     = 99999
-H2_ENUM_END(LogConstant)
+H2_ENUM_END(MiscLogPrivateConstant)
 
 H2_ENUM_BEGIN(MiscGameDefaultConstant)
     DEFAULT_WINDOW_ORIGIN        = 10,
@@ -379,8 +378,8 @@ H2_ENUM_END(StatusBarLayout)
 
 VA(0x004c3d10, 0x58)
 void InitMemEntry(void) {
-    LogInt(gMemEntryTag, iMemEntries, UNUSED_VALUE, UNUSED_VALUE, UNUSED_VALUE, UNUSED_VALUE,
-           UNUSED_VALUE, UNUSED_VALUE);
+    LogInt(gMemEntryTag, iMemEntries, LOG_UNUSED_VALUE, LOG_UNUSED_VALUE, LOG_UNUSED_VALUE, LOG_UNUSED_VALUE,
+           LOG_UNUSED_VALUE, LOG_UNUSED_VALUE);
     gpMemEntry = static_cast<MemEntry*>(malloc(MEMORY_ENTRY_CAPACITY * sizeof(MemEntry)));
     for (i32 i = 0; i < MEMORY_ENTRY_CAPACITY; ++i)
         gpMemEntry[i].used = 0;
@@ -393,8 +392,8 @@ void* BaseAlloc(u32 size, char* originalFile, i32 originalLine) {
     if (size == 0)
         return NULL;
     if (gpMemEntry == NULL) {
-        LogInt(gMemEntryTag, iMemEntries, UNUSED_VALUE, UNUSED_VALUE, UNUSED_VALUE,
-               UNUSED_VALUE, UNUSED_VALUE, UNUSED_VALUE);
+        LogInt(gMemEntryTag, iMemEntries, LOG_UNUSED_VALUE, LOG_UNUSED_VALUE, LOG_UNUSED_VALUE,
+               LOG_UNUSED_VALUE, LOG_UNUSED_VALUE, LOG_UNUSED_VALUE);
         gpMemEntry =
             static_cast<MemEntry*>(malloc(MEMORY_ENTRY_CAPACITY * sizeof(MemEntry)));
         for (i32 initIndex = 0; initIndex < MEMORY_ENTRY_CAPACITY; ++initIndex)
@@ -448,8 +447,8 @@ void BaseFree(void* ptr, char* originalFile, i32 originalLine) {
     char logText[TEXT_BUFFER_SIZE];
     char text[FORMAT_BUFFER_SIZE];
     if (gpMemEntry == NULL) {
-        LogInt(gMemEntryTag, iMemEntries, UNUSED_VALUE, UNUSED_VALUE, UNUSED_VALUE,
-               UNUSED_VALUE, UNUSED_VALUE, UNUSED_VALUE);
+        LogInt(gMemEntryTag, iMemEntries, LOG_UNUSED_VALUE, LOG_UNUSED_VALUE, LOG_UNUSED_VALUE,
+               LOG_UNUSED_VALUE, LOG_UNUSED_VALUE, LOG_UNUSED_VALUE);
         gpMemEntry =
             static_cast<MemEntry*>(malloc(MEMORY_ENTRY_CAPACITY * sizeof(MemEntry)));
         for (i32 initIndex = 0; initIndex < MEMORY_ENTRY_CAPACITY; ++initIndex)
@@ -459,12 +458,12 @@ void BaseFree(void* ptr, char* originalFile, i32 originalLine) {
         LogInt(
             gMiscText.memory.freeLabel.text,
             reinterpret_cast<i32>(ptr),
-            UNUSED_VALUE,
-            UNUSED_VALUE,
-            UNUSED_VALUE,
-            UNUSED_VALUE,
-            UNUSED_VALUE,
-            UNUSED_VALUE
+            LOG_UNUSED_VALUE,
+            LOG_UNUSED_VALUE,
+            LOG_UNUSED_VALUE,
+            LOG_UNUSED_VALUE,
+            LOG_UNUSED_VALUE,
+            LOG_UNUSED_VALUE
         );
     if (ptr == NULL) {
         if (giDebugLevel >= FILE_DEBUG_LEVEL) {
@@ -486,12 +485,12 @@ void BaseFree(void* ptr, char* originalFile, i32 originalLine) {
         LogInt(
             gMiscText.memory.entryUnderflow.text,
             iMemEntries,
-            UNUSED_VALUE,
-            UNUSED_VALUE,
-            UNUSED_VALUE,
-            UNUSED_VALUE,
-            UNUSED_VALUE,
-            UNUSED_VALUE
+            LOG_UNUSED_VALUE,
+            LOG_UNUSED_VALUE,
+            LOG_UNUSED_VALUE,
+            LOG_UNUSED_VALUE,
+            LOG_UNUSED_VALUE,
+            LOG_UNUSED_VALUE
         );
     i32 entryIndex;
     for (entryIndex = 0; entryIndex < MEMORY_ENTRY_CAPACITY; ++entryIndex) {
@@ -550,12 +549,12 @@ void PrintMemoryLeaks(void) {
         LogInt(
             gMiscText.memory.leakCountLabel.text,
             iMemEntries,
-            UNUSED_VALUE,
-            UNUSED_VALUE,
-            UNUSED_VALUE,
-            UNUSED_VALUE,
-            UNUSED_VALUE,
-            UNUSED_VALUE
+            LOG_UNUSED_VALUE,
+            LOG_UNUSED_VALUE,
+            LOG_UNUSED_VALUE,
+            LOG_UNUSED_VALUE,
+            LOG_UNUSED_VALUE,
+            LOG_UNUSED_VALUE
         );
         i32 entryIndex = 0;
         do {
@@ -1984,7 +1983,7 @@ void LogInt(
 ) {
     char text[FORMAT_BUFFER_SIZE];
     char logText[TEXT_BUFFER_SIZE];
-    if (value7 != UNUSED_VALUE)
+    if (value7 != LOG_UNUSED_VALUE)
         sprintf(
             text,
             gMiscText.log.sevenValueFormat.text,
@@ -1997,7 +1996,7 @@ void LogInt(
             value6,
             value7
         );
-    else if (value6 != UNUSED_VALUE)
+    else if (value6 != LOG_UNUSED_VALUE)
         sprintf(
             text,
             gMiscText.log.sixValueFormat.text,
@@ -2009,7 +2008,7 @@ void LogInt(
             value5,
             value6
         );
-    else if (value5 != UNUSED_VALUE)
+    else if (value5 != LOG_UNUSED_VALUE)
         sprintf(
             text,
             gMiscText.log.fiveValueFormat.text,
@@ -2020,11 +2019,11 @@ void LogInt(
             value4,
             value5
         );
-    else if (value4 != UNUSED_VALUE)
+    else if (value4 != LOG_UNUSED_VALUE)
         sprintf(text, gMiscText.log.fourValueFormat.text, label, value1, value2, value3, value4);
-    else if (value3 != UNUSED_VALUE)
+    else if (value3 != LOG_UNUSED_VALUE)
         sprintf(text, gMiscText.log.threeValueFormat.text, label, value1, value2, value3);
-    else if (value2 != UNUSED_VALUE)
+    else if (value2 != LOG_UNUSED_VALUE)
         sprintf(text, gMiscText.log.twoValueFormat.text, label, value1, value2);
     else
         sprintf(text, gMiscText.log.oneValueFormat.text, label, value1);

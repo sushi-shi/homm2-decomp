@@ -100,7 +100,7 @@ i32 armyGroup::GetMorale(hero* armyHero, town* occupiedTown, armyGroup* enemyGro
     if (hasSomeUndead)
         --morale;
     if (hasSomeUndead && alignmentValue > 0)
-        alignmentValue = 0;
+        alignmentValue = ARMY_GROUP_ALIGNMENT_NO_MODIFIER;
     morale += alignmentValue;
 
     if (occupiedTown != NULL && occupiedTown->m_type != FACTION_NECROMANCER

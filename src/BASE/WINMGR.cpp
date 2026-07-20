@@ -387,7 +387,7 @@ VA(0x004cac80, 0xbc)
 void heroWindowManager::AddWindow(class heroWindow* w, i32 zOrder, i32 openFlags) {
     heroWindow* cur = m_windowListTail;
     i32 z;
-    if ((w->m_winFlags & IDX(WINDOW_FLAG_FIXED_LAYER)) != 0)
+    if (HAS(w->m_winFlags, WINDOW_FLAG_FIXED_LAYER))
         z = 0;
     else
         z = zOrder;
