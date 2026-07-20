@@ -419,7 +419,8 @@ void army::DrawToBuffer(i32 x, i32 y, i32 effectsOnly) {
             x += xDistance;
         }
     }
-    if (giSpellEffectShowType == 0 && standing7 && m_spellCount > 0) {
+    if (giSpellEffectShowType == SPELL_EFFECT_DISPLAY_HIGHLIGHT && standing7
+        && m_spellCount > 0) {
         color = SPELL_EFFECT_COLOR;
     }
     if (m_hex == gpCombatManager->m_limitCreatureHex && gpCombatManager->m_limitCreature == 1) {
@@ -498,7 +499,8 @@ void army::DrawToBuffer(i32 x, i32 y, i32 effectsOnly) {
                 }
             }
         }
-        if (giSpellEffectShowType == 0 || !standing7 || m_spellCount < 1) {
+        if (giSpellEffectShowType == SPELL_EFFECT_DISPLAY_HIGHLIGHT || !standing7
+            || m_spellCount < 1) {
             drawn1 =
                 gpCombatManager->m_combatIcons[IDX(COMBAT_ICON_STATUS)]->CombatClipDrawToBuffer(
                     quantityX5,
@@ -510,7 +512,7 @@ void army::DrawToBuffer(i32 x, i32 y, i32 effectsOnly) {
                     NULL,
                     NULL
                 );
-        } else if (giSpellEffectShowType == 1) {
+        } else if (giSpellEffectShowType == SPELL_EFFECT_DISPLAY_SPELL_ICON) {
             drawn1 =
                 gpCombatManager->m_combatIcons[IDX(COMBAT_ICON_STATUS)]->CombatClipDrawToBuffer(
                     quantityX5,

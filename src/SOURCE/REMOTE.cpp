@@ -557,7 +557,7 @@ i32 TransmitRemoteData(
                 -1,
                 0
             );
-            if (gpWindowManager->m_dialogResult == PLAYER_EXIT_CONFIRM_OK)
+            if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE)
                 attempt0 = -1;
         }
         attempt0++;
@@ -667,7 +667,7 @@ void PollRemote(void) {
                         NormalDialog(
                             gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0
                         );
-                        if (gpWindowManager->m_dialogResult == PLAYER_EXIT_CONFIRM_OK) {
+                        if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
                             lLastHeartbeatReceive[queueIndex] = KBTickCount();
                         } else {
                             hostExit.netPosition = static_cast<i8>(queueIndex);
@@ -705,7 +705,7 @@ void PollRemote(void) {
                     NormalDialog(
                         gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0
                     );
-                    if (gpWindowManager->m_dialogResult == PLAYER_EXIT_CONFIRM_OK) {
+                    if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
                         lLastHeartbeatReceive[0] = KBTickCount();
                     } else if (giThisNetPos == 1) {
                         guestExit.netPosition = 0;
@@ -724,7 +724,7 @@ void PollRemote(void) {
                         NormalDialog(
                             gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0
                         );
-                        if (gpWindowManager->m_dialogResult == PLAYER_EXIT_CONFIRM_OK)
+                        if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE)
                             DropDownToOnePlayer();
                         else
                             ShutDown("");
@@ -846,7 +846,7 @@ i32 TransmitAndWait(
                     -1,
                     0
                 );
-                if (gpWindowManager->m_dialogResult == PLAYER_EXIT_CONFIRM_OK) {
+                if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
                     waitStart = KBTickCount();
                 } else {
                     result = 0;

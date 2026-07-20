@@ -38,13 +38,14 @@ class townManager;
 #include <BASE/WINMGR.h>
 
 H2_ENUM_BEGIN(GlobalTimerConstant)
-    GLOBAL_TIMER_COUNT              = 10,
-    GLOBAL_BUTTON_REPEAT_TIMER_SLOT = 2,
-    GLOBAL_MUSIC_FADE_TIMER_SLOT    = 4,
-    GLOBAL_POLL_SOUND_TIMER_SLOT    = 5,
-    GLOBAL_MOUSE_TIMER_SLOT         = 6,
-    GLOBAL_COLOR_CYCLE_TIMER_SLOT   = 7,
-    GLOBAL_COMBAT_CYCLE_TIMER_SLOT  = 8
+    GLOBAL_TIMER_COUNT               = 10,
+    GLOBAL_NET_BOX_CURSOR_TIMER_SLOT = 0,
+    GLOBAL_BUTTON_REPEAT_TIMER_SLOT  = 2,
+    GLOBAL_MUSIC_FADE_TIMER_SLOT     = 4,
+    GLOBAL_POLL_SOUND_TIMER_SLOT     = 5,
+    GLOBAL_MOUSE_TIMER_SLOT          = 6,
+    GLOBAL_COLOR_CYCLE_TIMER_SLOT    = 7,
+    GLOBAL_COMBAT_CYCLE_TIMER_SLOT   = 8
 H2_ENUM_END(GlobalTimerConstant)
 
 H2_ENUM_BEGIN(CombatHeroTableConstant)
@@ -130,19 +131,6 @@ struct SPlayerExit {
     i8 continueGame;
 };
 SIZE(SPlayerExit, 7);
-
-H2_ENUM_BEGIN(PlayerExitConstant)
-    PLAYER_EXIT_DIALOG_INFO        = 1,
-    PLAYER_EXIT_DIALOG_CONFIRM     = 2,
-    PLAYER_EXIT_CONFIRM_OK         = 0x7805,
-    PLAYER_EXIT_NETWORK_SLOTS      = 6,
-    PLAYER_EXIT_SHIFT_SLOTS        = 5,
-    PLAYER_EXIT_MESSAGE_LENGTH     = 500,
-    PLAYER_EXIT_MESSAGE_TIME       = 5000,
-    PLAYER_EXIT_HEARTBEAT_DISABLED = 0x0bebc1ff,
-    PLAYER_EXIT_PACKET_TYPE        = 7,
-    PLAYER_EXIT_PACKET_COMMAND     = 0x21
-H2_ENUM_END(PlayerExitConstant)
 
 H2_ENUM_BEGIN(EventWindowConstant)
     EVENT_WINDOW_RESOURCE_FLAG          = 0x200,
@@ -251,15 +239,18 @@ H2_ENUM_BEGIN(NormalDialogConstant)
     NORMAL_DIALOG_WIDGET_FLAGS             = 0x200
 H2_ENUM_END(NormalDialogConstant)
 
+H2_ENUM_BEGIN(HighScoreType)
+    HIGH_SCORE_CAMPAIGN           = 0,
+    HIGH_SCORE_STANDARD           = 1,
+    HIGH_SCORE_EXPANSION_CAMPAIGN = 2
+H2_ENUM_END(HighScoreType)
+
 H2_ENUM_BEGIN(HighScoreConstant)
     HIGH_SCORE_ENTRY_COUNT        = 10,
     HIGH_SCORE_NAME_LENGTH        = 16,
     HIGH_SCORE_PLAYER_NAME_SIZE   = HIGH_SCORE_NAME_LENGTH + 1,
     HIGH_SCORE_SCENARIO_NAME_SIZE = 41,
     HIGH_SCORE_RESERVED_SIZE      = 29,
-    HIGH_SCORE_STANDARD           = 1,
-    HIGH_SCORE_CAMPAIGN           = 0,
-    HIGH_SCORE_EXPANSION_CAMPAIGN = 2,
     HIGH_SCORE_EMPTY              = -1,
     HIGH_SCORE_FILE_READ_FLAGS    = 0x8000,
     HIGH_SCORE_FILE_WRITE_FLAGS   = 0x8301,
@@ -328,6 +319,23 @@ H2_ENUM_BEGIN(AppMenuCommand)
     APP_MENU_CHEAT_RESOURCES = 0x9cd0
 H2_ENUM_END(AppMenuCommand)
 
+H2_ENUM_BEGIN(DialogWaitType)
+    DIALOG_WAIT_OTHER_PLAYER           = 0,
+    DIALOG_WAIT_NETBIOS_GUEST          = 1,
+    DIALOG_WAIT_NETBIOS_HOST           = 2,
+    DIALOG_WAIT_NETBIOS_INIT_GUEST     = 3,
+    DIALOG_WAIT_NETBIOS_INIT_HOST      = 4,
+    DIALOG_WAIT_MODEM_COMMAND          = 5,
+    DIALOG_WAIT_MODEM_RESPONSE         = 6,
+    DIALOG_WAIT_DIRECT_CONNECT         = 7,
+    DIALOG_WAIT_DIRECTPLAY_FIRST_GUEST = 8,
+    DIALOG_WAIT_DIRECTPLAY_GUESTS      = 9,
+    DIALOG_WAIT_DIRECTPLAY_HOST        = 10,
+    DIALOG_WAIT_WINSOCK_FIRST_GUEST    = 11,
+    DIALOG_WAIT_WINSOCK_GUESTS         = 12,
+    DIALOG_WAIT_WINSOCK_HOST           = 13
+H2_ENUM_END(DialogWaitType)
+
 H2_ENUM_BEGIN(OldMainConstant)
     OLD_MAIN_PLAYER_COUNT                     = 6,
     OLD_MAIN_MATCH_BUFFER_SIZE                = 8,
@@ -362,13 +370,6 @@ H2_ENUM_BEGIN(OldMainConstant)
     OLD_MAIN_ROLAND_FINAL_SCENARIO            = 9,
     OLD_MAIN_ROLAND_CAMPAIGN                  = 0,
     OLD_MAIN_DIALOG_WAIT                      = 6,
-    OLD_MAIN_WAIT_DIRECT_CONNECT              = 7,
-    OLD_MAIN_WAIT_DP_FIRST_GUEST              = 8,
-    OLD_MAIN_WAIT_DP_EXTRA_GUESTS             = 9,
-    OLD_MAIN_WAIT_DP_HOST                     = 0xa,
-    OLD_MAIN_WAIT_WS_FIRST_GUEST              = 0xb,
-    OLD_MAIN_WAIT_WS_EXTRA_GUESTS             = 0xc,
-    OLD_MAIN_WAIT_WS_HOST                     = 0xd,
     OLD_MAIN_REMOTE_PREFIX_RESERVED_SIZE      = 4,
     OLD_MAIN_REMOTE_BODY_RESERVED_SIZE        = 2,
     OLD_MAIN_REMOTE_PAYLOAD_HEAD_SIZE         = 1
@@ -423,6 +424,8 @@ H2_ENUM_BEGIN(AppMenuConstant)
     APP_MENU_RESOURCE_BONUS      = 10,
     APP_MENU_GOLD_BONUS          = 1000,
     APP_MENU_MOVEMENT_BONUS      = 299999,
+    APP_MENU_CHEAT_SPELL_POINTS  = 999,
+    APP_MENU_CHEAT_ARMY_QUANTITY = 5,
     APP_MENU_CLOSE_MESSAGE       = 0x10,
     APP_MENU_ARMY_FIRST          = 41000,
     APP_MENU_ARMY_LAST           = 41066,
@@ -470,8 +473,8 @@ void CheckEndGame(i32, i32);
 void QuickViewWait(void);
 void InitVars(void);
 void ClearMapExtra(void);
-i32 GetMonType(i32 score, i32 campaign);
-i32 AddScoreToHighScore(i32, i32, i32, i32, char*);
+i32 GetMonType(i32 score, HighScoreType type);
+i32 AddScoreToHighScore(i32, i32, i32, HighScoreType, char*);
 void BVResMsg(char* s, i32 res, i32 qty);
 void GOut(char* str);
 i32 NetPosToGamePos(i32 netPos);
@@ -481,7 +484,7 @@ void AddNetBoxLine(char* str, char color);
 void ShutDown(char* msg);
 void FileError(char* filename);
 void SmackFade(u8* src, u8* dst);
-void ShowCongrats(i32);
+void ShowCongrats(HighScoreType);
 void CongratsWait(void);
 SAMPLE2 LoadPlaySample(char* name);
 void WaitEndSample(SAMPLE2 s, i32 waitTime);
@@ -601,7 +604,7 @@ extern i32 giTCPHostStatus;
 extern i32 giThisGamePos;
 extern i32 giThisNetPos;
 extern i32 giTotalHighMem;
-extern i32 giWaitType;
+extern DialogWaitType giWaitType;
 extern i32 glTimers[GLOBAL_TIMER_COUNT];
 extern i32 gMageBaseResourceValues[];
 extern i32 gMageBuildingCosts[][KB_BUILDING_RESOURCE_COUNT];

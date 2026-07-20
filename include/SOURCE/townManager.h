@@ -14,10 +14,10 @@ class bankBox;
 class hero;
 struct tag_message;
 
-H2_ENUM_BEGIN(TownManagerConstant)
+H2_ENUM_BEGIN(TownManagerStorageConstant)
     TOWN_MANAGER_OBJECT_COUNT     = 32,
     TOWN_MANAGER_STATUS_TEXT_SIZE = 0x50
-H2_ENUM_END(TownManagerConstant)
+H2_ENUM_END(TownManagerStorageConstant)
 
 H2_ENUM_BEGIN(TownManagerArmyCommand)
     ARMY_COMMAND_NONE      = -1,

@@ -180,7 +180,10 @@ void highScoreManager::Update(void) {
             m_monsterTypes[entry] = 0;
             sprintf(gText, "");
         } else {
-            m_monsterTypes[entry] = GetMonType(scoreEntry.score, m_showCampaignScores == 0);
+            m_monsterTypes[entry] = GetMonType(
+                scoreEntry.score,
+                m_showCampaignScores ? HIGH_SCORE_CAMPAIGN : HIGH_SCORE_STANDARD
+            );
         }
 
         if (scoreEntry.score == HIGH_SCORE_EMPTY)

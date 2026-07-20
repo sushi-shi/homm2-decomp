@@ -19,12 +19,6 @@ H2_ENUM_CLASS_BEGIN(DirectPlaySessionOpenFlag)
     SESSION_OPEN_CREATE = 2
 H2_ENUM_CLASS_END(DirectPlaySessionOpenFlag)
 
-H2_ENUM_CLASS_BEGIN(DirectPlayWaitType)
-    WAIT_FIRST_GUEST  = 8,
-    WAIT_EXTRA_GUESTS = 9,
-    WAIT_HOST         = 10
-H2_ENUM_CLASS_END(DirectPlayWaitType)
-
 H2_ENUM_CLASS_BEGIN(DirectPlayResult)
     RESULT_OK               = 0,
     RESULT_INVALID_ARGUMENT = static_cast<i32>(0x80070057),
@@ -174,13 +168,13 @@ i16 dpnet_init(void) {
 
         if (GameMode == IDX(REMOTE_GAME_NETWORK_HOST)) {
             gbRemoteGameOpen = true;
-            giWaitType = IDX(WAIT_FIRST_GUEST);
+            giWaitType = DIALOG_WAIT_DIRECTPLAY_FIRST_GUEST;
             sprintf(gText, "Waiting On Guest.\n\n  Press 'CANCEL' to abort.");
             NormalDialog(gText, NORMAL_DIALOG_WAIT_LAST, -1, -1, -1, 0, -1, 0, -1, 0);
             if (gbFunctionComplete == 0)
                 ShutDown(NULL);
             iLastMsgNumHumanPlayers = giNumHumanPlayers;
-            giWaitType = IDX(WAIT_EXTRA_GUESTS);
+            giWaitType = DIALOG_WAIT_DIRECTPLAY_GUESTS;
             sprintf(
                 gText,
                 "You have %d guest(s) now logged in.  Click 'OK' to move on, or wait for "
@@ -201,7 +195,7 @@ i16 dpnet_init(void) {
                 );
             }
         } else {
-            giWaitType = IDX(WAIT_HOST);
+            giWaitType = DIALOG_WAIT_DIRECTPLAY_HOST;
             sprintf(gText, "Waiting for other remote player to set up game.");
             NormalDialog(gText, NORMAL_DIALOG_WAIT_LAST, -1, -1, -1, 0, -1, 0, -1, 0);
             if (gbFunctionComplete == 0)
