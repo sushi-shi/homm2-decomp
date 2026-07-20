@@ -464,6 +464,7 @@ H2_ENUM_CLASS_END_SPLIT(FactionType, i8)
 typedef FactionType HeroCursorType;
 
 H2_ENUM_CLASS_BEGIN(TerrainType)
+    TERRAIN_INVALID   = -1,
     TERRAIN_WATER     = 0,
     TERRAIN_GRASS     = 1,
     TERRAIN_SNOW      = 2,
