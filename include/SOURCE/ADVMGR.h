@@ -77,7 +77,7 @@ H2_ENUM_CLASS_BEGIN(AdventureEnvironmentSoundId)
     ADVMGR_ENVIRONMENT_SOUND_COUNT    = 28
 H2_ENUM_CLASS_END(AdventureEnvironmentSoundId)
 
-H2_ENUM_CLASS_BEGIN(AdventureSystemOption)
+H2_ENUM_BEGIN(AdventureSystemOption)
     ADVMGR_SYSTEM_OPTION_MUSIC_VOLUME   = 10,
     ADVMGR_SYSTEM_OPTION_SOUND_VOLUME   = 11,
     ADVMGR_SYSTEM_OPTION_HERO_SPEED     = 12,
@@ -87,24 +87,11 @@ H2_ENUM_CLASS_BEGIN(AdventureSystemOption)
     ADVMGR_SYSTEM_OPTION_INTERFACE      = 16,
     ADVMGR_SYSTEM_OPTION_VIDEO          = 17,
     ADVMGR_SYSTEM_OPTION_COLOR_CURSOR   = 18,
-    ADVMGR_SYSTEM_OPTION_FIRST          = IDX(ADVMGR_SYSTEM_OPTION_MUSIC_VOLUME),
-    ADVMGR_SYSTEM_OPTION_LAST           = IDX(ADVMGR_SYSTEM_OPTION_COLOR_CURSOR),
+    ADVMGR_SYSTEM_OPTION_FIRST          = ADVMGR_SYSTEM_OPTION_MUSIC_VOLUME,
+    ADVMGR_SYSTEM_OPTION_LAST           = ADVMGR_SYSTEM_OPTION_COLOR_CURSOR,
     ADVMGR_SYSTEM_OPTION_COUNT          =
-        IDX(ADVMGR_SYSTEM_OPTION_LAST) - IDX(ADVMGR_SYSTEM_OPTION_FIRST) + 1
-H2_ENUM_CLASS_END(AdventureSystemOption)
-
-#ifdef HOMM2_STRICT_ENUM_TYPES
-inline i32 EncodeAdventureSystemOption(AdventureSystemOption option) {
-    return static_cast<i32>(option);
-}
-
-inline AdventureSystemOption DecodeAdventureSystemOption(i32 value) {
-    return static_cast<AdventureSystemOption>(value);
-}
-#else
-#define EncodeAdventureSystemOption(option) (option)
-#define DecodeAdventureSystemOption(value) (value)
-#endif
+        ADVMGR_SYSTEM_OPTION_LAST - ADVMGR_SYSTEM_OPTION_FIRST + 1
+H2_ENUM_END(AdventureSystemOption)
 
 H2_ENUM_CLASS_BEGIN(AdventureCommand)
     ADVMGR_INVALID_CELL               = -1,
@@ -149,15 +136,6 @@ H2_ENUM_BEGIN(AdventureAIStorageConstant)
     ADVMGR_PLACE_VISIT_COUNT      = 30,
     ADVMGR_PLACE_COORDINATE_COUNT = 2
 H2_ENUM_END(AdventureAIStorageConstant)
-
-#ifdef HOMM2_STRICT_ENUM_TYPES
-inline i32 EncodeAdventureSystemOptionTextControl(AdventureSystemOption option) {
-    return EncodeAdventureSystemOption(option) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
-}
-#else
-#define EncodeAdventureSystemOptionTextControl(option)                                             \
-    ((option) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET)
-#endif
 
 i32 SaveGame(void);
 i32 DimensionDoorHandler(struct tag_message&);
