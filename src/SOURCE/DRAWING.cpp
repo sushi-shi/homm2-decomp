@@ -1552,7 +1552,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                 cMiniViewText[IDX(SMALL_VIEW_TEXT_ATTACK)],
                 viewX + COMBAT_SMALL_VIEW_TEXT_X,
                 viewY2 + COMBAT_SMALL_VIEW_FIRST_STAT_Y
-                    + COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * STAT_ROW_ATTACK,
+                    + COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * IDX(STAT_ROW_ATTACK),
                 COMBAT_SMALL_VIEW_TEXT_WIDTH,
                 COMBAT_SMALL_VIEW_TEXT_HEIGHT,
                 FONT_DRAW_DEFAULT,
@@ -1562,7 +1562,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                 cMiniViewText[IDX(SMALL_VIEW_TEXT_DEFENSE)],
                 viewX + COMBAT_SMALL_VIEW_TEXT_X,
                 viewY2 + COMBAT_SMALL_VIEW_FIRST_STAT_Y
-                    + COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * STAT_ROW_DEFENSE,
+                    + COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * IDX(STAT_ROW_DEFENSE),
                 COMBAT_SMALL_VIEW_TEXT_WIDTH,
                 COMBAT_SMALL_VIEW_TEXT_HEIGHT,
                 FONT_DRAW_DEFAULT,
@@ -1572,7 +1572,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                 cMiniViewText[IDX(SMALL_VIEW_TEXT_HIT_POINTS)],
                 viewX + COMBAT_SMALL_VIEW_TEXT_X,
                 viewY2 + COMBAT_SMALL_VIEW_FIRST_STAT_Y
-                    + COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * STAT_ROW_HIT_POINTS,
+                    + COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * IDX(STAT_ROW_HIT_POINTS),
                 COMBAT_SMALL_VIEW_TEXT_WIDTH,
                 COMBAT_SMALL_VIEW_TEXT_HEIGHT,
                 FONT_DRAW_DEFAULT,
@@ -1582,7 +1582,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                 cMiniViewText[IDX(SMALL_VIEW_TEXT_DAMAGE)],
                 viewX + COMBAT_SMALL_VIEW_TEXT_X,
                 viewY2 + COMBAT_SMALL_VIEW_FIRST_STAT_Y
-                    + COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * STAT_ROW_DAMAGE,
+                    + COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * IDX(STAT_ROW_DAMAGE),
                 COMBAT_SMALL_VIEW_TEXT_WIDTH,
                 COMBAT_SMALL_VIEW_TEXT_HEIGHT,
                 FONT_DRAW_DEFAULT,
@@ -1592,7 +1592,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                 cMiniViewText[IDX(SMALL_VIEW_TEXT_MORALE)],
                 viewX + COMBAT_SMALL_VIEW_TEXT_X,
                 viewY2 + COMBAT_SMALL_VIEW_FIRST_STAT_Y
-                    + COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * STAT_ROW_MORALE,
+                    + COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * IDX(STAT_ROW_MORALE),
                 COMBAT_SMALL_VIEW_TEXT_WIDTH,
                 COMBAT_SMALL_VIEW_TEXT_HEIGHT,
                 FONT_DRAW_DEFAULT,
@@ -1602,7 +1602,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                 cMiniViewText[IDX(SMALL_VIEW_TEXT_LUCK)],
                 viewX + COMBAT_SMALL_VIEW_TEXT_X,
                 viewY2 + COMBAT_SMALL_VIEW_FIRST_STAT_Y
-                    + COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * STAT_ROW_LUCK,
+                    + COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * IDX(STAT_ROW_LUCK),
                 COMBAT_SMALL_VIEW_TEXT_WIDTH,
                 COMBAT_SMALL_VIEW_TEXT_HEIGHT,
                 FONT_DRAW_DEFAULT,
@@ -1624,7 +1624,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                 gText,
                 viewX + COMBAT_SMALL_VIEW_TEXT_X,
                 viewY2 + COMBAT_SMALL_VIEW_FIRST_STAT_Y
-                    + COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * STAT_ROW_ATTACK,
+                    + COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * IDX(STAT_ROW_ATTACK),
                 COMBAT_SMALL_VIEW_TEXT_WIDTH,
                 COMBAT_SMALL_VIEW_TEXT_HEIGHT,
                 FONT_DRAW_DEFAULT,
@@ -1635,7 +1635,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                 gText,
                 viewX + COMBAT_SMALL_VIEW_TEXT_X,
                 viewY2 + COMBAT_SMALL_VIEW_FIRST_STAT_Y
-                    + COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * STAT_ROW_DEFENSE,
+                    + COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * IDX(STAT_ROW_DEFENSE),
                 COMBAT_SMALL_VIEW_TEXT_WIDTH,
                 COMBAT_SMALL_VIEW_TEXT_HEIGHT,
                 FONT_DRAW_DEFAULT,
@@ -1646,7 +1646,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                 gText,
                 viewX + COMBAT_SMALL_VIEW_TEXT_X,
                 viewY2 + COMBAT_SMALL_VIEW_FIRST_STAT_Y
-                    + COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * STAT_ROW_HIT_POINTS,
+                    + COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * IDX(STAT_ROW_HIT_POINTS),
                 COMBAT_SMALL_VIEW_TEXT_WIDTH,
                 COMBAT_SMALL_VIEW_TEXT_HEIGHT,
                 FONT_DRAW_DEFAULT,
@@ -1662,7 +1662,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                 gText,
                 viewX + COMBAT_SMALL_VIEW_TEXT_X,
                 viewY2 + COMBAT_SMALL_VIEW_FIRST_STAT_Y
-                    + COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * STAT_ROW_DAMAGE,
+                    + COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * IDX(STAT_ROW_DAMAGE),
                 COMBAT_SMALL_VIEW_TEXT_WIDTH,
                 COMBAT_SMALL_VIEW_TEXT_HEIGHT,
                 FONT_DRAW_DEFAULT,
@@ -1676,7 +1676,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                         viewX + COMBAT_SMALL_VIEW_MODIFIER_RIGHT_X
                             - spellSlot * COMBAT_SMALL_VIEW_MODIFIER_STEP,
                         viewY2 + COMBAT_SMALL_VIEW_FIRST_STAT_Y
-                            + COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * STAT_ROW_MORALE,
+                            + COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * IDX(STAT_ROW_MORALE),
                         IDX(SMALL_VIEW_GOOD_MORALE_FRAME),
                         ICON_DRAW_NORMAL
                     );
@@ -1686,7 +1686,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                         viewX + COMBAT_SMALL_VIEW_MODIFIER_RIGHT_X
                             - spellSlot * COMBAT_SMALL_VIEW_MODIFIER_STEP,
                         viewY2 + COMBAT_SMALL_VIEW_FIRST_STAT_Y
-                            + COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * STAT_ROW_MORALE,
+                            + COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * IDX(STAT_ROW_MORALE),
                         IDX(SMALL_VIEW_BAD_MORALE_FRAME),
                         ICON_DRAW_NORMAL
                     );
@@ -1694,7 +1694,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                 m_combatIcons[IDX(COMBAT_ICON_SMALL_VIEW_MODIFIER)]->DrawToBuffer(
                     viewX + COMBAT_SMALL_VIEW_NEUTRAL_MORALE_X,
                     viewY2 + COMBAT_SMALL_VIEW_FIRST_STAT_Y
-                        + COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * STAT_ROW_MORALE,
+                        + COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * IDX(STAT_ROW_MORALE),
                     IDX(SMALL_VIEW_NEUTRAL_MORALE_FRAME),
                     ICON_DRAW_NORMAL
                 );
@@ -1707,7 +1707,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                         viewX + COMBAT_SMALL_VIEW_MODIFIER_RIGHT_X
                             - spellSlot * COMBAT_SMALL_VIEW_MODIFIER_STEP,
                         viewY2 + COMBAT_SMALL_VIEW_FIRST_STAT_Y
-                            + COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * STAT_ROW_LUCK,
+                            + COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * IDX(STAT_ROW_LUCK),
                         IDX(SMALL_VIEW_GOOD_LUCK_FRAME),
                         ICON_DRAW_NORMAL
                     );
@@ -1717,7 +1717,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                         viewX + COMBAT_SMALL_VIEW_MODIFIER_RIGHT_X
                             - spellSlot * COMBAT_SMALL_VIEW_MODIFIER_STEP,
                         viewY2 + COMBAT_SMALL_VIEW_FIRST_STAT_Y
-                            + COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * STAT_ROW_LUCK,
+                            + COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * IDX(STAT_ROW_LUCK),
                         IDX(SMALL_VIEW_BAD_LUCK_FRAME),
                         ICON_DRAW_NORMAL
                     );
@@ -1725,7 +1725,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                 m_combatIcons[IDX(COMBAT_ICON_SMALL_VIEW_MODIFIER)]->DrawToBuffer(
                     viewX + COMBAT_SMALL_VIEW_NEUTRAL_LUCK_X,
                     viewY2 + COMBAT_SMALL_VIEW_FIRST_STAT_Y
-                        + COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * STAT_ROW_LUCK,
+                        + COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * IDX(STAT_ROW_LUCK),
                     IDX(SMALL_VIEW_NEUTRAL_LUCK_FRAME),
                     ICON_DRAW_NORMAL
                 );
