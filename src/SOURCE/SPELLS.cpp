@@ -3607,27 +3607,27 @@ void combatManager::Earthquake(void) {
     m_backgroundDrawn = 0;
     DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
 
-    i32 newWallStates[EARTHQUAKE_STRUCTURE_COUNT];
-    i32 newTowerStates[EARTHQUAKE_STRUCTURE_COUNT];
+    CombatCastleWallState newWallStates[EARTHQUAKE_STRUCTURE_COUNT];
+    CombatCastleWallState newTowerStates[EARTHQUAKE_STRUCTURE_COUNT];
     i32 impactPositions[EARTHQUAKE_MAX_IMPACTS][IDX(COMBAT_COORDINATE_COUNT)];
     i32 impactCount = 0;
     i32 structure;
     for (structure = 0; structure < EARTHQUAKE_STRUCTURE_COUNT; ++structure) {
         newWallStates[structure] = m_wallStates[structure + COMBAT_WALL_SLOT_SECTION_FIRST];
         if (m_wallStates[structure + COMBAT_WALL_SLOT_SECTION_FIRST]
-                != IDX(COMBAT_WALL_STATE_DESTROYED)
+                != COMBAT_WALL_STATE_DESTROYED
             && m_wallStates[structure + COMBAT_WALL_SLOT_SECTION_FIRST]
-                   != IDX(COMBAT_WALL_STATE_SECTION_DESTROYED)
+                   != COMBAT_WALL_STATE_SECTION_DESTROYED
             && SRandom(0, EARTHQUAKE_CHANCE_ROLL_MAX) < EARTHQUAKE_WALL_HIT_CHANCE) {
             ++newWallStates[structure];
             if (m_wallStates[structure + COMBAT_WALL_SLOT_SECTION_FIRST]
-                    != IDX(COMBAT_WALL_STATE_DESTROYED)
+                    != COMBAT_WALL_STATE_DESTROYED
                 && m_wallStates[structure + COMBAT_WALL_SLOT_SECTION_FIRST]
-                       != IDX(COMBAT_WALL_STATE_TOWER_STANDING)
+                       != COMBAT_WALL_STATE_TOWER_STANDING
                 && m_wallStates[structure + COMBAT_WALL_SLOT_SECTION_FIRST]
-                       != IDX(COMBAT_WALL_STATE_SECTION_DESTROYED)
+                       != COMBAT_WALL_STATE_SECTION_DESTROYED
                 && m_wallStates[structure + COMBAT_WALL_SLOT_SECTION_FIRST]
-                       != IDX(COMBAT_WALL_STATE_SECTION_DAMAGE_LAST)
+                       != COMBAT_WALL_STATE_SECTION_DAMAGE_LAST
                 && SRandom(0, EARTHQUAKE_CHANCE_ROLL_MAX)
                        < EARTHQUAKE_WALL_SECOND_HIT_CHANCE)
                 ++newWallStates[structure];
@@ -3636,15 +3636,15 @@ void combatManager::Earthquake(void) {
             impactPositions[impactCount][IDX(COMBAT_COORDINATE_Y)] =
                 wallPos[structure][IDX(COMBAT_COORDINATE_Y)] + EARTHQUAKE_CLOUD_Y_OFFSET;
             ++impactCount;
-            if (newWallStates[structure] == IDX(COMBAT_WALL_STATE_DESTROYED)
-                || newWallStates[structure] == IDX(COMBAT_WALL_STATE_SECTION_DESTROYED))
+            if (newWallStates[structure] == COMBAT_WALL_STATE_DESTROYED
+                || newWallStates[structure] == COMBAT_WALL_STATE_SECTION_DESTROYED)
                 m_hexCells[iWallToHexCell[structure]].m_blocked = 0;
         }
 
         newTowerStates[structure] = m_wallStates[structure];
-        if (m_wallStates[structure] != IDX(COMBAT_WALL_STATE_DESTROYED)
+        if (m_wallStates[structure] != COMBAT_WALL_STATE_DESTROYED
             && SRandom(0, EARTHQUAKE_CHANCE_ROLL_MAX) < EARTHQUAKE_TOWER_HIT_CHANCE) {
-            newTowerStates[structure] = IDX(COMBAT_WALL_STATE_DESTROYED);
+            newTowerStates[structure] = COMBAT_WALL_STATE_DESTROYED;
             impactPositions[impactCount][IDX(COMBAT_COORDINATE_X)] =
                 towerPos[structure][IDX(COMBAT_COORDINATE_X)];
             impactPositions[impactCount][IDX(COMBAT_COORDINATE_Y)] =
@@ -3653,10 +3653,10 @@ void combatManager::Earthquake(void) {
         }
     }
 
-    i32 newKeepState = IDX(m_drawbridgeState);
+    CombatDrawbridgeState newKeepState = m_drawbridgeState;
     if (m_drawbridgeState != COMBAT_CASTLE_GATE_HIDDEN
         && SRandom(0, EARTHQUAKE_CHANCE_ROLL_MAX) < EARTHQUAKE_KEEP_HIT_CHANCE) {
-        newKeepState = IDX(COMBAT_CASTLE_GATE_HIDDEN);
+        newKeepState = COMBAT_CASTLE_GATE_HIDDEN;
         impactPositions[impactCount][IDX(COMBAT_COORDINATE_X)] =
             towerPos[0][IDX(COMBAT_COORDINATE_X)];
         impactPositions[impactCount][IDX(COMBAT_COORDINATE_Y)] =
@@ -3714,10 +3714,10 @@ void combatManager::Earthquake(void) {
             if (frame == EARTHQUAKE_APPLY_DAMAGE_FRAME) {
                 for (structure = 0; structure < EARTHQUAKE_STRUCTURE_COUNT; ++structure) {
                     m_wallStates[structure + COMBAT_WALL_SLOT_SECTION_FIRST] =
-                        static_cast<u8>(newWallStates[structure]);
-                    m_wallStates[structure] = static_cast<u8>(newTowerStates[structure]);
+                        newWallStates[structure];
+                    m_wallStates[structure] = newTowerStates[structure];
                 }
-                m_drawbridgeState = CombatDrawbridgeState(newKeepState);
+                m_drawbridgeState = newKeepState;
             }
         }
         gpResourceManager->Dispose(cloudIcon);

@@ -104,6 +104,7 @@ H2_ENUM_CLASS_BEGIN(CombatCastleWallState)
     COMBAT_WALL_STATE_SECTION_DAMAGE_LAST  = 5,
     COMBAT_WALL_STATE_SECTION_DESTROYED    = 6
 H2_ENUM_CLASS_END(CombatCastleWallState)
+H2_ENUM_STEPPED(CombatCastleWallState)
 
 H2_ENUM_CLASS_BEGIN(CombatCoordinateAxis)
     COMBAT_COORDINATE_X     = 0,
@@ -423,10 +424,6 @@ H2_ENUM_BEGIN(CombatAIConstant)
     COMBAT_AI_FIGHT_VALUE_MODE         = 1,
     COMBAT_AI_STRENGTH_ROUNDING        = 4,
     COMBAT_AI_STRENGTH_FRACTION        = 5,
-    COMBAT_AI_WALL_GATE                = 8,
-    COMBAT_AI_WALL_LEFT_TOWER          = 0,
-    COMBAT_AI_WALL_RIGHT_TOWER         = 3,
-    COMBAT_AI_WALL_INTACT              = 1,
     COMBAT_AI_ATTACK_NONE              = 0,
     COMBAT_AI_ATTACK_SHOOT             = 1,
     COMBAT_AI_ATTACK_FLY               = 2,
@@ -583,7 +580,8 @@ public:
     i16 m_eagleEyeSpell[COMBAT_MANAGER_SIDE_COUNT];
     CombatDrawbridgeState m_drawbridgeState;
     i32 m_drawbridgeBackgroundVisible;
-    u8 m_wallStates[IDX(COMBAT_WALL_SLOT_COUNT)];
+    H2_ENUM_STORAGE_STEPPED(CombatCastleWallState, u8)
+    m_wallStates[IDX(COMBAT_WALL_SLOT_COUNT)];
     class bitmap* m_combatBuffer;
     class bitmap* m_backgroundBuffer;
     class bitmap* m_mouseGridBuffer;
