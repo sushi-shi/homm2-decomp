@@ -127,9 +127,7 @@ namespace {
         EVENT_GRAVEYARD_ARMY_REMAINDER = 1,
         EVENT_CREATURE_UPGRADE_MOBILITY = 400,
         EVENT_HERO_LIMIT = 8,
-        EVENT_JAILED_HERO = 0x41,
-        EVENT_HERO_DIRECTION = 2,
-        EVENT_HERO_MAP_CHANGE_VALUE = -999
+        EVENT_JAILED_HERO = 0x41
     H2_ENUM_END(AIEventConstant)
 
     H2_ENUM_BEGIN(AIEventResultIndex)
@@ -4434,7 +4432,7 @@ void advManager::JailEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
         releasedHero1->m_x = x;
         releasedHero1->m_y = y;
         releasedHero1->m_eventFlags = HERO_EVENT_NONE;
-        releasedHero1->m_direction = EVENT_HERO_DIRECTION;
+        releasedHero1->m_direction = MAP_SPRITE_INITIAL_DIRECTION;
         releasedHero1->m_remainingMobility = releasedHero1->CalcMobility();
         releasedHero1->m_mobility = releasedHero1->m_remainingMobility;
         releasedHero1->m_locationType = cell->m_triggerType;
@@ -4446,7 +4444,7 @@ void advManager::JailEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             static_cast<i8>(heroId9),
             x,
             y,
-            EVENT_HERO_MAP_CHANGE_VALUE,
+            MAP_CHANGE_CURRENT_PLAYER,
             0,
             0
         );
@@ -7305,7 +7303,7 @@ void advManager::JailAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             releasedHero13->m_x = x;
             releasedHero13->m_y = y;
             releasedHero13->m_eventFlags = HERO_EVENT_NONE;
-            releasedHero13->m_direction = EVENT_HERO_DIRECTION;
+            releasedHero13->m_direction = MAP_SPRITE_INITIAL_DIRECTION;
             releasedHero13->m_remainingMobility = releasedHero13->CalcMobility();
             releasedHero13->m_mobility = releasedHero13->m_remainingMobility;
             releasedHero13->m_locationType = cell->m_triggerType;
@@ -7317,7 +7315,7 @@ void advManager::JailAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 static_cast<i8>(heroId9),
                 x,
                 y,
-                EVENT_HERO_MAP_CHANGE_VALUE,
+                MAP_CHANGE_CURRENT_PLAYER,
                 0,
                 0
             );

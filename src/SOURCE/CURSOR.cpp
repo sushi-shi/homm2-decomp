@@ -1240,11 +1240,11 @@ void advManager::ProcessMapChange(SMapChange change) {
                 "MC My Turn",
                 change.x,
                 change.y,
-                CURSOR_LOG_UNUSED,
-                CURSOR_LOG_UNUSED,
-                CURSOR_LOG_UNUSED,
-                CURSOR_LOG_UNUSED,
-                CURSOR_LOG_UNUSED
+                LOG_UNUSED_VALUE,
+                LOG_UNUSED_VALUE,
+                LOG_UNUSED_VALUE,
+                LOG_UNUSED_VALUE,
+                LOG_UNUSED_VALUE
             );
             break;
 
@@ -1253,11 +1253,11 @@ void advManager::ProcessMapChange(SMapChange change) {
                 "MC Teleport Hero",
                 change.x,
                 change.y,
-                CURSOR_LOG_UNUSED,
-                CURSOR_LOG_UNUSED,
-                CURSOR_LOG_UNUSED,
-                CURSOR_LOG_UNUSED,
-                CURSOR_LOG_UNUSED
+                LOG_UNUSED_VALUE,
+                LOG_UNUSED_VALUE,
+                LOG_UNUSED_VALUE,
+                LOG_UNUSED_VALUE,
+                LOG_UNUSED_VALUE
             );
             mapHero_n = gpGame->GetHero(change.id);
             TeleportTo(mapHero_n, change.x, change.y, 0, 1);
@@ -1266,13 +1266,13 @@ void advManager::ProcessMapChange(SMapChange change) {
         case MAP_CHANGE_CLAIM_MINE:
             LogInt(
                 "MC ClaimMine",
-                CURSOR_LOG_UNUSED,
-                CURSOR_LOG_UNUSED,
-                CURSOR_LOG_UNUSED,
-                CURSOR_LOG_UNUSED,
-                CURSOR_LOG_UNUSED,
-                CURSOR_LOG_UNUSED,
-                CURSOR_LOG_UNUSED
+                LOG_UNUSED_VALUE,
+                LOG_UNUSED_VALUE,
+                LOG_UNUSED_VALUE,
+                LOG_UNUSED_VALUE,
+                LOG_UNUSED_VALUE,
+                LOG_UNUSED_VALUE,
+                LOG_UNUSED_VALUE
             );
             gpGame->ClaimMine(change.id, change.player);
             CompleteDraw(0);
@@ -1282,13 +1282,13 @@ void advManager::ProcessMapChange(SMapChange change) {
         case MAP_CHANGE_CLAIM_TOWN:
             LogInt(
                 "MC ClaimTown",
-                CURSOR_LOG_UNUSED,
-                CURSOR_LOG_UNUSED,
-                CURSOR_LOG_UNUSED,
-                CURSOR_LOG_UNUSED,
-                CURSOR_LOG_UNUSED,
-                CURSOR_LOG_UNUSED,
-                CURSOR_LOG_UNUSED
+                LOG_UNUSED_VALUE,
+                LOG_UNUSED_VALUE,
+                LOG_UNUSED_VALUE,
+                LOG_UNUSED_VALUE,
+                LOG_UNUSED_VALUE,
+                LOG_UNUSED_VALUE,
+                LOG_UNUSED_VALUE
             );
             gpGame->ClaimTown(change.id, change.player, 1);
             CompleteDraw(0);
@@ -1298,13 +1298,13 @@ void advManager::ProcessMapChange(SMapChange change) {
         case MAP_CHANGE_BUILD_BOAT:
             LogInt(
                 "MC BuildBoat",
-                CURSOR_LOG_UNUSED,
-                CURSOR_LOG_UNUSED,
-                CURSOR_LOG_UNUSED,
-                CURSOR_LOG_UNUSED,
-                CURSOR_LOG_UNUSED,
-                CURSOR_LOG_UNUSED,
-                CURSOR_LOG_UNUSED
+                LOG_UNUSED_VALUE,
+                LOG_UNUSED_VALUE,
+                LOG_UNUSED_VALUE,
+                LOG_UNUSED_VALUE,
+                LOG_UNUSED_VALUE,
+                LOG_UNUSED_VALUE,
+                LOG_UNUSED_VALUE
             );
             gpGame->CreateBoat(change.x, change.y, 1);
             CompleteDraw(0);
@@ -1316,11 +1316,11 @@ void advManager::ProcessMapChange(SMapChange change) {
                 "MC Erase Object",
                 change.x,
                 change.y,
-                CURSOR_LOG_UNUSED,
-                CURSOR_LOG_UNUSED,
-                CURSOR_LOG_UNUSED,
-                CURSOR_LOG_UNUSED,
-                CURSOR_LOG_UNUSED
+                LOG_UNUSED_VALUE,
+                LOG_UNUSED_VALUE,
+                LOG_UNUSED_VALUE,
+                LOG_UNUSED_VALUE,
+                LOG_UNUSED_VALUE
             );
             eventCell_n = GetCell(change.x, change.y);
             EraseObj(eventCell_n, change.x, change.y);
@@ -1344,7 +1344,7 @@ void advManager::ProcessMapChange(SMapChange change) {
             mapHero_n->m_x = change.x;
             mapHero_n->m_y = change.y;
             mapHero_n->m_eventFlags = HERO_EVENT_NONE;
-            mapHero_n->m_direction = CURSOR_RECRUIT_HERO_DIRECTION;
+            mapHero_n->m_direction = MAP_SPRITE_INITIAL_DIRECTION;
             mapHero_n->m_locationType =
                 gpGame->m_worldMap.GetCell(change.x, change.y)->m_triggerType;
             mapHero_n->m_occupiedTown =
@@ -1400,11 +1400,11 @@ void advManager::ProcessIncomingSingleMapChange(SMapChange* incoming) {
                     "OQ",
                     incoming->sequence,
                     giMapChangeCtr,
-                    CURSOR_LOG_UNUSED,
-                    CURSOR_LOG_UNUSED,
-                    CURSOR_LOG_UNUSED,
-                    CURSOR_LOG_UNUSED,
-                    CURSOR_LOG_UNUSED
+                    LOG_UNUSED_VALUE,
+                    LOG_UNUSED_VALUE,
+                    LOG_UNUSED_VALUE,
+                    LOG_UNUSED_VALUE,
+                    LOG_UNUSED_VALUE
                 );
                 goto duplicateChange;
             }
@@ -1416,11 +1416,11 @@ void advManager::ProcessIncomingSingleMapChange(SMapChange* incoming) {
                     "SQ",
                     incoming->sequence,
                     giMapChangeCtr,
-                    CURSOR_LOG_UNUSED,
-                    CURSOR_LOG_UNUSED,
-                    CURSOR_LOG_UNUSED,
-                    CURSOR_LOG_UNUSED,
-                    CURSOR_LOG_UNUSED
+                    LOG_UNUSED_VALUE,
+                    LOG_UNUSED_VALUE,
+                    LOG_UNUSED_VALUE,
+                    LOG_UNUSED_VALUE,
+                    LOG_UNUSED_VALUE
                 );
                 sMapChangeQueue[slot] = *incoming;
                 goto duplicateChange;
@@ -1533,7 +1533,7 @@ void SendMapChange(
         return;
     if (!gbRemoteOn)
         return;
-    if (player == CURSOR_LOG_UNUSED)
+    if (player == MAP_CHANGE_CURRENT_PLAYER)
         player = giCurPlayer;
     LogInt(
         "Send Map Change",
@@ -1541,9 +1541,9 @@ void SendMapChange(
         id,
         x,
         y,
-        CURSOR_LOG_UNUSED,
-        CURSOR_LOG_UNUSED,
-        CURSOR_LOG_UNUSED
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE
     );
     memset(&change, 0, sizeof(change));
     change.type = type;

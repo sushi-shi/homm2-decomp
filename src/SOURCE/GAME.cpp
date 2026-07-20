@@ -84,16 +84,15 @@ H2_ENUM_BEGIN(GameHeroSelectionConstant)
 H2_ENUM_END(GameHeroSelectionConstant)
 
 H2_ENUM_BEGIN(GameInitialStateConstant)
-    INITIAL_DIFFICULTY_RATING    = 1,
-    INITIAL_PLAYER_COUNT         = 4,
-    INITIAL_CALENDAR_VALUE       = 1,
-    INITIAL_MAP_CHANGE_SEQUENCE  = 1,
-    INITIAL_MAP_SPRITE_DIRECTION = 2,
+    INITIAL_DIFFICULTY_RATING   = 1,
+    INITIAL_PLAYER_COUNT        = 4,
+    INITIAL_CALENDAR_VALUE      = 1,
+    INITIAL_MAP_CHANGE_SEQUENCE = 1,
     // Retail seeds both hero and town record types in nine-record groups
     // before map data is applied.
-    INITIAL_RECORD_TYPE_STRIDE   = IDX(GAME_HERO_COUNT) / IDX(FACTION_COUNT),
-    BOAT_HERO_NONE               = -1,
-    BOAT_SLOT_EMPTY              = -1
+    INITIAL_RECORD_TYPE_STRIDE  = IDX(GAME_HERO_COUNT) / IDX(FACTION_COUNT),
+    BOAT_HERO_NONE              = -1,
+    BOAT_SLOT_EMPTY             = -1
 H2_ENUM_END(GameInitialStateConstant)
 
 H2_ENUM_CLASS_BEGIN(GameMapTrigger)
@@ -599,13 +598,13 @@ i32 game::CreateBoat(i32 x, i32 y, i32 notify) {
     i32 boatIdx = Scan(m_boatSlots, 0, GAME_BOAT_COUNT);
     if (boatIdx != -1) {
         if (notify == 0)
-            SendMapChange(MAP_CHANGE_BUILD_BOAT, 0, x, y, -999, 0, 0);
+            SendMapChange(MAP_CHANGE_BUILD_BOAT, 0, x, y, MAP_CHANGE_CURRENT_PLAYER, 0, 0);
         m_boatSlots[boatIdx] = static_cast<i8>(boatIdx);
         boatRecord* boat = &m_boats[boatIdx];
         boat->id = static_cast<i8>(boatIdx);
         boat->x = static_cast<i8>(x);
         boat->y = static_cast<i8>(y);
-        boat->direction = 2;
+        boat->direction = MAP_SPRITE_INITIAL_DIRECTION;
         boat->owner = static_cast<i8>(giCurPlayer);
         mapCell* cell = WORLDMAP->Row(y) + x;
         boat->savedTriggerType = cell->m_triggerType;
@@ -940,7 +939,7 @@ void game::SetupOrigData(void) {
         m_heroRecs[i].m_id = static_cast<i8>(i);
         m_heroRecs[i].m_portrait = static_cast<u8>(i);
         m_heroRecs[i].m_owner = HERO_OWNER_NONE;
-        m_heroRecs[i].m_direction = INITIAL_MAP_SPRITE_DIRECTION;
+        m_heroRecs[i].m_direction = MAP_SPRITE_INITIAL_DIRECTION;
         strcpy(m_heroRecs[i].m_name, gHeroDefaultNames[i]);
         m_heroRecs[i].m_cursorType = static_cast<FactionType>(i / INITIAL_RECORD_TYPE_STRIDE);
         for (j = 0; j < HERO_STARTING_STAT_COUNT; j++)

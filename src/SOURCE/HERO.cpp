@@ -550,7 +550,7 @@ void hero::Deallocate(i32 updateMap) {
             m_id,
             static_cast<u8>(m_x),
             static_cast<u8>(m_y),
-            HERO_MAP_CHANGE_UNUSED,
+            MAP_CHANGE_CURRENT_PLAYER,
             0,
             0
         );
