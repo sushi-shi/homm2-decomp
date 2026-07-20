@@ -100,7 +100,7 @@ public:
     i32 m_yOffset;
     i32 m_xOffset;
     i32 m_spellCount;
-    u8 m_spellInfluence[ARMY_SPELL_INFLUENCE_COUNT];
+    u8 m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_COUNT)];
     i32 m_effectAnimationStarted;
     i32 m_drawEnabled;
     i32 m_hitByCreature;
