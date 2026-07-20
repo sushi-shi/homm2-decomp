@@ -34,6 +34,24 @@ H2_ENUM_BEGIN(EventRecordConstant)
     EVENT_RECORD_TOWN_NAME_SIZE          = 15
 H2_ENUM_END(EventRecordConstant)
 
+H2_ENUM_BEGIN(MapEventEncodingConstant)
+    EVENT_BARRIER_COLOR_MASK        = 7,
+    EVENT_RECRUIT_TYPE_MASK         = 7,
+    EVENT_RECRUIT_COUNT_SHIFT       = 3,
+    TREE_KNOWLEDGE_VISIT_INDEX_MASK = 31,
+    WISDOM_SPELL_LEVEL_BONUS        = 2,
+    PYRAMID_GUARD_STACK_QUANTITY    = 10,
+    AI_BATTLE_STAT_MAX              = 40
+H2_ENUM_END(MapEventEncodingConstant)
+
+H2_ENUM_BEGIN(RecruitSiteType)
+    SITE_GHOST           = 0,
+    SITE_EARTH_ELEMENTAL = 1,
+    SITE_AIR_ELEMENTAL   = 2,
+    SITE_FIRE_ELEMENTAL  = 3,
+    SITE_WATER_ELEMENTAL = 4
+H2_ENUM_END(RecruitSiteType)
+
 #pragma pack(push, 1)
 struct mapEventExtra {
     u8 active;
