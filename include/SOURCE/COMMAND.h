@@ -2,6 +2,7 @@
 #define HOMM2_COMMAND_H
 
 #include <Ints.h>
+#include <SOURCE/REMOTE_TYPES.h>
 
 struct tag_message;
 
@@ -41,7 +42,7 @@ H2_ENUM_CLASS_END(CombatAction)
 struct CombatRemotePacket {
     i8 messageLength;
     char reserved1[COMBAT_REMOTE_PACKET_PREFIX_RESERVED_SIZE];
-    i8 category;
+    H2_ENUM_STORAGE(RemoteMessageType, i8) type;
     i8 command;
     char reserved7[COMBAT_REMOTE_PACKET_BODY_RESERVED_SIZE];
     H2_ENUM_STORAGE(CombatAction, i32) nextAction;

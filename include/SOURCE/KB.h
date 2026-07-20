@@ -407,7 +407,7 @@ SIZE(OldMainNetBuffer, OLD_MAIN_NET_BUFFER_SIZE);
 struct KbRemotePacket {
     i8 sender;
     char reserved1[OLD_MAIN_REMOTE_PREFIX_RESERVED_SIZE];
-    i8 group;
+    H2_ENUM_STORAGE(RemoteMessageType, i8) type;
     i8 command;
     char reserved2[OLD_MAIN_REMOTE_BODY_RESERVED_SIZE];
     union {
