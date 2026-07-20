@@ -835,7 +835,7 @@ i32 philAI::DoAnywhereDDoorTownGate(i32 targetValue) {
                                             continue;
                                         if (cell->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
                                             continue;
-                                        if (cell->m_objectIndex != IDX(MAPCELL_SPRITE_NONE)
+                                        if (cell->m_objectIndex != MAPCELL_SPRITE_NONE
                                             && !(cell->m_flags & IDX(MAP_CELL_OBJECT_SHADOW_ONLY)))
                                             continue;
                                         bestX = candidateX;

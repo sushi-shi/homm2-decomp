@@ -10,10 +10,10 @@ H2_ENUM_CLASS_BEGIN(MapCellFlag)
     MAP_CELL_OCCUPIED           = 0x08
 H2_ENUM_CLASS_END(MapCellFlag)
 
-H2_ENUM_CLASS_BEGIN(MapCellSentinel)
+H2_ENUM_BEGIN(MapCellSentinel)
     MAPCELL_SPRITE_NONE = 0xff,
     MAPCELL_EXTRA_FREE  = 0xffff
-H2_ENUM_CLASS_END(MapCellSentinel)
+H2_ENUM_END(MapCellSentinel)
 
 // Adventure-map object image set. Retail expressions use i32, while map records
 // store the domain in packed 6/7-bit fields.
