@@ -29,17 +29,6 @@
 
 namespace {
 
-H2_ENUM_BEGIN(SpellSourceLine)
-    VAPORIZE_SOURCE_LINE_BASE         = 2524,
-    VAPORIZE_ALLOC_LINE_OFFSET        = 0x09,
-    VAPORIZE_FREE_LINE_OFFSET         = 0x38,
-    RIPPLE_SOURCE_LINE_BASE           = 2587,
-    RIPPLE_MODIFIER_ALLOC_LINE_OFFSET = 0x2c,
-    RIPPLE_WAVE_ALLOC_LINE_OFFSET     = 0x2d,
-    RIPPLE_MODIFIER_FREE_LINE_OFFSET  = 0x8e,
-    RIPPLE_WAVE_FREE_LINE_OFFSET      = 0x8f
-H2_ENUM_END(SpellSourceLine)
-
 H2_ENUM_BEGIN(CombatSpellUiConstant)
     COMMAND_CANCEL        = 1,
     CONTROL_PREVIOUS_PAGE = 2,
@@ -627,7 +616,7 @@ void combatManager::SpellMessage(SpellType spell, i32 hex) {
                 armyName = gArmyNames[IDX(target_i->m_monsterType)];
             else
                 armyName = gArmyNamesPlural[IDX(target_i->m_monsterType)];
-            sprintf(gText, "Cast %s on %s", gSpellNames[spell], armyName);
+            sprintf(gText, "Cast %s on %s", gSpellNames[IDX(spell)], armyName);
             break;
     }
 
@@ -2513,7 +2502,7 @@ void combatManager::ChainLightning(i32 targetHex, i32 spellPower) {
 
 VA(0x00426bbb, 0x292)
 void combatManager::VaporizeCreature(i32 side, i32 armyIndex) {
-    DATA(0x004f04e4) static i16 vaporizeSourceLineBase = VAPORIZE_SOURCE_LINE_BASE;
+    DATA(0x004f04e4) static i16 vaporizeSourceLineBase = 2524;
     army* target = &m_armies[side][armyIndex];
     ResetLimitCreature();
     ++m_limitCreatureCount[side][armyIndex];
@@ -2521,7 +2510,7 @@ void combatManager::VaporizeCreature(i32 side, i32 armyIndex) {
     gyModify = static_cast<i8*>(
         H2_ALLOC(
             SPELL_MODIFIER_ROW_COUNT,
-            vaporizeSourceLineBase + VAPORIZE_ALLOC_LINE_OFFSET
+            vaporizeSourceLineBase + 0x09
         )
     );
     memset(gyModify, 0, SPELL_MODIFIER_ROW_COUNT);
@@ -2566,14 +2555,14 @@ void combatManager::VaporizeCreature(i32 side, i32 armyIndex) {
     DelayMilli(static_cast<i32l>(gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_VANISH_END_DELAY));
     target->m_palette = NULL;
     target->m_drawEnabled = 1;
-    H2_FREE(gyModify, vaporizeSourceLineBase + VAPORIZE_FREE_LINE_OFFSET);
+    H2_FREE(gyModify, vaporizeSourceLineBase + 0x38);
     gyModify = NULL;
     gpCombatManager->DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
 }
 
 VA(0x00426e4d, 0x592)
 void combatManager::RippleCreature(i32 side, i32 armyIndex, CombatRippleMode mode) {
-    DATA(0x004f0540) static i16 rippleSourceLineBase = RIPPLE_SOURCE_LINE_BASE;
+    DATA(0x004f0540) static i16 rippleSourceLineBase = 2587;
     army* target = &m_armies[side][armyIndex];
     i32 phaseStep;
     i32 frameDelay;
@@ -2611,12 +2600,12 @@ void combatManager::RippleCreature(i32 side, i32 armyIndex, CombatRippleMode mod
     gyModify = static_cast<i8*>(
         H2_ALLOC(
             SPELL_MODIFIER_ROW_COUNT,
-            rippleSourceLineBase + RIPPLE_MODIFIER_ALLOC_LINE_OFFSET
+            rippleSourceLineBase + 0x2c
         )
     );
     float* wave = static_cast<float*>(H2_ALLOC(
         sizeof(float) * SPELL_MODIFIER_ROW_COUNT,
-        rippleSourceLineBase + RIPPLE_WAVE_ALLOC_LINE_OFFSET
+        rippleSourceLineBase + 0x2d
     ));
     memset(gyModify, 0, SPELL_MODIFIER_ROW_COUNT);
     i32 row;
@@ -2692,8 +2681,8 @@ void combatManager::RippleCreature(i32 side, i32 armyIndex, CombatRippleMode mod
     DelayMilli(static_cast<i32l>(gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_VANISH_END_DELAY));
     target->m_palette = NULL;
     target->m_drawEnabled = 1;
-    H2_FREE(gyModify, rippleSourceLineBase + RIPPLE_MODIFIER_FREE_LINE_OFFSET);
-    H2_FREE(wave, rippleSourceLineBase + RIPPLE_WAVE_FREE_LINE_OFFSET);
+    H2_FREE(gyModify, rippleSourceLineBase + 0x8e);
+    H2_FREE(wave, rippleSourceLineBase + 0x8f);
     gyModify = NULL;
     if (mode != COMBAT_RIPPLE_DEATH_RIPPLE)
         gpCombatManager->DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
