@@ -201,7 +201,7 @@ src/SOURCE/KB.cpp	pending
 src/SOURCE/Modem.cpp	reviewed	Private constants name setup storage, reset attempts, printable input, read storage, handshake layout, timing, and queue guard; shared serial baud/byte and dialog domains replace raw values, while zero/one values remain protocol states, booleans, indices, and byte counts.
 src/SOURCE/NOOPT.cpp	reviewed	Only VA evidence; delay values are caller-provided.
 src/SOURCE/Netbios.cpp	reviewed	Private setup, session, wait, game-mode, name-buffer, retry, and timing values are aligned enums; remaining zeros and ones are state initialization, boolean/status returns, dialog defaults, and null payload arguments.
-src/SOURCE/Newgame.cpp	pending
+src/SOURCE/Newgame.cpp	reviewed	Private constants name map selection, window placement, handler results, retained source lines, buffers, player-column geometry, control slots, map-size indices, chat, and scenario presentation. Shared dialog, widget-kind, map-condition, remote, player, and timing domains replace raw policy values; the received-text array derives from its named extent. Remaining zero and one values are initialization, booleans, zero-based indices, string terminators, arithmetic steps, or API flags.
 src/SOURCE/Overview.cpp	pending
 src/SOURCE/PATH.cpp	reviewed	Private geometry constants are prefix-free and aligned; shared attack-target, path-target, facing, hex-direction, hex, and occupant domains are named and used by their interfaces. Remaining zeroes and ones are results, booleans, loops, bit construction, or parity. Non-debug section bytes and ordered relocations are unchanged.
 src/SOURCE/PHILAI.cpp	pending
