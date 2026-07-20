@@ -10,10 +10,6 @@
 #include <BASE/inputManager.h>
 #include <SOURCE/KB.h>
 
-H2_ENUM_CLASS_BEGIN(ButtonSelectMode)
-    SELECT_DIALOG_RESULT = 1
-H2_ENUM_CLASS_END(ButtonSelectMode)
-
 H2_ENUM_BEGIN(ButtonHotkeyConstant)
     NO_HOTKEY = -1
 H2_ENUM_END(ButtonHotkeyConstant)
@@ -28,7 +24,7 @@ button::button(void) : widget(0, 0, 0, 0, 0, 0) {
     m_normalFrame = 0;
     m_pressedFrame = 0;
     m_iconId = 0;
-    m_selectMode = 0;
+    m_selectMode = BUTTON_SELECT_STANDARD;
     m_hotkey = NO_HOTKEY;
     m_icon = NULL;
 }
@@ -42,7 +38,7 @@ button::button(
     u32l iconId,
     i16 normalFrame,
     i16 pressedFrame,
-    i16 selectMode,
+    H2_ENUM_PARAM(ButtonSelectMode, i16) selectMode,
     i16 hotkey,
     i16 id,
     i16 kind
@@ -65,7 +61,7 @@ button::button(
     char* iconName,
     i16 normalFrame,
     i16 pressedFrame,
-    i16 selectMode,
+    H2_ENUM_PARAM(ButtonSelectMode, i16) selectMode,
     i16 hotkey,
     i16 id,
     i16 kind
@@ -94,7 +90,7 @@ void button::Read(void) {
     gpResourceManager->RestorePosition();
     m_normalFrame = gpResourceManager->ReadWord();
     m_pressedFrame = gpResourceManager->ReadWord();
-    m_selectMode = gpResourceManager->ReadWord();
+    m_selectMode = static_cast<ButtonSelectMode>(gpResourceManager->ReadWord());
     m_hotkey = gpResourceManager->ReadWord();
     m_id = gpResourceManager->ReadWord();
     m_kind = gpResourceManager->ReadWord();
@@ -293,7 +289,7 @@ i16 button::Select(struct tag_message& msg) {
     m_flags |= WIDGET_FLAG_SELECTED;
     msg.type = MESSAGE_WIDGET;
     msg.payload.widget.id = m_id;
-    if (m_selectMode == IDX(SELECT_DIALOG_RESULT)) {
+    if (m_selectMode == BUTTON_SELECT_DIALOG_RESULT) {
         msg.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
     } else {
         msg.payload.widget.command = WIDGET_COMMAND_SELECT;
