@@ -40,10 +40,10 @@ H2_ENUM_BEGIN(TextEntryConstant)
     PRESERVE_TEXT_FLAG          = 1
 H2_ENUM_END(TextEntryConstant)
 
-H2_ENUM_CLASS_BEGIN(InputManagerExtendedKey)
+H2_ENUM_BEGIN(InputManagerExtendedKey)
     EXTENDED_KEY_BASE = 0x100
 // extended keys arrive as scan code << 8
-H2_ENUM_CLASS_END(InputManagerExtendedKey)
+H2_ENUM_END(InputManagerExtendedKey)
 
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\Textntry.cpp"
 #define TEXT_ENTRY_MAIN_SOURCE_FILES RETAIL_FILE "\0\0\0" RETAIL_FILE
@@ -282,7 +282,7 @@ i32 textEntryWidget::Main(struct tag_message& message) {
                                            && event.payload.keyboard.keyCode != 0) {
                                     strcpy(backup, edit);
                                     char typed = 0;
-                                    if (event.payload.keyboard.keyCode >= IDX(EXTENDED_KEY_BASE)) {
+                                    if (event.payload.keyboard.keyCode >= EXTENDED_KEY_BASE) {
                                         switch ((event.payload.keyboard.keyCode
                                                  >> EXTENDED_KEY_SHIFT)
                                                 & EXTENDED_KEY_MASK) {

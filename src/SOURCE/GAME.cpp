@@ -302,7 +302,7 @@ H2_ENUM_END(DiffRuntimeConstant)
 #define SCORE_THIRD_TIER_BASE_DEDUCTION 60.0
 #define SCORE_FINAL_TIER_FACTOR 0.125
 
-H2_ENUM_CLASS_BEGIN(GameDiffEncoding)
+H2_ENUM_BEGIN(GameDiffEncoding)
     COMMAND_SHIFT      = 7,
     LEN_WORD_FLAG      = 0x40,
     LEN_BYTE_FLAG      = 0x20,
@@ -312,7 +312,7 @@ H2_ENUM_CLASS_BEGIN(GameDiffEncoding)
     LEN_SHORT_MASK     = 0x1f,
     LEN_BYTE_MAX       = 0x1f,
     LEN_WORD_MAX       = 0x1fff
-H2_ENUM_CLASS_END(GameDiffEncoding)
+H2_ENUM_END(GameDiffEncoding)
 
 H2_ENUM_CLASS_BEGIN(GameSaveSentinel)
     SAVED_TOWN_OFF_MAP = 0xff
@@ -7204,17 +7204,17 @@ void game::SetMapSize(i32 w, i32 h) {
 VA(0x004849a2, 0x100)
 void WriteDiffHeaderInfo(u8 cmd, i32 len, u8* buf, i32* pos) {
     u8 flags = 0;
-    flags = (cmd << IDX(COMMAND_SHIFT)) | flags;
-    if (len > IDX(LEN_WORD_MAX)) {
-        flags |= IDX(LEN_WORD_FLAG);
-        flags |= (len & IDX(LEN_HIGH_MASK)) >> DIFF_WORD_SHIFT;
-        u16 word = static_cast<u16>(len & IDX(LEN_LOW_MASK));
+    flags = (cmd << COMMAND_SHIFT) | flags;
+    if (len > LEN_WORD_MAX) {
+        flags |= LEN_WORD_FLAG;
+        flags |= (len & LEN_HIGH_MASK) >> DIFF_WORD_SHIFT;
+        u16 word = static_cast<u16>(len & LEN_LOW_MASK);
         buf[*pos] = flags;
         *reinterpret_cast<u16*>(buf + *pos + 1) = word;
         *pos += DIFF_WORD_HEADER_SIZE;
-    } else if (len > IDX(LEN_BYTE_MAX)) {
-        flags |= IDX(LEN_BYTE_FLAG);
-        flags |= (len >> DIFF_BYTE_SHIFT) & IDX(LEN_SHORT_MASK);
+    } else if (len > LEN_BYTE_MAX) {
+        flags |= LEN_BYTE_FLAG;
+        flags |= (len >> DIFF_BYTE_SHIFT) & LEN_SHORT_MASK;
         u8 lo = static_cast<u8>(len);
         buf[*pos] = flags;
         buf[*pos + 1] = lo;
@@ -7230,18 +7230,18 @@ VA(0x00484aa2, 0xab)
 i32 GetSkipCopyLen(u8* buf, i32* pos) {
     u8 b = buf[*pos];
     i32 len;
-    if (b & IDX(LEN_WORD_FLAG)) {
-        len = b & IDX(LEN_WORD_HIGH_MASK);
+    if (b & LEN_WORD_FLAG) {
+        len = b & LEN_WORD_HIGH_MASK;
         len <<= DIFF_WORD_SHIFT;
         len |= *reinterpret_cast<u16*>(buf + *pos + 1);
         *pos += DIFF_WORD_HEADER_SIZE;
-    } else if (b & IDX(LEN_BYTE_FLAG)) {
-        len = b & IDX(LEN_SHORT_MASK);
+    } else if (b & LEN_BYTE_FLAG) {
+        len = b & LEN_SHORT_MASK;
         len <<= DIFF_BYTE_SHIFT;
         len |= buf[*pos + 1];
         *pos += DIFF_BYTE_HEADER_SIZE;
     } else {
-        len = b & IDX(LEN_SHORT_MASK);
+        len = b & LEN_SHORT_MASK;
         (*pos)++;
     }
     return len;

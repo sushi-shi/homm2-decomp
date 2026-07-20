@@ -24,15 +24,15 @@ static inline u32 EncodeScanCode(u32 scanCode) {
     return scanCode << IDX(ENCODED_SCAN_CODE_SHIFT);
 }
 
-H2_ENUM_CLASS_BEGIN(InputManagerCursorBounds)
+H2_ENUM_BEGIN(InputManagerCursorBounds)
     CURSOR_INTERIOR_MIN_EXCLUSIVE   = 3,
     CURSOR_INTERIOR_MAX_X_EXCLUSIVE = 636,
     CURSOR_INTERIOR_MAX_Y_EXCLUSIVE = 476
-H2_ENUM_CLASS_END(InputManagerCursorBounds)
+H2_ENUM_END(InputManagerCursorBounds)
 
-H2_ENUM_CLASS_BEGIN(InputManagerTiming)
+H2_ENUM_BEGIN(InputManagerTiming)
     CURSOR_CHECK_DELAY = 500
-H2_ENUM_CLASS_END(InputManagerTiming)
+H2_ENUM_END(InputManagerTiming)
 
 H2_ENUM_BEGIN(InputManagerModifierClearMask)
     CLEAR_CONTROL_MASK     = 0xfffb,
@@ -203,11 +203,11 @@ i32 MouseMessageHandler(void*, u32 message, u32, i32l messageData) {
 
     if (gConfig.gfx[IDX(giCurExe)].fullScreen == 0 && gConfig.gfx[IDX(giCurExe)].colorMouseCursor == 0
         && KBTickCount() > iLastBWOnScreenCheck
-        && event->payload.mouse.x > IDX(CURSOR_INTERIOR_MIN_EXCLUSIVE)
-        && event->payload.mouse.x < IDX(CURSOR_INTERIOR_MAX_X_EXCLUSIVE)
-        && event->payload.mouse.y > IDX(CURSOR_INTERIOR_MIN_EXCLUSIVE)
-        && event->payload.mouse.y < IDX(CURSOR_INTERIOR_MAX_Y_EXCLUSIVE)) {
-        iLastBWOnScreenCheck = KBTickCount() + IDX(CURSOR_CHECK_DELAY);
+        && event->payload.mouse.x > CURSOR_INTERIOR_MIN_EXCLUSIVE
+        && event->payload.mouse.x < CURSOR_INTERIOR_MAX_X_EXCLUSIVE
+        && event->payload.mouse.y > CURSOR_INTERIOR_MIN_EXCLUSIVE
+        && event->payload.mouse.y < CURSOR_INTERIOR_MAX_Y_EXCLUSIVE) {
+        iLastBWOnScreenCheck = KBTickCount() + CURSOR_CHECK_DELAY;
         gpMouseManager->SetPointer(MOUSE_KEEP_CURRENT_FRAME);
     }
 
@@ -434,7 +434,7 @@ void inputManager::AsciiConvert(tag_message& event) {
 
 VA(0x004ce650, 0x33c)
 void inputManager::MakeScanCodeTable(void) {
-    for (u32 scanCode = 0; scanCode < IDX(INPUT_SCAN_CODE_CAPACITY); scanCode++)
+    for (u32 scanCode = 0; scanCode < INPUT_SCAN_CODE_CAPACITY; scanCode++)
         m_keyState[scanCode] = EncodeScanCode(scanCode);
 
     m_keyState[IDX(INPUT_SCAN_NONE)] = 0;

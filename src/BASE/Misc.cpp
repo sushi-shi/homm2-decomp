@@ -123,12 +123,12 @@ H2_ENUM_BEGIN(PCXConstant)
     COMPONENT_SCALE_SHIFT = 2
 H2_ENUM_END(PCXConstant)
 
-H2_ENUM_CLASS_BEGIN(MiscCycleColorRange)
+H2_ENUM_BEGIN(MiscCycleColorRange)
     CYCLE_RANGE_ONE_FIRST = 0xd6,
     CYCLE_RANGE_ONE_LAST  = 0xdd,
     CYCLE_RANGE_TWO_FIRST = 0xe7,
     CYCLE_RANGE_TWO_LAST  = 0xed
-H2_ENUM_CLASS_END(MiscCycleColorRange)
+H2_ENUM_END(MiscCycleColorRange)
 
 H2_ENUM_BEGIN(MiscFadeConstant)
     FADE_LEVEL_COUNT              = 0x40,
@@ -2175,8 +2175,8 @@ void FadeToColorTable(u8* colorTable, i32 increment) {
 
 VA(0x004c66a0, 0x29)
 i32 IsCycleColor(i32 color) {
-    if ((color >= IDX(CYCLE_RANGE_ONE_FIRST) && color <= IDX(CYCLE_RANGE_ONE_LAST))
-        || (color >= IDX(CYCLE_RANGE_TWO_FIRST) && color <= IDX(CYCLE_RANGE_TWO_LAST))) {
+    if ((color >= CYCLE_RANGE_ONE_FIRST && color <= CYCLE_RANGE_ONE_LAST)
+        || (color >= CYCLE_RANGE_TWO_FIRST && color <= CYCLE_RANGE_TWO_LAST)) {
         return 1;
     }
     return 0;
