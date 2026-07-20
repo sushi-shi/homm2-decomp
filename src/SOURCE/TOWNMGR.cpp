@@ -239,7 +239,9 @@ H2_ENUM_END(ThievesGuildConstant)
 
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\TOWNMGR.CPP"
 
-DATA(0x004eb080) static const i8 gTownObjectOrder[IDX(FACTION_COUNT)][TOWN_BUILDING_COUNT] = {
+DATA(0x004eb080)
+static const H2_ENUM_STORAGE(BuildingSlotType, i8)
+    gTownObjectOrder[IDX(FACTION_COUNT)][TOWN_BUILDING_COUNT] = {
     {TOWN_OBJECT_SECOND_WELL,
      TOWN_OBJECT_CASTLE_UPGRADE,
      TOWN_OBJECT_CASTLE,
@@ -498,24 +500,26 @@ DATA(0x004ee750) SBuildingInfo sBuildingInfo[IDX(FACTION_COUNT)][TOWN_BUILDING_C
 };
 
 VA(0x00413900, 0x16a)
-townObject::townObject(FactionType townType, i32 buildingId, char* iconBaseName) {
+townObject::townObject(
+    FactionType townType, H2_ENUM_PARAM(BuildingSlotType, i32) buildingId, char* iconBaseName
+) {
     char fileName[TOWN_OBJECT_FILENAME_SIZE];
     i32 x;
     i32 y;
     i32 tempY;
     i32 w;
     i32 h;
-    i32 buildingId_h;
+    H2_ENUM_STORAGE(BuildingSlotType, i32) buildingId_h;
 
     m_animationFrame = 0;
     m_icon = NULL;
     m_border = NULL;
     m_visible = 1;
-    m_animationFrameCount = sBuildingInfo[IDX(townType)][buildingId].animationFrameCount;
-    x = sBuildingInfo[IDX(townType)][buildingId].x;
-    y = sBuildingInfo[IDX(townType)][buildingId].y;
-    w = sBuildingInfo[IDX(townType)][buildingId].width;
-    h = sBuildingInfo[IDX(townType)][buildingId].height;
+    m_animationFrameCount = sBuildingInfo[IDX(townType)][IDX(buildingId)].animationFrameCount;
+    x = sBuildingInfo[IDX(townType)][IDX(buildingId)].x;
+    y = sBuildingInfo[IDX(townType)][IDX(buildingId)].y;
+    w = sBuildingInfo[IDX(townType)][IDX(buildingId)].width;
+    h = sBuildingInfo[IDX(townType)][IDX(buildingId)].height;
     buildingId_h = buildingId;
     m_buildingId = buildingId_h;
     sprintf(fileName, "%s.icn", iconBaseName);
@@ -526,7 +530,7 @@ townObject::townObject(FactionType townType, i32 buildingId, char* iconBaseName)
             y,
             w,
             h,
-            static_cast<i16>(buildingId_h),
+            static_cast<i16>(IDX(buildingId_h)),
             TOWN_OBJECT_BORDER_Z_ORDER,
             0,
             NULL
@@ -731,7 +735,7 @@ VA(0x0041436f, 0x95a)
 void townManager::SetupTown(void) {
     tag_message message;
     i32 objectOrder;
-    i32 objectId;
+    H2_ENUM_STORAGE(BuildingSlotType, i32) objectId;
     i32 crestFrame;
 
     sprintf(gText, GetTownName(m_town->m_id));
@@ -773,12 +777,17 @@ void townManager::SetupTown(void) {
         for (objectOrder = 0; objectOrder < TOWN_BUILDING_COUNT; ++objectOrder) {
             objectId = gTownObjectOrder[IDX(m_town->m_type)][objectOrder];
             if (objectId != TOWN_OBJECT_NONE) {
-                sprintf(gText, "%s%s", gTownPrefixNames[IDX(m_town->m_type)], gTownObjNames[objectId]);
+                sprintf(
+                    gText,
+                    "%s%s",
+                    gTownPrefixNames[IDX(m_town->m_type)],
+                    gTownObjNames[IDX(objectId)]
+                );
                 m_townObjects[m_townObjectCount] = new townObject(m_town->m_type, objectId, gText);
                 if (m_townObjects[m_townObjectCount] == NULL)
                     MemError();
                 if (m_townObjects[m_townObjectCount]->m_border != NULL) {
-                    if (!(m_town->m_buildings & (1L << objectId))) {
+                    if (!(m_town->m_buildings & BIT(objectId))) {
                         m_townObjects[m_townObjectCount]->m_border->m_flags &=
                             ~TOWN_OBJECT_BORDER_ENABLED;
                         m_townObjects[m_townObjectCount]->m_visible = 0;
@@ -795,10 +804,11 @@ void townManager::SetupTown(void) {
     } else {
         m_townObjectCount = 0;
         for (objectOrder = 0; objectOrder < TOWN_BUILDING_COUNT; ++objectOrder) {
-            i32 existingObjectId = gTownObjectOrder[IDX(m_town->m_type)][objectOrder];
+            H2_ENUM_STORAGE(BuildingSlotType, i32) existingObjectId =
+                gTownObjectOrder[IDX(m_town->m_type)][objectOrder];
             if (existingObjectId != TOWN_OBJECT_NONE) {
                 if (m_townObjects[m_townObjectCount]->m_border != NULL) {
-                    if (!(m_town->m_buildings & (1L << existingObjectId))) {
+                    if (!(m_town->m_buildings & BIT(existingObjectId))) {
                         m_townObjects[m_townObjectCount]->m_border->m_flags &=
                             ~TOWN_OBJECT_BORDER_ENABLED;
                         m_townObjects[m_townObjectCount]->m_visible = 0;
@@ -1031,6 +1041,83 @@ void townManager::SetCommandAndText(struct tag_message& message) {
     i32 objectId = message.payload.widget.id;
 
     m_command = ARMY_COMMAND_NONE;
+    if (objectId >= IDX(BUILDING_SLOT_MAGE_GUILD)
+        && objectId <= IDX(BUILDING_SLOT_DISABLED_LAST)) {
+        BuildingSlotType building = static_cast<BuildingSlotType>(objectId);
+        switch (building) {
+            case TOWN_OBJECT_MAGE_GUILD:
+                strcpy(m_statusText, cTownCommand[IDX(TEXT_MAGE_GUILD)]);
+                break;
+            case TOWN_OBJECT_THIEVES_GUILD:
+                strcpy(m_statusText, cTownCommand[IDX(TEXT_THIEVES_GUILD)]);
+                break;
+            case TOWN_OBJECT_TAVERN:
+                if (m_town->m_type == FACTION_NECROMANCER)
+                    strcpy(m_statusText, xNecromancerShrine);
+                else
+                    strcpy(m_statusText, cTownCommand[IDX(TEXT_TAVERN)]);
+                break;
+            case TOWN_OBJECT_DOCK:
+            case TOWN_OBJECT_BOAT:
+                strcpy(m_statusText, cTownCommand[IDX(TEXT_DOCK)]);
+                break;
+            case TOWN_OBJECT_WELL:
+                strcpy(m_statusText, cTownCommand[IDX(TEXT_WELL)]);
+                break;
+            case TOWN_OBJECT_TENT:
+                strcpy(m_statusText, cTownCommand[IDX(TEXT_TENT)]);
+                break;
+            case TOWN_OBJECT_CASTLE:
+                strcpy(m_statusText, cTownCommand[IDX(TEXT_CASTLE)]);
+                break;
+            case TOWN_OBJECT_STATUE:
+                strcpy(m_statusText, cTownCommand[IDX(TEXT_STATUE)]);
+                break;
+            case TOWN_OBJECT_LEFT_TURRET:
+                strcpy(m_statusText, cTownCommand[IDX(TEXT_LEFT_TURRET)]);
+                break;
+            case TOWN_OBJECT_RIGHT_TURRET:
+                strcpy(m_statusText, cTownCommand[IDX(TEXT_RIGHT_TURRET)]);
+                break;
+            case TOWN_OBJECT_MOAT:
+                strcpy(m_statusText, cTownCommand[IDX(TEXT_MOAT)]);
+                break;
+            case TOWN_OBJECT_MARKETPLACE:
+                strcpy(m_statusText, cTownCommand[IDX(TEXT_MARKETPLACE)]);
+                break;
+            case TOWN_OBJECT_CAPTAIN_QUARTERS:
+                strcpy(m_statusText, cTownCommand[IDX(TEXT_CAPTAIN_QUARTERS)]);
+                break;
+            case TOWN_OBJECT_SPECIAL_BUILDING:
+                strcpy(m_statusText, gSpecialBuildingNames[IDX(m_town->m_type)]);
+                break;
+            case TOWN_OBJECT_SECOND_WELL:
+                strcpy(m_statusText, gWellExtraNames[IDX(m_town->m_type)]);
+                break;
+            case TOWN_OBJECT_DWELLING_1:
+            case TOWN_OBJECT_DWELLING_2:
+            case TOWN_OBJECT_DWELLING_3:
+            case TOWN_OBJECT_DWELLING_4:
+            case TOWN_OBJECT_DWELLING_5:
+            case TOWN_OBJECT_DWELLING_6:
+            case TOWN_OBJECT_UPGRADED_DWELLING_2:
+            case TOWN_OBJECT_UPGRADED_DWELLING_3:
+            case TOWN_OBJECT_UPGRADED_DWELLING_4:
+            case TOWN_OBJECT_UPGRADED_DWELLING_5:
+            case TOWN_OBJECT_UPGRADED_DWELLING_6:
+            case TOWN_OBJECT_ALTERNATE_UPGRADED_DWELLING_6:
+                sprintf(
+                    m_statusText,
+                    cTownCommand[IDX(TEXT_RECRUIT)],
+                    gArmyNames[IDX(gDwellingType[IDX(m_town->m_type)]
+                                                [IDX(building)
+                                                 - IDX(TOWN_OBJECT_DWELLING_1)])]
+                );
+                break;
+        }
+        ShowText(m_statusText);
+        return;
+    }
     switch (objectId) {
         case CONTROL_CLOSE:
             strcpy(m_statusText, cTownCommand[IDX(TEXT_EXIT)]);
@@ -1107,73 +1194,6 @@ void townManager::SetCommandAndText(struct tag_message& message) {
                 }
             }
             break;
-        case TOWN_OBJECT_MAGE_GUILD:
-            strcpy(m_statusText, cTownCommand[IDX(TEXT_MAGE_GUILD)]);
-            break;
-        case TOWN_OBJECT_THIEVES_GUILD:
-            strcpy(m_statusText, cTownCommand[IDX(TEXT_THIEVES_GUILD)]);
-            break;
-        case TOWN_OBJECT_TAVERN:
-            if (m_town->m_type == FACTION_NECROMANCER)
-                strcpy(m_statusText, xNecromancerShrine);
-            else
-                strcpy(m_statusText, cTownCommand[IDX(TEXT_TAVERN)]);
-            break;
-        case TOWN_OBJECT_DOCK:
-        case TOWN_OBJECT_BOAT:
-            strcpy(m_statusText, cTownCommand[IDX(TEXT_DOCK)]);
-            break;
-        case TOWN_OBJECT_WELL:
-            strcpy(m_statusText, cTownCommand[IDX(TEXT_WELL)]);
-            break;
-        case TOWN_OBJECT_TENT:
-            strcpy(m_statusText, cTownCommand[IDX(TEXT_TENT)]);
-            break;
-        case TOWN_OBJECT_CASTLE:
-            strcpy(m_statusText, cTownCommand[IDX(TEXT_CASTLE)]);
-            break;
-        case TOWN_OBJECT_STATUE:
-            strcpy(m_statusText, cTownCommand[IDX(TEXT_STATUE)]);
-            break;
-        case TOWN_OBJECT_LEFT_TURRET:
-            strcpy(m_statusText, cTownCommand[IDX(TEXT_LEFT_TURRET)]);
-            break;
-        case TOWN_OBJECT_RIGHT_TURRET:
-            strcpy(m_statusText, cTownCommand[IDX(TEXT_RIGHT_TURRET)]);
-            break;
-        case TOWN_OBJECT_MOAT:
-            strcpy(m_statusText, cTownCommand[IDX(TEXT_MOAT)]);
-            break;
-        case TOWN_OBJECT_MARKETPLACE:
-            strcpy(m_statusText, cTownCommand[IDX(TEXT_MARKETPLACE)]);
-            break;
-        case TOWN_OBJECT_CAPTAIN_QUARTERS:
-            strcpy(m_statusText, cTownCommand[IDX(TEXT_CAPTAIN_QUARTERS)]);
-            break;
-        case TOWN_OBJECT_SPECIAL_BUILDING:
-            strcpy(m_statusText, gSpecialBuildingNames[IDX(m_town->m_type)]);
-            break;
-        case TOWN_OBJECT_SECOND_WELL:
-            strcpy(m_statusText, gWellExtraNames[IDX(m_town->m_type)]);
-            break;
-        case TOWN_OBJECT_DWELLING_1:
-        case TOWN_OBJECT_DWELLING_2:
-        case TOWN_OBJECT_DWELLING_3:
-        case TOWN_OBJECT_DWELLING_4:
-        case TOWN_OBJECT_DWELLING_5:
-        case TOWN_OBJECT_DWELLING_6:
-        case TOWN_OBJECT_UPGRADED_DWELLING_2:
-        case TOWN_OBJECT_UPGRADED_DWELLING_3:
-        case TOWN_OBJECT_UPGRADED_DWELLING_4:
-        case TOWN_OBJECT_UPGRADED_DWELLING_5:
-        case TOWN_OBJECT_UPGRADED_DWELLING_6:
-        case TOWN_OBJECT_ALTERNATE_UPGRADED_DWELLING_6:
-            sprintf(
-                m_statusText,
-                cTownCommand[IDX(TEXT_RECRUIT)],
-                gArmyNames[gDwellingType[IDX(m_town->m_type)][objectId - TOWN_OBJECT_DWELLING_1]]
-            );
-            break;
     }
     ShowText(m_statusText);
 }
@@ -1234,8 +1254,15 @@ i32 townManager::Main(tag_message& message) {
         case MESSAGE_WIDGET:
             switch (message.payload.widget.command) {
                 case WIDGET_COMMAND_SELECT:
-                case WIDGET_COMMAND_ALTERNATE_SELECT:
-                    switch (message.payload.widget.id) {
+                case WIDGET_COMMAND_ALTERNATE_SELECT: {
+                    if (message.payload.widget.id == CONTROL_CLOSE) {
+                        if (!quickView_k)
+                            SetCommandAndText(message);
+                        break;
+                    }
+                    BuildingSlotType selectedBuilding =
+                        static_cast<BuildingSlotType>(message.payload.widget.id);
+                    switch (selectedBuilding) {
                         case TOWN_OBJECT_DWELLING_1:
                         case TOWN_OBJECT_DWELLING_2:
                         case TOWN_OBJECT_DWELLING_3:
@@ -1483,7 +1510,7 @@ i32 townManager::Main(tag_message& message) {
                                         description_b,
                                         GetBuildingInfo(
                                             m_town->m_type,
-                                            static_cast<BuildingSlotType>(message.payload.widget.id),
+                                            selectedBuilding,
                                             1
                                         )
                                     );
@@ -1642,7 +1669,7 @@ i32 townManager::Main(tag_message& message) {
                                     description_b,
                                     GetBuildingInfo(
                                         m_town->m_type,
-                                        static_cast<BuildingSlotType>(message.payload.widget.id),
+                                        selectedBuilding,
                                         1
                                     )
                                 );
@@ -1663,7 +1690,7 @@ i32 townManager::Main(tag_message& message) {
                                     description_b,
                                     GetBuildingInfo(
                                         m_town->m_type,
-                                        static_cast<BuildingSlotType>(message.payload.widget.id),
+                                        selectedBuilding,
                                         1
                                     )
                                 );
@@ -1680,11 +1707,6 @@ i32 townManager::Main(tag_message& message) {
                                     0
                                 );
                             }
-                            break;
-
-                        case CONTROL_CLOSE:
-                            if (!quickView_k)
-                                SetCommandAndText(message);
                             break;
 
                         default:
@@ -1737,6 +1759,7 @@ i32 townManager::Main(tag_message& message) {
                             break;
                     }
                     break;
+                }
 
                 case WIDGET_COMMAND_DESELECT:
                     switch (message.payload.widget.id) {
@@ -2000,7 +2023,7 @@ void townManager::Toggle(H2_ENUM_PARAM(BuildingSlotType, i32) building) {
 
     if (m_town->m_buildings & BIT(building)) {
         for (index = 0; index < m_townObjectCount; ++index) {
-            if (m_townObjects[index]->m_buildingId == IDX(building))
+            if (m_townObjects[index]->m_buildingId == building)
                 m_townObjects[index]->m_visible ^= 1;
         }
     }
@@ -2097,7 +2120,7 @@ i32 townManager::BuyBuild(
     dwelling_k = -1;
     if (building >= TOWN_OBJECT_DWELLING_1
         && building <= TOWN_OBJECT_ALTERNATE_UPGRADED_DWELLING_6)
-        dwelling_k = building - TOWN_OBJECT_DWELLING_1;
+        dwelling_k = IDX(building) - IDX(TOWN_OBJECT_DWELLING_1);
 
     if (building == BUILDING_SLOT_TAVERN && m_town->m_type == FACTION_NECROMANCER) {
         for (index_h = 0; index_h < TOWN_RESOURCE_COUNT; ++index_h) {
@@ -2433,7 +2456,7 @@ void townManager::BuildObj(H2_ENUM_PARAM(BuildingSlotType, i32) building) {
         DrawTown(1, 1);
         m_town->BuildBuilding(building);
         for (index_j = 0; index_j < m_townObjectCount; ++index_j) {
-            if (m_town->m_buildings & (1L << m_townObjects[index_j]->m_buildingId)) {
+            if (m_town->m_buildings & BIT(m_townObjects[index_j]->m_buildingId)) {
                 m_townObjects[index_j]->m_visible = 1;
                 m_townObjects[index_j]->m_border->m_flags |= TOWN_OBJECT_BORDER_ENABLED;
             } else {
@@ -2444,7 +2467,7 @@ void townManager::BuildObj(H2_ENUM_PARAM(BuildingSlotType, i32) building) {
 
         objectIndex_k = -1;
         for (index_j = 0; index_j < m_townObjectCount; ++index_j) {
-            if (m_townObjects[index_j]->m_buildingId == IDX(building))
+            if (m_townObjects[index_j]->m_buildingId == building)
                 objectIndex_k = index_j;
         }
 
@@ -3056,7 +3079,9 @@ void townManager::SetupWell(heroWindow* window) {
         messaged.payload.widget.id = dwellingResult + TOWN_WELL_FIRST_CREATURE_CONTROL;
         strcpy(
             gText,
-            gArmyNamesPlural[gDwellingType[IDX(m_town->m_type)][dwellingTypesValue[dwellingResult]]]
+            gArmyNamesPlural[IDX(
+                gDwellingType[IDX(m_town->m_type)][dwellingTypesValue[dwellingResult]]
+            )]
         );
         gText[0] -= ' ';
         messaged.payload.widget.data.text = gText;
@@ -3064,8 +3089,9 @@ void townManager::SetupWell(heroWindow* window) {
     }
 
     for (dwellingResult = 0; dwellingResult < TOWN_WELL_DWELLING_COUNT; ++dwellingResult) {
-        monsterInfoi =
-            gMonsterDatabase[gDwellingType[IDX(m_town->m_type)][dwellingTypesValue[dwellingResult]]];
+        monsterInfoi = gMonsterDatabase[IDX(
+            gDwellingType[IDX(m_town->m_type)][dwellingTypesValue[dwellingResult]]
+        )];
         strcpy(gText, "");
         sprintf(detailTextf, "%s%d", cWellDetail[WELL_DETAIL_ATTACK], monsterInfoi.attack);
         strcat(gText, detailTextf);
@@ -3085,9 +3111,10 @@ void townManager::SetupWell(heroWindow* window) {
         strcat(gText, detailTextf);
         if (m_town->m_buildings
             & (1L << (dwellingTypesValue[dwellingResult] + IDX(BUILDING_SLOT_DWELLING_FIRST)))) {
-            growthd =
-                gMonsterDatabase[gDwellingType[IDX(m_town->m_type)][dwellingTypesValue[dwellingResult]]]
-                    .growth;
+            growthd = gMonsterDatabase[IDX(
+                gDwellingType[IDX(m_town->m_type)][dwellingTypesValue[dwellingResult]]
+            )]
+                          .growth;
             growthd += TOWN_WELL_BASE_GROWTH_BONUS;
             if (dwellingResult == 0
                 && (m_town->m_buildings & (1L << TOWN_WELL_FIRST_DWELLING_GROWTH_BUILDING)))

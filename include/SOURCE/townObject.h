@@ -2,6 +2,7 @@
 #define HOMM2_SOURCE_TOWNOBJECT_H
 
 #include <va.h>
+#include <SOURCE/KB_TYPES.h>
 
 class border;
 class icon;
@@ -12,10 +13,10 @@ public:
     i32 m_animationFrameCount;
     i32 m_animationFrame;
     i32 m_visible;
-    i32 m_buildingId;
+    H2_ENUM_STORAGE(BuildingSlotType, i32) m_buildingId;
     icon* m_icon;
     border* m_border;
-    townObject(FactionType, i32, char*);
+    townObject(FactionType, H2_ENUM_PARAM(BuildingSlotType, i32), char*);
     ~townObject();
     void Draw(i32);
 };

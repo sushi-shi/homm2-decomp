@@ -50,7 +50,7 @@ i32 combatManager::AICheckRetreat(void) {
         return 0;
     if (m_heroes[m_currentSide]->m_isCaptain != 0)
         return 0;
-    if (gpGame->m_mapHeader.victoryCondition == COMBAT_AI_DEFEAT_HERO_VICTORY
+    if (gpGame->m_mapHeader.victoryCondition == MAP_VICTORY_DEFEAT_HERO
         && static_cast<u8>(m_heroes[m_currentSide]->m_id)
                == gpGame->m_mapHeader.victoryConditionValue)
         return 0;
