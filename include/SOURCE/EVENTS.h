@@ -122,7 +122,11 @@ H2_ENUM_BEGIN(MapEventConstant)
     SKELETON_GOLD                        = 1000,
     CHEST_ARTIFACT_FLAG                  = 0x100,
     CHEST_ARTIFACT_MASK                  = 0xFF,
-    CHEST_GOLD_ONLY                      = 2,
+    SEA_CHEST_OUTCOME_EMPTY              = 0,
+    SEA_CHEST_OUTCOME_GOLD               = 1,
+    CHEST_REWARD_SMALL                   = 2,
+    CHEST_REWARD_MEDIUM                  = 3,
+    CHEST_REWARD_LARGE                   = 4,
     CHEST_GOLD_MULTIPLIER                = 500,
     CHEST_EXPERIENCE_MULTIPLIER          = 125,
     DAEMON_CAVE_EMPTY                    = 1,
@@ -238,6 +242,13 @@ H2_ENUM_BEGIN(MapEventConstant)
     COAST_FIZZLE_WIDTH                   = 96,
     COAST_FIZZLE_HEIGHT                  = 96
 H2_ENUM_END(MapEventConstant)
+
+H2_ENUM_BEGIN(UndeadEventLevel)
+    EVENT_LEVEL_SMALL  = 2,
+    EVENT_LEVEL_MEDIUM = 3,
+    EVENT_LEVEL_LARGE  = 4,
+    EVENT_LEVEL_HUGE   = 5
+H2_ENUM_END(UndeadEventLevel)
 
 H2_ENUM_BEGIN(FlotsamReward)
     FLOTSAM_EMPTY          = 0,
