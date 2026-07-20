@@ -1098,7 +1098,7 @@ void combatManager::DrawFrame(
                 0,
                 0,
                 m_wallStates[IDX(COMBAT_WALL_SLOT_KEEP)]
-                            == IDX(COMBAT_WALL_STATE_KEEP_STANDING)
+                            == COMBAT_WALL_STATE_KEEP_STANDING
                     ? COMBAT_CASTLE_GATE_CLOSED_FRAME
                     : COMBAT_CASTLE_GATE_FRAME,
                 &m_gateLimits,
@@ -1112,9 +1112,9 @@ void combatManager::DrawFrame(
         skipSpecialOccupants6 = 0;
         if (m_inCastleCombat != 0
             && m_wallStates[IDX(COMBAT_WALL_SLOT_SECTION_FOURTH)]
-                   != IDX(COMBAT_WALL_STATE_DESTROYED)
+                   != COMBAT_WALL_STATE_DESTROYED
             && m_wallStates[IDX(COMBAT_WALL_SLOT_SECTION_FOURTH)]
-                   != IDX(COMBAT_WALL_STATE_SECTION_DESTROYED)) {
+                   != COMBAT_WALL_STATE_SECTION_DESTROYED) {
             skipSpecialOccupants6 = 1;
             for (side5 = 0; side5 < ARMY_DRAW_PHASE_COUNT; side5++) {
                 m_hexCells[IDX(COMBAT_CASTLE_SPECIAL_HEX_FIRST)].DrawOccupant(
@@ -1169,26 +1169,34 @@ void combatManager::DrawFrame(
                     switch (static_cast<CombatCastleHex>(hexIndex6)) {
                         case COMBAT_CASTLE_HEX_TOP_TOWER:
                             wallFrame1 =
-                                wallFrameOffsets1[m_wallStates[COMBAT_WALL_SLOT_SECTION_FIRST]]
+                                wallFrameOffsets1[IDX(
+                                    m_wallStates[COMBAT_WALL_SLOT_SECTION_FIRST]
+                                )]
                                 + TOP_TOWER_BASE_FRAME;
                             break;
                         case COMBAT_CASTLE_HEX_SECOND_TOWER:
                             wallFrame1 =
-                                wallFrameOffsets1[m_wallStates[COMBAT_WALL_SLOT_SECTION_SECOND]]
+                                wallFrameOffsets1[IDX(
+                                    m_wallStates[COMBAT_WALL_SLOT_SECTION_SECOND]
+                                )]
                                 + SECOND_TOWER_BASE_FRAME;
                             break;
                         case COMBAT_CASTLE_HEX_THIRD_TOWER:
                             wallFrame1 =
-                                wallFrameOffsets1[m_wallStates[COMBAT_WALL_SLOT_SECTION_THIRD]]
+                                wallFrameOffsets1[IDX(
+                                    m_wallStates[COMBAT_WALL_SLOT_SECTION_THIRD]
+                                )]
                                 + THIRD_TOWER_BASE_FRAME;
                             break;
                         case COMBAT_CASTLE_HEX_BOTTOM_TOWER:
                             wallFrame1 =
-                                wallFrameOffsets1[m_wallStates[COMBAT_WALL_SLOT_SECTION_FOURTH]]
+                                wallFrameOffsets1[IDX(
+                                    m_wallStates[COMBAT_WALL_SLOT_SECTION_FOURTH]
+                                )]
                                 + BOTTOM_TOWER_BASE_FRAME;
                             break;
                         case COMBAT_CASTLE_HEX_TOP_WALL:
-                            wallFrame1 = m_wallStates[COMBAT_WALL_SLOT_TOP_TOWER]
+                            wallFrame1 = IDX(m_wallStates[COMBAT_WALL_SLOT_TOP_TOWER])
                                          + COMBAT_CASTLE_WALL_BASE_FRAME;
                             wallX7 =
                                 wallCoordinates1[IDX(m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type)]
@@ -1198,7 +1206,7 @@ void combatManager::DrawFrame(
                                                 [WALL_TOP_Y];
                             break;
                         case COMBAT_CASTLE_HEX_SECOND_WALL:
-                            wallFrame1 = m_wallStates[COMBAT_WALL_SLOT_SECOND_TOWER]
+                            wallFrame1 = IDX(m_wallStates[COMBAT_WALL_SLOT_SECOND_TOWER])
                                          + COMBAT_CASTLE_WALL_BASE_FRAME;
                             wallX7 =
                                 wallCoordinates1[IDX(m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type)]
@@ -1208,7 +1216,7 @@ void combatManager::DrawFrame(
                                                 [WALL_SECOND_Y];
                             break;
                         case COMBAT_CASTLE_HEX_THIRD_WALL:
-                            wallFrame1 = m_wallStates[COMBAT_WALL_SLOT_THIRD_TOWER]
+                            wallFrame1 = IDX(m_wallStates[COMBAT_WALL_SLOT_THIRD_TOWER])
                                          + COMBAT_CASTLE_WALL_BASE_FRAME;
                             wallX7 =
                                 wallCoordinates1[IDX(m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type)]
@@ -1218,7 +1226,7 @@ void combatManager::DrawFrame(
                                                 [WALL_THIRD_Y];
                             break;
                         case COMBAT_CASTLE_HEX_BOTTOM_WALL:
-                            wallFrame1 = m_wallStates[COMBAT_WALL_SLOT_BOTTOM_TOWER]
+                            wallFrame1 = IDX(m_wallStates[COMBAT_WALL_SLOT_BOTTOM_TOWER])
                                          + COMBAT_CASTLE_WALL_BASE_FRAME;
                             wallX7 =
                                 wallCoordinates1[IDX(m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type)]

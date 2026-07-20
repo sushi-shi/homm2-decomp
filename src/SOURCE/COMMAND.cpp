@@ -3106,7 +3106,7 @@ void combatManager::ViewBallista(i32 quickView) {
     m_combatTowns[COMBAT_DEFENDER_SIDE]->CalcNumLevelArchers(&archerCount, &attackBonus);
     sprintf(gText, "Ballista");
     strcpy(description, "");
-    if (m_wallStates[IDX(COMBAT_WALL_SLOT_KEEP)] != IDX(COMBAT_WALL_STATE_KEEP_STANDING)) {
+    if (m_wallStates[IDX(COMBAT_WALL_SLOT_KEEP)] != COMBAT_WALL_STATE_KEEP_STANDING) {
         sprintf(description, "\n\nThe %s is destroyed.", "Ballista");
     } else if (attackBonus > 0) {
         sprintf(
@@ -3129,10 +3129,10 @@ void combatManager::ViewBallista(i32 quickView) {
 
     strcpy(description, "");
     if ((m_combatTowns[COMBAT_DEFENDER_SIDE]->m_buildings & IDX(TOWN_BUILDING_LEFT_TURRET)) != 0) {
-        if (m_wallStates[IDX(COMBAT_WALL_SLOT_TOP_TOWER)] == IDX(COMBAT_WALL_STATE_DESTROYED)) {
+        if (m_wallStates[IDX(COMBAT_WALL_SLOT_TOP_TOWER)] == COMBAT_WALL_STATE_DESTROYED) {
             sprintf(description, "\n\nThe %s is destroyed.", "Left Turret");
         } else if (m_wallStates[IDX(COMBAT_WALL_SLOT_TOP_TOWER)]
-                   == IDX(COMBAT_WALL_STATE_TOWER_STANDING)) {
+                   == COMBAT_WALL_STATE_TOWER_STANDING) {
             if (attackBonus > 0) {
                 sprintf(
                     description,
@@ -3156,10 +3156,10 @@ void combatManager::ViewBallista(i32 quickView) {
 
     if ((m_combatTowns[COMBAT_DEFENDER_SIDE]->m_buildings & IDX(TOWN_BUILDING_RIGHT_TURRET)) != 0) {
         strcpy(description, "");
-        if (m_wallStates[IDX(COMBAT_WALL_SLOT_BOTTOM_TOWER)] == IDX(COMBAT_WALL_STATE_DESTROYED)) {
+        if (m_wallStates[IDX(COMBAT_WALL_SLOT_BOTTOM_TOWER)] == COMBAT_WALL_STATE_DESTROYED) {
             sprintf(description, "\n\nThe %s is destroyed.", "Right Turret");
         } else if (m_wallStates[IDX(COMBAT_WALL_SLOT_BOTTOM_TOWER)]
-                   == IDX(COMBAT_WALL_STATE_TOWER_STANDING)) {
+                   == COMBAT_WALL_STATE_TOWER_STANDING) {
             if (attackBonus > 0) {
                 sprintf(
                     description,
