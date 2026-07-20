@@ -1262,7 +1262,7 @@ i32 townManager::Main(tag_message& message) {
                             }
                             break;
 
-                        case IDX(BUILDING_SLOT_CASTLE):
+                        case TOWN_OBJECT_CASTLE:
                             if (quickView_k) {
                                 goto showBuildingInformation;
                             }
@@ -1354,7 +1354,7 @@ i32 townManager::Main(tag_message& message) {
                             }
                             break;
 
-                        case IDX(BUILDING_SLOT_MAGE_GUILD):
+                        case TOWN_OBJECT_MAGE_GUILD:
                             if (quickView_k) {
                                 goto showBuildingInformation;
                             }
@@ -1437,7 +1437,7 @@ i32 townManager::Main(tag_message& message) {
                             }
                             break;
 
-                        case IDX(BUILDING_SLOT_WELL):
+                        case TOWN_OBJECT_WELL:
                             if (quickView_k) {
                                 goto showBuildingInformation;
                             }
@@ -1452,7 +1452,7 @@ i32 townManager::Main(tag_message& message) {
                             }
                             break;
 
-                        case IDX(BUILDING_SLOT_THIEVES_GUILD):
+                        case TOWN_OBJECT_THIEVES_GUILD:
                             if (quickView_k) {
                                 goto showBuildingInformation;
                             }
@@ -1468,7 +1468,7 @@ i32 townManager::Main(tag_message& message) {
                             }
                             break;
 
-                        case IDX(BUILDING_SLOT_TAVERN):
+                        case TOWN_OBJECT_TAVERN:
                             if (quickView_k) {
                                 goto showBuildingInformation;
                             }
@@ -1500,7 +1500,7 @@ i32 townManager::Main(tag_message& message) {
                             }
                             break;
 
-                        case IDX(BUILDING_SLOT_UPGRADE_CASTLE):
+                        case TOWN_OBJECT_CASTLE_UPGRADE:
                             if (quickView_k) {
                                 goto showBuildingInformation;
                             }
@@ -1529,7 +1529,7 @@ i32 townManager::Main(tag_message& message) {
                             }
                             break;
 
-                        case IDX(BUILDING_SLOT_DOCK):
+                        case TOWN_OBJECT_DOCK:
                             if (quickView_k) {
                                 goto showBuildingInformation;
                             }
@@ -1606,7 +1606,7 @@ i32 townManager::Main(tag_message& message) {
                             }
                             break;
 
-                        case IDX(BUILDING_SLOT_TRADING_POST):
+                        case TOWN_OBJECT_MARKETPLACE:
                             if (quickView_k) {
                                 goto showBuildingInformation;
                             }
