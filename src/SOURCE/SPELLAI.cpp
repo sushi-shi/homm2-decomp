@@ -31,52 +31,51 @@ H2_ENUM_END(CombatLayoutConstant)
 
 VA(0x004867c0, 0x279)
 i32 combatManager::DoSpellAI(i32 side, i32 restricted) {
-    i32 bestSpellChoice;
+    SpellType bestSpellChoice;
     i32 effectScore;
-    i32 spellIndex;
+    i32 sideIndex;
+    SpellType spell;
     i32 bestHexWork;
     i32 candidateHex;
     i32 bestEffectWork;
     i32 manaRatioResult;
 
     bestEffectWork = 0;
-    bestSpellChoice = -1;
+    bestSpellChoice = SPELL_NONE;
     bestHexWork = -1;
 
     if (m_heroes[side] == NULL)
         return 0;
 
-    for (spellIndex = 0; spellIndex < COMBAT_SIDE_COUNT; spellIndex++) {
-        if (m_heroes[spellIndex] != NULL
-            && m_heroes[spellIndex]->HasArtifact(ARTIFACT_SPHERE_NEGATION))
+    for (sideIndex = 0; sideIndex < COMBAT_SIDE_COUNT; sideIndex++) {
+        if (m_heroes[sideIndex] != NULL
+            && m_heroes[sideIndex]->HasArtifact(ARTIFACT_SPHERE_NEGATION))
             return 0;
     }
 
-    for (spellIndex = 0; spellIndex < IDX(SPELL_COUNT); spellIndex++) {
-        if (m_heroes[side]->HasSpell(SpellType(spellIndex))
-            && HAS(gsSpellInfo[spellIndex].attributes, SPELL_INFO_ATTRIBUTE_COMBAT)
-            && GetManaCost(SpellType(spellIndex), m_heroes[side])
-                   <= m_heroes[side]->m_spellPoints) {
-            if (restricted && spellIndex != IDX(SPELL_FIREBALL)
-                && spellIndex != IDX(SPELL_FIREBLAST) && spellIndex != IDX(SPELL_LIGHTNING_BOLT)
-                && spellIndex != IDX(SPELL_CHAIN_LIGHTNING) && spellIndex != IDX(SPELL_HOLY_WORD)
-                && spellIndex != IDX(SPELL_HOLY_SHOUT) && spellIndex != IDX(SPELL_MAGIC_ARROW)
-                && spellIndex != IDX(SPELL_ARMAGEDDON) && spellIndex != IDX(SPELL_ELEMENTAL_STORM)
-                && spellIndex != IDX(SPELL_METEOR_SHOWER) && spellIndex != IDX(SPELL_COLD_RAY)
-                && spellIndex != IDX(SPELL_COLD_RING) && spellIndex != IDX(SPELL_DEATH_RIPPLE)
-                && spellIndex != IDX(SPELL_DEATH_WAVE))
+    for (spell = SPELL_FIREBALL; spell < SPELL_COUNT; spell++) {
+        if (m_heroes[side]->HasSpell(spell)
+            && HAS(gsSpellInfo[IDX(spell)].attributes, SPELL_INFO_ATTRIBUTE_COMBAT)
+            && GetManaCost(spell, m_heroes[side]) <= m_heroes[side]->m_spellPoints) {
+            if (restricted && spell != SPELL_FIREBALL && spell != SPELL_FIREBLAST
+                && spell != SPELL_LIGHTNING_BOLT && spell != SPELL_CHAIN_LIGHTNING
+                && spell != SPELL_HOLY_WORD && spell != SPELL_HOLY_SHOUT
+                && spell != SPELL_MAGIC_ARROW && spell != SPELL_ARMAGEDDON
+                && spell != SPELL_ELEMENTAL_STORM && spell != SPELL_METEOR_SHOWER
+                && spell != SPELL_COLD_RAY && spell != SPELL_COLD_RING
+                && spell != SPELL_DEATH_RIPPLE && spell != SPELL_DEATH_WAVE)
                 continue;
-            DetermineEffectOfSpell(SpellType(spellIndex), &effectScore, &candidateHex);
+            DetermineEffectOfSpell(spell, &effectScore, &candidateHex);
 
             manaRatioResult =
-                m_heroes[side]->m_spellPoints / GetManaCost(SpellType(spellIndex), m_heroes[side]);
+                m_heroes[side]->m_spellPoints / GetManaCost(spell, m_heroes[side]);
             if (manaRatioResult > SPELL_AI_MAX_MANA_RATIO)
                 manaRatioResult = SPELL_AI_MAX_MANA_RATIO;
             effectScore = static_cast<i32>(effectScore * gfSpellCastableCombatMod[manaRatioResult]);
 
             if (effectScore > bestEffectWork) {
                 bestEffectWork = effectScore;
-                bestSpellChoice = spellIndex;
+                bestSpellChoice = spell;
                 bestHexWork = candidateHex;
             }
         }
@@ -84,7 +83,7 @@ i32 combatManager::DoSpellAI(i32 side, i32 restricted) {
 
     if (bestEffectWork > 0) {
         giNextAction = ACTION_CAST_SPELL;
-        giNextActionExtra = bestSpellChoice;
+        giNextActionExtra = IDX(bestSpellChoice);
         giNextActionGridIndex = bestHexWork;
         return 1;
     }
