@@ -22,10 +22,6 @@ H2_ENUM_BEGIN(CombatLayoutConstant)
     SPELL_AI_ANY_SIDE                   = 2,
     SPELL_AI_MAX_DURATION               = 10,
     SPELL_AI_MAX_MANA_RATIO             = 10,
-    SPELL_AI_EARTHQUAKE_WALL_FIRST      = 4,
-    SPELL_AI_EARTHQUAKE_WALL_COUNT      = 4,
-    SPELL_AI_WALL_DAMAGED               = 2,
-    SPELL_AI_WALL_DESTROYED             = 6,
     SPELL_AI_EARTHQUAKE_NO_DAMAGE_SCORE = 29999,
     SPELL_AI_EARTHQUAKE_WALL_SCORE      = 100,
     SPELL_AI_HEX_ROW_END_OFFSET         = 2,
@@ -692,18 +688,17 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
             case SPELL_EARTHQUAKE:
                 if (m_currentSide == COMBAT_ATTACKER_SIDE && m_inCastleCombat != 0) {
                     wallsDamagedTotal = 0;
-                    for (indexWork = 0; indexWork < SPELL_AI_EARTHQUAKE_WALL_COUNT;
-                         indexWork++) {
-                        if (m_wallStates[indexWork + SPELL_AI_EARTHQUAKE_WALL_FIRST]
-                                == SPELL_AI_WALL_DAMAGED
-                            || m_wallStates[indexWork + SPELL_AI_EARTHQUAKE_WALL_FIRST]
-                                   == SPELL_AI_WALL_DESTROYED)
+                    for (indexWork = 0; indexWork < COMBAT_WALL_SECTION_COUNT; indexWork++) {
+                        if (m_wallStates[indexWork + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
+                                == COMBAT_WALL_STATE_DESTROYED
+                            || m_wallStates[indexWork + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
+                                   == COMBAT_WALL_STATE_SECTION_DESTROYED)
                             wallsDamagedTotal++;
                     }
                     if (wallsDamagedTotal == 0)
                         effect = SPELL_AI_EARTHQUAKE_NO_DAMAGE_SCORE;
-                    else if (wallsDamagedTotal < SPELL_AI_EARTHQUAKE_WALL_COUNT)
-                        effect = (SPELL_AI_EARTHQUAKE_WALL_COUNT - wallsDamagedTotal)
+                    else if (wallsDamagedTotal < COMBAT_WALL_SECTION_COUNT)
+                        effect = (COMBAT_WALL_SECTION_COUNT - wallsDamagedTotal)
                                  * SPELL_AI_EARTHQUAKE_WALL_SCORE;
                     else
                         effect = 0;

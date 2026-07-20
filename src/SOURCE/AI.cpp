@@ -244,13 +244,15 @@ void combatManager::DoCompAI(i32) {
                 enemyShooterStrength18 =
                     static_cast<i32>(enemyShooterStrength18) / COMBAT_AI_SIDE_COUNT;
         }
-        if (m_wallStates[COMBAT_AI_WALL_GATE] == 0) {
+        if (m_wallStates[IDX(COMBAT_WALL_SLOT_KEEP)] == COMBAT_WALL_STATE_KEEP_STANDING) {
             castle2 = m_combatTowns[COMBAT_DEFENDER_SIDE];
             m_combatTowns[COMBAT_DEFENDER_SIDE]->CalcNumLevelArchers(&numArchers6, &archerLevel18);
             extraArchers29 = 0;
-            if (m_wallStates[COMBAT_AI_WALL_LEFT_TOWER] == COMBAT_AI_WALL_INTACT)
+            if (m_wallStates[IDX(COMBAT_WALL_SLOT_TOP_TOWER)]
+                == COMBAT_WALL_STATE_TOWER_STANDING)
                 extraArchers29 += numArchers6 / COMBAT_AI_SIDE_COUNT;
-            if (m_wallStates[COMBAT_AI_WALL_RIGHT_TOWER] == COMBAT_AI_WALL_INTACT)
+            if (m_wallStates[IDX(COMBAT_WALL_SLOT_BOTTOM_TOWER)]
+                == COMBAT_WALL_STATE_TOWER_STANDING)
                 extraArchers29 += numArchers6 / COMBAT_AI_SIDE_COUNT;
             numArchers6 += extraArchers29;
             towerStrength4 = static_cast<i32>(

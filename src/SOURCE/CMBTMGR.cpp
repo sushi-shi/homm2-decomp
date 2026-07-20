@@ -1258,25 +1258,25 @@ void combatManager::CatAttack(i32 side) {
     i32 advancedRoll5;
     i32 index28;
 
-    if (m_wallStates[IDX(COMBAT_WALL_SLOT_SECTION_FIRST)] != IDX(COMBAT_WALL_STATE_DESTROYED)
+    if (m_wallStates[IDX(COMBAT_WALL_SLOT_SECTION_FIRST)] != COMBAT_WALL_STATE_DESTROYED
         && m_wallStates[IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
-               != IDX(COMBAT_WALL_STATE_SECTION_DESTROYED))
+               != COMBAT_WALL_STATE_SECTION_DESTROYED)
         wallCount7++;
-    if (m_wallStates[IDX(COMBAT_WALL_SLOT_SECTION_SECOND)] != IDX(COMBAT_WALL_STATE_DESTROYED)
+    if (m_wallStates[IDX(COMBAT_WALL_SLOT_SECTION_SECOND)] != COMBAT_WALL_STATE_DESTROYED
         && m_wallStates[IDX(COMBAT_WALL_SLOT_SECTION_SECOND)]
-               != IDX(COMBAT_WALL_STATE_SECTION_DESTROYED))
+               != COMBAT_WALL_STATE_SECTION_DESTROYED)
         wallCount7++;
-    if (m_wallStates[IDX(COMBAT_WALL_SLOT_SECTION_THIRD)] != IDX(COMBAT_WALL_STATE_DESTROYED)
+    if (m_wallStates[IDX(COMBAT_WALL_SLOT_SECTION_THIRD)] != COMBAT_WALL_STATE_DESTROYED
         && m_wallStates[IDX(COMBAT_WALL_SLOT_SECTION_THIRD)]
-               != IDX(COMBAT_WALL_STATE_SECTION_DESTROYED))
+               != COMBAT_WALL_STATE_SECTION_DESTROYED)
         wallCount7++;
-    if (m_wallStates[IDX(COMBAT_WALL_SLOT_SECTION_FOURTH)] != IDX(COMBAT_WALL_STATE_DESTROYED)
+    if (m_wallStates[IDX(COMBAT_WALL_SLOT_SECTION_FOURTH)] != COMBAT_WALL_STATE_DESTROYED
         && m_wallStates[IDX(COMBAT_WALL_SLOT_SECTION_FOURTH)]
-               != IDX(COMBAT_WALL_STATE_SECTION_DESTROYED))
+               != COMBAT_WALL_STATE_SECTION_DESTROYED)
         wallCount7++;
-    if (m_wallStates[IDX(COMBAT_WALL_SLOT_TOP_TOWER)] == IDX(COMBAT_WALL_STATE_TOWER_STANDING))
+    if (m_wallStates[IDX(COMBAT_WALL_SLOT_TOP_TOWER)] == COMBAT_WALL_STATE_TOWER_STANDING)
         towerCount1++;
-    if (m_wallStates[IDX(COMBAT_WALL_SLOT_BOTTOM_TOWER)] == IDX(COMBAT_WALL_STATE_TOWER_STANDING))
+    if (m_wallStates[IDX(COMBAT_WALL_SLOT_BOTTOM_TOWER)] == COMBAT_WALL_STATE_TOWER_STANDING)
         towerCount1++;
 
     if (wallCount7 != 0) {
@@ -1285,22 +1285,22 @@ void combatManager::CatAttack(i32 side) {
         while (random8 != 0) {
             wallIndex17++;
             if (m_wallStates[wallIndex17 + COMBAT_WALL_SLOT_SECTION_FIRST]
-                    != IDX(COMBAT_WALL_STATE_DESTROYED)
+                    != COMBAT_WALL_STATE_DESTROYED
                 && m_wallStates[wallIndex17 + COMBAT_WALL_SLOT_SECTION_FIRST]
-                       != IDX(COMBAT_WALL_STATE_SECTION_DESTROYED))
+                       != COMBAT_WALL_STATE_SECTION_DESTROYED)
                 random8--;
         }
     } else if (towerCount1 != 0) {
         random8 %= towerCount1;
         if (random8 == 1
-            || m_wallStates[IDX(COMBAT_WALL_SLOT_TOP_TOWER)] == IDX(COMBAT_WALL_STATE_DESTROYED))
+            || m_wallStates[IDX(COMBAT_WALL_SLOT_TOP_TOWER)] == COMBAT_WALL_STATE_DESTROYED)
             towerIndex27 = COMBAT_WALL_SLOT_BOTTOM_TOWER;
         else
             towerIndex27 = COMBAT_WALL_SLOT_TOP_TOWER;
     } else if (m_drawbridgeState != COMBAT_CASTLE_GATE_HIDDEN) {
         gateIndex2 = 1;
     } else {
-        if (m_wallStates[IDX(COMBAT_WALL_SLOT_KEEP)] == IDX(COMBAT_WALL_STATE_KEEP_STANDING))
+        if (m_wallStates[IDX(COMBAT_WALL_SLOT_KEEP)] == COMBAT_WALL_STATE_KEEP_STANDING)
             keepIndex6 = 0;
     }
 
@@ -1557,33 +1557,33 @@ void combatManager::CatAttack(i32 side) {
             && !missShot19) {
             if (wallIndex17 != -1) {
                 if (m_wallStates[wallIndex17 + COMBAT_WALL_SLOT_SECTION_FIRST]
-                        >= IDX(COMBAT_WALL_STATE_SECTION_DAMAGE_FIRST)
+                        >= COMBAT_WALL_STATE_SECTION_DAMAGE_FIRST
                     && m_wallStates[wallIndex17 + COMBAT_WALL_SLOT_SECTION_FIRST]
-                           <= IDX(COMBAT_WALL_STATE_SECTION_DAMAGE_LAST)) {
+                           <= COMBAT_WALL_STATE_SECTION_DAMAGE_LAST) {
                     m_wallStates[wallIndex17 + COMBAT_WALL_SLOT_SECTION_FIRST] +=
                         IDX(damageLevel13);
                     if (m_wallStates[wallIndex17 + COMBAT_WALL_SLOT_SECTION_FIRST]
-                        > IDX(COMBAT_WALL_STATE_SECTION_DAMAGE_LAST))
+                        > COMBAT_WALL_STATE_SECTION_DAMAGE_LAST)
                         m_wallStates[wallIndex17 + COMBAT_WALL_SLOT_SECTION_FIRST] =
-                            IDX(COMBAT_WALL_STATE_SECTION_DESTROYED);
+                            COMBAT_WALL_STATE_SECTION_DESTROYED;
                 } else {
                     if (damageLevel13 > CATAPULT_DAMAGE_NORMAL)
                         m_wallStates[wallIndex17 + COMBAT_WALL_SLOT_SECTION_FIRST] =
-                            IDX(COMBAT_WALL_STATE_DESTROYED);
+                            COMBAT_WALL_STATE_DESTROYED;
                     else
                         m_wallStates[wallIndex17 + COMBAT_WALL_SLOT_SECTION_FIRST]++;
                 }
                 if (m_wallStates[wallIndex17 + COMBAT_WALL_SLOT_SECTION_FIRST]
-                        == IDX(COMBAT_WALL_STATE_DESTROYED)
+                        == COMBAT_WALL_STATE_DESTROYED
                     || m_wallStates[wallIndex17 + COMBAT_WALL_SLOT_SECTION_FIRST]
-                           == IDX(COMBAT_WALL_STATE_SECTION_DESTROYED))
+                           == COMBAT_WALL_STATE_SECTION_DESTROYED)
                     m_hexCells[iWallToHexCell[wallIndex17]].m_blocked = 0;
             } else if (towerIndex27 != COMBAT_WALL_SLOT_NONE) {
-                m_wallStates[IDX(towerIndex27)] = IDX(COMBAT_WALL_STATE_DESTROYED);
+                m_wallStates[IDX(towerIndex27)] = COMBAT_WALL_STATE_DESTROYED;
             } else if (gateIndex2 != -1) {
                 m_drawbridgeState = COMBAT_CASTLE_GATE_HIDDEN;
             } else if (keepIndex6 != -1) {
-                m_wallStates[IDX(COMBAT_WALL_SLOT_KEEP)] = IDX(COMBAT_WALL_STATE_KEEP_DESTROYED);
+                m_wallStates[IDX(COMBAT_WALL_SLOT_KEEP)] = COMBAT_WALL_STATE_KEEP_DESTROYED;
             }
         }
     }
@@ -1604,13 +1604,13 @@ void combatManager::KeepAttack(H2_ENUM_PARAM(CombatTowerSelector, i32) tower) {
     if (!m_inCastleCombat)
         return;
     if ((tower == COMBAT_TOWER_GARRISON
-         && m_wallStates[IDX(COMBAT_WALL_SLOT_KEEP)] != IDX(COMBAT_WALL_STATE_KEEP_STANDING))
+         && m_wallStates[IDX(COMBAT_WALL_SLOT_KEEP)] != COMBAT_WALL_STATE_KEEP_STANDING)
         || (tower == COMBAT_TOWER_TOP
             && m_wallStates[IDX(COMBAT_WALL_SLOT_TOP_TOWER)]
-                   != IDX(COMBAT_WALL_STATE_TOWER_STANDING))
+                   != COMBAT_WALL_STATE_TOWER_STANDING)
         || (tower == COMBAT_TOWER_BOTTOM
             && m_wallStates[IDX(COMBAT_WALL_SLOT_BOTTOM_TOWER)]
-                   != IDX(COMBAT_WALL_STATE_TOWER_STANDING)))
+                   != COMBAT_WALL_STATE_TOWER_STANDING))
         return;
 
     LogStr("KA1");
@@ -1806,23 +1806,23 @@ void combatManager::SetupAndLoadObstacles(void) {
 
     m_debugFormation = 0;
     if (m_inCastleCombat) {
-        m_wallStates[IDX(COMBAT_WALL_SLOT_KEEP)] = IDX(COMBAT_WALL_STATE_KEEP_STANDING);
+        m_wallStates[IDX(COMBAT_WALL_SLOT_KEEP)] = COMBAT_WALL_STATE_KEEP_STANDING;
         for (cellIndex1 = 0; cellIndex1 < COMBAT_CASTLE_STRUCTURE_COUNT; cellIndex1++) {
             m_wallStates[cellIndex1 + COMBAT_WALL_SLOT_SECTION_FIRST] =
-                IDX(COMBAT_WALL_STATE_KEEP_STANDING);
+                COMBAT_WALL_STATE_KEEP_STANDING;
             if (m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type == FACTION_KNIGHT
                 && (m_combatTowns[COMBAT_DEFENDER_SIDE]->m_buildings
                     & IDX(TOWN_BUILDING_FORTIFICATIONS))) {
                 m_wallStates[cellIndex1 + COMBAT_WALL_SLOT_SECTION_FIRST] =
-                    IDX(COMBAT_WALL_STATE_SECTION_DAMAGE_FIRST);
+                    COMBAT_WALL_STATE_SECTION_DAMAGE_FIRST;
             }
-            m_wallStates[cellIndex1] = IDX(COMBAT_WALL_STATE_KEEP_STANDING);
+            m_wallStates[cellIndex1] = COMBAT_WALL_STATE_KEEP_STANDING;
         }
         if (m_combatTowns[COMBAT_DEFENDER_SIDE]->m_buildings & IDX(TOWN_BUILDING_LEFT_TURRET))
-            m_wallStates[IDX(COMBAT_WALL_SLOT_TOP_TOWER)] = IDX(COMBAT_WALL_STATE_TOWER_STANDING);
+            m_wallStates[IDX(COMBAT_WALL_SLOT_TOP_TOWER)] = COMBAT_WALL_STATE_TOWER_STANDING;
         if (m_combatTowns[COMBAT_DEFENDER_SIDE]->m_buildings & IDX(TOWN_BUILDING_RIGHT_TURRET))
             m_wallStates[IDX(COMBAT_WALL_SLOT_BOTTOM_TOWER)] =
-                IDX(COMBAT_WALL_STATE_TOWER_STANDING);
+                COMBAT_WALL_STATE_TOWER_STANDING;
 
         m_hexCells[IDX(COMBAT_CASTLE_HEX_TOP_TOWER)].m_blocked = 1;
         m_hexCells[IDX(COMBAT_CASTLE_HEX_TOP_WALL)].m_blocked = 1;
@@ -2064,13 +2064,13 @@ i32 combatManager::ShotIsThroughWall(i32 side, i32 sourceHex, i32 targetHex) {
              structureIndex0++) {
             if (iWallToHexCell[structureIndex0] == traceHex11
                 && m_wallStates[structureIndex0 + COMBAT_WALL_SLOT_SECTION_FIRST]
-                       != IDX(COMBAT_WALL_STATE_DESTROYED)
+                       != COMBAT_WALL_STATE_DESTROYED
                 && m_wallStates[structureIndex0 + COMBAT_WALL_SLOT_SECTION_FIRST]
-                       != IDX(COMBAT_WALL_STATE_SECTION_DESTROYED)) {
+                       != COMBAT_WALL_STATE_SECTION_DESTROYED) {
                 return 1;
             }
             if (iTowerToHexCell[structureIndex0] == traceHex11
-                && m_wallStates[structureIndex0] != IDX(COMBAT_WALL_STATE_DESTROYED)) {
+                && m_wallStates[structureIndex0] != COMBAT_WALL_STATE_DESTROYED) {
                 return 1;
             }
             if (traceHex11 == IDX(COMBAT_CASTLE_HEX_GATE)
