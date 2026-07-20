@@ -170,19 +170,20 @@ void town::BuildBuilding(H2_ENUM_PARAM(BuildingSlotType, i32) building) {
         m_buildings &= ~(IDX(TOWN_BUILDING_DWELLING_6) | IDX(TOWN_BUILDING_UPGRADED_DWELLING_6));
 
     if (building >= BUILDING_SLOT_DWELLING_FIRST && building <= BUILDING_SLOT_DWELLING_SIXTH) {
-        m_garrison[IDX(building) - TOWN_OBJECT_DWELLING_1] =
-            gMonsterDatabase
-                [gDwellingType[IDX(m_type)][IDX(building) - TOWN_OBJECT_DWELLING_1]]
-                    .growth;
+        m_garrison[IDX(building) - IDX(TOWN_OBJECT_DWELLING_1)] =
+            gMonsterDatabase[IDX(
+                gDwellingType[IDX(m_type)][IDX(building) - IDX(TOWN_OBJECT_DWELLING_1)]
+            )]
+                .growth;
     }
     if (building >= BUILDING_SLOT_UPGRADE_FIRST
         && building <= BUILDING_SLOT_SPECIAL_TWENTY_NINE) {
-        m_garrison[IDX(building) - TOWN_OBJECT_DWELLING_1] =
-            m_garrison[IDX(building) - TOWN_OBJECT_DWELLING_6];
+        m_garrison[IDX(building) - IDX(TOWN_OBJECT_DWELLING_1)] =
+            m_garrison[IDX(building) - IDX(TOWN_OBJECT_DWELLING_6)];
     }
     if (building == BUILDING_SLOT_SPECIAL_THIRTY) {
-        m_garrison[IDX(building) - TOWN_OBJECT_DWELLING_1] =
-            m_garrison[IDX(building) - TOWN_OBJECT_DWELLING_2];
+        m_garrison[IDX(building) - IDX(TOWN_OBJECT_DWELLING_1)] =
+            m_garrison[IDX(building) - IDX(TOWN_OBJECT_DWELLING_2)];
     }
     if (building == BUILDING_SLOT_CASTLE) {
         m_buildings &= ~IDX(TOWN_BUILDING_TENT);

@@ -970,8 +970,8 @@ struct _SAMPLE* soundManager::MemorySample(class sample* sampleResource) {
     m_channelVolumes[ch] = static_cast<char>(playbackData->volume);
     iLastVolume[ch] = static_cast<i16>(playbackData->volume);
     AIL_init_sample(smp);
-    AIL_set_sample_type(smp, playbackData->format, 0);
-    AIL_set_sample_playback_rate(smp, playbackData->sampleRate);
+    AIL_set_sample_type(smp, IDX(playbackData->format), 0);
+    AIL_set_sample_playback_rate(smp, IDX(playbackData->sampleRate));
     AIL_set_sample_loop_count(smp, playbackData->loopCount);
     AIL_set_sample_address(smp, playbackData->data, playbackData->size);
     if (gConfig.soundVolume != CONFIG_VOLUME_MUTED)
