@@ -308,13 +308,6 @@ H2_ENUM_BEGIN(BuildingRuleConstant)
     NECROMANCER_CASTLE_UPGRADE_BASE_RESOURCE_VALUE = 1000
 H2_ENUM_END(BuildingRuleConstant)
 
-H2_ENUM_BEGIN(ClearMapExtraSourceLine)
-    CLEAR_MAP_EXTRA_SOURCE_LINE_BASE       = 0x0cbe,
-    CLEAR_MAP_EXTRA_ENTRY_FREE_LINE_OFFSET = 6,
-    CLEAR_MAP_EXTRA_ARRAY_FREE_LINE_OFFSET = 9,
-    CLEAR_MAP_EXTRA_SIZES_FREE_LINE_OFFSET = 13
-H2_ENUM_END(ClearMapExtraSourceLine)
-
 H2_ENUM_BEGIN(HighScoreInputConstant)
     HIGH_SCORE_INPUT_NAME_SIZE   = 20,
     HIGH_SCORE_LAST_SHIFT_SOURCE = HIGH_SCORE_ENTRY_COUNT - 2
@@ -2901,22 +2894,22 @@ void game::ShowLuckInfo(hero* h, i32 dialogType) {
 
 VA(0x0049cc9e, 0xd7)
 void ClearMapExtra(void) {
-    DATA(0x005164bc) static i16 clearMapExtraSourceLineBase = CLEAR_MAP_EXTRA_SOURCE_LINE_BASE;
+    DATA(0x005164bc) static i16 clearMapExtraSourceLineBase = 0x0cbe;
     i32 i;
     for (i = 0; OD_STEER(i) < iMaxMapExtra; i++) {
         if (ppMapExtra[i])
             H2_FREE(
                 ppMapExtra[i],
-                clearMapExtraSourceLineBase + CLEAR_MAP_EXTRA_ENTRY_FREE_LINE_OFFSET
+                clearMapExtraSourceLineBase + 6
             );
     }
     if (ppMapExtra)
-        H2_FREE(ppMapExtra, clearMapExtraSourceLineBase + CLEAR_MAP_EXTRA_ARRAY_FREE_LINE_OFFSET);
+        H2_FREE(ppMapExtra, clearMapExtraSourceLineBase + 9);
     ppMapExtra = NULL;
     if (pwSizeOfMapExtra)
         H2_FREE(
             pwSizeOfMapExtra,
-            clearMapExtraSourceLineBase + CLEAR_MAP_EXTRA_SIZES_FREE_LINE_OFFSET
+            clearMapExtraSourceLineBase + 13
         );
     pwSizeOfMapExtra = NULL;
     iMaxMapExtra = 0;
@@ -3357,14 +3350,9 @@ void AddNetBoxLine(char* str, char color) {
     cNetBoxColor[BOX_LINE_COUNT - 1] = color;
 }
 
-H2_ENUM_BEGIN(ShutdownSourceLine)
-    SHUTDOWN_SOURCE_LINE_BASE      = 0x0ef4,
-    SHUTDOWN_MAP_EXTRA_FREE_OFFSET = 71
-H2_ENUM_END(ShutdownSourceLine)
-
 VA(0x0049e0f2, 0x214)
 void ShutDown(char* msg) {
-    DATA(0x005165e0) static i16 shutdownSourceLineBase = SHUTDOWN_SOURCE_LINE_BASE;
+    DATA(0x005165e0) static i16 shutdownSourceLineBase = 0x0ef4;
     char buf[GLOBAL_TEXT_BUFFER_SIZE];
     if (bInShutDown)
         return;
@@ -3406,7 +3394,7 @@ void ShutDown(char* msg) {
         gEventHandle = NULL;
     }
     if (mapExtra)
-        H2_FREE(mapExtra, shutdownSourceLineBase + SHUTDOWN_MAP_EXTRA_FREE_OFFSET);
+        H2_FREE(mapExtra, shutdownSourceLineBase + 71);
     mapExtra = NULL;
     CloseAIMapVars();
     DeleteMainClasses();
@@ -3455,17 +3443,9 @@ H2_ENUM_BEGIN(SmackFadeConstant)
     SMACK_FADE_RED_COMPONENT     = 0
 H2_ENUM_END(SmackFadeConstant)
 
-H2_ENUM_BEGIN(SmackFadeSourceLine)
-    SMACK_FADE_SOURCE_LINE_BASE     = 0x0f61,
-    SMACK_FADE_PALETTE_ALLOC_OFFSET = 13,
-    SMACK_FADE_LOOKUP_ALLOC_OFFSET  = 14,
-    SMACK_FADE_PALETTE_FREE_OFFSET  = 49,
-    SMACK_FADE_LOOKUP_FREE_OFFSET   = 50
-H2_ENUM_END(SmackFadeSourceLine)
-
 VA(0x0049e3a8, 0x255)
 void SmackFade(u8* src, u8* dst) {
-    DATA(0x00516668) static i16 smackFadeSourceLineBase = SMACK_FADE_SOURCE_LINE_BASE;
+    DATA(0x00516668) static i16 smackFadeSourceLineBase = 0x0f61;
     u8* a;
     u8* f;
     i32 k;
@@ -3481,11 +3461,11 @@ void SmackFade(u8* src, u8* dst) {
     k = -1;
     a = static_cast<u8*>(H2_ALLOC(
         MISC_PALETTE_BYTE_COUNT,
-        smackFadeSourceLineBase + SMACK_FADE_PALETTE_ALLOC_OFFSET
+        smackFadeSourceLineBase + 13
     ));
     f = static_cast<u8*>(H2_ALLOC(
         WINGRAPH_PALETTE_SIZE,
-        smackFadeSourceLineBase + SMACK_FADE_LOOKUP_ALLOC_OFFSET
+        smackFadeSourceLineBase + 14
     ));
     memset(a, 0, MISC_PALETTE_BYTE_COUNT);
     memset(f, 0, WINGRAPH_PALETTE_SIZE);
@@ -3523,19 +3503,13 @@ void SmackFade(u8* src, u8* dst) {
     }
     gpWindowManager->UpdateScreen();
     UpdatePalette(reinterpret_cast<i8*>(dst));
-    H2_FREE(a, smackFadeSourceLineBase + SMACK_FADE_PALETTE_FREE_OFFSET);
-    H2_FREE(f, smackFadeSourceLineBase + SMACK_FADE_LOOKUP_FREE_OFFSET);
+    H2_FREE(a, smackFadeSourceLineBase + 49);
+    H2_FREE(f, smackFadeSourceLineBase + 50);
 }
-
-H2_ENUM_BEGIN(CongratsSourceLine)
-    CONGRATS_SOURCE_LINE_BASE       = 0x0f97,
-    CONGRATS_TEXT_ALLOC_LINE_OFFSET = 9,
-    CONGRATS_TEXT_FREE_LINE_OFFSET  = 78
-H2_ENUM_END(CongratsSourceLine)
 
 VA(0x0049e5fd, 0x303)
 void ShowCongrats(HighScoreType highScoreType) {
-    DATA(0x0051670c) static i16 congratsSourceLineBase = CONGRATS_SOURCE_LINE_BASE;
+    DATA(0x0051670c) static i16 congratsSourceLineBase = 0x0f97;
     u8 savedPalette[CONGRATS_PALETTE_BUFFER_SIZE];
     i32 baseScore;
     i32 score_e;
@@ -3546,7 +3520,7 @@ void ShowCongrats(HighScoreType highScoreType) {
     gpWindowManager->m_updateFlags = 0;
     congratsText = static_cast<char*>(H2_ALLOC(
         CONGRATS_TEXT_SIZE,
-        congratsSourceLineBase + CONGRATS_TEXT_ALLOC_LINE_OFFSET
+        congratsSourceLineBase + 9
     ));
     baseScore = CalcBaseScore(giCurTurn);
     score_e = gpGame->m_difficultyRating * baseScore / CONGRATS_DIFFICULTY_SCALE;
@@ -3603,7 +3577,7 @@ void ShowCongrats(HighScoreType highScoreType) {
         HIGH_SCORE_STANDARD,
         gpGame->m_mapHeader.name
     );
-    H2_FREE(congratsText, congratsSourceLineBase + CONGRATS_TEXT_FREE_LINE_OFFSET);
+    H2_FREE(congratsText, congratsSourceLineBase + 78);
     congratsText = NULL;
     gpWindowManager->m_updateFlags = 1;
     memcpy(gpBufferPalette->m_data, gPalette->m_data, MISC_PALETTE_BYTE_COUNT);
@@ -4661,14 +4635,6 @@ void CheckShingleUpdate(void) {
     }
 }
 
-H2_ENUM_BEGIN(NormalDialogSourceLine)
-    NORMAL_DIALOG_SOURCE_LINE_BASE                = 0x14a5,
-    NORMAL_DIALOG_RESOURCE_TEXT_ALLOC_LINE_OFFSET = 187,
-    NORMAL_DIALOG_SKILL_LEVEL_ALLOC_LINE_OFFSET   = 431,
-    NORMAL_DIALOG_PRIMARY_BONUS_ALLOC_LINE_OFFSET = 457,
-    NORMAL_DIALOG_OR_TEXT_ALLOC_LINE_OFFSET       = 493
-H2_ENUM_END(NormalDialogSourceLine)
-
 H2_ENUM_BEGIN(NormalDialogLayoutConstant)
     NORMAL_DIALOG_PRIMARY_BONUS_TEXT_LENGTH        = 5,
     NORMAL_DIALOG_OR_TEXT_LENGTH                   = 3,
@@ -4762,8 +4728,7 @@ void NormalDialog(
     i32 showOrText,
     i32 timeout
 ) {
-    DATA(0x00516d20) static i16 normalDialogSourceLineBase =
-        NORMAL_DIALOG_SOURCE_LINE_BASE;
+    DATA(0x00516d20) static i16 normalDialogSourceLineBase = 0x14a5;
     i32 panelHeight_p;
     i32 labelY_o;
     widget* borderWidget_o;
@@ -4965,7 +4930,7 @@ void NormalDialog(
 
         resourceText_e[resourceSlot_n] = static_cast<char*>(H2_ALLOC(
             NORMAL_DIALOG_TEXT_LENGTH,
-            normalDialogSourceLineBase + NORMAL_DIALOG_RESOURCE_TEXT_ALLOC_LINE_OFFSET
+            normalDialogSourceLineBase + 187
         ));
         if (resourceType_l[resourceSlot_n] >= NORMAL_DIALOG_RESOURCE_FIRST
             && resourceType_l[resourceSlot_n] <= NORMAL_DIALOG_RESOURCE_LAST) {
@@ -5298,7 +5263,7 @@ void NormalDialog(
 
             resourceText_e[resourceSlot_n] = static_cast<char*>(H2_ALLOC(
                 NORMAL_DIALOG_TEXT_LENGTH,
-                normalDialogSourceLineBase + NORMAL_DIALOG_SKILL_LEVEL_ALLOC_LINE_OFFSET
+                normalDialogSourceLineBase + 431
             ));
             labelY_o = OD_STEER(sizingIconHeight_l) + resourceY_l
                 - NORMAL_DIALOG_SECONDARY_LEVEL_Y_OFFSET;
@@ -5337,7 +5302,7 @@ void NormalDialog(
         if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_PRIMARY_SKILL && showPrimaryBonus_e) {
             char* bonusText = static_cast<char*>(H2_ALLOC(
                 NORMAL_DIALOG_PRIMARY_BONUS_TEXT_LENGTH,
-                normalDialogSourceLineBase + NORMAL_DIALOG_PRIMARY_BONUS_ALLOC_LINE_OFFSET
+                normalDialogSourceLineBase + 457
             ));
             strcpy(bonusText, "+1 ");
             textPanel_h = new textWidget(
@@ -5380,7 +5345,7 @@ void NormalDialog(
     if (showOrText == NORMAL_DIALOG_SHOW_OR_TEXT) {
         orText_f = static_cast<char*>(H2_ALLOC(
             NORMAL_DIALOG_OR_TEXT_LENGTH,
-            normalDialogSourceLineBase + NORMAL_DIALOG_OR_TEXT_ALLOC_LINE_OFFSET
+            normalDialogSourceLineBase + 493
         ));
         strcpy(orText_f, "or");
         textPanel_h = new textWidget(
