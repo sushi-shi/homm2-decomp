@@ -149,7 +149,7 @@ i32 combatManager::ViewGeneral(i32 side, i32 allowActions, i32 quickView) {
                 gText,
                 "%s the %s",
                 m_heroes[side]->m_name,
-                gAlignmentNames[m_heroes[side]->m_cursorType]
+                gAlignmentNames[IDX(m_heroes[side]->m_cursorType)]
             );
         message.payload.widget.command = VIEW_GENERAL_SET_TEXT;
         message.payload.widget.id = GENERAL_NAME_WIDGET;
@@ -391,7 +391,7 @@ void combatManager::ViewArmy(army* viewedArmy, i32 quickView) {
         gpGame->ViewArmy(
             windowX,
             windowY_5,
-            IDX(viewedArmy->m_monsterType),
+            viewedArmy->m_monsterType,
             viewedArmy->m_quantity,
             m_combatTowns[side],
             1,
