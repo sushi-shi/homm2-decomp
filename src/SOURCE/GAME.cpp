@@ -218,6 +218,36 @@ H2_ENUM_BEGIN(RandomMapConstant)
     RANDOM_HERO_AVERAGE_DIVISOR  = 2
 H2_ENUM_END(RandomMapConstant)
 
+H2_ENUM_BEGIN(GameMapSetupConstant)
+    COMPUTER_SCREEN_WIDGET_FIRST          = 1,
+    COMPUTER_SCREEN_WIDGET_LAST           = 6,
+    HEROES_LOGO_X                         = 480,
+    HEROES_LOGO_Y                         = 16,
+    HEROES_LOGO_WIDTH                     = 144,
+    HEROES_LOGO_HEIGHT                    = 144,
+    GAME_SCREEN_WIDTH                     = 640,
+    GAME_SCREEN_HEIGHT                    = 480,
+    ALCHEMIST_LATE_OVERLAY_OFFSET         = 2,
+    DEFAULT_DWELLING_ROLL_CAPACITY        = 12,
+    DEFAULT_DWELLING_ROLL_BUCKET_COUNT    = 10,
+    TOWN_UPGRADE_BUILDING_FIRST           = IDX(BUILDING_SLOT_UPGRADE_FIRST),
+    TOWN_UPGRADE_BUILDING_LAST            = IDX(BUILDING_SLOT_SPECIAL_THIRTY),
+    TOWN_DWELLING_BUILDING_FIRST          = IDX(BUILDING_SLOT_DWELLING_FIRST),
+    TOWN_DWELLING_BUILDING_LAST           = IDX(BUILDING_SLOT_DWELLING_LAST),
+    TOWN_UPGRADE_TO_DWELLING_OFFSET       = 5,
+    MAP_HERO_PROCESS_PASS_COUNT           = 3,
+    MAP_HERO_ASSIGNMENT_PASS              = 0,
+    MAP_HERO_CLASS_PASS                   = 1,
+    MAP_HERO_PLACEMENT_PASS               = 2,
+    MAP_HERO_FRAME_STRIDE                 = IDX(FACTION_NEUTRAL) + 1,
+    MAP_HERO_RANDOM_FACTION_FRAME         = IDX(FACTION_NEUTRAL),
+    MAP_HEROES_PER_FACTION                = GAME_HERO_COUNT / IDX(FACTION_COUNT),
+    MAP_HERO_CLASS_SCAN_RETRY_LIMIT       = 1000,
+    MAP_HERO_SCOUTING_SKILL_INDEX         = IDX(HERO_SKILL_SCOUTING),
+    HERO_CONSISTENCY_PLAYABLE_FACTION_MAX = IDX(FACTION_NECROMANCER),
+    HERO_CONSISTENCY_POOL_THRESHOLD       = 40
+H2_ENUM_END(GameMapSetupConstant)
+
 H2_ENUM_BEGIN(GamePlayerTurnConstant)
     GAME_AI_MUSIC_TRACK            = 28,
     ENVIRONMENT_ORIGIN_TILE_OFFSET = 7
@@ -5545,19 +5575,19 @@ void game::GiveArmy(
         group->m_creatureTypes[i] = static_cast<i8>(IDX(type));
         group->m_creatureCounts[i] = 0;
     } else {
-        for (i = 0; i < 5; i++) {
+        for (i = 0; i < ARMY_GROUP_SLOT_COUNT; i++) {
             if (group->m_creatureTypes[i] == IDX(type))
                 break;
         }
-        if (i >= 5) {
-            for (i = 0; i < 5; i++) {
+        if (i >= ARMY_GROUP_SLOT_COUNT) {
+            for (i = 0; i < ARMY_GROUP_SLOT_COUNT; i++) {
                 if (group->m_creatureTypes[i] < 0) {
                     group->m_creatureCounts[i] = 0;
                     break;
                 }
             }
         }
-        if (i >= 5)
+        if (i >= ARMY_GROUP_SLOT_COUNT)
             return;
     }
     group->m_creatureTypes[i] = static_cast<i8>(IDX(type));
@@ -5568,7 +5598,7 @@ VA(0x00480f68, 0x91)
 i32 game::ExperienceValueOfStack(armyGroup* group, hero* h) {
     i32 exp = 0;
     i32 i;
-    for (i = 0; i < 5; i++) {
+    for (i = 0; i < ARMY_GROUP_SLOT_COUNT; i++) {
         if (group->m_quantities[i] > 0) {
             exp += gMonsterDatabase[group->m_creatureTypes[i]].hitPoints * group->m_quantities[i];
         }
@@ -5634,7 +5664,7 @@ void game::CancelComputerScreen(void) {
     TurnOffAIMusic();
     bShowIt = 1;
     i32 i;
-    for (i = 1; i <= 6; i++) {
+    for (i = COMPUTER_SCREEN_WIDGET_FIRST; i <= COMPUTER_SCREEN_WIDGET_LAST; i++) {
         gpWindowManager->BroadcastMessage(
             MESSAGE_WIDGET,
             WIDGET_COMMAND_CLEAR_FLAGS,
@@ -5650,7 +5680,7 @@ void game::ShowComputerScreen(void) {
         i32 saved = gbThisNetHumanPlayer[giCurPlayer];
         gbThisNetHumanPlayer[giCurPlayer] = 1;
         i32 i;
-        for (i = 1; i <= 6; i++)
+        for (i = COMPUTER_SCREEN_WIDGET_FIRST; i <= COMPUTER_SCREEN_WIDGET_LAST; i++)
             gpWindowManager->BroadcastMessage(
                 MESSAGE_WIDGET,
                 WIDGET_COMMAND_SET_FLAGS,
@@ -5674,8 +5704,25 @@ void game::ShowHeroesLogo(void) {
     if (gpAdvManager->m_openState == 0) {
         gpAdvManager->m_openState = 1;
         icon* theIcon = gpResourceManager->GetIcon("herologo.icn");
-        IconToBitmap(theIcon, gpWindowManager->m_screen, 480, 16, 0, 0, 0, 0, 640, 480, 0);
-        gpWindowManager->UpdateScreenRegion(480, 16, 144, 144);
+        IconToBitmap(
+            theIcon,
+            gpWindowManager->m_screen,
+            HEROES_LOGO_X,
+            HEROES_LOGO_Y,
+            0,
+            0,
+            0,
+            0,
+            GAME_SCREEN_WIDTH,
+            GAME_SCREEN_HEIGHT,
+            0
+        );
+        gpWindowManager->UpdateScreenRegion(
+            HEROES_LOGO_X,
+            HEROES_LOGO_Y,
+            HEROES_LOGO_WIDTH,
+            HEROES_LOGO_HEIGHT
+        );
         gpResourceManager->Dispose(static_cast<resource*>(theIcon));
     }
 }
@@ -5807,7 +5854,7 @@ void game::ProcessMapExtra(void) {
                 if (row > 0)
                     ConvertFlagToLateOverlay(col, row - 1);
                 if (row > 1)
-                    ConvertFlagToLateOverlay(col, row - 2);
+                    ConvertFlagToLateOverlay(col, row - ALCHEMIST_LATE_OVERLAY_OFFSET);
             }
         }
     }
@@ -5823,9 +5870,9 @@ void game::ProcessMapExtra(void) {
 VA(0x00481c47, 0x900)
 void game::SetupTowns(void) {
     DATA(0x004f756c) static i16 setupTownsSourceLineBase = 0x17f9;
-    char defaultDwellingRoll[12];
+    char defaultDwellingRoll[DEFAULT_DWELLING_ROLL_CAPACITY];
     i8 usedSpells[IDX(SPELL_COUNT)];
-    i32 spellsPerLevel[5];
+    i32 spellsPerLevel[TOWN_MAGE_GUILD_LEVEL_COUNT];
     i32 townIndex;
     i32 slot;
     i32 owner;
@@ -5857,7 +5904,7 @@ void game::SetupTowns(void) {
         castle->m_originalOwner = static_cast<i8>(owner);
 
         if (extra->hasCustomArmy) {
-            for (slot = 0; slot < 5; slot++) {
+            for (slot = 0; slot < ARMY_GROUP_SLOT_COUNT; slot++) {
                 castle->m_army.m_troopCounts[slot] = extra->troopCounts[slot];
                 if (static_cast<i16>(castle->m_army.m_troopCounts[slot]) > 0)
                     castle->m_army.m_troopTypes[slot] = extra->troopTypes[slot];
@@ -5865,7 +5912,7 @@ void game::SetupTowns(void) {
                     castle->m_army.m_troopTypes[slot] = -1;
             }
         } else {
-            for (slot = 0; slot < 5; slot++) {
+            for (slot = 0; slot < ARMY_GROUP_SLOT_COUNT; slot++) {
                 castle->m_army.m_troopCounts[slot] = 0;
                 castle->m_army.m_troopTypes[slot] = -1;
             }
@@ -5881,6 +5928,9 @@ void game::SetupTowns(void) {
                 | (castle->m_buildings & (IDX(TOWN_BUILDING_CASTLE) | IDX(TOWN_BUILDING_TENT)));
             castle->m_buildState = extra->mageGuildLevel;
         } else {
+            // The ten-entry table and AI adjustment are retail town-generation
+            // probability payload.
+            // NOLINTBEGIN(readability-magic-numbers)
             defaultDwellingRoll[0] = 1;
             defaultDwellingRoll[1] = 1;
             defaultDwellingRoll[2] = 1;
@@ -5891,31 +5941,42 @@ void game::SetupTowns(void) {
             defaultDwellingRoll[7] = 2;
             defaultDwellingRoll[8] = 1;
             defaultDwellingRoll[9] = 2;
-            dwellingCount = defaultDwellingRoll[Random(0, 99) / 10];
+            dwellingCount =
+                defaultDwellingRoll[Random(0, 99) / DEFAULT_DWELLING_ROLL_BUCKET_COUNT];
             castle->m_buildings |= IDX(TOWN_BUILDING_DWELLING_1);
             if (!gbHumanPlayer[castle->m_owner] && dwellingCount == 1 && Random(1, 10) < 4)
                 dwellingCount++;
+            // NOLINTEND(readability-magic-numbers)
             if (--dwellingCount != 0)
                 castle->m_buildings |= IDX(TOWN_BUILDING_DWELLING_2);
             dwellingCount--;
             castle->m_buildState = 0;
         }
 
-        for (building = 25; building <= 30; building++) {
+        for (building = TOWN_UPGRADE_BUILDING_FIRST; building <= TOWN_UPGRADE_BUILDING_LAST;
+             building++) {
             if (castle->m_buildings & (1 << building)) {
-                if (building == 30)
-                    castle->m_buildings &= -553648129;
+                if (building == TOWN_UPGRADE_BUILDING_LAST)
+                    castle->m_buildings &=
+                        ~(IDX(TOWN_BUILDING_DWELLING_6)
+                          | IDX(TOWN_BUILDING_UPGRADED_DWELLING_6));
                 else
-                    castle->m_buildings &= -1 - (1 << (building - 5));
+                    castle->m_buildings &=
+                        -1 - (1 << (building - TOWN_UPGRADE_TO_DWELLING_OFFSET));
             }
         }
-        for (building = 19; building <= 30; building++) {
+        for (building = TOWN_DWELLING_BUILDING_FIRST;
+             building <= TOWN_DWELLING_BUILDING_LAST;
+             building++) {
             if (castle->m_buildings & (1 << building)) {
-                castle->m_garrison[building - 19] =
-                    gMonsterDatabase[gDwellingType[IDX(castle->m_type)][building - 19]].growth;
+                castle->m_garrison[building - TOWN_DWELLING_BUILDING_FIRST] =
+                    gMonsterDatabase
+                        [gDwellingType[IDX(castle->m_type)]
+                                      [building - TOWN_DWELLING_BUILDING_FIRST]]
+                            .growth;
             }
         }
-        if (castle->m_buildings & 1) {
+        if (castle->m_buildings & IDX(TOWN_BUILDING_MAGE_GUILD)) {
             for (slot = 1; slot <= castle->m_buildState; slot++) {
                 castle->m_spellCounts[slot] = gSpellLimits[slot - 1];
                 if (castle->m_type == FACTION_WIZARD
@@ -5936,6 +5997,9 @@ void game::SetupTowns(void) {
                     IDX(SPELL_NONE);
         }
 
+        // Fixed spell choices, selection weights, and retry limits are retail
+        // mage-guild balance payload.
+        // NOLINTBEGIN(readability-magic-numbers)
         if (castle->m_type == FACTION_NECROMANCER && castle->m_owner != -1
             && !gbHumanPlayer[castle->m_owner]) {
             if (Random(0, 100) < 50)
@@ -6018,6 +6082,7 @@ void game::SetupTowns(void) {
                 }
             }
         }
+        // NOLINTEND(readability-magic-numbers)
         H2_FREE(ppMapExtra[extraIndex], 6375);
         ppMapExtra[extraIndex] = NULL;
     }
@@ -6045,7 +6110,7 @@ void game::ProcessOnMapHeroes(void) {
     town* occupiedTown4;
 
     memset(usedHeroes4, 0, GAME_HERO_COUNT);
-    for (pass19 = 0; pass19 < 3; pass19++) {
+    for (pass19 = 0; pass19 < MAP_HERO_PROCESS_PASS_COUNT; pass19++) {
         for (mapY15 = 0; mapY15 < MAP_HEIGHT; mapY15++) {
             for (mapX0 = 0; mapX0 < MAP_WIDTH; mapX0++) {
                 cell5 = &WORLDMAP->Row(mapY15)[mapX0];
@@ -6059,7 +6124,7 @@ void game::ProcessOnMapHeroes(void) {
                     extraIndex0 = cell5->m_objectMetadata;
                     extra0 = reinterpret_cast<mapHeroExtra*>(ppMapExtra[extraIndex0]);
 
-                    if (pass19 == 0) {
+                    if (pass19 == MAP_HERO_ASSIGNMENT_PASS) {
                         if (extra0->hasCustomHero && extra0->heroId < GAME_HERO_COUNT
                             && !usedHeroes4[extra0->heroId]) {
                             usedHeroes4[extra0->heroId] = 1;
@@ -6070,18 +6135,19 @@ void game::ProcessOnMapHeroes(void) {
                         if (isJail6) {
                             extra0->owner = -1;
                         } else {
-                            extra0->owner = static_cast<i8>(cell5->m_objectIndex / 7);
+                            extra0->owner =
+                                static_cast<i8>(cell5->m_objectIndex / MAP_HERO_FRAME_STRIDE);
                             owner1 = gcColorToPlayerPos[extra0->owner];
                             extra0->owner = static_cast<i8>(owner1);
                         }
                     }
 
-                    if (pass19 == 1) {
+                    if (pass19 == MAP_HERO_CLASS_PASS) {
                         if (isJail6) {
                             heroClass6 = extra0->heroClass;
                         } else {
-                            heroClass6 = cell5->m_objectIndex % 7;
-                            if (heroClass6 == 6) {
+                            heroClass6 = cell5->m_objectIndex % MAP_HERO_FRAME_STRIDE;
+                            if (heroClass6 == MAP_HERO_RANDOM_FACTION_FRAME) {
                                 heroClass6 = m_setupPlayerRace
                                     [gcColorToSetupPos[gpGame->m_players[extra0->owner].m_color]];
                             }
@@ -6091,10 +6157,22 @@ void game::ProcessOnMapHeroes(void) {
                             mapHero0 = GetHero(extra0->heroId);
                             mapHero0->m_cursorType = static_cast<FactionType>(heroClass6);
                         } else {
-                            heroId1 = RandomScan(usedHeroes4, heroClass6 * 9, 9, 1000, 0);
+                            heroId1 = RandomScan(
+                                usedHeroes4,
+                                heroClass6 * MAP_HEROES_PER_FACTION,
+                                MAP_HEROES_PER_FACTION,
+                                MAP_HERO_CLASS_SCAN_RETRY_LIMIT,
+                                0
+                            );
                             if (heroId1 == -1) {
-                                heroId1 = RandomScan(usedHeroes4, 0, GAME_HERO_COUNT, 10000, 0);
-                                heroClass6 = heroId1 / 9;
+                                heroId1 = RandomScan(
+                                    usedHeroes4,
+                                    0,
+                                    GAME_HERO_COUNT,
+                                    RANDOM_SCAN_RETRY_LIMIT,
+                                    0
+                                );
+                                heroClass6 = heroId1 / MAP_HEROES_PER_FACTION;
                             }
                             usedHeroes4[heroId1] = 1;
                             mapHero0 = GetHero(heroId1);
@@ -6105,7 +6183,7 @@ void game::ProcessOnMapHeroes(void) {
                         }
                     }
 
-                    if (pass19 == 2) {
+                    if (pass19 == MAP_HERO_PLACEMENT_PASS) {
                         mapHero0 = GetHero(extra0->heroId);
                         if (!isJail6 && extra0->hasPatrol) {
                             mapHero0->m_patrolX = static_cast<i8>(mapX0);
@@ -6113,7 +6191,8 @@ void game::ProcessOnMapHeroes(void) {
                             mapHero0->m_patrolRadius = extra0->patrolRadius;
                         }
                         if (extra0->hasCustomArmy) {
-                            for (armySlot0 = 0; armySlot0 < 5; armySlot0++) {
+                            for (armySlot0 = 0; armySlot0 < EVENT_RECORD_ARMY_SLOT_COUNT;
+                                 armySlot0++) {
                                 mapHero0->m_army.m_troopCounts[armySlot0] =
                                     extra0->troopCounts[armySlot0];
                                 if (static_cast<i16>(mapHero0->m_army.m_troopCounts[armySlot0]) > 0)
@@ -6123,7 +6202,8 @@ void game::ProcessOnMapHeroes(void) {
                                     mapHero0->m_army.m_troopTypes[armySlot0] = -1;
                             }
                         }
-                        for (artifactSlot10 = 0; artifactSlot10 < 3; artifactSlot10++) {
+                        for (artifactSlot10 = 0; artifactSlot10 < EVENT_RECORD_HERO_ARTIFACT_COUNT;
+                             artifactSlot10++) {
                             if (extra0->artifacts[artifactSlot10] >= 0)
                                 GiveArtifact(
                                     mapHero0,
@@ -6175,11 +6255,13 @@ void game::ProcessOnMapHeroes(void) {
 
                         if (extra0->hasCustomSkills) {
                             mapHero0->m_secondarySkillCount = 0;
-                            for (artifactSlot10 = 0; artifactSlot10 < 14; artifactSlot10++) {
+                            for (artifactSlot10 = 0; artifactSlot10 < IDX(HERO_SKILL_COUNT);
+                                 artifactSlot10++) {
                                 mapHero0->m_secondarySkills[artifactSlot10] = 0;
                                 mapHero0->m_secondarySkillOrder[artifactSlot10] = 0;
                             }
-                            for (artifactSlot10 = 0; artifactSlot10 < 8; artifactSlot10++) {
+                            for (artifactSlot10 = 0; artifactSlot10 < EVENT_RECORD_SKILL_CAPACITY;
+                                 artifactSlot10++) {
                                 if (extra0->skillTypes[artifactSlot10] != -1) {
                                     mapHero0->GiveSS(
                                         extra0->skillTypes[artifactSlot10],
@@ -6193,7 +6275,8 @@ void game::ProcessOnMapHeroes(void) {
                                 mapHero0->m_x,
                                 mapHero0->m_y,
                                 mapHero0->m_owner,
-                                giVisRange[mapHero0->m_secondarySkills[3]]
+                                giVisRange
+                                    [mapHero0->m_secondarySkills[MAP_HERO_SCOUTING_SKILL_INDEX]]
                             );
                         }
                         H2_FREE(ppMapExtra[extraIndex0], 6604);
@@ -6229,14 +6312,16 @@ void game::CheckHeroConsistency(void) {
 
     for (player3 = 0; player3 < m_playerCount; player3++) {
         if (m_playerDead[player3] == 0) {
-            for (slot1 = 0; slot1 < 2; slot1++) {
+            for (slot1 = 0; slot1 < AVAILABLE_HERO_SLOTS; slot1++) {
                 if ((m_availableHeroes[m_players[player3].m_availableHeroIds[slot1]] >= 0
-                     && m_availableHeroes[m_players[player3].m_availableHeroIds[slot1]] <= 5)
-                    || (total26 < 40
+                     && m_availableHeroes[m_players[player3].m_availableHeroIds[slot1]]
+                            <= HERO_CONSISTENCY_PLAYABLE_FACTION_MAX)
+                    || (total26 < HERO_CONSISTENCY_POOL_THRESHOLD
                         && m_availableHeroes[m_players[player3].m_availableHeroIds[slot1]] == -1)) {
                     m_players[player3].m_availableHeroIds[slot1] =
                         static_cast<i8>(GetNewHeroId(player3, FACTION_ANY, 0));
-                    m_availableHeroes[m_players[player3].m_availableHeroIds[slot1]] = 64;
+                    m_availableHeroes[m_players[player3].m_availableHeroIds[slot1]] =
+                        WEEKLY_AVAILABLE_HERO;
                 }
             }
         }
@@ -6246,13 +6331,13 @@ void game::CheckHeroConsistency(void) {
         for (y8 = 0; y8 < MAP_HEIGHT; y8++) {
             cell1 = gpAdvManager->GetCell(x11, y8);
             if (cell1->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MERMAID)) {
-                if (cell1->m_objectMetadata >= 0 && cell1->m_objectMetadata < 54) {
+                if (cell1->m_objectMetadata >= 0 && cell1->m_objectMetadata < GAME_HERO_COUNT) {
                     mapHero3 = &m_heroRecs[cell1->m_objectMetadata];
                     if (mapHero3->m_x != x11 || mapHero3->m_y != y8) {
                         cell1->m_triggerType = 0;
                         cell1->m_objectMetadata = 0;
                     }
-                    if (mapHero3->m_owner < 0 || mapHero3->m_owner >= 6) {
+                    if (mapHero3->m_owner < 0 || mapHero3->m_owner >= GAME_PLAYER_COUNT) {
                         if (mapHero3->m_locationType
                             == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)) {
                             occupiedTown9 = GetCastle(mapHero3->m_occupiedTown);
@@ -6279,15 +6364,15 @@ void game::CheckHeroConsistency(void) {
         }
     }
 
-    for (player3 = 0; player3 < 54; player3++) {
-        for (slot1 = 0; slot1 < 5; slot1++) {
+    for (player3 = 0; player3 < GAME_HERO_COUNT; player3++) {
+        for (slot1 = 0; slot1 < ARMY_GROUP_SLOT_COUNT; slot1++) {
             if (m_heroRecs[player3].m_army.m_troopTypes[slot1] == -1
                 || m_heroRecs[player3].m_army.m_creatureCounts[slot1] < 0)
                 m_heroRecs[player3].m_army.m_creatureCounts[slot1] = 0;
         }
     }
-    for (player3 = 0; player3 < 72; player3++) {
-        for (slot1 = 0; slot1 < 5; slot1++) {
+    for (player3 = 0; player3 < GAME_TOWN_COUNT; player3++) {
+        for (slot1 = 0; slot1 < ARMY_GROUP_SLOT_COUNT; slot1++) {
             if (m_castleRecs[player3].m_army.m_troopTypes[slot1] == -1
                 || m_castleRecs[player3].m_army.m_creatureCounts[slot1] < 0)
                 m_castleRecs[player3].m_army.m_creatureCounts[slot1] = 0;
