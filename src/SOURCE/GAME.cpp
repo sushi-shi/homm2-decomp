@@ -2209,7 +2209,7 @@ void game::RandomizeEvents(void) {
     for (yPos19 = 0; yPos19 < MAP_HEIGHT; yPos19++) {
         for (xPos2 = 0; (xPos2 | 0) < MAP_WIDTH; xPos2++) {
             cell2 = m_worldMap.Row(yPos19) + xPos2;
-            switch (IDX(cell2->m_triggerType)) {
+            switch (cell2->m_triggerType) {
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_WITCH_HUT:
                     cell2->m_objectMetadata = IDX(HERO_SKILL_NECROMANCY);
                     while (cell2->m_objectMetadata == IDX(HERO_SKILL_NECROMANCY)
@@ -4555,7 +4555,7 @@ void game::PerWeek(void) {
             // Retail's per-site refresh values and growth ranges are encoded map-object
             // balance payload. The surrounding case labels provide their semantic owners.
             // NOLINTBEGIN(readability-magic-numbers)
-            switch (IDX(WORLDMAP->Row(mapY5)[mapX8].m_triggerType)) {
+            switch (WORLDMAP->Row(mapY5)[mapX8].m_triggerType) {
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MONSTER: {
                     monsterCount36 = WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata
                                      & IDX(MAP_MONSTER_COUNT_MASK);
@@ -5874,7 +5874,7 @@ void game::ProcessMapExtra(void) {
     for (row = 0; row < MAP_HEIGHT; row++) {
         for (col = 0; MAP_WIDTH > col; col++) {
             cell = WORLDMAP->Row(row) + col;
-            switch (IDX(cell->m_triggerType)) {
+            switch (cell->m_triggerType) {
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE:
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_TOWN:
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_CASTLE:

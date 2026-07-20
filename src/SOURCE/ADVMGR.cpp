@@ -2878,7 +2878,7 @@ i32 advManager::ProcessHover(i32 mouseX, i32 mouseY) {
                     }
                     pointerBaseCursor = routeDaysCount * HOVER_ROUTE_FRAMES_PER_DAY;
 
-                    switch (IDX(hoverCellLocal->m_triggerType & MAP_TRIGGER_TYPE_MASK)) {
+                    switch (hoverCellLocal->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
                         case MAP_OBJECT_BOAT:
                             if (m_cursorType != HERO_TYPE_BOAT) {
                                 gpMouseManager->SetPointer(pointerBaseCursor + POINTER_SAIL);
@@ -4545,7 +4545,7 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                                 case TILESET_TREFIR:
                                 case TILESET_TREFALL:
                                 case TILESET_TREDECI:
-                                    switch (IDX(cellValue->m_triggerType)) {
+                                    switch (cellValue->m_triggerType) {
                                         case MAP_OBJECT_ALCHEMIST_LAB:
                                         case MAP_OBJECT_MINE:
                                         case MAP_OBJECT_SAWMILL:
@@ -4575,7 +4575,7 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                                     break;
                                 default:
                                 radar_default_object:
-                                    switch (IDX(cellValue->m_triggerType)) {
+                                    switch (cellValue->m_triggerType) {
                                         case MAP_OBJECT_ALCHEMIST_LAB:
                                         case MAP_OBJECT_MINE:
                                         case MAP_OBJECT_SAWMILL:
@@ -4835,7 +4835,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
             sprintf(gText, "%s", "Uncharted Territory");
         } else {
 
-            switch (IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)) {
+            switch (currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
                 case MAP_OBJECT_ARTIFACT:
                     sprintf(gText, "%s", "Artifact");
                     break;
@@ -8052,7 +8052,7 @@ AdventureEnvironmentSoundId advManager::GetSoundId(i32 x, i32 y) {
     }
 
     if (currentCell->m_triggerType & MAP_TRIGGER_ACTION_FLAG) {
-        switch (IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)) {
+        switch (currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
             case MAP_OBJECT_ARCHER_HOUSE:
                 return ADVMGR_SOUND_DWELLING;
             case MAP_OBJECT_DWARF_COTTAGE:
@@ -8124,7 +8124,7 @@ AdventureEnvironmentSoundId advManager::GetSoundId(i32 x, i32 y) {
                 break;
         }
     } else {
-        switch (IDX(currentCell->m_triggerType)) {
+        switch (currentCell->m_triggerType) {
             case MAP_OBJECT_TAR_PIT:
                 return ADVMGR_SOUND_TAR_PIT;
             case MAP_OBJECT_LAVA_POOL:
