@@ -349,8 +349,10 @@ void combatManager::SetupCombat(
             m_captain.m_spellPoints =
                 m_captain.Stats(HERO_PRIMARY_KNOWLEDGE) * COMBAT_CAPTAIN_SPELL_POINT_MULTIPLIER;
             m_captain.m_cursorType = m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type;
-            m_captain.m_portrait =
-                IDX(m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type) + COMBAT_CAPTAIN_PORTRAIT_BASE;
+            m_captain.m_portrait = static_cast<HeroPortrait>(
+                IDX(m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type)
+                + IDX(HERO_CAPTAIN_PORTRAIT_FIRST)
+            );
             strcpy(m_captain.m_name, "Captain");
             for (side = 0; side < ARMY_GROUP_SLOT_COUNT; side++)
                 m_captain.m_army.m_creatureTypes[side] = CREATURE_NONE;

@@ -338,7 +338,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
         sprintf(
             iconName4,
             "port%04d.icn",
-            gpGame->m_heroRecs[gpCurPlayer->AvailableHeroId(slot7)].m_portrait
+            IDX(gpGame->m_heroRecs[gpCurPlayer->AvailableHeroId(slot7)].m_portrait)
         );
         message3.payload.widget.data.text = iconName4;
         message3.payload.widget.id = CONTROL_HERO_FIRST + slot7;

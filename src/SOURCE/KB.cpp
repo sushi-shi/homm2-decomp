@@ -2484,7 +2484,7 @@ void CheckEndGame(
                == IDX(END_GAME_ROLAND_CAPTURE_SCENARIO)) {
         hasRoland_j = 0;
         for (player = 0; player < GAME_HERO_COUNT; player++) {
-            if (gpGame->m_heroRecs[player].m_portrait == IDX(CAMPAIGN_HERO_ROLAND)
+            if (gpGame->m_heroRecs[player].m_portrait == CAMPAIGN_HERO_ROLAND
                 && gpGame->m_heroRecs[player].m_owner >= 0
                 && gpGame->m_heroRecs[player].m_owner <= GAME_PLAYER_COUNT - 1) {
                 hasRoland_j = 1;
@@ -2601,8 +2601,9 @@ void CheckEndGame(
             for (campaignHeroIndex = 0; campaignHeroIndex < gpGame->m_players[0].m_heroCount;
                  campaignHeroIndex++) {
                 if (carryoverHeroId == CAMPAIGN_SWITCH_VICTORY_VALUE
-                    || gpGame->m_heroRecs[gpGame->m_players[0].m_heroIds[campaignHeroIndex]]
-                               .m_portrait
+                    || IDX(gpGame->m_heroRecs
+                               [gpGame->m_players[0].m_heroIds[campaignHeroIndex]]
+                                   .m_portrait)
                            == carryoverHeroId) {
                     break;
                 }
