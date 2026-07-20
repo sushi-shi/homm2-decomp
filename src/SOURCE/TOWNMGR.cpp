@@ -1220,7 +1220,7 @@ VA(0x0041595d, 0x1830)
 i32 townManager::Main(tag_message& message) {
     char description_b[BUILDING_DESCRIPTION_CAPACITY];
     i32 exitTown_i = 0;
-    i32 quickView_k = (message.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) != 0;
+    i32 quickView_k = (HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0;
     i32 debugBuilding_e;
     i32 index_i;
     i32 marketplaceCount_m;
@@ -1800,10 +1800,10 @@ i32 townManager::Main(tag_message& message) {
         case MESSAGE_MOUSE_MOVE:
             gpWindowManager->ConvertToHover(message);
             if (message.payload.hover.id == m_lastHoverId
-                && message.payload.hover.modifiers == m_lastHoverSubId)
+                && message.payload.hover.subId == m_lastHoverSubId)
                 return 1;
             m_lastHoverId = message.payload.hover.id;
-            m_lastHoverSubId = message.payload.hover.modifiers;
+            m_lastHoverSubId = message.payload.hover.subId;
             SetCommandAndText(message);
             return 1;
 
@@ -2667,7 +2667,7 @@ i32 MageGuildHandler(tag_message& message) {
         switch (message.payload.widget.command) {
             case WIDGET_COMMAND_SELECT:
             case WIDGET_COMMAND_ALTERNATE_SELECT:
-                quickView_f = message.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON;
+                quickView_f = HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON);
                 spellSlot = -1;
                 if (message.payload.widget.id >= TOWN_MAGE_FIRST_SPELL_CONTROL
                     && message.payload.widget.id
@@ -2868,9 +2868,8 @@ i32 TavernHandler(tag_message& message) {
                     case EVENT_WINDOW_SECOND_BUTTON:
                     case TOWN_DIALOG_CONFIRM:
                         gpWindowManager->m_dialogResult = message.payload.widget.id;
-                        message.payload.widget.id = WIDGET_COMMAND_DIALOG_SELECT;
-                        message.payload.widget.command =
-                            BaseWidgetCommand(message.payload.widget.id);
+                        message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
+                        message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
                         return EVENT_WINDOW_CLOSE;
                     default:
                         break;
@@ -2974,8 +2973,8 @@ i32 SplitArmyHandler(tag_message& message) {
     }
 
     if (handled == 1) {
-        message.payload.widget.id = WIDGET_COMMAND_DIALOG_SELECT;
-        message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
+        message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
+        message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
         return EVENT_WINDOW_CLOSE;
     }
     return EVENT_WINDOW_CONTINUE;

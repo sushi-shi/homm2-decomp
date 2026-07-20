@@ -98,8 +98,6 @@ H2_ENUM_BEGIN(HeroUiConstant)
     UI_SECONDARY_SKILL_ROW3_LAST   = 0x1a7,
     UI_CLOSE                       = 0x7800,
     UI_DISMISS                     = 0x7803,
-    UI_QUICK_VIEW_MODIFIER         = 0x200,
-    UI_SPLIT_MODIFIER_MASK         = 3,
     UI_DIALOG_CLOSE_COMMAND        = 10,
     UI_HANDLER_CONTINUE            = 1,
     UI_HANDLER_CLOSE               = 2,
@@ -1056,7 +1054,10 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
                 else
                     strcpy(gText, cHeroScreen[IDX(TEXT_EMPTY)]);
             } else if (gpHVHero->m_army.m_creatureTypes[armySlot] == CREATURE_NONE) {
-                if (message.payload.widget.parameter & UI_SPLIT_MODIFIER_MASK)
+                if (HAS(
+                        static_cast<MessageModifier>(message.payload.widget.parameter),
+                        MESSAGE_MODIFIER_SHIFT_KEYS
+                    ))
                     sprintf(
                         gText,
                         cHeroScreen[IDX(TEXT_SPLIT_ARMY)],
@@ -1178,7 +1179,10 @@ i32 HeroHandler(struct tag_message& message) {
     i32 nextExperience12;
     i32 level14;
 
-    if (message.payload.widget.parameter & UI_QUICK_VIEW_MODIFIER)
+    if (HAS(
+            static_cast<MessageModifier>(message.payload.widget.parameter),
+            MESSAGE_MODIFIER_RIGHT_BUTTON
+        ))
         quickView0 = 1;
     else
         quickView0 = 0;
@@ -1439,8 +1443,12 @@ i32 HeroHandler(struct tag_message& message) {
                             } else if (quickView0 == 0) {
                                 temporaryCreature =
                                     gpHVHero->m_army.m_creatureTypes[armySlot7];
-                                if ((message.payload.widget.parameter & UI_SPLIT_MODIFIER_MASK)
-                                        == 0
+                                if (!HAS(
+                                        static_cast<MessageModifier>(
+                                            message.payload.widget.parameter
+                                        ),
+                                        MESSAGE_MODIFIER_SHIFT_KEYS
+                                    )
                                     || (gpHVHero->m_army.m_creatureTypes[armySlot7]
                                             != CREATURE_NONE
                                         && gpHVHero->m_army.m_creatureTypes[giHeroScreenSrcIndex]

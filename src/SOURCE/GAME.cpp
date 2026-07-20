@@ -3246,7 +3246,7 @@ i32 ViewSpellsHandler(tag_message& msg) {
         switch (msg.payload.widget.command) {
             case WIDGET_COMMAND_DESELECT:
                 if (msg.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT
-                    || (msg.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) != 0)
+                    || (HAS(static_cast<MessageModifier>(msg.payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0)
                     break;
                 {
                     switch (msg.payload.widget.id) {
@@ -3301,7 +3301,7 @@ i32 ViewSpellsHandler(tag_message& msg) {
             case WIDGET_COMMAND_SELECT:
             case WIDGET_COMMAND_ALTERNATE_SELECT:
                 if (msg.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT
-                    || (msg.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) != 0) {
+                    || (HAS(static_cast<MessageModifier>(msg.payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0) {
                     switch (msg.payload.widget.id) {
                         case VIEW_SPELL_ICON_ID_0:
                         case VIEW_SPELL_ICON_ID_1:

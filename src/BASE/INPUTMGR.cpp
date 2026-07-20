@@ -49,7 +49,7 @@ i32 KeyboardMessageHandler(void*, u32 message, u32, i32l messageData) {
         return 1;
 
     tag_message* event = &gpInputManager->m_eventRing[gpInputManager->m_writeIndex];
-    event->payload.keyboard.modifiers = 0;
+    event->payload.keyboard.modifiers = MESSAGE_MODIFIER_NONE;
     event->payload.keyboard.unknown0x14 = 0;
     event->payload.keyboard.unknown0x10 = 0;
     event->payload.keyboard.unknown0x08 = 0;
@@ -63,7 +63,7 @@ i32 KeyboardMessageHandler(void*, u32 message, u32, i32l messageData) {
                 static_cast<u16>(static_cast<u32l>(messageData) >> IDX(WINDOWS_HIGH_WORD_SHIFT))
                 & IDX(SCAN_CODE_MASK);
             event->payload.keyboard.unknown0x08 = 0;
-            event->payload.keyboard.modifiers = 0;
+            event->payload.keyboard.modifiers = MESSAGE_MODIFIER_NONE;
             switch (event->payload.keyboard.keyCode) {
                 case INPUT_SCAN_CONTROL:
                     gpInputManager->m_modifiers |= MESSAGE_MODIFIER_CONTROL;
@@ -85,7 +85,7 @@ i32 KeyboardMessageHandler(void*, u32 message, u32, i32l messageData) {
                 static_cast<u16>(static_cast<u32l>(messageData) >> IDX(WINDOWS_HIGH_WORD_SHIFT))
                 & IDX(SCAN_CODE_MASK);
             event->payload.keyboard.unknown0x08 = 0;
-            event->payload.keyboard.modifiers = 0;
+            event->payload.keyboard.modifiers = MESSAGE_MODIFIER_NONE;
             switch (event->payload.keyboard.keyCode) {
                 case INPUT_SCAN_CONTROL:
                     gpInputManager->m_modifiers &= MESSAGE_MODIFIER_CLEAR_CONTROL_MASK;
@@ -104,7 +104,7 @@ i32 KeyboardMessageHandler(void*, u32 message, u32, i32l messageData) {
     }
 
     if (event->type != MESSAGE_NONE) {
-        event->payload.keyboard.modifiers = IDX(gpInputManager->m_modifiers);
+        event->payload.keyboard.modifiers = gpInputManager->m_modifiers;
         gpInputManager->m_writeIndex++;
         gpInputManager->m_writeIndex %= IDX(INPUT_EVENT_RING_CAPACITY);
         if (gpInputManager->m_writeIndex == gpInputManager->m_readIndex) {
@@ -117,7 +117,7 @@ i32 KeyboardMessageHandler(void*, u32 message, u32, i32l messageData) {
             if (event->type == MESSAGE_KEY_DOWN && event->payload.keyboard.keyCode == INPUT_SCAN_F12
                 && (event->payload.keyboard.modifiers
                     & (MESSAGE_MODIFIER_RIGHT_SHIFT | MESSAGE_MODIFIER_LEFT_SHIFT))
-                       != 0)
+                       != MESSAGE_MODIFIER_NONE)
                 gpWindowManager->ScreenShot();
             if (event->type == MESSAGE_KEY_DOWN
                 && event->payload.keyboard.keyCode == INPUT_SCAN_F1) {
@@ -142,7 +142,7 @@ i32 MouseMessageHandler(void*, u32 message, u32, i32l messageData) {
     gpInputManager->m_mouseMessageActive = 1;
 
     tag_message* event = &gpInputManager->m_eventRing[gpInputManager->m_writeIndex];
-    event->payload.mouse.modifiers = 0;
+    event->payload.mouse.modifiers = MESSAGE_MODIFIER_NONE;
     event->payload.mouse.screenY = 0;
     event->payload.mouse.screenX = 0;
     event->payload.mouse.y = 0;
@@ -225,7 +225,7 @@ afterMouseCoordinates:
     }
 
     if (event->type != MESSAGE_NONE) {
-        event->payload.mouse.modifiers = IDX(gpInputManager->m_modifiers);
+        event->payload.mouse.modifiers = gpInputManager->m_modifiers;
         gpInputManager->m_writeIndex++;
         gpInputManager->m_writeIndex %= IDX(INPUT_EVENT_RING_CAPACITY);
         i32 readIndex = gpInputManager->m_readIndex;
@@ -348,16 +348,15 @@ void inputManager::AsciiConvert(tag_message& event) {
         event.payload.keyboard.keyCode =
             m_keyState[event.payload.keyboard.keyCode] & IDX(SCAN_CODE_MASK);
 
-    i32 modifiers = event.payload.keyboard.modifiers
-                    & (MESSAGE_MODIFIER_RIGHT_SHIFT | MESSAGE_MODIFIER_LEFT_SHIFT);
-    if (modifiers == 0) {
+    MessageModifier modifiers = event.payload.keyboard.modifiers & MESSAGE_MODIFIER_SHIFT_KEYS;
+    if (modifiers == MESSAGE_MODIFIER_NONE) {
         i32 value = event.payload.keyboard.keyCode;
         if (value > 'A' - 1 && value < 'Z' + 1) {
             value += 'a' - 'A';
             event.payload.keyboard.keyCode = value;
         }
     }
-    if (modifiers != 0) {
+    if (modifiers != MESSAGE_MODIFIER_NONE) {
         switch (event.payload.keyboard.keyCode) {
             case '\'':
                 event.payload.keyboard.keyCode = '"';
@@ -556,7 +555,7 @@ void inputManager::ForceMouseMove(void) {
     gpMouseManager->MouseCoords(event->payload.mouse.x, event->payload.mouse.y);
     event->payload.mouse.screenX = event->payload.mouse.x;
     event->payload.mouse.screenY = event->payload.mouse.y;
-    event->payload.mouse.modifiers = IDX(gpInputManager->m_modifiers);
+    event->payload.mouse.modifiers = gpInputManager->m_modifiers;
     gpInputManager->m_writeIndex++;
     gpInputManager->m_writeIndex %= IDX(INPUT_EVENT_RING_CAPACITY);
     if (gpInputManager->m_writeIndex == gpInputManager->m_readIndex) {

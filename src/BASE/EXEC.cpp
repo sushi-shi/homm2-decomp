@@ -265,7 +265,7 @@ void executive::MainLoop(void) {
                             keepDispatching = 0;
                             break;
                         case MANAGER_HANDLE_EXECUTIVE_MESSAGE:
-                            if ((message.type & MESSAGE_EXECUTIVE) == 0)
+                            if ((message.type & MESSAGE_EXECUTIVE) == MESSAGE_NONE)
                                 break;
                             switch (message.payload.executive.command) {
                                 case EXECUTIVE_COMMAND_TERMINATE_LOOP:

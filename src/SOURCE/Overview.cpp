@@ -1334,7 +1334,10 @@ i32 OverviewHandler(struct tag_message& message) {
             case WIDGET_COMMAND_ALTERNATE_SELECT:
                 quickView15 = 1;
             case WIDGET_COMMAND_SELECT:
-                if (message.payload.keyboard.modifiers & MESSAGE_MODIFIER_RIGHT_BUTTON) {
+                if (HAS(
+                        static_cast<MessageModifier>(message.payload.widget.parameter),
+                        MESSAGE_MODIFIER_RIGHT_BUTTON
+                    )) {
                     quickView15 = 1;
                 }
                 switch (message.payload.widget.id) {

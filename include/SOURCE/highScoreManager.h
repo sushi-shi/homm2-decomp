@@ -43,7 +43,6 @@ H2_ENUM_BEGIN(HighScoreManagerConstant)
     HIGH_SCORE_UPDATE_Y                    = 51,
     HIGH_SCORE_UPDATE_WIDTH                = 76,
     HIGH_SCORE_UPDATE_HEIGHT               = 406,
-    HIGH_SCORE_INPUT_BLOCK_FLAG            = 0x200,
     HIGH_SCORE_MANAGER_OPEN_OK             = 0,
     HIGH_SCORE_MANAGER_CONTINUE            = 1,
     HIGH_SCORE_MANAGER_CLOSE               = 2
