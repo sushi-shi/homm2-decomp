@@ -3016,7 +3016,7 @@ i32 AddScoreToHighScore(
 }
 
 VA(0x0049d2c0, 0x66)
-void BVResMsg(char* s, i32 res, i32 qty) {
+void BVResMsg(char* s, H2_ENUM_PARAM(ResourceType, i32) res, i32 qty) {
     giBottomViewOverride = BOTTOM_VIEW_RESOURCE;
     giBottomViewOverrideEndTime = KBTickCount() + BOTTOM_VIEW_RESOURCE_MESSAGE_DURATION;
     giBottomViewResource = res;
@@ -9943,7 +9943,7 @@ DATA(0x005285bc) i32 giRandomClouds;
 DATA(0x005285c0) char cOverrideDigitalDriver[GLOBAL_DRIVER_NAME_SIZE];
 DATA(0x005285d0) i32 giBottomViewOverrideEndTime;
 DATA(0x005285d8) i8 gArmyEffected[COMBAT_CONTROL_SIDE_COUNT][KB_ARMY_EFFECT_COUNT];
-DATA(0x00528600) i32 giBottomViewResource;
+DATA(0x00528600) H2_ENUM_STORAGE(ResourceType, i32) giBottomViewResource;
 DATA(0x00528604) b32 gbInCampaign;
 DATA(0x00528608) i32 giResExtra1;
 DATA(0x0052860c) i32 giResExtra2;
