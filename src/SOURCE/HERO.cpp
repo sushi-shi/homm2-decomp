@@ -373,8 +373,8 @@ void hero::UseSpell(SpellType spell) {
 }
 
 VA(0x0046ca8b, 0x26)
-void hero::AddSpell(i32 spell, i32) {
-    m_spells[spell] = 1;
+void hero::AddSpell(H2_ENUM_PARAM(SpellType, i32) spell, i32) {
+    m_spells[IDX(spell)] = 1;
 }
 
 VA(0x0046cab1, 0x82)

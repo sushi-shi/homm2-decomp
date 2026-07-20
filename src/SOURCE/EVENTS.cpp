@@ -2583,7 +2583,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(-1, NORMAL_DIALOG_INFO, gText, -1, 0, -1, 0, -1);
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-                eventHero2->AddSpell(eventValue1, eventHero2->Stats(HERO_PRIMARY_KNOWLEDGE));
+                eventHero2->AddSpell(
+                    static_cast<SpellType>(eventValue1),
+                    eventHero2->Stats(HERO_PRIMARY_KNOWLEDGE)
+                );
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
@@ -3511,7 +3514,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             EventWindow(-1, NORMAL_DIALOG_INFO, eventText, -1, 0, -1, 0, -1);
                         } else {
                             eventHero2->AddSpell(
-                                eventValue1,
+                                static_cast<SpellType>(eventValue1),
                                 eventHero2->Stats(HERO_PRIMARY_KNOWLEDGE)
                             );
                             EventWindow(
@@ -6575,7 +6578,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                        <= IDX(eventHero->m_secondarySkills[IDX(HERO_SKILL_WISDOM)])
                               + WISDOM_SPELL_LEVEL_BONUS) {
                 eventHero->AddSpell(
-                    cell->m_objectMetadata - 1,
+                    static_cast<SpellType>(cell->m_objectMetadata - 1),
                     eventHero->Stats(HERO_PRIMARY_KNOWLEDGE)
                 );
             }
@@ -6856,7 +6859,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                     if (combatResult_d == 0) {
                     } else {
                         eventHero->AddSpell(
-                            cell->m_objectMetadata - 1,
+                            static_cast<SpellType>(cell->m_objectMetadata - 1),
                             eventHero->Stats(HERO_PRIMARY_KNOWLEDGE)
                         );
                         cell->m_objectMetadata = MAP_EVENT_DATA_EMPTY;

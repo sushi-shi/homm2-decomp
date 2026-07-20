@@ -6037,7 +6037,7 @@ void game::SetupTowns(void) {
             spellsPerLevel[spellLevel] = 0;
             for (spellSlot = 0; spellSlot < TOWN_MAGE_GUILD_SPELLS_PER_LEVEL; spellSlot++)
                 castle->m_spellSlots[spellLevel * TOWN_MAGE_GUILD_SPELLS_PER_LEVEL + spellSlot] =
-                    IDX(SPELL_NONE);
+                    SPELL_NONE;
         }
 
         // Fixed spell choices, selection weights, and retry limits are retail
@@ -6050,7 +6050,7 @@ void game::SetupTowns(void) {
             else
                 spell = SPELL_DEATH_WAVE;
             spellLevel = gsSpellInfo[IDX(spell)].level - 1;
-            castle->m_spells[spellLevel][spellsPerLevel[spellLevel]] = static_cast<i8>(spell);
+            castle->m_spells[spellLevel][spellsPerLevel[spellLevel]] = spell;
             spellsPerLevel[spellLevel]++;
         }
 
@@ -6064,7 +6064,7 @@ void game::SetupTowns(void) {
         else
             spell = SPELL_CURE;
         spellLevel = gsSpellInfo[IDX(spell)].level - 1;
-        castle->m_spells[spellLevel][spellsPerLevel[spellLevel]] = static_cast<i8>(spell);
+        castle->m_spells[spellLevel][spellsPerLevel[spellLevel]] = spell;
         spellsPerLevel[spellLevel]++;
 
         roll = Random(0, 100);
@@ -6079,16 +6079,18 @@ void game::SetupTowns(void) {
         else
             spell = SPELL_COLD_RING;
         spellLevel = gsSpellInfo[IDX(spell)].level - 1;
-        castle->m_spells[spellLevel][spellsPerLevel[spellLevel]] = static_cast<i8>(spell);
+        castle->m_spells[spellLevel][spellsPerLevel[spellLevel]] = spell;
         spellsPerLevel[spellLevel]++;
 
         for (spellLevel = 0; spellLevel < TOWN_MAGE_GUILD_LEVEL_COUNT; spellLevel++) {
             combatSpells = 0;
             for (spellSlot = 0; spellSlot < TOWN_MAGE_GUILD_SPELLS_PER_LEVEL; spellSlot++) {
                 if (castle->m_spellSlots[spellLevel * TOWN_MAGE_GUILD_SPELLS_PER_LEVEL + spellSlot]
-                    != IDX(SPELL_NONE)) {
-                    usedSpells[castle->m_spellSlots
-                                   [spellLevel * TOWN_MAGE_GUILD_SPELLS_PER_LEVEL + spellSlot]] = 1;
+                    != SPELL_NONE) {
+                    usedSpells[IDX(
+                        castle->m_spellSlots
+                            [spellLevel * TOWN_MAGE_GUILD_SPELLS_PER_LEVEL + spellSlot]
+                    )] = 1;
                 } else {
                     attempts = 0;
                     do {
@@ -6120,7 +6122,7 @@ void game::SetupTowns(void) {
                         combatSpells++;
                     castle
                         ->m_spellSlots[spellLevel * TOWN_MAGE_GUILD_SPELLS_PER_LEVEL + spellSlot] =
-                        static_cast<i8>(spell);
+                        spell;
                     usedSpells[IDX(spell)] = 1;
                 }
             }
