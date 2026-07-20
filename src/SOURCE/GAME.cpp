@@ -426,14 +426,15 @@ H2_ENUM_BEGIN(GameLoadMapConstant)
 H2_ENUM_END(GameLoadMapConstant)
 
 H2_ENUM_BEGIN(GameOwnershipConstant)
-    TOWN_FLAG_FRAME_STRIDE      = 2,
-    TOWN_FLAG_RIGHT_FRAME       = 1,
-    TOWN_NEW_OWNER_TURN_COUNT   = 2,
-    MINE_FLAG_COMMON_OFFSET     = 14,
-    MINE_FLAG_MERCURY_OFFSET    = 21,
-    MINE_FLAG_WOOD_OFFSET       = 28,
-    MINE_FLAG_ALCHEMIST_OFFSET  = 35,
-    MINE_FLAG_LIGHTHOUSE_OFFSET = 42
+    TOWN_FLAG_FRAME_STRIDE       = 2,
+    TOWN_FLAG_RIGHT_FRAME        = 1,
+    TOWN_NEW_OWNER_TURN_COUNT    = 2,
+    MINE_FLAG_COMMON_OFFSET      = 14,
+    MINE_FLAG_MERCURY_OFFSET     = 21,
+    MINE_FLAG_WOOD_OFFSET        = 28,
+    MINE_FLAG_ALCHEMIST_OFFSET   = 35,
+    MINE_FLAG_LIGHTHOUSE_OFFSET  = 42,
+    MINE_ALCHEMIST_FLAG_Y_OFFSET = 3
 H2_ENUM_END(GameOwnershipConstant)
 
 H2_ENUM_BEGIN(GameViewSpellsConstant)
@@ -481,6 +482,62 @@ H2_ENUM_BEGIN(GameViewSpellsConstant)
     VIEW_SPELL_HELP_OTHER              = 5,
     VIEW_SPELL_HELP_MANA               = 8
 H2_ENUM_END(GameViewSpellsConstant)
+
+H2_ENUM_BEGIN(GameViewArmyConstant)
+    VIEW_ARMY_UNUSED_BASE_X           = 86,
+    VIEW_ARMY_UNUSED_QUICK_BASE_Y     = 164,
+    VIEW_ARMY_BLANK_WIDGET_ID         = 1,
+    VIEW_ARMY_COUNT_WIDGET_ID         = 2,
+    VIEW_ARMY_TITLE_WIDGET_ID         = 3,
+    VIEW_ARMY_DETAIL_WIDGET_ID        = 4,
+    VIEW_ARMY_MONSTER_WIDGET_ID       = 5,
+    VIEW_ARMY_UPGRADE_ACTION_ID       = 500,
+    VIEW_ARMY_CLOSE_ID                = 10,
+    VIEW_ARMY_WINDOW_X                = 19,
+    VIEW_ARMY_WINDOW_Y                = 75,
+    VIEW_ARMY_MONSTER_BASE_X          = 167,
+    VIEW_ARMY_MONSTER_BASE_Y          = 138,
+    VIEW_ARMY_LOW_MEMORY_MONSTER_X    = 126,
+    VIEW_ARMY_LOW_MEMORY_MONSTER_Y    = 93,
+    VIEW_ARMY_MONSTER_WIDGET_WIDTH    = 86,
+    VIEW_ARMY_MONSTER_WIDGET_HEIGHT   = 149,
+    VIEW_ARMY_MONSTER_WIDGET_Z_ORDER  = 5,
+    VIEW_ARMY_MONSTER_WIDGET_COLOR    = 16,
+    VIEW_ARMY_ICON_CENTER_DIVISOR     = 2,
+    VIEW_ARMY_FILENAME_SIZE           = 16,
+    VIEW_ARMY_NAME_SIZE               = 32,
+    VIEW_ARMY_ASCII_CASE_OFFSET       = 32,
+    VIEW_ARMY_DETAIL_BUFFER_SIZE      = 550,
+    VIEW_ARMY_TEXT_NEUTRAL_OFFSET     = 3,
+    VIEW_ARMY_WIDGET_VISIBLE_FLAGS    = WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW,
+    VIEW_ARMY_COUNT_TEXT_SIZE         = 12,
+    VIEW_ARMY_SPELL_BASE_Y            = 169,
+    VIEW_ARMY_SPELL_CENTER_X          = 420,
+    VIEW_ARMY_QUICK_SPELL_Y_OFFSET    = 12,
+    VIEW_ARMY_SPELL_SPACING_BASE      = 44,
+    VIEW_ARMY_SPELL_X_BIAS            = 10,
+    VIEW_ARMY_SPELL_VISIBLE_LIMIT     = 6,
+    VIEW_ARMY_SPELL_WIDGET_Y_OFFSET   = 14,
+    VIEW_ARMY_SPELL_WIDGET_ID_BASE    = 200,
+    VIEW_ARMY_SPELL_WIDGET_COLOR      = 16,
+    VIEW_ARMY_ANIMATION_INITIAL_DELAY = 90,
+    VIEW_ARMY_HANDLER_FRAME_DELAY     = 5,
+    VIEW_ARMY_UPGRADE_COST_MULTIPLIER = 2,
+    VIEW_ARMY_DWELLING_UPGRADE_OFFSET =
+        IDX(BUILDING_SLOT_UPGRADE_FIRST) - IDX(BUILDING_SLOT_DWELLING_SECOND)
+H2_ENUM_END(GameViewArmyConstant)
+
+H2_ENUM_BEGIN(GameArmyDetailText)
+    ARMY_DETAIL_ATTACK        = 0,
+    ARMY_DETAIL_DEFENSE       = 1,
+    ARMY_DETAIL_SHOTS_LEFT    = 2,
+    ARMY_DETAIL_DAMAGE        = 3,
+    ARMY_DETAIL_HIT_POINTS    = 4,
+    ARMY_DETAIL_SPEED         = 5,
+    ARMY_DETAIL_MORALE        = 6,
+    ARMY_DETAIL_LUCK          = 7,
+    ARMY_DETAIL_SHOTS_OUTSIDE = 8
+H2_ENUM_END(GameArmyDetailText)
 
 #define GAME_HANDICAP_MODERATE_RESOURCE_FACTOR 0.85
 #define GAME_HANDICAP_SEVERE_RESOURCE_FACTOR 0.7
@@ -2858,7 +2915,7 @@ void game::ClaimMine(i32 mineId, i32 player) {
             break;
         case MINE_TYPE_ALCHEMIST_LAB:
             x = m_mines[mineId].x - 1;
-            y = m_mines[mineId].y - 3;
+            y = m_mines[mineId].y - MINE_ALCHEMIST_FLAG_Y_OFFSET;
             break;
         case MINE_TYPE_LIGHTHOUSE:
             x = m_mines[mineId].x;
@@ -3347,13 +3404,14 @@ void game::ViewArmy(
     i32 groupIndex
 ) {
     DATA(0x004f7388) static i16 viewArmySourceLineBase = 0x0dd1;
-    i16 baseX7 = 86;
-    i16 quickBaseY3 = 164;
-    i16 blankWidget3 = 1;
-    i16 numWidget15 = 2;
-    i16 titleMessage15 = 3;
-    i16 detailMessage2 = 4;
-    i16 frame18 = 5;
+    // Retail initializes these unused UI locals; retaining them preserves the /Od frame.
+    i16 baseX7 = VIEW_ARMY_UNUSED_BASE_X;
+    i16 quickBaseY3 = VIEW_ARMY_UNUSED_QUICK_BASE_Y;
+    i16 blankWidget3 = VIEW_ARMY_BLANK_WIDGET_ID;
+    i16 numWidget15 = VIEW_ARMY_COUNT_WIDGET_ID;
+    i16 titleMessage15 = VIEW_ARMY_TITLE_WIDGET_ID;
+    i16 detailMessage2 = VIEW_ARMY_DETAIL_WIDGET_ID;
+    i16 frame18 = VIEW_ARMY_MONSTER_WIDGET_ID;
     i32 loopIndex0;
     tag_message message6;
     message6.type = MESSAGE_WIDGET;
@@ -3364,14 +3422,19 @@ void game::ViewArmy(
     gbAllowUpgrade = false;
 
     if (castle && (gpAdvManager->m_active || gpTownManager->m_active)) {
-        for (loopIndex0 = 20; loopIndex0 <= 24; loopIndex0++) {
-            if (gDwellingType[IDX(castle->m_type)][loopIndex0 - 19] == monsterType
-                && (castle->m_buildings & (1 << (loopIndex0 + 5)))) {
+        for (loopIndex0 = IDX(BUILDING_SLOT_DWELLING_SECOND);
+             loopIndex0 <= IDX(BUILDING_SLOT_DWELLING_SIXTH);
+             loopIndex0++) {
+            if (gDwellingType[IDX(castle->m_type)]
+                             [loopIndex0 - IDX(BUILDING_SLOT_DWELLING_FIRST)]
+                    == monsterType
+                && (castle->m_buildings
+                    & (1 << (loopIndex0 + VIEW_ARMY_DWELLING_UPGRADE_OFFSET)))) {
                 gbAllowUpgrade = true;
                 iViewArmyUpgradeToType = static_cast<CreatureType>(IDX(monsterType) + 1);
             }
         }
-        if ((monsterType == 35 || monsterType == 36)
+        if ((monsterType == IDX(CREATURE_GREEN_DRAGON) || monsterType == IDX(CREATURE_RED_DRAGON))
             && (castle->m_buildings & IDX(KB_DWELLING_UPGRADE_SIXTH_FLAG))) {
             gbAllowUpgrade = true;
             iViewArmyUpgradeToType = CREATURE_BLACK_DRAGON;
@@ -3385,8 +3448,8 @@ void game::ViewArmy(
     else
         armyMonster11 = &gMonsterDatabase[monsterType];
 
-    x = 19;
-    y = 75;
+    x = VIEW_ARMY_WINDOW_X;
+    y = VIEW_ARMY_WINDOW_Y;
     m_viewArmyWindow = new heroWindow(x, y, const_cast<char*>("armywin.bin"));
     if (!m_viewArmyWindow)
         MemError();
@@ -3400,8 +3463,8 @@ void game::ViewArmy(
     ModifyFrameInfo(&sViewArmyMonFrameInfo, CreatureType(monsterType));
     BuildTempWalkSeq(&sViewArmyMonFrameInfo, 0, 1);
 
-    viewArmyBaseX = 167;
-    char filename4[16];
+    viewArmyBaseX = VIEW_ARMY_MONSTER_BASE_X;
+    char filename4[VIEW_ARMY_FILENAME_SIZE];
     if (gbLowMemory)
         sprintf(filename4, "monh%04d.icn", monsterType);
     else
@@ -3409,26 +3472,29 @@ void game::ViewArmy(
 
     icon* monsterIcon5 = gpResourceManager->GetIcon(filename4);
     i32 iconFrame15 = sViewArmyMonFrameInfo.animationFrames[IDX(ARMY_ANIMATION_WALK)][0];
-    viewArmyBaseX += (GetIconEntry(monsterIcon5, iconFrame15)->w / 2) * viewArmyFacingWIPXMod;
+    viewArmyBaseX += (GetIconEntry(monsterIcon5, iconFrame15)->w
+                      / VIEW_ARMY_ICON_CENTER_DIVISOR)
+                     * viewArmyFacingWIPXMod;
     viewArmyBaseX += GetIconEntry(monsterIcon5, iconFrame15)->x * viewArmyFacingWIPXMod
                      + sViewArmyMonFrameInfo.walkXOffsets[0] * viewArmyFacingWIPXMod;
-    viewArmyBaseY = 138;
-    viewArmyBaseY += GetIconEntry(monsterIcon5, iconFrame15)->h / 2;
+    viewArmyBaseY = VIEW_ARMY_MONSTER_BASE_Y;
+    viewArmyBaseY +=
+        GetIconEntry(monsterIcon5, iconFrame15)->h / VIEW_ARMY_ICON_CENTER_DIVISOR;
     if (gbLowMemory) {
-        viewArmyBaseX = 126;
-        viewArmyBaseY = 93;
+        viewArmyBaseX = VIEW_ARMY_LOW_MEMORY_MONSTER_X;
+        viewArmyBaseY = VIEW_ARMY_LOW_MEMORY_MONSTER_Y;
     }
 
     iconWidget* monsterWidget7 = new iconWidget(
         static_cast<i16>(viewArmyBaseX),
         static_cast<i16>(viewArmyBaseY),
-        86,
-        149,
+        VIEW_ARMY_MONSTER_WIDGET_WIDTH,
+        VIEW_ARMY_MONSTER_WIDGET_HEIGHT,
         filename4,
         gbLowMemory ? 0 : sViewArmyMonFrameInfo.animationFrames[IDX(ARMY_ANIMATION_WALK)][0],
         facing == 0,
-        5,
-        16,
+        VIEW_ARMY_MONSTER_WIDGET_Z_ORDER,
+        VIEW_ARMY_MONSTER_WIDGET_COLOR,
         1
     );
     if (!monsterWidget7)
@@ -3436,25 +3502,30 @@ void game::ViewArmy(
     m_viewArmyWindow->AddWidget(monsterWidget7, -1);
     gpResourceManager->Dispose(monsterIcon5);
 
-    char armyName8[32];
+    char armyName8[VIEW_ARMY_NAME_SIZE];
     strcpy(armyName8, gArmyNames[monsterType]);
-    armyName8[0] -= 32;
+    armyName8[0] -= VIEW_ARMY_ASCII_CASE_OFFSET;
     message6.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-    message6.payload.widget.id = 3;
+    message6.payload.widget.id = VIEW_ARMY_TITLE_WIDGET_ID;
     message6.payload.widget.data.text = armyName8;
     m_viewArmyWindow->BroadcastMessage(message6);
 
-    char* details9 = static_cast<char*>(H2_ALLOC(550, 3684));
+    char* details9 = static_cast<char*>(H2_ALLOC(VIEW_ARMY_DETAIL_BUFFER_SIZE, 3684));
     i32 morale2 = theGroup ? theGroup->GetMorale(theHero, castle, NULL) : 0;
     if (HAS(monster8->flags.all, MONSTER_FLAGS_NO_MORALE))
         morale2 = 0;
 
     sprintf(details9, "");
     i32 modifier15 = 0;
-    sprintf(gText, "%s%d", cArmyDetail[0], static_cast<i32>(monster8->attack));
+    sprintf(
+        gText,
+        "%s%d",
+        cArmyDetail[ARMY_DETAIL_ATTACK],
+        static_cast<i32>(monster8->attack)
+    );
     strcat(details9, gText);
     if (theHero)
-        modifier15 += theHero->Stats(HeroPrimaryStat(0));
+        modifier15 += theHero->Stats(HERO_PRIMARY_ATTACK);
     if (theArmy)
         modifier15 = theArmy->m_monster.attack - monster8->attack;
     if (modifier15) {
@@ -3463,10 +3534,15 @@ void game::ViewArmy(
     }
 
     modifier15 = 0;
-    sprintf(gText, "\n%s%d", cArmyDetail[1], static_cast<i32>(monster8->defense));
+    sprintf(
+        gText,
+        "\n%s%d",
+        cArmyDetail[ARMY_DETAIL_DEFENSE],
+        static_cast<i32>(monster8->defense)
+    );
     strcat(details9, gText);
     if (theHero)
-        modifier15 += theHero->Stats(HeroPrimaryStat(1));
+        modifier15 += theHero->Stats(HERO_PRIMARY_DEFENSE);
     if (theArmy)
         modifier15 = theArmy->m_monster.defense - monster8->defense;
     if (modifier15) {
@@ -3478,20 +3554,30 @@ void game::ViewArmy(
         i32 shots8 = armyMonster11->shots;
         if (shots8 > 0) {
             if (gpCombatManager->m_active)
-                sprintf(gText, "\n%s%d", cArmyDetail[2], shots8);
+                sprintf(gText, "\n%s%d", cArmyDetail[ARMY_DETAIL_SHOTS_LEFT], shots8);
             else
-                sprintf(gText, "\n%s%d", cArmyDetail[8], shots8);
+                sprintf(gText, "\n%s%d", cArmyDetail[ARMY_DETAIL_SHOTS_OUTSIDE], shots8);
             strcat(details9, gText);
         }
     }
 
-    sprintf(gText, "\n%s%d", cArmyDetail[3], static_cast<i32>(monster8->damageMin));
+    sprintf(
+        gText,
+        "\n%s%d",
+        cArmyDetail[ARMY_DETAIL_DAMAGE],
+        static_cast<i32>(monster8->damageMin)
+    );
     strcat(details9, gText);
     if (monster8->damageMin != monster8->damageMax) {
         sprintf(gText, "-%d", static_cast<i32>(monster8->damageMax));
         strcat(details9, gText);
     }
-    sprintf(gText, "\n%s%d", cArmyDetail[4], static_cast<u32>(monster8->hitPoints));
+    sprintf(
+        gText,
+        "\n%s%d",
+        cArmyDetail[ARMY_DETAIL_HIT_POINTS],
+        static_cast<u32>(monster8->hitPoints)
+    );
     strcat(details9, gText);
     if (gpCombatManager->m_active) {
         sprintf(
@@ -3502,77 +3588,91 @@ void game::ViewArmy(
         );
         strcat(details9, gText);
     }
-    sprintf(gText, "\n%s%s", cArmyDetail[5], speedText[armyMonster11->speed]);
+    sprintf(gText, "\n%s%s", cArmyDetail[ARMY_DETAIL_SPEED], speedText[armyMonster11->speed]);
     strcat(details9, gText);
-    sprintf(gText, "\n%s%s", cArmyDetail[6], gMoraleText[morale2 + 3]);
+    sprintf(
+        gText,
+        "\n%s%s",
+        cArmyDetail[ARMY_DETAIL_MORALE],
+        gMoraleText[morale2 + VIEW_ARMY_TEXT_NEUTRAL_OFFSET]
+    );
     strcat(details9, gText);
     i32 luck1 = GetLuck(theHero, theArmy, castle);
-    sprintf(gText, "\n%s%s", cArmyDetail[7], gLuckText[luck1 + 3]);
+    sprintf(
+        gText,
+        "\n%s%s",
+        cArmyDetail[ARMY_DETAIL_LUCK],
+        gLuckText[luck1 + VIEW_ARMY_TEXT_NEUTRAL_OFFSET]
+    );
     strcat(details9, gText);
 
-    message6.payload.widget.id = 4;
+    message6.payload.widget.id = VIEW_ARMY_DETAIL_WIDGET_ID;
     message6.payload.widget.data.text = details9;
     m_viewArmyWindow->BroadcastMessage(message6);
     if (!gbAllowUpgrade) {
         message6.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-        message6.payload.widget.data.text = reinterpret_cast<char*>(6);
-        message6.payload.widget.id = 500;
+        message6.payload.widget.data.value = VIEW_ARMY_WIDGET_VISIBLE_FLAGS;
+        message6.payload.widget.id = VIEW_ARMY_UPGRADE_ACTION_ID;
         m_viewArmyWindow->BroadcastMessage(message6);
     }
     if (disableUpgrade) {
         message6.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-        message6.payload.widget.data.text = reinterpret_cast<char*>(6);
+        message6.payload.widget.data.value = VIEW_ARMY_WIDGET_VISIBLE_FLAGS;
         message6.payload.widget.id = VIEW_ARMY_UPGRADE_ID;
         m_viewArmyWindow->BroadcastMessage(message6);
     }
     if (quickView) {
         message6.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-        message6.payload.widget.data.text = reinterpret_cast<char*>(6);
+        message6.payload.widget.data.value = VIEW_ARMY_WIDGET_VISIBLE_FLAGS;
         message6.payload.widget.id = VIEW_ARMY_QUICK_VIEW_ID;
         m_viewArmyWindow->BroadcastMessage(message6);
     }
     if (numTroops < 1) {
         message6.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-        message6.payload.widget.data.text = reinterpret_cast<char*>(6);
-        message6.payload.widget.id = 1;
+        message6.payload.widget.data.value = VIEW_ARMY_WIDGET_VISIBLE_FLAGS;
+        message6.payload.widget.id = VIEW_ARMY_BLANK_WIDGET_ID;
         m_viewArmyWindow->BroadcastMessage(message6);
-        message6.payload.widget.id = 2;
+        message6.payload.widget.id = VIEW_ARMY_COUNT_WIDGET_ID;
         m_viewArmyWindow->BroadcastMessage(message6);
     } else {
-        char countText[12];
+        char countText[VIEW_ARMY_COUNT_TEXT_SIZE];
         sprintf(countText, "%d", numTroops);
         message6.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-        message6.payload.widget.id = 2;
+        message6.payload.widget.id = VIEW_ARMY_COUNT_WIDGET_ID;
         message6.payload.widget.data.text = countText;
         m_viewArmyWindow->BroadcastMessage(message6);
     }
 
     if (theArmy) {
-        i32 spellY3 = 169;
-        i32 spellCenterX8 = 420;
+        i32 spellY3 = VIEW_ARMY_SPELL_BASE_Y;
+        i32 spellCenterX8 = VIEW_ARMY_SPELL_CENTER_X;
         if (quickView)
-            spellY3 += 12;
-        i32 spacing0 = 44 - theArmy->m_spellCount;
+            spellY3 += VIEW_ARMY_QUICK_SPELL_Y_OFFSET;
+        i32 spacing0 = VIEW_ARMY_SPELL_SPACING_BASE - theArmy->m_spellCount;
         i32 spellX3 =
-            10 - theArmy->m_spellCount + spellCenterX8 - (theArmy->m_spellCount * spacing0) / 2;
+            VIEW_ARMY_SPELL_X_BIAS - theArmy->m_spellCount + spellCenterX8
+            - (theArmy->m_spellCount * spacing0) / VIEW_ARMY_ICON_CENTER_DIVISOR;
         i32 spellIndex9 = -1;
-        for (loopIndex0 = 0; loopIndex0 < (theArmy->m_spellCount < 6 ? theArmy->m_spellCount : 6);
+        for (loopIndex0 = 0;
+             loopIndex0 < (theArmy->m_spellCount < VIEW_ARMY_SPELL_VISIBLE_LIMIT
+                               ? theArmy->m_spellCount
+                               : VIEW_ARMY_SPELL_VISIBLE_LIMIT);
              loopIndex0++) {
             spellIndex9++;
-            for (; spellIndex9 < 15; spellIndex9++) {
+            for (; spellIndex9 < ARMY_SPELL_INFLUENCE_COUNT; spellIndex9++) {
                 if (theArmy->m_spellInfluence[spellIndex9])
                     break;
             }
             iconWidget* spellWidget = new iconWidget(
                 static_cast<i16>((&loopIndex0)[0] * spacing0 + spellX3),
-                static_cast<i16>(spellY3 + 14),
+                static_cast<i16>(spellY3 + VIEW_ARMY_SPELL_WIDGET_Y_OFFSET),
                 0,
                 0,
                 const_cast<char*>("spellinl.icn"),
                 static_cast<i16>(spellIndex9),
                 0,
-                static_cast<i16>(loopIndex0 + 200),
-                16,
+                static_cast<i16>(loopIndex0 + VIEW_ARMY_SPELL_WIDGET_ID_BASE),
+                VIEW_ARMY_SPELL_WIDGET_COLOR,
                 1
             );
             if (!spellWidget)
@@ -3581,7 +3681,7 @@ void game::ViewArmy(
         }
     }
 
-    glTimers[0] = KBTickCount() + 90;
+    glTimers[0] = KBTickCount() + VIEW_ARMY_ANIMATION_INITIAL_DELAY;
     m_viewArmyResult = 0;
     if (quickView) {
         gpWindowManager->AddWindow(m_viewArmyWindow, -1, 1);
@@ -3608,7 +3708,7 @@ i32 ViewArmyHandler(tag_message& msg) {
 
     gbDismissArmy = false;
     gbUpgradeArmy = false;
-    i16 frameDelay0 = 5;
+    i16 frameDelay0 = VIEW_ARMY_HANDLER_FRAME_DELAY;
     i16 frameOffset1;
 
     if (msg.type == MESSAGE_WIDGET) {
@@ -3618,13 +3718,13 @@ i32 ViewArmyHandler(tag_message& msg) {
                     case EVENT_WINDOW_FIRST_BUTTON:
                     case EVENT_WINDOW_SECOND_BUTTON:
                         gpWindowManager->m_dialogResult = msg.payload.widget.id;
-                        msg.payload.widget.id = 10;
+                        msg.payload.widget.id = VIEW_ARMY_CLOSE_ID;
                         msg.payload.widget.command = BaseWidgetCommand(msg.payload.widget.id);
-                        return 2;
+                        return WIDGET_DISPATCH_FORWARD;
                     case EVENT_WINDOW_FOURTH_BUTTON:
                         NormalDialog(
                             const_cast<char*>("Are you sure you want to dismiss this army?"),
-                            2,
+                            NORMAL_DIALOG_CONFIRM,
                             -1,
                             -1,
                             -1,
@@ -3636,21 +3736,23 @@ i32 ViewArmyHandler(tag_message& msg) {
                         );
                         if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
                             gbDismissArmy = true;
-                            msg.payload.widget.id = 10;
+                            msg.payload.widget.id = VIEW_ARMY_CLOSE_ID;
                             msg.payload.widget.command = BaseWidgetCommand(msg.payload.widget.id);
-                            return 2;
+                            return WIDGET_DISPATCH_FORWARD;
                         }
                         break;
-                    case 500:
+                    case VIEW_ARMY_UPGRADE_ACTION_ID:
                         goldCost6 = (gMonsterDatabase[IDX(iViewArmyUpgradeToType)].cost
                                      - gMonsterDatabase[iViewArmyType].cost)
-                                    * iViewArmyNumTroops * 2;
+                                    * iViewArmyNumTroops * VIEW_ARMY_UPGRADE_COST_MULTIPLIER;
                         if (iViewArmyUpgradeToType == CREATURE_BLACK_DRAGON) {
                             resourceType0 = RES_SULFUR;
-                            resourceCost5 = iViewArmyNumTroops * 2;
+                            resourceCost5 =
+                                iViewArmyNumTroops * VIEW_ARMY_UPGRADE_COST_MULTIPLIER;
                         } else if (iViewArmyUpgradeToType == CREATURE_TITAN) {
                             resourceType0 = RES_GEMS;
-                            resourceCost5 = iViewArmyNumTroops * 2;
+                            resourceCost5 =
+                                iViewArmyNumTroops * VIEW_ARMY_UPGRADE_COST_MULTIPLIER;
                         } else {
                             resourceType0 = RES_NONE;
                             resourceCost5 = 0;
@@ -3663,10 +3765,10 @@ i32 ViewArmyHandler(tag_message& msg) {
                                     "Your troops can be upgraded, but it will cost you dearly.  "
                                     "Do you wish to upgrade them?"
                                 ),
-                                2,
+                                NORMAL_DIALOG_CONFIRM,
                                 -1,
                                 -1,
-                                6,
+                                IDX(RES_GOLD),
                                 goldCost6,
                                 IDX(resourceType0),
                                 resourceCost5,
@@ -3678,18 +3780,18 @@ i32 ViewArmyHandler(tag_message& msg) {
                                 if (resourceType0 != RES_NONE)
                                     gpCurPlayer->m_resources[IDX(resourceType0)] -= resourceCost5;
                                 gbUpgradeArmy = true;
-                                msg.payload.widget.id = 10;
+                                msg.payload.widget.id = VIEW_ARMY_CLOSE_ID;
                                 msg.payload.widget.command =
                                     BaseWidgetCommand(msg.payload.widget.id);
-                                return 2;
+                                return WIDGET_DISPATCH_FORWARD;
                             }
                         } else {
                             NormalDialog(
                                 const_cast<char*>("You can't afford to upgrade your troops!"),
-                                1,
+                                NORMAL_DIALOG_INFO,
                                 -1,
                                 -1,
-                                6,
+                                IDX(RES_GOLD),
                                 goldCost6,
                                 IDX(resourceType0),
                                 resourceCost5,
@@ -3710,7 +3812,7 @@ i32 ViewArmyHandler(tag_message& msg) {
     if (!gbLowMemory && KBTickCount() > glTimers[0]) {
         msg.type = MESSAGE_WIDGET;
         msg.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
-        msg.payload.widget.id = 5;
+        msg.payload.widget.id = VIEW_ARMY_MONSTER_WIDGET_ID;
         iViewArmyFrame = (iViewArmyFrame + 1)
                          % sViewArmyMonFrameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WALK)];
         msg.payload.widget.data.value =
@@ -3728,7 +3830,7 @@ i32 ViewArmyHandler(tag_message& msg) {
                   / sViewArmyMonFrameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WALK)]
         );
     }
-    return 1;
+    return WIDGET_DISPATCH_CONSUME;
 }
 
 VA(0x0047b6c4, 0x671)
