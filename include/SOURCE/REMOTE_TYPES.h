@@ -25,6 +25,15 @@ H2_ENUM_CLASS_BEGIN(MultiplayerBaseType)
     MULTIPLAYER_BASE_UNINITIALIZED = 10
 H2_ENUM_CLASS_END(MultiplayerBaseType)
 
+H2_ENUM_CLASS_BEGIN(RemoteGameMode)
+    REMOTE_GAME_NONE          = 0,
+    REMOTE_GAME_NETWORK_HOST  = 1,
+    REMOTE_GAME_NETWORK_GUEST = 2,
+    REMOTE_GAME_MODEM_HOST    = 3,
+    REMOTE_GAME_MODEM_GUEST   = 4,
+    REMOTE_GAME_UNINITIALIZED = 10
+H2_ENUM_CLASS_END(RemoteGameMode)
+
 #pragma pack(push, 1)
 struct SNetPlayerInfo {
     char uniqueSystemID[NET_PLAYER_INFO_SYSTEM_ID_SIZE];
