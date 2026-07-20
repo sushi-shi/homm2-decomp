@@ -2262,7 +2262,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 if (gpWindowManager->m_dialogResult != MONSTER_DIALOG_YES)
                     break;
                 dragonFactor_d = DRAGON_CITY_BASE_FACTOR;
-                if (gbInCampaign && gpGame->m_campaignType == IDX(CAMPAIGN_ARCHIBALD)
+                if (gbInCampaign && gpGame->m_campaignType == CAMPAIGN_ARCHIBALD
                     && gpGame->m_campaignScenario == DRAGON_CITY_ARCHIBALD_SCENARIO)
                     dragonFactor_d = DRAGON_CITY_CAMPAIGN_FACTOR;
                 if (CombatMonsterEvent(
