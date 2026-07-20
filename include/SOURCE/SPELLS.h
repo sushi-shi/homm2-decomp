@@ -180,7 +180,6 @@ H2_ENUM_BEGIN(SpellCastConstant)
     RESURRECT_MONSTER_ABILITY                      = 0x10,
     EARTHQUAKE_SHAKE_PASS_COUNT                    = 3,
     EARTHQUAKE_SHAKE_FRAME_COUNT                   = 15,
-    EARTHQUAKE_SHAKE_COORDINATE_COUNT              = 2,
     EARTHQUAKE_STRUCTURE_COUNT                     = 4,
     EARTHQUAKE_MAX_IMPACTS                         = 10,
     EARTHQUAKE_WALL_HIT_CHANCE                     = 75,

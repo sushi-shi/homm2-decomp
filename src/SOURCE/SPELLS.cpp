@@ -27,9 +27,13 @@
 #include <SOURCE/SPELLS.h>
 #include <SOURCE/X_GLOBAL.h>
 
+namespace {
+
 H2_ENUM_BEGIN(SpellSourceLine)
+    VAPORIZE_SOURCE_LINE_BASE         = 2524,
     VAPORIZE_ALLOC_LINE_OFFSET        = 0x09,
     VAPORIZE_FREE_LINE_OFFSET         = 0x38,
+    RIPPLE_SOURCE_LINE_BASE           = 2587,
     RIPPLE_MODIFIER_ALLOC_LINE_OFFSET = 0x2c,
     RIPPLE_WAVE_ALLOC_LINE_OFFSET     = 0x2d,
     RIPPLE_MODIFIER_FREE_LINE_OFFSET  = 0x8e,
@@ -56,6 +60,99 @@ H2_ENUM_BEGIN(CombatSpellUiConstant)
     HEX_RIGHT_BORDER      = 12,
     ELEMENTAL_ARMY_LIMIT  = 20
 H2_ENUM_END(CombatSpellUiConstant)
+
+H2_ENUM_BEGIN(SpellPresentationConstant)
+    PLURAL_QUANTITY_MINIMUM = 2,
+    MASS_SPELL_FRAME_DELAY  = 110,
+    TARGET_NAME_CAPACITY    = 60,
+    MESSAGE_CAPACITY        = 400
+H2_ENUM_END(SpellPresentationConstant)
+
+H2_ENUM_BEGIN(SpellBoltConstant)
+    LIGHTNING_BRANCH_DISTANCE                = 150,
+    LIGHTNING_BRANCH_LENGTH                  = 100,
+    LIGHTNING_START_WIDTH                    = 9,
+    LIGHTNING_END_WIDTH                      = 2,
+    LIGHTNING_MIN_ANGLE                      = -40,
+    LIGHTNING_MAX_ANGLE                      = 40,
+    LIGHTNING_ANGLE_DISTANCE                 = 30,
+    BRANCH_MIN_REMAINING_DISTANCE_MULTIPLIER = 2,
+    CHAIN_LIGHTNING_DISTANCE_SENTINEL        = 999999,
+    CHAIN_LIGHTNING_SHORT_FORCE_ANGLE        = 2,
+    CHAIN_LIGHTNING_LONG_FORCE_ANGLE         = 3
+H2_ENUM_END(SpellBoltConstant)
+
+H2_ENUM_BEGIN(SpellAreaConstant)
+    FIREBLAST_SOUTHEAST_FIRST_RING = IDX(COMBAT_DIRECTION_SOUTHEAST) + 1,
+    FIREBLAST_NORTHWEST_FIRST_RING = IDX(COMBAT_DIRECTION_NORTHWEST) + 1,
+    ELEMENTAL_WEAKNESS_MULTIPLIER  = 2
+H2_ENUM_END(SpellAreaConstant)
+
+H2_ENUM_BEGIN(SpellPaletteChannel)
+    PALETTE_RED_CHANNEL   = 0,
+    PALETTE_GREEN_CHANNEL = 1,
+    PALETTE_BLUE_CHANNEL  = 2
+H2_ENUM_END(SpellPaletteChannel)
+
+H2_ENUM_BEGIN(VaporizeConstant)
+    VAPORIZE_ROW_PAIR_SIZE = 2,
+    VAPORIZE_FRAME_DELAY   = 30
+H2_ENUM_END(VaporizeConstant)
+
+H2_ENUM_BEGIN(RippleCreatureConstant)
+    RIPPLE_WAVE_PHASE_STEP       = 2,
+    RIPPLE_DEFAULT_PHASE_STEP    = 1,
+    RIPPLE_WAVE_FRAME_DELAY      = 20,
+    RIPPLE_DEFAULT_FRAME_DELAY   = 30,
+    RIPPLE_WAVE_PHASE_MULTIPLIER = 2
+H2_ENUM_END(RippleCreatureConstant)
+
+H2_ENUM_BEGIN(MassSpellConstant)
+    HOLY_WORD_DAMAGE_PER_POWER    = 10,
+    HOLY_SHOUT_DAMAGE_PER_POWER   = 20,
+    HOLY_WORD_COLOR_ADJUSTMENT    = -2,
+    HOLY_SHOUT_COLOR_ADJUSTMENT   = -4,
+    DEATH_RIPPLE_STRENGTH         = 1,
+    DEATH_WAVE_STRENGTH           = 2,
+    DEATH_RIPPLE_DAMAGE_PER_POWER = 5,
+    DEATH_WAVE_DAMAGE_PER_POWER   = 10,
+    MIRROR_SOURCE_PART_COUNT      = 2
+H2_ENUM_END(MassSpellConstant)
+
+H2_ENUM_BEGIN(ElementalSummonConstant)
+    SUMMON_HEX_STORAGE_COUNT = 8,
+    SUMMON_HEXES_PER_SIDE    = 3,
+    SUMMON_RANDOM_OFFSET_MAX = 2,
+    ATTACKER_SUMMON_TOP_SLOT = 0,
+    ATTACKER_SUMMON_MID_SLOT = 1,
+    ATTACKER_SUMMON_LOW_SLOT = 2,
+    DEFENDER_SUMMON_TOP_SLOT = 3,
+    DEFENDER_SUMMON_MID_SLOT = 4,
+    DEFENDER_SUMMON_LOW_SLOT = 5,
+    ATTACKER_SUMMON_HEX_TOP  = 14,
+    ATTACKER_SUMMON_HEX_MID  = 27,
+    ATTACKER_SUMMON_HEX_LOW  = 40,
+    DEFENDER_SUMMON_HEX_TOP  = 11,
+    DEFENDER_SUMMON_HEX_MID  = 24,
+    DEFENDER_SUMMON_HEX_LOW  = 37
+H2_ENUM_END(ElementalSummonConstant)
+
+H2_ENUM_BEGIN(LuckConstant)
+    LUCK_RIGHT_FACING_FLIP_X = 480,
+    LUCK_LEFT_FACING_FLIP_X  = 200,
+    LUCK_DIAGONAL_DIVISOR    = 2
+H2_ENUM_END(LuckConstant)
+
+H2_ENUM_BEGIN(EarthquakeConstant)
+    EARTHQUAKE_CHANCE_ROLL_MAX   = 100,
+    EARTHQUAKE_KEEP_IMPACT_COUNT = 2,
+    EARTHQUAKE_MAX_IMPACT_DELAY  = 2
+H2_ENUM_END(EarthquakeConstant)
+
+#define RIPPLE_WAVE_CENTER 0.5
+#define RIPPLE_WAVE_RANGE 2.0
+
+}
 
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\SPELLS.CPP"
 VA(0x004204c0, 0x86)
@@ -276,7 +373,7 @@ i32 CombatSpecialHandler(tag_message& message) {
                 break;
             case CONTROL_FIRST_MANA:
             case CONTROL_FIRST_MANA + 1:
-            case CONTROL_FIRST_MANA + 2:
+            case CONTROL_LAST_MANA - 1:
             case CONTROL_LAST_MANA:
                 gpCombatManager->CombatMessage(cSpellHelp[HELP_MANA], 1, 0, 0);
                 break;
@@ -817,7 +914,7 @@ void combatManager::CastSpell(
                     m_heroes[m_currentSide],
                     m_heroes[1 - m_currentSide]
                 );
-                coldRayArmyName_f = target_i->m_quantity < 2
+                coldRayArmyName_f = target_i->m_quantity < PLURAL_QUANTITY_MINIMUM
                                         ? gArmyNames[IDX(target_i->m_monsterType)]
                                         : gArmyNamesPlural[IDX(target_i->m_monsterType)];
                 sprintf(
@@ -848,7 +945,7 @@ void combatManager::CastSpell(
                     m_heroes[m_currentSide],
                     m_heroes[1 - m_currentSide]
                 );
-                magicArrowArmyName_n = target_i->m_quantity < 2
+                magicArrowArmyName_n = target_i->m_quantity < PLURAL_QUANTITY_MINIMUM
                                            ? gArmyNames[IDX(target_i->m_monsterType)]
                                            : gArmyNamesPlural[IDX(target_i->m_monsterType)];
                 sprintf(
@@ -859,6 +956,8 @@ void combatManager::CastSpell(
                 );
                 CombatMessage(gText, 1, 1, 0);
                 missileIcon_p = gpResourceManager->GetIcon("keep.icn");
+                // Retail projectile-angle lookup, ordered from vertical up to vertical down.
+                // NOLINTBEGIN(readability-magic-numbers)
                 missileAngles[0] = 90.0f;
                 missileAngles[1] = 68.5f;
                 missileAngles[2] = 45.0f;
@@ -868,6 +967,7 @@ void combatManager::CastSpell(
                 missileAngles[6] = -45.0f;
                 missileAngles[7] = -68.5f;
                 missileAngles[8] = -90.0f;
+                // NOLINTEND(readability-magic-numbers)
                 ShootMissile(
                     castX,
                     castY,
@@ -893,7 +993,7 @@ void combatManager::CastSpell(
                     m_heroes[m_currentSide],
                     m_heroes[1 - m_currentSide]
                 );
-                lightningArmyName_d = target_i->m_quantity < 2
+                lightningArmyName_d = target_i->m_quantity < PLURAL_QUANTITY_MINIMUM
                                           ? gArmyNames[IDX(target_i->m_monsterType)]
                                           : gArmyNamesPlural[IDX(target_i->m_monsterType)];
                 sprintf(
@@ -909,14 +1009,14 @@ void combatManager::CastSpell(
                     castY,
                     target_i->MidX(),
                     target_i->MidY(),
-                    150,
-                    100,
-                    9,
-                    2,
+                    LIGHTNING_BRANCH_DISTANCE,
+                    LIGHTNING_BRANCH_LENGTH,
+                    LIGHTNING_START_WIDTH,
+                    LIGHTNING_END_WIDTH,
                     BOLT_COLOR_LIGHTNING,
-                    -40,
-                    40,
-                    30,
+                    LIGHTNING_MIN_ANGLE,
+                    LIGHTNING_MAX_ANGLE,
+                    LIGHTNING_ANGLE_DISTANCE,
                     1,
                     0,
                     0,
@@ -1260,19 +1360,19 @@ void combatManager::Fireball(i32 targetHex, SpellType spell) {
             affectedHexes_e[SPELL_FIREBLAST_AXIAL_SECOND] = COMBAT_HEX_EMPTY;
         affectedHexes_e[SPELL_FIREBLAST_CORNER_FIRST] =
             static_cast<i16>(GetAdjacentCellIndexNoArmy(
-                affectedHexes_e[2], COMBAT_DIRECTION_NORTHEAST
+                affectedHexes_e[FIREBLAST_SOUTHEAST_FIRST_RING], COMBAT_DIRECTION_NORTHEAST
             ));
-        affectedHexes_e[SPELL_FIREBLAST_CORNER_FIRST + 1] =
+        affectedHexes_e[SPELL_FIREBLAST_CORNER_SECOND] =
             static_cast<i16>(GetAdjacentCellIndexNoArmy(
-                affectedHexes_e[2], COMBAT_DIRECTION_SOUTHEAST
+                affectedHexes_e[FIREBLAST_SOUTHEAST_FIRST_RING], COMBAT_DIRECTION_SOUTHEAST
             ));
-        affectedHexes_e[SPELL_FIREBLAST_CORNER_FIRST + 2] =
+        affectedHexes_e[SPELL_FIREBLAST_CORNER_THIRD] =
             static_cast<i16>(GetAdjacentCellIndexNoArmy(
-                affectedHexes_e[5], COMBAT_DIRECTION_NORTHWEST
+                affectedHexes_e[FIREBLAST_NORTHWEST_FIRST_RING], COMBAT_DIRECTION_NORTHWEST
             ));
-        affectedHexes_e[SPELL_FIREBLAST_CORNER_FIRST + 3] =
+        affectedHexes_e[SPELL_FIREBLAST_CORNER_FOURTH] =
             static_cast<i16>(GetAdjacentCellIndexNoArmy(
-                affectedHexes_e[5], COMBAT_DIRECTION_SOUTHWEST
+                affectedHexes_e[FIREBLAST_NORTHWEST_FIRST_RING], COMBAT_DIRECTION_SOUTHWEST
             ));
     }
 
@@ -1301,7 +1401,7 @@ void combatManager::Fireball(i32 targetHex, SpellType spell) {
                         damage_f <<= 1;
                     if ((spell == SPELL_FIREBALL || spell == SPELL_FIREBLAST)
                         && target_n->m_monsterType == CREATURE_WATER_ELEMENTAL)
-                        damage_f *= 2;
+                        damage_f *= ELEMENTAL_WEAKNESS_MULTIPLIER;
                     if (target_n->m_monsterType == CREATURE_IRON_GOLEM
                         || target_n->m_monsterType == CREATURE_STEEL_GOLEM) {
                         damage_f = static_cast<i32l>(damage_f * SPELL_GOLEM_DAMAGE_MULTIPLIER);
@@ -1527,15 +1627,21 @@ void combatManager::Armageddon(void) {
         for (pass = 0; pass < SPELL_ARMAGEDDON_BRIGHTEN_PASS_COUNT; ++pass) {
             i32 color;
             for (color = 0; color < SPELL_ARMAGEDDON_PALETTE_COLOR_COUNT; ++color) {
-                if (effectData[color * SPELL_ARMAGEDDON_PALETTE_CHANNEL_COUNT]
+                if (effectData[color * SPELL_ARMAGEDDON_PALETTE_CHANNEL_COUNT
+                               + PALETTE_RED_CHANNEL]
                     < SPELL_ARMAGEDDON_CHANNEL_MAX)
-                    ++effectData[color * SPELL_ARMAGEDDON_PALETTE_CHANNEL_COUNT];
-                if (effectData[color * SPELL_ARMAGEDDON_PALETTE_CHANNEL_COUNT + 1]
+                    ++effectData[color * SPELL_ARMAGEDDON_PALETTE_CHANNEL_COUNT
+                                 + PALETTE_RED_CHANNEL];
+                if (effectData[color * SPELL_ARMAGEDDON_PALETTE_CHANNEL_COUNT
+                               + PALETTE_GREEN_CHANNEL]
                     < SPELL_ARMAGEDDON_CHANNEL_MAX)
-                    ++effectData[color * SPELL_ARMAGEDDON_PALETTE_CHANNEL_COUNT + 1];
-                if (effectData[color * SPELL_ARMAGEDDON_PALETTE_CHANNEL_COUNT + 2]
+                    ++effectData[color * SPELL_ARMAGEDDON_PALETTE_CHANNEL_COUNT
+                                 + PALETTE_GREEN_CHANNEL];
+                if (effectData[color * SPELL_ARMAGEDDON_PALETTE_CHANNEL_COUNT
+                               + PALETTE_BLUE_CHANNEL]
                     < SPELL_ARMAGEDDON_CHANNEL_MAX)
-                    ++effectData[color * SPELL_ARMAGEDDON_PALETTE_CHANNEL_COUNT + 2];
+                    ++effectData[color * SPELL_ARMAGEDDON_PALETTE_CHANNEL_COUNT
+                                 + PALETTE_BLUE_CHANNEL];
             }
             DelayTil(&glTimers[0]);
             SetPalette(effectData, 1);
@@ -1545,7 +1651,9 @@ void combatManager::Armageddon(void) {
             );
         }
 
-        i32 shakeOffsets[SPELL_ARMAGEDDON_SHAKE_FRAME_COUNT][2] = {
+        // Retail screen-shake trajectory; each row is an ordered x/y displacement.
+        // NOLINTBEGIN(readability-magic-numbers)
+        i32 shakeOffsets[SPELL_ARMAGEDDON_SHAKE_FRAME_COUNT][IDX(COMBAT_COORDINATE_COUNT)] = {
             {2, 2},
             {4, 1},
             {3, -2},
@@ -1562,6 +1670,7 @@ void combatManager::Armageddon(void) {
             {-2, -3},
             {0, 0}
         };
+        // NOLINTEND(readability-magic-numbers)
         gpMouseManager->HideColorPointer();
         memcpy(
             m_backgroundBuffer->m_pixels,
@@ -1578,29 +1687,42 @@ void combatManager::Armageddon(void) {
                 if (pass == 0) {
                     i32 color;
                     for (color = 0; color < SPELL_ARMAGEDDON_PALETTE_COLOR_COUNT; ++color) {
-                        if (effectData[color * SPELL_ARMAGEDDON_PALETTE_CHANNEL_COUNT + 1]
+                        if (effectData[color * SPELL_ARMAGEDDON_PALETTE_CHANNEL_COUNT
+                                       + PALETTE_GREEN_CHANNEL]
                             > SPELL_ARMAGEDDON_CHANNEL_STEP)
-                            effectData[color * SPELL_ARMAGEDDON_PALETTE_CHANNEL_COUNT + 1] -=
-                                SPELL_ARMAGEDDON_CHANNEL_STEP;
-                        if (effectData[color * SPELL_ARMAGEDDON_PALETTE_CHANNEL_COUNT + 2]
+                            effectData[color * SPELL_ARMAGEDDON_PALETTE_CHANNEL_COUNT
+                                       + PALETTE_GREEN_CHANNEL] -= SPELL_ARMAGEDDON_CHANNEL_STEP;
+                        if (effectData[color * SPELL_ARMAGEDDON_PALETTE_CHANNEL_COUNT
+                                       + PALETTE_BLUE_CHANNEL]
                             > SPELL_ARMAGEDDON_CHANNEL_STEP)
-                            effectData[color * SPELL_ARMAGEDDON_PALETTE_CHANNEL_COUNT + 2] -=
-                                SPELL_ARMAGEDDON_CHANNEL_STEP;
+                            effectData[color * SPELL_ARMAGEDDON_PALETTE_CHANNEL_COUNT
+                                       + PALETTE_BLUE_CHANNEL] -= SPELL_ARMAGEDDON_CHANNEL_STEP;
                     }
                     SetPalette(effectData, 1);
                 }
 
-                i32 offsetX = static_cast<i32>(shakeOffsets[frame][0] * scale);
-                i32 offsetY = static_cast<i32>(shakeOffsets[frame][1] * scale);
+                i32 offsetX = static_cast<i32>(
+                    shakeOffsets[frame][IDX(COMBAT_COORDINATE_X)] * scale
+                );
+                i32 offsetY = static_cast<i32>(
+                    shakeOffsets[frame][IDX(COMBAT_COORDINATE_Y)] * scale
+                );
                 i32 timer = static_cast<i32>(
                     KBTickCount()
                     + gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_ARMAGEDDON_SHAKE_DELAY
                 );
                 PollSound();
                 i32 copyWidth =
-                    COMBAT_SCREEN_WIDTH - abs(static_cast<i32>(shakeOffsets[frame][0] * scale));
+                    COMBAT_SCREEN_WIDTH
+                    - abs(static_cast<i32>(
+                        shakeOffsets[frame][IDX(COMBAT_COORDINATE_X)] * scale
+                    ));
                 i32 copyHeight =
-                    COMBAT_AREA_HEIGHT - abs(static_cast<i32>(shakeOffsets[frame][1] * scale)) - 1;
+                    COMBAT_AREA_HEIGHT
+                    - abs(static_cast<i32>(
+                        shakeOffsets[frame][IDX(COMBAT_COORDINATE_Y)] * scale
+                    ))
+                    - 1;
                 u8* source = m_backgroundBuffer->m_pixels
                              + (offsetY > 0 ? offsetY : 0) * COMBAT_SCREEN_WIDTH
                              + (offsetX > 0 ? offsetX : 0);
@@ -1914,6 +2036,8 @@ void combatManager::DrawBolt(SBolt* bolt, i32 stepCount) {
                             break;
                         case BOLT_COLOR_LIGHTNING: {
                             u8 color;
+                            // Retail distance-to-edge lookup for the lightning palette ramp.
+                            // NOLINTBEGIN(readability-magic-numbers)
                             if (edgeDistance == 0)
                                 color = BOLT_LIGHTNING_SHADE_0;
                             else if (edgeDistance == 1)
@@ -1926,6 +2050,7 @@ void combatManager::DrawBolt(SBolt* bolt, i32 stepCount) {
                                 color = BOLT_LIGHTNING_SHADE_4;
                             else
                                 color = BOLT_LIGHTNING_SHADE_5;
+                            // NOLINTEND(readability-magic-numbers)
                             gpWindowManager->m_screen
                                 ->m_pixels[drawY * COMBAT_SCREEN_WIDTH + drawX] = color;
                             break;
@@ -2178,7 +2303,9 @@ void combatManager::DoBolt(
                         i32 remainingDistance =
                             abs(bolts[boltIndex].endX - bolts[boltIndex].pixelX)
                             + abs(bolts[boltIndex].endY - bolts[boltIndex].pixelY);
-                        if (boltCount < BOLT_MAX_COUNT && angleDistance * 2 < remainingDistance
+                        if (boltCount < BOLT_MAX_COUNT
+                            && angleDistance * BRANCH_MIN_REMAINING_DISTANCE_MULTIPLIER
+                                   < remainingDistance
                             && Random(0, branchChance) < BOLT_BRANCH_PERCENT_LIMIT) {
                             if (bolts[boltIndex].lastBranchX != 0) {
                                 i32 branchSeparation =
@@ -2271,7 +2398,7 @@ i32 combatManager::GetNextChainLightningTarget(army* source, i32 requireWorks) {
     i32 deltaY_n;
     i32 closestDistance;
     i32 armyIndex_g;
-    closestDistance = 999999;
+    closestDistance = CHAIN_LIGHTNING_DISTANCE_SENTINEL;
     closestHex_f = COMBAT_HEX_EMPTY;
     sourceX = source->MidX();
     sourceY = source->MidY();
@@ -2315,7 +2442,7 @@ void combatManager::ChainLightning(i32 targetHex, i32 spellPower) {
     for (strike = 0; strike < CHAIN_LIGHTNING_MAX_TARGETS; ++strike) {
         army* target =
             &m_armies[m_hexCells[targetHex].m_occupantSide][m_hexCells[targetHex].m_occupantIndex];
-        if (strike <= CHAIN_LIGHTNING_MAX_TARGETS - 2
+        if (strike < CHAIN_LIGHTNING_MAX_TARGETS - 1
             && m_hexCells[targetHex].m_occupantSide == m_currentSide)
             gpCombatManager->m_heroDeathPending[m_currentSide] = 1;
 
@@ -2340,7 +2467,10 @@ void combatManager::ChainLightning(i32 targetHex, i32 spellPower) {
             branchDistance = CHAIN_LIGHTNING_MAX_BRANCH_DISTANCE;
         if (branchDistance < CHAIN_LIGHTNING_MIN_BRANCH_DISTANCE)
             branchDistance = CHAIN_LIGHTNING_MIN_BRANCH_DISTANCE;
-        i32 forceAngle = branchDistance < CHAIN_LIGHTNING_SHORT_BRANCH_THRESHOLD ? 2 : 3;
+        i32 forceAngle =
+            branchDistance < CHAIN_LIGHTNING_SHORT_BRANCH_THRESHOLD
+                ? CHAIN_LIGHTNING_SHORT_FORCE_ANGLE
+                : CHAIN_LIGHTNING_LONG_FORCE_ANGLE;
         DoBolt(
             0,
             startX,
@@ -2383,13 +2513,16 @@ void combatManager::ChainLightning(i32 targetHex, i32 spellPower) {
 
 VA(0x00426bbb, 0x292)
 void combatManager::VaporizeCreature(i32 side, i32 armyIndex) {
-    DATA(0x004f04e4) static i16 vaporizeSourceLineBase = 2524;
+    DATA(0x004f04e4) static i16 vaporizeSourceLineBase = VAPORIZE_SOURCE_LINE_BASE;
     army* target = &m_armies[side][armyIndex];
     ResetLimitCreature();
     ++m_limitCreatureCount[side][armyIndex];
     gpCombatManager->DrawFrame(1, 1, 1, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
     gyModify = static_cast<i8*>(
-        H2_ALLOC(SPELL_MODIFIER_ROW_COUNT, 2524 + VAPORIZE_ALLOC_LINE_OFFSET)
+        H2_ALLOC(
+            SPELL_MODIFIER_ROW_COUNT,
+            vaporizeSourceLineBase + VAPORIZE_ALLOC_LINE_OFFSET
+        )
     );
     memset(gyModify, 0, SPELL_MODIFIER_ROW_COUNT);
     i32 rowCount = giMaxExtentY - giMinExtentY + 1;
@@ -2403,6 +2536,8 @@ void combatManager::VaporizeCreature(i32 side, i32 armyIndex) {
     for (phase = 0; phase < VAPORIZE_PHASE_COUNT; ++phase) {
         i32 topOffset;
         i32 bottomOffset;
+        // The three phases erase paired stripes from the outside toward the center.
+        // NOLINTBEGIN(readability-magic-numbers)
         switch (phase) {
             case 0:
                 topOffset = 0;
@@ -2417,27 +2552,28 @@ void combatManager::VaporizeCreature(i32 side, i32 armyIndex) {
                 bottomOffset = 2;
                 break;
         }
+        // NOLINTEND(readability-magic-numbers)
         if (phase == VAPORIZE_PHASE_COUNT - 1)
-            rowCount = (rowCount - 1) / 2 + 1;
+            rowCount = (rowCount - 1) / VAPORIZE_ROW_PAIR_SIZE + 1;
         i32 row;
         for (row = 0; row < rowCount; ++row) {
             gyModify[row * VAPORIZE_STRIPE_WIDTH + firstY + topOffset] = VAPORIZE_MASKED;
             gyModify[lastY + (row * -VAPORIZE_STRIPE_WIDTH - bottomOffset)] = VAPORIZE_MASKED;
             gbLimitToExtent = true;
-            gpCombatManager->DrawFrame(1, 0, 1, 0, 30, 1, 1);
+            gpCombatManager->DrawFrame(1, 0, 1, 0, VAPORIZE_FRAME_DELAY, 1, 1);
         }
     }
     DelayMilli(static_cast<i32l>(gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_VANISH_END_DELAY));
     target->m_palette = NULL;
     target->m_drawEnabled = 1;
-    H2_FREE(gyModify, 2524 + VAPORIZE_FREE_LINE_OFFSET);
+    H2_FREE(gyModify, vaporizeSourceLineBase + VAPORIZE_FREE_LINE_OFFSET);
     gyModify = NULL;
     gpCombatManager->DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
 }
 
 VA(0x00426e4d, 0x592)
 void combatManager::RippleCreature(i32 side, i32 armyIndex, CombatRippleMode mode) {
-    DATA(0x004f0540) static i16 rippleSourceLineBase = 2587;
+    DATA(0x004f0540) static i16 rippleSourceLineBase = RIPPLE_SOURCE_LINE_BASE;
     army* target = &m_armies[side][armyIndex];
     i32 phaseStep;
     i32 frameDelay;
@@ -2445,20 +2581,20 @@ void combatManager::RippleCreature(i32 side, i32 armyIndex, CombatRippleMode mod
     float amplitudeStep;
     switch (mode) {
         case COMBAT_RIPPLE_WAVE:
-            phaseStep = 2;
-            frameDelay = 20;
+            phaseStep = RIPPLE_WAVE_PHASE_STEP;
+            frameDelay = RIPPLE_WAVE_FRAME_DELAY;
             amplitudeBase = RIPPLE_MODE_ZERO_AMPLITUDE_BASE;
             amplitudeStep = RIPPLE_MODE_ZERO_AMPLITUDE_STEP;
             break;
         case COMBAT_RIPPLE_DEATH_RIPPLE:
-            phaseStep = 1;
-            frameDelay = 30;
+            phaseStep = RIPPLE_DEFAULT_PHASE_STEP;
+            frameDelay = RIPPLE_DEFAULT_FRAME_DELAY;
             amplitudeBase = RIPPLE_OTHER_AMPLITUDE_BASE;
             amplitudeStep = RIPPLE_OTHER_AMPLITUDE_STEP;
             break;
         default:
-            phaseStep = 1;
-            frameDelay = 30;
+            phaseStep = RIPPLE_DEFAULT_PHASE_STEP;
+            frameDelay = RIPPLE_DEFAULT_FRAME_DELAY;
             amplitudeBase = RIPPLE_OTHER_AMPLITUDE_BASE;
             amplitudeStep = RIPPLE_OTHER_AMPLITUDE_STEP;
             break;
@@ -2473,11 +2609,14 @@ void combatManager::RippleCreature(i32 side, i32 armyIndex, CombatRippleMode mod
 
     i32 extentHeight = giMaxExtentY - giMinExtentY + 1;
     gyModify = static_cast<i8*>(
-        H2_ALLOC(SPELL_MODIFIER_ROW_COUNT, 2587 + RIPPLE_MODIFIER_ALLOC_LINE_OFFSET)
+        H2_ALLOC(
+            SPELL_MODIFIER_ROW_COUNT,
+            rippleSourceLineBase + RIPPLE_MODIFIER_ALLOC_LINE_OFFSET
+        )
     );
     float* wave = static_cast<float*>(H2_ALLOC(
         sizeof(float) * SPELL_MODIFIER_ROW_COUNT,
-        2587 + RIPPLE_WAVE_ALLOC_LINE_OFFSET
+        rippleSourceLineBase + RIPPLE_WAVE_ALLOC_LINE_OFFSET
     ));
     memset(gyModify, 0, SPELL_MODIFIER_ROW_COUNT);
     i32 row;
@@ -2485,8 +2624,8 @@ void combatManager::RippleCreature(i32 side, i32 armyIndex, CombatRippleMode mod
         wave[row] = static_cast<float>(
             (sin(static_cast<float>(row % RIPPLE_WAVE_PERIOD)
                  / static_cast<float>(RIPPLE_WAVE_DIVISOR))
-             - 0.5)
-            * 2.0
+             - RIPPLE_WAVE_CENTER)
+            * RIPPLE_WAVE_RANGE
         );
     }
     target->m_palette = gyModify;
@@ -2521,9 +2660,11 @@ void combatManager::RippleCreature(i32 side, i32 armyIndex, CombatRippleMode mod
             for (row = giMinExtentY; row < giMaxExtentY; ++row) {
                 i32 waveIndex;
                 if (mode == COMBAT_RIPPLE_DEATH_WAVE)
-                    waveIndex = -RIPPLE_PHASE_CENTER - giMaxExtentY + phase * 2 + row;
+                    waveIndex = -RIPPLE_PHASE_CENTER - giMaxExtentY
+                                + phase * RIPPLE_WAVE_PHASE_MULTIPLIER + row;
                 else
-                    waveIndex = phase * 2 - RIPPLE_PHASE_CENTER - row + giMinExtentY;
+                    waveIndex = phase * RIPPLE_WAVE_PHASE_MULTIPLIER - RIPPLE_PHASE_CENTER - row
+                                + giMinExtentY;
                 waveIndex += RIPPLE_WAVE_INDEX_OFFSET;
                 if (waveIndex >= 0 && waveIndex < SPELL_MODIFIER_ROW_COUNT)
                     gyModify[row] = static_cast<i8>(wave[waveIndex] * amplitude);
@@ -2551,15 +2692,19 @@ void combatManager::RippleCreature(i32 side, i32 armyIndex, CombatRippleMode mod
     DelayMilli(static_cast<i32l>(gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_VANISH_END_DELAY));
     target->m_palette = NULL;
     target->m_drawEnabled = 1;
-    H2_FREE(gyModify, 2587 + RIPPLE_MODIFIER_FREE_LINE_OFFSET);
-    H2_FREE(wave, 2587 + RIPPLE_WAVE_FREE_LINE_OFFSET);
+    H2_FREE(gyModify, rippleSourceLineBase + RIPPLE_MODIFIER_FREE_LINE_OFFSET);
+    H2_FREE(wave, rippleSourceLineBase + RIPPLE_WAVE_FREE_LINE_OFFSET);
     gyModify = NULL;
     if (mode != COMBAT_RIPPLE_DEATH_RIPPLE)
         gpCombatManager->DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
 }
 
 VA(0x004273df, 0x6b2)
-void combatManager::ShowMassSpell(i8 (*const affected)[20], i32 effect, i32 animateCreatures) {
+void combatManager::ShowMassSpell(
+    i8 (*const affected)[COMBAT_ARMY_SLOT_COUNT],
+    i32 effect,
+    i32 animateCreatures
+) {
     u32l effectFile = MAKEFILEID(gCombatFxNames[effect]);
     i32 effectFrames = giNumPowFrames[effect] - 1;
     i32 returnFrames = 0;
@@ -2632,7 +2777,7 @@ void combatManager::ShowMassSpell(i8 (*const affected)[20], i32 effect, i32 anim
                     gCurSpellEffectFrame = frame;
             }
         }
-        DrawFrame(1, 0, 0, 0, 110, 1, 1);
+        DrawFrame(1, 0, 0, 0, MASS_SPELL_FRAME_DELAY, 1, 1);
     }
 
     for (side = 0; side < COMBAT_SIDE_COUNT; ++side) {
@@ -2661,7 +2806,7 @@ void combatManager::ShowMassSpell(i8 (*const affected)[20], i32 effect, i32 anim
                 }
             }
         }
-        DrawFrame(1, 0, 0, 0, 110, 1, 1);
+        DrawFrame(1, 0, 0, 0, MASS_SPELL_FRAME_DELAY, 1, 1);
     }
 
     i32 creatureDied = 0;
@@ -2690,7 +2835,7 @@ void combatManager::CastMassSpell(SpellType spell, i32 spellPower) {
     i32 animateCreatures_k = 0;
     gpWindowManager->m_updateFlags = 0;
     ShowSpellMessage(0, IDX(spell), NULL);
-    i8 affected[COMBAT_SIDE_COUNT][20];
+    i8 affected[COMBAT_SIDE_COUNT][COMBAT_ARMY_SLOT_COUNT];
     memset(affected, 0, sizeof(affected));
 
     i32 side_i;
@@ -2731,19 +2876,23 @@ void combatManager::CastMassSpell(SpellType spell, i32 spellPower) {
         case SPELL_HOLY_WORD:
         case SPELL_HOLY_SHOUT: {
             animateCreatures_k = 1;
-            damage_c = (spell == SPELL_HOLY_WORD ? 10 : 20) * spellPower;
+            damage_c = (spell == SPELL_HOLY_WORD ? HOLY_WORD_DAMAGE_PER_POWER
+                                                 : HOLY_SHOUT_DAMAGE_PER_POWER)
+                       * spellPower;
             for (side_i = 0; side_i < COMBAT_SIDE_COUNT; ++side_i) {
                 for (armyIndex_k = 0; armyIndex_k < m_armyCount[side_i]; ++armyIndex_k) {
-                    if ((m_armies[side_i][armyIndex_k].m_monster.flags.bytes.attributeFlags & 4)
-                            != 0
+                    if (HAS(
+                            m_armies[side_i][armyIndex_k].m_monster.attributes,
+                            MONSTER_ATTRIBUTE_UNDEAD
+                        )
                         && m_armies[side_i][armyIndex_k].SpellCastWorks(spell))
                         affected[side_i][armyIndex_k] = 1;
                 }
             }
             if (spell == SPELL_HOLY_WORD)
-                Blur(0, -2, -2);
+                Blur(0, HOLY_WORD_COLOR_ADJUSTMENT, HOLY_WORD_COLOR_ADJUSTMENT);
             else
-                Blur(0, -4, -4);
+                Blur(0, HOLY_SHOUT_COLOR_ADJUSTMENT, HOLY_SHOUT_COLOR_ADJUSTMENT);
             for (side_i = 0; side_i < COMBAT_SIDE_COUNT; ++side_i) {
                 for (armyIndex_k = 0; armyIndex_k < m_armyCount[side_i]; ++armyIndex_k) {
                     if (affected[side_i][armyIndex_k] != 0)
@@ -2765,14 +2914,20 @@ void combatManager::CastMassSpell(SpellType spell, i32 spellPower) {
             animateCreatures_k = 1;
             for (side_i = 0; side_i < COMBAT_SIDE_COUNT; ++side_i) {
                 for (armyIndex_k = 0; armyIndex_k < m_armyCount[side_i]; ++armyIndex_k) {
-                    if ((m_armies[side_i][armyIndex_k].m_monster.flags.bytes.attributeFlags & 4)
-                            == 0
+                    if (!HAS(
+                            m_armies[side_i][armyIndex_k].m_monster.attributes,
+                            MONSTER_ATTRIBUTE_UNDEAD
+                        )
                         && m_armies[side_i][armyIndex_k].SpellCastWorks(spell))
                         affected[side_i][armyIndex_k] = 1;
                 }
             }
-            Ripple(2 - (spell == SPELL_DEATH_RIPPLE));
-            damage_c = (spell == SPELL_DEATH_RIPPLE ? 5 : 10) * spellPower;
+            Ripple(
+                spell == SPELL_DEATH_RIPPLE ? DEATH_RIPPLE_STRENGTH : DEATH_WAVE_STRENGTH
+            );
+            damage_c = (spell == SPELL_DEATH_RIPPLE ? DEATH_RIPPLE_DAMAGE_PER_POWER
+                                                     : DEATH_WAVE_DAMAGE_PER_POWER)
+                       * spellPower;
             for (side_i = 0; side_i < COMBAT_SIDE_COUNT; ++side_i) {
                 for (armyIndex_k = 0; armyIndex_k < m_armyCount[side_i]; ++armyIndex_k) {
                     if (affected[side_i][armyIndex_k] != 0)
@@ -2862,7 +3017,7 @@ void combatManager::MirrorImage(i32 targetHex) {
     i32 distance;
     for (distance = 1; distance <= MIRROR_SEARCH_MAX_DISTANCE; ++distance) {
         i32 sourcePart;
-        for (sourcePart = 0; sourcePart < 2; ++sourcePart) {
+        for (sourcePart = 0; sourcePart < MIRROR_SOURCE_PART_COUNT; ++sourcePart) {
             i32 searchHex;
             if (sourcePart == 0) {
                 searchHex = source->m_hex;
@@ -2969,24 +3124,28 @@ mirror_found:
 
 VA(0x00428951, 0x218)
 void combatManager::SummonElemental(i32 monsterType, i32 spellPower) {
-    u8 summonHexes_l[8];
-    summonHexes_l[0] = 14;
-    summonHexes_l[1] = 27;
-    summonHexes_l[2] = 40;
-    summonHexes_l[3] = 11;
-    summonHexes_l[4] = 24;
-    summonHexes_l[5] = 37;
-    i32 randomOffset_a = SRandom(0, 2);
+    u8 summonHexes_l[SUMMON_HEX_STORAGE_COUNT];
+    summonHexes_l[ATTACKER_SUMMON_TOP_SLOT] = ATTACKER_SUMMON_HEX_TOP;
+    summonHexes_l[ATTACKER_SUMMON_MID_SLOT] = ATTACKER_SUMMON_HEX_MID;
+    summonHexes_l[ATTACKER_SUMMON_LOW_SLOT] = ATTACKER_SUMMON_HEX_LOW;
+    summonHexes_l[DEFENDER_SUMMON_TOP_SLOT] = DEFENDER_SUMMON_HEX_TOP;
+    summonHexes_l[DEFENDER_SUMMON_MID_SLOT] = DEFENDER_SUMMON_HEX_MID;
+    summonHexes_l[DEFENDER_SUMMON_LOW_SLOT] = DEFENDER_SUMMON_HEX_LOW;
+    i32 randomOffset_a = SRandom(0, SUMMON_RANDOM_OFFSET_MAX);
     u32 summonHex = static_cast<u32>(COMBAT_HEX_EMPTY);
     if (m_heroes[m_currentSide] != NULL
         && m_heroes[m_currentSide]->HasArtifact(ARTIFACT_BOOK_ELEMENTS))
         spellPower <<= 1;
     i32 offset;
-    for (offset = 0; offset < 3; ++offset) {
-        if (m_hexCells[summonHexes_l[m_currentSide * 3 + ((randomOffset_a | 0) + offset) % 3]]
+    for (offset = 0; offset < SUMMON_HEXES_PER_SIDE; ++offset) {
+        if (m_hexCells[summonHexes_l[m_currentSide * SUMMON_HEXES_PER_SIDE
+                                     + ((randomOffset_a | 0) + offset)
+                                           % SUMMON_HEXES_PER_SIDE]]
                 .m_occupantSide
             == COMBAT_HEX_EMPTY)
-            summonHex = summonHexes_l[m_currentSide * 3 + ((randomOffset_a | 0) + offset) % 3];
+            summonHex = summonHexes_l[m_currentSide * SUMMON_HEXES_PER_SIDE
+                                      + ((randomOffset_a | 0) + offset)
+                                            % SUMMON_HEXES_PER_SIDE];
     }
     m_summonedCreatureType[m_currentSide] = static_cast<u8>(monsterType);
     AddArmy(
@@ -3024,14 +3183,14 @@ void combatManager::DoLuck(i32 side, i32 armyIndex) {
     i32 startY_n = LUCK_EDGE_START_Y;
     i32 startX_b;
     if (target_i->m_facing == ARMY_FACING_RIGHT) {
-        if (targetX_k < 480)
-            startX_b = targetX_k + targetY_l / 2 + LUCK_EDGE_INSET;
+        if (targetX_k < LUCK_RIGHT_FACING_FLIP_X)
+            startX_b = targetX_k + targetY_l / LUCK_DIAGONAL_DIVISOR + LUCK_EDGE_INSET;
         else
-            startX_b = targetX_k - LUCK_EDGE_INSET - targetY_l / 2;
-    } else if (targetX_k > 200) {
-        startX_b = targetX_k - LUCK_EDGE_INSET - targetY_l / 2;
+            startX_b = targetX_k - LUCK_EDGE_INSET - targetY_l / LUCK_DIAGONAL_DIVISOR;
+    } else if (targetX_k > LUCK_LEFT_FACING_FLIP_X) {
+        startX_b = targetX_k - LUCK_EDGE_INSET - targetY_l / LUCK_DIAGONAL_DIVISOR;
     } else {
-        startX_b = targetX_k + targetY_l / 2 + LUCK_EDGE_INSET;
+        startX_b = targetX_k + targetY_l / LUCK_DIAGONAL_DIVISOR + LUCK_EDGE_INSET;
     }
     if (targetY_l < LUCK_SHORT_BOLT_HEIGHT) {
         startX_b = side == 0 ? 0 : COMBAT_SCREEN_WIDTH - 1;
@@ -3293,12 +3452,14 @@ void combatManager::Resurrect(i32 spell, i32 targetHex, i32 spellPower) {
 
 VA(0x004296de, 0xb9)
 i32 combatManager::SpaceForElementalExists(void) {
-    if ((m_currentSide == 0 && m_hexCells[14].m_occupantSide != COMBAT_HEX_EMPTY
-         && m_hexCells[27].m_occupantSide != COMBAT_HEX_EMPTY
-         && m_hexCells[40].m_occupantSide != COMBAT_HEX_EMPTY)
-        || (m_currentSide == 1 && m_hexCells[11].m_occupantSide != COMBAT_HEX_EMPTY
-            && m_hexCells[24].m_occupantSide != COMBAT_HEX_EMPTY
-            && m_hexCells[37].m_occupantSide != COMBAT_HEX_EMPTY))
+    if ((m_currentSide == 0
+         && m_hexCells[ATTACKER_SUMMON_HEX_TOP].m_occupantSide != COMBAT_HEX_EMPTY
+         && m_hexCells[ATTACKER_SUMMON_HEX_MID].m_occupantSide != COMBAT_HEX_EMPTY
+         && m_hexCells[ATTACKER_SUMMON_HEX_LOW].m_occupantSide != COMBAT_HEX_EMPTY)
+        || (m_currentSide == 1
+            && m_hexCells[DEFENDER_SUMMON_HEX_TOP].m_occupantSide != COMBAT_HEX_EMPTY
+            && m_hexCells[DEFENDER_SUMMON_HEX_MID].m_occupantSide != COMBAT_HEX_EMPTY
+            && m_hexCells[DEFENDER_SUMMON_HEX_LOW].m_occupantSide != COMBAT_HEX_EMPTY))
         return 0;
     else
         return 1;
@@ -3368,37 +3529,26 @@ void combatManager::ModifyDamageForArtifacts(
 
 VA(0x00429ae0, 0x931)
 void combatManager::Earthquake(void) {
-    i32 shakeOffsets[30];
-    shakeOffsets[0] = 2;
-    shakeOffsets[1] = 2;
-    shakeOffsets[2] = 4;
-    shakeOffsets[3] = 1;
-    shakeOffsets[4] = 3;
-    shakeOffsets[5] = -2;
-    shakeOffsets[6] = 0;
-    shakeOffsets[7] = -6;
-    shakeOffsets[8] = 2;
-    shakeOffsets[9] = -2;
-    shakeOffsets[10] = -1;
-    shakeOffsets[11] = 3;
-    shakeOffsets[12] = -5;
-    shakeOffsets[13] = 4;
-    shakeOffsets[14] = -8;
-    shakeOffsets[15] = 6;
-    shakeOffsets[16] = -4;
-    shakeOffsets[17] = 2;
-    shakeOffsets[18] = -1;
-    shakeOffsets[19] = 1;
-    shakeOffsets[20] = -3;
-    shakeOffsets[21] = -3;
-    shakeOffsets[22] = -7;
-    shakeOffsets[23] = -5;
-    shakeOffsets[24] = -5;
-    shakeOffsets[25] = -7;
-    shakeOffsets[26] = -2;
-    shakeOffsets[27] = -3;
-    shakeOffsets[28] = 0;
-    shakeOffsets[29] = 0;
+    // Retail screen-shake trajectory; each row is an ordered x/y displacement.
+    // NOLINTBEGIN(readability-magic-numbers)
+    i32 shakeOffsets[EARTHQUAKE_SHAKE_FRAME_COUNT][IDX(COMBAT_COORDINATE_COUNT)] = {
+        {2, 2},
+        {4, 1},
+        {3, -2},
+        {0, -6},
+        {2, -2},
+        {-1, 3},
+        {-5, 4},
+        {-8, 6},
+        {-4, 2},
+        {-1, 1},
+        {-3, -3},
+        {-7, -5},
+        {-5, -7},
+        {-2, -3},
+        {0, 0}
+    };
+    // NOLINTEND(readability-magic-numbers)
 
     gpMouseManager->HideColorPointer();
     memcpy(
@@ -3416,45 +3566,27 @@ void combatManager::Earthquake(void) {
             PollSound();
             i32 width =
                 COMBAT_SCREEN_WIDTH
-                - abs(
-                    shakeOffsets
-                        [frame * EARTHQUAKE_SHAKE_COORDINATE_COUNT + IDX(COMBAT_COORDINATE_X)]
-                );
+                - abs(shakeOffsets[frame][IDX(COMBAT_COORDINATE_X)]);
             i32 height =
                 COMBAT_AREA_HEIGHT
-                - abs(
-                    shakeOffsets
-                        [frame * EARTHQUAKE_SHAKE_COORDINATE_COUNT + IDX(COMBAT_COORDINATE_Y)]
-                )
+                - abs(shakeOffsets[frame][IDX(COMBAT_COORDINATE_Y)])
                 - 1;
             u8* source =
                 m_backgroundBuffer->m_pixels
-                + (shakeOffsets
-                               [frame * EARTHQUAKE_SHAKE_COORDINATE_COUNT
-                                + IDX(COMBAT_COORDINATE_Y)]
-                           > 0
-                       ? shakeOffsets
-                             [frame * EARTHQUAKE_SHAKE_COORDINATE_COUNT + IDX(COMBAT_COORDINATE_Y)]
+                + (shakeOffsets[frame][IDX(COMBAT_COORDINATE_Y)] > 0
+                       ? shakeOffsets[frame][IDX(COMBAT_COORDINATE_Y)]
                        : 0)
                       * COMBAT_SCREEN_WIDTH
-                + (shakeOffsets
-                               [frame * EARTHQUAKE_SHAKE_COORDINATE_COUNT
-                                + IDX(COMBAT_COORDINATE_X)]
-                           > 0
-                       ? shakeOffsets
-                             [frame * EARTHQUAKE_SHAKE_COORDINATE_COUNT + IDX(COMBAT_COORDINATE_X)]
+                + (shakeOffsets[frame][IDX(COMBAT_COORDINATE_X)] > 0
+                       ? shakeOffsets[frame][IDX(COMBAT_COORDINATE_X)]
                        : 0);
             i32 destinationX =
-                shakeOffsets[frame * EARTHQUAKE_SHAKE_COORDINATE_COUNT + IDX(COMBAT_COORDINATE_X)]
-                        <= 0
-                    ? -shakeOffsets
-                          [frame * EARTHQUAKE_SHAKE_COORDINATE_COUNT + IDX(COMBAT_COORDINATE_X)]
+                shakeOffsets[frame][IDX(COMBAT_COORDINATE_X)] <= 0
+                    ? -shakeOffsets[frame][IDX(COMBAT_COORDINATE_X)]
                     : 0;
             i32 destinationY =
-                shakeOffsets[frame * EARTHQUAKE_SHAKE_COORDINATE_COUNT + IDX(COMBAT_COORDINATE_Y)]
-                        <= 0
-                    ? -shakeOffsets
-                          [frame * EARTHQUAKE_SHAKE_COORDINATE_COUNT + IDX(COMBAT_COORDINATE_Y)]
+                shakeOffsets[frame][IDX(COMBAT_COORDINATE_Y)] <= 0
+                    ? -shakeOffsets[frame][IDX(COMBAT_COORDINATE_Y)]
                     : 0;
             u8* destination = gpWindowManager->m_screen->m_pixels
                               + destinationY * COMBAT_SCREEN_WIDTH + destinationX;
@@ -3481,7 +3613,7 @@ void combatManager::Earthquake(void) {
 
     i32 newWallStates[EARTHQUAKE_STRUCTURE_COUNT];
     i32 newTowerStates[EARTHQUAKE_STRUCTURE_COUNT];
-    i32 impactPositions[EARTHQUAKE_MAX_IMPACTS][2];
+    i32 impactPositions[EARTHQUAKE_MAX_IMPACTS][IDX(COMBAT_COORDINATE_COUNT)];
     i32 impactCount = 0;
     i32 structure;
     for (structure = 0; structure < EARTHQUAKE_STRUCTURE_COUNT; ++structure) {
@@ -3490,7 +3622,7 @@ void combatManager::Earthquake(void) {
                 != IDX(COMBAT_WALL_STATE_DESTROYED)
             && m_wallStates[structure + COMBAT_WALL_SLOT_SECTION_FIRST]
                    != IDX(COMBAT_WALL_STATE_SECTION_DESTROYED)
-            && SRandom(0, 100) < EARTHQUAKE_WALL_HIT_CHANCE) {
+            && SRandom(0, EARTHQUAKE_CHANCE_ROLL_MAX) < EARTHQUAKE_WALL_HIT_CHANCE) {
             ++newWallStates[structure];
             if (m_wallStates[structure + COMBAT_WALL_SLOT_SECTION_FIRST]
                     != IDX(COMBAT_WALL_STATE_DESTROYED)
@@ -3500,7 +3632,8 @@ void combatManager::Earthquake(void) {
                        != IDX(COMBAT_WALL_STATE_SECTION_DESTROYED)
                 && m_wallStates[structure + COMBAT_WALL_SLOT_SECTION_FIRST]
                        != IDX(COMBAT_WALL_STATE_SECTION_DAMAGE_LAST)
-                && SRandom(0, 100) < EARTHQUAKE_WALL_SECOND_HIT_CHANCE)
+                && SRandom(0, EARTHQUAKE_CHANCE_ROLL_MAX)
+                       < EARTHQUAKE_WALL_SECOND_HIT_CHANCE)
                 ++newWallStates[structure];
             impactPositions[impactCount][IDX(COMBAT_COORDINATE_X)] =
                 wallPos[structure][IDX(COMBAT_COORDINATE_X)];
@@ -3514,7 +3647,7 @@ void combatManager::Earthquake(void) {
 
         newTowerStates[structure] = m_wallStates[structure];
         if (m_wallStates[structure] != IDX(COMBAT_WALL_STATE_DESTROYED)
-            && SRandom(0, 100) < EARTHQUAKE_TOWER_HIT_CHANCE) {
+            && SRandom(0, EARTHQUAKE_CHANCE_ROLL_MAX) < EARTHQUAKE_TOWER_HIT_CHANCE) {
             newTowerStates[structure] = IDX(COMBAT_WALL_STATE_DESTROYED);
             impactPositions[impactCount][IDX(COMBAT_COORDINATE_X)] =
                 towerPos[structure][IDX(COMBAT_COORDINATE_X)];
@@ -3526,7 +3659,7 @@ void combatManager::Earthquake(void) {
 
     i32 newKeepState = IDX(m_drawbridgeState);
     if (m_drawbridgeState != COMBAT_CASTLE_GATE_HIDDEN
-        && SRandom(0, 100) < EARTHQUAKE_KEEP_HIT_CHANCE) {
+        && SRandom(0, EARTHQUAKE_CHANCE_ROLL_MAX) < EARTHQUAKE_KEEP_HIT_CHANCE) {
         newKeepState = IDX(COMBAT_CASTLE_GATE_HIDDEN);
         impactPositions[impactCount][IDX(COMBAT_COORDINATE_X)] =
             towerPos[0][IDX(COMBAT_COORDINATE_X)];
@@ -3536,12 +3669,12 @@ void combatManager::Earthquake(void) {
             towerPos[1][IDX(COMBAT_COORDINATE_X)];
         impactPositions[impactCount + 1][IDX(COMBAT_COORDINATE_Y)] =
             towerPos[1][IDX(COMBAT_COORDINATE_Y)] + EARTHQUAKE_CLOUD_Y_OFFSET;
-        impactCount += 2;
+        impactCount += EARTHQUAKE_KEEP_IMPACT_COUNT;
     }
 
     i32 impactDelay[EARTHQUAKE_MAX_IMPACTS];
     for (structure = 0; structure < EARTHQUAKE_MAX_IMPACTS; ++structure)
-        impactDelay[structure] = Random(0, 2);
+        impactDelay[structure] = Random(0, EARTHQUAKE_MAX_IMPACT_DELAY);
     giMinExtentX = EARTHQUAKE_EXTENT_MIN_X;
     giMinExtentY = 0;
     giMaxExtentX = EARTHQUAKE_EXTENT_MAX_X;
@@ -3598,8 +3731,8 @@ void combatManager::Earthquake(void) {
 
 VA(0x0042a411, 0x2b1)
 void combatManager::ShowSpellMessage(i32 castByCreature, i32 spell, army* target) {
-    char targetName_b[60];
-    char message_m[400];
+    char targetName_b[TARGET_NAME_CAPACITY];
+    char message_m[MESSAGE_CAPACITY];
     i32 unhandledSpell_j;
     char* name_k;
     if (target != NULL) {
