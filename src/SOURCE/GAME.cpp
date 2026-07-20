@@ -5118,8 +5118,10 @@ void game::RandomizeMine(i32 x, i32 y) {
             if ((WORLDMAP->GetCell(columnOffset4 + x, y - rowOffset0)->m_triggerType
                  & MAP_TRIGGER_TYPE_MASK)
                 > 0)
-                if (IDX(WORLDMAP->GetCell(columnOffset4 + x, y - rowOffset0)->m_triggerType
-                        & MAP_TRIGGER_TYPE_MASK)
+                if (static_cast<i32>(
+                        WORLDMAP->GetCell(columnOffset4 + x, y - rowOffset0)->m_triggerType
+                        & MAP_TRIGGER_TYPE_MASK
+                    )
                     <= MINE_FLAG_OVERWRITE_LIMIT)
                     continue;
             WORLDMAP->GetCell(columnOffset4 + x, y - rowOffset0)->m_objectMetadata = mineId;

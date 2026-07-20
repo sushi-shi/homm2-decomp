@@ -334,7 +334,7 @@ void philAI::CheckForCreatureUpgrades(void) {
                             & (1 << (IDX(dwelling) + CREATURE_UPGRADE_BUILDING_OFFSET)))) {
                         canUpgrade = 1;
                         upgradeType = static_cast<CreatureType>(
-                            IDX(armyPtr->m_creatureTypes[creatureIndex]) + 1
+                            static_cast<i32>(armyPtr->m_creatureTypes[creatureIndex]) + 1
                         );
                     }
                 }
@@ -2234,7 +2234,9 @@ void philAI::ValueOfBuyingBuilding(
         adjustedValue -= static_cast<float>(
             GetBuildingBaseResourceValue(
                 currentTownRace,
-                BuildingSlotType(IDX(building) - CREATURE_UPGRADE_BUILDING_OFFSET),
+                static_cast<BuildingSlotType>(
+                    static_cast<i32>(building) - CREATURE_UPGRADE_BUILDING_OFFSET
+                ),
                 1
             )
         );
@@ -2242,7 +2244,9 @@ void philAI::ValueOfBuyingBuilding(
     if (building == BUILDING_SLOT_DWELLING_LAST) {
         adjustedValue -= static_cast<float>(GetBuildingBaseResourceValue(
             currentTownRace,
-            BuildingSlotType(IDX(BUILDING_SLOT_DWELLING_LAST) - 1),
+            static_cast<BuildingSlotType>(
+                static_cast<i32>(BUILDING_SLOT_DWELLING_LAST) - 1
+            ),
             1
         ));
     }
@@ -2373,7 +2377,8 @@ void philAI::ValueOfBuyingBuilding(
                        * 0.05)
                 * adjustedValue
             );
-            if (IDX(building) - IDX(BUILDING_SLOT_DWELLING_FIRST) < highestDwellingId)
+            if (static_cast<i32>(building) - IDX(BUILDING_SLOT_DWELLING_FIRST)
+                < highestDwellingId)
                 adjustedValue = static_cast<float>((1.66 - dwellingTotal * 0.33) * adjustedValue);
             if (townPtr->m_buildings & BIT(BUILDING_SLOT_SPECIAL_FOUR))
                 adjustedValue = static_cast<float>(adjustedValue * 1.1);

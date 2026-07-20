@@ -2571,7 +2571,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             if (!eventHero2->HasArtifact(ARTIFACT_MAGIC_BOOK)) {
                 strcat(gText, "Unfortunately, you have no Magic Book to record the spell with.");
                 EventWindow(-1, NORMAL_DIALOG_INFO, gText, -1, 0, -1, 0, -1);
-            } else if (IDX(eventHero2->m_secondarySkills[IDX(HERO_SKILL_WISDOM)])
+            } else if (static_cast<i32>(
+                           eventHero2->m_secondarySkills[IDX(HERO_SKILL_WISDOM)]
+                       )
                            + SHRINE_WISDOM_BONUS
                        < gsSpellInfo[eventValue1].level) {
                 strcat(

@@ -3291,9 +3291,9 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                     0,
                     0,
                     "miniport.icn",
-                    static_cast<i16>(IDX(
+                    static_cast<i16>(
                         gpGame->GetPlayerHero(rank, strongestHeroPosition_first)->m_portrait
-                    )),
+                    ),
                     ICON_DRAW_NORMAL,
                     -1,
                     WIDGET_KIND_ICON_DIRECT,
