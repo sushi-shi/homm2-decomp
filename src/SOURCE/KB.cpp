@@ -68,10 +68,6 @@ H2_ENUM_BEGIN(CampaignChoiceAmount)
     CHOICE_GOLD_BONUS     = 2000
 H2_ENUM_END(CampaignChoiceAmount)
 
-H2_ENUM_BEGIN(PlayerDeadConstant)
-    DEAD_MAP_CHANGE_UNUSED = -999
-H2_ENUM_END(PlayerDeadConstant)
-
 H2_ENUM_BEGIN(CheckEndGameConstants)
     END_GAME_NO_PLAYER               = -1,
     END_GAME_EMPTY_ARMY              = -1,
@@ -2050,7 +2046,7 @@ void PlayerDead(i32 player) {
                 static_cast<i8>(player),
                 0,
                 0,
-                DEAD_MAP_CHANGE_UNUSED,
+                MAP_CHANGE_CURRENT_PLAYER,
                 0,
                 0
             );

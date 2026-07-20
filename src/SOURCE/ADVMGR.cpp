@@ -8750,7 +8750,7 @@ void advManager::LoadRemote(void) {
     UpdateRadar(1, 0);
     UpdBottomView(1, 1, 1);
     gpAdvManager->ForceNewHover();
-    SendMapChange(MAP_CHANGE_MY_TURN, 0, 0, 0, CURSOR_LOG_UNUSED, 0, 0);
+    SendMapChange(MAP_CHANGE_MY_TURN, 0, 0, 0, MAP_CHANGE_CURRENT_PLAYER, 0, 0);
     gpSoundManager->m_samplesReady = 1;
 }
 

@@ -4391,7 +4391,7 @@ void philAI::BuildHero(town* townPtr, i32 availableHeroIndex) {
     newHero6->m_x = townX37;
     newHero6->m_y = townY9;
     newHero6->m_eventFlags = HERO_EVENT_NONE;
-    newHero6->m_direction = AI_HERO_BUILD_DIRECTION;
+    newHero6->m_direction = MAP_SPRITE_INITIAL_DIRECTION;
     newHero6->m_remainingMobility = newHero6->CalcMobility();
     newHero6->m_mobility = newHero6->m_remainingMobility;
 
@@ -4409,7 +4409,7 @@ void philAI::BuildHero(town* townPtr, i32 availableHeroIndex) {
         newHero6->m_id,
         static_cast<u8>(newHero6->m_x),
         static_cast<u8>(newHero6->m_y),
-        AI_HERO_BUILD_MAP_CHANGE_VALUE,
+        MAP_CHANGE_CURRENT_PLAYER,
         0,
         0
     );
