@@ -27,7 +27,7 @@ town::town(void) {
 VA(0x00432c65, 0x54)
 i32 town::HasGarrison(void) {
     for (i32 slot = 0; slot < ARMY_GROUP_SLOT_COUNT; ++slot) {
-        if (m_army.m_creatureTypes[slot] != ARMY_GROUP_EMPTY_SLOT)
+        if (m_army.m_creatureTypes[slot] != CREATURE_NONE)
             return 1;
     }
     return 0;

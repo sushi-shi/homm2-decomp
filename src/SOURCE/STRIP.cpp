@@ -44,7 +44,7 @@ strip::strip(
 
     for (i32 slot = 0; slot < STRIP_ARMY_SLOT_COUNT; slot++) {
         m_creatureIcons[slot] = NULL;
-        m_cachedCreatureTypes[slot] = ARMY_GROUP_EMPTY_SLOT;
+        m_cachedCreatureTypes[slot] = CREATURE_NONE;
     }
 
     m_flagIcon = gpResourceManager->GetIcon("portcflg.icn");
@@ -119,10 +119,10 @@ void strip::Draw(void) {
 VA(0x00432632, 0x3d3)
 void strip::DrawIcons(i32 drawWindow) {
     icon* oldIcons[STRIP_ARMY_SLOT_COUNT];
-    i32 oldCreatureTypes[STRIP_ARMY_SLOT_COUNT];
+    CreatureType oldCreatureTypes[STRIP_ARMY_SLOT_COUNT];
     i32 iconsCurrent_8;
     i32 slot;
-    i32 creatureType;
+    CreatureType creatureType;
 
     m_portraitIcon->DrawToBuffer(m_x + STRIP_PORTRAIT_X, m_y + STRIP_CONTENT_Y, m_portraitFrame, 0);
     if (m_flagFrame != ARMY_GROUP_EMPTY_SLOT)
@@ -136,7 +136,7 @@ void strip::DrawIcons(i32 drawWindow) {
     }
     iconsCurrent_8 = 1;
     for (slot = 0; slot < STRIP_ARMY_SLOT_COUNT; slot++) {
-        if (m_army->m_creatureTypes[slot] != ARMY_GROUP_EMPTY_SLOT
+        if (m_army->m_creatureTypes[slot] != CREATURE_NONE
             && m_army->m_creatureTypes[slot] != m_cachedCreatureTypes[slot])
             iconsCurrent_8 = 0;
     }
@@ -145,28 +145,28 @@ void strip::DrawIcons(i32 drawWindow) {
         for (slot = 0; slot < STRIP_ARMY_SLOT_COUNT; slot++) {
             oldIcons[slot] = m_creatureIcons[slot];
             oldCreatureTypes[slot] = m_cachedCreatureTypes[slot];
-            if (m_army->m_creatureTypes[slot] == ARMY_GROUP_EMPTY_SLOT) {
+            if (m_army->m_creatureTypes[slot] == CREATURE_NONE) {
                 m_creatureIcons[slot] = NULL;
-                m_cachedCreatureTypes[slot] = ARMY_GROUP_EMPTY_SLOT;
+                m_cachedCreatureTypes[slot] = CREATURE_NONE;
             } else {
-                sprintf(gText, "monh%04d.icn", m_army->m_creatureTypes[slot]);
+                sprintf(gText, "monh%04d.icn", IDX(m_army->m_creatureTypes[slot]));
                 m_creatureIcons[slot] = gpResourceManager->GetIcon(gText);
                 m_cachedCreatureTypes[slot] = m_army->m_creatureTypes[slot];
             }
         }
         for (slot = 0; slot < STRIP_ARMY_SLOT_COUNT; slot++) {
-            if (oldCreatureTypes[slot] != 0)
+            if (oldCreatureTypes[slot] != CREATURE_PEASANT)
                 gpResourceManager->Dispose(oldIcons[slot]);
         }
     }
 
     for (slot = 0; slot < STRIP_ARMY_SLOT_COUNT; slot++) {
         creatureType = m_army->m_creatureTypes[slot];
-        if (creatureType != ARMY_GROUP_EMPTY_SLOT) {
+        if (creatureType != CREATURE_NONE) {
             m_stripIcon->DrawToBuffer(
                 m_x + slot * STRIP_ARMY_X_STEP + STRIP_ARMY_FIRST_X,
                 m_y + STRIP_CONTENT_Y,
-                gMonsterDatabase[creatureType].race + STRIP_RACE_FRAME_OFFSET,
+                IDX(gMonsterDatabase[IDX(creatureType)].race) + STRIP_RACE_FRAME_OFFSET,
                 0
             );
             m_creatureIcons[slot]->DrawToBuffer(

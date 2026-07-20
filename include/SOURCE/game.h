@@ -86,7 +86,7 @@ public:
     u8 m_campaignChoice[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
     u8 m_campaignMapEnabled[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
     i16 m_campaignScore;
-    i16 m_campaignCarryoverCreatureTypes[CAMPAIGN_ARMY_SLOT_COUNT];
+    H2_ENUM_STORAGE(CreatureType, i16) m_campaignCarryoverCreatureTypes[CAMPAIGN_ARMY_SLOT_COUNT];
     i16 m_campaignCarryoverCreatureCounts[CAMPAIGN_ARMY_SLOT_COUNT];
     u8 m_campaignScenarioWon;
     u8 m_campaignCheated;
@@ -221,7 +221,7 @@ public:
     void ViewArmy(
         i32,
         i32,
-        i32,
+        H2_ENUM_PARAM(CreatureType, i32),
         i32,
         class town*,
         i32,

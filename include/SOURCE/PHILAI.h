@@ -319,7 +319,7 @@ extern b32 gbDismissArmy;
 extern i8* gbNGHuman;
 extern i32 iViewArmyFrame;
 extern b32 gbAllowUpgrade;
-extern i32 iViewArmyType;
+extern H2_ENUM_STORAGE(CreatureType, i32) iViewArmyType;
 extern class hero* viewSpellsHero;
 extern b32 gbUpgradeArmy;
 extern i16 RandMineQty[AI_RANDOM_MINE_TYPE_COUNT];
