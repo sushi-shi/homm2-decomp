@@ -2727,8 +2727,8 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
 
     artifactCountb = 0;
     for (indexValue = 0; indexValue < TOWN_MAX_ARTIFACTS; ++indexValue) {
-        if (m_recruitHero->m_artifacts[indexValue] != IDX(ARTIFACT_NONE)
-            && m_recruitHero->m_artifacts[indexValue] != IDX(ARTIFACT_MAGIC_BOOK))
+        if (m_recruitHero->m_artifacts[indexValue] != ARTIFACT_NONE
+            && m_recruitHero->m_artifacts[indexValue] != ARTIFACT_MAGIC_BOOK)
             ++artifactCountb;
     }
     sprintf(
@@ -3534,9 +3534,9 @@ void GetCategoryStats(
                         playerHero_h =
                             gpGame->GetHero(gpGame->m_players[player].m_heroIds[townIndex_c]);
                         for (heroIndex_n = 0; heroIndex_n < TOWN_MAX_ARTIFACTS; ++heroIndex_n) {
-                            if (playerHero_h->m_artifacts[heroIndex_n] != IDX(ARTIFACT_NONE)
+                            if (playerHero_h->m_artifacts[heroIndex_n] != ARTIFACT_NONE
                                 && playerHero_h->m_artifacts[heroIndex_n]
-                                       != IDX(ARTIFACT_MAGIC_BOOK)) {
+                                       != ARTIFACT_MAGIC_BOOK) {
                                 ++stats[player];
                             }
                         }

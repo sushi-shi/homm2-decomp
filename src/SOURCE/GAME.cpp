@@ -873,7 +873,7 @@ i32 playerData::NumOfGivenArtifact(ArtifactType artifact) {
     for (i = 0; i < m_heroCount; i++) {
         i32 j;
         for (j = 0; j < HERO_ARTIFACT_SLOT_COUNT; j++) {
-            if (gpGame->m_heroRecs[m_heroIds[i]].m_artifacts[j] == IDX(artifact))
+            if (gpGame->m_heroRecs[m_heroIds[i]].m_artifacts[j] == artifact)
                 count++;
         }
     }
@@ -1115,10 +1115,10 @@ i32 game::GetNewHeroId(i32, FactionType heroClass, i32 requireExperienced) {
             continue;
         if (requireExperienced && attempts < HERO_SELECTION_EXPERIENCE_RETRY_LIMIT
             && m_heroRecs[heroId].m_experience < HERO_SELECTION_MINIMUM_EXPERIENCE
-            && (m_heroRecs[heroId].m_artifacts[0] == IDX(ARTIFACT_NONE)
-                || m_heroRecs[heroId].m_artifacts[0] == IDX(ARTIFACT_MAGIC_BOOK))
-            && (m_heroRecs[heroId].m_artifacts[1] == IDX(ARTIFACT_NONE)
-                || m_heroRecs[heroId].m_artifacts[1] == IDX(ARTIFACT_MAGIC_BOOK)))
+            && (m_heroRecs[heroId].m_artifacts[0] == ARTIFACT_NONE
+                || m_heroRecs[heroId].m_artifacts[0] == ARTIFACT_MAGIC_BOOK)
+            && (m_heroRecs[heroId].m_artifacts[1] == ARTIFACT_NONE
+                || m_heroRecs[heroId].m_artifacts[1] == ARTIFACT_MAGIC_BOOK))
             continue;
         if (gbInCampaign && attempts < HERO_SELECTION_CAMPAIGN_RETRY_LIMIT
             && m_heroRecs[heroId].m_portrait >= HERO_SELECTION_CAMPAIGN_PORTRAIT_FIRST
@@ -1419,23 +1419,23 @@ void game::SetupOrigData(void) {
             m_heroRecs[i].GiveSS(HERO_SKILL_BALLISTICS, IDX(HERO_SKILL_LEVEL_BASIC));
         }
         if (m_heroRecs[i].m_cursorType == FACTION_SORCERESS) {
-            m_heroRecs[i].m_artifacts[0] = IDX(ARTIFACT_MAGIC_BOOK);
+            m_heroRecs[i].m_artifacts[0] = ARTIFACT_MAGIC_BOOK;
             m_heroRecs[i].GiveSS(HERO_SKILL_NAVIGATION, IDX(HERO_SKILL_LEVEL_ADVANCED));
             m_heroRecs[i].GiveSS(HERO_SKILL_WISDOM, IDX(HERO_SKILL_LEVEL_BASIC));
         }
         if (m_heroRecs[i].m_cursorType == FACTION_BARBARIAN)
             m_heroRecs[i].GiveSS(HERO_SKILL_PATHFINDING, IDX(HERO_SKILL_LEVEL_ADVANCED));
         if (m_heroRecs[i].m_cursorType == FACTION_WARLOCK) {
-            m_heroRecs[i].m_artifacts[0] = IDX(ARTIFACT_MAGIC_BOOK);
+            m_heroRecs[i].m_artifacts[0] = ARTIFACT_MAGIC_BOOK;
             m_heroRecs[i].GiveSS(HERO_SKILL_SCOUTING, IDX(HERO_SKILL_LEVEL_ADVANCED));
             m_heroRecs[i].GiveSS(HERO_SKILL_WISDOM, IDX(HERO_SKILL_LEVEL_BASIC));
         }
         if (m_heroRecs[i].m_cursorType == FACTION_WIZARD) {
-            m_heroRecs[i].m_artifacts[0] = IDX(ARTIFACT_MAGIC_BOOK);
+            m_heroRecs[i].m_artifacts[0] = ARTIFACT_MAGIC_BOOK;
             m_heroRecs[i].GiveSS(HERO_SKILL_WISDOM, IDX(HERO_SKILL_LEVEL_ADVANCED));
         }
         if (m_heroRecs[i].m_cursorType == FACTION_NECROMANCER) {
-            m_heroRecs[i].m_artifacts[0] = IDX(ARTIFACT_MAGIC_BOOK);
+            m_heroRecs[i].m_artifacts[0] = ARTIFACT_MAGIC_BOOK;
             m_heroRecs[i].GiveSS(HERO_SKILL_WISDOM, IDX(HERO_SKILL_LEVEL_BASIC));
             m_heroRecs[i].GiveSS(HERO_SKILL_NECROMANCY, IDX(HERO_SKILL_LEVEL_BASIC));
         }
