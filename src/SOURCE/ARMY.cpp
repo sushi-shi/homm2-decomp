@@ -392,7 +392,7 @@ void army::DrawToBuffer(i32 x, i32 y, i32 effectsOnly) {
     color = 0;
     standing7 = m_animationSequence == ARMY_ANIMATION_STAND
                 || (m_animationSequence >= ARMY_ANIMATION_STANDING_FIRST
-                    && IDX(m_animationSequence) <= IDX(ARMY_ANIMATION_STANDING_END) - 1);
+                    && m_animationSequence < ARMY_ANIMATION_STANDING_END);
     y += m_yOffset;
     x += m_xOffset;
     if (m_animationSequence == ARMY_ANIMATION_WALK
@@ -1400,7 +1400,7 @@ void army::DoHydraAttack(i32) {
     }
     gpCombatManager->DrawFrame(0, 1, 0, 1, ARMY_COMBAT_FRAME_DELAY, 1, 1);
     m_animationState = 1;
-    m_pendingAnimationSequence = ARMY_ATTACK_DELAY_NORMAL;
+    m_pendingAnimationSequence = ARMY_ANIMATION_ATTACK_FORWARD;
     gpSoundManager->MemorySample(m_samples[IDX(ARMY_SAMPLE_ATTACK)]);
     if (totalKilled_7 > 0) {
         sprintf(
@@ -1539,15 +1539,15 @@ void army::DoAttack(i32 retaliation) {
         if (m_attackDirection == COMBAT_DIRECTION_WIDE_WEST
             || m_attackDirection == COMBAT_DIRECTION_NORTHWEST
             || m_attackDirection == COMBAT_DIRECTION_NORTHEAST) {
-            m_pendingAnimationSequence = ARMY_ATTACK_DELAY_SHORT;
+            m_pendingAnimationSequence = ARMY_ANIMATION_ATTACK_UP;
         } else if (m_attackDirection == COMBAT_DIRECTION_EAST
                    || m_attackDirection == COMBAT_DIRECTION_WEST) {
-            m_pendingAnimationSequence = ARMY_ATTACK_DELAY_NORMAL;
+            m_pendingAnimationSequence = ARMY_ANIMATION_ATTACK_FORWARD;
         } else {
-            m_pendingAnimationSequence = ARMY_ATTACK_DELAY_LONG;
+            m_pendingAnimationSequence = ARMY_ANIMATION_ATTACK_DOWN;
         }
         if (breathTarget_6) {
-            m_pendingAnimationSequence += ARMY_BREATH_ATTACK_DELAY_BONUS;
+            m_pendingAnimationSequence += ARMY_BREATH_ATTACK_SEQUENCE_OFFSET;
         }
         gpSoundManager->MemorySample(m_samples[IDX(ARMY_SAMPLE_ATTACK)]);
         DamageEnemy(target_1, &damage, &killed_13, 0, 0);
@@ -2227,9 +2227,11 @@ void army::PowEffect(i32 effect, i32 resetLimits, i32 effectX, i32 effectY) {
             current = &gpCombatManager->m_armies[side_4][index_10];
             if (static_cast<u8>(current->m_animationState)) {
                 startFrames_5 =
-                    current->m_frameInfo.animationFrameCount[m_pendingAnimationSequence];
+                    current->m_frameInfo.animationFrameCount[IDX(m_pendingAnimationSequence)];
                 endFrames_1 =
-                    current->m_frameInfo.animationFrameCount[m_pendingAnimationSequence + 1] + 1;
+                    current->m_frameInfo
+                        .animationFrameCount[IDX(m_pendingAnimationSequence + 1)]
+                    + 1;
             } else {
                 if (current->m_deathPending) {
                     damageFrames =
@@ -2302,29 +2304,30 @@ void army::PowEffect(i32 effect, i32 resetLimits, i32 effectX, i32 effectY) {
     for (side_4 = 0; side_4 < ARMY_COMBAT_SIDE_COUNT; side_4++) {
         for (index_10 = 0; index_10 < gpCombatManager->m_armyCount[side_4]; index_10++) {
             current = &gpCombatManager->m_armies[side_4][index_10];
-            current->m_effectAnimationStart = -1;
-            current->m_effectAnimationEnd = -1;
+            current->m_effectAnimationStart = ARMY_ANIMATION_NONE;
+            current->m_effectAnimationEnd = ARMY_ANIMATION_NONE;
             current->m_effectAnimationStarted = 0;
             if (current->m_damagePending || static_cast<u8>(current->m_animationState)) {
                 if (static_cast<u8>(current->m_animationState)) {
                     current->m_effectAnimationStart = m_pendingAnimationSequence;
                     current->m_effectAnimationEnd = m_pendingAnimationSequence + 1;
                 } else if (current->m_deathPending) {
-                    current->m_effectAnimationStart = IDX(ARMY_ANIMATION_DEATH);
+                    current->m_effectAnimationStart = ARMY_ANIMATION_DEATH;
                 } else {
-                    current->m_effectAnimationStart = IDX(ARMY_ANIMATION_WINCE);
-                    current->m_effectAnimationEnd = IDX(ARMY_ANIMATION_WINCE_RETURN);
+                    current->m_effectAnimationStart = ARMY_ANIMATION_WINCE;
+                    current->m_effectAnimationEnd = ARMY_ANIMATION_WINCE_RETURN;
                 }
-                if (current->m_effectAnimationStart == IDX(ARMY_ANIMATION_DEATH)) {
+                if (current->m_effectAnimationStart == ARMY_ANIMATION_DEATH) {
                     current->m_effectAnimationLength =
                         current->m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_DEATH)];
                 } else {
                     current->m_effectAnimationLength =
-                        current->m_frameInfo.animationFrameCount[current->m_effectAnimationStart]
+                        current->m_frameInfo
+                            .animationFrameCount[IDX(current->m_effectAnimationStart)]
                         + current->m_frameInfo
-                              .animationFrameCount[current->m_effectAnimationStart + 1];
+                              .animationFrameCount[IDX(current->m_effectAnimationStart + 1)];
                 }
-                if (IDX(current->m_animationSequence) == current->m_effectAnimationStart) {
+                if (current->m_animationSequence == current->m_effectAnimationStart) {
                     current->m_effectAnimationLength--;
                 }
                 if (m_drawState < ARMY_DRAW_EFFECT) {
@@ -2355,7 +2358,8 @@ void army::PowEffect(i32 effect, i32 resetLimits, i32 effectX, i32 effectY) {
                         }
                     }
                 }
-                if (current->m_effectAnimationStart != -1 && !current->m_effectAnimationStarted
+                if (current->m_effectAnimationStart != ARMY_ANIMATION_NONE
+                    && !current->m_effectAnimationStarted
                     && (static_cast<u8>(current->m_animationState)
                         || static_cast<i32>(effectFrames_1 - frame - 1)
                                <= current->m_effectAnimationLength
@@ -2366,31 +2370,28 @@ void army::PowEffect(i32 effect, i32 resetLimits, i32 effectX, i32 effectY) {
                                 || current->m_animationFrame + 1
                                        < current->m_frameInfo.animationFrameCount
                                              [IDX(current->m_animationSequence)])))) {
-                    if (IDX(current->m_animationSequence) != current->m_effectAnimationStart
-                        && IDX(current->m_animationSequence) != current->m_effectAnimationEnd) {
+                    if (current->m_animationSequence != current->m_effectAnimationStart
+                        && current->m_animationSequence != current->m_effectAnimationEnd) {
                         if (!gbNoShowCombat
-                            && current->m_effectAnimationStart == IDX(ARMY_ANIMATION_WINCE)) {
+                            && current->m_effectAnimationStart == ARMY_ANIMATION_WINCE) {
                             gpSoundManager->MemorySample(gpCombatManager->m_armies[side_4][index_10]
                                                              .m_samples[IDX(ARMY_SAMPLE_WINCE)]);
                         }
                         if (!gbNoShowCombat
-                            && current->m_effectAnimationStart == IDX(ARMY_ANIMATION_DEATH)) {
+                            && current->m_effectAnimationStart == ARMY_ANIMATION_DEATH) {
                             gpSoundManager->MemorySample(gpCombatManager->m_armies[side_4][index_10]
                                                              .m_samples[IDX(ARMY_SAMPLE_KILL)]);
                         }
-                        current->m_animationSequence =
-                            ArmyAnimationSequence(current->m_effectAnimationStart);
+                        current->m_animationSequence = current->m_effectAnimationStart;
                         current->m_animationFrame = 0;
                     } else {
                         if (current->m_animationFrame + 1
                             < current->m_frameInfo
                                   .animationFrameCount[IDX(current->m_animationSequence)]) {
                             current->m_animationFrame++;
-                        } else if (IDX(current->m_animationSequence)
-                                       != current->m_effectAnimationEnd
-                                   && current->m_effectAnimationEnd != -1) {
-                            current->m_animationSequence =
-                                ArmyAnimationSequence(current->m_effectAnimationEnd);
+                        } else if (current->m_animationSequence != current->m_effectAnimationEnd
+                                   && current->m_effectAnimationEnd != ARMY_ANIMATION_NONE) {
+                            current->m_animationSequence = current->m_effectAnimationEnd;
                             current->m_animationFrame = 0;
                         } else {
                             if (current->m_animationSequence != ARMY_ANIMATION_STAND
