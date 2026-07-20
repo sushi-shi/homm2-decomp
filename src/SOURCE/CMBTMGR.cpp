@@ -48,7 +48,6 @@ H2_ENUM_BEGIN(CombatSystemOptionWidget)
 H2_ENUM_END(CombatSystemOptionWidget)
 
 H2_ENUM_BEGIN(CombatSystemOptionConstant)
-    SYSTEM_OPTION_RIGHT_BUTTON            = 0x200,
     SYSTEM_OPTION_CYCLE_COUNT             = 3,
     SYSTEM_OPTION_HELP_DIALOG             = 4,
     SYSTEM_OPTION_HANDLER_CONTINUE        = 1,
@@ -2312,30 +2311,33 @@ i32 CombatSystemOptionsHandler(tag_message& message) {
     i32 bDone = 0;
     char optionText[COMBAT_MESSAGE_LINE_SIZE];
     if (message.type == COMBAT_SYSTEM_OPTION_EVENT) {
-        if (message.payload.widget.parameter & SYSTEM_OPTION_RIGHT_BUTTON) {
+        if (HAS(
+                static_cast<MessageModifier>(message.payload.widget.parameter),
+                MESSAGE_MODIFIER_RIGHT_BUTTON
+            )) {
             if (message.payload.widget.command == COMBAT_SYSTEM_OPTION_BUTTON_EVENT
                 || message.payload.widget.command == COMBAT_SYSTEM_OPTION_HOVER_EVENT) {
                 i32 helpIndex = -1;
                 switch (message.payload.widget.id) {
-                    case IDX(SYSTEM_OPTION_CLOSE_BUTTON):
+                    case SYSTEM_OPTION_CLOSE_BUTTON:
                         helpIndex = IDX(HELP_CLOSE);
                         break;
-                    case IDX(SYSTEM_OPTION_SPEED_BUTTON):
+                    case SYSTEM_OPTION_SPEED_BUTTON:
                         helpIndex = IDX(HELP_SPEED);
                         break;
-                    case IDX(SYSTEM_OPTION_ARMY_INFO_BUTTON):
+                    case SYSTEM_OPTION_ARMY_INFO_BUTTON:
                         helpIndex = IDX(HELP_ARMY_INFO);
                         break;
-                    case IDX(SYSTEM_OPTION_AUTO_SPELL_BUTTON):
+                    case SYSTEM_OPTION_AUTO_SPELL_BUTTON:
                         helpIndex = IDX(HELP_AUTO_SPELL);
                         break;
-                    case IDX(SYSTEM_OPTION_GRID_BUTTON):
+                    case SYSTEM_OPTION_GRID_BUTTON:
                         helpIndex = IDX(HELP_GRID);
                         break;
-                    case IDX(SYSTEM_OPTION_SHADE_BUTTON):
+                    case SYSTEM_OPTION_SHADE_BUTTON:
                         helpIndex = IDX(HELP_SHADE);
                         break;
-                    case IDX(SYSTEM_OPTION_MOUSE_HEX_BUTTON):
+                    case SYSTEM_OPTION_MOUSE_HEX_BUTTON:
                         helpIndex = IDX(HELP_MOUSE_HEX);
                         break;
                 }
@@ -2358,41 +2360,41 @@ i32 CombatSystemOptionsHandler(tag_message& message) {
             switch (message.payload.widget.command) {
                 case COMBAT_SYSTEM_OPTION_CLOSE_EVENT:
                     switch (message.payload.widget.id) {
-                        case IDX(SYSTEM_OPTION_CLOSE_BUTTON):
+                        case SYSTEM_OPTION_CLOSE_BUTTON:
                             bDone = 1;
                             break;
                     }
                     break;
                 case COMBAT_SYSTEM_OPTION_BUTTON_EVENT:
                     switch (message.payload.widget.id) {
-                        case IDX(SYSTEM_OPTION_SPEED_BUTTON):
+                        case SYSTEM_OPTION_SPEED_BUTTON:
                             gConfig.combatSpeed =
                                 (gConfig.combatSpeed + 1) % SYSTEM_OPTION_CYCLE_COUNT;
                             bRedraw = 1;
                             bCPrefsChanged = 1;
                             break;
-                        case IDX(SYSTEM_OPTION_ARMY_INFO_BUTTON):
+                        case SYSTEM_OPTION_ARMY_INFO_BUTTON:
                             gConfig.combatArmyInfoLevel = (gConfig.combatArmyInfoLevel + 1)
                                                           % SYSTEM_OPTION_CYCLE_COUNT;
                             bRedraw = 1;
                             bCPrefsChanged = 1;
                             break;
-                        case IDX(SYSTEM_OPTION_AUTO_SPELL_BUTTON):
+                        case SYSTEM_OPTION_AUTO_SPELL_BUTTON:
                             gConfig.autoCombatUseSpells = 1 - gConfig.autoCombatUseSpells;
                             bRedraw = 1;
                             bCPrefsChanged = 1;
                             break;
-                        case IDX(SYSTEM_OPTION_GRID_BUTTON):
+                        case SYSTEM_OPTION_GRID_BUTTON:
                             gConfig.showCombatGrid = 1 - gConfig.showCombatGrid;
                             bRedraw = 1;
                             bCPrefsChanged = 1;
                             break;
-                        case IDX(SYSTEM_OPTION_SHADE_BUTTON):
+                        case SYSTEM_OPTION_SHADE_BUTTON:
                             gConfig.combatShadeLevel = 1 - gConfig.combatShadeLevel;
                             bRedraw = 1;
                             bCPrefsChanged = 1;
                             break;
-                        case IDX(SYSTEM_OPTION_MOUSE_HEX_BUTTON):
+                        case SYSTEM_OPTION_MOUSE_HEX_BUTTON:
                             gConfig.showCombatMouseHex = 1 - gConfig.showCombatMouseHex;
                             bRedraw = 1;
                             bCPrefsChanged = 1;

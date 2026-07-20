@@ -154,13 +154,13 @@ i32 recruitUnit::Open(i32 priority) {
         gpWindowManager->BroadcastMessage(
             MESSAGE_WIDGET,
             WIDGET_COMMAND_CLEAR_FLAGS,
-            IDX(CONFIRM_CONTROL),
+            CONFIRM_CONTROL,
             WIDGET_FLAG_ENABLED
         );
         gpWindowManager->BroadcastMessage(
             MESSAGE_WIDGET,
             WIDGET_COMMAND_SET_FLAGS,
-            IDX(CONFIRM_CONTROL),
+            CONFIRM_CONTROL,
             BROADCAST_FLAGS
         );
     }
@@ -239,7 +239,7 @@ i32 recruitUnit::Main(struct tag_message& message) {
             case WIDGET_COMMAND_SELECT:
             case WIDGET_COMMAND_ALTERNATE_SELECT:
                 switch (message.payload.widget.id) {
-                    case IDX(QUANTITY_CONTROL):
+                    case QUANTITY_CONTROL:
                         if (quickView != 0)
                             break;
                         message.payload.widget.command = WIDGET_COMMAND_GET_TEXT;
@@ -250,7 +250,7 @@ i32 recruitUnit::Main(struct tag_message& message) {
                         if (m_quantity > m_maximum)
                             m_quantity = m_maximum;
                         break;
-                    case IDX(CREATURE_CONTROL):
+                    case CREATURE_CONTROL:
                         gpGame->ViewArmy(
                             VIEW_ARMY_X,
                             VIEW_ARMY_Y,
@@ -272,7 +272,7 @@ i32 recruitUnit::Main(struct tag_message& message) {
                 break;
             case WIDGET_COMMAND_DESELECT:
                 switch (message.payload.widget.id) {
-                    case IDX(INCREASE_CONTROL):
+                    case INCREASE_CONTROL:
                         if (quickView != 0)
                             break;
                         ++m_quantity;
@@ -281,7 +281,7 @@ i32 recruitUnit::Main(struct tag_message& message) {
                         Update();
                         m_window->DrawWindow(1, 0, DRAW_DEPTH);
                         break;
-                    case IDX(DECREASE_CONTROL):
+                    case DECREASE_CONTROL:
                         if (quickView != 0)
                             break;
                         --m_quantity;
@@ -290,20 +290,20 @@ i32 recruitUnit::Main(struct tag_message& message) {
                         Update();
                         m_window->DrawWindow(1, 0, DRAW_DEPTH);
                         break;
-                    case IDX(MAXIMUM_CONTROL):
+                    case MAXIMUM_CONTROL:
                         if (quickView != 0)
                             break;
                         m_quantity = m_maximum;
                         Update();
                         m_window->DrawWindow(1, 0, DRAW_DEPTH);
                         break;
-                    case IDX(CANCEL_CONTROL):
+                    case CANCEL_CONTROL:
                         if (quickView != 0)
                             break;
                         m_quantity = 0;
                         close = 1;
                         break;
-                    case IDX(CONFIRM_CONTROL):
+                    case CONFIRM_CONTROL:
                         if (quickView != 0)
                             break;
                         if (m_quantity == 0) {

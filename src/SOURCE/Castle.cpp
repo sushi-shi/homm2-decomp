@@ -576,11 +576,11 @@ i32 CastleHandler(tag_message& message) {
 
             case TOWN_SELECTED_BUILDING_NONE:
                 switch (message.payload.widget.id) {
-                    case IDX(CONTROL_HERO_FIRST):
+                    case CONTROL_HERO_FIRST:
                     case CONTROL_HERO_FIRST + 1:
                         heroChoiceIndex = message.payload.widget.id - CONTROL_HERO_FIRST;
                         goto hero_hover_text;
-                    case IDX(CONTROL_RECRUIT_FIRST):
+                    case CONTROL_RECRUIT_FIRST:
                     case CONTROL_RECRUIT_FIRST + 1:
                         heroChoiceIndex = message.payload.widget.id - CONTROL_RECRUIT_FIRST;
                     hero_hover_text:
@@ -734,11 +734,11 @@ i32 CastleHandler(tag_message& message) {
 
                     case TOWN_SELECTED_BUILDING_NONE:
                         switch (message.payload.widget.id) {
-                            case IDX(CONTROL_HERO_FIRST):
+                            case CONTROL_HERO_FIRST:
                             case CONTROL_HERO_FIRST + 1:
                                 heroChoiceIndex = message.payload.widget.id - CONTROL_HERO_FIRST;
                                 goto hero_selected;
-                            case IDX(CONTROL_RECRUIT_FIRST):
+                            case CONTROL_RECRUIT_FIRST:
                             case CONTROL_RECRUIT_FIRST + 1:
                                 heroChoiceIndex = message.payload.widget.id - CONTROL_RECRUIT_FIRST;
                             hero_selected:

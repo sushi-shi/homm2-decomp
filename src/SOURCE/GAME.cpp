@@ -5328,8 +5328,8 @@ void game::ProcessRandomObjects(void) {
     for (y8 = 0; MAP_HEIGHT > y8; y8++) {
         for (x10 = 0; x10 < MAP_WIDTH; x10++) {
             cell6 = WORLDMAP->GetCell(x10, y8);
-            switch (cell6->m_triggerType) {
-                case IDX(TRIGGER_RANDOM_ULTIMATE_ARTIFACT):
+            switch (static_cast<GameMapTrigger>(cell6->m_triggerType)) {
+                case TRIGGER_RANDOM_ULTIMATE_ARTIFACT:
                     giUABaseX = static_cast<i16>(x10);
                     giUABaseY = static_cast<i16>(y8);
                     giUARadius = static_cast<i16>(cell6->m_objectMetadata);
@@ -5337,32 +5337,32 @@ void game::ProcessRandomObjects(void) {
                     cell6->m_objectTileset = TILESET_NONE;
                     cell6->m_objectIndex = -1;
                     break;
-                case IDX(TRIGGER_RANDOM_TOWN):
+                case TRIGGER_RANDOM_TOWN:
                     RandomizeTown(x10, y8, 0);
                     break;
-                case IDX(TRIGGER_RANDOM_CASTLE):
+                case TRIGGER_RANDOM_CASTLE:
                     RandomizeTown(x10, y8, 1);
                     break;
                 // Random-object value bands, quantity ranges, and paired source
                 // frames are serialized map-editor balance and tileset payload.
                 // NOLINTBEGIN(readability-magic-numbers)
-                case IDX(TRIGGER_RANDOM_MONSTER):
+                case TRIGGER_RANDOM_MONSTER:
                     minValue7 = 80;
                     maxValue17 = 2000;
                     goto randomMonster;
-                case IDX(TRIGGER_RANDOM_MONSTER_LEVEL_1):
+                case TRIGGER_RANDOM_MONSTER_LEVEL_1:
                     minValue7 = 0;
                     maxValue17 = 400;
                     goto randomMonster;
-                case IDX(TRIGGER_RANDOM_MONSTER_LEVEL_2):
+                case TRIGGER_RANDOM_MONSTER_LEVEL_2:
                     minValue7 = 400;
                     maxValue17 = 1000;
                     goto randomMonster;
-                case IDX(TRIGGER_RANDOM_MONSTER_LEVEL_3):
+                case TRIGGER_RANDOM_MONSTER_LEVEL_3:
                     minValue7 = 1000;
                     maxValue17 = 2500;
                     goto randomMonster;
-                case IDX(TRIGGER_RANDOM_MONSTER_LEVEL_4):
+                case TRIGGER_RANDOM_MONSTER_LEVEL_4:
                     minValue7 = 2500;
                     maxValue17 = 100000;
                     goto randomMonster;
@@ -5371,20 +5371,20 @@ void game::ProcessRandomObjects(void) {
                         && cell6->m_objectIndex >= RANDOM_MONSTER_SPRITE_FIRST
                         && cell6->m_objectIndex <= RANDOM_MONSTER_SPRITE_LAST) {
                         randomObjectType3 = cell6->m_objectIndex + RANDOM_MONSTER_SPRITE_TO_TRIGGER;
-                        switch (randomObjectType3) {
-                            case IDX(TRIGGER_RANDOM_MONSTER_LEVEL_1):
+                        switch (static_cast<GameMapTrigger>(randomObjectType3)) {
+                            case TRIGGER_RANDOM_MONSTER_LEVEL_1:
                                 minValue7 = 0;
                                 maxValue17 = 400;
                                 goto monsterBoundsReady;
-                            case IDX(TRIGGER_RANDOM_MONSTER_LEVEL_2):
+                            case TRIGGER_RANDOM_MONSTER_LEVEL_2:
                                 minValue7 = 400;
                                 maxValue17 = 1000;
                                 goto monsterBoundsReady;
-                            case IDX(TRIGGER_RANDOM_MONSTER_LEVEL_3):
+                            case TRIGGER_RANDOM_MONSTER_LEVEL_3:
                                 minValue7 = 1000;
                                 maxValue17 = 2500;
                                 goto monsterBoundsReady;
-                            case IDX(TRIGGER_RANDOM_MONSTER_LEVEL_4):
+                            case TRIGGER_RANDOM_MONSTER_LEVEL_4:
                                 minValue7 = 2500;
                                 maxValue17 = 100000;
                                 goto monsterBoundsReady;
@@ -5397,7 +5397,7 @@ void game::ProcessRandomObjects(void) {
                            || gMonsterDatabase[cell6->m_objectIndex].randomValue >= maxValue17)
                         cell6->m_objectIndex = static_cast<u8>(Random(0, 65));
                     break;
-                case IDX(TRIGGER_RANDOM_RESOURCE):
+                case TRIGGER_RANDOM_RESOURCE:
                     cell6->m_triggerType = IDX(TRIGGER_RESOURCE);
                     randomType0 = Random(0, 6);
                     ConvertObject(
@@ -5439,7 +5439,7 @@ void game::ProcessRandomObjects(void) {
                             break;
                     }
                     break;
-                case IDX(TRIGGER_RANDOM_ARTIFACT):
+                case TRIGGER_RANDOM_ARTIFACT:
                     artifactId18 = GetRandomArtifactId(ARTIFACT_LEVEL_RANDOM, false);
                     cell6->m_triggerType = IDX(TRIGGER_ARTIFACT);
                     ConvertObject(
@@ -5469,7 +5469,7 @@ void game::ProcessRandomObjects(void) {
                         -1
                     );
                     break;
-                case IDX(TRIGGER_RANDOM_ARTIFACT_LEVEL_1):
+                case TRIGGER_RANDOM_ARTIFACT_LEVEL_1:
                     artifactId18 = GetRandomArtifactId(ARTIFACT_LEVEL_TREASURE, false);
                     cell6->m_triggerType = IDX(TRIGGER_ARTIFACT);
                     ConvertObject(
@@ -5499,7 +5499,7 @@ void game::ProcessRandomObjects(void) {
                         -1
                     );
                     break;
-                case IDX(TRIGGER_RANDOM_ARTIFACT_LEVEL_2):
+                case TRIGGER_RANDOM_ARTIFACT_LEVEL_2:
                     artifactId18 = GetRandomArtifactId(ARTIFACT_LEVEL_MINOR, false);
                     cell6->m_triggerType = IDX(TRIGGER_ARTIFACT);
                     ConvertObject(
@@ -5529,7 +5529,7 @@ void game::ProcessRandomObjects(void) {
                         -1
                     );
                     break;
-                case IDX(TRIGGER_RANDOM_ARTIFACT_LEVEL_3):
+                case TRIGGER_RANDOM_ARTIFACT_LEVEL_3:
                     artifactId18 = GetRandomArtifactId(ARTIFACT_LEVEL_MAJOR, false);
                     cell6->m_triggerType = IDX(TRIGGER_ARTIFACT);
                     ConvertObject(
@@ -5560,7 +5560,7 @@ void game::ProcessRandomObjects(void) {
                     );
                     break;
                 // NOLINTEND(readability-magic-numbers)
-                case IDX(TRIGGER_RANDOM_MINE):
+                case TRIGGER_RANDOM_MINE:
                     RandomizeMine(x10, y8);
                     break;
             }
@@ -7550,7 +7550,11 @@ void game::SetupNewRumour(void) {
             attempts13 = 0;
             while (attempts13++ < 200) {
                 category10 = Random(6, 9);
-                GetCategoryStats(category10, categoryStats7, categoryOrder2);
+                GetCategoryStats(
+                    static_cast<TownThievesGuildCategory>(category10),
+                    categoryStats7,
+                    categoryOrder2
+                );
                 SortStats(categoryStats7, categoryOrder2);
                 if (categoryStats7[1] != categoryStats7[0]) {
                     if (category10 == 6)
