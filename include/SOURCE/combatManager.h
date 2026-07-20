@@ -79,6 +79,7 @@ H2_ENUM_CLASS_BEGIN(CombatDrawbridgeState)
     COMBAT_CASTLE_GATE_OPEN              =
         COMBAT_DRAWBRIDGE_RAISED // alias: raised bridge reads as open gate in town view
 H2_ENUM_CLASS_END(CombatDrawbridgeState)
+H2_ENUM_STEPPED(CombatDrawbridgeState)
 
 H2_ENUM_BEGIN(CombatCastleWallSlot)
     COMBAT_WALL_SLOT_NONE           = -1,

@@ -616,10 +616,10 @@ SOURCE/CMBTMGR	?GetNextArmy@combatManager@@QAEHH@Z	100.0000	8112e109eeba
 SOURCE/CMBTMGR	?InCastle@combatManager@@QAEHH@Z	100.0000	9958022caed6
 SOURCE/CMBTMGR	?InitNonVisualVars@combatManager@@QAEXXZ	100.0000	1bfef1999ada
 SOURCE/CMBTMGR	?IsWinner@combatManager@@QAEHH@Z	100.0000	1e6a6005c6de
-SOURCE/CMBTMGR	?KeepAttack@combatManager@@QAEXH@Z	99.9827	c5beebe69172
+SOURCE/CMBTMGR	?KeepAttack@combatManager@@QAEXH@Z	99.9827	5f665b1a6637
 SOURCE/CMBTMGR	?LoadArmies@combatManager@@QAEXXZ	100.0000	ea28e1efa5c8
 SOURCE/CMBTMGR	?LoadIcons@combatManager@@QAEXXZ	99.0950	b820ece13b00
-SOURCE/CMBTMGR	?LowerDoor@combatManager@@QAEXXZ	100.0000	cd140c18d14a
+SOURCE/CMBTMGR	?LowerDoor@combatManager@@QAEXXZ	100.0000	b02ca3e58d00
 SOURCE/CMBTMGR	?MakeCreaturesVanish@combatManager@@QAEXXZ	92.1919	6a909a0c4563
 SOURCE/CMBTMGR	?MoreTreesNear@combatManager@@QAEHXZ	99.0964	1bd66a760ab7
 SOURCE/CMBTMGR	?Open@combatManager@@UAEHH@Z	100.0000	340ba8de5316
