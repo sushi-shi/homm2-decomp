@@ -76,7 +76,7 @@ void ModemSetup(i32 mode) {
     if (gbDirectConnect != 0) {
         LogStr("MS4");
         WFDCStage = MODEM_CONNECTION_INIT_STAGE;
-        giWaitType = MODEM_WAIT_DIRECT_CONNECT;
+        giWaitType = DIALOG_WAIT_DIRECT_CONNECT;
         strcpy(
             directConnectMessage3,
             "Waiting for other computer to log in to direct connection.\n\n"
@@ -124,7 +124,7 @@ VA(0x0040cc30, 0x79)
 void GUIModemCommand(char* message, char* command) {
     iLastActionTime = 0;
     iModemCommandPos = 0;
-    giWaitType = MODEM_WAIT_COMMAND;
+    giWaitType = DIALOG_WAIT_MODEM_COMMAND;
     strcpy(cModemCommand, command);
     NormalDialog(message, NORMAL_DIALOG_WAIT_LAST, -1, -1, -1, 0, -1, 0, -1, 0);
     if (gbFunctionComplete == 0)
@@ -166,7 +166,7 @@ i8 GUIModemResponse(char* message, char* response) {
     memset(GUIMRresponse, 0, MODEM_RESPONSE_SIZE);
     GUIMRrespptr = 0;
     strcpy(GUIMRresp, response);
-    giWaitType = MODEM_WAIT_RESPONSE;
+    giWaitType = DIALOG_WAIT_MODEM_RESPONSE;
     NormalDialog(message, NORMAL_DIALOG_WAIT_LAST, -1, -1, -1, 0, -1, 0, -1, 0);
     if (gbFunctionComplete == 0)
         ShutDown(NULL);

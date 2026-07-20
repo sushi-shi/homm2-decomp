@@ -7,13 +7,11 @@
 #include <SOURCE/town.h>
 
 H2_ENUM_BEGIN(MoraleConstant)
-    FIZBIN_MORALE_PENALTY  = 2,
-    COLISEUM_MORALE_BONUS  = 2,
-    THREE_ALIGNMENT_COUNT  = 3,
-    FOUR_ALIGNMENT_COUNT   = 4,
-    FIVE_ALIGNMENT_COUNT   = 5,
-    THREE_ALIGNMENT_MORALE = -1,
-    FOUR_ALIGNMENT_MORALE  = -2
+    FIZBIN_MORALE_PENALTY = 2,
+    COLISEUM_MORALE_BONUS = 2,
+    THREE_ALIGNMENT_COUNT = 3,
+    FOUR_ALIGNMENT_COUNT  = 4,
+    FIVE_ALIGNMENT_COUNT  = 5
 H2_ENUM_END(MoraleConstant)
 
 VA(0x0048c040, 0x3c)
@@ -48,7 +46,7 @@ i32 armyGroup::HasSomeUndead(void) {
 VA(0x0048c17a, 0x24d)
 i32 armyGroup::GetMorale(hero* armyHero, town* occupiedTown, armyGroup* enemyGroup) {
     i32 morale = 0;
-    i32 alignmentValue;
+    ArmyGroupAlignmentResult alignmentValue;
     i32 hasSomeUndead = 0;
     i32 moraleModifier = 0;
     i32 enemyHasBoneDragon;
@@ -132,7 +130,7 @@ i32 armyGroup::IsMember(i32 creatureType) {
 }
 
 VA(0x0048c44b, 0x14e)
-i32 armyGroup::IsHomogeneous(i32 countRaces) {
+ArmyGroupAlignmentResult armyGroup::IsHomogeneous(i32 countRaces) {
     i32 numCreatureTypes = 0;
     u8 raceUsed[ARMY_GROUP_RACE_COUNT];
     memset(raceUsed, 0, sizeof(raceUsed));
@@ -151,7 +149,7 @@ i32 armyGroup::IsHomogeneous(i32 countRaces) {
     }
 
     if (numCreatureTypes <= 1)
-        return 0;
+        return ARMY_GROUP_ALIGNMENT_NO_MODIFIER;
 
     nRaces = 0;
     for (i = 0; i < ARMY_GROUP_RACE_COUNT; ++i) {
@@ -160,14 +158,14 @@ i32 armyGroup::IsHomogeneous(i32 countRaces) {
     }
 
     if (nRaces == 1)
-        return 1;
+        return ARMY_GROUP_ALIGNMENT_SAME;
     if (nRaces == THREE_ALIGNMENT_COUNT)
-        return THREE_ALIGNMENT_MORALE;
+        return ARMY_GROUP_ALIGNMENT_THREE;
     if (nRaces == FOUR_ALIGNMENT_COUNT)
-        return FOUR_ALIGNMENT_MORALE;
+        return ARMY_GROUP_ALIGNMENT_FOUR;
     if (nRaces >= FIVE_ALIGNMENT_COUNT)
-        return ARMY_GROUP_MORALE_MIN;
-    return 0;
+        return ARMY_GROUP_ALIGNMENT_FIVE_OR_MORE;
+    return ARMY_GROUP_ALIGNMENT_NO_MODIFIER;
 }
 
 VA(0x0048c599, 0x54)

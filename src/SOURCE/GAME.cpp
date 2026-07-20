@@ -442,45 +442,45 @@ saveLocation:
 VA(0x00471500, 0x2ac)
 i32 game::SetupPuzzlePieces(i32 player, i32 justCount) {
     i32 pieceCountTotal = GetNumObelisks(player);
-    i32 unvisitedObelisks = 48 - m_obeliskCount;
+    i32 unvisitedObelisks = PUZZLE_PIECE_COUNT - m_obeliskCount;
     float ratio = static_cast<float>(GetNumObelisks(player)) / m_obeliskCount;
     float interpolation = (ratio * ratio + ratio) / 2.0f;
     pieceCountTotal = static_cast<i32>(pieceCountTotal + unvisitedObelisks * interpolation);
 
     if (GetNumObelisks(player) == m_obeliskCount)
-        pieceCountTotal = 48;
+        pieceCountTotal = PUZZLE_PIECE_COUNT;
     pieceCountTotal += m_players[player].m_cheatValue;
-    if (pieceCountTotal > 48)
-        pieceCountTotal = 48;
+    if (pieceCountTotal > PUZZLE_PIECE_COUNT)
+        pieceCountTotal = PUZZLE_PIECE_COUNT;
     if (justCount)
         return pieceCountTotal;
 
-    memset(puzzlePiecesRemoved, 0, 6);
+    memset(puzzlePiecesRemoved, 0, PUZZLE_PIECE_STORAGE_SIZE);
     SRand(m_players[player].m_color + m_players[player].m_evilInterface * 3);
     i32 tries;
     i32 fallbackNum;
     i32 pieceValue;
     i32 i;
     for (i = 0; (&i)[0] < pieceCountTotal; i++) {
-        for (pieceValue = 0; pieceValue < 48; pieceValue += SRandom(1, 5)) {
+        for (pieceValue = 0; pieceValue < PUZZLE_PIECE_COUNT; pieceValue += SRandom(1, 5)) {
             if (!BitTest(puzzlePiecesRemoved, pieceValue))
                 break;
         }
 
         for (tries = 0; tries < 100; tries++) {
-            fallbackNum = SRandom(0, 47);
+            fallbackNum = SRandom(0, PUZZLE_PIECE_COUNT - 1);
             if (!BitTest(puzzlePiecesRemoved, fallbackNum))
                 break;
         }
         if (tries >= 100) {
-            for (fallbackNum = 0; fallbackNum < 48; fallbackNum++) {
+            for (fallbackNum = 0; fallbackNum < PUZZLE_PIECE_COUNT; fallbackNum++) {
                 if (!BitTest(puzzlePiecesRemoved, fallbackNum))
                     break;
             }
         }
-        if (fallbackNum >= 48)
+        if (fallbackNum >= PUZZLE_PIECE_COUNT)
             fallbackNum = 0;
-        if (pieceValue < 48)
+        if (pieceValue < PUZZLE_PIECE_COUNT)
             BitSet(puzzlePiecesRemoved, pieceValue);
         else
             BitSet(puzzlePiecesRemoved, fallbackNum);

@@ -73,23 +73,24 @@ H2_ENUM_BEGIN(PlayerDeadConstant)
 H2_ENUM_END(PlayerDeadConstant)
 
 H2_ENUM_BEGIN(CheckEndGameConstants)
-    END_GAME_NO_PLAYER          = -1,
-    END_GAME_EMPTY_ARMY         = -1,
-    END_GAME_PLAYER_COUNT       = 6,
-    END_GAME_HERO_COUNT         = 54,
-    END_GAME_ARMY_SLOTS         = 5,
-    END_GAME_GOLD_RESOURCE      = 6,
-    END_GAME_GRACE_DAYS         = 7,
-    END_GAME_DAYS_PER_WEEK      = 7,
-    END_GAME_DAYS_PER_MONTH     = 28,
-    END_GAME_TEXT_BUFFER_SIZE   = 100,
-    END_GAME_GOLD_SCALE         = 1000,
-    END_GAME_ULTIMATE_ARTIFACT  = 0,
-    END_GAME_LAST_ULTIMATE_PART = 7,
-    END_GAME_SIDE_SPECIAL_VALUE = 99,
-    END_GAME_PLAYER_DIALOG_ICON = 9,
-    END_GAME_REMOTE_DIALOG_TIME = 5000,
-    END_GAME_ROLAND_HERO        = 54
+    END_GAME_NO_PLAYER               = -1,
+    END_GAME_EMPTY_ARMY              = -1,
+    END_GAME_PLAYER_COUNT            = 6,
+    END_GAME_HERO_COUNT              = 54,
+    END_GAME_ARMY_SLOTS              = 5,
+    END_GAME_GOLD_RESOURCE           = 6,
+    END_GAME_GRACE_DAYS              = 7,
+    END_GAME_DAYS_PER_WEEK           = 7,
+    END_GAME_DAYS_PER_MONTH          = 28,
+    END_GAME_TEXT_BUFFER_SIZE        = 100,
+    END_GAME_GOLD_SCALE              = 1000,
+    END_GAME_ULTIMATE_ARTIFACT       = 0,
+    END_GAME_LAST_ULTIMATE_PART      = 7,
+    END_GAME_SIDE_SPECIAL_VALUE      = 99,
+    END_GAME_PLAYER_DIALOG_ICON      = 9,
+    END_GAME_REMOTE_DIALOG_TIME      = 5000,
+    END_GAME_ROLAND_HERO             = 54,
+    END_GAME_CAMPAIGN_SAVE_NAME_SIZE = 20
 H2_ENUM_END(CheckEndGameConstants)
 
 H2_ENUM_CLASS_BEGIN(CheckEndGameCampaignConstants)
@@ -167,7 +168,11 @@ H2_ENUM_CLASS_BEGIN(LuckInfoTextIndex)
     LUCK_INFO_BATTLE_GARB = 20
 H2_ENUM_CLASS_END(LuckInfoTextIndex)
 
-H2_ENUM_BEGIN(NetBoxConstant)
+H2_ENUM_BEGIN(MoraleLuckInfoConstant)
+    MORALE_LUCK_DESCRIPTION_SIZE = 200
+H2_ENUM_END(MoraleLuckInfoConstant)
+
+H2_ENUM_BEGIN(NetBoxLocalConstant)
     BOX_WINDOW_Y             = 0x19b,
     BOX_HEIGHT               = 0x44,
     BOX_WIDTH                = 0x27f,
@@ -179,7 +184,9 @@ H2_ENUM_BEGIN(NetBoxConstant)
     BOX_TEXT_X               = 20,
     BOX_TEXT_Y               = 54,
     BOX_MAX_INPUT            = 0x5d,
-    BOX_DEFAULT_COLOR        = 6,
+    BOX_MAX_COLOR            = 6,
+    BOX_DEFAULT_COLOR        = BOX_MAX_COLOR,
+    BOX_COLOR_FRAME_OFFSET   = 1,
     BOX_CURSOR_DELAY         = 0x168,
     BOX_CURSOR_WIDTH_PADDING = 0x32,
     BOX_CURSOR_WIDTH_LIMIT   = 0x25a,
@@ -188,9 +195,6 @@ H2_ENUM_BEGIN(NetBoxConstant)
     BOX_EXIT_DELAY           = 75,
     BOX_FIRST_LINE_ID        = 1,
     BOX_FIRST_COLOR_ID       = 0x14,
-    BOX_SECOND_COLOR_ID      = 0x15,
-    BOX_THIRD_COLOR_ID       = 0x16,
-    BOX_FOURTH_COLOR_ID      = 0x17,
     BOX_INPUT_ID             = 5,
     BOX_THIS_PLAYER_COLOR_ID = 0x18,
     BOX_KEY_ESCAPE           = 0x1b,
@@ -207,19 +211,31 @@ H2_ENUM_BEGIN(NetBoxConstant)
     BOX_REMOTE_CHAT          = 0xb,
     BOX_REMOTE_GROUP         = 3,
     BOX_REMOTE_CONTROL       = 2
-H2_ENUM_END(NetBoxConstant)
+H2_ENUM_END(NetBoxLocalConstant)
+
+H2_ENUM_BEGIN(PollSoundConstant)
+    MOUSE_UPDATE_INTERVAL           = 13,
+    COMBAT_COLOR_CYCLE_INTERVAL     = 110,
+    DEFAULT_COLOR_CYCLE_INTERVAL    = 200,
+    NON_PALETTED_COLOR_CYCLE_DELAY  = 300,
+    SOUND_POLL_INTERVAL             = 30,
+    PALETTED_VIDEO_MODE_COLOR_DEPTH = 8
+H2_ENUM_END(PollSoundConstant)
+
+H2_ENUM_BEGIN(CDRomSetupResult)
+    CD_ROM_READY                  = 0,
+    CD_ROM_DRIVE_UNAVAILABLE      = 1,
+    CD_ROM_EXPANSION_DISC_MISSING = 2,
+    CD_ROM_GAME_DIRECTORY_MISSING = 3,
+    CD_ROM_DATA_FILES_MISSING     = 4
+H2_ENUM_END(CDRomSetupResult)
 
 H2_ENUM_BEGIN(CongratsConstant)
-    PALETTE_SIZE        = 0x300,
-    PALETTE_BUFFER_SIZE = 0x304,
-    TEXT_SIZE           = 500,
-    RATING_LENGTH       = 32,
-    CAMPAIGN            = 0,
-    STANDARD            = 1,
-    EXPANSION_CAMPAIGN  = 2,
-    MUSIC_SILENT        = -1,
-    SMACKER             = 2,
-    DIFFICULTY_SCALE    = 100
+    CONGRATS_PALETTE_BUFFER_SIZE = 0x304,
+    CONGRATS_TEXT_SIZE           = 500,
+    CONGRATS_RATING_LENGTH       = 32,
+    CONGRATS_SMACKER             = 2,
+    CONGRATS_DIFFICULTY_SCALE    = 100
 H2_ENUM_END(CongratsConstant)
 
 H2_ENUM_BEGIN(CommandLineConstant)
@@ -272,30 +288,37 @@ H2_ENUM_BEGIN(InitMenuConstant)
     MENU_REDRAW_LEFT       = 0,
     MENU_REDRAW_TOP        = 105,
     MENU_REDRAW_WIDTH      = 565,
-    MENU_REDRAW_HEIGHT     = 375
+    MENU_REDRAW_HEIGHT     = 375,
+    MENU_HELP_NEW_GAME     = 0,
+    MENU_HELP_LOAD_GAME    = 1,
+    MENU_HELP_HIGH_SCORES  = 2,
+    MENU_HELP_CREDITS      = 3,
+    MENU_HELP_EXIT         = 4
 H2_ENUM_END(InitMenuConstant)
 
-H2_ENUM_BEGIN(DynamicWindowConstant)
-    TILE_SIZE          = 48,
-    WINDOW_PADDING     = 48,
-    CONTENT_LEFT       = 32,
-    CONTENT_TOP        = 16,
-    CORNER_SIZE        = 72,
-    CORNER_LEFT        = 40,
-    CORNER_RIGHT       = 23,
-    EDGE_OFFSET        = 24,
-    WINDOW_FLAGS       = 0x4002,
-    BACKGROUND_FRAME   = 12,
-    TOP_FRAME_FIRST    = 4,
-    TOP_FRAME_LAST     = 5,
-    RIGHT_FRAME_FIRST  = 6,
-    RIGHT_FRAME_LAST   = 7,
-    BOTTOM_FRAME_FIRST = 8,
-    BOTTOM_FRAME_LAST  = 9,
-    LEFT_FRAME_FIRST   = 10,
-    LEFT_FRAME_LAST    = 11,
-    WIDGET_COLOR       = 0x10
-H2_ENUM_END(DynamicWindowConstant)
+H2_ENUM_BEGIN(RecruitHeroConstant)
+    RECRUIT_HERO_VIEW_BUTTON = 2,
+    RECRUIT_HERO_FADE_STEPS  = 8
+H2_ENUM_END(RecruitHeroConstant)
+
+H2_ENUM_BEGIN(BuildingRuleConstant)
+    BUILDING_INFO_BUFFER_SIZE                      = 400,
+    MONSTER_RARE_RESOURCE_COST                     = 1,
+    MONSTER_UPGRADED_RARE_RESOURCE_COST            = 2,
+    NECROMANCER_CASTLE_UPGRADE_BASE_RESOURCE_VALUE = 1000
+H2_ENUM_END(BuildingRuleConstant)
+
+H2_ENUM_BEGIN(ClearMapExtraSourceLine)
+    CLEAR_MAP_EXTRA_SOURCE_LINE_BASE       = 0x0cbe,
+    CLEAR_MAP_EXTRA_ENTRY_FREE_LINE_OFFSET = 6,
+    CLEAR_MAP_EXTRA_ARRAY_FREE_LINE_OFFSET = 9,
+    CLEAR_MAP_EXTRA_SIZES_FREE_LINE_OFFSET = 13
+H2_ENUM_END(ClearMapExtraSourceLine)
+
+H2_ENUM_BEGIN(HighScoreInputConstant)
+    HIGH_SCORE_INPUT_NAME_SIZE   = 20,
+    HIGH_SCORE_LAST_SHIFT_SOURCE = HIGH_SCORE_ENTRY_COUNT - 2
+H2_ENUM_END(HighScoreInputConstant)
 
 #define RETAIL_FILE const_cast<char*>("I:\\Projects\\Heroes\\Prog\\SOURCE\\KB.CPP")
 
@@ -307,9 +330,10 @@ inline hero* GetHeroSlot(i32 i) {
     return &gpGame->m_heroRecs[i];
 }
 
-H2_ENUM_CLASS_BEGIN(NormalDialogDrawLimit)
-    NORMAL_DIALOG_DRAW_ID_LIMIT = 0x9000
-H2_ENUM_CLASS_END(NormalDialogDrawLimit)
+H2_ENUM_BEGIN(NormalDialogDrawRange)
+    NORMAL_DIALOG_FOREGROUND_WIDGET_LIMIT   = 0x9000,
+    NORMAL_DIALOG_BACKGROUND_WIDGET_LAST_ID = -256
+H2_ENUM_END(NormalDialogDrawRange)
 
 VA(0x00496450, 0x14e)
 extern "C" void PollSound(void) {
@@ -317,17 +341,21 @@ extern "C" void PollSound(void) {
         return;
     gbInPollSound = true;
     if (KBTickCount() > glTimers[GLOBAL_MOUSE_TIMER_SLOT] && !gbPutzingWithMouseCtr) {
-        glTimers[GLOBAL_MOUSE_TIMER_SLOT] = KBTickCount() + 13;
+        glTimers[GLOBAL_MOUSE_TIMER_SLOT] = KBTickCount() + MOUSE_UPDATE_INTERVAL;
         gpMouseManager->NewUpdate(0);
     }
     if (KBTickCount() > glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT]) {
-        if (IDX(giCycleType) == 1 || IDX(giCycleType) == 3)
-            glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT] = KBTickCount() + 110;
+        if (giCycleType == WINDOW_COLOR_CYCLE_COMBAT
+            || giCycleType == WINDOW_COLOR_CYCLE_COMBAT_ALTERNATE)
+            glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT] =
+                KBTickCount() + COMBAT_COLOR_CYCLE_INTERVAL;
         else
-            glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT] = KBTickCount() + 200;
+            glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT] =
+                KBTickCount() + DEFAULT_COLOR_CYCLE_INTERVAL;
         bDoColorCycle = 1;
-        if (IDX(giGraphicsType) == 1 && giMainVideoModeColorDepth != 8) {
-            glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT] += 300;
+        if (giGraphicsType == WINGRAPH_GRAPHICS_WING
+            && giMainVideoModeColorDepth != PALETTED_VIDEO_MODE_COLOR_DEPTH) {
+            glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT] += NON_PALETTED_COLOR_CYCLE_DELAY;
             if (gbHeroMoving)
                 bDoColorCycle = 0;
         }
@@ -335,7 +363,7 @@ extern "C" void PollSound(void) {
             CycleColors(0);
     }
     if (KBTickCount() > glTimers[GLOBAL_POLL_SOUND_TIMER_SLOT]) {
-        glTimers[GLOBAL_POLL_SOUND_TIMER_SLOT] = KBTickCount() + 30;
+        glTimers[GLOBAL_POLL_SOUND_TIMER_SLOT] = KBTickCount() + SOUND_POLL_INTERVAL;
         if (gbForegroundApp)
             gpSoundManager->PollSound();
         PollRemote();
@@ -426,7 +454,7 @@ void EarlyShutdown(char* caption, char* text) {
 VA(0x00496cd9, 0x148)
 void SetupCDRom(void) {
     i32 savedNoSound = gbNoSound;
-    if (iCDRomErr == 1) {
+    if (iCDRomErr == CD_ROM_DRIVE_UNAVAILABLE) {
         SetPalette(gPalette->m_data, 1);
         gpMouseManager->ShowColorPointer();
         gbNoSound = true;
@@ -434,7 +462,7 @@ void SetupCDRom(void) {
             NormalDialog(
                 "Unable to access CD-ROM Drive.  Without a CD-ROM drive and a Heroes 2 Expansion "
                 "CD-ROM you will only be able to play as the guest in a multi-player game.",
-                1,
+                NORMAL_DIALOG_INFO,
                 -1,
                 -1,
                 -1,
@@ -445,7 +473,7 @@ void SetupCDRom(void) {
                 0
             );
         gbNoCDRom = true;
-    } else if (iCDRomErr == 2) {
+    } else if (iCDRomErr == CD_ROM_EXPANSION_DISC_MISSING) {
         SetPalette(gPalette->m_data, 1);
         gpMouseManager->ShowColorPointer();
         gbNoSound = true;
@@ -454,7 +482,7 @@ void SetupCDRom(void) {
                 "The Heroes 2 Expansion CD-ROM is not in the drive.  Without a Heroes 2 Expansion "
                 "CD-ROM you will only be able to play as the guest in a multi-player game.  If you "
                 "have the CD, then exit the program, put the CD in, and try again.",
-                1,
+                NORMAL_DIALOG_INFO,
                 -1,
                 -1,
                 -1,
@@ -466,14 +494,14 @@ void SetupCDRom(void) {
             );
         gbNoCDRom = true;
     }
-    if (iCDRomErr == 3) {
+    if (iCDRomErr == CD_ROM_GAME_DIRECTORY_MISSING) {
         EarlyShutdown(
             "Startup Error",
             "Unable to change to the Heroes II directory.  Please run the installation program."
         );
         exit(0);
     }
-    if (iCDRomErr == 4) {
+    if (iCDRomErr == CD_ROM_DATA_FILES_MISSING) {
         EarlyShutdown(
             "Startup Error",
             "Unable to find the Heroes II data files.  Please run the installation program."
@@ -847,7 +875,7 @@ i32 oldmain(void) {
             LogStr("DWM 4");
             if (gbRemoteOn && gbWaitForRemoteReceive) {
                 LogStr("DWM 5");
-                giWaitType = 0;
+                giWaitType = DIALOG_WAIT_OTHER_PLAYER;
                 NormalDialog(
                     "Waiting to receive game data.",
                     OLD_MAIN_DIALOG_WAIT,
@@ -961,12 +989,12 @@ i32 oldmain(void) {
                     && gpGame->m_campaignScenarioCompleted[OLD_MAIN_ROLAND_CAMPAIGN]
                                                           [OLD_MAIN_ROLAND_FINAL_SCENARIO])) {
                 gbShowHighScore = true;
-                ShowCongrats(CAMPAIGN);
+                ShowCongrats(HIGH_SCORE_CAMPAIGN);
                 AddScoreToHighScore(
                     gpGame->m_campaignScore,
                     gpGame->m_campaignScore,
                     0,
-                    CAMPAIGN,
+                    HIGH_SCORE_CAMPAIGN,
                     const_cast<char*>(gpGame->m_campaignType ? "Archibald" : "Roland")
                 );
             }
@@ -982,12 +1010,12 @@ i32 oldmain(void) {
             result_i = xCampaign.HandleVictory();
             if (xCampaign.IsCompleted()) {
                 gbShowHighScore = true;
-                ShowCongrats(EXPANSION_CAMPAIGN);
+                ShowCongrats(HIGH_SCORE_EXPANSION_CAMPAIGN);
                 AddScoreToHighScore(
                     xCampaign.Days(),
                     xCampaign.Days(),
                     0,
-                    EXPANSION_CAMPAIGN,
+                    HIGH_SCORE_EXPANSION_CAMPAIGN,
                     xHSCampaignNames[xCampaign.CampaignID()]
                 );
             }
@@ -1000,7 +1028,7 @@ i32 oldmain(void) {
                 goto initialize_game;
             }
         } else {
-            ShowCongrats(STANDARD);
+            ShowCongrats(HIGH_SCORE_STANDARD);
             if (!gbShowHighScore) {
                 gpWindowManager->FadeScreen(FADE_OUT, OLD_MAIN_FADE_SPEED, gPalette);
                 gpResourceManager->GetBackdrop("heroes.icn", gpWindowManager->m_screen, 1);
@@ -1052,6 +1080,9 @@ VA(0x0049859c, 0x791)
 i32 InterpretCommandLine(void) {
     i32 len;
     i32 i;
+    i32 commandIndex;
+    i32 valueIndex;
+    i32 secondValueIndex;
     i32 helpRequested;
     gbTCPFirstTime = true;
     giTCPType = -1;
@@ -1073,70 +1104,75 @@ i32 InterpretCommandLine(void) {
 
     len = strlen(gcCommandLine);
     for (i = 0; OD_STEER(len) > i; i++) {
-        if (gcCommandLine[i] == ' ' && i + 1 < len
-            && (gcCommandLine[i + 1] == '?' || gcCommandLine[i + 1] == 'h'
-                || gcCommandLine[i + 1] == 'H')) {
+        commandIndex = i + 1;
+        valueIndex = commandIndex + 1;
+        secondValueIndex = valueIndex + 1;
+        if (gcCommandLine[i] == ' ' && commandIndex < len
+            && (gcCommandLine[commandIndex] == '?' || gcCommandLine[commandIndex] == 'h'
+                || gcCommandLine[commandIndex] == 'H')) {
             helpRequested = 1;
         }
-        if (gcCommandLine[i] == '/' && i + 1 < len) {
-            switch (toupper(gcCommandLine[i + 1])) {
+        if (gcCommandLine[i] == '/' && commandIndex < len) {
+            switch (toupper(gcCommandLine[commandIndex])) {
                 case 'Z':
                     gbDoMemCheck = false;
                     break;
                 case 'W':
                     gbUseWaveout = true;
-                    if (i + 2 < len)
-                        gbUseWaveout = gcCommandLine[i + 2] - '0';
+                    if (valueIndex < len)
+                        gbUseWaveout = gcCommandLine[valueIndex] - '0';
                     break;
                 case 'V':
                     gConfig.slowVideo = 1;
                     WritePrefs();
                     break;
                 case 'N':
-                    if (i + 3 < len && toupper(gcCommandLine[i + 2]) == 'W'
-                        && toupper(gcCommandLine[i + 3]) == 'C') {
+                    if (secondValueIndex < len && toupper(gcCommandLine[valueIndex]) == 'W'
+                        && toupper(gcCommandLine[secondValueIndex]) == 'C') {
                         gbCheatMenus = true;
                     }
                     break;
                 case 'M':
-                    if (i + 2 < len)
-                        gbDontTryMIDI = 1 - (gcCommandLine[i + 2] - '0');
+                    if (valueIndex < len)
+                        gbDontTryMIDI = 1 - (gcCommandLine[valueIndex] - '0');
                     break;
                 case 'R':
-                    if (i + 2 < len)
-                        gbDontTryRedbook = 1 - (gcCommandLine[i + 2] - '0');
+                    if (valueIndex < len)
+                        gbDontTryRedbook = 1 - (gcCommandLine[valueIndex] - '0');
                     break;
                 case 'D':
-                    if (i + 2 < len)
-                        gbDontTryDigital = 1 - (gcCommandLine[i + 2] - '0');
+                    if (valueIndex < len)
+                        gbDontTryDigital = 1 - (gcCommandLine[valueIndex] - '0');
                     break;
                 case 'S':
-                    if (i + 2 < len)
-                        gbNoSound = 1 - (gcCommandLine[i + 2] - '0');
+                    if (valueIndex < len)
+                        gbNoSound = 1 - (gcCommandLine[valueIndex] - '0');
                     break;
                 case 'I':
-                    if (i + 2 < len)
-                        giShowIntro = gcCommandLine[i + 2] - '0';
+                    if (valueIndex < len)
+                        giShowIntro = gcCommandLine[valueIndex] - '0';
                     break;
                 case 'P':
-                    if (i + 2 < len)
-                        giDebugLevel = gcCommandLine[i + 2] - '0';
+                    if (valueIndex < len)
+                        giDebugLevel = gcCommandLine[valueIndex] - '0';
                     break;
                 case 'X':
                     xSmackFromNetwork = 1;
                     break;
                 case 'T':
-                    if (i + 2 < len) {
-                        switch (toupper(gcCommandLine[i + 2])) {
+                    if (valueIndex < len) {
+                        switch (toupper(gcCommandLine[valueIndex])) {
                             case 'T':
-                                if (i + 3 < len && toupper(gcCommandLine[i + 3]) == 'L') {
+                                if (secondValueIndex < len
+                                    && toupper(gcCommandLine[secondValueIndex]) == 'L') {
                                     giTCPType = LINE_TCP_TYPE_L;
                                 } else {
                                     giTCPType = LINE_TCP_TYPE_DEFAULT;
                                 }
                                 break;
                             case 'S':
-                                if (i + 3 < len && toupper(gcCommandLine[i + 3]) == 'H') {
+                                if (secondValueIndex < len
+                                    && toupper(gcCommandLine[secondValueIndex]) == 'H') {
                                     giTCPHostStatus = LINE_TCP_HOST;
                                 } else {
                                     giTCPHostStatus = LINE_TCP_CLIENT;
@@ -1144,8 +1180,8 @@ i32 InterpretCommandLine(void) {
                                 break;
                             case 'P': {
                                 i32 count = 0;
-                                if (i + 3 < len)
-                                    count = gcCommandLine[i + 3] - '0';
+                                if (secondValueIndex < len)
+                                    count = gcCommandLine[secondValueIndex] - '0';
                                 if (count >= LINE_TCP_MIN_PLAYERS
                                     && count <= LINE_TCP_MAX_PLAYERS) {
                                     giTCPNumPlayers = count;
@@ -1153,9 +1189,9 @@ i32 InterpretCommandLine(void) {
                                 break;
                             }
                             case 'A': {
-                                if (i + 3 < len) {
+                                if (secondValueIndex < len) {
                                     i32 dst = 0;
-                                    i32 src = i + 3;
+                                    i32 src = secondValueIndex;
                                     while (dst < LINE_TCP_TEXT_LENGTH && gcCommandLine[src]
                                            && gcCommandLine[src] != ' ') {
                                         gcTCPAddress[dst] = gcCommandLine[src];
@@ -1167,9 +1203,9 @@ i32 InterpretCommandLine(void) {
                                 break;
                             }
                             case 'N': {
-                                if (i + 3 < len) {
+                                if (secondValueIndex < len) {
                                     i32 dst = 0;
-                                    i32 src = i + 3;
+                                    i32 src = secondValueIndex;
                                     while (dst < LINE_TCP_TEXT_LENGTH && gcCommandLine[src]
                                            && gcCommandLine[src] != ' ') {
                                         gcTCPName[dst] = gcCommandLine[src];
@@ -1234,19 +1270,19 @@ i32 InitMenuHandler(struct tag_message& msg) {
             helpIndex = -1;
             switch (msg.payload.widget.id) {
                 case MENU_NEW_GAME:
-                    helpIndex = 0;
+                    helpIndex = MENU_HELP_NEW_GAME;
                     break;
                 case MENU_LOAD_GAME:
-                    helpIndex = 1;
+                    helpIndex = MENU_HELP_LOAD_GAME;
                     break;
                 case MENU_HIGH_SCORES:
-                    helpIndex = 2;
+                    helpIndex = MENU_HELP_HIGH_SCORES;
                     break;
                 case MENU_CREDITS:
-                    helpIndex = 3;
+                    helpIndex = MENU_HELP_CREDITS;
                     break;
                 case MENU_EXIT:
-                    helpIndex = 4;
+                    helpIndex = MENU_HELP_EXIT;
                     break;
             }
             if (helpIndex >= 0) {
@@ -1422,19 +1458,26 @@ i32 NullHandler(struct tag_message& msg) {
 
 VA(0x004993e0, 0x1a9)
 i32 RecruitHeroHandler(tag_message& msg) {
-    i16 e = 2, p = 3, c = 8, d = 9;
-    i32 a = 0;
-    i32 b;
+    // Retail initializes these otherwise-unused /Od frame locals.
+    // NOLINTBEGIN(readability-magic-numbers)
+    i16 unusedLocal0 = 2, unusedLocal1 = 3, unusedLocal2 = 8, unusedLocal3 = 9;
+    // NOLINTEND(readability-magic-numbers)
+    i32 shouldClose = 0;
+    i32 unusedResult;
     if (msg.type == MESSAGE_WIDGET) {
         switch (msg.payload.widget.command) {
             case WIDGET_COMMAND_SELECT:
                 switch (msg.payload.widget.id) {
-                    case 2:
-                        HeroView(static_cast<u8>(gpTownManager->m_recruitHero->m_id), 1, 0);
+                    case RECRUIT_HERO_VIEW_BUTTON:
+                        HeroView(
+                            static_cast<u8>(gpTownManager->m_recruitHero->m_id),
+                            true,
+                            false
+                        );
                         gpTownManager->RedrawTownScreen();
                         gpTownManager->m_heroWindow0->DrawWindow();
                         gpTownManager->m_heroWindow1->DrawWindow();
-                        gpWindowManager->FadeScreen(FADE_IN, 8, NULL);
+                        gpWindowManager->FadeScreen(FADE_IN, RECRUIT_HERO_FADE_STEPS, NULL);
                         break;
                     default:
                         break;
@@ -1444,12 +1487,12 @@ i32 RecruitHeroHandler(tag_message& msg) {
                 switch (msg.payload.widget.id) {
                     case EVENT_WINDOW_SECOND_BUTTON:
                         gpTownManager->m_recruitState = -1;
-                        a = 1;
+                        shouldClose = 1;
                         break;
                     case EVENT_WINDOW_THIRD_BUTTON:
                         gpTownManager->m_recruitState = 0;
                         gpWindowManager->m_dialogResult = msg.payload.widget.id;
-                        a = 1;
+                        shouldClose = 1;
                         break;
                 }
                 break;
@@ -1457,17 +1500,17 @@ i32 RecruitHeroHandler(tag_message& msg) {
                 break;
         }
     }
-    if (a == 1) {
-        msg.payload.widget.id = 10;
+    if (shouldClose == 1) {
+        msg.payload.widget.id = EVENT_WINDOW_CLOSE_COMMAND;
         msg.payload.widget.command = BaseWidgetCommand(msg.payload.widget.id);
-        return 2;
+        return EVENT_WINDOW_CLOSE;
     }
-    return 1;
+    return EVENT_WINDOW_CONTINUE;
 }
 
 VA(0x00499589, 0x1a7)
 char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 mode) {
-    char buf[400];
+    char buf[BUILDING_INFO_BUFFER_SIZE];
     if (race == FACTION_NECROMANCER && building == BUILDING_SLOT_NECROMANCER_SHRINE) {
         sprintf(buf, xNecromancerShrineDesc);
     } else if (building == BUILDING_SLOT_WELL_EXTRA) {
@@ -1556,26 +1599,26 @@ void GetMonsterCost(CreatureType monster, i32* const cost) {
     cost[IDX(RES_GOLD)] = gMonsterDatabase[IDX(monster)].cost;
     switch (monster) {
         case CREATURE_GENIE:
-            cost[IDX(RES_GEMS)] = 1;
+            cost[IDX(RES_GEMS)] = MONSTER_RARE_RESOURCE_COST;
             break;
         case CREATURE_PHOENIX:
-            cost[IDX(RES_MERCURY)] = 1;
+            cost[IDX(RES_MERCURY)] = MONSTER_RARE_RESOURCE_COST;
             break;
         case CREATURE_CYCLOPS:
-            cost[IDX(RES_CRYSTAL)] = 1;
+            cost[IDX(RES_CRYSTAL)] = MONSTER_RARE_RESOURCE_COST;
             break;
         case CREATURE_GREEN_DRAGON:
         case CREATURE_RED_DRAGON:
-            cost[IDX(RES_SULFUR)] = 1;
+            cost[IDX(RES_SULFUR)] = MONSTER_RARE_RESOURCE_COST;
             break;
         case CREATURE_BLACK_DRAGON:
-            cost[IDX(RES_SULFUR)] = 2;
+            cost[IDX(RES_SULFUR)] = MONSTER_UPGRADED_RARE_RESOURCE_COST;
             break;
         case CREATURE_GIANT:
-            cost[IDX(RES_GEMS)] = 1;
+            cost[IDX(RES_GEMS)] = MONSTER_RARE_RESOURCE_COST;
             break;
         case CREATURE_TITAN:
-            cost[IDX(RES_GEMS)] = 2;
+            cost[IDX(RES_GEMS)] = MONSTER_UPGRADED_RARE_RESOURCE_COST;
             break;
     }
 }
@@ -1658,7 +1701,7 @@ i32 CanBuy(town* t, BuildingSlotType type) {
 VA(0x00499dbb, 0xc6)
 i32 GetBuildingBaseResourceValue(FactionType race, BuildingSlotType building, i32 level) {
     if (race == FACTION_NECROMANCER && building == BUILDING_SLOT_UPGRADE_CASTLE)
-        return 1000;
+        return NECROMANCER_CASTLE_UPGRADE_BASE_RESOURCE_VALUE;
     if (building < BUILDING_SLOT_DWELLING_FIRST || building > BUILDING_SLOT_DWELLING_LAST) {
         if (building > BUILDING_SLOT_NEUTRAL_LAST)
             return 0;
@@ -1694,46 +1737,46 @@ i32 WaitHandler(tag_message& msg) {
     }
     if (result == 0) {
         switch (giWaitType) {
-            case 0:
+            case DIALOG_WAIT_OTHER_PLAYER:
                 result = WaitForOtherPlayer();
                 break;
-            case 2:
+            case DIALOG_WAIT_NETBIOS_HOST:
                 result = WaitForHost();
                 break;
-            case 1:
+            case DIALOG_WAIT_NETBIOS_GUEST:
                 result = WaitForGuest();
                 break;
-            case 3:
+            case DIALOG_WAIT_NETBIOS_INIT_GUEST:
                 result = InitNetGuest();
                 break;
-            case 4:
+            case DIALOG_WAIT_NETBIOS_INIT_HOST:
                 result = InitNetHost();
                 break;
-            case 5:
+            case DIALOG_WAIT_MODEM_COMMAND:
                 result = GUIModemCommandExec();
                 break;
-            case 6:
+            case DIALOG_WAIT_MODEM_RESPONSE:
                 result = GUIModemResponseExec();
                 break;
-            case OLD_MAIN_WAIT_DIRECT_CONNECT:
+            case DIALOG_WAIT_DIRECT_CONNECT:
                 result = WaitForDirectConnect();
                 break;
-            case OLD_MAIN_WAIT_DP_FIRST_GUEST:
+            case DIALOG_WAIT_DIRECTPLAY_FIRST_GUEST:
                 result = dpWaitForFirstGuest();
                 break;
-            case OLD_MAIN_WAIT_DP_EXTRA_GUESTS:
+            case DIALOG_WAIT_DIRECTPLAY_GUESTS:
                 result = dpWaitForExtraGuests();
                 break;
-            case OLD_MAIN_WAIT_DP_HOST:
+            case DIALOG_WAIT_DIRECTPLAY_HOST:
                 result = dpWaitForHost();
                 break;
-            case OLD_MAIN_WAIT_WS_FIRST_GUEST:
+            case DIALOG_WAIT_WINSOCK_FIRST_GUEST:
                 result = wsWaitForFirstGuest();
                 break;
-            case OLD_MAIN_WAIT_WS_EXTRA_GUESTS:
+            case DIALOG_WAIT_WINSOCK_GUESTS:
                 result = wsWaitForExtraGuests();
                 break;
-            case OLD_MAIN_WAIT_WS_HOST:
+            case DIALOG_WAIT_WINSOCK_HOST:
                 result = wsWaitForHost();
                 break;
         }
@@ -1744,9 +1787,9 @@ i32 WaitHandler(tag_message& msg) {
         msg.type = MESSAGE_WIDGET;
         msg.payload.widget.id = EVENT_WINDOW_CLOSE_COMMAND;
         msg.payload.widget.command = BaseWidgetCommand(msg.payload.widget.id);
-        return 2;
+        return EVENT_WINDOW_CLOSE;
     }
-    return 1;
+    return EVENT_WINDOW_CONTINUE;
 }
 
 VA(0x0049a09f, 0x472)
@@ -1899,7 +1942,8 @@ i32 EventWindowHandler(struct tag_message& msg) {
                             break;
                         case NORMAL_DIALOG_SECONDARY_SKILL:
                             NormalDialog(
-                                cSecSkillDesc[extra / 3][extra % 3],
+                                cSecSkillDesc[extra / SECONDARY_SKILL_VALUE_LEVEL_COUNT]
+                                             [extra % SECONDARY_SKILL_VALUE_LEVEL_COUNT],
                                 NORMAL_DIALOG_QUICK_VIEW,
                                 -1,
                                 -1,
@@ -2052,7 +2096,7 @@ void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
     hero* lossHero;
     hero* winningHeroEntry;
     i32 winnerPlayer;
-    char campaignSaveName[20];
+    char campaignSaveName[END_GAME_CAMPAIGN_SAVE_NAME_SIZE];
     i32 campaignHeroIndex;
     u32 carryoverHeroId;
 
@@ -2651,18 +2695,14 @@ void InitVars(void) {
     strcpy(gpGame->m_mapFilename, "brokena.mp2");
     gpGame->m_newGameInitialized = 0;
     gbInNewGameSetup = false;
-    strcpy(cNetBoxLine[0], "");
-    strcpy(cNetBoxLine[1], "");
-    strcpy(cNetBoxLine[2], "");
-    strcpy(cNetBoxLine[3], "");
-    cNetBoxColor[0] = 6;
-    cNetBoxColor[1] = 6;
-    cNetBoxColor[2] = 6;
-    cNetBoxColor[3] = 6;
+    for (i = 0; i < BOX_LINE_COUNT; i++) {
+        strcpy(cNetBoxLine[i], "");
+        cNetBoxColor[i] = BOX_DEFAULT_COLOR;
+    }
     ppMapExtra = NULL;
     pwSizeOfMapExtra = NULL;
     iMaxMapExtra = 0;
-    for (i = 0; i < 10; i++)
+    for (i = 0; i < GLOBAL_TIMER_COUNT; i++)
         glTimers[i] = 0;
     if (gbCheatMenus) {
         hmnuDflt = LoadMenuA(hInstApp, "mnuDflt");
@@ -2681,9 +2721,9 @@ VA(0x0049c312, 0x61b)
 void game::ShowMoraleInfo(hero* h, i32 dialogType) {
     i32 mixedUndead4;
     i32 alignment_e;
-    i32 homogeneous3;
+    ArmyGroupAlignmentResult homogeneous3;
     i32 modifierStart;
-    char description[200];
+    char description[MORALE_LUCK_DESCRIPTION_SIZE];
     i32 slot8;
 
     mixedUndead4 = 0;
@@ -2707,13 +2747,13 @@ void game::ShowMoraleInfo(hero* h, i32 dialogType) {
         }
 
         homogeneous3 = h->m_army.IsHomogeneous(-1);
-        if (mixedUndead4 && homogeneous3 > 0) {
-            homogeneous3 = 0;
+        if (mixedUndead4 && homogeneous3 > ARMY_GROUP_ALIGNMENT_NO_MODIFIER) {
+            homogeneous3 = ARMY_GROUP_ALIGNMENT_NO_MODIFIER;
         }
-        if (homogeneous3 > 0) {
+        if (homogeneous3 > ARMY_GROUP_ALIGNMENT_NO_MODIFIER) {
             alignment_e = 0;
-            for (slot8 = 0; slot8 < 5; slot8++) {
-                if (h->m_army.m_creatureTypes[slot8] != -1) {
+            for (slot8 = 0; slot8 < ARMY_GROUP_SLOT_COUNT; slot8++) {
+                if (h->m_army.m_creatureTypes[slot8] != ARMY_GROUP_EMPTY_SLOT) {
                     alignment_e = IDX(gMonsterDatabase[h->m_army.m_creatureTypes[slot8]].race);
                 }
             }
@@ -2724,15 +2764,15 @@ void game::ShowMoraleInfo(hero* h, i32 dialogType) {
             );
             strcat(gText, description);
         }
-        if (homogeneous3 == -1) {
+        if (homogeneous3 == ARMY_GROUP_ALIGNMENT_THREE) {
             sprintf(description, cMoraleInfo[IDX(INFO_THREE_ALIGNMENTS)]);
             strcat(gText, description);
         }
-        if (homogeneous3 == -2) {
+        if (homogeneous3 == ARMY_GROUP_ALIGNMENT_FOUR) {
             sprintf(description, cMoraleInfo[IDX(INFO_FOUR_ALIGNMENTS)]);
             strcat(gText, description);
         }
-        if (homogeneous3 == -3) {
+        if (homogeneous3 == ARMY_GROUP_ALIGNMENT_FIVE_OR_MORE) {
             sprintf(description, cMoraleInfo[IDX(INFO_FIVE_ALIGNMENTS)]);
             strcat(gText, description);
         }
@@ -2807,7 +2847,7 @@ void game::ShowMoraleInfo(hero* h, i32 dialogType) {
 
 VA(0x0049c92d, 0x371)
 void game::ShowLuckInfo(hero* h, i32 dialogType) {
-    char description[200];
+    char description[MORALE_LUCK_DESCRIPTION_SIZE];
     i32 luckValue;
     i32 modifierStart;
 
@@ -2861,23 +2901,29 @@ void game::ShowLuckInfo(hero* h, i32 dialogType) {
 
 VA(0x0049cc9e, 0xd7)
 void ClearMapExtra(void) {
-    DATA(0x005164bc) static i16 clearMapExtraSourceLineBase = 0x0cbe;
+    DATA(0x005164bc) static i16 clearMapExtraSourceLineBase = CLEAR_MAP_EXTRA_SOURCE_LINE_BASE;
     i32 i;
     for (i = 0; OD_STEER(i) < iMaxMapExtra; i++) {
         if (ppMapExtra[i])
-            H2_FREE(ppMapExtra[i], 3268);
+            H2_FREE(
+                ppMapExtra[i],
+                clearMapExtraSourceLineBase + CLEAR_MAP_EXTRA_ENTRY_FREE_LINE_OFFSET
+            );
     }
     if (ppMapExtra)
-        H2_FREE(ppMapExtra, 3271);
+        H2_FREE(ppMapExtra, clearMapExtraSourceLineBase + CLEAR_MAP_EXTRA_ARRAY_FREE_LINE_OFFSET);
     ppMapExtra = NULL;
     if (pwSizeOfMapExtra)
-        H2_FREE(pwSizeOfMapExtra, 3275);
+        H2_FREE(
+            pwSizeOfMapExtra,
+            clearMapExtraSourceLineBase + CLEAR_MAP_EXTRA_SIZES_FREE_LINE_OFFSET
+        );
     pwSizeOfMapExtra = NULL;
     iMaxMapExtra = 0;
 }
 
 VA(0x0049cd75, 0x9f)
-i32 GetMonType(i32 score, i32 campaign) {
+i32 GetMonType(i32 score, HighScoreType campaign) {
     i32 idx;
     for (idx = IDX(CREATURE_COUNT) - 1; idx >= 0; idx--) {
         if (campaign == HIGH_SCORE_CAMPAIGN || campaign == HIGH_SCORE_EXPANSION_CAMPAIGN) {
@@ -2892,13 +2938,19 @@ i32 GetMonType(i32 score, i32 campaign) {
 }
 
 VA(0x0049ce14, 0x4ac)
-i32 AddScoreToHighScore(i32 score, i32 days, i32 scenario, i32 highScoreType, char* scenarioName) {
+i32 AddScoreToHighScore(
+    i32 score,
+    i32 days,
+    i32 scenario,
+    HighScoreType highScoreType,
+    char* scenarioName
+) {
     i32 destination;
     HighScoreEntry entries_a[HIGH_SCORE_ENTRY_COUNT];
     i32 file_a;
     i32 entry;
-    char filename_a[352];
-    char playerName_c[20];
+    char filename_a[HIGH_SCORE_FILENAME_LENGTH];
+    char playerName_c[HIGH_SCORE_INPUT_NAME_SIZE];
     i32 missingFile;
 
     missingFile = 0;
@@ -2936,7 +2988,7 @@ i32 AddScoreToHighScore(i32 score, i32 days, i32 scenario, i32 highScoreType, ch
     }
 
     if (entry < HIGH_SCORE_ENTRY_COUNT) {
-        for (destination = HIGH_SCORE_ENTRY_COUNT - 2; destination >= OD_STEER(entry);
+        for (destination = HIGH_SCORE_LAST_SHIFT_SOURCE; destination >= OD_STEER(entry);
              destination--)
             entries_a[destination + 1] = entries_a[destination];
 
@@ -2972,8 +3024,8 @@ i32 AddScoreToHighScore(i32 score, i32 days, i32 scenario, i32 highScoreType, ch
 
 VA(0x0049d2c0, 0x66)
 void BVResMsg(char* s, i32 res, i32 qty) {
-    giBottomViewOverride = 5;
-    giBottomViewOverrideEndTime = KBTickCount() + 5000;
+    giBottomViewOverride = BOTTOM_VIEW_RESOURCE;
+    giBottomViewOverrideEndTime = KBTickCount() + BOTTOM_VIEW_RESOURCE_MESSAGE_DURATION;
     giBottomViewResource = res;
     giBottomViewResourceQty = qty;
     strcpy(gcBottomViewText, s);
@@ -2988,7 +3040,7 @@ void GOut(char* str) {
 
 VA(0x0049d353, 0x54)
 i32 NetPosToGamePos(i32 netPos) {
-    for (i32 i = 0; i < 6; i++)
+    for (i32 i = 0; i < GAME_PLAYER_COUNT; i++)
         if (gbGamePosToNetPos[i] == netPos)
             return i;
     return -1;
@@ -3055,6 +3107,7 @@ void PopNetBox(char* text, i32 netPlayer) {
     KbRemotePacket* remoteData_g;
     i32 redrawAdventure_i;
     i32 cursorState;
+    i32 lineIndex;
 
     if (!gbRemoteOn)
         return;
@@ -3087,34 +3140,21 @@ void PopNetBox(char* text, i32 netPlayer) {
 
     updateMessage_f.type = NET_BOX_UPDATE_MESSAGE;
     updateMessage_f.payload.widget.command = NET_BOX_TEXT_COMMAND;
-    updateMessage_f.payload.widget.id = 1;
-    updateMessage_f.payload.widget.data.text = cNetBoxLine[0];
-    netWindow_j->BroadcastMessage(updateMessage_f);
-    updateMessage_f.payload.widget.id = 2;
-    updateMessage_f.payload.widget.data.text = cNetBoxLine[1];
-    netWindow_j->BroadcastMessage(updateMessage_f);
-    updateMessage_f.payload.widget.id = 3;
-    updateMessage_f.payload.widget.data.text = cNetBoxLine[2];
-    netWindow_j->BroadcastMessage(updateMessage_f);
-    updateMessage_f.payload.widget.id = 4;
-    updateMessage_f.payload.widget.data.text = cNetBoxLine[3];
-    netWindow_j->BroadcastMessage(updateMessage_f);
+    for (lineIndex = 0; lineIndex < BOX_LINE_COUNT; lineIndex++) {
+        updateMessage_f.payload.widget.id = BOX_FIRST_LINE_ID + lineIndex;
+        updateMessage_f.payload.widget.data.text = cNetBoxLine[lineIndex];
+        netWindow_j->BroadcastMessage(updateMessage_f);
+    }
     updateMessage_f.payload.widget.command = NET_BOX_COLOR_COMMAND;
-    updateMessage_f.payload.widget.id = BOX_FIRST_COLOR_ID;
-    updateMessage_f.payload.widget.data.value = cNetBoxColor[0] + 1;
-    netWindow_j->BroadcastMessage(updateMessage_f);
-    updateMessage_f.payload.widget.id = BOX_SECOND_COLOR_ID;
-    updateMessage_f.payload.widget.data.value = cNetBoxColor[1] + 1;
-    netWindow_j->BroadcastMessage(updateMessage_f);
-    updateMessage_f.payload.widget.id = BOX_THIRD_COLOR_ID;
-    updateMessage_f.payload.widget.data.value = cNetBoxColor[2] + 1;
-    netWindow_j->BroadcastMessage(updateMessage_f);
-    updateMessage_f.payload.widget.id = BOX_FOURTH_COLOR_ID;
-    updateMessage_f.payload.widget.data.value = cNetBoxColor[3] + 1;
-    netWindow_j->BroadcastMessage(updateMessage_f);
+    for (lineIndex = 0; lineIndex < BOX_LINE_COUNT; lineIndex++) {
+        updateMessage_f.payload.widget.id = BOX_FIRST_COLOR_ID + lineIndex;
+        updateMessage_f.payload.widget.data.value =
+            cNetBoxColor[lineIndex] + BOX_COLOR_FRAME_OFFSET;
+        netWindow_j->BroadcastMessage(updateMessage_f);
+    }
     updateMessage_f.payload.widget.id = BOX_THIS_PLAYER_COLOR_ID;
     updateMessage_f.payload.widget.data.value =
-        gpGame->m_players[NetPosToGamePos(giThisNetPos)].m_color + 1;
+        gpGame->m_players[NetPosToGamePos(giThisNetPos)].m_color + BOX_COLOR_FRAME_OFFSET;
     netWindow_j->BroadcastMessage(updateMessage_f);
 
     gpWindowManager->AddWindow(netWindow_j, -1, 1);
@@ -3215,7 +3255,7 @@ void PopNetBox(char* text, i32 netPlayer) {
                 }
         }
 
-        if (!updateInput_a && glTimers[0] < KBTickCount()) {
+        if (!updateInput_a && glTimers[GLOBAL_NET_BOX_CURSOR_TIMER_SLOT] < KBTickCount()) {
             cursorState = 1 - cursorState;
             updateInput_a = 1;
         }
@@ -3244,38 +3284,25 @@ void PopNetBox(char* text, i32 netPlayer) {
             redrawLines_f = 0;
             updateMessage_f.type = NET_BOX_UPDATE_MESSAGE;
             updateMessage_f.payload.widget.command = NET_BOX_TEXT_COMMAND;
-            updateMessage_f.payload.widget.id = 1;
-            updateMessage_f.payload.widget.data.text = cNetBoxLine[0];
-            netWindow_j->BroadcastMessage(updateMessage_f);
-            updateMessage_f.payload.widget.id = 2;
-            updateMessage_f.payload.widget.data.text = cNetBoxLine[1];
-            netWindow_j->BroadcastMessage(updateMessage_f);
-            updateMessage_f.payload.widget.id = 3;
-            updateMessage_f.payload.widget.data.text = cNetBoxLine[2];
-            netWindow_j->BroadcastMessage(updateMessage_f);
-            updateMessage_f.payload.widget.id = 4;
-            updateMessage_f.payload.widget.data.text = cNetBoxLine[3];
-            netWindow_j->BroadcastMessage(updateMessage_f);
+            for (lineIndex = 0; lineIndex < BOX_LINE_COUNT; lineIndex++) {
+                updateMessage_f.payload.widget.id = BOX_FIRST_LINE_ID + lineIndex;
+                updateMessage_f.payload.widget.data.text = cNetBoxLine[lineIndex];
+                netWindow_j->BroadcastMessage(updateMessage_f);
+            }
             updateMessage_f.payload.widget.command = NET_BOX_COLOR_COMMAND;
-            updateMessage_f.payload.widget.id = BOX_FIRST_COLOR_ID;
-            updateMessage_f.payload.widget.data.value = cNetBoxColor[0] + 1;
-            netWindow_j->BroadcastMessage(updateMessage_f);
-            updateMessage_f.payload.widget.id = BOX_SECOND_COLOR_ID;
-            updateMessage_f.payload.widget.data.value = cNetBoxColor[1] + 1;
-            netWindow_j->BroadcastMessage(updateMessage_f);
-            updateMessage_f.payload.widget.id = BOX_THIRD_COLOR_ID;
-            updateMessage_f.payload.widget.data.value = cNetBoxColor[2] + 1;
-            netWindow_j->BroadcastMessage(updateMessage_f);
-            updateMessage_f.payload.widget.id = BOX_FOURTH_COLOR_ID;
-            updateMessage_f.payload.widget.data.value = cNetBoxColor[3] + 1;
-            netWindow_j->BroadcastMessage(updateMessage_f);
+            for (lineIndex = 0; lineIndex < BOX_LINE_COUNT; lineIndex++) {
+                updateMessage_f.payload.widget.id = BOX_FIRST_COLOR_ID + lineIndex;
+                updateMessage_f.payload.widget.data.value =
+                    cNetBoxColor[lineIndex] + BOX_COLOR_FRAME_OFFSET;
+                netWindow_j->BroadcastMessage(updateMessage_f);
+            }
             netWindow_j->DrawWindow();
             gpWindowManager->UpdateScreenRegion(0, BOX_WINDOW_Y, BOX_WIDTH, BOX_HEIGHT);
         }
 
         if (updateInput_a) {
             updateInput_a = 0;
-            glTimers[0] = KBTickCount() + BOX_CURSOR_DELAY;
+            glTimers[GLOBAL_NET_BOX_CURSOR_TIMER_SLOT] = KBTickCount() + BOX_CURSOR_DELAY;
             if (cursorState)
                 inputText_c[inputLength_a] = '_';
             else
@@ -3319,22 +3346,26 @@ void PopNetBox(char* text, i32 netPlayer) {
 
 VA(0x0049e02b, 0xc7)
 void AddNetBoxLine(char* str, char color) {
-    if (color < 0 || color > 6)
-        color = 6;
-    strcpy(cNetBoxLine[0], cNetBoxLine[1]);
-    strcpy(cNetBoxLine[1], cNetBoxLine[2]);
-    strcpy(cNetBoxLine[2], cNetBoxLine[3]);
-    strcpy(cNetBoxLine[3], str);
-    cNetBoxColor[0] = cNetBoxColor[1];
-    cNetBoxColor[1] = cNetBoxColor[2];
-    cNetBoxColor[2] = cNetBoxColor[3];
-    cNetBoxColor[3] = color;
+    i32 lineIndex;
+    if (color < 0 || color > BOX_MAX_COLOR)
+        color = BOX_DEFAULT_COLOR;
+    for (lineIndex = 0; lineIndex < BOX_LINE_COUNT - 1; lineIndex++) {
+        strcpy(cNetBoxLine[lineIndex], cNetBoxLine[lineIndex + 1]);
+        cNetBoxColor[lineIndex] = cNetBoxColor[lineIndex + 1];
+    }
+    strcpy(cNetBoxLine[BOX_LINE_COUNT - 1], str);
+    cNetBoxColor[BOX_LINE_COUNT - 1] = color;
 }
+
+H2_ENUM_BEGIN(ShutdownSourceLine)
+    SHUTDOWN_SOURCE_LINE_BASE      = 0x0ef4,
+    SHUTDOWN_MAP_EXTRA_FREE_OFFSET = 71
+H2_ENUM_END(ShutdownSourceLine)
 
 VA(0x0049e0f2, 0x214)
 void ShutDown(char* msg) {
-    DATA(0x005165e0) static i16 shutdownSourceLineBase = 0x0ef4;
-    char buf[768];
+    DATA(0x005165e0) static i16 shutdownSourceLineBase = SHUTDOWN_SOURCE_LINE_BASE;
+    char buf[GLOBAL_TEXT_BUFFER_SIZE];
     if (bInShutDown)
         return;
     LogStr("Shutdown");
@@ -3375,7 +3406,7 @@ void ShutDown(char* msg) {
         gEventHandle = NULL;
     }
     if (mapExtra)
-        H2_FREE(mapExtra, 3899);
+        H2_FREE(mapExtra, shutdownSourceLineBase + SHUTDOWN_MAP_EXTRA_FREE_OFFSET);
     mapExtra = NULL;
     CloseAIMapVars();
     DeleteMainClasses();
@@ -3387,21 +3418,54 @@ void ShutDown(char* msg) {
     exit(0);
 }
 
+H2_ENUM_BEGIN(FileErrorConstant)
+    FILE_ERROR_BUFFER_SIZE = 500
+H2_ENUM_END(FileErrorConstant)
+
 VA(0x0049e306, 0xa2)
 void FileError(char* filename) {
-    char buf1[500];
+    char buf1[FILE_ERROR_BUFFER_SIZE];
     i32 err;
-    char buf[500];
+    char buf[FILE_ERROR_BUFFER_SIZE];
     err = errno;
     sprintf(buf1, "File Error %s", strerror(err));
-    LogInt(buf1, err, -999, -999, -999, -999, -999, -999);
+    LogInt(
+        buf1,
+        err,
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE
+    );
     sprintf(buf, "Error opening file %s!", filename);
     ShutDown(buf);
 }
 
+H2_ENUM_BEGIN(SmackFadeConstant)
+    SMACK_FADE_FIRST_COLOR       = WINGRAPH_SYSTEM_PALETTE_SIZE,
+    SMACK_FADE_COLOR_LIMIT       = WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE,
+    SMACK_FADE_MATCH_COLOR_LIMIT = 36,
+    SMACK_FADE_DISTANCE_SENTINEL = 999,
+    SMACK_FADE_SCREEN_WIDTH      = 640,
+    SMACK_FADE_SCREEN_HEIGHT     = 480,
+    SMACK_FADE_BLUE_COMPONENT    = 2,
+    SMACK_FADE_GREEN_COMPONENT   = 1,
+    SMACK_FADE_RED_COMPONENT     = 0
+H2_ENUM_END(SmackFadeConstant)
+
+H2_ENUM_BEGIN(SmackFadeSourceLine)
+    SMACK_FADE_SOURCE_LINE_BASE     = 0x0f61,
+    SMACK_FADE_PALETTE_ALLOC_OFFSET = 13,
+    SMACK_FADE_LOOKUP_ALLOC_OFFSET  = 14,
+    SMACK_FADE_PALETTE_FREE_OFFSET  = 49,
+    SMACK_FADE_LOOKUP_FREE_OFFSET   = 50
+H2_ENUM_END(SmackFadeSourceLine)
+
 VA(0x0049e3a8, 0x255)
 void SmackFade(u8* src, u8* dst) {
-    DATA(0x00516668) static i16 smackFadeSourceLineBase = 0x0f61;
+    DATA(0x00516668) static i16 smackFadeSourceLineBase = SMACK_FADE_SOURCE_LINE_BASE;
     u8* a;
     u8* f;
     i32 k;
@@ -3415,57 +3479,82 @@ void SmackFade(u8* src, u8* dst) {
     a = NULL;
     f = NULL;
     k = -1;
-    a = static_cast<u8*>(H2_ALLOC(768, 3950));
-    f = static_cast<u8*>(H2_ALLOC(256, 3951));
+    a = static_cast<u8*>(H2_ALLOC(
+        MISC_PALETTE_BYTE_COUNT,
+        smackFadeSourceLineBase + SMACK_FADE_PALETTE_ALLOC_OFFSET
+    ));
+    f = static_cast<u8*>(H2_ALLOC(
+        WINGRAPH_PALETTE_SIZE,
+        smackFadeSourceLineBase + SMACK_FADE_LOOKUP_ALLOC_OFFSET
+    ));
     memset(a, 0, MISC_PALETTE_BYTE_COUNT);
-    memset(f, 0, 256);
-    for (h = 10; h < 246; h++) {
-        e = (OD_STEER(src[h * 3 + 2]) + OD_STEER(src[h * 3]) + src[h * 3 + 1]) / 3;
-        d = 999;
-        for (i = 10; i < 36; i++) {
-            b = (OD_STEER(dst[i * 3 + 2]) + OD_STEER(dst[i * 3]) + dst[i * 3 + 1]) / 3;
+    memset(f, 0, WINGRAPH_PALETTE_SIZE);
+    for (h = SMACK_FADE_FIRST_COLOR; h < SMACK_FADE_COLOR_LIMIT; h++) {
+        e = (OD_STEER(src[h * MISC_PALETTE_COMPONENT_BYTES + SMACK_FADE_BLUE_COMPONENT])
+             + OD_STEER(src[h * MISC_PALETTE_COMPONENT_BYTES + SMACK_FADE_RED_COMPONENT])
+             + src[h * MISC_PALETTE_COMPONENT_BYTES + SMACK_FADE_GREEN_COMPONENT])
+            / MISC_PALETTE_COMPONENT_BYTES;
+        d = SMACK_FADE_DISTANCE_SENTINEL;
+        for (i = SMACK_FADE_FIRST_COLOR; i < SMACK_FADE_MATCH_COLOR_LIMIT; i++) {
+            b = (OD_STEER(dst[i * MISC_PALETTE_COMPONENT_BYTES + SMACK_FADE_BLUE_COMPONENT])
+                 + OD_STEER(dst[i * MISC_PALETTE_COMPONENT_BYTES + SMACK_FADE_RED_COMPONENT])
+                 + dst[i * MISC_PALETTE_COMPONENT_BYTES + SMACK_FADE_GREEN_COMPONENT])
+                / MISC_PALETTE_COMPONENT_BYTES;
             p = abs(e - b);
             if (OD_STEER(d) > p) {
                 d = p;
                 k = i;
             }
         }
-        memcpy(a + h * 3, dst + k * 3, 3);
+        memcpy(
+            a + h * MISC_PALETTE_COMPONENT_BYTES,
+            dst + k * MISC_PALETTE_COMPONENT_BYTES,
+            MISC_PALETTE_COMPONENT_BYTES
+        );
         f[h] = (u8)k;
     }
-    FadeTo(src, a, 8);
+    FadeTo(src, a, HIGH_SCORE_FADE_STEPS);
     j = gpWindowManager->m_screen->m_pixels;
-    for (c = 0; c < 640; c++) {
-        for (g = 0; g < 480; g++) {
+    for (c = 0; c < SMACK_FADE_SCREEN_WIDTH; c++) {
+        for (g = 0; g < SMACK_FADE_SCREEN_HEIGHT; g++) {
             *j = f[*j];
             j++;
         }
     }
     gpWindowManager->UpdateScreen();
     UpdatePalette(reinterpret_cast<i8*>(dst));
-    H2_FREE(a, 3986);
-    H2_FREE(f, 3987);
+    H2_FREE(a, smackFadeSourceLineBase + SMACK_FADE_PALETTE_FREE_OFFSET);
+    H2_FREE(f, smackFadeSourceLineBase + SMACK_FADE_LOOKUP_FREE_OFFSET);
 }
 
+H2_ENUM_BEGIN(CongratsSourceLine)
+    CONGRATS_SOURCE_LINE_BASE       = 0x0f97,
+    CONGRATS_TEXT_ALLOC_LINE_OFFSET = 9,
+    CONGRATS_TEXT_FREE_LINE_OFFSET  = 78
+H2_ENUM_END(CongratsSourceLine)
+
 VA(0x0049e5fd, 0x303)
-void ShowCongrats(i32 highScoreType) {
-    DATA(0x0051670c) static i16 congratsSourceLineBase = 0x0f97;
-    u8 savedPalette[PALETTE_BUFFER_SIZE];
+void ShowCongrats(HighScoreType highScoreType) {
+    DATA(0x0051670c) static i16 congratsSourceLineBase = CONGRATS_SOURCE_LINE_BASE;
+    u8 savedPalette[CONGRATS_PALETTE_BUFFER_SIZE];
     i32 baseScore;
     i32 score_e;
-    char rating[RATING_LENGTH];
+    char rating[CONGRATS_RATING_LENGTH];
 
     gpMouseManager->HideColorPointer();
-    memcpy(savedPalette, gpBufferPalette->m_data, PALETTE_SIZE);
+    memcpy(savedPalette, gpBufferPalette->m_data, MISC_PALETTE_BYTE_COUNT);
     gpWindowManager->m_updateFlags = 0;
-    congratsText = static_cast<char*>(H2_ALLOC(TEXT_SIZE, 4000));
+    congratsText = static_cast<char*>(H2_ALLOC(
+        CONGRATS_TEXT_SIZE,
+        congratsSourceLineBase + CONGRATS_TEXT_ALLOC_LINE_OFFSET
+    ));
     baseScore = CalcBaseScore(giCurTurn);
-    score_e = gpGame->m_difficultyRating * baseScore / DIFFICULTY_SCALE;
-    gpSoundManager->PlayAmbientMusic(MUSIC_SILENT, 0, MUSIC_SILENT);
+    score_e = gpGame->m_difficultyRating * baseScore / CONGRATS_DIFFICULTY_SCALE;
+    gpSoundManager->PlayAmbientMusic(MIDI_NO_TRACK, 0, MIDI_NO_TRACK);
 
-    if (highScoreType == STANDARD) {
+    if (highScoreType == HIGH_SCORE_STANDARD) {
         sprintf(rating, gArmyNames[GetMonType(score_e, highScoreType)]);
-    } else if (highScoreType == EXPANSION_CAMPAIGN) {
+    } else if (highScoreType == HIGH_SCORE_EXPANSION_CAMPAIGN) {
         sprintf(rating, gArmyNames[GetMonType(xCampaign.Days(), highScoreType)]);
     } else {
         sprintf(rating, gArmyNames[GetMonType(gpGame->m_campaignScore, highScoreType)]);
@@ -3474,7 +3563,7 @@ void ShowCongrats(i32 highScoreType) {
     if (static_cast<i8>(gpGame->m_cheated))
         sprintf(rating, "Cheater!!!");
 
-    if (highScoreType == STANDARD) {
+    if (highScoreType == HIGH_SCORE_STANDARD) {
         sprintf(
             congratsText,
             "Congratulations!\n\nDays: %d\nBase Score: %d\nDifficulty: %d\n\nScore: "
@@ -3485,7 +3574,7 @@ void ShowCongrats(i32 highScoreType) {
             score_e,
             rating
         );
-    } else if (highScoreType == EXPANSION_CAMPAIGN) {
+    } else if (highScoreType == HIGH_SCORE_EXPANSION_CAMPAIGN) {
         sprintf(
             congratsText,
             "Congratulations!\n\nDays: %d\n\nRating:\n%s\n",
@@ -3501,23 +3590,23 @@ void ShowCongrats(i32 highScoreType) {
         );
     }
 
-    PlaySmacker(SMACKER);
-    memcpy(gpBufferPalette->m_data, gPalette->m_data, PALETTE_SIZE);
+    PlaySmacker(CONGRATS_SMACKER);
+    memcpy(gpBufferPalette->m_data, gPalette->m_data, MISC_PALETTE_BYTE_COUNT);
     SmackFade(reinterpret_cast<u8*>(gpBufferPalette->m_data), savedPalette);
-    memcpy(gPalette->m_data, savedPalette, PALETTE_SIZE);
-    memcpy(gpBufferPalette->m_data, gPalette->m_data, PALETTE_SIZE);
+    memcpy(gPalette->m_data, savedPalette, MISC_PALETTE_BYTE_COUNT);
+    memcpy(gpBufferPalette->m_data, gPalette->m_data, MISC_PALETTE_BYTE_COUNT);
     gpMouseManager->ShowColorPointer();
     AddScoreToHighScore(
         score_e,
         giCurTurn,
         gpGame->m_difficultyRating,
-        STANDARD,
+        HIGH_SCORE_STANDARD,
         gpGame->m_mapHeader.name
     );
-    H2_FREE(congratsText, 4069);
+    H2_FREE(congratsText, congratsSourceLineBase + CONGRATS_TEXT_FREE_LINE_OFFSET);
     congratsText = NULL;
     gpWindowManager->m_updateFlags = 1;
-    memcpy(gpBufferPalette->m_data, gPalette->m_data, PALETTE_SIZE);
+    memcpy(gpBufferPalette->m_data, gPalette->m_data, MISC_PALETTE_BYTE_COUNT);
 }
 
 VA(0x0049e900, 0x99)
@@ -3537,12 +3626,17 @@ void CongratsWait(void) {
     }
 }
 
+H2_ENUM_BEGIN(SamplePlaybackConstant)
+    SAMPLE_PLAYBACK_CHANNEL_GROUP = 2,
+    SAMPLE_DEFAULT_WAIT_TIME      = 4000
+H2_ENUM_END(SamplePlaybackConstant)
+
 VA(0x0049e999, 0x54)
 SAMPLE2 LoadPlaySample(char* name) {
     SAMPLE2 ss;
     ss.pSample = gpResourceManager->GetSample(name);
     if (ss.pSample) {
-        ss.pSample->m_playbackData.channelType = 2;
+        ss.pSample->m_playbackData.channelType = SAMPLE_PLAYBACK_CHANNEL_GROUP;
         ss.pMem = gpSoundManager->MemorySample(ss.pSample);
     }
     return ss;
@@ -3552,7 +3646,7 @@ VA(0x0049e9ed, 0x8f)
 void WaitEndSample(SAMPLE2 s, i32 waitTime) {
     i32l endTime;
     if (waitTime < 0)
-        waitTime = 4000;
+        waitTime = SAMPLE_DEFAULT_WAIT_TIME;
     endTime = KBTickCount() + waitTime;
     if (s.pMem)
         while (gpSoundManager->DigitalReport(s.pMem, SOUND_DIGITAL_REPORT_PLAYING)
@@ -3564,13 +3658,17 @@ void WaitEndSample(SAMPLE2 s, i32 waitTime) {
         gpResourceManager->Dispose((resource*)s.pSample);
 }
 
+H2_ENUM_BEGIN(MemoryErrorConstant)
+    MEMORY_ERROR_REQUEST_SIZE = 6400
+H2_ENUM_END(MemoryErrorConstant)
+
 VA(0x0049ea7c, 0x5d)
 void MemError(void) {
     if (gbInMemError)
         return;
     gbInMemError = true;
     LogStr("Out of Memory");
-    sprintf(gText, cOutOfMemory, "Out of memory.", 6400);
+    sprintf(gText, cOutOfMemory, "Out of memory.", MEMORY_ERROR_REQUEST_SIZE);
     ShutDown(gText);
 }
 
@@ -3617,6 +3715,21 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
     currentHeroRec = NULL;
     if (gpCurPlayer != NULL && gpCurPlayer->CurrentHero() != -1)
         currentHeroRec = &gpGame->m_heroRecs[gpCurPlayer->CurrentHero()];
+
+    if (command >= APP_MENU_MUSIC_FIRST && command <= APP_MENU_MUSIC_LAST) {
+        gConfig.musicVolume =
+            static_cast<ConfigVolumeLevel>(command - APP_MENU_MUSIC_FIRST);
+        gpSoundManager->AdjustMusicVolumes();
+        WritePrefs();
+        return 0;
+    }
+    if (command >= APP_MENU_SOUND_FIRST && command <= APP_MENU_SOUND_LAST) {
+        gConfig.soundVolume =
+            static_cast<ConfigVolumeLevel>(command - APP_MENU_SOUND_FIRST);
+        gpSoundManager->AdjustSoundVolumes();
+        WritePrefs();
+        return 0;
+    }
 
     switch (command) {
         case APP_MENU_RESTART_0:
@@ -3665,82 +3778,6 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
             break;
         case APP_MENU_EXIT:
             PostMessageA(hwndApp, APP_MENU_CLOSE_MESSAGE, 0, 0);
-            break;
-
-        case APP_MENU_MUSIC_FIRST:
-            gConfig.musicVolume = 0;
-            goto adjustMusic;
-        case APP_MENU_MUSIC_FIRST + 1:
-            gConfig.musicVolume = 1;
-            goto adjustMusic;
-        case APP_MENU_MUSIC_FIRST + 2:
-            gConfig.musicVolume = 2;
-            goto adjustMusic;
-        case APP_MENU_MUSIC_FIRST + 3:
-            gConfig.musicVolume = 3;
-            goto adjustMusic;
-        case APP_MENU_MUSIC_FIRST + 4:
-            gConfig.musicVolume = 4;
-            goto adjustMusic;
-        case APP_MENU_MUSIC_FIRST + 5:
-            gConfig.musicVolume = 5;
-            goto adjustMusic;
-        case APP_MENU_MUSIC_FIRST + 6:
-            gConfig.musicVolume = 6;
-            goto adjustMusic;
-        case APP_MENU_MUSIC_FIRST + 7:
-            gConfig.musicVolume = 7;
-            goto adjustMusic;
-        case APP_MENU_MUSIC_FIRST + 8:
-            gConfig.musicVolume = 8;
-            goto adjustMusic;
-        case APP_MENU_MUSIC_FIRST + 9:
-            gConfig.musicVolume = 9;
-            goto adjustMusic;
-        case APP_MENU_MUSIC_LAST:
-            gConfig.musicVolume = 10;
-            goto adjustMusic;
-        adjustMusic:
-            gpSoundManager->AdjustMusicVolumes();
-            menuChanged = 1;
-            break;
-
-        case APP_MENU_SOUND_FIRST:
-            gConfig.soundVolume = 0;
-            goto adjustSound;
-        case APP_MENU_SOUND_FIRST + 1:
-            gConfig.soundVolume = 1;
-            goto adjustSound;
-        case APP_MENU_SOUND_FIRST + 2:
-            gConfig.soundVolume = 2;
-            goto adjustSound;
-        case APP_MENU_SOUND_FIRST + 3:
-            gConfig.soundVolume = 3;
-            goto adjustSound;
-        case APP_MENU_SOUND_FIRST + 4:
-            gConfig.soundVolume = 4;
-            goto adjustSound;
-        case APP_MENU_SOUND_FIRST + 5:
-            gConfig.soundVolume = 5;
-            goto adjustSound;
-        case APP_MENU_SOUND_FIRST + 6:
-            gConfig.soundVolume = 6;
-            goto adjustSound;
-        case APP_MENU_SOUND_FIRST + 7:
-            gConfig.soundVolume = 7;
-            goto adjustSound;
-        case APP_MENU_SOUND_FIRST + 8:
-            gConfig.soundVolume = 8;
-            goto adjustSound;
-        case APP_MENU_SOUND_FIRST + 9:
-            gConfig.soundVolume = 9;
-            goto adjustSound;
-        case APP_MENU_SOUND_LAST:
-            gConfig.soundVolume = 10;
-            goto adjustSound;
-        adjustSound:
-            gpSoundManager->AdjustSoundVolumes();
-            menuChanged = 1;
             break;
 
         case APP_MENU_TOGGLE_ROUTE:
@@ -3797,7 +3834,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
             if (currentHeroRec != NULL) {
                 for (loopIndex = 0; loopIndex < APP_MENU_MAX_SPELLS; loopIndex++)
                     currentHeroRec->AddSpell(loopIndex, APP_MENU_SPELL_COUNT);
-                currentHeroRec->m_spellPoints = 999;
+                currentHeroRec->m_spellPoints = APP_MENU_CHEAT_SPELL_POINTS;
             }
             break;
 
@@ -3830,7 +3867,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
                     gpGame->GiveArmy(
                         &gpGame->m_heroRecs[gpCurPlayer->CurrentHero()].m_army,
                         command - APP_MENU_ARMY_FIRST,
-                        5,
+                        APP_MENU_CHEAT_ARMY_QUANTITY,
                         -1
                     );
                     gpAdvManager->UpdBottomView(1, 1, 1);
@@ -3888,80 +3925,16 @@ void UpdateSystemOptionsMenu(void) {
 
     for (menuCommand = APP_MENU_MUSIC_FIRST; menuCommand <= APP_MENU_MUSIC_LAST; menuCommand++)
         CheckMenuItem(hmnuApp, menuCommand, APP_MENU_UNCHECKED);
-    switch (gConfig.musicVolume) {
-        case 1:
-            checkedCommand = APP_MENU_MUSIC_FIRST + 1;
-            break;
-        case 2:
-            checkedCommand = APP_MENU_MUSIC_FIRST + 2;
-            break;
-        case 3:
-            checkedCommand = APP_MENU_MUSIC_FIRST + 3;
-            break;
-        case 4:
-            checkedCommand = APP_MENU_MUSIC_FIRST + 4;
-            break;
-        case 5:
-            checkedCommand = APP_MENU_MUSIC_FIRST + 5;
-            break;
-        case 6:
-            checkedCommand = APP_MENU_MUSIC_FIRST + 6;
-            break;
-        case 7:
-            checkedCommand = APP_MENU_MUSIC_FIRST + 7;
-            break;
-        case 8:
-            checkedCommand = APP_MENU_MUSIC_FIRST + 8;
-            break;
-        case 9:
-            checkedCommand = APP_MENU_MUSIC_FIRST + 9;
-            break;
-        case 10:
-            checkedCommand = APP_MENU_MUSIC_LAST;
-            break;
-        default:
-            checkedCommand = APP_MENU_MUSIC_FIRST;
-            break;
-    }
+    checkedCommand = APP_MENU_MUSIC_FIRST;
+    if (gConfig.musicVolume >= CONFIG_VOLUME_MIN && gConfig.musicVolume <= CONFIG_VOLUME_MAX)
+        checkedCommand += gConfig.musicVolume;
     CheckMenuItem(hmnuApp, checkedCommand, APP_MENU_CHECKED);
 
     for (menuCommand = APP_MENU_SOUND_FIRST; menuCommand <= APP_MENU_SOUND_LAST; menuCommand++)
         CheckMenuItem(hmnuApp, menuCommand, APP_MENU_UNCHECKED);
-    switch (gConfig.soundVolume) {
-        case 1:
-            checkedCommand = APP_MENU_SOUND_FIRST + 1;
-            break;
-        case 2:
-            checkedCommand = APP_MENU_SOUND_FIRST + 2;
-            break;
-        case 3:
-            checkedCommand = APP_MENU_SOUND_FIRST + 3;
-            break;
-        case 4:
-            checkedCommand = APP_MENU_SOUND_FIRST + 4;
-            break;
-        case 5:
-            checkedCommand = APP_MENU_SOUND_FIRST + 5;
-            break;
-        case 6:
-            checkedCommand = APP_MENU_SOUND_FIRST + 6;
-            break;
-        case 7:
-            checkedCommand = APP_MENU_SOUND_FIRST + 7;
-            break;
-        case 8:
-            checkedCommand = APP_MENU_SOUND_FIRST + 8;
-            break;
-        case 9:
-            checkedCommand = APP_MENU_SOUND_FIRST + 9;
-            break;
-        case 10:
-            checkedCommand = APP_MENU_SOUND_LAST;
-            break;
-        default:
-            checkedCommand = APP_MENU_SOUND_FIRST;
-            break;
-    }
+    checkedCommand = APP_MENU_SOUND_FIRST;
+    if (gConfig.soundVolume >= CONFIG_VOLUME_MIN && gConfig.soundVolume <= CONFIG_VOLUME_MAX)
+        checkedCommand += gConfig.soundVolume;
     CheckMenuItem(hmnuApp, checkedCommand, APP_MENU_CHECKED);
 
     for (menuCommand = APP_MENU_SPEED_FIRST; menuCommand <= APP_MENU_SPEED_LAST; menuCommand++)
@@ -4006,10 +3979,43 @@ void EarlyResizeWindow(i32 x, i32 y, i32 w, i32 h) {
         return;
 }
 
+H2_ENUM_BEGIN(MapAreaConstant)
+    MAP_AREA_ORIGIN = 16,
+    MAP_AREA_LIMIT  = 448
+H2_ENUM_END(MapAreaConstant)
+
 VA(0x0049fa1d, 0x53)
 i32 InMapArea(i32 x, i32 y) {
-    return (x >= 16 && x < 448 && y >= 16 && y < 448);
+    return x >= MAP_AREA_ORIGIN && x < MAP_AREA_LIMIT && y >= MAP_AREA_ORIGIN
+        && y < MAP_AREA_LIMIT;
 }
+
+H2_ENUM_BEGIN(DynamicWindowConstant)
+    DYNAMIC_WINDOW_STONE      = 0,
+    TILE_SIZE                 = 48,
+    WINDOW_PADDING            = 48,
+    CONTENT_LEFT              = 32,
+    CONTENT_TOP               = 16,
+    CORNER_SIZE               = 72,
+    CORNER_LEFT               = 40,
+    CORNER_RIGHT              = 23,
+    EDGE_OFFSET               = 24,
+    WINDOW_FLAGS              = 0x4002,
+    CORNER_FRAME_TOP_LEFT     = 0,
+    CORNER_FRAME_TOP_RIGHT    = 1,
+    CORNER_FRAME_BOTTOM_RIGHT = 2,
+    CORNER_FRAME_BOTTOM_LEFT  = 3,
+    BACKGROUND_FRAME          = 12,
+    TOP_FRAME_FIRST           = 4,
+    TOP_FRAME_LAST            = 5,
+    RIGHT_FRAME_FIRST         = 6,
+    RIGHT_FRAME_LAST          = 7,
+    BOTTOM_FRAME_FIRST        = 8,
+    BOTTOM_FRAME_LAST         = 9,
+    LEFT_FRAME_FIRST          = 10,
+    LEFT_FRAME_LAST           = 11,
+    WIDGET_COLOR              = 0x10
+H2_ENUM_END(DynamicWindowConstant)
 
 VA(0x0049fa70, 0x6bc)
 void SetupDynamicWindow(
@@ -4082,7 +4088,7 @@ void SetupDynamicWindow(
     *contentRight = columnsSize * TILE_SIZE + *contentLeft - 1;
     *contentBottom = numRows * TILE_SIZE + *contentTop - 1;
 
-    if (windowType != 0)
+    if (windowType != DYNAMIC_WINDOW_STONE)
         return;
     *window = new heroWindow(x, y, *windowWidth, *windowHeight, WINDOW_FLAGS);
     leftOffset = *contentLeft - x;
@@ -4116,7 +4122,7 @@ void SetupDynamicWindow(
         CORNER_SIZE,
         CORNER_SIZE,
         "stonebk2.icn",
-        0,
+        CORNER_FRAME_TOP_LEFT,
         0,
         -1,
         WIDGET_COLOR,
@@ -4132,7 +4138,7 @@ void SetupDynamicWindow(
         CORNER_SIZE,
         CORNER_SIZE,
         "stonebk2.icn",
-        1,
+        CORNER_FRAME_TOP_RIGHT,
         0,
         -1,
         WIDGET_COLOR,
@@ -4148,7 +4154,7 @@ void SetupDynamicWindow(
         CORNER_SIZE,
         CORNER_SIZE,
         "stonebk2.icn",
-        2,
+        CORNER_FRAME_BOTTOM_RIGHT,
         0,
         -1,
         WIDGET_COLOR,
@@ -4164,7 +4170,7 @@ void SetupDynamicWindow(
         CORNER_SIZE,
         CORNER_SIZE,
         "stonebk2.icn",
-        3,
+        CORNER_FRAME_BOTTOM_LEFT,
         0,
         -1,
         WIDGET_COLOR,
@@ -4248,15 +4254,31 @@ void TestDynamicWindow(i32 p1, i32 p2) {
     heroWindow* p;
     i32 q, r, s, u, v, w;
     i32 t;
-    SetupDynamicWindow(0, 0, 1, 640, 480, p1 * 48, p2 * 48, &s, &u, &v, &w, &q, &r, &p, 0);
+    SetupDynamicWindow(
+        0,
+        0,
+        1,
+        WINGRAPH_WIDTH,
+        WINGRAPH_HEIGHT,
+        p1 * TILE_SIZE,
+        p2 * TILE_SIZE,
+        &s,
+        &u,
+        &v,
+        &w,
+        &q,
+        &r,
+        &p,
+        DYNAMIC_WINDOW_STONE
+    );
     gpWindowManager->AddWindow(p, -1, 1);
     t = 0;
     gpInputManager->Flush();
     while (!t) {
         Process1WindowsMessage();
         switch (gpInputManager->GetEvent().type) {
-            case 1:
-            case 8:
+            case MESSAGE_KEY_DOWN:
+            case MESSAGE_LEFT_BUTTON_DOWN:
             case MESSAGE_RIGHT_BUTTON_DOWN:
                 t = 1;
         }
@@ -4283,34 +4305,54 @@ void HandleRemoteDeadPlayerExit(i32 pos) {
     }
 }
 
+H2_ENUM_BEGIN(PlayerExitLocalConstant)
+    PLAYER_EXIT_HOST_NET_POSITION        = 0,
+    PLAYER_EXIT_FIRST_GUEST_NET_POSITION = 1,
+    PLAYER_EXIT_DIRECT_PLAYER_COUNT      = 2,
+    PLAYER_EXIT_MESSAGE_LENGTH           = 500,
+    PLAYER_EXIT_TRANSMIT_DELAY           = 500,
+    PLAYER_EXIT_MESSAGE_TIME             = 5000,
+    PLAYER_EXIT_HEARTBEAT_DISABLED       = 0x0bebc1ff
+H2_ENUM_END(PlayerExitLocalConstant)
+
 VA(0x004a02c5, 0xaa)
 void HandleRemoteSuddenExit(void) {
-    i32 a;
-    char buf[5];
+    i32 destination;
+    SPlayerExit exitInfo;
     if (!gbGameInitialized)
         return;
     if (!gbRemoteOn)
         return;
-    buf[0] = giThisNetPos;
-    buf[1] = giThisGamePos;
-    buf[2] = gbThisNetGotAdventureControl;
-    buf[3] = 0;
-    buf[4] = 0;
-    if (giThisNetPos == 0)
-        a = 1;
+    exitInfo.netPosition = static_cast<i8>(giThisNetPos);
+    exitInfo.gamePosition = static_cast<i8>(giThisGamePos);
+    exitInfo.updateNetworkControl = gbThisNetGotAdventureControl;
+    exitInfo.timedOut = 0;
+    exitInfo.eliminated = 0;
+    // Retail leaves the final two bytes unset. The receiver replaces continueGame and only
+    // consults hostReported for eliminated packets.
+    if (giThisNetPos == PLAYER_EXIT_HOST_NET_POSITION)
+        destination = PLAYER_EXIT_FIRST_GUEST_NET_POSITION;
     else
-        a = 0;
+        destination = PLAYER_EXIT_HOST_NET_POSITION;
     LogStr("HRSE1");
-    TransmitRemoteData(buf, a, 7, 31, 0, 0, 2);
+    TransmitRemoteData(
+        reinterpret_cast<char*>(&exitInfo),
+        destination,
+        sizeof(exitInfo),
+        ADVMGR_REMOTE_COMMAND_PLAYER_EXIT,
+        0,
+        0,
+        ADVMGR_REMOTE_PACKET_TYPE_GAME
+    );
     LogStr("HRSE2");
-    DelayMilli(500);
+    DelayMilli(PLAYER_EXIT_TRANSMIT_DELAY);
 }
 
 VA(0x004a036f, 0x62)
 void DropDownToOnePlayer(void) {
     RemoteCleanup();
     giNumHumanPlayers = 1;
-    for (i32 i = 0; i < 6; i++)
+    for (i32 i = 0; i < REMOTE_PLAYER_COUNT; i++)
         if (giThisNetPos != i)
             gbHumanPlayer[i] = 0;
     ComputeAdvNetControl();
@@ -4328,7 +4370,7 @@ void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, i32
             if (exitInfo.netPosition == giThisNetPos) {
                 RemoteCleanup();
                 sprintf(gText, "You have been eliminated from the game!!!");
-                NormalDialog(gText, PLAYER_EXIT_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
+                NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
                 gbGameOver = true;
                 giEndSequence = 0;
                 return;
@@ -4337,10 +4379,10 @@ void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, i32
             sprintf(gText, "%s has been vanquished!", gsNetPlayerInfo[exitInfo.netPosition].name);
             NormalDialog(
                 gText,
-                PLAYER_EXIT_DIALOG_INFO,
+                NORMAL_DIALOG_INFO,
                 -1,
                 -1,
-                9,
+                NORMAL_DIALOG_CREST,
                 gpGame->GetPlayerColor(exitInfo.gamePosition),
                 -1,
                 -1,
@@ -4357,8 +4399,8 @@ void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, i32
                 gsNetPlayerInfo[exitInfo.netPosition].name,
                 gsNetPlayerInfo[hostNetPosition].name
             );
-            NormalDialog(gText, PLAYER_EXIT_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0);
-            if (gpWindowManager->m_dialogResult == PLAYER_EXIT_CONFIRM_OK) {
+            NormalDialog(gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0);
+            if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
                 DropDownToOnePlayer();
             } else {
                 RemoteCleanup();
@@ -4392,13 +4434,13 @@ void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, i32
         giThisNetPos--;
     gbHumanPlayer[exitInfo.gamePosition] = 0;
 
-    for (netPosition = exitInfo.netPosition; netPosition < PLAYER_EXIT_SHIFT_SLOTS; netPosition++) {
+    for (netPosition = exitInfo.netPosition; netPosition < REMOTE_PLAYER_COUNT - 1; netPosition++) {
         lLastHeartbeatReceive[netPosition] = lLastHeartbeatReceive[netPosition + 1];
         giNetPosToDCOPos[netPosition] = giNetPosToDCOPos[netPosition + 1];
         strcpy(gsNetPlayerInfo[netPosition].name, gsNetPlayerInfo[netPosition + 1].name);
     }
 
-    for (netPosition = 0; netPosition < PLAYER_EXIT_NETWORK_SLOTS; netPosition++) {
+    for (netPosition = 0; netPosition < REMOTE_PLAYER_COUNT; netPosition++) {
         if (gbGamePosToNetPos[netPosition] == exitInfo.netPosition)
             gbGamePosToNetPos[netPosition] = -1;
         else if (gbGamePosToNetPos[netPosition] > exitInfo.netPosition)
@@ -4406,14 +4448,14 @@ void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, i32
     }
 
     giNumHumanPlayers--;
-    iLastDiffSendTo = -2;
+    iLastDiffSendTo = DIFF_SEND_FORCE_WHOLE;
     if (exitInfo.updateNetworkControl)
         ComputeAdvNetControl();
 
     if (showExitMessage)
         NormalDialog(
             playerExitMessage,
-            PLAYER_EXIT_DIALOG_INFO,
+            NORMAL_DIALOG_INFO,
             -1,
             -1,
             -1,
@@ -4445,10 +4487,10 @@ void ReceiveRemotePlayerExit(SPlayerExit exitInfo) {
         sprintf(gText, "%s has been vanquished!", gsNetPlayerInfo[exitInfo.netPosition].name);
         NormalDialog(
             gText,
-            PLAYER_EXIT_DIALOG_INFO,
+            NORMAL_DIALOG_INFO,
             -1,
             -1,
-            9,
+            NORMAL_DIALOG_CREST,
             gpGame->GetPlayerColor(exitInfo.gamePosition),
             -1,
             -1,
@@ -4475,21 +4517,21 @@ void ReceiveRemotePlayerExit(SPlayerExit exitInfo) {
                 gsNetPlayerInfo[exitInfo.netPosition].name
             );
         }
-        NormalDialog(gText, PLAYER_EXIT_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0);
-        if (gpWindowManager->m_dialogResult == PLAYER_EXIT_CONFIRM_OK)
+        NormalDialog(gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0);
+        if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE)
             exitInfo.continueGame = 1;
         else
             exitInfo.continueGame = 0;
     }
 
 exitInfoProcessed:
-    if (giNumHumanPlayers == 2) {
+    if (giNumHumanPlayers == PLAYER_EXIT_DIRECT_PLAYER_COUNT) {
         if (exitInfo.eliminated && !exitInfo.hostReported) {
             sendReturn = TransmitRemoteData(
                 reinterpret_cast<char*>(&exitInfo),
                 1 - giThisNetPos,
-                PLAYER_EXIT_PACKET_TYPE,
-                PLAYER_EXIT_PACKET_COMMAND,
+                sizeof(exitInfo),
+                ADVMGR_REMOTE_COMMAND_HOST_PLAYER_EXIT,
                 1,
                 1,
                 -1
@@ -4502,15 +4544,15 @@ exitInfoProcessed:
         RemoteCleanup();
         ComputeAdvNetControl();
     } else {
-        for (recipient = 0; recipient < PLAYER_EXIT_NETWORK_SLOTS; recipient++) {
+        for (recipient = 0; recipient < REMOTE_PLAYER_COUNT; recipient++) {
             if ((exitInfo.netPosition == recipient && exitInfo.eliminated && !exitInfo.hostReported)
                 || (exitInfo.netPosition != recipient && giNumHumanPlayers > recipient
                     && recipient != giThisNetPos)) {
                 sendReturn = TransmitRemoteData(
                     reinterpret_cast<char*>(&exitInfo),
                     recipient,
-                    PLAYER_EXIT_PACKET_TYPE,
-                    PLAYER_EXIT_PACKET_COMMAND,
+                    sizeof(exitInfo),
+                    ADVMGR_REMOTE_COMMAND_HOST_PLAYER_EXIT,
                     1,
                     1,
                     -1
@@ -4526,7 +4568,7 @@ playerExitHandled:
     if (localPlayerLost) {
         sprintf(gText, "You have been eliminated from the game!!!");
         RemoteCleanup();
-        NormalDialog(gText, PLAYER_EXIT_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
+        NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
         gbGameOver = true;
         giEndSequence = 0;
         return;
@@ -4536,10 +4578,16 @@ playerExitHandled:
     }
 }
 
+H2_ENUM_BEGIN(CheckMemoryConstant)
+    CHECK_MEMORY_INITIAL_AVAILABLE_KB = 5,
+    CHECK_MEMORY_TOTAL_KB             = 16000,
+    CHECK_MEMORY_AVAILABLE_KB         = 8000
+H2_ENUM_END(CheckMemoryConstant)
+
 VA(0x004a0b44, 0x29)
 i32 CheckMem(void) {
-    giTotalHighMem = 16000;
-    giHighMemBuffer = 8000;
+    giTotalHighMem = CHECK_MEMORY_TOTAL_KB;
+    giHighMemBuffer = CHECK_MEMORY_AVAILABLE_KB;
     return 1;
 }
 
@@ -4582,16 +4630,123 @@ void SetWinText(heroWindow* j, i32 id) {
     }
 }
 
+H2_ENUM_BEGIN(ShingleAnimationConstant)
+    SHINGLE_ANIMATION_INTERVAL     = 250,
+    SHINGLE_ANIMATION_FRAME_COUNT  = 39,
+    SHINGLE_ANIMATION_FRAME_OFFSET = 1,
+    SHINGLE_UPDATE_X               = 46,
+    SHINGLE_UPDATE_Y               = 176,
+    SHINGLE_UPDATE_WIDTH           = 139,
+    SHINGLE_UPDATE_HEIGHT          = 187
+H2_ENUM_END(ShingleAnimationConstant)
+
 VA(0x004a0d15, 0x8a)
 void CheckShingleUpdate(void) {
     if (!gShingleAnim)
         return;
     if (KBTickCount() > iNextShingleAnim) {
-        iNextShingleAnim = KBTickCount() + 250;
-        iShingleAnimFrame = (iShingleAnimFrame + 1) % 39;
-        gShingleAnim->DrawToBuffer(0, 0, iShingleAnimFrame + 1, 0);
-        gpWindowManager->UpdateScreenRegion(46, 176, 139, 187);
+        iNextShingleAnim = KBTickCount() + SHINGLE_ANIMATION_INTERVAL;
+        iShingleAnimFrame =
+            (iShingleAnimFrame + SHINGLE_ANIMATION_FRAME_OFFSET)
+            % SHINGLE_ANIMATION_FRAME_COUNT;
+        gShingleAnim->DrawToBuffer(
+            0, 0, iShingleAnimFrame + SHINGLE_ANIMATION_FRAME_OFFSET, 0
+        );
+        gpWindowManager->UpdateScreenRegion(
+            SHINGLE_UPDATE_X,
+            SHINGLE_UPDATE_Y,
+            SHINGLE_UPDATE_WIDTH,
+            SHINGLE_UPDATE_HEIGHT
+        );
     }
+}
+
+H2_ENUM_BEGIN(NormalDialogSourceLine)
+    NORMAL_DIALOG_SOURCE_LINE_BASE                = 0x14a5,
+    NORMAL_DIALOG_RESOURCE_TEXT_ALLOC_LINE_OFFSET = 187,
+    NORMAL_DIALOG_SKILL_LEVEL_ALLOC_LINE_OFFSET   = 431,
+    NORMAL_DIALOG_PRIMARY_BONUS_ALLOC_LINE_OFFSET = 457,
+    NORMAL_DIALOG_OR_TEXT_ALLOC_LINE_OFFSET       = 493
+H2_ENUM_END(NormalDialogSourceLine)
+
+H2_ENUM_BEGIN(NormalDialogLayoutConstant)
+    NORMAL_DIALOG_PRIMARY_BONUS_TEXT_LENGTH        = 5,
+    NORMAL_DIALOG_OR_TEXT_LENGTH                   = 3,
+    NORMAL_DIALOG_RESOURCE_LABEL_HEIGHT            = 12,
+    NORMAL_DIALOG_SPELL_LABEL_HEIGHT               = 24,
+    NORMAL_DIALOG_RESOURCE_LABEL_WIDTH             = 100,
+    NORMAL_DIALOG_RESOURCE_LABEL_HALF_WIDTH        = NORMAL_DIALOG_RESOURCE_LABEL_WIDTH / 2,
+    NORMAL_DIALOG_PRIMARY_BONUS_TEXT_HEIGHT        = 16,
+    NORMAL_DIALOG_OR_TEXT_WIDTH                    = 40,
+    NORMAL_DIALOG_OR_TEXT_HEIGHT                   = 12,
+    NORMAL_DIALOG_RESOURCE_LAYOUT_HEIGHT           = 44,
+    NORMAL_DIALOG_RESOURCE_ICON_WIDTH              = 38,
+    NORMAL_DIALOG_RESOURCE_ICON_HEIGHT             = 32,
+    NORMAL_DIALOG_GOLD_LAYOUT_HEIGHT               = 26,
+    NORMAL_DIALOG_LARGE_ICON_WIDTH                 = 76,
+    NORMAL_DIALOG_ARTIFACT_ICON_HEIGHT             = 76,
+    NORMAL_DIALOG_SPELL_LAYOUT_HEIGHT              = 79,
+    NORMAL_DIALOG_SPELL_ICON_WIDTH                 = 70,
+    NORMAL_DIALOG_SPELL_ICON_HEIGHT                = 55,
+    NORMAL_DIALOG_CREST_ICON_WIDTH                 = 50,
+    NORMAL_DIALOG_CREST_ICON_HEIGHT                = 55,
+    NORMAL_DIALOG_EXPMRL_ICON_WIDTH                = 64,
+    NORMAL_DIALOG_LUCK_BONUS_ICON_HEIGHT           = 28,
+    NORMAL_DIALOG_LUCK_PENALTY_ICON_HEIGHT         = 57,
+    NORMAL_DIALOG_MORALE_BONUS_ICON_HEIGHT         = 62,
+    NORMAL_DIALOG_MORALE_PENALTY_ICON_HEIGHT       = 59,
+    NORMAL_DIALOG_EXPERIENCE_ICON_HEIGHT           = 64,
+    NORMAL_DIALOG_HERO_LAYOUT_HEIGHT               = 111,
+    NORMAL_DIALOG_HERO_BACKGROUND_WIDTH            = 111,
+    NORMAL_DIALOG_HERO_BACKGROUND_HEIGHT           = 105,
+    NORMAL_DIALOG_SECONDARY_SKILL_LAYOUT_HEIGHT    = 81,
+    NORMAL_DIALOG_SECONDARY_SKILL_BACKGROUND_WIDTH = 75,
+    NORMAL_DIALOG_SECONDARY_SKILL_ICON_HEIGHT      = 65,
+    NORMAL_DIALOG_PRIMARY_MONSTER_LAYOUT_HEIGHT    = 105,
+    NORMAL_DIALOG_PRIMARY_MONSTER_BACKGROUND_WIDTH = 94,
+    NORMAL_DIALOG_PRIMARY_MONSTER_ICON_HEIGHT      = 105,
+    NORMAL_DIALOG_PRIMARY_MONSTER_OVERLAY_WIDTH    = 82,
+    NORMAL_DIALOG_PRIMARY_MONSTER_OVERLAY_HEIGHT   = 93,
+    NORMAL_DIALOG_CREST_OVERLAY_WIDTH              = 58,
+    NORMAL_DIALOG_CREST_OVERLAY_HEIGHT             = 55,
+    NORMAL_DIALOG_SECONDARY_SKILL_OVERLAY_WIDTH    = 71,
+    NORMAL_DIALOG_SECONDARY_SKILL_OVERLAY_HEIGHT   = 81,
+    NORMAL_DIALOG_HERO_OVERLAY_WIDTH               = 101,
+    NORMAL_DIALOG_HERO_OVERLAY_HEIGHT              = 95,
+    NORMAL_DIALOG_BUTTON_AREA_HEIGHT               = 39,
+    NORMAL_DIALOG_RESOURCE_VERTICAL_GAP            = 14,
+    NORMAL_DIALOG_ROW_CALCULATION_OFFSET           = 25,
+    NORMAL_DIALOG_DEFAULT_X                        = 159,
+    NORMAL_DIALOG_SINGLE_RESOURCE_CENTER_INSET     = 17,
+    NORMAL_DIALOG_FIRST_RESOURCE_CENTER_X          = 104,
+    NORMAL_DIALOG_SECOND_RESOURCE_RIGHT_INSET      = 87,
+    NORMAL_DIALOG_RESOURCE_BOTTOM_INSET            = 48,
+    NORMAL_DIALOG_SECONDARY_PAIR_SPACING           = 4,
+    NORMAL_DIALOG_ICON_OVERLAY_INSET               = 6,
+    NORMAL_DIALOG_SPELL_BACKGROUND_X_OFFSET        = 2,
+    NORMAL_DIALOG_CREST_OVERLAY_OUTSET             = 4,
+    NORMAL_DIALOG_SECONDARY_SKILL_OVERLAY_OUTSET   = 3,
+    NORMAL_DIALOG_HERO_OVERLAY_INSET               = 5,
+    NORMAL_DIALOG_SECONDARY_NAME_Y_OFFSET          = 72,
+    NORMAL_DIALOG_SECONDARY_LEVEL_Y_OFFSET         = 24,
+    NORMAL_DIALOG_PRIMARY_LABEL_Y_OFFSET           = 93,
+    NORMAL_DIALOG_DEFAULT_LABEL_Y_OFFSET           = 10,
+    NORMAL_DIALOG_PRIMARY_BONUS_LABEL_Y_OFFSET     = 22,
+    NORMAL_DIALOG_OR_TEXT_CENTER_X_OFFSET          = 10,
+    NORMAL_DIALOG_OR_TEXT_Y_OFFSET                 = 43,
+    NORMAL_DIALOG_CENTER_PART_COUNT                = 2,
+    NORMAL_DIALOG_PRIMARY_BACKGROUND_FRAME         = 4,
+    NORMAL_DIALOG_MONSTER_BACKGROUND_FRAME         = 12,
+    NORMAL_DIALOG_SECONDARY_BACKGROUND_FRAME_BASE  = 1,
+    NORMAL_DIALOG_HERO_BACKGROUND_FRAME            = 4,
+    NORMAL_DIALOG_ARTIFACT_FRAME_OFFSET            = 1,
+    NORMAL_DIALOG_MONSTER_RACE_FRAME_OFFSET        = 4,
+    NORMAL_DIALOG_CREST_OVERLAY_FRAME              = 6,
+    NORMAL_DIALOG_SECONDARY_OVERLAY_FRAME          = 15
+H2_ENUM_END(NormalDialogLayoutConstant)
+
+inline i32 NormalDialogCenterOffset(i32 extent) {
+    return extent / NORMAL_DIALOG_CENTER_PART_COUNT;
 }
 
 VA(0x004a0d9f, 0x17c6)
@@ -4607,7 +4762,8 @@ void NormalDialog(
     i32 showOrText,
     i32 timeout
 ) {
-    DATA(0x00516d20) static i16 normalDialogSourceLineBase = 0x14a5;
+    DATA(0x00516d20) static i16 normalDialogSourceLineBase =
+        NORMAL_DIALOG_SOURCE_LINE_BASE;
     i32 panelHeight_p;
     i32 labelY_o;
     widget* borderWidget_o;
@@ -4622,7 +4778,7 @@ void NormalDialog(
     heroWindow* savedNormalDialogWindow_o;
     i32 windowWidth_a;
     i32 savedFirstResourceType_p;
-    i32 resourceImageHeight_g;
+    i32 resourceImageWidth_g;
     i16 showMessage_h;
     i32 windowHeight_k;
     i32 resourceSlot_n;
@@ -4656,7 +4812,7 @@ void NormalDialog(
     resourceY_l = 0;
     resourceFrame_g = 0;
     textWidgetId_h = NORMAL_DIALOG_TEXT_WIDGET_FIRST_ID;
-    resourceImageHeight_g = 0;
+    resourceImageWidth_g = 0;
     iconHeight_d = 0;
     showPrimaryBonus_e = 0;
     showMessage_h = 1;
@@ -4690,37 +4846,39 @@ void NormalDialog(
     dialogContentHeight_h = lineCount_d * NORMAL_DIALOG_TEXT_LINE_HEIGHT;
     maxIconHeight_a = 0;
     if (dialogType != NORMAL_DIALOG_QUICK_VIEW)
-        dialogContentHeight_h += 39;
+        dialogContentHeight_h += NORMAL_DIALOG_BUTTON_AREA_HEIGHT;
 
     for (resourceSlot_n = 0; resourceSlot_n < NORMAL_DIALOG_RESOURCE_COUNT; resourceSlot_n++) {
         switch (resourceType_l[resourceSlot_n]) {
             case NORMAL_DIALOG_ARTIFACT:
-                sizingIconHeight_l = 76;
+                sizingIconHeight_l = NORMAL_DIALOG_ARTIFACT_ICON_HEIGHT;
                 break;
-            case NORMAL_DIALOG_EXPMRL_FIRST:
-                sizingIconHeight_l = 28;
+            case NORMAL_DIALOG_LUCK_BONUS:
+                sizingIconHeight_l = NORMAL_DIALOG_LUCK_BONUS_ICON_HEIGHT;
                 break;
-            case NORMAL_DIALOG_EXPMRL_FIRST + 1:
-                sizingIconHeight_l = 57;
+            case NORMAL_DIALOG_LUCK_PENALTY:
+                sizingIconHeight_l = NORMAL_DIALOG_LUCK_PENALTY_ICON_HEIGHT;
                 break;
-            case NORMAL_DIALOG_EXPMRL_FIRST + 2:
-                sizingIconHeight_l = 62;
+            case NORMAL_DIALOG_MORALE_BONUS:
+                sizingIconHeight_l = NORMAL_DIALOG_MORALE_BONUS_ICON_HEIGHT;
                 break;
-            case NORMAL_DIALOG_EXPMRL_FIRST + 3:
-                sizingIconHeight_l = 59;
+            case NORMAL_DIALOG_MORALE_PENALTY:
+                sizingIconHeight_l = NORMAL_DIALOG_MORALE_PENALTY_ICON_HEIGHT;
                 break;
-            case NORMAL_DIALOG_EXPMRL_LAST:
-                sizingIconHeight_l =
-                    ((resourceValue_l[resourceSlot_n] == NORMAL_DIALOG_NO_VALUE) - 1 & 12) + 64;
+            case NORMAL_DIALOG_EXPERIENCE:
+                sizingIconHeight_l = resourceValue_l[resourceSlot_n] == NORMAL_DIALOG_NO_VALUE
+                    ? NORMAL_DIALOG_EXPERIENCE_ICON_HEIGHT
+                    : NORMAL_DIALOG_EXPERIENCE_ICON_HEIGHT
+                        + NORMAL_DIALOG_RESOURCE_LABEL_HEIGHT;
                 break;
             case NORMAL_DIALOG_CREST:
-                sizingIconHeight_l = 55;
+                sizingIconHeight_l = NORMAL_DIALOG_CREST_ICON_HEIGHT;
                 break;
             case NORMAL_DIALOG_HERO:
-                sizingIconHeight_l = 111;
+                sizingIconHeight_l = NORMAL_DIALOG_HERO_LAYOUT_HEIGHT;
                 break;
             case IDX(RES_GOLD):
-                sizingIconHeight_l = 26;
+                sizingIconHeight_l = NORMAL_DIALOG_GOLD_LAYOUT_HEIGHT;
                 break;
             case IDX(RES_WOOD):
             case IDX(RES_MERCURY):
@@ -4728,17 +4886,17 @@ void NormalDialog(
             case IDX(RES_SULFUR):
             case IDX(RES_CRYSTAL):
             case IDX(RES_GEMS):
-                sizingIconHeight_l = 44;
+                sizingIconHeight_l = NORMAL_DIALOG_RESOURCE_LAYOUT_HEIGHT;
                 break;
             case NORMAL_DIALOG_SPELL:
-                sizingIconHeight_l = 79;
+                sizingIconHeight_l = NORMAL_DIALOG_SPELL_LAYOUT_HEIGHT;
                 break;
             case NORMAL_DIALOG_SECONDARY_SKILL:
-                sizingIconHeight_l = 81;
+                sizingIconHeight_l = NORMAL_DIALOG_SECONDARY_SKILL_LAYOUT_HEIGHT;
                 break;
             case NORMAL_DIALOG_MONSTER:
             case NORMAL_DIALOG_PRIMARY_SKILL:
-                sizingIconHeight_l = 105;
+                sizingIconHeight_l = NORMAL_DIALOG_PRIMARY_MONSTER_LAYOUT_HEIGHT;
                 break;
             default:
                 sizingIconHeight_l = 0;
@@ -4749,8 +4907,10 @@ void NormalDialog(
     }
 
     if (maxIconHeight_a)
-        dialogContentHeight_h += maxIconHeight_a + 14;
-    windowRows_j = (dialogContentHeight_h - 25) / NORMAL_DIALOG_WINDOW_ROW_HEIGHT;
+        dialogContentHeight_h += maxIconHeight_a + NORMAL_DIALOG_RESOURCE_VERTICAL_GAP;
+    windowRows_j =
+        (dialogContentHeight_h - NORMAL_DIALOG_ROW_CALCULATION_OFFSET)
+        / NORMAL_DIALOG_WINDOW_ROW_HEIGHT;
     if (windowRows_j > NORMAL_DIALOG_MAX_ROWS)
         windowRows_j = NORMAL_DIALOG_MAX_ROWS;
     windowWidth_a = NORMAL_DIALOG_WINDOW_WIDTH;
@@ -4758,9 +4918,9 @@ void NormalDialog(
         windowRows_j * NORMAL_DIALOG_WINDOW_ROW_HEIGHT + NORMAL_DIALOG_WINDOW_BASE_HEIGHT;
 
     if (windowX == -1 || windowX + windowWidth_a >= NORMAL_DIALOG_SCREEN_RIGHT)
-        windowX = 159;
+        windowX = NORMAL_DIALOG_DEFAULT_X;
     if (windowY == -1 || windowY + windowHeight_k >= NORMAL_DIALOG_SCREEN_BOTTOM) {
-        windowY = (NORMAL_DIALOG_SCREEN_HEIGHT - windowHeight_k) / 2;
+        windowY = NormalDialogCenterOffset(NORMAL_DIALOG_SCREEN_HEIGHT - windowHeight_k);
         if (windowY > NORMAL_DIALOG_MAX_TOP)
             windowY = NORMAL_DIALOG_MAX_TOP;
     }
@@ -4803,8 +4963,10 @@ void NormalDialog(
         if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_NO_RESOURCE)
             break;
 
-        resourceText_e[resourceSlot_n] =
-            static_cast<char*>(H2_ALLOC(NORMAL_DIALOG_TEXT_LENGTH, 5472));
+        resourceText_e[resourceSlot_n] = static_cast<char*>(H2_ALLOC(
+            NORMAL_DIALOG_TEXT_LENGTH,
+            normalDialogSourceLineBase + NORMAL_DIALOG_RESOURCE_TEXT_ALLOC_LINE_OFFSET
+        ));
         if (resourceType_l[resourceSlot_n] >= NORMAL_DIALOG_RESOURCE_FIRST
             && resourceType_l[resourceSlot_n] <= NORMAL_DIALOG_RESOURCE_LAST) {
             if (resourceValue_l[resourceSlot_n] < 1) {
@@ -4843,11 +5005,11 @@ void NormalDialog(
         } else if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_PRIMARY_SKILL) {
             sprintf(resourceText_e[resourceSlot_n], "%s", "");
             strcpy(iconFile_h, "primskil.icn");
-            resourceFrame_g = 4;
+            resourceFrame_g = NORMAL_DIALOG_PRIMARY_BACKGROUND_FRAME;
         } else if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_MONSTER) {
             sprintf(resourceText_e[resourceSlot_n], "%s", "");
             strcpy(iconFile_h, "strip.icn");
-            resourceFrame_g = 12;
+            resourceFrame_g = NORMAL_DIALOG_MONSTER_BACKGROUND_FRAME;
         } else if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_SECONDARY_SKILL) {
             sprintf(
                 resourceText_e[resourceSlot_n],
@@ -4857,11 +5019,12 @@ void NormalDialog(
             );
             strcpy(iconFile_h, "secskill.icn");
             resourceFrame_g =
-                resourceValue_l[resourceSlot_n] / SECONDARY_SKILL_VALUE_LEVEL_COUNT + 1;
+                resourceValue_l[resourceSlot_n] / SECONDARY_SKILL_VALUE_LEVEL_COUNT
+                + NORMAL_DIALOG_SECONDARY_BACKGROUND_FRAME_BASE;
         } else if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_HERO) {
             sprintf(resourceText_e[resourceSlot_n], "%s", "");
             sprintf(iconFile_h, "surrendr.icn");
-            resourceFrame_g = 4;
+            resourceFrame_g = NORMAL_DIALOG_HERO_BACKGROUND_FRAME;
         } else if (resourceType_l[resourceSlot_n] >= NORMAL_DIALOG_EXPMRL_FIRST
                    && resourceType_l[resourceSlot_n] <= NORMAL_DIALOG_EXPMRL_LAST) {
             strcpy(resourceText_e[resourceSlot_n], "");
@@ -4884,88 +5047,94 @@ void NormalDialog(
             case IDX(RES_SULFUR):
             case IDX(RES_CRYSTAL):
             case IDX(RES_GEMS):
-                resourceImageHeight_g = 38;
-                sizingIconHeight_l = 32;
+                resourceImageWidth_g = NORMAL_DIALOG_RESOURCE_ICON_WIDTH;
+                sizingIconHeight_l = NORMAL_DIALOG_RESOURCE_ICON_HEIGHT;
                 break;
             case IDX(RES_GOLD):
-                resourceImageHeight_g = 76;
-                sizingIconHeight_l = 26;
+                resourceImageWidth_g = NORMAL_DIALOG_LARGE_ICON_WIDTH;
+                sizingIconHeight_l = NORMAL_DIALOG_GOLD_LAYOUT_HEIGHT;
                 break;
             case NORMAL_DIALOG_ARTIFACT:
-                resourceImageHeight_g = 76;
-                sizingIconHeight_l = 76;
+                resourceImageWidth_g = NORMAL_DIALOG_LARGE_ICON_WIDTH;
+                sizingIconHeight_l = NORMAL_DIALOG_ARTIFACT_ICON_HEIGHT;
                 break;
             case NORMAL_DIALOG_SPELL:
-                resourceImageHeight_g = 70;
-                sizingIconHeight_l = 55;
+                resourceImageWidth_g = NORMAL_DIALOG_SPELL_ICON_WIDTH;
+                sizingIconHeight_l = NORMAL_DIALOG_SPELL_ICON_HEIGHT;
                 break;
             case NORMAL_DIALOG_CREST:
-                resourceImageHeight_g = 50;
-                sizingIconHeight_l = 55;
+                resourceImageWidth_g = NORMAL_DIALOG_CREST_ICON_WIDTH;
+                sizingIconHeight_l = NORMAL_DIALOG_CREST_ICON_HEIGHT;
                 break;
-            case NORMAL_DIALOG_EXPMRL_FIRST:
-                resourceImageHeight_g = 64;
-                sizingIconHeight_l = 28;
+            case NORMAL_DIALOG_LUCK_BONUS:
+                resourceImageWidth_g = NORMAL_DIALOG_EXPMRL_ICON_WIDTH;
+                sizingIconHeight_l = NORMAL_DIALOG_LUCK_BONUS_ICON_HEIGHT;
                 break;
-            case NORMAL_DIALOG_EXPMRL_FIRST + 1:
-                resourceImageHeight_g = 64;
-                sizingIconHeight_l = 57;
+            case NORMAL_DIALOG_LUCK_PENALTY:
+                resourceImageWidth_g = NORMAL_DIALOG_EXPMRL_ICON_WIDTH;
+                sizingIconHeight_l = NORMAL_DIALOG_LUCK_PENALTY_ICON_HEIGHT;
                 break;
-            case NORMAL_DIALOG_EXPMRL_FIRST + 2:
-                resourceImageHeight_g = 64;
-                sizingIconHeight_l = 62;
+            case NORMAL_DIALOG_MORALE_BONUS:
+                resourceImageWidth_g = NORMAL_DIALOG_EXPMRL_ICON_WIDTH;
+                sizingIconHeight_l = NORMAL_DIALOG_MORALE_BONUS_ICON_HEIGHT;
                 break;
-            case NORMAL_DIALOG_EXPMRL_FIRST + 3:
-                resourceImageHeight_g = 64;
-                sizingIconHeight_l = 59;
+            case NORMAL_DIALOG_MORALE_PENALTY:
+                resourceImageWidth_g = NORMAL_DIALOG_EXPMRL_ICON_WIDTH;
+                sizingIconHeight_l = NORMAL_DIALOG_MORALE_PENALTY_ICON_HEIGHT;
                 break;
-            case NORMAL_DIALOG_EXPMRL_LAST:
-                resourceImageHeight_g = 64;
-                sizingIconHeight_l = 64;
+            case NORMAL_DIALOG_EXPERIENCE:
+                resourceImageWidth_g = NORMAL_DIALOG_EXPMRL_ICON_WIDTH;
+                sizingIconHeight_l = NORMAL_DIALOG_EXPERIENCE_ICON_HEIGHT;
                 break;
             case NORMAL_DIALOG_HERO:
-                resourceImageHeight_g = 111;
-                sizingIconHeight_l = 105;
+                resourceImageWidth_g = NORMAL_DIALOG_HERO_BACKGROUND_WIDTH;
+                sizingIconHeight_l = NORMAL_DIALOG_HERO_BACKGROUND_HEIGHT;
                 break;
             case NORMAL_DIALOG_SECONDARY_SKILL:
-                resourceImageHeight_g = 75;
-                sizingIconHeight_l = 65;
+                resourceImageWidth_g = NORMAL_DIALOG_SECONDARY_SKILL_BACKGROUND_WIDTH;
+                sizingIconHeight_l = NORMAL_DIALOG_SECONDARY_SKILL_ICON_HEIGHT;
                 break;
             case NORMAL_DIALOG_MONSTER:
             case NORMAL_DIALOG_PRIMARY_SKILL:
-                resourceImageHeight_g = 94;
-                sizingIconHeight_l = 105;
+                resourceImageWidth_g = NORMAL_DIALOG_PRIMARY_MONSTER_BACKGROUND_WIDTH;
+                sizingIconHeight_l = NORMAL_DIALOG_PRIMARY_MONSTER_ICON_HEIGHT;
                 break;
         }
 
         imageHeight_b = sizingIconHeight_l;
         if (strlen(resourceText_e[resourceSlot_n]))
-            sizingIconHeight_l += 12;
+            sizingIconHeight_l += NORMAL_DIALOG_RESOURCE_LABEL_HEIGHT;
 
         if (resourceSlot_n == 0) {
             if (resourceType_l[1] == NORMAL_DIALOG_NO_RESOURCE)
-                resourceCenterX_a = (windowWidth_a - 17) / 2 + 17;
+                resourceCenterX_a = NormalDialogCenterOffset(
+                                        windowWidth_a
+                                        - NORMAL_DIALOG_SINGLE_RESOURCE_CENTER_INSET
+                                    )
+                                    + NORMAL_DIALOG_SINGLE_RESOURCE_CENTER_INSET;
             else
-                resourceCenterX_a = 104;
+                resourceCenterX_a = NORMAL_DIALOG_FIRST_RESOURCE_CENTER_X;
         } else {
-            resourceCenterX_a = windowWidth_a - 87;
+            resourceCenterX_a = windowWidth_a - NORMAL_DIALOG_SECOND_RESOURCE_RIGHT_INSET;
         }
-        resourceY_l = windowHeight_k - sizingIconHeight_l - 48;
+        resourceY_l =
+            windowHeight_k - sizingIconHeight_l - NORMAL_DIALOG_RESOURCE_BOTTOM_INSET;
         if (dialogType != NORMAL_DIALOG_QUICK_VIEW)
-            resourceY_l -= 39;
+            resourceY_l -= NORMAL_DIALOG_BUTTON_AREA_HEIGHT;
         if (resourceType_l[0] == NORMAL_DIALOG_SECONDARY_SKILL
             && resourceType_l[1] == NORMAL_DIALOG_SECONDARY_SKILL) {
             if (resourceSlot_n == 0)
-                resourceCenterX_a -= 4;
+                resourceCenterX_a -= NORMAL_DIALOG_SECONDARY_PAIR_SPACING;
             else
-                resourceCenterX_a += 4;
+                resourceCenterX_a += NORMAL_DIALOG_SECONDARY_PAIR_SPACING;
         }
 
         iconPanel_j = new iconWidget(
-            resourceCenterX_a - resourceImageHeight_g / 2
-                + (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_SPELL) * 2,
+            resourceCenterX_a - NormalDialogCenterOffset(resourceImageWidth_g)
+                + (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_SPELL)
+                    * NORMAL_DIALOG_SPELL_BACKGROUND_X_OFFSET,
             resourceY_l,
-            resourceImageHeight_g,
+            resourceImageWidth_g,
             imageHeight_b,
             iconFile_h,
             resourceFrame_g,
@@ -4980,12 +5149,13 @@ void NormalDialog(
 
         if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_ARTIFACT) {
             iconPanel_j = new iconWidget(
-                resourceCenterX_a - resourceImageHeight_g / 2 + 6,
-                resourceY_l + 6,
-                76,
-                76,
+                resourceCenterX_a - NormalDialogCenterOffset(resourceImageWidth_g)
+                    + NORMAL_DIALOG_ICON_OVERLAY_INSET,
+                resourceY_l + NORMAL_DIALOG_ICON_OVERLAY_INSET,
+                NORMAL_DIALOG_LARGE_ICON_WIDTH,
+                NORMAL_DIALOG_ARTIFACT_ICON_HEIGHT,
                 "artifact.icn",
-                resourceValue_l[resourceSlot_n] + 1,
+                resourceValue_l[resourceSlot_n] + NORMAL_DIALOG_ARTIFACT_FRAME_OFFSET,
                 0,
                 -1,
                 NORMAL_DIALOG_WIDGET_COLOR,
@@ -4997,10 +5167,11 @@ void NormalDialog(
         }
         if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_PRIMARY_SKILL) {
             iconPanel_j = new iconWidget(
-                resourceCenterX_a - resourceImageHeight_g / 2 + 6,
-                resourceY_l + 6,
-                82,
-                93,
+                resourceCenterX_a - NormalDialogCenterOffset(resourceImageWidth_g)
+                    + NORMAL_DIALOG_ICON_OVERLAY_INSET,
+                resourceY_l + NORMAL_DIALOG_ICON_OVERLAY_INSET,
+                NORMAL_DIALOG_PRIMARY_MONSTER_OVERLAY_WIDTH,
+                NORMAL_DIALOG_PRIMARY_MONSTER_OVERLAY_HEIGHT,
                 "primskil.icn",
                 resourceValue_l[resourceSlot_n],
                 0,
@@ -5015,12 +5186,14 @@ void NormalDialog(
         }
         if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_MONSTER) {
             iconPanel_j = new iconWidget(
-                resourceCenterX_a - resourceImageHeight_g / 2 + 6,
-                resourceY_l + 6,
-                82,
-                93,
+                resourceCenterX_a - NormalDialogCenterOffset(resourceImageWidth_g)
+                    + NORMAL_DIALOG_ICON_OVERLAY_INSET,
+                resourceY_l + NORMAL_DIALOG_ICON_OVERLAY_INSET,
+                NORMAL_DIALOG_PRIMARY_MONSTER_OVERLAY_WIDTH,
+                NORMAL_DIALOG_PRIMARY_MONSTER_OVERLAY_HEIGHT,
                 "strip.icn",
-                IDX(gMonsterDatabase[resourceValue_l[resourceSlot_n]].race) + 4,
+                IDX(gMonsterDatabase[resourceValue_l[resourceSlot_n]].race)
+                    + NORMAL_DIALOG_MONSTER_RACE_FRAME_OFFSET,
                 0,
                 -1,
                 NORMAL_DIALOG_WIDGET_COLOR,
@@ -5032,10 +5205,11 @@ void NormalDialog(
 
             sprintf(gText, "monh%04d.icn", resourceValue_l[resourceSlot_n]);
             iconPanel_j = new iconWidget(
-                resourceCenterX_a - resourceImageHeight_g / 2 + 6,
-                resourceY_l + 6,
-                82,
-                93,
+                resourceCenterX_a - NormalDialogCenterOffset(resourceImageWidth_g)
+                    + NORMAL_DIALOG_ICON_OVERLAY_INSET,
+                resourceY_l + NORMAL_DIALOG_ICON_OVERLAY_INSET,
+                NORMAL_DIALOG_PRIMARY_MONSTER_OVERLAY_WIDTH,
+                NORMAL_DIALOG_PRIMARY_MONSTER_OVERLAY_HEIGHT,
                 gText,
                 0,
                 0,
@@ -5049,12 +5223,13 @@ void NormalDialog(
         }
         if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_CREST) {
             iconPanel_j = new iconWidget(
-                resourceCenterX_a - resourceImageHeight_g / 2 - 4,
-                resourceY_l - 4,
-                58,
-                55,
+                resourceCenterX_a - NormalDialogCenterOffset(resourceImageWidth_g)
+                    - NORMAL_DIALOG_CREST_OVERLAY_OUTSET,
+                resourceY_l - NORMAL_DIALOG_CREST_OVERLAY_OUTSET,
+                NORMAL_DIALOG_CREST_OVERLAY_WIDTH,
+                NORMAL_DIALOG_CREST_OVERLAY_HEIGHT,
                 "brcrest.icn",
-                6,
+                NORMAL_DIALOG_CREST_OVERLAY_FRAME,
                 0,
                 -1,
                 NORMAL_DIALOG_WIDGET_COLOR,
@@ -5066,12 +5241,13 @@ void NormalDialog(
         }
         if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_SECONDARY_SKILL) {
             iconPanel_j = new iconWidget(
-                resourceCenterX_a - resourceImageHeight_g / 2 - 3,
-                resourceY_l - 3,
-                71,
-                81,
+                resourceCenterX_a - NormalDialogCenterOffset(resourceImageWidth_g)
+                    - NORMAL_DIALOG_SECONDARY_SKILL_OVERLAY_OUTSET,
+                resourceY_l - NORMAL_DIALOG_SECONDARY_SKILL_OVERLAY_OUTSET,
+                NORMAL_DIALOG_SECONDARY_SKILL_OVERLAY_WIDTH,
+                NORMAL_DIALOG_SECONDARY_SKILL_OVERLAY_HEIGHT,
                 "secskill.icn",
-                15,
+                NORMAL_DIALOG_SECONDARY_OVERLAY_FRAME,
                 0,
                 -1,
                 NORMAL_DIALOG_WIDGET_COLOR,
@@ -5084,10 +5260,11 @@ void NormalDialog(
         if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_HERO) {
             sprintf(iconFile_h, "port%04d.icn", resourceValue_l[resourceSlot_n]);
             iconPanel_j = new iconWidget(
-                resourceCenterX_a - resourceImageHeight_g / 2 + 5,
-                resourceY_l + 5,
-                101,
-                95,
+                resourceCenterX_a - NormalDialogCenterOffset(resourceImageWidth_g)
+                    + NORMAL_DIALOG_HERO_OVERLAY_INSET,
+                resourceY_l + NORMAL_DIALOG_HERO_OVERLAY_INSET,
+                NORMAL_DIALOG_HERO_OVERLAY_WIDTH,
+                NORMAL_DIALOG_HERO_OVERLAY_HEIGHT,
                 iconFile_h,
                 0,
                 0,
@@ -5101,12 +5278,13 @@ void NormalDialog(
         }
 
         if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_SECONDARY_SKILL) {
-            labelY_o = OD_STEER(sizingIconHeight_l) + resourceY_l - 72;
+            labelY_o = OD_STEER(sizingIconHeight_l) + resourceY_l
+                - NORMAL_DIALOG_SECONDARY_NAME_Y_OFFSET;
             textPanel_h = new textWidget(
-                resourceCenterX_a - 50,
+                resourceCenterX_a - NORMAL_DIALOG_RESOURCE_LABEL_HALF_WIDTH,
                 labelY_o,
-                100,
-                (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_SPELL) * 12 + 12,
+                NORMAL_DIALOG_RESOURCE_LABEL_WIDTH,
+                NORMAL_DIALOG_RESOURCE_LABEL_HEIGHT,
                 resourceText_e[resourceSlot_n],
                 "smalfont.fnt",
                 FONT_DRAW_DEFAULT,
@@ -5118,9 +5296,12 @@ void NormalDialog(
                 MemError();
             pNormalDialogWindow->AddWidget(textPanel_h, -1);
 
-            resourceText_e[resourceSlot_n] =
-                static_cast<char*>(H2_ALLOC(NORMAL_DIALOG_TEXT_LENGTH, 5716));
-            labelY_o = OD_STEER(sizingIconHeight_l) + resourceY_l - 24;
+            resourceText_e[resourceSlot_n] = static_cast<char*>(H2_ALLOC(
+                NORMAL_DIALOG_TEXT_LENGTH,
+                normalDialogSourceLineBase + NORMAL_DIALOG_SKILL_LEVEL_ALLOC_LINE_OFFSET
+            ));
+            labelY_o = OD_STEER(sizingIconHeight_l) + resourceY_l
+                - NORMAL_DIALOG_SECONDARY_LEVEL_Y_OFFSET;
             sprintf(
                 resourceText_e[resourceSlot_n],
                 "%s",
@@ -5128,16 +5309,20 @@ void NormalDialog(
                     [resourceValue_l[resourceSlot_n] % SECONDARY_SKILL_VALUE_LEVEL_COUNT]
             );
         } else if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_PRIMARY_SKILL) {
-            labelY_o = OD_STEER(sizingIconHeight_l) + resourceY_l - 93;
+            labelY_o = OD_STEER(sizingIconHeight_l) + resourceY_l
+                - NORMAL_DIALOG_PRIMARY_LABEL_Y_OFFSET;
         } else {
-            labelY_o = OD_STEER(sizingIconHeight_l) + resourceY_l - 10;
+            labelY_o = OD_STEER(sizingIconHeight_l) + resourceY_l
+                - NORMAL_DIALOG_DEFAULT_LABEL_Y_OFFSET;
         }
 
         textPanel_h = new textWidget(
-            resourceCenterX_a - 50,
+            resourceCenterX_a - NORMAL_DIALOG_RESOURCE_LABEL_HALF_WIDTH,
             labelY_o,
-            100,
-            (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_SPELL) * 12 + 12,
+            NORMAL_DIALOG_RESOURCE_LABEL_WIDTH,
+            resourceType_l[resourceSlot_n] == NORMAL_DIALOG_SPELL
+                ? NORMAL_DIALOG_SPELL_LABEL_HEIGHT
+                : NORMAL_DIALOG_RESOURCE_LABEL_HEIGHT,
             resourceText_e[resourceSlot_n],
             "smalfont.fnt",
             FONT_DRAW_DEFAULT,
@@ -5150,13 +5335,17 @@ void NormalDialog(
         pNormalDialogWindow->AddWidget(textPanel_h, -1);
 
         if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_PRIMARY_SKILL && showPrimaryBonus_e) {
-            char* bonusText = static_cast<char*>(H2_ALLOC(5, 5742));
+            char* bonusText = static_cast<char*>(H2_ALLOC(
+                NORMAL_DIALOG_PRIMARY_BONUS_TEXT_LENGTH,
+                normalDialogSourceLineBase + NORMAL_DIALOG_PRIMARY_BONUS_ALLOC_LINE_OFFSET
+            ));
             strcpy(bonusText, "+1 ");
             textPanel_h = new textWidget(
-                resourceCenterX_a - 50,
-                OD_STEER(sizingIconHeight_l) + resourceY_l - 22,
-                100,
-                16,
+                resourceCenterX_a - NORMAL_DIALOG_RESOURCE_LABEL_HALF_WIDTH,
+                OD_STEER(sizingIconHeight_l) + resourceY_l
+                    - NORMAL_DIALOG_PRIMARY_BONUS_LABEL_Y_OFFSET,
+                NORMAL_DIALOG_RESOURCE_LABEL_WIDTH,
+                NORMAL_DIALOG_PRIMARY_BONUS_TEXT_HEIGHT,
                 bonusText,
                 "bigfont.fnt",
                 FONT_DRAW_DEFAULT,
@@ -5170,9 +5359,9 @@ void NormalDialog(
         }
 
         borderWidget_o = new border(
-            resourceCenterX_a - resourceImageHeight_g / 2,
+            resourceCenterX_a - NormalDialogCenterOffset(resourceImageWidth_g),
             resourceY_l,
-            resourceImageHeight_g,
+            resourceImageWidth_g,
             sizingIconHeight_l,
             resourceSlot_n + NORMAL_DIALOG_RESOURCE_BORDER_FIRST_ID,
             1,
@@ -5189,13 +5378,16 @@ void NormalDialog(
     pNormalDialogWindow->BroadcastMessage(message_e);
 
     if (showOrText == NORMAL_DIALOG_SHOW_OR_TEXT) {
-        orText_f = static_cast<char*>(H2_ALLOC(3, 5778));
+        orText_f = static_cast<char*>(H2_ALLOC(
+            NORMAL_DIALOG_OR_TEXT_LENGTH,
+            normalDialogSourceLineBase + NORMAL_DIALOG_OR_TEXT_ALLOC_LINE_OFFSET
+        ));
         strcpy(orText_f, "or");
         textPanel_h = new textWidget(
-            windowWidth_a / 2 - 10,
-            resourceY_l + 43,
-            40,
-            12,
+            NormalDialogCenterOffset(windowWidth_a) - NORMAL_DIALOG_OR_TEXT_CENTER_X_OFFSET,
+            resourceY_l + NORMAL_DIALOG_OR_TEXT_Y_OFFSET,
+            NORMAL_DIALOG_OR_TEXT_WIDTH,
+            NORMAL_DIALOG_OR_TEXT_HEIGHT,
             orText_f,
             "smalfont.fnt",
             FONT_DRAW_DEFAULT,
@@ -5242,8 +5434,12 @@ void UpdateNormalDialog(char* text) {
     evt.payload.widget.id = 1;
     evt.payload.widget.data.text = text;
     pNormalDialogWindow->BroadcastMessage(evt);
-    pNormalDialogWindow->DrawWindow(0, 0, IDX(NORMAL_DIALOG_DRAW_ID_LIMIT));
-    pNormalDialogWindow->DrawWindow(1, -65535, -256);
+    pNormalDialogWindow->DrawWindow(0, 0, NORMAL_DIALOG_FOREGROUND_WIDGET_LIMIT);
+    pNormalDialogWindow->DrawWindow(
+        1,
+        IDX(WINDOW_ALL_WIDGETS_LOW),
+        NORMAL_DIALOG_BACKGROUND_WIDGET_LAST_ID
+    );
 }
 
 #define GROUND_REPEAT_2(value) value, value
@@ -5462,21 +5658,21 @@ DATA(0x004f95b8) u8 gColorTableDarkBrown[DIM_PALETTE_COLOR_COUNT] = {
     0x32, 0x33, 0x34, 0x35, 0x37, 0x38, 0x3a, 0x33, 0x34, 0x37, 0x39, 0x36, 0x39, 0x38, 0x2c, 0x30,
     0x36, 0x3e, 0x31, 0x33, 0x36, 0x39, 0x32, 0x32, 0x32, 0x32, 0x32, 0x32, 0x32, 0x32, 0x32, 0x2a
 };
-DATA(0x004f96b8) i32 MAP_WIDTH = 72;
-DATA(0x004f96bc) i32 MAP_HEIGHT = 72;
+DATA(0x004f96b8) i32 MAP_WIDTH = IDX(MAP_DIMENSION_MEDIUM);
+DATA(0x004f96bc) i32 MAP_HEIGHT = IDX(MAP_DIMENSION_MEDIUM);
 DATA(0x004f96c0) u8* mapExtra = NULL;
 DATA(0x004f96c4) b32 gbClosingApp = false;
 DATA(0x004f96c8) b32 gbForegroundApp = false;
-DATA(0x004f96cc) i32 giMainVideoModeColorDepth = 8;
-DATA(0x004f96d0) i32 giMainVideoModeWidth = 640;
-DATA(0x004f96d4) i32 giMainVideoModeHeight = 480;
+DATA(0x004f96cc) i32 giMainVideoModeColorDepth = WINGRAPH_COLOR_DEPTH;
+DATA(0x004f96d0) i32 giMainVideoModeWidth = WINGRAPH_WIDTH;
+DATA(0x004f96d4) i32 giMainVideoModeHeight = WINGRAPH_HEIGHT;
 DATA(0x004f96d8) u32l glMilliCounter = 0;
 DATA(0x004f96e0) u8 gMapColors[RADAR_MAP_COLOR_COUNT] =
     {77, 98, 13, 104, 32, 118, 54, 206, 41, 0, 0, 0, 0, 0, 0, 0};
 DATA(0x004f96f0) u8 gObjectColors[RADAR_OBJECT_COLOR_COUNT] =
     {16, 48, 98, 160, 126, 74, 110, 179, 100, 218, 12, 12, 12, 12, 12, 12};
 DATA(0x004f9700) u8 gOwnerColors[RADAR_OWNER_COLOR_COUNT] = {73, 105, 190, 114, 205, 138, 10, 0};
-DATA(0x004f9708) char* gTilesetFiles[64] = {
+DATA(0x004f9708) char* gTilesetFiles[IDX(TILESET_COUNT)] = {
     "",
     "",
     "",
@@ -5848,9 +6044,9 @@ DATA(0x004fa690) char* cEvilTranslate[KB_INTERFACE_TYPE_COUNT][KB_INTERFACE_VARI
     {"VGENBKG.ICN", "VGENBKGE.ICN"},  {"campbkgg.ICN", "campbkge.ICN"},
     {"campxtrg.ICN", "campxtre.ICN"}
 };
-DATA(0x004fa7b8) char gcAnimPath[0x160] = "\\HEROES2\\ANIM\\";
-DATA(0x004fa918) char gcGamePath[0x18] = ".\\GAMES\\";
-DATA(0x004fa930) char gcMapPath[0x14] = ".\\MAPS\\";
+DATA(0x004fa7b8) char gcAnimPath[GLOBAL_AGGREGATE_PATH_SIZE] = "\\HEROES2\\ANIM\\";
+DATA(0x004fa918) char gcGamePath[GLOBAL_GAME_PATH_SIZE] = ".\\GAMES\\";
+DATA(0x004fa930) char gcMapPath[GLOBAL_MAP_PATH_SIZE] = ".\\MAPS\\";
 DATA(0x004fa944) b32 gbPutzingWithMouseCtr = false;
 DATA(0x004fa948) b32 gbDontTryRedbook = false;
 DATA(0x004fa94c) b32 gbDontTryMIDI = false;
@@ -5907,7 +6103,7 @@ DATA(0x004faa30) i16 boatFrameFlip[MOVEMENT_FRAME_FLIP_COUNT] =
 DATA(0x004faa50) i8 gCastleResources[CASTLE_RESOURCE_SLOT_COUNT] =
     {IDX(RES_WOOD), IDX(RES_ORE), -1, -1, 0, 0, 0, 0};
 DATA(0x004faa58) i16 gCastleAmounts[CASTLE_AMOUNT_COUNT] = {20, 20, 0, 0};
-DATA(0x004faa60) i32 gHeroGoldCost = 2500;
+DATA(0x004faa60) i32 gHeroGoldCost = HERO_RECRUITMENT_GOLD_COST;
 DATA(0x004faa68) i16 gVesaMode[VESA_MODE_VALUE_COUNT] =
     {640, 480, 256, VESA_SET_MODE_FUNCTION, VESA_MODE_640_480_256, 0, 0, 0};
 DATA(0x004faa78) tag_tilePoint normalDirTable[NORMAL_DIRECTION_COUNT] = {
@@ -5974,9 +6170,9 @@ DATA(0x004fad08) i32 gArtifactBaseRV[KB_ARTIFACT_BASE_VALUE_COUNT] = {
     7600,  3700,  7400,  0,     0,     0,     0,     0,     2500,  4800, 9000,  -3250, 36200,
     2000,  -1050, -1050, 10000, 10000, 15000, 720,   7500,  10000, 9200, 10000, 1500
 };
-DATA(0x004faea4) i32 gUltArtifactAvgValue = 16500;
+DATA(0x004faea4) i32 gUltArtifactAvgValue = ULTIMATE_ARTIFACT_AVERAGE_VALUE;
 DATA(0x004faea8) i32 giDebugLevel = 0;
-DATA(0x004faeac) i8 giVisRangeTown = 5;
+DATA(0x004faeac) i8 giVisRangeTown = TOWN_VISIBILITY_RADIUS;
 DATA(0x004faeb0) tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
     {{20, 33}, 17, 12, 1, FACTION_KNIGHT, 2, 1, 1, 1, 1, 0, "psnt", MonsterAttribute(0)},
     {{150, 312}, 21, 8, 10, FACTION_KNIGHT, 2, 5, 3, 2, 3, 12, "arch", MONSTER_ATTRIBUTE_RANGED},
@@ -6399,7 +6595,7 @@ DATA(0x004fbd60) char* cMonFilename[IDX(CREATURE_COUNT)] = {
 };
 DATA(0x004fbe68) b32 gbProcessingCombatAction = false;
 DATA(0x004fbe6c) RemoteNetworkProtocol iMPNetProtocol = REMOTE_PROTOCOL_NETBIOS;
-DATA(0x004fbe70) i32 iLastDiffSendTo = -2;
+DATA(0x004fbe70) i32 iLastDiffSendTo = DIFF_SEND_FORCE_WHOLE;
 DATA(0x004fbe78) SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)] = {
     {"fireball",
      3,
@@ -6821,7 +7017,9 @@ DATA(0x004fc538) u8 giNumPowFrames[KB_SPELL_EFFECT_COUNT] = {10, 10, 10, 10, 10,
                                                              10, 8,  8,  10, 10, 10, 10, 15,
                                                              10, 10, 10, 10, 10, 16, 16, 14,
                                                              19, 22, 10, 17, 10, 12, 11, 16};
-DATA(0x004fc558) i32 giSpellEffectShowType = 2;
+DATA(0x004fc558)
+H2_ENUM_STORAGE(SpellEffectDisplayType, i32)
+giSpellEffectShowType = SPELL_EFFECT_DISPLAY_EFFECT_STATUS;
 DATA(0x004fc560) i8 gcColorToPlayerPos[RADAR_OWNER_COLOR_COUNT] = {0, 1, 2, 3, 4, 5, 0, 0};
 DATA(0x004fc568) char* cCombatBkgNames[KB_COMBAT_BACKGROUND_COUNT] = {
     "CBKGWATR.icn", "",
@@ -8732,7 +8930,7 @@ DATA(0x004ff2c0) char* cLongCombatHelp[KB_LONG_COMBAT_HELP_COUNT] = {
     "{Message Bar}\n\nShows the results of individual monster's actions.",
     NULL
 };
-DATA(0x004ff2d8) char* cTownCommand[28] = {
+DATA(0x004ff2d8) char* cTownCommand[KB_TOWN_COMMAND_COUNT] = {
     "Redistribute %s army",
     "Cannot combine hero's last army",
     "Combine %s armies",
@@ -8762,7 +8960,7 @@ DATA(0x004ff2d8) char* cTownCommand[28] = {
     "Marketplace",
     "Captain's Quarters"
 };
-DATA(0x004ff348) char* gHeroDefaultNames[54] = {
+DATA(0x004ff348) char* gHeroDefaultNames[KB_HERO_DEFAULT_NAME_COUNT] = {
     "Lord Kilburn", "Sir Gallant", "Ector",    "Gwenneth", "Tyro",    "Ambrose",   "Ruby",
     "Maximus",      "Dimitri",     "Thundax",  "Fineous",  "Jojosh",  "Crag Hack", "Jezebel",
     "Jaclyn",       "Ergon",       "Tsabu",    "Atlas",    "Astra",   "Natasha",   "Troyan",
@@ -9738,7 +9936,7 @@ DATA(0x00500154) i32 giHighScoreRank = -1;
 DATA(0x00500158) i32 giHighScoreType = 1;
 DATA(0x0050015c) b32 gbShowHighScore = false;
 DATA(0x00500160) b32 gbLowMemory = false;
-DATA(0x00500164) i32 giHighMemBuffer = 5;
+DATA(0x00500164) i32 giHighMemBuffer = CHECK_MEMORY_INITIAL_AVAILABLE_KB;
 DATA(0x00500168) void* gLowPage = NULL;
 DATA(0x0050016c) b32 gbLowPageGrabbed = false;
 DATA(0x00500170) i8 xSmackFromNetwork = 0;
@@ -9760,19 +9958,19 @@ DATA(0x00515f78) i32 bInCheckEndGame = 0;
 DATA(0x005165dc) i32 bInShutDown = 0;
 DATA(0x00516810) b32 gbInMemError = false;
 DATA(0x00516d1c) i32 iShingleAnimFrame = 0;
-DATA(0x00528598) b32 gbHumanPlayer[6];
+DATA(0x00528598) b32 gbHumanPlayer[IDX(GAME_PLAYER_COUNT)];
 DATA(0x005285b0) b32 gbHitEvent;
 DATA(0x005285b4) i32 giMaxExtentX;
 DATA(0x005285b8) i32 giMaxExtentY;
 DATA(0x005285bc) i32 giRandomClouds;
-DATA(0x005285c0) char cOverrideDigitalDriver[0x10];
+DATA(0x005285c0) char cOverrideDigitalDriver[GLOBAL_DRIVER_NAME_SIZE];
 DATA(0x005285d0) i32 giBottomViewOverrideEndTime;
-DATA(0x005285d8) i8 gArmyEffected[2][20];
+DATA(0x005285d8) i8 gArmyEffected[COMBAT_CONTROL_SIDE_COUNT][KB_ARMY_EFFECT_COUNT];
 DATA(0x00528600) i32 giBottomViewResource;
 DATA(0x00528604) b32 gbInCampaign;
 DATA(0x00528608) i32 giResExtra1;
 DATA(0x0052860c) i32 giResExtra2;
-DATA(0x00528610) i8 puzzlePiecesRemoved[6];
+DATA(0x00528610) i8 puzzlePiecesRemoved[PUZZLE_PIECE_STORAGE_SIZE];
 DATA(0x00528618) i32 giSeedingValid;
 DATA(0x0052861c) i32 giLimitPlayer;
 DATA(0x00528620) i32 giShowClouds;
@@ -9782,13 +9980,13 @@ DATA(0x00528630) SAMPLE2 NULL_SAMPLE2;
 DATA(0x00528638) i32 iMaxMapExtra;
 DATA(0x0052863c) palette* gPalette;
 DATA(0x00528640) resourceManager* gpResourceManager;
-DATA(0x00528648) char gcBotViewText[0x98];
+DATA(0x00528648) char gcBotViewText[GLOBAL_BOTTOM_VIEW_TEXT_SIZE];
 DATA(0x005286e0) i32 bSpecialHideCursor;
 DATA(0x005286e4) searchArray* gpSearchArray;
 DATA(0x005286e8) i32 giResType1;
 DATA(0x005286ec) b32 gbBlackoutPlayer;
 DATA(0x005286f0) i32 giResType2;
-DATA(0x005286f8) char cNetBoxLine[4][140];
+DATA(0x005286f8) char cNetBoxLine[BOX_LINE_COUNT][NET_BOX_LINE_SIZE];
 DATA(0x00528928) i32 gIndex;
 DATA(0x0052892c) i32 giWeekTypeExtra;
 DATA(0x00528930) philAI* gpPhilAI;
@@ -9797,12 +9995,12 @@ DATA(0x00528938) SpellType gCurLoadedSpellEffect;
 DATA(0x0052893c) class mouseManager* gpMouseManager;
 DATA(0x00528940) i32 giCurTempMobility;
 DATA(0x00528944) OverviewReturnAction giOverviewReturnAction;
-DATA(0x00528948) char cOverrideMIDIDriver[0x10];
+DATA(0x00528948) char cOverrideMIDIDriver[GLOBAL_DRIVER_NAME_SIZE];
 DATA(0x00528958) icon* gSystemIcons;
 DATA(0x0052895c) b8 gbCombatSurrender;
 DATA(0x00528960) heroWindow* pNormalDialogWindow;
 DATA(0x00528964) i32 giTCPHostStatus;
-DATA(0x00528968) char gMapName[16];
+DATA(0x00528968) char gMapName[GLOBAL_SHORT_MAP_NAME_SIZE];
 DATA(0x00528978) i32 giMinExtentX;
 DATA(0x0052897c) i32 giMinExtentY;
 DATA(0x00528980) MultiplayerBaseType iMPBaseType;
@@ -9810,14 +10008,14 @@ DATA(0x00528984) b32 gbTCPFirstTime;
 DATA(0x00528988) i16* pwSizeOfMapExtra;
 DATA(0x0052898c) i32 giHeroScreenSrcIndex;
 DATA(0x00528990) i32 giWeekType;
-DATA(0x00528998) char gText[768];
+DATA(0x00528998) char gText[GLOBAL_TEXT_BUFFER_SIZE];
 DATA(0x00528c98) b32 gbInNewGameSetup;
 DATA(0x00528c9c) class palette* gpBufferPalette;
 DATA(0x00528ca0) b32 gbCampaignSideChoice;
-DATA(0x00528ca4) char cNetBoxColor[4];
+DATA(0x00528ca4) char cNetBoxColor[BOX_LINE_COUNT];
 DATA(0x00528ca8) i32 giMonthTypeExtra;
 DATA(0x00528cac) i32 iMPExtendedType;
-DATA(0x00528cb0) i8 gcColorToSetupPos[8];
+DATA(0x00528cb0) i8 gcColorToSetupPos[RADAR_OWNER_COLOR_COUNT];
 DATA(0x00528cb8) char gFullMapName[GLOBAL_MAP_NAME_SIZE];
 DATA(0x00528cd0) char gcTCPName[GLOBAL_TCP_TEXT_SIZE];
 DATA(0x00528ce8) i32 giShowIntro;
@@ -9825,15 +10023,15 @@ DATA(0x00528cf0) i32 glTimers[GLOBAL_TIMER_COUNT];
 DATA(0x00528d18) i32 giScore;
 DATA(0x00528d1c) armyGroup* gpMonGroup;
 DATA(0x00528d20) configStruct gConfig;
-DATA(0x00528ec0) char gcRegAppPath[0x160];
+DATA(0x00528ec0) char gcRegAppPath[GLOBAL_AGGREGATE_PATH_SIZE];
 DATA(0x00529020) u32l gTimeMark;
 DATA(0x00529024) char* EXPANSION_AGGREGATE_NAME;
-DATA(0x00529028) char cPlayerNames[6][21];
+DATA(0x00529028) char cPlayerNames[X_GLOBAL_PLAYER_COUNT][GLOBAL_PLAYER_NAME_SIZE];
 DATA(0x005290a8) game* gpGame;
 DATA(0x005290ac) b8 gbRetreatWin;
-DATA(0x005290b0) i32 giWaitType;
+DATA(0x005290b0) DialogWaitType giWaitType;
 DATA(0x005290b4) class icon* gCurLoadedSpellIcon;
-DATA(0x005290b8) u8 bSaveMusicPosition[0x3c];
+DATA(0x005290b8) u8 bSaveMusicPosition[KB_MUSIC_TRACK_COUNT];
 DATA(0x005290f4) i32 giBottomViewOverride;
 DATA(0x005290f8) char gcTCPAddress[GLOBAL_TCP_TEXT_SIZE];
 DATA(0x00529110) u8 giSetupGameType;
@@ -9845,10 +10043,10 @@ DATA(0x00529288) i32 iCombatControlNetPos[COMBAT_CONTROL_SIDE_COUNT];
 DATA(0x00529290) char cExpAggPathName[GLOBAL_AGGREGATE_PATH_SIZE];
 DATA(0x005293f0) b32 gbMoveShown;
 DATA(0x005293f4) void** ppMapExtra;
-DATA(0x005293f8) char gcBottomViewText[92];
+DATA(0x005293f8) char gcBottomViewText[GLOBAL_BOTTOM_VIEW_MESSAGE_SIZE];
 DATA(0x00529454) i32 giThisNetPos;
-DATA(0x00529458) b8 gbSetupGamePosToRealGamePos[8];
-DATA(0x00529460) char gcRegCDRomPath[0x160];
+DATA(0x00529458) b8 gbSetupGamePosToRealGamePos[RADAR_OWNER_COLOR_COUNT];
+DATA(0x00529460) char gcRegCDRomPath[GLOBAL_AGGREGATE_PATH_SIZE];
 DATA(0x005295c0) class heroWindow* heroWin;
 DATA(0x005295c4) i32 giOverviewReturnActionExtra;
 DATA(0x005295c8) i32 giCurGeneral;
@@ -9865,7 +10063,7 @@ DATA(0x005295f0) i32 gGameCommand;
 DATA(0x005295f4) i32 giMonthType;
 DATA(0x005295f8) char* DEFAULT_AGGREGATE_NAME;
 DATA(0x005295fc) i32 gCurSpellEffectFrame;
-DATA(0x00529600) b8 gbThisNetHumanPlayer[8];
+DATA(0x00529600) b8 gbThisNetHumanPlayer[RADAR_OWNER_COLOR_COUNT];
 DATA(0x00529608) char cAggPathName[GLOBAL_AGGREGATE_PATH_SIZE];
 DATA(0x00529768) class highScoreManager* gpHighScoreManager;
 DATA(0x0052976c) b32 gbFunctionComplete;
@@ -9874,7 +10072,7 @@ DATA(0x00529774) b32 gbTextEntryEscaped;
 DATA(0x00529778) i32 giTotalHighMem;
 DATA(0x0052977c) i32 gMapX;
 DATA(0x00529780) i32 gMapY;
-DATA(0x00529788) char gcWinText[0x12c];
+DATA(0x00529788) char gcWinText[GLOBAL_WINDOW_TEXT_SIZE];
 DATA(0x005298b4) i32 bFreshSave;
 DATA(0x005298b8) i32 bShowIt;
 DATA(0x005298bc) i32 gLowPageScreenSelector;
@@ -9887,7 +10085,7 @@ DATA(0x00529910) b32 gbThisNetGotAdventureControl;
 DATA(0x00529914) i32 giMapChangeCtr;
 DATA(0x00529918) SMapChange sMapChangeQueue[CURSOR_MAP_CHANGE_QUEUE_COUNT];
 DATA(0x0052a184) b32 gbWaitForRemoteReceive;
-DATA(0x0052a188) u8 bMusicIsLooping[0x3c];
+DATA(0x0052a188) u8 bMusicIsLooping[KB_MUSIC_TRACK_COUNT];
 DATA(0x0052a1c4) townManager* gpTownManager;
 DATA(0x0052a1c8) advManager* gpAdvManager;
 DATA(0x0052a1d0) b8 gbGamePosToNetPos[OLD_MAIN_MATCH_BUFFER_SIZE];

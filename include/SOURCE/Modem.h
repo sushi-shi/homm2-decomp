@@ -22,9 +22,6 @@ void WriteModemPacket(char*, i32);
 H2_ENUM_BEGIN(ModemConstant)
     MODEM_MODE_DIAL                  = 3,
     MODEM_MODE_WAIT                  = 4,
-    MODEM_WAIT_COMMAND               = 5,
-    MODEM_WAIT_RESPONSE              = 6,
-    MODEM_WAIT_DIRECT_CONNECT        = 7,
     MODEM_CONNECTION_INIT_STAGE      = 0,
     MODEM_CONNECTION_HANDSHAKE_STAGE = 1,
     MODEM_CONNECTION_READY_STAGE     = 2,

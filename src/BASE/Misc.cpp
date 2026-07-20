@@ -816,8 +816,8 @@ void SetInstallDefaults(void) {
 VA(0x004c49a0, 0x1b5)
 void SetGameDefaults(void) {
     i32* fullScreen = &gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].fullScreen;
-    gConfig.musicVolume = 1;
-    gConfig.soundVolume = 1;
+    gConfig.musicVolume = CONFIG_VOLUME_MIN;
+    gConfig.soundVolume = CONFIG_VOLUME_MIN;
     gConfig.autosave = 1;
     gConfig.showRoute = 1;
     do {

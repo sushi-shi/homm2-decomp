@@ -194,7 +194,6 @@ H2_ENUM_BEGIN(CombatCommandGeometry)
     SCREEN_MAX_X                 = 639,
     SCREEN_MAX_Y                 = 479,
     ARMY_VIEW_LEVEL_COUNT        = 3,
-    SPELL_EFFECT_TYPE_COUNT      = 3,
     COMMAND_FRAME_DELAY          = 75,
     DEBUG_VAPORIZE_MASK          = 0x3,
     DEBUG_DOUBLE_RIPPLE_MASK     = 0xc
@@ -995,8 +994,7 @@ i32 combatManager::ProcessCombatMsg(tag_message& message) {
                     );
                     break;
                 case IDX(KEY_CYCLE_SPELL_EFFECT):
-                    giSpellEffectShowType =
-                        (giSpellEffectShowType + 1) % SPELL_EFFECT_TYPE_COUNT;
+                    giSpellEffectShowType = NextSpellEffectDisplayType(giSpellEffectShowType);
                     DrawFrame(1, 0, 0, 0, COMMAND_FRAME_DELAY, 1, 1);
                     break;
                 case IDX(KEY_DEBUG_CREATURE_EFFECT):
