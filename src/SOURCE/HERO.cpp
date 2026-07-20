@@ -181,7 +181,6 @@ H2_ENUM_BEGIN(HeroMobilityConstant)
     STABLES_MOBILITY_BONUS        = 400,
     AI_DIFFICULTY_MOBILITY_BONUS  = 75,
     AI_STATE_MOBILITY_BONUS       = 50,
-    LIGHTHOUSE_MINE_TYPE          = 100,
     HARD_GAME_DIFFICULTY          = 2,
     HIGH_AI_DIFFICULTY            = 2
 H2_ENUM_END(HeroMobilityConstant)
@@ -254,7 +253,7 @@ i32 hero::CalcMobility(void) {
             mobilityResult * gfSSNavigationMod[m_secondarySkills[IDX(HERO_SKILL_NAVIGATION)]]
         );
         if (m_owner != -1)
-            mobilityResult += gpGame->MineTypesOwned(m_owner, LIGHTHOUSE_MINE_TYPE)
+            mobilityResult += gpGame->MineTypesOwned(m_owner, MINE_TYPE_LIGHTHOUSE)
                               * lighthouseBonusIncrement;
         if (HasArtifact(ARTIFACT_SAILORS_ASTROLABE))
             mobilityResult += astrolabeBonus;

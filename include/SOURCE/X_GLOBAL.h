@@ -7,6 +7,7 @@
 #include <SOURCE/CURSOR.h>
 #include <SOURCE/dimPalette.h>
 #include <SOURCE/hero.h>
+#include <SOURCE/Overview.h>
 
 class ExpCampaign;
 
@@ -600,7 +601,7 @@ extern i32 giWeekTypeExtra;
 extern i32 giTCPType;
 extern SpellType gCurLoadedSpellEffect;
 extern i32 giCurTempMobility;
-extern i32 giOverviewReturnAction;
+extern OverviewReturnAction giOverviewReturnAction;
 extern char cOverrideMIDIDriver[GLOBAL_DRIVER_NAME_SIZE];
 extern char gMapName[GLOBAL_SHORT_MAP_NAME_SIZE];
 extern i32 giMinExtentX;

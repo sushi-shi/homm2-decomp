@@ -9796,7 +9796,7 @@ DATA(0x00528934) i32 giTCPType;
 DATA(0x00528938) SpellType gCurLoadedSpellEffect;
 DATA(0x0052893c) class mouseManager* gpMouseManager;
 DATA(0x00528940) i32 giCurTempMobility;
-DATA(0x00528944) i32 giOverviewReturnAction;
+DATA(0x00528944) OverviewReturnAction giOverviewReturnAction;
 DATA(0x00528948) char cOverrideMIDIDriver[0x10];
 DATA(0x00528958) icon* gSystemIcons;
 DATA(0x0052895c) b8 gbCombatSurrender;

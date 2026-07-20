@@ -171,7 +171,7 @@ public:
     void CampaignInfoUpdate(i32);
     void InitEntireCampaign(i32);
     void InitCampaignMap(void);
-    i32 MineTypesOwned(i32, i32);
+    i32 MineTypesOwned(i32, MineType);
     i32 SetupPuzzlePieces(i32, i32);
     i32 IsMobile(i32);
     class fullMap* GetWorldMapData(void);
