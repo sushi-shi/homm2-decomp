@@ -43,13 +43,13 @@ void fullMap::Init(i32 w, i32 h) {
 VA(0x0040b198, 0xce)
 void fullMap::ClearCellExtra(i32 index) {
     extras[index].objectTileset = TILESET_NONE;
-    extras[index].objectIndex = IDX(MAPCELL_SPRITE_NONE);
+    extras[index].objectIndex = MAPCELL_SPRITE_NONE;
     extras[index].animatedObject = 0;
     extras[index].objectLayerBit0 = 0;
     extras[index].objectLayerBit1 = 0;
     extras[index].objectDrawnAsOverlay = 0;
     extras[index].overlayTileset = TILESET_NONE;
-    extras[index].overlayIndex = IDX(MAPCELL_SPRITE_NONE);
+    extras[index].overlayIndex = MAPCELL_SPRITE_NONE;
     extras[index].animatedOverlay = 0;
     extras[index].drawOverlayOnTop = 0;
     extras[index].nextIndex = 0;
@@ -62,7 +62,7 @@ i32 fullMap::GetNewCellExtraIndex(void) {
     i32 j;
 
     for (nb = 1; nb < extraCount; nb++) {
-        if (extras[nb].nextIndex == IDX(MAPCELL_EXTRA_FREE)) {
+        if (extras[nb].nextIndex == MAPCELL_EXTRA_FREE) {
             ClearCellExtra(nb);
             return nb;
         }
@@ -74,7 +74,7 @@ i32 fullMap::GetNewCellExtraIndex(void) {
     delete extras;
     extras = i;
     for (j = extraCount; j < extraCount + EXTRA_ALLOCATION_STEP; j++)
-        extras[j].nextIndex = IDX(MAPCELL_EXTRA_FREE);
+        extras[j].nextIndex = MAPCELL_EXTRA_FREE;
     extraCount += EXTRA_ALLOCATION_STEP;
     ClearCellExtra(extraCount - EXTRA_ALLOCATION_STEP);
     return extraCount - EXTRA_ALLOCATION_STEP;
@@ -139,7 +139,7 @@ mapCellExtra* fullMap::GetNewCellExtraOverlay(i32 x, i32 y) {
         ix = Row(y)[x].m_extraIndex;
         node = Extra(Row(y)[x].m_extraIndex);
         for (;;) {
-            if (node->overlayIndex == IDX(MAPCELL_SPRITE_NONE))
+            if (node->overlayIndex == MAPCELL_SPRITE_NONE)
                 return node;
             if (node->nextIndex == 0) {
                 ni = GetNewCellExtraIndex();
@@ -169,7 +169,7 @@ mapCellExtra* fullMap::GetNewCellExtraObject(i32 x, i32 y) {
         ix = Row(y)[x].m_extraIndex;
         node = Extra(Row(y)[x].m_extraIndex);
         for (;;) {
-            if (node->objectIndex == IDX(MAPCELL_SPRITE_NONE))
+            if (node->objectIndex == MAPCELL_SPRITE_NONE)
                 return node;
             if (node->nextIndex == 0) {
                 ni = GetNewCellExtraIndex();
@@ -201,17 +201,17 @@ void fullMap::ChangeTilesetIndex(
     i32 dummy;
 
     ptr = NULL;
-    if (index == IDX(MAPCELL_SPRITE_NONE))
+    if (index == MAPCELL_SPRITE_NONE)
         t = TILESET_NONE;
     else
         t = tileset;
 
     if (overlay == 0) {
-        if (cell->m_objectIndex != IDX(MAPCELL_SPRITE_NONE) && cell->m_objectTileset != tileset) {
+        if (cell->m_objectIndex != MAPCELL_SPRITE_NONE && cell->m_objectTileset != tileset) {
             idx = cell->m_extraIndex;
             while (idx != 0) {
                 ptr = Extra(idx);
-                if (ptr->objectIndex != IDX(MAPCELL_SPRITE_NONE) && ptr->objectTileset != tileset) {
+                if (ptr->objectIndex != MAPCELL_SPRITE_NONE && ptr->objectTileset != tileset) {
                     idx = ptr->nextIndex;
                 } else {
                     ptr->animatedObject = 0;
@@ -237,11 +237,11 @@ void fullMap::ChangeTilesetIndex(
             cell->m_objectIndex = index;
         }
     } else {
-        if (cell->m_overlayIndex != IDX(MAPCELL_SPRITE_NONE) && cell->m_overlayTileset != tileset) {
+        if (cell->m_overlayIndex != MAPCELL_SPRITE_NONE && cell->m_overlayTileset != tileset) {
             idx = cell->m_extraIndex;
             while (idx != 0) {
                 ptr = Extra(idx);
-                if (ptr->overlayIndex != IDX(MAPCELL_SPRITE_NONE) && ptr->overlayTileset != tileset) {
+                if (ptr->overlayIndex != MAPCELL_SPRITE_NONE && ptr->overlayTileset != tileset) {
                     idx = ptr->nextIndex;
                 } else {
                     ptr->animatedOverlay = 0;
