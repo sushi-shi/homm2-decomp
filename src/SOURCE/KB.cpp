@@ -3147,7 +3147,7 @@ void PopNetBox(char* text, i32 netPlayer) {
     redrawLines_f = 1;
     redrawAdventure_i = 0;
     strcpy(inputText_c, "");
-    gpInputManager->SetKeyCodeType(0);
+    gpInputManager->SetKeyCodeType(INPUT_KEY_CODE_ASCII);
 
     while (!done_i) {
         PollSound();
@@ -3310,7 +3310,7 @@ void PopNetBox(char* text, i32 netPlayer) {
         }
     }
 
-    gpInputManager->SetKeyCodeType(1);
+    gpInputManager->SetKeyCodeType(INPUT_KEY_CODE_SCAN);
     if (redrawAdventure_i && gbMoveShown) {
         gbDrawWindowBackground = false;
         gpWindowManager->RemoveWindow(netWindow_j);
@@ -3967,7 +3967,6 @@ H2_ENUM_BEGIN(DynamicWindowConstant)
     CORNER_LEFT               = 40,
     CORNER_RIGHT              = 23,
     EDGE_OFFSET               = 24,
-    WINDOW_FLAGS              = 0x4002,
     CORNER_FRAME_TOP_LEFT     = 0,
     CORNER_FRAME_TOP_RIGHT    = 1,
     CORNER_FRAME_BOTTOM_RIGHT = 2,
@@ -3981,7 +3980,6 @@ H2_ENUM_BEGIN(DynamicWindowConstant)
     BOTTOM_FRAME_LAST         = 9,
     LEFT_FRAME_FIRST          = 10,
     LEFT_FRAME_LAST           = 11,
-    WIDGET_COLOR              = 0x10
 H2_ENUM_END(DynamicWindowConstant)
 
 VA(0x0049fa70, 0x6bc)
@@ -4038,7 +4036,7 @@ void SetupDynamicWindow(
     leftCornerPaddingLocal = CONTENT_TOP;
     rightCornerPaddingValue = CONTENT_TOP;
     centeredPadding = CONTENT_LEFT;
-    stoneWidgetColorSize = WIDGET_COLOR;
+    stoneWidgetColorSize = TILE_SIZE;
     newWidgetTemp = NULL;
     columnsSize = (contentWidth - 1) / TILE_SIZE + 1;
     numRows = (contentHeight - 1) / TILE_SIZE + 1;
@@ -4057,7 +4055,13 @@ void SetupDynamicWindow(
 
     if (windowType != DYNAMIC_WINDOW_STONE)
         return;
-    *window = new heroWindow(x, y, *windowWidth, *windowHeight, WINDOW_FLAGS);
+    *window = new heroWindow(
+        x,
+        y,
+        *windowWidth,
+        *windowHeight,
+        WINDOW_FLAG_SAVE_BACKGROUND | WINDOW_FLAG_OWNS_WIDGETS
+    );
     leftOffset = *contentLeft - x;
     topOffsetNum = *contentTop - y;
     rightOffset = *contentRight - x;
@@ -4074,7 +4078,7 @@ void SetupDynamicWindow(
                 BACKGROUND_FRAME,
                 ICON_DRAW_NORMAL,
                 -1,
-                WIDGET_COLOR,
+                WIDGET_KIND_ICON_DIRECT,
                 1
             );
             if (newWidgetTemp == NULL)
@@ -4092,7 +4096,7 @@ void SetupDynamicWindow(
         CORNER_FRAME_TOP_LEFT,
         ICON_DRAW_NORMAL,
         -1,
-        WIDGET_COLOR,
+        WIDGET_KIND_ICON_DIRECT,
         1
     );
     if (newWidgetTemp == NULL)
@@ -4108,7 +4112,7 @@ void SetupDynamicWindow(
         CORNER_FRAME_TOP_RIGHT,
         ICON_DRAW_NORMAL,
         -1,
-        WIDGET_COLOR,
+        WIDGET_KIND_ICON_DIRECT,
         1
     );
     if (newWidgetTemp == NULL)
@@ -4124,7 +4128,7 @@ void SetupDynamicWindow(
         CORNER_FRAME_BOTTOM_RIGHT,
         ICON_DRAW_NORMAL,
         -1,
-        WIDGET_COLOR,
+        WIDGET_KIND_ICON_DIRECT,
         1
     );
     if (newWidgetTemp == NULL)
@@ -4140,7 +4144,7 @@ void SetupDynamicWindow(
         CORNER_FRAME_BOTTOM_LEFT,
         ICON_DRAW_NORMAL,
         -1,
-        WIDGET_COLOR,
+        WIDGET_KIND_ICON_DIRECT,
         1
     );
     if (newWidgetTemp == NULL)
@@ -4157,7 +4161,7 @@ void SetupDynamicWindow(
             Random(TOP_FRAME_FIRST, TOP_FRAME_LAST),
             ICON_DRAW_NORMAL,
             -1,
-            WIDGET_COLOR,
+            WIDGET_KIND_ICON_DIRECT,
             1
         );
         if (newWidgetTemp == NULL)
@@ -4173,7 +4177,7 @@ void SetupDynamicWindow(
             Random(BOTTOM_FRAME_FIRST, BOTTOM_FRAME_LAST),
             ICON_DRAW_NORMAL,
             -1,
-            WIDGET_COLOR,
+            WIDGET_KIND_ICON_DIRECT,
             1
         );
         if (newWidgetTemp == NULL)
@@ -4191,7 +4195,7 @@ void SetupDynamicWindow(
             Random(LEFT_FRAME_FIRST, LEFT_FRAME_LAST),
             ICON_DRAW_NORMAL,
             -1,
-            WIDGET_COLOR,
+            WIDGET_KIND_ICON_DIRECT,
             1
         );
         if (newWidgetTemp == NULL)
@@ -4207,7 +4211,7 @@ void SetupDynamicWindow(
             Random(RIGHT_FRAME_FIRST, RIGHT_FRAME_LAST),
             ICON_DRAW_NORMAL,
             -1,
-            WIDGET_COLOR,
+            WIDGET_KIND_ICON_DIRECT,
             1
         );
         if (newWidgetTemp == NULL)
@@ -5098,7 +5102,9 @@ void NormalDialog(
             resourceFrame_g,
             ICON_DRAW_NORMAL,
             -1,
-            NORMAL_DIALOG_WIDGET_COLOR + (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_SPELL),
+            resourceType_l[resourceSlot_n] == NORMAL_DIALOG_SPELL
+                ? WIDGET_KIND_ICON_CENTERED
+                : WIDGET_KIND_ICON_DIRECT,
             1
         );
         if (!iconPanel_j)
@@ -5116,7 +5122,7 @@ void NormalDialog(
                 resourceValue_l[resourceSlot_n] + NORMAL_DIALOG_ARTIFACT_FRAME_OFFSET,
                 ICON_DRAW_NORMAL,
                 -1,
-                NORMAL_DIALOG_WIDGET_COLOR,
+                WIDGET_KIND_ICON_DIRECT,
                 1
             );
             if (!iconPanel_j)
@@ -5134,7 +5140,7 @@ void NormalDialog(
                 resourceValue_l[resourceSlot_n],
                 ICON_DRAW_NORMAL,
                 -1,
-                NORMAL_DIALOG_WIDGET_COLOR,
+                WIDGET_KIND_ICON_DIRECT,
                 1
             );
             if (!iconPanel_j)
@@ -5154,7 +5160,7 @@ void NormalDialog(
                     + NORMAL_DIALOG_MONSTER_RACE_FRAME_OFFSET,
                 ICON_DRAW_NORMAL,
                 -1,
-                NORMAL_DIALOG_WIDGET_COLOR,
+                WIDGET_KIND_ICON_DIRECT,
                 1
             );
             if (!iconPanel_j)
@@ -5172,7 +5178,7 @@ void NormalDialog(
                 0,
                 ICON_DRAW_NORMAL,
                 -1,
-                NORMAL_DIALOG_WIDGET_COLOR,
+                WIDGET_KIND_ICON_DIRECT,
                 1
             );
             if (!iconPanel_j)
@@ -5190,7 +5196,7 @@ void NormalDialog(
                 NORMAL_DIALOG_CREST_OVERLAY_FRAME,
                 ICON_DRAW_NORMAL,
                 -1,
-                NORMAL_DIALOG_WIDGET_COLOR,
+                WIDGET_KIND_ICON_DIRECT,
                 1
             );
             if (!iconPanel_j)
@@ -5208,7 +5214,7 @@ void NormalDialog(
                 NORMAL_DIALOG_SECONDARY_OVERLAY_FRAME,
                 ICON_DRAW_NORMAL,
                 -1,
-                NORMAL_DIALOG_WIDGET_COLOR,
+                WIDGET_KIND_ICON_DIRECT,
                 1
             );
             if (!iconPanel_j)
@@ -5227,7 +5233,7 @@ void NormalDialog(
                 0,
                 ICON_DRAW_NORMAL,
                 -1,
-                NORMAL_DIALOG_WIDGET_COLOR,
+                WIDGET_KIND_ICON_DIRECT,
                 1
             );
             if (!iconPanel_j)
@@ -5247,7 +5253,7 @@ void NormalDialog(
                 "smalfont.fnt",
                 FONT_DRAW_DEFAULT,
                 textWidgetId_h++,
-                NORMAL_DIALOG_WIDGET_FLAGS,
+                WIDGET_KIND_TEXT,
                 FONT_ALIGN_CENTER
             );
             if (!textPanel_h)
@@ -5285,7 +5291,7 @@ void NormalDialog(
             "smalfont.fnt",
             FONT_DRAW_DEFAULT,
             textWidgetId_h++,
-            NORMAL_DIALOG_WIDGET_FLAGS,
+            WIDGET_KIND_TEXT,
             FONT_ALIGN_CENTER
         );
         if (!textPanel_h)
@@ -5308,7 +5314,7 @@ void NormalDialog(
                 "bigfont.fnt",
                 FONT_DRAW_DEFAULT,
                 textWidgetId_h++,
-                NORMAL_DIALOG_WIDGET_FLAGS,
+                WIDGET_KIND_TEXT,
                 FONT_ALIGN_CENTER
             );
             if (!textPanel_h)
@@ -5322,7 +5328,7 @@ void NormalDialog(
             resourceImageWidth_g,
             sizingIconHeight_l,
             resourceSlot_n + NORMAL_DIALOG_RESOURCE_BORDER_FIRST_ID,
-            1,
+            WIDGET_KIND_TRANSPARENT,
             0,
             NULL
         );
@@ -5350,7 +5356,7 @@ void NormalDialog(
             "smalfont.fnt",
             FONT_DRAW_DEFAULT,
             textWidgetId_h++,
-            NORMAL_DIALOG_WIDGET_FLAGS,
+            WIDGET_KIND_TEXT,
             FONT_ALIGN_CENTER
         );
         if (!textPanel_h)

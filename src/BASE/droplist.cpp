@@ -66,7 +66,7 @@ DATA(0x00521078) static SDropListSourceFiles gDropListSourceFiles = {
 };
 
 VA(0x004dbf00, 0x3b)
-dropListWidget::dropListWidget(void) : widget(0, 0, 0, 0, 0, 0) {
+dropListWidget::dropListWidget(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
     m_items = NULL;
     m_savedBackground = NULL;
     m_itemCount = 0;

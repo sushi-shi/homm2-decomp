@@ -967,7 +967,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         -1
                     );
                     eventHero2->GiveSS(
-                        static_cast<HeroSecondarySkill>(cell->m_objectMetadata), 1
+                        static_cast<HeroSecondarySkill>(cell->m_objectMetadata),
+                        HERO_SKILL_LEVEL_BASIC
                     );
                 } else {
                     sprintf(
@@ -7028,7 +7029,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             if (eventHero->m_secondarySkills[cell->m_objectMetadata] == HERO_SKILL_LEVEL_NONE)
                 eventHero->GiveSS(
                     static_cast<HeroSecondarySkill>(cell->m_objectMetadata),
-                    IDX(HERO_SKILL_LEVEL_BASIC)
+                    HERO_SKILL_LEVEL_BASIC
                 );
             break;
 
@@ -7181,9 +7182,7 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
             if (!(eventHero->m_eventFlags & HERO_EVENT_SIRENS)) {
                 armyValue7 = 0;
                 for (artifactIndex1 = 0; artifactIndex1 < ARMY_GROUP_SLOT_COUNT; artifactIndex1++) {
-                    creatureType3 = static_cast<CreatureType>(
-                        eventHero->m_army.m_creatureTypes[artifactIndex1]
-                    );
+                    creatureType3 = eventHero->m_army.m_creatureTypes[artifactIndex1];
                     if (creatureType3 != CREATURE_NONE) {
                         quantity6 = eventHero->m_army.m_quantities[artifactIndex1];
                         if (quantity6 > EVENT_SIRENS_MIN_ARMY_QUANTITY) {

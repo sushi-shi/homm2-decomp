@@ -55,7 +55,7 @@ public:
         char* iconName,
         i16 iconFrame,
         i16 id,
-        i16 kind,
+        H2_ENUM_PARAM(WidgetKind, i16) kind,
         i16 layout,
         i32 horizontalInset,
         i32 verticalInset

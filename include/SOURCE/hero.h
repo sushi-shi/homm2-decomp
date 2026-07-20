@@ -212,7 +212,10 @@ public:
         H2_ENUM_PARAM(HeroSecondarySkill, i32), H2_ENUM_PARAM(HeroSkillLevel, i32)
     );
     i32 TakeSS(H2_ENUM_PARAM(HeroSecondarySkill, i32), i32);
-    i32 GiveSS(H2_ENUM_PARAM(HeroSecondarySkill, i32), i32);
+    i32 GiveSS(
+        H2_ENUM_PARAM(HeroSecondarySkill, i32),
+        H2_ENUM_PARAM(HeroSkillLevel, i32)
+    );
     i32 CreatureTypeCount(H2_ENUM_PARAM(CreatureType, i32));
     void UpgradeCreatures(
         H2_ENUM_PARAM(CreatureType, i32), H2_ENUM_PARAM(CreatureType, i32)

@@ -12,7 +12,14 @@ H2_ENUM_BEGIN(WidgetConstant)
 H2_ENUM_END(WidgetConstant)
 
 VA(0x004dde00, 0x5a)
-widget::widget(i16 x, i16 y, i16 width, i16 height, i16 id, i16 kind) {
+widget::widget(
+    i16 x,
+    i16 y,
+    i16 width,
+    i16 height,
+    i16 id,
+    H2_ENUM_PARAM(WidgetKind, i16) kind
+) {
     m_owner = NULL;
     m_next = NULL;
     m_prev = NULL;
@@ -34,7 +41,7 @@ widget::widget(void) {
     m_prev = NULL;
     m_flags = WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW;
     m_zOrder = -1;
-    m_kind = EncodeWidgetKind(WIDGET_KIND_DEFAULT);
+    m_kind = WIDGET_KIND_DEFAULT;
     m_y = 0;
     m_x = 0;
     m_width = DEFAULT_EXTENT;
@@ -76,8 +83,7 @@ i32 widget::Main(tag_message& message) {
                     if ((m_flags & WIDGET_FLAG_DRAW) != 0)
                         Draw();
                     if ((m_flags & WIDGET_FLAG_DIMMED) != 0
-                        && DecodeWidgetKind(m_kind) != WIDGET_KIND_UNDIMMED
-                        && DecodeWidgetKind(m_kind) != WIDGET_KIND_TEXT) {
+                        && m_kind != WIDGET_KIND_UNDIMMED && m_kind != WIDGET_KIND_TEXT) {
                         i16 x = m_x + static_cast<i16>(m_owner->m_posX);
                         i16 y = m_y + static_cast<i16>(m_owner->m_posY);
                         DimBitmapArea(gpWindowManager->m_screen, x, y, m_width, m_height, 0);
@@ -95,8 +101,7 @@ i32 widget::Main(tag_message& message) {
                         m_flags = flags;
                         if ((flags & WIDGET_FLAG_DIMMED) != 0) {
                             Draw();
-                            if (DecodeWidgetKind(m_kind) != WIDGET_KIND_UNDIMMED
-                                && DecodeWidgetKind(m_kind) != WIDGET_KIND_TEXT) {
+                            if (m_kind != WIDGET_KIND_UNDIMMED && m_kind != WIDGET_KIND_TEXT) {
                                 i16 x = m_x + static_cast<i16>(m_owner->m_posX);
                                 i16 y = m_y + static_cast<i16>(m_owner->m_posY);
                                 DimBitmapArea(
@@ -171,8 +176,7 @@ i32 widget::Main(tag_message& message) {
 
 VA(0x004de1e0, 0x47)
 void widget::Dim(void) {
-    if (DecodeWidgetKind(m_kind) != WIDGET_KIND_UNDIMMED
-        && DecodeWidgetKind(m_kind) != WIDGET_KIND_TEXT) {
+    if (m_kind != WIDGET_KIND_UNDIMMED && m_kind != WIDGET_KIND_TEXT) {
         i16 x = m_owner->m_posX + m_x;
         i16 y = m_y + m_owner->m_posY;
         DimBitmapArea(gpWindowManager->m_screen, x, y, m_width, m_height, 0);

@@ -41,6 +41,7 @@ H2_ENUM_CLASS_BEGIN(TownThievesGuildCategory)
     THIEVES_CATEGORY_ARMY_STRENGTH  = 8,
     THIEVES_CATEGORY_INCOME         = 9
 H2_ENUM_CLASS_END(TownThievesGuildCategory)
+H2_ENUM_STEPPED(TownThievesGuildCategory)
 
 H2_ENUM_BEGIN(TownManagerConstant)
     TOWN_DEBUG_BUILD_ALL                     = 100,
@@ -72,7 +73,6 @@ H2_ENUM_BEGIN(TownManagerConstant)
     TOWN_CREST_FRAME_WITH_HERO               = 1,
     TOWN_CREST_FRAME_WITHOUT_HERO            = 4,
     TOWN_EMPTY_HERO_PORTRAIT_OFFSET          = 0x10,
-    TOWN_OBJECT_BORDER_Z_ORDER               = 1,
     TOWN_BARBARIAN_ANIMATION_BUILD_STATE     = 5,
     TOWN_FADE_STEPS                          = 8,
     TOWN_GARRISON_SLOT_FIRST                 = 0x75,

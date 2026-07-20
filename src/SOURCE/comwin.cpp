@@ -150,7 +150,7 @@ void ShutdownComError(char* function) {
 }
 
 VA(0x0048ab13, 0x34a)
-i16 com_init(u8 portNumber, i32 baudRate, i32 useDtr) {
+i16 com_init(u8 portNumber, H2_ENUM_PARAM(ComBaudRate, i32) baudRate, i32 useDtr) {
     char portName[PORT_NAME_SIZE];
     BOOL result;
     DCB state;
@@ -180,7 +180,7 @@ i16 com_init(u8 portNumber, i32 baudRate, i32 useDtr) {
     s_comPorts[portIndex].savedState = state;
     GetCommTimeouts(s_comPorts[portIndex].handle, &s_comPorts[portIndex].savedTimeouts);
 
-    switch (static_cast<ComBaudRate>(baudRate)) {
+    switch (baudRate) {
         case COM_BAUD_2400:
             state.BaudRate = BAUD_VALUE_2400;
             break;
@@ -197,7 +197,7 @@ i16 com_init(u8 portNumber, i32 baudRate, i32 useDtr) {
             state.BaudRate = BAUD_VALUE_38400;
             break;
         default:
-            state.BaudRate = baudRate;
+            state.BaudRate = IDX(baudRate);
             break;
     }
 

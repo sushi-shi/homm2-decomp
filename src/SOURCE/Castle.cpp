@@ -136,9 +136,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
                     || (m_town->m_buildings & IDX(TOWN_BUILDING_ALTERNATE_UPGRADED_DWELLING_6)))) {
                 castleSlotsUse[slot7] = BUILDING_SLOT_DWELLING_LAST;
             } else {
-                castleSlotsUse[slot7] = static_cast<BuildingSlotType>(
-                    static_cast<i32>(castleSlotsBase[slot7]) + CASTLE_UPGRADE_OFFSET
-                );
+                castleSlotsUse[slot7] = castleSlotsBase[slot7] + CASTLE_UPGRADE_OFFSET;
             }
         }
     }

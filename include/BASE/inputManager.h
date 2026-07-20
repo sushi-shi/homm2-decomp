@@ -135,7 +135,7 @@ public:
     struct tag_message GetEvent(void);
     struct tag_message PeekEvent(void);
     void SetMouseCoords(i32, i32);
-    void SetKeyCodeType(i32);
+    void SetKeyCodeType(H2_ENUM_PARAM(InputManagerKeyCodeType, i32));
     void AsciiConvert(struct tag_message&);
     void MakeScanCodeTable(void);
     void ForceMouseMove(void);

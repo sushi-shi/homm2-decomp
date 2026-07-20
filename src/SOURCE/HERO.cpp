@@ -900,7 +900,7 @@ void hero::CheckLevel(void) {
                         -1,
                         0
                     );
-                    GiveSS(skillChoicesResult[0], 1);
+                    GiveSS(skillChoicesResult[0], HERO_SKILL_LEVEL_BASIC);
                 } else {
                     sprintf(
                         line,
@@ -928,21 +928,21 @@ void hero::CheckLevel(void) {
                         0
                     );
                     if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_SEVEN)
-                        GiveSS(skillChoicesResult[0], 1);
+                        GiveSS(skillChoicesResult[0], HERO_SKILL_LEVEL_BASIC);
                     else
-                        GiveSS(skillChoicesResult[1], 1);
+                        GiveSS(skillChoicesResult[1], HERO_SKILL_LEVEL_BASIC);
                 }
             } else {
                 if (skillChoicesResult[0] != HERO_SKILL_NONE) {
                     if (skillChoicesResult[1] != HERO_SKILL_NONE) {
                         if (gSSValues[IDX(skillChoicesResult[1])][0]
                             < gSSValues[IDX(skillChoicesResult[0])][0]) {
-                            GiveSS(skillChoicesResult[0], 1);
+                            GiveSS(skillChoicesResult[0], HERO_SKILL_LEVEL_BASIC);
                         } else {
-                            GiveSS(skillChoicesResult[1], 1);
+                            GiveSS(skillChoicesResult[1], HERO_SKILL_LEVEL_BASIC);
                         }
                     } else {
-                        GiveSS(skillChoicesResult[0], 1);
+                        GiveSS(skillChoicesResult[0], HERO_SKILL_LEVEL_BASIC);
                     }
                 }
             }
@@ -1917,7 +1917,7 @@ void hero::SetSS(
     else if (m_secondarySkills[IDX(skill)] != HERO_SKILL_LEVEL_NONE)
         m_secondarySkills[IDX(skill)] = level;
     else
-        GiveSS(skill, IDX(level));
+        GiveSS(skill, level);
 }
 
 VA(0x0047024b, 0xfa)
@@ -1945,15 +1945,18 @@ i32 hero::TakeSS(H2_ENUM_PARAM(HeroSecondarySkill, i32) skill, i32 levels) {
 }
 
 VA(0x00470345, 0xbf)
-i32 hero::GiveSS(H2_ENUM_PARAM(HeroSecondarySkill, i32) skill, i32 levels) {
+i32 hero::GiveSS(
+    H2_ENUM_PARAM(HeroSecondarySkill, i32) skill,
+    H2_ENUM_PARAM(HeroSkillLevel, i32) levels
+) {
     H2_ENUM_STORAGE(HeroSkillLevel, i32) oldLevel;
 
     oldLevel = m_secondarySkills[IDX(skill)];
     if (m_secondarySkills[IDX(skill)] != HERO_SKILL_LEVEL_NONE) {
-        m_secondarySkills[IDX(skill)] += levels;
+        m_secondarySkills[IDX(skill)] += IDX(levels);
     } else {
         if (m_secondarySkillCount < HERO_SECONDARY_SKILL_CAPACITY) {
-            m_secondarySkills[IDX(skill)] = static_cast<HeroSkillLevel>(levels);
+            m_secondarySkills[IDX(skill)] = levels;
             m_secondarySkillCount++;
             m_secondarySkillOrder[IDX(skill)] = static_cast<u8>(m_secondarySkillCount);
         }

@@ -15,7 +15,7 @@ H2_ENUM_BEGIN(IconWidgetConstant)
 H2_ENUM_END(IconWidgetConstant)
 
 VA(0x004d0a60, 0x2d)
-iconWidget::iconWidget(void) : widget(0, 0, 0, 0, 0, 0) {
+iconWidget::iconWidget(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
     m_frame = 0;
     m_fillColor = 0;
     m_icon = NULL;
@@ -34,7 +34,7 @@ iconWidget::iconWidget(
     i16 frame,
     H2_ENUM_PARAM(IconDrawOrientation, i8) orientation,
     i16 id,
-    i16 kind,
+    H2_ENUM_PARAM(WidgetKind, i16) kind,
     i16 fillColor
 )
     : widget(x, y, width, height, id, kind) {
@@ -56,7 +56,7 @@ iconWidget::iconWidget(
     i16 frame,
     H2_ENUM_PARAM(IconDrawOrientation, i8) orientation,
     i16 id,
-    i16 kind,
+    H2_ENUM_PARAM(WidgetKind, i16) kind,
     i16 fillColor
 )
     : widget(x, y, width, height, id, kind) {
@@ -194,11 +194,11 @@ void iconWidget::Draw(void) {
     heroWindow* window = m_owner;
     i16 y = static_cast<i16>(window->m_posY);
     i16 x = static_cast<i16>(window->m_posX);
-    i16 kind = m_kind;
+    WidgetKind kind = m_kind;
     x += m_x;
     y += m_y;
 
-    switch (DecodeWidgetKind(kind)) {
+    switch (kind) {
         case WIDGET_KIND_ICON_DIRECT:
             m_icon->DrawToBuffer(x, y, m_frame, m_orientation);
             return;

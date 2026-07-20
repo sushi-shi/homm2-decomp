@@ -433,7 +433,7 @@ void game::ShowCampaignInfo(i32 viewOnly, i32) {
                 CAMPAIGN_TRACK_ICON_FRAME,
                 ICON_DRAW_NORMAL,
                 trackMapIndex + CAMPAIGN_TRACK_WIDGET_FIRST,
-                CAMPAIGN_TRACK_ICON_COLOR,
+                WIDGET_KIND_ICON_DIRECT,
                 TRACK_ICON_FILL_COLOR
             );
             if (trackWidget == NULL)

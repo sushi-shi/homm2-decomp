@@ -39,9 +39,7 @@ H2_ENUM_BEGIN(ArenaConstant)
     WIDGET_FIRST_ID         = 100,
     WIDGET_LAST_ID          = 102,
     SELECTED_FRAME_OFFSET   = 4,
-    ICON_FILL_COLOR         = 0x10,
     TEXT_BACKGROUND         = -1,
-    TEXT_FLAGS              = 0x200,
     CYCLE_KEY               = 15,
     BROADCAST_TEXT_ID       = 1,
     BROADCAST_CONTROL_VALUE = 6,
@@ -99,7 +97,7 @@ i32 DoArenaDialog(void) {
                                      : widgetIndex_12,
             ICON_DRAW_NORMAL,
             widgetIndex_12 + WIDGET_FIRST_ID,
-            ICON_FILL_COLOR,
+            WIDGET_KIND_ICON_DIRECT,
             1
         );
         if (skillWidget[widgetIndex_12] == NULL)
@@ -114,7 +112,7 @@ i32 DoArenaDialog(void) {
             "smalfont.fnt",
             FONT_DRAW_DEFAULT,
             TEXT_BACKGROUND,
-            TEXT_FLAGS,
+            WIDGET_KIND_TEXT,
             FONT_ALIGN_CENTER
         );
         if (statWidgets[widgetIndex_12] == NULL)
@@ -241,7 +239,7 @@ void UpdateArenaIcons(void) {
             widgetIndex == choice ? widgetIndex + SELECTED_FRAME_OFFSET : widgetIndex,
             ICON_DRAW_NORMAL,
             widgetIndex + WIDGET_FIRST_ID,
-            ICON_FILL_COLOR,
+            WIDGET_KIND_ICON_DIRECT,
             1
         );
         if (skillWidget[widgetIndex] == NULL)

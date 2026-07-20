@@ -33,7 +33,7 @@ public:
         H2_ENUM_PARAM(ButtonSelectMode, i16) selectMode,
         i16 hotkey,
         i16 id,
-        i16 kind
+        H2_ENUM_PARAM(WidgetKind, i16) kind
     );
     button(
         i16 x,
@@ -46,7 +46,7 @@ public:
         H2_ENUM_PARAM(ButtonSelectMode, i16) selectMode,
         i16 hotkey,
         i16 id,
-        i16 kind
+        H2_ENUM_PARAM(WidgetKind, i16) kind
     );
     __declspec(dllexport) virtual inline ~button() OVERRIDE;
     virtual void Draw(void) OVERRIDE;
