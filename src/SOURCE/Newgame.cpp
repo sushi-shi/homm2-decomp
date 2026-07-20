@@ -59,7 +59,6 @@ H2_ENUM_BEGIN(NewGameConstant)
     GAME_SHADOW_FRAME                     = 6,
     GAME_MOUSE_RIGHT_FLAG                 = 0x200,
     GAME_LAST_STANDARD_RACE               = IDX(FACTION_NECROMANCER),
-    GAME_HANDICAP_COUNT                   = 3,
     GAME_PLAYER_CONTROL_COUNT             = 6,
     GAME_DIFFICULTY_COUNT                 = 5,
     GAME_CHAT_LINE_COUNT                  = 3,
@@ -365,7 +364,7 @@ void game::InitNewGame(struct SMapHeader* header) {
                 m_setupPlayerRace[player] = m_setupPlayerNetworkId[player];
                 m_playerHandicap[player] = m_setupPlayerRace[player];
             } else {
-                m_playerHandicap[player] = 0;
+                m_playerHandicap[player] = PLAYER_HANDICAP_NONE;
                 m_setupPlayerRace[player] = m_mapHeader.playerRace[m_setupPlayerColor[player]];
                 m_setupPlayerNetworkId[player] = GAME_NETWORK_PLAYER_NONE;
                 m_setupPlayerType[player] = GAME_NETWORK_PLAYER_NONE;
@@ -987,7 +986,7 @@ void game::UpdateNewGameWindow(void) {
         if (m_setupPlayerNetworkId[playerIndex3] == GAME_COMPUTER_PLAYER)
             messageTemp.payload.widget.data.value = NEW_GAME_RACE_NAME_FIRST;
         else
-            messageTemp.payload.widget.data.value = m_playerHandicap[playerIndex3];
+            messageTemp.payload.widget.data.value = IDX(m_playerHandicap[playerIndex3]);
         m_newGameWindow->BroadcastMessage(messageTemp);
         if (m_setupPlayerNetworkId[playerIndex3] == GAME_COMPUTER_PLAYER)
             messageTemp.payload.widget.command = NEW_GAME_WIDGET_DISABLE;
@@ -1343,10 +1342,11 @@ i32 NewGameHandler(struct tag_message& message) {
                     redrawWindow = 1;
                     if (gpGame->m_setupPlayerNetworkId[currentPlayerLocal]
                         != GAME_COMPUTER_PLAYER) {
-                        gpGame->m_playerHandicap[currentPlayerLocal] = static_cast<i8>(
-                            (gpGame->m_playerHandicap[currentPlayerLocal] + 1)
-                            % GAME_HANDICAP_COUNT
-                        );
+                        gpGame->m_playerHandicap[currentPlayerLocal] =
+                            static_cast<PlayerHandicap>(
+                                (IDX(gpGame->m_playerHandicap[currentPlayerLocal]) + 1)
+                                % IDX(PLAYER_HANDICAP_COUNT)
+                            );
                     }
                     break;
 
@@ -2039,7 +2039,7 @@ void game::ShowScenInfo(void) {
         if (m_setupPlayerNetworkId[playerCounter] == GAME_COMPUTER_PLAYER)
             scenarioMessageTemp.payload.widget.data.value = NEW_GAME_RACE_NAME_FIRST;
         else
-            scenarioMessageTemp.payload.widget.data.value = m_playerHandicap[playerCounter];
+            scenarioMessageTemp.payload.widget.data.value = IDX(m_playerHandicap[playerCounter]);
         scenarioWindowValue->BroadcastMessage(scenarioMessageTemp);
         if (m_setupPlayerNetworkId[playerCounter] == GAME_COMPUTER_PLAYER)
             scenarioMessageTemp.payload.widget.command = NEW_GAME_WIDGET_DISABLE;
