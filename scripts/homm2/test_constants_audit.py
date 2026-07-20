@@ -13,6 +13,9 @@ enum { VALUE_SEVEN = 7 };
 H2_ENUM_BEGIN(SampleValue)
     VALUE_ELEVEN = 11
 H2_ENUM_END(SampleValue)
+H2_ENUM_CLASS_BEGIN_SPLIT(StoredValue, i8)
+    VALUE_TWELVE = 12
+H2_ENUM_CLASS_END_SPLIT(StoredValue, i8)
 VA(0x402000, 0x20)
 i32 Function(i32 value) {
     i32 table[2] = {8, 9};
@@ -28,9 +31,19 @@ i32 Function(i32 value) {
         self.assertEqual(categories[("5", 1)], "data-payload")
         self.assertEqual(categories[("7", 2)], "enum")
         self.assertEqual(categories[("11", 4)], "enum")
-        self.assertEqual(categories[("0x402000", 6)], "annotation")
-        self.assertEqual(categories[("9", 8)], "local-table")
-        self.assertEqual(categories[("10", 9)], "code")
+        self.assertEqual(categories[("12", 7)], "enum")
+        self.assertEqual(categories[("0x402000", 9)], "annotation")
+        self.assertEqual(categories[("9", 11)], "local-table")
+        self.assertEqual(categories[("10", 12)], "code")
+
+    def test_null_zero_spelling_covers_integer_suffixes_and_bases(self):
+        for spelling in ("0", "00", "0U", "0L", "0UL", "0x0", "0X00ULL", "0b0", "false"):
+            with self.subTest(spelling=spelling):
+                self.assertTrue(constants_audit._is_zero_null_spelling(spelling))
+
+        for spelling in ("NULL", "nullptr", "1", "0x10", "true"):
+            with self.subTest(spelling=spelling):
+                self.assertFalse(constants_audit._is_zero_null_spelling(spelling))
 
     def test_diagnostics_use_source_literal_and_deduplicate(self):
         source = "void Test() {\n    return 12;\n}\n"

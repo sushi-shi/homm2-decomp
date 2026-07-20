@@ -30,6 +30,9 @@ NULL_RE = re.compile(
     r"\[modernize-use-nullptr\]$"
 )
 PROCESS_ERROR_RE = re.compile(r"^Error while processing (?P<path>.*)\.$")
+INTEGER_ZERO_RE = re.compile(
+    r"(?:0[xX]0+|0[bB]0+|0+)(?:[uU](?:ll|LL|l|L)?|(?:ll|LL|l|L)[uU]?)?"
+)
 
 
 @dataclass(frozen=True)
@@ -185,6 +188,10 @@ def _unexpected_failures(log: str) -> list[str]:
     return failures
 
 
+def _is_zero_null_spelling(spelling: str) -> bool:
+    return spelling == "false" or INTEGER_ZERO_RE.fullmatch(spelling) is not None
+
+
 def _run_tidy(check: str, *, config: dict | None = None, jobs: int = 8) -> str:
     runner = shutil.which("run-clang-tidy")
     if not runner:
@@ -297,7 +304,7 @@ def run(*, jobs: int = 8, magic_log: Path | None = None,
 
     magic = _diagnostic_rows(magic_log_text, MAGIC_RE, lexical)
     null_rows = _diagnostic_rows(null_log_text, NULL_RE, lexical)
-    null_zero = [item for item in null_rows if item["literal"] == "0"]
+    null_zero = [item for item in null_rows if _is_zero_null_spelling(item["literal"])]
     review = _review_rows(magic)
     OUTPUT.mkdir(parents=True, exist_ok=True)
     (OUTPUT / "magic-numbers.log").write_text(magic_log_text)
