@@ -2020,23 +2020,24 @@ i8 hero::Stats(HeroPrimaryStat stat) {
 VA(0x004705c2, 0xc3)
 i8 hero::GetSSLevel(H2_ENUM_PARAM(HeroSecondarySkill, i32) skill) {
     i8 shrineAndArtifactBonus = 0;
-    i8 level;
+    H2_ENUM_STORAGE(HeroSkillLevel, i8) baseLevel;
+    i8 effectiveLevel;
 
-    level = IDX(m_secondarySkills[IDX(skill)]);
+    baseLevel = m_secondarySkills[IDX(skill)];
     if (skill != HERO_SKILL_NECROMANCY)
-        return level;
-    if (level == IDX(HERO_SKILL_LEVEL_NONE))
-        return level;
+        return IDX(baseLevel);
+    if (baseLevel == HERO_SKILL_LEVEL_NONE)
+        return IDX(baseLevel);
     if (HasArtifact(ARTIFACT_SPADE_NECROMANCY))
         shrineAndArtifactBonus++;
     if (m_cursorType == FACTION_NECROMANCER)
         shrineAndArtifactBonus += gpGame->CountShrines(m_owner);
     if (shrineAndArtifactBonus > HERO_NECROMANCY_BONUS_MAX)
         shrineAndArtifactBonus = HERO_NECROMANCY_BONUS_MAX;
-    level = OD_STEER(shrineAndArtifactBonus) + level;
-    if (level > HERO_NECROMANCY_EFFECTIVE_LEVEL_MAX)
-        level = HERO_NECROMANCY_EFFECTIVE_LEVEL_MAX;
-    return level;
+    effectiveLevel = OD_STEER(shrineAndArtifactBonus) + IDX(baseLevel);
+    if (effectiveLevel > HERO_NECROMANCY_EFFECTIVE_LEVEL_MAX)
+        effectiveLevel = HERO_NECROMANCY_EFFECTIVE_LEVEL_MAX;
+    return effectiveLevel;
 }
 
 VA(0x00470685, 0xf4)
