@@ -337,7 +337,7 @@ i32 swapManager::Main(tag_message& message) {
                 case WIDGET_COMMAND_DESELECT:
                     if (quickView)
                         break;
-                    if (message.payload.widget.id == IDX(CONTROL_CLOSE))
+                    if (message.payload.widget.id == CONTROL_CLOSE)
                         closeRequested_5 = 1;
                     break;
 

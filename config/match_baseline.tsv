@@ -430,7 +430,7 @@ EDITOR/mapcell	?Read@fullMap@@QAEXHH@Z	98.7330	107173601e1d
 EDITOR/mapcell	?Write@fullMap@@QAEXH@Z	100.0000	4a2aaa54ffdc
 SOURCE/ADVMGR	??0advManager@@QAE@XZ	100.0000	363ca89e79c0
 SOURCE/ADVMGR	?APanelHandler@@YIHAAUtag_message@@@Z	0.0000	5bf2ee1bb443
-SOURCE/ADVMGR	?AdvPanel@advManager@@QAEXXZ	100.0000	71c2952730cd
+SOURCE/ADVMGR	?AdvPanel@advManager@@QAEXXZ	100.0000	e58e5a3e69f4
 SOURCE/ADVMGR	?CPanelHandler@@YIHAAUtag_message@@@Z	93.9959	eb0e6ebf7ce4
 SOURCE/ADVMGR	?CastSpell@advManager@@QAEXH@Z	100.0000	8a9d3b4a9399
 SOURCE/ADVMGR	?CheckCastSpell@advManager@@QAEXXZ	100.0000	903203e80d0e
@@ -455,7 +455,7 @@ SOURCE/ADVMGR	?DemobilizeCurrHero@advManager@@QAEXXZ	96.5049	080739775205
 SOURCE/ADVMGR	?DimensionDoor@advManager@@QAEXXZ	100.0000	1cec1ec0c7cb
 SOURCE/ADVMGR	?DimensionDoorHandler@@YIHAAUtag_message@@@Z	98.2857	b09e4c83e440
 SOURCE/ADVMGR	?DisableButtons@advManager@@QAEXXZ	98.9107	ca32152d651e
-SOURCE/ADVMGR	?DoAdvCommand@advManager@@QAEPAVmapCell@@XZ	99.5888	8d40ae6d7123
+SOURCE/ADVMGR	?DoAdvCommand@advManager@@QAEPAVmapCell@@XZ	99.5888	60582890c279
 SOURCE/ADVMGR	?DoHeroKnob@advManager@@QAEXXZ	98.9342	d559c91b7f56
 SOURCE/ADVMGR	?DoTownKnob@advManager@@QAEXXZ	98.9342	52ce8647f971
 SOURCE/ADVMGR	?DoVisions@advManager@@QAEHPAVhero@@@Z	99.9848	ca4d44f9f434
@@ -476,14 +476,14 @@ SOURCE/ADVMGR	?HideRoute@advManager@@QAEXHHH@Z	100.0000	59b94f1c26d6
 SOURCE/ADVMGR	?InsertSound@advManager@@QAEXHHHH@Z	100.0000	24d061448b62
 SOURCE/ADVMGR	?IsCrystalBallInEffect@advManager@@QAEHHHH@Z	98.2769	320a44746fe8
 SOURCE/ADVMGR	?LoadRemote@advManager@@QAEXXZ	100.0000	7c48cc55e1a7
-SOURCE/ADVMGR	?Main@advManager@@UAEHAAUtag_message@@@Z	1.4700	ca768e85c928
+SOURCE/ADVMGR	?Main@advManager@@UAEHAAUtag_message@@@Z	1.4700	87166b2259ac
 SOURCE/ADVMGR	?MapExtraPosAndAdjacentsSet@@YIHHHE@Z	99.8591	2a0eecd577ff
 SOURCE/ADVMGR	?MobilizeCurrHero@advManager@@QAEXH@Z	100.0000	8e4bc8dd471f
 SOURCE/ADVMGR	?MouseInScrollZone@advManager@@QAEHXZ	100.0000	d02799371e9a
 SOURCE/ADVMGR	?Open@advManager@@UAEHH@Z	100.0000	fb115494cc4b
-SOURCE/ADVMGR	?ProcessDeSelect@advManager@@QAEHPAUtag_message@@PAHPAPAVmapCell@@@Z	100.0000	a1c34fab0f5f
+SOURCE/ADVMGR	?ProcessDeSelect@advManager@@QAEHPAUtag_message@@PAHPAPAVmapCell@@@Z	100.0000	a5f242b5eb3f
 SOURCE/ADVMGR	?ProcessHover@advManager@@QAEHHH@Z	99.9835	737ce3f07ece
-SOURCE/ADVMGR	?ProcessSearch@advManager@@QAEHHH@Z	99.4859	edd8300d51bf
+SOURCE/ADVMGR	?ProcessSearch@advManager@@QAEHHH@Z	99.4859	83a05ee47938
 SOURCE/ADVMGR	?ProcessSelect@advManager@@QAEHPAUtag_message@@PAPAVmapCell@@@Z	99.1871	88d92f3cc0b6
 SOURCE/ADVMGR	?PuzzleDraw@advManager@@QAEXHHHH@Z	99.9091	c03609af4b97
 SOURCE/ADVMGR	?QuickInfo@advManager@@QAEXHH@Z	96.7287	c5edd6c83eb8
@@ -493,7 +493,7 @@ SOURCE/ADVMGR	?SaveAdventureBorder@advManager@@QAEXXZ	97.6163	ac9ca60c70d8
 SOURCE/ADVMGR	?SaveGame@@YIHXZ	100.0000	8cdef41d45fa
 SOURCE/ADVMGR	?ScreenScroll@advManager@@QAEXHH@Z	100.0000	a98b9ec9d1ba
 SOURCE/ADVMGR	?SeedTo@advManager@@QAEXHH@Z	100.0000	9b5a29f4a3ec
-SOURCE/ADVMGR	?SetEnvironmentOrigin@advManager@@QAEXHHH@Z	100.0000	67d3b03051a1
+SOURCE/ADVMGR	?SetEnvironmentOrigin@advManager@@QAEXHHH@Z	100.0000	6d2b83a9ad00
 SOURCE/ADVMGR	?SetHeroContext@advManager@@QAEXHH@Z	99.4718	16d2dc96fb5f
 SOURCE/ADVMGR	?SetInitialMapOrigin@advManager@@QAEXXZ	100.0000	366002bc283a
 SOURCE/ADVMGR	?SetTownContext@advManager@@QAEXH@Z	99.7500	d0cd288bd8f7
@@ -502,7 +502,7 @@ SOURCE/ADVMGR	?StopOnTrigger@@YIEPAVmapCell@@@Z	100.0000	7cc1f4acc970
 SOURCE/ADVMGR	?SummonBoat@advManager@@QAEXXZ	99.4259	d609d0eb4408
 SOURCE/ADVMGR	?SystemOptions@advManager@@QAEXXZ	99.6436	ef40e660735c
 SOURCE/ADVMGR	?SystemOptionsHandler@@YIHAAUtag_message@@@Z	0.0000	f7733a0cccba
-SOURCE/ADVMGR	?TeleportTo@advManager@@QAEXPAVhero@@HHHH@Z	98.7456	ea9c75061ae8
+SOURCE/ADVMGR	?TeleportTo@advManager@@QAEXPAVhero@@HHHH@Z	98.7456	972e2452b62c
 SOURCE/ADVMGR	?TownGate@advManager@@QAEXH@Z	99.9855	0004f43e43eb
 SOURCE/ADVMGR	?TownPortalHandler@@YIHAAUtag_message@@@Z	94.7808	1ecb174f2a52
 SOURCE/ADVMGR	?TownQuickView@advManager@@QAEXHHHH@Z	99.1583	a02f06b31c06
@@ -1264,7 +1264,7 @@ SOURCE/SWAPMGR	??0swapManager@@QAE@XZ	100.0000	81b7a6572b97
 SOURCE/SWAPMGR	?Close@swapManager@@UAEXXZ	62.4615	e848cb49bdbe
 SOURCE/SWAPMGR	?DrawSelector@swapManager@@QAEXXZ	100.0000	dfd2be2beeb0
 SOURCE/SWAPMGR	?DrawSwapWin@swapManager@@QAEHXZ	100.0000	2acb9982858c
-SOURCE/SWAPMGR	?Main@swapManager@@UAEHAAUtag_message@@@Z	92.0454	0b846e68ceb1
+SOURCE/SWAPMGR	?Main@swapManager@@UAEHAAUtag_message@@@Z	92.0373	05d3bcd70489
 SOURCE/SWAPMGR	?Open@swapManager@@UAEHH@Z	89.0779	c5c2eceb48c7
 SOURCE/SWAPMGR	?Reset@swapManager@@QAEXXZ	100.0000	1942015fabb9
 SOURCE/SWAPMGR	?SplitMons@swapManager@@QAEXXZ	99.9913	9a7a2ebbcac7
