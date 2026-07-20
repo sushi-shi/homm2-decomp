@@ -1922,7 +1922,7 @@ void hero::SetSS(
 VA(0x0047024b, 0xfa)
 i32 hero::TakeSS(H2_ENUM_PARAM(HeroSecondarySkill, i32) skill, i32 levels) {
     H2_ENUM_STORAGE(HeroSkillLevel, i32) oldLevel;
-    i32 otherSkill;
+    H2_ENUM_STORAGE_STEPPED(HeroSecondarySkill, i32) otherSkill;
 
     oldLevel = m_secondarySkills[IDX(skill)];
     if (m_secondarySkills[IDX(skill)] != HERO_SKILL_LEVEL_NONE) {
@@ -1930,9 +1930,10 @@ i32 hero::TakeSS(H2_ENUM_PARAM(HeroSecondarySkill, i32) skill, i32 levels) {
         if (m_secondarySkills[IDX(skill)] < HERO_SKILL_LEVEL_NONE)
             m_secondarySkills[IDX(skill)] = HERO_SKILL_LEVEL_NONE;
         if (m_secondarySkills[IDX(skill)] == HERO_SKILL_LEVEL_NONE) {
-            for (otherSkill = 0; otherSkill < IDX(HERO_SKILL_COUNT); otherSkill++) {
-                if (m_secondarySkillOrder[otherSkill] > m_secondarySkillOrder[IDX(skill)]) {
-                    m_secondarySkillOrder[otherSkill]--;
+            for (otherSkill = HERO_SKILL_PATHFINDING; otherSkill < HERO_SKILL_COUNT; otherSkill++) {
+                if (m_secondarySkillOrder[IDX(otherSkill)]
+                    > m_secondarySkillOrder[IDX(skill)]) {
+                    m_secondarySkillOrder[IDX(otherSkill)]--;
                 }
             }
             m_secondarySkillOrder[IDX(skill)] = 0;
