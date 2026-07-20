@@ -744,7 +744,7 @@ SOURCE/EVENTS	?PasswordEvent@advManager@@QAEXPAVmapCell@@PAVhero@@@Z	100.0000	56
 SOURCE/EVENTS	?PlayerMonsterInteract@advManager@@QAEXPAVmapCell@@0PAVhero@@PAHHHHHH@Z	99.9915	dd34829bb3e0
 SOURCE/EVENTS	?ReceiveHeroTownData@advManager@@QAEXPADPAH11PAPAVhero@@PAPAVarmyGroup@@PAPAVtown@@23111PAC55@Z	96.7357	34fca5b5f18f
 SOURCE/EVENTS	?RecruitEvent@advManager@@QAEXPAVhero@@HPAVmapCell@@@Z	100.0000	93a7a8abe1f0
-SOURCE/EVENTS	?RecruitSiteAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@@Z	100.0000	0bd88babb6a7
+SOURCE/EVENTS	?RecruitSiteAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@@Z	99.8669	adcdfd1746d6
 SOURCE/EVENTS	?RecruitSiteEvent@advManager@@QAEXPAVmapCell@@PAVhero@@@Z	100.0000	30240fa120e6
 SOURCE/EVENTS	?RiddleStringsEqual@@YIHPAD0@Z	99.9167	7729cdd50c7e
 SOURCE/EVENTS	?SendHeroTownData@advManager@@QAEXHHPAVhero@@PAVarmyGroup@@PAVtown@@01HHHHHHH@Z	98.4470	9ed9bba350a9
@@ -829,7 +829,7 @@ SOURCE/GAME	?PerDay@game@@QAEXXZ	94.5567	118d789cdfd5
 SOURCE/GAME	?PerMonth@game@@QAEXXZ	100.0000	f0fedd2c996e
 SOURCE/GAME	?PerWeek@game@@QAEXXZ	98.4572	4ba7221093f5
 SOURCE/GAME	?ProcessMapExtra@game@@QAEXXZ	96.5819	b20d46bb675b
-SOURCE/GAME	?ProcessOnMapHeroes@game@@QAEXXZ	99.6168	ca59294254fd
+SOURCE/GAME	?ProcessOnMapHeroes@game@@QAEXXZ	99.1234	308578a424fa
 SOURCE/GAME	?ProcessRandomObjects@game@@QAEXXZ	100.0000	a1d8c15af5ba
 SOURCE/GAME	?RandomScan@game@@QAEHPACHHHC@Z	100.0000	823cc4914545
 SOURCE/GAME	?RandomizeBarrier@game@@QAEXPAVmapCell@@@Z	100.0000	283318c47dd3

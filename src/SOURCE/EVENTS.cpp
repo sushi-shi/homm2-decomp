@@ -7220,7 +7220,7 @@ void advManager::RecruitSiteAIEvent(mapCell* cell, hero* eventHero) {
     i16 availableCount1;
     u32 siteType3;
     CreatureType creatureType13;
-    i32 resourceIndex27;
+    H2_ENUM_STORAGE_STEPPED(ResourceType, i32) resource27;
     i32 purchaseValue5;
     i32 replacementSlot26;
 
@@ -7267,9 +7267,9 @@ void advManager::RecruitSiteAIEvent(mapCell* cell, hero* eventHero) {
             packedSite17 = (availableCount1 << EVENT_RECRUIT_COUNT_SHIFT) | siteType3;
             cell->m_objectMetadata = packedSite17;
             GetMonsterCost(creatureType13, cost16);
-            for (resourceIndex27 = 0; resourceIndex27 < IDX(RES_COUNT); resourceIndex27++) {
-                gpCurPlayer->m_resources[resourceIndex27] -=
-                    cost16[resourceIndex27] * purchaseCount17;
+            for (resource27 = 0; resource27 < RES_COUNT; resource27++) {
+                gpCurPlayer->m_resources[IDX(resource27)] -=
+                    cost16[IDX(resource27)] * purchaseCount17;
             }
         }
     }

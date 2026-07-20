@@ -6150,7 +6150,7 @@ void game::ProcessOnMapHeroes(void) {
     i32 heroId1;
     i32 armySlot0;
     i32 mapY15;
-    i32 artifactSlot10;
+    i32 recordSlot10;
     i32 mapX0;
     i32 townId4;
     i32 heroClass6;
@@ -6250,12 +6250,12 @@ void game::ProcessOnMapHeroes(void) {
                                     mapHero0->m_army.m_troopTypes[armySlot0] = CREATURE_NONE;
                             }
                         }
-                        for (artifactSlot10 = 0; artifactSlot10 < EVENT_RECORD_HERO_ARTIFACT_COUNT;
-                             artifactSlot10++) {
-                            if (extra0->artifacts[artifactSlot10] >= 0)
+                        for (recordSlot10 = 0; recordSlot10 < EVENT_RECORD_HERO_ARTIFACT_COUNT;
+                             recordSlot10++) {
+                            if (extra0->artifacts[recordSlot10] >= 0)
                                 GiveArtifact(
                                     mapHero0,
-                                    ArtifactType(extra0->artifacts[artifactSlot10]),
+                                    ArtifactType(extra0->artifacts[recordSlot10]),
                                     1,
                                     -1
                                 );
@@ -6303,20 +6303,20 @@ void game::ProcessOnMapHeroes(void) {
 
                         if (extra0->hasCustomSkills) {
                             mapHero0->m_secondarySkillCount = 0;
-                            for (artifactSlot10 = 0; artifactSlot10 < IDX(HERO_SKILL_COUNT);
-                                 artifactSlot10++) {
-                                mapHero0->m_secondarySkills[artifactSlot10] =
+                            for (recordSlot10 = 0; recordSlot10 < IDX(HERO_SKILL_COUNT);
+                                 recordSlot10++) {
+                                mapHero0->m_secondarySkills[recordSlot10] =
                                     HERO_SKILL_LEVEL_NONE;
-                                mapHero0->m_secondarySkillOrder[artifactSlot10] = 0;
+                                mapHero0->m_secondarySkillOrder[recordSlot10] = 0;
                             }
-                            for (artifactSlot10 = 0; artifactSlot10 < EVENT_RECORD_SKILL_CAPACITY;
-                                 artifactSlot10++) {
-                                if (extra0->skillTypes[artifactSlot10] != -1) {
+                            for (recordSlot10 = 0; recordSlot10 < EVENT_RECORD_SKILL_CAPACITY;
+                                 recordSlot10++) {
+                                if (extra0->skillTypes[recordSlot10] != -1) {
                                     mapHero0->GiveSS(
                                         static_cast<HeroSecondarySkill>(
-                                            extra0->skillTypes[artifactSlot10]
+                                            extra0->skillTypes[recordSlot10]
                                         ),
-                                        extra0->skillLevels[artifactSlot10]
+                                        extra0->skillLevels[recordSlot10]
                                     );
                                 }
                             }
