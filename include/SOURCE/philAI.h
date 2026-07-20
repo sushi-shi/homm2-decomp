@@ -3,6 +3,7 @@
 
 #include <va.h>
 #include <SOURCE/KB_TYPES.h>
+#include <SOURCE/hero.h>
 
 class armyGroup;
 class hero;
@@ -113,8 +114,12 @@ public:
     void IncrementHourGlass(void);
     void TownEvent(class mapCell*, class hero*, i32, i32);
     i32 ComputeUpgradeValue(CreatureType, CreatureType);
-    i32 ComputeValueOfSS(class hero*, i32, i32);
-    i32 ComputeValueOfFreeSS(class hero*, i32);
+    i32 ComputeValueOfSS(
+        class hero*,
+        H2_ENUM_PARAM(HeroSecondarySkill, i32),
+        H2_ENUM_PARAM(HeroSkillLevel, i32)
+    );
+    i32 ComputeValueOfFreeSS(class hero*, H2_ENUM_PARAM(HeroSecondarySkill, i32));
     i32 ManaRefreshValue(class hero*, i32);
     i32 ValueOfEventAtPosition(i32, i32, i32, i32*);
     i32 EvaluateGenericSite(class mapCell*);

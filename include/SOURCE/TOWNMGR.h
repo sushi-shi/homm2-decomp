@@ -69,6 +69,19 @@ H2_ENUM_CLASS_BEGIN_T(TownExtraBuildingMask, u32)
 H2_ENUM_CLASS_END_T(TownExtraBuildingMask, u32)
 H2_ENUM_FLAGS(TownExtraBuildingMask)
 
+H2_ENUM_CLASS_BEGIN(TownThievesGuildCategory)
+    THIEVES_CATEGORY_TOWNS          = 0,
+    THIEVES_CATEGORY_CASTLES        = 1,
+    THIEVES_CATEGORY_HEROES         = 2,
+    THIEVES_CATEGORY_GOLD           = 3,
+    THIEVES_CATEGORY_WOOD_AND_ORE   = 4,
+    THIEVES_CATEGORY_RARE_RESOURCES = 5,
+    THIEVES_CATEGORY_OBELISKS       = 6,
+    THIEVES_CATEGORY_ARTIFACTS      = 7,
+    THIEVES_CATEGORY_ARMY_STRENGTH  = 8,
+    THIEVES_CATEGORY_INCOME         = 9
+H2_ENUM_CLASS_END(TownThievesGuildCategory)
+
 H2_ENUM_BEGIN(TownManagerConstant)
     TOWN_DEBUG_BUILD_ALL                     = 100,
     TOWN_BUILDING_COUNT                      = 32,
@@ -184,7 +197,11 @@ extern SBuildingInfo sBuildingInfo[][TOWN_BUILDING_COUNT];
 i32 MageGuildHandler(struct tag_message&);
 i32 TavernHandler(struct tag_message&);
 i32 SplitArmyHandler(struct tag_message&);
-void GetCategoryStats(i32, i32l* const, i8* const);
+void GetCategoryStats(
+    H2_ENUM_PARAM(TownThievesGuildCategory, i32),
+    i32l* const,
+    i8* const
+);
 void SortStats(i32l* const, i8* const);
 
 #endif
