@@ -96,6 +96,9 @@ H2_ENUM_BEGIN(GameInitialStateConstant)
 H2_ENUM_END(GameInitialStateConstant)
 
 H2_ENUM_BEGIN(NeutralTownReinforcementConstant)
+    REINFORCEMENT_CASTLE_CHANCE        = 80,
+    REINFORCEMENT_CHANCE               = 40,
+    REINFORCEMENT_ROLL_PERCENT_MAX     = 100,
     REINFORCEMENT_ROLL_MIN             = 1,
     REINFORCEMENT_ROLL_MAX             = 15,
     REINFORCEMENT_TIER_ONE_THRESHOLD   = 5,
@@ -119,6 +122,24 @@ H2_ENUM_BEGIN(NeutralTownReinforcementConstant)
     REINFORCEMENT_TURN_ROLL_DIVISOR    = 10,
     REINFORCEMENT_TURN_COUNT_DIVISOR   = 20
 H2_ENUM_END(NeutralTownReinforcementConstant)
+
+H2_ENUM_BEGIN(NewMapConstant)
+    VICTORY_SIDE_SEARCH_DONE                   = 99,
+    STARTING_HERO_TOWN_PASS_COUNT              = 2,
+    STARTING_HERO_ALLOW_NON_CASTLE_PASS        = 1,
+    NECROMANCER_SHRINE_BUILD_MASK              = 1 << IDX(BUILDING_SLOT_NECROMANCER_SHRINE),
+    EXPANSION_HERO_IVAN_PORTRAIT               = 63,
+    EXPANSION_HERO_JOSEPH_PORTRAIT             = 64,
+    CAMPAIGN_SCENARIO_NUMBER_OFFSET            = 1,
+    CAMPAIGN_ROLAND_ULTIMATE_CROWN_SCENARIO    = 8,
+    CAMPAIGN_ARCHIBALD_ULTIMATE_CROWN_SCENARIO = 9,
+    ULTIMATE_DISTANCE_ROLL_MIN                 = 1,
+    ULTIMATE_DISTANCE_COMMON_ROLL_MAX          = 20,
+    ULTIMATE_DISTANCE_BONUS_ROLL_MAX           = 30,
+    ULTIMATE_ARTIFACT_BORDER_MARGIN            = 9,
+    ULTIMATE_HUMAN_DISTANCE_RETRY_LIMIT        = 200,
+    ULTIMATE_SEARCH_REGION_RETRY_LIMIT         = 400
+H2_ENUM_END(NewMapConstant)
 
 H2_ENUM_CLASS_BEGIN(GameMapTrigger)
     TRIGGER_TOWN_BASE                = 0x23,
@@ -1351,10 +1372,10 @@ void game::GiveTroopsToNeutralTowns(void) {
     for (i = 0; i < GAME_TOWN_COUNT; i++) {
         GiveTroopsToNeutralTown(i);
         if (m_castleRecs[i].m_buildings & IDX(TOWN_BUILDING_CASTLE)) {
-            if (Random(0, 100) < NEUTRAL_TOWN_CASTLE_REINFORCE_CHANCE)
+            if (Random(0, REINFORCEMENT_ROLL_PERCENT_MAX) < REINFORCEMENT_CASTLE_CHANCE)
                 GiveTroopsToNeutralTown(i);
         } else {
-            if (Random(0, 100) < NEUTRAL_TOWN_REINFORCE_CHANCE)
+            if (Random(0, REINFORCEMENT_ROLL_PERCENT_MAX) < REINFORCEMENT_CHANCE)
                 GiveTroopsToNeutralTown(i);
         }
     }
@@ -1387,9 +1408,9 @@ void game::NewMap(char* filename) {
     if (extension0 != NULL && StrEqNoCase(extension0 + 1, "MX2"))
         xIsExpansionMap = 1;
     if (xIsExpansionMap)
-        gTownEligibleBuildMask[IDX(FACTION_NECROMANCER)] |= 4;
+        gTownEligibleBuildMask[IDX(FACTION_NECROMANCER)] |= NECROMANCER_SHRINE_BUILD_MASK;
     else
-        gTownEligibleBuildMask[IDX(FACTION_NECROMANCER)] &= ~4;
+        gTownEligibleBuildMask[IDX(FACTION_NECROMANCER)] &= ~NECROMANCER_SHRINE_BUILD_MASK;
 
     gbInNewGameSetup = true;
     giCurPlayer = 0;
@@ -1397,14 +1418,14 @@ void game::NewMap(char* filename) {
     giCurPlayerBit = static_cast<u8>(1 << giCurPlayer);
     giCurWatchPlayerBit = giCurPlayerBit;
     giCurWatchPlayer = giCurPlayer;
-    randomColor2 = Random(0, 5);
+    randomColor2 = Random(0, GAME_PLAYER_COUNT - 1);
     nextHuman6 = giNumHumanPlayers;
 
     for (player2 = 0; player2 < GAME_PLAYER_COUNT; player2++) {
         if (player2 >= static_cast<u8>(gpGame->m_mapHeader.playerCount)) {
             gbSetupGamePosToRealGamePos[player2] = -1;
         } else {
-            if (m_setupPlayerNetworkId[player2] == 10)
+            if (m_setupPlayerNetworkId[player2] == GAME_COMPUTER_PLAYER)
                 gbSetupGamePosToRealGamePos[player2] = static_cast<i8>(nextHuman6++);
             else
                 gbSetupGamePosToRealGamePos[player2] = m_setupPlayerNetworkId[player2];
@@ -1414,7 +1435,7 @@ void game::NewMap(char* filename) {
         m_players[player2].m_color = -1;
         gcColorToPlayerPos[player2] = -1;
         gcColorToSetupPos[player2] = -1;
-        if (gpGame->m_setupPlayerRace[player2] == 7)
+        if (gpGame->m_setupPlayerRace[player2] == GAME_RANDOM_RACE)
             gpGame->m_setupPlayerRace[player2] = static_cast<i8>(randomColor2);
         randomColor2 = (randomColor2 + 1) % GAME_PLAYER_COUNT;
     }
@@ -1461,7 +1482,7 @@ void game::NewMap(char* filename) {
                 townIndex9++;
             if (m_mapHeader.victoryConditionValue + 1 == townIndex9) {
                 m_mapHeader.victorySideThreshold = static_cast<u16>(player2);
-                player2 = 99;
+                player2 = VICTORY_SIDE_SEARCH_DONE;
             }
         }
     }
@@ -1475,7 +1496,7 @@ void game::NewMap(char* filename) {
         heroIndex1 = 0;
         selectedTown14 = -1;
         if (m_mapHeader.unknown25 == 0 && m_players[player2].m_townCount > 0) {
-            for (pass27 = 0; pass27 < 2; pass27++) {
+            for (pass27 = 0; pass27 < STARTING_HERO_TOWN_PASS_COUNT; pass27++) {
                 for (townIndex9 = 0; townIndex9 < m_players[player2].m_townCount; townIndex9++) {
                     if (selectedTown14 == -1
                         && m_castleRecs[(m_players + player2)->m_townIds[townIndex9]]
@@ -1484,7 +1505,7 @@ void game::NewMap(char* filename) {
                         && ((m_castleRecs[(m_players + player2)->m_townIds[townIndex9]].m_buildings
                              & IDX(TOWN_BUILDING_CASTLE))
                                 != 0
-                            || pass27 == 1))
+                            || pass27 == STARTING_HERO_ALLOW_NON_CASTLE_PASS))
                         selectedTown14 = townIndex9;
                 }
             }
@@ -1531,18 +1552,19 @@ void game::NewMap(char* filename) {
             }
             if (campaignHero15 < GAME_HERO_COUNT) {
                 if (m_campaignAwards[IDX(CAMPAIGN_AWARD_SORCERESS_GUILD)] != 0) {
-                    m_heroRecs[campaignHero15].m_experience += 5000;
+                    m_heroRecs[campaignHero15].m_experience += CAMPAIGN_EXPERIENCE_BONUS;
                     m_heroRecs[campaignHero15].CheckLevel();
                     strcpy(m_heroRecs[campaignHero15].m_name, "Sister Eliza");
                     m_heroRecs[campaignHero15].m_portrait = IDX(CAMPAIGN_HERO_ELIZA);
                 } else {
-                    m_heroRecs[campaignHero15].m_experience += 5000;
+                    m_heroRecs[campaignHero15].m_experience += CAMPAIGN_EXPERIENCE_BONUS;
                     m_heroRecs[campaignHero15].CheckLevel();
                     strcpy(m_heroRecs[campaignHero15].m_name, "Brother Brax");
                     m_heroRecs[campaignHero15].m_portrait = IDX(CAMPAIGN_HERO_BRAX);
                 }
                 m_players[player2].m_availableHeroIds[0] = static_cast<char>(campaignHero15);
-                m_availableHeroes[m_players[player2].m_availableHeroIds[0]] = 64;
+                m_availableHeroes[m_players[player2].m_availableHeroIds[0]] =
+                    WEEKLY_AVAILABLE_HERO;
                 heroClass5 = m_heroRecs[campaignHero15].m_cursorType;
                 goto secondHero;
             }
@@ -1553,11 +1575,11 @@ void game::NewMap(char* filename) {
                 if (xCampaign.HasAward(AWARD_WAYWARD_SON)) {
                     specialClass6 = FACTION_WIZARD;
                     specialName3 = xCampaign.JosephName();
-                    specialPortrait6 = 64;
+                    specialPortrait6 = EXPANSION_HERO_JOSEPH_PORTRAIT;
                 } else if (xCampaign.HasAward(AWARD_UNCLE_IVAN)) {
                     specialClass6 = FACTION_BARBARIAN;
                     specialName3 = xCampaign.IvanName();
-                    specialPortrait6 = 63;
+                    specialPortrait6 = EXPANSION_HERO_IVAN_PORTRAIT;
                 }
                 if (specialClass6 != FACTION_ANY) {
                     for (campaignHero15 = 0; campaignHero15 < GAME_HERO_COUNT; campaignHero15++) {
@@ -1566,26 +1588,28 @@ void game::NewMap(char* filename) {
                             break;
                     }
                     if (campaignHero15 < GAME_HERO_COUNT) {
-                        m_heroRecs[campaignHero15].m_experience = 5000;
+                        m_heroRecs[campaignHero15].m_experience = CAMPAIGN_EXPERIENCE_BONUS;
                         m_heroRecs[campaignHero15].CheckLevel();
                         strcpy(m_heroRecs[campaignHero15].m_name, specialName3);
                         m_heroRecs[campaignHero15].m_portrait = specialPortrait6;
                         m_players[player2].m_availableHeroIds[0] =
                             static_cast<char>(campaignHero15);
-                        m_availableHeroes[m_players[player2].m_availableHeroIds[0]] = 64;
+                        m_availableHeroes[m_players[player2].m_availableHeroIds[0]] =
+                            WEEKLY_AVAILABLE_HERO;
                         heroClass5 = m_heroRecs[campaignHero15].m_cursorType;
                         goto secondHero;
                     }
                 }
             }
             heroClass5 = static_cast<FactionType>(Random(0, IDX(FACTION_COUNT) - 1));
-            if (m_setupPlayerRace[gcColorToSetupPos[m_players[player2].m_color]] < 6)
+            if (m_setupPlayerRace[gcColorToSetupPos[m_players[player2].m_color]]
+                < IDX(FACTION_COUNT))
                 heroClass5 = static_cast<FactionType>(
                     m_setupPlayerRace[gcColorToSetupPos[m_players[player2].m_color]]
                 );
             m_players[player2].m_availableHeroIds[0] =
                 static_cast<char>(GetNewHeroId(player2, heroClass5, 0));
-            m_availableHeroes[m_players[player2].m_availableHeroIds[0]] = 64;
+            m_availableHeroes[m_players[player2].m_availableHeroIds[0]] = WEEKLY_AVAILABLE_HERO;
         }
     secondHero:
         heroClass5 = static_cast<FactionType>(
@@ -1593,7 +1617,7 @@ void game::NewMap(char* filename) {
         );
         m_players[player2].m_availableHeroIds[1] =
             static_cast<char>(GetNewHeroId(player2, heroClass5, 0));
-        m_availableHeroes[m_players[player2].m_availableHeroIds[1]] = 64;
+        m_availableHeroes[m_players[player2].m_availableHeroIds[1]] = WEEKLY_AVAILABLE_HERO;
     }
 
     for (player2 = 0; player2 < m_playerCount; player2++) {
@@ -1618,23 +1642,39 @@ void game::NewMap(char* filename) {
     player2 = -1;
     townIndex9 = -1;
     ultimateTries4 = 0;
-    ultimateDistance5 = Random(1, 20) + Random(1, 20) + Random(1, 30);
-    while (player2 < 9 || townIndex9 < 9 || player2 > MAP_WIDTH - 10 || townIndex9 > MAP_HEIGHT - 10
+    ultimateDistance5 =
+        Random(ULTIMATE_DISTANCE_ROLL_MIN, ULTIMATE_DISTANCE_COMMON_ROLL_MAX)
+        + Random(ULTIMATE_DISTANCE_ROLL_MIN, ULTIMATE_DISTANCE_COMMON_ROLL_MAX)
+        + Random(ULTIMATE_DISTANCE_ROLL_MIN, ULTIMATE_DISTANCE_BONUS_ROLL_MAX);
+    while (player2 < ULTIMATE_ARTIFACT_BORDER_MARGIN
+           || townIndex9 < ULTIMATE_ARTIFACT_BORDER_MARGIN
+           || player2 > MAP_WIDTH - ULTIMATE_ARTIFACT_BORDER_MARGIN - 1
+           || townIndex9 > MAP_HEIGHT - ULTIMATE_ARTIFACT_BORDER_MARGIN - 1
            || m_worldMap.GetCell(player2, townIndex9)->m_objectIndex != IDX(MAPCELL_SPRITE_NONE)
            || m_worldMap.GetCell(player2, townIndex9)->m_overlayIndex != IDX(MAPCELL_SPRITE_NONE)
            || giGroundToTerrain[m_worldMap.GetCell(player2, townIndex9)->m_terrainImageIndex] == 0
-           || (giNumHumanPlayers == 1 && ultimateTries4 < 200
+           || (giNumHumanPlayers == 1
+               && ultimateTries4 < ULTIMATE_HUMAN_DISTANCE_RETRY_LIMIT
                && ultimateDistance5
                       >= abs(player2 - m_heroRecs[m_players[0].m_heroIds[0]].m_x)
                              + abs(townIndex9 - m_heroRecs[m_players[0].m_heroIds[0]].m_y))) {
-        if (ultimateTries4 < 400 && giUABaseX > 0) {
+        if (ultimateTries4 < ULTIMATE_SEARCH_REGION_RETRY_LIMIT && giUABaseX > 0) {
             player2 = giUABaseX + (giUARadius != 0 ? Random(-giUARadius, giUARadius) : 0);
             townIndex9 = giUABaseY + (giUARadius != 0 ? Random(-giUARadius, giUARadius) : 0);
         } else {
-            player2 = Random(9, MAP_WIDTH - 10);
-            townIndex9 = Random(9, MAP_HEIGHT - 10);
+            player2 = Random(
+                ULTIMATE_ARTIFACT_BORDER_MARGIN,
+                MAP_WIDTH - ULTIMATE_ARTIFACT_BORDER_MARGIN - 1
+            );
+            townIndex9 = Random(
+                ULTIMATE_ARTIFACT_BORDER_MARGIN,
+                MAP_HEIGHT - ULTIMATE_ARTIFACT_BORDER_MARGIN - 1
+            );
         }
-        ultimateDistance5 = Random(1, 20) + Random(1, 20) + Random(1, 30);
+        ultimateDistance5 =
+            Random(ULTIMATE_DISTANCE_ROLL_MIN, ULTIMATE_DISTANCE_COMMON_ROLL_MAX)
+            + Random(ULTIMATE_DISTANCE_ROLL_MIN, ULTIMATE_DISTANCE_COMMON_ROLL_MAX)
+            + Random(ULTIMATE_DISTANCE_ROLL_MIN, ULTIMATE_DISTANCE_BONUS_ROLL_MAX);
         ultimateTries4++;
     }
     m_ultimateArtifactX = static_cast<i8>(player2);
@@ -1642,15 +1682,23 @@ void game::NewMap(char* filename) {
     m_ultimateArtifactId =
         static_cast<i8>(Random(IDX(ARTIFACT_ULTIMATE_BOOK), IDX(ARTIFACT_GOLDEN_GOOSE)));
     if (gbInCampaign
-        && ((m_campaignType == 0 && static_cast<i8>(m_campaignScenario) + 1 == 8)
-            || (m_campaignType == 1 && static_cast<i8>(m_campaignScenario) + 1 == 9)))
+        && ((m_campaignType == IDX(CAMPAIGN_ROLAND)
+             && static_cast<i8>(m_campaignScenario) + CAMPAIGN_SCENARIO_NUMBER_OFFSET
+                    == CAMPAIGN_ROLAND_ULTIMATE_CROWN_SCENARIO)
+            || (m_campaignType == IDX(CAMPAIGN_ARCHIBALD)
+                && static_cast<i8>(m_campaignScenario) + CAMPAIGN_SCENARIO_NUMBER_OFFSET
+                       == CAMPAIGN_ARCHIBALD_ULTIMATE_CROWN_SCENARIO)))
         m_ultimateArtifactId = IDX(ARTIFACT_ULTIMATE_CROWN);
     for (player2 = 0; player2 < m_playerCount; player2++) {
         if (gbHumanPlayer[player2]) {
             m_players[player2].m_aiDifficulty = PLAYER_PERSONALITY_HUMAN;
-            memcpy(m_players[player2].m_resources, gInitResourcesHuman[m_difficulty], 28);
+            memcpy(
+                m_players[player2].m_resources,
+                gInitResourcesHuman[m_difficulty],
+                sizeof(m_players[player2].m_resources)
+            );
             if (m_playerHandicap[player2] != 0) {
-                for (townIndex9 = 0; townIndex9 < 7; townIndex9++) {
+                for (townIndex9 = 0; townIndex9 < IDX(RES_COUNT); townIndex9++) {
                     double resourceScale;
                     if (m_playerHandicap[player2] == 1)
                         resourceScale = GAME_HANDICAP_MODERATE_RESOURCE_FACTOR;
@@ -1666,7 +1714,11 @@ void game::NewMap(char* filename) {
                 IDX(PLAYER_PERSONALITY_COMPUTER_FIRST),
                 IDX(PLAYER_PERSONALITY_COMPUTER_LAST)
             ));
-            memcpy(m_players[player2].m_resources, gInitResourcesComputer[m_difficulty], 28);
+            memcpy(
+                m_players[player2].m_resources,
+                gInitResourcesComputer[m_difficulty],
+                sizeof(m_players[player2].m_resources)
+            );
         }
     }
     SetupAdjacentMons();
@@ -1707,7 +1759,8 @@ void game::NewMap(char* filename) {
     for (player2 = 0; player2 < m_playerCount; player2++) {
         heroClass5 = FACTION_KNIGHT;
         if (m_setupPlayerRace[gcColorToSetupPos[m_players[player2].m_color]] >= 0
-            && m_setupPlayerRace[gcColorToSetupPos[m_players[player2].m_color]] < 6) {
+            && m_setupPlayerRace[gcColorToSetupPos[m_players[player2].m_color]]
+                   < IDX(FACTION_COUNT)) {
             heroClass5 = static_cast<FactionType>(
                 m_setupPlayerRace[gcColorToSetupPos[m_players[player2].m_color]]
             );
