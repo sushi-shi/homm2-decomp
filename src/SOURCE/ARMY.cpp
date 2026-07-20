@@ -2071,7 +2071,8 @@ void army::DamageEnemy(
     }
     commander1 = gpCombatManager->m_heroes[m_side];
     if (commander1 && rangedAttack) {
-        damage1 *= gfSSArcheryMod[commander1->m_secondarySkills[IDX(HERO_SKILL_ARCHERY)]];
+        damage1 *=
+            gfSSArcheryMod[IDX(commander1->m_secondarySkills[IDX(HERO_SKILL_ARCHERY)])];
     }
     if (HAS(m_monster.flags.all, MONSTER_FLAGS_SHOOTER) && !rangedAttack
         && m_monsterType != CREATURE_TITAN && m_monsterType != CREATURE_MAGE

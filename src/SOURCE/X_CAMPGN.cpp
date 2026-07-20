@@ -383,7 +383,10 @@ void ExpCampaign::InitMap(void) {
                         }
                     }
                 }
-                choiceHero->SetSS(campaignChoice->value, campaignChoice->amount);
+                choiceHero->SetSS(
+                    static_cast<HeroSecondarySkill>(campaignChoice->value),
+                    static_cast<HeroSkillLevel>(campaignChoice->amount)
+                );
             }
             break;
         case CAMPAIGN_CHOICE_CREATURES:

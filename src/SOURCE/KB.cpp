@@ -2809,13 +2809,13 @@ void game::ShowMoraleInfo(hero* h, i32 dialogType) {
         if (HAS(h->m_eventFlags, HERO_EVENT_DERELICT_SHIP)) {
             strcat(gText, cMoraleInfo[IDX(INFO_DERELICT_SHIP)]);
         }
-        if (h->m_secondarySkills[IDX(HERO_SKILL_LEADERSHIP)] == IDX(HERO_SKILL_LEVEL_BASIC)) {
+        if (h->m_secondarySkills[IDX(HERO_SKILL_LEADERSHIP)] == HERO_SKILL_LEVEL_BASIC) {
             strcat(gText, cMoraleInfo[IDX(INFO_BASIC_LEADERSHIP)]);
         }
-        if (h->m_secondarySkills[IDX(HERO_SKILL_LEADERSHIP)] == IDX(HERO_SKILL_LEVEL_ADVANCED)) {
+        if (h->m_secondarySkills[IDX(HERO_SKILL_LEADERSHIP)] == HERO_SKILL_LEVEL_ADVANCED) {
             strcat(gText, cMoraleInfo[IDX(INFO_ADVANCED_LEADERSHIP)]);
         }
-        if (h->m_secondarySkills[IDX(HERO_SKILL_LEADERSHIP)] == IDX(HERO_SKILL_LEVEL_EXPERT)) {
+        if (h->m_secondarySkills[IDX(HERO_SKILL_LEADERSHIP)] == HERO_SKILL_LEVEL_EXPERT) {
             strcat(gText, cMoraleInfo[IDX(INFO_EXPERT_LEADERSHIP)]);
         }
         if (h->HasArtifact(ARTIFACT_MASTHEAD) && HAS(h->m_eventFlags, HERO_EVENT_EMBARKED)) {
@@ -2868,11 +2868,11 @@ void game::ShowLuckInfo(hero* h, i32 dialogType) {
         strcat(gText, cLuckInfo[IDX(INFO_FOUNTAIN)]);
     if (HAS(h->m_eventFlags, HERO_EVENT_PYRAMID))
         strcat(gText, cLuckInfo[IDX(INFO_PYRAMID)]);
-    if (h->m_secondarySkills[IDX(HERO_SKILL_LUCK)] == IDX(HERO_SKILL_LEVEL_BASIC))
+    if (h->m_secondarySkills[IDX(HERO_SKILL_LUCK)] == HERO_SKILL_LEVEL_BASIC)
         strcat(gText, cLuckInfo[IDX(INFO_BASIC_SKILL)]);
-    if (h->m_secondarySkills[IDX(HERO_SKILL_LUCK)] == IDX(HERO_SKILL_LEVEL_ADVANCED))
+    if (h->m_secondarySkills[IDX(HERO_SKILL_LUCK)] == HERO_SKILL_LEVEL_ADVANCED)
         strcat(gText, cLuckInfo[IDX(INFO_ADVANCED_SKILL)]);
-    if (h->m_secondarySkills[IDX(HERO_SKILL_LUCK)] == IDX(HERO_SKILL_LEVEL_EXPERT))
+    if (h->m_secondarySkills[IDX(HERO_SKILL_LUCK)] == HERO_SKILL_LEVEL_EXPERT)
         strcat(gText, cLuckInfo[IDX(INFO_EXPERT_SKILL)]);
     if (h->HasArtifact(ARTIFACT_MASTHEAD) && HAS(h->m_eventFlags, HERO_EVENT_EMBARKED))
         strcat(gText, cLuckInfo[IDX(LUCK_INFO_MASTHEAD)]);
@@ -3675,8 +3675,8 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
     i32 menuChanged;
     hero* currentHeroRec;
     i32 loopIndex;
-    i32 secondarySkillIndex;
-    i32 secondaryLevel;
+    HeroSecondarySkill secondarySkillIndex;
+    HeroSkillLevel secondaryLevel;
     i32 formationHexIndex;
 
     menuChanged = 0;
@@ -3846,9 +3846,12 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
                 gpGame->m_cheated = 1;
                 if (gbInCampaign)
                     gpGame->m_campaignCheated = 1;
-                secondarySkillIndex =
-                    (command - APP_MENU_SECONDARY_FIRST) / APP_MENU_SECONDARY_LEVELS;
-                secondaryLevel = (command - APP_MENU_SECONDARY_FIRST) % APP_MENU_SECONDARY_LEVELS;
+                secondarySkillIndex = static_cast<HeroSecondarySkill>(
+                    (command - APP_MENU_SECONDARY_FIRST) / APP_MENU_SECONDARY_LEVELS
+                );
+                secondaryLevel = static_cast<HeroSkillLevel>(
+                    (command - APP_MENU_SECONDARY_FIRST) % APP_MENU_SECONDARY_LEVELS
+                );
                 if (currentHeroRec != NULL)
                     currentHeroRec->SetSS(secondarySkillIndex, secondaryLevel);
             }

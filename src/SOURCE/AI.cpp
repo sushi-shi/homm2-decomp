@@ -235,7 +235,7 @@ void combatManager::DoCompAI(i32) {
 
     if (m_inCastleCombat != 0) {
         if (m_heroes[COMBAT_ATTACKER_SIDE]->m_secondarySkills[IDX(HERO_SKILL_ARCHERY)]
-                == IDX(HERO_SKILL_LEVEL_NONE)
+                == HERO_SKILL_LEVEL_NONE
             && !m_heroes[COMBAT_ATTACKER_SIDE]->HasArtifact(ARTIFACT_GOLDEN_BOW)) {
             if (m_currentSide == COMBAT_ATTACKER_SIDE)
                 currentShooterStrength5 =
@@ -262,7 +262,7 @@ void combatManager::DoCompAI(i32) {
             if (m_heroes[COMBAT_ATTACKER_SIDE] != NULL
                 && (m_heroes[COMBAT_ATTACKER_SIDE]->HasArtifact(ARTIFACT_GOLDEN_BOW)
                     || m_heroes[COMBAT_ATTACKER_SIDE]->m_secondarySkills[IDX(HERO_SKILL_ARCHERY)]
-                           != IDX(HERO_SKILL_LEVEL_NONE)))
+                           != HERO_SKILL_LEVEL_NONE))
                 goldenBowBonus = 0;
             else
                 goldenBowBonus = 1;
@@ -276,14 +276,16 @@ void combatManager::DoCompAI(i32) {
     if (m_heroes[m_currentSide] != NULL) {
         currentShooterStrength5 = static_cast<i32>(
             static_cast<i32>(currentShooterStrength5)
-            * gfSSArcheryMod[m_heroes[m_currentSide]->m_secondarySkills[IDX(HERO_SKILL_ARCHERY)]]
+            * gfSSArcheryMod
+                [IDX(m_heroes[m_currentSide]->m_secondarySkills[IDX(HERO_SKILL_ARCHERY)])]
         );
     }
     if (m_heroes[COMBAT_DEFENDER_SIDE - m_currentSide] != NULL) {
         enemyShooterStrength18 = static_cast<i32>(
             static_cast<i32>(enemyShooterStrength18)
-            * gfSSArcheryMod[m_heroes[COMBAT_DEFENDER_SIDE - m_currentSide]
-                                 ->m_secondarySkills[IDX(HERO_SKILL_ARCHERY)]]
+            * gfSSArcheryMod
+                [IDX(m_heroes[COMBAT_DEFENDER_SIDE - m_currentSide]
+                         ->m_secondarySkills[IDX(HERO_SKILL_ARCHERY)])]
         );
     }
     if (static_cast<i32>(currentShooterStrength5)

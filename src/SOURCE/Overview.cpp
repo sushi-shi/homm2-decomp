@@ -683,7 +683,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
             hero* heroData0;
             i32 detailRow;
             i32 detailColumn;
-            i32 detailIndex;
+            HeroSecondarySkill detailIndex;
             heroData0 =
                 &m_heroRecs[gpCurPlayer->m_heroIds[giOverviewTop[IDX(giOverviewType)] + row]];
 
@@ -874,7 +874,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
 
             for (item = 0; item < OVERVIEW_SECONDARY_SKILL_SLOTS; item++) {
                 detailIndex = heroData0->GetNthSS(item);
-                if (detailIndex != HERO_SECONDARY_SKILL_NONE) {
+                if (detailIndex != HERO_SKILL_NONE) {
                     detailRow = item / OVERVIEW_SECONDARY_SKILL_COLUMNS;
                     detailColumn = item % OVERVIEW_SECONDARY_SKILL_COLUMNS;
                     OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] = new iconWidget(
@@ -1507,8 +1507,9 @@ i32 game::ProcessIconSelect(i32 widgetId, i32 quickView) {
                 }
             }
             if (widgetId >= HERO_SKILL_FIRST && widgetId <= HERO_SKILL_LAST) {
-                selectionIndex2 = selectedHero13->GetNthSS(widgetId - HERO_SKILL_FIRST);
-                selectedHero13->DoSSLevelDialog(selectionIndex2, quickView);
+                selectedHero13->DoSSLevelDialog(
+                    selectedHero13->GetNthSS(widgetId - HERO_SKILL_FIRST), quickView
+                );
             }
             if (widgetId >= HERO_ARTIFACT_FIRST
                 && widgetId <= HERO_ARTIFACT_LAST) {

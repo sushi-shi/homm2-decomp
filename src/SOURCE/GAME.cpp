@@ -1038,7 +1038,7 @@ i32 game::IsMobile(i32 heroId) {
                giGroundToTerrain[cp->m_terrainImageIndex],
                1,
                mobileHero->m_remainingMobility,
-               mobileHero->m_secondarySkills[IDX(HERO_SKILL_PATHFINDING)],
+               IDX(mobileHero->m_secondarySkills[IDX(HERO_SKILL_PATHFINDING)]),
                cp->m_isRoad,
                0
            )
@@ -1411,33 +1411,33 @@ void game::SetupOrigData(void) {
             m_heroRecs[i].Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE;
         m_heroRecs[i].m_secondarySkillCount = 0;
         for (j = 0; j < IDX(HERO_SKILL_COUNT); j++) {
-            m_heroRecs[i].m_secondarySkills[j] = 0;
+            m_heroRecs[i].m_secondarySkills[j] = HERO_SKILL_LEVEL_NONE;
             m_heroRecs[i].m_secondarySkillOrder[j] = 0;
         }
         if (m_heroRecs[i].m_cursorType == FACTION_KNIGHT) {
-            m_heroRecs[i].GiveSS(IDX(HERO_SKILL_LEADERSHIP), IDX(HERO_SKILL_LEVEL_BASIC));
-            m_heroRecs[i].GiveSS(IDX(HERO_SKILL_BALLISTICS), IDX(HERO_SKILL_LEVEL_BASIC));
+            m_heroRecs[i].GiveSS(HERO_SKILL_LEADERSHIP, IDX(HERO_SKILL_LEVEL_BASIC));
+            m_heroRecs[i].GiveSS(HERO_SKILL_BALLISTICS, IDX(HERO_SKILL_LEVEL_BASIC));
         }
         if (m_heroRecs[i].m_cursorType == FACTION_SORCERESS) {
             m_heroRecs[i].m_artifacts[0] = IDX(ARTIFACT_MAGIC_BOOK);
-            m_heroRecs[i].GiveSS(IDX(HERO_SKILL_NAVIGATION), IDX(HERO_SKILL_LEVEL_ADVANCED));
-            m_heroRecs[i].GiveSS(IDX(HERO_SKILL_WISDOM), IDX(HERO_SKILL_LEVEL_BASIC));
+            m_heroRecs[i].GiveSS(HERO_SKILL_NAVIGATION, IDX(HERO_SKILL_LEVEL_ADVANCED));
+            m_heroRecs[i].GiveSS(HERO_SKILL_WISDOM, IDX(HERO_SKILL_LEVEL_BASIC));
         }
         if (m_heroRecs[i].m_cursorType == FACTION_BARBARIAN)
-            m_heroRecs[i].GiveSS(IDX(HERO_SKILL_PATHFINDING), IDX(HERO_SKILL_LEVEL_ADVANCED));
+            m_heroRecs[i].GiveSS(HERO_SKILL_PATHFINDING, IDX(HERO_SKILL_LEVEL_ADVANCED));
         if (m_heroRecs[i].m_cursorType == FACTION_WARLOCK) {
             m_heroRecs[i].m_artifacts[0] = IDX(ARTIFACT_MAGIC_BOOK);
-            m_heroRecs[i].GiveSS(IDX(HERO_SKILL_SCOUTING), IDX(HERO_SKILL_LEVEL_ADVANCED));
-            m_heroRecs[i].GiveSS(IDX(HERO_SKILL_WISDOM), IDX(HERO_SKILL_LEVEL_BASIC));
+            m_heroRecs[i].GiveSS(HERO_SKILL_SCOUTING, IDX(HERO_SKILL_LEVEL_ADVANCED));
+            m_heroRecs[i].GiveSS(HERO_SKILL_WISDOM, IDX(HERO_SKILL_LEVEL_BASIC));
         }
         if (m_heroRecs[i].m_cursorType == FACTION_WIZARD) {
             m_heroRecs[i].m_artifacts[0] = IDX(ARTIFACT_MAGIC_BOOK);
-            m_heroRecs[i].GiveSS(IDX(HERO_SKILL_WISDOM), IDX(HERO_SKILL_LEVEL_ADVANCED));
+            m_heroRecs[i].GiveSS(HERO_SKILL_WISDOM, IDX(HERO_SKILL_LEVEL_ADVANCED));
         }
         if (m_heroRecs[i].m_cursorType == FACTION_NECROMANCER) {
             m_heroRecs[i].m_artifacts[0] = IDX(ARTIFACT_MAGIC_BOOK);
-            m_heroRecs[i].GiveSS(IDX(HERO_SKILL_WISDOM), IDX(HERO_SKILL_LEVEL_BASIC));
-            m_heroRecs[i].GiveSS(IDX(HERO_SKILL_NECROMANCY), IDX(HERO_SKILL_LEVEL_BASIC));
+            m_heroRecs[i].GiveSS(HERO_SKILL_WISDOM, IDX(HERO_SKILL_LEVEL_BASIC));
+            m_heroRecs[i].GiveSS(HERO_SKILL_NECROMANCY, IDX(HERO_SKILL_LEVEL_BASIC));
         }
     }
 
@@ -4288,8 +4288,9 @@ i32 game::ComputeDailyGold(i32 player) {
             * DAILY_GOLD_TAX_LIEN_INCOME;
 
     for (heroIndex = 0; heroIndex < m_players[player].m_heroCount; heroIndex++) {
-        gold += gEstatesGoldLevel[gpGame->m_heroRecs[m_players[player].m_heroIds[heroIndex]]
-                                      .m_secondarySkills[IDX(HERO_SKILL_ESTATES)]];
+        gold += gEstatesGoldLevel
+            [IDX(gpGame->m_heroRecs[m_players[player].m_heroIds[heroIndex]]
+                     .m_secondarySkills[IDX(HERO_SKILL_ESTATES)])];
     }
 
     if (!gbHumanPlayer[player]) {
@@ -4440,7 +4441,8 @@ void game::PerDay(void) {
         restoredSpellPoints13 = currentHero6->m_spellPoints;
         maxSpellPoints9 =
             currentHero6->Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE;
-        restoredSpellPoints13 += currentHero6->m_secondarySkills[IDX(HERO_SKILL_MYSTICISM)] + 1;
+        restoredSpellPoints13 +=
+            IDX(currentHero6->m_secondarySkills[IDX(HERO_SKILL_MYSTICISM)]) + 1;
         if (currentHero6->HasArtifact(ARTIFACT_POWER_RING))
             restoredSpellPoints13 += POWER_RING_DAILY_MANA_BONUS;
         if (restoredSpellPoints13 > maxSpellPoints9)
@@ -5697,7 +5699,7 @@ i32 game::GetLuck(hero* h, class army*, town* castle) {
         luck++;
     }
     luck += h->m_luck;
-    luck += h->m_secondarySkills[IDX(HERO_SKILL_LUCK)];
+    luck += IDX(h->m_secondarySkills[IDX(HERO_SKILL_LUCK)]);
     if (luck < MINIMUM)
         luck = MINIMUM;
     if (luck > MAXIMUM)
@@ -6328,14 +6330,17 @@ void game::ProcessOnMapHeroes(void) {
                             mapHero0->m_secondarySkillCount = 0;
                             for (artifactSlot10 = 0; artifactSlot10 < IDX(HERO_SKILL_COUNT);
                                  artifactSlot10++) {
-                                mapHero0->m_secondarySkills[artifactSlot10] = 0;
+                                mapHero0->m_secondarySkills[artifactSlot10] =
+                                    HERO_SKILL_LEVEL_NONE;
                                 mapHero0->m_secondarySkillOrder[artifactSlot10] = 0;
                             }
                             for (artifactSlot10 = 0; artifactSlot10 < EVENT_RECORD_SKILL_CAPACITY;
                                  artifactSlot10++) {
                                 if (extra0->skillTypes[artifactSlot10] != -1) {
                                     mapHero0->GiveSS(
-                                        extra0->skillTypes[artifactSlot10],
+                                        static_cast<HeroSecondarySkill>(
+                                            extra0->skillTypes[artifactSlot10]
+                                        ),
                                         extra0->skillLevels[artifactSlot10]
                                     );
                                 }
@@ -6346,8 +6351,8 @@ void game::ProcessOnMapHeroes(void) {
                                 mapHero0->m_x,
                                 mapHero0->m_y,
                                 mapHero0->m_owner,
-                                giVisRange
-                                    [mapHero0->m_secondarySkills[MAP_HERO_SCOUTING_SKILL_INDEX]]
+                                giVisRange[IDX(mapHero0->m_secondarySkills
+                                                   [MAP_HERO_SCOUTING_SKILL_INDEX])]
                             );
                         }
                         H2_FREE(ppMapExtra[extraIndex0], 6604);
