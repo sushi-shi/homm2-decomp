@@ -35,12 +35,13 @@ H2_ENUM_CLASS_BEGIN(ConfigWalkSpeed)
 H2_ENUM_CLASS_END(ConfigWalkSpeed)
 H2_ENUM_STEPPED(ConfigWalkSpeed)
 
-H2_ENUM_BEGIN(ConfigVolumeLevel)
+H2_ENUM_CLASS_BEGIN(ConfigVolumeLevel)
     CONFIG_VOLUME_MUTED       = 0,
     CONFIG_VOLUME_MIN         = 1,
     CONFIG_VOLUME_MAX         = 10,
     CONFIG_VOLUME_LEVEL_COUNT = CONFIG_VOLUME_MAX + 1
-H2_ENUM_END(ConfigVolumeLevel)
+H2_ENUM_CLASS_END(ConfigVolumeLevel)
+H2_ENUM_STEPPED(ConfigVolumeLevel)
 
 H2_ENUM_CLASS_BEGIN(ConfigExecutable)
     CONFIG_EXECUTABLE_GAME   = 0,

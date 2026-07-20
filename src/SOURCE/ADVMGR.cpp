@@ -830,26 +830,6 @@ H2_ENUM_BEGIN(AdventureQuickInfoObject)
     QUICK_INFO_BOTTOM_Y         = QUICK_INFO_BOTTOM - QUICK_INFO_HEIGHT
 H2_ENUM_END(AdventureQuickInfoObject)
 
-H2_ENUM_BEGIN(AdventureGenericSiteName)
-    GENERIC_SITE_ALCHEMIST_TOWER = 0,
-    GENERIC_SITE_ARENA           = 1,
-    GENERIC_SITE_HUT_OF_MAGI     = 2,
-    GENERIC_SITE_EYE_OF_MAGI     = 3,
-    GENERIC_SITE_STABLES         = 4,
-    GENERIC_SITE_MERMAID         = 5,
-    GENERIC_SITE_SIRENS          = 6,
-    GENERIC_SITE_UNKNOWN         = -1
-H2_ENUM_END(AdventureGenericSiteName)
-
-H2_ENUM_BEGIN(AdventureRecruitmentSiteName)
-    RECRUITMENT_SITE_BARROW_MOUNDS = 0,
-    RECRUITMENT_SITE_EARTH_ALTAR   = 1,
-    RECRUITMENT_SITE_AIR_ALTAR     = 2,
-    RECRUITMENT_SITE_FIRE_ALTAR    = 3,
-    RECRUITMENT_SITE_WATER_ALTAR   = 4,
-    RECRUITMENT_SITE_UNKNOWN       = -1
-H2_ENUM_END(AdventureRecruitmentSiteName)
-
 H2_ENUM_BEGIN(AdventureCheatConstant)
     CHEAT_SEQUENCE_RADIX     = 10,
     CHEAT_SEQUENCE_MODULUS   = 10000000,
@@ -1615,7 +1595,7 @@ i32 advManager::Main(struct tag_message& message) {
     if (giScreenScroll && gbForegroundApp) {
         CheckScreenScroll();
     }
-    if (!gbNoSound && gConfig.musicVolume && giForceSwitchMusic > 0
+    if (!gbNoSound && gConfig.musicVolume != CONFIG_VOLUME_MUTED && giForceSwitchMusic > 0
         && KBTickCount() - giForceSwitchMusic > FORCED_MUSIC_DELAY) {
         giForceSwitchMusic = -1;
         if (gpSoundManager->m_currentTrack == WAIT_AMBIENT_MUSIC) {
@@ -1926,7 +1906,7 @@ i32 advManager::Main(struct tag_message& message) {
                         ViewPuzzle();
                         break;
                     case INPUT_SCAN_V:
-                        ViewWorld(VIEW_WORLD_ALL, false, false);
+                        ViewWorld(SPELL_VIEW_ALL, false, false);
                         break;
                     case INPUT_SCAN_N:
                         cheatDigitLocal = 'e';
@@ -4790,7 +4770,6 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
     HeroEventFlag visitedMaskValue;
     char savedTextLocal[QUICK_INFO_TEXT_CAPACITY];
     char guardCaption[QUICK_INFO_TEXT_CAPACITY];
-    i32 siteIndexName;
     i32 siteFrameLocal[QUICK_INFO_SITE_FRAME_COUNT];
     TilesetId objectTilesetLocal;
     char uppercaseResult;
@@ -5081,6 +5060,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     gText[0] = uppercaseResult;
                     break;
                 case MAP_OBJECT_EXPANSION_OBJECT: {
+                    H2_ENUM_STORAGE(GenericSiteType, i32) genericSiteType;
                     mapObjectKindValue = -1;
                     if (currentCell->m_objectIndex != MAPCELL_SPRITE_NONE) {
                         siteFrameLocal[0] = currentCell->m_objectIndex;
@@ -5089,16 +5069,16 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         siteFrameLocal[0] = currentCell->m_overlayIndex;
                         objectTilesetLocal = currentCell->m_overlayTileset;
                     }
-                    siteIndexName = GENERIC_SITE_UNKNOWN;
+                    genericSiteType = GENERIC_SITE_UNKNOWN;
                     switch (objectTilesetLocal) {
                         case TILESET_X_LOC1:
                             if (siteFrameLocal[0] < 0) {
                                 break;
                             } else {
                                 if (siteFrameLocal[0] < GENERIC_SITE_1_END) {
-                                    siteIndexName = GENERIC_SITE_ALCHEMIST_TOWER;
+                                    genericSiteType = GENERIC_SITE_ALCHEMIST_TOWER;
                                 } else if (siteFrameLocal[0] < GENERIC_SITE_2_END) {
-                                    siteIndexName = GENERIC_SITE_ARENA;
+                                    genericSiteType = GENERIC_SITE_ARENA;
                                     visitedMaskValue = ADVMGR_VISIT_GENERIC_HUT;
                                 }
                             }
@@ -5108,15 +5088,15 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                                 break;
                             } else {
                                 if (siteFrameLocal[0] < GENERIC_ALTAR_END) {
-                                    siteIndexName = GENERIC_SITE_STABLES;
+                                    genericSiteType = GENERIC_SITE_STABLES;
                                     visitedMaskValue = ADVMGR_VISIT_GENERIC_ALTAR;
                                 } else if (siteFrameLocal[0] < GENERIC_UNUSED_END) {
-                                    siteIndexName = GENERIC_SITE_UNKNOWN;
+                                    genericSiteType = GENERIC_SITE_UNKNOWN;
                                 } else if (siteFrameLocal[0] < GENERIC_TOWER_END) {
-                                    siteIndexName = GENERIC_SITE_MERMAID;
+                                    genericSiteType = GENERIC_SITE_MERMAID;
                                     visitedMaskValue = ADVMGR_VISIT_GENERIC_TOWER;
                                 } else if (siteFrameLocal[0] < GENERIC_SPRING_END) {
-                                    siteIndexName = GENERIC_SITE_SIRENS;
+                                    genericSiteType = GENERIC_SITE_SIRENS;
                                     visitedMaskValue = ADVMGR_VISIT_GENERIC_SPRING;
                                 }
                             }
@@ -5126,17 +5106,17 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                                 break;
                             } else {
                                 if (siteFrameLocal[0] < GENERIC_SITE_3_SPLIT) {
-                                    siteIndexName = GENERIC_SITE_HUT_OF_MAGI;
+                                    genericSiteType = GENERIC_SITE_HUT_OF_MAGI;
                                 } else if (siteFrameLocal[0] < GENERIC_SITE_3_END) {
-                                    siteIndexName = GENERIC_SITE_EYE_OF_MAGI;
+                                    genericSiteType = GENERIC_SITE_EYE_OF_MAGI;
                                 }
                             }
                             break;
                     }
-                    if (siteIndexName == GENERIC_SITE_UNKNOWN) {
+                    if (genericSiteType == GENERIC_SITE_UNKNOWN) {
                         sprintf(gText, "Unknown");
                     } else {
-                        sprintf(gText, xGenericSiteNames[siteIndexName]);
+                        sprintf(gText, xGenericSiteNames[IDX(genericSiteType)]);
                     }
                     if (heroLocal != NULL && visitedMaskValue != HERO_EVENT_NONE) {
                         strcat(gText, "\n\n");
@@ -5149,6 +5129,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     break;
                 }
                 case MAP_OBJECT_EXPANSION_DWELLING: {
+                    H2_ENUM_STORAGE(RecruitSiteType, i32) recruitSiteType;
                     if (currentCell->m_overlayIndex == MAPCELL_SPRITE_NONE) {
                         siteFrameLocal[0] = currentCell->m_objectIndex;
                         objectTilesetLocal = currentCell->m_objectTileset;
@@ -5156,30 +5137,30 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         siteFrameLocal[0] = currentCell->m_overlayIndex;
                         objectTilesetLocal = currentCell->m_overlayTileset;
                     }
-                    siteIndexName = RECRUITMENT_SITE_UNKNOWN;
+                    recruitSiteType = RECRUITMENT_SITE_UNKNOWN;
                     switch (objectTilesetLocal) {
                         case TILESET_X_LOC1:
                             if (siteFrameLocal[0] < RECRUITMENT_START) {
                                 break;
                             } else {
                                 if (siteFrameLocal[0] < RECRUITMENT_1_END) {
-                                    siteIndexName = RECRUITMENT_SITE_BARROW_MOUNDS;
+                                    recruitSiteType = RECRUITMENT_SITE_BARROW_MOUNDS;
                                 } else if (siteFrameLocal[0] < RECRUITMENT_2_END) {
-                                    siteIndexName = RECRUITMENT_SITE_EARTH_ALTAR;
+                                    recruitSiteType = RECRUITMENT_SITE_EARTH_ALTAR;
                                 } else if (siteFrameLocal[0] < RECRUITMENT_3_END) {
-                                    siteIndexName = RECRUITMENT_SITE_AIR_ALTAR;
+                                    recruitSiteType = RECRUITMENT_SITE_AIR_ALTAR;
                                 } else if (siteFrameLocal[0] < RECRUITMENT_4_END) {
-                                    siteIndexName = RECRUITMENT_SITE_FIRE_ALTAR;
+                                    recruitSiteType = RECRUITMENT_SITE_FIRE_ALTAR;
                                 } else if (siteFrameLocal[0] < RECRUITMENT_5_END) {
-                                    siteIndexName = RECRUITMENT_SITE_WATER_ALTAR;
+                                    recruitSiteType = RECRUITMENT_SITE_WATER_ALTAR;
                                 }
                             }
                             break;
                     }
-                    if (siteIndexName == RECRUITMENT_SITE_UNKNOWN) {
+                    if (recruitSiteType == RECRUITMENT_SITE_UNKNOWN) {
                         sprintf(gText, "Unknown");
                     } else {
-                        sprintf(gText, xRecruitmentSiteNames[siteIndexName]);
+                        sprintf(gText, xRecruitmentSiteNames[IDX(recruitSiteType)]);
                     }
                     break;
                 }
@@ -7303,11 +7284,7 @@ void advManager::CastSpell(SpellType spell) {
         case SPELL_VIEW_TOWNS:
         case SPELL_VIEW_HEROES:
         case SPELL_VIEW_ALL:
-            ViewWorld(
-                static_cast<ViewWorldMode>(static_cast<i32>(spell)),
-                spell == SPELL_VIEW_ALL,
-                spell == SPELL_VIEW_ALL
-            );
+            ViewWorld(spell, spell == SPELL_VIEW_ALL, spell == SPELL_VIEW_ALL);
             break;
         case SPELL_IDENTIFY_HERO:
             m_identifyHeroActive = 1;
@@ -7976,7 +7953,7 @@ void advManager::SetEnvironmentOrigin(i32 originX, i32 originY, i32 stopSounds) 
         return;
     }
 
-    if (gConfig.soundVolume != 0) {
+    if (gConfig.soundVolume != CONFIG_VOLUME_MUTED) {
         m_activeSoundMask = 0;
         for (soundLayer = ENVIRONMENT_SOUND_FIRST_LAYER;
              soundLayer <= ENVIRONMENT_SOUND_LAYER_COUNT;
@@ -9833,7 +9810,7 @@ void advManager::AdvPanel(void) {
                 ProcessSearch(CURSOR_INVALID_POSITION, CURSOR_INVALID_POSITION);
                 break;
             case PANEL_VIEW_WORLD:
-                ViewWorld(VIEW_WORLD_ALL, false, false);
+                ViewWorld(SPELL_VIEW_ALL, false, false);
                 break;
             case PANEL_VIEW_PUZZLE:
                 ViewPuzzle();
@@ -10109,10 +10086,10 @@ void UpdateSystemOptions(i32 initialDraw) {
     message.payload.widget.command = ADVMGR_SYSTEM_OPTIONS_SET_FRAME;
 
     message.payload.widget.id = ADVMGR_SYSTEM_OPTION_MUSIC_VOLUME;
-    message.payload.widget.data.value = gConfig.musicVolume != 0;
+    message.payload.widget.data.value = gConfig.musicVolume != CONFIG_VOLUME_MUTED;
     cPanel->BroadcastMessage(message);
     message.payload.widget.id = ADVMGR_SYSTEM_OPTION_SOUND_VOLUME;
-    if (gConfig.soundVolume == 0) {
+    if (gConfig.soundVolume == CONFIG_VOLUME_MUTED) {
         message.payload.widget.data.value = ADVMGR_SYSTEM_OPTIONS_SOUND_FRAME_BASE;
     } else {
         message.payload.widget.data.value = ADVMGR_SYSTEM_OPTIONS_SOUND_FRAME_BASE + 1;
@@ -10162,11 +10139,11 @@ void UpdateSystemOptions(i32 initialDraw) {
     message.payload.widget.command = ADVMGR_SYSTEM_OPTIONS_SET_TEXT;
     message.payload.widget.id =
         ADVMGR_SYSTEM_OPTION_MUSIC_VOLUME + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
-    message.payload.widget.data.text = onOffText[gConfig.musicVolume];
+    message.payload.widget.data.text = onOffText[IDX(gConfig.musicVolume)];
     cPanel->BroadcastMessage(message);
     message.payload.widget.id =
         ADVMGR_SYSTEM_OPTION_SOUND_VOLUME + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
-    message.payload.widget.data.text = onOffText[gConfig.soundVolume];
+    message.payload.widget.data.text = onOffText[IDX(gConfig.soundVolume)];
     cPanel->BroadcastMessage(message);
     message.payload.widget.id =
         ADVMGR_SYSTEM_OPTION_HERO_SPEED + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
@@ -10255,7 +10232,7 @@ i32 SystemOptionsHandler(struct tag_message& message) {
                 case ADVMGR_SYSTEM_OPTIONS_ACTIVATE: {
                     switch (message.payload.widget.id) {
                         case ADVMGR_SYSTEM_OPTION_MUSIC_VOLUME:
-                            if (gConfig.musicVolume == 0 && gpSoundManager->m_cdReady == 0
+                            if (gConfig.musicVolume == CONFIG_VOLUME_MUTED && gpSoundManager->m_cdReady == 0
                                 && gpSoundManager->m_midiReady == 0) {
                                 NormalDialog(
                                     "Neither MIDI nor Redbook music is currently available on this "
@@ -10272,16 +10249,15 @@ i32 SystemOptionsHandler(struct tag_message& message) {
                                 );
                                 break;
                             }
-                            gConfig.musicVolume = static_cast<ConfigVolumeLevel>(
-                                (gConfig.musicVolume + 1) % CONFIG_VOLUME_LEVEL_COUNT
-                            );
+                            ++gConfig.musicVolume;
+                            gConfig.musicVolume %= CONFIG_VOLUME_LEVEL_COUNT;
                             gpSoundManager->AdjustMusicVolumes();
                             preferencesChanged = 1;
                             bPrefsChanged = 1;
                             break;
 
                         case ADVMGR_SYSTEM_OPTION_SOUND_VOLUME:
-                            if (gConfig.soundVolume == 0 && gpSoundManager->m_digitalDriver == NULL) {
+                            if (gConfig.soundVolume == CONFIG_VOLUME_MUTED && gpSoundManager->m_digitalDriver == NULL) {
                                 NormalDialog(
                                     "Digital sound is not currently available on this system.",
                                     OPTION_DIALOG_MESSAGE,
@@ -10296,9 +10272,8 @@ i32 SystemOptionsHandler(struct tag_message& message) {
                                 );
                                 break;
                             }
-                            gConfig.soundVolume = static_cast<ConfigVolumeLevel>(
-                                (gConfig.soundVolume + 1) % CONFIG_VOLUME_LEVEL_COUNT
-                            );
+                            ++gConfig.soundVolume;
+                            gConfig.soundVolume %= CONFIG_VOLUME_LEVEL_COUNT;
                             gpSoundManager->AdjustSoundVolumes();
                             preferencesChanged = 1;
                             bPrefsChanged = 1;

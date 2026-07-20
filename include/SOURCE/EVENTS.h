@@ -44,13 +44,30 @@ H2_ENUM_BEGIN(MapEventEncodingConstant)
     AI_BATTLE_STAT_MAX              = 40
 H2_ENUM_END(MapEventEncodingConstant)
 
-H2_ENUM_BEGIN(RecruitSiteType)
-    SITE_GHOST           = 0,
-    SITE_EARTH_ELEMENTAL = 1,
-    SITE_AIR_ELEMENTAL   = 2,
-    SITE_FIRE_ELEMENTAL  = 3,
-    SITE_WATER_ELEMENTAL = 4
-H2_ENUM_END(RecruitSiteType)
+H2_ENUM_CLASS_BEGIN(GenericSiteType)
+    GENERIC_SITE_UNKNOWN         = -1,
+    GENERIC_SITE_ALCHEMIST_TOWER = 0,
+    GENERIC_SITE_ARENA           = 1,
+    GENERIC_SITE_HUT_OF_MAGI     = 2,
+    GENERIC_SITE_EYE_OF_MAGI     = 3,
+    GENERIC_SITE_STABLES         = 4,
+    GENERIC_SITE_MERMAID         = 5,
+    GENERIC_SITE_SIRENS          = 6
+H2_ENUM_CLASS_END(GenericSiteType)
+
+H2_ENUM_BEGIN(GenericSiteEncodingConstant)
+    GENERIC_SITE_TYPE_MASK   = 0x3f,
+    GENERIC_SITE_LEVEL_SHIFT = 6
+H2_ENUM_END(GenericSiteEncodingConstant)
+
+H2_ENUM_CLASS_BEGIN(RecruitSiteType)
+    RECRUITMENT_SITE_UNKNOWN       = -1,
+    RECRUITMENT_SITE_BARROW_MOUNDS = 0,
+    RECRUITMENT_SITE_EARTH_ALTAR   = 1,
+    RECRUITMENT_SITE_AIR_ALTAR     = 2,
+    RECRUITMENT_SITE_FIRE_ALTAR    = 3,
+    RECRUITMENT_SITE_WATER_ALTAR   = 4
+H2_ENUM_CLASS_END(RecruitSiteType)
 
 #pragma pack(push, 1)
 struct mapEventExtra {

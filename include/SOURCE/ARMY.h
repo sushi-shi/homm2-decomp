@@ -6,6 +6,13 @@
 
 H2_ENUM_CLASS_BEGIN(ArmyAnimationSequence)
     ARMY_ANIMATION_NONE                  = -1,
+    ARMY_ANIMATION_WALK_BEGIN            = 0,
+    ARMY_ANIMATION_WALK_BEGIN_STANDING   = 1,
+    ARMY_ANIMATION_WALK_MIDDLE           = 2,
+    ARMY_ANIMATION_WALK_END              = 3,
+    ARMY_ANIMATION_WALK_END_STANDING     = 4,
+    ARMY_ANIMATION_WALK_STAND            = 5,
+    ARMY_ANIMATION_WALK_SOURCE_COUNT     = 6,
     ARMY_ANIMATION_WALK                  = 6,
     ARMY_ANIMATION_STAND                 = 7,
     ARMY_ANIMATION_STANDING_FIRST        = 8,
@@ -67,6 +74,7 @@ H2_ENUM_BEGIN(ArmyCombatConstant)
 H2_ENUM_END(ArmyCombatConstant)
 
 H2_ENUM_CLASS_BEGIN(ArmySpellInfluence)
+    ARMY_SPELL_INFLUENCE_NONE          = -1,
     ARMY_SPELL_INFLUENCE_HASTE         = 0,
     ARMY_SPELL_INFLUENCE_SLOW          = 1,
     ARMY_SPELL_INFLUENCE_BLIND         = 2,
@@ -126,16 +134,6 @@ H2_ENUM_BEGIN(ArmyFrameConstant)
     ARMY_QUANTITY_SIDE_COUNT      = 2
 H2_ENUM_END(ArmyFrameConstant)
 
-H2_ENUM_CLASS_BEGIN(ArmyWalkSegment)
-    ARMY_WALK_SEGMENT_BEGIN          = 0,
-    ARMY_WALK_SEGMENT_BEGIN_STANDING = 1,
-    ARMY_WALK_SEGMENT_MIDDLE         = 2,
-    ARMY_WALK_SEGMENT_END            = 3,
-    ARMY_WALK_SEGMENT_END_STANDING   = 4,
-    ARMY_WALK_SEGMENT_STAND          = 5,
-    ARMY_WALK_SEGMENT_COUNT          = 6
-H2_ENUM_CLASS_END(ArmyWalkSegment)
-
 #pragma pack(push, 1)
 struct SMonFrameInfo {
     struct MissileOffset {
@@ -145,7 +143,7 @@ struct SMonFrameInfo {
     char unknown00;
     i16 spellEffectX;
     i16 spellEffectY;
-    i8 animationXOffsets[IDX(ARMY_WALK_SEGMENT_COUNT)][ARMY_ANIMATION_FRAME_COUNT];
+    i8 animationXOffsets[IDX(ARMY_ANIMATION_WALK_SOURCE_COUNT)][ARMY_ANIMATION_FRAME_COUNT];
     i8 walkXOffsets[ARMY_ANIMATION_FRAME_COUNT];
     i8 standingAnimationCount;
     float standingAnimationChances[ARMY_STANDING_CHANCE_COUNT];

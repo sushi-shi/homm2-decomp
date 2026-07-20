@@ -6,25 +6,6 @@
 
 struct tag_message;
 
-H2_ENUM_CLASS_BEGIN(CombatSpellInfluence)
-    SPELL_INFLUENCE_HASTE         = 0,
-    SPELL_INFLUENCE_SLOW          = 1,
-    SPELL_INFLUENCE_BLIND         = 2,
-    SPELL_INFLUENCE_BLESS         = 3,
-    SPELL_INFLUENCE_CURSE         = 4,
-    SPELL_INFLUENCE_BERSERKER     = 5,
-    SPELL_INFLUENCE_PARALYZE      = 6,
-    SPELL_INFLUENCE_HYPNOTIZE     = 7,
-    SPELL_INFLUENCE_DRAGON_SLAYER = 8,
-    SPELL_INFLUENCE_BLOOD_LUST    = 9,
-    SPELL_INFLUENCE_SHIELD        = 10,
-    SPELL_INFLUENCE_MIRROR_IMAGE  = 11,
-    SPELL_INFLUENCE_ANTI_MAGIC    = 12,
-    SPELL_INFLUENCE_STONE_SKIN    = 13,
-    SPELL_INFLUENCE_STEEL_SKIN    = 14,
-    SPELL_INFLUENCE_COUNT         = 15
-H2_ENUM_CLASS_END(CombatSpellInfluence)
-
 H2_ENUM_CLASS_BEGIN(BoltColorMode)
     BOLT_COLOR_RED_TABLE       = 257,
     BOLT_COLOR_RAINBOW_FORWARD = 300,
@@ -83,7 +64,6 @@ H2_ENUM_BEGIN(SpellCastConstant)
     SPELL_STORM_TILE_SIZE                          = 54,
     SPELL_STORM_FRAME_COLUMN_STEP                  = 3,
     SPELL_ARMAGEDDON_PALETTE_COLOR_COUNT           = 256,
-    SPELL_ARMAGEDDON_PALETTE_CHANNEL_COUNT         = 3,
     SPELL_ARMAGEDDON_PALETTE_SIZE                  = 0x300,
     SPELL_ARMAGEDDON_BRIGHTEN_PASS_COUNT           = 16,
     SPELL_ARMAGEDDON_SHAKE_PASS_COUNT              = 4,
@@ -156,7 +136,6 @@ H2_ENUM_BEGIN(SpellCastConstant)
     RIPPLE_SKIP_DISTANCE_4                         = 3,
     MIRROR_SEARCH_MAX_DISTANCE                     = 9,
     MIRROR_SLIDE_FRAME_COUNT                       = 16,
-    MIRROR_ARMY_FLAG                               = 0x100,
     ELEMENTAL_SUMMON_QUANTITY_PER_POWER            = 3,
     LUCK_MIN_TARGET_Y                              = 75,
     LUCK_TARGET_FRAME_INDEX                        = 0,
