@@ -3589,7 +3589,7 @@ void game::ViewArmy(
                 && (castle->m_buildings
                     & (1 << (loopIndex0 + VIEW_ARMY_DWELLING_UPGRADE_OFFSET)))) {
                 gbAllowUpgrade = true;
-                iViewArmyUpgradeToType = static_cast<CreatureType>(IDX(monsterType) + 1);
+                iViewArmyUpgradeToType = NextCreatureType(monsterType);
             }
         }
         if ((monsterType == CREATURE_GREEN_DRAGON || monsterType == CREATURE_RED_DRAGON)
