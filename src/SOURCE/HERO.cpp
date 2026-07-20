@@ -643,7 +643,7 @@ void hero::Deallocate(i32 updateMap) {
         gpGame->SetRandomHeroArmies(m_id, RANDOM_HERO_NORMAL_ARMY);
 
     if (gbInCampaign && m_portrait == IDX(CAMPAIGN_HERO_CORLAGON)
-        && gpGame->m_campaignType == IDX(CAMPAIGN_ROLAND)
+        && gpGame->m_campaignType == CAMPAIGN_ROLAND
         && gpGame->m_campaignScenario + 1 == CAMPAIGN_ROLAND_FINAL_SCENARIO && !gbRetreatWin
         && !gbCombatSurrender) {
         gpGame->m_campaignAwards[IDX(CAMPAIGN_AWARD_CORLAGON_DEFEATED)] = 1;

@@ -75,8 +75,8 @@ H2_ENUM_END(GameStateStorageConstant)
 class game {
 public:
     i16 m_difficultyRating;
-    u8 m_campaignType;
-    u8 m_campaignStartingSide;
+    H2_ENUM_STORAGE(CampaignSide, u8) m_campaignType;
+    H2_ENUM_STORAGE(CampaignSide, u8) m_campaignStartingSide;
     i8 m_campaignScenario;
     u8 m_campaignScenarioCompleted[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
     i16 m_campaignScenarioBonus[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
@@ -173,10 +173,10 @@ public:
     i32 SetupGame(void);
     i32 PickLoadGame(void);
     i32 HandleCampaignWin(void);
-    void PlayPreScenarioSmacker(i32, i32);
+    void PlayPreScenarioSmacker(H2_ENUM_PARAM(CampaignSide, i32), i32);
     void ShowCampaignInfo(i32, i32);
     void CampaignInfoUpdate(i32);
-    void InitEntireCampaign(i32);
+    void InitEntireCampaign(H2_ENUM_PARAM(CampaignSide, i32));
     void InitCampaignMap(void);
     i32 MineTypesOwned(i32, MineType);
     i32 SetupPuzzlePieces(i32, i32);
@@ -319,7 +319,7 @@ extern i32 iLastDynamicTop;
 extern i32 iOverviewItems;
 extern i32 giOverviewItems[IDX(OVERVIEW_TYPE_COUNT)];
 extern class textWidget* textWidgetTitle[OVERVIEW_VISIBLE_ROWS];
-extern i32 iCurViewSide;
+extern H2_ENUM_STORAGE(CampaignSide, i32) iCurViewSide;
 extern i32 iCampaignTrackType;
 extern i32 bCampaignViewOnly;
 extern i32 iCurViewMap;

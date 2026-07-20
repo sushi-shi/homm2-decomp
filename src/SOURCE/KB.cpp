@@ -90,8 +90,6 @@ H2_ENUM_BEGIN(CheckEndGameConstants)
 H2_ENUM_END(CheckEndGameConstants)
 
 H2_ENUM_CLASS_BEGIN(CheckEndGameCampaignConstants)
-    END_GAME_ROLAND_CAMPAIGN         = 0,
-    END_GAME_ARCHIBALD_CAMPAIGN      = 1,
     END_GAME_SCENARIO_OFFSET         = 1,
     END_GAME_DWARF_SCENARIO          = 3,
     END_GAME_SIDE_SCENARIO           = 7,
@@ -709,7 +707,9 @@ i32 oldmain(void) {
                 switch (giSetupGameType) {
                     case OLD_MAIN_SETUP_NEW:
                         if (gbInCampaign) {
-                            gpGame->InitEntireCampaign(gbCampaignSideChoice);
+                            gpGame->InitEntireCampaign(
+                                static_cast<CampaignSide>(gbCampaignSideChoice)
+                            );
                             result_i = gpGame->HandleCampaignWin();
                             if (result_i) {
                                 gpGame->InitCampaignMap();
@@ -965,11 +965,11 @@ i32 oldmain(void) {
         } else if (gbInCampaign) {
             result_i = gpGame->HandleCampaignWin();
             if ((gpGame->m_campaignScenario == OLD_MAIN_ARCHIBALD_FINAL_SCENARIO
-                 && gpGame->m_campaignScenarioCompleted[gpGame->m_campaignType]
+                 && gpGame->m_campaignScenarioCompleted[IDX(gpGame->m_campaignType)]
                                                        [OLD_MAIN_ARCHIBALD_FINAL_SCENARIO])
                 || (gpGame->m_campaignScenario == OLD_MAIN_ROLAND_FINAL_SCENARIO
-                    && gpGame->m_campaignType == OLD_MAIN_ROLAND_CAMPAIGN
-                    && gpGame->m_campaignScenarioCompleted[OLD_MAIN_ROLAND_CAMPAIGN]
+                    && gpGame->m_campaignType == CAMPAIGN_ROLAND
+                    && gpGame->m_campaignScenarioCompleted[IDX(CAMPAIGN_ROLAND)]
                                                           [OLD_MAIN_ROLAND_FINAL_SCENARIO])) {
                 gbShowHighScore = true;
                 ShowCongrats(HIGH_SCORE_CAMPAIGN);
@@ -978,7 +978,9 @@ i32 oldmain(void) {
                     gpGame->m_campaignScore,
                     0,
                     HIGH_SCORE_CAMPAIGN,
-                    const_cast<char*>(gpGame->m_campaignType ? "Archibald" : "Roland")
+                    const_cast<char*>(
+                        gpGame->m_campaignType == CAMPAIGN_ARCHIBALD ? "Archibald" : "Roland"
+                    )
                 );
             }
             if (result_i) {
@@ -2212,7 +2214,7 @@ void CheckEndGame(
     allowNormalVictory = 1;
     if ((gpGame->m_mapHeader.victoryCondition != MAP_VICTORY_DEFEAT_ALL
          && !gpGame->m_mapHeader.allowNormalVictory)
-        || (gbInCampaign && gpGame->m_campaignType == IDX(END_GAME_ARCHIBALD_CAMPAIGN)
+        || (gbInCampaign && gpGame->m_campaignType == CAMPAIGN_ARCHIBALD
             && gpGame->m_campaignScenario + IDX(END_GAME_SCENARIO_OFFSET)
                    == IDX(END_GAME_SIDE_SCENARIO))) {
         allowNormalVictory = 0;
@@ -2220,7 +2222,7 @@ void CheckEndGame(
 
     if (gpGame->m_mapHeader.victoryCondition == MAP_VICTORY_DEFEAT_SIDE
         && gpGame->m_mapHeader.victoryConditionValue != IDX(END_GAME_SIDE_SPECIAL_VALUE)
-        && (!gbInCampaign || gpGame->m_campaignType != IDX(END_GAME_ARCHIBALD_CAMPAIGN)
+        && (!gbInCampaign || gpGame->m_campaignType != CAMPAIGN_ARCHIBALD
             || gpGame->m_campaignScenario + IDX(END_GAME_SCENARIO_OFFSET)
                    != IDX(END_GAME_SIDE_SCENARIO))) {
         sideBelow_i = 0;
@@ -2455,7 +2457,7 @@ void CheckEndGame(
         }
     }
 
-    if (gbInCampaign && gpGame->m_campaignType == IDX(END_GAME_ROLAND_CAMPAIGN)
+    if (gbInCampaign && gpGame->m_campaignType == CAMPAIGN_ROLAND
         && gpGame->m_campaignScenario + IDX(END_GAME_SCENARIO_OFFSET)
                == IDX(END_GAME_DWARF_SCENARIO)) {
         hasDwarfTown = 0;
@@ -2479,7 +2481,7 @@ void CheckEndGame(
         }
     }
 
-    if (gbInCampaign && gpGame->m_campaignType == IDX(END_GAME_ARCHIBALD_CAMPAIGN)
+    if (gbInCampaign && gpGame->m_campaignType == CAMPAIGN_ARCHIBALD
         && gpGame->m_campaignScenario + IDX(END_GAME_SCENARIO_OFFSET)
                == IDX(END_GAME_SIDE_SCENARIO)
         && dragonCityCaptured) {
@@ -2491,7 +2493,7 @@ void CheckEndGame(
         }
     }
 
-    if (gbInCampaign && gpGame->m_campaignType == IDX(END_GAME_ROLAND_CAMPAIGN)
+    if (gbInCampaign && gpGame->m_campaignType == CAMPAIGN_ROLAND
         && gpGame->m_campaignScenario + IDX(END_GAME_SCENARIO_OFFSET)
                == IDX(END_GAME_ROLAND_CAPTURE_SCENARIO)) {
         hasRoland_j = 0;
@@ -2512,7 +2514,7 @@ void CheckEndGame(
         }
     }
 
-    if (gbInCampaign && gpGame->m_campaignType == IDX(END_GAME_ROLAND_CAMPAIGN)
+    if (gbInCampaign && gpGame->m_campaignType == CAMPAIGN_ROLAND
         && gpGame->m_campaignScenario + IDX(END_GAME_SCENARIO_OFFSET)
                == IDX(END_GAME_ROLAND_CAPTURE_SCENARIO)) {
         enemyRemaining = 0;
@@ -2582,20 +2584,24 @@ void CheckEndGame(
                           + (gpGame->m_month - 1) * IDX(END_GAME_DAYS_PER_MONTH)
                           + gpGame->m_day;
         gpGame->m_campaignScenarioWon = 1;
-        gpGame->m_campaignScenarioCompleted[gpGame->m_campaignType][gpGame->m_campaignScenario] = 1;
-        gpGame->m_campaignScenarioDays[gpGame->m_campaignType][gpGame->m_campaignScenario] =
+        gpGame->m_campaignScenarioCompleted[IDX(gpGame->m_campaignType)]
+                                                   [gpGame->m_campaignScenario] = 1;
+        gpGame->m_campaignScenarioDays[IDX(gpGame->m_campaignType)]
+                                      [gpGame->m_campaignScenario] =
             currentDayIndex;
         gpGame->m_campaignScore =
-            gpGame->m_campaignScenarioDays[gpGame->m_campaignType][gpGame->m_campaignScenario]
-            + gpGame->m_campaignScenarioBonus[gpGame->m_campaignType][gpGame->m_campaignScenario];
+            gpGame->m_campaignScenarioDays[IDX(gpGame->m_campaignType)]
+                                          [gpGame->m_campaignScenario]
+            + gpGame->m_campaignScenarioBonus[IDX(gpGame->m_campaignType)]
+                                             [gpGame->m_campaignScenario];
 
         carryoverHeroId = IDX(END_GAME_NO_PLAYER);
-        if (gpGame->m_campaignType == IDX(END_GAME_ROLAND_CAMPAIGN)
+        if (gpGame->m_campaignType == CAMPAIGN_ROLAND
             && gpGame->m_campaignScenario + IDX(END_GAME_SCENARIO_OFFSET)
                    == IDX(END_GAME_SIDE_SCENARIO)) {
             carryoverHeroId = IDX(END_GAME_SIDE_SPECIAL_VALUE);
         }
-        if (gpGame->m_campaignType == IDX(END_GAME_ARCHIBALD_CAMPAIGN)
+        if (gpGame->m_campaignType == CAMPAIGN_ARCHIBALD
             && gpGame->m_campaignScenario + IDX(END_GAME_SCENARIO_OFFSET)
                    == IDX(END_GAME_FIRST_NO_SAVE_SCENARIO)) {
             carryoverHeroId = IDX(END_GAME_SIDE_SPECIAL_VALUE);
@@ -2634,12 +2640,12 @@ void CheckEndGame(
                 != IDX(END_GAME_LAST_SCENARIO)
             && (gpGame->m_campaignScenario + IDX(END_GAME_SCENARIO_OFFSET)
                     != IDX(END_GAME_FIRST_NO_SAVE_SCENARIO)
-                || gpGame->m_campaignType != IDX(END_GAME_ROLAND_CAMPAIGN))) {
+                || gpGame->m_campaignType != CAMPAIGN_ROLAND)) {
             sprintf(
                 campaignSaveName,
                 "%s%c_%02d",
                 "WIN_",
-                gpGame->m_campaignType == IDX(END_GAME_ROLAND_CAMPAIGN) ? 'G' : 'E',
+                gpGame->m_campaignType == CAMPAIGN_ROLAND ? 'G' : 'E',
                 gpGame->m_campaignScenario + 1
             );
             gpGame->SaveGame(campaignSaveName, 1, 0);
