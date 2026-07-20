@@ -18,10 +18,6 @@
 #include <SOURCE/kbwin.h>
 #include <SOURCE/REQUEST.h>
 
-H2_ENUM_CLASS_BEGIN(FileRequesterKey)
-    REQUESTER_KEY_CYCLE_FILTER = 0x40
-H2_ENUM_CLASS_END(FileRequesterKey)
-
 H2_ENUM_CLASS_BEGIN(FileRequesterHelpIndex)
     REQUESTER_HELP_NONE          = -1,
     REQUESTER_HELP_FILTER_SMALL  = 0,
@@ -484,7 +480,7 @@ i32 fileRequester::Main(struct tag_message& message) {
     switch (message.type) {
         case MESSAGE_KEY_DOWN:
             switch (message.payload.keyboard.keyCode) {
-                case IDX(REQUESTER_KEY_CYCLE_FILTER): {
+                case INPUT_SCAN_F6: {
                     if (m_selectedIndex != FILE_REQUESTER_SELECTION_NONE) {
                         strcpy(cycleNameBuffer, m_fileNames[m_selectedIndex].text);
                     } else {
