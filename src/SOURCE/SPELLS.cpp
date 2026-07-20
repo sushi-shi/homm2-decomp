@@ -196,8 +196,8 @@ i32 combatManager::ViewSpells(i32) {
                 elementalType = CREATURE_WATER_ELEMENTAL;
                 goto check_elemental;
             check_elemental:
-                if (m_summonedCreatureType[m_currentSide] != 0
-                    && m_summonedCreatureType[m_currentSide] != IDX(elementalType)) {
+                if (IDX(m_summonedCreatureType[m_currentSide]) != 0
+                    && m_summonedCreatureType[m_currentSide] != elementalType) {
                     NormalDialog(
                         "You may only summon one type of elemental per combat.",
                         NORMAL_DIALOG_INFO,
@@ -1036,16 +1036,16 @@ void combatManager::CastSpell(
                 MirrorImage(targetHex);
                 break;
             case SPELL_SUMMON_EARTH_ELEMENTAL:
-                SummonElemental(IDX(CREATURE_EARTH_ELEMENTAL), spellPower_i);
+                SummonElemental(CREATURE_EARTH_ELEMENTAL, spellPower_i);
                 break;
             case SPELL_SUMMON_AIR_ELEMENTAL:
-                SummonElemental(IDX(CREATURE_AIR_ELEMENTAL), spellPower_i);
+                SummonElemental(CREATURE_AIR_ELEMENTAL, spellPower_i);
                 break;
             case SPELL_SUMMON_FIRE_ELEMENTAL:
-                SummonElemental(IDX(CREATURE_FIRE_ELEMENTAL), spellPower_i);
+                SummonElemental(CREATURE_FIRE_ELEMENTAL, spellPower_i);
                 break;
             case SPELL_SUMMON_WATER_ELEMENTAL:
-                SummonElemental(IDX(CREATURE_WATER_ELEMENTAL), spellPower_i);
+                SummonElemental(CREATURE_WATER_ELEMENTAL, spellPower_i);
                 break;
             case SPELL_RESURRECT:
             case SPELL_TRUE_RESURRECT:
@@ -3119,7 +3119,10 @@ mirror_found:
 }
 
 VA(0x00428951, 0x218)
-void combatManager::SummonElemental(i32 monsterType, i32 spellPower) {
+void combatManager::SummonElemental(
+    H2_ENUM_PARAM(CreatureType, i32) monsterType,
+    i32 spellPower
+) {
     u8 summonHexes_l[SUMMON_HEX_STORAGE_COUNT];
     summonHexes_l[ATTACKER_SUMMON_TOP_SLOT] = ATTACKER_SUMMON_HEX_TOP;
     summonHexes_l[ATTACKER_SUMMON_MID_SLOT] = ATTACKER_SUMMON_HEX_MID;
@@ -3143,7 +3146,7 @@ void combatManager::SummonElemental(i32 monsterType, i32 spellPower) {
                                       + ((randomOffset_a | 0) + offset)
                                             % SUMMON_HEXES_PER_SIDE];
     }
-    m_summonedCreatureType[m_currentSide] = static_cast<u8>(monsterType);
+    m_summonedCreatureType[m_currentSide] = monsterType;
     AddArmy(
         m_currentSide,
         monsterType,
