@@ -5242,7 +5242,7 @@ void advManager::HouseEvent(hero* eventHero, mapCell* cell) {
     i32 siteIndex = RECRUIT_ARCHER;
     CreatureType creatureTypes[RECRUIT_SITE_COUNT];
 
-    switch (IDX(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK)) {
+    switch (cell->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
         case MAP_OBJECT_ARCHER_HOUSE:
             siteIndex = RECRUIT_ARCHER;
             break;
