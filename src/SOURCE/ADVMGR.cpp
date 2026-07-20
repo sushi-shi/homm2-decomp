@@ -90,6 +90,18 @@ H2_ENUM_BEGIN(AdventureUpdateScreenConstant)
     UPDATE_FRAME_CYCLE      = 18
 H2_ENUM_END(AdventureUpdateScreenConstant)
 
+H2_ENUM_BEGIN(AdventureAnimationPhaseIndex)
+    ANIMATION_PHASE_COLUMN_0         = 0,
+    ANIMATION_PHASE_COLUMN_1         = 1,
+    ANIMATION_PHASE_COLUMN_2         = 2,
+    ANIMATION_PHASE_COLUMN_3         = 3,
+    ANIMATION_PHASE_COLUMN_MASK      = ADVMGR_ANIMATION_PHASE_COUNT - 1,
+    ANIMATION_PHASE_COLUMN_0_INITIAL = 0,
+    ANIMATION_PHASE_COLUMN_1_INITIAL = 4,
+    ANIMATION_PHASE_COLUMN_2_INITIAL = 11,
+    ANIMATION_PHASE_COLUMN_3_INITIAL = 13
+H2_ENUM_END(AdventureAnimationPhaseIndex)
+
 H2_ENUM_BEGIN(AdventureSourceLineConstant)
     CLOSE_BORDER_FREE_LINE_BASE         = 0x0124,
     BORDER_INITIAL_FREE_LINE_OFFSET     = 22,
@@ -203,15 +215,18 @@ H2_ENUM_END(AdventureFrameConstant)
 H2_ENUM_BEGIN(AdventureStateConstant)
     INVALID_HERO               = -1,
     LOOPING_SOUND_LIMIT        = 4,
-    OBJECT_ICON_COUNT          = 64,
-    HERO_ICON_COUNT            = 8,
-    PLAYER_COLOR_COUNT         = GAME_PLAYER_COUNT,
-    LOOPING_SAMPLE_COUNT       = 28,
-    CURSOR_SAMPLE_COUNT        = 9,
-    SOUND_CELL_COUNT           = 4,
+    OBJECT_ICON_COUNT          = ADVMGR_OBJECT_ICON_COUNT,
+    HERO_ICON_COUNT            = ADVMGR_HERO_ICON_COUNT,
+    LOOPING_SAMPLE_COUNT       = IDX(ADVMGR_ENVIRONMENT_SOUND_COUNT),
+    CURSOR_SAMPLE_COUNT        = ADVMGR_CURSOR_SAMPLE_COUNT,
+    SOUND_CELL_COUNT           = ADVMGR_ACTIVE_SOUND_COUNT,
     HIGH_MEMORY_BUFFER_DIVISOR = 100,
     CURSOR_SAMPLE_VOLUME       = 64,
     CURSOR_SAMPLE_CHANNEL      = 2,
+    CURSOR_SAMPLE_FAST_SET     = 2,
+    HERO_ICON_FROTH            = IDX(HERO_TYPE_BOAT) + 1,
+    ADVENTURE_FADE_STEPS       = 8,
+    FORCED_MUSIC_DELAY         = 6000,
     QUICK_VIEW_NONE            = -99,
     UNUSED_OBJECT_ICON_1       = 21,
     UNUSED_OBJECT_ICON_2       = 38
@@ -799,10 +814,10 @@ advManager::advManager(void) {
     bShowIt = 1;
     m_lastQuickViewX = QUICK_VIEW_NONE;
     m_lastQuickViewY = QUICK_VIEW_NONE;
-    m_viewBounds[0] = 0;
-    m_viewBounds[1] = 4;
-    m_viewBounds[2] = 11;
-    m_viewBounds[3] = 13;
+    m_animationPhases[ANIMATION_PHASE_COLUMN_0] = ANIMATION_PHASE_COLUMN_0_INITIAL;
+    m_animationPhases[ANIMATION_PHASE_COLUMN_1] = ANIMATION_PHASE_COLUMN_1_INITIAL;
+    m_animationPhases[ANIMATION_PHASE_COLUMN_2] = ANIMATION_PHASE_COLUMN_2_INITIAL;
+    m_animationPhases[ANIMATION_PHASE_COLUMN_3] = ANIMATION_PHASE_COLUMN_3_INITIAL;
     m_mapData = gpGame->GetWorldMapData();
     gMapX = 0;
     gMapY = 0;
@@ -819,7 +834,7 @@ i32 advManager::Open(i32 id) {
     m_adventureBorder = NULL;
 
     i32 resourceIndex;
-    for (resourceIndex = 0; resourceIndex < 12; ++resourceIndex) {
+    for (resourceIndex = 0; resourceIndex < ADVMGR_LOCATOR_STATE_COUNT; ++resourceIndex) {
         m_heroLocatorState[resourceIndex] = 0;
         m_townLocatorState[resourceIndex] = 0;
     }
@@ -835,7 +850,7 @@ i32 advManager::Open(i32 id) {
             SCROLL_WIDTH,
             SCROLL_HEIGHT,
             "scroll.icn",
-            4,
+            WIDGET_FLAG_DRAW,
             0,
             SCROLL_LEFT_FRAME,
             SCROLL_HOTKEY,
@@ -851,7 +866,7 @@ i32 advManager::Open(i32 id) {
             SCROLL_WIDTH,
             SCROLL_HEIGHT,
             "scroll.icn",
-            4,
+            WIDGET_FLAG_DRAW,
             0,
             SCROLL_RIGHT_FRAME,
             SCROLL_HOTKEY,
@@ -899,29 +914,29 @@ i32 advManager::Open(i32 id) {
         }
     }
 
-    if (m_heroIcons[0] == NULL) {
-        m_heroIcons[0] = gpResourceManager->GetIcon("kngt32.icn");
+    if (m_heroIcons[IDX(FACTION_KNIGHT)] == NULL) {
+        m_heroIcons[IDX(FACTION_KNIGHT)] = gpResourceManager->GetIcon("kngt32.icn");
     }
-    if (m_heroIcons[1] == NULL) {
-        m_heroIcons[1] = gpResourceManager->GetIcon("barb32.icn");
+    if (m_heroIcons[IDX(FACTION_BARBARIAN)] == NULL) {
+        m_heroIcons[IDX(FACTION_BARBARIAN)] = gpResourceManager->GetIcon("barb32.icn");
     }
-    if (m_heroIcons[2] == NULL) {
-        m_heroIcons[2] = gpResourceManager->GetIcon("sorc32.icn");
+    if (m_heroIcons[IDX(FACTION_SORCERESS)] == NULL) {
+        m_heroIcons[IDX(FACTION_SORCERESS)] = gpResourceManager->GetIcon("sorc32.icn");
     }
-    if (m_heroIcons[3] == NULL) {
-        m_heroIcons[3] = gpResourceManager->GetIcon("wrlk32.icn");
+    if (m_heroIcons[IDX(FACTION_WARLOCK)] == NULL) {
+        m_heroIcons[IDX(FACTION_WARLOCK)] = gpResourceManager->GetIcon("wrlk32.icn");
     }
-    if (m_heroIcons[4] == NULL) {
-        m_heroIcons[4] = gpResourceManager->GetIcon("wzrd32.icn");
+    if (m_heroIcons[IDX(FACTION_WIZARD)] == NULL) {
+        m_heroIcons[IDX(FACTION_WIZARD)] = gpResourceManager->GetIcon("wzrd32.icn");
     }
-    if (m_heroIcons[5] == NULL) {
-        m_heroIcons[5] = gpResourceManager->GetIcon("necr32.icn");
+    if (m_heroIcons[IDX(FACTION_NECROMANCER)] == NULL) {
+        m_heroIcons[IDX(FACTION_NECROMANCER)] = gpResourceManager->GetIcon("necr32.icn");
     }
-    if (m_heroIcons[6] == NULL) {
-        m_heroIcons[6] = gpResourceManager->GetIcon("boat32.icn");
+    if (m_heroIcons[IDX(HERO_TYPE_BOAT)] == NULL) {
+        m_heroIcons[IDX(HERO_TYPE_BOAT)] = gpResourceManager->GetIcon("boat32.icn");
     }
-    if (m_heroIcons[7] == NULL) {
-        m_heroIcons[7] = gpResourceManager->GetIcon("froth.icn");
+    if (m_heroIcons[HERO_ICON_FROTH] == NULL) {
+        m_heroIcons[HERO_ICON_FROTH] = gpResourceManager->GetIcon("froth.icn");
     }
 
     gbLoadingMonoIcon = true;
@@ -933,41 +948,41 @@ i32 advManager::Open(i32 id) {
     }
     gbLoadingMonoIcon = false;
 
-    if (m_flagIcons[0] == NULL) {
-        m_flagIcons[0] = gpResourceManager->GetIcon("b-flag32.icn");
+    if (m_flagIcons[PLAYER_COLOR_BLUE] == NULL) {
+        m_flagIcons[PLAYER_COLOR_BLUE] = gpResourceManager->GetIcon("b-flag32.icn");
     }
-    if (m_flagIcons[1] == NULL) {
-        m_flagIcons[1] = gpResourceManager->GetIcon("g-flag32.icn");
+    if (m_flagIcons[PLAYER_COLOR_GREEN] == NULL) {
+        m_flagIcons[PLAYER_COLOR_GREEN] = gpResourceManager->GetIcon("g-flag32.icn");
     }
-    if (m_flagIcons[2] == NULL) {
-        m_flagIcons[2] = gpResourceManager->GetIcon("r-flag32.icn");
+    if (m_flagIcons[PLAYER_COLOR_RED] == NULL) {
+        m_flagIcons[PLAYER_COLOR_RED] = gpResourceManager->GetIcon("r-flag32.icn");
     }
-    if (m_flagIcons[3] == NULL) {
-        m_flagIcons[3] = gpResourceManager->GetIcon("y-flag32.icn");
+    if (m_flagIcons[PLAYER_COLOR_YELLOW] == NULL) {
+        m_flagIcons[PLAYER_COLOR_YELLOW] = gpResourceManager->GetIcon("y-flag32.icn");
     }
-    if (m_flagIcons[4] == NULL) {
-        m_flagIcons[4] = gpResourceManager->GetIcon("o-flag32.icn");
+    if (m_flagIcons[PLAYER_COLOR_ORANGE] == NULL) {
+        m_flagIcons[PLAYER_COLOR_ORANGE] = gpResourceManager->GetIcon("o-flag32.icn");
     }
-    if (m_flagIcons[5] == NULL) {
-        m_flagIcons[5] = gpResourceManager->GetIcon("p-flag32.icn");
+    if (m_flagIcons[PLAYER_COLOR_PURPLE] == NULL) {
+        m_flagIcons[PLAYER_COLOR_PURPLE] = gpResourceManager->GetIcon("p-flag32.icn");
     }
-    if (m_boatFlagIcons[0] == NULL) {
-        m_boatFlagIcons[0] = gpResourceManager->GetIcon("b-bflg32.icn");
+    if (m_boatFlagIcons[PLAYER_COLOR_BLUE] == NULL) {
+        m_boatFlagIcons[PLAYER_COLOR_BLUE] = gpResourceManager->GetIcon("b-bflg32.icn");
     }
-    if (m_boatFlagIcons[1] == NULL) {
-        m_boatFlagIcons[1] = gpResourceManager->GetIcon("g-bflg32.icn");
+    if (m_boatFlagIcons[PLAYER_COLOR_GREEN] == NULL) {
+        m_boatFlagIcons[PLAYER_COLOR_GREEN] = gpResourceManager->GetIcon("g-bflg32.icn");
     }
-    if (m_boatFlagIcons[2] == NULL) {
-        m_boatFlagIcons[2] = gpResourceManager->GetIcon("r-bflg32.icn");
+    if (m_boatFlagIcons[PLAYER_COLOR_RED] == NULL) {
+        m_boatFlagIcons[PLAYER_COLOR_RED] = gpResourceManager->GetIcon("r-bflg32.icn");
     }
-    if (m_boatFlagIcons[3] == NULL) {
-        m_boatFlagIcons[3] = gpResourceManager->GetIcon("y-bflg32.icn");
+    if (m_boatFlagIcons[PLAYER_COLOR_YELLOW] == NULL) {
+        m_boatFlagIcons[PLAYER_COLOR_YELLOW] = gpResourceManager->GetIcon("y-bflg32.icn");
     }
-    if (m_boatFlagIcons[4] == NULL) {
-        m_boatFlagIcons[4] = gpResourceManager->GetIcon("o-bflg32.icn");
+    if (m_boatFlagIcons[PLAYER_COLOR_ORANGE] == NULL) {
+        m_boatFlagIcons[PLAYER_COLOR_ORANGE] = gpResourceManager->GetIcon("o-bflg32.icn");
     }
-    if (m_boatFlagIcons[5] == NULL) {
-        m_boatFlagIcons[5] = gpResourceManager->GetIcon("p-bflg32.icn");
+    if (m_boatFlagIcons[PLAYER_COLOR_PURPLE] == NULL) {
+        m_boatFlagIcons[PLAYER_COLOR_PURPLE] = gpResourceManager->GetIcon("p-bflg32.icn");
     }
 
     gbLoadingMonoIcon = true;
@@ -1015,7 +1030,7 @@ i32 advManager::Open(i32 id) {
     }
     KBChangeMenu(hmnuAdv);
     ForceNewHover();
-    gpWindowManager->FadeScreen(FADE_IN, 8, gPalette);
+    gpWindowManager->FadeScreen(FADE_IN, ADVENTURE_FADE_STEPS, gPalette);
     giBottomViewOverride = 0;
     gConfig.soundVolume = oldSampleVolumeState;
     gpSoundManager->AdjustSoundVolumes();
@@ -1028,7 +1043,7 @@ i32 advManager::Open(i32 id) {
 
 VA(0x00457028, 0x40a)
 void advManager::Close(void) {
-    DATA(0x004f59a8) static i16 s_closeBorderFreeLineBase = 292;
+    DATA(0x004f59a8) static i16 s_closeBorderFreeLineBase = CLOSE_BORDER_FREE_LINE_BASE;
 
     ClearBottomView();
     gpMouseManager->SetPointer(-1);
@@ -1102,9 +1117,12 @@ void advManager::Close(void) {
 VA(0x00457432, 0xe9)
 void advManager::GetCursorSampleSet(i32 sampleSet) {
     if (sampleSet >= 1) {
-        sampleSet = 2;
+        sampleSet = CURSOR_SAMPLE_FAST_SET;
     }
+    // Ordered filename suffixes select the retail walking-sound variants.
+    // NOLINTBEGIN(readability-magic-numbers)
     i32 sampleSuffix[CURSOR_SAMPLE_COUNT] = {0, 3, 5, 3, 4, 5, 6, 3, 3};
+    // NOLINTEND(readability-magic-numbers)
     for (i32 index = 0; index < CURSOR_SAMPLE_COUNT; ++index) {
         sprintf(gText, "wsnd%1d%1d.82M", sampleSet, sampleSuffix[index]);
         m_cursorSamples[index] = gpResourceManager->GetSample(gText);
@@ -1153,7 +1171,7 @@ class mapCell* advManager::DoAdvCommand(void) {
                 currentHeroState->m_y,
                 currentHeroState->m_destinationX,
                 currentHeroState->m_destinationY,
-                59999
+                ROUTE_PATH_COST_LIMIT
             );
             if (gpSearchArray->m_pathLength > 0) {
                 oldVisibilityStateLocal = m_visibilityMapValid;
@@ -1259,10 +1277,14 @@ class mapCell* advManager::DoAdvCommand(void) {
             TrimLoopingSounds(0);
             HeroView(gpCurPlayer->CurrentHero(), 0, 0);
             if (gbLowMemory) {
-                SetEnvironmentOrigin(m_mapOriginX + 7, m_mapOriginY + 7, 1);
+                SetEnvironmentOrigin(
+                    m_mapOriginX + VIEW_CENTER_OFFSET,
+                    m_mapOriginY + VIEW_CENTER_OFFSET,
+                    1
+                );
             }
             RedrawAdvScreen(1, 0);
-            gpWindowManager->FadeScreen(FADE_IN, 8, NULL);
+            gpWindowManager->FadeScreen(FADE_IN, ADVENTURE_FADE_STEPS, NULL);
             break;
 
         case ADVMGR_COMMAND_SELECT_HERO:
@@ -1358,12 +1380,16 @@ i32 advManager::Main(struct tag_message& message) {
         CheckScreenScroll();
     }
     if (!gbNoSound && gConfig.musicVolume && giForceSwitchMusic > 0
-        && KBTickCount() - giForceSwitchMusic > 6000) {
+        && KBTickCount() - giForceSwitchMusic > FORCED_MUSIC_DELAY) {
         giForceSwitchMusic = -1;
-        if (gpSoundManager->m_currentTrack == 21) {
+        if (gpSoundManager->m_currentTrack == WAIT_AMBIENT_MUSIC) {
             gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[m_currentTerrain]);
         }
-        SetEnvironmentOrigin(m_mapOriginX + 7, m_mapOriginY + 7, 1);
+        SetEnvironmentOrigin(
+            m_mapOriginX + VIEW_CENTER_OFFSET,
+            m_mapOriginY + VIEW_CENTER_OFFSET,
+            1
+        );
     }
 
     i32 processResult = 1;
@@ -2716,15 +2742,15 @@ void advManager::UpdateScreen(i32, i32 forceUpdate) {
         glTimers[0] = KBTickCount() + TIMER_DELAY;
 
         if (m_updateMaxX == 1 || m_updateMaxX == 3 || m_updateMaxX == 5) {
-            ++m_viewBounds[1];
-            m_viewBounds[1] %= UPDATE_FRAME_CYCLE;
-            ++m_viewBounds[3];
-            m_viewBounds[3] %= UPDATE_FRAME_CYCLE;
+            ++m_animationPhases[ANIMATION_PHASE_COLUMN_1];
+            m_animationPhases[ANIMATION_PHASE_COLUMN_1] %= UPDATE_FRAME_CYCLE;
+            ++m_animationPhases[ANIMATION_PHASE_COLUMN_3];
+            m_animationPhases[ANIMATION_PHASE_COLUMN_3] %= UPDATE_FRAME_CYCLE;
         } else {
-            ++m_viewBounds[0];
-            m_viewBounds[0] %= UPDATE_FRAME_CYCLE;
-            ++m_viewBounds[2];
-            m_viewBounds[2] %= UPDATE_FRAME_CYCLE;
+            ++m_animationPhases[ANIMATION_PHASE_COLUMN_0];
+            m_animationPhases[ANIMATION_PHASE_COLUMN_0] %= UPDATE_FRAME_CYCLE;
+            ++m_animationPhases[ANIMATION_PHASE_COLUMN_2];
+            m_animationPhases[ANIMATION_PHASE_COLUMN_2] %= UPDATE_FRAME_CYCLE;
         }
     }
     giLimitUpdMinX = UPDATE_NONE;
@@ -3501,9 +3527,12 @@ void advManager::DrawCell(
                             );
                             if (s_drawCell->m_objectIndex == 59
                                 || s_drawCell->m_objectIndex == 60) {
-                                s_drawMonsterFrame = m_viewBounds[mapX & 3] % 6;
+                                s_drawMonsterFrame =
+                                    m_animationPhases[mapX & ANIMATION_PHASE_COLUMN_MASK]
+                                    % UPDATE_ANIMATION_PHASES;
                             } else {
-                                s_drawMonsterFrame = monAnimDrawFrame[m_viewBounds[mapX & 3]];
+                                s_drawMonsterFrame = monAnimDrawFrame
+                                    [m_animationPhases[mapX & ANIMATION_PHASE_COLUMN_MASK]];
                             }
                             IconToBitmap(
                                 m_objectIcons[TILESET_MONSTER],
