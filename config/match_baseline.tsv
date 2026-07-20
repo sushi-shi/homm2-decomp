@@ -212,7 +212,7 @@ BASE/Misc	?BitmapToScreen@@YIXPAVbitmap@@@Z	100.0000	dd72828a17e3
 BASE/Misc	?BlitBitmapToScreen@@YIXPAVbitmap@@HHHHHH@Z	98.7333	9f6ec1136f50
 BASE/Misc	?BlitBitmapToScreenNoMouseCheck@@YIXPAVbitmap@@HHHHHH@Z	100.0000	5f71e69e1a5b
 BASE/Misc	?CreatePCXFile@@YIXPADPAEHH1@Z	98.1757	dc26ba4959c7
-BASE/Misc	?DataEntryWindowHandler@@YIHAAUtag_message@@@Z	98.8889	3aee7c68a0dd
+BASE/Misc	?DataEntryWindowHandler@@YIHAAUtag_message@@@Z	98.8889	b4d0d68b454d
 BASE/Misc	?FadeIn@@YIXH@Z	97.4074	b9092401a5d8
 BASE/Misc	?FadeOut@@YIXH@Z	100.0000	68186f6c0fe5
 BASE/Misc	?FadeTo@@YIXPAE0H@Z	96.0260	1b9aabbee112
@@ -222,7 +222,7 @@ BASE/Misc	?FindIndex@@YIHPAUindexArray@@HHH@Z	98.3333	eab5d9a90dbb
 BASE/Misc	?FindLastToken@@YIPADPADD@Z	100.0000	f58301bc96e4
 BASE/Misc	?FindStringInString@@YIPADPAD0@Z	98.2000	fc35ef3ab6a6
 BASE/Misc	?FindToken@@YIPADPADD@Z	99.6552	8628e536dfbc
-BASE/Misc	?GetDataEntry@@YIXPAD0H0HH@Z	99.1020	a089a8b3e185
+BASE/Misc	?GetDataEntry@@YIXPAD0H0HH@Z	99.1020	a1c98244f4de
 BASE/Misc	?GetIconEntry@@YIPAUIconEntry@@PAVicon@@H@Z	100.0000	b037247edc8b
 BASE/Misc	?InitMemEntry@@YIXXZ	100.0000	0a4141774d22
 BASE/Misc	?IsCDDrive@@YIHH@Z	100.0000	af3039a3900c
@@ -364,7 +364,7 @@ BASE/droplist	?DeleteItem@dropListWidget@@QAEXH@Z	100.0000	abe880b8bd31
 BASE/droplist	?Draw@dropListWidget@@UAEXXZ	100.0000	f0402807160c
 BASE/droplist	?DrawDropStuff@dropListWidget@@QAEXXZ	100.0000	ab5b7660aea9
 BASE/droplist	?Main@dropListWidget@@UAEHAAUtag_message@@@Z	100.0000	d99815b504e4
-BASE/droplist	?ProcessSelectDialog@dropListWidget@@QAEXXZ	96.3607	b7aa95eec415
+BASE/droplist	?ProcessSelectDialog@dropListWidget@@QAEXXZ	96.5839	b7aa95eec415
 BASE/droplist	?Read@dropListWidget@@QAEXXZ	90.6721	7ecd3cb00e25
 BASE/droplist	?RestoreDropBackground@dropListWidget@@QAEXXZ	100.0000	a12dd5677fbf
 BASE/droplist	?SaveDropBackground@dropListWidget@@QAEXXZ	100.0000	33440694b7af
@@ -568,7 +568,7 @@ SOURCE/ARMY	?MidY@army@@QAEHXZ	100.0000	265d4afaef62
 SOURCE/ARMY	?ModifyFrameInfo@@YIXPAUSMonFrameInfo@@H@Z	100.0000	9956f21d508a
 SOURCE/ARMY	?MoveAttack@army@@QAEXHH@Z	96.9151	38bad37ce953
 SOURCE/ARMY	?OtherArmyAdjacent@army@@QAEHHH@Z	99.9619	85423beec6b5
-SOURCE/ARMY	?PowEffect@army@@QAEXHHHH@Z	99.5394	db3ad28cc1ff
+SOURCE/ARMY	?PowEffect@army@@QAEXHHHH@Z	99.5849	db3ad28cc1ff
 SOURCE/ARMY	?ProcessDeath@army@@QAEXH@Z	96.2602	5c35fc9a8499
 SOURCE/ARMY	?ResetPath@army@@QAEXXZ	100.0000	e28a4fc537db
 SOURCE/ARMY	?RightX@army@@QAEHXZ	100.0000	6c05f5b649d1
@@ -646,7 +646,7 @@ SOURCE/COMMAND	?CycleCombatScreen@combatManager@@QAEXXZ	97.7901	c3085d647e6b
 SOURCE/COMMAND	?DoCommand@combatManager@@QAEXH@Z	99.9808	ae28fc6bd165
 SOURCE/COMMAND	?DoLoseWindow@combatManager@@QAEXXZ	100.0000	4b0422331d15
 SOURCE/COMMAND	?DoSurrender@combatManager@@QAEHXZ	100.0000	abc1f938c310
-SOURCE/COMMAND	?DoVictory@combatManager@@QAEXH@Z	97.3263	b34915807b37
+SOURCE/COMMAND	?DoVictory@combatManager@@QAEXH@Z	97.6347	b34915807b37
 SOURCE/COMMAND	?GetCommand@combatManager@@QAEHH@Z	94.1031	13e8ba6cb193
 SOURCE/COMMAND	?GetControl@combatManager@@QAEXXZ	96.7778	73ab80bd89bb
 SOURCE/COMMAND	?GetPointer@combatManager@@QAEHHH@Z	100.0000	c0dc28a1c42b
@@ -854,7 +854,7 @@ SOURCE/GAME	?SetupTowns@game@@QAEXXZ	99.2266	0d484ebebe59
 SOURCE/GAME	?ShowComputerScreen@game@@QAEXXZ	100.0000	2cd8548ab948
 SOURCE/GAME	?ShowHeroesLogo@game@@QAEXXZ	100.0000	42c0f9145ce3
 SOURCE/GAME	?TownIDToTownPos@game@@QAEHPAVplayerData@@H@Z	100.0000	56c7a1afc85e
-SOURCE/GAME	?TransmitSaveGame@game@@QAEHHHH@Z	95.7011	947291d39e36
+SOURCE/GAME	?TransmitSaveGame@game@@QAEHHHH@Z	95.8301	947291d39e36
 SOURCE/GAME	?TurnOffAIMusic@game@@QAEXXZ	100.0000	20396e6e87b5
 SOURCE/GAME	?TurnOnAIMusic@game@@QAEXXZ	100.0000	e6507acb5725
 SOURCE/GAME	?UpdateSpellWidgets@game@@QAEXXZ	100.0000	bc28146d2809
@@ -971,7 +971,7 @@ SOURCE/KB	?PlayerDead@@YIXH@Z	100.0000	63cf3868fcff
 SOURCE/KB	?PopNetBox@@YIXPADH@Z	82.3827	445960a1bf8f
 SOURCE/KB	?QuickViewWait@@YIXXZ	100.0000	05344363be30
 SOURCE/KB	?ReceiveHostReportsPlayerExit@@YIXHUSPlayerExit@@H@Z	100.0000	e24d775cd49d
-SOURCE/KB	?ReceiveRemotePlayerExit@@YIXUSPlayerExit@@@Z	99.4783	38339e4d1a11
+SOURCE/KB	?ReceiveRemotePlayerExit@@YIXUSPlayerExit@@@Z	100.0000	38339e4d1a11
 SOURCE/KB	?RecruitHeroHandler@@YIHAAUtag_message@@@Z	99.9278	76ece8cb9694
 SOURCE/KB	?SetWinText@@YIXPAVheroWindow@@H@Z	100.0000	3f8195a3806e
 SOURCE/KB	?SetupCDRom@@YIXXZ	100.0000	4e5c50c123c7
@@ -1144,7 +1144,7 @@ SOURCE/RECRUIT	?Update@recruitUnit@@QAEXXZ	99.6706	437e3fe3d116
 SOURCE/REMOTE	?DecodePacket@@YIHPAEH@Z	99.7600	257eb56fc285
 SOURCE/REMOTE	?EncodePacket@@YIHPAEDDH@Z	100.0000	9b4e54bf06e9
 SOURCE/REMOTE	?GetRemoteData@@YIPADC@Z	100.0000	02d31c890141
-SOURCE/REMOTE	?PollRemote@@YIXXZ	91.6744	701d2aba3e4b
+SOURCE/REMOTE	?PollRemote@@YIXXZ	91.9819	701d2aba3e4b
 SOURCE/REMOTE	?ReceiveRemoteData@@YIHPAE0H@Z	100.0000	5886cdd01301
 SOURCE/REMOTE	?RemoteCleanup@@YIXXZ	99.3370	535d961c5bc0
 SOURCE/REMOTE	?RemoteMain@@YIXH@Z	98.3927	367e7da9dabb
@@ -1162,7 +1162,7 @@ SOURCE/REQUEST	?DoKnob@fileRequester@@QAEXXZ	99.9479	eed7e6036559
 SOURCE/REQUEST	?GetFilename@fileRequester@@QAEPADXZ	100.0000	e8670f51b419
 SOURCE/REQUEST	?GetMapHeader@@YIHPADPAUSMapHeader@@@Z	99.6429	c2b479a640bb
 SOURCE/REQUEST	?InitializeFiles@fileRequester@@QAEHPAD0H@Z	94.6110	2340e8d10f97
-SOURCE/REQUEST	?Main@fileRequester@@UAEHAAUtag_message@@@Z	95.0841	64ffa8c0b8b3
+SOURCE/REQUEST	?Main@fileRequester@@UAEHAAUtag_message@@@Z	95.1438	64ffa8c0b8b3
 SOURCE/REQUEST	?MapExistsForFilter@fileRequester@@QAEHH@Z	100.0000	9cb80ef44528
 SOURCE/REQUEST	?Open@fileRequester@@UAEHH@Z	99.9485	142ccd76eb89
 SOURCE/REQUEST	?SetOK@fileRequester@@QAEXH@Z	98.5476	f43273b6795c
@@ -1238,7 +1238,7 @@ SOURCE/SPELLS	?MeteorShower@combatManager@@QAEXH@Z	100.0000	72770f157e39
 SOURCE/SPELLS	?MirrorImage@combatManager@@QAEXH@Z	93.6271	3a463ee8ac8a
 SOURCE/SPELLS	?ModifyDamageForArtifacts@combatManager@@QAEXPAJHPAVhero@@1@Z	100.0000	483384c46f98
 SOURCE/SPELLS	?ResetBoltAngle@combatManager@@QAEXPAUSBolt@@@Z	98.4213	585b3db2d4a1
-SOURCE/SPELLS	?Resurrect@combatManager@@QAEXHHH@Z	91.8940	eb050fea0c23
+SOURCE/SPELLS	?Resurrect@combatManager@@QAEXHHH@Z	98.5585	eb050fea0c23
 SOURCE/SPELLS	?Ripple@combatManager@@QAEXH@Z	100.0000	e8c995ed9287
 SOURCE/SPELLS	?RippleCreature@combatManager@@QAEXHHH@Z	96.3629	7acf3fbec645
 SOURCE/SPELLS	?ShowMassSpell@combatManager@@QAEXQAY0BE@CHH@Z	95.1134	976e7b2922e1
@@ -1292,7 +1292,7 @@ SOURCE/TOWNMGR	?DoCommand@townManager@@QAEXH@Z	99.0521	1daceb8fd9d4
 SOURCE/TOWNMGR	?DoTavern@townManager@@QAEXXZ	100.0000	815fc3df80f1
 SOURCE/TOWNMGR	?Draw@townObject@@QAEXH@Z	100.0000	6e8c01f080f3
 SOURCE/TOWNMGR	?DrawTown@townManager@@QAEXHH@Z	100.0000	62dbd322bc57
-SOURCE/TOWNMGR	?GetCategoryStats@@YIXHQAJQAC@Z	98.1013	34f07f43945e
+SOURCE/TOWNMGR	?GetCategoryStats@@YIXHQAJQAC@Z	99.0400	34f07f43945e
 SOURCE/TOWNMGR	?MageGuildHandler@@YIHAAUtag_message@@@Z	100.0000	ace5bc9ba566
 SOURCE/TOWNMGR	?Main@townManager@@UAEHAAUtag_message@@@Z	99.3527	1b9227f70a52
 SOURCE/TOWNMGR	?Open@townManager@@UAEHH@Z	100.0000	c3d702f62c45
