@@ -186,9 +186,7 @@ H2_ENUM_BEGIN(CombatCommandGeometry)
     SCREEN_MAX_X                 = 639,
     SCREEN_MAX_Y                 = 479,
     ARMY_VIEW_LEVEL_COUNT        = 3,
-    COMMAND_FRAME_DELAY          = 75,
-    DEBUG_VAPORIZE_MASK          = 0x3,
-    DEBUG_DOUBLE_RIPPLE_MASK     = 0xc
+    COMMAND_FRAME_DELAY          = 75
 H2_ENUM_END(CombatCommandGeometry)
 
 H2_ENUM_BEGIN(CombatCasualtyConstant)
@@ -989,11 +987,12 @@ i32 combatManager::ProcessCombatMsg(tag_message& message) {
                     DrawFrame(1, 0, 0, 0, COMMAND_FRAME_DELAY, 1, 1);
                     break;
                 case KEY_DEBUG_CREATURE_EFFECT:
-                    if ((message.payload.keyboard.modifiers & DEBUG_VAPORIZE_MASK) != 0) {
+                    if (HAS(message.payload.keyboard.modifiers, MESSAGE_MODIFIER_SHIFT_KEYS)) {
                         VaporizeCreature(1, 1);
-                    } else if ((message.payload.keyboard.modifiers
-                                & DEBUG_DOUBLE_RIPPLE_MASK)
-                               != 0) {
+                    } else if (HAS(
+                                   message.payload.keyboard.modifiers,
+                                   MESSAGE_MODIFIER_CONTROL_KEYS
+                               )) {
                         RippleCreature(1, 1, COMBAT_RIPPLE_DEATH_RIPPLE);
                         RippleCreature(1, 1, COMBAT_RIPPLE_DEATH_WAVE);
                     } else {

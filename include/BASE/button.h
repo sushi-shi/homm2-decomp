@@ -2,11 +2,10 @@
 #define HOMM2_BASE_BUTTON_H
 
 #include <va.h>
+#include "message.h"
 #include "widget.h"
 
 class icon;
-struct tag_message;
-
 H2_ENUM_CLASS_BEGIN_T(ButtonSelectMode, i16)
     BUTTON_SELECT_STANDARD      = 0,
     BUTTON_SELECT_DIALOG_RESULT = 1
@@ -57,6 +56,6 @@ public:
 };
 #pragma pack(pop)
 SIZE(button, 0x30);
-extern i32 iLeftRightSave;
+extern MessageModifier iLeftRightSave;
 
 #endif

@@ -270,8 +270,7 @@ H2_ENUM_BEGIN(AdventureMainConstant)
 H2_ENUM_END(AdventureMainConstant)
 
 H2_ENUM_BEGIN(AdventureRemoteWaitConstant)
-    REMOTE_WAIT_EXIT_MODIFIER_MASK = 0x0c,
-    REMOTE_WAIT_EXIT_RESULT        = 2
+    REMOTE_WAIT_EXIT_RESULT = 2
 H2_ENUM_END(AdventureRemoteWaitConstant)
 
 H2_ENUM_BEGIN(AdventureEnvironmentSoundConstant)
@@ -347,7 +346,6 @@ H2_ENUM_BEGIN(AdventureInterfaceConstant)
 H2_ENUM_END(AdventureInterfaceConstant)
 
 H2_ENUM_BEGIN(AdventureSystemOptionsMessage)
-    SYSTEM_OPTIONS_CONTEXT_FLAG  = 0x200,
     SYSTEM_OPTIONS_DIALOG_ACCEPT = 0x7800,
     SYSTEM_OPTIONS_UNHANDLED     = 1,
     SYSTEM_OPTIONS_HANDLED       = 2
@@ -1615,7 +1613,7 @@ i32 advManager::Main(struct tag_message& message) {
             case MESSAGE_WIDGET:
                 switch (message.payload.widget.command) {
                     case WIDGET_COMMAND_DESELECT:
-                        if (!(message.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON)) {
+                        if (!(HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON))) {
                             processResult =
                                 ProcessDeSelect(&message, &exitRequestedFlag, eventCellsResult);
                         }
@@ -1623,7 +1621,7 @@ i32 advManager::Main(struct tag_message& message) {
                     case WIDGET_COMMAND_SELECT:
                     case WIDGET_COMMAND_ALTERNATE_SELECT: {
                         i32 helpIndexState;
-                        if (message.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) {
+                        if (HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) {
                             helpIndexState = message.payload.widget.id - PANEL_NEXT_HERO;
                             if (message.payload.widget.id < PANEL_NEXT_HERO
                                 || message.payload.widget.id > PANEL_CAST_SPELL) {
@@ -1834,56 +1832,56 @@ i32 advManager::Main(struct tag_message& message) {
                         break;
                     }
                     case INPUT_SCAN_NUMPAD_8:
-                        if (message.payload.keyboard.modifiers & MESSAGE_MODIFIER_CONTROL_KEYS) {
+                        if (HAS(message.payload.keyboard.modifiers, MESSAGE_MODIFIER_CONTROL_KEYS)) {
                             ScreenScroll(MAP_DIRECTION_NORTH, 0);
                         } else {
                             moveDirectionState = MAP_DIRECTION_NORTH;
                         }
                         break;
                     case INPUT_SCAN_NUMPAD_9:
-                        if (message.payload.keyboard.modifiers & MESSAGE_MODIFIER_CONTROL_KEYS) {
+                        if (HAS(message.payload.keyboard.modifiers, MESSAGE_MODIFIER_CONTROL_KEYS)) {
                             ScreenScroll(MAP_DIRECTION_NORTH_EAST, 0);
                         } else {
                             moveDirectionState = MAP_DIRECTION_NORTH_EAST;
                         }
                         break;
                     case INPUT_SCAN_NUMPAD_6:
-                        if (message.payload.keyboard.modifiers & MESSAGE_MODIFIER_CONTROL_KEYS) {
+                        if (HAS(message.payload.keyboard.modifiers, MESSAGE_MODIFIER_CONTROL_KEYS)) {
                             ScreenScroll(MAP_DIRECTION_EAST, 0);
                         } else {
                             moveDirectionState = MAP_DIRECTION_EAST;
                         }
                         break;
                     case INPUT_SCAN_NUMPAD_3:
-                        if (message.payload.keyboard.modifiers & MESSAGE_MODIFIER_CONTROL_KEYS) {
+                        if (HAS(message.payload.keyboard.modifiers, MESSAGE_MODIFIER_CONTROL_KEYS)) {
                             ScreenScroll(MAP_DIRECTION_SOUTH_EAST, 0);
                         } else {
                             moveDirectionState = MAP_DIRECTION_SOUTH_EAST;
                         }
                         break;
                     case INPUT_SCAN_NUMPAD_2:
-                        if (message.payload.keyboard.modifiers & MESSAGE_MODIFIER_CONTROL_KEYS) {
+                        if (HAS(message.payload.keyboard.modifiers, MESSAGE_MODIFIER_CONTROL_KEYS)) {
                             ScreenScroll(MAP_DIRECTION_SOUTH, 0);
                         } else {
                             moveDirectionState = MAP_DIRECTION_SOUTH;
                         }
                         break;
                     case INPUT_SCAN_NUMPAD_1:
-                        if (message.payload.keyboard.modifiers & MESSAGE_MODIFIER_CONTROL_KEYS) {
+                        if (HAS(message.payload.keyboard.modifiers, MESSAGE_MODIFIER_CONTROL_KEYS)) {
                             ScreenScroll(MAP_DIRECTION_SOUTH_WEST, 0);
                         } else {
                             moveDirectionState = MAP_DIRECTION_SOUTH_WEST;
                         }
                         break;
                     case INPUT_SCAN_NUMPAD_4:
-                        if (message.payload.keyboard.modifiers & MESSAGE_MODIFIER_CONTROL_KEYS) {
+                        if (HAS(message.payload.keyboard.modifiers, MESSAGE_MODIFIER_CONTROL_KEYS)) {
                             ScreenScroll(MAP_DIRECTION_WEST, 0);
                         } else {
                             moveDirectionState = MAP_DIRECTION_WEST;
                         }
                         break;
                     case INPUT_SCAN_NUMPAD_7:
-                        if (message.payload.keyboard.modifiers & MESSAGE_MODIFIER_CONTROL_KEYS) {
+                        if (HAS(message.payload.keyboard.modifiers, MESSAGE_MODIFIER_CONTROL_KEYS)) {
                             ScreenScroll(MAP_DIRECTION_NORTH_WEST, 0);
                         } else {
                             moveDirectionState = MAP_DIRECTION_NORTH_WEST;
@@ -2090,7 +2088,7 @@ i32 advManager::ProcessSelect(struct tag_message* message, class mapCell** event
                 break;
             }
             objectTypeState = gpCurPlayer->m_heroIds[gpCurPlayer->m_heroLocatorPage + pageState];
-            if (message->payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) {
+            if (HAS(static_cast<MessageModifier>(message->payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) {
                 HeroQuickView(objectTypeState, pageState, -1, -1);
             } else {
                 if (gpCurPlayer->CurrentHero() == objectTypeState) {
@@ -2111,7 +2109,7 @@ i32 advManager::ProcessSelect(struct tag_message* message, class mapCell** event
                 gpCurPlayer
                     ->m_townIds[gpCurPlayer->m_townLocatorPage + message->payload.widget.id
                                - LOCATOR_TOWN_IMAGE_BASE];
-            if (message->payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) {
+            if (HAS(static_cast<MessageModifier>(message->payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) {
                 TownQuickView(
                     objectTypeState,
                     message->payload.widget.id - LOCATOR_TOWN_IMAGE_BASE,
@@ -2177,7 +2175,7 @@ i32 advManager::ProcessSelect(struct tag_message* message, class mapCell** event
                 visible = 0;
             }
             currentCell = GetCell(m_lastHoverCell + m_mapOriginX, m_hoverCellY + m_mapOriginY);
-            if (message->payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) {
+            if (HAS(static_cast<MessageModifier>(message->payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) {
                 if (!visible) {
                     QuickInfo(m_lastHoverCell, m_hoverCellY);
                 } else {
@@ -2249,8 +2247,12 @@ i32 advManager::ProcessSelect(struct tag_message* message, class mapCell** event
                         m_selectedCell = ADVMGR_COMMAND_HERO_VIEW;
                         DoAdvCommand();
                     } else if ((!mobileResult
-                                || (message->payload.widget.parameter
-                                    & MESSAGE_MODIFIER_CONTROL_KEYS)
+                                || HAS(
+                                    static_cast<MessageModifier>(
+                                        message->payload.widget.parameter
+                                    ),
+                                    MESSAGE_MODIFIER_CONTROL_KEYS
+                                )
                                 || (gConfig.showRoute
                                     && (m_commandTargetX != currentHero->m_destinationX
                                         || m_commandTargetY != currentHero->m_destinationY)))
@@ -2286,7 +2288,7 @@ i32 advManager::ProcessSelect(struct tag_message* message, class mapCell** event
             break;
         }
         case PANEL_RADAR:
-            if (message->payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) {
+            if (HAS(static_cast<MessageModifier>(message->payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) {
                 NormalDialog(
                     "{World Map}\n\nA miniature view of the known world.  "
                     "Left click to move viewing area.",
@@ -2396,7 +2398,7 @@ i32 advManager::ProcessSelect(struct tag_message* message, class mapCell** event
             break;
     }
 
-    if ((message->payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON)
+    if ((HAS(static_cast<MessageModifier>(message->payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON))
         && message->payload.widget.id >= BOTTOM_VIEW_FIRST_MESSAGE
         && message->payload.widget.id <= BOTTOM_VIEW_LAST_MESSAGE) {
         NormalDialog(
@@ -7437,7 +7439,7 @@ i32 DimensionDoorHandler(tag_message& message) {
                     switch (message.payload.widget.id) {
                         case DIMENSION_DOOR_FIRST_BUTTON:
                         case DIMENSION_DOOR_LAST_BUTTON:
-                            if (message.payload.widget.parameter & MESSAGE_MODIFIER_LEFT_SHIFT) {
+                            if (HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_LEFT_SHIFT)) {
                             } else {
                                 if (gpWindowManager->m_dialogResult
                                     == TRAVEL_DIALOG_ACCEPT) {
@@ -8728,7 +8730,7 @@ void advManager::ShowRoute(i32 redraw, i32, i32 updateButton) {
     H2_ENUM_STORAGE(TerrainType, i32) currentTerrain0;
     mapCell* currentCell2;
     i32 routeFrame;
-    i32 buttonFrame;
+    BaseWidgetCommand buttonFrame;
 
     routeReachable8 = 0;
     if (!gbThisNetHumanPlayer[giCurPlayer]) {
@@ -8840,7 +8842,7 @@ void advManager::ShowRoute(i32 redraw, i32, i32 updateButton) {
             buttonFrame = routeReachable8 ? ADVMGR_BUTTON_DISABLE : ADVMGR_BUTTON_ENABLE;
             gpWindowManager->BroadcastMessage(
                 ADVMGR_BUTTON_MESSAGE,
-                BaseWidgetCommand(buttonFrame),
+                buttonFrame,
                 BUTTON_TARGET,
                 BUTTON_BROADCAST_FLAGS
             );
@@ -8903,7 +8905,7 @@ void advManager::CheckDimHero(void) {
 
 VA(0x004688b4, 0x6b)
 void advManager::CheckDimNextHeroBut(void) {
-    i32 frame;
+    BaseWidgetCommand frame;
     if (!gbThisNetHumanPlayer[giCurPlayer] || !gpCurPlayer->HasMobileHero()) {
         frame = ADVMGR_BUTTON_ENABLE;
     } else {
@@ -8911,7 +8913,7 @@ void advManager::CheckDimNextHeroBut(void) {
     }
     gpWindowManager->BroadcastMessage(
         ADVMGR_BUTTON_MESSAGE,
-        BaseWidgetCommand(frame),
+        frame,
         BUTTON_BROADCAST_ARG,
         BUTTON_BROADCAST_FLAGS
     );
@@ -9283,7 +9285,10 @@ i32 advManager::CheckHandleNetPlayerWait(struct tag_message& message, i32 doMain
                 break;
 
             case ADVMGR_REMOTE_WAIT_EXIT_COMMAND:
-                if (message.payload.widget.parameter & REMOTE_WAIT_EXIT_MODIFIER_MASK) {
+                if (HAS(
+                        static_cast<MessageModifier>(message.payload.widget.parameter),
+                        MESSAGE_MODIFIER_CONTROL_KEYS
+                    )) {
                     message.type = ADVMGR_REMOTE_WAIT_EXIT_MESSAGE;
                     message.payload.executive.command = EXECUTIVE_COMMAND_TERMINATE_LOOP;
                     return REMOTE_WAIT_EXIT_RESULT;
@@ -9826,7 +9831,7 @@ VA(0x0046a9d0, 0x1ca)
 i32 APanelHandler(tag_message& message) {
     i32 handled = 0;
     if (message.type == MESSAGE_WIDGET) {
-        if (message.payload.widget.parameter & MESSAGE_MODIFIER_LEFT_SHIFT) {
+        if (HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_LEFT_SHIFT)) {
             if (message.payload.widget.command == WIDGET_COMMAND_SELECT
                 || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT) {
                 i32 helpIndex = PANEL_NO_HELP;
@@ -9870,8 +9875,8 @@ i32 APanelHandler(tag_message& message) {
 
     if (handled) {
         gpWindowManager->m_dialogResult = message.payload.widget.id;
-        message.payload.widget.id = WIDGET_COMMAND_DIALOG_SELECT;
-        message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
+        message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
+        message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
         return DIMENSION_DOOR_HANDLED;
     }
     return DIMENSION_DOOR_UNHANDLED;
@@ -9934,7 +9939,7 @@ VA(0x0046ad7e, 0x304)
 i32 CPanelHandler(tag_message& message) {
     i32 handled = 0;
     if (message.type == MESSAGE_WIDGET) {
-        if (message.payload.widget.parameter & MESSAGE_MODIFIER_LEFT_SHIFT) {
+        if (HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_LEFT_SHIFT)) {
             if (message.payload.widget.command == WIDGET_COMMAND_SELECT
                 || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT) {
                 i32 helpIndex = PANEL_NO_HELP;
@@ -10029,8 +10034,8 @@ i32 CPanelHandler(tag_message& message) {
 
     if (handled) {
         gpWindowManager->m_dialogResult = message.payload.widget.id;
-        message.payload.widget.id = WIDGET_COMMAND_DIALOG_SELECT;
-        message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
+        message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
+        message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
         return DIMENSION_DOOR_HANDLED;
     }
     return DIMENSION_DOOR_UNHANDLED;
@@ -10190,7 +10195,10 @@ i32 SystemOptionsHandler(struct tag_message& message) {
     i32 accepted = 0;
 
     if (message.type == ADVMGR_SYSTEM_OPTIONS_MESSAGE) {
-        if (message.payload.widget.parameter & SYSTEM_OPTIONS_CONTEXT_FLAG) {
+        if (HAS(
+                static_cast<MessageModifier>(message.payload.widget.parameter),
+                MESSAGE_MODIFIER_RIGHT_BUTTON
+            )) {
             if (message.payload.widget.command == ADVMGR_SYSTEM_OPTIONS_ACTIVATE
                 || message.payload.widget.command == ADVMGR_SYSTEM_OPTIONS_HOVER) {
                 i32 helpIndex = OPTION_DIALOG_NONE;

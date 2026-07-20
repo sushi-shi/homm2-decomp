@@ -644,7 +644,7 @@ i32 CastleHandler(tag_message& message) {
                 break;
             case WIDGET_COMMAND_SELECT:
             case WIDGET_COMMAND_ALTERNATE_SELECT:
-                quickFlag = (message.payload.widget.parameter & MESSAGE_MODIFIER_LEFT_SHIFT) != 0;
+                quickFlag = (HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_LEFT_SHIFT)) != 0;
                 if (formationControl != 0) {
                     if (quickFlag) {
                         if (formationControl == CONTROL_CAPTAIN_FORMATION_SPREAD)

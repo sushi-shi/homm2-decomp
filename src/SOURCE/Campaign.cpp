@@ -446,13 +446,13 @@ void game::ShowCampaignInfo(i32 viewOnly, i32) {
     if (!viewOnly) {
         message.payload.widget.command = CAMPAIGN_MESSAGE_DESELECT;
         message.payload.widget.id = CAMPAIGN_DIALOG_RESTART;
-        message.payload.widget.data.value = CAMPAIGN_MESSAGE_DESELECT;
+        message.payload.widget.data.value = WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW;
         campWin->BroadcastMessage(message);
     }
     if (gbLowMemory) {
         message.payload.widget.command = CAMPAIGN_MESSAGE_DESELECT;
         message.payload.widget.id = CAMPAIGN_DIALOG_REPLAY;
-        message.payload.widget.data.value = CAMPAIGN_MESSAGE_DESELECT;
+        message.payload.widget.data.value = WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW;
         campWin->BroadcastMessage(message);
     }
     gpSoundManager->SwitchAmbientMusic(
