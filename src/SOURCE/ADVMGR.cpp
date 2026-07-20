@@ -271,14 +271,13 @@ H2_ENUM_BEGIN(AdventureTravelSpellConstant)
 H2_ENUM_END(AdventureTravelSpellConstant)
 
 H2_ENUM_BEGIN(AdventureTownPortalMessage)
-    TOWN_PORTAL_COMMAND_SELECT = 13,
-    TOWN_PORTAL_TITLE_WIDGET   = 1,
-    TOWN_PORTAL_CHOICE_WIDGET  = 100,
-    TOWN_PORTAL_CLOSE_COMMAND  = 10,
-    TOWN_PORTAL_FIRST_CHOICE   = 0x7801,
-    TOWN_PORTAL_LAST_CHOICE    = 0x7802,
-    TOWN_PORTAL_UNHANDLED      = 1,
-    TOWN_PORTAL_HANDLED        = 2
+    TOWN_PORTAL_TITLE_WIDGET  = 1,
+    TOWN_PORTAL_CHOICE_WIDGET = 100,
+    TOWN_PORTAL_CLOSE_WIDGET  = 10,
+    TOWN_PORTAL_FIRST_CHOICE  = 0x7801,
+    TOWN_PORTAL_LAST_CHOICE   = 0x7802,
+    TOWN_PORTAL_UNHANDLED     = 1,
+    TOWN_PORTAL_HANDLED       = 2
 H2_ENUM_END(AdventureTownPortalMessage)
 
 H2_ENUM_BEGIN(AdventureSoundTilesetConstant)
@@ -310,7 +309,6 @@ H2_ENUM_BEGIN(AdventureInterfaceConstant)
 H2_ENUM_END(AdventureInterfaceConstant)
 
 H2_ENUM_BEGIN(AdventureSystemOptionsMessage)
-    SYSTEM_OPTIONS_ACCEPT        = 13,
     SYSTEM_OPTIONS_CONTEXT_FLAG  = 0x200,
     SYSTEM_OPTIONS_DIALOG_ACCEPT = 0x7800,
     SYSTEM_OPTIONS_UNHANDLED     = 1,
@@ -396,9 +394,6 @@ H2_ENUM_BEGIN(AdventureRadarConstant)
     RADAR_CURRENT_CELL     = VIEW_CENTER_CELL,
     RADAR_TOWN_RADIUS      = 2,
     RADAR_TOWN_TRIGGER     = 0x2a,
-    RADAR_TOWN_TILESET_1   = 0x23,
-    RADAR_TOWN_TILESET_2   = 0x24,
-    RADAR_SPECIAL_TILESET  = 0x3e,
     RADAR_REEFS_TRIGGER    = 0x67,
     RADAR_NEIGHBOR_TRIGGER = 0xa3
 H2_ENUM_END(AdventureRadarConstant)
@@ -451,6 +446,14 @@ H2_ENUM_BEGIN(AdventureLocatorConstant)
     LOCATOR_HERO_MANA_OFFSET          = 3,
     LOCATOR_HERO_IMAGE_OFFSET         = 5,
     LOCATOR_HERO_BORDER_OFFSET        = 6,
+    LOCATOR_HERO_SELECT_BASE          = LOCATOR_HERO_WIDGET_BASE + LOCATOR_HERO_IMAGE_OFFSET,
+    LOCATOR_HERO_SELECT_1             = LOCATOR_HERO_SELECT_BASE + LOCATOR_HERO_WIDGET_STRIDE,
+    LOCATOR_HERO_SELECT_2             = LOCATOR_HERO_SELECT_1 + LOCATOR_HERO_WIDGET_STRIDE,
+    LOCATOR_HERO_SELECT_3             = LOCATOR_HERO_SELECT_2 + LOCATOR_HERO_WIDGET_STRIDE,
+    LOCATOR_HERO_SCROLL_CONTROL       = 22,
+    LOCATOR_TOWN_SCROLL_CONTROL       = 25,
+    LOCATOR_HERO_KNOB_CONTROL         = 26,
+    LOCATOR_TOWN_KNOB_CONTROL         = 27,
     LOCATOR_TOWN_IMAGE_BASE           = 16,
     LOCATOR_TOWN_BORDER_BASE          = 32,
     LOCATOR_TOWN_FLAG_BASE            = 300,
@@ -467,6 +470,8 @@ H2_ENUM_BEGIN(AdventureLocatorConstant)
     LOCATOR_TOWN_VILLAGE_FRAME_OFFSET = 6,
     LOCATOR_SCROLL_NO_PAGES_Y         = 232,
     LOCATOR_SCROLL_BASE_Y             = 195,
+    LOCATOR_SCROLL_MOUSE_BASE_Y       = LOCATOR_SCROLL_BASE_Y - 1,
+    LOCATOR_SCROLL_MOUSE_SPAN         = 92,
     LOCATOR_HERO_SCROLL_SPAN          = 73,
     LOCATOR_TOWN_SCROLL_SPAN          = 74,
     LOCATOR_KNOB_MAX_Y                = LOCATOR_SCROLL_BASE_Y + LOCATOR_HERO_SCROLL_SPAN,
@@ -477,6 +482,25 @@ H2_ENUM_BEGIN(AdventureLocatorConstant)
     LOCATOR_SCREEN_WIDTH              = 54,
     LOCATOR_SCREEN_HEIGHT             = 30
 H2_ENUM_END(AdventureLocatorConstant)
+
+H2_ENUM_BEGIN(AdventureQuickViewPlacementConstant)
+    QUICK_VIEW_MIN_X         = 30,
+    QUICK_VIEW_MIN_Y         = 16,
+    QUICK_VIEW_RIGHT         = 448,
+    QUICK_VIEW_BOTTOM        = 464,
+    HERO_QUICK_VIEW_X_OFFSET = 73,
+    HERO_QUICK_VIEW_Y_OFFSET = 72,
+    HERO_QUICK_VIEW_WIDTH    = 192,
+    HERO_QUICK_VIEW_HEIGHT   = 190,
+    HERO_QUICK_VIEW_RIGHT_X  = 256,
+    HERO_QUICK_VIEW_BOTTOM_Y = 274,
+    TOWN_QUICK_VIEW_X_OFFSET = 89,
+    TOWN_QUICK_VIEW_Y_OFFSET = 70,
+    TOWN_QUICK_VIEW_WIDTH    = 224,
+    TOWN_QUICK_VIEW_HEIGHT   = 186,
+    TOWN_QUICK_VIEW_RIGHT_X  = 224,
+    TOWN_QUICK_VIEW_BOTTOM_Y = 278
+H2_ENUM_END(AdventureQuickViewPlacementConstant)
 
 H2_ENUM_BEGIN(AdventureSpellConstant)
     TRAVEL_SPELL_MOBILITY_COST = 225,
@@ -640,13 +664,27 @@ H2_ENUM_BEGIN(AdventureQuickInfoObject)
     ROUTE_BEYOND_MOBILITY_FLAG = 0x100,
     HERO_FRAME_MIRROR_FLAG     = 0x80,
     HERO_FRAME_INDEX_MASK      = 0x7f,
-    CHEAT_CREATURES            = 32167,
-    CHEAT_WIN                  = 911,
-    CHEAT_LOSE                 = 1313,
-    CHEAT_REVEAL_MAP           = 8675309,
-    CHEAT_INFO                 = 411,
     OBJECT_GENERIC_SITE        = 0x7a
 H2_ENUM_END(AdventureQuickInfoObject)
+
+H2_ENUM_BEGIN(AdventureCheatConstant)
+    CHEAT_SEQUENCE_RADIX     = 10,
+    CHEAT_SEQUENCE_MODULUS   = 10000000,
+    CHEAT_CREATURES_MODULUS  = 100000,
+    CHEAT_LOSE_MODULUS       = 10000,
+    CHEAT_SHORT_MODULUS      = 1000,
+    CHEAT_CREATURES          = 32167,
+    CHEAT_WIN                = 911,
+    CHEAT_LOSE               = 1313,
+    CHEAT_REVEAL_MAP         = 8675309,
+    CHEAT_INFO               = 411,
+    CHEAT_RESOURCE_AMOUNT    = 10,
+    CHEAT_GOLD_AMOUNT        = 1000,
+    CHEAT_EXPERIENCE_AMOUNT  = 3000,
+    CHEAT_BLACK_DRAGON_COUNT = 5,
+    CHEAT_REVEAL_CENTER      = 30,
+    CHEAT_REVEAL_RADIUS      = 180
+H2_ENUM_END(AdventureCheatConstant)
 
 H2_ENUM_BEGIN(AdventureSiteConstant)
     GENERIC_SITE_1_END   = 4,
@@ -674,6 +712,8 @@ H2_ENUM_BEGIN(AdventurePanelCommand)
     PANEL_CONTROL_OPTIONS     = 6,
     PANEL_SYSTEM_OPTIONS      = 7,
     PANEL_CAST_SPELL          = 8,
+    PANEL_RADAR               = 9,
+    PANEL_MAP_VIEW            = 10,
     PANEL_HERO_PAGE_PREVIOUS  = 20,
     PANEL_HERO_PAGE_NEXT      = 21,
     PANEL_TOWN_PAGE_PREVIOUS  = 23,
@@ -1394,7 +1434,7 @@ i32 advManager::Main(struct tag_message& message) {
 
     i32 processResult = 1;
     i32 exitRequestedFlag = 0;
-    mapCell* eventCellsResult[3];
+    mapCell* eventCellsResult[3]; // Retail reserves three result slots; only the first is used.
     eventCellsResult[0] = NULL;
     i32 moveDirectionState;
     i32 cheatDigitLocal;
@@ -1411,40 +1451,40 @@ i32 advManager::Main(struct tag_message& message) {
                         }
                         break;
                     case WIDGET_COMMAND_SELECT:
-                    case 14: {
+                    case WIDGET_COMMAND_ALTERNATE_SELECT: {
                         i32 helpIndexState;
                         if (message.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) {
                             helpIndexState = -1;
                             switch (message.payload.widget.id) {
-                                case 1:
+                                case PANEL_NEXT_HERO:
                                     helpIndexState = 0;
                                     break;
-                                case 2:
+                                case PANEL_CONTINUE_ROUTE:
                                     helpIndexState = 1;
                                     break;
-                                case 3:
+                                case PANEL_OVERVIEW:
                                     helpIndexState = 2;
                                     break;
-                                case 4:
+                                case PANEL_END_TURN:
                                     helpIndexState = 3;
                                     break;
-                                case 5:
+                                case PANEL_ADVENTURE_OPTIONS:
                                     helpIndexState = 4;
                                     break;
-                                case 6:
+                                case PANEL_CONTROL_OPTIONS:
                                     helpIndexState = 5;
                                     break;
-                                case 7:
+                                case PANEL_SYSTEM_OPTIONS:
                                     helpIndexState = 6;
                                     break;
-                                case 8:
+                                case PANEL_CAST_SPELL:
                                     helpIndexState = 7;
                                     break;
                             }
                             if (helpIndexState >= 0) {
                                 NormalDialog(
                                     gAdvMenuHelp[helpIndexState],
-                                    4,
+                                    NORMAL_DIALOG_QUICK_VIEW,
                                     -1,
                                     -1,
                                     -1,
@@ -1475,73 +1515,74 @@ i32 advManager::Main(struct tag_message& message) {
                     currentHero = NULL;
                 }
                 if (giDebugLevel < 1
-                    && (message.payload.keyboard.keyCode == 61
-                        || message.payload.keyboard.keyCode == 62
-                        || message.payload.keyboard.keyCode == 63
-                        || message.payload.keyboard.keyCode == 64
-                        || message.payload.keyboard.keyCode == 65
-                        || message.payload.keyboard.keyCode == 66
-                        || message.payload.keyboard.keyCode == 67
-                        || message.payload.keyboard.keyCode == 68
-                        || message.payload.keyboard.keyCode == 87
-                        || message.payload.keyboard.keyCode == 88)) {
+                    && (message.payload.keyboard.keyCode == INPUT_SCAN_F3
+                        || message.payload.keyboard.keyCode == INPUT_SCAN_F4
+                        || message.payload.keyboard.keyCode == INPUT_SCAN_F5
+                        || message.payload.keyboard.keyCode == INPUT_SCAN_F6
+                        || message.payload.keyboard.keyCode == INPUT_SCAN_F7
+                        || message.payload.keyboard.keyCode == INPUT_SCAN_F8
+                        || message.payload.keyboard.keyCode == INPUT_SCAN_F9
+                        || message.payload.keyboard.keyCode == INPUT_SCAN_F10
+                        || message.payload.keyboard.keyCode == INPUT_SCAN_F11
+                        || message.payload.keyboard.keyCode == INPUT_SCAN_F12)) {
                     break;
                 }
 
                 switch (message.payload.keyboard.keyCode) {
-                    case 60:
+                    case INPUT_SCAN_F2:
                         CreateColorTables();
                         PopNetBox(NULL, -1);
                         break;
-                    case 64:
+                    case INPUT_SCAN_F6:
                         gpGame->CheckHeroConsistency();
                         break;
-                    case 65:
+                    case INPUT_SCAN_F7:
                         gpCurPlayer->m_cheatValue += 12;
                         if (currentHero != NULL) {
-                            GiveExperience(currentHero, 3000, 1);
+                            GiveExperience(currentHero, CHEAT_EXPERIENCE_AMOUNT, 1);
                         }
                         break;
-                    case 66:
-                    case 1:
+                    case INPUT_SCAN_F8:
+                    case INPUT_SCAN_ESCAPE:
                         break;
-                    case 67:
-                        for (cheatDigitLocal = 0; cheatDigitLocal < 7; ++cheatDigitLocal) {
+                    case INPUT_SCAN_F9:
+                        for (cheatDigitLocal = 0; cheatDigitLocal < IDX(RES_COUNT);
+                             ++cheatDigitLocal) {
                             if (cheatDigitLocal == IDX(RES_GOLD)) {
-                                gpCurPlayer->m_resources[cheatDigitLocal] += 1000;
+                                gpCurPlayer->m_resources[cheatDigitLocal] += CHEAT_GOLD_AMOUNT;
                             } else {
-                                gpCurPlayer->m_resources[cheatDigitLocal] += 10;
+                                gpCurPlayer->m_resources[cheatDigitLocal] += CHEAT_RESOURCE_AMOUNT;
                             }
                         }
                         break;
-                    case 11:
+                    case INPUT_SCAN_0:
                         cheatDigitLocal = 0;
                         goto process_cheat_digit;
-                    case 2:
+                    case INPUT_SCAN_1:
                         cheatDigitLocal = 1;
                         goto process_cheat_digit;
-                    case 3:
+                    case INPUT_SCAN_2:
                         cheatDigitLocal = 2;
                         goto process_cheat_digit;
-                    case 4:
+                    case INPUT_SCAN_3:
                         cheatDigitLocal = 3;
                         goto process_cheat_digit;
-                    case 5:
+                    case INPUT_SCAN_4:
                         cheatDigitLocal = 4;
                         goto process_cheat_digit;
-                    case 6:
+                    case INPUT_SCAN_5:
                         cheatDigitLocal = 5;
                         goto process_cheat_digit;
-                    case 7:
+                    case INPUT_SCAN_6:
                         cheatDigitLocal = 6;
                         goto process_cheat_digit;
-                    case 8:
+                    case INPUT_SCAN_7:
                         cheatDigitLocal = 7;
                         goto process_cheat_digit;
-                    case 9:
+                    case INPUT_SCAN_8:
                         cheatDigitLocal = 8;
                         goto process_cheat_digit;
-                    case 10:
+                    case INPUT_SCAN_9:
                         cheatDigitLocal = 9;
                         goto process_cheat_digit;
                     process_cheat_digit: {
@@ -1549,132 +1590,172 @@ i32 advManager::Main(struct tag_message& message) {
                         if (gpCurPlayer->CurrentHero() != INVALID_HERO) {
                             cheatHero = gpGame->GetHero(gpCurPlayer->m_currentHero);
                         }
-                        giCheatSeq = cheatDigitLocal + (giCheatSeq * 10) % 10000000;
+                        giCheatSeq = cheatDigitLocal
+                                     + (giCheatSeq * CHEAT_SEQUENCE_RADIX)
+                                           % CHEAT_SEQUENCE_MODULUS;
                         if (!gbRemoteOn) {
-                            if (giCheatSeq % 100000 == CHEAT_CREATURES && cheatHero != NULL) {
+                            if (giCheatSeq % CHEAT_CREATURES_MODULUS == CHEAT_CREATURES
+                                && cheatHero != NULL) {
                                 gpGame->m_cheated = 1;
                                 if (gbInCampaign) {
                                     gpGame->m_campaignCheated = 1;
                                 }
-                                gpGame->GiveArmy(&cheatHero->m_army, 37, 5, -1);
+                                gpGame->GiveArmy(
+                                    &cheatHero->m_army,
+                                    CREATURE_BLACK_DRAGON,
+                                    CHEAT_BLACK_DRAGON_COUNT,
+                                    -1
+                                );
                                 UpdBottomView(1, 1, 1);
                             }
-                            if (giCheatSeq % 1000 == CHEAT_WIN) {
+                            if (giCheatSeq % CHEAT_SHORT_MODULUS == CHEAT_WIN) {
                                 gpGame->m_cheated = 1;
                                 if (gbInCampaign) {
                                     gpGame->m_campaignCheated = 1;
                                 }
                                 CheckEndGame(1, 0);
                             }
-                            if (giCheatSeq % 10000 == CHEAT_LOSE) {
+                            if (giCheatSeq % CHEAT_LOSE_MODULUS == CHEAT_LOSE) {
                                 gpGame->m_cheated = 1;
                                 CheckEndGame(2, 0);
                             }
                         }
-                        if (giCheatSeq % 10000000 == CHEAT_REVEAL_MAP) {
+                        if (giCheatSeq % CHEAT_SEQUENCE_MODULUS == CHEAT_REVEAL_MAP) {
                             gpGame->m_cheated = 1;
                             if (gbInCampaign) {
                                 gpGame->m_campaignCheated = 1;
                             }
-                            gpGame->SetVisibility(30, 30, 0, 180);
-                            gpGame->SetVisibility(30, 30, 1, 180);
-                            gpGame->SetVisibility(30, 30, 2, 180);
-                            gpGame->SetVisibility(30, 30, 3, 180);
-                            gpGame->SetVisibility(30, 30, 4, 180);
-                            gpGame->SetVisibility(30, 30, 5, 180);
+                            gpGame->SetVisibility(
+                                CHEAT_REVEAL_CENTER,
+                                CHEAT_REVEAL_CENTER,
+                                PLAYER_COLOR_BLUE,
+                                CHEAT_REVEAL_RADIUS
+                            );
+                            gpGame->SetVisibility(
+                                CHEAT_REVEAL_CENTER,
+                                CHEAT_REVEAL_CENTER,
+                                PLAYER_COLOR_GREEN,
+                                CHEAT_REVEAL_RADIUS
+                            );
+                            gpGame->SetVisibility(
+                                CHEAT_REVEAL_CENTER,
+                                CHEAT_REVEAL_CENTER,
+                                PLAYER_COLOR_RED,
+                                CHEAT_REVEAL_RADIUS
+                            );
+                            gpGame->SetVisibility(
+                                CHEAT_REVEAL_CENTER,
+                                CHEAT_REVEAL_CENTER,
+                                PLAYER_COLOR_YELLOW,
+                                CHEAT_REVEAL_RADIUS
+                            );
+                            gpGame->SetVisibility(
+                                CHEAT_REVEAL_CENTER,
+                                CHEAT_REVEAL_CENTER,
+                                PLAYER_COLOR_ORANGE,
+                                CHEAT_REVEAL_RADIUS
+                            );
+                            gpGame->SetVisibility(
+                                CHEAT_REVEAL_CENTER,
+                                CHEAT_REVEAL_CENTER,
+                                PLAYER_COLOR_PURPLE,
+                                CHEAT_REVEAL_RADIUS
+                            );
                             Reseed(0, 0);
                             UpdateRadar(1, 0);
                             CompleteDraw(0);
                             UpdateScreen(0, 0);
                         }
-                        if (giCheatSeq % 1000 == CHEAT_INFO) {
+                        if (giCheatSeq % CHEAT_SHORT_MODULUS == CHEAT_INFO) {
                             sprintf(
                                 gText,
                                 "Coordinates at top left corner of view:\n\n  X: %d\n  Y: %d",
                                 m_mapOriginX,
                                 m_mapOriginY
                             );
-                            NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
+                            NormalDialog(
+                                gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0
+                            );
                             break;
                         }
                         break;
                     }
-                    case 72:
+                    case INPUT_SCAN_NUMPAD_8:
                         if (message.payload.keyboard.modifiers & MESSAGE_MODIFIER_CONTROL_KEYS) {
-                            ScreenScroll(AdventureScrollDirection(0), 0);
+                            ScreenScroll(ADVMGR_SCROLL_NORTH, 0);
                         } else {
                             moveDirectionState = 0;
                         }
                         break;
-                    case 73:
+                    case INPUT_SCAN_NUMPAD_9:
                         if (message.payload.keyboard.modifiers & MESSAGE_MODIFIER_CONTROL_KEYS) {
-                            ScreenScroll(AdventureScrollDirection(1), 0);
+                            ScreenScroll(ADVMGR_SCROLL_NORTH_EAST, 0);
                         } else {
                             moveDirectionState = 1;
                         }
                         break;
-                    case 77:
+                    case INPUT_SCAN_NUMPAD_6:
                         if (message.payload.keyboard.modifiers & MESSAGE_MODIFIER_CONTROL_KEYS) {
-                            ScreenScroll(AdventureScrollDirection(2), 0);
+                            ScreenScroll(ADVMGR_SCROLL_EAST, 0);
                         } else {
                             moveDirectionState = 2;
                         }
                         break;
-                    case 81:
+                    case INPUT_SCAN_NUMPAD_3:
                         if (message.payload.keyboard.modifiers & MESSAGE_MODIFIER_CONTROL_KEYS) {
-                            ScreenScroll(AdventureScrollDirection(3), 0);
+                            ScreenScroll(ADVMGR_SCROLL_SOUTH_EAST, 0);
                         } else {
                             moveDirectionState = 3;
                         }
                         break;
-                    case 80:
+                    case INPUT_SCAN_NUMPAD_2:
                         if (message.payload.keyboard.modifiers & MESSAGE_MODIFIER_CONTROL_KEYS) {
-                            ScreenScroll(AdventureScrollDirection(4), 0);
+                            ScreenScroll(ADVMGR_SCROLL_SOUTH, 0);
                         } else {
                             moveDirectionState = 4;
                         }
                         break;
-                    case 79:
+                    case INPUT_SCAN_NUMPAD_1:
                         if (message.payload.keyboard.modifiers & MESSAGE_MODIFIER_CONTROL_KEYS) {
-                            ScreenScroll(AdventureScrollDirection(5), 0);
+                            ScreenScroll(ADVMGR_SCROLL_SOUTH_WEST, 0);
                         } else {
                             moveDirectionState = 5;
                         }
                         break;
-                    case 75:
+                    case INPUT_SCAN_NUMPAD_4:
                         if (message.payload.keyboard.modifiers & MESSAGE_MODIFIER_CONTROL_KEYS) {
-                            ScreenScroll(AdventureScrollDirection(6), 0);
+                            ScreenScroll(ADVMGR_SCROLL_WEST, 0);
                         } else {
                             moveDirectionState = 6;
                         }
                         break;
-                    case 71:
+                    case INPUT_SCAN_NUMPAD_7:
                         if (message.payload.keyboard.modifiers & MESSAGE_MODIFIER_CONTROL_KEYS) {
-                            ScreenScroll(AdventureScrollDirection(7), 0);
+                            ScreenScroll(ADVMGR_SCROLL_NORTH_WEST, 0);
                         } else {
                             moveDirectionState = 7;
                         }
                         break;
-                    case 46:
+                    case INPUT_SCAN_C:
                         CheckCastSpell();
                         break;
-                    case 32:
+                    case INPUT_SCAN_D:
                         ProcessSearch(-1, -1);
                         break;
-                    case 25:
+                    case INPUT_SCAN_P:
                         ViewPuzzle();
                         break;
-                    case 47:
+                    case INPUT_SCAN_V:
                         ViewWorld(VIEW_WORLD_ALL, false, false);
                         break;
-                    case 49:
+                    case INPUT_SCAN_N:
                         cheatDigitLocal = 'e';
                         strcpy(
                             gText,
                             "Are you sure you want to restart?  (Your current game will be lost)"
                         );
                         goto confirm_game_command;
-                    case 38:
+                    case INPUT_SCAN_L:
                         cheatDigitLocal = 'f';
                         strcpy(
                             gText,
@@ -1682,27 +1763,33 @@ i32 advManager::Main(struct tag_message& message) {
                             "lost)"
                         );
                         goto confirm_game_command;
-                    case 16:
+                    case INPUT_SCAN_Q:
                         cheatDigitLocal = 'i';
                         strcpy(gText, "Are you sure you want to quit?");
                         goto confirm_game_command;
                     confirm_game_command:
                         exitRequestedFlag = 1;
-                        NormalDialog(gText, 2, -1, -1, -1, 0, -1, 0, -1, 0);
+                        NormalDialog(
+                            gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0
+                        );
                         if (gpWindowManager->m_dialogResult == DIALOG_OK) {
                             exitRequestedFlag = 0;
                         } else {
                             gGameCommand = cheatDigitLocal;
                         }
                         break;
-                    case 31:
+                    case INPUT_SCAN_S:
                         SaveGame();
                         break;
-                    case 23:
+                    case INPUT_SCAN_I:
                         if (gbInCampaign) {
                             SetEnvironmentOrigin(-1, -1, 1);
                             gpGame->ShowCampaignInfo(1, 0);
-                            SetEnvironmentOrigin(m_mapOriginX + 7, m_mapOriginY + 7, 1);
+                            SetEnvironmentOrigin(
+                                m_mapOriginX + VIEW_CENTER_OFFSET,
+                                m_mapOriginY + VIEW_CENTER_OFFSET,
+                                1
+                            );
                             RedrawAdvScreen(1, 0);
                             gpSoundManager->SwitchAmbientMusic(
                                 giTerrainToMusicTrack[m_currentTerrain]
@@ -1710,7 +1797,11 @@ i32 advManager::Main(struct tag_message& message) {
                         } else if (xIsPlayingExpansionCampaign) {
                             SetEnvironmentOrigin(-1, -1, 1);
                             xCampaign.ShowInfo(1, 0);
-                            SetEnvironmentOrigin(m_mapOriginX + 7, m_mapOriginY + 7, 1);
+                            SetEnvironmentOrigin(
+                                m_mapOriginX + VIEW_CENTER_OFFSET,
+                                m_mapOriginY + VIEW_CENTER_OFFSET,
+                                1
+                            );
                             RedrawAdvScreen(1, 0);
                             gpSoundManager->SwitchAmbientMusic(
                                 giTerrainToMusicTrack[m_currentTerrain]
@@ -1719,7 +1810,7 @@ i32 advManager::Main(struct tag_message& message) {
                             gpGame->ShowScenInfo();
                         }
                         break;
-                    case 20:
+                    case INPUT_SCAN_T:
                         if (gpCurPlayer->m_townCount >= 0) {
                             if (gpCurPlayer->CurrentTown() == IDX(ADVMGR_INVALID_CELL)) {
                                 nextTownId = gpCurPlayer->m_townIds[0];
@@ -1742,10 +1833,10 @@ i32 advManager::Main(struct tag_message& message) {
                             SetTownContext(nextTownId);
                         }
                         break;
-                    case 35:
+                    case INPUT_SCAN_H:
                         SetHeroContext(gpCurPlayer->NextHero(0), 0);
                         break;
-                    case 28:
+                    case INPUT_SCAN_ENTER:
                         if (gpCurPlayer->CurrentTown() != IDX(ADVMGR_INVALID_CELL)) {
                             m_selectedCell = ADVMGR_COMMAND_TOWN_VIEW;
                             DoAdvCommand();
@@ -1829,11 +1920,12 @@ i32 advManager::ProcessSelect(struct tag_message* message, class mapCell** event
     mouseY = message->payload.mouse.screenY;
 
     switch (message->payload.widget.id) {
-        case 105:
-        case 112:
-        case 119:
-        case 126: {
-            pageState = (message->payload.widget.id - 105) / 7;
+        case LOCATOR_HERO_SELECT_BASE:
+        case LOCATOR_HERO_SELECT_1:
+        case LOCATOR_HERO_SELECT_2:
+        case LOCATOR_HERO_SELECT_3: {
+            pageState = (message->payload.widget.id - LOCATOR_HERO_SELECT_BASE)
+                        / LOCATOR_HERO_WIDGET_STRIDE;
             if (pageState >= gpCurPlayer->m_heroCount) {
                 break;
             }
@@ -1851,15 +1943,21 @@ i32 advManager::ProcessSelect(struct tag_message* message, class mapCell** event
             }
             break;
         }
-        case 16:
-        case 17:
-        case 18:
-        case 19: {
+        case LOCATOR_TOWN_IMAGE_BASE:
+        case LOCATOR_TOWN_IMAGE_BASE + 1:
+        case LOCATOR_TOWN_IMAGE_BASE + 2:
+        case LOCATOR_TOWN_IMAGE_BASE + 3: {
             objectTypeState =
                 gpCurPlayer
-                    ->m_townIds[gpCurPlayer->m_townLocatorPage + message->payload.widget.id - 16];
+                    ->m_townIds[gpCurPlayer->m_townLocatorPage + message->payload.widget.id
+                               - LOCATOR_TOWN_IMAGE_BASE];
             if (message->payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) {
-                TownQuickView(objectTypeState, message->payload.widget.id - 16, -1, -1);
+                TownQuickView(
+                    objectTypeState,
+                    message->payload.widget.id - LOCATOR_TOWN_IMAGE_BASE,
+                    -1,
+                    -1
+                );
             } else {
                 HideRoute(1, 0, 1);
                 if (gpCurPlayer->CurrentTown() == objectTypeState) {
@@ -1871,15 +1969,18 @@ i32 advManager::ProcessSelect(struct tag_message* message, class mapCell** event
             }
             break;
         }
-        case 26:
+        case LOCATOR_HERO_KNOB_CONTROL:
             DoHeroKnob();
             break;
-        case 22: {
-            mouseY -= 194;
-            if (gpCurPlayer->m_heroCount > IDX(LOCATOR_PAGE_STEP)) {
-                pageState = mouseY / (92 / (gpCurPlayer->m_heroCount - 3));
-                if (pageState > gpCurPlayer->m_heroCount - 4) {
-                    pageState = gpCurPlayer->m_heroCount - 4;
+        case LOCATOR_HERO_SCROLL_CONTROL: {
+            mouseY -= LOCATOR_SCROLL_MOUSE_BASE_Y;
+            if (gpCurPlayer->m_heroCount > LOCATOR_PAGE_STEP) {
+                pageState = mouseY
+                            / (LOCATOR_SCROLL_MOUSE_SPAN
+                               / (gpCurPlayer->m_heroCount
+                                  - (LOCATOR_VISIBLE_COUNT - 1)));
+                if (pageState > gpCurPlayer->m_heroCount - LOCATOR_VISIBLE_COUNT) {
+                    pageState = gpCurPlayer->m_heroCount - LOCATOR_VISIBLE_COUNT;
                 }
             } else {
                 pageState = 0;
@@ -1888,15 +1989,18 @@ i32 advManager::ProcessSelect(struct tag_message* message, class mapCell** event
             UpdateHeroLocators(1, 1);
             break;
         }
-        case 27:
+        case LOCATOR_TOWN_KNOB_CONTROL:
             DoTownKnob();
             break;
-        case 25: {
-            mouseY -= 194;
-            if (gpCurPlayer->m_townCount > IDX(LOCATOR_PAGE_STEP)) {
-                pageState = mouseY / (92 / (gpCurPlayer->m_townCount - 3));
-                if (pageState > gpCurPlayer->m_townCount - 4) {
-                    pageState = gpCurPlayer->m_townCount - 4;
+        case LOCATOR_TOWN_SCROLL_CONTROL: {
+            mouseY -= LOCATOR_SCROLL_MOUSE_BASE_Y;
+            if (gpCurPlayer->m_townCount > LOCATOR_PAGE_STEP) {
+                pageState = mouseY
+                            / (LOCATOR_SCROLL_MOUSE_SPAN
+                               / (gpCurPlayer->m_townCount
+                                  - (LOCATOR_VISIBLE_COUNT - 1)));
+                if (pageState > gpCurPlayer->m_townCount - LOCATOR_VISIBLE_COUNT) {
+                    pageState = gpCurPlayer->m_townCount - LOCATOR_VISIBLE_COUNT;
                 }
             } else {
                 pageState = 0;
@@ -1905,7 +2009,7 @@ i32 advManager::ProcessSelect(struct tag_message* message, class mapCell** event
             UpdateTownLocators(1, 1);
             break;
         }
-        case 10: {
+        case PANEL_MAP_VIEW: {
             if (!(giCurPlayerBit
                   & (mapExtra
                      + (m_hoverCellY + m_mapOriginY)
@@ -1917,7 +2021,7 @@ i32 advManager::ProcessSelect(struct tag_message* message, class mapCell** event
                 if (!visible) {
                     QuickInfo(m_lastHoverCell, m_hoverCellY);
                 } else {
-                    if (m_lastHoverCell == 7 && m_hoverCellY == 7
+                    if (m_lastHoverCell == VIEW_CENTER_CELL && m_hoverCellY == VIEW_CENTER_CELL
                         && gpCurPlayer->CurrentHero() != INVALID_HERO
                         && m_heroContextLocked) {
                         objectTypeState = MAP_OBJECT_HERO_INTERACTION;
@@ -1928,36 +2032,36 @@ i32 advManager::ProcessSelect(struct tag_message* message, class mapCell** event
                     }
                     switch (objectTypeState) {
                         case MAP_OBJECT_HERO_INTERACTION:
-                            mouseX = m_lastHoverCell * 32 - 73;
-                            if (mouseX < 30) {
-                                mouseX = 30;
+                            mouseX = m_lastHoverCell * CELL_PIXELS - HERO_QUICK_VIEW_X_OFFSET;
+                            if (mouseX < QUICK_VIEW_MIN_X) {
+                                mouseX = QUICK_VIEW_MIN_X;
                             }
-                            if (mouseX + 192 > 448) {
-                                mouseX = 256;
+                            if (mouseX + HERO_QUICK_VIEW_WIDTH > QUICK_VIEW_RIGHT) {
+                                mouseX = HERO_QUICK_VIEW_RIGHT_X;
                             }
-                            mouseY = m_hoverCellY * 32 - 72;
-                            if (mouseY < 16) {
-                                mouseY = 16;
+                            mouseY = m_hoverCellY * CELL_PIXELS - HERO_QUICK_VIEW_Y_OFFSET;
+                            if (mouseY < QUICK_VIEW_MIN_Y) {
+                                mouseY = QUICK_VIEW_MIN_Y;
                             }
-                            if (mouseY + 190 > 464) {
-                                mouseY = 274;
+                            if (mouseY + HERO_QUICK_VIEW_HEIGHT > QUICK_VIEW_BOTTOM) {
+                                mouseY = HERO_QUICK_VIEW_BOTTOM_Y;
                             }
                             HeroQuickView(objectIdIndex, -1, mouseX, mouseY);
                             break;
                         case MAP_OBJECT_CASTLE:
-                            mouseX = m_lastHoverCell * 32 - 89;
-                            if (mouseX < 30) {
-                                mouseX = 30;
+                            mouseX = m_lastHoverCell * CELL_PIXELS - TOWN_QUICK_VIEW_X_OFFSET;
+                            if (mouseX < QUICK_VIEW_MIN_X) {
+                                mouseX = QUICK_VIEW_MIN_X;
                             }
-                            if (mouseX + 224 > 448) {
-                                mouseX = 224;
+                            if (mouseX + TOWN_QUICK_VIEW_WIDTH > QUICK_VIEW_RIGHT) {
+                                mouseX = TOWN_QUICK_VIEW_RIGHT_X;
                             }
-                            mouseY = m_hoverCellY * 32 - 70;
-                            if (mouseY < 16) {
-                                mouseY = 16;
+                            mouseY = m_hoverCellY * CELL_PIXELS - TOWN_QUICK_VIEW_Y_OFFSET;
+                            if (mouseY < QUICK_VIEW_MIN_Y) {
+                                mouseY = QUICK_VIEW_MIN_Y;
                             }
-                            if (mouseY + 186 > 464) {
-                                mouseY = 278;
+                            if (mouseY + TOWN_QUICK_VIEW_HEIGHT > QUICK_VIEW_BOTTOM) {
+                                mouseY = TOWN_QUICK_VIEW_BOTTOM_Y;
                             }
                             TownQuickView(objectIdIndex, -1, mouseX, mouseY);
                             break;
@@ -1979,7 +2083,7 @@ i32 advManager::ProcessSelect(struct tag_message* message, class mapCell** event
                     mobileResult = gpGame->IsMobile(static_cast<u8>(currentHero->m_id));
                 }
                 if (currentHero != NULL) {
-                    if (m_lastHoverCell == 7 && m_hoverCellY == 7
+                    if (m_lastHoverCell == VIEW_CENTER_CELL && m_hoverCellY == VIEW_CENTER_CELL
                         && gpCurPlayer->CurrentHero() != INVALID_HERO
                         && m_heroContextLocked) {
                         m_selectedCell = ADVMGR_COMMAND_HERO_VIEW;
@@ -2021,12 +2125,12 @@ i32 advManager::ProcessSelect(struct tag_message* message, class mapCell** event
             }
             break;
         }
-        case 9:
+        case PANEL_RADAR:
             if (message->payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) {
                 NormalDialog(
                     "{World Map}\n\nA miniature view of the known world.  "
                     "Left click to move viewing area.",
-                    4,
+                    NORMAL_DIALOG_QUICK_VIEW,
                     -1,
                     -1,
                     -1,
@@ -2040,28 +2144,28 @@ i32 advManager::ProcessSelect(struct tag_message* message, class mapCell** event
             }
             DemobilizeCurrHero();
             switch (MAP_HEIGHT) {
-                case 36:
+                case MAP_DIMENSION_SMALL:
                     radarScale = 4.0f;
                     break;
-                case 72:
+                case MAP_DIMENSION_MEDIUM:
                     radarScale = 2.0f;
                     break;
-                case 108:
+                case MAP_DIMENSION_LARGE:
                     radarScale = 1.3333f;
                     break;
                 default:
                     radarScale = 1.0f;
                     break;
             }
-            mouseX = static_cast<i32>((mouseX - 480) / radarScale);
-            mouseY = static_cast<i32>((mouseY - 16) / radarScale);
-            m_mapOriginX = mouseX - 7;
-            m_mapOriginY = mouseY - 7;
-            if (m_mapOriginX < -7) {
-                m_mapOriginX = -7;
+            mouseX = static_cast<i32>((mouseX - RADAR_LEFT) / radarScale);
+            mouseY = static_cast<i32>((mouseY - RADAR_TOP) / radarScale);
+            m_mapOriginX = mouseX - VIEW_CENTER_CELL;
+            m_mapOriginY = mouseY - VIEW_CENTER_CELL;
+            if (m_mapOriginX < SCROLL_MIN_ORIGIN) {
+                m_mapOriginX = SCROLL_MIN_ORIGIN;
             }
-            if (m_mapOriginY < -7) {
-                m_mapOriginY = -7;
+            if (m_mapOriginY < SCROLL_MIN_ORIGIN) {
+                m_mapOriginY = SCROLL_MIN_ORIGIN;
             }
             if (!(MAP_WIDTH - VIEW_EDGE_MARGIN >= m_mapOriginX)) {
                 m_mapOriginX = MAP_WIDTH - VIEW_EDGE_MARGIN;
@@ -2100,15 +2204,19 @@ i32 advManager::ProcessSelect(struct tag_message* message, class mapCell** event
                         radarMessage.payload.mouse.y = RADAR_BOTTOM - 1;
                     }
                     gpMouseManager->Main(radarMessage);
-                    mouseX = static_cast<i32>((radarMessage.payload.mouse.x - 480) / radarScale);
-                    mouseY = static_cast<i32>((radarMessage.payload.mouse.y - 16) / radarScale);
-                    m_mapOriginX = mouseX - 7;
-                    m_mapOriginY = mouseY - 7;
-                    if (m_mapOriginX < -7) {
-                        m_mapOriginX = -7;
+                    mouseX = static_cast<i32>(
+                        (radarMessage.payload.mouse.x - RADAR_LEFT) / radarScale
+                    );
+                    mouseY = static_cast<i32>(
+                        (radarMessage.payload.mouse.y - RADAR_TOP) / radarScale
+                    );
+                    m_mapOriginX = mouseX - VIEW_CENTER_CELL;
+                    m_mapOriginY = mouseY - VIEW_CENTER_CELL;
+                    if (m_mapOriginX < SCROLL_MIN_ORIGIN) {
+                        m_mapOriginX = SCROLL_MIN_ORIGIN;
                     }
-                    if (m_mapOriginY < -7) {
-                        m_mapOriginY = -7;
+                    if (m_mapOriginY < SCROLL_MIN_ORIGIN) {
+                        m_mapOriginY = SCROLL_MIN_ORIGIN;
                     }
                     if (!(MAP_WIDTH - VIEW_EDGE_MARGIN >= m_mapOriginX)) {
                         m_mapOriginX = MAP_WIDTH - VIEW_EDGE_MARGIN;
@@ -2132,7 +2240,7 @@ i32 advManager::ProcessSelect(struct tag_message* message, class mapCell** event
             "{Status Window}\n\nThis window provides information on the status "
             "of your hero or kingdom, and shows the date.  Left click here to "
             "cycle through these windows.",
-            4,
+            NORMAL_DIALOG_QUICK_VIEW,
             -1,
             -1,
             -1,
@@ -2153,43 +2261,43 @@ i32 advManager::ProcessDeSelect(
     class mapCell** eventCell
 ) {
     switch (message->payload.widget.id) {
-        case IDX(PANEL_TOWN_PAGE_PREVIOUS):
+        case PANEL_TOWN_PAGE_PREVIOUS:
             if (gpCurPlayer->m_townLocatorPage > 0) {
                 --gpCurPlayer->m_townLocatorPage;
                 UpdateTownLocators(1, 1);
             }
             break;
-        case IDX(PANEL_TOWN_PAGE_NEXT):
-            if (gpCurPlayer->m_townLocatorPage + IDX(LOCATOR_PAGE_STEP)
+        case PANEL_TOWN_PAGE_NEXT:
+            if (gpCurPlayer->m_townLocatorPage + LOCATOR_PAGE_STEP
                 < gpCurPlayer->m_townCount) {
                 ++gpCurPlayer->m_townLocatorPage;
                 UpdateTownLocators(1, 1);
             }
             break;
-        case IDX(PANEL_HERO_PAGE_PREVIOUS):
+        case PANEL_HERO_PAGE_PREVIOUS:
             if (gpCurPlayer->m_heroLocatorPage > 0) {
                 --gpCurPlayer->m_heroLocatorPage;
                 UpdateHeroLocators(1, 1);
             }
             break;
-        case IDX(PANEL_HERO_PAGE_NEXT):
-            if (gpCurPlayer->m_heroLocatorPage + IDX(LOCATOR_PAGE_STEP)
+        case PANEL_HERO_PAGE_NEXT:
+            if (gpCurPlayer->m_heroLocatorPage + LOCATOR_PAGE_STEP
                 < gpCurPlayer->m_heroCount) {
                 ++gpCurPlayer->m_heroLocatorPage;
                 UpdateHeroLocators(1, 1);
             }
             break;
-        case IDX(PANEL_CONTINUE_ROUTE):
+        case PANEL_CONTINUE_ROUTE:
             m_selectedCell = ADVMGR_COMMAND_CONTINUE_ROUTE;
             *eventCell = DoAdvCommand();
             break;
-        case IDX(PANEL_ADVENTURE_OPTIONS):
+        case PANEL_ADVENTURE_OPTIONS:
             AdvPanel();
             break;
-        case IDX(PANEL_CONTROL_OPTIONS):
+        case PANEL_CONTROL_OPTIONS:
             *result = ControlPanel();
             break;
-        case IDX(PANEL_END_TURN):
+        case PANEL_END_TURN:
             if (gpCurPlayer->HasMobileHero()) {
                 NormalDialog(
                     "One or more heroes may still move, are you sure you want to end your turn?",
@@ -2209,11 +2317,11 @@ i32 advManager::ProcessDeSelect(
             }
             gpGame->NextPlayer();
             break;
-        case IDX(PANEL_NEXT_HERO):
+        case PANEL_NEXT_HERO:
             HideRoute(1, 0, 1);
             SetHeroContext(gpCurPlayer->NextHero(1), 0);
             break;
-        case IDX(PANEL_OVERVIEW): {
+        case PANEL_OVERVIEW: {
             if (gbLowMemory) {
                 SetEnvironmentOrigin(-1, -1, 1);
             }
@@ -2250,10 +2358,10 @@ i32 advManager::ProcessDeSelect(
             }
             break;
         }
-        case IDX(PANEL_CAST_SPELL):
+        case PANEL_CAST_SPELL:
             CheckCastSpell();
             break;
-        case IDX(PANEL_SYSTEM_OPTIONS):
+        case PANEL_SYSTEM_OPTIONS:
             SystemOptions();
             break;
     }
@@ -4043,7 +4151,7 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
     i32 minYOffset;
     i32 minXSlot;
     i32 skipFrameIndex;
-    u32 objectTilesetLocal;
+    TilesetId objectTilesetLocal;
 
 
     if (partial == 0) {
@@ -4158,32 +4266,32 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                             radarColorValue = gOwnerColors[ownerColorIndex];
                         }
                     } else {
-                        objectTilesetLocal = static_cast<u32>(-1);
+                        objectTilesetLocal = static_cast<TilesetId>(-1);
                         if (cellValue->m_objectIndex != IDX(MAPCELL_SPRITE_NONE)) {
-                            objectTilesetLocal = IDX(cellValue->m_objectTileset);
+                            objectTilesetLocal = cellValue->m_objectTileset;
                         } else if (cellValue->m_overlayIndex != IDX(MAPCELL_SPRITE_NONE)) {
-                            objectTilesetLocal = IDX(cellValue->m_overlayTileset);
+                            objectTilesetLocal = cellValue->m_overlayTileset;
                         }
 
-                        if (cellValue->m_triggerType == RADAR_TOWN_TILESET_1
-                            || (objectTilesetLocal == IDX(TILESET_FLAG32) && mapColumnLimit > 0
+                        if (cellValue->m_triggerType == MAP_OBJECT_CASTLE
+                            || (objectTilesetLocal == TILESET_FLAG32 && mapColumnLimit > 0
                                 && mapColumnLimit < MAP_WIDTH - 1
                                 && m_mapData->Row(mapRow)[mapColumnLimit - 1].m_triggerType
                                        == RADAR_NEIGHBOR_TRIGGER)
                             || m_mapData->Row(mapRow)[mapColumnLimit + 1].m_triggerType
                                    == RADAR_NEIGHBOR_TRIGGER) {
-                            objectTilesetLocal = RADAR_TOWN_TILESET_1;
+                            objectTilesetLocal = TILESET_OBJNTOWN;
                         }
 
-                        if (objectTilesetLocal == RADAR_SPECIAL_TILESET
+                        if (objectTilesetLocal == TILESET_X_LOC2
                             && cellValue->m_triggerType == RADAR_REEFS_TRIGGER) {
                             radarColorValue =
                                 gMapColors[giGroundToTerrain[cellValue->m_terrainImageIndex]]
                                 + RADAR_TERRAIN_SHADE;
                         } else {
                             switch (objectTilesetLocal) {
-                                case RADAR_TOWN_TILESET_1:
-                                case RADAR_TOWN_TILESET_2: {
+                                case TILESET_OBJNTOWN:
+                                case TILESET_OBJNTWBA: {
                                     i32 ownerColorIndex;
                                     ownerIndexValue =
                                         gpGame->m_townOwners[cellValue->m_objectMetadata];
@@ -4204,20 +4312,20 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                                     }
                                     break;
                                 }
-                                case IDX(TILESET_MTNSNOW):
-                                case IDX(TILESET_MTNSWMP):
-                                case IDX(TILESET_MTNLAVA):
-                                case IDX(TILESET_MTNDSRT):
-                                case IDX(TILESET_MTNDIRT):
-                                case IDX(TILESET_MTNMULT):
-                                case IDX(TILESET_MTNCRCK):
-                                case IDX(TILESET_MTNGRAS):
-                                case IDX(TILESET_TREJNGL):
-                                case IDX(TILESET_TREEVIL):
-                                case IDX(TILESET_TRESNOW):
-                                case IDX(TILESET_TREFIR):
-                                case IDX(TILESET_TREFALL):
-                                case MAP_OBJECT_RANDOM_CASTLE:
+                                case TILESET_MTNSNOW:
+                                case TILESET_MTNSWMP:
+                                case TILESET_MTNLAVA:
+                                case TILESET_MTNDSRT:
+                                case TILESET_MTNDIRT:
+                                case TILESET_MTNMULT:
+                                case TILESET_MTNCRCK:
+                                case TILESET_MTNGRAS:
+                                case TILESET_TREJNGL:
+                                case TILESET_TREEVIL:
+                                case TILESET_TRESNOW:
+                                case TILESET_TREFIR:
+                                case TILESET_TREFALL:
+                                case TILESET_TREDECI:
                                     switch (cellValue->m_triggerType) {
                                         case MAP_OBJECT_ALCHEMIST_LAB:
                                         case MAP_OBJECT_MINE:
@@ -7973,19 +8081,18 @@ i32 TownPortalHandler(tag_message& message) {
 
     if (message.type == ADVMGR_TOWN_PORTAL_MESSAGE) {
         switch (message.payload.widget.command) {
-            case IDX(TOWN_PORTAL_COMMAND_SELECT):
+            case WIDGET_COMMAND_DESELECT:
                 switch (message.payload.widget.id) {
-                    case IDX(TOWN_PORTAL_FIRST_CHOICE):
-                    case IDX(TOWN_PORTAL_LAST_CHOICE):
+                    case TOWN_PORTAL_FIRST_CHOICE:
+                    case TOWN_PORTAL_LAST_CHOICE:
                         choiceMessage.type = ADVMGR_TOWN_PORTAL_MESSAGE;
                         choiceMessage.payload.widget.id = TOWN_PORTAL_CHOICE_WIDGET;
                         choiceMessage.payload.widget.command = ADVMGR_TOWN_PORTAL_COMMAND_CHOICE;
                         townPortalWin->BroadcastMessage(choiceMessage);
                         giTownPortalChoice = choiceMessage.payload.widget.data.value;
                         gpWindowManager->m_dialogResult = message.payload.widget.id;
-                        message.payload.widget.id = TOWN_PORTAL_CLOSE_COMMAND;
-                        message.payload.widget.command =
-                            BaseWidgetCommand(message.payload.widget.id);
+                        message.payload.widget.id = TOWN_PORTAL_CLOSE_WIDGET;
+                        message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
                         return TOWN_PORTAL_HANDLED;
                     default:
                         break;
@@ -9625,20 +9732,20 @@ void UpdateSystemOptions(i32 initialDraw) {
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = ADVMGR_SYSTEM_OPTIONS_SET_FRAME;
 
-    message.payload.widget.id = EncodeAdventureSystemOption(ADVMGR_SYSTEM_OPTION_MUSIC_VOLUME);
+    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_MUSIC_VOLUME;
     message.payload.widget.data.value = gConfig.musicVolume != 0;
     cPanel->BroadcastMessage(message);
-    message.payload.widget.id = EncodeAdventureSystemOption(ADVMGR_SYSTEM_OPTION_SOUND_VOLUME);
+    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_SOUND_VOLUME;
     if (gConfig.soundVolume == 0) {
         message.payload.widget.data.value = ADVMGR_SYSTEM_OPTIONS_SOUND_FRAME_BASE;
     } else {
         message.payload.widget.data.value = ADVMGR_SYSTEM_OPTIONS_SOUND_FRAME_BASE + 1;
     }
     cPanel->BroadcastMessage(message);
-    message.payload.widget.id = EncodeAdventureSystemOption(ADVMGR_SYSTEM_OPTION_HERO_SPEED);
+    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_HERO_SPEED;
     message.payload.widget.data.value = gConfig.walkSpeed + ADVMGR_SYSTEM_OPTIONS_SPEED_FRAME_BASE;
     cPanel->BroadcastMessage(message);
-    message.payload.widget.id = EncodeAdventureSystemOption(ADVMGR_SYSTEM_OPTION_MUSIC_SOURCE);
+    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_MUSIC_SOURCE;
     if (gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI) {
         musicQuality = 0;
     } else if (gConfig.useOpera == IDX(CONFIG_OPERA_DISABLED)) {
@@ -9649,11 +9756,11 @@ void UpdateSystemOptions(i32 initialDraw) {
     message.payload.widget.data.value =
         musicQuality + ADVMGR_SYSTEM_OPTIONS_MUSIC_SOURCE_FRAME_BASE;
     cPanel->BroadcastMessage(message);
-    message.payload.widget.id = EncodeAdventureSystemOption(ADVMGR_SYSTEM_OPTION_SHOW_ROUTE);
+    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_SHOW_ROUTE;
     message.payload.widget.data.value =
         (gConfig.showRoute == 0) + ADVMGR_SYSTEM_OPTIONS_ROUTE_FRAME_BASE;
     cPanel->BroadcastMessage(message);
-    message.payload.widget.id = EncodeAdventureSystemOption(ADVMGR_SYSTEM_OPTION_COMPUTER_SPEED);
+    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_COMPUTER_SPEED;
     if (gConfig.blackoutComputer == 0) {
         message.payload.widget.data.value =
             gConfig.computerWalkSpeed + ADVMGR_SYSTEM_OPTIONS_SPEED_FRAME_BASE;
@@ -9661,15 +9768,15 @@ void UpdateSystemOptions(i32 initialDraw) {
         message.payload.widget.data.value = ADVMGR_SYSTEM_OPTIONS_COMPUTER_HIDDEN_FRAME;
     }
     cPanel->BroadcastMessage(message);
-    message.payload.widget.id = EncodeAdventureSystemOption(ADVMGR_SYSTEM_OPTION_INTERFACE);
+    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_INTERFACE;
     message.payload.widget.data.value =
         gConfig.evilInterfaceUsage + ADVMGR_SYSTEM_OPTIONS_INTERFACE_FRAME_BASE;
     cPanel->BroadcastMessage(message);
-    message.payload.widget.id = EncodeAdventureSystemOption(ADVMGR_SYSTEM_OPTION_VIDEO);
+    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_VIDEO;
     message.payload.widget.data.value =
         ADVMGR_SYSTEM_OPTIONS_VIDEO_FRAME_BASE + (gConfig.slowVideo != 0);
     cPanel->BroadcastMessage(message);
-    message.payload.widget.id = EncodeAdventureSystemOption(ADVMGR_SYSTEM_OPTION_COLOR_CURSOR);
+    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_COLOR_CURSOR;
     message.payload.widget.data.value =
         gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].colorMouseCursor
         + ADVMGR_SYSTEM_OPTIONS_CURSOR_FRAME_BASE;
@@ -9677,27 +9784,27 @@ void UpdateSystemOptions(i32 initialDraw) {
 
     message.payload.widget.command = ADVMGR_SYSTEM_OPTIONS_SET_TEXT;
     message.payload.widget.id =
-        EncodeAdventureSystemOptionTextControl(ADVMGR_SYSTEM_OPTION_MUSIC_VOLUME);
+        ADVMGR_SYSTEM_OPTION_MUSIC_VOLUME + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
     message.payload.widget.data.text = onOffText[gConfig.musicVolume];
     cPanel->BroadcastMessage(message);
     message.payload.widget.id =
-        EncodeAdventureSystemOptionTextControl(ADVMGR_SYSTEM_OPTION_SOUND_VOLUME);
+        ADVMGR_SYSTEM_OPTION_SOUND_VOLUME + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
     message.payload.widget.data.text = onOffText[gConfig.soundVolume];
     cPanel->BroadcastMessage(message);
     message.payload.widget.id =
-        EncodeAdventureSystemOptionTextControl(ADVMGR_SYSTEM_OPTION_HERO_SPEED);
+        ADVMGR_SYSTEM_OPTION_HERO_SPEED + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
     message.payload.widget.data.text = walkSpeedText[gConfig.walkSpeed];
     cPanel->BroadcastMessage(message);
     message.payload.widget.id =
-        EncodeAdventureSystemOptionTextControl(ADVMGR_SYSTEM_OPTION_MUSIC_SOURCE);
+        ADVMGR_SYSTEM_OPTION_MUSIC_SOURCE + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
     message.payload.widget.data.text = musicQualityText[musicQuality];
     cPanel->BroadcastMessage(message);
     message.payload.widget.id =
-        EncodeAdventureSystemOptionTextControl(ADVMGR_SYSTEM_OPTION_SHOW_ROUTE);
+        ADVMGR_SYSTEM_OPTION_SHOW_ROUTE + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
     message.payload.widget.data.text = onOffText[gConfig.showRoute];
     cPanel->BroadcastMessage(message);
     message.payload.widget.id =
-        EncodeAdventureSystemOptionTextControl(ADVMGR_SYSTEM_OPTION_COMPUTER_SPEED);
+        ADVMGR_SYSTEM_OPTION_COMPUTER_SPEED + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
     if (gConfig.blackoutComputer == 0) {
         message.payload.widget.data.text = walkSpeedText[gConfig.computerWalkSpeed];
     } else {
@@ -9705,14 +9812,15 @@ void UpdateSystemOptions(i32 initialDraw) {
     }
     cPanel->BroadcastMessage(message);
     message.payload.widget.id =
-        EncodeAdventureSystemOptionTextControl(ADVMGR_SYSTEM_OPTION_INTERFACE);
+        ADVMGR_SYSTEM_OPTION_INTERFACE + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
     message.payload.widget.data.text = gInterfaceTypeText[gConfig.evilInterfaceUsage];
     cPanel->BroadcastMessage(message);
-    message.payload.widget.id = EncodeAdventureSystemOptionTextControl(ADVMGR_SYSTEM_OPTION_VIDEO);
+    message.payload.widget.id =
+        ADVMGR_SYSTEM_OPTION_VIDEO + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
     message.payload.widget.data.text = cSlowVideoLevelText[gConfig.slowVideo != 0];
     cPanel->BroadcastMessage(message);
     message.payload.widget.id =
-        EncodeAdventureSystemOptionTextControl(ADVMGR_SYSTEM_OPTION_COLOR_CURSOR);
+        ADVMGR_SYSTEM_OPTION_COLOR_CURSOR + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
     message.payload.widget.data.text =
         cBWMouseText[gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].colorMouseCursor];
     cPanel->BroadcastMessage(message);
@@ -9735,34 +9843,34 @@ i32 SystemOptionsHandler(struct tag_message& message) {
                 i32 helpIndex = OPTION_DIALOG_NONE;
 
                 switch (message.payload.widget.id) {
-                    case IDX(SYSTEM_OPTIONS_DIALOG_ACCEPT):
+                    case SYSTEM_OPTIONS_DIALOG_ACCEPT:
                         helpIndex = 0;
                         break;
-                    case IDX(ADVMGR_SYSTEM_OPTION_MUSIC_VOLUME):
+                    case ADVMGR_SYSTEM_OPTION_MUSIC_VOLUME:
                         helpIndex = 1;
                         break;
-                    case IDX(ADVMGR_SYSTEM_OPTION_SOUND_VOLUME):
+                    case ADVMGR_SYSTEM_OPTION_SOUND_VOLUME:
                         helpIndex = 2;
                         break;
-                    case IDX(ADVMGR_SYSTEM_OPTION_HERO_SPEED):
+                    case ADVMGR_SYSTEM_OPTION_HERO_SPEED:
                         helpIndex = 3;
                         break;
-                    case IDX(ADVMGR_SYSTEM_OPTION_MUSIC_SOURCE):
+                    case ADVMGR_SYSTEM_OPTION_MUSIC_SOURCE:
                         helpIndex = 4;
                         break;
-                    case IDX(ADVMGR_SYSTEM_OPTION_SHOW_ROUTE):
+                    case ADVMGR_SYSTEM_OPTION_SHOW_ROUTE:
                         helpIndex = 5;
                         break;
-                    case IDX(ADVMGR_SYSTEM_OPTION_COMPUTER_SPEED):
+                    case ADVMGR_SYSTEM_OPTION_COMPUTER_SPEED:
                         helpIndex = 6;
                         break;
-                    case IDX(ADVMGR_SYSTEM_OPTION_INTERFACE):
+                    case ADVMGR_SYSTEM_OPTION_INTERFACE:
                         helpIndex = 7;
                         break;
-                    case IDX(ADVMGR_SYSTEM_OPTION_VIDEO):
+                    case ADVMGR_SYSTEM_OPTION_VIDEO:
                         helpIndex = 8;
                         break;
-                    case IDX(ADVMGR_SYSTEM_OPTION_COLOR_CURSOR):
+                    case ADVMGR_SYSTEM_OPTION_COLOR_CURSOR:
                         helpIndex = 9;
                         break;
                 }
@@ -9784,16 +9892,16 @@ i32 SystemOptionsHandler(struct tag_message& message) {
             }
         } else {
             switch (message.payload.widget.command) {
-                case IDX(SYSTEM_OPTIONS_ACCEPT):
+                case WIDGET_COMMAND_DESELECT:
                     switch (message.payload.widget.id) {
-                        case IDX(SYSTEM_OPTIONS_DIALOG_ACCEPT):
+                        case SYSTEM_OPTIONS_DIALOG_ACCEPT:
                             accepted = 1;
                             break;
                     }
                     break;
 
-                case IDX(ADVMGR_SYSTEM_OPTIONS_ACTIVATE): {
-                    switch (DecodeAdventureSystemOption(message.payload.widget.id)) {
+                case ADVMGR_SYSTEM_OPTIONS_ACTIVATE: {
+                    switch (message.payload.widget.id) {
                         case ADVMGR_SYSTEM_OPTION_MUSIC_VOLUME:
                             if (gConfig.musicVolume == 0 && gpSoundManager->m_cdReady == 0
                                 && gpSoundManager->m_midiReady == 0) {
@@ -9968,8 +10076,8 @@ i32 SystemOptionsHandler(struct tag_message& message) {
     }
     if (accepted) {
         gpWindowManager->m_dialogResult = message.payload.widget.id;
-        message.payload.widget.id = EncodeAdventureSystemOption(ADVMGR_SYSTEM_OPTION_FIRST);
-        message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
+        message.payload.widget.id = ADVMGR_SYSTEM_OPTION_FIRST;
+        message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
         return SYSTEM_OPTIONS_HANDLED;
     }
     return SYSTEM_OPTIONS_UNHANDLED;
