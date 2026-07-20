@@ -2035,7 +2035,9 @@ void game::RandomizeEvents(void) {
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MONSTER:
                     if (cell2->m_objectMetadata == 0) {
-                        cell2->m_objectMetadata = GetRandomNumTroops(cell2->m_objectIndex);
+                        cell2->m_objectMetadata = GetRandomNumTroops(
+                            static_cast<CreatureType>(cell2->m_objectIndex)
+                        );
                         if (cell2->m_objectIndex != 59 && cell2->m_objectIndex != 62
                             && cell2->m_objectIndex != 63 && cell2->m_objectIndex != 64
                             && cell2->m_objectIndex != 65 && Random(0, 100) < 20)
@@ -3355,143 +3357,147 @@ i32 ViewArmyHandler(tag_message& msg) {
 }
 
 VA(0x0047b6c4, 0x671)
-i32 game::GetRandomNumTroops(i32 monsterType) {
+i32 game::GetRandomNumTroops(H2_ENUM_PARAM(CreatureType, i32) monsterType) {
+    // Retail per-creature neutral-stack ranges. The paired bounds are balance payload,
+    // while the switch labels identify the domain that owns each pair.
+    // NOLINTBEGIN(readability-magic-numbers)
     switch (monsterType) {
-        case 0:
+        case CREATURE_PEASANT:
             return Random(40, 80);
-        case 1:
+        case CREATURE_ARCHER:
             return Random(20, 30);
-        case 2:
+        case CREATURE_RANGER:
             return Random(20, 30);
-        case 3:
+        case CREATURE_PIKEMAN:
             return Random(20, 30);
-        case 4:
+        case CREATURE_VETERAN_PIKEMAN:
             return Random(20, 30);
-        case 5:
+        case CREATURE_SWORDSMAN:
             return Random(12, 25);
-        case 6:
+        case CREATURE_MASTER_SWORDSMAN:
             return Random(12, 25);
-        case 7:
+        case CREATURE_CAVALRY:
             return Random(10, 18);
-        case 8:
+        case CREATURE_CHAMPION:
             return Random(8, 16);
-        case 9:
+        case CREATURE_PALADIN:
             return Random(6, 12);
-        case 10:
+        case CREATURE_CRUSADER:
             return Random(6, 10);
-        case 11:
+        case CREATURE_GOBLIN:
             return Random(25, 40);
-        case 12:
+        case CREATURE_ORC:
             return Random(15, 30);
-        case 13:
+        case CREATURE_ORC_CHIEF:
             return Random(15, 30);
-        case 14:
+        case CREATURE_WOLF:
             return Random(20, 35);
-        case 15:
+        case CREATURE_OGRE:
             return Random(12, 25);
-        case 16:
+        case CREATURE_OGRE_LORD:
             return Random(10, 20);
-        case 17:
+        case CREATURE_TROLL:
             return Random(7, 10);
-        case 18:
+        case CREATURE_WAR_TROLL:
             return Random(7, 10);
-        case 19:
+        case CREATURE_CYCLOPS:
             return Random(5, 7);
-        case 20:
+        case CREATURE_SPRITE:
             return Random(25, 45);
-        case 21:
+        case CREATURE_DWARF:
             return Random(12, 25);
-        case 22:
+        case CREATURE_BATTLE_DWARF:
             return Random(10, 22);
-        case 23:
+        case CREATURE_ELF:
             return Random(15, 30);
-        case 24:
+        case CREATURE_GRAND_ELF:
             return Random(12, 28);
-        case 25:
+        case CREATURE_DRUID:
             return Random(10, 25);
-        case 26:
+        case CREATURE_GREATER_DRUID:
             return Random(10, 20);
-        case 27:
+        case CREATURE_UNICORN:
             return Random(8, 15);
-        case 28:
+        case CREATURE_PHOENIX:
             return Random(7, 12);
-        case 29:
+        case CREATURE_CENTAUR:
             return Random(20, 50);
-        case 30:
+        case CREATURE_GARGOYLE:
             return Random(15, 30);
-        case 31:
+        case CREATURE_GRIFFIN:
             return Random(12, 25);
-        case 32:
+        case CREATURE_MINOTAUR:
             return Random(10, 16);
-        case 33:
+        case CREATURE_MINOTAUR_KING:
             return Random(9, 16);
-        case 34:
+        case CREATURE_HYDRA:
             return Random(7, 10);
-        case 35:
+        case CREATURE_GREEN_DRAGON:
             return Random(4, 7);
-        case 36:
+        case CREATURE_RED_DRAGON:
             return Random(3, 7);
-        case 37:
+        case CREATURE_BLACK_DRAGON:
             return Random(3, 7);
-        case 38:
+        case CREATURE_HALFLING:
             return Random(20, 50);
-        case 39:
+        case CREATURE_BOAR:
             return Random(15, 30);
-        case 40:
+        case CREATURE_IRON_GOLEM:
             return Random(10, 25);
-        case 41:
+        case CREATURE_STEEL_GOLEM:
             return Random(10, 22);
-        case 42:
+        case CREATURE_ROC:
             return Random(10, 16);
-        case 43:
+        case CREATURE_MAGE:
             return Random(8, 12);
-        case 44:
+        case CREATURE_ARCHMAGE:
             return Random(7, 11);
-        case 45:
+        case CREATURE_GIANT:
             return Random(5, 8);
-        case 46:
+        case CREATURE_TITAN:
             return Random(3, 7);
-        case 47:
+        case CREATURE_SKELETON:
             return Random(20, 50);
-        case 48:
+        case CREATURE_ZOMBIE:
             return Random(15, 30);
-        case 49:
+        case CREATURE_MUTANT_ZOMBIE:
             return Random(15, 30);
-        case 50:
+        case CREATURE_MUMMY:
             return Random(10, 25);
-        case 51:
+        case CREATURE_ROYAL_MUMMY:
             return Random(10, 25);
-        case 52:
+        case CREATURE_VAMPIRE:
             return Random(8, 12);
-        case 53:
+        case CREATURE_VAMPIRE_LORD:
             return Random(8, 12);
-        case 54:
+        case CREATURE_LICH:
             return Random(6, 10);
-        case 55:
+        case CREATURE_POWER_LICH:
             return Random(6, 10);
-        case 56:
+        case CREATURE_BONE_DRAGON:
             return Random(4, 8);
-        case 57:
+        case CREATURE_ROGUE:
             return Random(20, 40);
-        case 58:
+        case CREATURE_NOMAD:
             return Random(12, 25);
-        case 59:
+        case CREATURE_GHOST:
             return Random(10, 20);
-        case 60:
+        case CREATURE_GENIE:
             return Random(5, 10);
-        case 61:
+        case CREATURE_MEDUSA:
             return Random(12, 20);
-        case 62:
+        case CREATURE_EARTH_ELEMENTAL:
             return Random(13, 25);
-        case 63:
+        case CREATURE_AIR_ELEMENTAL:
             return Random(13, 25);
-        case 64:
+        case CREATURE_FIRE_ELEMENTAL:
             return Random(13, 25);
-        case 65:
+        case CREATURE_WATER_ELEMENTAL:
             return Random(13, 25);
         default:
             return 3;
     }
+    // NOLINTEND(readability-magic-numbers)
 }
 
 VA(0x0047bd35, 0x3f)
@@ -4168,8 +4174,12 @@ void game::PerMonth(void) {
                         cell0->m_triggerType = MONSTER_TRIGGER;
                         cell0->m_objectTileset = MONSTER_TILESET;
                         cell0->m_objectIndex = static_cast<u8>(giMonthTypeExtra);
-                        firstCount5 = GetRandomNumTroops(giMonthTypeExtra);
-                        secondCount4 = GetRandomNumTroops(giMonthTypeExtra);
+                        firstCount5 = GetRandomNumTroops(
+                            static_cast<CreatureType>(giMonthTypeExtra)
+                        );
+                        secondCount4 = GetRandomNumTroops(
+                            static_cast<CreatureType>(giMonthTypeExtra)
+                        );
                         cell0->m_objectMetadata = ((firstCount5 | 0) + secondCount4) | 0;
                         if (Random(MONSTER_SPAWN_MIN, MONSTER_GUARD_ROLL_MAX)
                             < MONSTER_GUARD_CHANCE)

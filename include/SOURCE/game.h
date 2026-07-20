@@ -225,7 +225,7 @@ public:
         class armyGroup*,
         i32
     );
-    i32 GetRandomNumTroops(i32);
+    i32 GetRandomNumTroops(H2_ENUM_PARAM(CreatureType, i32));
     void TurnOnAIMusic(void);
     void TurnOffAIMusic(void);
     void NextPlayer(void);
