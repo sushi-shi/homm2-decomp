@@ -1436,11 +1436,17 @@ void combatManager::CatAttack(i32 side) {
         if (frame18 != 0) {
             giMinExtentX = previousX5 - COMBAT_CATAPULT_PROJECTILE_EXTENT_RADIUS;
             giMaxExtentX =
-                static_cast<i32l>(projectileX11 + COMBAT_CATAPULT_PROJECTILE_EXTENT_RADIUS);
+                static_cast<i32l>(
+                    projectileX11 + IDX(COMBAT_CATAPULT_PROJECTILE_EXTENT_RADIUS)
+                );
             giMinExtentY =
-                static_cast<i32l>(projectileY4 - COMBAT_CATAPULT_PROJECTILE_EXTENT_RADIUS);
+                static_cast<i32l>(
+                    projectileY4 - IDX(COMBAT_CATAPULT_PROJECTILE_EXTENT_RADIUS)
+                );
             giMaxExtentY =
-                static_cast<i32l>(projectileY4 + COMBAT_CATAPULT_PROJECTILE_EXTENT_RADIUS);
+                static_cast<i32l>(
+                    projectileY4 + IDX(COMBAT_CATAPULT_PROJECTILE_EXTENT_RADIUS)
+                );
             if (previousY2 < projectileY4)
                 giMinExtentY = previousY2 - COMBAT_CATAPULT_PROJECTILE_EXTENT_RADIUS;
             else
@@ -1515,7 +1521,8 @@ void combatManager::CatAttack(i32 side) {
             && (gateIndex2 != -1 || missShot19 != 0))
             continue;
         glTimers[COMBAT_CATAPULT_TIMER_SLOT] = static_cast<i32l>(
-            KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * COMBAT_CATAPULT_ANIMATION_DELAY
+            KBTickCount()
+            + gfCombatSpeedMod[gConfig.combatSpeed] * IDX(COMBAT_CATAPULT_ANIMATION_DELAY)
         );
         DrawFrame(0, 0, 1, 0, 0, 1, 0);
         if (gateIndex2 != -1 && frame18 >= COMBAT_CATAPULT_GATE_CLOUD_FIRST_FRAME && !missShot19) {

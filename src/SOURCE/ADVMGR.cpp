@@ -4715,8 +4715,8 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
     if (skipFrameIndex == 0) {
         if (gbInViewWorld != 0) {
             m_puzzleIcon->ClipFillToBuffer(
-                static_cast<i32>(iVWMapOriginX * radarScaleState + RADAR_LEFT),
-                static_cast<i32>(iVWMapOriginY * radarScaleState + RADAR_TOP),
+                static_cast<i32>(iVWMapOriginX * radarScaleState + IDX(RADAR_LEFT)),
+                static_cast<i32>(iVWMapOriginY * radarScaleState + IDX(RADAR_TOP)),
                 radarFrameLocal,
                 RADAR_VIEWPORT_COLOR,
                 ICON_DRAW_NORMAL,
@@ -4727,8 +4727,8 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
             );
         } else {
             m_puzzleIcon->ClipFillToBuffer(
-                static_cast<i32>(m_mapOriginX * radarScaleState + RADAR_LEFT),
-                static_cast<i32>(m_mapOriginY * radarScaleState + RADAR_TOP),
+                static_cast<i32>(m_mapOriginX * radarScaleState + IDX(RADAR_LEFT)),
+                static_cast<i32>(m_mapOriginY * radarScaleState + IDX(RADAR_TOP)),
                 radarFrameLocal,
                 RADAR_VIEWPORT_COLOR,
                 ICON_DRAW_NORMAL,
@@ -4743,8 +4743,8 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
     if (updateScreen != 0) {
         if (partial != 0) {
             gpWindowManager->UpdateScreenRegion(
-                static_cast<i32>(minXSlot * radarScaleState + RADAR_LEFT),
-                static_cast<i32>(minYOffset * radarScaleState + RADAR_TOP),
+                static_cast<i32>(minXSlot * radarScaleState + IDX(RADAR_LEFT)),
+                static_cast<i32>(minYOffset * radarScaleState + IDX(RADAR_TOP)),
                 static_cast<i32>((maxXLocal - minXSlot + 1) * radarScaleState),
                 static_cast<i32>((maxYLocal - minYOffset + 1) * radarScaleState)
             );
@@ -5730,7 +5730,10 @@ i32 advManager::UpdBottomViewNewTurn(void) {
     m_adventureWindow->AddWidget(m_bottomViewHourglassBackground, -1);
 
     weekText = static_cast<char*>(
-        H2_ALLOC(BOTTOM_VIEW_TEXT_BUFFER_SIZE, NEW_TURN_LINE_BASE + NEW_TURN_WEEK_ALLOC_LINE_OFFSET)
+        H2_ALLOC(
+            BOTTOM_VIEW_TEXT_BUFFER_SIZE,
+            NEW_TURN_LINE_BASE + IDX(NEW_TURN_WEEK_ALLOC_LINE_OFFSET)
+        )
     );
     sprintf(weekText, "%s: %d  %s: %d", "Month", gpGame->m_month, "Week", gpGame->m_week);
     m_bottomViewAllTexts[0] = new textWidget(
@@ -5751,7 +5754,10 @@ i32 advManager::UpdBottomViewNewTurn(void) {
     m_adventureWindow->AddWidget(m_bottomViewAllTexts[0], -1);
 
     dayText = static_cast<char*>(
-        H2_ALLOC(BOTTOM_VIEW_TEXT_BUFFER_SIZE, NEW_TURN_LINE_BASE + NEW_TURN_DAY_ALLOC_LINE_OFFSET)
+        H2_ALLOC(
+            BOTTOM_VIEW_TEXT_BUFFER_SIZE,
+            NEW_TURN_LINE_BASE + IDX(NEW_TURN_DAY_ALLOC_LINE_OFFSET)
+        )
     );
     sprintf(dayText, "%s: %d", "Day", gpGame->m_day);
     m_bottomViewAllTexts[0] = new textWidget(
@@ -5815,7 +5821,7 @@ i32 advManager::UpdBottomViewResMsg(void) {
     }
     messageText2 = static_cast<char*>(H2_ALLOC(
         strlen(gcBottomViewText) + 1,
-        RESOURCE_VIEW_LINE_BASE + RESOURCE_VIEW_MESSAGE_ALLOC_LINE_OFFSET
+        RESOURCE_VIEW_LINE_BASE + IDX(RESOURCE_VIEW_MESSAGE_ALLOC_LINE_OFFSET)
     ));
     sprintf(messageText2, gcBottomViewText);
     m_bottomViewAllTexts[0] = new textWidget(
@@ -5864,7 +5870,7 @@ i32 advManager::UpdBottomViewResMsg(void) {
 
         resourceCountText6 = static_cast<char*>(H2_ALLOC(
             BOTTOM_VIEW_COUNT_BUFFER_SIZE,
-            RESOURCE_VIEW_LINE_BASE + RESOURCE_VIEW_COUNT_ALLOC_LINE_OFFSET
+            RESOURCE_VIEW_LINE_BASE + IDX(RESOURCE_VIEW_COUNT_ALLOC_LINE_OFFSET)
         ));
         sprintf(resourceCountText6, "%d", giBottomViewResourceQty);
         m_bottomViewAllTexts[1] = new textWidget(
@@ -5971,7 +5977,7 @@ i32 advManager::UpdBottomViewKingdom(void) {
     for (index11 = 0; index11 < KINGDOM_VIEW_ENTRY_COUNT; ++index11) {
         countText14[index11] = static_cast<char*>(H2_ALLOC(
             BOTTOM_VIEW_COUNT_BUFFER_SIZE,
-            KINGDOM_VIEW_LINE_BASE + KINGDOM_VIEW_COUNT_ALLOC_LINE_OFFSET
+            KINGDOM_VIEW_LINE_BASE + IDX(KINGDOM_VIEW_COUNT_ALLOC_LINE_OFFSET)
         ));
         if (index11 < KINGDOM_VIEW_RESOURCE_COUNT) {
             sprintf(countText14[index11], "%d", gpCurPlayer->m_resources[index11]);
@@ -6312,7 +6318,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                     creatureTextWidgetsLocal[armyIndex] = new textWidget(
                         static_cast<i16>(armyIndex * ARMY_QUICK_ICON_SIZE + armyStartPosition),
                         static_cast<i16>(
-                            HERO_QUICK_DETAILED_CREATURE_Y + ARMY_QUICK_ICON_SIZE
+                            HERO_QUICK_DETAILED_CREATURE_Y + IDX(ARMY_QUICK_ICON_SIZE)
                         ),
                         ARMY_QUICK_ICON_SIZE,
                         ARMY_QUICK_LABEL_HEIGHT,
@@ -10138,27 +10144,27 @@ void UpdateSystemOptions(i32 initialDraw) {
 
     message.payload.widget.command = ADVMGR_SYSTEM_OPTIONS_SET_TEXT;
     message.payload.widget.id =
-        ADVMGR_SYSTEM_OPTION_MUSIC_VOLUME + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+        IDX(ADVMGR_SYSTEM_OPTION_MUSIC_VOLUME) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
     message.payload.widget.data.text = onOffText[IDX(gConfig.musicVolume)];
     cPanel->BroadcastMessage(message);
     message.payload.widget.id =
-        ADVMGR_SYSTEM_OPTION_SOUND_VOLUME + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+        IDX(ADVMGR_SYSTEM_OPTION_SOUND_VOLUME) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
     message.payload.widget.data.text = onOffText[IDX(gConfig.soundVolume)];
     cPanel->BroadcastMessage(message);
     message.payload.widget.id =
-        ADVMGR_SYSTEM_OPTION_HERO_SPEED + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+        IDX(ADVMGR_SYSTEM_OPTION_HERO_SPEED) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
     message.payload.widget.data.text = walkSpeedText[IDX(gConfig.walkSpeed)];
     cPanel->BroadcastMessage(message);
     message.payload.widget.id =
-        ADVMGR_SYSTEM_OPTION_MUSIC_SOURCE + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+        IDX(ADVMGR_SYSTEM_OPTION_MUSIC_SOURCE) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
     message.payload.widget.data.text = musicQualityText[IDX(musicQuality)];
     cPanel->BroadcastMessage(message);
     message.payload.widget.id =
-        ADVMGR_SYSTEM_OPTION_SHOW_ROUTE + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+        IDX(ADVMGR_SYSTEM_OPTION_SHOW_ROUTE) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
     message.payload.widget.data.text = onOffText[gConfig.showRoute];
     cPanel->BroadcastMessage(message);
     message.payload.widget.id =
-        ADVMGR_SYSTEM_OPTION_COMPUTER_SPEED + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+        IDX(ADVMGR_SYSTEM_OPTION_COMPUTER_SPEED) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
     if (gConfig.blackoutComputer == 0) {
         message.payload.widget.data.text = walkSpeedText[IDX(gConfig.computerWalkSpeed)];
     } else {
@@ -10166,15 +10172,15 @@ void UpdateSystemOptions(i32 initialDraw) {
     }
     cPanel->BroadcastMessage(message);
     message.payload.widget.id =
-        ADVMGR_SYSTEM_OPTION_INTERFACE + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+        IDX(ADVMGR_SYSTEM_OPTION_INTERFACE) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
     message.payload.widget.data.text = gInterfaceTypeText[gConfig.evilInterfaceUsage];
     cPanel->BroadcastMessage(message);
     message.payload.widget.id =
-        ADVMGR_SYSTEM_OPTION_VIDEO + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+        IDX(ADVMGR_SYSTEM_OPTION_VIDEO) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
     message.payload.widget.data.text = cSlowVideoLevelText[gConfig.slowVideo != 0];
     cPanel->BroadcastMessage(message);
     message.payload.widget.id =
-        ADVMGR_SYSTEM_OPTION_COLOR_CURSOR + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+        IDX(ADVMGR_SYSTEM_OPTION_COLOR_CURSOR) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
     message.payload.widget.data.text =
         cBWMouseText[gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].colorMouseCursor];
     cPanel->BroadcastMessage(message);
