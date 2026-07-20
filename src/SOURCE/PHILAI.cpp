@@ -300,7 +300,7 @@ void philAI::CheckForCreatureUpgrades(void) {
     i32 node;
     i32 armyIndex;
     i32 creatureIndex;
-    i32 dwelling;
+    BuildingSlotType dwelling;
     i32 canUpgrade;
     town* townPtr;
     armyGroup* armyPtr;
@@ -324,13 +324,14 @@ void philAI::CheckForCreatureUpgrades(void) {
                 if (armyPtr->m_creatureTypes[creatureIndex] == CREATURE_NONE)
                     continue;
                 canUpgrade = 0;
-                for (dwelling = IDX(BUILDING_SLOT_DWELLING_SECOND);
-                     dwelling <= IDX(BUILDING_SLOT_DWELLING_SIXTH);
+                for (dwelling = BUILDING_SLOT_DWELLING_SECOND;
+                     dwelling <= BUILDING_SLOT_DWELLING_SIXTH;
                      dwelling++) {
-                    if (gDwellingType[IDX(townPtr->m_type)][dwelling - IDX(BUILDING_SLOT_DWELLING_FIRST)]
+                    if (gDwellingType[IDX(townPtr->m_type)]
+                                     [IDX(dwelling) - IDX(BUILDING_SLOT_DWELLING_FIRST)]
                             == armyPtr->m_creatureTypes[creatureIndex]
                         && (townPtr->m_buildings
-                            & (1 << (dwelling + CREATURE_UPGRADE_BUILDING_OFFSET)))) {
+                            & (1 << (IDX(dwelling) + CREATURE_UPGRADE_BUILDING_OFFSET)))) {
                         canUpgrade = 1;
                         upgradeType = static_cast<CreatureType>(
                             IDX(armyPtr->m_creatureTypes[creatureIndex]) + 1
@@ -918,8 +919,8 @@ void ValidateHero(hero* pHero) {
     i32 i;
     for (i = 0; i < ARMY_GROUP_SLOT_COUNT; i++) {
         if (pHero->m_army.m_creatureTypes[i] != CREATURE_NONE) {
-            if (IDX(pHero->m_army.m_creatureTypes[i]) < 0
-                || IDX(pHero->m_army.m_creatureTypes[i]) >= IDX(CREATURE_COUNT)) {
+            if (pHero->m_army.m_creatureTypes[i] < CREATURE_PEASANT
+                || pHero->m_army.m_creatureTypes[i] >= CREATURE_COUNT) {
                 i32 j = 1;
                 j++;
             }
@@ -2424,7 +2425,7 @@ void philAI::ValueOfBuyingBuilding(
 VA(0x0043d6b7, 0x19b)
 void philAI::GetBestBuilding(town* t, BHC& bhc, float& fOut) {
     float score;
-    i32 node;
+    BuildingSlotType node;
     float nb;  // best randomized benefit-cost ratio
     float kn;  // best raw benefit-cost ratio
     i32 jb;    // best building index
@@ -2433,17 +2434,16 @@ void philAI::GetBestBuilding(town* t, BHC& bhc, float& fOut) {
     nb = -99.0f;
     kn = -99.0f;
     jb = -1;
-    for (node = 0; node < TOWN_BUILDING_COUNT; node++) {
-        if (!(t->m_buildings & (1 << node))
-            || (node == IDX(BUILDING_SLOT_MAGE_GUILD)
-                && t->m_buildState < AI_MAX_MAGE_GUILD_LEVEL)) {
-            if (CanBuild(t, BuildingSlotType(node))) {
-                ValueOfBuyingBuilding(t, BuildingSlotType(node), cost, idx);
+    for (node = BUILDING_SLOT_MAGE_GUILD; node <= BUILDING_SLOT_DISABLED_LAST; node++) {
+        if (!(t->m_buildings & (1 << IDX(node)))
+            || (node == BUILDING_SLOT_MAGE_GUILD && t->m_buildState < AI_MAX_MAGE_GUILD_LEVEL)) {
+            if (CanBuild(t, node)) {
+                ValueOfBuyingBuilding(t, node, cost, idx);
                 if (gpCurPlayer->m_aiDifficulty == PLAYER_PERSONALITY_BUILDER)
                     cost = static_cast<i32>(cost * 1.3);
                 score = (Random(1, 5) + 95) * idx / 100.0f;
                 if (score > OD_STEER(kn)) {
-                    jb = node;
+                    jb = IDX(node);
                     nb = idx;
                     kn = score;
                 }
@@ -2452,7 +2452,7 @@ void philAI::GetBestBuilding(town* t, BHC& bhc, float& fOut) {
                         gText,
                         "Town:%2d  Building: % 18s   Raw BC = %8.2f,  RandBC = %8.2f.",
                         t->m_id,
-                        GetBuildingName(t->m_type, BuildingSlotType(node)),
+                        GetBuildingName(t->m_type, node),
                         idx,
                         score
                     );
@@ -3312,14 +3312,11 @@ i32 philAI::StrategicValueOfPosition(
 VA(0x0043fa3e, 0x14e)
 i32 philAI::ValueOfTown(town* t) {
     i32 sum = 0;
-    i32 idx;
-    for (idx = 0; idx <= IDX(BUILDING_SLOT_DWELLING_SIXTH); idx++) {
-        if (t->m_buildings & (1 << idx))
-            sum += GetBuildingBaseResourceValue(
-                t->m_type,
-                BuildingSlotType(idx),
-                t->m_buildState
-            );
+    BuildingSlotType building;
+    for (building = BUILDING_SLOT_MAGE_GUILD; building <= BUILDING_SLOT_DWELLING_SIXTH;
+         building++) {
+        if (t->m_buildings & (1 << IDX(building)))
+            sum += GetBuildingBaseResourceValue(t->m_type, building, t->m_buildState);
     }
     sum = (i32)(gafAITurnCostResource[IDX(RES_GOLD)] * 1250.0f * 1.5 + sum);
     sum += 750;
@@ -3958,6 +3955,7 @@ void philAI::HeroInteractionAtHero(
     i32 heroValues27[HERO_INTERACTION_HERO_COUNT];
     hero* recipientHero36;
     i32 statIndex8;
+    HeroSecondarySkill secondarySkill;
     i32 recipientFightValue10;
     hero* currentHero9;
     hero* savedHero9;
@@ -3987,13 +3985,15 @@ void philAI::HeroInteractionAtHero(
                     heroValues27[heroIndex9] += currentHero9->Stats(HeroPrimaryStat(statIndex8))
                                                 * HERO_INTERACTION_PRIMARY_STAT_VALUE;
             }
-            for (statIndex8 = 0; statIndex8 < AI_BATTLE_ARTIFACT_SLOT_COUNT; statIndex8++) {
-                if (statIndex8 == IDX(HERO_SKILL_ESTATES))
+            for (secondarySkill = HERO_SKILL_PATHFINDING; secondarySkill < HERO_SKILL_COUNT;
+                 secondarySkill++) {
+                if (secondarySkill == HERO_SKILL_ESTATES)
                     continue;
-                if (currentHero9->m_secondarySkills[statIndex8] != HERO_SKILL_LEVEL_NONE) {
+                if (currentHero9->m_secondarySkills[IDX(secondarySkill)]
+                    != HERO_SKILL_LEVEL_NONE) {
                     heroValues27[heroIndex9] +=
-                        gSSValues[statIndex8]
-                                 [IDX(currentHero9->m_secondarySkills[statIndex8])
+                        gSSValues[IDX(secondarySkill)]
+                                 [IDX(currentHero9->m_secondarySkills[IDX(secondarySkill)])
                                   - SECONDARY_SKILL_LEVEL_OFFSET];
                 }
             }
@@ -5295,7 +5295,7 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                 break;
             case MAP_OBJECT_BUOY:
                 if (!(gpCurAIHero->m_eventFlags & HERO_EVENT_BUOY)
-                    && IDX(giCurAIHeroMorale) < ARMY_GROUP_MORALE_MAX)
+                    && giCurAIHeroMorale < ARMY_GROUP_MORALE_MAX)
                     value_h = static_cast<i32>(gpCurAIHero->m_aiFightValue * AI_BUOY_VALUE_FACTOR);
                 break;
             case MAP_OBJECT_TEMPLE:
@@ -5317,7 +5317,7 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                     );
                 break;
             case MAP_OBJECT_FOUNTAIN:
-                if (!(gpCurAIHero->m_eventFlags & HERO_EVENT_FOUNTAIN) && IDX(giCurAIHeroLuck) < 3)
+                if (!(gpCurAIHero->m_eventFlags & HERO_EVENT_FOUNTAIN) && giCurAIHeroLuck < 3)
                     value_h = static_cast<i32>(
                         gpCurAIHero->m_aiFightValue * AI_MORALE_LUCK_SITE_VALUE_FACTOR
                     );
