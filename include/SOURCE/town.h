@@ -72,7 +72,7 @@ public:
     char m_id;
     char m_owner;
     i8 m_threat;
-    char m_type;
+    H2_ENUM_STORAGE(FactionType, char) m_type;
     u8 m_x;
     u8 m_y;
     u8 m_boatX;

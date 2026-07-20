@@ -40,6 +40,13 @@ typedef i8 b8;
     }                                                                                              \
     ;                                                                                              \
     using enum name;
+// Keep strict builds type-safe without changing the retail domain or field storage.
+#define H2_ENUM_CLASS_BEGIN_SPLIT(name, storage) enum class name : storage {
+#define H2_ENUM_CLASS_END_SPLIT(name, storage)                                                     \
+    }                                                                                              \
+    ;                                                                                              \
+    using enum name;
+#define H2_ENUM_STORAGE(name, storage) name
 #define H2_ENUM_FLAGS(name)                                                                        \
     inline constexpr name operator|(name a, name b) {                                              \
         return static_cast<name>(static_cast<i64>(a) | static_cast<i64>(b));                       \
@@ -87,6 +94,13 @@ typedef i8 b8;
     }                                                                                              \
     ;                                                                                              \
     typedef storage name;
+// The enum domain remains i32 in retail builds; each field retains its proven storage.
+#define H2_ENUM_CLASS_BEGIN_SPLIT(name, storage) enum {
+#define H2_ENUM_CLASS_END_SPLIT(name, storage)                                                     \
+    }                                                                                              \
+    ;                                                                                              \
+    typedef i32 name;
+#define H2_ENUM_STORAGE(name, storage) storage
 #define H2_ENUM_FLAGS(name)
 #endif
 

@@ -101,10 +101,10 @@ i32 armyGroup::GetMorale(hero* armyHero, town* occupiedTown, armyGroup* enemyGro
         alignmentValue = 0;
     morale += alignmentValue;
 
-    if (occupiedTown != NULL && occupiedTown->m_type != IDX(FACTION_NECROMANCER)
+    if (occupiedTown != NULL && occupiedTown->m_type != FACTION_NECROMANCER
         && (occupiedTown->m_buildings & IDX(TOWN_BUILDING_TAVERN)))
         ++morale;
-    if (occupiedTown != NULL && occupiedTown->m_type == IDX(FACTION_BARBARIAN)
+    if (occupiedTown != NULL && occupiedTown->m_type == FACTION_BARBARIAN
         && (occupiedTown->m_buildings & IDX(TOWN_BUILDING_COLISEUM)))
         morale += COLISEUM_MORALE_BONUS;
 
@@ -142,7 +142,7 @@ i32 armyGroup::IsHomogeneous(i32 countRaces) {
     for (i = 0; i < ARMY_GROUP_SLOT_COUNT; ++i) {
         if (m_creatureTypes[i] != ARMY_GROUP_EMPTY_SLOT) {
             if (countRaces == ARMY_GROUP_EMPTY_SLOT)
-                ++raceUsed[gMonsterDatabase[m_creatureTypes[i]].race];
+                ++raceUsed[IDX(gMonsterDatabase[m_creatureTypes[i]].race)];
             if (m_creatureTypes[i] != last) {
                 ++numCreatureTypes;
                 last = m_creatureTypes[i];

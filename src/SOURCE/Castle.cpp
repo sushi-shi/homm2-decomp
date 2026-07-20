@@ -125,12 +125,12 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
             && ((m_town->m_buildings & (1L << castleSlotsBase[slot7]))
                 || (m_town->m_buildings & (1L << (castleSlotsBase[slot7] + CASTLE_UPGRADE_OFFSET)))
                 || (castleSlotsBase[slot7] == IDX(BUILDING_SLOT_DWELLING_SIXTH)
-                    && m_town->m_type == IDX(FACTION_WARLOCK)
+                    && m_town->m_type == FACTION_WARLOCK
                     && (m_town->m_buildings & IDX(TOWN_BUILDING_ALTERNATE_UPGRADED_DWELLING_6))))
-            && (gTownEligibleBuildMask[m_town->m_type]
+            && (gTownEligibleBuildMask[IDX(m_town->m_type)]
                 & (1L << (castleSlotsBase[slot7] + CASTLE_UPGRADE_OFFSET)))) {
             if (castleSlotsBase[slot7] == IDX(BUILDING_SLOT_DWELLING_SIXTH)
-                && m_town->m_type == IDX(FACTION_WARLOCK)
+                && m_town->m_type == FACTION_WARLOCK
                 && ((m_town->m_buildings & IDX(TOWN_BUILDING_UPGRADED_DWELLING_6))
                     || (m_town->m_buildings & IDX(TOWN_BUILDING_ALTERNATE_UPGRADED_DWELLING_6)))) {
                 castleSlotsUse[slot7] = IDX(BUILDING_SLOT_DWELLING_LAST);
@@ -158,7 +158,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
     }
 
     message3.payload.widget.command = CASTLE_WIDGET_ICON_FILE;
-    sprintf(iconName4, "cstl%s.icn", cHeroTypeShortName[m_town->m_type]);
+    sprintf(iconName4, "cstl%s.icn", cHeroTypeShortName[IDX(m_town->m_type)]);
     message3.payload.widget.data.text = iconName4;
     for (slot7 = 0; slot7 < CASTLE_SLOT_COUNT; ++slot7) {
         message3.payload.widget.id = CONTROL_BUILDING_ICON_FIRST + slot7;
@@ -178,7 +178,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
             message3.payload.widget.data.text = gText;
         } else {
             message3.payload.widget.data.text = GetBuildingName(
-                FactionType(m_town->m_type),
+                m_town->m_type,
                 BuildingSlotType(castleSlotsUse[slot7])
             );
         }
@@ -240,7 +240,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
     message3.payload.widget.id = CONTROL_CAPTAIN_ICON;
     message3.payload.widget.data.value = captainBuilt != 0;
     casWin->BroadcastMessage(message3);
-    sprintf(gText, "CSTLCAP%c.ICN", cHeroTypeInitial[m_town->m_type]);
+    sprintf(gText, "CSTLCAP%c.ICN", cHeroTypeInitial[IDX(m_town->m_type)]);
     message3.payload.widget.command = CASTLE_WIDGET_ICON_FILE;
     message3.payload.widget.id = CONTROL_CAPTAIN_ICON;
     message3.payload.widget.data.text = gText;
@@ -270,7 +270,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
         casWin->BroadcastMessage(message3);
         sprintf(gText, "");
         for (slot7 = 0; slot7 < HERO_PRIMARY_STAT_COUNT; ++slot7) {
-            sprintf(statLine11, "%d\n", captainStats[m_town->m_type][slot7]);
+            sprintf(statLine11, "%d\n", captainStats[IDX(m_town->m_type)][slot7]);
             strcat(gText, statLine11);
         }
         message3.payload.widget.id = CONTROL_CAPTAIN_VALUES;
@@ -348,7 +348,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
                                                 ->m_terrainImageIndex]
                           - 1)
                          * TERRAIN_ICON_COLUMNS * TERRAIN_ICON_FRAMES;
-    raceIconFrame = m_town->m_type * RACE_ICON_FRAMES;
+    raceIconFrame = IDX(m_town->m_type) * RACE_ICON_FRAMES;
     if (updateOnly == 0) {
         backgroundFrame6 = 0;
         for (row9 = BACKGROUND_TERRAIN_FIRST_ROW; row9 <= BACKGROUND_TERRAIN_LAST_ROW; ++row9) {
@@ -399,7 +399,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
                 ++backgroundFrame6;
             }
         }
-        if (xIsExpansionMap == 0 && m_town->m_type == IDX(FACTION_NECROMANCER)) {
+        if (xIsExpansionMap == 0 && m_town->m_type == FACTION_NECROMANCER) {
             backgroundWidget19 = new iconWidget(
                 EXPANSION_OVERLAY_X,
                 EXPANSION_OVERLAY_Y,
@@ -482,7 +482,7 @@ i32 CastleHandler(tag_message& message) {
                         gText,
                         cCastleInfo[IDX(INFO_CANNOT_BUILD)],
                         GetBuildingName(
-                            FactionType(gpTownManager->m_town->m_type),
+                            gpTownManager->m_town->m_type,
                             BuildingSlotType(buildingIndex)
                         )
                     );
@@ -491,7 +491,7 @@ i32 CastleHandler(tag_message& message) {
                         gText,
                         cCastleInfo[IDX(INFO_CANNOT_AFFORD)],
                         GetBuildingName(
-                            FactionType(gpTownManager->m_town->m_type),
+                            gpTownManager->m_town->m_type,
                             BuildingSlotType(buildingIndex)
                         )
                     );
@@ -539,7 +539,7 @@ i32 CastleHandler(tag_message& message) {
                         gText,
                         cCastleInfo[IDX(INFO_ALREADY_BUILT)],
                         GetBuildingName(
-                            FactionType(gpTownManager->m_town->m_type),
+                            gpTownManager->m_town->m_type,
                             BuildingSlotType(buildingIndex)
                         )
                     );
@@ -549,7 +549,7 @@ i32 CastleHandler(tag_message& message) {
                             gText,
                             cCastleInfo[IDX(INFO_CANNOT_BUILD)],
                             GetBuildingName(
-                                FactionType(gpTownManager->m_town->m_type),
+                                gpTownManager->m_town->m_type,
                                 BuildingSlotType(buildingIndex)
                             )
                         );
@@ -558,7 +558,7 @@ i32 CastleHandler(tag_message& message) {
                             gText,
                             cCastleInfo[IDX(INFO_CANNOT_AFFORD)],
                             GetBuildingName(
-                                FactionType(gpTownManager->m_town->m_type),
+                                gpTownManager->m_town->m_type,
                                 BuildingSlotType(buildingIndex)
                             )
                         );
@@ -567,7 +567,7 @@ i32 CastleHandler(tag_message& message) {
                             gText,
                             cCastleInfo[IDX(INFO_BUILD)],
                             GetBuildingName(
-                                FactionType(gpTownManager->m_town->m_type),
+                                gpTownManager->m_town->m_type,
                                 BuildingSlotType(buildingIndex)
                             )
                         );

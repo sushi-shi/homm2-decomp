@@ -36,7 +36,7 @@ public:
     icon* m_backgroundIcon;
     townObject* m_townObjects[TOWN_MANAGER_OBJECT_COUNT];
     i32 m_townObjectCount;
-    i32 m_lastTownType;
+    H2_ENUM_STORAGE(FactionType, i32) m_lastTownType;
     i32 m_unknownC6;
     heroWindow* m_townWindow;
     strip* m_garrisonStrip;

@@ -13,7 +13,7 @@
 #include <SOURCE/townManager.h>
 VA(0x00432c00, 0x65)
 town::town(void) {
-    m_type = IDX(FACTION_KNIGHT);
+    m_type = FACTION_KNIGHT;
     m_id = 0;
     m_owner = 0;
     m_x = 0;
@@ -143,12 +143,12 @@ void town::BuildBuilding(i32 building) {
     if (building == TOWN_OBJECT_MAGE_GUILD) {
         ++m_buildState;
         m_spellCounts[m_buildState] = gSpellLimits[m_buildState - TOWN_MAGE_GUILD_FIRST_LEVEL];
-        if (m_type == IDX(FACTION_WIZARD) && (m_buildings & IDX(TOWN_BUILDING_LIBRARY)))
+        if (m_type == FACTION_WIZARD && (m_buildings & IDX(TOWN_BUILDING_LIBRARY)))
             ++m_spellCounts[m_buildState];
         if (m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE)
             GiveSpells(NULL);
     }
-    if (building == TOWN_OBJECT_SPECIAL_BUILDING && m_type == IDX(FACTION_WIZARD)) {
+    if (building == TOWN_OBJECT_SPECIAL_BUILDING && m_type == FACTION_WIZARD) {
         for (level = 0; level < m_buildState; ++level)
             ++m_spellCounts[level + TOWN_MAGE_GUILD_FIRST_LEVEL];
         if (m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE)
@@ -171,7 +171,7 @@ void town::BuildBuilding(i32 building) {
 
     if (building >= TOWN_OBJECT_DWELLING_1 && building <= TOWN_OBJECT_DWELLING_6) {
         m_garrison[building - TOWN_OBJECT_DWELLING_1] =
-            gMonsterDatabase[gDwellingType[m_type][building - TOWN_OBJECT_DWELLING_1]].growth;
+            gMonsterDatabase[gDwellingType[IDX(m_type)][building - TOWN_OBJECT_DWELLING_1]].growth;
     }
     if (building >= TOWN_OBJECT_UPGRADED_DWELLING_2
         && building <= TOWN_OBJECT_UPGRADED_DWELLING_6) {
