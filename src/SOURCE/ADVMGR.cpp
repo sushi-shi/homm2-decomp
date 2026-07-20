@@ -54,8 +54,12 @@
 H2_ENUM_BEGIN(AdventureScreenConstant)
     SCREEN_WIDTH     = 640,
     SCREEN_HEIGHT    = 480,
+    VIEWPORT_SIZE    = SCREEN_HEIGHT,
+    VIEW_CELL_COUNT  = 15,
     SCROLL_BORDER    = 16,
     VIEW_EDGE_MARGIN = 8,
+    VIEW_CENTER_CELL = VIEW_EDGE_MARGIN - 1,
+    VIEW_LAST_CELL   = VIEW_CELL_COUNT - 1,
     RADAR_LEFT       = 480,
     RADAR_RIGHT      = 624,
     RADAR_TOP        = 16,
@@ -66,11 +70,11 @@ H2_ENUM_END(AdventureScreenConstant)
 
 H2_ENUM_BEGIN(AdventureDrawConstant)
     CELL_PIXELS                = 32,
-    DRAW_VIEW_CELLS            = 15,
-    DRAW_LAST_CELL             = DRAW_VIEW_CELLS - 1,
+    DRAW_VIEW_CELLS            = VIEW_CELL_COUNT,
+    DRAW_LAST_CELL             = VIEW_LAST_CELL,
     DRAW_FORWARD_DIRECTION_MAX = 4,
-    DRAW_CLIP_WIDTH            = 480,
-    DRAW_CLIP_HEIGHT           = 480,
+    DRAW_CLIP_WIDTH            = VIEWPORT_SIZE,
+    DRAW_CLIP_HEIGHT           = VIEWPORT_SIZE,
     CLOUD_VARIANTS             = 4,
     HERO_SHADOW_FRAME_END      = 36,
     MINE_GUARDIAN_ICON_SLOT    = 10,
@@ -111,7 +115,7 @@ H2_ENUM_END(AdventureSourceLineConstant)
 H2_ENUM_BEGIN(AdventureBorderConstant)
     BORDER_BUFFER_SIZE      = 0x7400,
     BORDER_EDGE_SIZE        = 16,
-    BORDER_VIEW_SIZE        = 480,
+    BORDER_VIEW_SIZE        = VIEWPORT_SIZE,
     BORDER_MIDDLE_END       = BORDER_VIEW_SIZE - BORDER_EDGE_SIZE,
     BORDER_ROW_BYTES        = BORDER_VIEW_SIZE,
     BORDER_SCREEN_PITCH     = SCREEN_WIDTH,
@@ -121,7 +125,7 @@ H2_ENUM_END(AdventureBorderConstant)
 
 H2_ENUM_BEGIN(AdventureScrollConstant)
     SCROLL_MIN_ORIGIN    = 1 - VIEW_EDGE_MARGIN,
-    VIEW_CENTER_OFFSET   = VIEW_EDGE_MARGIN - 1,
+    VIEW_CENTER_OFFSET   = VIEW_CENTER_CELL,
     SCROLL_TICK_INTERVAL = 70
 H2_ENUM_END(AdventureScrollConstant)
 
@@ -157,8 +161,8 @@ H2_ENUM_BEGIN(AdventureHoverObject)
 H2_ENUM_END(AdventureHoverObject)
 
 H2_ENUM_BEGIN(AdventureHoverConstant)
-    HOVER_VIEW_CELLS           = 15,
-    HOVER_MAX_CELL             = HOVER_VIEW_CELLS - 1,
+    HOVER_VIEW_CELLS           = VIEW_CELL_COUNT,
+    HOVER_MAX_CELL             = VIEW_LAST_CELL,
     HOVER_OBJECT_BLOCKED       = 0x08,
     HOVER_UNREACHABLE          = 0x80,
     HOVER_ROUTE_DAY_LIMIT      = 3,
@@ -201,12 +205,11 @@ H2_ENUM_BEGIN(AdventureStateConstant)
     LOOPING_SOUND_LIMIT        = 4,
     OBJECT_ICON_COUNT          = 64,
     HERO_ICON_COUNT            = 8,
-    PLAYER_COLOR_COUNT         = 6,
+    PLAYER_COLOR_COUNT         = GAME_PLAYER_COUNT,
     LOOPING_SAMPLE_COUNT       = 28,
     CURSOR_SAMPLE_COUNT        = 9,
     SOUND_CELL_COUNT           = 4,
     HIGH_MEMORY_BUFFER_DIVISOR = 100,
-    XLARGE_MAP_SIZE            = 144,
     CURSOR_SAMPLE_VOLUME       = 64,
     CURSOR_SAMPLE_CHANNEL      = 2,
     QUICK_VIEW_NONE            = -99,
@@ -233,7 +236,7 @@ H2_ENUM_BEGIN(AdventureTeleportConstant)
     TELEPORT_MAP_CHANGE_VALUE         = -999,
     TELEPORT_CELL_OBJECT_FLAG         = 0x40,
     TELEPORT_RESTORE_MODE             = 99,
-    TELEPORT_VIEW_CENTER              = 7,
+    TELEPORT_VIEW_CENTER              = VIEW_CENTER_CELL,
     TELEPORT_DELAY                    = 90,
     TELEPORT_FIZZLE_TIME              = 128,
     TELEPORT_REMOTE_FIZZLE_ADJUSTMENT = 64
@@ -307,7 +310,7 @@ H2_ENUM_BEGIN(AdventureSystemOptionConstant)
 H2_ENUM_END(AdventureSystemOptionConstant)
 
 H2_ENUM_BEGIN(AdventureSummonBoatConstant)
-    SUMMON_CENTER_OFFSET   = 7,
+    SUMMON_CENTER_OFFSET   = VIEW_CENTER_CELL,
     SUMMON_DIRECTION_COUNT = 8,
     SUMMON_BOAT_COUNT      = 48,
     SUMMON_OCCUPIED_FLAG   = 0x80,
@@ -346,13 +349,13 @@ H2_ENUM_BEGIN(AdventureRouteConstant)
 H2_ENUM_END(AdventureRouteConstant)
 
 H2_ENUM_BEGIN(AdventureSearchConstant)
-    ARTIFACT_CAPACITY       = 14,
+    ARTIFACT_CAPACITY       = HERO_ARTIFACT_SLOT_COUNT,
     DIG_HOLE_FRAME          = 140,
     ULTIMATE_ARTIFACT_MUSIC = 41
 H2_ENUM_END(AdventureSearchConstant)
 
 H2_ENUM_BEGIN(AdventureComboDrawConstant)
-    COMBO_VIEW_CELLS        = 15,
+    COMBO_VIEW_CELLS        = VIEW_CELL_COUNT,
     COMBO_GRID_CELLS        = 18,
     COMBO_CLEAR_BYTES       = 256,
     COMBO_CLOUD_MARK        = 10,
@@ -366,20 +369,16 @@ H2_ENUM_BEGIN(AdventureComboDrawConstant)
 H2_ENUM_END(AdventureComboDrawConstant)
 
 H2_ENUM_BEGIN(AdventureRadarConstant)
-    RADAR_SIZE             = 144,
-    RADAR_SCREEN_PITCH     = 640,
+    RADAR_SIZE             = MAP_DIMENSION_XLARGE,
+    RADAR_SCREEN_PITCH     = SCREEN_WIDTH,
     RADAR_ROW_GROUPS       = 5,
     RADAR_GROUP_BYTES      = 128,
-    RADAR_MAP_SMALL        = 36,
-    RADAR_MAP_MEDIUM       = 72,
-    RADAR_MAP_LARGE        = 108,
-    RADAR_MAP_XLARGE       = 144,
     RADAR_UNSEEN_COLOR     = 0x24,
-    RADAR_NEUTRAL_OWNER    = 6,
+    RADAR_NEUTRAL_OWNER    = GAME_PLAYER_COUNT,
     RADAR_TERRAIN_SHADE    = 3,
     RADAR_PARTIAL_MARGIN   = 2,
     RADAR_PARTIAL_SPAN     = 16,
-    RADAR_CURRENT_CELL     = 7,
+    RADAR_CURRENT_CELL     = VIEW_CENTER_CELL,
     RADAR_TOWN_RADIUS      = 2,
     RADAR_TOWN_TRIGGER     = 0x2a,
     RADAR_TOWN_TILESET_1   = 0x23,
@@ -402,7 +401,7 @@ H2_ENUM_END(AdventureArmySizeThreshold)
 
 H2_ENUM_BEGIN(AdventureBottomHeroViewConstant)
     BOTTOM_HERO_VIEW_ID          = 3,
-    BOTTOM_HERO_ARMY_SLOTS       = 5,
+    BOTTOM_HERO_ARMY_SLOTS       = ARMY_GROUP_SLOT_COUNT,
     BOTTOM_HERO_EMPTY_SLOT       = -1,
     BOTTOM_HERO_LABEL_BYTES      = 6,
     BOTTOM_HERO_MAX_FULL_COUNT   = 1999,
@@ -473,7 +472,7 @@ H2_ENUM_BEGIN(AdventureSpellConstant)
 H2_ENUM_END(AdventureSpellConstant)
 
 H2_ENUM_BEGIN(AdventureSaveConstant)
-    SAVE_PLAYER_COUNT   = 6,
+    SAVE_PLAYER_COUNT   = GAME_PLAYER_COUNT,
     SAVE_EXTENSION_SIZE = 8,
     SAVE_PATTERN_SIZE   = 16,
     SAVE_REQUESTER_X    = 131,
@@ -540,7 +539,7 @@ H2_ENUM_BEGIN(AdventureResourceViewConstant)
 H2_ENUM_END(AdventureResourceViewConstant)
 
 H2_ENUM_BEGIN(AdventureKingdomViewConstant)
-    KINGDOM_VIEW_RESOURCE_COUNT          = 7,
+    KINGDOM_VIEW_RESOURCE_COUNT          = IDX(RES_COUNT),
     KINGDOM_VIEW_ENTRY_COUNT             = 9,
     KINGDOM_VIEW_CASTLE_ENTRY            = 7,
     KINGDOM_VIEW_TOWN_ENTRY              = 8,
@@ -4049,21 +4048,21 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
     gpAdvManager->m_openState = 0;
     columnRemainderValue = rowRemainderState = 0;
     switch (MAP_HEIGHT) {
-        case RADAR_MAP_SMALL:
+        case MAP_DIMENSION_SMALL:
             screenRowOffset = gpWindowManager->m_screen->m_pixels
                               + (minYOffset * 4 + RADAR_TOP) * RADAR_ROW_GROUPS
                                     * RADAR_GROUP_BYTES
                               + RADAR_LEFT;
             screenColumnIndex = minXSlot * 4;
             break;
-        case RADAR_MAP_MEDIUM:
+        case MAP_DIMENSION_MEDIUM:
             screenRowOffset = gpWindowManager->m_screen->m_pixels
                               + (minYOffset * 2 + RADAR_TOP) * RADAR_ROW_GROUPS
                                     * RADAR_GROUP_BYTES
                               + RADAR_LEFT;
             screenColumnIndex = minXSlot * 2;
             break;
-        case RADAR_MAP_LARGE:
+        case MAP_DIMENSION_LARGE:
             screenRowOffset = gpWindowManager->m_screen->m_pixels
                               + (minYOffset + (minYOffset + 2) / 3 + RADAR_TOP)
                                     * RADAR_ROW_GROUPS * RADAR_GROUP_BYTES
@@ -4084,13 +4083,13 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
     for (mapRow = minYOffset; !(maxYLocal < mapRow); ++mapRow) {
         radarPixel = screenRowOffset + screenColumnIndex;
         switch (MAP_HEIGHT) {
-            case RADAR_MAP_SMALL:
+            case MAP_DIMENSION_SMALL:
                 screenRowOffset += RADAR_SCREEN_PITCH * 4;
                 break;
-            case RADAR_MAP_MEDIUM:
+            case MAP_DIMENSION_MEDIUM:
                 screenRowOffset += RADAR_SCREEN_PITCH * 2;
                 break;
-            case RADAR_MAP_LARGE:
+            case MAP_DIMENSION_LARGE:
                 ++rowRemainderState;
                 if (rowRemainderState > 2) {
                     rowRemainderState = 0;
@@ -4101,7 +4100,7 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                     screenRowOffset += RADAR_SCREEN_PITCH * 2;
                 }
                 break;
-            case RADAR_MAP_XLARGE:
+            case MAP_DIMENSION_XLARGE:
                 screenRowOffset += RADAR_SCREEN_PITCH;
                 break;
         }
@@ -4251,19 +4250,19 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
             }
 
             switch (MAP_HEIGHT) {
-                case RADAR_MAP_SMALL:
+                case MAP_DIMENSION_SMALL:
                     memset(radarPixel, radarColorValue, 4);
                     memset(radarPixel + RADAR_SCREEN_PITCH, radarColorValue, 4);
                     memset(radarPixel + RADAR_SCREEN_PITCH * 2, radarColorValue, 4);
                     memset(radarPixel + RADAR_SCREEN_PITCH * 3, radarColorValue, 4);
                     radarPixel += 4;
                     break;
-                case RADAR_MAP_MEDIUM:
+                case MAP_DIMENSION_MEDIUM:
                     memset(radarPixel, radarColorValue, 2);
                     memset(radarPixel + RADAR_SCREEN_PITCH, radarColorValue, 2);
                     radarPixel += 2;
                     break;
-                case RADAR_MAP_LARGE:
+                case MAP_DIMENSION_LARGE:
                     if (columnRemainderValue != 0) {
                         if (rowRemainderState != 0) {
                             radarPixel[0] = radarColorValue;
@@ -4289,7 +4288,7 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                         columnRemainderValue = 0;
                     }
                     break;
-                case RADAR_MAP_XLARGE:
+                case MAP_DIMENSION_XLARGE:
                     *radarPixel++ = radarColorValue;
                     break;
             }
@@ -4300,11 +4299,11 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
     skipFrameIndex = 0;
     if (gbInViewWorld != 0) {
         switch (MAP_HEIGHT) {
-            case RADAR_MAP_SMALL:
+            case MAP_DIMENSION_SMALL:
                 radarScaleState = 4.0f;
                 skipFrameIndex = 1;
                 break;
-            case RADAR_MAP_MEDIUM:
+            case MAP_DIMENSION_MEDIUM:
                 radarScaleState = 2.0f;
                 if (giViewWorldScale <= VIEW_WORLD_SCALE_MIDDLE) {
                     skipFrameIndex = 1;
@@ -4312,7 +4311,7 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                     radarFrameLocal = 6;
                 }
                 break;
-            case RADAR_MAP_LARGE:
+            case MAP_DIMENSION_LARGE:
                 radarScaleState = 1.33f;
                 if (giViewWorldScale <= VIEW_WORLD_SCALE_FAR) {
                     skipFrameIndex = 1;
@@ -4335,15 +4334,15 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
         }
     } else {
         switch (MAP_HEIGHT) {
-            case RADAR_MAP_SMALL:
+            case MAP_DIMENSION_SMALL:
                 radarFrameLocal = 5;
                 radarScaleState = 4.0f;
                 break;
-            case RADAR_MAP_MEDIUM:
+            case MAP_DIMENSION_MEDIUM:
                 radarFrameLocal = 3;
                 radarScaleState = 2.0f;
                 break;
-            case RADAR_MAP_LARGE:
+            case MAP_DIMENSION_LARGE:
                 radarFrameLocal = 2;
                 radarScaleState = 1.33f;
                 break;
@@ -8850,7 +8849,7 @@ void advManager::TrimLoopingSounds(i32 maxSamples) {
         maxSamples += giHighMemBuffer / HIGH_MEMORY_BUFFER_DIVISOR;
     }
 
-    if (MAP_WIDTH != XLARGE_MAP_SIZE) {
+    if (MAP_WIDTH != MAP_DIMENSION_XLARGE) {
         ++maxSamples;
     }
 

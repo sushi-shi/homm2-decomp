@@ -254,10 +254,6 @@ H2_ENUM_BEGIN(GamePlayerTurnConstant)
 H2_ENUM_END(GamePlayerTurnConstant)
 
 H2_ENUM_BEGIN(GameScoreConstant)
-    SCORE_MAP_SMALL         = 36,
-    SCORE_MAP_MEDIUM        = 72,
-    SCORE_MAP_LARGE         = 108,
-    SCORE_MAP_EXTRA_LARGE   = 144,
     SCORE_BASE              = 200,
     SCORE_FIRST_TIER        = 60,
     SCORE_SECOND_TIER       = 120,
@@ -7143,12 +7139,12 @@ VA(0x00484620, 0x1ea)
 i32 CalcBaseScore(i32 days) {
     i32 score = SCORE_BASE;
 
-    if (gpGame->m_mapHeader.width == SCORE_MAP_EXTRA_LARGE)
+    if (gpGame->m_mapHeader.width == MAP_DIMENSION_XLARGE)
         days = static_cast<i32>(days * GAME_SCORE_EXTRA_LARGE_DAY_SCALE);
-    else if (gpGame->m_mapHeader.width == SCORE_MAP_LARGE)
+    else if (gpGame->m_mapHeader.width == MAP_DIMENSION_LARGE)
         days = static_cast<i32>(days * GAME_SCORE_LARGE_DAY_SCALE);
-    else if (gpGame->m_mapHeader.width == SCORE_MAP_MEDIUM) {
-    } else if (gpGame->m_mapHeader.width == SCORE_MAP_SMALL)
+    else if (gpGame->m_mapHeader.width == MAP_DIMENSION_MEDIUM) {
+    } else if (gpGame->m_mapHeader.width == MAP_DIMENSION_SMALL)
         days = static_cast<i32>(days * GAME_SCORE_SMALL_DAY_SCALE);
 
     if (days <= SCORE_FIRST_TIER) {
