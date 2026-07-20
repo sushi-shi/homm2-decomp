@@ -259,10 +259,11 @@ i32 hero::CalcMobility(void) {
     } else {
         slowestSpeedValue = SLOWEST_LAND_SPEED;
         for (armySlotIndex = 0; armySlotIndex < ARMY_GROUP_SLOT_COUNT; armySlotIndex++) {
-            if (m_army.m_creatureTypes[armySlotIndex] != ARMY_GROUP_EMPTY_SLOT
-                && gMonsterDatabase[m_army.m_creatureTypes[armySlotIndex]].speed
+            if (m_army.m_creatureTypes[armySlotIndex] != CREATURE_NONE
+                && gMonsterDatabase[IDX(m_army.m_creatureTypes[armySlotIndex])].speed
                        < slowestSpeedValue) {
-                slowestSpeedValue = gMonsterDatabase[m_army.m_creatureTypes[armySlotIndex]].speed;
+                slowestSpeedValue =
+                    gMonsterDatabase[IDX(m_army.m_creatureTypes[armySlotIndex])].speed;
             }
         }
         mobilityResult = landMobility[slowestSpeedValue];
@@ -419,7 +420,7 @@ void hero::UpdateArmies(void) {
 
     message.type = HERO_UI_MESSAGE;
     for (index = 0; index < UI_ARMY_SLOT_COUNT; index++) {
-        if (m_army.m_creatureTypes[index] == ARMY_GROUP_EMPTY_SLOT) {
+        if (m_army.m_creatureTypes[index] == CREATURE_NONE) {
             message.payload.widget.command = HERO_UI_WIDGET_FRAME;
             message.payload.widget.id = index + UI_ARMY_ICON_FIRST;
             message.payload.widget.data.value = UI_ARMY_EMPTY_FRAME;
@@ -437,12 +438,12 @@ void hero::UpdateArmies(void) {
             message.payload.widget.command = HERO_UI_WIDGET_FRAME;
             message.payload.widget.id = index + UI_ARMY_ICON_FIRST;
             message.payload.widget.data.value =
-                IDX(gMonsterDatabase[m_army.m_creatureTypes[index]].race)
+                IDX(gMonsterDatabase[IDX(m_army.m_creatureTypes[index])].race)
                 + UI_ARMY_RACE_FRAME_OFFSET;
             heroWin->BroadcastMessage(message);
 
             message.payload.widget.command = HERO_UI_WIDGET_ICON_FILE;
-            sprintf(gText, "monh%04d.icn", m_army.m_creatureTypes[index]);
+            sprintf(gText, "monh%04d.icn", IDX(m_army.m_creatureTypes[index]));
             message.payload.widget.id = index + UI_ARMY_PORTRAIT_FIRST;
             message.payload.widget.data.text = gText;
             heroWin->BroadcastMessage(message);
@@ -1020,11 +1021,11 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
         case UI_ARMY_SELECTOR_SLOT_4:
             armySlot = message.payload.widget.id - UI_ARMY_SELECTOR_FIRST;
             if (giHeroScreenSrcIndex == UI_ARMY_SELECTION_NONE) {
-                if (gpHVHero->m_army.m_creatureTypes[armySlot] != ARMY_GROUP_EMPTY_SLOT)
+                if (gpHVHero->m_army.m_creatureTypes[armySlot] != CREATURE_NONE)
                     sprintf(
                         gText,
                         cHeroScreen[IDX(TEXT_SELECT_ARMY)],
-                        gArmyNames[gpHVHero->m_army.m_creatureTypes[armySlot]]
+                        gArmyNames[IDX(gpHVHero->m_army.m_creatureTypes[armySlot])]
                     );
                 else
                     strcpy(gText, cHeroScreen[IDX(TEXT_EMPTY)]);
@@ -1032,43 +1033,45 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
                 sprintf(
                     gText,
                     cHeroScreen[IDX(TEXT_SELECT_ARMY)],
-                    gArmyNames[gpHVHero->m_army.m_creatureTypes[armySlot]]
+                    gArmyNames[IDX(gpHVHero->m_army.m_creatureTypes[armySlot])]
                 );
             } else if (gpTownManager->m_castleDialogActive != 0) {
-                if (gpHVHero->m_army.m_creatureTypes[armySlot] != ARMY_GROUP_EMPTY_SLOT)
+                if (gpHVHero->m_army.m_creatureTypes[armySlot] != CREATURE_NONE)
                     sprintf(
                         gText,
                         cHeroScreen[IDX(TEXT_SELECT_ARMY)],
-                        gArmyNames[gpHVHero->m_army.m_creatureTypes[armySlot]]
+                        gArmyNames[IDX(gpHVHero->m_army.m_creatureTypes[armySlot])]
                     );
                 else
                     strcpy(gText, cHeroScreen[IDX(TEXT_EMPTY)]);
-            } else if (gpHVHero->m_army.m_creatureTypes[armySlot] == ARMY_GROUP_EMPTY_SLOT) {
+            } else if (gpHVHero->m_army.m_creatureTypes[armySlot] == CREATURE_NONE) {
                 if (message.payload.widget.parameter & UI_SPLIT_MODIFIER_MASK)
                     sprintf(
                         gText,
                         cHeroScreen[IDX(TEXT_SPLIT_ARMY)],
-                        gArmyNamesPlural[gpHVHero->m_army.m_creatureTypes[giHeroScreenSrcIndex]]
+                        gArmyNamesPlural[IDX(
+                            gpHVHero->m_army.m_creatureTypes[giHeroScreenSrcIndex]
+                        )]
                     );
                 else
                     sprintf(
                         gText,
                         cHeroScreen[IDX(TEXT_MOVE_ARMY)],
-                        gArmyNames[gpHVHero->m_army.m_creatureTypes[giHeroScreenSrcIndex]]
+                        gArmyNames[IDX(gpHVHero->m_army.m_creatureTypes[giHeroScreenSrcIndex])]
                     );
             } else if (gpHVHero->m_army.m_creatureTypes[armySlot]
                        == gpHVHero->m_army.m_creatureTypes[giHeroScreenSrcIndex]) {
                 sprintf(
                     gText,
                     cHeroScreen[IDX(TEXT_COMBINE_ARMIES)],
-                    gArmyNamesPlural[gpHVHero->m_army.m_creatureTypes[armySlot]]
+                    gArmyNamesPlural[IDX(gpHVHero->m_army.m_creatureTypes[armySlot])]
                 );
             } else {
                 sprintf(
                     gText,
                     cHeroScreen[IDX(TEXT_EXCHANGE_ARMIES)],
-                    gArmyNames[gpHVHero->m_army.m_creatureTypes[giHeroScreenSrcIndex]],
-                    gArmyNames[gpHVHero->m_army.m_creatureTypes[armySlot]]
+                    gArmyNames[IDX(gpHVHero->m_army.m_creatureTypes[giHeroScreenSrcIndex])],
+                    gArmyNames[IDX(gpHVHero->m_army.m_creatureTypes[armySlot])]
                 );
             }
             break;
@@ -1371,18 +1374,19 @@ i32 HeroHandler(struct tag_message& message) {
                     case UI_ARMY_SELECTOR_SLOT_4: {
                         tag_message dialogMessage;
                         i32 armyValue;
+                        CreatureType temporaryCreature;
 
                         armySlot7 = message.payload.widget.id - UI_ARMY_SELECTOR_FIRST;
                         if (quickView0 == 0
                             && giHeroScreenSrcIndex == UI_ARMY_SELECTION_NONE) {
                             if (gpHVHero->m_army.m_creatureTypes[armySlot7]
-                                != ARMY_GROUP_EMPTY_SLOT) {
+                                != CREATURE_NONE) {
                                 giHeroScreenSrcIndex = armySlot7;
                                 gpHVHero->HeroScreenUpdate();
                             }
                         } else if ((quickView0 != 0
                                     && gpHVHero->m_army.m_creatureTypes[armySlot7]
-                                           != ARMY_GROUP_EMPTY_SLOT)
+                                           != CREATURE_NONE)
                                    || (quickView0 == 0 && armySlot7 == giHeroScreenSrcIndex)) {
                             i32 canDismiss;
 
@@ -1414,16 +1418,17 @@ i32 HeroHandler(struct tag_message& message) {
                         } else {
                             if (quickView0 == 0 && gpTownManager->m_castleDialogActive != 0) {
                                 if (gpHVHero->m_army.m_creatureTypes[armySlot7]
-                                    != ARMY_GROUP_EMPTY_SLOT) {
+                                    != CREATURE_NONE) {
                                     giHeroScreenSrcIndex = armySlot7;
                                     gpHVHero->HeroScreenUpdate();
                                 }
                             } else if (quickView0 == 0) {
-                                temp1 = gpHVHero->m_army.m_creatureTypes[armySlot7];
+                                temporaryCreature =
+                                    gpHVHero->m_army.m_creatureTypes[armySlot7];
                                 if ((message.payload.widget.parameter & UI_SPLIT_MODIFIER_MASK)
                                         == 0
                                     || (gpHVHero->m_army.m_creatureTypes[armySlot7]
-                                            != ARMY_GROUP_EMPTY_SLOT
+                                            != CREATURE_NONE
                                         && gpHVHero->m_army.m_creatureTypes[giHeroScreenSrcIndex]
                                                != gpHVHero->m_army.m_creatureTypes[armySlot7])) {
                                     if (gpHVHero->m_army.m_creatureTypes[giHeroScreenSrcIndex]
@@ -1432,12 +1437,12 @@ i32 HeroHandler(struct tag_message& message) {
                                             gpHVHero->m_army.m_creatureCounts[giHeroScreenSrcIndex];
                                         gpHVHero->m_army.m_creatureCounts[giHeroScreenSrcIndex] = 0;
                                         gpHVHero->m_army.m_creatureTypes[giHeroScreenSrcIndex] =
-                                            ARMY_GROUP_EMPTY_SLOT;
+                                            CREATURE_NONE;
                                     } else {
                                         gpHVHero->m_army.m_creatureTypes[armySlot7] =
                                             gpHVHero->m_army.m_creatureTypes[giHeroScreenSrcIndex];
                                         gpHVHero->m_army.m_creatureTypes[giHeroScreenSrcIndex] =
-                                            static_cast<i8>(temp1);
+                                            temporaryCreature;
                                         temp1 = gpHVHero->m_army.m_creatureCounts[armySlot7];
                                         gpHVHero->m_army.m_creatureCounts[armySlot7] =
                                             gpHVHero->m_army.m_creatureCounts[giHeroScreenSrcIndex];
@@ -1875,7 +1880,7 @@ void DoHeroSplit(i32 destinationSlot, i32 sourceSlot) {
             gpHVHero->m_army.m_creatureCounts[sourceSlot] -= gpTownManager->m_splitAmount;
             gpHVHero->m_army.m_creatureCounts[destinationSlot] += gpTownManager->m_splitAmount;
             if (gpHVHero->m_army.m_creatureCounts[sourceSlot] == 0)
-                gpHVHero->m_army.m_creatureTypes[sourceSlot] = ARMY_GROUP_EMPTY_SLOT;
+                gpHVHero->m_army.m_creatureTypes[sourceSlot] = CREATURE_NONE;
         } else {
             gpHVHero->m_army.m_creatureCounts[sourceSlot] -= gpTownManager->m_splitAmount;
             gpHVHero->m_army.m_creatureCounts[destinationSlot] =
@@ -1883,7 +1888,7 @@ void DoHeroSplit(i32 destinationSlot, i32 sourceSlot) {
             gpHVHero->m_army.m_creatureTypes[destinationSlot] =
                 gpHVHero->m_army.m_creatureTypes[sourceSlot];
             if (gpHVHero->m_army.m_creatureCounts[sourceSlot] == 0)
-                gpHVHero->m_army.m_creatureTypes[sourceSlot] = ARMY_GROUP_EMPTY_SLOT;
+                gpHVHero->m_army.m_creatureTypes[sourceSlot] = CREATURE_NONE;
         }
     }
 }
@@ -1941,7 +1946,7 @@ i32 hero::GiveSS(i32 skill, i32 levels) {
 }
 
 VA(0x00470404, 0x6a)
-i32 hero::CreatureTypeCount(i32 creatureType) {
+i32 hero::CreatureTypeCount(H2_ENUM_PARAM(CreatureType, i32) creatureType) {
     i32 creatureCount;
     i32 armySlot;
 
@@ -1956,13 +1961,16 @@ i32 hero::CreatureTypeCount(i32 creatureType) {
 }
 
 VA(0x0047046e, 0x5e)
-void hero::UpgradeCreatures(i32 oldCreatureType, i32 newCreatureType) {
+void hero::UpgradeCreatures(
+    H2_ENUM_PARAM(CreatureType, i32) oldCreatureType,
+    H2_ENUM_PARAM(CreatureType, i32) newCreatureType
+) {
     i32 numberUpgraded = 0;
     i32 armySlot;
 
     for (armySlot = 0; armySlot < ARMY_GROUP_SLOT_COUNT; armySlot++) {
         if (m_army.m_creatureTypes[armySlot] == oldCreatureType)
-            m_army.m_creatureTypes[armySlot] = static_cast<i8>(newCreatureType);
+            m_army.m_creatureTypes[armySlot] = newCreatureType;
     }
 }
 

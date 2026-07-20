@@ -1403,7 +1403,7 @@ void game::SetupOrigData(void) {
             m_heroRecs[i].m_primaryStats[j] =
                 gStartingHeroStats[IDX(m_heroRecs[i].m_cursorType)][j];
         for (j = 0; j < ARMY_GROUP_SLOT_COUNT; j++)
-            m_heroRecs[i].m_army.m_creatureTypes[j] = ARMY_GROUP_EMPTY_SLOT;
+            m_heroRecs[i].m_army.m_creatureTypes[j] = CREATURE_NONE;
         m_heroRecs[i].m_destinationY = HERO_DESTINATION_NONE;
         m_heroRecs[i].m_destinationX = m_heroRecs[i].m_destinationY;
         m_heroRecs[i].m_level = HERO_INITIAL_LEVEL;
@@ -1450,7 +1450,7 @@ void game::SetupOrigData(void) {
         m_castleRecs[i].m_type = static_cast<FactionType>(i / INITIAL_RECORD_TYPE_STRIDE);
         m_castleRecs[i].m_occupyingHeroId = TOWN_OCCUPYING_HERO_NONE;
         for (j = 0; j < ARMY_GROUP_SLOT_COUNT; j++)
-            m_castleRecs[i].m_army.m_creatureTypes[j] = ARMY_GROUP_EMPTY_SLOT;
+            m_castleRecs[i].m_army.m_creatureTypes[j] = CREATURE_NONE;
     }
     for (i = 0; i < GAME_MINE_COUNT; i++)
         memset(&m_mines[i], -1, sizeof(m_mines[i]));
@@ -2990,7 +2990,7 @@ void game::ClaimTown(i32 townId, i32 player, i32 suppressVisibility) {
     if (m_castleOwners[townId] != -1)
         GetCastle(townId)->Deallocate();
     for (i = 0; i < ARMY_GROUP_SLOT_COUNT; i++) {
-        townRec->m_army.m_creatureTypes[i] = -1;
+        townRec->m_army.m_creatureTypes[i] = CREATURE_NONE;
         townRec->m_army.m_creatureCounts[i] = 0;
     }
     m_castleRecs[townId].m_turnsOwned =
@@ -3550,7 +3550,7 @@ VA(0x0047a649, 0xc86)
 void game::ViewArmy(
     i32 x,
     i32 y,
-    i32 monsterType,
+    H2_ENUM_PARAM(CreatureType, i32) monsterType,
     i32 numTroops,
     town* castle,
     i32 disableUpgrade,
@@ -3592,19 +3592,19 @@ void game::ViewArmy(
                 iViewArmyUpgradeToType = static_cast<CreatureType>(IDX(monsterType) + 1);
             }
         }
-        if ((monsterType == IDX(CREATURE_GREEN_DRAGON) || monsterType == IDX(CREATURE_RED_DRAGON))
+        if ((monsterType == CREATURE_GREEN_DRAGON || monsterType == CREATURE_RED_DRAGON)
             && (castle->m_buildings & IDX(KB_DWELLING_UPGRADE_SIXTH_FLAG))) {
             gbAllowUpgrade = true;
             iViewArmyUpgradeToType = CREATURE_BLACK_DRAGON;
         }
     }
 
-    tag_monsterInfo* monster8 = &gMonsterDatabase[monsterType];
+    tag_monsterInfo* monster8 = &gMonsterDatabase[IDX(monsterType)];
     tag_monsterInfo* armyMonster11;
     if (theArmy)
         armyMonster11 = &theArmy->m_monster;
     else
-        armyMonster11 = &gMonsterDatabase[monsterType];
+        armyMonster11 = &gMonsterDatabase[IDX(monsterType)];
 
     x = VIEW_ARMY_WINDOW_X;
     y = VIEW_ARMY_WINDOW_Y;
@@ -3848,11 +3848,11 @@ void game::ViewArmy(
     } else {
         gpWindowManager->DoDialog(m_viewArmyWindow, ViewArmyHandler, 0);
         if (gbDismissArmy && theGroup) {
-            theGroup->m_troopTypes[groupIndex] = -1;
+            theGroup->m_troopTypes[groupIndex] = CREATURE_NONE;
             theGroup->m_troopCounts[groupIndex] = 0;
         }
         if (gbUpgradeArmy && theGroup)
-            theGroup->m_troopTypes[groupIndex] = static_cast<i8>(iViewArmyUpgradeToType);
+            theGroup->m_troopTypes[groupIndex] = iViewArmyUpgradeToType;
     }
     H2_FREE(details9, 3893);
     delete m_viewArmyWindow;
@@ -3901,7 +3901,7 @@ i32 ViewArmyHandler(tag_message& msg) {
                         break;
                     case VIEW_ARMY_UPGRADE_ACTION_ID:
                         goldCost6 = (gMonsterDatabase[IDX(iViewArmyUpgradeToType)].cost
-                                     - gMonsterDatabase[iViewArmyType].cost)
+                                     - gMonsterDatabase[IDX(iViewArmyType)].cost)
                                     * iViewArmyNumTroops * VIEW_ARMY_UPGRADE_COST_MULTIPLIER;
                         if (iViewArmyUpgradeToType == CREATURE_BLACK_DRAGON) {
                             resourceType0 = RES_SULFUR;
@@ -4494,8 +4494,8 @@ void game::PerWeek(void) {
         for (innerIndex3 = WEEKLY_FIRST_DWELLING; innerIndex3 <= WEEKLY_LAST_DWELLING;
              innerIndex3++) {
             if (castle37->m_buildings & (1 << innerIndex3)) {
-                growth13 = gMonsterDatabase[gDwellingType[IDX(castle37->m_type)]
-                                                         [innerIndex3 - WEEKLY_FIRST_DWELLING]]
+                growth13 = gMonsterDatabase[IDX(gDwellingType[IDX(castle37->m_type)]
+                                                             [innerIndex3 - WEEKLY_FIRST_DWELLING])]
                                .growth;
                 if (castle37->m_buildings & BIT(BUILDING_SLOT_SPECIAL_FOUR))
                     growth13 += CASTLE_GROWTH_SPECIAL_BONUS;
@@ -4515,7 +4515,8 @@ void game::PerWeek(void) {
                         growth13 = static_cast<i32>(growth13 * WEEKLY_IMPOSSIBLE_GROWTH_FACTOR);
                 }
                 if (giWeekType == WEEK_CREATURE
-                    && gDwellingType[IDX(castle37->m_type)][innerIndex3 - WEEKLY_FIRST_DWELLING]
+                    && IDX(gDwellingType[IDX(castle37->m_type)]
+                                        [innerIndex3 - WEEKLY_FIRST_DWELLING])
                            == giWeekTypeExtra)
                     growth13 += CREATURE_WEEK_GROWTH_BONUS;
                 castle37->m_garrison[innerIndex3 - WEEKLY_FIRST_DWELLING] += growth13;
@@ -4797,8 +4798,8 @@ void game::PerMonth(void) {
         for (building4 = WEEKLY_FIRST_DWELLING; building4 <= WEEKLY_LAST_DWELLING; building4++) {
             castle10 = GetTown(townIndex0);
             if (castle10->m_buildings & (1 << building4)) {
-                growth9 = gMonsterDatabase[gDwellingType[IDX(castle10->m_type)]
-                                                        [building4 - WEEKLY_FIRST_DWELLING]]
+                growth9 = gMonsterDatabase[IDX(gDwellingType[IDX(castle10->m_type)]
+                                                            [building4 - WEEKLY_FIRST_DWELLING])]
                               .growth;
                 if (castle10->m_buildings & WELL_BUILDING)
                     growth9 += WELL_GROWTH;
@@ -4807,7 +4808,8 @@ void game::PerMonth(void) {
                     growth9 += FIRST_DWELLING_GROWTH;
 
                 if (giMonthType == TYPE_CREATURE
-                    && gDwellingType[IDX(castle10->m_type)][building4 - WEEKLY_FIRST_DWELLING]
+                    && IDX(gDwellingType[IDX(castle10->m_type)]
+                                        [building4 - WEEKLY_FIRST_DWELLING])
                            == giMonthTypeExtra)
                     castle10->m_garrison[building4 - WEEKLY_FIRST_DWELLING] *=
                         CREATURE_MONTH_MULTIPLIER;
@@ -5284,7 +5286,7 @@ void game::SetRandomHeroArmies(i32 heroId, i32 strongArmy) {
         selected9[1] = RANDOM_HERO_STACK_SELECTED;
 
     for (index9 = 0; index9 < RANDOM_HERO_ARMY_SLOT_COUNT; index9++) {
-        army2->m_creatureTypes[index9] = IDX(CREATURE_NONE);
+        army2->m_creatureTypes[index9] = CREATURE_NONE;
         army2->m_creatureCounts[index9] = RANDOM_HERO_EMPTY_COUNT;
     }
 
@@ -5640,16 +5642,16 @@ void game::GiveArmy(
     i32 i;
     if (slot >= 0) {
         i = slot;
-        group->m_creatureTypes[i] = static_cast<i8>(IDX(type));
+        group->m_creatureTypes[i] = type;
         group->m_creatureCounts[i] = 0;
     } else {
         for (i = 0; i < ARMY_GROUP_SLOT_COUNT; i++) {
-            if (group->m_creatureTypes[i] == IDX(type))
+            if (group->m_creatureTypes[i] == type)
                 break;
         }
         if (i >= ARMY_GROUP_SLOT_COUNT) {
             for (i = 0; i < ARMY_GROUP_SLOT_COUNT; i++) {
-                if (group->m_creatureTypes[i] < 0) {
+                if (group->m_creatureTypes[i] == CREATURE_NONE) {
                     group->m_creatureCounts[i] = 0;
                     break;
                 }
@@ -5658,7 +5660,7 @@ void game::GiveArmy(
         if (i >= ARMY_GROUP_SLOT_COUNT)
             return;
     }
-    group->m_creatureTypes[i] = static_cast<i8>(IDX(type));
+    group->m_creatureTypes[i] = type;
     group->m_creatureCounts[i] += count;
 }
 
@@ -5668,7 +5670,8 @@ i32 game::ExperienceValueOfStack(armyGroup* group, hero* h) {
     i32 i;
     for (i = 0; i < ARMY_GROUP_SLOT_COUNT; i++) {
         if (group->m_quantities[i] > 0) {
-            exp += gMonsterDatabase[group->m_creatureTypes[i]].hitPoints * group->m_quantities[i];
+            exp += gMonsterDatabase[IDX(group->m_creatureTypes[i])].hitPoints
+                * group->m_quantities[i];
         }
     }
     if (h != NULL)
@@ -5977,12 +5980,12 @@ void game::SetupTowns(void) {
                 if (static_cast<i16>(castle->m_army.m_troopCounts[slot]) > 0)
                     castle->m_army.m_troopTypes[slot] = extra->troopTypes[slot];
                 else
-                    castle->m_army.m_troopTypes[slot] = -1;
+                    castle->m_army.m_troopTypes[slot] = CREATURE_NONE;
             }
         } else {
             for (slot = 0; slot < ARMY_GROUP_SLOT_COUNT; slot++) {
                 castle->m_army.m_troopCounts[slot] = 0;
-                castle->m_army.m_troopTypes[slot] = -1;
+                castle->m_army.m_troopTypes[slot] = CREATURE_NONE;
             }
             GiveTroopsToNeutralTown(townIndex);
             GiveTroopsToNeutralTown(townIndex);
@@ -6267,7 +6270,7 @@ void game::ProcessOnMapHeroes(void) {
                                     mapHero0->m_army.m_troopTypes[armySlot0] =
                                         extra0->troopTypes[armySlot0];
                                 else
-                                    mapHero0->m_army.m_troopTypes[armySlot0] = -1;
+                                    mapHero0->m_army.m_troopTypes[armySlot0] = CREATURE_NONE;
                             }
                         }
                         for (artifactSlot10 = 0; artifactSlot10 < EVENT_RECORD_HERO_ARTIFACT_COUNT;
@@ -6434,14 +6437,14 @@ void game::CheckHeroConsistency(void) {
 
     for (player3 = 0; player3 < GAME_HERO_COUNT; player3++) {
         for (slot1 = 0; slot1 < ARMY_GROUP_SLOT_COUNT; slot1++) {
-            if (m_heroRecs[player3].m_army.m_troopTypes[slot1] == -1
+            if (m_heroRecs[player3].m_army.m_troopTypes[slot1] == CREATURE_NONE
                 || m_heroRecs[player3].m_army.m_creatureCounts[slot1] < 0)
                 m_heroRecs[player3].m_army.m_creatureCounts[slot1] = 0;
         }
     }
     for (player3 = 0; player3 < GAME_TOWN_COUNT; player3++) {
         for (slot1 = 0; slot1 < ARMY_GROUP_SLOT_COUNT; slot1++) {
-            if (m_castleRecs[player3].m_army.m_troopTypes[slot1] == -1
+            if (m_castleRecs[player3].m_army.m_troopTypes[slot1] == CREATURE_NONE
                 || m_castleRecs[player3].m_army.m_creatureCounts[slot1] < 0)
                 m_castleRecs[player3].m_army.m_creatureCounts[slot1] = 0;
         }
@@ -7902,7 +7905,7 @@ DATA(0x0052843c) b32 gbDismissArmy;
 DATA(0x00528440) i8* gbNGHuman;
 DATA(0x00528448) i32 iViewArmyFrame;
 DATA(0x0052844c) b32 gbAllowUpgrade;
-DATA(0x00528450) i32 iViewArmyType;
+DATA(0x00528450) H2_ENUM_STORAGE(CreatureType, i32) iViewArmyType;
 DATA(0x00528454) class hero* viewSpellsHero;
 DATA(0x00528458) b32 gbUpgradeArmy;
 DATA(0x00528460) i16 RandMineQty[AI_RANDOM_MINE_TYPE_COUNT];

@@ -2,6 +2,7 @@
 #define HOMM2_SOURCE_ARMYGROUP_H
 
 #include <va.h>
+#include <SOURCE/KB_TYPES.h>
 
 class hero;
 class town;
@@ -27,8 +28,8 @@ H2_ENUM_END(ArmyGroupAlignmentResult)
 class armyGroup {
 public:
     union {
-        i8 m_creatureTypes[ARMY_GROUP_SLOT_COUNT];
-        i8 m_troopTypes[ARMY_GROUP_SLOT_COUNT];
+        H2_ENUM_STORAGE(CreatureType, i8) m_creatureTypes[ARMY_GROUP_SLOT_COUNT];
+        H2_ENUM_STORAGE(CreatureType, i8) m_troopTypes[ARMY_GROUP_SLOT_COUNT];
     };
     union {
         i16 m_creatureCounts[ARMY_GROUP_SLOT_COUNT];
@@ -41,11 +42,11 @@ public:
     i32 HasSomeUndead(void);
     i32 GetMorale(class hero*, class town*, class armyGroup*);
     void Dismiss(i32);
-    i32 IsMember(i32);
+    i32 IsMember(H2_ENUM_PARAM(CreatureType, i32));
     ArmyGroupAlignmentResult IsHomogeneous(i32);
-    i32 CanJoin(i32);
+    i32 CanJoin(H2_ENUM_PARAM(CreatureType, i32));
     i32 GetNumArmies(void);
-    i32 Add(i32, i32, i32);
+    i32 Add(H2_ENUM_PARAM(CreatureType, i32), i32, i32);
     void Swap(i32, class armyGroup*, i32);
     void DamageGroup(float);
 };

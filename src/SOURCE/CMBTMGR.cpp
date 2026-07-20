@@ -223,10 +223,10 @@ void combatManager::CombineGroups(armyGroup* sourceGroup, armyGroup* targetGroup
     }
 
     for (sourceIndex = 0; sourceIndex < ARMY_GROUP_SLOT_COUNT; sourceIndex++) {
-        if (sourceGroup->m_creatureTypes[sourceIndex] != ARMY_GROUP_EMPTY_SLOT) {
+        if (sourceGroup->m_creatureTypes[sourceIndex] != CREATURE_NONE) {
             i32 targetIndex;
             for (targetIndex = 0; targetIndex < ARMY_GROUP_SLOT_COUNT; targetIndex++) {
-                if (targetGroup->m_creatureTypes[targetIndex] == ARMY_GROUP_EMPTY_SLOT) {
+                if (targetGroup->m_creatureTypes[targetIndex] == CREATURE_NONE) {
                     targetGroup->Add(
                         sourceGroup->m_creatureTypes[sourceIndex],
                         sourceGroup->m_creatureCounts[sourceIndex],
@@ -359,7 +359,7 @@ void combatManager::SetupCombat(
                 IDX(m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type) + COMBAT_CAPTAIN_PORTRAIT_BASE;
             strcpy(m_captain.m_name, "Captain");
             for (side = 0; side < ARMY_GROUP_SLOT_COUNT; side++)
-                m_captain.m_army.m_creatureTypes[side] = ARMY_GROUP_EMPTY_SLOT;
+                m_captain.m_army.m_creatureTypes[side] = CREATURE_NONE;
             for (side = 0; side < HERO_ARTIFACT_SLOT_COUNT; side++)
                 m_captain.m_artifacts[side] = ARMY_GROUP_EMPTY_SLOT;
             m_captain.m_artifacts[0] = IDX(ARTIFACT_MAGIC_BOOK);
@@ -574,7 +574,7 @@ void combatManager::Close(void) {
         groupSide = COMBAT_ATTACKER_SIDE;
 
     for (index = 0; index < ARMY_GROUP_SLOT_COUNT; index++) {
-        if (m_armyGroups[groupSide]->m_creatureTypes[index] != ARMY_GROUP_EMPTY_SLOT)
+        if (m_armyGroups[groupSide]->m_creatureTypes[index] != CREATURE_NONE)
             total += m_armyGroups[groupSide]->m_creatureCounts[index];
     }
 
@@ -611,7 +611,7 @@ void combatManager::UpdateArmyGroup(i32 side) {
     i32 index;
     i32 pos;
     for (index = 0; index < ARMY_GROUP_SLOT_COUNT; index++) {
-        m_armyGroups[side]->m_creatureTypes[index] = ARMY_GROUP_EMPTY_SLOT;
+        m_armyGroups[side]->m_creatureTypes[index] = CREATURE_NONE;
         m_armyGroups[side]->m_creatureCounts[index] = 0;
     }
 
@@ -626,14 +626,14 @@ void combatManager::UpdateArmyGroup(i32 side) {
                     || !HAS(m_armies[side][index].m_monster.flags.all, MONSTER_FLAGS_SUMMONED)))
             && !HAS(m_armies[side][index].m_monster.flags.all, MONSTER_FLAGS_MIRROR_IMAGE)) {
             m_armyGroups[side]->m_creatureTypes[m_armies[side][index].m_armyGroupSlot] =
-                static_cast<i8>(m_armies[side][index].m_monsterType);
+                m_armies[side][index].m_monsterType;
             m_armyGroups[side]->m_creatureCounts[m_armies[side][index].m_armyGroupSlot] =
                 static_cast<i16>(m_armies[side][index].m_quantity);
         }
     }
 
     if (giSkeletonsCreated && m_combatResult == side)
-        m_armyGroups[side]->Add(IDX(CREATURE_SKELETON), giSkeletonsCreated, ARMY_GROUP_EMPTY_SLOT);
+        m_armyGroups[side]->Add(CREATURE_SKELETON, giSkeletonsCreated, ARMY_GROUP_EMPTY_SLOT);
 }
 
 VA(0x00491641, 0x365)
@@ -917,7 +917,7 @@ void combatManager::LoadArmies(void) {
 
     for (groupSlot = 0; groupSlot < ARMY_GROUP_SLOT_COUNT; groupSlot++) {
         if (m_armyGroups[COMBAT_ATTACKER_SIDE]->m_creatureTypes[groupSlot]
-            != ARMY_GROUP_EMPTY_SLOT) {
+            != CREATURE_NONE) {
             if (m_heroes[COMBAT_ATTACKER_SIDE]
                 && HAS(m_heroes[COMBAT_ATTACKER_SIDE]->m_eventFlags, HERO_EVENT_GROUPED_FORMATION))
                 combatHex = COMBAT_GROUPED_HEX_STEP * groupSlot + COMBAT_ATTACKER_GROUPED_HEX;
@@ -925,7 +925,7 @@ void combatManager::LoadArmies(void) {
                 combatHex = COMBAT_SPREAD_HEX_STEP * groupSlot + COMBAT_ATTACKER_SPREAD_HEX;
 
             m_armies[COMBAT_ATTACKER_SIDE][m_armyCount[COMBAT_ATTACKER_SIDE]].Init(
-                CreatureType(m_armyGroups[COMBAT_ATTACKER_SIDE]->m_creatureTypes[groupSlot]),
+                m_armyGroups[COMBAT_ATTACKER_SIDE]->m_creatureTypes[groupSlot],
                 m_armyGroups[COMBAT_ATTACKER_SIDE]->m_creatureCounts[groupSlot],
                 COMBAT_ATTACKER_SIDE,
                 m_armyCount[COMBAT_ATTACKER_SIDE],
@@ -937,7 +937,7 @@ void combatManager::LoadArmies(void) {
         }
 
         if (m_armyGroups[COMBAT_DEFENDER_SIDE]->m_creatureTypes[groupSlot]
-            != ARMY_GROUP_EMPTY_SLOT) {
+            != CREATURE_NONE) {
             if ((m_heroes[COMBAT_DEFENDER_SIDE]
                  && HAS(m_heroes[COMBAT_DEFENDER_SIDE]->m_eventFlags, HERO_EVENT_GROUPED_FORMATION))
                 || (m_combatTowns[COMBAT_DEFENDER_SIDE]
@@ -947,7 +947,7 @@ void combatManager::LoadArmies(void) {
                 combatHex = COMBAT_SPREAD_HEX_STEP * groupSlot + COMBAT_DEFENDER_SPREAD_HEX;
 
             m_armies[COMBAT_DEFENDER_SIDE][m_armyCount[COMBAT_DEFENDER_SIDE]].Init(
-                CreatureType(m_armyGroups[COMBAT_DEFENDER_SIDE]->m_creatureTypes[groupSlot]),
+                m_armyGroups[COMBAT_DEFENDER_SIDE]->m_creatureTypes[groupSlot],
                 m_armyGroups[COMBAT_DEFENDER_SIDE]->m_creatureCounts[groupSlot],
                 COMBAT_DEFENDER_SIDE,
                 m_armyCount[COMBAT_DEFENDER_SIDE],

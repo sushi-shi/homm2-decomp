@@ -957,12 +957,12 @@ void townManager::SetArmyCommand(i32 qualifier) {
         sprintf(
             m_statusText,
             cTownCommand[IDX(TEXT_VIEW_ARMY)],
-            gArmyNames[m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot]]
+            gArmyNames[IDX(m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot])]
         );
         m_command = ARMY_COMMAND_VIEW;
     } else {
         sameType = 0;
-        if ((m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot] | 0)
+        if (m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot]
             == m_pendingStrip->m_army->m_creatureTypes[m_pendingArmySlot])
             sameType = 1;
         if (sameType) {
@@ -970,7 +970,7 @@ void townManager::SetArmyCommand(i32 qualifier) {
                 sprintf(
                     m_statusText,
                     cTownCommand[IDX(TEXT_REDISTRIBUTE_ARMY)],
-                    gArmyNames[m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot]]
+                    gArmyNames[IDX(m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot])]
                 );
                 m_command = ARMY_COMMAND_SPLIT;
             } else if (cantMoveLastArmy) {
@@ -980,17 +980,17 @@ void townManager::SetArmyCommand(i32 qualifier) {
                 sprintf(
                     m_statusText,
                     cTownCommand[IDX(TEXT_COMBINE_ARMIES)],
-                    gArmyNames[m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot]]
+                    gArmyNames[IDX(m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot])]
                 );
                 m_command = ARMY_COMMAND_MERGE;
             }
         } else if (qualifier != 0
                    && m_pendingStrip->m_army->m_creatureTypes[m_pendingArmySlot]
-                          == ARMY_GROUP_EMPTY_SLOT) {
+                          == CREATURE_NONE) {
             sprintf(
                 m_statusText,
                 cTownCommand[IDX(TEXT_REDISTRIBUTE_TO_EMPTY_SLOT)],
-                gArmyNames[m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot]]
+                gArmyNames[IDX(m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot])]
             );
             m_command = ARMY_COMMAND_SPLIT;
         }
@@ -998,7 +998,7 @@ void townManager::SetArmyCommand(i32 qualifier) {
 
     if (m_command != ARMY_COMMAND_NONE)
         return;
-    if (m_pendingStrip->m_army->m_creatureTypes[m_pendingArmySlot] == ARMY_GROUP_EMPTY_SLOT) {
+    if (m_pendingStrip->m_army->m_creatureTypes[m_pendingArmySlot] == CREATURE_NONE) {
         if (cantMoveLastArmy) {
             strcpy(m_statusText, cTownCommand[IDX(TEXT_CANNOT_MOVE_LAST_ARMY)]);
             return;
@@ -1006,7 +1006,7 @@ void townManager::SetArmyCommand(i32 qualifier) {
             sprintf(
                 m_statusText,
                 cTownCommand[IDX(TEXT_MOVE_ARMY)],
-                gArmyNames[m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot]]
+                gArmyNames[IDX(m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot])]
             );
             m_command = ARMY_COMMAND_SWAP;
         }
@@ -1014,8 +1014,8 @@ void townManager::SetArmyCommand(i32 qualifier) {
         sprintf(
             m_statusText,
             cTownCommand[IDX(TEXT_EXCHANGE_ARMIES)],
-            gArmyNames[m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot]],
-            gArmyNames[m_pendingStrip->m_army->m_creatureTypes[m_pendingArmySlot]]
+            gArmyNames[IDX(m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot])],
+            gArmyNames[IDX(m_pendingStrip->m_army->m_creatureTypes[m_pendingArmySlot])]
         );
         m_command = ARMY_COMMAND_SWAP;
     }
@@ -1052,13 +1052,15 @@ void townManager::SetCommandAndText(struct tag_message& message) {
                 m_selectedStrip = m_garrisonStrip;
                 m_selectedArmySlot = objectId - TOWN_GARRISON_SLOT_FIRST;
                 if (m_selectedStrip->m_army->m_creatureTypes[m_selectedArmySlot]
-                    == ARMY_GROUP_EMPTY_SLOT) {
+                    == CREATURE_NONE) {
                     strcpy(m_statusText, cTownCommand[IDX(TEXT_EMPTY_SLOT)]);
                 } else {
                     sprintf(
                         m_statusText,
                         cTownCommand[IDX(TEXT_SELECT_ARMY)],
-                        gArmyNames[m_selectedStrip->m_army->m_creatureTypes[m_selectedArmySlot]]
+                        gArmyNames[IDX(
+                            m_selectedStrip->m_army->m_creatureTypes[m_selectedArmySlot]
+                        )]
                     );
                     m_command = ARMY_COMMAND_SELECT;
                 }
@@ -1085,14 +1087,16 @@ void townManager::SetCommandAndText(struct tag_message& message) {
                 m_selectedArmySlot = objectId - TOWN_HERO_SLOT_FIRST;
                 if (m_selectedStrip->m_army == NULL
                     || m_selectedStrip->m_army->m_creatureTypes[m_selectedArmySlot]
-                           == ARMY_GROUP_EMPTY_SLOT) {
+                           == CREATURE_NONE) {
                     strcpy(m_statusText, cTownCommand[IDX(TEXT_EMPTY_SLOT)]);
                     m_command = ARMY_COMMAND_NONE;
                 } else {
                     sprintf(
                         m_statusText,
                         cTownCommand[IDX(TEXT_SELECT_ARMY)],
-                        gArmyNames[m_selectedStrip->m_army->m_creatureTypes[m_selectedArmySlot]]
+                        gArmyNames[IDX(
+                            m_selectedStrip->m_army->m_creatureTypes[m_selectedArmySlot]
+                        )]
                     );
                     m_command = ARMY_COMMAND_SELECT;
                 }
@@ -1698,7 +1702,7 @@ i32 townManager::Main(tag_message& message) {
                                 }
                                 if (armySelected
                                     && m_selectedStrip->m_army->m_creatureTypes[m_selectedArmySlot]
-                                           != -1) {
+                                           != CREATURE_NONE) {
                                     if (m_selectedStrip == m_heroStrip)
                                         viewedHero = gpGame->GetHero(m_town->m_occupyingHeroId);
                                     else
@@ -1809,6 +1813,7 @@ void townManager::DoCommand(TownManagerArmyCommand command) {
     i32 dismissAllowed;
     i32 slot;
     i32 oldValue;
+    CreatureType oldCreature;
 
     switch (command) {
         case ARMY_COMMAND_SELECT:
@@ -1844,7 +1849,7 @@ void townManager::DoCommand(TownManagerArmyCommand command) {
             );
             m_bankBox->Update(1);
             if (gpWindowManager->m_dialogResult == TOWN_DIALOG_CONFIRM) {
-                m_selectedStrip->m_army->m_creatureTypes[m_selectedArmySlot] = -1;
+                m_selectedStrip->m_army->m_creatureTypes[m_selectedArmySlot] = CREATURE_NONE;
                 m_selectedStrip->m_army->m_creatureCounts[m_selectedArmySlot] = 0;
             }
             ResetStrips();
@@ -1865,7 +1870,7 @@ void townManager::DoCommand(TownManagerArmyCommand command) {
             m_pendingStrip->m_army->m_creatureCounts[m_pendingArmySlot] =
                 m_pendingStrip->m_army->m_creatureCounts[m_pendingArmySlot]
                 + m_swapStrip->m_army->m_creatureCounts[m_swapArmySlot];
-            m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot] = -1;
+            m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot] = CREATURE_NONE;
             m_swapStrip->m_army->m_creatureCounts[m_swapArmySlot] = 0;
             ResetStrips();
             break;
@@ -1875,10 +1880,10 @@ void townManager::DoCommand(TownManagerArmyCommand command) {
             m_pendingStrip->m_army->m_creatureCounts[m_pendingArmySlot] =
                 m_swapStrip->m_army->m_creatureCounts[m_swapArmySlot];
             m_swapStrip->m_army->m_creatureCounts[m_swapArmySlot] = oldValue;
-            oldValue = m_pendingStrip->m_army->m_creatureTypes[m_pendingArmySlot];
+            oldCreature = m_pendingStrip->m_army->m_creatureTypes[m_pendingArmySlot];
             m_pendingStrip->m_army->m_creatureTypes[m_pendingArmySlot] =
                 m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot];
-            m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot] = oldValue;
+            m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot] = oldCreature;
             ResetStrips();
             break;
 
@@ -1935,7 +1940,7 @@ void townManager::SplitArmy(void) {
         sprintf(
             gText,
             "Move how many %s troops from %s to %s?",
-            gArmyNames[m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot]],
+            gArmyNames[IDX(m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot])],
             m_swapStrip == m_heroStrip ? "Hero's Army" : "Garrison",
             m_pendingStrip == m_heroStrip ? "Hero's Army" : "Garrison"
         );
@@ -3006,7 +3011,7 @@ void townManager::SetupWell(heroWindow* window) {
         sprintf(
             gText,
             "monh%04d.icn",
-            gDwellingType[IDX(m_town->m_type)][dwellingTypesValue[dwellingResult]]
+            IDX(gDwellingType[IDX(m_town->m_type)][dwellingTypesValue[dwellingResult]])
         );
         messaged.payload.widget.command = WIDGET_COMMAND_SET_ICON;
         messaged.payload.widget.id = dwellingResult + TOWN_WELL_FIRST_MONSTER_ICON_CONTROL;
@@ -3135,7 +3140,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
     i32 position_current;
     tag_message message_n;
     widget* textControl_icon;
-    i32 strongestCreature_m;
+    CreatureType strongestCreature_m;
 
     if (informationLevel == -1)
         informationLevel = gpGame->GetNumThievesGuilds(giCurPlayer);
@@ -3386,7 +3391,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
 
                     if (informationLevel < TOWN_THIEVES_INFO_STRONGEST_CREATURE) {
                     } else {
-                        strongestCreature_m = -1;
+                        strongestCreature_m = CREATURE_NONE;
                         strongestCreatureValue = 0;
                         for (heroPosition_index = 0;
                              heroPosition_index < gpGame->m_players[rank].m_townCount;
@@ -3394,17 +3399,18 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                             playerTown_k = gpGame->GetPlayerTown(rank, heroPosition_index);
                             for (armySlot_index = 0; armySlot_index < TOWN_ARMY_SLOT_COUNT;
                                  ++armySlot_index) {
-                                if (playerTown_k->m_army.m_creatureTypes[armySlot_index] != -1
+                                if (playerTown_k->m_army.m_creatureTypes[armySlot_index]
+                                        != CREATURE_NONE
                                     && playerTown_k->m_army.m_creatureCounts[armySlot_index] > 0
                                     && strongestCreatureValue
-                                           < gMonsterDatabase[playerTown_k->m_army
-                                                                  .m_creatureTypes[armySlot_index]]
+                                           < gMonsterDatabase[IDX(playerTown_k->m_army
+                                                                      .m_creatureTypes[armySlot_index])]
                                                  .fightValue) {
                                     strongestCreature_m =
                                         playerTown_k->m_army.m_creatureTypes[armySlot_index];
                                     strongestCreatureValue =
-                                        gMonsterDatabase[playerTown_k->m_army
-                                                             .m_creatureTypes[armySlot_index]]
+                                        gMonsterDatabase[IDX(playerTown_k->m_army
+                                                                 .m_creatureTypes[armySlot_index])]
                                             .fightValue;
                                 }
                             }
@@ -3415,22 +3421,23 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                             strongestHero_x = gpGame->GetPlayerHero(rank, heroPosition_index);
                             for (armySlot_index = 0; armySlot_index < TOWN_ARMY_SLOT_COUNT;
                                  ++armySlot_index) {
-                                if (strongestHero_x->m_army.m_creatureTypes[armySlot_index] != -1
+                                if (strongestHero_x->m_army.m_creatureTypes[armySlot_index]
+                                        != CREATURE_NONE
                                     && strongestHero_x->m_army.m_creatureCounts[armySlot_index] > 0
                                     && strongestCreatureValue
-                                           < gMonsterDatabase[strongestHero_x->m_army
-                                                                  .m_creatureTypes[armySlot_index]]
+                                           < gMonsterDatabase[IDX(strongestHero_x->m_army
+                                                                      .m_creatureTypes[armySlot_index])]
                                                  .fightValue) {
                                     strongestCreature_m =
                                         strongestHero_x->m_army.m_creatureTypes[armySlot_index];
                                     strongestCreatureValue =
-                                        gMonsterDatabase[strongestHero_x->m_army
-                                                             .m_creatureTypes[armySlot_index]]
+                                        gMonsterDatabase[IDX(strongestHero_x->m_army
+                                                                 .m_creatureTypes[armySlot_index])]
                                             .fightValue;
                                 }
                             }
                         }
-                        if (strongestCreature_m != -1) {
+                        if (strongestCreature_m != CREATURE_NONE) {
                             iconControl_last = new iconWidget(
                                 static_cast<i16>(
                                     position_current * THIEVES_PLAYER_COLUMN_WIDTH
