@@ -201,7 +201,7 @@ public:
     SpellType GetNthSpell(HeroSpellType, i32);
     i32 GetNumSpells(HeroSpellType);
     void UseSpell(SpellType);
-    void AddSpell(i32, i32);
+    void AddSpell(H2_ENUM_PARAM(SpellType, i32), i32);
     void HeroScreenUpdate(void);
     void UpdateArmies(void);
     void ViewStat(i32, i32);

@@ -2585,25 +2585,25 @@ void townManager::SetupMage(heroWindow* window) {
                 message_b.payload.widget.id =
                     level * TOWN_MAGE_SPELLS_PER_LEVEL + slot_m + TOWN_MAGE_FIRST_ICON_CONTROL;
                 message_b.payload.widget.data.value =
-                    gsSpellInfo[m_town->m_spells[level][slot_m]].iconIndex;
+                    gsSpellInfo[IDX(m_town->m_spells[level][slot_m])].iconIndex;
                 window->BroadcastMessage(message_b);
                 lineCount_m =
                     smallFont->LineLength(
-                        gSpellNames[m_town->m_spells[level][slot_m]], MAGE_SPELL_NAME_WIDTH
+                        gSpellNames[IDX(m_town->m_spells[level][slot_m])], MAGE_SPELL_NAME_WIDTH
                     );
                 if (lineCount_m == 1)
                     sprintf(
                         gText,
                         "%s\n[%d]",
-                        gSpellNames[m_town->m_spells[level][slot_m]],
-                        GetManaCost(SpellType(m_town->m_spells[level][slot_m]), NULL)
+                        gSpellNames[IDX(m_town->m_spells[level][slot_m])],
+                        GetManaCost(m_town->m_spells[level][slot_m], NULL)
                     );
                 else
                     sprintf(
                         gText,
                         "%s  [%d]",
-                        gSpellNames[m_town->m_spells[level][slot_m]],
-                        GetManaCost(SpellType(m_town->m_spells[level][slot_m]), NULL)
+                        gSpellNames[IDX(m_town->m_spells[level][slot_m])],
+                        GetManaCost(m_town->m_spells[level][slot_m], NULL)
                     );
                 message_b.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
                 message_b.payload.widget.id = level * TOWN_MAGE_SPELLS_PER_LEVEL + slot_m
@@ -2635,7 +2635,7 @@ i32 MageGuildHandler(tag_message& message) {
     i32 spellSlot;
     i32 level;
     i32 slot_p;
-    i32 spell;
+    SpellType spell;
 
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
@@ -2665,12 +2665,12 @@ i32 MageGuildHandler(tag_message& message) {
                         return 1;
                     spell = gpTownManager->m_town->m_spells[level][slot_p];
                     NormalDialog(
-                        gSpellDesc[spell],
+                        gSpellDesc[IDX(spell)],
                         quickView_f >= 1 ? NORMAL_DIALOG_QUICK_VIEW : NORMAL_DIALOG_INFO,
                         -1,
                         -1,
                         NORMAL_DIALOG_SPELL,
-                        spell,
+                        IDX(spell),
                         -1,
                         0,
                         -1,

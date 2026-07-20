@@ -3794,7 +3794,9 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
                 gpGame->m_campaignCheated = 1;
             if (currentHeroRec != NULL) {
                 for (loopIndex = 0; loopIndex < APP_MENU_MAX_SPELLS; loopIndex++)
-                    currentHeroRec->AddSpell(loopIndex, APP_MENU_SPELL_COUNT);
+                    currentHeroRec->AddSpell(
+                        static_cast<SpellType>(loopIndex), APP_MENU_SPELL_COUNT
+                    );
                 currentHeroRec->m_spellPoints = APP_MENU_CHEAT_SPELL_POINTS;
             }
             break;

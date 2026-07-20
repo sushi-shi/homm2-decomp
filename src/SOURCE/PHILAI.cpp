@@ -4167,17 +4167,16 @@ void philAI::HeroInteractionAtTown(hero* heroPtr, town* townPtr, i32 doInteracti
              spellLevel14++) {
             for (spellIndex = 0; spellIndex < townPtr->m_spellCounts[spellLevel14 - 1];
                  spellIndex++) {
-                if (!heroPtr->HasSpell(
-                        SpellType(townPtr->m_spells[spellLevel14 - 1][spellIndex])
-                    )) {
-                    if (HAS(gsSpellInfo[townPtr->m_spells[spellLevel14 - 1][spellIndex]].attributes,
+                if (!heroPtr->HasSpell(townPtr->m_spells[spellLevel14 - 1][spellIndex])) {
+                    if (HAS(gsSpellInfo[IDX(townPtr->m_spells[spellLevel14 - 1][spellIndex])]
+                                .attributes,
                             SPELL_INFO_ATTRIBUTE_POWER))
                         spellMultiplier1 = heroPtr->Stats(HERO_PRIMARY_KNOWLEDGE);
                     else
                         spellMultiplier1 = 1;
                     *value +=
                         spellMultiplier1
-                        * gsSpellInfo[townPtr->m_spells[spellLevel14 - 1][spellIndex]].aiValue;
+                        * gsSpellInfo[IDX(townPtr->m_spells[spellLevel14 - 1][spellIndex])].aiValue;
                 }
             }
         }
