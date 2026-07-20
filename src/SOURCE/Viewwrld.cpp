@@ -347,9 +347,9 @@ void advManager::VWCompleteDraw(void) {
                 }
 
                 if ((cell0->m_objectData & 1) && cell0->m_objectIndex != WORLD_NO_SPRITE
-                    && drawTilesets0[cell0->m_objectTileset]) {
+                    && drawTilesets0[IDX(cell0->m_objectTileset)]) {
                     IconToBitmapScale(
-                        m_objectIcons[cell0->m_objectTileset],
+                        m_objectIcons[IDX(cell0->m_objectTileset)],
                         gpWindowManager->m_screen,
                         pixelX6,
                         pixelY2,
@@ -369,9 +369,9 @@ void advManager::VWCompleteDraw(void) {
                     extra15 = m_mapData->Extra(cell0->m_extraIndex);
                 while (extra15 != NULL) {
                     if (extra15->objectLayerBit0 && extra15->objectIndex != WORLD_NO_SPRITE
-                        && drawTilesets0[extra15->objectTileset]) {
+                        && drawTilesets0[IDX(extra15->objectTileset)]) {
                         IconToBitmapScale(
-                            m_objectIcons[extra15->objectTileset],
+                            m_objectIcons[IDX(extra15->objectTileset)],
                             gpWindowManager->m_screen,
                             pixelX6,
                             pixelY2,
@@ -393,9 +393,9 @@ void advManager::VWCompleteDraw(void) {
                 }
 
                 if (!(cell0->m_objectData & 1) && cell0->m_objectIndex != WORLD_NO_SPRITE
-                    && drawTilesets0[cell0->m_objectTileset]) {
+                    && drawTilesets0[IDX(cell0->m_objectTileset)]) {
                     IconToBitmapScale(
-                        m_objectIcons[cell0->m_objectTileset],
+                        m_objectIcons[IDX(cell0->m_objectTileset)],
                         gpWindowManager->m_screen,
                         pixelX6,
                         pixelY2,
@@ -415,9 +415,9 @@ void advManager::VWCompleteDraw(void) {
                     extra15 = m_mapData->Extra(cell0->m_extraIndex);
                 while (extra15 != NULL) {
                     if (!extra15->objectLayerBit0 && extra15->objectIndex != WORLD_NO_SPRITE
-                        && drawTilesets0[extra15->objectTileset]) {
+                        && drawTilesets0[IDX(extra15->objectTileset)]) {
                         IconToBitmapScale(
-                            m_objectIcons[extra15->objectTileset],
+                            m_objectIcons[IDX(extra15->objectTileset)],
                             gpWindowManager->m_screen,
                             pixelX6,
                             pixelY2,
@@ -439,9 +439,9 @@ void advManager::VWCompleteDraw(void) {
                 }
 
                 if (cell0->m_overlayIndex != WORLD_NO_SPRITE
-                    && drawTilesets0[cell0->m_overlayTileset]) {
+                    && drawTilesets0[IDX(cell0->m_overlayTileset)]) {
                     IconToBitmapScale(
-                        m_objectIcons[cell0->m_overlayTileset],
+                        m_objectIcons[IDX(cell0->m_overlayTileset)],
                         gpWindowManager->m_screen,
                         pixelX6,
                         pixelY2,
@@ -460,9 +460,9 @@ void advManager::VWCompleteDraw(void) {
                 else
                     extra15 = m_mapData->Extra(cell0->m_extraIndex);
                 while (extra15 != NULL) {
-                    if (drawTilesets0[extra15->overlayTileset]) {
+                    if (drawTilesets0[IDX(extra15->overlayTileset)]) {
                         IconToBitmapScale(
-                            m_objectIcons[extra15->overlayTileset],
+                            m_objectIcons[IDX(extra15->overlayTileset)],
                             gpWindowManager->m_screen,
                             pixelX6,
                             pixelY2,

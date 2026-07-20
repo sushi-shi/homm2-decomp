@@ -42,13 +42,13 @@ void fullMap::Init(i32 w, i32 h) {
 
 VA(0x0040b198, 0xce)
 void fullMap::ClearCellExtra(i32 index) {
-    extras[index].objectTileset = 0;
+    extras[index].objectTileset = TILESET_NONE;
     extras[index].objectIndex = IDX(MAPCELL_SPRITE_NONE);
     extras[index].animatedObject = 0;
     extras[index].objectLayerBit0 = 0;
     extras[index].objectLayerBit1 = 0;
     extras[index].objectDrawnAsOverlay = 0;
-    extras[index].overlayTileset = 0;
+    extras[index].overlayTileset = TILESET_NONE;
     extras[index].overlayIndex = IDX(MAPCELL_SPRITE_NONE);
     extras[index].animatedOverlay = 0;
     extras[index].drawOverlayOnTop = 0;
@@ -190,19 +190,19 @@ void fullMap::ChangeTilesetIndex(
     mapCell* cell,
     i32 x,
     i32 y,
-    i32 tileset,
+    H2_ENUM_PARAM(TilesetId, i32) tileset,
     i32 index,
     i32 overlay,
     i32
 ) {
     i32 idx;
     mapCellExtra* ptr;
-    i32 t;
+    TilesetId t;
     i32 dummy;
 
     ptr = NULL;
     if (index == IDX(MAPCELL_SPRITE_NONE))
-        t = 0;
+        t = TILESET_NONE;
     else
         t = tileset;
 
@@ -233,7 +233,7 @@ void fullMap::ChangeTilesetIndex(
             cell->m_objectLayerBit0 = 0;
             cell->m_objectLayerBit1 = 0;
             cell->m_objectDrawnAsOverlay = 0;
-            cell->m_objectTileset = static_cast<u8>(t);
+            cell->m_objectTileset = t;
             cell->m_objectIndex = index;
         }
     } else {

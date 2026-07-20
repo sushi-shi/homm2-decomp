@@ -83,9 +83,11 @@ StatementMacros:
 Macros:
   - H2_ENUM_CLASS_BEGIN(name)=enum name {
   - H2_ENUM_CLASS_BEGIN_T(name, storage)=enum name {
+  - H2_ENUM_CLASS_BEGIN_SPLIT(name, storage)=enum name {
   - H2_ENUM_BEGIN(name)=enum name {
   - H2_ENUM_CLASS_END(name)=};
   - H2_ENUM_CLASS_END_T(name, storage)=};
+  - H2_ENUM_CLASS_END_SPLIT(name, storage)=};
   - H2_ENUM_END(name)=};
 AttributeMacros:
   - OVERRIDE
