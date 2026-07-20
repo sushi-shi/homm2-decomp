@@ -662,10 +662,10 @@ void game::InitNewGameWindow(void) {
                 9,
                 label,
                 "smalfont.fnt",
-                1,
+                FONT_DRAW_DEFAULT,
                 static_cast<i16>(playerCounter + NEW_GAME_PLAYER_NAME_FIRST),
                 MESSAGE_WIDGET,
-                1
+                FONT_ALIGN_CENTER
             );
             if (textControlLocal == NULL)
                 MemError();
@@ -710,10 +710,10 @@ void game::InitNewGameWindow(void) {
             12,
             label,
             "smalfont.fnt",
-            1,
+            FONT_DRAW_DEFAULT,
             static_cast<i16>(playerCounter + NEW_GAME_RACE_NAME_FIRST),
             MESSAGE_WIDGET,
-            1
+            FONT_ALIGN_CENTER
         );
         if (textControlLocal == NULL)
             MemError();
@@ -1715,10 +1715,10 @@ void game::ShowScenInfo(void) {
                 9,
                 label,
                 "smalfont.fnt",
-                1,
+                FONT_DRAW_DEFAULT,
                 static_cast<i16>(playerCounter + NEW_GAME_PLAYER_NAME_FIRST),
                 MESSAGE_WIDGET,
-                1
+                FONT_ALIGN_CENTER
             );
             if (textControlLocal == NULL)
                 MemError();
@@ -1762,10 +1762,10 @@ void game::ShowScenInfo(void) {
             12,
             label,
             "smalfont.fnt",
-            1,
+            FONT_DRAW_DEFAULT,
             static_cast<i16>(playerCounter + NEW_GAME_RACE_NAME_FIRST),
             MESSAGE_WIDGET,
-            1
+            FONT_ALIGN_CENTER
         );
         if (textControlLocal == NULL)
             MemError();

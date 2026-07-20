@@ -2,6 +2,7 @@
 #define HOMM2_BASE_LISTBOXWIDGET_H
 
 #include <va.h>
+#include <BASE/font.h>
 #include "widget.h"
 
 struct tag_message;
@@ -18,9 +19,9 @@ public:
     icon* m_icon;
     i16 m_maxVisibleItems;
     i16 m_visibleItemCount;
-    i16 m_normalColor;
-    i16 m_selectedColor;
-    i16 m_alignment;
+    H2_ENUM_STORAGE(FontDrawMode, i16) m_normalColor;
+    H2_ENUM_STORAGE(FontDrawMode, i16) m_selectedColor;
+    H2_ENUM_STORAGE(FontAlignment, i16) m_alignment;
     i16 m_itemCount;
     i16 m_selectedIndex;
     i16 m_lastSelectedIndex;

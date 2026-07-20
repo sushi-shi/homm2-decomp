@@ -207,7 +207,6 @@ H2_ENUM_BEGIN(MapEventConstant)
     STONE_LITHS_MIN_DISTANCE             = 1,
     WHIRLPOOL_MIN_DISTANCE               = 3,
     HERO_TOWN_LOCATION                   = 0xa3,
-    BOAT_CURSOR_TYPE                     = 6,
     BOAT_RESTORE_MODE                    = 2,
     COAST_FIZZLE_X                       = 192,
     COAST_FIZZLE_Y                       = 192,
