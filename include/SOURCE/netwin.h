@@ -84,8 +84,8 @@ struct NetbiosControlBlock;
 typedef void(__stdcall* NetbiosPostRoutine)(NetbiosControlBlock* controlBlock);
 
 struct NetbiosControlBlock {
-    u8 command;
-    u8 returnCode;
+    H2_ENUM_STORAGE(NetbiosCommand, u8) command;
+    H2_ENUM_STORAGE(NetbiosResult, u8) returnCode;
     u8 sessionNumber;
     u8 nameNumber;
     void* buffer;
@@ -96,7 +96,7 @@ struct NetbiosControlBlock {
     u8 sendTimeout;
     NetbiosPostRoutine postRoutine;
     u8 adapterNumber;
-    u8 commandComplete;
+    H2_ENUM_STORAGE(NetbiosResult, u8) commandComplete;
     u8 reserved[NETBIOS_CONTROL_BLOCK_RESERVED_SIZE];
     void* event;
 };
@@ -129,7 +129,7 @@ extern "C" u16 __fastcall nb_init(u16, u16);
 extern "C" void __fastcall nb_term(void);
 extern "C" u16 __fastcall nb_rcv(i16, void*);
 extern "C" u16 __fastcall nb_snd(i16, i16, void*);
-extern "C" u16 __cdecl nb_sess(i16, ...);
+extern "C" u16 __cdecl nb_sess(H2_ENUM_PARAM(NetbiosSessionOperation, i16), ...);
 extern "C" char __fastcall nb_stat(i16);
 void nb_thr_ctl(void);
 
