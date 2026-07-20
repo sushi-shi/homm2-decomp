@@ -2070,10 +2070,10 @@ void game::NewMap(char* filename) {
     m_ultimateArtifactId =
         static_cast<ArtifactType>(Random(IDX(ARTIFACT_ULTIMATE_BOOK), IDX(ARTIFACT_GOLDEN_GOOSE)));
     if (gbInCampaign
-        && ((m_campaignType == IDX(CAMPAIGN_ROLAND)
+        && ((m_campaignType == CAMPAIGN_ROLAND
              && static_cast<i8>(m_campaignScenario) + CAMPAIGN_SCENARIO_NUMBER_OFFSET
                     == CAMPAIGN_ROLAND_ULTIMATE_CROWN_SCENARIO)
-            || (m_campaignType == IDX(CAMPAIGN_ARCHIBALD)
+            || (m_campaignType == CAMPAIGN_ARCHIBALD
                 && static_cast<i8>(m_campaignScenario) + CAMPAIGN_SCENARIO_NUMBER_OFFSET
                        == CAMPAIGN_ARCHIBALD_ULTIMATE_CROWN_SCENARIO)))
         m_ultimateArtifactId = ARTIFACT_ULTIMATE_CROWN;
@@ -2163,7 +2163,7 @@ void game::NewMap(char* filename) {
                                              || heroClass5 == FACTION_WARLOCK
                                              || heroClass5 == FACTION_NECROMANCER;
         if (gbInCampaign && player2 == 0)
-            m_players[player2].m_evilInterface = m_campaignType == 1;
+            m_players[player2].m_evilInterface = m_campaignType == CAMPAIGN_ARCHIBALD;
         for (townIndex9 = 0; townIndex9 < gpGame->m_players[player2].m_townCount; townIndex9++)
             GetCastle(gpGame->m_players[player2].m_townIds[townIndex9])->GiveSpells(NULL);
         gpGame->m_players[player2].m_minimumHeroCount = gpGame->m_players[player2].m_heroCount;

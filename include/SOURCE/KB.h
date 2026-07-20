@@ -381,7 +381,6 @@ H2_ENUM_BEGIN(OldMainConstant)
     OLD_MAIN_NETWORK_PACKET                   = 0x20,
     OLD_MAIN_ARCHIBALD_FINAL_SCENARIO         = 10,
     OLD_MAIN_ROLAND_FINAL_SCENARIO            = 9,
-    OLD_MAIN_ROLAND_CAMPAIGN                  = 0,
     OLD_MAIN_DIALOG_WAIT                      = 6,
     OLD_MAIN_REMOTE_PREFIX_RESERVED_SIZE      = 4,
     OLD_MAIN_REMOTE_BODY_RESERVED_SIZE        = 2,
