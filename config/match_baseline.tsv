@@ -703,7 +703,7 @@ SOURCE/DRAWING	?ClearCombatMessages@combatManager@@QAEXH@Z	100.0000	7a1c0603e00f
 SOURCE/DRAWING	?CombatMessage@combatManager@@QAEXH@Z	100.0000	1ca8ce0e9bea
 SOURCE/DRAWING	?CombatMessage@combatManager@@QAEXPADHHH@Z	100.0000	6667886ea83a
 SOURCE/DRAWING	?DrawBackground@combatManager@@QAEXXZ	100.0000	e8aaea851420
-SOURCE/DRAWING	?DrawFrame@combatManager@@QAEXHHHHHHH@Z	99.7245	86f7bcf7563a
+SOURCE/DRAWING	?DrawFrame@combatManager@@QAEXHHHHHHH@Z	99.6326	2f8cfb19e9f0
 SOURCE/DRAWING	?DrawSmallView@combatManager@@QAEXHH@Z	99.9219	2ed71075aeee
 SOURCE/DRAWING	?NoShowCombatLog@combatManager@@QAEXPAD@Z	100.0000	175192ffefde
 SOURCE/DRAWING	?ResetLimitCreature@combatManager@@QAEXXZ	100.0000	aa89720270e5
