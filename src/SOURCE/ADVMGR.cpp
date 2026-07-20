@@ -2651,9 +2651,9 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
         y = m_mapOriginY + VIEW_CENTER_OFFSET;
     }
     currentCell = GetCell(x, IDX(y));
-    if (!((currentCell->m_objectIndex == IDX(MAPCELL_SPRITE_NONE)
+    if (!((currentCell->m_objectIndex == MAPCELL_SPRITE_NONE
            || currentCell->m_objectTileset == TILESET_DUMMY)
-          && currentCell->m_overlayIndex == IDX(MAPCELL_SPRITE_NONE))) {
+          && currentCell->m_overlayIndex == MAPCELL_SPRITE_NONE)) {
         if (!gbHumanPlayer[giCurPlayer]) {
             goto search_end;
         }
@@ -2671,7 +2671,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
     if (gbHumanPlayer[giCurPlayer]) {
         digSampleState = LoadPlaySample("DIGSOUND.82M");
     }
-    if (currentCell->m_objectIndex == IDX(MAPCELL_SPRITE_NONE)
+    if (currentCell->m_objectIndex == MAPCELL_SPRITE_NONE
         || currentCell->m_objectTileset == TILESET_DUMMY) {
         currentCell->m_objectTileset = TILESET_OBJNDIRT;
         currentCell->m_objectIndex = DIG_HOLE_FRAME;
@@ -3525,7 +3525,7 @@ void advManager::DrawCell(
 
                 if (s_drawCell->m_extraIndex != 0
                     && m_mapData->Extra(s_drawCell->m_extraIndex)->objectIndex
-                           != IDX(MAPCELL_SPRITE_NONE)) {
+                           != MAPCELL_SPRITE_NONE) {
                     s_drawExtra = m_mapData->Extra(s_drawCell->m_extraIndex);
                 } else {
                     s_drawExtra = NULL;
@@ -3569,7 +3569,7 @@ void advManager::DrawCell(
                     }
                     if (s_drawExtra->nextIndex != 0
                         && m_mapData->Extra(s_drawExtra->nextIndex)->objectIndex
-                               != IDX(MAPCELL_SPRITE_NONE)) {
+                               != MAPCELL_SPRITE_NONE) {
                         s_drawExtra = m_mapData->Extra(s_drawExtra->nextIndex);
                     } else {
                         s_drawExtra = NULL;
@@ -3615,7 +3615,7 @@ void advManager::DrawCell(
 
                 if (s_drawCell->m_extraIndex != 0
                     && m_mapData->Extra(s_drawCell->m_extraIndex)->objectIndex
-                           != IDX(MAPCELL_SPRITE_NONE)) {
+                           != MAPCELL_SPRITE_NONE) {
                     s_drawExtra = m_mapData->Extra(s_drawCell->m_extraIndex);
                 } else {
                     s_drawExtra = NULL;
@@ -3659,7 +3659,7 @@ void advManager::DrawCell(
                     }
                     if (s_drawExtra->nextIndex != 0
                         && m_mapData->Extra(s_drawExtra->nextIndex)->objectIndex
-                               != IDX(MAPCELL_SPRITE_NONE)) {
+                               != MAPCELL_SPRITE_NONE) {
                         s_drawExtra = m_mapData->Extra(s_drawExtra->nextIndex);
                     } else {
                         s_drawExtra = NULL;
@@ -3668,7 +3668,7 @@ void advManager::DrawCell(
             }
 
             if (HAS(drawMask, ADVMGR_DRAW_OBJECT)) {
-                if (s_drawCell->m_objectIndex != IDX(MAPCELL_SPRITE_NONE)
+                if (s_drawCell->m_objectIndex != MAPCELL_SPRITE_NONE
                     && !s_drawCell->m_objectLayerBit0 && !s_drawCell->m_objectLayerBit1
                     && !s_drawCell->m_objectDrawnAsOverlay
                     && s_drawCell->m_objectTileset != TILESET_MONS32
@@ -3719,7 +3719,7 @@ void advManager::DrawCell(
 
                 if (s_drawCell->m_extraIndex != 0
                     && m_mapData->Extra(s_drawCell->m_extraIndex)->objectIndex
-                           != IDX(MAPCELL_SPRITE_NONE)) {
+                           != MAPCELL_SPRITE_NONE) {
                     s_drawExtra = m_mapData->Extra(s_drawCell->m_extraIndex);
                 } else {
                     s_drawExtra = NULL;
@@ -3765,7 +3765,7 @@ void advManager::DrawCell(
                     }
                     if (s_drawExtra->nextIndex != 0
                         && m_mapData->Extra(s_drawExtra->nextIndex)->objectIndex
-                               != IDX(MAPCELL_SPRITE_NONE)) {
+                               != MAPCELL_SPRITE_NONE) {
                         s_drawExtra = m_mapData->Extra(s_drawExtra->nextIndex);
                     } else {
                         s_drawExtra = NULL;
@@ -4140,7 +4140,7 @@ void advManager::DrawCell(
 
             if (HAS(drawMask, ADVMGR_DRAW_OVERLAY) || HAS(drawMask, ADVMGR_DRAW_OVERLAY_TOP)) {
                 if (HAS(drawMask, ADVMGR_DRAW_OVERLAY)
-                    && s_drawCell->m_objectIndex != IDX(MAPCELL_SPRITE_NONE)
+                    && s_drawCell->m_objectIndex != MAPCELL_SPRITE_NONE
                     && s_drawCell->m_objectDrawnAsOverlay
                     && (gbDrawingPuzzle == 0 || bPuzzleDraw[IDX(s_drawCell->m_objectTileset)])) {
                     IconToBitmap(
@@ -4180,7 +4180,7 @@ void advManager::DrawCell(
 
                 if (s_drawCell->m_extraIndex != 0
                     && m_mapData->Extra(s_drawCell->m_extraIndex)->objectIndex
-                           != IDX(MAPCELL_SPRITE_NONE)) {
+                           != MAPCELL_SPRITE_NONE) {
                     s_drawExtra = m_mapData->Extra(s_drawCell->m_extraIndex);
                 } else {
                     s_drawExtra = NULL;
@@ -4224,14 +4224,14 @@ void advManager::DrawCell(
                     }
                     if (s_drawExtra->nextIndex != 0
                         && m_mapData->Extra(s_drawExtra->nextIndex)->objectIndex
-                               != IDX(MAPCELL_SPRITE_NONE)) {
+                               != MAPCELL_SPRITE_NONE) {
                         s_drawExtra = m_mapData->Extra(s_drawExtra->nextIndex);
                     } else {
                         s_drawExtra = NULL;
                     }
                 }
 
-                if (s_drawCell->m_overlayIndex != IDX(MAPCELL_SPRITE_NONE)
+                if (s_drawCell->m_overlayIndex != MAPCELL_SPRITE_NONE
                     && ((HAS(drawMask, ADVMGR_DRAW_OVERLAY) && !s_drawCell->m_drawOverlayOnTop)
                         || (HAS(drawMask, ADVMGR_DRAW_OVERLAY_TOP)
                             && s_drawCell->m_drawOverlayOnTop))
@@ -4274,7 +4274,7 @@ void advManager::DrawCell(
 
                 if (s_drawCell->m_extraIndex != 0
                     && m_mapData->Extra(s_drawCell->m_extraIndex)->overlayIndex
-                           != IDX(MAPCELL_SPRITE_NONE)) {
+                           != MAPCELL_SPRITE_NONE) {
                     s_drawExtra = m_mapData->Extra(s_drawCell->m_extraIndex);
                 } else {
                     s_drawExtra = NULL;
@@ -4324,7 +4324,7 @@ void advManager::DrawCell(
                     }
                     if (s_drawExtra->nextIndex != 0
                         && m_mapData->Extra(s_drawExtra->nextIndex)->overlayIndex
-                               != IDX(MAPCELL_SPRITE_NONE)) {
+                               != MAPCELL_SPRITE_NONE) {
                         s_drawExtra = m_mapData->Extra(s_drawExtra->nextIndex);
                     } else {
                         s_drawExtra = NULL;
@@ -4491,9 +4491,9 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                         }
                     } else {
                         objectTilesetLocal = static_cast<TilesetId>(-1);
-                        if (cellValue->m_objectIndex != IDX(MAPCELL_SPRITE_NONE)) {
+                        if (cellValue->m_objectIndex != MAPCELL_SPRITE_NONE) {
                             objectTilesetLocal = cellValue->m_objectTileset;
-                        } else if (cellValue->m_overlayIndex != IDX(MAPCELL_SPRITE_NONE)) {
+                        } else if (cellValue->m_overlayIndex != MAPCELL_SPRITE_NONE) {
                             objectTilesetLocal = cellValue->m_overlayTileset;
                         }
 
@@ -5084,7 +5084,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     break;
                 case OBJECT_GENERIC_SITE: {
                     mapObjectKindValue = -1;
-                    if (currentCell->m_objectIndex != IDX(MAPCELL_SPRITE_NONE)) {
+                    if (currentCell->m_objectIndex != MAPCELL_SPRITE_NONE) {
                         siteFrameLocal[0] = currentCell->m_objectIndex;
                         objectTilesetLocal = currentCell->m_objectTileset;
                     } else {
@@ -5151,7 +5151,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     break;
                 }
                 case MAP_OBJECT_EXPANSION_DWELLING: {
-                    if (currentCell->m_overlayIndex == IDX(MAPCELL_SPRITE_NONE)) {
+                    if (currentCell->m_overlayIndex == MAPCELL_SPRITE_NONE) {
                         siteFrameLocal[0] = currentCell->m_objectIndex;
                         objectTilesetLocal = currentCell->m_objectTileset;
                     } else {
@@ -8606,7 +8606,7 @@ void advManager::SummonBoat(void) {
             }
 
             destinationCell = GetCell(destinationX10, destinationY15);
-            if (destinationCell->m_objectIndex == IDX(MAPCELL_SPRITE_NONE)
+            if (destinationCell->m_objectIndex == MAPCELL_SPRITE_NONE
                 && destinationCell->m_triggerType == 0
                 && !giGroundToTerrain[destinationCell->m_terrainImageIndex]) {
                 foundDestination9 = 1;

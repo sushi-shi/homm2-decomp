@@ -935,8 +935,8 @@ void ComputeUALoc(i32 player) {
     while (
         !(x >= 0 && (&x)[0] < MAP_WIDTH && y >= 0 && (&y)[0] < MAP_HEIGHT
           && gpGame->m_worldMap.Row(y)[x].m_triggerType == MAP_OBJECT_NONE
-          && gpGame->m_worldMap.Row(y)[x].m_objectIndex == IDX(MAPCELL_SPRITE_NONE)
-          && gpGame->m_worldMap.Row(y)[x].m_overlayIndex == IDX(MAPCELL_SPRITE_NONE)
+          && gpGame->m_worldMap.Row(y)[x].m_objectIndex == MAPCELL_SPRITE_NONE
+          && gpGame->m_worldMap.Row(y)[x].m_overlayIndex == MAPCELL_SPRITE_NONE
           && giGroundToTerrain[gpGame->m_worldMap.Row(y)[x].m_terrainImageIndex] != 0)
     ) {
         tries++;
@@ -2061,8 +2061,8 @@ void game::NewMap(char* filename) {
            || townIndex9 < ULTIMATE_ARTIFACT_BORDER_MARGIN
            || player2 > MAP_WIDTH - ULTIMATE_ARTIFACT_BORDER_MARGIN - 1
            || townIndex9 > MAP_HEIGHT - ULTIMATE_ARTIFACT_BORDER_MARGIN - 1
-           || m_worldMap.GetCell(player2, townIndex9)->m_objectIndex != IDX(MAPCELL_SPRITE_NONE)
-           || m_worldMap.GetCell(player2, townIndex9)->m_overlayIndex != IDX(MAPCELL_SPRITE_NONE)
+           || m_worldMap.GetCell(player2, townIndex9)->m_objectIndex != MAPCELL_SPRITE_NONE
+           || m_worldMap.GetCell(player2, townIndex9)->m_overlayIndex != MAPCELL_SPRITE_NONE
            || giGroundToTerrain[m_worldMap.GetCell(player2, townIndex9)->m_terrainImageIndex] == 0
            || (giNumHumanPlayers == 1
                && ultimateTries4 < ULTIMATE_HUMAN_DISTANCE_RETRY_LIMIT
@@ -2253,7 +2253,7 @@ void game::RandomizeEvents(void) {
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_BOAT:
                     cell2->m_objectTileset = TILESET_NONE;
-                    cell2->m_objectIndex = IDX(MAPCELL_SPRITE_NONE);
+                    cell2->m_objectIndex = MAPCELL_SPRITE_NONE;
                     cell2->m_objectMetadata = 0;
                     cell2->m_triggerType = 0;
                     CreateBoat(xPos2, yPos19, 1);
@@ -2274,7 +2274,7 @@ void game::RandomizeEvents(void) {
                     mapEvent1->active = 1;
                     cell2->m_objectMetadata = 0;
                     cell2->m_triggerType = 0;
-                    cell2->m_objectIndex = IDX(MAPCELL_SPRITE_NONE);
+                    cell2->m_objectIndex = MAPCELL_SPRITE_NONE;
                     cell2->m_objectTileset = TILESET_NONE;
                     m_mapEventCount++;
                     break;
@@ -2734,12 +2734,12 @@ void game::RandomizeEvents(void) {
     for (yPos19 = 0; yPos19 < MAP_HEIGHT; yPos19++) {
         for (xPos2 = 0; (xPos2 | 0) < MAP_WIDTH; xPos2++) {
             cell2 = m_worldMap.Row(yPos19) + xPos2;
-            if (cell2->m_objectIndex != IDX(MAPCELL_SPRITE_NONE) && cell2->m_objectLayerBit1) {
+            if (cell2->m_objectIndex != MAPCELL_SPRITE_NONE && cell2->m_objectLayerBit1) {
                 valid27 = 1;
                 extraIndex3 = cell2->m_extraIndex;
                 while (extraIndex3 != 0) {
                     extra15 = m_worldMap.Extra(extraIndex3);
-                    if (extra15->objectIndex != IDX(MAPCELL_SPRITE_NONE)
+                    if (extra15->objectIndex != MAPCELL_SPRITE_NONE
                         && !extra15->objectLayerBit1)
                         valid27 = 0;
                     extraIndex3 = extra15->nextIndex;
@@ -2756,19 +2756,19 @@ void game::RandomizeEvents(void) {
             if ((cell2->m_triggerType & MAP_TRIGGER_TYPE_MASK) == MAP_OBJECT_ROCK
                 && cell2->m_objectTileset == TILESET_X_LOC2)
                 cell2->m_flags |= IDX(MAP_CELL_OCCUPIED);
-            if (cell2->m_objectIndex != IDX(MAPCELL_SPRITE_NONE)
+            if (cell2->m_objectIndex != MAPCELL_SPRITE_NONE
                 && !(cell2->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
                 && !(cell2->m_flags & IDX(MAP_CELL_OBJECT_SHADOW_ONLY))
-                && cell2->m_overlayIndex != IDX(MAPCELL_SPRITE_NONE))
+                && cell2->m_overlayIndex != MAPCELL_SPRITE_NONE)
                 cell2->m_flags |= IDX(MAP_CELL_OCCUPIED);
             upperCount = 0;
             lowerCount16 = 0;
             if (!(cell2->m_flags & IDX(MAP_CELL_OCCUPIED)) && yPos19 < MAP_HEIGHT - 1
-                && cell2->m_objectIndex != IDX(MAPCELL_SPRITE_NONE)
+                && cell2->m_objectIndex != MAPCELL_SPRITE_NONE
                 && !(cell2->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
                 && !(cell2->m_flags & IDX(MAP_CELL_OBJECT_SHADOW_ONLY))) {
                 mapCell* below0;
-                if (m_worldMap.GetCell(xPos2, yPos19 + 1)->m_objectIndex != IDX(MAPCELL_SPRITE_NONE)
+                if (m_worldMap.GetCell(xPos2, yPos19 + 1)->m_objectIndex != MAPCELL_SPRITE_NONE
                     && !(
                         m_worldMap.GetCell(xPos2, yPos19 + 1)->m_triggerType
                         & MAP_TRIGGER_ACTION_FLAG
@@ -2787,7 +2787,7 @@ void game::RandomizeEvents(void) {
                     else
                         extra15 = NULL;
                     while (upperCount < LAYER_SCAN_CAPACITY && extra15 != NULL) {
-                        if (extra15->objectIndex != IDX(MAPCELL_SPRITE_NONE)
+                        if (extra15->objectIndex != MAPCELL_SPRITE_NONE
                             && !extra15->objectLayerBit1) {
                             upperTilesets29[upperCount] = extra15->objectTileset;
                             upperIndexes1[upperCount] = extra15->objectIndex;
@@ -2809,7 +2809,7 @@ void game::RandomizeEvents(void) {
                     else
                         extra15 = NULL;
                     while (lowerCount16 < LAYER_SCAN_CAPACITY && extra15 != NULL) {
-                        if (extra15->objectIndex != IDX(MAPCELL_SPRITE_NONE)
+                        if (extra15->objectIndex != MAPCELL_SPRITE_NONE
                             && !extra15->objectLayerBit1) {
                             lowerTilesets4[lowerCount16] = extra15->objectTileset;
                             lowerIndexes7[lowerCount16] = extra15->objectIndex;
@@ -2839,7 +2839,7 @@ void game::RandomizeEvents(void) {
                            == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_CASTLE))
                     cell2->m_flags |= IDX(MAP_CELL_OCCUPIED);
             }
-            if (cell2->m_objectIndex != IDX(MAPCELL_SPRITE_NONE)
+            if (cell2->m_objectIndex != MAPCELL_SPRITE_NONE
                 && !(cell2->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
                 && !(cell2->m_flags & IDX(MAP_CELL_OBJECT_SHADOW_ONLY))
                 // Bit 2 is authored map data used by retail's occupancy pass. Its broader
@@ -3087,7 +3087,7 @@ void game::ClaimMine(i32 mineId, i32 player) {
     acc = m_worldMap.Row(y) + x;
     if (player == -1) {
         m_worldMap.ChangeTilesetIndex(
-            acc, x, y, TILESET_FLAG32, IDX(MAPCELL_SPRITE_NONE), 1, -1
+            acc, x, y, TILESET_FLAG32, MAPCELL_SPRITE_NONE, 1, -1
         );
     } else {
         m_worldMap.ChangeTilesetIndex(
@@ -5884,11 +5884,11 @@ i32 game::HasObjectTilesetIndex(
 VA(0x004818a0, 0x112)
 void game::ConvertAllToLateOverlay(i32 col, i32 row) {
     mapCell* cell = WORLDMAP->Row(row) + col;
-    if (cell->m_overlayIndex != IDX(MAPCELL_SPRITE_NONE))
+    if (cell->m_overlayIndex != MAPCELL_SPRITE_NONE)
         cell->m_drawOverlayOnTop = 1;
     mapCellExtra* extra = cell->m_extraIndex ? WORLDMAP->Extra(cell->m_extraIndex) : NULL;
     while (extra) {
-        if (extra->overlayIndex != IDX(MAPCELL_SPRITE_NONE))
+        if (extra->overlayIndex != MAPCELL_SPRITE_NONE)
             extra->drawOverlayOnTop = 1;
         extra = extra->nextIndex ? WORLDMAP->Extra(extra->nextIndex) : NULL;
     }
@@ -6321,7 +6321,7 @@ void game::ProcessOnMapHeroes(void) {
                             cell5->m_objectMetadata = extra0->heroId;
                         } else {
                             cell5->m_objectTileset = TILESET_NONE;
-                            cell5->m_objectIndex = IDX(MAPCELL_SPRITE_NONE);
+                            cell5->m_objectIndex = MAPCELL_SPRITE_NONE;
                             cell5->m_objectMetadata = 0;
                             cell5->m_triggerType = 0;
                         }
