@@ -3828,7 +3828,7 @@ void game::ViewArmy(
                 0,
                 const_cast<char*>("spellinl.icn"),
                 static_cast<i16>(spellIndex9),
-                0,
+                ICON_DRAW_NORMAL,
                 static_cast<i16>(loopIndex0 + VIEW_ARMY_SPELL_WIDGET_ID_BASE),
                 VIEW_ARMY_SPELL_WIDGET_COLOR,
                 1
@@ -5781,7 +5781,7 @@ void game::ShowHeroesLogo(void) {
             HEROES_LOGO_X,
             HEROES_LOGO_Y,
             0,
-            0,
+            ICON_DRAW_NO_CLIP,
             0,
             0,
             GAME_SCREEN_WIDTH,

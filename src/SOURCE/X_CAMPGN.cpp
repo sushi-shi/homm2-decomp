@@ -529,7 +529,7 @@ void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
             EXPANSION_CAMPAIGN_TRACK_ICON_SIZE,
             "x_cmpext.icn",
             0,
-            0,
+            ICON_DRAW_NORMAL,
             map + CAMPAIGN_TRACK_WIDGET_FIRST,
             EXPANSION_CAMPAIGN_TRACK_ICON_COLOR,
             1
@@ -547,7 +547,7 @@ void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
         CAMPAIGN_ICON_HEIGHT,
         "x_cmpext.icn",
         IDX(m_campaignId) + EXPANSION_CAMPAIGN_ICON_FRAME_BASE,
-        0,
+        ICON_DRAW_NORMAL,
         -1,
         EXPANSION_CAMPAIGN_TRACK_ICON_COLOR,
         1

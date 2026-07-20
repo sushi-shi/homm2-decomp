@@ -407,7 +407,7 @@ void textEntryWidget::Draw(void) {
                 length--;
             } while (m_font->LineWidth(display) > m_innerW);
         }
-        m_icon->DrawToBuffer(m_rectX + m_owner->m_posX, m_rectY + m_owner->m_posY, m_iconFrame, 0);
+        m_icon->DrawToBuffer(m_rectX + m_owner->m_posX, m_rectY + m_owner->m_posY, m_iconFrame, ICON_DRAW_NORMAL);
         m_font->DrawBoundedString(
             display,
             m_innerX + m_owner->m_posX,
@@ -418,7 +418,7 @@ void textEntryWidget::Draw(void) {
             m_alignment
         );
     } else {
-        m_icon->DrawToBuffer(m_rectX + m_owner->m_posX, m_rectY + m_owner->m_posY, m_iconFrame, 0);
+        m_icon->DrawToBuffer(m_rectX + m_owner->m_posX, m_rectY + m_owner->m_posY, m_iconFrame, ICON_DRAW_NORMAL);
         FontDrawMode color = FONT_DRAW_DIMMED;
         if ((m_flags & WIDGET_FLAG_DIMMED) == 0)
             color = m_color;

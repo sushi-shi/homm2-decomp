@@ -29,7 +29,7 @@ void FlipDimIconToBitmap(
     i32 y,
     i32 frame,
     i32 color,
-    i32 clip,
+    H2_ENUM_PARAM(IconDrawClipMode, i32) clip,
     i32 clipX,
     i32 clipY,
     i32 clipW,
@@ -50,15 +50,15 @@ void FlipDimIconToBitmap(
     gFDY = y + entryY;
     i32 X = w + x0 - 1;
     gFDXEnd = X;
-    if (clip != IDX(ICON_DRAW_NO_CLIP)) {
+    if (clip != ICON_DRAW_NO_CLIP) {
         i32 currentY;
         if (x0 < clipX || clipW + clipX < w + x0 || (currentY = gFDY) < clipY
             || entry->h + currentY > clipY + clipH) {
-            clip = IDX(ICON_DRAW_CLIP);
+            clip = ICON_DRAW_CLIP;
             gFDClipR = clipX + clipW - 1;
             gFDClipB = clipY + clipH - 1;
         } else {
-            clip = IDX(ICON_DRAW_NO_CLIP);
+            clip = ICON_DRAW_NO_CLIP;
         }
     }
     i16 pitch = dest->m_width;
@@ -76,7 +76,7 @@ void FlipDimIconToBitmap(
         }
         gFDRun = cmd;
         if (cmd != ICON_RLE_MONO_NEWLINE_COMMAND) {
-            if (clip == IDX(ICON_DRAW_NO_CLIP)) {
+            if (clip == ICON_DRAW_NO_CLIP) {
                 u32 cnt;
                 gFDCnt = 0;
                 u8* dst = (gFDRow - cmd) + X + 1;

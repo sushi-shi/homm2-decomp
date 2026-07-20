@@ -2,6 +2,7 @@
 #define HOMM2_BASE_ICON_H
 
 #include <va.h>
+#include <BASE/IconDraw.h>
 #include <BASE/resource.h>
 
 struct SLimitData {
@@ -25,13 +26,15 @@ public:
     }
     icon(u32l id);
     virtual ~icon();
-    void DrawToBuffer(i32 x, i32 y, i32 frame, i32 flip);
-    i32 CombatClipDrawToBuffer(
+    void DrawToBuffer(
+        i32 x, i32 y, i32 frame, H2_ENUM_PARAM(IconDrawOrientation, i32) orientation
+    );
+    IconDrawResult CombatClipDrawToBuffer(
         i32 x,
         i32 y,
         i32 frame,
         struct SLimitData* limits,
-        i32 flip,
+        H2_ENUM_PARAM(IconDrawOrientation, i32) orientation,
         i32 offset,
         u8* colorTable,
         i8* yModify
@@ -41,7 +44,7 @@ public:
         i32 y,
         i32 frame,
         i32 color,
-        i32 flip,
+        H2_ENUM_PARAM(IconDrawOrientation, i32) orientation,
         i32 clipX,
         i32 clipY,
         i32 clipW,
@@ -52,10 +55,12 @@ public:
         i32 y,
         i32 frame,
         i32 color,
-        i32 flip,
+        H2_ENUM_PARAM(IconDrawOrientation, i32) orientation,
         struct SLimitData* limits
     );
-    void DimToBuffer(i32 x, i32 y, i32 frame, i32 flip);
+    void DimToBuffer(
+        i32 x, i32 y, i32 frame, H2_ENUM_PARAM(IconDrawOrientation, i32) orientation
+    );
 };
 #pragma pack(pop)
 SIZE(icon, 0x16);

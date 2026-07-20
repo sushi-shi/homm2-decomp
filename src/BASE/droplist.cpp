@@ -294,13 +294,13 @@ void dropListWidget::Draw(void) {
         m_iconX + m_owner->m_posX,
         m_iconY + m_owner->m_posY,
         m_closedContentFrame,
-        0
+        ICON_DRAW_NORMAL
     );
     m_icon->DrawToBuffer(
         m_dropButtonX + m_owner->m_posX,
         m_dropButtonY + m_owner->m_posY,
         m_dropButtonFrame,
-        0
+        ICON_DRAW_NORMAL
     );
     if (m_itemCount > 0 && m_selectedIndex >= 0) {
         FontDrawMode color = FONT_DRAW_DIMMED;
@@ -321,7 +321,7 @@ void dropListWidget::Draw(void) {
 VA(0x004dc6e0, 0x378)
 void dropListWidget::DrawDropStuff(void) {
     i32 y = m_owner->m_posY + m_listY;
-    m_icon->DrawToBuffer(m_owner->m_posX + m_listX, y, m_firstRowFrame, 0);
+    m_icon->DrawToBuffer(m_owner->m_posX + m_listX, y, m_firstRowFrame, ICON_DRAW_NORMAL);
     FontDrawMode color = m_selectedIndex == m_topIndex ? m_selColor : m_normalColor;
     m_font->DrawBoundedString(
         m_items[m_topIndex],
@@ -335,7 +335,7 @@ void dropListWidget::DrawDropStuff(void) {
     i32 i = 1;
     y += m_firstRowHeight;
     while (i < m_visibleItemCount - 1 && m_topIndex + i < m_itemCount) {
-        m_icon->DrawToBuffer(m_owner->m_posX + m_listX, y, m_middleRowFrame, 0);
+        m_icon->DrawToBuffer(m_owner->m_posX + m_listX, y, m_middleRowFrame, ICON_DRAW_NORMAL);
         i32 item = m_topIndex + i;
         color = m_selectedIndex == item ? m_selColor : m_normalColor;
         m_font->DrawBoundedString(
@@ -350,7 +350,7 @@ void dropListWidget::DrawDropStuff(void) {
         i++;
         y += m_middleRowHeight;
     }
-    m_icon->DrawToBuffer(m_owner->m_posX + m_listX, y, m_lastRowFrame, 0);
+    m_icon->DrawToBuffer(m_owner->m_posX + m_listX, y, m_lastRowFrame, ICON_DRAW_NORMAL);
     i32 item = m_topIndex + i;
     if (item < m_itemCount) {
         color = m_selectedIndex == item ? m_selColor : m_normalColor;
@@ -371,12 +371,12 @@ void dropListWidget::DrawDropStuff(void) {
         else
             frame = m_scrollUpFrame;
         m_icon
-            ->DrawToBuffer(m_owner->m_posX + m_scrollUpX, m_owner->m_posY + m_scrollUpY, frame, 0);
+            ->DrawToBuffer(m_owner->m_posX + m_scrollUpX, m_owner->m_posY + m_scrollUpY, frame, ICON_DRAW_NORMAL);
         m_icon->DrawToBuffer(
             m_owner->m_posX + m_scrollTrackX,
             m_owner->m_posY + m_scrollTrackY,
             m_scrollTrackFirstFrame,
-            0
+            ICON_DRAW_NORMAL
         );
         i = SCROLL_TRACK_EDGE_ROW_COUNT;
         while (i < m_visibleItemCount - SCROLL_TRACK_EDGE_ROW_COUNT) {
@@ -384,7 +384,7 @@ void dropListWidget::DrawDropStuff(void) {
                 m_owner->m_posX + m_scrollTrackX,
                 m_owner->m_posY + m_scrollTrackY + m_middleRowHeight * (i - 1),
                 m_scrollTrackMiddleFrame,
-                0
+                ICON_DRAW_NORMAL
             );
             i++;
         }
@@ -392,7 +392,7 @@ void dropListWidget::DrawDropStuff(void) {
             m_owner->m_posX + m_scrollTrackX,
             m_owner->m_posY + m_scrollTrackY + m_middleRowHeight * (i - 1),
             m_scrollTrackLastFrame,
-            0
+            ICON_DRAW_NORMAL
         );
         if (m_scrollDownPressed != 0)
             frame = m_scrollDownPressedFrame;
@@ -402,14 +402,14 @@ void dropListWidget::DrawDropStuff(void) {
             m_owner->m_posX + m_scrollDownX,
             m_owner->m_posY + m_scrollDownY,
             frame,
-            0
+            ICON_DRAW_NORMAL
         );
         m_scrollThumbX =
             static_cast<i16>(m_owner->m_posX) + m_scrollTrackX + SCROLL_THUMB_X_INSET;
         m_scrollThumbY = static_cast<i16>(m_owner->m_posY)
                          + (m_scrollThumbTravel * m_topIndex) / m_scrollRange + m_scrollTrackY
                          + SCROLL_THUMB_Y_INSET;
-        m_icon->DrawToBuffer(m_scrollThumbX, m_scrollThumbY, m_scrollThumbFrame, 0);
+        m_icon->DrawToBuffer(m_scrollThumbX, m_scrollThumbY, m_scrollThumbFrame, ICON_DRAW_NORMAL);
     }
     gpWindowManager->UpdateScreenRegion(m_x, m_y, m_width, m_savedBackgroundHeight + m_height);
 }
@@ -517,7 +517,7 @@ void dropListWidget::ProcessSelectDialog(void) {
         m_owner->m_posX + m_dropButtonX,
         m_owner->m_posY + m_dropButtonY,
         m_dropButtonPressedFrame,
-        0
+        ICON_DRAW_NORMAL
     );
     gpWindowManager->UpdateScreenRegion(
         m_owner->m_posX + m_dropButtonX,
@@ -680,7 +680,7 @@ void dropListWidget::ProcessSelectDialog(void) {
                         m_dropButtonX + ownerX,
                         m_dropButtonY + ownerY,
                         m_dropButtonFrame,
-                        0
+                        ICON_DRAW_NORMAL
                     );
                     gpWindowManager->UpdateScreenRegion(
                         m_owner->m_posX + m_dropButtonX,

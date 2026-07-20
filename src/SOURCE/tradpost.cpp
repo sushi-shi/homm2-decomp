@@ -63,7 +63,7 @@ void DoTradingPost(i32 isMarketplace, float efficiency) {
         KNOB_HEIGHT,
         "tradpost.icn",
         KNOB_FRAME,
-        0,
+        ICON_DRAW_NORMAL,
         TRADING_POST_KNOB_ID,
         WIDGET_KIND_ICON_DIRECT,
         1

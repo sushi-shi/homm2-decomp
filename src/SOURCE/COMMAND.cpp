@@ -1655,7 +1655,7 @@ void combatManager::ShowWinLoseArtifact(class heroWindow* window, i32 artifact) 
         ARTIFACT_BACKGROUND_SIZE,
         "winloseb.icn",
         0,
-        0,
+        ICON_DRAW_NORMAL,
         WIN_LOSE_ARTIFACT_ICON_ID,
         WIN_LOSE_ICON_FLAGS,
         1
@@ -1671,7 +1671,7 @@ void combatManager::ShowWinLoseArtifact(class heroWindow* window, i32 artifact) 
         ARTIFACT_ICON_SIZE,
         "artifact.icn",
         artifact + 1,
-        0,
+        ICON_DRAW_NORMAL,
         WIN_LOSE_ARTIFACT_IMAGE_ID,
         WIN_LOSE_ICON_FLAGS,
         1
@@ -1718,7 +1718,7 @@ void combatManager::ShowSkeletons(class heroWindow* window) {
         SKELETON_ICON_HEIGHT,
         "mons32.icn",
         IDX(CREATURE_SKELETON),
-        0,
+        ICON_DRAW_NORMAL,
         WIN_LOSE_SKELETON_ICON_ID,
         WIN_LOSE_ICON_FLAGS,
         1
@@ -1790,7 +1790,7 @@ void combatManager::ShowEagleEyeSpell(class heroWindow* window) {
         0,
         "townwind.icn",
         0,
-        0,
+        ICON_DRAW_NORMAL,
         WIN_LOSE_EAGLE_BACKGROUND_ID,
         WIN_LOSE_ICON_FLAGS,
         1
@@ -1805,7 +1805,7 @@ void combatManager::ShowEagleEyeSpell(class heroWindow* window) {
         EAGLE_ICON_HEIGHT,
         "spells.icn",
         static_cast<i16>(gsSpellInfo[displayedSpell].iconIndex),
-        0,
+        ICON_DRAW_NORMAL,
         WIN_LOSE_EAGLE_SPELL_ID,
         WIN_LOSE_SPELL_ICON_FLAGS,
         1
@@ -2004,7 +2004,7 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
                     CASUALTY_ICON_HEIGHT,
                     "mons32.icn",
                     *(&casualtyType_1[0][0] + side_9 * COMBAT_ARMY_SLOT_COUNT + armyIndex_8),
-                    0,
+                    ICON_DRAW_NORMAL,
                     side_9 * CASUALTY_WIDGET_ID_STRIDE + armyIndex_8 + CASUALTY_ICON_WIDGET_ID_FIRST,
                     WIN_LOSE_ICON_FLAGS,
                     1
