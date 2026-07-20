@@ -1032,12 +1032,12 @@ SOURCE/Newgame	?ProcessNewMap@game@@QAEXPAUSMapHeader@@@Z	99.8571	6f616e09157a
 SOURCE/Newgame	?SetupNetPlayerNames@game@@QAEXXZ	100.0000	7913d1c9fc43
 SOURCE/Newgame	?ShowScenInfo@game@@QAEXXZ	100.0000	151921a8ad1d
 SOURCE/Newgame	?UpdateNewGameWindow@game@@QAEXXZ	100.0000	d30d3eeab86d
-SOURCE/Overview	?DoKnob@game@@QAEXXZ	99.9492	a924feca0e43
-SOURCE/Overview	?Overview@game@@QAEXXZ	100.0000	74212455abbc
+SOURCE/Overview	?DoKnob@game@@QAEXXZ	99.9492	13500b6ab083
+SOURCE/Overview	?Overview@game@@QAEXXZ	100.0000	5110a98d9335
 SOURCE/Overview	?OverviewHandler@@YIHAAUtag_message@@@Z	100.0000	86d82ab8be2f
 SOURCE/Overview	?ProcessIconSelect@game@@QAEHHH@Z	100.0000	18bd2540fe06
-SOURCE/Overview	?SetupDynamicStuff@game@@QAEXHHH@Z	98.9139	9a1bb02ccc05
-SOURCE/Overview	?SetupNewOverviewType@game@@QAEXHH@Z	100.0000	2102987ad876
+SOURCE/Overview	?SetupDynamicStuff@game@@QAEXHHH@Z	98.9139	9a9adcfc379f
+SOURCE/Overview	?SetupNewOverviewType@game@@QAEXHH@Z	100.0000	e5afc10b5a3e
 SOURCE/Overview	?SetupResources@game@@QAEXXZ	100.0000	8a25fa6261c7
 SOURCE/PATH	?FindPath@army@@QAEHHHHHH@Z	100.0000	83accd33a2da
 SOURCE/PATH	?GetAdjacentCellIndex@army@@QAEHHH@Z	93.1000	670122c2a1b0
