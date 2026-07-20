@@ -95,7 +95,7 @@ public:
     SMapHeader m_mapHeader;
     i8 m_setupPlayerColor[MAP_HEADER_PLAYER_COUNT];
     H2_ENUM_STORAGE(PlayerHandicap, i8) m_playerHandicap[MAP_HEADER_PLAYER_COUNT];
-    i8 m_setupPlayerRace[MAP_HEADER_PLAYER_COUNT];
+    H2_ENUM_STORAGE_STEPPED(FactionType, i8) m_setupPlayerRace[MAP_HEADER_PLAYER_COUNT];
     i8 m_setupPlayerNetworkId[MAP_HEADER_PLAYER_COUNT];
     i8 m_difficulty;
     char m_mapFilename[GAME_MAP_FILENAME_SIZE];

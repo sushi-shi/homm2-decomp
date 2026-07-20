@@ -62,7 +62,7 @@ struct SMapHeader {
     MapLossCondition lossCondition;
     u16 lossConditionValue;
     u8 unknown25;
-    i8 playerRace[MAP_HEADER_PLAYER_COUNT];
+    H2_ENUM_STORAGE(FactionType, i8) playerRace[MAP_HEADER_PLAYER_COUNT];
     u16 victoryTownY;
     u16 lossTownY;
     u16 victorySideThreshold;

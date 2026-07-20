@@ -892,7 +892,7 @@ void game::InitCampaignMap(void) {
             if (m_mapHeader.playerEnabled[1])
                 ++playerSlotSlot;
         }
-        m_setupPlayerRace[playerSlotSlot] = static_cast<i8>(IDX(choiceBest->faction));
+        m_setupPlayerRace[playerSlotSlot] = choiceBest->faction;
     }
 
     if (m_campaignScenario + 1 <= CAMPAIGN_EASY_SCENARIO_LIMIT)

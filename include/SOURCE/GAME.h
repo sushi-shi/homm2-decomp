@@ -37,8 +37,7 @@ H2_ENUM_BEGIN(GameCalendarConstant)
 H2_ENUM_END(GameCalendarConstant)
 
 H2_ENUM_BEGIN(GameSetupSharedConstant)
-    GAME_COMPUTER_PLAYER = 10,
-    GAME_RANDOM_RACE     = 7
+    GAME_COMPUTER_PLAYER = 10
 H2_ENUM_END(GameSetupSharedConstant)
 
 #pragma pack(push, 1)
