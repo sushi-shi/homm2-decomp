@@ -639,7 +639,7 @@ i32 fileRequester::Main(struct tag_message& message) {
                                 }
                                 break;
                         }
-                        if (IDX(helpIndexMouse) >= 0) {
+                        if (helpIndexMouse != REQUESTER_HELP_NONE) {
                             NormalDialog(
                                 gFileRequestHelp[IDX(helpIndexMouse)],
                                 NORMAL_DIALOG_QUICK_VIEW,
