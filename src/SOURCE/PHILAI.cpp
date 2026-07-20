@@ -540,9 +540,7 @@ void philAI::CheckForCreatureUpgrades(void) {
                         && (townPtr->m_buildings
                             & (1 << (IDX(dwelling) + CREATURE_UPGRADE_BUILDING_OFFSET)))) {
                         canUpgrade = 1;
-                        upgradeType = static_cast<CreatureType>(
-                            static_cast<i32>(armyPtr->m_creatureTypes[creatureIndex]) + 1
-                        );
+                        upgradeType = NextCreatureType(armyPtr->m_creatureTypes[creatureIndex]);
                     }
                 }
                 if ((armyPtr->m_creatureTypes[creatureIndex] == CREATURE_GREEN_DRAGON
@@ -2445,9 +2443,7 @@ void philAI::ValueOfBuyingBuilding(
         adjustedValue -= static_cast<float>(
             GetBuildingBaseResourceValue(
                 currentTownRace,
-                static_cast<BuildingSlotType>(
-                    static_cast<i32>(building) - CREATURE_UPGRADE_BUILDING_OFFSET
-                ),
+                building - CREATURE_UPGRADE_BUILDING_OFFSET,
                 1
             )
         );
@@ -2455,9 +2451,7 @@ void philAI::ValueOfBuyingBuilding(
     if (building == BUILDING_SLOT_DWELLING_LAST) {
         adjustedValue -= static_cast<float>(GetBuildingBaseResourceValue(
             currentTownRace,
-            static_cast<BuildingSlotType>(
-                static_cast<i32>(BUILDING_SLOT_DWELLING_LAST) - 1
-            ),
+            BUILDING_SLOT_DWELLING_LAST - 1,
             1
         ));
     }

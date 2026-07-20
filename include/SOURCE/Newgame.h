@@ -26,29 +26,6 @@ H2_ENUM_BEGIN(NewGameControl)
     NEW_GAME_RACE_NAME_FIRST       = 0x4e
 H2_ENUM_END(NewGameControl)
 
-#ifdef HOMM2_STRICT_ENUM_TYPES
-inline i32 EncodeNewGameControl(NewGameControl control) {
-    return static_cast<i32>(control);
-}
-
-inline NewGameControl DecodeNewGameControl(i32 value) {
-    return static_cast<NewGameControl>(value);
-}
-
-inline i32 EncodeNewGameControlIndex(NewGameControl first, i32 index) {
-    return index + static_cast<i32>(first);
-}
-
-inline i32 LastNewGameControl(NewGameControl first, i32 count) {
-    return static_cast<i32>(first) + count - 1;
-}
-#else
-#define EncodeNewGameControl(control) (control)
-#define DecodeNewGameControl(value) (value)
-#define EncodeNewGameControlIndex(first, index) ((index) + (first))
-#define LastNewGameControl(first, count) ((first) + (count) - 1)
-#endif
-
 H2_ENUM_BEGIN(NewGameRemotePacketConstant)
     NEW_GAME_REMOTE_RESERVED_SIZE     = 4,
     NEW_GAME_REMOTE_SEQUENCE_SIZE     = 2,

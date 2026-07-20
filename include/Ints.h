@@ -274,6 +274,15 @@ constexpr i32 H2EnumIndex(Value value) {
     inline constexpr name operator+(name a, i32 amount) {                                          \
         return static_cast<name>(static_cast<i64>(a) + amount);                                    \
     }                                                                                              \
+    inline constexpr name operator-(name a, i32 amount) {                                          \
+        return static_cast<name>(static_cast<i64>(a) - amount);                                    \
+    }                                                                                              \
+    inline name& operator+=(name& a, i32 amount) {                                                 \
+        return a = a + amount;                                                                     \
+    }                                                                                              \
+    inline name& operator-=(name& a, i32 amount) {                                                 \
+        return a = a - amount;                                                                     \
+    }                                                                                              \
     inline name& operator++(name& a) {                                                             \
         return a = static_cast<name>(static_cast<i64>(a) + 1);                                     \
     }                                                                                              \

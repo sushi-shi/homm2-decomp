@@ -29,7 +29,6 @@ H2_ENUM_BEGIN(DataEntryLayout)
     TEXT_FIELD_WIDTH            = 251,
     TEXT_FIELD_HEIGHT           = 20,
     TEXT_FIELD_ICON_FRAME       = 3,
-    TEXT_FIELD_KIND             = 0,
     TEXT_FIELD_LAYOUT           = 4,
     TEXT_FIELD_HORIZONTAL_INSET = 10,
     TEXT_FIELD_VERTICAL_INSET   = 3,
@@ -2403,7 +2402,7 @@ void GetDataEntry(
         gMiscText.dataEntry.iconFilename.text,
         TEXT_FIELD_ICON_FRAME,
         ENTRY_TEXT_WIDGET,
-        TEXT_FIELD_KIND,
+        WIDGET_KIND_NONE,
         TEXT_FIELD_LAYOUT,
         TEXT_FIELD_HORIZONTAL_INSET,
         TEXT_FIELD_VERTICAL_INSET

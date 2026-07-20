@@ -34,13 +34,6 @@ H2_ENUM_BEGIN(InputManagerTiming)
     CURSOR_CHECK_DELAY = 500
 H2_ENUM_END(InputManagerTiming)
 
-H2_ENUM_BEGIN(InputManagerModifierClearMask)
-    CLEAR_CONTROL_MASK     = 0xfffb,
-    CLEAR_LEFT_SHIFT_MASK  = 0xfffd,
-    CLEAR_RIGHT_SHIFT_MASK = 0xfffe,
-    CLEAR_ALT_MASK         = 0xffdf
-H2_ENUM_END(InputManagerModifierClearMask)
-
 DATA(0x0051f980) i32 iCurSwapPalette = 0;
 DATA(0x0051f984) i32 bLastMouseOffscreen = 0;
 DATA(0x0051f988) i32 bLastOnscreenMouseColor = 0;
@@ -95,20 +88,16 @@ i32 KeyboardMessageHandler(void*, u32 message, u32, i32l messageData) {
             event->payload.keyboard.modifiers = 0;
             switch (event->payload.keyboard.keyCode) {
                 case INPUT_SCAN_CONTROL:
-                    gpInputManager->m_modifiers &=
-                        static_cast<MessageModifier>(CLEAR_CONTROL_MASK);
+                    gpInputManager->m_modifiers &= MESSAGE_MODIFIER_CLEAR_CONTROL_MASK;
                     break;
                 case INPUT_SCAN_LEFT_SHIFT:
-                    gpInputManager->m_modifiers &=
-                        static_cast<MessageModifier>(CLEAR_LEFT_SHIFT_MASK);
+                    gpInputManager->m_modifiers &= MESSAGE_MODIFIER_CLEAR_LEFT_SHIFT_MASK;
                     break;
                 case INPUT_SCAN_RIGHT_SHIFT:
-                    gpInputManager->m_modifiers &=
-                        static_cast<MessageModifier>(CLEAR_RIGHT_SHIFT_MASK);
+                    gpInputManager->m_modifiers &= MESSAGE_MODIFIER_CLEAR_RIGHT_SHIFT_MASK;
                     break;
                 case INPUT_SCAN_ALT:
-                    gpInputManager->m_modifiers &=
-                        static_cast<MessageModifier>(CLEAR_ALT_MASK);
+                    gpInputManager->m_modifiers &= MESSAGE_MODIFIER_CLEAR_ALT_MASK;
                     break;
             }
             break;
@@ -341,8 +330,10 @@ VA(0x004ce450, 0x3)
 void inputManager::SetMouseCoords(i32, i32) {}
 
 VA(0x004ce460, 0x1b)
-void inputManager::SetKeyCodeType(i32 keyCodeType) {
-    m_keyCodeType = static_cast<InputManagerKeyCodeType>(keyCodeType);
+void inputManager::SetKeyCodeType(
+    H2_ENUM_PARAM(InputManagerKeyCodeType, i32) keyCodeType
+) {
+    m_keyCodeType = keyCodeType;
     ResetEventQueue(this);
 }
 

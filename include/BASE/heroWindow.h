@@ -11,6 +11,7 @@ H2_ENUM_CLASS_BEGIN(WindowFlag)
     WINDOW_FLAG_NONE            = 0,
     WINDOW_FLAG_FIXED_LAYER     = 1,
     WINDOW_FLAG_SAVE_BACKGROUND = 2,
+    WINDOW_FLAG_STRIP_WINDOW    = 8,
     WINDOW_FLAG_OWNS_WIDGETS    = 0x4000, // Close/RemoveWidgetById delete the widgets
     WINDOW_UPDATE_SUPPRESS_MASK = 0x7fff // DrawWindow skips the screen update when only fixed-layer is set
 H2_ENUM_CLASS_END(WindowFlag)
@@ -49,7 +50,7 @@ public:
     widget* m_widgetListHead;
     bitmap* m_savedBackground;
     heroWindow(void);
-    heroWindow(i32, i32, i32, i32, i32);
+    heroWindow(i32, i32, i32, i32, H2_ENUM_PARAM(WindowFlag, i32));
     heroWindow(i32, i32, char*);
     i32 Open(i32, i32);
     void RemoveAndDeleteWidget(i32);

@@ -531,7 +531,7 @@ townObject::townObject(
             w,
             h,
             static_cast<i16>(IDX(buildingId_h)),
-            TOWN_OBJECT_BORDER_Z_ORDER,
+            WIDGET_KIND_TRANSPARENT,
             0,
             NULL
         );
@@ -1233,15 +1233,18 @@ i32 townManager::Main(tag_message& message) {
         debugBuilding_e = giDebugBuildingToBuild;
         giDebugBuildingToBuild = -1;
         if (debugBuilding_e == TOWN_DEBUG_BUILD_ALL) {
-            for (index_i = 0; index_i < TOWN_BUILDING_COUNT; ++index_i) {
-                if ((gTownEligibleBuildMask[IDX(m_town->m_type)] & (1L << index_i))
-                    || index_i == IDX(BUILDING_SLOT_CASTLE))
-                    BuildObj(static_cast<BuildingSlotType>(index_i));
+            for (BuildingSlotType building = BUILDING_SLOT_MAGE_GUILD;
+                 IDX(building) < TOWN_BUILDING_COUNT;
+                 ++building) {
+                if ((gTownEligibleBuildMask[IDX(m_town->m_type)] & BIT(building))
+                    || building == BUILDING_SLOT_CASTLE)
+                    BuildObj(building);
             }
-        } else if ((gTownEligibleBuildMask[IDX(m_town->m_type)]
-                    & (1L << static_cast<u8>(debugBuilding_e)))
-                   || debugBuilding_e == IDX(BUILDING_SLOT_CASTLE)) {
-            BuildObj(static_cast<BuildingSlotType>(debugBuilding_e));
+        } else {
+            BuildingSlotType debugBuilding = static_cast<BuildingSlotType>(debugBuilding_e);
+            if ((gTownEligibleBuildMask[IDX(m_town->m_type)] & BIT(debugBuilding))
+                || debugBuilding == BUILDING_SLOT_CASTLE)
+                BuildObj(debugBuilding);
         }
     }
 
@@ -3142,7 +3145,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
     // thiefwin.bin retains this otherwise-unused player-column extent.
     // NOLINTNEXTLINE(readability-magic-numbers)
     i16 unusedPlayerWidth_value = 72;
-    i32 category_stat;
+    TownThievesGuildCategory category_stat;
     i8 categoryOrder_x[TOWN_THIEVES_ORDER_BUFFER_SIZE];
     i32 rank;
     i32 tiedCount_value;
@@ -3211,12 +3214,10 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
         window->BroadcastMessage(message_n);
     }
 
-    for (category_stat = 0; !(category_stat >= maxCategories_hero); ++category_stat) {
-        GetCategoryStats(
-            static_cast<TownThievesGuildCategory>(category_stat),
-            categoryStats_m,
-            categoryOrder_x
-        );
+    for (category_stat = THIEVES_CATEGORY_TOWNS;
+         !(IDX(category_stat) >= maxCategories_hero);
+         ++category_stat) {
+        GetCategoryStats(category_stat, categoryStats_m, categoryOrder_x);
         SortStats(categoryStats_m, categoryOrder_x);
         firstAtRank_rank = 0;
         lastAtRank_j = 0;
@@ -3238,7 +3239,8 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                         (position_current - firstAtRank_rank) * THIEVES_RANK_ICON_WIDTH + rankX_m
                     ),
                     static_cast<i16>(
-                        category_stat * THIEVES_CATEGORY_ROW_HEIGHT + THIEVES_FIRST_CATEGORY_Y
+                        IDX(category_stat) * THIEVES_CATEGORY_ROW_HEIGHT
+                        + THIEVES_FIRST_CATEGORY_Y
                     ),
                     THIEVES_RANK_ICON_WIDTH,
                     THIEVES_RANK_ICON_HEIGHT,

@@ -21,12 +21,12 @@ H2_ENUM_BEGIN(TextWidgetConstant)
 H2_ENUM_END(TextWidgetConstant)
 
 VA(0x004d1060, 0x3e)
-textWidget::textWidget(void) : widget(0, 0, 0, 0, 0, 0) {
+textWidget::textWidget(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
     m_color = FONT_DRAW_DEFAULT;
     m_alignment = FONT_ALIGN_CENTER;
     m_font = NULL;
     m_text = NULL;
-    m_kind = EncodeWidgetKind(WIDGET_KIND_TEXT);
+    m_kind = WIDGET_KIND_TEXT;
 }
 
 VA(0x004d10f0, 0x64)
@@ -39,7 +39,7 @@ textWidget::textWidget(
     char* fontName,
     H2_ENUM_PARAM(FontDrawMode, i16) color,
     i16 id,
-    i16 kind,
+    H2_ENUM_PARAM(WidgetKind, i16) kind,
     H2_ENUM_PARAM(FontAlignment, i16) alignment
 )
     : widget(x, y, width, height, id, kind) {
@@ -48,7 +48,7 @@ textWidget::textWidget(
     m_font = loadedFont;
     m_text = text;
     m_alignment = alignment;
-    m_kind = EncodeWidgetKind(WIDGET_KIND_TEXT);
+    m_kind = WIDGET_KIND_TEXT;
 }
 
 VA(0x004d1160, 0xef)
@@ -69,7 +69,7 @@ void textWidget::Read(void) {
     m_alignment = static_cast<FontAlignment>(gpResourceManager->ReadWord());
     m_id = gpResourceManager->ReadWord();
     gpResourceManager->ReadWord();
-    m_kind = EncodeWidgetKind(WIDGET_KIND_TEXT);
+    m_kind = WIDGET_KIND_TEXT;
 }
 
 VA(0x004d1250, 0x30)
@@ -127,8 +127,7 @@ i32 textWidget::Main(tag_message& msg) {
                     if (m_id != msg.payload.widget.id)
                         goto normalEvent;
                     char* newText = msg.payload.widget.data.text;
-                    if (DecodeWidgetKind(m_kind) != WIDGET_KIND_TEXT
-                        && DecodeWidgetKind(m_kind) != WIDGET_KIND_TEXT_ENTRY) {
+                    if (m_kind != WIDGET_KIND_TEXT && m_kind != WIDGET_KIND_TEXT_ENTRY) {
                         m_text = newText;
                         return WIDGET_DISPATCH_CONSUME;
                     }
@@ -190,8 +189,7 @@ void textWidget::SetColorIndex(H2_ENUM_PARAM(FontDrawMode, i16) color) {
 
 VA(0x004d14f0, 0xa2)
 void textWidget::SetText(char* text) {
-    if (DecodeWidgetKind(m_kind) != WIDGET_KIND_TEXT
-        && DecodeWidgetKind(m_kind) != WIDGET_KIND_TEXT_ENTRY) {
+    if (m_kind != WIDGET_KIND_TEXT && m_kind != WIDGET_KIND_TEXT_ENTRY) {
         m_text = text;
         return;
     }

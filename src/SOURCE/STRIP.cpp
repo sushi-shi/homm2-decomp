@@ -49,8 +49,13 @@ strip::strip(
 
     m_flagIcon = gpResourceManager->GetIcon("portcflg.icn");
     m_flagFrame = flagFrame;
-    m_window =
-        new heroWindow(m_x, m_y, STRIP_WINDOW_WIDTH, STRIP_WINDOW_HEIGHT, STRIP_WINDOW_FLAGS);
+    m_window = new heroWindow(
+        m_x,
+        m_y,
+        STRIP_WINDOW_WIDTH,
+        STRIP_WINDOW_HEIGHT,
+        WINDOW_FLAG_STRIP_WINDOW
+    );
     if (m_window == NULL)
         MemError();
 
@@ -61,7 +66,7 @@ strip::strip(
             STRIP_PORTRAIT_BORDER_WIDTH,
             STRIP_BORDER_HEIGHT,
             firstBorderId,
-            STRIP_BORDER_FILL_COLOR,
+            WIDGET_KIND_TRANSPARENT,
             0,
             NULL
         );
@@ -76,7 +81,7 @@ strip::strip(
                 STRIP_ARMY_BORDER_WIDTH,
                 STRIP_BORDER_HEIGHT,
                 slot + firstBorderId + 1,
-                STRIP_BORDER_FILL_COLOR,
+                WIDGET_KIND_TRANSPARENT,
                 0,
                 NULL
             );

@@ -213,7 +213,7 @@ void army::Init(CreatureType monsterType, i32 quantity, i32 side, i32 index, i32
         m_monster.attack += commander->Stats(HERO_PRIMARY_ATTACK);
         m_monster.defense += commander->Stats(HERO_PRIMARY_DEFENSE);
     }
-    m_facing = static_cast<ArmyFacing>(side ^ IDX(ARMY_FACING_RIGHT));
+    m_facing = side == COMBAT_ATTACKER_SIDE ? ARMY_FACING_RIGHT : ARMY_FACING_LEFT;
     m_animationSequence = ARMY_ANIMATION_STAND;
     m_animationFrame = 0;
     m_luckOutcome = 0;

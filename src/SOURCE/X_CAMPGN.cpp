@@ -535,7 +535,7 @@ void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
             0,
             ICON_DRAW_NORMAL,
             map + CAMPAIGN_TRACK_WIDGET_FIRST,
-            EXPANSION_CAMPAIGN_TRACK_ICON_COLOR,
+            WIDGET_KIND_ICON_DIRECT,
             1
         );
         if (trackWidget == NULL)
@@ -553,7 +553,7 @@ void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
         IDX(m_campaignId) + EXPANSION_CAMPAIGN_ICON_FRAME_BASE,
         ICON_DRAW_NORMAL,
         -1,
-        EXPANSION_CAMPAIGN_TRACK_ICON_COLOR,
+        WIDGET_KIND_ICON_DIRECT,
         1
     );
     if (campaignIcon == NULL)

@@ -97,9 +97,6 @@ H2_ENUM_BEGIN(CombatWinLoseConstant)
     WIN_LOSE_EAGLE_BACKGROUND_ID        = 902,
     WIN_LOSE_EAGLE_SPELL_ID             = 903,
     WIN_LOSE_EAGLE_TEXT_ID              = 904,
-    WIN_LOSE_ICON_FLAGS                 = 16,
-    WIN_LOSE_SPELL_ICON_FLAGS           = 17,
-    WIN_LOSE_TEXT_FLAGS                 = 512,
     WIN_LOSE_ICON_FILENAME_SIZE         = 40,
     PICKUP_SAMPLE_FIRST                 = 1,
     PICKUP_SAMPLE_LAST                  = 5
@@ -1668,7 +1665,7 @@ void combatManager::ShowWinLoseArtifact(
         0,
         ICON_DRAW_NORMAL,
         WIN_LOSE_ARTIFACT_ICON_ID,
-        WIN_LOSE_ICON_FLAGS,
+        WIDGET_KIND_ICON_DIRECT,
         1
     );
     if (m_winLoseBottomWidgets[0] == NULL)
@@ -1684,7 +1681,7 @@ void combatManager::ShowWinLoseArtifact(
         IDX(artifact) + 1,
         ICON_DRAW_NORMAL,
         WIN_LOSE_ARTIFACT_IMAGE_ID,
-        WIN_LOSE_ICON_FLAGS,
+        WIDGET_KIND_ICON_DIRECT,
         1
     );
     if (m_winLoseBottomWidgets[1] == NULL)
@@ -1702,7 +1699,7 @@ void combatManager::ShowWinLoseArtifact(
         "smalfont.fnt",
         FONT_DRAW_DEFAULT,
         WIN_LOSE_ARTIFACT_TEXT_ID,
-        WIN_LOSE_TEXT_FLAGS,
+        WIDGET_KIND_TEXT,
         FONT_ALIGN_CENTER
     );
     if (m_winLoseBottomTextWidgets[0] == NULL)
@@ -1731,7 +1728,7 @@ void combatManager::ShowSkeletons(class heroWindow* window) {
         IDX(CREATURE_SKELETON),
         ICON_DRAW_NORMAL,
         WIN_LOSE_SKELETON_ICON_ID,
-        WIN_LOSE_ICON_FLAGS,
+        WIDGET_KIND_ICON_DIRECT,
         1
     );
     if (m_winLoseBottomWidgets[0] == NULL)
@@ -1748,7 +1745,7 @@ void combatManager::ShowSkeletons(class heroWindow* window) {
         "smalfont.fnt",
         FONT_DRAW_DEFAULT,
         WIN_LOSE_SKELETON_TEXT_ID,
-        WIN_LOSE_TEXT_FLAGS,
+        WIDGET_KIND_TEXT,
         FONT_ALIGN_CENTER
     );
     if (m_winLoseBottomTextWidgets[0] == NULL)
@@ -1803,7 +1800,7 @@ void combatManager::ShowEagleEyeSpell(class heroWindow* window) {
         0,
         ICON_DRAW_NORMAL,
         WIN_LOSE_EAGLE_BACKGROUND_ID,
-        WIN_LOSE_ICON_FLAGS,
+        WIDGET_KIND_ICON_DIRECT,
         1
     );
     if (m_winLoseBottomWidgets[0] == NULL)
@@ -1818,7 +1815,7 @@ void combatManager::ShowEagleEyeSpell(class heroWindow* window) {
         static_cast<i16>(gsSpellInfo[IDX(displayedSpell)].iconIndex),
         ICON_DRAW_NORMAL,
         WIN_LOSE_EAGLE_SPELL_ID,
-        WIN_LOSE_SPELL_ICON_FLAGS,
+        WIDGET_KIND_ICON_CENTERED,
         1
     );
     if (m_winLoseBottomWidgets[1] == NULL)
@@ -1835,7 +1832,7 @@ void combatManager::ShowEagleEyeSpell(class heroWindow* window) {
         "smalfont.fnt",
         FONT_DRAW_DEFAULT,
         WIN_LOSE_EAGLE_TEXT_ID,
-        WIN_LOSE_TEXT_FLAGS,
+        WIDGET_KIND_TEXT,
         FONT_ALIGN_CENTER
     );
     if (m_winLoseBottomTextWidgets[0] == NULL)
@@ -1918,7 +1915,7 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
         "smalfont.fnt",
         FONT_DRAW_DEFAULT,
         CASUALTY_TEXT_WIDGET_ID,
-        WIN_LOSE_TEXT_FLAGS,
+        WIDGET_KIND_TEXT,
         FONT_ALIGN_CENTER
     );
     if (m_winLoseBottomTextWidgets[CASUALTY_TITLE_WIDGET] == NULL)
@@ -1941,7 +1938,7 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
             "smalfont.fnt",
             FONT_DRAW_DEFAULT,
             CASUALTY_TEXT_WIDGET_ID,
-            WIN_LOSE_TEXT_FLAGS,
+            WIDGET_KIND_TEXT,
             FONT_ALIGN_CENTER
         );
         if (m_winLoseBottomTextWidgets[CASUALTY_SIDE_WIDGET_FIRST + side_9] == NULL)
@@ -1960,7 +1957,7 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
                 "smalfont.fnt",
                 FONT_DRAW_DEFAULT,
                 side_9 * CASUALTY_WIDGET_ID_STRIDE + CASUALTY_TEXT_WIDGET_ID_FIRST,
-                WIN_LOSE_TEXT_FLAGS,
+                WIDGET_KIND_TEXT,
                 FONT_ALIGN_CENTER
             );
             if (m_winLoseBottomTextWidgets[side_9 * CASUALTY_WIDGETS_PER_SIDE] == NULL)
@@ -2017,7 +2014,7 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
                     *(&casualtyType_1[0][0] + side_9 * COMBAT_ARMY_SLOT_COUNT + armyIndex_8),
                     ICON_DRAW_NORMAL,
                     side_9 * CASUALTY_WIDGET_ID_STRIDE + armyIndex_8 + CASUALTY_ICON_WIDGET_ID_FIRST,
-                    WIN_LOSE_ICON_FLAGS,
+                    WIDGET_KIND_ICON_DIRECT,
                     1
                 );
             if (m_winLoseBottomWidgets[side_9 * CASUALTY_WIDGETS_PER_SIDE + armyIndex_8]
@@ -2041,7 +2038,7 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
                     "smalfont.fnt",
                     FONT_DRAW_DEFAULT,
                     side_9 * CASUALTY_WIDGET_ID_STRIDE + armyIndex_8 + CASUALTY_TEXT_WIDGET_ID_FIRST,
-                    WIN_LOSE_TEXT_FLAGS,
+                    WIDGET_KIND_TEXT,
                     FONT_ALIGN_CENTER
                 );
             if (m_winLoseBottomTextWidgets[side_9 * CASUALTY_WIDGETS_PER_SIDE + armyIndex_8]

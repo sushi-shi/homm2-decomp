@@ -27,7 +27,7 @@ public:
         char* fontName,
         H2_ENUM_PARAM(FontDrawMode, i16) color,
         i16 id,
-        i16 kind,
+        H2_ENUM_PARAM(WidgetKind, i16) kind,
         H2_ENUM_PARAM(FontAlignment, i16) alignment
     );
     virtual ~textWidget() OVERRIDE;
