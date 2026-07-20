@@ -15,6 +15,7 @@ H2_ENUM_BEGIN(SwapManagerSide)
     SWAP_SIDE_RIGHT = 1,
     SWAP_SIDE_COUNT = 2
 H2_ENUM_END(SwapManagerSide)
+H2_ENUM_STEPPED(SwapManagerSide)
 
 H2_ENUM_CLASS_BEGIN(SwapManagerItemType)
     SWAP_ITEM_NONE     = -1,
