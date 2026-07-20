@@ -245,7 +245,7 @@ public:
     void ProcessRandomObjects(void);
     void SetVisibility(i32, i32, i32, i32);
     void MakeAllWaterVisible(i32);
-    void GiveArmy(class armyGroup*, i32, i32, i32);
+    void GiveArmy(class armyGroup*, H2_ENUM_PARAM(CreatureType, i32), i32, i32);
     i32 ExperienceValueOfStack(class armyGroup*, class hero*);
     i32 GetLuck(class hero*, class army*, class town*);
     void SetupAdjacentMons(void);
