@@ -21,6 +21,11 @@ H2_ENUM_BEGIN(GameSerializationConstant)
     GAME_EVENT_MESSAGE_HEAD_SIZE = 1
 H2_ENUM_END(GameSerializationConstant)
 
+H2_ENUM_BEGIN(GameSetupSharedConstant)
+    GAME_COMPUTER_PLAYER = 10,
+    GAME_RANDOM_RACE     = 7
+H2_ENUM_END(GameSetupSharedConstant)
+
 #pragma pack(push, 1)
 struct EventExtra {
     u8 unknown00;
@@ -78,24 +83,22 @@ H2_ENUM_BEGIN(GameWeeklyConstant)
 H2_ENUM_END(GameWeeklyConstant)
 
 H2_ENUM_BEGIN(GameRandomTownConstant)
-    NEUTRAL_TOWN_CASTLE_REINFORCE_CHANCE = 80,
-    NEUTRAL_TOWN_REINFORCE_CHANCE        = 40,
-    RANDOM_TOWN_UNOWNED_COLOR            = -1,
-    RANDOM_TOWN_RACE_MIN                 = 0,
-    RANDOM_TOWN_RACE_MAX                 = 5,
-    RANDOM_TOWN_AGE                      = 10,
-    RANDOM_TOWN_LEFT                     = -5,
-    RANDOM_TOWN_TOP                      = -3,
-    RANDOM_TOWN_RIGHT                    = 2,
-    RANDOM_TOWN_BOTTOM                   = 1,
-    RANDOM_TOWN_OBJECT_SOURCE_FIRST      = 0,
-    RANDOM_TOWN_OBJECT_SOURCE_LAST       = 0x1f,
-    RANDOM_TOWN_OVERLAY_SOURCE_FIRST     = 0x20,
-    RANDOM_TOWN_OVERLAY_SOURCE_LAST      = 0xFF,
-    RANDOM_TOWN_RACE_FRAME_SHIFT         = 5,
-    RANDOM_TOWN_FIRST_TRIGGER            = 0x30,
-    RANDOM_TOWN_SECOND_TRIGGER           = 0x31,
-    RANDOM_TOWN_TRIGGER                  = 0x23
+    RANDOM_TOWN_UNOWNED_COLOR        = -1,
+    RANDOM_TOWN_RACE_MIN             = 0,
+    RANDOM_TOWN_RACE_MAX             = 5,
+    RANDOM_TOWN_AGE                  = 10,
+    RANDOM_TOWN_LEFT                 = -5,
+    RANDOM_TOWN_TOP                  = -3,
+    RANDOM_TOWN_RIGHT                = 2,
+    RANDOM_TOWN_BOTTOM               = 1,
+    RANDOM_TOWN_OBJECT_SOURCE_FIRST  = 0,
+    RANDOM_TOWN_OBJECT_SOURCE_LAST   = 0x1f,
+    RANDOM_TOWN_OVERLAY_SOURCE_FIRST = 0x20,
+    RANDOM_TOWN_OVERLAY_SOURCE_LAST  = 0xFF,
+    RANDOM_TOWN_RACE_FRAME_SHIFT     = 5,
+    RANDOM_TOWN_FIRST_TRIGGER        = 0x30,
+    RANDOM_TOWN_SECOND_TRIGGER       = 0x31,
+    RANDOM_TOWN_TRIGGER              = 0x23
 H2_ENUM_END(GameRandomTownConstant)
 
 H2_ENUM_BEGIN(GameRandomHeroConstant)
