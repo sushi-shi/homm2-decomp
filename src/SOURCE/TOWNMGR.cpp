@@ -668,7 +668,8 @@ void townManager::SetupExtraStuff(void) {
         && m_town->CanBuildDock())
         m_town->m_buildings |= IDX(TOWN_EXTRA_RACE_FIRST_MASK);
     if ((m_town->m_buildings & IDX(TOWN_BUILDING_DOCK))
-        && gpAdvManager->GetCell(m_town->m_boatX, m_town->m_boatY)->m_triggerType != 0)
+        && gpAdvManager->GetCell(m_town->m_boatX, m_town->m_boatY)->m_triggerType
+               != MAP_OBJECT_NONE)
         m_town->m_buildings |= IDX(TOWN_EXTRA_DOCK_GRAPHIC_MASK);
     else
         m_town->m_buildings &= ~IDX(TOWN_EXTRA_DOCK_GRAPHIC_MASK);
