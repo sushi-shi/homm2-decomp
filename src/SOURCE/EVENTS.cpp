@@ -485,7 +485,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         primaryAmount1 = 0;
                         secondaryReward_f = MAP_EVENT_REWARD_NONE;
                         secondaryAmount = 0;
-                        for (eventValue1 = 0; eventValue1 < IDX(SPHINX_RESOURCE_COUNT);
+                        for (eventValue1 = 0; eventValue1 < SPHINX_RESOURCE_COUNT;
                              eventValue1++) {
                             gpGame->m_players[giCurPlayer].m_resources[eventValue1] +=
                                 eventExtra1->resources[eventValue1];

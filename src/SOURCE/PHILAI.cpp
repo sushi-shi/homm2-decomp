@@ -441,7 +441,7 @@ void philAI::CheckBuyStuff(void) {
             if ((idx->m_buildings & AI_BUILDING_SHIPYARD_MASK)
                 && gpCurPlayer->m_resources[IDX(RES_GOLD)] >= TOWN_BOAT_GOLD_COST
                 && gpCurPlayer->m_resources[IDX(RES_WOOD)] >= TOWN_BOAT_WOOD_COST) {
-                if (gpGame->GetBoatsBuilt() < IDX(GAME_BOAT_COUNT)
+                if (gpGame->GetBoatsBuilt() < GAME_BOAT_COUNT
                     && gpAdvManager->GetCell(idx->m_boatX, idx->m_boatY)->m_triggerType
                            == MAP_OBJECT_NONE
                     && gpGame->CreateBoat(idx->m_boatX, idx->m_boatY, 0) != -1) {
@@ -1376,7 +1376,7 @@ firstWeekDone:
     }
     gpCurPlayer->m_artifactValue = static_cast<float>(artifactTotal8 / AI_ARTIFACT_POOL_DIVISOR);
 
-    for (generalIndex4 = 0; generalIndex4 < IDX(GAME_TOWN_COUNT); generalIndex4++)
+    for (generalIndex4 = 0; generalIndex4 < GAME_TOWN_COUNT; generalIndex4++)
         gpGame->m_castleRecs[generalIndex4].m_threat = 0;
     for (generalIndex4 = 0; generalIndex4 < gpCurPlayer->m_townCount; generalIndex4++)
         gpGame->m_castleRecs[gpCurPlayer->m_townIds[generalIndex4]].m_threat = 0;
@@ -2219,7 +2219,7 @@ void philAI::ValueOfBuyingBuilding(
         }
     }
     currentOccupiedSlots = 0;
-    for (indexBuilding = 0; indexBuilding < IDX(AI_TOWN_ARMY_SLOTS); indexBuilding++) {
+    for (indexBuilding = 0; indexBuilding < AI_TOWN_ARMY_SLOTS; indexBuilding++) {
         if (townPtr->m_army.m_quantities[indexBuilding] > 0)
             currentOccupiedSlots++;
     }
@@ -2351,7 +2351,7 @@ void philAI::ValueOfBuyingBuilding(
         case BUILDING_SLOT_SPECIAL_THIRTY:
             if (currentOccupiedSlots == AI_TOWN_ARMY_SLOTS) {
                 creatureLocated = 0;
-                for (indexBuilding = 0; indexBuilding < IDX(AI_TOWN_ARMY_SLOTS); indexBuilding++) {
+                for (indexBuilding = 0; indexBuilding < AI_TOWN_ARMY_SLOTS; indexBuilding++) {
                     if (gDwellingType[IDX(townPtr->m_type)]
                                      [IDX(building) - IDX(BUILDING_SLOT_DWELLING_FIRST)]
                         == townPtr->m_army.m_creatureTypes[indexBuilding]) {

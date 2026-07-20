@@ -283,7 +283,7 @@ i32 hero::CalcMobility(void) {
     if (HasArtifact(ARTIFACT_TRUE_COMPASS))
         mobilityResult += compassMobility;
 
-    if (m_owner >= 0 && m_owner < IDX(GAME_PLAYER_COUNT) && !gbHumanPlayer[m_owner]
+    if (m_owner >= 0 && m_owner < GAME_PLAYER_COUNT && !gbHumanPlayer[m_owner]
         && gpGame->m_difficulty >= HARD_GAME_DIFFICULTY) {
         mobilityResult += AI_DIFFICULTY_MOBILITY_BONUS;
         if (gpGame->m_players[m_owner].m_aiDifficulty == PLAYER_PERSONALITY_EXPLORER)
