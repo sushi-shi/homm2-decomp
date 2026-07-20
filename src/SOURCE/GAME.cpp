@@ -232,67 +232,75 @@ inline i8 PlayerEventByte(i8 color) {
     return gpGame->m_players[color].m_color;
 }
 
+H2_ENUM_BEGIN(PlayerDataSerializationConstant)
+    PLAYER_SAVE_SCRATCH_SIZE       = 52,
+    PLAYER_SAVE_SCRATCH_CLEAR_SIZE = 48,
+    PLAYER_SAVE_RESERVED_SIZE      = 42,
+    PLAYER_SAVE_CHEATED_FLAG_SIZE  = 1
+H2_ENUM_END(PlayerDataSerializationConstant)
+
 VA(0x004708b0, 0x23d)
 void playerData::Write(i32 file) {
-    char unused[52];
+    char unused[PLAYER_SAVE_SCRATCH_SIZE];
 
-    write(file, &m_color, 1);
-    write(file, &m_heroCount, 1);
-    write(file, &m_currentHero, 1);
-    write(file, &m_heroLocatorPage, 1);
-    write(file, m_heroIds, 8);
-    write(file, m_availableHeroIds, 2);
-    memset(unused, 0, 48);
-    write(file, unused, 42);
-    write(file, &gpGame->m_cheated, 1);
-    write(file, &m_cheatValue, 1);
-    write(file, &m_aiDifficulty, 4);
-    write(file, &m_minimumHeroCount, 1);
-    write(file, &m_evilInterface, 1);
-    write(file, &m_ultimateArtifactHintChance, 1);
-    write(file, &m_ultimateArtifactHintX, 1);
-    write(file, &m_ultimateArtifactHintY, 1);
-    write(file, &m_daysLeft, 1);
-    write(file, &m_townCount, 1);
-    write(file, &m_currentTown, 1);
-    write(file, &m_townLocatorPage, 1);
-    write(file, m_townIds, 72);
-    write(file, m_resources, 28);
-    write(file, m_income, 28);
-    write(file, &m_barrierTents, 1);
-    write(file, &m_barrierTents, 1);
-    write(file, m_unknownad, 6);
+    write(file, &m_color, sizeof(m_color));
+    write(file, &m_heroCount, sizeof(m_heroCount));
+    write(file, &m_currentHero, sizeof(m_currentHero));
+    write(file, &m_heroLocatorPage, sizeof(m_heroLocatorPage));
+    write(file, m_heroIds, sizeof(m_heroIds));
+    write(file, m_availableHeroIds, sizeof(m_availableHeroIds));
+    // Retail clears six more scratch bytes than it persists.
+    memset(unused, 0, PLAYER_SAVE_SCRATCH_CLEAR_SIZE);
+    write(file, unused, PLAYER_SAVE_RESERVED_SIZE);
+    write(file, &gpGame->m_cheated, PLAYER_SAVE_CHEATED_FLAG_SIZE);
+    write(file, &m_cheatValue, sizeof(m_cheatValue));
+    write(file, &m_aiDifficulty, sizeof(m_aiDifficulty));
+    write(file, &m_minimumHeroCount, sizeof(m_minimumHeroCount));
+    write(file, &m_evilInterface, sizeof(m_evilInterface));
+    write(file, &m_ultimateArtifactHintChance, sizeof(m_ultimateArtifactHintChance));
+    write(file, &m_ultimateArtifactHintX, sizeof(m_ultimateArtifactHintX));
+    write(file, &m_ultimateArtifactHintY, sizeof(m_ultimateArtifactHintY));
+    write(file, &m_daysLeft, sizeof(m_daysLeft));
+    write(file, &m_townCount, sizeof(m_townCount));
+    write(file, &m_currentTown, sizeof(m_currentTown));
+    write(file, &m_townLocatorPage, sizeof(m_townLocatorPage));
+    write(file, m_townIds, sizeof(m_townIds));
+    write(file, m_resources, sizeof(m_resources));
+    write(file, m_income, sizeof(m_income));
+    write(file, &m_barrierTents, sizeof(m_barrierTents));
+    write(file, &m_barrierTents, sizeof(m_barrierTents));
+    write(file, m_unknownad, sizeof(m_unknownad));
 }
 
 VA(0x00470aed, 0x22d)
 void playerData::Read(i32 file) {
-    char unused[52];
+    char unused[PLAYER_SAVE_SCRATCH_SIZE];
 
-    read(file, &m_color, 1);
-    read(file, &m_heroCount, 1);
-    read(file, &m_currentHero, 1);
-    read(file, &m_heroLocatorPage, 1);
-    read(file, m_heroIds, 8);
-    read(file, m_availableHeroIds, 2);
-    read(file, unused, 42);
-    read(file, &gpGame->m_cheated, 1);
-    read(file, &m_cheatValue, 1);
-    read(file, &m_aiDifficulty, 4);
-    read(file, &m_minimumHeroCount, 1);
-    read(file, &m_evilInterface, 1);
-    read(file, &m_ultimateArtifactHintChance, 1);
-    read(file, &m_ultimateArtifactHintX, 1);
-    read(file, &m_ultimateArtifactHintY, 1);
-    read(file, &m_daysLeft, 1);
-    read(file, &m_townCount, 1);
-    read(file, &m_currentTown, 1);
-    read(file, &m_townLocatorPage, 1);
-    read(file, m_townIds, 72);
-    read(file, m_resources, 28);
-    read(file, m_income, 28);
-    read(file, &m_barrierTents, 1);
-    read(file, &m_barrierTents, 1);
-    read(file, m_unknownad, 6);
+    read(file, &m_color, sizeof(m_color));
+    read(file, &m_heroCount, sizeof(m_heroCount));
+    read(file, &m_currentHero, sizeof(m_currentHero));
+    read(file, &m_heroLocatorPage, sizeof(m_heroLocatorPage));
+    read(file, m_heroIds, sizeof(m_heroIds));
+    read(file, m_availableHeroIds, sizeof(m_availableHeroIds));
+    read(file, unused, PLAYER_SAVE_RESERVED_SIZE);
+    read(file, &gpGame->m_cheated, PLAYER_SAVE_CHEATED_FLAG_SIZE);
+    read(file, &m_cheatValue, sizeof(m_cheatValue));
+    read(file, &m_aiDifficulty, sizeof(m_aiDifficulty));
+    read(file, &m_minimumHeroCount, sizeof(m_minimumHeroCount));
+    read(file, &m_evilInterface, sizeof(m_evilInterface));
+    read(file, &m_ultimateArtifactHintChance, sizeof(m_ultimateArtifactHintChance));
+    read(file, &m_ultimateArtifactHintX, sizeof(m_ultimateArtifactHintX));
+    read(file, &m_ultimateArtifactHintY, sizeof(m_ultimateArtifactHintY));
+    read(file, &m_daysLeft, sizeof(m_daysLeft));
+    read(file, &m_townCount, sizeof(m_townCount));
+    read(file, &m_currentTown, sizeof(m_currentTown));
+    read(file, &m_townLocatorPage, sizeof(m_townLocatorPage));
+    read(file, m_townIds, sizeof(m_townIds));
+    read(file, m_resources, sizeof(m_resources));
+    read(file, m_income, sizeof(m_income));
+    read(file, &m_barrierTents, sizeof(m_barrierTents));
+    read(file, &m_barrierTents, sizeof(m_barrierTents));
+    read(file, m_unknownad, sizeof(m_unknownad));
 }
 
 VA(0x00470d1a, 0x12d)
@@ -385,36 +393,50 @@ i32 game::MineTypesOwned(i32 owner, MineType mineType) {
     return num;
 }
 
+H2_ENUM_BEGIN(UltimateArtifactHintConstant)
+    MINIMUM_PUZZLE_PIECES     = 8,
+    HINT_CHANCE_PER_PIECE     = 4,
+    HINT_CHANCE_MINIMUM       = 1,
+    HINT_CHANCE_MAXIMUM       = 100,
+    HINT_COORDINATE_UNKNOWN   = -1,
+    HINT_OFFSET_CENTER        = 3,
+    HINT_OFFSET_ROLL_MAXIMUM  = 2,
+    HINT_LOCATION_RETRY_LIMIT = 200
+H2_ENUM_END(UltimateArtifactHintConstant)
+
 VA(0x004710f3, 0x40d)
 void ComputeUALoc(i32 player) {
     i32 result = gpGame->SetupPuzzlePieces(player, 1);
-    if (result < 8 || gpGame->m_ultimateArtifactId == IDX(ARTIFACT_NONE)) {
+    if (result < MINIMUM_PUZZLE_PIECES
+        || gpGame->m_ultimateArtifactId == IDX(ARTIFACT_NONE)) {
         gpGame->m_players[player].m_ultimateArtifactHintChance = 0;
-        gpGame->m_players[player].m_ultimateArtifactHintX = -1;
-        gpGame->m_players[player].m_ultimateArtifactHintY = -1;
+        gpGame->m_players[player].m_ultimateArtifactHintX = HINT_COORDINATE_UNKNOWN;
+        gpGame->m_players[player].m_ultimateArtifactHintY = HINT_COORDINATE_UNKNOWN;
         return;
     }
 
-    i32 probability = (result - 8) * 4;
-    if (probability > 100)
-        probability = 100;
-    if (probability < 1)
-        probability = 1;
+    i32 probability =
+        (result - MINIMUM_PUZZLE_PIECES) * HINT_CHANCE_PER_PIECE;
+    if (probability > HINT_CHANCE_MAXIMUM)
+        probability = HINT_CHANCE_MAXIMUM;
+    if (probability < HINT_CHANCE_MINIMUM)
+        probability = HINT_CHANCE_MINIMUM;
     gpGame->m_players[player].m_ultimateArtifactHintChance = static_cast<i8>(probability);
 
-    if (Random(1, 100) <= gpGame->m_players[player].m_ultimateArtifactHintChance) {
+    if (Random(HINT_CHANCE_MINIMUM, HINT_CHANCE_MAXIMUM)
+        <= gpGame->m_players[player].m_ultimateArtifactHintChance) {
         gpGame->m_players[player].m_ultimateArtifactHintX = gpGame->m_ultimateArtifactX;
         gpGame->m_players[player].m_ultimateArtifactHintY = gpGame->m_ultimateArtifactY;
         return;
     }
 
-    i32 x = -1;
-    i32 y = -1;
+    i32 x = HINT_COORDINATE_UNKNOWN;
+    i32 y = HINT_COORDINATE_UNKNOWN;
     i32 direction = 0;
     i32 tries = 0;
     while (
         !(x >= 0 && (&x)[0] < MAP_WIDTH && y >= 0 && (&y)[0] < MAP_HEIGHT
-          && gpGame->m_worldMap.Row(y)[x].m_triggerType == 0
+          && gpGame->m_worldMap.Row(y)[x].m_triggerType == MAP_OBJECT_NONE
           && gpGame->m_worldMap.Row(y)[x].m_objectIndex == IDX(MAPCELL_SPRITE_NONE)
           && gpGame->m_worldMap.Row(y)[x].m_overlayIndex == IDX(MAPCELL_SPRITE_NONE)
           && giGroundToTerrain[gpGame->m_worldMap.Row(y)[x].m_terrainImageIndex] != 0)
@@ -422,13 +444,17 @@ void ComputeUALoc(i32 player) {
         tries++;
         direction = 0;
         while (direction == 0)
-            direction = 3 - Random(0, 2) - Random(0, 2) - Random(0, 2);
+            direction = HINT_OFFSET_CENTER - Random(0, HINT_OFFSET_ROLL_MAXIMUM)
+                        - Random(0, HINT_OFFSET_ROLL_MAXIMUM)
+                        - Random(0, HINT_OFFSET_ROLL_MAXIMUM);
         x = gpGame->m_ultimateArtifactX + direction;
         direction = 0;
         while (direction == 0)
-            direction = 3 - Random(0, 2) - Random(0, 2) - Random(0, 2);
+            direction = HINT_OFFSET_CENTER - Random(0, HINT_OFFSET_ROLL_MAXIMUM)
+                        - Random(0, HINT_OFFSET_ROLL_MAXIMUM)
+                        - Random(0, HINT_OFFSET_ROLL_MAXIMUM);
         y = gpGame->m_ultimateArtifactY + direction;
-        if (tries >= 200) {
+        if (tries >= HINT_LOCATION_RETRY_LIMIT) {
             x = gpGame->m_ultimateArtifactX;
             y = gpGame->m_ultimateArtifactY;
             goto saveLocation;
@@ -439,12 +465,23 @@ saveLocation:
     gpGame->m_players[player].m_ultimateArtifactHintY = static_cast<i8>(y);
 }
 
+H2_ENUM_BEGIN(PuzzleSetupConstant)
+    PUZZLE_INTERPOLATION_TERM_COUNT = 2,
+    PUZZLE_INTERFACE_SEED_STRIDE    = 3,
+    PUZZLE_RANDOM_STEP_MAXIMUM      = 5,
+    PUZZLE_FALLBACK_RETRY_LIMIT     = 100
+H2_ENUM_END(PuzzleSetupConstant)
+
+inline float PuzzleCompletionCurve(float ratio) {
+    return (ratio * ratio + ratio) / static_cast<float>(PUZZLE_INTERPOLATION_TERM_COUNT);
+}
+
 VA(0x00471500, 0x2ac)
 i32 game::SetupPuzzlePieces(i32 player, i32 justCount) {
     i32 pieceCountTotal = GetNumObelisks(player);
     i32 unvisitedObelisks = PUZZLE_PIECE_COUNT - m_obeliskCount;
     float ratio = static_cast<float>(GetNumObelisks(player)) / m_obeliskCount;
-    float interpolation = (ratio * ratio + ratio) / 2.0f;
+    float interpolation = PuzzleCompletionCurve(ratio);
     pieceCountTotal = static_cast<i32>(pieceCountTotal + unvisitedObelisks * interpolation);
 
     if (GetNumObelisks(player) == m_obeliskCount)
@@ -456,23 +493,28 @@ i32 game::SetupPuzzlePieces(i32 player, i32 justCount) {
         return pieceCountTotal;
 
     memset(puzzlePiecesRemoved, 0, PUZZLE_PIECE_STORAGE_SIZE);
-    SRand(m_players[player].m_color + m_players[player].m_evilInterface * 3);
+    SRand(
+        m_players[player].m_color
+        + m_players[player].m_evilInterface * PUZZLE_INTERFACE_SEED_STRIDE
+    );
     i32 tries;
     i32 fallbackNum;
     i32 pieceValue;
     i32 i;
     for (i = 0; (&i)[0] < pieceCountTotal; i++) {
-        for (pieceValue = 0; pieceValue < PUZZLE_PIECE_COUNT; pieceValue += SRandom(1, 5)) {
+        for (pieceValue = 0;
+             pieceValue < PUZZLE_PIECE_COUNT;
+             pieceValue += SRandom(1, PUZZLE_RANDOM_STEP_MAXIMUM)) {
             if (!BitTest(puzzlePiecesRemoved, pieceValue))
                 break;
         }
 
-        for (tries = 0; tries < 100; tries++) {
+        for (tries = 0; tries < PUZZLE_FALLBACK_RETRY_LIMIT; tries++) {
             fallbackNum = SRandom(0, PUZZLE_PIECE_COUNT - 1);
             if (!BitTest(puzzlePiecesRemoved, fallbackNum))
                 break;
         }
-        if (tries >= 100) {
+        if (tries >= PUZZLE_FALLBACK_RETRY_LIMIT) {
             for (fallbackNum = 0; fallbackNum < PUZZLE_PIECE_COUNT; fallbackNum++) {
                 if (!BitTest(puzzlePiecesRemoved, fallbackNum))
                     break;
@@ -1383,8 +1425,7 @@ void game::NewMap(char* filename) {
                 m_heroRecs[m_players[player2].m_heroIds[m_players[player2].m_heroCount]].m_x,
                 m_heroRecs[m_players[player2].m_heroIds[m_players[player2].m_heroCount]].m_y,
                 player2,
-                giVisRange[static_cast<i8>(m_heroRecs[m_players[player2].m_heroIds[0]]
-                                               .m_cursorType)]
+                giVisRange[IDX(m_heroRecs[m_players[player2].m_heroIds[0]].m_cursorType)]
             );
             m_players[player2].m_heroCount++;
         }
