@@ -3,6 +3,7 @@
 
 #include <Ints.h>
 #include <SOURCE/REQUEST.h>
+#include <SOURCE/REMOTE_TYPES.h>
 
 struct tag_message;
 
@@ -58,7 +59,7 @@ H2_ENUM_END(NewGameRemotePacketConstant)
 struct NewGameRemotePacket {
     i8 sender;
     u8 reserved[NEW_GAME_REMOTE_RESERVED_SIZE];
-    i8 type;
+    H2_ENUM_STORAGE(RemoteMessageType, i8) type;
     i8 command;
     u8 sequence[NEW_GAME_REMOTE_SEQUENCE_SIZE];
     char payload[NEW_GAME_REMOTE_PAYLOAD_HEAD_SIZE];

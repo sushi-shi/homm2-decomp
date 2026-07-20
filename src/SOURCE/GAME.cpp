@@ -273,9 +273,7 @@ H2_ENUM_BEGIN(RemoteSaveConstant)
     REMOTE_SAVE_DATA_COMMAND         = 3,
     REMOTE_SAVE_ACK_REQUEST_COMMAND  = 4,
     REMOTE_SAVE_ACK_RESPONSE_COMMAND = 5,
-    REMOTE_SAVE_FINISH_COMMAND       = 6,
-    REMOTE_SAVE_PACKET_TYPE_FIRST    = 2,
-    REMOTE_SAVE_PACKET_TYPE_SECOND   = 3
+    REMOTE_SAVE_FINISH_COMMAND       = 6
 H2_ENUM_END(RemoteSaveConstant)
 
 H2_ENUM_BEGIN(NewTurnConstant)
@@ -6623,7 +6621,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
                             REMOTE_SAVE_DATA_COMMAND,
                             0,
                             1,
-                            -1
+                            REMOTE_MESSAGE_DEFAULT
                         );
                         if (!result)
                             ShutDown(NULL);
@@ -6663,7 +6661,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
             REMOTE_SAVE_FINISH_COMMAND,
             1,
             1,
-            -1
+            REMOTE_MESSAGE_DEFAULT
         );
         if (!result)
             ShutDown(NULL);
@@ -6796,7 +6794,15 @@ i32 game::ReceiveSaveGame(
     gpSoundManager->m_samplesReady = samplesReady;
 
     LogStr(const_cast<char*>("Begin Transmit Init Confirm"));
-    result = TransmitRemoteData(NULL, remotePlayer, 0, REMOTE_SAVE_INIT_RESPONSE, 1, 1, -1);
+    result = TransmitRemoteData(
+        NULL,
+        remotePlayer,
+        0,
+        REMOTE_SAVE_INIT_RESPONSE,
+        1,
+        1,
+        REMOTE_MESSAGE_DEFAULT
+    );
     LogStr(const_cast<char*>("End Transmit Init Confirm"));
     if (!result)
         ShutDown(NULL);
@@ -6843,8 +6849,8 @@ i32 game::ReceiveSaveGame(
 
         packet = reinterpret_cast<RemoteMessage*>(GetRemoteData(1));
         if (packet
-            && (packet->type == REMOTE_SAVE_PACKET_TYPE_FIRST
-                || packet->type == REMOTE_SAVE_PACKET_TYPE_SECOND)) {
+            && (packet->type == REMOTE_MESSAGE_RELIABLE
+                || packet->type == REMOTE_MESSAGE_UNRELIABLE)) {
             lastPacketTime = KBTickCount();
             switch (packet->command) {
                 case REMOTE_SAVE_DATA_COMMAND:
@@ -6878,7 +6884,7 @@ i32 game::ReceiveSaveGame(
                         REMOTE_SAVE_ACK_RESPONSE_COMMAND,
                         1,
                         1,
-                        -1
+                        REMOTE_MESSAGE_DEFAULT
                     );
                     if (!result)
                         ShutDown(NULL);

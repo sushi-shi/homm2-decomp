@@ -37,8 +37,6 @@ H2_ENUM_BEGIN(NewGameConstant)
     GAME_SETUP_PACKET_SIZE                = 0x7d,
     GAME_CHAT_TEXT_LIMIT                  = 100,
     GAME_REMOTE_CHANNEL                   = 0x7f,
-    GAME_REMOTE_PACKET_TYPE               = 2,
-    GAME_REMOTE_PACKET_TYPE_ALTERNATE     = 3,
     GAME_REMOTE_CHAT                      = 0x0b,
     GAME_REMOTE_SETUP                     = 0x33,
     GAME_REMOTE_MAP_HEADER                = 0x34,
@@ -486,7 +484,7 @@ i32 game::NewGame(void) {
                     PollSound();
                     remoteBuffer = reinterpret_cast<NewGameRemotePacket*>(GetRemoteData(1));
                 } while (remoteBuffer == NULL);
-            } while (remoteBuffer->type != GAME_REMOTE_PACKET_TYPE);
+            } while (remoteBuffer->type != REMOTE_MESSAGE_RELIABLE);
 
             switch (remoteBuffer->command) {
                 case GAME_REMOTE_MAP_HEADER:
@@ -584,7 +582,7 @@ i32 game::NewGame(void) {
                 GAME_REMOTE_MAP_HEADER,
                 1,
                 1,
-                GAME_NETWORK_PLAYER_NONE
+                REMOTE_MESSAGE_DEFAULT
             );
             if (!transmitResult)
                 ShutDown(NULL);
@@ -596,7 +594,7 @@ i32 game::NewGame(void) {
                 GAME_REMOTE_PLAYER_INFO,
                 1,
                 1,
-                GAME_NETWORK_PLAYER_NONE
+                REMOTE_MESSAGE_DEFAULT
             );
             if (!transmitResult)
                 ShutDown(NULL);
@@ -1065,8 +1063,8 @@ i32 NewGameHandler(struct tag_message& message) {
     if (message.type == MESSAGE_NONE) {
         remotePacketResult = reinterpret_cast<NewGameRemotePacket*>(GetRemoteData(1));
         if (remotePacketResult != NULL
-            && (remotePacketResult->type == GAME_REMOTE_PACKET_TYPE
-                || remotePacketResult->type == GAME_REMOTE_PACKET_TYPE_ALTERNATE)) {
+            && (remotePacketResult->type == REMOTE_MESSAGE_RELIABLE
+                || remotePacketResult->type == REMOTE_MESSAGE_UNRELIABLE)) {
             switch (remotePacketResult->command) {
                 case GAME_REMOTE_START:
                     gpWindowManager->m_dialogResult = message.payload.widget.id;
@@ -1165,7 +1163,7 @@ i32 NewGameHandler(struct tag_message& message) {
             GAME_REMOTE_CHAT,
             1,
             1,
-            GAME_NETWORK_PLAYER_NONE
+            REMOTE_MESSAGE_DEFAULT
         );
         if (!transmitResultTemp)
             ShutDown(NULL);
@@ -1266,7 +1264,7 @@ i32 NewGameHandler(struct tag_message& message) {
                             GAME_REMOTE_START,
                             1,
                             1,
-                            GAME_NETWORK_PLAYER_NONE
+                            REMOTE_MESSAGE_DEFAULT
                         );
                     }
                     gpWindowManager->m_dialogResult = message.payload.widget.id;
@@ -1284,7 +1282,7 @@ i32 NewGameHandler(struct tag_message& message) {
                             GAME_REMOTE_CANCEL,
                             1,
                             1,
-                            GAME_NETWORK_PLAYER_NONE
+                            REMOTE_MESSAGE_DEFAULT
                         );
                         ShutDown(NULL);
                     }
@@ -1514,7 +1512,7 @@ i32 NewGameHandler(struct tag_message& message) {
                                 GAME_REMOTE_MAP_HEADER,
                                 1,
                                 1,
-                                GAME_NETWORK_PLAYER_NONE
+                                REMOTE_MESSAGE_DEFAULT
                             );
                         }
                     }
@@ -1544,7 +1542,7 @@ finish:
             GAME_REMOTE_SETUP,
             1,
             1,
-            GAME_NETWORK_PLAYER_NONE
+            REMOTE_MESSAGE_DEFAULT
         );
         if (!transmitResultTemp)
             ShutDown(NULL);

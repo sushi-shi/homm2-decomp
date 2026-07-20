@@ -10,8 +10,6 @@ struct tag_message;
 
 H2_ENUM_BEGIN(AdventureRemoteConstant)
     ADVMGR_REMOTE_DATA_REQUEST             = 1,
-    ADVMGR_REMOTE_PACKET_TYPE_GAME         = 2,
-    ADVMGR_REMOTE_PACKET_TYPE_ALT          = 3,
     ADVMGR_REMOTE_COMMAND_SAVE_GAME        = 1,
     ADVMGR_REMOTE_COMMAND_POP_NET_BOX      = 11,
     ADVMGR_REMOTE_COMMAND_COMBAT           = 21,

@@ -196,9 +196,7 @@ H2_ENUM_BEGIN(NetBoxLocalConstant)
     BOX_REMOTE_MAP_CHANGE    = 0x29,
     BOX_REMOTE_SETUP         = 0x20,
     BOX_REMOTE_SAVE          = 1,
-    BOX_REMOTE_CHAT          = 0xb,
-    BOX_REMOTE_GROUP         = 3,
-    BOX_REMOTE_CONTROL       = 2
+    BOX_REMOTE_CHAT          = 0xb
 H2_ENUM_END(NetBoxLocalConstant)
 
 H2_ENUM_BEGIN(PollSoundConstant)
@@ -841,7 +839,7 @@ i32 oldmain(void) {
                         OLD_MAIN_NETWORK_PACKET,
                         1,
                         1,
-                        -1
+                        REMOTE_MESSAGE_DEFAULT
                     );
                     if (!transmissionResult_i)
                         ShutDown(NULL);
@@ -3047,7 +3045,7 @@ i32 WaitForOtherPlayer(void) {
     KbRemotePacket* data;
     PollSound();
     data = reinterpret_cast<KbRemotePacket*>(GetRemoteData(1));
-    if (data && data->group == BOX_REMOTE_CONTROL) {
+    if (data && data->type == REMOTE_MESSAGE_RELIABLE) {
         switch (data->command) {
             case BOX_REMOTE_SETUP:
                 memcpy(
@@ -3167,7 +3165,7 @@ void PopNetBox(char* text, i32 netPlayer) {
         PollSound();
         remoteData_g = reinterpret_cast<KbRemotePacket*>(GetRemoteData(0));
         if (remoteData_g != NULL) {
-            if (remoteData_g->group == BOX_REMOTE_GROUP) {
+            if (remoteData_g->type == REMOTE_MESSAGE_UNRELIABLE) {
                 remoteData_g = reinterpret_cast<KbRemotePacket*>(GetRemoteData(1));
                 switch (remoteData_g->command) {
                     case BOX_REMOTE_MAP_CHANGE:
@@ -3182,7 +3180,7 @@ void PopNetBox(char* text, i32 netPlayer) {
                         updateInput_a = 1;
                         break;
                 }
-            } else if (remoteData_g->group != BOX_REMOTE_CONTROL) {
+            } else if (remoteData_g->type != REMOTE_MESSAGE_RELIABLE) {
                 remoteData_g = reinterpret_cast<KbRemotePacket*>(GetRemoteData(1));
             } else {
                 switch (remoteData_g->command) {
@@ -3265,7 +3263,7 @@ void PopNetBox(char* text, i32 netPlayer) {
                 BOX_REMOTE_CHAT,
                 1,
                 1,
-                -1
+                REMOTE_MESSAGE_DEFAULT
             );
             if (!result_a)
                 ShutDown(NULL);
@@ -4321,7 +4319,7 @@ void HandleRemoteSuddenExit(void) {
         ADVMGR_REMOTE_COMMAND_PLAYER_EXIT,
         0,
         0,
-        ADVMGR_REMOTE_PACKET_TYPE_GAME
+        REMOTE_MESSAGE_RELIABLE
     );
     LogStr("HRSE2");
     DelayMilli(PLAYER_EXIT_TRANSMIT_DELAY);
@@ -4513,7 +4511,7 @@ exitInfoProcessed:
                 ADVMGR_REMOTE_COMMAND_HOST_PLAYER_EXIT,
                 1,
                 1,
-                -1
+                REMOTE_MESSAGE_DEFAULT
             );
         }
         if (localPlayerLost)
@@ -4534,7 +4532,7 @@ exitInfoProcessed:
                     ADVMGR_REMOTE_COMMAND_HOST_PLAYER_EXIT,
                     1,
                     1,
-                    -1
+                    REMOTE_MESSAGE_DEFAULT
                 );
             }
         }

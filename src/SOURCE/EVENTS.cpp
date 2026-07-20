@@ -8141,7 +8141,7 @@ void advManager::SendHeroTownData(
             REMOTE_COMMAND,
             COMBAT_REMOTE_FRAGMENT_TYPE,
             COMBAT_REMOTE_FRAGMENT_TYPE,
-            -1
+            REMOTE_MESSAGE_DEFAULT
         );
         if (!result)
             ShutDown(NULL);
@@ -8158,7 +8158,7 @@ void advManager::SendHeroTownData(
             REMOTE_COMMAND,
             COMBAT_REMOTE_FRAGMENT_TYPE,
             COMBAT_REMOTE_FRAGMENT_TYPE,
-            -1
+            REMOTE_MESSAGE_DEFAULT
         );
         if (!result)
             ShutDown(NULL);
@@ -8173,7 +8173,7 @@ void advManager::SendHeroTownData(
             REMOTE_COMMAND,
             COMBAT_REMOTE_FRAGMENT_TYPE,
             COMBAT_REMOTE_FRAGMENT_TYPE,
-            -1
+            REMOTE_MESSAGE_DEFAULT
         );
         if (!result)
             ShutDown(NULL);
@@ -8190,7 +8190,7 @@ void advManager::SendHeroTownData(
             REMOTE_COMMAND,
             COMBAT_REMOTE_FRAGMENT_TYPE,
             COMBAT_REMOTE_FRAGMENT_TYPE,
-            -1
+            REMOTE_MESSAGE_DEFAULT
         );
         if (!result)
             ShutDown(NULL);
@@ -8275,7 +8275,7 @@ void advManager::ReceiveHeroTownData(
         REMOTE_CONFIRM_COMMAND,
         COMBAT_REMOTE_FRAGMENT_TYPE,
         COMBAT_REMOTE_FRAGMENT_TYPE,
-        -1
+        REMOTE_MESSAGE_DEFAULT
     );
     if (!result7)
         ShutDown(NULL);
@@ -8318,7 +8318,7 @@ void advManager::ReceiveHeroTownData(
                 ShutDown(const_cast<char*>("Game canceled."));
         }
         packet = GetRemoteData(1);
-        if (packet && EVENTS_REMOTE_MESSAGE(packet)->type == IDX(REMOTE_MESSAGE_RELIABLE)
+        if (packet && EVENTS_REMOTE_MESSAGE(packet)->type == REMOTE_MESSAGE_RELIABLE
             && EVENTS_REMOTE_MESSAGE(packet)->command == REMOTE_COMMAND) {
             lastPacketTime36 = KBTickCount();
             if (EVENTS_REMOTE_HERO(packet)->fragment == REMOTE_FIRST_HERO_FIRST) {

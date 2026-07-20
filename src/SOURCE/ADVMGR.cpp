@@ -9223,8 +9223,8 @@ char* advManager::CheckHandleNet(void) {
 
     packet9 = reinterpret_cast<RemoteMessage*>(GetRemoteData(ADVMGR_REMOTE_DATA_REQUEST));
     if (packet9
-        && (packet9->type == ADVMGR_REMOTE_PACKET_TYPE_GAME
-            || packet9->type == ADVMGR_REMOTE_PACKET_TYPE_ALT)) {
+        && (packet9->type == REMOTE_MESSAGE_RELIABLE
+            || packet9->type == REMOTE_MESSAGE_UNRELIABLE)) {
         switch (packet9->command) {
             case ADVMGR_REMOTE_COMMAND_SAVE_GAME:
                 playerExited5 = ADVMGR_REMOTE_PAYLOAD(packet9)->savePlayerExited;

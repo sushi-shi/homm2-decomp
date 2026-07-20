@@ -27,7 +27,7 @@
 #include <stdio.h>
 #include <string.h>
 
-H2_ENUM_CLASS_BEGIN(CursorHeroShadowFrame)
+H2_ENUM_BEGIN(CursorHeroShadowFrame)
     SPRITE_UP_STEP_1        = 0x2e,
     SPRITE_UP_STEP_2        = 0x2f,
     SPRITE_UP_STEP_3        = 0x31,
@@ -37,7 +37,7 @@ H2_ENUM_CLASS_BEGIN(CursorHeroShadowFrame)
     SPRITE_UP_SHADOW_STEP_5 = 0x38,
     SPRITE_UP_SHADOW_STEP_4 = 0x39,
     SPRITE_UP_SHADOW_STEP_3 = 0x3a
-H2_ENUM_CLASS_END(CursorHeroShadowFrame)
+H2_ENUM_END(CursorHeroShadowFrame)
 
 H2_ENUM_BEGIN(CursorPrivateConstant)
     SLOW_CURSOR_CYCLE_START  = 2,
@@ -369,18 +369,18 @@ void advManager::DrawCursorShadow(void) {
             );
         } else if (m_drawHeroShadows && m_cursorType != HERO_TYPE_BOAT) {
             shadowFrame = drawFrame_f;
-            if (shadowFrame == IDX(SPRITE_UP_STEP_5))
-                shadowFrame = IDX(SPRITE_UP_SHADOW_STEP_5);
-            if (shadowFrame == IDX(SPRITE_UP_STEP_4))
-                shadowFrame = IDX(SPRITE_UP_SHADOW_STEP_4);
-            if (shadowFrame == IDX(SPRITE_UP_STEP_3))
-                shadowFrame = IDX(SPRITE_UP_SHADOW_STEP_3);
-            if (shadowFrame == IDX(SPRITE_UP_STEP_2))
-                shadowFrame = IDX(SPRITE_UP_SHADOW_WIDE);
-            if (shadowFrame == IDX(SPRITE_UP_STEP_1))
-                shadowFrame = IDX(SPRITE_UP_SHADOW_WIDE);
-            if (shadowFrame >= IDX(CURSOR_SHADOW_ANIM_FIRST)
-                && shadowFrame < IDX(CURSOR_SHADOW_ANIM_END))
+            if (shadowFrame == SPRITE_UP_STEP_5)
+                shadowFrame = SPRITE_UP_SHADOW_STEP_5;
+            if (shadowFrame == SPRITE_UP_STEP_4)
+                shadowFrame = SPRITE_UP_SHADOW_STEP_4;
+            if (shadowFrame == SPRITE_UP_STEP_3)
+                shadowFrame = SPRITE_UP_SHADOW_STEP_3;
+            if (shadowFrame == SPRITE_UP_STEP_2)
+                shadowFrame = SPRITE_UP_SHADOW_WIDE;
+            if (shadowFrame == SPRITE_UP_STEP_1)
+                shadowFrame = SPRITE_UP_SHADOW_WIDE;
+            if (shadowFrame >= CURSOR_SHADOW_ANIM_FIRST
+                && shadowFrame < CURSOR_SHADOW_ANIM_END)
                 shadowOffset = CURSOR_HORSE_SHADOW_OFFSET;
             else
                 shadowOffset = 0;
@@ -1577,7 +1577,7 @@ void SendMapChange(
         CURSOR_REMOTE_PACKET_TYPE,
         0,
         CURSOR_REMOTE_RELIABLE,
-        CURSOR_REMOTE_NO_TIMEOUT
+        REMOTE_MESSAGE_DEFAULT
     );
 }
 
