@@ -313,20 +313,20 @@ i32 hero::HasSpell(SpellType spell) {
 
 VA(0x0046c86c, 0xc5)
 SpellType hero::GetNthSpell(HeroSpellType type, i32 spellNumber) {
-    i32 spell;
+    SpellType spell;
     i32 spellOrdinalCount = 0;
 
-    for (spell = 0; spell < IDX(SPELL_COUNT); spell++) {
-        if (HasSpell(SpellType(spell))) {
+    for (spell = SPELL_FIREBALL; spell < SPELL_COUNT; spell++) {
+        if (HasSpell(spell)) {
             if (type == SPELL_TYPE_ALL
                 || (type == SPELL_TYPE_COMBAT
-                    && HAS(gsSpellInfo[spell].attributes, SPELL_INFO_ATTRIBUTE_COMBAT))
+                    && HAS(gsSpellInfo[IDX(spell)].attributes, SPELL_INFO_ATTRIBUTE_COMBAT))
                 || (type == SPELL_TYPE_ADVENTURE
-                    && !HAS(gsSpellInfo[spell].attributes, SPELL_INFO_ATTRIBUTE_COMBAT))) {
+                    && !HAS(gsSpellInfo[IDX(spell)].attributes, SPELL_INFO_ATTRIBUTE_COMBAT))) {
                 spellOrdinalCount++;
             }
             if (spellOrdinalCount == spellNumber)
-                return SpellType(spell);
+                return spell;
         }
     }
     return SPELL_NONE;
@@ -336,13 +336,13 @@ VA(0x0046c931, 0xd0)
 i32 hero::GetNumSpells(HeroSpellType type) {
     i32 numAdventureSpells;
     i32 numCombatSpells;
-    i32 spellIndexCurrent;
+    SpellType spell;
 
     numCombatSpells = 0;
     numAdventureSpells = 0;
-    for (spellIndexCurrent = 0; spellIndexCurrent < IDX(SPELL_COUNT); spellIndexCurrent++) {
-        if (HasSpell(SpellType(spellIndexCurrent))) {
-            if (HAS(gsSpellInfo[spellIndexCurrent].attributes, SPELL_INFO_ATTRIBUTE_COMBAT))
+    for (spell = SPELL_FIREBALL; spell < SPELL_COUNT; spell++) {
+        if (HasSpell(spell)) {
+            if (HAS(gsSpellInfo[IDX(spell)].attributes, SPELL_INFO_ATTRIBUTE_COMBAT))
                 numCombatSpells++;
             else
                 numAdventureSpells++;
