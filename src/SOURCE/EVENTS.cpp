@@ -417,26 +417,25 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 );
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
+                resourceType = static_cast<ResourceType>(
+                    cell->m_objectMetadata - MAP_EVENT_RESOURCE_OFFSET
+                );
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
                     "{Magic Garden}\n\nYou catch a leprechaun foolishly sleeping amidst a cluster "
                     "of magic mushrooms.  In exchange for his freedom, he guides you to a small "
                     "pot filled with precious things.",
-                    cell->m_objectMetadata - IDX(MAP_EVENT_RESOURCE_OFFSET),
-                    cell->m_objectMetadata - MAP_EVENT_RESOURCE_OFFSET == IDX(RES_GOLD)
-                        ? MAP_EVENT_GOLD_AMOUNT
-                        : MAP_EVENT_RESOURCE_AMOUNT,
+                    IDX(resourceType),
+                    resourceType == RES_GOLD ? MAP_EVENT_GOLD_AMOUNT : MAP_EVENT_RESOURCE_AMOUNT,
                     -1,
                     0,
                     -1
                 );
                 GiveResource(
                     eventHero2,
-                    ResourceType(cell->m_objectMetadata - IDX(MAP_EVENT_RESOURCE_OFFSET)),
-                    cell->m_objectMetadata - MAP_EVENT_RESOURCE_OFFSET == IDX(RES_GOLD)
-                        ? MAP_EVENT_GOLD_AMOUNT
-                        : MAP_EVENT_RESOURCE_AMOUNT
+                    resourceType,
+                    resourceType == RES_GOLD ? MAP_EVENT_GOLD_AMOUNT : MAP_EVENT_RESOURCE_AMOUNT
                 );
                 cell->m_objectMetadata = MAP_EVENT_DATA_EMPTY;
             }
@@ -6227,12 +6226,14 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
 
         case MAP_OBJECT_MAGIC_GARDEN:
             if (cell->m_objectMetadata != MAP_EVENT_DATA_EMPTY) {
+                resourceType_a = static_cast<ResourceType>(
+                    cell->m_objectMetadata - MAP_EVENT_RESOURCE_OFFSET
+                );
                 GiveResource(
                     eventHero,
-                    ResourceType(cell->m_objectMetadata - IDX(MAP_EVENT_RESOURCE_OFFSET)),
-                    cell->m_objectMetadata - MAP_EVENT_RESOURCE_OFFSET == IDX(RES_GOLD)
-                        ? MAP_EVENT_GOLD_AMOUNT
-                        : MAP_EVENT_RESOURCE_AMOUNT
+                    resourceType_a,
+                    resourceType_a == RES_GOLD ? MAP_EVENT_GOLD_AMOUNT
+                                               : MAP_EVENT_RESOURCE_AMOUNT
                 );
                 cell->m_objectMetadata = MAP_EVENT_DATA_EMPTY;
             }
