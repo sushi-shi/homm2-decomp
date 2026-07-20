@@ -26,20 +26,6 @@ H2_ENUM_CLASS_BEGIN(ExpansionCampaignHeroPortrait)
     HERO_CEALLACH  = 0x43
 H2_ENUM_CLASS_END(ExpansionCampaignHeroPortrait)
 
-H2_ENUM_CLASS_BEGIN(ExpansionCampaignAward)
-    AWARD_ELVEN_ALLIANCE      = 0,
-    AWARD_BREASTPLATE_ANDURAN = 1,
-    AWARD_WOOD_BONUS          = 2,
-    AWARD_HELMET_ANDURAN      = 3,
-    AWARD_DEFEAT_KRAEGER      = 4,
-    AWARD_BATTLE_GARB         = 5,
-    AWARD_WAYWARD_SON         = 6,
-    AWARD_UNCLE_IVAN          = 7,
-    AWARD_LEGENDARY_SCEPTER   = 8,
-    AWARD_SET_GUARDIAN        = 9,
-    AWARD_SPHERE_NEGATION     = 10
-H2_ENUM_CLASS_END(ExpansionCampaignAward)
-
 H2_ENUM_BEGIN(ExpansionCampaignSmacker)
     SMACKER_POL_INTRO             = 0x27,
     SMACKER_POL_UPRISING          = 0x28,
@@ -311,18 +297,18 @@ void ExpCampaign::ResetBonusChoices(void) {
 }
 
 VA(0x004bb75d, 0x23)
-void ExpCampaign::GrantAward(i32 award) {
-    m_awards[award] = 1;
+void ExpCampaign::GrantAward(H2_ENUM_PARAM(ExpansionCampaignAward, i32) award) {
+    m_awards[IDX(award)] = 1;
 }
 
 VA(0x004bb780, 0x23)
-void ExpCampaign::RemoveAward(i32 award) {
-    m_awards[award] = 0;
+void ExpCampaign::RemoveAward(H2_ENUM_PARAM(ExpansionCampaignAward, i32) award) {
+    m_awards[IDX(award)] = 0;
 }
 
 VA(0x004bb7a3, 0x22)
-i8 ExpCampaign::HasAward(i32 award) {
-    return m_awards[award];
+i8 ExpCampaign::HasAward(H2_ENUM_PARAM(ExpansionCampaignAward, i32) award) {
+    return m_awards[IDX(award)];
 }
 
 VA(0x004bb7c5, 0x24)

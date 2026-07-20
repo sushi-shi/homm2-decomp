@@ -35,6 +35,12 @@ H2_ENUM_BEGIN(CombatControlConstant)
     COMBAT_CONTROL_SIDE_COUNT = 2
 H2_ENUM_END(CombatControlConstant)
 
+H2_ENUM_BEGIN(AdventureDisposeLevel)
+    ADV_DISPOSE_NONE    = 0,
+    ADV_DISPOSE_PARTIAL = 1,
+    ADV_DISPOSE_FULL    = 2
+H2_ENUM_END(AdventureDisposeLevel)
+
 H2_ENUM_BEGIN(DiffSendRecipient)
     DIFF_SEND_FORCE_WHOLE = -2,
     DIFF_SEND_NONE        = -1

@@ -60,10 +60,7 @@ H2_ENUM_BEGIN(TownConstant)
     TOWN_CONVERT_OBJECT_NONE           = 0,
     TOWN_VIEW_MEMORY_REQUIREMENT       = 0x514,
     TOWN_VIEW_LOW_MEMORY_LIMIT         = 0x320,
-    TOWN_VIEW_HIGH_MEMORY_LIMIT        = 0xb54,
-    TOWN_DISPOSE_NONE                  = 0,
-    TOWN_DISPOSE_PARTIAL               = 1,
-    TOWN_DISPOSE_FULL                  = 2
+    TOWN_VIEW_HIGH_MEMORY_LIMIT        = 0xb54
 H2_ENUM_END(TownConstant)
 
 #pragma pack(push, 1)

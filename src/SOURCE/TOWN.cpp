@@ -96,9 +96,9 @@ VA(0x00432e74, 0xe0)
 void town::View(i32 noFade) {
     bEnteringTown = 1;
     if (giHighMemBuffer + TOWN_VIEW_MEMORY_REQUIREMENT > TOWN_VIEW_HIGH_MEMORY_LIMIT)
-        gAdvDisposeLevel = TOWN_DISPOSE_FULL;
+        gAdvDisposeLevel = ADV_DISPOSE_FULL;
     else if (giHighMemBuffer + TOWN_VIEW_MEMORY_REQUIREMENT > TOWN_VIEW_LOW_MEMORY_LIMIT)
-        gAdvDisposeLevel = TOWN_DISPOSE_PARTIAL;
+        gAdvDisposeLevel = ADV_DISPOSE_PARTIAL;
 
     townManager* manager = gpTownManager;
     manager->SetTown(this);
@@ -107,7 +107,7 @@ void town::View(i32 noFade) {
     gpExec->CallManager(gpTownManager);
     if (m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE)
         gpAdvManager->SetHeroContext(m_occupyingHeroId, 0);
-    gAdvDisposeLevel = TOWN_DISPOSE_NONE;
+    gAdvDisposeLevel = ADV_DISPOSE_NONE;
     bEnteringTown = 0;
 }
 
