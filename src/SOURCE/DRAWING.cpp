@@ -52,12 +52,6 @@ H2_ENUM_CLASS_BEGIN(CombatSmallViewModifierFrame)
     SMALL_VIEW_NEUTRAL_MORALE_FRAME = 5
 H2_ENUM_CLASS_END(CombatSmallViewModifierFrame)
 
-H2_ENUM_CLASS_BEGIN(CombatGridShade)
-    GRID_SHADE_NONE          = 0,
-    GRID_SHADE_REACHABLE     = 1,
-    GRID_SHADE_EMPTY_BLOCKED = 3
-H2_ENUM_CLASS_END(CombatGridShade)
-
 H2_ENUM_CLASS_BEGIN(CombatMessageText)
     MESSAGE_TEXT_DEFAULT          = 0,
     MESSAGE_TEXT_MOVE             = 1,
@@ -378,18 +372,18 @@ void combatManager::SetupGridForArmy(army* armyPtr) {
 
     for (hexIndex = 0; hexIndex < COMBAT_HEX_COUNT; hexIndex++) {
         if (armyPtr->m_hex == hexIndex) {
-            m_gridState[hexIndex] = IDX(GRID_SHADE_REACHABLE);
+            m_gridState[hexIndex] = GRID_SHADE_REACHABLE;
         } else if (m_hexCells[hexIndex].m_pathReachable != 0) {
             if (m_hexCells[hexIndex].m_occupantSide != COMBAT_OCCUPANT_NONE) {
                 if (m_hexCells[hexIndex].m_occupantSide != armyPtr->m_side)
-                    m_gridState[hexIndex] = IDX(GRID_SHADE_REACHABLE);
+                    m_gridState[hexIndex] = GRID_SHADE_REACHABLE;
             } else {
-                m_gridState[hexIndex] = IDX(GRID_SHADE_EMPTY_BLOCKED);
+                m_gridState[hexIndex] = GRID_SHADE_EMPTY_BLOCKED;
             }
         } else if (m_hexCells[hexIndex].m_occupantSide != COMBAT_OCCUPANT_NONE
                    && m_hexCells[hexIndex].m_occupantSide != 1 - m_currentSide
                    && (attackMask & (1 << m_hexCells[hexIndex].m_occupantIndex)) != 0) {
-            m_gridState[hexIndex] = IDX(GRID_SHADE_REACHABLE);
+            m_gridState[hexIndex] = GRID_SHADE_REACHABLE;
         }
     }
 }
@@ -437,9 +431,9 @@ i32 combatManager::UpdateGrid(i32 resetGridDisplay, i32 rebuildGrid) {
     for (cellIndex = 0; cellIndex < COMBAT_HEX_COUNT; cellIndex++) {
         if (m_previousGridState[cellIndex] != m_gridState[cellIndex])
             gridChanged = 1;
-        if (m_gridState[cellIndex] != IDX(GRID_SHADE_NONE))
+        if (m_gridState[cellIndex] != GRID_SHADE_NONE)
             drawShading = 1;
-        if (m_previousGridState[cellIndex] != IDX(GRID_SHADE_NONE))
+        if (m_previousGridState[cellIndex] != GRID_SHADE_NONE)
             hadOldShade = 1;
     }
 
@@ -452,7 +446,7 @@ i32 combatManager::UpdateGrid(i32 resetGridDisplay, i32 rebuildGrid) {
         if (hadOldShade != 0) {
             for (cellIndex = 0; cellIndex < COMBAT_HEX_COUNT; cellIndex++) {
                 if (m_previousGridState[cellIndex] != m_gridState[cellIndex]
-                    || m_gridState[cellIndex] != IDX(GRID_SHADE_NONE)) {
+                    || m_gridState[cellIndex] != GRID_SHADE_NONE) {
                     if (m_hexCells[cellIndex].m_gridLeft < minX)
                         minX = m_hexCells[cellIndex].m_gridLeft;
                     if (m_hexCells[cellIndex].m_gridTop < minY)
@@ -487,14 +481,14 @@ i32 combatManager::UpdateGrid(i32 resetGridDisplay, i32 rebuildGrid) {
     if (drawShading == 0)
         goto DrawCombatGrid;
     for (cellIndex = 0; cellIndex < COMBAT_HEX_COUNT; cellIndex++) {
-        if (m_gridState[cellIndex] != IDX(GRID_SHADE_NONE)) {
+        if (m_gridState[cellIndex] != GRID_SHADE_NONE) {
             DimIconToBitmap(
                 m_combatIcons[IDX(COMBAT_ICON_GRID)],
                 m_backgroundBuffer,
                 m_hexCells[cellIndex].m_gridLeft,
                 m_hexCells[cellIndex].m_gridTop,
                 1,
-                m_gridState[cellIndex] - 1,
+                IDX(m_gridState[cellIndex]) - 1,
                 ICON_DRAW_CLIP,
                 0,
                 0,

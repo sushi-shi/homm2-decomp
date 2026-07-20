@@ -548,7 +548,7 @@ SOURCE/ARMY	?CancelSpellType@army@@QAEXH@Z	100.0000	dfc5ea9ac9d9
 SOURCE/ARMY	?CheckLuck@army@@QAEXXZ	99.9363	406b4c1e0361
 SOURCE/ARMY	?Cure@army@@QAEXH@Z	100.0000	d5bb8726c91d
 SOURCE/ARMY	?Damage@army@@QAEHJH@Z	96.1736	8a901cef33d0
-SOURCE/ARMY	?DamageEnemy@army@@QAEXPAV1@PAH1HH@Z	96.6767	698374d6cfe2
+SOURCE/ARMY	?DamageEnemy@army@@QAEXPAV1@PAH1HH@Z	96.8641	698374d6cfe2
 SOURCE/ARMY	?DecrementSpellRounds@army@@QAEXXZ	100.0000	7ad5644711fe
 SOURCE/ARMY	?DirDoAttack@army@@QAEXH@Z	100.0000	9f6c0d7ac47d
 SOURCE/ARMY	?DispelGood@army@@QAEXXZ	100.0000	34656c7b2e67
@@ -622,7 +622,7 @@ SOURCE/CMBTMGR	?LoadIcons@combatManager@@QAEXXZ	99.0950	b820ece13b00
 SOURCE/CMBTMGR	?LowerDoor@combatManager@@QAEXXZ	100.0000	cd140c18d14a
 SOURCE/CMBTMGR	?MakeCreaturesVanish@combatManager@@QAEXXZ	92.1919	6a909a0c4563
 SOURCE/CMBTMGR	?MoreTreesNear@combatManager@@QAEHXZ	99.0964	1bd66a760ab7
-SOURCE/CMBTMGR	?Open@combatManager@@UAEHH@Z	100.0000	b279505ead39
+SOURCE/CMBTMGR	?Open@combatManager@@UAEHH@Z	100.0000	340ba8de5316
 SOURCE/CMBTMGR	?RaiseDoor@combatManager@@QAEXXZ	100.0000	56349f83c45e
 SOURCE/CMBTMGR	?ResetHitByCreature@combatManager@@QAEXXZ	100.0000	51c44ef0bd79
 SOURCE/CMBTMGR	?SaveCombatBorder@combatManager@@QAEXXZ	100.0000	22349ef5f7a5
@@ -646,7 +646,7 @@ SOURCE/COMMAND	?CycleCombatScreen@combatManager@@QAEXXZ	97.7901	c3085d647e6b
 SOURCE/COMMAND	?DoCommand@combatManager@@QAEXH@Z	99.9808	ae28fc6bd165
 SOURCE/COMMAND	?DoLoseWindow@combatManager@@QAEXXZ	100.0000	4b0422331d15
 SOURCE/COMMAND	?DoSurrender@combatManager@@QAEHXZ	100.0000	b1459069c521
-SOURCE/COMMAND	?DoVictory@combatManager@@QAEXH@Z	97.3263	c8eb1f563410
+SOURCE/COMMAND	?DoVictory@combatManager@@QAEXH@Z	97.3442	c8eb1f563410
 SOURCE/COMMAND	?GetCommand@combatManager@@QAEHH@Z	94.1031	13e8ba6cb193
 SOURCE/COMMAND	?GetControl@combatManager@@QAEXXZ	96.7778	73ab80bd89bb
 SOURCE/COMMAND	?GetPointer@combatManager@@QAEHHH@Z	100.0000	c0dc28a1c42b
@@ -654,7 +654,7 @@ SOURCE/COMMAND	?InCombatArea@@YIHHH@Z	99.8000	3c566432facc
 SOURCE/COMMAND	?IsNegationSphereInEffect@combatManager@@QAEHXZ	100.0000	9d7ce368e944
 SOURCE/COMMAND	?Main@combatManager@@UAEHAAUtag_message@@@Z	100.0000	94fc6371c1ad
 SOURCE/COMMAND	?ProcessCombatMsg@combatManager@@QAEHAAUtag_message@@@Z	97.2062	ee951b8a82fc
-SOURCE/COMMAND	?ProcessNextAction@combatManager@@QAEHAAUtag_message@@@Z	95.7724	ac24fe659389
+SOURCE/COMMAND	?ProcessNextAction@combatManager@@QAEHAAUtag_message@@@Z	95.7724	6e32a508f3cd
 SOURCE/COMMAND	?ResetCycleTimers@combatManager@@QAEXXZ	100.0000	e9e48a4f0ebf
 SOURCE/COMMAND	?ResetCyclingCreatures@combatManager@@QAEXXZ	99.9673	c8881c9c8b53
 SOURCE/COMMAND	?ResetMouse@combatManager@@QAEXXZ	100.0000	7fccf15dee35
@@ -664,7 +664,7 @@ SOURCE/COMMAND	?SetCombatDirections@combatManager@@QAEXH@Z	99.6679	b74dc8b72c6d
 SOURCE/COMMAND	?SetCombatGrid@combatManager@@QAEXHHH@Z	100.0000	eac88d6cdc01
 SOURCE/COMMAND	?SetCombatViewArmySmallLevel@combatManager@@QAEXH@Z	100.0000	ff78d34345c0
 SOURCE/COMMAND	?SetupSmallView@combatManager@@QAEXXZ	100.0000	18fed353ea49
-SOURCE/COMMAND	?ShowDeadArmies@combatManager@@QAEXPAVheroWindow@@@Z	97.5793	6943ab3ed737
+SOURCE/COMMAND	?ShowDeadArmies@combatManager@@QAEXPAVheroWindow@@@Z	97.5897	6943ab3ed737
 SOURCE/COMMAND	?ShowEagleEyeSpell@combatManager@@QAEXPAVheroWindow@@@Z	98.9901	baae87464fd4
 SOURCE/COMMAND	?ShowSkeletons@combatManager@@QAEXPAVheroWindow@@@Z	98.5862	444b69209f6d
 SOURCE/COMMAND	?ShowWinLoseArtifact@combatManager@@QAEXPAVheroWindow@@H@Z	98.8150	d8cd4d84e6fc
@@ -707,9 +707,9 @@ SOURCE/DRAWING	?DrawFrame@combatManager@@QAEXHHHHHHH@Z	99.6326	86f7bcf7563a
 SOURCE/DRAWING	?DrawSmallView@combatManager@@QAEXHH@Z	99.8425	2ed71075aeee
 SOURCE/DRAWING	?NoShowCombatLog@combatManager@@QAEXPAD@Z	100.0000	175192ffefde
 SOURCE/DRAWING	?ResetLimitCreature@combatManager@@QAEXXZ	100.0000	aa89720270e5
-SOURCE/DRAWING	?SetupGridForArmy@combatManager@@QAEXPAVarmy@@@Z	100.0000	cc4f9b7bff52
+SOURCE/DRAWING	?SetupGridForArmy@combatManager@@QAEXPAVarmy@@@Z	100.0000	72fa61903cdf
 SOURCE/DRAWING	?UpdateCombatArea@combatManager@@QAEXXZ	100.0000	20ff5a0212fc
-SOURCE/DRAWING	?UpdateGrid@combatManager@@QAEHHH@Z	100.0000	92a308e7bd1c
+SOURCE/DRAWING	?UpdateGrid@combatManager@@QAEHHH@Z	100.0000	1a2a2b4d42a3
 SOURCE/DRAWING	?UpdateMouseGrid@combatManager@@QAEXHH@Z	100.0000	1e868bc45bbe
 SOURCE/EVENTS	?AutoResolveCombat@advManager@@QAEHHHPAVhero@@PAVarmyGroup@@PAVtown@@01HHHH@Z	98.5455	9794ea86ce80
 SOURCE/EVENTS	?BarrierAIEvent@advManager@@QAEHPAVmapCell@@PAVhero@@@Z	100.0000	833429ba7aa9
@@ -726,7 +726,7 @@ SOURCE/EVENTS	?EventSound@advManager@@QAEXHHPAUSAMPLE2@@@Z	99.9096	7f31c2c63cdc
 SOURCE/EVENTS	?EventWindow@advManager@@QAEXHHPADHHHHH@Z	100.0000	2d135034f8fd
 SOURCE/EVENTS	?ExpansionRecruitEvent@advManager@@QAEXPAVhero@@HPAF@Z	100.0000	52d3e5726afd
 SOURCE/EVENTS	?FizzleCenter@advManager@@QAEXH@Z	100.0000	595626a17313
-SOURCE/EVENTS	?GenericSiteAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@@Z	92.5097	19d617cc20cd
+SOURCE/EVENTS	?GenericSiteAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@@Z	92.5136	19d617cc20cd
 SOURCE/EVENTS	?GenericSiteEvent@advManager@@QAEXPAVmapCell@@PAVhero@@@Z	97.1120	1528cf682e6e
 SOURCE/EVENTS	?GhostEvent@advManager@@QAEHPAVhero@@PAVmapCell@@PADHH@Z	100.0000	286a817f2e59
 SOURCE/EVENTS	?GiveArtifact@@YIHPAVhero@@HHC@Z	100.0000	450575d0ccdb
@@ -787,7 +787,7 @@ SOURCE/GAME	?ComputeUALoc@@YIXH@Z	99.9612	6d5653c3d548
 SOURCE/GAME	?ConvertAllToLateOverlay@game@@QAEXHH@Z	95.0000	f644cbd3c94a
 SOURCE/GAME	?ConvertFlagToLateOverlay@game@@QAEXHH@Z	95.2326	ff6c33136c39
 SOURCE/GAME	?ConvertObject@game@@QAEXHHHHHHHHHHH@Z	99.1733	0b3736560e05
-SOURCE/GAME	?CountShrines@game@@QAEHH@Z	93.7838	3667d4e7513f
+SOURCE/GAME	?CountShrines@game@@QAEHH@Z	98.6487	3667d4e7513f
 SOURCE/GAME	?CreateBoat@game@@QAEHHHH@Z	100.0000	107e63cfb83a
 SOURCE/GAME	?CreateDiffFile@@YIXPAD00HH@Z	96.0775	e39ae0acfeff
 SOURCE/GAME	?CreateJoinFile@@YIXPAD00@Z	95.4725	1327e28e455d
@@ -827,13 +827,13 @@ SOURCE/GAME	?NextPlayer@game@@QAEXXZ	94.5296	5af22658e916
 SOURCE/GAME	?NumOfGivenArtifact@playerData@@QAEHH@Z	100.0000	514e65fee12a
 SOURCE/GAME	?PerDay@game@@QAEXXZ	98.3056	08f597694da5
 SOURCE/GAME	?PerMonth@game@@QAEXXZ	100.0000	9f7ec0550e59
-SOURCE/GAME	?PerWeek@game@@QAEXXZ	98.4566	4ba7221093f5
+SOURCE/GAME	?PerWeek@game@@QAEXXZ	98.4572	4ba7221093f5
 SOURCE/GAME	?ProcessMapExtra@game@@QAEXXZ	96.5819	b20d46bb675b
 SOURCE/GAME	?ProcessOnMapHeroes@game@@QAEXXZ	99.6168	ca59294254fd
 SOURCE/GAME	?ProcessRandomObjects@game@@QAEXXZ	100.0000	a1d8c15af5ba
 SOURCE/GAME	?RandomScan@game@@QAEHPACHHHC@Z	100.0000	823cc4914545
 SOURCE/GAME	?RandomizeBarrier@game@@QAEXPAVmapCell@@@Z	100.0000	283318c47dd3
-SOURCE/GAME	?RandomizeEvents@game@@QAEXXZ	98.2288	5332eeec6581
+SOURCE/GAME	?RandomizeEvents@game@@QAEXXZ	98.2738	5332eeec6581
 SOURCE/GAME	?RandomizeHeroPool@game@@QAEXXZ	100.0000	551b3d30b6b6
 SOURCE/GAME	?RandomizeMine@game@@QAEXHH@Z	99.1548	b6d3baf1fbb3
 SOURCE/GAME	?RandomizePassword@game@@QAEXPAVmapCell@@@Z	100.0000	3a5de17df20b
@@ -927,7 +927,7 @@ SOURCE/KB	?AddScoreToHighScore@@YIHHHHHPAD@Z	100.0000	382d33aebcc0
 SOURCE/KB	?BVResMsg@@YIXPADHH@Z	100.0000	4cf86644a978
 SOURCE/KB	?CanBuild@@YIHPAVtown@@H@Z	100.0000	6c00cc05a3ba
 SOURCE/KB	?CanBuy@@YIHPAVtown@@H@Z	100.0000	c36b2281e0e3
-SOURCE/KB	?CheckEndGame@@YIXHH@Z	99.9197	277ee8407cba
+SOURCE/KB	?CheckEndGame@@YIXHH@Z	100.0000	277ee8407cba
 SOURCE/KB	?CheckMem@@YIHXZ	100.0000	47b096d75e57
 SOURCE/KB	?CheckShingleUpdate@@YIXXZ	100.0000	8c6021a89988
 SOURCE/KB	?CleanUpMenus@@YIXXZ	100.0000	619dd14d1e0e
@@ -1208,14 +1208,14 @@ SOURCE/SPELLAI	?DetermineEffectOfSpell@combatManager@@QAEXHPAH0@Z	99.4009	ddaa52
 SOURCE/SPELLAI	?DoSpellAI@combatManager@@QAEHHH@Z	100.0000	03dfc8829833
 SOURCE/SPELLAI	?EffectSpellCreateCreature@combatManager@@QAEHHH@Z	100.0000	151b5103f1fc
 SOURCE/SPELLAI	?EffectSpellCure@combatManager@@QAEXPAHHHH@Z	97.5871	59e7eb754bf3
-SOURCE/SPELLAI	?EffectSpellDamage@combatManager@@QAEXPAHHH@Z	97.1017	557daf720a8f
+SOURCE/SPELLAI	?EffectSpellDamage@combatManager@@QAEXPAHHH@Z	97.1021	557daf720a8f
 SOURCE/SPELLAI	?EffectSpellResurrect@combatManager@@QAEXPAHHH@Z	100.0000	77c4ee97df0b
 SOURCE/SPELLAI	?FirstArmy@combatManager@@QAEHHHPAH@Z	100.0000	94db8bb7e996
 SOURCE/SPELLAI	?FirstResurrectable@combatManager@@QAEHHPAHH@Z	100.0000	e29300831d1f
 SOURCE/SPELLAI	?NextPos@combatManager@@QAEXPAH@Z	100.0000	90d2fa7538d0
 SOURCE/SPELLAI	?RawEffectSpellInfluence@combatManager@@QAEHPAVarmy@@H@Z	97.9039	726d8f846ddc
 SOURCE/SPELLS	?AddBolt@combatManager@@QAEXPAUSBolt@@HHHHHHHHHHHH@Z	100.0000	76cd25d03337
-SOURCE/SPELLS	?Armageddon@combatManager@@QAEXXZ	99.5752	86ddd856b03c
+SOURCE/SPELLS	?Armageddon@combatManager@@QAEXXZ	99.5822	86ddd856b03c
 SOURCE/SPELLS	?BloodLustEffect@combatManager@@QAEXPAVarmy@@H@Z	100.0000	ac9fba24c780
 SOURCE/SPELLS	?Blur@combatManager@@QAEXHHH@Z	100.0000	1b0fde3aadea
 SOURCE/SPELLS	?CastMassSpell@combatManager@@QAEXHH@Z	97.4529	905a118343d8
