@@ -57,7 +57,7 @@ H2_ENUM_END(RecruitControl)
 VA(0x0048b310, 0x18c)
 void SetupRecruitWin(
     class heroWindow* window,
-    i32 creatureType,
+    H2_ENUM_PARAM(CreatureType, i32) creatureType,
     i32 goldCost,
     ResourceType resourceType,
     i32 resourceCost,
@@ -90,7 +90,7 @@ void SetupRecruitWin(
     message.payload.widget.data.text = gText;
     window->BroadcastMessage(message);
 
-    sprintf(gText, "monh%04d.icn", creatureType);
+    sprintf(gText, "monh%04d.icn", IDX(creatureType));
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_SET_ICON;
     message.payload.widget.id = CREATURE_CONTROL;
@@ -372,7 +372,7 @@ recruitUnit::recruitUnit(class town* townData, i32 dwelling, i32 refreshTown) {
     m_refreshTown = refreshTown;
     m_sourceType = RECRUIT_SOURCE_TOWN;
     m_army = &townData->m_army;
-    m_creatureType = CreatureType(gDwellingType[townData->m_type][dwelling]);
+    m_creatureType = gDwellingType[IDX(townData->m_type)][dwelling];
     m_available = &townData->m_garrison[dwelling];
     GetMonsterCost(m_creatureType, costs);
     m_goldCost = costs[GOLD_RESOURCE];
@@ -400,7 +400,7 @@ void QuickViewRecruit(class town* townData, i32 dwelling) {
     i32 available;
     i32 resource;
 
-    creatureType = CreatureType(gDwellingType[townData->m_type][dwelling]);
+    creatureType = gDwellingType[IDX(townData->m_type)][dwelling];
     available = townData->m_garrison[dwelling];
     GetMonsterCost(creatureType, costs);
     goldCost = costs[GOLD_RESOURCE];

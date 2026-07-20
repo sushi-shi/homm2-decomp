@@ -3580,20 +3580,21 @@ void game::ViewArmy(
         MemError();
 
     viewArmyFacingWIPXMod = facing == ARMY_FACING_RIGHT ? -1 : 1;
-    gpResourceManager->PointToFile(gpResourceManager->MakeId(cArmyFrameFileNames[monsterType], 1));
+    gpResourceManager
+        ->PointToFile(gpResourceManager->MakeId(cArmyFrameFileNames[IDX(monsterType)], 1));
     gpResourceManager->ReadBlock(
         reinterpret_cast<i8*>(&sViewArmyMonFrameInfo),
         sizeof(sViewArmyMonFrameInfo)
     );
-    ModifyFrameInfo(&sViewArmyMonFrameInfo, CreatureType(monsterType));
+    ModifyFrameInfo(&sViewArmyMonFrameInfo, monsterType);
     BuildTempWalkSeq(&sViewArmyMonFrameInfo, 0, 1);
 
     viewArmyBaseX = VIEW_ARMY_MONSTER_BASE_X;
     char filename4[VIEW_ARMY_FILENAME_SIZE];
     if (gbLowMemory)
-        sprintf(filename4, "monh%04d.icn", monsterType);
+        sprintf(filename4, "monh%04d.icn", IDX(monsterType));
     else
-        strcpy(filename4, cMonFilename[monsterType]);
+        strcpy(filename4, cMonFilename[IDX(monsterType)]);
 
     icon* monsterIcon5 = gpResourceManager->GetIcon(filename4);
     i32 iconFrame15 = sViewArmyMonFrameInfo.animationFrames[IDX(ARMY_ANIMATION_WALK)][0];
@@ -3617,7 +3618,7 @@ void game::ViewArmy(
         VIEW_ARMY_MONSTER_WIDGET_HEIGHT,
         filename4,
         gbLowMemory ? 0 : sViewArmyMonFrameInfo.animationFrames[IDX(ARMY_ANIMATION_WALK)][0],
-        facing == ARMY_FACING_LEFT,
+        facing == ARMY_FACING_LEFT ? ICON_DRAW_FLIPPED : ICON_DRAW_NORMAL,
         VIEW_ARMY_MONSTER_WIDGET_Z_ORDER,
         VIEW_ARMY_MONSTER_WIDGET_COLOR,
         1
@@ -3628,7 +3629,7 @@ void game::ViewArmy(
     gpResourceManager->Dispose(monsterIcon5);
 
     char armyName8[VIEW_ARMY_NAME_SIZE];
-    strcpy(armyName8, gArmyNames[monsterType]);
+    strcpy(armyName8, gArmyNames[IDX(monsterType)]);
     armyName8[0] -= VIEW_ARMY_ASCII_CASE_OFFSET;
     message6.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message6.payload.widget.id = VIEW_ARMY_TITLE_WIDGET_ID;
@@ -6015,10 +6016,11 @@ void game::SetupTowns(void) {
              building++) {
             if (castle->m_buildings & (1 << building)) {
                 castle->m_garrison[building - TOWN_DWELLING_BUILDING_FIRST] =
-                    gMonsterDatabase
-                        [gDwellingType[IDX(castle->m_type)]
-                                      [building - TOWN_DWELLING_BUILDING_FIRST]]
-                            .growth;
+                    gMonsterDatabase[IDX(
+                        gDwellingType[IDX(castle->m_type)]
+                                      [building - TOWN_DWELLING_BUILDING_FIRST]
+                    )]
+                        .growth;
             }
         }
         if (castle->m_buildings & IDX(TOWN_BUILDING_MAGE_GUILD)) {
@@ -7581,25 +7583,25 @@ void game::SetupNewRumour(void) {
         ultimateRumour:
             category10 = Random(0, 100);
             if (category10 < 33) {
-                if (!(m_mapHeader.width * 0.33 <= m_ultimateArtifactX
-                      || m_mapHeader.height * 0.33 <= m_ultimateArtifactX)) {
+                if (!(IDX(m_mapHeader.width) * 0.33 <= m_ultimateArtifactX
+                      || IDX(m_mapHeader.height) * 0.33 <= m_ultimateArtifactX)) {
                     direction9 = 7;
-                } else if (!(m_mapHeader.width * 0.33 <= m_ultimateArtifactX
-                             || m_ultimateArtifactX <= m_mapHeader.height * 0.66)) {
+                } else if (!(IDX(m_mapHeader.width) * 0.33 <= m_ultimateArtifactX
+                             || m_ultimateArtifactX <= IDX(m_mapHeader.height) * 0.66)) {
                     direction9 = 5;
-                } else if (!(m_mapHeader.width * 0.33 <= m_ultimateArtifactX)) {
+                } else if (!(IDX(m_mapHeader.width) * 0.33 <= m_ultimateArtifactX)) {
                     direction9 = 6;
-                } else if (!(m_ultimateArtifactX <= m_mapHeader.width * 0.66
-                             || m_mapHeader.height * 0.33 <= m_ultimateArtifactX)) {
+                } else if (!(m_ultimateArtifactX <= IDX(m_mapHeader.width) * 0.66
+                             || IDX(m_mapHeader.height) * 0.33 <= m_ultimateArtifactX)) {
                     direction9 = 1;
-                } else if (!(m_ultimateArtifactX <= m_mapHeader.width * 0.66
-                             || m_ultimateArtifactX <= m_mapHeader.height * 0.66)) {
+                } else if (!(m_ultimateArtifactX <= IDX(m_mapHeader.width) * 0.66
+                             || m_ultimateArtifactX <= IDX(m_mapHeader.height) * 0.66)) {
                     direction9 = 3;
-                } else if (!(m_ultimateArtifactX <= m_mapHeader.width * 0.66)) {
+                } else if (!(m_ultimateArtifactX <= IDX(m_mapHeader.width) * 0.66)) {
                     direction9 = 2;
-                } else if (!(m_mapHeader.height * 0.33 <= m_ultimateArtifactX)) {
+                } else if (!(IDX(m_mapHeader.height) * 0.33 <= m_ultimateArtifactX)) {
                     direction9 = 0;
-                } else if (!(m_ultimateArtifactX <= m_mapHeader.height * 0.66)) {
+                } else if (!(m_ultimateArtifactX <= IDX(m_mapHeader.height) * 0.66)) {
                     direction9 = 4;
                 } else {
                     direction9 = 8;

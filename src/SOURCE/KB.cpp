@@ -1489,7 +1489,7 @@ char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 mode) {
             buf,
             "The %s increases production of %s by 8 per week.",
             GetBuildingName(race, building),
-            gArmyNamesPlural[gDwellingType[IDX(race)][0]]
+            gArmyNamesPlural[IDX(gDwellingType[IDX(race)][0])]
         );
     } else if (building == BUILDING_SLOT_SPECIAL) {
         sprintf(buf, gBuildingInfoSpecial[IDX(race)]);
@@ -1500,8 +1500,9 @@ char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 mode) {
             gText,
             "The %s produces %s.",
             GetBuildingName(race, building),
-            gArmyNamesPlural[gDwellingType[IDX(race)]
-                                          [IDX(building) - IDX(BUILDING_SLOT_DWELLING_FIRST)]]
+            gArmyNamesPlural[IDX(gDwellingType[IDX(race)]
+                                               [IDX(building)
+                                                - IDX(BUILDING_SLOT_DWELLING_FIRST)])]
         );
         return gText;
     }
