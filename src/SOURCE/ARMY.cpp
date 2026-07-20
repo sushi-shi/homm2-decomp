@@ -139,12 +139,12 @@ H2_ENUM_CLASS_END(BerserkMaskIndex)
 
 VA(0x0044a8c0, 0xcf)
 army::army(void) {
-    i32 i;
+    H2_ENUM_STORAGE_STEPPED(ArmySampleType, i32) sampleType;
 
     m_creatureIcon = NULL;
     m_hex = 0;
-    for (i = 0; i < IDX(ARMY_SAMPLE_COUNT); i++) {
-        m_samples[i] = NULL;
+    for (sampleType = ARMY_SAMPLE_MOVE; sampleType < ARMY_SAMPLE_COUNT; sampleType++) {
+        m_samples[IDX(sampleType)] = NULL;
     }
     m_drawEnabled = 1;
     m_targetSide = -1;
@@ -165,10 +165,10 @@ void army::WaitSample(ArmySampleType sampleIndex) {
 
 VA(0x0044a9a7, 0xde)
 void army::InitClean(void) {
-    i32 i;
+    H2_ENUM_STORAGE_STEPPED(ArmySampleType, i32) sampleType;
 
-    for (i = 0; i < IDX(ARMY_SAMPLE_COUNT); i++) {
-        m_samples[i] = NULL;
+    for (sampleType = ARMY_SAMPLE_MOVE; sampleType < ARMY_SAMPLE_COUNT; sampleType++) {
+        m_samples[IDX(sampleType)] = NULL;
     }
     m_roundCounter = -1;
     m_spellCount = 0;
@@ -337,7 +337,7 @@ void army::LoadResources(void) {
 
 VA(0x0044b36e, 0xe8)
 void army::FreeResources(void) {
-    i32 i;
+    H2_ENUM_STORAGE_STEPPED(ArmySampleType, i32) sampleType;
 
     if (gbNoShowCombat) {
         return;
@@ -350,10 +350,10 @@ void army::FreeResources(void) {
         gpResourceManager->Dispose(m_creatureIcon);
         m_creatureIcon = NULL;
     }
-    for (i = 0; i < IDX(ARMY_SAMPLE_COUNT); i++) {
-        if (m_samples[i]) {
-            gpResourceManager->Dispose(m_samples[i]);
-            m_samples[i] = NULL;
+    for (sampleType = ARMY_SAMPLE_MOVE; sampleType < ARMY_SAMPLE_COUNT; sampleType++) {
+        if (m_samples[IDX(sampleType)]) {
+            gpResourceManager->Dispose(m_samples[IDX(sampleType)]);
+            m_samples[IDX(sampleType)] = NULL;
         }
     }
 }
