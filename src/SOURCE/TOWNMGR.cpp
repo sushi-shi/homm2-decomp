@@ -157,9 +157,6 @@ H2_ENUM_BEGIN(TownSplitConstant)
 H2_ENUM_END(TownSplitConstant)
 
 H2_ENUM_BEGIN(BuildDialogConstant)
-    BUILD_SOURCE_LINE_BASE                  = 0x0948,
-    BUILD_DESCRIPTION_ALLOC_LINE_OFFSET     = 0x08,
-    BUILD_AMOUNT_ALLOC_LINE_OFFSET          = 0x128,
     BUILD_RESOURCE_STORAGE_COUNT            = TOWN_RESOURCE_COUNT + 1,
     BUILD_ROW_RESOURCE_CAPACITY             = 4,
     BUILD_DESCRIPTION_WIDTH                 = 240,
@@ -225,7 +222,6 @@ H2_ENUM_BEGIN(WellDetailText)
 H2_ENUM_END(WellDetailText)
 
 H2_ENUM_BEGIN(ThievesGuildConstant)
-    THIEVES_SOURCE_LINE_BASE      = 0x0e0e,
     THIEVES_STAT_TEXT_CAPACITY    = 200,
     THIEVES_PLAYER_COLUMN_WIDTH   = 68,
     THIEVES_RANK_FIRST_X          = 258,
@@ -697,7 +693,7 @@ void townManager::SetupExtraStuff(void) {
 VA(0x00414109, 0x1ef)
 i32 townManager::Open(i32 id) {
     gpGame->CheckHeroConsistency();
-    if (gConfig.useOpera != IDX(CONFIG_OPERA_DISABLED)
+    if (gConfig.useOpera != CONFIG_OPERA_DISABLED
         || gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI)
         gpSoundManager->SwitchAmbientMusic(townTheme[IDX(m_town->m_type)]);
     PollSound();
@@ -735,7 +731,7 @@ VA(0x004142f8, 0x77)
 void townManager::ChangeTown(void) {
     tag_message message;
 
-    if (gConfig.useOpera != IDX(CONFIG_OPERA_DISABLED)
+    if (gConfig.useOpera != CONFIG_OPERA_DISABLED
         || gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI)
         gpSoundManager->SwitchAmbientMusic(townTheme[IDX(m_town->m_type)]);
     SetupExtraStuff();
@@ -953,7 +949,7 @@ void townManager::Close(void) {
         delete m_townWindow;
     }
     m_townWindow = NULL;
-    if (gConfig.useOpera != IDX(CONFIG_OPERA_DISABLED)
+    if (gConfig.useOpera != CONFIG_OPERA_DISABLED
         || gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI)
         gpSoundManager->SwitchAmbientMusic(TOWN_MUSIC_STOP);
     gpWindowManager->FadeScreen(FADE_OUT, TOWN_FADE_STEPS, NULL);
@@ -2047,7 +2043,7 @@ void townManager::DrawTown(i32 updateScreen, i32 drawFlags) {
 
 VA(0x00417c9d, 0xf35)
 i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
-    static i16 sourceLineBase = BUILD_SOURCE_LINE_BASE;
+    static i16 sourceLineBase = 0x0948; // NOLINT(readability-magic-numbers)
     u32l prerequisiteMask_c;
     i32 prerequisiteCount_p;
     i16 dialogLeft_a;
@@ -2095,7 +2091,7 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
     costCount_o = 0;
     description_b = static_cast<char*>(H2_ALLOC(
         BUILDING_DESCRIPTION_CAPACITY,
-        sourceLineBase + BUILD_DESCRIPTION_ALLOC_LINE_OFFSET
+        sourceLineBase + 8
     ));
 
     for (index_h = 0; index_h < TOWN_RESOURCE_COUNT; ++index_h) {
@@ -2320,7 +2316,7 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
                 entryWidth_o = GetIconEntry(resourceIcon_c, rowResourceTypes_a[index_h])->w;
                 amountText_n[widgetIndex_f] = static_cast<char*>(H2_ALLOC(
                     BUILD_AMOUNT_TEXT_CAPACITY,
-                    sourceLineBase + BUILD_AMOUNT_ALLOC_LINE_OFFSET
+                    sourceLineBase + 0x128
                 ));
                 sprintf(amountText_n[widgetIndex_f], "%d", costs_e[widgetIndex_f]);
                 i32 widgetXOffset = 0;
@@ -3112,7 +3108,7 @@ void townManager::SetupWell(heroWindow* window) {
 
 VA(0x0041a783, 0xf0f)
 void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
-    static i16 sourceLineBase = THIEVES_SOURCE_LINE_BASE;
+    static i16 sourceLineBase = 0x0e0e; // NOLINT(readability-magic-numbers)
     i16 unusedRankX_last = THIEVES_RANK_FIRST_X;
     i16 unusedRankWidth_category = THIEVES_PLAYER_COLUMN_WIDTH;
     i16 unusedRankY_j = THIEVES_FIRST_CATEGORY_Y;
@@ -3314,7 +3310,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                     widgetText_control = static_cast<char*>(
                         H2_ALLOC(
                             strlen(gText) + 1,
-                            sourceLineBase + TOWN_THIEVES_SOURCE_LINE_HERO_LABELS
+                            sourceLineBase + 0xbe
                         )
                     );
                     strcpy(widgetText_control, gText);
@@ -3349,7 +3345,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                     widgetText_control = static_cast<char*>(
                         H2_ALLOC(
                             strlen(gText) + 1,
-                            sourceLineBase + TOWN_THIEVES_SOURCE_LINE_HERO_STATS
+                            sourceLineBase + 0xd8
                         )
                     );
                     strcpy(widgetText_control, gText);
@@ -3377,7 +3373,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                     widgetText_control = static_cast<char*>(
                         H2_ALLOC(
                             strlen(gText) + 1,
-                            sourceLineBase + TOWN_THIEVES_SOURCE_LINE_PERSONALITY
+                            sourceLineBase + 0xf0
                         )
                     );
                     strcpy(widgetText_control, gText);
