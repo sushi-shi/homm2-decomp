@@ -45,6 +45,35 @@ i32 Function(i32 value) {
             with self.subTest(spelling=spelling):
                 self.assertFalse(constants_audit._is_zero_null_spelling(spelling))
 
+    def test_lexical_inventory_classifies_source_line_evidence(self):
+        source = """\
+DATA(0x401000) static i16 saveSourceLine = 0x294;
+void Function(i32 condition) {
+    void* first = H2_ALLOC(64, 1707);
+    void* second = H2_ALLOC(256 + 2000, 1708);
+    H2_FREE(first, 1755);
+    H2_ASSERT(condition == 12, RETAIL_FILE, 42);
+    H2_ALLOC_AT(80, "source.cpp", 99);
+}
+"""
+        with tempfile.TemporaryDirectory(dir=constants_audit.REPO) as directory:
+            path = Path(directory) / "source_lines.cpp"
+            path.write_text(source)
+            rows = constants_audit.lexical_inventory(path)
+        categories = {(row.token, row.line): row.category for row in rows}
+        self.assertEqual(categories[("0x401000", 1)], "annotation")
+        self.assertEqual(categories[("0x294", 1)], "source-line")
+        self.assertEqual(categories[("64", 3)], "code")
+        self.assertEqual(categories[("1707", 3)], "source-line")
+        self.assertEqual(categories[("256", 4)], "code")
+        self.assertEqual(categories[("2000", 4)], "code")
+        self.assertEqual(categories[("1708", 4)], "source-line")
+        self.assertEqual(categories[("1755", 5)], "source-line")
+        self.assertEqual(categories[("12", 6)], "code")
+        self.assertEqual(categories[("42", 6)], "source-line")
+        self.assertEqual(categories[("80", 7)], "code")
+        self.assertEqual(categories[("99", 7)], "source-line")
+
     def test_diagnostics_use_source_literal_and_deduplicate(self):
         source = "void Test() {\n    return 12;\n}\n"
         with tempfile.TemporaryDirectory(dir=constants_audit.REPO) as directory:
