@@ -595,7 +595,7 @@ void philAI::CheckReload(void) {
         IDX(gpCurAIHero->m_eventFlags) & IDX(HERO_EVENT_EMBARKED),
         0,
         gpCurAIHero->m_remainingMobility,
-        gpCurAIHero->m_secondarySkills[0],
+        IDX(gpCurAIHero->m_secondarySkills[IDX(HERO_SKILL_PATHFINDING)]),
         -1,
         -1,
         0,
@@ -1396,7 +1396,7 @@ firstWeekDone:
                 IDX(threatHeroPtr6->m_eventFlags) & IDX(HERO_EVENT_EMBARKED),
                 1,
                 threatHeroPtr6->m_remainingMobility + 100,
-                threatHeroPtr6->m_secondarySkills[0],
+                IDX(threatHeroPtr6->m_secondarySkills[IDX(HERO_SKILL_PATHFINDING)]),
                 -1,
                 -1,
                 0,
@@ -1721,7 +1721,8 @@ i32 philAI::DetermineTargetPosition(
 
     candidateCell = gpAdvManager->GetCell(gpCurAIHero->m_x, gpCurAIHero->m_y);
     mapTerrain = giGroundToTerrain[candidateCell->m_terrainImageIndex];
-    if (gpCurAIHero->m_secondarySkills[0] <= IDX(HERO_SKILL_LEVEL_BASIC)) {
+    if (gpCurAIHero->m_secondarySkills[IDX(HERO_SKILL_PATHFINDING)]
+        <= HERO_SKILL_LEVEL_BASIC) {
         if (mapTerrain == IDX(TERRAIN_SNOW) || mapTerrain == IDX(TERRAIN_SWAMP))
             mobility = static_cast<i32>(mobility * 1.15);
         if (mapTerrain == IDX(TERRAIN_DESERT))
@@ -1750,7 +1751,7 @@ i32 philAI::DetermineTargetPosition(
         IDX(gpCurAIHero->m_eventFlags) & IDX(HERO_EVENT_EMBARKED),
         1,
         gpCurAIHero->m_remainingMobility,
-        gpCurAIHero->m_secondarySkills[0],
+        IDX(gpCurAIHero->m_secondarySkills[IDX(HERO_SKILL_PATHFINDING)]),
         -1,
         -1,
         0,
@@ -3173,7 +3174,7 @@ i32 philAI::StrategicValueOfPosition(
         IDX(eventFlags8),
         0,
         59999,
-        gpCurAIHero->m_secondarySkills[0],
+        IDX(gpCurAIHero->m_secondarySkills[IDX(HERO_SKILL_PATHFINDING)]),
         -1,
         -1,
         0,
@@ -3440,11 +3441,12 @@ i32 philAI::FightValueOfStack(
 
     if (useEnemyMods) {
         if (heroPtr->HasArtifact(ARTIFACT_BALLISTA) || heroPtr->HasSpell(SPELL_EARTHQUAKE)
-            || heroPtr->m_secondarySkills[IDX(HERO_SKILL_BALLISTICS)]) {
+            || heroPtr->m_secondarySkills[IDX(HERO_SKILL_BALLISTICS)]
+                   != HERO_SKILL_LEVEL_NONE) {
             enemyMeleeModifierIndex = 1.05f;
             enemyFlyingModifier36 = 0.95f;
         }
-        if (heroPtr->m_secondarySkills[IDX(HERO_SKILL_ARCHERY)]
+        if (heroPtr->m_secondarySkills[IDX(HERO_SKILL_ARCHERY)] != HERO_SKILL_LEVEL_NONE
             || heroPtr->HasArtifact(ARTIFACT_GOLDEN_BOW))
             enemyRangedModifier27 = 1.05f;
     }
@@ -3522,10 +3524,13 @@ i32 philAI::FightValueOfStack(
                 }
                 if (HAS(gMonsterDatabase[IDX(group->m_creatureTypes[armySlotRecord])].attributes,
                         MONSTER_ATTRIBUTE_RANGED)
-                    && heroPtr && heroPtr->m_secondarySkills[IDX(HERO_SKILL_ARCHERY)]) {
+                    && heroPtr
+                    && heroPtr->m_secondarySkills[IDX(HERO_SKILL_ARCHERY)]
+                           != HERO_SKILL_LEVEL_NONE) {
                     stackValueMap = static_cast<i32>(
                         stackValueMap
-                        * gfSSAIArcheryMod[heroPtr->m_secondarySkills[IDX(HERO_SKILL_ARCHERY)]]
+                        * gfSSAIArcheryMod
+                            [IDX(heroPtr->m_secondarySkills[IDX(HERO_SKILL_ARCHERY)])]
                     );
                 }
                 if (useEnemyMods) {
@@ -3874,10 +3879,10 @@ i32 philAI::QuickCombat(
     DamageGroup(attacker, attackerHero, defenderHero, attackerDamage);
     DamageGroup(defender, defenderHero, attackerHero, defenderDamage);
 
-    if (attackerWon2 != 0 && attackerHero->GetSSLevel(IDX(HERO_SKILL_NECROMANCY)) != 0) {
+    if (attackerWon2 != 0 && attackerHero->GetSSLevel(HERO_SKILL_NECROMANCY) != 0) {
         necromancyCount6 = static_cast<i32>(
             static_cast<float>(defenderTroopCount1)
-            * static_cast<float>(attackerHero->GetSSLevel(IDX(HERO_SKILL_NECROMANCY)))
+            * static_cast<float>(attackerHero->GetSSLevel(HERO_SKILL_NECROMANCY))
             * AI_QUICK_COMBAT_NECROMANCY_FACTOR
         );
         if (necromancyCount6 <= 0)
@@ -3885,10 +3890,10 @@ i32 philAI::QuickCombat(
         attackerHero->m_army
             .Add(CREATURE_SKELETON, necromancyCount6, CREATURE_PURCHASE_NO_SLOT);
     } else if (defenderHero != NULL && defenderDamage <= AI_QUICK_COMBAT_NECROMANCY_THRESHOLD
-               && defenderHero->GetSSLevel(IDX(HERO_SKILL_NECROMANCY)) != 0) {
+               && defenderHero->GetSSLevel(HERO_SKILL_NECROMANCY) != 0) {
         necromancyCount6 = static_cast<i32>(
             static_cast<float>(attackerTroopCount5)
-            * static_cast<float>(defenderHero->GetSSLevel(IDX(HERO_SKILL_NECROMANCY)))
+            * static_cast<float>(defenderHero->GetSSLevel(HERO_SKILL_NECROMANCY))
             * AI_QUICK_COMBAT_NECROMANCY_FACTOR
         );
         if (necromancyCount6 <= 0)
@@ -3906,13 +3911,15 @@ i32 philAI::QuickCombat(
         defeatedHero5 = attackerHero;
         victoriousHero4 = defenderHero;
     }
-    if (defeatedHero5 != NULL && defeatedHero5->m_secondarySkills[IDX(HERO_SKILL_EAGLE_EYE)] != 0
+    if (defeatedHero5 != NULL
+        && defeatedHero5->m_secondarySkills[IDX(HERO_SKILL_EAGLE_EYE)]
+               != HERO_SKILL_LEVEL_NONE
         && victoriousHero4 != NULL) {
         for (armyIndex0 = 0; armyIndex0 < IDX(SPELL_COUNT); armyIndex0++) {
             if (defeatedHero5->HasSpell(SpellType(armyIndex0)) != 0
                 && victoriousHero4->HasSpell(SpellType(armyIndex0)) == 0
                 && gsSpellInfo[armyIndex0].level
-                       <= victoriousHero4->m_secondarySkills[IDX(HERO_SKILL_EAGLE_EYE)] + 1
+                       <= IDX(victoriousHero4->m_secondarySkills[IDX(HERO_SKILL_EAGLE_EYE)]) + 1
                 && HAS(gsSpellInfo[armyIndex0].attributes, SPELL_INFO_ATTRIBUTE_COMBAT)) {
                 victoriousHero4->m_spells[armyIndex0] = 1;
                 break;
@@ -3977,10 +3984,10 @@ void philAI::HeroInteractionAtHero(
             for (statIndex8 = 0; statIndex8 < AI_BATTLE_ARTIFACT_SLOT_COUNT; statIndex8++) {
                 if (statIndex8 == IDX(HERO_SKILL_ESTATES))
                     continue;
-                if (currentHero9->m_secondarySkills[statIndex8] != IDX(HERO_SKILL_LEVEL_NONE)) {
+                if (currentHero9->m_secondarySkills[statIndex8] != HERO_SKILL_LEVEL_NONE) {
                     heroValues27[heroIndex9] +=
                         gSSValues[statIndex8]
-                                 [currentHero9->m_secondarySkills[statIndex8]
+                                 [IDX(currentHero9->m_secondarySkills[statIndex8])
                                   - SECONDARY_SKILL_LEVEL_OFFSET];
                 }
             }
@@ -4150,7 +4157,7 @@ void philAI::HeroInteractionAtTown(hero* heroPtr, town* townPtr, i32 doInteracti
         *value += ManaRefreshValue(heroPtr, 1);
         for (spellLevel14 = 1;
              spellLevel14
-             <= heroPtr->m_secondarySkills[IDX(HERO_SKILL_WISDOM)]
+             <= IDX(heroPtr->m_secondarySkills[IDX(HERO_SKILL_WISDOM)])
                     + WISDOM_SPELL_LEVEL_BONUS;
              spellLevel14++) {
             for (spellIndex = 0; spellIndex < townPtr->m_spellCounts[spellLevel14 - 1];
@@ -5145,7 +5152,7 @@ VA(0x00443ec5, 0x59)
 i32 philAI::ComputeValueOfFreeSS(
     hero* h, H2_ENUM_PARAM(HeroSecondarySkill, i32) skill
 ) {
-    if (h->m_secondarySkills[IDX(skill)] != 0
+    if (h->m_secondarySkills[IDX(skill)] != HERO_SKILL_LEVEL_NONE
         || h->m_secondarySkillCount >= HERO_SECONDARY_SKILL_CAPACITY)
         return 0;
     else
@@ -5323,7 +5330,7 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                     && gpCurAIHero->HasArtifact(ARTIFACT_MAGIC_BOOK)
                     && !gpCurAIHero->HasSpell(SpellType(cell_k->m_objectMetadata - 1))) {
                     if (gsSpellInfo[cell_k->m_objectMetadata - 1].level
-                        <= gpCurAIHero->m_secondarySkills[IDX(HERO_SKILL_WISDOM)]
+                        <= IDX(gpCurAIHero->m_secondarySkills[IDX(HERO_SKILL_WISDOM)])
                                + WISDOM_SPELL_LEVEL_BONUS) {
                         value_h = gsSpellInfo[cell_k->m_objectMetadata - 1].aiValue;
                         if (HAS(gsSpellInfo[cell_k->m_objectMetadata - 1].attributes,
@@ -5722,7 +5729,9 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                     value_h = 0;
                 else {
                     if (gpCurAIHero->m_level
-                                + gpCurAIHero->m_secondarySkills[IDX(HERO_SKILL_DIPLOMACY)] * 2
+                                + IDX(gpCurAIHero->m_secondarySkills
+                                          [IDX(HERO_SKILL_DIPLOMACY)])
+                                      * 2
                             >= 10)
                         value_h =
                             static_cast<i32>(gpCurAIHero->m_aiFightValue * AI_XANADU_VALUE_FACTOR);
@@ -6117,13 +6126,15 @@ i32 philAI::EvaluateArtifactEvent(ArtifactType artifact, i32 eventData) {
                 result5 = defaultValue37;
                 break;
             case AI_ARTIFACT_EVENT_REQUIRES_WISDOM:
-                if (gpCurAIHero->m_secondarySkills[IDX(HERO_SKILL_WISDOM)] != 0)
+                if (gpCurAIHero->m_secondarySkills[IDX(HERO_SKILL_WISDOM)]
+                    != HERO_SKILL_LEVEL_NONE)
                     result5 = defaultValue37;
                 else
                     result5 = 0;
                 break;
             case AI_ARTIFACT_EVENT_REQUIRES_LEADERSHIP:
-                if (gpCurAIHero->m_secondarySkills[IDX(HERO_SKILL_LEADERSHIP)] != 0)
+                if (gpCurAIHero->m_secondarySkills[IDX(HERO_SKILL_LEADERSHIP)]
+                    != HERO_SKILL_LEVEL_NONE)
                     result5 = defaultValue37;
                 else
                     result5 = 0;
@@ -6324,7 +6335,7 @@ i32 philAI::EvaluateMonsterEvent(CreatureType monsterType, i32 eventData, i32* l
             + outcomeValue0 * AI_MONSTER_JOIN_OUTCOME_WEIGHT
         );
     } else if (strengthRatio26 > AI_MONSTER_OVERWHELMING_RATIO) {
-        if (gpCurAIHero->GetSSLevel(IDX(HERO_SKILL_NECROMANCY)) != 0)
+        if (gpCurAIHero->GetSSLevel(HERO_SKILL_NECROMANCY) != 0)
             // Necromancy's overwhelming-fight premium is retail AI policy.
             result5 = 120; // NOLINT(readability-magic-numbers)
         else

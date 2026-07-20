@@ -14,6 +14,7 @@ H2_ENUM_CLASS_BEGIN(HeroSpellType)
 H2_ENUM_CLASS_END(HeroSpellType)
 
 H2_ENUM_CLASS_BEGIN(HeroSecondarySkill)
+    HERO_SKILL_NONE        = -1,
     HERO_SKILL_PATHFINDING = 0,
     HERO_SKILL_ARCHERY     = 1,
     HERO_SKILL_LOGISTICS   = 2,
@@ -30,6 +31,7 @@ H2_ENUM_CLASS_BEGIN(HeroSecondarySkill)
     HERO_SKILL_ESTATES     = 13,
     HERO_SKILL_COUNT       = 14
 H2_ENUM_CLASS_END(HeroSecondarySkill)
+H2_ENUM_STEPPED(HeroSecondarySkill)
 
 H2_ENUM_CLASS_BEGIN(HeroSkillLevel)
     HERO_SKILL_LEVEL_NONE     = 0,
@@ -79,7 +81,6 @@ H2_ENUM_BEGIN(HeroConstant)
     HERO_SECONDARY_SKILL_ICON_STRIDE          = 3,
     HERO_SECONDARY_SKILL_ORDER_BASE           = 1,
     HERO_SECONDARY_SKILL_ICON_FRAME_BASE      = 1,
-    HERO_SECONDARY_SKILL_NONE                 = -1,
     HERO_MINIMUM_SPELL_POWER                  = 1,
     HERO_SPELL_POINTS_PER_KNOWLEDGE           = 10,
     HERO_NECROMANCY_BONUS_MAX                 = 6,
@@ -179,7 +180,7 @@ public:
     u8 m_randomSeed;
     u8 m_enabled;
     class armyGroup m_army;
-    i8 m_secondarySkills[IDX(HERO_SKILL_COUNT)];
+    H2_ENUM_STORAGE_STEPPED(HeroSkillLevel, i8) m_secondarySkills[IDX(HERO_SKILL_COUNT)];
     u8 m_secondarySkillOrder[IDX(HERO_SKILL_COUNT)];
     i32 m_secondarySkillCount;
     i8 m_spells[IDX(SPELL_COUNT)];
@@ -214,18 +215,20 @@ public:
     void ApplyBattleLossTemps(void);
     void CheckLevel(void);
     i32 NumArtifacts(void);
-    void SetSS(i32, i32);
-    i32 TakeSS(i32, i32);
-    i32 GiveSS(i32, i32);
+    void SetSS(
+        H2_ENUM_PARAM(HeroSecondarySkill, i32), H2_ENUM_PARAM(HeroSkillLevel, i32)
+    );
+    i32 TakeSS(H2_ENUM_PARAM(HeroSecondarySkill, i32), i32);
+    i32 GiveSS(H2_ENUM_PARAM(HeroSecondarySkill, i32), i32);
     i32 CreatureTypeCount(H2_ENUM_PARAM(CreatureType, i32));
     void UpgradeCreatures(
         H2_ENUM_PARAM(CreatureType, i32), H2_ENUM_PARAM(CreatureType, i32)
     );
-    i32 GetNthSS(i32);
+    HeroSecondarySkill GetNthSS(i32);
     class town* GetOccupiedTown(void);
     i8 Stats(HeroPrimaryStat);
-    i8 GetSSLevel(i32);
-    void DoSSLevelDialog(i32, i32);
+    i8 GetSSLevel(H2_ENUM_PARAM(HeroSecondarySkill, i32));
+    void DoSSLevelDialog(H2_ENUM_PARAM(HeroSecondarySkill, i32), i32);
     void CheckAnduranPieces(i32);
 };
 #pragma pack(pop)

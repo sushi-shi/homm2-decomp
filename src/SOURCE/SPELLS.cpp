@@ -658,11 +658,12 @@ void combatManager::CastSpell(
     if (castByCreature == 0 && m_eagleEyeSpell[1 - m_currentSide] == -1
         && m_heroes[1 - m_currentSide] != NULL && !m_heroes[1 - m_currentSide]->HasSpell(spell)
         && m_heroes[1 - m_currentSide]->m_secondarySkills[IDX(HERO_SKILL_EAGLE_EYE)]
-               != IDX(HERO_SKILL_LEVEL_NONE)
-        && m_heroes[1 - m_currentSide]->m_secondarySkills[IDX(HERO_SKILL_EAGLE_EYE)] + 1
+               != HERO_SKILL_LEVEL_NONE
+        && IDX(m_heroes[1 - m_currentSide]->m_secondarySkills[IDX(HERO_SKILL_EAGLE_EYE)]) + 1
                >= gsSpellInfo[IDX(spell)].level) {
         if (SRandom(0, SPELL_EAGLE_EYE_ROLL_MAX)
-            <= m_heroes[1 - m_currentSide]->m_secondarySkills[IDX(HERO_SKILL_EAGLE_EYE)]) {
+            <= IDX(m_heroes[1 - m_currentSide]
+                       ->m_secondarySkills[IDX(HERO_SKILL_EAGLE_EYE)])) {
             m_eagleEyeSpell[1 - m_currentSide] = static_cast<i16>(spell);
         }
     }

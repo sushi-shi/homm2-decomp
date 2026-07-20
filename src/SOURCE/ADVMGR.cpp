@@ -425,17 +425,17 @@ H2_ENUM_BEGIN(AdventureSearchConstant)
 H2_ENUM_END(AdventureSearchConstant)
 
 H2_ENUM_BEGIN(AdventureComboDrawConstant)
-    COMBO_VIEW_CELLS        = VIEW_CELL_COUNT,
-    COMBO_GRID_CELLS        = 18,
-    COMBO_CLEAR_BYTES       = 256,
-    COMBO_CLOUD_MARK        = 10,
-    COMBO_FRAME_LIMIT       = 12,
-    COMBO_HERO_PANEL_LEFT   = 5,
-    COMBO_HERO_PANEL_RIGHT  = 10,
-    COMBO_HERO_PANEL_TOP    = 6,
-    COMBO_HERO_PANEL_BOTTOM = 9,
-    COMBO_UPDATE_MIN        = 16,
-    COMBO_UPDATE_MAX        = 463,
+    COMBO_VIEW_CELLS          = VIEW_CELL_COUNT,
+    COMBO_GRID_CELLS          = 18,
+    COMBO_CLEAR_BYTES         = 256,
+    COMBO_CLOUD_MARK          = 10,
+    COMBO_FRAME_LIMIT         = 12,
+    COMBO_HERO_PANEL_LEFT     = 5,
+    COMBO_HERO_PANEL_RIGHT    = 10,
+    COMBO_HERO_PANEL_TOP      = 6,
+    COMBO_HERO_PANEL_BOTTOM   = 9,
+    COMBO_UPDATE_MIN          = 16,
+    COMBO_UPDATE_MAX          = 463,
     COMBO_FAR_NEIGHBOR_OFFSET = 2,
 H2_ENUM_END(AdventureComboDrawConstant)
 
@@ -495,24 +495,24 @@ H2_ENUM_BEGIN(AdventureArmySizeBand)
 H2_ENUM_END(AdventureArmySizeBand)
 
 H2_ENUM_BEGIN(AdventureArmyQuickViewConstant)
-    ARMY_QUICK_SLOT_COUNT              = ARMY_GROUP_SLOT_COUNT,
-    ARMY_QUICK_ICON_SIZE               = 32,
-    ARMY_QUICK_ICON_BASELINE           = 30,
-    ARMY_QUICK_AREA_LEFT               = 22,
-    ARMY_QUICK_CENTER_DIVISOR          = 2,
-    ARMY_QUICK_WIDGET_FLAGS            = 16,
-    ARMY_QUICK_LABEL_HEIGHT            = 12,
-    ARMY_QUICK_FIRST_ROW_SHIFT         = 22,
-    ARMY_QUICK_SECOND_ROW_SHIFT        = 44,
-    ARMY_QUICK_SECOND_ROW_ICON_SHIFT   = 6,
-    ARMY_QUICK_FIRST_ROW_COUNT         = 2,
-    ARMY_QUICK_TOP_ROW_MAX             = 3,
-    ARMY_QUICK_FOUR_STACK_COUNT        = 4,
-    ARMY_QUICK_FIVE_STACK_COUNT        = ARMY_GROUP_SLOT_COUNT,
-    ARMY_QUICK_FIVE_STACK_X_SHIFT      = 12,
-    ARMY_QUICK_EMPTY_SLOT              = -1,
-    ARMY_QUICK_TEXT_WIDTH              = 60,
-    ARMY_QUICK_TEXT_X_ADJUSTMENT       = 14
+    ARMY_QUICK_SLOT_COUNT            = ARMY_GROUP_SLOT_COUNT,
+    ARMY_QUICK_ICON_SIZE             = 32,
+    ARMY_QUICK_ICON_BASELINE         = 30,
+    ARMY_QUICK_AREA_LEFT             = 22,
+    ARMY_QUICK_CENTER_DIVISOR        = 2,
+    ARMY_QUICK_WIDGET_FLAGS          = 16,
+    ARMY_QUICK_LABEL_HEIGHT          = 12,
+    ARMY_QUICK_FIRST_ROW_SHIFT       = 22,
+    ARMY_QUICK_SECOND_ROW_SHIFT      = 44,
+    ARMY_QUICK_SECOND_ROW_ICON_SHIFT = 6,
+    ARMY_QUICK_FIRST_ROW_COUNT       = 2,
+    ARMY_QUICK_TOP_ROW_MAX           = 3,
+    ARMY_QUICK_FOUR_STACK_COUNT      = 4,
+    ARMY_QUICK_FIVE_STACK_COUNT      = ARMY_GROUP_SLOT_COUNT,
+    ARMY_QUICK_FIVE_STACK_X_SHIFT    = 12,
+    ARMY_QUICK_EMPTY_SLOT            = -1,
+    ARMY_QUICK_TEXT_WIDTH            = 60,
+    ARMY_QUICK_TEXT_X_ADJUSTMENT     = 14
 H2_ENUM_END(AdventureArmyQuickViewConstant)
 
 H2_ENUM_BEGIN(AdventureHeroQuickViewConstant)
@@ -535,59 +535,59 @@ H2_ENUM_BEGIN(AdventureHeroQuickViewConstant)
 H2_ENUM_END(AdventureHeroQuickViewConstant)
 
 H2_ENUM_BEGIN(AdventureTownQuickViewConstant)
-    TOWN_QUICK_ARMY_AREA_WIDTH        = 192,
-    TOWN_QUICK_FIRST_ROW_Y            = 76,
-    TOWN_QUICK_DEFAULT_WINDOW_X       = 328,
-    TOWN_QUICK_DEFAULT_WINDOW_Y       = 176,
-    TOWN_QUICK_WINDOW_TEXT            = 19,
-    TOWN_QUICK_NAME_WIDGET            = 1,
-    TOWN_QUICK_PORTRAIT_WIDGET        = 2,
-    TOWN_QUICK_PLAYER_COLOR_WIDGET    = 8,
-    TOWN_QUICK_TYPE_FRAME_BASE        = 9,
-    TOWN_QUICK_VILLAGE_FRAME_OFFSET   = 6,
-    TOWN_QUICK_KNOWN_MARKER_WIDGET    = 300,
-    TOWN_QUICK_EMPTY_LABEL_CAPACITY   = 20,
-    TOWN_QUICK_EMPTY_LABEL_X          = 13,
-    TOWN_QUICK_EMPTY_LABEL_Y          = 117,
-    TOWN_QUICK_EMPTY_LABEL_WIDTH      = 211,
-    TOWN_QUICK_ARMY_LABEL_CAPACITY    = 15,
-    TOWN_QUICK_INFORMATION_UNKNOWN    = 0,
-    TOWN_QUICK_INFORMATION_NAMES      = 1,
-    TOWN_QUICK_INFORMATION_ESTIMATES  = 2,
-    TOWN_QUICK_INFORMATION_EXACT      = 3,
-    TOWN_QUICK_DEBUG_INFORMATION      = 2
+    TOWN_QUICK_ARMY_AREA_WIDTH       = 192,
+    TOWN_QUICK_FIRST_ROW_Y           = 76,
+    TOWN_QUICK_DEFAULT_WINDOW_X      = 328,
+    TOWN_QUICK_DEFAULT_WINDOW_Y      = 176,
+    TOWN_QUICK_WINDOW_TEXT           = 19,
+    TOWN_QUICK_NAME_WIDGET           = 1,
+    TOWN_QUICK_PORTRAIT_WIDGET       = 2,
+    TOWN_QUICK_PLAYER_COLOR_WIDGET   = 8,
+    TOWN_QUICK_TYPE_FRAME_BASE       = 9,
+    TOWN_QUICK_VILLAGE_FRAME_OFFSET  = 6,
+    TOWN_QUICK_KNOWN_MARKER_WIDGET   = 300,
+    TOWN_QUICK_EMPTY_LABEL_CAPACITY  = 20,
+    TOWN_QUICK_EMPTY_LABEL_X         = 13,
+    TOWN_QUICK_EMPTY_LABEL_Y         = 117,
+    TOWN_QUICK_EMPTY_LABEL_WIDTH     = 211,
+    TOWN_QUICK_ARMY_LABEL_CAPACITY   = 15,
+    TOWN_QUICK_INFORMATION_UNKNOWN   = 0,
+    TOWN_QUICK_INFORMATION_NAMES     = 1,
+    TOWN_QUICK_INFORMATION_ESTIMATES = 2,
+    TOWN_QUICK_INFORMATION_EXACT     = 3,
+    TOWN_QUICK_DEBUG_INFORMATION     = 2
 H2_ENUM_END(AdventureTownQuickViewConstant)
 
 H2_ENUM_BEGIN(AdventureBottomHeroViewConstant)
-    BOTTOM_HERO_VIEW_ID          = 3,
-    BOTTOM_HERO_ARMY_SLOTS       = ARMY_GROUP_SLOT_COUNT,
-    BOTTOM_HERO_EMPTY_SLOT       = -1,
-    BOTTOM_HERO_LABEL_BYTES      = 6,
-    BOTTOM_HERO_MAX_FULL_COUNT   = 1999,
-    BOTTOM_HERO_COUNT_DIVISOR    = 1000,
-    BOTTOM_HERO_PANEL_X          = 480,
-    BOTTOM_HERO_PANEL_Y          = 392,
-    BOTTOM_HERO_PANEL_WIDTH      = 143,
-    BOTTOM_HERO_PANEL_HEIGHT     = 71,
-    BOTTOM_HERO_ICON_WIDTH       = 32,
-    BOTTOM_HERO_ICON_HEIGHT      = 28,
-    BOTTOM_HERO_LABEL_HEIGHT     = 12,
-    BOTTOM_HERO_LABEL_Y_OFFSET   = 25,
-    BOTTOM_HERO_TOP_LABEL_SHIFT  = 2,
-    BOTTOM_HERO_TOP_MIN_HEIGHT   = 35,
-    BOTTOM_HERO_LOWER_MIN_HEIGHT = 37,
-    BOTTOM_HERO_GROUP_WIDTH      = 45,
-    BOTTOM_HERO_CHARACTER_WIDTH  = 5,
+    BOTTOM_HERO_VIEW_ID                   = 3,
+    BOTTOM_HERO_ARMY_SLOTS                = ARMY_GROUP_SLOT_COUNT,
+    BOTTOM_HERO_EMPTY_SLOT                = -1,
+    BOTTOM_HERO_LABEL_BYTES               = 6,
+    BOTTOM_HERO_MAX_FULL_COUNT            = 1999,
+    BOTTOM_HERO_COUNT_DIVISOR             = 1000,
+    BOTTOM_HERO_PANEL_X                   = 480,
+    BOTTOM_HERO_PANEL_Y                   = 392,
+    BOTTOM_HERO_PANEL_WIDTH               = 143,
+    BOTTOM_HERO_PANEL_HEIGHT              = 71,
+    BOTTOM_HERO_ICON_WIDTH                = 32,
+    BOTTOM_HERO_ICON_HEIGHT               = 28,
+    BOTTOM_HERO_LABEL_HEIGHT              = 12,
+    BOTTOM_HERO_LABEL_Y_OFFSET            = 25,
+    BOTTOM_HERO_TOP_LABEL_SHIFT           = 2,
+    BOTTOM_HERO_TOP_MIN_HEIGHT            = 35,
+    BOTTOM_HERO_LOWER_MIN_HEIGHT          = 37,
+    BOTTOM_HERO_GROUP_WIDTH               = 45,
+    BOTTOM_HERO_CHARACTER_WIDTH           = 5,
     BOTTOM_HERO_ABBREVIATED_LABEL_PADDING = 4,
-    BOTTOM_HERO_POSITION_COMPONENT_COUNT = 2,
-    BOTTOM_HERO_LAYOUT_SLOT_COUNT       = 8,
-    BOTTOM_HERO_ICON_POSITION_BYTES     = BOTTOM_HERO_LAYOUT_SLOT_COUNT
+    BOTTOM_HERO_POSITION_COMPONENT_COUNT  = 2,
+    BOTTOM_HERO_LAYOUT_SLOT_COUNT         = 8,
+    BOTTOM_HERO_ICON_POSITION_BYTES       = BOTTOM_HERO_LAYOUT_SLOT_COUNT
         * BOTTOM_HERO_POSITION_COMPONENT_COUNT,
-    BOTTOM_HERO_CREATURE_BOUND_COUNT    = 2,
-    BOTTOM_HERO_FIRST_ICON_ID    = 2002,
-    BOTTOM_HERO_FIRST_TEXT_ID    = 2101,
-    BOTTOM_HERO_WIDGET_FLAGS     = 16,
-    BOTTOM_HERO_TEXT_ALIGNMENT   = 0x200
+    BOTTOM_HERO_CREATURE_BOUND_COUNT      = 2,
+    BOTTOM_HERO_FIRST_ICON_ID             = 2002,
+    BOTTOM_HERO_FIRST_TEXT_ID             = 2101,
+    BOTTOM_HERO_WIDGET_FLAGS              = 16,
+    BOTTOM_HERO_TEXT_ALIGNMENT            = 0x200
 H2_ENUM_END(AdventureBottomHeroViewConstant)
 
 H2_ENUM_BEGIN(AdventureLocatorConstant)
@@ -695,7 +695,7 @@ H2_ENUM_BEGIN(AdventureBottomViewConstant)
     BOTTOM_VIEW_TEXT_BUFFER_SIZE  = 30,
     BOTTOM_VIEW_COUNT_BUFFER_SIZE = 8,
     BOTTOM_VIEW_WIDGET_CAPACITY   = 12,
-    BOTTOM_VIEW_CENTER_DIVISOR     = 2,
+    BOTTOM_VIEW_CENTER_DIVISOR    = 2,
     BOTTOM_VIEW_NO_ENEMY          = -1,
     BOTTOM_VIEW_NO_ANIMATION      = -1
 H2_ENUM_END(AdventureBottomViewConstant)
@@ -762,10 +762,10 @@ H2_ENUM_BEGIN(AdventureKingdomViewConstant)
 H2_ENUM_END(AdventureKingdomViewConstant)
 
 H2_ENUM_BEGIN(AdventureVisionsConstant)
-    VISIONS_RADIUS              = 3,
-    VISIONS_MONSTER_TRIGGER     = 0x98,
-    VISIONS_NO_MONSTER_DISTANCE = 100,
-    VISIONS_MESSAGE_BUFFER_SIZE = 200,
+    VISIONS_RADIUS               = 3,
+    VISIONS_MONSTER_TRIGGER      = 0x98,
+    VISIONS_NO_MONSTER_DISTANCE  = 100,
+    VISIONS_MESSAGE_BUFFER_SIZE  = 200,
     VISIONS_JOIN_COST_MULTIPLIER = 2
 H2_ENUM_END(AdventureVisionsConstant)
 
@@ -8300,7 +8300,7 @@ void advManager::TeleportTo(
         m_mapOriginX + TELEPORT_VIEW_CENTER,
         m_mapOriginY + TELEPORT_VIEW_CENTER,
         giCurPlayer,
-        giVisRange[mapHero->m_secondarySkills[IDX(HERO_SKILL_SCOUTING)]]
+        giVisRange[IDX(mapHero->m_secondarySkills[IDX(HERO_SKILL_SCOUTING)])]
             + (static_cast<u32>(mapHero->HasArtifact(ARTIFACT_TELESCOPE)) >= 1)
     );
 
@@ -8789,7 +8789,7 @@ void advManager::ShowRoute(i32 redraw, i32, i32 updateButton) {
                 giGroundToTerrain[nextCell7->m_terrainImageIndex],
                 direction & 1,
                 ROUTE_TERRAIN_COST_INFINITY,
-                currentHero0->m_secondarySkills[IDX(HERO_SKILL_PATHFINDING)],
+                IDX(currentHero0->m_secondarySkills[IDX(HERO_SKILL_PATHFINDING)]),
                 currentCell2->m_isRoad,
                 nextCell7->m_isRoad
             );
@@ -8797,7 +8797,7 @@ void advManager::ShowRoute(i32 redraw, i32, i32 updateButton) {
                 currentTerrain0,
                 direction & 1,
                 remainingMobility2,
-                currentHero0->m_secondarySkills[IDX(HERO_SKILL_PATHFINDING)],
+                IDX(currentHero0->m_secondarySkills[IDX(HERO_SKILL_PATHFINDING)]),
                 currentCell2->m_isRoad,
                 nextCell7->m_isRoad
             );
@@ -8956,7 +8956,7 @@ void advManager::SeedTo(i32 targetX, i32 targetY) {
             m_cursorType == HERO_TYPE_BOAT,
             0,
             currentHero->m_remainingMobility,
-            currentHero->m_secondarySkills[IDX(HERO_SKILL_PATHFINDING)],
+            IDX(currentHero->m_secondarySkills[IDX(HERO_SKILL_PATHFINDING)]),
             targetX,
             targetY,
             0,
@@ -8971,7 +8971,7 @@ void advManager::SeedTo(i32 targetX, i32 targetY) {
             m_cursorType == HERO_TYPE_BOAT,
             0,
             currentHero->m_remainingMobility,
-            currentHero->m_secondarySkills[IDX(HERO_SKILL_PATHFINDING)],
+            IDX(currentHero->m_secondarySkills[IDX(HERO_SKILL_PATHFINDING)]),
             targetX,
             targetY,
             1,
@@ -10530,12 +10530,12 @@ i32 advManager::DoVisions(hero* visionHero) {
             strcat(gText, visionMessageResult);
             goto showVision;
         } else if (visionHero->m_secondarySkills[IDX(HERO_SKILL_DIPLOMACY)]
-                   != MONSTER_DIPLOMACY_NONE) {
+                   != HERO_SKILL_LEVEL_NONE) {
             if (visionHero->m_secondarySkills[IDX(HERO_SKILL_DIPLOMACY)]
-                == MONSTER_DIPLOMACY_EXPERT) {
+                == HERO_SKILL_LEVEL_EXPERT) {
                 joiningCount = monsterCountIndex;
             } else if (visionHero->m_secondarySkills[IDX(HERO_SKILL_DIPLOMACY)]
-                       == MONSTER_DIPLOMACY_ADVANCED) {
+                       == HERO_SKILL_LEVEL_ADVANCED) {
                 joiningCount = monsterCountIndex / MONSTER_DIPLOMACY_ADVANCED_JOIN_DIVISOR;
             } else {
                 joiningCount = monsterCountIndex / MONSTER_DIPLOMACY_BASIC_JOIN_DIVISOR;

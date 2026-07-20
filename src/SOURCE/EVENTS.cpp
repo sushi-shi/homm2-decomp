@@ -958,7 +958,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_WITCH_HUT:
-            if (!eventHero2->m_secondarySkills[cell->m_objectMetadata]) {
+            if (eventHero2->m_secondarySkills[cell->m_objectMetadata]
+                == HERO_SKILL_LEVEL_NONE) {
                 if (eventHero2->m_secondarySkillCount < HERO_SECONDARY_SKILL_LIMIT) {
                     EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                     sprintf(
@@ -977,7 +978,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         0,
                         -1
                     );
-                    eventHero2->GiveSS(cell->m_objectMetadata, 1);
+                    eventHero2->GiveSS(
+                        static_cast<HeroSecondarySkill>(cell->m_objectMetadata), 1
+                    );
                 } else {
                     sprintf(
                         gText,
@@ -1704,7 +1707,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_XANADU:
             if (!(eventHero2->m_xanaduVisits & (1 << cell->m_objectMetadata))) {
                 if (eventHero2->m_level
-                        + eventHero2->m_secondarySkills[IDX(HERO_SKILL_DIPLOMACY)]
+                        + IDX(eventHero2->m_secondarySkills[IDX(HERO_SKILL_DIPLOMACY)])
                               * XANADU_DIPLOMACY_MULTIPLIER
                     < XANADU_ADMISSION_LEVEL) {
                     NormalDialog(
@@ -2566,7 +2569,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             if (!eventHero2->HasArtifact(ARTIFACT_MAGIC_BOOK)) {
                 strcat(gText, "Unfortunately, you have no Magic Book to record the spell with.");
                 EventWindow(-1, NORMAL_DIALOG_INFO, gText, -1, 0, -1, 0, -1);
-            } else if (eventHero2->m_secondarySkills[IDX(HERO_SKILL_WISDOM)] + SHRINE_WISDOM_BONUS
+            } else if (IDX(eventHero2->m_secondarySkills[IDX(HERO_SKILL_WISDOM)])
+                           + SHRINE_WISDOM_BONUS
                        < gsSpellInfo[eventValue1].level) {
                 strcat(
                     gText,
@@ -2779,7 +2783,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         break;
 
                     case ARTIFACT_EVENT_MODE_WISDOM:
-                        if (eventHero2->m_secondarySkills[IDX(HERO_SKILL_WISDOM)])
+                        if (eventHero2->m_secondarySkills[IDX(HERO_SKILL_WISDOM)]
+                            != HERO_SKILL_LEVEL_NONE)
                             goto artifactPickup;
                         sprintf(
                             gText,
@@ -2792,7 +2797,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         break;
 
                     case ARTIFACT_EVENT_MODE_LEADERSHIP:
-                        if (eventHero2->m_secondarySkills[IDX(HERO_SKILL_LEADERSHIP)])
+                        if (eventHero2->m_secondarySkills[IDX(HERO_SKILL_LEADERSHIP)]
+                            != HERO_SKILL_LEVEL_NONE)
                             goto artifactPickup;
                         sprintf(
                             gText,
@@ -3492,7 +3498,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             );
                             EventWindow(-1, NORMAL_DIALOG_INFO, eventText, -1, 0, -1, 0, -1);
                         } else if (eventHero2->m_secondarySkills[IDX(HERO_SKILL_WISDOM)]
-                                   < PYRAMID_WISDOM_REQUIRED) {
+                                   < HERO_SKILL_LEVEL_EXPERT) {
                             strcat(
                                 eventText,
                                 "  Unfortunately, you do not have the wisdom to understand the "
@@ -6318,7 +6324,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
         case MAP_OBJECT_XANADU:
             if ((eventHero->m_xanaduVisits & (1U << cell->m_objectMetadata)) == 0
                 && eventHero->m_level
-                           + eventHero->m_secondarySkills[IDX(HERO_SKILL_DIPLOMACY)]
+                           + IDX(eventHero->m_secondarySkills[IDX(HERO_SKILL_DIPLOMACY)])
                                  * XANADU_DIPLOMACY_MULTIPLIER
                        >= XANADU_ADMISSION_LEVEL) {
                 ++eventHero->m_primaryStats[IDX(HERO_PRIMARY_ATTACK)];
@@ -6561,7 +6567,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
         case MAP_OBJECT_SHRINE_THIRD_CIRCLE:
             if (eventHero->HasArtifact(ARTIFACT_MAGIC_BOOK)
                 && gsSpellInfo[cell->m_objectMetadata - 1].level
-                       <= eventHero->m_secondarySkills[IDX(HERO_SKILL_WISDOM)]
+                       <= IDX(eventHero->m_secondarySkills[IDX(HERO_SKILL_WISDOM)])
                               + WISDOM_SPELL_LEVEL_BONUS) {
                 eventHero->AddSpell(
                     cell->m_objectMetadata - 1,
@@ -6669,11 +6675,13 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                     }
                     break;
                 case ARTIFACT_EVENT_MODE_WISDOM:
-                    if (eventHero->m_secondarySkills[IDX(HERO_SKILL_WISDOM)] != 0)
+                    if (eventHero->m_secondarySkills[IDX(HERO_SKILL_WISDOM)]
+                        != HERO_SKILL_LEVEL_NONE)
                         goto artifactPickup;
                     break;
                 case ARTIFACT_EVENT_MODE_LEADERSHIP:
-                    if (eventHero->m_secondarySkills[IDX(HERO_SKILL_LEADERSHIP)] != 0)
+                    if (eventHero->m_secondarySkills[IDX(HERO_SKILL_LEADERSHIP)]
+                        != HERO_SKILL_LEVEL_NONE)
                         goto artifactPickup;
                     break;
                 case ARTIFACT_EVENT_MODE_RESOURCE_3:
@@ -7009,8 +7017,11 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_WITCH_HUT:
-            if (eventHero->m_secondarySkills[cell->m_objectMetadata] == 0)
-                eventHero->GiveSS(cell->m_objectMetadata, IDX(HERO_SKILL_LEVEL_BASIC));
+            if (eventHero->m_secondarySkills[cell->m_objectMetadata] == HERO_SKILL_LEVEL_NONE)
+                eventHero->GiveSS(
+                    static_cast<HeroSecondarySkill>(cell->m_objectMetadata),
+                    IDX(HERO_SKILL_LEVEL_BASIC)
+                );
             break;
 
         case MAP_OBJECT_MAGELLAN_MAPS:
@@ -7499,11 +7510,12 @@ void advManager::PlayerMonsterInteract(
                 goto fightMonsters;
             }
         } else if (eventHero->m_secondarySkills[IDX(HERO_SKILL_DIPLOMACY)]
-                   != MONSTER_DIPLOMACY_NONE) {
-            if (eventHero->m_secondarySkills[IDX(HERO_SKILL_DIPLOMACY)] == MONSTER_DIPLOMACY_EXPERT)
+                   != HERO_SKILL_LEVEL_NONE) {
+            if (eventHero->m_secondarySkills[IDX(HERO_SKILL_DIPLOMACY)]
+                == HERO_SKILL_LEVEL_EXPERT)
                 joining = monsterCount_n;
             else if (eventHero->m_secondarySkills[IDX(HERO_SKILL_DIPLOMACY)]
-                     == MONSTER_DIPLOMACY_ADVANCED)
+                     == HERO_SKILL_LEVEL_ADVANCED)
                 joining = monsterCount_n / MONSTER_DIPLOMACY_ADVANCED_JOIN_DIVISOR;
             else
                 joining = monsterCount_n / MONSTER_DIPLOMACY_BASIC_JOIN_DIVISOR;
@@ -7661,12 +7673,13 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
                 *handled = 1;
             }
         } else {
-            if (eventHero->m_secondarySkills[IDX(HERO_SKILL_DIPLOMACY)]) {
+            if (eventHero->m_secondarySkills[IDX(HERO_SKILL_DIPLOMACY)]
+                != HERO_SKILL_LEVEL_NONE) {
                 if (eventHero->m_secondarySkills[IDX(HERO_SKILL_DIPLOMACY)]
-                    == MONSTER_DIPLOMACY_EXPERT)
+                    == HERO_SKILL_LEVEL_EXPERT)
                     joiningCount = monsterCount[MONSTER_COMBAT_REMAINING_COUNT];
                 else if (eventHero->m_secondarySkills[IDX(HERO_SKILL_DIPLOMACY)]
-                         == MONSTER_DIPLOMACY_ADVANCED)
+                         == HERO_SKILL_LEVEL_ADVANCED)
                     joiningCount = monsterCount[MONSTER_COMBAT_REMAINING_COUNT]
                                    / MONSTER_DIPLOMACY_ADVANCED_JOIN_DIVISOR;
                 else
@@ -7716,14 +7729,14 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
             1
         );
         eventHero->CheckLevel();
-        if (eventHero->GetSSLevel(IDX(HERO_SKILL_NECROMANCY))
+        if (eventHero->GetSSLevel(HERO_SKILL_NECROMANCY)
             && eventHero->m_army.CanJoin(CREATURE_SKELETON)) {
             gpGame->GiveArmy(
                 &eventHero->m_army,
                 CREATURE_SKELETON,
                 static_cast<i32>(
                     static_cast<double>(monsterCount[MONSTER_COMBAT_REMAINING_COUNT])
-                    * eventHero->GetSSLevel(IDX(HERO_SKILL_NECROMANCY))
+                    * eventHero->GetSSLevel(HERO_SKILL_NECROMANCY)
                     * MONSTER_NECROMANCY_FRACTION
                 ),
                 -1

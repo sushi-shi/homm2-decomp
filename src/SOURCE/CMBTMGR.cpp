@@ -310,7 +310,7 @@ void combatManager::SetupCombat(
         }
         if (m_heroes[side] != NULL
             && m_heroes[side]->m_secondarySkills[IDX(HERO_SKILL_BALLISTICS)]
-                   >= IDX(HERO_SKILL_LEVEL_ADVANCED)) {
+                   >= HERO_SKILL_LEVEL_ADVANCED) {
             m_catapultAttackCount[side]++;
             m_catapultAttacksRemaining[side]++;
         }
@@ -1345,7 +1345,7 @@ void combatManager::CatAttack(i32 side) {
     i32 frame18;
 
     if (m_heroes[COMBAT_ATTACKER_SIDE]->m_secondarySkills[IDX(HERO_SKILL_BALLISTICS)]
-        == IDX(HERO_SKILL_LEVEL_NONE)) {
+        == HERO_SKILL_LEVEL_NONE) {
         firstRoll7 =
             SRandom(COMBAT_CATAPULT_BALLISTICS_ROLL_MIN, COMBAT_CATAPULT_BALLISTICS_ROLL_MAX);
         if (!gbHumanPlayer[m_heroes[COMBAT_ATTACKER_SIDE]->m_owner])
@@ -1357,7 +1357,7 @@ void combatManager::CatAttack(i32 side) {
             damageLevel13 = CATAPULT_DAMAGE_NONE;
         }
     } else if (m_heroes[COMBAT_ATTACKER_SIDE]->m_secondarySkills[IDX(HERO_SKILL_BALLISTICS)]
-               <= IDX(HERO_SKILL_LEVEL_ADVANCED)) {
+               <= HERO_SKILL_LEVEL_ADVANCED) {
         advancedRoll5 =
             SRandom(COMBAT_CATAPULT_BALLISTICS_ROLL_MIN, COMBAT_CATAPULT_BALLISTICS_ROLL_MAX);
         if (!gbHumanPlayer[m_heroes[COMBAT_ATTACKER_SIDE]->m_owner])
@@ -1365,7 +1365,7 @@ void combatManager::CatAttack(i32 side) {
         if (advancedRoll5 < COMBAT_CATAPULT_ADVANCED_DOUBLE_THRESHOLD)
             damageLevel13 = CATAPULT_DAMAGE_DOUBLE;
     } else if (m_heroes[COMBAT_ATTACKER_SIDE]->m_secondarySkills[IDX(HERO_SKILL_BALLISTICS)]
-               == IDX(HERO_SKILL_LEVEL_EXPERT)) {
+               == HERO_SKILL_LEVEL_EXPERT) {
         damageLevel13 = CATAPULT_DAMAGE_DOUBLE;
     }
 
@@ -2023,7 +2023,8 @@ i32 combatManager::ShotIsThroughWall(i32 side, i32 sourceHex, i32 targetHex) {
         return 0;
     if (m_heroes[side]
         && (m_heroes[side]->HasArtifact(ARTIFACT_GOLDEN_BOW)
-            || m_heroes[side]->m_secondarySkills[IDX(HERO_SKILL_ARCHERY)])) {
+            || m_heroes[side]->m_secondarySkills[IDX(HERO_SKILL_ARCHERY)]
+                   != HERO_SKILL_LEVEL_NONE)) {
         return 0;
     }
     if (InCastle(sourceHex) || !InCastle(targetHex))

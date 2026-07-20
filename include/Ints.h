@@ -132,6 +132,11 @@ public:
         return *this;
     }
 
+    H2SteppedEnumStorage& operator-=(i32 amount) {
+        m_value = static_cast<Storage>(m_value - amount);
+        return *this;
+    }
+
 private:
     Storage m_value;
 };

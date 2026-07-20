@@ -186,7 +186,7 @@ i32 swapManager::Open(i32 id) {
                 message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
                 message.payload.widget.id = side_6 * SECONDARY_SKILL_WIDGET_COUNT + skillSlot
                                             + CONTROL_LEFT_SKILL_FIRST;
-                message.payload.widget.data.value = m_heroes[side_6]->GetNthSS(skillSlot);
+                message.payload.widget.data.value = IDX(m_heroes[side_6]->GetNthSS(skillSlot));
                 m_window->BroadcastMessage(message);
 
                 message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
@@ -321,7 +321,7 @@ i32 swapManager::Main(tag_message& message) {
     SwapManagerSide side;
     i32 slotIndex_8;
     i32 artifactSlot_2;
-    i32 secondarySkill_1;
+    HeroSecondarySkill secondarySkill_1;
 
     switch (message.type) {
         case MESSAGE_RIGHT_BUTTON_DOWN:

@@ -249,7 +249,8 @@ i32 hero::CalcMobility(void) {
     if (HAS(m_eventFlags, HERO_EVENT_EMBARKED)) {
         mobilityResult = seaBaseMobilityCurrent;
         mobilityResult = static_cast<i32>(
-            mobilityResult * gfSSNavigationMod[m_secondarySkills[IDX(HERO_SKILL_NAVIGATION)]]
+            mobilityResult
+            * gfSSNavigationMod[IDX(m_secondarySkills[IDX(HERO_SKILL_NAVIGATION)])]
         );
         if (m_owner != -1)
             mobilityResult += gpGame->MineTypesOwned(m_owner, MINE_TYPE_LIGHTHOUSE)
@@ -268,7 +269,8 @@ i32 hero::CalcMobility(void) {
         }
         mobilityResult = landMobility[slowestSpeedValue];
         mobilityResult = static_cast<i32>(
-            mobilityResult * gfSSLogisticsMod[m_secondarySkills[IDX(HERO_SKILL_LOGISTICS)]]
+            mobilityResult
+            * gfSSLogisticsMod[IDX(m_secondarySkills[IDX(HERO_SKILL_LOGISTICS)])]
         );
         if (HasArtifact(ARTIFACT_NOMAD_BOOTS))
             mobilityResult += nomadBootsMobilityBonus;
@@ -770,12 +772,12 @@ void hero::CheckLevel(void) {
     i32 levelsGained;
     i32 newLevel;
     i32 attempts;
-    i32 skillChoicesResult[HERO_SECONDARY_SKILL_CHOICE_COUNT];
+    HeroSecondarySkill skillChoicesResult[HERO_SECONDARY_SKILL_CHOICE_COUNT];
     i32 highLevelIndex;
     i32 indexValue;
     SAMPLE2 sampleValue;
     i32 currentLevelIndex;
-    i32 skillIndexValue;
+    HeroSecondarySkill skillIndexValue;
     i32 randomValue;
     i32 skillWeightIndex;
 
@@ -831,51 +833,57 @@ void hero::CheckLevel(void) {
             }
 
             for (indexValue = 0; indexValue < HERO_SECONDARY_SKILL_CHOICE_COUNT; indexValue++) {
-                skillChoicesResult[indexValue] = HERO_SECONDARY_SKILL_NONE;
+                skillChoicesResult[indexValue] = HERO_SKILL_NONE;
                 if (indexValue == 0 && m_cursorType != FACTION_BARBARIAN
                     && m_cursorType != FACTION_KNIGHT
-                    && m_secondarySkills[IDX(HERO_SKILL_WISDOM)] < IDX(HERO_SKILL_LEVEL_EXPERT)
+                    && m_secondarySkills[IDX(HERO_SKILL_WISDOM)] < HERO_SKILL_LEVEL_EXPERT
                     && currentLevelIndex - m_enabled >= HERO_SECONDARY_SKILL_OFFER_GAP) {
-                    skillChoicesResult[indexValue] = IDX(HERO_SKILL_WISDOM);
+                    skillChoicesResult[indexValue] = HERO_SKILL_WISDOM;
                 } else {
                     attempts = 0;
                     skillWeightIndex = Random(0, HERO_SECONDARY_SKILL_RANDOM_WEIGHT);
-                    skillIndexValue = 0;
+                    skillIndexValue = HERO_SKILL_PATHFINDING;
                     while (attempts < HERO_SECONDARY_SKILL_SEARCH_LIMIT) {
                         attempts++;
                         if ((indexValue == 0 || skillChoicesResult[0] != skillIndexValue)
-                            && ((m_secondarySkills[skillIndexValue] != IDX(HERO_SKILL_LEVEL_NONE)
-                                 && m_secondarySkills[skillIndexValue]
-                                        < IDX(HERO_SKILL_LEVEL_EXPERT))
-                                || (m_secondarySkills[skillIndexValue] == IDX(HERO_SKILL_LEVEL_NONE)
+                            && ((m_secondarySkills[IDX(skillIndexValue)]
+                                     != HERO_SKILL_LEVEL_NONE
+                                 && m_secondarySkills[IDX(skillIndexValue)]
+                                        < HERO_SKILL_LEVEL_EXPERT)
+                                || (m_secondarySkills[IDX(skillIndexValue)]
+                                            == HERO_SKILL_LEVEL_NONE
                                     && m_secondarySkillCount < HERO_SECONDARY_SKILL_CAPACITY))) {
-                            skillWeightIndex -= iGetSSByAlignment[skillIndexValue][IDX(m_cursorType)];
+                            skillWeightIndex -=
+                                iGetSSByAlignment[IDX(skillIndexValue)][IDX(m_cursorType)];
                             if (skillWeightIndex <= 0) {
                                 skillChoicesResult[indexValue] = skillIndexValue;
                                 break;
                             }
                         }
-                        skillIndexValue = (skillIndexValue + 1) % IDX(HERO_SKILL_COUNT);
+                        ++skillIndexValue;
+                        if (skillIndexValue == HERO_SKILL_COUNT)
+                            skillIndexValue = HERO_SKILL_PATHFINDING;
                     }
                     attempts--;
                 }
             }
 
-            if (skillChoicesResult[0] == IDX(HERO_SKILL_WISDOM)
-                || skillChoicesResult[1] == IDX(HERO_SKILL_WISDOM)) {
+            if (skillChoicesResult[0] == HERO_SKILL_WISDOM
+                || skillChoicesResult[1] == HERO_SKILL_WISDOM) {
                 m_enabled = static_cast<u8>(currentLevelIndex);
             }
 
             if (!gbInNewGameSetup && m_owner >= 0 && gbThisNetHumanPlayer[m_owner]) {
                 sampleValue = LoadPlaySample(const_cast<char*>("nwherolv.82m"));
-                if (skillChoicesResult[0] == HERO_SECONDARY_SKILL_NONE) {
+                if (skillChoicesResult[0] == HERO_SKILL_NONE) {
                     NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
-                } else if (skillChoicesResult[1] == HERO_SECONDARY_SKILL_NONE) {
+                } else if (skillChoicesResult[1] == HERO_SKILL_NONE) {
                     sprintf(
                         line,
                         "\n\nYou have learned %s %s.",
-                        gSecondarySkillLevels[m_secondarySkills[skillChoicesResult[0]]],
-                        gSecondarySkills[skillChoicesResult[0]]
+                        gSecondarySkillLevels
+                            [IDX(m_secondarySkills[IDX(skillChoicesResult[0])])],
+                        gSecondarySkills[IDX(skillChoicesResult[0])]
                     );
                     strcat(gText, line);
                     NormalDialog(
@@ -884,8 +892,8 @@ void hero::CheckLevel(void) {
                         -1,
                         -1,
                         NORMAL_DIALOG_SECONDARY_SKILL,
-                        m_secondarySkills[skillChoicesResult[0]]
-                            + skillChoicesResult[0] * HERO_SECONDARY_SKILL_ICON_STRIDE,
+                        IDX(m_secondarySkills[IDX(skillChoicesResult[0])])
+                            + IDX(skillChoicesResult[0]) * HERO_SECONDARY_SKILL_ICON_STRIDE,
                         -1,
                         0,
                         -1,
@@ -896,10 +904,12 @@ void hero::CheckLevel(void) {
                     sprintf(
                         line,
                         "\n\nYou may learn either %s %s or %s %s.",
-                        gSecondarySkillLevels[m_secondarySkills[skillChoicesResult[0]]],
-                        gSecondarySkills[skillChoicesResult[0]],
-                        gSecondarySkillLevels[m_secondarySkills[skillChoicesResult[1]]],
-                        gSecondarySkills[skillChoicesResult[1]]
+                        gSecondarySkillLevels
+                            [IDX(m_secondarySkills[IDX(skillChoicesResult[0])])],
+                        gSecondarySkills[IDX(skillChoicesResult[0])],
+                        gSecondarySkillLevels
+                            [IDX(m_secondarySkills[IDX(skillChoicesResult[1])])],
+                        gSecondarySkills[IDX(skillChoicesResult[1])]
                     );
                     strcat(gText, line);
                     NormalDialog(
@@ -908,11 +918,11 @@ void hero::CheckLevel(void) {
                         -1,
                         -1,
                         NORMAL_DIALOG_SECONDARY_SKILL,
-                        m_secondarySkills[skillChoicesResult[0]]
-                            + skillChoicesResult[0] * HERO_SECONDARY_SKILL_ICON_STRIDE,
+                        IDX(m_secondarySkills[IDX(skillChoicesResult[0])])
+                            + IDX(skillChoicesResult[0]) * HERO_SECONDARY_SKILL_ICON_STRIDE,
                         NORMAL_DIALOG_SECONDARY_SKILL,
-                        m_secondarySkills[skillChoicesResult[1]]
-                            + skillChoicesResult[1] * HERO_SECONDARY_SKILL_ICON_STRIDE,
+                        IDX(m_secondarySkills[IDX(skillChoicesResult[1])])
+                            + IDX(skillChoicesResult[1]) * HERO_SECONDARY_SKILL_ICON_STRIDE,
                         -1,
                         0
                     );
@@ -922,10 +932,10 @@ void hero::CheckLevel(void) {
                         GiveSS(skillChoicesResult[1], 1);
                 }
             } else {
-                if (skillChoicesResult[0] != HERO_SECONDARY_SKILL_NONE) {
-                    if (skillChoicesResult[1] != HERO_SECONDARY_SKILL_NONE) {
-                        if (gSSValues[skillChoicesResult[1]][0]
-                            < gSSValues[skillChoicesResult[0]][0]) {
+                if (skillChoicesResult[0] != HERO_SKILL_NONE) {
+                    if (skillChoicesResult[1] != HERO_SKILL_NONE) {
+                        if (gSSValues[IDX(skillChoicesResult[1])][0]
+                            < gSSValues[IDX(skillChoicesResult[0])][0]) {
                             GiveSS(skillChoicesResult[0], 1);
                         } else {
                             GiveSS(skillChoicesResult[1], 1);
@@ -1140,8 +1150,10 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
                     gText,
                     cHeroScreen[IDX(TEXT_SECONDARY_SKILL)],
                     gSecondarySkillLevels
-                        [gpHVHero->m_secondarySkills[gpHVHero->GetNthSS(secondarySkillSlot)] - 1],
-                    gSecondarySkills[gpHVHero->GetNthSS(secondarySkillSlot)]
+                        [IDX(gpHVHero->m_secondarySkills
+                                 [IDX(gpHVHero->GetNthSS(secondarySkillSlot))])
+                         - 1],
+                    gSecondarySkills[IDX(gpHVHero->GetNthSS(secondarySkillSlot))]
                 );
                 break;
             }
@@ -1603,7 +1615,7 @@ void SetupHeroView(void) {
     i32 luck;
     i32 morale;
     i32 secondarySkillBonus;
-    i32 secondarySkill;
+    HeroSecondarySkill secondarySkill;
     tag_message statusMessage;
 
     cannotDismiss = gbNoDismiss;
@@ -1773,7 +1785,7 @@ void SetupHeroView(void) {
             secondarySkill = gpHVHero->GetNthSS(index);
             message.payload.widget.id = UI_SECONDARY_SKILL_ROW1_FIRST + index;
             message.payload.widget.command = HERO_UI_WIDGET_FRAME;
-            message.payload.widget.data.value = secondarySkill + 1;
+            message.payload.widget.data.value = IDX(secondarySkill) + 1;
             heroWin->BroadcastMessage(message);
             message.payload.widget.command = HERO_UI_WIDGET_ENABLE;
             message.payload.widget.id = UI_SECONDARY_SKILL_ROW2_FIRST + index;
@@ -1785,24 +1797,26 @@ void SetupHeroView(void) {
             heroWin->BroadcastMessage(message);
             message.payload.widget.command = HERO_UI_WIDGET_TEXT;
             message.payload.widget.id = UI_SECONDARY_SKILL_ROW2_FIRST + index;
-            message.payload.widget.data.text = gSecondarySkills[secondarySkill];
+            message.payload.widget.data.text = gSecondarySkills[IDX(secondarySkill)];
             heroWin->BroadcastMessage(message);
             message.payload.widget.command = HERO_UI_WIDGET_TEXT;
             message.payload.widget.id = UI_SECONDARY_SKILL_ROW3_FIRST + index;
-            secondarySkillBonus =
-                gpHVHero->GetSSLevel(secondarySkill) - gpHVHero->m_secondarySkills[secondarySkill];
+            secondarySkillBonus = gpHVHero->GetSSLevel(secondarySkill)
+                                  - IDX(gpHVHero->m_secondarySkills[IDX(secondarySkill)]);
             if (secondarySkillBonus > 0) {
                 sprintf(
                     gText,
                     "%s+%d",
-                    gSecondarySkillLevels[gpHVHero->m_secondarySkills[secondarySkill] - 1],
+                    gSecondarySkillLevels
+                        [IDX(gpHVHero->m_secondarySkills[IDX(secondarySkill)]) - 1],
                     secondarySkillBonus
                 );
             } else {
                 sprintf(
                     gText,
                     "%s",
-                    gSecondarySkillLevels[gpHVHero->m_secondarySkills[secondarySkill] - 1]
+                    gSecondarySkillLevels
+                        [IDX(gpHVHero->m_secondarySkills[IDX(secondarySkill)]) - 1]
                 );
             }
             message.payload.widget.data.text = gText;
@@ -1894,55 +1908,58 @@ void DoHeroSplit(i32 destinationSlot, i32 sourceSlot) {
 }
 
 VA(0x004701e1, 0x6a)
-void hero::SetSS(i32 skill, i32 level) {
-    if (level == IDX(HERO_SKILL_LEVEL_NONE))
+void hero::SetSS(
+    H2_ENUM_PARAM(HeroSecondarySkill, i32) skill,
+    H2_ENUM_PARAM(HeroSkillLevel, i32) level
+) {
+    if (level == HERO_SKILL_LEVEL_NONE)
         TakeSS(skill, IDX(HERO_SKILL_LEVEL_EXPERT));
-    else if (m_secondarySkills[skill] != IDX(HERO_SKILL_LEVEL_NONE))
-        m_secondarySkills[skill] = static_cast<i8>(level);
+    else if (m_secondarySkills[IDX(skill)] != HERO_SKILL_LEVEL_NONE)
+        m_secondarySkills[IDX(skill)] = level;
     else
-        GiveSS(skill, level);
+        GiveSS(skill, IDX(level));
 }
 
 VA(0x0047024b, 0xfa)
-i32 hero::TakeSS(i32 skill, i32 levels) {
-    i32 oldLevel;
+i32 hero::TakeSS(H2_ENUM_PARAM(HeroSecondarySkill, i32) skill, i32 levels) {
+    H2_ENUM_STORAGE(HeroSkillLevel, i32) oldLevel;
     i32 otherSkill;
 
-    oldLevel = m_secondarySkills[skill];
-    if (m_secondarySkills[skill] != IDX(HERO_SKILL_LEVEL_NONE)) {
-        m_secondarySkills[skill] -= levels;
-        if (m_secondarySkills[skill] < IDX(HERO_SKILL_LEVEL_NONE))
-            m_secondarySkills[skill] = IDX(HERO_SKILL_LEVEL_NONE);
-        if (m_secondarySkills[skill] == IDX(HERO_SKILL_LEVEL_NONE)) {
+    oldLevel = m_secondarySkills[IDX(skill)];
+    if (m_secondarySkills[IDX(skill)] != HERO_SKILL_LEVEL_NONE) {
+        m_secondarySkills[IDX(skill)] -= levels;
+        if (m_secondarySkills[IDX(skill)] < HERO_SKILL_LEVEL_NONE)
+            m_secondarySkills[IDX(skill)] = HERO_SKILL_LEVEL_NONE;
+        if (m_secondarySkills[IDX(skill)] == HERO_SKILL_LEVEL_NONE) {
             for (otherSkill = 0; otherSkill < IDX(HERO_SKILL_COUNT); otherSkill++) {
-                if (m_secondarySkillOrder[otherSkill] > m_secondarySkillOrder[skill]) {
+                if (m_secondarySkillOrder[otherSkill] > m_secondarySkillOrder[IDX(skill)]) {
                     m_secondarySkillOrder[otherSkill]--;
                 }
             }
-            m_secondarySkillOrder[skill] = 0;
+            m_secondarySkillOrder[IDX(skill)] = 0;
             m_secondarySkillCount--;
         }
     }
-    return oldLevel - m_secondarySkills[skill];
+    return IDX(oldLevel) - IDX(m_secondarySkills[IDX(skill)]);
 }
 
 VA(0x00470345, 0xbf)
-i32 hero::GiveSS(i32 skill, i32 levels) {
-    i32 oldLevel;
+i32 hero::GiveSS(H2_ENUM_PARAM(HeroSecondarySkill, i32) skill, i32 levels) {
+    H2_ENUM_STORAGE(HeroSkillLevel, i32) oldLevel;
 
-    oldLevel = m_secondarySkills[skill];
-    if (m_secondarySkills[skill] != IDX(HERO_SKILL_LEVEL_NONE)) {
-        m_secondarySkills[skill] += levels;
+    oldLevel = m_secondarySkills[IDX(skill)];
+    if (m_secondarySkills[IDX(skill)] != HERO_SKILL_LEVEL_NONE) {
+        m_secondarySkills[IDX(skill)] += levels;
     } else {
         if (m_secondarySkillCount < HERO_SECONDARY_SKILL_CAPACITY) {
-            m_secondarySkills[skill] = static_cast<i8>(levels);
+            m_secondarySkills[IDX(skill)] = static_cast<HeroSkillLevel>(levels);
             m_secondarySkillCount++;
-            m_secondarySkillOrder[skill] = static_cast<u8>(m_secondarySkillCount);
+            m_secondarySkillOrder[IDX(skill)] = static_cast<u8>(m_secondarySkillCount);
         }
     }
-    if (m_secondarySkills[skill] > IDX(HERO_SKILL_LEVEL_EXPERT))
-        m_secondarySkills[skill] = IDX(HERO_SKILL_LEVEL_EXPERT);
-    return m_secondarySkills[skill] - oldLevel;
+    if (m_secondarySkills[IDX(skill)] > HERO_SKILL_LEVEL_EXPERT)
+        m_secondarySkills[IDX(skill)] = HERO_SKILL_LEVEL_EXPERT;
+    return IDX(m_secondarySkills[IDX(skill)]) - IDX(oldLevel);
 }
 
 VA(0x00470404, 0x6a)
@@ -1975,14 +1992,14 @@ void hero::UpgradeCreatures(
 }
 
 VA(0x004704cc, 0x5e)
-i32 hero::GetNthSS(i32 ordinal) {
-    i32 skill;
+HeroSecondarySkill hero::GetNthSS(i32 ordinal) {
+    HeroSecondarySkill skill;
 
-    for (skill = 0; skill < IDX(HERO_SKILL_COUNT); skill++) {
-        if (m_secondarySkillOrder[skill] == ordinal + HERO_SECONDARY_SKILL_ORDER_BASE)
+    for (skill = HERO_SKILL_PATHFINDING; skill < HERO_SKILL_COUNT; skill++) {
+        if (m_secondarySkillOrder[IDX(skill)] == ordinal + HERO_SECONDARY_SKILL_ORDER_BASE)
             return skill;
     }
-    return HERO_SECONDARY_SKILL_NONE;
+    return HERO_SKILL_NONE;
 }
 
 VA(0x0047052a, 0x51)
@@ -2001,12 +2018,12 @@ i8 hero::Stats(HeroPrimaryStat stat) {
 }
 
 VA(0x004705c2, 0xc3)
-i8 hero::GetSSLevel(i32 skill) {
+i8 hero::GetSSLevel(H2_ENUM_PARAM(HeroSecondarySkill, i32) skill) {
     i8 shrineAndArtifactBonus = 0;
     i8 level;
 
-    level = m_secondarySkills[skill];
-    if (skill != IDX(HERO_SKILL_NECROMANCY))
+    level = IDX(m_secondarySkills[IDX(skill)]);
+    if (skill != HERO_SKILL_NECROMANCY)
         return level;
     if (level == IDX(HERO_SKILL_LEVEL_NONE))
         return level;
@@ -2023,13 +2040,15 @@ i8 hero::GetSSLevel(i32 skill) {
 }
 
 VA(0x00470685, 0xf4)
-void hero::DoSSLevelDialog(i32 skill, i32 quickView) {
+void hero::DoSSLevelDialog(
+    H2_ENUM_PARAM(HeroSecondarySkill, i32) skill, i32 quickView
+) {
     i32 skillBonusValue;
     char* skillLevelText;
 
-    skillBonusValue = GetSSLevel(skill) - m_secondarySkills[skill];
+    skillBonusValue = GetSSLevel(skill) - IDX(m_secondarySkills[IDX(skill)]);
     if (skillBonusValue > 0) {
-        skillLevelText = gSecondarySkillLevels[m_secondarySkills[skill] - 1];
+        skillLevelText = gSecondarySkillLevels[IDX(m_secondarySkills[IDX(skill)]) - 1];
         sprintf(
             gText,
             "{%s Necromancy (+%d)}\n\n%s Necromancy (+%d) allows %d percent of the creatures "
@@ -2041,7 +2060,10 @@ void hero::DoSSLevelDialog(i32 skill, i32 quickView) {
             GetSSLevel(skill) * HERO_NECROMANCY_PERCENT_PER_LEVEL
         );
     } else {
-        sprintf(gText, cSecSkillDesc[skill][m_secondarySkills[skill] - 1]);
+        sprintf(
+            gText,
+            cSecSkillDesc[IDX(skill)][IDX(m_secondarySkills[IDX(skill)]) - 1]
+        );
     }
     NormalDialog(
         gText,
@@ -2049,7 +2071,7 @@ void hero::DoSSLevelDialog(i32 skill, i32 quickView) {
         NORMAL_DIALOG_NO_RESOURCE,
         NORMAL_DIALOG_NO_VALUE,
         NORMAL_DIALOG_SECONDARY_SKILL,
-        m_secondarySkills[skill] + skill * HERO_SECONDARY_SKILL_ICON_STRIDE
+        IDX(m_secondarySkills[IDX(skill)]) + IDX(skill) * HERO_SECONDARY_SKILL_ICON_STRIDE
             - HERO_SECONDARY_SKILL_ICON_FRAME_BASE,
         NORMAL_DIALOG_NO_RESOURCE,
         0,
