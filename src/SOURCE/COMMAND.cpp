@@ -2113,10 +2113,10 @@ void combatManager::DoVictory(i32 winningSide) {
 
     if (winningSide != COMBAT_RESULT_DRAW && eligibleWinnerStacks < VICTORY_NECROMANCY_STACK_LIMIT
         && m_heroes[winningSide] != NULL
-        && m_heroes[winningSide]->GetSSLevel(IDX(HERO_SKILL_NECROMANCY)) != 0) {
+        && m_heroes[winningSide]->GetSSLevel(HERO_SKILL_NECROMANCY) != 0) {
         giSkeletonsCreated = static_cast<i32>(
             deadCreatureCount
-            * (m_heroes[winningSide]->GetSSLevel(IDX(HERO_SKILL_NECROMANCY))
+            * (m_heroes[winningSide]->GetSSLevel(HERO_SKILL_NECROMANCY)
                * COMBAT_NECROMANCY_LEVEL_FACTOR)
         );
         if (giSkeletonsCreated <= 0 && deadCreatureCount != 0)
@@ -2396,7 +2396,7 @@ i32 combatManager::DoSurrender(void) {
     giSurrenderCost = static_cast<i32>(
         giSurrenderCost
         * (1.0
-           - m_heroes[m_currentSide]->m_secondarySkills[IDX(HERO_SKILL_DIPLOMACY)]
+           - IDX(m_heroes[m_currentSide]->m_secondarySkills[IDX(HERO_SKILL_DIPLOMACY)])
                  * COMBAT_SURRENDER_DIPLOMACY_FACTOR)
     );
 

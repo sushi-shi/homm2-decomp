@@ -182,7 +182,6 @@ H2_ENUM_BEGIN(MapEventConstant)
     TREE_KNOWLEDGE_GEM_COST              = 10,
     DWELLING_GUARDED_FLAG                = 0x100,
     PYRAMID_GUARD_COUNT                  = 50,
-    PYRAMID_WISDOM_REQUIRED              = 3,
     SHRINE_WISDOM_BONUS                  = 2,
     EVENT_TEXT_BUFFER_SIZE               = 500,
     EVENT_TEXT_ALCHEMIST_CAPTURED        = 0,
@@ -282,10 +281,6 @@ H2_ENUM_END(FlotsamReward)
 H2_ENUM_BEGIN(MonsterInteractionConstant)
     MONSTER_JOIN_FORCED                     = 0x1000,
     MONSTER_COUNT_MASK                      = 0xfff,
-    MONSTER_DIPLOMACY_NONE                  = 0,
-    MONSTER_DIPLOMACY_BASIC                 = 1,
-    MONSTER_DIPLOMACY_ADVANCED              = 2,
-    MONSTER_DIPLOMACY_EXPERT                = 3,
     MONSTER_DIPLOMACY_ADVANCED_JOIN_DIVISOR = 2,
     MONSTER_DIPLOMACY_BASIC_JOIN_DIVISOR    = 4,
     MONSTER_DIALOG_YES                      = 0x7805,

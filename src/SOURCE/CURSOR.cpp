@@ -577,7 +577,7 @@ mapCell* advManager::MoveHero(
         currentTerrain_b,
         direction & 1,
         movingHero_f->m_remainingMobility,
-        movingHero_f->m_secondarySkills[IDX(HERO_SKILL_PATHFINDING)],
+        IDX(movingHero_f->m_secondarySkills[IDX(HERO_SKILL_PATHFINDING)]),
         currentCell_f->m_isRoad,
         destinationCell_j->m_isRoad
     );
@@ -585,7 +585,7 @@ mapCell* advManager::MoveHero(
         giGroundToTerrain[destinationCell_j->m_terrainImageIndex],
         0,
         movingHero_f->m_remainingMobility - terrainCost_e,
-        movingHero_f->m_secondarySkills[IDX(HERO_SKILL_PATHFINDING)],
+        IDX(movingHero_f->m_secondarySkills[IDX(HERO_SKILL_PATHFINDING)]),
         destinationCell_j->m_isRoad,
         1
     );
@@ -727,7 +727,7 @@ mapCell* advManager::MoveHero(
         m_mapOriginX + directionX_b + CURSOR_MAP_DRAW_OFFSET,
         m_mapOriginY + directionY_b + CURSOR_MAP_DRAW_OFFSET,
         giCurPlayer,
-        giVisRange[movingHero_f->m_secondarySkills[IDX(HERO_SKILL_SCOUTING)]]
+        giVisRange[IDX(movingHero_f->m_secondarySkills[IDX(HERO_SKILL_SCOUTING)])]
             + (movingHero_f->HasArtifact(CURSOR_VISIBILITY_ARTIFACT) != 0)
     );
     m_forceCompleteDraw = 1;

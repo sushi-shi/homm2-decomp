@@ -959,7 +959,10 @@ void game::InitCampaignMap(void) {
         case CAMPAIGN_CHOICE_SECONDARY_SKILL:
             if (m_players[0].m_heroCount > 0)
                 gpGame->GetHero(m_players[0].m_heroIds[0])
-                    ->SetSS(choiceBest->value, choiceBest->amount);
+                    ->SetSS(
+                        static_cast<HeroSecondarySkill>(choiceBest->value),
+                        static_cast<HeroSkillLevel>(choiceBest->amount)
+                    );
             break;
         case CAMPAIGN_CHOICE_CREATURES:
             if (m_players[0].m_heroCount > 0)
