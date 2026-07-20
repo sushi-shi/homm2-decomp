@@ -69,17 +69,16 @@ H2_ENUM_BEGIN(AdventureScreenConstant)
 H2_ENUM_END(AdventureScreenConstant)
 
 H2_ENUM_BEGIN(AdventureDrawConstant)
-    CELL_PIXELS                = 32,
-    DRAW_VIEW_CELLS            = VIEW_CELL_COUNT,
-    DRAW_LAST_CELL             = VIEW_LAST_CELL,
-    DRAW_FORWARD_DIRECTION_MAX = 4,
-    DRAW_CLIP_WIDTH            = VIEWPORT_SIZE,
-    DRAW_CLIP_HEIGHT           = VIEWPORT_SIZE,
-    CLOUD_VARIANTS             = 4,
-    HERO_SHADOW_FRAME_END      = 36,
-    MINE_GUARDIAN_ICON_SLOT    = 10,
-    TILESET_MONSTER            = 20,
-    TILESET_BOAT               = 39
+    CELL_PIXELS             = 32,
+    DRAW_VIEW_CELLS         = VIEW_CELL_COUNT,
+    DRAW_LAST_CELL          = VIEW_LAST_CELL,
+    DRAW_CLIP_WIDTH         = VIEWPORT_SIZE,
+    DRAW_CLIP_HEIGHT        = VIEWPORT_SIZE,
+    CLOUD_VARIANTS          = 4,
+    HERO_SHADOW_FRAME_END   = 36,
+    MINE_GUARDIAN_ICON_SLOT = 10,
+    TILESET_MONSTER         = 20,
+    TILESET_BOAT            = 39
 H2_ENUM_END(AdventureDrawConstant)
 
 H2_ENUM_BEGIN(AdventureUpdateScreenConstant)
@@ -231,6 +230,12 @@ H2_ENUM_BEGIN(AdventureStateConstant)
     UNUSED_OBJECT_ICON_1       = 21,
     UNUSED_OBJECT_ICON_2       = 38
 H2_ENUM_END(AdventureStateConstant)
+
+H2_ENUM_BEGIN(AdventureMainConstant)
+    ADVENTURE_MAIN_CONTINUE           = 1,
+    ADVENTURE_MAIN_EXIT               = 2,
+    ADVENTURE_EVENT_CELL_RESULT_COUNT = 3
+H2_ENUM_END(AdventureMainConstant)
 
 H2_ENUM_BEGIN(AdventureRemoteWaitConstant)
     REMOTE_WAIT_EXIT_MODIFIER_MASK = 0x0c,
@@ -455,6 +460,9 @@ H2_ENUM_BEGIN(AdventureLocatorConstant)
     LOCATOR_HERO_KNOB_CONTROL         = 26,
     LOCATOR_TOWN_KNOB_CONTROL         = 27,
     LOCATOR_TOWN_IMAGE_BASE           = 16,
+    LOCATOR_TOWN_IMAGE_1              = LOCATOR_TOWN_IMAGE_BASE + 1,
+    LOCATOR_TOWN_IMAGE_2              = LOCATOR_TOWN_IMAGE_1 + 1,
+    LOCATOR_TOWN_IMAGE_3              = LOCATOR_TOWN_IMAGE_2 + 1,
     LOCATOR_TOWN_BORDER_BASE          = 32,
     LOCATOR_TOWN_FLAG_BASE            = 300,
     LOCATOR_SELECTED_COLOR            = 0x99,
@@ -1229,7 +1237,7 @@ class mapCell* advManager::DoAdvCommand(void) {
                 pathIndexLocal = gpSearchArray->m_pathLength - 1;
                 for (; pathIndexLocal >= 0; --pathIndexLocal) {
                     eventCellState = MoveHero(
-                        static_cast<u8>(
+                        static_cast<MapDirection>(
                             gpSearchArray->m_storage.path.directions[pathIndexLocal + 1]
                         ),
                         pathIndexLocal == 0,
@@ -1404,7 +1412,7 @@ i32 advManager::Main(struct tag_message& message) {
     if (gbGameOver) {
         message.type = MESSAGE_EXECUTIVE;
         message.payload.executive.command = EXECUTIVE_COMMAND_TERMINATE_LOOP;
-        return 2;
+        return ADVENTURE_MAIN_EXIT;
     }
 
     CheckHandleNet();
@@ -1414,7 +1422,7 @@ i32 advManager::Main(struct tag_message& message) {
     if (!gbHumanPlayer[giCurPlayer]) {
         gpPhilAI->DoAI(giCurPlayer);
         gpGame->NextPlayer();
-        return 1;
+        return ADVENTURE_MAIN_CONTINUE;
     }
     if (giScreenScroll && gbForegroundApp) {
         CheckScreenScroll();
@@ -1432,11 +1440,12 @@ i32 advManager::Main(struct tag_message& message) {
         );
     }
 
-    i32 processResult = 1;
+    i32 processResult = ADVENTURE_MAIN_CONTINUE;
     i32 exitRequestedFlag = 0;
-    mapCell* eventCellsResult[3]; // Retail reserves three result slots; only the first is used.
+    // Retail reserves three result slots; only the first is used.
+    mapCell* eventCellsResult[ADVENTURE_EVENT_CELL_RESULT_COUNT];
     eventCellsResult[0] = NULL;
-    i32 moveDirectionState;
+    MapDirection moveDirectionState;
     i32 cheatDigitLocal;
     i32 nextTownId;
     hero* currentHero;
@@ -1454,32 +1463,10 @@ i32 advManager::Main(struct tag_message& message) {
                     case WIDGET_COMMAND_ALTERNATE_SELECT: {
                         i32 helpIndexState;
                         if (message.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) {
-                            helpIndexState = -1;
-                            switch (message.payload.widget.id) {
-                                case PANEL_NEXT_HERO:
-                                    helpIndexState = 0;
-                                    break;
-                                case PANEL_CONTINUE_ROUTE:
-                                    helpIndexState = 1;
-                                    break;
-                                case PANEL_OVERVIEW:
-                                    helpIndexState = 2;
-                                    break;
-                                case PANEL_END_TURN:
-                                    helpIndexState = 3;
-                                    break;
-                                case PANEL_ADVENTURE_OPTIONS:
-                                    helpIndexState = 4;
-                                    break;
-                                case PANEL_CONTROL_OPTIONS:
-                                    helpIndexState = 5;
-                                    break;
-                                case PANEL_SYSTEM_OPTIONS:
-                                    helpIndexState = 6;
-                                    break;
-                                case PANEL_CAST_SPELL:
-                                    helpIndexState = 7;
-                                    break;
+                            helpIndexState = message.payload.widget.id - PANEL_NEXT_HERO;
+                            if (message.payload.widget.id < PANEL_NEXT_HERO
+                                || message.payload.widget.id > PANEL_CAST_SPELL) {
+                                helpIndexState = -1;
                             }
                             if (helpIndexState >= 0) {
                                 NormalDialog(
@@ -1508,7 +1495,7 @@ i32 advManager::Main(struct tag_message& message) {
             default:
                 break;
             case MESSAGE_KEY_DOWN:
-                moveDirectionState = -1;
+                moveDirectionState = MAP_DIRECTION_NONE;
                 if (gpCurPlayer->CurrentHero() != INVALID_HERO) {
                     currentHero = gpGame->GetHero(gpCurPlayer->m_currentHero);
                 } else {
@@ -1537,6 +1524,8 @@ i32 advManager::Main(struct tag_message& message) {
                         gpGame->CheckHeroConsistency();
                         break;
                     case INPUT_SCAN_F7:
+                        // Retail's debug command advances an opaque cheat-state payload.
+                        // NOLINTNEXTLINE(readability-magic-numbers)
                         gpCurPlayer->m_cheatValue += 12;
                         if (currentHero != NULL) {
                             GiveExperience(currentHero, CHEAT_EXPERIENCE_AMOUNT, 1);
@@ -1555,6 +1544,8 @@ i32 advManager::Main(struct tag_message& message) {
                             }
                         }
                         break;
+                    // Scan-code cases intentionally decode to their literal decimal digits.
+                    // NOLINTBEGIN(readability-magic-numbers)
                     case INPUT_SCAN_0:
                         cheatDigitLocal = 0;
                         goto process_cheat_digit;
@@ -1585,6 +1576,7 @@ i32 advManager::Main(struct tag_message& message) {
                     case INPUT_SCAN_9:
                         cheatDigitLocal = 9;
                         goto process_cheat_digit;
+                    // NOLINTEND(readability-magic-numbers)
                     process_cheat_digit: {
                         hero* cheatHero = NULL;
                         if (gpCurPlayer->CurrentHero() != INVALID_HERO) {
@@ -1613,11 +1605,11 @@ i32 advManager::Main(struct tag_message& message) {
                                 if (gbInCampaign) {
                                     gpGame->m_campaignCheated = 1;
                                 }
-                                CheckEndGame(1, 0);
+                                CheckEndGame(END_GAME_FORCE_VICTORY, false);
                             }
                             if (giCheatSeq % CHEAT_LOSE_MODULUS == CHEAT_LOSE) {
                                 gpGame->m_cheated = 1;
-                                CheckEndGame(2, 0);
+                                CheckEndGame(END_GAME_FORCE_DEFEAT, false);
                             }
                         }
                         if (giCheatSeq % CHEAT_SEQUENCE_MODULUS == CHEAT_REVEAL_MAP) {
@@ -1682,58 +1674,58 @@ i32 advManager::Main(struct tag_message& message) {
                     }
                     case INPUT_SCAN_NUMPAD_8:
                         if (message.payload.keyboard.modifiers & MESSAGE_MODIFIER_CONTROL_KEYS) {
-                            ScreenScroll(ADVMGR_SCROLL_NORTH, 0);
+                            ScreenScroll(MAP_DIRECTION_NORTH, 0);
                         } else {
-                            moveDirectionState = 0;
+                            moveDirectionState = MAP_DIRECTION_NORTH;
                         }
                         break;
                     case INPUT_SCAN_NUMPAD_9:
                         if (message.payload.keyboard.modifiers & MESSAGE_MODIFIER_CONTROL_KEYS) {
-                            ScreenScroll(ADVMGR_SCROLL_NORTH_EAST, 0);
+                            ScreenScroll(MAP_DIRECTION_NORTH_EAST, 0);
                         } else {
-                            moveDirectionState = 1;
+                            moveDirectionState = MAP_DIRECTION_NORTH_EAST;
                         }
                         break;
                     case INPUT_SCAN_NUMPAD_6:
                         if (message.payload.keyboard.modifiers & MESSAGE_MODIFIER_CONTROL_KEYS) {
-                            ScreenScroll(ADVMGR_SCROLL_EAST, 0);
+                            ScreenScroll(MAP_DIRECTION_EAST, 0);
                         } else {
-                            moveDirectionState = 2;
+                            moveDirectionState = MAP_DIRECTION_EAST;
                         }
                         break;
                     case INPUT_SCAN_NUMPAD_3:
                         if (message.payload.keyboard.modifiers & MESSAGE_MODIFIER_CONTROL_KEYS) {
-                            ScreenScroll(ADVMGR_SCROLL_SOUTH_EAST, 0);
+                            ScreenScroll(MAP_DIRECTION_SOUTH_EAST, 0);
                         } else {
-                            moveDirectionState = 3;
+                            moveDirectionState = MAP_DIRECTION_SOUTH_EAST;
                         }
                         break;
                     case INPUT_SCAN_NUMPAD_2:
                         if (message.payload.keyboard.modifiers & MESSAGE_MODIFIER_CONTROL_KEYS) {
-                            ScreenScroll(ADVMGR_SCROLL_SOUTH, 0);
+                            ScreenScroll(MAP_DIRECTION_SOUTH, 0);
                         } else {
-                            moveDirectionState = 4;
+                            moveDirectionState = MAP_DIRECTION_SOUTH;
                         }
                         break;
                     case INPUT_SCAN_NUMPAD_1:
                         if (message.payload.keyboard.modifiers & MESSAGE_MODIFIER_CONTROL_KEYS) {
-                            ScreenScroll(ADVMGR_SCROLL_SOUTH_WEST, 0);
+                            ScreenScroll(MAP_DIRECTION_SOUTH_WEST, 0);
                         } else {
-                            moveDirectionState = 5;
+                            moveDirectionState = MAP_DIRECTION_SOUTH_WEST;
                         }
                         break;
                     case INPUT_SCAN_NUMPAD_4:
                         if (message.payload.keyboard.modifiers & MESSAGE_MODIFIER_CONTROL_KEYS) {
-                            ScreenScroll(ADVMGR_SCROLL_WEST, 0);
+                            ScreenScroll(MAP_DIRECTION_WEST, 0);
                         } else {
-                            moveDirectionState = 6;
+                            moveDirectionState = MAP_DIRECTION_WEST;
                         }
                         break;
                     case INPUT_SCAN_NUMPAD_7:
                         if (message.payload.keyboard.modifiers & MESSAGE_MODIFIER_CONTROL_KEYS) {
-                            ScreenScroll(ADVMGR_SCROLL_NORTH_WEST, 0);
+                            ScreenScroll(MAP_DIRECTION_NORTH_WEST, 0);
                         } else {
-                            moveDirectionState = 7;
+                            moveDirectionState = MAP_DIRECTION_NORTH_WEST;
                         }
                         break;
                     case INPUT_SCAN_C:
@@ -1849,7 +1841,8 @@ i32 advManager::Main(struct tag_message& message) {
                         break;
                 }
 
-                if (gpCurPlayer->m_currentHero != INVALID_HERO && moveDirectionState >= 0) {
+                if (gpCurPlayer->m_currentHero != INVALID_HERO
+                    && moveDirectionState != MAP_DIRECTION_NONE) {
                     HideRoute(1, 1, 1);
                     gpMouseManager->HideColorPointer();
                     i32 movementChanged;
@@ -1890,7 +1883,7 @@ finish_message:
     if (gbGameOver || exitRequestedFlag == 1 || giMenuCommand != -1) {
         message.type = MESSAGE_EXECUTIVE;
         message.payload.executive.command = EXECUTIVE_COMMAND_TERMINATE_LOOP;
-        return 2;
+        return ADVENTURE_MAIN_EXIT;
     }
     return processResult;
 }
@@ -1944,9 +1937,9 @@ i32 advManager::ProcessSelect(struct tag_message* message, class mapCell** event
             break;
         }
         case LOCATOR_TOWN_IMAGE_BASE:
-        case LOCATOR_TOWN_IMAGE_BASE + 1:
-        case LOCATOR_TOWN_IMAGE_BASE + 2:
-        case LOCATOR_TOWN_IMAGE_BASE + 3: {
+        case LOCATOR_TOWN_IMAGE_1:
+        case LOCATOR_TOWN_IMAGE_2:
+        case LOCATOR_TOWN_IMAGE_3: {
             objectTypeState =
                 gpCurPlayer
                     ->m_townIds[gpCurPlayer->m_townLocatorPage + message->payload.widget.id
@@ -2143,6 +2136,8 @@ i32 advManager::ProcessSelect(struct tag_message* message, class mapCell** event
                 break;
             }
             DemobilizeCurrHero();
+            // These are retail's scale payloads for the four supported map dimensions.
+            // NOLINTBEGIN(readability-magic-numbers)
             switch (MAP_HEIGHT) {
                 case MAP_DIMENSION_SMALL:
                     radarScale = 4.0f;
@@ -2157,6 +2152,7 @@ i32 advManager::ProcessSelect(struct tag_message* message, class mapCell** event
                     radarScale = 1.0f;
                     break;
             }
+            // NOLINTEND(readability-magic-numbers)
             mouseX = static_cast<i32>((mouseX - RADAR_LEFT) / radarScale);
             mouseY = static_cast<i32>((mouseY - RADAR_TOP) / radarScale);
             m_mapOriginX = mouseX - VIEW_CENTER_CELL;
@@ -2301,7 +2297,7 @@ i32 advManager::ProcessDeSelect(
             if (gpCurPlayer->HasMobileHero()) {
                 NormalDialog(
                     "One or more heroes may still move, are you sure you want to end your turn?",
-                    2,
+                    NORMAL_DIALOG_CONFIRM,
                     -1,
                     -1,
                     -1,
@@ -2342,7 +2338,11 @@ i32 advManager::ProcessDeSelect(
                     1
                 );
                 if (gbLowMemory) {
-                    SetEnvironmentOrigin(m_mapOriginX + 7, m_mapOriginY + 7, 1);
+                    SetEnvironmentOrigin(
+                        m_mapOriginX + VIEW_CENTER_OFFSET,
+                        m_mapOriginY + VIEW_CENTER_OFFSET,
+                        1
+                    );
                 }
             } else if (giOverviewReturnAction == OVERVIEW_RETURN_TOWN) {
                 DemobilizeCurrHero();
@@ -2350,11 +2350,15 @@ i32 advManager::ProcessDeSelect(
                 gpGame->GetTown(giOverviewReturnActionExtra)->View(1);
                 fadeAfter = 0;
             } else if (gbLowMemory) {
-                SetEnvironmentOrigin(m_mapOriginX + 7, m_mapOriginY + 7, 1);
+                SetEnvironmentOrigin(
+                    m_mapOriginX + VIEW_CENTER_OFFSET,
+                    m_mapOriginY + VIEW_CENTER_OFFSET,
+                    1
+                );
             }
             RedrawAdvScreen(1, 0);
             if (fadeAfter) {
-                gpWindowManager->FadeScreen(FADE_IN, 8, NULL);
+                gpWindowManager->FadeScreen(FADE_IN, ADVENTURE_FADE_STEPS, NULL);
             }
             break;
         }
@@ -2368,16 +2372,16 @@ i32 advManager::ProcessDeSelect(
 
     if (message->payload.widget.id >= BOTTOM_VIEW_FIRST_MESSAGE
         && message->payload.widget.id <= BOTTOM_VIEW_LAST_MESSAGE) {
-        if (giBottomViewOverride == 2) {
-            giBottomViewOverride = 1;
-        } else if (giBottomViewOverride != 0) {
-            giBottomViewOverride = 0;
-        } else if (iCurBottomView == 2) {
-            giBottomViewOverride = 1;
+        if (giBottomViewOverride == BOTTOM_VIEW_KINGDOM) {
+            giBottomViewOverride = BOTTOM_VIEW_NEW_TURN;
+        } else if (giBottomViewOverride != BOTTOM_VIEW_NONE) {
+            giBottomViewOverride = BOTTOM_VIEW_NONE;
+        } else if (iCurBottomView == BOTTOM_VIEW_KINGDOM) {
+            giBottomViewOverride = BOTTOM_VIEW_NEW_TURN;
         } else {
-            giBottomViewOverride = 2;
+            giBottomViewOverride = BOTTOM_VIEW_KINGDOM;
         }
-        giBottomViewOverrideEndTime = KBTickCount() + IDX(BOTTOM_VIEW_DURATION);
+        giBottomViewOverrideEndTime = KBTickCount() + BOTTOM_VIEW_DURATION;
         UpdBottomView(1, 1, 1);
     }
     return 1;
@@ -2438,8 +2442,8 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
     CompleteDraw(0);
     UpdateScreen(0, 0);
     if (x == -1) {
-        x = m_mapOriginX + 7;
-        y = m_mapOriginY + 7;
+        x = m_mapOriginX + VIEW_CENTER_OFFSET;
+        y = m_mapOriginY + VIEW_CENTER_OFFSET;
     }
     currentCell = GetCell(x, IDX(y));
     if (!((currentCell->m_objectIndex == IDX(MAPCELL_SPRITE_NONE)
@@ -2548,7 +2552,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
     UpdBottomView(1, 1, 1);
     CheckDimHero();
     Reseed(0, 0);
-    CheckEndGame(0, 0);
+    CheckEndGame(END_GAME_FORCE_NONE, false);
     return 1;
 search_end:
     gpCurPlayer->m_ultimateArtifactHintChance = 0;
@@ -2849,7 +2853,7 @@ void advManager::UpdateScreen(i32, i32 forceUpdate) {
         }
         glTimers[0] = KBTickCount() + TIMER_DELAY;
 
-        if (m_updateMaxX == 1 || m_updateMaxX == 3 || m_updateMaxX == 5) {
+        if (m_updateMaxX & 1) {
             ++m_animationPhases[ANIMATION_PHASE_COLUMN_1];
             m_animationPhases[ANIMATION_PHASE_COLUMN_1] %= UPDATE_FRAME_CYCLE;
             ++m_animationPhases[ANIMATION_PHASE_COLUMN_3];
@@ -2912,7 +2916,7 @@ void advManager::CompleteDraw(i32 originX, i32 originY, i32 forceDraw, i32 updat
 
     for (drawY = 1; drawY < DRAW_VIEW_CELLS; ++drawY) {
         PollSound();
-        if (m_cursorDirection > DRAW_FORWARD_DIRECTION_MAX) {
+        if (m_cursorDirection > MAP_DIRECTION_SOUTH) {
             for (drawX = 0; drawX < DRAW_VIEW_CELLS; ++drawX) {
                 DrawCell(
                     originX + drawX,
@@ -6673,7 +6677,7 @@ void advManager::DemobilizeCurrHero(void) {
     mapCell* currentCell = GetCell(currentHero->m_x, currentHero->m_y);
     currentHero->m_locationType = currentCell->m_triggerType;
     currentHero->m_occupiedTown = currentCell->m_objectMetadata;
-    currentHero->m_direction = static_cast<u8>(m_cursorDirection);
+    currentHero->m_direction = m_cursorDirection;
     if (m_cursorType == HERO_TYPE_BOAT) {
         currentHero->m_eventFlags = HERO_EVENT_EMBARKED | currentHero->m_eventFlags;
     }
@@ -8657,7 +8661,7 @@ void advManager::ForceNewHover(void) {
 }
 
 VA(0x00468ab6, 0x1a6)
-void advManager::ScreenScroll(AdventureScrollDirection direction, i32 updatePointer) {
+void advManager::ScreenScroll(H2_ENUM_PARAM(MapDirection, i32) direction, i32 updatePointer) {
     i32 originX;
     i32 originY;
 
@@ -8666,31 +8670,31 @@ void advManager::ScreenScroll(AdventureScrollDirection direction, i32 updatePoin
     iLastScrollTime = KBTickCount();
 
     switch (direction) {
-        case ADVMGR_SCROLL_NORTH:
+        case MAP_DIRECTION_NORTH:
             --originY;
             break;
-        case ADVMGR_SCROLL_NORTH_EAST:
+        case MAP_DIRECTION_NORTH_EAST:
             ++originX;
             --originY;
             break;
-        case ADVMGR_SCROLL_EAST:
+        case MAP_DIRECTION_EAST:
             ++originX;
             break;
-        case ADVMGR_SCROLL_SOUTH_EAST:
+        case MAP_DIRECTION_SOUTH_EAST:
             ++originX;
             ++originY;
             break;
-        case ADVMGR_SCROLL_SOUTH:
+        case MAP_DIRECTION_SOUTH:
             ++originY;
             break;
-        case ADVMGR_SCROLL_SOUTH_WEST:
+        case MAP_DIRECTION_SOUTH_WEST:
             --originX;
             ++originY;
             break;
-        case ADVMGR_SCROLL_WEST:
+        case MAP_DIRECTION_WEST:
             --originX;
             break;
-        case ADVMGR_SCROLL_NORTH_WEST:
+        case MAP_DIRECTION_NORTH_WEST:
             --originX;
             --originY;
             break;
@@ -8740,24 +8744,24 @@ void advManager::CheckScreenScroll(void) {
             && mouseY1 < SCREEN_HEIGHT) {
             if (mouseX6 < SCROLL_BORDER) {
                 if (mouseY1 < SCROLL_BORDER) {
-                    ScreenScroll(ADVMGR_SCROLL_NORTH_WEST, 1);
+                    ScreenScroll(MAP_DIRECTION_NORTH_WEST, 1);
                 } else if (mouseY1 > SCREEN_HEIGHT - SCROLL_BORDER) {
-                    ScreenScroll(ADVMGR_SCROLL_SOUTH_WEST, 1);
+                    ScreenScroll(MAP_DIRECTION_SOUTH_WEST, 1);
                 } else {
-                    ScreenScroll(ADVMGR_SCROLL_WEST, 1);
+                    ScreenScroll(MAP_DIRECTION_WEST, 1);
                 }
             } else if (mouseX6 > SCREEN_WIDTH - SCROLL_BORDER - 1) {
                 if (mouseY1 < SCROLL_BORDER) {
-                    ScreenScroll(ADVMGR_SCROLL_NORTH_EAST, 1);
+                    ScreenScroll(MAP_DIRECTION_NORTH_EAST, 1);
                 } else if (mouseY1 > SCREEN_HEIGHT - SCROLL_BORDER) {
-                    ScreenScroll(ADVMGR_SCROLL_SOUTH_EAST, 1);
+                    ScreenScroll(MAP_DIRECTION_SOUTH_EAST, 1);
                 } else {
-                    ScreenScroll(ADVMGR_SCROLL_EAST, 1);
+                    ScreenScroll(MAP_DIRECTION_EAST, 1);
                 }
             } else if (mouseY1 < SCROLL_BORDER) {
-                ScreenScroll(ADVMGR_SCROLL_NORTH, 1);
+                ScreenScroll(MAP_DIRECTION_NORTH, 1);
             } else if (mouseY1 > SCREEN_HEIGHT - SCROLL_BORDER) {
-                ScreenScroll(ADVMGR_SCROLL_SOUTH, 1);
+                ScreenScroll(MAP_DIRECTION_SOUTH, 1);
             }
         }
 

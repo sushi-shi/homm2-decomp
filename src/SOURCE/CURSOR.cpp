@@ -44,9 +44,6 @@ H2_ENUM_BEGIN(CursorPrivateConstant)
     SKIPPED_ANIMATION_FRAME  = 4,
     FOOTSTEP_ANIMATION_FRAME = 3,
     DIRECTION_HALF_COUNT     = CURSOR_DIRECTION_COUNT / 2,
-    BOAT_DIRECTION_FIRST     = 5,
-    BOAT_DIRECTION_SECOND    = 6,
-    BOAT_DIRECTION_THIRD     = 7,
     TURN_FRAME_MULTIPLIER    = 2,
     MOVE_TILE_HALF_COUNT     = 2,
     GROUP_ALLOC_LINE_OFFSET  = 7,
@@ -58,7 +55,7 @@ H2_ENUM_END(CursorPrivateConstant)
 #define RETAIL_FILE const_cast<char*>("I:\\Projects\\Heroes\\Prog\\SOURCE\\CURSOR.CPP")
 
 VA(0x0040d5e0, 0x138)
-void advManager::StartCursor(i32 direction) {
+void advManager::StartCursor(H2_ENUM_PARAM(MapDirection, i32) direction) {
     i32 directionX_a;
     i32 directionY_a1;
     i32 cellX;
@@ -72,8 +69,8 @@ void advManager::StartCursor(i32 direction) {
     else
         m_cursorCycle = SLOW_CURSOR_CYCLE_START;
 
-    directionX_a = normalDirTable[direction].x;
-    directionY_a1 = normalDirTable[direction].y;
+    directionX_a = normalDirTable[IDX(direction)].x;
+    directionY_a1 = normalDirTable[IDX(direction)].y;
     m_previousCursorMapX = m_cursorMapX;
     m_previousCursorMapY = m_cursorMapY;
     m_cursorMapX += directionX_a;
@@ -443,34 +440,34 @@ void advManager::DrawCursorShadow(void) {
 }
 
 VA(0x0040e198, 0x85)
-i32 advManager::GetCursorBaseFrame(i32 direction) {
-    if (direction > DIRECTION_HALF_COUNT) {
+i32 advManager::GetCursorBaseFrame(H2_ENUM_PARAM(MapDirection, i32) direction) {
+    if (direction > MAP_DIRECTION_SOUTH) {
         switch (direction) {
-            case BOAT_DIRECTION_FIRST:
+            case MAP_DIRECTION_SOUTH_WEST:
                 return CURSOR_BOAT_BASE_FRAME_5;
-            case BOAT_DIRECTION_SECOND:
+            case MAP_DIRECTION_WEST:
                 return CURSOR_BOAT_BASE_FRAME_6;
-            case BOAT_DIRECTION_THIRD:
+            case MAP_DIRECTION_NORTH_WEST:
                 return CURSOR_BOAT_BASE_FRAME_7;
             default:
                 return 0;
         }
     } else {
-        return direction * CURSOR_FRAMES_PER_DIRECTION;
+        return IDX(direction) * CURSOR_FRAMES_PER_DIRECTION;
     }
 }
 
 VA(0x0040e21d, 0x256)
-void advManager::TurnTo(i32 direction) {
+void advManager::TurnTo(H2_ENUM_PARAM(MapDirection, i32) direction) {
     i32 turnStep_c = 1;
-    i32 directionDifference = direction - m_cursorDirection;
+    i32 directionDifference = IDX(direction) - IDX(m_cursorDirection);
     if (directionDifference == 0)
         return;
     if ((directionDifference < 0 && directionDifference >= -DIRECTION_HALF_COUNT)
         || (directionDifference > 0 && directionDifference > DIRECTION_HALF_COUNT))
         turnStep_c = -1;
     m_cursorTurning = 1;
-    i32 frameIndex_i = m_cursorDirection * TURN_FRAME_MULTIPLIER;
+    i32 frameIndex_i = IDX(m_cursorDirection) * TURN_FRAME_MULTIPLIER;
     i32 delay_f = giStepDelay[(&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]]];
     if ((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]]
         == IDX(CONFIG_WALK_SPEED_SLOWEST))
@@ -498,7 +495,7 @@ void advManager::TurnTo(i32 direction) {
         if (frameIndex_i < 0)
             frameIndex_i = CURSOR_TURN_FRAME_COUNT - 1;
         frameIndex_i %= CURSOR_TURN_FRAME_COUNT;
-    } while (direction * TURN_FRAME_MULTIPLIER != frameIndex_i);
+    } while (IDX(direction) * TURN_FRAME_MULTIPLIER != frameIndex_i);
 
     m_cursorDirection = direction;
     StopCursor(1);
@@ -509,9 +506,12 @@ void advManager::TurnTo(i32 direction) {
 }
 
 VA(0x0040e473, 0xac)
-i32 advManager::GetMoveShowIt(hero* movingHero, i32 direction) {
-    i32 directionX = normalDirTable[direction].x;
-    i32 directionY = normalDirTable[direction].y;
+i32 advManager::GetMoveShowIt(
+    hero* movingHero,
+    H2_ENUM_PARAM(MapDirection, i32) direction
+) {
+    i32 directionX = normalDirTable[IDX(direction)].x;
+    i32 directionY = normalDirTable[IDX(direction)].y;
     if ((gbThisNetHumanPlayer[giCurPlayer] || !gConfig.blackoutComputer)
         && (MapExtraPosAndAdjacentsSet(movingHero->m_x, movingHero->m_y, giCurWatchPlayerBit)
             || MapExtraPosAndAdjacentsSet(
@@ -526,7 +526,7 @@ i32 advManager::GetMoveShowIt(hero* movingHero, i32 direction) {
 
 VA(0x0040e51f, 0x1234)
 mapCell* advManager::MoveHero(
-    i32 direction,
+    H2_ENUM_PARAM(MapDirection, i32) direction,
     i32 stopAfterMove,
     i32* eventX,
     i32* eventY,
@@ -564,8 +564,8 @@ mapCell* advManager::MoveHero(
     movingHero_f = gpGame->GetHero(gpCurPlayer->m_currentHero);
     oldHeroX_b = movingHero_f->m_x;
     oldHeroY_b = movingHero_f->m_y;
-    directionX_b = normalDirTable[direction].x;
-    directionY_b = normalDirTable[direction].y;
+    directionX_b = normalDirTable[IDX(direction)].x;
+    directionY_b = normalDirTable[IDX(direction)].y;
     bShowIt = GetMoveShowIt(movingHero_f, direction);
     if (bShowIt)
         gbMoveShown = true;
@@ -611,7 +611,7 @@ mapCell* advManager::MoveHero(
     *eventY = movingHero_f->m_y + directionY_b;
     if (m_cursorDirection != direction)
         TurnTo(direction);
-    movingHero_f->m_direction = static_cast<u8>(direction);
+    movingHero_f->m_direction = direction;
 
     if (HAS(movingHero_f->m_eventFlags, HERO_EVENT_EMBARKED)
         && destinationCell_j->m_triggerType == MAP_OBJECT_COAST) {
@@ -623,7 +623,7 @@ mapCell* advManager::MoveHero(
         mapCell* boatCell_a = GetCell(movingHero_f->m_x, movingHero_f->m_y);
         boat->savedTriggerType = boatCell_a->m_triggerType;
         boat->savedEventData = static_cast<u8>(boatCell_a->m_objectMetadata);
-        boat->direction = static_cast<i8>(m_cursorDirection);
+        boat->direction = m_cursorDirection;
         boat->heroId = static_cast<i8>(boat->heroId | MAP_TRIGGER_ACTION_FLAG);
         boatCell_a->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_BOAT;
         boatCell_a->m_objectMetadata = static_cast<u16>(OD_STEER(step_a));
@@ -996,15 +996,18 @@ void advManager::CheckAdjacentMon(i32* adjacentMonster) {
 }
 
 VA(0x0040f8c7, 0x14e)
-i32 advManager::ValidMoveWithEvent(hero* movingHero, i32 direction) {
+i32 advManager::ValidMoveWithEvent(
+    hero* movingHero,
+    H2_ENUM_PARAM(MapDirection, i32) direction
+) {
     i32 directionX0;
     i32 destinationX0;
     i32 directionY0;
     i32 destinationY0;
     mapCell* destinationCell0;
 
-    directionX0 = normalDirTable[direction].x;
-    directionY0 = normalDirTable[direction].y;
+    directionX0 = normalDirTable[IDX(direction)].x;
+    directionY0 = normalDirTable[IDX(direction)].y;
     destinationX0 = movingHero->m_x + directionX0;
     destinationY0 = movingHero->m_y + directionY0;
     if (destinationX0 < 0 || destinationX0 > MAP_WIDTH - 1 || destinationY0 < 0
@@ -1028,7 +1031,7 @@ i32 advManager::ValidMoveWithEvent(hero* movingHero, i32 direction) {
 }
 
 VA(0x0040fa15, 0x4f2)
-i32 advManager::ValidMove(i32 direction, i32 eventMode) {
+i32 advManager::ValidMove(H2_ENUM_PARAM(MapDirection, i32) direction, i32 eventMode) {
     i32 directionX_j;
     i32 directionY_h;
     i32 destinationMapX_e;
@@ -1044,8 +1047,8 @@ i32 advManager::ValidMove(i32 direction, i32 eventMode) {
     i32 northDirection_b;
     i32 southDirection_e;
 
-    directionX_j = normalDirTable[direction].x;
-    directionY_h = normalDirTable[direction].y;
+    directionX_j = normalDirTable[IDX(direction)].x;
+    directionY_h = normalDirTable[IDX(direction)].y;
     destinationMapX_e = m_mapOriginX + directionX_j;
     destinationMapY_e = m_mapOriginY + directionY_h;
     centerX_p = m_mapOriginX + CURSOR_MAP_DRAW_OFFSET;
@@ -1194,7 +1197,7 @@ void advManager::ProcessMapChange(SMapChange change) {
                 change.id,
                 change.x,
                 change.y,
-                change.direction,
+                change.movement.direction,
                 change.sequence,
                 gpGame->GetHero(change.id)->m_x,
                 gpGame->GetHero(change.id)->m_y
@@ -1216,8 +1219,8 @@ void advManager::ProcessMapChange(SMapChange change) {
             }
             gpAdvManager->SetHeroContext(change.id, 0);
             eventCell_n = MoveHero(
-                change.direction,
-                change.stopAfterMove,
+                change.movement.direction,
+                change.movement.stopAfterMove,
                 &eventX_b,
                 &eventY_c,
                 &outOfMobility_g,
@@ -1551,8 +1554,10 @@ void SendMapChange(
     change.x = x;
     change.y = y;
     change.player = static_cast<i8>(player);
-    change.stopAfterMove = static_cast<i8>(stopAfterMove);
-    change.direction = static_cast<i8>(direction);
+    // The two bytes are a tagged payload; movement packets interpret them as
+    // direction and stop-after-move, while other packet types currently send zeroes.
+    change.wire.direction = static_cast<i8>(direction);
+    change.wire.stopAfterMove = static_cast<i8>(stopAfterMove);
     change.sequence = giMapChangeCtr;
     ++giMapChangeCtr;
     memmove(

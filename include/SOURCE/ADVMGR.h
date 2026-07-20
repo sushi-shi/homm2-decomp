@@ -8,17 +8,6 @@
 class mapCell;
 struct tag_message;
 
-H2_ENUM_CLASS_BEGIN(AdventureScrollDirection)
-    ADVMGR_SCROLL_NORTH      = 0,
-    ADVMGR_SCROLL_NORTH_EAST = 1,
-    ADVMGR_SCROLL_EAST       = 2,
-    ADVMGR_SCROLL_SOUTH_EAST = 3,
-    ADVMGR_SCROLL_SOUTH      = 4,
-    ADVMGR_SCROLL_SOUTH_WEST = 5,
-    ADVMGR_SCROLL_WEST       = 6,
-    ADVMGR_SCROLL_NORTH_WEST = 7
-H2_ENUM_CLASS_END(AdventureScrollDirection)
-
 H2_ENUM_BEGIN(AdventureRemoteConstant)
     ADVMGR_REMOTE_DATA_REQUEST             = 1,
     ADVMGR_REMOTE_PACKET_TYPE_GAME         = 2,

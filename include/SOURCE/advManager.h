@@ -110,7 +110,7 @@ public:
     i32 m_cursorActive;
     i32 m_drawHeroShadows;
     H2_ENUM_STORAGE(HeroCursorType, i32) m_cursorType;
-    i32 m_cursorDirection;
+    H2_ENUM_STORAGE(MapDirection, i32) m_cursorDirection;
     i32 m_cursorFrame;
     i32 m_cursorFrameCount;
     i32 m_cursorCycle;
@@ -136,17 +136,26 @@ public:
     virtual i32 Open(i32) OVERRIDE;
     virtual void Close(void) OVERRIDE;
     virtual i32 Main(struct tag_message&) OVERRIDE;
-    void StartCursor(i32);
+    void StartCursor(H2_ENUM_PARAM(MapDirection, i32));
     void StopCursor(i32);
     void DrawCursor(void);
     void DrawCursorShadow(void);
-    i32 GetCursorBaseFrame(i32);
-    void TurnTo(i32);
-    i32 GetMoveShowIt(class hero*, i32);
-    class mapCell* MoveHero(i32, i32, i32*, i32*, i32*, i32, i32*, i32);
+    i32 GetCursorBaseFrame(H2_ENUM_PARAM(MapDirection, i32));
+    void TurnTo(H2_ENUM_PARAM(MapDirection, i32));
+    i32 GetMoveShowIt(class hero*, H2_ENUM_PARAM(MapDirection, i32));
+    class mapCell* MoveHero(
+        H2_ENUM_PARAM(MapDirection, i32),
+        i32,
+        i32*,
+        i32*,
+        i32*,
+        i32,
+        i32*,
+        i32
+    );
     void CheckAdjacentMon(i32*);
-    i32 ValidMoveWithEvent(class hero*, i32);
-    i32 ValidMove(i32, i32);
+    i32 ValidMoveWithEvent(class hero*, H2_ENUM_PARAM(MapDirection, i32));
+    i32 ValidMove(H2_ENUM_PARAM(MapDirection, i32), i32);
     void MoveOrigin(i32, i32);
     void ProcessMapChange(struct SMapChange);
     void ProcessIncomingSingleMapChange(struct SMapChange*);
@@ -219,7 +228,7 @@ public:
     void CheckDimNextHeroBut(void);
     void SeedTo(i32, i32);
     void ForceNewHover(void);
-    void ScreenScroll(AdventureScrollDirection, i32);
+    void ScreenScroll(H2_ENUM_PARAM(MapDirection, i32), i32);
     void CheckScreenScroll(void);
     i32 MouseInScrollZone(void);
     void SetInitialMapOrigin(void);

@@ -102,12 +102,6 @@ H2_ENUM_CLASS_BEGIN(CheckEndGameCampaignConstants)
     END_GAME_ALLY_COLOR              = 3
 H2_ENUM_CLASS_END(CheckEndGameCampaignConstants)
 
-H2_ENUM_CLASS_BEGIN(CheckEndGameForcedResult)
-    END_GAME_FORCE_NONE    = 0,
-    END_GAME_FORCE_VICTORY = 1,
-    END_GAME_FORCE_DEFEAT  = 2
-H2_ENUM_CLASS_END(CheckEndGameForcedResult)
-
 H2_ENUM_CLASS_BEGIN(MoraleInfoTextIndex)
     MORALE_INFO_GOOD          = 0,
     MORALE_INFO_NEUTRAL       = 1,
@@ -2054,7 +2048,10 @@ void PlayerDead(i32 player) {
 }
 
 VA(0x0049a6c1, 0x19bb)
-void CheckEndGame(i32 forcedResult, i32 dragonCityCaptured) {
+void CheckEndGame(
+    H2_ENUM_PARAM(CheckEndGameForcedResult, i32) forcedResult,
+    b32 dragonCityCaptured
+) {
     i32 showedDialog;
     i32 defeated;
     i32 allowNormalVictory;
