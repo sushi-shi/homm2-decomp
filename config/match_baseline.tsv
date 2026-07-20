@@ -428,9 +428,9 @@ EDITOR/mapcell	?GetNewCellExtraOverlay@fullMap@@QAEPAUmapCellExtra@@HH@Z	97.2789
 EDITOR/mapcell	?Init@fullMap@@QAEXHH@Z	100.0000	c04f466bc074
 EDITOR/mapcell	?Read@fullMap@@QAEXHH@Z	98.7330	107173601e1d
 EDITOR/mapcell	?Write@fullMap@@QAEXH@Z	100.0000	4a2aaa54ffdc
-SOURCE/ADVMGR	??0advManager@@QAE@XZ	100.0000	36affcc914e1
+SOURCE/ADVMGR	??0advManager@@QAE@XZ	100.0000	363ca89e79c0
 SOURCE/ADVMGR	?APanelHandler@@YIHAAUtag_message@@@Z	0.0000	5bf2ee1bb443
-SOURCE/ADVMGR	?AdvPanel@advManager@@QAEXXZ	100.0000	9fa1e3ffea22
+SOURCE/ADVMGR	?AdvPanel@advManager@@QAEXXZ	100.0000	71c2952730cd
 SOURCE/ADVMGR	?CPanelHandler@@YIHAAUtag_message@@@Z	93.9959	eb0e6ebf7ce4
 SOURCE/ADVMGR	?CastSpell@advManager@@QAEXH@Z	100.0000	8a9d3b4a9399
 SOURCE/ADVMGR	?CheckCastSpell@advManager@@QAEXXZ	100.0000	903203e80d0e
@@ -444,7 +444,7 @@ SOURCE/ADVMGR	?CheckSetEvilInterface@advManager@@QAEXHH@Z	99.8370	fd42bdf03c53
 SOURCE/ADVMGR	?ClearBottomView@advManager@@QAEXXZ	100.0000	fb49c92a6a6c
 SOURCE/ADVMGR	?Close@advManager@@UAEXXZ	99.0848	04649b362bc0
 SOURCE/ADVMGR	?ComboDraw@advManager@@QAEHH@Z	100.0000	e3655562a8de
-SOURCE/ADVMGR	?ComboDraw@advManager@@QAEHHHH@Z	98.4847	20bbaa390993
+SOURCE/ADVMGR	?ComboDraw@advManager@@QAEHHHH@Z	98.7009	20bbaa390993
 SOURCE/ADVMGR	?CompleteDraw@advManager@@QAEXH@Z	100.0000	51da8a03dd11
 SOURCE/ADVMGR	?CompleteDraw@advManager@@QAEXHHHH@Z	100.0000	63a08780cf80
 SOURCE/ADVMGR	?ComputeAdvNetControl@@YIXXZ	99.9315	1ab6389a0ee3
@@ -455,7 +455,7 @@ SOURCE/ADVMGR	?DemobilizeCurrHero@advManager@@QAEXXZ	96.5049	080739775205
 SOURCE/ADVMGR	?DimensionDoor@advManager@@QAEXXZ	100.0000	1cec1ec0c7cb
 SOURCE/ADVMGR	?DimensionDoorHandler@@YIHAAUtag_message@@@Z	98.2857	b09e4c83e440
 SOURCE/ADVMGR	?DisableButtons@advManager@@QAEXXZ	98.9107	ca32152d651e
-SOURCE/ADVMGR	?DoAdvCommand@advManager@@QAEPAVmapCell@@XZ	99.5888	6fa4ce515c72
+SOURCE/ADVMGR	?DoAdvCommand@advManager@@QAEPAVmapCell@@XZ	99.5888	8d40ae6d7123
 SOURCE/ADVMGR	?DoHeroKnob@advManager@@QAEXXZ	98.9342	d559c91b7f56
 SOURCE/ADVMGR	?DoTownKnob@advManager@@QAEXXZ	98.9342	52ce8647f971
 SOURCE/ADVMGR	?DoVisions@advManager@@QAEHPAVhero@@@Z	99.9848	ca4d44f9f434
@@ -463,7 +463,7 @@ SOURCE/ADVMGR	?DrawAdventureBorder@advManager@@QAEXXZ	100.0000	c35bd8b79a65
 SOURCE/ADVMGR	?DrawCell@advManager@@QAEXHHHHHH@Z	97.7181	a6e137929a8b
 SOURCE/ADVMGR	?EnableButtons@advManager@@QAEXXZ	98.9107	a28d68bbf7f8
 SOURCE/ADVMGR	?FindAdjacentMonster@advManager@@QAEHHHPAH0HH@Z	95.0617	85133aaed632
-SOURCE/ADVMGR	?ForceNewHover@advManager@@QAEXXZ	100.0000	6df70c0c3baf
+SOURCE/ADVMGR	?ForceNewHover@advManager@@QAEXXZ	100.0000	009fdde9fbd9
 SOURCE/ADVMGR	?GetArmySizeName@advManager@@QAEPADHH@Z	100.0000	3a6716a9b9f9
 SOURCE/ADVMGR	?GetCell@advManager@@QAEPAVmapCell@@HH@Z	100.0000	b584d66179f2
 SOURCE/ADVMGR	?GetCloudLookup@advManager@@QAEHHH@Z	97.3251	0d7f1fa217da
@@ -472,11 +472,11 @@ SOURCE/ADVMGR	?GetManaFrame@@YIHH@Z	100.0000	5313adfe20ff
 SOURCE/ADVMGR	?GetMobilityFrame@@YIHH@Z	100.0000	11ff82621dc9
 SOURCE/ADVMGR	?GetSoundId@advManager@@QAEHHH@Z	100.0000	05e67a388ee1
 SOURCE/ADVMGR	?HeroQuickView@advManager@@QAEXHHHH@Z	99.0358	a7b56a5870b9
-SOURCE/ADVMGR	?HideRoute@advManager@@QAEXHHH@Z	100.0000	8bcfe3a8dd78
+SOURCE/ADVMGR	?HideRoute@advManager@@QAEXHHH@Z	100.0000	59b94f1c26d6
 SOURCE/ADVMGR	?InsertSound@advManager@@QAEXHHHH@Z	100.0000	24d061448b62
 SOURCE/ADVMGR	?IsCrystalBallInEffect@advManager@@QAEHHHH@Z	98.2769	320a44746fe8
 SOURCE/ADVMGR	?LoadRemote@advManager@@QAEXXZ	100.0000	7c48cc55e1a7
-SOURCE/ADVMGR	?Main@advManager@@UAEHAAUtag_message@@@Z	1.4700	1f1b97f4d348
+SOURCE/ADVMGR	?Main@advManager@@UAEHAAUtag_message@@@Z	1.4700	ca768e85c928
 SOURCE/ADVMGR	?MapExtraPosAndAdjacentsSet@@YIHHHE@Z	99.8591	2a0eecd577ff
 SOURCE/ADVMGR	?MobilizeCurrHero@advManager@@QAEXH@Z	100.0000	8e4bc8dd471f
 SOURCE/ADVMGR	?MouseInScrollZone@advManager@@QAEHXZ	100.0000	d02799371e9a
@@ -494,10 +494,10 @@ SOURCE/ADVMGR	?SaveGame@@YIHXZ	100.0000	8cdef41d45fa
 SOURCE/ADVMGR	?ScreenScroll@advManager@@QAEXHH@Z	100.0000	a98b9ec9d1ba
 SOURCE/ADVMGR	?SeedTo@advManager@@QAEXHH@Z	100.0000	9b5a29f4a3ec
 SOURCE/ADVMGR	?SetEnvironmentOrigin@advManager@@QAEXHHH@Z	99.7885	67d3b03051a1
-SOURCE/ADVMGR	?SetHeroContext@advManager@@QAEXHH@Z	99.4718	f4da0aed841e
-SOURCE/ADVMGR	?SetInitialMapOrigin@advManager@@QAEXXZ	100.0000	c5a3c0a7b90d
+SOURCE/ADVMGR	?SetHeroContext@advManager@@QAEXHH@Z	99.4718	16d2dc96fb5f
+SOURCE/ADVMGR	?SetInitialMapOrigin@advManager@@QAEXXZ	100.0000	366002bc283a
 SOURCE/ADVMGR	?SetTownContext@advManager@@QAEXH@Z	99.7500	d0cd288bd8f7
-SOURCE/ADVMGR	?ShowRoute@advManager@@QAEXHHH@Z	100.0000	9c5367705aa7
+SOURCE/ADVMGR	?ShowRoute@advManager@@QAEXHHH@Z	100.0000	e61291cf22b2
 SOURCE/ADVMGR	?StopOnTrigger@@YIEPAVmapCell@@@Z	100.0000	7cc1f4acc970
 SOURCE/ADVMGR	?SummonBoat@advManager@@QAEXXZ	99.4259	d609d0eb4408
 SOURCE/ADVMGR	?SystemOptions@advManager@@QAEXXZ	99.6436	ef40e660735c
@@ -518,8 +518,8 @@ SOURCE/ADVMGR	?UpdateHeroLocators@advManager@@QAEXHH@Z	99.9265	c9fe2a838f11
 SOURCE/ADVMGR	?UpdateRadar@advManager@@QAEXHH@Z	98.7734	7ec61fada3ee
 SOURCE/ADVMGR	?UpdateScreen@advManager@@QAEXHH@Z	94.7222	29987c5467ab
 SOURCE/ADVMGR	?UpdateSystemOptions@@YIXH@Z	94.0829	5c04c29c4c19
-SOURCE/ADVMGR	?UpdateTownLocators@advManager@@QAEXHH@Z	99.9718	d842b621a761
-SOURCE/ADVMGR	?ViewPuzzle@advManager@@QAEXXZ	99.1384	6581687e102e
+SOURCE/ADVMGR	?UpdateTownLocators@advManager@@QAEXHH@Z	99.9718	c30d67476922
+SOURCE/ADVMGR	?ViewPuzzle@advManager@@QAEXXZ	99.3333	6581687e102e
 SOURCE/AI	?AICheckRetreat@combatManager@@QAEHXZ	99.4798	026b3ec74e76
 SOURCE/AI	?AttemptAdjacentAttack@combatManager@@QAEHPAVarmy@@@Z	99.1150	07b79b87669a
 SOURCE/AI	?AttemptAttack@combatManager@@QAEHPAVarmy@@HH@Z	100.0000	37cd6536b001
@@ -646,7 +646,7 @@ SOURCE/COMMAND	?CycleCombatScreen@combatManager@@QAEXXZ	97.7901	c3085d647e6b
 SOURCE/COMMAND	?DoCommand@combatManager@@QAEXH@Z	99.9808	ae28fc6bd165
 SOURCE/COMMAND	?DoLoseWindow@combatManager@@QAEXXZ	100.0000	4b0422331d15
 SOURCE/COMMAND	?DoSurrender@combatManager@@QAEHXZ	100.0000	b1459069c521
-SOURCE/COMMAND	?DoVictory@combatManager@@QAEXH@Z	97.3442	c8eb1f563410
+SOURCE/COMMAND	?DoVictory@combatManager@@QAEXH@Z	97.6169	c8eb1f563410
 SOURCE/COMMAND	?GetCommand@combatManager@@QAEHH@Z	94.1031	13e8ba6cb193
 SOURCE/COMMAND	?GetControl@combatManager@@QAEXXZ	96.7778	73ab80bd89bb
 SOURCE/COMMAND	?GetPointer@combatManager@@QAEHHH@Z	100.0000	c0dc28a1c42b
@@ -703,7 +703,7 @@ SOURCE/DRAWING	?ClearCombatMessages@combatManager@@QAEXH@Z	100.0000	7a1c0603e00f
 SOURCE/DRAWING	?CombatMessage@combatManager@@QAEXH@Z	100.0000	1ca8ce0e9bea
 SOURCE/DRAWING	?CombatMessage@combatManager@@QAEXPADHHH@Z	100.0000	6667886ea83a
 SOURCE/DRAWING	?DrawBackground@combatManager@@QAEXXZ	100.0000	e8aaea851420
-SOURCE/DRAWING	?DrawFrame@combatManager@@QAEXHHHHHHH@Z	99.6326	86f7bcf7563a
+SOURCE/DRAWING	?DrawFrame@combatManager@@QAEXHHHHHHH@Z	99.7245	86f7bcf7563a
 SOURCE/DRAWING	?DrawSmallView@combatManager@@QAEXHH@Z	99.9219	2ed71075aeee
 SOURCE/DRAWING	?NoShowCombatLog@combatManager@@QAEXPAD@Z	100.0000	175192ffefde
 SOURCE/DRAWING	?ResetLimitCreature@combatManager@@QAEXXZ	100.0000	aa89720270e5
@@ -764,7 +764,7 @@ SOURCE/FINDPATH	?PushCombatPoint@searchArray@@QAEXHHHH@Z	96.0638	05f7882b033c
 SOURCE/FINDPATH	?PushPoint@searchArray@@QAEXHHHHHHHHHHHH@Z	97.6064	a55218cc35a3
 SOURCE/FINDPATH	?QuickDistance@searchArray@@QAEHHHHH@Z	96.6667	e3454863055f
 SOURCE/FINDPATH	?SeedCombatPosition@searchArray@@QAEXPAVarmy@@@Z	99.3377	7289c68fe9bb
-SOURCE/FINDPATH	?TestPossibleDirections@searchArray@@QAEXHHQAC0HH@Z	93.4647	91d1ea6e056a
+SOURCE/FINDPATH	?TestPossibleDirections@searchArray@@QAEXHHQAC0HH@Z	94.8838	91d1ea6e056a
 SOURCE/FLY	?CanFit@army@@QAEHHHPAH@Z	89.3846	7dcc2741cce6
 SOURCE/FLY	?FlyTo@army@@QAEHH@Z	96.4810	8ab98b3d685e
 SOURCE/FLY	?FlyTo@army@@QAEHXZ	100.0000	214d2ea93c6c
@@ -1229,7 +1229,7 @@ SOURCE/SPELLS	?DoLuck@combatManager@@QAEXHH@Z	99.5918	9c87dfd9170f
 SOURCE/SPELLS	?DrawBolt@combatManager@@QAEXPAUSBolt@@H@Z	94.8437	26c250b19a35
 SOURCE/SPELLS	?Earthquake@combatManager@@QAEXXZ	97.1952	21afda07cd81
 SOURCE/SPELLS	?ElementalStorm@combatManager@@QAEXXZ	100.0000	83b693f2e333
-SOURCE/SPELLS	?FindResurrectArmyIndex@combatManager@@QAEHHHH@Z	91.3982	8748e9f3ecd8
+SOURCE/SPELLS	?FindResurrectArmyIndex@combatManager@@QAEHHHH@Z	96.5000	8748e9f3ecd8
 SOURCE/SPELLS	?Fireball@combatManager@@QAEXHH@Z	99.9905	f8b5d1f09a69
 SOURCE/SPELLS	?GetNextChainLightningTarget@combatManager@@QAEHPAVarmy@@H@Z	100.0000	9236702dbb5c
 SOURCE/SPELLS	?HandleCastSpell@@YIHAAUtag_message@@@Z	100.0000	747fdd40b20e
