@@ -310,7 +310,7 @@ void heroWindow::DrawWindow(void) {
 
 VA(0x004cf6e0, 0x2e)
 void heroWindow::DrawWindow(i32 flags) {
-    DrawWindow(flags, IDX(WINDOW_ALL_WIDGETS_LOW), IDX(WINDOW_ALL_WIDGETS_HIGH));
+    DrawWindow(flags, WINDOW_ALL_WIDGETS_LOW, WINDOW_ALL_WIDGETS_HIGH);
 }
 
 VA(0x004cf710, 0x116)
@@ -323,7 +323,7 @@ void heroWindow::DrawWindow(i32 update, i32 firstId, i32 lastId) {
     local_24.payload.widget.command = WIDGET_COMMAND_DRAW;
     while (local_8 != NULL) {
         PollSound();
-        if (firstId != IDX(WINDOW_ALL_WIDGETS_LOW) || lastId != IDX(WINDOW_ALL_WIDGETS_HIGH)) {
+        if (firstId != WINDOW_ALL_WIDGETS_LOW || lastId != WINDOW_ALL_WIDGETS_HIGH) {
             if (firstId <= local_8->m_id && local_8->m_id <= lastId)
                 local_8->Main(local_24);
         } else

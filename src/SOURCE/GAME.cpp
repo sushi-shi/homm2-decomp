@@ -3954,7 +3954,7 @@ i32 ViewArmyHandler(tag_message& msg) {
             sViewArmyMonFrameInfo.walkXOffsets[iViewArmyFrame] * viewArmyFacingWIPXMod
             + viewArmyBaseX;
         gpGame->m_viewArmyWindow->BroadcastMessage(msg);
-        gpGame->m_viewArmyWindow->DrawWindow(1, 0, IDX(WINDOW_DRAW_ID_LIMIT));
+        gpGame->m_viewArmyWindow->DrawWindow(1, 0, WINDOW_DRAW_ID_LIMIT);
         glTimers[0] = static_cast<i32>(
             KBTickCount()
             + sViewArmyMonFrameInfo.walkDuration * GAME_VIEW_ARMY_FRAME_DELAY_SCALE

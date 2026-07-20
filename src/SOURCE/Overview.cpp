@@ -1285,7 +1285,7 @@ void game::DoKnob(void) {
                     SetupDynamicStuff(1, 0, 0);
                     previousTop6 = newTop8;
                 } else {
-                    overWin->DrawWindow(1, 0, IDX(WINDOW_DRAW_ID_LIMIT));
+                    overWin->DrawWindow(1, 0, WINDOW_DRAW_ID_LIMIT);
                 }
             }
             Process1WindowsMessage();
