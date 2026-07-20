@@ -24,6 +24,9 @@ reason the numeric spelling remains intact.
 - `local-table` is an initialized table inside a function. Prefer a named private table and named
   dimensions when that preserves the retail storage and code shape.
 - `declaration` includes array extents, storage dimensions, and file-scope scalar initializers.
+- `source-line` is an explicit allocation, free, or assertion line operand, or a named retained
+  source-line data anchor. It is historical diagnostic and relocation evidence, not a gameplay
+  constant.
 - `code` is an executable numeric decision, argument, index, scale, mask, timeout, coordinate, or
   sentinel and is the primary cleanup queue.
 

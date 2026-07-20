@@ -21,6 +21,14 @@ DATABASE = REPO / "build" / "clangd" / "compile_commands.json"
 REVIEW_MANIFEST = REPO / "config" / "constants_review.tsv"
 SOURCE_PATTERN = r"src/(BASE|SOURCE|EDITOR)/.*\.cpp"
 ANNOTATION_MACROS = {"DATA", "SIZE", "SYMBOL", "VA", "VAU", "VTBL"}
+SOURCE_LINE_ARGUMENTS = {
+    "H2_ALLOC": 1,
+    "H2_FREE": 1,
+    "H2_ALLOC_AT": 2,
+    "H2_FREE_AT": 2,
+    "H2_ASSERT": 2,
+}
+SOURCE_LINE_DECLARATION_RE = re.compile(r"\b\w*source_?line\w*\s*=", re.IGNORECASE)
 MAGIC_RE = re.compile(
     r"^(?P<path>.*?):(?P<line>\d+):(?P<column>\d+): warning: "
     r"(?P<value>.+?) is a magic number;.*\[readability-magic-numbers\]$"
@@ -88,14 +96,16 @@ def lexical_inventory(path: Path) -> list[Literal]:
 
     relative = str(path.relative_to(REPO))
     braces: list[str] = []
-    parens: list[str] = []
+    parens: list[list[str | int]] = []
     statement_start = 0
     result = []
     for index, token in enumerate(tokens):
         if token.text == "(":
-            parens.append(tokens[index - 1].text if index else "")
+            parens.append([tokens[index - 1].text if index else "", 0])
         elif token.text == ")" and parens:
             parens.pop()
+        elif token.text == "," and parens:
+            parens[-1][1] += 1
         elif token.text == "{":
             braces.append(_brace_kind(tokens, index, braces, statement_start))
         elif token.text == "}" and braces:
@@ -109,8 +119,12 @@ def lexical_inventory(path: Path) -> list[Literal]:
         line_text = lines[token.line - 1] if token.line <= len(lines) else ""
         if line_text.lstrip().startswith("#"):
             category = "preprocessor"
-        elif any(name in ANNOTATION_MACROS for name in parens):
+        elif any(frame[0] in ANNOTATION_MACROS for frame in parens):
             category = "annotation"
+        elif any(SOURCE_LINE_ARGUMENTS.get(str(frame[0])) == frame[1] for frame in parens):
+            category = "source-line"
+        elif SOURCE_LINE_DECLARATION_RE.search(line_text):
+            category = "source-line"
         elif token.line in enum_lines:
             category = "enum"
         else:
