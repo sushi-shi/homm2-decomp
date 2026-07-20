@@ -669,6 +669,44 @@ struct SCmbtHero {
 };
 SIZE(SCmbtHero, 0x81);
 #pragma pack(pop)
+
+H2_ENUM_CLASS_BEGIN(CombatEffectType)
+    COMBAT_EFFECT_INVALID       = -1,
+    COMBAT_EFFECT_EMPTY         = 0,
+    COMBAT_EFFECT_MAGIC_01      = 1,
+    COMBAT_EFFECT_MAGIC_02      = 2,
+    COMBAT_EFFECT_MAGIC_03      = 3,
+    COMBAT_EFFECT_MAGIC_04      = 4,
+    COMBAT_EFFECT_MAGIC_05      = 5,
+    COMBAT_EFFECT_MAGIC_06      = 6,
+    COMBAT_EFFECT_MAGIC_07      = 7,
+    COMBAT_EFFECT_MAGIC_08      = 8,
+    COMBAT_EFFECT_GOOD_LUCK     = 9,
+    COMBAT_EFFECT_BAD_LUCK      = 10,
+    COMBAT_EFFECT_GOOD_MORALE   = 11,
+    COMBAT_EFFECT_BAD_MORALE    = 12,
+    COMBAT_EFFECT_RED_DEATH     = 13,
+    COMBAT_EFFECT_RED_FIRE      = 14,
+    COMBAT_EFFECT_SPARKS        = 15,
+    COMBAT_EFFECT_ELECTRIC      = 16,
+    COMBAT_EFFECT_PHYSICAL      = 17,
+    COMBAT_EFFECT_BLUE_FIRE     = 18,
+    COMBAT_EFFECT_ICE_CLOUD     = 19,
+    COMBAT_EFFECT_LICH_CLOUD    = 20,
+    COMBAT_EFFECT_BLESS         = 21,
+    COMBAT_EFFECT_BERSERK       = 22,
+    COMBAT_EFFECT_SHIELD        = 23,
+    COMBAT_EFFECT_HASTE         = 24,
+    COMBAT_EFFECT_PARALYZE      = 25,
+    COMBAT_EFFECT_HYPNOTIZE     = 26,
+    COMBAT_EFFECT_DRAGON_SLAYER = 27,
+    COMBAT_EFFECT_BLIND         = 28,
+    COMBAT_EFFECT_CURSE         = 29,
+    COMBAT_EFFECT_STONE_SKIN    = 30,
+    COMBAT_EFFECT_STEEL_SKIN    = 31,
+    COMBAT_EFFECT_COUNT         = 32
+H2_ENUM_CLASS_END(CombatEffectType)
+
 H2_ENUM_CLASS_BEGIN_T(SpellInfoAttribute, u8)
     SPELL_INFO_ATTRIBUTE_POWER     = 0x01,
     SPELL_INFO_ATTRIBUTE_COMBAT    = 0x02,
@@ -686,7 +724,7 @@ struct SSpellInfo {
     char soundName[SPELL_INFO_SOUND_NAME_SIZE];
     u8 level;
     u8 iconIndex;
-    u8 combatEffect;
+    H2_ENUM_STORAGE(CombatEffectType, u8) combatEffect;
     i16 aiValue;
     u8 cost;
     u8 raceChance[SPELL_INFO_RACE_COUNT];
