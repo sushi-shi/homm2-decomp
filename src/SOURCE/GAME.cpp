@@ -193,6 +193,21 @@ H2_ENUM_BEGIN(GameDailyEconomyConstant)
     POWER_RING_DAILY_MANA_BONUS     = 2
 H2_ENUM_END(GameDailyEconomyConstant)
 
+H2_ENUM_BEGIN(WeekType)
+    WEEK_NORMAL   = 0,
+    WEEK_CREATURE = 1
+H2_ENUM_END(WeekType)
+
+H2_ENUM_BEGIN(WeeklyRuntimeConstant)
+    WEEK_NAME_LAST                = KB_WEEK_NAME_COUNT - 2,
+    CREATURE_WEEK_LAST            = IDX(CREATURE_BONE_DRAGON),
+    SPECIAL_WEEK_ROLL_MAX         = 4,
+    CASTLE_GROWTH_SPECIAL_BONUS   = 2,
+    CASTLE_GROWTH_WELL_BONUS      = 8,
+    NEUTRAL_CASTLE_GROWTH_DIVISOR = 2,
+    CREATURE_WEEK_GROWTH_BONUS    = 5
+H2_ENUM_END(WeeklyRuntimeConstant)
+
 H2_ENUM_BEGIN(GamePlayerTurnConstant)
     GAME_AI_MUSIC_TRACK            = 28,
     ENVIRONMENT_ORIGIN_TILE_OFFSET = 7
@@ -573,6 +588,9 @@ H2_ENUM_END(GameArmyDetailText)
 #define GAME_DIFFICULTY_HARD_GOLD_FACTOR 1.29
 #define GAME_DIFFICULTY_EXPERT_GOLD_FACTOR 1.45
 #define GAME_DIFFICULTY_IMPOSSIBLE_GOLD_FACTOR 1.6
+#define WEEKLY_HARD_GROWTH_FACTOR 1.20
+#define WEEKLY_EXPERT_GROWTH_FACTOR 1.32
+#define WEEKLY_IMPOSSIBLE_GROWTH_FACTOR 1.44
 
 H2_ENUM_BEGIN(ViewArmyControlId)
     VIEW_ARMY_QUICK_VIEW_ID = 0x7800,
@@ -4353,13 +4371,13 @@ void game::PerWeek(void) {
     i32 monsterCount36;
     hero* weeklyHero4;
 
-    giWeekType = 0;
-    giWeekTypeExtra = Random(0, 14);
-    if (m_week != 4) {
-        outerIndex5 = Random(1, 4);
+    giWeekType = WEEK_NORMAL;
+    giWeekTypeExtra = Random(0, WEEK_NAME_LAST);
+    if (m_week != GAME_WEEKS_PER_MONTH) {
+        outerIndex5 = Random(1, SPECIAL_WEEK_ROLL_MAX);
         if (outerIndex5 == 1) {
-            giWeekType = 1;
-            giWeekTypeExtra = Random(0, 56);
+            giWeekType = WEEK_CREATURE;
+            giWeekTypeExtra = Random(0, CREATURE_WEEK_LAST);
         }
     }
 
@@ -4372,33 +4390,33 @@ void game::PerWeek(void) {
                                                          [innerIndex3 - WEEKLY_FIRST_DWELLING]]
                                .growth;
                 if (castle37->m_buildings & BIT(BUILDING_SLOT_SPECIAL_FOUR))
-                    growth13 += 2;
+                    growth13 += CASTLE_GROWTH_SPECIAL_BONUS;
                 if (innerIndex3 == WEEKLY_FIRST_DWELLING
                     && (castle37->m_buildings & BIT(BUILDING_SLOT_WELL_EXTRA)))
-                    growth13 += 8;
+                    growth13 += CASTLE_GROWTH_WELL_BONUS;
                 if (castle37->m_owner == -1)
-                    growth13 /= 2;
+                    growth13 /= NEUTRAL_CASTLE_GROWTH_DIVISOR;
                 if (castle37->m_owner >= 0
                     && castle37->m_garrison[innerIndex3 - WEEKLY_FIRST_DWELLING] == 0
                     && !gbHumanPlayer[castle37->m_owner]) {
                     if (gpGame->m_difficulty == DIFFICULTY_HARD)
-                        growth13 = static_cast<i32>(growth13 * 1.20);
+                        growth13 = static_cast<i32>(growth13 * WEEKLY_HARD_GROWTH_FACTOR);
                     if (gpGame->m_difficulty == DIFFICULTY_EXPERT)
-                        growth13 = static_cast<i32>(growth13 * 1.32);
+                        growth13 = static_cast<i32>(growth13 * WEEKLY_EXPERT_GROWTH_FACTOR);
                     if (gpGame->m_difficulty == DIFFICULTY_IMPOSSIBLE)
-                        growth13 = static_cast<i32>(growth13 * 1.44);
+                        growth13 = static_cast<i32>(growth13 * WEEKLY_IMPOSSIBLE_GROWTH_FACTOR);
                 }
-                if (giWeekType == 1
+                if (giWeekType == WEEK_CREATURE
                     && gDwellingType[IDX(castle37->m_type)][innerIndex3 - WEEKLY_FIRST_DWELLING]
                            == giWeekTypeExtra)
-                    growth13 += 5;
+                    growth13 += CREATURE_WEEK_GROWTH_BONUS;
                 castle37->m_garrison[innerIndex3 - WEEKLY_FIRST_DWELLING] += growth13;
             }
         }
     }
 
     for (outerIndex5 = 0; outerIndex5 < GAME_PLAYER_COUNT; outerIndex5++) {
-        for (innerIndex3 = 0; innerIndex3 < 2; innerIndex3++) {
+        for (innerIndex3 = 0; innerIndex3 < AVAILABLE_HERO_SLOTS; innerIndex3++) {
             if (innerIndex3 == 1) {
                 heroClass18 =
                     m_heroRecs[gpGame->m_players[outerIndex5].m_availableHeroIds[0]].m_cursorType;
@@ -4453,12 +4471,16 @@ void game::PerWeek(void) {
 
     for (mapY5 = 0; MAP_HEIGHT > mapY5; mapY5++) {
         for (mapX8 = 0; mapX8 < MAP_WIDTH; mapX8++) {
+            // Retail's per-site refresh values and growth ranges are encoded map-object
+            // balance payload. The surrounding case labels provide their semantic owners.
+            // NOLINTBEGIN(readability-magic-numbers)
             switch (WORLDMAP->Row(mapY5)[mapX8].m_triggerType) {
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MONSTER: {
                     monsterCount36 = WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata
                                      & IDX(MAP_MONSTER_COUNT_MASK);
-                    monsterIncrease16 = monsterCount36 / 7;
-                    if (Random(1, 7) <= static_cast<i32>(monsterCount36 % 7))
+                    monsterIncrease16 = monsterCount36 / EVENT_DAYS_PER_WEEK;
+                    if (Random(1, EVENT_DAYS_PER_WEEK)
+                        <= static_cast<i32>(monsterCount36 % EVENT_DAYS_PER_WEEK))
                         monsterIncrease16++;
                     monsterCount36 += monsterIncrease16;
                     if (monsterCount36 > WEEKLY_MONSTER_LIMIT)
@@ -4574,6 +4596,7 @@ void game::PerWeek(void) {
                 default:
                     break;
             }
+            // NOLINTEND(readability-magic-numbers)
         }
     }
 
