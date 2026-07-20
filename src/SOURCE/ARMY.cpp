@@ -2119,14 +2119,14 @@ i32 army::Damage(i32l damage, SpellType spell) {
         if (gbRemoteOn) {
             gpCombatManager->ModifyDamageForArtifacts(
                 &damage,
-                IDX(spell),
+                spell,
                 gpCombatManager->m_heroes[m_side],
                 gpCombatManager->m_heroes[gpCombatManager->m_currentSide]
             );
         } else {
             gpCombatManager->ModifyDamageForArtifacts(
                 &damage,
-                IDX(spell),
+                spell,
                 gpCombatManager->m_heroes[gpCombatManager->m_currentSide],
                 gpCombatManager->m_heroes[m_side]
             );

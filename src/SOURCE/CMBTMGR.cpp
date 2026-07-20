@@ -1601,15 +1601,15 @@ void combatManager::CatAttack(i32 side) {
 }
 
 VA(0x0049412d, 0x74f)
-void combatManager::KeepAttack(i32 tower) {
+void combatManager::KeepAttack(H2_ENUM_PARAM(CombatTowerSelector, i32) tower) {
     if (!m_inCastleCombat)
         return;
-    if ((tower == IDX(COMBAT_TOWER_GARRISON)
+    if ((tower == COMBAT_TOWER_GARRISON
          && m_wallStates[IDX(COMBAT_WALL_SLOT_KEEP)] != IDX(COMBAT_WALL_STATE_KEEP_STANDING))
-        || (tower == IDX(COMBAT_TOWER_TOP)
+        || (tower == COMBAT_TOWER_TOP
             && m_wallStates[IDX(COMBAT_WALL_SLOT_TOP_TOWER)]
                    != IDX(COMBAT_WALL_STATE_TOWER_STANDING))
-        || (tower == IDX(COMBAT_TOWER_BOTTOM)
+        || (tower == COMBAT_TOWER_BOTTOM
             && m_wallStates[IDX(COMBAT_WALL_SLOT_BOTTOM_TOWER)]
                    != IDX(COMBAT_WALL_STATE_TOWER_STANDING)))
         return;
@@ -1700,7 +1700,7 @@ void combatManager::KeepAttack(i32 tower) {
         attackBonus4 = COMBAT_KEEP_ATTACK_STAT_LIMIT;
     if (attackBonus4 < -COMBAT_KEEP_ATTACK_STAT_LIMIT)
         attackBonus4 = -COMBAT_KEEP_ATTACK_STAT_LIMIT;
-    if (tower != IDX(COMBAT_TOWER_GARRISON))
+    if (tower != COMBAT_TOWER_GARRISON)
         shotCount28 /= COMBAT_KEEP_SIDE_TOWER_SHOT_DIVISOR;
 
     i32 damage8 = 0;
@@ -1722,7 +1722,7 @@ void combatManager::KeepAttack(i32 tower) {
         sprintf(
             gText,
             "%s %d %s.\n%d %s %s.",
-            tower == IDX(COMBAT_TOWER_GARRISON) ? "Garrison does" : "Tower does",
+            tower == COMBAT_TOWER_GARRISON ? "Garrison does" : "Tower does",
             damage8,
             "damage",
             killed29,
@@ -1733,7 +1733,7 @@ void combatManager::KeepAttack(i32 tower) {
         sprintf(
             gText,
             "%s %d %s.",
-            tower == IDX(COMBAT_TOWER_GARRISON) ? "Garrison does" : "Tower does",
+            tower == COMBAT_TOWER_GARRISON ? "Garrison does" : "Tower does",
             damage8,
             "damage"
         );

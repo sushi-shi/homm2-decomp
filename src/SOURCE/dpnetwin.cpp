@@ -149,7 +149,7 @@ i16 dpnet_init(void) {
         if (result != IDX(RESULT_OK))
             DPSD(result, RETAIL_FILE, initSourceLineBase + 41);
 
-        if (GameMode == IDX(REMOTE_GAME_NETWORK_HOST)) {
+        if (GameMode == REMOTE_GAME_NETWORK_HOST) {
             gbRemoteGameOpen = true;
             giWaitType = DIALOG_WAIT_DIRECTPLAY_FIRST_GUEST;
             sprintf(gText, "Waiting On Guest.\n\n  Press 'CANCEL' to abort.");
@@ -342,7 +342,7 @@ void dpEvaluateMessage(u32l size, i32 sender) {
             iDPRcvBufferHead = (iDPRcvBufferHead + 1) % DP_TRANSPORT_BUFFER_COUNT;
             break;
         case IDX(NETWORK_PACKET_GUEST_ARRIVED):
-            if (GameMode == IDX(REMOTE_GAME_NETWORK_HOST)) {
+            if (GameMode == REMOTE_GAME_NETWORK_HOST) {
                 for (i = 1; i < giNumHumanPlayers; i++) {
                     if (giNetPosToDCOPos[i] == sender) {
                         dpSendMessage(sender, IDX(NETWORK_PACKET_GUEST_ACCEPTED), 0, NULL);

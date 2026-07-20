@@ -657,7 +657,7 @@ townManager::townManager(void) {
     m_town = NULL;
     m_heroWindow0 = NULL;
     m_unknownC6 = 0;
-    m_selectedBuilding = TOWN_SELECTED_BUILDING_NONE;
+    m_selectedBuilding = BUILDING_SLOT_NONE;
     m_castleDialogActive = 0;
 }
 
@@ -1222,13 +1222,13 @@ i32 townManager::Main(tag_message& message) {
         if (debugBuilding_e == TOWN_DEBUG_BUILD_ALL) {
             for (index_i = 0; index_i < TOWN_BUILDING_COUNT; ++index_i) {
                 if ((gTownEligibleBuildMask[IDX(m_town->m_type)] & (1L << index_i))
-                    || index_i == IDX(TOWN_COMMAND_CASTLE))
-                    BuildObj(index_i);
+                    || index_i == IDX(BUILDING_SLOT_CASTLE))
+                    BuildObj(static_cast<BuildingSlotType>(index_i));
             }
         } else if ((gTownEligibleBuildMask[IDX(m_town->m_type)]
                     & (1L << static_cast<u8>(debugBuilding_e)))
-                   || debugBuilding_e == IDX(TOWN_COMMAND_CASTLE)) {
-            BuildObj(debugBuilding_e);
+                   || debugBuilding_e == IDX(BUILDING_SLOT_CASTLE)) {
+            BuildObj(static_cast<BuildingSlotType>(debugBuilding_e));
         }
     }
 
@@ -1258,13 +1258,13 @@ i32 townManager::Main(tag_message& message) {
                             if (quickView_k) {
                                 QuickViewRecruit(
                                     m_town,
-                                    message.payload.widget.id - IDX(TOWN_COMMAND_FIRST_DWELLING)
+                                    message.payload.widget.id - IDX(BUILDING_SLOT_DWELLING_FIRST)
                                 );
                             } else {
                                 DrawTown(1, 1);
                                 dialogManager_d = new recruitUnit(
                                     m_town,
-                                    message.payload.widget.id - IDX(TOWN_COMMAND_FIRST_DWELLING),
+                                    message.payload.widget.id - IDX(BUILDING_SLOT_DWELLING_FIRST),
                                     1
                                 );
                                 if (dialogManager_d == NULL)
@@ -1274,7 +1274,7 @@ i32 townManager::Main(tag_message& message) {
                             }
                             break;
 
-                        case IDX(TOWN_COMMAND_CASTLE):
+                        case IDX(BUILDING_SLOT_CASTLE):
                             if (quickView_k) {
                                 goto showBuildingInformation;
                             }
@@ -1333,7 +1333,7 @@ i32 townManager::Main(tag_message& message) {
                                     m_recruitResult = 0;
                                     gpWindowManager->ReleaseFizzleSource();
                                 } else {
-                                    if (m_selectedBuilding == TOWN_OBJECT_CAPTAIN_QUARTERS
+                                    if (m_selectedBuilding == BUILDING_SLOT_NEUTRAL_LAST
                                         && m_town->m_occupyingHeroId == -1) {
                                         if (m_heroStrip != NULL)
                                             delete m_heroStrip;
@@ -1360,13 +1360,13 @@ i32 townManager::Main(tag_message& message) {
                                             MemError();
                                     }
                                     RedrawTownScreen();
-                                    if (m_selectedBuilding != -1)
+                                    if (m_selectedBuilding != BUILDING_SLOT_NONE)
                                         BuildObj(m_selectedBuilding);
                                 }
                             }
                             break;
 
-                        case IDX(TOWN_COMMAND_MAGE_GUILD):
+                        case IDX(BUILDING_SLOT_MAGE_GUILD):
                             if (quickView_k) {
                                 goto showBuildingInformation;
                             }
@@ -1449,7 +1449,7 @@ i32 townManager::Main(tag_message& message) {
                             }
                             break;
 
-                        case IDX(TOWN_COMMAND_WELL):
+                        case IDX(BUILDING_SLOT_WELL):
                             if (quickView_k) {
                                 goto showBuildingInformation;
                             }
@@ -1464,7 +1464,7 @@ i32 townManager::Main(tag_message& message) {
                             }
                             break;
 
-                        case IDX(TOWN_COMMAND_THIEVES_GUILD):
+                        case IDX(BUILDING_SLOT_THIEVES_GUILD):
                             if (quickView_k) {
                                 goto showBuildingInformation;
                             }
@@ -1480,7 +1480,7 @@ i32 townManager::Main(tag_message& message) {
                             }
                             break;
 
-                        case IDX(TOWN_COMMAND_TAVERN):
+                        case IDX(BUILDING_SLOT_TAVERN):
                             if (quickView_k) {
                                 goto showBuildingInformation;
                             }
@@ -1512,7 +1512,7 @@ i32 townManager::Main(tag_message& message) {
                             }
                             break;
 
-                        case IDX(TOWN_COMMAND_UPGRADE_CASTLE):
+                        case IDX(BUILDING_SLOT_UPGRADE_CASTLE):
                             if (quickView_k) {
                                 goto showBuildingInformation;
                             }
@@ -1532,19 +1532,16 @@ i32 townManager::Main(tag_message& message) {
                                     );
                                 } else {
                                     if (BuyBuild(
-                                            IDX(TOWN_COMMAND_CASTLE),
-                                            CanBuy(
-                                                m_town,
-                                                BuildingSlotType(IDX(TOWN_COMMAND_CASTLE))
-                                            ) == 0,
+                                            BUILDING_SLOT_CASTLE,
+                                            CanBuy(m_town, BUILDING_SLOT_CASTLE) == 0,
                                             quickView_k
                                         ))
-                                        BuildObj(IDX(TOWN_COMMAND_CASTLE));
+                                        BuildObj(BUILDING_SLOT_CASTLE);
                                 }
                             }
                             break;
 
-                        case IDX(TOWN_COMMAND_DOCK):
+                        case IDX(BUILDING_SLOT_DOCK):
                             if (quickView_k) {
                                 goto showBuildingInformation;
                             }
@@ -1587,7 +1584,7 @@ i32 townManager::Main(tag_message& message) {
                                         == IDX(DIALOG_BUILD_BOAT)) {
                                         if (gpGame->CreateBoat(m_town->m_boatX, m_town->m_boatY, 0)
                                             != -1) {
-                                            BuildObj(TOWN_OBJECT_BOAT);
+                                            BuildObj(BUILDING_SLOT_DISABLED_FIRST);
                                             gpGame->m_players[giCurPlayer]
                                                 .m_resources[IDX(RES_GOLD)] -= TOWN_BOAT_GOLD_COST;
                                             gpGame->m_players[giCurPlayer]
@@ -1621,7 +1618,7 @@ i32 townManager::Main(tag_message& message) {
                             }
                             break;
 
-                        case IDX(TOWN_COMMAND_TRADING_POST):
+                        case IDX(BUILDING_SLOT_TRADING_POST):
                             if (quickView_k) {
                                 goto showBuildingInformation;
                             }
@@ -2004,12 +2001,12 @@ void townManager::ResetStrips(void) {
 }
 
 VA(0x00417b62, 0x7b)
-void townManager::Toggle(i32 building) {
+void townManager::Toggle(H2_ENUM_PARAM(BuildingSlotType, i32) building) {
     i32 index;
 
-    if (m_town->m_buildings & (1L << building)) {
+    if (m_town->m_buildings & BIT(building)) {
         for (index = 0; index < m_townObjectCount; ++index) {
-            if (m_townObjects[index]->m_buildingId == building)
+            if (m_townObjects[index]->m_buildingId == IDX(building))
                 m_townObjects[index]->m_visible ^= 1;
         }
     }
@@ -2042,7 +2039,11 @@ void townManager::DrawTown(i32 updateScreen, i32 drawFlags) {
 }
 
 VA(0x00417c9d, 0xf35)
-i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
+i32 townManager::BuyBuild(
+    H2_ENUM_PARAM(BuildingSlotType, i32) building,
+    i32 cannotBuy,
+    i32 quickView
+) {
     static i16 sourceLineBase = 0x0948; // NOLINT(readability-magic-numbers)
     u32l prerequisiteMask_c;
     i32 prerequisiteCount_p;
@@ -2104,7 +2105,7 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
         && building <= TOWN_OBJECT_ALTERNATE_UPGRADED_DWELLING_6)
         dwelling_k = building - TOWN_OBJECT_DWELLING_1;
 
-    if (building == IDX(TOWN_COMMAND_TAVERN) && m_town->m_type == FACTION_NECROMANCER) {
+    if (building == BUILDING_SLOT_TAVERN && m_town->m_type == FACTION_NECROMANCER) {
         for (index_h = 0; index_h < TOWN_RESOURCE_COUNT; ++index_h) {
             if (xShrineBuildingCost[index_h] > 0) {
                 resourceTypes_o[costCount_o] = static_cast<i8>(index_h);
@@ -2112,7 +2113,7 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
                 ++costCount_o;
             }
         }
-    } else if (building == IDX(TOWN_COMMAND_MAGE_GUILD)) {
+    } else if (building == BUILDING_SLOT_MAGE_GUILD) {
         mageLevel_k = gpTownManager->m_town->m_buildState;
         for (index_h = 0; index_h < TOWN_RESOURCE_COUNT; ++index_h) {
             if (gMageBuildingCosts
@@ -2129,7 +2130,7 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
                 ++costCount_o;
             }
         }
-    } else if (building == IDX(TOWN_COMMAND_SPECIAL_BUILDING)) {
+    } else if (building == BUILDING_SLOT_SPECIAL) {
         for (index_h = 0; index_h < TOWN_RESOURCE_COUNT; ++index_h) {
             if (gSpecialBuildingCosts[IDX(gpTownManager->m_town->m_type)][index_h] > 0) {
                 resourceTypes_o[costCount_o] = static_cast<i8>(index_h);
@@ -2138,11 +2139,12 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
                 ++costCount_o;
             }
         }
-    } else if (building <= IDX(TOWN_COMMAND_LAST_NEUTRAL_BUILDING)) {
+    } else if (building <= BUILDING_SLOT_NEUTRAL_LAST) {
         for (index_h = 0; index_h < TOWN_RESOURCE_COUNT; ++index_h) {
-            if (gNeutralBuildingCosts[building][index_h] > 0) {
+            if (gNeutralBuildingCosts[IDX(building)][index_h] > 0) {
                 resourceTypes_o[costCount_o] = static_cast<i8>(index_h);
-                costs_e[costCount_o] = static_cast<i16>(gNeutralBuildingCosts[building][index_h]);
+                costs_e[costCount_o] =
+                    static_cast<i16>(gNeutralBuildingCosts[IDX(building)][index_h]);
                 ++costCount_o;
             }
         }
@@ -2196,7 +2198,7 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
 
     sprintf(
         description_b,
-        GetBuildingInfo(m_town->m_type, static_cast<BuildingSlotType>(building), 0)
+        GetBuildingInfo(m_town->m_type, building, 0)
     );
     if (dwelling_k >= 0) {
         prerequisiteCount_p = 0;
@@ -2214,7 +2216,7 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
             }
         }
         if (m_town->m_type == FACTION_NECROMANCER
-            && building == IDX(TOWN_COMMAND_NECROMANCER_MAGE_GUILD_PREREQUISITE)
+            && building == BUILDING_SLOT_NECROMANCER_MAGE_PREREQUISITE
             && m_town->m_buildState <= NECROMANCER_PREREQUISITE_MAX_MAGE_LEVEL)
             strcat(description_b, "\nLevel 2 Mage Guild");
     }
@@ -2250,10 +2252,10 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
     window_a->BroadcastMessage(message_m);
     message_m.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
     message_m.payload.widget.id = BUILD_ICON_CONTROL;
-    message_m.payload.widget.data.value = building;
+    message_m.payload.widget.data.value = IDX(building);
     window_a->BroadcastMessage(message_m);
 
-    if (building == IDX(TOWN_COMMAND_MAGE_GUILD)) {
+    if (building == BUILDING_SLOT_MAGE_GUILD) {
         sprintf(
             gText,
             "Mage Guild, Level %d",
@@ -2261,7 +2263,7 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
                                                         : TOWN_MAGE_GUILD_MAX_LEVEL
         );
     } else {
-        strcpy(gText, GetBuildingName(m_town->m_type, BuildingSlotType(building)));
+        strcpy(gText, GetBuildingName(m_town->m_type, building));
     }
     message_m.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message_m.payload.widget.id = BUILD_NAME_CONTROL;
@@ -2367,7 +2369,7 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
             IDX(CONTROL_CLOSE),
             TOWN_INTERFACE_BROADCAST_FLAGS
         );
-    m_selectedBuilding = -1;
+    m_selectedBuilding = BUILDING_SLOT_NONE;
     if (quickView != 0) {
         message_m.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message_m.payload.widget.data.value = WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW;
@@ -2418,19 +2420,19 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
 }
 
 VA(0x00418bd2, 0x3e9)
-void townManager::BuildObj(i32 building) {
+void townManager::BuildObj(H2_ENUM_PARAM(BuildingSlotType, i32) building) {
     i32 objectIndex_k;
     SLimitData limits_h;
     i32 index_j;
     SAMPLE2 buildSample_b;
     i32 frame_g;
 
-    if ((m_town->m_buildings & (1L << building))
-        && (building != IDX(TOWN_COMMAND_MAGE_GUILD)
+    if ((m_town->m_buildings & BIT(building))
+        && (building != BUILDING_SLOT_MAGE_GUILD
             || m_town->m_buildState == TOWN_MAGE_GUILD_MAX_LEVEL)) {
         return;
     }
-    if (building == IDX(TOWN_COMMAND_DOCK) && !m_town->CanBuildDock()) {
+    if (building == BUILDING_SLOT_DOCK && !m_town->CanBuildDock()) {
         return;
     }
     {
@@ -2448,7 +2450,7 @@ void townManager::BuildObj(i32 building) {
 
         objectIndex_k = -1;
         for (index_j = 0; index_j < m_townObjectCount; ++index_j) {
-            if (m_townObjects[index_j]->m_buildingId == building)
+            if (m_townObjects[index_j]->m_buildingId == IDX(building))
                 objectIndex_k = index_j;
         }
 
@@ -2459,7 +2461,7 @@ void townManager::BuildObj(i32 building) {
         gbComputeExtent = true;
         gbSaveBiggestExtent = true;
         gbReturnAfterComputeExtent = true;
-        if (building == IDX(TOWN_COMMAND_MAGE_GUILD)) {
+        if (building == BUILDING_SLOT_MAGE_GUILD) {
             if (gpTownManager->m_town->m_type == FACTION_NECROMANCER)
                 frame_g = (gpTownManager->m_town->m_buildState - 1)
                           * NECROMANCER_BUILD_STATE_FRAME_STRIDE;
@@ -2501,7 +2503,7 @@ void townManager::BuildObj(i32 building) {
         );
         WaitEndSample(buildSample_b, -1);
         PollSound();
-        m_selectedBuilding = -1;
+        m_selectedBuilding = BUILDING_SLOT_NONE;
         gpWindowManager->BroadcastMessage(
             MESSAGE_WIDGET,
             WIDGET_COMMAND_CLEAR_FLAGS,
@@ -3015,7 +3017,7 @@ void townManager::SetupWell(heroWindow* window) {
         messaged.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
         messaged.payload.widget.id = dwellingResult + 1;
         messaged.payload.widget.data.value =
-            dwellingTypesValue[dwellingResult] + IDX(TOWN_COMMAND_FIRST_DWELLING);
+            dwellingTypesValue[dwellingResult] + IDX(BUILDING_SLOT_DWELLING_FIRST);
         window->BroadcastMessage(messaged);
         sprintf(
             gText,
@@ -3036,7 +3038,7 @@ void townManager::SetupWell(heroWindow* window) {
             GetBuildingName(
                 m_town->m_type,
                 BuildingSlotType(
-                    dwellingTypesValue[dwellingResult] + IDX(TOWN_COMMAND_FIRST_DWELLING)
+                    dwellingTypesValue[dwellingResult] + IDX(BUILDING_SLOT_DWELLING_FIRST)
                 )
             )
         );
@@ -3045,7 +3047,7 @@ void townManager::SetupWell(heroWindow* window) {
         window->BroadcastMessage(messaged);
 
         if (m_town->m_buildings
-            & (1L << (dwellingTypesValue[dwellingResult] + IDX(TOWN_COMMAND_FIRST_DWELLING)))) {
+            & (1L << (dwellingTypesValue[dwellingResult] + IDX(BUILDING_SLOT_DWELLING_FIRST)))) {
             availablen = m_town->m_garrison[dwellingTypesValue[dwellingResult]];
             sprintf(gText, "Available:");
             messaged.payload.widget.id = dwellingResult + TOWN_WELL_FIRST_AVAILABLE_CONTROL;
@@ -3088,7 +3090,7 @@ void townManager::SetupWell(heroWindow* window) {
         sprintf(detailTextf, cWellDetail[WELL_DETAIL_SPEED], speedText[monsterInfoi.speed]);
         strcat(gText, detailTextf);
         if (m_town->m_buildings
-            & (1L << (dwellingTypesValue[dwellingResult] + IDX(TOWN_COMMAND_FIRST_DWELLING)))) {
+            & (1L << (dwellingTypesValue[dwellingResult] + IDX(BUILDING_SLOT_DWELLING_FIRST)))) {
             growthd =
                 gMonsterDatabase[gDwellingType[IDX(m_town->m_type)][dwellingTypesValue[dwellingResult]]]
                     .growth;

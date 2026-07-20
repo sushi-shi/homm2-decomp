@@ -707,7 +707,7 @@ public:
     void ViewArmy(class army*, i32);
     i32 HasValidSpellTarget(SpellType);
     i32 ViewSpells(i32);
-    i32 FindResurrectArmyIndex(i32, i32, i32);
+    i32 FindResurrectArmyIndex(i32, H2_ENUM_PARAM(SpellType, i32), i32);
     i32 ValidSpellTarget(SpellType, i32);
     void SpellMessage(SpellType, i32);
     void CastSpell(SpellType, i32, i32, i32);
@@ -765,13 +765,18 @@ public:
     void MirrorImage(i32);
     void SummonElemental(i32, i32);
     void DoLuck(i32, i32);
-    void DoBlast(i32, i32);
-    void Resurrect(i32, i32, i32);
+    void DoBlast(i32, H2_ENUM_PARAM(SpellType, i32));
+    void Resurrect(H2_ENUM_PARAM(SpellType, i32), i32, i32);
     i32 SpaceForElementalExists(void);
     void ShowSpellCastFailure(class army*, i32);
-    void ModifyDamageForArtifacts(i32l*, i32, class hero*, class hero*);
+    void ModifyDamageForArtifacts(
+        i32l*,
+        H2_ENUM_PARAM(SpellType, i32),
+        class hero*,
+        class hero*
+    );
     void Earthquake(void);
-    void ShowSpellMessage(i32, i32, class army*);
+    void ShowSpellMessage(i32, H2_ENUM_PARAM(SpellType, i32), class army*);
     i32 ValidHexToStandOn(i32);
     void SetCombatDirections(i32);
     void CheckSetMouseDirection(i32, i32, i32);
@@ -812,7 +817,7 @@ public:
     void ClearEffects(void);
     void NextPos(i32*);
     i32 FirstArmy(i32, i32, i32*);
-    i32 FirstResurrectable(i32, i32*, i32);
+    i32 FirstResurrectable(i32, i32*, H2_ENUM_PARAM(SpellType, i32));
     void EffectSpellCure(i32*, i32, i32, i32);
     void EffectSpellResurrect(i32*, i32, SpellType);
     void EffectSpellDamage(i32*, SpellType, i32);
@@ -845,7 +850,7 @@ public:
     i32 GetNextArmy(i32);
     i32 IsWinner(i32);
     void CatAttack(i32);
-    void KeepAttack(i32);
+    void KeepAttack(H2_ENUM_PARAM(CombatTowerSelector, i32));
     i32 ExperienceValueOfStack(i32);
     void ResetHitByCreature(void);
     void SaveCombatBorder(void);

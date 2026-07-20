@@ -36,13 +36,17 @@ void ModemSetup(i32 mode) {
     inque.readPosition = 0;
     outque.writePosition = 0;
     outque.readPosition = 0;
-    iBaudBits = MODEM_BAUD_CLOCK / gConfig.baudRate[gbDirectConnect];
-    com_init(static_cast<u8>(gConfig.comPort[gbDirectConnect]), IDX(COM_BAUD_19200), 0);
+    iBaudBits = MODEM_BAUD_CLOCK / IDX(gConfig.baudRate[gbDirectConnect]);
+    com_init(
+        static_cast<u8>(IDX(gConfig.comPort[gbDirectConnect])),
+        IDX(COM_BAUD_19200),
+        0
+    );
     LogStr("MS2");
 
     if (gbDirectConnect == 0) {
         for (resetAttempt9 = 0; resetAttempt9 < RESET_ATTEMPT_COUNT; ++resetAttempt9) {
-            if (gConfig.comPort[gbDirectConnect] >= 1)
+            if (gConfig.comPort[gbDirectConnect] >= CONFIG_COM_PORT_1)
                 sprintf(command, gConfig.modemInitString);
             else
                 sprintf(command, "ATZ");
@@ -60,13 +64,13 @@ void ModemSetup(i32 mode) {
         case MODEM_MODE_DIAL:
             if (gbDirectConnect == 0 && Dial() != 0) {
                 RemoteCleanup();
-                GameMode = 0;
+                GameMode = REMOTE_GAME_NONE;
             }
             break;
         case MODEM_MODE_WAIT:
             if (gbDirectConnect == 0 && Wait() != 0) {
                 RemoteCleanup();
-                GameMode = 0;
+                GameMode = REMOTE_GAME_NONE;
             }
             break;
         default:

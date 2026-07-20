@@ -56,7 +56,7 @@ public:
     u32l m_affordableBuildings;
     u32l m_buildableBuildings;
     i32 m_castleDialogActive;
-    i32 m_selectedBuilding;
+    H2_ENUM_STORAGE(BuildingSlotType, i32) m_selectedBuilding;
     heroWindow* m_heroWindow0;
     heroWindow* m_heroWindow1;
     i32 m_splitAmount;
@@ -82,10 +82,10 @@ public:
     void SplitArmy(void);
     void ShiftQualChange(void);
     void ResetStrips(void);
-    void Toggle(i32);
+    void Toggle(H2_ENUM_PARAM(BuildingSlotType, i32));
     void DrawTown(i32, i32);
-    i32 BuyBuild(i32, i32, i32);
-    void BuildObj(i32);
+    i32 BuyBuild(H2_ENUM_PARAM(BuildingSlotType, i32), i32, i32);
+    void BuildObj(H2_ENUM_PARAM(BuildingSlotType, i32));
     void SetupMage(class heroWindow*);
     i32 RecruitHero(i32, i32);
     void DoTavern(void);
