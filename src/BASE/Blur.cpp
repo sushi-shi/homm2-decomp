@@ -7,14 +7,14 @@
 // each output pixel. Component-table indices are byte offsets into int tables.
 // The game palette stores 256 RGB triplets with six-bit component values.
 H2_ENUM_BEGIN(BlurPaletteConstant)
-    PALETTE_RED_OFFSET          = -3,
-    PALETTE_GREEN_OFFSET        = -2,
-    PALETTE_BLUE_OFFSET         = -1,
-    PALETTE_CHANNEL_COUNT       = 3,
-    PALETTE_COLOR_COUNT         = 256,
-    PALETTE_BYTE_COUNT          = PALETTE_CHANNEL_COUNT * PALETTE_COLOR_COUNT,
-    PALETTE_COMPONENT_MAXIMUM   = 0x3f,
-    COMPONENT_TABLE_BYTE_COUNT  = sizeof(i32) * PALETTE_COLOR_COUNT
+    PALETTE_RED_OFFSET         = -3,
+    PALETTE_GREEN_OFFSET       = -2,
+    PALETTE_BLUE_OFFSET        = -1,
+    PALETTE_CHANNEL_COUNT      = 3,
+    PALETTE_COLOR_COUNT        = 256,
+    PALETTE_BYTE_COUNT         = PALETTE_CHANNEL_COUNT * PALETTE_COLOR_COUNT,
+    PALETTE_COMPONENT_MAXIMUM  = 0x3f,
+    COMPONENT_TABLE_BYTE_COUNT = sizeof(i32) * PALETTE_COLOR_COUNT
 H2_ENUM_END(BlurPaletteConstant)
 
 // RGBLOOKP.BIN is addressed as 1024 rows of 32 quantized blue entries.
