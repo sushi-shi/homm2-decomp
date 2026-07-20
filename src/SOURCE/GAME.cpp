@@ -532,8 +532,15 @@ H2_ENUM_BEGIN(GameCompressionTestConstant)
     TEST_RANDOM_SIZE_MAX     = 100000,
     TEST_RANDOM_BUFFER_EXTRA = 5000,
     TEST_FILE_BUFFER_EXTRA   = 2000,
-    TEST_FILENAME_SIZE       = 32
+    TEST_FILENAME_SIZE       = 32,
+    TEST_MESSAGE_CAPACITY    = 40,
+    COMPRESS_TEST_ITERATIONS = 100
 H2_ENUM_END(GameCompressionTestConstant)
+
+H2_ENUM_BEGIN(GameRumourConstant)
+    RUMOUR_SCRATCH_CAPACITY        = 100,
+    RUMOUR_CATEGORY_ORDER_CAPACITY = 8
+H2_ENUM_END(GameRumourConstant)
 
 DATA(0x004f70e0) b32 gbGameOver = false;
 // Fixed source-file and line anchors preserve allocation diagnostics.
@@ -557,8 +564,7 @@ H2_ENUM_BEGIN(GameTuningConstant)
     RANDOM_MONSTER_SPRITE_TO_TRIGGER =
         0x70,                     // sprite index + 0x70 == its MAP_TRIGGER_RANDOM_MONSTER_LEVEL_*
     BANK_GUARDIAN_FLAG               = 0x100,   // creature-bank metadata: defenders present
-    TOWN_RECORD_TYPE_MASK            = 0x7f, // saved town record: low bits carry the race
-    COMPRESS_TEST_ITERATIONS         = 100
+    TOWN_RECORD_TYPE_MASK            = 0x7f // saved town record: low bits carry the race
 H2_ENUM_END(GameTuningConstant)
 
 H2_ENUM_BEGIN(GamePasswordConstant)
@@ -7511,15 +7517,18 @@ i32 game::TownIDToTownPos(playerData* pd, i32 townId) {
 
 VA(0x0048558f, 0x79f)
 void game::SetupNewRumour(void) {
-    char rumourBuffer6[100];
-    i32l categoryStats7[6];
-    i8 categoryOrder2[8];
+    char rumourBuffer6[RUMOUR_SCRATCH_CAPACITY];
+    i32l categoryStats7[GAME_PLAYER_COUNT];
+    i8 categoryOrder2[RUMOUR_CATEGORY_ORDER_CAPACITY];
     rumourEventExtra* event4;
     i32 eventIndex11;
     i32 attempts13;
     i32 category10;
     i32 roll2;
     i32 direction9;
+    // Retail's event chances, category weights, and cDirections indices are
+    // tavern-rumour selection payload.
+    // NOLINTBEGIN(readability-magic-numbers)
     if (m_rumourEventCount != 0 && Random(0, 9) < static_cast<i32>(m_rumourEventCount)) {
         attempts13 = 0;
         while (attempts13++ < 200) {
@@ -7626,6 +7635,7 @@ void game::SetupNewRumour(void) {
             }
         }
     }
+    // NOLINTEND(readability-magic-numbers)
 }
 
 VA(0x00485d2e, 0xd9)
@@ -7773,7 +7783,8 @@ void CompressTest2(void) {
     decodedData6 =
         static_cast<char*>(H2_ALLOC(dataSize2 + TEST_RANDOM_BUFFER_EXTRA, 8059));
     for (index7 = 0; index7 < dataSize2; index7++)
-        sourceData6[index7] = static_cast<char>(Random(0, 255));
+        // Random() is inclusive, so this covers every byte payload value.
+        sourceData6[index7] = static_cast<char>(Random(0, 255)); // NOLINT(readability-magic-numbers)
     sourceCrc0 = calc_crc_long(reinterpret_cast<u8*>(sourceData6), dataSize2);
     encodedSize14 = EncodeData(encodedData6, sourceData6, dataSize2);
     decodedSize17 = DecodeData(decodedData6, encodedData6, encodedSize14);
@@ -7831,7 +7842,7 @@ void CompressTest(void) {
 
 VA(0x00486652, 0x53)
 void CompressTest3(void) {
-    char buf[40];
+    char buf[TEST_MESSAGE_CAPACITY];
     i32 i;
     for (i = 0; i < COMPRESS_TEST_ITERATIONS; i++) {
         sprintf(buf, "Test # %d", i);
@@ -7894,8 +7905,8 @@ DATA(0x0052844c) b32 gbAllowUpgrade;
 DATA(0x00528450) i32 iViewArmyType;
 DATA(0x00528454) class hero* viewSpellsHero;
 DATA(0x00528458) b32 gbUpgradeArmy;
-DATA(0x00528460) i16 RandMineQty[8];
-DATA(0x00528470) char gcCurMapName[16];
+DATA(0x00528460) i16 RandMineQty[AI_RANDOM_MINE_TYPE_COUNT];
+DATA(0x00528470) char gcCurMapName[GAME_CURRENT_MAP_NAME_SIZE];
 DATA(0x00528480) i8* gbNGDifficulty;
 DATA(0x00528488) CreatureType iViewArmyUpgradeToType;
 DATA(0x0052848c) i32 viewArmyBaseX;
