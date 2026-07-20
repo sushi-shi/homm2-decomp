@@ -375,11 +375,11 @@ i32 playerData::NumOfGivenArtifact(ArtifactType artifact) {
 }
 
 VA(0x00471071, 0x82)
-i32 game::MineTypesOwned(i32 owner, i32 resourceType) {
+i32 game::MineTypesOwned(i32 owner, MineType mineType) {
     i32 num = 0;
     i32 i;
     for (i = 0; i < GAME_MINE_COUNT; i++) {
-        if (m_mines[i].owner == owner && m_mines[i].resourceType == resourceType)
+        if (m_mines[i].owner == owner && m_mines[i].resourceType == mineType)
             num++;
     }
     return num;
