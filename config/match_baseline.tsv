@@ -523,7 +523,7 @@ SOURCE/ADVMGR	?ViewPuzzle@advManager@@QAEXXZ	99.1384	feec2a8721b7
 SOURCE/AI	?AICheckRetreat@combatManager@@QAEHXZ	99.7261	16df51ac9b0a
 SOURCE/AI	?AttemptAdjacentAttack@combatManager@@QAEHPAVarmy@@@Z	99.1150	6abbf1d20778
 SOURCE/AI	?AttemptAttack@combatManager@@QAEHPAVarmy@@HH@Z	100.0000	802e053483a4
-SOURCE/AI	?DoCompAI@combatManager@@QAEXH@Z	97.1407	37ae2fdda7e8
+SOURCE/AI	?DoCompAI@combatManager@@QAEXH@Z	97.4966	4ffee81a40cf
 SOURCE/AI	?DoLichShot@combatManager@@QAEXPAVarmy@@@Z	100.0000	db9fcf76860f
 SOURCE/AI	?GetAllMask@combatManager@@QAEHH@Z	100.0000	dfefa7e559c6
 SOURCE/AI	?GetBestArmy@combatManager@@QAEHHH@Z	75.4557	cdc1f3e6bae2

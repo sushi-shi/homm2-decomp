@@ -472,10 +472,11 @@ finish:
             );
             if (adjacentHex8 > 0 && adjacentHex8 < COMBAT_HEX_COUNT
                 && gpCombatManager->m_hexCells[adjacentHex8].m_occupantSide
-                       == COMBAT_DEFENDER_SIDE - m_currentSide)
+                       == COMBAT_DEFENDER_SIDE - m_currentSide) {
+                giNextActionGridIndex = adjacentHex8;
                 break;
+            }
         }
-        giNextActionGridIndex = adjacentHex8;
     }
 }
 
