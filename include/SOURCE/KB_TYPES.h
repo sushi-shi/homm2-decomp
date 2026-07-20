@@ -473,6 +473,7 @@ H2_ENUM_CLASS_BEGIN_SPLIT(FactionType, i8)
     FACTION_NECROMANCER   = 5,
     FACTION_NEUTRAL       = 6,
     HERO_TYPE_BOAT        = 6,  // Hero cursor sprites use the neutral slot for boats.
+    FACTION_RANDOM        = 7,
     FACTION_COUNT         = 6
 H2_ENUM_CLASS_END_SPLIT(FactionType, i8)
 

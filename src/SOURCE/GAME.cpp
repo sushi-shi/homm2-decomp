@@ -1815,8 +1815,8 @@ void game::NewMap(char* filename) {
         m_players[player2].m_color = -1;
         gcColorToPlayerPos[player2] = -1;
         gcColorToSetupPos[player2] = -1;
-        if (gpGame->m_setupPlayerRace[player2] == GAME_RANDOM_RACE)
-            gpGame->m_setupPlayerRace[player2] = static_cast<i8>(randomColor2);
+        if (gpGame->m_setupPlayerRace[player2] == FACTION_RANDOM)
+            gpGame->m_setupPlayerRace[player2] = static_cast<FactionType>(randomColor2);
         randomColor2 = (randomColor2 + 1) % GAME_PLAYER_COUNT;
     }
     for (player2 = 0; player2 < m_playerCount; player2++)
@@ -1983,10 +1983,8 @@ void game::NewMap(char* filename) {
             }
             heroClass5 = static_cast<FactionType>(Random(0, IDX(FACTION_COUNT) - 1));
             if (m_setupPlayerRace[gcColorToSetupPos[m_players[player2].m_color]]
-                < IDX(FACTION_COUNT))
-                heroClass5 = static_cast<FactionType>(
-                    m_setupPlayerRace[gcColorToSetupPos[m_players[player2].m_color]]
-                );
+                < FACTION_COUNT)
+                heroClass5 = m_setupPlayerRace[gcColorToSetupPos[m_players[player2].m_color]];
             m_players[player2].m_availableHeroIds[0] =
                 static_cast<char>(GetNewHeroId(player2, heroClass5, 0));
             m_availableHeroes[m_players[player2].m_availableHeroIds[0]] = WEEKLY_AVAILABLE_HERO;
@@ -2140,12 +2138,10 @@ void game::NewMap(char* filename) {
     }
     for (player2 = 0; player2 < m_playerCount; player2++) {
         heroClass5 = FACTION_KNIGHT;
-        if (m_setupPlayerRace[gcColorToSetupPos[m_players[player2].m_color]] >= 0
+        if (m_setupPlayerRace[gcColorToSetupPos[m_players[player2].m_color]] >= FACTION_KNIGHT
             && m_setupPlayerRace[gcColorToSetupPos[m_players[player2].m_color]]
-                   < IDX(FACTION_COUNT)) {
-            heroClass5 = static_cast<FactionType>(
-                m_setupPlayerRace[gcColorToSetupPos[m_players[player2].m_color]]
-            );
+                   < FACTION_COUNT) {
+            heroClass5 = m_setupPlayerRace[gcColorToSetupPos[m_players[player2].m_color]];
         } else {
             if (!!m_players[player2].m_townCount) {
                 heroClass5 = gpGame->m_castleRecs[m_players[player2].TownId(0)].m_type;
@@ -4513,10 +4509,9 @@ void game::PerWeek(void) {
             desiredClass1 = heroClass18;
             if (innerIndex3 == 0
                 && m_setupPlayerRace[gcColorToSetupPos[m_players[outerIndex5].m_color]]
-                       < GAME_PLAYER_COUNT) {
-                desiredClass1 = static_cast<FactionType>(
-                    m_setupPlayerRace[gcColorToSetupPos[m_players[outerIndex5].m_color]]
-                );
+                       < FACTION_COUNT) {
+                desiredClass1 =
+                    m_setupPlayerRace[gcColorToSetupPos[m_players[outerIndex5].m_color]];
             }
 
             if (gpGame->m_availableHeroes[(
@@ -4933,7 +4928,7 @@ void game::RandomizeTown(i32 x, i32 y, i32) {
     if (extra->color == RANDOM_TOWN_UNOWNED_COLOR)
         race0 = Random(RANDOM_TOWN_RACE_MIN, RANDOM_TOWN_RACE_MAX);
     else
-        race0 = m_setupPlayerRace[gcColorToSetupPos[extra->color]];
+        race0 = IDX(m_setupPlayerRace[gcColorToSetupPos[extra->color]]);
 
     castle0->m_turnsOwned = RANDOM_TOWN_AGE;
     ConvertObject(
@@ -6196,8 +6191,8 @@ void game::ProcessOnMapHeroes(void) {
                         } else {
                             heroClass6 = cell5->m_objectIndex % MAP_HERO_FRAME_STRIDE;
                             if (heroClass6 == MAP_HERO_RANDOM_FACTION_FRAME) {
-                                heroClass6 = m_setupPlayerRace
-                                    [gcColorToSetupPos[gpGame->m_players[extra0->owner].m_color]];
+                                heroClass6 = IDX(m_setupPlayerRace
+                                    [gcColorToSetupPos[gpGame->m_players[extra0->owner].m_color]]);
                             }
                         }
 
