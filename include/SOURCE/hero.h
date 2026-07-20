@@ -48,8 +48,6 @@ H2_ENUM_CLASS_BEGIN(HeroPrimaryStat)
     HERO_PRIMARY_KNOWLEDGE   = 3
 H2_ENUM_CLASS_END(HeroPrimaryStat)
 
-#define HERO_EXPERIENCE_GROWTH_FACTOR 1.2
-
 H2_ENUM_BEGIN(HeroConstant)
     HERO_OWNER_NONE                           = -1,
     HERO_BOAT_NONE                            = 0xff,

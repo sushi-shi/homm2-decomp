@@ -27,6 +27,8 @@
 #include <SOURCE/TOWNMGR.h>
 #include <SOURCE/X_GLOBAL.h>
 
+#define HERO_EXPERIENCE_GROWTH_FACTOR 1.2
+
 H2_ENUM_BEGIN(HeroUiConstant)
     UI_STATUS_TEXT_WIDGET          = 0x12f,
     UI_ARTIFACT_SLOT_0             = 0x14,

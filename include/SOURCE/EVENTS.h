@@ -275,8 +275,6 @@ H2_ENUM_BEGIN(FlotsamReward)
     FLOTSAM_LARGE_TREASURE = 3
 H2_ENUM_END(FlotsamReward)
 
-#define GENERIC_SITE_SIREN_ARMY_REMAINDER 0.7
-
 H2_ENUM_BEGIN(MonsterInteractionConstant)
     MONSTER_JOIN_FORCED                     = 0x1000,
     MONSTER_COUNT_MASK                      = 0xfff,
@@ -289,9 +287,6 @@ H2_ENUM_END(MonsterInteractionConstant)
 
 #define MONSTER_STRENGTH_JOIN 2.0
 #define MONSTER_STRENGTH_FLEE 5.0
-
-#define MONSTER_NECROMANCY_FRACTION 0.1
-#define MONSTER_AI_JOIN_COST_FRACTION 0.75
 
 H2_ENUM_BEGIN(EventArtifactStatConstant)
     EVENT_ARTIFACT_PRIMARY_STAT_COUNT     = 4,

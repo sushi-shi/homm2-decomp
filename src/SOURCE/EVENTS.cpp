@@ -39,6 +39,10 @@
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/x_arena.h>
 
+#define GENERIC_SITE_SIREN_ARMY_REMAINDER 0.7
+#define MONSTER_NECROMANCY_FRACTION 0.1
+#define MONSTER_AI_JOIN_COST_FRACTION 0.75
+
 namespace {
 
     H2_ENUM_BEGIN(CombatRemoteCommand)
