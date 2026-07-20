@@ -2,6 +2,7 @@
 #define HOMM2_X_GLOBAL_H
 
 #include <SOURCE/KB_TYPES.h>
+#include <SOURCE/CONFIG_TYPES.h>
 #include <SOURCE/REMOTE_TYPES.h>
 #include <va.h>
 #include <SOURCE/CURSOR.h>
@@ -376,7 +377,7 @@ extern i32 giScrollX;
 extern i32 giScrollY;
 extern b32 gbNoBorder;
 extern b32 gbEnlargeScreenBlit;
-extern i32 giCurExe;
+extern H2_ENUM_STORAGE(ConfigExecutable, i32) giCurExe;
 extern b32 gbInDialog;
 extern b32 gbInSetupDialog;
 extern b32 gbMinimized;
