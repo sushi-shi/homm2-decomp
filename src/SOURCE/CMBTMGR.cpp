@@ -399,7 +399,7 @@ void combatManager::InitNonVisualVars(void) {
     m_heroAlternateDeathPending[0] = m_heroAlternateDeathPending[1] = 0;
     m_eagleEyeSpell[COMBAT_ATTACKER_SIDE] = -1;
     m_eagleEyeSpell[COMBAT_DEFENDER_SIDE] = -1;
-    giNextAction = 0;
+    giNextAction = ACTION_NONE;
     m_summonedCreatureType[0] = 0;
     m_summonedCreatureType[1] = 0;
     m_selectedHex = -1;

@@ -101,7 +101,7 @@ i8 InitNetGuest(void) {
             if (namePending) {
                 if (status & IDX(NETBIOS_SESSION_ERROR)) {
                     iNameRetryCount++;
-                    // Retry registration after SETUP_WAIT_FOR_LOCAL_NAME fails.
+                    // SETUP_WAIT_FOR_LOCAL_NAME failed; return to SETUP_REGISTER_LOCAL_NAME.
                     iInitNetGuestStatus--;
                 }
             } else {

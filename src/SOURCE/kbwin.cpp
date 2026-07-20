@@ -384,27 +384,27 @@ LRESULT AppCommand(HWND window, UINT message, WPARAM messageParam, LPARAM messag
     DLGPROC appDialogProc;
 
     command = LOWORD(messageParam);
-    switch (command) {
-        case IDX(KBWIN_MENU_ABOUT):
+    switch (static_cast<KbWinMenuCommand>(command)) {
+        case KBWIN_MENU_ABOUT:
             appDialogProc = reinterpret_cast<DLGPROC>(AppAbout);
             DialogBoxParamA(hInstApp, "HEROES", window, appDialogProc, 0);
             break;
-        case IDX(KBWIN_MENU_HELP):
+        case KBWIN_MENU_HELP:
             WinHelpA(hwndApp, ".\\HELP\\HEROES2.HLP", HELP_FINDER, 0);
             break;
-        case IDX(KBWIN_MENU_SIZE_640_480):
+        case KBWIN_MENU_SIZE_640_480:
             ResizeWindow(-1, -1, KBWIN_WIDTH_640, KBWIN_HEIGHT_480);
             break;
-        case IDX(KBWIN_MENU_SIZE_800_600):
+        case KBWIN_MENU_SIZE_800_600:
             ResizeWindow(-1, -1, KBWIN_WIDTH_800, KBWIN_HEIGHT_600);
             break;
-        case IDX(KBWIN_MENU_SIZE_1024_768):
+        case KBWIN_MENU_SIZE_1024_768:
             ResizeWindow(-1, -1, KBWIN_WIDTH_1024, KBWIN_HEIGHT_768);
             break;
-        case IDX(KBWIN_MENU_SIZE_1280_1024):
+        case KBWIN_MENU_SIZE_1280_1024:
             ResizeWindow(-1, -1, KBWIN_WIDTH_1280, KBWIN_HEIGHT_1024);
             break;
-        case IDX(KBWIN_MENU_FULLSCREEN):
+        case KBWIN_MENU_FULLSCREEN:
             SetFullScreenStatus(1 - gConfig.gfx[giCurExe].fullScreen);
             break;
         default:

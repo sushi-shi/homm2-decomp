@@ -28,7 +28,6 @@ H2_ENUM_BEGIN(CombatLayoutConstant)
     SPELL_AI_WALL_DESTROYED             = 6,
     SPELL_AI_EARTHQUAKE_NO_DAMAGE_SCORE = 29999,
     SPELL_AI_EARTHQUAKE_WALL_SCORE      = 100,
-    SPELL_AI_CAST_ACTION                = 1,
     SPELL_AI_HEX_ROW_END_OFFSET         = 2,
     SPELL_AI_HEX_ROW_SKIP               = 3,
     SPELL_AI_MIRROR_VALUE_DIVISOR       = 2
@@ -88,7 +87,7 @@ i32 combatManager::DoSpellAI(i32 side, i32 restricted) {
     }
 
     if (bestEffectWork > 0) {
-        giNextAction = SPELL_AI_CAST_ACTION;
+        giNextAction = ACTION_CAST_SPELL;
         giNextActionExtra = bestSpellChoice;
         giNextActionGridIndex = bestHexWork;
         return 1;
