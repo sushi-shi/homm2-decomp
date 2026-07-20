@@ -226,9 +226,7 @@ H2_ENUM_BEGIN(GameMonthlyConstant)
     MONSTER_TILESET               = 12,
     MONSTER_SPAWN_MIN             = 0,
     MONSTER_SPAWN_MAX             = 360,
-    MONSTER_SPAWN_ROLL            = 10,
-    MONSTER_GUARD_ROLL_MAX        = 100,
-    MONSTER_GUARD_CHANCE          = 20
+    MONSTER_SPAWN_ROLL            = 10
 H2_ENUM_END(GameMonthlyConstant)
 
 H2_ENUM_BEGIN(GameRandomArtifactConstant)
@@ -268,6 +266,7 @@ H2_ENUM_END(SkeletonEventConstant)
 
 H2_ENUM_BEGIN(EventGenerationRollConstant)
     EVENT_ROLL_MIN        = 0,
+    EVENT_BINARY_ROLL_MAX = 1,
     EVENT_ROLL_MAX        = 100,
     EVENT_BUCKET_ROLL_MAX = 99,
     EVENT_BUCKET_COUNT    = 10
@@ -302,6 +301,26 @@ H2_ENUM_BEGIN(ShipwreckSurvivorGenerationConstant)
     SHIPWRECK_SURVIVOR_TREASURE_CUTOFF = 60,
     SHIPWRECK_SURVIVOR_MINOR_CUTOFF    = 80
 H2_ENUM_END(ShipwreckSurvivorGenerationConstant)
+
+H2_ENUM_BEGIN(MonsterGuardGenerationConstant)
+    MONSTER_GUARD_ROLL_MIN = 0,
+    MONSTER_GUARD_ROLL_MAX = 100,
+    MONSTER_GUARD_CUTOFF   = 20
+H2_ENUM_END(MonsterGuardGenerationConstant)
+
+H2_ENUM_BEGIN(ResourceGenerationConstant)
+    RESOURCE_BULK_AMOUNT_MIN   = 5,
+    RESOURCE_BULK_AMOUNT_MAX   = 10,
+    RESOURCE_SCARCE_AMOUNT_MIN = 3,
+    RESOURCE_SCARCE_AMOUNT_MAX = 6
+H2_ENUM_END(ResourceGenerationConstant)
+
+H2_ENUM_BEGIN(EventSpellLevel)
+    SHRINE_FIRST_CIRCLE_SPELL_LEVEL  = 1,
+    SHRINE_SECOND_CIRCLE_SPELL_LEVEL = 2,
+    SHRINE_THIRD_CIRCLE_SPELL_LEVEL  = 3,
+    PYRAMID_SPELL_LEVEL              = 5
+H2_ENUM_END(EventSpellLevel)
 
 H2_ENUM_BEGIN(GameVisibilityConstant)
     EARLY_TURN_LAST        = 20,
@@ -378,6 +397,22 @@ inline town* GetCastle(i32 idx) {
 }
 inline i8 PlayerEventByte(i8 color) {
     return gpGame->m_players[color].m_color;
+}
+
+inline b32 CanGenerateMonsterGuard(CreatureType monsterType) {
+    return monsterType != CREATURE_GHOST && monsterType != CREATURE_EARTH_ELEMENTAL
+           && monsterType != CREATURE_AIR_ELEMENTAL && monsterType != CREATURE_FIRE_ELEMENTAL
+           && monsterType != CREATURE_WATER_ELEMENTAL;
+}
+
+inline i32 GetRandomEventSpell(EventSpellLevel spellLevel) {
+    i32 spellMetadata =
+        Random(IDX(SPELL_FIREBALL), IDX(SPELL_COUNT) - 1) + MAP_EVENT_SPELL_OFFSET;
+    while (gsSpellInfo[spellMetadata - MAP_EVENT_SPELL_OFFSET].level != spellLevel) {
+        spellMetadata =
+            Random(IDX(SPELL_FIREBALL), IDX(SPELL_COUNT) - 1) + MAP_EVENT_SPELL_OFFSET;
+    }
+    return spellMetadata;
 }
 
 H2_ENUM_BEGIN(PlayerDataSerializationConstant)
@@ -2103,6 +2138,8 @@ void game::RandomizeEvents(void) {
                     // NOLINTEND(readability-magic-numbers)
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ARCHER_HOUSE:
+                    // Retail weekly dwelling availability ranges are balance payload.
+                    // NOLINTBEGIN(readability-magic-numbers)
                     cell2->m_objectMetadata = Random(10, 25);
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_GOBLIN_HUT:
@@ -2116,68 +2153,72 @@ void game::RandomizeEvents(void) {
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_LOG_CABIN:
                     cell2->m_objectMetadata = Random(20, 50);
+                    // NOLINTEND(readability-magic-numbers)
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_WATER_WHEEL:
-                    cell2->m_objectMetadata = 1;
+                    cell2->m_objectMetadata = MAP_EVENT_DATA_AVAILABLE;
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ARTESIAN_SPRING:
-                    cell2->m_objectMetadata = 1;
+                    cell2->m_objectMetadata = MAP_EVENT_DATA_AVAILABLE;
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MAGIC_GARDEN:
-                    cell2->m_objectMetadata = Random(0, 1) == 0 ? 6 : 7;
+                    cell2->m_objectMetadata =
+                        Random(EVENT_ROLL_MIN, EVENT_BINARY_ROLL_MAX) == EVENT_ROLL_MIN
+                            ? IDX(RES_GEMS) + MAP_EVENT_RESOURCE_OFFSET
+                            : IDX(RES_GOLD) + MAP_EVENT_RESOURCE_OFFSET;
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_TREE_OF_KNOWLEDGE:
-                    cell2->m_objectMetadata = (Random(1, 3) << 6) | eyeId13++;
+                    cell2->m_objectMetadata =
+                        (Random(TREE_KNOWLEDGE_FREE, TREE_KNOWLEDGE_GEMS)
+                         << TREE_KNOWLEDGE_MODE_SHIFT)
+                        | eyeId13++;
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MONSTER:
-                    if (cell2->m_objectMetadata == 0) {
-                        cell2->m_objectMetadata = GetRandomNumTroops(
-                            static_cast<CreatureType>(cell2->m_objectIndex)
-                        );
-                        if (cell2->m_objectIndex != 59 && cell2->m_objectIndex != 62
-                            && cell2->m_objectIndex != 63 && cell2->m_objectIndex != 64
-                            && cell2->m_objectIndex != 65 && Random(0, 100) < 20)
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MONSTER: {
+                    CreatureType monsterType = static_cast<CreatureType>(cell2->m_objectIndex);
+                    if (cell2->m_objectMetadata == MAP_EVENT_DATA_EMPTY) {
+                        cell2->m_objectMetadata = GetRandomNumTroops(monsterType);
+                        if (CanGenerateMonsterGuard(monsterType)
+                            && Random(MONSTER_GUARD_ROLL_MIN, MONSTER_GUARD_ROLL_MAX)
+                                   < MONSTER_GUARD_CUTOFF)
                             cell2->m_objectMetadata |= IDX(MAP_MONSTER_GUARD_FLAG);
                     }
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RESOURCE:
-                    cell2->m_objectMetadata = cell2->m_objectIndex >> 1;
-                    switch (cell2->m_objectMetadata) {
-                        case 0:
-                        case 2:
-                            cell2->m_objectMetadata = Random(5, 10);
+                }
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RESOURCE: {
+                    ResourceType resourceType =
+                        static_cast<ResourceType>(cell2->m_objectIndex >> 1);
+                    cell2->m_objectMetadata = IDX(resourceType);
+                    switch (resourceType) {
+                        case RES_WOOD:
+                        case RES_ORE:
+                            cell2->m_objectMetadata =
+                                Random(RESOURCE_BULK_AMOUNT_MIN, RESOURCE_BULK_AMOUNT_MAX);
                             break;
-                        case 6:
-                            cell2->m_objectMetadata = Random(5, 10);
+                        case RES_GOLD:
+                            cell2->m_objectMetadata =
+                                Random(RESOURCE_BULK_AMOUNT_MIN, RESOURCE_BULK_AMOUNT_MAX);
                             break;
                         default:
-                            cell2->m_objectMetadata = Random(3, 6);
+                            cell2->m_objectMetadata =
+                                Random(RESOURCE_SCARCE_AMOUNT_MIN, RESOURCE_SCARCE_AMOUNT_MAX);
                             break;
                     }
                     break;
+                }
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SHRINE_FIRST_CIRCLE:
-                    cell2->m_objectMetadata = Random(0, 64) + 1;
-                    while (gsSpellInfo[cell2->m_objectMetadata - 1].level != 1) {
-                        cell2->m_objectMetadata = Random(0, 64) + 1;
-                    }
+                    cell2->m_objectMetadata =
+                        GetRandomEventSpell(SHRINE_FIRST_CIRCLE_SPELL_LEVEL);
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SHRINE_SECOND_CIRCLE:
-                    cell2->m_objectMetadata = Random(0, 64) + 1;
-                    while (gsSpellInfo[cell2->m_objectMetadata - 1].level != 2) {
-                        cell2->m_objectMetadata = Random(0, 64) + 1;
-                    }
+                    cell2->m_objectMetadata =
+                        GetRandomEventSpell(SHRINE_SECOND_CIRCLE_SPELL_LEVEL);
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SHRINE_THIRD_CIRCLE:
-                    cell2->m_objectMetadata = Random(0, 64) + 1;
-                    while (gsSpellInfo[cell2->m_objectMetadata - 1].level != 3) {
-                        cell2->m_objectMetadata = Random(0, 64) + 1;
-                    }
+                    cell2->m_objectMetadata =
+                        GetRandomEventSpell(SHRINE_THIRD_CIRCLE_SPELL_LEVEL);
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_PYRAMID:
-                    cell2->m_objectMetadata = Random(0, 64) + 1;
-                    while (gsSpellInfo[cell2->m_objectMetadata - 1].level != 5) {
-                        cell2->m_objectMetadata = Random(0, 64) + 1;
-                    }
+                    cell2->m_objectMetadata = GetRandomEventSpell(PYRAMID_SPELL_LEVEL);
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_TREE_HOUSE:
                     cell2->m_objectMetadata = Random(15, 25);
@@ -4286,8 +4327,8 @@ void game::PerMonth(void) {
                             static_cast<CreatureType>(giMonthTypeExtra)
                         );
                         cell0->m_objectMetadata = ((firstCount5 | 0) + secondCount4) | 0;
-                        if (Random(MONSTER_SPAWN_MIN, MONSTER_GUARD_ROLL_MAX)
-                            < MONSTER_GUARD_CHANCE)
+                        if (Random(MONSTER_GUARD_ROLL_MIN, MONSTER_GUARD_ROLL_MAX)
+                            < MONSTER_GUARD_CUTOFF)
                             cell0->m_objectMetadata |= IDX(MAP_MONSTER_GUARD_FLAG);
                     }
                 }
