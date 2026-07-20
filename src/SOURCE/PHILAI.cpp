@@ -5406,8 +5406,9 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                     * gMineCharacteristics[IDX(RES_GOLD)] * gafAITurnCostResource[IDX(RES_GOLD)]
                 );
                 for (index_k = 0; index_k < AI_TOWN_ARMY_SLOTS; index_k++) {
-                    gpMonGroup->m_creatureTypes[index_k] =
-                        gpGame->m_mines[cell_k->m_objectMetadata].guardianType;
+                    gpMonGroup->m_creatureTypes[index_k] = static_cast<i8>(IDX(
+                        gpGame->m_mines[cell_k->m_objectMetadata].guardianType
+                    ));
                     gpMonGroup->m_quantities[index_k] = static_cast<i16>(
                         gpGame->m_mines[cell_k->m_objectMetadata].guardianCount / 5
                     );
@@ -5953,7 +5954,7 @@ i32 philAI::EvaluateMineEvent(i32 mineIndex, i32 x, i32 y, i32* liveChance) {
         || OnMySide(gpGame->m_mineOwners[mineIndex]))
         return result1;
 
-    if (gpGame->m_mines[mineIndex].guardianType != ARMY_GROUP_EMPTY_SLOT) {
+    if (gpGame->m_mines[mineIndex].guardianType != CREATURE_NONE) {
         guardianCount5 = gpGame->m_mines[mineIndex].guardianCount;
         memset(gpMonGroup->m_creatureTypes, ARMY_GROUP_EMPTY_SLOT, ARMY_GROUP_SLOT_COUNT);
         memset(
@@ -5964,14 +5965,16 @@ i32 philAI::EvaluateMineEvent(i32 mineIndex, i32 x, i32 y, i32* liveChance) {
 
         if (guardianCount5 / ARMY_GROUP_SLOT_COUNT > 0) {
             for (stackIndex1 = 0; stackIndex1 < ARMY_GROUP_SLOT_COUNT; stackIndex1++) {
-                gpMonGroup->m_creatureTypes[stackIndex1] = gpGame->m_mines[mineIndex].guardianType;
+                gpMonGroup->m_creatureTypes[stackIndex1] =
+                    static_cast<i8>(IDX(gpGame->m_mines[mineIndex].guardianType));
                 gpMonGroup->m_quantities[stackIndex1] =
                     static_cast<i16>(guardianCount5 / ARMY_GROUP_SLOT_COUNT);
             }
         }
         for (stackIndex1 = guardianCount5 % ARMY_GROUP_SLOT_COUNT - 1; stackIndex1 >= 0;
              stackIndex1--) {
-            gpMonGroup->m_creatureTypes[stackIndex1] = gpGame->m_mines[mineIndex].guardianType;
+            gpMonGroup->m_creatureTypes[stackIndex1] =
+                static_cast<i8>(IDX(gpGame->m_mines[mineIndex].guardianType));
             gpMonGroup->m_quantities[stackIndex1]++;
         }
 

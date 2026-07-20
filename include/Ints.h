@@ -77,6 +77,7 @@ constexpr i32 H2EnumIndex(Value value) {
 }
 
 #define H2_ENUM_STORAGE(name, storage) H2EnumStorage<name, storage>
+#define H2_ENUM_BITFIELD(name, storage) name
 #define H2_ENUM_PARAM(name, storage) name
 #define H2_ENUM_FLAGS(name)                                                                        \
     inline constexpr name operator|(name a, name b) {                                              \
@@ -132,6 +133,7 @@ constexpr i32 H2EnumIndex(Value value) {
     ;                                                                                              \
     typedef i32 name;
 #define H2_ENUM_STORAGE(name, storage) storage
+#define H2_ENUM_BITFIELD(name, storage) storage
 #define H2_ENUM_PARAM(name, storage) storage
 #define H2_ENUM_FLAGS(name)
 #endif

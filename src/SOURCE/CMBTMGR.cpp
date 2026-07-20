@@ -181,22 +181,6 @@ H2_ENUM_CLASS_BEGIN(CombatMapTrigger)
     TRIGGER_HERO    = 0xaa
 H2_ENUM_CLASS_END(CombatMapTrigger)
 
-H2_ENUM_CLASS_BEGIN(CombatNearbyTileset)
-    TILESET_SNOW_MOUNTAINS    = 0x16,
-    TILESET_SWAMP_MOUNTAINS   = 0x17,
-    TILESET_LAVA_MOUNTAINS    = 0x18,
-    TILESET_DESERT_MOUNTAINS  = 0x19,
-    TILESET_DIRT_MOUNTAINS    = 0x1a,
-    TILESET_MIXED_MOUNTAINS   = 0x1b,
-    TILESET_CRACKED_MOUNTAINS = 0x1f,
-    TILESET_GRASS_MOUNTAINS   = 0x20,
-    TILESET_JUNGLE_TREES      = 0x21,
-    TILESET_EVIL_TREES        = 0x22,
-    TILESET_SNOW_TREES        = 0x2a,
-    TILESET_SUMMER_TREES      = 0x2b,
-    TILESET_AUTUMN_TREES      = 0x2c
-H2_ENUM_CLASS_END(CombatNearbyTileset)
-
 }
 
 VA(0x0048fd50, 0x1ba)
@@ -602,13 +586,13 @@ void combatManager::Close(void) {
     }
 
     if (m_battlefieldCell->m_triggerType == IDX(TRIGGER_MINE)
-        && gpGame->m_mines[m_battlefieldCell->m_objectMetadata].guardianType != -1)
+        && gpGame->m_mines[m_battlefieldCell->m_objectMetadata].guardianType != CREATURE_NONE)
         gpGame->m_mines[m_battlefieldCell->m_objectMetadata].guardianCount = static_cast<u8>(total);
 
     if (m_battlefieldCell->m_triggerType == IDX(TRIGGER_HERO)) {
         hero* combatHero = gpGame->GetHero(m_battlefieldCell->m_objectMetadata);
         if (combatHero->m_locationType == IDX(TRIGGER_MINE)
-            && gpGame->m_mines[combatHero->m_occupiedTown].guardianType != -1)
+            && gpGame->m_mines[combatHero->m_occupiedTown].guardianType != CREATURE_NONE)
             gpGame->m_mines[combatHero->m_occupiedTown].guardianCount = static_cast<u8>(total);
     }
 
@@ -775,7 +759,7 @@ i32 combatManager::MoreTreesNear(void) {
     i32 radius;
     i32 combatOriginX;
     NearbyFeature nearbyTypeTable[NEARBY_RADIUS_COUNT][NORMAL_DIRECTION_COUNT];
-    u8 nearbyTileset;
+    TilesetId nearbyTileset;
     i32 nearbyDirection;
     i32 centerY;
 
@@ -791,21 +775,21 @@ i32 combatManager::MoreTreesNear(void) {
                 combatCell = gpAdvManager->GetCell(x, y);
                 nearbyTileset = combatCell->m_objectTileset;
                 switch (nearbyTileset) {
-                    case IDX(TILESET_SNOW_MOUNTAINS):
-                    case IDX(TILESET_SWAMP_MOUNTAINS):
-                    case IDX(TILESET_LAVA_MOUNTAINS):
-                    case IDX(TILESET_DESERT_MOUNTAINS):
-                    case IDX(TILESET_DIRT_MOUNTAINS):
-                    case IDX(TILESET_MIXED_MOUNTAINS):
-                    case IDX(TILESET_CRACKED_MOUNTAINS):
-                    case IDX(TILESET_GRASS_MOUNTAINS):
+                    case TILESET_MTNSNOW:
+                    case TILESET_MTNSWMP:
+                    case TILESET_MTNLAVA:
+                    case TILESET_MTNDSRT:
+                    case TILESET_MTNDIRT:
+                    case TILESET_MTNMULT:
+                    case TILESET_MTNCRCK:
+                    case TILESET_MTNGRAS:
                         nearbyTypeTable[radius][nearbyDirection] = NEARBY_MOUNTAIN;
                         break;
-                    case IDX(TILESET_JUNGLE_TREES):
-                    case IDX(TILESET_EVIL_TREES):
-                    case IDX(TILESET_SNOW_TREES):
-                    case IDX(TILESET_SUMMER_TREES):
-                    case IDX(TILESET_AUTUMN_TREES):
+                    case TILESET_TREJNGL:
+                    case TILESET_TREEVIL:
+                    case TILESET_TRESNOW:
+                    case TILESET_TREFIR:
+                    case TILESET_TREFALL:
                         nearbyTypeTable[radius][nearbyDirection] = NEARBY_TREE;
                         break;
                 }
