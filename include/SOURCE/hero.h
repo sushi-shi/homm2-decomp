@@ -158,7 +158,7 @@ public:
             i8 m_patrolRadius;
         };
     };
-    u8 m_direction;
+    H2_ENUM_STORAGE(MapDirection, u8) m_direction;
     i16 m_locationType;
     i16 m_occupiedTown;
     i32 m_mobility;

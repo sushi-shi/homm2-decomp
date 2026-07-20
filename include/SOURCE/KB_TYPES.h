@@ -18,6 +18,19 @@ H2_ENUM_CLASS_BEGIN(ResourceType)
     RES_COUNT           = 7
 H2_ENUM_CLASS_END(ResourceType)
 
+H2_ENUM_BEGIN(MapDirection)
+    MAP_DIRECTION_NONE       = -1,
+    MAP_DIRECTION_NORTH      = 0,
+    MAP_DIRECTION_NORTH_EAST = 1,
+    MAP_DIRECTION_EAST       = 2,
+    MAP_DIRECTION_SOUTH_EAST = 3,
+    MAP_DIRECTION_SOUTH      = 4,
+    MAP_DIRECTION_SOUTH_WEST = 5,
+    MAP_DIRECTION_WEST       = 6,
+    MAP_DIRECTION_NORTH_WEST = 7,
+    MAP_DIRECTION_COUNT      = 8
+H2_ENUM_END(MapDirection)
+
 // Mine records use the resource ids for ordinary mines and reserve two
 // additional ids for map facilities tracked through the same table.
 H2_ENUM_BEGIN(MineType)

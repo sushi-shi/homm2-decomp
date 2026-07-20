@@ -2,6 +2,7 @@
 #define HOMM2_CURSOR_H
 
 #include <va.h>
+#include <SOURCE/KB_TYPES.h>
 
 // Vertical-walk frames begin at 45; frames 0x37-0x3a contain their shadows.
 H2_ENUM_BEGIN(CursorConstant)
@@ -65,7 +66,7 @@ H2_ENUM_BEGIN(MapChangeConstant)
 H2_ENUM_END(MapChangeConstant)
 
 H2_ENUM_BEGIN(MapSpriteConstant)
-    MAP_SPRITE_INITIAL_DIRECTION = 2
+    MAP_SPRITE_INITIAL_DIRECTION = MAP_DIRECTION_EAST
 H2_ENUM_END(MapSpriteConstant)
 
 H2_ENUM_CLASS_BEGIN_SPLIT(MapChangeType, u8)
@@ -89,8 +90,16 @@ struct SMapChange {
     i8 id;
     u8 x;
     u8 y;
-    i8 direction;
-    i8 stopAfterMove;
+    union {
+        struct {
+            H2_ENUM_STORAGE(MapDirection, i8) direction;
+            i8 stopAfterMove;
+        } movement;
+        struct {
+            i8 direction;
+            i8 stopAfterMove;
+        } wire;
+    };
     i8 player;
     i32 sequence;
 };

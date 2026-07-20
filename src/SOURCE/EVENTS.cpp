@@ -1112,7 +1112,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             if (HAS(eventHero2->m_eventFlags, HERO_EVENT_EMBARKED)) {
                 eventHero2->m_eventFlags = eventHero2->m_eventFlags & ~HERO_EVENT_EMBARKED;
                 eventHero2->m_remainingMobility = 0;
-                eventHero2->m_direction = static_cast<u8>(m_cursorDirection);
+                eventHero2->m_direction = m_cursorDirection;
                 m_cursorType = eventHero2->m_cursorType;
                 m_cursorFrame = GetCursorBaseFrame(m_cursorDirection);
                 m_cursorActive = 1;
@@ -2282,7 +2282,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     )
                     != 0)
                     break;
-                CheckEndGame(0, 1);
+                CheckEndGame(END_GAME_FORCE_NONE, true);
                 if (gbGameOver)
                     break;
                 eventHero2->CheckLevel();
@@ -3351,8 +3351,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         break;
                     default:
                         zombieCell6 = GetCell(
-                            x - normalDirTable[eventHero2->m_direction].x,
-                            y - normalDirTable[eventHero2->m_direction].y
+                            x - normalDirTable[IDX(eventHero2->m_direction)].x,
+                            y - normalDirTable[IDX(eventHero2->m_direction)].y
                         );
                         if (ZombieEvent(
                                 eventHero2,
@@ -3404,8 +3404,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         break;
                     default:
                         skeletonCell1 = GetCell(
-                            x - normalDirTable[eventHero2->m_direction].x,
-                            y - normalDirTable[eventHero2->m_direction].y
+                            x - normalDirTable[IDX(eventHero2->m_direction)].x,
+                            y - normalDirTable[IDX(eventHero2->m_direction)].y
                         );
                         if (SkeletonEvent(
                                 eventHero2,
@@ -3670,7 +3670,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
     UpdateScreen(0, 0);
     gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[m_currentTerrain]);
     WaitEndSample(playedSample3, -1);
-    CheckEndGame(0, 0);
+    CheckEndGame(END_GAME_FORCE_NONE, false);
 }
 
 VA(0x004ae00b, 0x9f7)
@@ -4700,7 +4700,7 @@ i32 GiveArtifact(hero* eventHero, ArtifactType artifact, b32 checkEndGame, i8 ar
     GiveTakeArtifactStat(eventHero, artifact, 0);
     eventHero->CheckAnduranPieces(0);
     if (checkEndGame)
-        CheckEndGame(0, 0);
+        CheckEndGame(END_GAME_FORCE_NONE, false);
     return artifactSlot;
 }
 
@@ -4738,7 +4738,7 @@ void advManager::GiveResource(hero* eventHero, ResourceType resourceType, i32 am
     if (resourceType >= RES_WOOD && resourceType <= RES_GOLD)
         gpGame->m_players[eventHero->m_owner].m_resources[IDX(resourceType)] += amount;
     if (resourceType == RES_GOLD && gbHumanPlayer[eventHero->m_owner])
-        CheckEndGame(0, 0);
+        CheckEndGame(END_GAME_FORCE_NONE, false);
 }
 
 VA(0x004b022e, 0xbb)
@@ -6021,7 +6021,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             if (HAS(eventHero->m_eventFlags, HERO_EVENT_EMBARKED)) {
                 eventHero->m_eventFlags = eventHero->m_eventFlags & ~HERO_EVENT_EMBARKED;
                 eventHero->m_remainingMobility = 0;
-                eventHero->m_direction = static_cast<u8>(m_cursorDirection);
+                eventHero->m_direction = m_cursorDirection;
                 m_cursorType = eventHero->m_cursorType;
                 m_cursorFrame = GetCursorBaseFrame(m_cursorDirection);
                 m_cursorActive = 1;
@@ -7059,7 +7059,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     gpCurPlayer = oldPlayerData_h;
     if (eventHero->m_owner != EVENT_NO_OWNER)
         eventHero->CheckLevel();
-    CheckEndGame(0, 0);
+    CheckEndGame(END_GAME_FORCE_NONE, false);
 }
 
 VA(0x004b4883, 0x65)

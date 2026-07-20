@@ -2,6 +2,7 @@
 #define HOMM2_SOURCE_PHILAI_H
 
 #include <va.h>
+#include <SOURCE/KB_TYPES.h>
 
 class armyGroup;
 class hero;
@@ -15,7 +16,7 @@ public:
     void DoAllHeroInteractions(void);
     void CheckForCreatureUpgrades(void);
     void CheckBuyStuff(void);
-    i32 GoodAdjacent(i32*);
+    i32 GoodAdjacent(H2_ENUM_PARAM(MapDirection, i32)*);
     void CheckReload(void);
     void CheckBerserk(void);
     void DimensionDoorTo(i32, i32);
@@ -27,7 +28,12 @@ public:
     void GetTurnAIVars(i32);
     void GetBestBHC(i32, struct BHC&);
     class hero* DetermineHeroToMove(i32);
-    i32 DetermineTargetPosition(i32&, i32&, i32, i32&);
+    i32 DetermineTargetPosition(
+        i32&,
+        i32&,
+        i32,
+        H2_ENUM_PARAM(MapDirection, i32)&
+    );
     void ProbableOutcomeOfBattle(
         class armyGroup*,
         class hero*,

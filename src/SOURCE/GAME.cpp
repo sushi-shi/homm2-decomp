@@ -3024,7 +3024,7 @@ void game::ClaimTown(i32 townId, i32 player, i32 suppressVisibility) {
     if (suppressVisibility != 0)
         return;
     SetVisibility(m_castleRecs[townId].m_x, m_castleRecs[townId].m_y, player, giVisRangeTown);
-    CheckEndGame(0, 0);
+    CheckEndGame(END_GAME_FORCE_NONE, false);
 }
 
 VA(0x00479394, 0x4c2)
@@ -4170,7 +4170,7 @@ void game::NextPlayer(void) {
     gpAdvManager->m_identifyHeroActive = 0;
     if (gpGame->m_players[giCurPlayer].m_daysLeft > 0)
         gpGame->m_players[giCurPlayer].m_daysLeft--;
-    CheckEndGame(0, 0);
+    CheckEndGame(END_GAME_FORCE_NONE, false);
     gpAdvManager->DeactivateCurrTown();
     gpAdvManager->DeactivateCurrHero();
 
@@ -4232,7 +4232,7 @@ void game::NextPlayer(void) {
         gpSoundManager->m_samplesReady = 0;
 
     DoNewTurn();
-    CheckEndGame(0, 0);
+    CheckEndGame(END_GAME_FORCE_NONE, false);
     if (gbThisNetHumanPlayer[giCurPlayer] && gpSoundManager->m_samplesReady == 0
         && giForceSwitchMusic == -1) {
         gpSoundManager->m_samplesReady = 1;
@@ -6991,7 +6991,7 @@ void game::DoNewTurn(void) {
 
     CheckForTimeEvent();
     if (!gbThisNetHumanPlayer[giCurPlayer]) {
-        CheckEndGame(0, 0);
+        CheckEndGame(END_GAME_FORCE_NONE, false);
         return;
     }
     giBottomViewOverrideEndTime = KBTickCount() + NEW_TURN_BOTTOM_VIEW_DURATION;
@@ -7000,7 +7000,7 @@ void game::DoNewTurn(void) {
     gpAdvManager->SetInitialMapOrigin();
     gpAdvManager->CompleteDraw(0);
     gpAdvManager->UpdateScreen(0, 0);
-    CheckEndGame(0, 0);
+    CheckEndGame(END_GAME_FORCE_NONE, false);
 
     if (gpCurPlayer->m_daysLeft >= 0) {
         if (gpCurPlayer->m_daysLeft == 1) {
