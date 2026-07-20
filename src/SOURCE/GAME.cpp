@@ -906,7 +906,7 @@ VA(0x004710f3, 0x40d)
 void ComputeUALoc(i32 player) {
     i32 result = gpGame->SetupPuzzlePieces(player, 1);
     if (result < MINIMUM_PUZZLE_PIECES
-        || gpGame->m_ultimateArtifactId == IDX(ARTIFACT_NONE)) {
+        || gpGame->m_ultimateArtifactId == ARTIFACT_NONE) {
         gpGame->m_players[player].m_ultimateArtifactHintChance = 0;
         gpGame->m_players[player].m_ultimateArtifactHintX = HINT_COORDINATE_UNKNOWN;
         gpGame->m_players[player].m_ultimateArtifactHintY = HINT_COORDINATE_UNKNOWN;
@@ -2091,7 +2091,7 @@ void game::NewMap(char* filename) {
     m_ultimateArtifactX = static_cast<i8>(player2);
     m_ultimateArtifactY = static_cast<i8>(townIndex9);
     m_ultimateArtifactId =
-        static_cast<i8>(Random(IDX(ARTIFACT_ULTIMATE_BOOK), IDX(ARTIFACT_GOLDEN_GOOSE)));
+        static_cast<ArtifactType>(Random(IDX(ARTIFACT_ULTIMATE_BOOK), IDX(ARTIFACT_GOLDEN_GOOSE)));
     if (gbInCampaign
         && ((m_campaignType == IDX(CAMPAIGN_ROLAND)
              && static_cast<i8>(m_campaignScenario) + CAMPAIGN_SCENARIO_NUMBER_OFFSET
@@ -2099,7 +2099,7 @@ void game::NewMap(char* filename) {
             || (m_campaignType == IDX(CAMPAIGN_ARCHIBALD)
                 && static_cast<i8>(m_campaignScenario) + CAMPAIGN_SCENARIO_NUMBER_OFFSET
                        == CAMPAIGN_ARCHIBALD_ULTIMATE_CROWN_SCENARIO)))
-        m_ultimateArtifactId = IDX(ARTIFACT_ULTIMATE_CROWN);
+        m_ultimateArtifactId = ARTIFACT_ULTIMATE_CROWN;
     for (player2 = 0; player2 < m_playerCount; player2++) {
         if (gbHumanPlayer[player2]) {
             m_players[player2].m_aiDifficulty = PLAYER_PERSONALITY_HUMAN;
@@ -7638,7 +7638,7 @@ void game::SetupNewRumour(void) {
                 sprintf(
                     m_rumour,
                     "The ultimate artifact is really the %s.",
-                    gArtifactNames[m_ultimateArtifactId]
+                    gArtifactNames[IDX(m_ultimateArtifactId)]
                 );
             }
         }
