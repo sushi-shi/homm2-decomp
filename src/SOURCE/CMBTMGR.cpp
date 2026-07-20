@@ -256,7 +256,7 @@ void combatManager::SetupCombat(
     else
         m_battlefieldCell = NULL;
 
-    m_terrainType = TerrainType(giGroundToTerrain[m_battlefieldCell->m_terrainImageIndex]);
+    m_terrainType = giGroundToTerrain[m_battlefieldCell->m_terrainImageIndex];
     sprintf(m_battlefieldBackgroundName, GetBackgroundName());
 
     if (attackerHero != NULL) {

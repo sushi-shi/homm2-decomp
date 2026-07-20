@@ -779,7 +779,7 @@ i32 philAI::DoAnywhereDDoorTownGate(i32 targetValue) {
                             if (gpCurAIHero->m_x == x && gpCurAIHero->m_y == y)
                                 continue;
                             cell = gpAdvManager->GetCell(x, y);
-                            if (giGroundToTerrain[cell->m_terrainImageIndex] == 0)
+                            if (giGroundToTerrain[cell->m_terrainImageIndex] == TERRAIN_WATER)
                                 continue;
                             if (!((cell->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
                                   || (targetValue < 25 && Random(0, 10) < 2))) {
@@ -830,7 +830,8 @@ i32 philAI::DoAnywhereDDoorTownGate(i32 targetValue) {
                                             ))
                                             continue;
                                         cell = gpAdvManager->GetCell(candidateX, candidateY);
-                                        if (giGroundToTerrain[cell->m_terrainImageIndex] == 0)
+                                        if (giGroundToTerrain[cell->m_terrainImageIndex]
+                                            == TERRAIN_WATER)
                                             continue;
                                         if (cell->m_flags & IDX(MAP_CELL_OCCUPIED))
                                             continue;
@@ -1700,7 +1701,7 @@ i32 philAI::DetermineTargetPosition(
     i32 scanMaxYCounter;
     i32 candidate;
     i32 targetBestYLocal;
-    i32 mapTerrain;
+    H2_ENUM_STORAGE(TerrainType, i32) mapTerrain;
     town* shipyardPtrSearch;
     i32 scanSpacingStep;
 
@@ -1724,11 +1725,11 @@ i32 philAI::DetermineTargetPosition(
     mapTerrain = giGroundToTerrain[candidateCell->m_terrainImageIndex];
     if (gpCurAIHero->m_secondarySkills[IDX(HERO_SKILL_PATHFINDING)]
         <= HERO_SKILL_LEVEL_BASIC) {
-        if (mapTerrain == IDX(TERRAIN_SNOW) || mapTerrain == IDX(TERRAIN_SWAMP))
+        if (mapTerrain == TERRAIN_SNOW || mapTerrain == TERRAIN_SWAMP)
             mobility = static_cast<i32>(mobility * 1.15);
-        if (mapTerrain == IDX(TERRAIN_DESERT))
+        if (mapTerrain == TERRAIN_DESERT)
             mobility = static_cast<i32>(mobility * 1.35);
-        if (mapTerrain == IDX(TERRAIN_WASTELAND))
+        if (mapTerrain == TERRAIN_WASTELAND)
             mobility = static_cast<i32>(mobility * 1.25);
     } else if (gpGame->m_mapHeader.width == MAP_DIMENSION_SMALL) {
         mobility = static_cast<i32>(mobility * 0.9);
@@ -1842,10 +1843,10 @@ i32 philAI::DetermineTargetPosition(
                                || (x % scanSpacingStep == 0 && y % scanSpacingStep == 0
                                    && ((HAS(gpCurAIHero->m_eventFlags, HERO_EVENT_EMBARKED)
                                         && giGroundToTerrain[candidateCell->m_terrainImageIndex]
-                                               == 0)
+                                               == TERRAIN_WATER)
                                        || (!HAS(gpCurAIHero->m_eventFlags, HERO_EVENT_EMBARKED)
                                            && giGroundToTerrain[candidateCell->m_terrainImageIndex]
-                                                  != 0)))
+                                                  != TERRAIN_WATER)))
                                || (gpCurPlayer->m_ultimateArtifactHintX == x
                                    && gpCurPlayer->m_ultimateArtifactHintY == y)) {
                         candidate = 1;
@@ -3120,12 +3121,12 @@ i32 philAI::StrategicValueOfPosition(
     i32 unusedThreatValue9;
     i32 danger26;
     i32 heroIndex2;
-    i32 heroTerrain7;
+    H2_ENUM_STORAGE(TerrainType, i32) heroTerrain7;
     i32 shortDistance13;
     i32 penalty;
     i32 allocatedSearch2;
     i32 unusedStrategicValue17;
-    i32 targetTerrain29;
+    H2_ENUM_STORAGE(TerrainType, i32) targetTerrain29;
     i32 score4;
 
     if (!extraDistance && !immediate
@@ -3279,8 +3280,8 @@ i32 philAI::StrategicValueOfPosition(
                              gpGame->m_heroRecs[gpCurPlayer->m_heroIds[heroIndex2]].m_y
                          )
                          ->m_terrainImageIndex];
-                if (targetTerrain29 != 0 || heroTerrain7 <= 0) {
-                    if (targetTerrain29 <= 0 || heroTerrain7 != 0) {
+                if (targetTerrain29 != TERRAIN_WATER || heroTerrain7 == TERRAIN_WATER) {
+                    if (targetTerrain29 == TERRAIN_WATER || heroTerrain7 != TERRAIN_WATER) {
                         score4 -= (9 - distance15) * 600 / 9;
                     }
                 }
@@ -4122,7 +4123,7 @@ void philAI::HeroInteractionAtTown(hero* heroPtr, town* townPtr, i32 doInteracti
         } else if ((townPtr->m_buildings & AI_BUILDING_CASTLE_MASK)
                    && giGroundToTerrain[gpAdvManager->GetCell(townPtr->m_x - 1, townPtr->m_y + 1)
                                             ->m_terrainImageIndex]
-                          == 0
+                          == TERRAIN_WATER
                    && !gbActualShipyardFound && townPtr->m_id != giBestShipyardId) {
             index7 = abs(townPtr->m_y - heroPtr->m_y) + abs(townPtr->m_x - heroPtr->m_x);
             if (gbPossibleShipyardFound) {

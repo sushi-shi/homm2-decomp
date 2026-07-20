@@ -3676,7 +3676,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         CompleteDraw(0);
     }
     UpdateScreen(0, 0);
-    gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[m_currentTerrain]);
+    gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[IDX(m_currentTerrain)]);
     WaitEndSample(playedSample3, -1);
     CheckEndGame(END_GAME_FORCE_NONE, false);
 }

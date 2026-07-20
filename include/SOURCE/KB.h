@@ -607,7 +607,7 @@ extern i32 giBottomViewResourceQty;
 extern WindowColorCycleMode giCycleType;
 extern i32 giDebugLevel;
 extern i32 giDialogTimeout;
-extern u8 giGroundToTerrain[];
+extern H2_ENUM_STORAGE(TerrainType, u8) giGroundToTerrain[];
 extern i32 giHighMemBuffer;
 extern i32 giMainVideoModeColorDepth;
 extern i32 giNumHumanPlayers;

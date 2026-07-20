@@ -912,7 +912,7 @@ void ComputeUALoc(i32 player) {
           && gpGame->m_worldMap.Row(y)[x].m_triggerType == MAP_OBJECT_NONE
           && gpGame->m_worldMap.Row(y)[x].m_objectIndex == MAPCELL_SPRITE_NONE
           && gpGame->m_worldMap.Row(y)[x].m_overlayIndex == MAPCELL_SPRITE_NONE
-          && giGroundToTerrain[gpGame->m_worldMap.Row(y)[x].m_terrainImageIndex] != 0)
+          && giGroundToTerrain[gpGame->m_worldMap.Row(y)[x].m_terrainImageIndex] != TERRAIN_WATER)
     ) {
         tries++;
         direction = 0;
@@ -2039,7 +2039,8 @@ void game::NewMap(char* filename) {
            || townIndex9 > MAP_HEIGHT - ULTIMATE_ARTIFACT_BORDER_MARGIN - 1
            || m_worldMap.GetCell(player2, townIndex9)->m_objectIndex != MAPCELL_SPRITE_NONE
            || m_worldMap.GetCell(player2, townIndex9)->m_overlayIndex != MAPCELL_SPRITE_NONE
-           || giGroundToTerrain[m_worldMap.GetCell(player2, townIndex9)->m_terrainImageIndex] == 0
+           || giGroundToTerrain[m_worldMap.GetCell(player2, townIndex9)->m_terrainImageIndex]
+                  == TERRAIN_WATER
            || (giNumHumanPlayers == 1
                && ultimateTries4 < ULTIMATE_HUMAN_DISTANCE_RETRY_LIMIT
                && ultimateDistance5
@@ -2356,7 +2357,7 @@ void game::RandomizeEvents(void) {
                     // NOLINTEND(readability-magic-numbers)
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_TREASURE_CHEST:
-                    if (giGroundToTerrain[cell2->m_terrainImageIndex] == IDX(TERRAIN_WATER)) {
+                    if (giGroundToTerrain[cell2->m_terrainImageIndex] == TERRAIN_WATER) {
                         cell2->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SEA_CHEST;
                         randomValue7 = Random(EVENT_ROLL_MIN, EVENT_ROLL_MAX);
                         if (randomValue7 < SEA_CHEST_EMPTY_CUTOFF)
@@ -2638,7 +2639,8 @@ void game::RandomizeEvents(void) {
                             xPos2 - CASTLE_BOAT_X_OFFSET,
                             yPos19 + CASTLE_BOAT_Y_OFFSET
                         );
-                        if (giGroundToTerrain[townEntrance->m_terrainImageIndex] == 0) {
+                        if (giGroundToTerrain[townEntrance->m_terrainImageIndex]
+                            == TERRAIN_WATER) {
                             townRec4->m_boatX = static_cast<i8>(xPos2 - CASTLE_BOAT_X_OFFSET);
                             townRec4->m_boatY = static_cast<i8>(yPos19 + CASTLE_BOAT_Y_OFFSET);
                         } else {
@@ -2646,7 +2648,8 @@ void game::RandomizeEvents(void) {
                                 xPos2 + CASTLE_BOAT_X_OFFSET,
                                 yPos19 + CASTLE_BOAT_Y_OFFSET
                             );
-                            if (giGroundToTerrain[townEntrance->m_terrainImageIndex] == 0) {
+                            if (giGroundToTerrain[townEntrance->m_terrainImageIndex]
+                                == TERRAIN_WATER) {
                                 townRec4->m_boatX =
                                     static_cast<i8>(xPos2 + CASTLE_BOAT_X_OFFSET);
                                 townRec4->m_boatY =
@@ -4212,7 +4215,9 @@ void game::NextPlayer(void) {
     if (gbThisNetHumanPlayer[giCurPlayer] && gpSoundManager->m_samplesReady == 0
         && giForceSwitchMusic == -1) {
         gpSoundManager->m_samplesReady = 1;
-        gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[gpAdvManager->m_currentTerrain]);
+        gpSoundManager->SwitchAmbientMusic(
+            giTerrainToMusicTrack[IDX(gpAdvManager->m_currentTerrain)]
+        );
         gpAdvManager->SetEnvironmentOrigin(
             gpAdvManager->m_mapOriginX + ENVIRONMENT_ORIGIN_TILE_OFFSET,
             gpAdvManager->m_mapOriginY + ENVIRONMENT_ORIGIN_TILE_OFFSET,
@@ -4809,7 +4814,7 @@ void game::PerMonth(void) {
                 cell0 = gpAdvManager->GetCell(mapX8, mapY5);
                 if (cell0->m_triggerType == 0 && !cell0->m_objectLayerBit1
                     && !cell0->m_objectLayerBit0
-                    && giGroundToTerrain[cell0->m_terrainImageIndex] != 0) {
+                    && giGroundToTerrain[cell0->m_terrainImageIndex] != TERRAIN_WATER) {
                     if (Random(MONSTER_SPAWN_MIN, MONSTER_SPAWN_MAX)
                         == MONSTER_SPAWN_ROLL) {
                         cell0->m_triggerType = MONSTER_TRIGGER;
@@ -5605,7 +5610,7 @@ void game::MakeAllWaterVisible(i32 player) {
     i32 y;
     for (x = 0; x < MAP_WIDTH; x++) {
         for (y = 0; y < MAP_HEIGHT; y++) {
-            if (giGroundToTerrain[WORLDMAP->Row(y)[x].m_terrainImageIndex] == 0)
+            if (giGroundToTerrain[WORLDMAP->Row(y)[x].m_terrainImageIndex] == TERRAIN_WATER)
                 mapExtra[y * MAP_WIDTH + x] |= mask;
         }
     }
@@ -7061,11 +7066,13 @@ void game::DoNewTurn(void) {
             gpMouseManager->SetPointer(0);
             NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
             gpSoundManager->SwitchAmbientMusic(
-                giTerrainToMusicTrack[gpAdvManager->m_currentTerrain]
+                giTerrainToMusicTrack[IDX(gpAdvManager->m_currentTerrain)]
             );
         }
     }
-    gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[gpAdvManager->m_currentTerrain]);
+    gpSoundManager->SwitchAmbientMusic(
+        giTerrainToMusicTrack[IDX(gpAdvManager->m_currentTerrain)]
+    );
     gpAdvManager->SetEnvironmentOrigin(
         gpAdvManager->m_mapOriginX + ENVIRONMENT_ORIGIN_TILE_OFFSET,
         gpAdvManager->m_mapOriginY + ENVIRONMENT_ORIGIN_TILE_OFFSET,
@@ -7608,9 +7615,10 @@ void game::SetupNewRumour(void) {
                     m_rumour,
                     "The ultimate artifact may be found %s.",
                     cRumourTerrainDescriptions
-                        [giGroundToTerrain[gpAdvManager
-                                               ->GetCell(m_ultimateArtifactX, m_ultimateArtifactY)
-                                               ->m_terrainImageIndex]]
+                        [IDX(giGroundToTerrain
+                                 [gpAdvManager
+                                      ->GetCell(m_ultimateArtifactX, m_ultimateArtifactY)
+                                      ->m_terrainImageIndex])]
                 );
             } else {
                 sprintf(
