@@ -46,7 +46,7 @@ DATA(0x0052ae48) static mapCell* gSearchCurrentCell;
 DATA(0x0052ae4c) static i32 gSearchDirection;
 DATA(0x0052ae50) static H2_ENUM_STORAGE(MapObjectType, i32) gSearchTriggerType;
 DATA(0x0052ae54) static i32 gSearchNextX;
-DATA(0x0052ae58) static i32 gSearchTerrain;
+DATA(0x0052ae58) static H2_ENUM_STORAGE(TerrainType, i32) gSearchTerrain;
 DATA(0x0052ae5c) static searchNode* gSearchQueueNode;
 DATA(0x0052ae60) static i32 gSearchMiddle;
 DATA(0x0052ae64) static i32 gSearchHigh;
@@ -225,12 +225,12 @@ VA(0x004a4e90, 0x36f)
 void searchArray::TestPossibleDirections(
     i32 x,
     i32 y,
-    i8* const terrain,
+    H2_ENUM_STORAGE(TerrainType, i8) * const terrain,
     i8* const occupied,
     i32 allowOccupied,
     i32 waterMode
 ) {
-    i32 invalidTerrain = SEARCH_INVALID_COORDINATE;
+    TerrainType invalidTerrain = TERRAIN_INVALID;
 
     memset(occupied, 0, SEARCH_DIRECTION_COUNT);
     gSearchCurrentCell = gpAdvManager->GetCell(x, y);
@@ -258,8 +258,8 @@ void searchArray::TestPossibleDirections(
             }
         }
 
-        gSearchTerrain = IDX(giGroundToTerrain[gSearchNextCell->m_terrainImageIndex]);
-        if (gSearchTerrain == IDX(TERRAIN_WATER)) {
+        gSearchTerrain = giGroundToTerrain[gSearchNextCell->m_terrainImageIndex];
+        if (gSearchTerrain == TERRAIN_WATER) {
             if (waterMode != 0) {
                 if (gSearchNextCell->m_triggerType
                     == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_BOAT))
@@ -333,7 +333,7 @@ void searchArray::TestPossibleDirections(
     invalidDirection:
         gSearchTerrain = invalidTerrain;
     storeDirection:
-        terrain[gSearchDirection] = static_cast<i8>(gSearchTerrain);
+        terrain[gSearchDirection] = gSearchTerrain;
         gSearchDirection++;
     } while (gSearchDirection < SEARCH_DIRECTION_COUNT);
 }

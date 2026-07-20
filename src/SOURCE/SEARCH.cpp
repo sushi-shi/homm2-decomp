@@ -16,7 +16,8 @@ DATA(0x0052a1dc) static H2_ENUM_STORAGE(MapObjectType, i32) s_triggerType;
 DATA(0x0052a1e4) static i32 s_processedPointCount;
 DATA(0x0052a1e8) static i32 s_remainingMobility;
 DATA(0x0052a1ec) static i32 s_adjacentX;
-DATA(0x0052a1f0) static i8 s_possibleDirections[SEARCH_DIRECTION_COUNT];
+DATA(0x0052a1f0)
+static H2_ENUM_STORAGE(TerrainType, i8) s_possibleDirections[SEARCH_DIRECTION_COUNT];
 DATA(0x0052a1f8) static i32 s_targetWater;
 DATA(0x0052a1fc) static i32 s_neighborX;
 DATA(0x0052a200) static i32 s_mapY;
@@ -240,7 +241,7 @@ seed_loop:
             s_direction = 0;
             s_remainingMobility = giCurTempMobility - s_currentNode.distance;
             do {
-                if (s_possibleDirections[s_direction] != -1) {
+                if (s_possibleDirections[s_direction] != TERRAIN_INVALID) {
                     s_neighborX = normalDirTable[s_direction].x + s_currentNode.x;
                     s_neighborY = normalDirTable[s_direction].y + s_currentNode.y;
                     i32 neighborIndex = MAP_WIDTH * s_neighborY + s_neighborX;
@@ -287,9 +288,7 @@ seed_loop:
                             && !s_currentNode.rvFlag1) {
                             mapCell* neighborCell = gpAdvManager->GetCell(s_neighborX, s_neighborY);
                             s_targetStepCost = CalcTerrainCost(
-                                static_cast<TerrainType>(
-                                    static_cast<i8>(s_possibleDirections[s_direction])
-                                ),
+                                s_possibleDirections[s_direction],
                                 s_direction,
                                 giCurTempMobility - s_currentNode.distance,
                                 pathfindingSkill,
