@@ -3366,11 +3366,11 @@ float philAI::TurnValueOfObelisk(i32 player) {
     i32 idx;        // turns
     playerData* ta;
     ta = &gpGame->m_players[player];
-    jb = gArtifactBaseRV[gpGame->m_ultimateArtifactId];
+    jb = gArtifactBaseRV[IDX(gpGame->m_ultimateArtifactId)];
     if (gpGame->m_mapHeader.victoryCondition == MAP_VICTORY_FIND_ARTIFACT)
         jb <<= 1;
     idx = jb / 110;
-    if (gpGame->m_ultimateArtifactId == IDX(ARTIFACT_NONE))
+    if (gpGame->m_ultimateArtifactId == ARTIFACT_NONE)
         return 0.0f;
     ta->m_obeliskValue = idx * GAME_OBELISK_VISITOR_COUNT / gpGame->m_obeliskCount;
     if (gpCurPlayer->m_aiDifficulty == PLAYER_PERSONALITY_EXPLORER)
