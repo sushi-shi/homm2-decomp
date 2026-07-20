@@ -62,6 +62,11 @@ public:
         return *this;
     }
 
+    H2EnumStorage& operator=(Storage value) {
+        m_value = value;
+        return *this;
+    }
+
 private:
     Storage m_value;
 };
