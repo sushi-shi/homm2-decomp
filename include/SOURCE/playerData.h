@@ -12,6 +12,16 @@ H2_ENUM_BEGIN(PlayerDataStorageConstant)
     PLAYER_RUNTIME_TAIL_GAP_SIZE = 0x1c
 H2_ENUM_END(PlayerDataStorageConstant)
 
+H2_ENUM_BEGIN(PlayerPersonality)
+    PLAYER_PERSONALITY_WARRIOR        = 0,
+    PLAYER_PERSONALITY_BUILDER        = 1,
+    PLAYER_PERSONALITY_EXPLORER       = 2,
+    PLAYER_PERSONALITY_HUMAN          = 3,
+    PLAYER_PERSONALITY_COMPUTER_FIRST = PLAYER_PERSONALITY_WARRIOR,
+    PLAYER_PERSONALITY_COMPUTER_LAST  = PLAYER_PERSONALITY_EXPLORER,
+    PLAYER_PERSONALITY_COUNT          = PLAYER_PERSONALITY_HUMAN + 1
+H2_ENUM_END(PlayerPersonality)
+
 #pragma pack(push, 1)
 struct playerAttentionWeights {
     float gameWeightA;
@@ -32,7 +42,7 @@ public:
     i8 m_heroIds[PLAYER_HERO_CAPACITY];
     i8 m_availableHeroIds[PLAYER_AVAILABLE_HERO_COUNT];
     i8 m_minimumHeroCount;
-    i32 m_aiDifficulty;
+    H2_ENUM_STORAGE(PlayerPersonality, i32) m_aiDifficulty;
     i8 m_cheatValue;
     char m_unusedSaveData[PLAYER_UNUSED_SAVE_DATA_SIZE];
     i8 m_ultimateArtifactHintChance;
