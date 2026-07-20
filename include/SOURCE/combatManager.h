@@ -558,6 +558,12 @@ H2_ENUM_CLASS_BEGIN(CombatMessageCommand)
     COMBAT_MESSAGE_COMMAND_SHOOT_THROUGH_WALL = 15
 H2_ENUM_CLASS_END(CombatMessageCommand)
 
+H2_ENUM_CLASS_BEGIN_T(CombatGridShade, u8)
+    GRID_SHADE_NONE          = 0,
+    GRID_SHADE_REACHABLE     = 1,
+    GRID_SHADE_EMPTY_BLOCKED = 3
+H2_ENUM_CLASS_END_T(CombatGridShade, u8)
+
 #pragma pack(push, 1)
 class combatManager : public baseManager {
 public:
@@ -565,8 +571,8 @@ public:
     i8 m_savedPalette[COMBAT_PALETTE_DATA_SIZE];
     char m_previousCombatMessage[COMBAT_MESSAGE_LINE_SIZE];
     char m_currentCombatMessage[COMBAT_MESSAGE_LINE_SIZE];
-    u8 m_previousGridState[COMBAT_HEX_COUNT];
-    u8 m_gridState[COMBAT_HEX_COUNT];
+    H2_ENUM_STORAGE(CombatGridShade, u8) m_previousGridState[COMBAT_HEX_COUNT];
+    H2_ENUM_STORAGE(CombatGridShade, u8) m_gridState[COMBAT_HEX_COUNT];
     hexcell m_hexCells[COMBAT_HEX_COUNT];
     TerrainType m_terrainType;
     BattlefieldFringeFrame m_battlefieldFringe;
