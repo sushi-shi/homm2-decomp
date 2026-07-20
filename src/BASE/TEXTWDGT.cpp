@@ -22,8 +22,8 @@ H2_ENUM_END(TextWidgetConstant)
 
 VA(0x004d1060, 0x3e)
 textWidget::textWidget(void) : widget(0, 0, 0, 0, 0, 0) {
-    m_color = static_cast<i16>(FONT_DRAW_DEFAULT);
-    m_alignment = static_cast<char>(FONT_ALIGN_CENTER);
+    m_color = FONT_DRAW_DEFAULT;
+    m_alignment = FONT_ALIGN_CENTER;
     m_font = NULL;
     m_text = NULL;
     m_kind = EncodeWidgetKind(WIDGET_KIND_TEXT);
@@ -37,17 +37,17 @@ textWidget::textWidget(
     i16 height,
     char* text,
     char* fontName,
-    i16 color,
+    H2_ENUM_PARAM(FontDrawMode, i16) color,
     i16 id,
     i16 kind,
-    i16 alignment
+    H2_ENUM_PARAM(FontAlignment, i16) alignment
 )
     : widget(x, y, width, height, id, kind) {
     font* loadedFont = gpResourceManager->GetFont(fontName);
     m_color = color;
     m_font = loadedFont;
     m_text = text;
-    m_alignment = static_cast<char>(alignment);
+    m_alignment = alignment;
     m_kind = EncodeWidgetKind(WIDGET_KIND_TEXT);
 }
 
@@ -65,8 +65,8 @@ void textWidget::Read(void) {
     gpResourceManager->SavePosition();
     m_font = gpResourceManager->GetFont(resourceName);
     gpResourceManager->RestorePosition();
-    m_color = gpResourceManager->ReadWord() & DRAW_MODE_MASK;
-    m_alignment = static_cast<char>(gpResourceManager->ReadWord());
+    m_color = static_cast<FontDrawMode>(gpResourceManager->ReadWord() & DRAW_MODE_MASK);
+    m_alignment = static_cast<FontAlignment>(gpResourceManager->ReadWord());
     m_id = gpResourceManager->ReadWord();
     gpResourceManager->ReadWord();
     m_kind = EncodeWidgetKind(WIDGET_KIND_TEXT);
@@ -150,7 +150,7 @@ i32 textWidget::Main(tag_message& msg) {
                 case WIDGET_COMMAND_SET_FILL_COLOR:
                     if (m_id != msg.payload.widget.id)
                         goto normalEvent;
-                    m_color = msg.payload.widget.data.value;
+                    m_color = static_cast<FontDrawMode>(msg.payload.widget.data.value);
                     return WIDGET_DISPATCH_CONSUME;
 
                 default:
@@ -169,9 +169,9 @@ normalEvent:
 
 VA(0x004d1490, 0x49)
 void textWidget::Draw(void) {
-    FontDrawMode color = FONT_DRAW_DARK_GRAY;
+    FontDrawMode color = FONT_DRAW_DIMMED;
     if ((m_flags & WIDGET_FLAG_DIMMED) == 0)
-        color = FontDrawModeFromStorage(m_color);
+        color = m_color;
     m_font->DrawBoundedString(
         m_text,
         m_x + m_owner->m_posX,
@@ -179,12 +179,12 @@ void textWidget::Draw(void) {
         m_width,
         m_height,
         color,
-        FontAlignmentFromStorage(m_alignment)
+        m_alignment
     );
 }
 
 VA(0x004d14e0, 0xc)
-void textWidget::SetColorIndex(i16 color) {
+void textWidget::SetColorIndex(H2_ENUM_PARAM(FontDrawMode, i16) color) {
     m_color = color;
 }
 

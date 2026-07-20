@@ -1706,10 +1706,10 @@ void combatManager::ShowWinLoseArtifact(class heroWindow* window, i32 artifact) 
         ARTIFACT_TEXT_HEIGHT,
         capturedArtifactName,
         "smalfont.fnt",
-        1,
+        FONT_DRAW_DEFAULT,
         WIN_LOSE_ARTIFACT_TEXT_ID,
         WIN_LOSE_TEXT_FLAGS,
-        1
+        FONT_ALIGN_CENTER
     );
     if (m_winLoseBottomTextWidgets[0] == NULL)
         MemError();
@@ -1752,10 +1752,10 @@ void combatManager::ShowSkeletons(class heroWindow* window) {
         SKELETON_TEXT_HEIGHT,
         skeletonCount,
         "smalfont.fnt",
-        1,
+        FONT_DRAW_DEFAULT,
         WIN_LOSE_SKELETON_TEXT_ID,
         WIN_LOSE_TEXT_FLAGS,
-        1
+        FONT_ALIGN_CENTER
     );
     if (m_winLoseBottomTextWidgets[0] == NULL)
         MemError();
@@ -1839,10 +1839,10 @@ void combatManager::ShowEagleEyeSpell(class heroWindow* window) {
         EAGLE_TEXT_HEIGHT,
         spellName,
         "smalfont.fnt",
-        1,
+        FONT_DRAW_DEFAULT,
         WIN_LOSE_EAGLE_TEXT_ID,
         WIN_LOSE_TEXT_FLAGS,
-        1
+        FONT_ALIGN_CENTER
     );
     if (m_winLoseBottomTextWidgets[0] == NULL)
         MemError();
@@ -1922,10 +1922,10 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
         CASUALTY_TEXT_HEIGHT,
         text_27,
         "smalfont.fnt",
-        1,
+        FONT_DRAW_DEFAULT,
         CASUALTY_TEXT_WIDGET_ID,
         WIN_LOSE_TEXT_FLAGS,
-        1
+        FONT_ALIGN_CENTER
     );
     if (m_winLoseBottomTextWidgets[CASUALTY_TITLE_WIDGET] == NULL)
         MemError();
@@ -1945,10 +1945,10 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
             CASUALTY_TEXT_HEIGHT,
             text_27,
             "smalfont.fnt",
-            1,
+            FONT_DRAW_DEFAULT,
             CASUALTY_TEXT_WIDGET_ID,
             WIN_LOSE_TEXT_FLAGS,
-            1
+            FONT_ALIGN_CENTER
         );
         if (m_winLoseBottomTextWidgets[CASUALTY_SIDE_WIDGET_FIRST + side_9] == NULL)
             MemError();
@@ -1964,10 +1964,10 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
                 CASUALTY_TEXT_HEIGHT,
                 text_27,
                 "smalfont.fnt",
-                1,
+                FONT_DRAW_DEFAULT,
                 side_9 * CASUALTY_WIDGET_ID_STRIDE + CASUALTY_TEXT_WIDGET_ID_FIRST,
                 WIN_LOSE_TEXT_FLAGS,
-                1
+                FONT_ALIGN_CENTER
             );
             if (m_winLoseBottomTextWidgets[side_9 * CASUALTY_WIDGETS_PER_SIDE] == NULL)
                 MemError();
@@ -2045,10 +2045,10 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
                     CASUALTY_QUANTITY_HEIGHT,
                     text_27,
                     "smalfont.fnt",
-                    1,
+                    FONT_DRAW_DEFAULT,
                     side_9 * CASUALTY_WIDGET_ID_STRIDE + armyIndex_8 + CASUALTY_TEXT_WIDGET_ID_FIRST,
                     WIN_LOSE_TEXT_FLAGS,
-                    1
+                    FONT_ALIGN_CENTER
                 );
             if (m_winLoseBottomTextWidgets[side_9 * CASUALTY_WIDGETS_PER_SIDE + armyIndex_8]
                 == NULL)

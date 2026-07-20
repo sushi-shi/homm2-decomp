@@ -46,9 +46,13 @@ Use `H2_ENUM_CLASS_BEGIN_SPLIT(name, storage)` when one semantic domain has an `
 type but is also stored in narrower fields. Strict Clang builds see a scoped enum with the declared
 underlying type; retail MSVC builds keep the domain typedef as `i32`. Declare each stored field as
 `H2_ENUM_STORAGE(name, proven_storage)`, which exposes the enum to strict checking while preserving
-that field's proven retail type (`u8`, `i8`, plain `char`, or `i32`) in production.
+that field's proven representation (`u8`, `i8`, plain `char`, or `i32`) in both builds. Strict
+builds use a width-preserving storage proxy whose assignments and reads are checked as the enum;
+retail builds use the proven scalar directly.
 
-Function parameters and semantic locals use the domain type directly. Raw file/network values are
-converted where they enter the domain, and `IDX` remains limited to real indexing or arithmetic.
+Function parameters and semantic locals use the domain type directly. Use
+`H2_ENUM_PARAM(name, retail_type)` only where the retail signature has a different scalar type;
+strict builds still expose the enum parameter. Raw file/network values are converted where they
+enter the domain, and `IDX` remains limited to real indexing or arithmetic.
 Generic integer sinks should provide a strict-only enum overload when every enum is a legitimate
 input, instead of making ordinary callers encode and decode the domain manually.

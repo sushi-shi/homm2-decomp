@@ -46,7 +46,38 @@ typedef i8 b8;
     }                                                                                              \
     ;                                                                                              \
     using enum name;
-#define H2_ENUM_STORAGE(name, storage) name
+
+// A retail domain can appear in fields of several widths. Keep the exact field
+// representation while presenting the domain type to strict-build expressions.
+template <typename Enum, typename Storage>
+class H2EnumStorage {
+public:
+    H2EnumStorage() = default;
+    constexpr H2EnumStorage(Enum value) : m_value(static_cast<Storage>(value)) {}
+
+    constexpr operator Enum() const { return static_cast<Enum>(m_value); }
+
+    H2EnumStorage& operator=(Enum value) {
+        m_value = static_cast<Storage>(value);
+        return *this;
+    }
+
+private:
+    Storage m_value;
+};
+
+template <typename Enum, typename Storage>
+constexpr i32 H2EnumIndex(H2EnumStorage<Enum, Storage> value) {
+    return static_cast<i32>(static_cast<Enum>(value));
+}
+
+template <typename Value>
+constexpr i32 H2EnumIndex(Value value) {
+    return static_cast<i32>(value);
+}
+
+#define H2_ENUM_STORAGE(name, storage) H2EnumStorage<name, storage>
+#define H2_ENUM_PARAM(name, storage) name
 #define H2_ENUM_FLAGS(name)                                                                        \
     inline constexpr name operator|(name a, name b) {                                              \
         return static_cast<name>(static_cast<i64>(a) | static_cast<i64>(b));                       \
@@ -101,13 +132,14 @@ typedef i8 b8;
     ;                                                                                              \
     typedef i32 name;
 #define H2_ENUM_STORAGE(name, storage) storage
+#define H2_ENUM_PARAM(name, storage) storage
 #define H2_ENUM_FLAGS(name)
 #endif
 
 // Table lookup by semantic domain: IDX spells the value-as-index conversion at
 // the site. Production expands to the bare value, so bytes cannot change.
 #ifdef HOMM2_STRICT_ENUM_TYPES
-#define IDX(x) static_cast<i32>(x)
+#define IDX(x) H2EnumIndex(x)
 #else
 #define IDX(x) (x)
 #endif

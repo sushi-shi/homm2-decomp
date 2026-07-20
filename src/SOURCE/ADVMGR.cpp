@@ -72,7 +72,6 @@ H2_ENUM_BEGIN(AdventureDrawConstant)
     DRAW_CLIP_WIDTH            = 480,
     DRAW_CLIP_HEIGHT           = 480,
     CLOUD_VARIANTS             = 4,
-    HERO_TYPE_BOAT             = 6,
     HERO_SHADOW_FRAME_END      = 36,
     MINE_GUARDIAN_ICON_SLOT    = 10,
     TILESET_MONSTER            = 20,
@@ -373,7 +372,6 @@ H2_ENUM_BEGIN(AdventureComboDrawConstant)
     COMBO_HERO_PANEL_BOTTOM = 9,
     COMBO_UPDATE_MIN        = 16,
     COMBO_UPDATE_MAX        = 463,
-    CURSOR_ROUTE            = 6
 H2_ENUM_END(AdventureComboDrawConstant)
 
 H2_ENUM_BEGIN(AdventureRadarConstant)
@@ -757,7 +755,7 @@ DATA(0x00527f10) static i32 s_drawStoneTile;
 DATA(0x00527f18) static mapCell* s_drawCell;
 DATA(0x00527f1c) static mineRecord* s_drawMine;
 DATA(0x00527f20) static hero* s_drawHero;
-DATA(0x00527f3c) static i32 s_drawHeroType;
+DATA(0x00527f3c) static H2_ENUM_STORAGE(HeroCursorType, i32) s_drawHeroType;
 DATA(0x00527f44) static i32 s_drawCovered;
 DATA(0x00527f48) static mapCell* s_drawAdjacentCell;
 DATA(0x00528094) static i32 s_drawHasHero;
@@ -2536,14 +2534,14 @@ i32 advManager::ProcessHover(i32 mouseX, i32 mouseY) {
                     return 1;
                 }
 
-                if (!((m_cursorType == CURSOR_ROUTE
+                if (!((m_cursorType == HERO_TYPE_BOAT
                        || giGroundToTerrain[hoverCellLocal->m_terrainImageIndex]
                        || hoverCellLocal->m_triggerType
                               == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION)
                        || hoverCellLocal->m_triggerType
                               == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_BOAT)
                        || hoverCellLocal->m_triggerType == HOVER_SHIPWRECK_TRIGGER)
-                      && (m_cursorType != CURSOR_ROUTE
+                      && (m_cursorType != HERO_TYPE_BOAT
                           || !giGroundToTerrain[hoverCellLocal->m_terrainImageIndex]
                           || hoverCellLocal->m_triggerType == HOVER_COAST))) {
                     gpSearchArray->m_pathLength = 0;
@@ -2569,7 +2567,7 @@ i32 advManager::ProcessHover(i32 mouseX, i32 mouseY) {
 
                     switch (hoverCellLocal->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
                         case HOVER_BOAT:
-                            if (m_cursorType != CURSOR_ROUTE) {
+                            if (m_cursorType != HERO_TYPE_BOAT) {
                                 gpMouseManager->SetPointer(pointerBaseCursor + POINTER_SAIL);
                                 m_selectedCell = ADVMGR_COMMAND_MOVE_TO;
                             } else {
@@ -2577,7 +2575,7 @@ i32 advManager::ProcessHover(i32 mouseX, i32 mouseY) {
                             }
                             break;
                         case HOVER_COAST:
-                            if (m_cursorType == CURSOR_ROUTE) {
+                            if (m_cursorType == HERO_TYPE_BOAT) {
                                 gpMouseManager->SetPointer(
                                     pointerBaseCursor + POINTER_DISEMBARK
                                 );
@@ -2625,7 +2623,7 @@ i32 advManager::ProcessHover(i32 mouseX, i32 mouseY) {
                         process_default_hover:
                             if (!((mapExtra[m_commandTargetY * MAP_WIDTH + m_commandTargetX]
                                    & HOVER_UNREACHABLE)
-                                  && m_cursorType != CURSOR_ROUTE
+                                  && m_cursorType != HERO_TYPE_BOAT
                                   && (!(hoverCellLocal->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
                                       || !StopOnTrigger(hoverCellLocal))
                                   && (gpMouseManager->SetPointer(
@@ -2633,7 +2631,7 @@ i32 advManager::ProcessHover(i32 mouseX, i32 mouseY) {
                                       ),
                                       1))) {
                                 if (hoverCellLocal->m_triggerType & MAP_TRIGGER_ACTION_FLAG) {
-                                    if (m_cursorType != CURSOR_ROUTE) {
+                                    if (m_cursorType != HERO_TYPE_BOAT) {
                                         if (giGroundToTerrain[hoverCellLocal
                                                                   ->m_terrainImageIndex]) {
                                             gpMouseManager->SetPointer(
@@ -2663,7 +2661,7 @@ i32 advManager::ProcessHover(i32 mouseX, i32 mouseY) {
                                         }
                                     }
                                 } else {
-                                    if (m_cursorType == CURSOR_ROUTE) {
+                                    if (m_cursorType == HERO_TYPE_BOAT) {
                                         gpMouseManager->SetPointer(
                                             pointerBaseCursor + POINTER_SAIL
                                         );
@@ -3651,7 +3649,7 @@ void advManager::DrawCell(
                                 );
                             }
                             FlipIconToBitmap(
-                                m_heroIcons[s_drawHeroType],
+                                m_heroIcons[IDX(s_drawHeroType)],
                                 gpWindowManager->m_screen,
                                 s_drawPixelX + 32,
                                 s_drawPixelY + 31 + s_drawHeroYOffset,
@@ -3747,7 +3745,7 @@ void advManager::DrawCell(
                                 );
                             }
                             IconToBitmap(
-                                m_heroIcons[s_drawHeroType],
+                                m_heroIcons[IDX(s_drawHeroType)],
                                 gpWindowManager->m_screen,
                                 s_drawPixelX,
                                 s_drawPixelY + 31 + s_drawHeroYOffset,
@@ -5051,7 +5049,7 @@ void advManager::UpdateTownLocators(i32 drawWindow, i32 updateScreen) {
             m_adventureWindow->BroadcastMessage(locatorMessage14);
             locatorMessage14.payload.widget.command = ADVMGR_LOCATOR_COMMAND_SET_FRAME;
             locatorMessage14.payload.widget.data.value =
-                gpGame->GetTown(townId37)->m_type + LOCATOR_TOWN_TYPE_FRAME_BASE;
+                IDX(gpGame->GetTown(townId37)->m_type) + LOCATOR_TOWN_TYPE_FRAME_BASE;
             if (!(gpGame->GetTown(townId37)->m_buildings & IDX(TOWN_BUILDING_CASTLE))) {
                 locatorMessage14.payload.widget.data.value +=
                     LOCATOR_TOWN_VILLAGE_FRAME_OFFSET;
@@ -5386,10 +5384,10 @@ i32 advManager::UpdBottomViewNewTurn(void) {
         NEW_TURN_WEEK_TEXT_HEIGHT,
         weekText,
         "smalfont.fnt",
-        1,
+        FONT_DRAW_DEFAULT,
         BOTTOM_VIEW_TEXT_ID,
         BOTTOM_VIEW_TEXT_FLAGS,
-        1
+        FONT_ALIGN_CENTER
     );
     if (m_bottomViewAllTexts[0] == NULL) {
         MemError();
@@ -5407,10 +5405,10 @@ i32 advManager::UpdBottomViewNewTurn(void) {
         NEW_TURN_DAY_TEXT_HEIGHT,
         dayText,
         "bigfont.fnt",
-        1,
+        FONT_DRAW_DEFAULT,
         BOTTOM_VIEW_TEXT_ID,
         BOTTOM_VIEW_TEXT_FLAGS,
-        1
+        FONT_ALIGN_CENTER
     );
     if (m_bottomViewAllTexts[0] == NULL) {
         MemError();
@@ -5471,10 +5469,10 @@ i32 advManager::UpdBottomViewResMsg(void) {
         RESOURCE_VIEW_TEXT_HEIGHT,
         messageText2,
         "smalfont.fnt",
-        1,
+        FONT_DRAW_DEFAULT,
         BOTTOM_VIEW_TEXT_ID,
         BOTTOM_VIEW_TEXT_FLAGS,
-        1
+        FONT_ALIGN_CENTER
     );
     if (m_bottomViewAllTexts[0] == NULL) {
         MemError();
@@ -5519,10 +5517,10 @@ i32 advManager::UpdBottomViewResMsg(void) {
             RESOURCE_VIEW_COUNT_HEIGHT,
             resourceCountText6,
             "smalfont.fnt",
-            1,
+            FONT_DRAW_DEFAULT,
             BOTTOM_VIEW_TEXT_ID_2,
             BOTTOM_VIEW_TEXT_FLAGS,
-            1
+            FONT_ALIGN_CENTER
         );
         if (m_bottomViewAllTexts[1] == NULL) {
             MemError();
@@ -5633,10 +5631,10 @@ i32 advManager::UpdBottomViewKingdom(void) {
             KINGDOM_VIEW_TEXT_HEIGHT,
             countText14[index11],
             "smalfont.fnt",
-            1,
+            FONT_DRAW_DEFAULT,
             index11 + BOTTOM_VIEW_TEXT_ID,
             BOTTOM_VIEW_TEXT_FLAGS,
-            1
+            FONT_ALIGN_CENTER
         );
         if (m_bottomViewAllTexts[index11] == NULL) {
             MemError();
@@ -5785,10 +5783,10 @@ i32 advManager::UpdBottomViewHero(void) {
                     BOTTOM_HERO_LABEL_HEIGHT,
                     armyCountLabelsResult[displayIndexData],
                     "smalfont.fnt",
-                    1,
+                    FONT_DRAW_DEFAULT,
                     displayIndexData + BOTTOM_HERO_FIRST_TEXT_ID,
                     BOTTOM_HERO_TEXT_ALIGNMENT,
-                    1
+                    FONT_ALIGN_CENTER
                 );
                 if (m_bottomViewTexts[displayIndexData] == NULL) {
                     MemError();
@@ -5944,10 +5942,10 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                         12,
                         armyLabelsStrings[armyIndex],
                         "smalfont.fnt",
-                        1,
+                        FONT_DRAW_DEFAULT,
                         -1,
                         WIDGET_KIND_TEXT,
-                        1
+                        FONT_ALIGN_CENTER
                     );
                     if (creatureTextWidgetsLocal[armyIndex] == NULL) {
                         MemError();
@@ -6024,10 +6022,10 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                 12,
                 armyLabelsStrings[armyIndex],
                 "smalfont.fnt",
-                1,
+                FONT_DRAW_DEFAULT,
                 -1,
                 WIDGET_KIND_TEXT,
-                1
+                FONT_ALIGN_CENTER
             );
             if (creatureTextWidgetsLocal[armyIndex] == NULL) {
                 MemError();
@@ -6083,10 +6081,10 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                     12,
                     armyLabelsStrings[armyIndex],
                     "smalfont.fnt",
-                    1,
+                    FONT_DRAW_DEFAULT,
                     -1,
                     WIDGET_KIND_TEXT,
-                    1
+                    FONT_ALIGN_CENTER
                 );
                 if (creatureTextWidgetsLocal[armyIndex] == NULL) {
                     MemError();
@@ -6215,7 +6213,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
     messageLocal.type = MESSAGE_WIDGET;
     messageLocal.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
     messageLocal.payload.widget.id = 2;
-    messageLocal.payload.widget.data.value = quickTownLocal->m_type + 9;
+    messageLocal.payload.widget.data.value = IDX(quickTownLocal->m_type) + 9;
     if ((gpGame->GetTown(townId)->m_buildings & BIT(BUILDING_SLOT_CASTLE)) == 0) {
         messageLocal.payload.widget.data.value += 6;
     }
@@ -6275,10 +6273,10 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
             12,
             emptyArmyLabel,
             "smalfont.fnt",
-            1,
+            FONT_DRAW_DEFAULT,
             -1,
             WIDGET_KIND_TEXT,
-            1
+            FONT_ALIGN_CENTER
         );
         if (emptyArmyTextState == NULL) {
             MemError();
@@ -6380,10 +6378,10 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
                 12,
                 armyLabelsResult[widgetIndexWidget],
                 "smalfont.fnt",
-                1,
+                FONT_DRAW_DEFAULT,
                 -1,
                 WIDGET_KIND_TEXT,
-                1
+                FONT_ALIGN_CENTER
             );
             if (armyTexts[widgetIndexWidget] == NULL) {
                 MemError();
@@ -6457,10 +6455,10 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
                     12,
                     armyLabelsResult[widgetIndexWidget],
                     "smalfont.fnt",
-                    1,
+                    FONT_DRAW_DEFAULT,
                     -1,
                     WIDGET_KIND_TEXT,
-                    1
+                    FONT_ALIGN_CENTER
                 );
                 if (armyTexts[widgetIndexWidget] == NULL) {
                     MemError();
@@ -6558,7 +6556,7 @@ void advManager::DemobilizeCurrHero(void) {
     currentHero->m_locationType = currentCell->m_triggerType;
     currentHero->m_occupiedTown = currentCell->m_objectMetadata;
     currentHero->m_direction = static_cast<u8>(m_cursorDirection);
-    if (m_cursorType == CURSOR_HERO_TYPE_BOAT) {
+    if (m_cursorType == HERO_TYPE_BOAT) {
         currentHero->m_eventFlags = HERO_EVENT_EMBARKED | currentHero->m_eventFlags;
     }
     currentCell->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION;
@@ -6633,7 +6631,7 @@ void advManager::SetHeroContext(i32 heroId, i32 update) {
     m_previousCursorMapY = IDX(ADVMGR_INVALID_CELL);
     m_previousCursorMapX = m_previousCursorMapY;
     if (HAS(currentHero->m_eventFlags, HERO_EVENT_EMBARKED)) {
-        m_cursorType = CURSOR_HERO_TYPE_BOAT;
+        m_cursorType = HERO_TYPE_BOAT;
     } else {
         m_cursorType = currentHero->m_cursorType;
     }
@@ -7220,7 +7218,7 @@ i32 advManager::ComboDraw(i32 originX, i32 originY, i32 animate) {
         }
     }
 
-    if (m_cursorType == CURSOR_ROUTE) {
+    if (m_cursorType == HERO_TYPE_BOAT) {
         ++bComboDraw[6][5];
         ++bComboDraw[7][5];
         ++bComboDraw[8][5];
@@ -7885,7 +7883,7 @@ void advManager::TeleportTo(
                 (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION);
             destinationCell29->m_objectMetadata = static_cast<u8>(mapHero->m_id);
         }
-        if (m_cursorType == BOAT_CURSOR_TYPE) {
+        if (m_cursorType == HERO_TYPE_BOAT) {
             mapHero->m_eventFlags = HERO_EVENT_EMBARKED | mapHero->m_eventFlags;
         }
         m_cursorActive = 0;
@@ -8501,7 +8499,7 @@ void advManager::SeedTo(i32 targetX, i32 targetY) {
             currentHero->m_y,
             m_cursorDirection,
             ROUTE_PATH_COST_LIMIT,
-            m_cursorType == POINTER_SAIL,
+            m_cursorType == HERO_TYPE_BOAT,
             0,
             currentHero->m_remainingMobility,
             currentHero->m_secondarySkills[IDX(HERO_SKILL_PATHFINDING)],
@@ -8516,7 +8514,7 @@ void advManager::SeedTo(i32 targetX, i32 targetY) {
             currentHero->m_y,
             m_cursorDirection,
             ROUTE_PATH_COST_LIMIT,
-            m_cursorType == POINTER_SAIL,
+            m_cursorType == HERO_TYPE_BOAT,
             0,
             currentHero->m_remainingMobility,
             currentHero->m_secondarySkills[IDX(HERO_SKILL_PATHFINDING)],

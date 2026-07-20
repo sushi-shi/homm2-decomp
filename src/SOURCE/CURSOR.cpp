@@ -120,13 +120,13 @@ void advManager::DrawCursor(void) {
 
     i32 drawX = m_updateMinX + CURSOR_DRAW_X;
     drawY = m_updateMinY + CURSOR_DRAW_Y;
-    if (m_cursorType == CURSOR_HERO_TYPE_BOAT)
+    if (m_cursorType == HERO_TYPE_BOAT)
         drawY -= CURSOR_DRAW_Y - CURSOR_BOAT_DRAW_Y;
 
     if (m_cursorFrame & CURSOR_FLIP_FLAG) {
         drawX += CURSOR_FLIPPED_DRAW_X - CURSOR_DRAW_X;
         drawFrame_f = (m_cursorFrame & CURSOR_FRAME_MASK) + m_cursorFrameCount;
-        if (m_cursorType == CURSOR_HERO_TYPE_BOAT
+        if (m_cursorType == HERO_TYPE_BOAT
             && !(
                 GetCell(
                     m_mapOriginX + CURSOR_MAP_DRAW_OFFSET,
@@ -150,7 +150,7 @@ void advManager::DrawCursor(void) {
             );
         }
         FlipIconToBitmap(
-            m_heroIcons[m_cursorType],
+            m_heroIcons[IDX(m_cursorType)],
             gpWindowManager->m_screen,
             drawX,
             drawY,
@@ -162,7 +162,7 @@ void advManager::DrawCursor(void) {
             CURSOR_CLIP_SIZE,
             0
         );
-        if (m_cursorType == CURSOR_HERO_TYPE_BOAT) {
+        if (m_cursorType == HERO_TYPE_BOAT) {
             i32 flagDrawn;
 
             FlipIconToBitmap(
@@ -202,7 +202,7 @@ void advManager::DrawCursor(void) {
         }
     } else {
         drawFrame_f = m_cursorFrame + m_cursorFrameCount;
-        if (m_cursorType == CURSOR_HERO_TYPE_BOAT
+        if (m_cursorType == HERO_TYPE_BOAT
             && !(
                 GetCell(
                     m_mapOriginX + CURSOR_MAP_DRAW_OFFSET,
@@ -226,7 +226,7 @@ void advManager::DrawCursor(void) {
             );
         }
         IconToBitmap(
-            m_heroIcons[m_cursorType],
+            m_heroIcons[IDX(m_cursorType)],
             gpWindowManager->m_screen,
             drawX,
             drawY,
@@ -238,7 +238,7 @@ void advManager::DrawCursor(void) {
             CURSOR_CLIP_SIZE,
             0
         );
-        if (m_cursorType == CURSOR_HERO_TYPE_BOAT) {
+        if (m_cursorType == HERO_TYPE_BOAT) {
             i32 flagDrawn;
 
             IconToBitmap(
@@ -344,13 +344,13 @@ void advManager::DrawCursorShadow(void) {
 
     i32 drawX = m_updateMinX + CURSOR_DRAW_X;
     drawY = m_updateMinY + CURSOR_DRAW_Y;
-    if (m_cursorType == CURSOR_HERO_TYPE_BOAT)
+    if (m_cursorType == HERO_TYPE_BOAT)
         drawY -= CURSOR_DRAW_Y - CURSOR_BOAT_DRAW_Y;
 
     if (m_cursorFrame & CURSOR_FLIP_FLAG) {
         drawX += CURSOR_SHADOW_FLIP_X_ADJUST;
         drawFrame_f = (m_cursorFrame & CURSOR_FRAME_MASK) + m_cursorFrameCount;
-        if (m_drawHeroShadows && m_cursorType == CURSOR_HERO_TYPE_BOAT) {
+        if (m_drawHeroShadows && m_cursorType == HERO_TYPE_BOAT) {
             boatFrame_i = drawFrame_f;
             if (boatFrame_i >= CURSOR_SHADOW_ANIM_FIRST && boatFrame_i < CURSOR_SHADOW_ANIM_END)
                 boatShadowOffset = CURSOR_BOAT_SHADOW_OFFSET;
@@ -369,7 +369,7 @@ void advManager::DrawCursorShadow(void) {
                 CURSOR_CLIP_SIZE,
                 0
             );
-        } else if (m_drawHeroShadows && m_cursorType != CURSOR_HERO_TYPE_BOAT) {
+        } else if (m_drawHeroShadows && m_cursorType != HERO_TYPE_BOAT) {
             shadowFrame = drawFrame_f;
             if (shadowFrame == IDX(SPRITE_UP_STEP_5))
                 shadowFrame = IDX(SPRITE_UP_SHADOW_STEP_5);
@@ -402,7 +402,7 @@ void advManager::DrawCursorShadow(void) {
         }
     } else {
         drawFrame_f = m_cursorFrame + m_cursorFrameCount;
-        if (m_drawHeroShadows && m_cursorType == CURSOR_HERO_TYPE_BOAT) {
+        if (m_drawHeroShadows && m_cursorType == HERO_TYPE_BOAT) {
             IconToBitmap(
                 m_boatShadowIcon,
                 gpWindowManager->m_screen,
@@ -416,7 +416,7 @@ void advManager::DrawCursorShadow(void) {
                 CURSOR_CLIP_SIZE,
                 0
             );
-        } else if (m_drawHeroShadows && m_cursorType != CURSOR_HERO_TYPE_BOAT) {
+        } else if (m_drawHeroShadows && m_cursorType != HERO_TYPE_BOAT) {
             IconToBitmap(
                 m_shadowIcon,
                 gpWindowManager->m_screen,
@@ -481,7 +481,7 @@ void advManager::TurnTo(i32 direction) {
 
     do {
         m_cursorCycle = 1;
-        if (m_cursorType >= CURSOR_HERO_TYPE_BOAT)
+        if (m_cursorType >= HERO_TYPE_BOAT)
             m_cursorFrame = boatFrameFlip[frameIndex_i];
         else
             m_cursorFrame = horseFrameFlip[frameIndex_i];
@@ -1066,7 +1066,7 @@ i32 advManager::ValidMove(i32 direction, i32 eventMode) {
         return 0;
 
     if (giGroundToTerrain[destinationCell_g->m_terrainImageIndex] == CURSOR_WATER_TERRAIN) {
-        if (m_cursorType != CURSOR_HERO_TYPE_BOAT
+        if (m_cursorType != HERO_TYPE_BOAT
             && destinationCell_g->m_triggerType != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_BOAT)
             && destinationCell_g->m_triggerType != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SHIPWRECK))
             return 0;
@@ -1080,7 +1080,7 @@ i32 advManager::ValidMove(i32 direction, i32 eventMode) {
                        != CURSOR_WATER_TERRAIN)
                 return 0;
         }
-    } else if (m_cursorType == CURSOR_HERO_TYPE_BOAT
+    } else if (m_cursorType == HERO_TYPE_BOAT
                && destinationCell_g->m_triggerType != MAP_OBJECT_COAST) {
         return 0;
     }

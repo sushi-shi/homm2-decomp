@@ -5,7 +5,6 @@
 
 // Vertical-walk frames begin at 45; frames 0x37-0x3a contain their shadows.
 H2_ENUM_BEGIN(CursorConstant)
-    CURSOR_HERO_TYPE_BOAT               = 6,
     CURSOR_BOAT_WAKE_TYPE               = 7,
     CURSOR_DIRECTION_COUNT              = 8,
     CURSOR_TURN_FRAME_COUNT             = 16,
