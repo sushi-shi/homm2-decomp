@@ -72,7 +72,61 @@ private:
 };
 
 template <typename Enum, typename Storage>
+class H2SteppedEnumStorage {
+public:
+    H2SteppedEnumStorage() = default;
+    constexpr H2SteppedEnumStorage(Enum value) : m_value(static_cast<Storage>(value)) {}
+
+    constexpr operator Enum() const { return static_cast<Enum>(m_value); }
+
+    H2SteppedEnumStorage& operator=(Enum value) {
+        m_value = static_cast<Storage>(value);
+        return *this;
+    }
+
+    H2SteppedEnumStorage& operator=(Storage value) {
+        m_value = value;
+        return *this;
+    }
+
+    H2SteppedEnumStorage& operator++() {
+        ++m_value;
+        return *this;
+    }
+
+    H2SteppedEnumStorage operator++(i32) {
+        H2SteppedEnumStorage previous = *this;
+        ++m_value;
+        return previous;
+    }
+
+    H2SteppedEnumStorage& operator--() {
+        --m_value;
+        return *this;
+    }
+
+    H2SteppedEnumStorage operator--(i32) {
+        H2SteppedEnumStorage previous = *this;
+        --m_value;
+        return previous;
+    }
+
+    H2SteppedEnumStorage& operator+=(i32 amount) {
+        m_value = static_cast<Storage>(m_value + amount);
+        return *this;
+    }
+
+private:
+    Storage m_value;
+};
+
+template <typename Enum, typename Storage>
 constexpr i32 H2EnumIndex(H2EnumStorage<Enum, Storage> value) {
+    return static_cast<i32>(static_cast<Enum>(value));
+}
+
+template <typename Enum, typename Storage>
+constexpr i32 H2EnumIndex(H2SteppedEnumStorage<Enum, Storage> value) {
     return static_cast<i32>(static_cast<Enum>(value));
 }
 
@@ -82,6 +136,7 @@ constexpr i32 H2EnumIndex(Value value) {
 }
 
 #define H2_ENUM_STORAGE(name, storage) H2EnumStorage<name, storage>
+#define H2_ENUM_STORAGE_STEPPED(name, storage) H2SteppedEnumStorage<name, storage>
 #define H2_ENUM_BITFIELD(name, storage) name
 #define H2_ENUM_PARAM(name, storage) name
 #define H2_ENUM_FLAGS(name)                                                                        \
@@ -138,6 +193,7 @@ constexpr i32 H2EnumIndex(Value value) {
     ;                                                                                              \
     typedef i32 name;
 #define H2_ENUM_STORAGE(name, storage) storage
+#define H2_ENUM_STORAGE_STEPPED(name, storage) storage
 #define H2_ENUM_BITFIELD(name, storage) storage
 #define H2_ENUM_PARAM(name, storage) storage
 #define H2_ENUM_FLAGS(name)

@@ -103,7 +103,7 @@ public:
     i32 ChooseToFightForArtifact(i32, i32, i32);
     i32 NetValueOfArtifact(i32, i32, i32, i32);
     i32 ChooseToPayRansomOnHero(i32);
-    void BuildBuilding(class town*, i32);
+    void BuildBuilding(class town*, H2_ENUM_PARAM(BuildingSlotType, i32));
     void BuildHero(class town*, i32);
     void BuildCreature(class town*, i32, i32);
     i32 CanBuyBHC(struct BHC&);

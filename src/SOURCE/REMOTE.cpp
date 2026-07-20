@@ -47,7 +47,7 @@ H2_ENUM_CLASS_END(RemoteSetupCommand)
 DATA(0x00516f60) i32 iInOrderCtr = 0;
 DATA(0x00516f64) i32 iCurLastID = 0;
 DATA(0x00516f68) i32 giLastConfirm = -1;
-DATA(0x00516f6c) u8 GameMode = 0;
+DATA(0x00516f6c) H2_ENUM_STORAGE(RemoteGameMode, u8) GameMode = REMOTE_GAME_NONE;
 DATA(0x00516f70) i32l lLastHeartbeatSend = 0;
 DATA(0x00516f74) b32 gbInRemoteMain = false;
 DATA(0x00516f78) b32 gbInRemoteCleanup = false;
@@ -75,7 +75,7 @@ void RemoteCleanup(void) {
             } else {
                 gbInRemoteCleanup = true;
                 LogStr("RC3");
-                switch (static_cast<RemoteGameMode>(GameMode)) {
+                switch (GameMode) {
         case REMOTE_GAME_NETWORK_HOST:
         case REMOTE_GAME_NETWORK_GUEST:
                         UnloadRemoteDriver(1);
@@ -90,7 +90,7 @@ void RemoteCleanup(void) {
                 iInOrderCtr = 0;
                 iCurLastID = 0;
                 giLastConfirm = -1;
-                GameMode = static_cast<u8>(REMOTE_GAME_NONE);
+                GameMode = REMOTE_GAME_NONE;
                 lLastHeartbeatSend = 0;
                 gbInRemoteMain = false;
                 iIDCtr = 0;
@@ -154,7 +154,7 @@ void RemoteMain(RemoteGameMode gameMode) {
         rcvBuf[player] = NULL;
     LogStr("RM 5");
     memset(iLastIds, 0, REMOTE_RECENT_ID_COUNT);
-    GameMode = static_cast<u8>(gameMode);
+    GameMode = gameMode;
     LogStr("RM 6");
     memset(gsNetPlayerInfo, 0, sizeof(gsNetPlayerInfo));
     memset(&gsThisNetPlayerInfo, 0, sizeof(gsThisNetPlayerInfo));
@@ -415,7 +415,7 @@ i32 SendRemoteData(u8* dataToSend, u8*, i32 destination, i32 length) {
         static_cast<char>(destination),
         length
     );
-    switch (static_cast<RemoteGameMode>(GameMode)) {
+    switch (GameMode) {
         case REMOTE_GAME_NETWORK_HOST:
         case REMOTE_GAME_NETWORK_GUEST:
             if (bUseDirectPlay != 0) {
@@ -456,7 +456,7 @@ i32 ReceiveRemoteData(u8*, u8* data, i32 decodeType) {
     i32 receiveResult;
 
     result = 1;
-    switch (static_cast<RemoteGameMode>(GameMode)) {
+    switch (GameMode) {
         case REMOTE_GAME_NETWORK_HOST:
         case REMOTE_GAME_NETWORK_GUEST:
             if (bUseDirectPlay != 0) {

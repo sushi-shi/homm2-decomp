@@ -199,7 +199,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
     }
 
     if (targetModeBySide[0] == SPELL_AI_RESURRECT)
-        doneResult = FirstResurrectable(SPELL_AI_FIRST_HEX, &hexIndex, IDX(spell));
+        doneResult = FirstResurrectable(SPELL_AI_FIRST_HEX, &hexIndex, spell);
     if (targetModeBySide[0] == SPELL_AI_FRIENDLY || targetModeBySide[0] == SPELL_AI_ENEMY
         || targetModeBySide[0] == SPELL_AI_SUM_ENEMY
         || targetModeBySide[0] == SPELL_AI_SUM_FRIENDLY
@@ -754,7 +754,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
                     doneResult = 1;
                 break;
             case SPELL_AI_RESURRECT:
-                doneResult = FirstResurrectable(hexIndex + 1, &hexIndex, IDX(spell));
+                doneResult = FirstResurrectable(hexIndex + 1, &hexIndex, spell);
         }
     }
 }
@@ -1005,7 +1005,11 @@ i32 combatManager::FirstArmy(i32 startHex, i32 side, i32* hex) {
 }
 
 VA(0x0048874e, 0x73)
-i32 combatManager::FirstResurrectable(i32 startHex, i32* hex, i32 spell) {
+i32 combatManager::FirstResurrectable(
+    i32 startHex,
+    i32* hex,
+    H2_ENUM_PARAM(SpellType, i32) spell
+) {
     while (startHex <= SPELL_AI_LAST_HEX) {
         if (FindResurrectArmyIndex(m_currentSide, spell, startHex) != -1) {
             *hex = startHex;
@@ -1147,13 +1151,13 @@ void combatManager::EffectSpellResurrect(i32* effect, i32 hex, SpellType spell) 
     if (m_heroes[m_currentSide] != NULL && m_heroes[m_currentSide]->HasArtifact(ARTIFACT_ANKH))
         resurrectPowerWork <<= 1;
 
-    armyIndexWork = FindResurrectArmyIndex(m_currentSide, IDX(spell), hex);
+    armyIndexWork = FindResurrectArmyIndex(m_currentSide, spell, hex);
     targetStack = &m_armies[m_currentSide][armyIndexWork];
     quantityResult[0] = resurrectPowerWork / targetStack->m_monster.hitPoints;
     if (targetStack->m_quantity + quantityResult[0] > targetStack->m_initialQuantity)
         quantityResult[0] = targetStack->m_initialQuantity - targetStack->m_quantity;
     *effect = gMonsterDatabase[IDX(targetStack->m_monsterType)].fightValue * quantityResult[0];
-    *effect = static_cast<i32>(*effect * targetStack->SpellCastWorkChance(SpellType(spell)));
+    *effect = static_cast<i32>(*effect * targetStack->SpellCastWorkChance(spell));
     if (spell == SPELL_RESURRECT)
         *effect = static_cast<i32>(*effect * COMBAT_SPELL_AI_RESURRECT_VALUE_MODIFIER);
 }
@@ -1437,7 +1441,7 @@ void combatManager::EffectSpellDamage(i32* effect, SpellType spell, i32 targetHe
 
                     ModifyDamageForArtifacts(
                         &spellDamageWork,
-                        IDX(spell),
+                        spell,
                         m_heroes[m_currentSide],
                         m_heroes[targetCreature->m_side]
                     );

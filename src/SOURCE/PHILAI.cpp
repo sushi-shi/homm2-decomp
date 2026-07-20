@@ -427,7 +427,7 @@ void philAI::CheckBuyStuff(void) {
         }
         if (giBuildShipyard[giCurPlayer] >= 0) {
             if (CanBuy(idx, BUILDING_SLOT_DOCK) && CanBuild(idx, BUILDING_SLOT_DOCK)) {
-                BuildBuilding(idx, IDX(BUILDING_SLOT_DOCK));
+                BuildBuilding(idx, BUILDING_SLOT_DOCK);
                 giBuildShipyard[giCurPlayer] = -1;
             } else {
                 gpCurPlayer->m_resources[IDX(RES_GOLD)] -= SHIPYARD_GOLD_COST;
@@ -457,7 +457,7 @@ void philAI::CheckBuyStuff(void) {
             if (best.type != PURCHASE_NONE && CanBuyBHC(best)) {
                 switch (best.type) {
                     case PURCHASE_BUILDING:
-                        BuildBuilding(best.pTown, best.what);
+                        BuildBuilding(best.pTown, static_cast<BuildingSlotType>(best.what));
                         break;
                     case PURCHASE_HERO:
                         BuildHero(best.pTown, best.what);
@@ -4526,14 +4526,14 @@ i32 philAI::ChooseToPayRansomOnHero(i32) {
 }
 
 VA(0x004427e1, 0xd7)
-void philAI::BuildBuilding(town* t, i32 building) {
+void philAI::BuildBuilding(town* t, H2_ENUM_PARAM(BuildingSlotType, i32) building) {
     i32 cost[AI_PURCHASE_RESOURCE_COUNT];
     i32 i;
     sprintf(
         gText,
         "Player %d built %s in town %d.\n",
         giCurPlayer,
-        GetBuildingName(t->m_type, BuildingSlotType(building)),
+        GetBuildingName(t->m_type, building),
         t->m_id
     );
     LogStr(gText);
@@ -4541,7 +4541,7 @@ void philAI::BuildBuilding(town* t, i32 building) {
         AiPrint(gText);
         DelayMilli(AI_PURCHASE_DEBUG_DELAY);
     }
-    GetBuildingCost(t->m_type, BuildingSlotType(building), cost, t->m_buildState);
+    GetBuildingCost(t->m_type, building, cost, t->m_buildState);
     for (i = 0; i < AI_PURCHASE_RESOURCE_COUNT; i++)
         gpCurPlayer->m_resources[i] -= cost[i];
     t->BuildBuilding(building);

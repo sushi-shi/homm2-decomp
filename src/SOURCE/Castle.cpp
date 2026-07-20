@@ -725,7 +725,7 @@ i32 CastleHandler(tag_message& message) {
                                  ++loopIndex) {
                             }
                             result = gpTownManager->BuyBuild(
-                                buildingIndex,
+                                static_cast<BuildingSlotType>(buildingIndex),
                                 (gpTownManager->m_affordableBuildings & (1L << buildingIndex)) == 0,
                                 quickFlag
                             );

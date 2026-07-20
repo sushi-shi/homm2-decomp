@@ -65,6 +65,21 @@ H2_ENUM_CLASS_BEGIN(ConfigConnectionType)
     CONFIG_CONNECTION_COUNT  = 2
 H2_ENUM_CLASS_END(ConfigConnectionType)
 
+H2_ENUM_CLASS_BEGIN(ConfigComPort)
+    CONFIG_COM_PORT_UNCONFIGURED = 0,
+    CONFIG_COM_PORT_1            = 1,
+    CONFIG_COM_PORT_2            = 2,
+    CONFIG_COM_PORT_3            = 3,
+    CONFIG_COM_PORT_4            = 4
+H2_ENUM_CLASS_END(ConfigComPort)
+
+H2_ENUM_CLASS_BEGIN(ConfigBaudRate)
+    CONFIG_BAUD_2400  = 2400,
+    CONFIG_BAUD_9600  = 9600,
+    CONFIG_BAUD_19200 = 19200,
+    CONFIG_BAUD_38400 = 38400
+H2_ENUM_CLASS_END(ConfigBaudRate)
+
 struct configStruct {
     ConfigWalkSpeed computerWalkSpeed;
     ConfigWalkSpeed walkSpeed;
@@ -91,8 +106,8 @@ struct configStruct {
     char reservedAfterAutoSave[CONFIG_AUTOSAVE_RESERVED_SIZE];
     ConfigMusicSource musicSource;
     char modemInitString[CONFIG_MODEM_INIT_STRING_SIZE];
-    i32 comPort[IDX(CONFIG_CONNECTION_COUNT)];
-    i32 baudRate[IDX(CONFIG_CONNECTION_COUNT)];
+    H2_ENUM_STORAGE(ConfigComPort, i32) comPort[IDX(CONFIG_CONNECTION_COUNT)];
+    H2_ENUM_STORAGE(ConfigBaudRate, i32) baudRate[IDX(CONFIG_CONNECTION_COUNT)];
     char uniqueSystemID[CONFIG_UNIQUE_SYSTEM_ID_SIZE];
     ConfigOperaMode useOpera;
     i32 quickCombatLevel;
